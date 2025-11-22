@@ -13,7 +13,7 @@ name: main
 object: sys/main.dol
 
 # (optional) SHA-1 hash of the main.dol file for verification.
-hash: 0b3b7c1f48319e28905ca6eff66b815d1c09c6d3
+hash: C96097DB7F61A902AB71C5B1DFD760D9C2103AAA
 
 # (optional) If set, all object paths will be relative to this directory.
 # If not set, all object paths will be relative to the root of the project.

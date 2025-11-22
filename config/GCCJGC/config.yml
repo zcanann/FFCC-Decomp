@@ -38,17 +38,6 @@ symbols: config/GCCJGC/symbols.txt
 # See docs/splits.md for more information.
 splits: config/GCCJGC/splits.txt
 
-# (optional) Path to the DOL's .map file.
-# This path is relative to the root of the project, and is _not_ affected by `object_base`.
-# This should only used for initial analysis, and generating the symbols and splits files.
-# Once those files are generated, remove this to avoid conflicts.
-map: orig/GCCJGC/files/game.MAP
-
-# (optional) Start address of common BSS symbols, if any.
-# Useful along with `map`, but not required otherwise, since common BSS
-# is marked in the splits file.
-common_start: 0x80001234
-
 # (optional) Version used to generate `.comment` sections in the split objects.
 # If not specified, no `.comment` sections will be generated.
 # See docs/comment_section.md for more information.

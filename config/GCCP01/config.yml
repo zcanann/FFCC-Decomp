@@ -38,6 +38,13 @@ symbols: config/GCCP01/symbols.txt
 # See docs/splits.md for more information.
 splits: config/GCCP01/splits.txt
 
+# (optional) Path to the DOL's .map file.
+# This path is relative to the root of the project, and is _not_ affected by `object_base`.
+# This should only used for initial analysis, and generating the symbols and splits files.
+# Once those files are generated, remove this to avoid conflicts.
+# EU map file appears to be from an old build! It cannot be used directly!
+# map: orig/GCCP01/game.MAP
+
 # (optional) Version used to generate `.comment` sections in the split objects.
 # If not specified, no `.comment` sections will be generated.
 # See docs/comment_section.md for more information.
@@ -93,3 +100,66 @@ export_all: true
 # Alternatively, you can set extab_padding on any affected objects in
 # configure.py, in order to exactly match the original DOL.
 clean_extab: false
+
+sections:
+  - name: .init
+    vram: 0x80003100
+    size: 0x24E8
+    file: 0x100
+
+  - name: extab
+    vram: 0x80005600
+    size: 0x5780
+    file: 0x1C5120
+
+  - name: extabindex
+    vram: 0x8000AD80
+    size: 0x7AF0
+    file: 0x1CA8A0
+
+  - name: .text
+    vram: 0x80012880
+    size: 0x1C2B0C
+    file: 0x2600
+
+  - name: .ctors
+    vram: 0x801D53A0
+    size: 0xB8
+    file: 0x1D23A0
+
+  - name: .dtors
+    vram: 0x801D5460
+    size: 0x10
+    file: 0x1D2460
+
+  - name: .rodata
+    vram: 0x801D5480
+    size: 0x12D20
+    file: 0x1D2480
+
+  - name: .data
+    vram: 0x801E81A0
+    size: 0x36B8C
+    file: 0x1E51A0
+
+  - name: .bss
+    vram: 0x8021ED40
+    size: 0x10F670
+
+  - name: .sdata
+    vram: 0x8032E3C0
+    size: 0x87C
+    file: 0x21BD40
+
+  - name: .sbss
+    vram: 0x8032EC40
+    size: 0x9B8
+
+  - name: .sdata2
+    vram: 0x8032F600
+    size: 0x47CC
+    file: 0x21C5C0
+
+  - name: .bss2
+    vram: 0x80333DE0
+    size: 0x24

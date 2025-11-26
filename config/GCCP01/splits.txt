@@ -12,3 +12,6 @@ Sections:
 	.sbss       type:bss align:8
 	.sdata2     type:rodata align:16
 	.sbss2      type:bss align:32
+
+dolphin/os/__start.c:
+	.init       start:0x80003100 end:0x800033e0

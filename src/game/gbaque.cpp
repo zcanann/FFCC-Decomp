@@ -1,0 +1,1461 @@
+
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GbaQueue()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::~GbaQueue()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::Init()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::BlockSem(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ReleaseSem(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::LoadAll()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ClrShopMode()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::LoadMask()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::SetQueue(int, unsigned int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ResetQueue()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ExecutQueue()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ChgItemData(int, unsigned int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ChgMoneyData(int, unsigned int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ChgEquipPosData(int, unsigned int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ChgCmdLstData(int, unsigned int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::SetSellData(int, unsigned int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::SetBuyData(int, unsigned int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::SetSmithData(int, unsigned int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::SetStageNo(int, int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetStageNo(int, int *, int *)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetStageFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ClrStageFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::SetRadarType()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetMBasePos(int, short *, short *)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::LoadAllStat()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::LoadPlayerStat()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::LoadEnemyStat()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::LoadMapItemStat()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetPlayerPos(int, unsigned int *)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetEnemyPos(int, unsigned int *, int *)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetTreasurePos(int, unsigned int *, int *)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetMapObjInfo(int, unsigned char *)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetPlayerStat(int, GbaPInfo *)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetCaravanName(char *)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetItemAll(int, unsigned char *)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaPInfo::operator= (const GbaPInfo &)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetScrFlg()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetPlayerHP(int, unsigned char *)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::MakeLetterList(int, char *)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::MakeLetterData(int, char *, int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetLetterLstFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ClrLetterLstFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetLetterDatFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ClrLetterDatFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::MoveLetterItem(int, unsigned int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ReplyLetter(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::LoadMapObj()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetMapObj(unsigned char *)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetMapObjDrawFlg(unsigned int *)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::SetAddLetter(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetFavoriteFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ClrFavoriteFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetFavorite(int, char *)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetMoneyFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ClrMoneyFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetMoney(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ClrScrInitEnd()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::InitCmakeInfo(int, int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ChkCMakeName(int, unsigned int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaCMakeInfo::operator= (const GbaCMakeInfo &)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ChkCMakeCharaType(int, unsigned int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ChkCMakeJob(int, unsigned int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::CMakeEnd(int, unsigned int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::CMakeBarthday(int, unsigned int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::CMakeFavorite(int, unsigned int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetCompatibilityFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ClrCompatibilityFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetCompatibility(int, unsigned char *)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetCMakeInfo(int, GbaCMakeInfo *)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetCmdData(int, unsigned char *)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetEquipData(int, unsigned char *)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::SetShopFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ClrShopFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::SetSmithFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ClrSmithFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ShopEnd(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::SmithEnd(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::MakeBuyData(int, char *)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::MakeSellData(int, char *)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::MakeSmithData(int, char *)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetSellFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ClrSellFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetBuyFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ClrBuyFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetMkSmithFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ClrMkSmithFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::SetResetFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetBonus(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetArtifactFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ClrArtifactFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetArtifactData(int, unsigned char *)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetUseItemFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetChgUseItemFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ClrChgUseItemFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::SetChgUseItemFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetStrengthFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ClrStrengthFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetStrengthData(int, unsigned char *)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetArtiDatFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ClrArtiDatFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::MakeArtiData(int, char *)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetTmpArtifactData(int, unsigned char *)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetRadarType(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ClrRadarTypeFlg()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetRadarMode(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::SetRadarMode(int, int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetChgRadarMode(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ClrChgRadarMode(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetScouterInfo(int, unsigned char *)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetChgHitFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ClrChgHitFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetChgScouFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ClrChgScouFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::SetHitEnemy(int, int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void HitEInfo::operator= (const HitEInfo &)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetHitEInfo(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::IsSingleMode(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::SetControllerMode(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetControllerMode()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::OpenMenu(int, int, int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::SetPauseMode(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetPauseMode()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetItemUse(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetSPModeFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ClrSPModeFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetSPMode(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetMemorysFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ClrMemorysFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetMemorys(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetCmdNumFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ClrCmdNumFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetCmdNum(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetPlayModeFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ClrPlayModeFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::SetStartBonusFlg()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::GetStartBonusFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void GbaQueue::ClrStartBonusFlg(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void __sinit_gbaque_cpp(void)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGame::GetGbaSP(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGame::GetNumBonusName()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGame::GetLetterReply(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGame::GetLetter(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGame::GetHelpName(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CFlatRuntime2::IsInitFinished()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CFlatRuntime2::CanReplyLetter()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CCaravanWork::IsUseItem()
+{
+	// TODO
+}

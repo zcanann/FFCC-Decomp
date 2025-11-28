@@ -2,8 +2,12 @@
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void WriteCallback(void)
 {
@@ -12,8 +16,12 @@ void WriteCallback(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void EraseCallback(void)
 {
@@ -22,8 +30,12 @@ void EraseCallback(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void CARDWriteAsync(void)
 {
@@ -32,8 +44,12 @@ void CARDWriteAsync(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void CARDWrite(void)
 {

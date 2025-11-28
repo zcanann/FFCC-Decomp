@@ -2,8 +2,12 @@
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void __AXGetStudio(void)
 {
@@ -12,8 +16,12 @@ void __AXGetStudio(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void __AXDepopFade(void)
 {
@@ -22,8 +30,12 @@ void __AXDepopFade(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void __AXPrintStudio(void)
 {
@@ -32,8 +44,12 @@ void __AXPrintStudio(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void __AXSPBInit(void)
 {
@@ -42,8 +58,12 @@ void __AXSPBInit(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void __AXSPBQuit(void)
 {
@@ -52,8 +72,12 @@ void __AXSPBQuit(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void __AXDepopVoice(void)
 {

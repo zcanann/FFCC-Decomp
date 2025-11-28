@@ -2,8 +2,12 @@
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void UpdateIconOffsets(void)
 {
@@ -12,8 +16,12 @@ void UpdateIconOffsets(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void CARDGetStatus(void)
 {
@@ -22,8 +30,12 @@ void CARDGetStatus(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void CARDSetStatusAsync(void)
 {
@@ -32,8 +44,12 @@ void CARDSetStatusAsync(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void CARDSetStatus(void)
 {

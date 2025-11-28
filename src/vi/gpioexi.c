@@ -2,8 +2,12 @@
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void __VIInitI2C(void)
 {
@@ -12,8 +16,12 @@ void __VIInitI2C(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void initGpioExi(void)
 {
@@ -22,8 +30,12 @@ void initGpioExi(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void __VISetSCL(void)
 {
@@ -32,8 +44,12 @@ void __VISetSCL(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void __VIGetSCL(void)
 {
@@ -42,8 +58,12 @@ void __VIGetSCL(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void __VISetSDA(void)
 {
@@ -52,8 +72,12 @@ void __VISetSDA(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void __VIGetSDA(void)
 {
@@ -62,8 +86,12 @@ void __VIGetSDA(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void setVideoReset(void)
 {
@@ -72,8 +100,12 @@ void setVideoReset(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void setI2CEnable(void)
 {
@@ -82,8 +114,12 @@ void setI2CEnable(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void gpioOutput(void)
 {
@@ -92,8 +128,12 @@ void gpioOutput(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void gpioOE(void)
 {
@@ -102,8 +142,12 @@ void gpioOE(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void gpioOut(void)
 {
@@ -112,8 +156,12 @@ void gpioOut(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void gpioInput(void)
 {

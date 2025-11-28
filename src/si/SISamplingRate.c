@@ -2,8 +2,12 @@
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void SISetSamplingRate(void)
 {
@@ -12,8 +16,12 @@ void SISetSamplingRate(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void SIRefreshSamplingRate(void)
 {

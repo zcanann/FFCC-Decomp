@@ -2,8 +2,12 @@
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void __TRK_get_MSR(void)
 {
@@ -12,8 +16,12 @@ void __TRK_get_MSR(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void __TRK_set_MSR(void)
 {
@@ -22,8 +30,12 @@ void __TRK_set_MSR(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void TRK_ppc_memcpy(void)
 {
@@ -32,8 +44,12 @@ void TRK_ppc_memcpy(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void TRKInterruptHandler(void)
 {
@@ -42,8 +58,12 @@ void TRKInterruptHandler(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void TRKExceptionHandler(void)
 {
@@ -52,8 +72,12 @@ void TRKExceptionHandler(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void TRKSwapAndGo(void)
 {
@@ -62,8 +86,12 @@ void TRKSwapAndGo(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void TRKInterruptHandlerEnableInterrupts(void)
 {
@@ -72,8 +100,12 @@ void TRKInterruptHandlerEnableInterrupts(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void ReadFPSCR(void)
 {
@@ -82,8 +114,12 @@ void ReadFPSCR(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void WriteFPSCR(void)
 {
@@ -92,8 +128,12 @@ void WriteFPSCR(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void TRKTargetAccessARAM(void)
 {
@@ -102,8 +142,12 @@ void TRKTargetAccessARAM(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void TRKTargetSetInputPendingPtr(void)
 {
@@ -112,8 +156,12 @@ void TRKTargetSetInputPendingPtr(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void TRKTargetStop(void)
 {
@@ -122,8 +170,12 @@ void TRKTargetStop(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void TRKTargetSetStopped(void)
 {
@@ -132,8 +184,12 @@ void TRKTargetSetStopped(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void TRKTargetStopped(void)
 {
@@ -142,8 +198,12 @@ void TRKTargetStopped(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void TRKTargetSupportRequest(void)
 {
@@ -152,8 +212,12 @@ void TRKTargetSupportRequest(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void TRKTargetGetPC(void)
 {
@@ -162,8 +226,12 @@ void TRKTargetGetPC(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void TRKTargetStepOutOfRange(void)
 {
@@ -172,8 +240,12 @@ void TRKTargetStepOutOfRange(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void TRKTargetSingleStep(void)
 {
@@ -182,8 +254,12 @@ void TRKTargetSingleStep(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void TRKTargetAddExceptionInfo(void)
 {
@@ -192,8 +268,12 @@ void TRKTargetAddExceptionInfo(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void TRKTargetAddStopInfo(void)
 {
@@ -202,8 +282,12 @@ void TRKTargetAddStopInfo(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void TRKTargetInterrupt(void)
 {
@@ -212,8 +296,12 @@ void TRKTargetInterrupt(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void TRKPostInterruptEvent(void)
 {
@@ -222,8 +310,12 @@ void TRKPostInterruptEvent(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void TRKTargetAccessExtended2(void)
 {
@@ -232,8 +324,12 @@ void TRKTargetAccessExtended2(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void TRKTargetAccessExtended1(void)
 {
@@ -242,8 +338,12 @@ void TRKTargetAccessExtended1(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void TRKTargetAccessFP(void)
 {
@@ -252,8 +352,12 @@ void TRKTargetAccessFP(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void TRKTargetAccessDefault(void)
 {
@@ -262,8 +366,12 @@ void TRKTargetAccessDefault(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void TRKTargetReadInstruction(void)
 {
@@ -272,8 +380,12 @@ void TRKTargetReadInstruction(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void TRKTargetAccessMemory(void)
 {
@@ -282,8 +394,12 @@ void TRKTargetAccessMemory(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void TRKValidMemory32(void)
 {

@@ -2,8 +2,12 @@
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void THPVideoDecode(void)
 {
@@ -12,8 +16,12 @@ void THPVideoDecode(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void __THPSetupBuffers(void)
 {
@@ -22,8 +30,12 @@ void __THPSetupBuffers(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void __THPReadFrameHeader(void)
 {
@@ -32,8 +44,12 @@ void __THPReadFrameHeader(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void __THPReadScaneHeader(void)
 {
@@ -42,8 +58,12 @@ void __THPReadScaneHeader(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void __THPReadQuantizationTable(void)
 {
@@ -52,8 +72,12 @@ void __THPReadQuantizationTable(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void __THPReadHuffmanTableSpecification(void)
 {
@@ -62,8 +86,12 @@ void __THPReadHuffmanTableSpecification(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void __THPHuffGenerateSizeTable(void)
 {
@@ -72,8 +100,12 @@ void __THPHuffGenerateSizeTable(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void __THPHuffGenerateCodeTable(void)
 {
@@ -82,8 +114,12 @@ void __THPHuffGenerateCodeTable(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void __THPHuffGenerateDecoderTables(void)
 {
@@ -92,8 +128,12 @@ void __THPHuffGenerateDecoderTables(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void __THPRestartDefinition(void)
 {
@@ -102,8 +142,12 @@ void __THPRestartDefinition(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void __THPPrepBitStream(void)
 {
@@ -112,8 +156,12 @@ void __THPPrepBitStream(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void __THPDecompressYUV(void)
 {
@@ -122,8 +170,12 @@ void __THPDecompressYUV(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void __THPDecompressiMCURow512x448(void)
 {
@@ -132,8 +184,12 @@ void __THPDecompressiMCURow512x448(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void __THPDecompressiMCURow640x480(void)
 {
@@ -142,8 +198,12 @@ void __THPDecompressiMCURow640x480(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void __THPDecompressiMCURowNxN(void)
 {
@@ -152,8 +212,12 @@ void __THPDecompressiMCURowNxN(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void __THPHuffDecodeDCTCompY(void)
 {
@@ -162,8 +226,12 @@ void __THPHuffDecodeDCTCompY(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void __THPHuffDecodeDCTCompU(void)
 {
@@ -172,8 +240,12 @@ void __THPHuffDecodeDCTCompU(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void __THPHuffDecodeDCTCompV(void)
 {
@@ -182,8 +254,12 @@ void __THPHuffDecodeDCTCompV(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * JP Address: 
+ * JP Size: 
+ * PAL Address: 
+ * PAL Size: 
+ * EN Address: 
+ * EN Size: 
  */
 void THPInit(void)
 {

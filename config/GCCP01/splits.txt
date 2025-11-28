@@ -14,4 +14,4 @@ Sections:
 	.sbss2      type:bss align:32
 
 dolphin/os/__start.c:
-	.init       start:0x80003100 end:0x800033e0
+	.init       start:0x80003100 end:0x80003340

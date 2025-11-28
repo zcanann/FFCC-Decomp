@@ -1127,6 +1127,565 @@ prgobj.cpp:
 pppBindOnlyPos.cpp:
 	.text       start:0x80127B54 end:0x80127B74
 
+p_minigame.cpp:
+	extab       start:0x8000970C end:0x8000976C
+	extabindex  start:0x8001075C end:0x800107EC
+	.text       start:0x80127B74 end:0x8012B24C
+	.ctors      start:0x801D543C end:0x801D5440
+
+pppLerpPos.cpp:
+	extab       start:0x8000976C end:0x8000977C
+	extabindex  start:0x800107EC end:0x80010804
+	.text       start:0x8012B24C end:0x8012B4A8
+
+pppScaleLoopAuto.cpp:
+	extab       start:0x8000977C end:0x80009784
+	extabindex  start:0x80010804 end:0x80010810
+	.text       start:0x8012B4A8 end:0x8012B710
+
+p_dbgmenu.cpp:
+	extab       start:0x80009784 end:0x800097EC
+	extabindex  start:0x80010810 end:0x800108AC
+	.text       start:0x8012B710 end:0x8012D3FC
+	.ctors      start:0x801D5440 end:0x801D5444
+
+pppChangeBGColor.cpp:
+	.text       start:0x8012D3FC end:0x8012D458
+
+pppScreenBreak.cpp:
+	extab       start:0x800097EC end:0x80009834
+	extabindex  start:0x800108AC end:0x80010918
+	.text       start:0x8012D458 end:0x8012E5DC
+
+monobj_boss.cpp:
+	extab       start:0x80009834 end:0x80009A34
+	extabindex  start:0x80010918 end:0x80010C18
+	.text       start:0x8012E5DC end:0x80133108
+
+bonus_menu.cpp:
+	extab       start:0x80009A34 end:0x80009AC4
+	extabindex  start:0x80010C18 end:0x80010CF0
+	.text       start:0x80133108 end:0x8013E294
+
+pppScreenBlur.cpp:
+	extab       start:0x80009AC4 end:0x80009ADC
+	extabindex  start:0x80010CF0 end:0x80010D14
+	.text       start:0x8013E294 end:0x8013E3BC
+
+pppScreenQuake.cpp:
+	extab       start:0x80009ADC end:0x80009AEC
+	extabindex  start:0x80010D14 end:0x80010D2C
+	.text       start:0x8013E3BC end:0x8013E584
+
+pppCharaZEnvCtrl.cpp:
+	extab       start:0x80009AEC end:0x80009B0C
+	extabindex  start:0x80010D2C end:0x80010D5C
+	.text       start:0x8013E584 end:0x8013E694
+
+pppCrystal2.cpp:
+	extab       start:0x80009B0C end:0x80009B24
+	extabindex  start:0x80010D5C end:0x80010D80
+	.text       start:0x8013E694 end:0x8013EF94
+
+pppChangeTex.cpp:
+	extab       start:0x80009B24 end:0x80009B4C
+	extabindex  start:0x80010D80 end:0x80010DBC
+	.text       start:0x8013EF94 end:0x8013F9D0
+
+pppCharaBreak.cpp:
+	extab       start:0x80009B4C end:0x80009B84
+	extabindex  start:0x80010DBC end:0x80010E10
+	.text       start:0x8013F9D0 end:0x80141204
+
+pppCallBackDistance.cpp:
+	extab       start:0x80009B84 end:0x80009B94
+	extabindex  start:0x80010E10 end:0x80010E28
+	.text       start:0x80141204 end:0x8014139C
+
+pppParHitSphMat.cpp:
+	extab       start:0x80009B94 end:0x80009B9C
+	extabindex  start:0x80010E28 end:0x80010E34
+	.text       start:0x8014139C end:0x80141550
+
+astar.cpp:
+	extab       start:0x80009B9C end:0x80009BFC
+	extabindex  start:0x80010E34 end:0x80010EC4
+	.text       start:0x80141550 end:0x80143098
+	.ctors      start:0x801D5444 end:0x801D5448
+
+pppConstrainCameraDir.cpp:
+	extab       start:0x80009BFC end:0x80009C04
+	extabindex  start:0x80010EC4 end:0x80010ED0
+	.text       start:0x80143098 end:0x801432E0
+
+pppFilter.cpp:
+	extab       start:0x80009C04 end:0x80009C0C
+	extabindex  start:0x80010ED0 end:0x80010EDC
+	.text       start:0x801432E0 end:0x801433B8
+
+monobj_table.cpp:
+	extab       start:0x80009C0C end:0x80009C14
+	extabindex  start:0x80010EDC end:0x80010EE8
+	.text       start:0x801433B8 end:0x801453F4
+	.ctors      start:0x801D5448 end:0x801D544C
+
+singmenu.cpp:
+	extab       start:0x80009C14 end:0x80009D04
+	extabindex  start:0x80010EE8 end:0x80011050
+	.text       start:0x801453F4 end:0x8014A940
+
+menu_cmd.cpp:
+	extab       start:0x80009D04 end:0x80009D94
+	extabindex  start:0x80011050 end:0x80011128
+	.text       start:0x8014A940 end:0x801503C8
+
+shopmenu.cpp:
+	extab       start:0x80009D94 end:0x80009E54
+	extabindex  start:0x80011128 end:0x80011248
+	.text       start:0x801503C8 end:0x80159654
+
+menu_item.cpp:
+	extab       start:0x80009E54 end:0x80009E8C
+	extabindex  start:0x80011248 end:0x8001129C
+	.text       start:0x80159654 end:0x8015B158
+
+menu_equip.cpp:
+	extab       start:0x80009E8C end:0x80009ED4
+	extabindex  start:0x8001129C end:0x80011308
+	.text       start:0x8015B158 end:0x8015D798
+
+menu_tmparti.cpp:
+	extab       start:0x80009ED4 end:0x80009EF4
+	extabindex  start:0x80011308 end:0x80011338
+	.text       start:0x8015D798 end:0x8015E37C
+
+menu_money.cpp:
+	extab       start:0x80009EF4 end:0x80009F1C
+	extabindex  start:0x80011338 end:0x80011374
+	.text       start:0x8015E37C end:0x8015FA28
+
+menu_arti.cpp:
+	extab       start:0x80009F1C end:0x80009F54
+	extabindex  start:0x80011374 end:0x800113C8
+	.text       start:0x8015FA28 end:0x80160EDC
+
+menu_compa.cpp:
+	extab       start:0x80009F54 end:0x80009F7C
+	extabindex  start:0x800113C8 end:0x80011404
+	.text       start:0x80160EDC end:0x80162360
+
+menu_favo.cpp:
+	extab       start:0x80009F7C end:0x80009FAC
+	extabindex  start:0x80011404 end:0x8001144C
+	.text       start:0x80162360 end:0x8016394C
+
+menu_letter.cpp:
+	extab       start:0x80009FAC end:0x8000A004
+	extabindex  start:0x8001144C end:0x800114D0
+	.text       start:0x8016394C end:0x80167DD4
+
+pppConstrainCameraForLoc.cpp:
+	extab       start:0x8000A004 end:0x8000A01C
+	extabindex  start:0x800114D0 end:0x800114F4
+	.text       start:0x80167DD4 end:0x80168130
+
+goout.cpp:
+	extab       start:0x8000A01C end:0x8000A06C
+	extabindex  start:0x800114F4 end:0x8001156C
+	.text       start:0x80168130 end:0x8016C9E8
+
+pppDrawMatrixLoc.cpp:
+	extab       start:0x8000A06C end:0x8000A074
+	extabindex  start:0x8001156C end:0x80011578
+	.text       start:0x8016C9E8 end:0x8016CA80
+
+pppConstrainCameraDir2.cpp:
+	extab       start:0x8000A074 end:0x8000A07C
+	extabindex  start:0x80011578 end:0x80011584
+	.text       start:0x8016CA80 end:0x8016CD30
+
+pppFovAdjustMatrix.cpp:
+	.text       start:0x8016CD30 end:0x8016CD3C
+
+cmake.cpp:
+	extab       start:0x8000A07C end:0x8000A12C
+	extabindex  start:0x80011584 end:0x8001168C
+	.text       start:0x8016CD3C end:0x8017474C
+
+menu_lst.cpp:
+	extab       start:0x8000A12C end:0x8000A14C
+	extabindex  start:0x8001168C end:0x800116BC
+	.text       start:0x8017474C end:0x801754E0
+
+pppLaser.cpp:
+	extab       start:0x8000A14C end:0x8000A16C
+	extabindex  start:0x800116BC end:0x800116EC
+	.text       start:0x801754E0 end:0x8017683C
+
+MenuUtil.cpp:
+	extab       start:0x8000A16C end:0x8000A1CC
+	extabindex  start:0x800116EC end:0x8001177C
+	.text       start:0x8017683C end:0x8017AF14
+
+wmm_str.cpp:
+	extab       start:0x8000A1CC end:0x8000A1DC
+	extabindex  start:0x8001177C end:0x80011794
+	.text       start:0x8017AF14 end:0x8017B494
+
+base/PPCArch.c:
+	.text       start:0x8017B494 end:0x8017B5A8
+
+db/db.c:
+	.text       start:0x8017B5A8 end:0x8017B694
+
+os/OS.c:
+	.text       start:0x8017B694 end:0x8017C180
+
+os/OSAlarm.c:
+	.text       start:0x8017C180 end:0x8017C8E8
+
+os/OSAlloc.c:
+	.text       start:0x8017C8E8 end:0x8017CBF8
+
+os/OSArena.c:
+	.text       start:0x8017CBF8 end:0x8017CC18
+
+os/OSAudioSystem.c:
+	.text       start:0x8017CC18 end:0x8017CEAC
+
+os/OSCache.c:
+	.text       start:0x8017CEAC end:0x8017D4F8
+
+os/OSContext.c:
+	.text       start:0x8017D4F8 end:0x8017DD68
+
+os/OSInterrupt.c:
+	.text       start:0x8017E340 end:0x8017EBAC
+
+os/OSLink.c:
+	.text       start:0x8017EBAC end:0x8017EBC4
+
+os/OSMessage.c:
+	.text       start:0x8017EBC4 end:0x8017EDC8
+
+os/OSMemory.c:
+	.text       start:0x8017EDC8 end:0x8017F0AC
+
+os/OSMutex.c:
+	.text       start:0x8017F0AC end:0x8017F11C
+
+os/OSReboot.c:
+	.text       start:0x8017F11C end:0x8017F478
+
+os/OSReset.c:
+	.text       start:0x8017F478 end:0x8017F86C
+
+os/OSResetSW.c:
+	.text       start:0x8017F86C end:0x8017FBF8
+
+os/OSRtc.c:
+	.text       start:0x8017FBF8 end:0x80180690
+
+os/OSSemaphore.c:
+	.text       start:0x80180690 end:0x80180814
+
+os/OSStopwatch.c:
+	.text       start:0x80180814 end:0x80180970
+
+os/OSSync.c:
+	.text       start:0x80180970 end:0x801809F4
+
+os/OSThread.c:
+	.text       start:0x801809F4 end:0x80181BF8
+
+os/OSTime.c:
+	.text       start:0x80181BF8 end:0x8018201C
+
+os/__ppc_eabi_init.c:
+	.text       start:0x8018201C end:0x801820B0
+
+exi/EXIBios.c:
+	.text       start:0x801820B0 end:0x80183A8C
+
+exi/EXIUart.c:
+	.text       start:0x80183A8C end:0x80184060
+
+si/SIBios.c:
+	.text       start:0x80184060 end:0x801858B0
+
+si/SISamplingRate.c:
+	.text       start:0x801858B0 end:0x801859B8
+
+mtx/mtx.c:
+	.text       start:0x801859B8 end:0x801863F4
+
+mtx/mtxvec.c:
+	.text       start:0x801863F4 end:0x80186528
+
+mtx/mtx44.c:
+	.text       start:0x80186528 end:0x80186BFC
+
+mtx/mtx44vec.c:
+	.text       start:0x80186BFC end:0x80186C74
+
+mtx/vec.c:
+	.text       start:0x80186C74 end:0x80186F24
+
+mtx/quat.c:
+	.text       start:0x80186F24 end:0x80187490
+
+dvd/dvdlow.c:
+	.text       start:0x80187490 end:0x801882D0
+
+dvd/dvdfs.c:
+	.text       start:0x801882D0 end:0x80188A70
+
+dvd/dvd.c:
+	.text       start:0x80188A70 end:0x8018B16C
+
+dvd/dvdqueue.c:
+	.text       start:0x8018B16C end:0x8018B364
+
+dvd/dvderror.c:
+	.text       start:0x8018B364 end:0x8018B4FC
+
+dvd/dvdidutils.c:
+	.text       start:0x8018B4FC end:0x8018B5F4
+
+dvd/dvdFatal.c:
+	.text       start:0x8018B5F4 end:0x8018B624
+
+dvd/fstload.c:
+	.text       start:0x8018B624 end:0x8018B864
+
+vi/vi.c:
+	.text       start:0x8018B864 end:0x8018D298
+
+pad/Padclamp.c:
+	.text       start:0x8018D298 end:0x8018D4DC
+
+pad/Pad.c:
+	.text       start:0x8018D4DC end:0x8018EE04
+
+ai/ai.c:
+	.text       start:0x8018EE04 end:0x8018F710
+
+ar/ar.c:
+	.text       start:0x8018F710 end:0x801911E8
+
+ar/arq.c:
+	.text       start:0x801911E8 end:0x801915A4
+
+ax/AX.c:
+	.text       start:0x801915A4 end:0x80191614
+
+ax/AXAlloc.c:
+	.text       start:0x80191614 end:0x80191ADC
+
+ax/AXAux.c:
+	.text       start:0x80191ADC end:0x80191F7C
+
+ax/AXCL.c:
+	.text       start:0x80191F7C end:0x801926B4
+
+ax/AXOut.c:
+	.text       start:0x801926B4 end:0x80192DA0
+
+ax/AXSPB.c:
+	.text       start:0x80192DA0 end:0x80193268
+
+ax/AXVPB.c:
+	.text       start:0x80193268 end:0x80193E28
+
+ax/AXProf.c:
+	.text       start:0x80193E28 end:0x80193E70
+
+axfx/reverb_hi.c:
+	.text       start:0x80193E70 end:0x80194F34
+
+axfx/reverb_std.c:
+	.text       start:0x80194F34 end:0x80195B30
+
+axfx/chorus.c:
+	.text       start:0x80195B30 end:0x80196518
+
+axfx/delay.c:
+	.text       start:0x80196518 end:0x801969C4
+
+axfx/axfx.c:
+	.text       start:0x801969C4 end:0x80196A20
+
+axfx/reverb_hi_4ch.c:
+	.text       start:0x80196A20 end:0x80197958
+
+mix/mix.c:
+	.text       start:0x80197958 end:0x80197978
+
+axart/axart.c:
+	.text       start:0x80197978 end:0x80197A0C
+
+axart/axart3d.c:
+	.text       start:0x80197A0C end:0x80197A1C
+
+dsp/dsp.c:
+	.text       start:0x80197A1C end:0x80197CAC
+
+dsp/dsp_debug.c:
+	.text       start:0x80197CAC end:0x80197CFC
+
+dsp/dsp_task.c:
+	.text       start:0x80197CFC end:0x80198580
+
+card/CARDBios.c:
+	.text       start:0x80198580 end:0x801998E8
+
+card/CARDUnlock.c:
+	.text       start:0x801998E8 end:0x8019AB48
+
+card/CARDRdwr.c:
+	.text       start:0x8019AB48 end:0x8019ADC8
+
+card/CARDBlock.c:
+	.text       start:0x8019ADC8 end:0x8019B1CC
+
+card/CARDDir.c:
+	.text       start:0x8019B1CC end:0x8019B430
+
+card/CARDCheck.c:
+	.text       start:0x8019B430 end:0x8019C36C
+
+card/CARDMount.c:
+	.text       start:0x8019C36C end:0x8019CE2C
+
+card/CARDFormat.c:
+	.text       start:0x8019CE2C end:0x8019D664
+
+card/CARDOpen.c:
+	.text       start:0x8019D664 end:0x8019DC18
+
+card/CARDCreate.c:
+	.text       start:0x8019DC18 end:0x8019DFB0
+
+card/CARDRead.c:
+	.text       start:0x8019DFB0 end:0x8019E428
+
+card/CARDWrite.c:
+	.text       start:0x8019E428 end:0x8019E7A4
+
+card/CARDDelete.c:
+	.text       start:0x8019E7A4 end:0x8019E9A0
+
+card/CARDStat.c:
+	.text       start:0x8019E9A0 end:0x8019EE80
+
+card/CARDNet.c:
+	.text       start:0x8019EE80 end:0x8019EF44
+
+gx/GXInit.c:
+	.text       start:0x8019EF44 end:0x801A02C8
+
+gx/GXFifo.c:
+	.text       start:0x801A02C8 end:0x801A0B10
+
+gx/GXAttr.c:
+	.text       start:0x801A0B10 end:0x801A1C80
+
+gx/GXMisc.c:
+	.text       start:0x801A1C80 end:0x801A2424
+
+gx/GXGeometry.cpp:
+	.text       start:0x801A2424 end:0x801A27D4
+
+gx/GXFrameBuf.c:
+	.text       start:0x801A27D4 end:0x801A34F0
+
+gx/GXLight.c:
+	.text       start:0x801A34F0 end:0x801A3B78
+
+gx/GXTexture.c:
+	.text       start:0x801A3B78 end:0x801A4B44
+
+gx/GXBump.c:
+	.text       start:0x801A4B44 end:0x801A51D8
+
+gx/GXTev.c:
+	.text       start:0x801A51D8 end:0x801A59BC
+
+gx/GXPixel.c:
+	.text       start:0x801A59BC end:0x801A5FF4
+
+gx/GXStubs.c:
+	.text       start:0x801A5FF4 end:0x801A5FF8
+
+gx/GXDisplayList.c:
+	.text       start:0x801A5FF8 end:0x801A6204
+
+gx/GXTransform.c:
+	.text       start:0x801A6204 end:0x801A69B4
+
+gx/GXPerf.c:
+	.text       start:0x801A69B4 end:0x801A740C
+
+gba/GBA.c:
+	.text       start:0x801A740C end:0x801A76FC
+
+gba/GBAGetProcessStatus.c:
+	.text       start:0x801A76FC end:0x801A7870
+
+gba/GBAJoyBoot.c:
+	.text       start:0x801A7870 end:0x801A877C
+
+gba/GBARead.c:
+	.text       start:0x801A877C end:0x801A88DC
+
+gba/GBAWrite.c:
+	.text       start:0x801A88DC end:0x801A8A64
+
+gba/GBAXfer.c:
+	.text       start:0x801A8A64 end:0x801A8D9C
+
+gba/GBAKey.c:
+	.text       start:0x801A8D9C end:0x801A9004
+
+TRK_MINNOW_DOLPHIN/mainloop.c:
+	.text       start:0x801A9004 end:0x801A90FC
+
+TRK_MINNOW_DOLPHIN/nubevent.c:
+	.text       start:0x801A90FC end:0x801A9324
+
+TRK_MINNOW_DOLPHIN/nubinit.c:
+	.text       start:0x801A9324 end:0x801A94BC
+
+TRK_MINNOW_DOLPHIN/msg.c:
+	.text       start:0x801A94BC end:0x801A9500
+
+TRK_MINNOW_DOLPHIN/msgbuf.c:
+	.text       start:0x801A9500 end:0x801A9D3C
+
+TRK_MINNOW_DOLPHIN/serpoll.c:
+	.text       start:0x801A9D3C end:0x801A9FF4
+
+TRK_MINNOW_DOLPHIN/usr_put.c:
+	.text       start:0x801A9FF4 end:0x801AA080
+
+TRK_MINNOW_DOLPHIN/dispatch.c:
+	.text       start:0x801AA080 end:0x801AA1F8
+
+TRK_MINNOW_DOLPHIN/msghndlr.c:
+	.text       start:0x801AA1F8 end:0x801AB268
+
+TRK_MINNOW_DOLPHIN/support.c:
+	.text       start:0x801AB268 end:0x801AB97C
+
+TRK_MINNOW_DOLPHIN/mutex_TRK.c:
+	.text       start:0x801AB97C end:0x801AB994
+
+TRK_MINNOW_DOLPHIN/notify.c:
+	.text       start:0x801AB994 end:0x801ABA2C
+
+TRK_MINNOW_DOLPHIN/flush_cache.c:
+	.text       start:0x801ABA2C end:0x801ABA64
+
 dolphin/os/__start.c:
 	.init       start:0x80003100 end:0x80003340
 
@@ -1135,12 +1694,277 @@ dolphin/os/__ppc_eabi_init.cpp:
 
 TRK_MINNOW_DOLPHIN/mem_TRK.c:
 	.init       start:0x80003458 end:0x80003488
+	.text       start:0x801ABA64 end:0x801ABB1C
+
+TRK_MINNOW_DOLPHIN/targimpl.c:
+	.text       start:0x801ABB1C end:0x801AD6B0
+
+TRK_MINNOW_DOLPHIN/targsupp.c:
+	.text       start:0x801AD6B0 end:0x801AD6D0
+
+TRK_MINNOW_DOLPHIN/mpc_7xx_603e.c:
+	.text       start:0x801AD6D0 end:0x801ADA40
 
 TRK_MINNOW_DOLPHIN/__exception.s:
 	.init       start:0x800034AC end:0x800053E0
 
 TRK_MINNOW_DOLPHIN/dolphin_trk.c:
 	.init       start:0x800053E0 end:0x8000540C
+	.text       start:0x801ADA40 end:0x801AE07C
+
+TRK_MINNOW_DOLPHIN/main_TRK.c:
+	.text       start:0x801AE07C end:0x801AE0D4
+
+TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c:
+	.text       start:0x801AE0D4 end:0x801AE62C
+
+TRK_MINNOW_DOLPHIN/targcont.c:
+	.text       start:0x801AE62C end:0x801AE660
+
+TRK_MINNOW_DOLPHIN/target_options.c:
+	.text       start:0x801AE660 end:0x801AE67C
+
+TRK_MINNOW_DOLPHIN/mslsupp.c:
+	.text       start:0x801AE67C end:0x801AECBC
+
+TRK_MINNOW_DOLPHIN/UDP_Stubs.c:
+	.text       start:0x801AECBC end:0x801AED04
+
+TRK_MINNOW_DOLPHIN/main.c:
+	.text       start:0x801AED04 end:0x801AF048
+
+TRK_MINNOW_DOLPHIN/CircleBuffer.c:
+	.text       start:0x801AF048 end:0x801AF2B0
+
+TRK_MINNOW_DOLPHIN/MWTrace.c:
+	.text       start:0x801AF5FC end:0x801AF64C
+
+TRK_MINNOW_DOLPHIN/MWCriticalSection_gc.c:
+	.text       start:0x801AF64C end:0x801AF6A4
+
+Runtime/PPCEABI/H/__va_arg.c:
+	.text       start:0x801AF6A4 end:0x801AF76C
+
+Runtime/PPCEABI/H/global_destructor_chain.c:
+	.text       start:0x801AF76C end:0x801AF7CC
+	.dtors      start:0x801D5468 end:0x801D546C
+
+Runtime/PPCEABI/H/CPlusLibPPC.cp:
+	.text       start:0x801AF7CC end:0x801AF7FC
+
+Runtime/PPCEABI/H/New.cp:
+	extab       start:0x8000A1DC end:0x8000A204
+	extabindex  start:0x80011794 end:0x800117A0
+	.text       start:0x801AF7FC end:0x801AF87C
+
+Runtime/PPCEABI/H/NMWException.cp:
+	extab       start:0x8000A204 end:0x8000A26C
+	extabindex  start:0x800117A0 end:0x8001180C
+	.text       start:0x801AF87C end:0x801AFEEC
+
+Runtime/PPCEABI/H/ptmf.p:
+	.text       start:0x801AFEEC end:0x801AFF44
+
+Runtime/PPCEABI/H/runtime.p:
+	.text       start:0x801AFF44 end:0x801B063C
+
+Runtime/PPCEABI/H/Gecko_ExceptionPPC.cp:
+	extab       start:0x8000A26C end:0x8000A2E0
+	extabindex  start:0x8001180C end:0x80011860
+	.text       start:0x801B06B8 end:0x801B1AF0
+
+Runtime/PPCEABI/H/GCN_mem_alloc.p:
+	.text       start:0x801B1AF0 end:0x801B1C60
+
+MSL_C/PPCEABI/bare/H/abort_exit.c:
+	.text       start:0x801B1C60 end:0x801B1DEC
+
+MSL_C/PPCEABI/bare/H/alloc.c:
+	.text       start:0x801B1DEC end:0x801B2CC4
+
+MSL_C/PPCEABI/bare/H/ansi_files.c:
+	.text       start:0x801B2CC4 end:0x801B2FD4
+
+MSL_C/PPCEABI/bare/H/ansi_fp.c:
+	.text       start:0x801B2FD4 end:0x801B4F28
+
+MSL_C/PPCEABI/bare/H/buffer_io.c:
+	.text       start:0x801B4F28 end:0x801B5294
+
+MSL_C/PPCEABI/bare/H/gamecube.c:
+	.text       start:0x801B5294 end:0x801B52A0
+
+MSL_C/PPCEABI/bare/H/ctype.c:
+	.text       start:0x801B52A0 end:0x801B52C4
+
+MSL_C/PPCEABI/bare/H/direct_io.c:
+	.text       start:0x801B52C4 end:0x801B5A18
+
+MSL_C/PPCEABI/bare/H/file_io.c:
+	.text       start:0x801B5A18 end:0x801B60D8
+
+MSL_C/PPCEABI/bare/H/FILE_POS.c:
+	.text       start:0x801B60D8 end:0x801B6498
+
+MSL_C/PPCEABI/bare/H/mbstring.c:
+	.text       start:0x801B6498 end:0x801B65B0
 
 MSL_C/PPCEABI/bare/H/mem.c:
 	.init       start:0x8000540C end:0x80005544
+	.text       start:0x801B65B0 end:0x801B6720
+
+MSL_C/PPCEABI/bare/H/mem_funcs.c:
+	.text       start:0x801B6720 end:0x801B69F0
+
+MSL_C/PPCEABI/bare/H/misc_io.c:
+	.text       start:0x801B69F0 end:0x801B6A10
+
+MSL_C/PPCEABI/bare/H/printf.c:
+	.text       start:0x801B6A10 end:0x801B8B10
+
+MSL_C/PPCEABI/bare/H/rand.c:
+	.text       start:0x801B8B10 end:0x801B8B30
+
+MSL_C/PPCEABI/bare/H/signal.c:
+	.text       start:0x801B8B30 end:0x801B8BF0
+
+MSL_C/PPCEABI/bare/H/string.c:
+	.text       start:0x801B8BF0 end:0x801B90B8
+
+MSL_C/PPCEABI/bare/H/wchar_io.c:
+	.text       start:0x801B90B8 end:0x801B9140
+
+MSL_C/PPCEABI/bare/H/uart_console_io_gcn.c:
+	.text       start:0x801B9140 end:0x801B9210
+
+MSL_C/PPCEABI/bare/H/e_acos.c:
+	.text       start:0x801B9210 end:0x801B944C
+
+MSL_C/PPCEABI/bare/H/e_atan2.c:
+	.text       start:0x801B944C end:0x801B96DC
+
+MSL_C/PPCEABI/bare/H/e_fmod.c:
+	.text       start:0x801B96DC end:0x801B9A18
+
+MSL_C/PPCEABI/bare/H/e_pow.c:
+	.text       start:0x801B9A18 end:0x801BA248
+
+MSL_C/PPCEABI/bare/H/e_rem_pio2.c:
+	.text       start:0x801BA248 end:0x801BA5E8
+
+MSL_C/PPCEABI/bare/H/k_cos.c:
+	.text       start:0x801BA5E8 end:0x801BA6DC
+
+MSL_C/PPCEABI/bare/H/k_rem_pio2.c:
+	.text       start:0x801BA6DC end:0x801BB530
+
+MSL_C/PPCEABI/bare/H/k_sin.c:
+	.text       start:0x801BB530 end:0x801BB5D0
+
+MSL_C/PPCEABI/bare/H/k_tan.c:
+	.text       start:0x801BB5D0 end:0x801BB7E4
+
+MSL_C/PPCEABI/bare/H/s_atan.c:
+	.text       start:0x801BB7E4 end:0x801BB9FC
+
+MSL_C/PPCEABI/bare/H/s_copysign.c:
+	.text       start:0x801BB9FC end:0x801BBA24
+
+MSL_C/PPCEABI/bare/H/s_cos.c:
+	.text       start:0x801BBA24 end:0x801BBAF8
+
+MSL_C/PPCEABI/bare/H/s_floor.c:
+	.text       start:0x801BBAF8 end:0x801BBC40
+
+MSL_C/PPCEABI/bare/H/s_frexp.c:
+	.text       start:0x801BBC40 end:0x801BBCCC
+
+MSL_C/PPCEABI/bare/H/s_ldexp.c:
+	.text       start:0x801BBCCC end:0x801BBE90
+
+MSL_C/PPCEABI/bare/H/s_modf.c:
+	.text       start:0x801BBE90 end:0x801BBF8C
+
+MSL_C/PPCEABI/bare/H/s_sin.c:
+	.text       start:0x801BBF8C end:0x801BC064
+
+MSL_C/PPCEABI/bare/H/s_tan.c:
+	.text       start:0x801BC064 end:0x801BC0DC
+
+MSL_C/PPCEABI/bare/H/w_acos.c:
+	.text       start:0x801BC0DC end:0x801BC0FC
+
+MSL_C/PPCEABI/bare/H/w_atan2.c:
+	.text       start:0x801BC0FC end:0x801BC11C
+
+MSL_C/PPCEABI/bare/H/w_fmod.c:
+	.text       start:0x801BC11C end:0x801BC13C
+
+MSL_C/PPCEABI/bare/H/w_pow.c:
+	.text       start:0x801BC13C end:0x801BC15C
+
+MSL_C/PPCEABI/bare/H/e_sqrt.c:
+	.text       start:0x801BC15C end:0x801BC380
+
+MSL_C/PPCEABI/bare/H/math_ppc.c:
+	.text       start:0x801BC380 end:0x801BC434
+
+MSL_C/PPCEABI/bare/H/w_sqrt.c:
+	.text       start:0x801BC434 end:0x801BC454
+
+amcstubs/AmcExi2Stubs.c:
+	.text       start:0x801BC454 end:0x801BC484
+
+odenotstub/odenotstub.c:
+	.text       start:0x801BC484 end:0x801BC48C
+
+OdemuExi2/DebuggerDriver.c:
+	.text       start:0x801BC48C end:0x801BCF0C
+
+RedSound/RedDriver.cpp:
+	extab       start:0x8000A2E0 end:0x8000A5B8
+	extabindex  start:0x80011860 end:0x80011CA4
+	.text       start:0x801BCF0C end:0x801BFF34
+	.ctors      start:0x801D544C end:0x801D5450
+
+RedSound/RedMemory.cpp:
+	extab       start:0x8000A5B8 end:0x8000A5F8
+	extabindex  start:0x80011CA4 end:0x80011D04
+	.text       start:0x801BFF34 end:0x801C05F8
+
+RedSound/RedEntry.cpp:
+	extab       start:0x8000A5F8 end:0x8000A760
+	extabindex  start:0x80011D04 end:0x80011F20
+	.text       start:0x801C05F8 end:0x801C2FC4
+
+RedSound/RedExecute.cpp:
+	extab       start:0x8000A760 end:0x8000A880
+	extabindex  start:0x80011F20 end:0x800120D0
+	.text       start:0x801C2FC4 end:0x801C7478
+
+RedSound/RedMidiCtrl.cpp:
+	extab       start:0x8000A880 end:0x8000AB00
+	extabindex  start:0x800120D0 end:0x80012490
+	.text       start:0x801C7478 end:0x801CA038
+
+RedSound/RedCommand.cpp:
+	extab       start:0x8000AB00 end:0x8000AB80
+	extabindex  start:0x80012490 end:0x80012550
+	.text       start:0x801CA038 end:0x801CB93C
+
+RedSound/RedStream.cpp:
+	extab       start:0x8000AB80 end:0x8000ABC8
+	extabindex  start:0x80012550 end:0x800125BC
+	.text       start:0x801CB93C end:0x801CCA34
+
+RedSound/RedSound.cpp:
+	extab       start:0x8000ABC8 end:0x8000AD80
+	extabindex  start:0x800125BC end:0x80012850
+	.text       start:0x801CCA34 end:0x801CD8F4
+	.ctors      start:0x801D5450 end:0x801D5454
+
+thp/THPDec.c:
+	.text       start:0x801CD8F4 end:0x801D4E5C
+
+thp/THPAudio.c:
+	.text       start:0x801D4E5C end:0x801D538C

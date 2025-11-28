@@ -1,5 +1,41 @@
-decomp-toolkit Project Template
+
+decomp-toolkit Final Fantasy Crystal Chronicles
 ===============================
+This is the decompilation for Final Fantasy Crystal Chronicles for the Nintendo GameCube.
+
+There are 3 versions of this game: JP, EN, and PAL (EU).
+
+Fortunately, the EN build contains a debug symbol file, and the PAL version contains a release symbol file (although for a different build). This has made the decompilation process very easy to match the original source code incredibly closely. These symbols allowed us to recover exact function and class names, as well as all parameters to each function, and class hierarchies.
+
+
+Unmapped Splits:
+-------------
+os/OSSync.c:
+	.text       start:0x80180970 end:0x801809F4
+
+os/OSStopwatch.c:
+	.text       start:0x80180814 end:0x80180970
+
+TRK_MINNOW_DOLPHIN/main.c:
+	.text       start:0x801af2b0 end:0x801af5fc
+
+Runtime/PPCEABI/H/__init_cpp_exceptions.p:
+	.text       start:0x801b063c end:0x801b06b8
+	
+os/OSError.c:
+	.text       start:0x8017dd68 end:0x80000000
+
+os/OSFatal.c:
+	.text       start:0x80000000 end:0x80000000
+
+os/OSFont.c:
+	.text       start:0x80000000 end:0x80000000
+
+ax/AXProf.c:
+	.text       start:0x80193E28 end:0x80193E70
+
+ORIGINAL TEMPLATE README BELOW
+-------------
 
 If starting a new GameCube / Wii decompilation project, this repository can be used as a scaffold.
 

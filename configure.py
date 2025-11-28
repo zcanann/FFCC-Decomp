@@ -234,6 +234,16 @@ elif args.warn == "error":
     cflags_base.append("-W error")
 
 # Metrowerks library flags
+cflags_msl = [
+    *cflags_base,
+    "-char signed",
+    "-use_lmw_stmw on",
+    "-str reuse,pool,readonly",
+    "-common off",
+    "-inline auto,deferred",
+]
+
+# Metrowerks library flags
 cflags_runtime = [
     *cflags_base,
     "-use_lmw_stmw on",
@@ -241,13 +251,6 @@ cflags_runtime = [
     "-gccinc",
     "-common off",
     "-inline auto",
-]
-
-# REL flags
-cflags_rel = [
-    *cflags_base,
-    "-sdata 0",
-    "-sdata2 0",
 ]
 
 config.linker_version = "GC/1.3.2"
@@ -260,17 +263,6 @@ def DolphinLib(lib_name: str, objects: List[Object]) -> Dict[str, Any]:
         "mw_version": "GC/1.2.5n",
         "cflags": cflags_base,
         "progress_category": "sdk",
-        "objects": objects,
-    }
-
-
-# Helper function for REL script objects
-def Rel(lib_name: str, objects: List[Object]) -> Dict[str, Any]:
-    return {
-        "lib": lib_name,
-        "mw_version": "GC/1.3.2",
-        "cflags": cflags_rel,
-        "progress_category": "game",
         "objects": objects,
     }
 
@@ -296,6 +288,14 @@ config.libs = [
         "objects": [
             Object(NonMatching, "Runtime.PPCEABI.H/global_destructor_chain.c"),
             Object(NonMatching, "Runtime.PPCEABI.H/__init_cpp_exceptions.cpp"),
+        ],
+    },
+    {
+        "lib": "MSL_C.PPCEABI.bare.H",
+        "mw_version": config.linker_version,
+        "cflags": cflags_msl,
+        "objects": [
+            Object(Matching, "MSL_C/PPCEABI/bare/H/s_copysign.c"),
         ],
     },
 ]

@@ -524,6 +524,609 @@ pppSRandDownFV.cpp:
 	extabindex  start:0x8000D0F0 end:0x8000D0FC
 	.text       start:0x80063840 end:0x800639EC
 
+pppSRandDownHCV.cpp:
+	extab       start:0x80007188 end:0x80007190
+	extabindex  start:0x8000D0FC end:0x8000D108
+	.text       start:0x800639EC end:0x80063C7C
+
+pppSRandFV.cpp:
+	extab       start:0x80007190 end:0x80007198
+	extabindex  start:0x8000D108 end:0x8000D114
+	.text       start:0x80063C7C end:0x80063E34
+
+pppSRandHCV.cpp:
+	extab       start:0x80007198 end:0x800071A0
+	extabindex  start:0x8000D114 end:0x8000D120
+	.text       start:0x80063E34 end:0x80064114
+
+pppSRandUpCV.cpp:
+	extab       start:0x800071A0 end:0x800071A8
+	extabindex  start:0x8000D120 end:0x8000D12C
+	.text       start:0x80064114 end:0x800643A4
+
+pppSRandUpFV.cpp:
+	extab       start:0x800071A8 end:0x800071B0
+	extabindex  start:0x8000D12C end:0x8000D138
+	.text       start:0x800643A4 end:0x80064550
+
+pppSRandUpHCV.cpp:
+	extab       start:0x800071B0 end:0x800071B8
+	extabindex  start:0x8000D138 end:0x8000D144
+	.text       start:0x80064550 end:0x800647E0
+
+pppVertexAp.cpp:
+	extab       start:0x800071B8 end:0x800071C0
+	extabindex  start:0x8000D144 end:0x8000D150
+	.text       start:0x800647E0 end:0x80064B08
+
+pppVertexApAt.cpp:
+	extab       start:0x800071C0 end:0x800071C8
+	extabindex  start:0x8000D150 end:0x8000D15C
+	.text       start:0x80064B08 end:0x80064CE8
+
+pppVertexApLc.cpp:
+	extab       start:0x800071C8 end:0x800071D0
+	extabindex  start:0x8000D15C end:0x8000D168
+	.text       start:0x80064CE8 end:0x80064F6C
+
+pppVertexAttend.cpp:
+	extab       start:0x800071D0 end:0x800071D8
+	extabindex  start:0x8000D168 end:0x8000D174
+	.text       start:0x80064F6C end:0x80065034
+
+pppVtMime.cpp:
+	extab       start:0x800071D8 end:0x800071E8
+	extabindex  start:0x8000D174 end:0x8000D18C
+	.text       start:0x80065034 end:0x80065350
+
+pppDrawMatrix.cpp:
+	extab       start:0x800071E8 end:0x800071F0
+	extabindex  start:0x8000D18C end:0x8000D198
+	.text       start:0x80065350 end:0x80065384
+
+pppDrawMdl.cpp:
+	extab       start:0x800071F0 end:0x800071F8
+	extabindex  start:0x8000D198 end:0x8000D1A4
+	.text       start:0x80065384 end:0x8006542C
+
+pppDrawMatrixFront.cpp:
+	extab       start:0x800071F8 end:0x80007200
+	extabindex  start:0x8000D1A4 end:0x8000D1B0
+	.text       start:0x8006542C end:0x800654B4
+
+pppDrawShape.cpp:
+	extab       start:0x80007200 end:0x80007208
+	extabindex  start:0x8000D1B0 end:0x8000D1BC
+	.text       start:0x800654B4 end:0x80065678
+
+pppShape.cpp:
+	extab       start:0x80007208 end:0x80007248
+	extabindex  start:0x8000D1BC end:0x8000D21C
+	.text       start:0x80065678 end:0x80065CAC
+
+cflat_runtime.cpp:
+	extab       start:0x80007248 end:0x80007310
+	extabindex  start:0x8000D21C end:0x8000D2F4
+	.text       start:0x80065CAC end:0x80069B08
+
+cflat_runtime2.cpp:
+	extab       start:0x80007310 end:0x80007480
+	extabindex  start:0x8000D2F4 end:0x8000D4C8
+	.text       start:0x80069B08 end:0x8006EB04
+	.ctors      start:0x801D540C end:0x801D5410
+
+chara.cpp:
+	extab       start:0x80007480 end:0x800075E0
+	extabindex  start:0x8000D4C8 end:0x8000D69C
+	.text       start:0x8006EB04 end:0x80073AF4
+	.ctors      start:0x801D5410 end:0x801D5414
+
+p_chara.cpp:
+	extab       start:0x800075E0 end:0x80007838
+	extabindex  start:0x8000D69C end:0x8000D9A8
+	.text       start:0x80073AF4 end:0x8007BB90
+	.ctors      start:0x801D5414 end:0x801D5418
+
+pppDrawMng.cpp:
+	extab       start:0x80007838 end:0x80007850
+	extabindex  start:0x8000D9A8 end:0x8000D9CC
+	.text       start:0x8007BB90 end:0x8007BE40
+
+gobject.cpp:
+	extab       start:0x80007850 end:0x80007988
+	extabindex  start:0x8000D9CC end:0x8000DBA0
+	.text       start:0x8007BE40 end:0x80082278
+
+pppRyjMegaBirth.cpp:
+	extab       start:0x80007988 end:0x800079C0
+	extabindex  start:0x8000DBA0 end:0x8000DBF4
+	.text       start:0x80082278 end:0x800841E4
+
+pppRyjMegaBirthModel.cpp:
+	extab       start:0x800079C0 end:0x80007A00
+	extabindex  start:0x8000DBF4 end:0x8000DC54
+	.text       start:0x800841E4 end:0x80087EF0
+
+pppDrawMdlTs.cpp:
+	extab       start:0x80007A00 end:0x80007A08
+	extabindex  start:0x8000DC54 end:0x8000DC60
+	.text       start:0x80087EF0 end:0x800880F0
+
+pppKeShpTail.cpp:
+	extab       start:0x80007A08 end:0x80007A10
+	extabindex  start:0x8000DC60 end:0x8000DC6C
+	.text       start:0x800880F0 end:0x8008821C
+
+pppKeZCrctShp.cpp:
+	extab       start:0x80007A10 end:0x80007A18
+	extabindex  start:0x8000DC6C end:0x8000DC78
+	.text       start:0x8008821C end:0x80088698
+
+pppKeShpTail2X.cpp:
+	extab       start:0x80007A18 end:0x80007A38
+	extabindex  start:0x8000DC78 end:0x8000DCA8
+	.text       start:0x80088698 end:0x8008922C
+
+pppKeShpTail3X.cpp:
+	extab       start:0x80007A38 end:0x80007A50
+	extabindex  start:0x8000DCA8 end:0x8000DCCC
+	.text       start:0x8008922C end:0x8008A38C
+
+pppYmDrawMdlTexAnm.cpp:
+	extab       start:0x80007A50 end:0x80007A70
+	extabindex  start:0x8000DCCC end:0x8000DCFC
+	.text       start:0x8008A38C end:0x8008ABC0
+
+pppDrawMatrixWood.cpp:
+	extab       start:0x80007A70 end:0x80007A78
+	extabindex  start:0x8000DCFC end:0x8000DD08
+	.text       start:0x8008ABC0 end:0x8008AC30
+
+pppDrawMatrixNoRot.cpp:
+	extab       start:0x80007A78 end:0x80007A80
+	extabindex  start:0x8000DD08 end:0x8000DD14
+	.text       start:0x8008AC30 end:0x8008ACC4
+
+pppYmMegaBirthShpTail2.cpp:
+	extab       start:0x80007A80 end:0x80007AB0
+	extabindex  start:0x8000DD14 end:0x8000DD5C
+	.text       start:0x8008ACC4 end:0x8008CA98
+
+pppYmMegaBirthShpTail3.cpp:
+	extab       start:0x80007AB0 end:0x80007AE0
+	extabindex  start:0x8000DD5C end:0x8000DDA4
+	.text       start:0x8008CA98 end:0x8008ECA0
+
+pppKeLns.cpp:
+	extab       start:0x80007AE0 end:0x80007AE8
+	extabindex  start:0x8000DDA4 end:0x8000DDB0
+	.text       start:0x8008ECA0 end:0x8008ED14
+
+KeLns.cpp:
+	extab       start:0x80007AE8 end:0x80007AF0
+	extabindex  start:0x8000DDB0 end:0x8000DDBC
+	.text       start:0x8008ED14 end:0x8008ED4C
+
+pppKeDMat.cpp:
+	extab       start:0x80007AF0 end:0x80007AF8
+	extabindex  start:0x8000DDBC end:0x8000DDC8
+	.text       start:0x8008ED4C end:0x8008EEC8
+
+pppYmDeformationShp.cpp:
+	extab       start:0x80007AF8 end:0x80007B10
+	extabindex  start:0x8000DDC8 end:0x8000DDEC
+	.text       start:0x8008EEC8 end:0x800905DC
+
+pppWDrawMatrix.cpp:
+	extab       start:0x80007B10 end:0x80007B18
+	extabindex  start:0x8000DDEC end:0x8000DDF8
+	.text       start:0x800905DC end:0x80090654
+
+pppWDrawMatrixFront.cpp:
+	extab       start:0x80007B18 end:0x80007B20
+	extabindex  start:0x8000DDF8 end:0x8000DE04
+	.text       start:0x80090654 end:0x800906DC
+
+pppParMoveLine.cpp:
+	extab       start:0x80007B20 end:0x80007B28
+	extabindex  start:0x8000DE04 end:0x8000DE10
+	.text       start:0x800906DC end:0x800907C4
+
+pppYmMiasma.cpp:
+	extab       start:0x80007B28 end:0x80007B50
+	extabindex  start:0x8000DE10 end:0x8000DE4C
+	.text       start:0x800907C4 end:0x8009159C
+
+pppYmDeformationScreen.cpp:
+	extab       start:0x80007B50 end:0x80007B60
+	extabindex  start:0x8000DE4C end:0x8000DE64
+	.text       start:0x8009159C end:0x80091E58
+
+fontman.cpp:
+	extab       start:0x80007B60 end:0x80007BF0
+	extabindex  start:0x8000DE64 end:0x8000DF3C
+	.text       start:0x80091E58 end:0x8009312C
+	.ctors      start:0x801D5418 end:0x801D541C
+
+pppYmTracer.cpp:
+	extab       start:0x80007BF0 end:0x80007C08
+	extabindex  start:0x8000DF3C end:0x8000DF60
+	.text       start:0x8009312C end:0x80093D04
+
+pppParHitSph.cpp:
+	extab       start:0x80007C08 end:0x80007C10
+	extabindex  start:0x8000DF60 end:0x8000DF6C
+	.text       start:0x80093D04 end:0x80093E78
+
+p_menu.cpp:
+	extab       start:0x80007C10 end:0x80007CE0
+	extabindex  start:0x8000DF6C end:0x8000E0A4
+	.text       start:0x80093E78 end:0x800977D8
+	.ctors      start:0x801D541C end:0x801D5420
+
+p_gba.cpp:
+	extab       start:0x80007CE0 end:0x80007D20
+	extabindex  start:0x8000E0A4 end:0x8000E104
+	.text       start:0x800977D8 end:0x80097AC8
+	.ctors      start:0x801D5420 end:0x801D5424
+
+cflat_data.cpp:
+	extab       start:0x80007D20 end:0x80007D38
+	extabindex  start:0x8000E104 end:0x8000E128
+	.text       start:0x80097AC8 end:0x800981F0
+
+mes.cpp:
+	extab       start:0x80007D38 end:0x80007D78
+	extabindex  start:0x8000E128 end:0x8000E188
+	.text       start:0x800981F0 end:0x8009B3B4
+
+menu.cpp:
+	extab       start:0x80007D78 end:0x80007DA0
+	extabindex  start:0x8000E188 end:0x8000E1C4
+	.text       start:0x8009B3B4 end:0x8009B4E4
+
+mesmenu.cpp:
+	extab       start:0x80007DA0 end:0x80007E04
+	extabindex  start:0x8000E1C4 end:0x8000E23C
+	.text       start:0x8009B4E4 end:0x8009E1C0
+
+gobjwork.cpp:
+	extab       start:0x80007E04 end:0x80007F78
+	extabindex  start:0x8000E23C end:0x8000E44C
+	.text       start:0x8009E1C0 end:0x800A2DD4
+
+ringmenu.cpp:
+	extab       start:0x80007F78 end:0x80007FC8
+	extabindex  start:0x8000E44C end:0x8000E4C4
+	.text       start:0x800A2DD4 end:0x800A538C
+
+pppYmMelt.cpp:
+	extab       start:0x80007FC8 end:0x80007FE8
+	extabindex  start:0x8000E4C4 end:0x8000E4F4
+	.text       start:0x800A538C end:0x800A5FCC
+
+pppYmCallBack.cpp:
+	extab       start:0x80007FE8 end:0x80007FF0
+	extabindex  start:0x8000E4F4 end:0x8000E500
+	.text       start:0x800A5FCC end:0x800A6094
+
+joybus.cpp:
+	extab       start:0x80007FF0 end:0x80008280
+	extabindex  start:0x8000E500 end:0x8000E8D8
+	.text       start:0x800A6094 end:0x800B28F0
+	.ctors      start:0x801D5424 end:0x801D5428
+
+cflat_r2system.cpp:
+	extab       start:0x80008280 end:0x80008338
+	extabindex  start:0x8000E8D8 end:0x8000E9EC
+	.text       start:0x800B28F0 end:0x800BA2FC
+
+cflat_r2class.cpp:
+	extab       start:0x80008338 end:0x80008350
+	extabindex  start:0x8000E9EC end:0x8000EA10
+	.text       start:0x800BA2FC end:0x800BD848
+
+p_chara_viewer.cpp:
+	extab       start:0x80008350 end:0x80008390
+	extabindex  start:0x8000EA10 end:0x8000EA40
+	.text       start:0x800BD848 end:0x800BF620
+
+chara_anim.cpp:
+	extab       start:0x80008390 end:0x800083C0
+	extabindex  start:0x8000EA40 end:0x8000EA88
+	.text       start:0x800BF620 end:0x800BFE78
+
+pppYmBreath.cpp:
+	extab       start:0x800083C0 end:0x800083F8
+	extabindex  start:0x8000EA88 end:0x8000EADC
+	.text       start:0x800BFE78 end:0x800C17B8
+
+memorycard.cpp:
+	extab       start:0x800083F8 end:0x800084E0
+	extabindex  start:0x8000EADC end:0x8000EC38
+	.text       start:0x800C17B8 end:0x800C4DD8
+	.ctors      start:0x801D5428 end:0x801D542C
+
+pppWDrawMatrixLoop.cpp:
+	extab       start:0x800084E0 end:0x800084E8
+	extabindex  start:0x8000EC38 end:0x8000EC44
+	.text       start:0x800C4DD8 end:0x800C4E50
+
+vector.cpp:
+	extab       start:0x800084E8 end:0x800084F8
+	extabindex  start:0x8000EC44 end:0x8000EC5C
+	.text       start:0x800C4E50 end:0x800C4F04
+
+color.cpp:
+	.text       start:0x800C4F04 end:0x800C4F50
+
+pppWDrawMatrixFrontLoop.cpp:
+	extab       start:0x800084F8 end:0x80008500
+	extabindex  start:0x8000EC5C end:0x8000EC68
+	.text       start:0x800C4F50 end:0x800C4FD8
+
+sound.cpp:
+	extab       start:0x80008500 end:0x800086CC
+	extabindex  start:0x8000EC68 end:0x8000EEFC
+	.text       start:0x800C4FD8 end:0x800C8A8C
+	.ctors      start:0x801D542C end:0x801D5430
+
+gbaque.cpp:
+	extab       start:0x800086CC end:0x80008A64
+	extabindex  start:0x8000EEFC end:0x8000F460
+	.text       start:0x800C8A8C end:0x800D160C
+	.ctors      start:0x801D5430 end:0x801D5434
+
+pppYmMoveCircle.cpp:
+	extab       start:0x80008A64 end:0x80008A74
+	extabindex  start:0x8000F460 end:0x8000F478
+	.text       start:0x800D160C end:0x800D1968
+
+pppDrawMatrixFrontLnr.cpp:
+	extab       start:0x80008A74 end:0x80008A7C
+	extabindex  start:0x8000F478 end:0x8000F484
+	.text       start:0x800D1968 end:0x800D19F0
+
+pppYmDeformationMdl.cpp:
+	extab       start:0x80008A7C end:0x80008A8C
+	extabindex  start:0x8000F484 end:0x8000F49C
+	.text       start:0x800D19F0 end:0x800D2100
+
+pppPointApMtx.cpp:
+	extab       start:0x80008A8C end:0x80008A94
+	extabindex  start:0x8000F49C end:0x8000F4A8
+	.text       start:0x800D2100 end:0x800D2250
+
+pppVertexApMtx.cpp:
+	extab       start:0x80008A94 end:0x80008A9C
+	extabindex  start:0x8000F4A8 end:0x8000F4B4
+	.text       start:0x800D2250 end:0x800D25E0
+
+pppSDrawMatrix.cpp:
+	extab       start:0x80008A9C end:0x80008AA4
+	extabindex  start:0x8000F4B4 end:0x8000F4C0
+	.text       start:0x800D25E0 end:0x800D2614
+
+pppYmLaser.cpp:
+	extab       start:0x80008AA4 end:0x80008AC4
+	extabindex  start:0x8000F4C0 end:0x8000F4F0
+	.text       start:0x800D2614 end:0x800D3818
+
+pppSpMatrix.cpp:
+	extab       start:0x80008AC4 end:0x80008ACC
+	extabindex  start:0x8000F4F0 end:0x8000F4FC
+	.text       start:0x800D3818 end:0x800D3854
+
+pppYmChangeTex.cpp:
+	extab       start:0x80008ACC end:0x80008AF4
+	extabindex  start:0x8000F4FC end:0x8000F538
+	.text       start:0x800D3854 end:0x800D4278
+
+pppYmMoveParabola.cpp:
+	extab       start:0x80008AF4 end:0x80008B04
+	extabindex  start:0x8000F538 end:0x8000F550
+	.text       start:0x800D4278 end:0x800D467C
+
+pppParMoveMatrix.cpp:
+	extab       start:0x80008B04 end:0x80008B0C
+	extabindex  start:0x8000F550 end:0x8000F55C
+	.text       start:0x800D467C end:0x800D4828
+
+pppYmTraceMove.cpp:
+	extab       start:0x80008B0C end:0x80008B1C
+	extabindex  start:0x8000F55C end:0x8000F574
+	.text       start:0x800D4828 end:0x800D4C7C
+
+pppYmMana.cpp:
+	extab       start:0x80008B1C end:0x80008B94
+	extabindex  start:0x8000F574 end:0x8000F628
+	.text       start:0x800D4C7C end:0x800D8710
+
+p_sound.cpp:
+	extab       start:0x80008B94 end:0x80008BBC
+	extabindex  start:0x8000F628 end:0x8000F664
+	.text       start:0x800D8710 end:0x800D88C8
+	.ctors      start:0x801D5434 end:0x801D5438
+
+pppYmLookOn.cpp:
+	extab       start:0x80008BBC end:0x80008BC4
+	extabindex  start:0x8000F664 end:0x8000F670
+	.text       start:0x800D88C8 end:0x800D8ABC
+
+pppYmCheckBGHeight.cpp:
+	extab       start:0x80008BC4 end:0x80008BCC
+	extabindex  start:0x8000F670 end:0x8000F67C
+	.text       start:0x800D8ABC end:0x800D8C1C
+
+pppLocationTitle.cpp:
+	extab       start:0x80008BCC end:0x80008BE4
+	extabindex  start:0x8000F67C end:0x8000F6A0
+	.text       start:0x800D8C1C end:0x800D92FC
+
+wind.cpp:
+	extab       start:0x80008BE4 end:0x80008C1C
+	extabindex  start:0x8000F6A0 end:0x8000F6F4
+	.text       start:0x800D92FC end:0x800DA0B4
+
+LocationTitle2.cpp:
+	extab       start:0x80008C1C end:0x80008C34
+	extabindex  start:0x8000F6F4 end:0x8000F718
+	.text       start:0x800DA0B4 end:0x800DA93C
+
+pppDrawShape2.cpp:
+	extab       start:0x80008C34 end:0x80008C3C
+	extabindex  start:0x8000F718 end:0x8000F724
+	.text       start:0x800DA93C end:0x800DAB00
+
+pppLight.cpp:
+	extab       start:0x80008C3C end:0x80008C44
+	extabindex  start:0x8000F724 end:0x8000F730
+	.text       start:0x800DAB00 end:0x800DB094
+
+pppBreathModel.cpp:
+	extab       start:0x80008C44 end:0x80008C7C
+	extabindex  start:0x8000F730 end:0x8000F784
+	.text       start:0x800DB094 end:0x800DC9A0
+
+pppCrystal.cpp:
+	extab       start:0x80008C7C end:0x80008C94
+	extabindex  start:0x8000F784 end:0x8000F7A8
+	.text       start:0x800DC9A0 end:0x800DD424
+
+pppRain.cpp:
+	extab       start:0x80008C94 end:0x80008CAC
+	extabindex  start:0x8000F7A8 end:0x8000F7CC
+	.text       start:0x800DD424 end:0x800DDAF8
+
+pppBlurChara.cpp:
+	extab       start:0x80008CAC end:0x80008CDC
+	extabindex  start:0x8000F7CC end:0x8000F814
+	.text       start:0x800DDAF8 end:0x800DE718
+
+pppLensFlare.cpp:
+	extab       start:0x80008CDC end:0x80008CEC
+	extabindex  start:0x8000F814 end:0x8000F82C
+	.text       start:0x800DE718 end:0x800DEC5C
+
+pppColum.cpp:
+	extab       start:0x80008CEC end:0x80008D04
+	extabindex  start:0x8000F82C end:0x8000F850
+	.text       start:0x800DEC5C end:0x800DF320
+
+pppCorona.cpp:
+	extab       start:0x80008D04 end:0x80008D14
+	extabindex  start:0x8000F850 end:0x8000F868
+	.text       start:0x800DF320 end:0x800DF618
+
+chara_fur.cpp:
+	extab       start:0x80008D14 end:0x80008D84
+	extabindex  start:0x8000F868 end:0x8000F910
+	.text       start:0x800DF618 end:0x800E46DC
+
+pppYmEnv.cpp:
+	extab       start:0x80008D84 end:0x80008DB4
+	extabindex  start:0x8000F910 end:0x8000F958
+	.text       start:0x800E46DC end:0x800E6060
+
+pppEmission.cpp:
+	extab       start:0x80008DB4 end:0x80008DE4
+	extabindex  start:0x8000F958 end:0x8000F9A0
+	.text       start:0x800E6060 end:0x800E6B98
+
+wm_menu.cpp:
+	extab       start:0x80008DE4 end:0x80009024
+	extabindex  start:0x8000F9A0 end:0x8000FD00
+	.text       start:0x800E6B98 end:0x80102FB4
+
+gxfunc.cpp:
+	extab       start:0x80009024 end:0x8000907C
+	extabindex  start:0x8000FD00 end:0x8000FD84
+	.text       start:0x80102FB4 end:0x801035DC
+
+pppYmTracer2.cpp:
+	extab       start:0x8000907C end:0x80009094
+	extabindex  start:0x8000FD84 end:0x8000FDA8
+	.text       start:0x801035DC end:0x80103EC0
+
+pppEraseCharaParts.cpp:
+	extab       start:0x80009094 end:0x800090B4
+	extabindex  start:0x8000FDA8 end:0x8000FDD8
+	.text       start:0x80103EC0 end:0x801040C8
+
+THPSimple.cpp:
+	extab       start:0x800090B4 end:0x80009114
+	extabindex  start:0x8000FDD8 end:0x8000FE68
+	.text       start:0x801040C8 end:0x8010597C
+
+THPDraw.cpp:
+	extab       start:0x80009114 end:0x8000912C
+	extabindex  start:0x8000FE68 end:0x8000FE8C
+	.text       start:0x8010597C end:0x8010617C
+
+pppMana2.cpp:
+	extab       start:0x8000912C end:0x8000918C
+	extabindex  start:0x8000FE8C end:0x8000FF1C
+	.text       start:0x8010617C end:0x801091D4
+
+pppConformBGNormal.cpp:
+	extab       start:0x8000918C end:0x80009194
+	extabindex  start:0x8000FF1C end:0x8000FF28
+	.text       start:0x801091D4 end:0x80109810
+
+pppAlignmentScale.cpp:
+	extab       start:0x80009194 end:0x8000919C
+	extabindex  start:0x8000FF28 end:0x8000FF34
+	.text       start:0x80109810 end:0x80109930
+
+pppMiasma.cpp:
+	extab       start:0x8000919C end:0x800091B4
+	extabindex  start:0x8000FF34 end:0x8000FF58
+	.text       start:0x80109930 end:0x8010B150
+
+baseobj.cpp:
+	extab       start:0x800091B4 end:0x800091E4
+	extabindex  start:0x8000FF58 end:0x8000FFA0
+	.text       start:0x8010B150 end:0x8010B2A4
+
+quadobj.cpp:
+	extab       start:0x800091E4 end:0x800091EC
+	extabindex  start:0x8000FFA0 end:0x8000FFAC
+	.text       start:0x8010B2A4 end:0x8010B660
+
+charaobj.cpp:
+	extab       start:0x800091EC end:0x800092E4
+	extabindex  start:0x8000FFAC end:0x80010120
+	.text       start:0x8010B660 end:0x80112D54
+
+monobj.cpp:
+	extab       start:0x800092E4 end:0x8000944C
+	extabindex  start:0x80010120 end:0x8001033C
+	.text       start:0x80112D54 end:0x8011A574
+
+partyobj.cpp:
+	extab       start:0x8000944C end:0x800095FC
+	extabindex  start:0x8001033C end:0x800105C4
+	.text       start:0x8011A574 end:0x80124998
+
+p_mc.cpp:
+	extab       start:0x800095FC end:0x8000960C
+	extabindex  start:0x800105C4 end:0x800105DC
+	.text       start:0x80124998 end:0x80124B78
+	.ctors      start:0x801D5438 end:0x801D543C
+
+itemobj.cpp:
+	extab       start:0x8000960C end:0x8000968C
+	extabindex  start:0x800105DC end:0x8001069C
+	.text       start:0x80124B78 end:0x80127008
+
+prgobj.cpp:
+	extab       start:0x8000968C end:0x8000970C
+	extabindex  start:0x8001069C end:0x8001075C
+	.text       start:0x80127008 end:0x80127B54
+
+pppBindOnlyPos.cpp:
+	.text       start:0x80127B54 end:0x80127B74
+
 dolphin/os/__start.c:
 	.init       start:0x80003100 end:0x80003340
 

@@ -12,7 +12,6 @@
 #include <dolphin/vi.h>
 #include <dolphin/ai.h>
 #include <dolphin/ar.h>
-#include <dolphin/arq.h>
 #include <dolphin/dsp.h>
 #include <dolphin/card.h>
 

@@ -414,6 +414,13 @@ config.libs = [
         ],
     ),
     DolphinLib(
+        "ar",
+        [
+            Object(NonMatching, "ar/ar.c"),
+            Object(NonMatching, "ar/arq.c"),
+        ],
+    ),
+    DolphinLib(
         "ax",
         [
             Object(NonMatching, "ax/AX.c"),

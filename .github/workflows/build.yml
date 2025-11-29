@@ -14,8 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Add game versions here
-        version: [GCCP01, GCCE01, GCCJGC]
+        version: [GCCP01] #, GCCE01, GCCJGC] # Enable these eventually
 
     steps:
     # Checkout the repository

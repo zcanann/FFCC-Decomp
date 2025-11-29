@@ -1,13 +1,13 @@
-
+#include "TRK_MINNOW_DOLPHIN/MWCriticalSection_gc.h"
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-void MWExitCriticalSection(void)
+extern void MWExitCriticalSection(u32* section)
 {
-	// TODO
+    OSRestoreInterrupts(*section);
 }
 
 /*
@@ -15,9 +15,9 @@ void MWExitCriticalSection(void)
  * Address:	TODO
  * Size:	TODO
  */
-void MWEnterCriticalSection(void)
+extern void MWEnterCriticalSection(u32* section)
 {
-	// TODO
+    *section = OSDisableInterrupts();
 }
 
 /*
@@ -25,7 +25,7 @@ void MWEnterCriticalSection(void)
  * Address:	TODO
  * Size:	TODO
  */
-void MWInitializeCriticalSection(void)
+extern void MWInitializeCriticalSection(u32*)
 {
-	// TODO
+	
 }

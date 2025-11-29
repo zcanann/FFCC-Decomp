@@ -234,6 +234,16 @@ elif args.warn == "error":
     cflags_base.append("-W error")
 
 # Metrowerks library flags
+cflags_runtime = [
+    *cflags_base,
+    "-use_lmw_stmw on",
+    "-str reuse,pool,readonly",
+    "-gccinc",
+    "-common off",
+    "-inline auto",
+]
+
+# Metrowerks library flags
 cflags_msl = [
     *cflags_base,
     "-char signed",
@@ -244,13 +254,16 @@ cflags_msl = [
 ]
 
 # Metrowerks library flags
-cflags_runtime = [
+cflags_trk = [
     *cflags_base,
     "-use_lmw_stmw on",
-    "-str reuse,pool,readonly",
-    "-gccinc",
+    "-str reuse,readonly",
     "-common off",
-    "-inline auto",
+    "-sdata 0",
+    "-sdata2 0",
+    "-inline auto,deferred",
+    "-enum min",
+    "-sdatathreshold 0"
 ]
 
 config.linker_version = "GC/1.3.2"
@@ -357,7 +370,7 @@ config.libs = [
         "mw_version": "GC/1.3",
         "cflags": cflags_trk,
         "objects": [
-            # Object(NonMatching, "TRK_MINNOW_DOLPHIN/CircleBuffer.c"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/CircleBuffer.c"),
             # Object(NonMatching, "TRK_MINNOW_DOLPHIN/dispatch.c"),
             # Object(NonMatching, "TRK_MINNOW_DOLPHIN/dolphin_trk.c"),
             # Object(NonMatching, "TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c"),
@@ -372,7 +385,7 @@ config.libs = [
             # Object(NonMatching, "TRK_MINNOW_DOLPHIN/msghndlr.c"),
             # Object(NonMatching, "TRK_MINNOW_DOLPHIN/mslsupp.c"),
             # Object(NonMatching, "TRK_MINNOW_DOLPHIN/mutex_TRK.c"),
-            # Object(NonMatching, "TRK_MINNOW_DOLPHIN/MWCriticalSection_gc.c"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/MWCriticalSection_gc.c"),
             # Object(NonMatching, "TRK_MINNOW_DOLPHIN/MWTrace.c"),
             # Object(NonMatching, "TRK_MINNOW_DOLPHIN/notify.c"),
             # Object(NonMatching, "TRK_MINNOW_DOLPHIN/nubevent.c"),

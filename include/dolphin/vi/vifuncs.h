@@ -2,8 +2,7 @@
 #define _DOLPHIN_VIFUNCS
 
 #include <dolphin/types.h>
-
-#include <dolphin/vitypes.h>
+#include <dolphin/vi/vitypes.h>
 
 #ifdef __cplusplus
 extern "C" {

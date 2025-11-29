@@ -57,6 +57,14 @@ typedef int BOOL;
 #endif
 #endif
 
+#if defined(__MWERKS__)
+#define AT_ADDRESS(addr) : (addr)
+#elif defined(__GNUC__)
+#define AT_ADDRESS(addr)
+#else
+#error unknown compiler
+#endif
+
 #ifdef TARGET_PC
 #include <stddef.h>
 #else

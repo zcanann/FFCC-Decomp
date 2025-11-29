@@ -282,6 +282,10 @@ cflags_odenotstub = [
     "-inline auto,deferred",
 ]
 
+cflags_thp = [
+    *cflags_base,
+]
+
 config.linker_version = "GC/1.3.2"
 
 
@@ -377,6 +381,43 @@ config.libs = [
             Object(NonMatching, "dvd/dvdlow.c"),
             Object(NonMatching, "dvd/dvdqueue.c"),
             Object(NonMatching, "dvd/fstload.c"),
+        ],
+    ),
+    #DolphinLib(
+        #"gba",
+        #[
+            # Object(Matching, "gba/GBA.c"),
+            #Object(Matching, "gba/GBAGetProcessStatus.c"),
+            #Object(Matching, "gba/GBAJoyBoot.c"),
+            #Object(Matching, "gba/GBAKey.c"),
+            #Object(Matching, "gba/GBARead.c"),
+            #Object(Matching, "gba/GBAWrite.c"),
+            #Object(Matching, "gba/GBAXfer.c"),
+        #],
+    #),
+    DolphinLib(
+        "gx",
+        [
+            Object(NonMatching, "gx/GXAttr.c"),
+            Object(NonMatching, "gx/GXBump.c"),
+            Object(NonMatching, "gx/GXDisplayList.c"),
+            Object(NonMatching, "gx/GXFifo.c"),
+            Object(NonMatching, "gx/GXFrameBuf.c"),
+            Object(NonMatching, "gx/GXGeometry.c"),
+            Object(NonMatching, "gx/GXInit.c"),
+            Object(NonMatching, "gx/GXLight.c"),
+            Object(NonMatching, "gx/GXMisc.c"),
+            Object(NonMatching, "gx/GXPerf.c"),
+            Object(NonMatching, "gx/GXPixel.c"),
+            Object(NonMatching, "gx/GXSave.c"),
+            Object(NonMatching, "gx/GXStubs.c"),
+            Object(NonMatching, "gx/GXTev.c"),
+            Object(NonMatching, "gx/GXTexture.c"),
+            Object(NonMatching, "gx/GXTransform.c"),
+            Object(NonMatching, "gx/GXVerifRAS.c"),
+            Object(NonMatching, "gx/GXVerifXF.c"),
+            Object(NonMatching, "gx/GXVerify.c"),
+            Object(NonMatching, "gx/GXVert.c"),
         ],
     ),
     {
@@ -510,6 +551,15 @@ config.libs = [
         "cflags": cflags_odenotstub,
         "objects": [
             Object(Matching, "odenotstub/odenotstub.c"),
+        ],
+    },
+    {
+        "lib": "thp",
+        "mw_version": "GC/1.2.5",
+        "cflags": cflags_thp,
+        "objects": [
+            Object(NonMatching, "thp/THPDec.c"),
+            Object(NonMatching, "thp/THPAudio.c"),
         ],
     },
 ]

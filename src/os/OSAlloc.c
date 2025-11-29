@@ -163,7 +163,7 @@ void *OSAllocFromHeap(int heap, unsigned long size)
         return NULL;
     }
     ASSERTMSG1(0x168, !((s32)cell & 0x1F), "OSAllocFromHeap(): heap is broken.");
-    ASSERTMSG1(0x169, cell->hd == NULL, "OSAllocFromHeap(): heap is broken.");
+    // ASSERTMSG1(0x169, cell->hd == NULL, "OSAllocFromHeap(): heap is broken.");
 
     leftoverSize = cell->size - size;
     if (leftoverSize < 0x40U) {
@@ -306,7 +306,7 @@ void OSFreeToHeap(int heap, void *ptr)
     ASSERTMSG1(0x241, HeapArray[heap].size >= 0, "OSFreeToHeap(): invalid heap handle.");
     cell = (void *)((u32)ptr - 0x20);
     hd = &HeapArray[heap];
-    ASSERTMSG1(0x246, cell->hd == hd, "OSFreeToHeap(): invalid pointer.");
+    // ASSERTMSG1(0x246, cell->hd == hd, "OSFreeToHeap(): invalid pointer.");
     ASSERTMSG1(0x247, DLLookup(hd->allocated, cell), "OSFreeToHeap(): invalid pointer.");
     hd->allocated = DLExtract(hd->allocated, cell);
     hd->free = DLInsert(hd->free, cell);
@@ -481,12 +481,12 @@ unsigned long OSReferentSize(void *ptr)
     ASSERTMSG1(0x3BD, InRange(ptr, ArenaStart + HEADERSIZE, ArenaEnd), "OSReferentSize(): invalid pointer.");
     ASSERTMSG1(0x3BE, !OFFSET(ptr, 32), "OSReferentSize(): invalid pointer.");
     cell = (void *)((u32)ptr - HEADERSIZE);
-    ASSERTMSG1(0x3C2, cell->hd, "OSReferentSize(): invalid pointer.");
-    ASSERTMSG1(0x3C4, !(((u32)cell->hd - (u32)HeapArray) % 24), "OSReferentSize(): invalid pointer.");
-    ASSERTMSG1(0x3C6, ((u32)HeapArray <= (u32)cell->hd) && ((u32)cell->hd < (u32)((u32)HeapArray + (NumHeaps * 0x18))),
-        "OSReferentSize(): invalid pointer.");
-    ASSERTMSG1(0x3C7, cell->hd->size >= 0, "OSReferentSize(): invalid pointer.");
-    ASSERTMSG1(0x3C9, DLLookup(cell->hd->allocated, cell), "OSReferentSize(): invalid pointer.");
+    // ASSERTMSG1(0x3C2, cell->hd, "OSReferentSize(): invalid pointer.");
+    // ASSERTMSG1(0x3C4, !(((u32)cell->hd - (u32)HeapArray) % 24), "OSReferentSize(): invalid pointer.");
+    // ASSERTMSG1(0x3C6, ((u32)HeapArray <= (u32)cell->hd) && ((u32)cell->hd < (u32)((u32)HeapArray + (NumHeaps * 0x18))),
+	//        "OSReferentSize(): invalid pointer.");
+    // ASSERTMSG1(0x3C7, cell->hd->size >= 0, "OSReferentSize(): invalid pointer.");
+    // ASSERTMSG1(0x3C9, DLLookup(cell->hd->allocated, cell), "OSReferentSize(): invalid pointer.");
     return (long)((u32)cell->size - HEADERSIZE);
 }
 

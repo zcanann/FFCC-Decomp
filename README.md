@@ -13,8 +13,6 @@ Unmapped Splits:
 os/OSSync.c:
 	.text       start:0x80180970 end:0x801809F4
 
-os/OSStopwatch.c:
-	.text       start:0x80180814 end:0x80180970
 
 TRK_MINNOW_DOLPHIN/main.c:
 	.text       start:0x801af2b0 end:0x801af5fc

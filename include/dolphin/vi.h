@@ -2,7 +2,7 @@
 #define _DOLPHIN_VI
 
 #include <dolphin/gx/GXStruct.h>
-#include <dolphin/vifuncs.h>
+#include <dolphin/vi/vifuncs.h>
 
 #ifdef __cplusplus
 extern "C" {

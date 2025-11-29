@@ -1,15 +1,5 @@
+#include <dolphin/gx.h>
 
+#include "dolphin/gx/__gx.h"
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void __GXSetRange(void)
-{
-	// TODO
-}
+void __GXSetRange(f32 nearz, f32 fgSideX) {}

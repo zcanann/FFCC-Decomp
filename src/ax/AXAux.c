@@ -1,211 +1,167 @@
+#include <dolphin.h>
+#include <dolphin/ax.h>
 
+#include "dolphin/ax/__ax.h"
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void __AXAuxInit(void)
-{
-	// TODO
+static s32 __AXBufferAuxA[3][480] ATTRIBUTE_ALIGN(32);
+static s32 __AXBufferAuxB[3][480] ATTRIBUTE_ALIGN(32);
+
+static void (* __AXCallbackAuxA)(void*, void*);
+static void (* __AXCallbackAuxB)(void*, void*);
+static void* __AXContextAuxA;
+static void* __AXContextAuxB;
+static s32* __AXAuxADspWrite;
+static s32* __AXAuxADspRead;
+static s32* __AXAuxBDspWrite;
+static s32* __AXAuxBDspRead;
+static u32 __AXAuxDspWritePosition;
+static u32 __AXAuxDspReadPosition;
+static u32 __AXAuxDspWritePositionDpl2;
+static u32 __AXAuxDspReadPositionDpl2;
+static u32 __AXAuxCpuReadWritePosition;
+
+void __AXAuxInit(void) {
+    int i;
+    s32* pA;
+    s32* pB;
+
+#ifdef DEBUG
+    OSReport("Initializing AXAux code module\n");
+#endif
+    __AXCallbackAuxA = NULL;
+    __AXCallbackAuxB = NULL;
+    __AXContextAuxA = 0;
+    __AXContextAuxB = 0;
+    __AXAuxDspWritePosition = 0;
+    __AXAuxDspReadPosition = 1;
+    __AXAuxDspWritePositionDpl2 = 0;
+    __AXAuxDspReadPositionDpl2 = 1;
+    __AXAuxCpuReadWritePosition = 2;
+
+    pA = (s32*)&__AXBufferAuxA;
+    pB = (s32*)&__AXBufferAuxB;
+
+    for (i = 0; i < 480; i++) {
+        *(pA) = 0; pA++;
+        *(pB) = 0; pB++;
+    }
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void __AXAuxQuit(void)
-{
-	// TODO
+void __AXAuxQuit(void) {
+#ifdef DEBUG
+    OSReport("Shutting down AXAux code module\n");
+#endif
+    __AXCallbackAuxA = NULL;
+    __AXCallbackAuxB = NULL;
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void __AXGetAuxAInput(void)
-{
-	// TODO
+void __AXGetAuxAInput(u32* p) {
+    if (__AXCallbackAuxA) {
+        *p = (u32)&__AXBufferAuxA[__AXAuxDspWritePosition][0];
+    } else {
+        *p = 0;
+    }
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void __AXGetAuxAInputDpl2(void)
-{
-	// TODO
+void __AXGetAuxAInputDpl2(u32* p) {
+    *p = (u32)&__AXBufferAuxB[__AXAuxDspWritePosition][320];
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void __AXGetAuxAOutput(void)
-{
-	// TODO
+void __AXGetAuxAOutput(u32* p) {
+    *p = (u32)&__AXBufferAuxA[__AXAuxDspReadPosition][0];
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void __AXGetAuxAOutputDpl2R(void)
-{
-	// TODO
+void __AXGetAuxAOutputDpl2R(u32* p) {
+    *p = (u32)&__AXBufferAuxA[__AXAuxDspReadPosition][160];
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void __AXGetAuxAOutputDpl2Ls(void)
-{
-	// TODO
+void __AXGetAuxAOutputDpl2Ls(u32* p) {
+    *p = (u32)&__AXBufferAuxA[__AXAuxDspReadPosition][320];
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void __AXGetAuxAOutputDpl2Rs(void)
-{
-	// TODO
+void __AXGetAuxAOutputDpl2Rs(u32* p) {
+    *p = (u32)&__AXBufferAuxB[__AXAuxDspReadPosition][320];
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void __AXGetAuxBInput(void)
-{
-	// TODO
+void __AXGetAuxBInput(u32* p) {
+    if (__AXCallbackAuxB) {
+        *p = (u32)&__AXBufferAuxB[__AXAuxDspWritePosition][0];
+    } else {
+        *p = 0;
+    }
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void __AXGetAuxBOutput(void)
-{
-	// TODO
+void __AXGetAuxBOutput(u32* p) {
+    *p = (u32)&__AXBufferAuxB[__AXAuxDspReadPosition][0];
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void __AXGetAuxBForDPL2(void)
-{
-	// TODO
+void __AXGetAuxBForDPL2(u32* p) {
+    *p = (u32)&__AXBufferAuxB[__AXAuxDspWritePositionDpl2][0];
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void __AXGetAuxBOutputDPL2(void)
-{
-	// TODO
+void __AXGetAuxBOutputDPL2(u32* p) {
+    *p = (u32)&__AXBufferAuxB[__AXAuxDspReadPositionDpl2][0];
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void __AXProcessAux(void)
-{
-	// TODO
+void __AXProcessAux(void) {
+    __AXAuxADspWrite = &__AXBufferAuxA[__AXAuxDspWritePosition][0];
+    __AXAuxADspRead = &__AXBufferAuxA[__AXAuxDspReadPosition][0];
+    __AXAuxBDspWrite = &__AXBufferAuxB[__AXAuxDspWritePosition][0];
+    __AXAuxBDspRead = &__AXBufferAuxB[__AXAuxDspReadPosition][0];
+
+    if (__AXCallbackAuxA) {
+        if (__AXClMode == 2) {
+            AX_AUX_DATA_DPL2 auxData;
+            auxData.l = &__AXBufferAuxA[__AXAuxCpuReadWritePosition][0];
+            auxData.r = &__AXBufferAuxA[__AXAuxCpuReadWritePosition][160];
+            auxData.ls = &__AXBufferAuxA[__AXAuxCpuReadWritePosition][320];
+            auxData.rs = &__AXBufferAuxB[__AXAuxCpuReadWritePosition][320];
+            DCInvalidateRange(auxData.l, 0x780);
+            DCInvalidateRange(auxData.rs, 0x280);
+            __AXCallbackAuxA(&auxData.l, __AXContextAuxA);
+            DCFlushRangeNoSync(auxData.l, 0x780);
+            DCFlushRangeNoSync(auxData.rs, 0x280);
+        } else {
+            AX_AUX_DATA auxData;
+            auxData.l = &__AXBufferAuxA[__AXAuxCpuReadWritePosition][0];
+            auxData.r = &__AXBufferAuxA[__AXAuxCpuReadWritePosition][160];
+            auxData.s = &__AXBufferAuxA[__AXAuxCpuReadWritePosition][320];
+            DCInvalidateRange(auxData.l, 0x780);
+            __AXCallbackAuxA(&auxData.l, __AXContextAuxA);
+            DCFlushRangeNoSync(auxData.l, 0x780);
+        }        
+    }
+
+    if (__AXCallbackAuxB && __AXClMode != 2) {
+        AX_AUX_DATA auxData;
+        auxData.l = &__AXBufferAuxB[__AXAuxCpuReadWritePosition][0];
+        auxData.r = &__AXBufferAuxB[__AXAuxCpuReadWritePosition][160];
+        auxData.s = &__AXBufferAuxB[__AXAuxCpuReadWritePosition][320];
+        DCInvalidateRange(auxData.l, 0x780);
+        __AXCallbackAuxB(&auxData.l, __AXContextAuxB);
+        DCFlushRangeNoSync(auxData.l, 0x780);
+    }
+
+    __AXAuxDspWritePosition += 1;
+    __AXAuxDspWritePosition %= 3;
+    __AXAuxDspReadPosition += 1;
+    __AXAuxDspReadPosition %= 3;
+
+    __AXAuxDspWritePositionDpl2 += 1;
+    __AXAuxDspWritePositionDpl2 &= 1;
+    __AXAuxDspReadPositionDpl2 += 1;
+    __AXAuxDspReadPositionDpl2 &= 1;
+
+    __AXAuxCpuReadWritePosition += 1;
+    __AXAuxCpuReadWritePosition %= 3;
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void AXRegisterAuxACallback(void)
-{
-	// TODO
+void AXRegisterAuxACallback(void (*callback)(void*, void*), void* context) {
+    __AXCallbackAuxA = callback;
+    __AXContextAuxA = context;    
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void AXRegisterAuxBCallback(void)
-{
-	// TODO
+void AXRegisterAuxBCallback(void (*callback)(void*, void*), void* context) {
+    __AXCallbackAuxB = callback;
+    __AXContextAuxB = context;    
 }

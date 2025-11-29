@@ -414,6 +414,19 @@ config.libs = [
         ],
     ),
     DolphinLib(
+        "ax",
+        [
+            Object(NonMatching, "ax/AX.c"),
+            Object(NonMatching, "ax/AXAlloc.c"),
+            Object(NonMatching, "ax/AXAux.c"),
+            Object(NonMatching, "ax/AXCL.c"),
+            Object(NonMatching, "ax/AXOut.c"),
+            Object(NonMatching, "ax/AXProf.c"),
+            Object(NonMatching, "ax/AXSPB.c"),
+            Object(NonMatching, "ax/AXVPB.c"),
+        ],
+    ),
+    DolphinLib(
         "dsp",
         [
             Object(NonMatching, "dsp/dsp.c"),

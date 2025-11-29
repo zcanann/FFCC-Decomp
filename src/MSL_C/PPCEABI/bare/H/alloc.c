@@ -1,4 +1,6 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/alloc.h"
+#include "Runtime.PPCEABI.H/GCN_mem_alloc.h"
+#include "string.h"
 
 typedef struct Block {
     struct Block* prev;

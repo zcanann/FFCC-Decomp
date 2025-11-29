@@ -1,6 +1,7 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/abort_exit.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/critical_regions.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/signal.h"
+#include "Runtime.PPCEABI.H/NMWException.h"
 #include "stddef.h"
 
 void _ExitProcess();

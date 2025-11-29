@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/signal.h"
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/abort_exit.h"
 
 __signal_func_ptr signal_funcs[6];
 

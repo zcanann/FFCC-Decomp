@@ -37,6 +37,13 @@ enum __file_orientation {
 	/* 0x2 */ WIDE_ORIENTED
 };
 
+enum __open_modes
+{
+    __must_exist,
+    __create_if_necessary,
+    __create_or_truncate
+};
+
 typedef struct _file_modes {
 	unsigned int open_mode : 2;
 	unsigned int io_mode : 3;

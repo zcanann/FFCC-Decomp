@@ -1,6 +1,140 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/direct_io.h"
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/buffer_io.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/critical_regions.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/wchar_io.h"
+
+typedef enum {
+    __load_ok       = 0,
+    __load_error    = 1,
+    __load_eof      = 2
+} __load_result;
+
+size_t fread(const void *buffer, size_t size, size_t count, FILE *stream)
+{
+    size_t retval;
+
+    __begin_critical_region(stdin_access);
+    retval = __fread(buffer, size, count, stream);
+    __end_critical_region(stdin_access);
+
+    return retval;
+}
+
+size_t __fread(const void* buffer, size_t size, size_t count, FILE* stream)
+{
+    unsigned char* read_ptr;
+    size_t total_bytes;
+    size_t bytes_to_go;
+    size_t bytes_read;
+    size_t num_bytes;
+    int    ioresult;
+    int    always_buffer;
+
+#ifndef __NO_WIDE_CHAR
+    if (fwide(stream, 0) == 0)
+        fwide(stream, -1);
+#endif
+
+    total_bytes = size * count;
+
+    if (!total_bytes
+		|| stream->file_state.error
+		|| stream->file_mode.file_kind == __closed_file)
+    {
+        return 0;
+    }
+
+    always_buffer = !stream->file_mode.binary_io
+		|| stream->file_mode.buffer_mode == _IOFBF;
+
+    if (stream->file_state.io_state == __neutral
+		&& (stream->file_mode.io_mode & __read))
+    {
+        stream->file_state.io_state = __reading;
+        stream->buffer_length = 0;
+    }
+
+    if (stream->file_state.io_state != __reading)
+    {
+        set_error(stream);
+        return 0;
+    }
+
+    if ((stream->file_mode.io_mode & __write)
+		&& __flush_line_buffered_output_files() != 0)
+    {
+        set_error(stream);
+        return 0;
+    }
+	
+	// Huge chunk of code missing
+
+    bytes_to_go = total_bytes;
+    bytes_read  = 0;
+    read_ptr    = (unsigned char*)buffer;
+
+    if (bytes_to_go && (stream->buffer_length != 0 || always_buffer)) {
+        do {
+            if (stream->buffer_length == 0) {
+                ioresult = __load_buffer(stream, NULL, 0);
+
+                if (ioresult != __load_ok || stream->buffer_length == 0) {
+                    if (ioresult == __load_error) {
+                        set_error(stream);
+                    } else if (ioresult == __load_eof) {
+                        stream->file_state.eof = 1;
+                    }
+                    stream->buffer_length = 0;
+                    break;
+                }
+            }
+
+            num_bytes = stream->buffer_length;
+            if (num_bytes > bytes_to_go)
+                num_bytes = bytes_to_go;
+
+            memcpy(read_ptr, stream->buffer_ptr, num_bytes);
+
+            read_ptr += num_bytes;
+            bytes_read += num_bytes;
+            bytes_to_go -= num_bytes;
+            stream->buffer_ptr += num_bytes;
+            stream->buffer_length -= num_bytes;
+
+        } while (!bytes_to_go || !always_buffer);
+    }
+
+    if (bytes_to_go && !always_buffer) {
+        unsigned char* save_buffer = stream->buffer;
+        size_t save_size   = stream->buffer_size;
+        size_t direct_read = 0;
+
+        stream->buffer        = read_ptr;
+        stream->buffer_size   = bytes_to_go;
+        stream->buffer_ptr    = read_ptr;
+        stream->buffer_length = 0;
+
+        ioresult = __load_buffer(stream, &direct_read, 1);
+
+        if (ioresult != __load_ok && direct_read == 0) {
+            if (ioresult == __load_error) {
+                set_error(stream);
+            } else if (ioresult == __load_eof) {
+                stream->file_state.eof = 1;
+            }
+        }
+
+        bytes_read += direct_read;
+
+        stream->buffer      = save_buffer;
+        stream->buffer_size = save_size;
+
+        __prep_buffer(stream);
+        stream->buffer_length = 0;
+    }
+
+    return bytes_read / size;
+}
 
 size_t fwrite(const void* buffer, size_t size, size_t count, FILE* stream) {
     size_t retval;

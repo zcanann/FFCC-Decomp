@@ -1,20 +1,22 @@
 #include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/serpoll.h"
 #include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/msgbuf.h"
-#include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/dispatch.h"
-#include "TRK_MINNOW_DOLPHIN/Os/dolphin/targcont.h"
 #include "TRK_MINNOW_DOLPHIN/ppc/Generic/targimpl.h"
 
-void TRKHandleRequestEvent(TRKEvent* event)
+inline void TRKHandleRequestEvent(TRKEvent* event)
 {
 	TRKBuffer* buffer = TRKGetBuffer(event->msgBufID);
 	TRKDispatchMessage(buffer);
 }
 
-void TRKHandleSupportEvent(TRKEvent* event) { TRKTargetSupportRequest(); }
-
-void TRKIdle()
+inline void TRKHandleSupportEvent(TRKEvent* event)
 {
-	if (TRKTargetStopped() == FALSE) {
+	TRKTargetSupportRequest();
+}
+
+inline void TRKIdle()
+{
+	if (TRKTargetStopped() == FALSE)
+	{
 		TRKTargetContinue();
 	}
 }

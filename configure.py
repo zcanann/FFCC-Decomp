@@ -253,22 +253,33 @@ cflags_msl = [
     "-inline auto,deferred",
 ]
 
+# Metrowerks library flags
+cflags_trk = [
+    *cflags_base,
+    "-use_lmw_stmw on",
+    "-rostr",
+    "-str reuse",
+    "-gccinc",
+    "-common off",
+    "-inline deferred,auto",
+    "-char signed",
+    "-sdata 0",
+    "-sdata2 0",
+]
+
 cflags_odemuexi = [
     *cflags_base,
     "-inline deferred"
 ]
 
-# Metrowerks library flags
-cflags_trk = [
+cflags_amcstub = [
     *cflags_base,
-    "-use_lmw_stmw on",
-    "-str reuse,readonly",
-    "-common off",
-    "-sdata 0",
-    "-sdata2 0",
     "-inline auto,deferred",
-    "-enum min",
-    "-sdatathreshold 0"
+]
+
+cflags_odenotstub = [
+    *cflags_base,
+    "-inline auto,deferred",
 ]
 
 config.linker_version = "GC/1.3.2"
@@ -298,6 +309,19 @@ def MatchingFor(*versions):
 config.warn_missing_config = True
 config.warn_missing_source = False
 config.libs = [
+    DolphinLib(
+        "dvd",
+        [
+            Object(NonMatching, "dvd/dvd.c"),
+            Object(NonMatching, "dvd/dvderror.c"),
+            Object(NonMatching, "dvd/dvdFatal.c"),
+            Object(NonMatching, "dvd/dvdfs.c"),
+            Object(NonMatching, "dvd/dvdidutils.c"),
+            Object(NonMatching, "dvd/dvdlow.c"),
+            Object(NonMatching, "dvd/dvdqueue.c"),
+            Object(NonMatching, "dvd/fstload.c"),
+        ],
+    ),
     {
         "lib": "Runtime.PPCEABI.H",
         "mw_version": config.linker_version,
@@ -392,7 +416,7 @@ config.libs = [
             Object(NonMatching, "TRK_MINNOW_DOLPHIN/flush_cache.c"),
             Object(NonMatching, "TRK_MINNOW_DOLPHIN/main.c"),
             Object(NonMatching, "TRK_MINNOW_DOLPHIN/main_TRK.c"),
-            Object(NonMatching, "TRK_MINNOW_DOLPHIN/mainloop.c"),
+            Object(Matching, "TRK_MINNOW_DOLPHIN/mainloop.c"),
             Object(NonMatching, "TRK_MINNOW_DOLPHIN/mem_TRK.c"),
             Object(NonMatching, "TRK_MINNOW_DOLPHIN/mpc_7xx_603e.c"),
             Object(NonMatching, "TRK_MINNOW_DOLPHIN/msg.c"),
@@ -413,6 +437,22 @@ config.libs = [
             Object(NonMatching, "TRK_MINNOW_DOLPHIN/targsupp.s"),
             Object(NonMatching, "TRK_MINNOW_DOLPHIN/UDP_Stubs.c"),
             Object(NonMatching, "TRK_MINNOW_DOLPHIN/usr_put.c"),
+        ],
+    },
+    {
+        "lib": "amcstubs",
+        "mw_version": config.linker_version,
+        "cflags": cflags_amcstub,
+        "objects": [
+            Object(Matching, "amcstubs/AmcExi2Stubs.c"),
+        ],
+    },
+    {
+        "lib": "odenotstub",
+        "mw_version": config.linker_version,
+        "cflags": cflags_odenotstub,
+        "objects": [
+            Object(Matching, "odenotstub/odenotstub.c"),
         ],
     },
 ]

@@ -7,9 +7,10 @@
 extern "C" {
 #endif
 
-int __msl_strnicmp(const char* str1, const char* str2, int n);
+FILE *fopen(const char *filename, const char *mode);
 int fflush(FILE* file);
 int fclose(FILE* file);
+int __get_file_modes(const char* mode, file_modes* modes);
 
 #ifdef __cplusplus
 }

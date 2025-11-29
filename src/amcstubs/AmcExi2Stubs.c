@@ -1,113 +1,40 @@
+#include <dolphin.h>
 
+// EXI error codes
+typedef enum { AMC_EXI_NO_ERROR = 0, AMC_EXI_UNSELECTED } AmcExiError;
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void EXI2_Init(void)
+int AMC_IsStub();
+void EXI2_Unreserve();
+void EXI2_Reserve();
+AmcExiError EXI2_WriteN();
+AmcExiError EXI2_ReadN();
+int EXI2_Poll();
+void EXI2_EnableInterrupts();
+void EXI2_Init();
+
+int AMC_IsStub()
 {
-	// TODO
+    return 1;
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void EXI2_EnableInterrupts(void)
+void EXI2_Unreserve() { }
+
+void EXI2_Reserve() { }
+
+AmcExiError EXI2_WriteN()
 {
-	// TODO
+    return AMC_EXI_NO_ERROR;
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void EXI2_Poll(void)
+AmcExiError EXI2_ReadN()
 {
-	// TODO
+    return AMC_EXI_NO_ERROR;
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void EXI2_ReadN(void)
+int EXI2_Poll()
 {
-	// TODO
+    return 0;
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void EXI2_WriteN(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void EXI2_Reserve(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void EXI2_Unreserve(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void AMC_IsStub(void)
-{
-	// TODO
-}
+void EXI2_EnableInterrupts() { }
+void EXI2_Init() { }

@@ -1,4 +1,4 @@
-
+#include <dolphin.h>
 
 /*
  * --INFO--
@@ -9,7 +9,7 @@
  * EN Address: 
  * EN Size: 
  */
-void Hu_IsStub(void)
+int Hu_IsStub(void)
 {
-	// TODO
+	return 0;
 }

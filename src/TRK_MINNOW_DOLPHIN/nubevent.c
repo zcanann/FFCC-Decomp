@@ -1,71 +1,72 @@
+#include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/nubevent.h"
+#include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/mutex_TRK.h"
+#include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/msgbuf.h"
+#include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/mem_TRK.h"
 
+TRKEventQueue gTRKEventQueue;
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void TRKDestructEvent(void)
+DSError TRKInitializeEventQueue()
 {
-	// TODO
+	TRKInitializeMutex(&gTRKEventQueue);
+	TRKAcquireMutex(&gTRKEventQueue);
+	gTRKEventQueue.count   = 0;
+	gTRKEventQueue.next    = 0;
+	gTRKEventQueue.eventID = 0x100;
+	TRKReleaseMutex(&gTRKEventQueue);
+	return DS_NoError;
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void TRKConstructEvent(void)
+void TRKCopyEvent(TRKEvent* dstEvent, const TRKEvent* srcEvent)
 {
-	// TODO
+	TRK_memcpy(dstEvent, srcEvent, sizeof(TRKEvent));
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void TRKPostEvent(void)
+BOOL TRKGetNextEvent(TRKEvent* event)
 {
-	// TODO
+	BOOL status = 0;
+	TRKAcquireMutex(&gTRKEventQueue);
+	if (0 < gTRKEventQueue.count) {
+		TRKCopyEvent(event, &gTRKEventQueue.events[gTRKEventQueue.next]);
+		gTRKEventQueue.count--;
+		gTRKEventQueue.next++;
+		if (gTRKEventQueue.next == 2)
+			gTRKEventQueue.next = 0;
+
+		status = 1;
+	}
+	TRKReleaseMutex(&gTRKEventQueue);
+	return status;
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void TRKGetNextEvent(void)
+DSError TRKPostEvent(TRKEvent* event)
 {
-	// TODO
+	DSError ret = DS_NoError;
+	int nextEventID;
+
+	TRKAcquireMutex(&gTRKEventQueue);
+
+	if (gTRKEventQueue.count == 2) {
+		ret = DS_EventQueueFull;
+	} else {
+		nextEventID = (gTRKEventQueue.next + gTRKEventQueue.count) % 2;
+		TRKCopyEvent(&gTRKEventQueue.events[nextEventID], event);
+		gTRKEventQueue.events[nextEventID].eventID = gTRKEventQueue.eventID;
+		gTRKEventQueue.eventID++;
+		if (gTRKEventQueue.eventID < 0x100)
+			gTRKEventQueue.eventID = 0x100;
+
+		gTRKEventQueue.count++;
+	}
+
+	TRKReleaseMutex(&gTRKEventQueue);
+	return ret;
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void TRKInitializeEventQueue(void)
+void TRKConstructEvent(TRKEvent* event, NubEventType eventType)
 {
-	// TODO
+	event->eventType = eventType;
+	event->eventID   = 0;
+	event->msgBufID  = -1;
 }
+
+void TRKDestructEvent(TRKEvent* event) { TRKReleaseBuffer(event->msgBufID); }

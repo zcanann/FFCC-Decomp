@@ -1693,7 +1693,7 @@ TRK_MINNOW_DOLPHIN/mem_TRK.c:
 TRK_MINNOW_DOLPHIN/targimpl.c:
 	.text       start:0x801ABB1C end:0x801AD6B0
 
-TRK_MINNOW_DOLPHIN/targsupp.c:
+TRK_MINNOW_DOLPHIN/targsupp.s:
 	.text       start:0x801AD6B0 end:0x801AD6D0
 
 TRK_MINNOW_DOLPHIN/mpc_7xx_603e.c:

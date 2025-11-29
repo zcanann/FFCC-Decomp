@@ -1,29 +1,11 @@
+#include "PowerPC_EABI_Support/MetroTRK/trk.h"
 
+static u8 bUseSerialIO;
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void GetUseSerialIO(void)
-{
-	// TODO
+void SetUseSerialIO(u8 sio) {
+    bUseSerialIO = sio;
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void SetUseSerialIO(void)
-{
-	// TODO
+u8 GetUseSerialIO(void) {
+    return bUseSerialIO;
 }

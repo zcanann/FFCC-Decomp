@@ -1,113 +1,120 @@
+#include "PowerPC_EABI_Support/MetroTRK/trk.h"
+#include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/msghndlr.h"
+#include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/msghndlr.h"
+#include "TRK_MINNOW_DOLPHIN/Os/dolphin/targsupp.h"
 
+#include <stddef.h>
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+// forward declares
+DSIOResult __read_file(u32 handle, u8* buffer, size_t* count, void* ref_con);
+DSIOResult __write_file(u32 handle, u8* buffer, size_t* count, void* ref_con);
+DSIOResult __access_file(u32 handle, u8* buffer, size_t* count, void* ref_con, MessageCommandID cmd);
+
+/**
+ * @note Address: 0x800C0B4C
+ * @note Size: 0xBC
  */
-void __position_file(void)
+DSIOResult __read_console(u32 handle, u8* buffer, size_t* count, void* ref_con)
 {
-	// TODO
+	if (GetUseSerialIO() == 0) {
+		return DS_IOError;
+	}
+	return __read_file(DS_Stdin, buffer, count, ref_con);
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+/**
+ * @note Address: 0x800C0A90
+ * @note Size: 0xBC
  */
-void __close_file(void)
+DSIOResult __TRK_write_console(u32 handle, u8* buffer, size_t* count, void* ref_con)
 {
-	// TODO
+	if (GetUseSerialIO() == 0) {
+		return DS_IOError;
+	}
+	return __write_file(DS_Stdout, buffer, count, ref_con);
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+/**
+ * @note Address: N/A
+ * @note Size: 0xB4
+ */
+DSIOResult __read_file(u32 handle, u8* buffer, size_t* count, void* ref_con)
+{
+	return __access_file(handle, buffer, count, ref_con, DSMSG_ReadFile);
+}
+
+/**
+ * @note Address: N/A
+ * @note Size: 0xB4
+ */
+DSIOResult __write_file(u32 handle, u8* buffer, size_t* count, void* ref_con)
+{
+	return __access_file(handle, buffer, count, ref_con, DSMSG_WriteFile);
+}
+
+/**
+ * @note Address: N/A
+ * @note Size: 0x17C
  */
 void __open_file(void)
 {
-	// TODO
+	// UNUSED FUNCTION
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+/**
+ * @note Address: N/A
+ * @note Size: 0xDC
  */
-void __write_file(void)
+void __position_file(void)
 {
-	// TODO
+	// UNUSED FUNCTION
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+/**
+ * @note Address: N/A
+ * @note Size: 0xE0
  */
-void __read_file(void)
+void convertFileMode(void)
 {
-	// TODO
+	// UNUSED FUNCTION
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+/**
+ * @note Address: N/A
+ * @note Size: 0xC0
  */
-void __close_console(void)
+ 
+DSIOResult __access_file(u32 handle, u8* buffer, size_t* count, void* ref_con, MessageCommandID cmd)
 {
-	// TODO
+	/*
+	size_t countTemp;
+	u32 r0;
+
+	if (GetTRKConnected() == DS_NoError) {
+		return DS_IOError;
+	}
+
+	countTemp = *count;
+	r0        = TRKAccessFile(cmd, handle, &countTemp, buffer);
+	*count    = countTemp;
+
+	switch ((u8)r0) {
+	case DS_IONoError:
+		return DS_IONoError;
+	case DS_IOEOF:
+		return DS_IOEOF;
+	}*/
+
+	return DS_IOError;
+	
+	// UNUSED FUNCTION
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+/**
+ * @note Address: N/A
+ * @note Size: 0x1D0
  */
-void __TRK_write_console(void)
+void __open_temp_file(void)
 {
-	// TODO
-}
-
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void __read_console(void)
-{
-	// TODO
+	// UNUSED FUNCTION
 }

@@ -1,29 +1,27 @@
+#include "TRK_MINNOW_DOLPHIN/Os/dolphin/usr_put.h"
+#include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/msghndlr.h"
+#include "PowerPC_EABI_Support/MetroTRK/trk.h"
+#include "dolphin/os.h"
 
-
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void usr_put_initialize(void)
+BOOL usr_puts_serial(const char* msg)
 {
-	// TODO
+	BOOL connect_ = FALSE;
+	char c;
+	char buf[2];
+
+	while (!connect_ && (c = *msg++) != '\0') {
+		BOOL connect = GetTRKConnected();
+
+		buf[0] = c;
+		buf[1] = '\0';
+
+		SetTRKConnected(FALSE);
+		OSReport(buf);
+
+		SetTRKConnected(connect);
+		connect_ = FALSE;
+	}
+	return connect_;
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void usr_puts_serial(void)
-{
-	// TODO
-}
+void usr_put_initialize(void) { }

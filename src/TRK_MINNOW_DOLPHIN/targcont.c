@@ -1,15 +1,12 @@
+#include "TRK_MINNOW_DOLPHIN/Os/dolphin/targcont.h"
+#include "TRK_MINNOW_DOLPHIN/Os/dolphin/dolphin_trk_glue.h"
+#include "TRK_MINNOW_DOLPHIN/ppc/Generic/targimpl.h"
 
-
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void TRKTargetContinue(void)
+DSError TRKTargetContinue(void)
 {
-	// TODO
+	TRKTargetSetStopped(0);
+	UnreserveEXI2Port();
+	TRKSwapAndGo();
+	ReserveEXI2Port();
+	return 0;
 }

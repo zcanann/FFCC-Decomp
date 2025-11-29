@@ -1,15 +1,17 @@
+#include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/main_TRK.h"
+#include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/nubinit.h"
 
+static DSError TRK_mainError;
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void TRK_main(void)
+DSError TRK_main(void)
 {
-	// TODO
+	TRK_mainError = TRKInitializeNub();
+
+	if (TRK_mainError == DS_NoError) {
+		TRKNubWelcome();
+		TRKNubMainLoop();
+	}
+
+	TRK_mainError = TRKTerminateNub();
+	return TRK_mainError;
 }

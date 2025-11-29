@@ -1,43 +1,7 @@
+#include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/mutex_TRK.h"
 
+DSError TRKInitializeMutex(void*) { return DS_NoError; }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void TRKReleaseMutex(void)
-{
-	// TODO
-}
+DSError TRKAcquireMutex(void*) { return DS_NoError; }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void TRKAcquireMutex(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void TRKInitializeMutex(void)
-{
-	// TODO
-}
+DSError TRKReleaseMutex(void*) { return DS_NoError; }

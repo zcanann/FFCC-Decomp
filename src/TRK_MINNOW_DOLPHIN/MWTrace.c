@@ -1,4 +1,4 @@
-
+#include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/MWTrace.h"
 
 /*
  * --INFO--
@@ -9,7 +9,7 @@
  * EN Address: 
  * EN Size: 
  */
-void MWTRACE(void)
+void MWTRACE(u8, char*, ...)
 {
-	// TODO
+	
 }

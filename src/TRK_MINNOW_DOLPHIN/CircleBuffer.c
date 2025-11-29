@@ -1,6 +1,6 @@
-#include "TRK_MINNOW_DOLPHIN/CircleBuffer.h"
+#include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/CircleBuffer.h"
 
-#include "TRK_MINNOW_DOLPHIN/MWCriticalSection_gc.h"
+#include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/MWCriticalSection_gc.h"
 #include "string.h"
 
 /*

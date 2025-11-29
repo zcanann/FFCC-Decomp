@@ -253,6 +253,11 @@ cflags_msl = [
     "-inline auto,deferred",
 ]
 
+cflags_odemuexi = [
+    *cflags_base,
+    "-inline deferred"
+]
+
 # Metrowerks library flags
 cflags_trk = [
     *cflags_base,
@@ -297,7 +302,7 @@ config.libs = [
         "lib": "Runtime.PPCEABI.H",
         "mw_version": config.linker_version,
         "cflags": cflags_runtime,
-        "progress_category": "sdk",  # str | List[str]
+        "progress_category": "sdk",
         "objects": [
             Object(NonMatching, "Runtime.PPCEABI.H/__init_cpp_exceptions.cpp"),
             Object(NonMatching, "Runtime.PPCEABI.H/__va_arg.c"),
@@ -315,7 +320,7 @@ config.libs = [
         "lib": "MSL_C.PPCEABI.bare.H",
         "mw_version": config.linker_version,
         "cflags": cflags_msl,
-        "progress_category": "sdk",  # str | List[str]
+        "progress_category": "sdk",
         "objects": [
             # Object(NonMatching, "MSL_C/PPCEABI/bare/H/abort_exit.c"),
             # Object(NonMatching, "MSL_C/PPCEABI/bare/H/alloc.c"),
@@ -366,37 +371,48 @@ config.libs = [
         ],
     },
     {
+        "lib": "OdemuExi2",
+        "mw_version": "GC/1.3",
+        "cflags": cflags_odemuexi,
+        "progress_category": "sdk",
+        "objects": [
+            Object(NonMatching, "OdemuExi2/DebuggerDriver.c"),
+        ],
+    },
+    {
         "lib": "TRK_MINNOW_DOLPHIN",
         "mw_version": "GC/1.3",
         "cflags": cflags_trk,
+        "progress_category": "sdk",
         "objects": [
             Object(NonMatching, "TRK_MINNOW_DOLPHIN/CircleBuffer.c"),
-            # Object(NonMatching, "TRK_MINNOW_DOLPHIN/dispatch.c"),
-            # Object(NonMatching, "TRK_MINNOW_DOLPHIN/dolphin_trk.c"),
-            # Object(NonMatching, "TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c"),
-            # Object(NonMatching, "TRK_MINNOW_DOLPHIN/flush_cache.c"),
-            # Object(NonMatching, "TRK_MINNOW_DOLPHIN/main.c"),
-            # Object(NonMatching, "TRK_MINNOW_DOLPHIN/main_TRK.c"),
-            # Object(NonMatching, "TRK_MINNOW_DOLPHIN/mainloop.c"),
-            # Object(NonMatching, "TRK_MINNOW_DOLPHIN/mem_TRK.c"),
-            # Object(NonMatching, "TRK_MINNOW_DOLPHIN/mpc_7xx_603e.c"),
-            # Object(NonMatching, "TRK_MINNOW_DOLPHIN/msg.c"),
-            # Object(NonMatching, "TRK_MINNOW_DOLPHIN/msgbuf.c"),
-            # Object(NonMatching, "TRK_MINNOW_DOLPHIN/msghndlr.c"),
-            # Object(NonMatching, "TRK_MINNOW_DOLPHIN/mslsupp.c"),
-            # Object(NonMatching, "TRK_MINNOW_DOLPHIN/mutex_TRK.c"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/dispatch.c"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/dolphin_trk.c"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/flush_cache.c"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/main.c"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/main_TRK.c"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/mainloop.c"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/mem_TRK.c"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/mpc_7xx_603e.c"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/msg.c"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/msgbuf.c"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/msghndlr.c"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/mslsupp.c"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/mutex_TRK.c"),
             Object(NonMatching, "TRK_MINNOW_DOLPHIN/MWCriticalSection_gc.c"),
-            # Object(NonMatching, "TRK_MINNOW_DOLPHIN/MWTrace.c"),
-            # Object(NonMatching, "TRK_MINNOW_DOLPHIN/notify.c"),
-            # Object(NonMatching, "TRK_MINNOW_DOLPHIN/nubevent.c"),
-            # Object(NonMatching, "TRK_MINNOW_DOLPHIN/nubinit.c"),
-            # Object(NonMatching, "TRK_MINNOW_DOLPHIN/serpoll.c"),
-            # Object(NonMatching, "TRK_MINNOW_DOLPHIN/support.c"),
-            # Object(NonMatching, "TRK_MINNOW_DOLPHIN/targcont.c"),
-            # Object(NonMatching, "TRK_MINNOW_DOLPHIN/target_options.c"),
-            # Object(NonMatching, "TRK_MINNOW_DOLPHIN/targimpl.c"),
-            # Object(NonMatching, "TRK_MINNOW_DOLPHIN/UDP_Stubs.c"),
-            # Object(NonMatching, "TRK_MINNOW_DOLPHIN/usr_put.c"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/MWTrace.c"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/notify.c"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/nubevent.c"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/nubinit.c"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/serpoll.c"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/support.c"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/targcont.c"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/target_options.c"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/targimpl.c"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/targsupp.s"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/UDP_Stubs.c"),
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/usr_put.c"),
         ],
     },
 ]

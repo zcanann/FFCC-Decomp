@@ -1736,38 +1736,38 @@ TRK_MINNOW_DOLPHIN/MWTrace.c:
 TRK_MINNOW_DOLPHIN/MWCriticalSection_gc.c:
 	.text       start:0x801AF64C end:0x801AF6A4
 
-Runtime/PPCEABI/H/__va_arg.c:
+Runtime.PPCEABI.H/__va_arg.c:
 	.text       start:0x801AF6A4 end:0x801AF76C
 
-Runtime/PPCEABI/H/global_destructor_chain.c:
+Runtime.PPCEABI.H/global_destructor_chain.c:
 	.text       start:0x801AF76C end:0x801AF7CC
 	.dtors      start:0x801D5468 end:0x801D546C
 
-Runtime/PPCEABI/H/CPlusLibPPC.cp:
+Runtime.PPCEABI.H/CPlusLibPPC.cp:
 	.text       start:0x801AF7CC end:0x801AF7FC
 
-Runtime/PPCEABI/H/New.cp:
+Runtime.PPCEABI.H/New.cp:
 	extab       start:0x8000A1DC end:0x8000A204
 	extabindex  start:0x80011794 end:0x800117A0
 	.text       start:0x801AF7FC end:0x801AF87C
 
-Runtime/PPCEABI/H/NMWException.cp:
+Runtime.PPCEABI.H/NMWException.cp:
 	extab       start:0x8000A204 end:0x8000A26C
 	extabindex  start:0x800117A0 end:0x8001180C
 	.text       start:0x801AF87C end:0x801AFEEC
 
-Runtime/PPCEABI/H/ptmf.p:
+Runtime.PPCEABI.H/ptmf.p:
 	.text       start:0x801AFEEC end:0x801AFF44
 
-Runtime/PPCEABI/H/runtime.p:
+Runtime.PPCEABI.H/runtime.p:
 	.text       start:0x801AFF44 end:0x801B063C
 
-Runtime/PPCEABI/H/Gecko_ExceptionPPC.cp:
+Runtime.PPCEABI.H/Gecko_ExceptionPPC.cp:
 	extab       start:0x8000A26C end:0x8000A2E0
 	extabindex  start:0x8001180C end:0x80011860
 	.text       start:0x801B06B8 end:0x801B1AF0
 
-Runtime/PPCEABI/H/GCN_mem_alloc.p:
+Runtime.PPCEABI.H/GCN_mem_alloc.p:
 	.text       start:0x801B1AF0 end:0x801B1C60
 
 MSL_C/PPCEABI/bare/H/abort_exit.c:

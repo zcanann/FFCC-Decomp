@@ -427,6 +427,17 @@ config.libs = [
         ],
     ),
     DolphinLib(
+        "axfx",
+        [
+            Object(NonMatching, "axfx/axfx.c"),
+            Object(NonMatching, "axfx/chorus.c"),
+            Object(NonMatching, "axfx/delay.c"),
+            Object(NonMatching, "axfx/reverb_hi.c"),
+            Object(NonMatching, "axfx/reverb_hi_4ch.c"),
+            Object(NonMatching, "axfx/reverb_std.c"),
+        ],
+    ),
+    DolphinLib(
         "dsp",
         [
             Object(NonMatching, "dsp/dsp.c"),

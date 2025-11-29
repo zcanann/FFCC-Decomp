@@ -1,43 +1,20 @@
+#include <dolphin.h>
+#include <dolphin/ax.h>
 
-
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void __AXFXAllocFunction(void)
-{
-	// TODO
+static void* __AXFXAllocFunction(u32 bytes) {
+    return OSAlloc(bytes);
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void __AXFXFreeFunction(void)
-{
-	// TODO
+static void __AXFXFreeFunction(void* p) {
+    OSFree(p);
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void AXFXSetHooks(void)
-{
-	// TODO
+void* (*__AXFXAlloc)(u32) = __AXFXAllocFunction;
+void (*__AXFXFree)(void*) = __AXFXFreeFunction;
+
+void AXFXSetHooks(void* (*alloc)(u32), void (*free)(void*)) {
+    ASSERTLINE(46, alloc && free);
+
+    __AXFXAlloc = alloc;
+    __AXFXFree = free;
 }

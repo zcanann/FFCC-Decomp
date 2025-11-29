@@ -392,18 +392,34 @@ config.libs = [
             Object(NonMatching, "vi/vi.c"),
         ],
     ),
-    #DolphinLib(
-        #"gba",
-        #[
-            # Object(Matching, "gba/GBA.c"),
-            #Object(Matching, "gba/GBAGetProcessStatus.c"),
-            #Object(Matching, "gba/GBAJoyBoot.c"),
-            #Object(Matching, "gba/GBAKey.c"),
-            #Object(Matching, "gba/GBARead.c"),
-            #Object(Matching, "gba/GBAWrite.c"),
-            #Object(Matching, "gba/GBAXfer.c"),
-        #],
-    #),
+    DolphinLib(
+        "dsp",
+        [
+            Object(NonMatching, "dsp/dsp.c"),
+            Object(NonMatching, "dsp/dsp_debug.c"),
+            Object(NonMatching, "dsp/dsp_task.c"),
+        ],
+    ),
+    DolphinLib(
+        "card",
+        [
+            Object(NonMatching, "card/CARDBios.c"),
+            Object(NonMatching, "card/CARDBlock.c"),
+            Object(NonMatching, "card/CARDCheck.c"),
+            Object(NonMatching, "card/CARDCreate.c"),
+            Object(NonMatching, "card/CARDDelete.c"),
+            Object(NonMatching, "card/CARDDir.c"),
+            Object(NonMatching, "card/CARDFormat.c"),
+            Object(NonMatching, "card/CARDMount.c"),
+            Object(NonMatching, "card/CARDNet.c"),
+            Object(NonMatching, "card/CARDOpen.c"),
+            Object(NonMatching, "card/CARDRdwr.c"),
+            Object(NonMatching, "card/CARDRead.c"),
+            Object(NonMatching, "card/CARDStat.c"),
+            Object(NonMatching, "card/CARDUnlock.c"),
+            Object(NonMatching, "card/CARDWrite.c"),
+        ],
+    ),
     DolphinLib(
         "gx",
         [
@@ -429,6 +445,18 @@ config.libs = [
             Object(NonMatching, "gx/GXVert.c"),
         ],
     ),
+    #DolphinLib(
+        #"gba",
+        #[
+            # Object(Matching, "gba/GBA.c"),
+            #Object(Matching, "gba/GBAGetProcessStatus.c"),
+            #Object(Matching, "gba/GBAJoyBoot.c"),
+            #Object(Matching, "gba/GBAKey.c"),
+            #Object(Matching, "gba/GBARead.c"),
+            #Object(Matching, "gba/GBAWrite.c"),
+            #Object(Matching, "gba/GBAXfer.c"),
+        #],
+    #),
     {
         "lib": "Runtime.PPCEABI.H",
         "mw_version": config.linker_version,

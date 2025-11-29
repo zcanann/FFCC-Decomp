@@ -2,7 +2,7 @@
 #define __DOLPHIN_H__
 
 #include <dolphin/types.h>
-#include <dolphin/PPCArch.h>
+#include <dolphin/base/PPCArch.h>
 #include <dolphin/db.h>
 #include <dolphin/os.h>
 #include <dolphin/dvd.h>

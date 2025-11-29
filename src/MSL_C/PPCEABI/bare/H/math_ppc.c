@@ -1,85 +1,20 @@
-
-
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void powf(void)
-{
-	// TODO
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/math_ppc.h"
+float acosf(float arg0) {
+    return (float) acos(arg0);
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void tanf(void)
-{
-	// TODO
+float atan2f(float arg0) {
+    return (float) atan2(arg0);
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void sinf(void)
-{
-	// TODO
+float cosf(float arg0) {
+    return (float) cos(arg0);
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void cosf(void)
-{
-	// TODO
+float sinf(float arg0) {
+    return (float) sin(arg0);
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void acosf(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void __fpclassifyf(void)
-{
-	// TODO
+float tanf(float arg0) {
+    return (float) tan(arg0);
 }

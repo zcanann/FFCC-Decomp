@@ -1,57 +1,41 @@
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/ansi_files.h"
 
-
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void setvbuf(void)
+void __prep_buffer(FILE* file)
 {
-	// TODO
+	file->buffer_ptr    = file->buffer;
+	file->buffer_length = file->buffer_size;
+	file->buffer_length -= file->position & file->buffer_alignment;
+	file->buffer_position = file->position;
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void __flush_buffer(void)
-{
-	// TODO
-}
+void __convert_from_newlines(unsigned char* p, size_t* n) { }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void __load_buffer(void)
+int __flush_buffer(FILE* file, size_t* bytes_flushed)
 {
-	// TODO
-}
+	size_t buffer_len;
+	int ioresult;
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void __prep_buffer(void)
-{
-	// TODO
+	buffer_len = file->buffer_ptr - file->buffer;
+
+	if (buffer_len) {
+		file->buffer_length = buffer_len;
+
+		if (!file->file_mode.binary_io)
+			__convert_from_newlines(file->buffer, &file->buffer_length);
+
+		ioresult = (*file->write_fn)(file->handle, file->buffer,
+		                             &file->buffer_length, file->idle_fn);
+
+		if (bytes_flushed)
+			*bytes_flushed = file->buffer_length;
+
+		if (ioresult)
+			return ioresult;
+
+		file->position += file->buffer_length;
+	}
+
+	__prep_buffer(file);
+
+	return __no_io_error;
 }

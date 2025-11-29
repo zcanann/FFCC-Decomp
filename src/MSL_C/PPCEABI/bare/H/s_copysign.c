@@ -24,8 +24,8 @@
  * --INFO--
  * JP Address: 
  * JP Size: 
- * PAL Address: 
- * PAL Size: 
+ * PAL Address: 0x801bb9fc
+ * PAL Size: 0x28
  * EN Address: 
  * EN Size: 
  */

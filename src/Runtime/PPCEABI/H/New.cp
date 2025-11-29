@@ -1,21 +1,8 @@
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/alloc.h"
+#include "PowerPC_EABI_Support/Runtime/New.h"
 
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void std::exception::~exception()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void std::exception::what() const
-{
-	// TODO
+void operator delete(void* arg0) throw() {
+    if (arg0 != 0) {
+        free(arg0);
+    }
 }

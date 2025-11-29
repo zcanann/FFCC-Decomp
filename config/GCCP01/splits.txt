@@ -1756,10 +1756,10 @@ Runtime.PPCEABI.H/NMWException.cp:
 	extabindex  start:0x800117A0 end:0x8001180C
 	.text       start:0x801AF87C end:0x801AFEEC
 
-Runtime.PPCEABI.H/ptmf.p:
+Runtime.PPCEABI.H/ptmf.c:
 	.text       start:0x801AFEEC end:0x801AFF44
 
-Runtime.PPCEABI.H/runtime.p:
+Runtime.PPCEABI.H/runtime.c:
 	.text       start:0x801AFF44 end:0x801B063C
 
 Runtime.PPCEABI.H/Gecko_ExceptionPPC.cp:
@@ -1767,7 +1767,7 @@ Runtime.PPCEABI.H/Gecko_ExceptionPPC.cp:
 	extabindex  start:0x8001180C end:0x80011860
 	.text       start:0x801B06B8 end:0x801B1AF0
 
-Runtime.PPCEABI.H/GCN_mem_alloc.p:
+Runtime.PPCEABI.H/GCN_mem_alloc.c:
 	.text       start:0x801B1AF0 end:0x801B1C60
 
 MSL_C/PPCEABI/bare/H/abort_exit.c:

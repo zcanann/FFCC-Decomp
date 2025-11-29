@@ -1,7 +1,8 @@
-#include "Runtime.PPCEABI.H/__va_arg.h"
+#include "PowerPC_EABI_Support/Runtime/__va_arg.h"
 
 #undef __va_arg
 
+/* 80361B14-80361BDC 35C454 00C8+00 0/0 3/3 0/0 .text            __va_arg */
 void* __va_arg(_va_list_struct* list, int type) {
     char* addr;
     char* reg = &(list->gpr);
@@ -37,7 +38,7 @@ void* __va_arg(_va_list_struct* list, int type) {
     } else {
         *reg = 8;
         addr = list->input_arg_area;
-        addr = (char*)(((u32)(addr) + ((size)-1)) & ~((size)-1));
+        addr = (char*)(((unsigned int)(addr) + ((size)-1)) & ~((size)-1));
         list->input_arg_area = addr + size;
     }
 

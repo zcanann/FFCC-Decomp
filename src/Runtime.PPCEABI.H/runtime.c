@@ -139,7 +139,7 @@ asm u32 __cvt_fp2unsigned(register f64 d)
 }
 
 /* 80362108-80362134 35CA48 002C+00 0/0 0/0 0/0 .text            __save_fpr */
-asm void __save_fpr(void) {
+asm static void __save_fpr(void) {
 #ifdef __MWERKS__ // clang-format off
 	nofralloc
     ENTRY_SAVE_FPR(14)
@@ -183,7 +183,7 @@ asm void __save_fpr(void) {
 }
 
 /* 80362154-80362180 35CA94 002C+00 0/0 0/0 0/0 .text            __restore_fpr */
-asm void __restore_fpr(void) {
+asm static void __restore_fpr(void) {
 #ifdef __MWERKS__ // clang-format off
 	nofralloc
     ENTRY_RESTORE_FPR(14)
@@ -227,7 +227,7 @@ asm void __restore_fpr(void) {
 }
 
 /* 803621A0-803621A4 35CAE0 0004+00 0/0 22/22 13/13 .text            _savegpr_14 */
-asm void __save_gpr(void) {
+asm static void __save_gpr(void) {
 #ifdef __MWERKS__ // clang-format off
 	nofralloc
 	ENTRY_SAVE_GPR(14)
@@ -271,7 +271,7 @@ asm void __save_gpr(void) {
 }
 
 /* 803621EC-803621F0 35CB2C 0004+00 0/0 22/22 13/13 .text            _restgpr_14 */
-asm void __restore_gpr(void) {
+asm static void __restore_gpr(void) {
 #ifdef __MWERKS__ // clang-format off
 	nofralloc
 	ENTRY_RESTORE_GPR(14)

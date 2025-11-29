@@ -1,6 +1,14 @@
 #include "PowerPC_EABI_Support/Runtime/NMWException.h"
 #include "PowerPC_EABI_Support/Runtime/MWCPlusLib.h"
 
+typedef void (*unexpected_handler)();
+unexpected_handler set_unexpected(unexpected_handler handler);
+void unexpected();
+
+typedef void (*terminate_handler)();
+terminate_handler set_terminate(terminate_handler handler);
+void terminate();
+
 #define ARRAY_HEADER_SIZE 16
 
 extern "C" {
@@ -8,41 +16,32 @@ extern void abort();
 }
 
 namespace std {
-/**
- * @note Address: N/A
- * @note Size: 0x20
- */
 static void dthandler() { abort(); }
 
 static terminate_handler thandler = dthandler;
 
-/**
- * @note Address: N/A
- * @note Size: 0x28
- */
 static void duhandler() { terminate(); }
 
 static unexpected_handler uhandler = duhandler;
 
-/**
- * @note Address: N/A
- * @note Size: 0x28
- */
+extern terminate_handler set_terminate(terminate_handler handler) {
+	terminate_handler old = thandler;
+	thandler              = handler;
+	return old;
+}
+
 extern void terminate() { thandler(); }
 
-/**
- * @note Address: N/A
- * @note Size: 0x28
- */
+extern unexpected_handler set_unexpected(unexpected_handler handler) {
+	unexpected_handler old = uhandler;
+	uhandler               = handler;
+	return old;
+}
+
 extern void unexpected() { uhandler(); }
 } // namespace std
 
-/**
- * @note Address: N/A
- * @note Size: 0x22C
- */
-extern char __throw_catch_compare(const char* throwtype, const char* catchtype, s32* offset_result)
-{
+extern char __throw_catch_compare(const char* throwtype, const char* catchtype, long* offset_result) {
 	const char *cptr1, *cptr2;
 
 	*offset_result = 0;
@@ -75,7 +74,7 @@ extern char __throw_catch_compare(const char* throwtype, const char* catchtype, 
 		for (;;) {
 			if (*cptr1 == *cptr2++) {
 				if (*cptr1++ == '!') {
-					s32 offset;
+					long offset;
 
 					for (offset = 0; *cptr1 != '!';) {
 						offset = offset * 10 + *cptr1++ - '0';
@@ -134,8 +133,7 @@ private:
 public:
 	size_t i;
 
-	__partial_array_destructor(void* array, size_t elementsize, size_t nelements, ConstructorDestructor destructor)
-	{
+	__partial_array_destructor(void* array, size_t elementsize, size_t nelements, ConstructorDestructor destructor) {
 		p    = array;
 		size = elementsize;
 		n    = nelements;
@@ -143,8 +141,7 @@ public:
 		i    = n;
 	}
 
-	~__partial_array_destructor()
-	{
+	~__partial_array_destructor() {
 		char* ptr;
 
 		if (i < n && dtor) {
@@ -155,3 +152,67 @@ public:
 		}
 	}
 };
+
+extern void* __construct_new_array(void* block, ConstructorDestructor ctor, ConstructorDestructor dtor, size_t size, size_t n) {
+	char* ptr;
+
+	if ((ptr = (char*)block) != 0L) {
+		size_t* p = (size_t*)ptr;
+
+		p[0] = size;
+		p[1] = n;
+		ptr += ARRAY_HEADER_SIZE;
+
+		if (ctor) {
+			__partial_array_destructor pad(ptr, size, n, dtor);
+			char* p;
+
+			for (pad.i = 0, p = (char*)ptr; pad.i < n; pad.i++, p += size) {
+				CTORCALL_COMPLETE(ctor, p);
+			}
+		}
+	}
+	return ptr;
+}
+
+extern void __construct_array(void* ptr, ConstructorDestructor ctor, ConstructorDestructor dtor, size_t size, size_t n) {
+	__partial_array_destructor pad(ptr, size, n, dtor);
+	char* p;
+
+	for (pad.i = 0, p = (char*)ptr; pad.i < n; pad.i++, p += size) {
+		CTORCALL_COMPLETE(ctor, p);
+	}
+}
+
+extern void __destroy_arr(void* block, ConstructorDestructor* dtor, size_t size, size_t n) {
+	char* p;
+
+	for (p = (char*)block + size * n; n > 0; n--) {
+		p -= size;
+		DTORCALL_COMPLETE(dtor, p);
+	}
+}
+
+extern void __destroy_new_array(void* block, ConstructorDestructor dtor) {
+	if (block) {
+		if (dtor) {
+			size_t i, objects, objectsize;
+			char* p;
+
+			objectsize = *(size_t*)((char*)block - ARRAY_HEADER_SIZE);
+			objects    = ((size_t*)((char*)block - ARRAY_HEADER_SIZE))[1];
+			p          = (char*)block + (objectsize * objects);
+
+			for (i = 0; i < objects; i++) {
+				p -= objectsize;
+				DTORCALL_COMPLETE(dtor, p);
+			}
+		}
+
+		::operator delete[]((char*)block - ARRAY_HEADER_SIZE);
+	}
+}
+
+void __destroy_new_array2(void) {}
+
+void __destroy_new_array3(void) {}

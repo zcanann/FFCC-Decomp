@@ -2,10 +2,10 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/ansi_fp.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/direct_io.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/ctype.h"
-#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/string.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/scanf.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h"
+#include "string.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/wchar_io.h"
 #include "stdarg.h"
 

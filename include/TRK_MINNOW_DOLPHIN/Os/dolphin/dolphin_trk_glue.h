@@ -38,6 +38,7 @@ void TRKLoadContext(OSContext* ctx, u32 r4);
 int InitMetroTRKCommTable(int hwId);
 void EnableEXI2Interrupts(void);
 void TRK_board_display(char* str);
+void TRKUARTInterruptHandler();
 
 #ifdef __cplusplus
 }

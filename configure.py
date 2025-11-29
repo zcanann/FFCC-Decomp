@@ -160,7 +160,7 @@ if not config.non_matching:
 # Tool versions
 config.binutils_tag = "2.42-1"
 config.compilers_tag = "20250812"
-config.dtk_tag = "v1.7.1"
+config.dtk_tag = "v1.7.4"
 config.objdiff_tag = "v3.4.1"
 config.sjiswrap_tag = "v1.2.2"
 config.wibo_tag = "1.0.0-beta.5"
@@ -324,7 +324,7 @@ config.libs = [
         "objects": [
             Object(NonMatching, "MSL_C/PPCEABI/bare/H/abort_exit.c"),
             Object(NonMatching, "MSL_C/PPCEABI/bare/H/alloc.c"),
-            # Object(NonMatching, "MSL_C/PPCEABI/bare/H/ansi_files.c"),
+            Object(NonMatching, "MSL_C/PPCEABI/bare/H/ansi_files.c"),
             Object(NonMatching, "MSL_C/PPCEABI/bare/H/ansi_fp.c"),
             Object(NonMatching, "MSL_C/PPCEABI/bare/H/buffer_io.c"),
             Object(NonMatching, "MSL_C/PPCEABI/bare/H/critical_regions.gamecube.c"),

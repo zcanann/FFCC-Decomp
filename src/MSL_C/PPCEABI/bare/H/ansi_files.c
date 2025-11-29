@@ -1,4 +1,5 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/ansi_files.h"
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/alloc.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/file_io.h"
 
 static unsigned char stdin_buff[0x100];
@@ -75,24 +76,30 @@ FILE __files[4] = {
 };
 
 void __close_all() {
-    FILE* p = &__files[0];
-    FILE* plast;
+    FILE* file = &__files[0];
+    FILE* last_file;
 
-    while (p != NULL) {
-        if (p->file_mode.file_kind != __closed_file) {
-            fclose(p);
+    __begin_critical_region(2);
+
+    while (file != NULL) {
+        if (file->file_mode.file_kind != __closed_file) {
+            fclose(file);
         }
 
-        plast = p;
-        p = p->next_file_struct;
-        if (plast->is_dynamically_allocated)
-            free(plast);
-        else {
-            plast->file_mode.file_kind = __string_file;
-            if ((p != NULL) && p->is_dynamically_allocated)
-                plast->next_file_struct = NULL;
+        last_file = file;
+        file = file->next_file_struct;
+
+        if (last_file->is_dynamically_allocated) {
+            free(last_file);
+        } else {
+            last_file->file_mode.file_kind = __string_file;
+            if (file != NULL && file->is_dynamically_allocated) {
+                last_file->next_file_struct = NULL;
+            }
         }
     }
+
+    __end_critical_region(2);
 }
 
 unsigned int __flush_all() {

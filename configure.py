@@ -407,6 +407,13 @@ config.libs = [
         ],
     ),
     DolphinLib(
+        "pad",
+        [
+            Object(NonMatching, "pad/Padclamp.c"),
+            Object(NonMatching, "pad/Pad.c"),
+        ],
+    ),
+    DolphinLib(
         "dsp",
         [
             Object(NonMatching, "dsp/dsp.c"),

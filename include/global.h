@@ -20,7 +20,7 @@
 #define _SDA2_BASE_(dummy) 0
 
 #ifndef offsetof
-#define offsetof(type, member) ((size_t) & (((type*)0)->member))
+#define offsetof(type, member) ((unsigned int) & (((type*)0)->member))
 #endif
 
 #define SQUARE(x) ((x) * (x))

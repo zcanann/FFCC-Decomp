@@ -232,6 +232,14 @@ elif args.warn == "off":
     cflags_base.append("-W off")
 elif args.warn == "error":
     cflags_base.append("-W error")
+    
+# Game flags
+cflags_game = [
+    *cflags_base,
+    "-O0,p",
+    "-char unsigned",
+    "-fp_contract off",
+]
 
 # Metrowerks library flags
 cflags_runtime = [
@@ -313,7 +321,14 @@ def MatchingFor(*versions):
 config.warn_missing_config = True
 config.warn_missing_source = False
 config.libs = [
-
+    {
+        "lib": "Game",
+        "mw_version": config.linker_version,
+        "cflags": cflags_game,
+        "objects": [
+            Object(NonMatching, "pppFovAdjustMatrix.cpp"),
+        ]
+    },
     DolphinLib(
         "base",
         [

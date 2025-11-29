@@ -1,4 +1,14 @@
+#include "pppFovAdjustMatrix.h"
 
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void pppFrameFovAdjustMatrix(void)
+{
+	return;
+}
 
 /*
  * --INFO--
@@ -7,7 +17,7 @@
  */
 void pppConstructFovAdjustMatrix(void)
 {
-	// TODO
+	return;
 }
 
 /*
@@ -17,15 +27,5 @@ void pppConstructFovAdjustMatrix(void)
  */
 void pppDestructFovAdjustMatrix(void)
 {
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppFrameFovAdjustMatrix(void)
-{
-	// TODO
+	return;
 }

@@ -1,8 +1,6 @@
 #ifndef _MSL_COMMON_ANSI_FP_H
 #define _MSL_COMMON_ANSI_FP_H
 
-#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/float.h"
-
 #define SIGDIGLEN 36
 
 typedef struct decimal {

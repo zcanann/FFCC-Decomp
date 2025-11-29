@@ -327,7 +327,7 @@ config.libs = [
             Object(NonMatching, "MSL_C/PPCEABI/bare/H/ansi_files.c"),
             Object(NonMatching, "MSL_C/PPCEABI/bare/H/ansi_fp.c"),
             Object(NonMatching, "MSL_C/PPCEABI/bare/H/buffer_io.c"),
-            Object(NonMatching, "MSL_C/PPCEABI/bare/H/critical_regions.gamecube.c"),
+            Object(NonMatching, "MSL_C/PPCEABI/bare/H/critical_regions_gamecube.c"),
             Object(NonMatching, "MSL_C/PPCEABI/bare/H/ctype.c"),
             Object(NonMatching, "MSL_C/PPCEABI/bare/H/direct_io.c"),
             Object(Matching, "MSL_C/PPCEABI/bare/H/extras.c"),

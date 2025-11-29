@@ -1,4 +1,4 @@
-
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/critical_regions.gamecube.h"
 
 /*
  * --INFO--
@@ -9,9 +9,8 @@
  * EN Address: 
  * EN Size: 
  */
-void __end_critical_region(void)
+void __kill_critical_regions(void)
 {
-	// TODO
 }
 
 /*
@@ -25,7 +24,6 @@ void __end_critical_region(void)
  */
 void __begin_critical_region(void)
 {
-	// TODO
 }
 
 /*
@@ -37,7 +35,6 @@ void __begin_critical_region(void)
  * EN Address: 
  * EN Size: 
  */
-void __kill_critical_regions(void)
+void __end_critical_region(void)
 {
-	// TODO
 }

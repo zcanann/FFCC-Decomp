@@ -414,6 +414,12 @@ config.libs = [
         ],
     ),
     DolphinLib(
+        "ai",
+        [
+            Object(NonMatching, "ai/ai.c"),
+        ],
+    ),
+    DolphinLib(
         "ar",
         [
             Object(NonMatching, "ar/ar.c"),
@@ -442,6 +448,19 @@ config.libs = [
             Object(NonMatching, "axfx/reverb_hi.c"),
             Object(NonMatching, "axfx/reverb_hi_4ch.c"),
             Object(NonMatching, "axfx/reverb_std.c"),
+        ],
+    ),
+    DolphinLib(
+        "mix",
+        [
+            Object(NonMatching, "mix/mix.c"),
+        ],
+    ),
+    DolphinLib(
+        "axart",
+        [
+            Object(NonMatching, "axart/axart.c"),
+            Object(NonMatching, "axart/axart3d.c"),
         ],
     ),
     DolphinLib(

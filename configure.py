@@ -353,6 +353,13 @@ config.libs = [
         ],
     ),
     DolphinLib(
+        "exi",
+        [
+            Object(NonMatching, "exi/EXIBios.c"),
+            Object(NonMatching, "exi/EXIUart.c"),
+        ],
+    ),
+    DolphinLib(
         "si",
         [
             Object(NonMatching, "si/SIBios.c"),

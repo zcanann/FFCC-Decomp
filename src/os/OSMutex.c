@@ -1,158 +1,166 @@
-#include "dolphin/os.h"
+#include <dolphin.h>
+#include <dolphin/os.h>
 
-#define PushTail(queue, mutex, link)                                                                                                                 \
-    do {                                                                                                                                             \
-        OSMutex *__prev;                                                                                                                             \
-                                                                                                                                                     \
-        __prev = (queue)->tail;                                                                                                                      \
-        if (__prev == NULL)                                                                                                                          \
-            (queue)->head = (mutex);                                                                                                                 \
-        else                                                                                                                                         \
-            __prev->link.next = (mutex);                                                                                                             \
-        (mutex)->link.prev = __prev;                                                                                                                 \
-        (mutex)->link.next = NULL;                                                                                                                   \
-        (queue)->tail = (mutex);                                                                                                                     \
-    } while (0)
+#include "dolphin/os/__os.h"
 
-#define PopHead(queue, mutex, link)                                                                                                                  \
-    do {                                                                                                                                             \
-        OSMutex *__next;                                                                                                                             \
-                                                                                                                                                     \
-        (mutex) = (queue)->head;                                                                                                                     \
-        __next = (mutex)->link.next;                                                                                                                 \
-        if (__next == NULL)                                                                                                                          \
-            (queue)->tail = NULL;                                                                                                                    \
-        else                                                                                                                                         \
-            __next->link.prev = NULL;                                                                                                                \
-        (queue)->head = __next;                                                                                                                      \
-    } while (0)
+#define ENQUEUE_MUTEX(mutex, queue, link)        \
+    do {                                         \
+        OSMutex* __prev = (queue)->tail; \
+        if (__prev == NULL) {                    \
+            (queue)->head = (mutex);             \
+        } else {                                 \
+            __prev->link.next = (mutex);         \
+        }                                        \
+        (mutex)->link.prev = __prev;             \
+        (mutex)->link.next = 0;                  \
+        (queue)->tail = (mutex);                 \
+    } while(0);
 
-#define PopItem(queue, mutex, link)                                                                                                                  \
-    do {                                                                                                                                             \
-        OSMutex *__next;                                                                                                                             \
-        OSMutex *__prev;                                                                                                                             \
-                                                                                                                                                     \
-        __next = (mutex)->link.next;                                                                                                                 \
-        __prev = (mutex)->link.prev;                                                                                                                 \
-                                                                                                                                                     \
-        if (__next == NULL)                                                                                                                          \
-            (queue)->tail = __prev;                                                                                                                  \
-        else                                                                                                                                         \
-            __next->link.prev = __prev;                                                                                                              \
-                                                                                                                                                     \
-        if (__prev == NULL)                                                                                                                          \
-            (queue)->head = __next;                                                                                                                  \
-        else                                                                                                                                         \
-            __prev->link.next = __next;                                                                                                              \
-    } while (0)
+#define DEQUEUE_MUTEX(mutex, queue, link)             \
+    do {                                              \
+        OSMutex* __next = (mutex)->link.next; \
+        OSMutex* __prev = (mutex)->link.prev; \
+        if (__next == NULL) {                         \
+            (queue)->tail = __prev;                   \
+        } else {                                      \
+            __next->link.prev = __prev;               \
+        }                                             \
+        if (__prev == NULL) {                         \
+            (queue)->head = __next;                   \
+        } else {                                      \
+            __prev->link.next = __next;               \
+        }                                             \
+    } while(0);
 
-void OSInitMutex(OSMutex *mutex)
-{
+#define DEQUEUE_HEAD(mutex, queue, link)            \
+    do {                                            \
+        OSMutex* __next = mutex->link.next; \
+        if (__next == NULL) {                       \
+            (queue)->tail = 0;                      \
+        } else {                                    \
+            __next->link.prev = 0;                  \
+        }                                           \
+        (queue)->head = __next;                     \
+    } while(0);
+
+// prototypes
+static int IsMember(OSMutexQueue* queue, OSMutex* mutex);
+int __OSCheckMutex(OSMutex* mutex);
+int __OSCheckDeadLock(OSThread* thread);
+int __OSCheckMutexes(OSThread* thread);
+
+void OSInitMutex(OSMutex* mutex) {
     OSInitThreadQueue(&mutex->queue);
     mutex->thread = 0;
     mutex->count = 0;
 }
 
-void OSLockMutex(OSMutex *mutex)
-{
+void OSLockMutex(OSMutex* mutex) {
     BOOL enabled = OSDisableInterrupts();
-    OSThread *currentThread = OSGetCurrentThread();
-    OSThread *ownerThread;
+    OSThread* currentThread = OSGetCurrentThread();
 
-    while (TRUE) {
-        ownerThread = ((OSMutex *)mutex)->thread;
+    ASSERTMSGLINE(140, currentThread, "OSLockMutex(): current thread does not exist.");
+    ASSERTMSGLINE(142, currentThread->state == 2, "OSLockMutex(): current thread is not running.");
+    
+    while (1) {
+        OSThread* ownerThread = mutex->thread;
         if (ownerThread == 0) {
             mutex->thread = currentThread;
             mutex->count++;
-            PushTail(&currentThread->queueMutex, mutex, link);
+            ENQUEUE_MUTEX(mutex, &currentThread->queueMutex, link);
             break;
-        }
-        else if (ownerThread == currentThread) {
+        } else if (ownerThread == currentThread) {
             mutex->count++;
             break;
-        }
-        else {
+        } else {
             currentThread->mutex = mutex;
             __OSPromoteThread(mutex->thread, currentThread->priority);
+            ASSERTMSG2LINE(164, __OSCheckDeadLock(currentThread) == 0, "OSLockMutex(): detected deadlock: current thread %p, mutex %p.", currentThread, mutex);
             OSSleepThread(&mutex->queue);
-            currentThread->mutex = 0;
+            currentThread->mutex = NULL;
         }
     }
     OSRestoreInterrupts(enabled);
 }
 
-void OSUnlockMutex(OSMutex *mutex)
-{
+void OSUnlockMutex(OSMutex* mutex) {
     BOOL enabled = OSDisableInterrupts();
-    OSThread *currentThread = OSGetCurrentThread();
+    OSThread* currentThread = OSGetCurrentThread();
 
-    if (mutex->thread == currentThread && --mutex->count == 0) {
-        PopItem(&currentThread->queueMutex, mutex, link);
-        mutex->thread = NULL;
-        if (currentThread->priority < currentThread->base) {
-            currentThread->priority = __OSGetEffectivePriority(currentThread);
+    ASSERTMSGLINE(189, currentThread, "OSUnlockMutex(): current thread does not exist.");
+    ASSERTMSGLINE(191, currentThread->state == 2, "OSUnlockMutex(): current thread is not running.");
+    ASSERTMSG2LINE(194, mutex->thread == currentThread, "OSUnlockMutex(): current thread %p is not the owner of mutex %p.", currentThread, mutex);
+
+    if (mutex->thread == currentThread) {
+        if (!--mutex->count) {
+            DEQUEUE_MUTEX(mutex, &currentThread->queueMutex, link);
+            mutex->thread = 0;
+
+            if (currentThread->priority < currentThread->base) {
+                currentThread->priority = __OSGetEffectivePriority(currentThread);
+            }
+            OSWakeupThread(&mutex->queue);
         }
-
-        OSWakeupThread(&mutex->queue);
     }
     OSRestoreInterrupts(enabled);
 }
 
-void __OSUnlockAllMutex(OSThread *thread)
-{
-    OSMutex *mutex;
+void __OSUnlockAllMutex(OSThread* thread) {
+    OSMutex* mutex;
 
     while (thread->queueMutex.head) {
-        PopHead(&thread->queueMutex, mutex, link);
+        mutex = thread->queueMutex.head;
+        DEQUEUE_HEAD(mutex, &thread->queueMutex, link);
+        ASSERTLINE(229, mutex->thread == thread);
         mutex->count = 0;
-        mutex->thread = NULL;
+        mutex->thread = 0;
         OSWakeupThread(&mutex->queue);
     }
 }
 
-BOOL OSTryLockMutex(OSMutex *mutex)
-{
+BOOL OSTryLockMutex(OSMutex* mutex) {
     BOOL enabled = OSDisableInterrupts();
-    OSThread *currentThread = OSGetCurrentThread();
+    OSThread* currentThread = OSGetCurrentThread();
     BOOL locked;
-    if (mutex->thread == 0) {
+
+    ASSERTMSGLINE(255, currentThread, "OSTryLockMutex(): current thread does not exist.");
+    ASSERTMSGLINE(257, currentThread->state == 2, "OSTryLockMutex(): current thread is not running.");
+
+    if (!mutex->thread) {
         mutex->thread = currentThread;
         mutex->count++;
-        PushTail(&currentThread->queueMutex, mutex, link);
+        ENQUEUE_MUTEX(mutex, &currentThread->queueMutex, link);
         locked = TRUE;
-    }
-    else if (mutex->thread == currentThread) {
+    } else if (mutex->thread == currentThread) {
         mutex->count++;
         locked = TRUE;
-    }
-    else {
+    } else {
         locked = FALSE;
     }
     OSRestoreInterrupts(enabled);
     return locked;
 }
 
-void OSInitCond(OSCond *cond)
-{
+void OSInitCond(OSCond* cond) {
     OSInitThreadQueue(&cond->queue);
 }
 
-void OSWaitCond(OSCond *cond, OSMutex *mutex)
-{
+void OSWaitCond(OSCond* cond, OSMutex* mutex) {
     BOOL enabled = OSDisableInterrupts();
-    OSThread *currentThread = OSGetCurrentThread();
-    s32 count;
+    OSThread* currentThread = OSGetCurrentThread();
+
+    ASSERTMSGLINE(313, currentThread, "OSWaitCond(): current thread does not exist.");
+    ASSERTMSGLINE(315, currentThread->state == 2, "OSWaitCond(): current thread is not running.");
+    ASSERTMSG2LINE(318, mutex->thread == currentThread, "OSWaitCond(): current thread %p is not the owner of mutex %p.", currentThread, mutex);
 
     if (mutex->thread == currentThread) {
-        count = mutex->count;
+        s32 count = mutex->count;
         mutex->count = 0;
-        PopItem(&currentThread->queueMutex, mutex, link);
-        mutex->thread = NULL;
-
+        DEQUEUE_MUTEX(mutex, &currentThread->queueMutex, link);
+        mutex->thread = 0;
         if (currentThread->priority < currentThread->base) {
             currentThread->priority = __OSGetEffectivePriority(currentThread);
         }
-
         OSDisableScheduler();
         OSWakeupThread(&mutex->queue);
         OSEnableScheduler();
@@ -160,85 +168,89 @@ void OSWaitCond(OSCond *cond, OSMutex *mutex)
         OSLockMutex(mutex);
         mutex->count = count;
     }
-
     OSRestoreInterrupts(enabled);
 }
 
-void OSSignalCond(OSCond *cond)
-{
+void OSSignalCond(OSCond* cond) {
     OSWakeupThread(&cond->queue);
 }
 
-static BOOL IsMember(OSMutexQueue *queue, OSMutex *mutex)
-{
-    OSMutex *member;
+static int IsMember(OSMutexQueue* queue, OSMutex* mutex) {
+    OSMutex* member = queue->head;
 
-    for (member = queue->head; member; member = member->link.next) {
-        if (mutex == member)
-            return TRUE;
+    while (member) {
+        if (mutex == member) {
+            return 1;
+        }
+        member = member->link.next;
     }
-    return FALSE;
+    return 0;
 }
 
-BOOL __OSCheckMutex(OSMutex *mutex)
-{
-    OSThread *thread;
-    OSThreadQueue *queue;
-    OSPriority priority = 0;
+int __OSCheckMutex(OSMutex* mutex) {
+    OSThread* thread;
+    OSThreadQueue* queue;
+    s32 priority;
 
+    priority = 0;
     queue = &mutex->queue;
-    if (!(queue->head == NULL || queue->head->link.prev == NULL))
-        return FALSE;
-    if (!(queue->tail == NULL || queue->tail->link.next == NULL))
-        return FALSE;
-    for (thread = queue->head; thread; thread = thread->link.next) {
-        if (!(thread->link.next == NULL || thread == thread->link.next->link.prev))
-            return FALSE;
-        if (!(thread->link.prev == NULL || thread == thread->link.prev->link.next))
-            return FALSE;
 
-        if (thread->state != OS_THREAD_STATE_WAITING)
-            return FALSE;
-
-        if (thread->priority < priority)
-            return FALSE;
+    if (queue->head != NULL && queue->head->link.prev != NULL) {
+        return 0;
+    }
+    if (queue->tail != NULL && queue->tail->link.next != NULL) {
+        return 0;
+    }
+    thread = queue->head;
+    while (thread) {
+        if (thread->link.next != NULL && (thread != thread->link.next->link.prev)) {
+            return 0;
+        } 
+        if (thread->link.prev != NULL && (thread != thread->link.prev->link.next)) {
+            return 0;
+        } 
+        if (thread->state != 4) {
+            return 0;
+        } 
+        if (thread->priority < priority) {
+            return 0;
+        }
         priority = thread->priority;
+        thread = thread->link.next;
     }
-
     if (mutex->thread) {
-        if (mutex->count <= 0)
-            return FALSE;
+        if (mutex->count <= 0) {
+            return 0;
+        }
+    } else if (mutex->count != 0) {
+        return 0;
     }
-    else {
-        if (0 != mutex->count)
-            return FALSE;
-    }
-
-    return TRUE;
+    return 1;
 }
 
-BOOL __OSCheckDeadLock(OSThread *thread)
-{
-    OSMutex *mutex;
+int __OSCheckDeadLock(OSThread* thread) {
+    OSMutex* mutex = thread->mutex;
 
-    mutex = thread->mutex;
     while (mutex && mutex->thread) {
-        if (mutex->thread == thread)
-            return TRUE;
+        if (mutex->thread == thread) {
+            return 1;
+        }
         mutex = mutex->thread->mutex;
     }
-    return FALSE;
+    return 0;
 }
 
-BOOL __OSCheckMutexes(OSThread *thread)
-{
-    OSMutex *mutex;
+int __OSCheckMutexes(OSThread* thread) {
+    OSMutex* mutex = thread->queueMutex.head;
 
-    for (mutex = thread->queueMutex.head; mutex; mutex = mutex->link.next) {
-        if (mutex->thread != thread)
-            return FALSE;
-        if (!__OSCheckMutex(mutex))
-            return FALSE;
+    while (mutex) {
+        if (mutex->thread != thread) {
+            return 0;
+        }
+        if (__OSCheckMutex(mutex) == 0) {
+            return 0;
+        }
+        mutex = mutex->link.next;
     }
-    return TRUE;
+    return 1;
 }

@@ -1,29 +1,33 @@
-#include "string.h"
-#include "dolphin/PPCArch.h"
-#include "dolphin/os.h"
+#include <dolphin.h>
+#include <dolphin/os.h>
 
-void __OSSystemCallVectorStart();
-void __OSSystemCallVectorEnd();
-static asm void SystemCallVector() {
-  nofralloc
+#include "dolphin/os/__os.h"
+
+// prototypes
+void __OSSystemCallVectorStart(void);
+void __OSSystemCallVectorEnd(void);
+
+#ifdef __GEKKO__
+static asm void SystemCallVector(void) {
 entry __OSSystemCallVectorStart
-  mfspr r9, HID0
-  ori r10, r9, 8
-  mtspr HID0, r10
-  isync
+    nofralloc
+    mfspr r9, HID0
+    ori r10, r9, 0x8
+    mtspr HID0, r10
+    isync
     sync
-  mtspr HID0, r9
-
-  rfi
-
+    mtspr HID0, r9
+    rfi
 entry __OSSystemCallVectorEnd
-  nop
+    nop
 }
+#endif
 
-void __OSInitSystemCall() {
-  void* addr = OSPhysicalToCached(0x00C00);
-  memcpy(addr, __OSSystemCallVectorStart, (size_t)__OSSystemCallVectorEnd - (size_t)__OSSystemCallVectorStart);
-  DCFlushRangeNoSync(addr, 0x100);
-  __sync();
-  ICInvalidateRange(addr, 0x100);
+void __OSInitSystemCall(void) {
+    void* addr = (void*)OSPhysicalToCached(0xC00);
+
+    memcpy(addr, __OSSystemCallVectorStart, (u32)&__OSSystemCallVectorEnd - (u32)&__OSSystemCallVectorStart);
+    DCFlushRangeNoSync(addr, 0x100);
+    __sync();
+    ICInvalidateRange(addr, 0x100);
 }

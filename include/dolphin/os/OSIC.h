@@ -1,5 +1,9 @@
-#ifndef _DOLPHIN_OSIC
-#define _DOLPHIN_OSIC
+#ifndef _DOLPHIN_OSIC_H_
+#define _DOLPHIN_OSIC_H_
+
+#ifdef __REVOLUTION_SDK__
+#include <revolution/os/OSIC.h>
+#else
 
 #ifdef __cplusplus
 extern "C" {
@@ -17,4 +21,5 @@ void ICSync(void);
 }
 #endif
 
+#endif
 #endif

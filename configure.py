@@ -383,6 +383,15 @@ config.libs = [
             Object(NonMatching, "dvd/fstload.c"),
         ],
     ),
+    DolphinLib(
+        "vi",
+        [
+            Object(NonMatching, "vi/gpioexi.c"),
+            Object(NonMatching, "vi/i2c.c"),
+            Object(NonMatching, "vi/initphilips.c"),
+            Object(NonMatching, "vi/vi.c"),
+        ],
+    ),
     #DolphinLib(
         #"gba",
         #[

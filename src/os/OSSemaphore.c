@@ -1,71 +1,56 @@
+#include <dolphin.h>
+#include <dolphin/os.h>
 
+void OSInitSemaphore(OSSemaphore* sem, s32 count) {
+    BOOL enabled = OSDisableInterrupts();
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void OSInitSemaphore(void)
-{
-	// TODO
+    OSInitThreadQueue(&sem->queue);
+    sem->count = count;
+    OSRestoreInterrupts(enabled);
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void OSWaitSemaphore(void)
-{
-	// TODO
+s32 OSWaitSemaphore(OSSemaphore* sem) {
+    BOOL enabled;
+    s32 count;
+
+    enabled = OSDisableInterrupts();
+
+    while((sem->count = (count = sem->count)) <= 0) {
+        OSSleepThread(&sem->queue);
+    }
+
+    sem->count--;
+    OSRestoreInterrupts(enabled);
+    return count;
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void OSTryWaitSemaphore(void)
-{
-	// TODO
+s32 OSTryWaitSemaphore(OSSemaphore* sem) {
+    BOOL enabled;
+    s32 count;
+
+    enabled = OSDisableInterrupts();
+    count = sem->count;
+    if (sem->count > 0) {
+        sem->count = sem->count - 1;
+    }
+
+    OSRestoreInterrupts(enabled);
+    return count;
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void OSSignalSemaphore(void)
-{
-	// TODO
+s32 OSSignalSemaphore(OSSemaphore* sem) {
+    BOOL enabled;
+    s32 count;
+
+    enabled = OSDisableInterrupts();
+    count = sem->count;
+    sem->count++;
+
+    OSWakeupThread(&sem->queue);
+    OSRestoreInterrupts(enabled);
+    return count;
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void OSGetSemaphoreCount(void)
-{
-	// TODO
+s32 OSGetSemaphoreCount(OSSemaphore* sem) {
+    return sem->count;
 }

@@ -1,57 +1,61 @@
+#include <dolphin.h>
+#include <dolphin/os.h>
 
-
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void OSInitStopwatch(void)
+void OSInitStopwatch(struct OSStopwatch *sw, char *name)
 {
-	// TODO
+    sw->name = name;
+    sw->total = 0;
+    sw->hits = 0;
+    sw->min = 0x00000000FFFFFFFF;
+    sw->max = 0;
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void OSStartStopwatch(void)
+void OSStartStopwatch(struct OSStopwatch *sw)
 {
-	// TODO
+    sw->running = 1;
+    sw->last = OSGetTime();
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void OSStopStopwatch(void)
+void OSStopStopwatch(struct OSStopwatch *sw)
 {
-	// TODO
+    long long interval;
+
+    if (sw->running != 0) {
+        interval = OSGetTime() - sw->last;
+        sw->total += interval;
+        sw->running = 0;
+        sw->hits++;
+        if (sw->max < interval) {
+            sw->max = interval;
+        }
+        if (interval < sw->min) {
+            sw->min = interval;
+        }
+    }
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void OSResetStopwatch(void)
+long long OSCheckStopwatch(struct OSStopwatch *sw)
 {
-	// TODO
+    long long currTotal;
+
+    currTotal = sw->total;
+    if (sw->running != 0) {
+        currTotal += OSGetTime() - sw->last;
+    }
+    return currTotal;
+}
+
+void OSResetStopwatch(struct OSStopwatch *sw)
+{
+    OSInitStopwatch(sw, sw->name);
+}
+
+void OSDumpStopwatch(struct OSStopwatch *sw)
+{
+    OSReport("Stopwatch [%s]	:\n", sw->name);
+    OSReport("\tTotal= %lld us\n", OSTicksToMicroseconds(sw->total));
+    OSReport("\tHits = %d \n", sw->hits);
+    OSReport("\tMin  = %lld us\n", OSTicksToMicroseconds(sw->min));
+    OSReport("\tMax  = %lld us\n", OSTicksToMicroseconds(sw->max));
+    OSReport("\tMean = %lld us\n", OSTicksToMicroseconds(sw->total / sw->hits));
 }

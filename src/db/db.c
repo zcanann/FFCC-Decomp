@@ -1,71 +1,43 @@
+#include <dolphin/db.h>
+#include <dolphin/os.h>
 
+DBInterface* __DBInterface = NULL;
+int DBVerbose;
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void DBInit(void)
-{
-	// TODO
+extern void __DBExceptionStart();
+extern void __DBExceptionEnd();
+extern void __DBExceptionSetNumber();
+
+void DBInit(void) {
+  __DBInterface = (DBInterface*)OSPhysicalToCached(OS_DBINTERFACE_ADDR);
+  __DBInterface->ExceptionDestination = (void (*)())OSCachedToPhysical(__DBExceptionDestination);
+  DBVerbose = TRUE;
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void __DBExceptionDestinationAux(void)
-{
-	// TODO
+void __DBExceptionDestinationAux(void) {
+  u32* contextAddr = (void*)0x00C0;
+  OSContext* context = (OSContext*)OSPhysicalToCached(*contextAddr);
+
+  OSReport("DBExceptionDestination\n");
+  OSDumpContext(context);
+  PPCHalt();
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void __DBExceptionDestination(void)
-{
-	// TODO
+/* clang-format off */
+asm void __DBExceptionDestination(void) {
+    nofralloc
+    mfmsr       r3
+    ori         r3, r3, 0x10|0x20
+    mtmsr       r3
+
+    b __DBExceptionDestinationAux
+}
+/* clang-format on */
+
+BOOL __DBIsExceptionMarked(__OSException exception) {
+  u32 mask = 1 << exception;
+
+  return (BOOL)(__DBInterface->exceptionMask & mask);
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void __DBIsExceptionMarked(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void DBPrintf(void)
-{
-	// TODO
-}
+void DBPrintf(char* format, ...) {}

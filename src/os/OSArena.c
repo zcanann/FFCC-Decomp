@@ -1,71 +1,53 @@
+#include <dolphin/os/OSArena.h>
 
+#define ROUND(n, a) (((u32)(n) + (a)-1) & ~((a)-1))
+#define TRUNC(n, a) (((u32)(n)) & ~((a)-1))
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void OSGetArenaHi(void)
+void *__OSArenaHi;
+void *__OSArenaLo = (void *)-1;
+
+void *OSGetArenaHi(void)
 {
-	// TODO
+    return __OSArenaHi;
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void OSGetArenaLo(void)
+void *OSGetArenaLo(void)
 {
-	// TODO
+    return __OSArenaLo;
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void OSSetArenaHi(void)
+void OSSetArenaHi(void *addr)
 {
-	// TODO
+    __OSArenaHi = addr;
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void OSSetArenaLo(void)
+void OSSetArenaLo(void *addr)
 {
-	// TODO
+    __OSArenaLo = addr;
 }
 
-/*
- * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
- */
-void OSAllocFromArenaLo(void)
+void *OSAllocFromArenaLo(u32 size, u32 align)
 {
-	// TODO
+    void *ptr;
+    u8 *arenaLo;
+
+    ptr = OSGetArenaLo();
+    arenaLo = ptr = (void *)ROUND(ptr, align);
+    arenaLo += size;
+    arenaLo = (u8 *)ROUND(arenaLo, align);
+    OSSetArenaLo(arenaLo);
+    return ptr;
+}
+
+void *OSAllocFromArenaHi(u32 size, u32 align)
+{
+    void *ptr;
+    u8 *arenaHi;
+
+    arenaHi = OSGetArenaHi();
+    arenaHi = (u8 *)TRUNC(arenaHi, align);
+    arenaHi -= size;
+    arenaHi = ptr = (void *)TRUNC(arenaHi, align);
+    OSSetArenaHi(arenaHi);
+    return ptr;
 }

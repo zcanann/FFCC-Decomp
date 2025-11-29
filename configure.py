@@ -309,6 +309,63 @@ def MatchingFor(*versions):
 config.warn_missing_config = True
 config.warn_missing_source = False
 config.libs = [
+
+    DolphinLib(
+        "base",
+        [
+            Object(NonMatching, "PPCArch.c"),
+        ],
+    ),
+    DolphinLib(
+        "os",
+        [
+            Object(NonMatching, "os/__start.c"),
+            Object(NonMatching, "os/__ppc_eabi_init.cpp"),
+            Object(NonMatching, "os/OS.c"),
+            Object(NonMatching, "os/OSAddress.c"),
+            Object(NonMatching, "os/OSAlarm.c"),
+            Object(NonMatching, "os/OSAlloc.c"),
+            Object(NonMatching, "os/OSArena.c"),
+            Object(NonMatching, "os/OSAudioSystem.c"),
+            Object(NonMatching, "os/OSCache.c"),
+            Object(NonMatching, "os/OSContext.c"),
+            Object(NonMatching, "os/OSError.c"),
+            Object(NonMatching, "os/OSFatal.c"),
+            Object(NonMatching, "os/OSFont.c"),
+            Object(NonMatching, "os/OSInterrupt.c"),
+            Object(NonMatching, "os/OSLink.c"),
+            Object(NonMatching, "os/OSMemory.c"),
+            Object(NonMatching, "os/OSMessage.c"),
+            Object(NonMatching, "os/OSMutex.c"),
+            Object(NonMatching, "os/OSReboot.c"),
+            Object(NonMatching, "os/OSReset.c"),
+            Object(NonMatching, "os/OSResetSW.c"),
+            Object(NonMatching, "os/OSRtc.c"),
+            Object(NonMatching, "os/OSSemaphore.c"),
+            Object(NonMatching, "os/OSStopwatch.c"),
+            Object(NonMatching, "os/OSSync.c"),
+            Object(NonMatching, "os/OSThread.c"),
+            Object(NonMatching, "os/OSTime.c"),
+        ],
+    ),
+    DolphinLib(
+        "db",
+        [
+            Object(NonMatching, "db/db.c"),
+        ],
+    ),
+    DolphinLib(
+        "mtx",
+        [
+            Object(NonMatching, "mtx/mtx.c"),
+            Object(NonMatching, "mtx/mtxvec.c"),
+            Object(NonMatching, "mtx/mtx44.c"),
+            Object(NonMatching, "mtx/mtx44vec.c"),
+            Object(NonMatching, "mtx/vec.c"),
+            Object(NonMatching, "mtx/quat.c"),
+            Object(NonMatching, "mtx/psmtx.c"),
+        ],
+    ),
     DolphinLib(
         "dvd",
         [

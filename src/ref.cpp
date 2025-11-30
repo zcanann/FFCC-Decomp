@@ -1,13 +1,13 @@
-
+#include "ffcc/ref.h"
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-void CRef::CRef()
+CRef::CRef()
 {
-	// TODO
+	this->refCount = 1;
 }
 
 /*
@@ -15,7 +15,6 @@ void CRef::CRef()
  * Address:	TODO
  * Size:	TODO
  */
-void CRef::~CRef()
+CRef::~CRef()
 {
-	// TODO
 }

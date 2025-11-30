@@ -327,6 +327,7 @@ config.libs = [
         "cflags": cflags_game,
         "objects": [
             Object(NonMatching, "pppFovAdjustMatrix.cpp"),
+            Object(NonMatching, "ref.cpp"),
         ]
     },
     DolphinLib(

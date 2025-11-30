@@ -1,5 +1,5 @@
-#ifndef _PPP_FOV_ADJUST_MATRIX_H_
-#define _PPP_FOV_ADJUST_MATRIX_H_
+#ifndef _FFCC_PPP_FOV_ADJUST_MATRIX_H_
+#define _FFCC_PPP_FOV_ADJUST_MATRIX_H_
 
 #ifdef __cplusplus
 extern "C" {

@@ -4,8 +4,8 @@
  */
 
 #include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/msg.h"
-#include "TRK_MINNOW_DOLPHIN/utils/common/MWTrace.h"
-#include "trk.h"
+#include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/MWTrace.h"
+#include "PowerPC_EABI_Support/MetroTRK/trk.h"
 
 /* 8036CFD8-8036D01C 367918 0044+00 0/0 6/6 0/0 .text            TRKMessageSend */
 DSError TRKMessageSend(TRK_Msg* msg) {

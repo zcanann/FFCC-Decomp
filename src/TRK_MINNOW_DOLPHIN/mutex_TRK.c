@@ -3,7 +3,7 @@
  * Description:
  */
 
-#include "trk.h"
+#include "PowerPC_EABI_Support/MetroTRK/trk.h"
 
 /* 8036F4A8-8036F4B0 369DE8 0008+00 0/0 2/2 0/0 .text            TRKInitializeMutex */
 DSError TRKInitializeMutex(void*) {

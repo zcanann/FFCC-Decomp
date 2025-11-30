@@ -16,6 +16,8 @@ extern "C" {
 #define DTORARG_TYPE int
 
 #define DTORCALL_COMPLETE(dtor, objptr) (((void (*)(void*, DTORARG_TYPE))dtor)(objptr, -1))
+#define DTORCALL_PARTIAL(dtor, objptr)                                         \
+	(((void (*)(void*, DTORARG_TYPE))dtor)(objptr, 0))
 
 typedef void* ConstructorDestructor;
 

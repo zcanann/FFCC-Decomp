@@ -1587,7 +1587,7 @@ gx/GXAttr.c:
 gx/GXMisc.c:
 	.text       start:0x801A1C80 end:0x801A2424
 
-gx/GXGeometry.cpp:
+gx/GXGeometry.c:
 	.text       start:0x801A2424 end:0x801A27D4
 
 gx/GXFrameBuf.c:

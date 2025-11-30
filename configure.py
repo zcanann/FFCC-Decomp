@@ -629,6 +629,7 @@ config.libs = [
         "cflags": cflags_trk,
         "progress_category": "sdk",
         "objects": [
+            Object(NonMatching, "TRK_MINNOW_DOLPHIN/__exception.s"),
             Object(NonMatching, "TRK_MINNOW_DOLPHIN/CircleBuffer.c"),
             Object(NonMatching, "TRK_MINNOW_DOLPHIN/dispatch.c"),
             Object(NonMatching, "TRK_MINNOW_DOLPHIN/dolphin_trk.c"),

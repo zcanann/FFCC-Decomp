@@ -326,6 +326,7 @@ config.libs = [
         "objects": [
             Object(NonMatching, "file.cpp"),
             Object(NonMatching, "pppFovAdjustMatrix.cpp"),
+            Object(NonMatching, "pppKeLns.cpp"),
             Object(NonMatching, "ref.cpp"),
             Object(NonMatching, "vector.cpp"),
         ]

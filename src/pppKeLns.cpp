@@ -1,4 +1,4 @@
-
+#include "ffcc/pppKeLns.h"
 
 /*
  * --INFO--
@@ -27,7 +27,7 @@ void pppKeLnsLpCon2(void)
  */
 void pppKeLnsLpDraw(void)
 {
-	// TODO
+	return;
 }
 
 /*
@@ -37,7 +37,7 @@ void pppKeLnsLpDraw(void)
  */
 void pppKeLnsFlsCon(void)
 {
-	// TODO
+	return;
 }
 
 /*
@@ -47,5 +47,5 @@ void pppKeLnsFlsCon(void)
  */
 void pppKeLnsFlsDraw(void)
 {
-	// TODO
+	return;
 }

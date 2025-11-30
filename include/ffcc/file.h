@@ -19,7 +19,7 @@ public:
 		void Reset();
 		
 		CHandle* mNext;
-		CHandle* mPrev;
+		CHandle* mPrevious;
 		unsigned int mFlags;
 		DVDFileInfo mDvdFileInfo;
 		unsigned int mFileOffset;
@@ -58,15 +58,12 @@ public:
 	
     void* mStage;
     void* mReadBuffer;
-    struct CHandle mFileHandle;
+    CHandle mFileHandle;
     void* mFreeListSentinelDummy;
-    struct CHandle *mFreeList;
-    struct CHandle *mHandlePool;
+    CHandle* mFreeList;
+    CHandle mHandlePoolHead;
     int mFatalDiskErrorFlag;
     int mIsDiskError;
-	
-private:
-	void readASync(CHandle* handle);   // Lowercase-a variant (likely used internally)
 };
 
 static CFile* g_file;

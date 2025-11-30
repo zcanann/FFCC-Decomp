@@ -1,10 +1,9 @@
 #ifndef METROTRK_PORTABLE_MUTEX_TRK_H
 #define METROTRK_PORTABLE_MUTEX_TRK_H
 
-#include "PowerPC_EABI_Support/MetroTRK/trk.h"
 
-DSError TRKInitializeMutex(void*);
-DSError TRKAcquireMutex(void*);
-DSError TRKReleaseMutex(void*);
+u8 TRKReleaseMutex();
+u8 TRKAcquireMutex();
+u8 TRKInitializeMutex();
 
 #endif /* METROTRK_PORTABLE_MUTEX_TRK_H */

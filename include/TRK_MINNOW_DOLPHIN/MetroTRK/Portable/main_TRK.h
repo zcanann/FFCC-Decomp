@@ -1,7 +1,7 @@
 #ifndef METROTRK_PORTABLE_MAIN_TRK_H
 #define METROTRK_PORTABLE_MAIN_TRK_H
 
-#include "PowerPC_EABI_Support/MetroTRK/trk.h"
+#include "trk.h"
 
 #ifdef __cplusplus
 extern "C" {

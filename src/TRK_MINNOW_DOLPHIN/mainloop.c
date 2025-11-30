@@ -1,72 +1,56 @@
 #include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/serpoll.h"
-#include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/msgbuf.h"
 #include "TRK_MINNOW_DOLPHIN/ppc/Generic/targimpl.h"
+#include "PowerPC_EABI_Support/MetroTRK/trk.h"
 
-inline void TRKHandleRequestEvent(TRKEvent* event)
-{
-	TRKBuffer* buffer = TRKGetBuffer(event->msgBufID);
-	TRKDispatchMessage(buffer);
-}
+/* 8036CB20-8036CC18 367460 00F8+00 0/0 1/1 0/0 .text            TRKNubMainLoop */
+void TRKNubMainLoop(void) {
+    void* msg;
+    TRKEvent event;
+    BOOL isShutdownRequested;
+    BOOL isNewInput;
 
-inline void TRKHandleSupportEvent(TRKEvent* event)
-{
-	TRKTargetSupportRequest();
-}
+    isShutdownRequested = FALSE;
+    isNewInput = FALSE;
+    while (isShutdownRequested == FALSE) {
+        if (TRKGetNextEvent(&event) != FALSE) {
+            isNewInput = FALSE;
 
-inline void TRKIdle()
-{
-	if (TRKTargetStopped() == FALSE)
-	{
-		TRKTargetContinue();
-	}
-}
+            switch (event.eventType) {
+            case NUBEVENT_Null:
+                break;
 
-void TRKNubMainLoop(void)
-{
-	void* msg;
-	TRKEvent event;
-	BOOL isShutdownRequested;
-	BOOL isNewInput;
+            case NUBEVENT_Request:
+                msg = TRKGetBuffer(event.msgBufID);
+                TRKDispatchMessage(msg);
+                break;
 
-	isShutdownRequested = FALSE;
-	isNewInput          = FALSE;
-	while (isShutdownRequested == FALSE) {
-		if (TRKGetNextEvent(&event) != FALSE) {
-			isNewInput = FALSE;
+            case NUBEVENT_Shutdown:
+                isShutdownRequested = TRUE;
+                break;
 
-			switch (event.eventType) {
-			case NUBEVENT_Null:
-				break;
+            case NUBEVENT_Breakpoint:
+            case NUBEVENT_Exception:
+                TRKTargetInterrupt(&event);
+                break;
 
-			case NUBEVENT_Request:
-				TRKHandleRequestEvent(&event);
-				break;
+            case NUBEVENT_Support:
+                TRKTargetSupportRequest();
+                break;
+            }
 
-			case NUBEVENT_Shutdown:
-				isShutdownRequested = TRUE;
-				break;
+            TRKDestructEvent(&event);
+            continue;
+        }
 
-			case NUBEVENT_Breakpoint:
-			case NUBEVENT_Exception:
-				TRKTargetInterrupt(&event);
-				break;
+        if ((isNewInput == FALSE) || (*(u8*)gTRKInputPendingPtr != '\0')) {
+            isNewInput = TRUE;
+            TRKGetInput();
+            continue;
+        }
 
-			case NUBEVENT_Support:
-				TRKHandleSupportEvent(&event);
-				break;
-			}
-
-			TRKDestructEvent(&event);
-			continue;
-		}
-
-		if ((isNewInput == FALSE) || (*(u8*)gTRKInputPendingPtr != '\0')) {
-			isNewInput = TRUE;
-			TRKGetInput();
-			continue;
-		}
-
-		TRKIdle();
-		isNewInput = FALSE;
-	}
+        if (TRKTargetStopped() == FALSE) {
+            TRKTargetContinue();
+        }
+        isNewInput = FALSE;
+    }
 }

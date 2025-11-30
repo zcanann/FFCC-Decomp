@@ -9,6 +9,7 @@ public:
 		PRI_LOW    = 0,
 		PRI_NORMAL = 1,
 		PRI_HIGH   = 2,
+		PRI_CRITICAL   = 3,
 	};
 
 	class CHandle {
@@ -16,62 +17,60 @@ public:
 		CHandle();
 		void Reset();
 		
-		CHandle* next;
-		CHandle* prev;
-		unsigned int flags;
-		DVDFileInfo dvdFileInfo;
-		unsigned int nextOffset;
-		int priority;
-		int length;
-		unsigned int userParam;
-		int completionStatus;
-		int closedFlag;
-		char name[76];
+		CHandle* mNext;
+		CHandle* mPrev;
+		unsigned int mFlags;
+		DVDFileInfo mDvdFileInfo;
+		unsigned int mFileOffset;
+		int mPriority;
+		int mLength;
+		unsigned int mUserParam;
+		int mCompletionStatus;
+		int mClosedFlag;
+		char mName[64];
+		unsigned int mChunkSize;
+		unsigned int mCurrentOffset;
+		unsigned int mNextOffset;
 	};
 
 	CFile();
 
-	static void Init();
-	static void Quit();
-	static void Frame();
-
-	static DVDDiskID* GetCurrentDiskID();
-
-	static void Open(char* path, unsigned long length, PRI pri);
-	static int GetLength(CHandle* handle);
-
-	static void BackAllFilesToQueue(CHandle* handle);
-	static void Read(CHandle* handle);
-
-	static void LockBuffer();
-	static void UnlockBuffer();
-
-	static void ReadASync(CHandle* handle);   // Capital-A variant
-	static void readASync(CHandle* handle);   // Lowercase-a variant (likely used internally)
-
+	void Init();
+	void Quit();
+	void Frame();
+	DVDDiskID* GetCurrentDiskID();
+	CHandle* Open(const char* path, unsigned long userParam, PRI pri);
+	int GetLength(CHandle* handle);
+	void BackAllFilesToQueue(CHandle* handle);
+	void Read(CHandle* handle);
+	void LockBuffer();
+	void UnlockBuffer();
+	void ReadASync(CHandle* handle);
 	void Close(CHandle* handle);
-
 	bool IsCompleted(CHandle* handle);
-	static void SyncCompleted(CHandle* handle);
+	void SyncCompleted(CHandle* handle);
 
-	static void kick();
-	static CHandle* CheckQueue();
+	void kick();
+	CHandle* CheckQueue();
 
-	static void DrawError(DVDFileInfo& info, int errorCode);
+	void DrawError(DVDFileInfo& info, int errorCode);
 	
     void* mStage;
     void* mReadBuffer;
     struct CHandle* mQueueSentinel;
     struct CHandle* mQueueHead;
-    char unknown1[68];
-    unsigned int maxPriority;
-    char unknown2[92];
-    void* freeListSentinelDummy;
-    struct CHandle *freeList;
-    char unknown3[164];
-    struct CHandle *handlePool;
-    int fatalDiskErrorFlag;
-    int isDiskError;
+    char mUnknown1[68];
+    unsigned int mMaxPriority;
+    char mUnknown2[92];
+    void* mFreeListSentinelDummy;
+    struct CHandle *mFreeList;
+    char mUnknown3[164];
+    struct CHandle *mHandlePool;
+    int mFatalDiskErrorFlag;
+    int mIsDiskError;
+	
+private:
+	void readASync(CHandle* handle);   // Lowercase-a variant (likely used internally)
 };
 
 static CFile* g_file;

@@ -324,6 +324,7 @@ config.libs = [
         "mw_version": config.linker_version,
         "cflags": cflags_game,
         "objects": [
+            Object(NonMatching, "file.cpp"),
             Object(NonMatching, "pppFovAdjustMatrix.cpp"),
             Object(NonMatching, "ref.cpp"),
             Object(NonMatching, "vector.cpp"),

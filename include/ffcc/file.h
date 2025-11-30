@@ -6,10 +6,11 @@
 class CFile {
 public:
 	enum PRI {
-		PRI_LOW    = 0,
+		PRI_LOW = 0,
 		PRI_NORMAL = 1,
-		PRI_HIGH   = 2,
-		PRI_CRITICAL   = 3,
+		PRI_HIGH = 2,
+		PRI_CRITICAL = 3,
+		PRI_SENTINEL = 4,
 	};
 
 	class CHandle {
@@ -57,14 +58,9 @@ public:
 	
     void* mStage;
     void* mReadBuffer;
-    struct CHandle* mQueueSentinel;
-    struct CHandle* mQueueHead;
-    char mUnknown1[68];
-    unsigned int mMaxPriority;
-    char mUnknown2[92];
+    struct CHandle mFileHandle;
     void* mFreeListSentinelDummy;
     struct CHandle *mFreeList;
-    char mUnknown3[164];
     struct CHandle *mHandlePool;
     int mFatalDiskErrorFlag;
     int mIsDiskError;

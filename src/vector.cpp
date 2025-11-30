@@ -1,11 +1,14 @@
+#include "ffcc/vector.h"
 
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common_Embedded/Math/fdlibm.h"
+#include "dolphin/mtx.h"
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-void CVector::CVector()
+CVector::CVector()
 {
 	// TODO
 }
@@ -15,9 +18,11 @@ void CVector::CVector()
  * Address:	TODO
  * Size:	TODO
  */
-void CVector::CVector(float, float, float)
+CVector::CVector(float x, float y, float z)
 {
-	// TODO
+	this->x = x;
+	this->y = y;
+	this->z = z;
 }
 
 /*
@@ -25,9 +30,11 @@ void CVector::CVector(float, float, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CVector::CVector(const Vec &)
+CVector::CVector(const Vec& vec)
 {
-	// TODO
+	this->x = vec.x;
+	this->y = vec.y;
+	this->z = vec.z;
 }
 
 /*
@@ -37,7 +44,9 @@ void CVector::CVector(const Vec &)
  */
 void CVector::Identity()
 {
-	// TODO
+	this->x = 0.0f;
+	this->y = 0.0f;
+	this->z = 0.0f;
 }
 
 /*
@@ -47,7 +56,7 @@ void CVector::Identity()
  */
 void CVector::Normalize()
 {
-	// TODO
+    PSVECNormalize((const Vec*)this, (Vec*)this);
 }
 
 /*
@@ -55,7 +64,12 @@ void CVector::Normalize()
  * Address:	TODO
  * Size:	TODO
  */
-void CVector::GetRotateY()
+float CVector::GetRotateY()
 {
-	// TODO
+    if (x != 0.0f || z != 0.0f)
+	{
+        return (float)atan2((double)x, (double)z);
+    }
+
+    return 0.0f;
 }

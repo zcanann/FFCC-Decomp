@@ -235,10 +235,7 @@ elif args.warn == "error":
     
 # Game flags
 cflags_game = [
-    *cflags_base,
-    "-O0,p",
-    "-char unsigned",
-    "-fp_contract off",
+    *cflags_base
 ]
 
 # Metrowerks library flags
@@ -328,6 +325,7 @@ config.libs = [
         "objects": [
             Object(NonMatching, "pppFovAdjustMatrix.cpp"),
             Object(NonMatching, "ref.cpp"),
+            Object(NonMatching, "vector.cpp"),
         ]
     },
     DolphinLib(

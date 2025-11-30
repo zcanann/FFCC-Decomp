@@ -343,7 +343,7 @@ void CSystem::errorHandler(unsigned short, OSContext *, unsigned long, unsigned 
  * Address:	TODO
  * Size:	TODO
  */
-void OSPanic(void)
+void OSPanic(...)
 {
 	// TODO
 }

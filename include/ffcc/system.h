@@ -50,6 +50,7 @@ public:
     bool IsGdev();
 
     void DumpMapFile();
+    void OSPanic(...);
 
     // void*      vtable;             // 0x0000 (4 bytes)
     int    mExitFlag;             // 0x0004

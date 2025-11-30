@@ -10,4 +10,7 @@ typedef struct __ptmf {
 	} f_data;
 } __ptmf;
 
+long __ptmf_test(register __ptmf* ptmf);
+void __ptmf_scall(...);
+
 #endif /* PTMF_H */

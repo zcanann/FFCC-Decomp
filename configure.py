@@ -329,6 +329,7 @@ config.libs = [
             Object(NonMatching, "pppKeLns.cpp"),
             Object(NonMatching, "ref.cpp"),
             Object(NonMatching, "vector.cpp"),
+            Object(NonMatching, "system.cpp"),
         ]
     },
     DolphinLib(

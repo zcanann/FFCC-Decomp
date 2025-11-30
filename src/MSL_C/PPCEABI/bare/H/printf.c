@@ -1245,7 +1245,8 @@ int vsnprintf(char* s, size_t n, const char* format, va_list arg)
     return end;
 }
 
-int vsprintf(char *s, const char *format, va_list arg) {
+int vsprintf(char *s, const char *format, va_list arg)
+{
     return vsnprintf(s, 0xFFFFFFFF, format, arg);
 }
 

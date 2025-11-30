@@ -1,14 +1,14 @@
 .include "macros.inc"
 .file "__exception.s"
 
-# 0x80003534..0x80005468 | size: 0x1F34
+# 0x800034AC..0x80005468 | size: 0x1F34
 .section .init, "ax"
 .balign 4
-# .init:0x0 | 0x80003534 | size: 0x0
+# .init:0x0 | 0x800034AC | size: 0x0
 .sym gTRKInterruptVectorTable, global
 
-# .init:0x0 | 0x80003534 | size: 0x1F34
-.fn pad_00_80003534_init, local
+# .init:0x0 | 0x800034AC | size: 0x1F34
+.fn pad_00_800034AC_init, local
 .4byte 0x4D657472 
 xoris r23, r27, 0x6572
 xori r19, r27, 0x2054
@@ -20,7 +20,7 @@ oris r18, r11, 0x6e65
 xoris r0, r1, 0x666f
 andi. r0, r17, 0x506f
 andis. r5, r27, 0x7250
-.L_80003560:
+.L_800034D8:
 	.4byte 0x43000000 
 	.4byte 0x00000000 
 	.4byte 0x00000000 
@@ -152,8 +152,8 @@ andis. r5, r27, 0x7250
 	mfmsr r3
 	ori r3, r3, 0x30
 	mtsrr1 r3
-	lis r3, 0x800f
-	ori r3, r3, 0x4a0
+	lis r3, 0x801a
+	ori r3, r3, 0xbb68
 	mtsrr0 r3
 	li r3, 0x200
 	rfi
@@ -210,8 +210,8 @@ andis. r5, r27, 0x7250
 	mfmsr r3
 	ori r3, r3, 0x30
 	mtsrr1 r3
-	lis r3, 0x800f
-	ori r3, r3, 0x4a0
+	lis r3, 0x801a
+	ori r3, r3, 0xbb68
 	mtsrr0 r3
 	li r3, 0x300
 	rfi
@@ -220,8 +220,8 @@ andis. r5, r27, 0x7250
 	.4byte 0x00000000 
 	.4byte 0x00000000 
 	.4byte 0x00000000 
-# .init:0x348 | 0x8000387C | size: 0x0
-.sym lbl_8000387C, global
+# .init:0x348 | 0x800037F4 | size: 0x0
+.sym lbl_800037F4, global
 	.4byte 0x00000000 
 	.4byte 0x00000000 
 	.4byte 0x00000000 
@@ -247,8 +247,8 @@ andis. r5, r27, 0x7250
 	.4byte 0x00000000 
 	.4byte 0x00000000 
 	.4byte 0x00000000 
-# .init:0x3AC | 0x800038E0 | size: 0x0
-.sym lbl_800038E0, global
+# .init:0x3AC | 0x80003858 | size: 0x0
+.sym lbl_80003858, global
 	.4byte 0x00000000 
 	.4byte 0x00000000 
 	.4byte 0x00000000 
@@ -278,8 +278,8 @@ andis. r5, r27, 0x7250
 	mfmsr r3
 	ori r3, r3, 0x30
 	mtsrr1 r3
-	lis r3, 0x800f
-	ori r3, r3, 0x4a0
+	lis r3, 0x801a
+	ori r3, r3, 0xbb68
 	mtsrr0 r3
 	li r3, 0x400
 	rfi
@@ -342,8 +342,8 @@ andis. r5, r27, 0x7250
 	mfmsr r3
 	ori r3, r3, 0x30
 	mtsrr1 r3
-	lis r3, 0x800f
-	ori r3, r3, 0x4a0
+	lis r3, 0x801a
+	ori r3, r3, 0xbb68
 	mtsrr0 r3
 	li r3, 0x500
 	rfi
@@ -406,8 +406,8 @@ andis. r5, r27, 0x7250
 	mfmsr r3
 	ori r3, r3, 0x30
 	mtsrr1 r3
-	lis r3, 0x800f
-	ori r3, r3, 0x4a0
+	lis r3, 0x801a
+	ori r3, r3, 0xbb68
 	mtsrr0 r3
 	li r3, 0x600
 	rfi
@@ -470,8 +470,8 @@ andis. r5, r27, 0x7250
 	mfmsr r3
 	ori r3, r3, 0x30
 	mtsrr1 r3
-	lis r3, 0x800f
-	ori r3, r3, 0x4a0
+	lis r3, 0x801a
+	ori r3, r3, 0xbb68
 	mtsrr0 r3
 	li r3, 0x700
 	rfi
@@ -534,8 +534,8 @@ andis. r5, r27, 0x7250
 	mfmsr r3
 	ori r3, r3, 0x30
 	mtsrr1 r3
-	lis r3, 0x800f
-	ori r3, r3, 0x4a0
+	lis r3, 0x801a
+	ori r3, r3, 0xbb68
 	mtsrr0 r3
 	li r3, 0x800
 	rfi
@@ -598,8 +598,8 @@ andis. r5, r27, 0x7250
 	mfmsr r3
 	ori r3, r3, 0x30
 	mtsrr1 r3
-	lis r3, 0x800f
-	ori r3, r3, 0x4a0
+	lis r3, 0x801a
+	ori r3, r3, 0xbb68
 	mtsrr0 r3
 	li r3, 0x900
 	rfi
@@ -790,8 +790,8 @@ andis. r5, r27, 0x7250
 	mfmsr r3
 	ori r3, r3, 0x30
 	mtsrr1 r3
-	lis r3, 0x800f
-	ori r3, r3, 0x4a0
+	lis r3, 0x801a
+	ori r3, r3, 0xbb68
 	mtsrr0 r3
 	li r3, 0xc00
 	rfi
@@ -854,8 +854,8 @@ andis. r5, r27, 0x7250
 	mfmsr r3
 	ori r3, r3, 0x30
 	mtsrr1 r3
-	lis r3, 0x800f
-	ori r3, r3, 0x4a0
+	lis r3, 0x801a
+	ori r3, r3, 0xbb68
 	mtsrr0 r3
 	li r3, 0xd00
 	rfi
@@ -918,8 +918,8 @@ andis. r5, r27, 0x7250
 	mfmsr r3
 	ori r3, r3, 0x30
 	mtsrr1 r3
-	lis r3, 0x800f
-	ori r3, r3, 0x4a0
+	lis r3, 0x801a
+	ori r3, r3, 0xbb68
 	mtsrr0 r3
 	li r3, 0xe00
 	rfi
@@ -974,7 +974,7 @@ andis. r5, r27, 0x7250
 	.4byte 0x00000000 
 	.4byte 0x00000000 
 	.4byte 0x00000000 
-	b .L_80004488
+	b .L_80004400
 	.4byte 0x00000000 
 	.4byte 0x00000000 
 	.4byte 0x00000000 
@@ -990,12 +990,12 @@ andis. r5, r27, 0x7250
 	mfmsr r3
 	ori r3, r3, 0x30
 	mtsrr1 r3
-	lis r3, 0x800f
-	ori r3, r3, 0x4a0
+	lis r3, 0x801a
+	ori r3, r3, 0xbb68
 	mtsrr0 r3
 	li r3, 0xf20
 	rfi
-.L_80004488:
+.L_80004400:
 	mtsprg 1, r2
 	mtsprg 2, r3
 	mtsprg 3, r4
@@ -1004,8 +1004,8 @@ andis. r5, r27, 0x7250
 	mfmsr r3
 	ori r3, r3, 0x30
 	mtsrr1 r3
-	lis r3, 0x800f
-	ori r3, r3, 0x4a0
+	lis r3, 0x801a
+	ori r3, r3, 0xbb68
 	mtsrr0 r3
 	li r3, 0xf00
 	rfi
@@ -1044,14 +1044,14 @@ andis. r5, r27, 0x7250
 	mtsprg 2, r2
 	mfmsr r2
 	andis. r2, r2, 0x2
-	beq .L_80004564
+	beq .L_800044DC
 	mfmsr r2
 	xoris r2, r2, 0x2
 	sync
 	mtmsr r2
 	sync
 	mtsprg 1, r2
-.L_80004564:
+.L_800044DC:
 	mfsprg r2, 2
 	mtcrf 255, r2
 	mfsprg r2, 1
@@ -1063,8 +1063,8 @@ andis. r5, r27, 0x7250
 	mfmsr r3
 	ori r3, r3, 0x30
 	mtsrr1 r3
-	lis r3, 0x800f
-	ori r3, r3, 0x4a0
+	lis r3, 0x801a
+	ori r3, r3, 0xbb68
 	mtsrr0 r3
 	li r3, 0x1000
 	rfi
@@ -1109,14 +1109,14 @@ andis. r5, r27, 0x7250
 	mtsprg 2, r2
 	mfmsr r2
 	andis. r2, r2, 0x2
-	beq .L_80004664
+	beq .L_800045DC
 	mfmsr r2
 	xoris r2, r2, 0x2
 	sync
 	mtmsr r2
 	sync
 	mtsprg 1, r2
-.L_80004664:
+.L_800045DC:
 	mfsprg r2, 2
 	mtcrf 255, r2
 	mfsprg r2, 1
@@ -1128,8 +1128,8 @@ andis. r5, r27, 0x7250
 	mfmsr r3
 	ori r3, r3, 0x30
 	mtsrr1 r3
-	lis r3, 0x800f
-	ori r3, r3, 0x4a0
+	lis r3, 0x801a
+	ori r3, r3, 0xbb68
 	mtsrr0 r3
 	li r3, 0x1100
 	rfi
@@ -1174,14 +1174,14 @@ andis. r5, r27, 0x7250
 	mtsprg 2, r2
 	mfmsr r2
 	andis. r2, r2, 0x2
-	beq .L_80004764
+	beq .L_800046DC
 	mfmsr r2
 	xoris r2, r2, 0x2
 	sync
 	mtmsr r2
 	sync
 	mtsprg 1, r2
-.L_80004764:
+.L_800046DC:
 	mfsprg r2, 2
 	mtcrf 255, r2
 	mfsprg r2, 1
@@ -1193,8 +1193,8 @@ andis. r5, r27, 0x7250
 	mfmsr r3
 	ori r3, r3, 0x30
 	mtsrr1 r3
-	lis r3, 0x800f
-	ori r3, r3, 0x4a0
+	lis r3, 0x801a
+	ori r3, r3, 0xbb68
 	mtsrr0 r3
 	li r3, 0x1200
 	rfi
@@ -1242,8 +1242,8 @@ andis. r5, r27, 0x7250
 	mfmsr r3
 	ori r3, r3, 0x30
 	mtsrr1 r3
-	lis r3, 0x800f
-	ori r3, r3, 0x4a0
+	lis r3, 0x801a
+	ori r3, r3, 0xbb68
 	mtsrr0 r3
 	li r3, 0x1300
 	rfi
@@ -1306,8 +1306,8 @@ andis. r5, r27, 0x7250
 	mfmsr r3
 	ori r3, r3, 0x30
 	mtsrr1 r3
-	lis r3, 0x800f
-	ori r3, r3, 0x4a0
+	lis r3, 0x801a
+	ori r3, r3, 0xbb68
 	mtsrr0 r3
 	li r3, 0x1400
 	rfi
@@ -1434,8 +1434,8 @@ andis. r5, r27, 0x7250
 	mfmsr r3
 	ori r3, r3, 0x30
 	mtsrr1 r3
-	lis r3, 0x800f
-	ori r3, r3, 0x4a0
+	lis r3, 0x801a
+	ori r3, r3, 0xbb68
 	mtsrr0 r3
 	li r3, 0x1600
 	rfi
@@ -1498,8 +1498,8 @@ andis. r5, r27, 0x7250
 	mfmsr r3
 	ori r3, r3, 0x30
 	mtsrr1 r3
-	lis r3, 0x800f
-	ori r3, r3, 0x4a0
+	lis r3, 0x801a
+	ori r3, r3, 0xbb68
 	mtsrr0 r3
 	li r3, 0x1700
 	rfi
@@ -1818,8 +1818,8 @@ andis. r5, r27, 0x7250
 	mfmsr r3
 	ori r3, r3, 0x30
 	mtsrr1 r3
-	lis r3, 0x800f
-	ori r3, r3, 0x4a0
+	lis r3, 0x801a
+	ori r3, r3, 0xbb68
 	mtsrr0 r3
 	li r3, 0x1c00
 	rfi
@@ -1882,8 +1882,8 @@ andis. r5, r27, 0x7250
 	mfmsr r3
 	ori r3, r3, 0x30
 	mtsrr1 r3
-	lis r3, 0x800f
-	ori r3, r3, 0x4a0
+	lis r3, 0x801a
+	ori r3, r3, 0xbb68
 	mtsrr0 r3
 	li r3, 0x1d00
 	rfi
@@ -1946,8 +1946,8 @@ andis. r5, r27, 0x7250
 	mfmsr r3
 	ori r3, r3, 0x30
 	mtsrr1 r3
-	lis r3, 0x800f
-	ori r3, r3, 0x4a0
+	lis r3, 0x801a
+	ori r3, r3, 0xbb68
 	mtsrr0 r3
 	li r3, 0x1e00
 	rfi
@@ -2010,9 +2010,9 @@ andis. r5, r27, 0x7250
 	mfmsr r3
 	ori r3, r3, 0x30
 	mtsrr1 r3
-	lis r3, 0x800f
-	ori r3, r3, 0x4a0
+	lis r3, 0x801a
+	ori r3, r3, 0xbb68
 	mtsrr0 r3
 	li r3, 0x1f00
 	rfi
-.endfn pad_00_80003534_init
+.endfn pad_00_800034AC_init

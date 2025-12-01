@@ -325,6 +325,7 @@ config.libs = [
         "cflags": cflags_game,
         "objects": [
             Object(NonMatching, "file.cpp"),
+            Object(NonMatching, "joybus.cpp"),
             Object(NonMatching, "memorycard.cpp"),
             Object(NonMatching, "pppFovAdjustMatrix.cpp"),
             Object(NonMatching, "pppKeLns.cpp"),

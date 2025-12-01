@@ -1,5 +1,7 @@
 #include "ffcc/file.h"
 
+#include "ffcc/system.h"
+
 /*
  * --INFO--
  * Address:	TODO
@@ -394,7 +396,7 @@ void CFile::kick()
                 if (readSize > 0x100000U)
 				{
 					//  && System._4700_4_ >= 1) {
-                    // System.Printf(&DAT_801D5DCC, cur->mName, readSize);
+                    System.Printf("" /* &DAT_801D5DCC */, cur->mName, readSize);
                 }
 
                 DVDReadAsyncPrio(
@@ -407,11 +409,6 @@ void CFile::kick()
                 );
 
                 cur->mNextOffset = cur->mCurrentOffset + readSize;
-
-                if (cur->mCompletionStatus != 3)
-				{
-                    return;
-                }
 
                 kick();
                 return;

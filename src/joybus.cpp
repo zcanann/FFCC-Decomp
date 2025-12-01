@@ -1,11 +1,15 @@
+#include "ffcc/joybus.h"
 
+#include "ffcc/system.h"
+
+#include "string.h"
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-void DEBPRINT(char *, ...)
+JoyBus::JoyBus()
 {
 	// TODO
 }
@@ -15,27 +19,7 @@ void DEBPRINT(char *, ...)
  * Address:	TODO
  * Size:	TODO
  */
-void JoyBus::Crc16(int, unsigned char *, unsigned short *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void JoyBus::JoyBus()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void JoyBus::~JoyBus()
+JoyBus::~JoyBus()
 {
 	// TODO
 }
@@ -125,7 +109,7 @@ void JoyBus::ThreadMain(void *)
  * Address:	TODO
  * Size:	TODO
  */
-void JoyBus::_ThreadMain(void *)
+void* JoyBus::_ThreadMain(void* param)
 {
 	// TODO
 }
@@ -137,7 +121,39 @@ void JoyBus::_ThreadMain(void *)
  */
 void JoyBus::ThreadInit()
 {
-	// TODO
+    memset(m_threadParams, 0, sizeof(m_threadParams));
+
+    m_threadInitFlag = 0;
+    m_threadRunningMask = 0;
+    ThreadParam* threadParam = m_threadParams;
+    OSThread* thread = m_threads;
+
+    for (int i = 0; i < 4; i++, threadParam++, thread++)
+    {
+        threadParam->m_portIndex = i;
+        threadParam->m_gbaStatus = 1;
+		
+        unsigned char* stackBase = m_sendBuffer[i] + sizeof(m_sendBuffer[0]);
+
+        OSCreateThread(
+            thread,
+            JoyBus::_ThreadMain,
+            threadParam,
+            stackBase,
+            sizeof(m_sendBuffer[0]),
+            8,
+            1
+        );
+
+        OSResumeThread(thread);
+
+        m_threadRunningMask |= (1 << i);
+    }
+
+    if ((unsigned int)System.mExecParam >= 2u)
+    {
+        System.Printf("JoyBus::ThreadInit end\n");
+    }
 }
 
 /*
@@ -165,7 +181,7 @@ void JoyBus::WriteInitialCode(ThreadParam *)
  * Address:	TODO
  * Size:	TODO
  */
-void JoyBus::ThreadSleep(long long)
+void ThreadAlarmHandler(OSAlarm *, OSContext *)
 {
 	// TODO
 }
@@ -175,9 +191,19 @@ void JoyBus::ThreadSleep(long long)
  * Address:	TODO
  * Size:	TODO
  */
-void ThreadAlarmHandler(OSAlarm *, OSContext *)
+void JoyBus::ThreadSleep(long long ticks)
 {
-	// TODO
+    OSAlarm alarm;
+	
+    OSCreateAlarm(&alarm);
+    OSSetAlarmTag(&alarm, 1);
+	
+    OSThread* thread = OSGetCurrentThread();
+    u32 level = OSDisableInterrupts();
+
+    OSSetAlarm(&alarm, ticks, ThreadAlarmHandler);
+    OSSuspendThread(thread);
+    OSRestoreInterrupts(level);
 }
 
 /*
@@ -965,9 +991,34 @@ void JoyBus::SetCmdLst(int, int, short)
  * Address:	TODO
  * Size:	TODO
  */
-void JoyBus::SetTmpArti(int, int, int)
+int JoyBus::SetTmpArti(int portIndex, int param3, int param4)
 {
-	// TODO
+	// TODO: Decomp jank
+    unsigned int cmd = (static_cast<unsigned char>('a' + param4) << 24);
+
+    if (m_threadRunningMask == 0)
+	{
+        return 0;
+    }
+
+    unsigned int port = m_threadParams[portIndex].m_portIndex;
+
+    OSWaitSemaphore(&m_accessSemaphores[port]);
+
+	// TODO: Decomp jank
+    if (static_cast<int>(m_cmdCount[port]) < 0x40)
+	{
+        m_cmdQueueData[port][m_cmdCount[port]] = cmd;
+        m_cmdCount[port]++;
+
+        OSSignalSemaphore(&m_accessSemaphores[port]);
+        return 0;
+    }
+	else
+	{
+        OSSignalSemaphore(&m_accessSemaphores[port]);
+        return -1;
+    }
 }
 
 /*
@@ -1005,7 +1056,7 @@ void JoyBus::SetOpenMenu(int, char)
  * Address:	TODO
  * Size:	TODO
  */
-void CGbaPcs::GetStage()
+void DEBPRINT(char *, ...)
 {
 	// TODO
 }
@@ -1015,37 +1066,7 @@ void CGbaPcs::GetStage()
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::GetBonusName(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGame::CGameWork::IsBonusStage()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenuPcs::SetSingMenuId(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void __sinit_joybus_cpp(void)
+void JoyBus::Crc16(int, unsigned char *, unsigned short *)
 {
 	// TODO
 }

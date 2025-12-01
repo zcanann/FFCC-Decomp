@@ -48,8 +48,8 @@ public:
 
     void MakeSaveData();
     void SetLoadData();
-    void CalcCrc(Mc::SaveDat*);
-    void ChkCrc(Mc::SaveDat*);
+    unsigned int CalcCrc(Mc::SaveDat*);
+    unsigned int ChkCrc(Mc::SaveDat*);
 
     int DummySave();
     int DummyLoad();
@@ -62,9 +62,6 @@ public:
 
     void CalcSaveDatHpMax(Mc::SaveDat*);
     void Odekake(int, Mc::SaveDat&, int, Mc::SaveDat&, int);
-
-    void rotlwi(int, int);
-    void rotrwi(int, int);
 
     // void* vtable;              // 0x00
     int mResult;                  // 0x04

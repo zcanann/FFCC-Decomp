@@ -683,8 +683,9 @@ void CMemoryCardMan::SetLoadData()
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::CalcCrc(Mc::SaveDat*)
+unsigned int CMemoryCardMan::CalcCrc(Mc::SaveDat*)
 {
+	return 0;
 }
 
 /*
@@ -692,8 +693,9 @@ void CMemoryCardMan::CalcCrc(Mc::SaveDat*)
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::ChkCrc(Mc::SaveDat*)
+unsigned int CMemoryCardMan::ChkCrc(Mc::SaveDat*)
 {
+	return 0;
 }
 
 /*
@@ -1276,6 +1278,16 @@ int CMemoryCardMan::McChkConnect(int chan)
     return result;
 }
 
+inline int rotlwi(int, int)
+{
+	return 0;
+}
+
+inline int rotrwi(int, int)
+{
+	return 0;
+}
+
 /*
  * --INFO--
  * Address:	TODO
@@ -1283,7 +1295,7 @@ int CMemoryCardMan::McChkConnect(int chan)
  */
 void CMemoryCardMan::EncodeData()
 {
-    const u8  key       = mSaveBuffer[0x11];
+    const u8  key = mSaveBuffer[0x11];
     const u32 rotAmount = key & 0x1F;
 
     u32* ptr = reinterpret_cast<u32*>(mSaveBuffer + 0x18);

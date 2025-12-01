@@ -7,44 +7,45 @@
 typedef unsigned char uchar;
 typedef unsigned int uint;
 
+struct ThreadParam
+{
+	unsigned int    m_portIndex;         // 0x00
+	unsigned int    m_unk1;              // 0x04
+	unsigned int    m_recvWriteIdx;      // 0x08
+	unsigned int    m_recvReadIdx;       // 0x0C
+
+	unsigned char   m_deviceType;        // 0x10
+	unsigned char   m_padding[3];        // 0x11
+
+	unsigned int    m_gbaStatus;         // 0x14
+	unsigned int    m_padType;           // 0x18
+	unsigned char   m_unknown1C[4];      // 0x1C
+
+	unsigned char   m_gbaBootFlag;       // 0x20
+	unsigned char   m_bootRetryCount;    // 0x21
+	unsigned char   m_unk2;              // 0x22
+	unsigned char   m_timeChangedFlag;   // 0x23
+
+	unsigned int    m_timestamp;         // 0x24
+
+	unsigned char   m_state;             // 0x28
+	unsigned char   m_subState;          // 0x29
+	unsigned char   m_prevState;         // 0x2A
+	unsigned char   m_altState;          // 0x2B
+
+	unsigned char   m_pposCounter;       // 0x2C
+	unsigned char   m_unk3;              // 0x2D
+	unsigned char   m_errorRetry;        // 0x2E
+	unsigned char   m_counter0x2B;       // 0x2F
+
+	unsigned char   m_skipProcessingFlag; // 0x30
+	unsigned char   m_sentStartFlag;      // 0x31
+	unsigned char   m_flags[10];          // 0x32
+};
+
 class JoyBus
 {
 public:
-	struct ThreadParam
-	{
-		unsigned int    m_portIndex;         // 0x00
-		unsigned int    m_unk1;              // 0x04
-		unsigned int    m_recvWriteIdx;      // 0x08
-		unsigned int    m_recvReadIdx;       // 0x0C
-
-		unsigned char   m_deviceType;        // 0x10
-		unsigned char   m_padding[3];        // 0x11
-
-		unsigned int    m_gbaStatus;         // 0x14
-		unsigned int    m_padType;           // 0x18
-		unsigned char   m_unknown1C[4];      // 0x1C
-
-		unsigned char   m_gbaBootFlag;       // 0x20
-		unsigned char   m_bootRetryCount;    // 0x21
-		unsigned char   m_unk2;              // 0x22
-		unsigned char   m_timeChangedFlag;   // 0x23
-
-		unsigned int    m_timestamp;         // 0x24
-
-		unsigned char   m_state;             // 0x28
-		unsigned char   m_subState;          // 0x29
-		unsigned char   m_prevState;         // 0x2A
-		unsigned char   m_altState;          // 0x2B
-
-		unsigned char   m_pposCounter;       // 0x2C
-		unsigned char   m_unk3;              // 0x2D
-		unsigned char   m_errorRetry;        // 0x2E
-		unsigned char   m_counter0x2B;       // 0x2F
-
-		unsigned char   m_skipProcessingFlag; // 0x30
-		unsigned char   m_sentStartFlag;      // 0x31
-		unsigned char   m_flags[10];          // 0x32
-	};
 	
 	struct JoyBusRecvBuffer
 	{
@@ -74,94 +75,94 @@ public:
     void ThreadInit();
     void ThreadSleep(long long);
 
-    void ReadInitialCode(ThreadParam*);
-    void WriteInitialCode(ThreadParam*);
-    void ReadContext(ThreadParam*);
-    void ReadHostId(ThreadParam*);
-    void WriteHostId(ThreadParam*);
-    void WriteContext(ThreadParam*);
+    void ReadInitialCode(ThreadParam* threadParam);
+    void WriteInitialCode(ThreadParam* threadParam);
+    void ReadContext(ThreadParam* threadParam);
+    void ReadHostId(ThreadParam* threadParam);
+    void WriteHostId(ThreadParam* threadParam);
+    void WriteContext(ThreadParam* threadParam);
 
-    void SetPadData(ThreadParam*, unsigned char*);
+    void SetPadData(ThreadParam* threadParam, unsigned char* data);
     void GetPadData(int);
 
     void RecvGBA(ThreadParam*, unsigned int*);
-    void SendGBA(ThreadParam*);
+    int SendGBA(ThreadParam* threadParam);
     void GBARecvSend(ThreadParam*, unsigned int*);
 
-    void ResetQueue(ThreadParam*);
-    void CleanQueue(ThreadParam*);
-    void InitialCode(ThreadParam*);
+    void ResetQueue(ThreadParam* threadParam);
+    void CleanQueue(ThreadParam* threadParam);
+    void InitialCode(ThreadParam* threadParam);
     void SetSendQueue(ThreadParam*, unsigned int);
-    void SendGBAStart(ThreadParam*, unsigned int*);
-    void SendGBAStop(ThreadParam*);
-    void SendChkCrc(ThreadParam*, int, unsigned short, unsigned int*);
-    void SendCancel(ThreadParam*);
+    int SendGBAStart(ThreadParam*, unsigned int*);
+    int SendGBAStop(ThreadParam* threadParam);
+    int SendChkCrc(ThreadParam*, int, unsigned short, unsigned int*);
+    int SendCancel(ThreadParam* threadParam);
 
-    void SendDataFile(ThreadParam*);
-    void SendMBase(ThreadParam*);
-    void SendMapNo(ThreadParam*);
+    int SendDataFile(ThreadParam* threadParam);
+    int SendMBase(ThreadParam* threadParam);
+    int SendMapNo(ThreadParam* threadParam);
 
     void InitPpos();
-    void SendPpos(ThreadParam*);
+    int SendPpos(ThreadParam* threadParam);
 
     void MakeJoyData(char*, int, unsigned int*);
 
-    void SendPlayerStat(ThreadParam*);
-    void SendPlayerHP(ThreadParam*);
-    void SendItemAll(ThreadParam*);
-    void SendMapObj(ThreadParam*);
-    void SendCompatibility(ThreadParam*);
-    void SendCtrlMode(ThreadParam*, int);
-    void SendMapObjDrawFlg(ThreadParam*);
-    void SendFavorite(ThreadParam*);
+    int SendPlayerStat(ThreadParam* threadParam);
+    int SendPlayerHP(ThreadParam* threadParam);
+    int SendItemAll(ThreadParam* threadParam);
+    int SendMapObj(ThreadParam* threadParam);
+    int SendCompatibility(ThreadParam* threadParam);
+    int SendCtrlMode(ThreadParam*, int);
+    int SendMapObjDrawFlg(ThreadParam* threadParam);
+    int SendFavorite(ThreadParam* threadParam);
 
     void RequestData(ThreadParam*, int, int);
     void SetRecvBuffer(ThreadParam*, unsigned int);
     void ClrRecvBuffer(int);
     void GetRecvBuffer(int, unsigned char*);
 
-    void SendMType(ThreadParam*, int);
-    void SendEquip(ThreadParam*);
-    void SendCmd(ThreadParam*);
-    void SendBonusStr(ThreadParam*);
-    void SendArtifact(ThreadParam*);
-    void SendTmpArtifact(ThreadParam*);
-    void SendMapObjInfo(ThreadParam*);
-    void SendStrength(ThreadParam*);
-    void SendRaderType(ThreadParam*);
-    void SendRaderMode(ThreadParam*);
-    void SendScouInfo(ThreadParam*);
-    void SendOpenMenu(ThreadParam*, char);
-    void SendItemUse(ThreadParam*);
-    void SendSPMode(ThreadParam*);
-    void SendMemorys(ThreadParam*);
-    void SendChgCmdNum(ThreadParam*);
-    void SendStartBonus(ThreadParam*);
+    int SendMType(ThreadParam*, int);
+    int SendEquip(ThreadParam* threadParam);
+    int SendCmd(ThreadParam* threadParam);
+    int SendBonusStr(ThreadParam* threadParam);
+    int SendArtifact(ThreadParam* threadParam);
+    int SendTmpArtifact(ThreadParam* threadParam);
+    int SendMapObjInfo(ThreadParam* threadParam);
+    int SendStrength(ThreadParam* threadParam);
+    int SendRaderType(ThreadParam* threadParam);
+    int SendRaderMode(ThreadParam* threadParam);
+    int SendScouInfo(ThreadParam* threadParam);
+    int SendOpenMenu(ThreadParam*, char);
+    int SendItemUse(ThreadParam* threadParam);
+    int SendSPMode(ThreadParam* threadParam);
+    int SendMemorys(ThreadParam* threadParam);
+    int SendChgCmdNum(ThreadParam* threadParam);
+    int SendStartBonus(ThreadParam* threadParam);
 
     void DecRecvQueue(int);
-    void GetGBAStat(ThreadParam*);
+    void GetGBAStat(ThreadParam* threadParam);
     void ChgCtrlMode(int);
-    void SetCtrlMode(int, int);
+    int SetCtrlMode(int portIndex, int controlMode);
     void GetCtrlMode(int);
     void GetGBAConnect(int);
     void IsInitSend(int);
     void GetGBAStart(int);
     void GBAReady(int);
-    void SendAllStat(int);
+    int SendAllStat(int);
 
     void GetLetterBuffer(int);
-    void SetLetterSize(int, int);
-    void SendResult(int, int, int, int);
+    void SetLetterSize(int portIndex, int letterSize);
+    int SendResult(int, int, int, int);
     void IsLetterMenu(int);
-    void SendAddLetter(int);
+    int SendAddLetter(int);
 
-    void SetItem(int, unsigned char, short);
+	int SetItem(int portIndex, unsigned char itemId, short amount);
     void DelItem(int, unsigned char);
 
-    void SendMask(int, unsigned short);
-    void SetMoney(int, unsigned int);
+    int SendMask(int, unsigned short);
+	int SetMoney(int portIndex, unsigned int money);
 
-    void SetMType(int, int);
+	int SetMType(int portIndex, int mtype);
     void GetMType(int);
     void GetPadType(int);
 
@@ -169,11 +170,11 @@ public:
     void IsThreadRunning();
     void RestartThread();
 
-    void SetCmdLst(int, int, short);
+    int SetCmdLst(int, int, short);
 	int SetTmpArti(int portIndex, int param3, int param4);
-    void SendUseItem(int, char);
-    void SendHitEnemy(int, char, short);
-    void SetOpenMenu(int, char);
+    int SendUseItem(int portIndex, char itemId);
+    int SendHitEnemy(int, char, short);
+    int SetOpenMenu(int playerIndex, char menuId);
 
     char m_pathBuf[128];
 

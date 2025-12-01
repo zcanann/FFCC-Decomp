@@ -10,9 +10,11 @@ class CStage;
 struct OSContext;
 struct OSThread;
 
-class CSystem : public CManager {
+class CSystem
+{
 public:
-    struct COrder {
+    struct COrder
+	{
         unsigned int   mPriority;  // 0x00
         float      mLastTime;      // 0x04
         void*      mDebugName;     // 0x08
@@ -37,11 +39,11 @@ public:
     unsigned int AddScenegraph(CProcess*, int);
     void RemoveScenegraph(CProcess*, int);
 
-    virtual void ScriptChanging(char*);
-    virtual void ScriptChanged(char*, int);
+    void ScriptChanging(char*);
+    void ScriptChanged(char*, int);
 
-    virtual void MapChanging(int, int);
-    virtual void MapChanged(int, int, int);
+    void MapChanging(int, int);
+    void MapChanged(int, int, int);
 
     COrder* GetFirstOrder();
     COrder* GetNextOrder(COrder*);
@@ -52,22 +54,22 @@ public:
     void DumpMapFile(void*);
     void OSPanic(...);
 
-    // void*      vtable;             // 0x0000 (4 bytes)
-    int    mExitFlag;             // 0x0004
-    COrder     mOrderSentinel;        // 0x0008 (size 0x24)
-    COrder     mFreeOrderHead;        // 0x002C (size 0x24)
-    COrder     orderPool[128];        // 0x0050 (0x24 * 128 = 0x1200)
-    int    mOrderCount;           // 0x1250
-    int    mScenegraphStepMode;   // 0x1254
-    unsigned int   mFrameCounter;         // 0x1258
-    int    mExecParam;            // 0x125C
-    OSThread*  mOwnerThread;          // 0x1260
-    COrder*    mCurrentOrder;         // 0x1264
-    int    mCurrentOrderIndex;    // 0x1268
-    int    mInitialized;          // 0x126C
-    CStage*    mMapStage;             // 0x1270
-    void*      mMapBuffer;            // 0x1274
-    unsigned int   mMapSize;              // 0x1278
+    // void* vtable;                 // 0x0000 (4 bytes)
+    int mExitFlag;                // 0x0004
+    COrder mOrderSentinel;        // 0x0008 (size 0x24)
+    COrder mFreeOrderHead;        // 0x002C (size 0x24)
+    COrder orderPool[128];        // 0x0050 (0x24 * 128 = 0x1200)
+    int mOrderCount;              // 0x1250
+    int mScenegraphStepMode;      // 0x1254
+    unsigned int mFrameCounter;   // 0x1258
+    int mExecParam;               // 0x125C
+    OSThread* mOwnerThread;       // 0x1260
+    COrder* mCurrentOrder;        // 0x1264
+    int mCurrentOrderIndex;       // 0x1268
+    int mInitialized;             // 0x126C
+    CStage* mMapStage;            // 0x1270
+    void* mMapBuffer;             // 0x1274
+    unsigned int mMapSize;        // 0x1278
 };
 
 CSystem g_system;

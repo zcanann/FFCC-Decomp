@@ -15,9 +15,15 @@ Fortunately, the EN build contains a debug symbol file, and the PAL version cont
 
 Unmapped Splits:
 -------------
+
+These two seem to cause the DTK template configuration to completely hang:
+os/OSStopwatch.c:
+	.text       start:0x80180814 end:0x80180970
+	
 os/OSSync.c:
 	.text       start:0x80180970 end:0x801809F4
 
+These I have not entirely figured out the boundaries for:
 
 TRK_MINNOW_DOLPHIN/main.c:
 	.text       start:0x801af2b0 end:0x801af5fc

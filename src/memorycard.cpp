@@ -1,4 +1,13 @@
+#include "ffcc/memorycard.h"
 
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+CMemoryCardMan::CMemoryCardMan()
+{
+}
 
 /*
  * --INFO--
@@ -7,7 +16,6 @@
  */
 void CMemoryCardMan::Init()
 {
-	// TODO
 }
 
 /*
@@ -17,7 +25,6 @@ void CMemoryCardMan::Init()
  */
 void CMemoryCardMan::Quit()
 {
-	// TODO
 }
 
 /*
@@ -25,49 +32,8 @@ void CMemoryCardMan::Quit()
  * Address:	TODO
  * Size:	TODO
  */
-void name2idx(char *)
+void CMemoryCardMan::DebugReadWrite(int, char*, void*, int)
 {
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMemoryCardMan::DebugReadWrite(int, char *, void *, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void Detach(long, long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void Attach(long, long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMemoryCardMan::CardInit()
-{
-	// TODO
 }
 
 /*
@@ -77,7 +43,6 @@ void CMemoryCardMan::CardInit()
  */
 void CMemoryCardMan::AsyncFinished()
 {
-	// TODO
 }
 
 /*
@@ -87,17 +52,6 @@ void CMemoryCardMan::AsyncFinished()
  */
 void CMemoryCardMan::GetResult()
 {
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMemoryCardMan::SetMountChan(int)
-{
-	// TODO
 }
 
 /*
@@ -107,7 +61,6 @@ void CMemoryCardMan::SetMountChan(int)
  */
 void CMemoryCardMan::McMount(int)
 {
-	// TODO
 }
 
 /*
@@ -117,7 +70,6 @@ void CMemoryCardMan::McMount(int)
  */
 void CMemoryCardMan::McUnmount(int)
 {
-	// TODO
 }
 
 /*
@@ -127,7 +79,6 @@ void CMemoryCardMan::McUnmount(int)
  */
 void CMemoryCardMan::McOpen(int)
 {
-	// TODO
 }
 
 /*
@@ -137,7 +88,6 @@ void CMemoryCardMan::McOpen(int)
  */
 void CMemoryCardMan::McClose()
 {
-	// TODO
 }
 
 /*
@@ -147,7 +97,6 @@ void CMemoryCardMan::McClose()
  */
 void CMemoryCardMan::McCreate(int)
 {
-	// TODO
 }
 
 /*
@@ -157,7 +106,6 @@ void CMemoryCardMan::McCreate(int)
  */
 void CMemoryCardMan::McGetStat(int)
 {
-	// TODO
 }
 
 /*
@@ -167,7 +115,6 @@ void CMemoryCardMan::McGetStat(int)
  */
 void CMemoryCardMan::McSetStat(int)
 {
-	// TODO
 }
 
 /*
@@ -177,7 +124,6 @@ void CMemoryCardMan::McSetStat(int)
  */
 void CMemoryCardMan::CreateMcBuff()
 {
-	// TODO
 }
 
 /*
@@ -187,7 +133,6 @@ void CMemoryCardMan::CreateMcBuff()
  */
 void CMemoryCardMan::DestroyMcBuff()
 {
-	// TODO
 }
 
 /*
@@ -197,7 +142,6 @@ void CMemoryCardMan::DestroyMcBuff()
  */
 void CMemoryCardMan::McEnd()
 {
-	// TODO
 }
 
 /*
@@ -207,7 +151,6 @@ void CMemoryCardMan::McEnd()
  */
 void CMemoryCardMan::SetMcIconImage()
 {
-	// TODO
 }
 
 /*
@@ -215,9 +158,8 @@ void CMemoryCardMan::SetMcIconImage()
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::McRead(char *, int, int)
+void CMemoryCardMan::McRead(char*, int, int)
 {
-	// TODO
 }
 
 /*
@@ -225,9 +167,8 @@ void CMemoryCardMan::McRead(char *, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::McWrite(char *, int, int)
+void CMemoryCardMan::McWrite(char*, int, int)
 {
-	// TODO
 }
 
 /*
@@ -237,7 +178,6 @@ void CMemoryCardMan::McWrite(char *, int, int)
  */
 void CMemoryCardMan::McFormat(int)
 {
-	// TODO
 }
 
 /*
@@ -247,7 +187,6 @@ void CMemoryCardMan::McFormat(int)
  */
 void CMemoryCardMan::McCheck(int)
 {
-	// TODO
 }
 
 /*
@@ -255,9 +194,8 @@ void CMemoryCardMan::McCheck(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::McFreeBlocks(int, int *, int *)
+void CMemoryCardMan::McFreeBlocks(int, int*, int*)
 {
-	// TODO
 }
 
 /*
@@ -267,7 +205,6 @@ void CMemoryCardMan::McFreeBlocks(int, int *, int *)
  */
 void CMemoryCardMan::McDelFile(int)
 {
-	// TODO
 }
 
 /*
@@ -277,7 +214,6 @@ void CMemoryCardMan::McDelFile(int)
  */
 void CMemoryCardMan::IsBrokenFile()
 {
-	// TODO
 }
 
 /*
@@ -287,7 +223,6 @@ void CMemoryCardMan::IsBrokenFile()
  */
 void CMemoryCardMan::MakeSaveData()
 {
-	// TODO
 }
 
 /*
@@ -297,7 +232,6 @@ void CMemoryCardMan::MakeSaveData()
  */
 void CMemoryCardMan::SetLoadData()
 {
-	// TODO
 }
 
 /*
@@ -305,9 +239,8 @@ void CMemoryCardMan::SetLoadData()
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::CalcCrc(Mc::SaveDat *)
+void CMemoryCardMan::CalcCrc(Mc::SaveDat*)
 {
-	// TODO
 }
 
 /*
@@ -315,9 +248,8 @@ void CMemoryCardMan::CalcCrc(Mc::SaveDat *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::ChkCrc(Mc::SaveDat *)
+void CMemoryCardMan::ChkCrc(Mc::SaveDat*)
 {
-	// TODO
 }
 
 /*
@@ -327,7 +259,6 @@ void CMemoryCardMan::ChkCrc(Mc::SaveDat *)
  */
 void CMemoryCardMan::DummySave()
 {
-	// TODO
 }
 
 /*
@@ -337,7 +268,6 @@ void CMemoryCardMan::DummySave()
  */
 void CMemoryCardMan::DummyLoad()
 {
-	// TODO
 }
 
 /*
@@ -345,9 +275,8 @@ void CMemoryCardMan::DummyLoad()
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::CnvPlayTime(unsigned int, int *, int *)
+void CMemoryCardMan::CnvPlayTime(unsigned int, int*, int*)
 {
-	// TODO
 }
 
 /*
@@ -357,17 +286,6 @@ void CMemoryCardMan::CnvPlayTime(unsigned int, int *, int *)
  */
 void CMemoryCardMan::McChkConnect(int)
 {
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMemoryCardMan::Crc32(int, unsigned char *, unsigned int *)
-{
-	// TODO
 }
 
 /*
@@ -377,7 +295,6 @@ void CMemoryCardMan::Crc32(int, unsigned char *, unsigned int *)
  */
 void CMemoryCardMan::EncodeData()
 {
-	// TODO
 }
 
 /*
@@ -387,7 +304,10 @@ void CMemoryCardMan::EncodeData()
  */
 void CMemoryCardMan::DecodeData()
 {
-	// TODO
+}
+
+void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat*)
+{
 }
 
 /*
@@ -395,9 +315,8 @@ void CMemoryCardMan::DecodeData()
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::Odekake(int, Mc::SaveDat &, int, Mc::SaveDat &, int)
+void CMemoryCardMan::Odekake(int, Mc::SaveDat&, int, Mc::SaveDat&, int)
 {
-	// TODO
 }
 
 /*
@@ -405,67 +324,16 @@ void CMemoryCardMan::Odekake(int, Mc::SaveDat &, int, Mc::SaveDat &, int)
  * Address:	TODO
  * Size:	TODO
  */
-void __sinit_memorycard_cpp(void)
+void Detach(long, long)
 {
-	// TODO
 }
+
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::CMemoryCardMan()
+void Attach(long, long)
 {
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CSound::IsStereo()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CSound::GetSeMasterVolume()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CSound::GetBgmMasterVolume()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMemoryCardMan::rotlwi(int, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMemoryCardMan::rotrwi(int, int)
-{
-	// TODO
 }

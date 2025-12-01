@@ -93,7 +93,7 @@ public:
     void CleanQueue(ThreadParam* threadParam);
     void InitialCode(ThreadParam* threadParam);
     void SetSendQueue(ThreadParam*, unsigned int);
-    int SendGBAStart(ThreadParam*, unsigned int*);
+    int SendGBAStart(ThreadParam*, unsigned int* outCmd);
     int SendGBAStop(ThreadParam* threadParam);
     int SendChkCrc(ThreadParam*, int, unsigned short, unsigned int*);
     int SendCancel(ThreadParam* threadParam);
@@ -121,7 +121,7 @@ public:
     void ClrRecvBuffer(int);
     void GetRecvBuffer(int, unsigned char*);
 
-    int SendMType(ThreadParam*, int);
+    int SendMType(ThreadParam* threadParam, int modeType);
     int SendEquip(ThreadParam* threadParam);
     int SendCmd(ThreadParam* threadParam);
     int SendBonusStr(ThreadParam* threadParam);
@@ -132,9 +132,9 @@ public:
     int SendRaderType(ThreadParam* threadParam);
     int SendRaderMode(ThreadParam* threadParam);
     int SendScouInfo(ThreadParam* threadParam);
-    int SendOpenMenu(ThreadParam*, char);
+    int SendOpenMenu(ThreadParam* threadParam, char menuId);
     int SendItemUse(ThreadParam* threadParam);
-    int SendSPMode(ThreadParam* threadParam);
+    void SendSPMode(ThreadParam* threadParam);
     int SendMemorys(ThreadParam* threadParam);
     int SendChgCmdNum(ThreadParam* threadParam);
     int SendStartBonus(ThreadParam* threadParam);
@@ -173,7 +173,7 @@ public:
     int SetCmdLst(int, int, short);
 	int SetTmpArti(int portIndex, int param3, int param4);
     int SendUseItem(int portIndex, char itemId);
-    int SendHitEnemy(int, char, short);
+    int SendHitEnemy(int portIndex, char enemyId, short hitValue);
     int SetOpenMenu(int playerIndex, char menuId);
 
     char m_pathBuf[128];
@@ -232,5 +232,7 @@ public:
 
     unsigned char m_padding[5174];
 };
+
+extern const unsigned short JoyBusCrcTable[256];
 
 #endif // JOYBUS_H

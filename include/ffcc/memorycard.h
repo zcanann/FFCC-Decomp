@@ -51,8 +51,8 @@ public:
     void CalcCrc(Mc::SaveDat*);
     void ChkCrc(Mc::SaveDat*);
 
-    void DummySave();
-    void DummyLoad();
+    int DummySave();
+    int DummyLoad();
 
     void CnvPlayTime(unsigned int frames, int* hours, int* minutes);
     int McChkConnect(int chan);

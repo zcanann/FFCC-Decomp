@@ -506,6 +506,22 @@ void CMemoryCardMan::SetMcIconImage()
  */
 void CMemoryCardMan::McRead(char* buffer, int length, int offset)
 {
+    if (buffer == nullptr)
+    {
+        buffer = mSaveBuffer;
+    }
+
+    mOpDoneFlag = 0;
+    mState = 8;
+
+    int result = CARDReadAsync(&mFileInfo, buffer, length, offset, &Attach);
+
+    if (result < 0)
+    {
+        mOpDoneFlag = 1;
+    }
+
+    mResult = result;
 }
 
 /*
@@ -685,8 +701,337 @@ void CMemoryCardMan::ChkCrc(Mc::SaveDat*)
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::DummySave()
+int CMemoryCardMan::DummySave()
 {
+    int result;
+
+    mOpDoneFlag = 0;
+    mState = 1;
+
+    result = CARDMountAsync(0, mMountWorkArea, &Detach, &Attach);
+    if (result < 0)
+    {
+        mOpDoneFlag = 1;
+    }
+    mResult = result;
+
+    // Busy-wait for async completion
+    while ((-((int)mOpDoneFlag) | (int)mOpDoneFlag) >= 0)
+    {
+    }
+
+    if (mResult == -6)
+    {
+        mOpDoneFlag = 0;
+        mState = 10;
+
+        result = CARDFormatAsync(0, &Attach);
+        if (result < 0)
+        {
+            mOpDoneFlag = 1;
+        }
+        mResult = result;
+
+        while ((-((int)mOpDoneFlag) | (int)mOpDoneFlag) >= 0)
+        {
+        }
+
+        if (mResult != 0)
+        {
+            if (System.mExecParam != 0)
+            {
+                // "%s(%d) McFormat(%d) error(%d)"
+                System.Printf("%s", /* s_McFormat(%d)_error(%d)_801daef8 */ 0);
+            }
+
+            result = CARDUnmount(0);
+            mResult = result;
+            mOpDoneFlag = 1;
+            mState = 2;
+            mCurrentSlot = 0xFF;
+
+            return mResult;
+        }
+    }
+
+    // Handle general mount error
+    if (mResult != 0)
+    {
+        if (System.mExecParam != 0)
+        {
+            // "%s(%d) McMount(%d) error(%d)"
+            System.Printf("%s", /* s_McMount(%d)_error(%d)_801dae78 */ 0);
+        }
+
+        result = CARDUnmount(0);
+        mResult = result;
+        mOpDoneFlag = 1;
+        mState = 2;
+        mCurrentSlot = 0xFF;
+
+        return mResult;
+    }
+
+    result = CARDOpen(0, /* PTR_DAT_8032e854 */ (const char*)0, &mFileInfo);
+    mResult = result;
+    mOpDoneFlag = 1;
+    mState = 3;
+
+    if (mResult == -4)
+    {
+        mOpDoneFlag = 0;
+        mState = 5;
+
+        result = CARDCreateAsync(
+            0,
+            /* PTR_DAT_8032e854 */ (const char*)0,
+            0x2C000,
+            &mFileInfo,
+            &Attach
+        );
+
+        if (result < 0)
+        {
+            mOpDoneFlag = 1;
+        }
+        mResult = result;
+
+        while ((-((int)mOpDoneFlag) | (int)mOpDoneFlag) >= 0)
+        {
+        }
+
+        if (mResult != 0)
+        {
+            if (System.mExecParam != 0)
+            {
+                // "McCreate(%d) error(%d)"
+                System.Printf("%s", /* s_McCreate(%d)_error(%d)_801daf10 */ 0);
+            }
+
+            result = CARDUnmount(0);
+            mResult = result;
+            mOpDoneFlag = 1;
+            mState = 2;
+            mCurrentSlot = 0xFF;
+
+            return mResult;
+        }
+
+        result = CARDGetStatus(0, mFileInfo.fileNo, &mCardStat);
+        mResult = result;
+        mOpDoneFlag = 1;
+        mState = 6;
+
+        if (mResult != 0)
+        {
+            if (System.mExecParam != 0)
+            {
+                // "McGetStat(%d) error(%d)"
+                System.Printf("%s", /* s_McGetStat(%d)_error(%d)_801daf28 */ 0);
+            }
+
+            result = CARDUnmount(0);
+            mResult = result;
+            mOpDoneFlag = 1;
+            mState = 2;
+            mCurrentSlot = 0xFF;
+
+            return mResult;
+        }
+
+        if (mSaveBuffer == 0)
+        {
+            mSaveBuffer = (char*)0;  
+            // __nwa__(0xA000, mStage, s_memorycard_cpp_801daea8, 0x2AB);
+
+            if (mSaveBuffer == 0 && System.mExecParam != 0)
+            {
+                // "%s(%d): Error: memory allocation"
+                System.Printf("%s", /* s_%s(%d):_Error:_memory_allocation_801daeb8 */ 0);
+            }
+        }
+
+        memset(mSaveBuffer, 0, 0xA000);
+		
+        SetMcIconImage();
+
+        mOpDoneFlag = 0;
+        mState = 9;
+
+        result = CARDWriteAsync(
+            &mFileInfo,
+            mSaveBuffer,
+            0x4000,
+            0,
+            &Attach
+        );
+
+        if (result < 0)
+        {
+            mOpDoneFlag = 1;
+        }
+        mResult = result;
+
+        while ((-((int)mOpDoneFlag) | (int)mOpDoneFlag) >= 0)
+        {
+        }
+
+        if (mResult != 0)
+        {
+            if (System.mExecParam != 0)
+            {
+                System.Printf("%s", /* s_McWrite(%d)_error(%d)_801daf44 */ 0);
+            }
+
+            result = CARDUnmount(0);
+            mResult = result;
+            mOpDoneFlag = 1;
+            mState = 2;
+            mCurrentSlot = 0xFF;
+
+            if (mSaveBuffer != 0)
+            {
+                delete[] mSaveBuffer;
+                mSaveBuffer = 0;
+            }
+
+            return mResult;
+        }
+
+        result = CARDSetStatus(0, mFileInfo.fileNo, &mCardStat);
+        mResult = result;
+        mOpDoneFlag = 1;
+        mState = 7;
+
+        if (mResult != 0)
+        {
+            if (System.mExecParam != 0)
+            {
+                System.Printf("%s", /* s_McSetStat(%d)_error(%d)_801daf5c */ 0);
+            }
+
+            result = CARDUnmount(0);
+            mResult = result;
+            mOpDoneFlag = 1;
+            mState = 2;
+            mCurrentSlot = 0xFF;
+
+            if (mSaveBuffer != 0)
+            {
+                delete[] mSaveBuffer;
+                mSaveBuffer = 0;
+            }
+
+            return mResult;
+        }
+    }
+    else
+    {
+        if (mSaveBuffer == 0)
+        {
+            mSaveBuffer = (char*)0;
+            // __nwa__(0xA000, ...)
+
+            if (mSaveBuffer == 0 && System.mExecParam != 0)
+            {
+                System.Printf("%s", /* s_%s(%d):_Error:_memory_allocation_801daeb8 */ 0);
+            }
+        }
+
+        memset(mSaveBuffer, 0, 0xA000);
+    }
+
+    MakeSaveData();
+	
+    mOpDoneFlag = 0;
+    mState = 9;
+
+    result = CARDWriteAsync(
+        &mFileInfo,
+        mSaveBuffer,
+        0xA000,
+        0x4000,
+        &Attach
+    );
+
+    if (result < 0)
+    {
+        mOpDoneFlag = 1;
+    }
+    mResult = result;
+
+    while ((-((int)mOpDoneFlag) | (int)mOpDoneFlag) >= 0)
+    {
+    }
+
+    if (mResult == 0)
+    {
+        if (mSaveBuffer != 0)
+        {
+            delete[] mSaveBuffer;
+            mSaveBuffer = 0;
+        }
+
+        int chan = mFileInfo.chan;
+
+        if (chan < 0 || chan > 1)
+        {
+            mOpDoneFlag = 1;
+            mState = 4;
+            mResult = -3;
+        }
+        else
+        {
+            result = CARDClose(&mFileInfo);
+            mResult = result;
+            mOpDoneFlag = 1;
+            mState = 4;
+        }
+
+        result = CARDUnmount(0);
+        mResult = result;
+        mOpDoneFlag = 1;
+
+        mState = 2;
+        mCurrentSlot = 0xFF;
+
+        return 0;
+    }
+
+    if (System.mExecParam != 0)
+    {
+        System.Printf("%s", /* s_McWrite(%d)_error(%d)_801daf44 */ 0);
+    }
+
+    int chan = mFileInfo.chan;
+
+    if (chan < 0 || chan > 1)
+    {
+        mOpDoneFlag = 1;
+        mState = 4;
+        mResult = -3;
+    }
+    else
+    {
+        result = CARDClose(&mFileInfo);
+        mResult = result;
+        mOpDoneFlag = 1;
+        mState = 4;
+    }
+
+    result = CARDUnmount(0);
+    mResult = result;
+    mOpDoneFlag = 1;
+    mState = 2;
+    mCurrentSlot = 0xFF;
+
+    if (mSaveBuffer != 0)
+    {
+        delete[] mSaveBuffer;
+        mSaveBuffer = 0;
+    }
+
+    return mResult;
 }
 
 /*
@@ -694,8 +1039,174 @@ void CMemoryCardMan::DummySave()
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::DummyLoad()
+int CMemoryCardMan::DummyLoad()
 {
+    int result;
+
+    // Begin mount
+    mOpDoneFlag = 0;
+    mState = 1;
+
+    result = CARDMountAsync(0, mMountWorkArea, &Detach, &Attach);
+    if (result < 0)
+    {
+        mOpDoneFlag = 1;
+    }
+    mResult = result;
+
+    // Busy wait for async completion
+    while ( ((-(int)mOpDoneFlag) | (int)mOpDoneFlag) >= 0 )
+    {
+    }
+
+    // If mount failed
+    if (mResult != 0)
+    {
+        if (System.mExecParam != 0)
+        {
+            // "McMount(%d) error(%d)"
+            System.Printf("%s", /* s_McMount(%d)_error(%d)_801dae78 */ 0);
+        }
+
+        result = CARDUnmount(0);
+        mResult = result;
+        mOpDoneFlag = 1;
+        mState = 2;
+        mCurrentSlot = 0xFF;
+
+        return mResult;
+    }
+
+    result = CARDOpen(0, /* PTR_DAT_8032e854 */ (const char*)0, &mFileInfo);
+    mResult = result;
+    mOpDoneFlag = 1;
+    mState = 3;
+
+    if (mResult != 0)
+    {
+        // Open failed
+        if (System.mExecParam != 0)
+        {
+            // "McOpen(%d) error(%d)"
+            System.Printf("%s", /* s_McOpen(%d)_error(%d)_801dae90 */ 0);
+        }
+
+        result = CARDUnmount(0);
+        mResult = result;
+        mOpDoneFlag = 1;
+        mState = 2;
+        mCurrentSlot = 0xFF;
+
+        return mResult;
+    }
+
+    if (mSaveBuffer == 0)
+    {
+        mSaveBuffer = (char*)0; 
+        // __nwa__(0xA000, mStage, s_memorycard_cpp_801daea8, 0x2AB);
+
+        if (mSaveBuffer == 0 && System.mExecParam != 0)
+        {
+            System.Printf("%s", /* s_%s(%d):_Error:_memory_allocation_801daeb8 */ 0);
+        }
+    }
+
+    memset(mSaveBuffer, 0, 0xA000);
+    mOpDoneFlag = 0;
+    mState = 8;
+
+    result = CARDReadAsync(
+        &mFileInfo,
+        mSaveBuffer,
+        0xA000,
+        0x4000,
+        &Attach
+    );
+
+    if (result < 0)
+    {
+        mOpDoneFlag = 1;
+    }
+
+    mResult = result;
+
+    // Wait for read to finish
+    while ( ((-(int)mOpDoneFlag) | (int)mOpDoneFlag) >= 0 )
+    {
+    }
+
+    if (mResult == 0)
+    {
+        int chan = mFileInfo.chan;
+
+        if (chan < 0 || chan > 1)
+        {
+            mOpDoneFlag = 1;
+            mState = 4;
+            mResult = -3;
+        }
+        else
+        {
+            result = CARDClose(&mFileInfo);
+            mResult = result;
+            mOpDoneFlag = 1;
+            mState = 4;
+        }
+
+        result = CARDUnmount(0);
+        mResult = result;
+        mOpDoneFlag = 1;
+        mState = 2;
+        mCurrentSlot = 0xFF;
+
+        // Game.LoadInit();
+        SetLoadData();
+        // Game.LoadFinished();
+
+        if (mSaveBuffer != 0)
+        {
+            delete[] mSaveBuffer;
+            mSaveBuffer = 0;
+        }
+
+        return 0;
+    }
+
+    if (System.mExecParam != 0)
+    {
+        // "McRead(%d) error(%d)"
+        System.Printf("%s", /* s_McRead(%d)_error(%d)_801daee0 */ 0);
+    }
+
+    int chan = mFileInfo.chan;
+
+    if (chan < 0 || chan > 1)
+    {
+        mOpDoneFlag = 1;
+        mState = 4;
+        mResult = -3;
+    }
+    else
+    {
+        result = CARDClose(&mFileInfo);
+        mResult = result;
+        mOpDoneFlag = 1;
+        mState = 4;
+    }
+
+    result = CARDUnmount(0);
+    mResult = result;
+    mOpDoneFlag = 1;
+    mState = 2;
+    mCurrentSlot = 0xFF;
+
+    if (mSaveBuffer != 0)
+    {
+        delete[] mSaveBuffer;
+        mSaveBuffer = 0;
+    }
+
+    return mResult;
 }
 
 /*

@@ -20,7 +20,7 @@ public:
     void Init();
     void Quit();
 
-    void DebugReadWrite(int, char*, void*, int);
+    void DebugReadWrite(int isWrite, char* filename, void* buffer, int length);
 
     bool AsyncFinished();
     int GetResult();
@@ -44,7 +44,7 @@ public:
 	int McFreeBlocks(int chan, int* bytesFree, int* filesFree);
     void McDelFile(int chan);
 
-    void IsBrokenFile();
+    bool IsBrokenFile();
 
     void MakeSaveData();
     void SetLoadData();
@@ -69,16 +69,13 @@ public:
     // void* vtable;              // 0x00
     int mResult;                  // 0x04
     char mOpDoneFlag;             // 0x08
-    char mPadding1[3];            // 0x09
     CStage* mStage;               // 0x0C
     void* mMountWorkArea;         // 0x10
-    unsigned char* mSaveBuffer;   // 0x14
+    char* mSaveBuffer;            // 0x14
     CARDFileInfo mFileInfo;       // 0x18 (size 0x12)
-    char mPadding2[2];            // 0x2A
     CARDStat mCardStat;           // 0x2C (size 0x6C)
     unsigned char mState;         // 0x98
     char mCurrentSlot;            // 0x99
-    char mPadding3[2];            // 0x9A
 };
 
 extern CMemoryCardMan MemoryCardMan;

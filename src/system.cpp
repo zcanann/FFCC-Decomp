@@ -322,10 +322,11 @@ bool CSystem::IsGdev()
  * Address:	TODO
  * Size:	TODO
  */
-void CSystem::DumpMapFile()
+void CSystem::DumpMapFile(void*)
 { 
-	// OSInitStopwatch();
-	// OSResetStopwatch(();
+	// TODO: Where the hell do we get these from?
+	OSInitStopwatch((OSStopwatch*)this, (char*)this);
+	OSResetStopwatch((OSStopwatch*)this);
 }
 
 /*

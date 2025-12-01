@@ -49,7 +49,7 @@ public:
 
     bool IsGdev();
 
-    void DumpMapFile();
+    void DumpMapFile(void*);
     void OSPanic(...);
 
     // void*      vtable;             // 0x0000 (4 bytes)

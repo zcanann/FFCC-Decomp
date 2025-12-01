@@ -3,6 +3,7 @@
 
 #include <Dolphin/types.h>
 #include <Dolphin/card.h>
+#include "ffcc/manager.h"
 
 class CStage;
 
@@ -11,7 +12,7 @@ namespace Mc
     struct SaveDat;
 }
 
-class CMemoryCardMan
+class CMemoryCardMan : public CManager
 {
 public:
     CMemoryCardMan();
@@ -21,11 +22,11 @@ public:
 
     void DebugReadWrite(int, char*, void*, int);
 
-    void AsyncFinished();
-    void GetResult();
+    bool AsyncFinished();
+    int GetResult();
 
-    void McMount(int);
-    void McUnmount(int);
+    void McMount(int chan);
+    int McUnmount(int chan);
     void McOpen(int);
     void McClose();
     void McCreate(int);
@@ -53,7 +54,7 @@ public:
     void DummySave();
     void DummyLoad();
 
-    void CnvPlayTime(unsigned int, int*, int*);
+    void CnvPlayTime(unsigned int frames, int* hours, int* minutes);
     void McChkConnect(int);
     void Crc32(int, unsigned char*, unsigned int*);
     void EncodeData();
@@ -65,18 +66,18 @@ public:
     void rotlwi(int, int);
     void rotrwi(int, int);
 
-    // void* vtable;                 // 0x00
+    // void* vtable;              // 0x00
     int mResult;                  // 0x04
     char mOpDoneFlag;             // 0x08
     char mPadding1[3];            // 0x09
     CStage* mStage;               // 0x0C
     void* mMountWorkArea;         // 0x10
-    u8* mSaveBuffer;              // 0x14
+    unsigned char* mSaveBuffer;   // 0x14
     CARDFileInfo mFileInfo;       // 0x18 (size 0x12)
     char mPadding2[2];            // 0x2A
     CARDStat mCardStat;           // 0x2C (size 0x6C)
-    u8 mState;                    // 0x98
-    u8 mCurrentSlot;              // 0x99
+    unsigned char mState;         // 0x98
+    char mCurrentSlot;            // 0x99
     char mPadding3[2];            // 0x9A
 };
 

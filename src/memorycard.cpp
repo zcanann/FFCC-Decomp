@@ -1,5 +1,7 @@
 #include "ffcc/memorycard.h"
 
+#include "dolphin/card.h"
+
 /*
  * --INFO--
  * Address:	TODO
@@ -24,7 +26,16 @@ void CMemoryCardMan::Init()
  * Size:	TODO
  */
 void CMemoryCardMan::Quit()
-{
+{ 
+  mCurrentSlot = -1;
+  
+  if (mMountWorkArea != (void*)nullptr)
+  {
+    delete[] mMountWorkArea;
+    mMountWorkArea = (void*)nullptr;
+  }
+  
+  // DestroyStage__7CMemoryFPQ27CMemory6CStage(&g_memory,mStage);
 }
 
 /*
@@ -41,8 +52,9 @@ void CMemoryCardMan::DebugReadWrite(int, char*, void*, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::AsyncFinished()
-{
+bool CMemoryCardMan::AsyncFinished()
+{ 
+	return mOpDoneFlag != 0;
 }
 
 /*
@@ -50,8 +62,9 @@ void CMemoryCardMan::AsyncFinished()
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::GetResult()
+int CMemoryCardMan::GetResult()
 {
+	return mResult;
 }
 
 /*
@@ -59,8 +72,19 @@ void CMemoryCardMan::GetResult()
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::McMount(int)
-{
+void CMemoryCardMan::McMount(int chan)
+{ 
+    mOpDoneFlag = 0;
+    mState = 1;
+
+    int result = CARDMountAsync(chan, mMountWorkArea, &Detach, &Attach);
+
+    if (result < 0)
+	{
+        mOpDoneFlag = 1;
+    }
+
+    mResult = result;
 }
 
 /*
@@ -68,8 +92,14 @@ void CMemoryCardMan::McMount(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::McUnmount(int)
+int CMemoryCardMan::McUnmount(int chan)
 {
+	mResult = CARDUnmount(chan);
+	mOpDoneFlag = 1;
+	mState = '\x02';
+	mCurrentSlot = 0xff;
+
+	return mResult;
 }
 
 /*
@@ -132,7 +162,12 @@ void CMemoryCardMan::CreateMcBuff()
  * Size:	TODO
  */
 void CMemoryCardMan::DestroyMcBuff()
-{
+{ 
+  if (mSaveBuffer != (unsigned char*)nullptr)
+  {
+    delete[] mSaveBuffer;
+	mSaveBuffer = (unsigned char*)nullptr;
+  }
 }
 
 /*
@@ -275,8 +310,17 @@ void CMemoryCardMan::DummyLoad()
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::CnvPlayTime(unsigned int, int*, int*)
+void CMemoryCardMan::CnvPlayTime(unsigned int frames, int* hours, int* minutes)
 {
+    int total_minutes = frames / 1500;
+	
+    *minutes = total_minutes % 60;
+    *hours = total_minutes / 60;
+	
+    if (*hours >= 999)
+	{
+        *hours = 999;
+	}
 }
 
 /*

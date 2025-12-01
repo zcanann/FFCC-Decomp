@@ -54,7 +54,7 @@ public:
     void DumpMapFile(void*);
     void OSPanic(...);
 
-    // void* vtable;                 // 0x0000 (4 bytes)
+    // void* vtable;              // 0x0000 (4 bytes)
     int mExitFlag;                // 0x0004
     COrder mOrderSentinel;        // 0x0008 (size 0x24)
     COrder mFreeOrderHead;        // 0x002C (size 0x24)

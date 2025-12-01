@@ -107,8 +107,13 @@ int CMemoryCardMan::McUnmount(int chan)
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::McOpen(int)
-{
+int CMemoryCardMan::McOpen(int chan)
+{ 
+	mResult = CARDOpen(chan, (const char*)nullptr /* PTR_DAT_8032e854 */, &mFileInfo);
+	mOpDoneFlag = 1;
+	mState = 3;
+
+	return mResult;
 }
 
 /*
@@ -116,8 +121,26 @@ void CMemoryCardMan::McOpen(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::McClose()
+int CMemoryCardMan::McClose()
 {
+	int chan = mFileInfo.chan;
+
+	if (chan < 0 || chan > 1)
+	{
+		mOpDoneFlag = 1;
+		mState = 4;
+		mResult = -3;
+
+		return mResult;
+	}
+
+	int result = CARDClose(&mFileInfo);
+	
+	mResult = result;
+	mOpDoneFlag = 1;
+	mState = 4;
+
+	return mResult;
 }
 
 /*
@@ -125,8 +148,25 @@ void CMemoryCardMan::McClose()
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::McCreate(int)
+void CMemoryCardMan::McCreate(int chan)
 {
+    mOpDoneFlag = 0;
+    mState = 5;
+
+    int result = CARDCreateAsync(
+        chan,
+        (const char*)nullptr, // PTR_DAT_8032e854, // file name string
+        0x2C000, // size
+        &mFileInfo,
+        &Attach
+    );
+
+    if (result < 0)
+    {
+        mOpDoneFlag = 1;
+    }
+
+    mResult = result;
 }
 
 /*
@@ -134,8 +174,19 @@ void CMemoryCardMan::McCreate(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::McGetStat(int)
+int CMemoryCardMan::McGetStat(int chan)
 {
+	int result = CARDGetStatus(
+		chan,
+		mFileInfo.fileNo,
+		&mCardStat
+	);
+
+	mResult = result;
+	mOpDoneFlag = 1;
+	mState = 6;
+
+	return mResult;
 }
 
 /*
@@ -143,8 +194,19 @@ void CMemoryCardMan::McGetStat(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::McSetStat(int)
+int CMemoryCardMan::McSetStat(int chan)
 {
+	int result = CARDSetStatus(
+		chan,
+		mFileInfo.fileNo,
+		&mCardStat
+	);
+
+	mResult = result;
+	mOpDoneFlag = 1;
+	mState = 7;
+
+	return mResult;
 }
 
 /*
@@ -193,7 +255,7 @@ void CMemoryCardMan::SetMcIconImage()
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::McRead(char*, int, int)
+void CMemoryCardMan::McRead(char* buffer, int length, int offset)
 {
 }
 
@@ -202,7 +264,7 @@ void CMemoryCardMan::McRead(char*, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::McWrite(char*, int, int)
+void CMemoryCardMan::McWrite(char* buffer, int length, int offset)
 {
 }
 
@@ -211,8 +273,22 @@ void CMemoryCardMan::McWrite(char*, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::McFormat(int)
+void CMemoryCardMan::McFormat(int chan)
 {
+    mOpDoneFlag = 0;
+    mState = 10;
+	
+    int result = CARDFormatAsync(
+        chan,
+        &Attach
+    );
+
+    if (result < 0)
+    {
+        mOpDoneFlag = 1;
+    }
+
+    mResult = result;
 }
 
 /*
@@ -229,17 +305,46 @@ void CMemoryCardMan::McCheck(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::McFreeBlocks(int, int*, int*)
+int CMemoryCardMan::McFreeBlocks(int chan, int* bytesFree, int* filesFree)
 {
+    int result;
+    long localBytes;
+    long localFiles;
+
+    result = CARDFreeBlocks(chan, &localBytes, &localFiles);
+
+    mResult = result;
+    *bytesFree = localBytes;
+    *filesFree = localFiles;
+    mState = 12;
+    mOpDoneFlag = 1;
+
+    return mResult;
 }
+
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::McDelFile(int)
+void CMemoryCardMan::McDelFile(int chan)
 {
+    mOpDoneFlag = 0;
+    mState = 13;
+	
+    int result = CARDDeleteAsync(
+        chan,
+        (const char*)nullptr, // PTR_DAT_8032e854,   // file name
+        &Attach
+    );
+
+    if (result < 0)
+    {
+        mOpDoneFlag = 1;
+    }
+
+    mResult = result;
 }
 
 /*
@@ -328,8 +433,48 @@ void CMemoryCardMan::CnvPlayTime(unsigned int frames, int* hours, int* minutes)
  * Address:	TODO
  * Size:	TODO
  */
-void CMemoryCardMan::McChkConnect(int)
+int CMemoryCardMan::McChkConnect(int chan)
 {
+    long type;
+    long sectorSize;
+	int result;
+
+    // CARDProbeEx returns:
+    //  0   = ready
+    // -1   = no card
+    // -2   = busy
+    // -5   = broken
+    int probeResult = CARDProbeEx(chan, &type, &sectorSize);
+
+    if (probeResult == -1)
+    {
+        result = 1;
+    }
+    else if (probeResult == 0)
+    {
+        if (sectorSize != 0x2000)
+        {
+            result = -2;
+        }
+        else
+        {
+            result = 0;
+        }
+    }
+    else if (probeResult == -2)
+    {
+        result = -3;
+    }
+    else if (probeResult == -5)
+    {
+        result = -4;
+    }
+    else
+    {
+        result = -1;
+    }
+
+    return result;
 }
 
 /*
@@ -378,6 +523,17 @@ void Detach(long, long)
  * Address:	TODO
  * Size:	TODO
  */
-void Attach(long, long)
+void Attach(long currentSlot, long result)
 {
+    MemoryCardMan.mResult = result;
+    MemoryCardMan.mOpDoneFlag = 1;
+
+    if (MemoryCardMan.mState == 1)
+    {
+        if (result == 0)
+        {
+            MemoryCardMan.mCurrentSlot = currentSlot;
+        }
+    }
 }
+

@@ -72,6 +72,6 @@ public:
     unsigned int mMapSize;        // 0x1278
 };
 
-CSystem g_system;
+extern CSystem System;
 
 #endif // CSYSTEM_H

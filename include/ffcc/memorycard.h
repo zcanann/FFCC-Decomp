@@ -27,22 +27,22 @@ public:
 
     void McMount(int chan);
     int McUnmount(int chan);
-    void McOpen(int);
-    void McClose();
-    void McCreate(int);
-    void McGetStat(int);
-    void McSetStat(int);
+    int McOpen(int chan);
+    int McClose();
+    void McCreate(int chan);
+    int McGetStat(int chan);
+    int McSetStat(int chan);
     void CreateMcBuff();
     void DestroyMcBuff();
     void McEnd();
     void SetMcIconImage();
 
-    void McRead(char*, int, int);
-    void McWrite(char*, int, int);
-    void McFormat(int);
-    void McCheck(int);
-    void McFreeBlocks(int, int*, int*);
-    void McDelFile(int);
+    void McRead(char* buffer, int length, int offset);
+    void McWrite(char* buffer, int length, int offset);
+    void McFormat(int chan);
+    void McCheck(int chan);
+	int McFreeBlocks(int chan, int* bytesFree, int* filesFree);
+    void McDelFile(int chan);
 
     void IsBrokenFile();
 
@@ -55,7 +55,7 @@ public:
     void DummyLoad();
 
     void CnvPlayTime(unsigned int frames, int* hours, int* minutes);
-    void McChkConnect(int);
+    int McChkConnect(int chan);
     void Crc32(int, unsigned char*, unsigned int*);
     void EncodeData();
     void DecodeData();
@@ -80,6 +80,8 @@ public:
     char mCurrentSlot;            // 0x99
     char mPadding3[2];            // 0x9A
 };
+
+extern CMemoryCardMan MemoryCardMan;
 
 // Free Functions
 void Detach(long, long);

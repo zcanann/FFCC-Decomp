@@ -66,6 +66,6 @@ public:
     int mIsDiskError;
 };
 
-CFile g_file;
+CFile File;
 
 #endif // CFILE_H

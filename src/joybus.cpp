@@ -612,9 +612,28 @@ void JoyBus::SetPadData(ThreadParam* threadParam, unsigned char* data)
  * Address:	TODO
  * Size:	TODO
  */
-void JoyBus::GetPadData(int)
+short JoyBus::GetPadData(int portIndex)
 {
-	// TODO
+    OSWaitSemaphore(&m_accessSemaphores[portIndex]);
+
+    short value = m_stageFlags[portIndex];
+	
+    m_stageFlags[portIndex] = 0;
+
+    if (m_threadInitFlag != 0) {
+        value = 0;
+    }
+
+    OSSignalSemaphore(&m_accessSemaphores[portIndex]);
+
+    bool isSingleMode = (bool)this; // GbaQue.IsSingleMode(portIndex);
+	
+    if (isSingleMode != 0)
+	{
+        value = 0;
+    }
+
+    return value;
 }
 
 /*
@@ -1493,8 +1512,250 @@ void JoyBus::InitPpos()
  */
 int JoyBus::SendPpos(ThreadParam* threadParam)
 {
-	// TODO
+    int result = 0;
+    const int port = threadParam->m_portIndex;
+    unsigned char& state = threadParam->m_pposCounter;
+    unsigned char& playerCount = m_cmdBuffer[port];
+    unsigned char& mobCount = m_cmdBuffer[4 + port];
+    unsigned char* posBytes = m_playerPosPacketBuffer[port];
+    unsigned int* posWords = (unsigned int*)posBytes;
+    int& wordIndex = m_pposWordIndex[port];
+
+    switch (state)
+    {
+    case 0:
+    {
+        if ((System.mExecParam % 4) != 0)
+        {
+            return 0;
+        }
+
+        memset(posBytes, 0, 0x100);
+
+        // TODO
+        // GbaQueue::GetPlayerPos(&GbaQue, port, posWords);
+
+        playerCount = 3;
+        wordIndex   = 0;
+        state += 1;
+		
+        break;
+    }
+
+    case 1:
+    {
+        int sent = 0;
+        int totalWord = (int)(signed char)playerCount;
+
+        while (sent < totalWord)
+        {
+            unsigned int word = posWords[wordIndex + sent];
+
+            if (m_threadRunningMask != 0)
+            {
+                OSWaitSemaphore(&m_accessSemaphores[port]);
+
+                if ((int)m_cmdCount[port] >= 0x40)
+                {
+                    OSSignalSemaphore(&m_accessSemaphores[port]);
+                    result = -1;
+                }
+                else
+                {
+                    m_cmdQueueData[port][m_cmdCount[port]] = word;
+                    m_cmdCount[port]++;
+
+                    OSSignalSemaphore(&m_accessSemaphores[port]);
+                }
+            }
+
+            if (result != 0)
+            {
+                break;
+            }
+
+            sent++;
+        }
+
+        // Advance index by number of words we actually pushed this call
+        wordIndex += sent;
+
+        // Done with all player-pos words?
+        if (wordIndex >= (unsigned int)(signed char)playerCount)
+        {
+            playerCount = 0;
+            wordIndex = 0;
+            state += 1;
+        }
+        break;
+    }
+
+    case 2:
+    {
+        memset(posBytes, 0, 0x100);
+        wordIndex = 0;
+        mobCount = 0;
+
+        int enemyCount = 0;
+
+        // TODO
+        // GbaQueue::GetEnemyPos(&GbaQue, port, posWords, &enemyCount);
+		
+        mobCount = (unsigned char)enemyCount;
+
+        // If there are no enemies, skip straight to treasure (state 4)
+        if (mobCount == 0)
+        {
+            state += 2; // 2 -> 4
+        }
+        else
+        {
+            state += 1; // 2 -> 3
+        }
+        break;
+    }
+
+    case 3:
+    {
+        int sent = 0;
+        int totalWord = (int)(signed char)mobCount;
+
+        while (sent < totalWord)
+        {
+            unsigned int word = posWords[wordIndex + sent];
+
+            if (m_threadRunningMask != 0)
+            {
+                OSWaitSemaphore(&m_accessSemaphores[port]);
+
+                if ((int)m_cmdCount[port] >= 0x40)
+                {
+                    OSSignalSemaphore(&m_accessSemaphores[port]);
+                    result = -1;
+                }
+                else
+                {
+                    m_cmdQueueData[port][m_cmdCount[port]] = word;
+                    m_cmdCount[port]++;
+
+                    OSSignalSemaphore(&m_accessSemaphores[port]);
+                }
+            }
+
+            if (result != 0)
+            {
+                break;
+            }
+
+            sent++;
+        }
+
+        wordIndex += sent;
+
+        if (wordIndex >= (unsigned int)(signed char)mobCount)
+        {
+            mobCount = 0;
+            wordIndex = 0;
+            state += 1;
+        }
+		
+        break;
+    }
+
+    case 4:
+    {
+        memset(posBytes, 0, 0x100);
+        wordIndex = 0;
+        mobCount  = 0;
+
+        int treasureCount = 0;
+
+        // TODO: restore when GbaQueue exists:
+        // GbaQueue::GetTreasurePos(&GbaQue, port, posWords, &treasureCount);
+        treasureCount = (int)this; // stub
+
+        mobCount = (unsigned char)treasureCount;
+
+        if (mobCount == 0)
+        {
+            state = 0;
+        }
+        else
+        {
+            state += 1;
+        }
+
+        break;
+    }
+
+    case 5:
+    {
+        int sent = 0;
+        int totalWord = (int)(signed char)mobCount;
+
+        while (sent < totalWord)
+        {
+            unsigned int word = posWords[wordIndex + sent];
+
+            if (m_threadRunningMask != 0)
+            {
+                OSWaitSemaphore(&m_accessSemaphores[port]);
+
+                if ((int)m_cmdCount[port] >= 0x40)
+                {
+                    OSSignalSemaphore(&m_accessSemaphores[port]);
+                    result = -1;
+                }
+                else
+                {
+                    m_cmdQueueData[port][m_cmdCount[port]] = word;
+                    m_cmdCount[port]++;
+
+                    OSSignalSemaphore(&m_accessSemaphores[port]);
+                }
+            }
+
+            if (result != 0)
+            {
+                break;
+            }
+
+            sent++;
+        }
+
+        wordIndex += sent;
+
+        if (wordIndex >= (unsigned int)(signed char)mobCount)
+        {
+            state = 0;
+            mobCount = 0;
+            wordIndex = 0;
+        }
+
+        break;
+    }
+
+    default:
+    {
+        if ((unsigned int)System.mExecParam >= 2u)
+        {
+            signed char cnt = (signed char)m_cmdBuffer[port];
+
+            System.Printf("JoyBus::SendPpos: bad state (port=%d, cnt=%d)\n", port, (int)cnt);
+        }
+
+        m_cmdBuffer[port] = 0;
+        m_cmdBuffer[4 + port] = 0;
+        m_pposWordIndex[port] = 0;
+        result = -1;
+		
+        break;
+    }
+    }
+
+    return result;
 }
+
 
 /*
  * --INFO--
@@ -1635,7 +1896,205 @@ int JoyBus::MakeJoyData(char* src, int length, unsigned int* outBuffer)
  */
 int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 {
-	// TODO
+    const int port = threadParam->m_portIndex;
+    int result = 0;
+
+    if (threadParam->m_subState == 1)
+    {
+        unsigned char* base = m_joyDataPacketBuffer[port];
+        unsigned int* wordPtr = (unsigned int*)(void*)(base + m_txWordIndex[port] * 4 + 2);
+        unsigned int word = *wordPtr;
+
+        if (m_threadRunningMask == 0)
+        {
+            result = 0;
+        }
+        else
+        {
+            OSWaitSemaphore(&m_accessSemaphores[port]);
+
+            if ((int)m_cmdCount[port] < 0x40)
+            {
+                m_cmdQueueData[port][m_cmdCount[port]] = word;
+                m_cmdCount[port]++;
+
+                OSSignalSemaphore(&m_accessSemaphores[port]);
+                result = 0;
+            }
+            else
+            {
+                OSSignalSemaphore(&m_accessSemaphores[port]);
+                result = -1;
+            }
+        }
+    }
+    else
+    {
+        // Phase 1: build the player-stat packet, then send the first word
+        if (threadParam->m_subState == 0)
+        {
+            // Raw player-info buffer (what GbaQueue fills)
+            unsigned char playerInfo[2][0x1B8];
+            memset(playerInfo, 0, sizeof(playerInfo));
+
+            // TODO: real GbaQueue call
+            // GetPlayerStat(&GbaQue, port, (GbaPInfo*)playerInfo);
+            (void)this; // keep path "alive" until GbaQueue exists
+
+            // Start from first word
+            m_txWordIndex[port] = 0;
+
+            // Four-byte “class mask” that the original builds bit-by-bit.
+            unsigned char classFlags[4];
+            memset(classFlags, 0xFF, sizeof(classFlags));
+
+            // Payload that MakeJoyData will consume (starts at local_68c in the asm).
+            unsigned char payload[0x300];
+            memset(payload, 0, sizeof(payload));
+
+            // Zero out the output buffer we’re about to fill (as in the asm).
+            memset(m_joyDataPacketBuffer[port] + 2, 0, 0x400);
+
+            // First byte: type = 1
+            payload[0] = 1;
+
+            // Caravan name (128 bytes), comes right after the type.
+            char caravanName[128];
+            memset(caravanName, 0, sizeof(caravanName));
+			
+            // TODO: real GbaQueue call
+            // GetCaravanName(&GbaQue, caravanName);
+
+            memcpy(&payload[1], caravanName, sizeof(caravanName));
+
+            // Build the class mask from the raw player info.
+            // This is the direct translation of the loop around pcVar4, abStack_690.
+            unsigned char* p = &playerInfo[0][0];
+            unsigned char lowBits  = 0;
+            unsigned char highBits = 0;
+
+            for (int i = 0; i < 2; ++i)
+            {
+                // First “slot”
+                if (p[0x16] != 0)
+                {
+                    int idx = (int)p[0] >> 1;
+                    unsigned char v = (classFlags[idx] & 0x0F) | lowBits;
+
+                    if ((p[0] & 1) != 0)
+                    {
+                        v = (classFlags[idx] & 0xF0) | highBits;
+                    }
+
+                    classFlags[idx] = v;
+                }
+
+                // Second “slot”
+                if (p[0xF2] != 0)
+                {
+                    int idx = (int)p[0xDC] >> 1;
+                    unsigned char v =
+                        (classFlags[idx] & 0x0F) | (unsigned char)(lowBits + 0x10);
+
+                    if ((p[0xDC] & 1) != 0)
+                    {
+                        v = (classFlags[idx] & 0xF0) | (unsigned char)(highBits + 1);
+                    }
+
+                    classFlags[idx] = v;
+                }
+
+                p       += 0x1B8;
+                lowBits += 0x20;
+                highBits += 2;
+            }
+
+            // Drop the 4-byte class mask into the header after the name.
+            memcpy(&payload[1 + sizeof(caravanName)], classFlags, sizeof(classFlags));
+
+            unsigned char compatBuf[64];
+            memset(compatBuf, 0, sizeof(compatBuf));
+
+            int compatLen = 0;
+            // TODO: real GbaQueue call
+            // compatLen = GetCompatibility(&GbaQue, port, compatBuf);
+            compatLen = (int)this; // stub, just to keep the path alive
+
+            if (compatLen < 0)
+            {
+                compatLen = 0;
+            }
+            if (compatLen > (int)sizeof(compatBuf))
+            {
+                compatLen = (int)sizeof(compatBuf);
+            }
+
+            unsigned char* body = &payload[0xA3];
+
+            if (compatLen > 0)
+            {
+                memcpy(body, compatBuf, (unsigned int)compatLen);
+            }
+			
+            const int byteLen = compatLen + 0xA3;
+
+            int wordCount = MakeJoyData((char*)payload, byteLen, (unsigned int*)(void*)(m_joyDataPacketBuffer[port] + 2));
+
+            if (wordCount < 0)
+            {
+                return wordCount;
+            }
+
+            m_txWordCount[port] = wordCount;
+            threadParam->m_subState = 1;
+
+            // Immediately queue the first word (same as the subState == 1 path)
+            unsigned char* base = m_joyDataPacketBuffer[port];
+            unsigned int* wordPtr =
+                (unsigned int*)(void*)(base + m_txWordIndex[port] * 4 + 2);
+            unsigned int word = *wordPtr;
+
+            if (m_threadRunningMask == 0)
+            {
+                result = 0;
+            }
+            else
+            {
+                OSWaitSemaphore(&m_accessSemaphores[port]);
+
+                if ((int)m_cmdCount[port] < 0x40)
+                {
+                    m_cmdQueueData[port][m_cmdCount[port]] = word;
+                    m_cmdCount[port]++;
+
+                    OSSignalSemaphore(&m_accessSemaphores[port]);
+                    result = 0;
+                }
+                else
+                {
+                    OSSignalSemaphore(&m_accessSemaphores[port]);
+                    result = -1;
+                }
+            }
+        }
+    }
+
+    // Common tail: advance word index and clear GBA flag when finished.
+    if (result == 0)
+    {
+        m_txWordIndex[port]++;
+
+        if (m_txWordCount[port] <= m_txWordIndex[port])
+        {
+            // TODO: real GbaQueue call
+            // ClrCompatibilityFlg(&GbaQue, port);
+            (void)this; // keep placeholder alive
+
+            return 1;
+        }
+    }
+
+    return result;
 }
 
 /*

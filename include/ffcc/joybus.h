@@ -84,7 +84,7 @@ public:
     void WriteContext(ThreadParam* threadParam);
 
     void SetPadData(ThreadParam* threadParam, unsigned char* data);
-    void GetPadData(int);
+    short GetPadData(int portIndex);
 
     int RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer);
     int SendGBA(ThreadParam* threadParam);
@@ -231,7 +231,13 @@ public:
     uchar m_stageId;
     uchar m_mapId;
 
-    unsigned char m_padding[5174];
+	unsigned char m_joyDataPacketBuffer[4][1024];
+	// unsigned char padding[2];
+	unsigned char m_playerPosPacketBuffer[4][256];
+	int m_txWordIndex[4];
+	int m_pposWordIndex[4];
+	int m_txWordCount[4];
+	// unsigned char padding[4];
 };
 
 extern JoyBus Joybus;

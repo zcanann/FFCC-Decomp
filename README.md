@@ -15,14 +15,18 @@ Fortunately, the EN build contains a debug symbol file, and the PAL version cont
 **⚠️ Assets are not bundled with this repository. You must obtain these on your own. ⚠️**
 
 # Contribution Guide
--------------
 
-Coming soon.
+## Beginners Contribution Guide
+The most direct way to contribute that requires minimal setup, is to simply pick a 30-99% matching section from [https://decomp.dev/zcanann/FFCC-Decomp](the decomp tracker), and update the code until it has a higher match score.
 
-## Remaining Work
-Aside from the obvious remaining work of decompiling all code and data, this section of the readme is dedicated to tracking known issues or cleanup tasks that are not directly tied to progress.
+Refer to the sections on building and diffing. Once you have this set up, all you need to do is modify .cpp and .h files until the score goes up!
+
+## Advanced Contribution Guide
+For experienced reverse-engineers, there are still quite a few harder tasks remaining.
 
 ### Unmapped Splits
+There are several splits that are still unmapped, even though we have access to the PAL game.MAP symbols from a stale build. There are only a few remaining, so this is a pretty small effort, but it requires reverse-engineering precision.
+
 These two seem to cause the DTK template configuration to completely hang:
 os/OSStopwatch.c:
 	.text       start:0x80180814 end:0x80180970
@@ -50,7 +54,7 @@ os/OSFont.c:
 ax/AXProf.c:
 	.text       start:0x80193E28 end:0x80193E70
 
-# EN & JPN Versions
+### EN & JPN Versions
 
 The EN & JPN versions are deliberately being left for last. However, if someone wishes to begin this effort early, this is more than welcome.
 

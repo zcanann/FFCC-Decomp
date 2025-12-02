@@ -12,18 +12,17 @@ There are 3 versions of this game: JP, EN, and PAL (EU).
 
 Fortunately, the EN build contains a debug symbol file, and the PAL version contains a release symbol file (although for a different build). This has made the decompilation process very easy to match the original source code incredibly closely. These symbols allowed us to recover exact function and class names, as well as all parameters to each function, and class hierarchies.
 
-**⚠️ Assets are not bundled with this repository. You must obtain these on your own.⚠️ **
+**⚠️ Assets are not bundled with this repository. You must obtain these on your own. ⚠️**
 
-Contribution Guide
+# Contribution Guide
 -------------
 
 Coming soon.
 
-Remaining Work
--------------
+## Remaining Work
 Aside from the obvious remaining work of decompiling all code and data, this section of the readme is dedicated to tracking known issues or cleanup tasks that are not directly tied to progress.
 
-# Unmapped Splits
+### Unmapped Splits
 These two seem to cause the DTK template configuration to completely hang:
 os/OSStopwatch.c:
 	.text       start:0x80180814 end:0x80180970
@@ -55,11 +54,9 @@ ax/AXProf.c:
 
 The EN & JPN versions are deliberately being left for last. However, if someone wishes to begin this effort early, this is more than welcome.
 
-Dependencies
-============
+# Dependencies
 
-Windows
---------
+## Windows
 
 On Windows, it's **highly recommended** to use native tooling. WSL or msys2 are **not** required.  
 When running under WSL, [objdiff](#diffing) is unable to get filesystem notifications for automatic rebuilds.
@@ -69,8 +66,7 @@ When running under WSL, [objdiff](#diffing) is unable to get filesystem notifica
 - Download [ninja](https://github.com/ninja-build/ninja/releases) and add it to `%PATH%`.
   - Quick install via pip: `pip install ninja`
 
-macOS
-------
+## macOS
 
 - Install [ninja](https://github.com/ninja-build/ninja/wiki/Pre-built-Ninja-packages):
 
@@ -80,15 +76,13 @@ macOS
 
 [wibo](https://github.com/decompals/wibo), a minimal 32-bit Windows binary wrapper, will be automatically downloaded and used.
 
-Linux
-------
+## Linux
 
 - Install [ninja](https://github.com/ninja-build/ninja/wiki/Pre-built-Ninja-packages).
 
 [wibo](https://github.com/decompals/wibo), a minimal 32-bit Windows binary wrapper, will be automatically downloaded and used.
 
-Building
-========
+## Building
 
 - Clone the repository:
 
@@ -114,8 +108,7 @@ Building
   ninja
   ```
 
-Diffing
-=======
+## Diffing
 
 Once the initial build succeeds, an `objdiff.json` should exist in the project root.
 

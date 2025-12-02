@@ -1127,7 +1127,43 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
  */
 void JoyBus::ResetQueue(ThreadParam* threadParam)
 {
-	// TODO
+    int port = threadParam->m_portIndex;
+
+    OSWaitSemaphore(&m_accessSemaphores[port]);
+
+    for (int index = 0; index < 8; index++)
+	{
+		int offset = 0x20 * index;
+		
+        *(unsigned int*)((char*)m_cmdQueueData[port] + offset) = 0;
+        *(unsigned int*)((char*)m_recvQueueEntriesArr[port] + offset) = 0;
+
+        *(unsigned int*)((char*)m_cmdQueueData[port] + offset + 4) = 0;
+        *(unsigned int*)((char*)m_recvQueueEntriesArr[port] + offset + 4) = 0;
+
+        *(unsigned int*)((char*)m_cmdQueueData[port] + offset + 8) = 0;
+        *(unsigned int*)((char*)m_recvQueueEntriesArr[port] + offset + 8) = 0;
+
+        *(unsigned int*)((char*)m_cmdQueueData[port] + offset + 0xC) = 0;
+        *(unsigned int*)((char*)m_recvQueueEntriesArr[port] + offset + 0xC) = 0;
+
+        *(unsigned int*)((char*)m_cmdQueueData[port] + offset + 0x10) = 0;
+        *(unsigned int*)((char*)m_recvQueueEntriesArr[port] + offset + 0x10) = 0;
+
+        *(unsigned int*)((char*)m_cmdQueueData[port] + offset + 0x14) = 0;
+        *(unsigned int*)((char*)m_recvQueueEntriesArr[port] + offset + 0x14) = 0;
+
+        *(unsigned int*)((char*)m_cmdQueueData[port] + offset + 0x18) = 0;
+        *(unsigned int*)((char*)m_recvQueueEntriesArr[port] + offset + 0x18) = 0;
+
+        *(unsigned int*)((char*)m_cmdQueueData[port] + offset + 0x1C) = 0;
+        *(unsigned int*)((char*)m_recvQueueEntriesArr[port] + offset + 0x1C) = 0;
+    }
+
+    m_cmdCount[port] = 0;
+    m_secCmdCount[port] = 0;
+
+    OSSignalSemaphore(&m_accessSemaphores[port]);
 }
 
 /*
@@ -1155,10 +1191,31 @@ void JoyBus::InitialCode(ThreadParam* threadParam)
  * Address:	TODO
  * Size:	TODO
  */
-void JoyBus::SetSendQueue(ThreadParam *, unsigned int)
+int JoyBus::SetSendQueue(ThreadParam* threadParam, unsigned int command)
 {
-	// TODO
+    if (m_threadRunningMask == 0) {
+        return 0;
+    }
+
+    int port = threadParam->m_portIndex;
+
+    OSWaitSemaphore(m_accessSemaphores + port);
+
+    if ((int)m_cmdCount[port] < 0x40)
+    {
+        m_cmdQueueData[port][m_cmdCount[port]] = command;
+        m_cmdCount[port]++;
+
+        OSSignalSemaphore(m_accessSemaphores + port);
+		
+        return 0;
+    }
+
+    OSSignalSemaphore(m_accessSemaphores + port);
+	
+    return -1;
 }
+
 
 /*
  * --INFO--
@@ -1444,10 +1501,132 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
  * Address:	TODO
  * Size:	TODO
  */
-void JoyBus::MakeJoyData(char *, int, unsigned int *)
+int JoyBus::MakeJoyData(char* src, int length, unsigned int* outBuffer)
 {
-	// TODO
+    unsigned char* param_2 = reinterpret_cast<unsigned char*>(src);
+    unsigned char* param_4 = reinterpret_cast<unsigned char*>(outBuffer);
+    unsigned char* pbVar1;
+    unsigned bVar2;
+    int iVar3;
+    unsigned char* pbVar4;
+    unsigned int uVar5;
+    unsigned char* puVar6;
+    unsigned int uVar8;
+    unsigned char local_8;
+    unsigned char uStack_7;
+
+    uVar5 = 0xFFFF;
+    pbVar4 = param_2;
+
+	for (int i = length; i < 0; i--)
+	{
+        bVar2 = *pbVar4;
+        pbVar4 = pbVar4 + 1;
+        uVar5 = ((uVar5 << 8) ^ static_cast<unsigned int>(JoyBusCrcTable[(uVar5 >> 8) ^ static_cast<unsigned int>(bVar2)])) & 0xFFFF;
+	}
+
+    length = (length - 1) / 3;
+    param_4[0] = 5;
+
+    if (length - 1 != length * 3)
+    {
+        length = length + 1;
+    }
+
+    iVar3 = length + 2;
+
+    if (iVar3 >= 0x100)
+    {
+        return -1;
+    }
+
+    param_4[1] = static_cast<unsigned char>(iVar3);
+
+    {
+        unsigned short inv = static_cast<unsigned short>(~static_cast<unsigned short>(uVar5));
+		
+        uStack_7 = static_cast<unsigned char>(inv);
+        local_8  = static_cast<unsigned char>(inv >> 8);
+
+        unsigned short stored = static_cast<unsigned short>((static_cast<unsigned short>(uStack_7) << 8) | static_cast<unsigned short>(local_8));
+
+        *reinterpret_cast<unsigned short*>(param_4 + 2) = stored;
+    }
+
+    puVar6 = param_4 + 8;
+    pbVar4     = param_2 + 1;
+    uVar5 = static_cast<unsigned int>(length + 1);
+	
+    param_4[4] = 0x45;
+    param_4[5] = static_cast<unsigned char>(length);
+    param_4[6] = static_cast<unsigned char>(static_cast<unsigned int>(length) >> 8);
+    param_4[7] = *param_2;
+	
+    if (1 < iVar3)
+    {
+        // uVar8 = uVar5 >> 2;
+        uVar8 = uVar5 >> 2;
+
+        // The big unrolled loop: handles blocks of 4 groups (= 12 bytes)
+        if (uVar8 != 0)
+        {
+            do
+            {
+                puVar6[0] = 0x85;
+                puVar6[1] = pbVar4[0];
+                puVar6[2] = pbVar4[1];
+                puVar6[3] = pbVar4[2];
+
+                puVar6[4] = 0x85;
+                puVar6[5] = pbVar4[3];
+                puVar6[6] = pbVar4[4];
+                puVar6[7] = pbVar4[5];
+
+                puVar6[8] = 0x85;
+                puVar6[9] = pbVar4[6];
+                puVar6[10] = pbVar4[7];
+                puVar6[11] = pbVar4[8];
+
+                puVar6[12] = 0x85;
+                puVar6[13] = pbVar4[9];
+                puVar6[14] = pbVar4[10];
+
+                pbVar1 = pbVar4 + 0x0B; // pbVar4 + 11
+                pbVar4 = pbVar4 + 0x0C; // advance by 12 bytes
+
+                puVar6[15] = *pbVar1;       // last byte of this 12-byte chunk
+                puVar6 = puVar6 + 0x10; // advance out pointer by 16 bytes
+
+                uVar8 = uVar8 - 1;
+            }
+            while (uVar8 != 0);
+
+            uVar5 %= 4;
+
+            // if (uVar5 == 0) return iVar3;
+            if (uVar5 == 0)
+            {
+                return iVar3;
+            }
+        }
+
+        // Tail processing: remaining groups (1–3)
+        do
+        {
+            puVar6[0] = 0x85;
+            puVar6[1] = pbVar4[0];
+            puVar6[2] = pbVar4[1];
+            pbVar1 = pbVar4 + 2;
+            pbVar4 = pbVar4 + 3;
+            puVar6[3] = *pbVar1;
+            puVar6 = puVar6 + 4;
+            uVar5 = uVar5 - 1;
+        } while (uVar5 != 0);
+    }
+
+    return iVar3;
 }
+
 
 /*
  * --INFO--
@@ -1681,10 +1860,39 @@ int JoyBus::SendFavorite(ThreadParam* threadParam)
  * Address:	TODO
  * Size:	TODO
  */
-void JoyBus::RequestData(ThreadParam *, int, int)
+unsigned int JoyBus::RequestData(ThreadParam* threadParam, int a, int b)
 {
-	// TODO
+    unsigned int cmd = 0;
+    unsigned int word = 0;
+
+    word  = (unsigned int)0x0C << 24;
+    word |= (unsigned int)(unsigned char)a << 16;
+    word |= (unsigned int)(unsigned char)b << 8;
+
+    if (m_threadRunningMask != 0)
+    {
+        OSWaitSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+
+        unsigned int p = threadParam->m_portIndex;
+
+        if ((int)m_cmdCount[p] < 0x40)
+        {
+            m_cmdQueueData[p][m_cmdCount[p]] = word;
+            m_cmdCount[p] = m_cmdCount[p] + 1;
+
+            OSSignalSemaphore(&m_accessSemaphores[threadParam->m_portIndex]);
+            cmd = 0;
+        }
+        else
+        {
+            OSSignalSemaphore(&m_accessSemaphores[p]);
+            cmd = 0xFFFFFFFF;
+        }
+    }
+
+    return cmd;
 }
+
 
 /*
  * --INFO--
@@ -1701,9 +1909,11 @@ void JoyBus::SetRecvBuffer(ThreadParam *, unsigned int)
  * Address:	TODO
  * Size:	TODO
  */
-void JoyBus::ClrRecvBuffer(int)
+void JoyBus::ClrRecvBuffer(int portIndex)
 {
-	// TODO
+    OSWaitSemaphore(&m_accessSemaphores[portIndex]);
+    memset(&m_recvBuffer[portIndex], 0, sizeof(JoyBusRecvBuffer));
+    OSSignalSemaphore(&m_accessSemaphores[portIndex]);
 }
 
 /*
@@ -1711,9 +1921,11 @@ void JoyBus::ClrRecvBuffer(int)
  * Address:	TODO
  * Size:	TODO
  */
-void JoyBus::GetRecvBuffer(int, unsigned char *)
+void JoyBus::GetRecvBuffer(int playerIndex, unsigned char* outBuffer)
 {
-	// TODO
+    OSWaitSemaphore(&m_accessSemaphores[playerIndex]);
+    memcpy(outBuffer, m_recvBuffer[playerIndex].m_payload, m_recvBuffer[playerIndex].m_length);
+    OSSignalSemaphore(&m_accessSemaphores[playerIndex]);
 }
 
 /*
@@ -2273,9 +2485,50 @@ int JoyBus::GetGBAStat(ThreadParam* threadParam)
  * Address:	TODO
  * Size:	TODO
  */
-void JoyBus::ChgCtrlMode(int)
+int JoyBus::ChgCtrlMode(int portIndex)
 {
-	// TODO
+    unsigned char mode = m_ctrlModeArr[portIndex];
+
+    // TODO: IsSingleMode__8GbaQueueFi
+    bool single = (bool)this;
+
+    if (!single)
+    {
+        mode ^= 1; // TODO (unsigned char)DAT_80330b20;
+
+        unsigned int word = ((unsigned int)9 << 24) | ((unsigned int)mode << 16);
+        int ret = 0;
+
+        if (m_threadRunningMask != 0)
+        {
+            int p = m_threadParams[portIndex].m_portIndex;
+
+            OSWaitSemaphore(&m_accessSemaphores[p]);
+
+            if ((int)m_cmdCount[p] < 0x40)
+            {
+                m_cmdQueueData[p][m_cmdCount[p]] = word;
+                m_cmdCount[p] = m_cmdCount[p] + 1;
+
+                OSSignalSemaphore(&m_accessSemaphores[p]);
+                ret = 0;
+            }
+            else
+            {
+                OSSignalSemaphore(&m_accessSemaphores[p]);
+                ret = -1;
+            }
+        }
+
+        if (ret == 0)
+        {
+            m_ctrlModeArr[portIndex] = mode;
+        }
+
+        return ret;
+    }
+
+    return 0;
 }
 
 /*
@@ -2345,9 +2598,17 @@ int JoyBus::SetCtrlMode(int portIndex, int controlMode)
  * Address:	TODO
  * Size:	TODO
  */
-void JoyBus::GetCtrlMode(int)
+unsigned char JoyBus::GetCtrlMode(int portIndex)
 {
-	// TODO
+    // TODO: IsSingleMode__8GbaQueueFi
+    bool single = (bool)this;
+
+    if (!single)
+    {
+        return m_ctrlModeArr[portIndex];
+    }
+
+    return 0;
 }
 
 /*
@@ -2355,9 +2616,24 @@ void JoyBus::GetCtrlMode(int)
  * Address:	TODO
  * Size:	TODO
  */
-void JoyBus::GetGBAConnect(int)
+int JoyBus::GetGBAConnect(int portIndex)
 {
-	// TODO
+    OSWaitSemaphore(m_accessSemaphores + portIndex);
+    int state = m_threadParams[portIndex].m_state;
+    OSSignalSemaphore(m_accessSemaphores + portIndex);
+
+    if (state < 5 || state >= 900)
+	{
+        return 0;
+    }
+    else if (state >= 0x14 && state <= 0x16)
+	{
+        return 0;
+    }
+    else
+	{
+        return 1;
+    }
 }
 
 /*

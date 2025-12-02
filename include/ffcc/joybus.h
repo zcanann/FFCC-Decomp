@@ -49,10 +49,10 @@ public:
 	
 	struct JoyBusRecvBuffer
 	{
-		unsigned int   m_length;        // 0x00
-		unsigned short m_cmdFlags;      // 0x04
-		unsigned short m_crc;           // 0x06
-		unsigned char  m_payload[1024]; // 0x08
+		unsigned int   m_length;         // 0x00
+		unsigned short m_cmdFlags;       // 0x04
+		unsigned short m_crc;            // 0x06
+		unsigned char  m_payload[0x400]; // 0x08
 	};
 
 
@@ -93,7 +93,7 @@ public:
     void ResetQueue(ThreadParam* threadParam);
     void CleanQueue(ThreadParam* threadParam);
     void InitialCode(ThreadParam* threadParam);
-    void SetSendQueue(ThreadParam* threadParam, unsigned int);
+    int SetSendQueue(ThreadParam* threadParam, unsigned int command);
     int SendGBAStart(ThreadParam* threadParam, unsigned int* outCmd);
     int SendGBAStop(ThreadParam* threadParam);
     int SendChkCrc(ThreadParam* threadParam, int, unsigned short, unsigned int*);
@@ -106,7 +106,7 @@ public:
     void InitPpos();
     int SendPpos(ThreadParam* threadParam);
 
-    void MakeJoyData(char*, int, unsigned int*);
+	int MakeJoyData(char* src, int length, unsigned int* outBuffer);
 
     int SendPlayerStat(ThreadParam* threadParam);
     int SendPlayerHP(ThreadParam* threadParam);
@@ -117,10 +117,10 @@ public:
     int SendMapObjDrawFlg(ThreadParam* threadParam);
     int SendFavorite(ThreadParam* threadParam);
 
-    void RequestData(ThreadParam*, int, int);
+    unsigned int RequestData(ThreadParam*, int a, int b);
     void SetRecvBuffer(ThreadParam*, unsigned int);
     void ClrRecvBuffer(int portIndex);
-    void GetRecvBuffer(int portIndex, unsigned char*);
+	void GetRecvBuffer(int playerIndex, unsigned char* outBuffer);
 
     int SendMType(ThreadParam* threadParam, int modeType);
     int SendEquip(ThreadParam* threadParam);
@@ -142,10 +142,10 @@ public:
 
     void DecRecvQueue(int portIndex);
     int GetGBAStat(ThreadParam* threadParam);
-    void ChgCtrlMode(int);
+    int ChgCtrlMode(int portIndex);
     int SetCtrlMode(int portIndex, int controlMode);
-    void GetCtrlMode(int portIndex);
-    void GetGBAConnect(int portIndex);
+	unsigned char GetCtrlMode(int portIndex);
+    int GetGBAConnect(int portIndex);
     int IsInitSend(int portIndex);
     bool GetGBAStart(int portIndex);
     int GBAReady(int portIndex);

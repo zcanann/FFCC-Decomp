@@ -49,6 +49,7 @@ public:
 	void ReadASync(CHandle* handle);
 	void Close(CHandle* handle);
 	bool IsCompleted(CHandle* handle);
+	bool IsDiskError();
 	void SyncCompleted(CHandle* handle);
 
 	void kick();

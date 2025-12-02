@@ -71,8 +71,8 @@ public:
     void BlockSem(int portIndex);
     void ReleaseSem(int portIndex);
 
-    void ThreadMain(void*);
-    static void* _ThreadMain(void*);
+    void ThreadMain(void* arg);
+    static void* _ThreadMain(void* arg);
     void ThreadInit();
     void ThreadSleep(long long);
 
@@ -92,7 +92,7 @@ public:
 
     void ResetQueue(ThreadParam* threadParam);
     void CleanQueue(ThreadParam* threadParam);
-    void InitialCode(ThreadParam* threadParam);
+    int InitialCode(ThreadParam* threadParam);
     int SetSendQueue(ThreadParam* threadParam, unsigned int command);
     int SendGBAStart(ThreadParam* threadParam, unsigned int* outCmd);
     int SendGBAStop(ThreadParam* threadParam);

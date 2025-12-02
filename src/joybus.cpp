@@ -8,6 +8,9 @@
 
 #include "string.h"
 
+extern int DAT_800000f8 = 0;
+extern int DAT_8032edb8 = 0;
+
 const unsigned short JoyBusCrcTable[256] =
 {
     0x0000, 0x1021, 0x2042, 0x3063,
@@ -506,10 +509,369 @@ void JoyBus::ReleaseSem(int portIndex)
  * Address:	TODO
  * Size:	TODO
  */
-void JoyBus::ThreadMain(void *)
+void JoyBus::ThreadMain(void* arg)
 {
-	// TODO
+	ThreadParam* threadParam = (ThreadParam*)arg;
+    unsigned int port = (unsigned int)threadParam->m_portIndex;
+
+    unsigned int padType = 0;
+    unsigned int stateTimeoutTicks = 0;
+    unsigned long long stateStartTime = 0;
+
+    unsigned short localCrc[2];
+    unsigned int localWord = 0;
+    unsigned int localCmd = 0;
+    unsigned char localBuf[4];
+
+    threadParam->m_gbaStatus = 0;
+    // TODO: threadParam->m_gbaStatus = GBAReset(threadParam->m_portIndex, &threadParam->m_unk3);
+
+    ThreadSleep((DAT_800000f8 / 4000) * 0xF);
+    stateStartTime = OSGetTime();
+
+    for (;;)
+    {
+        int diskError = File.IsDiskError();
+
+        if (diskError != 0)
+        {
+            threadParam->m_state = (unsigned char)0x86;
+            ResetQueue(threadParam);
+            ClrRecvBuffer(threadParam->m_portIndex);
+
+            ThreadSleep((DAT_800000f8 / 4000) * 0xF);
+            stateStartTime = OSGetTime();
+            continue;
+        }
+
+        if (threadParam != &m_threadParams[threadParam->m_portIndex])
+        {
+            unsigned int idx = 0;
+            int left = 4;
+            JoyBus* jb = this;
+
+            while (left > 0)
+            {
+                if (threadParam == jb->m_threadParams)
+                {
+                    memset(threadParam, 0, 0x3c);
+                    threadParam->m_portIndex = (int)idx;
+                    break;
+                }
+
+                jb = (JoyBus*)(jb->m_pathBuf + 0x3c);
+                idx++;
+                left--;
+            }
+
+            port = (unsigned int)threadParam->m_portIndex;
+        }
+
+        if (m_threadInitFlag != 0)
+        {
+            m_threadRunningMask = (unsigned char)(m_threadRunningMask & ~(unsigned char)(1 << port));
+            m_stageFlags[port] = 0;
+            OSExitThread(&DAT_8032edb8);
+        }
+
+        {
+            unsigned int s = (unsigned int)threadParam->m_state;
+
+            if (s == 5 || s == 900)
+            {
+                stateTimeoutTicks = (DAT_800000f8 / 4000) * 500;
+            }
+            else if (s > 2 && s < 5)
+            {
+                stateTimeoutTicks = (DAT_800000f8 / 4000) * 500;
+            }
+            else if (s == 2)
+            {
+                stateTimeoutTicks = (DAT_800000f8 / 4000) * 2000;
+            }
+            else
+            {
+                stateTimeoutTicks = (DAT_800000f8 / 4000) * 1000;
+            }
+        }
+
+        {
+            unsigned long long now = OSGetTime();
+            unsigned int elapsed = (unsigned int)(now - stateStartTime);
+
+            if (elapsed > stateTimeoutTicks)
+            {
+                threadParam->m_prevState = threadParam->m_state;
+
+                if (threadParam->m_gbaStatus == 3)
+                {
+                    threadParam->m_state = (unsigned char)0x86;
+                }
+                else
+                {
+                    threadParam->m_gbaStatus = 1;
+                    threadParam->m_state = (unsigned char)0x85;
+                }
+
+                stateStartTime = OSGetTime();
+                ThreadSleep((DAT_800000f8 / 4000) * 0xF);
+                continue;
+            }
+        }
+
+        if (threadParam->m_skipProcessingFlag != 0)
+        {
+            threadParam->m_skipProcessingFlag = 0;
+        }
+
+        padType = 0; // TODO: SIProbe(threadParam->m_portIndex);
+
+        BlockSem(threadParam->m_portIndex);
+
+        if (padType == 0x00040000 ||
+            padType == 0x09000000 ||
+            padType == 0x8B100000 ||
+            padType == 0x88000000)
+        {
+            threadParam->m_padType = padType;
+        }
+        else if (padType != 0x80)
+        {
+            threadParam->m_padType = 0x40;
+            threadParam->m_sentStartFlag = 0;
+        }
+
+        ReleaseSem(threadParam->m_portIndex);
+
+        if (m_nextModeTypeArr[port] != m_modeXArr[port])
+        {
+            threadParam->m_state    = (unsigned char)0x14;
+            threadParam->m_subState = 0;
+            m_modeXArr[port]        = m_nextModeTypeArr[port];
+        }
+
+        int gamePadState = 0;
+        // TODO: char single = IsSingleMode(&GbaQue, threadParam->m_portIndex);
+        // TODO: unsigned int statusIndex = (single != 0 && threadParam->m_portIndex != 1) ? 0 : (unsigned int)threadParam->m_portIndex;
+        // TODO: int* padPtr = (int*)(&Game.game.field_0xc5c0 + statusIndex * 4);
+        // TODO: gamePadState = *padPtr;
+
+        unsigned int state = (unsigned int)threadParam->m_state;
+
+        switch (state)
+        {
+        case 0x00:
+        {
+            threadParam->m_state = 1;
+
+            // TODO: SetChgUseItemFlg(&GbaQue, port);
+            // TODO: SetResetFlg(&GbaQue, port);
+
+            threadParam->m_subState      = 0;
+            threadParam->m_pposCounter   = 0;
+            threadParam->m_counter0x2B   = 0;
+            threadParam->m_sentStartFlag = 0;
+            threadParam->m_flags[0]      = 0;
+            threadParam->m_flags[1]      = 0;
+            threadParam->m_flags[5]      = 0;
+            threadParam->m_flags[4]      = 0;
+            threadParam->m_flags[2]      = 0;
+            threadParam->m_flags[3]      = 0;
+
+            m_ctrlModeArr[port] = 0;
+
+            char controllerMode = 0;
+            // TODO: controllerMode = GetControllerMode(&GbaQue);
+
+            if (controllerMode == 0)
+                m_nextModeTypeArr[port] = 0;
+            else
+                m_nextModeTypeArr[port] = 4;
+
+            ResetQueue(threadParam);
+
+            threadParam->m_gbaStatus = 0;
+            // TODO: threadParam->m_gbaStatus = GBAJoyBoot(port, port << 1, 2, m_gbaBootParamA, m_gbaBootParamB, &threadParam->m_unk3);
+
+            if (threadParam->m_gbaStatus == 3 && (threadParam->m_unk3 & 0x10) != 0)
+            {
+                threadParam->m_flags[0] = 0;
+                threadParam->m_state    = 4;
+            }
+            else if (threadParam->m_gbaStatus == 0)
+            {
+                char cm = 0;
+                // TODO: cm = GetControllerMode(&GbaQue);
+
+                if (cm == 0)
+                    m_nextModeTypeArr[port] = 0;
+                else
+                    m_nextModeTypeArr[port] = 4;
+
+                threadParam->m_state    = 2;
+                threadParam->m_subState = 0;
+
+                threadParam->m_timestamp = OSGetTick();
+
+                ThreadSleep((DAT_800000f8 / 4000) * 0xF);
+                stateStartTime = OSGetTime();
+            }
+            else if (threadParam->m_gbaStatus == 3)
+            {
+                int stat = GetGBAStat(threadParam);
+                if (stat == 0)
+                {
+                    threadParam->m_state    = 2;
+                    threadParam->m_subState = 0;
+                    ThreadSleep((DAT_800000f8 / 4000) * 0xF);
+                    stateStartTime = OSGetTime();
+                }
+                else
+                {
+                    threadParam->m_flags[0] = 0;
+                }
+            }
+
+            break;
+        }
+
+        case 0x01:
+        {
+            // TODO: optionally split logic from case 0 if needed
+            break;
+        }
+
+        case 0x02:
+        {
+            int result = 0;
+            // TODO: result = InitialCode(threadParam);
+
+            if (result == 1)
+            {
+                stateStartTime = OSGetTime();
+            }
+            else if (result == 2)
+            {
+                ThreadSleep((DAT_800000f8 / 4000) * 0xF);
+            }
+
+            break;
+        }
+
+        case 0x03:
+        {
+            // TODO: SetResetFlg(&GbaQue, port);
+
+            ResetQueue(threadParam);
+
+            threadParam->m_gbaStatus = 0;
+            // TODO: threadParam->m_gbaStatus = GBAReset(threadParam->m_portIndex, &threadParam->m_unk3);
+
+            if (threadParam->m_gbaStatus == 0)
+            {
+                threadParam->m_state    = 2;
+                threadParam->m_subState = 0;
+
+                ThreadSleep((DAT_800000f8 / 4000) * 0xF);
+                stateStartTime = OSGetTime();
+            }
+
+            break;
+        }
+
+        case 0x04:
+        {
+            threadParam->m_flags[0] = 0;
+            break;
+        }
+
+        case 0x05:
+        {
+            // TODO: main in-game loop logic (SendGBAStart/Stop, SPMode, pause, map, radar, money, etc.)
+            break;
+        }
+
+        case 0x06:
+        {
+            // TODO: controller mode 4 / SP-mode specific loop
+            break;
+        }
+
+        case 0x14:
+        {
+            threadParam->m_state = 0x15;
+
+            localCrc[0] = 0xFFFF;
+            // TODO: unsigned short crcA = Crc16(m_fileBaseA_dup, m_fileBaseA, localCrc);
+            // TODO: int chkA = SendChkCrc(threadParam, 0, crcA, &localWord);
+            // TODO: if (chkA != 0) { threadParam->m_altState = threadParam->m_state; threadParam->m_recvWriteIdx = localWord; threadParam->m_state = 0x84; }
+
+            break;
+        }
+
+        case 0x1D:
+        {
+            int res = 0;
+            // TODO: res = GBARecvSend(threadParam, (unsigned int*)localBuf);
+
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0)
+            {
+                int sendRes = SendMapNo(threadParam);
+                if (sendRes >= 0)
+                {
+                    // TODO: stage flag / fileB CRC logic
+                }
+            }
+
+            break;
+        }
+
+        case 0x4E:
+        {
+            unsigned int r = 0;
+            // TODO: r = GBARecvSend(threadParam, (unsigned int*)localBuf);
+
+            if ((int)r > 0 && threadParam->m_skipProcessingFlag == 0)
+            {
+                if ((localBuf[0] & 0x3F) == 7)
+                    threadParam->m_state = 'L';
+                else
+                    threadParam->m_state = 5;
+            }
+
+            break;
+        }
+
+        case 900:
+        {
+            int res = 0;
+            // TODO: res = GBARecvSend(threadParam, (unsigned int*)localBuf);
+
+            if (res >= 0 && threadParam->m_skipProcessingFlag == 0)
+            {
+                int qres = SetSendQueue(threadParam, threadParam->m_recvWriteIdx);
+                if (qres == 0)
+                {
+                    threadParam->m_state        = threadParam->m_altState;
+                    threadParam->m_recvWriteIdx = 0;
+                }
+            }
+
+            break;
+        }
+
+        default:
+        {
+            // TODO: add remaining state handling as you decompile them
+            break;
+        }
+        }
+
+        ThreadSleep((DAT_800000f8 / 4000) * 0xF);
+        stateStartTime = OSGetTime();
+    }
 }
+
 
 /*
  * --INFO--
@@ -1286,9 +1648,453 @@ void JoyBus::CleanQueue(ThreadParam* threadParam)
  * Address:	TODO
  * Size:	TODO
  */
-void JoyBus::InitialCode(ThreadParam* threadParam)
+int JoyBus::InitialCode(ThreadParam* threadParam)
 {
-	// TODO
+    const int port = threadParam->m_portIndex;
+    int result = 0;
+
+    switch (threadParam->m_subState)
+    {
+    case 0:
+    {
+        // Clear per-port state
+        m_stateFlagArr[port] = 0;
+
+        OSWaitSemaphore(&m_accessSemaphores[port]);
+
+        // Clear command / receive queues for this port
+        memset(m_cmdQueueData[port],         0, sizeof(m_cmdQueueData[port]));
+        memset(m_recvQueueEntriesArr[port],  0, sizeof(m_recvQueueEntriesArr[port]));
+
+        m_cmdCount[port]    = 0;
+        m_secCmdCount[port] = 0;
+
+        OSSignalSemaphore(&m_accessSemaphores[port]);
+
+        // Get initial GBA status
+        bool singleMode = false;
+        // TODO: singleMode = IsSingleMode__8GbaQueueFi(&GbaQue, port);
+
+        if (!singleMode || port == 1)
+        {
+            threadParam->m_gbaStatus = 1; // TODO: GBAGetStatus(port, &threadParam->m_unk3);
+        }
+        else
+        {
+            threadParam->m_gbaStatus = 0;
+        }
+
+        if (threadParam->m_gbaStatus == 0 && threadParam->m_unk3 == '(')
+        {
+            unsigned int readBuf[4];
+
+            threadParam->m_gbaStatus = 0; // TODO: GBARead(port, readBuf, &threadParam->m_unk3);
+
+            if (threadParam->m_gbaStatus == 0)
+            {
+                threadParam->m_recvReadIdx = readBuf[0];
+
+                threadParam->m_deviceType   = 0;
+                threadParam->m_padding[0]   = 0;
+                threadParam->m_padding[1]   = 0;
+                threadParam->m_padding[2]   = 1;
+            }
+        }
+
+        threadParam->m_subState = 1;
+        result = 0;
+        break;
+    }
+
+    case 1:
+    {
+        bool singleMode = false;
+        // TODO: singleMode = IsSingleMode__8GbaQueueFi(&GbaQue, port);
+
+        if (!singleMode || port == 1)
+        {
+            threadParam->m_gbaStatus = 1; // TODO: GBAGetStatus(port, &threadParam->m_unk3);
+        }
+        else
+        {
+            threadParam->m_gbaStatus = 0;
+        }
+
+        unsigned int status = threadParam->m_gbaStatus;
+
+        if (status == 0)
+        {
+            if (threadParam->m_unk3 == ' ')
+            {
+                threadParam->m_gbaStatus = 0; // TODO: GBAWrite(port, m_diskId, &threadParam->m_unk3);
+                status = threadParam->m_gbaStatus;
+
+                if (status == 0)
+                {
+                    bool singleMode2 = false;
+                    // TODO: singleMode2 = IsSingleMode__8GbaQueueFi(&GbaQue, port);
+
+                    if (!singleMode2 || port == 1)
+                    {
+                        threadParam->m_gbaStatus = 1; // TODO: GBAGetStatus(port, &threadParam->m_unk3);
+                    }
+                    else
+                    {
+                        threadParam->m_gbaStatus = 0;
+                    }
+
+                    status = threadParam->m_gbaStatus;
+
+                    if (status == 0)
+                    {
+                        if ((threadParam->m_unk3 & 0x30) == 0x20)
+                            status = 0;
+                        else
+                            status = 1;
+                    }
+                }
+            }
+            else
+            {
+                status = 1;
+            }
+        }
+
+        if (status == 0)
+        {
+            threadParam->m_subState = 2;
+            result = 0;
+        }
+        else
+        {
+            result = 1;
+        }
+
+        break;
+    }
+
+    case 2:
+    {
+        bool singleMode = false;
+        // TODO: singleMode = IsSingleMode__8GbaQueueFi(&GbaQue, port);
+
+        if (!singleMode || port == 1)
+        {
+            threadParam->m_gbaStatus = 1; // TODO: GBAGetStatus(port, &threadParam->m_unk3);
+        }
+        else
+        {
+            threadParam->m_gbaStatus = 0;
+        }
+
+        unsigned int status = threadParam->m_gbaStatus;
+
+        if (status == 0)
+        {
+            if (threadParam->m_unk3 == '(')
+            {
+                char header;
+                unsigned char flags = 0; // will land in local_1f
+
+                // GBARead fills header + flag byte (and maybe more); we only care about these two.
+                struct
+                {
+                    char          h;
+                    unsigned char f;
+                } tmpBuf;
+
+                threadParam->m_gbaStatus = 1; // TODO: GBARead(port, &tmpBuf, &threadParam->m_unk3);
+                status = threadParam->m_gbaStatus;
+
+                if (status == 0)
+                {
+                    header = tmpBuf.h;
+                    flags  = tmpBuf.f;
+
+                    if (header == 1)
+                    {
+                        status = 0;
+
+                        threadParam->m_gbaBootFlag    = (unsigned char)((int)(unsigned char)flags >> 6);
+                        threadParam->m_unk2           = (unsigned char)((flags >> 4) & 0x03);
+                        threadParam->m_bootRetryCount = (unsigned char)(flags & 0x0F);
+                    }
+                    else
+                    {
+                        status = 1;
+                    }
+                }
+            }
+            else
+            {
+                status = 1;
+            }
+        }
+
+        if (status == 0)
+        {
+            threadParam->m_subState = 3;
+            result = 0;
+        }
+        else
+        {
+            result = 1;
+        }
+
+        break;
+    }
+
+    case 3:
+    {
+        bool singleMode = false;
+        // TODO: singleMode = IsSingleMode__8GbaQueueFi(&GbaQue, port);
+
+        if (!singleMode || port == 1)
+        {
+            threadParam->m_gbaStatus = 1; // TODO: GBAGetStatus(port, &threadParam->m_unk3);
+        }
+        else
+        {
+            threadParam->m_gbaStatus = 0;
+        }
+
+        unsigned int status = threadParam->m_gbaStatus;
+
+        if (status == 0)
+        {
+            if (threadParam->m_unk3 == '(')
+            {
+                unsigned int timeValue = 0;
+                threadParam->m_gbaStatus = 1; // TODO: GBARead(port, &timeValue, &threadParam->m_unk3);
+                status = threadParam->m_gbaStatus;
+
+                if (status == 0)
+                {
+                    // Bit-twiddly inequality check preserved from decomp
+                    unsigned char a = (unsigned char)((timeValue - threadParam->m_timestamp) >> 24);
+                    unsigned char b = (unsigned char)((threadParam->m_timestamp - timeValue) >> 24);
+
+                    threadParam->m_timeChangedFlag = (unsigned char)((a | b) >> 7);
+                    threadParam->m_timestamp = timeValue;
+                    status = 0;
+                }
+            }
+            else
+            {
+                status = 1;
+            }
+        }
+
+        if (status == 0)
+        {
+            threadParam->m_subState = 4;
+            // fall through into case 4
+        }
+        else
+        {
+            result = 1;
+            break;
+        }
+    }
+
+    case 4:
+    {
+        bool singleMode = false;
+        // TODO: singleMode = IsSingleMode__8GbaQueueFi(&GbaQue, port);
+
+        if (!singleMode || port == 1)
+        {
+            threadParam->m_gbaStatus = 1; // TODO: GBAGetStatus(port, &threadParam->m_unk3);
+        }
+        else
+        {
+            threadParam->m_gbaStatus = 0;
+        }
+
+        unsigned int status = threadParam->m_gbaStatus;
+
+        if (status == 0)
+        {
+            if (threadParam->m_unk3 == ' ')
+            {
+                if (threadParam->m_timeChangedFlag != 0 ||
+                    (threadParam->m_gbaBootFlag == 0 && threadParam->m_timestamp == 0))
+                {
+                    threadParam->m_timestamp = OSGetTick();
+                }
+
+                threadParam->m_gbaStatus = 1; // TODO: GBAWrite(port, &threadParam->m_timestamp, &threadParam->m_unk3);
+
+                status = threadParam->m_gbaStatus;
+
+                if (status == 0)
+                {
+                    status = 0;
+                }
+            }
+            else
+            {
+                status = 1;
+            }
+        }
+
+        if (status == 0)
+        {
+            threadParam->m_subState = 5;
+            result = 0;
+        }
+        else
+        {
+            result = 1;
+        }
+
+        break;
+    }
+
+    case 5:
+    {
+        bool singleMode = false;
+        // TODO: singleMode = IsSingleMode__8GbaQueueFi(&GbaQue, port);
+
+        if (!singleMode || port == 1)
+        {
+            threadParam->m_gbaStatus = 1; // TODO: GBAGetStatus(port, &threadParam->m_unk3);
+        }
+        else
+        {
+            threadParam->m_gbaStatus = 0;
+        }
+
+        unsigned int status = threadParam->m_gbaStatus;
+
+        if (status == 0)
+        {
+            if (threadParam->m_unk3 == ' ')
+            {
+                bool singleMode2 = false;
+                // TODO: singleMode2 = IsSingleMode__8GbaQueueFi(&GbaQue, port);
+
+                unsigned char portVal = singleMode2 ? 0 : (unsigned char)port;
+                unsigned char header = 1;
+                unsigned char flags = (unsigned char)(portVal | (threadParam->m_gbaBootFlag << 6) | (threadParam->m_unk2 << 4));
+                unsigned int word = (1u << 24) | ((unsigned int)flags << 16);
+
+                threadParam->m_gbaStatus = 0; // TODO GBAWrite(port, &word, &threadParam->m_unk3);
+                status = threadParam->m_gbaStatus;
+
+                if (status == 0)
+                {
+                    status = 0;
+                }
+            }
+            else
+            {
+                status = 1;
+            }
+        }
+
+        if (status == 0)
+        {
+            threadParam->m_subState = 6;
+            result = 0;
+        }
+        else
+        {
+            result = 1;
+        }
+
+        break;
+    }
+
+    case 6:
+    {
+        int err = SendMType(threadParam, (int)m_nextModeTypeArr[port]);
+        if (err < 0)
+        {
+            result = 1;
+            break;
+        }
+
+        char stageMajor[3] = { 0, 0, 0 };
+        char stageMinor[3] = { 0, 0, 0 };
+
+        // TODO: GetStageNo__8GbaQueueFiPiPi(&GbaQue, port, stageMajor, stageMinor);
+
+        unsigned int cmdStage = 0;
+        // TODO: cmdStage = build stage command from stageMajor / stageMinor, like local_34.
+
+        if (m_threadRunningMask != 0)
+        {
+            OSWaitSemaphore(&m_accessSemaphores[port]);
+
+            if ((int)m_cmdCount[port] < 0x40)
+            {
+                m_cmdQueueData[port][m_cmdCount[port]] = cmdStage;
+                m_cmdCount[port]++;
+
+                OSSignalSemaphore(&m_accessSemaphores[port]);
+                err = 0;
+            }
+            else
+            {
+                OSSignalSemaphore(&m_accessSemaphores[port]);
+                err = -1;
+            }
+        }
+
+        if (err < 0)
+        {
+            result = 1;
+            break;
+        }
+
+        unsigned int cmdGame = 0;
+        // TODO: cmdGame = (build from Game.game.gameWork._6_1_ and DAT_80330b24, like local_38).
+
+        err = 0;
+
+        if (m_threadRunningMask != 0)
+        {
+            OSWaitSemaphore(&m_accessSemaphores[port]);
+
+            if ((int)m_cmdCount[port] < 0x40)
+            {
+                m_cmdQueueData[port][m_cmdCount[port]] = cmdGame;
+                m_cmdCount[port]++;
+
+                OSSignalSemaphore(&m_accessSemaphores[port]);
+                err = 0;
+            }
+            else
+            {
+                OSSignalSemaphore(&m_accessSemaphores[port]);
+                err = -1;
+            }
+        }
+
+        if (err < 0)
+        {
+            result = 1;
+            break;
+        }
+
+        threadParam->m_subState  = 0;
+        threadParam->m_state     = 0x14;
+        threadParam->m_flags[0]  = 1;
+
+        // TODO: ClrPlayModeFlg__8GbaQueueFi(&GbaQue, port);
+
+        result = 0;
+        break;
+    }
+
+    default:
+        // Unknown state, treat as error / busy
+        result = 1;
+        break;
+    }
+
+    return result;
 }
 
 /*
@@ -1474,7 +2280,524 @@ int JoyBus::SendCancel(ThreadParam* threadParam)
  */
 int JoyBus::SendDataFile(ThreadParam* threadParam)
 {
-	// TODO
+    const int port = threadParam->m_portIndex;
+    int result = 0;
+
+    unsigned char* temp = m_perThreadTemp[port];
+
+    unsigned char& sendType      = temp[0];
+    unsigned char& phase         = temp[1];
+    unsigned short& crc          = *reinterpret_cast<unsigned short*>(temp + 0x02);
+    unsigned char*& dataPtr      = *reinterpret_cast<unsigned char**>(temp + 0x04);
+    unsigned char*& dataBase     = *reinterpret_cast<unsigned char**>(temp + 0x08);
+    unsigned char& blockCount    = temp[0x0C];
+    unsigned char& blockIndex    = temp[0x0D];
+    unsigned short& step         = *reinterpret_cast<unsigned short*>(temp + 0x0E);
+    unsigned short& chunkCount   = *reinterpret_cast<unsigned short*>(temp + 0x10);
+    unsigned short& totalSize    = *reinterpret_cast<unsigned short*>(temp + 0x12);
+    unsigned short& chunkSize    = *reinterpret_cast<unsigned short*>(temp + 0x14);
+
+    unsigned int localWord = 0;
+    unsigned int gbaStatus = GBARecvSend(threadParam, &localWord);
+
+    if (threadParam->m_skipProcessingFlag != 0)
+    {
+        return 0;
+    }
+
+    if ((int)gbaStatus < 0)
+    {
+        return -1;
+    }
+
+    if (threadParam->m_unk3 & 2)
+    {
+        return 0;
+    }
+
+    if ((gbaStatus & 1) == 0)
+    {
+        if (phase == 2)
+        {
+            unsigned short sentBlocks = chunkCount;
+            unsigned short doneBlocks = step;
+
+            if (sentBlocks <= doneBlocks)
+            {
+                return -1;
+            }
+        }
+
+        return 0;
+    }
+
+    {
+        OSWaitSemaphore(&m_accessSemaphores[port]);
+
+        m_recvQueueEntriesArr[port][m_secCmdCount[port]] = 0;
+        m_secCmdCount[port]--;
+
+        localWord = (localWord & 0xFFFF0000u) |
+                    static_cast<unsigned short>(static_cast<char>(localWord >> 24));
+
+        OSSignalSemaphore(&m_accessSemaphores[port]);
+    }
+
+    const unsigned char cmd = static_cast<unsigned char>(localWord & 0x3F);
+    const unsigned char seq = static_cast<unsigned char>((localWord >> 8) & 0xFF);
+
+    if (cmd == 7)
+    {
+        step = 0;
+        phase = 0;
+        blockIndex = 0;
+        localWord = 0;
+
+        OSWaitSemaphore(&m_accessSemaphores[port]);
+
+        memset(m_cmdQueueData[port], 0, sizeof(m_cmdQueueData[port]));
+        memset(m_recvQueueEntriesArr[port], 0, sizeof(m_recvQueueEntriesArr[port]));
+
+        m_cmdCount[port] = 0;
+        m_secCmdCount[port] = 0;
+
+        OSSignalSemaphore(&m_accessSemaphores[port]);
+
+        result = 0;
+
+        if (m_threadRunningMask != 0)
+        {
+            OSWaitSemaphore(&m_accessSemaphores[port]);
+
+            if ((int)m_cmdCount[port] < 0x40)
+            {
+                m_cmdQueueData[port][m_cmdCount[port]] = 0x10000000;
+                m_cmdCount[port]++;
+
+                OSSignalSemaphore(&m_accessSemaphores[port]);
+                result = 0;
+            }
+            else
+            {
+                OSSignalSemaphore(&m_accessSemaphores[port]);
+                result = -1;
+            }
+        }
+
+        const int typeVal = static_cast<char>(sendType);
+        const int respVal = static_cast<char>(seq);
+
+        if (result != 0)
+        {
+            int diffMask = ((typeVal - respVal) | (respVal - typeVal)) >> 31;
+            return -2 - diffMask;
+        }
+
+        int diffMask = ((respVal - typeVal) | (typeVal - respVal)) >> 31;
+        return diffMask - 1;
+    }
+
+    if (seq == sendType)
+    {
+        step = 0;
+        phase = 1;
+        blockIndex++;
+        dataPtr += chunkSize;
+
+        if (blockCount <= blockIndex)
+        {
+            return 1;
+        }
+    }
+
+    result = 0;
+    localWord = 0x0B000000;
+
+    if (phase == 0)
+    {
+        if (step == 0)
+        {
+            unsigned char type = sendType;
+
+            if (type != 3 && type != 2 && type != 6 && type != 7 && type != 8 && type != 9)
+            {
+                // TODO: IsSingleMode__8GbaQueueFi(&GbaQue, port);
+
+                if (m_threadRunningMask == 0)
+                {
+                    result = 0;
+                }
+                else
+                {
+                    OSWaitSemaphore(&m_accessSemaphores[port]);
+
+                    if ((int)m_cmdCount[port] < 0x40)
+                    {
+                        m_cmdQueueData[port][m_cmdCount[port]] = 0x09000000;
+                        m_cmdCount[port]++;
+
+                        OSSignalSemaphore(&m_accessSemaphores[port]);
+                        result = 0;
+                    }
+                    else
+                    {
+                        OSSignalSemaphore(&m_accessSemaphores[port]);
+                        result = -1;
+                    }
+                }
+
+                if (result != 0)
+                {
+                    return -1;
+                }
+
+                m_ctrlModeArr[port] = 0;
+            }
+
+            if (type == 0)
+            {
+                dataBase = reinterpret_cast<unsigned char*>(m_fileBaseA);
+                dataPtr = dataBase;
+                totalSize = static_cast<unsigned short>(m_fileBaseA_dup);
+            }
+            else if (type == 1)
+            {
+                dataBase = reinterpret_cast<unsigned char*>(m_fileBaseB);
+                dataPtr = dataBase;
+                totalSize = static_cast<unsigned short>(m_fileBaseB_dup);
+            }
+            else
+            {
+                unsigned char* letter = reinterpret_cast<unsigned char*>(m_letterBuffer[port]);
+                dataBase = letter;
+                dataPtr = letter;
+                totalSize = static_cast<unsigned short>(m_letterSizeArr[port]);
+            }
+
+            unsigned short size = totalSize;
+            unsigned char blocks = static_cast<unsigned char>(size / 0x2FD);
+
+            if (static_cast<unsigned short>(blocks) * 0x2FD != size)
+            {
+                blocks++;
+            }
+
+            blockCount = blocks;
+
+            unsigned short crcAcc = 0xFFFF;
+            unsigned char* p = dataBase;
+            unsigned int count = size;
+
+            while (static_cast<int>(count) > 0)
+            {
+                unsigned char b = *p++;
+                count--;
+
+                crcAcc = static_cast<unsigned short>(
+                    (crcAcc << 8) ^
+                    JoyBusCrcTable[(crcAcc >> 8) ^ b]
+                );
+            }
+
+            crc = static_cast<unsigned short>(~crcAcc);
+
+            unsigned int word =
+                (static_cast<unsigned int>(0x0B) << 24) |
+                (static_cast<unsigned int>(sendType) << 16) |
+                (static_cast<unsigned int>(blockCount) << 8);
+
+            if (m_threadRunningMask == 0)
+            {
+                result = 0;
+            }
+            else
+            {
+                localWord = word;
+
+                OSWaitSemaphore(&m_accessSemaphores[port]);
+
+                if ((int)m_cmdCount[port] < 0x40)
+                {
+                    m_cmdQueueData[port][m_cmdCount[port]] = word;
+                    m_cmdCount[port]++;
+
+                    OSSignalSemaphore(&m_accessSemaphores[port]);
+                    result = 0;
+                }
+                else
+                {
+                    OSSignalSemaphore(&m_accessSemaphores[port]);
+                    result = -1;
+                }
+            }
+
+            if (result != 0)
+            {
+                return -1;
+            }
+
+            step++;
+        }
+        else if (step == 1)
+        {
+            unsigned short size = totalSize;
+            unsigned short len = size;
+
+            unsigned int word =
+                (static_cast<unsigned int>(0x0B00) << 16) |
+                static_cast<unsigned int>(len);
+
+            if (m_threadRunningMask != 0)
+            {
+                localWord = word;
+
+                OSWaitSemaphore(&m_accessSemaphores[port]);
+
+                if ((int)m_cmdCount[port] < 0x40)
+                {
+                    m_cmdQueueData[port][m_cmdCount[port]] = word;
+                    m_cmdCount[port]++;
+
+                    OSSignalSemaphore(&m_accessSemaphores[port]);
+                    result = 0;
+                }
+                else
+                {
+                    OSSignalSemaphore(&m_accessSemaphores[port]);
+                    result = -1;
+                }
+            }
+
+            if (result != 0)
+            {
+                return -1;
+            }
+
+            step++;
+        }
+        else
+        {
+            unsigned short crcAcc = 0xFFFF;
+            unsigned char* p = dataBase;
+            unsigned int count = chunkSize;
+
+            while (static_cast<int>(count) > 0)
+            {
+                unsigned char b = *p++;
+                count--;
+
+                crcAcc = static_cast<unsigned short>(
+                    (crcAcc << 8) ^
+                    JoyBusCrcTable[(crcAcc >> 8) ^ b]
+                );
+            }
+
+            unsigned short crcChunk = static_cast<unsigned short>(~crcAcc);
+
+            unsigned int word =
+                (static_cast<unsigned int>(0x0B00) << 16) |
+                static_cast<unsigned int>(crcChunk);
+
+            if (m_threadRunningMask != 0)
+            {
+                localWord = word;
+
+                OSWaitSemaphore(&m_accessSemaphores[port]);
+
+                if ((int)m_cmdCount[port] < 0x40)
+                {
+                    m_cmdQueueData[port][m_cmdCount[port]] = word;
+                    m_cmdCount[port]++;
+
+                    OSSignalSemaphore(&m_accessSemaphores[port]);
+                    result = 0;
+                }
+                else
+                {
+                    OSSignalSemaphore(&m_accessSemaphores[port]);
+                    result = -1;
+                }
+            }
+
+            if (result != 0)
+            {
+                return -1;
+            }
+
+            phase = 2;
+            step = 0;
+        }
+    }
+    else if (phase == 1)
+    {
+        if (step == 0)
+        {
+            if (static_cast<int>(blockIndex) < static_cast<int>(blockCount - 1))
+            {
+                chunkCount = 0x00FF;
+                chunkSize = 0x02FD;
+            }
+            else
+            {
+                unsigned int remaining = totalSize % 0x2FD;
+
+                if (totalSize != 0 && remaining == 0)
+                {
+                    remaining = 0x2FD;
+                }
+
+                unsigned int rows = remaining / 3;
+
+                if (rows * 3 != remaining)
+                {
+                    rows++;
+                }
+
+                chunkCount = static_cast<unsigned short>(rows);
+                chunkSize = static_cast<unsigned short>(remaining);
+            }
+
+            unsigned short len = chunkSize;
+            unsigned char rowCount = static_cast<unsigned char>(chunkCount);
+
+            unsigned int word = (static_cast<unsigned int>(0x4B) << 24) | (static_cast<unsigned int>(rowCount) << 16) | static_cast<unsigned int>(len);
+
+            if (m_threadRunningMask == 0)
+            {
+                result = 0;
+            }
+            else
+            {
+                localWord = word;
+
+                OSWaitSemaphore(&m_accessSemaphores[port]);
+
+                if ((int)m_cmdCount[port] < 0x40)
+                {
+                    m_cmdQueueData[port][m_cmdCount[port]] = word;
+                    m_cmdCount[port]++;
+
+                    OSSignalSemaphore(&m_accessSemaphores[port]);
+                    result = 0;
+                }
+                else
+                {
+                    OSSignalSemaphore(&m_accessSemaphores[port]);
+                    result = -1;
+                }
+            }
+
+            if (result != 0)
+            {
+                return -1;
+            }
+
+            step++;
+        }
+        else
+        {
+            unsigned short crcAcc = 0xFFFF;
+            unsigned char* p = dataPtr;
+            unsigned int count = chunkSize;
+
+            while (static_cast<int>(count) > 0)
+            {
+                unsigned char b = *p++;
+                count--;
+
+                crcAcc = static_cast<unsigned short>(
+                    (crcAcc << 8) ^
+                    JoyBusCrcTable[(crcAcc >> 8) ^ b]
+                );
+            }
+
+            unsigned short crcChunk = static_cast<unsigned short>(~crcAcc);
+
+            unsigned int word =
+                (static_cast<unsigned int>(0x4B) << 24) |
+                (static_cast<unsigned int>(blockIndex) << 16) |
+                static_cast<unsigned int>(crcChunk);
+
+            if (m_threadRunningMask == 0)
+            {
+                result = 0;
+            }
+            else
+            {
+                localWord = word;
+
+                OSWaitSemaphore(&m_accessSemaphores[port]);
+
+                if ((int)m_cmdCount[port] < 0x40)
+                {
+                    m_cmdQueueData[port][m_cmdCount[port]] = word;
+                    m_cmdCount[port]++;
+
+                    OSSignalSemaphore(&m_accessSemaphores[port]);
+                    result = 0;
+                }
+                else
+                {
+                    OSSignalSemaphore(&m_accessSemaphores[port]);
+                    result = -1;
+                }
+            }
+
+            if (result != 0)
+            {
+                return -1;
+            }
+
+            phase = 2;
+            step = 0;
+        }
+    }
+    else
+    {
+        unsigned char* p = dataPtr;
+
+        unsigned char b0 = *p++;
+        unsigned char b1 = *p++;
+        unsigned char b2 = *p++;
+
+        dataPtr = p;
+
+        unsigned int word =
+            (static_cast<unsigned int>(0x8B) << 24) |
+            (static_cast<unsigned int>(b0) << 16) |
+            (static_cast<unsigned int>(b1) << 8) |
+            static_cast<unsigned int>(b2);
+
+        if (m_threadRunningMask != 0)
+        {
+            localWord = word;
+
+            OSWaitSemaphore(&m_accessSemaphores[port]);
+
+            if ((int)m_cmdCount[port] < 0x40)
+            {
+                m_cmdQueueData[port][m_cmdCount[port]] = word;
+                m_cmdCount[port]++;
+
+                OSSignalSemaphore(&m_accessSemaphores[port]);
+                result = 0;
+            }
+            else
+            {
+                OSSignalSemaphore(&m_accessSemaphores[port]);
+                result = -1;
+            }
+        }
+
+        if (result != 0)
+        {
+            return -1;
+        }
+
+        step++;
+    }
+
+    return result;
 }
 
 /*

@@ -348,6 +348,17 @@ bool CFile::IsCompleted(CFile::CHandle* fileHandle)
 	return false;
 }
 
+
+bool CFile::IsDiskError()
+{
+	if (mIsDiskError == 0)
+	{
+		return false;
+	}
+	
+	return true;
+}
+
 /*
  * --INFO--
  * Address:	TODO

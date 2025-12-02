@@ -10,7 +10,7 @@ This is the decompilation for Final Fantasy Crystal Chronicles for the Nintendo 
 
 There are 3 versions of this game: JP, EN, and PAL (EU).
 
-Fortunately, the EN build contains a debug symbol file, and the PAL version contains a release symbol file (although for a different build). This has made the decompilation process very easy to match the original source code incredibly closely. These symbols allowed us to recover exact function and class names, as well as all parameters to each function, and class hierarchies.
+Fortunately, the EN build contains a debug symbol file, and the PAL version contains a release symbol file (although for a different build). These have greatly simplified the decompilation process for FFCC. These symbols allowed us to recover exact function and class names, as well as all parameters to each function, and class hierarchies.
 
 **⚠️ Assets are not bundled with this repository. You must obtain these on your own. ⚠️**
 

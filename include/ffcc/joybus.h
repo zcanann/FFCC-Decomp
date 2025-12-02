@@ -63,7 +63,7 @@ public:
     void Init();
     void CreateInit();
     void Destroy();
-    void LoadBin();
+    int LoadBin();
     int LoadMap(int, int);
 
 	unsigned short Crc16(int len, unsigned char* data, unsigned short* crc);

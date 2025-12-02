@@ -63,12 +63,12 @@ public:
     void CreateInit();
     void Destroy();
     void LoadBin();
-    void LoadMap(int, int);
+    int LoadMap(int, int);
 
-    void Crc16(int, unsigned char*, unsigned short*);
+	unsigned short Crc16(int len, unsigned char* data, unsigned short* crc);
 
-    void BlockSem(int);
-    void ReleaseSem(int);
+    void BlockSem(int portIndex);
+    void ReleaseSem(int portIndex);
 
     void ThreadMain(void*);
     static void* _ThreadMain(void*);
@@ -85,7 +85,7 @@ public:
     void SetPadData(ThreadParam* threadParam, unsigned char* data);
     void GetPadData(int);
 
-    void RecvGBA(ThreadParam*, unsigned int*);
+    int RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer);
     int SendGBA(ThreadParam* threadParam);
     void GBARecvSend(ThreadParam*, unsigned int*);
 
@@ -118,8 +118,8 @@ public:
 
     void RequestData(ThreadParam*, int, int);
     void SetRecvBuffer(ThreadParam*, unsigned int);
-    void ClrRecvBuffer(int);
-    void GetRecvBuffer(int, unsigned char*);
+    void ClrRecvBuffer(int portIndex);
+    void GetRecvBuffer(int portIndex, unsigned char*);
 
     int SendMType(ThreadParam* threadParam, int modeType);
     int SendEquip(ThreadParam* threadParam);
@@ -139,38 +139,38 @@ public:
     int SendChgCmdNum(ThreadParam* threadParam);
     int SendStartBonus(ThreadParam* threadParam);
 
-    void DecRecvQueue(int);
+    void DecRecvQueue(int portIndex);
     void GetGBAStat(ThreadParam* threadParam);
     void ChgCtrlMode(int);
     int SetCtrlMode(int portIndex, int controlMode);
-    void GetCtrlMode(int);
-    void GetGBAConnect(int);
-    void IsInitSend(int);
-    void GetGBAStart(int);
-    void GBAReady(int);
-    int SendAllStat(int);
+    void GetCtrlMode(int portIndex);
+    void GetGBAConnect(int portIndex);
+    int IsInitSend(int portIndex);
+    void GetGBAStart(int portIndex);
+    void GBAReady(int portIndex);
+    int SendAllStat(int portIndex);
 
-    void GetLetterBuffer(int);
+    void GetLetterBuffer(int portIndex);
     void SetLetterSize(int portIndex, int letterSize);
-    int SendResult(int, int, int, int);
-    void IsLetterMenu(int);
-    int SendAddLetter(int);
+    int SendResult(int portIndex, int, int, int);
+    bool IsLetterMenu(int portIndex);
+    int SendAddLetter(int portIndex);
 
 	int SetItem(int portIndex, unsigned char itemId, short amount);
-    void DelItem(int, unsigned char);
+    int DelItem(int portIndex, unsigned char itemId);
 
-    int SendMask(int, unsigned short);
+    int SendMask(int portIndex, unsigned short);
 	int SetMoney(int portIndex, unsigned int money);
 
 	int SetMType(int portIndex, int mtype);
-    void GetMType(int);
-    void GetPadType(int);
+    void GetMType(int portIndex);
+    void GetPadType(int portIndex);
 
     void ExitThread();
-    void IsThreadRunning();
+    bool IsThreadRunning();
     void RestartThread();
 
-    int SetCmdLst(int, int, short);
+    int SetCmdLst(int portIndex, int, short);
 	int SetTmpArti(int portIndex, int param3, int param4);
     int SendUseItem(int portIndex, char itemId);
     int SendHitEnemy(int portIndex, char enemyId, short hitValue);
@@ -213,8 +213,8 @@ public:
     bool m_exitThreadFlag;
     uchar m_threadRunningMask;
 
-    unsigned int m_fileBaseA;
-    unsigned int m_fileBaseB;
+    unsigned int* m_fileBaseA;
+    unsigned int* m_fileBaseB;
 
     unsigned int m_letterBuffer[4];
 
@@ -233,6 +233,7 @@ public:
     unsigned char m_padding[5174];
 };
 
+extern JoyBus JoyBus;
 extern const unsigned short JoyBusCrcTable[256];
 
 #endif // JOYBUS_H

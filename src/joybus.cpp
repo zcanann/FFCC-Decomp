@@ -6599,3 +6599,13 @@ unsigned short JoyBus::Crc16(int len, unsigned char* data, unsigned short* crc)
 
     return (unsigned short)~(*crc);
 }
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+int CFile::IsDiskError()
+{
+	return mIsDiskError;
+}

@@ -166,12 +166,12 @@ void JoyBus::CreateInit()
         m_stateFlagArr[i] = 0;
     }
 
-    if (m_gbaBootParamA == 0)
+    if (m_gbaBootImage == 0)
     {
         // TODO: __nwa__FUlPQ27CMemory6CStagePci
-        m_gbaBootParamA = (unsigned int)__nwa(0x38000);
+        m_gbaBootImage = (char*)__nwa(0x38000);
 
-        if (m_gbaBootParamA == 0 && System.mExecParam != 0)
+        if (m_gbaBootImage == 0 && System.mExecParam != 0)
         {
             System.Printf("%s(%d): Error: memory allocation",
                 "joybus.cpp", 0x126);
@@ -233,7 +233,7 @@ void JoyBus::CreateInit()
         if (m_letterBuffer[i] == 0)
         {
             // TODO: __nwa__FUlPQ27CMemory6CStagePci
-            m_letterBuffer[i] = (unsigned int)__nwa(0x2800);
+            m_letterBuffer[i] = (char*)__nwa(0x2800);
 
             if (m_letterBuffer[i] == 0 && System.mExecParam != 0)
             {
@@ -264,11 +264,11 @@ void JoyBus::Destroy()
     {
     }
 
-    if (m_gbaBootParamA != 0)
+    if (m_gbaBootImage != 0)
     {
         // TODO: __dla__FPv
-        // free((void*)m_gbaBootParamA);
-        m_gbaBootParamA = 0;
+        // free((void*)m_gbaBootImage);
+        m_gbaBootImage = 0;
     }
 
     if (m_fileBaseA != 0)
@@ -809,9 +809,315 @@ int JoyBus::SendGBA(ThreadParam* threadParam)
  * Address:	TODO
  * Size:	TODO
  */
-void JoyBus::GBARecvSend(ThreadParam *, unsigned int *)
+int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
 {
-	// TODO
+    const int port = threadParam->m_portIndex;
+
+    int recvResult = RecvGBA(threadParam, cmdOut);
+
+    if (recvResult < 0)
+    {
+        threadParam->m_state = 0x02;
+        threadParam->m_subState = 0;
+        return recvResult;
+    }
+
+    if (recvResult == 2)
+    {
+        unsigned char* cmdBytes = reinterpret_cast<unsigned char*>(cmdOut);
+        unsigned char op = cmdBytes[0] & 0x3F;
+
+        if (op == 0x14 || op == 0x17 || op == 0x1A ||
+            op == 0x1C || op == 0x1D || op == 0x1E ||
+            op == 0x1F || (op == 0x06 && cmdBytes[1] == 0x18))
+        {
+            OSWaitSemaphore(&m_accessSemaphores[port]);
+
+            unsigned int idx = (m_secCmdCount[port] + 63) & 0x3F;
+            unsigned int prevCmd = m_recvQueueEntriesArr[port][idx];
+            m_secCmdCount[port]--;
+
+            OSSignalSemaphore(&m_accessSemaphores[port]);
+
+            // TODO: SetQueue__8GbaQueueFiUi(&GbaQue, port, prevCmd);
+
+            recvResult = 0;
+            *cmdOut = 0;
+        }
+        else if (op == 0x0C)
+        {
+            OSWaitSemaphore(&m_accessSemaphores[port]);
+
+            unsigned int idx = (m_secCmdCount[port] + 63) & 0x3F;
+            unsigned int prevCmd = m_recvQueueEntriesArr[port][idx];
+            m_secCmdCount[port]--;
+
+            OSSignalSemaphore(&m_accessSemaphores[port]);
+
+            unsigned char sub = cmdBytes[1];
+
+            if (sub == 0x03)
+            {
+                // TODO: ClrLetterLstFlg__8GbaQueueFi(&GbaQue, port);
+                // TODO: SetQueue__8GbaQueueFiUi(&GbaQue, port, prevCmd);
+                threadParam->m_state = '!';
+                threadParam->m_subState = 0;
+                threadParam->m_skipProcessingFlag = 1;
+            }
+            else if (sub == 0x02)
+            {
+                // TODO: ClrLetterDatFlg__8GbaQueueFi(&GbaQue, port);
+                // TODO: SetQueue__8GbaQueueFiUi(&GbaQue, port, prevCmd);
+                threadParam->m_state = '%';
+                threadParam->m_subState = 0;
+                threadParam->m_skipProcessingFlag = 1;
+            }
+            else if (sub == 0x06)
+            {
+                // TODO: ClrSellFlg__8GbaQueueFi(&GbaQue, port);
+                // TODO: SetQueue__8GbaQueueFiUi(&GbaQue, port, prevCmd);
+                threadParam->m_state = '5';
+                threadParam->m_subState = 0;
+                threadParam->m_skipProcessingFlag = 1;
+            }
+            else if (sub == 0x07)
+            {
+                // TODO: ClrBuyFlg__8GbaQueueFi(&GbaQue, port);
+                // TODO: SetQueue__8GbaQueueFiUi(&GbaQue, port, prevCmd);
+                threadParam->m_state = '7';
+                threadParam->m_subState = 0;
+                threadParam->m_skipProcessingFlag = 1;
+            }
+            else if (sub == 0x08)
+            {
+                // TODO: ClrMkSmithFlg__8GbaQueueFi(&GbaQue, port);
+                // TODO: SetQueue__8GbaQueueFiUi(&GbaQue, port, prevCmd);
+                threadParam->m_state = '9';
+                threadParam->m_subState = 0;
+                threadParam->m_skipProcessingFlag = 1;
+            }
+            else if (sub == 0x09)
+            {
+                // TODO: ClrArtiDatFlg__8GbaQueueFi(&GbaQue, port);
+                // TODO: SetQueue__8GbaQueueFiUi(&GbaQue, port, prevCmd);
+                threadParam->m_state = 'A';
+                threadParam->m_subState = 0;
+                threadParam->m_skipProcessingFlag = 1;
+            }
+        }
+        else if (op == 0x15)
+        {
+            OSWaitSemaphore(&m_accessSemaphores[port]);
+
+            unsigned int idx = (m_secCmdCount[port] + 63) & 0x3F;
+            unsigned int prevCmd = m_recvQueueEntriesArr[port][idx];
+            m_secCmdCount[port]--;
+
+            OSSignalSemaphore(&m_accessSemaphores[port]);
+
+            unsigned char header = cmdBytes[0];
+
+            if ((header >> 6) == 0)
+            {
+                OSWaitSemaphore(&m_accessSemaphores[port]);
+                memset(&m_recvBuffer[port], 0, 0x408);
+                OSSignalSemaphore(&m_accessSemaphores[port]);
+            }
+
+            unsigned int word = *cmdOut;
+            JoyBusRecvBuffer& buf = m_recvBuffer[port];
+
+            if (buf.m_cmdFlags != 0)
+            {
+                unsigned char cmdId = static_cast<unsigned char>(word >> 24);
+
+                if (buf.m_cmdFlags != (cmdId & 0x3F))
+                {
+                    if (static_cast<unsigned int>(System.mExecParam) > 1u)
+                    {
+                        System.Printf("(%d):%s(%d): Warning: Recv data type mismatch", port, "joybus.cpp", 0x1079);
+                    }
+
+                    OSWaitSemaphore(&m_accessSemaphores[port]);
+                    memset(&m_recvBuffer[port], 0, 0x408);
+                    OSSignalSemaphore(&m_accessSemaphores[port]);
+                }
+            }
+
+            OSWaitSemaphore(&m_accessSemaphores[port]);
+
+            unsigned int length = buf.m_length;
+            unsigned char b0 = static_cast<unsigned char>(word);
+            unsigned char b1 = static_cast<unsigned char>(word >> 8);
+            unsigned char b2 = static_cast<unsigned char>(word >> 16);
+
+            if (length == 0)
+            {
+                buf.m_crc = static_cast<unsigned short>(word >> 8);
+                unsigned int idx0 = buf.m_length;
+                buf.m_length = idx0 + 1;
+                buf.m_payload[idx0] = b0;
+            }
+            else
+            {
+                buf.m_length = length + 1;
+                buf.m_payload[length] = b2;
+
+                unsigned int idx1 = buf.m_length;
+                buf.m_length = idx1 + 1;
+                buf.m_payload[idx1] = b1;
+
+                unsigned int idx2 = buf.m_length;
+                buf.m_length = idx2 + 1;
+                buf.m_payload[idx2] = b0;
+            }
+
+            OSSignalSemaphore(&m_accessSemaphores[port]);
+
+            if ((header >> 6) == 2)
+            {
+                unsigned short crc = 0xFFFF;
+                unsigned int len = buf.m_length;
+                unsigned char* data = buf.m_payload;
+
+                while (len-- > 0)
+                {
+                    unsigned char b = *data++;
+                    unsigned char idxC = static_cast<unsigned char>(((crc >> 8) ^ b));
+                    crc = static_cast<unsigned short>((crc << 8) ^ JoyBusCrcTable[idxC]);
+                }
+
+                if (static_cast<unsigned short>(~crc) == buf.m_crc)
+                {
+                    // TODO: SetQueue__8GbaQueueFiUi(&GbaQue, port, prevCmd);
+                }
+                else
+                {
+                    if (m_threadRunningMask != 0)
+                    {
+                        const unsigned int tPort = m_threadParams[port].m_portIndex;
+                        OSWaitSemaphore(&m_accessSemaphores[tPort]);
+
+                        if (static_cast<int>(m_cmdCount[tPort]) < 0x40)
+                        {
+                            m_cmdQueueData[tPort][m_cmdCount[tPort]] = 0x07150000;
+                            m_cmdCount[tPort]++;
+                            OSSignalSemaphore(&m_accessSemaphores[tPort]);
+                        }
+                        else
+                        {
+                            OSSignalSemaphore(&m_accessSemaphores[tPort]);
+                        }
+                    }
+
+                    OSWaitSemaphore(&m_accessSemaphores[port]);
+                    memset(&m_recvBuffer[port], 0, 0x408);
+                    OSSignalSemaphore(&m_accessSemaphores[port]);
+                }
+            }
+        }
+    }
+
+    int sendResult = SendGBA(threadParam);
+
+    if (sendResult < 0)
+    {
+        threadParam->m_state = 0x02;
+        threadParam->m_subState = 0;
+        threadParam->m_skipProcessingFlag = 1;
+    }
+    else
+    {
+        if (threadParam->m_skipProcessingFlag != 0)
+        {
+            OSWaitSemaphore(&m_accessSemaphores[port]);
+
+            unsigned int newCount = 0;
+
+            for (unsigned int i = 0; i < m_cmdCount[port]; ++i)
+            {
+                unsigned int cmd = m_cmdQueueData[port][i];
+                unsigned char op = static_cast<unsigned char>(cmd >> 24) & 0x3F;
+
+                if (op == 0x0A || op == 0x10 || op == 0x14 ||
+                    op == 0x1B || op == 0x13 || op == 0x09)
+                {
+                    m_recvQueueEntriesArr[port][newCount++] = cmd;
+                }
+            }
+
+            for (unsigned int i = 0; i < 0x20; ++i)
+            {
+                if (i < newCount)
+                {
+                    m_cmdQueueData[port][i] = m_recvQueueEntriesArr[port][i];
+                }
+                else
+                {
+                    m_cmdQueueData[port][i] = 0;
+                }
+
+                m_recvQueueEntriesArr[port][i] = 0;
+            }
+
+            m_secCmdCount[port] = 0;
+            m_cmdCount[port] = newCount;
+
+            OSSignalSemaphore(&m_accessSemaphores[port]);
+        }
+
+        const unsigned char state = threadParam->m_state;
+
+        if (m_stateFlagArr[port] != 0 &&
+            m_stateCodeArr[port] != 0x09 &&
+            state != 0x05 &&
+            state > 0x20 && state < 0x29)
+        {
+            OSWaitSemaphore(&m_accessSemaphores[port]);
+
+            unsigned int newCount = 0;
+
+            for (unsigned int i = 0; i < m_cmdCount[port]; ++i)
+            {
+                unsigned int cmd = m_cmdQueueData[port][i];
+                unsigned char op = static_cast<unsigned char>(cmd >> 24) & 0x3F;
+
+                if (op == 0x0A || op == 0x10 || op == 0x14 ||
+                    op == 0x1B || op == 0x13 || op == 0x09)
+                {
+                    m_recvQueueEntriesArr[port][newCount++] = cmd;
+                }
+            }
+
+            for (unsigned int i = 0; i < 0x20; ++i)
+            {
+                if (i < newCount)
+                {
+                    m_cmdQueueData[port][i] = m_recvQueueEntriesArr[port][i];
+                }
+                else
+                {
+                    m_cmdQueueData[port][i] = 0;
+                }
+
+                m_recvQueueEntriesArr[port][i] = 0;
+            }
+
+            m_secCmdCount[port] = 0;
+            m_cmdCount[port] = newCount;
+
+            OSSignalSemaphore(&m_accessSemaphores[port]);
+
+            threadParam->m_state = 0x05;
+            threadParam->m_subState = 0;
+            threadParam->m_skipProcessingFlag = 1;
+        }
+    }
+
+    unsigned int recvBit = (recvResult == 2) ? 1u : 0u;
+    unsigned int sendBit = (sendResult != 0) ? 2u : 0u;
+
+    return static_cast<int>(recvBit | sendBit);
 }
 
 /*
@@ -1944,9 +2250,22 @@ void JoyBus::DecRecvQueue(int portIndex)
  * Address:	TODO
  * Size:	TODO
  */
-void JoyBus::GetGBAStat(ThreadParam* threadParam)
+int JoyBus::GetGBAStat(ThreadParam* threadParam)
 {
-	// TODO
+    // TODO: IsSingleMode__8GbaQueueFi
+    bool single = (bool)this;
+
+    if (!single || threadParam->m_portIndex == 1)
+    {
+		// TODO // GBAGetStatus(threadParam->m_portIndex, &threadParam->m_unk3);
+        threadParam->m_gbaStatus = (int)this;
+    }
+    else
+    {
+        threadParam->m_gbaStatus = 0;
+    }
+
+    return threadParam->m_gbaStatus;
 }
 
 /*
@@ -2106,9 +2425,9 @@ int JoyBus::IsInitSend(int portIndex)
  * Address:	TODO
  * Size:	TODO
  */
-void JoyBus::GetGBAStart(int)
+bool JoyBus::GetGBAStart(int portIndex)
 {
-	// TODO
+	return m_threadParams[portIndex].m_sentStartFlag != 0;
 }
 
 /*
@@ -2116,9 +2435,26 @@ void JoyBus::GetGBAStart(int)
  * Address:	TODO
  * Size:	TODO
  */
-void JoyBus::GBAReady(int)
+int JoyBus::GBAReady(int portIndex)
 {
-	// TODO
+    unsigned int padType;
+
+    OSWaitSemaphore(&m_accessSemaphores[portIndex]);
+    padType = m_threadParams[portIndex].m_padType;
+    OSSignalSemaphore(&m_accessSemaphores[portIndex]);
+	
+	// TODO: No idea
+    int ready = padType;
+
+    // TODO: IsSingleMode__8GbaQueueFi
+    bool isSingle = (bool)this;
+
+    if (isSingle)
+    {
+        ready = 0;
+    }
+
+    return ready;
 }
 
 /*
@@ -2157,9 +2493,9 @@ int JoyBus::SendAllStat(int portIndex)
  * Address:	TODO
  * Size:	TODO
  */
-void JoyBus::GetLetterBuffer(int)
+char* JoyBus::GetLetterBuffer(int portIndex)
 {
-	// TODO
+	return m_letterBuffer[portIndex];
 }
 
 /*
@@ -2461,9 +2797,15 @@ int JoyBus::SetMType(int portIndex, int mtype)
  * Address:	TODO
  * Size:	TODO
  */
-void JoyBus::GetMType(int)
+char JoyBus::GetMType(int portIndex)
 {
-	// TODO
+    OSWaitSemaphore(&m_accessSemaphores[portIndex]);
+	
+    unsigned char type = m_nextModeTypeArr[portIndex];
+	
+    OSSignalSemaphore(&m_accessSemaphores[portIndex]);
+	
+    return type;
 }
 
 /*
@@ -2471,9 +2813,15 @@ void JoyBus::GetMType(int)
  * Address:	TODO
  * Size:	TODO
  */
-void JoyBus::GetPadType(int)
+unsigned int JoyBus::GetPadType(int playerIndex)
 {
-	// TODO
+    OSWaitSemaphore(&m_accessSemaphores[playerIndex]);
+	
+    unsigned int type = m_threadParams[playerIndex].m_padType;
+	
+    OSSignalSemaphore(&m_accessSemaphores[playerIndex]);
+	
+    return type;
 }
 
 /*
@@ -2483,7 +2831,7 @@ void JoyBus::GetPadType(int)
  */
 void JoyBus::ExitThread()
 {
-	// TODO
+	m_threadInitFlag = 1;
 }
 
 /*
@@ -2503,8 +2851,137 @@ bool JoyBus::IsThreadRunning()
  */
 void JoyBus::RestartThread()
 {
-	// TODO
+    m_threadInitFlag = 0;
+
+    // TODO: CreateInit__6JoyBusFv
+    (void)this;
+
+    int err = 0;
+
+    if (!Joybus.m_binLoaded)
+    {
+        CFile::CHandle* file = File.Open((char*)&Joybus, 0, CFile::PRI_LOW);
+
+        if (file == 0)
+        {
+            if ((unsigned int)System.mExecParam > 1)
+                System.Printf("Error: %s not found", (char*)&Joybus);
+
+            err = -1;
+        }
+        else
+        {
+            File.Read(file);
+            File.SyncCompleted(file);
+
+            Joybus.m_gbaBootImageSize = File.GetLength(file);
+            memcpy(Joybus.m_gbaBootImage, File.mReadBuffer, Joybus.m_gbaBootImageSize);
+
+            File.Close(file);
+
+            Joybus.m_diskId = (char*)File.GetCurrentDiskID();
+
+            int idx = 0xBC;
+
+            Joybus.m_gbaBootImage[0xAC] = Joybus.m_diskId[0];
+            Joybus.m_gbaBootImage[0xAD] = Joybus.m_diskId[1];
+            Joybus.m_gbaBootImage[0xAE] = Joybus.m_diskId[2];
+            Joybus.m_gbaBootImage[0xAF] = Joybus.m_diskId[3];
+
+            char* p = Joybus.m_gbaBootImage + 0xBC;
+            int left = 1;
+
+            unsigned char sum =
+                (unsigned char)(
+                    ((((((((((((((((((((((((((((-0x19
+                    - Joybus.m_gbaBootImage[0xA0])
+                    - Joybus.m_gbaBootImage[0xA1])
+                    - Joybus.m_gbaBootImage[0xA2])
+                    - Joybus.m_gbaBootImage[0xA3])
+                    - Joybus.m_gbaBootImage[0xA4])
+                    - Joybus.m_gbaBootImage[0xA5])
+                    - Joybus.m_gbaBootImage[0xA6])
+                    - Joybus.m_gbaBootImage[0xA7])
+                    - Joybus.m_gbaBootImage[0xA8])
+                    - Joybus.m_gbaBootImage[0xA9])
+                    - Joybus.m_gbaBootImage[0xAA])
+                    - Joybus.m_gbaBootImage[0xAB])
+                    - Joybus.m_gbaBootImage[0xAC])
+                    - Joybus.m_gbaBootImage[0xAD])
+                    - Joybus.m_gbaBootImage[0xAE])
+                    - Joybus.m_gbaBootImage[0xAF])
+                    - Joybus.m_gbaBootImage[0xB0])
+                    - Joybus.m_gbaBootImage[0xB1])
+                    - Joybus.m_gbaBootImage[0xB2])
+                    - Joybus.m_gbaBootImage[0xB3])
+                    - Joybus.m_gbaBootImage[0xB4])
+                    - Joybus.m_gbaBootImage[0xB5])
+                    - Joybus.m_gbaBootImage[0xB6])
+                    - Joybus.m_gbaBootImage[0xB7])
+                    - Joybus.m_gbaBootImage[0xB8])
+                    - Joybus.m_gbaBootImage[0xB9])
+                    - Joybus.m_gbaBootImage[0xBA])
+                    - Joybus.m_gbaBootImage[0xBB])
+                );
+
+            do
+            {
+                unsigned char v = *p++;
+                idx++;
+                sum -= v;
+                left--;
+            }
+            while (left != 0);
+
+            Joybus.m_gbaBootImage[idx] = sum;
+
+            *(unsigned int*)(Joybus.m_gbaBootImage + 200) = OSGetTick();
+
+            Joybus.m_binLoaded = 1;
+        }
+    }
+
+    if (err != 0 && (unsigned int)System.mExecParam > 1)
+        System.Printf("JoyBus::LoadBin() error");
+
+    memset((void*)0x802F07D0, 0, 0xF0);
+
+    Joybus.m_threadInitFlag = 0;
+    Joybus.m_threadRunningMask = 0;
+
+    JoyBus* jbA = &Joybus;
+    JoyBus* jbB = &Joybus;
+
+    for (int i = 0; i < 4; i++)
+    {
+        jbB->m_threadParams[i].m_portIndex = i;
+        jbB->m_threadParams[i].m_gbaStatus = 1;
+		
+        unsigned char* stackBase = (unsigned char *)m_sendBuffer;
+
+        OSCreateThread(
+            &jbA->m_threads[i],
+            JoyBus::_ThreadMain,
+            &jbB->m_threadParams[i],
+            stackBase,
+            sizeof(jbA->m_sendBuffer[0]),
+            8,
+            1
+        );
+
+        OSResumeThread(&jbA->m_threads[0]);
+
+        Joybus.m_threadRunningMask |= (unsigned char)(1 << i);
+
+        jbA = (JoyBus*)(jbA->m_recvBuffer[0].m_payload + 0x290);
+        jbB = (JoyBus*)(jbB->m_pathBuf + 0x3C);
+
+    }
+
+    if ((unsigned int)System.mExecParam > 1)
+        System.Printf("JoyBus::ThreadInit end");
 }
+
 
 /*
  * --INFO--

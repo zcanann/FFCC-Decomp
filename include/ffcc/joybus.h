@@ -49,8 +49,9 @@ public:
 	
 	struct JoyBusRecvBuffer
 	{
-		unsigned int   m_length;      // 0x00
-		unsigned int   m_cmdFlags;    // 0x04
+		unsigned int   m_length;        // 0x00
+		unsigned short m_cmdFlags;      // 0x04
+		unsigned short m_crc;           // 0x06
 		unsigned char  m_payload[1024]; // 0x08
 	};
 
@@ -87,15 +88,15 @@ public:
 
     int RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer);
     int SendGBA(ThreadParam* threadParam);
-    void GBARecvSend(ThreadParam*, unsigned int*);
+    int GBARecvSend(ThreadParam* threadParam, unsigned int* outCmd);
 
     void ResetQueue(ThreadParam* threadParam);
     void CleanQueue(ThreadParam* threadParam);
     void InitialCode(ThreadParam* threadParam);
-    void SetSendQueue(ThreadParam*, unsigned int);
-    int SendGBAStart(ThreadParam*, unsigned int* outCmd);
+    void SetSendQueue(ThreadParam* threadParam, unsigned int);
+    int SendGBAStart(ThreadParam* threadParam, unsigned int* outCmd);
     int SendGBAStop(ThreadParam* threadParam);
-    int SendChkCrc(ThreadParam*, int, unsigned short, unsigned int*);
+    int SendChkCrc(ThreadParam* threadParam, int, unsigned short, unsigned int*);
     int SendCancel(ThreadParam* threadParam);
 
     int SendDataFile(ThreadParam* threadParam);
@@ -140,17 +141,17 @@ public:
     int SendStartBonus(ThreadParam* threadParam);
 
     void DecRecvQueue(int portIndex);
-    void GetGBAStat(ThreadParam* threadParam);
+    int GetGBAStat(ThreadParam* threadParam);
     void ChgCtrlMode(int);
     int SetCtrlMode(int portIndex, int controlMode);
     void GetCtrlMode(int portIndex);
     void GetGBAConnect(int portIndex);
     int IsInitSend(int portIndex);
-    void GetGBAStart(int portIndex);
-    void GBAReady(int portIndex);
+    bool GetGBAStart(int portIndex);
+    int GBAReady(int portIndex);
     int SendAllStat(int portIndex);
 
-    void GetLetterBuffer(int portIndex);
+    char* GetLetterBuffer(int portIndex);
     void SetLetterSize(int portIndex, int letterSize);
     int SendResult(int portIndex, int, int, int);
     bool IsLetterMenu(int portIndex);
@@ -163,8 +164,8 @@ public:
 	int SetMoney(int portIndex, unsigned int money);
 
 	int SetMType(int portIndex, int mtype);
-    void GetMType(int portIndex);
-    void GetPadType(int portIndex);
+    char GetMType(int portIndex);
+    unsigned int GetPadType(int portIndex);
 
     void ExitThread();
     bool IsThreadRunning();
@@ -180,10 +181,10 @@ public:
 
     JoyBusRecvBuffer m_recvBuffer[4];
 
-    unsigned int m_gbaBootParamA;
-    unsigned int m_gbaBootParamB;
+    char* m_gbaBootImage;
+    unsigned int m_gbaBootImageSize;
 
-    unsigned int m_diskId;
+    char* m_diskId;
     unsigned char m_diskIdBytes[4];
 
     OSThread m_threads[4];
@@ -216,7 +217,7 @@ public:
     unsigned int* m_fileBaseA;
     unsigned int* m_fileBaseB;
 
-    unsigned int m_letterBuffer[4];
+    char* m_letterBuffer[4];
 
     unsigned int m_fileBaseA_dup;
     unsigned int m_fileBaseB_dup;
@@ -233,7 +234,7 @@ public:
     unsigned char m_padding[5174];
 };
 
-extern JoyBus JoyBus;
+extern JoyBus Joybus;
 extern const unsigned short JoyBusCrcTable[256];
 
 #endif // JOYBUS_H

@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Ninja Build Task",
+      "type": "lldb",
+      "request": "launch",
+      "program": "/usr/bin/env",
+      "args": ["bash", "-c", "true"],
+      "preLaunchTask": "ninja",
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}

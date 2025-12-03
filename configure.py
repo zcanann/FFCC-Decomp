@@ -352,6 +352,14 @@ config.libs = [
             Object(NonMatching, "pppCrystal.cpp"),
             Object(NonMatching, "pppCrystal2.cpp"),
             Object(NonMatching, "pppDrawMatrix.cpp"),
+            Object(NonMatching, "pppDrawMatrixFront.cpp"),
+            Object(NonMatching, "pppDrawMatrixFrontLnr.cpp"),
+            Object(NonMatching, "pppDrawMatrixLoc.cpp"),
+            Object(NonMatching, "pppDrawMatrixNoRot.cpp"),
+            Object(NonMatching, "pppDrawMatrixWood.cpp"),
+            Object(NonMatching, "pppDrawMdl.cpp"),
+            Object(NonMatching, "pppDrawMdlTs.cpp"),
+            
             # ....
             Object(NonMatching, "pppFovAdjustMatrix.cpp"),
             Object(NonMatching, "pppKeLns.cpp"),

@@ -1,4 +1,4 @@
-decomp-toolkit Final Fantasy Crystal Chronicles
+Final Fantasy Crystal Chronicles Decompilation
 [![Build Status]][actions] [![Progress]][progress site] [![DOL Progress]][progress site]
 ===============================
 [Build Status]: https://github.com/zcanann/FFCC-Decomp/actions/workflows/build.yml/badge.svg
@@ -10,11 +10,22 @@ This is the decompilation for Final Fantasy Crystal Chronicles for the Nintendo 
 
 There are 3 versions of this game: JP, EN, and PAL (EU).
 
-Fortunately, the EN build contains a debug symbol file, and the PAL version contains a release symbol file (although for a different build). This has made the decompilation process very easy to match the original source code incredibly closely. These symbols allowed us to recover exact function and class names, as well as all parameters to each function, and class hierarchies.
+Fortunately, the EN build contains a debug symbol file, and the PAL version contains a release symbol file (although for a different build). These have greatly simplified the decompilation process for FFCC. These symbols allowed us to recover exact function and class names, as well as all parameters to each function, and class hierarchies.
 
+**⚠️ Assets are not bundled with this repository. You must obtain these on your own. ⚠️**
 
-Unmapped Splits:
--------------
+# Contribution Guide
+
+## Beginners Contribution Guide
+The most direct way to contribute that requires minimal setup, is to simply pick a 30-99% matching section from [https://decomp.dev/zcanann/FFCC-Decomp](the decomp tracker), and update the code until it has a higher match score.
+
+Refer to the sections on building and diffing. Once you have this set up, all you need to do is modify .cpp and .h files until the score goes up!
+
+## Advanced Contribution Guide
+For experienced reverse-engineers, there are still quite a few harder tasks remaining.
+
+### Unmapped Splits
+There are several splits that are still unmapped, even though we have access to the PAL game.MAP symbols from a stale build. There are only a few remaining, so this is a pretty small effort, but it requires reverse-engineering precision.
 
 These two seem to cause the DTK template configuration to completely hang:
 os/OSStopwatch.c:
@@ -43,69 +54,70 @@ os/OSFont.c:
 ax/AXProf.c:
 	.text       start:0x80193E28 end:0x80193E70
 
-ORIGINAL TEMPLATE README BELOW
--------------
+### EN & JPN Versions
 
-If starting a new GameCube / Wii decompilation project, this repository can be used as a scaffold.
+The EN & JPN versions are deliberately being left for last. However, if someone wishes to begin this effort early, this is more than welcome.
 
-See [decomp-toolkit](https://github.com/encounter/decomp-toolkit) for background on the concept and more information on the tooling used.
+# Dependencies
 
-Documentation
--------------
+## Windows
 
-- [Dependencies](docs/dependencies.md)
-- [Getting Started](docs/getting_started.md)
-- [`symbols.txt`](docs/symbols.md)
-- [`splits.txt`](docs/splits.md)
-- [GitHub Actions](docs/github_actions.md) (new!)
+On Windows, it's **highly recommended** to use native tooling. WSL or msys2 are **not** required.  
+When running under WSL, [objdiff](#diffing) is unable to get filesystem notifications for automatic rebuilds.
 
-General:
+- Install [Python](https://www.python.org/downloads/) and add it to `%PATH%`.
+  - Also available from the [Windows Store](https://apps.microsoft.com/store/detail/python-311/9NRWMJP3717K).
+- Download [ninja](https://github.com/ninja-build/ninja/releases) and add it to `%PATH%`.
+  - Quick install via pip: `pip install ninja`
 
-- [Common BSS](docs/common_bss.md)
-- [`.comment` section](docs/comment_section.md)
+## macOS
 
-References
---------
+- Install [ninja](https://github.com/ninja-build/ninja/wiki/Pre-built-Ninja-packages):
 
-- [Discord: GC/Wii Decompilation](https://discord.gg/hKx3FJJgrV) (Come to `#dtk` for help!)
-- [objdiff](https://github.com/encounter/objdiff) (Local diffing tool)
-- [decomp.me](https://decomp.me) (Collaborate on matches)
-- [decomp.dev](https://decomp.dev) (Decompilation progress hub and API)
-- [wibo](https://github.com/decompals/wibo) (Minimal Win32 wrapper for Linux)
-- [sjiswrap](https://github.com/encounter/sjiswrap) (UTF-8 to Shift JIS wrapper)
+  ```sh
+  brew install ninja
+  ```
 
-Nearly all active GC/Wii decompilation projects use this structure, and will be useful
-for reference. A list of active GC/Wii projects can be found on [decomp.dev](https://decomp.dev).
+[wibo](https://github.com/decompals/wibo), a minimal 32-bit Windows binary wrapper, will be automatically downloaded and used.
 
-Features
---------
+## Linux
 
-- Few external dependencies: Just `python` for the generator and `ninja` for the build system. See [Dependencies](docs/dependencies.md).
-- Simple configuration: Everything lives in `config.yml`, `symbols.txt`, and `splits.txt`.
-- Multi-version support: Separate configurations for each game version, and a `configure.py --version` flag to switch between them.
-- Feature-rich analyzer: Many time-consuming tasks are automated, allowing you to focus on the decompilation itself. See [Analyzer features](https://github.com/encounter/decomp-toolkit#analyzer-features).
-- REL support: RELs each have their own `symbols.txt` and `splits.txt`, and will automatically be built and linked against the main binary.
-- No manual assembly: decomp-toolkit handles splitting the DOL into relocatable objects based on the configuration. No game assets are committed to the repository.
-- Progress calculation and integration with [decomp.dev](https://decomp.dev).
-- Integration with [objdiff](https://github.com/encounter/objdiff) for a diffing workflow.
-- CI workflow template for GitHub Actions.
+- Install [ninja](https://github.com/ninja-build/ninja/wiki/Pre-built-Ninja-packages).
 
-Project structure
------------------
+[wibo](https://github.com/decompals/wibo), a minimal 32-bit Windows binary wrapper, will be automatically downloaded and used.
 
-- `configure.py` - Project configuration and generator script.
-- `config/[GAMEID]` - Configuration files for each game version.
-- `config/[GAMEID]/build.sha1` - SHA-1 hashes for each built artifact, for final verification.
-- `build/` - Build artifacts generated by the the build process. Ignored by `.gitignore`.
-- `orig/[GAMEID]` - Original game files, extracted from the disc. Ignored by `.gitignore`.
-- `orig/[GAMEID]/.gitkeep` - Empty checked-in file to ensure the directory is created on clone.
-- `src/` - C/C++ source files.
-- `include/` - C/C++ header files.
-- `tools/` - Scripts shared between projects.
+## Building
 
-Temporary, delete when done:
+- Clone the repository:
 
-- `config/GAMEID/config.example.yml` - Example configuration file and documentation.
-- `docs/` - Documentation for decomp-toolkit configuration.
-- `README.md` - This file, replace with your own. For a template, see [`README.example.md`](README.example.md).
-- `LICENSE` - This repository is licensed under the CC0 license. Replace with your own if desired.
+  ```sh
+  git clone https://github.com/my/repo.git
+  ```
+
+- Copy your game's disc image to `orig/GAMEID`.
+  - Supported formats: ISO (GCM), RVZ, WIA, WBFS, CISO, NFS, GCZ, TGC
+  - After the initial build, the disc image can be deleted to save space.
+
+- Configure:
+
+  ```sh
+  python configure.py
+  ```
+
+  To use a version other than `GAMEID` (USA), specify it with `--version`.
+
+- Build:
+
+  ```sh
+  ninja
+  ```
+
+## Diffing
+
+Once the initial build succeeds, an `objdiff.json` should exist in the project root.
+
+Download the latest release from [encounter/objdiff](https://github.com/encounter/objdiff). Under project settings, set `Project directory`. The configuration should be loaded automatically.
+
+Select an object from the left sidebar to begin diffing. Changes to the project will rebuild automatically: changes to source files, headers, `configure.py`, `splits.txt` or `symbols.txt`.
+
+![](assets/objdiff.png)

@@ -17,7 +17,7 @@ Fortunately, the EN build contains a debug symbol file, and the PAL version cont
 # Contribution Guide
 
 ## Beginners Contribution Guide
-The most direct way to contribute that requires minimal setup, is to simply pick a 30-99% matching section from https://decomp.dev/zcanann/FFCC-Decomp (the decomp tracker), and update the code until it has a higher match score.
+The most direct way to contribute that requires minimal setup, is to simply pick a 30-99% matching section from [the decomp tracker](https://decomp.dev/zcanann/FFCC-Decomp), and update the code until it has a higher match score.
 
 Refer to the sections on building and diffing. Once you have this set up, all you need to do is modify .cpp and .h files until the score goes up!
 

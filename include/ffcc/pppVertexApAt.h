@@ -1,6 +1,10 @@
 #ifndef _PPP_VERTEXAPAT_H_
 #define _PPP_VERTEXAPAT_H_
 
+class _pppPObject;
+class PVertexApAt;
+class PVertexApLc;
+
 void pppVertexApAtCon(void);
 void apea(_pppPObject *, PVertexApAt *, unsigned short);
 void pppVertexApAt(void);

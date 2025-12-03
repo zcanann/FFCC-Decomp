@@ -1,6 +1,8 @@
 #ifndef _FFCC_CFLAT_RUNTIME2_H_
 #define _FFCC_CFLAT_RUNTIME2_H_
 
+#include "ffcc/p_chara_viewer.h"
+
 class CGObject;
 class CFlatRuntime;
 class CGBaseObj;

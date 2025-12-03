@@ -1,9 +1,9 @@
 #ifndef _PPP_YMDEFORMATIONSCREEN_H_
 #define _PPP_YMDEFORMATIONSCREEN_H_
 
+class CCameraPcs;
 struct VYmDeformationScreen;
 struct Vec;
-struct CCameraPcs;
 
 void SetUpIndWarp(VYmDeformationScreen *);
 void pppConstructYmDeformationScreen(void);

@@ -1,7 +1,8 @@
 #ifndef _PPP_PART_H_
 #define _PPP_PART_H_
 
-class CMemory;
+#include "ffcc/memory.h"
+
 class CGObject;
 class CParShapeSet;
 class CParModelSet;
@@ -22,20 +23,20 @@ struct pppProg;
 void pppPlaySe(_pppMngSt *, PPPSEST *);
 void pppStopSe(_pppMngSt *, PPPSEST *);
 void pppUnitMatrix(pppFMATRIX &);
-void pppRotMatrix(pppFMATRIX &, pppFMATRIX, Vec);
-void pppApplyMatrix(Vec &, pppFMATRIX, Vec);
-void pppAddVector(Vec &, Vec, Vec);
-void pppScaleVectorXYZ(Vec &, Vec, float);
-void pppScaleVector(Vec &, Vec, float);
+void pppRotMatrix(pppFMATRIX &, pppFMATRIX, Vec&);
+void pppApplyMatrix(Vec &, pppFMATRIX, Vec&);
+void pppAddVector(Vec &, Vec&, Vec&);
+void pppScaleVectorXYZ(Vec &, Vec&, float);
+void pppScaleVector(Vec &, Vec&, float);
 void pppGetRowVector(pppFMATRIX &, Vec &, Vec &, Vec &, Vec &);
 void pppSetRowVector(pppFMATRIX &, Vec &, Vec &, Vec &, Vec &);
 void pppNormalize(Vec &, Vec);
-void pppOuterProduct(Vec &, Vec, Vec);
-void pppCopyMatrix(pppFMATRIX &, pppFMATRIX);
-void pppMulMatrix(pppFMATRIX &, pppFMATRIX, pppFMATRIX);
-void pppCopyVector(Vec &, Vec);
-void pppSubVector(Vec &, Vec, Vec);
-void pppVectorLength(Vec);
+void pppOuterProduct(Vec &, Vec&, Vec&);
+void pppCopyMatrix(pppFMATRIX &, pppFMATRIX&);
+void pppMulMatrix(pppFMATRIX &, pppFMATRIX&, pppFMATRIX&);
+void pppCopyVector(Vec &, Vec&);
+void pppSubVector(Vec &, Vec&, Vec&);
+void pppVectorLength(Vec&);
 void pppCreateHeap(_pppEnvSt *, unsigned long);
 void pppDestroyHeap(_pppEnvSt *);
 void pppFreePObjectPrio(_pppMngSt *);

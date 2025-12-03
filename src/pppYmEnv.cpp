@@ -95,37 +95,7 @@ void genParaboloidMap(void *, unsigned long *, unsigned short, _GXVtxFmt)
  * Address:	TODO
  * Size:	TODO
  */
-void GXEnd(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void drawParaboloidMap(_GXTexObj *, _GXTexObj *, void *, unsigned long, _GXTexObj *, unsigned char)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CModel::GetTotalFrame()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GXSetTexCoordGen(void)
 {
 	// TODO
 }

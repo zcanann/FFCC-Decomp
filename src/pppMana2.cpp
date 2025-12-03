@@ -85,7 +85,7 @@ void CalcReflectionVector2(Vec *, S16Vec *, S16Vec *, long, unsigned long, unsig
  * Address:	TODO
  * Size:	TODO
  */
-void MakeWave(Vec *, unsigned short *, float *, Vec, float, float)
+void MakeWave(Vec *, unsigned short *, float *, Vec*, float, float)
 {
 	// TODO
 }
@@ -145,7 +145,7 @@ void CalculateNormal(VMana2 *)
  * Address:	TODO
  * Size:	TODO
  */
-void CalcWaterReflectionVector(Vec *, Vec *, Vec *, long, Vec, float (*) [4], _GXColor *, Vec2d *)
+void CalcWaterReflectionVector(Vec *, Vec *, Vec *, long, Vec*, float (*) [4], _GXColor *, Vec2d *)
 {
 	// TODO
 }

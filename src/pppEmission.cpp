@@ -85,16 +85,6 @@ void pppRenderEmission(void)
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterialMan::GetModelViewITMtx(float (*) [4])
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void GXSetTexCoordGen(void)
 {
 	// TODO

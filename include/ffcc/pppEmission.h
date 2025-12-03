@@ -1,7 +1,8 @@
 #ifndef _PPPEMISSION_H_
 #define _PPPEMISSION_H_
 
-class CChara;
+#include "ffcc/chara.h"
+
 class CMaterialMan;
 class PEmission;
 

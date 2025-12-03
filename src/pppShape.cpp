@@ -5,16 +5,6 @@
  * Address:	TODO
  * Size:	TODO
  */
-void pppShapeSt::GetTexture(long *, CMaterialSet *, int &)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void pppDrawShp(long *, short, CMaterialSet *, unsigned char)
 {
 	// TODO

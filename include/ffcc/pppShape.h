@@ -1,6 +1,12 @@
 #ifndef _PPP_SHAPE_H_
 #define _PPP_SHAPE_H_
 
+class CMaterialSet;
+class pppShapeSt;
+class tagOAN3_SHAPE;
+class Vec;
+class Vec2d;
+
 void pppShapeSt_GetTexture(long *, CMaterialSet *, int &);
 void pppDrawShp(long *, short, CMaterialSet *, unsigned char);
 void pppDrawShp(tagOAN3_SHAPE *, CMaterialSet *, unsigned char);

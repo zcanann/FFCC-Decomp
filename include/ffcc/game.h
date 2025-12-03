@@ -8,7 +8,6 @@ class CGPrgObj;
 class CGPartyObj;
 class CCombi2Set;
 class CMapLightHolder;
-class CCharaPcs;
 class CBound;
 struct _GXColor;
 

@@ -35,7 +35,7 @@ void pppUnitMatrix(pppFMATRIX &)
  * Address:	TODO
  * Size:	TODO
  */
-void pppRotMatrix(pppFMATRIX &, pppFMATRIX, Vec)
+void pppRotMatrix(pppFMATRIX &, pppFMATRIX&, Vec&)
 {
 	// TODO
 }
@@ -45,7 +45,7 @@ void pppRotMatrix(pppFMATRIX &, pppFMATRIX, Vec)
  * Address:	TODO
  * Size:	TODO
  */
-void pppApplyMatrix(Vec &, pppFMATRIX, Vec)
+void pppApplyMatrix(Vec &, pppFMATRIX&, Vec&)
 {
 	// TODO
 }
@@ -55,7 +55,7 @@ void pppApplyMatrix(Vec &, pppFMATRIX, Vec)
  * Address:	TODO
  * Size:	TODO
  */
-void pppAddVector(Vec &, Vec, Vec)
+void pppAddVector(Vec &, Vec&, Vec&)
 {
 	// TODO
 }
@@ -65,7 +65,7 @@ void pppAddVector(Vec &, Vec, Vec)
  * Address:	TODO
  * Size:	TODO
  */
-void pppScaleVectorXYZ(Vec &, Vec, float)
+void pppScaleVectorXYZ(Vec &, Vec&, float)
 {
 	// TODO
 }
@@ -75,7 +75,7 @@ void pppScaleVectorXYZ(Vec &, Vec, float)
  * Address:	TODO
  * Size:	TODO
  */
-void pppScaleVector(Vec &, Vec, float)
+void pppScaleVector(Vec &, Vec&, float)
 {
 	// TODO
 }
@@ -105,7 +105,7 @@ void pppSetRowVector(pppFMATRIX &, Vec &, Vec &, Vec &, Vec &)
  * Address:	TODO
  * Size:	TODO
  */
-void pppNormalize(Vec &, Vec)
+void pppNormalize(Vec &, Vec&)
 {
 	// TODO
 }
@@ -115,7 +115,7 @@ void pppNormalize(Vec &, Vec)
  * Address:	TODO
  * Size:	TODO
  */
-void pppOuterProduct(Vec &, Vec, Vec)
+void pppOuterProduct(Vec &, Vec&, Vec&)
 {
 	// TODO
 }
@@ -125,7 +125,7 @@ void pppOuterProduct(Vec &, Vec, Vec)
  * Address:	TODO
  * Size:	TODO
  */
-void pppCopyMatrix(pppFMATRIX &, pppFMATRIX)
+void pppCopyMatrix(pppFMATRIX &, pppFMATRIX&)
 {
 	// TODO
 }
@@ -135,7 +135,7 @@ void pppCopyMatrix(pppFMATRIX &, pppFMATRIX)
  * Address:	TODO
  * Size:	TODO
  */
-void pppMulMatrix(pppFMATRIX &, pppFMATRIX, pppFMATRIX)
+void pppMulMatrix(pppFMATRIX &, pppFMATRIX&, pppFMATRIX&)
 {
 	// TODO
 }
@@ -145,7 +145,7 @@ void pppMulMatrix(pppFMATRIX &, pppFMATRIX, pppFMATRIX)
  * Address:	TODO
  * Size:	TODO
  */
-void pppCopyVector(Vec &, Vec)
+void pppCopyVector(Vec &, Vec&)
 {
 	// TODO
 }
@@ -155,7 +155,7 @@ void pppCopyVector(Vec &, Vec)
  * Address:	TODO
  * Size:	TODO
  */
-void pppSubVector(Vec &, Vec, Vec)
+void pppSubVector(Vec &, Vec&, Vec&)
 {
 	// TODO
 }
@@ -165,7 +165,7 @@ void pppSubVector(Vec &, Vec, Vec)
  * Address:	TODO
  * Size:	TODO
  */
-void pppVectorLength(Vec)
+void pppVectorLength(Vec&)
 {
 	// TODO
 }
@@ -606,106 +606,6 @@ void pppInitDrawEnv(unsigned char)
  * Size:	TODO
  */
 void pppHitCylinderSendSystem(_pppMngSt *, Vec *, Vec *, float, float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGObject::GetModelAlpha()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGObject::IsDisp()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGObject::IsFirstDraw()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppShapeSt::AddRef()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CParShapeSet::Find(char *, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CParShapeSet::GetNumShape()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppModelSt::AddRef()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CParModelSet::Find(char *, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CParModelSet::GetNumModel()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapPcs::CalcHitPosition(Vec *)
 {
 	// TODO
 }

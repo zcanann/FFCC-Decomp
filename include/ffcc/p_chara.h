@@ -1,6 +1,8 @@
 #ifndef _FFCC_P_CHARA_H_
 #define _FFCC_P_CHARA_H_
 
+#include "ffcc/p_chara_viewer.h"
+
 class Vec;
 class CColor;
 class CColor3;

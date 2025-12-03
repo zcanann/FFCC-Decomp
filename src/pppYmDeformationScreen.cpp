@@ -79,13 +79,3 @@ void GXSetTexCoordGen(void)
 {
 	// TODO
 }
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCameraPcs::GetRefPosition(Vec *)
-{
-	// TODO
-}

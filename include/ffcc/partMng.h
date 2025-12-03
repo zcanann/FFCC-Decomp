@@ -1,11 +1,12 @@
 #ifndef _FFCC_PARTMNG_H_
 #define _FFCC_PARTMNG_H_
 
+#include "ffcc/p_chara_viewer.h"
+
 class CChunkFile;
 class CTexture;
 class CTextureSet;
 class CChara;
-class CCharaPcs;
 struct Vec;
 struct _GXColor;
 struct _pppMngSt;

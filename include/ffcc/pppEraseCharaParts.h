@@ -1,7 +1,7 @@
 #ifndef _PPP_ERASECHARAPARTS_H_
 #define _PPP_ERASECHARAPARTS_H_
 
-class CChara;
+#include "ffcc/chara.h"
 
 void EraseCharaParts_DrawMeshDLCallback(CChara::CModel *, void *, void *, int, int, float (*)[4]);
 void pppConstructEraseCharaParts(void);

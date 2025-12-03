@@ -109,33 +109,3 @@ void pppRenderScreenBreak(void)
 {
 	// TODO
 }
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CNode::SetCalcLocal(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CModel::SetBeforeCalcMatrixCallback(int (*) (CChara::CModel *, void *, void *))
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGraphic::GetSaveFrameBufferAddress()
-{
-	// TODO
-}

@@ -1,7 +1,7 @@
 #ifndef _PPP_YMCHANGETEX_H_
 #define _PPP_YMCHANGETEX_H_
 
-class CChara;
+#include "ffcc/chara.h"
 
 void ChangeTex_DrawMeshDLCallback(CChara::CModel *, void *, void *, int, int, float (*)[4]);
 void ChangeTex_AfterDrawMeshCallback(CChara::CModel *, void *, void *, int, float (*)[4]);

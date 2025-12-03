@@ -55,7 +55,7 @@ void setVertexUV(Vec2d *, float, float, float, float)
  * Address:	TODO
  * Size:	TODO
  */
-void calcScreenPos(Vec4d &, Vec, float (*) [4], float (*) [4])
+void calcScreenPos(Vec4d &, Vec&, float (*) [4], float (*) [4])
 {
 	// TODO
 }

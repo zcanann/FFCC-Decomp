@@ -1,4 +1,4 @@
-
+#include "ffcc/menu_favo.h"
 
 /*
  * --INFO--

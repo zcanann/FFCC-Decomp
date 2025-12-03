@@ -1,4 +1,4 @@
-
+#include "ffcc/pppRandChar.h"
 
 /*
  * --INFO--

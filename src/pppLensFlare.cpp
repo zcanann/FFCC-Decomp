@@ -1,4 +1,4 @@
-
+#include "ffcc/pppLensFlare.h"
 
 /*
  * --INFO--

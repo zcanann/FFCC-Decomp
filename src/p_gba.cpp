@@ -1,4 +1,4 @@
-
+#include "ffcc/p_gba.h"
 
 /*
  * --INFO--

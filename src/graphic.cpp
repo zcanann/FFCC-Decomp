@@ -1,4 +1,4 @@
-
+#include "ffcc/graphic.h"
 
 /*
  * --INFO--

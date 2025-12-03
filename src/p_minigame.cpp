@@ -1,4 +1,4 @@
-
+#include "ffcc/p_minigame.h"
 
 /*
  * --INFO--

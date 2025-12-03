@@ -1,4 +1,4 @@
-
+#include "ffcc/gxfunc.h"
 
 /*
  * --INFO--

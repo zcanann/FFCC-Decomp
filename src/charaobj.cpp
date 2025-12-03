@@ -1,4 +1,4 @@
-
+#include "ffcc/charaobj.h"
 
 /*
  * --INFO--

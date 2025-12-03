@@ -1,4 +1,4 @@
-
+#include "ffcc/pppScaleLoopAuto.h"
 
 /*
  * --INFO--

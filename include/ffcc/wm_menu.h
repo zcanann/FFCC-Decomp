@@ -6,6 +6,7 @@ class CGraphic;
 class CCameraPcs;
 class CMemoryCardMan;
 
+// TODO: Where does this live?
 namespace Mc { struct SaveDat; }
 
 struct McListInfo

@@ -1,4 +1,4 @@
-
+#include "ffcc/maplight.h"
 
 /*
  * --INFO--

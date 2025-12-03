@@ -1,4 +1,4 @@
-
+#include "ffcc/menu_cmd.h"
 
 /*
  * --INFO--

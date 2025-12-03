@@ -1,4 +1,4 @@
-
+#include "ffcc/mapshadow.h"
 
 /*
  * --INFO--

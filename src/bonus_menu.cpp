@@ -1,4 +1,4 @@
-
+#include "ffcc/bonus_menu.h"
 
 /*
  * --INFO--

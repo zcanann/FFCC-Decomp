@@ -1,4 +1,4 @@
-
+#include "ffcc/p_sound.h"
 
 /*
  * --INFO--

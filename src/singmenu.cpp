@@ -1,4 +1,4 @@
-
+#include "ffcc/singmenu.h"
 
 /*
  * --INFO--

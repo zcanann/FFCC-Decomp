@@ -1,11 +1,11 @@
-
+#include "ffcc/zlist.h"
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-void ZLIST::ZLIST()
+ZLIST::ZLIST()
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void ZLIST::ZLIST()
  * Address:	TODO
  * Size:	TODO
  */
-void ZLIST::~ZLIST()
+ZLIST::~ZLIST()
 {
 	// TODO
 }
@@ -76,16 +76,6 @@ void ZLIST::MakeItem()
  * Size:	TODO
  */
 void ZLIST::GetItemIdx(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMaterialEditorPcs::GetStage()
 {
 	// TODO
 }

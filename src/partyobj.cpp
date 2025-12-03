@@ -1,4 +1,4 @@
-
+#include "ffcc/partyobj.h"
 
 /*
  * --INFO--

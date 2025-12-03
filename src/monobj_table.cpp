@@ -1,4 +1,4 @@
-
+#include "ffcc/monobj_table.h"
 
 /*
  * --INFO--

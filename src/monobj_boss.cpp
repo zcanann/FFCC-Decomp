@@ -1,4 +1,4 @@
-
+#include "ffcc/monobj_boss.h"
 
 /*
  * --INFO--

@@ -1,4 +1,4 @@
-
+#include "ffcc/textureman.h"
 
 /*
  * --INFO--

@@ -1,4 +1,4 @@
-
+#include "ffcc/pppEraseCharaParts.h"
 
 /*
  * --INFO--

@@ -1,4 +1,4 @@
-
+#include "ffcc/baseobj.h"
 
 /*
  * --INFO--

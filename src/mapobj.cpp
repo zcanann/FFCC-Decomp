@@ -1,4 +1,4 @@
-
+#include "ffcc/mapobj.h"
 
 /*
  * --INFO--

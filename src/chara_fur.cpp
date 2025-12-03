@@ -1,4 +1,4 @@
-
+#include "ffcc/chara_fur.h"
 
 /*
  * --INFO--

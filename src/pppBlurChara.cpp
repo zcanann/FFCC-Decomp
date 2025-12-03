@@ -1,4 +1,4 @@
-
+#include "ffcc/pppBlurChara.h"
 
 /*
  * --INFO--

@@ -1,4 +1,4 @@
-
+#include "ffcc/texanim.h"
 
 /*
  * --INFO--

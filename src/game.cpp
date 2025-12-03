@@ -1,4 +1,4 @@
-
+#include "ffcc/game.h"
 
 /*
  * --INFO--

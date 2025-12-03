@@ -1,4 +1,4 @@
-
+#include "ffcc/pppScreenQuake.h"
 
 /*
  * --INFO--

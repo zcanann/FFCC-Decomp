@@ -1,6 +1,9 @@
 #ifndef _FFCC_CHARA_H_
 #define _FFCC_CHARA_H_
 
+
+#include "ffcc/memory.h"
+
 class CChunkFile;
 class CTextureSet;
 class CMemory;
@@ -14,6 +17,51 @@ void VECLerp(Vec *, Vec *, Vec *, float);
 
 class CChara
 {
+	class CModel;
+
+	class CSkin
+	{
+		CSkin();
+		~CSkin();
+
+		void Create(CChunkFile &, CMemory::CStage *);
+	};
+
+	class CAnim
+	{
+		CAnim();
+		~CAnim();
+	};
+
+	class CAnimNode
+	{
+		CAnimNode();
+		~CAnimNode();
+
+		void IsScale();
+	};
+
+	class CNode
+	{
+		enum TYPE
+		{
+			TODO,
+		};
+
+		CNode();
+		~CNode();
+
+		class CRefData
+		{
+			CRefData();
+			~CRefData();
+		};
+
+		void Create(CChunkFile &, CChara::CModel *, CChara::CNode::TYPE, CMemory::CStage *);
+		void Duplicate(CChara::CNode *, CMemory::CStage *);
+		void CalcBind(CChara::CModel *);
+	};
+
 	class CModel
 	{
 		CModel();
@@ -53,22 +101,6 @@ class CChara
 		void GetDispIndex(CChara::CNode *);
 	};
 
-	class CNode
-	{
-		CNode();
-		~CNode();
-
-		class CRefData
-		{
-			CRefData();
-			~CRefData();
-		};
-
-		void Create(CChunkFile &, CChara::CModel *, CChara::CNode::TYPE, CMemory::CStage *);
-		void Duplicate(CChara::CNode *, CMemory::CStage *);
-		void CalcBind(CChara::CModel *);
-	};
-
 	class CMesh
 	{
 		CMesh();
@@ -90,28 +122,6 @@ class CChara
 		void Duplicate(CChara::CMesh *, CMemory::CStage *);
 		void skin(int, int, int, CChara::CSkin *, void *, void *, void *, S16Vec *, S16Vec *, S16Vec *, S16Vec *);
 		void Calc(CChara::CModel *);
-	};
-
-	class CSkin
-	{
-		CSkin();
-		~CSkin();
-
-		void Create(CChunkFile &, CMemory::CStage *);
-	};
-
-	class CAnim
-	{
-		CAnim();
-		~CAnim();
-	};
-
-	class CAnimNode
-	{
-		CAnimNode();
-		~CAnimNode();
-
-		void IsScale();
 	};
 	
 	CChara();

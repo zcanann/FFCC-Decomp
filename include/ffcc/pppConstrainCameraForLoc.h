@@ -1,7 +1,7 @@
 #ifndef _FFCC_PPPCONSTRAINCAMERAFORLOC_H_
 #define _FFCC_PPPCONSTRAINCAMERAFORLOC_H_
 
-class CChara;
+#include "ffcc/chara.h"
 
 void CC_BeforeCalcMatrixCallback(CChara::CModel*, void*, void*);
 void pppConstructConstrainCameraForLoc(void);

@@ -1,7 +1,7 @@
 #ifndef _FFCC_PPPCHARAZENVCTRL_H_
 #define _FFCC_PPPCHARAZENVCTRL_H_
 
-class CChara;
+#include "ffcc/chara.h"
 
 void CharaZEnvCtrl_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
 void pppConCharaZEnvCtrl(void);

@@ -69,13 +69,3 @@ void pppRenderBlurChara(void)
 {
 	// TODO
 }
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CModel::SetAfterDrawModelCallback(void (*) (CChara::CModel *, void *, void *))
-{
-	// TODO
-}

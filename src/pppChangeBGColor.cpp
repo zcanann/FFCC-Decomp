@@ -29,13 +29,3 @@ void pppFrameChangeBGColor(void)
 {
 	// TODO
 }
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapMng::SetEffectAmbientColor(_GXColor &)
-{
-	// TODO
-}

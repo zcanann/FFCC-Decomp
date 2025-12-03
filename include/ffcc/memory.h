@@ -8,10 +8,55 @@ class CChara;
 
 void CheckSum(void*, int);
 
+class CMemory
+{
+public:
+    class CStage
+    {
+    public:
+        void initBlock();
+        void quitBlock();
+        void alloc(unsigned long, char*, unsigned long, int);
+        void setDefaultParam(unsigned long);
+        void resDefaultParam();
+        void setParam(void*, unsigned long);
+        void free(void*);
+        void heapWalker(int, void*, unsigned long);
+        void drawHeapBar(int);
+        void drawHeapTitle(int);
+        void GetHeapUnuse();
+        void heapInfo(unsigned long&, unsigned long&, unsigned long&);
+        void GetTail();
+        void GetTop();
+    };
+
+    CMemory();
+    void Init();
+    void Quit();
+    void Frame();
+    void HeapWalker();
+    void Draw();
+    void SetGroup(void*, int);
+    void CreateStage(unsigned long, char*, int);
+    void DestroyStage(CMemory::CStage*);
+    void _Alloc(unsigned long, CMemory::CStage*, char*, int, int);
+    void Free(void*);
+    void IncHeapWalkerLevel();
+    void DecHeapWalkerLevel();
+    void CopyToAMemory(void*, void*, unsigned long);
+    void CopyFromAMemory(void*, void*, unsigned long);
+    void CopyToAMemorySync(void*, void*, unsigned long);
+    void CopyFromAMemorySync(void*, void*, unsigned long);
+    void IsCopyCompleted(int);
+};
+
 class CAmemCache
 {
 public:
-    enum TYPE;
+    enum TYPE
+    {
+        TODO,
+    };
 
     CAmemCache();
     ~CAmemCache();
@@ -51,50 +96,6 @@ public:
     void RefCnt0Compare();
     void AssertCache();
     void DumpCache();
-};
-
-class CMemory
-{
-public:
-    class CStage;
-
-    CMemory();
-    void Init();
-    void Quit();
-    void Frame();
-    void HeapWalker();
-    void Draw();
-    void SetGroup(void*, int);
-    void CreateStage(unsigned long, char*, int);
-    void DestroyStage(CMemory::CStage*);
-    void _Alloc(unsigned long, CMemory::CStage*, char*, int, int);
-    void Free(void*);
-    void IncHeapWalkerLevel();
-    void DecHeapWalkerLevel();
-    void CopyToAMemory(void*, void*, unsigned long);
-    void CopyFromAMemory(void*, void*, unsigned long);
-    void CopyToAMemorySync(void*, void*, unsigned long);
-    void CopyFromAMemorySync(void*, void*, unsigned long);
-    void IsCopyCompleted(int);
-
-    class CStage
-    {
-    public:
-        void initBlock();
-        void quitBlock();
-        void alloc(unsigned long, char*, unsigned long, int);
-        void setDefaultParam(unsigned long);
-        void resDefaultParam();
-        void setParam(void*, unsigned long);
-        void free(void*);
-        void heapWalker(int, void*, unsigned long);
-        void drawHeapBar(int);
-        void drawHeapTitle(int);
-        void GetHeapUnuse();
-        void heapInfo(unsigned long&, unsigned long&, unsigned long&);
-        void GetTail();
-        void GetTop();
-    };
 };
 
 #endif // _FFCC_MEMORY_H_

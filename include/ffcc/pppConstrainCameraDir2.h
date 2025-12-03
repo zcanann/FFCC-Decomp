@@ -1,0 +1,6 @@
+#ifndef _FFCC_PPPCONSTRAINCAMERADIR2_H_
+#define _FFCC_PPPCONSTRAINCAMERADIR2_H_
+
+void pppFrameConstrainCameraDir2(void);
+
+#endif // _FFCC_PPPCONSTRAINCAMERADIR2_H_

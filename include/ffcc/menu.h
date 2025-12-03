@@ -1,0 +1,19 @@
+#ifndef _FFCC_MENU_H_
+#define _FFCC_MENU_H_
+
+class CMenu
+{
+public:
+    CMenu();
+    ~CMenu();
+	
+    void Create();
+    void Destroy();
+    void Calc();
+    void Draw();
+    void ScriptChanging(char*);
+    virtual void onScriptChanging(char*);
+    virtual void onScriptChanged(char*, int);
+};
+
+#endif // _FFCC_MENU_H_

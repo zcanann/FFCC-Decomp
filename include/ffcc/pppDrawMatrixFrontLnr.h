@@ -1,0 +1,6 @@
+#ifndef _FFCC_PPPDRAWMATRIXFRONTLNR_H_
+#define _FFCC_PPPDRAWMATRIXFRONTLNR_H_
+
+void pppDrawMatrixFrontLnr(void);
+
+#endif // _FFCC_PPPDRAWMATRIXFRONTLNR_H_

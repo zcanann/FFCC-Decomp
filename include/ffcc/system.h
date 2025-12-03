@@ -1,5 +1,5 @@
-#ifndef CSYSTEM_H
-#define CSYSTEM_H
+#ifndef _FFCC_SYSTEM_H
+#define _FFCC_SYSTEM_H
 
 #include <Dolphin/types.h>
 
@@ -9,6 +9,18 @@ class CProcess;
 class CStage;
 struct OSContext;
 struct OSThread;
+
+class CProcess
+{
+public:
+    CProcess();
+
+    void onScriptChanging(char*);
+    void onScriptChanged(char*, int);
+
+    void onMapChanging(int, int);
+    void onMapChanged(int, int, int);
+};
 
 class CSystem
 {
@@ -74,4 +86,4 @@ public:
 
 extern CSystem System;
 
-#endif // CSYSTEM_H
+#endif // _FFCC_SYSTEM_H

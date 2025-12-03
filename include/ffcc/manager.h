@@ -1,5 +1,5 @@
-#ifndef CMANAGER_H
-#define CMANAGER_H
+#ifndef _FFCC_MANAGER_H
+#define _FFCC_MANAGER_H
 
 class CManager {
 public:
@@ -10,4 +10,4 @@ public:
     virtual void MapChanged(int, int, int);
 };
 
-#endif // CMANAGER_H
+#endif // _FFCC_MANAGER_H

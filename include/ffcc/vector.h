@@ -17,4 +17,4 @@ class CVector
 	float z;
 };
 
-#endif
+#endif // _FFCC_VECTOR_H_

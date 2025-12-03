@@ -1,0 +1,20 @@
+#ifndef _FFCC_P_SAMPLE_H_
+#define _FFCC_P_SAMPLE_H_
+
+class CSamplePcs
+{
+public:
+    CSamplePcs();
+
+    void Init();
+    void Quit();
+    void GetTable(unsigned long);
+
+    void create();
+    void destroy();
+
+    void func0();
+    void func1();
+};
+
+#endif

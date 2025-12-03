@@ -1,0 +1,6 @@
+#ifndef _FFCC_PPPDRAWMATRIXNOROT_H_
+#define _FFCC_PPPDRAWMATRIXNOROT_H_
+
+void pppDrawMatrixNoRot(void);
+
+#endif // _FFCC_PPPDRAWMATRIXNOROT_H_

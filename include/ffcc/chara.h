@@ -1,0 +1,128 @@
+#ifndef _FFCC_CHARA_H_
+#define _FFCC_CHARA_H_
+
+class CChunkFile;
+class CTextureSet;
+class CMemory;
+class CTexAnimSet;
+class Quaternion;
+class S16Vec;
+class Vec;
+
+void D3DXMatrixMultiplyRotate(float (*)[4], float (*)[4], float (*)[4]);
+void VECLerp(Vec *, Vec *, Vec *, float);
+
+class CChara
+{
+	class CModel
+	{
+		CModel();
+		~CModel();
+
+		class CRefData
+		{
+			CRefData();
+			~CRefData();
+		};
+
+		void Init();
+		void Create(void *, CMemory::CStage *);
+		void CreateDynamics(void *, CMemory::CStage *);
+		void setup();
+		void Duplicate(CMemory::CStage *);
+		void calcBindMatrix();
+		void CalcMatrix();
+		void CalcSkin();
+		void calcNowFrame();
+		void calcMatrix();
+		void CalcFrameMatrix(float, CChara::CNode *, float (*)[4]);
+		void dynamics(CChara::CNode *, CChara::CNode *);
+		void calcSkin();
+		void SetMatrix(float (*)[4]);
+		void SearchNode(char *);
+		void SearchNodeSk(char *);
+		void Draw(float (*)[4], int, int);
+		void DrawShadow(float (*)[4], int);
+		void CalcInterpFrame();
+		void CalcSafeNodeWorldMatrix(float (*)[4], CChara::CNode *);
+		void AttachAnim(CChara::CAnim *, int, int, int);
+		void AttachTextureSet(CTextureSet *);
+		void AddFrame(float);
+		void SetFrame(float);
+		void CalcFurColor();
+		void GetDispIndex(CChara::CNode *);
+	};
+
+	class CNode
+	{
+		CNode();
+		~CNode();
+
+		class CRefData
+		{
+			CRefData();
+			~CRefData();
+		};
+
+		void Create(CChunkFile &, CChara::CModel *, CChara::CNode::TYPE, CMemory::CStage *);
+		void Duplicate(CChara::CNode *, CMemory::CStage *);
+		void CalcBind(CChara::CModel *);
+	};
+
+	class CMesh
+	{
+		CMesh();
+		~CMesh();
+
+		class CRefData
+		{
+			CRefData();
+			~CRefData();
+		};
+
+		class CDisplayList
+		{
+			CDisplayList();
+			~CDisplayList();
+		};
+
+		void Create(CChara::CModel *, CChunkFile &, CMemory::CStage *);
+		void Duplicate(CChara::CMesh *, CMemory::CStage *);
+		void skin(int, int, int, CChara::CSkin *, void *, void *, void *, S16Vec *, S16Vec *, S16Vec *, S16Vec *);
+		void Calc(CChara::CModel *);
+	};
+
+	class CSkin
+	{
+		CSkin();
+		~CSkin();
+
+		void Create(CChunkFile &, CMemory::CStage *);
+	};
+
+	class CAnim
+	{
+		CAnim();
+		~CAnim();
+	};
+
+	class CAnimNode
+	{
+		CAnimNode();
+		~CAnimNode();
+
+		void IsScale();
+	};
+	
+	CChara();
+	~CChara();
+
+	void Init();
+	void Quit();
+	void Create();
+	void Destroy();
+	void FlipDBuffer();
+	void gqrInit(unsigned long, unsigned long, unsigned long);
+};
+
+#endif // _FFCC_CHARA_H_

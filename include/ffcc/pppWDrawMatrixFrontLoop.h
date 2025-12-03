@@ -1,0 +1,6 @@
+#ifndef _PPP_WDRAWMATRIXFRONTLOOP_H_
+#define _PPP_WDRAWMATRIXFRONTLOOP_H_
+
+void pppWDrawMatrixFrontLoop(void);
+
+#endif // _PPP_WDRAWMATRIXFRONTLOOP_H_

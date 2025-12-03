@@ -1,11 +1,13 @@
-#ifndef CFILE_H
-#define CFILE_H
+#ifndef _FFCC_FILE_H
+#define _FFCC_FILE_H
 
 #include <Dolphin/dvd.h>
 
-class CFile {
+class CFile
+{
 public:
-	enum PRI {
+	enum PRI
+	{
 		PRI_LOW = 0,
 		PRI_NORMAL = 1,
 		PRI_HIGH = 2,
@@ -13,7 +15,8 @@ public:
 		PRI_SENTINEL = 4,
 	};
 
-	class CHandle {
+	class CHandle
+	{
 	public:
 		CHandle();
 		void Reset();
@@ -69,4 +72,4 @@ public:
 
 CFile File;
 
-#endif // CFILE_H
+#endif // _FFCC_FILE_H

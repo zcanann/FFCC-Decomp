@@ -3,7 +3,7 @@
 
 #include "ffcc/baseobj.h"
 
-class Vec;
+struct Vec;
 class Vec2d;
 class CFont;
 class PPPIFPARAM;

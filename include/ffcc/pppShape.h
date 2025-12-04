@@ -4,7 +4,7 @@
 class CMaterialSet;
 class pppShapeSt;
 class tagOAN3_SHAPE;
-class Vec;
+struct Vec;
 class Vec2d;
 
 void pppShapeSt_GetTexture(long *, CMaterialSet *, int &);

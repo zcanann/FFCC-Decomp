@@ -1,13 +1,15 @@
 #ifndef _FFCC_VECTOR_H_
 #define _FFCC_VECTOR_H_
 
-#include "dolphin/mtx/GeoTypes.h"
+#include <dolphin/mtx.h>
 
 class CVector
 {
+public:
 	CVector();
 	CVector(float, float, float);
-	CVector(const Vec &);
+	CVector(const Vec&);
+
 	void Identity();
 	void Normalize();
 	float GetRotateY();

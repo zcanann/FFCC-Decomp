@@ -24,16 +24,16 @@ void CMemoryCardMan::Init()
 {
     CARDInit();
 
-    mResult = 0;
-    mOpDoneFlag = 0;
-    mCurrentSlot = -1;
-    mState = 0;
-    mSaveBuffer = (char*)nullptr;
+    m_result = 0;
+    m_opDoneFlag = 0;
+    m_currentSlot = -1;
+    m_state = 0;
+    m_saveBuffer = (char*)nullptr;
 
-    // mStage = g_memory.CreateStage(0x16000, s_CMemoryCardMan_801dae0c, 0);
-    // mMountWorkArea = __nwa__(0xA000,  mStage, s_memorycard_cpp_801daea8, 0x88);
+    // m_stage = Memory.CreateStage(0x16000, s_CMemoryCardMan_801dae0c, 0);
+    // m_mountWorkArea = __nwa__(0xA000,  mStage, s_memorycard_cpp_801daea8, 0x88);
 
-    mCurrentSlot = -1;
+    m_currentSlot = -1;
 }
 
 /*
@@ -43,15 +43,15 @@ void CMemoryCardMan::Init()
  */
 void CMemoryCardMan::Quit()
 { 
-  mCurrentSlot = -1;
+  m_currentSlot = -1;
   
-  if (mMountWorkArea != (void*)nullptr)
+  if (m_mountWorkArea != (void*)nullptr)
   {
-    delete[] mMountWorkArea;
-    mMountWorkArea = (void*)nullptr;
+    delete[] m_mountWorkArea;
+    m_mountWorkArea = (void*)nullptr;
   }
   
-  // DestroyStage__7CMemoryFPQ27CMemory6CStage(&g_memory,mStage);
+  // DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory,mStage);
 }
 
 /*
@@ -66,7 +66,7 @@ void CMemoryCardMan::DebugReadWrite(int isWrite, char* filename, void* buffer, i
     int  result;
 
     // Mount card
-    result = CARDMount(1, mMountWorkArea, 0);
+    result = CARDMount(1, m_mountWorkArea, 0);
 
     bool canUseCard = false;
 	
@@ -176,7 +176,7 @@ void CMemoryCardMan::DebugReadWrite(int isWrite, char* filename, void* buffer, i
  */
 bool CMemoryCardMan::AsyncFinished()
 { 
-	return mOpDoneFlag != 0;
+	return m_opDoneFlag != 0;
 }
 
 /*
@@ -186,7 +186,7 @@ bool CMemoryCardMan::AsyncFinished()
  */
 int CMemoryCardMan::GetResult()
 {
-	return mResult;
+	return m_result;
 }
 
 /*
@@ -196,17 +196,17 @@ int CMemoryCardMan::GetResult()
  */
 void CMemoryCardMan::McMount(int chan)
 { 
-    mOpDoneFlag = 0;
-    mState = 1;
+    m_opDoneFlag = 0;
+    m_state = 1;
 
-    int result = CARDMountAsync(chan, mMountWorkArea, &Detach, &Attach);
+    int result = CARDMountAsync(chan, m_mountWorkArea, &Detach, &Attach);
 
     if (result < 0)
 	{
-        mOpDoneFlag = 1;
+        m_opDoneFlag = 1;
     }
 
-    mResult = result;
+    m_result = result;
 }
 
 /*
@@ -216,12 +216,12 @@ void CMemoryCardMan::McMount(int chan)
  */
 int CMemoryCardMan::McUnmount(int chan)
 {
-	mResult = CARDUnmount(chan);
-	mOpDoneFlag = 1;
-	mState = '\x02';
-	mCurrentSlot = 0xff;
+	m_result = CARDUnmount(chan);
+	m_opDoneFlag = 1;
+	m_state = '\x02';
+	m_currentSlot = 0xff;
 
-	return mResult;
+	return m_result;
 }
 
 /*
@@ -231,11 +231,11 @@ int CMemoryCardMan::McUnmount(int chan)
  */
 int CMemoryCardMan::McOpen(int chan)
 { 
-	mResult = CARDOpen(chan, (const char*)nullptr /* PTR_DAT_8032e854 */, &mFileInfo);
-	mOpDoneFlag = 1;
-	mState = 3;
+	m_result = CARDOpen(chan, (const char*)nullptr /* PTR_DAT_8032e854 */, &m_fileInfo);
+	m_opDoneFlag = 1;
+	m_state = 3;
 
-	return mResult;
+	return m_result;
 }
 
 /*
@@ -245,24 +245,24 @@ int CMemoryCardMan::McOpen(int chan)
  */
 int CMemoryCardMan::McClose()
 {
-	int chan = mFileInfo.chan;
+	int chan = m_fileInfo.chan;
 
 	if (chan < 0 || chan > 1)
 	{
-		mOpDoneFlag = 1;
-		mState = 4;
-		mResult = -3;
+		m_opDoneFlag = 1;
+		m_state = 4;
+		m_result = -3;
 
-		return mResult;
+		return m_result;
 	}
 
-	int result = CARDClose(&mFileInfo);
+	int result = CARDClose(&m_fileInfo);
 	
-	mResult = result;
-	mOpDoneFlag = 1;
-	mState = 4;
+	m_result = result;
+	m_opDoneFlag = 1;
+	m_state = 4;
 
-	return mResult;
+	return m_result;
 }
 
 /*
@@ -272,23 +272,23 @@ int CMemoryCardMan::McClose()
  */
 void CMemoryCardMan::McCreate(int chan)
 {
-    mOpDoneFlag = 0;
-    mState = 5;
+    m_opDoneFlag = 0;
+    m_state = 5;
 
     int result = CARDCreateAsync(
         chan,
         (const char*)nullptr, // PTR_DAT_8032e854, // file name string
         0x2C000, // size
-        &mFileInfo,
+        &m_fileInfo,
         &Attach
     );
 
     if (result < 0)
     {
-        mOpDoneFlag = 1;
+        m_opDoneFlag = 1;
     }
 
-    mResult = result;
+    m_result = result;
 }
 
 /*
@@ -300,15 +300,15 @@ int CMemoryCardMan::McGetStat(int chan)
 {
 	int result = CARDGetStatus(
 		chan,
-		mFileInfo.fileNo,
-		&mCardStat
+		m_fileInfo.fileNo,
+		&m_cardStat
 	);
 
-	mResult = result;
-	mOpDoneFlag = 1;
-	mState = 6;
+	m_result = result;
+	m_opDoneFlag = 1;
+	m_state = 6;
 
-	return mResult;
+	return m_result;
 }
 
 /*
@@ -320,15 +320,15 @@ int CMemoryCardMan::McSetStat(int chan)
 {
 	int result = CARDSetStatus(
 		chan,
-		mFileInfo.fileNo,
-		&mCardStat
+		m_fileInfo.fileNo,
+		&m_cardStat
 	);
 
-	mResult = result;
-	mOpDoneFlag = 1;
-	mState = 7;
+	m_result = result;
+	m_opDoneFlag = 1;
+	m_state = 7;
 
-	return mResult;
+	return m_result;
 }
 
 /*
@@ -338,18 +338,18 @@ int CMemoryCardMan::McSetStat(int chan)
  */
 void CMemoryCardMan::CreateMcBuff()
 {
-    if (mSaveBuffer == 0)
+    if (m_saveBuffer == 0)
     {
-        mSaveBuffer = (char*)nullptr; // (char*)__nwa__(0xA000, mStage, s_memorycard_cpp_801daea8, 0x2AB);
+        m_saveBuffer = (char*)nullptr; // (char*)__nwa__(0xA000, mStage, s_memorycard_cpp_801daea8, 0x2AB);
 
-        if (mSaveBuffer == 0 && System.mExecParam != 0)
+        if (m_saveBuffer == 0 && System.m_execParam != 0)
         {
             System.Printf("%s(%d): Error: memory allocation", "memorycard.cpp", 0x2AD);
         }
     }
 
     // Zero buffer every call, allocated or not
-    memset(mSaveBuffer, 0, 0xA000);
+    memset(m_saveBuffer, 0, 0xA000);
 }
 
 /*
@@ -359,10 +359,10 @@ void CMemoryCardMan::CreateMcBuff()
  */
 void CMemoryCardMan::DestroyMcBuff()
 { 
-  if (mSaveBuffer != (char*)nullptr)
+  if (m_saveBuffer != (char*)nullptr)
   {
-    delete[] mSaveBuffer;
-	mSaveBuffer = (char*)nullptr;
+    delete[] m_saveBuffer;
+	m_saveBuffer = (char*)nullptr;
   }
 }
 
@@ -383,13 +383,13 @@ void CMemoryCardMan::McEnd()
         {
             int result = CARDUnmount(chan);
 
-            mResult = result;
-            mOpDoneFlag = 1;
-            mState = 2;
-            mCurrentSlot = 0xFF;
+            m_result = result;
+            m_opDoneFlag = 1;
+            m_state = 2;
+            m_currentSlot = 0xFF;
 
-            // IMPORTANT: compare mResult, not result
-            if (mResult != -1)
+            // IMPORTANT: compare m_result, not result
+            if (m_result != -1)
             {
                 break;
             }
@@ -400,17 +400,17 @@ void CMemoryCardMan::McEnd()
         chan++;
     }
 
-    if (mSaveBuffer != 0)
+    if (m_saveBuffer != 0)
     {
-        delete[] mSaveBuffer;
-        mSaveBuffer = 0;
+        delete[] m_saveBuffer;
+        m_saveBuffer = 0;
     }
 
-    mResult = 0;
-    mOpDoneFlag = 0;
-    mCurrentSlot = 0xFF;
-    mState = 0;
-    mSaveBuffer = 0;
+    m_result = 0;
+    m_opDoneFlag = 0;
+    m_currentSlot = 0xFF;
+    m_state = 0;
+    m_saveBuffer = 0;
 }
 
 /*
@@ -420,16 +420,16 @@ void CMemoryCardMan::McEnd()
  */
 void CMemoryCardMan::SetMcIconImage()
 {
-    if (mSaveBuffer == (char*)nullptr)
+    if (m_saveBuffer == (char*)nullptr)
     {
-        mSaveBuffer = (char*)nullptr; // (char*)__nwa__(0xA000, mStage, s_memorycard_cpp_801daea8, 0x2AB);
+        m_saveBuffer = (char*)nullptr; // (char*)__nwa__(0xA000, mStage, s_memorycard_cpp_801daea8, 0x2AB);
 
-        if (mSaveBuffer == (char*)nullptr && System.mExecParam != 0)
+        if (m_saveBuffer == (char*)nullptr && System.m_execParam != 0)
         {
             System.Printf("%s(%d): Error: memory allocation", "" /* s_memorycard_cpp_801daea8 */, 0x2AD);
         }
 
-        memset(mSaveBuffer, 0, 0xA000);
+        memset(m_saveBuffer, 0, 0xA000);
     }
 	
     char path[136];
@@ -438,7 +438,7 @@ void CMemoryCardMan::SetMcIconImage()
     sprintf(path, "dvd/%smenu/%s", lang, "" /*PTR_s_icon_dat_8032e850*/);
     CFile::CHandle* h = File.Open(path, 0, CFile::PRI_LOW);
 
-    if (h == nullptr && System.mExecParam != 0)
+    if (h == nullptr && System.m_execParam != 0)
     {
         System.Printf("%s(%d): Error: %s open error", "" /* s_memorycard_cpp_801daea8 */, 0x2EF, path);
     }
@@ -448,55 +448,55 @@ void CMemoryCardMan::SetMcIconImage()
 
     int len = File.GetLength(h);
 
-    if (len != 0x2A00 && System.mExecParam != 0)
+    if (len != 0x2A00 && System.m_execParam != 0)
     {
         System.Printf("%s(%d): Error: [%s] data error", "" /* s_memorycard_cpp_801daea8 */, 0x2F6, path);
     }
 
-    memcpy(mSaveBuffer + 0x40, File.mReadBuffer, len);
+    memcpy(m_saveBuffer + 0x40, File.m_readBuffer, len);
 
     File.Close(h);
 
-    mCardStat.commentAddr = 0;
-    mCardStat.iconAddr    = 0x40;
+    m_cardStat.commentAddr = 0;
+    m_cardStat.iconAddr    = 0x40;
 
-    mCardStat.bannerFormat = (mCardStat.bannerFormat & ~0x03) | 0x02; // lower 2 bits = 2
-    mCardStat.bannerFormat &= ~0x04;  // clear bit 2
+    m_cardStat.bannerFormat = (m_cardStat.bannerFormat & ~0x03) | 0x02; // lower 2 bits = 2
+    m_cardStat.bannerFormat &= ~0x04;  // clear bit 2
 
-    mCardStat.iconFormat = (mCardStat.iconFormat & ~0x0003) | 0x0001;
-    mCardStat.iconSpeed  = (mCardStat.iconSpeed  & ~0x0003) | 0x0002;
+    m_cardStat.iconFormat = (m_cardStat.iconFormat & ~0x0003) | 0x0001;
+    m_cardStat.iconSpeed  = (m_cardStat.iconSpeed  & ~0x0003) | 0x0002;
 
-    mCardStat.iconFormat = (mCardStat.iconFormat & ~0x000C) | 0x0004;
-    mCardStat.iconSpeed  = (mCardStat.iconSpeed  & ~0x000C) | 0x0008;
+    m_cardStat.iconFormat = (m_cardStat.iconFormat & ~0x000C) | 0x0004;
+    m_cardStat.iconSpeed  = (m_cardStat.iconSpeed  & ~0x000C) | 0x0008;
 
-    mCardStat.iconFormat = (mCardStat.iconFormat & ~0x0030) | 0x0010;
-    mCardStat.iconSpeed  = (mCardStat.iconSpeed  & ~0x0030) | 0x0020;
+    m_cardStat.iconFormat = (m_cardStat.iconFormat & ~0x0030) | 0x0010;
+    m_cardStat.iconSpeed  = (m_cardStat.iconSpeed  & ~0x0030) | 0x0020;
 
-    mCardStat.iconFormat = (mCardStat.iconFormat & ~0x00C0) | 0x0040;
-    mCardStat.iconSpeed  = (mCardStat.iconSpeed  & ~0x00C0) | 0x0080;
+    m_cardStat.iconFormat = (m_cardStat.iconFormat & ~0x00C0) | 0x0040;
+    m_cardStat.iconSpeed  = (m_cardStat.iconSpeed  & ~0x00C0) | 0x0080;
 
-    mCardStat.iconFormat &= ~0x0300;
-    mCardStat.iconSpeed  &= ~0x0300;
+    m_cardStat.iconFormat &= ~0x0300;
+    m_cardStat.iconSpeed  &= ~0x0300;
 
-    mCardStat.offsetIcon[4] = 0xFFFFFFFF;
-    mCardStat.iconFormat &= ~0x0C00;
-    mCardStat.iconSpeed  &= ~0x0C00;
+    m_cardStat.offsetIcon[4] = 0xFFFFFFFF;
+    m_cardStat.iconFormat &= ~0x0C00;
+    m_cardStat.iconSpeed  &= ~0x0C00;
 
-    mCardStat.offsetIcon[5] = 0xFFFFFFFF;
-    mCardStat.iconFormat &= ~0x3000;
-    mCardStat.iconSpeed  &= ~0x3000;
+    m_cardStat.offsetIcon[5] = 0xFFFFFFFF;
+    m_cardStat.iconFormat &= ~0x3000;
+    m_cardStat.iconSpeed  &= ~0x3000;
 
-    mCardStat.offsetIcon[6] = 0xFFFFFFFF;
-    mCardStat.iconFormat &= ~0xC000;
-    mCardStat.iconSpeed  &= ~0xC000;
+    m_cardStat.offsetIcon[6] = 0xFFFFFFFF;
+    m_cardStat.iconFormat &= ~0xC000;
+    m_cardStat.iconSpeed  &= ~0xC000;
 
-    mCardStat.offsetIcon[7] = 0xFFFFFFFF;
+    m_cardStat.offsetIcon[7] = 0xFFFFFFFF;
 
-    mCardStat.offsetIconTlut = 0x2840;
-    mCardStat.offsetIconTlut = 0x2A40;
+    m_cardStat.offsetIconTlut = 0x2840;
+    m_cardStat.offsetIconTlut = 0x2A40;
 
     size_t titleLen = strlen("" /* PTR_s_FF_Crystal_Chronicles_8032e858 */);
-    memcpy(mSaveBuffer, "" /*PTR_s_FF_Crystal_Chronicles_8032e858*/, titleLen);
+    memcpy(m_saveBuffer, "" /*PTR_s_FF_Crystal_Chronicles_8032e858*/, titleLen);
 }
 
 /*
@@ -508,20 +508,20 @@ void CMemoryCardMan::McRead(char* buffer, int length, int offset)
 {
     if (buffer == nullptr)
     {
-        buffer = mSaveBuffer;
+        buffer = m_saveBuffer;
     }
 
-    mOpDoneFlag = 0;
-    mState = 8;
+    m_opDoneFlag = 0;
+    m_state = 8;
 
-    int result = CARDReadAsync(&mFileInfo, buffer, length, offset, &Attach);
+    int result = CARDReadAsync(&m_fileInfo, buffer, length, offset, &Attach);
 
     if (result < 0)
     {
-        mOpDoneFlag = 1;
+        m_opDoneFlag = 1;
     }
 
-    mResult = result;
+    m_result = result;
 }
 
 /*
@@ -533,14 +533,14 @@ void CMemoryCardMan::McWrite(char* buffer, int length, int offset)
 {
     if (buffer == nullptr)
     {
-        buffer = mSaveBuffer;
+        buffer = m_saveBuffer;
     }
 
-    mOpDoneFlag = 0;
-    mState = 9;
+    m_opDoneFlag = 0;
+    m_state = 9;
 
     int result = CARDWriteAsync(
-        &mFileInfo,
+        &m_fileInfo,
         buffer,
         length,
         offset,
@@ -549,10 +549,10 @@ void CMemoryCardMan::McWrite(char* buffer, int length, int offset)
 
     if (result < 0)
     {
-        mOpDoneFlag = 1;
+        m_opDoneFlag = 1;
     }
 
-    mResult = result;
+    m_result = result;
 }
 
 /*
@@ -562,8 +562,8 @@ void CMemoryCardMan::McWrite(char* buffer, int length, int offset)
  */
 void CMemoryCardMan::McFormat(int chan)
 {
-    mOpDoneFlag = 0;
-    mState = 10;
+    m_opDoneFlag = 0;
+    m_state = 10;
 	
     int result = CARDFormatAsync(
         chan,
@@ -572,10 +572,10 @@ void CMemoryCardMan::McFormat(int chan)
 
     if (result < 0)
     {
-        mOpDoneFlag = 1;
+        m_opDoneFlag = 1;
     }
 
-    mResult = result;
+    m_result = result;
 }
 
 /*
@@ -585,17 +585,17 @@ void CMemoryCardMan::McFormat(int chan)
  */
 void CMemoryCardMan::McCheck(int chan)
 {
-    mOpDoneFlag = 0;
-    mState = 11;
+    m_opDoneFlag = 0;
+    m_state = 11;
 
     int result = CARDCheckAsync(chan, &Attach);
 
     if (result < 0)
     {
-        mOpDoneFlag = 1;
+        m_opDoneFlag = 1;
     }
 
-    mResult = result;
+    m_result = result;
 }
 
 /*
@@ -611,13 +611,13 @@ int CMemoryCardMan::McFreeBlocks(int chan, int* bytesFree, int* filesFree)
 
     result = CARDFreeBlocks(chan, &localBytes, &localFiles);
 
-    mResult = result;
+    m_result = result;
     *bytesFree = localBytes;
     *filesFree = localFiles;
-    mState = 12;
-    mOpDoneFlag = 1;
+    m_state = 12;
+    m_opDoneFlag = 1;
 
-    return mResult;
+    return m_result;
 }
 
 
@@ -628,8 +628,8 @@ int CMemoryCardMan::McFreeBlocks(int chan, int* bytesFree, int* filesFree)
  */
 void CMemoryCardMan::McDelFile(int chan)
 {
-    mOpDoneFlag = 0;
-    mState = 13;
+    m_opDoneFlag = 0;
+    m_state = 13;
 	
     int result = CARDDeleteAsync(
         chan,
@@ -639,10 +639,10 @@ void CMemoryCardMan::McDelFile(int chan)
 
     if (result < 0)
     {
-        mOpDoneFlag = 1;
+        m_opDoneFlag = 1;
     }
 
-    mResult = result;
+    m_result = result;
 }
 
 /*
@@ -652,7 +652,7 @@ void CMemoryCardMan::McDelFile(int chan)
  */
 bool CMemoryCardMan::IsBrokenFile()
 {
-    if (mCardStat.iconAddr == 0xFFFFFFFF || mCardStat.commentAddr == 0xFFFFFFFF)
+    if (m_cardStat.iconAddr == 0xFFFFFFFF || m_cardStat.commentAddr == 0xFFFFFFFF)
     {
 		return 1;
     }
@@ -707,162 +707,162 @@ int CMemoryCardMan::DummySave()
 {
     int result;
 
-    mOpDoneFlag = 0;
-    mState = 1;
+    m_opDoneFlag = 0;
+    m_state = 1;
 
-    result = CARDMountAsync(0, mMountWorkArea, &Detach, &Attach);
+    result = CARDMountAsync(0, m_mountWorkArea, &Detach, &Attach);
     if (result < 0)
     {
-        mOpDoneFlag = 1;
+        m_opDoneFlag = 1;
     }
-    mResult = result;
+    m_result = result;
 
     // Busy-wait for async completion
-    while ((-((int)mOpDoneFlag) | (int)mOpDoneFlag) >= 0)
+    while ((-((int)m_opDoneFlag) | (int)m_opDoneFlag) >= 0)
     {
     }
 
-    if (mResult == -6)
+    if (m_result == -6)
     {
-        mOpDoneFlag = 0;
-        mState = 10;
+        m_opDoneFlag = 0;
+        m_state = 10;
 
         result = CARDFormatAsync(0, &Attach);
         if (result < 0)
         {
-            mOpDoneFlag = 1;
+            m_opDoneFlag = 1;
         }
-        mResult = result;
+        m_result = result;
 
-        while ((-((int)mOpDoneFlag) | (int)mOpDoneFlag) >= 0)
+        while ((-((int)m_opDoneFlag) | (int)m_opDoneFlag) >= 0)
         {
         }
 
-        if (mResult != 0)
+        if (m_result != 0)
         {
-            if (System.mExecParam != 0)
+            if (System.m_execParam != 0)
             {
                 // "%s(%d) McFormat(%d) error(%d)"
                 System.Printf("%s", /* s_McFormat(%d)_error(%d)_801daef8 */ 0);
             }
 
             result = CARDUnmount(0);
-            mResult = result;
-            mOpDoneFlag = 1;
-            mState = 2;
-            mCurrentSlot = 0xFF;
+            m_result = result;
+            m_opDoneFlag = 1;
+            m_state = 2;
+            m_currentSlot = 0xFF;
 
-            return mResult;
+            return m_result;
         }
     }
 
     // Handle general mount error
-    if (mResult != 0)
+    if (m_result != 0)
     {
-        if (System.mExecParam != 0)
+        if (System.m_execParam != 0)
         {
             // "%s(%d) McMount(%d) error(%d)"
             System.Printf("%s", /* s_McMount(%d)_error(%d)_801dae78 */ 0);
         }
 
         result = CARDUnmount(0);
-        mResult = result;
-        mOpDoneFlag = 1;
-        mState = 2;
-        mCurrentSlot = 0xFF;
+        m_result = result;
+        m_opDoneFlag = 1;
+        m_state = 2;
+        m_currentSlot = 0xFF;
 
-        return mResult;
+        return m_result;
     }
 
-    result = CARDOpen(0, /* PTR_DAT_8032e854 */ (const char*)0, &mFileInfo);
-    mResult = result;
-    mOpDoneFlag = 1;
-    mState = 3;
+    result = CARDOpen(0, /* PTR_DAT_8032e854 */ (const char*)0, &m_fileInfo);
+    m_result = result;
+    m_opDoneFlag = 1;
+    m_state = 3;
 
-    if (mResult == -4)
+    if (m_result == -4)
     {
-        mOpDoneFlag = 0;
-        mState = 5;
+        m_opDoneFlag = 0;
+        m_state = 5;
 
         result = CARDCreateAsync(
             0,
             /* PTR_DAT_8032e854 */ (const char*)0,
             0x2C000,
-            &mFileInfo,
+            &m_fileInfo,
             &Attach
         );
 
         if (result < 0)
         {
-            mOpDoneFlag = 1;
+            m_opDoneFlag = 1;
         }
-        mResult = result;
+        m_result = result;
 
-        while ((-((int)mOpDoneFlag) | (int)mOpDoneFlag) >= 0)
+        while ((-((int)m_opDoneFlag) | (int)m_opDoneFlag) >= 0)
         {
         }
 
-        if (mResult != 0)
+        if (m_result != 0)
         {
-            if (System.mExecParam != 0)
+            if (System.m_execParam != 0)
             {
                 // "McCreate(%d) error(%d)"
                 System.Printf("%s", /* s_McCreate(%d)_error(%d)_801daf10 */ 0);
             }
 
             result = CARDUnmount(0);
-            mResult = result;
-            mOpDoneFlag = 1;
-            mState = 2;
-            mCurrentSlot = 0xFF;
+            m_result = result;
+            m_opDoneFlag = 1;
+            m_state = 2;
+            m_currentSlot = 0xFF;
 
-            return mResult;
+            return m_result;
         }
 
-        result = CARDGetStatus(0, mFileInfo.fileNo, &mCardStat);
-        mResult = result;
-        mOpDoneFlag = 1;
-        mState = 6;
+        result = CARDGetStatus(0, m_fileInfo.fileNo, &m_cardStat);
+        m_result = result;
+        m_opDoneFlag = 1;
+        m_state = 6;
 
-        if (mResult != 0)
+        if (m_result != 0)
         {
-            if (System.mExecParam != 0)
+            if (System.m_execParam != 0)
             {
                 // "McGetStat(%d) error(%d)"
                 System.Printf("%s", /* s_McGetStat(%d)_error(%d)_801daf28 */ 0);
             }
 
             result = CARDUnmount(0);
-            mResult = result;
-            mOpDoneFlag = 1;
-            mState = 2;
-            mCurrentSlot = 0xFF;
+            m_result = result;
+            m_opDoneFlag = 1;
+            m_state = 2;
+            m_currentSlot = 0xFF;
 
-            return mResult;
+            return m_result;
         }
 
-        if (mSaveBuffer == 0)
+        if (m_saveBuffer == 0)
         {
-            mSaveBuffer = (char*)0;  
+            m_saveBuffer = (char*)0;  
             // __nwa__(0xA000, mStage, s_memorycard_cpp_801daea8, 0x2AB);
 
-            if (mSaveBuffer == 0 && System.mExecParam != 0)
+            if (m_saveBuffer == 0 && System.m_execParam != 0)
             {
                 // "%s(%d): Error: memory allocation"
                 System.Printf("%s", /* s_%s(%d):_Error:_memory_allocation_801daeb8 */ 0);
             }
         }
 
-        memset(mSaveBuffer, 0, 0xA000);
+        memset(m_saveBuffer, 0, 0xA000);
 		
         SetMcIconImage();
 
-        mOpDoneFlag = 0;
-        mState = 9;
+        m_opDoneFlag = 0;
+        m_state = 9;
 
         result = CARDWriteAsync(
-            &mFileInfo,
-            mSaveBuffer,
+            &m_fileInfo,
+            m_saveBuffer,
             0x4000,
             0,
             &Attach
@@ -870,87 +870,87 @@ int CMemoryCardMan::DummySave()
 
         if (result < 0)
         {
-            mOpDoneFlag = 1;
+            m_opDoneFlag = 1;
         }
-        mResult = result;
+        m_result = result;
 
-        while ((-((int)mOpDoneFlag) | (int)mOpDoneFlag) >= 0)
+        while ((-((int)m_opDoneFlag) | (int)m_opDoneFlag) >= 0)
         {
         }
 
-        if (mResult != 0)
+        if (m_result != 0)
         {
-            if (System.mExecParam != 0)
+            if (System.m_execParam != 0)
             {
                 System.Printf("%s", /* s_McWrite(%d)_error(%d)_801daf44 */ 0);
             }
 
             result = CARDUnmount(0);
-            mResult = result;
-            mOpDoneFlag = 1;
-            mState = 2;
-            mCurrentSlot = 0xFF;
+            m_result = result;
+            m_opDoneFlag = 1;
+            m_state = 2;
+            m_currentSlot = 0xFF;
 
-            if (mSaveBuffer != 0)
+            if (m_saveBuffer != 0)
             {
-                delete[] mSaveBuffer;
-                mSaveBuffer = 0;
+                delete[] m_saveBuffer;
+                m_saveBuffer = 0;
             }
 
-            return mResult;
+            return m_result;
         }
 
-        result = CARDSetStatus(0, mFileInfo.fileNo, &mCardStat);
-        mResult = result;
-        mOpDoneFlag = 1;
-        mState = 7;
+        result = CARDSetStatus(0, m_fileInfo.fileNo, &m_cardStat);
+        m_result = result;
+        m_opDoneFlag = 1;
+        m_state = 7;
 
-        if (mResult != 0)
+        if (m_result != 0)
         {
-            if (System.mExecParam != 0)
+            if (System.m_execParam != 0)
             {
                 System.Printf("%s", /* s_McSetStat(%d)_error(%d)_801daf5c */ 0);
             }
 
             result = CARDUnmount(0);
-            mResult = result;
-            mOpDoneFlag = 1;
-            mState = 2;
-            mCurrentSlot = 0xFF;
+            m_result = result;
+            m_opDoneFlag = 1;
+            m_state = 2;
+            m_currentSlot = 0xFF;
 
-            if (mSaveBuffer != 0)
+            if (m_saveBuffer != 0)
             {
-                delete[] mSaveBuffer;
-                mSaveBuffer = 0;
+                delete[] m_saveBuffer;
+                m_saveBuffer = 0;
             }
 
-            return mResult;
+            return m_result;
         }
     }
     else
     {
-        if (mSaveBuffer == 0)
+        if (m_saveBuffer == 0)
         {
-            mSaveBuffer = (char*)0;
+            m_saveBuffer = (char*)0;
             // __nwa__(0xA000, ...)
 
-            if (mSaveBuffer == 0 && System.mExecParam != 0)
+            if (m_saveBuffer == 0 && System.m_execParam != 0)
             {
                 System.Printf("%s", /* s_%s(%d):_Error:_memory_allocation_801daeb8 */ 0);
             }
         }
 
-        memset(mSaveBuffer, 0, 0xA000);
+        memset(m_saveBuffer, 0, 0xA000);
     }
 
     MakeSaveData();
 	
-    mOpDoneFlag = 0;
-    mState = 9;
+    m_opDoneFlag = 0;
+    m_state = 9;
 
     result = CARDWriteAsync(
-        &mFileInfo,
-        mSaveBuffer,
+        &m_fileInfo,
+        m_saveBuffer,
         0xA000,
         0x4000,
         &Attach
@@ -958,82 +958,82 @@ int CMemoryCardMan::DummySave()
 
     if (result < 0)
     {
-        mOpDoneFlag = 1;
+        m_opDoneFlag = 1;
     }
-    mResult = result;
+    m_result = result;
 
-    while ((-((int)mOpDoneFlag) | (int)mOpDoneFlag) >= 0)
+    while ((-((int)m_opDoneFlag) | (int)m_opDoneFlag) >= 0)
     {
     }
 
-    if (mResult == 0)
+    if (m_result == 0)
     {
-        if (mSaveBuffer != 0)
+        if (m_saveBuffer != 0)
         {
-            delete[] mSaveBuffer;
-            mSaveBuffer = 0;
+            delete[] m_saveBuffer;
+            m_saveBuffer = 0;
         }
 
-        int chan = mFileInfo.chan;
+        int chan = m_fileInfo.chan;
 
         if (chan < 0 || chan > 1)
         {
-            mOpDoneFlag = 1;
-            mState = 4;
-            mResult = -3;
+            m_opDoneFlag = 1;
+            m_state = 4;
+            m_result = -3;
         }
         else
         {
-            result = CARDClose(&mFileInfo);
-            mResult = result;
-            mOpDoneFlag = 1;
-            mState = 4;
+            result = CARDClose(&m_fileInfo);
+            m_result = result;
+            m_opDoneFlag = 1;
+            m_state = 4;
         }
 
         result = CARDUnmount(0);
-        mResult = result;
-        mOpDoneFlag = 1;
+        m_result = result;
+        m_opDoneFlag = 1;
 
-        mState = 2;
-        mCurrentSlot = 0xFF;
+        m_state = 2;
+        m_currentSlot = 0xFF;
 
         return 0;
     }
 
-    if (System.mExecParam != 0)
+    if (System.m_execParam != 0)
     {
         System.Printf("%s", /* s_McWrite(%d)_error(%d)_801daf44 */ 0);
     }
 
-    int chan = mFileInfo.chan;
+    int chan = m_fileInfo.chan;
 
     if (chan < 0 || chan > 1)
     {
-        mOpDoneFlag = 1;
-        mState = 4;
-        mResult = -3;
+        m_opDoneFlag = 1;
+        m_state = 4;
+        m_result = -3;
     }
     else
     {
-        result = CARDClose(&mFileInfo);
-        mResult = result;
-        mOpDoneFlag = 1;
-        mState = 4;
+        result = CARDClose(&m_fileInfo);
+        m_result = result;
+        m_opDoneFlag = 1;
+        m_state = 4;
     }
 
     result = CARDUnmount(0);
-    mResult = result;
-    mOpDoneFlag = 1;
-    mState = 2;
-    mCurrentSlot = 0xFF;
+    m_result = result;
+    m_opDoneFlag = 1;
+    m_state = 2;
+    m_currentSlot = 0xFF;
 
-    if (mSaveBuffer != 0)
+    if (m_saveBuffer != 0)
     {
-        delete[] mSaveBuffer;
-        mSaveBuffer = 0;
+        delete[] m_saveBuffer;
+        m_saveBuffer = 0;
     }
 
-    return mResult;
+    return m_result;
 }
 
 /*
@@ -1046,80 +1046,80 @@ int CMemoryCardMan::DummyLoad()
     int result;
 
     // Begin mount
-    mOpDoneFlag = 0;
-    mState = 1;
+    m_opDoneFlag = 0;
+    m_state = 1;
 
-    result = CARDMountAsync(0, mMountWorkArea, &Detach, &Attach);
+    result = CARDMountAsync(0, m_mountWorkArea, &Detach, &Attach);
     if (result < 0)
     {
-        mOpDoneFlag = 1;
+        m_opDoneFlag = 1;
     }
-    mResult = result;
+    m_result = result;
 
     // Busy wait for async completion
-    while ( ((-(int)mOpDoneFlag) | (int)mOpDoneFlag) >= 0 )
+    while ( ((-(int)m_opDoneFlag) | (int)m_opDoneFlag) >= 0 )
     {
     }
 
     // If mount failed
-    if (mResult != 0)
+    if (m_result != 0)
     {
-        if (System.mExecParam != 0)
+        if (System.m_execParam != 0)
         {
             // "McMount(%d) error(%d)"
             System.Printf("%s", /* s_McMount(%d)_error(%d)_801dae78 */ 0);
         }
 
         result = CARDUnmount(0);
-        mResult = result;
-        mOpDoneFlag = 1;
-        mState = 2;
-        mCurrentSlot = 0xFF;
+        m_result = result;
+        m_opDoneFlag = 1;
+        m_state = 2;
+        m_currentSlot = 0xFF;
 
-        return mResult;
+        return m_result;
     }
 
-    result = CARDOpen(0, /* PTR_DAT_8032e854 */ (const char*)0, &mFileInfo);
-    mResult = result;
-    mOpDoneFlag = 1;
-    mState = 3;
+    result = CARDOpen(0, /* PTR_DAT_8032e854 */ (const char*)0, &m_fileInfo);
+    m_result = result;
+    m_opDoneFlag = 1;
+    m_state = 3;
 
-    if (mResult != 0)
+    if (m_result != 0)
     {
         // Open failed
-        if (System.mExecParam != 0)
+        if (System.m_execParam != 0)
         {
             // "McOpen(%d) error(%d)"
             System.Printf("%s", /* s_McOpen(%d)_error(%d)_801dae90 */ 0);
         }
 
         result = CARDUnmount(0);
-        mResult = result;
-        mOpDoneFlag = 1;
-        mState = 2;
-        mCurrentSlot = 0xFF;
+        m_result = result;
+        m_opDoneFlag = 1;
+        m_state = 2;
+        m_currentSlot = 0xFF;
 
-        return mResult;
+        return m_result;
     }
 
-    if (mSaveBuffer == 0)
+    if (m_saveBuffer == 0)
     {
-        mSaveBuffer = (char*)0; 
+        m_saveBuffer = (char*)0; 
         // __nwa__(0xA000, mStage, s_memorycard_cpp_801daea8, 0x2AB);
 
-        if (mSaveBuffer == 0 && System.mExecParam != 0)
+        if (m_saveBuffer == 0 && System.m_execParam != 0)
         {
             System.Printf("%s", /* s_%s(%d):_Error:_memory_allocation_801daeb8 */ 0);
         }
     }
 
-    memset(mSaveBuffer, 0, 0xA000);
-    mOpDoneFlag = 0;
-    mState = 8;
+    memset(m_saveBuffer, 0, 0xA000);
+    m_opDoneFlag = 0;
+    m_state = 8;
 
     result = CARDReadAsync(
-        &mFileInfo,
-        mSaveBuffer,
+        &m_fileInfo,
+        m_saveBuffer,
         0xA000,
         0x4000,
         &Attach
@@ -1127,88 +1127,88 @@ int CMemoryCardMan::DummyLoad()
 
     if (result < 0)
     {
-        mOpDoneFlag = 1;
+        m_opDoneFlag = 1;
     }
 
-    mResult = result;
+    m_result = result;
 
     // Wait for read to finish
-    while ( ((-(int)mOpDoneFlag) | (int)mOpDoneFlag) >= 0 )
+    while ( ((-(int)m_opDoneFlag) | (int)m_opDoneFlag) >= 0 )
     {
     }
 
-    if (mResult == 0)
+    if (m_result == 0)
     {
-        int chan = mFileInfo.chan;
+        int chan = m_fileInfo.chan;
 
         if (chan < 0 || chan > 1)
         {
-            mOpDoneFlag = 1;
-            mState = 4;
-            mResult = -3;
+            m_opDoneFlag = 1;
+            m_state = 4;
+            m_result = -3;
         }
         else
         {
-            result = CARDClose(&mFileInfo);
-            mResult = result;
-            mOpDoneFlag = 1;
-            mState = 4;
+            result = CARDClose(&m_fileInfo);
+            m_result = result;
+            m_opDoneFlag = 1;
+            m_state = 4;
         }
 
         result = CARDUnmount(0);
-        mResult = result;
-        mOpDoneFlag = 1;
-        mState = 2;
-        mCurrentSlot = 0xFF;
+        m_result = result;
+        m_opDoneFlag = 1;
+        m_state = 2;
+        m_currentSlot = 0xFF;
 
         // Game.LoadInit();
         SetLoadData();
         // Game.LoadFinished();
 
-        if (mSaveBuffer != 0)
+        if (m_saveBuffer != 0)
         {
-            delete[] mSaveBuffer;
-            mSaveBuffer = 0;
+            delete[] m_saveBuffer;
+            m_saveBuffer = 0;
         }
 
         return 0;
     }
 
-    if (System.mExecParam != 0)
+    if (System.m_execParam != 0)
     {
         // "McRead(%d) error(%d)"
         System.Printf("%s", /* s_McRead(%d)_error(%d)_801daee0 */ 0);
     }
 
-    int chan = mFileInfo.chan;
+    int chan = m_fileInfo.chan;
 
     if (chan < 0 || chan > 1)
     {
-        mOpDoneFlag = 1;
-        mState = 4;
-        mResult = -3;
+        m_opDoneFlag = 1;
+        m_state = 4;
+        m_result = -3;
     }
     else
     {
-        result = CARDClose(&mFileInfo);
-        mResult = result;
-        mOpDoneFlag = 1;
-        mState = 4;
+        result = CARDClose(&m_fileInfo);
+        m_result = result;
+        m_opDoneFlag = 1;
+        m_state = 4;
     }
 
     result = CARDUnmount(0);
-    mResult = result;
-    mOpDoneFlag = 1;
-    mState = 2;
-    mCurrentSlot = 0xFF;
+    m_result = result;
+    m_opDoneFlag = 1;
+    m_state = 2;
+    m_currentSlot = 0xFF;
 
-    if (mSaveBuffer != 0)
+    if (m_saveBuffer != 0)
     {
-        delete[] mSaveBuffer;
-        mSaveBuffer = 0;
+        delete[] m_saveBuffer;
+        m_saveBuffer = 0;
     }
 
-    return mResult;
+    return m_result;
 }
 
 /*
@@ -1295,10 +1295,10 @@ inline int rotrwi(int, int)
  */
 void CMemoryCardMan::EncodeData()
 {
-    const u8  key = mSaveBuffer[0x11];
+    const u8  key = m_saveBuffer[0x11];
     const u32 rotAmount = key & 0x1F;
 
-    u32* ptr = reinterpret_cast<u32*>(mSaveBuffer + 0x18);
+    u32* ptr = reinterpret_cast<u32*>(m_saveBuffer + 0x18);
 
     for (int i = 0; i < 0x5B6; i++)
     {
@@ -1320,9 +1320,9 @@ void CMemoryCardMan::EncodeData()
  */
 void CMemoryCardMan::DecodeData()
 {
-    u32 shift = (mSaveBuffer[0x11] & 0x1F);
+    u32 shift = (m_saveBuffer[0x11] & 0x1F);
     u32 rshift = (32 - shift) & 31; 
-    u32* ptr = reinterpret_cast<u32*>(mSaveBuffer + 0x18);
+    u32* ptr = reinterpret_cast<u32*>(m_saveBuffer + 0x18);
 
     for (int i = 0; i < 0x5B6; i++)
     {
@@ -1357,8 +1357,8 @@ void CMemoryCardMan::Odekake(int, Mc::SaveDat&, int, Mc::SaveDat&, int)
  */
 void Detach(long currentSlot, long result)
 { 
-	MemoryCardMan.mResult = result;
-	MemoryCardMan.mOpDoneFlag = 1;
+	MemoryCardMan.m_result = result;
+	MemoryCardMan.m_opDoneFlag = 1;
 }
 
 /*
@@ -1368,15 +1368,14 @@ void Detach(long currentSlot, long result)
  */
 void Attach(long currentSlot, long result)
 {
-    MemoryCardMan.mResult = result;
-    MemoryCardMan.mOpDoneFlag = 1;
+    MemoryCardMan.m_result = result;
+    MemoryCardMan.m_opDoneFlag = 1;
 
-    if (MemoryCardMan.mState == 1)
+    if (MemoryCardMan.m_state == 1)
     {
         if (result == 0)
         {
-            MemoryCardMan.mCurrentSlot = currentSlot;
+            MemoryCardMan.m_currentSlot = currentSlot;
         }
     }
 }
-

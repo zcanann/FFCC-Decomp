@@ -1,6 +1,8 @@
 #ifndef _FFCC_P_GAME_H_
 #define _FFCC_P_GAME_H_
 
+#include "ffcc/game.h"
+
 class CGamePcs
 {
 public:
@@ -25,6 +27,11 @@ public:
     virtual void onScriptChanged(char *, int);
     virtual void onMapChanging(int, int);
     virtual void onMapChanged(int, int, int);
+
+    char unknown[0x10];
+    CGame game;
 };
+
+extern CGamePcs Game;
 
 #endif // _FFCC_P_GAME_H_

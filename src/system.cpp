@@ -31,28 +31,28 @@ void CSystem::Init()
  */
 void CSystem::Quit()
 {
-	if (mMapBuffer != nullptr)
+	if (m_mapBuffer != nullptr)
 	{
-		delete[]mMapBuffer;
-		mMapBuffer = nullptr;
+		delete[]m_mapBuffer;
+		m_mapBuffer = nullptr;
 	}
 	
-	if (mMapStage != (CStage *)0x0)
+	if (m_mapStage != (CStage *)0x0)
 	{
-		// DestroyStage__7CMemoryFPQ27CMemory6CStage(&g_memory,mMapStage);
+		// DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory,m_mapStage);
 	}
 	
 	/*
-	Quit__14CMemoryCardManFv(&g_memoryCardMan);
-	Quit__8CFontManFv(&g_fontMan);
-	Quit__11CTextureManFv(&g_textureMan);
-	Quit__12CMaterialManFv(&g_materialMan);
-	Quit__8CGraphicFv(&g_Graphic);
-	Quit__4CPadFv(&g_pad);
-	Quit__5CFileFv(&g_file);
-	Quit__6CSoundFv(&g_sound);
-	Quit__7CMemoryFv(&g_memory);
-	Quit__5CMathFv(&g_math);
+	Quit__14CMemoryCardManFv(&MemoryCardMan);
+	Quit__8CFontManFv(&FontMan);
+	Quit__11CTextureManFv(&TextureMan);
+	Quit__12CMaterialManFv(&MaterialMan);
+	Quit__8CGraphicFv(&Graphic);
+	Quit__4CPadFv(&Pad);
+	Quit__5CFileFv(&File);
+	Quit__6CSoundFv(&Sound);
+	Quit__7CMemoryFv(&Memory);
+	Quit__5CMathFv(&Math);
 	*/
 }
 
@@ -110,31 +110,31 @@ unsigned int CSystem::AddScenegraph(CProcess* process, int arg)
             return 1;
 		}
 
-        COrder* sentinel = &mOrderSentinel;
-        COrder* current = sentinel->mNext;
+        COrder* sentinel = &m_orderSentinel;
+        COrder* current = sentinel->m_next;
 
         while (true)
         {
-            if (entry[3] < current->mPriority)
+            if (entry[3] < current->m_priority)
             {
-                COrder* order = mFreeOrderHead.mNext;
-                mFreeOrderHead.mNext = order->mNext;
-                order->mNext = current;
-                order->mPrevious = current->mPrevious;
-                current->mPrevious->mNext = order;
-                current->mPrevious = order;
-                order->mEntry = entry;
-                order->mInsertIndex = insertIndex++;
-                order->mDescBlock = description;
-                order->mOwner = process;
-                order->mPriority = entry[3];
-                order->mDebugName = (void*)description[0];
-                mOrderCount++;
+                COrder* order = m_freeOrderHead.m_next;
+                m_freeOrderHead.m_next = order->m_next;
+                order->m_next = current;
+                order->m_previous = current->m_previous;
+                current->m_previous->m_next = order;
+                current->m_previous = order;
+                order->m_entry = entry;
+                order->m_insertIndex = insertIndex++;
+                order->m_descBlock = description;
+                order->m_owner = process;
+                order->m_priority = entry[3];
+                order->m_debugName = (void*)description[0];
+                m_orderCount++;
 				
                 break;
             }
 
-            current = current->mNext;
+            current = current->m_next;
 			
             if (current == sentinel)
 			{
@@ -154,20 +154,20 @@ unsigned int CSystem::AddScenegraph(CProcess* process, int arg)
 void CSystem::RemoveScenegraph(CProcess* process, int arg)
 {
     void* descBlock = (void*)this; // proc->GetScenegraphBlock(arg);
-    COrder* order = mOrderSentinel.mNext;
+    COrder* order = m_orderSentinel.m_next;
 	
-    while (order != &mOrderSentinel)
+    while (order != &m_orderSentinel)
     {
-        COrder* next = order->mNext;
+        COrder* next = order->m_next;
 
-        if (order->mDescBlock == descBlock)
+        if (order->m_descBlock == descBlock)
         {
-            order->mPrevious->mNext = order->mNext;
-            order->mNext->mPrevious = order->mPrevious;
-            order->mNext = mFreeOrderHead.mNext;
-            mFreeOrderHead.mNext = order;
+            order->m_previous->m_next = order->m_next;
+            order->m_next->m_previous = order->m_previous;
+            order->m_next = m_freeOrderHead.m_next;
+            m_freeOrderHead.m_next = order;
 
-            mOrderCount--;
+            m_orderCount--;
         }
 
         order = next;
@@ -187,11 +187,11 @@ void CSystem::RemoveScenegraph(CProcess* process, int arg)
  */
 void CSystem::ScriptChanging(char *)
 {
-	for (COrder* order = mOrderSentinel.mNext; order != &mOrderSentinel; order = order->mNext)
+	for (COrder* order = m_orderSentinel.m_next; order != &m_orderSentinel; order = order->m_next)
 	{
-		if (order->mEntry == (void *)((int)order->mDescBlock + 0x1c))
+		if (order->m_entry == (void *)((int)order->m_descBlock + 0x1c))
 		{
-			//(**(code **)((int)*order->mOwner + 0x14))(order->mOwner,param_2);
+			//(**(code **)((int)*order->m_owner + 0x14))(order->m_owner,param_2);
 		}
 	}
 }
@@ -203,11 +203,11 @@ void CSystem::ScriptChanging(char *)
  */
 void CSystem::ScriptChanged(char *, int)
 {
-	for (COrder* order = mOrderSentinel.mNext; order != &mOrderSentinel; order = order->mNext)
+	for (COrder* order = m_orderSentinel.m_next; order != &m_orderSentinel; order = order->m_next)
 	{
-		if (order->mEntry == (void *)((int)order->mDescBlock + 0x1c))
+		if (order->m_entry == (void *)((int)order->m_descBlock + 0x1c))
 		{
-			//(**(code **)((int)*order->mOwner + 0x18))(order->mOwner,param_2,param_3);
+			//(**(code **)((int)*order->m_owner + 0x18))(order->m_owner,param_2,param_3);
 		}
 	}
 }
@@ -219,11 +219,11 @@ void CSystem::ScriptChanged(char *, int)
  */
 void CSystem::MapChanging(int, int)
 {
-	for (COrder* order = mOrderSentinel.mNext; order != &mOrderSentinel; order = order->mNext)
+	for (COrder* order = m_orderSentinel.m_next; order != &m_orderSentinel; order = order->m_next)
 	{
-		if (order->mEntry == (void *)((int)order->mDescBlock + 0x1c))
+		if (order->m_entry == (void *)((int)order->m_descBlock + 0x1c))
 		{
-			//(**(code **)((int)*order->mOwner + 0x1c))(order->mOwner,param_2,param_3)
+			//(**(code **)((int)*order->m_owner + 0x1c))(order->m_owner,param_2,param_3)
 		}
 	}
 }
@@ -235,11 +235,11 @@ void CSystem::MapChanging(int, int)
  */
 void CSystem::MapChanged(int, int, int)
 {
-	for (COrder* order = mOrderSentinel.mNext; order != &mOrderSentinel; order = order->mNext)
+	for (COrder* order = m_orderSentinel.m_next; order != &m_orderSentinel; order = order->m_next)
 	{
-		if (order->mEntry == (void *)((int)order->mDescBlock + 0x1c))
+		if (order->m_entry == (void *)((int)order->m_descBlock + 0x1c))
 		{
-			//(**(code **)((int)*order->mOwner + 0x20))(order->mOwner,param_2,param_3,param_4);
+			//(**(code **)((int)*order->m_owner + 0x20))(order->m_owner,param_2,param_3,param_4);
 		}
 	}
 }
@@ -251,9 +251,9 @@ void CSystem::MapChanged(int, int, int)
  */
 CSystem::COrder* CSystem::GetFirstOrder()
 { 
-	COrder* order = mOrderSentinel.mNext;
+	COrder* order = m_orderSentinel.m_next;
 	
-	if (order == &mOrderSentinel)
+	if (order == &m_orderSentinel)
 	{
 		return (COrder*)nullptr;
 	}
@@ -268,12 +268,12 @@ CSystem::COrder* CSystem::GetFirstOrder()
  */
 CSystem::COrder* CSystem::GetNextOrder(CSystem::COrder* order)
 { 
-	if (order->mNext == &mOrderSentinel)
+	if (order->m_next == &m_orderSentinel)
 	{
 		return (COrder*)0x0;
 	}
 	
-	return order->mNext;
+	return order->m_next;
 }
 
 /*
@@ -290,7 +290,7 @@ CSystem::COrder* CSystem::GetOrder(int index)
 		return nextOrder;
 	}
 	
-	nextOrder = (mOrderSentinel).mNext;
+	nextOrder = (m_orderSentinel).m_next;
 	int foundIndex = 0;
 	
 	while (nextOrder)
@@ -300,7 +300,7 @@ CSystem::COrder* CSystem::GetOrder(int index)
 			break;
 		}
 		
-		nextOrder = nextOrder->mNext;
+		nextOrder = nextOrder->m_next;
 		foundIndex++;
 	}
 	
@@ -349,4 +349,3 @@ void OSPanic(...)
 {
 	// TODO
 }
-

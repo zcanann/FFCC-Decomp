@@ -6,7 +6,7 @@
 
 #include <dolphin/gx.h>
 
-class Vec;
+struct Vec;
 class CColor;
 class CColor3;
 class CMemory;

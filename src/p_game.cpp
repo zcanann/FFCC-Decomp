@@ -67,7 +67,7 @@ void CGamePcs::destroy()
  */
 void CGamePcs::calcInit()
 {
-	// TODO
+	Game.game.CheckScriptChange();
 }
 
 /*

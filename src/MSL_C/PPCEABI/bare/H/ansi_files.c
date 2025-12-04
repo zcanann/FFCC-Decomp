@@ -92,7 +92,7 @@ void __close_all() {
         if (last_file->is_dynamically_allocated) {
             free(last_file);
         } else {
-            last_file->file_mode.file_kind = __string_file;
+            last_file->file_mode.file_kind = __strinFile;
             if (file != NULL && file->is_dynamically_allocated) {
                 last_file->next_file_struct = NULL;
             }

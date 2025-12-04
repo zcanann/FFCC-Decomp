@@ -5,7 +5,7 @@ class CFont;
 class CGPrgObj;
 class CGPartyObj;
 class CGCharaObj;
-class Vec;
+struct Vec;
 class CVector;
 class CMapPcs;
 

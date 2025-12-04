@@ -67,16 +67,16 @@ public:
     void CalcSaveDatHpMax(Mc::SaveDat*);
     void Odekake(int, Mc::SaveDat&, int, Mc::SaveDat&, int);
 
-    // void* vtable;              // 0x00
-    int mResult;                  // 0x04
-    char mOpDoneFlag;             // 0x08
-    CStage* mStage;               // 0x0C
-    void* mMountWorkArea;         // 0x10
-    char* mSaveBuffer;            // 0x14
-    CARDFileInfo mFileInfo;       // 0x18 (size 0x12)
-    CARDStat mCardStat;           // 0x2C (size 0x6C)
-    unsigned char mState;         // 0x98
-    char mCurrentSlot;            // 0x99
+    // void* vtable;           // 0x00
+    int m_result;              // 0x04
+    char m_opDoneFlag;         // 0x08
+    CStage* m_stage;           // 0x0C
+    void* m_mountWorkArea;     // 0x10
+    char* m_saveBuffer;        // 0x14
+    CARDFileInfo m_fileInfo;   // 0x18 (size 0x12)
+    CARDStat m_cardStat;       // 0x2C (size 0x6C)
+    unsigned char m_state;     // 0x98
+    char m_currentSlot;        // 0x99
 };
 
 extern CMemoryCardMan MemoryCardMan;

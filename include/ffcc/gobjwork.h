@@ -10,8 +10,10 @@ public:
     CGObjWork();
     ~CGObjWork();
 
-    void Init(int, CRomWork *, int);
+    void Init(int, CRomWork*, int);
     void CalcStatus();
+
+    char placeholderData[0x100];
 };
 
 class CMonWork
@@ -20,13 +22,21 @@ public:
     CMonWork();
     ~CMonWork();
 
-    void Init(int, CRomWork *, int);
+    void Init(int, CRomWork*, int);
     void CalcStatus();
+    
+    char placeholderData[0x110];
 };
 
 class CCaravanWork
 {
 public:
+    class CLetterWork
+    {
+    public:
+        void operator=(const CLetterWork&);
+    };
+
     CCaravanWork();
     ~CCaravanWork();
     
@@ -34,17 +44,10 @@ public:
     void LoadInit();
     void ClearEvtWork();
     void LoadFinished();
-    void Init(int, CRomWork *, int);
+    void Init(int, CRomWork*, int);
     void SetBonusCondition(int);
     void IsOutOfShouki();
     void AddLetter(int, int, int, int, int, int, int, int, int);
-
-    class CLetterWork
-    {
-    public:
-        void operator=(const CLetterWork &);
-    };
-
     void FGLetterOpen(int);
     void FGLetterReply(int, int, int, int);
     void FGUseItem(int, int);
@@ -53,26 +56,26 @@ public:
     void ChgCmdLst(int, int);
     void ChgEquipPos(int, int);
     void CanAddComList(int);
-    void AddComList(int, int *);
+    void AddComList(int, int*);
     void DeleteCmdList(int, int);
-    void AddItem(int, int *);
+    void AddItem(int, int*);
     void SetArtifact(int, int);
     void FGAddItemIdx(int, int);
-    void ChkNumItem(char *, int);
+    void ChkNumItem(char*, int);
     void CanAddTmpArtifact(int);
     void FindItem(int);
     void DeleteItemIdx(int, int);
     void DeleteItem(int, int);
-    void AddTmpArtifact(int, int *);
+    void AddTmpArtifact(int, int*);
     void CanAddGil(int);
     void AddGil(int);
     void GetFoodRank(int);
-    void SearchRomLetterWork(CRomLetterWork **, int);
+    void SearchRomLetterWork(CRomLetterWork**, int);
     void ShopRequest(int, int, int, int, int, int, int);
     void CallShop(int, int, int, int, int);
     void SafeDeleteTempItem();
-    void ClampStatus(short &, unsigned short &);
-    void CalcArtifactStatus(int, int, int &, int &, int &, int &, int &);
+    void ClampStatus(short&, unsigned short&);
+    void CalcArtifactStatus(int, int, int&, int&, int&, int&, int&);
     void CalcStatus();
     void CanPlayerUseItem();
     void ValidCmdList(int);
@@ -80,7 +83,7 @@ public:
     void SetIdxCmdList(int);
     void IsUseCmdList(int);
     void IsSelectedCmdList(int);
-    void GetMagicCharge(int, int &, int &);
+    void GetMagicCharge(int, int&, int&);
     void GetCmdListItemName(int);
     void GetWeaponAttrib(int);
     void GetCmdListItem(int);
@@ -89,7 +92,7 @@ public:
     void GetNumCombi(int);
     void GetNextCmdListIdx(int, int);
     void CanPlayerPutItem();
-    void GetCurrentWeaponItem(int &, int &);
+    void GetCurrentWeaponItem(int&, int&);
     void SetCurrentWeaponIdx(int);
     void CheckAndResetCurrentWeaponIdx(int);
     void SortBeforeReturnWorldMap();
@@ -97,6 +100,8 @@ public:
     void UniteComList(int, int, int);
     void UnuniteComList(int, int);
     void GetEvtFlag(int);
+
+    char placeholderData[0xC30];
 };
 
 #endif // _FFCC_GOBJWORK_H_

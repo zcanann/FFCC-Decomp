@@ -7,7 +7,7 @@ class CGObject;
 class CGPartyObj;
 class CFlatRuntime;
 class CFont;
-class Vec;
+struct Vec;
 class PPPIFPARAM;
 
 class CGItemObj

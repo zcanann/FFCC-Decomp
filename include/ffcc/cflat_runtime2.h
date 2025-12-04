@@ -12,7 +12,7 @@ class CGBaseObj;
 class CGQuadObj;
 class CGMonObj;
 class CGItemObj;
-class Vec;
+struct Vec;
 
 class CFlatRuntime2
 {

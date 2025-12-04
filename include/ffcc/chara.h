@@ -9,7 +9,7 @@ class CMemory;
 class CTexAnimSet;
 class Quaternion;
 class S16Vec;
-class Vec;
+struct Vec;
 
 void D3DXMatrixMultiplyRotate(float (*)[4], float (*)[4], float (*)[4]);
 void VECLerp(Vec *, Vec *, Vec *, float);

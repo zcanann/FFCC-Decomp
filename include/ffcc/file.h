@@ -21,20 +21,20 @@ public:
 		CHandle();
 		void Reset();
 		
-		CHandle* mNext;
-		CHandle* mPrevious;
-		unsigned int mFlags;
-		DVDFileInfo mDvdFileInfo;
-		unsigned int mFileOffset;
-		int mPriority;
-		int mLength;
-		unsigned int mUserParam;
-		int mCompletionStatus;
-		int mClosedFlag;
-		char mName[64];
-		unsigned int mChunkSize;
-		unsigned int mCurrentOffset;
-		unsigned int mNextOffset;
+		CHandle* m_next;
+		CHandle* m_previous;
+		unsigned int m_flags;
+		DVDFileInfo m_dvdFileInfo;
+		unsigned int m_fileOffset;
+		int m_priority;
+		int m_length;
+		unsigned int m_userParam;
+		int m_completionStatus;
+		int m_closedFlag;
+		char m_name[64];
+		unsigned int m_chunkSize;
+		unsigned int m_currentOffset;
+		unsigned int m_nextOffset;
 	};
 
 	CFile();
@@ -60,14 +60,14 @@ public:
 
 	void DrawError(DVDFileInfo& info, int errorCode);
 	
-    void* mStage;
-    void* mReadBuffer;
-    CHandle mFileHandle;
-    void* mFreeListSentinelDummy;
-    CHandle* mFreeList;
-    CHandle mHandlePoolHead;
-    int mFatalDiskErrorFlag;
-    int mIsDiskError;
+    void* m_stage;
+    void* m_readBuffer;
+    CHandle m_fileHandle;
+    void* m_freeListSentinelDummy;
+    CHandle* m_freeList;
+    CHandle m_handlePoolHead;
+    int m_fatalDiskErrorFlag;
+    int m_isDiskError;
 };
 
 CFile File;

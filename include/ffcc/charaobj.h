@@ -7,7 +7,7 @@ class CGCharaObj;
 class CCombi2Set;
 class CGPartyObj;
 class CFont;
-class Vec;
+struct Vec;
 class PPPIFPARAM;
 class CGObjWork;
 class CFlatRuntime2;

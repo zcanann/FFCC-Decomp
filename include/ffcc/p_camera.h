@@ -5,7 +5,7 @@
 
 class SRT;
 class CBound;
-class Vec;
+struct Vec;
 class CVector;
 class CMapPcs;
 class CGObject;

@@ -8,6 +8,8 @@ class CFlatData
 
 	void Create(void *);
 	void Destroy();
+
+    char placeholderData[0x14D4];
 };
 
 #endif // _FFCC_CFLAT_DATA_H_

@@ -1,7 +1,7 @@
 #ifndef _FFCC_MONOBJ_BOSS_H_
 #define _FFCC_MONOBJ_BOSS_H_
 
-class Vec;
+struct Vec;
 class CGObject;
 
 class CGMonObj

@@ -1,7 +1,7 @@
 #ifndef _FFCC_ASTAR_H_
 #define _FFCC_ASTAR_H_
 
-class Vec;
+struct Vec;
 class CGPartyObj;
 
 class CAStar

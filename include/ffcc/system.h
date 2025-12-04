@@ -26,22 +26,21 @@ class CSystem
 public:
     struct COrder
 	{
-        unsigned int   mPriority;  // 0x00
-        float      mLastTime;      // 0x04
-        void*      mDebugName;     // 0x08
-        int    mInsertIndex;       // 0x0C
-        COrder*    mPrevious;      // 0x10
-        COrder*    mNext;          // 0x14
-        CProcess*  mOwner;         // 0x18
-        void*      mDescBlock;     // 0x1C
-        void*      mEntry;         // 0x20
+        unsigned int m_priority;  // 0x00
+        float m_lastTime;        // 0x04
+        void* m_debugName;       // 0x08
+        int m_insertIndex;       // 0x0C
+        COrder* m_previous;      // 0x10
+        COrder* m_next;          // 0x14
+        CProcess* m_owner;       // 0x18
+        void* m_descBlock;       // 0x1C
+        void* m_entry;          // 0x20
         // sizeof = 0x24
     };
 
 public:
-    static void errorHandler(unsigned short, OSContext*, unsigned long, unsigned long);
-
     CSystem();
+
     void Init();
     void Quit();
     void Printf(char*, ...);
@@ -65,22 +64,24 @@ public:
     void DumpMapFile(void*);
     void OSPanic(...);
 
-    // void* vtable;              // 0x0000 (4 bytes)
-    int mExitFlag;                // 0x0004
-    COrder mOrderSentinel;        // 0x0008 (size 0x24)
-    COrder mFreeOrderHead;        // 0x002C (size 0x24)
-    COrder orderPool[128];        // 0x0050 (0x24 * 128 = 0x1200)
-    int mOrderCount;              // 0x1250
-    int mScenegraphStepMode;      // 0x1254
-    unsigned int mFrameCounter;   // 0x1258
-    int mExecParam;               // 0x125C
-    OSThread* mOwnerThread;       // 0x1260
-    COrder* mCurrentOrder;        // 0x1264
-    int mCurrentOrderIndex;       // 0x1268
-    int mInitialized;             // 0x126C
-    CStage* mMapStage;            // 0x1270
-    void* mMapBuffer;             // 0x1274
-    unsigned int mMapSize;        // 0x1278
+    static void errorHandler(unsigned short, OSContext*, unsigned long, unsigned long);
+
+    // void* vtable;               // 0x0000 (4 bytes)
+    int m_exitFlag;                // 0x0004
+    COrder m_orderSentinel;        // 0x0008 (size 0x24)
+    COrder m_freeOrderHead;        // 0x002C (size 0x24)
+    COrder m_orderPool[128];       // 0x0050 (0x24 * 128 = 0x1200)
+    int m_orderCount;              // 0x1250
+    int m_scenegraphStepMode;      // 0x1254
+    unsigned int m_frameCounter;   // 0x1258
+    int m_execParam;               // 0x125C
+    OSThread* m_ownerThread;       // 0x1260
+    COrder* m_currentOrder;        // 0x1264
+    int m_currentOrderIndex;       // 0x1268
+    int m_initialized;             // 0x126C
+    CStage* m_mapStage;            // 0x1270
+    void* m_mapBuffer;             // 0x1274
+    unsigned int m_mapSize;        // 0x1278
 };
 
 extern CSystem System;

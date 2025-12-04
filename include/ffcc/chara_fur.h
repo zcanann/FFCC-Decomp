@@ -14,7 +14,7 @@ class CCombi2;
 class PPPIFPARAM;
 class CFont;
 class CGObjWork;
-class Vec;
+struct Vec;
 class CFlatRuntime2;
 
 void la(CGObject *);

@@ -584,10 +584,10 @@ config.libs = [
             Object(NonMatching, "THPSimple.cpp"),
             Object(NonMatching, "usb.cpp"),
             Object(NonMatching, "USBStreamData.cpp"),
-            # Object(NonMatching, "util.cpp"),
+            Object(NonMatching, "util.cpp"),
             Object(NonMatching, "vector.cpp"),
             Object(NonMatching, "wind.cpp"),
-            # Object(NonMatching, "wm_menu.cpp"),
+            Object(NonMatching, "wm_menu.cpp"),
             Object(NonMatching, "wmm_str.cpp"),
             Object(NonMatching, "zlist.cpp"),
         ]

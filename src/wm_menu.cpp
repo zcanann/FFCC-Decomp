@@ -465,27 +465,7 @@ void CMenuPcs::SplitPlace(const char *, char *, char *)
  * Address:	TODO
  * Size:	TODO
  */
-void std::strrchr(char *, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CMenuPcs::SplitPlace2(const char *, char *, char *, CFont *, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void std::strchr(char *, int)
 {
 	// TODO
 }
@@ -925,16 +905,6 @@ void CMenuPcs::DrawRect2(unsigned long, float, float, float, float, float, float
  * Address:	TODO
  * Size:	TODO
  */
-void GXEnd(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CMenuPcs::DrawRect3d(unsigned long, float, float, float, float, float, float, float, float, float)
 {
 	// TODO
@@ -966,16 +936,6 @@ void CMenuPcs::DrawMcWin(short, short)
  * Size:	TODO
  */
 void CMenuPcs::DrawMcWinMess(int, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void std::strstr(char *, const char *)
 {
 	// TODO
 }
@@ -1045,7 +1005,7 @@ void CMenuPcs::DrawFilter(unsigned char, unsigned char, unsigned char, unsigned 
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::CopyNowCaravanDat(Mc::SaveDat *)
+void CMenuPcs::CopyNowCaravanDat(CMemoryCardMan::Mc::SaveDat *)
 {
 	// TODO
 }
@@ -1055,7 +1015,7 @@ void CMenuPcs::CopyNowCaravanDat(Mc::SaveDat *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::SetCaravanWork(Mc::SaveDat *)
+void CMenuPcs::SetCaravanWork(CMemoryCardMan::Mc::SaveDat *)
 {
 	// TODO
 }
@@ -1065,7 +1025,7 @@ void CMenuPcs::SetCaravanWork(Mc::SaveDat *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::GetSameCharaData(Mc::SaveDat *, Mc::SaveDat *, int, int)
+void CMenuPcs::GetSameCharaData(CMemoryCardMan::Mc::SaveDat *, CMemoryCardMan::Mc::SaveDat *, int, int)
 {
 	// TODO
 }
@@ -1075,7 +1035,7 @@ void CMenuPcs::GetSameCharaData(Mc::SaveDat *, Mc::SaveDat *, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::CheckSameMcFormatID(Mc::SaveDat *, Mc::SaveDat *)
+void CMenuPcs::CheckSameMcFormatID(CMemoryCardMan::Mc::SaveDat *, CMemoryCardMan::Mc::SaveDat *)
 {
 	// TODO
 }
@@ -1245,46 +1205,6 @@ void McCtrl::EraseDat()
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::CHandle::GetLoadAnimTotalFrame(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCharaPcs::CHandle::GetCurrentAnimNumber()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenuPcs::EffectInfo::EffectInfo()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMath::MTXRotRadApply(float (*) [4], float (*) [4], char, float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void McCtrl::GetDno()
 {
 	// TODO
@@ -1366,46 +1286,6 @@ void CMenuPcs::AlphaAdd()
  * Size:	TODO
  */
 void CMenuPcs::GetFontWorld()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGraphic::GetRenderModeObj()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCameraPcs::SetProjectionMatrix(float (*) [4])
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCameraPcs::SetWorldZoomCam(int, unsigned short, float, float, float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMemoryCardMan::GetMcBuffer()
 {
 	// TODO
 }

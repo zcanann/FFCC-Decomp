@@ -5,6 +5,36 @@
  * Address:	TODO
  * Size:	TODO
  */
+CUtil::CUtil()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CUtil::Init()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CUtil::Quit()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 void CUtil::SetVtxFmt_POS_CLR()
 {
 	// TODO
@@ -65,7 +95,7 @@ void CUtil::GetNoise(unsigned char)
  * Address:	TODO
  * Size:	TODO
  */
-void CUtil::GetSplinePos(Vec &, Vec, Vec, Vec, Vec, float, float)
+void CUtil::GetSplinePos(Vec &, Vec&, Vec&, Vec&, Vec&, float, float)
 {
 	// TODO
 }
@@ -75,7 +105,7 @@ void CUtil::GetSplinePos(Vec &, Vec, Vec, Vec, Vec, float, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CUtil::ConvI2FVector(Vec &, S16Vec, long)
+void CUtil::ConvI2FVector(Vec &, S16Vec&, long)
 {
 	// TODO
 }
@@ -85,7 +115,7 @@ void CUtil::ConvI2FVector(Vec &, S16Vec, long)
  * Address:	TODO
  * Size:	TODO
  */
-void CUtil::ConvF2IVector(S16Vec &, Vec, long)
+void CUtil::ConvF2IVector(S16Vec &, Vec&, long)
 {
 	// TODO
 }
@@ -95,7 +125,7 @@ void CUtil::ConvF2IVector(S16Vec &, Vec, long)
  * Address:	TODO
  * Size:	TODO
  */
-void CUtil::ConvF2IVector2d(S16Vec2d &, Vec2d, long)
+void CUtil::ConvF2IVector2d(S16Vec2d &, Vec2d&, long)
 {
 	// TODO
 }
@@ -105,7 +135,7 @@ void CUtil::ConvF2IVector2d(S16Vec2d &, Vec2d, long)
  * Address:	TODO
  * Size:	TODO
  */
-void CUtil::RenderQuadNoTex(Vec, Vec, _GXColor)
+void CUtil::RenderQuadNoTex(Vec&, Vec&, _GXColor)
 {
 	// TODO
 }
@@ -115,7 +145,7 @@ void CUtil::RenderQuadNoTex(Vec, Vec, _GXColor)
  * Address:	TODO
  * Size:	TODO
  */
-void GXEnd(void)
+void CUtil::RenderQuad(Vec&, Vec&, _GXColor, Vec2d *, Vec2d *)
 {
 	// TODO
 }
@@ -125,17 +155,7 @@ void GXEnd(void)
  * Address:	TODO
  * Size:	TODO
  */
-void CUtil::RenderQuad(Vec, Vec, _GXColor, Vec2d *, Vec2d *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CUtil::RenderQuadTex2(Vec, Vec, _GXColor, Vec2d *, Vec2d *)
+void CUtil::RenderQuadTex2(Vec&, Vec&, _GXColor, Vec2d *, Vec2d *)
 {
 	// TODO
 }
@@ -285,7 +305,7 @@ void CUtil::GetNumPolygonFromDL(void *, unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void CUtil::GetDirectVector(Vec *, Vec *, Vec)
+void CUtil::GetDirectVector(Vec *, Vec *, Vec&)
 {
 	// TODO
 }
@@ -316,76 +336,6 @@ void CUtil::SSepa(char *)
  * Size:	TODO
  */
 void CUtil::SNl()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CTexture::GetFormat()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CTexture::GetTexObj()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CTexture::GetTlutObj(unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void __sinit_util_cpp(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CUtil::CUtil()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CUtil::Init()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CUtil::Quit()
 {
 	// TODO
 }

@@ -5,6 +5,16 @@
  * Address:	TODO
  * Size:	TODO
  */
+void SAFE_CAST_WORK(CGObjWork *)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 void CGCharaObj::onCreate()
 {
 	// TODO
@@ -485,46 +495,6 @@ void CGCharaObj::enableAttackCol(int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGPrgObj::bonus(int, int, CGPrgObj *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGPrgObj::getReplaceStat(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGPrgObj::onDamaged(CGPrgObj *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGPrgObj::onAttacked(CGPrgObj *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CGCharaObj::onStatShield()
 {
 	// TODO
@@ -555,26 +525,6 @@ void CGCharaObj::onStatDie()
  * Address:	TODO
  * Size:	TODO
  */
-void CGPrgObj::onChangePrg(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCombi2::GetNumSet()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CGCharaObj::GetCID()
 {
 	// TODO
@@ -586,66 +536,6 @@ void CGCharaObj::GetCID()
  * Size:	TODO
  */
 void CGCharaObj::enableDamageCol(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGPrgObj::onFrameAlways()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGPrgObj::onFrameAlwaysAfter()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPad::GetButtonDownAnalog(long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void SAFE_CAST_WORK(CGObjWork *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFlatRuntime2::IntToClass(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CVector::operator/= (float)
 {
 	// TODO
 }

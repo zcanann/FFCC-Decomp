@@ -1,4 +1,5 @@
 #include "ffcc/chara_fur.h"
+#include "ffcc/charaobj.h"
 
 /*
  * --INFO--

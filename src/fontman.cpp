@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void CFontMan::CFontMan()
+CFontMan::CFontMan()
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void CFontMan::CFontMan()
  * Address:	TODO
  * Size:	TODO
  */
-void CFontMan::~CFontMan()
+CFontMan::~CFontMan()
 {
 	// TODO
 }
@@ -55,7 +55,7 @@ void CFontMan::GetInternal22Size()
  * Address:	TODO
  * Size:	TODO
  */
-void CFont::CFont()
+CFont::CFont()
 {
 	// TODO
 }
@@ -65,17 +65,7 @@ void CFont::CFont()
  * Address:	TODO
  * Size:	TODO
  */
-void CFont::~CFont()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFont::operator new (unsigned long, CMemory::CStage *, char *, int)
+CFont::~CFont()
 {
 	// TODO
 }
@@ -265,36 +255,6 @@ void CFont::Draw(unsigned short)
  * Address:	TODO
  * Size:	TODO
  */
-void GXEnd(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void std::floor(float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void std::floorf(float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CFont::GetWidth(char *)
 {
 	// TODO
@@ -336,26 +296,6 @@ void CFont::getNextChar(char **, unsigned short *)
  * Size:	TODO
  */
 void __sinit_fontman_cpp(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CTexture::SetExternalTlutColor(void *, int, _GXColor &)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GXSetTexCoordGen(void)
 {
 	// TODO
 }

@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatData::CFlatData()
+CFlatData::CFlatData()
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void CFlatData::CFlatData()
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatData::~CFlatData()
+CFlatData::~CFlatData()
 {
 	// TODO
 }

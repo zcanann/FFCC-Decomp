@@ -1,7 +1,10 @@
 #ifndef _FFCC_CFLAT_RUNTIME2_H_
 #define _FFCC_CFLAT_RUNTIME2_H_
 
+#include "ffcc/cflat_runtime.h"
 #include "ffcc/p_chara_viewer.h"
+
+#include <dolphin/gx.h>
 
 class CGObject;
 class CFlatRuntime;
@@ -9,9 +12,7 @@ class CGBaseObj;
 class CGQuadObj;
 class CGMonObj;
 class CGItemObj;
-
-void GXEnd(void);
-void GXSetTexCoordGen(void);
+class Vec;
 
 class CFlatRuntime2
 {

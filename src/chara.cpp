@@ -15,6 +15,16 @@ void D3DXMatrixMultiplyRotate(float (*) [4], float (*) [4], float (*) [4])
  * Address:	TODO
  * Size:	TODO
  */
+CChara::CChara()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 void CChara::Init()
 {
 	// TODO
@@ -75,7 +85,7 @@ void CChara::gqrInit(unsigned long, unsigned long, unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CModel::CRefData::CRefData()
+CChara::CModel::CRefData::CRefData()
 {
 	// TODO
 }
@@ -85,7 +95,7 @@ void CChara::CModel::CRefData::CRefData()
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CModel::CRefData::~CRefData()
+CChara::CModel::CRefData::~CRefData()
 {
 	// TODO
 }
@@ -95,7 +105,7 @@ void CChara::CModel::CRefData::~CRefData()
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CModel::CModel()
+CChara::CModel::CModel()
 {
 	// TODO
 }
@@ -105,7 +115,7 @@ void CChara::CModel::CModel()
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CModel::~CModel()
+CChara::CModel::~CModel()
 {
 	// TODO
 }
@@ -375,7 +385,7 @@ void CChara::CModel::GetDispIndex(CChara::CNode *)
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CNode::CNode()
+CChara::CNode::CNode()
 {
 	// TODO
 }
@@ -385,7 +395,7 @@ void CChara::CNode::CNode()
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CNode::~CNode()
+CChara::CNode::~CNode()
 {
 	// TODO
 }
@@ -415,16 +425,6 @@ void CChara::CNode::Duplicate(CChara::CNode *, CMemory::CStage *)
  * Address:	TODO
  * Size:	TODO
  */
-void Quaternion::operator= (const Quaternion &)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CChara::CNode::CalcBind(CChara::CModel *)
 {
 	// TODO
@@ -435,7 +435,7 @@ void CChara::CNode::CalcBind(CChara::CModel *)
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CNode::CRefData::CRefData()
+CChara::CNode::CRefData::CRefData()
 {
 	// TODO
 }
@@ -445,7 +445,7 @@ void CChara::CNode::CRefData::CRefData()
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CNode::CRefData::~CRefData()
+CChara::CNode::CRefData::~CRefData()
 {
 	// TODO
 }
@@ -455,7 +455,7 @@ void CChara::CNode::CRefData::~CRefData()
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CMesh::CMesh()
+CChara::CMesh::CMesh()
 {
 	// TODO
 }
@@ -465,7 +465,7 @@ void CChara::CMesh::CMesh()
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CMesh::~CMesh()
+CChara::CMesh::~CMesh()
 {
 	// TODO
 }
@@ -515,7 +515,7 @@ void CChara::CMesh::Calc(CChara::CModel *)
  * Address:	TODO
  * Size:	TODO
  */
-void S16Vec::operator= (const S16Vec &)
+CChara::CMesh::CRefData::CRefData()
 {
 	// TODO
 }
@@ -525,7 +525,7 @@ void S16Vec::operator= (const S16Vec &)
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CMesh::CRefData::CRefData()
+CChara::CMesh::CRefData::~CRefData()
 {
 	// TODO
 }
@@ -535,7 +535,7 @@ void CChara::CMesh::CRefData::CRefData()
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CMesh::CRefData::~CRefData()
+CChara::CMesh::CDisplayList::CDisplayList()
 {
 	// TODO
 }
@@ -545,7 +545,7 @@ void CChara::CMesh::CRefData::~CRefData()
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CMesh::CDisplayList::CDisplayList()
+CChara::CMesh::CDisplayList::~CDisplayList()
 {
 	// TODO
 }
@@ -555,7 +555,7 @@ void CChara::CMesh::CDisplayList::CDisplayList()
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CMesh::CDisplayList::~CDisplayList()
+CChara::CSkin::CSkin()
 {
 	// TODO
 }
@@ -565,17 +565,7 @@ void CChara::CMesh::CDisplayList::~CDisplayList()
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CSkin::CSkin()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CSkin::~CSkin()
+CChara::CSkin::~CSkin()
 {
 	// TODO
 }
@@ -586,26 +576,6 @@ void CChara::CSkin::~CSkin()
  * Size:	TODO
  */
 void CChara::CSkin::Create(CChunkFile &, CMemory::CStage *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void VECLerp(Vec *, Vec *, Vec *, float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CTexAnimSet::GetChin()
 {
 	// TODO
 }
@@ -626,76 +596,6 @@ void CChara::CAnimNode::IsScale()
  * Size:	TODO
  */
 void CChara::CModel::CalcNodeWorldMatrix(float (*) [4], CChara::CNode *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CVector::__opP3Vec()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CVector::operator*= (float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CVector::operator+= (const CVector &)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CVector::operator- (const CVector &) const
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CVector::operator= (const CVector &)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void __sinit_chara_cpp(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CChara()
 {
 	// TODO
 }

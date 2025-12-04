@@ -4,8 +4,6 @@
 class Vec;
 class CGPartyObj;
 
-void GXEnd(void);
-
 class CAStar
 {
 	class CATemp

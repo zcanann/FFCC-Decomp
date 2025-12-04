@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::CFlatRuntime()
+CFlatRuntime::CFlatRuntime()
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void CFlatRuntime::CFlatRuntime()
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::~CFlatRuntime()
+CFlatRuntime::~CFlatRuntime()
 {
 	// TODO
 }
@@ -395,7 +395,7 @@ void CFlatRuntime::PrintPerformance()
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::CClass::CClass()
+CFlatRuntime::CClass::CClass()
 {
 	// TODO
 }

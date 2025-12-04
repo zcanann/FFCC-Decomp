@@ -1,11 +1,9 @@
 #ifndef _FFCC_FONTMAN_H_
 #define _FFCC_FONTMAN_H_
 
-struct _GXColor;
-class CMemory;
+#include "ffcc/memory.h"
 
-void GXEnd(void);
-void GXSetTexCoordGen(void);
+#include <dolphin/gx.h>
 
 class CFontMan
 {

@@ -239,33 +239,3 @@ void CMenuPcs::ClrBattleItem()
 {
 	// TODO
 }
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCaravanWork::GetTotalBonus2()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCaravanWork::GetTotalBonus()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenuPcs::Sprt2::operator= (const CMenuPcs::Sprt2 &)
-{
-	// TODO
-}

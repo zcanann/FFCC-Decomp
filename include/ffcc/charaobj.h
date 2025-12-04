@@ -20,7 +20,7 @@ class CGCharaObj
 {
 	CGCharaObj();
 	~CGCharaObj();
-
+	
 	void onCreate();
 	void onDestroy();
 	void ClearAllSta();
@@ -54,6 +54,9 @@ class CGCharaObj
 	void statMagic();
 	void statKizetsu();
 	void onStatMagic();
+	void onStatShield();
+	void onStatAttack(int);
+	void onStatDie();
 	void statDamage();
 	void statButtobi();
 	void onChangePrg(int);

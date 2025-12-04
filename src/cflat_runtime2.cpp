@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::CFlatRuntime2()
+CFlatRuntime2::CFlatRuntime2()
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void CFlatRuntime2::CFlatRuntime2()
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::CParticleWork::CParticleWork()
+CFlatRuntime2::~CFlatRuntime2()
 {
 	// TODO
 }
@@ -25,7 +25,7 @@ void CFlatRuntime2::CParticleWork::CParticleWork()
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::~CFlatRuntime2()
+CFlatRuntime2::CParticleWork::CParticleWork()
 {
 	// TODO
 }
@@ -245,27 +245,7 @@ void CFlatRuntime2::Calc()
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::CObj$1304cflat_runtime2_cpp::operator= (const CFlatRuntime2::CObj$1304cflat_runtime2_cpp &)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CFlatRuntime2::Draw()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GXEnd(void)
 {
 	// TODO
 }
@@ -356,16 +336,6 @@ void CFlatRuntime2::PutParticleWork()
  * Size:	TODO
  */
 void CFlatRuntime2::ResetParticleWork(int, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void PPPCREATEPARAM::operator= (const PPPCREATEPARAM &)
 {
 	// TODO
 }
@@ -596,236 +566,6 @@ void CFlatRuntime2::resetChangeScript()
  * Size:	TODO
  */
 void CFlatRuntime2::ResetNewGame()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGame::GetMemoryStage()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGame::GetDebugMemoryStage()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGBaseObj::InitFinished()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFlatRuntime2::CCam$1303cflat_runtime2_cpp::operator= (const CFlatRuntime2::CCam$1303cflat_runtime2_cpp &)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCameraPcs::GetZRotate()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCameraPcs::GetFov()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCameraPcs::GetRefPosition()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCameraPcs::GetPosition()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCameraPcs::SetShadowAuto(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPad::SetAnalogDepth(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPad::ResetAnalogDepth()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCharaPcs::GetCharaAllocStage()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CTexture::SetTev()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GXSetTexCoordGen(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CLine<64>::CLine()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CLine<64>::Draw()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void __sinit_cflat_runtime2_cpp(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGMonObj::CGMonObj()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGCharaObj::CGCharaObj()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGPrgObj::CGPrgObj()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGPartyObj::CGPartyObj()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGItemObj::CGItemObj()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGQuadObj::CGQuadObj()
 {
 	// TODO
 }

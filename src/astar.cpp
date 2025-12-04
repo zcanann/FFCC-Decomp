@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void CAStar::CAStar()
+CAStar::CAStar()
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void CAStar::CAStar()
  * Address:	TODO
  * Size:	TODO
  */
-void CAStar::~CAStar()
+CAStar::~CAStar()
 {
 	// TODO
 }
@@ -145,17 +145,7 @@ void CAStar::calcPolygonGroup(Vec *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void __sinit_astar_cpp(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CAStar::CATemp::CATemp()
+CAStar::CATemp::CATemp()
 {
 	// TODO
 }
@@ -185,7 +175,7 @@ void CAStar::CAPos::CalcLength(CAStar::CAPos &)
  * Address:	TODO
  * Size:	TODO
  */
-void CAStar::CATemp::CATemp(const CAStar::CATemp &)
+CAStar::CATemp::CATemp(const CAStar::CATemp &)
 {
 	// TODO
 }

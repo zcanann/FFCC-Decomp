@@ -83,6 +83,7 @@ class CChara
 		void CalcSkin();
 		void calcNowFrame();
 		void calcMatrix();
+		void CalcNodeWorldMatrix(float (*) [4], CChara::CNode *);
 		void CalcFrameMatrix(float, CChara::CNode *, float (*)[4]);
 		void dynamics(CChara::CNode *, CChara::CNode *);
 		void calcSkin();

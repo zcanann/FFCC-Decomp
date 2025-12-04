@@ -5,7 +5,6 @@
 
 #include "ffcc/manager.h"
 
-class CProcess;
 class CStage;
 struct OSContext;
 struct OSThread;

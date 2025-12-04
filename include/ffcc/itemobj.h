@@ -1,6 +1,8 @@
 #ifndef _FFCC_ITEMOBJ_H_
 #define _FFCC_ITEMOBJ_H_
 
+#include "ffcc/cflat_runtime.h"
+
 class CGObject;
 class CGPartyObj;
 class CFlatRuntime;
@@ -11,6 +13,10 @@ class PPPIFPARAM;
 class CGItemObj
 {
 public:
+	struct CCFS
+	{
+	};
+
 	void onCreate();
 	void onDestroy();
 	void onFramePreCalc();

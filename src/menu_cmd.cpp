@@ -5,6 +5,16 @@
  * Address:	TODO
  * Size:	TODO
  */
+bool IsMagicArti(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 void CMenuPcs::CmdInit()
 {
 	// TODO
@@ -246,16 +256,6 @@ void CMenuPcs::GetSkillStr(int)
  * Size:	TODO
  */
 void CMenuPcs::GetFontItem()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void IsMagicArti(int)
 {
 	// TODO
 }

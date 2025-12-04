@@ -1,8 +1,7 @@
 #ifndef _FFCC_P_MATERIALEDITOR_H_
 #define _FFCC_P_MATERIALEDITOR_H_
 
-void GXEnd(void);
-void GXSetTexCoordGen(void);
+struct Vec;
 
 class CMaterialEditorPcs
 {

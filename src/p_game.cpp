@@ -5,6 +5,16 @@
  * Address:	TODO
  * Size:	TODO
  */
+CGamePcs::CGamePcs()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 void CGamePcs::Init()
 {
 	// TODO
@@ -156,26 +166,6 @@ void CGamePcs::onMapChanging(int, int)
  * Size:	TODO
  */
 void CGamePcs::onMapChanged(int, int, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void __sinit_p_game_cpp(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGamePcs::CGamePcs()
 {
 	// TODO
 }

@@ -1,84 +1,5 @@
 #include "ffcc/chara_anim.h"
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CAnim::CAnim()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CAnim::~CAnim()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CAnim::Create(void *, CMemory::CStage *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CAnim::InitQuantize()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CAnimNode::CAnimNode()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CAnimNode::~CAnimNode()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CAnimNode::Create(CChunkFile &)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CAnimNode::Interp(CChara::CAnim *, SRT *, float)
-{
-	// TODO
-}
 
 /*
  * --INFO--
@@ -145,7 +66,77 @@ void i2f_5(float *, unsigned short *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMemory::CStage::GetSize()
+CChara::CAnim::CAnim()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+CChara::CAnim::~CAnim()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CChara::CAnim::Create(void *, CMemory::CStage *)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CChara::CAnim::InitQuantize()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+CChara::CAnimNode::CAnimNode()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+CChara::CAnimNode::~CAnimNode()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CChara::CAnimNode::Create(CChunkFile &)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CChara::CAnimNode::Interp(CChara::CAnim *, SRT *, float)
 {
 	// TODO
 }

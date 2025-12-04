@@ -2,7 +2,7 @@
 #define _FFCC_CFLAT_RUNTIME2_H_
 
 #include "ffcc/cflat_runtime.h"
-#include "ffcc/p_chara_viewer.h"
+#include "ffcc/p_chara.h"
 
 #include <dolphin/gx.h>
 

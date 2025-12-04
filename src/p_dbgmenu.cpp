@@ -5,6 +5,16 @@
  * Address:	TODO
  * Size:	TODO
  */
+CDbgMenuPcs::CDbgMenuPcs()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 void CDbgMenuPcs::Init()
 {
 	// TODO
@@ -205,7 +215,7 @@ void CDbgMenuPcs::Delete(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CPad::Reset()
+CDbgMenuPcs::CDMParam::CDMParam()
 {
 	// TODO
 }
@@ -215,17 +225,7 @@ void CPad::Reset()
  * Address:	TODO
  * Size:	TODO
  */
-void GXEnd(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CDbgMenuPcs::CDMParam::CDMParam(int, int, int, int, int, int, void *, void (*) (CDbgMenuPcs::CDM &, void *), void (*) (CDbgMenuPcs::CDM &, void *))
+CDbgMenuPcs::CDMParam::CDMParam(int, int, int, int, int, int, void *, void (*) (CDbgMenuPcs::CDM &, void *), void (*) (CDbgMenuPcs::CDM &, void *))
 {
 	// TODO
 }
@@ -245,7 +245,7 @@ void CDbgMenuPcs::CDMParam::Clear()
  * Address:	TODO
  * Size:	TODO
  */
-void CDbgMenuPcs::CDMParam::CDMParam()
+CDbgMenuPcs::CDM::CDM()
 {
 	// TODO
 }
@@ -256,36 +256,6 @@ void CDbgMenuPcs::CDMParam::CDMParam()
  * Size:	TODO
  */
 void CDbgMenuPcs::CDM::Clear()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CDbgMenuPcs::CDM::CDM()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void __sinit_p_dbgmenu_cpp(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CDbgMenuPcs::CDbgMenuPcs()
 {
 	// TODO
 }

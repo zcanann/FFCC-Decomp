@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void CMapAnimKeyDt::CMapAnimKeyDt()
+CMapAnimKeyDt::CMapAnimKeyDt()
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void CMapAnimKeyDt::CMapAnimKeyDt()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapAnimKeyDt::~CMapAnimKeyDt()
+CMapAnimKeyDt::~CMapAnimKeyDt()
 {
 	// TODO
 }
@@ -25,7 +25,7 @@ void CMapAnimKeyDt::~CMapAnimKeyDt()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapAnimNode::CMapAnimNode()
+CMapAnimNode::CMapAnimNode()
 {
 	// TODO
 }
@@ -35,7 +35,7 @@ void CMapAnimNode::CMapAnimNode()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapAnimNode::~CMapAnimNode()
+CMapAnimNode::~CMapAnimNode()
 {
 	// TODO
 }
@@ -75,7 +75,7 @@ void CMapAnimNode::interp(Vec *, CMapAnimKey *, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapAnim::CMapAnim()
+CMapAnim::CMapAnim()
 {
 	// TODO
 }
@@ -85,7 +85,7 @@ void CMapAnim::CMapAnim()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapAnim::~CMapAnim()
+CMapAnim::~CMapAnim()
 {
 	// TODO
 }
@@ -126,86 +126,6 @@ void CMapAnimRun::Calc(long)
  * Size:	TODO
  */
 void CMapAnimRun::Start(int, int, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CMapAnimNode *>::CPtrArray()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CMapAnimNode *>::~CPtrArray()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CMapAnimNode *>::Add(CMapAnimNode *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CMapAnimNode *>::RemoveAll()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CMapAnimNode *>::SetStage(CMemory::CStage *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CMapAnimNode *>::setSize(unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CMapAnimKeyDt *>::Add(CMapAnimKeyDt *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CMapAnimKeyDt *>::setSize(unsigned long)
 {
 	// TODO
 }

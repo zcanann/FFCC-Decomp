@@ -5,6 +5,26 @@
  * Address:	TODO
  * Size:	TODO
  */
+void VECMultAdd(Vec *, Vec *, Vec *, float)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+CMath::CMath()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 void CMath::Init()
 {
 	// TODO
@@ -246,56 +266,6 @@ void CMath::Hsb2Rgb(int, int, int)
  * Size:	TODO
  */
 void CMath::DstRot(float, float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void std::acosf(float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void __sinit_math_cpp(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMath::CMath()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void VECMultAdd(Vec *, Vec *, Vec *, float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void std::sqrtf(float)
 {
 	// TODO
 }

@@ -4,7 +4,6 @@
 class FoodRank
 {
 public:
-    FoodRank& operator=(const FoodRank&);
 };
 
 class CMenuPcs

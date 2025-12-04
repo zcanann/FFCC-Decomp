@@ -5,6 +5,17 @@
  * Address:	TODO
  * Size:	TODO
  */
+void VECNormalizeZero(Vec *, Vec *)
+{
+	// TODO
+}
+
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 void CGObject::onCreate()
 {
 	// TODO
@@ -36,16 +47,6 @@ void CGObject::move()
  * Size:	TODO
  */
 void CGObject::objectCollision()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void std::atan2(float, float)
 {
 	// TODO
 }
@@ -216,26 +217,6 @@ void CGObject::moveVectorHRot(float, float, float, int)
  * Size:	TODO
  */
 void CGObject::CCClass(int, int, float, Vec *, float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void std::atan(float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void std::atanf(float)
 {
 	// TODO
 }
@@ -575,26 +556,6 @@ void CGObject::IsDispRader()
  * Address:	TODO
  * Size:	TODO
  */
-void CGBaseObj::onCreate()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGBaseObj::onDestroy()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CGObject::IsHChara()
 {
 	// TODO
@@ -655,26 +616,6 @@ void CGObject::onAlphaUpdate()
  * Address:	TODO
  * Size:	TODO
  */
-void CGBaseObj::onDraw()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GXEnd(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CGObject::onHitParticle(int, int, int, int, Vec *, PPPIFPARAM *)
 {
 	// TODO
@@ -696,266 +637,6 @@ void CGObject::onDrawDebug(CFont *, float, float &, float)
  * Size:	TODO
  */
 void CGObject::GetCID()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGBaseObj::onFrame()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void std::tan(float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void std::tanf(float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void VECNormalizeZero(Vec *, Vec *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCameraPcs::GetRotate()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPad::GetButtonUp(long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapPcs::IsHitFaceFlag(char)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapPcs::GetHitFaceNormal(Vec *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapPcs::GetHitGrpNo()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapPcs::GetHitGrpBit()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapPcs::CheckHitCylinderNear(Vec *, Vec *, float, unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CVector::operator- () const
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CNode::GetWorldMatrix()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CModel::GetNowFrame()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CAnim::GetTotalFrame()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CModel::GetAnim()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CModel::SetDynaVector(Vec *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CModel::SetGlobalChest(float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CModel::GetGlobalChest()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CModel::SetLookAt(Vec2d *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void Vec2d::operator= (const Vec2d &)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CModel::GetLookAt(Vec2d *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CModel::GetStartFrame()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CModel::GetEndFrame()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CModel::GetTexAnimSet()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CModel::ResetDynamics()
 {
 	// TODO
 }

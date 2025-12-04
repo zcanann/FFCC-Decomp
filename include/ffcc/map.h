@@ -1,9 +1,12 @@
 #ifndef _FFCC_MAP_H_
 #define _FFCC_MAP_H_
 
+#include "ffcc/mapobj.h"
+
+#include <dolphin/gx.h>
+
 class CChunkFile;
 class CMapObj;
-class CMapObjAtr;
 class CMapHit;
 class CMapCylinder;
 class CMapLightHolder;
@@ -13,7 +16,6 @@ class CMapAnimNode;
 class CMapAnimKeyDt;
 class CMapShadow;
 class CMemory;
-struct _GXColor;
 struct Vec;
 
 void setDbgLight(int, Vec&, _GXColor&);
@@ -22,6 +24,9 @@ void GXSetTexCoordGen();
 class CMapKeyFrame
 {
 public:
+    CMapKeyFrame();
+    ~CMapKeyFrame();
+
     void Get();
     void Get(int&, int&, float&);
     void Calc();
@@ -100,8 +105,8 @@ public:
     void ShowMapMeshID(int, int);
     void SetMapObjPrioID(int, unsigned char);
     void SetMapObjTransRate(int, float, float, float);
-    void SetMapObjWorldMapLightIdx(int, _GXColor, Vec);
-    void SetMapObjWorldMapLightID(int, _GXColor, Vec);
+    void SetMapObjWorldMapLightIdx(int, _GXColor, Vec&);
+    void SetMapObjWorldMapLightID(int, _GXColor, Vec&);
     void SetDrawRangeOctTree(float);
     void SetDrawRangeMapObj(float);
     void SetDraw(unsigned char);

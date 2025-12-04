@@ -1089,6 +1089,36 @@ void CMenuPcs::IsAsyncCharaLoadFinish()
 {
 	// TODO
 }
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+McCtrl::McCtrl()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+McCtrl::~McCtrl()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void McCtrl::Init()
+{
+	// TODO
+}
+
 
 /*
  * --INFO--

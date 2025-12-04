@@ -1,14 +1,14 @@
 #ifndef _FFCC_P_USB_H_
 #define _FFCC_P_USB_H_
 
-enum MCCChannel;
+#include "ffcc/usb.h"
 
 class CUSBPcs
 {
 public:
     struct CDataHeader
 	{
-	}
+	};
 
     CUSBPcs();
 

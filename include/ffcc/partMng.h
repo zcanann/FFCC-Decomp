@@ -1,7 +1,7 @@
 #ifndef _FFCC_PARTMNG_H_
 #define _FFCC_PARTMNG_H_
 
-#include "ffcc/p_chara_viewer.h"
+#include "ffcc/p_chara.h"
 
 class CChunkFile;
 class CTexture;
@@ -20,7 +20,6 @@ struct PPPIFPARAM;
 struct PmcomGetImageSt;
 struct PmcomRendSt;
 
-void GXEnd();
 void Screen2world(Vec&, Vec&);
 void pppEditGetViewPos(Vec*);
 void pppEditGetViewMatrix(float (*)[4]);

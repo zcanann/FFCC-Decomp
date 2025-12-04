@@ -5,6 +5,16 @@
  * Address:	TODO
  * Size:	TODO
  */
+CLightPcs::CLightPcs()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 void CLightPcs::Init()
 {
 	// TODO
@@ -96,16 +106,6 @@ void CLightPcs::Clear()
  * Size:	TODO
  */
 void CLightPcs::Add(CLightPcs::CLight *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CLightPcs::CLight::operator= (const CLightPcs::CLight &)
 {
 	// TODO
 }
@@ -265,16 +265,6 @@ void CLightPcs::CBumpLight::MakeLightMap()
  * Address:	TODO
  * Size:	TODO
  */
-void GXEnd(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CLightPcs::MakeLightMap()
 {
 	// TODO
@@ -295,7 +285,7 @@ void CLightPcs::SetBumpTexMatirx(float (*) [4], CLightPcs::CBumpLight *, Vec *, 
  * Address:	TODO
  * Size:	TODO
  */
-void CLightPcs::CBumpLight::CBumpLight()
+CLightPcs::CBumpLight::CBumpLight()
 {
 	// TODO
 }
@@ -315,7 +305,7 @@ void CLightPcs::CBumpLight::SetTexture(_GXTexMapID, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CLightPcs::CLight::CLight()
+CLightPcs::CLight::CLight()
 {
 	// TODO
 }
@@ -326,46 +316,6 @@ void CLightPcs::CLight::CLight()
  * Size:	TODO
  */
 void CLightPcs::CLight::Set(CLightPcs::CLight *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCameraPcs::GetVector(Vec *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMaterialMan::SetForceBlendAlpha(unsigned char)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void __sinit_p_light_cpp(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CLightPcs::CLightPcs()
 {
 	// TODO
 }

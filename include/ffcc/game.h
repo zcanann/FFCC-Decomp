@@ -1,15 +1,19 @@
 #ifndef _FFCC_GAME_H_
 #define _FFCC_GAME_H_
 
+#include "ffcc/memory.h"
+
+#include <dolphin/gx.h>
+
 class Vec;
 class PPPIFPARAM;
 class CGObject;
 class CGPrgObj;
 class CGPartyObj;
 class CCombi2Set;
+class CGObjWork;
 class CMapLightHolder;
 class CBound;
-struct _GXColor;
 
 void VECMaximize(const Vec *, const Vec *, Vec *);
 void VECMinimize(const Vec *, const Vec *, Vec *);

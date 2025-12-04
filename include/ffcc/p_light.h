@@ -1,27 +1,38 @@
 #ifndef _FFCC_P_LIGHT_H_
 #define _FFCC_P_LIGHT_H_
 
-void setchanctrl(CLightPcs::TARGET, unsigned long);
+#include "ffcc/memory.h"
 
-class CLightPcs::CBumpLight
-{
-public:
-    void MakeLightMap();
-    void SetTexture(_GXTexMapID, int);
-    CBumpLight();
-};
+#include <dolphin/gx.h>
 
-class CLightPcs::CLight
-{
-public:
-    void operator=(const CLightPcs::CLight &);
-    void Set(CLightPcs::CLight *);
-    CLight();
-};
+class COctTree;
+struct Vec;
 
 class CLightPcs
 {
 public:
+    class CBumpLight
+    {
+    public:
+        CBumpLight();
+        
+        void MakeLightMap();
+        void SetTexture(_GXTexMapID, int);
+    };
+    class CLight
+    {
+    public:
+        CLight();
+
+        void Set(CLightPcs::CLight *);
+    };
+    enum TARGET
+    {
+        TODO,
+    };
+
+    CLightPcs();
+
     void Init();
     void Quit();
     void GetTable(unsigned long);
@@ -47,7 +58,8 @@ public:
     void InsertOctTree(CLightPcs::TARGET, COctTree &);
     void MakeLightMap();
     void SetBumpTexMatirx(float (*)[4], CLightPcs::CBumpLight *, Vec *, unsigned char);
-    CLightPcs();
 };
+
+void setchanctrl(CLightPcs::TARGET, unsigned long);
 
 #endif // _FFCC_P_LIGHT_H_

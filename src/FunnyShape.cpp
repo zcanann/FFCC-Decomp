@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void CFunnyShape::CFunnyShape()
+CFunnyShape::CFunnyShape()
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void CFunnyShape::CFunnyShape()
  * Address:	TODO
  * Size:	TODO
  */
-void CFunnyShape::~CFunnyShape()
+CFunnyShape::~CFunnyShape()
 {
 	// TODO
 }
@@ -115,7 +115,7 @@ void CFunnyShape::ClearTextureData()
  * Address:	TODO
  * Size:	TODO
  */
-void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE *, Vec2d, float)
+void CFunnyShape::RenderShape(FS_tagOAN3_SHAPE *, Vec2d&, float)
 {
 	// TODO
 }

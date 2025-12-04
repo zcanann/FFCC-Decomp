@@ -1,6 +1,8 @@
 #ifndef _FFCC_P_GRAPHIC_H_
 #define _FFCC_P_GRAPHIC_H_
 
+#include <dolphin/gx.h>
+
 class CGraphicPcs
 {
 public:

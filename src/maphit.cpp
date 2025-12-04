@@ -15,16 +15,6 @@ void FindIntersection(const Vec &, const Vec &, const CMapCylinder &, float &)
  * Address:	TODO
  * Size:	TODO
  */
-void std::sqrt(float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CheckLineCylinder(const Vec &, const Vec &, const CMapCylinder &, float &)
 {
 	// TODO
@@ -35,7 +25,7 @@ void CheckLineCylinder(const Vec &, const Vec &, const CMapCylinder &, float &)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapCylinder::CMapCylinder()
+CMapCylinder::CMapCylinder()
 {
 	// TODO
 }
@@ -45,7 +35,7 @@ void CMapCylinder::CMapCylinder()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapHit::CMapHit()
+CMapHit::CMapHit()
 {
 	// TODO
 }
@@ -55,7 +45,7 @@ void CMapHit::CMapHit()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapHit::~CMapHit()
+CMapHit::~CMapHit()
 {
 	// TODO
 }
@@ -205,27 +195,7 @@ void CMapHit::DrawNormal()
  * Address:	TODO
  * Size:	TODO
  */
-void __sinit_maphit_cpp(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CBound::CheckCross(CBound &)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapHitFace::CMapHitFace()
+CMapHitFace::CMapHitFace()
 {
 	// TODO
 }

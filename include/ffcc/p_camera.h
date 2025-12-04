@@ -1,6 +1,8 @@
 #ifndef _FFCC_P_CAMERA_H_
 #define _FFCC_P_CAMERA_H_
 
+#include <dolphin/gx.h>
+
 class SRT;
 class CBound;
 class Vec;
@@ -11,7 +13,6 @@ class CPad;
 class CColor;
 
 void dbgDrawSphere(float, float, float, float, unsigned char, unsigned char, unsigned char);
-void GXEnd(void);
 
 class CCameraPcs
 {
@@ -87,7 +88,6 @@ public:
     class camdtst
     {
     public:
-        void operator=(const camdtst&);
     };
 };
 

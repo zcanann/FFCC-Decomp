@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void CColor::CColor()
+CColor::CColor()
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void CColor::CColor()
  * Address:	TODO
  * Size:	TODO
  */
-void CColor::CColor(unsigned char, unsigned char, unsigned char, unsigned char)
+CColor::CColor(unsigned char, unsigned char, unsigned char, unsigned char)
 {
 	// TODO
 }
@@ -25,7 +25,7 @@ void CColor::CColor(unsigned char, unsigned char, unsigned char, unsigned char)
  * Address:	TODO
  * Size:	TODO
  */
-void CColor::CColor(CColor &)
+CColor::CColor(CColor &)
 {
 	// TODO
 }
@@ -35,7 +35,7 @@ void CColor::CColor(CColor &)
  * Address:	TODO
  * Size:	TODO
  */
-void CColor::CColor(_GXColor &)
+CColor::CColor(_GXColor &)
 {
 	// TODO
 }
@@ -45,7 +45,7 @@ void CColor::CColor(_GXColor &)
  * Address:	TODO
  * Size:	TODO
  */
-void CColor3::CColor3()
+CColor3::CColor3()
 {
 	// TODO
 }
@@ -55,7 +55,7 @@ void CColor3::CColor3()
  * Address:	TODO
  * Size:	TODO
  */
-void CColor3::CColor3(CColor3 &)
+CColor3::CColor3(CColor3 &)
 {
 	// TODO
 }
@@ -65,7 +65,7 @@ void CColor3::CColor3(CColor3 &)
  * Address:	TODO
  * Size:	TODO
  */
-void CColor3::CColor3(_GXColor &)
+CColor3::CColor3(_GXColor &)
 {
 	// TODO
 }

@@ -29,7 +29,7 @@ class CCaravanWork
 public:
     CCaravanWork();
     ~CCaravanWork();
-
+    
     void clearCaravanWork();
     void LoadInit();
     void ClearEvtWork();
@@ -96,6 +96,7 @@ public:
     void BackupTutorialItem(int);
     void UniteComList(int, int, int);
     void UnuniteComList(int, int);
+    void GetEvtFlag(int);
 };
 
 #endif // _FFCC_GOBJWORK_H_

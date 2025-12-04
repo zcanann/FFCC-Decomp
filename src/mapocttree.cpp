@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void COctTree::COctTree()
+void setbit32(unsigned long *, unsigned long)
 {
 	// TODO
 }
@@ -15,7 +15,17 @@ void COctTree::COctTree()
  * Address:	TODO
  * Size:	TODO
  */
-void COctTree::~COctTree()
+COctTree::COctTree()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+COctTree::~COctTree()
 {
 	// TODO
 }
@@ -265,37 +275,7 @@ void COctTree::CheckHitCylinderNear(CMapCylinder *, Vec *, unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void __sinit_mapocttree_cpp(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void COctNode::COctNode()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void setbit32(unsigned long *, unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CBound::SetMinMax(Vec *, Vec *)
+COctNode::COctNode()
 {
 	// TODO
 }

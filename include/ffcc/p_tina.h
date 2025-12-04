@@ -1,7 +1,8 @@
 #ifndef _FFCC_P_TINA_H_
 #define _FFCC_P_TINA_H_
 
-class CMemory;
+#include "ffcc/memory.h"
+
 struct Vec;
 struct pppIVECTOR3;
 struct pppFVECTOR4;

@@ -2,6 +2,9 @@
 #define _FFCC_CGCHARAOBJ_H_
 
 #include "ffcc/charaobj.h"
+#include "ffcc/color.h"
+
+#include <dolphin/gx.h>
 
 class CGObject;
 class CGPrgObj;
@@ -16,5 +19,11 @@ class CFlatRuntime2;
 
 void la(CGObject *);
 void SAFE_CAST_WORK(CGObjWork *);
+
+class CHairSet
+{
+public:
+    CHairSet();
+};
 
 #endif // _FFCC_CGCHARAOBJ_H_

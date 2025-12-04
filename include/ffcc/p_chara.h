@@ -1,7 +1,10 @@
 #ifndef _FFCC_P_CHARA_H_
 #define _FFCC_P_CHARA_H_
 
+#include "ffcc/memory.h"
 #include "ffcc/p_chara_viewer.h"
+
+#include <dolphin/gx.h>
 
 class Vec;
 class CColor;
@@ -9,9 +12,6 @@ class CColor3;
 class CMemory;
 
 void GET_CHARA_ALLOC_STAGE_S(int, CMemory::CStage*);
-void GXSetTexCoordGen(void);
-void GXEnd(void);
-void __sinit_p_chara_cpp(void);
 
 class CChara
 {

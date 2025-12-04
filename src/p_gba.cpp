@@ -5,6 +5,16 @@
  * Address:	TODO
  * Size:	TODO
  */
+CGbaPcs::CGbaPcs()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 void CGbaPcs::Init()
 {
 	// TODO
@@ -106,26 +116,6 @@ void CGbaPcs::onScriptChanging(char *)
  * Size:	TODO
  */
 void CGbaPcs::SetFirstZone()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void __sinit_p_gba_cpp(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGbaPcs::CGbaPcs()
 {
 	// TODO
 }

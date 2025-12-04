@@ -5,6 +5,16 @@
  * Address:	TODO
  * Size:	TODO
  */
+CMcPcs::CMcPcs()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 void CMcPcs::Init()
 {
 	// TODO
@@ -56,26 +66,6 @@ void CMcPcs::destroy()
  * Size:	TODO
  */
 void CMcPcs::calc()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void __sinit_p_mc_cpp(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMcPcs::CMcPcs()
 {
 	// TODO
 }

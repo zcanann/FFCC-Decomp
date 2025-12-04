@@ -5,27 +5,27 @@
  * Address:	TODO
  * Size:	TODO
  */
+CMapObj::CMapObj()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+CMapObj::~CMapObj()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 void CMapObj::Init()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapObj::CMapObj()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapObj::~CMapObj()
 {
 	// TODO
 }
@@ -235,7 +235,7 @@ void CMapObj::SetMime(int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapObjAtr::~CMapObjAtr()
+CMapObjAtr::~CMapObjAtr()
 {
 	// TODO
 }
@@ -245,7 +245,7 @@ void CMapObjAtr::~CMapObjAtr()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapObjAtrPlaySta::CMapObjAtrPlaySta()
+CMapObjAtrPlaySta::CMapObjAtrPlaySta()
 {
 	// TODO
 }
@@ -255,7 +255,7 @@ void CMapObjAtrPlaySta::CMapObjAtrPlaySta()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapObjAtr::CMapObjAtr()
+CMapObjAtr::CMapObjAtr()
 {
 	// TODO
 }
@@ -265,77 +265,7 @@ void CMapObjAtr::CMapObjAtr()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapObjAtrMime::CMapObjAtrMime()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapKeyFrame::~CMapKeyFrame()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapKeyFrame::CMapKeyFrame()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapShadow::CalcBound()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapShadow::CMapShadow(CMapShadow::TYPE)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapAnimRun::CMapAnimRun()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapObjAtrSpotLight::CMapObjAtrSpotLight()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapObjAtrPointLight::CMapObjAtrPointLight()
+CMapObjAtrMime::CMapObjAtrMime()
 {
 	// TODO
 }
@@ -355,7 +285,7 @@ void CMapObj::SetCalcMtx()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapObjAtrMeshName::CMapObjAtrMeshName()
+CMapObjAtrMeshName::CMapObjAtrMeshName()
 {
 	// TODO
 }
@@ -365,7 +295,7 @@ void CMapObjAtrMeshName::CMapObjAtrMeshName()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapKeyFrame::Set(int, int, int)
+CMapObjAtrMeshName::~CMapObjAtrMeshName()
 {
 	// TODO
 }
@@ -375,7 +305,7 @@ void CMapKeyFrame::Set(int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapObjAtrMeshName::~CMapObjAtrMeshName()
+CMapObjAtrPointLight::~CMapObjAtrPointLight()
 {
 	// TODO
 }
@@ -385,7 +315,7 @@ void CMapObjAtrMeshName::~CMapObjAtrMeshName()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapObjAtrPointLight::~CMapObjAtrPointLight()
+CMapObjAtrSpotLight::~CMapObjAtrSpotLight()
 {
 	// TODO
 }
@@ -395,7 +325,7 @@ void CMapObjAtrPointLight::~CMapObjAtrPointLight()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapObjAtrSpotLight::~CMapObjAtrSpotLight()
+CMapObjAtrMime::~CMapObjAtrMime()
 {
 	// TODO
 }
@@ -405,97 +335,7 @@ void CMapObjAtrSpotLight::~CMapObjAtrSpotLight()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapObjAtrMime::~CMapObjAtrMime()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapObjAtrPlaySta::~CMapObjAtrPlaySta()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCameraPcs::SetFullScreenShadowEnable(unsigned char)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMaterialMan::LockEnv()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMaterialMan::InitEnv()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapCylinder::CalcBound()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CMapAnimRun *>::Add(CMapAnimRun *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CMapAnimRun *>::setSize(unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CMapShadow *>::Add(CMapShadow *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CMapShadow *>::setSize(unsigned long)
+CMapObjAtrPlaySta::~CMapObjAtrPlaySta()
 {
 	// TODO
 }

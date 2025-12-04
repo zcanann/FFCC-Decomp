@@ -1,7 +1,6 @@
 #ifndef _FFCC_CHARA_H_
 #define _FFCC_CHARA_H_
 
-
 #include "ffcc/memory.h"
 
 class CChunkFile;

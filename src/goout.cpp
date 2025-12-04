@@ -5,6 +5,27 @@
  * Address:	TODO
  * Size:	TODO
  */
+void DrawGoOutMenu()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void getFreeCaravanIdx(CMemoryCardMan::Mc::SaveDat *)
+{
+	// TODO
+}
+
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 void CGoOutMenu::CharaSelClose()
 {
 	// TODO
@@ -205,16 +226,6 @@ void CGoOutMenu::Destroy()
  * Address:	TODO
  * Size:	TODO
  */
-void getFreeCaravanIdx(Mc::SaveDat *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CGoOutMenu::SetGoOutMode(unsigned char)
 {
 	// TODO
@@ -315,46 +326,6 @@ void CGoOutMenu::Draw()
  * Address:	TODO
  * Size:	TODO
  */
-void DrawGoOutMenu()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void McCtrl::SetMcAccessPos(int, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void McCtrl::Format2()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenuPcs::GetMcMenuEnd()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CGoOutMenu::InitMemCardProc()
 {
 	// TODO
@@ -366,16 +337,6 @@ void CGoOutMenu::InitMemCardProc()
  * Size:	TODO
  */
 void CGoOutMenu::EndMemCardProc()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCaravanWork::DeleteOdekake()
 {
 	// TODO
 }

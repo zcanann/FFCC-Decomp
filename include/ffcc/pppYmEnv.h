@@ -1,15 +1,14 @@
 #ifndef _PPP_YMENV_H_
 #define _PPP_YMENV_H_
 
-#include "ffcc/chara.h"
-#include "ffcc/p_chara_viewer.h"
+#include "ffcc/p_chara.h"
 
 #include <dolphin/gx.h>
 
-struct CGObject;
 struct _pppMngSt;
 struct _pppPObject;
 struct _pppEnvSt;
+struct CGObject;
 struct CTexture;
 struct Vec;
 

@@ -23,6 +23,11 @@ void calcColorKeyFrame(CMapKeyFrame*, _GXColor&, _GXColor*);
 class CMapObjAtr
 {
 public:
+    enum TYPE
+    {
+        TODO,
+    };
+    
     CMapObjAtr();
     ~CMapObjAtr();
 };

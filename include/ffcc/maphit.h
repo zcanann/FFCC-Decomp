@@ -4,7 +4,6 @@
 class CChunkFile;
 class CMapCylinder;
 class CMapHit;
-class CMapHitFace;
 class CBound;
 struct Vec;
 

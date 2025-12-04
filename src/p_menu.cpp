@@ -5,6 +5,26 @@
  * Address:	TODO
  * Size:	TODO
  */
+CMenuPcs::CMenuPcs()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+CMenuPcs::~CMenuPcs()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 void CMenuPcs::Init()
 {
 	// TODO
@@ -125,16 +145,6 @@ void CMenuPcs::DrawInit()
  * Address:	TODO
  * Size:	TODO
  */
-void GXSetTexCoordGen(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CMenuPcs::SetAttrFmt(CMenuPcs::FMT)
 {
 	// TODO
@@ -216,16 +226,6 @@ void CMenuPcs::SetTexture(CMenuPcs::TEX)
  * Size:	TODO
  */
 void CMenuPcs::DrawRect(unsigned long, float, float, float, float, float, float, float, float, float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GXEnd(void)
 {
 	// TODO
 }
@@ -355,137 +355,7 @@ void CMenuPcs::ChgPlayModeFromScript(bool)
  * Address:	TODO
  * Size:	TODO
  */
-void CFontMan::IsInternal22()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFont::FlushDefaultTlutColor()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFont::SetDefaultTlutColor(int, _GXColor)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFont::GetDefaultTlutColor(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CMenuPcs::GetTexture(CMenuPcs::TEX)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void McCtrl::~McCtrl()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void McCtrl::Init()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenuPcs::CMenuPcs()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void McCtrl::McCtrl()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPad::GetButtonRepeat(long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CRingMenu::SetIndex(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMesMenu::SetIndex(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void __sinit_p_menu_cpp(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenuPcs::~CMenuPcs()
 {
 	// TODO
 }

@@ -1,13 +1,11 @@
 #ifndef _FFCC_PPP_WM_MENU_H_
 #define _FFCC_PPP_WM_MENU_H_
 
+#include "ffcc/memorycard.h"
+
 class CFont;
 class CGraphic;
 class CCameraPcs;
-class CMemoryCardMan;
-
-// TODO: Where does this live?
-namespace Mc { struct SaveDat; }
 
 struct McListInfo
 {
@@ -17,6 +15,10 @@ struct McListInfo
 class McCtrl
 {
 public:
+    McCtrl();
+    ~McCtrl();
+
+    void Init();
     void LoadMcList();
     void SetListDat(int, int);
     void SetBrokenFile(int);

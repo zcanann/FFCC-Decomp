@@ -1,7 +1,7 @@
 #ifndef _FFCC_PPPDRAWMNG_H_
 #define _FFCC_PPPDRAWMNG_H_
 
-#include "ffcc/p_chara_viewer.h"
+#include "ffcc/p_chara.h"
 
 struct pppOtDrawPrim;
 struct _pppMngSt;

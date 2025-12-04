@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void CChunkFile::CChunkFile()
+CChunkFile::CChunkFile()
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void CChunkFile::CChunkFile()
  * Address:	TODO
  * Size:	TODO
  */
-void CChunkFile::CChunkFile(void *)
+CChunkFile::CChunkFile(void *)
 {
 	// TODO
 }

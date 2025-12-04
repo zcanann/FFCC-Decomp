@@ -5,6 +5,16 @@
  * Address:	TODO
  * Size:	TODO
  */
+CUSBPcs::CUSBPcs()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 void CUSBPcs::Init()
 {
 	// TODO
@@ -126,26 +136,6 @@ void CUSBPcs::SendDataCode(int, void *, int, int)
  * Size:	TODO
  */
 void CUSBPcs::GetPath()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void __sinit_p_usb_cpp(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CUSBPcs::CUSBPcs()
 {
 	// TODO
 }

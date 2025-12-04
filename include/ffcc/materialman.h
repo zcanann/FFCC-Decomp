@@ -1,72 +1,40 @@
 #ifndef _FFCC_MATERIALMAN_H_
 #define _FFCC_MATERIALMAN_H_
 
+#include "ffcc/mapshadow.h"
+#include "ffcc/memory.h"
+#include "ffcc/p_light.h"
+
+#include <dolphin/gx.h>
+
 class CChunkFile;
 class CMaterial;
 class CMaterialSet;
 class CTexture;
 class CTextureSet;
-class CMapShadow;
 class CFullScreenShadow;
 class CLightPcs;
 class CAmemCacheSet;
-class CMemory;
-template <class T> class CPtrArray;
 struct Vec;
 struct CBound;
 
-enum _GXTevScale;
-enum _GXTexMapID;
-enum _GXCompType;
-
-void GXSetTexCoordGen(void);
-
-class CMaterial
+class CTexScroll
 {
 public:
-    CMaterial();
-    ~CMaterial();
-    void Create(unsigned long, CMaterialMan::TEV_BIT);
-    void Set(_GXTexMapID);
-    void CacheLoadTexture(CAmemCacheSet*);
-    void CacheUnLoadTexture(CAmemCacheSet*);
-    void CacheRefCnt0UpTexture(CAmemCacheSet*);
-    void CacheDumpTexture(CAmemCacheSet*);
-    void* operator new(unsigned long, CMemory::CStage*, char*, int);
-    void IncNumTexture();
-    void SetTevBit(CMaterialMan::TEV_BIT);
-    void GetNumTexture();
-    void SetTag(int);
-    void AddTextureIdx(int, int);
-};
-
-class CMaterialSet
-{
-public:
-    CMaterialSet();
-    ~CMaterialSet();
-    void* operator new(unsigned long, CMemory::CStage*, char*, int);
-    void GetFreeMaterielIdx();
-    void Create(CChunkFile&, CTextureSet*, CMaterialMan::TEV_BIT, CLightPcs::CBumpLight*);
-    void SetTextureSet(CTextureSet*);
-    void Calc();
-    void FindTexName(char*, long*);
-    void CacheLoadTexture(int, CAmemCacheSet*);
-    void CacheUnLoadTexture(int, CAmemCacheSet*);
-    void CacheRefCnt0UpTexture(int, CAmemCacheSet*);
-    void CacheDumpTexture(int, CAmemCacheSet*);
-    void Find(char*);
-    void SetPartFromTextureSet(CTextureSet*, int);
-    void ReleaseTag(CTextureSet*, int, CAmemCacheSet*);
-    void AddMaterial(CMaterial*, int);
+    CTexScroll();
+    ~CTexScroll();
 };
 
 class CMaterialMan
 {
 public:
-    enum TEV_BIT;
+    enum TEV_BIT
+    {
+        TODO,
+    };
 
     CMaterialMan();
+    
     void Init();
     void Quit();
     void SetBlendMode(CMaterialSet*, int);
@@ -106,6 +74,46 @@ public:
     void ErrorTexMtxCur();
     void ErrorTexMapIdCur();
     void GetMemoryStage();
+};
+
+class CMaterial
+{
+public:
+    CMaterial();
+    ~CMaterial();
+    void Create(unsigned long, CMaterialMan::TEV_BIT);
+    void Set(_GXTexMapID);
+    void CacheLoadTexture(CAmemCacheSet*);
+    void CacheUnLoadTexture(CAmemCacheSet*);
+    void CacheRefCnt0UpTexture(CAmemCacheSet*);
+    void CacheDumpTexture(CAmemCacheSet*);
+    void* operator new(unsigned long, CMemory::CStage*, char*, int);
+    void IncNumTexture();
+    void SetTevBit(CMaterialMan::TEV_BIT);
+    void GetNumTexture();
+    void SetTag(int);
+    void AddTextureIdx(int, int);
+};
+
+class CMaterialSet
+{
+public:
+    CMaterialSet();
+    ~CMaterialSet();
+    void* operator new(unsigned long, CMemory::CStage*, char*, int);
+    void GetFreeMaterielIdx();
+    void Create(CChunkFile&, CTextureSet*, CMaterialMan::TEV_BIT, CLightPcs::CBumpLight*);
+    void SetTextureSet(CTextureSet*);
+    void Calc();
+    void FindTexName(char*, long*);
+    void CacheLoadTexture(int, CAmemCacheSet*);
+    void CacheUnLoadTexture(int, CAmemCacheSet*);
+    void CacheRefCnt0UpTexture(int, CAmemCacheSet*);
+    void CacheDumpTexture(int, CAmemCacheSet*);
+    void Find(char*);
+    void SetPartFromTextureSet(CTextureSet*, int);
+    void ReleaseTag(CTextureSet*, int, CAmemCacheSet*);
+    void AddMaterial(CMaterial*, int);
 };
 
 #endif // _FFCC_MATERIALMAN_H_

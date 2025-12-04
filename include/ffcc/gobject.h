@@ -1,6 +1,8 @@
 #ifndef _FFCC_CGOBJECT_H_
 #define _FFCC_CGOBJECT_H_
 
+#include "ffcc/baseobj.h"
+
 class Vec;
 class Vec2d;
 class CFont;

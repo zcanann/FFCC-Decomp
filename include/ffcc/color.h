@@ -1,7 +1,7 @@
 #ifndef _FFCC_COLOR_H_
 #define _FFCC_COLOR_H_
 
-struct _GXColor;
+#include <dolphin/gx.h>
 
 class CColor
 {

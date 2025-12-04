@@ -1,9 +1,10 @@
 #ifndef _FFCC_CHARA_ANIM_H_
 #define _FFCC_CHARA_ANIM_H_
 
+#include "ffcc/memory.h"
+
 class CChunkFile;
 class SRT;
-class CMemory;
 
 void i2f2_7(float *, unsigned short *, float);
 void i2f_7(float *, unsigned short *);

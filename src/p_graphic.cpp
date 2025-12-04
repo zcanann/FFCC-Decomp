@@ -5,6 +5,16 @@
  * Address:	TODO
  * Size:	TODO
  */
+CGraphicPcs::CGraphicPcs()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 void CGraphicPcs::Init()
 {
 	// TODO
@@ -195,16 +205,6 @@ void CGraphicPcs::drawSFRect(float, float, float, float, _GXColor, _GXColor)
  * Address:	TODO
  * Size:	TODO
  */
-void GXEnd(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CGraphicPcs::drawSFCircle(int, int, int, int, _GXColor, _GXColor)
 {
 	// TODO
@@ -226,96 +226,6 @@ void CGraphicPcs::GetScreenFadeExecutingBit()
  * Size:	TODO
  */
 void CGraphicPcs::drawScreenFade()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CSystem::GetNumOrder()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPad::GetPortEmulation()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPad::IsDebug(long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGraphic::SetDrawBlur(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGraphic::IsDrawBlur()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGraphic::GetSaveFrameBuffer()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GXSetTexCoordGen(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void __sinit_p_graphic_cpp(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGraphicPcs::CGraphicPcs()
 {
 	// TODO
 }

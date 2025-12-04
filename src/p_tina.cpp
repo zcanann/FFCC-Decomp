@@ -5,6 +5,26 @@
  * Address:	TODO
  * Size:	TODO
  */
+CPartPcs::CPartPcs()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+CPartPcs::~CPartPcs()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 void CPartPcs::Init()
 {
 	// TODO
@@ -315,27 +335,7 @@ void CPartPcs::GetParLocIdx(int, Vec &)
  * Address:	TODO
  * Size:	TODO
  */
-void pppIVECTOR3::operator= (const pppIVECTOR3 &)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CPartPcs::SetParColIdx(int, pppFVECTOR4 &)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppFVECTOR4::operator= (const pppFVECTOR4 &)
 {
 	// TODO
 }
@@ -476,86 +476,6 @@ void CPartPcs::EndMiruraEvent()
  * Size:	TODO
  */
 void CPartPcs::SetUSBData()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPartMng::InitAmem(void *, unsigned long, unsigned char)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPartMng::IsLoadPart()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CProfile::GetMax()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CProfile::GetTime()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenuPcs::GetStage(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void __sinit_p_tina_cpp(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPartPcs::~CPartPcs()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPartPcs::CPartPcs()
 {
 	// TODO
 }

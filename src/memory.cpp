@@ -15,37 +15,7 @@ void CheckSum(void *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void operator new (unsigned long, CMemory::CStage *, char *, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void operator new[] (unsigned long, CMemory::CStage *, char *, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void operator delete (void *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void operator delete[] (void *)
+CMemory::CMemory()
 {
 	// TODO
 }
@@ -625,7 +595,7 @@ void CMemory::CStage::heapInfo(unsigned long &, unsigned long &, unsigned long &
  * Address:	TODO
  * Size:	TODO
  */
-void __sinit_memory_cpp(void)
+CAmemCache::CAmemCache()
 {
 	// TODO
 }
@@ -635,27 +605,7 @@ void __sinit_memory_cpp(void)
  * Address:	TODO
  * Size:	TODO
  */
-void CMemory::CMemory()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CAmemCache::~CAmemCache()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CAmemCache::CAmemCache()
+CAmemCache::~CAmemCache()
 {
 	// TODO
 }
@@ -686,16 +636,6 @@ void CMemory::CStage::GetTail()
  * Size:	TODO
  */
 void CMemory::CStage::GetTop()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::GetAmemOffset()
 {
 	// TODO
 }

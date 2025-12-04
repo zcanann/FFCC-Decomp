@@ -5,6 +5,16 @@
  * Address:	TODO
  * Size:	TODO
  */
+CPartMng::CPartMng()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 void CPartMng::Create()
 {
 	// TODO
@@ -116,16 +126,6 @@ void CPartMng::pppGetFreePppDataMngSt()
  * Size:	TODO
  */
 void CPartMng::drawLine(int, int, int, int, _GXColor &)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GXEnd(void)
 {
 	// TODO
 }
@@ -365,16 +365,6 @@ void CPartMng::pppDataRcv(unsigned long, char *, unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void PmcomGetImageSt::operator= (const PmcomGetImageSt &)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void pppEditSetProjection2D()
 {
 	// TODO
@@ -396,26 +386,6 @@ void pppSetFog(unsigned char, unsigned char, unsigned char, unsigned char, float
  * Size:	TODO
  */
 void CPartMng::pppEditBeforeCalc()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGObject::CGObject()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGBaseObj::CGBaseObj()
 {
 	// TODO
 }
@@ -635,16 +605,6 @@ void CPartMng::pppLoadPtx(const char *, int, int, void *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CParModelSet::Create(CChunkFile &, int, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CPartMng::pppLoadPmd(CChunkFile &)
 {
 	// TODO
@@ -656,16 +616,6 @@ void CPartMng::pppLoadPmd(CChunkFile &)
  * Size:	TODO
  */
 void CPartMng::pppLoadPmd(const char *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CParShapeSet::Create(CChunkFile &, int)
 {
 	// TODO
 }
@@ -726,26 +676,6 @@ void CPartMng::pppGetDefaultCreateParam()
  * Size:	TODO
  */
 void CPartMng::pppCreate0(int, int, PPPCREATEPARAM *, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void PPPSEST::operator= (const PPPSEST &)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void PPPIFPARAM::operator= (const PPPIFPARAM &)
 {
 	// TODO
 }
@@ -936,296 +866,6 @@ void CPartMng::pppDeleteAll()
  * Size:	TODO
  */
 void CPartMng::pppDestroyAll()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void PPPSEST::Init()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void PPPCREATEPARAM::PPPCREATEPARAM()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void PPPIFPARAM::PPPIFPARAM()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void PPPSEST::PPPSEST()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPartMng::CPartMng()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void _pppMngSt::_pppMngSt()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CParShapeSet::~CParShapeSet()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppShapeSt::~pppShapeSt()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppShapeSt::Release()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CParModelSet::~CParModelSet()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppModelSt::~pppModelSt()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppModelSt::Release()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppShapeSt::pppShapeSt()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppShapeSt::Init()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppModelSt::pppModelSt()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppModelSt::Init()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void PmcomRendSt::operator= (const PmcomRendSt &)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppModelSt::SetUse()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CParModelSet::GetFree()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CParModelSet::CParModelSet()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppShapeSt::SetUse()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CParShapeSet::GetFree()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CParShapeSet::CParShapeSet()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CModel::GetNode(unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CTextureSet::SetDefaultSize(int, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFlatRuntime::CObject::CObject()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFlatRuntime::CObject::onNewFinished()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexture *>::SetGrow(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void __sinit_partMng_cpp(void)
 {
 	// TODO
 }

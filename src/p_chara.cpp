@@ -5,6 +5,36 @@
  * Address:	TODO
  * Size:	TODO
  */
+void GET_CHARA_ALLOC_STAGE_S(int, CMemory::CStage *)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+CCharaPcs::CCharaPcs()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+CCharaPcs::~CCharaPcs()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 void CCharaPcs::Init()
 {
 	// TODO
@@ -26,16 +56,6 @@ void CCharaPcs::Quit()
  * Size:	TODO
  */
 void CCharaPcs::GetTable(unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GET_CHARA_ALLOC_STAGE_S(int, CMemory::CStage *)
 {
 	// TODO
 }
@@ -395,7 +415,7 @@ void CCharaPcs::drawOverlap()
  * Address:	TODO
  * Size:	TODO
  */
-void GXSetTexCoordGen(void)
+CCharaPcs::CHandle::CHandle()
 {
 	// TODO
 }
@@ -405,27 +425,7 @@ void GXSetTexCoordGen(void)
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::CHandle::operator new (unsigned long, CMemory::CStage *, char *, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCharaPcs::CHandle::CHandle()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCharaPcs::CHandle::~CHandle()
+CCharaPcs::CHandle::~CHandle()
 {
 	// TODO
 }
@@ -595,7 +595,7 @@ void CCharaPcs::CHandle::CancelLoadModelASync()
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::CLoadModel::CLoadModel()
+CCharaPcs::CLoadModel::CLoadModel()
 {
 	// TODO
 }
@@ -605,7 +605,7 @@ void CCharaPcs::CLoadModel::CLoadModel()
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::CLoadModel::~CLoadModel()
+CCharaPcs::CLoadModel::~CLoadModel()
 {
 	// TODO
 }
@@ -615,7 +615,7 @@ void CCharaPcs::CLoadModel::~CLoadModel()
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::CLoadAnim::CLoadAnim()
+CCharaPcs::CLoadAnim::CLoadAnim()
 {
 	// TODO
 }
@@ -625,7 +625,7 @@ void CCharaPcs::CLoadAnim::CLoadAnim()
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::CLoadAnim::~CLoadAnim()
+CCharaPcs::CLoadAnim::~CLoadAnim()
 {
 	// TODO
 }
@@ -635,7 +635,7 @@ void CCharaPcs::CLoadAnim::~CLoadAnim()
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::CLoadTexture::CLoadTexture()
+CCharaPcs::CLoadTexture::CLoadTexture()
 {
 	// TODO
 }
@@ -645,7 +645,7 @@ void CCharaPcs::CLoadTexture::CLoadTexture()
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::CLoadTexture::~CLoadTexture()
+CCharaPcs::CLoadTexture::~CLoadTexture()
 {
 	// TODO
 }
@@ -655,7 +655,7 @@ void CCharaPcs::CLoadTexture::~CLoadTexture()
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::CLoadPdt::CLoadPdt()
+CCharaPcs::CLoadPdt::CLoadPdt()
 {
 	// TODO
 }
@@ -665,197 +665,7 @@ void CCharaPcs::CLoadPdt::CLoadPdt()
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::CLoadPdt::~CLoadPdt()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CColor::operator= (const CColor &)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CColor::operator* (float) const
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CColor3::operator* (const CColor3 &) const
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CColor::__opR7CColor3()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CColor::operator+ (const CColor &) const
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::SetAmemStage(CMemory::CStage *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::GetMemoryStage()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::ResetAmem(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CAnim::SetAmemAddress(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CAnim::GetBankSize()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CAnim::GetAmemAddress()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CAnim::AddHistory()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CAnim::ReleaseBank()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CAnim::GetHistory()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CAnim::IsBanked()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CModel::GetMatrix()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CAnim::SetLastFrame(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CAnim::SetInterp(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChara::CModel::GetMatrix(float (*) [4])
+CCharaPcs::CLoadPdt::~CLoadPdt()
 {
 	// TODO
 }
@@ -866,626 +676,6 @@ void CChara::CModel::GetMatrix(float (*) [4])
  * Size:	TODO
  */
 void CCharaPcs::GetAnimStage()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMemory::ResetDefaultGroup()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMemory::SetDefaultGroup(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCameraPcs::SetViewMatrix(float (*) [4])
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GXEnd(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGraphic::GetCopyClearColor()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGraphic::GetFogParam(float &, float &)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGraphic::GetFogColor()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadPdt *>::Add(CCharaPcs::CLoadPdt *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadPdt *>::GetSize()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadPdt *>::ReleaseAndRemoveAll()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadPdt *>::RemoveAt(unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadPdt *>::operator[] (unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadPdt *>::SetStage(CMemory::CStage *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadPdt *>::SetDefaultSize(unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadPdt *>::SetGrow(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadPdt *>::setSize(unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadTexture *>::Add(CCharaPcs::CLoadTexture *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadTexture *>::GetSize()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadTexture *>::ReleaseAndRemoveAll()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadTexture *>::RemoveAt(unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadTexture *>::operator[] (unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadTexture *>::SetStage(CMemory::CStage *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadTexture *>::SetDefaultSize(unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadTexture *>::SetGrow(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadTexture *>::setSize(unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadAnim *>::Add(CCharaPcs::CLoadAnim *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadAnim *>::GetSize()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadAnim *>::ReleaseAndRemoveAll()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadAnim *>::RemoveAt(unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadAnim *>::operator[] (unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadAnim *>::SetStage(CMemory::CStage *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadAnim *>::SetDefaultSize(unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadAnim *>::SetGrow(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadAnim *>::setSize(unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadModel *>::Add(CCharaPcs::CLoadModel *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadModel *>::GetSize()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadModel *>::ReleaseAndRemoveAll()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadModel *>::RemoveAt(unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadModel *>::operator[] (unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadModel *>::SetStage(CMemory::CStage *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadModel *>::SetDefaultSize(unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadModel *>::SetGrow(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadModel *>::setSize(unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadPdt *>::GetAt(unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadPdt *>::RemoveAll()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadTexture *>::GetAt(unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadTexture *>::RemoveAll()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadAnim *>::GetAt(unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadAnim *>::RemoveAll()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadModel *>::GetAt(unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadModel *>::RemoveAll()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void __sinit_p_chara_cpp(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCharaPcs::~CCharaPcs()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCharaPcs::CCharaPcs()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadPdt *>::CPtrArray()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadPdt *>::~CPtrArray()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadTexture *>::CPtrArray()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadTexture *>::~CPtrArray()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadAnim *>::CPtrArray()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadAnim *>::~CPtrArray()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadModel *>::CPtrArray()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CCharaPcs::CLoadModel *>::~CPtrArray()
 {
 	// TODO
 }

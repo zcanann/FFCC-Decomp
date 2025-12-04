@@ -5,7 +5,17 @@
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMesh::CMapMesh()
+CMapMesh::CMapMesh()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+CMapMesh::~CMapMesh()
 {
 	// TODO
 }
@@ -16,16 +26,6 @@ void CMapMesh::CMapMesh()
  * Size:	TODO
  */
 void CMapMesh::Destroy()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMapMesh::~CMapMesh()
 {
 	// TODO
 }
@@ -166,96 +166,6 @@ void CMapMesh::pppCacheRefCnt0UpModelTexture(CMaterialSet *, CAmemCacheSet *)
  * Size:	TODO
  */
 void CMapMesh::pppCacheDumpModelTexture(CMaterialSet *, CAmemCacheSet *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChunkFile::operator= (const CChunkFile &)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CChunkFile::CChunkFile(const CChunkFile &)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMaterialMan::SetNRM(S16Vec *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMaterial::GetTevBit()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMaterialSet::GetMaterial(long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMaterial::GetTexture(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CMaterial *>::GetSize()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CMaterial *>::operator[] (unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CMaterial *>::GetAt(unsigned long)
 {
 	// TODO
 }

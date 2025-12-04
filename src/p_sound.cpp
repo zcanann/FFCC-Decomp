@@ -5,6 +5,16 @@
  * Address:	TODO
  * Size:	TODO
  */
+CSoundPcs::CSoundPcs()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 void CSoundPcs::Init()
 {
 	// TODO
@@ -76,26 +86,6 @@ void CSoundPcs::calc()
  * Size:	TODO
  */
 void CSoundPcs::draw()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void __sinit_p_sound_cpp(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CSoundPcs::CSoundPcs()
 {
 	// TODO
 }

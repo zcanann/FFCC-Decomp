@@ -235,56 +235,6 @@ void CGItemObj::DispAllFieldItem(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGPrgObj::onFramePreCalc()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGPrgObj::onFramePostCalc()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGPrgObj::onChangeStat(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGPrgObj::onCancelStat(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGPrgObj::onFrameStat()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CGItemObj::GetCID()
 {
 	// TODO

@@ -5,6 +5,16 @@
  * Address:	TODO
  * Size:	TODO
  */
+void CATEGOLY2TYPE(int)
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 void CGPartyObj::onCreate()
 {
 	// TODO
@@ -765,77 +775,7 @@ void CGPartyObj::onDraw()
  * Address:	TODO
  * Size:	TODO
  */
-void CCaravanWork::CanAddItem(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGame::GetMark()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGame::CGameWork::IsStreamStage()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGame::GetNumBonus()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CATEGOLY2TYPE(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGItemObj::isCarry()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CGPartyObj::GetCID()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CVector::operator/ (float) const
 {
 	// TODO
 }

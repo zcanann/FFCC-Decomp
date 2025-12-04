@@ -1,6 +1,10 @@
 #ifndef _FFCC_P_MAP_H_
 #define _FFCC_P_MAP_H_
 
+#include <dolphin/gx.h>
+
+struct Vec;
+
 void mapInitDrawEnv();
 
 class CMapPcs

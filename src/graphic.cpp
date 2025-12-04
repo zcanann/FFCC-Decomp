@@ -15,6 +15,16 @@ void checkThread(void *)
  * Address:	TODO
  * Size:	TODO
  */
+CGraphic::CGraphic()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 void CGraphic::Init()
 {
 	// TODO
@@ -275,16 +285,6 @@ void CGraphic::DrawDebugStringDirect(unsigned long, unsigned long, char *, unsig
  * Address:	TODO
  * Size:	TODO
  */
-void GXEnd(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CGraphic::SaveFrameBuffer(char *)
 {
 	// TODO
@@ -336,26 +336,6 @@ void CGraphic::DrawSphere(float (*) [4], _GXColor)
  * Size:	TODO
  */
 void CGraphic::makeSphere()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void std::sinf(float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void std::cosf(float)
 {
 	// TODO
 }
@@ -435,7 +415,7 @@ void CGraphic::GetBackBufferRect2(void *, _GXTexObj *, int, int, int, int, int, 
  * Address:	TODO
  * Size:	TODO
  */
-void CGraphic::RenderTexQuadGrouad(Vec, Vec, _GXColor, _GXColor, _GXColor, _GXColor)
+void CGraphic::RenderTexQuadGrouad(Vec&, Vec&, _GXColor, _GXColor, _GXColor, _GXColor)
 {
 	// TODO
 }
@@ -445,7 +425,7 @@ void CGraphic::RenderTexQuadGrouad(Vec, Vec, _GXColor, _GXColor, _GXColor, _GXCo
  * Address:	TODO
  * Size:	TODO
  */
-void CGraphic::RenderNoTexQuadGrouad(Vec, Vec, _GXColor, _GXColor, _GXColor, _GXColor)
+void CGraphic::RenderNoTexQuadGrouad(Vec&, Vec&, _GXColor, _GXColor, _GXColor, _GXColor)
 {
 	// TODO
 }
@@ -455,7 +435,7 @@ void CGraphic::RenderNoTexQuadGrouad(Vec, Vec, _GXColor, _GXColor, _GXColor, _GX
  * Address:	TODO
  * Size:	TODO
  */
-void CGraphic::RenderDOF(char, char, float, float, Vec, int)
+void CGraphic::RenderDOF(char, char, float, float, Vec&, int)
 {
 	// TODO
 }
@@ -506,166 +486,6 @@ void CGraphic::CreateTempBuffer()
  * Size:	TODO
  */
 void CGraphic::DestroyTempBuffer()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void __sinit_graphic_cpp(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGraphic::CGraphic()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPad::GetDebugButtonDown(long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CSystem::GetIdxCurrentOrder()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CSystem::IsDraw()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CSystem::GetSpeed()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMemoryCardMan::IsMcMount()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFile::IsFatalError()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CUtil::ConvertEndian4(long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CUtil::ConvertEndian2(short)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCameraPcs::GetViewMatrix(float (*) [4])
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCameraPcs::GetClip(float *, float *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCameraPcs::GetPosition(Vec *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCameraPcs::GetProjectionMatrix(float (*) [4])
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCameraPcs::GetProjectionMatrix()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCameraPcs::GetViewMatrix()
 {
 	// TODO
 }

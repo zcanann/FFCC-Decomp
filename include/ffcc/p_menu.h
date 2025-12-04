@@ -1,22 +1,14 @@
 #ifndef _FFCC_P_MENU_H_
 #define _FFCC_P_MENU_H_
 
-struct _GXColor;
+#include <dolphin/gx.h>
+
 class CColor;
 class CFontMan;
 class CFont;
 class CPad;
 class CRingMenu;
 class CMesMenu;
-
-class McCtrl
-{
-public:
-    McCtrl();
-    ~McCtrl();
-
-    void Init();
-};
 
 class CMenuPcs
 {
@@ -26,15 +18,15 @@ public:
 	};
     enum MENUMODE
 	{
-		TODO,
+		TODOA,
 	};
     enum FMT
 	{
-		TODO,
+		TODOB,
 	};
     enum TEX
 	{
-		TODO,
+		TODOC,
 	};
 
     CMenuPcs();

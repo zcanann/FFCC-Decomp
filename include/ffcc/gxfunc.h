@@ -1,24 +1,7 @@
 #ifndef _GXFUNC_H_
 #define _GXFUNC_H_
 
-enum _GXTevStageID : int;
-enum _GXTevMode : int;
-enum _GXTevColorArg : int;
-enum _GXTevAlphaArg : int;
-enum _GXTevOp : int;
-enum _GXTevBias : int;
-enum _GXTevScale : int;
-enum _GXTevRegID : int;
-enum _GXCompare : int;
-enum _GXAlphaOp : int;
-enum _GXTexCoordID : int;
-enum _GXTexMapID : int;
-enum _GXChannelID : int;
-enum _GXTevSwapSel : int;
-enum _GXTevColorChan : int;
-enum _GXBlendMode : int;
-enum _GXBlendFactor : int;
-enum _GXLogicOp : int;
+#include <dolphin/gx.h>
 
 void _GXSetTev0_Init(_GXTevStageID);
 void _GXSetTev_Init();

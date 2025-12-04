@@ -1,16 +1,14 @@
 #ifndef _GRAPHIC_H_
 #define _GRAPHIC_H_
 
+#include <dolphin/gx.h>
+
 // Forward declarations
-struct _GXColor;
-struct _GXTexObj;
 struct CBound;
 struct OSAlarm;
 struct OSContext;
 struct Vec;
 struct Vec2d;
-enum _GXTexFilter : int;
-enum _GXTexFmt : int;
 class CGraphic;
 class CPad;
 class CSystem;
@@ -78,10 +76,10 @@ public:
     void GetBackBufferRect(int &, int &, int &, int &, int);
     void GetBackBufferRect2(void *, _GXTexObj *, int, int, int, int, int, _GXTexFilter, _GXTexFmt, int);
 
-    void RenderTexQuadGrouad(Vec, Vec, _GXColor, _GXColor, _GXColor, _GXColor);
-    void RenderNoTexQuadGrouad(Vec, Vec, _GXColor, _GXColor, _GXColor, _GXColor);
+    void RenderTexQuadGrouad(Vec&, Vec&, _GXColor, _GXColor, _GXColor, _GXColor);
+    void RenderNoTexQuadGrouad(Vec&, Vec&, _GXColor, _GXColor, _GXColor, _GXColor);
 
-    void RenderDOF(char, char, float, float, Vec, int);
+    void RenderDOF(char, char, float, float, Vec&, int);
 
     void CreateSmallBackTexture(void *, _GXTexObj *, long, long, _GXTexFilter, _GXTexFmt, unsigned long);
 

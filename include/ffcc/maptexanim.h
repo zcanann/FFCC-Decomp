@@ -9,6 +9,9 @@ class CTexture;
 class CMapTexAnimSet
 {
 public:
+    CMapTexAnimSet();
+    ~CMapTexAnimSet();
+
     void Create(CChunkFile&, CMaterialSet*, CTextureSet*);
     void Calc();
     void SetMapTexAnim(int, int, int, int);

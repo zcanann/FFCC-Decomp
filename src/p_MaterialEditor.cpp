@@ -5,6 +5,26 @@
  * Address:	TODO
  * Size:	TODO
  */
+CMaterialEditorPcs::CMaterialEditorPcs()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+CMaterialEditorPcs::~CMaterialEditorPcs()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 void CMaterialEditorPcs::Init()
 {
 	// TODO
@@ -85,77 +105,7 @@ void CMaterialEditorPcs::drawViewer()
  * Address:	TODO
  * Size:	TODO
  */
-void GXEnd(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GXSetTexCoordGen(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CMaterialEditorPcs::CreateBoundaryBox(Vec &, Vec &, long, const Vec *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CUSBStreamData::UnLockBuffer()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void ZLIST::GetHead()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void __sinit_p_MaterialEditor_cpp(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMaterialEditorPcs::~CMaterialEditorPcs()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMaterialEditorPcs::CMaterialEditorPcs()
 {
 	// TODO
 }

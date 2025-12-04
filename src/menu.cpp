@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void CMenu::CMenu()
+CMenu::CMenu()
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void CMenu::CMenu()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenu::~CMenu()
+CMenu::~CMenu()
 {
 	// TODO
 }

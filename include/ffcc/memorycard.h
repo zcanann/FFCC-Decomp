@@ -7,14 +7,18 @@
 
 class CStage;
 
-namespace Mc
-{
-    struct SaveDat;
-}
-
 class CMemoryCardMan : public CManager
 {
 public:
+    class Mc
+    {
+    public:
+        class SaveDat
+        {
+            public:
+        };
+    };
+
     CMemoryCardMan();
 
     void Init();

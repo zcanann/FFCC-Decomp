@@ -15,16 +15,6 @@ void CMenuPcs::FavoInit()
  * Address:	TODO
  * Size:	TODO
  */
-void FoodRank::operator= (const FoodRank &)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CMenuPcs::FavoInit0()
 {
 	// TODO

@@ -1,8 +1,9 @@
 #ifndef _FFCC_MAPMESH_H_
 #define _FFCC_MAPMESH_H_
 
+#include "ffcc/memory.h"
+
 class CChunkFile;
-class CMemory;
 class CMaterialSet;
 class CMaterialMan;
 class CMaterial;
@@ -13,8 +14,9 @@ class CMapMesh
 {
 public:
     CMapMesh();
-    void Destroy();
     ~CMapMesh();
+    
+    void Destroy();
     void Ptr2Off();
     void Off2Ptr();
     void ReadOtmMesh(CChunkFile&, CMemory::CStage*, int, int);

@@ -1,13 +1,14 @@
 #ifndef _GOOUT_H_
 #define _GOOUT_H_
 
+#include "ffcc/memorycard.h"
+
 class CGoOutMenu;
 class CCaravanWork;
 class McCtrl;
 class CMenuPcs;
-class SaveDat;
 
-void getFreeCaravanIdx(SaveDat *);
+void getFreeCaravanIdx(CMemoryCardMan::Mc::SaveDat *);
 void CalcGoOutMenu();
 void DrawGoOutMenu();
 

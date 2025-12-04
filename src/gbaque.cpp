@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::GbaQueue()
+GbaQueue::GbaQueue()
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void GbaQueue::GbaQueue()
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::~GbaQueue()
+GbaQueue::~GbaQueue()
 {
 	// TODO
 }
@@ -355,16 +355,6 @@ void GbaQueue::GetItemAll(int, unsigned char *)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaPInfo::operator= (const GbaPInfo &)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void GbaQueue::GetScrFlg()
 {
 	// TODO
@@ -586,16 +576,6 @@ void GbaQueue::InitCmakeInfo(int, int)
  * Size:	TODO
  */
 void GbaQueue::ChkCMakeName(int, unsigned int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GbaCMakeInfo::operator= (const GbaCMakeInfo &)
 {
 	// TODO
 }
@@ -1145,16 +1125,6 @@ void GbaQueue::SetHitEnemy(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void HitEInfo::operator= (const HitEInfo &)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void GbaQueue::GetHitEInfo(int)
 {
 	// TODO
@@ -1376,86 +1346,6 @@ void GbaQueue::ClrStartBonusFlg(int)
  * Size:	TODO
  */
 void __sinit_gbaque_cpp(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGame::GetGbaSP(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGame::GetNumBonusName()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGame::GetLetterReply(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGame::GetLetter(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGame::GetHelpName(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFlatRuntime2::IsInitFinished()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFlatRuntime2::CanReplyLetter()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCaravanWork::IsUseItem()
 {
 	// TODO
 }

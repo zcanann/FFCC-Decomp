@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void CGObjWork::CGObjWork()
+CGObjWork::CGObjWork()
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void CGObjWork::CGObjWork()
  * Address:	TODO
  * Size:	TODO
  */
-void CGObjWork::~CGObjWork()
+CGObjWork::~CGObjWork()
 {
 	// TODO
 }
@@ -45,7 +45,7 @@ void CGObjWork::CalcStatus()
  * Address:	TODO
  * Size:	TODO
  */
-void CCaravanWork::CCaravanWork()
+CCaravanWork::CCaravanWork()
 {
 	// TODO
 }
@@ -55,7 +55,7 @@ void CCaravanWork::CCaravanWork()
  * Address:	TODO
  * Size:	TODO
  */
-void CCaravanWork::~CCaravanWork()
+CCaravanWork::~CCaravanWork()
 {
 	// TODO
 }
@@ -665,7 +665,7 @@ void CCaravanWork::UnuniteComList(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMonWork::CMonWork()
+CMonWork::CMonWork()
 {
 	// TODO
 }
@@ -675,7 +675,7 @@ void CMonWork::CMonWork()
  * Address:	TODO
  * Size:	TODO
  */
-void CMonWork::~CMonWork()
+CMonWork::~CMonWork()
 {
 	// TODO
 }
@@ -705,57 +705,7 @@ void CMonWork::CalcStatus()
  * Address:	TODO
  * Size:	TODO
  */
-void CMes::SetTempValue(int, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CCaravanWork::GetEvtFlag(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGame::GetEvtFlag(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGame::GetShortItemName(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGame::CGameWork::GetNumPlayer()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGame::CGameWork::IsBattleStage()
 {
 	// TODO
 }

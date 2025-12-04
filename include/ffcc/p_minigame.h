@@ -1,321 +1,58 @@
+#ifndef _FFCC_P_MINIGAME_H_
+#define _FFCC_P_MINIGAME_H_
 
+#include <dolphin/os.h>
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMiniGamePcs::GetTable(unsigned long)
+class MgGbaThreadParam;
+class OSAlarm;
+class OSContext;
+class OSThread;
+
+void ChgHL16(unsigned short);
+void MiniGameFileRead(char*, void*, unsigned long&);
+void CalcCrc(unsigned long);
+void AdjustGbaImageRegistry(char*, char*);
+void _OpenCallback(MgGbaThreadParam*, void*);
+void getKoubutsuList(unsigned char*, int);
+void GbaThreadAlarmHandler(OSAlarm*, OSContext*);
+void GbaThreadSleep(long long);
+void GbaThreadReadInitialCode(MgGbaThreadParam*);
+void _GbaThreadMain(void*);
+void _MngThreadMain(void*);
+
+class CMiniGamePcs
 {
-	// TODO
-}
+public:
+    CMiniGamePcs();
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void ChgHL16(unsigned short)
-{
-	// TODO
-}
+    void GetTable(unsigned long);
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMiniGamePcs::Init()
-{
-	// TODO
-}
+    void Init();
+    void Quit();
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMiniGamePcs::Quit()
-{
-	// TODO
-}
+    void create();
+    void destroy();
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMiniGamePcs::create()
-{
-	// TODO
-}
+    void MiniGameGo(char*, char*);
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMiniGamePcs::destroy()
-{
-	// TODO
-}
+    void GbaThreadInitGbaContext(MgGbaThreadParam*, int);
+    void GbaThreadWriteInitialCode(MgGbaThreadParam*);
+    void GbaThreadReadContext(MgGbaThreadParam*);
+    void GbaThreadMain(void*);
+    void GbaThreadInit(long, MgGbaThreadParam*, OSThread*, unsigned char*, unsigned long,
+                       long, void (*)(MgGbaThreadParam*, void*), unsigned char*, long);
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void MiniGameFileRead(char *, void *, unsigned long &)
-{
-	// TODO
-}
+    void OpenCallback(MgGbaThreadParam*, void*);
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CalcCrc(unsigned long)
-{
-	// TODO
-}
+    void calc();
+    void PadCodeProc(int, unsigned short);
+    void EndThread();
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void AdjustGbaImageRegistry(char *, char *)
-{
-	// TODO
-}
+    void MngThreadMain(void*);
+    void MiniGameEnd();
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void _OpenCallback(MgGbaThreadParam *, void *)
-{
-	// TODO
-}
+    void CallMiniGameParam(int, int, int);
+    void SetNumPlayer();
+};
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMiniGamePcs::MiniGameGo(char *, char *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void getKoubutsuList(unsigned char *, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMiniGamePcs::GbaThreadInitGbaContext(MgGbaThreadParam *, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GbaThreadAlarmHandler(OSAlarm *, OSContext *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GbaThreadSleep(long long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GbaThreadReadInitialCode(MgGbaThreadParam *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMiniGamePcs::GbaThreadWriteInitialCode(MgGbaThreadParam *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMiniGamePcs::GbaThreadReadContext(MgGbaThreadParam *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMiniGamePcs::GbaThreadMain(void *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void _GbaThreadMain(void *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMiniGamePcs::GbaThreadInit(long, MgGbaThreadParam *, OSThread *, unsigned char *, unsigned long, long, void (*) (MgGbaThreadParam *, void *), unsigned char *, long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMiniGamePcs::OpenCallback(MgGbaThreadParam *, void *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMiniGamePcs::calc()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMiniGamePcs::PadCodeProc(int, unsigned short)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMiniGamePcs::EndThread()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void _MngThreadMain(void *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMiniGamePcs::MngThreadMain(void *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMiniGamePcs::MiniGameEnd()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMiniGamePcs::CallMiniGameParam(int, int, int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMiniGamePcs::SetNumPlayer()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void __sinit_p_minigame_cpp(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMiniGamePcs::CMiniGamePcs()
-{
-	// TODO
-}
+#endif // _FFCC_P_MINIGAME_H_

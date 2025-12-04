@@ -1,8 +1,9 @@
 #ifndef _FFCC_MENU_UTIL_H_
 #define _FFCC_MENU_UTIL_H_
 
+#include <dolphin/gx.h>
+
 class CFont;
-struct _GXColor;
 
 class CMenuPcs
 {

@@ -1,24 +1,26 @@
 #ifndef _FFCC_P_DBGMENU_H_
 #define _FFCC_P_DBGMENU_H_
 
-class CPad;
-
 class CDbgMenuPcs
 {
 public:
+    struct CDM
+    {
+        CDM();
+
+        void Clear();
+    };
+
     struct CDMParam
     {
         CDMParam();
         CDMParam(int, int, int, int, int, int, void *, void (*)(CDM &, void *), void (*)(CDM &, void *));
+        
         void Clear();
         void operator=(const CDMParam &);
     };
-	
-    struct CDM
-    {
-        CDM();
-        void Clear();
-    };
+
+    CDbgMenuPcs();
 	
     void Init();
     void Quit();
@@ -39,7 +41,6 @@ public:
     void Add();
     void Add(int, int, CDMParam &);
     void Delete(int);
-    void CDbgMenuPcs();
 };
 
 #endif // _FFCC_P_DBGMENU_H_

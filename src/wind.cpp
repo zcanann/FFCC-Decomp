@@ -99,13 +99,3 @@ void CWind::ChangePower(int, float)
 {
 	// TODO
 }
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenuPcs::GetMenuMode()
-{
-	// TODO
-}

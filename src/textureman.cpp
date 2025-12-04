@@ -5,6 +5,16 @@
  * Address:	TODO
  * Size:	TODO
  */
+CTextureMan::CTextureMan()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 void CTextureMan::Init()
 {
 	// TODO
@@ -45,7 +55,7 @@ void CTextureMan::SetTextureTev(CTexture *)
  * Address:	TODO
  * Size:	TODO
  */
-void CTexture::CTexture()
+CTexture::CTexture()
 {
 	// TODO
 }
@@ -55,17 +65,7 @@ void CTexture::CTexture()
  * Address:	TODO
  * Size:	TODO
  */
-void CTexture::~CTexture()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CTexture::operator new (unsigned long, CMemory::CStage *, char *, int)
+CTexture::~CTexture()
 {
 	// TODO
 }
@@ -225,7 +225,7 @@ void CTexture::FlushExternalTlut(void *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CTextureSet::CTextureSet()
+CTextureSet::CTextureSet()
 {
 	// TODO
 }
@@ -235,17 +235,7 @@ void CTextureSet::CTextureSet()
  * Address:	TODO
  * Size:	TODO
  */
-void CTextureSet::~CTextureSet()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CTextureSet::operator new (unsigned long, CMemory::CStage *, char *, int)
+CTextureSet::~CTextureSet()
 {
 	// TODO
 }
@@ -296,166 +286,6 @@ void CTextureSet::ReleaseTextureIdx(int, CAmemCacheSet *)
  * Size:	TODO
  */
 void CTexture::GetNumTlut()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CRef::AddRef()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CRef::GetRef()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexture *>::CPtrArray()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexture *>::~CPtrArray()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexture *>::Add(CTexture *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexture *>::SetAt(unsigned long, CTexture *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexture *>::GetSize()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexture *>::RemoveAll()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexture *>::ReleaseAndRemoveAll()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexture *>::operator[] (unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexture *>::SetStage(CMemory::CStage *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexture *>::SetDefaultSize(unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexture *>::setSize(unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexture *>::GetAt(unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void __sinit_textureman_cpp(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CTextureMan::CTextureMan()
 {
 	// TODO
 }

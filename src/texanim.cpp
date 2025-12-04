@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void CTexAnimSet::CTexAnimSet()
+CTexAnimSet::CTexAnimSet()
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void CTexAnimSet::CTexAnimSet()
  * Address:	TODO
  * Size:	TODO
  */
-void CTexAnimSet::~CTexAnimSet()
+CTexAnimSet::~CTexAnimSet()
 {
 	// TODO
 }
@@ -85,7 +85,7 @@ void CTexAnimSet::SetTexGen()
  * Address:	TODO
  * Size:	TODO
  */
-void CTexAnim::CTexAnim()
+CTexAnim::CTexAnim()
 {
 	// TODO
 }
@@ -95,7 +95,7 @@ void CTexAnim::CTexAnim()
  * Address:	TODO
  * Size:	TODO
  */
-void CTexAnim::~CTexAnim()
+CTexAnim::~CTexAnim()
 {
 	// TODO
 }
@@ -195,7 +195,7 @@ void CTexAnim::GetChin()
  * Address:	TODO
  * Size:	TODO
  */
-void CTexAnim::CRefData::CRefData()
+CTexAnim::CRefData::CRefData()
 {
 	// TODO
 }
@@ -205,7 +205,7 @@ void CTexAnim::CRefData::CRefData()
  * Address:	TODO
  * Size:	TODO
  */
-void CTexAnim::CRefData::~CRefData()
+CTexAnim::CRefData::~CRefData()
 {
 	// TODO
 }
@@ -215,7 +215,7 @@ void CTexAnim::CRefData::~CRefData()
  * Address:	TODO
  * Size:	TODO
  */
-void CTexAnimSeq::CTexAnimSeq()
+CTexAnimSeq::CTexAnimSeq()
 {
 	// TODO
 }
@@ -225,7 +225,7 @@ void CTexAnimSeq::CTexAnimSeq()
  * Address:	TODO
  * Size:	TODO
  */
-void CTexAnimSeq::~CTexAnimSeq()
+CTexAnimSeq::~CTexAnimSeq()
 {
 	// TODO
 }
@@ -246,26 +246,6 @@ void CTexAnimSeq::Create(CChunkFile &, CMemory::CStage *)
  * Size:	TODO
  */
 void CTexAnimSeq::Interp(float, Vec &)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void std::fmodf(float, float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMaterial::SetTexScroll(int, float, float, float, float)
 {
 	// TODO
 }
@@ -296,206 +276,6 @@ void CTexAnimSeq::GetName()
  * Size:	TODO
  */
 void CTexAnimSeq::IsChin()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexAnimSeq *>::CPtrArray()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexAnimSeq *>::~CPtrArray()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexAnimSeq *>::Add(CTexAnimSeq *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexAnimSeq *>::GetSize()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexAnimSeq *>::RemoveAll()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexAnimSeq *>::ReleaseAndRemoveAll()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexAnimSeq *>::operator[] (unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexAnimSeq *>::SetStage(CMemory::CStage *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexAnimSeq *>::setSize(unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexAnim *>::CPtrArray()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexAnim *>::~CPtrArray()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexAnim *>::Add(CTexAnim *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexAnim *>::GetSize()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexAnim *>::RemoveAll()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexAnim *>::ReleaseAndRemoveAll()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexAnim *>::operator[] (unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexAnim *>::SetStage(CMemory::CStage *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexAnim *>::setSize(unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexAnimSeq *>::GetAt(unsigned long)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPtrArray<CTexAnim *>::GetAt(unsigned long)
 {
 	// TODO
 }

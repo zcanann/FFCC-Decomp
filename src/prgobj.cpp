@@ -209,13 +209,3 @@ void CGPrgObj::GetCID()
 {
 	// TODO
 }
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CPartPcs::IsLocationTitle()
-{
-	// TODO
-}

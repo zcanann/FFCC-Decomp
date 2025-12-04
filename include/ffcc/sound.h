@@ -1,6 +1,8 @@
 #ifndef _FFCC_PPP_SOUND_H_
 #define _FFCC_PPP_SOUND_H_
 
+#include "ffcc/file.h"
+
 struct Vec;
 
 class CSound

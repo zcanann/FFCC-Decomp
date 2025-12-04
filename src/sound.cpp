@@ -5,6 +5,26 @@
  * Address:	TODO
  * Size:	TODO
  */
+CSound::CSound()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+CSound::~CSound()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 void CSound::Init()
 {
 	// TODO
@@ -586,96 +606,6 @@ void CSound::AddNoFreeWave(int)
  * Size:	TODO
  */
 void CSound::WaitASync()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFile::CHandle::GetReadSize()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CLine<10>::Calc(Vec *, float *, unsigned long *, float *, Vec *, float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CLine<10>::Draw()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CLine<10>::CalcBound()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GXEnd(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CLine<10>::CLine()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void __sinit_sound_cpp(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CSound::~CSound()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CSound::CSound()
 {
 	// TODO
 }

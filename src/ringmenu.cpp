@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void CRingMenu::CRingMenu()
+CRingMenu::CRingMenu()
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void CRingMenu::CRingMenu()
  * Address:	TODO
  * Size:	TODO
  */
-void CRingMenu::~CRingMenu()
+CRingMenu::~CRingMenu()
 {
 	// TODO
 }
@@ -146,46 +146,6 @@ void CRingMenu::SetBattleCommand(int, int, int)
  * Size:	TODO
  */
 void CRingMenu::DrawIcon()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCaravanWork::GetNumCmdList()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGame::CGameWork::IsMogStage()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGame::GetRingName(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenuPcs::GetFont23()
 {
 	// TODO
 }

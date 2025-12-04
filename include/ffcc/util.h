@@ -1,14 +1,13 @@
 #ifndef _FFCC_PPP_UTIL_H_
 #define _FFCC_PPP_UTIL_H_
 
+#include <dolphin/gx.h>
+
 class CTexture;
 struct Vec;
 struct Vec2d;
 struct S16Vec;
 struct S16Vec2d;
-struct _GXColor;
-struct _GXTexObj;
-enum _GXBlendFactor;
 
 class CUtil
 {

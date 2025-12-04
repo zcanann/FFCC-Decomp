@@ -1,10 +1,13 @@
 #ifndef _FFCC_PPP_TEXTUREMAN_H_
 #define _FFCC_PPP_TEXTUREMAN_H_
 
+#include "ffcc/memory.h"
+
+#include <dolphin/gx.h>
+
 class CChunkFile;
 class CAmemCacheSet;
 class CMemory;
-struct _GXColor;
 
 enum _GXTexMapID;
 
@@ -13,8 +16,6 @@ class CTexture
 public:
     CTexture();
     ~CTexture();
-
-    static void *operator new(unsigned long, CMemory::CStage *, char *, int);
 
     void InitTexObj();
     void Create(CChunkFile &, CMemory::CStage *, CAmemCacheSet *, int, int);
@@ -39,8 +40,6 @@ class CTextureSet
 public:
     CTextureSet();
     ~CTextureSet();
-
-    static void *operator new(unsigned long, CMemory::CStage *, char *, int);
 
     void Create(void *, CMemory::CStage *, int, CAmemCacheSet *, int, int);
     void Create(CChunkFile &, CMemory::CStage *, int, CAmemCacheSet *, int, int);

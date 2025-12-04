@@ -1,7 +1,11 @@
 #ifndef _FFCC_PPP_USB_H_
 #define _FFCC_PPP_USB_H_
 
-enum MCCChannel;
+// TODO: Who owns?
+enum MCCChannel
+{
+
+};
 
 class CUSB
 {

@@ -519,23 +519,3 @@ void CMenuPcs::GetItemIcon(int)
 {
 	// TODO
 }
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGraphic::GetTempStage()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CFont::SetFixed(int)
-{
-	// TODO
-}

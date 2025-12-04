@@ -1,10 +1,11 @@
 #ifndef _FFCC_PPP_SHOPMENU_H_
 #define _FFCC_PPP_SHOPMENU_H_
 
+#include <dolphin/gx.h>
+
 class CFont;
 class CMaterialSet;
 class CCaravanWork;
-struct _GXColor;
 struct tagOAN3_SHAPE;
 
 void _drawNoShadowFont(CFont *, char *, float, float, int, int);

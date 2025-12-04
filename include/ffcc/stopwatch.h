@@ -1,101 +1,30 @@
+#ifndef _FFCC_STOPWATCH_H
+#define _FFCC_STOPWATCH_H
 
+#include <Dolphin/types.h>
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CStopWatch::CStopWatch(char *)
+#include "ffcc/manager.h"
+
+class CStopWatch
 {
-	// TODO
-}
+public:
+	CStopWatch(char *);
+	~CStopWatch();
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CStopWatch::~CStopWatch()
-{
-	// TODO
-}
+	void Reset();
+	void Start();
+	void Stop();
+	void Get();
+};
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CStopWatch::Reset()
+class CProfile
 {
-	// TODO
-}
+public:
+	CProfile(char *);
+	~CProfile();
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CStopWatch::Start()
-{
-	// TODO
-}
+	void ProfStart();
+	void ProfEnd();
+};
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CStopWatch::Stop()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CStopWatch::Get()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CProfile::CProfile(char *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CProfile::~CProfile()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CProfile::ProfStart()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CProfile::ProfEnd()
-{
-	// TODO
-}
+#endif // _FFCC_STOPWATCH_H

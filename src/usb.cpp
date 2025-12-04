@@ -5,6 +5,16 @@
  * Address:	TODO
  * Size:	TODO
  */
+CUSB::CUSB()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 void CUSB::Init()
 {
 	// TODO
@@ -106,26 +116,6 @@ void CUSB::RemoveMessageCallback(void (*) (unsigned long, void *, MCCChannel))
  * Size:	TODO
  */
 void CUSB::Printf(char *, ...)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void __sinit_usb_cpp(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CUSB::CUSB()
 {
 	// TODO
 }

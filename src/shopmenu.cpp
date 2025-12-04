@@ -255,36 +255,6 @@ void drawGrouadQuad(int, int, int, int, _GXColor, _GXColor, _GXColor, _GXColor)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::CreateShopMenu()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenuPcs::CreateSmithMenu()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenuPcs::DestroyShopMenu()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CShopMenu::Init(int)
 {
 	// TODO

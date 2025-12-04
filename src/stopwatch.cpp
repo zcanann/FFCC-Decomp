@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void CStopWatch::CStopWatch(char *)
+CStopWatch::CStopWatch(char *)
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void CStopWatch::CStopWatch(char *)
  * Address:	TODO
  * Size:	TODO
  */
-void CStopWatch::~CStopWatch()
+CStopWatch::~CStopWatch()
 {
 	// TODO
 }
@@ -65,7 +65,7 @@ void CStopWatch::Get()
  * Address:	TODO
  * Size:	TODO
  */
-void CProfile::CProfile(char *)
+CProfile::CProfile(char *)
 {
 	// TODO
 }
@@ -75,7 +75,7 @@ void CProfile::CProfile(char *)
  * Address:	TODO
  * Size:	TODO
  */
-void CProfile::~CProfile()
+CProfile::~CProfile()
 {
 	// TODO
 }

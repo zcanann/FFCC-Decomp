@@ -1,6 +1,8 @@
 #ifndef _FFCC_PPP_TEXANIM_H_
 #define _FFCC_PPP_TEXANIM_H_
 
+#include "ffcc/memory.h"
+
 class CMaterialSet;
 class CChunkFile;
 class CMemory;
@@ -9,7 +11,10 @@ struct Vec;
 class CTexAnimSet
 {
 public:
-    enum ANIM_TYPE;
+    enum ANIM_TYPE
+    {
+        TODO,
+    };
 
     CTexAnimSet();
     ~CTexAnimSet();

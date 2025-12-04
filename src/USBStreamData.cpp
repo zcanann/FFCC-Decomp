@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void CUSBStreamData::CUSBStreamData()
+CUSBStreamData::CUSBStreamData()
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void CUSBStreamData::CUSBStreamData()
  * Address:	TODO
  * Size:	TODO
  */
-void CUSBStreamData::~CUSBStreamData()
+CUSBStreamData::~CUSBStreamData()
 {
 	// TODO
 }

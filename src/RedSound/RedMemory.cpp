@@ -1,11 +1,11 @@
-
+#include "ffcc/RedSound/RedMemory.h"
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-void CRedMemory::CRedMemory()
+CRedMemory::CRedMemory()
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void CRedMemory::CRedMemory()
  * Address:	TODO
  * Size:	TODO
  */
-void CRedMemory::~CRedMemory()
+CRedMemory::~CRedMemory()
 {
 	// TODO
 }

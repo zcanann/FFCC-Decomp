@@ -1,11 +1,11 @@
-
+#include "ffcc/RedSound/RedEntry.h"
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-void CRedEntry::CRedEntry()
+CRedEntry::CRedEntry()
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void CRedEntry::CRedEntry()
  * Address:	TODO
  * Size:	TODO
  */
-void CRedEntry::~CRedEntry()
+CRedEntry::~CRedEntry()
 {
 	// TODO
 }

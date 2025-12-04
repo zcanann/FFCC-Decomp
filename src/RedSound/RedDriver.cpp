@@ -1,4 +1,4 @@
-
+#include "ffcc/RedSound/RedDriver.h"
 
 /*
  * --INFO--
@@ -445,7 +445,7 @@ void _RedAXCallback()
  * Address:	TODO
  * Size:	TODO
  */
-void CRedDriver::CRedDriver()
+CRedDriver::CRedDriver()
 {
 	// TODO
 }
@@ -455,7 +455,7 @@ void CRedDriver::CRedDriver()
  * Address:	TODO
  * Size:	TODO
  */
-void CRedDriver::~CRedDriver()
+CRedDriver::~CRedDriver()
 {
 	// TODO
 }
@@ -936,16 +936,6 @@ void CRedDriver::SetReverbDepth(int, int, int)
  * Size:	TODO
  */
 void CRedDriver::TestProcess(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void __sinit_RedDriver_cpp(void)
 {
 	// TODO
 }

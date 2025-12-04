@@ -324,6 +324,14 @@ config.libs = [
         "mw_version": config.linker_version,
         "cflags": cflags_game,
         "objects": [
+            Object(NonMatching, "RedSound/RedCommand.cpp"),
+            Object(NonMatching, "RedSound/RedDriver.cpp"),
+            Object(NonMatching, "RedSound/RedEntry.cpp"),
+            Object(NonMatching, "RedSound/RedExecute.cpp"),
+            Object(NonMatching, "RedSound/RedMemory.cpp"),
+            Object(NonMatching, "RedSound/RedMidiCtrl.cpp"),
+            Object(NonMatching, "RedSound/RedSound.cpp"),
+            Object(NonMatching, "RedSound/RedStream.cpp"),
             Object(NonMatching, "astar.cpp"),
             Object(NonMatching, "baseobj.cpp"),
             Object(NonMatching, "bonus_menu.cpp"),
@@ -375,8 +383,6 @@ config.libs = [
             Object(NonMatching, "menu_arti.cpp"),
             Object(NonMatching, "menu_cmd.cpp"),
             Object(NonMatching, "menu_compa.cpp"),
-
-
             Object(NonMatching, "menu_equip.cpp"),
             Object(NonMatching, "menu_favo.cpp"),
             Object(NonMatching, "menu_item.cpp"),

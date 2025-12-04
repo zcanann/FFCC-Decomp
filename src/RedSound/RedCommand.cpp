@@ -1,4 +1,4 @@
-
+#include "ffcc/RedSound/RedCommand.h"
 
 /*
  * --INFO--

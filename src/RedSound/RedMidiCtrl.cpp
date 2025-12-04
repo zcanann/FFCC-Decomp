@@ -1,4 +1,4 @@
-
+#include "ffcc/RedSound/RedMidiCtrl.h"
 
 /*
  * --INFO--

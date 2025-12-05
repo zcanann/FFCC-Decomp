@@ -120,7 +120,7 @@ public:
     void onDrawDebug(CFont*, float, float&, float);
     void onDraw();
 
-    void GetCID();
+    int GetCID();
 };
 
 #endif

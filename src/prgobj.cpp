@@ -205,7 +205,7 @@ void CGPrgObj::GetClassControl(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGPrgObj::GetCID()
+int CGPrgObj::GetCID()
 {
-	// TODO
+	return 0;
 }

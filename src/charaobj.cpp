@@ -525,9 +525,9 @@ void CGCharaObj::onStatDie()
  * Address:	TODO
  * Size:	TODO
  */
-void CGCharaObj::GetCID()
+int CGCharaObj::GetCID()
 {
-	// TODO
+	return 0;
 }
 
 /*

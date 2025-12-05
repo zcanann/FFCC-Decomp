@@ -27,7 +27,7 @@ public:
     void dstTargetRot(CGPrgObj *);
     void ClassControl(int, int);
     void GetClassControl(int);
-    void GetCID();
+    int GetCID();
 };
 
 #endif // _FFCC_PPP_PRGOBJ_H_

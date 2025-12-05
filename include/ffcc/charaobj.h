@@ -71,7 +71,7 @@ class CGCharaObj
 	void scCheckTime(CCombi2Set *, CGCharaObj *, CGCharaObj *, int);
 	void searchCombi(int, CGPartyObj **, int &);
 	void enableAttackCol(int, int, int);
-	void GetCID();
+	int GetCID();
 	void enableDamageCol(int);
 };
 

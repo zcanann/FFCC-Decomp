@@ -775,7 +775,7 @@ void CGPartyObj::onDraw()
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::GetCID()
+int CGPartyObj::GetCID()
 {
-	// TODO
+	return 0;
 }

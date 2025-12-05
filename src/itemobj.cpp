@@ -235,7 +235,7 @@ void CGItemObj::DispAllFieldItem(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGItemObj::GetCID()
+int CGItemObj::GetCID()
 {
-	// TODO
+	return 0;
 }

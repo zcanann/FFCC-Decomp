@@ -40,7 +40,7 @@ public:
 	void ItemJump(int, float);
 	void DeleteAllFieldItem();
 	void DispAllFieldItem(int);
-	void GetCID();
+	int GetCID();
 };
 
 #endif // _FFCC_ITEMOBJ_H_

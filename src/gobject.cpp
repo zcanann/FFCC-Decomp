@@ -636,7 +636,7 @@ void CGObject::onDrawDebug(CFont *, float, float &, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::GetCID()
+int CGObject::GetCID()
 {
-	// TODO
+	return 0;
 }

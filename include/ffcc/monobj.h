@@ -87,7 +87,7 @@ public:
     void sysControl(int);
     void onChangePrg(int);
     void footSe();
-    void GetCID();
+    int GetCID();
 };
 
 #endif // _FFCC_MONOBJ_H_

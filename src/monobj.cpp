@@ -705,7 +705,7 @@ void CGMonObj::CMoveWork::Clear()
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::GetCID()
+int CGMonObj::GetCID()
 {
-	// TODO
+	return 0;
 }

@@ -15,8 +15,10 @@ class CGBaseObj;
 class CGObject : public CGBaseObj
 {
 public:
-    void onCreate();
-    void onDestroy();
+    virtual void onCreate();
+    virtual void onDestroy();
+    virtual void onDraw();
+    virtual int GetCID();
     void move();
     void objectCollision();
     void bgCollision();
@@ -27,7 +29,6 @@ public:
     void hit();
     void update();
     void copy();
-    void onDraw();
     void CancelMove(int);
     void Move(Vec *, float, int, int, int, int, int);
     void MoveVector(Vec *, float, int, int, int, int);
@@ -77,7 +78,6 @@ public:
     void onAlphaUpdate();
     void onHitParticle(int, int, int, int, Vec *, PPPIFPARAM *);
     void onDrawDebug(CFont *, float, float &, float);
-    void GetCID();
 };
 
 #endif // _FFCC_CGOBJECT_H_

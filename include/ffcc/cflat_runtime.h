@@ -27,7 +27,29 @@ class CFlatRuntime
 		CObject();
 		~CObject();
 
-		char placeholder[72];
+		unsigned int m_id;         // 0x0
+		void** m_freeListNode;     // 0x4
+		unsigned int* m_sp;        // 0x8
+		unsigned int* m_localBase; // 0xC
+		unsigned int* m_thisBase;  // 0x10
+		short m_classIndex;        // 0x14-0x16
+		void* m_engineObject;      // 0x18
+		unsigned int m_codePos;    // 0x1C
+		CObject* m_previous;       // 0x20
+		CObject* m_next;           // 0x24
+		int m_waitCounter;	       // 0x28
+		unsigned char m_reqFlag0;  // 0x2C
+		unsigned char m_reqFlag1;  // 0x2D
+		unsigned char m_reqFlag2;  // 0x2E
+		unsigned char m_reqFlag3;  // 0x2F
+		short m_particleId;        // 0x30
+		short m_0x32;              // 0x32
+		short m_0x34;              // 0x34-0x36
+		short m_argCount;          // 0x36-0x38
+		unsigned char m_flags;     // 0x38-0x3B
+		int m_0x3C;                // 0x3C
+		int m_0x40;                // 0x40
+		int m_0x44;                // 0x44
 	};
 
 	class CFunc

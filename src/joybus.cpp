@@ -2285,17 +2285,17 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
 
     unsigned char* temp = m_perThreadTemp[port];
 
-    unsigned char& sendType      = temp[0];
-    unsigned char& phase         = temp[1];
-    unsigned short& crc          = *reinterpret_cast<unsigned short*>(temp + 0x02);
-    unsigned char*& dataPtr      = *reinterpret_cast<unsigned char**>(temp + 0x04);
-    unsigned char*& dataBase     = *reinterpret_cast<unsigned char**>(temp + 0x08);
-    unsigned char& blockCount    = temp[0x0C];
-    unsigned char& blockIndex    = temp[0x0D];
-    unsigned short& step         = *reinterpret_cast<unsigned short*>(temp + 0x0E);
-    unsigned short& chunkCount   = *reinterpret_cast<unsigned short*>(temp + 0x10);
-    unsigned short& totalSize    = *reinterpret_cast<unsigned short*>(temp + 0x12);
-    unsigned short& chunkSize    = *reinterpret_cast<unsigned short*>(temp + 0x14);
+    unsigned char& sendType = temp[0];
+    unsigned char& phase = temp[1];
+    unsigned short& crc = *reinterpret_cast<unsigned short*>(temp + 0x02);
+    unsigned char*& dataPtr = *reinterpret_cast<unsigned char**>(temp + 0x04);
+    unsigned char*& dataBase = *reinterpret_cast<unsigned char**>(temp + 0x08);
+    unsigned char& blockCount = temp[0x0C];
+    unsigned char& blockIndex = temp[0x0D];
+    unsigned short& step = *reinterpret_cast<unsigned short*>(temp + 0x0E);
+    unsigned short& chunkCount = *reinterpret_cast<unsigned short*>(temp + 0x10);
+    unsigned short& totalSize = *reinterpret_cast<unsigned short*>(temp + 0x12);
+    unsigned short& chunkSize = *reinterpret_cast<unsigned short*>(temp + 0x14);
 
     unsigned int localWord = 0;
     unsigned int gbaStatus = GBARecvSend(threadParam, &localWord);

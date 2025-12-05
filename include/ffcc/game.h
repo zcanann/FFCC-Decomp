@@ -39,9 +39,11 @@ public:
         void InitNewGame();
         void ClearScriptChange();
 
-        unsigned char placeholder1[0x14];
+        unsigned char placeholder1[0x6];
+        unsigned char m_languageId;
+        unsigned char placeholder2[0x14 - 0x7];
         int m_frameCounter;
-        unsigned char placeholder2[0x13E8 - 0x18];
+        unsigned char placeholder3[0x13E8 - 0x18];
     };
 
 public:
@@ -88,8 +90,8 @@ public:
     void MakeArtMonName(char*, int, int);
     void MakeArtsMonNames(char*, int);
     void MakeNumMonName(char*, int, int);
-    void GetLangString();
-    void SetNextScript(CGame::CNextScript*);
+    const char* GetLangString();
+    void SetNextScript(CGame::CNextScript* nextScript);
     void IsWorldMap();
     void IsPartyExist(int);
     void GetItemName(int);

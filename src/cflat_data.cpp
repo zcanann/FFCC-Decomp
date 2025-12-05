@@ -1,13 +1,18 @@
 #include "ffcc/cflat_data.h"
 
+#include <dolphin/types.h>
+
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
 CFlatData::CFlatData()
-{
-	// TODO
+{ 
+	m_dataCount = 0;
+	m_tableCount = 0;
+	m_mesCount = 0;
+	m_mesBuffer = (char*)nullptr;
 }
 
 /*

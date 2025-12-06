@@ -3280,7 +3280,7 @@ int JoyBus::MakeJoyData(char* src, int length, unsigned int* outBuffer)
             }
         }
 
-        // Tail processing: remaining groups (1–3)
+        // Tail processing: remaining groups (1-3)
         do
         {
             puVar6[0] = 0x85;

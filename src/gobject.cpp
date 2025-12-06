@@ -1,5 +1,13 @@
 #include "ffcc/gobject.h"
 
+#include "ffcc/p_game.h"
+
+static const float sBgDefaultGravityY = 0.0;
+static bool sBgCollisionActive;
+static const float  sAnimFrameOffset = 1.0f;  // FLOAT_80330338
+static const double sLoopBias = 1.2;   // DOUBLE_80330378
+static const float  sZeroFloat = 0.0f;  // FLOAT_80330350
+
 /*
  * --INFO--
  * Address:	TODO
@@ -58,7 +66,29 @@ void CGObject::objectCollision()
  */
 void CGObject::bgCollision()
 {
-	// TODO
+    m_stateFlags0 &= ~0x80;
+    m_stateFlags0 &= ~0x40;
+
+    m_radiusCtrl.x = 0.0f;
+    m_gravityY = sBgDefaultGravityY;
+
+    bgAttribCollision();
+
+    if (m_bgColMask & 0x01)
+    {
+        sBgCollisionActive = true;
+
+        if (Game.game.m_currentMapId == 0x21)
+        {
+            bgWorldCollision();
+        }
+        else
+        {
+            bgNormalCollision();
+        }
+
+        sBgCollisionActive = false;
+    }
 }
 
 /*
@@ -406,9 +436,66 @@ void CGObject::FreeAnim(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::IsLoopAnim(int)
+bool CGObject::IsLoopAnim(int mode)
 {
-	// TODO
+    // m_charaModelHandle is treated as an array; element 0x5A holds an animation controller.
+    CCharaPcs::CHandle* handles = m_charaModelHandle;
+
+    bool hasAnimCtrl = false;
+
+    if (handles != nullptr) // && handles[0x5A] != nullptr
+    {
+        hasAnimCtrl = true;
+    }
+
+    if (!hasAnimCtrl || m_currentAnimSlot == -1)
+    {
+        return 1;
+    }
+	
+    if (mode) // handles->m_someFlag == 0 // TODO
+    {
+        return 1;
+    }
+
+    const float span = *(float*)handles; // sAnimFrameOffset + (anim->m_endFrame - anim->m_startFrame); // TODO
+
+    if (span == sAnimFrameOffset)
+    {
+        return 1;
+    }
+
+    float base;
+	
+    if (mode == 0)
+    {
+        base = *(float*)handles; // TODO
+    }
+    else
+    {
+        base = m_turnSpeed;
+    }
+
+    double threshold = static_cast<double>(base);
+
+    // mode == 2 adds the 1.2 bias
+    if (mode == 2)
+    {
+        threshold = static_cast<double>(static_cast<float>(threshold + sLoopBias));
+    }
+
+	// TODO: Retype float?
+    const float lastAttr = *reinterpret_cast<const float*>(m_lastBgAttr);
+
+    if (static_cast<double>(lastAttr) < static_cast<double>(sZeroFloat))
+    {
+        return (threshold <= static_cast<double>(sZeroFloat)) ? 1 : 0;
+    }
+    else
+    {
+        const double diff = static_cast<double>(span - sAnimFrameOffset);
+        return (diff < threshold) ? 1 : 0;
+    }
 }
 
 /*
@@ -546,19 +633,9 @@ void CGObject::PutDropItem()
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::IsDispRader()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGObject::IsHChara()
-{
-	// TODO
+bool CGObject::IsDispRader()
+{ 
+	return m_displayFlags & 1;
 }
 
 /*
@@ -567,26 +644,6 @@ void CGObject::IsHChara()
  * Size:	TODO
  */
 void CGObject::onHit(int, CGObject *, int, Vec *)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGObject::IsHShield()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGObject::IsHWeapon()
 {
 	// TODO
 }

@@ -45,9 +45,11 @@ void CGPrgObj::changeStat(int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGPrgObj::changeSubStat(int)
+void CGPrgObj::changeSubStat(int subState)
 {
-	// TODO
+	m_subState = subState;
+	m_subFrame = 0;
+	m_subFrameGate = 1;
 }
 
 /*
@@ -56,8 +58,10 @@ void CGPrgObj::changeSubStat(int)
  * Size:	TODO
  */
 void CGPrgObj::addSubStat()
-{
-	// TODO
+{ 
+	m_subState = m_subState + 1;
+	m_subFrame = 0;
+	m_subFrameGate = 1;
 }
 
 /*
@@ -207,5 +211,5 @@ void CGPrgObj::GetClassControl(int)
  */
 int CGPrgObj::GetCID()
 {
-	return 0;
+	return 13;
 }

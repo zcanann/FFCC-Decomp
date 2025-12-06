@@ -417,7 +417,36 @@ void CCharaPcs::drawOverlap()
  */
 CCharaPcs::CHandle::CHandle()
 {
-	// TODO
+	m_previous = (CCharaPcs::CHandle*)nullptr;
+	m_next = (CCharaPcs::CHandle*)nullptr;
+	m_model = (CChara::CModel*)nullptr;
+	m_textureSet = (CTextureSet*)nullptr;
+	m_modelLoadRef = (CRef*)nullptr;
+	m_texLoadRef = (CRef*)nullptr;
+
+	for (int i = 0; i < 64; ++i)
+	{
+		m_animSlot[i] = (CRef*)nullptr;
+	}
+
+	// PDT load ref
+	m_pdtLoadRef = (CRef*)nullptr;
+
+	// Playback / state
+	m_currentAnimIndex = -1;
+	m_flags = 0;
+
+	m_colorPhase = 1.0f; // FLOAT_8033028c
+	m_sortZ = 0.0f; // FLOAT_80330288
+	m_shadowTexturePtr = nullptr;
+
+	m_asyncState = 0;
+	m_asyncFileHandle = (CFile::CHandle*)nullptr;
+
+	m_fogBlend = m_sortZ;
+	m_unk0x158 = 0;
+
+	m_drawListFlags &= 0x80;
 }
 
 /*
@@ -437,17 +466,16 @@ CCharaPcs::CHandle::~CHandle()
  */
 void CCharaPcs::CHandle::Add()
 {
-	// TODO
-}
+    if (m_next == nullptr && m_previous == nullptr)
+	{
+		CCharaPcs::CHandle* head = (this); // *(CCharaPcsCHandle **)(CharaPcs._76_4_ + 0x15c); // gCharaPcsHandleHead;
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CCharaPcs::CHandle::Remove()
-{
-	// TODO
+		m_previous = head;
+		m_next = head->m_next;
+
+		head->m_next->m_previous = this;
+		head->m_next = this;
+	}
 }
 
 /*
@@ -478,6 +506,19 @@ void CCharaPcs::CHandle::LoadModel(int, unsigned long, unsigned long, unsigned l
 void CCharaPcs::CHandle::LoadAnim(char *, int, int, int, int, int, int)
 {
 	// TODO
+}
+
+bool CCharaPcs::CHandle::IsModelLoaded(int checkModelField)
+{
+	if ((m_asyncState == 0 || m_asyncState == 7)
+		&& m_model != nullptr
+		// TODO: Pending CModel decomp
+		&& (checkModelField == 0 || *reinterpret_cast<int*>(reinterpret_cast<char*>(m_model) + 0xB0) != 0))
+	{
+			return true;
+	}
+
+	return false;
 }
 
 /*
@@ -575,9 +616,14 @@ void CCharaPcs::CHandle::loadModelASyncFrame()
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::CHandle::IsLoadModelASyncCompleted()
+bool CCharaPcs::CHandle::IsLoadModelASyncCompleted()
 {
-	// TODO
+    if (m_asyncState == 7)
+	{
+		return true;
+	}
+
+	return false;
 }
 
 /*

@@ -3,11 +3,11 @@
 
 #include <dolphin/gx.h>
 
+#include "ffcc/math.h"
+
 class CTexture;
 struct Vec;
 struct Vec2d;
-struct S16Vec;
-struct S16Vec2d;
 
 class CUtil
 {

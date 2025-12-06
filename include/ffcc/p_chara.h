@@ -4,6 +4,7 @@
 #include "ffcc/file.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_chara_viewer.h"
+#include "ffcc/ref.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -34,7 +35,7 @@ public:
         void SetInterp(int);
     };
 
-    class CModel
+    class CModel : public CRef
     {
     public:
         void GetMatrix();
@@ -70,7 +71,7 @@ public:
         void Calc();
         void Draw(int);
         void draw(int, int);
-        
+
         void LoadModelASync(int, unsigned long, unsigned long);
         void loadModelASyncFrame();
         bool IsLoadModelASyncCompleted();

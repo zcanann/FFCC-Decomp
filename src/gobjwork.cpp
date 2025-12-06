@@ -666,18 +666,11 @@ void CCaravanWork::UnuniteComList(int, int)
  * Size:	TODO
  */
 CMonWork::CMonWork()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CMonWork::~CMonWork()
-{
-	// TODO
+{ 
+	m_objType = -1;
+	m_saveSlot = 0xff;
+	m_partyIndex = 0xff;
+	m_objType = 1;
 }
 
 /*

@@ -1,6 +1,8 @@
 #ifndef _FFCC_P_CAMERA_H_
 #define _FFCC_P_CAMERA_H_
 
+#include "ffcc/system.h"
+
 #include <dolphin/gx.h>
 
 class SRT;
@@ -14,7 +16,7 @@ class CColor;
 
 void dbgDrawSphere(float, float, float, float, unsigned char, unsigned char, unsigned char);
 
-class CCameraPcs
+class CCameraPcs : public CProcess
 {
 public:
     CCameraPcs();

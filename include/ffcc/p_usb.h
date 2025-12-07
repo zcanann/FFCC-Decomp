@@ -2,8 +2,9 @@
 #define _FFCC_P_USB_H_
 
 #include "ffcc/usb.h"
+#include "ffcc/system.h"
 
-class CUSBPcs
+class CUSBPcs : public CProcess
 {
 public:
     struct CDataHeader

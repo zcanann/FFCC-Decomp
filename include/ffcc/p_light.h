@@ -2,13 +2,14 @@
 #define _FFCC_P_LIGHT_H_
 
 #include "ffcc/memory.h"
+#include "ffcc/system.h"
 
 #include <dolphin/gx.h>
 
 class COctTree;
 struct Vec;
 
-class CLightPcs
+class CLightPcs : public CProcess
 {
 public:
     class CBumpLight

@@ -1,9 +1,11 @@
 #ifndef _FFCC_P_GRAPHIC_H_
 #define _FFCC_P_GRAPHIC_H_
 
+#include "ffcc/system.h"
+
 #include <dolphin/gx.h>
 
-class CGraphicPcs
+class CGraphicPcs : public CProcess
 {
 public:
     void Init();

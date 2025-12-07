@@ -1,9 +1,11 @@
 #ifndef _FFCC_P_MATERIALEDITOR_H_
 #define _FFCC_P_MATERIALEDITOR_H_
 
+#include "ffcc/system.h"
+
 struct Vec;
 
-class CMaterialEditorPcs
+class CMaterialEditorPcs : public CProcess
 {
 public:
     CMaterialEditorPcs();

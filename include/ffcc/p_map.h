@@ -3,11 +3,13 @@
 
 #include <dolphin/gx.h>
 
+#include "ffcc/system.h"
+
 struct Vec;
 
 void mapInitDrawEnv();
 
-class CMapPcs
+class CMapPcs : public CProcess
 {
 public:
     CMapPcs();

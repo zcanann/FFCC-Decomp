@@ -1,6 +1,8 @@
 #ifndef _FFCC_P_MINIGAME_H_
 #define _FFCC_P_MINIGAME_H_
 
+#include "ffcc/system.h"
+
 #include <dolphin/os.h>
 
 class MgGbaThreadParam;
@@ -20,7 +22,7 @@ void GbaThreadReadInitialCode(MgGbaThreadParam*);
 void _GbaThreadMain(void*);
 void _MngThreadMain(void*);
 
-class CMiniGamePcs
+class CMiniGamePcs : public CProcess
 {
 public:
     CMiniGamePcs();

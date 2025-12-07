@@ -2,6 +2,7 @@
 #define _FFCC_P_TINA_H_
 
 #include "ffcc/memory.h"
+#include "ffcc/system.h"
 
 struct Vec;
 struct pppIVECTOR3;
@@ -14,7 +15,7 @@ void pppFreeMngStPrioForData();
 void pppAmemDeletePmng(unsigned long);
 void pppAmemRefCntError(unsigned long);
 
-class CPartPcs
+class CPartPcs : public CProcess
 {
 public:
     CPartPcs();

@@ -1,7 +1,9 @@
 #ifndef _FFCC_P_MC_H_
 #define _FFCC_P_MC_H_
 
-class CMcPcs
+#include "ffcc/system.h"
+
+class CMcPcs : public CProcess
 {
 public:
     CMcPcs();

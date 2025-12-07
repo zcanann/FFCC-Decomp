@@ -1,7 +1,9 @@
 #ifndef _FFCC_P_SOUND_H_
 #define _FFCC_P_SOUND_H_
 
-class CSoundPcs
+#include "ffcc/system.h"
+
+class CSoundPcs : public CProcess
 {
 public:
     CSoundPcs();

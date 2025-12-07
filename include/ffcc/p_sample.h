@@ -1,7 +1,9 @@
 #ifndef _FFCC_P_SAMPLE_H_
 #define _FFCC_P_SAMPLE_H_
 
-class CSamplePcs
+#include "ffcc/system.h"
+
+class CSamplePcs : public CProcess
 {
 public:
     CSamplePcs();

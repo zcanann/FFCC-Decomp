@@ -1,7 +1,9 @@
 #ifndef _FFCC_P_GBA_H_
 #define _FFCC_P_GBA_H_
 
-class CGbaPcs
+#include "ffcc/system.h"
+
+class CGbaPcs : public CProcess
 {
 public:
     CGbaPcs();

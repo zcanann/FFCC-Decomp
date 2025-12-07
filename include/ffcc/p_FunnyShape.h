@@ -1,7 +1,9 @@
 #ifndef _FFCC_P_FUNNYSHAPE_H_
 #define _FFCC_P_FUNNYSHAPE_H_
 
-class CFunnyShapePcs
+#include "ffcc/system.h"
+
+class CFunnyShapePcs : public CProcess
 {
 public:
     CFunnyShapePcs();

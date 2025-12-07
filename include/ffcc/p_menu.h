@@ -2,6 +2,7 @@
 #define _FFCC_P_MENU_H_
 
 #include "ffcc/memorycard.h"
+#include "ffcc/system.h"
 
 #include <dolphin/gx.h>
 
@@ -12,7 +13,7 @@ class CPad;
 class CRingMenu;
 class CMesMenu;
 
-class CMenuPcs
+class CMenuPcs : public CProcess
 {
 public:
     struct CTmp

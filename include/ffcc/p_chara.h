@@ -5,6 +5,7 @@
 #include "ffcc/memory.h"
 #include "ffcc/p_chara_viewer.h"
 #include "ffcc/ref.h"
+#include "ffcc/system.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -47,7 +48,7 @@ public:
     void ResetAmem(int);
 };
 
-class CCharaPcs
+class CCharaPcs : public CProcess
 {
 public:
 

@@ -1,7 +1,9 @@
 #ifndef _FFCC_P_SYSTEM_H_
 #define _FFCC_P_SYSTEM_H_
 
-class CSystemPcs
+#include "ffcc/system.h"
+
+class CSystemPcs : public CProcess
 {
 public:
     CSystemPcs();

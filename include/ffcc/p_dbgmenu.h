@@ -1,7 +1,9 @@
 #ifndef _FFCC_P_DBGMENU_H_
 #define _FFCC_P_DBGMENU_H_
 
-class CDbgMenuPcs
+#include "ffcc/system.h"
+
+class CDbgMenuPcs : public CProcess
 {
 public:
     struct CDM

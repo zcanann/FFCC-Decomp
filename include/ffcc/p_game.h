@@ -2,8 +2,9 @@
 #define _FFCC_P_GAME_H_
 
 #include "ffcc/game.h"
+#include "ffcc/system.h"
 
-class CGamePcs
+class CGamePcs : public CProcess
 {
 public:
     CGamePcs();
@@ -28,8 +29,9 @@ public:
     virtual void onMapChanging(int, int);
     virtual void onMapChanged(int, int, int);
 
-    char unknown[0x10];
-    CGame game;
+    // void* vtable; // 0x00
+    int unknown[3];  // 0x4-0xC
+    CGame game;      // 0xC
 };
 
 extern CGamePcs Game;

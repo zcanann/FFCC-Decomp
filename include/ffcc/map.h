@@ -80,7 +80,7 @@ public:
     void DrawBefore();
     void Draw();
     void DrawAfter();
-    void CheckHitCylinder(CMapCylinder*, Vec*, unsigned long);
+    int CheckHitCylinder(CMapCylinder*, Vec*, unsigned long);
     int CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned long);
     void GetAnimRunMapObj(CMapObj*);
     void GetAnimRunID(int);

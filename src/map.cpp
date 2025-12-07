@@ -435,7 +435,7 @@ void CMapMng::DrawAfter()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMng::CheckHitCylinder(CMapCylinder*, Vec*, unsigned long)
+int CMapMng::CheckHitCylinder(CMapCylinder*, Vec*, unsigned long)
 {
 	// TODO
 }
@@ -445,7 +445,7 @@ void CMapMng::CheckHitCylinder(CMapCylinder*, Vec*, unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMng::CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned long)
+int CMapMng::CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned long)
 {
 	// TODO
 }

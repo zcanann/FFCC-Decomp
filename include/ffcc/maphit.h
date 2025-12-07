@@ -45,8 +45,8 @@ public:
     void GetHitFaceNormal(Vec*);
     void CalcHitSlide(Vec*, float);
     void CalcHitPosition(Vec*);
-    void CheckHitCylinder(CMapCylinder*, Vec*, unsigned long);
-    void CheckHitCylinder(CMapCylinder*, Vec*, unsigned short, unsigned short, unsigned long);
+    int CheckHitCylinder(CMapCylinder*, Vec*, unsigned long);
+    int CheckHitCylinder(CMapCylinder*, Vec*, unsigned short, unsigned short, unsigned long);
     int CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned long);
     int CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned short, unsigned short, unsigned long);
     void Draw();

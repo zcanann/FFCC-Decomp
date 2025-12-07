@@ -47,8 +47,8 @@ public:
 	void ClearShadow();
 	void InsertShadow(long, Vec&, CBound&);
 	void ClearFlag(unsigned long);
-	void CheckHitCylinder_r(COctNode*);
-	void CheckHitCylinder(CMapCylinder*, Vec*, unsigned long);
+	int CheckHitCylinder_r(COctNode*);
+	int CheckHitCylinder(CMapCylinder*, Vec*, unsigned long);
 	int CheckHitCylinderNear_r(COctNode*);
 	int CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned long);
 	void SetOctTreeMapObj(int);

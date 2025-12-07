@@ -115,7 +115,7 @@ void CMapHit::CalcHitPosition(Vec*)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapHit::CheckHitCylinder(CMapCylinder*, Vec*, unsigned long)
+int CMapHit::CheckHitCylinder(CMapCylinder*, Vec*, unsigned long)
 {
 	// TODO
 }
@@ -125,7 +125,7 @@ void CMapHit::CheckHitCylinder(CMapCylinder*, Vec*, unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapHit::CheckHitCylinder(CMapCylinder*, Vec*, unsigned short, unsigned short, unsigned long)
+int CMapHit::CheckHitCylinder(CMapCylinder*, Vec*, unsigned short, unsigned short, unsigned long)
 {
 	// TODO
 }

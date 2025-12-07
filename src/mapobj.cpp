@@ -175,7 +175,7 @@ void CMapObj::DrawHitNormal()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapObj::CheckHitCylinder(CMapCylinder*, Vec*, unsigned long)
+int CMapObj::CheckHitCylinder(CMapCylinder*, Vec*, unsigned long)
 {
 	// TODO
 }

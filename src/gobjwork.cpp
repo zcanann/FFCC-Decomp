@@ -25,7 +25,7 @@ CGObjWork::~CGObjWork()
  * Address:	TODO
  * Size:	TODO
  */
-void CGObjWork::Init(int, CRomWork *, int)
+void CGObjWork::Init(int, CRomWork*, int)
 {
 	// TODO
 }
@@ -105,7 +105,7 @@ void CCaravanWork::LoadFinished()
  * Address:	TODO
  * Size:	TODO
  */
-void CCaravanWork::Init(int, CRomWork *, int)
+void CCaravanWork::Init(int, CRomWork*, int)
 {
 	// TODO
 }
@@ -145,7 +145,7 @@ void CCaravanWork::AddLetter(int, int, int, int, int, int, int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CCaravanWork::CLetterWork::operator= (const CCaravanWork::CLetterWork &)
+void CCaravanWork::CLetterWork::operator= (const CCaravanWork::CLetterWork&)
 {
 	// TODO
 }
@@ -235,7 +235,7 @@ void CCaravanWork::CanAddComList(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CCaravanWork::AddComList(int, int *)
+void CCaravanWork::AddComList(int, int*)
 {
 	// TODO
 }
@@ -255,7 +255,7 @@ void CCaravanWork::DeleteCmdList(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CCaravanWork::AddItem(int, int *)
+void CCaravanWork::AddItem(int, int*)
 {
 	// TODO
 }
@@ -285,7 +285,7 @@ void CCaravanWork::FGAddItemIdx(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CCaravanWork::ChkNumItem(char *, int)
+void CCaravanWork::ChkNumItem(char*, int)
 {
 	// TODO
 }
@@ -335,7 +335,7 @@ void CCaravanWork::DeleteItem(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CCaravanWork::AddTmpArtifact(int, int *)
+void CCaravanWork::AddTmpArtifact(int, int*)
 {
 	// TODO
 }
@@ -415,7 +415,7 @@ void CCaravanWork::SafeDeleteTempItem()
  * Address:	TODO
  * Size:	TODO
  */
-void CCaravanWork::ClampStatus(short &, unsigned short &)
+void CCaravanWork::ClampStatus(short&, unsigned short&)
 {
 	// TODO
 }
@@ -425,7 +425,7 @@ void CCaravanWork::ClampStatus(short &, unsigned short &)
  * Address:	TODO
  * Size:	TODO
  */
-void CCaravanWork::CalcArtifactStatus(int, int, int &, int &, int &, int &, int &)
+void CCaravanWork::CalcArtifactStatus(int, int, int&, int&, int&, int&, int&)
 {
 	// TODO
 }
@@ -505,7 +505,7 @@ void CCaravanWork::IsSelectedCmdList(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CCaravanWork::GetMagicCharge(int, int &, int &)
+void CCaravanWork::GetMagicCharge(int, int&, int&)
 {
 	// TODO
 }
@@ -595,7 +595,7 @@ void CCaravanWork::CanPlayerPutItem()
  * Address:	TODO
  * Size:	TODO
  */
-void CCaravanWork::GetCurrentWeaponItem(int &, int &)
+void CCaravanWork::GetCurrentWeaponItem(int&, int&)
 {
 	// TODO
 }
@@ -678,7 +678,7 @@ CMonWork::CMonWork()
  * Address:	TODO
  * Size:	TODO
  */
-void CMonWork::Init(int, CRomWork *, int)
+void CMonWork::Init(int, CRomWork*, int)
 {
 	// TODO
 }

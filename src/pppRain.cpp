@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void InitRainData(VRain *, PRain *, RAIN_DATA *)
+void InitRainData(VRain*, PRain*, RAIN_DATA*)
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void InitRainData(VRain *, PRain *, RAIN_DATA *)
  * Address:	TODO
  * Size:	TODO
  */
-void UpdateRain(VRain *, PRain *, RAIN_DATA *)
+void UpdateRain(VRain*, PRain*, RAIN_DATA*)
 {
 	// TODO
 }

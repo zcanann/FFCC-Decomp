@@ -85,7 +85,7 @@ void CUSBPcs::func()
  * Address:	TODO
  * Size:	TODO
  */
-void CUSBPcs::messageCallback(unsigned long, void *, MCCChannel)
+void CUSBPcs::messageCallback(unsigned long, void*, MCCChannel)
 {
 	// TODO
 }
@@ -115,7 +115,7 @@ void CUSBPcs::USBDataCallback(unsigned long, MCCChannel)
  * Address:	TODO
  * Size:	TODO
  */
-void CUSBPcs::WriteMessage(CUSBPcs::CDataHeader *, MCCChannel)
+void CUSBPcs::WriteMessage(CUSBPcs::CDataHeader*, MCCChannel)
 {
 	// TODO
 }
@@ -125,7 +125,7 @@ void CUSBPcs::WriteMessage(CUSBPcs::CDataHeader *, MCCChannel)
  * Address:	TODO
  * Size:	TODO
  */
-void CUSBPcs::SendDataCode(int, void *, int, int)
+void CUSBPcs::SendDataCode(int, void*, int, int)
 {
 	// TODO
 }

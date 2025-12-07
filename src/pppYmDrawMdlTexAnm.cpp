@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void SetUpPerUV(pppModelSt *, float &, float &)
+void SetUpPerUV(pppModelSt*, float&, float&)
 {
 	// TODO
 }

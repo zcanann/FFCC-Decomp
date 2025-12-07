@@ -21,7 +21,7 @@ public:
 
     virtual void onMapChanging(int, int);
     virtual void onMapChanged(int, int, int);
-    virtual void onScriptChanging(char *);
+    virtual void onScriptChanging(char*);
 
 };
 

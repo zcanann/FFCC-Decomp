@@ -9,12 +9,12 @@ public:
     void ClearAll();
     void Frame();
     void Draw();
-    void Calc(Vec *, const Vec *, int);
+    void Calc(Vec*, const Vec*, int);
     void searchFreeObj();
     void getObj(int);
     void AddAmbient(float, float);
-    void AddDiffuse(const Vec *, float, float, float);
-    void AddSphere(const Vec *, float, float, int);
+    void AddDiffuse(const Vec*, float, float, float);
+    void AddSphere(const Vec*, float, float, int);
     void ChangePower(int, float);
 };
 

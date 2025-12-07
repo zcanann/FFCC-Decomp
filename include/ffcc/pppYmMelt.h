@@ -5,8 +5,8 @@ struct PYmMelt;
 struct VERTEX_DATA;
 struct _GXColor;
 
-void InitPolygonData(PYmMelt *, VERTEX_DATA *, short);
-void CalcPolygonHeight(PYmMelt *, VERTEX_DATA *, _GXColor *, float);
+void InitPolygonData(PYmMelt*, VERTEX_DATA*, short);
+void CalcPolygonHeight(PYmMelt*, VERTEX_DATA*, _GXColor*, float);
 void pppConstructYmMelt(void);
 void pppDestructYmMelt(void);
 void pppFrameYmMelt(void);

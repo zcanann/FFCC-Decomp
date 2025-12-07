@@ -175,7 +175,7 @@ void CMenuPcs::DrawSelectCloseAnim()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawBonusCnt(CMenuPcs::Sprt2 *, int)
+void CMenuPcs::DrawBonusCnt(CMenuPcs::Sprt2*, int)
 {
 	// TODO
 }
@@ -195,7 +195,7 @@ void CMenuPcs::DrawBonusFrame(float, float, float, float, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2 *, float)
+void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2*, float)
 {
 	// TODO
 }
@@ -215,7 +215,7 @@ void CMenuPcs::DrawBonusChkMark(float)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2 *, CMenuPcs::Sprt2 *)
+void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2*, CMenuPcs::Sprt2*)
 {
 	// TODO
 }

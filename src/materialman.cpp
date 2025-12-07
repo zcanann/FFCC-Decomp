@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void chkbit32(unsigned long *, unsigned long)
+void chkbit32(unsigned long*, unsigned long)
 {
 	// TODO
 }
@@ -55,7 +55,7 @@ void CMaterialMan::Quit()
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterialMan::SetBlendMode(CMaterialSet *, int)
+void CMaterialMan::SetBlendMode(CMaterialSet*, int)
 {
 	// TODO
 }
@@ -165,7 +165,7 @@ void CMaterialMan::SetUnderWaterTex()
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterialMan::SetMaterial(CMaterialSet *, int, int, _GXTevScale)
+void CMaterialMan::SetMaterial(CMaterialSet*, int, int, _GXTevScale)
 {
 	// TODO
 }
@@ -175,7 +175,7 @@ void CMaterialMan::SetMaterial(CMaterialSet *, int, int, _GXTevScale)
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterialMan::SetMaterialCharaShadow(CMaterial *)
+void CMaterialMan::SetMaterialCharaShadow(CMaterial*)
 {
 	// TODO
 }
@@ -185,7 +185,7 @@ void CMaterialMan::SetMaterialCharaShadow(CMaterial *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterialMan::SetMaterialPart(CMaterialSet *, int, int)
+void CMaterialMan::SetMaterialPart(CMaterialSet*, int, int)
 {
 	// TODO
 }
@@ -195,7 +195,7 @@ void CMaterialMan::SetMaterialPart(CMaterialSet *, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterialMan::SetMaterialMenu(CMaterialSet *, int, int)
+void CMaterialMan::SetMaterialMenu(CMaterialSet*, int, int)
 {
 	// TODO
 }
@@ -225,7 +225,7 @@ void CMaterialMan::SetTexScroll(float, float, float, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterialMan::SetFullScreenShadow(CFullScreenShadow &, float (*) [4], long)
+void CMaterialMan::SetFullScreenShadow(CFullScreenShadow&, float (*) [4], long)
 {
 	// TODO
 }
@@ -235,7 +235,7 @@ void CMaterialMan::SetFullScreenShadow(CFullScreenShadow &, float (*) [4], long)
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterialMan::SetShadow(CMapShadow &, float (*) [4], int, unsigned long)
+void CMaterialMan::SetShadow(CMapShadow&, float (*) [4], int, unsigned long)
 {
 	// TODO
 }
@@ -245,7 +245,7 @@ void CMaterialMan::SetShadow(CMapShadow &, float (*) [4], int, unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterialMan::SetShadowBit32(CMapShadow::TARGET, unsigned long *, float (*) [4])
+void CMaterialMan::SetShadowBit32(CMapShadow::TARGET, unsigned long*, float (*) [4])
 {
 	// TODO
 }
@@ -255,7 +255,7 @@ void CMaterialMan::SetShadowBit32(CMapShadow::TARGET, unsigned long *, float (*)
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterialMan::SetPosition(CMapShadow::TARGET, Vec *, float, float, float (*) [4], int)
+void CMaterialMan::SetPosition(CMapShadow::TARGET, Vec*, float, float, float (*) [4], int)
 {
 	// TODO
 }
@@ -265,7 +265,7 @@ void CMaterialMan::SetPosition(CMapShadow::TARGET, Vec *, float, float, float (*
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterialMan::GetCharaShadow(int, CMaterial **, float (**) [4], Vec *, float, float, int)
+void CMaterialMan::GetCharaShadow(int, CMaterial **, float (**) [4], Vec*, float, float, int)
 {
 	// TODO
 }
@@ -275,7 +275,7 @@ void CMaterialMan::GetCharaShadow(int, CMaterial **, float (**) [4], Vec *, floa
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterialMan::SetShadowBound(CMapShadow::TARGET, CBound *, float (*) [4])
+void CMaterialMan::SetShadowBound(CMapShadow::TARGET, CBound*, float (*) [4])
 {
 	// TODO
 }
@@ -465,7 +465,7 @@ void CMaterial::IncNumTexture()
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterialSet::AddMaterial(CMaterial *, int)
+void CMaterialSet::AddMaterial(CMaterial*, int)
 {
 	// TODO
 }

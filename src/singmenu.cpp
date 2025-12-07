@@ -65,7 +65,7 @@ void CMenuPcs::drawSingleMenu()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp *, int, int, int)
+void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, int)
 {
 	// TODO
 }
@@ -195,7 +195,7 @@ void CMenuPcs::DrawSingleIcon(int, int, int, float, int, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawShadowFont(CFont *, char *, float, float, int, int)
+void CMenuPcs::DrawShadowFont(CFont*, char*, float, float, int, int)
 {
 	// TODO
 }
@@ -205,7 +205,7 @@ void CMenuPcs::DrawShadowFont(CFont *, char *, float, float, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawNoShadowFont(CFont *, char *, float, float, int, int)
+void CMenuPcs::DrawNoShadowFont(CFont*, char*, float, float, int, int)
 {
 	// TODO
 }
@@ -285,7 +285,7 @@ void CMenuPcs::DrawSingWinMess(int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::GetSingWinSize(int, short *, short *, int)
+void CMenuPcs::GetSingWinSize(int, short*, short*, int)
 {
 	// TODO
 }
@@ -305,7 +305,7 @@ void CMenuPcs::SetSingWinInfo(int, int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::SetSingDynamicWinMessInfo(int, char *, char *, char *, char *, char *, char *, char *, char *)
+void CMenuPcs::SetSingDynamicWinMessInfo(int, char*, char*, char*, char*, char*, char*, char*, char*)
 {
 	// TODO
 }
@@ -375,7 +375,7 @@ void CMenuPcs::GetSmithItem(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::GetRecipeMaterial(int, CMenuPcs::MaterialInfo *)
+void CMenuPcs::GetRecipeMaterial(int, CMenuPcs::MaterialInfo*)
 {
 	// TODO
 }
@@ -385,7 +385,7 @@ void CMenuPcs::GetRecipeMaterial(int, CMenuPcs::MaterialInfo *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::GetRaceStr(int, char *)
+void CMenuPcs::GetRaceStr(int, char*)
 {
 	// TODO
 }

@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void initTracePolygon(PYmTracer2 *, TRACE_POLYGON &)
+void initTracePolygon(PYmTracer2*, TRACE_POLYGON&)
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void initTracePolygon(PYmTracer2 *, TRACE_POLYGON &)
  * Address:	TODO
  * Size:	TODO
  */
-void copyPolygonData(TRACE_POLYGON *, TRACE_POLYGON *)
+void copyPolygonData(TRACE_POLYGON*, TRACE_POLYGON*)
 {
 	// TODO
 }

@@ -45,7 +45,7 @@ void pppKeShpTail2XDes(void)
  * Address:	TODO
  * Size:	TODO
  */
-void U8ToF32(pppFVECTOR4 *, unsigned char *)
+void U8ToF32(pppFVECTOR4*, unsigned char*)
 {
 	// TODO
 }

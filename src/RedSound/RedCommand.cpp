@@ -55,7 +55,7 @@ void SeStopMG(int, int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void _SePlayStart(RedSeINFO *, int, int, int, int)
+void _SePlayStart(RedSeINFO*, int, int, int, int)
 {
 	// TODO
 }
@@ -125,7 +125,7 @@ void SePause(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void _MusicPlayStart(RedMusicHEAD *, RedWaveHeadWD *, int, int, int)
+void _MusicPlayStart(RedMusicHEAD*, RedWaveHeadWD*, int, int, int)
 {
 	// TODO
 }

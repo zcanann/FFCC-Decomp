@@ -18,20 +18,20 @@ public:
     ~CTexture();
 
     void InitTexObj();
-    void Create(CChunkFile &, CMemory::CStage *, CAmemCacheSet *, int, int);
-    void CacheLoadTexture(CAmemCacheSet *);
-    void CacheUnLoadTexture(CAmemCacheSet *);
-    void CacheRefCnt0UpTexture(CAmemCacheSet *);
-    void CacheDumpTexture(CAmemCacheSet *);
-    void CheckName(char *);
-    void SetExternalTlut(void *, int);
+    void Create(CChunkFile&, CMemory::CStage*, CAmemCacheSet*, int, int);
+    void CacheLoadTexture(CAmemCacheSet*);
+    void CacheUnLoadTexture(CAmemCacheSet*);
+    void CacheRefCnt0UpTexture(CAmemCacheSet*);
+    void CacheDumpTexture(CAmemCacheSet*);
+    void CheckName(char*);
+    void SetExternalTlut(void*, int);
     void GetTlutColor(int);
-    void GetExternalTlutColor(void *, int, int);
+    void GetExternalTlutColor(void*, int, int);
     void SetTlutColor(int, _GXColor);
-    void SetExternalTlutColor(void *, int, int, _GXColor &);
+    void SetExternalTlutColor(void*, int, int, _GXColor&);
     void FlushTlut();
-    void FlushExternalTlut(void *);
-    void FlushExternalTlut(void *, int);
+    void FlushExternalTlut(void*);
+    void FlushExternalTlut(void*, int);
     void GetNumTlut();
 };
 
@@ -41,10 +41,10 @@ public:
     CTextureSet();
     ~CTextureSet();
 
-    void Create(void *, CMemory::CStage *, int, CAmemCacheSet *, int, int);
-    void Create(CChunkFile &, CMemory::CStage *, int, CAmemCacheSet *, int, int);
-    void Find(char *);
-    void ReleaseTextureIdx(int, CAmemCacheSet *);
+    void Create(void*, CMemory::CStage*, int, CAmemCacheSet*, int, int);
+    void Create(CChunkFile&, CMemory::CStage*, int, CAmemCacheSet*, int, int);
+    void Find(char*);
+    void ReleaseTextureIdx(int, CAmemCacheSet*);
 };
 
 class CTextureMan
@@ -54,8 +54,8 @@ public:
 
     void Init();
     void Quit();
-    void SetTexture(_GXTexMapID, CTexture *);
-    void SetTextureTev(CTexture *);
+    void SetTexture(_GXTexMapID, CTexture*);
+    void SetTextureTev(CTexture*);
 };
 
 #endif // _FFCC_PPP_TEXTUREMAN_H_

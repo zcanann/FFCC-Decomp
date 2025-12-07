@@ -35,7 +35,7 @@ void CWind::Draw()
  * Address:	TODO
  * Size:	TODO
  */
-void CWind::Calc(Vec *, const Vec *, int)
+void CWind::Calc(Vec*, const Vec*, int)
 {
 	// TODO
 }
@@ -75,7 +75,7 @@ void CWind::AddAmbient(float, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CWind::AddDiffuse(const Vec *, float, float, float)
+void CWind::AddDiffuse(const Vec*, float, float, float)
 {
 	// TODO
 }
@@ -85,7 +85,7 @@ void CWind::AddDiffuse(const Vec *, float, float, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CWind::AddSphere(const Vec *, float, float, int)
+void CWind::AddSphere(const Vec*, float, float, int)
 {
 	// TODO
 }

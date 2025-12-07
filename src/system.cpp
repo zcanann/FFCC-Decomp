@@ -37,7 +37,7 @@ void CSystem::Quit()
 		m_mapBuffer = nullptr;
 	}
 	
-	if (m_mapStage != (CStage *)0x0)
+	if (m_mapStage != (CStage*)0x0)
 	{
 		// DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory,m_mapStage);
 	}
@@ -185,11 +185,11 @@ void CSystem::RemoveScenegraph(CProcess* process, int arg)
  * Address:	TODO
  * Size:	TODO
  */
-void CSystem::ScriptChanging(char *)
+void CSystem::ScriptChanging(char*)
 {
 	for (COrder* order = m_orderSentinel.m_next; order != &m_orderSentinel; order = order->m_next)
 	{
-		if (order->m_entry == (void *)((int)order->m_descBlock + 0x1c))
+		if (order->m_entry == (void*)((int)order->m_descBlock + 0x1c))
 		{
 			//(**(code **)((int)*order->m_owner + 0x14))(order->m_owner,param_2);
 		}
@@ -201,11 +201,11 @@ void CSystem::ScriptChanging(char *)
  * Address:	TODO
  * Size:	TODO
  */
-void CSystem::ScriptChanged(char *, int)
+void CSystem::ScriptChanged(char*, int)
 {
 	for (COrder* order = m_orderSentinel.m_next; order != &m_orderSentinel; order = order->m_next)
 	{
-		if (order->m_entry == (void *)((int)order->m_descBlock + 0x1c))
+		if (order->m_entry == (void*)((int)order->m_descBlock + 0x1c))
 		{
 			//(**(code **)((int)*order->m_owner + 0x18))(order->m_owner,param_2,param_3);
 		}
@@ -221,7 +221,7 @@ void CSystem::MapChanging(int, int)
 {
 	for (COrder* order = m_orderSentinel.m_next; order != &m_orderSentinel; order = order->m_next)
 	{
-		if (order->m_entry == (void *)((int)order->m_descBlock + 0x1c))
+		if (order->m_entry == (void*)((int)order->m_descBlock + 0x1c))
 		{
 			//(**(code **)((int)*order->m_owner + 0x1c))(order->m_owner,param_2,param_3)
 		}
@@ -237,7 +237,7 @@ void CSystem::MapChanged(int, int, int)
 {
 	for (COrder* order = m_orderSentinel.m_next; order != &m_orderSentinel; order = order->m_next)
 	{
-		if (order->m_entry == (void *)((int)order->m_descBlock + 0x1c))
+		if (order->m_entry == (void*)((int)order->m_descBlock + 0x1c))
 		{
 			//(**(code **)((int)*order->m_owner + 0x20))(order->m_owner,param_2,param_3,param_4);
 		}
@@ -335,7 +335,7 @@ void CSystem::DumpMapFile(void*)
  * Address:	TODO
  * Size:	TODO
  */
-void CSystem::errorHandler(unsigned short, OSContext *, unsigned long, unsigned long)
+void CSystem::errorHandler(unsigned short, OSContext*, unsigned long, unsigned long)
 {
 	return;
 }

@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::CalcHelpLine(int, int &, int &)
+void CMenuPcs::CalcHelpLine(int, int&, int&)
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void CMenuPcs::CalcHelpLine(int, int &, int &)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::GetLongHelpString(CFont *, int, int)
+void CMenuPcs::GetLongHelpString(CFont*, int, int)
 {
 	// TODO
 }
@@ -25,7 +25,7 @@ void CMenuPcs::GetLongHelpString(CFont *, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::CalcCenteringPos2(char *, float, float)
+void CMenuPcs::CalcCenteringPos2(char*, float, float)
 {
 	// TODO
 }
@@ -35,7 +35,7 @@ void CMenuPcs::CalcCenteringPos2(char *, float, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::CalcCenteringPos(char *, CFont *)
+void CMenuPcs::CalcCenteringPos(char*, CFont*)
 {
 	// TODO
 }
@@ -45,7 +45,7 @@ void CMenuPcs::CalcCenteringPos(char *, CFont *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawFont(int, int, _GXColor, int, char *, float, float)
+void CMenuPcs::DrawFont(int, int, _GXColor, int, char*, float, float)
 {
 	// TODO
 }
@@ -55,7 +55,7 @@ void CMenuPcs::DrawFont(int, int, _GXColor, int, char *, float, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::GetFontWidth(char *, float, float)
+void CMenuPcs::GetFontWidth(char*, float, float)
 {
 	// TODO
 }
@@ -65,7 +65,7 @@ void CMenuPcs::GetFontWidth(char *, float, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawFont2(int, int, _GXColor, int, char *, float, float, float)
+void CMenuPcs::DrawFont2(int, int, _GXColor, int, char*, float, float, float)
 {
 	// TODO
 }
@@ -75,7 +75,7 @@ void CMenuPcs::DrawFont2(int, int, _GXColor, int, char *, float, float, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawHelpMessageUS(int, CFont *, int, int, _GXColor, int, float, float)
+void CMenuPcs::DrawHelpMessageUS(int, CFont*, int, int, _GXColor, int, float, float)
 {
 	// TODO
 }
@@ -85,7 +85,7 @@ void CMenuPcs::DrawHelpMessageUS(int, CFont *, int, int, _GXColor, int, float, f
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawHelpMessage(int, CFont *, int, int, _GXColor, int, float, float)
+void CMenuPcs::DrawHelpMessage(int, CFont*, int, int, _GXColor, int, float, float)
 {
 	// TODO
 }

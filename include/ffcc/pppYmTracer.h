@@ -4,8 +4,8 @@
 struct PYmTracer;
 struct TRACE_POLYGON;
 
-void initTracePolygon(PYmTracer *, TRACE_POLYGON *);
-void copyPolygonData(TRACE_POLYGON *, TRACE_POLYGON *);
+void initTracePolygon(PYmTracer*, TRACE_POLYGON*);
+void copyPolygonData(TRACE_POLYGON*, TRACE_POLYGON*);
 void pppConstructYmTracer(void);
 void pppConstruct2YmTracer(void);
 void pppDestructYmTracer(void);

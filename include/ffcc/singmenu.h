@@ -5,7 +5,7 @@ class CFont;
 class CGraphic;
 
 void CGraphic_GetTempStage();
-void CFont_SetFixed(CFont *, int);
+void CFont_SetFixed(CFont*, int);
 
 class CMenuPcs
 {
@@ -23,7 +23,7 @@ public:
     void SingMenuEnd();
     void calcSingleMenu();
     void drawSingleMenu();
-    void loadTextureAsync(char **, int, int, CTmp *, int, int, int);
+    void loadTextureAsync(char **, int, int, CTmp*, int, int, int);
     void SingCalcChara(float);
     void DrawSingleBase(float);
     void DrawSingleStat(float);
@@ -36,8 +36,8 @@ public:
     void SingleCalcCtrl();
     void SingleDrawCtrl();
     void DrawSingleIcon(int, int, int, float, int, float);
-    void DrawShadowFont(CFont *, char *, float, float, int, int);
-    void DrawNoShadowFont(CFont *, char *, float, float, int, int);
+    void DrawShadowFont(CFont*, char*, float, float, int, int);
+    void DrawNoShadowFont(CFont*, char*, float, float, int, int);
     void GetItemType(int, int);
     void CalcListPos(int, int, int);
     void DrawListPosMark(float, float, float);
@@ -45,17 +45,17 @@ public:
     void DrawEquipMark(int, int, float);
     void DrawSingWin(short);
     void DrawSingWinMess(int, int, int);
-    void GetSingWinSize(int, short *, short *, int);
+    void GetSingWinSize(int, short*, short*, int);
     void SetSingWinInfo(int, int, int, int);
-    void SetSingDynamicWinMessInfo(int, char *, char *, char *, char *, char *, char *, char *, char *);
+    void SetSingDynamicWinMessInfo(int, char*, char*, char*, char*, char*, char*, char*, char*);
     void SetSingWinScl(float);
     void GetSingWinScl();
     void SingWinMessHeight();
     void ChkEquipPossible(int);
     void GetEquipType(int);
     void GetSmithItem(int);
-    void GetRecipeMaterial(int, MaterialInfo *);
-    void GetRaceStr(int, char *);
+    void GetRecipeMaterial(int, MaterialInfo*);
+    void GetRaceStr(int, char*);
     void DrawSingBar(int, int, int, float);
     void SingSetLetterAttachflg(int);
     void SingGetLetterAttachflg();

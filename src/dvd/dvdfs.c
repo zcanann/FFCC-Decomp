@@ -387,7 +387,7 @@ int DVDSeekAsyncPrio(DVDFileInfo* fileInfo, s32 offset, DVDCallback callback, s3
 static void cbForSeekAsync(s32 result, DVDCommandBlock* block) {
     DVDFileInfo* fileInfo;
 
-    fileInfo = (DVDFileInfo *)&block->next;
+    fileInfo = (DVDFileInfo*)&block->next;
     ASSERTLINE(925, (void*) &fileInfo->cb == (void*) block);
     if (fileInfo->callback) {
         (fileInfo->callback)(result, fileInfo);

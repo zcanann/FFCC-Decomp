@@ -15,7 +15,7 @@ void pppVertexApAtCon(void)
  * Address:	TODO
  * Size:	TODO
  */
-void apea(_pppPObject *, PVertexApAt *, unsigned short)
+void apea(_pppPObject*, PVertexApAt*, unsigned short)
 {
 	// TODO
 }

@@ -5,7 +5,7 @@ class CMenuPcs
 {
 	class Sprt2
 	{
-		void operator=(const Sprt2 &);
+		void operator=(const Sprt2&);
 	};
 	
 	CMenuPcs();
@@ -31,11 +31,11 @@ class CMenuPcs
 	void CalcSelectCloseAnim();
 	void DrawSelectCloseAnim();
 
-	void DrawBonusCnt(CMenuPcs::Sprt2 *, int);
+	void DrawBonusCnt(CMenuPcs::Sprt2*, int);
 	void DrawBonusFrame(float, float, float, float, float);
-	void DrawArtiBase(CMenuPcs::Sprt2 *, float);
+	void DrawArtiBase(CMenuPcs::Sprt2*, float);
 	void DrawBonusChkMark(float);
-	void ArtiBaseInfoInit(CMenuPcs::Sprt2 *, CMenuPcs::Sprt2 *);
+	void ArtiBaseInfoInit(CMenuPcs::Sprt2*, CMenuPcs::Sprt2*);
 
 	void GetAllPadOn();
 	void ClrBattleItem();

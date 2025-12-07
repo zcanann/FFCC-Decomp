@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void pppPlaySe(_pppMngSt *, PPPSEST *)
+void pppPlaySe(_pppMngSt*, PPPSEST*)
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void pppPlaySe(_pppMngSt *, PPPSEST *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppStopSe(_pppMngSt *, PPPSEST *)
+void pppStopSe(_pppMngSt*, PPPSEST*)
 {
 	// TODO
 }
@@ -25,7 +25,7 @@ void pppStopSe(_pppMngSt *, PPPSEST *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppUnitMatrix(pppFMATRIX &)
+void pppUnitMatrix(pppFMATRIX&)
 {
 	// TODO
 }
@@ -35,7 +35,7 @@ void pppUnitMatrix(pppFMATRIX &)
  * Address:	TODO
  * Size:	TODO
  */
-void pppRotMatrix(pppFMATRIX &, pppFMATRIX&, Vec&)
+void pppRotMatrix(pppFMATRIX&, pppFMATRIX&, Vec&)
 {
 	// TODO
 }
@@ -45,7 +45,7 @@ void pppRotMatrix(pppFMATRIX &, pppFMATRIX&, Vec&)
  * Address:	TODO
  * Size:	TODO
  */
-void pppApplyMatrix(Vec &, pppFMATRIX&, Vec&)
+void pppApplyMatrix(Vec&, pppFMATRIX&, Vec&)
 {
 	// TODO
 }
@@ -55,7 +55,7 @@ void pppApplyMatrix(Vec &, pppFMATRIX&, Vec&)
  * Address:	TODO
  * Size:	TODO
  */
-void pppAddVector(Vec &, Vec&, Vec&)
+void pppAddVector(Vec&, Vec&, Vec&)
 {
 	// TODO
 }
@@ -65,7 +65,7 @@ void pppAddVector(Vec &, Vec&, Vec&)
  * Address:	TODO
  * Size:	TODO
  */
-void pppScaleVectorXYZ(Vec &, Vec&, float)
+void pppScaleVectorXYZ(Vec&, Vec&, float)
 {
 	// TODO
 }
@@ -75,7 +75,7 @@ void pppScaleVectorXYZ(Vec &, Vec&, float)
  * Address:	TODO
  * Size:	TODO
  */
-void pppScaleVector(Vec &, Vec&, float)
+void pppScaleVector(Vec&, Vec&, float)
 {
 	// TODO
 }
@@ -85,7 +85,7 @@ void pppScaleVector(Vec &, Vec&, float)
  * Address:	TODO
  * Size:	TODO
  */
-void pppGetRowVector(pppFMATRIX &, Vec &, Vec &, Vec &, Vec &)
+void pppGetRowVector(pppFMATRIX&, Vec&, Vec&, Vec&, Vec&)
 {
 	// TODO
 }
@@ -95,7 +95,7 @@ void pppGetRowVector(pppFMATRIX &, Vec &, Vec &, Vec &, Vec &)
  * Address:	TODO
  * Size:	TODO
  */
-void pppSetRowVector(pppFMATRIX &, Vec &, Vec &, Vec &, Vec &)
+void pppSetRowVector(pppFMATRIX&, Vec&, Vec&, Vec&, Vec&)
 {
 	// TODO
 }
@@ -105,7 +105,7 @@ void pppSetRowVector(pppFMATRIX &, Vec &, Vec &, Vec &, Vec &)
  * Address:	TODO
  * Size:	TODO
  */
-void pppNormalize(Vec &, Vec&)
+void pppNormalize(Vec&, Vec&)
 {
 	// TODO
 }
@@ -115,7 +115,7 @@ void pppNormalize(Vec &, Vec&)
  * Address:	TODO
  * Size:	TODO
  */
-void pppOuterProduct(Vec &, Vec&, Vec&)
+void pppOuterProduct(Vec&, Vec&, Vec&)
 {
 	// TODO
 }
@@ -125,7 +125,7 @@ void pppOuterProduct(Vec &, Vec&, Vec&)
  * Address:	TODO
  * Size:	TODO
  */
-void pppCopyMatrix(pppFMATRIX &, pppFMATRIX&)
+void pppCopyMatrix(pppFMATRIX&, pppFMATRIX&)
 {
 	// TODO
 }
@@ -135,7 +135,7 @@ void pppCopyMatrix(pppFMATRIX &, pppFMATRIX&)
  * Address:	TODO
  * Size:	TODO
  */
-void pppMulMatrix(pppFMATRIX &, pppFMATRIX&, pppFMATRIX&)
+void pppMulMatrix(pppFMATRIX&, pppFMATRIX&, pppFMATRIX&)
 {
 	// TODO
 }
@@ -145,7 +145,7 @@ void pppMulMatrix(pppFMATRIX &, pppFMATRIX&, pppFMATRIX&)
  * Address:	TODO
  * Size:	TODO
  */
-void pppCopyVector(Vec &, Vec&)
+void pppCopyVector(Vec&, Vec&)
 {
 	// TODO
 }
@@ -155,7 +155,7 @@ void pppCopyVector(Vec &, Vec&)
  * Address:	TODO
  * Size:	TODO
  */
-void pppSubVector(Vec &, Vec&, Vec&)
+void pppSubVector(Vec&, Vec&, Vec&)
 {
 	// TODO
 }
@@ -175,7 +175,7 @@ void pppVectorLength(Vec&)
  * Address:	TODO
  * Size:	TODO
  */
-void pppCreateHeap(_pppEnvSt *, unsigned long)
+void pppCreateHeap(_pppEnvSt*, unsigned long)
 {
 	// TODO
 }
@@ -185,7 +185,7 @@ void pppCreateHeap(_pppEnvSt *, unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void pppDestroyHeap(_pppEnvSt *)
+void pppDestroyHeap(_pppEnvSt*)
 {
 	// TODO
 }
@@ -195,7 +195,7 @@ void pppDestroyHeap(_pppEnvSt *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppFreePObjectPrio(_pppMngSt *)
+void pppFreePObjectPrio(_pppMngSt*)
 {
 	// TODO
 }
@@ -205,7 +205,7 @@ void pppFreePObjectPrio(_pppMngSt *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppFreeMngStPrioForHeap(char *)
+void pppFreeMngStPrioForHeap(char*)
 {
 	// TODO
 }
@@ -215,7 +215,7 @@ void pppFreeMngStPrioForHeap(char *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppMemAlloc(unsigned long, CMemory::CStage *, char *, int)
+void pppMemAlloc(unsigned long, CMemory::CStage*, char*, int)
 {
 	// TODO
 }
@@ -225,7 +225,7 @@ void pppMemAlloc(unsigned long, CMemory::CStage *, char *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void pppMemFree(void *)
+void pppMemFree(void*)
 {
 	// TODO
 }
@@ -235,7 +235,7 @@ void pppMemFree(void *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppHeapUseRate(CMemory::CStage *)
+void pppHeapUseRate(CMemory::CStage*)
 {
 	// TODO
 }
@@ -245,7 +245,7 @@ void pppHeapUseRate(CMemory::CStage *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppHeapCheckLeak(CMemory::CStage *)
+void pppHeapCheckLeak(CMemory::CStage*)
 {
 	// TODO
 }
@@ -255,7 +255,7 @@ void pppHeapCheckLeak(CMemory::CStage *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppMngStHeapCheckLeak(CMemory::CStage *)
+void pppMngStHeapCheckLeak(CMemory::CStage*)
 {
 	// TODO
 }
@@ -265,7 +265,7 @@ void pppMngStHeapCheckLeak(CMemory::CStage *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppMngStHeapCheck(CMemory::CStage *)
+void pppMngStHeapCheck(CMemory::CStage*)
 {
 	// TODO
 }
@@ -275,7 +275,7 @@ void pppMngStHeapCheck(CMemory::CStage *)
  * Address:	TODO
  * Size:	TODO
  */
-void callInitProg(_pppMngSt *)
+void callInitProg(_pppMngSt*)
 {
 	// TODO
 }
@@ -285,7 +285,7 @@ void callInitProg(_pppMngSt *)
  * Address:	TODO
  * Size:	TODO
  */
-void callCon2Prog(_pppPObject *)
+void callCon2Prog(_pppPObject*)
 {
 	// TODO
 }
@@ -295,7 +295,7 @@ void callCon2Prog(_pppPObject *)
  * Address:	TODO
  * Size:	TODO
  */
-void callConProg(_pppPObject *)
+void callConProg(_pppPObject*)
 {
 	// TODO
 }
@@ -305,7 +305,7 @@ void callConProg(_pppPObject *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppCreatePObject(_pppMngSt *, _pppPDataVal *)
+void pppCreatePObject(_pppMngSt*, _pppPDataVal*)
 {
 	// TODO
 }
@@ -315,7 +315,7 @@ void pppCreatePObject(_pppMngSt *, _pppPDataVal *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppDeletePObject(_pppPObject *)
+void pppDeletePObject(_pppPObject*)
 {
 	// TODO
 }
@@ -325,7 +325,7 @@ void pppDeletePObject(_pppPObject *)
  * Address:	TODO
  * Size:	TODO
  */
-void _pppAllFreePObject(_pppMngSt *)
+void _pppAllFreePObject(_pppMngSt*)
 {
 	// TODO
 }
@@ -335,7 +335,7 @@ void _pppAllFreePObject(_pppMngSt *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppSetBindChrSync(_pppMngSt *)
+void pppSetBindChrSync(_pppMngSt*)
 {
 	// TODO
 }
@@ -345,7 +345,7 @@ void pppSetBindChrSync(_pppMngSt *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppSetMatrix(_pppMngSt *)
+void pppSetMatrix(_pppMngSt*)
 {
 	// TODO
 }
@@ -355,7 +355,7 @@ void pppSetMatrix(_pppMngSt *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppSetFpMatrix(_pppMngSt *)
+void pppSetFpMatrix(_pppMngSt*)
 {
 	// TODO
 }
@@ -365,7 +365,7 @@ void pppSetFpMatrix(_pppMngSt *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppCacheLoadModel(short *, _pppDataHead *)
+void pppCacheLoadModel(short*, _pppDataHead*)
 {
 	// TODO
 }
@@ -375,7 +375,7 @@ void pppCacheLoadModel(short *, _pppDataHead *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppCacheLoadShape(short *, _pppDataHead *)
+void pppCacheLoadShape(short*, _pppDataHead*)
 {
 	// TODO
 }
@@ -385,7 +385,7 @@ void pppCacheLoadShape(short *, _pppDataHead *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppCacheUnLoadModel(short *, _pppDataHead *)
+void pppCacheUnLoadModel(short*, _pppDataHead*)
 {
 	// TODO
 }
@@ -395,7 +395,7 @@ void pppCacheUnLoadModel(short *, _pppDataHead *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppCacheUnLoadShape(short *, _pppDataHead *)
+void pppCacheUnLoadShape(short*, _pppDataHead*)
 {
 	// TODO
 }
@@ -405,7 +405,7 @@ void pppCacheUnLoadShape(short *, _pppDataHead *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppCacheRefCnt0UpModel(short *, _pppDataHead *)
+void pppCacheRefCnt0UpModel(short*, _pppDataHead*)
 {
 	// TODO
 }
@@ -415,7 +415,7 @@ void pppCacheRefCnt0UpModel(short *, _pppDataHead *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppCacheRefCnt0UpShape(short *, _pppDataHead *)
+void pppCacheRefCnt0UpShape(short*, _pppDataHead*)
 {
 	// TODO
 }
@@ -425,7 +425,7 @@ void pppCacheRefCnt0UpShape(short *, _pppDataHead *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppCacheDumpModel(short *, _pppDataHead *)
+void pppCacheDumpModel(short*, _pppDataHead*)
 {
 	// TODO
 }
@@ -435,7 +435,7 @@ void pppCacheDumpModel(short *, _pppDataHead *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppCacheDumpShape(short *, _pppDataHead *)
+void pppCacheDumpShape(short*, _pppDataHead*)
 {
 	// TODO
 }
@@ -445,7 +445,7 @@ void pppCacheDumpShape(short *, _pppDataHead *)
  * Address:	TODO
  * Size:	TODO
  */
-void _pppStartPart(_pppMngSt *, long *, int)
+void _pppStartPart(_pppMngSt*, long*, int)
 {
 	// TODO
 }
@@ -455,7 +455,7 @@ void _pppStartPart(_pppMngSt *, long *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void pppInitPdt(long *, pppProg *)
+void pppInitPdt(long*, pppProg*)
 {
 	// TODO
 }
@@ -465,7 +465,7 @@ void pppInitPdt(long *, pppProg *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppInitData(_pppDataHead *, pppProg *, int)
+void pppInitData(_pppDataHead*, pppProg*, int)
 {
 	// TODO
 }
@@ -475,7 +475,7 @@ void pppInitData(_pppDataHead *, pppProg *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void pppCalcPartStd(_pppMngSt *)
+void pppCalcPartStd(_pppMngSt*)
 {
 	// TODO
 }
@@ -485,7 +485,7 @@ void pppCalcPartStd(_pppMngSt *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppDrawPartStd(_pppMngSt *)
+void pppDrawPartStd(_pppMngSt*)
 {
 	// TODO
 }
@@ -495,7 +495,7 @@ void pppDrawPartStd(_pppMngSt *)
  * Address:	TODO
  * Size:	TODO
  */
-void _pppDeadPart(_pppMngSt *)
+void _pppDeadPart(_pppMngSt*)
 {
 	// TODO
 }
@@ -505,7 +505,7 @@ void _pppDeadPart(_pppMngSt *)
  * Address:	TODO
  * Size:	TODO
  */
-void _pppInitPart(_pppMngSt *)
+void _pppInitPart(_pppMngSt*)
 {
 	// TODO
 }
@@ -515,7 +515,7 @@ void _pppInitPart(_pppMngSt *)
  * Address:	TODO
  * Size:	TODO
  */
-void apeaPObject(_pppMngSt *)
+void apeaPObject(_pppMngSt*)
 {
 	// TODO
 }
@@ -525,7 +525,7 @@ void apeaPObject(_pppMngSt *)
  * Address:	TODO
  * Size:	TODO
  */
-void _pppCalcPart(_pppMngSt *)
+void _pppCalcPart(_pppMngSt*)
 {
 	// TODO
 }
@@ -535,7 +535,7 @@ void _pppCalcPart(_pppMngSt *)
  * Address:	TODO
  * Size:	TODO
  */
-void _pppDrawPart(_pppMngSt *)
+void _pppDrawPart(_pppMngSt*)
 {
 	// TODO
 }
@@ -545,7 +545,7 @@ void _pppDrawPart(_pppMngSt *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppDrawMesh(pppModelSt *, Vec *, int)
+void pppDrawMesh(pppModelSt*, Vec*, int)
 {
 	// TODO
 }
@@ -585,7 +585,7 @@ void pppClearDrawEnv()
  * Address:	TODO
  * Size:	TODO
  */
-void pppSetDrawEnv(pppCVECTOR *, pppFMATRIX *, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char)
+void pppSetDrawEnv(pppCVECTOR*, pppFMATRIX*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char)
 {
 	// TODO
 }
@@ -605,7 +605,7 @@ void pppInitDrawEnv(unsigned char)
  * Address:	TODO
  * Size:	TODO
  */
-void pppHitCylinderSendSystem(_pppMngSt *, Vec *, Vec *, float, float)
+void pppHitCylinderSendSystem(_pppMngSt*, Vec*, Vec*, float, float)
 {
 	// TODO
 }

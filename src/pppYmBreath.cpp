@@ -15,7 +15,7 @@ void get_rand()
  * Address:	TODO
  * Size:	TODO
  */
-void BirthParticle(_pppPObject *, VYmBreath *, PYmBreath *, VColor *, PARTICLE_DATA *, PARTICLE_WMAT *, PARTICLE_COLOR *)
+void BirthParticle(_pppPObject*, VYmBreath*, PYmBreath*, VColor*, PARTICLE_DATA*, PARTICLE_WMAT*, PARTICLE_COLOR*)
 {
 	// TODO
 }
@@ -25,7 +25,7 @@ void BirthParticle(_pppPObject *, VYmBreath *, PYmBreath *, VColor *, PARTICLE_D
  * Address:	TODO
  * Size:	TODO
  */
-void UpdateParticle(VYmBreath *, PYmBreath *, PARTICLE_DATA *, VColor *, PARTICLE_COLOR *)
+void UpdateParticle(VYmBreath*, PYmBreath*, PARTICLE_DATA*, VColor*, PARTICLE_COLOR*)
 {
 	// TODO
 }
@@ -35,7 +35,7 @@ void UpdateParticle(VYmBreath *, PYmBreath *, PARTICLE_DATA *, VColor *, PARTICL
  * Address:	TODO
  * Size:	TODO
  */
-void UpdateAllParticle(_pppPObject *, VYmBreath *, PYmBreath *, VColor *)
+void UpdateAllParticle(_pppPObject*, VYmBreath*, PYmBreath*, VColor*)
 {
 	// TODO
 }
@@ -45,7 +45,7 @@ void UpdateAllParticle(_pppPObject *, VYmBreath *, PYmBreath *, VColor *)
  * Address:	TODO
  * Size:	TODO
  */
-void SetParticleMatrix(_pppPObject *, VYmBreath *, PARTICLE_DATA *, PARTICLE_WMAT *)
+void SetParticleMatrix(_pppPObject*, VYmBreath*, PARTICLE_DATA*, PARTICLE_WMAT*)
 {
 	// TODO
 }
@@ -105,7 +105,7 @@ void pppDestructYmBreath(void)
  * Address:	TODO
  * Size:	TODO
  */
-void IsDeadGroupBreath(PYmBreath *, VYmBreath *, short)
+void IsDeadGroupBreath(PYmBreath*, VYmBreath*, short)
 {
 	// TODO
 }
@@ -115,7 +115,7 @@ void IsDeadGroupBreath(PYmBreath *, VYmBreath *, short)
  * Address:	TODO
  * Size:	TODO
  */
-void SearchIndex(PYmBreath *, VYmBreath *, short &, short &, short)
+void SearchIndex(PYmBreath*, VYmBreath*, short&, short&, short)
 {
 	// TODO
 }
@@ -125,7 +125,7 @@ void SearchIndex(PYmBreath *, VYmBreath *, short &, short &, short)
  * Address:	TODO
  * Size:	TODO
  */
-void IsExistGroupParticle(PYmBreath *, VYmBreath *, short)
+void IsExistGroupParticle(PYmBreath*, VYmBreath*, short)
 {
 	// TODO
 }

@@ -8,7 +8,7 @@
 class CStopWatch
 {
 public:
-	CStopWatch(char *);
+	CStopWatch(char*);
 	~CStopWatch();
 
 	void Reset();
@@ -20,7 +20,7 @@ public:
 class CProfile
 {
 public:
-	CProfile(char *);
+	CProfile(char*);
 	~CProfile();
 
 	void ProfStart();

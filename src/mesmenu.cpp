@@ -85,7 +85,7 @@ void CMesMenu::DrawHeart(float, float, float, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CMesMenu::onScriptChanging(char *)
+void CMesMenu::onScriptChanging(char*)
 {
 	// TODO
 }
@@ -95,7 +95,7 @@ void CMesMenu::onScriptChanging(char *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMesMenu::onScriptChanged(char *, int)
+void CMesMenu::onScriptChanged(char*, int)
 {
 	// TODO
 }
@@ -105,7 +105,7 @@ void CMesMenu::onScriptChanged(char *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMesMenu::Open(char *, int, int, int, int, int, int)
+void CMesMenu::Open(char*, int, int, int, int, int, int)
 {
 	// TODO
 }

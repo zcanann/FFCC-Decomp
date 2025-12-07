@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void CalcSphereRadius(Vec *, unsigned short)
+void CalcSphereRadius(Vec*, unsigned short)
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void CalcSphereRadius(Vec *, unsigned short)
  * Address:	TODO
  * Size:	TODO
  */
-void CreateScaleMatrix(_pppPObject *, float)
+void CreateScaleMatrix(_pppPObject*, float)
 {
 	// TODO
 }

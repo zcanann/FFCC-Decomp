@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void _drawNoShadowFont(CFont *, char *, float, float, int, int)
+void _drawNoShadowFont(CFont*, char*, float, float, int, int)
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void _drawNoShadowFont(CFont *, char *, float, float, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void _drawShadowFont(CFont *, char *, float, float, int, int)
+void _drawShadowFont(CFont*, char*, float, float, int, int)
 {
 	// TODO
 }
@@ -195,7 +195,7 @@ void setOrtho(int, int, float, float, float)
  * Address:	TODO
  * Size:	TODO
  */
-void drawShp(tagOAN3_SHAPE *, CMaterialSet *, unsigned char)
+void drawShp(tagOAN3_SHAPE*, CMaterialSet*, unsigned char)
 {
 	// TODO
 }

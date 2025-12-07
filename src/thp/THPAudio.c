@@ -16,7 +16,7 @@ u32 THPAudioDecode(s16 *audioBuffer, u8 *audioFrame, s32 flag)
         return 0;
     }
 
-    header = (THPAudioRecordHeader *)audioFrame;
+    header = (THPAudioRecordHeader*)audioFrame;
     left = audioFrame + sizeof(THPAudioRecordHeader);
     right = left + header->offsetNextChannel;
 

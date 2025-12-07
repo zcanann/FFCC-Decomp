@@ -295,7 +295,7 @@ static u32 SetInterruptMask(OSInterruptMask mask, OSInterruptMask current) {
 }
 
 OSInterruptMask OSGetInterruptMask(void) { 
-    return *(OSInterruptMask *)OSPhysicalToCached(0x00C8);
+    return *(OSInterruptMask*)OSPhysicalToCached(0x00C8);
 }
 
 OSInterruptMask OSSetInterruptMask(OSInterruptMask local) {
@@ -305,10 +305,10 @@ OSInterruptMask OSSetInterruptMask(OSInterruptMask local) {
     OSInterruptMask mask;
 
     enabled = OSDisableInterrupts();
-    global = *(OSInterruptMask *)OSPhysicalToCached(0x00C4);
-    prev = *(OSInterruptMask *)OSPhysicalToCached(0x00C8);
+    global = *(OSInterruptMask*)OSPhysicalToCached(0x00C4);
+    prev = *(OSInterruptMask*)OSPhysicalToCached(0x00C8);
     mask = (global | prev) ^ local;
-    *(OSInterruptMask *)OSPhysicalToCached(0x00C8) = local;
+    *(OSInterruptMask*)OSPhysicalToCached(0x00C8) = local;
     while (mask) {
         mask = SetInterruptMask(mask, global | local);
     }
@@ -323,11 +323,11 @@ OSInterruptMask __OSMaskInterrupts(OSInterruptMask global) {
     OSInterruptMask mask;
 
     enabled = OSDisableInterrupts();
-    prev = *(OSInterruptMask *)OSPhysicalToCached(0x00C4);
-    local = *(OSInterruptMask *)OSPhysicalToCached(0x00C8);
+    prev = *(OSInterruptMask*)OSPhysicalToCached(0x00C4);
+    local = *(OSInterruptMask*)OSPhysicalToCached(0x00C8);
     mask = ~(prev | local) & global;
     global |= prev;
-    *(OSInterruptMask *)OSPhysicalToCached(0x00C4) = global;
+    *(OSInterruptMask*)OSPhysicalToCached(0x00C4) = global;
     while (mask) {
         mask = SetInterruptMask(mask, global | local);
     }
@@ -342,11 +342,11 @@ OSInterruptMask __OSUnmaskInterrupts(OSInterruptMask global) {
     OSInterruptMask mask;
 
     enabled = OSDisableInterrupts();
-    prev = *(OSInterruptMask *)OSPhysicalToCached(0x00C4);
-    local = *(OSInterruptMask *)OSPhysicalToCached(0x00C8);
+    prev = *(OSInterruptMask*)OSPhysicalToCached(0x00C4);
+    local = *(OSInterruptMask*)OSPhysicalToCached(0x00C8);
     mask = (prev | local) & global;
     global = prev & ~global;
-    *(OSInterruptMask *)OSPhysicalToCached(0x00C4) = global;
+    *(OSInterruptMask*)OSPhysicalToCached(0x00C4) = global;
     while (mask) {
         mask = SetInterruptMask(mask, global | local);
     }
@@ -459,8 +459,8 @@ void __OSDispatchInterrupt(__OSException exception, OSContext* context) {
     }
     #endif
 
-    unmasked = cause & ~(*(OSInterruptMask *)OSPhysicalToCached(0x00C4) |
-                        *(OSInterruptMask *)OSPhysicalToCached(0x00C8));
+    unmasked = cause & ~(*(OSInterruptMask*)OSPhysicalToCached(0x00C4) |
+                        *(OSInterruptMask*)OSPhysicalToCached(0x00C8));
     if (unmasked) {
         for (prio = InterruptPrioTable;; ++prio) {
             if (unmasked & *prio) {

@@ -35,7 +35,7 @@ void CTextureMan::Quit()
  * Address:	TODO
  * Size:	TODO
  */
-void CTextureMan::SetTexture(_GXTexMapID, CTexture *)
+void CTextureMan::SetTexture(_GXTexMapID, CTexture*)
 {
 	// TODO
 }
@@ -45,7 +45,7 @@ void CTextureMan::SetTexture(_GXTexMapID, CTexture *)
  * Address:	TODO
  * Size:	TODO
  */
-void CTextureMan::SetTextureTev(CTexture *)
+void CTextureMan::SetTextureTev(CTexture*)
 {
 	// TODO
 }
@@ -85,7 +85,7 @@ void CTexture::InitTexObj()
  * Address:	TODO
  * Size:	TODO
  */
-void CTexture::Create(CChunkFile &, CMemory::CStage *, CAmemCacheSet *, int, int)
+void CTexture::Create(CChunkFile&, CMemory::CStage*, CAmemCacheSet*, int, int)
 {
 	// TODO
 }
@@ -95,7 +95,7 @@ void CTexture::Create(CChunkFile &, CMemory::CStage *, CAmemCacheSet *, int, int
  * Address:	TODO
  * Size:	TODO
  */
-void CTexture::CacheLoadTexture(CAmemCacheSet *)
+void CTexture::CacheLoadTexture(CAmemCacheSet*)
 {
 	// TODO
 }
@@ -105,7 +105,7 @@ void CTexture::CacheLoadTexture(CAmemCacheSet *)
  * Address:	TODO
  * Size:	TODO
  */
-void CTexture::CacheUnLoadTexture(CAmemCacheSet *)
+void CTexture::CacheUnLoadTexture(CAmemCacheSet*)
 {
 	// TODO
 }
@@ -115,7 +115,7 @@ void CTexture::CacheUnLoadTexture(CAmemCacheSet *)
  * Address:	TODO
  * Size:	TODO
  */
-void CTexture::CacheRefCnt0UpTexture(CAmemCacheSet *)
+void CTexture::CacheRefCnt0UpTexture(CAmemCacheSet*)
 {
 	// TODO
 }
@@ -125,7 +125,7 @@ void CTexture::CacheRefCnt0UpTexture(CAmemCacheSet *)
  * Address:	TODO
  * Size:	TODO
  */
-void CTexture::CacheDumpTexture(CAmemCacheSet *)
+void CTexture::CacheDumpTexture(CAmemCacheSet*)
 {
 	// TODO
 }
@@ -135,7 +135,7 @@ void CTexture::CacheDumpTexture(CAmemCacheSet *)
  * Address:	TODO
  * Size:	TODO
  */
-void CTexture::CheckName(char *)
+void CTexture::CheckName(char*)
 {
 	// TODO
 }
@@ -145,7 +145,7 @@ void CTexture::CheckName(char *)
  * Address:	TODO
  * Size:	TODO
  */
-void CTexture::SetExternalTlut(void *, int)
+void CTexture::SetExternalTlut(void*, int)
 {
 	// TODO
 }
@@ -165,7 +165,7 @@ void CTexture::GetTlutColor(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CTexture::GetExternalTlutColor(void *, int, int)
+void CTexture::GetExternalTlutColor(void*, int, int)
 {
 	// TODO
 }
@@ -185,7 +185,7 @@ void CTexture::SetTlutColor(int, _GXColor)
  * Address:	TODO
  * Size:	TODO
  */
-void CTexture::SetExternalTlutColor(void *, int, int, _GXColor &)
+void CTexture::SetExternalTlutColor(void*, int, int, _GXColor&)
 {
 	// TODO
 }
@@ -205,7 +205,7 @@ void CTexture::FlushTlut()
  * Address:	TODO
  * Size:	TODO
  */
-void CTexture::FlushExternalTlut(void *)
+void CTexture::FlushExternalTlut(void*)
 {
 	// TODO
 }
@@ -215,7 +215,7 @@ void CTexture::FlushExternalTlut(void *)
  * Address:	TODO
  * Size:	TODO
  */
-void CTexture::FlushExternalTlut(void *, int)
+void CTexture::FlushExternalTlut(void*, int)
 {
 	// TODO
 }
@@ -245,7 +245,7 @@ CTextureSet::~CTextureSet()
  * Address:	TODO
  * Size:	TODO
  */
-void CTextureSet::Create(void *, CMemory::CStage *, int, CAmemCacheSet *, int, int)
+void CTextureSet::Create(void*, CMemory::CStage*, int, CAmemCacheSet*, int, int)
 {
 	// TODO
 }
@@ -255,7 +255,7 @@ void CTextureSet::Create(void *, CMemory::CStage *, int, CAmemCacheSet *, int, i
  * Address:	TODO
  * Size:	TODO
  */
-void CTextureSet::Create(CChunkFile &, CMemory::CStage *, int, CAmemCacheSet *, int, int)
+void CTextureSet::Create(CChunkFile&, CMemory::CStage*, int, CAmemCacheSet*, int, int)
 {
 	// TODO
 }
@@ -265,7 +265,7 @@ void CTextureSet::Create(CChunkFile &, CMemory::CStage *, int, CAmemCacheSet *, 
  * Address:	TODO
  * Size:	TODO
  */
-void CTextureSet::Find(char *)
+void CTextureSet::Find(char*)
 {
 	// TODO
 }
@@ -275,7 +275,7 @@ void CTextureSet::Find(char *)
  * Address:	TODO
  * Size:	TODO
  */
-void CTextureSet::ReleaseTextureIdx(int, CAmemCacheSet *)
+void CTextureSet::ReleaseTextureIdx(int, CAmemCacheSet*)
 {
 	// TODO
 }

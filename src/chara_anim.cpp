@@ -6,7 +6,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void i2f2_7(float *, unsigned short *, float)
+void i2f2_7(float*, unsigned short*, float)
 {
 	// TODO
 }
@@ -16,7 +16,7 @@ void i2f2_7(float *, unsigned short *, float)
  * Address:	TODO
  * Size:	TODO
  */
-void i2f_7(float *, unsigned short *)
+void i2f_7(float*, unsigned short*)
 {
 	// TODO
 }
@@ -26,7 +26,7 @@ void i2f_7(float *, unsigned short *)
  * Address:	TODO
  * Size:	TODO
  */
-void i2f2_6(float *, unsigned short *, float)
+void i2f2_6(float*, unsigned short*, float)
 {
 	// TODO
 }
@@ -36,7 +36,7 @@ void i2f2_6(float *, unsigned short *, float)
  * Address:	TODO
  * Size:	TODO
  */
-void i2f_6(float *, unsigned short *)
+void i2f_6(float*, unsigned short*)
 {
 	// TODO
 }
@@ -46,7 +46,7 @@ void i2f_6(float *, unsigned short *)
  * Address:	TODO
  * Size:	TODO
  */
-void i2f2_5(float *, unsigned short *, float)
+void i2f2_5(float*, unsigned short*, float)
 {
 	// TODO
 }
@@ -56,7 +56,7 @@ void i2f2_5(float *, unsigned short *, float)
  * Address:	TODO
  * Size:	TODO
  */
-void i2f_5(float *, unsigned short *)
+void i2f_5(float*, unsigned short*)
 {
 	// TODO
 }
@@ -86,7 +86,7 @@ CChara::CAnim::~CAnim()
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CAnim::Create(void *, CMemory::CStage *)
+void CChara::CAnim::Create(void*, CMemory::CStage*)
 {
 	// TODO
 }
@@ -126,7 +126,7 @@ CChara::CAnimNode::~CAnimNode()
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CAnimNode::Create(CChunkFile &)
+void CChara::CAnimNode::Create(CChunkFile&)
 {
 	// TODO
 }
@@ -136,7 +136,7 @@ void CChara::CAnimNode::Create(CChunkFile &)
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CAnimNode::Interp(CChara::CAnim *, SRT *, float)
+void CChara::CAnimNode::Interp(CChara::CAnim*, SRT*, float)
 {
 	// TODO
 }

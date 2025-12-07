@@ -65,7 +65,7 @@ void CMenuPcs::InitFrame0Info()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::Sprt::operator= (const CMenuPcs::Sprt &)
+void CMenuPcs::Sprt::operator= (const CMenuPcs::Sprt&)
 {
 	// TODO
 }
@@ -365,7 +365,7 @@ void CMenuPcs::CallWorldParam(int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::CalcSpl(CMenuPcs::SPL *, CMenuPcs::SPL *, float)
+void CMenuPcs::CalcSpl(CMenuPcs::SPL*, CMenuPcs::SPL*, float)
 {
 	// TODO
 }
@@ -445,7 +445,7 @@ void CMenuPcs::DrawFukidashi()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::ChkPlaceLength(char *)
+void CMenuPcs::ChkPlaceLength(char*)
 {
 	// TODO
 }
@@ -455,7 +455,7 @@ void CMenuPcs::ChkPlaceLength(char *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::SplitPlace(const char *, char *, char *)
+void CMenuPcs::SplitPlace(const char*, char*, char*)
 {
 	// TODO
 }
@@ -465,7 +465,7 @@ void CMenuPcs::SplitPlace(const char *, char *, char *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::SplitPlace2(const char *, char *, char *, CFont *, int)
+void CMenuPcs::SplitPlace2(const char*, char*, char*, CFont*, int)
 {
 	// TODO
 }
@@ -765,7 +765,7 @@ void CMenuPcs::DrawMainMenuSub()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::GetMcAccessPos(int *, int *)
+void CMenuPcs::GetMcAccessPos(int*, int*)
 {
 	// TODO
 }
@@ -775,7 +775,7 @@ void CMenuPcs::GetMcAccessPos(int *, int *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::GetMcOdekakePos(int *, int *)
+void CMenuPcs::GetMcOdekakePos(int*, int*)
 {
 	// TODO
 }
@@ -835,7 +835,7 @@ void CMenuPcs::DrawMcObj()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::SetMcList(int, McListInfo *)
+void CMenuPcs::SetMcList(int, McListInfo*)
 {
 	// TODO
 }
@@ -845,7 +845,7 @@ void CMenuPcs::SetMcList(int, McListInfo *)
  * Address:	TODO
  * Size:	TODO
  */
-void McListInfo::operator= (const McListInfo &)
+void McListInfo::operator= (const McListInfo&)
 {
 	// TODO
 }
@@ -945,7 +945,7 @@ void CMenuPcs::DrawMcWinMess(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::GetWinSize(int, short *, short *, int)
+void CMenuPcs::GetWinSize(int, short*, short*, int)
 {
 	// TODO
 }
@@ -1005,7 +1005,7 @@ void CMenuPcs::DrawFilter(unsigned char, unsigned char, unsigned char, unsigned 
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::CopyNowCaravanDat(CMemoryCardMan::Mc::SaveDat *)
+void CMenuPcs::CopyNowCaravanDat(CMemoryCardMan::Mc::SaveDat*)
 {
 	// TODO
 }
@@ -1015,7 +1015,7 @@ void CMenuPcs::CopyNowCaravanDat(CMemoryCardMan::Mc::SaveDat *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::SetCaravanWork(CMemoryCardMan::Mc::SaveDat *)
+void CMenuPcs::SetCaravanWork(CMemoryCardMan::Mc::SaveDat*)
 {
 	// TODO
 }
@@ -1025,7 +1025,7 @@ void CMenuPcs::SetCaravanWork(CMemoryCardMan::Mc::SaveDat *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::GetSameCharaData(CMemoryCardMan::Mc::SaveDat *, CMemoryCardMan::Mc::SaveDat *, int, int)
+void CMenuPcs::GetSameCharaData(CMemoryCardMan::Mc::SaveDat*, CMemoryCardMan::Mc::SaveDat*, int, int)
 {
 	// TODO
 }
@@ -1035,7 +1035,7 @@ void CMenuPcs::GetSameCharaData(CMemoryCardMan::Mc::SaveDat *, CMemoryCardMan::M
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::CheckSameMcFormatID(CMemoryCardMan::Mc::SaveDat *, CMemoryCardMan::Mc::SaveDat *)
+void CMenuPcs::CheckSameMcFormatID(CMemoryCardMan::Mc::SaveDat*, CMemoryCardMan::Mc::SaveDat*)
 {
 	// TODO
 }
@@ -1175,7 +1175,7 @@ void McCtrl::ChkNowData()
  * Address:	TODO
  * Size:	TODO
  */
-void McCtrl::SaveDataBuffer(char *)
+void McCtrl::SaveDataBuffer(char*)
 {
 	// TODO
 }
@@ -1185,7 +1185,7 @@ void McCtrl::SaveDataBuffer(char *)
  * Address:	TODO
  * Size:	TODO
  */
-void McCtrl::ChkParty(char *)
+void McCtrl::ChkParty(char*)
 {
 	// TODO
 }
@@ -1225,7 +1225,7 @@ void McCtrl::GetSerial()
  * Address:	TODO
  * Size:	TODO
  */
-void McCtrl::SetDataBuff(char *)
+void McCtrl::SetDataBuff(char*)
 {
 	// TODO
 }

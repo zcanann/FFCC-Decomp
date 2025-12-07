@@ -950,7 +950,7 @@ void JoyBus::WriteInitialCode(ThreadParam* threadParam)
  * Address:	TODO
  * Size:	TODO
  */
-void ThreadAlarmHandler(OSAlarm *, OSContext *)
+void ThreadAlarmHandler(OSAlarm*, OSContext*)
 {
 	// TODO
 }
@@ -4210,7 +4210,7 @@ unsigned int JoyBus::RequestData(ThreadParam* threadParam, int a, int b)
  * Address:	TODO
  * Size:	TODO
  */
-void JoyBus::SetRecvBuffer(ThreadParam *, unsigned int)
+void JoyBus::SetRecvBuffer(ThreadParam*, unsigned int)
 {
 	// TODO
 }
@@ -6309,7 +6309,7 @@ void JoyBus::RestartThread()
         jbB->m_threadParams[i].m_portIndex = i;
         jbB->m_threadParams[i].m_gbaStatus = 1;
 		
-        unsigned char* stackBase = (unsigned char *)m_sendBuffer;
+        unsigned char* stackBase = (unsigned char*)m_sendBuffer;
 
         OSCreateThread(
             &jbA->m_threads[i],
@@ -6574,7 +6574,7 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
  * Address:	TODO
  * Size:	TODO
  */
-void DEBPRINT(char *, ...)
+void DEBPRINT(char*, ...)
 {
 	// TODO
 }

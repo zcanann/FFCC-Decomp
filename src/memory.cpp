@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void CheckSum(void *, int)
+void CheckSum(void*, int)
 {
 	// TODO
 }
@@ -75,7 +75,7 @@ void CMemory::Draw()
  * Address:	TODO
  * Size:	TODO
  */
-void CMemory::SetGroup(void *, int)
+void CMemory::SetGroup(void*, int)
 {
 	// TODO
 }
@@ -85,7 +85,7 @@ void CMemory::SetGroup(void *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMemory::CreateStage(unsigned long, char *, int)
+void CMemory::CreateStage(unsigned long, char*, int)
 {
 	// TODO
 }
@@ -95,7 +95,7 @@ void CMemory::CreateStage(unsigned long, char *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMemory::DestroyStage(CMemory::CStage *)
+void CMemory::DestroyStage(CMemory::CStage*)
 {
 	// TODO
 }
@@ -105,7 +105,7 @@ void CMemory::DestroyStage(CMemory::CStage *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMemory::_Alloc(unsigned long, CMemory::CStage *, char *, int, int)
+void CMemory::_Alloc(unsigned long, CMemory::CStage*, char*, int, int)
 {
 	// TODO
 }
@@ -115,7 +115,7 @@ void CMemory::_Alloc(unsigned long, CMemory::CStage *, char *, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMemory::Free(void *)
+void CMemory::Free(void*)
 {
 	// TODO
 }
@@ -145,7 +145,7 @@ void CMemory::DecHeapWalkerLevel()
  * Address:	TODO
  * Size:	TODO
  */
-void CMemory::CopyToAMemory(void *, void *, unsigned long)
+void CMemory::CopyToAMemory(void*, void*, unsigned long)
 {
 	// TODO
 }
@@ -155,7 +155,7 @@ void CMemory::CopyToAMemory(void *, void *, unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void CMemory::CopyFromAMemory(void *, void *, unsigned long)
+void CMemory::CopyFromAMemory(void*, void*, unsigned long)
 {
 	// TODO
 }
@@ -165,7 +165,7 @@ void CMemory::CopyFromAMemory(void *, void *, unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void CMemory::CopyToAMemorySync(void *, void *, unsigned long)
+void CMemory::CopyToAMemorySync(void*, void*, unsigned long)
 {
 	// TODO
 }
@@ -175,7 +175,7 @@ void CMemory::CopyToAMemorySync(void *, void *, unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void CMemory::CopyFromAMemorySync(void *, void *, unsigned long)
+void CMemory::CopyFromAMemorySync(void*, void*, unsigned long)
 {
 	// TODO
 }
@@ -215,7 +215,7 @@ void CMemory::CStage::quitBlock()
  * Address:	TODO
  * Size:	TODO
  */
-void CMemory::CStage::alloc(unsigned long, char *, unsigned long, int)
+void CMemory::CStage::alloc(unsigned long, char*, unsigned long, int)
 {
 	// TODO
 }
@@ -245,7 +245,7 @@ void CMemory::CStage::resDefaultParam()
  * Address:	TODO
  * Size:	TODO
  */
-void CMemory::CStage::setParam(void *, unsigned long)
+void CMemory::CStage::setParam(void*, unsigned long)
 {
 	// TODO
 }
@@ -255,7 +255,7 @@ void CMemory::CStage::setParam(void *, unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void CMemory::CStage::free(void *)
+void CMemory::CStage::free(void*)
 {
 	// TODO
 }
@@ -265,7 +265,7 @@ void CMemory::CStage::free(void *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMemory::CStage::heapWalker(int, void *, unsigned long)
+void CMemory::CStage::heapWalker(int, void*, unsigned long)
 {
 	// TODO
 }
@@ -315,7 +315,7 @@ void CMemory::CStage::GetHeapUnuse()
  * Address:	TODO
  * Size:	TODO
  */
-void CAmemCache::Destroy(CMemory::CStage *)
+void CAmemCache::Destroy(CMemory::CStage*)
 {
 	// TODO
 }
@@ -325,7 +325,7 @@ void CAmemCache::Destroy(CMemory::CStage *)
  * Address:	TODO
  * Size:	TODO
  */
-void CAmemCache::GetData(CMemory::CStage *, char *, int)
+void CAmemCache::GetData(CMemory::CStage*, char*, int)
 {
 	// TODO
 }
@@ -335,7 +335,7 @@ void CAmemCache::GetData(CMemory::CStage *, char *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CAmemCache::SetData(void *, int)
+void CAmemCache::SetData(void*, int)
 {
 	// TODO
 }
@@ -345,7 +345,7 @@ void CAmemCache::SetData(void *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CAmemCacheSet::Init(char *, CMemory::CStage *, CMemory::CStage *, int, unsigned char (*) (unsigned long), unsigned long, unsigned char (*) (unsigned long), unsigned long, unsigned char (*) (unsigned long), unsigned long)
+void CAmemCacheSet::Init(char*, CMemory::CStage*, CMemory::CStage*, int, unsigned char (*) (unsigned long), unsigned long, unsigned char (*) (unsigned long), unsigned long, unsigned char (*) (unsigned long), unsigned long)
 {
 	// TODO
 }
@@ -355,7 +355,7 @@ void CAmemCacheSet::Init(char *, CMemory::CStage *, CMemory::CStage *, int, unsi
  * Address:	TODO
  * Size:	TODO
  */
-void CAmemCacheSet::SetRStage(CMemory::CStage *)
+void CAmemCacheSet::SetRStage(CMemory::CStage*)
 {
 	// TODO
 }
@@ -445,7 +445,7 @@ void CAmemCacheSet::GetFree()
  * Address:	TODO
  * Size:	TODO
  */
-void CAmemCacheSet::GetData(short, char *, int)
+void CAmemCacheSet::GetData(short, char*, int)
 {
 	// TODO
 }
@@ -455,7 +455,7 @@ void CAmemCacheSet::GetData(short, char *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CAmemCacheSet::SetData(void *, int, CAmemCache::TYPE, int)
+void CAmemCacheSet::SetData(void*, int, CAmemCache::TYPE, int)
 {
 	// TODO
 }
@@ -585,7 +585,7 @@ void CAmemCacheSet::DumpCache()
  * Address:	TODO
  * Size:	TODO
  */
-void CMemory::CStage::heapInfo(unsigned long &, unsigned long &, unsigned long &)
+void CMemory::CStage::heapInfo(unsigned long&, unsigned long&, unsigned long&)
 {
 	// TODO
 }

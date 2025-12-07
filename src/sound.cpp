@@ -285,7 +285,7 @@ void CSound::LoadSe(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CSound::LoadSe(void *)
+void CSound::LoadSe(void*)
 {
 	// TODO
 }
@@ -305,7 +305,7 @@ void CSound::LoadWave(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CSound::LoadWave(void *)
+void CSound::LoadWave(void*)
 {
 	// TODO
 }
@@ -385,7 +385,7 @@ void CSound::ChangeSePan(int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CSound::calcVolumePan(CSound::CSe3D *, int &, int &)
+void CSound::calcVolumePan(CSound::CSe3D*, int&, int&)
 {
 	// TODO
 }
@@ -405,7 +405,7 @@ void CSound::searchSe3D(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CSound::PlaySe3D(int, Vec *, float, float, int)
+void CSound::PlaySe3D(int, Vec*, float, float, int)
 {
 	// TODO
 }
@@ -465,7 +465,7 @@ void CSound::FadeOutSe3D(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CSound::ChangeSe3DPos(int, Vec *)
+void CSound::ChangeSe3DPos(int, Vec*)
 {
 	// TODO
 }
@@ -495,7 +495,7 @@ void CSound::Clear3DLine(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CSound::Add3DLine(int, Vec *)
+void CSound::Add3DLine(int, Vec*)
 {
 	// TODO
 }

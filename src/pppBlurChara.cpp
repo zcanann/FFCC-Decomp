@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void BlurChara_SetBeforeMeshLockEnvCallback(CChara::CModel *, void *, void *, int)
+void BlurChara_SetBeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void BlurChara_SetBeforeMeshLockEnvCallback(CChara::CModel *, void *, void *, in
  * Address:	TODO
  * Size:	TODO
  */
-void BlurChara_AfterDrawModelCallback(CChara::CModel *, void *, void *)
+void BlurChara_AfterDrawModelCallback(CChara::CModel*, void*, void*)
 {
 	// TODO
 }

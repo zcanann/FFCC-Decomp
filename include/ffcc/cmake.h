@@ -3,9 +3,9 @@
 
 class CMenuPcs;
 
-void GetChara(char *, int, char *);
-void GetCharaType(char *, int);
-void GetCharaCnt(char *);
+void GetChara(char*, int, char*);
+void GetCharaType(char*, int);
+void GetCharaCnt(char*);
 
 class CMenuPcs
 {
@@ -24,7 +24,7 @@ class CMenuPcs
 	void DrawCmakeBallCursor(int, int, float);
 	void DrawCmakeCharaText(int, float);
 	void DrawCmakeCrest(int, int, int, float);
-	void DrawCmakeName(int, int, char *, float);
+	void DrawCmakeName(int, int, char*, float);
 	void AddNameChara(int, int, int, int);
 	void DrawCmakeYesNo(int, float);
 

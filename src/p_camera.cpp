@@ -75,7 +75,7 @@ void CCameraPcs::destroy()
  * Address:	TODO
  * Size:	TODO
  */
-void CCameraPcs::onScriptChanging(char *)
+void CCameraPcs::onScriptChanging(char*)
 {
 	// TODO
 }
@@ -85,7 +85,7 @@ void CCameraPcs::onScriptChanging(char *)
  * Address:	TODO
  * Size:	TODO
  */
-void CCameraPcs::onScriptChanged(char *, int)
+void CCameraPcs::onScriptChanged(char*, int)
 {
 	// TODO
 }
@@ -145,7 +145,7 @@ void CCameraPcs::draw()
  * Address:	TODO
  * Size:	TODO
  */
-void CCameraPcs::calcViewerCameraMatrix(float (*) [4], const SRT *)
+void CCameraPcs::calcViewerCameraMatrix(float (*) [4], const SRT*)
 {
 	// TODO
 }
@@ -155,7 +155,7 @@ void CCameraPcs::calcViewerCameraMatrix(float (*) [4], const SRT *)
  * Address:	TODO
  * Size:	TODO
  */
-void CCameraPcs::SetViewerSRT(const SRT *)
+void CCameraPcs::SetViewerSRT(const SRT*)
 {
 	// TODO
 }
@@ -255,7 +255,7 @@ void CCameraPcs::destroyFullShadow()
  * Address:	TODO
  * Size:	TODO
  */
-void CCameraPcs::GetShadowRect(CBound &)
+void CCameraPcs::GetShadowRect(CBound&)
 {
 	// TODO
 }

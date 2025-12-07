@@ -75,7 +75,7 @@ CFont::~CFont()
  * Address:	TODO
  * Size:	TODO
  */
-void CFont::Create(void *, CMemory::CStage *)
+void CFont::Create(void*, CMemory::CStage*)
 {
 	// TODO
 }
@@ -235,7 +235,7 @@ void CFont::DrawQuit()
  * Address:	TODO
  * Size:	TODO
  */
-void CFont::Draw(char *)
+void CFont::Draw(char*)
 {
 	// TODO
 }
@@ -255,7 +255,7 @@ void CFont::Draw(unsigned short)
  * Address:	TODO
  * Size:	TODO
  */
-void CFont::GetWidth(char *)
+void CFont::GetWidth(char*)
 {
 	// TODO
 }
@@ -285,7 +285,7 @@ void CFont::searchChar(unsigned short)
  * Address:	TODO
  * Size:	TODO
  */
-void CFont::getNextChar(char **, unsigned short *)
+void CFont::getNextChar(char **, unsigned short*)
 {
 	// TODO
 }

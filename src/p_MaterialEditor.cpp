@@ -105,7 +105,7 @@ void CMaterialEditorPcs::drawViewer()
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterialEditorPcs::CreateBoundaryBox(Vec &, Vec &, long, const Vec *)
+void CMaterialEditorPcs::CreateBoundaryBox(Vec&, Vec&, long, const Vec*)
 {
 	// TODO
 }

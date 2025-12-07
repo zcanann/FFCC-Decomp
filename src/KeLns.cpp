@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void KeLnsLp_Init(_KeLnsLp *)
+void KeLnsLp_Init(_KeLnsLp*)
 {
 	// TODO
 }

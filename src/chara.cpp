@@ -135,7 +135,7 @@ void CChara::CModel::Init()
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CModel::Create(void *, CMemory::CStage *)
+void CChara::CModel::Create(void*, CMemory::CStage*)
 {
 	// TODO
 }
@@ -145,7 +145,7 @@ void CChara::CModel::Create(void *, CMemory::CStage *)
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CModel::CreateDynamics(void *, CMemory::CStage *)
+void CChara::CModel::CreateDynamics(void*, CMemory::CStage*)
 {
 	// TODO
 }
@@ -165,7 +165,7 @@ void CChara::CModel::setup()
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CModel::Duplicate(CMemory::CStage *)
+void CChara::CModel::Duplicate(CMemory::CStage*)
 {
 	// TODO
 }
@@ -225,7 +225,7 @@ void CChara::CModel::calcMatrix()
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CModel::CalcFrameMatrix(float, CChara::CNode *, float (*) [4])
+void CChara::CModel::CalcFrameMatrix(float, CChara::CNode*, float (*) [4])
 {
 	// TODO
 }
@@ -235,7 +235,7 @@ void CChara::CModel::CalcFrameMatrix(float, CChara::CNode *, float (*) [4])
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CModel::dynamics(CChara::CNode *, CChara::CNode *)
+void CChara::CModel::dynamics(CChara::CNode*, CChara::CNode*)
 {
 	// TODO
 }
@@ -265,7 +265,7 @@ void CChara::CModel::SetMatrix(float (*) [4])
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CModel::SearchNode(char *)
+void CChara::CModel::SearchNode(char*)
 {
 	// TODO
 }
@@ -275,7 +275,7 @@ void CChara::CModel::SearchNode(char *)
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CModel::SearchNodeSk(char *)
+void CChara::CModel::SearchNodeSk(char*)
 {
 	// TODO
 }
@@ -315,7 +315,7 @@ void CChara::CModel::CalcInterpFrame()
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CModel::CalcSafeNodeWorldMatrix(float (*) [4], CChara::CNode *)
+void CChara::CModel::CalcSafeNodeWorldMatrix(float (*) [4], CChara::CNode*)
 {
 	// TODO
 }
@@ -325,7 +325,7 @@ void CChara::CModel::CalcSafeNodeWorldMatrix(float (*) [4], CChara::CNode *)
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CModel::AttachAnim(CChara::CAnim *, int, int, int)
+void CChara::CModel::AttachAnim(CChara::CAnim*, int, int, int)
 {
 	// TODO
 }
@@ -335,7 +335,7 @@ void CChara::CModel::AttachAnim(CChara::CAnim *, int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CModel::AttachTextureSet(CTextureSet *)
+void CChara::CModel::AttachTextureSet(CTextureSet*)
 {
 	// TODO
 }
@@ -375,7 +375,7 @@ void CChara::CModel::CalcFurColor()
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CModel::GetDispIndex(CChara::CNode *)
+void CChara::CModel::GetDispIndex(CChara::CNode*)
 {
 	// TODO
 }
@@ -405,7 +405,7 @@ CChara::CNode::~CNode()
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CNode::Create(CChunkFile &, CChara::CModel *, CChara::CNode::TYPE, CMemory::CStage *)
+void CChara::CNode::Create(CChunkFile&, CChara::CModel*, CChara::CNode::TYPE, CMemory::CStage*)
 {
 	// TODO
 }
@@ -415,7 +415,7 @@ void CChara::CNode::Create(CChunkFile &, CChara::CModel *, CChara::CNode::TYPE, 
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CNode::Duplicate(CChara::CNode *, CMemory::CStage *)
+void CChara::CNode::Duplicate(CChara::CNode*, CMemory::CStage*)
 {
 	// TODO
 }
@@ -425,7 +425,7 @@ void CChara::CNode::Duplicate(CChara::CNode *, CMemory::CStage *)
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CNode::CalcBind(CChara::CModel *)
+void CChara::CNode::CalcBind(CChara::CModel*)
 {
 	// TODO
 }
@@ -475,7 +475,7 @@ CChara::CMesh::~CMesh()
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CMesh::Create(CChara::CModel *, CChunkFile &, CMemory::CStage *)
+void CChara::CMesh::Create(CChara::CModel*, CChunkFile&, CMemory::CStage*)
 {
 	// TODO
 }
@@ -485,7 +485,7 @@ void CChara::CMesh::Create(CChara::CModel *, CChunkFile &, CMemory::CStage *)
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CMesh::Duplicate(CChara::CMesh *, CMemory::CStage *)
+void CChara::CMesh::Duplicate(CChara::CMesh*, CMemory::CStage*)
 {
 	// TODO
 }
@@ -495,7 +495,7 @@ void CChara::CMesh::Duplicate(CChara::CMesh *, CMemory::CStage *)
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CMesh::skin(int, int, int, CChara::CSkin *, void *, void *, void *, S16Vec *, S16Vec *, S16Vec *, S16Vec *)
+void CChara::CMesh::skin(int, int, int, CChara::CSkin*, void*, void*, void*, S16Vec*, S16Vec*, S16Vec*, S16Vec*)
 {
 	// TODO
 }
@@ -505,7 +505,7 @@ void CChara::CMesh::skin(int, int, int, CChara::CSkin *, void *, void *, void *,
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CMesh::Calc(CChara::CModel *)
+void CChara::CMesh::Calc(CChara::CModel*)
 {
 	// TODO
 }
@@ -575,7 +575,7 @@ CChara::CSkin::~CSkin()
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CSkin::Create(CChunkFile &, CMemory::CStage *)
+void CChara::CSkin::Create(CChunkFile&, CMemory::CStage*)
 {
 	// TODO
 }
@@ -595,7 +595,7 @@ void CChara::CAnimNode::IsScale()
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CModel::CalcNodeWorldMatrix(float (*) [4], CChara::CNode *)
+void CChara::CModel::CalcNodeWorldMatrix(float (*) [4], CChara::CNode*)
 {
 	// TODO
 }

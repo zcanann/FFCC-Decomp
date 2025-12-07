@@ -25,7 +25,7 @@ void get_noise(unsigned char)
  * Address:	TODO
  * Size:	TODO
  */
-void alloc_check(VRyjMegaBirth *, PRyjMegaBirth *)
+void alloc_check(VRyjMegaBirth*, PRyjMegaBirth*)
 {
 	// TODO
 }
@@ -35,7 +35,7 @@ void alloc_check(VRyjMegaBirth *, PRyjMegaBirth *)
  * Address:	TODO
  * Size:	TODO
  */
-void birth(_pppPObject *, VRyjMegaBirth *, PRyjMegaBirth *, VColor *, _PARTICLE_DATA *, _PARTICLE_WMAT *, _PARTICLE_COLOR *)
+void birth(_pppPObject*, VRyjMegaBirth*, PRyjMegaBirth*, VColor*, _PARTICLE_DATA*, _PARTICLE_WMAT*, _PARTICLE_COLOR*)
 {
 	// TODO
 }
@@ -45,7 +45,7 @@ void birth(_pppPObject *, VRyjMegaBirth *, PRyjMegaBirth *, VColor *, _PARTICLE_
  * Address:	TODO
  * Size:	TODO
  */
-void calc(VRyjMegaBirth *, PRyjMegaBirth *, _PARTICLE_DATA *, VColor *, _PARTICLE_COLOR *)
+void calc(VRyjMegaBirth*, PRyjMegaBirth*, _PARTICLE_DATA*, VColor*, _PARTICLE_COLOR*)
 {
 	// TODO
 }
@@ -55,7 +55,7 @@ void calc(VRyjMegaBirth *, PRyjMegaBirth *, _PARTICLE_DATA *, VColor *, _PARTICL
  * Address:	TODO
  * Size:	TODO
  */
-void calc_particle(_pppPObject *, VRyjMegaBirth *, PRyjMegaBirth *, VColor *)
+void calc_particle(_pppPObject*, VRyjMegaBirth*, PRyjMegaBirth*, VColor*)
 {
 	// TODO
 }
@@ -75,7 +75,7 @@ void pppRyjMegaBirth(void)
  * Address:	TODO
  * Size:	TODO
  */
-void init_matrix(_pppPObject *, pppFMATRIX &, PRyjMegaBirth *, VRyjMegaBirth *)
+void init_matrix(_pppPObject*, pppFMATRIX&, PRyjMegaBirth*, VRyjMegaBirth*)
 {
 	// TODO
 }
@@ -85,7 +85,7 @@ void init_matrix(_pppPObject *, pppFMATRIX &, PRyjMegaBirth *, VRyjMegaBirth *)
  * Address:	TODO
  * Size:	TODO
  */
-void set_matrix(_pppPObject *, pppFMATRIX &, PRyjMegaBirth *, VRyjMegaBirth *, _PARTICLE_DATA *, _PARTICLE_WMAT *)
+void set_matrix(_pppPObject*, pppFMATRIX&, PRyjMegaBirth*, VRyjMegaBirth*, _PARTICLE_DATA*, _PARTICLE_WMAT*)
 {
 	// TODO
 }

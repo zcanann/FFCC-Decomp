@@ -25,7 +25,7 @@ void pppDrawMng::DrawOt()
  * Address:	TODO
  * Size:	TODO
  */
-void pppDrawMng::AddPrimOt(unsigned long, pppOtDrawPrim *)
+void pppDrawMng::AddPrimOt(unsigned long, pppOtDrawPrim*)
 {
 	// TODO
 }
@@ -35,7 +35,7 @@ void pppDrawMng::AddPrimOt(unsigned long, pppOtDrawPrim *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppDrawMng::AddPrimOt(unsigned long, _pppMngSt *)
+void pppDrawMng::AddPrimOt(unsigned long, _pppMngSt*)
 {
 	// TODO
 }
@@ -45,7 +45,7 @@ void pppDrawMng::AddPrimOt(unsigned long, _pppMngSt *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppDrawMng::AddPrim(float, _pppMngSt *, char)
+void pppDrawMng::AddPrim(float, _pppMngSt*, char)
 {
 	// TODO
 }
@@ -55,7 +55,7 @@ void pppDrawMng::AddPrim(float, _pppMngSt *, char)
  * Address:	TODO
  * Size:	TODO
  */
-void pppDrawMng::AddPrimOt(unsigned long, CCharaPcs::CHandle *)
+void pppDrawMng::AddPrimOt(unsigned long, CCharaPcs::CHandle*)
 {
 	// TODO
 }
@@ -65,7 +65,7 @@ void pppDrawMng::AddPrimOt(unsigned long, CCharaPcs::CHandle *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppDrawMng::AddPrim(float, CCharaPcs::CHandle *)
+void pppDrawMng::AddPrim(float, CCharaPcs::CHandle*)
 {
 	// TODO
 }

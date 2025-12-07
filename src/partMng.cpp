@@ -125,7 +125,7 @@ void CPartMng::pppGetFreePppDataMngSt()
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::drawLine(int, int, int, int, _GXColor &)
+void CPartMng::drawLine(int, int, int, int, _GXColor&)
 {
 	// TODO
 }
@@ -135,7 +135,7 @@ void CPartMng::drawLine(int, int, int, int, _GXColor &)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::drawLine3D(Vec *, Vec *, _GXColor &)
+void CPartMng::drawLine3D(Vec*, Vec*, _GXColor&)
 {
 	// TODO
 }
@@ -165,7 +165,7 @@ void CPartMng::render3Dcursor()
  * Address:	TODO
  * Size:	TODO
  */
-void Screen2world(Vec &, Vec &)
+void Screen2world(Vec&, Vec&)
 {
 	// TODO
 }
@@ -195,7 +195,7 @@ void CPartMng::drawStart()
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::setProcSpeed(ProcSpdSt *, int)
+void CPartMng::setProcSpeed(ProcSpdSt*, int)
 {
 	// TODO
 }
@@ -275,7 +275,7 @@ void CPartMng::InitMaterialSet()
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::ReadTex(CChunkFile &)
+void CPartMng::ReadTex(CChunkFile&)
 {
 	// TODO
 }
@@ -285,7 +285,7 @@ void CPartMng::ReadTex(CChunkFile &)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppReadRsd(CChunkFile &, pppModelSt *)
+void CPartMng::pppReadRsd(CChunkFile&, pppModelSt*)
 {
 	// TODO
 }
@@ -295,7 +295,7 @@ void CPartMng::pppReadRsd(CChunkFile &, pppModelSt *)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppReadShp(CChunkFile &, pppShapeSt *)
+void CPartMng::pppReadShp(CChunkFile&, pppShapeSt*)
 {
 	// TODO
 }
@@ -305,7 +305,7 @@ void CPartMng::pppReadShp(CChunkFile &, pppShapeSt *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppEditGetViewPos(Vec *)
+void pppEditGetViewPos(Vec*)
 {
 	// TODO
 }
@@ -345,7 +345,7 @@ void CPartMng::pppEditAllReleaseResource()
  * Address:	TODO
  * Size:	TODO
  */
-void CheckSum(char *, unsigned long, unsigned long)
+void CheckSum(char*, unsigned long, unsigned long)
 {
 	// TODO
 }
@@ -355,7 +355,7 @@ void CheckSum(char *, unsigned long, unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppDataRcv(unsigned long, char *, unsigned long)
+void CPartMng::pppDataRcv(unsigned long, char*, unsigned long)
 {
 	// TODO
 }
@@ -485,7 +485,7 @@ void CPartMng::pppDumpCacheIdx()
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppDrawPppMngSt(Vec &, _pppMngSt *)
+void CPartMng::pppDrawPppMngSt(Vec&, _pppMngSt*)
 {
 	// TODO
 }
@@ -565,7 +565,7 @@ void CPartMng::pppPartInit()
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppInitEnv(_pppEnvSt *, _pppDataHead *, unsigned int)
+void CPartMng::pppInitEnv(_pppEnvSt*, _pppDataHead*, unsigned int)
 {
 	// TODO
 }
@@ -575,7 +575,7 @@ void CPartMng::pppInitEnv(_pppEnvSt *, _pppDataHead *, unsigned int)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppFileRead(char *, unsigned long &, void *, int)
+void CPartMng::pppFileRead(char*, unsigned long&, void*, int)
 {
 	// TODO
 }
@@ -595,7 +595,7 @@ void CPartMng::LoadPartNoSyncCalc()
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppLoadPtx(const char *, int, int, void *, int)
+void CPartMng::pppLoadPtx(const char*, int, int, void*, int)
 {
 	// TODO
 }
@@ -605,7 +605,7 @@ void CPartMng::pppLoadPtx(const char *, int, int, void *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppLoadPmd(CChunkFile &)
+void CPartMng::pppLoadPmd(CChunkFile&)
 {
 	// TODO
 }
@@ -615,7 +615,7 @@ void CPartMng::pppLoadPmd(CChunkFile &)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppLoadPmd(const char *)
+void CPartMng::pppLoadPmd(const char*)
 {
 	// TODO
 }
@@ -625,7 +625,7 @@ void CPartMng::pppLoadPmd(const char *)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppLoadPan(CChunkFile &)
+void CPartMng::pppLoadPan(CChunkFile&)
 {
 	// TODO
 }
@@ -635,7 +635,7 @@ void CPartMng::pppLoadPan(CChunkFile &)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppLoadPan(const char *)
+void CPartMng::pppLoadPan(const char*)
 {
 	// TODO
 }
@@ -645,7 +645,7 @@ void CPartMng::pppLoadPan(const char *)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppLoadPdt(const char *, int, int, void *, int)
+void CPartMng::pppLoadPdt(const char*, int, int, void*, int)
 {
 	// TODO
 }
@@ -675,7 +675,7 @@ void CPartMng::pppGetDefaultCreateParam()
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppCreate0(int, int, PPPCREATEPARAM *, int)
+void CPartMng::pppCreate0(int, int, PPPCREATEPARAM*, int)
 {
 	// TODO
 }
@@ -685,7 +685,7 @@ void CPartMng::pppCreate0(int, int, PPPCREATEPARAM *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppCreate(int, int, PPPCREATEPARAM *, int)
+void CPartMng::pppCreate(int, int, PPPCREATEPARAM*, int)
 {
 	// TODO
 }
@@ -815,7 +815,7 @@ void CPartMng::pppSetDeltaSlot(int, long)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppSetLocSlot(int, Vec *)
+void CPartMng::pppSetLocSlot(int, Vec*)
 {
 	// TODO
 }
@@ -825,7 +825,7 @@ void CPartMng::pppSetLocSlot(int, Vec *)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppDeleteCHandle(CCharaPcs::CHandle *)
+void CPartMng::pppDeleteCHandle(CCharaPcs::CHandle*)
 {
 	// TODO
 }
@@ -835,7 +835,7 @@ void CPartMng::pppDeleteCHandle(CCharaPcs::CHandle *)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppEndCHandle(CCharaPcs::CHandle *)
+void CPartMng::pppEndCHandle(CCharaPcs::CHandle*)
 {
 	// TODO
 }
@@ -845,7 +845,7 @@ void CPartMng::pppEndCHandle(CCharaPcs::CHandle *)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppIsDeadCHandle(CCharaPcs::CHandle *)
+void CPartMng::pppIsDeadCHandle(CCharaPcs::CHandle*)
 {
 	// TODO
 }

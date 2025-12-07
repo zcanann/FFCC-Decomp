@@ -75,7 +75,7 @@ void CMenuPcs::destroy()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::loadFont(int, char *, int, int)
+void CMenuPcs::loadFont(int, char*, int, int)
 {
 	// TODO
 }
@@ -85,7 +85,7 @@ void CMenuPcs::loadFont(int, char *, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::loadTexture(char **, int, int, CMenuPcs::CTmp *, int, int, int)
+void CMenuPcs::loadTexture(char **, int, int, CMenuPcs::CTmp*, int, int, int)
 {
 	// TODO
 }
@@ -185,7 +185,7 @@ void CMenuPcs::GetButtonRepeat(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::onScriptChanging(char *)
+void CMenuPcs::onScriptChanging(char*)
 {
 	// TODO
 }
@@ -235,7 +235,7 @@ void CMenuPcs::DrawRect(unsigned long, float, float, float, float, float, float,
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawRect(unsigned long, float, float, float, float, float, float, _GXColor *, float, float, float)
+void CMenuPcs::DrawRect(unsigned long, float, float, float, float, float, float, _GXColor*, float, float, float)
 {
 	// TODO
 }
@@ -265,7 +265,7 @@ void CMenuPcs::DrawWindow(float, float, float, float, CMenuPcs::TEX, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::SetColor(CColor &)
+void CMenuPcs::SetColor(CColor&)
 {
 	// TODO
 }
@@ -275,7 +275,7 @@ void CMenuPcs::SetColor(CColor &)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::LoadExtraFont(int, char *)
+void CMenuPcs::LoadExtraFont(int, char*)
 {
 	// TODO
 }

@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void SAFE_CAST_WORK(CGObjWork *)
+void SAFE_CAST_WORK(CGObjWork*)
 {
 	// TODO
 }
@@ -165,7 +165,7 @@ void CGCharaObj::damageDelete()
  * Address:	TODO
  * Size:	TODO
  */
-void CGCharaObj::onHit(int, CGObject *, int, Vec *)
+void CGCharaObj::onHit(int, CGObject*, int, Vec*)
 {
 	// TODO
 }
@@ -175,7 +175,7 @@ void CGCharaObj::onHit(int, CGObject *, int, Vec *)
  * Address:	TODO
  * Size:	TODO
  */
-void CGCharaObj::onHitParticle(int, int, int, int, Vec *, PPPIFPARAM *)
+void CGCharaObj::onHitParticle(int, int, int, int, Vec*, PPPIFPARAM*)
 {
 	// TODO
 }
@@ -195,7 +195,7 @@ void CGCharaObj::getReplaceStat(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGCharaObj::putHitParticleFromItem(CGPrgObj *, int)
+void CGCharaObj::putHitParticleFromItem(CGPrgObj*, int)
 {
 	// TODO
 }
@@ -215,7 +215,7 @@ void CGCharaObj::setSta(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGCharaObj::effective(int, int, CGPrgObj *, int &)
+void CGCharaObj::effective(int, int, CGPrgObj*, int&)
 {
 	// TODO
 }
@@ -225,7 +225,7 @@ void CGCharaObj::effective(int, int, CGPrgObj *, int &)
  * Address:	TODO
  * Size:	TODO
  */
-void CGCharaObj::calcSta(int, int, CGObject *)
+void CGCharaObj::calcSta(int, int, CGObject*)
 {
 	// TODO
 }
@@ -235,7 +235,7 @@ void CGCharaObj::calcSta(int, int, CGObject *)
  * Address:	TODO
  * Size:	TODO
  */
-void CGCharaObj::addHp(int, CGPrgObj *)
+void CGCharaObj::addHp(int, CGPrgObj*)
 {
 	// TODO
 }
@@ -245,7 +245,7 @@ void CGCharaObj::addHp(int, CGPrgObj *)
  * Address:	TODO
  * Size:	TODO
  */
-void CGCharaObj::calcRegist(int, int, int &, int &, int &, int)
+void CGCharaObj::calcRegist(int, int, int&, int&, int&, int)
 {
 	// TODO
 }
@@ -255,7 +255,7 @@ void CGCharaObj::calcRegist(int, int, int &, int &, int &, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGCharaObj::onDamage(CGPrgObj *, int, int, int, Vec *)
+void CGCharaObj::onDamage(CGPrgObj*, int, int, int, Vec*)
 {
 	// TODO
 }
@@ -265,7 +265,7 @@ void CGCharaObj::onDamage(CGPrgObj *, int, int, int, Vec *)
  * Address:	TODO
  * Size:	TODO
  */
-void CGCharaObj::getItemPdt(int, int, int &, int &, int &)
+void CGCharaObj::getItemPdt(int, int, int&, int&, int&)
 {
 	// TODO
 }
@@ -275,7 +275,7 @@ void CGCharaObj::getItemPdt(int, int, int &, int &, int &)
  * Address:	TODO
  * Size:	TODO
  */
-void CGCharaObj::putParticleFromItem(int, int, int, Vec *)
+void CGCharaObj::putParticleFromItem(int, int, int, Vec*)
 {
 	// TODO
 }
@@ -295,7 +295,7 @@ void CGCharaObj::statShield()
  * Address:	TODO
  * Size:	TODO
  */
-void la(CGObject *)
+void la(CGObject*)
 {
 	// TODO
 }
@@ -395,7 +395,7 @@ void CGCharaObj::calcCastTime(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGCharaObj::onDrawDebug(CFont *, float, float &, float)
+void CGCharaObj::onDrawDebug(CFont*, float, float&, float)
 {
 	// TODO
 }
@@ -445,7 +445,7 @@ void CGCharaObj::combi2()
  * Address:	TODO
  * Size:	TODO
  */
-void CGCharaObj::sendCombiToScript(CGCharaObj *, int, int)
+void CGCharaObj::sendCombiToScript(CGCharaObj*, int, int)
 {
 	// TODO
 }
@@ -455,7 +455,7 @@ void CGCharaObj::sendCombiToScript(CGCharaObj *, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGCharaObj::scCheckItem(CCombi2Set *, CGCharaObj *, int)
+void CGCharaObj::scCheckItem(CCombi2Set*, CGCharaObj*, int)
 {
 	// TODO
 }
@@ -465,7 +465,7 @@ void CGCharaObj::scCheckItem(CCombi2Set *, CGCharaObj *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGCharaObj::scCheckTime(CCombi2Set *, CGCharaObj *, CGCharaObj *, int)
+void CGCharaObj::scCheckTime(CCombi2Set*, CGCharaObj*, CGCharaObj*, int)
 {
 	// TODO
 }
@@ -475,7 +475,7 @@ void CGCharaObj::scCheckTime(CCombi2Set *, CGCharaObj *, CGCharaObj *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGCharaObj::searchCombi(int, CGPartyObj **, int &)
+void CGCharaObj::searchCombi(int, CGPartyObj **, int&)
 {
 	// TODO
 }

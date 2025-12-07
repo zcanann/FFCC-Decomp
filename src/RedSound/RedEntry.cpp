@@ -55,7 +55,7 @@ void CRedEntry::WaveHistoryDelete(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedEntry::WaveHistoryChoice(RedHistoryBANK *)
+void CRedEntry::WaveHistoryChoice(RedHistoryBANK*)
 {
 	// TODO
 }
@@ -85,7 +85,7 @@ void CRedEntry::SearchUseWave(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedEntry::WaveDelete(RedHistoryBANK *)
+void CRedEntry::WaveDelete(RedHistoryBANK*)
 {
 	// TODO
 }
@@ -105,7 +105,7 @@ void CRedEntry::WaveOldClear(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedEntry::WaveHeadAdd(int, RedWaveHeadWD *, int)
+void CRedEntry::WaveHeadAdd(int, RedWaveHeadWD*, int)
 {
 	// TODO
 }
@@ -115,7 +115,7 @@ void CRedEntry::WaveHeadAdd(int, RedWaveHeadWD *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedEntry::SetWaveData(int, void *, int)
+void CRedEntry::SetWaveData(int, void*, int)
 {
 	// TODO
 }
@@ -225,7 +225,7 @@ void CRedEntry::SeSepHistoryDelete(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedEntry::SeSepHistoryChoice(RedHistoryBANK *)
+void CRedEntry::SeSepHistoryChoice(RedHistoryBANK*)
 {
 	// TODO
 }
@@ -245,7 +245,7 @@ void CRedEntry::SearchSeSepSequence(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedEntry::SeSepMemoryFree(RedHistoryBANK *)
+void CRedEntry::SeSepMemoryFree(RedHistoryBANK*)
 {
 	// TODO
 }
@@ -265,7 +265,7 @@ void CRedEntry::SeSepOldDelete()
  * Address:	TODO
  * Size:	TODO
  */
-void CRedEntry::SeSepHeadAdd(RedSeSepHEAD *)
+void CRedEntry::SeSepHeadAdd(RedSeSepHEAD*)
 {
 	// TODO
 }
@@ -275,7 +275,7 @@ void CRedEntry::SeSepHeadAdd(RedSeSepHEAD *)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedEntry::SetSeSepData(RedSeSepHEAD *)
+void CRedEntry::SetSeSepData(RedSeSepHEAD*)
 {
 	// TODO
 }
@@ -365,7 +365,7 @@ void CRedEntry::MusicHistoryDelete(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedEntry::MusicHistoryChoice(RedHistoryBANK *)
+void CRedEntry::MusicHistoryChoice(RedHistoryBANK*)
 {
 	// TODO
 }
@@ -385,7 +385,7 @@ void CRedEntry::SearchMusicSequence(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedEntry::MusicMemoryFree(RedHistoryBANK *)
+void CRedEntry::MusicMemoryFree(RedHistoryBANK*)
 {
 	// TODO
 }
@@ -445,7 +445,7 @@ void CRedEntry::MusicHistoryManager(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedEntry::MusicHeadAdd(RedMusicHEAD *)
+void CRedEntry::MusicHeadAdd(RedMusicHEAD*)
 {
 	// TODO
 }
@@ -455,7 +455,7 @@ void CRedEntry::MusicHeadAdd(RedMusicHEAD *)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedEntry::SetMusicData(RedMusicHEAD *)
+void CRedEntry::SetMusicData(RedMusicHEAD*)
 {
 	// TODO
 }

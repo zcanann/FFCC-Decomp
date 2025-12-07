@@ -226,7 +226,7 @@ static void WriteMTXPS4x2(const register f32 mtx[2][4], register volatile f32* d
 do { \
     f32 xfData = (value); \
     GX_WRITE_F32(value); \
-    VERIF_MTXLIGHT((addr), *(u32 *)&xfData); \
+    VERIF_MTXLIGHT((addr), *(u32*)&xfData); \
 } while (0)
 
 void GXLoadPosMtxImm(const Mtx mtx, u32 id) {
@@ -495,7 +495,7 @@ do { \
     { \
         f32 xfData = (value); \
         GX_WRITE_F32(value); \
-        VERIF_XF_REG_alt(addr, *(u32 *)&xfData); \
+        VERIF_XF_REG_alt(addr, *(u32*)&xfData); \
     } \
 } while (0)
 

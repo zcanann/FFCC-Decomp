@@ -19,11 +19,11 @@ public:
     CTexAnimSet();
     ~CTexAnimSet();
 
-    void Create(CChunkFile &, CMemory::CStage *);
-    void Duplicate(CMemory::CStage *);
-    void AttachMaterialSet(CMaterialSet *);
+    void Create(CChunkFile&, CMemory::CStage*);
+    void Duplicate(CMemory::CStage*);
+    void AttachMaterialSet(CMaterialSet*);
     void AddFrame();
-    void Change(char *, float, ANIM_TYPE);
+    void Change(char*, float, ANIM_TYPE);
     void SetTexGen();
 };
 
@@ -33,8 +33,8 @@ public:
     CTexAnimSeq();
     ~CTexAnimSeq();
 
-    void Create(CChunkFile &, CMemory::CStage *);
-    void Interp(float, Vec &);
+    void Create(CChunkFile&, CMemory::CStage*);
+    void Interp(float, Vec&);
     void GetTotalFrame();
     void GetName();
     void IsChin();
@@ -53,11 +53,11 @@ public:
     CTexAnim();
     ~CTexAnim();
 
-    void Create(CChunkFile &, CMemory::CStage *);
-    void Duplicate(CMemory::CStage *);
-    void AttachMaterialSet(CMaterialSet *);
+    void Create(CChunkFile&, CMemory::CStage*);
+    void Duplicate(CMemory::CStage*);
+    void AttachMaterialSet(CMaterialSet*);
     void AddFrame(float);
-    void Find(char *);
+    void Find(char*);
     void Change(int, float, CTexAnimSet::ANIM_TYPE);
     void SetTexGen();
     void IsChin();

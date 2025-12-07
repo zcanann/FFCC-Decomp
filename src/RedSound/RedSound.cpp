@@ -45,7 +45,7 @@ void CRedSound::EntryStandbyID(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::Init(void *, int, int, int)
+void CRedSound::Init(void*, int, int, int)
 {
 	// TODO
 }
@@ -105,7 +105,7 @@ void CRedSound::ReportStandby(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::DMAEntry(int, int, int, int, int, void (*) (void *), void *)
+void CRedSound::DMAEntry(int, int, int, int, int, void (*) (void*), void*)
 {
 	// TODO
 }
@@ -165,7 +165,7 @@ void CRedSound::SetReverbDepth(int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::SetMusicData(void *)
+void CRedSound::SetMusicData(void*)
 {
 	// TODO
 }
@@ -265,7 +265,7 @@ void CRedSound::SetMusicPhraseStop(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::SetSeBlockData(int, void *)
+void CRedSound::SetSeBlockData(int, void*)
 {
 	// TODO
 }
@@ -275,7 +275,7 @@ void CRedSound::SetSeBlockData(int, void *)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::SetSeSepData(void *)
+void CRedSound::SetSeSepData(void*)
 {
 	// TODO
 }
@@ -455,7 +455,7 @@ void CRedSound::StreamPlayState(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::GetStreamPlayPoint(int, int *, int *)
+void CRedSound::GetStreamPlayPoint(int, int*, int*)
 {
 	// TODO
 }
@@ -475,7 +475,7 @@ void CRedSound::StreamStop(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::StreamPlay(void *, int, int, int)
+void CRedSound::StreamPlay(void*, int, int, int)
 {
 	// TODO
 }
@@ -505,7 +505,7 @@ void CRedSound::StreamPause(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::SetWaveData(int, void *, int)
+void CRedSound::SetWaveData(int, void*, int)
 {
 	// TODO
 }

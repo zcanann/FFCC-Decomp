@@ -25,7 +25,7 @@ CMapTexAnimSet::~CMapTexAnimSet()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapTexAnimSet::Create(CChunkFile &, CMaterialSet *, CTextureSet *)
+void CMapTexAnimSet::Create(CChunkFile&, CMaterialSet*, CTextureSet*)
 {
 	// TODO
 }
@@ -35,7 +35,7 @@ void CMapTexAnimSet::Create(CChunkFile &, CMaterialSet *, CTextureSet *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapTexAnim::Calc(CMaterialSet *, CTextureSet *)
+void CMapTexAnim::Calc(CMaterialSet*, CTextureSet*)
 {
 	// TODO
 }

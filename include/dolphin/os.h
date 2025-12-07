@@ -73,8 +73,8 @@ OSThread* __gUnkThread1 AT_ADDRESS(OS_BASE_CACHED | 0x00D8);
 int __gUnknown800030C0[2] AT_ADDRESS(OS_BASE_CACHED | 0x30C0);
 u8 __gUnknown800030E3 AT_ADDRESS(OS_BASE_CACHED | 0x30E3);
 #else
-#define __OSBusClock  (*(u32 *)(OS_BASE_CACHED | 0x00F8))
-#define __OSCoreClock (*(u32 *)(OS_BASE_CACHED | 0x00FC))
+#define __OSBusClock  (*(u32*)(OS_BASE_CACHED | 0x00F8))
+#define __OSCoreClock (*(u32*)(OS_BASE_CACHED | 0x00FC))
 #endif
 
 #define OS_BUS_CLOCK   __OSBusClock

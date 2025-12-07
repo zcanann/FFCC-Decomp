@@ -6,16 +6,16 @@
 class CGBaseObj : public CFlatRuntime::CObject
 {
 	CGBaseObj();
-	virtual ~CGBaseObj();                       // vtable 0x4
+	virtual ~CGBaseObj();                       // vtable entry 0x4
 	
-    virtual void onNewFinished(int) = 0;        // vtable 0x8
-    virtual int GetCID();                       // vtable 0x10
-	virtual void onPush(CGBaseObj* other, int); // vtable 0x14
-	virtual void onTalk(CGBaseObj* other, int); // vtable 0x18
-	virtual void onCreate();                    // vtable 0x1c
-	virtual void onDestroy();                   // vtable 0x20
-    virtual void onFrame();                     // vtable 0x24
-    virtual void onDraw();                      // vtable 0x28
+    virtual void onNewFinished(int) = 0;        // vtable entry 0x8
+    virtual int GetCID();                       // vtable entry 0x10
+	virtual void onPush(CGBaseObj* other, int); // vtable entry 0x14
+	virtual void onTalk(CGBaseObj* other, int); // vtable entry 0x18
+	virtual void onCreate();                    // vtable entry 0x1c
+	virtual void onDestroy();                   // vtable entry 0x20
+    virtual void onFrame();                     // vtable entry 0x24
+    virtual void onDraw();                      // vtable entry 0x28
 
 	void Create();
 	void Destroy();

@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void pppGetRotMatrixYXZ(pppFMATRIX &, pppIVECTOR4 *)
+void pppGetRotMatrixYXZ(pppFMATRIX&, pppIVECTOR4*)
 {
 	// TODO
 }

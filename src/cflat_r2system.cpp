@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject *, int, int, int &)
+void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject*, int, int, int&)
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject *, int, int, int &)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::onSystemVal(CFlatRuntime::CObject *, int)
+void CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int)
 {
 	// TODO
 }
@@ -25,7 +25,7 @@ void CFlatRuntime2::onSystemVal(CFlatRuntime::CObject *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::onSetSystemVal(int, CFlatRuntime::CStack *, int)
+void CFlatRuntime2::onSetSystemVal(int, CFlatRuntime::CStack*, int)
 {
 	// TODO
 }

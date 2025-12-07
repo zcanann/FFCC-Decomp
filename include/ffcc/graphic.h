@@ -17,8 +17,8 @@ class CFile;
 class CUtil;
 class CCameraPcs;
 
-void checkThread(void *);
-void wakeup(OSAlarm *, OSContext *);
+void checkThread(void*);
+void wakeup(OSAlarm*, OSContext*);
 void sleep();
 void GXSetTexCoordGen();
 void GXEnd();
@@ -43,29 +43,29 @@ public:
     void EndFrame();
     void SetDrawDoneDebugData(char);
     void SetDrawDoneDebugDataPartControl(int);
-    void _WaitDrawDone(char *, int);
+    void _WaitDrawDone(char*, int);
     void Thread();
     void IsFifoOver();
     void IsFrameRateOver();
     void Flip();
 
-    void Printf(char *, ...);
-    void Printf(unsigned long, unsigned long, char *, ...);
+    void Printf(char*, ...);
+    void Printf(unsigned long, unsigned long, char*, ...);
 
     void DrawDebugString();
     void InitDebugString();
 
-    void DrawDebugStringDirect(unsigned long, unsigned long, char *, unsigned long);
+    void DrawDebugStringDirect(unsigned long, unsigned long, char*, unsigned long);
 
-    void SaveFrameBuffer(char *);
+    void SaveFrameBuffer(char*);
     void DrawSphere();
-    void DrawSphere(float (*)[4], Vec *, float, _GXColor *);
-    void DrawSphere(float (*)[4], Vec *, Vec *, _GXColor *);
+    void DrawSphere(float (*)[4], Vec*, float, _GXColor*);
+    void DrawSphere(float (*)[4], Vec*, Vec*, _GXColor*);
     void DrawSphere(float (*)[4], _GXColor);
 
     void makeSphere();
 
-    void DrawBound(CBound &, _GXColor);
+    void DrawBound(CBound&, _GXColor);
 
     void SetFogColor(_GXColor);
     void SetFogParam(float, float);
@@ -73,15 +73,15 @@ public:
 
     void CopySaveFrameBuffer();
 
-    void GetBackBufferRect(int &, int &, int &, int &, int);
-    void GetBackBufferRect2(void *, _GXTexObj *, int, int, int, int, int, _GXTexFilter, _GXTexFmt, int);
+    void GetBackBufferRect(int&, int&, int&, int&, int);
+    void GetBackBufferRect2(void*, _GXTexObj*, int, int, int, int, int, _GXTexFilter, _GXTexFmt, int);
 
     void RenderTexQuadGrouad(Vec&, Vec&, _GXColor, _GXColor, _GXColor, _GXColor);
     void RenderNoTexQuadGrouad(Vec&, Vec&, _GXColor, _GXColor, _GXColor, _GXColor);
 
     void RenderDOF(char, char, float, float, Vec&, int);
 
-    void CreateSmallBackTexture(void *, _GXTexObj *, long, long, _GXTexFilter, _GXTexFmt, unsigned long);
+    void CreateSmallBackTexture(void*, _GXTexObj*, long, long, _GXTexFilter, _GXTexFmt, unsigned long);
 
     void InitBlurParameter();
     void RenderBlur(int, unsigned char, unsigned char, unsigned char, unsigned char, short);

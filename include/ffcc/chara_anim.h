@@ -6,12 +6,12 @@
 class CChunkFile;
 class SRT;
 
-void i2f2_7(float *, unsigned short *, float);
-void i2f_7(float *, unsigned short *);
-void i2f2_6(float *, unsigned short *, float);
-void i2f_6(float *, unsigned short *);
-void i2f2_5(float *, unsigned short *, float);
-void i2f_5(float *, unsigned short *);
+void i2f2_7(float*, unsigned short*, float);
+void i2f_7(float*, unsigned short*);
+void i2f2_6(float*, unsigned short*, float);
+void i2f_6(float*, unsigned short*);
+void i2f2_5(float*, unsigned short*, float);
+void i2f_5(float*, unsigned short*);
 
 class CChara
 {
@@ -20,7 +20,7 @@ class CChara
 		CAnim();
 		~CAnim();
 
-		void Create(void *, CMemory::CStage *);
+		void Create(void*, CMemory::CStage*);
 		void InitQuantize();
 	};
 
@@ -29,8 +29,8 @@ class CChara
 		CAnimNode();
 		~CAnimNode();
 
-		void Create(CChunkFile &);
-		void Interp(CChara::CAnim *, SRT *, float);
+		void Create(CChunkFile&);
+		void Interp(CChara::CAnim*, SRT*, float);
 	};
 };
 

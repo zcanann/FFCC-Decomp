@@ -95,7 +95,7 @@ void CUtil::GetNoise(unsigned char)
  * Address:	TODO
  * Size:	TODO
  */
-void CUtil::GetSplinePos(Vec &, Vec&, Vec&, Vec&, Vec&, float, float)
+void CUtil::GetSplinePos(Vec&, Vec&, Vec&, Vec&, Vec&, float, float)
 {
 	// TODO
 }
@@ -105,7 +105,7 @@ void CUtil::GetSplinePos(Vec &, Vec&, Vec&, Vec&, Vec&, float, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CUtil::ConvI2FVector(Vec &, S16Vec&, long)
+void CUtil::ConvI2FVector(Vec&, S16Vec&, long)
 {
 	// TODO
 }
@@ -115,7 +115,7 @@ void CUtil::ConvI2FVector(Vec &, S16Vec&, long)
  * Address:	TODO
  * Size:	TODO
  */
-void CUtil::ConvF2IVector(S16Vec &, Vec&, long)
+void CUtil::ConvF2IVector(S16Vec&, Vec&, long)
 {
 	// TODO
 }
@@ -125,7 +125,7 @@ void CUtil::ConvF2IVector(S16Vec &, Vec&, long)
  * Address:	TODO
  * Size:	TODO
  */
-void CUtil::ConvF2IVector2d(S16Vec2d &, Vec2d&, long)
+void CUtil::ConvF2IVector2d(S16Vec2d&, Vec2d&, long)
 {
 	// TODO
 }
@@ -145,7 +145,7 @@ void CUtil::RenderQuadNoTex(Vec&, Vec&, _GXColor)
  * Address:	TODO
  * Size:	TODO
  */
-void CUtil::RenderQuad(Vec&, Vec&, _GXColor, Vec2d *, Vec2d *)
+void CUtil::RenderQuad(Vec&, Vec&, _GXColor, Vec2d*, Vec2d*)
 {
 	// TODO
 }
@@ -155,7 +155,7 @@ void CUtil::RenderQuad(Vec&, Vec&, _GXColor, Vec2d *, Vec2d *)
  * Address:	TODO
  * Size:	TODO
  */
-void CUtil::RenderQuadTex2(Vec&, Vec&, _GXColor, Vec2d *, Vec2d *)
+void CUtil::RenderQuadTex2(Vec&, Vec&, _GXColor, Vec2d*, Vec2d*)
 {
 	// TODO
 }
@@ -225,7 +225,7 @@ void CUtil::RenderColorQuad(float, float, float, float, _GXColor)
  * Address:	TODO
  * Size:	TODO
  */
-void CUtil::RenderTextureQuad(float, float, float, float, _GXTexObj *, Vec2d *, Vec2d *, _GXColor *, _GXBlendFactor, _GXBlendFactor)
+void CUtil::RenderTextureQuad(float, float, float, float, _GXTexObj*, Vec2d*, Vec2d*, _GXColor*, _GXBlendFactor, _GXBlendFactor)
 {
 	// TODO
 }
@@ -235,7 +235,7 @@ void CUtil::RenderTextureQuad(float, float, float, float, _GXTexObj *, Vec2d *, 
  * Address:	TODO
  * Size:	TODO
  */
-void CUtil::RenderTextureQuad(float, float, float, float, CTexture *, Vec2d *, Vec2d *, _GXColor *, _GXBlendFactor, _GXBlendFactor)
+void CUtil::RenderTextureQuad(float, float, float, float, CTexture*, Vec2d*, Vec2d*, _GXColor*, _GXBlendFactor, _GXBlendFactor)
 {
 	// TODO
 }
@@ -245,7 +245,7 @@ void CUtil::RenderTextureQuad(float, float, float, float, CTexture *, Vec2d *, V
  * Address:	TODO
  * Size:	TODO
  */
-void CUtil::SetPaletteEnv(CTexture *)
+void CUtil::SetPaletteEnv(CTexture*)
 {
 	// TODO
 }
@@ -255,7 +255,7 @@ void CUtil::SetPaletteEnv(CTexture *)
  * Address:	TODO
  * Size:	TODO
  */
-void CUtil::CalcUV(float &, float &, unsigned long, unsigned long, unsigned long, unsigned long)
+void CUtil::CalcUV(float&, float&, unsigned long, unsigned long, unsigned long, unsigned long)
 {
 	// TODO
 }
@@ -275,7 +275,7 @@ void CUtil::IsHasDrawFmtDL(unsigned char)
  * Address:	TODO
  * Size:	TODO
  */
-void CUtil::ReWriteDisplayList(void *, unsigned long, unsigned long)
+void CUtil::ReWriteDisplayList(void*, unsigned long, unsigned long)
 {
 	// TODO
 }
@@ -285,7 +285,7 @@ void CUtil::ReWriteDisplayList(void *, unsigned long, unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void CUtil::CalcBoundaryBoxQuantized(Vec *, Vec *, S16Vec *, unsigned long, unsigned long)
+void CUtil::CalcBoundaryBoxQuantized(Vec*, Vec*, S16Vec*, unsigned long, unsigned long)
 {
 	// TODO
 }
@@ -295,7 +295,7 @@ void CUtil::CalcBoundaryBoxQuantized(Vec *, Vec *, S16Vec *, unsigned long, unsi
  * Address:	TODO
  * Size:	TODO
  */
-void CUtil::GetNumPolygonFromDL(void *, unsigned long)
+void CUtil::GetNumPolygonFromDL(void*, unsigned long)
 {
 	// TODO
 }
@@ -305,7 +305,7 @@ void CUtil::GetNumPolygonFromDL(void *, unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void CUtil::GetDirectVector(Vec *, Vec *, Vec&)
+void CUtil::GetDirectVector(Vec*, Vec*, Vec&)
 {
 	// TODO
 }
@@ -325,7 +325,7 @@ void CUtil::InitConstantRegister()
  * Address:	TODO
  * Size:	TODO
  */
-void CUtil::SSepa(char *)
+void CUtil::SSepa(char*)
 {
 	// TODO
 }

@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void VECMultAdd(Vec *, Vec *, Vec *, float)
+void VECMultAdd(Vec*, Vec*, Vec*, float)
 {
 	// TODO
 }
@@ -45,7 +45,7 @@ void CMath::Quit()
  * Address:	TODO
  * Size:	TODO
  */
-void CMath::rotateToMatrix(float (*) [4], Vec *)
+void CMath::rotateToMatrix(float (*) [4], Vec*)
 {
 	// TODO
 }
@@ -55,7 +55,7 @@ void CMath::rotateToMatrix(float (*) [4], Vec *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMath::SRTToMatrix(float (*) [4], SRT *)
+void CMath::SRTToMatrix(float (*) [4], SRT*)
 {
 	// TODO
 }
@@ -65,7 +65,7 @@ void CMath::SRTToMatrix(float (*) [4], SRT *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMath::SRTToMatrixRT(float (*) [4], SRT *)
+void CMath::SRTToMatrixRT(float (*) [4], SRT*)
 {
 	// TODO
 }
@@ -125,7 +125,7 @@ void CMath::RandFPM(float)
  * Address:	TODO
  * Size:	TODO
  */
-void CBound::SetFrustum(Vec &, float (*) [4])
+void CBound::SetFrustum(Vec&, float (*) [4])
 {
 	// TODO
 }
@@ -135,7 +135,7 @@ void CBound::SetFrustum(Vec &, float (*) [4])
  * Address:	TODO
  * Size:	TODO
  */
-void CBound::CheckFrustum0(CBound &)
+void CBound::CheckFrustum0(CBound&)
 {
 	// TODO
 }
@@ -155,7 +155,7 @@ void CBound::CheckFrustum0(float)
  * Address:	TODO
  * Size:	TODO
  */
-void CBound::CheckFrustum(Vec &, float (*) [4], float)
+void CBound::CheckFrustum(Vec&, float (*) [4], float)
 {
 	// TODO
 }
@@ -165,7 +165,7 @@ void CBound::CheckFrustum(Vec &, float (*) [4], float)
  * Address:	TODO
  * Size:	TODO
  */
-void CMath::MTX44MultVec4(float (*) [4], Vec *, Vec4d *)
+void CMath::MTX44MultVec4(float (*) [4], Vec*, Vec4d*)
 {
 	// TODO
 }
@@ -175,7 +175,7 @@ void CMath::MTX44MultVec4(float (*) [4], Vec *, Vec4d *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMath::MTX44MultVec4(float (*) [4], Vec4d *, Vec4d *)
+void CMath::MTX44MultVec4(float (*) [4], Vec4d*, Vec4d*)
 {
 	// TODO
 }
@@ -185,7 +185,7 @@ void CMath::MTX44MultVec4(float (*) [4], Vec4d *, Vec4d *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMath::MTXGetScale(float (*) [4], Vec *)
+void CMath::MTXGetScale(float (*) [4], Vec*)
 {
 	// TODO
 }
@@ -195,7 +195,7 @@ void CMath::MTXGetScale(float (*) [4], Vec *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMath::CrossCheckSphereVector(Vec *, float *, Vec *, Vec *, Vec *, float)
+void CMath::CrossCheckSphereVector(Vec*, float*, Vec*, Vec*, Vec*, float)
 {
 	// TODO
 }
@@ -205,7 +205,7 @@ void CMath::CrossCheckSphereVector(Vec *, float *, Vec *, Vec *, Vec *, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CMath::CrossCheckEllipseCapsule(Vec *, float *, Vec *, Vec *, float, Vec *, float, float)
+void CMath::CrossCheckEllipseCapsule(Vec*, float*, Vec*, Vec*, float, Vec*, float, float)
 {
 	// TODO
 }
@@ -215,7 +215,7 @@ void CMath::CrossCheckEllipseCapsule(Vec *, float *, Vec *, Vec *, float, Vec *,
  * Address:	TODO
  * Size:	TODO
  */
-void CMath::CalcSpline(Vec *, Vec *, Vec *, Vec *, Vec *, float, float, float, float, float)
+void CMath::CalcSpline(Vec*, Vec*, Vec*, Vec*, Vec*, float, float, float, float, float)
 {
 	// TODO
 }
@@ -225,7 +225,7 @@ void CMath::CalcSpline(Vec *, Vec *, Vec *, Vec *, Vec *, float, float, float, f
  * Address:	TODO
  * Size:	TODO
  */
-void CMath::MakeSpline1Dtable(int, float *, float *, float *)
+void CMath::MakeSpline1Dtable(int, float*, float*, float*)
 {
 	// TODO
 }
@@ -235,7 +235,7 @@ void CMath::MakeSpline1Dtable(int, float *, float *, float *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMath::Spline1D(int, float, float *, float *, float *)
+void CMath::Spline1D(int, float, float*, float*, float*)
 {
 	// TODO
 }
@@ -245,7 +245,7 @@ void CMath::Spline1D(int, float, float *, float *, float *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMath::Line1D(int, float, float *, float *)
+void CMath::Line1D(int, float, float*, float*)
 {
 	// TODO
 }

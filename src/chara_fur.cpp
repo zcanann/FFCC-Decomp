@@ -37,7 +37,7 @@ void myRandFPM(float)
  * Address:	TODO
  * Size:	TODO
  */
-void brush(unsigned short *, int, int, float, float, int, _GXColor, _GXColor *, _GXColor *)
+void brush(unsigned short*, int, int, float, float, int, _GXColor, _GXColor*, _GXColor*)
 {
 	// TODO
 }

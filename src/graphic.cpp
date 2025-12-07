@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void checkThread(void *)
+void checkThread(void*)
 {
 	// TODO
 }
@@ -155,7 +155,7 @@ void CGraphic::SetDrawDoneDebugDataPartControl(int)
  * Address:	TODO
  * Size:	TODO
  */
-void wakeup(OSAlarm *, OSContext *)
+void wakeup(OSAlarm*, OSContext*)
 {
 	// TODO
 }
@@ -175,7 +175,7 @@ void sleep()
  * Address:	TODO
  * Size:	TODO
  */
-void CGraphic::_WaitDrawDone(char *, int)
+void CGraphic::_WaitDrawDone(char*, int)
 {
 	// TODO
 }
@@ -225,7 +225,7 @@ void CGraphic::Flip()
  * Address:	TODO
  * Size:	TODO
  */
-void CGraphic::Printf(char *, ...)
+void CGraphic::Printf(char*, ...)
 {
 	// TODO
 }
@@ -235,7 +235,7 @@ void CGraphic::Printf(char *, ...)
  * Address:	TODO
  * Size:	TODO
  */
-void CGraphic::Printf(unsigned long, unsigned long, char *, ...)
+void CGraphic::Printf(unsigned long, unsigned long, char*, ...)
 {
 	// TODO
 }
@@ -275,7 +275,7 @@ void GXSetTexCoordGen(void)
  * Address:	TODO
  * Size:	TODO
  */
-void CGraphic::DrawDebugStringDirect(unsigned long, unsigned long, char *, unsigned long)
+void CGraphic::DrawDebugStringDirect(unsigned long, unsigned long, char*, unsigned long)
 {
 	// TODO
 }
@@ -285,7 +285,7 @@ void CGraphic::DrawDebugStringDirect(unsigned long, unsigned long, char *, unsig
  * Address:	TODO
  * Size:	TODO
  */
-void CGraphic::SaveFrameBuffer(char *)
+void CGraphic::SaveFrameBuffer(char*)
 {
 	// TODO
 }
@@ -305,7 +305,7 @@ void CGraphic::DrawSphere()
  * Address:	TODO
  * Size:	TODO
  */
-void CGraphic::DrawSphere(float (*) [4], Vec *, float, _GXColor *)
+void CGraphic::DrawSphere(float (*) [4], Vec*, float, _GXColor*)
 {
 	// TODO
 }
@@ -315,7 +315,7 @@ void CGraphic::DrawSphere(float (*) [4], Vec *, float, _GXColor *)
  * Address:	TODO
  * Size:	TODO
  */
-void CGraphic::DrawSphere(float (*) [4], Vec *, Vec *, _GXColor *)
+void CGraphic::DrawSphere(float (*) [4], Vec*, Vec*, _GXColor*)
 {
 	// TODO
 }
@@ -345,7 +345,7 @@ void CGraphic::makeSphere()
  * Address:	TODO
  * Size:	TODO
  */
-void CGraphic::DrawBound(CBound &, _GXColor)
+void CGraphic::DrawBound(CBound&, _GXColor)
 {
 	// TODO
 }
@@ -395,7 +395,7 @@ void CGraphic::CopySaveFrameBuffer()
  * Address:	TODO
  * Size:	TODO
  */
-void CGraphic::GetBackBufferRect(int &, int &, int &, int &, int)
+void CGraphic::GetBackBufferRect(int&, int&, int&, int&, int)
 {
 	// TODO
 }
@@ -405,7 +405,7 @@ void CGraphic::GetBackBufferRect(int &, int &, int &, int &, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGraphic::GetBackBufferRect2(void *, _GXTexObj *, int, int, int, int, int, _GXTexFilter, _GXTexFmt, int)
+void CGraphic::GetBackBufferRect2(void*, _GXTexObj*, int, int, int, int, int, _GXTexFilter, _GXTexFmt, int)
 {
 	// TODO
 }
@@ -445,7 +445,7 @@ void CGraphic::RenderDOF(char, char, float, float, Vec&, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGraphic::CreateSmallBackTexture(void *, _GXTexObj *, long, long, _GXTexFilter, _GXTexFmt, unsigned long)
+void CGraphic::CreateSmallBackTexture(void*, _GXTexObj*, long, long, _GXTexFilter, _GXTexFmt, unsigned long)
 {
 	// TODO
 }

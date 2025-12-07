@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void SetTexGenMode(PEmission *)
+void SetTexGenMode(PEmission*)
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void SetTexGenMode(PEmission *)
  * Address:	TODO
  * Size:	TODO
  */
-void Emission_DrawMeshDLCallback(CChara::CModel *, void *, void *, int, int, float (*) [4])
+void Emission_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*) [4])
 {
 	// TODO
 }
@@ -25,7 +25,7 @@ void Emission_DrawMeshDLCallback(CChara::CModel *, void *, void *, int, int, flo
  * Address:	TODO
  * Size:	TODO
  */
-void Emission_AfterDrawMeshCallback(CChara::CModel *, void *, void *, int, float (*) [4])
+void Emission_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*) [4])
 {
 	// TODO
 }

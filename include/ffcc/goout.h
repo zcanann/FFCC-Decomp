@@ -8,7 +8,7 @@ class CCaravanWork;
 class McCtrl;
 class CMenuPcs;
 
-void getFreeCaravanIdx(CMemoryCardMan::Mc::SaveDat *);
+void getFreeCaravanIdx(CMemoryCardMan::Mc::SaveDat*);
 void CalcGoOutMenu();
 void DrawGoOutMenu();
 
@@ -18,7 +18,7 @@ public:
     void CharaSelClose();
     void SetMemCardSlot(int, int);
     void SetMemCardProc(unsigned char);
-    void SetMemCardSaveBuff(void *);
+    void SetMemCardSaveBuff(void*);
     void GetMemCardResult();
     void CalcMemCardProc();
     void SetMemCardError();

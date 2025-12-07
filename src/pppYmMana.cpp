@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void SetEnvMap(PYmMana *, VYmMana *)
+void SetEnvMap(PYmMana*, VYmMana*)
 {
 	// TODO
 }
@@ -25,7 +25,7 @@ void GXSetTexCoordGen(void)
  * Address:	TODO
  * Size:	TODO
  */
-void Mana_BeforeDrawShadowLockEnvCallback(CChara::CModel *, void *, void *, int)
+void Mana_BeforeDrawShadowLockEnvCallback(CChara::CModel*, void*, void*, int)
 {
 	// TODO
 }
@@ -35,7 +35,7 @@ void Mana_BeforeDrawShadowLockEnvCallback(CChara::CModel *, void *, void *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void Chara_DrawShadowMeshDLCallback(CChara::CModel *, void *, void *, int, int, float (*) [4])
+void Chara_DrawShadowMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*) [4])
 {
 	// TODO
 }
@@ -45,7 +45,7 @@ void Chara_DrawShadowMeshDLCallback(CChara::CModel *, void *, void *, int, int, 
  * Address:	TODO
  * Size:	TODO
  */
-void Mana_DrawMeshDLCallback(CChara::CModel *, void *, void *, int, int, float (*) [4])
+void Mana_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*) [4])
 {
 	// TODO
 }
@@ -95,7 +95,7 @@ void pppRenderYmMana(void)
  * Address:	TODO
  * Size:	TODO
  */
-void Mana_BeforeDrawCallback(CChara::CModel *, void *, void *, float (*) [4], int)
+void Mana_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
 {
 	// TODO
 }
@@ -115,7 +115,7 @@ void GXSetViewportv(void)
  * Address:	TODO
  * Size:	TODO
  */
-void MakeWave(Vec *, unsigned short *, float *, Vec&, float, float)
+void MakeWave(Vec*, unsigned short*, float*, Vec&, float, float)
 {
 	// TODO
 }
@@ -125,7 +125,7 @@ void MakeWave(Vec *, unsigned short *, float *, Vec&, float, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CreateWaterMesh(Vec *, Vec *, Vec2d *, unsigned short *, float)
+void CreateWaterMesh(Vec*, Vec*, Vec2d*, unsigned short*, float)
 {
 	// TODO
 }
@@ -135,7 +135,7 @@ void CreateWaterMesh(Vec *, Vec *, Vec2d *, unsigned short *, float)
  * Address:	TODO
  * Size:	TODO
  */
-void UpdateWaterMesh(VYmMana *)
+void UpdateWaterMesh(VYmMana*)
 {
 	// TODO
 }
@@ -145,7 +145,7 @@ void UpdateWaterMesh(VYmMana *)
  * Address:	TODO
  * Size:	TODO
  */
-void RenderWaterMesh(VYmMana *)
+void RenderWaterMesh(VYmMana*)
 {
 	// TODO
 }
@@ -165,7 +165,7 @@ void GXEnd(void)
  * Address:	TODO
  * Size:	TODO
  */
-void CalculateNormal(VYmMana *)
+void CalculateNormal(VYmMana*)
 {
 	// TODO
 }
@@ -175,7 +175,7 @@ void CalculateNormal(VYmMana *)
  * Address:	TODO
  * Size:	TODO
  */
-void CalcWaterReflectionVector(Vec *, Vec *, Vec *, long, Vec&, float (*) [4], _GXColor *, Vec2d *)
+void CalcWaterReflectionVector(Vec*, Vec*, Vec*, long, Vec&, float (*) [4], _GXColor*, Vec2d*)
 {
 	// TODO
 }
@@ -185,7 +185,7 @@ void CalcWaterReflectionVector(Vec *, Vec *, Vec *, long, Vec&, float (*) [4], _
  * Address:	TODO
  * Size:	TODO
  */
-void CalcReflectionVector2(Vec *, S16Vec *, S16Vec *, long, unsigned long, unsigned long, float (*) [4], void *, unsigned long, _GXColor *, S16Vec2d *, S16Vec2d *, CChara::CNode *, PYmMana *, VYmMana *)
+void CalcReflectionVector2(Vec*, S16Vec*, S16Vec*, long, unsigned long, unsigned long, float (*) [4], void*, unsigned long, _GXColor*, S16Vec2d*, S16Vec2d*, CChara::CNode*, PYmMana*, VYmMana*)
 {
 	// TODO
 }

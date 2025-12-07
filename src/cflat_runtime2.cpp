@@ -55,7 +55,7 @@ void CFlatRuntime2::getDebugStage()
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::onNewObject(CFlatRuntime::CObject *)
+void CFlatRuntime2::onNewObject(CFlatRuntime::CObject*)
 {
 	// TODO
 }
@@ -65,7 +65,7 @@ void CFlatRuntime2::onNewObject(CFlatRuntime::CObject *)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::onDeleteObject(CFlatRuntime::CObject *)
+void CFlatRuntime2::onDeleteObject(CFlatRuntime::CObject*)
 {
 	// TODO
 }
@@ -115,7 +115,7 @@ void CFlatRuntime2::Frame(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::Load(char *)
+void CFlatRuntime2::Load(char*)
 {
 	// TODO
 }
@@ -135,7 +135,7 @@ void CFlatRuntime2::FindGObjFirst()
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::FindGObjNext(CGObject *)
+void CFlatRuntime2::FindGObjNext(CGObject*)
 {
 	// TODO
 }
@@ -155,7 +155,7 @@ void CFlatRuntime2::FindGBaseObjFirst()
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::FindGBaseObjNext(CGBaseObj *)
+void CFlatRuntime2::FindGBaseObjNext(CGBaseObj*)
 {
 	// TODO
 }
@@ -175,7 +175,7 @@ void CFlatRuntime2::FindGQuadObjFirst()
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::FindGQuadObjNext(CGQuadObj *)
+void CFlatRuntime2::FindGQuadObjNext(CGQuadObj*)
 {
 	// TODO
 }
@@ -195,7 +195,7 @@ void CFlatRuntime2::FindGMonObjFirst()
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::FindGMonObjNext(CGMonObj *)
+void CFlatRuntime2::FindGMonObjNext(CGMonObj*)
 {
 	// TODO
 }
@@ -215,7 +215,7 @@ void CFlatRuntime2::FindGItemObjFirst()
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::FindGItemObjNext(CGItemObj *)
+void CFlatRuntime2::FindGItemObjNext(CGItemObj*)
 {
 	// TODO
 }
@@ -255,7 +255,7 @@ void CFlatRuntime2::Draw()
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::AddDebugDrawCC(Vec *, Vec *, float, int, int)
+void CFlatRuntime2::AddDebugDrawCC(Vec*, Vec*, float, int, int)
 {
 	// TODO
 }
@@ -265,7 +265,7 @@ void CFlatRuntime2::AddDebugDrawCC(Vec *, Vec *, float, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::CcClass2D(int, int, Vec *, float, float, int, CGObject **)
+void CFlatRuntime2::CcClass2D(int, int, Vec*, float, float, int, CGObject **)
 {
 	// TODO
 }
@@ -275,7 +275,7 @@ void CFlatRuntime2::CcClass2D(int, int, Vec *, float, float, int, CGObject **)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::loadLayer(int, char *)
+void CFlatRuntime2::loadLayer(int, char*)
 {
 	// TODO
 }
@@ -295,7 +295,7 @@ void CFlatRuntime2::isLoadLayerASyncCompleted(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::loadLayerASync(int, char *)
+void CFlatRuntime2::loadLayerASync(int, char*)
 {
 	// TODO
 }
@@ -305,7 +305,7 @@ void CFlatRuntime2::loadLayerASync(int, char *)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::drawLayer(int, char *, int, int, int, int, int, int, float, float, _GXColor *, int)
+void CFlatRuntime2::drawLayer(int, char*, int, int, int, int, int, int, float, float, _GXColor*, int)
 {
 	// TODO
 }
@@ -315,7 +315,7 @@ void CFlatRuntime2::drawLayer(int, char *, int, int, int, int, int, int, float, 
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::PutParticle(int, Vec &, float)
+void CFlatRuntime2::PutParticle(int, Vec&, float)
 {
 	// TODO
 }
@@ -355,7 +355,7 @@ void CFlatRuntime2::SetParticleWorkNo(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::SetParticleWorkPos(Vec &, float)
+void CFlatRuntime2::SetParticleWorkPos(Vec&, float)
 {
 	// TODO
 }
@@ -365,7 +365,7 @@ void CFlatRuntime2::SetParticleWorkPos(Vec &, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::SetParticleWorkTarget(Vec &)
+void CFlatRuntime2::SetParticleWorkTarget(Vec&)
 {
 	// TODO
 }
@@ -405,7 +405,7 @@ void CFlatRuntime2::SetParticleWorkCol(int, int, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::SetParticleWorkTrace(CFlatRuntime::CObject *)
+void CFlatRuntime2::SetParticleWorkTrace(CFlatRuntime::CObject*)
 {
 	// TODO
 }
@@ -425,7 +425,7 @@ void CFlatRuntime2::SetParticleWorkSpeed(float)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::SetParticleWorkBind(CFlatRuntime::CObject *)
+void CFlatRuntime2::SetParticleWorkBind(CFlatRuntime::CObject*)
 {
 	// TODO
 }
@@ -435,7 +435,7 @@ void CFlatRuntime2::SetParticleWorkBind(CFlatRuntime::CObject *)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::SetParticleWorkParam(int, CFlatRuntime::CObject *)
+void CFlatRuntime2::SetParticleWorkParam(int, CFlatRuntime::CObject*)
 {
 	// TODO
 }
@@ -475,7 +475,7 @@ void CFlatRuntime2::EndParticleSlot(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::EndParticle(CCharaPcs::CHandle *)
+void CFlatRuntime2::EndParticle(CCharaPcs::CHandle*)
 {
 	// TODO
 }
@@ -495,7 +495,7 @@ void CFlatRuntime2::DeleteParticleSlot(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::IgnoreParticle(int, CFlatRuntime::CObject *)
+void CFlatRuntime2::IgnoreParticle(int, CFlatRuntime::CObject*)
 {
 	// TODO
 }
@@ -515,7 +515,7 @@ void CFlatRuntime2::initAllFinished()
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::reqFinished(int, CFlatRuntime::CObject *)
+void CFlatRuntime2::reqFinished(int, CFlatRuntime::CObject*)
 {
 	// TODO
 }

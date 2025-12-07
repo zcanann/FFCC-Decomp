@@ -12,7 +12,7 @@ public:
     ~ZLIST();
 
     void DeleteList();
-    void AddTail(void *);
+    void AddTail(void*);
     void GetDataNext(_ZLISTITEM **);
     void GetDataIdx(int);
     void MakeItem();

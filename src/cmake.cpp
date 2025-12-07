@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void GetChara(char *, int, char *)
+void GetChara(char*, int, char*)
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void GetChara(char *, int, char *)
  * Address:	TODO
  * Size:	TODO
  */
-void GetCharaType(char *, int)
+void GetCharaType(char*, int)
 {
 	// TODO
 }
@@ -25,7 +25,7 @@ void GetCharaType(char *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void GetCharaCnt(char *)
+void GetCharaCnt(char*)
 {
 	// TODO
 }
@@ -155,7 +155,7 @@ void CMenuPcs::DrawCmakeCrest(int, int, int, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawCmakeName(int, int, char *, float)
+void CMenuPcs::DrawCmakeName(int, int, char*, float)
 {
 	// TODO
 }

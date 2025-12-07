@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void GET_CHARA_ALLOC_STAGE_S(int, CMemory::CStage *)
+void GET_CHARA_ALLOC_STAGE_S(int, CMemory::CStage*)
 {
 	// TODO
 }
@@ -115,7 +115,7 @@ void CCharaPcs::correctLoadAnimAmem()
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::onScriptChanging(char *)
+void CCharaPcs::onScriptChanging(char*)
 {
 	// TODO
 }
@@ -205,7 +205,7 @@ void CCharaPcs::GetNumTexShadow()
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::GetTexShadow(int, int, _GXTexObj *, Vec *, float (*) [3][4])
+void CCharaPcs::GetTexShadow(int, int, _GXTexObj*, Vec*, float (*) [3][4])
 {
 	// TODO
 }
@@ -255,7 +255,7 @@ void CCharaPcs::drawShadow()
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::createTextureSet(void *, int)
+void CCharaPcs::createTextureSet(void*, int)
 {
 	// TODO
 }
@@ -275,7 +275,7 @@ void CCharaPcs::releaseUnuseLoadModel(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::releaseUnuseLoadAnim(CCharaPcs::CLoadAnim *, int)
+void CCharaPcs::releaseUnuseLoadAnim(CCharaPcs::CLoadAnim*, int)
 {
 	// TODO
 }
@@ -315,7 +315,7 @@ void CCharaPcs::searchTexture(int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::searchAnim(int, int, char *)
+void CCharaPcs::searchAnim(int, int, char*)
 {
 	// TODO
 }
@@ -335,7 +335,7 @@ void CCharaPcs::searchPdt(int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::LoadCam(int, char *)
+void CCharaPcs::LoadCam(int, char*)
 {
 	// TODO
 }
@@ -375,7 +375,7 @@ void CCharaPcs::isCached(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::loadModel(void *, int, int, int, int, int, int)
+void CCharaPcs::loadModel(void*, int, int, int, int, int, int)
 {
 	// TODO
 }
@@ -385,7 +385,7 @@ void CCharaPcs::loadModel(void *, int, int, int, int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::loadTexture(void *, int, int, int, int, int, int, int)
+void CCharaPcs::loadTexture(void*, int, int, int, int, int, int, int)
 {
 	// TODO
 }
@@ -395,7 +395,7 @@ void CCharaPcs::loadTexture(void *, int, int, int, int, int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::loadAnimBuffer(void *, char *, int, int, int, int)
+void CCharaPcs::loadAnimBuffer(void*, char*, int, int, int, int)
 {
 	// TODO
 }
@@ -503,7 +503,7 @@ void CCharaPcs::CHandle::LoadModel(int, unsigned long, unsigned long, unsigned l
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::CHandle::LoadAnim(char *, int, int, int, int, int, int)
+void CCharaPcs::CHandle::LoadAnim(char*, int, int, int, int, int, int)
 {
 	// TODO
 }
@@ -526,7 +526,7 @@ bool CCharaPcs::CHandle::IsModelLoaded(int checkModelField)
  * Address:	TODO
  * Size:	TODO
  */
-void CCharaPcs::LoadAnim(int, int, char *, int, int, int)
+void CCharaPcs::LoadAnim(int, int, char*, int, int, int)
 {
 	// TODO
 }

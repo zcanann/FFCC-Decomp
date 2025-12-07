@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void GetModelPtr(CGObject *)
+void GetModelPtr(CGObject*)
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void GetModelPtr(CGObject *)
  * Address:	TODO
  * Size:	TODO
  */
-void GetCharaNodeFrameMatrix(_pppMngSt *, float, float (*) [4])
+void GetCharaNodeFrameMatrix(_pppMngSt*, float, float (*) [4])
 {
 	// TODO
 }
@@ -25,7 +25,7 @@ void GetCharaNodeFrameMatrix(_pppMngSt *, float, float (*) [4])
  * Address:	TODO
  * Size:	TODO
  */
-void CalcGraphValue(_pppPObject *, long, float &, float &, float &, float, float &, float &)
+void CalcGraphValue(_pppPObject*, long, float&, float&, float&, float, float&, float&)
 {
 	// TODO
 }
@@ -35,7 +35,7 @@ void CalcGraphValue(_pppPObject *, long, float &, float &, float &, float, float
  * Address:	TODO
  * Size:	TODO
  */
-void GetTextureFromRSD(int, _pppEnvSt *)
+void GetTextureFromRSD(int, _pppEnvSt*)
 {
 	// TODO
 }
@@ -45,7 +45,7 @@ void GetTextureFromRSD(int, _pppEnvSt *)
  * Address:	TODO
  * Size:	TODO
  */
-void GetCharaModelPtr(CCharaPcs::CHandle *)
+void GetCharaModelPtr(CCharaPcs::CHandle*)
 {
 	// TODO
 }
@@ -55,7 +55,7 @@ void GetCharaModelPtr(CCharaPcs::CHandle *)
  * Address:	TODO
  * Size:	TODO
  */
-void GetCharaHandlePtr(CGObject *, long)
+void GetCharaHandlePtr(CGObject*, long)
 {
 	// TODO
 }
@@ -75,7 +75,7 @@ void DisableIndWarp(_GXTevStageID, _GXIndTexStageID)
  * Address:	TODO
  * Size:	TODO
  */
-void SetUpPaletteEnv(CTexture *)
+void SetUpPaletteEnv(CTexture*)
 {
 	// TODO
 }
@@ -85,7 +85,7 @@ void SetUpPaletteEnv(CTexture *)
  * Address:	TODO
  * Size:	TODO
  */
-void genParaboloidMap(void *, unsigned long *, unsigned short, _GXVtxFmt)
+void genParaboloidMap(void*, unsigned long*, unsigned short, _GXVtxFmt)
 {
 	// TODO
 }
@@ -95,7 +95,7 @@ void genParaboloidMap(void *, unsigned long *, unsigned short, _GXVtxFmt)
  * Address:	TODO
  * Size:	TODO
  */
-void drawParaboloidMap(_GXTexObj *, _GXTexObj *, void *, unsigned long, _GXTexObj *, unsigned char)
+void drawParaboloidMap(_GXTexObj*, _GXTexObj*, void*, unsigned long, _GXTexObj*, unsigned char)
 {
 	// TODO
 }

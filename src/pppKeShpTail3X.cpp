@@ -45,7 +45,7 @@ void pppKeShpTail3XDes(void)
  * Address:	TODO
  * Size:	TODO
  */
-void S4ToF32(pppFVECTOR4 *, short *)
+void S4ToF32(pppFVECTOR4*, short*)
 {
 	// TODO
 }

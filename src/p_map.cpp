@@ -65,7 +65,7 @@ void CMapPcs::createViewer()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapPcs::LoadMap(char *, void *, unsigned long, unsigned char)
+void CMapPcs::LoadMap(char*, void*, unsigned long, unsigned char)
 {
 	// TODO
 }
@@ -75,7 +75,7 @@ void CMapPcs::LoadMap(char *, void *, unsigned long, unsigned char)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapPcs::LoadMap(int, int, void *, unsigned long, unsigned char)
+void CMapPcs::LoadMap(int, int, void*, unsigned long, unsigned char)
 {
 	// TODO
 }
@@ -215,7 +215,7 @@ void CMapPcs::drawAfterViewer()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapPcs::GetMapLightHolder(long, _GXColor *, Vec *)
+void CMapPcs::GetMapLightHolder(long, _GXColor*, Vec*)
 {
 	// TODO
 }

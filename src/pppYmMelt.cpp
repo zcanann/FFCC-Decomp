@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void InitPolygonData(PYmMelt *, VERTEX_DATA *, short)
+void InitPolygonData(PYmMelt*, VERTEX_DATA*, short)
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void InitPolygonData(PYmMelt *, VERTEX_DATA *, short)
  * Address:	TODO
  * Size:	TODO
  */
-void CalcPolygonHeight(PYmMelt *, VERTEX_DATA *, _GXColor *, float)
+void CalcPolygonHeight(PYmMelt*, VERTEX_DATA*, _GXColor*, float)
 {
 	// TODO
 }

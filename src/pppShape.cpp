@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void pppDrawShp(long *, short, CMaterialSet *, unsigned char)
+void pppDrawShp(long*, short, CMaterialSet*, unsigned char)
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void pppDrawShp(long *, short, CMaterialSet *, unsigned char)
  * Address:	TODO
  * Size:	TODO
  */
-void pppDrawShp(tagOAN3_SHAPE *, CMaterialSet *, unsigned char)
+void pppDrawShp(tagOAN3_SHAPE*, CMaterialSet*, unsigned char)
 {
 	// TODO
 }
@@ -25,7 +25,7 @@ void pppDrawShp(tagOAN3_SHAPE *, CMaterialSet *, unsigned char)
  * Address:	TODO
  * Size:	TODO
  */
-void pppSetShapeMaterial0(pppShapeSt *, tagOAN3_SHAPE *, CMaterialSet *, char **)
+void pppSetShapeMaterial0(pppShapeSt*, tagOAN3_SHAPE*, CMaterialSet*, char **)
 {
 	// TODO
 }
@@ -35,7 +35,7 @@ void pppSetShapeMaterial0(pppShapeSt *, tagOAN3_SHAPE *, CMaterialSet *, char **
  * Address:	TODO
  * Size:	TODO
  */
-void pppSetShapeMaterial(pppShapeSt *, CMaterialSet *, char **)
+void pppSetShapeMaterial(pppShapeSt*, CMaterialSet*, char **)
 {
 	// TODO
 }
@@ -45,7 +45,7 @@ void pppSetShapeMaterial(pppShapeSt *, CMaterialSet *, char **)
  * Address:	TODO
  * Size:	TODO
  */
-void pppShapeSetUseTexture(tagOAN3_SHAPE *, unsigned char *)
+void pppShapeSetUseTexture(tagOAN3_SHAPE*, unsigned char*)
 {
 	// TODO
 }
@@ -55,7 +55,7 @@ void pppShapeSetUseTexture(tagOAN3_SHAPE *, unsigned char *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppCacheLoadShapeTexture(pppShapeSt *, CMaterialSet *)
+void pppCacheLoadShapeTexture(pppShapeSt*, CMaterialSet*)
 {
 	// TODO
 }
@@ -65,7 +65,7 @@ void pppCacheLoadShapeTexture(pppShapeSt *, CMaterialSet *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppCacheUnLoadShapeTexture(pppShapeSt *, CMaterialSet *)
+void pppCacheUnLoadShapeTexture(pppShapeSt*, CMaterialSet*)
 {
 	// TODO
 }
@@ -75,7 +75,7 @@ void pppCacheUnLoadShapeTexture(pppShapeSt *, CMaterialSet *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppCacheRefCnt0UpShapeTexture(pppShapeSt *, CMaterialSet *)
+void pppCacheRefCnt0UpShapeTexture(pppShapeSt*, CMaterialSet*)
 {
 	// TODO
 }
@@ -85,7 +85,7 @@ void pppCacheRefCnt0UpShapeTexture(pppShapeSt *, CMaterialSet *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppCacheDumpShapeTexture(pppShapeSt *, CMaterialSet *)
+void pppCacheDumpShapeTexture(pppShapeSt*, CMaterialSet*)
 {
 	// TODO
 }
@@ -95,7 +95,7 @@ void pppCacheDumpShapeTexture(pppShapeSt *, CMaterialSet *)
  * Address:	TODO
  * Size:	TODO
  */
-void pppGetShapePos(long *, short, Vec &, Vec &, int)
+void pppGetShapePos(long*, short, Vec&, Vec&, int)
 {
 	// TODO
 }
@@ -105,7 +105,7 @@ void pppGetShapePos(long *, short, Vec &, Vec &, int)
  * Address:	TODO
  * Size:	TODO
  */
-void pppGetShapeUV(long *, short, Vec2d &, Vec2d &, int)
+void pppGetShapeUV(long*, short, Vec2d&, Vec2d&, int)
 {
 	// TODO
 }
@@ -115,7 +115,7 @@ void pppGetShapeUV(long *, short, Vec2d &, Vec2d &, int)
  * Address:	TODO
  * Size:	TODO
  */
-void pppCalcFrameShape(long *, short &, short &, short &, short)
+void pppCalcFrameShape(long*, short&, short&, short&, short)
 {
 	// TODO
 }

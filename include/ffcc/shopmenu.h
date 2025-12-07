@@ -8,12 +8,12 @@ class CMaterialSet;
 class CCaravanWork;
 struct tagOAN3_SHAPE;
 
-void _drawNoShadowFont(CFont *, char *, float, float, int, int);
-void _drawShadowFont(CFont *, char *, float, float, int, int);
+void _drawNoShadowFont(CFont*, char*, float, float, int, int);
+void _drawShadowFont(CFont*, char*, float, float, int, int);
 void getButtonRepeat(int, unsigned short);
 void bButtonNoRepeat(unsigned short);
 void setOrtho(int, int, float, float, float);
-void drawShp(tagOAN3_SHAPE *, CMaterialSet *, unsigned char);
+void drawShp(tagOAN3_SHAPE*, CMaterialSet*, unsigned char);
 void drawShapeSeq0(int, int, unsigned char, unsigned char);
 void drawShapeSeq(int, int, int, int, unsigned char, unsigned char, unsigned char, float, unsigned char);
 void drawShapeSeqScale(int, int, int, int, float, float, unsigned char);

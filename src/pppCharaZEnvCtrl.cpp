@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void CharaZEnvCtrl_BeforeMeshLockEnvCallback(CChara::CModel *, void *, void *, int)
+void CharaZEnvCtrl_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
 {
 	// TODO
 }

@@ -35,7 +35,7 @@ void CMapKeyFrame::Get()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapKeyFrame::Get(int &, int &, float &)
+void CMapKeyFrame::Get(int&, int&, float&)
 {
 	// TODO
 }
@@ -65,7 +65,7 @@ void CMapKeyFrame::IsRun()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapKeyFrame::ReadJun(CChunkFile &, int)
+void CMapKeyFrame::ReadJun(CChunkFile&, int)
 {
 	// TODO
 }
@@ -75,7 +75,7 @@ void CMapKeyFrame::ReadJun(CChunkFile &, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapKeyFrame::ReadFrame(CChunkFile &, int)
+void CMapKeyFrame::ReadFrame(CChunkFile&, int)
 {
 	// TODO
 }
@@ -85,7 +85,7 @@ void CMapKeyFrame::ReadFrame(CChunkFile &, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapKeyFrame::ReadKey(CChunkFile &, int)
+void CMapKeyFrame::ReadKey(CChunkFile&, int)
 {
 	// TODO
 }
@@ -225,7 +225,7 @@ void CMapMng::Destroy()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMng::MapFileRead(char *, unsigned long &)
+void CMapMng::MapFileRead(char*, unsigned long&)
 {
 	// TODO
 }
@@ -235,7 +235,7 @@ void CMapMng::MapFileRead(char *, unsigned long &)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMng::MapCheckFileRead(char *)
+void CMapMng::MapCheckFileRead(char*)
 {
 	// TODO
 }
@@ -255,7 +255,7 @@ void CMapMng::LoadMapNoSyncCalc()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMng::SearchChildMapObj(CMapObj *, CMapObj *)
+void CMapMng::SearchChildMapObj(CMapObj*, CMapObj*)
 {
 	// TODO
 }
@@ -265,7 +265,7 @@ void CMapMng::SearchChildMapObj(CMapObj *, CMapObj *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMng::SearchAtribMapObj(CMapObj *, CMapObjAtr::TYPE)
+void CMapMng::SearchAtribMapObj(CMapObj*, CMapObjAtr::TYPE)
 {
 	// TODO
 }
@@ -275,7 +275,7 @@ void CMapMng::SearchAtribMapObj(CMapObj *, CMapObjAtr::TYPE)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMng::AttachMapHit(CMapHit *, char *)
+void CMapMng::AttachMapHit(CMapHit*, char*)
 {
 	// TODO
 }
@@ -285,7 +285,7 @@ void CMapMng::AttachMapHit(CMapHit *, char *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMng::GetDebugPlaySta(int, Vec *)
+void CMapMng::GetDebugPlaySta(int, Vec*)
 {
 	// TODO
 }
@@ -325,7 +325,7 @@ void CMapMng::InitMapShadow()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMng::ReadMtx(char *)
+void CMapMng::ReadMtx(char*)
 {
 	// TODO
 }
@@ -335,7 +335,7 @@ void CMapMng::ReadMtx(char *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMng::ReadMpl(char *)
+void CMapMng::ReadMpl(char*)
 {
 	// TODO
 }
@@ -345,7 +345,7 @@ void CMapMng::ReadMpl(char *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMng::ReadOtm(char *)
+void CMapMng::ReadOtm(char*)
 {
 	// TODO
 }
@@ -355,7 +355,7 @@ void CMapMng::ReadOtm(char *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMng::ReadMid(char *)
+void CMapMng::ReadMid(char*)
 {
 	// TODO
 }
@@ -385,7 +385,7 @@ void CMapMng::DrawMapShadow()
  * Address:	TODO
  * Size:	TODO
  */
-void setDbgLight(int, Vec &, _GXColor &)
+void setDbgLight(int, Vec&, _GXColor&)
 {
 	// TODO
 }
@@ -435,7 +435,7 @@ void CMapMng::DrawAfter()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMng::CheckHitCylinder(CMapCylinder *, Vec *, unsigned long)
+void CMapMng::CheckHitCylinder(CMapCylinder*, Vec*, unsigned long)
 {
 	// TODO
 }
@@ -445,7 +445,7 @@ void CMapMng::CheckHitCylinder(CMapCylinder *, Vec *, unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMng::CheckHitCylinderNear(CMapCylinder *, Vec *, unsigned long)
+void CMapMng::CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned long)
 {
 	// TODO
 }
@@ -455,7 +455,7 @@ void CMapMng::CheckHitCylinderNear(CMapCylinder *, Vec *, unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMng::GetAnimRunMapObj(CMapObj *)
+void CMapMng::GetAnimRunMapObj(CMapObj*)
 {
 	// TODO
 }

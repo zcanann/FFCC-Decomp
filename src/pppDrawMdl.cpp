@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void pppDrawMdl0(_pppPObject *, PDrawMdl *, _pppCtrlTable *)
+void pppDrawMdl0(_pppPObject*, PDrawMdl*, _pppCtrlTable*)
 {
 	// TODO
 }

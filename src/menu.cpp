@@ -65,7 +65,7 @@ void CMenu::Draw()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenu::ScriptChanging(char *)
+void CMenu::ScriptChanging(char*)
 {
 	// TODO
 }
@@ -75,7 +75,7 @@ void CMenu::ScriptChanging(char *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenu::onScriptChanging(char *)
+void CMenu::onScriptChanging(char*)
 {
 	// TODO
 }
@@ -85,7 +85,7 @@ void CMenu::onScriptChanging(char *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenu::onScriptChanged(char *, int)
+void CMenu::onScriptChanged(char*, int)
 {
 	// TODO
 }

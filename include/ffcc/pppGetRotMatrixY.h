@@ -3,6 +3,6 @@
 
 class pppFMATRIX;
 
-void pppGetRotMatrixY(pppFMATRIX &, long);
+void pppGetRotMatrixY(pppFMATRIX&, long);
 
 #endif // _PPP_GETROTMATRIXY_H_

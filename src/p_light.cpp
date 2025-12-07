@@ -105,7 +105,7 @@ void CLightPcs::Clear()
  * Address:	TODO
  * Size:	TODO
  */
-void CLightPcs::Add(CLightPcs::CLight *)
+void CLightPcs::Add(CLightPcs::CLight*)
 {
 	// TODO
 }
@@ -125,7 +125,7 @@ void CLightPcs::GetFreeBumpLight(CLightPcs::TARGET)
  * Address:	TODO
  * Size:	TODO
  */
-void CLightPcs::AddBump(CLightPcs::CLight *, CLightPcs::TARGET, CMemory::CStage *, int)
+void CLightPcs::AddBump(CLightPcs::CLight*, CLightPcs::TARGET, CMemory::CStage*, int)
 {
 	// TODO
 }
@@ -195,7 +195,7 @@ void CLightPcs::EnableLight(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CLightPcs::SetDiffuse(unsigned long, _GXColor, Vec *, int)
+void CLightPcs::SetDiffuse(unsigned long, _GXColor, Vec*, int)
 {
 	// TODO
 }
@@ -205,7 +205,7 @@ void CLightPcs::SetDiffuse(unsigned long, _GXColor, Vec *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CLightPcs::SetPosition(CLightPcs::TARGET, Vec *, unsigned long)
+void CLightPcs::SetPosition(CLightPcs::TARGET, Vec*, unsigned long)
 {
 	// TODO
 }
@@ -225,7 +225,7 @@ void setchanctrl(CLightPcs::TARGET, unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void CLightPcs::SetBit32(CLightPcs::TARGET, unsigned long *)
+void CLightPcs::SetBit32(CLightPcs::TARGET, unsigned long*)
 {
 	// TODO
 }
@@ -235,7 +235,7 @@ void CLightPcs::SetBit32(CLightPcs::TARGET, unsigned long *)
  * Address:	TODO
  * Size:	TODO
  */
-void CLightPcs::SetPart(CLightPcs::TARGET, void *, unsigned char)
+void CLightPcs::SetPart(CLightPcs::TARGET, void*, unsigned char)
 {
 	// TODO
 }
@@ -245,7 +245,7 @@ void CLightPcs::SetPart(CLightPcs::TARGET, void *, unsigned char)
  * Address:	TODO
  * Size:	TODO
  */
-void CLightPcs::InsertOctTree(CLightPcs::TARGET, COctTree &)
+void CLightPcs::InsertOctTree(CLightPcs::TARGET, COctTree&)
 {
 	// TODO
 }
@@ -275,7 +275,7 @@ void CLightPcs::MakeLightMap()
  * Address:	TODO
  * Size:	TODO
  */
-void CLightPcs::SetBumpTexMatirx(float (*) [4], CLightPcs::CBumpLight *, Vec *, unsigned char)
+void CLightPcs::SetBumpTexMatirx(float (*) [4], CLightPcs::CBumpLight*, Vec*, unsigned char)
 {
 	// TODO
 }
@@ -315,7 +315,7 @@ CLightPcs::CLight::CLight()
  * Address:	TODO
  * Size:	TODO
  */
-void CLightPcs::CLight::Set(CLightPcs::CLight *)
+void CLightPcs::CLight::Set(CLightPcs::CLight*)
 {
 	// TODO
 }

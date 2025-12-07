@@ -24,8 +24,8 @@ public:
     void draw1();
     void draw2();
 
-    virtual void onScriptChanging(char *);
-    virtual void onScriptChanged(char *, int);
+    virtual void onScriptChanging(char*);
+    virtual void onScriptChanged(char*, int);
     virtual void onMapChanging(int, int);
     virtual void onMapChanged(int, int, int);
 

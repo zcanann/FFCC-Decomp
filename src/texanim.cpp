@@ -25,7 +25,7 @@ CTexAnimSet::~CTexAnimSet()
  * Address:	TODO
  * Size:	TODO
  */
-void CTexAnimSet::Create(CChunkFile &, CMemory::CStage *)
+void CTexAnimSet::Create(CChunkFile&, CMemory::CStage*)
 {
 	// TODO
 }
@@ -35,7 +35,7 @@ void CTexAnimSet::Create(CChunkFile &, CMemory::CStage *)
  * Address:	TODO
  * Size:	TODO
  */
-void CTexAnimSet::Duplicate(CMemory::CStage *)
+void CTexAnimSet::Duplicate(CMemory::CStage*)
 {
 	// TODO
 }
@@ -45,7 +45,7 @@ void CTexAnimSet::Duplicate(CMemory::CStage *)
  * Address:	TODO
  * Size:	TODO
  */
-void CTexAnimSet::AttachMaterialSet(CMaterialSet *)
+void CTexAnimSet::AttachMaterialSet(CMaterialSet*)
 {
 	// TODO
 }
@@ -65,7 +65,7 @@ void CTexAnimSet::AddFrame()
  * Address:	TODO
  * Size:	TODO
  */
-void CTexAnimSet::Change(char *, float, CTexAnimSet::ANIM_TYPE)
+void CTexAnimSet::Change(char*, float, CTexAnimSet::ANIM_TYPE)
 {
 	// TODO
 }
@@ -105,7 +105,7 @@ CTexAnim::~CTexAnim()
  * Address:	TODO
  * Size:	TODO
  */
-void CTexAnim::Create(CChunkFile &, CMemory::CStage *)
+void CTexAnim::Create(CChunkFile&, CMemory::CStage*)
 {
 	// TODO
 }
@@ -115,7 +115,7 @@ void CTexAnim::Create(CChunkFile &, CMemory::CStage *)
  * Address:	TODO
  * Size:	TODO
  */
-void CTexAnim::Duplicate(CMemory::CStage *)
+void CTexAnim::Duplicate(CMemory::CStage*)
 {
 	// TODO
 }
@@ -125,7 +125,7 @@ void CTexAnim::Duplicate(CMemory::CStage *)
  * Address:	TODO
  * Size:	TODO
  */
-void CTexAnim::AttachMaterialSet(CMaterialSet *)
+void CTexAnim::AttachMaterialSet(CMaterialSet*)
 {
 	// TODO
 }
@@ -145,7 +145,7 @@ void CTexAnim::AddFrame(float)
  * Address:	TODO
  * Size:	TODO
  */
-void CTexAnim::Find(char *)
+void CTexAnim::Find(char*)
 {
 	// TODO
 }
@@ -235,7 +235,7 @@ CTexAnimSeq::~CTexAnimSeq()
  * Address:	TODO
  * Size:	TODO
  */
-void CTexAnimSeq::Create(CChunkFile &, CMemory::CStage *)
+void CTexAnimSeq::Create(CChunkFile&, CMemory::CStage*)
 {
 	// TODO
 }
@@ -245,7 +245,7 @@ void CTexAnimSeq::Create(CChunkFile &, CMemory::CStage *)
  * Address:	TODO
  * Size:	TODO
  */
-void CTexAnimSeq::Interp(float, Vec &)
+void CTexAnimSeq::Interp(float, Vec&)
 {
 	// TODO
 }

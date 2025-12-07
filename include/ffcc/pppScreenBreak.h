@@ -6,12 +6,12 @@
 class PScreenBreak;
 class VScreenBreak;
 
-void SB_BeforeCalcMatrixCallback(CChara::CModel *, void *, void *);
-void SB_BeforeDrawCallback(CChara::CModel *, void *, void *, float (*)[4], int);
-void SB_DrawMeshDLCallback(CChara::CModel *, void *, void *, int, int, float (*)[4]);
+void SB_BeforeCalcMatrixCallback(CChara::CModel*, void*, void*);
+void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*)[4], int);
+void SB_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 void GXSetTexCoordGen(void);
-void InitPieceData(CChara::CModel *, PScreenBreak *, VScreenBreak *);
-void SB_BeforeMeshLockEnvCallback(CChara::CModel *, void *, void *, int);
+void InitPieceData(CChara::CModel*, PScreenBreak*, VScreenBreak*);
+void SB_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
 
 void pppConScreenBreak(void);
 void pppCon2ScreenBreak(void);

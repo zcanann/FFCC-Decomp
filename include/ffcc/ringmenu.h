@@ -6,7 +6,7 @@ class CCaravanWork;
 class CGame;
 class CMenuPcs;
 
-void drawCommand(int, CFont *, float, float, CCaravanWork *, int, float, float);
+void drawCommand(int, CFont*, float, float, CCaravanWork*, int, float, float);
 
 class CRingMenu
 {
@@ -20,8 +20,8 @@ public:
     void onCalc();
     void onDraw();
     void drawGBA();
-    void onScriptChanging(char *);
-    void onScriptChanged(char *, int);
+    void onScriptChanging(char*);
+    void onScriptChanged(char*, int);
     void SetFade(int);
     void SetBattleButton(int, int);
     void SetBattleCommand(int, int, int);

@@ -244,7 +244,7 @@ static s32 DoMount(s32 chan) {
 
     step = card->mountStep - 2;
     result = __CARDRead(chan, (u32)card->sectorSize * step, CARD_SYSTEM_BLOCK_SIZE,
-                        (u8 *)card->workArea + (CARD_SYSTEM_BLOCK_SIZE * step), __CARDMountCallback);
+                        (u8*)card->workArea + (CARD_SYSTEM_BLOCK_SIZE * step), __CARDMountCallback);
     if (result < 0)
         __CARDPutControlBlock(card, result);
     return result;

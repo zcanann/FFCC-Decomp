@@ -60,7 +60,7 @@ void GXFlush(void) {
 void GXResetWriteGatherPipe(void) {
     while (PPCMfwpar() & 1) {
     }
-    PPCMtwpar(OSUncachedToPhysical((void *)GXFIFO_ADDR));
+    PPCMtwpar(OSUncachedToPhysical((void*)GXFIFO_ADDR));
 }
 
 static void __GXAbortWait(u32 clocks) {

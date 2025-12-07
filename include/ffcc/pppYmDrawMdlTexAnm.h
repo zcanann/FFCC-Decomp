@@ -4,7 +4,7 @@
 // Forward declarations
 struct pppModelSt;
 
-void SetUpPerUV(pppModelSt *, float &, float &);
+void SetUpPerUV(pppModelSt*, float&, float&);
 
 void pppConstructYmDrawMdlTexAnm(void);
 void pppDestructYmDrawMdlTexAnm(void);

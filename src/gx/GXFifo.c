@@ -116,7 +116,7 @@ void GXInitFifoBase(GXFifoObj* fifo, void* base, u32 size) {
 }
 
 void GXInitFifoPtrs(GXFifoObj* fifo, void* readPtr, void* writePtr) {
-    __GXFifoObj* realFifo = (__GXFifoObj *)fifo;
+    __GXFifoObj* realFifo = (__GXFifoObj*)fifo;
     BOOL enabled;
 
     ASSERTMSGLINE(LINE(592, 592, 596), realFifo != CPUFifo,         "GXInitFifoPtrs: fifo is attached to CPU");
@@ -591,7 +591,7 @@ volatile void* GXRedirectWriteGatherPipe(void* ptr) {
 
     PPCSync();
     OSRestoreInterrupts(enabled);
-    return (volatile void *)GXFIFO_ADDR;
+    return (volatile void*)GXFIFO_ADDR;
 }
 
 // NONMATCHING
@@ -613,7 +613,7 @@ void GXRestoreWriteGatherPipe(void) {
 
     PPCSync();
     while (PPCMfwpar() & 1) {}
-    PPCMtwpar((u32)OSUncachedToPhysical((void *)GXFIFO_ADDR));
+    PPCMtwpar((u32)OSUncachedToPhysical((void*)GXFIFO_ADDR));
     GX_SET_PI_REG(3, (u32)CPUFifo->base & 0x3FFFFFFF);
     GX_SET_PI_REG(4, (u32)CPUFifo->top & 0x3FFFFFFF);
     SET_REG_FIELD(1578, reg, 21, 5, ((u32)CPUFifo->wrPtr & 0x3FFFFFFF) >> 5);

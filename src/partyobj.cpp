@@ -115,7 +115,7 @@ void CGPartyObj::command()
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::callCommandScript(int, CGObject *)
+void CGPartyObj::callCommandScript(int, CGObject*)
 {
 	// TODO
 }
@@ -335,7 +335,7 @@ void CGPartyObj::statAlive()
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::onPush(CGBaseObj *, int)
+void CGPartyObj::onPush(CGBaseObj*, int)
 {
 	// TODO
 }
@@ -345,7 +345,7 @@ void CGPartyObj::onPush(CGBaseObj *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::onTalk(CGBaseObj *, int)
+void CGPartyObj::onTalk(CGBaseObj*, int)
 {
 	// TODO
 }
@@ -365,7 +365,7 @@ void CGPartyObj::commandFinished()
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::carry(int, CGObject *, int)
+void CGPartyObj::carry(int, CGObject*, int)
 {
 	// TODO
 }
@@ -405,7 +405,7 @@ void CGPartyObj::statPickup()
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::bonus(int, int, CGPrgObj *)
+void CGPartyObj::bonus(int, int, CGPrgObj*)
 {
 	// TODO
 }
@@ -625,7 +625,7 @@ void CGPartyObj::setAlive(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::PutMemoryCapsule(int, int, int, int, char *)
+void CGPartyObj::PutMemoryCapsule(int, int, int, int, char*)
 {
 	// TODO
 }
@@ -635,7 +635,7 @@ void CGPartyObj::PutMemoryCapsule(int, int, int, int, char *)
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::onDamaged(CGPrgObj *)
+void CGPartyObj::onDamaged(CGPrgObj*)
 {
 	// TODO
 }
@@ -645,7 +645,7 @@ void CGPartyObj::onDamaged(CGPrgObj *)
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::onAttacked(CGPrgObj *)
+void CGPartyObj::onAttacked(CGPrgObj*)
 {
 	// TODO
 }
@@ -705,7 +705,7 @@ void calcWeightMax()
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::gpmCalcDist(Vec *, float &)
+void CGPartyObj::gpmCalcDist(Vec*, float&)
 {
 	// TODO
 }
@@ -755,7 +755,7 @@ void CGPartyObj::sysControl(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::onDrawDebug(CFont *, float, float &, float)
+void CGPartyObj::onDrawDebug(CFont*, float, float&, float)
 {
 	// TODO
 }

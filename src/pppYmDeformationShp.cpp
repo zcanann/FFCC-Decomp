@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void SetUpIndWarp(VYmDeformationShp *)
+void SetUpIndWarp(VYmDeformationShp*)
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void SetUpIndWarp(VYmDeformationShp *)
  * Address:	TODO
  * Size:	TODO
  */
-void calcBoundaryBox(Vec &, Vec &, Vec4d *)
+void calcBoundaryBox(Vec&, Vec&, Vec4d*)
 {
 	// TODO
 }
@@ -25,7 +25,7 @@ void calcBoundaryBox(Vec &, Vec &, Vec4d *)
  * Address:	TODO
  * Size:	TODO
  */
-void setVertexPos(Vec &, Vec &, Vec &, Vec &, float, char)
+void setVertexPos(Vec&, Vec&, Vec&, Vec&, float, char)
 {
 	// TODO
 }
@@ -35,7 +35,7 @@ void setVertexPos(Vec &, Vec &, Vec &, Vec &, float, char)
  * Address:	TODO
  * Size:	TODO
  */
-void setVertexPos(Vec *, char, float, float, float, float)
+void setVertexPos(Vec*, char, float, float, float, float)
 {
 	// TODO
 }
@@ -45,7 +45,7 @@ void setVertexPos(Vec *, char, float, float, float, float)
  * Address:	TODO
  * Size:	TODO
  */
-void setVertexUV(Vec2d *, float, float, float, float)
+void setVertexUV(Vec2d*, float, float, float, float)
 {
 	// TODO
 }
@@ -55,7 +55,7 @@ void setVertexUV(Vec2d *, float, float, float, float)
  * Address:	TODO
  * Size:	TODO
  */
-void calcScreenPos(Vec4d &, Vec&, float (*) [4], float (*) [4])
+void calcScreenPos(Vec4d&, Vec&, float (*) [4], float (*) [4])
 {
 	// TODO
 }
@@ -65,7 +65,7 @@ void calcScreenPos(Vec4d &, Vec&, float (*) [4], float (*) [4])
  * Address:	TODO
  * Size:	TODO
  */
-void oddToEven(float &)
+void oddToEven(float&)
 {
 	// TODO
 }
@@ -115,7 +115,7 @@ void pppFrameYmDeformationShp(void)
  * Address:	TODO
  * Size:	TODO
  */
-void RenderDeformationShape(_pppPObject *, VYmDeformationShp *, Vec *, Vec2d *)
+void RenderDeformationShape(_pppPObject*, VYmDeformationShp*, Vec*, Vec2d*)
 {
 	// TODO
 }

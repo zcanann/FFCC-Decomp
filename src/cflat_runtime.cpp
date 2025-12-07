@@ -65,7 +65,7 @@ void CFlatRuntime::clear()
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::Create(void *)
+void CFlatRuntime::Create(void*)
 {
 	// TODO
 }
@@ -75,7 +75,7 @@ void CFlatRuntime::Create(void *)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::CreateDebug(void *, int)
+void CFlatRuntime::CreateDebug(void*, int)
 {
 	// TODO
 }
@@ -85,7 +85,7 @@ void CFlatRuntime::CreateDebug(void *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::createVal(CChunkFile &, int, CFlatRuntime::CVal *)
+void CFlatRuntime::createVal(CChunkFile&, int, CFlatRuntime::CVal*)
 {
 	// TODO
 }
@@ -115,7 +115,7 @@ void CFlatRuntime::AfterFrame(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::deleteObject(CFlatRuntime::CObject *)
+void CFlatRuntime::deleteObject(CFlatRuntime::CObject*)
 {
 	// TODO
 }
@@ -155,7 +155,7 @@ void CFlatRuntime::searchFunc(int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::SystemCall(CFlatRuntime::CObject *, int, int, int, CFlatRuntime::CStack *, CFlatRuntime::CStack *)
+void CFlatRuntime::SystemCall(CFlatRuntime::CObject*, int, int, int, CFlatRuntime::CStack*, CFlatRuntime::CStack*)
 {
 	// TODO
 }
@@ -165,7 +165,7 @@ void CFlatRuntime::SystemCall(CFlatRuntime::CObject *, int, int, int, CFlatRunti
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::CStack::operator= (const CFlatRuntime::CStack &)
+void CFlatRuntime::CStack::operator= (const CFlatRuntime::CStack&)
 {
 	// TODO
 }
@@ -175,7 +175,7 @@ void CFlatRuntime::CStack::operator= (const CFlatRuntime::CStack &)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::request(CFlatRuntime::CObject *, int, int, int, CFlatRuntime::CStack *)
+void CFlatRuntime::request(CFlatRuntime::CObject*, int, int, int, CFlatRuntime::CStack*)
 {
 	// TODO
 }
@@ -185,7 +185,7 @@ void CFlatRuntime::request(CFlatRuntime::CObject *, int, int, int, CFlatRuntime:
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::callSetup(CFlatRuntime::CObject *, CFlatRuntime::CFunc *, int)
+void CFlatRuntime::callSetup(CFlatRuntime::CObject*, CFlatRuntime::CFunc*, int)
 {
 	// TODO
 }
@@ -195,7 +195,7 @@ void CFlatRuntime::callSetup(CFlatRuntime::CObject *, CFlatRuntime::CFunc *, int
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::callCleanup(CFlatRuntime::CObject *)
+void CFlatRuntime::callCleanup(CFlatRuntime::CObject*)
 {
 	// TODO
 }
@@ -205,7 +205,7 @@ void CFlatRuntime::callCleanup(CFlatRuntime::CObject *)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::CCodeIndex::operator= (const CFlatRuntime::CCodeIndex &)
+void CFlatRuntime::CCodeIndex::operator= (const CFlatRuntime::CCodeIndex&)
 {
 	// TODO
 }
@@ -225,7 +225,7 @@ void CFlatRuntime::ClearParmanent()
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::initVal(int, CFlatRuntime::CVal *, CFlatRuntime::CStack *, int)
+void CFlatRuntime::initVal(int, CFlatRuntime::CVal*, CFlatRuntime::CStack*, int)
 {
 	// TODO
 }
@@ -235,7 +235,7 @@ void CFlatRuntime::initVal(int, CFlatRuntime::CVal *, CFlatRuntime::CStack *, in
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::push(CFlatRuntime::CObject *, int)
+void CFlatRuntime::push(CFlatRuntime::CObject*, int)
 {
 	// TODO
 }
@@ -245,7 +245,7 @@ void CFlatRuntime::push(CFlatRuntime::CObject *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::push(CFlatRuntime::CObject *, CFlatRuntime::CStack *, int)
+void CFlatRuntime::push(CFlatRuntime::CObject*, CFlatRuntime::CStack*, int)
 {
 	// TODO
 }
@@ -255,7 +255,7 @@ void CFlatRuntime::push(CFlatRuntime::CObject *, CFlatRuntime::CStack *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::pushAddress(CFlatRuntime::CObject *, CFlatRuntime::CStack *)
+void CFlatRuntime::pushAddress(CFlatRuntime::CObject*, CFlatRuntime::CStack*)
 {
 	// TODO
 }
@@ -265,7 +265,7 @@ void CFlatRuntime::pushAddress(CFlatRuntime::CObject *, CFlatRuntime::CStack *)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::pop(CFlatRuntime::CObject *)
+void CFlatRuntime::pop(CFlatRuntime::CObject*)
 {
 	// TODO
 }
@@ -285,7 +285,7 @@ void CFlatRuntime::PrintCodeInfo()
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::GetCodeInfo(char *)
+void CFlatRuntime::GetCodeInfo(char*)
 {
 	// TODO
 }
@@ -295,7 +295,7 @@ void CFlatRuntime::GetCodeInfo(char *)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::checkWB(void *)
+void CFlatRuntime::checkWB(void*)
 {
 	// TODO
 }
@@ -305,7 +305,7 @@ void CFlatRuntime::checkWB(void *)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::calc(CFlatRuntime::CObject *, int)
+void CFlatRuntime::calc(CFlatRuntime::CObject*, int)
 {
 	// TODO
 }
@@ -315,7 +315,7 @@ void CFlatRuntime::calc(CFlatRuntime::CObject *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::systemVal(CFlatRuntime::CObject *, int, int)
+void CFlatRuntime::systemVal(CFlatRuntime::CObject*, int, int)
 {
 	// TODO
 }
@@ -325,7 +325,7 @@ void CFlatRuntime::systemVal(CFlatRuntime::CObject *, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::setSystemVal(CFlatRuntime::CObject *, int)
+void CFlatRuntime::setSystemVal(CFlatRuntime::CObject*, int)
 {
 	// TODO
 }
@@ -335,7 +335,7 @@ void CFlatRuntime::setSystemVal(CFlatRuntime::CObject *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::objectFrame(CFlatRuntime::CObject *)
+void CFlatRuntime::objectFrame(CFlatRuntime::CObject*)
 {
 	// TODO
 }
@@ -345,7 +345,7 @@ void CFlatRuntime::objectFrame(CFlatRuntime::CObject *)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::toFunc(CFlatRuntime::CCodeIndex &)
+void CFlatRuntime::toFunc(CFlatRuntime::CCodeIndex&)
 {
 	// TODO
 }
@@ -355,7 +355,7 @@ void CFlatRuntime::toFunc(CFlatRuntime::CCodeIndex &)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::toCode(CFlatRuntime::CCodeIndex &)
+void CFlatRuntime::toCode(CFlatRuntime::CCodeIndex&)
 {
 	// TODO
 }
@@ -365,7 +365,7 @@ void CFlatRuntime::toCode(CFlatRuntime::CCodeIndex &)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::systemFunc(CFlatRuntime::CObject *, int, int, int &)
+void CFlatRuntime::systemFunc(CFlatRuntime::CObject*, int, int, int&)
 {
 	// TODO
 }
@@ -405,7 +405,7 @@ CFlatRuntime::CClass::CClass()
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::reqFinished(int, CFlatRuntime::CObject *)
+void CFlatRuntime::reqFinished(int, CFlatRuntime::CObject*)
 {
 	// TODO
 }
@@ -415,7 +415,7 @@ void CFlatRuntime::reqFinished(int, CFlatRuntime::CObject *)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::onDeleteObject(CFlatRuntime::CObject *)
+void CFlatRuntime::onDeleteObject(CFlatRuntime::CObject*)
 {
 	// TODO
 }
@@ -425,7 +425,7 @@ void CFlatRuntime::onDeleteObject(CFlatRuntime::CObject *)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::onNewObject(CFlatRuntime::CObject *)
+void CFlatRuntime::onNewObject(CFlatRuntime::CObject*)
 {
 	// TODO
 }
@@ -455,7 +455,7 @@ void CFlatRuntime::intToClass(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::onSystemVal(CFlatRuntime::CObject *, int)
+void CFlatRuntime::onSystemVal(CFlatRuntime::CObject*, int)
 {
 	// TODO
 }
@@ -465,7 +465,7 @@ void CFlatRuntime::onSystemVal(CFlatRuntime::CObject *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::onClassSystemVal(CFlatRuntime::CObject *, int)
+void CFlatRuntime::onClassSystemVal(CFlatRuntime::CObject*, int)
 {
 	// TODO
 }
@@ -475,7 +475,7 @@ void CFlatRuntime::onClassSystemVal(CFlatRuntime::CObject *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::onSetSystemVal(int, CFlatRuntime::CStack *, int)
+void CFlatRuntime::onSetSystemVal(int, CFlatRuntime::CStack*, int)
 {
 	// TODO
 }
@@ -485,7 +485,7 @@ void CFlatRuntime::onSetSystemVal(int, CFlatRuntime::CStack *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::onSetClassSystemVal(int, CFlatRuntime::CObject *, CFlatRuntime::CStack *, int)
+void CFlatRuntime::onSetClassSystemVal(int, CFlatRuntime::CObject*, CFlatRuntime::CStack*, int)
 {
 	// TODO
 }
@@ -495,7 +495,7 @@ void CFlatRuntime::onSetClassSystemVal(int, CFlatRuntime::CObject *, CFlatRuntim
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::onClassSystemFunc(CFlatRuntime::CObject *, int, int, int &)
+void CFlatRuntime::onClassSystemFunc(CFlatRuntime::CObject*, int, int, int&)
 {
 	// TODO
 }
@@ -505,7 +505,7 @@ void CFlatRuntime::onClassSystemFunc(CFlatRuntime::CObject *, int, int, int &)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::onSystemFunc(CFlatRuntime::CObject *, int, int, int &)
+void CFlatRuntime::onSystemFunc(CFlatRuntime::CObject*, int, int, int&)
 {
 	// TODO
 }

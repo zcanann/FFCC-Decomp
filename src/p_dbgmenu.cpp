@@ -105,7 +105,7 @@ void CDbgMenuPcs::draw()
  * Address:	TODO
  * Size:	TODO
  */
-void CDbgMenuPcs::calcMenu(CDbgMenuPcs::CDM *)
+void CDbgMenuPcs::calcMenu(CDbgMenuPcs::CDM*)
 {
 	// TODO
 }
@@ -115,7 +115,7 @@ void CDbgMenuPcs::calcMenu(CDbgMenuPcs::CDM *)
  * Address:	TODO
  * Size:	TODO
  */
-void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM *)
+void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM*)
 {
 	// TODO
 }
@@ -135,7 +135,7 @@ void CDbgMenuPcs::changeVtxFmt(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CDbgMenuPcs::drawWindow(int, int, int, int, int, char *)
+void CDbgMenuPcs::drawWindow(int, int, int, int, int, char*)
 {
 	// TODO
 }
@@ -145,7 +145,7 @@ void CDbgMenuPcs::drawWindow(int, int, int, int, int, char *)
  * Address:	TODO
  * Size:	TODO
  */
-void CDbgMenuPcs::drawFont(int, int, int, char *)
+void CDbgMenuPcs::drawFont(int, int, int, char*)
 {
 	// TODO
 }
@@ -165,7 +165,7 @@ void CDbgMenuPcs::searchFreeCDM()
  * Address:	TODO
  * Size:	TODO
  */
-void CDbgMenuPcs::searchID(int, CDbgMenuPcs::CDM &)
+void CDbgMenuPcs::searchID(int, CDbgMenuPcs::CDM&)
 {
 	// TODO
 }
@@ -185,7 +185,7 @@ void CDbgMenuPcs::Add()
  * Address:	TODO
  * Size:	TODO
  */
-void CDbgMenuPcs::CDMParam::operator= (const CDbgMenuPcs::CDMParam &)
+void CDbgMenuPcs::CDMParam::operator= (const CDbgMenuPcs::CDMParam&)
 {
 	// TODO
 }
@@ -195,7 +195,7 @@ void CDbgMenuPcs::CDMParam::operator= (const CDbgMenuPcs::CDMParam &)
  * Address:	TODO
  * Size:	TODO
  */
-void CDbgMenuPcs::Add(int, int, CDbgMenuPcs::CDMParam &)
+void CDbgMenuPcs::Add(int, int, CDbgMenuPcs::CDMParam&)
 {
 	// TODO
 }
@@ -225,7 +225,7 @@ CDbgMenuPcs::CDMParam::CDMParam()
  * Address:	TODO
  * Size:	TODO
  */
-CDbgMenuPcs::CDMParam::CDMParam(int, int, int, int, int, int, void *, void (*) (CDbgMenuPcs::CDM &, void *), void (*) (CDbgMenuPcs::CDM &, void *))
+CDbgMenuPcs::CDMParam::CDMParam(int, int, int, int, int, int, void*, void (*) (CDbgMenuPcs::CDM&, void*), void (*) (CDbgMenuPcs::CDM&, void*))
 {
 	// TODO
 }

@@ -15,7 +15,7 @@ void checkError()
  * Address:	TODO
  * Size:	TODO
  */
-void _kami_DVDREAD(DVDFileInfo *, void *, long, long)
+void _kami_DVDREAD(DVDFileInfo*, void*, long, long)
 {
 	// TODO
 }
@@ -95,7 +95,7 @@ void ReadFrameAsync()
  * Address:	TODO
  * Size:	TODO
  */
-void __THPSimpleDVDCallback(long, DVDFileInfo *)
+void __THPSimpleDVDCallback(long, DVDFileInfo*)
 {
 	// TODO
 }
@@ -165,7 +165,7 @@ void CheckPrefetch()
  * Address:	TODO
  * Size:	TODO
  */
-void VideoDecode(unsigned char *)
+void VideoDecode(unsigned char*)
 {
 	// TODO
 }
@@ -185,7 +185,7 @@ void THPSimpleDrawCurrentFrame(void)
  * Address:	TODO
  * Size:	TODO
  */
-void MixAudio(short *, short *, unsigned long)
+void MixAudio(short*, short*, unsigned long)
 {
 	// TODO
 }

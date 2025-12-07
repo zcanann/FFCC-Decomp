@@ -15,7 +15,7 @@ void get_rand()
  * Address:	TODO
  * Size:	TODO
  */
-void BirthParticle(_pppPObject *, VBreathModel *, PBreathModel *, VColor *, PARTICLE_DATA *, PARTICLE_WMAT *, PARTICLE_COLOR *)
+void BirthParticle(_pppPObject*, VBreathModel*, PBreathModel*, VColor*, PARTICLE_DATA*, PARTICLE_WMAT*, PARTICLE_COLOR*)
 {
 	// TODO
 }
@@ -25,7 +25,7 @@ void BirthParticle(_pppPObject *, VBreathModel *, PBreathModel *, VColor *, PART
  * Address:	TODO
  * Size:	TODO
  */
-void SetParticleMatrix(_pppPObject *, VBreathModel *, PARTICLE_DATA *, PARTICLE_WMAT *, _pppMngSt *)
+void SetParticleMatrix(_pppPObject*, VBreathModel*, PARTICLE_DATA*, PARTICLE_WMAT*, _pppMngSt*)
 {
 	// TODO
 }
@@ -35,7 +35,7 @@ void SetParticleMatrix(_pppPObject *, VBreathModel *, PARTICLE_DATA *, PARTICLE_
  * Address:	TODO
  * Size:	TODO
  */
-void UpdateParticle(VBreathModel *, PBreathModel *, PARTICLE_DATA *, VColor *, PARTICLE_COLOR *)
+void UpdateParticle(VBreathModel*, PBreathModel*, PARTICLE_DATA*, VColor*, PARTICLE_COLOR*)
 {
 	// TODO
 }
@@ -45,7 +45,7 @@ void UpdateParticle(VBreathModel *, PBreathModel *, PARTICLE_DATA *, VColor *, P
  * Address:	TODO
  * Size:	TODO
  */
-void UpdateAllParticle(_pppPObject *, VBreathModel *, PBreathModel *, VColor *)
+void UpdateAllParticle(_pppPObject*, VBreathModel*, PBreathModel*, VColor*)
 {
 	// TODO
 }
@@ -95,7 +95,7 @@ void pppDestructBreathModel(void)
  * Address:	TODO
  * Size:	TODO
  */
-void IsDeadGroupBreath(PBreathModel *, VBreathModel *, short)
+void IsDeadGroupBreath(PBreathModel*, VBreathModel*, short)
 {
 	// TODO
 }
@@ -105,7 +105,7 @@ void IsDeadGroupBreath(PBreathModel *, VBreathModel *, short)
  * Address:	TODO
  * Size:	TODO
  */
-void SearchIndex(PBreathModel *, VBreathModel *, short &, short &, short)
+void SearchIndex(PBreathModel*, VBreathModel*, short&, short&, short)
 {
 	// TODO
 }
@@ -115,7 +115,7 @@ void SearchIndex(PBreathModel *, VBreathModel *, short &, short &, short)
  * Address:	TODO
  * Size:	TODO
  */
-void IsExistGroupParticle(PBreathModel *, VBreathModel *, short)
+void IsExistGroupParticle(PBreathModel*, VBreathModel*, short)
 {
 	// TODO
 }

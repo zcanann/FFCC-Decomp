@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void setbit32(unsigned long *, unsigned long)
+void setbit32(unsigned long*, unsigned long)
 {
 	// TODO
 }
@@ -35,7 +35,7 @@ COctTree::~COctTree()
  * Address:	TODO
  * Size:	TODO
  */
-void COctTree::ReadOtmOctTree(CChunkFile &)
+void COctTree::ReadOtmOctTree(CChunkFile&)
 {
 	// TODO
 }
@@ -45,7 +45,7 @@ void COctTree::ReadOtmOctTree(CChunkFile &)
  * Address:	TODO
  * Size:	TODO
  */
-void COctTree::DrawTypeMeshFlag_r(COctNode *)
+void COctTree::DrawTypeMeshFlag_r(COctNode*)
 {
 	// TODO
 }
@@ -55,7 +55,7 @@ void COctTree::DrawTypeMeshFlag_r(COctNode *)
  * Address:	TODO
  * Size:	TODO
  */
-void COctTree::DrawCharaShadowTypeMeshFlag_r(COctNode *)
+void COctTree::DrawCharaShadowTypeMeshFlag_r(COctNode*)
 {
 	// TODO
 }
@@ -65,7 +65,7 @@ void COctTree::DrawCharaShadowTypeMeshFlag_r(COctNode *)
  * Address:	TODO
  * Size:	TODO
  */
-void COctTree::DrawTypeMeshFrustumIn_r(COctNode *)
+void COctTree::DrawTypeMeshFrustumIn_r(COctNode*)
 {
 	// TODO
 }
@@ -75,7 +75,7 @@ void COctTree::DrawTypeMeshFrustumIn_r(COctNode *)
  * Address:	TODO
  * Size:	TODO
  */
-void COctTree::DrawTypeMesh_r(COctNode *)
+void COctTree::DrawTypeMesh_r(COctNode*)
 {
 	// TODO
 }
@@ -115,7 +115,7 @@ void COctTree::SetDrawFlag()
  * Address:	TODO
  * Size:	TODO
  */
-void COctTree::GetLocalPosition(Vec &, Vec &)
+void COctTree::GetLocalPosition(Vec&, Vec&)
 {
 	// TODO
 }
@@ -125,7 +125,7 @@ void COctTree::GetLocalPosition(Vec &, Vec &)
  * Address:	TODO
  * Size:	TODO
  */
-void ClearLight_r(COctNode *)
+void ClearLight_r(COctNode*)
 {
 	// TODO
 }
@@ -145,7 +145,7 @@ void COctTree::ClearLight()
  * Address:	TODO
  * Size:	TODO
  */
-void InsertLight_r(COctNode *)
+void InsertLight_r(COctNode*)
 {
 	// TODO
 }
@@ -155,7 +155,7 @@ void InsertLight_r(COctNode *)
  * Address:	TODO
  * Size:	TODO
  */
-void COctTree::InsertLight(long, Vec &, float, unsigned long)
+void COctTree::InsertLight(long, Vec&, float, unsigned long)
 {
 	// TODO
 }
@@ -165,7 +165,7 @@ void COctTree::InsertLight(long, Vec &, float, unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void ClearShadow_r(COctNode *)
+void ClearShadow_r(COctNode*)
 {
 	// TODO
 }
@@ -185,7 +185,7 @@ void COctTree::ClearShadow()
  * Address:	TODO
  * Size:	TODO
  */
-void InsertShadow_r(COctNode *)
+void InsertShadow_r(COctNode*)
 {
 	// TODO
 }
@@ -195,7 +195,7 @@ void InsertShadow_r(COctNode *)
  * Address:	TODO
  * Size:	TODO
  */
-void COctTree::InsertShadow(long, Vec &, CBound &)
+void COctTree::InsertShadow(long, Vec&, CBound&)
 {
 	// TODO
 }
@@ -205,7 +205,7 @@ void COctTree::InsertShadow(long, Vec &, CBound &)
  * Address:	TODO
  * Size:	TODO
  */
-void CBound::operator= (const CBound &)
+void CBound::operator= (const CBound&)
 {
 	// TODO
 }
@@ -215,7 +215,7 @@ void CBound::operator= (const CBound &)
  * Address:	TODO
  * Size:	TODO
  */
-void ClearFlag_r(COctNode *)
+void ClearFlag_r(COctNode*)
 {
 	// TODO
 }
@@ -235,7 +235,7 @@ void COctTree::ClearFlag(unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void COctTree::CheckHitCylinder_r(COctNode *)
+void COctTree::CheckHitCylinder_r(COctNode*)
 {
 	// TODO
 }
@@ -245,7 +245,7 @@ void COctTree::CheckHitCylinder_r(COctNode *)
  * Address:	TODO
  * Size:	TODO
  */
-void COctTree::CheckHitCylinder(CMapCylinder *, Vec *, unsigned long)
+void COctTree::CheckHitCylinder(CMapCylinder*, Vec*, unsigned long)
 {
 	// TODO
 }
@@ -255,7 +255,7 @@ void COctTree::CheckHitCylinder(CMapCylinder *, Vec *, unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void COctTree::CheckHitCylinderNear_r(COctNode *)
+void COctTree::CheckHitCylinderNear_r(COctNode*)
 {
 	// TODO
 }
@@ -265,7 +265,7 @@ void COctTree::CheckHitCylinderNear_r(COctNode *)
  * Address:	TODO
  * Size:	TODO
  */
-void COctTree::CheckHitCylinderNear(CMapCylinder *, Vec *, unsigned long)
+void COctTree::CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned long)
 {
 	// TODO
 }

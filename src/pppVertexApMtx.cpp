@@ -15,7 +15,7 @@ void pppVertexApMtxCon(void)
  * Address:	TODO
  * Size:	TODO
  */
-void apea(_pppPObject *, PVertexApMtx *, Vec *)
+void apea(_pppPObject*, PVertexApMtx*, Vec*)
 {
 	// TODO
 }

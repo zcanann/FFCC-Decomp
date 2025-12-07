@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void SetUpIndWarp(VYmDeformationScreen *)
+void SetUpIndWarp(VYmDeformationScreen*)
 {
 	// TODO
 }

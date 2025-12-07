@@ -10,7 +10,7 @@ class CCameraPcs;
 
 struct McListInfo
 {
-    void operator=(const McListInfo &);
+    void operator=(const McListInfo&);
 };
 
 class McCtrl
@@ -29,12 +29,12 @@ public:
     void ChkEmpty(int);
     void ChkConnect(int);
     void ChkNowData();
-    void SaveDataBuffer(char *);
-    void ChkParty(char *);
+    void SaveDataBuffer(char*);
+    void ChkParty(char*);
     void EraseDat();
     void GetDno();
     void GetSerial();
-    void SetDataBuff(char *);
+    void SetDataBuff(char*);
     void GetSlot();
     void SetDno(int);
     void SetSlot(int);

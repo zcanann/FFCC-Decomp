@@ -25,7 +25,7 @@ void PitchCompute(int, int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void _ReverbNullCallback(AXFX_BUFFERUPDATE *, void *)
+void _ReverbNullCallback(AXFX_BUFFERUPDATE*, void*)
 {
 	// TODO
 }
@@ -45,7 +45,7 @@ void ReverbAreaAlloc(unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void ReverbAreaFree(void *)
+void ReverbAreaFree(void*)
 {
 	// TODO
 }
@@ -65,7 +65,7 @@ void InitReverb()
  * Address:	TODO
  * Size:	TODO
  */
-void _SetReverbData(RedReverbDATA *, int *)
+void _SetReverbData(RedReverbDATA*, int*)
 {
 	// TODO
 }
@@ -85,7 +85,7 @@ void _ClearReverb(int)
  * Address:	TODO
  * Size:	TODO
  */
-void SetReverb(int, int, int *)
+void SetReverb(int, int, int*)
 {
 	// TODO
 }
@@ -95,7 +95,7 @@ void SetReverb(int, int, int *)
  * Address:	TODO
  * Size:	TODO
  */
-void EntryVoiceSearch(RedTrackDATA *)
+void EntryVoiceSearch(RedTrackDATA*)
 {
 	// TODO
 }
@@ -115,7 +115,7 @@ void _VoiceEnvelopeCheck()
  * Address:	TODO
  * Size:	TODO
  */
-void SetVoiceVolumeMix(RedVoiceDATA *, int, int)
+void SetVoiceVolumeMix(RedVoiceDATA*, int, int)
 {
 	// TODO
 }
@@ -125,7 +125,7 @@ void SetVoiceVolumeMix(RedVoiceDATA *, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void _VolumeExecute(RedVoiceDATA *, int)
+void _VolumeExecute(RedVoiceDATA*, int)
 {
 	// TODO
 }
@@ -135,7 +135,7 @@ void _VolumeExecute(RedVoiceDATA *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void _PitchExecute(RedVoiceDATA *)
+void _PitchExecute(RedVoiceDATA*)
 {
 	// TODO
 }
@@ -145,7 +145,7 @@ void _PitchExecute(RedVoiceDATA *)
  * Address:	TODO
  * Size:	TODO
  */
-void _WaveSplitSelect(RedWaveDATA *, RedNoteDATA *)
+void _WaveSplitSelect(RedWaveDATA*, RedNoteDATA*)
 {
 	// TODO
 }
@@ -155,7 +155,7 @@ void _WaveSplitSelect(RedWaveDATA *, RedNoteDATA *)
  * Address:	TODO
  * Size:	TODO
  */
-void _VoiceDataAsign(RedTrackDATA *, RedVoiceDATA *, RedNoteDATA *, int *)
+void _VoiceDataAsign(RedTrackDATA*, RedVoiceDATA*, RedNoteDATA*, int*)
 {
 	// TODO
 }
@@ -165,7 +165,7 @@ void _VoiceDataAsign(RedTrackDATA *, RedVoiceDATA *, RedNoteDATA *, int *)
  * Address:	TODO
  * Size:	TODO
  */
-void _VoiceDataSelect(RedTrackDATA *, RedNoteDATA *, int *)
+void _VoiceDataSelect(RedTrackDATA*, RedNoteDATA*, int*)
 {
 	// TODO
 }
@@ -175,7 +175,7 @@ void _VoiceDataSelect(RedTrackDATA *, RedNoteDATA *, int *)
  * Address:	TODO
  * Size:	TODO
  */
-void SetVoiceAccess(RedTrackDATA *, int)
+void SetVoiceAccess(RedTrackDATA*, int)
 {
 	// TODO
 }
@@ -185,7 +185,7 @@ void SetVoiceAccess(RedTrackDATA *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void SetVoiceSwitch(RedTrackDATA *, int)
+void SetVoiceSwitch(RedTrackDATA*, int)
 {
 	// TODO
 }
@@ -195,7 +195,7 @@ void SetVoiceSwitch(RedTrackDATA *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void _AdsrStart(RedVoiceDATA *)
+void _AdsrStart(RedVoiceDATA*)
 {
 	// TODO
 }
@@ -205,7 +205,7 @@ void _AdsrStart(RedVoiceDATA *)
  * Address:	TODO
  * Size:	TODO
  */
-void _AdsrDataCompute(RedVoiceDATA *)
+void _AdsrDataCompute(RedVoiceDATA*)
 {
 	// TODO
 }
@@ -215,7 +215,7 @@ void _AdsrDataCompute(RedVoiceDATA *)
  * Address:	TODO
  * Size:	TODO
  */
-void _AdsrDataExecute(RedVoiceDATA *)
+void _AdsrDataExecute(RedVoiceDATA*)
 {
 	// TODO
 }
@@ -225,7 +225,7 @@ void _AdsrDataExecute(RedVoiceDATA *)
  * Address:	TODO
  * Size:	TODO
  */
-void _VoiceDropedCallback(void *)
+void _VoiceDropedCallback(void*)
 {
 	// TODO
 }
@@ -265,7 +265,7 @@ void _ExecuteExtraData()
  * Address:	TODO
  * Size:	TODO
  */
-void _MusicTrackDataExecute(RedTrackDATA *, int)
+void _MusicTrackDataExecute(RedTrackDATA*, int)
 {
 	// TODO
 }
@@ -275,7 +275,7 @@ void _MusicTrackDataExecute(RedTrackDATA *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void _MidiTrackExecute(RedSoundCONTROL *, RedKeyOnDATA *, int)
+void _MidiTrackExecute(RedSoundCONTROL*, RedKeyOnDATA*, int)
 {
 	// TODO
 }
@@ -285,7 +285,7 @@ void _MidiTrackExecute(RedSoundCONTROL *, RedKeyOnDATA *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void _MusicMidiNoteExecute(RedSoundCONTROL *, RedKeyOnDATA *, int)
+void _MusicMidiNoteExecute(RedSoundCONTROL*, RedKeyOnDATA*, int)
 {
 	// TODO
 }
@@ -305,7 +305,7 @@ void _MusicNoteExecute()
  * Address:	TODO
  * Size:	TODO
  */
-void _MusicMidiNoteSkipExecute(RedSoundCONTROL *, RedKeyOnDATA *, int)
+void _MusicMidiNoteSkipExecute(RedSoundCONTROL*, RedKeyOnDATA*, int)
 {
 	// TODO
 }
@@ -335,7 +335,7 @@ void MusicSkipFunction()
  * Address:	TODO
  * Size:	TODO
  */
-void _SeTrackDataExecute(RedTrackDATA *, int)
+void _SeTrackDataExecute(RedTrackDATA*, int)
 {
 	// TODO
 }
@@ -345,7 +345,7 @@ void _SeTrackDataExecute(RedTrackDATA *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void _SeMidiNoteExecute(RedSoundCONTROL *, RedKeyOnDATA *, RedTrackDATA *, int, int)
+void _SeMidiNoteExecute(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*, int, int)
 {
 	// TODO
 }

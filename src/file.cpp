@@ -476,7 +476,7 @@ CFile::CHandle* CFile::CheckQueue()
  * Address:	TODO
  * Size:	TODO
  */
-void CFile::DrawError(DVDFileInfo &, int)
+void CFile::DrawError(DVDFileInfo&, int)
 {
 	// TODO
 }

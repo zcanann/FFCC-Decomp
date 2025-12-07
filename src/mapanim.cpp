@@ -45,7 +45,7 @@ CMapAnimNode::~CMapAnimNode()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapAnimNode::ReadOtmAnimNode(CChunkFile &, CMapAnim *)
+void CMapAnimNode::ReadOtmAnimNode(CChunkFile&, CMapAnim*)
 {
 	// TODO
 }
@@ -65,7 +65,7 @@ void CMapAnimNode::Interp(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapAnimNode::interp(Vec *, CMapAnimKey *, int, int)
+void CMapAnimNode::interp(Vec*, CMapAnimKey*, int, int)
 {
 	// TODO
 }
@@ -95,7 +95,7 @@ CMapAnim::~CMapAnim()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapAnim::ReadOtmAnim(CChunkFile &)
+void CMapAnim::ReadOtmAnim(CChunkFile&)
 {
 	// TODO
 }

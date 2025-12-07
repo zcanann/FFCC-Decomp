@@ -25,7 +25,7 @@ CColor::CColor(unsigned char, unsigned char, unsigned char, unsigned char)
  * Address:	TODO
  * Size:	TODO
  */
-CColor::CColor(CColor &)
+CColor::CColor(CColor&)
 {
 	// TODO
 }
@@ -35,7 +35,7 @@ CColor::CColor(CColor &)
  * Address:	TODO
  * Size:	TODO
  */
-CColor::CColor(_GXColor &)
+CColor::CColor(_GXColor&)
 {
 	// TODO
 }
@@ -55,7 +55,7 @@ CColor3::CColor3()
  * Address:	TODO
  * Size:	TODO
  */
-CColor3::CColor3(CColor3 &)
+CColor3::CColor3(CColor3&)
 {
 	// TODO
 }
@@ -65,7 +65,7 @@ CColor3::CColor3(CColor3 &)
  * Address:	TODO
  * Size:	TODO
  */
-CColor3::CColor3(_GXColor &)
+CColor3::CColor3(_GXColor&)
 {
 	// TODO
 }

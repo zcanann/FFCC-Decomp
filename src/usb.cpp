@@ -65,7 +65,7 @@ void CUSB::Frame()
  * Address:	TODO
  * Size:	TODO
  */
-void CUSB::Write(void *, int)
+void CUSB::Write(void*, int)
 {
 	// TODO
 }
@@ -95,7 +95,7 @@ void CUSB::IsConnected()
  * Address:	TODO
  * Size:	TODO
  */
-void CUSB::AddMessageCallback(void (*) (unsigned long, void *, MCCChannel), void *)
+void CUSB::AddMessageCallback(void (*) (unsigned long, void*, MCCChannel), void*)
 {
 	// TODO
 }
@@ -105,7 +105,7 @@ void CUSB::AddMessageCallback(void (*) (unsigned long, void *, MCCChannel), void
  * Address:	TODO
  * Size:	TODO
  */
-void CUSB::RemoveMessageCallback(void (*) (unsigned long, void *, MCCChannel))
+void CUSB::RemoveMessageCallback(void (*) (unsigned long, void*, MCCChannel))
 {
 	// TODO
 }
@@ -115,7 +115,7 @@ void CUSB::RemoveMessageCallback(void (*) (unsigned long, void *, MCCChannel))
  * Address:	TODO
  * Size:	TODO
  */
-void CUSB::Printf(char *, ...)
+void CUSB::Printf(char*, ...)
 {
 	// TODO
 }

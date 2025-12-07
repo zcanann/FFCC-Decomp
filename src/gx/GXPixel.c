@@ -82,8 +82,8 @@ void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor
         SET_REG_FIELD(201, fog2, 8, 24, 0xF0);
     }
 
-    a_hex = *(u32 *)&a;
-    c_hex = *(u32 *)&c;
+    a_hex = *(u32*)&a;
+    c_hex = *(u32*)&c;
 
     SET_REG_FIELD(209, fog0, 11, 0, (a_hex >> 12) & 0x7FF);
     SET_REG_FIELD(210, fog0, 8, 11, (a_hex >> 23) & 0xFF);

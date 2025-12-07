@@ -13,8 +13,8 @@ class CGObjWork;
 class CFlatRuntime2;
 class CVector;
 
-void la(CGObject *);
-void SAFE_CAST_WORK(CGObjWork *);
+void la(CGObject*);
+void SAFE_CAST_WORK(CGObjWork*);
 
 class CGCharaObj
 {
@@ -36,18 +36,18 @@ class CGCharaObj
 	void resetIgnoreHit();
 	void decIgnoreHit();
 	void damageDelete();
-	void onHit(int, CGObject *, int, Vec *);
-	void onHitParticle(int, int, int, int, Vec *, PPPIFPARAM *);
+	void onHit(int, CGObject*, int, Vec*);
+	void onHitParticle(int, int, int, int, Vec*, PPPIFPARAM*);
 	void getReplaceStat(int);
-	void putHitParticleFromItem(CGPrgObj *, int);
+	void putHitParticleFromItem(CGPrgObj*, int);
 	void setSta(int, int);
-	void effective(int, int, CGPrgObj *, int &);
-	void calcSta(int, int, CGObject *);
-	void addHp(int, CGPrgObj *);
-	void calcRegist(int, int, int &, int &, int &, int);
-	void onDamage(CGPrgObj *, int, int, int, Vec *);
-	void getItemPdt(int, int, int &, int &, int &);
-	void putParticleFromItem(int, int, int, Vec *);
+	void effective(int, int, CGPrgObj*, int&);
+	void calcSta(int, int, CGObject*);
+	void addHp(int, CGPrgObj*);
+	void calcRegist(int, int, int&, int&, int&, int);
+	void onDamage(CGPrgObj*, int, int, int, Vec*);
+	void getItemPdt(int, int, int&, int&, int&);
+	void putParticleFromItem(int, int, int, Vec*);
 	void statShield();
 	void statAttack();
 	void statDie();
@@ -61,15 +61,15 @@ class CGCharaObj
 	void statButtobi();
 	void onChangePrg(int);
 	void calcCastTime(int);
-	void onDrawDebug(CFont *, float, float &, float);
+	void onDrawDebug(CFont*, float, float&, float);
 	void addSe(int);
 	void seDamageDelete();
 	void StaticFrame();
 	void combi2();
-	void sendCombiToScript(CGCharaObj *, int, int);
-	void scCheckItem(CCombi2Set *, CGCharaObj *, int);
-	void scCheckTime(CCombi2Set *, CGCharaObj *, CGCharaObj *, int);
-	void searchCombi(int, CGPartyObj **, int &);
+	void sendCombiToScript(CGCharaObj*, int, int);
+	void scCheckItem(CCombi2Set*, CGCharaObj*, int);
+	void scCheckTime(CCombi2Set*, CGCharaObj*, CGCharaObj*, int);
+	void searchCombi(int, CGPartyObj **, int&);
 	void enableAttackCol(int, int, int);
 	int GetCID();
 	void enableDamageCol(int);

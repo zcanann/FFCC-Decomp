@@ -50,13 +50,13 @@ s32 THPVideoDecode(void *file, void *tileY, void *tileU, void *tileV, void *work
         goto _err_not_initialized;
     }
 
-    __THPWorkArea = (u8 *)work;
-    __THPInfo = (THPFileInfo *)OSRoundUp32B(__THPWorkArea);
-    __THPWorkArea = (u8 *)OSRoundUp32B(__THPWorkArea) + sizeof(THPFileInfo);
+    __THPWorkArea = (u8*)work;
+    __THPInfo = (THPFileInfo*)OSRoundUp32B(__THPWorkArea);
+    __THPWorkArea = (u8*)OSRoundUp32B(__THPWorkArea) + sizeof(THPFileInfo);
     DCZeroRange(__THPInfo, sizeof(THPFileInfo));
     __THPInfo->cnt = 33;
     __THPInfo->decompressedY = 0;
-    __THPInfo->c = (u8 *)file;
+    __THPInfo->c = (u8*)file;
     all_done = FALSE;
 
     for (;;) {
@@ -185,7 +185,7 @@ static void __THPSetupBuffers(void)
     u8 i;
     THPCoeff *buffer;
 
-    buffer = (THPCoeff *)OSRoundUp32B(__THPWorkArea);
+    buffer = (THPCoeff*)OSRoundUp32B(__THPWorkArea);
 
     for (i = 0; i < 6; i++) {
         __THPMCUBuffer[i] = &buffer[i * 64];
@@ -301,7 +301,7 @@ static u8 __THPReadHuffmanTableSpecification(void)
     u16 length, num_Vij;
 
     __THPHuffmanSizeTab = __THPWorkArea;
-    __THPHuffmanCodeTab = (u16 *)((u32)__THPWorkArea + 256 + 1);
+    __THPHuffmanCodeTab = (u16*)((u32)__THPWorkArea + 256 + 1);
     length = (u16)((__THPInfo->c)[0] << 8 | (__THPInfo->c)[1]);
     __THPInfo->c += 2;
     length -= 2;
@@ -445,7 +445,7 @@ void __THPPrepBitStream(void)
     u32 *ptr;
     u32 offset, i, j, k;
 
-    ptr = (u32 *)((u32)__THPInfo->c & 0xFFFFFFFC);
+    ptr = (u32*)((u32)__THPInfo->c & 0xFFFFFFFC);
     offset = (u32)__THPInfo->c & 3;
 
     if (__THPInfo->cnt != 33) {
@@ -455,7 +455,7 @@ void __THPPrepBitStream(void)
         __THPInfo->cnt = (offset * 8) + 1;
     }
 
-    __THPInfo->c = (u8 *)ptr;
+    __THPInfo->c = (u8*)ptr;
     __THPInfo->currByte = *ptr;
 
     for (i = 0; i < 4; i++) {
@@ -1602,11 +1602,11 @@ static void __THPHuffDecodeDCTCompY(register THPFileInfo *info, THPCoeff *block)
         THPCoeff dc;
         register THPCoeff diff;
 
-        __dcbz((void *)block, 0);
+        __dcbz((void*)block, 0);
         t = __THPHuffDecodeTab(info, Ydchuff);
-        __dcbz((void *)block, 32);
+        __dcbz((void*)block, 32);
         diff = 0;
-        __dcbz((void *)block, 64);
+        __dcbz((void*)block, 64);
 
         if (t) {
             {
@@ -1662,7 +1662,7 @@ static void __THPHuffDecodeDCTCompY(register THPFileInfo *info, THPCoeff *block)
             }
         };
 
-        __dcbz((void *)block, 96);
+        __dcbz((void*)block, 96);
         dc = (s16)(info->components[0].predDC + diff);
         block[0] = info->components[0].predDC = dc;
     }
@@ -2009,11 +2009,11 @@ static void __THPHuffDecodeDCTCompU(register THPFileInfo *info, THPCoeff *block)
     register s32 ssss;
     register s32 rrrr;
 
-    __dcbz((void *)block, 0);
+    __dcbz((void*)block, 0);
     t = __THPHuffDecodeTab(info, Udchuff);
-    __dcbz((void *)block, 32);
+    __dcbz((void*)block, 32);
     diff = 0;
-    __dcbz((void *)block, 64);
+    __dcbz((void*)block, 64);
 
     if (t) {
         // clang-format off
@@ -2058,7 +2058,7 @@ static void __THPHuffDecodeDCTCompU(register THPFileInfo *info, THPCoeff *block)
         }
     }
 
-    __dcbz((void *)block, 96);
+    __dcbz((void*)block, 96);
     dc = (s16)(info->components[1].predDC + diff);
     block[0] = info->components[1].predDC = dc;
 
@@ -2137,11 +2137,11 @@ static void __THPHuffDecodeDCTCompV(register THPFileInfo *info, THPCoeff *block)
     register s32 ssss;
     register s32 rrrr;
 
-    __dcbz((void *)block, 0);
+    __dcbz((void*)block, 0);
     t = __THPHuffDecodeTab(info, Vdchuff);
-    __dcbz((void *)block, 32);
+    __dcbz((void*)block, 32);
     diff = 0;
-    __dcbz((void *)block, 64);
+    __dcbz((void*)block, 64);
 
     if (t) {
         // clang-format off
@@ -2186,7 +2186,7 @@ static void __THPHuffDecodeDCTCompV(register THPFileInfo *info, THPCoeff *block)
         }
     }
 
-    __dcbz((void *)block, 96);
+    __dcbz((void*)block, 96);
 
     dc = (s16)(info->components[2].predDC + diff);
     block[0] = info->components[2].predDC = dc;
@@ -2256,7 +2256,7 @@ static void __THPHuffDecodeDCTCompV(register THPFileInfo *info, THPCoeff *block)
 BOOL THPInit(void)
 {
     u8 *base;
-    base = (u8 *)(0xE000 << 16);
+    base = (u8*)(0xE000 << 16);
 
     __THPLCWork512[0] = base;
     base += 0x2000;
@@ -2265,7 +2265,7 @@ BOOL THPInit(void)
     __THPLCWork512[2] = base;
     base += 0x200;
 
-    base = (u8 *)(0xE000 << 16);
+    base = (u8*)(0xE000 << 16);
     __THPLCWork640[0] = base;
     base += 0x2800;
     __THPLCWork640[1] = base;

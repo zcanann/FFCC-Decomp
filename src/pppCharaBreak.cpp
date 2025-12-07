@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void CreatePolygon(POLYGON_DATA *, void *, unsigned long, CChara::CModel *, CChara::CMesh *)
+void CreatePolygon(POLYGON_DATA*, void*, unsigned long, CChara::CModel*, CChara::CMesh*)
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void CreatePolygon(POLYGON_DATA *, void *, unsigned long, CChara::CModel *, CCha
  * Address:	TODO
  * Size:	TODO
  */
-void InitPolygonParameter(PCharaBreak *, VCharaBreak *, POLYGON_DATA *, unsigned long, CChara::CModel *, CChara::CMesh *)
+void InitPolygonParameter(PCharaBreak*, VCharaBreak*, POLYGON_DATA*, unsigned long, CChara::CModel*, CChara::CMesh*)
 {
 	// TODO
 }
@@ -25,7 +25,7 @@ void InitPolygonParameter(PCharaBreak *, VCharaBreak *, POLYGON_DATA *, unsigned
  * Address:	TODO
  * Size:	TODO
  */
-void UpdatePolygonData(PCharaBreak *, VCharaBreak *, CChara::CModel *)
+void UpdatePolygonData(PCharaBreak*, VCharaBreak*, CChara::CModel*)
 {
 	// TODO
 }

@@ -30,7 +30,7 @@ CFlatData::~CFlatData()
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatData::Create(void *)
+void CFlatData::Create(void*)
 {
 	// TODO
 }

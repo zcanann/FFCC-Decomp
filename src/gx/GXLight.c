@@ -298,7 +298,7 @@ do {  \
 do {  \
     f32 xfData = val; \
     GX_WRITE_F32(val); \
-    VERIF_MTXLIGHT(addr, *(u32 *)&xfData); \
+    VERIF_MTXLIGHT(addr, *(u32*)&xfData); \
 } while (0)
 #else
 #define WRITE_SOME_LIGHT_REG1(val, addr) GX_WRITE_U32(val)

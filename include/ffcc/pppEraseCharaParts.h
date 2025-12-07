@@ -3,7 +3,7 @@
 
 #include "ffcc/chara.h"
 
-void EraseCharaParts_DrawMeshDLCallback(CChara::CModel *, void *, void *, int, int, float (*)[4]);
+void EraseCharaParts_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 void pppConstructEraseCharaParts(void);
 void pppDestructEraseCharaParts(void);
 void pppFrameEraseCharaParts(void);

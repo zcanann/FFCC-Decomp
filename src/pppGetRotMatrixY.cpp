@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void pppGetRotMatrixY(pppFMATRIX &, long)
+void pppGetRotMatrixY(pppFMATRIX&, long)
 {
 	// TODO
 }

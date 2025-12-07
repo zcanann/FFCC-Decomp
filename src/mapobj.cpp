@@ -35,7 +35,7 @@ void CMapObj::Init()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapObj::ReadOtmObj(CChunkFile &)
+void CMapObj::ReadOtmObj(CChunkFile&)
 {
 	// TODO
 }
@@ -85,7 +85,7 @@ void CMapObj::SetLink()
  * Address:	TODO
  * Size:	TODO
  */
-void calcColorKeyFrame(CMapKeyFrame *, _GXColor &, _GXColor *)
+void calcColorKeyFrame(CMapKeyFrame*, _GXColor&, _GXColor*)
 {
 	// TODO
 }
@@ -175,7 +175,7 @@ void CMapObj::DrawHitNormal()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapObj::CheckHitCylinder(CMapCylinder *, Vec *, unsigned long)
+void CMapObj::CheckHitCylinder(CMapCylinder*, Vec*, unsigned long)
 {
 	// TODO
 }
@@ -185,7 +185,7 @@ void CMapObj::CheckHitCylinder(CMapCylinder *, Vec *, unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapObj::CheckHitCylinderNear(CMapCylinder *, Vec *, unsigned long)
+void CMapObj::CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned long)
 {
 	// TODO
 }
@@ -195,7 +195,7 @@ void CMapObj::CheckHitCylinderNear(CMapCylinder *, Vec *, unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapObj::GetHitFaceNormal(Vec *)
+void CMapObj::GetHitFaceNormal(Vec*)
 {
 	// TODO
 }
@@ -205,7 +205,7 @@ void CMapObj::GetHitFaceNormal(Vec *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapObj::CalcHitSlide(Vec *, float)
+void CMapObj::CalcHitSlide(Vec*, float)
 {
 	// TODO
 }
@@ -215,7 +215,7 @@ void CMapObj::CalcHitSlide(Vec *, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapObj::CalcHitPosition(Vec *)
+void CMapObj::CalcHitPosition(Vec*)
 {
 	// TODO
 }

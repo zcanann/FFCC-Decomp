@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void EraseCharaParts_DrawMeshDLCallback(CChara::CModel *, void *, void *, int, int, float (*) [4])
+void EraseCharaParts_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*) [4])
 {
 	// TODO
 }

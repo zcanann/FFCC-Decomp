@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void CMapShadowInsertOctTree(CMapShadow::TARGET, COctTree &)
+void CMapShadowInsertOctTree(CMapShadow::TARGET, COctTree&)
 {
 	// TODO
 }

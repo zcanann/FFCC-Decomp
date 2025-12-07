@@ -3,22 +3,44 @@
 
 #include "ffcc/p_chara.h"
 
+#include <dolphin/gx.h>
+
+class CChara;
 class CChunkFile;
 class CTexture;
 class CTextureSet;
-class CChara;
 struct Vec;
-struct _GXColor;
-struct _pppMngSt;
-struct _pppEnvSt;
-struct _pppDataHead;
-struct pppShapeSt;
-struct pppModelSt;
-struct PPPCREATEPARAM;
+
+// Possibly defined in pppPart.h
 struct PPPSEST;
-struct PPPIFPARAM;
-struct PmcomGetImageSt;
-struct PmcomRendSt;
+
+struct _pppMngSt
+{
+};
+
+struct _pppEnvSt
+{
+};
+
+struct _pppDataHead
+{
+};
+
+struct pppShapeSt
+{
+};
+
+struct pppModelSt
+{
+};
+
+struct PPPCREATEPARAM
+{
+};
+
+struct PPPIFPARAM
+{
+};
 
 void Screen2world(Vec&, Vec&);
 void pppEditGetViewPos(Vec*);

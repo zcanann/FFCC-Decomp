@@ -135,7 +135,7 @@ void CGamePcs::draw2()
  * Address:	TODO
  * Size:	TODO
  */
-void CGamePcs::onScriptChanging(char *)
+void CGamePcs::onScriptChanging(char*)
 {
 	// TODO
 }
@@ -145,7 +145,7 @@ void CGamePcs::onScriptChanging(char *)
  * Address:	TODO
  * Size:	TODO
  */
-void CGamePcs::onScriptChanged(char *, int)
+void CGamePcs::onScriptChanged(char*, int)
 {
 	// TODO
 }

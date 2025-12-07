@@ -45,7 +45,7 @@ void RedDelete(int)
  * Address:	TODO
  * Size:	TODO
  */
-void RedDelete(void *)
+void RedDelete(void*)
 {
 	// TODO
 }
@@ -75,7 +75,7 @@ void RedDeleteA(int)
  * Address:	TODO
  * Size:	TODO
  */
-void RedDeleteA(void *)
+void RedDeleteA(void*)
 {
 	// TODO
 }

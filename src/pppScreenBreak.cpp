@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void SB_BeforeCalcMatrixCallback(CChara::CModel *, void *, void *)
+void SB_BeforeCalcMatrixCallback(CChara::CModel*, void*, void*)
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void SB_BeforeCalcMatrixCallback(CChara::CModel *, void *, void *)
  * Address:	TODO
  * Size:	TODO
  */
-void SB_BeforeDrawCallback(CChara::CModel *, void *, void *, float (*) [4], int)
+void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
 {
 	// TODO
 }
@@ -25,7 +25,7 @@ void SB_BeforeDrawCallback(CChara::CModel *, void *, void *, float (*) [4], int)
  * Address:	TODO
  * Size:	TODO
  */
-void SB_DrawMeshDLCallback(CChara::CModel *, void *, void *, int, int, float (*) [4])
+void SB_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*) [4])
 {
 	// TODO
 }
@@ -45,7 +45,7 @@ void GXSetTexCoordGen(void)
  * Address:	TODO
  * Size:	TODO
  */
-void InitPieceData(CChara::CModel *, PScreenBreak *, VScreenBreak *)
+void InitPieceData(CChara::CModel*, PScreenBreak*, VScreenBreak*)
 {
 	// TODO
 }
@@ -55,7 +55,7 @@ void InitPieceData(CChara::CModel *, PScreenBreak *, VScreenBreak *)
  * Address:	TODO
  * Size:	TODO
  */
-void SB_BeforeMeshLockEnvCallback(CChara::CModel *, void *, void *, int)
+void SB_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
 {
 	// TODO
 }

@@ -99,7 +99,7 @@ void CGPrgObj::isLoopAnimDirect()
  * Address:	TODO
  * Size:	TODO
  */
-void CGPrgObj::playSe3D(int, int, int, int, Vec *)
+void CGPrgObj::playSe3D(int, int, int, int, Vec*)
 {
 	// TODO
 }
@@ -119,7 +119,7 @@ void CGPrgObj::changePrg(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGPrgObj::putParticle(int, int, Vec *, float, int)
+void CGPrgObj::putParticle(int, int, Vec*, float, int)
 {
 	// TODO
 }
@@ -129,7 +129,7 @@ void CGPrgObj::putParticle(int, int, Vec *, float, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGPrgObj::putParticle(int, int, CGObject *, float, int)
+void CGPrgObj::putParticle(int, int, CGObject*, float, int)
 {
 	// TODO
 }
@@ -139,7 +139,7 @@ void CGPrgObj::putParticle(int, int, CGObject *, float, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGPrgObj::putParticleTrace(int, int, CGObject *, float, int)
+void CGPrgObj::putParticleTrace(int, int, CGObject*, float, int)
 {
 	// TODO
 }
@@ -149,7 +149,7 @@ void CGPrgObj::putParticleTrace(int, int, CGObject *, float, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGPrgObj::putParticleBindTrace(int, int, CGObject *, float, int)
+void CGPrgObj::putParticleBindTrace(int, int, CGObject*, float, int)
 {
 	// TODO
 }
@@ -159,7 +159,7 @@ void CGPrgObj::putParticleBindTrace(int, int, CGObject *, float, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGPrgObj::getTargetRot(CGPrgObj *)
+void CGPrgObj::getTargetRot(CGPrgObj*)
 {
 	// TODO
 }
@@ -169,7 +169,7 @@ void CGPrgObj::getTargetRot(CGPrgObj *)
  * Address:	TODO
  * Size:	TODO
  */
-void CGPrgObj::rotTarget(CGPrgObj *)
+void CGPrgObj::rotTarget(CGPrgObj*)
 {
 	// TODO
 }
@@ -179,7 +179,7 @@ void CGPrgObj::rotTarget(CGPrgObj *)
  * Address:	TODO
  * Size:	TODO
  */
-void CGPrgObj::dstTargetRot(CGPrgObj *)
+void CGPrgObj::dstTargetRot(CGPrgObj*)
 {
 	// TODO
 }

@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void InitParticleData(VYmMiasma *, _pppPObject *, PYmMiasma *, PARTICLE_DATA *)
+void InitParticleData(VYmMiasma*, _pppPObject*, PYmMiasma*, PARTICLE_DATA*)
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void InitParticleData(VYmMiasma *, _pppPObject *, PYmMiasma *, PARTICLE_DATA *)
  * Address:	TODO
  * Size:	TODO
  */
-void UpdateParticleData(_pppPObject *, _pppCtrlTable *, PYmMiasma *, PARTICLE_DATA *)
+void UpdateParticleData(_pppPObject*, _pppCtrlTable*, PYmMiasma*, PARTICLE_DATA*)
 {
 	// TODO
 }
@@ -25,7 +25,7 @@ void UpdateParticleData(_pppPObject *, _pppCtrlTable *, PYmMiasma *, PARTICLE_DA
  * Address:	TODO
  * Size:	TODO
  */
-void RenderParticle(_pppPObject *, PYmMiasma *, PARTICLE_DATA *)
+void RenderParticle(_pppPObject*, PYmMiasma*, PARTICLE_DATA*)
 {
 	// TODO
 }

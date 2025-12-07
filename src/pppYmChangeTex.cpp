@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void ChangeTex_DrawMeshDLCallback(CChara::CModel *, void *, void *, int, int, float (*) [4])
+void ChangeTex_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*) [4])
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void ChangeTex_DrawMeshDLCallback(CChara::CModel *, void *, void *, int, int, fl
  * Address:	TODO
  * Size:	TODO
  */
-void ChangeTex_AfterDrawMeshCallback(CChara::CModel *, void *, void *, int, float (*) [4])
+void ChangeTex_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*) [4])
 {
 	// TODO
 }

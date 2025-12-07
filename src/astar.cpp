@@ -35,7 +35,7 @@ void CAStar::reset()
  * Address:	TODO
  * Size:	TODO
  */
-void CAStar::addAstar(Vec &, int, int)
+void CAStar::addAstar(Vec&, int, int)
 {
 	// TODO
 }
@@ -65,7 +65,7 @@ void CAStar::dumpAStar()
  * Address:	TODO
  * Size:	TODO
  */
-void CAStar::check(int, int, CAStar::CATemp &)
+void CAStar::check(int, int, CAStar::CATemp&)
 {
 	// TODO
 }
@@ -105,7 +105,7 @@ void GXEnd(void)
  * Address:	TODO
  * Size:	TODO
  */
-void CAStar::addRealTime(CGPartyObj *)
+void CAStar::addRealTime(CGPartyObj*)
 {
 	// TODO
 }
@@ -115,7 +115,7 @@ void CAStar::addRealTime(CGPartyObj *)
  * Address:	TODO
  * Size:	TODO
  */
-void CAStar::getEscapePos(Vec &, Vec &, int, int)
+void CAStar::getEscapePos(Vec&, Vec&, int, int)
 {
 	// TODO
 }
@@ -125,7 +125,7 @@ void CAStar::getEscapePos(Vec &, Vec &, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CAStar::calcSpecialPolygonGroup(Vec *)
+void CAStar::calcSpecialPolygonGroup(Vec*)
 {
 	// TODO
 }
@@ -135,7 +135,7 @@ void CAStar::calcSpecialPolygonGroup(Vec *)
  * Address:	TODO
  * Size:	TODO
  */
-void CAStar::calcPolygonGroup(Vec *, int)
+void CAStar::calcPolygonGroup(Vec*, int)
 {
 	// TODO
 }
@@ -165,7 +165,7 @@ void CAStar::CAPos::IsUse()
  * Address:	TODO
  * Size:	TODO
  */
-void CAStar::CAPos::CalcLength(CAStar::CAPos &)
+void CAStar::CAPos::CalcLength(CAStar::CAPos&)
 {
 	// TODO
 }
@@ -175,7 +175,7 @@ void CAStar::CAPos::CalcLength(CAStar::CAPos &)
  * Address:	TODO
  * Size:	TODO
  */
-CAStar::CATemp::CATemp(const CAStar::CATemp &)
+CAStar::CATemp::CATemp(const CAStar::CATemp&)
 {
 	// TODO
 }
@@ -195,7 +195,7 @@ void CAStar::CAPos::IsExist(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CAStar::CATemp::operator= (const CAStar::CATemp &)
+void CAStar::CATemp::operator= (const CAStar::CATemp&)
 {
 	// TODO
 }

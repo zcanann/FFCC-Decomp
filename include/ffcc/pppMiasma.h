@@ -4,8 +4,8 @@
 struct Vec;
 struct _pppPObject;
 
-void CalcSphereRadius(Vec *, unsigned short);
-void CreateScaleMatrix(_pppPObject *, float);
+void CalcSphereRadius(Vec*, unsigned short);
+void CreateScaleMatrix(_pppPObject*, float);
 void pppRenderMiasma(void);
 void pppConstructMiasma(void);
 void pppConstruct2Miasma(void);

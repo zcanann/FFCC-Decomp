@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void CC_BeforeCalcMatrixCallback(CChara::CModel *, void *, void *)
+void CC_BeforeCalcMatrixCallback(CChara::CModel*, void*, void*)
 {
 	// TODO
 }

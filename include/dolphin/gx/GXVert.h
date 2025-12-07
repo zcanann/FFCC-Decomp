@@ -29,7 +29,7 @@ typedef union {
 #ifdef __MWERKS__
 volatile PPCWGPipe GXWGFifo AT_ADDRESS(GXFIFO_ADDR);
 #else
-#define GXWGFifo (*(volatile PPCWGPipe *)GXFIFO_ADDR)
+#define GXWGFifo (*(volatile PPCWGPipe*)GXFIFO_ADDR)
 #endif
 
 #if DEBUG

@@ -55,13 +55,13 @@ static u8 lightRegisterNames[13][256] = {
     "Z Light Direction / Half Angle Z Component",
 };
 
-#define LOWORD(var) (((u16 *)&(var))[0])
-#define HIWORD(var) (((u16 *)&(var))[1])
+#define LOWORD(var) (((u16*)&(var))[0])
+#define HIWORD(var) (((u16*)&(var))[1])
 
-#define BYTE0(var) (((u8 *)&(var))[0])
-#define BYTE1(var) (((u8 *)&(var))[1])
-#define BYTE2(var) (((u8 *)&(var))[2])
-#define BYTE3(var) (((u8 *)&(var))[3])
+#define BYTE0(var) (((u8*)&(var))[0])
+#define BYTE1(var) (((u8*)&(var))[1])
+#define BYTE2(var) (((u8*)&(var))[2])
+#define BYTE3(var) (((u8*)&(var))[3])
 
 static void CountTextureTypes(void) {
     u32 i;
@@ -762,7 +762,7 @@ static void CheckFloatingPointValue(u8 dirtyBit, u32 value, char* label) {
     if ((dirtyBit == 0)) {
         return;
     }
-    valuef = *(f32 *)&value;
+    valuef = *(f32*)&value;
     ComputeSignExponentMantissa(valuef, &sign, &exponent, &mantissa);
 
     if (exponent == 0 && mantissa == 0) {
@@ -774,27 +774,27 @@ static void CheckFloatingPointValue(u8 dirtyBit, u32 value, char* label) {
             if (mantissa == 0) {
                 if (sign != 0) {
                     if (__gxVerif->verifyLevel >= __gxvWarnLev[0x5C]) {
-                        __GX_WARNF(0x5C, label, "-", *(u32 *)&valuef);
+                        __GX_WARNF(0x5C, label, "-", *(u32*)&valuef);
                     }
                 } else {
                     if (__gxVerif->verifyLevel >= __gxvWarnLev[0x5C]) {
-                        __GX_WARNF(0x5C, label, "+", *(u32 *)&valuef);
+                        __GX_WARNF(0x5C, label, "+", *(u32*)&valuef);
                     }
                 }
             } else {
                 if (__gxVerif->verifyLevel >= __gxvWarnLev[0x5D]) {
-                    __GX_WARNF(0x5D, label, *(u32 *)&valuef);
+                    __GX_WARNF(0x5D, label, *(u32*)&valuef);
                 }
             }
         }
     } else if (__gxVerif->verifyLevel >= 3) {
         if (exponent < 0x6BU) {
             if (__gxVerif->verifyLevel >= __gxvWarnLev[0x5E]) {
-                __GX_WARNF(0x5E, label, valuef, *(u32 *)&valuef);
+                __GX_WARNF(0x5E, label, valuef, *(u32*)&valuef);
             }
         } else if (exponent > 0x96U) {
             if (__gxVerif->verifyLevel >= __gxvWarnLev[0x5F]) {
-                __GX_WARNF(0x5F, label, valuef, *(u32 *)&valuef);
+                __GX_WARNF(0x5F, label, valuef, *(u32*)&valuef);
             }
         }
     }

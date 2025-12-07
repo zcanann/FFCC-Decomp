@@ -85,7 +85,7 @@ void CGItemObj::onFrameStat()
  * Address:	TODO
  * Size:	TODO
  */
-void CGItemObj::DeleteOld(int, int, CFlatRuntime::CObject *, CFlatRuntime::CObject *)
+void CGItemObj::DeleteOld(int, int, CFlatRuntime::CObject*, CFlatRuntime::CObject*)
 {
 	// TODO
 }
@@ -105,7 +105,7 @@ void CGItemObj::CanCreateFromScript()
  * Address:	TODO
  * Size:	TODO
  */
-void CGItemObj::CreateFromScript(int, int, int, CGObject *, float, CGItemObj::CCFS *)
+void CGItemObj::CreateFromScript(int, int, int, CGObject*, float, CGItemObj::CCFS*)
 {
 	// TODO
 }
@@ -125,7 +125,7 @@ void CGItemObj::safeDetach(int, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CGItemObj::carry(CGPartyObj *, int, int)
+void CGItemObj::carry(CGPartyObj*, int, int)
 {
 	// TODO
 }
@@ -165,7 +165,7 @@ void CGItemObj::onFrameAlways()
  * Address:	TODO
  * Size:	TODO
  */
-void CGItemObj::onHitParticle(int, int, int, int, Vec *, PPPIFPARAM *)
+void CGItemObj::onHitParticle(int, int, int, int, Vec*, PPPIFPARAM*)
 {
 	// TODO
 }
@@ -195,7 +195,7 @@ void CGItemObj::onNewFinished()
  * Address:	TODO
  * Size:	TODO
  */
-void CGItemObj::DrawOmoideName(CFont *)
+void CGItemObj::DrawOmoideName(CFont*)
 {
 	// TODO
 }

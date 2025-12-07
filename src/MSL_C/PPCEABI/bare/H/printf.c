@@ -860,7 +860,7 @@ static char* float2str(long double num, char *buff, print_format format) {
             if (int_digits + frac_digits > 509)
                 return 0;
 
-            q = (char *) dec.sig.text + dec.sig.length;
+            q = (char*) dec.sig.text + dec.sig.length;
 
             for (digits = 0; digits < (format.precision - frac_digits); ++digits)
                 *--p = '0';
@@ -903,7 +903,7 @@ static char* float2str(long double num, char *buff, print_format format) {
     return p;
 }
 
-static int __pformatter(void *(*WriteProc)(void *, const char *, size_t), void *WriteProcArg, const char * format_str, va_list arg) {
+static int __pformatter(void *(*WriteProc)(void*, const char*, size_t), void *WriteProcArg, const char * format_str, va_list arg) {
     int num_chars, chars_written, field_width;
     const char* format_ptr;
     const char* curr_format;
@@ -1063,7 +1063,7 @@ static int __pformatter(void *(*WriteProc)(void *, const char *, size_t), void *
                     buff_ptr = &buff[0];
                 }
                 else {
-                    buff_ptr = va_arg(arg, char *);
+                    buff_ptr = va_arg(arg, char*);
                 }
 
                 if (buff_ptr == NULL) {
@@ -1091,7 +1091,7 @@ static int __pformatter(void *(*WriteProc)(void *, const char *, size_t), void *
                 break;
 
             case 'n':
-                buff_ptr = va_arg(arg, char *);
+                buff_ptr = va_arg(arg, char*);
 
                 switch (format.argument_options) {
                     case normal_argument:

@@ -3,6 +3,6 @@
 
 struct pppFMATRIX;
 
-void pppGetRotMatrixZ(pppFMATRIX &, long);
+void pppGetRotMatrixZ(pppFMATRIX&, long);
 
 #endif // _PPP_GETROTMATRIXZ_H_

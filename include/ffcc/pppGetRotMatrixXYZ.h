@@ -4,6 +4,6 @@
 struct pppFMATRIX;
 struct pppIVECTOR4;
 
-void pppGetRotMatrixXYZ(pppFMATRIX &, pppIVECTOR4 *);
+void pppGetRotMatrixXYZ(pppFMATRIX&, pppIVECTOR4*);
 
 #endif // _PPP_GETROTMATRIXXYZ_H_

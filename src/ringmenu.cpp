@@ -65,7 +65,7 @@ void CRingMenu::onCalc()
  * Address:	TODO
  * Size:	TODO
  */
-void drawCommand(int, CFont *, float, float, CCaravanWork *, int, float, float)
+void drawCommand(int, CFont*, float, float, CCaravanWork*, int, float, float)
 {
 	// TODO
 }
@@ -95,7 +95,7 @@ void CRingMenu::drawGBA()
  * Address:	TODO
  * Size:	TODO
  */
-void CRingMenu::onScriptChanging(char *)
+void CRingMenu::onScriptChanging(char*)
 {
 	// TODO
 }
@@ -105,7 +105,7 @@ void CRingMenu::onScriptChanging(char *)
  * Address:	TODO
  * Size:	TODO
  */
-void CRingMenu::onScriptChanged(char *, int)
+void CRingMenu::onScriptChanged(char*, int)
 {
 	// TODO
 }

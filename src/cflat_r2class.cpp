@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void SAFE_CAST_MON_WORK(CGObjWork *)
+void SAFE_CAST_MON_WORK(CGObjWork*)
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void SAFE_CAST_MON_WORK(CGObjWork *)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject *, int, int, int &)
+void CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject*, int, int, int&)
 {
 	// TODO
 }
@@ -25,7 +25,7 @@ void CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject *, int, int, int &)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject *, int)
+void CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject*, int)
 {
 	// TODO
 }
@@ -35,7 +35,7 @@ void CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::onSetClassSystemVal(int, CFlatRuntime::CObject *, CFlatRuntime::CStack *, int)
+void CFlatRuntime2::onSetClassSystemVal(int, CFlatRuntime::CObject*, CFlatRuntime::CStack*, int)
 {
 	// TODO
 }

@@ -21,7 +21,7 @@ public:
 	};
     struct Sprt
     {
-        void operator=(const Sprt &);
+        void operator=(const Sprt&);
     };
     struct SPL
     {
@@ -139,7 +139,7 @@ public:
     void SetWorldParam(int, int);
     void GetWorldParam(int);
     void CallWorldParam(int, int, int);
-    void CalcSpl(SPL *, SPL *, float);
+    void CalcSpl(SPL*, SPL*, float);
     void GetFcvValue(FCV, float);
     void SetProjection(int);
     void RestoreProjection();
@@ -147,9 +147,9 @@ public:
     void CalcPitcher();
     void CalcFukidashi();
     void DrawFukidashi();
-    void ChkPlaceLength(char *);
-    void SplitPlace(const char *, char *, char *);
-    void SplitPlace2(const char *, char *, char *, CFont *, int);
+    void ChkPlaceLength(char*);
+    void SplitPlace(const char*, char*, char*);
+    void SplitPlace2(const char*, char*, char*, CFont*, int);
     void CalcWMFrame();
     void DrawWMFrame();
     void CalcWMFrame0(int);
@@ -179,14 +179,14 @@ public:
     void CalcMainMenuSub();
     void ChkSelectParty();
     void DrawMainMenuSub();
-    void GetMcAccessPos(int *, int *);
-    void GetMcOdekakePos(int *, int *);
+    void GetMcAccessPos(int*, int*);
+    void GetMcOdekakePos(int*, int*);
     void ChkMcDataCnt();
     void DrawMCList();
     void DrawHelpBase(int, float);
     void CalcMcObj();
     void DrawMcObj();
-    void SetMcList(int, struct McListInfo *);
+    void SetMcList(int, struct McListInfo*);
     void ClrMcList();
     void BindEffect(int, int, int);
     void SetLight(int);
@@ -196,15 +196,15 @@ public:
     void SetMcWinInfo(int, int);
     void DrawMcWin(short, short);
     void DrawMcWinMess(int, int);
-    void GetWinSize(int, short *, short *, int);
+    void GetWinSize(int, short*, short*, int);
     void SetTextureLoc(int);
     void GetMaxAnimWait();
     void BindMcObj();
     void DrawFilter(unsigned char, unsigned char, unsigned char, unsigned char);
-    void CopyNowCaravanDat(CMemoryCardMan::Mc::SaveDat *);
-    void SetCaravanWork(CMemoryCardMan::Mc::SaveDat *);
-    void GetSameCharaData(CMemoryCardMan::Mc::SaveDat *, CMemoryCardMan::Mc::SaveDat *, int, int);
-    void CheckSameMcFormatID(CMemoryCardMan::Mc::SaveDat *, CMemoryCardMan::Mc::SaveDat *);
+    void CopyNowCaravanDat(CMemoryCardMan::Mc::SaveDat*);
+    void SetCaravanWork(CMemoryCardMan::Mc::SaveDat*);
+    void GetSameCharaData(CMemoryCardMan::Mc::SaveDat*, CMemoryCardMan::Mc::SaveDat*, int, int);
+    void CheckSameMcFormatID(CMemoryCardMan::Mc::SaveDat*, CMemoryCardMan::Mc::SaveDat*);
     void IsAsyncCharaLoadFinish();
     void AlphaNormal();
     void AlphaAdd();

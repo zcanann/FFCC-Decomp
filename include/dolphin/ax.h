@@ -267,7 +267,7 @@ void AXQuit(void);
 
 // AXAlloc
 void AXFreeVoice(AXVPB* p);
-AXVPB* AXAcquireVoice(u32 priority, void (*callback)(void *), u32 userContext);
+AXVPB* AXAcquireVoice(u32 priority, void (*callback)(void*), u32 userContext);
 void AXSetVoicePriority(AXVPB* p, u32 priority);
 
 // AXAux

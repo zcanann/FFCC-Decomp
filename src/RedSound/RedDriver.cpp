@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void _SetSoundMode(int *)
+void _SetSoundMode(int*)
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void _SetSoundMode(int *)
  * Address:	TODO
  * Size:	TODO
  */
-void _SetReverbDepth(int *)
+void _SetReverbDepth(int*)
 {
 	// TODO
 }
@@ -25,7 +25,7 @@ void _SetReverbDepth(int *)
  * Address:	TODO
  * Size:	TODO
  */
-void _SetMusicData(int *)
+void _SetMusicData(int*)
 {
 	// TODO
 }
@@ -35,7 +35,7 @@ void _SetMusicData(int *)
  * Address:	TODO
  * Size:	TODO
  */
-void _MusicStop(int *)
+void _MusicStop(int*)
 {
 	// TODO
 }
@@ -45,7 +45,7 @@ void _MusicStop(int *)
  * Address:	TODO
  * Size:	TODO
  */
-void _MusicPlaySequence(int *)
+void _MusicPlaySequence(int*)
 {
 	// TODO
 }
@@ -55,7 +55,7 @@ void _MusicPlaySequence(int *)
  * Address:	TODO
  * Size:	TODO
  */
-void _MusicCrossPlaySequence(int *)
+void _MusicCrossPlaySequence(int*)
 {
 	// TODO
 }
@@ -65,7 +65,7 @@ void _MusicCrossPlaySequence(int *)
  * Address:	TODO
  * Size:	TODO
  */
-void _MusicNextPlaySequence(int *)
+void _MusicNextPlaySequence(int*)
 {
 	// TODO
 }
@@ -75,7 +75,7 @@ void _MusicNextPlaySequence(int *)
  * Address:	TODO
  * Size:	TODO
  */
-void _MusicMasterVolume(int *)
+void _MusicMasterVolume(int*)
 {
 	// TODO
 }
@@ -85,7 +85,7 @@ void _MusicMasterVolume(int *)
  * Address:	TODO
  * Size:	TODO
  */
-void _MusicVolume(int *)
+void _MusicVolume(int*)
 {
 	// TODO
 }
@@ -95,7 +95,7 @@ void _MusicVolume(int *)
  * Address:	TODO
  * Size:	TODO
  */
-void _SetMusicPhraseStop(int *)
+void _SetMusicPhraseStop(int*)
 {
 	// TODO
 }
@@ -105,7 +105,7 @@ void _SetMusicPhraseStop(int *)
  * Address:	TODO
  * Size:	TODO
  */
-void _SetSeBlockData(int *)
+void _SetSeBlockData(int*)
 {
 	// TODO
 }
@@ -115,7 +115,7 @@ void _SetSeBlockData(int *)
  * Address:	TODO
  * Size:	TODO
  */
-void _SetSeSepData(int *)
+void _SetSeSepData(int*)
 {
 	// TODO
 }
@@ -125,7 +125,7 @@ void _SetSeSepData(int *)
  * Address:	TODO
  * Size:	TODO
  */
-void _ClearSeSepData(int *)
+void _ClearSeSepData(int*)
 {
 	// TODO
 }
@@ -135,7 +135,7 @@ void _ClearSeSepData(int *)
  * Address:	TODO
  * Size:	TODO
  */
-void _ClearSeSepDataMG(int *)
+void _ClearSeSepDataMG(int*)
 {
 	// TODO
 }
@@ -145,7 +145,7 @@ void _ClearSeSepDataMG(int *)
  * Address:	TODO
  * Size:	TODO
  */
-void _SeStop(int *)
+void _SeStop(int*)
 {
 	// TODO
 }
@@ -155,7 +155,7 @@ void _SeStop(int *)
  * Address:	TODO
  * Size:	TODO
  */
-void _SeStopMG(int *)
+void _SeStopMG(int*)
 {
 	// TODO
 }
@@ -165,7 +165,7 @@ void _SeStopMG(int *)
  * Address:	TODO
  * Size:	TODO
  */
-void _SeBlockPlay(int *)
+void _SeBlockPlay(int*)
 {
 	// TODO
 }
@@ -175,7 +175,7 @@ void _SeBlockPlay(int *)
  * Address:	TODO
  * Size:	TODO
  */
-void _SeSepPlay(int *)
+void _SeSepPlay(int*)
 {
 	// TODO
 }
@@ -185,7 +185,7 @@ void _SeSepPlay(int *)
  * Address:	TODO
  * Size:	TODO
  */
-void _SeSepPlaySequence(int *)
+void _SeSepPlaySequence(int*)
 {
 	// TODO
 }
@@ -195,7 +195,7 @@ void _SeSepPlaySequence(int *)
  * Address:	TODO
  * Size:	TODO
  */
-void _SeMasterVolume(int *)
+void _SeMasterVolume(int*)
 {
 	// TODO
 }
@@ -205,7 +205,7 @@ void _SeMasterVolume(int *)
  * Address:	TODO
  * Size:	TODO
  */
-void _SeVolume(int *)
+void _SeVolume(int*)
 {
 	// TODO
 }
@@ -215,7 +215,7 @@ void _SeVolume(int *)
  * Address:	TODO
  * Size:	TODO
  */
-void _SePan(int *)
+void _SePan(int*)
 {
 	// TODO
 }
@@ -225,7 +225,7 @@ void _SePan(int *)
  * Address:	TODO
  * Size:	TODO
  */
-void _SePitch(int *)
+void _SePitch(int*)
 {
 	// TODO
 }
@@ -235,7 +235,7 @@ void _SePitch(int *)
  * Address:	TODO
  * Size:	TODO
  */
-void _SePause(int *)
+void _SePause(int*)
 {
 	// TODO
 }
@@ -245,7 +245,7 @@ void _SePause(int *)
  * Address:	TODO
  * Size:	TODO
  */
-void _StreamStop(int *)
+void _StreamStop(int*)
 {
 	// TODO
 }
@@ -255,7 +255,7 @@ void _StreamStop(int *)
  * Address:	TODO
  * Size:	TODO
  */
-void _StreamPlay(int *)
+void _StreamPlay(int*)
 {
 	// TODO
 }
@@ -265,7 +265,7 @@ void _StreamPlay(int *)
  * Address:	TODO
  * Size:	TODO
  */
-void _StreamVolume(int *)
+void _StreamVolume(int*)
 {
 	// TODO
 }
@@ -275,7 +275,7 @@ void _StreamVolume(int *)
  * Address:	TODO
  * Size:	TODO
  */
-void _StreamPause(int *)
+void _StreamPause(int*)
 {
 	// TODO
 }
@@ -285,7 +285,7 @@ void _StreamPause(int *)
  * Address:	TODO
  * Size:	TODO
  */
-void _EntryExecCommand(void (*) (int *), int, int, int, int, int, int, int)
+void _EntryExecCommand(void (*) (int*), int, int, int, int, int, int, int)
 {
 	// TODO
 }
@@ -325,7 +325,7 @@ void GetMyEntryID()
  * Address:	TODO
  * Size:	TODO
  */
-void _MyAlarmHandler(OSAlarm *, OSContext *)
+void _MyAlarmHandler(OSAlarm*, OSContext*)
 {
 	// TODO
 }
@@ -345,7 +345,7 @@ void RedSleep(int)
  * Address:	TODO
  * Size:	TODO
  */
-void _MainThread(void *)
+void _MainThread(void*)
 {
 	// TODO
 }
@@ -355,7 +355,7 @@ void _MainThread(void *)
  * Address:	TODO
  * Size:	TODO
  */
-void _WaveSettingThread(void *)
+void _WaveSettingThread(void*)
 {
 	// TODO
 }
@@ -385,7 +385,7 @@ void _DmaCallback(unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void RedDmaEntry(int, int, int, int, int, void (*) (void *), void *)
+void RedDmaEntry(int, int, int, int, int, void (*) (void*), void*)
 {
 	// TODO
 }
@@ -415,7 +415,7 @@ void _DmaExecute()
  * Address:	TODO
  * Size:	TODO
  */
-void _DmaExecuteThread(void *)
+void _DmaExecuteThread(void*)
 {
 	// TODO
 }
@@ -425,7 +425,7 @@ void _DmaExecuteThread(void *)
  * Address:	TODO
  * Size:	TODO
  */
-void _MusicSkipThread(void *)
+void _MusicSkipThread(void*)
 {
 	// TODO
 }
@@ -515,7 +515,7 @@ void CRedDriver::GetSoundMode()
  * Address:	TODO
  * Size:	TODO
  */
-void CRedDriver::SetMusicData(void *)
+void CRedDriver::SetMusicData(void*)
 {
 	// TODO
 }
@@ -615,7 +615,7 @@ void CRedDriver::SetMusicPhraseStop(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedDriver::SetSeBlockData(int, void *)
+void CRedDriver::SetSeBlockData(int, void*)
 {
 	// TODO
 }
@@ -625,7 +625,7 @@ void CRedDriver::SetSeBlockData(int, void *)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedDriver::SetSeSepData(void *)
+void CRedDriver::SetSeSepData(void*)
 {
 	// TODO
 }
@@ -805,7 +805,7 @@ void CRedDriver::StreamPlayState(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedDriver::GetStreamPlayPoint(int, int *, int *)
+void CRedDriver::GetStreamPlayPoint(int, int*, int*)
 {
 	// TODO
 }
@@ -825,7 +825,7 @@ void CRedDriver::StreamStop(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedDriver::StreamPlay(int, void *, int, int, int)
+void CRedDriver::StreamPlay(int, void*, int, int, int)
 {
 	// TODO
 }
@@ -885,7 +885,7 @@ void CRedDriver::ClearWaveBank(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedDriver::SetWaveData(int, int, void *, int)
+void CRedDriver::SetWaveData(int, int, void*, int)
 {
 	// TODO
 }

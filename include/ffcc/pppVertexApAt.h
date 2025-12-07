@@ -6,7 +6,7 @@ class PVertexApAt;
 class PVertexApLc;
 
 void pppVertexApAtCon(void);
-void apea(_pppPObject *, PVertexApAt *, unsigned short);
+void apea(_pppPObject*, PVertexApAt*, unsigned short);
 void pppVertexApAt(void);
 
 #endif // _PPP_VERTEXAPAT_H_

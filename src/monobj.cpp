@@ -255,7 +255,7 @@ void CGMonObj::onStatDie()
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::onDrawDebug(CFont *, float, float &, float)
+void CGMonObj::onDrawDebug(CFont*, float, float&, float)
 {
 	// TODO
 }
@@ -265,7 +265,7 @@ void CGMonObj::onDrawDebug(CFont *, float, float &, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::onAttacked(CGPrgObj *)
+void CGMonObj::onAttacked(CGPrgObj*)
 {
 	// TODO
 }
@@ -275,7 +275,7 @@ void CGMonObj::onAttacked(CGPrgObj *)
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::onDamaged(CGPrgObj *)
+void CGMonObj::onDamaged(CGPrgObj*)
 {
 	// TODO
 }
@@ -285,7 +285,7 @@ void CGMonObj::onDamaged(CGPrgObj *)
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::link(CGPartyObj *, CGMonObj *)
+void CGMonObj::link(CGPartyObj*, CGMonObj*)
 {
 	// TODO
 }
@@ -315,7 +315,7 @@ void CGMonObj::aiTargetAttackRomMon(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::checkCol(int, float, float, float *, int *)
+void CGMonObj::checkCol(int, float, float, float*, int*)
 {
 	// TODO
 }
@@ -405,7 +405,7 @@ void CGMonObj::moveCancel()
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::moveChase(CGCharaObj *)
+void CGMonObj::moveChase(CGCharaObj*)
 {
 	// TODO
 }
@@ -425,7 +425,7 @@ void CGMonObj::moveEscape()
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::moveAway(CGCharaObj *, int, int, int, int)
+void CGMonObj::moveAway(CGCharaObj*, int, int, int, int)
 {
 	// TODO
 }
@@ -435,7 +435,7 @@ void CGMonObj::moveAway(CGCharaObj *, int, int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::moveChaseAndStat(CGCharaObj *, int, float, int, int)
+void CGMonObj::moveChaseAndStat(CGCharaObj*, int, float, int, int)
 {
 	// TODO
 }
@@ -475,7 +475,7 @@ void CGMonObj::mlAttack()
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::aiAddDefault(int &)
+void CGMonObj::aiAddDefault(int&)
 {
 	// TODO
 }
@@ -625,7 +625,7 @@ void CGMonObj::statMove()
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::moveAStar(int, int, Vec &)
+void CGMonObj::moveAStar(int, int, Vec&)
 {
 	// TODO
 }

@@ -5,8 +5,8 @@ struct VRain;
 struct PRain;
 struct RAIN_DATA;
 
-void InitRainData(VRain *, PRain *, RAIN_DATA *);
-void UpdateRain(VRain *, PRain *, RAIN_DATA *);
+void InitRainData(VRain*, PRain*, RAIN_DATA*);
+void UpdateRain(VRain*, PRain*, RAIN_DATA*);
 void pppConstructRain(void);
 void pppDestructRain(void);
 void pppFrameRain(void);

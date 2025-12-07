@@ -3,7 +3,7 @@
 
 struct VYmDeformationMdl;
 
-void SetUpIndWarp(VYmDeformationMdl *);
+void SetUpIndWarp(VYmDeformationMdl*);
 void DisableIndWarp(void);
 void pppConstructYmDeformationMdl(void);
 void pppConstruct2YmDeformationMdl(void);

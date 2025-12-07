@@ -19,8 +19,8 @@ public:
     void GetTable(unsigned long);
     void create();
     void createViewer();
-    void LoadMap(char *, void *, unsigned long, unsigned char);
-    void LoadMap(int, int, void *, unsigned long, unsigned char);
+    void LoadMap(char*, void*, unsigned long, unsigned char);
+    void LoadMap(int, int, void*, unsigned long, unsigned char);
     void IsLoadMapCompleted();
     void destroy();
     void calcInit();
@@ -33,7 +33,7 @@ public:
     void drawViewer();
     void drawAfter();
     void drawAfterViewer();
-    void GetMapLightHolder(long, _GXColor *, Vec *);
+    void GetMapLightHolder(long, _GXColor*, Vec*);
 };
 
 #endif // _FFCC_P_MAP_H_

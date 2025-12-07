@@ -55,7 +55,7 @@ void CMapMesh::Off2Ptr()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMesh::ReadOtmMesh(CChunkFile &, CMemory::CStage *, int, int)
+void CMapMesh::ReadOtmMesh(CChunkFile&, CMemory::CStage*, int, int)
 {
 	// TODO
 }
@@ -95,7 +95,7 @@ void CMapMesh::DrawMeshCharaShadow(unsigned short, unsigned short)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMesh::Draw(CMaterialSet *)
+void CMapMesh::Draw(CMaterialSet*)
 {
 	// TODO
 }
@@ -105,7 +105,7 @@ void CMapMesh::Draw(CMaterialSet *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMesh::DrawPart(CMaterialSet *, int)
+void CMapMesh::DrawPart(CMaterialSet*, int)
 {
 	// TODO
 }
@@ -115,7 +115,7 @@ void CMapMesh::DrawPart(CMaterialSet *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMesh::GetTexture(CMaterialSet *, int &)
+void CMapMesh::GetTexture(CMaterialSet*, int&)
 {
 	// TODO
 }
@@ -125,7 +125,7 @@ void CMapMesh::GetTexture(CMaterialSet *, int &)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMesh::SetDisplayListMaterial(CMaterialSet *, char **, CAmemCacheSet *)
+void CMapMesh::SetDisplayListMaterial(CMaterialSet*, char **, CAmemCacheSet*)
 {
 	// TODO
 }
@@ -135,7 +135,7 @@ void CMapMesh::SetDisplayListMaterial(CMaterialSet *, char **, CAmemCacheSet *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMesh::pppCacheLoadModelTexture(CMaterialSet *, CAmemCacheSet *)
+void CMapMesh::pppCacheLoadModelTexture(CMaterialSet*, CAmemCacheSet*)
 {
 	// TODO
 }
@@ -145,7 +145,7 @@ void CMapMesh::pppCacheLoadModelTexture(CMaterialSet *, CAmemCacheSet *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMesh::pppCacheUnLoadModelTexture(CMaterialSet *, CAmemCacheSet *)
+void CMapMesh::pppCacheUnLoadModelTexture(CMaterialSet*, CAmemCacheSet*)
 {
 	// TODO
 }
@@ -155,7 +155,7 @@ void CMapMesh::pppCacheUnLoadModelTexture(CMaterialSet *, CAmemCacheSet *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMesh::pppCacheRefCnt0UpModelTexture(CMaterialSet *, CAmemCacheSet *)
+void CMapMesh::pppCacheRefCnt0UpModelTexture(CMaterialSet*, CAmemCacheSet*)
 {
 	// TODO
 }
@@ -165,7 +165,7 @@ void CMapMesh::pppCacheRefCnt0UpModelTexture(CMaterialSet *, CAmemCacheSet *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMesh::pppCacheDumpModelTexture(CMaterialSet *, CAmemCacheSet *)
+void CMapMesh::pppCacheDumpModelTexture(CMaterialSet*, CAmemCacheSet*)
 {
 	// TODO
 }

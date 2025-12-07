@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void FindIntersection(const Vec &, const Vec &, const CMapCylinder &, float &)
+void FindIntersection(const Vec&, const Vec&, const CMapCylinder&, float&)
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void FindIntersection(const Vec &, const Vec &, const CMapCylinder &, float &)
  * Address:	TODO
  * Size:	TODO
  */
-void CheckLineCylinder(const Vec &, const Vec &, const CMapCylinder &, float &)
+void CheckLineCylinder(const Vec&, const Vec&, const CMapCylinder&, float&)
 {
 	// TODO
 }
@@ -55,7 +55,7 @@ CMapHit::~CMapHit()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapHit::ReadOtmHit(CChunkFile &)
+void CMapHit::ReadOtmHit(CChunkFile&)
 {
 	// TODO
 }
@@ -75,7 +75,7 @@ void CMapHit::CheckHitFaceCylinder(unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapCylinder::operator= (const CMapCylinder &)
+void CMapCylinder::operator= (const CMapCylinder&)
 {
 	// TODO
 }
@@ -85,7 +85,7 @@ void CMapCylinder::operator= (const CMapCylinder &)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapHit::GetHitFaceNormal(Vec *)
+void CMapHit::GetHitFaceNormal(Vec*)
 {
 	// TODO
 }
@@ -95,7 +95,7 @@ void CMapHit::GetHitFaceNormal(Vec *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapHit::CalcHitSlide(Vec *, float)
+void CMapHit::CalcHitSlide(Vec*, float)
 {
 	// TODO
 }
@@ -105,7 +105,7 @@ void CMapHit::CalcHitSlide(Vec *, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapHit::CalcHitPosition(Vec *)
+void CMapHit::CalcHitPosition(Vec*)
 {
 	// TODO
 }
@@ -115,7 +115,7 @@ void CMapHit::CalcHitPosition(Vec *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapHit::CheckHitCylinder(CMapCylinder *, Vec *, unsigned long)
+void CMapHit::CheckHitCylinder(CMapCylinder*, Vec*, unsigned long)
 {
 	// TODO
 }
@@ -125,7 +125,7 @@ void CMapHit::CheckHitCylinder(CMapCylinder *, Vec *, unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapHit::CheckHitCylinder(CMapCylinder *, Vec *, unsigned short, unsigned short, unsigned long)
+void CMapHit::CheckHitCylinder(CMapCylinder*, Vec*, unsigned short, unsigned short, unsigned long)
 {
 	// TODO
 }
@@ -135,7 +135,7 @@ void CMapHit::CheckHitCylinder(CMapCylinder *, Vec *, unsigned short, unsigned s
  * Address:	TODO
  * Size:	TODO
  */
-void CMapHit::CheckHitCylinderNear(CMapCylinder *, Vec *, unsigned long)
+void CMapHit::CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned long)
 {
 	// TODO
 }
@@ -145,7 +145,7 @@ void CMapHit::CheckHitCylinderNear(CMapCylinder *, Vec *, unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapHit::CheckHitCylinderNear(CMapCylinder *, Vec *, unsigned short, unsigned short, unsigned long)
+void CMapHit::CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned short, unsigned short, unsigned long)
 {
 	// TODO
 }

@@ -13,7 +13,7 @@ static const float  sZeroFloat = 0.0f;  // FLOAT_80330350
  * Address:	TODO
  * Size:	TODO
  */
-void VECNormalizeZero(Vec *, Vec *)
+void VECNormalizeZero(Vec*, Vec*)
 {
 	// TODO
 }
@@ -186,7 +186,7 @@ void CGObject::CancelMove(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::Move(Vec *, float, int, int, int, int, int)
+void CGObject::Move(Vec*, float, int, int, int, int, int)
 {
 	// TODO
 }
@@ -196,7 +196,7 @@ void CGObject::Move(Vec *, float, int, int, int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::MoveVector(Vec *, float, int, int, int, int)
+void CGObject::MoveVector(Vec*, float, int, int, int, int)
 {
 	// TODO
 }
@@ -206,7 +206,7 @@ void CGObject::MoveVector(Vec *, float, int, int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::moveVector(Vec *, float, int)
+void CGObject::moveVector(Vec*, float, int)
 {
 	// TODO
 }
@@ -216,7 +216,7 @@ void CGObject::moveVector(Vec *, float, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::moveVectorH(Vec *, float, int)
+void CGObject::moveVectorH(Vec*, float, int)
 {
 	// TODO
 }
@@ -246,7 +246,7 @@ void CGObject::moveVectorHRot(float, float, float, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::CCClass(int, int, float, Vec *, float)
+void CGObject::CCClass(int, int, float, Vec*, float)
 {
 	// TODO
 }
@@ -266,7 +266,7 @@ void CGObject::CCClassRot(int, int, float, float, float, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::Attach(CGObject *, char *, Vec *)
+void CGObject::Attach(CGObject*, char*, Vec*)
 {
 	// TODO
 }
@@ -296,7 +296,7 @@ void CGObject::DispCharaParts(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::SetAttackCol(int, char *, float, Vec *)
+void CGObject::SetAttackCol(int, char*, float, Vec*)
 {
 	// TODO
 }
@@ -306,7 +306,7 @@ void CGObject::SetAttackCol(int, char *, float, Vec *)
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::SetDamageCol(int, char *, float, float, Vec *)
+void CGObject::SetDamageCol(int, char*, float, float, Vec*)
 {
 	// TODO
 }
@@ -336,7 +336,7 @@ void CGObject::Turn(float, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::HitParticle(int, int, int, int, Vec *, PPPIFPARAM *)
+void CGObject::HitParticle(int, int, int, int, Vec*, PPPIFPARAM*)
 {
 	// TODO
 }
@@ -356,7 +356,7 @@ void CGObject::SetClassWork(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::SetTexAnim(char *)
+void CGObject::SetTexAnim(char*)
 {
 	// TODO
 }
@@ -366,7 +366,7 @@ void CGObject::SetTexAnim(char *)
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::LookAt(CGObject *, char *)
+void CGObject::LookAt(CGObject*, char*)
 {
 	// TODO
 }
@@ -416,7 +416,7 @@ void CGObject::LoadShield(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::LoadAnim(char *, int, int, int, unsigned long)
+void CGObject::LoadAnim(char*, int, int, int, unsigned long)
 {
 	// TODO
 }
@@ -523,7 +523,7 @@ void CGObject::CancelAnim(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::PlayAnim(int, int, int, int, int, char *)
+void CGObject::PlayAnim(int, int, int, int, int, char*)
 {
 	// TODO
 }
@@ -543,7 +543,7 @@ void CGObject::SetDispItemName(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::DrawDebug(CFont *)
+void CGObject::DrawDebug(CFont*)
 {
 	// TODO
 }
@@ -553,7 +553,7 @@ void CGObject::DrawDebug(CFont *)
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::SetPosBG(Vec *, int)
+void CGObject::SetPosBG(Vec*, int)
 {
 	// TODO
 }
@@ -573,7 +573,7 @@ void CGObject::ResetDynamics()
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::CalcSphereNearPos(float, float, Vec &)
+void CGObject::CalcSphereNearPos(float, float, Vec&)
 {
 	// TODO
 }
@@ -613,7 +613,7 @@ void CGObject::SetAnimSlot(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::CalcSafePos(int, CGObject *, Vec *)
+void CGObject::CalcSafePos(int, CGObject*, Vec*)
 {
 	// TODO
 }
@@ -643,7 +643,7 @@ bool CGObject::IsDispRader()
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::onHit(int, CGObject *, int, Vec *)
+void CGObject::onHit(int, CGObject*, int, Vec*)
 {
 	// TODO
 }
@@ -673,7 +673,7 @@ void CGObject::onAlphaUpdate()
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::onHitParticle(int, int, int, int, Vec *, PPPIFPARAM *)
+void CGObject::onHitParticle(int, int, int, int, Vec*, PPPIFPARAM*)
 {
 	// TODO
 }
@@ -683,7 +683,7 @@ void CGObject::onHitParticle(int, int, int, int, Vec *, PPPIFPARAM *)
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::onDrawDebug(CFont *, float, float &, float)
+void CGObject::onDrawDebug(CFont*, float, float&, float)
 {
 	// TODO
 }

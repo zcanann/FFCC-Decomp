@@ -35,7 +35,7 @@ void ZLIST::DeleteList()
  * Address:	TODO
  * Size:	TODO
  */
-void ZLIST::AddTail(void *)
+void ZLIST::AddTail(void*)
 {
 	// TODO
 }

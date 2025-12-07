@@ -45,7 +45,7 @@ void CPartPcs::Quit()
  * Address:	TODO
  * Size:	TODO
  */
-void CPartPcs::onScriptChanging(char *)
+void CPartPcs::onScriptChanging(char*)
 {
 	// TODO
 }
@@ -155,7 +155,7 @@ void CPartPcs::destroy()
  * Address:	TODO
  * Size:	TODO
  */
-void CPartPcs::ChangeDataStage(CMemory::CStage *)
+void CPartPcs::ChangeDataStage(CMemory::CStage*)
 {
 	// TODO
 }
@@ -315,7 +315,7 @@ void CPartPcs::DrawMenuIdx(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartPcs::SetParLocIdx(int, Vec &)
+void CPartPcs::SetParLocIdx(int, Vec&)
 {
 	// TODO
 }
@@ -325,7 +325,7 @@ void CPartPcs::SetParLocIdx(int, Vec &)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartPcs::GetParLocIdx(int, Vec &)
+void CPartPcs::GetParLocIdx(int, Vec&)
 {
 	// TODO
 }
@@ -335,7 +335,7 @@ void CPartPcs::GetParLocIdx(int, Vec &)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartPcs::SetParColIdx(int, pppFVECTOR4 &)
+void CPartPcs::SetParColIdx(int, pppFVECTOR4&)
 {
 	// TODO
 }
@@ -345,7 +345,7 @@ void CPartPcs::SetParColIdx(int, pppFVECTOR4 &)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartPcs::GetParColIdx(int, pppFVECTOR4 &)
+void CPartPcs::GetParColIdx(int, pppFVECTOR4&)
 {
 	// TODO
 }
@@ -385,7 +385,7 @@ void LoadFieldPdt0(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartPcs::LoadFieldPdt(int, int, void *, unsigned long, unsigned char)
+void CPartPcs::LoadFieldPdt(int, int, void*, unsigned long, unsigned char)
 {
 	// TODO
 }
@@ -395,7 +395,7 @@ void CPartPcs::LoadFieldPdt(int, int, void *, unsigned long, unsigned char)
  * Address:	TODO
  * Size:	TODO
  */
-void loadPdtPtx(char *, void *, int, void *, int, int)
+void loadPdtPtx(char*, void*, int, void*, int, int)
 {
 	// TODO
 }
@@ -405,7 +405,7 @@ void loadPdtPtx(char *, void *, int, void *, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartPcs::LoadMonsterPdt(int, int, void *, int, void *, int)
+void CPartPcs::LoadMonsterPdt(int, int, void*, int, void*, int)
 {
 	// TODO
 }
@@ -415,7 +415,7 @@ void CPartPcs::LoadMonsterPdt(int, int, void *, int, void *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartPcs::LoadMenuPdt(char *)
+void CPartPcs::LoadMenuPdt(char*)
 {
 	// TODO
 }

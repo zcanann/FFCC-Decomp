@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterialEditorPcs::ResetRsdList(ZLIST *)
+void CMaterialEditorPcs::ResetRsdList(ZLIST*)
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void CMaterialEditorPcs::ResetRsdList(ZLIST *)
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterialEditorPcs::DeleteRsdItem(RSDLISTITEM *)
+void CMaterialEditorPcs::DeleteRsdItem(RSDLISTITEM*)
 {
 	// TODO
 }
@@ -35,7 +35,7 @@ void CMaterialEditorPcs::DeleteColAnmData(ZCANMGRP **, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterialEditorPcs::AddRsdList(ZLIST *)
+void CMaterialEditorPcs::AddRsdList(ZLIST*)
 {
 	// TODO
 }

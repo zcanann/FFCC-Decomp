@@ -25,7 +25,7 @@ CMes::~CMes()
  * Address:	TODO
  * Size:	TODO
  */
-void CMes::Set(char *, int)
+void CMes::Set(char*, int)
 {
 	// TODO
 }
@@ -135,7 +135,7 @@ void CMes::useFlag(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMes::addFlag(CMes::CFlag &)
+void CMes::addFlag(CMes::CFlag&)
 {
 	// TODO
 }
@@ -145,7 +145,7 @@ void CMes::addFlag(CMes::CFlag &)
  * Address:	TODO
  * Size:	TODO
  */
-void CMes::CFlag::operator= (const CMes::CFlag &)
+void CMes::CFlag::operator= (const CMes::CFlag&)
 {
 	// TODO
 }
@@ -155,7 +155,7 @@ void CMes::CFlag::operator= (const CMes::CFlag &)
  * Address:	TODO
  * Size:	TODO
  */
-void CMes::MakeAgbString(char *, char *, int, int)
+void CMes::MakeAgbString(char*, char*, int, int)
 {
 	// TODO
 }
@@ -165,7 +165,7 @@ void CMes::MakeAgbString(char *, char *, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMes::drawTagString(CFont *, char *, int, int, int)
+void CMes::drawTagString(CFont*, char*, int, int, int)
 {
 	// TODO
 }

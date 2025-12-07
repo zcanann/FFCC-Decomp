@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void ImageBufferSetPixel_IA8(HSD_ImageBuffer *, unsigned long, unsigned long, unsigned long, unsigned long, unsigned long, unsigned long)
+void ImageBufferSetPixel_IA8(HSD_ImageBuffer*, unsigned long, unsigned long, unsigned long, unsigned long, unsigned long, unsigned long)
 {
 	// TODO
 }
@@ -15,7 +15,7 @@ void ImageBufferSetPixel_IA8(HSD_ImageBuffer *, unsigned long, unsigned long, un
  * Address:	TODO
  * Size:	TODO
  */
-void MakeRefractionMap(HSD_ImageBuffer *)
+void MakeRefractionMap(HSD_ImageBuffer*)
 {
 	// TODO
 }

@@ -101,7 +101,7 @@ do { \
 do { \
     f32 xfData = (value); \
     GX_WRITE_F32(value); \
-    VERIF_XF_REG_alt(addr, *(u32 *)&xfData); \
+    VERIF_XF_REG_alt(addr, *(u32*)&xfData); \
 } while (0)
 #else
 #define GX_WRITE_XF_REG_2(addr, value) \

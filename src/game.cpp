@@ -176,7 +176,7 @@ void CGame::ChangeMap(int mapId, int mapVariant, int param4, int param5)
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::ScriptChanging(char *)
+void CGame::ScriptChanging(char*)
 {
 	// TODO
 }
@@ -186,7 +186,7 @@ void CGame::ScriptChanging(char *)
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::ScriptChanged(char *, int)
+void CGame::ScriptChanged(char*, int)
 {
 	// TODO
 }
@@ -369,7 +369,7 @@ void CGame::Draw3()
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::HitParticleBG(int, int, int, Vec *, PPPIFPARAM *)
+void CGame::HitParticleBG(int, int, int, Vec*, PPPIFPARAM*)
 {
 	// TODO
 }
@@ -379,7 +379,7 @@ void CGame::HitParticleBG(int, int, int, Vec *, PPPIFPARAM *)
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::ParticleFrameCallback(int, int, int, int, int, Vec *)
+void CGame::ParticleFrameCallback(int, int, int, int, int, Vec*)
 {
 	// TODO
 }
@@ -389,7 +389,7 @@ void CGame::ParticleFrameCallback(int, int, int, int, int, Vec *)
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::SaveScript(char *)
+void CGame::SaveScript(char*)
 {
 	// TODO
 }
@@ -399,7 +399,7 @@ void CGame::SaveScript(char *)
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::LoadScript(char *)
+void CGame::LoadScript(char*)
 {
 	// TODO
 }
@@ -449,7 +449,7 @@ void CGame::GetFoodLevel(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::GetTargetCursor(int, Vec &, Vec &)
+void CGame::GetTargetCursor(int, Vec&, Vec&)
 {
 	// TODO
 }
@@ -459,7 +459,7 @@ void CGame::GetTargetCursor(int, Vec &, Vec &)
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::GetParticleSpecialInfo(PPPIFPARAM &, int &, int &)
+void CGame::GetParticleSpecialInfo(PPPIFPARAM&, int&, int&)
 {
 	// TODO
 }
@@ -479,7 +479,7 @@ void CGame::GetPartyObj(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::MakeArtItemName(char *, int, int)
+void CGame::MakeArtItemName(char*, int, int)
 {
 	// TODO
 }
@@ -489,7 +489,7 @@ void CGame::MakeArtItemName(char *, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::MakeArtsItemNames(char *, int)
+void CGame::MakeArtsItemNames(char*, int)
 {
 	// TODO
 }
@@ -499,7 +499,7 @@ void CGame::MakeArtsItemNames(char *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::MakeNumItemName(char *, int, int)
+void CGame::MakeNumItemName(char*, int, int)
 {
 	// TODO
 }
@@ -509,7 +509,7 @@ void CGame::MakeNumItemName(char *, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::MakeArtMonName(char *, int, int)
+void CGame::MakeArtMonName(char*, int, int)
 {
 	// TODO
 }
@@ -519,7 +519,7 @@ void CGame::MakeArtMonName(char *, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::MakeArtsMonNames(char *, int)
+void CGame::MakeArtsMonNames(char*, int)
 {
 	// TODO
 }
@@ -529,7 +529,7 @@ void CGame::MakeArtsMonNames(char *, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::MakeNumMonName(char *, int, int)
+void CGame::MakeNumMonName(char*, int, int)
 {
 	// TODO
 }

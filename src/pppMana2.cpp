@@ -5,7 +5,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void Mana2_DrawMeshDLCallback(CChara::CModel *, void *, void *, int, int, float (*) [4])
+void Mana2_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*) [4])
 {
 	// TODO
 }
@@ -55,7 +55,7 @@ void pppRenderMana2(void)
  * Address:	TODO
  * Size:	TODO
  */
-void Mana2_BeforeDrawCallback(CChara::CModel *, void *, void *, float (*) [4], int)
+void Mana2_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
 {
 	// TODO
 }
@@ -75,7 +75,7 @@ void GXSetTexCoordGen(void)
  * Address:	TODO
  * Size:	TODO
  */
-void CalcReflectionVector2(Vec *, S16Vec *, S16Vec *, long, unsigned long, unsigned long, float (*) [4], void *, unsigned long, _GXColor *, S16Vec2d *, CChara::CNode *)
+void CalcReflectionVector2(Vec*, S16Vec*, S16Vec*, long, unsigned long, unsigned long, float (*) [4], void*, unsigned long, _GXColor*, S16Vec2d*, CChara::CNode*)
 {
 	// TODO
 }
@@ -85,7 +85,7 @@ void CalcReflectionVector2(Vec *, S16Vec *, S16Vec *, long, unsigned long, unsig
  * Address:	TODO
  * Size:	TODO
  */
-void MakeWave(Vec *, unsigned short *, float *, Vec*, float, float)
+void MakeWave(Vec*, unsigned short*, float*, Vec*, float, float)
 {
 	// TODO
 }
@@ -95,7 +95,7 @@ void MakeWave(Vec *, unsigned short *, float *, Vec*, float, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CreateWaterMesh(Vec *, Vec *, Vec2d *, unsigned short *, float)
+void CreateWaterMesh(Vec*, Vec*, Vec2d*, unsigned short*, float)
 {
 	// TODO
 }
@@ -105,7 +105,7 @@ void CreateWaterMesh(Vec *, Vec *, Vec2d *, unsigned short *, float)
  * Address:	TODO
  * Size:	TODO
  */
-void UpdateWaterMesh(VMana2 *)
+void UpdateWaterMesh(VMana2*)
 {
 	// TODO
 }
@@ -115,7 +115,7 @@ void UpdateWaterMesh(VMana2 *)
  * Address:	TODO
  * Size:	TODO
  */
-void RenderWaterMesh(VMana2 *)
+void RenderWaterMesh(VMana2*)
 {
 	// TODO
 }
@@ -135,7 +135,7 @@ void GXEnd(void)
  * Address:	TODO
  * Size:	TODO
  */
-void CalculateNormal(VMana2 *)
+void CalculateNormal(VMana2*)
 {
 	// TODO
 }
@@ -145,7 +145,7 @@ void CalculateNormal(VMana2 *)
  * Address:	TODO
  * Size:	TODO
  */
-void CalcWaterReflectionVector(Vec *, Vec *, Vec *, long, Vec*, float (*) [4], _GXColor *, Vec2d *)
+void CalcWaterReflectionVector(Vec*, Vec*, Vec*, long, Vec*, float (*) [4], _GXColor*, Vec2d*)
 {
 	// TODO
 }

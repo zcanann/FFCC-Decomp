@@ -7,12 +7,12 @@ class HitEInfo;
 
 struct GbaPInfo
 {
-    GbaPInfo &operator=(const GbaPInfo &);
+    GbaPInfo &operator=(const GbaPInfo&);
 };
 
 struct GbaCMakeInfo
 {
-    GbaCMakeInfo &operator=(const GbaCMakeInfo &);
+    GbaCMakeInfo &operator=(const GbaCMakeInfo&);
 };
 
 class GbaQueue
@@ -38,26 +38,26 @@ public:
     void SetBuyData(int, unsigned int);
     void SetSmithData(int, unsigned int);
     void SetStageNo(int, int);
-    void GetStageNo(int, int *, int *);
+    void GetStageNo(int, int*, int*);
     void GetStageFlg(int);
     void ClrStageFlg(int);
     void SetRadarType();
-    void GetMBasePos(int, short *, short *);
+    void GetMBasePos(int, short*, short*);
     void LoadAllStat();
     void LoadPlayerStat();
     void LoadEnemyStat();
     void LoadMapItemStat();
-    void GetPlayerPos(int, unsigned int *);
-    void GetEnemyPos(int, unsigned int *, int *);
-    void GetTreasurePos(int, unsigned int *, int *);
-    void GetMapObjInfo(int, unsigned char *);
-    void GetPlayerStat(int, GbaPInfo *);
-    void GetCaravanName(char *);
-    void GetItemAll(int, unsigned char *);
+    void GetPlayerPos(int, unsigned int*);
+    void GetEnemyPos(int, unsigned int*, int*);
+    void GetTreasurePos(int, unsigned int*, int*);
+    void GetMapObjInfo(int, unsigned char*);
+    void GetPlayerStat(int, GbaPInfo*);
+    void GetCaravanName(char*);
+    void GetItemAll(int, unsigned char*);
     void GetScrFlg();
-    void GetPlayerHP(int, unsigned char *);
-    void MakeLetterList(int, char *);
-    void MakeLetterData(int, char *, int);
+    void GetPlayerHP(int, unsigned char*);
+    void MakeLetterList(int, char*);
+    void MakeLetterData(int, char*, int);
     void GetLetterLstFlg(int);
     void ClrLetterLstFlg(int);
     void GetLetterDatFlg(int);
@@ -65,12 +65,12 @@ public:
     void MoveLetterItem(int, unsigned int);
     void ReplyLetter(int);
     void LoadMapObj();
-    void GetMapObj(unsigned char *);
-    void GetMapObjDrawFlg(unsigned int *);
+    void GetMapObj(unsigned char*);
+    void GetMapObjDrawFlg(unsigned int*);
     void SetAddLetter(int);
     void GetFavoriteFlg(int);
     void ClrFavoriteFlg(int);
-    void GetFavorite(int, char *);
+    void GetFavorite(int, char*);
     void GetMoneyFlg(int);
     void ClrMoneyFlg(int);
     void GetMoney(int);
@@ -84,19 +84,19 @@ public:
     void CMakeFavorite(int, unsigned int);
     void GetCompatibilityFlg(int);
     void ClrCompatibilityFlg(int);
-    void GetCompatibility(int, unsigned char *);
-    void GetCMakeInfo(int, GbaCMakeInfo *);
-    void GetCmdData(int, unsigned char *);
-    void GetEquipData(int, unsigned char *);
+    void GetCompatibility(int, unsigned char*);
+    void GetCMakeInfo(int, GbaCMakeInfo*);
+    void GetCmdData(int, unsigned char*);
+    void GetEquipData(int, unsigned char*);
     void SetShopFlg(int);
     void ClrShopFlg(int);
     void SetSmithFlg(int);
     void ClrSmithFlg(int);
     void ShopEnd(int);
     void SmithEnd(int);
-    void MakeBuyData(int, char *);
-    void MakeSellData(int, char *);
-    void MakeSmithData(int, char *);
+    void MakeBuyData(int, char*);
+    void MakeSellData(int, char*);
+    void MakeSmithData(int, char*);
     void GetSellFlg(int);
     void ClrSellFlg(int);
     void GetBuyFlg(int);
@@ -107,25 +107,25 @@ public:
     void GetBonus(int);
     void GetArtifactFlg(int);
     void ClrArtifactFlg(int);
-    void GetArtifactData(int, unsigned char *);
+    void GetArtifactData(int, unsigned char*);
     void GetUseItemFlg(int);
     void GetChgUseItemFlg(int);
     void ClrChgUseItemFlg(int);
     void SetChgUseItemFlg(int);
     void GetStrengthFlg(int);
     void ClrStrengthFlg(int);
-    void GetStrengthData(int, unsigned char *);
+    void GetStrengthData(int, unsigned char*);
     void GetArtiDatFlg(int);
     void ClrArtiDatFlg(int);
-    void MakeArtiData(int, char *);
-    void GetTmpArtifactData(int, unsigned char *);
+    void MakeArtiData(int, char*);
+    void GetTmpArtifactData(int, unsigned char*);
     void GetRadarType(int);
     void ClrRadarTypeFlg();
     void GetRadarMode(int);
     void SetRadarMode(int, int);
     void GetChgRadarMode(int);
     void ClrChgRadarMode(int);
-    void GetScouterInfo(int, unsigned char *);
+    void GetScouterInfo(int, unsigned char*);
     void GetChgHitFlg(int);
     void ClrChgHitFlg(int);
     void GetChgScouFlg(int);

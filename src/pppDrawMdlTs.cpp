@@ -35,7 +35,7 @@ void pppDrawMdlTs(void)
  * Address:	TODO
  * Size:	TODO
  */
-void pppDrawDrawMdlTs0(_pppPObject *, PDrawMdlTs *, _pppCtrlTable *)
+void pppDrawDrawMdlTs0(_pppPObject*, PDrawMdlTs*, _pppCtrlTable*)
 {
 	// TODO
 }

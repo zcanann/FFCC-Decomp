@@ -15,7 +15,7 @@ void get_rand()
  * Address:	TODO
  * Size:	TODO
  */
-void S4ToF32(pppFVECTOR4 *, short *)
+void S4ToF32(pppFVECTOR4*, short*)
 {
 	// TODO
 }
@@ -25,7 +25,7 @@ void S4ToF32(pppFVECTOR4 *, short *)
  * Address:	TODO
  * Size:	TODO
  */
-void alloc_check(VYmMegaBirthShpTail3 *, PYmMegaBirthShpTail3 *)
+void alloc_check(VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*)
 {
 	// TODO
 }
@@ -55,7 +55,7 @@ void pppDestructYmMegaBirthShpTail3(void)
  * Address:	TODO
  * Size:	TODO
  */
-void birth(_pppPObject *, VYmMegaBirthShpTail3 *, PYmMegaBirthShpTail3 *, VColor *, _PARTICLE_DATA *, _PARTICLE_WMAT *, _PARTICLE_COLOR *)
+void birth(_pppPObject*, VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, VColor*, _PARTICLE_DATA*, _PARTICLE_WMAT*, _PARTICLE_COLOR*)
 {
 	// TODO
 }
@@ -65,7 +65,7 @@ void birth(_pppPObject *, VYmMegaBirthShpTail3 *, PYmMegaBirthShpTail3 *, VColor
  * Address:	TODO
  * Size:	TODO
  */
-void calc(_pppPObject *, VYmMegaBirthShpTail3 *, PYmMegaBirthShpTail3 *, _PARTICLE_DATA *, VColor *, _PARTICLE_COLOR *)
+void calc(_pppPObject*, VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, _PARTICLE_DATA*, VColor*, _PARTICLE_COLOR*)
 {
 	// TODO
 }
@@ -75,7 +75,7 @@ void calc(_pppPObject *, VYmMegaBirthShpTail3 *, PYmMegaBirthShpTail3 *, _PARTIC
  * Address:	TODO
  * Size:	TODO
  */
-void calc_particle(_pppPObject *, VYmMegaBirthShpTail3 *, PYmMegaBirthShpTail3 *, VColor *)
+void calc_particle(_pppPObject*, VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, VColor*)
 {
 	// TODO
 }

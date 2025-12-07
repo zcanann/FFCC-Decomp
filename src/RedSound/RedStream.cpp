@@ -15,7 +15,7 @@ void _SearchEmptyStreamData()
  * Address:	TODO
  * Size:	TODO
  */
-void _StreamStop(RedStreamDATA *)
+void _StreamStop(RedStreamDATA*)
 {
 	// TODO
 }
@@ -25,7 +25,7 @@ void _StreamStop(RedStreamDATA *)
  * Address:	TODO
  * Size:	TODO
  */
-void _ArrangeStreamDataNoLoop(RedStreamDATA *, int, int)
+void _ArrangeStreamDataNoLoop(RedStreamDATA*, int, int)
 {
 	// TODO
 }
@@ -35,7 +35,7 @@ void _ArrangeStreamDataNoLoop(RedStreamDATA *, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void _ArrangeStreamDataLoop(RedStreamDATA *, int, int)
+void _ArrangeStreamDataLoop(RedStreamDATA*, int, int)
 {
 	// TODO
 }
@@ -55,7 +55,7 @@ void StreamStop(int)
  * Address:	TODO
  * Size:	TODO
  */
-void StreamPlay(int, void *, int, int, int)
+void StreamPlay(int, void*, int, int, int)
 {
 	// TODO
 }

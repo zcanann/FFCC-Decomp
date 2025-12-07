@@ -6,7 +6,7 @@ class CFlatData
 	CFlatData();
 	~CFlatData();
 
-	void Create(void *);
+	void Create(void*);
 	void Destroy();
 
 private:

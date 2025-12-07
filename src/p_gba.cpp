@@ -105,7 +105,7 @@ void CGbaPcs::onMapChanged(int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGbaPcs::onScriptChanging(char *)
+void CGbaPcs::onScriptChanging(char*)
 {
 	// TODO
 }

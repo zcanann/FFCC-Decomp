@@ -625,7 +625,7 @@ void CGMonObj::attackCheckFuncMeteoParasite(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::aiAddDuct(int &)
+void CGMonObj::aiAddDuct(int&)
 {
 	// TODO
 }
@@ -765,7 +765,7 @@ void CGMonObj::logicFuncLastBoss()
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::teleport(int, int, int, int, int, int, int, int, int, Vec *, int &, Vec &)
+void CGMonObj::teleport(int, int, int, int, int, int, int, int, int, Vec*, int&, Vec&)
 {
 	// TODO
 }
@@ -775,7 +775,7 @@ void CGMonObj::teleport(int, int, int, int, int, int, int, int, int, Vec *, int 
  * Address:	TODO
  * Size:	TODO
  */
-void CGMonObj::suikomiSub(CGObject *, float)
+void CGMonObj::suikomiSub(CGObject*, float)
 {
 	// TODO
 }

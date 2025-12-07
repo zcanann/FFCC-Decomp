@@ -14,38 +14,6 @@ struct Vec;
 void D3DXMatrixMultiplyRotate(float (*)[4], float (*)[4], float (*)[4]);
 void VECLerp(Vec *, Vec *, Vec *, float);
 
-/*
-
-class CChara
-{
-public:
-    class CAnim
-    {
-    public:
-        void SetAmemAddress(int);
-        void GetBankSize();
-        void GetAmemAddress();
-        void AddHistory();
-        void ReleaseBank();
-        void GetHistory();
-        void IsBanked();
-        void SetLastFrame(int);
-        void SetInterp(int);
-    };
-
-    class CModel : public CRef
-    {
-    public:
-        void GetMatrix();
-        void GetMatrix(float(*)[4]);
-    };
-	
-    void SetAmemStage(CMemory::CStage*);
-    void GetMemoryStage();
-    void ResetAmem(int);
-};
-*/
-
 class CChara
 {
 	class CModel;
@@ -62,6 +30,16 @@ class CChara
 	{
 		CAnim();
 		~CAnim();
+
+        void SetAmemAddress(int);
+        void GetBankSize();
+        void GetAmemAddress();
+        void AddHistory();
+        void ReleaseBank();
+        void GetHistory();
+        void IsBanked();
+        void SetLastFrame(int);
+        void SetInterp(int);
 	};
 
 	class CAnimNode
@@ -131,6 +109,8 @@ class CChara
 		void SetFrame(float);
 		void CalcFurColor();
 		void GetDispIndex(CChara::CNode *);
+        void GetMatrix();
+        void GetMatrix(float(*)[4]);
 	};
 
 	class CMesh
@@ -165,6 +145,9 @@ class CChara
 	void Destroy();
 	void FlipDBuffer();
 	void gqrInit(unsigned long, unsigned long, unsigned long);
+    void SetAmemStage(CMemory::CStage*);
+    void GetMemoryStage();
+    void ResetAmem(int);
 };
 
 #endif // _FFCC_CHARA_H_

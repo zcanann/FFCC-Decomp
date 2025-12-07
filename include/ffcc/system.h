@@ -9,16 +9,16 @@ class CStage;
 struct OSContext;
 struct OSThread;
 
-class CProcess
+class CProcess : public CManager
 {
 public:
     CProcess();
 
-    void onScriptChanging(char*);
-    void onScriptChanged(char*, int);
+    virtual void ScriptChanging(char*);
+    virtual void ScriptChanged(char*, int);
 
-    void onMapChanging(int, int);
-    void onMapChanged(int, int, int);
+    virtual void MapChanging(int, int);
+    virtual void MapChanged(int, int, int);
 };
 
 class CSystem

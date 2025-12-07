@@ -81,7 +81,7 @@ public:
     void Draw();
     void DrawAfter();
     void CheckHitCylinder(CMapCylinder*, Vec*, unsigned long);
-    void CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned long);
+    int CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned long);
     void GetAnimRunMapObj(CMapObj*);
     void GetAnimRunID(int);
     void SetViewMtx(float (*)[4], float (*)[4]);
@@ -112,5 +112,7 @@ public:
     void SetDraw(unsigned char);
     void GetFogEnable();
 };
+
+CMapMng MapMng;
 
 #endif // _FFCC_MAP_H_

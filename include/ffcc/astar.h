@@ -1,6 +1,9 @@
 #ifndef _FFCC_ASTAR_H_
 #define _FFCC_ASTAR_H_
 
+#include "ffcc/map.h"
+#include "ffcc/maphit.h"
+
 #include <dolphin/mtx.h>
 #include <dolphin/types.h>
 
@@ -28,7 +31,7 @@ public:
 		CATemp();
 		CATemp(const CATemp&);
 
-		void operator=(const CATemp&);
+		void operator=(const CATemp& other);
 
 		unsigned char m_visited[64]; // 0x0
 		unsigned char m_path[64];    // 0x40
@@ -44,10 +47,10 @@ public:
 	void check(int current, int goal, CATemp& temp);
 	void calcAStar();
 	void drawAStar();
-	void addRealTime(CGPartyObj*);
-	void getEscapePos(Vec&, Vec&, int, int);
-	void calcSpecialPolygonGroup(Vec*);
-	void calcPolygonGroup(Vec*, int);
+	void addRealTime(CGPartyObj* gPartyObj);
+	CAPos* getEscapePos(Vec& from, Vec& base, int startGroup, int forbiddenGroup);
+	unsigned char calcSpecialPolygonGroup(Vec* pos);
+	unsigned char calcPolygonGroup(Vec* pos, int hitAttributeMask);
 
 	unsigned char m_flags;                  // 0x00
 	// Unused                               // 0x1-0x3

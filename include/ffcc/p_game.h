@@ -34,6 +34,6 @@ public:
     CGame game;      // 0xC
 };
 
-extern CGamePcs Game;
+CGamePcs Game;
 
 #endif // _FFCC_P_GAME_H_

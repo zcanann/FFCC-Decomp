@@ -240,7 +240,6 @@ public:
 	// unsigned char padding[4];
 };
 
-extern JoyBus Joybus;
-extern const unsigned short JoyBusCrcTable[256];
+JoyBus Joybus;
 
 #endif // JOYBUS_H

@@ -1,6 +1,8 @@
 #ifndef _FFCC_CGCHARAOBJ_H_
 #define _FFCC_CGCHARAOBJ_H_
 
+#include "ffcc/prgobj.h"
+
 class CGObject;
 class CGPrgObj;
 class CGCharaObj;
@@ -16,8 +18,9 @@ class CVector;
 void la(CGObject*);
 void SAFE_CAST_WORK(CGObjWork*);
 
-class CGCharaObj
+class CGCharaObj : public CGPrgObj
 {
+public:
 	CGCharaObj();
 	~CGCharaObj();
 	
@@ -73,6 +76,8 @@ class CGCharaObj
 	void enableAttackCol(int, int, int);
 	int GetCID();
 	void enableDamageCol(int);
+
+	short m_aStarGroupId;
 };
 
 #endif // _FFCC_CGCHARAOBJ_H_

@@ -19,6 +19,13 @@ public:
     void Quit();
     void Frame();
     void SaveReplayData();
+
+    short _4_2_;
+    short _8_2_;
+    int _448_4_;
+    int _452_4_;
 };
+
+CPad Pad;
 
 #endif

@@ -255,7 +255,7 @@ void COctTree::CheckHitCylinder(CMapCylinder*, Vec*, unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void COctTree::CheckHitCylinderNear_r(COctNode*)
+int COctTree::CheckHitCylinderNear_r(COctNode*)
 {
 	// TODO
 }
@@ -265,7 +265,7 @@ void COctTree::CheckHitCylinderNear_r(COctNode*)
  * Address:	TODO
  * Size:	TODO
  */
-void COctTree::CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned long)
+int COctTree::CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned long)
 {
 	// TODO
 }

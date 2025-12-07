@@ -185,7 +185,7 @@ void CMapObj::CheckHitCylinder(CMapCylinder*, Vec*, unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapObj::CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned long)
+int CMapObj::CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned long)
 {
 	// TODO
 }

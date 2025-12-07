@@ -1,6 +1,8 @@
 #ifndef _FFCC_PARTYOBJ_H_
 #define _FFCC_PARTYOBJ_H_
 
+#include "ffcc/charaobj.h"
+
 class CGObject;
 class CGBaseObj;
 class CGPrgObj;
@@ -17,7 +19,7 @@ void chooseMagic();
 void decMagic(int);
 void calcWeightMax();
 
-class CGPartyObj
+class CGPartyObj : public CGCharaObj
 {
 public:
     void onCreate();

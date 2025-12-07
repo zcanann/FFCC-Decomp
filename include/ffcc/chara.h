@@ -3,16 +3,48 @@
 
 #include "ffcc/memory.h"
 
+#include <dolphin/mtx.h>
+
 class CChunkFile;
 class CTextureSet;
 class CMemory;
 class CTexAnimSet;
-class Quaternion;
-class S16Vec;
 struct Vec;
 
 void D3DXMatrixMultiplyRotate(float (*)[4], float (*)[4], float (*)[4]);
 void VECLerp(Vec *, Vec *, Vec *, float);
+
+/*
+
+class CChara
+{
+public:
+    class CAnim
+    {
+    public:
+        void SetAmemAddress(int);
+        void GetBankSize();
+        void GetAmemAddress();
+        void AddHistory();
+        void ReleaseBank();
+        void GetHistory();
+        void IsBanked();
+        void SetLastFrame(int);
+        void SetInterp(int);
+    };
+
+    class CModel : public CRef
+    {
+    public:
+        void GetMatrix();
+        void GetMatrix(float(*)[4]);
+    };
+	
+    void SetAmemStage(CMemory::CStage*);
+    void GetMemoryStage();
+    void ResetAmem(int);
+};
+*/
 
 class CChara
 {

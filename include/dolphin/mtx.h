@@ -15,6 +15,10 @@ typedef struct Vec {
 } Vec, *VecPtr, Point3d, *Point3dPtr;
 
 typedef struct {
+    s16 x, y;
+} S16Vec2d, *S16Vec2dPtr;
+
+typedef struct {
     s16 x, y, z;
 } S16Vec, *S16VecPtr;
 

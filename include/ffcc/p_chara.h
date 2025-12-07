@@ -1,6 +1,7 @@
 #ifndef _FFCC_P_CHARA_H_
 #define _FFCC_P_CHARA_H_
 
+#include "ffcc/chara.h"
 #include "ffcc/file.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_chara_viewer.h"
@@ -18,35 +19,6 @@ class CRef;
 class CTextureSet;
 
 void GET_CHARA_ALLOC_STAGE_S(int, CMemory::CStage*);
-
-class CChara
-{
-public:
-    class CAnim
-    {
-    public:
-        void SetAmemAddress(int);
-        void GetBankSize();
-        void GetAmemAddress();
-        void AddHistory();
-        void ReleaseBank();
-        void GetHistory();
-        void IsBanked();
-        void SetLastFrame(int);
-        void SetInterp(int);
-    };
-
-    class CModel : public CRef
-    {
-    public:
-        void GetMatrix();
-        void GetMatrix(float(*)[4]);
-    };
-	
-    void SetAmemStage(CMemory::CStage*);
-    void GetMemoryStage();
-    void ResetAmem(int);
-};
 
 class CCharaPcs : public CProcess
 {

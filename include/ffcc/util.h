@@ -1,9 +1,10 @@
 #ifndef _FFCC_PPP_UTIL_H_
 #define _FFCC_PPP_UTIL_H_
 
-#include <dolphin/gx.h>
-
 #include "ffcc/math.h"
+
+#include <dolphin/gx.h>
+#include <dolphin/mtx.h>
 
 class CTexture;
 struct Vec;

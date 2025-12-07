@@ -1,6 +1,7 @@
 #ifndef _PPP_YMENV_H_
 #define _PPP_YMENV_H_
 
+#include "ffcc/chara.h"
 #include "ffcc/p_chara.h"
 
 #include <dolphin/gx.h>

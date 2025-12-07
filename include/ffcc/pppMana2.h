@@ -3,10 +3,10 @@
 
 #include "ffcc/chara.h"
 
+#include <dolphin/mtx.h>
+
 struct Vec;
 struct Vec2d;
-struct S16Vec;
-struct S16Vec2d;
 struct _GXColor;
 struct VMana2;
 

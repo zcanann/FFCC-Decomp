@@ -7,19 +7,6 @@ struct SRT;
 
 void VECMultAdd(Vec*, Vec*, Vec*, float);
 
-struct S16Vec
-{
-    short x;
-    short y;
-    short z;
-};
-
-struct S16Vec2d
-{
-    short x;
-    short y;
-};
-
 class CBound
 {
 public:

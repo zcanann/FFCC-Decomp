@@ -3,12 +3,13 @@
 
 #include "ffcc/memory.h"
 
+#include <dolphin/mtx.h>
+
 class CChunkFile;
 class CMaterialSet;
 class CMaterialMan;
 class CMaterial;
 class CAmemCacheSet;
-struct S16Vec;
 
 class CMapMesh
 {

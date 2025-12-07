@@ -1,9 +1,14 @@
 #ifndef _FFCC_PPP_ZLIST_H_
 #define _FFCC_PPP_ZLIST_H_
 
+#include <dolphin/types.h>
+
 struct _ZLISTITEM
 {
-};
+    _ZLISTITEM* m_previous; // 0x0
+    _ZLISTITEM* m_next;     // 0x4
+    void* m_data;           // 0x8
+}; // Size 0xC
 
 class ZLIST
 {
@@ -12,11 +17,12 @@ public:
     ~ZLIST();
 
     void DeleteList();
-    void AddTail(void*);
-    void GetDataNext(_ZLISTITEM **);
-    void GetDataIdx(int);
-    void MakeItem();
-    void GetItemIdx(int);
-};
+    bool AddTail(void* data);
+    void* GetDataNext(_ZLISTITEM** it);
+    void* GetDataIdx(int index);
+
+    _ZLISTITEM m_root;
+    short m_count;
+}; // Size 0x10
 
 #endif // _FFCC_PPP_ZLIST_H_

@@ -16,7 +16,7 @@ struct PPPSEST;
 
 struct _pppMngSt
 {
-};
+}; // Size: 0x158
 
 struct _pppEnvSt
 {

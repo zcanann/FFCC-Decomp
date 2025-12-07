@@ -7,7 +7,10 @@
  */
 ZLIST::ZLIST()
 {
-	// TODO
+	m_root.m_previous = (_ZLISTITEM*)nullptr;
+	m_root.m_next = (_ZLISTITEM*)nullptr;
+	m_root.m_data = (void*)nullptr;
+	m_count = 0;
 }
 
 /*
@@ -17,7 +20,21 @@ ZLIST::ZLIST()
  */
 ZLIST::~ZLIST()
 {
-	// TODO
+    _ZLISTITEM* it = m_root.m_previous;
+
+    if (it != (_ZLISTITEM*)nullptr)
+    {
+        while (it->m_next != (_ZLISTITEM*)nullptr)
+        {
+            _ZLISTITEM* next = it->m_next;
+            delete it;
+            it = next;
+        }
+
+        m_root.m_previous = (_ZLISTITEM*)nullptr;
+        m_root.m_next = (_ZLISTITEM*)nullptr;
+        m_count = 0;
+    }
 }
 
 /*
@@ -27,7 +44,21 @@ ZLIST::~ZLIST()
  */
 void ZLIST::DeleteList()
 {
-	// TODO
+    if (m_root.m_previous != (_ZLISTITEM*)nullptr)
+    {
+        _ZLISTITEM* it = m_root.m_previous;
+
+        while (it->m_next != (_ZLISTITEM*)nullptr)
+        {
+            _ZLISTITEM* next = it->m_next;
+            delete it;
+            it = next;
+        }
+
+        m_root.m_previous = (_ZLISTITEM*)nullptr;
+        m_root.m_next = (_ZLISTITEM*)nullptr;
+        m_count = 0;
+    }
 }
 
 /*
@@ -35,9 +66,38 @@ void ZLIST::DeleteList()
  * Address:	TODO
  * Size:	TODO
  */
-void ZLIST::AddTail(void*)
+bool ZLIST::AddTail(void* data)
 {
-	// TODO
+	_ZLISTITEM* newItem = new _ZLISTITEM(); // TODO: Alloc to memoryStage
+
+    if (newItem != (_ZLISTITEM*)nullptr)
+    {
+        newItem->m_previous = (_ZLISTITEM*)nullptr;
+        newItem->m_next = (_ZLISTITEM*)nullptr;
+    }
+
+    if (newItem == (_ZLISTITEM*)nullptr)
+    {
+        return false;
+    }
+
+    if (m_root.m_next == (_ZLISTITEM*)nullptr)
+    {
+        m_root.m_previous = newItem;
+        m_root.m_next = newItem;
+    }
+    else
+    {
+        newItem->m_previous = m_root.m_next;
+        m_root.m_next->m_next = newItem;
+        m_root.m_next = newItem;
+    }
+
+    newItem->m_data = data;
+
+    m_count++;
+
+    return true;
 }
 
 /*
@@ -45,9 +105,23 @@ void ZLIST::AddTail(void*)
  * Address:	TODO
  * Size:	TODO
  */
-void ZLIST::GetDataNext(_ZLISTITEM **)
+void* ZLIST::GetDataNext(_ZLISTITEM** it)
 {
-	// TODO
+	if (it == (_ZLISTITEM**)nullptr)
+	{
+		return (void*)nullptr;
+	}
+
+	_ZLISTITEM* state = *it;
+
+	if (state == (_ZLISTITEM*)nullptr)
+	{
+		return (void*)nullptr;
+	}
+
+	*it = state->m_next;
+
+	return state->m_data;
 }
 
 /*
@@ -55,27 +129,29 @@ void ZLIST::GetDataNext(_ZLISTITEM **)
  * Address:	TODO
  * Size:	TODO
  */
-void ZLIST::GetDataIdx(int)
+void* ZLIST::GetDataIdx(int index)
 {
-	// TODO
-}
+    _ZLISTITEM* it = m_root.m_previous;
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void ZLIST::MakeItem()
-{
-	// TODO
-}
+    if (it == nullptr)
+	{
+        return nullptr;
+	}
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void ZLIST::GetItemIdx(int)
-{
-	// TODO
+    while (index-- > 0)
+    {
+        it = it->m_next;
+
+        if (it == nullptr)
+		{
+            break;
+		}
+    }
+
+    if (it == nullptr)
+	{
+        return nullptr;
+	}
+
+    return it->m_data;
 }

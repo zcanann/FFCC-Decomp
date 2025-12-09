@@ -1,7 +1,7 @@
 #ifndef _PPP_VERTEXAPMTX_H_
 #define _PPP_VERTEXAPMTX_H_
 
-class _pppPObject;
+struct _pppPObject;
 class PVertexApMtx;
 struct Vec;
 

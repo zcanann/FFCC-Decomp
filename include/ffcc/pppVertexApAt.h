@@ -1,7 +1,7 @@
 #ifndef _PPP_VERTEXAPAT_H_
 #define _PPP_VERTEXAPAT_H_
 
-class _pppPObject;
+struct _pppPObject;
 class PVertexApAt;
 class PVertexApLc;
 

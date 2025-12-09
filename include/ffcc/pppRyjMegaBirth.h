@@ -1,14 +1,14 @@
 #ifndef _PPP_RYJMEGABIRTH_H_
 #define _PPP_RYJMEGABIRTH_H_
 
-class _PARTICLE_COLOR;
-class _PARTICLE_DATA;
-class _PARTICLE_WMAT;
-class _pppPObject;
+struct _PARTICLE_COLOR;
+struct _PARTICLE_DATA;
+struct _PARTICLE_WMAT;
+struct _pppPObject;
 struct pppFMATRIX;
 class PRyjMegaBirth;
 class VRyjMegaBirth;
-class VColor;
+struct VColor;
 
 void get_rand(void);
 void get_noise(unsigned char);

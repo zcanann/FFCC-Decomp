@@ -32,6 +32,8 @@ public:
     void pppCacheUnLoadModelTexture(CMaterialSet*, CAmemCacheSet*);
     void pppCacheRefCnt0UpModelTexture(CMaterialSet*, CAmemCacheSet*);
     void pppCacheDumpModelTexture(CMaterialSet*, CAmemCacheSet*);
+
+    char placeholder[0x40];
 };
 
 #endif // _FFCC_MAPMESH_H_

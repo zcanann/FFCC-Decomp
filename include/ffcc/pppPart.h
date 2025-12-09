@@ -2,23 +2,22 @@
 #define _PPP_PART_H_
 
 #include "ffcc/memory.h"
+#include "ffcc/partMng.h"
+
+#include <dolphin/mtx.h>
 
 class CGObject;
 class CParShapeSet;
 class CParModelSet;
 class CMapPcs;
-struct _pppMngSt;
-struct _pppEnvSt;
-struct _pppPObject;
-struct _pppPDataVal;
-struct _pppDataHead;
-struct pppFMATRIX;
-struct PPPSEST;
-struct Vec;
-struct pppCVECTOR;
-struct pppModelSt;
-struct pppShapeSt;
-struct pppProg;
+
+struct _pppPDataVal
+{
+};
+
+struct pppCVECTOR
+{
+};
 
 void pppPlaySe(_pppMngSt*, PPPSEST*);
 void pppStopSe(_pppMngSt*, PPPSEST*);

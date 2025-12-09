@@ -315,9 +315,9 @@ void GbaQueue::GetTreasurePos(int, unsigned int*, int*)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::GetMapObjInfo(int, unsigned char*)
+int GbaQueue::GetMapObjInfo(int, unsigned char*)
 {
-	// TODO
+	return 0;
 }
 
 /*
@@ -345,9 +345,9 @@ void GbaQueue::GetCaravanName(char*)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::GetItemAll(int, unsigned char*)
+int GbaQueue::GetItemAll(int, unsigned char*)
 {
-	// TODO
+	return 0;
 }
 
 /*
@@ -365,9 +365,9 @@ void GbaQueue::GetScrFlg()
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::GetPlayerHP(int, unsigned char*)
+int GbaQueue::GetPlayerHP(int, unsigned char*)
 {
-	// TODO
+	return 0;
 }
 
 /*
@@ -465,9 +465,9 @@ void GbaQueue::LoadMapObj()
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::GetMapObj(unsigned char*)
+int GbaQueue::GetMapObj(unsigned char*)
 {
-	// TODO
+	return 0;
 }
 
 /*
@@ -515,9 +515,9 @@ void GbaQueue::ClrFavoriteFlg(int)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::GetFavorite(int, char*)
+int GbaQueue::GetFavorite(int, char*)
 {
-	// TODO
+	return 0;
 }
 
 /*
@@ -655,9 +655,9 @@ void GbaQueue::ClrCompatibilityFlg(int)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::GetCompatibility(int, unsigned char*)
+int GbaQueue::GetCompatibility(int, unsigned char*)
 {
-	// TODO
+	return 0;
 }
 
 /*
@@ -685,9 +685,9 @@ void GbaQueue::GetCmdData(int, unsigned char*)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::GetEquipData(int, unsigned char*)
+int GbaQueue::GetEquipData(int, unsigned char*)
 {
-	// TODO
+	return 0;
 }
 
 /*
@@ -885,9 +885,9 @@ void GbaQueue::ClrArtifactFlg(int)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::GetArtifactData(int, unsigned char*)
+int GbaQueue::GetArtifactData(int, unsigned char*)
 {
-	// TODO
+	return 0;
 }
 
 /*
@@ -955,9 +955,9 @@ void GbaQueue::ClrStrengthFlg(int)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::GetStrengthData(int, unsigned char*)
+int GbaQueue::GetStrengthData(int, unsigned char*)
 {
-	// TODO
+	return 0;
 }
 
 /*
@@ -995,9 +995,9 @@ void GbaQueue::MakeArtiData(int, char*)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::GetTmpArtifactData(int, unsigned char*)
+int GbaQueue::GetTmpArtifactData(int, unsigned char*)
 {
-	// TODO
+	return 0;
 }
 
 /*
@@ -1005,9 +1005,9 @@ void GbaQueue::GetTmpArtifactData(int, unsigned char*)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::GetRadarType(int)
+unsigned char GbaQueue::GetRadarType(int)
 {
-	// TODO
+	return 0;
 }
 
 /*
@@ -1065,9 +1065,9 @@ void GbaQueue::ClrChgRadarMode(int)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::GetScouterInfo(int, unsigned char*)
+int GbaQueue::GetScouterInfo(int, unsigned char*)
 {
-	// TODO
+	return 0;
 }
 
 /*
@@ -1135,9 +1135,9 @@ void GbaQueue::GetHitEInfo(int)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::IsSingleMode(int)
+bool GbaQueue::IsSingleMode(int)
 {
-	// TODO
+	return false;
 }
 
 /*
@@ -1155,9 +1155,9 @@ void GbaQueue::SetControllerMode(int)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::GetControllerMode()
+char GbaQueue::GetControllerMode()
 {
-	// TODO
+	return 0;
 }
 
 /*
@@ -1195,9 +1195,9 @@ void GbaQueue::GetPauseMode()
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::GetItemUse(int)
+unsigned char GbaQueue::GetItemUse(int)
 {
-	// TODO
+	return 0;
 }
 
 /*
@@ -1225,9 +1225,9 @@ void GbaQueue::ClrSPModeFlg(int)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::GetSPMode(int)
+unsigned int GbaQueue::GetSPMode(int)
 {
-	// TODO
+	return 0;
 }
 
 /*
@@ -1255,9 +1255,9 @@ void GbaQueue::ClrMemorysFlg(int)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::GetMemorys(int)
+unsigned char GbaQueue::GetMemorys(int)
 {
-	// TODO
+	return 0;
 }
 
 /*
@@ -1285,9 +1285,9 @@ void GbaQueue::ClrCmdNumFlg(int)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::GetCmdNum(int)
+unsigned char GbaQueue::GetCmdNum(int)
 {
-	// TODO
+	return 0;
 }
 
 /*

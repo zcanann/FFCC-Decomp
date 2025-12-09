@@ -1,6 +1,7 @@
 #include "ffcc/joybus.h"
 
 #include "ffcc/file.h"
+#include "ffcc/gbaque.h"
 #include "ffcc/system.h"
 
 #include "dolphin/os.h"
@@ -521,7 +522,7 @@ void JoyBus::ThreadMain(void* arg)
     unsigned short localCrc[2];
     unsigned int localWord = 0;
     unsigned int localCmd = 0;
-    unsigned char localBuf[4];
+    unsigned char localBuf[4] = {};
 
     threadParam->m_gbaStatus = 0;
     // TODO: threadParam->m_gbaStatus = GBAReset(threadParam->m_portIndex, &threadParam->m_unk3);
@@ -651,7 +652,7 @@ void JoyBus::ThreadMain(void* arg)
         }
 
         int gamePadState = 0;
-        // TODO: char single = IsSingleMode(&GbaQue, threadParam->m_portIndex);
+        bool single = GbaQue.IsSingleMode(threadParam->m_portIndex);
         // TODO: unsigned int statusIndex = (single != 0 && threadParam->m_portIndex != 1) ? 0 : (unsigned int)threadParam->m_portIndex;
         // TODO: int* padPtr = (int*)(&Game.game.field_0xc5c0 + statusIndex * 4);
         // TODO: gamePadState = *padPtr;
@@ -664,8 +665,8 @@ void JoyBus::ThreadMain(void* arg)
         {
             threadParam->m_state = 1;
 
-            // TODO: SetChgUseItemFlg(&GbaQue, port);
-            // TODO: SetResetFlg(&GbaQue, port);
+            GbaQue.SetChgUseItemFlg(port);
+            GbaQue.SetResetFlg(port);
 
             threadParam->m_subState      = 0;
             threadParam->m_pposCounter   = 0;
@@ -700,8 +701,7 @@ void JoyBus::ThreadMain(void* arg)
             }
             else if (threadParam->m_gbaStatus == 0)
             {
-                char cm = 0;
-                // TODO: cm = GetControllerMode(&GbaQue);
+                char cm = GbaQue.GetControllerMode();
 
                 if (cm == 0)
                     m_nextModeTypeArr[port] = 0;
@@ -760,7 +760,7 @@ void JoyBus::ThreadMain(void* arg)
 
         case 0x03:
         {
-            // TODO: SetResetFlg(&GbaQue, port);
+            GbaQue.SetResetFlg(port);
 
             ResetQueue(threadParam);
 
@@ -880,7 +880,7 @@ void JoyBus::ThreadMain(void* arg)
  */
 void* JoyBus::_ThreadMain(void* param)
 {
-	// TODO
+	return nullptr;
 }
 
 /*
@@ -1074,7 +1074,7 @@ short JoyBus::GetPadData(int portIndex)
 
     OSSignalSemaphore(&m_accessSemaphores[portIndex]);
 
-    bool isSingleMode = (bool)this; // GbaQue.IsSingleMode(portIndex);
+    bool isSingleMode = GbaQue.IsSingleMode(portIndex);
 	
     if (isSingleMode != 0)
 	{
@@ -1105,8 +1105,7 @@ int JoyBus::RecvGBA(ThreadParam* threadParam, unsigned int* recvBuffer)
         return 0;
     }
 
-    // TODO: isSingle = IsSingleMode__8GbaQueueFi(&GbaQue, port);
-    bool isSingle = (bool)this; // isSingle = IsSingleMode__8GbaQueueFi(&GbaQue, port);
+    bool isSingle = GbaQue.IsSingleMode(port);
 
     if (!isSingle || port == 1)
     {
@@ -1306,7 +1305,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
 
             OSSignalSemaphore(&m_accessSemaphores[port]);
 
-            // TODO: SetQueue__8GbaQueueFiUi(&GbaQue, port, prevCmd);
+            GbaQue.SetQueue(port, prevCmd);
 
             recvResult = 0;
             *cmdOut = 0;
@@ -1326,7 +1325,8 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
             if (sub == 0x03)
             {
                 // TODO: ClrLetterLstFlg__8GbaQueueFi(&GbaQue, port);
-                // TODO: SetQueue__8GbaQueueFiUi(&GbaQue, port, prevCmd);
+                GbaQue.SetQueue(port, prevCmd);
+
                 threadParam->m_state = '!';
                 threadParam->m_subState = 0;
                 threadParam->m_skipProcessingFlag = 1;
@@ -1334,7 +1334,8 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
             else if (sub == 0x02)
             {
                 // TODO: ClrLetterDatFlg__8GbaQueueFi(&GbaQue, port);
-                // TODO: SetQueue__8GbaQueueFiUi(&GbaQue, port, prevCmd);
+                GbaQue.SetQueue(port, prevCmd);
+
                 threadParam->m_state = '%';
                 threadParam->m_subState = 0;
                 threadParam->m_skipProcessingFlag = 1;
@@ -1342,7 +1343,8 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
             else if (sub == 0x06)
             {
                 // TODO: ClrSellFlg__8GbaQueueFi(&GbaQue, port);
-                // TODO: SetQueue__8GbaQueueFiUi(&GbaQue, port, prevCmd);
+                GbaQue.SetQueue(port, prevCmd);
+
                 threadParam->m_state = '5';
                 threadParam->m_subState = 0;
                 threadParam->m_skipProcessingFlag = 1;
@@ -1350,7 +1352,8 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
             else if (sub == 0x07)
             {
                 // TODO: ClrBuyFlg__8GbaQueueFi(&GbaQue, port);
-                // TODO: SetQueue__8GbaQueueFiUi(&GbaQue, port, prevCmd);
+                GbaQue.SetQueue(port, prevCmd);
+
                 threadParam->m_state = '7';
                 threadParam->m_subState = 0;
                 threadParam->m_skipProcessingFlag = 1;
@@ -1358,7 +1361,8 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
             else if (sub == 0x08)
             {
                 // TODO: ClrMkSmithFlg__8GbaQueueFi(&GbaQue, port);
-                // TODO: SetQueue__8GbaQueueFiUi(&GbaQue, port, prevCmd);
+                GbaQue.SetQueue(port, prevCmd);
+
                 threadParam->m_state = '9';
                 threadParam->m_subState = 0;
                 threadParam->m_skipProcessingFlag = 1;
@@ -1366,7 +1370,8 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
             else if (sub == 0x09)
             {
                 // TODO: ClrArtiDatFlg__8GbaQueueFi(&GbaQue, port);
-                // TODO: SetQueue__8GbaQueueFiUi(&GbaQue, port, prevCmd);
+                GbaQue.SetQueue(port, prevCmd);
+
                 threadParam->m_state = 'A';
                 threadParam->m_subState = 0;
                 threadParam->m_skipProcessingFlag = 1;
@@ -1456,7 +1461,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
 
                 if (static_cast<unsigned short>(~crc) == buf.m_crc)
                 {
-                    // TODO: SetQueue__8GbaQueueFiUi(&GbaQue, port, prevCmd);
+                    GbaQue.SetQueue(port, prevCmd);
                 }
                 else
                 {
@@ -1672,8 +1677,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
         OSSignalSemaphore(&m_accessSemaphores[port]);
 
         // Get initial GBA status
-        bool singleMode = false;
-        // TODO: singleMode = IsSingleMode__8GbaQueueFi(&GbaQue, port);
+        bool singleMode = GbaQue.IsSingleMode(port);
 
         if (!singleMode || port == 1)
         {
@@ -1686,7 +1690,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
 
         if (threadParam->m_gbaStatus == 0 && threadParam->m_unk3 == '(')
         {
-            unsigned int readBuf[4];
+            unsigned int readBuf[4] = {};
 
             threadParam->m_gbaStatus = 0; // TODO: GBARead(port, readBuf, &threadParam->m_unk3);
 
@@ -1708,8 +1712,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
 
     case 1:
     {
-        bool singleMode = false;
-        // TODO: singleMode = IsSingleMode__8GbaQueueFi(&GbaQue, port);
+        bool singleMode = GbaQue.IsSingleMode(port);
 
         if (!singleMode || port == 1)
         {
@@ -1731,8 +1734,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
 
                 if (status == 0)
                 {
-                    bool singleMode2 = false;
-                    // TODO: singleMode2 = IsSingleMode__8GbaQueueFi(&GbaQue, port);
+                    bool singleMode2 = GbaQue.IsSingleMode(port);
 
                     if (!singleMode2 || port == 1)
                     {
@@ -1801,7 +1803,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
                 {
                     char          h;
                     unsigned char f;
-                } tmpBuf;
+                } tmpBuf = {};
 
                 threadParam->m_gbaStatus = 1; // TODO: GBARead(port, &tmpBuf, &threadParam->m_unk3);
                 status = threadParam->m_gbaStatus;
@@ -1953,8 +1955,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
 
     case 5:
     {
-        bool singleMode = false;
-        // TODO: singleMode = IsSingleMode__8GbaQueueFi(&GbaQue, port);
+        bool singleMode = GbaQue.IsSingleMode(port);
 
         if (!singleMode || port == 1)
         {
@@ -1971,8 +1972,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
         {
             if (threadParam->m_unk3 == ' ')
             {
-                bool singleMode2 = false;
-                // TODO: singleMode2 = IsSingleMode__8GbaQueueFi(&GbaQue, port);
+                bool singleMode2 = GbaQue.IsSingleMode(port);
 
                 unsigned char portVal = singleMode2 ? 0 : (unsigned char)port;
                 unsigned char header = 1;
@@ -2018,7 +2018,7 @@ int JoyBus::InitialCode(ThreadParam* threadParam)
         char stageMajor[3] = { 0, 0, 0 };
         char stageMinor[3] = { 0, 0, 0 };
 
-        // TODO: GetStageNo__8GbaQueueFiPiPi(&GbaQue, port, stageMajor, stageMinor);
+        GbaQue.GetStageNo(port, (int*)&stageMajor, (int*)&stageMinor);
 
         unsigned int cmdStage = 0;
         // TODO: cmdStage = build stage command from stageMajor / stageMinor, like local_34.
@@ -2808,12 +2808,10 @@ int JoyBus::SendDataFile(ThreadParam* threadParam)
 int JoyBus::SendMBase(ThreadParam* threadParam)
 {
     const int port = threadParam->m_portIndex;
+    short posX, posY;
 
-    // TODO
-    // short posX, posY;
-    // GetMBasePos__8GbaQueueFiPsPs(&GbaQue, port, &posX, &posY);
-    short posX = (short)this;
-    short posY = (short)this;
+    GbaQue.GetMBasePos(port, &posX, &posY);
+
     unsigned int cmdX = (0x0Fu << 24) | (0x00u << 16) | ((unsigned char)(posX & 0xFF) << 8) | ((unsigned char)((posX >> 8) & 0xFF));
     int result = 0;
 
@@ -2871,14 +2869,13 @@ int JoyBus::SendMapNo(ThreadParam* threadParam)
 {
     const int port = threadParam->m_portIndex;
 
-    // TODO restore:
-    // unsigned char bufA[3];
-    // unsigned char bufB[3];
-    // GetStageNo(&GbaQue, port, bufA, bufB);
-    // stageA = bufA[2];
-    // stageB = bufB[2];
-    unsigned char stageA = (unsigned char)this;
-    unsigned char stageB = (unsigned char)this;
+    char stageMajor[3] = { 0, 0, 0 };
+    char stageMinor[3] = { 0, 0, 0 };
+
+    GbaQue.GetStageNo(port, (int*)&stageMajor, (int*)&stageMinor);
+
+    unsigned char stageA = stageMajor[2];
+    unsigned char stageB = stageMinor[2];
 
     unsigned int cmd = (0x0Eu << 24) | (0x01u << 16) | (stageA << 8) | (stageB);
 
@@ -2941,8 +2938,7 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
 
         memset(posBytes, 0, 0x100);
 
-        // TODO
-        // GbaQueue::GetPlayerPos(&GbaQue, port, posWords);
+        GbaQue.GetPlayerPos(port, posWords);
 
         playerCount = 3;
         wordIndex = 0;
@@ -3078,10 +3074,8 @@ int JoyBus::SendPpos(ThreadParam* threadParam)
         mobCount = 0;
 
         int treasureCount = 0;
-
-        // TODO: restore when GbaQueue exists:
-        // GbaQueue::GetTreasurePos(&GbaQue, port, posWords, &treasureCount);
-        treasureCount = (int)this; // stub
+        
+        GbaQue.GetTreasurePos(port, posWords, &treasureCount);
 
         mobCount = (unsigned char)treasureCount;
 
@@ -3339,52 +3333,38 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
     }
     else
     {
-        // Phase 1: build the player-stat packet, then send the first word
         if (threadParam->m_subState == 0)
         {
-            // Raw player-info buffer (what GbaQueue fills)
-            unsigned char playerInfo[2][0x1B8];
-            memset(playerInfo, 0, sizeof(playerInfo));
+            GbaPInfo playerInfo;
+            memset(&playerInfo, 0, sizeof(playerInfo));
 
-            // TODO: real GbaQueue call
-            // GetPlayerStat(&GbaQue, port, (GbaPInfo*)playerInfo);
-            (void)this; // keep path "alive" until GbaQueue exists
+            GbaQue.GetPlayerStat(port, &playerInfo);
 
-            // Start from first word
             m_txWordIndex[port] = 0;
 
-            // Four-byte “class mask” that the original builds bit-by-bit.
             unsigned char classFlags[4];
             memset(classFlags, 0xFF, sizeof(classFlags));
 
-            // Payload that MakeJoyData will consume (starts at local_68c in the asm).
             unsigned char payload[0x300];
             memset(payload, 0, sizeof(payload));
 
-            // Zero out the output buffer we’re about to fill (as in the asm).
             memset(m_joyDataPacketBuffer[port] + 2, 0, 0x400);
 
-            // First byte: type = 1
             payload[0] = 1;
 
-            // Caravan name (128 bytes), comes right after the type.
             char caravanName[128];
             memset(caravanName, 0, sizeof(caravanName));
-			
-            // TODO: real GbaQueue call
-            // GetCaravanName(&GbaQue, caravanName);
+            
+            GbaQue.GetCaravanName(caravanName);
 
             memcpy(&payload[1], caravanName, sizeof(caravanName));
 
-            // Build the class mask from the raw player info.
-            // This is the direct translation of the loop around pcVar4, abStack_690.
-            unsigned char* p = &playerInfo[0][0];
+            unsigned char* p = (unsigned char*)&playerInfo;
             unsigned char lowBits = 0;
             unsigned char highBits = 0;
 
             for (int i = 0; i < 2; ++i)
             {
-                // First “slot”
                 if (p[0x16] != 0)
                 {
                     int idx = (int)p[0] >> 1;
@@ -3398,7 +3378,6 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
                     classFlags[idx] = v;
                 }
 
-                // Second “slot”
                 if (p[0xF2] != 0)
                 {
                     int idx = (int)p[0xDC] >> 1;
@@ -3418,16 +3397,12 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
                 highBits += 2;
             }
 
-            // Drop the 4-byte class mask into the header after the name.
             memcpy(&payload[1 + sizeof(caravanName)], classFlags, sizeof(classFlags));
 
             unsigned char compatBuf[64];
             memset(compatBuf, 0, sizeof(compatBuf));
 
-            int compatLen = 0;
-            // TODO: real GbaQueue call
-            // compatLen = GetCompatibility(&GbaQue, port, compatBuf);
-            compatLen = (int)this; // stub, just to keep the path alive
+            int compatLen = GbaQue.GetCompatibility(port, compatBuf);
 
             if (compatLen < 0)
             {
@@ -3495,9 +3470,7 @@ int JoyBus::SendPlayerStat(ThreadParam* threadParam)
 
         if (m_txWordCount[port] <= m_txWordIndex[port])
         {
-            // TODO: real GbaQueue call
-            // ClrCompatibilityFlg(&GbaQue, port);
-            (void)this; // keep placeholder alive
+            GbaQue.ClrCompatibilityFlg(port);
 
             return 1;
         }
@@ -3526,9 +3499,7 @@ int JoyBus::SendPlayerHP(ThreadParam* threadParam)
 
     hpData[0] = 0;
 
-	// TODO
-    // hpStatus = GetPlayerHP(&GbaQue, threadParam->m_portIndex, (unsigned char*)hpData);
-    int hpStatus = (int)this;
+    int hpStatus = GbaQue.GetPlayerHP(threadParam->m_portIndex, (unsigned char*)hpData);
 
     if (hpStatus >= 0)
 	{
@@ -3620,7 +3591,7 @@ int JoyBus::SendItemAll(ThreadParam* threadParam)
 
         unsigned char* itemBuf = &payload[1];
 
-        int itemLen = (int)this; // GetItemAll__8GbaQueueFiPUc(&GbaQue, port, itemBuf);
+        int itemLen = GbaQue.GetItemAll(port, itemBuf);
 
         if (itemLen < 0)
         {
@@ -3742,7 +3713,7 @@ int JoyBus::SendMapObj(ThreadParam* threadParam)
 
         unsigned char* mapObjBuf = &payload[1];
 
-        int dataLen = (int)this; // TODO GetMapObj__8GbaQueueFPUc(&GbaQue, mapObjBuf);
+        int dataLen = GbaQue.GetMapObj(mapObjBuf);
 
         if (dataLen < 0)
         {
@@ -3862,7 +3833,7 @@ int JoyBus::SendCompatibility(ThreadParam* threadParam)
 
         unsigned char* compatBuf = &payload[1];
 
-        int compatLen = (int)this; // GetCompatibility__8GbaQueueFiPUc(&GbaQue, port, compatBuf);
+        int compatLen = GbaQue.GetCompatibility(port, compatBuf);
 
         if (compatLen < 0)
         {
@@ -3933,7 +3904,7 @@ int JoyBus::SendCtrlMode(ThreadParam* threadParam, int controlMode)
 {
     const int port = threadParam->m_portIndex;
     unsigned char modeByte = static_cast<unsigned char>(controlMode);
-    bool isSingle = (bool)this; // TODO IsSingleMode__8GbaQueueFi(&GbaQue, port) != 0;
+    bool isSingle = GbaQue.IsSingleMode(port);
 
     // If single-player, force modeByte = 0
     if (isSingle)
@@ -3984,8 +3955,7 @@ int JoyBus::SendMapObjDrawFlg(ThreadParam* threadParam)
     //     return -1;
     unsigned char flgByte = 0;
 
-    // TODO restore:
-    // GetMapObjDrawFlg(&GbaQue, &flgByte);
+    GbaQue.GetMapObjDrawFlg((unsigned int*)&flgByte);
 
     unsigned char data[4] = { 0, 0, 0, flgByte };
     unsigned int crc = 0xFFFF;
@@ -4095,8 +4065,7 @@ int JoyBus::SendFavorite(ThreadParam* threadParam)
 
         unsigned char* favBuf = &payload[1];
 
-        int dataLen = 0;
-        // TODO: GetFavorite__8GbaQueueFiPc(&GbaQue, port, (char*)favBuf);
+        int dataLen = GbaQue.GetFavorite(port, (char*)favBuf);
 
         if (dataLen < 0)
         {
@@ -4378,8 +4347,7 @@ int JoyBus::SendEquip(ThreadParam* threadParam)
 
         unsigned char* equipBuf = &payload[1];
 
-        int dataLen = 0;
-        // TODO: dataLen = GetEquipData__8GbaQueueFiPUc(&GbaQue, port, equipBuf);
+        int dataLen = GbaQue.GetEquipData(port, equipBuf);
 
         if (dataLen < 0)
         {
@@ -4733,7 +4701,7 @@ int JoyBus::SendArtifact(ThreadParam* threadParam)
 
         unsigned char* artiBuf = &payload[1];
 
-        int dataLen = (int)this; // TODO: GetArtifactData__8GbaQueueFiPUc(&GbaQue, port, artiBuf);
+        int dataLen = GbaQue.GetArtifactData(port, artiBuf);
 
         if (dataLen < 0)
         {
@@ -4853,7 +4821,7 @@ int JoyBus::SendTmpArtifact(ThreadParam* threadParam)
 
         unsigned char* artiBuf = &payload[1];
 
-        int dataLen = (int)this; // TODO: GetTmpArtifactData__8GbaQueueFiPUc(&GbaQue, port, artiBuf);
+        int dataLen = GbaQue.GetTmpArtifactData(port, artiBuf);
 
         if (dataLen < 0)
         {
@@ -4974,7 +4942,7 @@ int JoyBus::SendMapObjInfo(ThreadParam* threadParam)
 
         unsigned char* mapObjBuf = &payload[1];
 
-        int dataLen = (int)this; // TODO: GetMapObjInfo__8GbaQueueFiPUc(&GbaQue, port, mapObjBuf);
+        int dataLen = GbaQue.GetMapObjInfo(port, mapObjBuf);
 
         if (dataLen < 0)
         {
@@ -5049,17 +5017,12 @@ int JoyBus::SendMapObjInfo(ThreadParam* threadParam)
 int JoyBus::SendStrength(ThreadParam* threadParam)
 {
     // Strength data returned as 3 bytes
-    unsigned char strength0 = 0;
-    unsigned char strength1 = 0;
-    unsigned char strength2 = 0;
+    unsigned char strength[3];
 
-    // TODO: restore when GbaQue exists
-    // GetStrengthData__8GbaQueueFiPUc(&GbaQue, threadParam->m_portIndex, &strength0);
-    // strength1 = ... (filled by GbaQue)
-    // strength2 = ...
+    GbaQue.GetStrengthData(threadParam->m_portIndex, (unsigned char*)&strength);
 
-    const unsigned short opcode = static_cast<unsigned short>(0x1900 | strength0);
-    const unsigned int cmd = MakeJoyCmd16(opcode, strength1, strength2);
+    const unsigned short opcode = static_cast<unsigned short>(0x1900 | strength[0]);
+    const unsigned int cmd = MakeJoyCmd16(opcode, strength[1], strength[2]);
 
     // If threads not running, return success
     if (m_threadRunningMask == 0)
@@ -5097,9 +5060,7 @@ int JoyBus::SendStrength(ThreadParam* threadParam)
 int JoyBus::SendRaderType(ThreadParam* threadParam)
 {
     const int port = threadParam->m_portIndex;
-
-    // unsigned char radarType = GetRadarType__8GbaQueueFi(&GbaQue, port);
-    unsigned char radarType = 0; // TODO restore when GbaQueue exists
+    unsigned char radarType = GbaQue.GetRadarType(port);
     unsigned short opcode = 0x140D;
     unsigned int cmd = MakeJoyCmd16(opcode, radarType, 0);
 
@@ -5134,10 +5095,9 @@ int JoyBus::SendRaderMode(ThreadParam* threadParam)
 {
     const int port = threadParam->m_portIndex;
 
-    // unsigned char radarMode = GetRadarMode__8GbaQueueFi(&GbaQue, port);
-    unsigned char radarMode = 0; // TODO restore when GbaQueue exists
+    unsigned char radarType = GbaQue.GetRadarType(port);
     unsigned short opcode = 0x140D;
-    unsigned int cmd = MakeJoyCmd16(opcode, radarMode, 0);
+    unsigned int cmd = MakeJoyCmd16(opcode, radarType, 0);
 
     int result = 0;
 
@@ -5218,7 +5178,7 @@ int JoyBus::SendScouInfo(ThreadParam* threadParam)
 
         unsigned char* scouterBuf = &payload[1];
 
-        int dataLen = 0; // TODO: GetScouterInfo__8GbaQueueFiPUc(&GbaQue, port, scouterBuf);
+        int dataLen = GbaQue.GetScouterInfo(port, scouterBuf);
 
         if (dataLen < 0)
         {
@@ -5286,10 +5246,7 @@ int JoyBus::SendScouInfo(ThreadParam* threadParam)
 int JoyBus::SendOpenMenu(ThreadParam* threadParam, char menuId)
 {
     const int port = threadParam->m_portIndex;
-
-    // Skip sending when in "single mode" (stubbed out for now)
-    bool isSingle = (bool)this;
-    // isSingle = IsSingleMode__8GbaQueueFi(&GbaQue, port);
+    bool isSingle = GbaQue.IsSingleMode(port);
 
     if (isSingle)
 	{
@@ -5331,22 +5288,15 @@ int JoyBus::SendOpenMenu(ThreadParam* threadParam, char menuId)
 int JoyBus::SendItemUse(ThreadParam* threadParam)
 {
     const int port = threadParam->m_portIndex;
-
-    // TODO
-    // isSingle = (IsSingleMode__8GbaQueueFi(&GbaQue, port) != 0);
-    bool isSingle = (bool)this;
+    bool isSingle = GbaQue.IsSingleMode(port);
 
     if (isSingle)
     {
         return 0;
     }
 
-    // TODO
-    unsigned char itemId = (unsigned char)this;
-    // itemId = GetItemUse__8GbaQueueFi(&GbaQue, port);
-
+    unsigned char itemId = GbaQue.GetItemUse(port);
     unsigned int cmd = MakeJoyCmd16(0x1410, itemId);
-
     int result = 0;
 
     if (m_threadRunningMask != 0)
@@ -5376,10 +5326,7 @@ int JoyBus::SendItemUse(ThreadParam* threadParam)
  */
 void JoyBus::SendSPMode(ThreadParam* threadParam)
 {
-    // Fetch SP mode (commented out until GbaQueue exists)
-    // unsigned int mode = GetSPMode__8GbaQueueFi(&GbaQue, threadParam->m_portIndex);
-    unsigned int mode = (int)threadParam; // TODO: replace when GbaQueue is implemented
-
+    unsigned int mode = GbaQue.GetSPMode(threadParam->m_portIndex);
     const unsigned char bVar1 = (mode != 0) ? 1 : 0;
     const unsigned short opcode = 0x1411;
     const unsigned int cmd = MakeJoyCmd16(opcode, bVar1, 0);
@@ -5419,10 +5366,7 @@ void JoyBus::SendSPMode(ThreadParam* threadParam)
 int JoyBus::SendMemorys(ThreadParam* threadParam)
 {
     const int port = threadParam->m_portIndex;
-
-    // TODO
-    // unsigned char value = GetMemorys__8GbaQueueFi(&GbaQue, port);
-    unsigned char value = (unsigned char)this;
+    unsigned char value = GbaQue.GetMemorys(port);
     unsigned int cmd = (0x14u << 24) | (0x13u << 16) | (value << 8);
 
     if (m_threadRunningMask == 0)
@@ -5457,10 +5401,7 @@ int JoyBus::SendMemorys(ThreadParam* threadParam)
 int JoyBus::SendChgCmdNum(ThreadParam* threadParam)
 {
     const int port = threadParam->m_portIndex;
-
-    // TODO
-    // cmdNum = GetCmdNum__8GbaQueueFi(&GbaQue, port);
-    unsigned char cmdNum = 0;
+    unsigned char cmdNum = GbaQue.GetCmdNum(port);
     unsigned int cmd = (0x14u << 24) | (0x12u << 16) | (static_cast<unsigned int>(cmdNum) << 8);
     int result = 0;
 
@@ -5541,8 +5482,7 @@ void JoyBus::DecRecvQueue(int portIndex)
  */
 int JoyBus::GetGBAStat(ThreadParam* threadParam)
 {
-    // TODO: IsSingleMode__8GbaQueueFi
-    bool single = (bool)this;
+    bool single = GbaQue.IsSingleMode(threadParam->m_portIndex);
 
     if (!single || threadParam->m_portIndex == 1)
     {
@@ -5565,9 +5505,7 @@ int JoyBus::GetGBAStat(ThreadParam* threadParam)
 int JoyBus::ChgCtrlMode(int portIndex)
 {
     unsigned char mode = m_ctrlModeArr[portIndex];
-
-    // TODO: IsSingleMode__8GbaQueueFi
-    bool single = (bool)this;
+    bool single = GbaQue.IsSingleMode(portIndex);
 
     if (!single)
     {
@@ -5615,9 +5553,7 @@ int JoyBus::ChgCtrlMode(int portIndex)
  */
 int JoyBus::SetCtrlMode(int portIndex, int controlMode)
 {
-    // TODO: restore when GbaQue exists
-    bool isSingle = portIndex > 0;
-    // isSingle = (IsSingleMode__8GbaQueueFi(&GbaQue, portIndex) != 0);
+    bool isSingle = GbaQue.IsSingleMode(portIndex);
 
     if (isSingle)
 	{
@@ -5625,11 +5561,7 @@ int JoyBus::SetCtrlMode(int portIndex, int controlMode)
 	}
 
     unsigned char modeFlag = (controlMode != 0) ? 1 : 0;
-
-    // TODO: restore when GbaQue exists
-    bool isSinglePort = portIndex > 0;
-    // isSinglePort = (IsSingleMode__8GbaQueueFi(&GbaQue,
-    //                    m_threadParams[portIndex].m_portIndex) != 0);
+    bool isSinglePort = GbaQue.IsSingleMode(m_threadParams[portIndex].m_portIndex);
 
     if (isSinglePort)
 	{
@@ -5677,8 +5609,7 @@ int JoyBus::SetCtrlMode(int portIndex, int controlMode)
  */
 unsigned char JoyBus::GetCtrlMode(int portIndex)
 {
-    // TODO: IsSingleMode__8GbaQueueFi
-    bool single = (bool)this;
+    bool single = GbaQue.IsSingleMode(portIndex);
 
     if (!single)
     {
@@ -6494,9 +6425,7 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
 	// TODO: restore when GbaQue exists
     else if (playerIndex == 1 /* && IsSingleMode__8GbaQueueFi(&GbaQue, 1) */   && menuId == 0)
     {
-		// TODO: restore when GbaQue exists
-        bool isSingle = false;
-        // isSingle = (IsSingleMode__8GbaQueueFi(&GbaQue, m_threadParams[1].m_portIndex) != 0);
+        bool isSingle = GbaQue.IsSingleMode(m_threadParams[1].m_portIndex);
 
         if (!isSingle)
         {
@@ -6529,12 +6458,8 @@ int JoyBus::SetOpenMenu(int playerIndex, char menuId)
     }
     else
     {
-		// TODO: restore when GbaQue exists
-        bool isSingle = false;
-        // isSingle = (IsSingleMode__8GbaQueueFi(
-        //                 &GbaQue,
-        //                 m_threadParams[playerIndex].m_portIndex) != 0);
-
+        bool isSingle = GbaQue.IsSingleMode(m_threadParams[playerIndex].m_portIndex);
+        
         if (!isSingle)
         {
             if (m_threadRunningMask == 0)

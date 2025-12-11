@@ -31,13 +31,14 @@ public:
     };
 
     CMemory();
+
     void Init();
     void Quit();
     void Frame();
     void HeapWalker();
     void Draw();
     void SetGroup(void*, int);
-    void CreateStage(unsigned long, char*, int);
+    CStage* CreateStage(unsigned long, char*, int);
     void DestroyStage(CMemory::CStage*);
     void _Alloc(unsigned long, CMemory::CStage*, char*, int, int);
     void Free(void*);
@@ -97,5 +98,7 @@ public:
     void AssertCache();
     void DumpCache();
 };
+
+CMemory Memory;
 
 #endif // _FFCC_MEMORY_H_

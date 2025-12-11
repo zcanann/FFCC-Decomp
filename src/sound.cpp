@@ -455,9 +455,9 @@ void CSound::StopSe3D(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CSound::FadeOutSe3D(int, int)
+_pppMngSt* CSound::FadeOutSe3D(int, int)
 {
-	// TODO
+	return (_pppMngSt*)nullptr;
 }
 
 /*

@@ -3,6 +3,7 @@
 
 #include "ffcc/file.h"
 
+struct _pppMngSt;
 struct Vec;
 
 class CSound
@@ -56,7 +57,7 @@ public:
     void SetSe3DGroup(int, int);
     void StopSe3DGroup(int);
     void StopSe3D(int);
-    void FadeOutSe3D(int, int);
+    _pppMngSt* FadeOutSe3D(int, int);
     void ChangeSe3DPos(int, Vec*);
     void ChangeSe3DPitch(int, int, int);
     void Clear3DLine(int);
@@ -73,5 +74,7 @@ public:
     void AddNoFreeWave(int);
     void WaitASync();
 };
+
+CSound Sound;
 
 #endif // _FFCC_PPP_SOUND_H_

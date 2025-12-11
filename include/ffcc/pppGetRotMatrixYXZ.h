@@ -1,7 +1,8 @@
 #ifndef _PPP_GETROTMATRIXYXZ_H_
 #define _PPP_GETROTMATRIXYXZ_H_
 
-struct pppFMATRIX;
+#include "ffcc/partMng.h"
+
 struct pppIVECTOR4;
 
 void pppGetRotMatrixYXZ(pppFMATRIX&, pppIVECTOR4*);

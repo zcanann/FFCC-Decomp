@@ -1,7 +1,7 @@
 #ifndef _PPP_GETROTMATRIXX_H_
 #define _PPP_GETROTMATRIXX_H_
 
-struct pppFMATRIX;
+#include "ffcc/partMng.h"
 
 void pppGetRotMatrixX(pppFMATRIX&, long);
 

@@ -49,7 +49,7 @@ void pppDrawMng::DrawOt()
     do
     {
         pppDrawPrimitive* prim = *slot;
-		
+
         if (prim != 0)
         {
             do
@@ -83,7 +83,6 @@ void pppDrawMng::DrawOt()
 
                     Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
                     break;
-
                 default:
                     break;
                 }

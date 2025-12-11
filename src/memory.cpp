@@ -85,9 +85,9 @@ void CMemory::SetGroup(void*, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMemory::CreateStage(unsigned long, char*, int)
+CMemory::CreateStage* CMemory::CreateStage(unsigned long, char*, int)
 {
-	// TODO
+	return (CMemory::CreateStage*)nullptr;
 }
 
 /*

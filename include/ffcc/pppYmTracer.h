@@ -11,7 +11,5 @@ void pppConstruct2YmTracer(void);
 void pppDestructYmTracer(void);
 void pppFrameYmTracer(void);
 void pppRenderYmTracer(void);
-void GXEnd(void);
-void GXSetTexCoordGen(void);
 
 #endif // _FFCC_PPP_YMTRACER_H_

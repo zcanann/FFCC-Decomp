@@ -10,6 +10,5 @@ void pppConstruct2YmDeformationMdl(void);
 void pppDestructYmDeformationMdl(void);
 void pppFrameYmDeformationMdl(void);
 void pppRenderYmDeformationMdl(void);
-void GXSetTexCoordGen(void);
 
 #endif // _PPP_YMDEFORMATIONMDL_H_

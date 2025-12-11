@@ -59,13 +59,3 @@ void pppRenderRain(void)
 {
 	// TODO
 }
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GXEnd(void)
-{
-	// TODO
-}

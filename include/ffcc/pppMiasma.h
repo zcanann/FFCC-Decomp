@@ -11,6 +11,5 @@ void pppConstructMiasma(void);
 void pppConstruct2Miasma(void);
 void pppDestructMiasma(void);
 void pppFrameMiasma(void);
-void GXSetTexCoordGen(void);
 
 #endif // _PPP_MIASMA_H_

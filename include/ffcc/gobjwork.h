@@ -1,6 +1,8 @@
 #ifndef _FFCC_GOBJWORK_H_
 #define _FFCC_GOBJWORK_H_
 
+#include "global.h"
+
 class CRomWork;
 class CRomLetterWork;
 
@@ -13,7 +15,7 @@ public:
     void Init(int, CRomWork*, int);
     void CalcStatus();
 
-    void* vtable;                           // 0x0000
+    // void* vtable;                        // 0x0000
     int m_objType;                          // 0x0004
     unsigned char m_saveSlot;               // 0x0008
     unsigned char m_partyIndex;             // 0x0009
@@ -32,8 +34,10 @@ public:
     unsigned short* m_romWorkPtr;           // 0x0024
     unsigned short m_elementResistances[8]; // 0x0028 physical, fire, freeze, stun, slow, stop, gravity, holy
     unsigned short m_statusTimers[42];      // 0x0038
-    unsigned short m_statusValues[16];      // 0x008C
-};
+    unsigned short m_statusValues[16];      // 0x008C-0xAB
+}; // Size: 0xAC
+
+STATIC_ASSERT(sizeof(CGObjWork) == 0xAC);
 
 class CMonWork : public CGObjWork
 {
@@ -47,8 +51,9 @@ public:
     unsigned short unk_0xb4[14]; // 0x00B4
     unsigned short unk_0xd0[16]; // 0x00D0
     unsigned short unk_0xf0[16]; // 0x00F0
-    
-};
+}; // Size 0x110
+
+STATIC_ASSERT(sizeof(CMonWork) == 0x110);
 
 class CCaravanWork : public CGObjWork
 {
@@ -122,7 +127,6 @@ public:
     void UniteComList(int, int, int);
     void UnuniteComList(int, int);
     void GetEvtFlag(int);
-
 
     short m_equipment[4];                       // 0x00AC weapon[0], armor[1], tribal[2], accessory[3]
     short m_inventoryItemCount;                 // 0x00B4
@@ -211,7 +215,8 @@ public:
     int m_shopData0;                            // 0x0C24
     int m_shopData1;                            // 0x0C28
     int m_shopData2;                            // 0x0C2C
+}; // Size 0xC30
 
-};
+STATIC_ASSERT(sizeof(CCaravanWork) == 0xC30);
 
 #endif // _FFCC_GOBJWORK_H_

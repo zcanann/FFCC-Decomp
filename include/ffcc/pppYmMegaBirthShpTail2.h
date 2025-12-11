@@ -1,14 +1,14 @@
 #ifndef _PPP_YMMEGABIRTHSHPTAIL2_H_
 #define _PPP_YMMEGABIRTHSHPTAIL2_H_
 
-struct pppFVECTOR4;
-struct VYmMegaBirthShpTail2;
-struct PYmMegaBirthShpTail2;
-struct _pppPObject;
-struct VColor;
-struct _PARTICLE_DATA;
-struct _PARTICLE_WMAT;
-struct _PARTICLE_COLOR;
+#include "ffcc/partMng.h"
+
+typedef _PARTICLE_DATA PYmMegaBirthShpTail2; // Size 0x140
+
+struct VYmMegaBirthShpTail2
+{
+
+};
 
 void get_rand(void);
 void U8ToF32(pppFVECTOR4*, unsigned char*);

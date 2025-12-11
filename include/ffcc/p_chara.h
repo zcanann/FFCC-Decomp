@@ -23,7 +23,6 @@ void GET_CHARA_ALLOC_STAGE_S(int, CMemory::CStage*);
 class CCharaPcs : public CProcess
 {
 public:
-
     class CHandle
     {
     public:
@@ -156,5 +155,7 @@ public:
     void LoadAnim(int, int, char*, int, int, int);
     void GetAnimStage();
 };
+
+CCharaPcs CharaPcs;
 
 #endif // _FFCC_P_CHARA_H_

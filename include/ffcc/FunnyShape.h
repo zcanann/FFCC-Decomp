@@ -4,9 +4,6 @@
 class FS_tagOAN3_SHAPE;
 class Vec2d;
 
-void GXEnd(void);
-void GXSetTexCoordGen(void);
-
 class CFunnyShape
 {
 public:

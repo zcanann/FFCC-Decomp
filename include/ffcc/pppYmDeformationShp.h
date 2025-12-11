@@ -19,8 +19,6 @@ void pppConstruct2YmDeformationShp(void);
 void pppDestructYmDeformationShp(void);
 void pppFrameYmDeformationShp(void);
 void RenderDeformationShape(_pppPObject*, VYmDeformationShp*, Vec*, Vec2d*);
-void GXEnd(void);
-void GXSetTexCoordGen(void);
 void pppRenderYmDeformationShp(void);
 
 #endif // _PPP_YMDEFORMATIONSHP_H_

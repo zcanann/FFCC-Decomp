@@ -45,9 +45,9 @@ void pppRotMatrix(pppFMATRIX&, pppFMATRIX&, Vec&)
  * Address:	TODO
  * Size:	TODO
  */
-void pppApplyMatrix(Vec&, pppFMATRIX&, Vec&)
-{
-	// TODO
+void pppApplyMatrix(Vec& destination, pppFMATRIX pppFMatrix, Vec source)
+{ 
+	PSMTXMultVecSR(pppFMatrix, &source, &destination);
 }
 
 /*

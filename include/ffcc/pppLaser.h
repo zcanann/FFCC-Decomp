@@ -6,7 +6,5 @@ void pppConstruct2Laser(void);
 void pppDestructLaser(void);
 void pppFrameLaser(void);
 void pppRenderLaser(void);
-void GXEnd(void);
-void GXSetTexCoordGen(void);
 
 #endif // _PPP_LASER_H_

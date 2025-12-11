@@ -15,6 +15,5 @@ void pppDestructEmission(void);
 void pppFrameEmission(void);
 void pppRenderEmission(void);
 void CMaterialMan_GetModelViewITMtx(float (*)[4]);
-void GXSetTexCoordGen(void);
 
 #endif // _PPPEMISSION_H_

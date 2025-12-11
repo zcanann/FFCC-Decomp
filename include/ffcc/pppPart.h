@@ -17,13 +17,14 @@ struct _pppPDataVal
 
 struct pppCVECTOR
 {
+    unsigned char rgba[4];
 };
 
 void pppPlaySe(_pppMngSt*, PPPSEST*);
 void pppStopSe(_pppMngSt*, PPPSEST*);
 void pppUnitMatrix(pppFMATRIX&);
 void pppRotMatrix(pppFMATRIX&, pppFMATRIX, Vec&);
-void pppApplyMatrix(Vec&, pppFMATRIX, Vec&);
+void pppApplyMatrix(Vec& destination, pppFMATRIX pppFMatrix, Vec source);
 void pppAddVector(Vec&, Vec&, Vec&);
 void pppScaleVectorXYZ(Vec&, Vec&, float);
 void pppScaleVector(Vec&, Vec&, float);

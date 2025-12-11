@@ -11,6 +11,4 @@ void pppDestructCrystal2(void);
 void pppFrameCrystal2(void);
 void pppRenderCrystal2(void);
 
-void GXSetTexCoordGen(void);
-
 #endif // _FFCC_PPPCRYSTAL2_H_

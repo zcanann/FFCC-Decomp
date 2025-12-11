@@ -125,16 +125,6 @@ void RenderWaterMesh(VMana2*)
  * Address:	TODO
  * Size:	TODO
  */
-void GXEnd(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CalculateNormal(VMana2*)
 {
 	// TODO

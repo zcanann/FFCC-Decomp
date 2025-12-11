@@ -5,6 +5,5 @@ void pppConstructColum(void);
 void pppDestructColum(void);
 void pppFrameColum(void);
 void pppRenderColum(void);
-void GXSetTexCoordGen(void);
 
 #endif // _FFCC_PPPCOLUM_H_

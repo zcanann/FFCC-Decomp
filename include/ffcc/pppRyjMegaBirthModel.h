@@ -1,14 +1,14 @@
 #ifndef _PPP_RYJMEGABIRTHMODEL_H_
 #define _PPP_RYJMEGABIRTHMODEL_H_
 
-struct _PARTICLE_COLOR;
-struct _PARTICLE_DATA;
-struct _PARTICLE_WMAT;
-struct _pppPObject;
-struct pppFMATRIX;
-class PRyjMegaBirthModel;
-class VRyjMegaBirthModel;
-struct VColor;
+#include "ffcc/partMng.h"
+
+typedef _PARTICLE_DATA PRyjMegaBirthModel; // Size 0x140
+
+struct VRyjMegaBirthModel
+{
+
+};
 
 void get_rand(void);
 void get_noise(unsigned char);

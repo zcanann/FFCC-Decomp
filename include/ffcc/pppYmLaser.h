@@ -7,7 +7,4 @@ void pppDestructYmLaser(void);
 void pppFrameYmLaser(void);
 void pppRenderYmLaser(void);
 
-void GXEnd(void);
-void GXSetTexCoordGen(void);
-
 #endif // _PPP_YMLASER_H_

@@ -11,6 +11,5 @@ void pppConstructRain(void);
 void pppDestructRain(void);
 void pppFrameRain(void);
 void pppRenderRain(void);
-void GXEnd(void);
 
 #endif // _PPP_RAIN_H_

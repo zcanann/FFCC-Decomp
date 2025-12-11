@@ -20,8 +20,6 @@ class CCameraPcs;
 void checkThread(void*);
 void wakeup(OSAlarm*, OSContext*);
 void sleep();
-void GXSetTexCoordGen();
-void GXEnd();
 void std_sinf(float);
 void std_cosf(float);
 
@@ -89,5 +87,7 @@ public:
     void CreateTempBuffer();
     void DestroyTempBuffer();
 };
+
+CGraphic Graphic;
 
 #endif // _GRAPHIC_H_

@@ -1,6 +1,8 @@
 #ifndef _FFCC_GAME_H_
 #define _FFCC_GAME_H_
 
+#include "global.h"
+
 #include "ffcc/cflat_data.h"
 #include "ffcc/gobjwork.h"
 #include "ffcc/manager.h"
@@ -77,7 +79,7 @@ public:
         unsigned char m_stereoFlag;                      // 0x13DF
         unsigned int m_mcSerial0;                        // 0x13E0
         unsigned int m_mcSerial1;                        // 0x13E4
-    };
+    }; // Size 0x13E8
 
 public:
     CGame();
@@ -145,7 +147,7 @@ public:
     CMonWork m_monWorkArr[64];              // 0x81A0 size 0x4400
     unsigned int unkCFlatData0[4];          // 0xC5A0
     CGPartyObj* m_partyObjArr[4];           // 0xC5B0
-    unsigned char* m_scriptFoodBase[4];     // 0xC5C0
+    unsigned int m_scriptFoodBase[4];       // 0xC5C0
     unsigned int m_scriptWork[4][16][2];    // 0xC5D0
     unsigned int unk_flat3_0xc7d0;          // 0xC7D0
     unsigned int unk_flat3_count_0xc7d4;    // 0xC7D4
@@ -179,6 +181,9 @@ public:
     CMemory::CStage* m_mainStage;           // 0xCC30
     CMemory::CStage* m_debugStage;          // 0xCC34
     CFlatData m_cFlatDataArr[4];            // 0xCC38 stride 0x14D4, total 0x5350
-};
+}; // Size 0x11F88
+
+STATIC_ASSERT(sizeof(CGame::CGameWork) == 0x13E8);
+STATIC_ASSERT(sizeof(CGame) == 0x11F88);
 
 #endif // _FFCC_GAME_H_

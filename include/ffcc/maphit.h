@@ -10,7 +10,6 @@ class CBound;
 
 void FindIntersection(const Vec&, const Vec&, const CMapCylinder&, float&);
 void CheckLineCylinder(const Vec&, const Vec&, const CMapCylinder&, float&);
-void GXEnd(void);
 
 class CMapCylinder
 {

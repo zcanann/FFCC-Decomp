@@ -32,7 +32,9 @@ public:
     // void* vtable; // 0x00
     int unknown[3];  // 0x4-0xC
     CGame game;      // 0xC
-};
+}; // Size 0x11F98
+
+STATIC_ASSERT(sizeof(CGamePcs) == 0x11F98);
 
 CGamePcs Game;
 

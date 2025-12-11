@@ -22,8 +22,6 @@ void GetCharaHandlePtr(CGObject*, long);
 void DisableIndWarp(_GXTevStageID, _GXIndTexStageID);
 void SetUpPaletteEnv(CTexture*);
 void genParaboloidMap(void*, unsigned long*, unsigned short, _GXVtxFmt);
-void GXEnd(void);
 void drawParaboloidMap(_GXTexObj*, _GXTexObj*, void*, unsigned long, _GXTexObj*, unsigned char);
-void GXSetTexCoordGen(void);
 
 #endif // _PPP_YMENV_H_

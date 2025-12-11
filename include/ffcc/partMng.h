@@ -14,6 +14,11 @@ class CChunkFile;
 class CTexture;
 class CTextureSet;
 
+struct _PARTICLE_WMAT
+{
+
+};
+
 struct PPPSEST
 {
     int m_soundEffectSlot;                  // 0x0
@@ -78,10 +83,18 @@ struct _PARTICLE_COLOR
 
 struct _PARTICLE_DATA
 {
+    Mtx m_matrix; // 0x0
+
+    // Will fill these in once I ghidra the entire struct.
 };
 
 struct _pppPObject
 {
+};
+
+struct pppFVECTOR4
+{
+
 };
 
 struct VColor
@@ -262,5 +275,8 @@ public:
     void pppDeleteAll();
     void pppDestroyAll();
 };
+
+_pppEnvSt* pppEnvStPtr;
+_pppMngSt* pppMngStPtr;
 
 #endif

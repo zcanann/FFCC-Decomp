@@ -9,6 +9,5 @@ void pppConstructCrystal(void);
 void pppDestructCrystal(void);
 void pppFrameCrystal(void);
 void pppRenderCrystal(void);
-void GXSetTexCoordGen(void);
 
 #endif // _FFCC_PPPCRYSTAL_H_

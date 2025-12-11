@@ -165,16 +165,6 @@ void CMapHit::Draw()
  * Address:	TODO
  * Size:	TODO
  */
-void GXEnd(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CMapHit::DrawWire()
 {
 	// TODO

@@ -59,23 +59,3 @@ void pppRenderYmDeformationScreen(void)
 {
 	// TODO
 }
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GXEnd(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GXSetTexCoordGen(void)
-{
-	// TODO
-}

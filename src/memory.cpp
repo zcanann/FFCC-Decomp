@@ -285,16 +285,6 @@ void CMemory::CStage::drawHeapBar(int)
  * Address:	TODO
  * Size:	TODO
  */
-void GXEnd(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CMemory::CStage::drawHeapTitle(int)
 {
 	// TODO

@@ -173,6 +173,7 @@ struct _pppMngSt
     unsigned char m_ownerFlagsInitialized;
     unsigned char m_slotVisible;
     unsigned char m_nodeScaleInitialized;
+    unsigned char m_fpBillboard;
     float m_ownerScale;
     unsigned char m_useOwnerScaleSign;
     CChara::CNode* m_bindNode;
@@ -462,6 +463,10 @@ public:
     void pppDeleteAll();
     void pppDestroyAll();
 };
+
+Mtx ppvCameraMatrix0;
+Mtx ppvWorldMatrix;
+Mtx ppvWorldMatrixWood;
 
 _pppEnvSt* pppEnvStPtr;
 _pppMngSt* pppMngStPtr;

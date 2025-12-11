@@ -3,6 +3,7 @@
 #include "ffcc/map.h"
 #include "ffcc/memory.h"
 #include "ffcc/sound.h"
+#include "ffcc/p_camera.h"
 #include "ffcc/pppGetRotMatrixXYZ.h"
 #include "ffcc/pppGetRotMatrixXZY.h"
 #include "ffcc/pppGetRotMatrixYXZ.h"
@@ -451,7 +452,7 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 
 	u8 mode = pppMngSt->m_matrixMode;
 
-	Mtx nodeMtx;
+	Mtx nodeMtx = {};
 	Vec tmpPos;
 	bool attached = false;
 
@@ -709,9 +710,92 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
  * Address:	TODO
  * Size:	TODO
  */
-void pppSetFpMatrix(_pppMngSt*)
+void pppSetFpMatrix(_pppMngSt* pppMngSt)
 {
-	// TODO
+	Vec pos;
+	Vec up;
+	Vec upTmp;
+	Vec right;
+	Vec rightTmp;
+	Vec forward;
+	Vec forwardTmp;
+	Mtx localMtx = {};
+
+	PSMTXCopy(pppMngStPtr->m_matrix, localMtx);
+
+	if (pppMngSt->m_fpBillboard == 0)
+	{
+		PSMTXConcat(ppvCameraMatrix0, pppMngStPtr->m_matrix, ppvWorldMatrix);
+
+		pos.x = localMtx[0][3];
+		pos.y = localMtx[1][3];
+		pos.z = localMtx[2][3];
+
+		PSMTXMultVec(ppvCameraMatrix0, &pos, &pos);
+	}
+	else
+	{
+		PSMTXConcat(ppvCameraMatrix0, pppMngStPtr->m_matrix, ppvWorldMatrix);
+
+		pos.x = localMtx[0][3];
+		pos.y = localMtx[1][3];
+		pos.z = localMtx[2][3];
+
+		PSMTXMultVecSR(ppvCameraMatrix0, &pos, &pos);
+
+		pos.y += CameraPcs._228_4_;
+	}
+
+	up.x = ppvWorldMatrix[0][1];
+	up.y = ppvWorldMatrix[1][1];
+	up.z = ppvWorldMatrix[2][1];
+
+	upTmp = up;
+
+	ppvWorldMatrix[0][3] = pos.x;
+	ppvWorldMatrix[1][3] = pos.y;
+	ppvWorldMatrix[2][3] = pos.z;
+
+	if (ppvWorldMatrix[0][1] != kPppZero || ppvWorldMatrix[1][1] != kPppZero || ppvWorldMatrix[2][1] != kPppZero)
+	{
+		PSVECNormalize(&upTmp, &up);
+	}
+
+	right.x	= up.y;
+	rightTmp.x = up.y;
+	rightTmp.y = -up.x;
+	right.y	= rightTmp.y;
+	right.z	= kPppZero;
+	rightTmp.z = kPppZero;
+
+	ppvWorldMatrixWood[0][1] = up.x;
+	ppvWorldMatrixWood[1][1] = up.y;
+	ppvWorldMatrixWood[2][1] = up.z;
+
+	if (up.y != kPppZero || rightTmp.y != kPppZero)
+	{
+		PSVECNormalize(&rightTmp, &right);
+	}
+
+	ppvWorldMatrixWood[0][0] = right.x;
+	ppvWorldMatrixWood[1][0] = right.y;
+	ppvWorldMatrixWood[2][0] = right.z;
+
+	PSVECCrossProduct(&right, &up, &forward);
+	forwardTmp = forward;
+
+	if (forward.x != kPppZero || forward.y != kPppZero || forward.z != kPppZero)
+	{
+		PSVECNormalize(&forwardTmp, &forward);
+	}
+
+	ppvWorldMatrixWood[0][2] = forward.x;
+	ppvWorldMatrixWood[1][2] = forward.y;
+	ppvWorldMatrixWood[2][2] = forward.z;
+
+	ppvWorldMatrixWood[0][3] = ppvWorldMatrix[0][3];
+	ppvWorldMatrixWood[1][3] = ppvWorldMatrix[1][3];
+	ppvWorldMatrixWood[2][3] = ppvWorldMatrix[2][3];
 }
 
 /*

@@ -19,6 +19,12 @@ void dbgDrawSphere(float, float, float, float, unsigned char, unsigned char, uns
 class CCameraPcs : public CProcess
 {
 public:
+    class camdtst
+    {
+    public:
+        
+    };
+
     CCameraPcs();
 
     void Init();
@@ -84,13 +90,10 @@ public:
     void SetWorldMapMatrix(float (*)[4]);
     void GetWorldMapInverseMatrix(float (*)[4]);
 
-    //
-    // camdtst
-    //
-    class camdtst
-    {
-    public:
-    };
+    // TODO
+    float _228_4_;
 };
+
+CCameraPcs CameraPcs;
 
 #endif // _FFCC_P_CAMERA_H_

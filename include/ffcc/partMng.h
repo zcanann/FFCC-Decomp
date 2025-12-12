@@ -16,7 +16,6 @@ class CTextureSet;
 
 struct _PARTICLE_WMAT
 {
-
 };
 
 struct PPPSEST
@@ -136,7 +135,10 @@ struct _pppDataHead
 
 struct pppIVECTOR4
 {
-    short vector[4];
+    short x;
+    short y;
+    short z;
+    short w;
 };
 
 struct _pppEnvSt

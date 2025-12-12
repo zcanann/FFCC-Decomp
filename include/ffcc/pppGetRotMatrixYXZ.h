@@ -3,8 +3,6 @@
 
 #include "ffcc/partMng.h"
 
-struct pppIVECTOR4;
-
-void pppGetRotMatrixYXZ(pppFMATRIX&, pppIVECTOR4*);
+void pppGetRotMatrixYXZ(pppFMATRIX& out, pppIVECTOR4* angle);
 
 #endif // _PPP_GETROTMATRIXYXZ_H_

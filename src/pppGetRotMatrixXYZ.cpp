@@ -1,11 +1,25 @@
 #include "ffcc/pppGetRotMatrixXYZ.h"
 
+#include "ffcc/partMngTrig.h"
+#include "ffcc/pppGetRotMatrixX.h"
+#include "ffcc/pppGetRotMatrixY.h"
+#include "ffcc/pppGetRotMatrixZ.h"
+
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-void pppGetRotMatrixXYZ(pppFMATRIX&, pppIVECTOR4*)
+void pppGetRotMatrixXYZ(pppFMATRIX& out, pppIVECTOR4* angle)
 {
-	// TODO
+	pppFMATRIX mZ;
+	pppFMATRIX mY;
+	Mtx yz;
+	pppFMATRIX mX;
+
+	pppGetRotMatrixZ(mZ, angle->z);
+	pppGetRotMatrixY(mY, angle->y);
+	PSMTXConcat(mY, mZ, yz);
+	pppGetRotMatrixX(mX, angle->x);
+	PSMTXConcat(mX, yz, out);
 }

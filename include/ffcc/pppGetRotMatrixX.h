@@ -3,6 +3,6 @@
 
 #include "ffcc/partMng.h"
 
-void pppGetRotMatrixX(pppFMATRIX&, long);
+void pppGetRotMatrixX(pppFMATRIX& mtx, unsigned long angle);
 
 #endif // _PPP_GETROTMATRIXX_H_

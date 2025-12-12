@@ -7,7 +7,7 @@
  * Address:	TODO
  * Size:	TODO
  */
-void pppGetRotMatrixZ(pppFMATRIX& mtx, unsigned long angle)
+void pppGetRotMatrixZ(pppFMATRIX& mtx, long angle)
 {    
 	float zero = 0.0f; // FLOAT_8032fec4
 	float one = 1.0f; // FLOAT_8032fec0

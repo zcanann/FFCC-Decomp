@@ -1,6 +1,8 @@
 #ifndef _FFCC_MEMORY_H_
 #define _FFCC_MEMORY_H_
 
+#include <dolphin/types.h>
+
 class CMemory;
 class CAmemCache;
 class CAmemCacheSet;

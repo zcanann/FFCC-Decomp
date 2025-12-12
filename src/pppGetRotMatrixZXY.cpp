@@ -14,12 +14,12 @@ void pppGetRotMatrixZXY(pppFMATRIX& out, pppIVECTOR4* angle)
 {
     pppFMATRIX mY;
     pppFMATRIX mX;
-    Mtx xy;
+    pppFMATRIX xy;
     pppFMATRIX mZ;
 	
     pppGetRotMatrixY(mY, angle->y);
     pppGetRotMatrixX(mX, angle->x);
-    PSMTXConcat(mX, mY, xy);
+    PSMTXConcat(mX.value, mY.value, xy.value);
     pppGetRotMatrixZ(mZ, angle->z);
-    PSMTXConcat(mZ, xy, out);
+    PSMTXConcat(mZ.value, xy.value, out.value);
 }

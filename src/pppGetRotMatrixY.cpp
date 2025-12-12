@@ -14,18 +14,18 @@ void pppGetRotMatrixY(pppFMATRIX& mtx, unsigned long angle)
 	float sinValue = pppSinFromTable(angle);
 	float cosValue = pppCosFromTable(angle);
 
-	mtx[0][0] = cosValue;
-	mtx[0][1] = zero;
-	mtx[0][2] = sinValue;
-	mtx[0][3] = zero;
+	mtx.value[0][0] = cosValue;
+	mtx.value[0][1] = zero;
+	mtx.value[0][2] = sinValue;
+	mtx.value[0][3] = zero;
 
-	mtx[1][0] = zero;
-	mtx[1][1] = one;
-	mtx[1][2] = zero;
-	mtx[1][3] = zero;
+	mtx.value[1][0] = zero;
+	mtx.value[1][1] = one;
+	mtx.value[1][2] = zero;
+	mtx.value[1][3] = zero;
 
-	mtx[2][0] = -sinValue;
-	mtx[2][1] = zero;
-	mtx[2][2] = cosValue;
-	mtx[2][3] = zero;
+	mtx.value[2][0] = -sinValue;
+	mtx.value[2][1] = zero;
+	mtx.value[2][2] = cosValue;
+	mtx.value[2][3] = zero;
 }

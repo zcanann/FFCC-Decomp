@@ -71,7 +71,10 @@ struct PPPCREATEPARAM
     int m_unk;                        // 0x6c
 }; // SIze 0x70
 
-typedef Mtx pppFMATRIX;     // Size 0x30
+struct pppFMATRIX
+{
+    Mtx value;
+};
 typedef Mtx PARTICLE_WMAT;  // Size 0x30
 
 struct _PARTICLE_COLOR

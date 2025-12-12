@@ -39,7 +39,7 @@ _pppMngSt* pppStopSe(_pppMngSt* pppMngSt, PPPSEST* pppSest)
  */
 void pppUnitMatrix(pppFMATRIX& pppFMtx)
 { 
-	PSMTXIdentity(pppFMtx);
+	PSMTXIdentity(pppFMtx.value);
 }
 
 /*
@@ -49,17 +49,17 @@ void pppUnitMatrix(pppFMATRIX& pppFMtx)
  */
 void pppRotMatrix(pppFMATRIX& dst, pppFMATRIX& src, const Vec& rot)
 {
-	Mtx Rx;
-	Mtx Ry;
-	Mtx Rz;
-	Mtx R;
+	pppFMATRIX Rx;
+	pppFMATRIX Ry;
+	pppFMATRIX Rz;
+	pppFMATRIX R;
 
-	PSMTXRotRad(Rx, 'x', rot.x);
-	PSMTXRotRad(Ry, 'y', rot.y);
-	PSMTXRotRad(Rz, 'z', rot.z);
-	PSMTXConcat(Ry, Rz, R);
-	PSMTXConcat(Rx, R, R);
-	PSMTXConcat(R, src, dst);
+	PSMTXRotRad(Rx.value, 'x', rot.x);
+	PSMTXRotRad(Ry.value, 'y', rot.y);
+	PSMTXRotRad(Rz.value, 'z', rot.z);
+	PSMTXConcat(Ry.value, Rz.value, R.value);
+	PSMTXConcat(Rx.value, R.value, R.value);
+	PSMTXConcat(R.value, src.value, dst.value);
 }
 
 /*
@@ -69,7 +69,7 @@ void pppRotMatrix(pppFMATRIX& dst, pppFMATRIX& src, const Vec& rot)
  */
 void pppApplyMatrix(Vec& destination, pppFMATRIX pppFMatrix, Vec source)
 { 
-	PSMTXMultVecSR(pppFMatrix, &source, &destination);
+	PSMTXMultVecSR(pppFMatrix.value, &source, &destination);
 }
 
 /*
@@ -109,21 +109,21 @@ void pppScaleVector(Vec& outVec, Vec inVec, float scale)
  */
 void pppGetRowVector(pppFMATRIX& pppFMtx, Vec& vecA, Vec& vecB, Vec& vecC, Vec& vecD)
 {
-	vecA.x = pppFMtx[0][0];
-	vecA.y = pppFMtx[1][0];
-	vecA.z = pppFMtx[2][0];
+	vecA.x = pppFMtx.value[0][0];
+	vecA.y = pppFMtx.value[1][0];
+	vecA.z = pppFMtx.value[2][0];
 
-	vecB.x = pppFMtx[0][1];
-	vecB.y = pppFMtx[1][1];
-	vecB.z = pppFMtx[2][1];
+	vecB.x = pppFMtx.value[0][1];
+	vecB.y = pppFMtx.value[1][1];
+	vecB.z = pppFMtx.value[2][1];
 
-	vecC.x = pppFMtx[0][2];
-	vecC.y = pppFMtx[1][2];
-	vecC.z = pppFMtx[2][2];
+	vecC.x = pppFMtx.value[0][2];
+	vecC.y = pppFMtx.value[1][2];
+	vecC.z = pppFMtx.value[2][2];
 
-	vecD.x = pppFMtx[0][3];
-	vecD.y = pppFMtx[1][3];
-	vecD.z = pppFMtx[2][3];
+	vecD.x = pppFMtx.value[0][3];
+	vecD.y = pppFMtx.value[1][3];
+	vecD.z = pppFMtx.value[2][3];
 }
 
 /*
@@ -133,21 +133,21 @@ void pppGetRowVector(pppFMATRIX& pppFMtx, Vec& vecA, Vec& vecB, Vec& vecC, Vec& 
  */
 void pppSetRowVector(pppFMATRIX& pppFMtx, Vec& vecA, Vec& vecB, Vec& vecC, Vec& vecD)
 {
-	pppFMtx[0][0] = vecA.x;
-	pppFMtx[1][0] = vecA.y;
-	pppFMtx[2][0] = vecA.z;
+	pppFMtx.value[0][0] = vecA.x;
+	pppFMtx.value[1][0] = vecA.y;
+	pppFMtx.value[2][0] = vecA.z;
 
-	pppFMtx[0][1] = vecB.x;
-	pppFMtx[1][1] = vecB.y;
-	pppFMtx[2][1] = vecB.z;
+	pppFMtx.value[0][1] = vecB.x;
+	pppFMtx.value[1][1] = vecB.y;
+	pppFMtx.value[2][1] = vecB.z;
 
-	pppFMtx[0][2] = vecC.x;
-	pppFMtx[1][2] = vecC.y;
-	pppFMtx[2][2] = vecC.z;
+	pppFMtx.value[0][2] = vecC.x;
+	pppFMtx.value[1][2] = vecC.y;
+	pppFMtx.value[2][2] = vecC.z;
 
-	pppFMtx[0][3] = vecD.x;
-	pppFMtx[1][3] = vecD.y;
-	pppFMtx[2][3] = vecD.z;
+	pppFMtx.value[0][3] = vecD.x;
+	pppFMtx.value[1][3] = vecD.y;
+	pppFMtx.value[2][3] = vecD.z;
 }
 
 /*
@@ -180,7 +180,7 @@ void pppOuterProduct(Vec& ab, Vec a, Vec b)
  */
 void pppCopyMatrix(pppFMATRIX& dest, pppFMATRIX source)
 { 
-	PSMTXCopy(source, dest);
+	PSMTXCopy(source.value, dest.value);
 }
 
 /*
@@ -190,7 +190,7 @@ void pppCopyMatrix(pppFMATRIX& dest, pppFMATRIX source)
  */
 void pppMulMatrix(pppFMATRIX& ab, pppFMATRIX& a, pppFMATRIX& b)
 { 
-	PSMTXConcat(a, b, ab);
+	PSMTXConcat(a.value, b.value, ab.value);
 }
 
 /*
@@ -481,7 +481,7 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 		nodeMtx[1][3] += pppMngStPtr->m_position.y;
 		nodeMtx[2][3] += pppMngStPtr->m_position.z;
 
-		PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix, pppMngStPtr->m_matrix);
+		PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
 		attached = true;
 	}
 	else if (mode < 5)
@@ -510,7 +510,7 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 			nodeMtx[1][3] += pppMngStPtr->m_position.y;
 			nodeMtx[2][3] += pppMngStPtr->m_position.z;
 
-			PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix, pppMngStPtr->m_matrix);
+			PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
 			attached = true;
 		}
 		else
@@ -526,7 +526,7 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 				nodeMtx[1][3] += pppMngStPtr->m_position.y;
 				nodeMtx[2][3] += pppMngStPtr->m_position.z;
 
-				PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix, pppMngStPtr->m_matrix);
+				PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
 				attached = true;
 			}
 			else
@@ -544,7 +544,7 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 				nodeMtx[1][3] += pppMngStPtr->m_position.y;
 				nodeMtx[2][3] += pppMngStPtr->m_position.z;
 
-				PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix, pppMngStPtr->m_matrix);
+				PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
 				attached = true;
 			}
 		}
@@ -572,9 +572,9 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 
 			PSMTXMultVecSR(nodeMtx, &pppMngStPtr->m_position, &tmpPos);
 
-			pppMngStPtr->m_matrix[0][3] = nodeMtx[0][3] + tmpPos.x;
-			pppMngStPtr->m_matrix[1][3] = nodeMtx[1][3] + tmpPos.y;
-			pppMngStPtr->m_matrix[2][3] = nodeMtx[2][3] + tmpPos.z;
+			pppMngStPtr->m_matrix.value[0][3] = nodeMtx[0][3] + tmpPos.x;
+			pppMngStPtr->m_matrix.value[1][3] = nodeMtx[1][3] + tmpPos.y;
+			pppMngStPtr->m_matrix.value[2][3] = nodeMtx[2][3] + tmpPos.z;
 
 			attached = true;
 		}
@@ -628,7 +628,7 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 			nodeMtx[1][3] += tmpPos.y;
 			nodeMtx[2][3] += tmpPos.z;
 
-			PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix, pppMngStPtr->m_matrix);
+			PSMTXConcat(nodeMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
 			attached = true;
 		}
 	}
@@ -638,70 +638,70 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 	LocalOnly:
 		Vec col;
 
-		col.x = pppMngStPtr->m_matrix[0][0];
-		col.y = pppMngStPtr->m_matrix[1][0];
-		col.z = pppMngStPtr->m_matrix[2][0];
+		col.x = pppMngStPtr->m_matrix.value[0][0];
+		col.y = pppMngStPtr->m_matrix.value[1][0];
+		col.z = pppMngStPtr->m_matrix.value[2][0];
 		PSVECScale(&col, &col, pppMngSt->m_scale.x);
-		pppMngStPtr->m_matrix[0][0] = col.x;
-		pppMngStPtr->m_matrix[1][0] = col.y;
-		pppMngStPtr->m_matrix[2][0] = col.z;
+		pppMngStPtr->m_matrix.value[0][0] = col.x;
+		pppMngStPtr->m_matrix.value[1][0] = col.y;
+		pppMngStPtr->m_matrix.value[2][0] = col.z;
 
-		col.x = pppMngStPtr->m_matrix[0][1];
-		col.y = pppMngStPtr->m_matrix[1][1];
-		col.z = pppMngStPtr->m_matrix[2][1];
+		col.x = pppMngStPtr->m_matrix.value[0][1];
+		col.y = pppMngStPtr->m_matrix.value[1][1];
+		col.z = pppMngStPtr->m_matrix.value[2][1];
 		PSVECScale(&col, &col, pppMngSt->m_scale.y);
-		pppMngStPtr->m_matrix[0][1] = col.x;
-		pppMngStPtr->m_matrix[1][1] = col.y;
-		pppMngStPtr->m_matrix[2][1] = col.z;
+		pppMngStPtr->m_matrix.value[0][1] = col.x;
+		pppMngStPtr->m_matrix.value[1][1] = col.y;
+		pppMngStPtr->m_matrix.value[2][1] = col.z;
 
-		col.x = pppMngStPtr->m_matrix[0][2];
-		col.y = pppMngStPtr->m_matrix[1][2];
-		col.z = pppMngStPtr->m_matrix[2][2];
+		col.x = pppMngStPtr->m_matrix.value[0][2];
+		col.y = pppMngStPtr->m_matrix.value[1][2];
+		col.z = pppMngStPtr->m_matrix.value[2][2];
 		PSVECScale(&col, &col, pppMngSt->m_scale.z);
-		pppMngStPtr->m_matrix[0][2] = col.x;
-		pppMngStPtr->m_matrix[1][2] = col.y;
-		pppMngStPtr->m_matrix[2][2] = col.z;
+		pppMngStPtr->m_matrix.value[0][2] = col.x;
+		pppMngStPtr->m_matrix.value[1][2] = col.y;
+		pppMngStPtr->m_matrix.value[2][2] = col.z;
 
-		pppMngStPtr->m_matrix[0][3] = pppMngSt->m_position.x;
-		pppMngStPtr->m_matrix[1][3] = pppMngSt->m_position.y;
-		pppMngStPtr->m_matrix[2][3] = pppMngSt->m_position.z;
+		pppMngStPtr->m_matrix.value[0][3] = pppMngSt->m_position.x;
+		pppMngStPtr->m_matrix.value[1][3] = pppMngSt->m_position.y;
+		pppMngStPtr->m_matrix.value[2][3] = pppMngSt->m_position.z;
 		return;
 	}
 
 	if (pppMngSt->m_scale.x != kPppOne)
 	{
 		Vec col;
-		col.x = pppMngStPtr->m_matrix[0][0];
-		col.y = pppMngStPtr->m_matrix[1][0];
-		col.z = pppMngStPtr->m_matrix[2][0];
+		col.x = pppMngStPtr->m_matrix.value[0][0];
+		col.y = pppMngStPtr->m_matrix.value[1][0];
+		col.z = pppMngStPtr->m_matrix.value[2][0];
 		PSVECScale(&col, &col, pppMngSt->m_scale.x);
-		pppMngStPtr->m_matrix[0][0] = col.x;
-		pppMngStPtr->m_matrix[1][0] = col.y;
-		pppMngStPtr->m_matrix[2][0] = col.z;
+		pppMngStPtr->m_matrix.value[0][0] = col.x;
+		pppMngStPtr->m_matrix.value[1][0] = col.y;
+		pppMngStPtr->m_matrix.value[2][0] = col.z;
 	}
 
 	if (pppMngSt->m_scale.y != kPppOne)
 	{
 		Vec col;
-		col.x = pppMngStPtr->m_matrix[0][1];
-		col.y = pppMngStPtr->m_matrix[1][1];
-		col.z = pppMngStPtr->m_matrix[2][1];
+		col.x = pppMngStPtr->m_matrix.value[0][1];
+		col.y = pppMngStPtr->m_matrix.value[1][1];
+		col.z = pppMngStPtr->m_matrix.value[2][1];
 		PSVECScale(&col, &col, pppMngSt->m_scale.y);
-		pppMngStPtr->m_matrix[0][1] = col.x;
-		pppMngStPtr->m_matrix[1][1] = col.y;
-		pppMngStPtr->m_matrix[2][1] = col.z;
+		pppMngStPtr->m_matrix.value[0][1] = col.x;
+		pppMngStPtr->m_matrix.value[1][1] = col.y;
+		pppMngStPtr->m_matrix.value[2][1] = col.z;
 	}
 
 	if (pppMngSt->m_scale.z != kPppOne)
 	{
 		Vec col;
-		col.x = pppMngStPtr->m_matrix[0][2];
-		col.y = pppMngStPtr->m_matrix[1][2];
-		col.z = pppMngStPtr->m_matrix[2][2];
+		col.x = pppMngStPtr->m_matrix.value[0][2];
+		col.y = pppMngStPtr->m_matrix.value[1][2];
+		col.z = pppMngStPtr->m_matrix.value[2][2];
 		PSVECScale(&col, &col, pppMngSt->m_scale.z);
-		pppMngStPtr->m_matrix[0][2] = col.x;
-		pppMngStPtr->m_matrix[1][2] = col.y;
-		pppMngStPtr->m_matrix[2][2] = col.z;
+		pppMngStPtr->m_matrix.value[0][2] = col.x;
+		pppMngStPtr->m_matrix.value[1][2] = col.y;
+		pppMngStPtr->m_matrix.value[2][2] = col.z;
 	}
 }
 
@@ -721,11 +721,11 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 	Vec forwardTmp;
 	Mtx localMtx = {};
 
-	PSMTXCopy(pppMngStPtr->m_matrix, localMtx);
+	PSMTXCopy(pppMngStPtr->m_matrix.value, localMtx);
 
 	if (pppMngSt->m_fpBillboard == 0)
 	{
-		PSMTXConcat(ppvCameraMatrix0, pppMngStPtr->m_matrix, ppvWorldMatrix);
+		PSMTXConcat(ppvCameraMatrix0, pppMngStPtr->m_matrix.value, ppvWorldMatrix);
 
 		pos.x = localMtx[0][3];
 		pos.y = localMtx[1][3];
@@ -735,7 +735,7 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 	}
 	else
 	{
-		PSMTXConcat(ppvCameraMatrix0, pppMngStPtr->m_matrix, ppvWorldMatrix);
+		PSMTXConcat(ppvCameraMatrix0, pppMngStPtr->m_matrix.value, ppvWorldMatrix);
 
 		pos.x = localMtx[0][3];
 		pos.y = localMtx[1][3];

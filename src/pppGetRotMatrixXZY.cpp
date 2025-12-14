@@ -1,6 +1,6 @@
 #include "ffcc/pppGetRotMatrixXZY.h"
 
-#include "ffcc/partMngTrig.h"
+#include "ffcc/pppsintbl.h"
 #include "ffcc/pppGetRotMatrixX.h"
 #include "ffcc/pppGetRotMatrixY.h"
 #include "ffcc/pppGetRotMatrixZ.h"

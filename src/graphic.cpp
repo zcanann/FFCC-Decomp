@@ -1,5 +1,7 @@
 #include "ffcc/graphic.h"
 
+#include "ffcc/pppfunctbl.h"
+
 /*
  * --INFO--
  * Address:	TODO

@@ -893,7 +893,7 @@ void _pppStartPart(_pppMngSt*, long*, int)
  * Address:	TODO
  * Size:	TODO
  */
-void pppInitPdt(long*, pppProg*)
+void pppInitPdt(long*, _pppDataHead::pppProg*)
 {
 	// TODO
 }
@@ -903,7 +903,7 @@ void pppInitPdt(long*, pppProg*)
  * Address:	TODO
  * Size:	TODO
  */
-void pppInitData(_pppDataHead*, pppProg*, int)
+void pppInitData(_pppDataHead*, _pppDataHead::pppProg*, int)
 {
 	// TODO
 }

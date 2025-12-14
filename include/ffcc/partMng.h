@@ -11,6 +11,7 @@
 
 class CChara;
 class CChunkFile;
+class CGObject;
 class CTexture;
 class CTextureSet;
 
@@ -113,16 +114,21 @@ struct PPPIFPARAM
     unsigned char m_hitFlags;       // 0x7
 }; // Size 0x8
 
-struct pppProg
-{
-    char* m_functionNameTable; // 0x0
-    int m_unk1;                // 0x4
-    void* m_func;              // 0x8
-    int m_unk2[8];             // 0xc
-}; // Size 0x2c
-
 struct _pppDataHead
 {
+    struct pppProg
+    {
+        char* m_pppName;                 // 0x0
+        char* m_unkPtr;                  // 0x4
+        void* m_pppFunctionOperation;    // 0x8
+        void* m_unkPtr2;                 // 0xC
+        CGObject* m_objects[3];          // 0x10
+        void* m_pppFunctionConstructor;  // 0x1C
+        void* m_pppFunctionConstructor2; // 0x20
+        void* m_pppFunctionConstructor3; // 0x24
+        void* m_pppFunctionDestructor;   // 0x28
+    }; // Size 0x2c
+
     unsigned int m_version;           // 0x0
     unsigned short m_partCount;       // 0x4
     unsigned short m_cacheChunkCount; // 0x6
@@ -279,7 +285,7 @@ Length: 12 Alignment: 1
 0xc8	0x4	void *	void *	m_pDataValList	TODO: _pppPDataVal* type
 0xcc	0x4	void *	void *	m_controlProgramTable	
 0xd0	0x4	void *	void *	m_programInfoTable	
-0xd4	0x4	void *	void *	m_programControlArray	TODO: _pppProgCtrl* type
+0xd4	0x4	void *	void *	m_programControlArray
 0xd8	0x4	void *	void *	m_owner	
 0xdc	0x4	void *	void *	m_lookTarget	
 0xe0	0x4	CNode *	CNode *	m_bindNode	

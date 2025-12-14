@@ -11,9 +11,20 @@ class CParShapeSet;
 class CParModelSet;
 class CMapPcs;
 
+struct _pppPDataVal;
+
+// Note: Not officially part of the decomp .MAP file, so this is speculative,
+// but it seems to work.
+struct _pppPObjLink
+{
+    _pppPObjLink* m_next;     // 0x0
+    _pppPObjLink* m_previous; // 0x4
+    _pppPDataVal* m_owner;    // 0x8
+}; // Size 0xc
+
 struct _pppPDataVal
 {
-};
+}; // Size 0x10
 
 struct pppCVECTOR
 {
@@ -61,8 +72,8 @@ void pppCacheRefCnt0UpShape(short*, _pppDataHead*);
 void pppCacheDumpModel(short*, _pppDataHead*);
 void pppCacheDumpShape(short*, _pppDataHead*);
 void _pppStartPart(_pppMngSt*, long*, int);
-void pppInitPdt(long*, pppProg*);
-void pppInitData(_pppDataHead*, pppProg*, int);
+void pppInitPdt(long*, _pppDataHead::pppProg*);
+void pppInitData(_pppDataHead*, _pppDataHead::pppProg*, int);
 void pppCalcPartStd(_pppMngSt*);
 void pppDrawPartStd(_pppMngSt*);
 void _pppDeadPart(_pppMngSt*);

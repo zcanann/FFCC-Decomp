@@ -1,5 +1,5 @@
-#ifndef _FFCC_PARTMNG_TRIG_H_
-#define _FFCC_PARTMNG_TRIG_H_
+#ifndef _FFCC_SINTBL_H_
+#define _FFCC_SINTBL_H_
 
 static const float pppTrigTable[] = {
     0.0f,
@@ -16405,4 +16405,4 @@ static inline float pppCosFromTable(unsigned int angle)
 }
 
 
-#endif // _FFCC_PARTMNG_TRIG_H_
+#endif // _FFCC_SINTBL_H_

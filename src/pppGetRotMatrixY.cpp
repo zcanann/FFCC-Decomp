@@ -1,6 +1,6 @@
 #include "ffcc/pppGetRotMatrixY.h"
 
-#include "ffcc/partMngTrig.h"
+#include "ffcc/pppsintbl.h"
 
 /*
  * --INFO--

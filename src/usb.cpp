@@ -65,9 +65,9 @@ void CUSB::Frame()
  * Address:	TODO
  * Size:	TODO
  */
-void CUSB::Write(void*, int)
+bool CUSB::Write(void*, int)
 {
-	// TODO
+	return true;
 }
 
 /*
@@ -75,9 +75,9 @@ void CUSB::Write(void*, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CUSB::SendMessage(unsigned long, MCCChannel)
+bool CUSB::SendMessage(unsigned long, MCCChannel)
 {
-	// TODO
+	return true;
 }
 
 /*
@@ -85,9 +85,9 @@ void CUSB::SendMessage(unsigned long, MCCChannel)
  * Address:	TODO
  * Size:	TODO
  */
-void CUSB::IsConnected()
+bool CUSB::IsConnected()
 {
-	// TODO
+	return true;
 }
 
 /*

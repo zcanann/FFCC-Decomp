@@ -17,12 +17,14 @@ public:
     void Connect();
     void Disconnect();
     void Frame();
-    void Write(void*, int);
-    void SendMessage(unsigned long, MCCChannel);
-    void IsConnected();
+    bool Write(void*, int);
+    bool SendMessage(unsigned long, MCCChannel);
+    bool IsConnected();
     void AddMessageCallback(void (*)(unsigned long, void*, MCCChannel), void*);
     void RemoveMessageCallback(void (*)(unsigned long, void*, MCCChannel));
     void Printf(char*, ...);
 };
+
+CUSB USB;
 
 #endif // _FFCC_PPP_USB_H_

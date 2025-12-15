@@ -1,5 +1,14 @@
 #include "ffcc/p_usb.h"
 
+#include "ffcc/usb.h"
+
+#include <dolphin/os.h>
+#include "string.h"
+
+char DAT_8032ec6c;
+int DAT_8032ec68;
+
+
 /*
  * --INFO--
  * Address:	TODO
@@ -7,7 +16,6 @@
  */
 CUSBPcs::CUSBPcs()
 {
-	// TODO
 }
 
 /*
@@ -16,8 +24,15 @@ CUSBPcs::CUSBPcs()
  * Size:	TODO
  */
 void CUSBPcs::Init()
-{
-	// TODO
+{ 
+	m_smallStage = Memory.CreateStage(0x2000, "CUSBPcs", 0);
+	m_bigStage = (CMemory::CStage*)nullptr;
+
+	strcpy(m_rootPath, "plot/kmitsuru/");
+	m_unk0x104 = 0;
+	m_unk0x108 = 0;
+
+	USB.Connect();
 }
 
 /*
@@ -26,8 +41,14 @@ void CUSBPcs::Init()
  * Size:	TODO
  */
 void CUSBPcs::Quit()
-{
-	// TODO
+{ 
+	if (m_bigStage != (CMemory::CStage*)nullptr)
+	{
+		Memory.DestroyStage(m_bigStage);
+	}
+	
+	Memory.DestroyStage(m_smallStage);
+	USB.Disconnect();
 }
 
 /*
@@ -45,9 +66,23 @@ void CUSBPcs::GetTable(unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void CUSBPcs::IsBigAlloc(int)
+void CUSBPcs::IsBigAlloc(int param_2)
 {
-	// TODO
+    if (param_2 != 0)
+    {
+        if (m_bigStage == (CMemory::CStage*)nullptr)
+        {
+            m_bigStage = Memory.CreateStage(0x100000, "CUSBPcs", 0);
+        }
+    }
+    else
+    {
+        if (m_bigStage != (CMemory::CStage*)nullptr)
+        {
+            Memory.DestroyStage(m_bigStage);
+            m_bigStage = (CMemory::CStage*)nullptr;
+        }
+    }
 }
 
 /*
@@ -57,7 +92,7 @@ void CUSBPcs::IsBigAlloc(int)
  */
 void CUSBPcs::create()
 {
-	// TODO
+	USB.AddMessageCallback(CUSBPcs::messageCallback, this);
 }
 
 /*
@@ -67,7 +102,7 @@ void CUSBPcs::create()
  */
 void CUSBPcs::destroy()
 {
-	// TODO
+	USB.RemoveMessageCallback(CUSBPcs::messageCallback);
 }
 
 /*
@@ -77,7 +112,7 @@ void CUSBPcs::destroy()
  */
 void CUSBPcs::func()
 {
-	// TODO
+	USB.Frame();
 }
 
 /*
@@ -96,46 +131,101 @@ void CUSBPcs::messageCallback(unsigned long, void*, MCCChannel)
  * Size:	TODO
  */
 void CUSBPcs::mccReadData()
-{
-	// TODO
+{ 
+	if (DAT_8032ec6c == '\0')
+	{
+		DAT_8032ec68 = 0;
+		DAT_8032ec6c = '\x01';
+	}
+
+	DAT_8032ec68 = DAT_8032ec68 + 1;
+
+	if (4 < DAT_8032ec68)
+	{
+		DAT_8032ec68 = 0;
+		USB.IsConnected();
+	}
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CUSBPcs::USBDataCallback(unsigned long, MCCChannel)
+static inline unsigned int Align32(unsigned int x)
 {
-	// TODO
+    return (x + 0x1F) & ~0x1F;
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CUSBPcs::WriteMessage(CUSBPcs::CDataHeader*, MCCChannel)
+static inline unsigned int Swap32(unsigned int x)
 {
-	// TODO
+    unsigned int tmp = x;
+    return __lwbrx((void*)&tmp, 4);
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CUSBPcs::SendDataCode(int, void*, int, int)
+int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
 {
-	// TODO
-}
+    unsigned int count      = (unsigned int)(elemSize * elemCount);
+    unsigned int packetSize = Align32(count + 0x40);
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CUSBPcs::GetPath()
-{
-	// TODO
+    // Prefer big stage if present, else small stage (matches target).
+    CMemory::CStage* stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
+
+    unsigned int* packet  = new unsigned int[packetSize >> 2];
+    unsigned int* sendBuf = (unsigned int*)nullptr;
+
+    int result = 0;
+
+    // Header
+    packet[0]  = 4;
+    packet[1]  = packetSize;
+    packet[8]  = Swap32(count);
+    packet[9]  = Swap32((unsigned int)code);
+    packet[10] = Swap32((unsigned int)elemCount);
+    packet[11] = 0;
+    packet[12] = Swap32(count);
+
+    // Payload
+    memcpy((unsigned char*)packet + 0x40, src, count);
+
+    do
+    {
+        if (!USB.IsConnected())
+            break;
+
+        // Target reloads stage selection here too.
+        stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
+
+        unsigned int sendSize = Align32(packet[1]);
+
+        sendBuf = new unsigned int[sendSize >> 2];
+        memcpy(sendBuf, packet, sendSize);
+
+        // Swap only the first two words (matches target doing lwbrx on [0] and [1]).
+        sendBuf[0] = Swap32(sendBuf[0]);
+        sendBuf[1] = Swap32(sendBuf[1]);
+
+        DCFlushRange(sendBuf, sendSize);
+        DCInvalidateRange(sendBuf, sendSize);
+
+        if (!USB.Write(sendBuf, (int)sendSize))
+        {
+            delete[] sendBuf;
+            sendBuf = (unsigned int*)nullptr;
+            break;
+        }
+
+        if (!USB.SendMessage(0, (MCCChannel)9))
+        {
+            delete[] sendBuf;
+            sendBuf = (unsigned int*)nullptr;
+            break;
+        }
+
+        delete[] sendBuf;
+        sendBuf = (unsigned int*)nullptr;
+
+        result = 1;
+    } while (0);
+
+    // Target always reaches a single cleanup for the packet.
+    if (packet != (unsigned int*)nullptr)
+        delete[] packet;
+
+    return result;
 }

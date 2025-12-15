@@ -1,14 +1,6 @@
 #include "ffcc/usb.h"
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CUSB::CUSB()
-{
-	// TODO
-}
+#include "ffcc/system.h"
 
 /*
  * --INFO--
@@ -36,8 +28,8 @@ void CUSB::Quit()
  * Size:	TODO
  */
 void CUSB::Connect()
-{
-	// TODO
+{ 
+	m_connectionState = 7;
 }
 
 /*
@@ -87,7 +79,12 @@ bool CUSB::SendMessage(unsigned long, MCCChannel)
  */
 bool CUSB::IsConnected()
 {
-	return true;
+	if (m_connectionState == 8)
+	{
+		return true;
+	}
+
+	return false;
 }
 
 /*
@@ -95,9 +92,26 @@ bool CUSB::IsConnected()
  * Address:	TODO
  * Size:	TODO
  */
-void CUSB::AddMessageCallback(void (*) (unsigned long, void*, MCCChannel), void*)
+void CUSB::AddMessageCallback(MessageCallback callback, void* callerContext)
 {
-	// TODO
+	for (int i = 0; i < sizeof(m_callbacks); i++)
+	{
+		if (m_callbacks[i].m_inUse == 0)
+		{
+			m_callbacks[i].m_inUse = 1;
+			m_callbacks[i].m_callback = callback;
+			m_callbacks[i].m_callerContext = callerContext;
+			return;
+		}
+
+		if (m_callbacks[i].m_callback == callback)
+		{
+			System.Printf("CUSB.AddMessageCallback: 同じ");
+			return;
+		}
+	}
+
+	System.Printf("CUSB.AddMessageCallback: イベント");
 }
 
 /*
@@ -105,9 +119,57 @@ void CUSB::AddMessageCallback(void (*) (unsigned long, void*, MCCChannel), void*
  * Address:	TODO
  * Size:	TODO
  */
-void CUSB::RemoveMessageCallback(void (*) (unsigned long, void*, MCCChannel))
+void CUSB::RemoveMessageCallback(MessageCallback callback)
 {
-	// TODO
+    if (m_callbacks[0].m_inUse && m_callbacks[0].m_callback == callback)
+    {
+        m_callbacks[0].m_inUse = 0;
+        return;
+    }
+
+    if (m_callbacks[1].m_inUse && m_callbacks[1].m_callback == callback)
+    {
+        m_callbacks[1].m_inUse = 0;
+        return;
+    }
+
+    if (m_callbacks[2].m_inUse && m_callbacks[2].m_callback == callback)
+    {
+        m_callbacks[2].m_inUse = 0;
+        return;
+    }
+
+    if (m_callbacks[3].m_inUse && m_callbacks[3].m_callback == callback)
+    {
+        m_callbacks[3].m_inUse = 0;
+        return;
+    }
+
+    if (m_callbacks[4].m_inUse && m_callbacks[4].m_callback == callback)
+    {
+        m_callbacks[4].m_inUse = 0;
+        return;
+    }
+
+    if (m_callbacks[5].m_inUse && m_callbacks[5].m_callback == callback)
+    {
+        m_callbacks[5].m_inUse = 0;
+        return;
+    }
+
+    if (m_callbacks[6].m_inUse && m_callbacks[6].m_callback == callback)
+    {
+        m_callbacks[6].m_inUse = 0;
+        return;
+    }
+
+    if (m_callbacks[7].m_inUse && m_callbacks[7].m_callback == callback)
+    {
+        m_callbacks[7].m_inUse = 0;
+        return;
+    }
+
+    System.Printf("RemoveMessageCallback: callback not found\n");
 }
 
 /*

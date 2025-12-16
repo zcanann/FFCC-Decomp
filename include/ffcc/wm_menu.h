@@ -8,11 +8,6 @@ class CFont;
 class CGraphic;
 class CCameraPcs;
 
-struct McListInfo
-{
-    void operator=(const McListInfo&);
-};
-
 class McCtrl
 {
 public:
@@ -26,9 +21,9 @@ public:
     void SaveDat();
     void LoadDat();
     void Format(int);
-    void ChkEmpty(int);
-    void ChkConnect(int);
-    void ChkNowData();
+    int ChkEmpty(int param_2);
+    int ChkConnect(int chan);
+    int ChkNowData();
     void SaveDataBuffer(char*);
     void ChkParty(char*);
     void EraseDat();
@@ -38,6 +33,17 @@ public:
     void GetSlot();
     void SetDno(int);
     void SetSlot(int);
+
+    int m_previousState;
+    int m_state;
+    int m_cardChannel;
+    int m_lastResult;
+    int m_saveIndex;
+    int m_iteration;
+    int m_createFlag;
+    void* m_userBuffer;
+    unsigned int m_serialLo;
+    unsigned int m_serialHi;	
 };
 
 #endif // _FFCC_PPP_WM_MENU_H_

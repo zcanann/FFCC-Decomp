@@ -13,6 +13,11 @@ class CPad;
 class CRingMenu;
 class CMesMenu;
 
+struct McListInfo
+{
+    void operator=(const McListInfo&);
+};
+
 class CMenuPcs : public CProcess
 {
 public:

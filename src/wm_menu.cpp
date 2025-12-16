@@ -1,5 +1,7 @@
 #include "ffcc/wm_menu.h"
 
+#include "ffcc/p_game.h"
+
 /*
  * --INFO--
  * Address:	TODO
@@ -1145,9 +1147,151 @@ void McCtrl::Format(int)
  * Address:	TODO
  * Size:	TODO
  */
-void McCtrl::ChkEmpty(int)
+int McCtrl::ChkEmpty(int param_2)
 {
-	// TODO
+	int filesFree;
+	int bytesFree[3];
+
+	if (m_state < 0)
+	{
+		return -1;
+	}
+
+	m_previousState = m_state;
+
+	int state = m_state;
+
+	if (state == 2)
+	{
+		m_lastResult = MemoryCardMan.McOpen(m_cardChannel);
+
+		if (m_lastResult < 0)
+		{
+			if (m_lastResult == -4)
+			{
+				if (param_2 != 0)
+				{
+					MemoryCardMan.McUnmount(m_cardChannel);
+					m_state = -1;
+					return -6;
+				}
+
+				m_state = 3;
+			}
+			else
+			{
+				if (m_lastResult == -5)
+				{
+					MemoryCardMan.McUnmount(m_cardChannel);
+					m_state = -1;
+					return -5;
+				}
+
+				MemoryCardMan.McUnmount(m_cardChannel);
+				m_state = -1;
+			}
+		}
+		else
+		{
+			MemoryCardMan.McClose();
+			MemoryCardMan.McUnmount(m_cardChannel);
+			m_state = 4;
+		}
+	}
+	else if (state < 2)
+	{
+		if (state == 0)
+		{
+			MemoryCardMan.McMount(m_cardChannel);
+			m_lastResult = MemoryCardMan.GetResult();
+			m_state = 1;
+			m_iteration = 0;
+		}
+		else if (state > -1 && MemoryCardMan.AsyncFinished() == 1)
+		{
+			m_lastResult = MemoryCardMan.GetResult();
+
+			if (m_lastResult == 0)
+			{
+				m_state = 2;
+			}
+			else
+			{
+				if (m_lastResult == -0x0D)
+				{
+					MemoryCardMan.m_opDoneFlag = 1;
+					MemoryCardMan.m_currentSlot = 0xFF;
+					m_state = -1;
+					return -3;
+				}
+
+				if (m_lastResult == -6)
+				{
+					MemoryCardMan.m_opDoneFlag = 1;
+					MemoryCardMan.m_currentSlot = 0xFF;
+					m_state = -1;
+					return -4;
+				}
+
+				if (m_lastResult == -5)
+				{
+					MemoryCardMan.m_opDoneFlag = 1;
+					MemoryCardMan.m_currentSlot = 0xFF;
+					m_state = -1;
+					return -5;
+				}
+
+				MemoryCardMan.m_opDoneFlag = 1;
+				MemoryCardMan.m_currentSlot = 0xFF;
+				m_state = -1;
+			}
+		}
+	}
+	else if (state != 4 && state < 4)
+	{
+		m_lastResult = MemoryCardMan.McFreeBlocks(m_cardChannel, bytesFree, &filesFree);
+		MemoryCardMan.McUnmount(m_cardChannel);
+
+		if (m_lastResult < 0)
+		{
+			if (m_lastResult == -5)
+			{
+				m_state = -1;
+				return -5;
+			}
+
+			m_state = -1;
+		}
+		else
+		{
+			if (filesFree == 0)
+			{
+				m_state = -1;
+				return -2;
+			}
+
+			if (bytesFree[0] < 0x2C000)
+			{
+				m_state = -1;
+				return -2;
+			}
+
+			m_state = 4;
+		}
+	}
+
+	if (m_state == -1)
+	{
+		return -1;
+	}
+	else if (m_state == 4)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
 }
 
 /*
@@ -1155,19 +1299,235 @@ void McCtrl::ChkEmpty(int)
  * Address:	TODO
  * Size:	TODO
  */
-void McCtrl::ChkConnect(int)
+int McCtrl::ChkConnect(int chan)
 {
-	// TODO
+	int result = MemoryCardMan.McChkConnect(chan);
+
+	if (result == 0)
+	{
+		result = 1;
+	}
+	else if (result == -1)
+	{
+		result = -3;
+	}
+	else if (result == -2)
+	{
+		result = -6;
+	}
+	else if (result == -3)
+	{
+		result = -2;
+	}
+	else if (result == -4)
+	{
+		result = -5;
+	}
+	else
+	{
+		result = -1;
+	}
+
+	return result;
 }
+
 
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-void McCtrl::ChkNowData()
+int McCtrl::ChkNowData()
 {
-	// TODO
+	unsigned int serialLo;
+	unsigned int serialHi;
+
+	if (m_state < 0)
+	{
+		return -999;
+	}
+
+	m_previousState = m_state;
+
+	switch (m_state)
+	{
+	case 0:
+		MemoryCardMan.McMount(m_cardChannel);
+		m_lastResult = MemoryCardMan.GetResult();
+		m_state = 1;
+		m_iteration = 0;
+		break;
+
+	case 1:
+		if (MemoryCardMan.AsyncFinished() == 1)
+		{
+			m_lastResult = MemoryCardMan.GetResult();
+
+			if (m_lastResult < 0)
+			{
+				MemoryCardMan.m_opDoneFlag = 1;
+				MemoryCardMan.m_currentSlot = 0xFF;
+
+				if (m_lastResult == -6)
+				{
+					m_state = 2;
+				}
+				else
+				{
+					if (m_lastResult == -0x0D)
+					{
+						m_state = -1;
+						return -0x0D;
+					}
+
+					if (m_lastResult == -5)
+					{
+						m_state = -1;
+						return -5;
+					}
+
+					m_state = -1;
+				}
+			}
+			else
+			{
+				m_state = 4;
+			}
+		}
+		break;
+
+	case 2:
+		MemoryCardMan.McCheck(m_cardChannel);
+		m_lastResult = MemoryCardMan.GetResult();
+		m_state = 3;
+		break;
+
+	case 3:
+		if (MemoryCardMan.AsyncFinished() == 1)
+		{
+			m_lastResult = MemoryCardMan.GetResult();
+
+			if (m_lastResult != 0)
+			{
+				MemoryCardMan.McUnmount(m_cardChannel);
+				MemoryCardMan.DestroyMcBuff();
+				m_state = 7;
+
+				if (m_lastResult == -5)
+				{
+					return -5;
+				}
+				return -6;
+			}
+
+			m_state = 4;
+		}
+		break;
+
+	case 4:
+		m_lastResult = MemoryCardMan.McOpen(m_cardChannel);
+
+		if (m_lastResult < 0)
+		{
+			MemoryCardMan.McUnmount(m_cardChannel);
+			MemoryCardMan.DestroyMcBuff();
+
+			if (m_lastResult == -4)
+			{
+				m_state = -1;
+				return -4;
+			}
+
+			if (m_lastResult == -5)
+			{
+				m_state = -1;
+				return -5;
+			}
+
+			m_state = -1;
+		}
+		else
+		{
+			m_state = 5;
+		}
+		break;
+
+	case 5:
+		if (CARDGetSerialNo(m_cardChannel, (unsigned long long*)&serialLo) != 0)
+		{
+			MemoryCardMan.McClose();
+			MemoryCardMan.McUnmount(m_cardChannel);
+			MemoryCardMan.DestroyMcBuff();
+			m_state = -1;
+			return -999;
+		}
+
+		m_serialHi = serialHi;
+		m_serialLo = serialLo;
+
+		MemoryCardMan.CreateMcBuff();
+		MemoryCardMan.McRead(0, 0xA000, m_saveIndex * 0xA000 + 0x4000);
+		m_state = 6;
+		break;
+
+	case 6:
+		if (MemoryCardMan.AsyncFinished() == 1)
+		{
+			m_lastResult = MemoryCardMan.GetResult();
+
+			if (m_lastResult < 0)
+			{
+				MemoryCardMan.McClose();
+				MemoryCardMan.McUnmount(m_cardChannel);
+				MemoryCardMan.DestroyMcBuff();
+				m_state = -1;
+
+				if (m_lastResult == -5)
+				{
+					return -5;
+				}
+			}
+			else
+			{
+				MemoryCardMan.DecodeData();
+
+				int r = MemoryCardMan.McClose();
+				if (r == 0)
+				{
+					MemoryCardMan.McUnmount(m_cardChannel);
+
+					if ((*(unsigned int*)(MemoryCardMan.m_saveBuffer + 0x13D4) == Game.game.m_gameWork.m_mcSerial1 &&
+						 *(unsigned int*)(MemoryCardMan.m_saveBuffer + 0x13D0) == Game.game.m_gameWork.m_mcSerial0) &&
+						(*(unsigned int*)(MemoryCardMan.m_saveBuffer + 0x13D8) == Game.game.m_gameWork.m_mcRandom))
+					{
+						r = 1;
+					}
+					else
+					{
+						r = -1000;
+					}
+
+					MemoryCardMan.DestroyMcBuff();
+					m_state = 7;
+					return r;
+				}
+
+				m_lastResult = r;
+				m_state = -1;
+			}
+		}
+		break;
+	}
+
+	if (m_state == -1)
+	{
+		return -999;
+	}
+	if (m_state == 7)
+	{
+		return 1;
+	}
+	return 0;
 }
 
 /*

@@ -1,13 +1,19 @@
 #include "ffcc/USBStreamData.h"
 
+#include "ffcc/File.h"
+
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
 CUSBStreamData::CUSBStreamData()
-{
-	// TODO
+{ 
+	m_data = (unsigned char*)nullptr;
+	m_headerReady = 0;
+	m_dataReady = 0;
+	m_sizeBytes = 0;
+	m_packetCode = 0;
 }
 
 /*
@@ -16,8 +22,12 @@ CUSBStreamData::CUSBStreamData()
  * Size:	TODO
  */
 CUSBStreamData::~CUSBStreamData()
-{
-	// TODO
+{                                               
+	if (m_data != (unsigned char*)nullptr)
+	{
+		delete[] m_data;
+		m_data = (unsigned char*)nullptr;
+	}
 }
 
 /*
@@ -26,8 +36,8 @@ CUSBStreamData::~CUSBStreamData()
  * Size:	TODO
  */
 void CUSBStreamData::CreateBuffer()
-{
-	// TODO
+{ 
+	m_data = (unsigned char*)File.m_readBuffer;
 }
 
 /*
@@ -36,8 +46,17 @@ void CUSBStreamData::CreateBuffer()
  * Size:	TODO
  */
 void CUSBStreamData::DeleteBuffer()
-{
-	// TODO
+{ 
+	if (m_data != (unsigned char*)nullptr)
+	{
+		delete[] m_data;
+		m_data = (unsigned char*)nullptr;
+	}
+
+	m_headerReady = 0;
+	m_dataReady = 0;
+	m_sizeBytes = 0;
+	m_packetCode = 0;
 }
 
 /*
@@ -45,19 +64,14 @@ void CUSBStreamData::DeleteBuffer()
  * Address:	TODO
  * Size:	TODO
  */
-void CUSBStreamData::SendMayamikaMessage()
-{
-	// TODO
-}
+bool CUSBStreamData::IsUSBStreamDataDone()
+{ 
+	if (m_dataReady != 0 && m_headerReady != 0)
+	{
+		return true;
+	}
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CUSBStreamData::IsUSBStreamDataDone()
-{
-	// TODO
+	return false;
 }
 
 /*
@@ -66,6 +80,7 @@ void CUSBStreamData::IsUSBStreamDataDone()
  * Size:	TODO
  */
 void CUSBStreamData::SetUSBStreamDataDone()
-{
-	// TODO
+{ 
+	m_headerReady = 0;
+	m_dataReady = 0;
 }

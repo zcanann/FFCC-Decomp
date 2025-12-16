@@ -9,7 +9,6 @@
  */
 void CUSB::Init()
 {
-	// TODO
 }
 
 /*
@@ -19,7 +18,6 @@ void CUSB::Init()
  */
 void CUSB::Quit()
 {
-	// TODO
 }
 
 /*
@@ -39,7 +37,6 @@ void CUSB::Connect()
  */
 void CUSB::Disconnect()
 {
-	// TODO
 }
 
 /*
@@ -49,7 +46,6 @@ void CUSB::Disconnect()
  */
 void CUSB::Frame()
 {
-	// TODO
 }
 
 /*
@@ -179,5 +175,4 @@ void CUSB::RemoveMessageCallback(MessageCallback callback)
  */
 void CUSB::Printf(char*, ...)
 {
-	// TODO
 }

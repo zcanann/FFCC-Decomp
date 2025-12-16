@@ -60,11 +60,12 @@ public:
 
 	void DrawError(DVDFileInfo& info, int errorCode);
 	
-    void* m_stage;
-    void* m_readBuffer;
-    CHandle m_fileHandle;
-    void* m_freeListSentinelDummy;
-    CHandle* m_freeList;
+	// void* m_vtable;             // 0x0
+    void* m_stage;                 // 0x4
+    void* m_readBuffer;            // 0x8
+    CHandle m_fileHandle;          // 0xc-0xb7
+    void* m_freeListSentinelDummy; // 0xb8-0x167
+    CHandle* m_freeList;           // Mismatch from ghidra from here on out?
     CHandle m_handlePoolHead;
     int m_fatalDiskErrorFlag;
     int m_isDiskError;

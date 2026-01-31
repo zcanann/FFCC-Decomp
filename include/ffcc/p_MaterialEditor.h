@@ -26,7 +26,6 @@ public:
 
     void CreateBoundaryBox(Vec&, Vec&, long, const Vec*);
 
-    // guessed from uses (e.g. ZLIST::AddTail): lwz r4, 0x4(MaterialEditorPcs)
     CMemory::CStage* m_stage; // 0x04
 };
 

@@ -101,9 +101,6 @@ public:
     void DumpCache();
 };
 
-// MetroWerks / FFCC codebase uses a stage-aware operator new with debug parameters.
-// This corresponds to the linker symbol:
-//   __nw__FUlPQ27CMemory6CStagePci
 void* operator new(unsigned long size, CMemory::CStage* stage, char* file, int line);
 
 extern CMemory Memory;

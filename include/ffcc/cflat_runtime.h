@@ -1,13 +1,17 @@
 #ifndef _FFCC_CFLAT_RUNTIME_H_
 #define _FFCC_CFLAT_RUNTIME_H_
 
+#include "global.h"
+
 class CChunkFile;
 
 class CFlatRuntime
 {
 public:
-	class CStack
+	struct CStack
 	{
+		u32 m_word;
+
 		void operator=(const CStack&);
 	};
 

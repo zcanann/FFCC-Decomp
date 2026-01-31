@@ -235,7 +235,7 @@ char* CChunkFile::GetString()
 void CChunkFile::Align(unsigned long alignment)
 { 
     unsigned long offset = (unsigned long)(m_cursor - m_base);
-    offset += alignment;
+    offset = alignment + offset;
     offset -= 1;
     unsigned long remainder = offset % alignment;
     offset = offset - remainder;

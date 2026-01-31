@@ -88,8 +88,11 @@ ninja
 
 If build fails, fix and rebuild. Do not proceed to diffing with a broken build.
 
-### Step 4 — Diff with objdiff (function-level)
+### Step 4 — Diff with objdiff (function-level, ASM-first)
 Objdiff diffs **expected object** (`build/GCCP01/src/...`) vs **current object** (`build/GCCP01/obj/...`).
+
+**Important:** Don’t treat “percent match” as magic. You should be looking at the **raw assembly**.
+Match work is ultimately about making *the compiler emit the same instructions* from plausible source.
 
 #### 4a) Find a symbol name in the expected object
 Example (for `main/chunkfile`):
@@ -98,7 +101,7 @@ nm -g build/GCCP01/src/chunkfile.o | head
 ```
 Pick a function symbol, e.g. `Align__10CChunkFileFUl`.
 
-#### 4b) Run interactive diff
+#### 4b) Run objdiff for that symbol (interactive ASM view)
 **Note:** `objdiff-cli diff` is interactive and requires a real TTY.
 
 Run:
@@ -108,8 +111,22 @@ build/tools/objdiff-cli diff -p . -u main/chunkfile Align__10CChunkFileFUl
 Quit with `q`.
 
 Interpretation:
-- If the left (TARGET) vs right (CURRENT) assembly aligns better after your edit, you are improving match.
+- Use the ASM view to identify *why* it mismatches (register allocation differences, load/store ordering, constant materialization, branching shape, etc.).
 - Iterate: adjust source, rebuild, re-run diff.
+
+#### 4c) If objdiff UI is unavailable (fallback): dump ASM and diff it yourself
+If you’re running headless automation (cron) or can’t use the interactive UI, you can still inspect ASM by dumping disassembly for both objects and diffing.
+
+Tooling options:
+- If the project provides a PowerPC objdump via its toolchain, use it.
+- As a last resort, use whatever objdump is available, but ensure it supports PPC.
+
+Suggested approach:
+1) Identify the base + target object paths from `objdiff.json` for the unit.
+2) Dump function disassembly for both.
+3) Compare with `diff`.
+
+(Exact commands depend on the available binutils/objdump in this environment.)
 
 ### Step 5 — Check progress summary
 At the end of `ninja`, a progress report is printed.
@@ -160,6 +177,7 @@ A cron-driven agent should:
 3) **Create a branch immediately** for that unit so work never lands on `main` accidentally.
    - Branch naming: `pr/<unit>` (unit path is sufficient; avoid extra task text).
    - Example: `pr/main/chunkfile`
+   - Note: git branch names can contain slashes; that’s fine.
 4) Attempt a small number of edits.
 5) Rebuild with `ninja`.
 6) Run objdiff on 1–3 symbols to validate direction.

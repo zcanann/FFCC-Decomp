@@ -73,7 +73,7 @@ void CChunkFile::PushChunk()
  */
 void CChunkFile::PopChunk()
 { 
-	m_stackDepth = m_stackDepth + -1;
+	m_stackDepth = m_stackDepth - 1;
 	m_scopeSize = m_chunkScopes[m_stackDepth].m_scopeSize;
 	m_lastChunkSize = m_chunkScopes[m_stackDepth].m_lastChunkSize;
 	m_scopeOffset = m_chunkScopes[m_stackDepth].m_scopeOffset;
@@ -95,38 +95,31 @@ bool CChunkFile::GetNextChunk(CChunk& outChunk)
 		skip = 0;
 	}
 	else {
-		int s = m_lastChunkSize + 0xF;
-
-		skip = (s / 16) * 16 + 0x10;
+		skip = ((m_lastChunkSize + 15) / 16) * 16 + 16;
 	}
 
     m_scopeOffset += skip;
     m_headerPtr += skip;
     m_cursor = m_headerPtr;
 
-    if ((int)m_scopeSize <= m_scopeOffset)
+    if (m_scopeSize <= m_scopeOffset)
 	{
         return false;
 	}
 
-    unsigned int* cursorPtr = (unsigned int*)m_cursor;
+    outChunk.m_id = *(unsigned int*)m_cursor;
+    m_cursor += 4;
 
-    m_cursor += sizeof(unsigned int);
-    outChunk.m_id = *cursorPtr;
+    outChunk.m_size = *(unsigned int*)m_cursor;
+    m_cursor += 4;
 
-    cursorPtr = (unsigned int*)m_cursor;
-    m_cursor += sizeof(unsigned int);
-    outChunk.m_size = *cursorPtr;
+    outChunk.m_arg0 = *(unsigned int*)m_cursor;
+    m_cursor += 4;
 
-    cursorPtr = (unsigned int*)m_cursor;
-    m_cursor += sizeof(unsigned int);
-    outChunk.m_arg0 = *cursorPtr;
+    outChunk.m_version = *(unsigned int*)m_cursor;
+    m_cursor += 4;
 
-    cursorPtr = (unsigned int*)m_cursor;
-    m_cursor += sizeof(unsigned int);
-    outChunk.m_version = *cursorPtr;
-
-    m_lastChunkSize = (int)outChunk.m_size;
+    m_lastChunkSize = outChunk.m_size;
 
     return true;
 }
@@ -146,11 +139,10 @@ unsigned char* CChunkFile::GetAddress()
  * Address:	TODO
  * Size:	TODO
  */
-void CChunkFile::Get(void* param_2, long param_3)
+void CChunkFile::Get(void* dest, long size)
 { 
-	memcpy(param_2, m_cursor, param_3);
-
-	m_cursor = m_cursor + param_3;
+	memcpy(dest, m_cursor, size);
+	m_cursor += size;
 }
 
 /*
@@ -203,11 +195,9 @@ unsigned int CChunkFile::Get4()
 float CChunkFile::GetF4()
 {
     float value;
-    unsigned char* cursorPtr = m_cursor;
-
+    unsigned int* cursorPtr = (unsigned int*)m_cursor;
+    *(unsigned int*)&value = *cursorPtr;
     m_cursor += 4;
-    *(unsigned int*)&value = *(unsigned int*)cursorPtr;
-
     return value;
 }
 
@@ -236,10 +226,8 @@ char* CChunkFile::GetString()
  */
 void CChunkFile::Align(unsigned long alignment)
 { 
-    unsigned long delta = (unsigned long)(m_cursor - m_base);
-
-    delta += alignment - 1;
-    delta -= (delta % alignment);
-
-    m_cursor = m_base + delta;
+    unsigned long offset = (unsigned long)(m_cursor - m_base);
+    offset += alignment - 1;
+    offset -= offset % alignment;
+    m_cursor = m_base + offset;
 }

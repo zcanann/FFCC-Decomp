@@ -1,5 +1,12 @@
 #include "ffcc/zlist.h"
 
+#include "ffcc/memory.h"
+
+extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+
+extern char lbl_801D7DC0[]; // "zlist.cpp"
+extern char MaterialEditorPcs[];
+
 /*
  * --INFO--
  * Address:	TODO
@@ -68,18 +75,19 @@ void ZLIST::DeleteList()
  */
 bool ZLIST::AddTail(void* data)
 {
-	_ZLISTITEM* newItem = new _ZLISTITEM(); // TODO: Alloc to memoryStage
+	CMemory::CStage* stage = *(CMemory::CStage**)(MaterialEditorPcs + 4);
+	_ZLISTITEM* newItem = (_ZLISTITEM*)__nw__FUlPQ27CMemory6CStagePci(sizeof(_ZLISTITEM), stage, lbl_801D7DC0, 0x107);
 
-    if (newItem != (_ZLISTITEM*)nullptr)
-    {
-        newItem->m_previous = (_ZLISTITEM*)nullptr;
-        newItem->m_next = (_ZLISTITEM*)nullptr;
-    }
+	if (newItem != (_ZLISTITEM*)nullptr)
+	{
+		newItem->m_previous = (_ZLISTITEM*)nullptr;
+		newItem->m_next = (_ZLISTITEM*)nullptr;
+	}
 
-    if (newItem == (_ZLISTITEM*)nullptr)
-    {
-        return false;
-    }
+	if (newItem == (_ZLISTITEM*)nullptr)
+	{
+		return false;
+	}
 
     if (m_root.m_next == (_ZLISTITEM*)nullptr)
     {

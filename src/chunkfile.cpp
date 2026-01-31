@@ -73,7 +73,7 @@ void CChunkFile::PushChunk()
  */
 void CChunkFile::PopChunk()
 { 
-	m_stackDepth = m_stackDepth + -1;
+	m_stackDepth = m_stackDepth - 1;
 	m_scopeSize = m_chunkScopes[m_stackDepth].m_scopeSize;
 	m_lastChunkSize = m_chunkScopes[m_stackDepth].m_lastChunkSize;
 	m_scopeOffset = m_chunkScopes[m_stackDepth].m_scopeOffset;
@@ -95,9 +95,7 @@ bool CChunkFile::GetNextChunk(CChunk& outChunk)
 		skip = 0;
 	}
 	else {
-		int s = m_lastChunkSize + 0xF;
-
-		skip = (s / 16) * 16 + 0x10;
+		skip = ((m_lastChunkSize + 0xF) / 16) * 16 + 0x10;
 	}
 
     m_scopeOffset += skip;
@@ -236,10 +234,8 @@ char* CChunkFile::GetString()
  */
 void CChunkFile::Align(unsigned long alignment)
 { 
-    unsigned long delta = (unsigned long)(m_cursor - m_base);
-
-    delta += alignment - 1;
-    delta -= (delta % alignment);
-
-    m_cursor = m_base + delta;
+    unsigned long offset = (unsigned long)(m_cursor - m_base);
+    unsigned long aligned = (offset + alignment - 1) / alignment * alignment;
+    
+    m_cursor = m_base + aligned;
 }

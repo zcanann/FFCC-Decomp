@@ -95,36 +95,31 @@ bool CChunkFile::GetNextChunk(CChunk& outChunk)
 		skip = 0;
 	}
 	else {
-		skip = ((m_lastChunkSize + 0xF) / 16) * 16 + 0x10;
+		skip = ((m_lastChunkSize + 15) / 16) * 16 + 16;
 	}
 
     m_scopeOffset += skip;
     m_headerPtr += skip;
     m_cursor = m_headerPtr;
 
-    if ((int)m_scopeSize <= m_scopeOffset)
+    if (m_scopeSize <= m_scopeOffset)
 	{
         return false;
 	}
 
-    unsigned int* cursorPtr = (unsigned int*)m_cursor;
+    outChunk.m_id = *(unsigned int*)m_cursor;
+    m_cursor += 4;
 
-    m_cursor += sizeof(unsigned int);
-    outChunk.m_id = *cursorPtr;
+    outChunk.m_size = *(unsigned int*)m_cursor;
+    m_cursor += 4;
 
-    cursorPtr = (unsigned int*)m_cursor;
-    m_cursor += sizeof(unsigned int);
-    outChunk.m_size = *cursorPtr;
+    outChunk.m_arg0 = *(unsigned int*)m_cursor;
+    m_cursor += 4;
 
-    cursorPtr = (unsigned int*)m_cursor;
-    m_cursor += sizeof(unsigned int);
-    outChunk.m_arg0 = *cursorPtr;
+    outChunk.m_version = *(unsigned int*)m_cursor;
+    m_cursor += 4;
 
-    cursorPtr = (unsigned int*)m_cursor;
-    m_cursor += sizeof(unsigned int);
-    outChunk.m_version = *cursorPtr;
-
-    m_lastChunkSize = (int)outChunk.m_size;
+    m_lastChunkSize = outChunk.m_size;
 
     return true;
 }

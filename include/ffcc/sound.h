@@ -75,6 +75,6 @@ public:
     void WaitASync();
 };
 
-CSound Sound;
+extern CSound Sound;
 
 #endif // _FFCC_PPP_SOUND_H_

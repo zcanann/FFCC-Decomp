@@ -76,6 +76,6 @@ public:
     unsigned int m_mapSize;      // 0x1278
 };
 
-CSystem System;
+extern CSystem System;
 
 #endif // _FFCC_SYSTEM_H

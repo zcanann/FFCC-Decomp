@@ -94,6 +94,6 @@ public:
     float _228_4_;
 };
 
-CCameraPcs CameraPcs;
+extern CCameraPcs CameraPcs;
 
 #endif // _FFCC_P_CAMERA_H_

@@ -79,7 +79,7 @@ public:
     char m_currentSlot;        // 0x99
 };
 
-CMemoryCardMan MemoryCardMan;
+extern CMemoryCardMan MemoryCardMan;
 
 // Free Functions
 void Detach(long, long);

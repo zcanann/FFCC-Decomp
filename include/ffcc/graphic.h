@@ -88,6 +88,6 @@ public:
     void DestroyTempBuffer();
 };
 
-CGraphic Graphic;
+extern CGraphic Graphic;
 
 #endif // _GRAPHIC_H_

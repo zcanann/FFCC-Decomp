@@ -101,6 +101,6 @@ public:
     void DumpCache();
 };
 
-CMemory Memory;
+extern CMemory Memory;
 
 #endif // _FFCC_MEMORY_H_

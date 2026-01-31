@@ -155,6 +155,6 @@ public:
     void ClrStartBonusFlg(int);
 };
 
-GbaQueue GbaQue;
+extern GbaQueue GbaQue;
 
 #endif // _FFCC_GBAQUEUE_H_

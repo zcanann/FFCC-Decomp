@@ -36,6 +36,6 @@ public:
 
 STATIC_ASSERT(sizeof(CGamePcs) == 0x11F98);
 
-CGamePcs Game;
+extern CGamePcs Game;
 
 #endif // _FFCC_P_GAME_H_

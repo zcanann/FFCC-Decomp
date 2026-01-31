@@ -17,7 +17,7 @@ typedef void (*MessageCallback)(unsigned long, void*, MCCChannel);
 
 struct CUSBCallbackEntry
 {
-    unsigned int m_inUse;  // 0x0
+    int m_inUse;           // 0x0
     void* m_callback;      // 0x4
     void* m_callerContext; // 0x8
 };

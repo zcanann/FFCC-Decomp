@@ -5,6 +5,7 @@ class CChunkFile;
 
 class CFlatRuntime
 {
+public:
 	class CStack
 	{
 		void operator=(const CStack&);

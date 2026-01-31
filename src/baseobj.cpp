@@ -1,5 +1,7 @@
 #include "ffcc/baseobj.h"
 
+#include "global.h"
+
 extern __declspec(section ".data") CFlatRuntime CFlat;
 
 /*
@@ -9,9 +11,9 @@ extern __declspec(section ".data") CFlatRuntime CFlat;
  */
 void CGBaseObj::onPush(CGBaseObj* other, int param_3)
 {
-	int stack[2];
-	stack[0] = other->m_particleId;
-	stack[1] = param_3;
+	u32 stack[2];
+	stack[0] = (u32)other->m_particleId;
+	stack[1] = (u32)param_3;
 	CFlat.SystemCall(this, 2, 4, 2, (CFlatRuntime::CStack*)stack, 0);
 }
 
@@ -22,9 +24,9 @@ void CGBaseObj::onPush(CGBaseObj* other, int param_3)
  */
 void CGBaseObj::onTalk(CGBaseObj* other, int param_3)
 {
-	int stack[2];
-	stack[0] = other->m_particleId;
-	stack[1] = param_3;
+	u32 stack[2];
+	stack[0] = (u32)other->m_particleId;
+	stack[1] = (u32)param_3;
 	CFlat.SystemCall(this, 2, 6, 2, (CFlatRuntime::CStack*)stack, 0);
 }
 

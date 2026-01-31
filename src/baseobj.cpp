@@ -2,6 +2,31 @@
 
 extern __declspec(section ".data") CFlatRuntime CFlat;
 
+void CGBaseObj::onCreate()
+{
+}
+
+void CGBaseObj::onDestroy()
+{
+}
+
+void CGBaseObj::onDraw()
+{
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGBaseObj::onTalk(CGBaseObj* other, int param_3)
+{
+	CFlatRuntime::CStack stack[2];
+	stack[0].m_word = (u32)other->m_particleId;
+	stack[1].m_word = (u32)param_3;
+	CFlat.SystemCall(this, 2, 6, 2, stack, 0);
+}
+
 /*
  * --INFO--
  * Address:	TODO
@@ -20,48 +45,9 @@ void CGBaseObj::onPush(CGBaseObj* other, int param_3)
  * Address:	TODO
  * Size:	TODO
  */
-void CGBaseObj::onTalk(CGBaseObj* other, int param_3)
+void CGBaseObj::Draw()
 {
-	CFlatRuntime::CStack stack[2];
-	stack[0].m_word = (u32)other->m_particleId;
-	stack[1].m_word = (u32)param_3;
-	CFlat.SystemCall(this, 2, 6, 2, stack, 0);
-}
-
-void CGBaseObj::onCreate()
-{
-}
-
-void CGBaseObj::onDestroy()
-{
-}
-
-void CGBaseObj::onFrame()
-{
-}
-
-void CGBaseObj::onDraw()
-{
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGBaseObj::Create()
-{
-	onCreate();
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CGBaseObj::Destroy()
-{
-	onDestroy();
+	onDraw();
 }
 
 /*
@@ -79,7 +65,17 @@ void CGBaseObj::Frame()
  * Address:	TODO
  * Size:	TODO
  */
-void CGBaseObj::Draw()
+void CGBaseObj::Destroy()
 {
-	onDraw();
+	onDestroy();
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CGBaseObj::Create()
+{
+	onCreate();
 }

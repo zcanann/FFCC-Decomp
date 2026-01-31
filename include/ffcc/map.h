@@ -113,6 +113,6 @@ public:
     void GetFogEnable();
 };
 
-CMapMng MapMng;
+extern CMapMng MapMng;
 
 #endif // _FFCC_MAP_H_

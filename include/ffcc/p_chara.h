@@ -156,6 +156,6 @@ public:
     void GetAnimStage();
 };
 
-CCharaPcs CharaPcs;
+extern CCharaPcs CharaPcs;
 
 #endif // _FFCC_P_CHARA_H_

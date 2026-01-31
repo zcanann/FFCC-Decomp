@@ -240,6 +240,6 @@ public:
 	// unsigned char padding[4];
 };
 
-JoyBus Joybus;
+extern JoyBus Joybus;
 
 #endif // JOYBUS_H

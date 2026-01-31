@@ -48,6 +48,6 @@ public:
     unsigned int m_unk0x7c;           // 0x7c
 };
 
-CUSB USB;
+extern CUSB USB;
 
 #endif // _FFCC_PPP_USB_H_

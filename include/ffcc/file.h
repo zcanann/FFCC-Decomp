@@ -71,6 +71,6 @@ public:
     int m_isDiskError;
 };
 
-CFile File;
+extern CFile File;
 
 #endif // _FFCC_FILE_H

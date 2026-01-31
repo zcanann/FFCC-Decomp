@@ -26,6 +26,6 @@ public:
     int _452_4_;
 };
 
-CPad Pad;
+extern CPad Pad;
 
 #endif

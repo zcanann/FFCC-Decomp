@@ -31,9 +31,13 @@ CVector::CVector(float x, float y, float z)
  */
 CVector::CVector(const Vec& vec)
 {
-    x = vec.x;
-    y = vec.y;
-    z = vec.z;
+	float x = vec.x;
+	float y = vec.y;
+	this->x = x;
+
+	float z = vec.z;
+	this->y = y;
+	this->z = z;
 }
 
 /*
@@ -65,25 +69,11 @@ void CVector::Normalize()
  */
 float CVector::GetRotateY()
 {
-    float x = this->x;
-    bool canPerformAtan = false;
-
-    if (x != 0.0f)
+    // If x and z are both zero, direction is undefined; original returns 0.
+    if (this->x == 0.0f && this->z == 0.0f)
     {
-        canPerformAtan = true;
-    }
-    else {
-		float z = this->z;
-		
-        if (z != 0.0f)
-        {
-            canPerformAtan = true;
-        }
-        else
-        {
-            return 0.0f;
-        }
+        return 0.0f;
     }
 
-    return (float)atan2((double)x, (double)this->z);
+    return (float)atan2((double)this->x, (double)this->z);
 }

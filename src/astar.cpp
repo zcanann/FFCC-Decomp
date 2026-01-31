@@ -449,7 +449,6 @@ void CAStar::calcAStar()
 			m_bestPath.m_cost = kInfiniteCost;
 
 			CATemp temp;
-			memset(&temp, 0, sizeof(temp));
 
 			check(from, to, temp);
 
@@ -875,7 +874,8 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
  */
 CAStar::CATemp::CATemp()
 {
-	// TODO
+	// Plausible original behavior: zero-initialize the temp path structure.
+	memset(this, 0, sizeof(*this));
 }
 
 /*

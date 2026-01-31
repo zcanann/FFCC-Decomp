@@ -1,5 +1,9 @@
 #include "ffcc/zlist.h"
 
+#include "ffcc/p_MaterialEditor.h"
+
+extern char lbl_801D7DC0[];
+
 /*
  * --INFO--
  * Address:	TODO
@@ -68,18 +72,18 @@ void ZLIST::DeleteList()
  */
 bool ZLIST::AddTail(void* data)
 {
-	_ZLISTITEM* newItem = new _ZLISTITEM(); // TODO: Alloc to memoryStage
+	_ZLISTITEM* newItem = new (MaterialEditorPcs.m_stage, lbl_801D7DC0, 0x107) _ZLISTITEM;
 
-    if (newItem != (_ZLISTITEM*)nullptr)
-    {
-        newItem->m_previous = (_ZLISTITEM*)nullptr;
-        newItem->m_next = (_ZLISTITEM*)nullptr;
-    }
+	if (newItem != (_ZLISTITEM*)nullptr)
+	{
+		newItem->m_previous = (_ZLISTITEM*)nullptr;
+		newItem->m_next = (_ZLISTITEM*)nullptr;
+	}
 
-    if (newItem == (_ZLISTITEM*)nullptr)
-    {
-        return false;
-    }
+	if (newItem == (_ZLISTITEM*)nullptr)
+	{
+		return false;
+	}
 
     if (m_root.m_next == (_ZLISTITEM*)nullptr)
     {

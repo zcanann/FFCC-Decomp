@@ -101,6 +101,8 @@ public:
     void DumpCache();
 };
 
+void* operator new(unsigned long size, CMemory::CStage* stage, char* file, int line);
+
 extern CMemory Memory;
 
 #endif // _FFCC_MEMORY_H_

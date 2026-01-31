@@ -1,16 +1,18 @@
 #include "ffcc/baseobj.h"
 
+extern __declspec(section ".data") CFlatRuntime CFlat;
+
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-void CGBaseObj::onPush(CGBaseObj* other, int)
+void CGBaseObj::onPush(CGBaseObj* other, int param_3)
 {
-	/*
-	int particle_id = (int)(other->object).m_particleId;
-	CFlat.SystemCall(this, 2, 4, 2, &particle_id, 0);
-	*/
+	CFlatRuntime::CStack stack[2];
+	stack[0].m_word = (u32)other->m_particleId;
+	stack[1].m_word = (u32)param_3;
+	CFlat.SystemCall(this, 2, 4, 2, stack, 0);
 }
 
 /*
@@ -20,10 +22,10 @@ void CGBaseObj::onPush(CGBaseObj* other, int)
  */
 void CGBaseObj::onTalk(CGBaseObj* other, int param_3)
 {
-	/*
-	int particle_id = (int)(other->object).m_particleId;
-	CFlat.SystemCall(this, 2, 6, 2, &particle_id, 0);
-	*/
+	CFlatRuntime::CStack stack[2];
+	stack[0].m_word = (u32)other->m_particleId;
+	stack[1].m_word = (u32)param_3;
+	CFlat.SystemCall(this, 2, 6, 2, stack, 0);
 }
 
 void CGBaseObj::onCreate()

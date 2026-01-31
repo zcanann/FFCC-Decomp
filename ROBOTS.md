@@ -139,10 +139,18 @@ PR checklist:
 A cron-driven agent should:
 1) Ensure PAL config (`python3 configure.py --version GCCP01`) is in effect.
 2) Select **one** unit to work on (time-boxed).
-3) Attempt a small number of edits.
-4) Rebuild with `ninja`.
-5) Run objdiff on 1–3 symbols to validate direction.
-6) If improvement is real, prepare a PR (or stage changes and ask for review, depending on policy).
+3) **Create a branch immediately** for that unit so work never lands on `main` accidentally.
+   - Branch naming: `pr/<unit>` (unit path is sufficient; avoid extra task text).
+   - Example: `pr/main/chunkfile`
+4) Attempt a small number of edits.
+5) Rebuild with `ninja`.
+6) Run objdiff on 1–3 symbols to validate direction.
+7) If improvement is real, prepare/open a PR.
+
+Branching policy:
+- **Do not stack unrelated work** on one branch.
+- One branch = one unit/PR.
+- If you need to switch units, commit or discard changes, then switch branches.
 
 Time-boxing recommendation:
 - 30–60 minutes per tick max.

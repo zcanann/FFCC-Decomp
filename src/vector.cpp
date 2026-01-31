@@ -64,10 +64,10 @@ void CVector::Normalize()
  */
 float CVector::GetRotateY()
 {
-    if (this->x == 0.0f && this->z == 0.0f)
+    if (x == 0.0f && z == 0.0f)
     {
         return 0.0f;
     }
 
-    return (float)atan2((double)this->x, (double)this->z);
+    return (float)atan2((double)x, (double)z);
 }

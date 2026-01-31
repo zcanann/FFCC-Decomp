@@ -22,7 +22,50 @@ CFlatData::CFlatData()
  */
 CFlatData::~CFlatData()
 {
-	// TODO
+	// Mirrors the compiler-generated scalar-deleting destructor logic (see dtor_800980B4).
+	// Free per-data entries
+	for (int i = 0; i < m_dataCount; i++)
+	{
+		if (m_data[i].m_data != nullptr)
+		{
+			operator delete(m_data[i].m_data);
+			m_data[i].m_data = (void*)nullptr;
+		}
+		if (m_data[i].m_strings != (char**)nullptr)
+		{
+			operator delete(m_data[i].m_strings);
+			m_data[i].m_strings = (char**)nullptr;
+		}
+		if (m_data[i].m_stringBuf != (char*)nullptr)
+		{
+			operator delete(m_data[i].m_stringBuf);
+			m_data[i].m_stringBuf = (char*)nullptr;
+		}
+	}
+	m_dataCount = 0;
+
+	// Free tables
+	for (int i = 0; i < m_tableCount; i++)
+	{
+		if (m_tabl[i].m_strings != (char**)nullptr)
+		{
+			operator delete(m_tabl[i].m_strings);
+			m_tabl[i].m_strings = (char**)nullptr;
+		}
+		if (m_tabl[i].m_stringBuf != (char*)nullptr)
+		{
+			operator delete(m_tabl[i].m_stringBuf);
+			m_tabl[i].m_stringBuf = (char*)nullptr;
+		}
+	}
+	m_tableCount = 0;
+
+	if (m_mesBuffer != (char*)nullptr)
+	{
+		operator delete(m_mesBuffer);
+		m_mesBuffer = (char*)nullptr;
+	}
+	m_mesCount = 0;
 }
 
 /*

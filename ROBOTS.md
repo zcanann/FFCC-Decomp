@@ -121,16 +121,34 @@ Optional: generate a JSON report:
 build/tools/objdiff-cli report generate -p . -o build/GCCP01/report.json -f json-pretty
 ```
 
-### Step 6 — Decide whether to PR
-Make a PR only if:
-- match improved meaningfully (not just a rename/reformat)
-- changes are minimal and understandable
-- build is clean
+### Step 6 — Decide whether to PR (match + plausibility)
+A higher match score is **necessary but not sufficient**.
+
+Make a PR only if **both** are true:
+
+**A) Match improves meaningfully**
+- objdiff shows real alignment improvement (not just formatting/renames)
+- preferably improves one or more specific functions, not just global noise
+
+**B) The resulting C/C++ is plausible original source**
+The goal is to match what the **original FFCC authors likely wrote**, not merely to coax the compiler.
+
+Reject/avoid changes that look like “compiler coaxing,” e.g.:
+- contrived temporaries and reordering that a human wouldn’t naturally write
+- intentionally odd sequencing (load x/y, store x, load z, store y/z) unless there’s strong evidence
+- changes that preserve output but reduce readability without a clear original-source rationale
+
+Prefer changes that are source-plausible:
+- fixing signedness / types to match ABI expectations
+- using idiomatic control flow the codebase uses elsewhere
+- removing obviously redundant variables/branches
+- matching struct/field semantics (names and meaning)
 
 PR checklist:
 - describe what changed (types/control flow/constants/etc.)
-- specify which unit(s) improved
-- include before/after match evidence (screenshots or brief notes)
+- specify which unit(s)/symbol(s) improved
+- include before/after match evidence (objdiff screenshot or brief notes)
+- explain why the new code is *plausibly original* (not just “score went up”)
 
 ---
 

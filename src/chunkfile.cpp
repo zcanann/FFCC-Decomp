@@ -144,11 +144,10 @@ unsigned char* CChunkFile::GetAddress()
  * Address:	TODO
  * Size:	TODO
  */
-void CChunkFile::Get(void* param_2, long param_3)
+void CChunkFile::Get(void* dest, long size)
 { 
-	memcpy(param_2, m_cursor, param_3);
-
-	m_cursor = m_cursor + param_3;
+	memcpy(dest, m_cursor, size);
+	m_cursor += size;
 }
 
 /*
@@ -201,11 +200,9 @@ unsigned int CChunkFile::Get4()
 float CChunkFile::GetF4()
 {
     float value;
-    unsigned char* cursorPtr = m_cursor;
-
+    unsigned int* cursorPtr = (unsigned int*)m_cursor;
+    *(unsigned int*)&value = *cursorPtr;
     m_cursor += 4;
-    *(unsigned int*)&value = *(unsigned int*)cursorPtr;
-
     return value;
 }
 
@@ -235,10 +232,7 @@ char* CChunkFile::GetString()
 void CChunkFile::Align(unsigned long alignment)
 { 
     unsigned long offset = (unsigned long)(m_cursor - m_base);
-    offset = alignment + offset;
-    offset -= 1;
-    unsigned long remainder = offset % alignment;
-    offset = offset - remainder;
-    
+    offset += alignment - 1;
+    offset -= offset % alignment;
     m_cursor = m_base + offset;
 }

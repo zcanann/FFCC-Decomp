@@ -42,5 +42,48 @@ void CFlatData::Create(void*)
  */
 void CFlatData::Destroy()
 {
-	// TODO
+	// First: free per-data entries
+	for (int i = 0; i < m_dataCount; i++)
+	{
+		if (m_data[i].m_data != nullptr)
+		{
+			operator delete(m_data[i].m_data);
+			m_data[i].m_data = nullptr;
+		}
+		if (m_data[i].m_strings != nullptr)
+		{
+			operator delete(m_data[i].m_strings);
+			m_data[i].m_strings = (char**)nullptr;
+		}
+		if (m_data[i].m_stringBuf != nullptr)
+		{
+			operator delete(m_data[i].m_stringBuf);
+			m_data[i].m_stringBuf = (char*)nullptr;
+		}
+	}
+	m_dataCount = 0;
+
+	// Next: free tables
+	for (int i = 0; i < m_tableCount; i++)
+	{
+		if (m_tabl[i].m_strings != nullptr)
+		{
+			operator delete(m_tabl[i].m_strings);
+			m_tabl[i].m_strings = (char**)nullptr;
+		}
+		if (m_tabl[i].m_stringBuf != nullptr)
+		{
+			operator delete(m_tabl[i].m_stringBuf);
+			m_tabl[i].m_stringBuf = (char*)nullptr;
+		}
+	}
+	m_tableCount = 0;
+
+	// Finally: free mes buffer
+	if (m_mesBuffer != nullptr)
+	{
+		operator delete(m_mesBuffer);
+		m_mesBuffer = (char*)nullptr;
+	}
+	m_mesCount = 0;
 }

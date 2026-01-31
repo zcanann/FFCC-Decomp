@@ -3,6 +3,7 @@
 
 class CFlatData
 {
+public:
 	CFlatData();
 	~CFlatData();
 

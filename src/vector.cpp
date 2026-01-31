@@ -9,7 +9,6 @@
  */
 CVector::CVector()
 {
-	// TODO
 }
 
 /*
@@ -65,25 +64,10 @@ void CVector::Normalize()
  */
 float CVector::GetRotateY()
 {
-    float x = this->x;
-    bool canPerformAtan = false;
-
-    if (x != 0.0f)
+    if (this->x == 0.0f && this->z == 0.0f)
     {
-        canPerformAtan = true;
-    }
-    else {
-		float z = this->z;
-		
-        if (z != 0.0f)
-        {
-            canPerformAtan = true;
-        }
-        else
-        {
-            return 0.0f;
-        }
+        return 0.0f;
     }
 
-    return (float)atan2((double)x, (double)this->z);
+    return (float)atan2((double)this->x, (double)this->z);
 }

@@ -7,17 +7,27 @@ class CColor
 {
 public:
 	CColor();
-	CColor(unsigned char, unsigned char, unsigned char, unsigned char);
-	CColor(CColor&);
-	CColor(_GXColor&);
+	CColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
+	CColor(CColor& other);
+	CColor(_GXColor& other);
+
+	union {
+		GXColor color;
+		u32 raw;
+	};
 };
 
 class CColor3
 {
 public:
 	CColor3();
-	CColor3(CColor3&);
-	CColor3(_GXColor&);
+	CColor3(CColor3& other);
+	CColor3(_GXColor& other);
+
+	union {
+		GXColor color;
+		u32 raw;
+	};
 };
 
 #endif // _FFCC_COLOR_H_

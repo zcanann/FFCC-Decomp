@@ -152,8 +152,9 @@ The goal is to match what the **original FFCC authors likely wrote**, not merely
 
 Reject/avoid changes that look like “compiler coaxing,” e.g.:
 - contrived temporaries and reordering that a human wouldn’t naturally write
-- intentionally odd sequencing (load x/y, store x, load z, store y/z) unless there’s strong evidence
+- intentionally odd sequencing unless there’s strong evidence
 - changes that preserve output but reduce readability without a clear original-source rationale
+- **explanatory comments that add no real information** (e.g., “Plausible original behavior: …”)
 
 Prefer changes that are source-plausible:
 - fixing signedness / types to match ABI expectations
@@ -181,7 +182,10 @@ A cron-driven agent should:
 4) Attempt a small number of edits.
 5) Rebuild with `ninja`.
 6) Run objdiff on 1–3 symbols to validate direction.
-7) If improvement is real, prepare/open a PR.
+7) If improvement is real, push the branch and **DM the owner (Zac)** with:
+   - PR link
+   - 2–6 bullet summary of what changed
+   - 1–2 bullet summary of why it’s plausibly original (not just “score went up”)
 
 Branching policy:
 - **Do not stack unrelated work** on one branch.

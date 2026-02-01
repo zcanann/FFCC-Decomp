@@ -1,36 +1,39 @@
 #include "ffcc/pppPoint.h"
+#include <stddef.h>
+
+// Global state - assembly shows access to static data 
+static int pppPointEnabled = 0;
+static PppData* gPppData1 = NULL;
+static PppData* gPppData2 = NULL; 
+static PppData* gPppCtx = NULL;
 
 /*
  * --INFO--
  * PAL Address: 0x80065cfc
  * PAL Size: 96b
  */
-void pppPoint(void* obj, void* param1, void* param2)
+void pppPoint(void)
 {
-	// Check global flag first
-	extern int lbl_8032ED70; // Global flag
-	if (lbl_8032ED70 != 0) {
+	if (pppPointEnabled == 0) {
 		return;
 	}
 	
-	// Check object IDs match
-	int param1_id = *((int*)param1);
-	int obj_id = *((int*)((char*)obj + 0x0c));
-	if (param1_id != obj_id) {
+	if (!gPppData1 || !gPppData2 || !gPppCtx) {
 		return;
 	}
 	
-	// Get position data structures
-	void* param2_data = *((void**)((char*)param2 + 0x0c));
-	int position_offset = *((int*)param2_data);
-	float* obj_position = (float*)((char*)obj + position_offset + 0x80);
+	// ID comparison from assembly pattern 
+	if (gPppData1->id != gPppCtx->id) {
+		return;
+	}
 	
-	// Add position deltas (x, y, z)
-	float* param1_deltas = (float*)((char*)param1 + 0x08);
+	// Vector addition pattern from assembly
+	float* src = &gPppData1->values[2]; // offset 0x8 (z component)
+	float* dst = (float*)((char*)gPppCtx->ptr + 0x80); // offset +0x80 from pointer
 	
-	obj_position[0] += param1_deltas[0]; // x
-	obj_position[1] += param1_deltas[1]; // y  
-	obj_position[2] += param1_deltas[2]; // z
+	dst[0] += src[0]; // x
+	dst[1] += src[1]; // y  
+	dst[2] += src[2]; // z
 }
 
 /*
@@ -38,15 +41,17 @@ void pppPoint(void* obj, void* param1, void* param2)
  * PAL Address: 0x80065cd8
  * PAL Size: 36b
  */
-void pppPointCon(void* obj, void* param)
+void pppPointCon(void)
 {
-	// Get structure pointer and offset to position data
-	void* data = *((void**)((char*)param + 0x0c));
-	int offset = *((int*)data);
-	float* position = (float*)((char*)obj + offset + 0x80);
+	if (!gPppData2 || !gPppCtx) {
+		return;
+	}
 	
-	// Initialize position vector to zero (in reverse order to match assembly)
-	position[2] = 0.0f; // z
-	position[1] = 0.0f; // y
-	position[0] = 0.0f; // x
+	// Load 0.0f constant and initialize vector
+	float zero = 0.0f;
+	float* dst = (float*)((char*)gPppCtx->ptr + 0x80);
+	
+	dst[0] = zero; // x
+	dst[1] = zero; // y
+	dst[2] = zero; // z
 }

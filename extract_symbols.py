@@ -418,6 +418,7 @@ def main():
                     if 'error' not in result:
                         print(f"  {result['content']} (pattern: {result.get('pattern_match', 'unknown')})")
     
+    print("\n⚠️  Note: Addresses and sizes are from a different build and may not match!")
     return 0
 
 if __name__ == "__main__":

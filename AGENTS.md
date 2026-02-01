@@ -62,59 +62,12 @@ python3 extract_symbols.py Game                          # All symbols containin
 
 This outputs only relevant symbol information (~5-15 lines) instead of megabytes.
 
-### Common Symbol Workflow Use Cases
+### Symbol Usage
 
-**🔍 When implementing a 0% function:**
-```sh
-# 1. Get EVERYTHING for the object file in one call (recommended)
-python3 extract_symbols.py chunkfile.o
-
-# 2. Or get specific function details
-python3 extract_symbols.py "pppMatrixXZY"
-
-# 3. Or check data sections if needed
-python3 extract_symbols.py .data --section
-```
-
-**🏗️ When working on C++ classes:**
-```sh
-# Find vtables for the class
-python3 extract_symbols.py "__vt__5CGame"
-
-# Check all symbols for the class
-python3 extract_symbols.py "CGame"
-
-# Look at class data layout
-python3 extract_symbols.py game.o --globals
-```
-
-**📊 When debugging data structures:**
-```sh
-# Check .bss for large uninitialized arrays
-python3 extract_symbols.py .bss --section
-
-# Find specific global variables
-python3 extract_symbols.py "Game" --globals
-
-# Check data section organization
-python3 extract_symbols.py .data --section
-```
-
-**🔧 When validating function size:**
-```sh
-# Compare your function size with symbol info
-python3 extract_symbols.py "SetUSBData__18CMaterialEditorPcsFv"
-# Look for: Size: XXXX bytes - should match your implementation
-```
-
-**💡 When looking for string literals or constants:**
-```sh
-# Find compiler-generated symbols (often string literals)
-python3 extract_symbols.py "@"
-
-# Look for specific strings in symbol names
-python3 extract_symbols.py "Error"
-```
+- **Object analysis**: `python3 extract_symbols.py <object>.o`
+- **Function lookup**: `python3 extract_symbols.py "<function_name>"`
+- **Section info**: `python3 extract_symbols.py .data --section`
+- **Globals**: `python3 extract_symbols.py <object>.o --globals`
 
 ### Function Documentation Format
 When updating functions, include version-specific address and size information:
@@ -135,28 +88,7 @@ When updating functions, include version-specific address and size information:
 
 **Important for 0% matches**: Ghidra decomp provides full reference implementations that can be adapted to match the original source style. Even 0% match functions are highly viable targets.
 
-## Quick Workflow Reference
-
-**🎯 Complete automation workflow:**
-```sh
-# 1. Target selection → Get unit name, source file, functions
-python3 agent_select_target.py
-
-# 2. Symbol analysis → Get function addresses, sizes, globals  
-python3 extract_symbols.py <object_file.o>
-
-# 3. Create branch
-git checkout -b pr/<unit>
-
-# 4. Edit source files in src/ (use Ghidra decomp for 0% functions)
-# 5. Build & test with ninja + objdiff
-# 6. Commit & push if improvement is meaningful + plausible
-```
-
-**📊 Key file relationships:**
-- **Unit**: `main/pppMove` → **Object**: `pppMove.o` → **Source**: `src/pppMove.cpp`
-- **Functions**: Get from symbol analysis (address + size)
-- **Ghidra decomp**: `resources/ghidra-decomp-*/<address>_<mangled_name>.c`
+**Key relationships:** Unit → Object file → Source file. Use symbols for context, Ghidra decomp for 0% functions.
 
 ## State Tracking & Memory
 
@@ -164,25 +96,7 @@ git checkout -b pr/<unit>
 - **Main log**: `~/.openclaw/workspace/memory/ffcc-decomp-notes.md`
 - **Session state**: `~/.openclaw/workspace/memory/decomp-state.json`
 
-**Notes format** (append to markdown):
-```markdown
-## 2026-01-31 - main/chunkfile
-- **Target functions**: `Align__10CChunkFileFUl`, `Read__10CChunkFileFv`
-- **Attempts**: Tried changing padding in CChunkFile struct - no improvement
-- **Result**: No progress, need different approach
-- **Next**: Try inlining barriers or signedness changes
-```
-
-**State format** (JSON):
-```json
-{
-  "currentTarget": "main/chunkfile",
-  "lastAttempt": "2026-01-31T19:06:00Z",
-  "recentFailures": ["main/chunkfile", "audio/stream"],
-  "blacklisted": [],
-  "nextCheck": "2026-02-01T10:00:00Z"
-}
-```
+Update these files to track progress and avoid cycling through failed targets.
 
 ### Cycle Avoidance Strategy
 1. **Track attempts** per unit with timestamps
@@ -275,106 +189,22 @@ python3 extract_symbols.py pppMove.o
   📊 Summary: 2 functions, 0 globals
 ```
 
+**Key derivations:** Unit → Object file → Source file. Use Ghidra decomp for 0% functions, objdiff for partial matches.
+
+### Step 2 - Create branch: `git checkout -b pr/<unit>`
+
+### Step 3 - Edit source files in `src/` and `include/`
+Make small changes: types, signedness, struct layout, control flow, constants.
+
+### Step 4 - Build: `ninja`
+
+### Step 5 - Analyze with objdiff
 ```sh
-# 3. Reference Ghidra decomp for 0% functions (as needed)
-ls resources/ghidra-decomp-*/80065b18_*  # Find decompiled reference
+build/tools/objdiff-cli diff -p . -u <unit> -o - <symbol> > diff_result.json
 ```
+Parse JSON to assess real assembly improvements vs formatting changes.
 
-**Key derivations from target selection:**
-- **Unit**: `main/pppMove` → **Object file**: `pppMove.o` 
-- **Source exists**: `src/pppMove.cpp` (ready to edit)
-- **Symbol info**: Addresses, sizes, function names
-- **Ghidra decomp**: Available for 0% match functions
-
-**Record in notes:**
-- **Unit name**: From script output
-- **Target functions**: With sizes and addresses  
-- **Approach**: 0% = implement from Ghidra, partial = incremental fix
-
-### Step 2 - Create branch for the target
-Once target is identified, create a branch:
-```sh
-git checkout -b pr/<unit>
-```
-Example: `pr/main/chunkfile`
-
-### Step 3 - Open the relevant source
-Edit the corresponding `.c/.cpp/.h` under:
-- `src/`
-- `include/`
-
-Make small, explainable changes:
-- types / signedness
-- struct layout / padding
-- inlining barriers
-- control flow shape
-- constant forms
-- call ordering
-
-### Step 4 - Rebuild
-From repo root:
-```sh
-ninja
-```
-
-If build fails, fix and rebuild. Do not proceed to diffing with a broken build.
-
-### Step 5 - Diff with objdiff (JSON oneshot mode)
-Objdiff diffs **expected object** (`build/GCCP01/src/...`) vs **current object** (`build/GCCP01/obj/...`).
-
-**Important:** Don't treat "percent match" as magic. You should be looking at the **raw assembly**.
-Match work is ultimately about making *the compiler emit the same instructions* from plausible source.
-
-#### 5a) Find a symbol name in the expected object
-Example (for `main/chunkfile`):
-```sh
-nm -g build/GCCP01/src/chunkfile.o | head
-```
-Pick a function symbol, e.g. `Align__10CChunkFileFUl`.
-
-#### 5b) Run objdiff in JSON oneshot mode (automation-friendly)
-**Recommended for automation:** JSON oneshot mode provides structured data without requiring a TTY.
-
-```sh
-build/tools/objdiff-cli diff -p . -u main/chunkfile -o - Align__10CChunkFileFUl > diff_result.json
-```
-
-The JSON output includes:
-- **Per-instruction assembly comparison** (left vs right)
-- **Symbol mappings** and relocation data
-- **Match percentages** and diff analysis
-- **Formatted assembly** with highlighting
-
-#### 5c) Parse JSON results programmatically
-Parse the JSON to assess:
-- **Real improvements**: instruction sequence changes, not just formatting
-- **Match quality**: function-level progress vs global noise
-- **Specific mismatches**: register allocation, load/store ordering, branching, constants
-
-Example analysis:
-```bash
-# Check if there are actual instruction differences
-jq '.left.symbols[].instructions | length' diff_result.json
-# Get match percentage for the target function
-jq '.left.symbols[] | select(.name == "target_symbol") | .match_percent' diff_result.json
-```
-
-#### 5d) Interactive mode (optional)
-For manual analysis, the interactive UI is still available:
-```sh
-build/tools/objdiff-cli diff -p . -u main/chunkfile Align__10CChunkFileFUl
-```
-Quit with `q`.
-
-### Step 6 - Check progress summary
-At the end of `ninja`, a progress report is printed.
-Example tail:
-- `All: 8.88% matched, 0.00% linked (0 / 480 files)`
-
-Optional: generate a JSON report:
-```sh
-build/tools/objdiff-cli report generate -p . -o build/GCCP01/report.json -f json-pretty
-```
+### Step 6 - Check overall progress with `ninja` output
 
 ### Step 7 - Decide whether to create PR (match + plausibility)
 A higher match score is **necessary but not sufficient**.
@@ -416,44 +246,18 @@ Prefer changes that are source-plausible:
 
 ---
 
-## Operational guidance for automation
+## Automation workflow
 
-A cron-driven agent should:
-1) Ensure PAL config (`python3 configure.py --version GCCP01`) is in effect.
-2) **Select target**: `python3 agent_select_target.py` → get unit name, source path, target functions
-3) **Extract symbols**: `python3 extract_symbols.py <object>.o` → get comprehensive symbol info  
-4) **Create branch** for that specific unit (`pr/<unit>`).
-5) **Update state files** with current attempt.
-6) **Reference resources as needed**:
-   - **0% functions**: Use Ghidra decomp from `resources/ghidra-decomp-*`
-   - **Partial functions**: Focus on objdiff analysis for specific mismatches
-7) Attempt a small number of edits.
-8) Rebuild with `ninja`.
-9) **Run objdiff JSON analysis** on 1–3 target symbols:
-   ```sh
-   build/tools/objdiff-cli diff -p . -u <unit> -o - <symbol> > diff_analysis.json
-   ```
-10) **Parse JSON results** to determine if changes represent real progress:
-    - Instruction-level improvements, not just formatting
-    - Function match percentage increases
-    - Meaningful assembly differences (register allocation, branching, etc.)
-11) **If improvement is real and plausible, create PR**:
-    - Commit: `git commit -m "Descriptive message with metrics"`
-    - Push: `git push origin pr/<unit>`
-    - Create PR: `gh pr create --title "..." --body "..."`
-    - **Required in PR description:**
-      - Summary of technical changes
-      - Before/after match percentages 
-      - Why changes represent plausible original source
-      - objdiff analysis highlights
+1. **Select target**: `python3 agent_select_target.py`
+2. **Extract symbols**: `python3 extract_symbols.py <object>.o`  
+3. **Create branch**: `git checkout -b pr/<unit>`
+4. **Update state files** 
+5. **Edit source** (use Ghidra decomp for 0% functions)
+6. **Build**: `ninja`
+7. **Analyze**: `build/tools/objdiff-cli diff -p . -u <unit> -o - <symbol>`
+8. **If real improvement**: commit, push, create PR with technical details
 
-Branching policy:
-- **Do not stack unrelated work** on one branch.
-- One branch = one unit/PR.
-- If you need to switch units, commit or discard changes, then switch branches.
-
-Time-boxing recommendation:
-- 30-60 minutes per tick max.
+**Constraints**: One branch per unit, 30-60 min time limit.
 
 ---
 

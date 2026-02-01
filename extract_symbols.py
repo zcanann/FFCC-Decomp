@@ -282,9 +282,9 @@ def main():
     
     # Execute appropriate search based on mode
     if is_object_file:
-        # Comprehensive object file analysis
+        # Comprehensive object file analysis - both PAL and EN
         if pal_map.exists():
-            print(f"\n📦 PAL Comprehensive Analysis ({search_term}):")
+            print(f"\n📦 PAL Release Analysis ({search_term}):")
             all_info = extract_all_for_object(pal_map, search_term)
             
             if 'error' in all_info:
@@ -325,11 +325,36 @@ def main():
                 total_functions = len(all_info['functions'])
                 total_globals = len(all_info['globals'])
                 print(f"\n  📊 Summary: {total_functions} functions, {total_globals} globals")
+        
+        # EN Debug analysis too
+        if en_map.exists():
+            print(f"\n📦 EN Debug Analysis ({search_term}):")
+            all_info_en = extract_all_for_object(en_map, search_term)
+            
+            if 'error' in all_info_en:
+                print(f"  Error: {all_info_en['error']}")
+            else:
+                # Functions
+                if all_info_en['functions']:
+                    print(f"\n  ⚡ Functions ({len(all_info_en['functions'])}):")
+                    for i, func in enumerate(all_info_en['functions'], 1):
+                        p = func['parsed']
+                        try:
+                            size_bytes = int(p['size'], 16) if p['size'] != 'UNUSED' else 0
+                        except:
+                            size_bytes = 0
+                        size_kb = f"{size_bytes}"
+                        print(f"    {i:2}. {p['symbol']} ({size_kb}b at {p['virtual_addr']})")
+                
+                # Summary
+                total_functions_en = len(all_info_en['functions'])
+                total_globals_en = len(all_info_en['globals'])
+                print(f"\n  📊 Summary: {total_functions_en} functions, {total_globals_en} globals")
     
     elif is_section_search:
-        # Section information search
+        # Section information search - both PAL and EN
         if pal_map.exists():
-            print(f"\n📂 PAL Section Info ({search_term}):")
+            print(f"\n📂 PAL Release Section Info ({search_term}):")
             section_results = extract_section_info(pal_map, search_term)
             
             if section_results:
@@ -345,11 +370,29 @@ def main():
                             print(f"     Size: {p['size']} bytes at {p['virtual_addr']} from {p['object_file']}")
             else:
                 print("  No section info found")
+        
+        if en_map.exists():
+            print(f"\n📂 EN Debug Section Info ({search_term}):")
+            section_results_en = extract_section_info(en_map, search_term)
+            
+            if section_results_en:
+                for i, result in enumerate(section_results_en[:8], 1):
+                    if 'error' in result:
+                        print(f"  Error: {result['error']}")
+                    elif result['type'] == 'section_header':
+                        print(f"  📋 {result['content']}")
+                    else:
+                        print(f"  {i-1}. {result['content']}")
+                        if result.get('parsed'):
+                            p = result['parsed']
+                            print(f"     Size: {p['size']} bytes at {p['virtual_addr']} from {p['object_file']}")
+            else:
+                print("  No section info found")
     
     elif is_globals_search:
-        # Globals search
+        # Globals search - both PAL and EN
         if pal_map.exists():
-            print(f"\n🌍 PAL Global Variables (containing '{search_term}'):")
+            print(f"\n🌍 PAL Release Global Variables (containing '{search_term}'):")
             if search_term.endswith('.o'):
                 globals_results = extract_globals_for_file(pal_map, search_term)
             else:
@@ -360,6 +403,31 @@ def main():
             
             if globals_results:
                 for i, result in enumerate(globals_results[:8], 1):
+                    if 'error' in result:
+                        print(f"  Error: {result['error']}")
+                    else:
+                        print(f"  {i}. {result['content']}")
+                        if result.get('parsed'):
+                            p = result['parsed'] 
+                            section = p.get('section', 'unknown')
+                            size = p.get('size', 'unknown')
+                            addr = p.get('virtual_addr', 'unknown')
+                            print(f"     {section} section: {size} bytes at {addr}")
+            else:
+                print("  No global variables found")
+        
+        if en_map.exists():
+            print(f"\n🌍 EN Debug Global Variables (containing '{search_term}'):")
+            if search_term.endswith('.o'):
+                globals_results_en = extract_globals_for_file(en_map, search_term)
+            else:
+                # Search for globals containing the term
+                globals_results_en = extract_symbols_for_function(en_map, search_term)
+                globals_results_en = [r for r in globals_results_en if r.get('parsed') and 
+                                     r['parsed'].get('section') in ['.data', '.bss', '.sdata']]
+            
+            if globals_results_en:
+                for i, result in enumerate(globals_results_en[:8], 1):
                     if 'error' in result:
                         print(f"  Error: {result['error']}")
                     else:

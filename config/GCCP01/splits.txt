@@ -362,10 +362,13 @@ pppMatrixZYX.cpp:
 pppMove.cpp:
 	.text       start:0x800609C0 end:0x80060A80
 
-pppPObjPoint.cpp:
+pppParMatrix.cpp:
 	extab       start:0x80007098 end:0x800070A0
 	extabindex  start:0x8000CF94 end:0x8000CFA0
-	.text       start:0x80060A80 end:0x80060B80
+	.text       start:0x80060A80 end:0x80060AEC
+
+pppPObjPoint.cpp:
+	.text       start:0x80060AEC end:0x80060B80
 
 pppPoint.cpp:
 	.text       start:0x80060B80 end:0x80060C04

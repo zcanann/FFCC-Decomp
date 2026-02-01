@@ -14,15 +14,17 @@ void pppAngMove(void* dest, void* src, void* param1, void* param2)
     }
     
     int* param2Ptr = (int*)param2;
-    int* destPtr = (int*)((char*)dest + param2Ptr[0] + 0x80);
-    int* srcPtr = (int*)((char*)dest + param2Ptr[1] + 0x80);
+    int destOffset = param2Ptr[0];
+    int srcOffset = param2Ptr[1];
+    int* destPtr = (int*)((char*)dest + destOffset + 0x80);
+    int* srcPtr = (int*)((char*)dest + srcOffset + 0x80);
     
-    if (param1) {
+    if (param1 != 0) {
         int* param1Ptr = (int*)param1;
         if (param1Ptr[3] == ((int*)dest)[3]) {
-            srcPtr[0] += ((int*)((char*)param1 + 0x8))[0];
-            srcPtr[1] += ((int*)((char*)param1 + 0xc))[0];
-            srcPtr[2] += ((int*)((char*)param1 + 0x10))[0];
+            srcPtr[0] += param1Ptr[2];
+            srcPtr[1] += param1Ptr[3];
+            srcPtr[2] += param1Ptr[4];
         }
     }
     
@@ -39,8 +41,7 @@ void pppAngMove(void* dest, void* src, void* param1, void* param2)
 void pppAngMoveCon(void* dest, void* param)
 {
     int* paramPtr = (int*)param;
-    paramPtr[3]; // Access param[3] first to match assembly 
-    int offset = paramPtr[1]; // Then access param[1]
+    int offset = paramPtr[1];
     int* ptr = (int*)((char*)dest + offset + 0x80);
     ptr[2] = 0;
     ptr[1] = 0;

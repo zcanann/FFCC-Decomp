@@ -8,10 +8,10 @@
 void pppColMoveCon(void* param1, void* param2)
 {
     int** ptr_array = (int**)param2;
-    int* target_ptr = ptr_array[3];  // Load from offset 0xC
-    target_ptr = (int*)target_ptr[1]; // Load from offset 0x4 
-    int offset = (int)target_ptr + 0x80;
-    short* target = (short*)((char*)param1 + offset);
+    int* temp_ptr = ptr_array[3];  // Load from offset 0xC
+    temp_ptr = (int*)temp_ptr[1]; // Load from offset 0x4 
+    temp_ptr = (int*)((char*)temp_ptr + 0x80);
+    short* target = (short*)((char*)param1 + (int)temp_ptr);
     
     target[3] = 0;  // offset 0x6
     target[2] = 0;  // offset 0x4
@@ -46,7 +46,7 @@ void pppColMove(void* param1, void* param2, void* param3)
     int* param1_int = (int*)param1;
     
     if (param2_int[0] == param1_int[3]) {  // Compare param2[0] with param1[0xC]
-        // Skip movement update if equal
+        // Skip movement updates, go directly to final addition
     } else {
         // Update movement values
         short* movement = (short*)((char*)param2 + 0x8);

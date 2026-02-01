@@ -1,0 +1,133 @@
+// Function: ArtiInit__8CMenuPcsFv
+// Entry: 80160c34
+// Size: 680 bytes
+
+void ArtiInit__8CMenuPcsFv(int param_1)
+
+{
+  short sVar1;
+  float fVar2;
+  float fVar3;
+  float fVar4;
+  int iVar5;
+  short sVar6;
+  short sVar7;
+  short *psVar8;
+  int iVar9;
+  int iVar10;
+  int iVar11;
+  
+  memset(*(undefined4 *)(param_1 + 0x850),0,0x1008);
+  fVar2 = FLOAT_80332fac;
+  iVar5 = *(int *)(param_1 + 0x850) + 8;
+  iVar10 = 8;
+  do {
+    *(float *)(iVar5 + 0x14) = fVar2;
+    *(float *)(iVar5 + 0x54) = fVar2;
+    *(float *)(iVar5 + 0x94) = fVar2;
+    *(float *)(iVar5 + 0xd4) = fVar2;
+    *(float *)(iVar5 + 0x114) = fVar2;
+    *(float *)(iVar5 + 0x154) = fVar2;
+    *(float *)(iVar5 + 0x194) = fVar2;
+    *(float *)(iVar5 + 0x1d4) = fVar2;
+    iVar5 = iVar5 + 0x200;
+    iVar10 = iVar10 + -1;
+  } while (iVar10 != 0);
+  iVar5 = *(int *)(param_1 + 0x850);
+  *(undefined4 *)(iVar5 + 0x24) = 0x2e;
+  *(undefined2 *)(iVar5 + 8) = 0x68;
+  *(undefined2 *)(iVar5 + 10) = 0x28;
+  *(undefined2 *)(iVar5 + 0xc) = 0x78;
+  fVar2 = FLOAT_80332fe8;
+  *(undefined2 *)(iVar5 + 0xe) = 0x108;
+  fVar4 = FLOAT_80332fec;
+  *(float *)(iVar5 + 0x10) = fVar2;
+  fVar3 = FLOAT_80332fac;
+  *(float *)(iVar5 + 0x14) = fVar4;
+  fVar2 = FLOAT_80332fa8;
+  sVar6 = 0;
+  *(float *)(iVar5 + 0x1c) = fVar3;
+  fVar4 = FLOAT_80332ff0;
+  sVar7 = 4;
+  *(undefined4 *)(iVar5 + 0x2c) = 5;
+  *(undefined4 *)(iVar5 + 0x30) = 5;
+  iVar5 = 0x100;
+  iVar10 = *(int *)(param_1 + 0x850);
+  *(undefined4 *)(iVar10 + 100) = 0x44;
+  *(undefined2 *)(iVar10 + 0x48) = 0x50;
+  *(undefined2 *)(iVar10 + 0x4a) = 0xe;
+  *(undefined2 *)(iVar10 + 0x4c) = 0x30;
+  *(undefined2 *)(iVar10 + 0x4e) = 0x30;
+  *(float *)(iVar10 + 0x50) = fVar2;
+  *(float *)(iVar10 + 0x54) = fVar2;
+  *(float *)(iVar10 + 0x5c) = fVar3;
+  *(undefined4 *)(iVar10 + 0x6c) = 0;
+  *(undefined4 *)(iVar10 + 0x70) = 5;
+  iVar10 = *(int *)(param_1 + 0x850);
+  *(undefined4 *)(iVar10 + 0xa4) = 0x44;
+  *(undefined2 *)(iVar10 + 0x88) = 0x55;
+  *(undefined2 *)(iVar10 + 0x8c) = 0x30;
+  *(undefined2 *)(iVar10 + 0x8e) = 0x30;
+  *(short *)(iVar10 + 0x8a) = 0x150 - *(short *)(iVar10 + 0x8e);
+  *(float *)(iVar10 + 0x90) = fVar2;
+  *(float *)(iVar10 + 0x94) = fVar2;
+  *(float *)(iVar10 + 0x9c) = fVar4;
+  *(undefined4 *)(iVar10 + 0xac) = 0;
+  *(undefined4 *)(iVar10 + 0xb0) = 5;
+  iVar10 = *(int *)(param_1 + 0x850);
+  *(undefined4 *)(iVar10 + 0xf4) = 2;
+  *(undefined4 *)(iVar10 + 0xe4) = 0x2e;
+  *(undefined2 *)(iVar10 + 200) = 0x50;
+  *(undefined2 *)(iVar10 + 0xca) = 8;
+  *(undefined2 *)(iVar10 + 0xcc) = 0x48;
+  *(undefined2 *)(iVar10 + 0xce) = 0x140;
+  *(float *)(iVar10 + 0xd0) = fVar2;
+  *(float *)(iVar10 + 0xd4) = fVar2;
+  *(undefined4 *)(iVar10 + 0xec) = 0;
+  *(undefined4 *)(iVar10 + 0xf0) = 5;
+  iVar10 = *(int *)(param_1 + 0x850);
+  iVar11 = 4;
+  do {
+    psVar8 = (short *)(*(int *)(param_1 + 0x850) + iVar5 + 8);
+    psVar8[0x16] = 0;
+    psVar8[0x17] = 2;
+    psVar8[0xe] = 0;
+    psVar8[0xf] = 0x37;
+    sVar7 = sVar7 + 2;
+    *psVar8 = *(short *)(iVar10 + 8) + 0x24;
+    sVar1 = sVar6 + 0x20;
+    psVar8[1] = *(short *)(iVar10 + 10) + sVar6;
+    psVar8[2] = 200;
+    psVar8[3] = 0x28;
+    *(float *)(psVar8 + 4) = fVar2;
+    *(float *)(psVar8 + 6) = fVar2;
+    psVar8[0x12] = 0;
+    psVar8[0x13] = 7;
+    psVar8[0x14] = 0;
+    psVar8[0x15] = 5;
+    iVar9 = iVar5 + 0x48;
+    iVar5 = iVar5 + 0x80;
+    psVar8 = (short *)(*(int *)(param_1 + 0x850) + iVar9);
+    psVar8[0x16] = 0;
+    psVar8[0x17] = 2;
+    psVar8[0xe] = 0;
+    psVar8[0xf] = 0x37;
+    *psVar8 = *(short *)(iVar10 + 8) + 0x24;
+    sVar6 = sVar6 + 0x40;
+    psVar8[1] = *(short *)(iVar10 + 10) + sVar1;
+    psVar8[2] = 200;
+    psVar8[3] = 0x28;
+    *(float *)(psVar8 + 4) = fVar2;
+    *(float *)(psVar8 + 6) = fVar2;
+    psVar8[0x12] = 0;
+    psVar8[0x13] = 7;
+    psVar8[0x14] = 0;
+    psVar8[0x15] = 5;
+    iVar11 = iVar11 + -1;
+  } while (iVar11 != 0);
+  **(short **)(param_1 + 0x850) = sVar7;
+  *(undefined2 *)(*(int *)(param_1 + 0x82c) + 0x26) = 0;
+  *(undefined *)(*(int *)(param_1 + 0x82c) + 0xb) = 1;
+  return;
+}
+

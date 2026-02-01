@@ -1,0 +1,92 @@
+// Function: __sinit_p_camera_cpp
+// Entry: 8003a250
+// Size: 940 bytes
+
+void __sinit_p_camera_cpp(void)
+
+{
+  CameraPcs.process.manager.vtable = (CManager)&PTR_PTR_s_CCameraPcs_801e9b00;
+  CameraPcs._1052_4_ = FLOAT_8032fa78;
+  CameraPcs._1048_4_ = FLOAT_8032fa78;
+  CameraPcs._1044_4_ = FLOAT_8032fa78;
+  CameraPcs._1064_4_ = FLOAT_8032fa7c;
+  CameraPcs._1060_4_ = FLOAT_8032fa7c;
+  CameraPcs._1056_4_ = FLOAT_8032fa7c;
+  DAT_801e9160 = DAT_801e9030;
+  DAT_801e9164 = DAT_801e9034;
+  DAT_801e9168 = PTR_create__10CCameraPcsFv_801e9038;
+  DAT_801e916c = DAT_801e903c;
+  DAT_801e9170 = DAT_801e9040;
+  DAT_801e9174 = PTR_destroy__10CCameraPcsFv_801e9044;
+  DAT_801e9178 = DAT_801e9048;
+  DAT_801e917c = DAT_801e904c;
+  DAT_801e9180 = PTR_calc__10CCameraPcsFv_801e9050;
+  DAT_801e918c = DAT_801e9054;
+  DAT_801e9190 = DAT_801e9058;
+  DAT_801e9194 = PTR_draw__10CCameraPcsFv_801e905c;
+  DAT_801e92bc = DAT_801e9060;
+  DAT_801e92c0 = DAT_801e9064;
+  DAT_801e92c4 = PTR_createChara__10CCameraPcsFv_801e9068;
+  DAT_801e92c8 = DAT_801e906c;
+  DAT_801e92cc = DAT_801e9070;
+  DAT_801e92d0 = PTR_destroyChara__10CCameraPcsFv_801e9074;
+  DAT_801e92d4 = DAT_801e9078;
+  DAT_801e92d8 = DAT_801e907c;
+  DAT_801e92dc = PTR_calcChara__10CCameraPcsFv_801e9080;
+  DAT_801e96e0 = DAT_801e90dc;
+  DAT_801e96e8 = DAT_801e90e4;
+  DAT_801e96ec = DAT_801e90e8;
+  DAT_801e982c = DAT_801e90f0;
+  DAT_801e9830 = DAT_801e90f4;
+  DAT_801e9418 = DAT_801e9084;
+  DAT_801e941c = DAT_801e9088;
+  DAT_801e9420 = PTR_createMap__10CCameraPcsFv_801e908c;
+  DAT_801e9424 = DAT_801e9090;
+  DAT_801e9428 = DAT_801e9094;
+  DAT_801e942c = PTR_destroyMap__10CCameraPcsFv_801e9098;
+  DAT_801e9430 = DAT_801e909c;
+  DAT_801e9434 = DAT_801e90a0;
+  DAT_801e9438 = PTR_calcMap__10CCameraPcsFv_801e90a4;
+  DAT_801e9574 = DAT_801e90a8;
+  DAT_801e9578 = DAT_801e90ac;
+  DAT_801e957c = PTR_createMaterialEditor__10CCameraPcsFv_801e90b0;
+  DAT_801e9580 = DAT_801e90b4;
+  DAT_801e9584 = DAT_801e90b8;
+  DAT_801e9588 = PTR_destroyMaterialEditor__10CCameraPcsFv_801e90bc;
+  DAT_801e958c = DAT_801e90c0;
+  DAT_801e9590 = DAT_801e90c4;
+  DAT_801e9594 = PTR_calcMaterialEditor__10CCameraPcsFv_801e90c8;
+  DAT_801e96d0 = DAT_801e90cc;
+  DAT_801e96d4 = DAT_801e90d0;
+  DAT_801e96d8 = PTR_createFunnyShape__10CCameraPcsFv_801e90d4;
+  DAT_801e96dc = DAT_801e90d8;
+  DAT_801e96e4 = PTR_destroyFunnyShape__10CCameraPcsFv_801e90e0;
+  DAT_801e96f0 = PTR_calcFunnyShape__10CCameraPcsFv_801e90ec;
+  DAT_801e9834 = PTR_createPart__10CCameraPcsFv_801e90f8;
+  DAT_801e9838 = DAT_801e90fc;
+  DAT_801e983c = DAT_801e9100;
+  DAT_801e9840 = PTR_destroyPart__10CCameraPcsFv_801e9104;
+  DAT_801e9844 = DAT_801e9108;
+  DAT_801e9848 = DAT_801e910c;
+  DAT_801e984c = PTR_calcPart__10CCameraPcsFv_801e9110;
+  DAT_801e9988 = DAT_801e9114;
+  DAT_801e998c = DAT_801e9118;
+  DAT_801e9990 = PTR_createFullShadow__10CCameraPcsFv_801e911c;
+  DAT_801e9994 = DAT_801e9120;
+  DAT_801e9998 = DAT_801e9124;
+  DAT_801e999c = PTR_destroyFullShadow__10CCameraPcsFv_801e9128;
+  DAT_801e99a0 = DAT_801e912c;
+  DAT_801e99a4 = DAT_801e9130;
+  DAT_801e99a8 = PTR_drawShadowBegin__10CCameraPcsFv_801e9134;
+  DAT_801e99b4 = DAT_801e9138;
+  DAT_801e99b8 = DAT_801e913c;
+  DAT_801e99bc = PTR_drawShadowEnd__10CCameraPcsFv_801e9140;
+  DAT_801e99c8 = DAT_801e9144;
+  DAT_801e99cc = DAT_801e9148;
+  DAT_801e99d0 = PTR_drawShadowChrBegin__10CCameraPcsFv_801e914c;
+  DAT_801e99dc = DAT_801e9150;
+  DAT_801e99e0 = DAT_801e9154;
+  DAT_801e99e4 = PTR_drawShadowEndAll__10CCameraPcsFv_801e9158;
+  return;
+}
+

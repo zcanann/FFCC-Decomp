@@ -1,0 +1,167 @@
+// Function: GetItemAll__8GbaQueueFiPUc
+// Entry: 800cdfc0
+// Size: 832 bytes
+
+undefined4 GetItemAll__8GbaQueueFiPUc(GbaQueue *gbaQueue,int param_2,void *param_3)
+
+{
+  char *pcVar1;
+  undefined4 uVar2;
+  char *pcVar3;
+  char *pcVar4;
+  undefined4 *puVar5;
+  undefined2 *puVar6;
+  int iVar7;
+  int iVar8;
+  undefined2 local_198;
+  undefined2 local_196;
+  undefined2 local_194;
+  undefined2 local_192;
+  undefined2 local_190;
+  undefined2 local_18e;
+  undefined2 local_18c;
+  undefined2 local_18a;
+  undefined2 local_188;
+  undefined2 local_186;
+  undefined2 local_184;
+  undefined2 local_182;
+  uint local_180;
+  uint local_17c;
+  uint local_178;
+  undefined2 local_174 [64];
+  char local_f4;
+  char local_f3;
+  char local_f2;
+  char local_f1;
+  undefined4 local_f0;
+  undefined4 local_ec;
+  undefined4 local_e8;
+  undefined4 local_e4;
+  undefined2 local_e0;
+  char local_de;
+  char local_dd;
+  undefined4 local_dc;
+  undefined4 local_d8;
+  undefined auStack_d4 [3];
+  char local_d1;
+  undefined4 local_d0;
+  uint local_cc;
+  uint local_c8;
+  uint local_c4;
+  undefined2 local_c0;
+  undefined4 local_be;
+  char local_ba [4];
+  undefined4 local_b6;
+  char local_b2 [120];
+  undefined4 local_3a;
+  undefined4 local_36;
+  undefined4 local_32;
+  undefined4 local_2e;
+  undefined4 local_2a;
+  undefined4 local_26;
+  undefined local_22;
+  undefined local_21;
+  undefined local_20;
+  undefined local_1f;
+  undefined local_1e;
+  undefined local_1d;
+  undefined local_1c;
+  undefined local_1b;
+  undefined local_1a;
+  
+  OSWaitSemaphore(gbaQueue->accessSemaphores + param_2);
+  iVar7 = param_2 * 0xdc;
+  local_f4 = gbaQueue->compatibilityStr[iVar7 + -4];
+  local_f3 = gbaQueue->compatibilityStr[iVar7 + -3];
+  local_f2 = gbaQueue->compatibilityStr[iVar7 + -2];
+  local_f1 = gbaQueue->compatibilityStr[iVar7 + -1];
+  local_f0 = *(undefined4 *)(gbaQueue->compatibilityStr + iVar7);
+  local_ec = *(undefined4 *)(gbaQueue->compatibilityStr + iVar7 + 4);
+  local_e8 = *(undefined4 *)(gbaQueue->compatibilityStr + iVar7 + 8);
+  local_e4 = *(undefined4 *)(gbaQueue->compatibilityStr + iVar7 + 0xc);
+  local_e0 = *(undefined2 *)(gbaQueue->compatibilityStr + iVar7 + 0x10);
+  local_de = gbaQueue->compatibilityStr[iVar7 + 0x12];
+  local_dd = gbaQueue->compatibilityStr[iVar7 + 0x13];
+  local_dc = *(undefined4 *)(gbaQueue->compatibilityStr + iVar7 + 0x14);
+  local_d8 = *(undefined4 *)(gbaQueue->compatibilityStr + iVar7 + 0x18);
+  __copy(auStack_d4,gbaQueue->compatibilityStr + iVar7 + 0x1c,3);
+  local_d1 = gbaQueue->compatibilityStr[iVar7 + 0x1f];
+  puVar5 = &local_be;
+  pcVar4 = gbaQueue->compatibilityStr + iVar7 + 0x32;
+  local_d0 = *(undefined4 *)(gbaQueue->compatibilityStr + iVar7 + 0x20);
+  local_cc = *(uint *)(gbaQueue->compatibilityStr + iVar7 + 0x24);
+  local_c8 = *(uint *)(gbaQueue->compatibilityStr + iVar7 + 0x28);
+  local_c4 = *(uint *)(gbaQueue->compatibilityStr + iVar7 + 0x2c);
+  local_c0 = *(undefined2 *)(gbaQueue->compatibilityStr + iVar7 + 0x30);
+  local_be = *(undefined4 *)(gbaQueue->compatibilityStr + iVar7 + 0x32);
+  iVar8 = 0x10;
+  do {
+    pcVar1 = pcVar4 + 4;
+    pcVar4 = pcVar4 + 8;
+    uVar2 = *(undefined4 *)pcVar4;
+    puVar5[1] = *(undefined4 *)pcVar1;
+    puVar5 = puVar5 + 2;
+    *puVar5 = uVar2;
+    iVar8 = iVar8 + -1;
+  } while (iVar8 != 0);
+  local_3a = *(undefined4 *)(&gbaQueue->field_0x50e + iVar7);
+  local_36 = *(undefined4 *)(&gbaQueue->field_0x512 + iVar7);
+  local_32 = *(undefined4 *)(&gbaQueue->field_0x516 + iVar7);
+  local_2e = *(undefined4 *)(&gbaQueue->field_0x51a + iVar7);
+  local_2a = *(undefined4 *)(&gbaQueue->field_0x51e + iVar7);
+  local_26 = *(undefined4 *)(&gbaQueue->field_0x522 + iVar7);
+  local_22 = (&gbaQueue->bonus)[iVar7];
+  local_21 = (&gbaQueue->field_0x527)[iVar7];
+  local_20 = (&gbaQueue->field_0x528)[iVar7];
+  local_1f = (&gbaQueue->field_0x529)[iVar7];
+  local_1e = (&gbaQueue->itemUse)[iVar7];
+  __copy(&local_1d,&gbaQueue->field_0x52b + iVar7,4);
+  OSSignalSemaphore(gbaQueue->accessSemaphores + param_2);
+  pcVar4 = &local_f4;
+  puVar6 = local_174;
+  iVar7 = 8;
+  do {
+    *puVar6 = CONCAT11(pcVar4[0x3b],pcVar4[0x3a]);
+    puVar6[1] = CONCAT11(pcVar4[0x3d],pcVar4[0x3c]);
+    puVar6[2] = CONCAT11(pcVar4[0x3f],pcVar4[0x3e]);
+    puVar6[3] = CONCAT11(pcVar4[0x41],pcVar4[0x40]);
+    puVar6[4] = CONCAT11(pcVar4[0x43],pcVar4[0x42]);
+    puVar6[5] = CONCAT11(pcVar4[0x45],pcVar4[0x44]);
+    pcVar3 = pcVar4 + 0x48;
+    puVar6[6] = CONCAT11(pcVar4[0x47],pcVar4[0x46]);
+    pcVar1 = pcVar4 + 0x49;
+    pcVar4 = pcVar4 + 0x10;
+    puVar6[7] = CONCAT11(*pcVar1,*pcVar3);
+    puVar6 = puVar6 + 8;
+    iVar7 = iVar7 + -1;
+  } while (iVar7 != 0);
+  memcpy(param_3,local_174,0x80);
+  local_180 = local_cc << 0x18 | (local_cc >> 8 & 0xff) << 0x10 | (local_cc >> 0x10 & 0xff) << 8 |
+              local_cc >> 0x18;
+  local_17c = local_c8 << 0x18 | (local_c8 >> 8 & 0xff) << 0x10 | (local_c8 >> 0x10 & 0xff) << 8 |
+              local_c8 >> 0x18;
+  local_178 = local_c4 << 0x18 | (local_c4 >> 8 & 0xff) << 0x10 | (local_c4 >> 0x10 & 0xff) << 8 |
+              local_c4 >> 0x18;
+  memcpy((void *)((int)param_3 + 0x80),&local_180,0xc);
+  local_198 = CONCAT11(local_3a._1_1_,local_3a._0_1_);
+  local_196 = CONCAT11((undefined)local_3a,local_3a._2_1_);
+  local_194 = CONCAT11(local_36._1_1_,local_36._0_1_);
+  local_192 = CONCAT11((undefined)local_36,local_36._2_1_);
+  memcpy((void *)((int)param_3 + 0x8c),&local_198,8);
+  *(undefined *)((int)param_3 + 0x94) = local_1d;
+  *(undefined *)((int)param_3 + 0x95) = local_1c;
+  *(undefined *)((int)param_3 + 0x96) = local_1b;
+  *(undefined *)((int)param_3 + 0x97) = local_1a;
+  local_190 = CONCAT11(local_32._1_1_,local_32._0_1_);
+  local_18e = CONCAT11((undefined)local_32,local_32._2_1_);
+  local_18c = CONCAT11(local_2e._1_1_,local_2e._0_1_);
+  local_18a = CONCAT11((undefined)local_2e,local_2e._2_1_);
+  local_188 = CONCAT11(local_2a._1_1_,local_2a._0_1_);
+  local_186 = CONCAT11((undefined)local_2a,local_2a._2_1_);
+  local_184 = CONCAT11(local_26._1_1_,local_26._0_1_);
+  local_182 = CONCAT11((undefined)local_26,local_26._2_1_);
+  memcpy((void *)((int)param_3 + 0x98),&local_190,0x10);
+  *(undefined *)((int)param_3 + 0xa8) = local_21;
+  return 0xa9;
+}
+

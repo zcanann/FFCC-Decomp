@@ -376,7 +376,7 @@ Optional: generate a JSON report:
 build/tools/objdiff-cli report generate -p . -o build/GCCP01/report.json -f json-pretty
 ```
 
-### Step 7 - Decide whether to PR (match + plausibility)
+### Step 7 - Decide whether to create PR (match + plausibility)
 A higher match score is **necessary but not sufficient**.
 
 Make a PR only if **both** are true:
@@ -400,11 +400,19 @@ Prefer changes that are source-plausible:
 - removing obviously redundant variables/branches
 - matching struct/field semantics (names and meaning)
 
-PR checklist:
-- describe what changed (types/control flow/constants/etc.)
-- specify which unit(s)/symbol(s) improved
-- include before/after match evidence (objdiff screenshot or brief notes)
-- explain why the new code is *plausibly original* (not just "score went up")
+### Step 8 - Create Pull Request (if improvement is real + plausible)
+
+**Required steps to create PR:**
+1. **Commit changes**: `git commit -m "Descriptive message"`
+2. **Push branch**: `git push origin pr/<unit>`
+3. **Create PR**: `gh pr create --title "..." --body "..."`
+
+**PR description must include:**
+- **Summary**: What changed (types/control flow/constants/etc.)
+- **Functions improved**: Which unit(s)/symbol(s) and their improvement metrics
+- **Match evidence**: Before/after percentages, assembly analysis results
+- **Plausibility rationale**: Why the new code represents *plausible original source* (not just "score went up")
+- **Technical details**: Key insights from objdiff analysis, implementation approach
 
 ---
 
@@ -429,11 +437,15 @@ A cron-driven agent should:
     - Instruction-level improvements, not just formatting
     - Function match percentage increases
     - Meaningful assembly differences (register allocation, branching, etc.)
-11) If improvement is real, push the branch and **DM the owner (Zac)** with:
-   - PR link
-   - 2–6 bullet summary of what changed
-   - 1–2 bullet summary of why it's plausibly original (not just "score went up")
-   - JSON diff highlights showing specific improvements
+11) **If improvement is real and plausible, create PR**:
+    - Commit: `git commit -m "Descriptive message with metrics"`
+    - Push: `git push origin pr/<unit>`
+    - Create PR: `gh pr create --title "..." --body "..."`
+    - **Required in PR description:**
+      - Summary of technical changes
+      - Before/after match percentages 
+      - Why changes represent plausible original source
+      - objdiff analysis highlights
 
 Branching policy:
 - **Do not stack unrelated work** on one branch.

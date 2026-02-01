@@ -19,7 +19,7 @@ void pppAccele(void* obj, void* param2, void* param3)
 		return;
 	}
 	
-	if (*((int*)((char*)param2 + 0x08)) == *((int*)((char*)obj + 0x08))) {
+	if (*((int*)((char*)param2 + 0x00)) == *((int*)((char*)obj + 0x0c))) {
 		*pfVar2 = *pfVar2 + *((float*)((char*)param2 + 0x0c));
 		pfVar2[1] = pfVar2[1] + *((float*)((char*)param2 + 0x10));
 		pfVar2[2] = pfVar2[2] + *((float*)((char*)param2 + 0x14));

@@ -88,24 +88,21 @@ void CChunkFile::PopChunk()
  */
 bool CChunkFile::GetNextChunk(CChunk& outChunk)
 {
-    int skip;
-
-	if (m_lastChunkSize < 0)
-	{
-		skip = 0;
-	}
-	else {
-		skip = ((m_lastChunkSize + 15) & ~15) + 16;
-	}
+    int skip = 0;
+    
+    if (m_lastChunkSize >= 0)
+    {
+        skip = ((m_lastChunkSize + 15) & ~15) + 16;
+    }
 
     m_scopeOffset += skip;
     m_headerPtr += skip;
     m_cursor = m_headerPtr;
 
-    if (m_scopeSize <= m_scopeOffset)
-	{
+    if (m_scopeOffset >= m_scopeSize)
+    {
         return false;
-	}
+    }
 
     outChunk.m_id = *(unsigned int*)m_cursor;
     m_cursor += 4;
@@ -152,11 +149,9 @@ void CChunkFile::Get(void* dest, long size)
  */
 unsigned char CChunkFile::Get1()
 {
-	unsigned char* value = m_cursor;
-
-	m_cursor += sizeof(unsigned char);
-
-	return *value;
+	unsigned char result = *m_cursor;
+	m_cursor += 1;
+	return result;
 }
 
 /*
@@ -166,11 +161,9 @@ unsigned char CChunkFile::Get1()
  */
 unsigned short CChunkFile::Get2()
 {
-	unsigned short* value = (unsigned short*)m_cursor;
-
-	m_cursor += sizeof(unsigned short);
-
-	return *value;
+	unsigned short result = *(unsigned short*)m_cursor;
+	m_cursor += 2;
+	return result;
 }
 
 /*
@@ -180,11 +173,9 @@ unsigned short CChunkFile::Get2()
  */
 unsigned int CChunkFile::Get4()
 {
-	unsigned int* value = (unsigned int*)m_cursor;
-
-	m_cursor += sizeof(unsigned int);
-
-	return *value;
+	unsigned int result = *(unsigned int*)m_cursor;
+	m_cursor += 4;
+	return result;
 }
 
 /*
@@ -207,13 +198,13 @@ float CChunkFile::GetF4()
 char* CChunkFile::GetString()
 { 
     char* stringPtr = (char*)m_cursor;
-    unsigned char currentChar;
-
-    do
+    
+    while (*m_cursor != 0)
     {
-        currentChar = *m_cursor++;
-    } while (currentChar != 0);
-
+        m_cursor++;
+    }
+    m_cursor++; // Skip null terminator
+    
     return stringPtr;
 }
 

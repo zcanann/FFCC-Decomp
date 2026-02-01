@@ -195,10 +195,42 @@ def extract_all_for_object(map_file, object_file):
             for line_num, line in enumerate(f, 1):
                 line_stripped = line.strip()
                 
-                # Look for lines that reference our object file (exact match at end)
-                if line_stripped.endswith(f"\t{object_file}") or line_stripped.endswith(f" {object_file}"):
+                # Look for lines that reference our object file (both PAL and EN formats)
+                if (line_stripped.endswith(f"\t{object_file}") or 
+                    line_stripped.endswith(f" {object_file}") or
+                    f"found in {object_file}" in line_stripped):
                     parts = line_stripped.split()
-                    if len(parts) >= 7:
+                    
+                    # Handle EN debug format: "symbol (type) found in object_file"
+                    if "found in" in line_stripped:
+                        # EN format parsing
+                        if ') found in' in line_stripped:
+                            symbol_part = line_stripped.split(') found in')[0]
+                            if '(' in symbol_part:
+                                symbol_name = symbol_part.split('(')[0].strip()
+                                type_info = symbol_part.split('(')[1].strip() if '(' in symbol_part else 'unknown'
+                            else:
+                                symbol_name = symbol_part.strip()
+                                type_info = 'unknown'
+                        else:
+                            symbol_name = parts[0] if parts else 'unnamed'
+                            type_info = 'unknown'
+                            
+                        entry = {
+                            'line': line_num,
+                            'content': line_stripped,
+                            'parsed': {
+                                'flag': 'EN',
+                                'offset': 'unknown',
+                                'size': 'unknown', 
+                                'virtual_addr': 'unknown',
+                                'type_flag': type_info,
+                                'symbol': symbol_name,
+                                'object_file': object_file
+                            }
+                        }
+                    # Handle PAL format: "flag offset size virtual_addr type_flag symbol object_file"
+                    elif len(parts) >= 7:
                         flag = parts[0]
                         offset = parts[1] 
                         size = parts[2]
@@ -219,17 +251,30 @@ def extract_all_for_object(map_file, object_file):
                                 'object_file': object_file
                             }
                         }
+                    else:
+                        # Fallback for unrecognized format
+                        entry = {
+                            'line': line_num,
+                            'content': line_stripped,
+                            'parsed': None
+                        }
                         
-                        # Categorize by type
-                        # Individual functions typically have flag 'G' and type '4' 
-                        # Section headers have flag 'X' 
-                        # Data symbols are in actual section names like .data, .bss
-                        if flag == 'G' and type_flag == '4':
+                    # Categorize by type (handle both PAL and EN formats)
+                    if entry.get('parsed'):
+                        parsed = entry['parsed']
+                        flag = parsed.get('flag', '')
+                        type_flag = parsed.get('type_flag', '')
+                        symbol = parsed.get('symbol', '')
+                        
+                        # Functions: PAL format (G+4) or EN format (func in type)
+                        if (flag == 'G' and type_flag == '4') or 'func' in type_flag:
                             functions.append(entry)
-                        elif type_flag in ['.data', '.bss', '.sdata', '.sbss']:
+                        # Global data: section names or object type
+                        elif type_flag in ['.data', '.bss', '.sdata', '.sbss'] or 'object' in type_flag:
                             globals_data.append(entry)
+                        # Section headers
                         elif symbol in ['.data', '.bss', '.sdata', '.sbss', '.text']:
-                            sections.append(entry)  # Section headers
+                            sections.append(entry)
                         else:
                             sections.append(entry)  # Other symbols
                 

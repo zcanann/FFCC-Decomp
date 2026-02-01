@@ -33,14 +33,14 @@ class CChunkFile
 
 private:
 	struct ChunkScope {
-		unsigned int m_scopeSize;
+		int m_scopeSize;
 		int m_lastChunkSize;
 		int m_scopeOffset;
 		unsigned char* m_base;
 		unsigned char* m_headerPtr;
 	};
 
-    unsigned int m_scopeSize;    // 0x00
+    int m_scopeSize;             // 0x00
     int m_lastChunkSize;         // 0x04
     int m_scopeOffset;           // 0x08
     unsigned char *m_base;       // 0x0C

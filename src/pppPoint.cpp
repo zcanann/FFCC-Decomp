@@ -1,5 +1,4 @@
 #include "ffcc/pppPoint.h"
-#include <stddef.h>
 
 // Global state - assembly shows access to static data 
 static int pppPointEnabled = 0;

@@ -45,7 +45,7 @@ When updating functions, include version-specific address and size information:
  */
 ```
 
-**Note**: Addresses and sizes are exported in the Ghidra decomp as part of the header.
+**Note**: PAL Addresses and sizes are exported in the Ghidra decomp as part of the header. Leave the other versions as TODO for now.
 
 ## State Tracking & Memory
 

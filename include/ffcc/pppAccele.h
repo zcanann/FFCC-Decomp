@@ -2,6 +2,6 @@
 #define _FFCC_PPPACCELE_H_
 
 void pppAccele(void);
-void pppAcceleCon(void);
+void pppAcceleCon(void* obj, void* param);
 
 #endif

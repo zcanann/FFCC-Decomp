@@ -22,20 +22,18 @@ void pppAngAccele(void* particleSystem, void* particleData)
     int particleId = *(int*)particleIdPtr;
     void* angularAccelerationPtr = systemDataPtr[1];
     
-    if (particleId != (int)angularVelocityPtr) {
-        goto apply_velocity;
+    char* angularVelocityBase = (char*)particleSystem + (int)angularVelocityPtr + 0x80;
+    char* angularAccelBase = (char*)particleSystem + (int)angularAccelerationPtr + 0x80;
+    
+    if (particleId == (int)angularVelocityPtr) {
+        *(int*)(angularAccelBase + 0x0) += *(int*)((char*)particleData + 0x8);
+        *(int*)(angularAccelBase + 0x4) += *(int*)((char*)particleData + 0xc);
+        *(int*)(angularAccelBase + 0x8) += *(int*)((char*)particleData + 0x10);
     }
     
-    // Angular acceleration update
-    *(int*)((char*)angularAccelerationPtr + 0x80) += *(int*)((char*)particleData + 0x8);
-    *(int*)((char*)angularAccelerationPtr + 0x84) += *(int*)((char*)particleData + 0xc);
-    *(int*)((char*)angularAccelerationPtr + 0x88) += *(int*)((char*)particleData + 0x10);
-    
-apply_velocity:
-    // Angular velocity update
-    *(int*)((char*)angularVelocityPtr + 0x80) += *(int*)((char*)angularAccelerationPtr + 0x80);
-    *(int*)((char*)angularVelocityPtr + 0x84) += *(int*)((char*)angularAccelerationPtr + 0x84);
-    *(int*)((char*)angularVelocityPtr + 0x88) += *(int*)((char*)angularAccelerationPtr + 0x88);
+    *(int*)(angularVelocityBase + 0x0) += *(int*)(angularAccelBase + 0x0);
+    *(int*)(angularVelocityBase + 0x4) += *(int*)(angularAccelBase + 0x4);
+    *(int*)(angularVelocityBase + 0x8) += *(int*)(angularAccelBase + 0x8);
 }
 
 /*
@@ -50,8 +48,8 @@ void pppAngAcceleCon(void* particleSystem)
     void** systemDataPtr = (void**)systemData;
     void* angularAccelerationPtr = systemDataPtr[1];
     
-    char* ptr = (char*)angularAccelerationPtr + (int)particleSystem;
-    *(int*)(ptr + 0x88) = 0;
-    *(int*)(ptr + 0x84) = 0;  
-    *(int*)(ptr + 0x80) = 0;
+    char* ptr = (char*)particleSystem + (int)angularAccelerationPtr + 0x80;
+    *(int*)(ptr + 0x8) = 0;
+    *(int*)(ptr + 0x4) = 0;  
+    *(int*)(ptr + 0x0) = 0;
 }

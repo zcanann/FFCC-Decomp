@@ -95,7 +95,7 @@ bool CChunkFile::GetNextChunk(CChunk& outChunk)
 		skip = 0;
 	}
 	else {
-		skip = ((m_lastChunkSize + 15) / 16) * 16 + 16;
+		skip = ((m_lastChunkSize + 15) & ~15) + 16;
 	}
 
     m_scopeOffset += skip;
@@ -194,11 +194,9 @@ unsigned int CChunkFile::Get4()
  */
 float CChunkFile::GetF4()
 {
-    float value;
-    unsigned int* cursorPtr = (unsigned int*)m_cursor;
-    *(unsigned int*)&value = *cursorPtr;
+    float* value = (float*)m_cursor;
     m_cursor += 4;
-    return value;
+    return *value;
 }
 
 /*
@@ -227,7 +225,6 @@ char* CChunkFile::GetString()
 void CChunkFile::Align(unsigned long alignment)
 { 
     unsigned long offset = (unsigned long)(m_cursor - m_base);
-    offset += alignment - 1;
-    offset -= offset % alignment;
+    offset = (offset + alignment - 1) & ~(alignment - 1);
     m_cursor = m_base + offset;
 }

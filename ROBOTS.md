@@ -1,17 +1,92 @@
-# ROBOTS.md — Agent Runbook (FFCC-Decomp)
+# ROBOTS.md - Agent Runbook (FFCC-Decomp)
 
 This file is the canonical, step-by-step runbook for automated contributions to **FFCC-Decomp**.
 
 Goal: improve match scores by editing C/C++ source, rebuilding, diffing, and submitting clean PRs when progress is real.
 
+## Ghidra Decompilation Reference
+
+### Decomp Resources
+- **Current decomp location**: `resources/ghidra-decomp-1-31-2026/`
+- **File naming format**: `{PAL_VERSION_ADDRESS}_{METROWERKS_MANGLED_FUNCTION_NAME}`
+- **Purpose**: Aid in debugging and reverse engineering
+
+### Symbol Files
+
+#### PAL Release (Metrowerks Release Build)
+- **Location**: `orig/GCCP01/game.MAP`
+- **Note**: Contains Metrowerks Release build output from a prior build
+- **Important**: Addresses do not match current decomp, but function symbols have ~99% accuracy
+
+#### EN Release (Debug Build)
+- **Location**: `orig/GCCE01/game.MAP`
+- **Note**: Contains old Debug build symbols
+- **Cross-reference**: Can be used for any version (e.g., EN symbols to aid PAL decompilation)
+
+### Symbol File Usage
+Symbol files are helpful for determining:
+- Class hierarchies
+- Function arguments and parameters
+- Global variables (especially .bss section data)
+- Function relationships and dependencies
+
+### Function Documentation Format
+When updating functions, include version-specific address and size information:
+
+```c
+/*
+ * --INFO--
+ * PAL Address: 0x80001234
+ * PAL Size: 128b
+ * EN Address: 0x80001234
+ * EN Size: 128b
+ * JP Address: 0x80001234
+ * JP Size: 128b
+ */
+```
+
+**Note**: Addresses and sizes are exported in the Ghidra decomp as part of the header.
+
+## State Tracking & Memory
+
+### Automation Notes
+- **Main log**: `~/.openclaw/workspace/memory/ffcc-decomp-notes.md`
+- **Session state**: `~/.openclaw/workspace/memory/decomp-state.json`
+
+**Notes format** (append to markdown):
+```markdown
+## 2026-01-31 - main/chunkfile
+- **Target functions**: `Align__10CChunkFileFUl`, `Read__10CChunkFileFv`
+- **Attempts**: Tried changing padding in CChunkFile struct - no improvement
+- **Result**: No progress, need different approach
+- **Next**: Try inlining barriers or signedness changes
+```
+
+**State format** (JSON):
+```json
+{
+  "currentTarget": "main/chunkfile",
+  "lastAttempt": "2026-01-31T19:06:00Z",
+  "recentFailures": ["main/chunkfile", "audio/stream"],
+  "blacklisted": [],
+  "nextCheck": "2026-02-01T10:00:00Z"
+}
+```
+
+### Cycle Avoidance Strategy
+1. **Track attempts** per unit with timestamps
+2. **Avoid units** with frequent recent abandonments
+3. **Rotate targets** using semi-random selection from viable candidates
+4. **Periodically reassess** avoided units to give them another chance
+
 ## Scope (current)
-- **Target version:** **PAL** (`GCCP01`) — required for now.
+- **Target version:** **PAL** (`GCCP01`) - required for now.
   - Do not attempt other versions until PAL is substantially complete.
 
 ## Preconditions (one-time setup)
 
 ### 0) Repo + assets
-- Repo directory (on Zac’s Mac):
+- Repo directory (on Zac's Mac):
   - `~/Documents/projects/FFCC-Decomp`
 - Required assets are **not** in git. You must have the original files locally:
   - `orig/GCCP01/...` must exist (at minimum `orig/GCCP01/sys/main.dol`).
@@ -50,24 +125,42 @@ build/tools/objdiff-cli --version
 
 ## The contribution loop (repeatable)
 
-### Step 1 — Pick a target unit
-Pick work from the progress tracker:
-- https://decomp.dev/zcanann/FFCC-Decomp
+### Step 1 - Pick a target unit
+Parse `build/GCCP01/report.json` to identify targets programmatically.
 
-Prefer:
-- units that are partially matched (30–99%)
-- high-leverage units (core gameplay/system code)
-- smaller, self-contained units first
+**Target selection strategy** (hybrid approach):
+1. **Parse report.json** for units with 30-99% match (sweet spot)
+2. **Check memory notes** (`~/.openclaw/workspace/memory/ffcc-decomp-notes.md`) for recent attempts
+3. **Apply avoidance logic**:
+   - Avoid units with frequent recent abandonments
+   - Temporarily skip units with repeated failures
+4. **Semi-random selection** from remaining candidates to prevent cycles
 
-Avoid:
-- auto-generated units (`auto_*` in `objdiff.json`) unless you know why
-- “mass refactors” that change formatting without matching improvement
+**Prefer:**
+- Units with partial matches (30-99%)
+- Units not recently attempted
+- Smaller, self-contained units
+- High-leverage units (core gameplay/system code)
 
-Write down:
-- the **unit name** (e.g. `main/chunkfile`)
-- 1–3 candidate **symbols/functions** in that unit to focus on
+**Avoid:**
+- Auto-generated units (`auto_*` in objdiff.json)
+- Units recently failed multiple times
+- Mass refactors without real matching improvement
 
-### Step 2 — Open the relevant source
+**Record in notes:**
+- **Unit name** (e.g. `main/chunkfile`)
+- **Target functions** (1-3 candidates)
+- **Attempt timestamp**
+- **Previous approaches tried**
+
+### Step 2 - Create branch for the target
+Once target is identified, create a branch:
+```sh
+git checkout -b pr/<unit>
+```
+Example: `pr/main/chunkfile`
+
+### Step 3 - Open the relevant source
 Edit the corresponding `.c/.cpp/.h` under:
 - `src/`
 - `include/`
@@ -80,7 +173,7 @@ Make small, explainable changes:
 - constant forms
 - call ordering
 
-### Step 3 — Rebuild
+### Step 4 - Rebuild
 From repo root:
 ```sh
 ninja
@@ -88,10 +181,10 @@ ninja
 
 If build fails, fix and rebuild. Do not proceed to diffing with a broken build.
 
-### Step 4 — Diff with objdiff (function-level, ASM-first)
+### Step 5 - Diff with objdiff (function-level, ASM-first)
 Objdiff diffs **expected object** (`build/GCCP01/src/...`) vs **current object** (`build/GCCP01/obj/...`).
 
-**Important:** Don’t treat “percent match” as magic. You should be looking at the **raw assembly**.
+**Important:** Don't treat "percent match" as magic. You should be looking at the **raw assembly**.
 Match work is ultimately about making *the compiler emit the same instructions* from plausible source.
 
 #### 4a) Find a symbol name in the expected object
@@ -115,7 +208,7 @@ Interpretation:
 - Iterate: adjust source, rebuild, re-run diff.
 
 #### 4c) If objdiff UI is unavailable (fallback): dump ASM and diff it yourself
-If you’re running headless automation (cron) or can’t use the interactive UI, you can still inspect ASM by dumping disassembly for both objects and diffing.
+If you're running headless automation (cron) or can't use the interactive UI, you can still inspect ASM by dumping disassembly for both objects and diffing.
 
 Tooling options:
 - If the project provides a PowerPC objdump via its toolchain, use it.
@@ -128,7 +221,7 @@ Suggested approach:
 
 (Exact commands depend on the available binutils/objdump in this environment.)
 
-### Step 5 — Check progress summary
+### Step 6 - Check progress summary
 At the end of `ninja`, a progress report is printed.
 Example tail:
 - `All: 8.88% matched, 0.00% linked (0 / 480 files)`
@@ -138,7 +231,7 @@ Optional: generate a JSON report:
 build/tools/objdiff-cli report generate -p . -o build/GCCP01/report.json -f json-pretty
 ```
 
-### Step 6 — Decide whether to PR (match + plausibility)
+### Step 7 - Decide whether to PR (match + plausibility)
 A higher match score is **necessary but not sufficient**.
 
 Make a PR only if **both** are true:
@@ -150,11 +243,11 @@ Make a PR only if **both** are true:
 **B) The resulting C/C++ is plausible original source**
 The goal is to match what the **original FFCC authors likely wrote**, not merely to coax the compiler.
 
-Reject/avoid changes that look like “compiler coaxing,” e.g.:
-- contrived temporaries and reordering that a human wouldn’t naturally write
-- intentionally odd sequencing unless there’s strong evidence
+Reject/avoid changes that look like "compiler coaxing," e.g.:
+- contrived temporaries and reordering that a human wouldn't naturally write
+- intentionally odd sequencing unless there's strong evidence
 - changes that preserve output but reduce readability without a clear original-source rationale
-- **explanatory comments that add no real information** (e.g., “Plausible original behavior: …”)
+- **explanatory comments that add no real information** (e.g., "Plausible original behavior: …")
 
 Prefer changes that are source-plausible:
 - fixing signedness / types to match ABI expectations
@@ -166,7 +259,7 @@ PR checklist:
 - describe what changed (types/control flow/constants/etc.)
 - specify which unit(s)/symbol(s) improved
 - include before/after match evidence (objdiff screenshot or brief notes)
-- explain why the new code is *plausibly original* (not just “score went up”)
+- explain why the new code is *plausibly original* (not just "score went up")
 
 ---
 
@@ -174,18 +267,18 @@ PR checklist:
 
 A cron-driven agent should:
 1) Ensure PAL config (`python3 configure.py --version GCCP01`) is in effect.
-2) Select **one** unit to work on (time-boxed).
-3) **Create a branch immediately** for that unit so work never lands on `main` accidentally.
-   - Branch naming: `pr/<unit>` (unit path is sufficient; avoid extra task text).
-   - Example: `pr/main/chunkfile`
-   - Note: git branch names can contain slashes; that’s fine.
-4) Attempt a small number of edits.
-5) Rebuild with `ninja`.
-6) Run objdiff on 1–3 symbols to validate direction.
-7) If improvement is real, push the branch and **DM the owner (Zac)** with:
+2) **Build and parse** `build/GCCP01/report.json` for target candidates.
+3) **Check state files** to avoid recently failed units and cycles.
+4) **Select one unit** using hybrid semi-random + memory-based strategy.
+5) **Create branch** for that specific unit (`pr/<unit>`).
+6) **Update state files** with current attempt.
+7) Attempt a small number of edits.
+8) Rebuild with `ninja`.
+9) Run objdiff on 1–3 symbols to validate direction.
+10) If improvement is real, push the branch and **DM the owner (Zac)** with:
    - PR link
    - 2–6 bullet summary of what changed
-   - 1–2 bullet summary of why it’s plausibly original (not just “score went up”)
+   - 1–2 bullet summary of why it's plausibly original (not just "score went up")
 
 Branching policy:
 - **Do not stack unrelated work** on one branch.
@@ -193,7 +286,7 @@ Branching policy:
 - If you need to switch units, commit or discard changes, then switch branches.
 
 Time-boxing recommendation:
-- 30–60 minutes per tick max.
+- 30-60 minutes per tick max.
 
 ---
 
@@ -202,7 +295,7 @@ Time-boxing recommendation:
 ### Missing `main.dol`
 If you see:
 - `orig/GCCP01/sys/main.dol not found`
-You haven’t synced the original files into `orig/GCCP01/`.
+You haven't synced the original files into `orig/GCCP01/`.
 
 ### Endpoint gotcha (Moltbook-style)
 Not applicable here.

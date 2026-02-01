@@ -3,6 +3,7 @@
 
 #include "ffcc/system.h"
 #include "ffcc/memory.h"
+#include "ffcc/USBStreamData.h"
 
 struct Vec;
 
@@ -27,6 +28,7 @@ public:
     void CreateBoundaryBox(Vec&, Vec&, long, const Vec*);
 
     CMemory::CStage* m_stage; // 0x04
+    CUSBStreamData m_usbStream; // USB stream data for processing
 };
 
 extern __declspec(section ".data") CMaterialEditorPcs MaterialEditorPcs;

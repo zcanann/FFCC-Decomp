@@ -1,8 +1,7 @@
 #ifndef _FFCC_PPPCOLMOVE_H_
 #define _FFCC_PPPCOLMOVE_H_
 
-// Based on assembly analysis, these functions take parameters for color manipulation
-void pppColMove(void* dst, void* src, void* params);
-void pppColMoveCon(void* dst, void* params);
+void pppColMove(void* param1, void* param2, void* param3);
+void pppColMoveCon(void* param1, void* param2);
 
 #endif // _FFCC_PPPCOLMOVE_H_

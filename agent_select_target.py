@@ -91,6 +91,9 @@ def extract_targets(report_path, max_targets=10):
         
         candidates.append(entry)
     
+    # Shuffle to avoid deterministic selection order across runs
+    random.shuffle(candidates)
+    
     # Sort by gap (improvement potential) and limit results
     candidates.sort(key=lambda x: x["gap"], reverse=True)
     return candidates[:max_targets]

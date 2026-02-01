@@ -111,14 +111,19 @@ ninja
 Success criteria: build completes and verifies:
 - `build/GCCP01/main.dol: OK`
 
-### 4) Objdiff CLI (optional, but recommended)
-The CLI tool can be downloaded into the repo (example tag):
+### 4) Objdiff CLI (required for automation)
+The CLI tool can be downloaded into the repo. **Use v3.6.1+ for JSON oneshot mode**:
 ```sh
-python3 tools/download_tool.py objdiff-cli build/tools/objdiff-cli --tag v3.0.0
+python3 tools/download_tool.py objdiff-cli build/tools/objdiff-cli --tag v3.6.1
+```
+Or download manually:
+```sh
+curl -L https://github.com/encounter/objdiff/releases/download/v3.6.1/objdiff-cli-macos-arm64 -o build/tools/objdiff-cli
+chmod +x build/tools/objdiff-cli
 ```
 Verify:
 ```sh
-build/tools/objdiff-cli --version
+build/tools/objdiff-cli --version  # Should show v3.6.1+
 ```
 
 ---
@@ -181,45 +186,52 @@ ninja
 
 If build fails, fix and rebuild. Do not proceed to diffing with a broken build.
 
-### Step 5 - Diff with objdiff (function-level, ASM-first)
+### Step 5 - Diff with objdiff (JSON oneshot mode)
 Objdiff diffs **expected object** (`build/GCCP01/src/...`) vs **current object** (`build/GCCP01/obj/...`).
 
 **Important:** Don't treat "percent match" as magic. You should be looking at the **raw assembly**.
 Match work is ultimately about making *the compiler emit the same instructions* from plausible source.
 
-#### 4a) Find a symbol name in the expected object
+#### 5a) Find a symbol name in the expected object
 Example (for `main/chunkfile`):
 ```sh
 nm -g build/GCCP01/src/chunkfile.o | head
 ```
 Pick a function symbol, e.g. `Align__10CChunkFileFUl`.
 
-#### 4b) Run objdiff for that symbol (interactive ASM view)
-**Note:** `objdiff-cli diff` is interactive and requires a real TTY.
+#### 5b) Run objdiff in JSON oneshot mode (automation-friendly)
+**Recommended for automation:** JSON oneshot mode provides structured data without requiring a TTY.
 
-Run:
+```sh
+build/tools/objdiff-cli diff -p . -u main/chunkfile -o - Align__10CChunkFileFUl > diff_result.json
+```
+
+The JSON output includes:
+- **Per-instruction assembly comparison** (left vs right)
+- **Symbol mappings** and relocation data
+- **Match percentages** and diff analysis
+- **Formatted assembly** with highlighting
+
+#### 5c) Parse JSON results programmatically
+Parse the JSON to assess:
+- **Real improvements**: instruction sequence changes, not just formatting
+- **Match quality**: function-level progress vs global noise
+- **Specific mismatches**: register allocation, load/store ordering, branching, constants
+
+Example analysis:
+```bash
+# Check if there are actual instruction differences
+jq '.left.symbols[].instructions | length' diff_result.json
+# Get match percentage for the target function
+jq '.left.symbols[] | select(.name == "target_symbol") | .match_percent' diff_result.json
+```
+
+#### 5d) Interactive mode (optional)
+For manual analysis, the interactive UI is still available:
 ```sh
 build/tools/objdiff-cli diff -p . -u main/chunkfile Align__10CChunkFileFUl
 ```
 Quit with `q`.
-
-Interpretation:
-- Use the ASM view to identify *why* it mismatches (register allocation differences, load/store ordering, constant materialization, branching shape, etc.).
-- Iterate: adjust source, rebuild, re-run diff.
-
-#### 4c) If objdiff UI is unavailable (fallback): dump ASM and diff it yourself
-If you're running headless automation (cron) or can't use the interactive UI, you can still inspect ASM by dumping disassembly for both objects and diffing.
-
-Tooling options:
-- If the project provides a PowerPC objdump via its toolchain, use it.
-- As a last resort, use whatever objdump is available, but ensure it supports PPC.
-
-Suggested approach:
-1) Identify the base + target object paths from `objdiff.json` for the unit.
-2) Dump function disassembly for both.
-3) Compare with `diff`.
-
-(Exact commands depend on the available binutils/objdump in this environment.)
 
 ### Step 6 - Check progress summary
 At the end of `ninja`, a progress report is printed.
@@ -274,11 +286,19 @@ A cron-driven agent should:
 6) **Update state files** with current attempt.
 7) Attempt a small number of edits.
 8) Rebuild with `ninja`.
-9) Run objdiff on 1–3 symbols to validate direction.
-10) If improvement is real, push the branch and **DM the owner (Zac)** with:
+9) **Run objdiff JSON analysis** on 1–3 target symbols:
+   ```sh
+   build/tools/objdiff-cli diff -p . -u <unit> -o - <symbol> > diff_analysis.json
+   ```
+10) **Parse JSON results** to determine if changes represent real progress:
+    - Instruction-level improvements, not just formatting
+    - Function match percentage increases
+    - Meaningful assembly differences (register allocation, branching, etc.)
+11) If improvement is real, push the branch and **DM the owner (Zac)** with:
    - PR link
    - 2–6 bullet summary of what changed
    - 1–2 bullet summary of why it's plausibly original (not just "score went up")
+   - JSON diff highlights showing specific improvements
 
 Branching policy:
 - **Do not stack unrelated work** on one branch.

@@ -15,7 +15,7 @@ public:
 	class CAPos
 	{
 	public:
-		float CalcLength(CAPos&);
+		float CalcLength(const CAPos&);
 		unsigned char GetOthers(int group);
 		int IsExist(int group);
 

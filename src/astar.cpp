@@ -879,7 +879,7 @@ CAStar::CATemp::CATemp()
  * Address:	TODO
  * Size:	TODO
  */
-float CAStar::CAPos::CalcLength(CAStar::CAPos& other)
+float CAStar::CAPos::CalcLength(const CAStar::CAPos& other)
 {
 	return PSVECDistance(&this->m_position, &other.m_position);
 }

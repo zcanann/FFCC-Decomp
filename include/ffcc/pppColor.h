@@ -3,10 +3,27 @@
 
 struct _pppColor
 {
-    unsigned char m_colorRGBA[4]; // 0x0
+    union {
+        unsigned char m_colorRGBA[4]; // 0x0
+        struct {
+            unsigned char r;
+            unsigned char g;
+            unsigned char b;
+            unsigned char a;
+        };
+    };
 }; // Size 0x4
 
-void pppColor(void);
-void pppColorCon(void);
+struct _pppColorWork
+{
+    short r;  // 0x0
+    short g;  // 0x2
+    short b;  // 0x4
+    short a;  // 0x6
+    _pppColor result; // 0x8
+}; // Size 0xC
+
+void pppColor(void* param1, void* param2, void* param3);
+void pppColorCon(void* param1, void* param2);
 
 #endif // _FFCC_PPPCOLOR_H_

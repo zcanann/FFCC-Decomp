@@ -7,47 +7,30 @@
  */
 void pppAngAccele(void* particleSystem, void* particleData)
 {
-    // Get pointer to particle system data structure
-    void** systemPtr = (void**)particleSystem;
-    void* systemData = systemPtr[3];  // Load from offset 0xc
-    
-    // Get particle instances for angular velocity and acceleration  
-    void** systemDataPtr = (void**)systemData;
-    void* angularVelocityPtr = systemDataPtr[0];      // Load from offset 0x0
-    void* angularAccelerationPtr = systemDataPtr[1];  // Load from offset 0x4
-    
-    // Check global enable flag
     extern int lbl_8032ED70;
+    
     if (lbl_8032ED70 != 0) {
         return;
     }
     
-    // Get particle data values
-    void** particlePtr = (void**)particleData;
-    int particleId = *(int*)particlePtr[0];           // Load from offset 0x0
+    void** systemData = (void**)((void**)particleSystem)[3];
+    void* particleIdPtr = ((void**)particleData)[0];
+    void* angularVelocityPtr = systemData[0];
+    int particleId = *(int*)particleIdPtr;
+    void* angularAccelerationPtr = systemData[1];
     
-    // Check if this particle matches the current system
-    int systemId = *(int*)((char*)particleSystem + 0xc);
-    if (particleId != systemId) {
-        goto apply_to_velocity;
+    char* angularVelocityBase = (char*)particleSystem + (int)angularVelocityPtr + 0x80;
+    char* angularAccelBase = (char*)particleSystem + (int)angularAccelerationPtr + 0x80;
+    
+    if (particleId == (int)angularVelocityPtr) {
+        *(int*)(angularAccelBase + 0x0) += *(int*)((char*)particleData + 0x8);
+        *(int*)(angularAccelBase + 0x4) += *(int*)((char*)particleData + 0xc);
+        *(int*)(angularAccelBase + 0x8) += *(int*)((char*)particleData + 0x10);
     }
     
-    // Apply angular acceleration to angular velocity for this particle
-    int* velocity = (int*)((char*)angularAccelerationPtr + 0x80);
-    int* acceleration = (int*)((char*)particleData + 0x8);
-    
-    velocity[0] += acceleration[0];  // X component
-    velocity[1] += acceleration[1];  // Y component 
-    velocity[2] += acceleration[2];  // Z component
-    
-apply_to_velocity:
-    // Apply angular velocity to angular position
-    int* position = (int*)((char*)angularVelocityPtr + 0x80);
-    int* velocity2 = (int*)((char*)angularAccelerationPtr + 0x80);
-    
-    position[0] += velocity2[0];  // X component
-    position[1] += velocity2[1];  // Y component
-    position[2] += velocity2[2];  // Z component
+    *(int*)(angularVelocityBase + 0x0) += *(int*)(angularAccelBase + 0x0);
+    *(int*)(angularVelocityBase + 0x4) += *(int*)(angularAccelBase + 0x4);
+    *(int*)(angularVelocityBase + 0x8) += *(int*)(angularAccelBase + 0x8);
 }
 
 /*
@@ -57,20 +40,11 @@ apply_to_velocity:
  */
 void pppAngAcceleCon(void* particleSystem)
 {
-    // Get pointer to particle system data structure
-    void** systemPtr = (void**)particleSystem;
-    void* systemData = systemPtr[3];  // Load from offset 0xc
+    void** systemData = (void**)((void**)particleSystem)[3];
+    void* angularAccelerationPtr = systemData[1];
     
-    // Get particle instances for angular acceleration 
-    void** systemDataPtr = (void**)systemData;
-    void* angularAccelerationPtr = systemDataPtr[1];  // Load from offset 0x4
-    
-    // Calculate final pointer: particleSystem + (angularAccelerationPtr + 0x80)
-    int offset = (int)angularAccelerationPtr + 0x80;
-    int* targetPtr = (int*)((char*)particleSystem + offset);
-    
-    // Store zeros at specific offsets relative to final pointer
-    targetPtr[2] = 0;  // Store at offset 0x8
-    targetPtr[1] = 0;  // Store at offset 0x4  
-    targetPtr[0] = 0;  // Store at offset 0x0
+    char* ptr = (char*)particleSystem + (int)angularAccelerationPtr + 0x80;
+    *(int*)(ptr + 0x8) = 0;
+    *(int*)(ptr + 0x4) = 0;  
+    *(int*)(ptr + 0x0) = 0;
 }

@@ -8,10 +8,10 @@
 void pppColMoveCon(void* param1, void* param2)
 {
     int** ptr_array = (int**)param2;
-    int* target_ptr = ptr_array[3];  // Load from offset 0xC
-    target_ptr = (int*)target_ptr[1]; // Load from offset 0x4 
-    target_ptr = (int*)((char*)target_ptr + 0x80);
-    short* target = (short*)((char*)param1 + (int)target_ptr);
+    int* temp_ptr = ptr_array[3];  // Load from offset 0xC
+    temp_ptr = (int*)temp_ptr[1]; // Load from offset 0x4 
+    temp_ptr = (int*)((char*)temp_ptr + 0x80);
+    short* target = (short*)((char*)param1 + (int)temp_ptr);
     
     target[3] = 0;  // offset 0x6
     target[2] = 0;  // offset 0x4
@@ -31,16 +31,19 @@ void pppColMove(void* param1, void* param2, void* param3)
     // Load pointers first (like target assembly)
     int** ptr_array = (int**)param3;
     int* ptr0 = ptr_array[3];  // Load from offset 0xC
-    int* ptr_src = (int*)ptr0[0]; // Load from offset 0x0
-    int* ptr_dest = (int*)ptr0[1]; // Load from offset 0x4
-    ptr_src = (int*)((char*)ptr_src + 0x80);
-    ptr_dest = (int*)((char*)ptr_dest + 0x80);
-    short* src = (short*)((char*)param1 + (int)ptr_src);
-    short* dest = (short*)((char*)param1 + (int)ptr_dest);
     
     if (lbl_8032ED70 != 0) {
         return;
     }
+    
+    int* ptr_src = (int*)ptr0[0]; // Load from offset 0x0
+    int* ptr_dest = (int*)ptr0[1]; // Load from offset 0x4
+    
+    // Calculate offsets separately to match expected assembly
+    ptr_src = (int*)((char*)ptr_src + 0x80);
+    ptr_dest = (int*)((char*)ptr_dest + 0x80);
+    short* src = (short*)((char*)param1 + (int)ptr_src);
+    short* dest = (short*)((char*)param1 + (int)ptr_dest);
     
     int* param2_int = (int*)param2;
     int* param1_int = (int*)param1;

@@ -5,6 +5,7 @@ This file is the canonical, step-by-step runbook for automated contributions to 
 Goal: improve match scores by editing C/C++ source, rebuilding, diffing, and submitting clean PRs when progress is real.
 
 ## Ghidra Decompilation Reference
+⚠️ Do not fully trust Ghidra for anything other than address and sizes. The existing decomp is based off of a snapshot and guesswork. The function names however are 99% accurate and were reconstructed from Metrowerks build symbol files.
 
 ### Decomp Resources
 - **Current decomp location**: `resources/ghidra-decomp-1-31-2026/`
@@ -12,7 +13,7 @@ Goal: improve match scores by editing C/C++ source, rebuilding, diffing, and sub
 - **Purpose**: Aid in debugging and reverse engineering
 
 ### Symbol Files
-The EN and PAL versions accidentally shipped with build logs, containing symbol names for data sections and function names. High level symbols only, not granular.
+The EN and PAL versions accidentally shipped with build logs, containing symbol names in mangled Metrowerks format for data sections and function names. High level symbols only, not granular.
 
 #### PAL Release (Metrowerks Release Build)
 - **Location**: `orig/GCCP01/game.MAP`
@@ -86,16 +87,9 @@ When updating functions, include version-specific address and size information:
 
 **Note**: PAL Addresses and sizes are exported in the Ghidra decomp as part of the header. Leave the other versions as TODO for now.
 
-**Important for 0% matches**: Ghidra decomp provides full reference implementations that can be adapted to match the original source style. Even 0% match functions are highly viable targets.
-Additionally, if the `config/GCCP01/splits.txt` contains a different function signature than the C++, the match scores may falsely report 0%. Is is highly unlikely that splits.txt is wrong, given that this file was populated from the debug/release game.MAP build trace files with function symbol information.
+**Important for 0% matches**: Ghidra decomp provides full reference implementations that can be adapted to match the original source style. Even 0% match functions are highly viable targets. **IMPORTANT** Note that many ppp* functions do not take any parameters, but instead seem to reference global state. Objdiff should show the function parameters. If objdiff is reporting different function signatures, you may need to update the C++ accordingly.
 
-Unsolved problem 1) Many of the particle ppp functions seem to have parameters in Ghidra, but not in the .MAP file. This makes these falsely report sizes. The game.MAP files do not show a Metrowerks mangled name. These are also not called in a normal manner, these functions have no XREFs in Ghidra. It is unclear if:
-A) These are truly parameterless functions or
-B) These have parameters, but the game.MAP files missed these parameters due to a strange build setup (ie some sort of asm-inline function table or low-level trickery), which means the splits.txt actually does need updating.
-
-Try not to "solve" this problem unless absolutely confident.
-
-Unsolved problem 2) `configure.py` has several build flags which can influence binary output. This is just as important to code matching as the code itself! The exact compiler version and flags for each module is not known yet.
+**Important for near matches** `configure.py` has several build flags which can influence binary output. This is just as important to code matching as the code itself! The exact compiler version and flags for each module is not known yet. For this reason, high matches like 97% are sometimes acceptable and not worth dealing with because it could be build system related.
 
 **Key relationships:** Unit → Object file → Source file. Use symbols for context, Ghidra decomp for 0% functions.
 
@@ -122,8 +116,8 @@ Update these files to track progress and avoid cycling through failed targets.
 ### 0) Repo + assets
 - Repo directory (on Zac's Mac):
   - `~/Documents/projects/FFCC-Decomp`
-- Required assets are **not** in git. You must have the original files locally:
-  - `orig/GCCP01/...` must exist (at minimum `orig/GCCP01/sys/main.dol`).
+- Required assets are **not** in git. Your owner will have already given you the original files locally:
+  - `orig/GCCP01/...` (at minimum `orig/GCCP01/sys/main.dol`).
 
 ### 1) Tooling
 - Install ninja:
@@ -197,6 +191,8 @@ python3 extract_symbols.py pppMove.o
      2. pppMove (156b at 80065b3c)
   📊 Summary: 2 functions, 0 globals
 ```
+
+Note: If the function parameters do not match, the match score cannot be improved beyond 0%!
 
 **Key derivations:** Unit → Object file → Source file. Use Ghidra decomp for 0% functions, objdiff for partial matches.
 

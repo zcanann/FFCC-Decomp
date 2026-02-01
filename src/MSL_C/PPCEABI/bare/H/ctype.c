@@ -76,3 +76,8 @@ int tolower(int __c)
 {
 	return __c == -1 ? -1 : __lower_map[(unsigned char)__c];
 }
+
+int toupper(int __c)
+{
+	return __c == -1 ? -1 : __upper_map[(unsigned char)__c];
+}

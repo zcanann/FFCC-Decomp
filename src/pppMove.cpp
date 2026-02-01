@@ -25,11 +25,11 @@ void pppMoveCon(void* basePtr, PppMoveData* data)
     u32 offset = *((u32*)((u8*)objPtr + 0x4));
     PppMoveObj* moveObj = (PppMoveObj*)((u8*)basePtr + offset + 0x80);
     
-    // Initialize to zero
+    // Initialize to zero (store order: z, y, x to match assembly)
     f32 zero = lbl_8032FED8;
-    moveObj->x = zero;
-    moveObj->y = zero;
     moveObj->z = zero;
+    moveObj->y = zero;
+    moveObj->x = zero;
 }
 
 /*
@@ -43,30 +43,30 @@ void pppMoveCon(void* basePtr, PppMoveData* data)
  */
 void pppMove(void* basePtr, PppMoveInput* input, PppMoveData* data1, PppMoveData* data2)
 {
-    // Load data pointers early to match assembly order
+    // Match target assembly order: load data2 pointer, then global flag
     void* data2ObjPtr = data2->ptrData;
-    u32 data1Offset = *((u32*)data1->ptrData);
-    u32 data2Offset = *((u32*)data2ObjPtr);
     
-    // Check global enable flag first
     if (lbl_8032ED70 != 0) {
         return;
     }
     
-    // Calculate object pointers 
+    // Load data pointers following target pattern
+    void* data1ObjPtr = data1->ptrData;
+    u32 inputId = *(u32*)input;
+    u32 baseId = *((u32*)((u8*)basePtr + 0xc));
+    u32 data1Offset = *((u32*)data1ObjPtr);
+    u32 data2Offset = *((u32*)data2ObjPtr);
+    
+    // Calculate object pointers with +0x80
     data1Offset += 0x80;
     data2Offset += 0x80;
     PppMoveObj* obj1 = (PppMoveObj*)((u8*)basePtr + data1Offset);
     PppMoveObj* obj2 = (PppMoveObj*)((u8*)basePtr + data2Offset);
     
-    // ID comparison and conditional input addition
-    u32 inputId = *(u32*)input;
-    u32 baseId = *((u32*)((u8*)basePtr + 0xc));
-    
+    // Conditional input addition to obj2
     if (inputId == baseId) {
-        // Add input vector to obj2
         obj2->x += input->x;
-        obj2->y += input->y; 
+        obj2->y += input->y;
         obj2->z += input->z;
     }
     

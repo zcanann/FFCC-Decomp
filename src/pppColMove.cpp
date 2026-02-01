@@ -33,10 +33,10 @@ void pppColMove(void* param1, void* param2, void* param3)
     int* ptr0 = ptr_array[3];  // Load from offset 0xC
     int* ptr_src = (int*)ptr0[0]; // Load from offset 0x0
     int* ptr_dest = (int*)ptr0[1]; // Load from offset 0x4
-    ptr_src = (int*)((char*)ptr_src + 0x80);
-    ptr_dest = (int*)((char*)ptr_dest + 0x80);
-    short* src = (short*)((char*)param1 + (int)ptr_src);
-    short* dest = (short*)((char*)param1 + (int)ptr_dest);
+    int src_offset = (int)ptr_src + 0x80;
+    int dest_offset = (int)ptr_dest + 0x80;
+    short* src = (short*)((char*)param1 + src_offset);
+    short* dest = (short*)((char*)param1 + dest_offset);
     
     if (lbl_8032ED70 != 0) {
         return;

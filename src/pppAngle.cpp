@@ -13,12 +13,16 @@ void pppAngle(void* dest, void* src, void* param1, void* param2)
         return;
     }
     
-    if (((int*)src)[0] != ((int*)dest)[3]) {
+    int* srcData = (int*)src;
+    int* destData = (int*)dest;
+    
+    if (srcData[0] != destData[3]) {
         return;
     }
     
-    int* destPtr = (int*)((char*)dest + ((int*)param2)[3] + 0x80);
-    int* srcPtr = (int*)((char*)src + 0x8);
+    int* param2Data = (int*)param2;
+    int* destPtr = (int*)((char*)dest + param2Data[3] + 0x80);
+    int* srcPtr = (int*)((char*)src + 8);
     
     destPtr[0] += srcPtr[0];
     destPtr[1] += srcPtr[1]; 
@@ -32,10 +36,11 @@ void pppAngle(void* dest, void* src, void* param1, void* param2)
  */
 void pppAngleCon(void* dest, void* param)
 {
-    ((int*)param)[3]; // Access param[3] first to match target assembly
-    asm(""); // Prevent optimization
-    int* ptr = (int*)((char*)dest + ((int*)param)[0] + 0x80);
-    ptr[2] = 0;
-    ptr[1] = 0;
+    int* paramData = (int*)param;
+    int offset = paramData[0];
+    
+    int* ptr = (int*)((char*)dest + offset + 0x80);
     ptr[0] = 0;
+    ptr[1] = 0;
+    ptr[2] = 0;
 }

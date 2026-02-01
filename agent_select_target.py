@@ -91,12 +91,29 @@ def extract_targets(report_path, max_targets=10):
         
         candidates.append(entry)
     
-    # Shuffle to avoid deterministic selection order across runs
-    random.shuffle(candidates)
+    if not candidates:
+        return []
     
-    # Sort by gap (improvement potential) and limit results
+    # Sort by gap (improvement potential)
     candidates.sort(key=lambda x: x["gap"], reverse=True)
-    return candidates[:max_targets]
+    
+    # Find the highest gap value
+    max_gap = candidates[0]["gap"]
+    
+    # Get all candidates with the max gap (handles ties properly)
+    max_gap_candidates = [c for c in candidates if c["gap"] == max_gap]
+    
+    # Shuffle among tied candidates to avoid deterministic selection
+    random.shuffle(max_gap_candidates)
+    
+    # Take up to max_targets, but include lower-gap candidates if needed
+    if len(max_gap_candidates) >= max_targets:
+        return max_gap_candidates[:max_targets]
+    else:
+        # Include some lower-gap candidates to reach max_targets
+        remaining_candidates = [c for c in candidates if c["gap"] < max_gap]
+        result = max_gap_candidates + remaining_candidates[:max_targets - len(max_gap_candidates)]
+        return result
 
 def select_target(candidates):
     """Select one target using weighted randomness (favor higher gaps)"""

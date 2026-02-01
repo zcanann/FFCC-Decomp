@@ -246,12 +246,54 @@ Prefer changes that are source-plausible:
 
 ---
 
+## 🚨 Critical Automation Rules
+
+**Follow these rules to avoid contaminated PRs and cleanup work:**
+
+### 🌿 Branch Management - ALWAYS FROM MAIN!
+- **ALWAYS branch from `main`**, never from existing PRs
+- Before creating new branch: `git checkout main && git pull origin main`
+- Branch naming: `pr/unit_name` (e.g., `pr/main_pppMove`)
+- **Why this matters**: Branching from PRs creates dependency chains that contaminate later PRs with unmerged changes
+
+### 📝 Memory Location - AGENT WORKSPACE ONLY!
+- **NEVER write notes/memories to the project directory** (`Documents/projects/FFCC-Decomp/`)
+- **ALWAYS write to agent workspace**: `~/.openclaw/workspace/memory/`
+- Project work notes → `memory/YYYY-MM-DD.md` or `memory/ffcc-decomp-notes.md`
+- State tracking → `memory/decomp-state.json`
+- **Why this matters**: Project directory is for source code only, not agent notes
+
+### 🧹 Code Quality - Clean Source Only!
+- **NO junk comments** in submitted code (no original assembly, no debug notes)
+- **NO commented-out code** unless specifically needed
+- **NO "TODO" or "FIXME" comments** - either implement it or don't include it
+- Code should look like **plausible original source** that a game developer would write
+- **Why this matters**: PRs should contain production-quality code, not analysis artifacts
+
+### ✅ Pre-Submit Checklist
+Before creating any FFCC-Decomp PR:
+1. ✅ Branched from clean `main`?
+2. ✅ All notes written to agent workspace (not project directory)?  
+3. ✅ Code is clean (no assembly comments, debug prints, etc.)?
+4. ✅ Real improvement achieved (size match or functionality)?
+5. ✅ Build passes with `ninja`?
+
+### 🚨 If You Break These Rules
+- **Stop immediately** and fix the issues
+- Clean up the branch/PR before continuing
+- Update your automation scripts to prevent recurrence
+- Document the fix in your memory files
+
+**These rules exist because overnight automation created several contaminated PRs that required manual cleanup. Following them keeps the project clean and maintainable.**
+
+---
+
 ## Automation workflow
 
 1. **Select target**: `python3 agent_select_target.py`
 2. **Extract symbols**: `python3 extract_symbols.py <object>.o`  
-3. **Create branch**: `git checkout -b pr/<unit>`
-4. **Update state files** 
+3. **Create branch from clean main**: `git checkout main && git pull origin main && git checkout -b pr/<unit>`
+4. **Update state files** (in agent workspace, not project directory)
 5. **Edit source** (use Ghidra decomp for 0% functions)
 6. **Build**: `ninja`
 7. **Analyze**: `build/tools/objdiff-cli diff -p . -u <unit> -o - <symbol>`

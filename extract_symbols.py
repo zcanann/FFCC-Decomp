@@ -199,11 +199,10 @@ def extract_all_for_object(map_file, object_file):
                 if (line_stripped.endswith(f"\t{object_file}") or 
                     line_stripped.endswith(f" {object_file}") or
                     f"found in {object_file}" in line_stripped):
-                    parts = line_stripped.split()
                     
                     # Handle EN debug format: "symbol (type) found in object_file"
                     if "found in" in line_stripped:
-                        # EN format parsing
+                        parts = line_stripped.split()
                         if ') found in' in line_stripped:
                             symbol_part = line_stripped.split(') found in')[0]
                             if '(' in symbol_part:
@@ -229,35 +228,81 @@ def extract_all_for_object(map_file, object_file):
                                 'object_file': object_file
                             }
                         }
-                    # Handle PAL format: "flag offset size virtual_addr type_flag symbol object_file"
-                    elif len(parts) >= 7:
-                        flag = parts[0]
-                        offset = parts[1] 
+                    # Handle PAL format: multiple patterns
+                    elif line_stripped.strip().startswith('UNUSED'):
+                        # UNUSED format: "UNUSED size ........ symbol object"
+                        parts = line_stripped.split()
+                        if len(parts) >= 5:
+                            flag = 'UNUSED'
+                            size = parts[1]
+                            symbol = parts[3] if len(parts) > 3 else 'unnamed'
+                            
+                            entry = {
+                                'line': line_num,
+                                'content': line_stripped,
+                                'parsed': {
+                                    'flag': flag,
+                                    'offset': 'UNUSED',
+                                    'size': size,
+                                    'virtual_addr': 'UNUSED',
+                                    'type_flag': 'UNUSED',
+                                    'symbol': symbol,
+                                    'object_file': object_file
+                                }
+                            }
+                        else:
+                            entry = {'line': line_num, 'content': line_stripped, 'parsed': None}
+                    elif 'UNUSED' in line_stripped and len(line_stripped.split()) >= 6:
+                        # PAL UNUSED function: "G UNUSED size ........ symbol object"  
+                        parts = line_stripped.split()
+                        flag = parts[0]  # G
                         size = parts[2]
-                        virtual_addr = parts[3]
-                        type_flag = parts[4] if len(parts) > 4 else 'unknown'
-                        symbol = parts[5] if len(parts) > 5 else 'unnamed'
+                        symbol = parts[4] if len(parts) > 4 else 'unnamed'
                         
                         entry = {
                             'line': line_num,
                             'content': line_stripped,
                             'parsed': {
                                 'flag': flag,
-                                'offset': offset,
+                                'offset': 'UNUSED',
                                 'size': size,
-                                'virtual_addr': virtual_addr,
-                                'type_flag': type_flag,
+                                'virtual_addr': 'UNUSED',
+                                'type_flag': 'UNUSED',
                                 'symbol': symbol,
                                 'object_file': object_file
                             }
                         }
                     else:
-                        # Fallback for unrecognized format
-                        entry = {
-                            'line': line_num,
-                            'content': line_stripped,
-                            'parsed': None
-                        }
+                        # Normal PAL format: "flag offset size addr type symbol \t object"  
+                        parts = line_stripped.split()
+                        if len(parts) >= 7:
+                            flag = parts[0]  # G, X, etc.
+                            offset = parts[1]
+                            size = parts[2] 
+                            virtual_addr = parts[3]
+                            type_flag = parts[4]
+                            symbol = parts[5]
+                            
+                            entry = {
+                                'line': line_num,
+                                'content': line_stripped,
+                                'parsed': {
+                                    'flag': flag,
+                                    'offset': offset,
+                                    'size': size,
+                                    'virtual_addr': virtual_addr,
+                                    'type_flag': type_flag,
+                                    'symbol': symbol,
+                                    'object_file': object_file
+                                }
+                            }
+                        else:
+                            # Fallback for unrecognized format
+                            entry = {
+                                'line': line_num,
+                                'content': line_stripped,
+                                'parsed': None
+                            }
                         
                     # Categorize by type (handle both PAL and EN formats)
                     if entry.get('parsed'):
@@ -266,14 +311,19 @@ def extract_all_for_object(map_file, object_file):
                         type_flag = parsed.get('type_flag', '')
                         symbol = parsed.get('symbol', '')
                         
-                        # Functions: PAL format (G+4) or EN format (func in type)
-                        if (flag == 'G' and type_flag == '4') or 'func' in type_flag:
+                        # Functions: PAL format (G+4 or G+UNUSED) or EN format (func in type)
+                        if (flag == 'G' and (type_flag == '4' or type_flag == 'UNUSED')) or 'func' in type_flag:
                             functions.append(entry)
-                        # Global data: section names or object type
-                        elif type_flag in ['.data', '.bss', '.sdata', '.sbss'] or 'object' in type_flag:
+                        # Global data: multiple patterns
+                        elif flag == 'UNUSED' or \
+                             (type_flag == '4' and flag != 'G') or \
+                             type_flag in ['.data', '.bss', '.sdata', '.sbss'] or \
+                             'object' in type_flag or \
+                             symbol.startswith('__RTTI__') or \
+                             ('$' in symbol and not symbol.startswith('.')): # Constants like neg_one$206
                             globals_data.append(entry)
                         # Section headers
-                        elif symbol in ['.data', '.bss', '.sdata', '.sbss', '.text']:
+                        elif symbol in ['.data', '.bss', '.sdata', '.sbss', '.text'] or type_flag == '1':
                             sections.append(entry)
                         else:
                             sections.append(entry)  # Other symbols

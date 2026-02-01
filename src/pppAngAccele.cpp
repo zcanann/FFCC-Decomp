@@ -13,14 +13,11 @@ void pppAngAccele(void* particleSystem, void* particleData)
         return;
     }
     
-    void** systemPtr = (void**)particleSystem;
-    void** particlePtr = (void**)particleData;
-    void* systemData = systemPtr[3];
-    void* particleIdPtr = particlePtr[0];
-    void** systemDataPtr = (void**)systemData;
-    void* angularVelocityPtr = systemDataPtr[0];
+    void** systemData = (void**)((void**)particleSystem)[3];
+    void* particleIdPtr = ((void**)particleData)[0];
+    void* angularVelocityPtr = systemData[0];
     int particleId = *(int*)particleIdPtr;
-    void* angularAccelerationPtr = systemDataPtr[1];
+    void* angularAccelerationPtr = systemData[1];
     
     char* angularVelocityBase = (char*)particleSystem + (int)angularVelocityPtr + 0x80;
     char* angularAccelBase = (char*)particleSystem + (int)angularAccelerationPtr + 0x80;
@@ -43,10 +40,8 @@ void pppAngAccele(void* particleSystem, void* particleData)
  */
 void pppAngAcceleCon(void* particleSystem)
 {
-    void** systemPtr = (void**)particleSystem;
-    void* systemData = systemPtr[3];
-    void** systemDataPtr = (void**)systemData;
-    void* angularAccelerationPtr = systemDataPtr[1];
+    void** systemData = (void**)((void**)particleSystem)[3];
+    void* angularAccelerationPtr = systemData[1];
     
     char* ptr = (char*)particleSystem + (int)angularAccelerationPtr + 0x80;
     *(int*)(ptr + 0x8) = 0;

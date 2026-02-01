@@ -8,22 +8,23 @@
  */
 void pppMatrixScl(void* mtx, void* data)
 {
-    f32* m = (f32*)mtx;
-    Mtx* matPtr = (Mtx*)((u8*)m + 16);
-    PSMTXIdentity(*matPtr);
+    f32* matrix = (f32*)mtx;
+    Mtx* mtxPtr = (Mtx*)((u8*)matrix + 16);
     
-    void* dataPtr = ((void**)data)[3]; 
+    void* dataPtr = ((void**)data)[3];
     u32* indices = (u32*)dataPtr;
-    u32 idx1 = indices[0];
-    u32 idx2 = indices[1];
+    u32 index1 = indices[0];
+    u32 index2 = indices[1];
     
-    f32* src1 = (f32*)((u8*)mtx + idx1 + 0x80);
-    f32* src2 = (f32*)((u8*)mtx + idx2 + 0x80);
+    f32* scale1 = (f32*)((u8*)matrix + index1 + 0x80);
+    f32* scale2 = (f32*)((u8*)matrix + index2 + 0x80);
     
-    m[4] = src2[0];   // 0x10 offset 
-    m[9] = src2[1];   // 0x24 offset
-    m[14] = src2[2];  // 0x38 offset
-    m[7] = src1[0];   // 0x1c offset
-    m[11] = src1[1];  // 0x2c offset  
-    m[15] = src1[2];  // 0x3c offset
+    PSMTXIdentity(*mtxPtr);
+    
+    matrix[4] = scale2[0];   // 0x10 offset
+    matrix[9] = scale2[1];   // 0x24 offset
+    matrix[14] = scale2[2];  // 0x38 offset
+    matrix[7] = scale1[0];   // 0x1c offset
+    matrix[11] = scale1[1];  // 0x2c offset
+    matrix[15] = scale1[2];  // 0x3c offset
 }

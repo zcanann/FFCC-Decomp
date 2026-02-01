@@ -5,6 +5,7 @@ This file is the canonical, step-by-step runbook for automated contributions to 
 Goal: improve match scores by editing C/C++ source, rebuilding, diffing, and submitting clean PRs when progress is real.
 
 ## Ghidra Decompilation Reference
+⚠️ Do not fully trust Ghidra for anything other than address and sizes. The existing decomp is based off of a snapshot and guesswork. The function names however are 99% accurate and were reconstructed from Metrowerks build symbol files.
 
 ### Decomp Resources
 - **Current decomp location**: `resources/ghidra-decomp-1-31-2026/`
@@ -12,7 +13,7 @@ Goal: improve match scores by editing C/C++ source, rebuilding, diffing, and sub
 - **Purpose**: Aid in debugging and reverse engineering
 
 ### Symbol Files
-The EN and PAL versions accidentally shipped with build logs, containing symbol names for data sections and function names. High level symbols only, not granular.
+The EN and PAL versions accidentally shipped with build logs, containing symbol names in mangled Metrowerks format for data sections and function names. High level symbols only, not granular.
 
 #### PAL Release (Metrowerks Release Build)
 - **Location**: `orig/GCCP01/game.MAP`
@@ -115,8 +116,8 @@ Update these files to track progress and avoid cycling through failed targets.
 ### 0) Repo + assets
 - Repo directory (on Zac's Mac):
   - `~/Documents/projects/FFCC-Decomp`
-- Required assets are **not** in git. You must have the original files locally:
-  - `orig/GCCP01/...` must exist (at minimum `orig/GCCP01/sys/main.dol`).
+- Required assets are **not** in git. Your owner will have already given you the original files locally:
+  - `orig/GCCP01/...` (at minimum `orig/GCCP01/sys/main.dol`).
 
 ### 1) Tooling
 - Install ninja:
@@ -190,6 +191,8 @@ python3 extract_symbols.py pppMove.o
      2. pppMove (156b at 80065b3c)
   📊 Summary: 2 functions, 0 globals
 ```
+
+Note: If the function parameters do not match, the match score cannot be improved beyond 0%!
 
 **Key derivations:** Unit → Object file → Source file. Use Ghidra decomp for 0% functions, objdiff for partial matches.
 

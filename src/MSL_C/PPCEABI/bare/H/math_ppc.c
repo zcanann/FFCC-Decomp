@@ -3,8 +3,8 @@ float acosf(float arg0) {
     return (float) acos(arg0);
 }
 
-float atan2f(float arg0) {
-    return (float) atan2(arg0);
+float powf(float base, float exponent) {
+    return (float) pow(base, exponent);
 }
 
 float cosf(float arg0) {

@@ -5,8 +5,8 @@ struct _pppPObject;
 struct PDrawMdlTs;
 struct _pppCtrlTable;
 
-void pppDrawMdlTsCon(void);
-void pppDrawMdlTsCon3(void);
+void pppDrawMdlTsCon(struct _pppPObject* obj, struct PDrawMdlTs* data);
+void pppDrawMdlTsCon3(struct _pppPObject* obj, struct PDrawMdlTs* data);
 void pppDrawMdlTs(void);
 void pppDrawDrawMdlTs0(struct _pppPObject*, struct PDrawMdlTs*, struct _pppCtrlTable*);
 void pppDrawDrawMdlTs(void);

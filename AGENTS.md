@@ -7,6 +7,8 @@ Goal: improve match scores by editing C/C++ source, rebuilding, diffing, and sub
 ## Ghidra Decompilation Reference
 ⚠️ Do not fully trust Ghidra for anything other than address and sizes. The existing decomp is based off of a snapshot and guesswork. The function names however are 99% accurate and were reconstructed from Metrowerks build symbol files.
 
+In other words, function parameters can be wrong in Ghidra, unless there is Metrowerks mangling in the function name to indicate the true parameters.
+
 ### Decomp Resources
 - **Current decomp location**: `resources/ghidra-decomp-1-31-2026/`
 - **File naming format**: `{PAL_VERSION_ADDRESS}_{METROWERKS_MANGLED_FUNCTION_NAME}`
@@ -31,44 +33,16 @@ Symbol files are helpful for determining:
 - Function arguments and parameters
 - Global variables (especially .bss section data)
 - Function relationships and dependencies
-
-**⚡ Context-Safe Symbol Lookup:**
 To avoid loading massive MAP files (1-3MB), use the symbol extraction script:
+- **Complete object analysis**: `python3 tools/extract_symbols.py <object>.o`
 
-**🚀 Comprehensive object analysis (recommended):**
+**🚀 Example usage:**
 ```sh
-python3 extract_symbols.py ME_USB_process.o     # Everything for this object file
-python3 extract_symbols.py chunkfile.o          # All functions, globals, sections
+python3 tools/extract_symbols.py ME_USB_process.o     # Everything for this object file
+python3 tools/extract_symbols.py chunkfile.o          # All functions, globals, sections
 ```
 
-**Function lookup:**
-```sh
-python3 extract_symbols.py pppMatrixXZY
-python3 extract_symbols.py "SetUSBData__18CMaterialEditorPcsFv" main/ME_USB_process
-```
-
-**Section information (for data layout):**
-```sh
-python3 extract_symbols.py .data --section     # Data section layout
-python3 extract_symbols.py .bss --section      # Uninitialized globals
-python3 extract_symbols.py .text --section     # Code section
-```
-
-**Global variables (for struct layout/globals):**
-```sh
-python3 extract_symbols.py ME_USB_process.o --globals    # All globals in object
-python3 extract_symbols.py Game --globals                # Globals containing "Game"
-python3 extract_symbols.py Game                          # All symbols containing "Game"
-```
-
-This outputs only relevant symbol information (~5-15 lines) instead of megabytes.
-
-### Symbol Usage
-
-- **Object analysis**: `python3 extract_symbols.py <object>.o`
-- **Function lookup**: `python3 extract_symbols.py "<function_name>"`
-- **Section info**: `python3 extract_symbols.py .data --section`
-- **Globals**: `python3 extract_symbols.py <object>.o --globals`
+This outputs only relevant symbol information instead of having to sift through MBs of data.
 
 ### Function Documentation Format
 When updating functions, include version-specific address and size information:
@@ -78,16 +52,16 @@ When updating functions, include version-specific address and size information:
  * --INFO--
  * PAL Address: 0x80001234
  * PAL Size: 128b
- * EN Address: 0x80001234
- * EN Size: 128b
- * JP Address: 0x80001234
- * JP Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 ```
 
 **Note**: PAL Addresses and sizes are exported in the Ghidra decomp as part of the header. Leave the other versions as TODO for now.
 
-**Important for 0% matches**: Ghidra decomp provides full reference implementations that can be adapted to match the original source style. Even 0% match functions are highly viable targets. **IMPORTANT** Note that many ppp* functions do not take any parameters, but instead seem to reference global state. Objdiff should show the function parameters. If objdiff is reporting different function signatures, you may need to update the C++ accordingly.
+**Important for 0% matches**: Ghidra decomp provides full reference implementations that can be adapted to match the original source style. Even 0% match functions are highly viable targets. **IMPORTANT** Many ppp* functions do not take any parameters, but instead seem to reference global state. Objdiff should show the function parameters. If objdiff is reporting different function signatures, you will need to update the C++ accordingly.
 
 **Important for near matches** `configure.py` has several build flags which can influence binary output. This is just as important to code matching as the code itself! The exact compiler version and flags for each module is not known yet. For this reason, high matches like 97% are sometimes acceptable and not worth dealing with because it could be build system related.
 
@@ -112,9 +86,10 @@ Update these files to track progress and avoid cycling through failed targets.
   - Do not attempt other versions until PAL is substantially complete.
 
 ## Preconditions (one-time setup)
+Skip the preconditions step unless errors are encountered indicating lack of initial setup.
 
 ### 0) Repo + assets
-- Repo directory (on Zac's Mac):
+- Repo directory (default location):
   - `~/Documents/projects/FFCC-Decomp`
 - Required assets are **not** in git. Your owner will have already given you the original files locally:
   - `orig/GCCP01/...` (at minimum `orig/GCCP01/sys/main.dol`).
@@ -157,13 +132,14 @@ build/tools/objdiff-cli --version  # Should show v3.6.1+
 ---
 
 ## The contribution loop (repeatable)
+This is likely the starting point for the agent.
 
 ### Step 1 - Select Target & Gather Context (automated)
 **Complete target selection and context gathering in 3 steps:**
 
 ```sh
 # 1. Pick a target unit
-python3 agent_select_target.py
+python3 tools/agent_select_target.py
 ```
 
 **Example output:**
@@ -180,7 +156,7 @@ Target functions:
 
 ```sh
 # 2. Get comprehensive symbol information
-python3 extract_symbols.py pppMove.o
+python3 tools/extract_symbols.py pppMove.o
 ```
 
 **Example output:**
@@ -192,9 +168,11 @@ python3 extract_symbols.py pppMove.o
   📊 Summary: 2 functions, 0 globals
 ```
 
-Note: If the function parameters do not match, the match score cannot be improved beyond 0%!
+⚠️ If the function parameters do not match, the match score cannot be improved beyond 0%! This is very common for ppp* functions, many of which lack parameters and instead reference global state. You will need to remove these parameters and make the function match signatures to improve beyond 0%.
 
-**Key derivations:** Unit → Object file → Source file. Use Ghidra decomp for 0% functions, objdiff for partial matches.
+DO NOT TRUST GHIDRA FOR FUNCTION PARAMETERS, GHIDRA IS A GUIDELINE. OBJDIFF IS THE REAL SOURCE OF TRUTH FOR HOW CLOSE WE ARE.
+
+**Key derivations:** Unit → Object file → Source file. Use Ghidra decomp for 0% functions that are not caused by parameter mismatches, objdiff for partial matches.
 
 ### Step 2 - Create branch: `git checkout -b pr/<unit>`
 

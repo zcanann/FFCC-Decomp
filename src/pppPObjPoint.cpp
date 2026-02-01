@@ -6,33 +6,6 @@ extern void* lbl_8032ED50; // Global data structure
 
 /*
  * --INFO--
- * Address:	80060A80
- * Size:	108 bytes (0x6C)
- */
-void pppParMatrix(PppPointData* pointData)
-{
-    Vec tempVec;
-    void* matrix;
-    
-    // Load matrix pointer first (to match target instruction order)
-    matrix = pointData->matrix;
-    
-    // Load vector from pointData
-    tempVec.x = pointData->x;
-    tempVec.y = pointData->y;
-    tempVec.z = pointData->z;
-    
-    // Multiply with matrix (matrix + 0x10 offset)
-    PSMTXMultVec(*((Mtx*)((u8*)matrix + 0x10)), &tempVec, &tempVec);
-    
-    // Store result back
-    pointData->x = tempVec.x;
-    pointData->y = tempVec.y;
-    pointData->z = tempVec.z;
-}
-
-/*
- * --INFO--
  * Address:	80060AEC
  * Size:	148 bytes (0x94)
  */

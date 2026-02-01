@@ -42,7 +42,6 @@ struct PppPointObj {
     void* vecPtr;    // 0x10
 };
 
-void pppParMatrix(PppPointData* pointData);
 void pppPObjPoint(PppPointData* pointData, PppObjData* objData, PppContainer* container);
 
 #endif // _PPP_POBJPOINT_H_

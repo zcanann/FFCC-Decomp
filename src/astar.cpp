@@ -674,8 +674,8 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 
 	escapeDir.Normalize();
 
-	double behindBestDist = -1000000.0;
-	double aheadBestDist  = -1000000.0;
+	float behindBestDist = -1000000.0f;
+	float aheadBestDist  = -1000000.0f;
 
 	CAPos* behindBest = (CAPos*)nullptr;
 	CAPos* aheadBest  = (CAPos*)nullptr;
@@ -736,10 +736,8 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 
 		dirToPortal.Normalize();
 
-		double dot = static_cast<double>(
-			PSVECDotProduct(reinterpret_cast<Vec*>(&escapeDir),
-			                reinterpret_cast<Vec*>(&dirToPortal))
-		);
+		float dot = PSVECDotProduct(reinterpret_cast<Vec*>(&escapeDir),
+		                            reinterpret_cast<Vec*>(&dirToPortal));
 
 		CVector baseVec2(base);
 		CVector portalPos2(portal.m_position);
@@ -756,9 +754,7 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 		diffForMag.y = diffBaseToPortalMagSrc.y;
 		diffForMag.z = diffBaseToPortalMagSrc.z;
 
-		double dist = static_cast<double>(
-			PSVECMag(reinterpret_cast<Vec*>(&diffForMag))
-		);
+		float dist = PSVECMag(reinterpret_cast<Vec*>(&diffForMag));
 
 		if (dot < 0.0)
 		{

@@ -4,7 +4,7 @@
 class CRef
 {
 	CRef();
-	virtual ~CRef();
+	virtual ~CRef() {}
 	
 	int refCount;
 };

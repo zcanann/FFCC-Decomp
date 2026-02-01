@@ -11,6 +11,29 @@ struct PppMoveObj {
 
 /*
  * --INFO--
+ * PAL Address: 0x80065b18
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO  
+ * JP Size: TODO
+ */
+void pppMoveCon(void* basePtr, PppMoveData* data)
+{
+    // Get object pointer from data structure
+    void* objPtr = data->ptrData;
+    u32 offset = *((u32*)((u8*)objPtr + 0x4));
+    PppMoveObj* moveObj = (PppMoveObj*)((u8*)basePtr + offset + 0x80);
+    
+    // Initialize to zero
+    f32 zero = lbl_8032FED8;
+    moveObj->x = zero;
+    moveObj->y = zero;
+    moveObj->z = zero;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80065b3c
  * PAL Size: 156b
  * EN Address: TODO
@@ -51,27 +74,4 @@ void pppMove(void* basePtr, PppMoveInput* input, PppMoveData* data1, PppMoveData
     obj1->x += obj2->x;
     obj1->y += obj2->y;
     obj1->z += obj2->z;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80065b18
- * PAL Size: 36b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO  
- * JP Size: TODO
- */
-void pppMoveCon(void* basePtr, PppMoveData* data)
-{
-    // Get object pointer from data structure
-    void* objPtr = data->ptrData;
-    u32 offset = *((u32*)((u8*)objPtr + 0x4));
-    PppMoveObj* moveObj = (PppMoveObj*)((u8*)basePtr + offset + 0x80);
-    
-    // Initialize to zero
-    f32 zero = lbl_8032FED8;
-    moveObj->x = zero;
-    moveObj->y = zero;
-    moveObj->z = zero;
 }

@@ -18,7 +18,7 @@ struct PppMoveInput {
     f32 z;           // 0x10
 };
 
-void pppMove(void* basePtr, PppMoveInput* input, PppMoveData* data1, PppMoveData* data2);
 void pppMoveCon(void* basePtr, PppMoveData* data);
+void pppMove(void* basePtr, PppMoveInput* input, PppMoveData* data1, PppMoveData* data2);
 
 #endif // _PPP_MOVE_H_

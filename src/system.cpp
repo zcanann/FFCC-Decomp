@@ -63,10 +63,10 @@ void CSystem::Quit()
  */
 void CSystem::Printf(char* fmt, ...)
 {
-    if (((int)this /* MiniGamePcs._25732_4_ */ &  0x1000) == 0)
-	{
+    if (((int)this & 0x1000) == 0)
+    {
         return;
-	}
+    }
 
     char buffer[0x20C];
     va_list args;
@@ -74,7 +74,6 @@ void CSystem::Printf(char* fmt, ...)
     vsprintf(buffer, fmt, args);
     va_end(args);
     OSReport(buffer);
-    // USB.Printf(buffer);
 }
 
 /*
@@ -314,7 +313,7 @@ CSystem::COrder* CSystem::GetOrder(int index)
  */
 bool CSystem::IsGdev()
 {
-	return OSGetConsoleType() >> 0x1C & 1;
+	return (OSGetConsoleType() >> 0x1C) & 1;
 }
 
 /*

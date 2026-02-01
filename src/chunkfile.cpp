@@ -223,8 +223,10 @@ char* CChunkFile::GetString()
  * Size:	TODO
  */
 void CChunkFile::Align(unsigned long alignment)
-{ 
+{
+    // Pattern to generate andc instruction for efficient alignment
+    unsigned long alignMask = alignment - 1;
     unsigned long offset = (unsigned long)(m_cursor - m_base);
-    offset = (offset + alignment - 1) & ~(alignment - 1);
+    offset = (offset + alignMask) & ~alignMask;
     m_cursor = m_base + offset;
 }

@@ -21,7 +21,9 @@ void pppAngle(void* dest, void* src, void* param1, void* param2)
     }
     
     int* param2Data = (int*)param2;
-    int* destPtr = (int*)((char*)dest + param2Data[3] + 0x80);
+    int* offsetPtr = (int*)param2Data[3];
+    int offset = offsetPtr[0];
+    int* destPtr = (int*)((char*)dest + offset + 0x80);
     int* srcPtr = (int*)((char*)src + 8);
     
     destPtr[0] += srcPtr[0];
@@ -37,7 +39,8 @@ void pppAngle(void* dest, void* src, void* param1, void* param2)
 void pppAngleCon(void* dest, void* param)
 {
     int* paramData = (int*)param;
-    int offset = paramData[0];
+    int* offsetPtr = (int*)paramData[3];
+    int offset = offsetPtr[0];
     
     int* ptr = (int*)((char*)dest + offset + 0x80);
     ptr[0] = 0;

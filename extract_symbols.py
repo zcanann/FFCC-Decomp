@@ -441,6 +441,18 @@ def main():
                         size_kb = f"{size_bytes}"
                         print(f"    {i:2}. {p['symbol']} ({size_kb}b at {p['virtual_addr']})")
                 
+                # Global Variables
+                if all_info_en['globals']:
+                    print(f"\n  🌍 Global Variables ({len(all_info_en['globals'])}):")
+                    for i, glob in enumerate(all_info_en['globals'], 1):
+                        p = glob['parsed']
+                        try:
+                            size_bytes = int(p['size'], 16) if p['size'] != 'UNUSED' else 0
+                        except:
+                            size_bytes = 0
+                        size_kb = f"{size_bytes}"
+                        print(f"    {i:2}. {p['symbol']} ({size_kb}b {p['type_flag']} at {p['virtual_addr']})")
+                
                 # Summary
                 total_functions_en = len(all_info_en['functions'])
                 total_globals_en = len(all_info_en['globals'])

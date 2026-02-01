@@ -126,7 +126,10 @@ s32 CARDReadAsync(CARDFileInfo* fileInfo, void* buf, s32 length, s32 offset, CAR
 
     dir = __CARDGetDirBlock(card);
     ent = &dir[fileInfo->fileNo];
-    result = __CARDIsReadable(card, ent);
+    result = __CARDAccess(card, ent);
+    if (result == CARD_RESULT_NOPERM) {
+        result = __CARDIsPublic(ent);
+    }
     if (result < 0)
         return __CARDPutControlBlock(card, result);
 

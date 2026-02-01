@@ -56,6 +56,14 @@ s32 __CARDIsWritable(CARDControl* card, CARDDir* ent) {
     return result;
 }
 
+s32 __CARDIsPublic(CARDDir* ent) {
+    u8 perm = ent->permission & __CARDPermMask;
+    if (perm & 0x4) {
+        return CARD_RESULT_READY;
+    }
+    return CARD_RESULT_NOPERM;
+}
+
 s32 __CARDIsReadable(CARDControl* card, CARDDir* ent) {
     s32 result = __CARDIsWritable(card, ent);
     if (result == CARD_RESULT_NOPERM && (ent->permission & 0x4)) {

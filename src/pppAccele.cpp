@@ -1,5 +1,8 @@
 #include "ffcc/pppAccele.h"
 
+extern int DAT_8032ed70;
+extern float DAT_8032fec8;
+
 /*
  * --INFO--
  * PAL Address: 0x80064c7c
@@ -7,33 +10,24 @@
  */
 void pppAccele(void* obj, void* param2, void* param3)
 {
-	// Get pointers to position/velocity data from param3 offsets
 	void* dataPtr = *((void**)((char*)param3 + 0x0c));
-	int* offsets = (int*)((char*)dataPtr + 0x04);
 	
-	float* positionVector = (float*)((char*)obj + offsets[0] + 0x80);
-	float* accelerationVector = (float*)((char*)obj + offsets[1] + 0x80);
+	float* pfVar1 = (float*)((char*)obj + *((int*)((char*)dataPtr + 0x00)) + 0x80);
+	float* pfVar2 = (float*)((char*)obj + *((int*)((char*)dataPtr + 0x04)) + 0x80);
 	
-	// Check global flag - return early if disabled
-	// Note: DAT_8032ed70 appears to be a global disable flag
-	// TODO: Replace with actual global variable reference
-	// if (globalDisableFlag != 0) return;
-	
-	// Check if graph IDs match between param2 and obj
-	int param2GraphId = *((int*)((char*)param2 + 0x08)); // m_graphId offset
-	int objGraphId = *((int*)((char*)obj + 0x08));       // m_graphId offset
-	
-	if (param2GraphId == objGraphId) {
-		// Add parameter values to acceleration vector
-		accelerationVector[0] += (float)*((int*)((char*)param2 + 0x0c)); // m_initWOrk
-		accelerationVector[1] += *((float*)((char*)param2 + 0x10));      // m_stepValue  
-		accelerationVector[2] += (float)*((int*)((char*)param2 + 0x14)); // m_arg3
+	if (DAT_8032ed70 != 0) {
+		return;
 	}
 	
-	// Add acceleration to position
-	positionVector[0] += accelerationVector[0];
-	positionVector[1] += accelerationVector[1]; 
-	positionVector[2] += accelerationVector[2];
+	if (*((int*)((char*)param2 + 0x08)) == *((int*)((char*)obj + 0x08))) {
+		*pfVar2 = *pfVar2 + *((float*)((char*)param2 + 0x0c));
+		pfVar2[1] = pfVar2[1] + *((float*)((char*)param2 + 0x10));
+		pfVar2[2] = pfVar2[2] + *((float*)((char*)param2 + 0x14));
+	}
+	
+	*pfVar1 = *pfVar1 + *pfVar2;
+	pfVar1[1] = pfVar1[1] + pfVar2[1];
+	pfVar1[2] = pfVar1[2] + pfVar2[2];
 }
 
 /*
@@ -43,13 +37,11 @@ void pppAccele(void* obj, void* param2, void* param3)
  */
 void pppAcceleCon(void* obj, void* param)
 {
-	// Get structure pointer and offset to acceleration data  
-	void* data = *((void**)((char*)param + 0x0c));
-	int offset = *((int*)((char*)data + 0x04));
-	float* accel = (float*)((char*)obj + offset + 0x80);
+	void* dataPtr = *((void**)((char*)param + 0x0c));
+	float* puVar2 = (float*)((char*)obj + *((int*)((char*)dataPtr + 0x04)) + 0x80);
+	float uVar1 = DAT_8032fec8;
 	
-	// Initialize acceleration vector to zero (in reverse order to match assembly)
-	accel[2] = 0.0f;  // z
-	accel[1] = 0.0f;  // y  
-	accel[0] = 0.0f;  // x
+	puVar2[2] = uVar1;
+	puVar2[1] = uVar1;
+	*puVar2 = uVar1;
 }

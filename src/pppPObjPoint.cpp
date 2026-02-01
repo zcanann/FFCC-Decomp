@@ -1,61 +1,58 @@
 #include "ffcc/pppPObjPoint.h"
-#include <dolphin/types.h>
+#include "dolphin/mtx.h"
 
-// External global flags (from @sda21 addressing)
-extern u32 lbl_8032ED70;
-extern void* lbl_8032ED50;
-extern void* lbl_801EADC8;
+extern u32 lbl_8032ED70; // Global enable flag
+extern void* lbl_8032ED50; // Global data structure
 
 /*
  * --INFO--
- * PAL Address: 0x80065c44  
- * PAL Size: 148b
+ * Address:	80060AEC
+ * Size:	148 bytes (0x94)
  */
-void pppPObjPoint(void* obj, void* param1, void* param2)
+void pppPObjPoint(PppPointData* pointData, PppObjData* objData, PppContainer* container)
 {
-	// Early return if global flag is set
-	if (lbl_8032ED70 != 0) {
-		return;
-	}
-	
-	// Get values from parameter structures  
-	void* param1_data = *(void**)((char*)param2 + 0x0c);
-	u32 param1_val = *(u32*)((char*)param1 + 0x00);
-	u32 obj_val = *(u32*)((char*)obj + 0x0c);
-	void* param1_ptr = *(void**)((char*)param1_data + 0x00);
-	
-	// Calculate target offset in object
-	void* target = (char*)obj + (u32)param1_ptr + 0x80;
-	
-	// Compare values and branch
-	if (param1_val != obj_val) {
-		// Complex case - calculate pointer based on param values
-		u32 param2_val = *(u32*)((char*)param1 + 0x04);
-		
-		if ((param2_val + 1) == 0xFFFF) {
-			// Special case - use static data
-			*(void**)((char*)target + 0x10) = lbl_801EADC8;
-		} else {
-			// Calculate dynamic pointer
-			void* base = lbl_8032ED50;
-			void* data_ptr = *(void**)((char*)base + 0xd4);
-			u32 offset = param2_val << 4;  // slwi r0, r3, 4
-			void* calc_base = (char*)data_ptr + offset;
-			void* param3_base = *(void**)((char*)param1 + 0x08);
-			void* final_offset = *(void**)((char*)calc_base + 0x04);
-			void* result = (char*)param3_base + (u32)final_offset + 0x80;
-			*(void**)((char*)target + 0x10) = result;
-		}
-	}
-	
-	// Copy float data (x, y, z components)
-	void* src = *(void**)((char*)target + 0x10);
-	f32 x = *(f32*)((char*)src + 0x00);
-	*(f32*)((char*)target + 0x00) = x;
-	
-	f32 y = *(f32*)((char*)src + 0x04); 
-	*(f32*)((char*)target + 0x04) = y;
-	
-	f32 z = *(f32*)((char*)src + 0x08);
-	*(f32*)((char*)target + 0x08) = z;
+    // Check global enable flag - return early if disabled
+    if (lbl_8032ED70 != 0) {
+        return;
+    }
+    
+    // Load container data and dereference
+    void* containerData = container->ptrData;
+    u32 objId = objData->id;
+    u32 pointId = pointData->id;
+    void* dataPtr = *(void**)containerData;
+    
+    // Compare IDs
+    if (objId == pointId) {
+        // IDs match - set up vector pointer
+        void* vectorPtr;
+        
+        // Calculate base object pointer with 0x80 offset
+        PppPointObj* objPtr = (PppPointObj*)((u8*)pointData + (u32)dataPtr + 0x80);
+        
+        // Check for special case (field_4 == 0xFFFF)  
+        if ((objData->field_4 + 0x10000) == 0xFFFF) {
+            // Use static/default vector pointer
+            extern u32 lbl_801EADC8;
+            vectorPtr = (void*)&lbl_801EADC8;
+        } else {
+            // Calculate dynamic vector pointer
+            void* globalData = lbl_8032ED50;
+            void* arrayPtr = *((void**)((u8*)globalData + 0xD4));
+            u32 index = objData->field_4 << 4; // multiply by 16
+            void* entry = (u8*)arrayPtr + index;
+            void* basePtr = *((void**)((u8*)entry + 0x4));
+            vectorPtr = (u8*)objData->data + (u32)basePtr + 0x80;
+        }
+        
+        // Store vector pointer
+        objPtr->vecPtr = vectorPtr;
+    }
+    
+    // Always copy vector data (happens regardless of ID match)
+    PppPointObj* objPtr = (PppPointObj*)((u8*)pointData + (u32)dataPtr + 0x80);
+    f32* src = (f32*)objPtr->vecPtr;
+    objPtr->x = src[0];
+    objPtr->y = src[1]; 
+    objPtr->z = src[2];
 }

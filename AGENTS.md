@@ -72,7 +72,7 @@ This outputs only relevant symbol information (~5-15 lines) instead of megabytes
 ### Function Documentation Format
 When updating functions, include version-specific address and size information:
 
-```c
+```
 /*
  * --INFO--
  * PAL Address: 0x80001234
@@ -87,6 +87,15 @@ When updating functions, include version-specific address and size information:
 **Note**: PAL Addresses and sizes are exported in the Ghidra decomp as part of the header. Leave the other versions as TODO for now.
 
 **Important for 0% matches**: Ghidra decomp provides full reference implementations that can be adapted to match the original source style. Even 0% match functions are highly viable targets.
+Additionally, if the `config/GCCP01/splits.txt` contains a different function signature than the C++, the match scores may falsely report 0%. Is is highly unlikely that splits.txt is wrong, given that this file was populated from the debug/release game.MAP build trace files with function symbol information.
+
+Unsolved problem 1) Many of the particle ppp functions seem to have parameters in Ghidra, but not in the .MAP file. This makes these falsely report sizes. The game.MAP files do not show a Metrowerks mangled name. These are also not called in a normal manner, these functions have no XREFs in Ghidra. It is unclear if:
+A) These are truly parameterless functions or
+B) These have parameters, but the game.MAP files missed these parameters due to a strange build setup (ie some sort of asm-inline function table or low-level trickery), which means the splits.txt actually does need updating.
+
+Try not to "solve" this problem unless absolutely confident.
+
+Unsolved problem 2) `configure.py` has several build flags which can influence binary output. This is just as important to code matching as the code itself! The exact compiler version and flags for each module is not known yet.
 
 **Key relationships:** Unit → Object file → Source file. Use symbols for context, Ghidra decomp for 0% functions.
 

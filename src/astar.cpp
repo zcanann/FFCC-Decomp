@@ -674,8 +674,8 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 
 	escapeDir.Normalize();
 
-	double behindBestDist = -1000000.0;
-	double aheadBestDist  = -1000000.0;
+	float behindBestDist = -1000000.0f;
+	float aheadBestDist  = -1000000.0f;
 
 	CAPos* behindBest = (CAPos*)nullptr;
 	CAPos* aheadBest  = (CAPos*)nullptr;

@@ -1,6 +1,8 @@
 #ifndef _PPP_MATRIXXYZ_H_
 #define _PPP_MATRIXXYZ_H_
 
-void pppMatrixXYZ(void);
+#include "ffcc/partMng.h"
+
+void pppMatrixXYZ(pppFMATRIX& matrix, PPPCREATEPARAM* param);
 
 #endif // _PPP_MATRIXXYZ_H_

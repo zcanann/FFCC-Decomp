@@ -1,11 +1,10 @@
 #include "ffcc/pppPoint.h"
-#include <stddef.h>
 
 // Global state - assembly shows access to static data 
 static int pppPointEnabled = 0;
-static PppData* gPppData1 = NULL;
-static PppData* gPppData2 = NULL; 
-static PppData* gPppCtx = NULL;
+static PppData* gPppData1 = 0;
+static PppData* gPppData2 = 0; 
+static PppData* gPppCtx = 0;
 
 /*
  * --INFO--

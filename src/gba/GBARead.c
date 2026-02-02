@@ -27,14 +27,24 @@ s32 GBAReadAsync(s32 chan, u8* dst, u8* status, GBACallback callback) {
     return __GBATransfer(chan, 1, 5, ReadProc);
 }
 
-s32 GBARead(s32 chan, u8* dst, u8* status) {
-    s32 tmp;
-    GBAControl* gba = &__GBA[chan];
+void GBARead(s32 chan, u8* dst, u8* status) {
+    GBAControl* gba;
     s32 ret;
-    ret = GBAReadAsync(chan, dst, status, __GBASyncCallback);
-    if (ret != GBA_READY) {
-        return ret;
+
+    gba = &__GBA[chan];
+
+    if (gba->callback != NULL) {
+        ret = 2;
+    } else {
+        gba->output[0] = 0x14;
+        gba->ptr = dst;
+        gba->status = status;
+        gba->callback = __GBASyncCallback;
+
+        ret = __GBATransfer(chan, 1, 5, ReadProc);
     }
 
-    return __GBASync(chan);
+    if (ret == 0) {
+        __GBASync(chan);
+    }
 }

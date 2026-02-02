@@ -50,7 +50,7 @@ s32 GBAGetStatusAsync(s32 chan, u8* status, GBACallback callback);
 s32 GBAReset(s32 chan, u8* status);
 s32 GBAResetAsync(s32 chan, u8* status, GBACallback callback);
 s32 GBAGetProcessStatus(s32 chan, u8* percentp);
-s32 GBARead(s32 chan, u8* dst, u8* status);
+void GBARead(s32 chan, u8* dst, u8* status);
 s32 GBAReadAsync(s32 chan, u8* dst, u8* status, GBACallback callback);
 s32 GBAWrite(s32 chan, u8* src, u8* status);
 s32 GBAWriteAsync(s32 chan, u8* src, u8* status, GBACallback callback);

@@ -16,85 +16,93 @@ void pppScaleLoopAuto(void* arg1, void* arg2, void* arg3)
 		return;
 	}
 	
-	int** arg3Data = (int**)arg3;
 	int* arg2Data = (int*)arg2;
+	int* arg3Data0 = (int*)((int**)arg3)[0];
 	int* arg1Data = (int*)arg1;
 	
-	// Load first data pointer and check condition
-	int* data1 = arg3Data[0];
+	// Check condition for first operation
 	if (arg2Data[0] == arg1Data[3]) {
-		// Calculate pointer and add values
-		float* ptr1 = (float*)((char*)arg1 + (int)data1 + 0x80);
-		ptr1[0] += ((float*)arg2)[2];
-		ptr1[1] += ((float*)arg2)[3];
-		ptr1[2] += ((float*)arg2)[4];
+		float* targetPtr = (float*)((char*)arg1 + (int)arg3Data0 + 0x80);
+		float* arg2Float = (float*)arg2;
+		targetPtr[0] += arg2Float[2];
+		targetPtr[1] += arg2Float[3];
+		targetPtr[2] += arg2Float[4];
 	}
 	
-	// Load scale data pointer
-	int* data3 = arg3Data[3];
-	int* data3_ptr = (int*)data3[0];
-	float* scaleData = (float*)((char*)arg1 + (int)data3_ptr + 0x80);
-	char* scaleBytes = (char*)scaleData;
+	// Load scale data structure
+	int** arg3Ptrs = (int**)arg3;
+	int* scaleDataPtr = (int*)arg3Ptrs[3][0];
+	char* scaleTarget = (char*)arg1 + (int)scaleDataPtr + 0x80;
+	float* scaleData = (float*)scaleTarget;
 	
-	// Check if initialization needed
-	if (scaleBytes[28] == 0) {
-		scaleBytes[28] = 1;
+	// Check initialization flag
+	if (scaleTarget[28] == 0) {
+		scaleTarget[28] = 1;
 		scaleData[4] = scaleData[0];
 		scaleData[5] = scaleData[1];
 		scaleData[6] = scaleData[2];
-		scaleBytes[32] = ((char*)arg2)[29];
-		scaleBytes[33] = ((char*)arg2)[30];
+		scaleTarget[32] = ((char*)arg2)[29];
+		scaleTarget[33] = ((char*)arg2)[30];
 		return;
 	}
 	
-	short angle = *(short*)(scaleBytes + 30);
-	if (angle < 90) {
-		signed char counter = scaleBytes[32];
+	short currentAngle = *(short*)(scaleTarget + 30);
+	if (currentAngle < 90) {
+		signed char counter = scaleTarget[32];
 		if (counter > 0) {
-			scaleBytes[32] = counter - 1;
-			float delta = scaleData[9];
-			scaleData[0] += delta;
-			scaleData[1] += delta;
-			scaleData[2] += delta;
+			scaleTarget[32] = counter - 1;
+			float deltaValue = scaleData[9];
+			scaleData[0] += deltaValue;
+			scaleData[1] += deltaValue;
+			scaleData[2] += deltaValue;
 		}
-	} else if (angle < 270) {
-		signed char counter = scaleBytes[33];
-		if (counter > 0) {
-			scaleBytes[33] = counter - 1;
-			float delta = scaleData[9];
-			scaleData[0] += delta;
-			scaleData[1] += delta;
-			scaleData[2] += delta;
-		}
-	} else {
-		scaleBytes[29]++;
-		unsigned char cycleLimit = ((char*)arg2)[28];
-		if (scaleBytes[29] >= cycleLimit) {
-			scaleBytes[29] = 0;
-			*(short*)(scaleBytes + 30) = 0;
-			scaleBytes[32] = ((char*)arg2)[29];
-			scaleBytes[33] = ((char*)arg2)[30];
-		} else {
-			// Calculate angle increment and sine lookup
-			int angleIncrement = 360 / cycleLimit;
-			angle += angleIncrement;
-			*(short*)(scaleBytes + 30) = angle;
-			
-			// Sine table lookup and scaling
-			extern float lbl_801EC9F0[];
-			int tableIndex = (angle * 32768) / 360;
-			float sine = lbl_801EC9F0[(tableIndex & 0x3FFC) >> 2];
-			
-			float baseScale = ((float*)arg2)[6];
-			float scaleRange = ((float*)arg2)[8];
-			float delta = baseScale * sine * scaleRange;
-			
-			scaleData[9] = delta;
-			scaleData[0] += delta;
-			scaleData[1] += delta;
-			scaleData[2] += delta;
-		}
+		return;
 	}
+	
+	if (currentAngle < 270) {
+		signed char counter = scaleTarget[33];
+		if (counter > 0) {
+			scaleTarget[33] = counter - 1;
+			float deltaValue = scaleData[9];
+			scaleData[0] += deltaValue;
+			scaleData[1] += deltaValue;
+			scaleData[2] += deltaValue;
+		}
+		return;
+	}
+	
+	// Handle cycle completion
+	scaleTarget[29]++;
+	unsigned char cycleLimit = ((char*)arg2)[28];
+	signed char currentCycle = scaleTarget[29];
+	if ((unsigned char)currentCycle >= cycleLimit) {
+		scaleTarget[29] = 0;
+		*(short*)(scaleTarget + 30) = 0;
+		scaleTarget[32] = ((char*)arg2)[29];
+		scaleTarget[33] = ((char*)arg2)[30];
+		return;
+	}
+	
+	// Calculate angle increment and update angle
+	int angleIncrement = 360 / (int)cycleLimit;
+	currentAngle += angleIncrement;
+	*(short*)(scaleTarget + 30) = currentAngle;
+	
+	// Advanced sine table lookup using fixed-point arithmetic
+	extern float lbl_801EC9F0[];
+	int angleScaled = currentAngle * 32768;
+	int angleNormalized = angleScaled / 360;
+	int tableLookup = (angleNormalized & 0x3FFC) >> 2;
+	float sineValue = lbl_801EC9F0[tableLookup];
+	
+	float baseScale = ((float*)arg2)[6];
+	float scaleRange = ((float*)arg2)[8];
+	float scaleFactor = baseScale * sineValue * scaleRange;
+	
+	scaleData[9] = scaleFactor;
+	scaleData[0] += scaleFactor;
+	scaleData[1] += scaleFactor;
+	scaleData[2] += scaleFactor;
 }
 
 /*
@@ -112,10 +120,11 @@ void pppScaleLoopAutoCon(void* arg1, void* arg2)
 	int* data = arg2Data[3];
 	int* ptr = (int*)data[0];
 	
-	float* targetData = (float*)((char*)arg1 + (int)ptr + 0x80);
-	char* targetBytes = (char*)targetData;
+	void* targetPtr = (void*)((char*)arg1 + (int)ptr + 0x80);
+	float* targetData = (float*)targetPtr;
+	char* targetBytes = (char*)targetPtr;
 	
-	// Initialize float values
+	// Initialize float values to 0.0f
 	targetData[0] = 0.0f;
 	targetData[1] = 0.0f;
 	targetData[2] = 0.0f;
@@ -124,7 +133,7 @@ void pppScaleLoopAutoCon(void* arg1, void* arg2)
 	targetData[6] = 0.0f;
 	targetData[9] = 0.0f;
 	
-	// Initialize byte values
+	// Initialize byte values to 0
 	targetBytes[28] = 0;
 	targetBytes[29] = 0;
 	targetBytes[30] = 0;

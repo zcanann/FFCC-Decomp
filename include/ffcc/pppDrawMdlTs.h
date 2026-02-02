@@ -7,8 +7,8 @@ struct _pppCtrlTable;
 
 void pppDrawMdlTsCon(struct _pppPObject* obj, struct PDrawMdlTs* data);
 void pppDrawMdlTsCon3(struct _pppPObject* obj, struct PDrawMdlTs* data);
-void pppDrawMdlTs(void);
+void pppDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct PDrawMdlTs* param);
 void pppDrawDrawMdlTs0(struct _pppPObject*, struct PDrawMdlTs*, struct _pppCtrlTable*);
-void pppDrawDrawMdlTs(void);
+void pppDrawDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _pppCtrlTable* ctrl);
 
 #endif // _FFCC_PPPDRAWMDLTS_H_

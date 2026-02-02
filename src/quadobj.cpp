@@ -36,37 +36,27 @@ void CGQuadObj::onDestroy()
  */
 void CGQuadObj::onDraw()
 {
-    // m_vertexCount == 0 or flag bit not set → nothing to draw
-    if (m_vertexCount == 0 || (CFlatFlags & 0x10000) == 0)
-	{
-        return;
-	}
+    if (m_vertexCount != 0 && (CFlatFlags & 0x10000) != 0) {
+        GXColor white = { 0xFF, 0xFF, 0xFF, 0xFF };
+        GXSetChanMatColor(GX_COLOR0A0, white);
+        GXLoadPosMtxImm(gFlatPosMtx, GX_PNMTX0);
+        GXBegin(GX_TRIANGLES, GX_VTXFMT0, (u32)m_vertexCount * 6);
 
-    GXColor white = { 0xFF, 0xFF, 0xFF, 0xFF };
-    GXSetChanMatColor(GX_COLOR0A0, white);
-    GXLoadPosMtxImm(gFlatPosMtx, GX_PNMTX0);
-    GXBegin(GX_TRIANGLES, GX_VTXFMT0, m_vertexCount * 6);
-
-    const float y0 = m_yBase;
-    const float y1 = m_yBase + m_yHeight;
-
-    for (int i = 0; i < m_vertexCount; ++i)
-    {
-        const int next = (i + 1) % m_vertexCount;
-        const QuadVertex& v0 = m_vertices[i];
-        const QuadVertex& v1 = m_vertices[next];
-
-        // Bottom edge vertices
-        GXPosition3f32(v0.x, y0, v0.z);
-        GXPosition3f32(v1.x, y0, v1.z);
-
-        // Top edge vertices
-        GXPosition3f32(v0.x, y1, v0.z);
-        GXPosition3f32(v1.x, y1, v1.z);
-
-        // Extra two verts (same v0 bottom/top) to form the second triangle
-        GXPosition3f32(v0.x, y0, v0.z);
-        GXPosition3f32(v0.x, y1, v0.z);
+        int i = 0;
+        QuadVertex* pVert = m_vertices;
+        while (i < (int)m_vertexCount) {
+            int next = (i + 1) % (int)m_vertexCount;
+            
+            GXPosition3f32(pVert->x, m_yBase, pVert->z);
+            GXPosition3f32(m_vertices[next].x, m_yBase, m_vertices[next].z);
+            GXPosition3f32(pVert->x, m_yBase + m_yHeight, pVert->z);
+            GXPosition3f32(m_vertices[next].x, m_yBase + m_yHeight, m_vertices[next].z);
+            GXPosition3f32(pVert->x, m_yBase, pVert->z);
+            GXPosition3f32(pVert->x, m_yBase + m_yHeight, pVert->z);
+            
+            pVert++;
+            i++;
+        }
     }
 }
 
@@ -87,52 +77,42 @@ int CGQuadObj::GetCID()
  */
 bool CGQuadObj::isInner(Vec* vec)
 {
-    int count = m_vertexCount;
-
-    if (count != 0)
-    {
+    u32 count = (u32)m_vertexCount;
+    
+    if (count != 0) {
         float px = vec->x;
-        float py = vec->y;
         float pz = vec->z;
-
-        if (m_bboxMinX <= px && m_bboxMinZ <= pz && m_bboxMaxX >= px && m_bboxMaxZ >= pz && m_yBase <= py)
-        {
-            float top = m_yBase + m_yHeight;
-
-            if (top >= py)
-            {
-                char* p = reinterpret_cast<char*>(this);
-                int i;
-
-                for (i = 0; i < count; i++)
-                {
-					// TODO: These are likely base object fields, need to get that sorted out.
-                    float z0 = *reinterpret_cast<float*>(p + 0x58);
-                    float x0 = *reinterpret_cast<float*>(p + 0x54);
-                    int next = (i + 1) % count;
-                    const QuadVertex& v1 = m_vertices[next];
-                    float dz0 = pz - z0;
-                    float dx0 = px - x0;
-                    float dz1 = v1.z - z0;
-                    float dx1 = v1.x - x0;
-                    float cross = dx1 * dz0 - dz1 * dx0;
-
-                    if (cross < EPS)
-                    {
+        
+        if ((m_bboxMinX <= px && m_bboxMinZ <= pz) && 
+            (px <= m_bboxMaxX && pz <= m_bboxMaxZ)) {
+            if (m_yBase <= vec->y && vec->y <= m_yBase + m_yHeight) {
+                u32 i = 0;
+                u32 remaining = count;
+                QuadVertex* pVert = m_vertices;
+                
+                while (remaining != 0) {
+                    float z0 = pVert->z;
+                    float x0 = pVert->x;
+                    int next = ((i + 1) - ((int)(i + 1) / (int)count) * count);
+                    float cross = (m_vertices[next].x - x0) * (pz - z0) - 
+                                  (m_vertices[next].z - z0) * (px - x0);
+                    
+                    if (!(EPS <= cross)) {
                         break;
                     }
-
-                    p += sizeof(QuadVertex);
+                    
+                    pVert++;
+                    i++;
+                    remaining--;
                 }
-
-                if (i == count)
-                {
+                
+                if (i == count) {
                     return true;
                 }
             }
         }
     }
-
+    
     return false;
 }
 

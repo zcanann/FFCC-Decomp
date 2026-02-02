@@ -23,6 +23,11 @@ struct _pppColorWork
     _pppColor result; // 0x8
 }; // Size 0xC
 
+// External data references used by pppColor
+extern int lbl_8032ED70;
+extern float lbl_8032ED50;
+extern double lbl_8032FED0;
+
 void pppColor(void* param1, void* param2, void* param3);
 void pppColorCon(void* param1, void* param2);
 

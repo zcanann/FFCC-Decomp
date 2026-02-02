@@ -1,14 +1,54 @@
 #include <stdlib.h>
 #include <dolphin.h>
 #include <dolphin/os.h>
+#include <string.h>
 
 #include "dolphin/os/__os.h"
 
 __declspec(section ".ctors") extern void (* _ctors[])();
 __declspec(section ".dtors") extern void (* _dtors[])();
 
+// External symbols for initialization
+extern char _rom_copy_info[];
+extern char _bss_init_info[];
+
+// Structure for ROM copy info
+typedef struct {
+    void* dst;
+    void* src; 
+    unsigned int size;
+} RomCopyInfo;
+
+// Structure for BSS init info  
+typedef struct {
+    void* dst;
+    unsigned int size;
+} BssInitInfo;
+
 static void __init_cpp(void);
 static void __fini_cpp(void);
+
+__declspec(section ".init") void __init_data_80003340(void)
+{
+    RomCopyInfo* romInfo = (RomCopyInfo*)_rom_copy_info;
+    
+    // Process ROM copy entries
+    while (romInfo->size != 0) {
+        if (romInfo->dst != romInfo->src) {
+            memcpy(romInfo->dst, romInfo->src, romInfo->size);
+            __flush_cache(romInfo->dst, romInfo->size);
+        }
+        romInfo++;
+    }
+    
+    BssInitInfo* bssInfo = (BssInitInfo*)_bss_init_info;
+    
+    // Process BSS initialization entries  
+    while (bssInfo->size != 0) {
+        memset(bssInfo->dst, 0, bssInfo->size);
+        bssInfo++;
+    }
+}
 
 __declspec(section ".init") asm void __init_hardware(void)
 { // clang-format off

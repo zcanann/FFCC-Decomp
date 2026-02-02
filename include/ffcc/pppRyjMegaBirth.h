@@ -7,7 +7,12 @@ typedef _PARTICLE_DATA PRyjMegaBirth; // Size 0x140
 
 struct VRyjMegaBirth
 {
-
+    Mtx m_worldMatrix;
+    Vec *m_particleBlock;
+    u32 m_numParticles;
+    PARTICLE_WMAT *m_worldMatrixBlock;
+    _PARTICLE_COLOR *m_colorBlock;
+    Vec m_accelerationAxis;
 };
 
 void get_rand(void);

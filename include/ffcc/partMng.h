@@ -8,6 +8,7 @@
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include <dolphin/types.h>
 
 class CChara;
 class CChunkFile;
@@ -93,6 +94,9 @@ struct _PARTICLE_DATA
 
 struct _pppPObject
 {
+    s32 m_graphId;              // 0x0
+    pppFMATRIX m_localMatrix;   // 0x4 (size 0x30)
+    // Additional members may exist
 };
 
 struct pppFVECTOR4

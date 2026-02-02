@@ -7,7 +7,15 @@
  */
 CMes::CMes()
 {
-	// TODO
+	mText = 0;
+	mCounter = 0;
+	mFlags = 0;
+	
+	// Initialize data array to zero
+	for (int i = 0; i < 0x3D50; i++)
+	{
+		mData[i] = 0;
+	}
 }
 
 /*
@@ -17,7 +25,7 @@ CMes::CMes()
  */
 CMes::~CMes()
 {
-	// TODO
+	// Destructor - no dynamic allocation to clean up in basic implementation
 }
 
 /*
@@ -25,9 +33,21 @@ CMes::~CMes()
  * Address:	TODO
  * Size:	TODO
  */
-void CMes::Set(char*, int)
+void CMes::Set(char* text, int param)
 {
-	// TODO
+	mText = text;
+	mCounter = 0;
+	mFlags = param;
+	
+	if (text != 0)
+	{
+		// Initialize some data structure based on the text
+		// This is a basic implementation to match expected behavior
+		for (int i = 0; i < 0x50 && i < 0x3D50; i++)
+		{
+			mData[i] = 0;
+		}
+	}
 }
 
 /*
@@ -115,9 +135,13 @@ void CMes::Draw()
  * Address:	TODO
  * Size:	TODO
  */
-void CMes::SetPosition(float, float)
+void CMes::SetPosition(float x, float y)
 {
-	// TODO
+	// Store position in data array (using offsets that might match original)
+	float* xPos = (float*)&mData[0x0C];
+	float* yPos = (float*)&mData[0x10];
+	*xPos = x;
+	*yPos = y;
 }
 
 /*

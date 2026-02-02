@@ -12,9 +12,8 @@ void pppMatrixScl(void* mtx, void* data)
     Mtx* mtxPtr = (Mtx*)((u8*)matrix + 16);
     
     void* dataPtr = ((void**)data)[3];
-    u32* indices = (u32*)dataPtr;
-    u32 index1 = indices[0];
-    u32 index2 = indices[1];
+    u32 index1 = ((u32*)dataPtr)[0];
+    u32 index2 = ((u32*)dataPtr)[1];
     
     f32* scale1 = (f32*)((u8*)matrix + index1 + 0x80);
     f32* scale2 = (f32*)((u8*)matrix + index2 + 0x80);

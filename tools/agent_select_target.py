@@ -127,7 +127,7 @@ def select_target(candidates):
     return selected
 
 def main():
-    report_path = Path(__file__).parent / "build/GCCP01/report.json"
+    report_path = Path(__file__).parent.parent / "build/GCCP01/report.json"
     
     if not report_path.exists():
         print(f"ERROR: {report_path} not found. Run 'ninja' first.")

@@ -1,13 +1,24 @@
 #include "ffcc/RedSound/RedExecute.h"
+#include "types.h"
+#include <string.h>
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c2fc4
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GetRandomData()
+u8 GetRandomData()
 {
-	// TODO
+    extern u8 DAT_8032f4a8;
+    extern u8* DAT_8021dcce;
+    
+    u8 uVar1 = DAT_8032f4a8;
+    DAT_8032f4a8++;
+    return DAT_8021dcce[uVar1];
 }
 
 /*
@@ -22,12 +33,19 @@ void PitchCompute(int, int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c30fc
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _ReverbNullCallback(AXFX_BUFFERUPDATE*, void*)
+void _ReverbNullCallback(AXFX_BUFFERUPDATE* param_1, void*)
 {
-	// TODO
+    u32* data = (u32*)param_1;
+    memset((void*)data[0], 0, 0x280);
+    memset((void*)data[1], 0, 0x280);
+    memset((void*)data[2], 0, 0x280);
 }
 
 /*
@@ -222,12 +240,26 @@ void _AdsrDataExecute(RedVoiceDATA*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c4fd4
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _VoiceDropedCallback(void*)
+void _VoiceDropedCallback(void* param_1)
 {
-	// TODO
+    extern u32* DAT_8032f444;
+    
+    u32* puVar1 = DAT_8032f444;
+    do {
+        if ((puVar1[5] != 0) && (puVar1[5] == (u32)param_1)) {
+            puVar1[0x23] = 0;
+            *puVar1 = 0;
+            puVar1[5] = 0;
+        }
+        puVar1 = puVar1 + 0x30;
+    } while (puVar1 < DAT_8032f444 + 0xc00);
 }
 
 /*

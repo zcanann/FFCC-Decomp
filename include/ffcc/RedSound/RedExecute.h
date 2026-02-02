@@ -1,6 +1,8 @@
 #ifndef _FFCC_REDSOUND_REDEXECUTE_H
 #define _FFCC_REDSOUND_REDEXECUTE_H
 
+#include "types.h"
+
 class AXFX_BUFFERUPDATE;
 struct RedReverbDATA;
 struct RedTrackDATA;
@@ -10,7 +12,7 @@ struct RedNoteDATA;
 struct RedSoundCONTROL;
 struct RedKeyOnDATA;
 
-void GetRandomData();
+u8 GetRandomData();
 void PitchCompute(int, int, int, int);
 void _ReverbNullCallback(AXFX_BUFFERUPDATE*, void*);
 void ReverbAreaAlloc(unsigned long);

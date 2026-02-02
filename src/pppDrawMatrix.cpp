@@ -1,11 +1,18 @@
 #include "ffcc/pppDrawMatrix.h"
+#include "ffcc/partMng.h"
+
+#include <dolphin/mtx.h>
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80065350
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppDrawMatrix(void)
+void pppDrawMatrix(struct _pppPObject* param_1)
 {
-	// TODO
+	PSMTXConcat(ppvWorldMatrix, *(Mtx*)((char*)param_1 + 0x10), *(Mtx*)((char*)param_1 + 0x40));
 }

@@ -1,0 +1,4 @@
+Sun Feb  1 17:21:29 PST 2026: Starting work on pppRyjMegaBirth unit
+Sun Feb  1 17:21:54 PST 2026: pppRyjMegaBirth unit - target functions are highly complex (1000+ byte functions)
+Sun Feb  1 17:21:54 PST 2026: Functions include extensive math operations, RNG calls, particle system logic
+Sun Feb  1 17:21:54 PST 2026: Requires Ghidra decompilation analysis - beyond scope of single automation session

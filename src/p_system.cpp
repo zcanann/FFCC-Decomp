@@ -32,12 +32,16 @@ void CSystemPcs::Quit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80047d60
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSystemPcs::GetTable(unsigned long)
+int CSystemPcs::GetTable(unsigned long index)
 {
-	// TODO
+	return index * 0x15c + -0x7fe15f0c;
 }
 
 /*

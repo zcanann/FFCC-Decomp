@@ -5,7 +5,7 @@ struct _pppPObject;
 class PVertexApMtx;
 struct Vec;
 
-void pppVertexApMtxCon(void);
+void pppVertexApMtxCon(_pppPObject* obj, PVertexApMtx* vtx);
 void apea(_pppPObject*, PVertexApMtx*, Vec*);
 void pppVertexApMtx(void);
 

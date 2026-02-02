@@ -33,5 +33,37 @@ void apea(_pppPObject*, PVertexApAt*, unsigned short)
  */
 void pppVertexApAt(_pppPObject* obj, PVertexApAt* data, void* param3)
 {
-	// Complex function with loops and randomization - placeholder for now
+	// Based on assembly analysis - complex function with loops and object creation
+	void* dataPtr = *(void**)((char*)data + 0xc);
+	void* basePtr = *(void**)dataPtr;
+	void* targetPtr = (char*)obj + (int)basePtr + 0x80;
+	
+	// Assembly shows checks for global flags and branches
+	int globalFlag = *(int*)0x8032ED70; // Global flag check
+	if (globalFlag == 0) {
+		short value = *(short*)((char*)data + 0x4);
+		if (value < 0) return;
+		
+		unsigned short currentValue = *(unsigned short*)((char*)targetPtr + 0x2);
+		if (currentValue != 0) {
+			// Complex loop logic would go here
+			// For now, simplified version
+			return;
+		}
+		
+		// Function calls pppCreatePObject and sets various values
+		// This is a simplified placeholder implementation
+		unsigned char loopCount = *(unsigned char*)((char*)data + 0x6);
+		for (int i = 0; i < loopCount; i++) {
+			// Loop body would implement object creation logic
+		}
+	}
+	
+	// Set final values
+	unsigned char finalValue = *(unsigned char*)((char*)data + 0x7);
+	*(short*)((char*)targetPtr + 0x2) = finalValue;
+	
+	if (*(short*)((char*)targetPtr + 0x2) > 0) {
+		(*(short*)((char*)targetPtr + 0x2))--;
+	}
 }

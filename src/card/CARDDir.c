@@ -3,21 +3,25 @@
 #include "dolphin/card/__card.h"
 
 // prototypes
-static void WriteCallback(s32 chan, s32 result);
-static void EraseCallback(s32 chan, s32 result);
+static void WriteCallback2(s32 chan, s32 result);
+static void EraseCallback2(s32 chan, s32 result);
 
 CARDDir* __CARDGetDirBlock(CARDControl* card) {
     ASSERTLINE(54, card->currentDir);
     return card->currentDir;
 }
 
-static void WriteCallback(s32 chan, s32 result) {
-    CARDControl* card = &__CARDBlock[chan];
+static void WriteCallback2(s32 chan, s32 result) {
+    CARDControl* card;
     CARDCallback callback;
 
+    card = &__CARDBlock[chan];
     if (result >= 0) {
-        CARDDir* dir0 = (CARDDir*)((u8*)card->workArea + 0x2000);
-        CARDDir* dir1 = (CARDDir*)((u8*)card->workArea + 0x4000);
+        CARDDir* dir0;
+        CARDDir* dir1;
+        
+        dir0 = (CARDDir*)((u8*)card->workArea + 0x2000);
+        dir1 = (CARDDir*)((u8*)card->workArea + 0x4000);
 
         ASSERTLINE(79, card->currentDir);
 
@@ -31,8 +35,9 @@ static void WriteCallback(s32 chan, s32 result) {
         }
     }
 
-    if (!card->apiCallback)
+    if (!card->apiCallback) {
         __CARDPutControlBlock(card, result);
+    }
 
     callback = card->eraseCallback;
     if (callback) {
@@ -41,22 +46,25 @@ static void WriteCallback(s32 chan, s32 result) {
     }
 }
 
-static void EraseCallback(s32 chan, s32 result) {
-    CARDControl* card = &__CARDBlock[chan];
+static void EraseCallback2(s32 chan, s32 result) {
+    CARDControl* card;
     CARDCallback callback;
     CARDDir* dir;
     u32 addr;
 
+    card = &__CARDBlock[chan];
     if (result >= 0) {
         dir = __CARDGetDirBlock(card);
         addr = ((u32)dir - (u32)card->workArea) / 0x2000 * card->sectorSize;
-        result = __CARDWrite(chan, addr, 0x2000, dir, WriteCallback);
-        if (result >= 0)
+        result = __CARDWrite(chan, addr, 0x2000, dir, WriteCallback2);
+        if (result >= 0) {
             return;
+        }
     }
 
-    if (!card->apiCallback)
+    if (!card->apiCallback) {
         __CARDPutControlBlock(card, result);
+    }
 
     callback = card->eraseCallback;
     if (callback) {
@@ -85,5 +93,5 @@ s32 __CARDUpdateDir(s32 chan, CARDCallback callback) {
 
     card->eraseCallback = callback;
     addr = ((u32)dir - (u32)card->workArea) / 0x2000 * card->sectorSize;
-    return __CARDEraseSector(chan, addr, EraseCallback);
+    return __CARDEraseSector(chan, addr, EraseCallback2);
 }

@@ -7,7 +7,7 @@ struct PppData {
     void* ptr;
 };
 
-void pppPoint(void);
-void pppPointCon(void);
+void pppPoint(PppData* a, PppData* b, PppData* c);
+void pppPointCon(PppData* a, PppData* b);
 
 #endif // _PPP_POINT_H_

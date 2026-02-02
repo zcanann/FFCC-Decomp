@@ -29,7 +29,7 @@ void pppWDrawMatrixFrontLoop(struct _pppPObject* param_1)
 	
 	PSMTXMultVec(ppvCameraMatrix0, &local_18, &local_18);
 	
-	*(s32*)((char*)param_1 + 0x4c) = (s32)local_18.x;
+	*(float*)((char*)param_1 + 0x4c) = local_18.x;
 	*(float*)((char*)param_1 + 0x5c) = local_18.y;
 	*(float*)((char*)param_1 + 0x6c) = local_18.z;
 }

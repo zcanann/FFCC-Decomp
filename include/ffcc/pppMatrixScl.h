@@ -3,6 +3,14 @@
 
 #include "dolphin/mtx.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void pppMatrixScl(void* mtx, void* data);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _PPP_MATRIXSCL_H_

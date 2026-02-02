@@ -18,13 +18,9 @@ asm void DCFlashInvalidate(void) {
     blr
 }
 
-asm void DCEnable(void) {
-    nofralloc
-    sync
-    mfspr r3, HID0
-    ori   r3, r3, 0x4000
-    mtspr HID0, r3
-    blr
+void DCEnable(void) {
+    PPCSync();
+    PPCMthid0(PPCMfhid0() | HID0_DCE);
 }
 
 asm void DCDisable(void) {
@@ -83,39 +79,31 @@ asm void DCBlockInvalidate(register void* addr) {
     blr
 }
 
-asm void DCInvalidateRange(register void* addr, register u32 nBytes) {
-    nofralloc
-    cmplwi nBytes, 0
-    blelr
-    clrlwi r5, addr, 27
-    add    nBytes, nBytes, r5
-    addi   nBytes, nBytes, 31
-    srwi   nBytes, nBytes, 5
-    mtctr  nBytes
-
-@1
-    dcbi r0, addr
-    addi addr, addr, 32
-    bdnz @1
-    blr
+void DCInvalidateRange(void* addr, u32 nBytes) {
+    if (nBytes == 0) {
+        return;
+    }
+    
+    u32 alignedAddr = (u32)addr & ~31;
+    u32 numLines = ((u32)addr + nBytes + 31 - alignedAddr) >> 5;
+    
+    for (u32 i = 0; i < numLines; i++) {
+        DCBlockInvalidate((void*)(alignedAddr + (i << 5)));
+    }
 }
 
-asm void DCFlushRange(register void* addr, register u32 nBytes) {
-    nofralloc
-    cmplwi nBytes, 0
-    blelr
-    clrlwi r5, addr, 27
-    add nBytes, nBytes, r5
-    addi nBytes, nBytes, 31
-    srwi nBytes, nBytes, 5
-    mtctr nBytes
-
-@1
-    dcbf r0, addr
-    addi addr, addr, 32
-    bdnz @1
-    sc
-    blr
+void DCFlushRange(void* addr, u32 nBytes) {
+    if (nBytes == 0) {
+        return;
+    }
+    
+    u32 alignedAddr = (u32)addr & ~31;
+    u32 numLines = ((u32)addr + nBytes + 31 - alignedAddr) >> 5;
+    
+    for (u32 i = 0; i < numLines; i++) {
+        DCBlockFlush((void*)(alignedAddr + (i << 5)));
+    }
+    PPCSync();
 }
 
 asm void DCStoreRange(register void* addr, register u32 nBytes) {

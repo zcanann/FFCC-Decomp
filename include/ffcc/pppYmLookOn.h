@@ -1,7 +1,27 @@
 #ifndef _PPP_YMLOOKON_H_
 #define _PPP_YMLOOKON_H_
 
-void pppConstructYmLookOn(void);
-void pppFrameYmLookOn(void);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+struct pppYmLookOn {
+    int field0_0x0[2]; // Placeholder structure based on Ghidra access patterns
+};
+
+struct UnkB {
+    int m_dataValIndex;
+};
+
+struct UnkC {
+    int* m_serializedDataOffsets;
+};
+
+void pppConstructYmLookOn(struct pppYmLookOn* pppYmLookOn, struct UnkC* param_2);
+void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct UnkB* param_2, struct UnkC* param_3);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _PPP_YMLOOKON_H_

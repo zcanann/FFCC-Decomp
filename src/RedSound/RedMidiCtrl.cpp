@@ -662,12 +662,64 @@ void __MidiCtrl_ChannelFix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c9098
+ * PAL Size: 288b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_VibrateOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_VibrateOn(RedSoundCONTROL* control, RedKeyOnDATA* keyOn, RedTrackDATA* track)
 {
-	// TODO
+	unsigned int depth;
+	int rate;
+	void* entry;
+	
+	// Set vibrato depth from first parameter byte (12-bit shift)
+	((int*)track)[0x20] = (unsigned int)(*(unsigned char*)((int*)track)[0]) << 0xc;
+	
+	// Set vibrato rate from second parameter byte
+	if (*(char*)(((int*)track)[0] + 1) == '\0') {
+		depth = 0x100;
+	} else {
+		depth = (unsigned int)(*(unsigned char*)(((int*)track)[0] + 1));
+	}
+	((int*)track)[0x1e] = 0x100000 / depth;
+	
+	// Set vibrato type from third parameter byte (lower 4 bits) 
+	// Note: This should reference a function pointer table, using placeholder for now
+	((int*)track)[0x1d] = (int)SineSwing; // Simplified for compilation
+	
+	// Initialize vibrato state
+	*(short*)((int)track + 0x8e) = 0;
+	*(short*)(((int*)track) + 0x23) = 0;
+	
+	// Advance parameter pointer by 3 bytes
+	((int*)track)[0] = ((int*)track)[0] + 3;
+	
+	// Apply to active sound entries
+	entry = (void*)0x8032f444; // DAT_8032f444
+	do {
+		if ((RedTrackDATA*)*(int*)entry == track) {
+			rate = 0x100;
+			*(short*)((int)entry + 0x28) = *(short*)(((int*)track) + 0x24);
+			
+			if (((int*)track)[0x1e] >> 0xc != 0) {
+				rate = 0x100 / (((int*)track)[0x1e] >> 0xc);
+			}
+			
+			if (*(short*)((int)track + 0x92) == 0) {
+				rate = 0;
+			} else {
+				rate = (int)*(short*)((int)track + 0x92) * rate * 4;
+			}
+			
+			((int*)entry)[8] = rate;
+			((int*)entry)[9] = 0;
+			((int*)entry)[7] = 0;
+		}
+		entry = (void*)((int)entry + 0xc0);
+	} while (entry < (void*)(0x8032f444 + 0xc00));
 }
 
 /*

@@ -23,7 +23,7 @@ void pppAngMove(void* dest, void* src, void* param1, void* param2)
         int* param1Ptr = (int*)param1;
         if (param1Ptr[3] == ((int*)dest)[3]) {
             srcPtr[0] += param1Ptr[2];
-            srcPtr[1] += param1Ptr[3];
+            srcPtr[1] += param1Ptr[3]; 
             srcPtr[2] += param1Ptr[4];
         }
     }
@@ -41,7 +41,7 @@ void pppAngMove(void* dest, void* src, void* param1, void* param2)
 void pppAngMoveCon(void* dest, void* param)
 {
     int* paramPtr = (int*)param;
-    int offset = paramPtr[1];
+    int offset = paramPtr[3];
     int* ptr = (int*)((char*)dest + offset + 0x80);
     ptr[2] = 0;
     ptr[1] = 0;

@@ -15,11 +15,19 @@ void UpdateParticle(VYmBreath*, PYmBreath*, PARTICLE_DATA*, VColor*, PARTICLE_CO
 void UpdateAllParticle(_pppPObject*, VYmBreath*, PYmBreath*, VColor*);
 void SetParticleMatrix(_pppPObject*, VYmBreath*, PARTICLE_DATA*, PARTICLE_WMAT*);
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void pppFrameYmBreath(void);
 void pppRenderYmBreath(void);
 void pppConstructYmBreath(void);
 void pppConstruct2YmBreath(void);
 void pppDestructYmBreath(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 void IsDeadGroupBreath(PYmBreath*, VYmBreath*, short);
 void SearchIndex(PYmBreath*, VYmBreath*, short&, short&, short);

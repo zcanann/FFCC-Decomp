@@ -80,7 +80,8 @@ void pppDestructCrystal2(pppCrystal2* pppCrystal2, UnkC* param_2)
  */
 void pppFrameCrystal2(pppCrystal2* pppCrystal2, UnkB* param_2, UnkC* param_3)
 {
-    // TODO: Implement frame logic
+    // TODO: Implement complex texture generation logic for crystal refraction
+    // This function generates dynamic textures for crystal rendering effects
 }
 
 /*

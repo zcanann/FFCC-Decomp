@@ -198,19 +198,19 @@ void GXSetDispCopyFrame2Field(GXCopyMode mode) {
 }
 
 void GXSetCopyClamp(GXFBClamp clamp) {
-    u8 clmpB;
-    u8 clmpT;
+    u32 clmpT;
+    u32 clmpB;
 
     CHECK_GXBEGIN(1431, "GXSetCopyClamp");
 
-    clmpT = (clamp & GX_CLAMP_TOP) == 1;
-    clmpB = (clamp & GX_CLAMP_BOTTOM) == 2;
+    clmpT = (clamp & GX_CLAMP_TOP) != 0;
+    clmpB = (clamp & GX_CLAMP_BOTTOM) != 0;
 
     SET_REG_FIELD(1435, __GXData->cpDisp, 1, 0, clmpT);
     SET_REG_FIELD(1436, __GXData->cpDisp, 1, 1, clmpB);
-
-    SET_REG_FIELD(1438, __GXData->cpTex, 1, 0, clmpT);
-    SET_REG_FIELD(1439, __GXData->cpTex, 1, 1, clmpB);
+    SET_REG_FIELD(1437, __GXData->cpTex, 1, 0, clmpT);
+    SET_REG_FIELD(1438, __GXData->cpTex, 1, 1, clmpB);
+    __GXData->bpSentNot = 0;
 }
 
 static u32 __GXGetNumXfbLines(u32 efbHt, u32 iScale) {
@@ -306,27 +306,12 @@ u32 GXSetDispCopyYScale(f32 vscale) {
 }
 
 void GXSetCopyClear(GXColor clear_clr, u32 clear_z) {
-    u32 reg;
-
     CHECK_GXBEGIN(1596, "GXSetCopyClear");
     ASSERTMSGLINE(1598, clear_z <= 0xFFFFFF, "GXSetCopyClear: Z clear value is out of range");
 
-    reg = 0;
-    SET_REG_FIELD(1601, reg, 8, 0, clear_clr.r);
-    SET_REG_FIELD(1602, reg, 8, 8, clear_clr.a);
-    SET_REG_FIELD(1602, reg, 8, 24, 0x4F);
-    GX_WRITE_RAS_REG(reg);
-
-    reg = 0;
-    SET_REG_FIELD(1607, reg, 8, 0, clear_clr.b);
-    SET_REG_FIELD(1608, reg, 8, 8, clear_clr.g);
-    SET_REG_FIELD(1608, reg, 8, 24, 0x50);
-    GX_WRITE_RAS_REG(reg);
-
-    reg = 0;
-    SET_REG_FIELD(1613, reg, 24, 0, clear_z);
-    SET_REG_FIELD(1613, reg, 8, 24, 0x51);
-    GX_WRITE_RAS_REG(reg);
+    GX_WRITE_RAS_REG((clear_clr.a << 8) | clear_clr.r | 0x4F000000);
+    GX_WRITE_RAS_REG((clear_clr.g << 8) | clear_clr.b | 0x50000000);
+    GX_WRITE_RAS_REG((clear_z & 0xFFFFFF) | 0x51000000);
     __GXData->bpSentNot = 0;
 }
 
@@ -334,50 +319,37 @@ void GXSetCopyFilter(GXBool aa, const u8 sample_pattern[12][2], GXBool vf, const
     u32 msLoc[4];
     u32 coeff0;
     u32 coeff1;
+    const u8* pattern;
 
     CHECK_GXBEGIN(1641, "GXSetCopyFilter");
 
-    if (aa != 0) {
-        msLoc[0] = 0;
-        SET_REG_FIELD(1645, msLoc[0], 4,  0, sample_pattern[0][0]);
-        SET_REG_FIELD(1646, msLoc[0], 4,  4, sample_pattern[0][1]);
-        SET_REG_FIELD(1647, msLoc[0], 4,  8, sample_pattern[1][0]);
-        SET_REG_FIELD(1648, msLoc[0], 4, 12, sample_pattern[1][1]);
-        SET_REG_FIELD(1649, msLoc[0], 4, 16, sample_pattern[2][0]);
-        SET_REG_FIELD(1650, msLoc[0], 4, 20, sample_pattern[2][1]);
-        SET_REG_FIELD(1651, msLoc[0], 8, 24, 1);
+    pattern = (const u8*)sample_pattern;
 
-        msLoc[1] = 0;
-        SET_REG_FIELD(1654, msLoc[1], 4,  0, sample_pattern[3][0]);
-        SET_REG_FIELD(1655, msLoc[1], 4,  4, sample_pattern[3][1]);
-        SET_REG_FIELD(1656, msLoc[1], 4,  8, sample_pattern[4][0]);
-        SET_REG_FIELD(1657, msLoc[1], 4, 12, sample_pattern[4][1]);
-        SET_REG_FIELD(1658, msLoc[1], 4, 16, sample_pattern[5][0]);
-        SET_REG_FIELD(1659, msLoc[1], 4, 20, sample_pattern[5][1]);
-        SET_REG_FIELD(1660, msLoc[1], 8, 24, 2);
-
-        msLoc[2] = 0;
-        SET_REG_FIELD(1663, msLoc[2], 4,  0, sample_pattern[6][0]);
-        SET_REG_FIELD(1664, msLoc[2], 4,  4, sample_pattern[6][1]);
-        SET_REG_FIELD(1665, msLoc[2], 4,  8, sample_pattern[7][0]);
-        SET_REG_FIELD(1666, msLoc[2], 4, 12, sample_pattern[7][1]);
-        SET_REG_FIELD(1667, msLoc[2], 4, 16, sample_pattern[8][0]);
-        SET_REG_FIELD(1668, msLoc[2], 4, 20, sample_pattern[8][1]);
-        SET_REG_FIELD(1669, msLoc[2], 8, 24, 3);
-
-        msLoc[3] = 0;
-        SET_REG_FIELD(1672, msLoc[3], 4,  0, sample_pattern[9][0]);
-        SET_REG_FIELD(1673, msLoc[3], 4,  4, sample_pattern[9][1]);
-        SET_REG_FIELD(1674, msLoc[3], 4,  8, sample_pattern[10][0]);
-        SET_REG_FIELD(1675, msLoc[3], 4, 12, sample_pattern[10][1]);
-        SET_REG_FIELD(1676, msLoc[3], 4, 16, sample_pattern[11][0]);
-        SET_REG_FIELD(1677, msLoc[3], 4, 20, sample_pattern[11][1]);
-        SET_REG_FIELD(1678, msLoc[3], 8, 24, 4);
+    if (aa == 0) {
+        msLoc[0] = 0x1666666;
+        msLoc[1] = 0x2666666;
+        msLoc[2] = 0x3666666;
+        msLoc[3] = 0x4666666;
     } else {
-        msLoc[0] = 0x01666666;
-        msLoc[1] = 0x02666666;
-        msLoc[2] = 0x03666666;
-        msLoc[3] = 0x04666666;
+        msLoc[0] = (pattern[0] & 0xF) | ((pattern[1] & 0xF) << 4) |
+                   ((pattern[2] & 0xF) << 8) | ((pattern[3] & 0xF) << 0xC) |
+                   ((pattern[4] & 0xF) << 0x10) | ((pattern[5] & 0xF) << 0x14) |
+                   0x1000000;
+
+        msLoc[1] = (pattern[6] & 0xF) | ((pattern[7] & 0xF) << 4) |
+                   ((pattern[8] & 0xF) << 8) | ((pattern[9] & 0xF) << 0xC) |
+                   ((pattern[10] & 0xF) << 0x10) | ((pattern[11] & 0xF) << 0x14) |
+                   0x2000000;
+
+        msLoc[2] = (pattern[12] & 0xF) | ((pattern[13] & 0xF) << 4) |
+                   ((pattern[14] & 0xF) << 8) | ((pattern[15] & 0xF) << 0xC) |
+                   ((pattern[16] & 0xF) << 0x10) | ((pattern[17] & 0xF) << 0x14) |
+                   0x3000000;
+
+        msLoc[3] = (pattern[18] & 0xF) | ((pattern[19] & 0xF) << 4) |
+                   ((pattern[20] & 0xF) << 8) | ((pattern[21] & 0xF) << 0xC) |
+                   ((pattern[22] & 0xF) << 0x10) | ((pattern[23] & 0xF) << 0x14) |
+                   0x4000000;
     }
 
     GX_WRITE_RAS_REG(msLoc[0]);
@@ -385,27 +357,14 @@ void GXSetCopyFilter(GXBool aa, const u8 sample_pattern[12][2], GXBool vf, const
     GX_WRITE_RAS_REG(msLoc[2]);
     GX_WRITE_RAS_REG(msLoc[3]);
 
-    coeff0 = 0;
-    SET_REG_FIELD(0, coeff0, 8, 24, 0x53);
-    coeff1 = 0;
-    SET_REG_FIELD(0, coeff1, 8, 24, 0x54);
-
-    if (vf != 0) {
-        SET_REG_FIELD(1702, coeff0, 6,  0, vfilter[0]);
-        SET_REG_FIELD(1703, coeff0, 6,  6, vfilter[1]);
-        SET_REG_FIELD(1704, coeff0, 6, 12, vfilter[2]);
-        SET_REG_FIELD(1705, coeff0, 6, 18, vfilter[3]);
-        SET_REG_FIELD(1706, coeff1, 6,  0, vfilter[4]);
-        SET_REG_FIELD(1707, coeff1, 6,  6, vfilter[5]);
-        SET_REG_FIELD(1708, coeff1, 6, 12, vfilter[6]);
+    if (vf == 0) {
+        coeff0 = 0x53595000;
+        coeff1 = 0x54000015;
     } else {
-        SET_REG_FIELD(0, coeff0, 6,  0, 0);
-        SET_REG_FIELD(0, coeff0, 6,  6, 0);
-        SET_REG_FIELD(0, coeff0, 6, 12, 21);
-        SET_REG_FIELD(0, coeff0, 6, 18, 22);
-        SET_REG_FIELD(0, coeff1, 6,  0, 21);
-        SET_REG_FIELD(0, coeff1, 6,  6,  0);
-        SET_REG_FIELD(0, coeff1, 6, 12,  0);
+        coeff0 = (vfilter[0] & 0x3F) | 0x53000000 | ((vfilter[1] & 0x3F) << 6) |
+                 ((vfilter[2] & 0x3F) << 0xC) | ((u32)vfilter[3] << 0x12);
+        coeff1 = (vfilter[4] & 0x3F) | 0x54000000 | ((vfilter[5] & 0x3F) << 6) |
+                 ((u32)vfilter[6] << 0xC);
     }
 
     GX_WRITE_RAS_REG(coeff0);

@@ -1,5 +1,8 @@
 #include "ffcc/pppShape.h"
 #include "ffcc/materialman.h"
+#include "ffcc/partMng.h"
+
+#include <string.h>
 
 extern "C" {
     extern CMaterialMan MaterialMan;
@@ -117,7 +120,29 @@ void pppCacheRefCnt0UpShapeTexture(pppShapeSt*, CMaterialSet*)
  */
 void pppCacheDumpShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
 {
-    // TODO: Implement function body
+    char textureUsed[256];
+    void* animData = shapeSt->m_animData;
+    
+    memset(textureUsed, 0, 256);
+    
+    void* currentFrame = animData;
+    for (int frameIndex = 0; frameIndex < *(short*)((int)animData + 6); frameIndex++) {
+        short shapeOffset = *(short*)((int)currentFrame + 0x10);
+        int shapeEntryOffset = 0;
+        
+        for (int shapeIndex = 0; shapeIndex < *(short*)((int)animData + shapeOffset + 2); shapeIndex++) {
+            int entryPtr = shapeEntryOffset + shapeOffset;
+            shapeEntryOffset += 8;
+            textureUsed[*(unsigned char*)((int)animData + entryPtr + 10)] = 1;
+        }
+        currentFrame = (void*)((int)currentFrame + 8);
+    }
+    
+    for (unsigned int textureIndex = 0; textureIndex < 256; textureIndex++) {
+        if (textureUsed[textureIndex] != 0) {
+            CacheDumpTexture__12CMaterialSetFiP13CAmemCacheSet(materialSet, textureIndex, CAMemCacheSet);
+        }
+    }
 }
 
 /*

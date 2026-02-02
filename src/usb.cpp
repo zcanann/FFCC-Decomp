@@ -176,3 +176,13 @@ void CUSB::RemoveMessageCallback(MessageCallback callback)
 void CUSB::Printf(char*, ...)
 {
 }
+
+/*
+ * --INFO--
+ * Address: 80022704
+ * Size: 32b
+ */
+void __sinit_usb_cpp()
+{
+	USB.m_managerStringTable = &PTR_PTR_DAT_801e88a4;
+}

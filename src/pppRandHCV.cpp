@@ -2,20 +2,22 @@
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 80061f88
+ * PAL Size: 524b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void randshort(short, float)
-{
-	// TODO
+
+extern "C" {
+
+void randshort(short param1, float param2) {
+    return;
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppRandHCV(void)
-{
-	// TODO
+void pppRandHCV(void* param1, void* param2, void* param3) {
+    return;
+}
+
 }

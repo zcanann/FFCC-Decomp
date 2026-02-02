@@ -36,35 +36,27 @@ void CGQuadObj::onDestroy()
  */
 void CGQuadObj::onDraw()
 {
-    // m_vertexCount == 0 or flag bit not set → nothing to draw
     if (m_vertexCount == 0 || (CFlatFlags & 0x10000) == 0)
-	{
         return;
-	}
 
     GXColor white = { 0xFF, 0xFF, 0xFF, 0xFF };
     GXSetChanMatColor(GX_COLOR0A0, white);
     GXLoadPosMtxImm(gFlatPosMtx, GX_PNMTX0);
     GXBegin(GX_TRIANGLES, GX_VTXFMT0, m_vertexCount * 6);
 
-    const float y0 = m_yBase;
-    const float y1 = m_yBase + m_yHeight;
+    float y0 = m_yBase;
+    float y1 = m_yBase + m_yHeight;
 
-    for (int i = 0; i < m_vertexCount; ++i)
+    for (int i = 0; i < m_vertexCount; i++)
     {
-        const int next = (i + 1) % m_vertexCount;
-        const QuadVertex& v0 = m_vertices[i];
-        const QuadVertex& v1 = m_vertices[next];
+        int next = (i + 1) % m_vertexCount;
+        QuadVertex& v0 = m_vertices[i];
+        QuadVertex& v1 = m_vertices[next];
 
-        // Bottom edge vertices
         GXPosition3f32(v0.x, y0, v0.z);
         GXPosition3f32(v1.x, y0, v1.z);
-
-        // Top edge vertices
         GXPosition3f32(v0.x, y1, v0.z);
         GXPosition3f32(v1.x, y1, v1.z);
-
-        // Extra two verts (same v0 bottom/top) to form the second triangle
         GXPosition3f32(v0.x, y0, v0.z);
         GXPosition3f32(v0.x, y1, v0.z);
     }
@@ -101,28 +93,24 @@ bool CGQuadObj::isInner(Vec* vec)
 
             if (top >= py)
             {
-                char* p = reinterpret_cast<char*>(this);
                 int i;
 
                 for (i = 0; i < count; i++)
                 {
-					// TODO: These are likely base object fields, need to get that sorted out.
-                    float z0 = *reinterpret_cast<float*>(p + 0x58);
-                    float x0 = *reinterpret_cast<float*>(p + 0x54);
+                    const QuadVertex& v0 = m_vertices[i];
                     int next = (i + 1) % count;
                     const QuadVertex& v1 = m_vertices[next];
-                    float dz0 = pz - z0;
-                    float dx0 = px - x0;
-                    float dz1 = v1.z - z0;
-                    float dx1 = v1.x - x0;
+                    
+                    float dz0 = pz - v0.z;
+                    float dx0 = px - v0.x;
+                    float dz1 = v1.z - v0.z;
+                    float dx1 = v1.x - v0.x;
                     float cross = dx1 * dz0 - dz1 * dx0;
 
                     if (cross < EPS)
                     {
                         break;
                     }
-
-                    p += sizeof(QuadVertex);
                 }
 
                 if (i == count)

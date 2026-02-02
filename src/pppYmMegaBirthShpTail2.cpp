@@ -1,4 +1,5 @@
 #include "ffcc/pppYmMegaBirthShpTail2.h"
+#include "ffcc/pppPart.h"
 
 /*
  * --INFO--
@@ -25,9 +26,13 @@ void U8ToF32(pppFVECTOR4*, unsigned char*)
  * Address:	TODO
  * Size:	TODO
  */
-void alloc_check(VYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*)
+void alloc_check(VYmMegaBirthShpTail2* vdata, PYmMegaBirthShpTail2* param)
 {
-	// TODO
+	vdata->m_maxParticles = *(unsigned short*)((char*)&param->m_matrix + 0xe);
+	// TODO: Proper memory allocation
+	vdata->m_particles = (_PARTICLE_DATA*)0;
+	vdata->m_wmats = (_PARTICLE_WMAT*)0;
+	vdata->m_colors = (_PARTICLE_COLOR*)0;
 }
 
 /*
@@ -82,20 +87,20 @@ void calc_particle(_pppPObject*, VYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*, V
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8008b3f4
+ * PAL Size: 1072b
  */
 void pppFrameYmMegaBirthShpTail2(void)
 {
-	// TODO
+	// TODO: Implement frame processing
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8008acc4
+ * PAL Size: 1840b
  */
 void pppRenderYmMegaBirthShpTail2(void)
 {
-	// TODO
+	// TODO: Implement rendering
 }

@@ -8,7 +8,7 @@ void DisableIndWarp(void);
 void pppConstructYmDeformationMdl(void);
 void pppConstruct2YmDeformationMdl(void);
 void pppDestructYmDeformationMdl(void);
-void pppFrameYmDeformationMdl(void);
-void pppRenderYmDeformationMdl(void);
+void pppFrameYmDeformationMdl(void* pppYmDeformationMdl, void* param_2, void* param_3);
+void pppRenderYmDeformationMdl(void* pppYmDeformationMdl, void* param_2, void* param_3);
 
 #endif // _PPP_YMDEFORMATIONMDL_H_

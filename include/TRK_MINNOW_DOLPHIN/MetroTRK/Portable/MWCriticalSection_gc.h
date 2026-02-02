@@ -9,7 +9,7 @@ extern "C" {
 
 void MWExitCriticalSection(u32* section);
 void MWEnterCriticalSection(u32* section);
-void MWInitializeCriticalSection(u32*);
+void MWInitializeCriticalSection(void);
 
 #ifdef __cplusplus
 }

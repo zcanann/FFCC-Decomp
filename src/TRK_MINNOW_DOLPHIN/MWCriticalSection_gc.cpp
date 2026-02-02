@@ -2,30 +2,47 @@
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801af64c
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-extern void MWExitCriticalSection(u32* section)
+extern void MWExitCriticalSection(u32* param_1)
 {
-    OSRestoreInterrupts(*section);
+    OSRestoreInterrupts(*param_1);
+    return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801af670
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-extern void MWEnterCriticalSection(u32* section)
+extern void MWEnterCriticalSection(u32* param_1)
 {
-    *section = OSDisableInterrupts();
+    u32 uVar1;
+    
+    uVar1 = OSDisableInterrupts();
+    *param_1 = uVar1;
+    return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801af6a0
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-extern void MWInitializeCriticalSection(u32* section)
+extern void MWInitializeCriticalSection(void)
 {
     return;
 }

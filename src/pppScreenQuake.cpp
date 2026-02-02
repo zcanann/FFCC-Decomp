@@ -11,7 +11,10 @@ const float FLOAT_80331fc8 = 0.0f;  // Screen quake disable value
  */
 void pppConScreenQuake(void)
 {
-	// TODO: Implementation based on Ghidra decomp shows initialization pattern
+	// Based on Ghidra decomp: similar to pppCon2ScreenQuake
+	// Initializes 9 float values to FLOAT_80331fc8
+	float fVar1 = FLOAT_80331fc8;
+	// TODO: Need proper access to float array through parameters
 }
 
 /*
@@ -21,7 +24,10 @@ void pppConScreenQuake(void)
  */
 void pppCon2ScreenQuake(void)
 {
-	// TODO: Implementation based on Ghidra decomp shows float array initialization
+	// Based on Ghidra decomp: initializes 9 float values to FLOAT_80331fc8
+	// Actual implementation requires proper parameter types
+	float fVar1 = FLOAT_80331fc8;
+	// TODO: Need proper access to float array through parameters
 }
 
 /*

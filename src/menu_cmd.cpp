@@ -1,4 +1,5 @@
 #include "ffcc/menu_cmd.h"
+#include "dolphin/types.h"
 
 /*
  * --INFO--
@@ -8,6 +9,7 @@
 bool IsMagicArti(int)
 {
 	// TODO
+	return false;
 }
 
 /*
@@ -72,12 +74,17 @@ void CMenuPcs::CmdCtrl()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8014f2e8
+ * PAL Size: 512b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::CmdClose()
+int CMenuPcs::CmdClose()
 {
-	// TODO
+	// TODO: Implement CmdClose 
+	return 0;
 }
 
 /*
@@ -172,12 +179,16 @@ void CMenuPcs::CmdDismantle(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8014ba20
+ * PAL Size: 3228b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawUniteList()
 {
-	// TODO
+	// TODO: Implement DrawUniteList
 }
 
 /*

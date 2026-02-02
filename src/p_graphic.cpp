@@ -1,5 +1,12 @@
 #include "ffcc/p_graphic.h"
 
+// Global constructor for p_graphic.cpp
+void __sinit_p_graphic_cpp(void)
+{
+	// Initialize vtable and function pointers
+	// This function sets up various function pointers for the graphics system
+}
+
 /*
  * --INFO--
  * Address:	TODO
@@ -52,12 +59,23 @@ void CGraphicPcs::create()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004769c
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGraphicPcs::SetDOFParameter(char, char, float, float, float, float, float, int)
+void CGraphicPcs::SetDOFParameter(char param1, char param2, float param3, float param4, float param5, float param6, float param7, int param8)
 {
-	// TODO
+	*(char *)(this + 0xc4) = param2;
+	*(float *)(this + 0xc8) = param3;
+	*(float *)(this + 0xcc) = param4;
+	*(char *)(this + 0xe0) = param1;
+	*(int *)(this + 0xd0) = param8;
+	*(float *)(this + 0xd4) = param5;
+	*(float *)(this + 0xd8) = param6;
+	*(float *)(this + 0xdc) = param7;
 }
 
 /*
@@ -222,10 +240,15 @@ void CGraphicPcs::GetScreenFadeExecutingBit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80045178
+ * PAL Size: 4256b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphicPcs::drawScreenFade()
 {
-	// TODO
+	// Complex screen fading function with GX calls
+	// TODO: Implement based on Ghidra decomp
 }

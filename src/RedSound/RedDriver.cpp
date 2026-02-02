@@ -1,4 +1,51 @@
 #include "ffcc/RedSound/RedDriver.h"
+#include "ffcc/RedSound/RedMemory.h" 
+#include "ffcc/RedSound/RedEntry.h"
+
+// Global objects that need initialization
+extern CRedMemory DAT_8032f480;
+extern CRedEntry DAT_8032e154;
+extern void* DAT_8032e13c;
+extern void* DAT_8032e148;
+
+extern "C" {
+    void __register_global_object(void*, void (*)(void*), void*);
+    void* __ct__10CRedMemoryFv(void*);
+    void* __ct__9CRedEntryFv(void*);
+    void __dt__10CRedMemoryFv(void*);
+    void __dt__9CRedEntryFv(void*);
+    void* RedNew__Fi(int);
+    void RedDelete__FPv(void*);
+    void* memcpy(void*, const void*, unsigned long);
+    void* memset(void*, int, unsigned long);
+    int SearchMusicSequence__9CRedEntryFi(void*, int);
+    void MusicStop__Fi(int);
+    void MusicPlay__Fiii(int, int, int);
+}
+
+// Global data references from Ghidra
+extern void* DAT_8032f3f0;
+extern void* DAT_8032f418;
+extern int DAT_8032f42c;
+
+/*
+ * --INFO--
+ * PAL Address: 0x801bfed8
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void __sinit_RedDriver_cpp()
+{
+    void* uVar1;
+    
+    uVar1 = __ct__10CRedMemoryFv(&DAT_8032f480);
+    __register_global_object(uVar1, __dt__10CRedMemoryFv, &DAT_8032e13c);
+    uVar1 = __ct__9CRedEntryFv(&DAT_8032e154);
+    __register_global_object(uVar1, __dt__9CRedEntryFv, &DAT_8032e148);
+}
 
 /*
  * --INFO--
@@ -52,12 +99,62 @@ void _MusicPlaySequence(int*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bd1fc
+ * PAL Size: 520b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _MusicCrossPlaySequence(int*)
+void _MusicCrossPlaySequence(int* param_1)
 {
-	// TODO
+    int iVar1;
+    void* pvVar2;
+    
+    param_1[2] = param_1[2] * 200;
+    iVar1 = param_1[2] / 0x3c + (param_1[2] >> 0x1f);
+    param_1[2] = iVar1 - (iVar1 >> 0x1f);
+    if (param_1[2] == 0) {
+        param_1[2] = param_1[2] + 1;
+    }
+    pvVar2 = DAT_8032f3f0;
+    if ((*param_1 != *(int*)((int)DAT_8032f3f0 + 0x470)) &&
+       (*param_1 != *(int*)((int)DAT_8032f3f0 + 0xd98))) {
+        if (*param_1 == *(int*)((int)DAT_8032f3f0 + 0x904)) {
+            *(int*)((int)DAT_8032f3f0 + 0x458) = -*(int*)((int)DAT_8032f3f0 + 0x454) / param_1[2];
+            *(int*)((int)pvVar2 + 0x45c) = param_1[2];
+            pvVar2 = DAT_8032f3f0;
+            *(int*)((int)DAT_8032f3f0 + 0x8ec) =
+                 (0x1ff800 - *(int*)((int)DAT_8032f3f0 + 0x8e8)) / param_1[2];
+            *(int*)((int)pvVar2 + 0x8f0) = param_1[2];
+            pvVar2 = RedNew__Fi(0x494);
+            memcpy(pvVar2, (void*)((int)DAT_8032f3f0 + 0x494), 0x494);
+            memcpy((void*)((int)DAT_8032f3f0 + 0x494), DAT_8032f3f0, 0x494);
+            memcpy(DAT_8032f3f0, pvVar2, 0x494);
+            RedDelete__FPv(pvVar2);
+        }
+        else {
+            iVar1 = SearchMusicSequence__9CRedEntryFi(&DAT_8032e154, *param_1);
+            if (-1 < iVar1) {
+                DAT_8032f42c = param_1[2];
+                iVar1 = 0;
+                if (*(int*)((int)pvVar2 + 0x470) != -1) {
+                    if (*(int*)((int)pvVar2 + 0x904) != -1) {
+                        MusicStop__Fi(*(int*)((int)pvVar2 + 0x904));
+                    }
+                    *(int*)((int)pvVar2 + 0x458) = -*(int*)((int)pvVar2 + 0x454) / param_1[2];
+                    *(int*)((int)pvVar2 + 0x45c) = param_1[2];
+                    iVar1 = *(int*)((char*)DAT_8032f418 + *param_1 * 4);
+                    *(int*)((char*)DAT_8032f418 + *param_1 * 4) = 0;
+                    if (iVar1 == 0) {
+                        memcpy((void*)((int)pvVar2 + 0x494), pvVar2, 0x494);
+                        *(int*)((int)pvVar2 + 0x470) = 0xffffffff;
+                    }
+                }
+                MusicPlay__Fiii(*param_1, param_1[1], iVar1);
+            }
+        }
+    }
 }
 
 /*

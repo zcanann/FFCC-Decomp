@@ -3,6 +3,6 @@
 
 void randshort(short, float);
 void randf(unsigned char);
-void pppSRandDownHCV(void);
+void pppSRandDownHCV(void* param1, void* param2);
 
 #endif // _PPP_SRANDDOWNHCV_H_

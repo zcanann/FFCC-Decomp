@@ -61,7 +61,21 @@ When updating functions, include version-specific address and size information:
 
 **Note**: PAL Addresses and sizes are exported in the Ghidra decomp as part of the header. Leave the other versions as TODO for now.
 
-**Important for 0% matches**: Ghidra decomp provides full reference implementations that can be adapted to match the original source style. Even 0% match functions are highly viable targets. **IMPORTANT** Many ppp* functions do not take any parameters, but instead seem to reference global state. Objdiff should show the function parameters. If objdiff is reporting different function signatures, you will need to update the C++ accordingly.
+**Important for 0% matches**: Ghidra decomp provides full reference implementations that can be adapted to match the original source style. Even 0% match functions are highly viable targets. **IMPORTANT** Many ppp* functions show no Metrowerks mangled names, but the assembly hints that these functions take args. The reasoning is unknown.
+
+It is possible that:
+A) They truly take no args, and somehow they get args from globals
+B) Adding C linkage may fix these, ie:
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void pppMatrixScl(void* mtx, void* data);
+
+#ifdef __cplusplus
+}
+#endif
 
 **Important for near matches** `configure.py` has several build flags which can influence binary output. This is just as important to code matching as the code itself! The exact compiler version and flags for each module is not known yet. For this reason, high matches like 97% are sometimes acceptable and not worth dealing with because it could be build system related.
 
@@ -168,7 +182,7 @@ python3 tools/extract_symbols.py pppMove.o
   📊 Summary: 2 functions, 0 globals
 ```
 
-⚠️ If the function parameters do not match, the match score cannot be improved beyond 0%! This is very common for ppp* functions, many of which lack parameters and instead reference global state. You will need to remove these parameters and make the function match signatures to improve beyond 0%.
+⚠️ If the function parameters do not match, the match score cannot be improved beyond 0%! This is very common for ppp* functions as mentioned earlier, which may need C linkage or some other remedy.
 
 DO NOT TRUST GHIDRA FOR FUNCTION PARAMETERS, GHIDRA IS A GUIDELINE. OBJDIFF IS THE REAL SOURCE OF TRUTH FOR HOW CLOSE WE ARE.
 

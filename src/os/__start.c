@@ -22,13 +22,14 @@ extern u8 Debug_BBA_804516D0;
 
 /* 80003100-80003140 000000 0040+00 1/1 0/0 0/0 .init            __check_pad3 */
 SECTION_INIT void __check_pad3(void) {
-    if ((*(u16*)0x800030E4 & 0xEEF) == 0xEEF) {
+    u16 pad_status = *(u16*)0x800030E4;
+    if ((pad_status & 0xEEF) == 0xEEF) {
         OSResetSystem(0, 0, 0);
     }
 }
 
 /* 80003140-8000314C 000040 000C+00 1/1 0/0 0/0 .init            __set_debug_bba */
-void __set_debug_bba(void) {
+SECTION_INIT void __set_debug_bba(void) {
     Debug_BBA_804516D0 = 1;
 }
 

@@ -17,8 +17,16 @@ struct UnkC {
     int* m_serializedDataOffsets;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void pppConstructYmLookOn(struct pppYmLookOn* pppYmLookOn, struct UnkC* param_2);
 void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct UnkB* param_2, struct UnkC* param_3);
+
+#ifdef __cplusplus
+}
+#endif
 
 #ifdef __cplusplus
 }

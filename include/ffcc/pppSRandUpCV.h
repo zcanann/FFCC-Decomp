@@ -4,7 +4,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 void pppSRandUpCV(void* param1, void* param2);
+
 #ifdef __cplusplus
 }
 #endif

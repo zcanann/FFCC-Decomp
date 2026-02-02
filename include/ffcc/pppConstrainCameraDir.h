@@ -18,9 +18,17 @@ typedef struct UnkC {
     int* m_serializedDataOffsets;
 } UnkC;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void pppConstructConstrainCameraDir(pppConstrainCameraDir* param1, UnkC* param2);
 void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* param1, UnkC* param2);
 void pppDestructConstrainCameraDir(void);
 void pppFrameConstrainCameraDir(pppConstrainCameraDir* param1, UnkB* param2, UnkC* param3);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _FFCC_PPPCONSTRAINCAMERADIR_H_

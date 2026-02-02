@@ -18,8 +18,16 @@ struct UnkC {
     char padding2[16];
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void pppConChangeBGColor(void);
 void pppDesChangeBGColor(void);
 void pppFrameChangeBGColor(struct pppChangeBGColor* pppChangeBGColor, struct UnkB* param_2, struct UnkC* param_3);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _FFCC_PPPCHANGEBGCOLOR_H_

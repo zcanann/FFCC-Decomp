@@ -5,9 +5,27 @@
 
 typedef _PARTICLE_DATA PYmMegaBirthShpTail2; // Size 0x140
 
+struct pppYmMegaBirthShpTail2
+{
+    _pppPObject field0_0x0;    // 0x0
+    pppFMATRIX field_0x40;     // 0x40
+    char field_0x70[0x4c];     // 0x70 - padding/other fields
+    unsigned int field_0xbc;   // 0xbc
+    unsigned int field_0xc0;   // 0xc0
+    unsigned int field_0xc4;   // 0xc4
+    unsigned int field_0xc8;   // 0xc8
+    char m_data[0x500];        // 0xcc - additional data
+};
+
 struct VYmMegaBirthShpTail2
 {
-
+    pppFMATRIX m_emitterMatrix;         // 0x0
+    _PARTICLE_DATA* m_particles;        // 0x30
+    _PARTICLE_WMAT* m_wmats;            // 0x34
+    _PARTICLE_COLOR* m_colors;          // 0x38
+    unsigned int m_maxParticles;        // 0x3c
+    unsigned int m_lifeLimit;           // 0x40
+    Vec m_tailScaleDirection;           // 0x44
 };
 
 void get_rand(void);

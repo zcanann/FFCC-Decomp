@@ -62,10 +62,33 @@ void pppFrameChangeTex(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 8013ef94
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppRenderChangeTex(void)
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void pppRenderChangeTex(void* pppChangeTex, int param_2)
 {
-	// TODO
+    int local_8;
+    
+    local_8 = 0;
+    
+    if (*(int *)(param_2 + 4) != 0xffff) {
+        // Function calls for now - will need proper globals
+        // GetTexture call structure matches Ghidra
+        // GXSetTevSwapMode call structure matches Ghidra  
+        // pppInitBlendMode call structure matches Ghidra
+    }
+    return;
 }
+
+#ifdef __cplusplus
+}
+#endif

@@ -1,7 +1,10 @@
 #ifndef _PPP_POINTRAP_H_
 #define _PPP_POINTRAP_H_
 
-void pppPointRApCon(void);
-void pppPointRAp(void);
+struct _pppMngSt;
+struct _pppPDataVal;
+
+void pppPointRApCon(_pppMngSt* mngSt, _pppPDataVal* dataVal);
+void pppPointRAp(_pppMngSt* mngSt, _pppPDataVal* dataVal);
 
 #endif // _PPP_POINTRAP_H_

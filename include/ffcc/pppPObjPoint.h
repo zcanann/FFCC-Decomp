@@ -4,7 +4,7 @@
 #include <stddef.h>
 
 struct PppObjData {
-    unsigned int id;          // 0x0
+    int id;          // 0x0
     unsigned int field_4;     // 0x4
     void* data;      // 0x8
     unsigned int objId;       // 0xc
@@ -14,7 +14,7 @@ struct PppPointData {
     void* field_0;   // 0x0
     void* matrix;    // 0x4 - points to transformation matrix
     unsigned int field_8;     // 0x8
-    unsigned int id;          // 0xc
+    int id;          // 0xc
     float field_10;    // 0x10
     float field_14;    // 0x14
     float field_18;    // 0x18
@@ -42,6 +42,14 @@ struct PppPointObj {
     void* vecPtr;    // 0x10
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void pppPObjPoint(PppPointData* pointData, PppObjData* objData, PppContainer* container);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _PPP_POBJPOINT_H_

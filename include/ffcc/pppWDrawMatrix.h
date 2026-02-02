@@ -1,6 +1,8 @@
 #ifndef _PPP_WDRAWMATRIX_H_
 #define _PPP_WDRAWMATRIX_H_
 
-void pppWDrawMatrix(void);
+struct _pppPObject;
+
+void pppWDrawMatrix(_pppPObject* pppPObject);
 
 #endif // _PPP_WDRAWMATRIX_H_

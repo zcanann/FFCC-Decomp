@@ -12,12 +12,16 @@ void pppConstructCorona(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800df5e0
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppDestructCorona(void)
 {
-	// TODO
+	return;
 }
 
 /*

@@ -9,8 +9,8 @@ extern unsigned char lbl_801EADC8[];
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
  */
 void randshort(short param_1, float param_2) {
     // TODO - not used in main function
@@ -18,8 +18,8 @@ void randshort(short param_1, float param_2) {
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO 
+ * PAL Size: TODO
  */
 void randf(unsigned char param_1) {
     // TODO - not used in main function

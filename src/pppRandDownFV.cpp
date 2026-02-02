@@ -20,23 +20,23 @@ void pppRandDownFV(void* r3, void* r4, void* r5)
     if (lbl_8032ED70 == 0) return;
     
     u8* param1 = (u8*)r3;  // r29
-    u8* param2 = (u8*)r4;  // r31  
-    u8* param3 = (u8*)r5;  // r30
+    u8* param2 = (u8*)r4;  // r30  
+    u8* param3 = (u8*)r5;  // r31
     
     // Check param2[0xc] - if zero, generate random value
     u32 p2_field_c = *(u32*)(param2 + 0xc);
     if (p2_field_c == 0) {
-        // Generate random number
+        // Generate random number  
         math.RandF();
-        float randomVal = -0.0f;  // fneg f31, f1
+        float randomVal = -0.0f; // This will hopefully generate fneg
         
-        // Check param2[0x18] byte for second condition
+        // Check param2[0x18] byte for second condition  
         u8 p2_field_18 = *(u8*)(param2 + 0x18);
         if (p2_field_18 != 0) {
             math.RandF();
-            // fsubs f1, f31, f1; fmuls f31, f1, f0
             extern float lbl_8032FF40;
-            randomVal = randomVal * lbl_8032FF40;
+            float tempVal = randomVal - 1.0f; // fsubs f1, f31, f1  
+            randomVal = tempVal * lbl_8032FF40; // fmuls f31, f1, f0
         }
         
         // Calculate target address and store result
@@ -73,10 +73,13 @@ void pppRandDownFV(void* r3, void* r4, void* r5)
         float force_y = *(float*)(param2 + 0xc);  
         float force_z = *(float*)(param2 + 0x10);
         
-        // Apply force to vector components (x, y, z at offsets 0, 4, 8)
+        // Apply force to vector components - use separate multiply and add
         float scale_factor = *(float*)base_vec;
-        target_vec[0] = target_vec[0] + (force_x * scale_factor);
-        target_vec[1] = target_vec[1] + (force_y * scale_factor);
-        target_vec[2] = target_vec[2] + (force_z * scale_factor);
+        float temp_x = force_x * scale_factor;
+        target_vec[0] = target_vec[0] + temp_x;
+        float temp_y = force_y * scale_factor;
+        target_vec[1] = target_vec[1] + temp_y;
+        float temp_z = force_z * scale_factor;
+        target_vec[2] = target_vec[2] + temp_z;
     }
 }

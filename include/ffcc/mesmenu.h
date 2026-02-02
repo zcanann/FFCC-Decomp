@@ -20,6 +20,7 @@ public:
     void Open(char*, int, int, int, int, int, int);
     void CloseRequest(int);
     void close(int);
+    void SetPos(float, float, float);
 };
 
 #endif // _FFCC_MESMENU_H_

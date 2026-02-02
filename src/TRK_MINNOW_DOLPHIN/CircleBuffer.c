@@ -91,7 +91,7 @@ void CircleBufferInitialize(CircleBuffer* cb, u8* buf, s32 size) {
     cb->write_ptr = cb->start_ptr;
     cb->mBytesToRead = 0;
     cb->mBytesToWrite = cb->size;
-    MWInitializeCriticalSection(&cb->mCriticalSection);
+    MWInitializeCriticalSection();
 }
 
 

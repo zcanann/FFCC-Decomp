@@ -2,40 +2,56 @@
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80065cb8
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppConstructLocationTitle2(void)
+void pppConstructLocationTitle2()
 {
-	// TODO
+	// Basic initialization - stub implementation for now
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80065b3c  
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppDestructLocationTitle2(void)
+void pppDestructLocationTitle2() 
 {
-	// TODO
+	// Cleanup - stub implementation for now
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80065b90
+ * PAL Size: 1216b  
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppFrameLocationTitle2(void)
+void pppFrameLocationTitle2()
 {
-	// TODO
+	// Frame update logic - stub implementation for now
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80065c50
+ * PAL Size: 836b
+ * EN Address: TODO  
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppRenderLocationTitle2(void)
+void pppRenderLocationTitle2()
 {
-	// TODO
+	// Rendering logic - stub implementation for now
 }

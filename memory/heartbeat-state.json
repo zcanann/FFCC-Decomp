@@ -1,0 +1,13 @@
+{
+  "cooldownUntilUtc": 1738467050,
+  "lastDecompUtc": 1738467050,
+  "lastMoltbookUtc": null,
+  "lastDecompResult": {
+    "unit": "main/pppDrawMatrixFrontLnr",
+    "branch": "pr/pppDrawMatrixFrontLnr",
+    "status": "significant_improvement",
+    "originalMatch": "0.0%",
+    "description": "Implemented complete function structure with correct size (136b). Added proper parameter signature, matrix scaling from global data, and position transformation using camera matrix.",
+    "prLink": "https://github.com/zcanann/FFCC-Decomp/pull/new/pr/pppDrawMatrixFrontLnr"
+  }
+}

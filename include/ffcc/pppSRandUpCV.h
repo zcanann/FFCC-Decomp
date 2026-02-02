@@ -1,9 +1,6 @@
 #ifndef _PPP_SRANDUPCV_H_
 #define _PPP_SRANDUPCV_H_
 
-void randchar(char, float);
-void randf(unsigned char);
-
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -22,45 +22,39 @@ void pppDrawMdl0(_pppPObject*, PDrawMdl*, _pppCtrlTable*)
  */
 void pppDrawMdl(_pppPObject* pObject, PDrawMdl* drawMdl, _pppCtrlTable* ctrlTable)
 {
-    // Load value from drawMdl offset 0x4 and check if high 16 bits are 0xffff
-    unsigned int value = *(unsigned int*)((char*)drawMdl + 0x4);
+    _pppPObject* obj = pObject;
+    PDrawMdl* mdl = drawMdl;
+    
+    unsigned int value = *(unsigned int*)((char*)mdl + 0x4);
     if ((value >> 16) == 0xffff) {
         return;
     }
     
-    // Extract byte parameters from drawMdl structure at various offsets
-    unsigned char alpha = *(unsigned char*)((char*)drawMdl + 0xe);
-    unsigned char blendMode = *(unsigned char*)((char*)drawMdl + 0x9);
-    unsigned char param5 = *(unsigned char*)((char*)drawMdl + 0x14);
-    unsigned char param6 = *(unsigned char*)((char*)drawMdl + 0xa);
-    unsigned char param7 = *(unsigned char*)((char*)drawMdl + 0x9);
-    unsigned char param8 = *(unsigned char*)((char*)drawMdl + 0xb);
-    unsigned char param9 = *(unsigned char*)((char*)drawMdl + 0xc);
-    unsigned char param10 = *(unsigned char*)((char*)drawMdl + 0xd);
-    
-    // Load float parameter from offset 0x10
-    float scale = *(float*)((char*)drawMdl + 0x10);
-    
-    // Get vector parameter (pObject + 0x40)
-    pppCVECTOR* vector = (pppCVECTOR*)((char*)pObject + 0x40);
-    
-    // Get matrix parameter from ctrlTable structure
     void* ctrlPtr = *(void**)((char*)ctrlTable + 0xc);
+    pppCVECTOR* vector = (pppCVECTOR*)((char*)obj + 0x40);
+    unsigned char blendMode = *(unsigned char*)((char*)mdl + 0x9);
+    
     pppFMATRIX* matrix = (pppFMATRIX*)(*(void**)ctrlPtr);
+    unsigned char param10 = *(unsigned char*)((char*)mdl + 0xd);
+    unsigned char saved_blend = blendMode;
     matrix = (pppFMATRIX*)((char*)matrix + 0x88);
-    matrix = (pppFMATRIX*)((char*)pObject + (int)matrix);
+    matrix = (pppFMATRIX*)((char*)obj + (int)matrix);
     
-    // Call pppSetDrawEnv with all parameters
-    pppSetDrawEnv(vector, matrix, scale, alpha, param5, param6, param7, param8, param9, param10);
+    float scale = *(float*)((char*)mdl + 0x10);
+    unsigned char alpha = *(unsigned char*)((char*)mdl + 0xe);
+    unsigned char param5 = *(unsigned char*)((char*)mdl + 0x14);
+    unsigned char param6 = *(unsigned char*)((char*)mdl + 0xa);
+    unsigned char param8 = *(unsigned char*)((char*)mdl + 0xb);
+    unsigned char param9 = *(unsigned char*)((char*)mdl + 0xc);
     
-    // Set blend mode
-    pppSetBlendMode(blendMode);
+    pppSetDrawEnv(vector, matrix, scale, alpha, param5, param6, saved_blend, param8, param9, param10);
     
-    // Get model array and draw mesh
-    extern void* lbl_8032ED54;  // Global models array reference
+    pppSetBlendMode(saved_blend);
+    
+    unsigned int modelIndex = *(unsigned int*)((char*)mdl + 0x4);
+    extern void* lbl_8032ED54;
     void** modelsArray = (void**)*(void**)((char*)&lbl_8032ED54 + 0x8);
-    unsigned int modelIndex = *(unsigned int*)((char*)drawMdl + 0x4);
+    Vec* vertexData = (Vec*)((char*)obj + 0x70);
     pppModelSt* model = (pppModelSt*)modelsArray[modelIndex];
-    Vec* vertexData = (Vec*)((char*)pObject + 0x70);
     pppDrawMesh(model, vertexData, 1);
 }

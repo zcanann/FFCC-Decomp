@@ -79,12 +79,10 @@ int CGQuadObj::GetCID()
  */
 bool CGQuadObj::isInner(Vec* vec)
 {
-    int count = m_vertexCount;
-
-    if (count != 0)
-    {
+    u32 count = (u32)m_vertexCount;
+    
+    if (count != 0) {
         float px = vec->x;
-        float py = vec->y;
         float pz = vec->z;
 
         if (m_bboxMinX <= px && m_bboxMinZ <= pz && m_bboxMaxX >= px && m_bboxMaxZ >= pz && m_yBase <= py)
@@ -112,15 +110,14 @@ bool CGQuadObj::isInner(Vec* vec)
                         break;
                     }
                 }
-
-                if (i == count)
-                {
+                
+                if (i == count) {
                     return true;
                 }
             }
         }
     }
-
+    
     return false;
 }
 

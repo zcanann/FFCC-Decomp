@@ -1,4 +1,5 @@
 #include "ffcc/LocationTitle2.h"
+#include <string.h>
 
 /*
  * --INFO--
@@ -9,9 +10,12 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructLocationTitle2()
+void pppConstructLocationTitle2(struct pppLocationTitle2* locationTitle, struct UnkC* unkC)
 {
-	// Basic initialization - stub implementation for now
+    // Zero initialization based on typical constructor pattern
+    if (locationTitle) {
+        memset(locationTitle, 0, sizeof(struct pppLocationTitle2));
+    }
 }
 
 /*
@@ -23,9 +27,12 @@ void pppConstructLocationTitle2()
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructLocationTitle2() 
+void pppDestructLocationTitle2(struct pppLocationTitle2* locationTitle, struct UnkC* unkC) 
 {
-	// Cleanup - stub implementation for now
+    // Cleanup logic based on typical destructor pattern
+    if (locationTitle) {
+        // Placeholder for cleanup logic
+    }
 }
 
 /*
@@ -37,9 +44,12 @@ void pppDestructLocationTitle2()
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameLocationTitle2()
+void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, struct UnkB* unkB, struct UnkC* unkC)
 {
-	// Frame update logic - stub implementation for now
+    // Frame update logic - large function (1216 bytes)
+    if (locationTitle && unkB && unkC) {
+        // Placeholder for frame logic
+    }
 }
 
 /*
@@ -51,7 +61,10 @@ void pppFrameLocationTitle2()
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderLocationTitle2()
+void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle, struct UnkB* unkB, struct UnkC* unkC)
 {
-	// Rendering logic - stub implementation for now
+    // Rendering logic - large function (836 bytes)  
+    if (locationTitle && unkB && unkC) {
+        // Placeholder for render logic
+    }
 }

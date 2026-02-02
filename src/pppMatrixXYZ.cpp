@@ -20,7 +20,7 @@ void pppMatrixXYZ(pppFMATRIX& matrix, PPPCREATEPARAM* param)
     
     // Get rotation matrix from angle data 
     pppGetRotMatrixXYZ(matrix, (pppIVECTOR4*)param->m_extraPositionPtr);
-    
+
     // Extract and scale first column vector (X-axis)
     tempVec1.x = matrix.value[0][0];
     tempVec1.y = matrix.value[1][0]; 
@@ -47,15 +47,13 @@ void pppMatrixXYZ(pppFMATRIX& matrix, PPPCREATEPARAM* param)
     tempVec3.x = matrix.value[0][2];
     tempVec3.y = matrix.value[1][2]; 
     tempVec3.z = matrix.value[2][2];
-    
+
     PSVECScale(&tempVec3, &tempVec3, param->m_scalePtr->z);
-    
+
     matrix.value[0][2] = tempVec3.x;
     matrix.value[1][2] = tempVec3.y;
     matrix.value[2][2] = tempVec3.z;
-    
+
     // Set translation components from position
     matrix.value[0][3] = param->m_positionOffsetPtr->x;
-    matrix.value[1][3] = param->m_positionOffsetPtr->y; 
-    matrix.value[2][3] = param->m_positionOffsetPtr->z;
 }

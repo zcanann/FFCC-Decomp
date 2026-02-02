@@ -61,25 +61,11 @@ When updating functions, include version-specific address and size information:
 
 **Note**: PAL Addresses and sizes are exported in the Ghidra decomp as part of the header. Leave the other versions as TODO for now.
 
-**Important for 0% matches**: Ghidra decomp provides full reference implementations that can be adapted to match the original source style. Even 0% match functions are highly viable targets. **IMPORTANT** Many ppp* functions show no Metrowerks mangled names, but the assembly hints that these functions take args. The reasoning is unknown.
-
-It is possible that:
-A) They truly take no args, and somehow they get args from globals
-B) Adding C linkage may fix these, ie:
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void pppMatrixScl(void* mtx, void* data);
-
-#ifdef __cplusplus
-}
-#endif
+**Important for 0% matches**: Ghidra decomp provides full reference implementations that can be adapted to match the original source style. Even 0% match functions are highly viable targets. For large functions, even small incremental gains in match score can be considered valuable progress.
 
 **Important for near matches** `configure.py` has several build flags which can influence binary output. This is just as important to code matching as the code itself! The exact compiler version and flags for each module is not known yet. For this reason, high matches like 97% are sometimes acceptable and not worth dealing with because it could be build system related.
 
-**Key relationships:** Unit → Object file → Source file. Use symbols for context, Ghidra decomp for 0% functions.
+**Key relationships:** Unit → Object file → Source file. Use symbols for context, Ghidra decomp for low match score functions.
 
 ## State Tracking & Memory
 
@@ -88,12 +74,6 @@ void pppMatrixScl(void* mtx, void* data);
 - **Session state**: `~/.openclaw/workspace/memory/decomp-state.json`
 
 Update these files to track progress and avoid cycling through failed targets.
-
-### Cycle Avoidance Strategy
-1. **Track attempts** per unit with timestamps
-2. **Avoid units** with frequent recent abandonments
-3. **Rotate targets** using semi-random selection from viable candidates
-4. **Periodically reassess** avoided units to give them another chance
 
 ## Scope (current)
 - **Target version:** **PAL** (`GCCP01`) - required for now.
@@ -182,11 +162,9 @@ python3 tools/extract_symbols.py pppMove.o
   📊 Summary: 2 functions, 0 globals
 ```
 
-⚠️ If the function parameters do not match, the match score cannot be improved beyond 0%! This is very common for ppp* functions as mentioned earlier, which may need C linkage or some other remedy.
+⚠️ If the function parameters do not match, the match score cannot be improved beyond 0%! This is very common for ppp* functions as mentioned earlier, which may need C linkage or some other remedy to prevent Metrowerks mangled names (thus allowing objdiff to match these).
 
-DO NOT TRUST GHIDRA FOR FUNCTION PARAMETERS, GHIDRA IS A GUIDELINE. OBJDIFF IS THE REAL SOURCE OF TRUTH FOR HOW CLOSE WE ARE.
-
-**Key derivations:** Unit → Object file → Source file. Use Ghidra decomp for 0% functions that are not caused by parameter mismatches, objdiff for partial matches.
+DO NOT TRUST GHIDRA BEYOND GETTING A FEEL FOR THE FUNCTION. GHIDRA IS A GUIDELINE. OBJDIFF IS THE REAL SOURCE OF TRUTH FOR HOW CLOSE WE ARE.
 
 ### Step 2 - Create branch: `git checkout -b pr/<unit>`
 
@@ -226,6 +204,8 @@ Prefer changes that are source-plausible:
 - using idiomatic control flow the codebase uses elsewhere
 - removing obviously redundant variables/branches
 - matching struct/field semantics (names and meaning)
+
+For initial stabs at large functions, hacky function bodies are permissable.
 
 ### Step 8 - Create Pull Request (if improvement is real + plausible)
 

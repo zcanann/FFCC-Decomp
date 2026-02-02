@@ -3,15 +3,10 @@
 
 struct _pppColor
 {
-    union {
-        unsigned char m_colorRGBA[4]; // 0x0
-        struct {
-            unsigned char r;
-            unsigned char g;
-            unsigned char b;
-            unsigned char a;
-        };
-    };
+    unsigned char r;  // 0x0
+    unsigned char g;  // 0x1
+    unsigned char b;  // 0x2
+    unsigned char a;  // 0x3
 }; // Size 0x4
 
 struct _pppColorWork

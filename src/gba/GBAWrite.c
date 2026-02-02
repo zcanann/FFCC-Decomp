@@ -2,8 +2,7 @@
 #include "string.h"
 
 static void WriteProc(s32 chan) {
-    GBAControl* gba;
-    gba = &__GBA[chan];
+    GBAControl* gba = &__GBA[chan];
 
     if (gba->ret != 0) {
         return;
@@ -27,10 +26,7 @@ s32 GBAWriteAsync(s32 chan, u8* src, u8* status, GBACallback callback) {
 }
 
 s32 GBAWrite(s32 chan, u8* src, u8* status) {
-    s32 tmp;
-    GBAControl* gba = &__GBA[chan];
-    s32 ret;
-    ret = GBAWriteAsync(chan, src, status, __GBASyncCallback);
+    s32 ret = GBAWriteAsync(chan, src, status, __GBASyncCallback);
     if (ret != GBA_READY) {
         return ret;
     }

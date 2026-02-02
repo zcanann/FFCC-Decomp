@@ -3,11 +3,12 @@
 
 #include "ffcc/chara.h"
 
+void CharaZEnvCtrl_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void CharaZEnvCtrl_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
 void pppConCharaZEnvCtrl(void);
 void pppDesCharaZEnvCtrl(void);
 void pppFrameCharaZEnvCtrl(void);

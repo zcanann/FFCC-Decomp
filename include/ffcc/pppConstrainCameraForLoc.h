@@ -3,11 +3,12 @@
 
 #include "ffcc/chara.h"
 
+void CC_BeforeCalcMatrixCallback(CChara::CModel*, void*, void*);
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void CC_BeforeCalcMatrixCallback(CChara::CModel*, void*, void*);
 void pppConstructConstrainCameraForLoc(void);
 void pppConstruct2ConstrainCameraForLoc(void);
 void pppDestructConstrainCameraForLoc(void);

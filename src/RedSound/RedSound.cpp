@@ -1,4 +1,24 @@
 #include "ffcc/RedSound/RedSound.h"
+#include "ffcc/RedSound/RedDriver.h"
+#include "ffcc/RedSound/RedMemory.h"
+#include "ffcc/RedSound/RedEntry.h"
+
+#include "PowerPC_EABI_Support/Runtime/NMWException.h"
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/file_io.h"
+#include "string.h"
+#include "dolphin/os.h"
+#include "dolphin/ai.h"
+#include "dolphin/ar.h"
+#include "dolphin/ax.h"
+
+// Global variables (external declarations)
+extern CRedDriver CRedDriver_8032f4c0;
+extern CRedMemory DAT_8032f480;
+extern CRedEntry DAT_8032e154;
+extern int DAT_8032f408; // Debug flag
+extern char DAT_8032e17c[]; // Buffer for memset
+extern void* DAT_8032e170; // Registration memory
+extern FILE DAT_8021d1a8; // File handle for fflush
 
 /*
  * --INFO--
@@ -17,7 +37,7 @@ CRedSound::CRedSound()
  */
 CRedSound::~CRedSound()
 {
-	// TODO
+	End();
 }
 
 /*
@@ -45,9 +65,56 @@ void CRedSound::EntryStandbyID(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::Init(void*, int, int, int)
+void CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 {
-	// TODO
+	memset(&DAT_8032e17c, 0, 0x100);
+	
+	if (param_3 < 1 || param_5 < 1) {
+		if (DAT_8032f408 != 0) {
+			OSReport("[%s] Sound Driver Initialize ERROR! %s %s\n", "RedSound", "Invalid parameters", "");
+			fflush(&DAT_8021d1a8);
+		}
+		return;
+	}
+	
+	if (((unsigned)param_2 & 0x1f) != 0 || ((unsigned)param_3 & 0x1f) != 0) {
+		if (DAT_8032f408 != 0) {
+			OSReport("[%s] %s Memory Setting Error! 0x%x 0x%x %s\n", "RedSound", "", (unsigned)param_2, param_3, "");
+			fflush(&DAT_8021d1a8);
+		}
+		return;
+	}
+	
+	if (((unsigned)param_4 & 0x1f) != 0 || ((unsigned)param_5 & 0x1f) != 0) {
+		if (DAT_8032f408 != 0) {
+			OSReport("[%s] A Memory Setting Error! 0x%x 0x%x %s\n", "RedSound", "", param_4, param_5, "");
+			fflush(&DAT_8021d1a8);
+		}
+		return;
+	}
+	
+	int initResult = ARCheckInit();
+	if (initResult == 0) {
+		if (DAT_8032f408 != 0) {
+			OSReport("[%s] AR was not initialized %s\n", "RedSound", "");
+			fflush(&DAT_8021d1a8);
+		}
+		return;
+	}
+	
+	AIReset();
+	AIInit(0);
+	AXInit();
+	// AXARTInit(); // Function might not exist yet
+	DAT_8032f480.Init((int)param_2, param_3, param_4, param_5);
+	DAT_8032e154.Init();
+	Start();
+	CRedDriver_8032f4c0.Init();
+	
+	if (DAT_8032f408 != 0) {
+		OSReport("[%s] Sound Driver Initialize OK! %s\n", "RedSound", "");
+		fflush(&DAT_8021d1a8);
+	}
 }
 
 /*
@@ -575,7 +642,11 @@ void CRedSound::TestProcess(int)
  * Address:	TODO
  * Size:	TODO
  */
+// Forward declaration
+extern "C" void __dt__10CRedDriverFv(void*);
+
 void __sinit_RedSound_cpp(void)
 {
-	// TODO
+	// Initialize the global CRedDriver object and register for destruction
+	__register_global_object(&CRedDriver_8032f4c0, __dt__10CRedDriverFv, &DAT_8032e170);
 }

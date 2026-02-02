@@ -1,4 +1,5 @@
 #include "ffcc/pppCrystal2.h"
+#include "ffcc/pppPart.h"
 
 /*
  * --INFO--
@@ -47,7 +48,25 @@ void pppConstructCrystal2(pppCrystal2* pppCrystal2, UnkC* param_2)
  */
 void pppDestructCrystal2(pppCrystal2* pppCrystal2, UnkC* param_2)
 {
-    // TODO: Implement memory cleanup
+    CMemory::CStage* stage;
+    u32* puVar1;
+    
+    puVar1 = (u32*)((char*)&pppCrystal2->field0_0x0 + 2*4 + param_2->m_serializedDataOffsets[2]);
+    stage = (CMemory::CStage*)puVar1[0];
+    
+    if ((CMemory::CStage*)puVar1[1] != 0) {
+        pppHeapUseRate((CMemory::CStage*)puVar1[1]);
+        puVar1[1] = 0;
+    }
+    
+    if ((stage != 0) && (*(CMemory::CStage**)stage != 0)) {
+        pppHeapUseRate(*(CMemory::CStage**)stage);
+        *(u32*)stage = 0;
+    }
+    
+    if (stage != 0) {
+        pppHeapUseRate(stage);
+    }
 }
 
 /*

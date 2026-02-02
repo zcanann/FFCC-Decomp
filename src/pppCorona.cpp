@@ -9,8 +9,31 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructCorona(void)
+void pppConstructCorona(void* param1, void* param2)
 {
+    // Based on objdiff expected assembly pattern  
+    // Function works with offsets and stores shorts/floats
+    char* p1 = (char*)param1;
+    char** p2 = (char**)param2;
+    
+    if (p2) {
+        char** base = (char**)*(p2 + 3); // offset 0xc from param2
+        if (base) {
+            int offset_val = (int)*(base + 3); // offset 0xc from base
+            char* target = p1 + offset_val + 0x80;
+            
+            // Store three shorts as 0
+            *((short*)target) = 0;
+            *((short*)(target + 2)) = 0;
+            *((short*)(target + 4)) = 0;
+            
+            // Store three floats with a constant value  
+            float constant = 0.0f; // Will need to find the right constant
+            *((float*)(target + 8)) = constant;
+            *((float*)(target + 0xc)) = constant; 
+            *((float*)(target + 0x10)) = constant;
+        }
+    }
 }
 
 /*
@@ -35,8 +58,9 @@ void pppDestructCorona(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameCorona(void)
+void pppFrameCorona(void* param1, void* param2)
 {
+    // Placeholder implementation - complex function with many operations
 }
 
 /*
@@ -48,6 +72,7 @@ void pppFrameCorona(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderCorona(void)
+void pppRenderCorona(void* param1, void* param2)
 {
+    // Placeholder implementation - very complex rendering function
 }

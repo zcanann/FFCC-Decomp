@@ -1,6 +1,7 @@
 #include "ffcc/pppScreenBlur.h"
 #include "ffcc/graphic.h"
 #include "ffcc/pppPart.h"
+#include "global.h"
 #include <dolphin/gx.h>
 
 /*
@@ -10,12 +11,15 @@
  */
 void pppConScreenBlur(void* param1, void* param2)
 {
-    void** ptr_struct = (void**)param2;
-    void* work_ptr = ptr_struct[1];
-    unsigned char* base = (unsigned char*)param1;
+    int iVar1;
+    
+    void** param2_offsets = (void**)param2;
+    iVar1 = (int)param2_offsets[3]; // offset from struct
     
     Graphic.InitBlurParameter();
-    base[((int)work_ptr + 2)] = 0;
+    
+    unsigned char* param1_base = (unsigned char*)param1;
+    param1_base[iVar1 + 0x80] = 0;
 }
 
 /*
@@ -55,28 +59,37 @@ void pppFrameScreenBlur(void)
  */
 void pppRenderScreenBlur(void* param1, void* param2, void* param3)
 {
-    void** ptr_struct2 = (void**)param2;
-    void** ptr_struct3 = (void**)param3;
+    unsigned int uVar1;
+    int iVar2;
+    int iVar3;
     
-    unsigned char* base1 = (unsigned char*)param1;
-    unsigned char* base2 = (unsigned char*)param2;
+    void** param3_offsets = (void**)param3;
+    iVar3 = (int)param3_offsets[3]; // offset from struct at index 3
+    iVar2 = *(int*)param3_offsets[0]; // dereference pointer at index 0
     
-    int offset3 = (int)ptr_struct3[1];
-    int offset2 = *(int*)ptr_struct3[0];
+    unsigned char* param2_base = (unsigned char*)param2;
+    unsigned char* param1_base = (unsigned char*)param1;
     
-    base2[2] = 0;
+    // Set byte at offset 6 in param2 to 0
+    param2_base[6] = 0;
     
-    unsigned char blur_flag = base1[offset3 + 2];
-    int blur_enabled = (blur_flag == 0) ? 1 : 0;
+    // Count leading zeros on the byte at param1 + iVar3 + 0x80
+    unsigned char blur_byte = param1_base[iVar3 + 0x80];
+    // cntlzw pattern: if byte is 0, result is 8; if non-zero, result is less
+    uVar1 = (blur_byte == 0) ? 8 : 0;
     
-    Graphic.RenderBlur(blur_enabled, base2[0], base2[1], base2[2], 
-                      base1[offset2 + 0x8b], *(short*)&base2[12]);
+    Graphic.RenderBlur(uVar1 >> 5,
+                      param2_base[4],
+                      param2_base[5], 
+                      param2_base[6],
+                      param1_base[iVar2 + 0x80 + 0xb],
+                      *(short*)&param2_base[8]);
     
     pppInitBlendMode();
     
-    // Set projection with screen matrix
     extern float ppvScreenMatrix[4][4];
-    GXSetProjection(ppvScreenMatrix, GX_ORTHOGRAPHIC);
+    GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
     
-    base1[offset3 + 2] = 1;
+    // Set the blur flag to 1
+    param1_base[iVar3 + 0x80] = 1;
 }

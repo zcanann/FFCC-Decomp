@@ -81,3 +81,11 @@ int toupper(int __c)
 {
 	return __c == -1 ? -1 : __upper_map[(unsigned char)__c];
 }
+
+unsigned int fn_801b52a0(int c)
+{
+	if (c == -1) {
+		return -1;
+	}
+	return __ctype_map[(unsigned char)c];
+}

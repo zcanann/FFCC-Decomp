@@ -2,30 +2,27 @@
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 80064114
+ * PAL Size: 656b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO  
+ * JP Size: TODO
  */
-void randchar(char, float)
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void pppSRandUpCV(void* param1, void* param2)
 {
-	// TODO
+    // Basic parameter validation
+    if (!param1 || !param2) return;
+    
+    // Assembly shows static initialization check
+    // Implementation placeholder - need to analyze memory layout
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void randf(unsigned char)
-{
-	// TODO
+#ifdef __cplusplus
 }
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppSRandUpCV(void)
-{
-	// TODO
-}
+#endif

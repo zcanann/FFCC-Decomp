@@ -10,18 +10,13 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructColum(void)
+void pppConstructColum(pppColum *column, UnkC *param_2)
 {
-    if (pppMngStPtr == nullptr) return;
-    
-    // Initialize column particle data structure
-    void* dataPtr = (void*)((int)pppMngStPtr + 0x80);
-    
-    // Zero out the structure fields
-    *(short*)((int)dataPtr + 0x0) = 0;
-    *(short*)((int)dataPtr + 0x2) = 0;
-    *(short*)((int)dataPtr + 0x4) = 0;
-    *(int*)((int)dataPtr + 0x8) = 0;
+    unsigned short *puVar1 = (unsigned short *)((char*)column + 0x80 + param_2->m_serializedDataOffsets[3]);
+    puVar1[2] = 0;
+    puVar1[1] = 0;
+    *puVar1 = 0;
+    *(unsigned int *)(puVar1 + 4) = 0;
 }
 
 /*
@@ -33,17 +28,13 @@ void pppConstructColum(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructColum(void)
+void pppDestructColum(pppColum *column, UnkC *param_2)
 {
-    if (pppMngStPtr == nullptr) return;
-    
-    void* dataPtr = (void*)((int)pppMngStPtr + 0x80);
-    void* allocatedMemory = *(void**)((int)dataPtr + 0x8);
-    
-    if (allocatedMemory != nullptr) {
-        // Free allocated memory if exists
-        // pppHeapUseRate__FPQ27CMemory6CStage(allocatedMemory);
-        *(void**)((int)dataPtr + 0x8) = nullptr;
+    int iVar1 = param_2->m_serializedDataOffsets[3];
+    void** memPtr = (void**)((char*)column + 0x88 + iVar1);
+    if (*memPtr != 0) {
+        // TODO: pppHeapUseRate__FPQ27CMemory6CStage(*memPtr);
+        *memPtr = 0;
     }
 }
 
@@ -56,21 +47,18 @@ void pppDestructColum(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameColum(void)
+void pppFrameColum(pppColum *column, UnkB *param_2, UnkC *param_3)
 {
-    if (pppMngStPtr == nullptr) return;
-    
-    // Check global pause state
-    extern int DAT_8032ed70;
-    if (DAT_8032ed70 != 0) return;
-    
-    void* dataPtr = (void*)((int)pppMngStPtr + 0x80);
-    void* allocatedData = *(void**)((int)dataPtr + 0x8);
-    
-    if (allocatedData == nullptr) {
-        // Allocate memory for column particle data
-        // Basic allocation simulation - would need proper memory manager
-        // *(void**)((int)dataPtr + 0x8) = pppMemAlloc(size, stage, "pppColum.cpp", 0x7d);
+    // TODO: Check global pause state - if (DAT_8032ed70 == 0)
+    unsigned char *puVar4 = (unsigned char *)((char*)column + 0x80 + param_3->m_serializedDataOffsets[3]);
+    if (*(int *)(puVar4 + 8) == 0) {
+        // TODO: Allocate memory for particle data
+        // uVar1 = pppMemAlloc(...);
+        // Initialize particle data arrays
+    }
+    if (param_2->m_dataValIndex != 0xffff) {
+        // TODO: Calculate frame shape
+        // pppCalcFrameShape__FPlRsRsRss(...);
     }
 }
 
@@ -83,31 +71,22 @@ void pppFrameColum(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderColum(void)
+void pppRenderColum(pppColum *column, UnkB *param_2, UnkC *param_3)
 {
-    if (pppMngStPtr == nullptr || pppEnvStPtr == nullptr) return;
+    int iVar7 = param_3->m_serializedDataOffsets[3];
+    int iVar5 = param_3->m_serializedDataOffsets[2];
     
-    // Basic rendering setup and particle processing
-    // This is a simplified version of the complex rendering logic
-    void* dataPtr = (void*)((int)pppMngStPtr + 0x80);
-    void* allocatedData = *(void**)((int)dataPtr + 0x8);
-    
-    if (allocatedData != nullptr) {
-        // Process particle rendering
-        // Complex rendering logic would go here
+    if (param_2->m_dataValIndex != 0xffff) {
+        // TODO: Get texture and shape data
+        // pppShapeSt *shapeSt = ...;
+        
+        // TODO: Check if column data is active
+        // if (column->field_0xb2[iVar5] != 0) {
+            // TODO: Complex rendering logic
+            // - Matrix setup
+            // - Vector calculations
+            // - Blending setup
+            // - Quad rendering loop
+        // }
     }
-}
-
-/*
- * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void GXSetTexCoordGen(void)
-{
-    // TODO - This appears to be a GameCube graphics API function
 }

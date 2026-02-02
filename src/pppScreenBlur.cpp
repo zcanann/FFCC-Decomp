@@ -1,4 +1,5 @@
 #include "ffcc/pppScreenBlur.h"
+#include "ffcc/graphic.h"
 
 /*
  * --INFO--
@@ -7,7 +8,7 @@
  */
 void pppConScreenBlur(void)
 {
-	// TODO
+	// TODO: needs parameters according to objdiff
 }
 
 /*
@@ -17,7 +18,7 @@ void pppConScreenBlur(void)
  */
 void pppCon2ScreenBlur(void)
 {
-	// TODO
+	return;
 }
 
 /*
@@ -27,7 +28,7 @@ void pppCon2ScreenBlur(void)
  */
 void pppDesScreenBlur(void)
 {
-	// TODO
+	Graphic.InitBlurParameter();
 }
 
 /*
@@ -37,7 +38,7 @@ void pppDesScreenBlur(void)
  */
 void pppFrameScreenBlur(void)
 {
-	// TODO
+	// TODO: needs implementation
 }
 
 /*
@@ -47,5 +48,5 @@ void pppFrameScreenBlur(void)
  */
 void pppRenderScreenBlur(void)
 {
-	// TODO
+	// TODO: needs parameters and complex implementation
 }

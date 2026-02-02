@@ -4,7 +4,9 @@
 #include "types.h"
 
 struct pppYmMoveParabola {
-    u32 field0_0x0;
+    struct {
+        s32 m_graphId;
+    } field0_0x0;
 };
 
 struct UnkB {

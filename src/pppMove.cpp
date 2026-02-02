@@ -47,17 +47,18 @@ void pppMove(void* basePtr, PppMoveInput* input, PppMoveData* data1, PppMoveData
         return;
     }
     
+    u32 data2Offset = *(u32*)data2->ptrData + 0x80;
+    u32 data1Offset = *(u32*)data1->ptrData + 0x80;
+    
+    f32* data2Obj = (f32*)((u8*)basePtr + data2Offset);
+    f32* data1Obj = (f32*)((u8*)basePtr + data1Offset);
+    
     u32 inputId = *(u32*)input;
     u32 baseId = *((u32*)((u8*)basePtr + 0xc));
     
-    u32 data1Offset = *((u32*)data1->ptrData);
-    u32 data2Offset = *((u32*)data2->ptrData);
-    
-    // Match target: add offset directly then add basePtr
-    f32* data1Obj = (f32*)((u8*)basePtr + data1Offset + 0x80);
-    f32* data2Obj = (f32*)((u8*)basePtr + data2Offset + 0x80);
-    
-    if (inputId == baseId) {
+    if (inputId != baseId) {
+        // Skip input application
+    } else {
         data2Obj[0] += input->x;
         data2Obj[1] += input->y;  
         data2Obj[2] += input->z;

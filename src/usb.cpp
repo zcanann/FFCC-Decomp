@@ -90,7 +90,7 @@ bool CUSB::IsConnected()
  */
 void CUSB::AddMessageCallback(MessageCallback callback, void* callerContext)
 {
-	for (int i = 0; i < sizeof(m_callbacks); i++)
+	for (int i = 0; i < 8; i++)
 	{
 		if (m_callbacks[i].m_inUse == 0)
 		{

@@ -14,10 +14,14 @@
  */
 void CFunnyShape::SetUSBData()
 {
-	// TODO: Complex USB data processing function
-	// Original function handles packet codes 4,5,6,10,11,12,15,16 for different data types
-	// Requires proper CFunnyShapePcs field definitions and USB stream data structures
-	// The function performs extensive byte swapping and memory management for USB data
+	// TODO: This is a complex USB data processing function
+	// that handles different packet codes (4,5,6,10,11,12,15,16)
+	// and performs extensive byte swapping for network data.
+	// Implementation requires understanding of:
+	// - CFunnyShapePcs structure layout with USB stream data fields
+	// - Memory allocation functions (__nwa__, __nw__, __dla__)
+	// - Graphics functions (GXInitTexObj, GXSetCopyClear, DCFlushRange)
+	// - The exact packet data formats for each case
 }
 
 /*

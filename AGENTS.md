@@ -243,8 +243,7 @@ For initial stabs at large functions, hacky function bodies are permissable.
 ### 🧹 Code Quality - Clean Source Only!
 - **NO junk comments** in submitted code (no original assembly, no debug notes)
 - **NO commented-out code** unless specifically needed
-- **NO "TODO" or "FIXME" comments** - either implement it or don't include it
-- Code should look like **plausible original source** that a game developer would write
+- Code should look like **plausible original source** that a game developer would write, unless making an early attempt at a complex function
 - **Why this matters**: PRs should contain production-quality code, not analysis artifacts
 
 ### ✅ Pre-Submit Checklist
@@ -271,7 +270,7 @@ Before creating any FFCC-Decomp PR:
 2. **Extract symbols**: `python3 extract_symbols.py <object>.o`  
 3. **Create branch from clean main**: `git checkout main && git pull origin main && git checkout -b pr/<unit>`
 4. **Update state files** (in agent workspace, not project directory)
-5. **Edit source** (use Ghidra decomp for 0% functions)
+5. **Edit source** (use Ghidra decomp for low-match functions)
 6. **Build**: `ninja`
 7. **Analyze**: `build/tools/objdiff-cli diff -p . -u <unit> -o - <symbol>`
 8. **If real improvement**: commit, push, create PR with technical details

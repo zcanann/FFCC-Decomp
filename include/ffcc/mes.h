@@ -31,6 +31,14 @@ public:
     void addFlag(class CFlag&);
     void MakeAgbString(char*, char*, int, int);
     void drawTagString(CFont*, char*, int, int, int);
+
+private:
+    char* mText;
+    int mCounter;
+    int mFlags;
+    
+    // Large data structure to account for high memory offsets seen in objdiff
+    char mData[0x3D50];  // Provides space up to offset 0x3D50
 };
 
 #endif // _FFCC_MES_H_

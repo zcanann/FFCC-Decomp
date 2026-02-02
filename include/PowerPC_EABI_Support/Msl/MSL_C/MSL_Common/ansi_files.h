@@ -128,6 +128,9 @@ extern int __read_console(__file_handle file, unsigned char* buf, size_t* count,
 
 unsigned int __flush_all(void);
 void __close_all(void);
+FILE* __find_unopened_file(void);
+void __init_file(FILE* file, file_modes mode, unsigned char* buffer, int buffer_size);
+int __flush_line_buffered_output_files(void);
 
 #ifdef __cplusplus
 };

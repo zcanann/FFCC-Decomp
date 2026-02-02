@@ -14,10 +14,10 @@
 u8 GetRandomData()
 {
     extern u8 DAT_8032f4a8;
-    extern u8* DAT_8021dcce;
+    extern u8 DAT_8021dcce[];
     
-    u8 uVar1 = DAT_8032f4a8;
-    DAT_8032f4a8++;
+    u8 uVar1 = (u8)DAT_8032f4a8;
+    DAT_8032f4a8 = DAT_8032f4a8 + 1;
     return DAT_8021dcce[uVar1];
 }
 
@@ -60,12 +60,17 @@ void ReverbAreaAlloc(unsigned long)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c31ac
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void ReverbAreaFree(void*)
+void ReverbAreaFree(void* param_1)
 {
-	// TODO
+    extern void RedDelete(void*);
+    RedDelete(param_1);
 }
 
 /*
@@ -251,9 +256,12 @@ void _VoiceDropedCallback(void* param_1)
 {
     extern u32* DAT_8032f444;
     
-    u32* puVar1 = DAT_8032f444;
+    u32* puVar1;
+    int iParam1 = (int)param_1;
+    
+    puVar1 = DAT_8032f444;
     do {
-        if ((puVar1[5] != 0) && (puVar1[5] == (u32)param_1)) {
+        if ((puVar1[5] != 0) && ((int)puVar1[5] == iParam1)) {
             puVar1[0x23] = 0;
             *puVar1 = 0;
             puVar1[5] = 0;

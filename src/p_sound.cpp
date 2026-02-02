@@ -15,52 +15,53 @@ CSoundPcs::CSoundPcs()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	800d8808
+ * Size:	4
  */
 void CSoundPcs::Init()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	800d8804
+ * Size:	4
  */
 void CSoundPcs::Quit()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	800d87f0
+ * Size:	20
  */
-void CSoundPcs::GetTable(unsigned long)
+void CSoundPcs::GetTable(unsigned long param)
 {
-	// TODO
+	// TODO: Ghidra shows this returns param * 0x15c + -0x7fdefa50
+	// but header shows void return type - needs investigation
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	800d87ec
+ * Size:	4
  */
 void CSoundPcs::create()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	800d87c4
+ * Size:	40
  */
 void CSoundPcs::createLoad()
 {
-	// TODO
+	Sound.LoadBlock();
 }
 
 /*
@@ -78,12 +79,12 @@ void CSoundPcs::destroy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	800d874c
+ * Size:	40
  */
 void CSoundPcs::calc()
 {
-	// TODO
+	Sound.Frame();
 }
 
 /*

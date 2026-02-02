@@ -6,6 +6,6 @@ struct PDrawMdl;
 struct _pppCtrlTable;
 
 void pppDrawMdl0(struct _pppPObject*, struct PDrawMdl*, struct _pppCtrlTable*);
-void pppDrawMdl(void);
+void pppDrawMdl(struct _pppPObject*, struct PDrawMdl*, struct _pppCtrlTable*);
 
 #endif // _FFCC_PPPDRAWMDL_H_

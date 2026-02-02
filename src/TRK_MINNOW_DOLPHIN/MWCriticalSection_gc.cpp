@@ -9,10 +9,9 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-extern void MWExitCriticalSection(u32* param_1)
+void MWExitCriticalSection(u32* section)
 {
-    OSRestoreInterrupts(*param_1);
-    return;
+    OSRestoreInterrupts(*section);
 }
 
 /*
@@ -24,13 +23,9 @@ extern void MWExitCriticalSection(u32* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern void MWEnterCriticalSection(u32* param_1)
+void MWEnterCriticalSection(u32* section)
 {
-    u32 uVar1;
-    
-    uVar1 = OSDisableInterrupts();
-    *param_1 = uVar1;
-    return;
+    *section = OSDisableInterrupts();
 }
 
 /*
@@ -42,7 +37,6 @@ extern void MWEnterCriticalSection(u32* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern void MWInitializeCriticalSection(void)
+void MWInitializeCriticalSection(void)
 {
-    return;
 }

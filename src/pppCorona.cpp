@@ -1,8 +1,4 @@
 #include "ffcc/pppCorona.h"
-#include "types.h"
-
-// Global state for corona system
-static bool coronaInitialized = false;
 
 /*
  * --INFO--
@@ -15,9 +11,6 @@ static bool coronaInitialized = false;
  */
 void pppConstructCorona(void)
 {
-	if (!coronaInitialized) {
-		coronaInitialized = true;
-	}
 }
 
 /*
@@ -31,7 +24,6 @@ void pppConstructCorona(void)
  */
 void pppDestructCorona(void)
 {
-	coronaInitialized = false;
 }
 
 /*
@@ -45,15 +37,6 @@ void pppDestructCorona(void)
  */
 void pppFrameCorona(void)
 {
-	if (!coronaInitialized) {
-		return;
-	}
-	
-	// Update corona effects
-	// Typical corona frame processing:
-	// - Update alpha/intensity values
-	// - Handle distance-based scaling
-	// - Process visibility checks
 }
 
 /*
@@ -67,14 +50,4 @@ void pppFrameCorona(void)
  */
 void pppRenderCorona(void)
 {
-	if (!coronaInitialized) {
-		return;
-	}
-	
-	// Render corona effects
-	// Typical corona rendering:
-	// - Set up blending modes
-	// - Draw corona geometry/quads
-	// - Apply distance-based scaling
-	// - Handle screen-space positioning
 }

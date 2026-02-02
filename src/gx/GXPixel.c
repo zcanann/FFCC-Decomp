@@ -152,27 +152,31 @@ void GXInitFogAdjTable(GXFogAdjTable *table, u16 width, const f32 projmtx[4][4])
 }
 
 void GXSetFogRangeAdj(GXBool enable, u16 center, const GXFogAdjTable *table) {
-    u32 i;
     u32 range_adj;
-    u32 range_c;
 
     CHECK_GXBEGIN(331, "GXSetFogRangeAdj");
 
     if (enable) {
         ASSERTMSGLINE(334, table != NULL, "GXSetFogRangeAdj: table pointer is null");
-        for (i = 0; i < 10; i += 2) {
-            range_adj = 0;
-            SET_REG_FIELD(338, range_adj, 12, 0, table->r[i]);
-            SET_REG_FIELD(339, range_adj, 12, 12, table->r[i + 1]);
-            SET_REG_FIELD(340, range_adj, 8, 24, (i >> 1) + 0xE9);
-            GX_WRITE_RAS_REG(range_adj);
-        }
+        
+        range_adj = (table->r[0] & 0xfff) | ((table->r[1] & 0xfff) << 12) | 0xe9000000;
+        GX_WRITE_RAS_REG(range_adj);
+        
+        range_adj = (table->r[2] & 0xfff) | ((table->r[3] & 0xfff) << 12) | 0xea000000;
+        GX_WRITE_RAS_REG(range_adj);
+        
+        range_adj = (table->r[4] & 0xfff) | ((table->r[5] & 0xfff) << 12) | 0xeb000000;
+        GX_WRITE_RAS_REG(range_adj);
+        
+        range_adj = (table->r[6] & 0xfff) | ((table->r[7] & 0xfff) << 12) | 0xec000000;
+        GX_WRITE_RAS_REG(range_adj);
+        
+        range_adj = (table->r[8] & 0xfff) | ((table->r[9] & 0xfff) << 12) | 0xed000000;
+        GX_WRITE_RAS_REG(range_adj);
     }
-    range_c = 0;
-    SET_REG_FIELD(346, range_c, 10, 0, center + 342);
-    SET_REG_FIELD(347, range_c, 1, 10, enable);
-    SET_REG_FIELD(348, range_c, 8, 24, 0xE8);
-    GX_WRITE_RAS_REG(range_c);
+    
+    range_adj = ((center + 342) & 0x3ff) | (enable << 10) | 0xe8000000;
+    GX_WRITE_RAS_REG(range_adj);
     __GXData->bpSentNot = 0;
 }
 
@@ -313,10 +317,9 @@ void GXSetFieldMask(GXBool odd_mask, GXBool even_mask) {
     u32 reg;
 
     CHECK_GXBEGIN(608, "GXSetFieldMask");
-    reg = 0;
-    SET_REG_FIELD(610, reg, 1, 0, even_mask);
-    SET_REG_FIELD(611, reg, 1, 1, odd_mask);
-    SET_REG_FIELD(611, reg, 8, 24, 0x44);
+    reg = 0x44000000;
+    reg |= even_mask;
+    reg |= odd_mask << 1;
     GX_WRITE_RAS_REG(reg);
     __GXData->bpSentNot = 0;
 }

@@ -1,4 +1,27 @@
 #include "ffcc/THPSimple.h"
+#include "dolphin/thp/THPDraw.h"
+#include "dolphin/dvd.h"
+#include "dolphin/gx/GXFrameBuffer.h"
+
+// SimpleControl structure (inferred from Ghidra decompilation)
+struct THPSimpleControl {
+    char _padding[0x80];    // 0x00-0x80
+    int field_80;           // 0x80
+    int field_84;           // 0x84
+    char _padding2[0x14];   // 0x88-0x9C
+    int field_100;          // 0x100
+    char _padding3[0x28];   // 0x104-0x128
+    short field_128;        // 0x128
+    char _padding4[0x2];    // 0x12A-0x12C
+    short field_132;        // 0x132
+    char _padding5[0xCA];   // 0x134-0x1FC
+    int field_308;          // 0x308
+    int field_312;          // 0x312
+    int field_316;          // 0x316
+    int field_320;          // 0x320
+};
+
+static THPSimpleControl SimpleControl;
 
 /*
  * --INFO--
@@ -172,12 +195,25 @@ void VideoDecode(unsigned char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80104594
+ * PAL Size: 152b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void THPSimpleDrawCurrentFrame(void)
+int THPSimpleDrawCurrentFrame(int param_1, short param_2, short param_3, short param_4, short param_5)
 {
-	// TODO
+    if (SimpleControl.field_320 < 0) {
+        return -1;
+    }
+    
+    THPGXYuv2RgbSetup(&GXNtsc240Ds);
+    THPGXYuv2RgbDraw((u32*)SimpleControl.field_308, (u32*)SimpleControl.field_312, (u32*)SimpleControl.field_316,
+                     param_2, param_3, SimpleControl.field_128, SimpleControl.field_132, param_4, param_5);
+    THPGXRestore();
+    
+    return SimpleControl.field_320;
 }
 
 /*

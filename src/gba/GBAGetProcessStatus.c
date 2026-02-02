@@ -11,6 +11,8 @@ s32 GBAGetProcessStatus(s32 chan, u8* percentp) {
     gba = &__GBA[chan];
     bootInfo = &__GBA[chan].bootInfo;
 
+    enabled = OSDisableInterrupts();
+
     if (gba->callback != NULL || bootInfo->callback != NULL) {
         ret = GBA_BUSY;
 
@@ -35,5 +37,6 @@ s32 GBAGetProcessStatus(s32 chan, u8* percentp) {
         ret = GBA_READY;
     }
 
+    OSRestoreInterrupts(enabled);
     return ret;
 }

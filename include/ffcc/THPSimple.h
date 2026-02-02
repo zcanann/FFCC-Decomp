@@ -20,7 +20,7 @@ void THPSimpleLoadStop(void);
 void THPSimpleDecode(void);
 void CheckPrefetch();
 void VideoDecode(unsigned char*);
-void THPSimpleDrawCurrentFrame(void);
+int THPSimpleDrawCurrentFrame(int param_1, short param_2, short param_3, short param_4, short param_5);
 void MixAudio(short*, short*, unsigned long);
 void THPAudioMixCallback();
 

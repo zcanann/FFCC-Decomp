@@ -122,6 +122,21 @@ void CMesMenu::CloseRequest(int)
 
 /*
  * --INFO--
+ * PAL Address: 0x8009b4e4
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMesMenu::SetPos(float x, float y, float z)
+{
+	*(float*)((char*)this + 0x3d74) = x;
+	*(float*)((char*)this + 0x3d78) = y;
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

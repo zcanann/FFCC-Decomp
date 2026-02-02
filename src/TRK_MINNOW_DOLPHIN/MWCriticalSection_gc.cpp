@@ -1,4 +1,4 @@
-#include "TRK_MINNOW_DOLPHIN/MWCriticalSection_gc.h"
+#include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/MWCriticalSection_gc.h"
 
 /*
  * --INFO--
@@ -25,7 +25,7 @@ extern void MWEnterCriticalSection(u32* section)
  * Address:	TODO
  * Size:	TODO
  */
-extern void MWInitializeCriticalSection(u32*)
+extern void MWInitializeCriticalSection(u32* section)
 {
-	
+    return;
 }

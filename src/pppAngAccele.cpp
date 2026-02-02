@@ -13,14 +13,14 @@ void pppAngAccele(void* particleSystem, void* particleData)
         return;
     }
     
-    void** systemData = (void**)((void**)particleSystem)[3];
-    void* particleIdPtr = ((void**)particleData)[0];
-    void* angularVelocityPtr = systemData[0];
+    void** systemPtr = (void**)((void**)particleSystem)[3];
+    void** particleIdPtr = (void**)particleData;
+    void* angularVelocityPtr = systemPtr[0];
     int particleId = *(int*)particleIdPtr;
-    void* angularAccelerationPtr = systemData[1];
+    void* angularAccelPtr = systemPtr[1];
     
     char* angularVelocityBase = (char*)particleSystem + (int)angularVelocityPtr + 0x80;
-    char* angularAccelBase = (char*)particleSystem + (int)angularAccelerationPtr + 0x80;
+    char* angularAccelBase = (char*)particleSystem + (int)angularAccelPtr + 0x80;
     
     if (particleId == (int)angularVelocityPtr) {
         *(int*)(angularAccelBase + 0x0) += *(int*)((char*)particleData + 0x8);

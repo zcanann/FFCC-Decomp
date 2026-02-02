@@ -1,21 +1,35 @@
 #include "ffcc/pppYmMoveCircle.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 800d183c
+ * PAL Size: 300b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppConstructYmMoveCircle(void)
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 800d160c
+ * PAL Size: 560b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppFrameYmMoveCircle(void)
 {
-	// TODO
 }
+
+#ifdef __cplusplus
+}
+#endif

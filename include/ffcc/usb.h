@@ -50,4 +50,6 @@ public:
 
 extern CUSB USB;
 
+extern void* PTR_PTR_DAT_801e88a4;
+
 #endif // _FFCC_PPP_USB_H_

@@ -90,7 +90,7 @@ bool CUSB::IsConnected()
  */
 void CUSB::AddMessageCallback(MessageCallback callback, void* callerContext)
 {
-	for (int i = 0; i < sizeof(m_callbacks); i++)
+	for (int i = 0; i < 8; i++)
 	{
 		if (m_callbacks[i].m_inUse == 0)
 		{
@@ -175,4 +175,14 @@ void CUSB::RemoveMessageCallback(MessageCallback callback)
  */
 void CUSB::Printf(char*, ...)
 {
+}
+
+/*
+ * --INFO--
+ * Address: 80022704
+ * Size: 32b
+ */
+void __sinit_usb_cpp()
+{
+	USB.m_managerStringTable = &PTR_PTR_DAT_801e88a4;
 }

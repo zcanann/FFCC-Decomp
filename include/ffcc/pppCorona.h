@@ -5,10 +5,10 @@
 extern "C" {
 #endif
 
-void pppConstructCorona(void);
+void pppConstructCorona(void* param1, void* param2);
 void pppDestructCorona(void);
-void pppFrameCorona(void);
-void pppRenderCorona(void);
+void pppFrameCorona(void* param1, void* param2);
+void pppRenderCorona(void* param1, void* param2);
 
 #ifdef __cplusplus
 }

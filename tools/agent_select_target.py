@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 FFCC-Decomp Target Selection Script
-Distills report.json to actionable target candidates without loading massive data into context.
+Randomly selects viable targets (0-90% match) to avoid getting stuck on problematic 0% functions.
 """
 
 import json
@@ -94,35 +94,22 @@ def extract_targets(report_path, max_targets=10):
     if not candidates:
         return []
     
-    # Sort by gap (improvement potential)
-    candidates.sort(key=lambda x: x["gap"], reverse=True)
+    # Filter to 0-90% match range (avoid perfect matches, include all others)
+    viable_candidates = [c for c in candidates if 0 <= c["fuzzy_match"] <= 90]
     
-    # Find the highest gap value
-    max_gap = candidates[0]["gap"]
+    # Simple random shuffle instead of gap-based prioritization
+    random.shuffle(viable_candidates)
     
-    # Get all candidates with the max gap (handles ties properly)
-    max_gap_candidates = [c for c in candidates if c["gap"] == max_gap]
-    
-    # Shuffle among tied candidates to avoid deterministic selection
-    random.shuffle(max_gap_candidates)
-    
-    # Take up to max_targets, but include lower-gap candidates if needed
-    if len(max_gap_candidates) >= max_targets:
-        return max_gap_candidates[:max_targets]
-    else:
-        # Include some lower-gap candidates to reach max_targets
-        remaining_candidates = [c for c in candidates if c["gap"] < max_gap]
-        result = max_gap_candidates + remaining_candidates[:max_targets - len(max_gap_candidates)]
-        return result
+    # Return up to max_targets
+    return viable_candidates[:max_targets]
 
 def select_target(candidates):
-    """Select one target using weighted randomness (favor higher gaps)"""
+    """Select one target randomly from viable candidates"""
     if not candidates:
         return None
     
-    # Weight by gap (improvement potential)
-    weights = [c["gap"] for c in candidates]
-    selected = random.choices(candidates, weights=weights, k=1)[0]
+    # Simple random selection - no weighting
+    selected = random.choice(candidates)
     
     return selected
 

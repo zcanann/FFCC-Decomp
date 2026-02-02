@@ -23,7 +23,15 @@ extern int lbl_8032ED70;
 extern float lbl_8032ED50;
 extern double lbl_8032FED0;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void pppColor(void* param1, void* param2, void* param3);
 void pppColorCon(void* param1, void* param2);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _FFCC_PPPCOLOR_H_

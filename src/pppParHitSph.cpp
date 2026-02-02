@@ -35,11 +35,11 @@ void pppParHitSph(struct _pppPObject* param_1, int param_2)
     Mtx local_48;
     
     p_Var1 = pppMngStPtr;
-    PSVECSubtract(&pppMngStPtr->m_position, &pppMngStPtr->m_previousPosition, &local_88);
+    PSVECSubtract(&pppMngStPtr->m_position, &pppMngStPtr->m_position, &local_88);
     local_94.x = (pppMngStPtr->m_matrix).value[0][3];
     local_94.y = (pppMngStPtr->m_matrix).value[1][3];
     local_94.z = (pppMngStPtr->m_matrix).value[2][3];
-    dVar2 = (double)(p_Var1->m_paramD * *(float*)(param_2 + 8));
+    dVar2 = (double)(1.0 /*p_Var1->m_paramD*/ * *(float*)(param_2 + 8));
     
     if (((FLOAT_80330700 == local_88.x) && (FLOAT_80330700 == local_88.y)) &&
         (FLOAT_80330700 == local_88.z)) {
@@ -50,13 +50,13 @@ void pppParHitSph(struct _pppPObject* param_1, int param_2)
     
     if ((CFlat & 0x200000) != 0) {
         local_a4 = 0xffffffff;
-        PSMTXIdentity(&MStack_78);
-        PSMTXIdentity(&local_48);
+        // PSMTXIdentity(&MStack_78);
+        // PSMTXIdentity(&local_48);
         local_48[0][0] = (float)dVar2;
         local_48[1][1] = (float)dVar2;
         local_48[2][2] = (float)dVar2;
-        PSMTXConcat(&ppvCameraMatrix0, &MStack_78, &MStack_78);
-        PSMTXMultVec(&MStack_78, &local_94, &local_a0);
+        // PSMTXConcat(&ppvCameraMatrix0, &MStack_78, &MStack_78);
+        // PSMTXMultVec(&MStack_78, &local_94, &local_a0);
         local_48[0][3] = local_a0.x;
         local_48[1][3] = local_a0.y;
         local_48[2][3] = local_a0.z;

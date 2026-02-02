@@ -11,7 +11,8 @@
  */
 void pppPointApCon(void* param1, void* param2)
 {
-    int* data = (int*)((int*)param2)[3];
+    int** param2_ptr = (int**)param2;
+    int* data = (int*)param2_ptr[3];
     int offset = data[1] + 0x81;
     ((char*)param1)[offset] = 0;
 }
@@ -29,8 +30,9 @@ void pppPointAp(void* param1, void* param2, void* param3)
 {
     // Extract data from param3
     int** data = (int**)((char*)param3 + 0xc);
-    float* coords1 = (float*)(*data + 0x0);
-    float* coords2 = (float*)(*data + 0x4);
+    int* data_ptr = *data;
+    float* coords1 = (float*)(data_ptr + 0);
+    float* coords2 = (float*)(data_ptr + 1);
     
     // Calculate base pointers with offset 0x80
     char* base1 = (char*)param1 + (int)coords1[0] + 0x80;  
@@ -46,8 +48,8 @@ void pppPointAp(void* param1, void* param2, void* param3)
             if (obj_id != 0xFFFF) {
                 // Create object
                 extern int lbl_8032ED50;
-                int* mgr = &lbl_8032ED50;
-                void* obj_data = (void*)(mgr[0x34/4] + (obj_id << 4));
+                int* mgr = (int*)&lbl_8032ED50;
+                void* obj_data = (void*)(mgr[0x34/4] + (obj_id * 16));
                 if (obj_data) {
                     // Call object creation function
                     extern void* pppCreatePObject__FP9_pppMngStP12_pppPDataVal(void* mgr, void* data);
@@ -57,7 +59,8 @@ void pppPointAp(void* param1, void* param2, void* param3)
                         
                         // Handle coordinate transformation
                         char transform_flag = ((char*)param2)[0xd];
-                        float* dest_coords = (float*)((char*)obj + ((int*)param2)[2] + 0x80);
+                        int offset = ((int*)param2)[2];
+                        float* dest_coords = (float*)((char*)obj + offset + 0x80);
                         
                         if (transform_flag == 0) {
                             // Direct copy of 3 floats
@@ -67,7 +70,7 @@ void pppPointAp(void* param1, void* param2, void* param3)
                         } else {
                             // Matrix transformation
                             extern void PSMTXMultVec(void* mtx, void* src, void* dst);
-                            PSMTXMultVec((char*)&lbl_8032ED50 + 0x78, coords1, dest_coords);
+                            PSMTXMultVec((void*)((char*)&lbl_8032ED50 + 0x78), coords1, dest_coords);
                         }
                         
                         // Set flag from param2
@@ -79,9 +82,9 @@ void pppPointAp(void* param1, void* param2, void* param3)
         }
         
         // Decrement counter flag
-        char counter = *(base2 + 1);
-        if (counter > 0) {
-            *(base2 + 1) = counter - 1;
+        char* counter_ptr = base2 + 1;
+        if (*counter_ptr > 0) {
+            (*counter_ptr)--;
         }
     }
 }

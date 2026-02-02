@@ -12,7 +12,7 @@ public:
     void CmdInit2();
     void CmdOpen();
     void CmdCtrl();
-    void CmdClose();
+    int CmdClose();
     void CmdDraw();
     void CmdCtrlCur();
     void CmdOpen0();

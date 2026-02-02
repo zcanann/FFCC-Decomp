@@ -6,8 +6,15 @@ class pppShapeSt;
 class tagOAN3_SHAPE;
 struct Vec;
 class Vec2d;
+class CMaterialMan;
 
-void pppShapeSt_GetTexture(long*, CMaterialSet*, int&);
+extern "C" {
+    void SetMaterialPart__12CMaterialManFP12CMaterialSetii(CMaterialMan*, CMaterialSet*, unsigned int, int);
+    void pppSetBlendMode__FUc(unsigned char);
+    void CacheDumpTexture__12CMaterialSetFiP13CAmemCacheSet(CMaterialSet*, unsigned int, void*);
+}
+
+void* pppShapeSt_GetTexture(long*, CMaterialSet*, int&);
 void pppDrawShp(long*, short, CMaterialSet*, unsigned char);
 void pppDrawShp(tagOAN3_SHAPE*, CMaterialSet*, unsigned char);
 void pppSetShapeMaterial0(pppShapeSt*, tagOAN3_SHAPE*, CMaterialSet*, char **);

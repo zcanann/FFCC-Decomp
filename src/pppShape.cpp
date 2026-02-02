@@ -1,13 +1,39 @@
 #include "ffcc/pppShape.h"
+#include "ffcc/materialman.h"
+
+extern "C" {
+    extern CMaterialMan MaterialMan;
+    extern void* CAMemCacheSet;
+}
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80065c6c
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppDrawShp(long*, short, CMaterialSet*, unsigned char)
+void* pppShapeSt_GetTexture(long* animData, CMaterialSet* materialSet, int& textureIndex)
 {
-	// TODO
+    int shapePtr = (int)animData + *(short*)((int)animData + 0x10) + 8;
+    textureIndex = (unsigned int)*(unsigned char*)(shapePtr + 2);
+    return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80065b74
+ * PAL Size: 248b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppDrawShp(long* animData, short frameIndex, CMaterialSet* materialSet, unsigned char blendMode)
+{
+    // TODO: Implement function body
 }
 
 /*
@@ -82,12 +108,16 @@ void pppCacheRefCnt0UpShapeTexture(pppShapeSt*, CMaterialSet*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006580c
+ * PAL Size: 240b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppCacheDumpShapeTexture(pppShapeSt*, CMaterialSet*)
+void pppCacheDumpShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
 {
-	// TODO
+    // TODO: Implement function body
 }
 
 /*

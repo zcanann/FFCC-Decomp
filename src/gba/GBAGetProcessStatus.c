@@ -10,44 +10,50 @@
  * JP Size: TODO
  */
 
-s32 GBAGetProcessStatus(s32 chan, u8* percentp) {
-    u32 enabled;
-    s32 ret;
-    u8 percent;
-    OSTime time;
-    s32 param_offset;
+s32 GBAGetProcessStatus(s32 param_1, u8* param_2) {
+    u32 uVar1;
+    u32 uVar4;
+    s32 iVar3;
+    u32 uVar2;
+    u64 uVar6;
     
-    param_offset = chan * 0x100;
-    enabled = OSDisableInterrupts();
+    param_1 = param_1 * 0x100;
+    uVar1 = OSDisableInterrupts();
     
-    if (*(s32*)((u8*)&__GBA + param_offset + 0x54) == 0) {
-        if (*(s32*)((u8*)&__GBA + param_offset + 0x1c) == 0) {
-            ret = 0;
+    if (*(s32*)((u8*)&__GBA + param_1 + 0x54) == 0) {
+        if (*(s32*)((u8*)&__GBA + param_1 + 0x1c) == 0) {
+            iVar3 = 0;
         } else {
-            ret = 2;
+            iVar3 = 2;
         }
     } else {
-        ret = 2;
-        percent = (*(s32*)((u8*)&__GBA + param_offset + 0x74) * 100) / *(s32*)((u8*)&__GBA + param_offset + 0xa4) & 0xff;
+        iVar3 = 2;
+        uVar4 = (*(s32*)((u8*)&__GBA + param_1 + 0x74) * 100) / *(s32*)((u8*)&__GBA + param_1 + 0xa4) & 0xff;
         
-        if (*(s32*)((u8*)&__GBA + param_offset + 0x6c) != 0 || *(s32*)((u8*)&__GBA + param_offset + 0x68) != 0) {
-            time = OSGetTime();
-            time = time - *(OSTime*)((u8*)&__GBA + param_offset + 0x68);
+        if (*(s32*)((u8*)&__GBA + param_1 + 0x6c) != 0 || *(s32*)((u8*)&__GBA + param_1 + 0x68) != 0) {
+            uVar6 = OSGetTime();
+            uVar2 = (u32)uVar6 - *(u32*)((u8*)&__GBA + param_1 + 0x68);
+            iVar3 = (s32)(uVar6 >> 32) - ((u32)uVar6 < *(u32*)((u8*)&__GBA + param_1 + 0x68)) - *(s32*)((u8*)&__GBA + param_1 + 0x6c);
             
-            if (__div2i(0, time, 0, OSSecondsToTicks(1) / 1000 * 5500) < 0x157c) {
-                percent = __div2i(0, percent * time, 0, OSSecondsToTicks(1) / 1000 * 5500) & 0xff;
+            uVar6 = __div2i(iVar3, uVar2, 0, *(u32*)0x800000f8 / 4000);
+            if (((u32)(uVar6 >> 32) ^ 0x80000000) < (((u32)uVar6 < 0x157c) + 0x80000000)) {
+                uVar4 = __div2i((s32)((u64)uVar4 * (u64)uVar2 >> 32) + uVar4 * iVar3, uVar4 * uVar2, 
+                               (s32)((u64)(*(u32*)0x800000f8 / 4000) * 0x157cULL >> 32), 
+                               (*(u32*)0x800000f8 / 4000) * 0x157c) & 0xff;
             }
             
-            if ((percent & 0xff) > 99) {
-                percent = 100;
+            if (99 < (uVar4 & 0xff)) {
+                uVar4 = 100;
             }
         }
         
-        if (percentp != NULL) {
-            *percentp = percent;
+        if (param_2 != NULL) {
+            *param_2 = (u8)uVar4;
         }
+        
+        iVar3 = 2;
     }
     
-    OSRestoreInterrupts(enabled);
-    return ret;
+    OSRestoreInterrupts(uVar1);
+    return iVar3;
 }

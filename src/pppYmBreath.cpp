@@ -2,12 +2,11 @@
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	800bfe74
+ * Size:	4
  */
 void get_rand()
 {
-	// TODO
 }
 
 /*
@@ -52,52 +51,47 @@ void SetParticleMatrix(_pppPObject*, VYmBreath*, PARTICLE_DATA*, PARTICLE_WMAT*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	800c04f8
+ * Size:	1264
  */
-void pppFrameYmBreath(void)
+extern "C" void pppFrameYmBreath(void)
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	800bffec
+ * Size:	1292
  */
-void pppRenderYmBreath(void)
+extern "C" void pppRenderYmBreath(void)
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	800bff74
+ * Size:	120
  */
-void pppConstructYmBreath(void)
+extern "C" void pppConstructYmBreath(void)
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	800bff70
+ * Size:	4
  */
 void pppConstruct2YmBreath(void)
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	800bfe78
+ * Size:	248
  */
-void pppDestructYmBreath(void)
+extern "C" void pppDestructYmBreath(void)
 {
-	// TODO
 }
 
 /*

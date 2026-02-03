@@ -1,5 +1,33 @@
 #include "ffcc/p_chara.h"
 
+// CPtrArray template implementation
+template<class T>
+class CPtrArray
+{
+public:
+    CPtrArray() : m_count(0), m_capacity(0), m_data((T**)0) {}
+    
+    void Add(T* item)
+    {
+        // Simple implementation - just increment count for now
+        // Real implementation would manage memory allocation
+        m_count++;
+    }
+    
+    int GetSize() const
+    {
+        return m_count;
+    }
+    
+private:
+    int m_count;
+    int m_capacity;
+    T** m_data;
+};
+
+// Explicit template instantiation for CLoadPdt
+template class CPtrArray<CCharaPcs::CLoadPdt>;
+
 /*
  * --INFO--
  * Address:	TODO
@@ -408,6 +436,16 @@ void CCharaPcs::loadAnimBuffer(void*, char*, int, int, int, int)
 void CCharaPcs::drawOverlap()
 {
 	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void* CCharaPcs::CHandle::operator new(unsigned long size, CMemory::CStage* stage, char* file, int line)
+{
+	return ::operator new(size, stage, file, line);
 }
 
 /*

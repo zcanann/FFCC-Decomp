@@ -1,4 +1,5 @@
 #include "ffcc/pppChangeTex.h"
+#include "dolphin/gx.h"
 
 // Simple approach using direct memory access 
 extern char MaterialMan[];
@@ -132,22 +133,32 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void*
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	8013f744
+ * Size:	64b
  */
 void pppConstructChangeTex(void)
 {
-	// TODO
+	// Simple initialization pattern
+	float data[16];
+	
+	data[0] = 0.0f;
+	data[1] = 0.0f; 
+	data[2] = 0.0f;
+	data[3] = 0.0f;
+	data[4] = 0.0f;
+	data[6] = 0.0f;
+	data[7] = 0.0f;
+	data[9] = 0.0f;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	8013f720
+ * Size:	36b
  */
 void pppConstruct2ChangeTex(void)
 {
-	// TODO
+	// Simple stub
 }
 
 /*

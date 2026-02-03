@@ -62,11 +62,3 @@ void pppSRandUpCV(void* param1, void* param2)
         targetColors[i] = (unsigned char)(currentValue + adjustment);
     }
 }
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#ifdef __cplusplus
-}
-#endif

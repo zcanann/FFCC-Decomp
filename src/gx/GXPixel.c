@@ -152,31 +152,31 @@ void GXInitFogAdjTable(GXFogAdjTable *table, u16 width, const f32 projmtx[4][4])
 }
 
 void GXSetFogRangeAdj(GXBool enable, u16 center, const GXFogAdjTable *table) {
-    u32 range_adj;
+    u32 val;
 
     CHECK_GXBEGIN(331, "GXSetFogRangeAdj");
 
     if (enable) {
         ASSERTMSGLINE(334, table != NULL, "GXSetFogRangeAdj: table pointer is null");
         
-        range_adj = (table->r[0] & 0xfff) | ((table->r[1] & 0xfff) << 12) | 0xe9000000;
-        GX_WRITE_RAS_REG(range_adj);
+        val = table->r[0] | (table->r[1] << 12) | 0xe9000000;
+        GX_WRITE_RAS_REG(val);
         
-        range_adj = (table->r[2] & 0xfff) | ((table->r[3] & 0xfff) << 12) | 0xea000000;
-        GX_WRITE_RAS_REG(range_adj);
+        val = table->r[2] | (table->r[3] << 12) | 0xea000000;
+        GX_WRITE_RAS_REG(val);
         
-        range_adj = (table->r[4] & 0xfff) | ((table->r[5] & 0xfff) << 12) | 0xeb000000;
-        GX_WRITE_RAS_REG(range_adj);
+        val = table->r[4] | (table->r[5] << 12) | 0xeb000000;
+        GX_WRITE_RAS_REG(val);
         
-        range_adj = (table->r[6] & 0xfff) | ((table->r[7] & 0xfff) << 12) | 0xec000000;
-        GX_WRITE_RAS_REG(range_adj);
+        val = table->r[6] | (table->r[7] << 12) | 0xec000000;
+        GX_WRITE_RAS_REG(val);
         
-        range_adj = (table->r[8] & 0xfff) | ((table->r[9] & 0xfff) << 12) | 0xed000000;
-        GX_WRITE_RAS_REG(range_adj);
+        val = table->r[8] | (table->r[9] << 12) | 0xed000000;
+        GX_WRITE_RAS_REG(val);
     }
     
-    range_adj = ((center + 342) & 0x3ff) | (enable << 10) | 0xe8000000;
-    GX_WRITE_RAS_REG(range_adj);
+    val = (center + 342) | (enable << 10) | 0xe8000000;
+    GX_WRITE_RAS_REG(val);
     __GXData->bpSentNot = 0;
 }
 
@@ -317,9 +317,7 @@ void GXSetFieldMask(GXBool odd_mask, GXBool even_mask) {
     u32 reg;
 
     CHECK_GXBEGIN(608, "GXSetFieldMask");
-    reg = 0x44000000;
-    reg |= even_mask;
-    reg |= odd_mask << 1;
+    reg = (even_mask & 0xFF) | (0x44 << 24) | ((odd_mask & 0xFF) << 1);
     GX_WRITE_RAS_REG(reg);
     __GXData->bpSentNot = 0;
 }

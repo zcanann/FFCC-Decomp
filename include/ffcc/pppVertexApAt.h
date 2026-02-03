@@ -11,8 +11,8 @@ void apea(_pppPObject*, PVertexApAt*, unsigned short);
 extern "C" {
 #endif
 
-void pppVertexApAtCon(void);
-void pppVertexApAt(void);
+void pppVertexApAtCon(_pppPObject*, PVertexApAt*);
+void pppVertexApAt(_pppPObject*, PVertexApAt*);
 
 #ifdef __cplusplus
 }

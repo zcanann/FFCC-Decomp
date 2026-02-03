@@ -16,20 +16,20 @@ void pppWDrawMatrixFront(struct _pppPObject* param_1)
 	Vec local_18;
 	
 	PSMTXScaleApply(
-		*(Mtx*)((char*)param_1 + 0x10),
-		*(Mtx*)((char*)param_1 + 0x40),
+		param_1->m_localMatrix.value,
+		(param_1 + 1)->m_localMatrix.value,
 		(pppMngStPtr->m_scale).x,
 		(pppMngStPtr->m_scale).y,
 		(pppMngStPtr->m_scale).z
 	);
 	
-	local_18.x = *(float*)((char*)param_1 + 0x1c);
-	local_18.y = *(float*)((char*)param_1 + 0x2c);
-	local_18.z = *(float*)((char*)param_1 + 0x3c);
+	local_18.x = (param_1->m_localMatrix).value[0][3];
+	local_18.y = (param_1->m_localMatrix).value[1][3];
+	local_18.z = (param_1->m_localMatrix).value[2][3];
 	
 	PSMTXMultVec(ppvCameraMatrix0, &local_18, &local_18);
 	
-	*(s32*)((char*)param_1 + 0x4c) = (s32)local_18.x;
-	*(float*)((char*)param_1 + 0x5c) = local_18.y;
-	*(float*)((char*)param_1 + 0x6c) = local_18.z;
+	param_1[1].m_graphId = (s32)local_18.x;
+	param_1[1].m_localMatrix.value[0][3] = local_18.y;
+	param_1[1].m_localMatrix.value[1][3] = local_18.z;
 }

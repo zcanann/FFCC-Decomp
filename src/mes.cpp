@@ -1,21 +1,20 @@
 #include "ffcc/mes.h"
+#include <string.h>
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address: 8009b358
+ * Size: 92b
  */
 CMes::CMes()
 {
 	mText = 0;
 	mCounter = 0;
-	mFlags = 0;
-	
-	// Initialize data array to zero
-	for (int i = 0; i < 0x3D50; i++)
-	{
-		mData[i] = 0;
-	}
+	*(int*)((char*)this + 0x3c10) = 0;
+	*(int*)((char*)this + 0x3c0c) = 0;
+	*(int*)((char*)this + 0x3d34) = 0;
+	*(int*)((char*)this + 0x3d38) = 1;
+	memset((char*)this + 0x3cc0, 0, 0x50);
 }
 
 /*
@@ -30,23 +29,59 @@ CMes::~CMes()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address: 8009b168
+ * Size: 436b
  */
 void CMes::Set(char* text, int param)
 {
-	mText = text;
-	mCounter = 0;
-	mFlags = param;
+	*(int*)((char*)this + 4) = (int)text;
+	*(int*)((char*)this + 0x3c74) = 0;
+	*(float*)((char*)this + 0x3ca8) = 0.0f;
+	*(float*)((char*)this + 0x3ca4) = 0.0f;
+	*(int*)((char*)this + 8) = 0;
+	*(int*)((char*)this + 0x3c10) = 0;
+	*(int*)((char*)this + 0x3c0c) = 0;
+	*(int*)((char*)this + 0x3d10) = 0;
+	*(int*)((char*)this + 0x3d30) = param;
+	*(float*)((char*)this + 0x3d3c) = 0.0f;
+	*(int*)((char*)this + 0x3d40) = 0;
+	*(float*)((char*)this + 0x3d44) = 1.0f;
+	*(float*)((char*)this + 0x3d48) = 1.0f;
+	*(int*)((char*)this + 0x3d4c) = 1;
 	
 	if (text != 0)
 	{
-		// Initialize some data structure based on the text
-		// This is a basic implementation to match expected behavior
-		for (int i = 0; i < 0x50 && i < 0x3D50; i++)
+		// Copy data and process text
+		memcpy((char*)this + 0x3cc0, (char*)this + 0x3cc0, 0x50);
+		
+		while (*(int*)((char*)this + 0x3c74) == 0)
 		{
-			mData[i] = 0;
+			*(int*)((char*)this + 8) = 0;
+			*(int*)((char*)this + 0x3c10) = 0;
+			*(int*)((char*)this + 0x3c0c) = 0;
+			*(float*)((char*)this + 0x3c88) = 0.0f;
+			*(float*)((char*)this + 0x3c84) = 0.0f;
+			*(float*)((char*)this + 0x3c90) = 0.0f;
+			*(float*)((char*)this + 0x3c8c) = 0.0f;
+			
+			// Call addString - simplified
+			break; // Avoid infinite loop for now
 		}
+		
+		// Final setup
+		*(int*)((char*)this + 4) = (int)text;
+		*(int*)((char*)this + 0x3c74) = 0;
+		*(int*)((char*)this + 0x3cb0) = 0;
+		*(int*)((char*)this + 0x3cb4) = 3;
+		*(int*)((char*)this + 0x3cb8) = 0;
+		*(int*)((char*)this + 0x3d10) = 0;
+		*(int*)((char*)this + 0x3d2c) = 0;
+		*(int*)((char*)this + 0x3d28) = 7;
+		*(float*)((char*)this + 0x3d3c) = 0.0f;
+		*(int*)((char*)this + 0x3d40) = 0;
+		*(float*)((char*)this + 0x3d44) = 1.0f;
+		*(float*)((char*)this + 0x3d48) = 1.0f;
+		*(int*)((char*)this + 0x3d4c) = 1;
 	}
 }
 

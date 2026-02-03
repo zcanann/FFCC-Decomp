@@ -47,17 +47,6 @@ int AXFXDelaySettings(AXFX_DELAY* delay) {
     s32* s;
     BOOL old;
 
-    ASSERTMSGLINE(67, delay->delay[0] >= 10 && delay->delay[0] <= 5000 &&
-                     delay->delay[1] >= 10 && delay->delay[1] <= 5000 &&
-                     delay->delay[2] >= 10 && delay->delay[2] <= 5000 &&
-                     delay->feedback[0] >= 0 && delay->feedback[0] <= 100 &&
-                     delay->feedback[1] >= 0 && delay->feedback[1] <= 100 &&
-                     delay->feedback[2] >= 0 && delay->feedback[2] <= 100 &&
-                     delay->output[0] >= 0 && delay->output[0] <= 100 &&
-                     delay->output[1] >= 0 && delay->output[1] <= 100 &&
-                     delay->output[2] >= 0 && delay->output[2] <= 100,
-                     "The value of specified parameter is out of range.");
-
     if (delay->delay[0] < 10 || delay->delay[0] > 5000 ||
         delay->delay[1] < 10 || delay->delay[1] > 5000 ||
         delay->delay[2] < 10 || delay->delay[2] > 5000 ||
@@ -70,6 +59,17 @@ int AXFXDelaySettings(AXFX_DELAY* delay) {
     {
         return 0;
     }
+
+    ASSERTMSGLINE(67, delay->delay[0] >= 10 && delay->delay[0] <= 5000 &&
+                     delay->delay[1] >= 10 && delay->delay[1] <= 5000 &&
+                     delay->delay[2] >= 10 && delay->delay[2] <= 5000 &&
+                     delay->feedback[0] >= 0 && delay->feedback[0] <= 100 &&
+                     delay->feedback[1] >= 0 && delay->feedback[1] <= 100 &&
+                     delay->feedback[2] >= 0 && delay->feedback[2] <= 100 &&
+                     delay->output[0] >= 0 && delay->output[0] <= 100 &&
+                     delay->output[1] >= 0 && delay->output[1] <= 100 &&
+                     delay->output[2] >= 0 && delay->output[2] <= 100,
+                     "The value of specified parameter is out of range.");
 
     AXFXDelayShutdown(delay);
     old = OSDisableInterrupts();
@@ -89,6 +89,7 @@ int AXFXDelaySettings(AXFX_DELAY* delay) {
 
     if (delay->left == NULL || delay->right == NULL || delay->sur == NULL) {
         AXFXDelayShutdown(delay);
+        OSRestoreInterrupts(old);
         return 0;
     }
 
@@ -120,7 +121,7 @@ int AXFXDelayInit(AXFX_DELAY* delay) {
     delay->right = NULL;
     delay->sur = NULL;
     OSRestoreInterrupts(old);
-    AXFXDelaySettings(delay);
+    return AXFXDelaySettings(delay);
 }
 
 int AXFXDelayShutdown(AXFX_DELAY* delay) {
@@ -129,19 +130,18 @@ int AXFXDelayShutdown(AXFX_DELAY* delay) {
     old = OSDisableInterrupts();
     if (delay->left) {
         __AXFXFree(delay->left);
+        delay->left = NULL;
     }
 
     if (delay->right) {
         __AXFXFree(delay->right);
+        delay->right = NULL;
     }
 
     if (delay->sur) {
         __AXFXFree(delay->sur);
+        delay->sur = NULL;
     }
-
-    delay->left = NULL;
-    delay->right = NULL;
-    delay->sur = NULL;
 
     OSRestoreInterrupts(old);
     return 1;

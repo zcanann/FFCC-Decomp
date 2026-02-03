@@ -8,8 +8,12 @@ extern void GXCallDisplayList(void*, unsigned int);
 
 /*
  * --INFO--
- * Address:	800d4164 (PAL)
- * Size:	276 bytes
+ * PAL Address: 0x800d4164
+ * PAL Size: 276b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* param_3, int param_4, int param_5, float (*param_6) [4])
 {
@@ -60,8 +64,12 @@ void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* pa
 
 /*
  * --INFO--
- * Address:	800d3fd8 (PAL)
- * Size:	396 bytes
+ * PAL Address: 0x800d3fd8
+ * PAL Size: 396b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* param_3, int param_4, float (*param_5) [4])
 {
@@ -173,8 +181,12 @@ void pppDestructChangeTex(void)
 
 /*
  * --INFO--
- * Address:	8013eff8 (PAL)
- * Size:	1292 bytes
+ * PAL Address: 0x8013eff8
+ * PAL Size: 1292b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppFrameChangeTex(void)
 {

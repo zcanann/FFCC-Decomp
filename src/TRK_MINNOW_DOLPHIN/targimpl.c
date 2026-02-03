@@ -115,6 +115,20 @@ asm void __TRK_set_MSR(register u32 msr) {
 #endif // clang-format on
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801abed4
+ * PAL Size: 36b
+ */
+asm void WriteFPSCR(register f64* fpscr) {
+#ifdef __MWERKS__ // clang-format off
+    nofralloc
+    lfd f0, 0(r3)
+    mtfsf 0xff, f0
+    blr
+#endif // clang-format on
+}
+
 #pragma dont_inline on
 DSError TRKValidMemory32(const void* addr, size_t length,
                          ValidMemoryOptions readWriteable)

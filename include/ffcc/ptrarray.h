@@ -75,14 +75,6 @@ bool CPtrArray<T>::Add(T* item)
 }
 
 template <class T>
-bool CPtrArray<T>::setSize(unsigned int newSize)
-{
-    // TODO: Implement proper array resizing logic
-    // For now, assume success - this needs memory allocation logic
-    return true;
-}
-
-#endif // _FFCC_PTRARRAY_H_
 void CPtrArray<T>::RemoveAll()
 {
     if (m_items != 0) {

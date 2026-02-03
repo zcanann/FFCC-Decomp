@@ -4,6 +4,9 @@
 #define K1 0x80808080
 #define K2 0xFEFEFEFF
 
+// Global state for strtok
+static char* strtok_state = NULL;
+
 size_t strlen(const char* str)
 {
 	size_t len       = -1;
@@ -98,22 +101,27 @@ char* strncpy(char* dst, const char* src, size_t n)
 	return dst;
 }
 
-// TODO: same implementation as strncpy?
 char* strcat(char* dst, const char* src, size_t n)
 {
-    const unsigned char* p = (const unsigned char*)src - 1;
-	unsigned char* q       = (unsigned char*)dst - 1;
-
-	n++;
-	while (--n) {
-		if (!(*++q = *++p)) {
-			while (--n) {
-				*++q = 0;
-			}
-			break;
-		}
-	}
-
+	const char* pcVar2 = src - 1;
+	char* pcVar3;
+	char* pcVar4 = dst - 1;
+	char cVar1;
+	
+	// Find end of dst string
+	do {
+		pcVar3 = pcVar4;
+		pcVar4 = pcVar3 + 1;
+	} while (pcVar3[1] != '\0');
+	
+	// Append src to dst
+	do {
+		pcVar2 = pcVar2 + 1;
+		cVar1 = *pcVar2;
+		pcVar4 = pcVar4 + 1;
+		*pcVar4 = cVar1;
+	} while (cVar1 != '\0');
+	
 	return dst;
 }
 
@@ -271,4 +279,64 @@ char* strstr(const char* str, const char* pat)
 	}
 
 	return NULL;
+}
+
+char* strtok(char* str, const char* delim)
+{
+	char delimiter_table[32];  // 256 bits / 8 = 32 bytes
+	unsigned char bVar2;
+	char* pbVar1;
+	char* pbVar3;
+	char* pbVar4;
+	int i;
+	
+	// Initialize delimiter bit table
+	for (i = 0; i < 32; i++) {
+		delimiter_table[i] = 0;
+	}
+	
+	// If new string provided, use it
+	if (str != NULL) {
+		strtok_state = str;
+	}
+	
+	// Build delimiter bit table
+	pbVar3 = (char*)(delim - 1);
+	while (1) {
+		pbVar3 = pbVar3 + 1;
+		bVar2 = *pbVar3;
+		if (bVar2 == 0) break;
+		delimiter_table[bVar2 >> 3] |= (1 << (bVar2 & 7));
+	}
+	
+	// Skip leading delimiters
+	pbVar3 = strtok_state - 1;
+	do {
+		pbVar3 = pbVar3 + 1;
+		bVar2 = *pbVar3;
+		if (bVar2 == 0) break;
+	} while ((delimiter_table[bVar2 >> 3] & (1 << (bVar2 & 7))) != 0);
+	
+	pbVar1 = pbVar3;
+	if (bVar2 == 0) {
+		strtok_state = NULL;
+		return NULL;
+	}
+	
+	// Find end of token
+	do {
+		pbVar4 = pbVar1;
+		pbVar1 = pbVar4 + 1;
+		bVar2 = *pbVar1;
+		if (bVar2 == 0) break;
+	} while ((delimiter_table[bVar2 >> 3] & (1 << (bVar2 & 7))) == 0);
+	
+	if (bVar2 == 0) {
+		strtok_state = NULL;
+	} else {
+		strtok_state = pbVar4 + 2;
+		*pbVar1 = 0;
+	}
+	
+	return pbVar3;
 }

@@ -25,17 +25,22 @@ void TRK_fill_mem(void* dst, int val, u32 n) {
         }
 
         if (v)
-            v |= v << 24 | v << 16 | v << 8;
+            v |= v << 8 | v << 16 | v << 24;
 
         ((u32*)dst) = ((u32*)(((u8*)dst) + 4)) - 1;
-        ((u32*)dst) = ((u32*)(((u8*)dst) + 1)) - 1;
 
         i = n / 32;
 
         if (i) {
             do {
-                for (j = 0; j < 8; j++)
-                    *++((u32*)dst) = v;
+                *++((u32*)dst) = v;
+                *++((u32*)dst) = v;
+                *++((u32*)dst) = v;
+                *++((u32*)dst) = v;
+                *++((u32*)dst) = v;
+                *++((u32*)dst) = v;
+                *++((u32*)dst) = v;
+                *++((u32*)dst) = v;
             } while (--i);
         }
 

@@ -1,5 +1,20 @@
 #include "ffcc/p_game.h"
 
+extern "C" void __sinit_p_game_cpp();
+
+/*
+ * --INFO--
+ * PAL Address: 80047b54
+ * PAL Size: 328b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void __sinit_p_game_cpp() {
+    // Static initialization for p_game module
+}
+
 /*
  * --INFO--
  * Address:	TODO
@@ -132,22 +147,30 @@ void CGamePcs::draw2()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 800479a8
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGamePcs::onScriptChanging(char*)
+void CGamePcs::onScriptChanging(char* script)
 {
-	// TODO
+	Game.game.ScriptChanging(script);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 80047980
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGamePcs::onScriptChanged(char*, int)
+void CGamePcs::onScriptChanged(char* script, int param)
 {
-	// TODO
+	Game.game.ScriptChanged(script, param);
 }
 
 /*

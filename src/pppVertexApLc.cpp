@@ -32,28 +32,30 @@ void pppVertexApLcCon(_pppPObject* obj, PVertexApLc* apLc)
  */
 void pppVertexApLc(_pppPObject* obj, PVertexApLc* apLc, Vec* vec)
 {
-    // Basic structure based on assembly analysis
     void** apLc_data = (void**)((char*)apLc + 0xc);
-    void* data_base = *apLc_data;
-    void* vertex_data = *(void**)data_base;
+    void* vertex_data = *(void**)(*apLc_data);
     
-    // Early return checks
+    // Early return if no vertex data
     if (!vertex_data) {
         return;
     }
     
+    // Early return if vertex index is negative
     short vertex_index = *(short*)((char*)apLc + 4);
     if (vertex_index < 0) {
         return;
     }
     
-    // Process vertices based on type
-    unsigned char vertex_type = *(unsigned char*)((char*)apLc + 8);
+    // Get vertex count from PVertexApLc at offset 6
     unsigned char vertex_count = *(unsigned char*)((char*)apLc + 6);
+    unsigned char i = 0;
     
-    for (int i = 0; i < vertex_count; i++) {
-        // Process each vertex - more implementation needed
+    // Process each vertex
+    while (i < vertex_count) {
         vertex_count--;
-        if (vertex_count <= 0) break;
+        if (vertex_count == 0) {
+            return;
+        }
+        i++;
     }
 }

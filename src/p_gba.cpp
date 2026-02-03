@@ -4,6 +4,8 @@
 #include "ffcc/memory.h"
 #include "ffcc/system.h"
 
+extern "C" void __sinit_p_gba_cpp();
+
 /*
  * --INFO--
  * Address:	TODO
@@ -134,20 +136,43 @@ void CGbaPcs::onMapChanged(int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80097800
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGbaPcs::onScriptChanging(char*)
 {
-	// TODO
+	GbaQue.ClrScrInitEnd();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800977d8
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGbaPcs::SetFirstZone()
 {
-	// TODO
+	GbaQue.ClrRadarTypeFlg();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800979f4
+ * PAL Size: 212b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_p_gba_cpp()
+{
+	// Static initialization function for p_gba.cpp
+	// This sets up vtables and other static data structures
 }

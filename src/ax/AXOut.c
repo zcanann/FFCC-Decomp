@@ -226,13 +226,7 @@ void __AXOutQuit(void) {
 }
 
 AXCallback AXRegisterCallback(AXCallback callback) {
-    BOOL enabled;
-    AXCallback oldCB;
-
-    oldCB = __AXUserFrameCallback;
-    enabled = OSDisableInterrupts();
+    AXCallback oldCB = __AXUserFrameCallback;
     __AXUserFrameCallback = callback;
-
-    OSRestoreInterrupts(enabled);
     return oldCB;
 }

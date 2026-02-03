@@ -67,7 +67,35 @@ size_t __fread(const void* buffer, size_t size, size_t count, FILE* stream)
         return 0;
     }
 	
-	// Huge chunk of code missing
+    // Handle ungetc buffer - characters pushed back with ungetc()
+    bytes_read = 0;
+    if (total_bytes != 0 && stream->file_state.io_state > __reading) {
+        do {
+#ifndef __NO_WIDE_CHAR
+            if (fwide(stream, 0) == 1) {
+                // Wide character mode - read 2 bytes from wide buffer
+                bytes_read += 2;
+                total_bytes -= 2;
+                *(wchar_t*)buffer = stream->ungetc_wide_buffer[stream->file_state.io_state - 3];
+                buffer = (char*)buffer + 2;
+            } else
+#endif
+            {
+                // Byte character mode - read 1 byte from byte buffer  
+                bytes_read += 1;
+                total_bytes -= 1;
+                *(char*)buffer = stream->ungetc_buffer[stream->file_state.io_state - 3];
+                buffer = (char*)buffer + 1;
+            }
+            // Decrement ungetc stack depth in io_state
+            stream->file_state.io_state = stream->file_state.io_state - 1;
+        } while (total_bytes != 0 && stream->file_state.io_state > __reading);
+        
+        // Restore buffer length when ungetc buffer is emptied
+        if (stream->file_state.io_state == __reading) {
+            stream->buffer_length = stream->save_buffer_length;
+        }
+    }
 
     bytes_to_go = total_bytes;
     bytes_read  = 0;

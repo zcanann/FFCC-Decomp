@@ -23,51 +23,52 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void*
 }
 
 /*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * --INFO--  
+ * Address:	8013f744 (PAL)
+ * Size:	64 bytes
  */
 void pppConstructChangeTex(void)
 {
-	// TODO
+	// TODO: Implement based on Ghidra decomp
+	// Initializes data structure with zeros and constants
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	8013f720 (PAL)  
+ * Size:	36 bytes
  */
 void pppConstruct2ChangeTex(void)
 {
-	// TODO
+	// TODO: Implement constructor 2
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	8013f504 (PAL)
+ * Size:	540 bytes  
  */
 void pppDestructChangeTex(void)
 {
-	// TODO
+	// TODO: Implement destructor
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	8013eff8 (PAL)
+ * Size:	1292 bytes
  */
 void pppFrameChangeTex(void)
 {
-	// TODO
+	// TODO: Implement main frame processing
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	8013ef94 (PAL)
+ * Size:	100 bytes
  */
 void pppRenderChangeTex(void)
 {
-	// TODO
+	// TODO: Implement render processing
 }

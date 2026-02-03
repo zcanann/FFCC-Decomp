@@ -90,3 +90,87 @@ int memcmp(const void* lhs, const void* rhs, size_t count)
 
 	return 0;
 }
+
+void* memcpy(void* dst, const void* src, size_t count)
+{
+	unsigned char* srcPtr;
+	unsigned char* dstPtr;
+	int n;
+
+	if (dst <= src) {
+		srcPtr = (unsigned char*)src - 1;
+		dstPtr = (unsigned char*)dst - 1;
+		n = count + 1;
+		while (--n != 0) {
+			*++dstPtr = *++srcPtr;
+		}
+	} else {
+		srcPtr = (unsigned char*)src + count;
+		dstPtr = (unsigned char*)dst + count;
+		n = count + 1;
+		while (--n != 0) {
+			*--dstPtr = *--srcPtr;
+		}
+	}
+	return dst;
+}
+
+void __fill_mem(void* dst, unsigned char c, size_t count)
+{
+	unsigned int fillValue;
+	unsigned int* wordPtr;
+	unsigned char* bytePtr;
+	unsigned int alignBytes;
+	unsigned int words;
+
+	fillValue = (unsigned int)c;
+	bytePtr = (unsigned char*)dst - 1;
+
+	if (count > 31) {
+		alignBytes = (~(unsigned int)bytePtr) & 3;
+		if (alignBytes != 0) {
+			count -= alignBytes;
+			do {
+				*++bytePtr = c;
+				alignBytes--;
+			} while (alignBytes != 0);
+		}
+
+		if (fillValue != 0) {
+			fillValue = fillValue | (fillValue << 8) | (fillValue << 24) | (fillValue << 16);
+		}
+
+		wordPtr = (unsigned int*)(bytePtr - 3);
+		for (words = count >> 5; words != 0; words--) {
+			wordPtr[1] = fillValue;
+			wordPtr[2] = fillValue;
+			wordPtr[3] = fillValue;
+			wordPtr[4] = fillValue;
+			wordPtr[5] = fillValue;
+			wordPtr[6] = fillValue;
+			wordPtr[7] = fillValue;
+			wordPtr += 8;
+			*wordPtr = fillValue;
+		}
+
+		for (words = (count >> 2) & 7; words != 0; words--) {
+			*++wordPtr = fillValue;
+		}
+
+		bytePtr = (unsigned char*)((int)wordPtr + 3);
+		count = count & 3;
+	}
+
+	if (count != 0) {
+		do {
+			*++bytePtr = (unsigned char)fillValue;
+			count--;
+		} while (count != 0);
+	}
+}
+
+void* memset(void* dst, int c, size_t count)
+{
+	__fill_mem(dst, (unsigned char)c, count);
+	return dst;
+}

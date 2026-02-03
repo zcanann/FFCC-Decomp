@@ -4,8 +4,8 @@
 #define K1 0x80808080
 #define K2 0xFEFEFEFF
 
-// Global state for strtok
-static char* strtok_state = NULL;
+// Static variables for strtok
+static char* strtok_ptr = NULL;
 
 size_t strlen(const char* str)
 {
@@ -103,26 +103,115 @@ char* strncpy(char* dst, const char* src, size_t n)
 
 char* strcat(char* dst, const char* src, size_t n)
 {
-	const char* pcVar2 = src - 1;
-	char* pcVar3;
-	char* pcVar4 = dst - 1;
-	char cVar1;
-	
+	char* srcPtr = (char*)src - 1;
+	char* dstPtr = (char*)dst - 1;
+	char* endPtr;
+	char c;
+
 	// Find end of dst string
 	do {
-		pcVar3 = pcVar4;
-		pcVar4 = pcVar3 + 1;
-	} while (pcVar3[1] != '\0');
-	
-	// Append src to dst
+		endPtr = dstPtr;
+		dstPtr = endPtr + 1;
+	} while (endPtr[1] != '\0');
+
+	// Copy src to end of dst (ignore n parameter for now)
 	do {
-		pcVar2 = pcVar2 + 1;
-		cVar1 = *pcVar2;
-		pcVar4 = pcVar4 + 1;
-		*pcVar4 = cVar1;
-	} while (cVar1 != '\0');
-	
+		srcPtr = srcPtr + 1;
+		c = *srcPtr;
+		endPtr = endPtr + 1;
+		*endPtr = c;
+	} while (c != '\0');
+
 	return dst;
+}
+
+char* strncat(char* dst, const char* src, size_t n)
+{
+	char* srcPtr = (char*)src - 1;
+	char* dstPtr = (char*)dst - 1; 
+	char* endPtr;
+	char c;
+
+	// Find end of dst string
+	do {
+		endPtr = dstPtr;
+		dstPtr = endPtr + 1;
+	} while (endPtr[1] != '\0');
+
+	// Copy up to n chars from src to end of dst
+	n++;
+	while (--n) {
+		srcPtr = srcPtr + 1;
+		c = *srcPtr;
+		endPtr = endPtr + 1;
+		*endPtr = c;
+		if (c == '\0') break;
+	}
+
+	return dst;
+}
+
+char* strtok(char* str, const char* delim)
+{
+	unsigned char delim_table[32];
+	unsigned char* delimPtr;
+	unsigned char* strPtr;
+	unsigned char* tokenStart;
+	unsigned char ch;
+
+	// Initialize delimiter table from constants
+	*(int*)&delim_table[0] = 0x80818081;  // Approximation of DAT_801e70e0 etc.
+	*(int*)&delim_table[4] = 0x80818081;
+	*(int*)&delim_table[8] = 0x80818081;
+	*(int*)&delim_table[12] = 0x80818081;
+	*(int*)&delim_table[16] = 0x80818081;
+	*(int*)&delim_table[20] = 0x80818081;
+	*(int*)&delim_table[24] = 0x80818081;
+	*(int*)&delim_table[28] = 0x80818081;
+
+	// Set string pointer - use existing if str is NULL
+	if (str != NULL) {
+		strtok_ptr = str;
+	}
+
+	// Build delimiter bitmap
+	delimPtr = (unsigned char*)delim - 1;
+	while (1) {
+		delimPtr = delimPtr + 1;
+		ch = *delimPtr;
+		if (ch == 0) break;
+		delim_table[ch >> 3] |= (1 << (ch & 7));
+	}
+
+	// Skip leading delimiters
+	strPtr = (unsigned char*)strtok_ptr - 1;
+	do {
+		strPtr = strPtr + 1;
+		ch = *strPtr;
+		if (ch == 0) break;
+	} while ((delim_table[ch >> 3] & (1 << (ch & 7))) != 0);
+
+	tokenStart = strPtr;
+	if (ch == 0) {
+		strtok_ptr = NULL;
+		return NULL;
+	} else {
+		// Find end of token
+		do {
+			strPtr = strPtr + 1;
+			ch = *strPtr;
+			if (ch == 0) break;
+		} while ((delim_table[ch >> 3] & (1 << (ch & 7))) == 0);
+
+		if (ch == 0) {
+			strtok_ptr = NULL;
+		} else {
+			strtok_ptr = (char*)(strPtr + 1);
+			*strPtr = 0;
+		}
+	}
+
+	return (char*)tokenStart;
 }
 
 int strcmp(const char* str1, const char* str2)
@@ -297,7 +386,7 @@ char* strtok(char* str, const char* delim)
 	
 	// If new string provided, use it
 	if (str != NULL) {
-		strtok_state = str;
+		strtok_ptr = str;
 	}
 	
 	// Build delimiter bit table
@@ -310,7 +399,7 @@ char* strtok(char* str, const char* delim)
 	}
 	
 	// Skip leading delimiters
-	pbVar3 = strtok_state - 1;
+	pbVar3 = strtok_ptr - 1;
 	do {
 		pbVar3 = pbVar3 + 1;
 		bVar2 = *pbVar3;
@@ -319,7 +408,7 @@ char* strtok(char* str, const char* delim)
 	
 	pbVar1 = pbVar3;
 	if (bVar2 == 0) {
-		strtok_state = NULL;
+		strtok_ptr = NULL;
 		return NULL;
 	}
 	
@@ -332,9 +421,9 @@ char* strtok(char* str, const char* delim)
 	} while ((delimiter_table[bVar2 >> 3] & (1 << (bVar2 & 7))) == 0);
 	
 	if (bVar2 == 0) {
-		strtok_state = NULL;
+		strtok_ptr = NULL;
 	} else {
-		strtok_state = pbVar4 + 2;
+		strtok_ptr = pbVar4 + 2;
 		*pbVar1 = 0;
 	}
 	

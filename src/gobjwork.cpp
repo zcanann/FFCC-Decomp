@@ -1,4 +1,5 @@
 #include "ffcc/gobjwork.h"
+#include "ffcc/p_game.h"
 
 /*
  * --INFO--
@@ -658,6 +659,64 @@ void CCaravanWork::UniteComList(int, int, int)
 void CCaravanWork::UnuniteComList(int, int)
 {
 	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8009e1c0
+ * PAL Size: 316b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CCaravanWork::GetArtifactIncludeHpMax()
+{
+	int totalHpBonus = 0;
+	int artifactIndex = 0;
+	
+	// Iterate through artifacts in pairs (50 iterations, 2 artifacts each = 100 artifacts total)
+	for (int i = 0; i < 50; i++)
+	{
+		// Check first artifact in pair
+		if (artifactIndex < 96 && m_artifacts[artifactIndex] > 0)
+		{
+			unsigned short* artifactData = (unsigned short*)(Game.game.unkCFlatData0[2] + m_artifacts[artifactIndex] * 0x48);
+			unsigned short artifactType = artifactData[0];
+			
+			// Check if this is an HP-boosting artifact (type 0xe4, excluding 0xdb)
+			if (artifactType != 0xdb && artifactType > 0xda && artifactType == 0xe4)
+			{
+				totalHpBonus += artifactData[3]; // Add HP bonus value
+			}
+		}
+		
+		// Check second artifact in pair
+		if ((artifactIndex + 1) < 96 && m_artifacts[artifactIndex + 1] > 0)
+		{
+			unsigned short* artifactData = (unsigned short*)(Game.game.unkCFlatData0[2] + m_artifacts[artifactIndex + 1] * 0x48);
+			unsigned short artifactType = artifactData[0];
+			
+			// Check if this is an HP-boosting artifact (type 0xe4, excluding 0xdb)
+			if (artifactType != 0xdb && artifactType > 0xda && artifactType == 0xe4)
+			{
+				totalHpBonus += artifactData[3]; // Add HP bonus value
+			}
+		}
+		
+		artifactIndex += 2;
+	}
+	
+	// Add base HP value from character data
+	totalHpBonus += *(unsigned short*)(Game.game.unkCFlatData0[0] + m_baseDataIndex * 0x1d0 + 6);
+	
+	// Cap at 16 (0x10)
+	if (totalHpBonus > 15)
+	{
+		return 16;
+	}
+	
+	return totalHpBonus;
 }
 
 /*

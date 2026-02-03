@@ -12,6 +12,8 @@ public:
     void Calc();
     void Draw();
     void ScriptChanging(char*);
+    virtual void onCalc();
+    virtual void onDraw();
     virtual void onScriptChanging(char*);
     virtual void onScriptChanged(char*, int);
 };

@@ -2,6 +2,7 @@
 #define _FFCC_P_GBA_H_
 
 #include "ffcc/system.h"
+#include "ffcc/memory.h"
 
 class CGbaPcs : public CProcess
 {
@@ -23,6 +24,8 @@ public:
     virtual void onMapChanged(int, int, int);
     virtual void onScriptChanging(char*);
 
+private:
+    CMemory::CStage* m_stage;
 };
 
 #endif // _FFCC_P_GBA_H_

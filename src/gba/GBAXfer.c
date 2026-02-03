@@ -2,58 +2,51 @@
 #include "dolphin/si/SIBios.h"
 
 void __GBAHandler(s32 chan, u32 error, OSContext* context) {
-    GBAControl* gba;
     GBATransferCallback proc;
     GBACallback callback;
     OSContext exceptionContext;
 
-    gba = &__GBA[chan];
     if (__GBAReset != 0) {
         return;
     }
 
-    if ((error & 0xf)) {
-        gba->ret = GBA_NOT_READY;
+    if ((error & 0xf) == 0) {
+        __GBA[chan].ret = GBA_READY;
     } else {
-        gba->ret = GBA_READY;
+        __GBA[chan].ret = GBA_NOT_READY;
     }
 
-    if (gba->proc != NULL) {
-        proc = gba->proc;
-        gba->proc = NULL;
+    proc = __GBA[chan].proc;
+    if (proc != NULL) {
+        __GBA[chan].proc = NULL;
         proc(chan);
     }
 
-    if (gba->callback == NULL) {
-        return;
+    if (__GBA[chan].callback != NULL) {
+        OSClearContext(&exceptionContext);
+        OSSetCurrentContext(&exceptionContext);
+        callback = __GBA[chan].callback;
+        __GBA[chan].callback = NULL;
+        callback(chan, __GBA[chan].ret);
+        OSClearContext(&exceptionContext);
+        OSSetCurrentContext(context);
     }
-
-    OSClearContext(&exceptionContext);
-    OSSetCurrentContext(&exceptionContext);
-    callback = gba->callback;
-    gba->callback = NULL;
-    callback(chan, gba->ret);
-    OSClearContext(&exceptionContext);
-    OSSetCurrentContext(context);
 }
 
-void __GBASyncCallback(s32 chan, s32 ret) {
-    GBAControl* gba = &__GBA[chan];
-    OSWakeupThread(&gba->threadQueue);
+void __GBASyncCallback(s32 chan) {
+    OSWakeupThread(&__GBA[chan].threadQueue);
 }
 
 s32 __GBASync(s32 chan) {
-    GBAControl* gba;
-    s32 ret;
     s32 enabled;
-    gba = &__GBA[chan];
+    s32 ret;
 
     enabled = OSDisableInterrupts();
-    while (gba->callback != NULL) {
-        OSSleepThread(&gba->threadQueue);
+    while (__GBA[chan].callback != NULL) {
+        OSSleepThread(&__GBA[chan].threadQueue);
     }
 
-    ret = gba->ret;
+    ret = __GBA[chan].ret;
     OSRestoreInterrupts(enabled);
 
     return ret;

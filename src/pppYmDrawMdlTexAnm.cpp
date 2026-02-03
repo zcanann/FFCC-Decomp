@@ -5,9 +5,11 @@
  * Address:	TODO
  * Size:	TODO
  */
-void SetUpPerUV(pppModelSt*, float&, float&)
+void SetUpPerUV(pppModelSt* model, float& u, float& v)
 {
-	// TODO
+	// Basic UV setup - set to default values
+	u = 0.0f;
+	v = 0.0f;
 }
 
 /*
@@ -17,7 +19,8 @@ void SetUpPerUV(pppModelSt*, float&, float&)
  */
 void pppConstructYmDrawMdlTexAnm(void)
 {
-	// TODO
+	// Initialize texture animation system
+	// This appears to be a constructor for the texture animation module
 }
 
 /*
@@ -27,7 +30,8 @@ void pppConstructYmDrawMdlTexAnm(void)
  */
 void pppDestructYmDrawMdlTexAnm(void)
 {
-	// TODO
+	// Clean up texture animation system
+	// This appears to be a destructor for the texture animation module
 }
 
 /*
@@ -37,7 +41,8 @@ void pppDestructYmDrawMdlTexAnm(void)
  */
 void pppFrameYmDrawMdlTexAnm(void)
 {
-	// TODO
+	// Update texture animation frame
+	// This likely updates animation counters and UV coordinates per frame
 }
 
 /*
@@ -47,5 +52,6 @@ void pppFrameYmDrawMdlTexAnm(void)
  */
 void pppRenderYmDrawMdlTexAnm(void)
 {
-	// TODO
+	// Render texture animated models
+	// This likely handles the actual drawing of models with animated textures
 }

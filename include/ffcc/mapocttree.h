@@ -25,7 +25,7 @@ class CBound
 public:
 	void operator=(const CBound&);
 	void SetMinMax(Vec*, Vec*);
-	void CheckCross(CBound&);
+	int CheckCross(CBound&);
 };
 
 class COctTree

@@ -1,6 +1,12 @@
 #include "ffcc/pppSRandUpCV.h"
 #include "ffcc/math.h"
 
+extern CMath math;
+extern int lbl_8032ED70;
+
+// Forward declaration to handle RandF return value
+extern "C" float RandF__5CMathFv();
+
 /*
  * --INFO--
  * PAL Address: 80064114
@@ -12,36 +18,50 @@
  */
 void pppSRandUpCV(void* param1, void* param2)
 {
-    extern int lbl_8032ED70;
     if (lbl_8032ED70 != 0) return;
-    
-    CMath math;
-    
-    unsigned int* p1 = (unsigned int*)param1;
-    unsigned char* p2_bytes = (unsigned char*)param2;
     
     // Check if indices match
     int currentIndex = *((int*)param2);
-    int targetIndex = p1[3];
+    int targetIndex = *((int*)param1 + 3);
     if (currentIndex != targetIndex) return;
     
     // Get data offset and calculate target array
     int dataOffset = *((int*)param2 + 3);
     float* target = (float*)((char*)param1 + dataOffset + 0x80);
     
-    unsigned char flag = p2_bytes[12]; // 0xc offset
+    unsigned char flag = *((unsigned char*)param2 + 12);
     
-    // Generate 4 random float values
-    for (int i = 0; i < 4; i++) {
-        math.RandF();
-        float randVal = 1.0f; // Placeholder - RandF result stored elsewhere
-        if (flag != 0) {
-            math.RandF();
-            float randVal2 = 0.5f; // Placeholder for second random
-            randVal = (randVal + randVal2) * 0.5f;
-        }
-        target[i] = randVal;
+    // Generate first random float value
+    float randVal1 = RandF__5CMathFv();
+    if (flag != 0) {
+        float randVal2 = RandF__5CMathFv();
+        randVal1 = (randVal1 + randVal2) * 0.5f;
     }
+    target[0] = randVal1;
+    
+    // Generate second random float value  
+    randVal1 = RandF__5CMathFv();
+    if (flag != 0) {
+        float randVal2 = RandF__5CMathFv();
+        randVal1 = (randVal1 + randVal2) * 0.5f;
+    }
+    target[1] = randVal1;
+    
+    // Generate third random float value
+    randVal1 = RandF__5CMathFv();
+    if (flag != 0) {
+        float randVal2 = RandF__5CMathFv();
+        randVal1 = (randVal1 + randVal2) * 0.5f;
+    }
+    target[2] = randVal1;
+    
+    // Generate fourth random float value
+    randVal1 = RandF__5CMathFv();
+    if (flag != 0) {
+        float randVal2 = RandF__5CMathFv();
+        randVal1 = (randVal1 + randVal2) * 0.5f;
+    }
+    target[3] = randVal1;
     
     // Get target color array pointer
     int colorOffset = *((int*)param2 + 1);
@@ -53,12 +73,23 @@ void pppSRandUpCV(void* param1, void* param2)
         targetColors = (unsigned char*)((char*)param1 + colorOffset + 0x80);
     }
     
-    // Apply random modifications to 4 byte values
-    for (int i = 0; i < 4; i++) {
-        signed char baseValue = (signed char)p2_bytes[8 + i]; // +0x8, +0x9, +0xa, +0xb offsets
-        float randomMult = target[i];
-        int adjustment = (int)(baseValue * randomMult);
-        unsigned char currentValue = targetColors[i];
-        targetColors[i] = (unsigned char)(currentValue + adjustment);
-    }
+    // Apply random modifications to first byte value
+    signed char baseValue1 = *((signed char*)param2 + 8);
+    int adjustment1 = (int)(baseValue1 * target[0]);
+    targetColors[0] += (unsigned char)adjustment1;
+    
+    // Apply random modifications to second byte value
+    signed char baseValue2 = *((signed char*)param2 + 9);
+    int adjustment2 = (int)(baseValue2 * target[1]);
+    targetColors[1] += (unsigned char)adjustment2;
+    
+    // Apply random modifications to third byte value
+    signed char baseValue3 = *((signed char*)param2 + 10);
+    int adjustment3 = (int)(baseValue3 * target[2]);
+    targetColors[2] += (unsigned char)adjustment3;
+    
+    // Apply random modifications to fourth byte value
+    signed char baseValue4 = *((signed char*)param2 + 11);
+    int adjustment4 = (int)(baseValue4 * target[3]);
+    targetColors[3] += (unsigned char)adjustment4;
 }

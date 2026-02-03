@@ -35,9 +35,12 @@ void CMcPcs::Quit()
  * Address:	TODO
  * Size:	TODO
  */
-void CMcPcs::GetTable(unsigned long)
+void* CMcPcs::GetTable(unsigned long index)
 {
-	// TODO
+	// Based on assembly: mulli r4, r4, 0x15c; add to base address
+	// 0x15c = 348 bytes per entry
+	extern char lbl_80211DAC[];
+	return lbl_80211DAC + (index * 0x15c);
 }
 
 /*

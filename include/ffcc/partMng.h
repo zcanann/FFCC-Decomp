@@ -202,6 +202,10 @@ struct _pppMngSt
     Vec m_position;
     short m_mapObjIndex;
     Vec m_scale;
+    // Additional fields (based on offset layout in comments below)
+    char padding[0x74 - (0x28 + sizeof(Vec))]; // Fill to offset 0x74
+    short m_kind;        // 0x74
+    short m_nodeIndex;   // 0x76
     /*
     0x0	0x4	void *	void *	m_pppResSet	
 0x4	0x4	int32_t	typedef int32_t int	m_partIndex	

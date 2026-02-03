@@ -15,9 +15,8 @@ void GET_CHARA_ALLOC_STAGE_S(int, CMemory::CStage*)
  * Address:	TODO
  * Size:	TODO
  */
-CCharaPcs::CCharaPcs()
+CCharaPcs::CCharaPcs() : CProcess()
 {
-	// TODO
 }
 
 /*
@@ -27,7 +26,6 @@ CCharaPcs::CCharaPcs()
  */
 CCharaPcs::~CCharaPcs()
 {
-	// TODO
 }
 
 /*

@@ -25,6 +25,47 @@ void pppPointRApCon(_pppMngSt* mngSt, _pppPDataVal* dataVal)
  */
 void pppPointRAp(_pppMngSt* mngSt, _pppPDataVal* dataVal)
 {
-    // TODO: Complex particle effect function
-    // Stub implementation - needs reverse engineering from assembly
+    extern int lbl_8032ED70;
+    
+    // Early return if global flag is set
+    if (lbl_8032ED70 != 0) return;
+    
+    // Get data pointer from dataVal + 0xC
+    u32* dataPtr = (u32*)((char*)dataVal + 0xC);
+    u32 dataValue = *(u32*)((char*)*dataPtr + 0x4);
+    
+    // Calculate base particle pointer
+    u32 particleOffset = dataValue + 0x80;
+    u8* particlePtr = (u8*)mngSt + particleOffset;
+    
+    // Check particle lifetime counter at offset +1
+    u8* lifetimePtr = particlePtr + 1;
+    if (*lifetimePtr == 0) {
+        // Initialize new particle if valid
+        u32 checkValue = *(u32*)((char*)dataVal + 0xC);
+        if ((checkValue + 0x10000) != 0xFFFF) {
+            // Create particle object
+            void* particleObj = nullptr; // Simplified - would call pppCreatePObject
+            
+            // Generate random values for positioning
+            math.RandF();
+            math.RandF();
+            
+            // Get scale values from dataVal
+            float positionScale = *(float*)((char*)dataVal + 0x4);
+            float velocityScale = *(float*)((char*)dataVal + 0x8);
+            
+            // Set up particle positions and velocities (simplified)
+            // This would involve sine/cosine table lookups in full implementation
+            
+            // Set initial lifetime
+            u8 initialLifetime = *(u8*)((char*)dataVal + 0x1C);
+            *lifetimePtr = initialLifetime;
+        }
+    }
+    
+    // Decrement lifetime counter
+    if (*lifetimePtr > 0) {
+        *lifetimePtr = *lifetimePtr - 1;
+    }
 }

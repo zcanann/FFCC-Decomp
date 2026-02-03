@@ -1,5 +1,7 @@
 #include "ffcc/pppYmDeformationMdl.h"
 #include "ffcc/pppYmEnv.h"
+#include <dolphin/gx.h>
+#include <dolphin/mtx.h>
 
 /*
  * --INFO--
@@ -125,7 +127,40 @@ void pppFrameYmDeformationMdl(void* pppYmDeformationMdl, void* param_2, void* pa
  */
 void pppRenderYmDeformationMdl(void* pppYmDeformationMdl, void* param_2, void* param_3)
 {
-	// TODO
+	unsigned int local_19c[4];
+	float local_18c, local_188, local_184, local_180;
+	float local_17c, local_178, local_174, local_170;
+	float local_16c, local_168, local_164, local_160;
+	float local_12c, local_128, local_11c, local_118;
+	Mtx local_fc, MStack_cc, MStack_5c;
+	unsigned int local_28, uStack_24, local_20, uStack_1c;
+	
+	// Initialize arrays
+	local_19c[3] = 0;
+	
+	short* psVar4 = (short*)((char*)pppYmDeformationMdl + 0x80 + *((int*)param_3 + 2));
+	
+	if (*((unsigned short*)param_2 + 1) != 0xffff) {
+		int iVar2 = *((int*)param_3 + 1);
+		
+		// TODO: Get pppModelSt from pppEnvStPtr->m_mapMeshPtr[param_2->m_dataValIndex]
+		// TODO: GetTexture call
+		
+		PSMTXIdentity(MStack_5c);
+		
+		// TODO: Matrix calculations and transformations
+		
+		// GX setup calls
+		GXSetNumTevStages(1);
+		GXSetNumTexGens(2);
+		GXSetNumChans(1);
+		
+		// TODO: Additional GX configuration calls
+		// GXSetTevOrder, GXSetTevColorIn, GXSetTevColorOp, etc.
+		
+		// TODO: Texture binding and rendering logic
+		// TODO: Model rendering with deformation
+	}
 }
 
 /*

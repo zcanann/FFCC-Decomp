@@ -7,7 +7,7 @@ extern "C" {
 
 void pppConstructYmCallBack(void);
 void pppDestructYmCallBack(void);
-void pppFrameYmCallBack(void);
+void pppFrameYmCallBack(void* pppYmCallBack, void* param_2);
 
 #ifdef __cplusplus
 }

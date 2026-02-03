@@ -61,7 +61,7 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(struct pppYmCheckBGHeight* pp
 		dVar2 = (double)(pppMngStPtr->m_matrix).value[1][3];
 		local_60 = (pppMngStPtr->m_matrix).value[0][3];
 		local_58 = (pppMngStPtr->m_matrix).value[2][3];
-		local_5c = (float)(dVar2 + (double)(float)param_2->m_unk0x4);
+		local_5c = (float)(dVar2 + (double)param_2->m_unk0x4);
 		local_30 = FLOAT_80330ed8;
 		local_34 = FLOAT_80330ed8;
 		local_38 = FLOAT_80330ed8;
@@ -75,15 +75,20 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(struct pppYmCheckBGHeight* pp
 		
 		iVar1 = MapMng.CheckHitCylinderNear((CMapCylinder*)&local_60, (Vec*)&local_6c, 0xffffffff);
 		if (iVar1 != 0) {
-			// Simplified version - calculate hit position adjustment
-			if ((float)(dVar2 - (double)(float)param_2->m_serializedDataOffsets) <= local_74) {
-				dVar2 = (double)(local_74 + (float)param_2->m_unk0x8);
+			// TODO: Need proper CalcHitPosition call
+			if ((float)(dVar2 - (double)param_2->m_serializedDataOffsets) <= local_74) {
+				dVar2 = (double)(local_74 + param_2->m_unk0x8);
 			}
 		}
-		(pppMngSt->m_position).y = (float)dVar2;
-		(pppMngStPtr->m_matrix).value[0][3] = (pppMngSt->m_position).x;
-		(pppMngStPtr->m_matrix).value[1][3] = (pppMngSt->m_position).y;
-		(pppMngStPtr->m_matrix).value[2][3] = (pppMngSt->m_position).z;
+		pppMngSt->m_position.y = (float)dVar2;
+		// Additional position fields based on Ghidra offsets
+		*((float*)pppMngSt + 0x17) = (float)dVar2; // m_savedPosition.y at ~0x5c
+		*((float*)pppMngSt + 0x1B) = (float)dVar2; // m_paramVec0.y at ~0x6c  
+		*((float*)pppMngSt + 0x13) = (float)dVar2; // m_previousPosition.y at ~0x4c
+		
+		(pppMngStPtr->m_matrix).value[0][3] = pppMngSt->m_position.x;
+		(pppMngStPtr->m_matrix).value[1][3] = pppMngSt->m_position.y;
+		(pppMngStPtr->m_matrix).value[2][3] = pppMngSt->m_position.z;
 		
 		pppSetFpMatrix(pppMngSt);
 	}

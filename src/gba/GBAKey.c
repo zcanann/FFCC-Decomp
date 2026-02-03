@@ -45,6 +45,56 @@ static void F25(void* task)
     __GBAX01(chan, 0);
 }
 
+static void F232(void* task)
+{
+    s32 chan;
+    s32 result;
+    
+    if ((int)task == -0x7fcd7c38) {
+        chan = 0;
+    } else if ((int)task == -0x7fcd7b38) {
+        chan = 1;
+    } else if ((int)task == -0x7fcd7a38) {
+        chan = 2;
+    } else if ((int)task == -0x7fcd7938) {
+        chan = 3;
+    } else {
+        OSPanic(__FILE__, 169, "GBA - unexpected dsp call");
+        chan = -1;
+    }
+    
+    DSPSendMailToDSP(0xabba0000);
+    do {
+        result = DSPCheckMailToDSP();
+    } while (result != 0);
+    
+    DSPSendMailToDSP((u32)&__GBA[chan].param);
+    do {
+        result = DSPCheckMailToDSP();
+    } while (result != 0);
+}
+
+static s32 F252(void* task)
+{
+    s32 chan;
+
+    if ((int)task == -0x7fcd7c38) {
+        chan = 0;
+    } else if ((int)task == -0x7fcd7b38) {
+        chan = 1;
+    } else if ((int)task == -0x7fcd7a38) {
+        chan = 2;
+    } else if ((int)task == -0x7fcd7938) {
+        chan = 3;
+    } else {
+        OSPanic(__FILE__, 169, "GBA - unexpected dsp call");
+        chan = -1;
+    }
+    
+    __GBAX01(chan, 0);
+    return chan;
+}
+
 void __GBAX02(s32 chan, u8* readbuf) {
     GBAControl* gba = &__GBA[chan];
     void* param = &gba->param;
@@ -63,9 +113,9 @@ void __GBAX02(s32 chan, u8* readbuf) {
     gba->task.aramAddress = 0x380;
     gba->task.aramLength = 0;
     gba->task.aramMmemAddress = 0x10;
-    gba->task.resumeCallback = F23;
+    gba->task.resumeCallback = F232;
     gba->task.resumeContext = 0;
-    gba->task.doneCallback = F25;
+    gba->task.doneCallback = F252;
     gba->task.doneContext = 0;
     
     DSPAddTask(&gba->task);

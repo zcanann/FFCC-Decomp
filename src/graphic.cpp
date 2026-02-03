@@ -414,22 +414,66 @@ void CGraphic::GetBackBufferRect2(void*, _GXTexObj*, int, int, int, int, int, _G
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 800178a4
+ * PAL Size: 220b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGraphic::RenderTexQuadGrouad(Vec&, Vec&, _GXColor, _GXColor, _GXColor, _GXColor)
+void CGraphic::RenderTexQuadGrouad(Vec& pos1, Vec& pos2, _GXColor color1, _GXColor color2, _GXColor color3, _GXColor color4)
 {
-	// TODO
+	GXBegin(GX_QUADS, GX_VTXFMT7, 4);
+	
+	// Vertex 1
+	GXPosition3f32(pos1.x, pos1.y, pos1.z);
+	GXColor1u32(*(u32*)&color1);
+	GXTexCoord2f32(0.0f, 0.0f);
+	
+	// Vertex 2
+	GXPosition3f32(pos2.x, pos1.y, pos1.z);
+	GXColor1u32(*(u32*)&color2);
+	GXTexCoord2f32(1.0f, 0.0f);
+	
+	// Vertex 3
+	GXPosition3f32(pos2.x, pos2.y, pos1.z);
+	GXColor1u32(*(u32*)&color4);
+	GXTexCoord2f32(1.0f, 1.0f);
+	
+	// Vertex 4
+	GXPosition3f32(pos1.x, pos2.y, pos1.z);
+	GXColor1u32(*(u32*)&color3);
+	GXTexCoord2f32(0.0f, 1.0f);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 800177f0
+ * PAL Size: 180b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGraphic::RenderNoTexQuadGrouad(Vec&, Vec&, _GXColor, _GXColor, _GXColor, _GXColor)
+void CGraphic::RenderNoTexQuadGrouad(Vec& pos1, Vec& pos2, _GXColor color1, _GXColor color2, _GXColor color3, _GXColor color4)
 {
-	// TODO
+	GXBegin(GX_QUADS, GX_VTXFMT6, 4);
+	
+	// Vertex 1
+	GXPosition3f32(pos1.x, pos1.y, pos1.z);
+	GXColor1u32(*(u32*)&color1);
+	
+	// Vertex 2  
+	GXPosition3f32(pos2.x, pos1.y, pos1.z);
+	GXColor1u32(*(u32*)&color2);
+	
+	// Vertex 3
+	GXPosition3f32(pos2.x, pos2.y, pos1.z);
+	GXColor1u32(*(u32*)&color4);
+	
+	// Vertex 4
+	GXPosition3f32(pos1.x, pos2.y, pos1.z);
+	GXColor1u32(*(u32*)&color3);
 }
 
 /*

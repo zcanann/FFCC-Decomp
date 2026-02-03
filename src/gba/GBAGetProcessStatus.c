@@ -1,34 +1,47 @@
 #include "dolphin/gba/GBAPriv.h"
 
+/*
+ * --INFO--
+ * PAL Address: 0x801a76fc
+ * PAL Size: 372b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+
 s32 GBAGetProcessStatus(s32 chan, u8* percentp) {
-    BOOL enabled;           // r26
-    s32 ret;                // r29
-    GBAControl* gba;        // r25
-    GBABootInfo* bootInfo;  // r31
-    u8 percent;             // r30
-    OSTime t;               // r27
+    BOOL enabled;
+    s32 ret;
+    u8* gbaBase;
+    s32 offset;
+    u8 percent;
+    OSTime t;
 
     enabled = OSDisableInterrupts();
     
-    gba = &__GBA[chan];
-    bootInfo = &__GBA[chan].bootInfo;
+    offset = chan * sizeof(GBAControl);
+    gbaBase = (u8*)__GBA + offset;
 
-    if (gba->callback != NULL || bootInfo->callback != NULL) {
+    if (*(void**)(gbaBase + 0x1c) != NULL) {
         ret = GBA_BUSY;
-
-        if (bootInfo->callback != NULL) {
-            percent = (bootInfo->curOffset * 100) / bootInfo->realLength;
-            if (bootInfo->begin != 0) {
-                t = OSGetTime() - bootInfo->begin;
+        
+        if (*(void**)(gbaBase + 0x54) != NULL) {
+            percent = (*(u32*)(gbaBase + 0x74) * 100) / *(u32*)(gbaBase + 0xa4);
+            
+            if (*(u32*)(gbaBase + 0x6c) != 0 || *(u32*)(gbaBase + 0x68) != 0) {
+                t = OSGetTime();
+                t = t - *(OSTime*)(gbaBase + 0x68);
+                
                 if (OSTicksToMilliseconds(t) < 5500) {
-                    percent = (percent * t) / OSMillisecondsToTicks(5500ll);
+                    percent = (percent * (u32)t) / (u32)OSMillisecondsToTicks(5500);
                 }
-
+                
                 if (percent >= 100) {
                     percent = 100;
                 }
             }
-
+            
             if (percentp != NULL) {
                 *percentp = percent;
             }

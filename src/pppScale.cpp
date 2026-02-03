@@ -18,9 +18,9 @@ void pppScale(void* obj, void* param2, void* param3)
 	if (*((int*)((char*)param2 + 0x08)) == *((int*)((char*)obj + 0x08))) {
 		float scale = *((float*)((char*)param2 + 0x0c));
 		float* pfVar2 = (float*)((char*)obj + *((int*)((char*)dataPtr + 0x04)) + 0x80);
-		pfVar2[0] *= scale;
-		pfVar2[1] *= scale;  
-		pfVar2[2] *= scale;
+		pfVar2[0] += scale;
+		pfVar2[1] += scale;  
+		pfVar2[2] += scale;
 	}
 	
 	float* pfVar1 = (float*)((char*)obj + *((int*)((char*)dataPtr + 0x00)) + 0x80);

@@ -19,7 +19,7 @@ public:
     
 private:
     bool setSize(unsigned int newSize);
-        
+            
     unsigned long m_size;
     unsigned long m_numItems;
     unsigned long m_defaultSize;

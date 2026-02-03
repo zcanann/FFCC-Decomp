@@ -622,5 +622,5 @@ extern "C" void* PTR_PTR_s_CChara_801fcd24;
  */
 void __sinit_chara_cpp(void)
 {
-	Chara.field0_0x0.object.base_object.object.m_id = (unsigned int)&PTR_PTR_s_CChara_801fcd24;
+	Chara.field0_0x0.object.base_object.object.m_id = (u32)&PTR_PTR_s_CChara_801fcd24;
 }

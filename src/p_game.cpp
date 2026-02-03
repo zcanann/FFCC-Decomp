@@ -152,20 +152,28 @@ void CGamePcs::onScriptChanged(char*, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 80047958
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGamePcs::onMapChanging(int, int)
+void CGamePcs::onMapChanging(int a, int b)
 {
-	// TODO
+	Game.game.MapChanging(a, b);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 80047930
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGamePcs::onMapChanged(int, int, int)
+void CGamePcs::onMapChanged(int a, int b, int c)
 {
-	// TODO
+	Game.game.MapChanged(a, b, c);
 }

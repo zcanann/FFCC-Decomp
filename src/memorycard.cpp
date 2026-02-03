@@ -1444,8 +1444,64 @@ void CMemoryCardMan::DecodeData()
     }
 }
 
-void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat*)
+void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat* saveDat)
 {
+    int charSlot = 0;
+    
+    do {
+        char* charData = (char*)saveDat + charSlot * 0x9c0;
+        
+        // Check if character slot is active
+        if (*(int*)(charData + 0x1a84) != 0)
+        {
+            short equippedItems[4];
+            int itemSlot = 0x45;
+            int accessoryCount = 0x49;
+            
+            // Process equipped accessory slots (items 0x45-0x48)
+            do {
+                if (itemSlot > 0x44) {
+                    int bitShift = itemSlot >> 0x1f;
+                    unsigned int bitMask = 1 << ((bitShift * 0x20 | (unsigned int)(itemSlot * 0x8000000 + bitShift) >> 0x1b) - bitShift);
+                    
+                    if ((*(unsigned int*)(charData + (itemSlot >> 5) * 4 + 0x158c) & bitMask) == 0) {
+                        equippedItems[itemSlot - 0x45] = -1;
+                    } else {
+                        equippedItems[itemSlot - 0x45] = itemSlot + 0x9f;
+                    }
+                }
+                itemSlot++;
+                accessoryCount--;
+            } while (accessoryCount != 0);
+            
+            // Calculate total HP bonus from equipped accessories
+            unsigned int totalHpBonus = 0;
+            
+            if (equippedItems[0] >= 0) {
+                // TODO: Access Game.game.unkCFlatData0[2] + itemID * 0x48 + 6
+                totalHpBonus += 0; // Placeholder
+            }
+            if (equippedItems[1] >= 0) {
+                totalHpBonus += 0; // Placeholder
+            }
+            if (equippedItems[2] >= 0) {
+                totalHpBonus += 0; // Placeholder
+            }
+            if (equippedItems[3] >= 0) {
+                totalHpBonus += 0; // Placeholder
+            }
+            
+            // Calculate final HP max (base 8 + bonuses, capped at 16)
+            unsigned short finalHpMax = 16;
+            if (totalHpBonus + 8 < 16) {
+                finalHpMax = totalHpBonus + 8;
+            }
+            
+            // Store calculated HP max in save data
+            *(unsigned short*)(charData + 0x14d6) = finalHpMax;
+        }
+        charSlot++;
+    } while (charSlot < 8);
 }
 
 /*

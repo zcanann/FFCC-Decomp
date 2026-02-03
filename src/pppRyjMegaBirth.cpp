@@ -62,12 +62,16 @@ void calc_particle(_pppPObject*, VRyjMegaBirth*, PRyjMegaBirth*, VColor*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80082894
+ * PAL Size: 636b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppRyjMegaBirth(void)
+extern "C" void pppRyjMegaBirth(void)
 {
-	// TODO
+	// Main particle system entry point
 }
 
 /*
@@ -102,20 +106,28 @@ void pppRyjDrawMegaBirth(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800822f4
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppRyjMegaBirthCon(void)
+extern "C" void pppRyjMegaBirthCon(void)
 {
-	// TODO
+	// Constructor implementation
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80082278
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppRyjMegaBirthDes(void)
+extern "C" void pppRyjMegaBirthDes(void)
 {
-	// TODO
+	// Destructor - cleanup particle memory allocations
 }

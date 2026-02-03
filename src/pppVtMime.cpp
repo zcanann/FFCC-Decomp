@@ -76,7 +76,7 @@ void pppDrawVtMime(void* param1, void* param2, void* param3)
 	float* vert1Pos = (float*)((char*)vert1Data + 0x2C);
 	float* vert2Pos = (float*)((char*)vert2Data + 0x2C);
 	
-	short vertCount = *(short*)vert1Data;
+	short vertCount = *(signed short*)vert1Data;
 	
 	// Check if memory needs allocation
 	void** memPtr = (void**)((char*)target + 0xC);
@@ -184,17 +184,17 @@ void pppVtMimeCon2(void* param1, void* param2, void* param3)
  */
 void pppVtMimeDes(void* param1, void* param2)
 {
-	// Get data structure from param2 and param1
+	// Get data structure from param2
 	void** dataPtr = (void**)((char*)param2 + 0xC);
 	void* data = *dataPtr;
 	void* dataBase = *(void**)data;
 	
-	// Calculate offset and get target structure  
-	char* target = (char*)param1 + (int)dataBase + 0x80;
-	void** targetPtr = (void**)((char*)target + 0xC);
+	// Calculate target offset and check memory allocation
+	int offset = (int)dataBase + 0x80 + 0xC; // Direct offset calculation
+	void** memPtr = (void**)((char*)param1 + offset);
 	
 	// Check if memory is allocated
-	if (*targetPtr != 0) {
+	if (*memPtr != 0) {
 		// Graphics wait and memory cleanup
 		extern void _WaitDrawDone__8CGraphicFPci(void*, const char*, int);
 		extern void* Graphic;
@@ -202,9 +202,9 @@ void pppVtMimeDes(void* param1, void* param2)
 		
 		// Heap usage reporting
 		extern void pppHeapUseRate__FPQ27CMemory6CStage(void*);
-		pppHeapUseRate__FPQ27CMemory6CStage(*targetPtr);
+		pppHeapUseRate__FPQ27CMemory6CStage(*memPtr);
 		
 		// Clear the pointer
-		*targetPtr = 0;
+		*memPtr = 0;
 	}
 }

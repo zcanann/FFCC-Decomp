@@ -2,6 +2,21 @@
 
 /*
  * --INFO--
+ * PAL Address: 0x8004a348
+ * PAL Size: 344b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void __sinit_p_light_cpp(void)
+{
+    // Static initialization function - simplified implementation
+    // TODO: Complete implementation when global structures are defined
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

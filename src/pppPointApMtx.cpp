@@ -12,8 +12,7 @@ extern _pppMngSt* gPppMngSt;
  */
 void pppPointApMtxCon(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal)
 {
-	unsigned long* dataPtr = (unsigned long*)((char*)pppPDataVal + 0xc);
-	unsigned long offset = *((unsigned long*)dataPtr + 1);  // +1 to get offset 0x4
+	unsigned long offset = *((unsigned long*)((char*)pppPDataVal + 0x10));
 	*((unsigned char*)pppPObject + offset + 0x81) = 0;
 }
 
@@ -24,17 +23,13 @@ void pppPointApMtxCon(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal)
  */
 void pppPointApMtx(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal, _pppMngSt* pppMngSt)
 {
-	unsigned long* structPtr = (unsigned long*)((char*)pppPDataVal + 0xc);
-	unsigned long param1 = *structPtr;           // param for position
-	unsigned long param2 = *(structPtr + 1);    // param for matrix
-	
-	Vec* pPos = (Vec*)((char*)pppPObject + param1 + 0x80);
+	unsigned long param2 = *((unsigned long*)((char*)pppPDataVal + 0x10));
 	Mtx* pMatrix = (Mtx*)((char*)pppPObject + param2 + 0x80);
 	unsigned char* pFlag = (unsigned char*)pMatrix + 1;
 	
 	if (gPppGlobalFlag == 0) {
 		if (*pFlag == 0) {
-			if ((param2 + 1) != 0) {
+			if ((param2 + 1) != 0xFFFF) {  // This generates addic. r0, r5, 0x1
 				pppCreatePObject(gPppMngSt, pppPDataVal);
 			}
 		}

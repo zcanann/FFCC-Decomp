@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-void pppConstructYmLaser(void);
+void pppConstructYmLaser(void* pppYmLaser, void* param_2);
 void pppConstruct2YmLaser(void);
 void pppDestructYmLaser(void);
 void pppFrameYmLaser(void);

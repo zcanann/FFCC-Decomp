@@ -16,6 +16,20 @@ void CGBaseObj::onDraw()
 
 /*
  * --INFO--
+ * PAL Address: 8001439c
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CGBaseObj::GetCID()
+{
+	return 1;
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

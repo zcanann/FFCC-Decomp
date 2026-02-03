@@ -4,6 +4,9 @@
 #define K1 0x80808080
 #define K2 0xFEFEFEFF
 
+// Static variables for strtok
+static char* strtok_ptr = NULL;
+
 size_t strlen(const char* str)
 {
 	size_t len       = -1;
@@ -98,23 +101,117 @@ char* strncpy(char* dst, const char* src, size_t n)
 	return dst;
 }
 
-// TODO: same implementation as strncpy?
 char* strcat(char* dst, const char* src, size_t n)
 {
-    const unsigned char* p = (const unsigned char*)src - 1;
-	unsigned char* q       = (unsigned char*)dst - 1;
+	char* srcPtr = (char*)src - 1;
+	char* dstPtr = (char*)dst - 1;
+	char* endPtr;
+	char c;
 
+	// Find end of dst string
+	do {
+		endPtr = dstPtr;
+		dstPtr = endPtr + 1;
+	} while (endPtr[1] != '\0');
+
+	// Copy src to end of dst (ignore n parameter for now)
+	do {
+		srcPtr = srcPtr + 1;
+		c = *srcPtr;
+		endPtr = endPtr + 1;
+		*endPtr = c;
+	} while (c != '\0');
+
+	return dst;
+}
+
+char* strncat(char* dst, const char* src, size_t n)
+{
+	char* srcPtr = (char*)src - 1;
+	char* dstPtr = (char*)dst - 1; 
+	char* endPtr;
+	char c;
+
+	// Find end of dst string
+	do {
+		endPtr = dstPtr;
+		dstPtr = endPtr + 1;
+	} while (endPtr[1] != '\0');
+
+	// Copy up to n chars from src to end of dst
 	n++;
 	while (--n) {
-		if (!(*++q = *++p)) {
-			while (--n) {
-				*++q = 0;
-			}
-			break;
-		}
+		srcPtr = srcPtr + 1;
+		c = *srcPtr;
+		endPtr = endPtr + 1;
+		*endPtr = c;
+		if (c == '\0') break;
 	}
 
 	return dst;
+}
+
+char* strtok(char* str, const char* delim)
+{
+	unsigned char delim_table[32];
+	unsigned char* delimPtr;
+	unsigned char* strPtr;
+	unsigned char* tokenStart;
+	unsigned char ch;
+
+	// Initialize delimiter table from constants
+	*(int*)&delim_table[0] = 0x80818081;  // Approximation of DAT_801e70e0 etc.
+	*(int*)&delim_table[4] = 0x80818081;
+	*(int*)&delim_table[8] = 0x80818081;
+	*(int*)&delim_table[12] = 0x80818081;
+	*(int*)&delim_table[16] = 0x80818081;
+	*(int*)&delim_table[20] = 0x80818081;
+	*(int*)&delim_table[24] = 0x80818081;
+	*(int*)&delim_table[28] = 0x80818081;
+
+	// Set string pointer - use existing if str is NULL
+	if (str != NULL) {
+		strtok_ptr = str;
+	}
+
+	// Build delimiter bitmap
+	delimPtr = (unsigned char*)delim - 1;
+	while (1) {
+		delimPtr = delimPtr + 1;
+		ch = *delimPtr;
+		if (ch == 0) break;
+		delim_table[ch >> 3] |= (1 << (ch & 7));
+	}
+
+	// Skip leading delimiters
+	strPtr = (unsigned char*)strtok_ptr - 1;
+	do {
+		strPtr = strPtr + 1;
+		ch = *strPtr;
+		if (ch == 0) break;
+	} while ((delim_table[ch >> 3] & (1 << (ch & 7))) != 0);
+
+	tokenStart = strPtr;
+	if (ch == 0) {
+		strtok_ptr = NULL;
+		return NULL;
+	} else {
+		// Find end of token
+		do {
+			strPtr = strPtr + 1;
+			ch = *strPtr;
+			if (ch == 0) break;
+		} while ((delim_table[ch >> 3] & (1 << (ch & 7))) == 0);
+
+		if (ch == 0) {
+			strtok_ptr = NULL;
+		} else {
+			strtok_ptr = (char*)(strPtr + 1);
+			*strPtr = 0;
+		}
+	}
+
+	return (char*)tokenStart;
 }
 
 int strcmp(const char* str1, const char* str2)
@@ -271,4 +368,64 @@ char* strstr(const char* str, const char* pat)
 	}
 
 	return NULL;
+}
+
+char* strtok(char* str, const char* delim)
+{
+	char delimiter_table[32];  // 256 bits / 8 = 32 bytes
+	unsigned char bVar2;
+	char* pbVar1;
+	char* pbVar3;
+	char* pbVar4;
+	int i;
+	
+	// Initialize delimiter bit table
+	for (i = 0; i < 32; i++) {
+		delimiter_table[i] = 0;
+	}
+	
+	// If new string provided, use it
+	if (str != NULL) {
+		strtok_ptr = str;
+	}
+	
+	// Build delimiter bit table
+	pbVar3 = (char*)(delim - 1);
+	while (1) {
+		pbVar3 = pbVar3 + 1;
+		bVar2 = *pbVar3;
+		if (bVar2 == 0) break;
+		delimiter_table[bVar2 >> 3] |= (1 << (bVar2 & 7));
+	}
+	
+	// Skip leading delimiters
+	pbVar3 = strtok_ptr - 1;
+	do {
+		pbVar3 = pbVar3 + 1;
+		bVar2 = *pbVar3;
+		if (bVar2 == 0) break;
+	} while ((delimiter_table[bVar2 >> 3] & (1 << (bVar2 & 7))) != 0);
+	
+	pbVar1 = pbVar3;
+	if (bVar2 == 0) {
+		strtok_ptr = NULL;
+		return NULL;
+	}
+	
+	// Find end of token
+	do {
+		pbVar4 = pbVar1;
+		pbVar1 = pbVar4 + 1;
+		bVar2 = *pbVar1;
+		if (bVar2 == 0) break;
+	} while ((delimiter_table[bVar2 >> 3] & (1 << (bVar2 & 7))) == 0);
+	
+	if (bVar2 == 0) {
+		strtok_ptr = NULL;
+	} else {
+		strtok_ptr = pbVar4 + 2;
+		*pbVar1 = 0;
+	}
+	
+	return pbVar3;
 }

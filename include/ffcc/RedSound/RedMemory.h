@@ -1,10 +1,10 @@
 #ifndef _FFCC_REDSOUND_REDMEMORY_H
 #define _FFCC_REDSOUND_REDMEMORY_H
 
-void RedNew(int);
+int RedNew(int);
 void RedDelete(int);
 void RedDelete(void*);
-void RedNewA(int, int, int);
+int RedNewA(int, int, int);
 void RedDeleteA(int);
 void RedDeleteA(void*);
 

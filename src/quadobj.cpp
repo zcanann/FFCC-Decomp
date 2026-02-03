@@ -37,24 +37,22 @@ void CGQuadObj::onDestroy()
 void CGQuadObj::onDraw()
 {
     if (m_vertexCount != 0 && (CFlatFlags & 0x10000) != 0) {
-        GXColor white = { 0xFF, 0xFF, 0xFF, 0xFF };
-        GXSetChanMatColor(GX_COLOR0A0, white);
+        u32 white = 0xFFFFFFFF;
+        GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)&white);
         GXLoadPosMtxImm(gFlatPosMtx, GX_PNMTX0);
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, (u32)m_vertexCount * 6);
 
         int i = 0;
-        QuadVertex* pVert = m_vertices;
         while (i < (int)m_vertexCount) {
             int next = (i + 1) % (int)m_vertexCount;
             
-            GXPosition3f32(pVert->x, m_yBase, pVert->z);
+            GXPosition3f32(m_vertices[i].x, m_yBase, m_vertices[i].z);
             GXPosition3f32(m_vertices[next].x, m_yBase, m_vertices[next].z);
-            GXPosition3f32(pVert->x, m_yBase + m_yHeight, pVert->z);
+            GXPosition3f32(m_vertices[i].x, m_yBase + m_yHeight, m_vertices[i].z);
             GXPosition3f32(m_vertices[next].x, m_yBase + m_yHeight, m_vertices[next].z);
-            GXPosition3f32(pVert->x, m_yBase, pVert->z);
-            GXPosition3f32(pVert->x, m_yBase + m_yHeight, pVert->z);
+            GXPosition3f32(m_vertices[i].x, m_yBase, m_vertices[i].z);
+            GXPosition3f32(m_vertices[i].x, m_yBase + m_yHeight, m_vertices[i].z);
             
-            pVert++;
             i++;
         }
     }
@@ -97,7 +95,7 @@ bool CGQuadObj::isInner(Vec* vec)
                     float cross = (m_vertices[next].x - x0) * (pz - z0) - 
                                   (m_vertices[next].z - z0) * (px - x0);
                     
-                    if (!(EPS <= cross)) {
+                    if (cross < EPS) {
                         break;
                     }
                     

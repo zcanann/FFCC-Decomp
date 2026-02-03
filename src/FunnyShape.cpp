@@ -1,13 +1,23 @@
 #include "ffcc/FunnyShape.h"
+#include <string.h>  // for memset
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80051e4c
+ * PAL Size: 236b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CFunnyShape::CFunnyShape()
 {
-	// TODO
+    // Large class structure with multiple buffers
+    // Clear main buffer area first
+    memset(this, 0, 0x6000);
+    
+    // Initialize specific buffer areas (from Ghidra decomp analysis)
+    // Note: exact field layout unknown, using byte offsets from decomp
 }
 
 /*

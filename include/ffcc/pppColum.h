@@ -2,6 +2,12 @@
 #define _FFCC_PPPCOLUM_H_
 
 #include <dolphin/types.h>
+#include <dolphin/mtx.h>
+
+// pppCVector structure
+typedef struct pppCVector {
+    u8 m_rgba[4];
+} pppCVector;
 
 struct pppColum {
     union {
@@ -33,7 +39,7 @@ struct UnkB {
     u32 m_stepValue;
     u8 m_arg3;
     char pad2[3];
-    void* m_payload;
+    char* m_payload;
 };
 
 struct UnkC {

@@ -3,8 +3,6 @@
 extern int DAT_8032ed70;
 extern int* DAT_8032ed50;
 
-static int temp_state;
-
 /*
  * --INFO--
  * PAL Address: 0x80127b70
@@ -34,5 +32,7 @@ void pppFrameBindOnlyPos(void)
 		return;
 	}
 	
-	temp_state = (*(unsigned int*)((char*)DAT_8032ed50 + 0xd8) == 0);
+	if (*(unsigned int*)((char*)DAT_8032ed50 + 0xd8) == 0) {
+		return;
+	}
 }

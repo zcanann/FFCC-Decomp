@@ -1,6 +1,12 @@
 #include "ffcc/pppSRandUpCV.h"
 #include "ffcc/math.h"
 
+extern CMath math;
+extern int lbl_8032ED70;
+
+// Forward declaration to handle RandF return value
+extern "C" float RandF__5CMathFv();
+
 /*
  * --INFO--
  * PAL Address: 80064114
@@ -12,32 +18,24 @@
  */
 void pppSRandUpCV(void* param1, void* param2)
 {
-    extern int lbl_8032ED70;
     if (lbl_8032ED70 != 0) return;
-    
-    CMath math;
-    
-    unsigned int* p1 = (unsigned int*)param1;
-    unsigned char* p2_bytes = (unsigned char*)param2;
     
     // Check if indices match
     int currentIndex = *((int*)param2);
-    int targetIndex = p1[3];
+    int targetIndex = *((int*)param1 + 3);
     if (currentIndex != targetIndex) return;
     
     // Get data offset and calculate target array
     int dataOffset = *((int*)param2 + 3);
     float* target = (float*)((char*)param1 + dataOffset + 0x80);
     
-    unsigned char flag = p2_bytes[12]; // 0xc offset
+    unsigned char flag = *((unsigned char*)param2 + 12);
     
-    // Generate 4 random float values
+    // Generate 4 random float values using loop
     for (int i = 0; i < 4; i++) {
-        math.RandF();
-        float randVal = 1.0f; // Placeholder - RandF result stored elsewhere
+        float randVal = RandF__5CMathFv();
         if (flag != 0) {
-            math.RandF();
-            float randVal2 = 0.5f; // Placeholder for second random
+            float randVal2 = RandF__5CMathFv();
             randVal = (randVal + randVal2) * 0.5f;
         }
         target[i] = randVal;
@@ -53,12 +51,11 @@ void pppSRandUpCV(void* param1, void* param2)
         targetColors = (unsigned char*)((char*)param1 + colorOffset + 0x80);
     }
     
-    // Apply random modifications to 4 byte values
+    // Apply random modifications to 4 byte values using loop
     for (int i = 0; i < 4; i++) {
-        signed char baseValue = (signed char)p2_bytes[8 + i]; // +0x8, +0x9, +0xa, +0xb offsets
+        signed char baseValue = *((signed char*)param2 + 8 + i);
         float randomMult = target[i];
         int adjustment = (int)(baseValue * randomMult);
-        unsigned char currentValue = targetColors[i];
-        targetColors[i] = (unsigned char)(currentValue + adjustment);
+        targetColors[i] += (unsigned char)adjustment;
     }
 }

@@ -1,7 +1,8 @@
 #ifndef _FFCC_PPP_WIND_H_
 #define _FFCC_PPP_WIND_H_
 
-#include "ffcc/types.h"
+#include "types.h"
+#include <dolphin/mtx.h>
 
 struct WindObject
 {

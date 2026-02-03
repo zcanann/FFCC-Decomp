@@ -1,33 +1,54 @@
 #include "ffcc/wind.h"
 
+#include <string.h>
+#include <math.h>
+#include "ffcc/graphic.h"
+#include "ffcc/color.h"
+#include "ffcc/vector.h"
+#include "ffcc/p_camera.h"
+#include "ffcc/math.h"
+
+extern CGraphic Graphic;
+extern CCameraPcs CameraPcs;
+extern u32 CFlat; // Temporary - needs proper declaration
+
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	800da05c
+ * Size:	88
  */
 void CWind::ClearAll()
 {
-	// TODO
+	memset(this, 0, 0xc80);
+	*(u32*)((char*)this + 0xc80) = 1;
+	memset((char*)this + 0xc84, 0, 0x7000);
+	*(u32*)((char*)this + 0x7c84) = 10000000;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	800d9d60
+ * Size:	764
  */
 void CWind::Frame()
 {
-	// TODO
+	// Basic loop structure to get started
+	for (int i = 0; i < 32; i++) {
+		WindObject* obj = &m_objects[i];
+		if (obj->flags & 0x80) {
+			// Wind object processing - TODO: implement full logic
+		}
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	800d9b2c
+ * Size:	564
  */
 void CWind::Draw()
 {
-	// TODO
+	// TODO: Implement wind rendering
 }
 
 /*

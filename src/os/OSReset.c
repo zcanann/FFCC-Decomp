@@ -231,8 +231,8 @@ void OSResetSystem(BOOL reset, u32 resetCode, BOOL forceMenu) {
 
 u32 OSGetResetCode() {
     u32 resetCode;
-    if (__OSRebootParams.valid)
-        resetCode = 0x80000000 | __OSRebootParams.restartCode;
+    if (*(volatile u8*)0x800030e2)
+        resetCode = 0x80000000;
     else
         resetCode = (__PIRegs[9] & 0xFFFFFFF8) / 8;
 

@@ -1,4 +1,10 @@
 #include "ffcc/gbaque.h"
+#include <string.h>
+#include <Dolphin/os.h>
+#include <Runtime.PPCEABI.H/NMWException.h>
+
+extern void* ARRAY_802f49b0;
+extern void __dt__8GbaQueueFv(void*);
 
 /*
  * --INFO--
@@ -568,6 +574,24 @@ void GbaQueue::ClrScrInitEnd()
 void GbaQueue::InitCmakeInfo(int, int)
 {
 	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800cc9dc
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void GbaQueue::ClrCmakeInfo(int param_2)
+{
+	BlockSem(param_2);
+	if (cmakeInfo[param_2 * 0x20] != '\0') {
+		memset(&cmakeInfo[param_2 * 0x20], 0, 0x20);
+	}
+	ReleaseSem(param_2);
 }
 
 /*
@@ -1347,5 +1371,6 @@ void GbaQueue::ClrStartBonusFlg(int)
  */
 void __sinit_gbaque_cpp(void)
 {
-	// TODO
+	GbaQue.Init();
+	__register_global_object(&GbaQue, __dt__8GbaQueueFv, ARRAY_802f49b0);
 }

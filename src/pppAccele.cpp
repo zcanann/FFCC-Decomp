@@ -8,21 +8,19 @@ extern float DAT_8032fec8;
  * PAL Address: 0x80064c7c
  * PAL Size: 156b
  */
-void pppAccele(void* obj, void* param2, void* param3)
+void pppAccele(pppAcceleObj* obj, UnkB* param_2, UnkC* param_3)
 {
-	void* dataPtr = *((void**)((char*)param3 + 0x0c));
-	
-	float* pfVar1 = (float*)((char*)obj + *((int*)((char*)dataPtr + 0x00)) + 0x80);
-	float* pfVar2 = (float*)((char*)obj + *((int*)((char*)dataPtr + 0x04)) + 0x80);
+	float* pfVar1 = (float*)((char*)obj + *param_3->m_serializedDataOffsets + 0x80);
+	float* pfVar2 = (float*)((char*)obj + param_3->m_serializedDataOffsets[1] + 0x80);
 	
 	if (DAT_8032ed70 != 0) {
 		return;
 	}
 	
-	if (*((int*)((char*)param2 + 0x08)) == *((int*)((char*)obj + 0x08))) {
-		*pfVar2 = *pfVar2 + *((float*)((char*)param2 + 0x0c));
-		pfVar2[1] = pfVar2[1] + *((float*)((char*)param2 + 0x10));
-		pfVar2[2] = pfVar2[2] + *((float*)((char*)param2 + 0x14));
+	if (param_2->m_graphId == obj->m_graphId) {
+		*pfVar2 = *pfVar2 + (float)param_2->m_initWOrk;
+		pfVar2[1] = pfVar2[1] + param_2->m_stepValue;
+		pfVar2[2] = pfVar2[2] + (float)param_2->m_arg3;
 	}
 	
 	*pfVar1 = *pfVar1 + *pfVar2;
@@ -35,10 +33,9 @@ void pppAccele(void* obj, void* param2, void* param3)
  * PAL Address: 0x80064c58 
  * PAL Size: 36b
  */
-void pppAcceleCon(void* obj, void* param)
+void pppAcceleCon(pppAcceleObj* obj, UnkC* param)
 {
-	void* dataPtr = *((void**)((char*)param + 0x0c));
-	float* puVar2 = (float*)((char*)obj + *((int*)((char*)dataPtr + 0x04)) + 0x80);
+	float* puVar2 = (float*)((char*)obj + param->m_serializedDataOffsets[1] + 0x80);
 	float uVar1 = DAT_8032fec8;
 	
 	puVar2[2] = uVar1;

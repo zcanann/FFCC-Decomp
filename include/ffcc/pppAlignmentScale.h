@@ -4,6 +4,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 void pppConstructAlignmentScale(void);
 void pppFrameAlignmentScale(void);
 

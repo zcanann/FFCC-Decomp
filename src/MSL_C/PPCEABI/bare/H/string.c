@@ -151,69 +151,6 @@ char* strncat(char* dst, const char* src, size_t n)
 	return dst;
 }
 
-char* strtok(char* str, const char* delim)
-{
-	unsigned char delim_table[32];
-	unsigned char* delimPtr;
-	unsigned char* strPtr;
-	unsigned char* tokenStart;
-	unsigned char ch;
-
-	// Initialize delimiter table from constants
-	*(int*)&delim_table[0] = 0x80818081;  // Approximation of DAT_801e70e0 etc.
-	*(int*)&delim_table[4] = 0x80818081;
-	*(int*)&delim_table[8] = 0x80818081;
-	*(int*)&delim_table[12] = 0x80818081;
-	*(int*)&delim_table[16] = 0x80818081;
-	*(int*)&delim_table[20] = 0x80818081;
-	*(int*)&delim_table[24] = 0x80818081;
-	*(int*)&delim_table[28] = 0x80818081;
-
-	// Set string pointer - use existing if str is NULL
-	if (str != NULL) {
-		strtok_ptr = str;
-	}
-
-	// Build delimiter bitmap
-	delimPtr = (unsigned char*)delim - 1;
-	while (1) {
-		delimPtr = delimPtr + 1;
-		ch = *delimPtr;
-		if (ch == 0) break;
-		delim_table[ch >> 3] |= (1 << (ch & 7));
-	}
-
-	// Skip leading delimiters
-	strPtr = (unsigned char*)strtok_ptr - 1;
-	do {
-		strPtr = strPtr + 1;
-		ch = *strPtr;
-		if (ch == 0) break;
-	} while ((delim_table[ch >> 3] & (1 << (ch & 7))) != 0);
-
-	tokenStart = strPtr;
-	if (ch == 0) {
-		strtok_ptr = NULL;
-		return NULL;
-	} else {
-		// Find end of token
-		do {
-			strPtr = strPtr + 1;
-			ch = *strPtr;
-			if (ch == 0) break;
-		} while ((delim_table[ch >> 3] & (1 << (ch & 7))) == 0);
-
-		if (ch == 0) {
-			strtok_ptr = NULL;
-		} else {
-			strtok_ptr = (char*)(strPtr + 1);
-			*strPtr = 0;
-		}
-	}
-
-	return (char*)tokenStart;
-}
-
 int strcmp(const char* str1, const char* str2)
 {
 	register unsigned char* left  = (unsigned char*)str1;

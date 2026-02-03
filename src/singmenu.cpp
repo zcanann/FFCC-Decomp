@@ -1,5 +1,7 @@
 #include "ffcc/singmenu.h"
 
+extern CMenuPcs MenuPcs;
+
 /*
  * --INFO--
  * Address:	TODO
@@ -52,12 +54,16 @@ void CMenuPcs::calcSingleMenu()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80149534
+ * PAL Size: 2344b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::drawSingleMenu()
 {
-	// TODO
+    return;
 }
 
 /*
@@ -262,12 +268,16 @@ void CMenuPcs::DrawEquipMark(int, int, float)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80146adc
+ * PAL Size: 1500b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::DrawSingWin(short)
+void CMenuPcs::DrawSingWin(short state)
 {
-	// TODO
+    return;
 }
 
 /*

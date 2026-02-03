@@ -7,13 +7,13 @@
  */
 void pppVertexApMtxCon(_pppPObject* obj, PVertexApMtx* vtx)
 {
-	// Initialize vertex matrix state to zero
-	int* vtx_base = (int*)((char*)vtx + 0xc);
-	int* data_base = (int*)*vtx_base;
-	int offset = (int)data_base + 0x80;
-	char* ptr = (char*)obj + offset;
-	*(short*)ptr = 0;
-	*(short*)(ptr + 2) = 0;
+	// Get base address from vtx offset 0xc
+	char* base = *(char**)((char*)vtx + 0xc);
+	// Calculate final address: obj + base + 0x80
+	char* target = (char*)obj + (int)base + 0x80;
+	// Zero out two shorts at the target location
+	*(short*)target = 0;
+	*(short*)(target + 2) = 0;
 }
 
 /*

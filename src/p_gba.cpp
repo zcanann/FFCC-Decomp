@@ -134,20 +134,28 @@ void CGbaPcs::onMapChanged(int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80097800
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGbaPcs::onScriptChanging(char*)
 {
-	// TODO
+	GbaQue.ClrScrInitEnd();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800977d8
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGbaPcs::SetFirstZone()
 {
-	// TODO
+	GbaQue.ClrRadarTypeFlg();
 }

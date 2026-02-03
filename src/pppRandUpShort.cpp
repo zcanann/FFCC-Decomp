@@ -18,40 +18,41 @@ void pppRandUpShort(void* param1, void* param2, void* param3)
         return;
     }
     
-    if (((int*)param1)[3] == 0) {
-        float f31;
+    int* p1 = (int*)param1;
+    unsigned char* p2 = (unsigned char*)param2;
+    void** p3 = (void**)param3;
+    
+    if (p1[3] == 0) {
+        register float f31 asm("f31");
         
         math.RandF();
-        // f31 = f1 result from RandF
+        // Assume f31 gets the result from RandF()
         
-        if (((unsigned char*)param2)[0xA] != 0) {
+        if (p2[0xA] != 0) {
             math.RandF();
-            // f31 += f1 result from second RandF
+            // f31 += second RandF result
         }
         
-        // f31 *= lbl_80330038
-        // Store result at calculated address
+        f31 *= lbl_80330038;
+        
         void** ptr = (void**)((char*)param3 + 0xC);
         int* indexPtr = (int*)*ptr;
-        int index = *indexPtr;
-        ((float*)((char*)param1 + index + 0x80))[0] = f31;
+        int offset = *indexPtr + 0x80;
+        ((float*)param1)[offset/4] = f31;
         
     } else {
         int field0 = ((int*)param2)[0];
-        int param1_field3 = ((int*)param1)[3];
-        
-        if (field0 != param1_field3) {
+        if (field0 != p1[3]) {
             return;
         }
         
         void** ptr = (void**)((char*)param3 + 0xC);
         int* indexPtr = (int*)*ptr;
-        int index = *indexPtr;
-        float* sourceAddr = (float*)((char*)param1 + index + 0x80);
+        int offset = *indexPtr + 0x80;
+        float* sourceAddr = (float*)((char*)param1 + offset);
         
         int field4 = ((int*)param2)[1];
         short* targetShort;
-        
         if (field4 == -1) {
             targetShort = &lbl_801EADC8;
         } else {
@@ -62,6 +63,8 @@ void pppRandUpShort(void* param1, void* param2, void* param3)
         float sourceValue = *sourceAddr;
         short currentValue = *targetShort;
         
-        *targetShort = currentValue + (short)(int)((double)multiplier - lbl_80330040) * sourceValue;
+        double multiplierD = (double)multiplier;
+        double result = (multiplierD - lbl_80330040) * sourceValue;
+        *targetShort = currentValue + (short)(int)result;
     }
 }

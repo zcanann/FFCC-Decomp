@@ -7,6 +7,7 @@
 #include "ffcc/gobjwork.h"
 #include "ffcc/manager.h"
 #include "ffcc/memory.h"
+#include "ffcc/ptrarray.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>

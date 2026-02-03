@@ -12,12 +12,15 @@ CFlatRuntime::CFlatRuntime()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80069a2c
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CFlatRuntime::~CFlatRuntime()
 {
-	// TODO
 }
 
 /*

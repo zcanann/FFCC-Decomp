@@ -111,6 +111,13 @@ class CChara
 		void GetDispIndex(CChara::CNode*);
         void GetMatrix();
         void GetMatrix(float(*)[4]);
+
+	private:
+		float m_curFrame;
+		CAnim* m_anim;
+		float m_time;
+		float m_animStart;
+		float m_animEnd;
 	};
 
 	class CMesh

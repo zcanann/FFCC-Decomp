@@ -1,6 +1,8 @@
 #ifndef _FFCC_MAPOBJ_H_
 #define _FFCC_MAPOBJ_H_
 
+#include "ffcc/ptrarray.h"
+
 class CChunkFile;
 class CMapKeyFrame;
 class CMapCylinder;
@@ -14,7 +16,6 @@ class CMapObjAtrPointLight;
 class CMapObjAtrMeshName;
 class CMaterialMan;
 class CCameraPcs;
-template <class T> class CPtrArray;
 struct Vec;
 struct _GXColor;
 

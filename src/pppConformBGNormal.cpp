@@ -1,8 +1,19 @@
 #include "ffcc/pppConformBGNormal.h"
 #include "types.h"
 #include "dolphin/mtx.h"
+#include "ffcc/game.h"
+#include "dolphin/gx.h"
 
 extern u32 DAT_8032ed70;
+extern f32 FLOAT_80331908;
+extern f32 FLOAT_8033190c;
+extern f32 FLOAT_80331910;
+extern f32 FLOAT_80331914;
+extern f32 FLOAT_80331918;
+extern f32 FLOAT_8033191c;
+
+extern void* pppMngStPtr;
+extern void* MapMng;
 
 /*
  * --INFO--
@@ -13,15 +24,32 @@ extern u32 DAT_8032ed70;
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructConformBGNormal(void)
+void pppConstructConformBGNormal(struct pppConformBGNormal* conformBG, struct UnkC* param2)
 {
-    // Based on objdiff analysis, this appears to initialize some memory structure
-    // The function takes no parameters but accesses global state
+    f32* ptr = (f32*)((int)(&conformBG->field0_0x0[8]) + *param2->m_serializedDataOffsets);
     
-    // Pattern from assembly: load from offset, add 0x80, store floats + byte
-    // This is a minimal stub that will need global variable definitions to work properly
-    f32 zero = 0.0f;
+    ptr[2] = FLOAT_80331908;
+    ptr[1] = FLOAT_80331908;
+    ptr[0] = FLOAT_80331908;
     
-    // Need to access globals that aren't defined yet
-    // This is a placeholder until proper globals are identified
+    *(u8*)(ptr + 3) = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801091d4
+ * PAL Size: 1552b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppFrameConformBGNormal(struct pppConformBGNormal* conformBG, struct UnkB* param2, struct UnkC* param3)
+{
+    // This is a complex function - implementing basic structure first
+    if (DAT_8032ed70 == 0) {
+        // Basic implementation stub
+        // TODO: Full implementation requires more game state understanding
+        return;
+    }
 }

@@ -1,4 +1,20 @@
 #include "ffcc/p_system.h"
+#include "ffcc/pad.h"
+#include "ffcc/p_dbgmenu.h"
+
+/*
+ * --INFO--
+ * PAL Address: 0x80047d7c
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void __sinit_p_system_cpp(void)
+{
+	// TODO: Static initialization
+}
 
 /*
  * --INFO--
@@ -66,10 +82,47 @@ void CSystemPcs::destroy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80047c9c
+ * PAL Size: 188b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CSystemPcs::calc()
 {
-	// TODO
+	unsigned short uVar2;
+	int iVar1;
+	
+	if (Pad._452_4_ == 0) {
+		// Calculate controller index and read button data
+		// Complex controller selection logic from Ghidra
+		int controllerIndex = Pad._448_4_;
+		int indexCalc = (~((int)~(controllerIndex - 4 | 4 - controllerIndex) >> 0x1f) & 4U);
+		unsigned char* padData = (unsigned char*)&Pad;
+		uVar2 = *(unsigned short*)(padData + 0x36 + indexCalc * 0x54);
+	}
+	else {
+		uVar2 = 0;
+	}
+	
+	if ((uVar2 & 0x1000) == 0) { // Not START/MENU button
+		if ((uVar2 & 0x100) == 0) { // Not A button
+			if (((uVar2 & 0x800) == 0) && ((uVar2 & 0x40) != 0)) { // Not Y button, but L trigger
+				iVar1 = Pad._448_4_ + 1;
+				if (iVar1 == 0) {
+					iVar1 = Pad._448_4_ + 2;
+				}
+				Pad._448_4_ = iVar1;
+				if (3 < iVar1) {
+					Pad._448_4_ = -1;
+				}
+			}
+		}
+		else {
+			// A button pressed - add debug menu entry  
+			// TODO: Need to properly call debug menu function
+			// The original assembly shows: bl Add__11CDbgMenuPcsFv
+		}
+	}
 }

@@ -23,10 +23,28 @@ extern u16 DAT_800030e4;  // Pad status at 0x800030E4
 extern u8 DAT_8032efe0;   // Debug BBA flag
 
 /* 80003100-80003140 000000 0040+00 1/1 0/0 0/0 .init            __check_pad3 */
-SECTION_INIT void __check_pad3(void) {
-    if ((DAT_800030e4 & 0xeef) == 0xeef) {
-        OSResetSystem(0, 0, 0);
-    }
+SECTION_INIT asm void __check_pad3(void) {
+    // clang-format off
+    nofralloc
+
+    mflr r0
+    lis r3, 0x8000
+    stw r0, 4(r1)
+    stwu r1, -8(r1)
+    lhz r0, 0x30e4(r3)
+    andi. r0, r0, 0xeef
+    cmpwi r0, 0xeef
+    bne end
+    li r3, 0
+    li r4, 0
+    li r5, 0
+    bl OSResetSystem
+end:
+    lwz r0, 0xc(r1)
+    addi r1, r1, 8
+    mtlr r0
+    blr
+    // clang-format on
 }
 
 /* 80003140-8000314C 000040 000C+00 1/1 0/0 0/0 .init            __set_debug_bba */

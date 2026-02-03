@@ -66,22 +66,34 @@ void CGbaPcs::create()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800978d4
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGbaPcs::destroy()
 {
-	// TODO
+	Joybus.Destroy();
+	Memory.DestroyStage(m_stage);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009788c
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGbaPcs::calc()
 {
-	// TODO
+	if (Joybus.IsThreadRunning()) {
+		GbaQue.ExecutQueue();
+		GbaQue.LoadAll();
+	}
 }
 
 /*
@@ -122,20 +134,28 @@ void CGbaPcs::onMapChanged(int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80097800
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGbaPcs::onScriptChanging(char*)
 {
-	// TODO
+	GbaQue.ClrScrInitEnd();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800977d8
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGbaPcs::SetFirstZone()
 {
-	// TODO
+	GbaQue.ClrRadarTypeFlg();
 }

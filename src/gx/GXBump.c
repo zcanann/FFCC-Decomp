@@ -293,7 +293,45 @@ void GXSetTevIndRepeat(GXTevStageID tev_stage) {
     GXSetTevIndirect(tev_stage, GX_INDTEXSTAGE0, GX_ITF_8, GX_ITB_NONE, GX_ITM_OFF, GX_ITW_0, GX_ITW_0, GX_TRUE, GX_FALSE, GX_ITBA_OFF);
 }
 
-void __GXUpdateBPMask(void) {}
+void __GXUpdateBPMask(void) {
+    u32 mask;
+    int i;
+    u32 numStages;
+    u32 texMap;
+
+    mask = 0;
+    i = 0;
+    numStages = (__GXData->genMode >> 16) & 3;
+
+    for (i = 0; i < numStages; i++) {
+        switch (i) {
+        case 0:
+            texMap = __GXData->iref & 7;
+            break;
+        case 1:
+            texMap = (__GXData->iref >> 6) & 7;
+            break;
+        case 2:
+            texMap = (__GXData->iref >> 12) & 7;
+            break;
+        case 3:
+            texMap = (__GXData->iref >> 18) & 7;
+            break;
+        default:
+            texMap = 0;
+            break;
+        }
+        mask |= (1 << texMap);
+    }
+
+    if (((__GXData->bpMask & 0xFF) == mask)) {
+        return;
+    }
+
+    __GXData->bpMask = (__GXData->bpMask & 0xFFFFFF00) | mask;
+    GX_WRITE_SOME_REG5(GX_LOAD_BP_REG, __GXData->bpMask);
+    __GXData->bpSentNot = 0;
+}
 
 void __GXSetIndirectMask(u32 mask) {
     SET_REG_FIELD(664, __GXData->bpMask, 8, ~0xFF, mask);

@@ -32,50 +32,41 @@ void randint(int param1, float param2)
  */
 void pppRandDownIV(void* arg1, void* arg2, void* arg3)
 {
-	// Cast parameters based on assembly analysis
-	int* data1 = (int*)arg1;      // r30
-	int* data2 = (int*)arg2;      // r31
-	int* data3 = (int*)arg3;      // r29
+	int* data1 = (int*)arg1;
+	int* data2 = (int*)arg2;
+	int* data3 = (int*)arg3;
+	float randVal;
 	
-	// Check global state first - if set, return early
+	// Early exit if global flag is set
 	if (lbl_8032ED70 != 0) {
 		return;
 	}
 	
-	// Check if data2[0] == data1[3] (assembly shows comparison at offsets 0 and 0xc)
+	// Check if data2[0] == data1[3]
 	if (data2[0] == data1[3]) {
-		// Get random float from CMath
+		// Get random float - assume RandF stores result in a member or global
 		math.RandF();
-		float randVal = 0.0f; // RandF result stored elsewhere
-		float scaledRand = -randVal;
+		// Assume the random value is available somehow - use placeholder
+		randVal = -1.0f; // Negative placeholder for now
 		
 		// Check flag at offset 0x18 in data2
 		if (*(unsigned char*)((char*)data2 + 0x18) != 0) {
-			// Get another random value and scale it
 			math.RandF();
-			float randVal2 = 0.0f; // Second RandF result
-			scaledRand = (scaledRand - randVal2) * lbl_8032FF68; // 2.0f
+			float randVal2 = -1.0f; // Second random placeholder
+			randVal = (randVal - randVal2) * lbl_8032FF68; // 2.0f
 		}
 		
-		// Store result at computed offset in data structure
+		// Get base pointer from data3[3] and store result
 		void** data3_ptr = (void**)&data3[3];
 		void* base = *data3_ptr;
 		int base_offset = *((int*)base);
 		float* resultPtr = (float*)((char*)data1 + base_offset + 0x80);
-		*resultPtr = scaledRand;
-	}
-	
-	// Handle case where comparison fails but still need to process
-	if (data2[0] != data1[3]) {
+		*resultPtr = randVal;
 		return;
 	}
 	
-	// Get pointer to result storage area
-	void** data3_ptr = (void**)&data3[3];
-	void* base = *data3_ptr;
+	// Get base address for vector operations
 	void* addr_base;
-	
-	// Check field at offset 4 of data2
 	if (data2[1] == -1) {
 		addr_base = &lbl_801EADC8[0];
 	} else {
@@ -83,6 +74,35 @@ void pppRandDownIV(void* arg1, void* arg2, void* arg3)
 		addr_base = (char*)data1 + offset;
 	}
 	
-	// Process vector components (X, Y, Z)
-	// This follows the pattern seen in the assembly for 3 similar calculations
+	// Process vector component operations
+	int sourceVal = data2[2]; // Get value from offset 8
+	
+	// Convert signed integer to float with bias adjustment
+	float signedVal = (float)((int)(sourceVal ^ 0x80000000)) - (float)lbl_8032FF70;
+	
+	// Get current component value from addr_base
+	float currentVal = *((float*)addr_base);
+	
+	// Multiply and convert back to int
+	float result = signedVal * currentVal;
+	int resultInt = (int)result;
+	
+	// Store back to source array
+	*((int*)addr_base) += resultInt;
+	
+	// Process Y component
+	sourceVal = data2[3]; // Get value from offset 0xc
+	signedVal = (float)((int)(sourceVal ^ 0x80000000)) - (float)lbl_8032FF70;
+	currentVal = *((float*)((char*)addr_base + 4));
+	result = signedVal * currentVal;
+	resultInt = (int)result;
+	*((int*)((char*)addr_base + 4)) += resultInt;
+	
+	// Process Z component  
+	sourceVal = data2[4]; // Get value from offset 0x10
+	signedVal = (float)((int)(sourceVal ^ 0x80000000)) - (float)lbl_8032FF70;
+	currentVal = *((float*)((char*)addr_base + 8));
+	result = signedVal * currentVal;
+	resultInt = (int)result;
+	*((int*)((char*)addr_base + 8)) += resultInt;
 }

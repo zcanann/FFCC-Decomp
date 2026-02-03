@@ -1,6 +1,8 @@
 #ifndef _FFCC_GBAQUEUE_H_
 #define _FFCC_GBAQUEUE_H_
 
+#include <Dolphin/os.h>
+
 class GbaPInfo;
 class GbaCMakeInfo;
 class HitEInfo;
@@ -76,6 +78,7 @@ public:
     void GetMoney(int);
     void ClrScrInitEnd();
     void InitCmakeInfo(int, int);
+    void ClrCmakeInfo(int);
     void ChkCMakeName(int, unsigned int);
     void ChkCMakeCharaType(int, unsigned int);
     void ChkCMakeJob(int, unsigned int);
@@ -153,6 +156,10 @@ public:
     void SetStartBonusFlg();
     void GetStartBonusFlg(int);
     void ClrStartBonusFlg(int);
+
+private:
+    char cmakeInfo[4][0x20];
+    OSSemaphore accessSemaphores[4];
 };
 
 extern GbaQueue GbaQue;

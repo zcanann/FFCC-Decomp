@@ -2,6 +2,10 @@
 #define _FFCC_PPPCONSTRAINCAMERAFORLOC_H_
 
 #include "ffcc/chara.h"
+#include "ffcc/partMng.h"
+#include "ffcc/pppYmEnv.h"
+
+class CGObject;
 
 void CC_BeforeCalcMatrixCallback(CChara::CModel*, void*, void*);
 

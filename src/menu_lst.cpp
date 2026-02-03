@@ -130,12 +130,67 @@ void CMenuPcs::MLstCtrl()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80174ce8
+ * PAL Size: 428b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO  
+ * JP Size: TODO
  */
-void CMenuPcs::MLstClose()
+int CMenuPcs::MLstClose()
 {
-	// TODO
+	int completedItems = 0;
+	
+	// Increment animation frame counter
+	*(short*)((char*)this + 0x82c + 0x22) += 1;
+	int currentFrame = *(short*)((char*)this + 0x82c + 0x22);
+	
+	int itemCount = **(short**)((char*)this + 0x850);
+	short* itemPtr = *(short**)((char*)this + 0x850) + 4;
+	
+	// Update each item's fade-out animation
+	for (int i = 0; i < itemCount; i++) {
+		int startFrame = *(int*)(itemPtr + 0x12);
+		int duration = *(int*)(itemPtr + 0x14);
+		
+		if (startFrame <= currentFrame) {
+			if (currentFrame < startFrame + duration) {
+				// Animate fade-out
+				*(int*)(itemPtr + 0x10) += 1;
+				int progress = *(int*)(itemPtr + 0x10);
+				
+				// Calculate fade-out alpha (1.0 - progress/duration)
+				float alpha = 1.0f - (float)progress / (float)duration;
+				if (alpha < 0.0f) {
+					alpha = 0.0f;
+				}
+				*(float*)(itemPtr + 8) = alpha;
+			} else {
+				// Animation complete
+				completedItems++;
+				*(float*)(itemPtr + 8) = 0.0f;
+			}
+		}
+		
+		itemPtr += 0x20;
+	}
+	
+	// Check if all animations are complete
+	if (itemCount == completedItems) {
+		// Reset all animation states
+		itemPtr = *(short**)((char*)this + 0x850) + 4;
+		for (int i = 0; i < itemCount; i++) {
+			*(short*)(itemPtr + 0x12) = 0;  // Reset start frame
+			*(short*)(itemPtr + 0x13) = 0;
+			*(short*)(itemPtr + 0x14) = 0;  // Reset duration
+			*(short*)(itemPtr + 0x15) = 1;
+			*(float*)(itemPtr + 8) = 0.0f;  // Zero alpha
+			itemPtr += 0x20;
+		}
+		return 1;  // Close animation complete
+	}
+	
+	return 0;  // Still animating
 }
 
 /*

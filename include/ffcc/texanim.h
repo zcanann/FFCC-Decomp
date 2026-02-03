@@ -2,6 +2,7 @@
 #define _FFCC_PPP_TEXANIM_H_
 
 #include "ffcc/memory.h"
+#include "ffcc/ptrarray.h"
 
 class CMaterialSet;
 class CChunkFile;

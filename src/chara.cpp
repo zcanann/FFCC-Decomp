@@ -1,4 +1,5 @@
 #include "ffcc/chara.h"
+#include "ffcc/cflat_runtime.h"
 
 /*
  * --INFO--
@@ -345,9 +346,9 @@ void CChara::CModel::AttachTextureSet(CTextureSet*)
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CModel::AddFrame(float)
+void CChara::CModel::AddFrame(float frame)
 {
-	// TODO
+	m_curFrame += frame;
 }
 
 /*
@@ -355,9 +356,9 @@ void CChara::CModel::AddFrame(float)
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CModel::SetFrame(float)
+void CChara::CModel::SetFrame(float frame)
 {
-	// TODO
+	m_curFrame = frame;
 }
 
 /*
@@ -598,4 +599,28 @@ void CChara::CAnimNode::IsScale()
 void CChara::CModel::CalcNodeWorldMatrix(float (*) [4], CChara::CNode*)
 {
 	// TODO
+}
+
+// Global Chara object - composite structure with nested base objects
+struct CharaGlobal {
+	struct Field0 {
+		struct Object {
+			struct BaseObject {
+				CFlatRuntime::CObject object;
+			} base_object;
+		} object;
+	} field0_0x0;
+} Chara;
+
+// External vtable reference
+extern "C" void* PTR_PTR_s_CChara_801fcd24;
+
+/*
+ * --INFO--
+ * PAL Address: 80073ad4
+ * PAL Size: 32b
+ */
+void __sinit_chara_cpp(void)
+{
+	Chara.field0_0x0.object.base_object.object.m_id = (unsigned int)&PTR_PTR_s_CChara_801fcd24;
 }

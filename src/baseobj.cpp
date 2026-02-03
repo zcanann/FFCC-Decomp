@@ -75,6 +75,16 @@ void CGBaseObj::Destroy()
  * Address:	TODO
  * Size:	TODO
  */
+int CGBaseObj::GetCID()
+{
+	return 0;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 void CGBaseObj::Create()
 {
 	onCreate();

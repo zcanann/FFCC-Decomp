@@ -20,6 +20,22 @@ class CMapLightHolder;
 class CBound;
 class PPPIFPARAM;
 
+template <class T>
+class CPtrArray
+{
+public:
+    CPtrArray() : m_size(0) {}
+    
+    unsigned long GetSize() const { return m_size; }
+    
+    T& operator[](unsigned long index) { return m_data[index]; }
+    const T& operator[](unsigned long index) const { return m_data[index]; }
+
+private:
+    T* m_data;
+    unsigned long m_size;
+};
+
 class CGame : public CManager
 {
 public:

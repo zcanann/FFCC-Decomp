@@ -13,73 +13,65 @@ extern CMath math;
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRandDownFV(void* r3, void* r4, void* r5)
+void pppRandDownFV(void* param1, void* param2, void* param3)
 {
-    // Check global initialization flag first
     extern int lbl_8032ED70;
     if (lbl_8032ED70 == 0) return;
     
-    u8* param1 = (u8*)r3;  // r29
-    u8* param2 = (u8*)r4;  // r30  
-    u8* param3 = (u8*)r5;  // r31
+    u8* r29 = (u8*)param1;
+    u8* r31 = (u8*)param2;  
+    u8* r30 = (u8*)param3;
     
-    // Check param2[0xc] - if zero, generate random value
-    u32 p2_field_c = *(u32*)(param2 + 0xc);
+    u32 p2_field_c = *(u32*)(r31 + 0xc);
     if (p2_field_c == 0) {
-        // Generate random number  
+        float f31;
         math.RandF();
-        float randomVal = -0.0f; // This will hopefully generate fneg
+        f31 = 0.0f;
+        f31 = -f31;  // fneg
         
-        // Check param2[0x18] byte for second condition  
-        u8 p2_field_18 = *(u8*)(param2 + 0x18);
+        u8 p2_field_18 = *(u8*)(r31 + 0x18);
         if (p2_field_18 != 0) {
             math.RandF();
             extern float lbl_8032FF40;
-            float tempVal = randomVal - 1.0f; // fsubs f1, f31, f1  
-            randomVal = tempVal * lbl_8032FF40; // fmuls f31, f1, f0
+            float f1 = f31 - f1;  // fsubs f1, f31, f1
+            f31 = f1 * lbl_8032FF40; // fmuls f31, f1, f0
         }
         
-        // Calculate target address and store result
-        u32* p3_field_c = (u32*)(param3 + 0xc);
+        u32* p3_field_c = (u32*)(r30 + 0xc);
         u32* base_ptr = (u32*)*p3_field_c;
         u32 offset = *base_ptr + 0x80;
-        float* target = (float*)(param1 + offset);
-        *target = randomVal;
+        float* target = (float*)(r29 + offset);
+        *target = f31;
         
     } else {
-        // Check if param2[0] matches param2[0xc]
-        u32 p2_field_0 = *(u32*)param2;
+        u32 p2_field_0 = *(u32*)r31;
         if (p2_field_0 != p2_field_c) return;
         
-        // Calculate target memory location for vector operations
-        u32* p3_field_c = (u32*)(param3 + 0xc);
+        u32* p3_field_c = (u32*)(r30 + 0xc);
         u32* base_ptr = (u32*)*p3_field_c;
         u32 base_offset = *base_ptr + 0x80;
-        float* base_vec = (float*)(param1 + base_offset);
+        float* base_vec = (float*)(r29 + base_offset);
         
-        // Get param2[4] for vector selection
-        s32 p2_field_4 = *(s32*)(param2 + 4);
+        s32 p2_field_4 = *(s32*)(r31 + 4);
         float* target_vec;
         
         if (p2_field_4 == -1) {
             extern float lbl_801EADC8;
             target_vec = &lbl_801EADC8;
         } else {
-            target_vec = (float*)(param1 + p2_field_4 + 0x80);
+            target_vec = (float*)(r29 + p2_field_4 + 0x80);
         }
         
-        // Load force values from param2[0x8, 0xc, 0x10]
-        float force_x = *(float*)(param2 + 0x8);
-        float force_y = *(float*)(param2 + 0xc);  
-        float force_z = *(float*)(param2 + 0x10);
+        float force_x = *(float*)(r31 + 0x8);
+        float force_y = *(float*)(r31 + 0xc);  
+        float force_z = *(float*)(r31 + 0x10);
         
-        // Apply force to vector components - use separate multiply and add
-        float scale_factor = *(float*)base_vec;
-        float temp_x = force_x * scale_factor;
-        target_vec[0] = target_vec[0] + temp_x;
-        float temp_y = force_y * scale_factor;
-        target_vec[1] = target_vec[1] + temp_y;
-        float temp_z = force_z * scale_factor;
-        target_vec[2] = target_vec[2] + temp_z;
+        float scale_factor = *base_vec;
+        force_x *= scale_factor;
+        target_vec[0] += force_x;
+        force_y *= scale_factor;
+        target_vec[1] += force_y;
+        force_z *= scale_factor;
+        target_vec[2] += force_z;
     }
 }

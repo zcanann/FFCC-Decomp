@@ -10,7 +10,7 @@ void DisableIndWarp(void);
 extern "C" {
 #endif
 
-void pppConstructYmDeformationMdl(void);
+void pppConstructYmDeformationMdl(void* pppYmDeformationMdl, void* param_2);
 void pppConstruct2YmDeformationMdl(void);
 void pppDestructYmDeformationMdl(void);
 void pppFrameYmDeformationMdl(void* pppYmDeformationMdl, void* param_2, void* param_3);

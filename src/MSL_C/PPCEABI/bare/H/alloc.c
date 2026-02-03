@@ -87,6 +87,9 @@ static int initialized = 0;
 
 static SubBlock* SubBlock_merge_prev(SubBlock*, SubBlock**);
 static void SubBlock_merge_next(SubBlock*, SubBlock**);
+static Block* link_new_block(__mem_pool_obj* pool_obj, unsigned long size);
+static void Block_construct(Block* block, unsigned long size);
+static SubBlock* Block_subBlock(Block* block, unsigned long requested_size);
 
 static const unsigned long fix_pool_sizes[] = {4, 12, 20, 36, 52, 68};
 
@@ -95,18 +98,20 @@ static const unsigned long fix_pool_sizes[] = {4, 12, 20, 36, 52, 68};
 #define Block_size(ths) ((ths)->size & 0xFFFFFFF8)
 #define Block_start(ths) (*(SubBlock**)((char*)(ths) + Block_size((ths)) - sizeof(unsigned long)))
 
-#define SubBlock_set_free(ths)                                                                     \
+#define SubBlock_set_free(ths) do {                                                                \
     unsigned long this_size = SubBlock_size((ths));                                                \
     (ths)->size &= ~0x2;                                                                           \
     *(unsigned long*)((char*)(ths) + this_size) &= ~0x4;                                           \
-    *(unsigned long*)((char*)(ths) + this_size - sizeof(unsigned long)) = this_size
+    *(unsigned long*)((char*)(ths) + this_size - sizeof(unsigned long)) = this_size;               \
+} while(0)
 
 #define SubBlock_is_free(ths) !((ths)->size & 2)
-#define SubBlock_set_size(ths, sz)                                                                 \
+#define SubBlock_set_size(ths, sz) do {                                                            \
     (ths)->size &= ~0xFFFFFFF8;                                                                    \
     (ths)->size |= (sz) & 0xFFFFFFF8;                                                              \
     if (SubBlock_is_free((ths)))                                                                   \
-    *(unsigned long*)((char*)(ths) + (sz) - sizeof(unsigned long)) = (sz)
+        *(unsigned long*)((char*)(ths) + (sz) - sizeof(unsigned long)) = (sz);                    \
+} while(0)
 
 #define SubBlock_from_pointer(ptr) ((SubBlock*)((char*)(ptr)-8))
 #define FixSubBlock_from_pointer(ptr) ((FixSubBlock*)((char*)(ptr)-4))
@@ -124,6 +129,7 @@ static const unsigned long fix_pool_sizes[] = {4, 12, 20, 36, 52, 68};
         SubBlock_is_free(_sb) && SubBlock_size(_sb) == Block_size((ths)) - 24
 
 void __sys_free();
+void* __sys_alloc(unsigned long size);
 
 static inline SubBlock* SubBlock_merge_prev(SubBlock* ths, SubBlock** start) {
     unsigned long prevsz;
@@ -304,6 +310,115 @@ void deallocate_from_fixed_pools(__mem_pool_obj* pool_obj, void* ptr, unsigned l
 
         deallocate_from_var_pools(pool_obj, b);
     }
+}
+
+static Block* link_new_block(__mem_pool_obj* pool_obj, unsigned long size) {
+    Block* new_block;
+    unsigned long aligned_size;
+    
+    aligned_size = (size + 31) & 0xfffffff8;
+    if (aligned_size < 0x10000) {
+        aligned_size = 0x10000;
+    }
+    
+    new_block = (Block*)__sys_alloc(aligned_size);
+    if (new_block == 0) {
+        return 0;
+    }
+    
+    Block_construct(new_block, aligned_size);
+    
+    if (pool_obj->start_ == 0) {
+        pool_obj->start_ = new_block;
+        new_block->prev = new_block;
+        new_block->next = new_block;
+    } else {
+        new_block->prev = pool_obj->start_->prev;
+        new_block->next = pool_obj->start_;
+        new_block->prev->next = new_block;
+        new_block->next->prev = new_block;
+        pool_obj->start_ = new_block;
+    }
+    
+    return new_block;
+}
+
+static void Block_construct(Block* block, unsigned long size) {
+    SubBlock* sb;
+    SubBlock** start_ptr;
+    
+    block->size = size | 3;
+    block->max_size = size - 24;
+    
+    sb = (SubBlock*)((char*)block + 16);
+    sb->size = size - 24;
+    sb->block = (Block*)((unsigned long)block | 1);
+    
+    start_ptr = &Block_start(block);
+    *start_ptr = sb;
+    sb->prev = sb;
+    sb->next = sb;
+    
+    SubBlock_set_free(sb);
+}
+
+static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
+    SubBlock** start_ptr;
+    SubBlock* current;
+    SubBlock* best_fit = 0;
+    unsigned long current_size;
+    unsigned long best_size = 0xFFFFFFFF;
+    
+    start_ptr = &Block_start(block);
+    current = *start_ptr;
+    
+    if (current == 0) {
+        block->max_size = 0;
+        return 0;
+    }
+    
+    do {
+        current_size = SubBlock_size(current);
+        if (requested_size <= current_size) {
+            if (current_size < best_size) {
+                best_fit = current;
+                best_size = current_size;
+            }
+        }
+        current = current->next;
+    } while (current != *start_ptr);
+    
+    if (best_fit == 0) {
+        return 0;
+    }
+    
+    if (best_size > requested_size + 80) {
+        SubBlock* remainder = (SubBlock*)((char*)best_fit + requested_size);
+        remainder->size = best_size - requested_size;
+        remainder->block = best_fit->block;
+        remainder->next = best_fit->next;
+        remainder->prev = best_fit;
+        best_fit->next->prev = remainder;
+        best_fit->next = remainder;
+        
+        SubBlock_set_size(best_fit, requested_size);
+        SubBlock_set_free(remainder);
+    }
+    
+    if (*start_ptr == best_fit) {
+        *start_ptr = best_fit->next;
+    }
+    if (*start_ptr == best_fit) {
+        *start_ptr = 0;
+        block->max_size = 0;
+    } else {
+        best_fit->next->prev = best_fit->prev;
+        best_fit->prev->next = best_fit->next;
+    }
+    
+    best_fit->size |= 2;
+    
+    return best_fit;
 }
 
 void __pool_free(__mem_pool* pool, void* ptr) {

@@ -1,4 +1,7 @@
 #include "ffcc/pppScreenQuake.h"
+#include "ffcc/p_camera.h"
+
+extern float FLOAT_80331fc8;
 
 /*
  * --INFO--
@@ -12,22 +15,35 @@ void pppConScreenQuake(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8013e50c
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppCon2ScreenQuake(void)
 {
-	// TODO
+	// TODO - needs parameter signature fix for non-zero match
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8013e4b8
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppDesScreenQuake(void)
 {
-	// TODO
+	double dVar1;
+	
+	dVar1 = (double)FLOAT_80331fc8;
+	CameraPcs.SetQuakeParameter((int)dVar1, (int)dVar1, (short)dVar1, (short)dVar1, 
+	                            (float)dVar1, (float)dVar1, (float)dVar1, (float)dVar1, 
+	                            (float)dVar1, (float)dVar1, 1);
 }
 
 /*

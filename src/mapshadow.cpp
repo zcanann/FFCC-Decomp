@@ -1,41 +1,114 @@
 #include "ffcc/mapshadow.h"
+#include "ffcc/mapocttree.h"
+#include "ffcc/map.h"
+#include "ffcc/vector.h"
+#include <dolphin/mtx.h>
+
+// External constants referenced in decompilation
+extern double DOUBLE_8032fcf8;
+extern double DOUBLE_8032fce8;
+extern float FLOAT_8032fcf0;
+extern float FLOAT_8032fce0;
+
+// MapMng is already declared in map.h
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004c71c
+ * PAL Size: 236b
  */
-void CMapShadowInsertOctTree(CMapShadow::TARGET, COctTree&)
+void CMapShadowInsertOctTree(CMapShadow::TARGET mapShadow, COctTree& octTree)
 {
-	// TODO
+	// TODO: Simplified implementation for now
+	// Need better understanding of CMapShadow structure and TARGET enum
+	octTree.ClearShadow();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004c91c
+ * PAL Size: 236b
  */
 void CMapShadow::Init()
 {
-	// TODO
+	float fVar1;
+	float fVar2;
+	double dVar3;
+	int iVar4;
+	unsigned int uVar5;
+	unsigned int uVar6;
+	
+	// Access material data through MapMng structure  
+	iVar4 = *(int*)((char*)&MapMng + 8 + *(unsigned short*)((char*)this + 4) * 4);
+	dVar3 = DOUBLE_8032fcf8;
+	iVar4 = *(int *)(iVar4 + 0x3c);
+	uVar6 = *(unsigned int *)(iVar4 + 100);
+	uVar5 = *(unsigned int *)(iVar4 + 0x68);
+	*((char*)this + 7) = (char)*(unsigned int *)(iVar4 + 0x6c);
+	fVar1 = (float)((double)((long long)(uVar6) + 0x4330000000000000ULL) - dVar3);
+	fVar2 = (float)((double)((long long)(uVar5) + 0x4330000000000000ULL) - dVar3);
+	
+	if (*((char*)this + 6) == 0) {
+		C_MTXLightOrtho((MtxPtr)((char*)this + 0x48), -fVar2, fVar2, -fVar1, fVar1,
+						(float)(DOUBLE_8032fce8 * (double)*(float*)((char*)this + 0xa8)),
+						(float)((double)FLOAT_8032fcf0 * (double)*(float*)((char*)this + 0xa8)),
+						FLOAT_8032fcf0, FLOAT_8032fcf0);
+	} else {
+		C_MTXLightFrustum((MtxPtr)((char*)this + 0x48), -fVar2, fVar2, -fVar1, fVar1, *(float*)((char*)this + 0xac),
+						  (float)(DOUBLE_8032fce8 * (double)*(float*)((char*)this + 0xa8)),
+						  (float)((double)FLOAT_8032fcf0 * (double)*(float*)((char*)this + 0xa8)),
+						  FLOAT_8032fcf0, FLOAT_8032fcf0);
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004c8c8
+ * PAL Size: 84b
  */
 void CMapShadow::Calc()
 {
-	// TODO
+	float fVar1;
+	
+	fVar1 = FLOAT_8032fce0;
+	*(float*)((char*)this + 0x54) = *(float*)((char*)this + 0x54) + *(float*)((char*)this + 0xb8);
+	if (fVar1 < *(float*)((char*)this + 0x54)) {
+		*(float*)((char*)this + 0x54) = *(float*)((char*)this + 0x54) - fVar1;
+	}
+	fVar1 = FLOAT_8032fce0;
+	*(float*)((char*)this + 0x64) = *(float*)((char*)this + 0x64) + *(float*)((char*)this + 0xbc);
+	if (*(float*)((char*)this + 0x64) > fVar1) {
+		*(float*)((char*)this + 0x64) = *(float*)((char*)this + 0x64) - fVar1;
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004c808
+ * PAL Size: 192b
  */
 void CMapShadow::Draw()
 {
-	// TODO
+	int iVar1;
+	Vec VStack_38;
+	Vec local_2c;
+	Vec local_20;
+	Vec local_14;
+	
+	iVar1 = *(int*)((char*)this + 0xc);
+	local_14.x = *(float*)(iVar1 + 0xc4);
+	local_14.y = *(float*)(iVar1 + 0xd4);
+	local_14.z = *(float*)(iVar1 + 0xe4);
+	iVar1 = *(int*)((char*)this + 0x14);
+	local_20.x = *(float*)(iVar1 + 0xc4);
+	local_20.y = *(float*)(iVar1 + 0xd4);
+	local_20.z = *(float*)(iVar1 + 0xe4);
+	iVar1 = *(int*)((char*)this + 0x10);
+	local_2c.x = *(float*)(iVar1 + 0xc4);
+	local_2c.y = *(float*)(iVar1 + 0xd4);
+	local_2c.z = *(float*)(iVar1 + 0xe4);
+	PSVECSubtract(&local_20, &local_14, &local_20);
+	PSVECSubtract(&local_2c, &local_14, &VStack_38);
+	C_MTXLookAt((MtxPtr)((char*)this + 0x18), (Point3d*)&local_14, &local_20, (Point3d*)&local_2c);
+	PSMTXConcat((MtxPtr)((char*)this + 0x48), (MtxPtr)((char*)this + 0x18), (MtxPtr)((char*)this + 0x78));
 }

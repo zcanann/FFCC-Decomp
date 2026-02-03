@@ -1,8 +1,5 @@
 #include "ffcc/texanim.h"
 
-// Template instantiation to force generation of CPtrArray<CTexAnimSeq*> methods
-template class CPtrArray<CTexAnimSeq*>;
-
 /*
  * --INFO--
  * Address:	TODO

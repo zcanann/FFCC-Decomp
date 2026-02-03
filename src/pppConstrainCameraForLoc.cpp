@@ -24,59 +24,33 @@ void CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
 {
     float* params = (float*)param_2;
     
-    // Local variables matching Ghidra decompilation structure
-    Vec local_a4, local_e0, local_ec;
-    Vec local_bc;
-    Mtx MStack_98, MStack_68;
-    float local_b0, local_ac, local_a8;
-    
     // Load scale parameter
     float scale = *params;
     
-    // Get some basic CameraPcs data (simplified access)
-    unsigned char* cameraPcsPtr = (unsigned char*)&CameraPcs;
-    float* cameraDirPtr = (float*)(cameraPcsPtr + 0xec); // approximate offset for direction
-    float* cameraPosPtr = (float*)(cameraPcsPtr + 0xe0); // approximate offset for position
+    // Load camera direction and position
+    float dirX = *(float*)((char*)&CameraPcs + 0xec);
+    float dirY = *(float*)((char*)&CameraPcs + 0xf0);
+    float dirZ = *(float*)((char*)&CameraPcs + 0xf4);
     
-    // Load direction values
-    local_b0 = cameraDirPtr[0];
-    local_ac = cameraDirPtr[1]; 
-    local_a8 = cameraDirPtr[2];
-    
-    // Load position values  
-    local_bc.x = cameraPosPtr[0];
-    local_bc.y = cameraPosPtr[1];
-    local_bc.z = cameraPosPtr[2];
+    Vec cameraPos;
+    cameraPos.x = *(float*)((char*)&CameraPcs + 0xe0);
+    cameraPos.y = *(float*)((char*)&CameraPcs + 0xe4);
+    cameraPos.z = *(float*)((char*)&CameraPcs + 0xe8);
     
     // Calculate scaled direction
-    local_a4.x = scale * local_b0;
-    local_a4.y = scale * local_ac;
-    local_a4.z = scale * local_a8;
+    Vec scaledDir;
+    scaledDir.x = scale * dirX;
+    scaledDir.y = scale * dirY;
+    scaledDir.z = scale * dirZ;
     
     // Add position to scaled direction
-    PSVECAdd(&local_bc, &local_a4, &local_a4);
-    
-    // Get offset values from params
-    float offsetX = *(float*)((char*)params + 0x1c);
-    float offsetY = *(float*)((char*)params + 0x2c);
-    
-    // Simple offset calculations
-    local_e0.x = offsetX;
-    local_e0.y = offsetX;
-    local_e0.z = offsetX;
-    
-    local_ec.x = offsetY;
-    local_ec.y = offsetY;
-    local_ec.z = offsetY;
-    
-    // Add offsets
-    PSVECAdd(&local_a4, &local_e0, &local_a4);
-    PSVECAdd(&local_a4, &local_ec, &local_a4);
+    Vec result;
+    PSVECAdd(&cameraPos, &scaledDir, &result);
     
     // Store results in params 
-    params[7] = local_a4.x;
-    params[11] = local_a4.y;
-    params[15] = local_a4.z;
+    params[7] = result.x;
+    params[11] = result.y;
+    params[15] = result.z;
 }
 
 /*
@@ -117,6 +91,16 @@ void pppDestructConstrainCameraForLoc(void)
 		// Set up callback
 		*(void**)(modelPtr + 0xec) = (void*)CC_BeforeCalcMatrixCallback;
 	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 80167ec4  
+ * PAL Size: 40b
+ */
+void fn_80167EC4(void)
+{
+	// TODO - implement based on assembly patterns
 }
 
 /*

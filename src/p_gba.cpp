@@ -3,6 +3,7 @@
 #include "ffcc/gbaque.h"
 #include "ffcc/memory.h"
 #include "ffcc/system.h"
+#include "dolphin/gba/GBA.h"
 
 /*
  * --INFO--
@@ -21,7 +22,8 @@ CGbaPcs::CGbaPcs()
  */
 void CGbaPcs::Init()
 {
-	// TODO
+	m_stage = 0;
+	GBAInit();
 }
 
 /*
@@ -39,9 +41,10 @@ void CGbaPcs::Quit()
  * Address:	TODO
  * Size:	TODO
  */
-void CGbaPcs::GetTable(unsigned long)
+void CGbaPcs::GetTable(unsigned long index)
 {
-	// TODO
+	// Return pointer to table element (size 0x15c per entry)
+	// Based on objdiff analysis: mulli r4, r4, 0x15c
 }
 
 /*
@@ -139,7 +142,7 @@ void CGbaPcs::onMapChanged(int, int, int)
  */
 void CGbaPcs::onScriptChanging(char*)
 {
-	// TODO
+	GbaQue.ClrScrInitEnd();
 }
 
 /*
@@ -149,5 +152,5 @@ void CGbaPcs::onScriptChanging(char*)
  */
 void CGbaPcs::SetFirstZone()
 {
-	// TODO
+	GbaQue.ClrRadarTypeFlg();
 }

@@ -37,6 +37,8 @@ public:
     
     void Init();
     void Quit();
+    void InitEnv();
+    void LockEnv();
     void SetBlendMode(CMaterialSet*, int);
     void addtev_bump_st(int, _GXTevScale);
     void addtev_bump_water(_GXTevScale);

@@ -31,15 +31,37 @@ void pppSRandUpCV(void* param1, void* param2)
     
     unsigned char flag = *((unsigned char*)param2 + 12);
     
-    // Generate 4 random float values using loop
-    for (int i = 0; i < 4; i++) {
-        float randVal = RandF__5CMathFv();
-        if (flag != 0) {
-            float randVal2 = RandF__5CMathFv();
-            randVal = (randVal + randVal2) * 0.5f;
-        }
-        target[i] = randVal;
+    // Generate first random float value
+    float randVal1 = RandF__5CMathFv();
+    if (flag != 0) {
+        float randVal2 = RandF__5CMathFv();
+        randVal1 = (randVal1 + randVal2) * 0.5f;
     }
+    target[0] = randVal1;
+    
+    // Generate second random float value  
+    randVal1 = RandF__5CMathFv();
+    if (flag != 0) {
+        float randVal2 = RandF__5CMathFv();
+        randVal1 = (randVal1 + randVal2) * 0.5f;
+    }
+    target[1] = randVal1;
+    
+    // Generate third random float value
+    randVal1 = RandF__5CMathFv();
+    if (flag != 0) {
+        float randVal2 = RandF__5CMathFv();
+        randVal1 = (randVal1 + randVal2) * 0.5f;
+    }
+    target[2] = randVal1;
+    
+    // Generate fourth random float value
+    randVal1 = RandF__5CMathFv();
+    if (flag != 0) {
+        float randVal2 = RandF__5CMathFv();
+        randVal1 = (randVal1 + randVal2) * 0.5f;
+    }
+    target[3] = randVal1;
     
     // Get target color array pointer
     int colorOffset = *((int*)param2 + 1);
@@ -51,11 +73,23 @@ void pppSRandUpCV(void* param1, void* param2)
         targetColors = (unsigned char*)((char*)param1 + colorOffset + 0x80);
     }
     
-    // Apply random modifications to 4 byte values using loop
-    for (int i = 0; i < 4; i++) {
-        signed char baseValue = *((signed char*)param2 + 8 + i);
-        float randomMult = target[i];
-        int adjustment = (int)(baseValue * randomMult);
-        targetColors[i] += (unsigned char)adjustment;
-    }
+    // Apply random modifications to first byte value
+    signed char baseValue1 = *((signed char*)param2 + 8);
+    int adjustment1 = (int)(baseValue1 * target[0]);
+    targetColors[0] += (unsigned char)adjustment1;
+    
+    // Apply random modifications to second byte value
+    signed char baseValue2 = *((signed char*)param2 + 9);
+    int adjustment2 = (int)(baseValue2 * target[1]);
+    targetColors[1] += (unsigned char)adjustment2;
+    
+    // Apply random modifications to third byte value
+    signed char baseValue3 = *((signed char*)param2 + 10);
+    int adjustment3 = (int)(baseValue3 * target[2]);
+    targetColors[2] += (unsigned char)adjustment3;
+    
+    // Apply random modifications to fourth byte value
+    signed char baseValue4 = *((signed char*)param2 + 11);
+    int adjustment4 = (int)(baseValue4 * target[3]);
+    targetColors[3] += (unsigned char)adjustment4;
 }

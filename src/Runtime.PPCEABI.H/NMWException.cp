@@ -5,6 +5,7 @@
 
 extern "C" {
 extern void abort();
+extern void __dla__FPv(void*);
 }
 
 namespace std {
@@ -155,3 +156,62 @@ public:
 		}
 	}
 };
+
+/**
+ * @note Address: 801af970
+ * @note Size: 252b
+ */
+extern "C" void __construct_array(void* ptr, ConstructorDestructor ctor, ConstructorDestructor dtor, size_t size, size_t n) {
+	void* current = ptr;
+	size_t i;
+	
+	for (i = 0; i < n; i++) {
+		CTORCALL_COMPLETE(ctor, current);
+		current = (void*)((char*)current + size);
+	}
+	
+	if (i < n && dtor != nullptr) {
+		current = (void*)((char*)ptr + size * i);
+		for (; i != 0; i--) {
+			current = (void*)((char*)current - size);
+			DTORCALL_COMPLETE(dtor, current);
+		}
+	}
+}
+
+/**
+ * @note Address: 801af8f8
+ * @note Size: 120b
+ */
+extern "C" void __destroy_arr(void* block, ConstructorDestructor* dtor, size_t size, size_t n) {
+	char* current = (char*)block + size * n;
+	
+	for (; n != 0; n--) {
+		current -= size;
+		DTORCALL_COMPLETE(*dtor, current);
+	}
+}
+
+/**
+ * @note Address: 801af87c
+ * @note Size: 124b
+ */
+extern "C" void __destroy_new_array(void* block, ConstructorDestructor dtor) {
+	if (block != nullptr) {
+		char* arrayStart = (char*)block;
+		
+		if (dtor != nullptr) {
+			size_t elementSize = *(size_t*)(arrayStart - 0x10);
+			size_t elementCount = *(size_t*)(arrayStart - 0xc);
+			char* current = arrayStart + elementSize * elementCount;
+			
+			for (size_t i = 0; i < elementCount; i++) {
+				current -= elementSize;
+				DTORCALL_COMPLETE(dtor, current);
+			}
+		}
+		
+		// Call delete operator on the allocation header
+		__dla__FPv((void*)(arrayStart - 0x10));
+	}
+}

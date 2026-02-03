@@ -10,7 +10,7 @@ public:
     void ArtiCtrl();
     void ArtiClose();
     void ArtiDraw();
-    void ArtiCtrlCur();
+    int ArtiCtrlCur();
 };
 
 #endif // _FFCC_MENU_ARTI_H_

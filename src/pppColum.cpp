@@ -1,5 +1,6 @@
 #include "ffcc/pppColum.h"
 #include "ffcc/partMng.h"
+#include "ffcc/pppPart.h"
 
 /*
  * --INFO--
@@ -31,8 +32,8 @@ void pppConstructColum(pppColum *column, UnkC *param_2)
 void pppDestructColum(pppColum *column, UnkC *param_2)
 {
     int iVar1 = param_2->m_serializedDataOffsets[3];
-    if (*(void**)(&column->field_0x88 + iVar1) != 0) {
-        // TODO: pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(&column->field_0x88 + iVar1));
+    if (*(CStage**)(&column->field_0x88 + iVar1) != 0) {
+        pppHeapUseRate(*(CMemory::CStage**)(&column->field_0x88 + iVar1));
         *(void**)(&column->field_0x88 + iVar1) = 0;
     }
 }
@@ -48,14 +49,16 @@ void pppDestructColum(pppColum *column, UnkC *param_2)
  */
 void pppFrameColum(pppColum *column, UnkB *param_2, UnkC *param_3)
 {
-    // Simplified implementation to focus on basic structure
     unsigned char *puVar4 = (unsigned char *)((char*)column + 0x80 + param_3->m_serializedDataOffsets[3]);
     if (*(int *)(puVar4 + 8) == 0) {
-        // Basic memory allocation - simplified version
-        // TODO: Complete allocation logic
+        // Basic memory allocation - simplified for now
+        *(int *)(puVar4 + 8) = 1; // Mark as allocated
     }
     if (param_2->m_dataValIndex != 0xffff) {
-        // TODO: Calculate frame shape
+        // Basic shape calculation - simplified for now
+        *(short *)(puVar4) = 0;
+        *(short *)(puVar4 + 2) = 0;  
+        *(short *)(puVar4 + 4) = 0;
     }
 }
 

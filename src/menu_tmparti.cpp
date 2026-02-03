@@ -1,4 +1,8 @@
 #include "ffcc/menu_tmparti.h"
+#include "ffcc/sound.h"
+#include "ffcc/pad.h"
+#include "ffcc/p_game.h"
+#include <string.h>
 
 /*
  * --INFO--
@@ -22,22 +26,32 @@ void CMenuPcs::TmpArtiInit0()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015e04c
+ * PAL Size: 816b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::TmpArtiOpen()
+unsigned int CMenuPcs::TmpArtiOpen()
 {
-	// TODO
+	// Basic initialization logic placeholder
+	return 1;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015dd64
+ * PAL Size: 744b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::TmpArtiCtrl()
 {
-	// TODO
+	// Basic control logic placeholder
+	Sound.PlaySe(3, 0x40, 0x7f, 0);
 }
 
 /*
@@ -52,12 +66,16 @@ void CMenuPcs::TmpArtiClose()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015d798
+ * PAL Size: 1056b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::TmpArtiDraw()
 {
-	// TODO
+	// Basic rendering placeholder
 }
 
 /*

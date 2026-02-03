@@ -10,16 +10,14 @@
  * PAL Address: 800659d8
  * PAL Size: 320b
  */
-void pppMatrixZYX(pppFMATRIX& out, pppIVECTOR4* angle)
+extern "C" void pppMatrixZYX(pppFMATRIX& out, pppIVECTOR4* angle)
 {
-    pppFMATRIX mZ;
-    pppFMATRIX mY;
-    pppFMATRIX zy;
-    pppFMATRIX mX;
+    pppFMATRIX mZ, mY, mX, zy;
 
     pppGetRotMatrixZ(mZ, angle->z);
     pppGetRotMatrixY(mY, angle->y);
-    PSMTXConcat(mZ.value, mY.value, zy.value);
     pppGetRotMatrixX(mX, angle->x);
+    
+    PSMTXConcat(mZ.value, mY.value, zy.value);
     PSMTXConcat(zy.value, mX.value, out.value);
 }

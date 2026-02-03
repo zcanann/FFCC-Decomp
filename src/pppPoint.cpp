@@ -10,9 +10,8 @@ static int pppPointEnabled = 0;
  */
 void pppPointCon(PppData* a, PppData* b)
 {
-	// Assembly shows access to b->ptr + 0x80, stores 0.0f constants
-	void* ptr = b->ptr;
-	float* dst = (float*)((char*)ptr + 0x80);
+	// Direct access pattern to match assembly
+	float* dst = (float*)((char*)b->ptr + 0x80);
 	
 	dst[0] = 0.0f; // x
 	dst[1] = 0.0f; // y
@@ -31,17 +30,16 @@ void pppPoint(PppData* a, PppData* b, PppData* c)
 		return;
 	}
 	
-	// ID comparison from assembly pattern - a->id vs c->id  
+	// ID comparison from assembly pattern - b->id vs c->id  
 	if (b->id != c->id) {
 		return;
 	}
 	
-	// Assembly shows access to c->ptr + 0x80 
-	void* ptr = c->ptr;
-	float* dst = (float*)((char*)ptr + 0x80);
+	// Direct access to c->ptr + 0x80 
+	float* dst = (float*)((char*)c->ptr + 0x80);
 	
-	// Vector addition from b->values[2+] (offset 0x8)
-	dst[0] += b->values[2]; // x 
-	dst[1] += b->values[3]; // y  
-	dst[2] += b->values[2]; // z - assembly pattern shows reuse
+	// Vector addition from b->values
+	dst[0] += b->values[1]; // x from values[1]
+	dst[1] += b->values[1]; // y from values[1] (reused)
+	dst[2] += b->values[1]; // z from values[1] (reused)
 }

@@ -2,9 +2,9 @@
 #define _PPP_POINT_H_
 
 struct PppData {
-    int id;
-    float values[4]; // x, y, z, w
-    void* ptr;
+    int id;          // offset 0x0
+    float values[2]; // offset 0x4, 0x8 
+    void* ptr;       // offset 0xc
 };
 
 #ifdef __cplusplus

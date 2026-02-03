@@ -294,9 +294,8 @@ static char* long2str(long num, char* buff, print_format format)
     unsigned long unsigned_num, base;
     char* p;
     int n, digits;
-    int minus    = 0;
+    int minus = 0;
     unsigned_num = num;
-    minus        = 0;
 
     p      = buff;
     *--p   = 0;
@@ -399,10 +398,9 @@ static char* longlong2str(long long num, char* pBuf, print_format fmt)
     unsigned long long unsigned_num, base;
     char* p;
     int n, digits;
-    int minus    = 0;
+    int minus = 0;
     unsigned_num = num;
-    minus        = 0;
-    p            = pBuf;
+    p = pBuf;
     *--p         = 0;
     digits       = 0;
 

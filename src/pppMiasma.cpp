@@ -1,4 +1,5 @@
 #include "ffcc/pppMiasma.h"
+#include <string.h>
 
 /*
  * --INFO--
@@ -32,12 +33,15 @@ void pppRenderMiasma(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80109b08
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppConstructMiasma(void)
 {
-	// TODO
 }
 
 /*
@@ -51,7 +55,6 @@ void pppConstructMiasma(void)
  */
 void pppConstruct2Miasma(void)
 {
-	return;
 }
 
 /*
@@ -79,7 +82,6 @@ void pppDestructMiasma(void)
  */
 void pppFrameMiasma(void)
 {
-	return;
 }
 
 /*

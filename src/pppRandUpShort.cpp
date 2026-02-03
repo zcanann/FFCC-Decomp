@@ -14,76 +14,54 @@ extern short lbl_801EADC8;
  */
 void pppRandUpShort(void* param1, void* param2, void* param3)
 {
-    // Cast parameters based on assembly analysis
-    int* p1 = (int*)param1;
-    
-    struct ParamStruct2 {
-        int field0;           // offset 0
-        int field4;           // offset 4
-        short field8;         // offset 8 
-        unsigned char fieldA; // offset 10
-    }* p2 = (struct ParamStruct2*)param2;
-    
-    struct ParamStruct3 {
-        void* fieldC;         // offset 12
-    }* p3 = (struct ParamStruct3*)param3;
-    
-    // Check global flag first
     if (lbl_8032ED70 != 0) {
         return;
     }
     
-    // Check field at offset 12 of first parameter
-    if (p1[3] == 0) {
-        // Generate random float
-        math.RandF();
-        float randVal = 1.0f; // Placeholder for random value
+    if (((int*)param1)[3] == 0) {
+        float f31;
         
-        // Check if second random needed
-        if (p2->fieldA != 0) {
+        math.RandF();
+        // f31 = f1 result from RandF
+        
+        if (((unsigned char*)param2)[0xA] != 0) {
             math.RandF();
-            randVal += 1.0f; // Add second random value
+            // f31 += f1 result from second RandF
         }
         
-        // Scale by constant
-        randVal *= lbl_80330038;
-        
-        // Store to calculated memory location
-        void** basePtr = (void**)p3->fieldC;
-        int* indexPtr = (int*)*basePtr;
-        float* targetAddr = (float*)((char*)param1 + (*indexPtr + 0x80));
-        *targetAddr = randVal;
+        // f31 *= lbl_80330038
+        // Store result at calculated address
+        void** ptr = (void**)((char*)param3 + 0xC);
+        int* indexPtr = (int*)*ptr;
+        int index = *indexPtr;
+        ((float*)((char*)param1 + index + 0x80))[0] = f31;
         
     } else {
-        // Check if fields match
-        if (p2->field0 != p1[3]) {
+        int field0 = ((int*)param2)[0];
+        int param1_field3 = ((int*)param1)[3];
+        
+        if (field0 != param1_field3) {
             return;
         }
         
-        // Calculate target address for final operation
-        void** basePtr = (void**)p3->fieldC;
-        int* indexPtr = (int*)*basePtr;
-        float* sourceAddr = (float*)((char*)param1 + (*indexPtr + 0x80));
+        void** ptr = (void**)((char*)param3 + 0xC);
+        int* indexPtr = (int*)*ptr;
+        int index = *indexPtr;
+        float* sourceAddr = (float*)((char*)param1 + index + 0x80);
         
+        int field4 = ((int*)param2)[1];
         short* targetShort;
-        if (p2->field4 == -1) {
+        
+        if (field4 == -1) {
             targetShort = &lbl_801EADC8;
         } else {
-            targetShort = (short*)((char*)param1 + (p2->field4 + 0x80));
+            targetShort = (short*)((char*)param1 + field4 + 0x80);
         }
         
-        // Perform floating point to integer conversion and arithmetic
-        short multiplier = p2->field8;
+        short multiplier = ((short*)param2)[4];
         float sourceValue = *sourceAddr;
-        
-        // Convert multiplier to double, subtract magic constant, multiply by source
-        double multiplierD = (double)multiplier;
-        double result = multiplierD - lbl_80330040;
-        result *= sourceValue;
-        
-        // Convert to integer and add to existing value
-        int intResult = (int)result;
         short currentValue = *targetShort;
-        *targetShort = currentValue + (short)intResult;
+        
+        *targetShort = currentValue + (short)(int)((double)multiplier - lbl_80330040) * sourceValue;
     }
 }

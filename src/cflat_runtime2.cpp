@@ -7,7 +7,6 @@
  */
 CFlatRuntime2::CFlatRuntime2()
 {
-	// TODO
 }
 
 /*
@@ -17,7 +16,6 @@ CFlatRuntime2::CFlatRuntime2()
  */
 CFlatRuntime2::~CFlatRuntime2()
 {
-	// TODO
 }
 
 /*
@@ -27,7 +25,6 @@ CFlatRuntime2::~CFlatRuntime2()
  */
 CFlatRuntime2::CParticleWork::CParticleWork()
 {
-	// TODO
 }
 
 /*
@@ -55,9 +52,8 @@ void CFlatRuntime2::getDebugStage()
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::onNewObject(CFlatRuntime::CObject*)
+void CFlatRuntime2::onNewObject(CFlatRuntime::CObject* object)
 {
-	// TODO
 }
 
 /*
@@ -65,9 +61,8 @@ void CFlatRuntime2::onNewObject(CFlatRuntime::CObject*)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::onDeleteObject(CFlatRuntime::CObject*)
+void CFlatRuntime2::onDeleteObject(CFlatRuntime::CObject* object)
 {
-	// TODO
 }
 
 /*
@@ -507,7 +502,6 @@ void CFlatRuntime2::IgnoreParticle(int, CFlatRuntime::CObject*)
  */
 void CFlatRuntime2::initAllFinished()
 {
-	// TODO
 }
 
 /*
@@ -557,7 +551,6 @@ void CFlatRuntime2::resetSpawnBit(int)
  */
 void CFlatRuntime2::resetChangeScript()
 {
-	// TODO
 }
 
 /*
@@ -567,5 +560,4 @@ void CFlatRuntime2::resetChangeScript()
  */
 void CFlatRuntime2::ResetNewGame()
 {
-	// TODO
 }

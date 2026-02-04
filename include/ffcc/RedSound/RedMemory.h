@@ -3,10 +3,10 @@
 
 int RedNew(int);
 void RedDelete(int);
-void RedDelete(void*);
+void RedDelete(unsigned int);
 int RedNewA(int, int, int);
 void RedDeleteA(int);
-void RedDeleteA(void*);
+void RedDeleteA(unsigned int);
 
 class CRedMemory
 {

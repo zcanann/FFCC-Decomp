@@ -104,15 +104,18 @@ DSError TRKInitializeIntDrivenUART(u32 param_0, u32 param_1, u32 param_2,
 
 void EnableEXI2Interrupts(void) { gDBCommTable.init_interrupts_func(); }
 
-inline int TRKPollUART(void) { return gDBCommTable.peek_func(); }
+int TRKPollUART(void) 
+{
+    return gDBCommTable.peek_func();
+}
 
-inline UARTError TRKReadUARTN(void* bytes, u32 length)
+UARTError TRKReadUARTN(void* bytes, u32 length)
 {
     int readErr = gDBCommTable.read_func(bytes, length);
     return readErr == 0 ? 0 : -1;
 }
 
-inline UARTError TRKWriteUARTN(const void* bytes, u32 length)
+UARTError TRKWriteUARTN(const void* bytes, u32 length)
 {
     int writeErr = gDBCommTable.write_func(bytes, length);
     return writeErr == 0 ? 0 : -1;

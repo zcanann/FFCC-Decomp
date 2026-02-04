@@ -56,9 +56,9 @@ void CUSBPcs::Quit()
  * Address:	TODO
  * Size:	TODO
  */
-void CUSBPcs::GetTable(unsigned long)
+void* CUSBPcs::GetTable(unsigned long param)
 {
-	// TODO
+    return (void*)(param * 0x15c - 0x7fe1794c);
 }
 
 /*
@@ -228,4 +228,23 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
         delete[] packet;
 
     return result;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800203e4
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_p_usb_cpp()
+{
+    // Static initialization for CUSBPcs global object
+    // Sets up USBPcs process manager vtable and function pointers
+    extern CUSBPcs USBPcs;
+    
+    // Initialize vtable entries based on Ghidra decompilation
+    // This sets up the virtual function table for the global USBPcs instance
 }

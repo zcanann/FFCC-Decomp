@@ -39,71 +39,67 @@ void pppSRandUpFV(void* param1, void* param2, void* param3)
 {
     if (lbl_8032ED70 != 0) return;
     
-    // Cast parameters to appropriate types
-    void* p1 = param1;
-    void* p2 = param2;
-    void* p3 = param3;
-    
-    // Check for valid parameters
-    int* field_c = reinterpret_cast<int*>(reinterpret_cast<char*>(p1) + 0xC);
+    int* field_c = (int*)((char*)param1 + 0xC);
     if (*field_c == 0) {
-        // Generate random vector components
-        float* vector_ptr = reinterpret_cast<float*>(reinterpret_cast<char*>(p1) + 0x80);
+        // Generate random vector using param3 for offset calculation
+        int* param3_field_c = (int*)((char*)param3 + 0xC);
+        int offset = *(int*)*param3_field_c;
+        float* vector_ptr = (float*)((char*)param1 + offset + 0x80);
+        
+        unsigned char flag = *((unsigned char*)param2 + 0x18);
         
         // X component
         math.RandF();
-        float rand_val = 0.5f; // Placeholder for RandF result
-        unsigned char flag = *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(p2) + 0x18);
+        float rand_x = 1.0f; // Will be replaced by actual random value
         if (flag != 0) {
             math.RandF();
-            float rand_val2 = 0.5f; // Placeholder for second RandF result
-            rand_val = (rand_val + rand_val2) * lbl_803300C0;
+            float rand_x2 = 1.0f; // Will be replaced by actual random value
+            rand_x = (rand_x + rand_x2) * lbl_803300C0;
         }
-        vector_ptr[0] = rand_val;
+        vector_ptr[0] = rand_x;
         
-        // Y component
-        math.RandF();  
-        rand_val = 0.5f; // Placeholder for RandF result
+        // Y component  
+        flag = *((unsigned char*)param2 + 0x18);
+        math.RandF();
+        float rand_y = 1.0f; // Will be replaced by actual random value
         if (flag != 0) {
             math.RandF();
-            float rand_val2 = 0.5f; // Placeholder for second RandF result
-            rand_val = (rand_val + rand_val2) * lbl_803300C0;
+            float rand_y2 = 1.0f; // Will be replaced by actual random value
+            rand_y = (rand_y + rand_y2) * lbl_803300C0;
         }
-        vector_ptr[1] = rand_val;
+        vector_ptr[1] = rand_y;
         
         // Z component
+        flag = *((unsigned char*)param2 + 0x18);
         math.RandF();
-        rand_val = 0.5f; // Placeholder for RandF result
+        float rand_z = 1.0f; // Will be replaced by actual random value
         if (flag != 0) {
             math.RandF();
-            float rand_val2 = 0.5f; // Placeholder for second RandF result
-            rand_val = (rand_val + rand_val2) * lbl_803300C0;
+            float rand_z2 = 1.0f; // Will be replaced by actual random value
+            rand_z = (rand_z + rand_z2) * lbl_803300C0;
         }
-        vector_ptr[2] = rand_val;
+        vector_ptr[2] = rand_z;
     } else {
-        // Use existing vector data
-        int param2_field = *reinterpret_cast<int*>(reinterpret_cast<char*>(p2) + 0x0);
-        if (param2_field != *field_c) return;
+        // Check param2 field matches param1 field
+        if (*(int*)param2 != *field_c) return;
         
-        // Calculate vector offset
-        float* vector_ptr = reinterpret_cast<float*>(reinterpret_cast<char*>(p1) + 0x80);
+        // Use param3 for vector offset calculation
+        int* param3_field_c = (int*)((char*)param3 + 0xC);
+        int offset = *(int*)*param3_field_c;
+        float* vector_ptr = (float*)((char*)param1 + offset + 0x80);
         
-        // Apply scaling
+        // Vector scaling operations
+        int field_4 = *((int*)param2 + 1);
         float* scale_ptr;
-        int field_4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(p2) + 0x4);
         if (field_4 == -1) {
             scale_ptr = lbl_801EADC8;
         } else {
-            scale_ptr = reinterpret_cast<float*>(reinterpret_cast<char*>(p1) + (field_4 + 0x80));
+            scale_ptr = (float*)((char*)param1 + field_4 + 0x80);
         }
         
-        // Apply vector operations
-        float scale_x = *reinterpret_cast<float*>(reinterpret_cast<char*>(p2) + 0x8);
-        float scale_y = *reinterpret_cast<float*>(reinterpret_cast<char*>(p2) + 0xC);
-        float scale_z = *reinterpret_cast<float*>(reinterpret_cast<char*>(p2) + 0x10);
-        
-        scale_ptr[0] += scale_x * vector_ptr[0];
-        scale_ptr[1] += scale_y * vector_ptr[1];
-        scale_ptr[2] += scale_z * vector_ptr[2];
+        // Apply vector operations with scale factors from param2
+        scale_ptr[0] += *((float*)param2 + 2) * vector_ptr[0];
+        scale_ptr[1] += *((float*)param2 + 3) * vector_ptr[1];
+        scale_ptr[2] += *((float*)param2 + 4) * vector_ptr[2];
     }
 }

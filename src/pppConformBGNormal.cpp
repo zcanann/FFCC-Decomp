@@ -26,13 +26,15 @@ extern void* MapMng;
  */
 void pppConstructConformBGNormal(struct pppConformBGNormal* conformBG, struct UnkC* param2)
 {
-    f32* ptr = (f32*)((int)(&conformBG->field0_0x0[8]) + *param2->m_serializedDataOffsets);
+    f32 fVar1;
+    f32* pfVar2;
     
-    ptr[2] = FLOAT_80331908;
-    ptr[1] = FLOAT_80331908;
-    ptr[0] = FLOAT_80331908;
-    
-    *(u8*)(ptr + 3) = 0;
+    fVar1 = FLOAT_80331908;
+    pfVar2 = (f32*)((int)(&conformBG->field0_0x0 + 2) + *param2->m_serializedDataOffsets);
+    pfVar2[2] = FLOAT_80331908;
+    pfVar2[1] = fVar1;
+    *pfVar2 = fVar1;
+    *(u8*)(pfVar2 + 3) = 0;
 }
 
 /*

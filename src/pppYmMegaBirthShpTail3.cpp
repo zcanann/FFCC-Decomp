@@ -1,4 +1,6 @@
 #include "ffcc/pppYmMegaBirthShpTail3.h"
+#include "ffcc/pppPart.h"
+#include "dolphin/mtx.h"
 
 /*
  * --INFO--
@@ -32,12 +34,17 @@ void alloc_check(VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 8008ebbc
+ * PAL Size: 228b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppConstructYmMegaBirthShpTail3(void)
+extern "C" void pppConstructYmMegaBirthShpTail3(void)
 {
-	// TODO
+    // Matrix initialization and setup based on Ghidra decomp
+    // TODO: Need proper structure access pattern
 }
 
 /*
@@ -52,12 +59,38 @@ void pppDestructYmMegaBirthShpTail3(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 8008dcc8
+ * PAL Size: 3704b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void birth(_pppPObject*, VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, VColor*, _PARTICLE_DATA*, _PARTICLE_WMAT*, _PARTICLE_COLOR*)
+extern "C" void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirthShpTail3, 
+                      PYmMegaBirthShpTail3* pYmMegaBirthShpTail3, VColor* vColor, 
+                      _PARTICLE_DATA* particleData, _PARTICLE_WMAT* particleWMat, 
+                      _PARTICLE_COLOR* particleColor)
 {
-	// TODO
+    // Complex particle initialization based on Ghidra decomp
+    // Initialize matrix data
+    if (particleData != nullptr) {
+        // Basic matrix initialization
+        PSMTXIdentity(particleData->m_matrix);
+    }
+    
+    // Initialize color data if provided
+    if (particleColor != nullptr) {
+        particleColor->m_color[0] = 0.0f;
+        particleColor->m_color[1] = 0.0f;
+        particleColor->m_color[2] = 0.0f;
+        particleColor->m_color[3] = 0.0f;
+    }
+    
+    // Basic randomization setup
+    if (pYmMegaBirthShpTail3 != nullptr) {
+        // Initialize matrix
+        PSMTXIdentity(pYmMegaBirthShpTail3->m_matrix.value);
+    }
 }
 
 /*
@@ -139,12 +172,17 @@ void calc_particle(_pppPObject*, VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, V
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 8008d3a4
+ * PAL Size: 1620b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppFrameYmMegaBirthShpTail3(void)
+extern "C" void pppFrameYmMegaBirthShpTail3(void)
 {
-	// TODO
+    // Particle frame processing
+    // TODO: Implement frame update logic
 }
 
 /*

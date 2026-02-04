@@ -34,10 +34,11 @@ int __load_buffer(FILE* file, size_t* bytes_loaded, int mode)
 		if (!file->file_mode.binary_io) {
 			buffer_start = file->buffer;
 			for (i = file->buffer_length; i != 0; i--) {
-				if (*buffer_start == '\n') {
+				char c = *buffer_start;
+				buffer_start++;
+				if (c == '\n') {
 					file->position++;
 				}
-				buffer_start++;
 			}
 		}
 		ioresult = 0;

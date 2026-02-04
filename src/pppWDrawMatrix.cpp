@@ -16,9 +16,9 @@ void pppWDrawMatrix(_pppPObject* pppPObject)
 {
     Vec* inVec;
     
-    PSMTXConcat(ppvCameraMatrix0, pppPObject->m_localMatrix.value, *(Mtx*)((char*)pppPObject + 0x34));
-    PSVECScale((Vec*)((char*)pppPObject + 0x34), (Vec*)((char*)pppPObject + 0x34), (pppMngStPtr->m_scale).x);
-    PSVECScale((Vec*)((char*)pppPObject + 0x38), (Vec*)((char*)pppPObject + 0x38), (pppMngStPtr->m_scale).y);
-    inVec = (Vec*)((char*)pppPObject + 0x3c);
+    PSMTXConcat(ppvCameraMatrix0, pppPObject->m_localMatrix.value, *(Mtx*)((char*)pppPObject + 0x40));
+    PSVECScale((Vec*)((char*)pppPObject + 0x40), (Vec*)((char*)pppPObject + 0x40), (pppMngStPtr->m_scale).x);
+    PSVECScale((Vec*)((char*)pppPObject + 0x50), (Vec*)((char*)pppPObject + 0x50), (pppMngStPtr->m_scale).y);
+    inVec = (Vec*)((char*)pppPObject + 0x60);
     PSVECScale(inVec, inVec, (pppMngStPtr->m_scale).z);
 }

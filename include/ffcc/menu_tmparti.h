@@ -8,7 +8,7 @@ public:
     void TmpArtiInit0();
     unsigned int TmpArtiOpen();
     void TmpArtiCtrl();
-    void TmpArtiClose();
+    unsigned int TmpArtiClose();
     void TmpArtiDraw();
     void TmpArtiCtrlCur();
 };

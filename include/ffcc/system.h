@@ -53,6 +53,7 @@ public:
     COrder* GetFirstOrder();
     COrder* GetNextOrder(COrder*);
     COrder* GetOrder(int);
+    unsigned int GetCounter();
     bool IsGdev();
     void DumpMapFile(void*);
     void OSPanic(...);

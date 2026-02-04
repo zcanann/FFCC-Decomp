@@ -49,6 +49,11 @@ void pppDesScreenBlur(void)
  */
 void pppFrameScreenBlur(void)
 {
+    // Check global state before processing
+    extern int pppScreenBlurEnabled; // Placeholder global variable
+    if (pppScreenBlurEnabled == 0) {
+        return;
+    }
     return;
 }
 

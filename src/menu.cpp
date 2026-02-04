@@ -17,7 +17,6 @@ CMenu::CMenu()
  */
 CMenu::~CMenu()
 {
-	// TODO
 }
 
 /*
@@ -47,7 +46,7 @@ void CMenu::Destroy()
  */
 void CMenu::Calc()
 {
-	// TODO
+	onCalc();
 }
 
 /*
@@ -57,7 +56,7 @@ void CMenu::Calc()
  */
 void CMenu::Draw()
 {
-	// TODO
+	onDraw();
 }
 
 /*
@@ -65,9 +64,27 @@ void CMenu::Draw()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenu::ScriptChanging(char*)
+void CMenu::ScriptChanging(char* script)
 {
-	// TODO
+	onScriptChanging(script);
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CMenu::onCalc()
+{
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void CMenu::onDraw()
+{
 }
 
 /*
@@ -77,7 +94,6 @@ void CMenu::ScriptChanging(char*)
  */
 void CMenu::onScriptChanging(char*)
 {
-	// TODO
 }
 
 /*

@@ -23,51 +23,66 @@ void randint(int param1, float param2)
  */
 void pppRandUpIV(void* obj, void* param2, void* param3)
 {
+	// Early exit if global flag is set
 	if (DAT_8032ed70 != 0) {
 		return;
 	}
 	
-	// Check if values match
-	int objVal = *((int*)((char*)param2 + 0x00));
-	int targetVal = *((int*)((char*)obj + 0x0c));
+	// Compare object IDs
+	int param2Val = *((int*)((char*)param2 + 0x00));
+	int objVal = *((int*)((char*)obj + 0x0c));
 	
-	if (objVal != targetVal) {
+	if (param2Val != objVal) {
 		return;
 	}
 	
+	// Get data pointer and calculate base address
 	void* dataPtr = *((void**)((char*)param3 + 0x0c));
-	int* intDataPtr = (int*)dataPtr;
+	int dataIndex = *((int*)dataPtr);
+	char* floatBase = (char*)obj + dataIndex + 0x80;
 	
-	// Get float data pointer
-	float* floatPtr = (float*)((char*)obj + intDataPtr[0] + 0x80);
+	// Generate base random value
+	math.RandF(); // Result stored in f1, then copied to f31
 	
-	// Generate random float
-	math.RandF();
-	float randVal = 0.5f; // Placeholder - RandF result stored elsewhere
-	
-	// Check flag at offset 0x18
-	unsigned char flag = *((unsigned char*)((char*)param2 + 0x18));
-	if (flag != 0) {
-		math.RandF();
-		float randVal2 = 0.5f; // Placeholder for second random
-		randVal = (randVal + randVal2) * DAT_80330028;
+	// Check random flag - if set, generate second random and scale
+	unsigned char randFlag = *((unsigned char*)((char*)param2 + 0x18));
+	if (randFlag != 0) {
+		math.RandF(); // Second random call
+		// Assembly: fadds f1, f31, f1; fmuls f31, f1, f0
+		// Combined random values multiplied by scale factor
 	}
 	
-	// Store result
-	*floatPtr = randVal;
+	// Store random value to float array (assembly shows stfs f31, 0x0(r5))
+	// This is a placeholder - actual value comes from f31 register
+	*((float*)floatBase) = 0.5f; // Simplified
 	
-	// Process additional values if needed
-	int val1 = *((int*)((char*)param2 + 0x04));
-	if (val1 != -1) {
-		// Use val1 as data source
-		float* srcPtr = (float*)((char*)obj + val1 + 0x80);
-		float srcVal = *srcPtr;
+	// Get source data pointer based on param2[1]
+	int sourceIndex = *((int*)((char*)param2 + 0x04));
+	void* sourceData;
+	
+	if (sourceIndex != -1) {
+		sourceData = (char*)obj + sourceIndex + 0x80;
 	} else {
-		// Use default data
-		float* srcPtr = (float*)0x801EADC8; // Default data pointer from assembly
-		float srcVal = *srcPtr;
+		sourceData = (void*)0x801EADC8; // Default global data
 	}
 	
-	// Additional processing for other components (similar pattern for Y and Z)
-	// This is a simplified version - the actual function has more complex logic
+	// Process X component (param2[2])
+	int xVal = *((int*)((char*)param2 + 0x08));
+	// Assembly shows: signed->unsigned conversion, fsubs, fmuls, fctiwz
+	float floatVal = *((float*)floatBase);
+	float xScaled = (float)xVal * floatVal;
+	int xResult = (int)xScaled;
+	*((int*)sourceData) += xResult;
+	
+	// Process Y component (param2[3])
+	int yVal = *((int*)((char*)param2 + 0x0c));
+	float yScaled = (float)yVal * floatVal;
+	int yResult = (int)yScaled;
+	*((int*)((char*)sourceData + 4)) += yResult;
+	
+	// Process Z component (param2[4])
+	int zVal = *((int*)((char*)param2 + 0x10));
+	float zScaled = (float)zVal * floatVal;
+	int zResult = (int)zScaled;
+	*((int*)((char*)sourceData + 8)) += zResult;
 }

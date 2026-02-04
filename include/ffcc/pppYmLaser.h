@@ -5,11 +5,11 @@
 extern "C" {
 #endif
 
-void pppConstructYmLaser(void);
-void pppConstruct2YmLaser(void);
-void pppDestructYmLaser(void);
-void pppFrameYmLaser(void);
-void pppRenderYmLaser(void);
+void pppConstructYmLaser(void* pppYmLaser, void* param_2);
+void pppConstruct2YmLaser(void* pppYmLaser, void* param_2);
+void pppDestructYmLaser(void* pppYmLaser, void* param_2);
+void pppFrameYmLaser(void* pppYmLaser, void* param_2, void* param_3);
+void pppRenderYmLaser(void* pppYmLaser, void* param_2, void* param_3);
 
 #ifdef __cplusplus
 }

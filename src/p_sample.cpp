@@ -7,75 +7,114 @@
  */
 CSamplePcs::CSamplePcs()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	8001feac
+ * Size:	4
  */
 void CSamplePcs::Init()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	8001fea8
+ * Size:	4
  */
 void CSamplePcs::Quit()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	8001fe94
+ * Size:	4
  */
 void CSamplePcs::GetTable(unsigned long)
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	8001fe90
+ * Size:	4
  */
 void CSamplePcs::create()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	8001fe8c
+ * Size:	4
  */
 void CSamplePcs::destroy()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	8001fe88
+ * Size:	4
  */
 void CSamplePcs::func0()
 {
-	// TODO
+	return;
+}
+
+/*
+ * --INFO--
+ * Address:	8001fe84
+ * Size:	4
+ */
+void CSamplePcs::func1()
+{
+	return;
 }
 
 /*
  * --INFO--
  * Address:	TODO
- * Size:	TODO
+ * Size:	4
  */
-void CSamplePcs::func1()
+void CSamplePcs::onScriptChanging(char*)
 {
-	// TODO
+	return;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	4
+ */
+void CSamplePcs::onScriptChanged(char*, int)
+{
+	return;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	4
+ */
+void CSamplePcs::onMapChanging(int, int)
+{
+	return;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	4
+ */
+void CSamplePcs::onMapChanged(int, int, int)
+{
+	return;
 }

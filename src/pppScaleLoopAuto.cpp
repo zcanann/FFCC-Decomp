@@ -12,9 +12,7 @@
 void pppScaleLoopAuto(void* arg1, void* arg2, void* arg3)
 {
 	extern int lbl_8032ED70;
-	if (lbl_8032ED70 != 0) {
-		return;
-	}
+	if (lbl_8032ED70 != 0) return;
 	
 	int* arg2Data = (int*)arg2;
 	int* arg3Data0 = (int*)((int**)arg3)[0];
@@ -49,25 +47,23 @@ void pppScaleLoopAuto(void* arg1, void* arg2, void* arg3)
 	short currentAngle = *(short*)(scaleTarget + 30);
 	if (currentAngle < 90) {
 		signed char counter = scaleTarget[32];
-		if (counter > 0) {
-			scaleTarget[32] = counter - 1;
-			float deltaValue = scaleData[9];
-			scaleData[0] += deltaValue;
-			scaleData[1] += deltaValue;
-			scaleData[2] += deltaValue;
-		}
+		if (counter <= 0) return;
+		scaleTarget[32] = counter - 1;
+		float deltaValue = scaleData[9];
+		scaleData[0] += deltaValue;
+		scaleData[1] += deltaValue;
+		scaleData[2] += deltaValue;
 		return;
 	}
 	
 	if (currentAngle < 270) {
 		signed char counter = scaleTarget[33];
-		if (counter > 0) {
-			scaleTarget[33] = counter - 1;
-			float deltaValue = scaleData[9];
-			scaleData[0] += deltaValue;
-			scaleData[1] += deltaValue;
-			scaleData[2] += deltaValue;
-		}
+		if (counter <= 0) return;
+		scaleTarget[33] = counter - 1;
+		float deltaValue = scaleData[9];
+		scaleData[0] += deltaValue;
+		scaleData[1] += deltaValue;
+		scaleData[2] += deltaValue;
 		return;
 	}
 	
@@ -124,20 +120,19 @@ void pppScaleLoopAutoCon(void* arg1, void* arg2)
 	float* targetData = (float*)targetPtr;
 	char* targetBytes = (char*)targetPtr;
 	
-	// Initialize float values to 0.0f
+	// Initialize float values to 0.0f - including 0x24 offset
 	targetData[0] = 0.0f;
-	targetData[1] = 0.0f;
+	targetData[1] = 0.0f; 
 	targetData[2] = 0.0f;
 	targetData[4] = 0.0f;
 	targetData[5] = 0.0f;
 	targetData[6] = 0.0f;
 	targetData[9] = 0.0f;
 	
-	// Initialize byte values to 0
+	// Initialize byte values to 0 - complete sequence
 	targetBytes[28] = 0;
 	targetBytes[29] = 0;
-	targetBytes[30] = 0;
-	targetBytes[31] = 0;
+	*(short*)(targetBytes + 30) = 0;  // Use 16-bit store for 30-31
 	targetBytes[32] = 0;
 	targetBytes[33] = 0;
 }

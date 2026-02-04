@@ -19,7 +19,7 @@ public:
     
 private:
     bool setSize(unsigned int newSize);
-        
+            
     unsigned long m_size;
     unsigned long m_numItems;
     unsigned long m_defaultSize;
@@ -77,12 +77,12 @@ bool CPtrArray<T>::Add(T* item)
 template <class T>
 void CPtrArray<T>::RemoveAll()
 {
-    if (items != 0) {
-        delete[] items;
-        items = 0;
+    if (m_items != 0) {
+        delete[] m_items;
+        m_items = 0;
     }
-    size = 0;
-    numItems = 0;
+    m_size = 0;
+    m_numItems = 0;
 }
 
 template <class T>

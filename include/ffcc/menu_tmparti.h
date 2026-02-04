@@ -6,9 +6,9 @@ class CMenuPcs
 public:
     void TmpArtiInit();
     void TmpArtiInit0();
-    void TmpArtiOpen();
+    unsigned int TmpArtiOpen();
     void TmpArtiCtrl();
-    void TmpArtiClose();
+    unsigned int TmpArtiClose();
     void TmpArtiDraw();
     void TmpArtiCtrlCur();
 };

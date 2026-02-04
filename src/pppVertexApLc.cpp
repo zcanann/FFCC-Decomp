@@ -35,8 +35,12 @@ void pppVertexApLc(_pppPObject* obj, PVertexApLc* apLc, Vec* vec)
     void** apLc_data = (void**)((char*)apLc + 0xc);
     void* vertex_data = *(void**)(*apLc_data);
     
-    if (!vertex_data) return;
+    // Early return if no vertex data
+    if (!vertex_data) {
+        return;
+    }
     
+    // Early return if vertex index is negative
     short vertex_index = *(short*)((char*)apLc + 4);
     if (vertex_index < 0) return;
     

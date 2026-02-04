@@ -46,16 +46,20 @@ void pppColMove(void* param1, void* param2, void* param3)
     int* param2_int = (int*)param2;
     int* param1_int = (int*)param1;
     
-    if (param2_int[0] != param1_int[3]) {  // Compare param2[0] with param1[0xC]
-        // Update movement values
-        short* movement = (short*)((char*)param2 + 0x8);
-        
-        dest[0] += movement[0];  // x
-        dest[1] += movement[1];  // y
-        dest[2] += movement[2];  // z
-        dest[3] += movement[3];  // w
+    if (param2_int[0] == param1_int[3]) {  // Inverted comparison
+        // Skip the movement update section
+        goto do_final_add;
     }
     
+    // Update movement values
+    short* movement = (short*)((char*)param2 + 0x8);
+    
+    dest[0] += movement[0];  // x
+    dest[1] += movement[1];  // y
+    dest[2] += movement[2];  // z
+    dest[3] += movement[3];  // w
+
+do_final_add:
     // Always perform this addition
     src[0] += dest[0];  // x
     src[1] += dest[1];  // y  

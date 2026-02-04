@@ -7,7 +7,7 @@ extern "C" {
 
 void randchar(char, float);
 void randf(unsigned char);
-void pppSRandCV(void);
+void pppSRandCV(void* param1, void* param2);
 
 #ifdef __cplusplus
 }

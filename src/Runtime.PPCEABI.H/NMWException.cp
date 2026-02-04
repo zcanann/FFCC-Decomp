@@ -39,90 +39,116 @@ extern void unexpected() { uhandler(); }
 } // namespace std
 
 /**
- * @note Address: N/A
- * @note Size: 0x22C
+ * @note Address: 801AFA6C
+ * @note Size: 184b
  */
-extern char __throw_catch_compare(const char* throwtype, const char* catchtype, s32* offset_result)
+extern "C" void dtor_801AFA6C() {
+	// TODO: Implement destructor function
+	// Based on address 801AFA6C, size 184 bytes
+}
+
+/**
+ * @note Address: 801afc28
+ * @note Size: 556b
+ */
+extern "C" char __throw_catch_compare(const char* throwtype, const char* catchtype, int* offset_result)
 {
-	const char *cptr1, *cptr2;
+	char cVar1;
+	char cVar2;
+	int iVar3;
+	const char* pcVar4;
+	const char* pcVar5;
 
 	*offset_result = 0;
-
-	if ((cptr2 = catchtype) == 0) {
-		return true;
+	if (catchtype == nullptr) {
+		return 1;
 	}
 
-	cptr1 = throwtype;
-
-	if (*cptr2 == 'P') {
-		cptr2++;
-		if (*cptr2 == 'C')
-			cptr2++;
-		if (*cptr2 == 'V')
-			cptr2++;
-		if (*cptr2 == 'v') {
-			if (*cptr1 == 'P' || *cptr1 == '*') {
-				return true;
-			}
+	if (*catchtype == 'P') {
+		pcVar4 = catchtype + 1;
+		if (*pcVar4 == 'C') {
+			pcVar4 = catchtype + 2;
 		}
-		cptr2 = catchtype;
+		if (*pcVar4 == 'V') {
+			pcVar4 = pcVar4 + 1;
+		}
+		if ((*pcVar4 == 'v') && ((*throwtype == 'P' || (*throwtype == '*')))) {
+			return 1;
+		}
 	}
 
-	switch (*cptr1) {
-	case '*':
-	case '!':
-		if (*cptr1++ != *cptr2++)
-			return false;
-		for (;;) {
-			if (*cptr1 == *cptr2++) {
-				if (*cptr1++ == '!') {
-					s32 offset;
-
-					for (offset = 0; *cptr1 != '!';) {
-						offset = offset * 10 + *cptr1++ - '0';
+	cVar1 = *throwtype;
+	if ((cVar1 == '*') || ((cVar1 < '*' && (cVar1 == '!')))) {
+		pcVar4 = throwtype + 1;
+		pcVar5 = catchtype + 1;
+		if (*throwtype != *catchtype) {
+			return 0;
+		}
+		while (true) {
+			while (true) {
+				cVar1 = *pcVar5;
+				pcVar5 = pcVar5 + 1;
+				cVar2 = *pcVar4;
+				if (cVar2 != cVar1) break;
+				pcVar4 = pcVar4 + 1;
+				if (cVar2 == '!') {
+					iVar3 = 0;
+					for (; *pcVar4 != '!'; pcVar4 = pcVar4 + 1) {
+						iVar3 = (int)*pcVar4 + iVar3 * 10 - 0x30;
 					}
-					*offset_result = offset;
-					return true;
+					*offset_result = iVar3;
+					return 1;
 				}
-			} else {
-				while (*cptr1++ != '!') { }
-				while (*cptr1++ != '!') { }
-				if (*cptr1 == 0)
-					return false;
-
-				cptr2 = catchtype + 1;
 			}
+			do {
+				cVar1 = *pcVar4;
+				pcVar4 = pcVar4 + 1;
+			} while (cVar1 != '!');
+			do {
+				cVar1 = *pcVar4;
+				pcVar4 = pcVar4 + 1;
+			} while (cVar1 != '!');
+			if (*pcVar4 == '\0') break;
+			pcVar5 = catchtype + 1;
 		}
-		return false;
+		return 0;
 	}
 
-	while ((*cptr1 == 'P' || *cptr1 == 'R') && *cptr1 == *cptr2) {
-		cptr1++;
-		cptr2++;
-
-		if (*cptr2 == 'C') {
-			if (*cptr1 == 'C')
-				cptr1++;
-			cptr2++;
+	while (true) {
+		cVar1 = *throwtype;
+		if (((cVar1 != 'P') && (cVar1 != 'R')) || (cVar1 != *catchtype)) {
+			while (true) {
+				if (*throwtype != *catchtype) {
+					return 0;
+				}
+				if (*throwtype == '\0') break;
+				throwtype = throwtype + 1;
+				catchtype = catchtype + 1;
+			}
+			return 1;
 		}
-		if (*cptr1 == 'C')
-			return false;
-
-		if (*cptr2 == 'V') {
-			if (*cptr1 == 'V')
-				cptr1++;
-			cptr2++;
+		pcVar4 = throwtype + 1;
+		pcVar5 = catchtype + 1;
+		if (catchtype[1] == 'C') {
+			if (*pcVar4 == 'C') {
+				pcVar4 = throwtype + 2;
+			}
+			pcVar5 = catchtype + 2;
 		}
-		if (*cptr1 == 'V')
-			return false;
+		catchtype = pcVar5;
+		throwtype = pcVar4;
+		if (*throwtype == 'C') break;
+		if (*catchtype == 'V') {
+			if (*throwtype == 'V') {
+				throwtype = throwtype + 1;
+			}
+			catchtype = catchtype + 1;
+		}
+		if (*throwtype == 'V') {
+			return 0;
+		}
 	}
-
-	for (; *cptr1 == *cptr2; cptr1++, cptr2++) {
-		if (*cptr1 == 0)
-			return true;
-	}
-
-	return false;
+	return 0;
 }
 
 class __partial_array_destructor {
@@ -156,6 +182,15 @@ public:
 		}
 	}
 };
+
+/**
+ * @note Address: 801afb24
+ * @note Size: 260b
+ */
+extern "C" void* __construct_new_array(void* ptr, ConstructorDestructor ctor, ConstructorDestructor dtor, size_t elementSize, size_t count) {
+	// TODO: Implement new array construction
+	return nullptr;
+}
 
 /**
  * @note Address: 801af970

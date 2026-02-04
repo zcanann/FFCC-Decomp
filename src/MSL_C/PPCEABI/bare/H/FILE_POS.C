@@ -1,6 +1,7 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/ansi_files.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/buffer_io.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/errno.h"
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/critical_regions.h"
 
 inline fpos_t _ftell(FILE* file) {
     int charsInUndoBuffer = 0;
@@ -28,7 +29,9 @@ inline fpos_t _ftell(FILE* file) {
 long ftell(FILE* file) {
     long retval;
 
+    __begin_critical_region(2);
     retval = (long)_ftell(file);
+    __end_critical_region(2);
 
     return retval;
 }
@@ -90,9 +93,11 @@ int _fseek(FILE* file, fpos_t offset, int file_mode) {
 int fseek(FILE * file, long offset, int file_mode)
 {
     fpos_t real_offset = (fpos_t)offset;
-    int retval;		
+    int retval;
 
+    __begin_critical_region(2);
     retval = _fseek(file, real_offset, file_mode);
+    __end_critical_region(2);
 
     return(retval);
 }

@@ -1,4 +1,7 @@
 #include "ffcc/p_chara.h"
+#include "ffcc/memory.h"
+
+extern CMemory Memory;
 
 /*
  * --INFO--

@@ -2,6 +2,9 @@
 #define _FFCC_PPPCHANGETEX_H_
 
 #include "ffcc/chara.h"
+#include "ffcc/materialman.h"
+#include "dolphin/gx/GXDispList.h"
+#include "dolphin/gx/GXVert.h"
 
 void ChangeTex_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 void ChangeTex_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);

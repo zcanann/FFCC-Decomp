@@ -270,14 +270,14 @@ void GXSetTevKColor(GXTevKColorID id, GXColor color) {
     rgba = *(u32*)&color;
 
     regRA = (0xE0 + id * 2) << 24;
-    SET_REG_FIELD(838, regRA, 8, 0, rgba >> 24);
-    SET_REG_FIELD(839, regRA, 8, 12, rgba & 0xFF);
-    SET_REG_FIELD(839, regRA, 4, 20, 8);
+    regRA |= (rgba >> 24) & 0xFF;
+    regRA |= (rgba & 0xFF) << 12;
+    regRA |= 8 << 20;
 
     regBG = (0xE1 + id * 2) << 24;
-    SET_REG_FIELD(843, regBG, 8, 0, (rgba >> 8) & 0xFF);
-    SET_REG_FIELD(844, regBG, 8, 12, (rgba >> 16) & 0xFF);
-    SET_REG_FIELD(845, regBG, 4, 20, 8);
+    regBG |= (rgba >> 8) & 0xFF;
+    regBG |= ((rgba >> 16) & 0xFF) << 12;
+    regBG |= 8 << 20;
 
     GX_WRITE_RAS_REG(regRA);
     GX_WRITE_RAS_REG(regBG);
@@ -335,27 +335,19 @@ void GXSetTevSwapMode(GXTevStageID stage, GXTevSwapSel ras_sel, GXTevSwapSel tex
 
 void GXSetTevSwapModeTable(GXTevSwapSel table, GXTevColorChan red, GXTevColorChan green, GXTevColorChan blue, GXTevColorChan alpha) {
     u32* Kreg;
-#if !DEBUG
-    // not a real variable, but needed to match release
-    int index = table * 2;
-#endif
 
     CHECK_GXBEGIN(978, "GXSetTevSwapModeTable");
     ASSERTMSGLINE(979, table < GX_MAX_TEVSWAP, "GXSetTevSwapModeTable: Invalid Swap Selection Index");
 
-#if DEBUG
     Kreg = &__GXData->tevKsel[table * 2];
-#else
-    Kreg = &__GXData->tevKsel[index];
-#endif
-    SET_REG_FIELD(982, *Kreg, 2, 0, red);
-    SET_REG_FIELD(983, *Kreg, 2, 2, green);
+    *Kreg = (*Kreg & ~3) | (red & 3);
+    *Kreg = (*Kreg & ~0xC) | ((green & 3) << 2);
 
     GX_WRITE_RAS_REG(*Kreg);
 
     Kreg = &__GXData->tevKsel[table * 2 + 1];
-    SET_REG_FIELD(987, *Kreg, 2, 0, blue);
-    SET_REG_FIELD(988, *Kreg, 2, 2, alpha);
+    *Kreg = (*Kreg & ~3) | (blue & 3);
+    *Kreg = (*Kreg & ~0xC) | ((alpha & 3) << 2);
 
     GX_WRITE_RAS_REG(*Kreg);
     __GXData->bpSentNot = 0;
@@ -371,11 +363,11 @@ void GXSetAlphaCompare(GXCompare comp0, u8 ref0, GXAlphaOp op, GXCompare comp1, 
     CHECK_GXBEGIN(1046, "GXSetAlphaCompare");
     reg = 0xF3000000;
 
-    SET_REG_FIELD(1049, reg, 8, 0, ref0);
-    SET_REG_FIELD(1050, reg, 8, 8, ref1);
-    SET_REG_FIELD(1051, reg, 3, 16, comp0);
-    SET_REG_FIELD(1052, reg, 3, 19, comp1);
-    SET_REG_FIELD(1053, reg, 2, 22, op);
+    reg |= ref0 & 0xFF;
+    reg |= (ref1 & 0xFF) << 8;
+    reg |= (comp0 & 7) << 16;
+    reg |= (comp1 & 7) << 19;
+    reg |= (op & 3) << 22;
 
     GX_WRITE_RAS_REG(reg);
     __GXData->bpSentNot = 0;

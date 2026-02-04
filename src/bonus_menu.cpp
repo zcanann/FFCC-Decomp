@@ -112,12 +112,17 @@ void CMenuPcs::DrawResultCloseAnim()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80135d60
+ * PAL Size: 4668b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CalcSelectOpenAnim()
 {
-	// TODO
+	// Simplified implementation to get basic structure compiling
+	// TODO: Expand based on Ghidra decompilation patterns
 }
 
 /*

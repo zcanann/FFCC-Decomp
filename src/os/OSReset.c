@@ -195,7 +195,7 @@ void OSResetSystem(BOOL reset, u32 resetCode, BOOL forceMenu) {
 
     OSDisableScheduler();
 
-    if (reset == TRUE && forceMenu) {
+    if (reset == OS_RESET_RESTART && forceMenu) {
         sram = __OSLockSram();
         sram->flags |= 0x40;
         __OSUnlockSram(1);
@@ -221,11 +221,11 @@ void OSResetSystem(BOOL reset, u32 resetCode, BOOL forceMenu) {
         __OSReboot(resetCode, bootThisDol);
     }
 
-    memset(OSPhysicalToCached(0x40), 0, 0xcc - 0x40);
-    memset(OSPhysicalToCached(0xd4), 0, 0xe8 - 0xd4);
-    memset(OSPhysicalToCached(0xf4), 0, 0xf8 - 0xf4);
+    memset(OSPhysicalToCached(0x40), 0, 0x8c);
+    memset(OSPhysicalToCached(0xd4), 0, 0x14);
+    memset(OSPhysicalToCached(0xf4), 0, 4);
     memset(OSPhysicalToCached(0x3000), 0, 0xc0);
-    memset(OSPhysicalToCached(0x30c8), 0, 0xd4 - 0xc8);
+    memset(OSPhysicalToCached(0x30c8), 0, 0xc);
     memset(OSPhysicalToCached(0x30e2), 0, 1);
 }
 
@@ -234,7 +234,7 @@ u32 OSGetResetCode() {
     if (__OSRebootParams.valid)
         resetCode = 0x80000000 | __OSRebootParams.restartCode;
     else
-        resetCode = (__PIRegs[9] & 0xFFFFFFF8) / 8;
+        resetCode = (__PIRegs[9] & 0xFFFFFFF8) >> 3;
 
     return resetCode;
 }

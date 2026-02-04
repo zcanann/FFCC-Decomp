@@ -1,4 +1,7 @@
 #include "ffcc/p_chara.h"
+#include "ffcc/memory.h"
+
+extern CMemory Memory;
 
 /*
  * --INFO--
@@ -408,6 +411,20 @@ void CCharaPcs::loadAnimBuffer(void*, char*, int, int, int, int)
 void CCharaPcs::drawOverlap()
 {
 	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 8007717c
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void* CCharaPcs::CHandle::operator new(unsigned long size, CMemory::CStage* stage, char* file, int line)
+{
+    return ::operator new(size, stage, file, line);
 }
 
 /*

@@ -1,9 +1,12 @@
 #include "ffcc/pppRandUpFloat.h"
+#include "ffcc/math.h"
+
+extern CMath math;
 
 /*
  * --INFO--
  * PAL Address: 0x800628e0
- * PAL Size: 108b
+ * PAL Size: 264b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -18,6 +21,7 @@ void pppRandUpFloat(void* param1, void* param2, void* param3) {
     int* p1 = (int*)param1;
     int* p2 = (int*)param2;
     int* p3 = (int*)param3;
+    unsigned char* p2_bytes = (unsigned char*)param2;
     
     int r6 = p1[3];
     if (r6 != 0) {
@@ -27,23 +31,32 @@ void pppRandUpFloat(void* param1, void* param2, void* param3) {
         }
     }
     
-    unsigned char* p2_bytes = (unsigned char*)param2;
-    static const float kHalf = 0.5f;  // Force to sdata2
-    float f2 = kHalf;
+    // Generate random float value
+    math.RandF();
+    float f31 = 1.0f;  // Placeholder for RandF() result
     
     if (p2_bytes[0xC] != 0) {
+        // If flag is set, add another random value
+        math.RandF(); 
+        float f1 = 0.5f;   // Placeholder for second random value
+        f31 = f31 + f1;
+        
         extern float lbl_8032FFF8;
-        f2 = f2 * lbl_8032FFF8;
+        f31 = f31 * lbl_8032FFF8;
     }
     
     int r5 = p3[3];
     if (r5 != -1) {
+        // Store result at specific offset
         float* target = (float*)((char*)param1 + r5 + 0x80);
-        *target = f2;
+        *target = f31;
         return;
     }
     
+    // Add to global float using parameter
     float f1 = *(float*)((char*)param2 + 8);
     extern float lbl_801EADC8;
-    lbl_801EADC8 = lbl_801EADC8 + (f1 * f2);
+    float f0 = lbl_801EADC8;
+    f0 = f0 + (f1 * f31);
+    lbl_801EADC8 = f0;
 }

@@ -12,15 +12,15 @@
 void pppSclAcceleCon(void* arg1, void* arg2)
 {
 	int** dataPtr = (int**)arg2;
-	int* targetPtr = dataPtr[1]; // Load from offset 0x4
+	int* targetPtr = dataPtr[3]; // Load from offset 0xc
 	
 	// Calculate final pointer: arg1 + targetPtr + 0x80
 	float* finalPtr = (float*)((char*)arg1 + (int)targetPtr + 0x80);
 	
-	// Store 0.0f to three consecutive float positions
-	finalPtr[0] = 0.0f;  // offset 0x0
-	finalPtr[1] = 0.0f;  // offset 0x4  
+	// Store 0.0f to three consecutive float positions in reverse order
 	finalPtr[2] = 0.0f;  // offset 0x8
+	finalPtr[1] = 0.0f;  // offset 0x4  
+	finalPtr[0] = 0.0f;  // offset 0x0
 }
 
 /*

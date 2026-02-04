@@ -10,7 +10,7 @@ public:
 };
 
 exception::~exception() {
-    // Destructor implementation
+    // Empty virtual destructor - compiler generates vtable setup
 }
 
 const char* exception::what() const {

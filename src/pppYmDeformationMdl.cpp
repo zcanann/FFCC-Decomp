@@ -22,12 +22,26 @@ void DisableIndWarp()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800d20c0
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppConstructYmDeformationMdl(void)
+void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, struct UnkC* param_2)
 {
-	// TODO
+    float fVar1 = 1.0f; // FLOAT_80330dac equivalent 
+    u16* puVar2 = (u16*)((u8*)pppYmDeformationMdl_ + 0x80 + param_2->m_serializedDataOffsets[2]);
+    
+    *puVar2 = 0;
+    *(u8*)(puVar2 + 1) = 1;
+    *(float*)(puVar2 + 6) = fVar1;
+    *(float*)(puVar2 + 4) = fVar1;
+    *(float*)(puVar2 + 2) = fVar1;
+    *(float*)(puVar2 + 0xc) = fVar1;
+    *(float*)(puVar2 + 10) = fVar1;
+    *(float*)(puVar2 + 8) = fVar1;
 }
 
 /*

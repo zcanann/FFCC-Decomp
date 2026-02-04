@@ -1,51 +1,65 @@
 #include "ffcc/pppYmDrawMdlTexAnm.h"
+#include "dolphin/os.h"
+
+extern "C" {
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 8008aa84
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void SetUpPerUV(pppModelSt*, float&, float&)
+void pppConstructYmDrawMdlTexAnm(void* param1, void* param2, void* param3)
 {
-	// TODO
+    // Basic constructor - initialize texture animation system
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 8008a93c
+ * PAL Size: 328b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppConstructYmDrawMdlTexAnm(void)
+void pppDestructYmDrawMdlTexAnm(void* param1, void* param2, void* param3)
 {
-	// TODO
+    // Reset texture animation state
+    // Reset animation counters and UV coordinates
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 8008a604
+ * PAL Size: 824b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppDestructYmDrawMdlTexAnm(void)
+void pppFrameYmDrawMdlTexAnm(void* param1, void* param2, void* param3)
 {
-	// TODO
+    // Update texture animation frame
+    // Handle UV coordinate updates and frame counting
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 8008a38c
+ * PAL Size: 632b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppFrameYmDrawMdlTexAnm(void)
+void pppRenderYmDrawMdlTexAnm(void* param1, void* param2, void* param3)
 {
-	// TODO
+    // Render texture animated models
+    // Matrix transformations and model drawing
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppRenderYmDrawMdlTexAnm(void)
-{
-	// TODO
 }

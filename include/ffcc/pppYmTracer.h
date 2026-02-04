@@ -1,10 +1,18 @@
 #ifndef _FFCC_PPP_YMTRACER_H_
 #define _FFCC_PPP_YMTRACER_H_
 
-struct pppYmTracer;
+#include <dolphin/types.h>
+
+// Forward declarations
 struct UnkB;
 struct UnkC;
 struct TRACE_POLYGON;
+
+// Basic structure for pppYmTracer - based on Ghidra analysis
+struct pppYmTracer {
+    char field0_0x0[8]; // Base object data
+    // Additional fields inferred from usage pattern
+};
 
 void initTracePolygon(pppYmTracer*, TRACE_POLYGON*);
 void copyPolygonData(TRACE_POLYGON*, TRACE_POLYGON*);

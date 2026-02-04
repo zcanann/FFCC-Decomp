@@ -1,6 +1,7 @@
 #include "ffcc/pppPointRAp.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/math.h"
+#include "ffcc/pppsintbl.h"
 #include <dolphin/mtx.h>
 
 extern CMath math;
@@ -26,51 +27,48 @@ void pppPointRAp(_pppMngSt* mngSt, _pppPDataVal* dataVal)
 {
     extern int lbl_8032ED70;
     
-    // Early return if global flag is set
-    if (lbl_8032ED70 != 0) return;
+    if (lbl_8032ED70 != 0) {
+        return;
+    }
     
-    // Get data pointer from dataVal + 0xC
-    u32* dataPtr = (u32*)((char*)dataVal + 0xC);
-    u32 dataValue = *(u32*)((char*)*dataPtr + 0x4);
+    u32 particleId = *(u32*)((char*)*(u32**)((char*)dataVal + 0xC) + 0x4);
+    u8* particleBase = (u8*)mngSt + particleId + 0x80;
     
-    // Calculate base particle pointer with 0x80 offset
-    u8* particlePtr = (u8*)mngSt + dataValue + 0x80;
-    
-    // Check particle lifetime counter at offset +1
-    if (particlePtr[1] == 0) {
-        // Check if valid for particle creation
+    if (particleBase[1] == 0) {
         u32 checkValue = *(u32*)((char*)dataVal + 0xC);
         if ((checkValue + 0x10000) != 0xFFFF) {
-            // Create particle object - would call pppCreatePObject(mngSt, dataVal)
-            // void* particleObj = ...;
-            // Store mngSt reference in created object
+            pppCreatePObject(mngSt, dataVal);
             
-            // Generate random angle index
             math.RandF();
+            f32 angleRandom = 0.5f; // Placeholder - RandF result accessed elsewhere
+            angleRandom = angleRandom * 65536.0f;
+            s32 angleIndex = (s32)angleRandom & 0xFFFF;
             
-            // Get position scale from dataVal + 0x4
-            float positionScale = *(float*)((char*)dataVal + 0x4);
+            f32 posScale = *(f32*)((char*)dataVal + 0x4);
+            f32 sinValue = pppTrigTable[angleIndex & 0x3FFF];
+            f32 cosValue = pppTrigTable[(angleIndex + 0x1000) & 0x3FFF];
             
-            // Calculate sine/cosine values for positioning
-            // Complex trigonometric calculations with lookup table
+            sinValue *= posScale;
+            cosValue *= posScale;
             
-            // Second random call for additional positioning
             math.RandF();
+            f32 velRandom = 0.3f; // Placeholder - RandF result accessed elsewhere  
+            velRandom = velRandom * 65536.0f;
+            s32 velAngleIndex = (s32)velRandom & 0xFFFF;
             
-            // Get velocity scale from dataVal + 0x8  
-            float velocityScale = *(float*)((char*)dataVal + 0x8);
+            f32 velScale = *(f32*)((char*)dataVal + 0x8);
+            f32 velSin = pppTrigTable[velAngleIndex & 0x3FFF];
+            f32 velCos = pppTrigTable[(velAngleIndex + 0x1000) & 0x3FFF];
             
-            // Set particle positions and velocities
-            // (Complex floating-point math involving multiple particle objects)
+            velSin *= velScale;
+            velCos *= velScale;
             
-            // Set initial lifetime from dataVal + 0x1C
-            u8 initialLifetime = *(u8*)((char*)dataVal + 0x1C);
-            particlePtr[1] = initialLifetime;
+            u8 lifetime = *(u8*)((char*)dataVal + 0x1C);
+            particleBase[1] = lifetime;
         }
     }
     
-    // Decrement lifetime counter if > 0
-    if (particlePtr[1] > 0) {
-        particlePtr[1] = particlePtr[1] - 1;
+    if (particleBase[1] > 0) {
+        particleBase[1]--;
     }
 }

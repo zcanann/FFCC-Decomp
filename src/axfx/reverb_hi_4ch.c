@@ -582,7 +582,41 @@ int AXFXReverbHiShutdownDpl2(AXFX_REVERBHI_DPL2* reverb) {
     BOOL old;
 
     old = OSDisableInterrupts();
-    ReverbHIDpl2Free(&reverb->rv);
+    
+    // Free all delay line inputs directly (24 delay lines total: 12 AP + 12 C)
+    __AXFXFree(reverb->rv.AP[0].inputs);
+    __AXFXFree(reverb->rv.AP[1].inputs);
+    __AXFXFree(reverb->rv.AP[2].inputs);
+    __AXFXFree(reverb->rv.AP[3].inputs);
+    __AXFXFree(reverb->rv.AP[4].inputs);
+    __AXFXFree(reverb->rv.AP[5].inputs);
+    __AXFXFree(reverb->rv.AP[6].inputs);
+    __AXFXFree(reverb->rv.AP[7].inputs);
+    __AXFXFree(reverb->rv.AP[8].inputs);
+    __AXFXFree(reverb->rv.AP[9].inputs);
+    __AXFXFree(reverb->rv.AP[10].inputs);
+    __AXFXFree(reverb->rv.AP[11].inputs);
+    __AXFXFree(reverb->rv.C[0].inputs);
+    __AXFXFree(reverb->rv.C[1].inputs);
+    __AXFXFree(reverb->rv.C[2].inputs);
+    __AXFXFree(reverb->rv.C[3].inputs);
+    __AXFXFree(reverb->rv.C[4].inputs);
+    __AXFXFree(reverb->rv.C[5].inputs);
+    __AXFXFree(reverb->rv.C[6].inputs);
+    __AXFXFree(reverb->rv.C[7].inputs);
+    __AXFXFree(reverb->rv.C[8].inputs);
+    __AXFXFree(reverb->rv.C[9].inputs);
+    __AXFXFree(reverb->rv.C[10].inputs);
+    __AXFXFree(reverb->rv.C[11].inputs);
+    
+    // Free pre-delay lines if they exist
+    if (reverb->rv.preDelayTime != 0) {
+        __AXFXFree(reverb->rv.preDelayLine[0]);
+        __AXFXFree(reverb->rv.preDelayLine[1]);
+        __AXFXFree(reverb->rv.preDelayLine[2]);
+        __AXFXFree(reverb->rv.preDelayLine[3]);
+    }
+    
     OSRestoreInterrupts(old);
     return 1;
 }

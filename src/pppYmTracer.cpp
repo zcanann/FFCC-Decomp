@@ -1,5 +1,7 @@
 #include "ffcc/pppYmTracer.h"
 
+extern f32 FLOAT_803306e8;
+
 /*
  * --INFO--
  * PAL Address: TODO
@@ -39,13 +41,33 @@ void copyPolygonData(TRACE_POLYGON*, TRACE_POLYGON*)
  */
 void pppConstructYmTracer(pppYmTracer* pppYmTracer, UnkC* param_2)
 {
-	// TODO: Implement based on Ghidra decomp
+    f32 fVar1;
+    f32* pfVar2;
+    
+    fVar1 = FLOAT_803306e8;
+    pfVar2 = (f32*)((int)(&pppYmTracer->field0_0x0 + 2) + *(int*)param_2);
+    
+    pfVar2[10] = 0.0f;
+    pfVar2[9] = 0.0f;
+    pfVar2[8] = 0.0f;
+    *(u16*)(pfVar2 + 0xb) = 0;
+    
+    pfVar2[3] = fVar1;
+    pfVar2[2] = fVar1;
+    pfVar2[1] = fVar1;
+    pfVar2[0] = fVar1;
+    pfVar2[7] = fVar1;
+    pfVar2[6] = fVar1;
+    pfVar2[5] = fVar1;
+    pfVar2[4] = fVar1;
+    
+    *(u16*)((int)pfVar2 + 0x2e) = 0;
 }
 
 /*
  * --INFO--
  * PAL Address: 80093c94
- * PAL Size: TODO
+ * PAL Size: 32b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -53,7 +75,11 @@ void pppConstructYmTracer(pppYmTracer* pppYmTracer, UnkC* param_2)
  */
 void pppConstruct2YmTracer(pppYmTracer* pppYmTracer, UnkC* param_2)
 {
-	// TODO
+    int iVar1;
+    
+    iVar1 = *(int*)param_2;
+    *(u16*)((char*)pppYmTracer + 0xae + iVar1) = 0;
+    *(u16*)((char*)pppYmTracer + 0xac + iVar1) = 0;
 }
 
 /*
@@ -67,7 +93,11 @@ void pppConstruct2YmTracer(pppYmTracer* pppYmTracer, UnkC* param_2)
  */
 void pppDestructYmTracer(pppYmTracer* pppYmTracer, UnkC* param_2)
 {
-	// TODO: Implement based on Ghidra decomp
+    void** ptr = (void**)((char*)pppYmTracer + 0xa8 + *(int*)param_2);
+    if (*ptr != nullptr) {
+        // Call some heap usage function - simplified for now
+        // pppHeapUseRate__FPQ27CMemory6CStage(*ptr);
+    }
 }
 
 /*

@@ -12,7 +12,7 @@ public:
 
     void Init();
     void Quit();
-    void GetTable(unsigned long);
+    void* GetTable(unsigned long);
     void IsBigAlloc(int param_2);
     void create();
     void destroy();

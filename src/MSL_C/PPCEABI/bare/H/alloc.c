@@ -421,6 +421,205 @@ static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
     return best_fit;
 }
 
+static void* allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long size) {
+    unsigned long aligned_size;
+    Block* current_block;
+    SubBlock* result;
+    
+    aligned_size = (size + 0xF) & 0xFFFFFFF8;
+    if (aligned_size < 0x50) {
+        aligned_size = 0x50;
+    }
+    
+    current_block = pool_obj->start_;
+    if (current_block == 0) {
+        current_block = link_new_block(pool_obj, aligned_size);
+    }
+    
+    if (current_block == 0) {
+        return 0;
+    }
+    
+    do {
+        if (aligned_size <= current_block->max_size) {
+            result = Block_subBlock(current_block, aligned_size);
+            if (result != 0) {
+                pool_obj->start_ = current_block;
+                return (char*)result + 8;
+            }
+        }
+        current_block = current_block->next;
+    } while (current_block != pool_obj->start_);
+    
+    current_block = link_new_block(pool_obj, aligned_size);
+    if (current_block == 0) {
+        return 0;
+    }
+    
+    result = Block_subBlock(current_block, aligned_size);
+    if (result != 0) {
+        return (char*)result + 8;
+    }
+    
+    return 0;
+}
+
+static void* soft_allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long size, unsigned long* available_size) {
+    unsigned long aligned_size;
+    Block* current_block;
+    SubBlock* result;
+    unsigned long block_available;
+    
+    aligned_size = (size + 0xF) & 0xFFFFFFF8;
+    if (aligned_size < 0x50) {
+        aligned_size = 0x50;
+    }
+    
+    *available_size = 0;
+    current_block = pool_obj->start_;
+    
+    if (current_block != 0) {
+        do {
+            if (aligned_size <= current_block->max_size) {
+                result = Block_subBlock(current_block, aligned_size);
+                if (result != 0) {
+                    pool_obj->start_ = current_block;
+                    return (char*)result + 8;
+                }
+            }
+            
+            if (current_block->max_size > 8) {
+                block_available = current_block->max_size - 8;
+                if (*available_size < block_available) {
+                    *available_size = block_available;
+                }
+            }
+            
+            current_block = current_block->next;
+        } while (current_block != pool_obj->start_);
+    }
+    
+    return 0;
+}
+
+static void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long size) {
+    unsigned long pool_index = 0;
+    FixStart* fix_start;
+    FixBlock* block;
+    FixSubBlock* sub_block;
+    FixSubBlock* current_sub;
+    FixSubBlock* new_sub;
+    void* allocation_ptr;
+    unsigned long block_count;
+    unsigned long client_size;
+    unsigned long total_size;
+    unsigned long available_space;
+    unsigned long local_array[4];
+    unsigned long i;
+    
+    // Find the appropriate fixed pool size
+    while (size > fix_pool_sizes[pool_index]) {
+        pool_index++;
+    }
+    
+    fix_start = &pool_obj->fix_start[pool_index];
+    
+    // Check if we need to allocate a new block
+    if (fix_start->head_ == 0 || fix_start->head_->start_ == 0) {
+        block_count = 0xFEC / (fix_pool_sizes[pool_index] + 4);
+        if (block_count > 0x100) {
+            block_count = 0x100;
+        }
+        
+        // Try soft allocation first
+        while (block_count > 9) {
+            allocation_ptr = soft_allocate_from_var_pools(pool_obj, 
+                block_count * (fix_pool_sizes[pool_index] + 4) + 0x14, local_array);
+            if (allocation_ptr != 0) {
+                break;
+            }
+            
+            if (local_array[0] < 0x15) {
+                block_count = 0;
+            } else {
+                block_count = (local_array[0] - 0x14) / (fix_pool_sizes[pool_index] + 4);
+            }
+        }
+        
+        // If soft allocation failed, try hard allocation
+        if (allocation_ptr == 0 && block_count < 0x100) {
+            allocation_ptr = allocate_from_var_pools(pool_obj, 
+                0x100 * (fix_pool_sizes[pool_index] + 4) + 0x14);
+            if (allocation_ptr == 0) {
+                return 0;
+            }
+        }
+        
+        // Get the actual available space
+        block = (FixBlock*)((char*)allocation_ptr - 8);
+        if ((*(unsigned long*)((char*)block - 4) & 1) == 0) {
+            available_space = *(unsigned long*)(*(unsigned long*)((char*)block - 4) + 8);
+        } else {
+            available_space = (*(unsigned long*)((char*)block - 8) & 0xFFFFFFF8) - 8;
+        }
+        
+        // Initialize the block
+        if (fix_start->head_ == 0) {
+            fix_start->head_ = block;
+            fix_start->tail_ = block;
+        }
+        
+        client_size = fix_pool_sizes[pool_index];
+        total_size = client_size + 4;
+        block_count = (available_space - 0x14) / total_size;
+        
+        // Set up block linkage
+        if (fix_start->tail_ != 0) {
+            block->prev_ = fix_start->tail_;
+            block->next_ = fix_start->head_;
+            fix_start->tail_->next_ = block;
+            fix_start->head_->prev_ = block;
+        } else {
+            block->prev_ = block;
+            block->next_ = block;
+        }
+        
+        block->client_size_ = client_size;
+        
+        // Initialize the sub-block chain
+        current_sub = (FixSubBlock*)((char*)block + 0x14);
+        block->start_ = current_sub;
+        block->n_allocated_ = 0;
+        
+        for (i = 0; i < block_count; i++) {
+            current_sub->block_ = block;
+            if (i < block_count - 1) {
+                new_sub = (FixSubBlock*)((char*)current_sub + total_size);
+                current_sub->next_ = new_sub;
+                current_sub = new_sub;
+            } else {
+                current_sub->next_ = 0;
+            }
+        }
+        
+        fix_start->head_ = block;
+    }
+    
+    // Allocate from the existing block
+    sub_block = fix_start->head_->start_;
+    fix_start->head_->start_ = sub_block->next_;
+    fix_start->head_->n_allocated_++;
+    
+    if (fix_start->head_->start_ == 0) {
+        fix_start->head_ = fix_start->head_->next_;
+        if (fix_start->tail_->next_ == fix_start->head_) {
+            fix_start->tail_ = fix_start->tail_->prev_;
+        }
+    }
+    
+    return (char*)sub_block + 4;
+}
+
 void __pool_free(__mem_pool* pool, void* ptr) {
     __mem_pool_obj* pool_obj;
     unsigned long size;

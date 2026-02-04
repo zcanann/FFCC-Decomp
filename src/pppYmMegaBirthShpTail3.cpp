@@ -1,7 +1,6 @@
 #include "ffcc/pppYmMegaBirthShpTail3.h"
 #include "ffcc/pppPart.h"
 #include "dolphin/mtx.h"
-#include <cstdlib>
 
 /*
  * --INFO--

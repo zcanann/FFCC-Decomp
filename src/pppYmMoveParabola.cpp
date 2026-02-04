@@ -23,10 +23,10 @@ extern int DAT_8032ed70;      // Global flag
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, struct UnkC* dataPtr)
+extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, struct UnkC* dataPtr)
 {
-    _pppMngSt* pppMngSt = pppMngStPtr;
     f32 zero = FLOAT_80330e1c;
+    _pppMngSt* pppMngSt = pppMngStPtr;
     f32* pfVar = (f32*)((u8*)&basePtr->field0_0x0 + 8 + *dataPtr->m_serializedDataOffsets);
     
     // Initialize velocity components
@@ -35,9 +35,8 @@ void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, struct UnkC* 
     *pfVar = zero;
     *(u16*)(pfVar + 3) = 1;
     
-    // For now, simplified implementation without unavailable struct members
     if (Game.game.m_currentSceneId == 7) {
-        // Initialize position data from matrix
+        // Get matrix position for initialization
         f32 matrixX = pppMngStPtr->m_matrix.value[0][3];
         f32 matrixY = pppMngStPtr->m_matrix.value[1][3];
         f32 matrixZ = pppMngStPtr->m_matrix.value[2][3];
@@ -46,6 +45,7 @@ void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, struct UnkC* 
         pfVar[5] = matrixY;
         pfVar[6] = matrixZ;
         
+        // Add offset to X component
         pfVar[4] = pfVar[4] + FLOAT_80330e18;
     }
 }
@@ -59,7 +59,7 @@ void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, struct UnkC* 
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct UnkB* stepData, struct UnkC* offsetData)
+extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct UnkB* stepData, struct UnkC* offsetData)
 {
     _pppMngSt* pppMngSt = pppMngStPtr;
     
@@ -86,39 +86,47 @@ void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct UnkB* step
             direction.x = FLOAT_80330e18;
             direction.z = FLOAT_80330e1c;
         } else {
-            // Simplified direction calculation using current position
+            // Simplified direction calculation
             direction.x = pppMngSt->m_position.x;
             direction.y = pppMngSt->m_position.y;
             direction.z = pppMngSt->m_position.z;
         }
         
-        Vec normalizedDir;
-        pppNormalize(normalizedDir, direction);
+        // Normalize the direction vector
+        Vec tempDir = direction;
+        pppNormalize(direction, tempDir);
         
         // Trigonometric parabolic motion calculations
         u32 sinIndex = (u32)((FLOAT_80330e20 * (f32)stepData->m_dataValIndex) / FLOAT_80330e24);
         
-        f32 horizontalScale = (f32)(frameCount * (double)(*pfVar * *(f32*)((int)ppvSinTbl + ((sinIndex + 0x4000) & 0xfffc))));
-        f32 horizontalX = normalizedDir.x * horizontalScale;
-        f32 horizontalZ = normalizedDir.z * horizontalScale;
-        f32 verticalY = (f32)(frameCount * (double)(*pfVar * *(f32*)((int)ppvSinTbl + (sinIndex & 0xfffc))) - 
+        f32 baseValue = *pfVar;
+        f32 horizontalScale = (f32)(frameCount * (double)(baseValue * *(f32*)((int)ppvSinTbl + ((sinIndex + 0x4000) & 0xfffc))));
+        f32 horizontalX = direction.x * horizontalScale;
+        f32 horizontalZ = direction.z * horizontalScale;
+        f32 verticalY = (f32)(frameCount * (double)(baseValue * *(f32*)((int)ppvSinTbl + (sinIndex & 0xfffc))) - 
                              (double)(f32)(frameCount * (double)(f32)((double)(FLOAT_80330e28 * (f32)stepData->m_initWOrk) * frameCount)));
         
         Vec newPosition;
         if (Game.game.m_currentSceneId == 7) {
-            f32 baseX = pfVar[4];
-            f32 baseY = pfVar[5];
-            f32 baseZ = pfVar[6];
-            Vec offset = {horizontalX, verticalY, horizontalZ};
-            Vec base = {baseX, baseY, baseZ};
-            pppAddVector(newPosition, offset, base);
+            Vec basePos;
+            basePos.x = pfVar[4];
+            basePos.y = pfVar[5];
+            basePos.z = pfVar[6];
+            Vec offset;
+            offset.x = horizontalX;
+            offset.y = verticalY;
+            offset.z = horizontalZ;
+            pppAddVector(newPosition, offset, basePos);
         } else {
-            f32 posX = pppMngSt->m_position.x;
-            f32 posY = pppMngSt->m_position.y;
-            f32 posZ = pppMngSt->m_position.z;
-            Vec offset = {horizontalX, verticalY, horizontalZ};
-            Vec base = {posX, posY, posZ};
-            pppAddVector(newPosition, offset, base);
+            Vec basePos;
+            basePos.x = pppMngSt->m_position.x;
+            basePos.y = pppMngSt->m_position.y;
+            basePos.z = pppMngSt->m_position.z;
+            Vec offset;
+            offset.x = horizontalX;
+            offset.y = verticalY;
+            offset.z = horizontalZ;
+            pppAddVector(newPosition, offset, basePos);
         }
         
         // Update matrix with new position

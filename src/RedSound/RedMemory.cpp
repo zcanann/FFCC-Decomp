@@ -134,12 +134,16 @@ void RedDelete(int address)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c01c0
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void RedDelete(void*)
+void RedDelete(void* address)
 {
-	// TODO
+	RedDelete((int)address);
 }
 
 /*
@@ -239,32 +243,73 @@ int RedNewA(int size, int offset, int maxSize)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c0428
+ * PAL Size: 216b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void RedDeleteA(int)
+void RedDeleteA(int address)
 {
-	// TODO
+	if (address == 0) {
+		return;
+	}
+	
+	unsigned int interrupts = OSDisableInterrupts();
+	int* blockPtr = DAT_8032f4a4;
+	
+	if (blockPtr) {
+		while (blockPtr[1] != 0 && blockPtr < DAT_8032f4a4 + 0x800) {
+			if (blockPtr[0] == address) {
+				unsigned int moveCount = (int)DAT_8032f4a4 + (0x2000 - (int)(blockPtr + 2));
+				int entryCount = ((int)moveCount >> 3) + ((int)moveCount < 0 && (moveCount & 7) != 0);
+				if (entryCount > 0) {
+					memcpy(blockPtr, blockPtr + 2, entryCount * 8);
+					memset(DAT_8032f4a4 + 0x7FE, 0, 8);
+				}
+				break;
+			}
+			blockPtr += 2;
+		}
+	}
+	
+	OSRestoreInterrupts(interrupts);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c0500
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void RedDeleteA(void*)
+void RedDeleteA(void* address)
 {
-	// TODO
+	RedDeleteA((int)address);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c0528
+ * PAL Size: 160b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedMemory::Init(int, int, int, int)
+void CRedMemory::Init(int param1, int param2, int param3, int param4)
 {
-	// TODO
+	DAT_8032f498 = param2 + -0x4000;
+	DAT_8032f4a4 = (int*)(param1 + 0x2000);
+	DAT_8032f490 = param1 + 0x4000;
+	DAT_8032f4a0 = (int*)param1;
+	memset((void*)param1, 0, 0x2000);
+	memset(DAT_8032f4a4, 0, 0x2000);
+	DAT_8032f494 = param3;
+	DAT_8032f49c = param4;
 }
 
 /*

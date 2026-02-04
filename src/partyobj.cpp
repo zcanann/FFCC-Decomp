@@ -282,12 +282,38 @@ void CGPartyObj::isRideTarget()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address:	8011ead4
+ * PAL Size:	2636b
+ * EN Address:	TODO
+ * EN Size:	TODO
+ * JP Address:	TODO
+ * JP Size:	TODO
  */
 void CGPartyObj::checkTargetParticle()
 {
-	// TODO
+	// Basic particle checking implementation
+	// This is a simplified version focusing on compilation and basic structure
+	
+	// TODO: Implement particle flag checking
+	// Complex bit manipulation and field access patterns from Ghidra decomp
+	
+	// TODO: Implement input handling for target particle movement
+	// Includes analog stick and digital pad input processing
+	
+	// TODO: Implement menu stage vs normal game mode logic  
+	// Different behavior when in boss artifact stages
+	
+	// TODO: Implement collision detection and position constraints
+	// Complex map geometry collision checking
+	
+	// TODO: Implement camera rotation and angle calculations
+	// Transform movement vectors based on camera orientation
+	
+	// For now, basic placeholder to establish compilation baseline
+	Vec targetPos;
+	targetPos.x = 0.0f;
+	targetPos.y = 0.0f; 
+	targetPos.z = 0.0f;
 }
 
 /*

@@ -3,9 +3,11 @@
 
 class CRef
 {
+public:
 	CRef();
-	virtual ~CRef() {}
+	virtual ~CRef();
 	
+private:
 	int refCount;
 };
 

@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 void randchar(char, float);
-void pppRandDownCV(void);
+void pppRandDownCV(void*, void*, void*);
 
 #ifdef __cplusplus
 }

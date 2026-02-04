@@ -100,7 +100,7 @@ static void DisableWriteGatherPipe(void) {
     PPCMthid2(hid2);
 }
 
-static GXTexRegion*__GXDefaultTexRegionCallback(const GXTexObj* t_obj, GXTexMapID id) {
+static GXTexRegion* __GXDefaultTexRegionCallback(const GXTexObj* t_obj, GXTexMapID id) {
     GXTexFmt fmt;
     u8 mm;
 
@@ -108,22 +108,21 @@ static GXTexRegion*__GXDefaultTexRegionCallback(const GXTexObj* t_obj, GXTexMapI
     mm = GXGetTexObjMipMap(t_obj);
     id = (GXTexMapID)(id % GX_MAX_TEXMAP);
 
-    switch (fmt) {
-    case GX_TF_RGBA8:
+    if (fmt == GX_TF_RGBA8) {
         if (mm) {
             return &__GXData->TexRegions2[id];
         }
         return &__GXData->TexRegions1[id];
-    case GX_TF_C4:
-    case GX_TF_C8:
-    case GX_TF_C14X2:
-        return &__GXData->TexRegions0[id];
-    default:
-        if (mm) {
-            return &__GXData->TexRegions1[id];
-        }
+    }
+    
+    if ((fmt == GX_TF_C4) || (fmt == GX_TF_C8) || (fmt == GX_TF_C14X2)) {
         return &__GXData->TexRegions0[id];
     }
+    
+    if (mm) {
+        return &__GXData->TexRegions1[id];
+    }
+    return &__GXData->TexRegions0[id];
 }
 
 static GXTlutRegion* __GXDefaultTlutRegionCallback(u32 idx) {
@@ -281,12 +280,12 @@ GXFifoObj* GXInit(void* base, u32 size) {
 
     __GXData->genMode = 0;
     SET_REG_FIELD(0, __GXData->genMode, 8, 24, 0);
-    __GXData->bpMask = 255;
+    __GXData->bpMask = 0xFF;
     SET_REG_FIELD(0, __GXData->bpMask, 8, 24, 0x0F);
     __GXData->lpSize = 0;
     SET_REG_FIELD(0, __GXData->lpSize, 8, 24, 0x22);
 
-    for (i = 0; i < 16; ++i) {
+    for (i = 0; i < 16; i++) {
         __GXData->tevc[i] = 0;
         __GXData->teva[i] = 0;
         __GXData->tref[i / 2] = 0;
@@ -300,7 +299,7 @@ GXFifoObj* GXInit(void* base, u32 size) {
     __GXData->iref = 0;
     SET_REG_FIELD(0, __GXData->iref, 8, 24, 0x27);
 
-    for (i = 0; i < 8; ++i) {
+    for (i = 0; i < 8; i++) {
         __GXData->suTs0[i] = 0;
         __GXData->suTs1[i] = 0;
         SET_REG_FIELD(1144, __GXData->suTs0[i], 8, 24, 0x30 + i * 2);
@@ -315,7 +314,7 @@ GXFifoObj* GXInit(void* base, u32 size) {
     SET_REG_FIELD(0, __GXData->peCtrl, 8, 24, 0x43);
     SET_REG_FIELD(0, __GXData->cpTex, 2, 7, 0);
 
-    __GXData->zScale = 1.6777216E7f;
+    __GXData->zScale = 16777216.0f;
     __GXData->zOffset = 0.0f;
     __GXData->dirtyState = 0;
     __GXData->dirtyVAT = FALSE;

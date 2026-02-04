@@ -6506,8 +6506,12 @@ void DEBPRINT(char*, ...)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800b26d8
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 unsigned short JoyBus::Crc16(int len, unsigned char* data, unsigned short* crc)
 {
@@ -6533,4 +6537,60 @@ unsigned short JoyBus::Crc16(int len, unsigned char* data, unsigned short* crc)
 int CFile::IsDiskError()
 {
 	return m_isDiskError;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800b2728
+ * PAL Size: 456b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void __sinit_joybus_cpp()
+{
+    Joybus.m_threadRunningMask = 0;
+    Joybus.m_binLoaded = false;
+    Joybus.m_fileBaseA_dup = 0;
+    Joybus.m_fileBaseB_dup = 0;
+    Joybus.m_gbaBootImage = 0;
+    Joybus.m_fileBaseA = 0;
+    Joybus.m_fileBaseB = 0;
+    
+    for (int i = 0; i < 4; i++)
+    {
+        Joybus.m_letterBuffer[i] = 0;
+        Joybus.m_letterSizeArr[i] = 0;
+    }
+    
+    strcpy(Joybus.m_pathBuf, "dvd_gba/");
+    strcat(Joybus.m_pathBuf, "ffcc_cli.bin", 128UL);
+    
+    // Initialize various memory regions with memset
+    memset((void*)0x802ec7d0, 0, 0x4000);
+    memset((void*)0x802f08f0, 0, 8);
+    memset((void*)0x802f08f8, 0, 0x400);
+    memset((void*)0x802f0cf8, 0, 0x400);
+    memset((void*)0x802f07d0, 0, 0xf0);
+    memset((void*)0x802f1160, 0, 0x60);
+    memset((void*)0x802eab40, 0, 0x1020);
+    
+    Joybus.m_mapId = 0xff;
+    Joybus.m_stageId = 0xff;
+    
+    // Initialize thread parameters and related arrays
+    for (int i = 0; i < 4; i++)
+    {
+        Joybus.m_threadParams[i].m_gbaStatus = 1;
+        Joybus.m_threadParams[i].m_padType = 0x40;
+        Joybus.m_cmdCount[i] = 0;
+        Joybus.m_secCmdCount[i] = 0;
+        OSInitSemaphore(&Joybus.m_accessSemaphores[i], 1);
+        Joybus.m_ctrlModeArr[i] = 0;
+        Joybus.m_nextModeTypeArr[i] = 0;
+        Joybus.m_modeXArr[i] = 0;
+        Joybus.m_stateCodeArr[i] = 0xff;
+        Joybus.m_stateFlagArr[i] = 0;
+    }
 }

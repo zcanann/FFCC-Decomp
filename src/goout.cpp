@@ -223,12 +223,36 @@ void CGoOutMenu::Destroy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8016b8d4
+ * PAL Size: 2256b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO  
+ * JP Size: TODO
  */
-void CGoOutMenu::SetGoOutMode(unsigned char)
+void CGoOutMenu::SetGoOutMode(unsigned char mode)
 {
-	// TODO
+	field_0x18 = mode;
+	switch(field_0x18) {
+	case 1:
+		field_0x1c = 0;
+		// Menu state initialization
+		break;
+	case 3:
+		field_0x45 = 0;
+		field_0x34 = 4;
+		field_0x48 = 0;
+		field_0x3c = 0;
+		field_0x46 = 1;
+		break;
+	case 4:
+		field_0x45 = 0;
+		field_0x34 = 5;
+		field_0x48 = 0;
+		field_0x3c = 0;
+		field_0x46 = 1;
+		break;
+	}
 }
 
 /*

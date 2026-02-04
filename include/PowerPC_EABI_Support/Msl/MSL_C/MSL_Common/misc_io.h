@@ -1,11 +1,14 @@
 #ifndef _MSL_COMMON_MISC_IO_H
 #define _MSL_COMMON_MISC_IO_H
 
+#include "ansi_files.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 void __stdio_atexit(void);
+void clearerr(FILE* stream);
 
 #ifdef __cplusplus
 }

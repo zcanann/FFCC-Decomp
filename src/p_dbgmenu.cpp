@@ -1,4 +1,32 @@
 #include "ffcc/p_dbgmenu.h"
+#include "ffcc/graphic.h"
+#include "ffcc/system.h"
+#include <dolphin/gx.h>
+#include <string.h>
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012d288
+ * PAL Size: 300b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_p_dbgmenu_cpp()
+{
+	// Static initialization function for debug menu system
+	// Initialize MiniGamePcs structure
+	// memset calls for initialization
+	memset((void*)0x80306710, 0, 0x34);
+	memset((void*)0x80306744, 0, 0x20);
+	
+	// Initialize debug menu array with constructor calls
+	// __construct_array call for CDM objects
+	
+	// Set up vtable pointers and function pointers
+	// These appear to be vtable entries for CDbgMenuPcs
+}
 
 /*
  * --INFO--
@@ -132,22 +160,155 @@ void CDbgMenuPcs::changeVtxFmt(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012c274
+ * PAL Size: 1336b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CDbgMenuPcs::drawWindow(int, int, int, int, int, char*)
+void CDbgMenuPcs::drawWindow(int x, int y, int width, int height, int flags, char* text)
 {
-	// TODO
+	// Set up GX vertex format if not already done
+	if (*(int*)((char*)this + 0x2a68) != 1) {
+		GXClearVtxDesc();
+		GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+		GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+		GXSetVtxAttrFmt(GX_VTXFMT1, GX_VA_POS, GX_CLR_RGBA, GX_F32, 0);
+		GXSetVtxAttrFmt(GX_VTXFMT1, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+		GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+		GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+		GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+		*(int*)((char*)this + 0x2a68) = 1;
+	}
+
+	// Draw window border if flag is not set
+	if ((flags & 1) == 0) {
+		GXBegin(GX_QUADS, GX_VTXFMT1, 4);
+		// Window border quad rendering
+		for (int i = 0; i < 4; i++) {
+			float xPos = (float)(x + (width & (i & 1 ? -1 : 0)));
+			float yPos = (float)(y + (height & (i > 1 ? -1 : 0)));
+			GXPosition3f32(xPos, yPos, 0.0f);
+			GXColor1u32(0x808080ff); // Gray border color
+		}
+	}
+
+	// Draw window triangles
+	GXBegin(GX_TRIANGLES, GX_VTXFMT1, 3);
+	int colorOffset = (flags >> 1 & 1) * 4;
+	GXPosition3f32((float)(x + width), (float)y, 0.0f);
+	GXColor1u32(0x404040ff); // Dark color
+	GXPosition3f32((float)x, (float)y, 0.0f);
+	GXColor1u32(0x404040ff);
+	GXPosition3f32((float)x, (float)(y + height), 0.0f);
+	GXColor1u32(0x404040ff);
+
+	GXBegin(GX_TRIANGLES, GX_VTXFMT1, 3);
+	GXPosition3f32((float)(x + width), (float)y, 0.0f);
+	GXColor1u32(0x808080ff); // Light color
+	GXPosition3f32((float)(x + width), (float)(y + height), 0.0f);
+	GXColor1u32(0x808080ff);
+	GXPosition3f32((float)x, (float)(y + height), 0.0f);
+	GXColor1u32(0x808080ff);
+
+	// Draw selection highlight if flag is set
+	char selectionFlag = *(char*)(*(int*)((char*)this + 0x2a5c) + 0x34);
+	if (selectionFlag < 0) {
+		unsigned char alpha = 0xc0;
+		if ((System.m_frameCounter >> 2 & 1) != 0) {
+			alpha = 0xff;
+		}
+		u32 highlightColor = (alpha << 24) | (alpha << 16) | (alpha << 8) | 0xff;
+
+		GXBegin(GX_QUADS, GX_VTXFMT1, 5);
+		// Highlight border
+		GXPosition3f32((float)(x + width + 1), (float)(y - 1), 0.0f);
+		GXColor1u32(highlightColor);
+		GXPosition3f32((float)(x - 1), (float)(y - 1), 0.0f);
+		GXColor1u32(highlightColor);
+		GXPosition3f32((float)(x - 1), (float)(y + height + 1), 0.0f);
+		GXColor1u32(highlightColor);
+		GXPosition3f32((float)(x + width + 1), (float)(y + height + 1), 0.0f);
+		GXColor1u32(highlightColor);
+		GXPosition3f32((float)(x + width + 1), (float)(y - 1), 0.0f);
+		GXColor1u32(highlightColor);
+	}
+
+	// Draw text if provided
+	if (text != nullptr) {
+		drawFont(5, x + 8, y - 6, text);
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012bd4c
+ * PAL Size: 1320b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CDbgMenuPcs::drawFont(int, int, int, char*)
+void CDbgMenuPcs::drawFont(int flags, int x, int y, char* text)
 {
-	// TODO
+	// Reset GX state if needed
+	if (*(int*)((char*)this + 0x2a68) != 0) {
+		GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+		GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+		GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
+		*(int*)((char*)this + 0x2a68) = 0;
+	}
+
+	// Draw drop shadow if flag is set
+	if ((flags & 4) != 0) {
+		changeVtxFmt(0);
+		GXColor shadowColor = {0, 0, 0, 255};
+		GXSetChanMatColor(GX_COLOR0A0, shadowColor);
+
+		int fontSize = 10;
+		if ((flags & 1) != 0) {
+			fontSize = 8;
+		}
+
+		short shadowX = x - 1;
+		short shadowY = y;
+		if ((flags & 8) != 0) {
+			// Center text
+			int textLen = strlen(text);
+			shadowX = x - (short)((fontSize * textLen) >> 1);
+			shadowY = y - (short)(fontSize >> 1);
+		}
+
+		// Draw shadow in 4 directions
+		Graphic.DrawDebugStringDirect(shadowX, shadowY, text, fontSize);
+		Graphic.DrawDebugStringDirect(x, shadowY + 1, text, fontSize);
+		Graphic.DrawDebugStringDirect(x + 1, shadowY, text, fontSize);
+		Graphic.DrawDebugStringDirect(x, shadowY - 1, text, fontSize);
+	}
+
+	// Draw main text
+	GXColor mainColor = {255, 255, 255, 255}; // Default white
+	if ((flags & 2) != 0) {
+		mainColor.r = mainColor.g = mainColor.b = 0; // Black text
+	}
+	GXSetChanMatColor(GX_COLOR0A0, mainColor);
+
+	int fontSize = 10;
+	if ((flags & 1) != 0) {
+		fontSize = 8;
+	}
+
+	short finalX = x;
+	short finalY = y;
+	if ((flags & 8) != 0) {
+		// Center text
+		int textLen = strlen(text);
+		finalX = x - (short)((fontSize * textLen) >> 1);
+		finalY = y - (short)(fontSize >> 1);
+	}
+
+	Graphic.DrawDebugStringDirect(finalX, finalY, text, fontSize);
 }
 
 /*

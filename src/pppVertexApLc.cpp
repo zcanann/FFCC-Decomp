@@ -35,27 +35,17 @@ void pppVertexApLc(_pppPObject* obj, PVertexApLc* apLc, Vec* vec)
     void** apLc_data = (void**)((char*)apLc + 0xc);
     void* vertex_data = *(void**)(*apLc_data);
     
-    // Early return if no vertex data
-    if (!vertex_data) {
-        return;
-    }
+    if (!vertex_data) return;
     
-    // Early return if vertex index is negative
     short vertex_index = *(short*)((char*)apLc + 4);
-    if (vertex_index < 0) {
-        return;
-    }
+    if (vertex_index < 0) return;
     
-    // Get vertex count from PVertexApLc at offset 6
     unsigned char vertex_count = *(unsigned char*)((char*)apLc + 6);
     unsigned char i = 0;
     
-    // Process each vertex
     while (i < vertex_count) {
         vertex_count--;
-        if (vertex_count == 0) {
-            return;
-        }
+        if (vertex_count == 0) return;
         i++;
     }
 }

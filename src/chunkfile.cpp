@@ -4,8 +4,8 @@
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	800A0080
+ * Size:	4
  */
 CChunkFile::CChunkFile()
 {
@@ -126,8 +126,8 @@ bool CChunkFile::GetNextChunk(CChunk& outChunk)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	800A0060
+ * Size:	8
  */
 unsigned char* CChunkFile::GetAddress()
 {
@@ -136,8 +136,8 @@ unsigned char* CChunkFile::GetAddress()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	800A00E0
+ * Size:	20
  */
 void CChunkFile::Get(void* dest, long size)
 { 
@@ -147,87 +147,77 @@ void CChunkFile::Get(void* dest, long size)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	800A0000
+ * Size:	12
  */
 unsigned char CChunkFile::Get1()
 {
-	unsigned char* value = m_cursor;
-
-	m_cursor += sizeof(unsigned char);
-
-	return *value;
+	unsigned char value = *m_cursor;
+	m_cursor++;
+	return value;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	800A0020
+ * Size:	16
  */
 unsigned short CChunkFile::Get2()
 {
-	unsigned short* value = (unsigned short*)m_cursor;
-
-	m_cursor += sizeof(unsigned short);
-
-	return *value;
+	unsigned short value = *(unsigned short*)m_cursor;
+	m_cursor += 2;
+	return value;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	800A0040
+ * Size:	16
  */
 unsigned int CChunkFile::Get4()
 {
-	unsigned int* value = (unsigned int*)m_cursor;
-
-	m_cursor += sizeof(unsigned int);
-
-	return *value;
+	unsigned int value = *(unsigned int*)m_cursor;
+	m_cursor += 4;
+	return value;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	800A00C0
+ * Size:	16
  */
 float CChunkFile::GetF4()
 {
-    float value;
-    unsigned int* cursorPtr = (unsigned int*)m_cursor;
-    *(unsigned int*)&value = *cursorPtr;
+    float value = *(float*)m_cursor;
     m_cursor += 4;
     return value;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	800A00A0
+ * Size:	24
  */
 char* CChunkFile::GetString()
 { 
     char* stringPtr = (char*)m_cursor;
-    unsigned char currentChar;
-
-    do
-    {
-        currentChar = *m_cursor++;
-    } while (currentChar != 0);
-
+    
+    while (*m_cursor != 0) {
+        m_cursor++;
+    }
+    m_cursor++; // skip null terminator
+    
     return stringPtr;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address:	800A0100
+ * Size:	32
  */
 void CChunkFile::Align(unsigned long alignment)
 { 
     unsigned long offset = (unsigned long)(m_cursor - m_base);
-    offset += alignment - 1;
-    offset -= offset % alignment;
+    offset = (offset + alignment - 1) & ~(alignment - 1);
     m_cursor = m_base + offset;
 }

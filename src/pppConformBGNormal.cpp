@@ -46,12 +46,23 @@ void pppConstructConformBGNormal(struct pppConformBGNormal* conformBG, struct Un
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameConformBGNormal(struct pppConformBGNormal* conformBG, struct UnkB* param2, struct UnkC* param3)
+void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, struct UnkB* param2, struct UnkC* param3)
 {
-    // This is a complex function - implementing basic structure first
+    char cVar1;
+    f32 fVar2;
+    f32 fVar3;
+    void* pppMngSt;
+    s32 iVar4;
+    f32 fVar5;
+    // Add more local variables as needed
+    
+    pppMngSt = pppMngStPtr;
     if (DAT_8032ed70 == 0) {
-        // Basic implementation stub
-        // TODO: Full implementation requires more game state understanding
+        // Access pppMngStPtr fields (based on Ghidra decomp)
+        iVar4 = 0;
+        // TODO: Implement complex game logic with scene checks
+        // Ghidra shows checks for Game.game.m_currentSceneId != 7
+        // and various floating point calculations with matrix operations
         return;
     }
 }

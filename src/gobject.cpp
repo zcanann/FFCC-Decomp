@@ -24,6 +24,16 @@ void VECNormalizeZero(Vec*, Vec*)
  * Address:	TODO
  * Size:	TODO
  */
+void CGBaseObj::onFrame()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 void CGObject::onCreate()
 {
 	// TODO

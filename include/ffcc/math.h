@@ -1,6 +1,8 @@
 #ifndef _FFCC_CMATH_H_
 #define _FFCC_CMATH_H_
 
+#include "types.h"
+
 struct Vec;
 struct Vec4d;
 struct SRT;

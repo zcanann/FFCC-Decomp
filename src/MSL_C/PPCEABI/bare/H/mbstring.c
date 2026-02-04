@@ -54,7 +54,7 @@ size_t wcstombs(char* s, const wchar_t* pwcs, size_t n) {
         } else {
             result = wctomb(temp, *source++);
             if ((chars_written + result) <= n) {
-                strcat(s + chars_written, temp, result);
+                strncat(s + chars_written, temp, result);
                 chars_written += result;
             } else
                 break;

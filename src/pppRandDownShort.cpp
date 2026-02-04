@@ -14,49 +14,50 @@ extern CMath math;
  */
 void pppRandDownShort(void* r3, void* r4, void* r5)
 {
-    // Check global flag first - assembly shows early return if this is 0
+    // Check global flag first - early return if zero
     extern int lbl_8032ED70;
     if (lbl_8032ED70 == 0) return;
     
-    // Cast parameters based on register usage (r3->r30, r4->r31, r5->r29)
+    // Cast parameters based on register usage (r3->r30, r4->r31, r5->r29) 
     u8* param1 = (u8*)r3;  // r30
-    u8* param2 = (u8*)r4;  // r31  
+    u8* param2 = (u8*)r4;  // r31
     u8* param3 = (u8*)r5;  // r29
     
-    // Check param1[0xc] - if zero, take first branch
+    // Check param1[0xc] - branch based on zero/non-zero
     u32 p1_field_c = *(u32*)(param1 + 0xc);
     if (p1_field_c == 0) {
-        // Generate random numbers
-        math.RandF();
-        f32 randomVal = 0.0f; // Placeholder since RandF() is void
+        // First branch: param1[0xc] == 0
+        math.RandF();  // Generates value in f1
+        f32 result = -0.0f;  // fneg f31, f1 - placeholder for negative of random value
         
         // Check param2[0xa] byte
         u8 p2_field_a = *(u8*)(param2 + 0xa);
         if (p2_field_a != 0) {
-            math.RandF();
-            // Do some calculation with second random
+            math.RandF();  // Second random call
             extern f32 lbl_8032FF78;
-            randomVal = randomVal * lbl_8032FF78;
+            f32 temp = result - 1.0f;  // fsubs f1, f31, f1 
+            result = temp * lbl_8032FF78;  // fmuls f31, f1, f0
         }
         
-        // Calculate target address and store result
+        // Store result at calculated address
         u32* p3_field_c = (u32*)(param3 + 0xc);
         u32* base_ptr = (u32*)*p3_field_c;
         u32 offset = *base_ptr + 0x80;
         f32* target = (f32*)(param1 + offset);
-        *target = randomVal;
+        *target = result;
         
     } else {
+        // Second branch: param1[0xc] != 0
         // Check if param2[0] matches param1[0xc]
         u32 p2_field_0 = *(u32*)param2;
         if (p2_field_0 != p1_field_c) return;
         
-        // Calculate target memory location
+        // Calculate base address
         u32* p3_field_c = (u32*)(param3 + 0xc);
         u32* base_ptr = (u32*)*p3_field_c;
         u32 base_offset = *base_ptr + 0x80;
         
-        // Get param2[4]
+        // Determine target pointer based on param2[4]
         s32 p2_field_4 = *(s32*)(param2 + 4);
         s16* target_ptr;
         
@@ -67,20 +68,17 @@ void pppRandDownShort(void* r3, void* r4, void* r5)
             target_ptr = (s16*)(param1 + p2_field_4 + 0x80);
         }
         
-        // Get param2[8] (multiplier)
+        // Get multiplier and current values
         u16 multiplier = *(u16*)(param2 + 8);
-        
-        // Load current values and do arithmetic
-        f32 mem_val = *(f32*)(param1 + base_offset);
+        f32 base_val = *(f32*)(param1 + base_offset);
         s16 current_short = *target_ptr;
         
-        // Float conversion and arithmetic from assembly
-        extern f64 lbl_8032FF80;  // Used for float conversion
+        // Float arithmetic following assembly pattern
         f32 mult_f = (f32)multiplier;
-        f32 result = mult_f * mem_val;
-        s16 delta = (s16)result;
+        f32 product = mult_f * base_val;
+        s16 delta = (s16)product;
         
-        // Store result back
+        // Update target
         *target_ptr = current_short + delta;
     }
 }

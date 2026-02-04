@@ -101,28 +101,25 @@ char* strncpy(char* dst, const char* src, size_t n)
 	return dst;
 }
 
-char* strcat(char* dst, const char* src, size_t n)
+void strcat(char* param_1, char* param_2)
 {
-	char* srcPtr = (char*)src - 1;
-	char* dstPtr = (char*)dst - 1;
-	char* endPtr;
-	char c;
+	char cVar1;
+	char* pcVar2;
+	char* pcVar3;
+	char* pcVar4;
 
-	// Find end of dst string
+	pcVar3 = param_2 - 1;
+	pcVar2 = param_1 - 1;
 	do {
-		endPtr = dstPtr;
-		dstPtr = endPtr + 1;
-	} while (endPtr[1] != '\0');
-
-	// Copy src to end of dst (ignore n parameter for now)
+		pcVar4 = pcVar2;
+		pcVar2 = pcVar4 + 1;
+	} while (pcVar4[1] != '\0');
 	do {
-		srcPtr = srcPtr + 1;
-		c = *srcPtr;
-		endPtr = endPtr + 1;
-		*endPtr = c;
-	} while (c != '\0');
-
-	return dst;
+		pcVar3 = pcVar3 + 1;
+		cVar1 = *pcVar3;
+		pcVar4 = pcVar4 + 1;
+		*pcVar4 = cVar1;
+	} while (cVar1 != '\0');
 }
 
 char* strncat(char* dst, const char* src, size_t n)
@@ -307,62 +304,64 @@ char* strstr(const char* str, const char* pat)
 	return NULL;
 }
 
-char* strtok(char* str, const char* delim)
+unsigned char* strtok(int param_1, int param_2)
 {
-	char delimiter_table[32];  // 256 bits / 8 = 32 bytes
+	unsigned char* pbVar1;
 	unsigned char bVar2;
-	char* pbVar1;
-	char* pbVar3;
-	char* pbVar4;
-	int i;
-	
-	// Initialize delimiter bit table
-	for (i = 0; i < 32; i++) {
-		delimiter_table[i] = 0;
+	unsigned char* pbVar3;
+	unsigned char* pbVar4;
+	unsigned int local_28;
+	unsigned int local_24;
+	unsigned int local_20;
+	unsigned int local_1c;
+	unsigned int local_18;
+	unsigned int local_14;
+	unsigned int local_10;
+	unsigned int local_c;
+
+	local_28 = 0;
+	local_24 = 0;
+	local_20 = 0;
+	local_1c = 0;
+	local_18 = 0;
+	local_14 = 0;
+	local_10 = 0;
+	local_c = 0;
+
+	if (param_1 != 0) {
+		strtok_ptr = (char*)param_1;
 	}
-	
-	// If new string provided, use it
-	if (str != NULL) {
-		strtok_ptr = str;
-	}
-	
-	// Build delimiter bit table
-	pbVar3 = (char*)(delim - 1);
+	pbVar3 = (unsigned char*)(param_2 - 1);
 	while (1) {
 		pbVar3 = pbVar3 + 1;
 		bVar2 = *pbVar3;
 		if (bVar2 == 0) break;
-		delimiter_table[bVar2 >> 3] |= (1 << (bVar2 & 7));
+		*(unsigned char*)((int)&local_28 + (unsigned int)(bVar2 >> 3)) =
+			*(unsigned char*)((int)&local_28 + (unsigned int)(bVar2 >> 3)) | (unsigned char)(1 << (bVar2 & 7));
 	}
-	
-	// Skip leading delimiters
-	pbVar3 = strtok_ptr - 1;
+	pbVar3 = (unsigned char*)((int)strtok_ptr - 1);
 	do {
 		pbVar3 = pbVar3 + 1;
 		bVar2 = *pbVar3;
 		if (bVar2 == 0) break;
-	} while ((delimiter_table[bVar2 >> 3] & (1 << (bVar2 & 7))) != 0);
-	
+	} while (((unsigned int)*(unsigned char*)((int)&local_28 + (unsigned int)(bVar2 >> 3)) & 1 << (bVar2 & 7)) != 0);
 	pbVar1 = pbVar3;
 	if (bVar2 == 0) {
-		strtok_ptr = NULL;
-		return NULL;
-	}
-	
-	// Find end of token
-	do {
-		pbVar4 = pbVar1;
-		pbVar1 = pbVar4 + 1;
-		bVar2 = *pbVar1;
-		if (bVar2 == 0) break;
-	} while ((delimiter_table[bVar2 >> 3] & (1 << (bVar2 & 7))) == 0);
-	
-	if (bVar2 == 0) {
-		strtok_ptr = NULL;
+		pbVar3 = (unsigned char*)0x0;
+		strtok_ptr = 0;
 	} else {
-		strtok_ptr = pbVar4 + 2;
-		*pbVar1 = 0;
+		do {
+			pbVar4 = pbVar1;
+			pbVar1 = pbVar4 + 1;
+			bVar2 = *pbVar1;
+			if (bVar2 == 0) break;
+		} while (((unsigned int)*(unsigned char*)((int)&local_28 + (unsigned int)(bVar2 >> 3)) & 1 << (bVar2 & 7)) == 0);
+		if (bVar2 == 0) {
+			strtok_ptr = 0;
+		} else {
+			strtok_ptr = (char*)(pbVar4 + 2);
+			*pbVar1 = 0;
+		}
 	}
-	
 	return pbVar3;
 }

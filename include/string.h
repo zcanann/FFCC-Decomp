@@ -10,11 +10,11 @@ char* strrchr(const char* str, int c);
 char* strchr(const char* str, int c);
 int strncmp(const char* str1, const char* str2, size_t n);
 int strcmp(const char* str1, const char* str2);
-char* strcat(char* dst, const char* src, size_t n);
+void strcat(char* dst, char* src);
 char* strncat(char* dst, const char* src, size_t n);
 char* strncpy(char* dst, const char* src, size_t n);
 char* strcpy(char* dst, const char* src);
 size_t strlen(const char* str);
-char* strtok(char* str, const char* delim);
+unsigned char* strtok(int param_1, int param_2);
 
 #endif

@@ -185,8 +185,7 @@ void JoyBus::CreateInit()
     char path[140];
     strcpy(path, "dvd/gba/");
 
-    // MWCC PPC requires 3-arg strcat
-    strcat(path, "objdat.spt", 131UL);
+    strcat(path, "objdat.spt");
 
     CFile::CHandle* file = File.Open(path, 0, CFile::PRI_LOW);
 
@@ -456,7 +455,7 @@ int JoyBus::LoadMap(int stageId, int mapId)
 
     strcpy(path, "dvd/gba/");
     sprintf(tmp, "m%02d_%d.mcd", stageId, mapId);
-    strcat(path, tmp, 132UL);
+    strcat(path, tmp);
 
     CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
 

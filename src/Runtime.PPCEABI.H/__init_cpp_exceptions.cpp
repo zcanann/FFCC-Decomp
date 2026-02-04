@@ -13,40 +13,34 @@ extern void __init_cpp_exceptions(void);
 extern void __fini_cpp_exceptions(void);
 
 extern void __destroy_global_chain(void);
-extern void __unregister_fragment(int);
-extern int __register_fragment(struct __eti_init_info* info, char* TOC);
+extern void __unregister_fragment();
+extern int __register_fragment(void* info, int TOC);
 
 #ifdef __cplusplus
 }
 #endif
 
-/* 80450AD0-80450AD8 000550 0004+04 2/2 0/0 0/0 .sdata           fragmentID */
-static int fragmentID = -2;
+/* 8032EBF0-8032EBF4 329550 0004+00 2/2 0/0 0/0 .sdata           fragmentID */
+static int DAT_8032ebf0 = -2;
 
-extern void GetR2(char** R2) {
-	register char* temp;
-	asm {
-		mr temp, r2
-	}
-	*R2 = temp;
-}
+extern int GetR2__Fv();
+extern void* PTR_PTR_GetF4__10CChunkFileFv_80012850;
 
-/* 80362870-803628AC 35D1B0 003C+00 1/0 1/0 0/0 .text            __init_cpp_exceptions */
+/* 801B0678-801B06B8 1AB018 0040+00 1/0 1/0 0/0 .text            __init_cpp_exceptions */
 void __init_cpp_exceptions(void) {
-    char* R2;
-
-    if (fragmentID == -2) {
-        GetR2(&R2);
-        fragmentID = __register_fragment(_eti_init_info, R2);
+    int uVar1;
+    
+    if (DAT_8032ebf0 == -2) {
+        uVar1 = GetR2__Fv();
+        DAT_8032ebf0 = __register_fragment((void*)&PTR_PTR_GetF4__10CChunkFileFv_80012850, uVar1);
     }
 }
 
-/* 8036283C-80362870 35D17C 0034+00 1/0 1/0 0/0 .text            __fini_cpp_exceptions */
+/* 801B0644-801B0678 1AAFE4 0034+00 1/0 1/0 0/0 .text            __fini_cpp_exceptions */
 void __fini_cpp_exceptions(void) {
-    char* R2;
-    if (fragmentID != -2) {
-        __unregister_fragment(fragmentID);
-        fragmentID = -2;
+    if (DAT_8032ebf0 != -2) {
+        __unregister_fragment();
+        DAT_8032ebf0 = -2;
     }
 }
 

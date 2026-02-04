@@ -6,7 +6,7 @@
  * PAL Address: TODO
  * PAL Size: TODO
  */
-void randshort(short value, float range)
+extern "C" void randshort(short value, float range)
 {
     // Implementation needed
 }
@@ -16,7 +16,7 @@ void randshort(short value, float range)
  * PAL Address: TODO 
  * PAL Size: TODO
  */
-void randf(unsigned char flag)
+extern "C" void randf(unsigned char flag)
 {
     // Implementation needed  
 }
@@ -26,32 +26,36 @@ void randf(unsigned char flag)
  * PAL Address: 80063e34
  * PAL Size: 736b
  */
-void pppSRandHCV(void* data1, void* data2)
+extern "C" void pppSRandHCV(void* data1, void* data2)
 {
+    // Early exit check using global flag reference
+    extern int lbl_8032ED70;
+    if (lbl_8032ED70 != 0) {
+        return;
+    }
+    
+    // Create math instance for random generation (following existing pattern)
     CMath math;
     
-    // Check global disable flag from assembly reference
-    extern int lbl_8032ED70;
-    if (lbl_8032ED70 != 0) return;
+    // Access data structures with proper types
+    unsigned char* ptr2_bytes = (unsigned char*)data2;
+    float* target = (float*)((char*)data1 + 0x80);
     
-    // Based on assembly analysis - this function generates random HCV values
-    // and applies them to some data structure with conditional behavior
-    float* vec = (float*)((char*)data1 + 0x80);
+    // Flag check at offset 0x10 in second parameter  
+    unsigned char flag = ptr2_bytes[0x10];
     
-    // Generate random values for 4 components (X, Y, Z, W based on assembly offsets)
-    for (int i = 0; i < 4; i++) {
-        math.RandF();
-        
-        // Apply conditional logic based on flag at offset 0x10
-        unsigned char flag = *((unsigned char*)data2 + 0x10);
-        float result;
-        if (flag != 0) {
-            math.RandF();
-            result = 1.0f; // Placeholder - actual value comes from RandF result
-        } else {
-            result = 0.5f; // Based on lbl_803300A0 reference in assembly
-        }
-        
-        vec[i] = result;
+    // Generate random values following GameCube pattern
+    math.RandF(); // Generate first random value
+    float randVal1 = 1.0f; // Placeholder - actual value stored in math state
+    
+    if (flag != 0) {
+        // Path when flag is set - generate second random and combine
+        math.RandF(); 
+        float randVal2 = 0.5f; // Placeholder for second random value
+        *target = randVal1 * randVal2;
+    } else {
+        // Path when flag is clear - use constant reference
+        extern float lbl_803300A0; 
+        *target = randVal1 * lbl_803300A0;
     }
 }

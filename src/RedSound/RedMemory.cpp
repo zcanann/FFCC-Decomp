@@ -21,6 +21,12 @@ extern char s__s_sA_Memory_Bank_Full____s_801e78b5[];
 extern char DAT_801e78a3;
 extern char DAT_80333d20;
 extern char DAT_80333d28;
+extern char DAT_8021d1a8;
+
+// Function declarations
+extern "C" {
+	void fflush(void*);
+}
 
 /*
  * --INFO--
@@ -51,48 +57,53 @@ CRedMemory::~CRedMemory()
  * JP Address: TODO
  * JP Size: TODO
  */
-int RedNew(int size)
+int RedNew(int param_1)
 {
-	if (size <= 0 || !DAT_8032f4a0 || !DAT_8032f490) {
-		return 0;
-	}
+	int *piVar1;
+	unsigned int uVar2;
+	unsigned int uVar3;
+	unsigned int uVar4;
+	int iVar5;
+	int iVar6;
+	int *piVar7;
 	
-	unsigned int alignedSize = (size + 0x1F) & 0xFFFFFFE0;
-	int currentAddr = DAT_8032f490;
-	int* blockPtr = DAT_8032f4a0;
-	
-	unsigned int interrupts = OSDisableInterrupts();
-	
-	while (blockPtr < DAT_8032f4a0 + 0x800) {
-		if (!blockPtr[1] || (int)(currentAddr + alignedSize) <= blockPtr[0]) {
-			if (DAT_8032f4a0[0x7FF] >= 1) {
-				if (DAT_8032f408) {
-					OSReport(s__s_sMemory_Bank_Full____s_801e7888, &DAT_801e78a3, &DAT_80333d20, &DAT_80333d28);
+	if (((0 < param_1) && (DAT_8032f4a0 != (int *)0x0)) && (DAT_8032f490 != 0)) {
+		uVar4 = OSDisableInterrupts();
+		uVar2 = param_1 + 0x1fU & 0xffffffe0;
+		iVar5 = DAT_8032f490;
+		piVar7 = DAT_8032f4a0;
+		do {
+			if ((piVar7[1] == 0) || ((int)(iVar5 + uVar2) <= *piVar7)) {
+				if (DAT_8032f4a0[0x7ff] < 1) {
+					if (iVar5 + uVar2 <= (unsigned int)(DAT_8032f490 + DAT_8032f498)) {
+						if (0 < piVar7[1]) {
+							uVar3 = (int)DAT_8032f4a0 + (0x2000 - (int)(piVar7 + 2));
+							iVar6 = ((int)uVar3 >> 3) + (unsigned int)((int)uVar3 < 0 && (uVar3 & 7) != 0);
+							if (0 < iVar6) {
+								memmove(piVar7 + 2, piVar7, iVar6 * 8);
+							}
+						}
+						*piVar7 = iVar5;
+						piVar7[1] = uVar2;
+						OSRestoreInterrupts(uVar4);
+						return iVar5;
+					}
+				}
+				else {
+					if (DAT_8032f408 != 0) {
+						OSReport(s__s_sMemory_Bank_Full____s_801e7888, &DAT_801e78a3, &DAT_80333d20, &DAT_80333d28);
+						fflush(&DAT_8021d1a8);
+					}
 				}
 				break;
 			}
-			
-			if (currentAddr + alignedSize <= (unsigned int)(DAT_8032f490 + DAT_8032f498)) {
-				if (blockPtr[1] > 0) {
-					unsigned int moveCount = (int)DAT_8032f4a0 + (0x2000 - (int)(blockPtr + 2));
-					int entryCount = ((int)moveCount >> 3) + ((int)moveCount < 0 && (moveCount & 7) != 0);
-					if (entryCount > 0) {
-						memmove(blockPtr + 2, blockPtr, entryCount * 8);
-					}
-				}
-				
-				blockPtr[0] = currentAddr;
-				blockPtr[1] = alignedSize;
-				OSRestoreInterrupts(interrupts);
-				return currentAddr;
-			}
-		}
-		
-		currentAddr = blockPtr[0] + blockPtr[1];
-		blockPtr += 2;
+			iVar5 = *piVar7;
+			piVar1 = piVar7 + 1;
+			piVar7 = piVar7 + 2;
+			iVar5 = iVar5 + *piVar1;
+		} while (piVar7 < DAT_8032f4a0 + 0x800);
+		OSRestoreInterrupts(uVar4);
 	}
-	
-	OSRestoreInterrupts(interrupts);
 	return 0;
 }
 
@@ -141,9 +152,9 @@ void RedDelete(int address)
  * JP Address: TODO
  * JP Size: TODO
  */
-void RedDelete(void* address)
+void RedDelete(unsigned int param_1)
 {
-	RedDelete((int)address);
+	RedDelete((int)param_1);
 }
 
 /*
@@ -286,9 +297,9 @@ void RedDeleteA(int address)
  * JP Address: TODO
  * JP Size: TODO
  */
-void RedDeleteA(void* address)
+void RedDeleteA(unsigned int param_1)
 {
-	RedDeleteA((int)address);
+	RedDeleteA((int)param_1);
 }
 
 /*

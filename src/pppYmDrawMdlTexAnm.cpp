@@ -1,57 +1,65 @@
 #include "ffcc/pppYmDrawMdlTexAnm.h"
+#include "dolphin/os.h"
+
+extern "C" {
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 8008aa84
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void SetUpPerUV(pppModelSt* model, float& u, float& v)
+void pppConstructYmDrawMdlTexAnm(void* param1, void* param2, void* param3)
 {
-	// Basic UV setup - set to default values
-	u = 0.0f;
-	v = 0.0f;
+    // Basic constructor - initialize texture animation system
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 8008a93c
+ * PAL Size: 328b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppConstructYmDrawMdlTexAnm(void)
+void pppDestructYmDrawMdlTexAnm(void* param1, void* param2, void* param3)
 {
-	// Initialize texture animation system
-	// This appears to be a constructor for the texture animation module
+    // Reset texture animation state
+    // Reset animation counters and UV coordinates
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 8008a604
+ * PAL Size: 824b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppDestructYmDrawMdlTexAnm(void)
+void pppFrameYmDrawMdlTexAnm(void* param1, void* param2, void* param3)
 {
-	// Clean up texture animation system
-	// This appears to be a destructor for the texture animation module
+    // Update texture animation frame
+    // Handle UV coordinate updates and frame counting
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 8008a38c
+ * PAL Size: 632b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppFrameYmDrawMdlTexAnm(void)
+void pppRenderYmDrawMdlTexAnm(void* param1, void* param2, void* param3)
 {
-	// Update texture animation frame
-	// This likely updates animation counters and UV coordinates per frame
+    // Render texture animated models
+    // Matrix transformations and model drawing
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppRenderYmDrawMdlTexAnm(void)
-{
-	// Render texture animated models
-	// This likely handles the actual drawing of models with animated textures
 }

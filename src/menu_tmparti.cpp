@@ -35,8 +35,161 @@ void CMenuPcs::TmpArtiInit0()
  */
 unsigned int CMenuPcs::TmpArtiOpen()
 {
-	// Basic initialization logic placeholder
-	return 1;
+	double dVar1;
+	float fVar2;
+	float fVar3;
+	double dVar4;
+	double dVar5;
+	int iVar6;
+	short *psVar7;
+	unsigned int uVar8;
+	unsigned short *puVar9;
+	int iVar10;
+	unsigned int uVar11;
+
+	if (*(char *)(*(int *)((char *)this + 0x82c) + 0xb) == '\0') {
+		memset(*(void **)((char *)this + 0x850), 0, 0x1008);
+		fVar3 = 1.0f;
+		iVar6 = *(int *)((char *)this + 0x850) + 8;
+		iVar10 = 8;
+		do {
+			*(float *)(iVar6 + 0x14) = fVar3;
+			*(float *)(iVar6 + 0x54) = fVar3;
+			*(float *)(iVar6 + 0x94) = fVar3;
+			*(float *)(iVar6 + 0xd4) = fVar3;
+			*(float *)(iVar6 + 0x114) = fVar3;
+			*(float *)(iVar6 + 0x154) = fVar3;
+			*(float *)(iVar6 + 0x194) = fVar3;
+			*(float *)(iVar6 + 0x1d4) = fVar3;
+			dVar5 = 2.0;
+			dVar4 = 4607182418800017408.0;
+			fVar2 = 0.0f;
+			dVar1 = 4602678819172646912.0;
+			iVar6 = iVar6 + 0x200;
+			iVar10 = iVar10 - 1;
+		} while (iVar10 != 0);
+		iVar6 = 0;
+		puVar9 = (unsigned short *)(*(int *)((char *)this + 0x850) + 8);
+		iVar10 = 2;
+		do {
+			*(unsigned int *)(puVar9 + 0xe) = 0x37;
+			puVar9[2] = 200;
+			puVar9[3] = 0x28;
+			*puVar9 = (short)(int)-(((double)((unsigned int)(short)puVar9[2] ^ 0x80000000 | 0x4330000000000000) - dVar4) * dVar1 - dVar5);
+			puVar9[1] = (short)iVar6 * (puVar9[3] + -8) + 0x60;
+			*(float *)(puVar9 + 4) = fVar2;
+			*(float *)(puVar9 + 6) = fVar2;
+			*(int *)(puVar9 + 0x12) = iVar6;
+			*(unsigned int *)(puVar9 + 0x14) = 3;
+			*(unsigned int *)(puVar9 + 0x2e) = 0x37;
+			puVar9[0x22] = 200;
+			puVar9[0x23] = 0x28;
+			puVar9[0x20] = (short)(int)-(((double)((unsigned int)(short)puVar9[0x22] ^ 0x80000000 | 0x4330000000000000) - dVar4) * dVar1 - dVar5);
+			puVar9[0x21] = (short)(iVar6 + 1) * (puVar9[0x23] + -8) + 0x60;
+			*(float *)(puVar9 + 0x24) = fVar2;
+			*(float *)(puVar9 + 0x26) = fVar2;
+			*(int *)(puVar9 + 0x32) = iVar6 + 1;
+			iVar6 = iVar6 + 2;
+			*(unsigned int *)(puVar9 + 0x34) = 3;
+			puVar9 = puVar9 + 0x40;
+			iVar10 = iVar10 - 1;
+		} while (iVar10 != 0);
+		**(unsigned short **)((char *)this + 0x850) = 4;
+		*(unsigned short *)(*(int *)((char *)this + 0x82c) + 0x26) = 0;
+		*(unsigned char *)(*(int *)((char *)this + 0x82c) + 0xb) = 1;
+	}
+	iVar6 = 0;
+	*(short *)(*(int *)((char *)this + 0x82c) + 0x22) = *(short *)(*(int *)((char *)this + 0x82c) + 0x22) + 1;
+	uVar8 = (unsigned int)**(short **)((char *)this + 0x850);
+	psVar7 = *(short **)((char *)this + 0x850) + 4;
+	iVar10 = (int)*(short *)(*(int *)((char *)this + 0x82c) + 0x22);
+	uVar11 = uVar8;
+	if (0 < (int)uVar8) {
+		do {
+			dVar1 = 4607182418800017408.0;
+			if (*(int *)(psVar7 + 0x12) <= iVar10) {
+				if (iVar10 < *(int *)(psVar7 + 0x12) + *(int *)(psVar7 + 0x14)) {
+					*(int *)(psVar7 + 0x10) = *(int *)(psVar7 + 0x10) + 1;
+					*(float *)(psVar7 + 8) = (float)((1.0 / 
+						((double)((unsigned int)*(unsigned int *)(psVar7 + 0x14) ^ 0x80000000 | 0x4330000000000000) - dVar1)) *
+						((double)((unsigned int)*(unsigned int *)(psVar7 + 0x10) ^ 0x80000000 | 0x4330000000000000) - dVar1));
+				} else {
+					iVar6 = iVar6 + 1;
+					*(float *)(psVar7 + 8) = 1.0f;
+				}
+			}
+			psVar7 = psVar7 + 0x20;
+			uVar11 = uVar11 - 1;
+		} while (uVar11 != 0);
+	}
+	fVar3 = 1.0f;
+	if (**(short **)((char *)this + 0x850) == iVar6) {
+		psVar7 = *(short **)((char *)this + 0x850) + 4;
+		if (0 < (int)uVar8) {
+			uVar11 = uVar8 >> 3;
+			if (uVar11 != 0) {
+				do {
+					psVar7[0x12] = 0;
+					psVar7[0x13] = 0;
+					psVar7[0x14] = 0;
+					psVar7[0x15] = 1;
+					*(float *)(psVar7 + 8) = fVar3;
+					psVar7[0x32] = 0;
+					psVar7[0x33] = 0;
+					psVar7[0x34] = 0;
+					psVar7[0x35] = 1;
+					*(float *)(psVar7 + 0x28) = fVar3;
+					psVar7[0x52] = 0;
+					psVar7[0x53] = 0;
+					psVar7[0x54] = 0;
+					psVar7[0x55] = 1;
+					*(float *)(psVar7 + 0x48) = fVar3;
+					psVar7[0x72] = 0;
+					psVar7[0x73] = 0;
+					psVar7[0x74] = 0;
+					psVar7[0x75] = 1;
+					*(float *)(psVar7 + 0x68) = fVar3;
+					psVar7[0x92] = 0;
+					psVar7[0x93] = 0;
+					psVar7[0x94] = 0;
+					psVar7[0x95] = 1;
+					*(float *)(psVar7 + 0x88) = fVar3;
+					psVar7[0xb2] = 0;
+					psVar7[0xb3] = 0;
+					psVar7[0xb4] = 0;
+					psVar7[0xb5] = 1;
+					*(float *)(psVar7 + 0xa8) = fVar3;
+					psVar7[0xd2] = 0;
+					psVar7[0xd3] = 0;
+					psVar7[0xd4] = 0;
+					psVar7[0xd5] = 1;
+					*(float *)(psVar7 + 200) = fVar3;
+					psVar7[0xf2] = 0;
+					psVar7[0xf3] = 0;
+					psVar7[0xf4] = 0;
+					psVar7[0xf5] = 1;
+					*(float *)(psVar7 + 0xe8) = fVar3;
+					psVar7 = psVar7 + 0x100;
+					uVar11 = uVar11 - 1;
+				} while (uVar11 != 0);
+				uVar8 = uVar8 & 7;
+				if (uVar8 == 0) {
+					return 1;
+				}
+			}
+			do {
+				psVar7[0x12] = 0;
+				psVar7[0x13] = 0;
+				psVar7[0x14] = 0;
+				psVar7[0x15] = 1;
+				*(float *)(psVar7 + 8) = fVar3;
+				psVar7 = psVar7 + 0x20;
+				uVar8 = uVar8 - 1;
+			} while (uVar8 != 0);
+		}
+		return 1;
+	}
+	return 0;
 }
 
 /*
@@ -56,12 +209,123 @@ void CMenuPcs::TmpArtiCtrl()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015dbb8
+ * PAL Size: 428b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::TmpArtiClose()
+unsigned int CMenuPcs::TmpArtiClose()
 {
-	// TODO
+	float fVar1;
+	double dVar2;
+	double dVar3;
+	short *psVar4;
+	int iVar5;
+	unsigned int uVar6;
+	int iVar7;
+	unsigned int uVar8;
+	
+	iVar5 = 0;
+	*(short *)(*(int *)((char *)this + 0x82c) + 0x22) = *(short *)(*(int *)((char *)this + 0x82c) + 0x22) + 1;
+	uVar6 = (unsigned int)**(short **)((char *)this + 0x850);
+	psVar4 = *(short **)((char *)this + 0x850) + 4;
+	iVar7 = (int)*(short *)(*(int *)((char *)this + 0x82c) + 0x22);
+	uVar8 = uVar6;
+	
+	if (0 < (int)uVar6) {
+		do {
+			dVar2 = 4607182418800017408.0; // DOUBLE_80332f40
+			if (*(int *)(psVar4 + 0x12) <= iVar7) {
+				if (iVar7 < *(int *)(psVar4 + 0x12) + *(int *)(psVar4 + 0x14)) {
+					*(int *)(psVar4 + 0x10) = *(int *)(psVar4 + 0x10) + 1;
+					dVar3 = 4611686018427387904.0; // DOUBLE_80332f50
+					*(float *)(psVar4 + 8) = (float)-((1.0 /
+						((double)((unsigned int)*(unsigned int *)(psVar4 + 0x14) ^ 0x80000000 | 0x4330000000000000) - dVar2)) * 
+						((double)((unsigned int)*(unsigned int *)(psVar4 + 0x10) ^ 0x80000000 | 0x4330000000000000) - dVar2) - 1.0);
+					if ((double)*(float *)(psVar4 + 8) < dVar3) {
+						*(float *)(psVar4 + 8) = 0.0f;
+					}
+				}
+				else {
+					iVar5 = iVar5 + 1;
+					*(float *)(psVar4 + 8) = 0.0f;
+				}
+			}
+			psVar4 = psVar4 + 0x20;
+			uVar8 = uVar8 - 1;
+		} while (uVar8 != 0);
+	}
+	
+	fVar1 = 0.0f;
+	if (**(short **)((char *)this + 0x850) == iVar5) {
+		psVar4 = *(short **)((char *)this + 0x850) + 4;
+		if (0 < (int)uVar6) {
+			uVar8 = uVar6 >> 3;
+			if (uVar8 != 0) {
+				do {
+					psVar4[0x12] = 0;
+					psVar4[0x13] = 0;
+					psVar4[0x14] = 0;
+					psVar4[0x15] = 1;
+					*(float *)(psVar4 + 8) = fVar1;
+					psVar4[0x32] = 0;
+					psVar4[0x33] = 0;
+					psVar4[0x34] = 0;
+					psVar4[0x35] = 1;
+					*(float *)(psVar4 + 0x28) = fVar1;
+					psVar4[0x52] = 0;
+					psVar4[0x53] = 0;
+					psVar4[0x54] = 0;
+					psVar4[0x55] = 1;
+					*(float *)(psVar4 + 0x48) = fVar1;
+					psVar4[0x72] = 0;
+					psVar4[0x73] = 0;
+					psVar4[0x74] = 0;
+					psVar4[0x75] = 1;
+					*(float *)(psVar4 + 0x68) = fVar1;
+					psVar4[0x92] = 0;
+					psVar4[0x93] = 0;
+					psVar4[0x94] = 0;
+					psVar4[0x95] = 1;
+					*(float *)(psVar4 + 0x88) = fVar1;
+					psVar4[0xb2] = 0;
+					psVar4[0xb3] = 0;
+					psVar4[0xb4] = 0;
+					psVar4[0xb5] = 1;
+					*(float *)(psVar4 + 0xa8) = fVar1;
+					psVar4[0xd2] = 0;
+					psVar4[0xd3] = 0;
+					psVar4[0xd4] = 0;
+					psVar4[0xd5] = 1;
+					*(float *)(psVar4 + 200) = fVar1;
+					psVar4[0xf2] = 0;
+					psVar4[0xf3] = 0;
+					psVar4[0xf4] = 0;
+					psVar4[0xf5] = 1;
+					*(float *)(psVar4 + 0xe8) = fVar1;
+					psVar4 = psVar4 + 0x100;
+					uVar8 = uVar8 - 1;
+				} while (uVar8 != 0);
+				uVar6 = uVar6 & 7;
+				if (uVar6 == 0) {
+					return 1;
+				}
+			}
+			do {
+				psVar4[0x12] = 0;
+				psVar4[0x13] = 0;
+				psVar4[0x14] = 0;
+				psVar4[0x15] = 1;
+				*(float *)(psVar4 + 8) = fVar1;
+				psVar4 = psVar4 + 0x20;
+				uVar6 = uVar6 - 1;
+			} while (uVar6 != 0);
+		}
+		return 1;
+	}
+	return 0;
 }
 
 /*

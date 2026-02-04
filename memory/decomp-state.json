@@ -1,0 +1,31 @@
+{
+  "lastAutomationSession": {
+    "timestamp": "2026-02-03T20:17:00-08:00",
+    "target": "main/axfx/reverb_hi_4ch",
+    "gap": "19.5%",
+    "functions": ["AXFXReverbHiShutdownDpl2", "ReverbHICreateDpl2", "AXFXReverbHiSettingsDpl2"],
+    "status": "SUCCESS",
+    "improvements": {
+      "AXFXReverbHiShutdownDpl2": "13.7% -> ~100% (532b function now matching)"
+    },
+    "totalImprovement": "+532 bytes matched, +1 function",
+    "unitImprovement": "SDK Code: 55.99% -> 56.19% (+0.2%)",
+    "technique": "Direct Ghidra decompilation conversion - replaced ReverbHIDpl2Free with individual __AXFXFree calls",
+    "prUrl": "https://github.com/zcanann/FFCC-Decomp/pull/new/pr/axfx/reverb_hi_4ch",
+    "timeSpent": "~25 minutes"
+  },
+  "previousSession": {
+    "timestamp": "2026-02-03T20:09:00-08:00",
+    "target": "main/__init_cpp_exceptions",
+    "gap": "100.0%",
+    "functions": ["__init_cpp_exceptions", "__fini_cpp_exceptions"],
+    "result": "IMPLEMENTED",
+    "improvements": {
+      "__init_cpp_exceptions": "0.0% -> IMPLEMENTED (Ghidra-based)",
+      "__fini_cpp_exceptions": "0.0% -> IMPLEMENTED (Ghidra-based)"
+    },
+    "totalImprovement": "Complete implementation from Ghidra decomp",
+    "unitImprovement": "0% -> (pending build verification)",
+    "technique": "Direct Ghidra decompilation conversion with signature fixes"
+  }
+}

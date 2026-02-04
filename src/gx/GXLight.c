@@ -225,9 +225,7 @@ void GXGetLightDir(const GXLightObj* lt_obj, f32* nx, f32* ny, f32* nz) {
 
 void GXInitSpecularDir(GXLightObj* lt_obj, f32 nx, f32 ny, f32 nz) {
     f32 mag;
-    f32 vx;
-    f32 vy;
-    f32 vz;
+    f32 vx, vy, vz;
     __GXLightObjInt_struct* obj;
 
     ASSERTMSGLINE(398, lt_obj != NULL, "Light Object Pointer is null");
@@ -236,9 +234,9 @@ void GXInitSpecularDir(GXLightObj* lt_obj, f32 nx, f32 ny, f32 nz) {
 
     vx = -nx;
     vy = -ny;
-    vz = -nz + 1.0f;
+    vz = 1.0f - nz;
 
-    mag = (vx * vx) + (vy * vy) + (vz * vz);
+    mag = vx * vx + vy * vy + vz * vz;
     if (mag != 0.0f) {
         mag = 1.0f / sqrtf(mag);
     }
@@ -246,9 +244,9 @@ void GXInitSpecularDir(GXLightObj* lt_obj, f32 nx, f32 ny, f32 nz) {
     obj->ldir[0] = vx * mag;
     obj->ldir[1] = vy * mag;
     obj->ldir[2] = vz * mag;
-    obj->lpos[0] = nx * -1000000000000000000.0f;
-    obj->lpos[1] = ny * -1000000000000000000.0f;
-    obj->lpos[2] = nz * -1000000000000000000.0f;
+    obj->lpos[0] = -1000000000000000000.0f * nx;
+    obj->lpos[1] = -1000000000000000000.0f * ny;
+    obj->lpos[2] = -1000000000000000000.0f * nz;
 }
 
 void GXInitSpecularDirHA(GXLightObj* lt_obj, f32 nx, f32 ny, f32 nz, f32 hx, f32 hy, f32 hz) {
@@ -526,7 +524,7 @@ void GXSetNumChans(u8 nChans) {
     ASSERTMSGLINE(858, nChans <= 2, "GXSetNumChans: nChans > 2");
 
     SET_REG_FIELD(860, __GXData->genMode, 3, 4, nChans);
-    GX_WRITE_XF_REG(9, nChans);
+    GX_WRITE_XF_REG(9, nChans & 0xFF);
     __GXData->dirtyState |= 4;
 }
 
@@ -546,17 +544,21 @@ void GXSetChanCtrl(GXChannelID chan, GXBool enable, GXColorSrc amb_src, GXColorS
     else
         idx = chan;
 #else
-    idx = chan & 0x3;
+    idx = chan & 3;
 #endif
 
     reg = 0;
-    SET_REG_FIELD(907, reg, 1, 1, enable);
-    SET_REG_FIELD(908, reg, 1, 0, mat_src);
+    SET_REG_FIELD(907, reg, 1, 1, enable & 0xFF);
+    SET_REG_FIELD(908, reg, 1, 0, mat_src & 0xFF);
     SET_REG_FIELD(909, reg, 1, 6, amb_src);
     
-    SET_REG_FIELD(911, reg, 2, 7, (attn_fn == 0) ? 0 : diff_fn);
-    SET_REG_FIELD(912, reg, 1, 9, (attn_fn != 2));
-    SET_REG_FIELD(913, reg, 1, 10, (attn_fn != 0));
+    if (attn_fn == 0) {
+        SET_REG_FIELD(911, reg, 2, 7, 0);
+    } else {
+        SET_REG_FIELD(911, reg, 2, 7, diff_fn);
+    }
+    SET_REG_FIELD(912, reg, 1, 9, (attn_fn != 2) ? 1 : 0);
+    SET_REG_FIELD(913, reg, 1, 10, (attn_fn != 0) ? 1 : 0);
 
     SET_REG_FIELD(925, reg, 4, 2, light_mask & 0xF);
     SET_REG_FIELD(926, reg, 4, 11, (light_mask >> 4) & 0xF);

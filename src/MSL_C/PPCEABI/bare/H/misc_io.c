@@ -4,3 +4,8 @@
 void __stdio_atexit(void) {
     __stdio_exit = __close_all;
 }
+
+void clearerr(FILE* stream) {
+    stream->file_state.eof = 0;
+    stream->file_state.error = 0;
+}

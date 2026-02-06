@@ -3,6 +3,14 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/file_io.h"
 #include <string.h>
 
+extern int __position_file(__file_handle file, fpos_t* position, int mode,
+                           __idle_proc idle_proc);
+extern int __read_file(__file_handle file, unsigned char* buff, size_t* count,
+                       __idle_proc idle_proc);
+extern int __write_file(__file_handle file, unsigned char* buff, size_t* count,
+                        __idle_proc idle_proc);
+extern int __close_file(__file_handle file);
+
 static unsigned char stdin_buff[0x100];
 static unsigned char stdout_buff[0x100];
 static unsigned char stderr_buff[0x100];
@@ -118,10 +126,19 @@ unsigned int __flush_all() {
     return retval;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801b2f44
+ * PAL Size: 144b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 FILE* __find_unopened_file(void) {
     FILE* file = &__files[0];
     FILE* prev = NULL;
-    
+
     while (file != NULL) {
         if (file->file_mode.file_kind == __closed_file) {
             return file;
@@ -129,69 +146,95 @@ FILE* __find_unopened_file(void) {
         prev = file;
         file = file->next_file_struct;
     }
-    
-    // Allocate new file structure
-    file = (FILE*)malloc(sizeof(FILE));
+
+    file = (FILE*)malloc(0x50);
     if (file == NULL) {
         return NULL;
     }
-    
-    memset(file, 0, sizeof(FILE));
+
+    memset(file, 0, 0x50);
     file->is_dynamically_allocated = 1;
-    
-    if (prev != NULL) {
-        prev->next_file_struct = file;
-    }
-    
+
+    prev->next_file_struct = file;
+
     return file;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801b2e68
+ * PAL Size: 220b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void __init_file(FILE* file, file_modes mode, unsigned char* buffer, int buffer_size) {
+    unsigned char* state_bytes;
+    unsigned short mode_bits;
+
     file->handle = 0;
     file->file_mode = mode;
-    
-    // Clear file state flags
-    file->file_state.io_state = __neutral;
-    file->file_state.free_buffer = 0;
-    file->file_state.eof = 0;
-    file->file_state.error = 0;
-    
-    file->buffer_length = 0;
-    
+
+    state_bytes = (unsigned char*)&file->file_state;
+    state_bytes[0] &= 0x1f;
+    state_bytes[0] &= 0xef;
+    state_bytes[1] = 0;
+    state_bytes[2] = 0;
+
+    file->position = 0;
+
     if (buffer_size == 0) {
         setvbuf(file, NULL, _IONBF, 0);
     } else {
         setvbuf(file, (char*)buffer, _IOFBF, buffer_size);
     }
-    
+
     file->buffer_ptr = file->buffer;
-    file->buffer_position = 0;
-    
-    // Set I/O function pointers for disk files
-    if (file->file_mode.file_kind == __disk_file) {
-        file->position_fn = NULL;
-        file->read_fn = NULL;
-        file->write_fn = NULL;
-        file->close_fn = NULL;
+    file->buffer_length = 0;
+
+    mode_bits = *(unsigned short*)((unsigned char*)file + 4);
+    if (((mode_bits >> 6) & 7) == __disk_file) {
+        file->position_fn = __position_file;
+        file->read_fn = __read_file;
+        file->write_fn = __write_file;
+        file->close_fn = __close_file;
     }
-    
+
     file->idle_fn = NULL;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801b2cc4
+ * PAL Size: 140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 int __flush_line_buffered_output_files(void) {
     FILE* file = &__files[0];
     int result = 0;
-    
-    while (file != NULL) {
-        if (file->file_mode.file_kind != __closed_file && 
-            file->file_mode.io_mode != __read &&
-            file->file_mode.buffer_mode == _IOLBF) {
+    unsigned char* file_bytes;
+    unsigned short mode_bits;
+
+    while (1) {
+        if (file == NULL) {
+            break;
+        }
+
+        file_bytes = (unsigned char*)file;
+        mode_bits = *(unsigned short*)(file_bytes + 4);
+        if ((((mode_bits >> 6) & 7) != 0) && (((file_bytes[4] >> 1) & 1) != 0) &&
+            ((file_bytes[8] >> 5) == 1)) {
             if (fflush(file) != 0) {
                 result = -1;
             }
         }
+
         file = file->next_file_struct;
     }
-    
+
     return result;
 }

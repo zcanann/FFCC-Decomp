@@ -5,7 +5,7 @@ This file is the canonical, step-by-step runbook for automated contributions to 
 Goal: improve match scores by editing C/C++ source, rebuilding, diffing, and submitting clean PRs when progress is real.
 
 ## Ghidra Decompilation Reference
-⚠️ Do not fully trust Ghidra for anything other than address and sizes. The existing decomp is based off of a snapshot and guesswork. The function names however are 99% accurate and were reconstructed from Metrowerks build symbol files.
+WARNING: Do not fully trust Ghidra for anything other than address and sizes. The existing decomp is based off of a snapshot and guesswork. The function names however are 99% accurate and were reconstructed from Metrowerks build symbol files.
 
 In other words, function parameters can be wrong in Ghidra, unless there is Metrowerks mangling in the function name to indicate the true parameters.
 
@@ -33,10 +33,10 @@ Symbol files are helpful for determining:
 - Function arguments and parameters
 - Global variables (especially .bss section data)
 - Function relationships and dependencies
-To avoid loading massive MAP files (1-3MB), use the symbol extraction script:
-- **Complete object analysis**: `python3 tools/extract_symbols.py <object>.o`
+To avoid loading massive MAP files (1-3MB), use the symbol extraction script when you need a deeper dive.
+NOTE: `tools/agent_select_target.py` already includes symbol summaries for each random target, so this step is optional.
 
-**🚀 Example usage:**
+**Example usage (manual, optional):**
 ```sh
 python3 tools/extract_symbols.py ME_USB_process.o     # Everything for this object file
 python3 tools/extract_symbols.py chunkfile.o          # All functions, globals, sections
@@ -65,7 +65,7 @@ When updating functions, include version-specific address and size information:
 
 **Important for near matches** `configure.py` has several build flags which can influence binary output. This is just as important to code matching as the code itself! The exact compiler version and flags for each module is not known yet. For this reason, high matches like 97% are sometimes acceptable and not worth dealing with because it could be build system related.
 
-**Key relationships:** Unit → Object file → Source file. Use symbols for context, Ghidra decomp for low match score functions.
+**Key relationships:** Unit -> Object file -> Source file. Use symbols for context, Ghidra decomp for low match score functions.
 
 ## State Tracking & Memory
 
@@ -135,40 +135,28 @@ tools/objdiff-cli --version  # Should show v3.6.1+
 This is likely the starting point for the agent.
 
 ### Step 1 - Select Target & Gather Context (automated)
-**Complete target selection and context gathering in 3 steps:**
+Run the selector once. It prints several random viable targets with symbol summaries.
 
 ```sh
-# 1. Pick a target unit
 python3 tools/agent_select_target.py
 ```
 
-**Example output:**
+**Example output (abridged):**
 ```
-SELECTED TARGET:
-Unit: main/pppMove
-Gap: 100.0% (current: 0.0%)
-Source: src/pppMove.cpp
-Functions: 0/2
-Target functions:
-  - pppMoveCon (0.0% match, 36b)
-  - pppMove (0.0% match, 156b)
-```
-
-```sh
-# 2. Get comprehensive symbol information
-python3 tools/extract_symbols.py pppMove.o
+RANDOM TARGETS:
+ 1. Unit: main/pppMove (gap: 100.0%, current: 0.0%)
+    Source: src/pppMove.cpp
+    Object: pppMove.o
+    Functions: 0/2 (0.0%)
+    Targets:
+      - pppMoveCon (0.0% match, 36b)
+      - pppMove (0.0% match, 156b)
+    PAL symbols: 2 funcs, 0 globals (showing up to 5 funcs)
+      - pppMoveCon (0x24b at 80065b18)
+      - pppMove (0x9cb at 80065b3c)
 ```
 
-**Example output:**
-```
-📦 PAL Comprehensive Analysis (pppMove.o):
-  ⚡ Functions (2):
-     1. pppMoveCon (36b at 80065b18)
-     2. pppMove (156b at 80065b3c)
-  📊 Summary: 2 functions, 0 globals
-```
-
-⚠️ If the function parameters do not match, the match score cannot be improved beyond 0%! This is very common for ppp* functions as mentioned earlier, which may need C linkage or some other remedy to prevent Metrowerks mangled names (thus allowing objdiff to match these).
+WARNING: If the function parameters do not match, the match score cannot be improved beyond 0%! This is very common for ppp* functions as mentioned earlier, which may need C linkage or some other remedy to prevent Metrowerks mangled names (thus allowing objdiff to match these).
 
 DO NOT TRUST GHIDRA BEYOND GETTING A FEEL FOR THE FUNCTION. GHIDRA IS A GUIDELINE. OBJDIFF IS THE REAL SOURCE OF TRUTH FOR HOW CLOSE WE ARE.
 
@@ -203,7 +191,7 @@ Reject/avoid changes that look like "compiler coaxing," e.g.:
 - contrived temporaries and reordering that a human wouldn't naturally write
 - intentionally odd sequencing unless there's strong evidence
 - changes that preserve output but reduce readability without a clear original-source rationale
-- **explanatory comments that add no real information** (e.g., "Plausible original behavior: …")
+- **explanatory comments that add no real information** (e.g., "Plausible original behavior: ...")
 
 Prefer changes that are source-plausible:
 - fixing signedness / types to match ABI expectations
@@ -229,38 +217,38 @@ For initial stabs at large functions, hacky function bodies are permissable.
 
 ---
 
-## 🚨 Critical Automation Rules
+## Critical Automation Rules
 
 **Follow these rules to avoid contaminated PRs and cleanup work:**
 
-### 🌿 Branch Management - ALWAYS FROM MAIN!
+### Branch Management - ALWAYS FROM MAIN!
 - **ALWAYS branch from `main`**, never from existing PRs
 - Before creating new branch: `git checkout main && git pull origin main`
 - Branch naming: `pr/unit_name` (e.g., `pr/main_pppMove`)
 - **Why this matters**: Branching from PRs creates dependency chains that contaminate later PRs with unmerged changes
 
-### 📝 Memory Location - AGENT WORKSPACE ONLY!
+### Memory Location - AGENT WORKSPACE ONLY!
 - **NEVER write notes/memories to the project directory** (`Documents/projects/FFCC-Decomp/`)
 - **ALWAYS write to agent workspace**: `~/.openclaw/workspace/memory/`
-- Project work notes → `memory/YYYY-MM-DD.md` or `memory/ffcc-decomp-notes.md`
-- State tracking → `memory/decomp-state.json`
+- Project work notes -> `memory/YYYY-MM-DD.md` or `memory/ffcc-decomp-notes.md`
+- State tracking -> `memory/decomp-state.json`
 - **Why this matters**: Project directory is for source code only, not agent notes
 
-### 🧹 Code Quality - Clean Source Only!
+### Code Quality - Clean Source Only!
 - **NO junk comments** in submitted code (no original assembly, no debug notes)
 - **NO commented-out code** unless specifically needed
 - Code should look like **plausible original source** that a game developer would write, unless making an early attempt at a complex function
 - **Why this matters**: PRs should contain production-quality code, not analysis artifacts
 
-### ✅ Pre-Submit Checklist
+### Pre-Submit Checklist
 Before creating any FFCC-Decomp PR:
-1. ✅ Branched from clean `main`?
-2. ✅ All notes written to agent workspace (not project directory)?  
-3. ✅ Code is clean (no assembly comments, debug prints, etc.)?
-4. ✅ Real improvement achieved (size match or functionality)?
-5. ✅ Build passes with `ninja`?
+1. Branched from clean `main`?
+2. All notes written to agent workspace (not project directory)?  
+3. Code is clean (no assembly comments, debug prints, etc.)?
+4. Real improvement achieved (size match or functionality)?
+5. Build passes with `ninja`?
 
-### 🚨 If You Break These Rules
+### If You Break These Rules
 - **Stop immediately** and fix the issues
 - Clean up the branch/PR before continuing
 - Update your automation scripts to prevent recurrence
@@ -272,8 +260,8 @@ Before creating any FFCC-Decomp PR:
 
 ## Automation workflow
 
-1. **Select target**: `python3 agent_select_target.py`
-2. **Extract symbols**: `python3 extract_symbols.py <object>.o`  
+1. **Select target**: `python3 tools/agent_select_target.py`
+2. **Symbols are included** in the selector output (manual extract is optional)  
 3. **Create branch from clean main**: `git checkout main && git pull origin main && git checkout -b pr/<unit>`
 4. **Update state files** (in agent workspace, not project directory)
 5. **Edit source** (use Ghidra decomp for low-match functions)
@@ -294,3 +282,6 @@ You haven't synced the original files into `orig/GCCP01/`.
 
 ### Endpoint gotcha (Moltbook-style)
 Not applicable here.
+
+
+

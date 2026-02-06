@@ -9,6 +9,8 @@ import sys
 import random
 from pathlib import Path
 
+import extract_symbols
+
 def load_blacklist():
     """Load recently failed units to avoid"""
     state_file = Path.home() / ".openclaw/workspace/memory/decomp-state.json"
@@ -46,6 +48,48 @@ def is_viable_target(unit, blacklist):
         return False, "already perfect"
     
     return True, "viable"
+
+def derive_object_file(unit):
+    source_path = unit.get("metadata", {}).get("source_path")
+    if source_path and source_path != "unknown":
+        base = Path(source_path).stem
+        return f"{base}.o"
+    name = unit.get("name", "")
+    base = Path(name).name
+    return f"{base}.o"
+
+def derive_source_file(unit):
+    source_path = unit.get("metadata", {}).get("source_path")
+    if source_path and source_path != "unknown":
+        return Path(source_path).name
+    name = unit.get("name", "")
+    base = Path(name).name
+    return f"{base}.cpp"
+
+def summarize_symbols(label, all_info):
+    if not all_info or "error" in all_info:
+        err = all_info.get("error") if isinstance(all_info, dict) else "unknown error"
+        return [f"  {label}: error: {err}"]
+
+    lines = []
+    functions = all_info.get("functions", [])
+    globals_data = all_info.get("globals", [])
+    lines.append(f"  {label}: {len(functions)} funcs, {len(globals_data)} globals (showing up to 5 funcs)")
+    for func in functions[:5]:
+        p = func.get("parsed", {})
+        symbol = p.get("symbol", "unknown")
+        size_raw = p.get("size", "unknown")
+        addr = p.get("virtual_addr", "unknown")
+        if size_raw not in ["unknown", "UNUSED"]:
+            try:
+                size_val = int(size_raw, 16)
+                size = f"0x{size_val:x}"
+            except ValueError:
+                size = size_raw
+        else:
+            size = size_raw
+        lines.append(f"    - {symbol} ({size}b at {addr})")
+    return lines
 
 def extract_targets(report_path, max_targets=10):
     """Extract viable targets from report.json"""
@@ -114,46 +158,52 @@ def select_target(candidates):
     return selected
 
 def main():
-    report_path = Path(__file__).parent.parent / "build/GCCP01/report.json"
+    repo_root = Path(__file__).resolve().parent.parent
+    report_path = repo_root / "build/GCCP01/report.json"
+    pal_map = repo_root / "orig/GCCP01/game.MAP"
+    en_map = repo_root / "orig/GCCE01/game.MAP"
     
     if not report_path.exists():
         print(f"ERROR: {report_path} not found. Run 'ninja' first.")
         return 1
     
     if len(sys.argv) > 1 and sys.argv[1] == "--list":
-        # List mode: show top candidates
-        candidates = extract_targets(report_path, max_targets=15)
-        print("Top target candidates:")
-        print("=" * 60)
-        for i, c in enumerate(candidates, 1):
-            print(f"{i:2}. {c['name']} (gap: {c['gap']:.1f}%)")
-            print(f"    Source: {c['source_path']}")
-            print(f"    Functions: {c['matched_functions']}/{c['total_functions']} ({c['func_match_percent']:.1f}%)")
-            if c['top_functions']:
-                print(f"    Targets: {', '.join(f['name'] for f in c['top_functions'][:2])}")
-            print()
-        return 0
-    
-    # Selection mode: pick one target
-    candidates = extract_targets(report_path, max_targets=20)
+        max_targets = 20
+    else:
+        max_targets = 10
+
+    candidates = extract_targets(report_path, max_targets=max_targets)
     
     if not candidates:
         print("No viable targets found.")
         return 1
-    
-    selected = select_target(candidates)
-    
-    print("SELECTED TARGET:")
-    print(f"Unit: {selected['name']}")
-    print(f"Gap: {selected['gap']:.1f}% (current: {selected['fuzzy_match']:.1f}%)")
-    print(f"Source: {selected['source_path']}")
-    print(f"Functions: {selected['matched_functions']}/{selected['total_functions']}")
-    
-    if selected['top_functions']:
-        print("Target functions:")
-        for func in selected['top_functions']:
-            print(f"  - {func['name']} ({func['match']:.1f}% match, {func['size']}b)")
-    
+
+    print("RANDOM TARGETS:")
+    print("=" * 70)
+    for i, c in enumerate(candidates, 1):
+        unit_info = {"name": c["name"], "metadata": {"source_path": c["source_path"]}}
+        obj_file = derive_object_file(unit_info)
+        src_file = derive_source_file(unit_info)
+        print(f"{i:2}. Unit: {c['name']} (gap: {c['gap']:.1f}%, current: {c['fuzzy_match']:.1f}%)")
+        print(f"    Source: {c['source_path']}")
+        print(f"    Object: {obj_file}")
+        print(f"    Source file: {src_file}")
+        print(f"    Functions: {c['matched_functions']}/{c['total_functions']} ({c['func_match_percent']:.1f}%)")
+        if c["top_functions"]:
+            print("    Targets:")
+            for func in c["top_functions"]:
+                print(f"      - {func['name']} ({func['match']:.1f}% match, {func['size']}b)")
+
+        if pal_map.exists():
+            pal_info = extract_symbols.extract_all_for_module(pal_map, object_file=obj_file, source_file=src_file)
+            for line in summarize_symbols("PAL symbols", pal_info):
+                print(line)
+        if en_map.exists():
+            en_info = extract_symbols.extract_all_for_module(en_map, object_file=obj_file, source_file=src_file)
+            for line in summarize_symbols("EN symbols", en_info):
+                print(line)
+        print()
+
     return 0
 
 if __name__ == "__main__":

@@ -8,6 +8,8 @@ import re
 import sys
 from pathlib import Path
 
+EN_FOUND_IN_RE = re.compile(r"^\s*\d+\]\s*(.+?)\s*\(([^)]+)\)\s+found in\s+(.+)$")
+
 def extract_symbols_for_function(map_file, function_name):
     """Extract symbol information for a specific function"""
     results = []
@@ -184,8 +186,102 @@ def extract_globals_for_file(map_file, object_file):
     
     return results
 
+def _parse_en_found_in(line_stripped):
+    match = EN_FOUND_IN_RE.match(line_stripped)
+    if not match:
+        return None
+    symbol_name = match.group(1).strip()
+    type_info = match.group(2).strip()
+    object_file = match.group(3).strip()
+    return {
+        'flag': 'EN',
+        'offset': 'unknown',
+        'size': 'unknown',
+        'virtual_addr': 'unknown',
+        'type_flag': type_info,
+        'symbol': symbol_name,
+        'object_file': object_file
+    }
+
+def _parse_pal_line(line_stripped):
+    # PAL format: "flag offset size addr type symbol [object info]"
+    if line_stripped.startswith('UNUSED'):
+        parts = line_stripped.split()
+        if len(parts) >= 5:
+            size = parts[1]
+            symbol = parts[3] if len(parts) > 3 else 'unnamed'
+            object_info = ' '.join(parts[4:]) if len(parts) > 4 else ''
+            return {
+                'flag': 'UNUSED',
+                'offset': 'UNUSED',
+                'size': size,
+                'virtual_addr': 'UNUSED',
+                'type_flag': 'UNUSED',
+                'symbol': symbol,
+                'object_file': object_info
+            }
+        return None
+
+    if 'UNUSED' in line_stripped and len(line_stripped.split()) >= 6:
+        parts = line_stripped.split()
+        flag = parts[0]
+        size = parts[2]
+        symbol = parts[4] if len(parts) > 4 else 'unnamed'
+        object_info = ' '.join(parts[5:]) if len(parts) > 5 else ''
+        return {
+            'flag': flag,
+            'offset': 'UNUSED',
+            'size': size,
+            'virtual_addr': 'UNUSED',
+            'type_flag': 'UNUSED',
+            'symbol': symbol,
+            'object_file': object_info
+        }
+
+    parts = line_stripped.split()
+    if len(parts) >= 6:
+        flag = parts[0]
+        offset = parts[1]
+        size = parts[2]
+        virtual_addr = parts[3]
+        type_flag = parts[4]
+        symbol = parts[5]
+        object_info = ' '.join(parts[6:]) if len(parts) > 6 else ''
+        return {
+            'flag': flag,
+            'offset': offset,
+            'size': size,
+            'virtual_addr': virtual_addr,
+            'type_flag': type_flag,
+            'symbol': symbol,
+            'object_file': object_info
+        }
+
+    return None
+
+def _categorize_entry(entry, functions, globals_data, sections):
+    if not entry:
+        return
+    flag = entry.get('flag', '')
+    type_flag = entry.get('type_flag', '')
+    symbol = entry.get('symbol', '')
+
+    if (flag == 'G' and (type_flag == '4' or type_flag == 'UNUSED')) or 'func' in type_flag:
+        functions.append({'parsed': entry})
+    elif flag == 'UNUSED' or \
+         (type_flag == '4' and flag != 'G') or \
+         type_flag in ['.data', '.bss', '.sdata', '.sbss'] or \
+         'object' in type_flag or \
+         symbol.startswith('__RTTI__') or \
+         ('$' in symbol and not symbol.startswith('.')):
+        globals_data.append({'parsed': entry})
+    elif symbol in ['.data', '.bss', '.sdata', '.sbss', '.text'] or type_flag == '1':
+        sections.append({'parsed': entry})
+    else:
+        sections.append({'parsed': entry})
+
 def extract_all_for_object(map_file, object_file):
-    """Extract comprehensive information for a specific object file"""
+    """Extract comprehensive information for a specific object file (strict match)."""
     functions = []
     globals_data = []
     sections = []
@@ -195,141 +291,16 @@ def extract_all_for_object(map_file, object_file):
             for line_num, line in enumerate(f, 1):
                 line_stripped = line.strip()
                 
-                # Look for lines that reference our object file (both PAL and EN formats)
                 if (line_stripped.endswith(f"\t{object_file}") or 
                     line_stripped.endswith(f" {object_file}") or
                     f"found in {object_file}" in line_stripped):
-                    
-                    # Handle EN debug format: "symbol (type) found in object_file"
                     if "found in" in line_stripped:
-                        parts = line_stripped.split()
-                        if ') found in' in line_stripped:
-                            symbol_part = line_stripped.split(') found in')[0]
-                            if '(' in symbol_part:
-                                symbol_name = symbol_part.split('(')[0].strip()
-                                type_info = symbol_part.split('(')[1].strip() if '(' in symbol_part else 'unknown'
-                            else:
-                                symbol_name = symbol_part.strip()
-                                type_info = 'unknown'
-                        else:
-                            symbol_name = parts[0] if parts else 'unnamed'
-                            type_info = 'unknown'
-                            
-                        entry = {
-                            'line': line_num,
-                            'content': line_stripped,
-                            'parsed': {
-                                'flag': 'EN',
-                                'offset': 'unknown',
-                                'size': 'unknown', 
-                                'virtual_addr': 'unknown',
-                                'type_flag': type_info,
-                                'symbol': symbol_name,
-                                'object_file': object_file
-                            }
-                        }
-                    # Handle PAL format: multiple patterns
-                    elif line_stripped.strip().startswith('UNUSED'):
-                        # UNUSED format: "UNUSED size ........ symbol object"
-                        parts = line_stripped.split()
-                        if len(parts) >= 5:
-                            flag = 'UNUSED'
-                            size = parts[1]
-                            symbol = parts[3] if len(parts) > 3 else 'unnamed'
-                            
-                            entry = {
-                                'line': line_num,
-                                'content': line_stripped,
-                                'parsed': {
-                                    'flag': flag,
-                                    'offset': 'UNUSED',
-                                    'size': size,
-                                    'virtual_addr': 'UNUSED',
-                                    'type_flag': 'UNUSED',
-                                    'symbol': symbol,
-                                    'object_file': object_file
-                                }
-                            }
-                        else:
-                            entry = {'line': line_num, 'content': line_stripped, 'parsed': None}
-                    elif 'UNUSED' in line_stripped and len(line_stripped.split()) >= 6:
-                        # PAL UNUSED function: "G UNUSED size ........ symbol object"  
-                        parts = line_stripped.split()
-                        flag = parts[0]  # G
-                        size = parts[2]
-                        symbol = parts[4] if len(parts) > 4 else 'unnamed'
-                        
-                        entry = {
-                            'line': line_num,
-                            'content': line_stripped,
-                            'parsed': {
-                                'flag': flag,
-                                'offset': 'UNUSED',
-                                'size': size,
-                                'virtual_addr': 'UNUSED',
-                                'type_flag': 'UNUSED',
-                                'symbol': symbol,
-                                'object_file': object_file
-                            }
-                        }
+                        parsed = _parse_en_found_in(line_stripped)
                     else:
-                        # Normal PAL format: "flag offset size addr type symbol \t object"  
-                        parts = line_stripped.split()
-                        if len(parts) >= 7:
-                            flag = parts[0]  # G, X, etc.
-                            offset = parts[1]
-                            size = parts[2] 
-                            virtual_addr = parts[3]
-                            type_flag = parts[4]
-                            symbol = parts[5]
-                            
-                            entry = {
-                                'line': line_num,
-                                'content': line_stripped,
-                                'parsed': {
-                                    'flag': flag,
-                                    'offset': offset,
-                                    'size': size,
-                                    'virtual_addr': virtual_addr,
-                                    'type_flag': type_flag,
-                                    'symbol': symbol,
-                                    'object_file': object_file
-                                }
-                            }
-                        else:
-                            # Fallback for unrecognized format
-                            entry = {
-                                'line': line_num,
-                                'content': line_stripped,
-                                'parsed': None
-                            }
-                        
-                    # Categorize by type (handle both PAL and EN formats)
-                    if entry.get('parsed'):
-                        parsed = entry['parsed']
-                        flag = parsed.get('flag', '')
-                        type_flag = parsed.get('type_flag', '')
-                        symbol = parsed.get('symbol', '')
-                        
-                        # Functions: PAL format (G+4 or G+UNUSED) or EN format (func in type)
-                        if (flag == 'G' and (type_flag == '4' or type_flag == 'UNUSED')) or 'func' in type_flag:
-                            functions.append(entry)
-                        # Global data: multiple patterns
-                        elif flag == 'UNUSED' or \
-                             (type_flag == '4' and flag != 'G') or \
-                             type_flag in ['.data', '.bss', '.sdata', '.sbss'] or \
-                             'object' in type_flag or \
-                             symbol.startswith('__RTTI__') or \
-                             ('$' in symbol and not symbol.startswith('.')): # Constants like neg_one$206
-                            globals_data.append(entry)
-                        # Section headers
-                        elif symbol in ['.data', '.bss', '.sdata', '.sbss', '.text'] or type_flag == '1':
-                            sections.append(entry)
-                        else:
-                            sections.append(entry)  # Other symbols
-                
-                # Stop after reasonable number
-                if len(functions) + len(globals_data) + len(sections) >= 50:
+                        parsed = _parse_pal_line(line_stripped)
+                    _categorize_entry(parsed, functions, globals_data, sections)
+
+                if len(functions) + len(globals_data) + len(sections) >= 200:
                     break
                     
     except Exception as e:
@@ -337,6 +308,45 @@ def extract_all_for_object(map_file, object_file):
     
     return {
         'functions': functions[:15],  # Limit each category
+        'globals': globals_data[:15],
+        'sections': sections[:10]
+    }
+
+def extract_all_for_module(map_file, object_file=None, source_file=None):
+    """Extract comprehensive information for a module using object and/or source identifiers."""
+    identifiers = [v for v in [object_file, source_file] if v]
+    if not identifiers:
+        return {'functions': [], 'globals': [], 'sections': []}
+
+    functions = []
+    globals_data = []
+    sections = []
+
+    try:
+        with open(map_file, 'r', encoding='utf-8', errors='ignore') as f:
+            for line_num, line in enumerate(f, 1):
+                line_stripped = line.strip()
+                if not line_stripped:
+                    continue
+
+                if not any(ident in line_stripped for ident in identifiers):
+                    continue
+
+                if "found in" in line_stripped:
+                    parsed = _parse_en_found_in(line_stripped)
+                else:
+                    parsed = _parse_pal_line(line_stripped)
+
+                _categorize_entry(parsed, functions, globals_data, sections)
+
+                if len(functions) + len(globals_data) + len(sections) >= 200:
+                    break
+
+    except Exception as e:
+        return {'error': f"Failed to read {map_file}: {e}"}
+
+    return {
+        'functions': functions[:15],
         'globals': globals_data[:15],
         'sections': sections[:10]
     }
@@ -355,7 +365,7 @@ def main():
     search_term = sys.argv[1]
     context = sys.argv[2] if len(sys.argv) > 2 else None
     
-    repo_root = Path(__file__).parent
+    repo_root = Path(__file__).resolve().parent.parent
     pal_map = repo_root / "orig/GCCP01/game.MAP"
     en_map = repo_root / "orig/GCCE01/game.MAP"
     
@@ -363,6 +373,7 @@ def main():
     is_section_search = context == "--section"
     is_globals_search = context == "--globals"
     is_object_file = search_term.endswith('.o') and not is_section_search and not is_globals_search
+    is_source_file = search_term.endswith(('.c', '.cpp', '.s')) and not is_section_search and not is_globals_search
     
     print(f"SYMBOL SEARCH: {search_term}")
     if is_section_search:
@@ -548,6 +559,43 @@ def main():
             else:
                 print("  No global variables found")
     
+    elif is_source_file:
+        if pal_map.exists():
+            print(f"\n📍 PAL Release Symbols (GCCP01):")
+            all_info = extract_all_for_module(pal_map, source_file=search_term)
+            if 'error' in all_info:
+                print(f"  Error: {all_info['error']}")
+            else:
+                if all_info['functions']:
+                    print(f"\n  ⚡ Functions ({len(all_info['functions'])}):")
+                    for i, func in enumerate(all_info['functions'], 1):
+                        p = func['parsed']
+                        print(f"    {i:2}. {p['symbol']} ({p['size']}b at {p['virtual_addr']})")
+                if all_info['globals']:
+                    print(f"\n  🌍 Global Variables ({len(all_info['globals'])}):")
+                    for i, glob in enumerate(all_info['globals'], 1):
+                        p = glob['parsed']
+                        print(f"    {i:2}. {p['symbol']} ({p['size']}b {p['type_flag']} at {p['virtual_addr']})")
+                print(f"\n  📊 Summary: {len(all_info['functions'])} functions, {len(all_info['globals'])} globals")
+
+        if en_map.exists():
+            print(f"\n📍 EN Debug Symbols (GCCE01):")
+            all_info_en = extract_all_for_module(en_map, source_file=search_term)
+            if 'error' in all_info_en:
+                print(f"  Error: {all_info_en['error']}")
+            else:
+                if all_info_en['functions']:
+                    print(f"\n  ⚡ Functions ({len(all_info_en['functions'])}):")
+                    for i, func in enumerate(all_info_en['functions'], 1):
+                        p = func['parsed']
+                        print(f"    {i:2}. {p['symbol']} ({p['size']}b at {p['virtual_addr']})")
+                if all_info_en['globals']:
+                    print(f"\n  🌍 Global Variables ({len(all_info_en['globals'])}):")
+                    for i, glob in enumerate(all_info_en['globals'], 1):
+                        p = glob['parsed']
+                        print(f"    {i:2}. {p['symbol']} ({p['size']}b {p['type_flag']} at {p['virtual_addr']})")
+                print(f"\n  📊 Summary: {len(all_info_en['functions'])} functions, {len(all_info_en['globals'])} globals")
+
     else:
         # Function search (original behavior)
         if pal_map.exists():

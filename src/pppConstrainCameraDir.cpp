@@ -1,4 +1,5 @@
 #include "ffcc/pppConstrainCameraDir.h"
+#include "ffcc/partMng.h"
 
 /*
  * --INFO--
@@ -67,13 +68,14 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, Un
 {
     extern int DAT_8032ed70;
     extern char DAT_8032ed78;
-    extern void* pppMngStPtr;
     extern struct {
         float _224_4_, _228_4_, _232_4_, _236_4_, _240_4_, _244_4_, _252_4_;
         float m_cameraMatrix[3][4];
     } CameraPcs;
     extern float FLOAT_803320b8, FLOAT_803320bc, FLOAT_803320c0;
     
+    _pppMngSt* pppMngSt = pppMngStPtr;
+
     if (DAT_8032ed70 == 0) {
         float* value = (float*)((int)(&pppConstrainCameraDir->field0_0x0 + 2) + *param_3->m_serializedDataOffsets);
         
@@ -86,52 +88,43 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, Un
         if ((DAT_8032ed78 != 1) && 
             ((*(char*)((int)&param_2->m_arg3 + 1) != 0 || *(char*)&param_2->m_arg3 != 0))) {
             
-            float dVar8 = CameraPcs._236_4_;
-            float dVar7 = CameraPcs._240_4_;
-            float dVar6 = CameraPcs._244_4_;
+            double dVar8 = (double)CameraPcs._236_4_;
+            double dVar7 = (double)CameraPcs._240_4_;
+            double dVar6 = (double)CameraPcs._244_4_;
             
-            extern void PSMTXCopy(void*, void*);
-            float MStack_b8[3][4];
-            PSMTXCopy(&CameraPcs.m_cameraMatrix, &MStack_b8);
+            Mtx MStack_b8;
+            PSMTXCopy(CameraPcs.m_cameraMatrix, MStack_b8);
             
-            float dVar5 = CameraPcs._224_4_;
-            float dVar4 = CameraPcs._228_4_;
-            float dVar3 = CameraPcs._232_4_;
-            float dVar2 = FLOAT_803320b8 + ((CameraPcs._252_4_ - FLOAT_803320bc) / FLOAT_803320bc);
+            double dVar5 = (double)CameraPcs._224_4_;
+            double dVar4 = (double)CameraPcs._228_4_;
+            double dVar3 = (double)CameraPcs._232_4_;
+            double dVar2 = (double)(FLOAT_803320b8 + ((CameraPcs._252_4_ - FLOAT_803320bc) / FLOAT_803320bc));
             
-            extern void PSMTXIdentity(void*);
-            extern struct {
-                float m_matrix[3][4];
-                struct { float x, y, z; } m_scale;
-            }* pppMngStPtr;
+            PSMTXIdentity(pppMngStPtr->m_matrix.value);
             
-            PSMTXIdentity(&pppMngStPtr->m_matrix);
+            float fVar1 = FLOAT_803320b8;
+            pppMngSt->m_scale.x = (float)((double)FLOAT_803320c0 * dVar2);
+            pppMngSt->m_scale.y = (float)dVar2;
+            pppMngSt->m_scale.z = fVar1;
             
-            pppMngStPtr->m_scale.x = FLOAT_803320c0 * dVar2;
-            pppMngStPtr->m_scale.y = dVar2;
-            pppMngStPtr->m_scale.z = FLOAT_803320b8;
-            
-            extern void PSMTXScale(float, float, float, void*);
-            float MStack_e8[3][4];
-            PSMTXScale(pppMngStPtr->m_scale.x, pppMngStPtr->m_scale.y, pppMngStPtr->m_scale.z, &MStack_e8);
+            Mtx MStack_e8;
+            PSMTXScale(MStack_e8, pppMngSt->m_scale.x, pppMngSt->m_scale.y, pppMngSt->m_scale.z);
             
             if (*(char*)((int)&param_2->m_arg3 + 1) != 0) {
-                extern void PSMTXInverse(void*, void*);
-                PSMTXInverse(&MStack_b8, &pppMngStPtr->m_matrix);
+                PSMTXInverse(MStack_b8, pppMngStPtr->m_matrix.value);
             }
             
-            extern void PSMTXConcat(void*, void*, void*);
-            PSMTXConcat(&MStack_e8, &pppMngStPtr->m_matrix, &pppMngStPtr->m_matrix);
+            PSMTXConcat(MStack_e8, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
             
             if (*(char*)&param_2->m_arg3 != 0) {
-                float dVar2 = *value;
-                pppMngStPtr->m_matrix[0][3] = dVar8 * dVar2 + dVar5;
-                pppMngStPtr->m_matrix[1][3] = dVar7 * dVar2 + dVar4;
-                pppMngStPtr->m_matrix[2][3] = dVar6 * dVar2 + dVar3;
+                dVar2 = (double)*value;
+                pppMngStPtr->m_matrix.value[0][3] = (float)(dVar8 * dVar2 + dVar5);
+                pppMngStPtr->m_matrix.value[1][3] = (float)(dVar7 * dVar2 + dVar4);
+                pppMngStPtr->m_matrix.value[2][3] = (float)(dVar6 * dVar2 + dVar3);
             }
             
             extern void pppSetFpMatrix__FP9_pppMngSt(void*);
-            pppSetFpMatrix__FP9_pppMngSt(pppMngStPtr);
+            pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
         }
     }
 }

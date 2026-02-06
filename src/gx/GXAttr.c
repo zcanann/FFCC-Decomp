@@ -16,37 +16,61 @@
 #define CHECK_MTXIDX(line, attr, type)    ASSERTMSGLINE(line, (attr) > GX_VA_TEX7MTXIDX || (type) <= GX_VA_TEX0MTXIDX, "GXSetVtxDesc: GX_VA_*MTXIDX accepts GX_NONE or GX_DIRECT only")
 
 static void __GXXfVtxSpecs(void) {
-    u32 nCols = 0;
+    u32 nCols;
     u32 nNrm;
     u32 nTex;
     u32 reg;
+    u32 vcdHi;
+    u32 vcdLo;
 
-    nNrm = __GXData->hasBiNrms ? 2 : __GXData->hasNrms ? 1 : 0;
+    if (__GXData->hasBiNrms == 0) {
+        if (__GXData->hasNrms == 0) {
+            nNrm = 0;
+        } else {
+            nNrm = 1;
+        }
+    } else {
+        nNrm = 2;
+    }
 
-#ifdef DEBUG
-    nCols = GET_REG_FIELD(__GXData->vcdLo, 2, 13) ? 1 : 0;
-    nCols += GET_REG_FIELD(__GXData->vcdLo, 2, 15) ? 1 : 0;
-#else
-    nCols = 33 - __cntlzw(GET_REG_FIELD(__GXData->vcdLo, 4, 13));
-    nCols /= 2;
-#endif
+    vcdHi = __GXData->vcdHi;
+    vcdLo = __GXData->vcdLo;
 
-#ifdef DEBUG
     nTex = 0;
-    nTex += GET_REG_FIELD(__GXData->vcdHi, 2, 0) ? 1 : 0;
-    nTex += GET_REG_FIELD(__GXData->vcdHi, 2, 2) ? 1 : 0;
-    nTex += GET_REG_FIELD(__GXData->vcdHi, 2, 4) ? 1 : 0;
-    nTex += GET_REG_FIELD(__GXData->vcdHi, 2, 6) ? 1 : 0;
-    nTex += GET_REG_FIELD(__GXData->vcdHi, 2, 8) ? 1 : 0;
-    nTex += GET_REG_FIELD(__GXData->vcdHi, 2, 10) ? 1 : 0;
-    nTex += GET_REG_FIELD(__GXData->vcdHi, 2, 12) ? 1 : 0;
-    nTex += GET_REG_FIELD(__GXData->vcdHi, 2, 14) ? 1 : 0;
-#else
-    nTex = 33 - __cntlzw(GET_REG_FIELD(__GXData->vcdHi, 16, 0));
-    nTex /= 2;
-#endif
+    if ((vcdHi & 3) != 0) {
+        nTex++;
+    }
+    if (((vcdHi >> 2) & 3) != 0) {
+        nTex++;
+    }
+    if (((vcdHi >> 4) & 3) != 0) {
+        nTex++;
+    }
+    if (((vcdHi >> 6) & 3) != 0) {
+        nTex++;
+    }
+    if (((vcdHi >> 8) & 3) != 0) {
+        nTex++;
+    }
+    if (((vcdHi >> 10) & 3) != 0) {
+        nTex++;
+    }
+    if (((vcdHi >> 12) & 3) != 0) {
+        nTex++;
+    }
+    if (((vcdHi >> 14) & 3) != 0) {
+        nTex++;
+    }
 
-    reg = (nCols) | (nNrm << 2) | (nTex << 4);
+    nCols = 0;
+    if (((vcdLo >> 13) & 3) != 0) {
+        nCols++;
+    }
+    if (((vcdLo >> 15) & 3) != 0) {
+        nCols++;
+    }
+
+    reg = (nTex << 4) | nCols | (nNrm << 2);
     GX_WRITE_XF_REG(8, reg);
     __GXData->bpSentNot = 1;
 }
@@ -131,8 +155,12 @@ void GXSetVtxDescv(const GXVtxDescList *attrPtr) {
 }
 
 void __GXSetVCD(void) {
-    GX_WRITE_SOME_REG4(8, 0x50, __GXData->vcdLo, -12);
-    GX_WRITE_SOME_REG4(8, 0x60, __GXData->vcdHi, -12);
+    GX_WRITE_U8(8);
+    GX_WRITE_U8(0x50);
+    GX_WRITE_U32(__GXData->vcdLo);
+    GX_WRITE_U8(8);
+    GX_WRITE_U8(0x60);
+    GX_WRITE_U32(__GXData->vcdHi);
     __GXXfVtxSpecs();
 }
 

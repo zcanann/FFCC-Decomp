@@ -307,18 +307,15 @@ int PADReset(u32 mask) {
     ASSERTMSGLINE(0x381, !(mask & 0x0FFFFFFF), "PADReset(): invalid mask");
 
     enabled = OSDisableInterrupts();
-    mask |= PendingBits;
-    PendingBits = 0;
-    mask &= ~(WaitingBits | CheckingBits);
+    mask = (mask | PendingBits) & ~(WaitingBits | CheckingBits);
     ResettingBits |= mask;
+    PendingBits = 0;
     disableBits = ResettingBits & EnabledBits;
-    EnabledBits &= ~mask;
-    BarrelBits &= ~mask;
-
     if (Spec == 4) {
         RecalibrateBits |= mask;
     }
 
+    EnabledBits &= ~mask;
     SIDisablePolling(disableBits);
 
     if (ResettingChan == 0x20) {
@@ -336,18 +333,15 @@ BOOL PADRecalibrate(u32 mask) {
     ASSERTMSGLINE(939, !(mask & 0x0FFFFFFF), "PADReset(): invalid mask");
     enabled = OSDisableInterrupts();
 
-    mask |= PendingBits;
-    PendingBits = 0;
-    mask &= ~(WaitingBits | CheckingBits);
+    mask = (mask | PendingBits) & ~(WaitingBits | CheckingBits);
     ResettingBits |= mask;
+    PendingBits = 0;
     disableBits = ResettingBits & EnabledBits;
-    EnabledBits &= ~mask;
-    BarrelBits &= ~mask;
-
     if (!(__gUnknown800030E3 & 0x40)) {
         RecalibrateBits |= mask;
     }
 
+    EnabledBits &= ~mask;
     SIDisablePolling(disableBits);
     if (ResettingChan == 32)
         DoReset();
@@ -357,7 +351,6 @@ BOOL PADRecalibrate(u32 mask) {
 }
 
 BOOL PADInit() {
-    s32 chan;
     if (Initialized) {
         return 1;
     }
@@ -378,34 +371,75 @@ BOOL PADInit() {
         RecalibrateBits = PAD_CHAN0_BIT | PAD_CHAN1_BIT | PAD_CHAN2_BIT | PAD_CHAN3_BIT;
     }
 
-    for (chan = 0; chan < SI_MAX_CHAN; ++chan) {
-        CmdProbeDevice[chan] = (0x4D << 24) | (chan << 22) | ((__OSWirelessPadFixMode & 0x3fffu) << 8);
-    }
+    CmdProbeDevice[0] = 0x4D000000 | ((__OSWirelessPadFixMode & 0x3fffu) << 8);
+    CmdProbeDevice[1] = 0x4D400000 | ((__OSWirelessPadFixMode & 0x3fffu) << 8);
+    CmdProbeDevice[2] = 0x4D800000 | ((__OSWirelessPadFixMode & 0x3fffu) << 8);
+    CmdProbeDevice[3] = 0x4DC00000 | ((__OSWirelessPadFixMode & 0x3fffu) << 8);
 
     SIRefreshSamplingRate();
     OSRegisterResetFunction(&ResetFunctionInfo);
 
-    return PADReset(PAD_CHAN0_BIT | PAD_CHAN1_BIT | PAD_CHAN2_BIT | PAD_CHAN3_BIT);
+    {
+        BOOL enabled;
+        u32 mask;
+        u32 disableBits;
+
+        enabled = OSDisableInterrupts();
+        mask = (PAD_CHAN0_BIT | PAD_CHAN1_BIT | PAD_CHAN2_BIT | PAD_CHAN3_BIT);
+        mask = (mask | PendingBits) & ~(WaitingBits | CheckingBits);
+        ResettingBits |= mask;
+        PendingBits = 0;
+        disableBits = ResettingBits & EnabledBits;
+        if (Spec == PAD_SPEC_4) {
+            RecalibrateBits |= mask;
+        }
+        EnabledBits &= ~mask;
+        SIDisablePolling(disableBits);
+        if (ResettingChan == 0x20) {
+            DoReset();
+        }
+        OSRestoreInterrupts(enabled);
+    }
+
+    return 1;
 }
 
 u32 PADRead(PADStatus* status) {
     BOOL enabled;
     s32 chan;
-    u32 data[2];
+    u32 data[3];
     u32 chanBit;
     u32 sr;
-    int chanShift;
     u32 motor;
+    PADStatus* origin;
 
     enabled = OSDisableInterrupts();
     motor = 0;
+    origin = Origin;
 
-    for (chan = 0; chan < 4; chan++, status++) {
+    for (chan = 0; chan < 4; chan++, status++, origin++) {
         chanBit = PAD_CHAN0_BIT >> chan;
-        chanShift = 8 * (SI_MAX_CHAN - 1 - chan);
 
         if (PendingBits & chanBit) {
-            PADReset(0);
+            BOOL enabled2;
+            u32 mask;
+            u32 disableBits;
+
+            enabled2 = OSDisableInterrupts();
+            mask = PendingBits & ~(WaitingBits | CheckingBits);
+            ResettingBits |= mask;
+            PendingBits = 0;
+            disableBits = ResettingBits & EnabledBits;
+            if (Spec == PAD_SPEC_4) {
+                RecalibrateBits |= mask;
+            }
+            EnabledBits &= ~mask;
+            SIDisablePolling(disableBits);
+            if (ResettingChan == 0x20) {
+                DoReset();
+            }
+            OSRestoreInterrupts(enabled2);
+
             status->err = PAD_ERR_NOT_READY;
             memset(status, 0, offsetof(PADStatus, err));
         } else if ((ResettingBits & chanBit) || ResettingChan == chan) {
@@ -457,7 +491,7 @@ u32 PADRead(PADStatus* status) {
                         // Get origin. It is okay if the following transfer fails
                         // since the PAD_ORIGIN bit remains until the read origin
                         // command complete.
-                        SITransfer(chan, &CmdReadOrigin, 1, &Origin[chan], 10, PADOriginUpdateCallback, 0);
+                        SITransfer(chan, &CmdReadOrigin, 1, origin, 10, PADOriginUpdateCallback, 0);
                     } else {
                         status->err = PAD_ERR_NONE;
         

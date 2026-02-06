@@ -117,16 +117,16 @@ Success criteria: build completes and verifies:
 ### 4) Objdiff CLI (required for automation)
 The CLI tool can be downloaded into the repo. **Use v3.6.1+ for JSON oneshot mode**:
 ```sh
-python3 tools/download_tool.py objdiff-cli build/tools/objdiff-cli --tag v3.6.1
+python3 tools/download_tool.py objdiff-cli tools/objdiff-cli --tag v3.6.1
 ```
 Or download manually:
 ```sh
-curl -L https://github.com/encounter/objdiff/releases/download/v3.6.1/objdiff-cli-macos-arm64 -o build/tools/objdiff-cli
-chmod +x build/tools/objdiff-cli
+curl -L https://github.com/encounter/objdiff/releases/download/v3.6.1/objdiff-cli-macos-arm64 -o tools/objdiff-cli
+chmod +x tools/objdiff-cli
 ```
 Verify:
 ```sh
-build/tools/objdiff-cli --version  # Should show v3.6.1+
+tools/objdiff-cli --version  # Should show v3.6.1+
 ```
 
 ---

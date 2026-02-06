@@ -24,7 +24,7 @@ void pppRandDownShort(void* r3, void* r4, void* r5)
     u8* param3 = (u8*)r5;  // r29
     
     // Check param1[0xc] - if zero, take first branch
-    u32 p1_field_c = *(u32*)(param1 + 0xc);
+    s32 p1_field_c = *(s32*)(param1 + 0xc);
     if (p1_field_c == 0) {
         // Generate random numbers
         math.RandF();
@@ -48,7 +48,7 @@ void pppRandDownShort(void* r3, void* r4, void* r5)
         
     } else {
         // Check if param2[0] matches param1[0xc]
-        u32 p2_field_0 = *(u32*)param2;
+        s32 p2_field_0 = *(s32*)param2;
         if (p2_field_0 != p1_field_c) return;
         
         // Calculate target memory location

@@ -2,6 +2,9 @@
 #include "ffcc/math.h"
 
 extern CMath math;
+extern int lbl_8032ED70;
+extern float lbl_8032FFF8;
+extern float lbl_801EADC8;
 
 /*
  * --INFO--
@@ -13,7 +16,6 @@ extern CMath math;
  * JP Size: TODO
  */
 void pppRandUpFloat(void* param1, void* param2, void* param3) {
-    extern int lbl_8032ED70;
     if (lbl_8032ED70 != 0) {
         return;
     }
@@ -21,42 +23,34 @@ void pppRandUpFloat(void* param1, void* param2, void* param3) {
     int* p1 = (int*)param1;
     int* p2 = (int*)param2;
     int* p3 = (int*)param3;
-    unsigned char* p2_bytes = (unsigned char*)param2;
-    
-    int r6 = p1[3];
-    if (r6 != 0) {
-        int r0 = p2[0];
-        if (r0 != r6) {
-            return;
+
+    int id = p1[3];
+    if (id == 0) {
+        math.RandF();
+        float value = 1.0f;
+
+        if (((unsigned char*)param2)[0xC] != 0) {
+            math.RandF();
+            value = (value + 0.5f) * lbl_8032FFF8;
         }
-    }
-    
-    // Generate random float value
-    math.RandF();
-    float f31 = 1.0f;  // Placeholder for RandF() result
-    
-    if (p2_bytes[0xC] != 0) {
-        // If flag is set, add another random value
-        math.RandF(); 
-        float f1 = 0.5f;   // Placeholder for second random value
-        f31 = f31 + f1;
-        
-        extern float lbl_8032FFF8;
-        f31 = f31 * lbl_8032FFF8;
-    }
-    
-    int r5 = p3[3];
-    if (r5 != -1) {
-        // Store result at specific offset
-        float* target = (float*)((char*)param1 + r5 + 0x80);
-        *target = f31;
+
+        int outIndex = *(int*)p3[3];
+        *(float*)((char*)param1 + outIndex + 0x80) = value;
         return;
     }
-    
-    // Add to global float using parameter
-    float f1 = *(float*)((char*)param2 + 8);
-    extern float lbl_801EADC8;
-    float f0 = lbl_801EADC8;
-    f0 = f0 + (f1 * f31);
-    lbl_801EADC8 = f0;
+
+    if (p2[0] != id) {
+        return;
+    }
+
+    int outIndex = *(int*)p3[3];
+    float* outValue = (float*)((char*)param1 + outIndex + 0x80);
+
+    int sourceIndex = p2[1];
+    float* source = &lbl_801EADC8;
+    if (sourceIndex != -1) {
+        source = (float*)((char*)param1 + sourceIndex + 0x80);
+    }
+
+    *source = *source + (*(float*)((char*)param2 + 8) * *outValue);
 }

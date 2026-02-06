@@ -70,10 +70,16 @@ When updating functions, include version-specific address and size information:
 ## State Tracking & Memory
 
 ### Automation Notes
+
+## OpenClaw
 - **Main log**: `~/.openclaw/workspace/memory/ffcc-decomp-notes.md`
 - **Session state**: `~/.openclaw/workspace/memory/decomp-state.json`
 
 Update these files to track progress and avoid cycling through failed targets.
+
+## Codex
+
+No action required.
 
 ## Scope (current)
 - **Target version:** **PAL** (`GCCP01`) - required for now.

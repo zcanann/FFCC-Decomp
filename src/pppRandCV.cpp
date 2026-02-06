@@ -1,6 +1,40 @@
 #include "ffcc/pppRandCV.h"
 #include "ffcc/math.h"
 
+extern CMath math;
+extern int lbl_8032ED70;
+extern float lbl_8032FF08;
+extern double lbl_8032FF10;
+extern unsigned char lbl_801EADC8[32];
+extern "C" float RandF__5CMathFv(CMath* instance);
+
+typedef struct RandCVParams {
+	int index;
+	int colorOffset;
+	signed char delta[4];
+	unsigned char flag;
+	unsigned char pad[3];
+} RandCVParams;
+
+typedef union DoubleConv {
+	struct {
+		unsigned int hi;
+		unsigned int lo;
+	} parts;
+	double d;
+} DoubleConv;
+
+typedef struct RandCVConv {
+	DoubleConv d0;
+	DoubleConv c0;
+	DoubleConv d1;
+	DoubleConv c1;
+	DoubleConv d2;
+	DoubleConv c2;
+	DoubleConv d3;
+	DoubleConv c3;
+} RandCVConv;
+
 /*
  * --INFO--
  * PAL Address: UNUSED
@@ -8,8 +42,9 @@
  */
 void randchar(char range, float factor)
 {
-	// Helper function for random character generation
-	// Implementation details based on usage context
+	float value = (float)range;
+	float scaled = value * factor;
+	(void)scaled;
 }
 
 /*
@@ -17,73 +52,104 @@ void randchar(char range, float factor)
  * PAL Address: 0x80066194
  * PAL Size: 540b
  */
-void pppRandCV(void* colorArray, void* colorParams, void* entityData)
+void pppRandCV(void* param1, void* param2, void* param3)
 {
-	// Check global disable flag
-	extern int lbl_8032ED70;
-	if (lbl_8032ED70 != 0) return;
-	
-	// Cast parameters to appropriate types
-	int* params = (int*)colorParams;
-	int* entity = (int*)entityData;
-	
-	// Check if color indices match
-	int currentIndex = params[0];
-	int targetIndex = entity[3];
-	if (currentIndex != targetIndex) return;
-	
-	CMath math;
-	
-	// Generate base random float
-	math.RandF();
-	// Note: RandF result stored in floating point register, need proper handling
-	
-	// Check random flag and generate scaling factor
-	unsigned char randomFlag = *((unsigned char*)params + 0xC);
-	float scalingFactor;
-	if (randomFlag != 0) {
-		math.RandF();
-		// Add random values for intensity variation
-		scalingFactor = 1.0f; // Placeholder - assembly shows complex float ops
+	void* p1 = param1;
+	void* p2 = param2;
+	void* p3 = param3;
+	RandCVParams* params = (RandCVParams*)p2;
+	int* baseIndex;
+	int baseOffset;
+	float* randValuePtr;
+
+	if (lbl_8032ED70 != 0) {
+		return;
+	}
+
+	if (params->index == *(int*)((char*)p1 + 0xc)) {
+		baseIndex = *(int**)((char*)p3 + 0xc);
+		baseOffset = *baseIndex;
+		randValuePtr = (float*)((char*)p1 + baseOffset + 0x80);
+
+		float randVal = RandF__5CMathFv(&math);
+		if (params->flag != 0) {
+			float randVal2 = RandF__5CMathFv(&math);
+			randVal = randVal + randVal2;
+		} else {
+			randVal = randVal * lbl_8032FF08;
+		}
+		*randValuePtr = randVal;
+		return;
+	}
+
+	baseIndex = *(int**)((char*)p3 + 0xc);
+	baseOffset = *baseIndex;
+	randValuePtr = (float*)((char*)p1 + baseOffset + 0x80);
+
+	unsigned char* colors;
+	if (params->colorOffset == -1) {
+		colors = lbl_801EADC8;
 	} else {
-		// Use fixed scaling when randomFlag is 0
-		extern float lbl_8032FF08;
-		scalingFactor = lbl_8032FF08;
+		colors = (unsigned char*)p1 + params->colorOffset + 0x80;
 	}
-	
-	// Get color buffer pointer based on entity data
-	int colorOffset = params[1];
-	unsigned char* targetColors;
-	if (colorOffset == -1) {
-		// Use default color array
-		extern unsigned char lbl_801EADC8[];
-		targetColors = lbl_801EADC8;
-	} else {
-		targetColors = (unsigned char*)((char*)colorArray + 0x80 + colorOffset);
+
+	float scale = *randValuePtr;
+	const double bias = lbl_8032FF10;
+	RandCVConv conv;
+
+	{
+		signed char delta = params->delta[0];
+		unsigned char current = colors[0];
+		conv.d0.parts.hi = 0x43300000;
+		conv.d0.parts.lo = (unsigned int)((int)delta ^ 0x8000);
+		conv.c0.parts.hi = 0x43300000;
+		conv.c0.parts.lo = (unsigned int)(current ^ 0x8000);
+		double value = conv.d0.d - bias;
+		double baseValue = conv.c0.d - bias;
+		double result = value * (double)scale - baseValue;
+		int add = (int)result;
+		colors[0] = (unsigned char)(current + add);
 	}
-	
-	// Process RGBA components (4 bytes)
-	for (int i = 0; i < 4; i++) {
-		// Get the random adjustment value for this component
-		char adjustment = *((char*)params + 8 + i);
-		unsigned char currentValue = targetColors[i];
-		
-		// Complex floating point calculation matching assembly pattern:
-		// Convert signed byte to double, apply scaling, convert back
-		extern double lbl_8032FF10;
-		double adjustmentDouble = (double)adjustment;
-		double currentDouble = (double)currentValue;
-		
-		// fmsubs operation: multiply-subtract-single  
-		double result = adjustmentDouble * scalingFactor - currentDouble;
-		
-		// Convert back to integer and add to current value
-		int finalValue = (int)result + currentValue;
-		targetColors[i] = (unsigned char)finalValue;
+
+	{
+		signed char delta = params->delta[1];
+		unsigned char current = colors[1];
+		conv.d1.parts.hi = 0x43300000;
+		conv.d1.parts.lo = (unsigned int)((int)delta ^ 0x8000);
+		conv.c1.parts.hi = 0x43300000;
+		conv.c1.parts.lo = (unsigned int)(current ^ 0x8000);
+		double value = conv.d1.d - bias;
+		double baseValue = conv.c1.d - bias;
+		double result = value * (double)scale - baseValue;
+		int add = (int)result;
+		colors[1] = (unsigned char)(current + add);
 	}
-	
-	// Note: Above implementation is simplified - original assembly suggests more complex 
-	// floating point operations with specific PowerPC instructions that don't map 
-	// directly to C. The original likely processes components in pairs with optimized
-	// floating point register usage.
+
+	{
+		signed char delta = params->delta[2];
+		unsigned char current = colors[2];
+		conv.d2.parts.hi = 0x43300000;
+		conv.d2.parts.lo = (unsigned int)((int)delta ^ 0x8000);
+		conv.c2.parts.hi = 0x43300000;
+		conv.c2.parts.lo = (unsigned int)(current ^ 0x8000);
+		double value = conv.d2.d - bias;
+		double baseValue = conv.c2.d - bias;
+		double result = value * (double)scale - baseValue;
+		int add = (int)result;
+		colors[2] = (unsigned char)(current + add);
+	}
+
+	{
+		signed char delta = params->delta[3];
+		unsigned char current = colors[3];
+		conv.d3.parts.hi = 0x43300000;
+		conv.d3.parts.lo = (unsigned int)((int)delta ^ 0x8000);
+		conv.c3.parts.hi = 0x43300000;
+		conv.c3.parts.lo = (unsigned int)(current ^ 0x8000);
+		double value = conv.d3.d - bias;
+		double baseValue = conv.c3.d - bias;
+		double result = value * (double)scale - baseValue;
+		int add = (int)result;
+		colors[3] = (unsigned char)(current + add);
+	}
 }

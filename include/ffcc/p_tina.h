@@ -11,7 +11,7 @@ struct pppFVECTOR4;
 void loadPdtPtx(char*, void*, int, void*, int, int);
 void LoadFieldPdt0(int, int);
 void pppNotAllocAmemCacheRmem(unsigned long);
-void pppFreeMngStPrioForData();
+unsigned int pppFreeMngStPrioForData();
 void pppAmemDeletePmng(unsigned long);
 void pppAmemRefCntError(unsigned long);
 

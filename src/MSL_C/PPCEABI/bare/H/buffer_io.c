@@ -1,6 +1,7 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/ansi_files.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/alloc.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/file_io.h"
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/critical_regions.h"
 
 void* malloc(size_t size);
 
@@ -47,17 +48,28 @@ int __load_buffer(FILE* file, size_t* bytes_loaded, int mode)
 	return ioresult;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801b4f28
+ * PAL Size: 356b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 int setvbuf(FILE* file, char* buffer, int mode, size_t size)
 {
 	if (mode == _IONBF) {
 		fflush(file);
 	}
 	
-	if (!file->file_state.free_buffer && file->file_mode.io_mode != 0) {
+	if (file->file_state.io_state == __neutral && file->file_mode.io_mode != 0) {
 		if (mode == _IONBF || mode == _IOLBF || mode == _IOFBF) {
 			if (file->buffer != NULL && file->file_state.free_buffer) {
 				free(file->buffer);
 			}
+			
+			__begin_critical_region(2);
 			
 			file->file_mode.buffer_mode = mode;
 			file->file_state.free_buffer = 0;
@@ -65,15 +77,18 @@ int setvbuf(FILE* file, char* buffer, int mode, size_t size)
 			file->buffer_ptr = (unsigned char*)file->ungetc_buffer;
 			file->buffer_size = 1;
 			file->buffer_length = 0;
+			file->buffer_alignment = 0;
 			file->buffer_position = 0;
 			
 			if (mode == _IONBF || size == 0) {
 				*file->buffer_ptr = 0;
+				__end_critical_region(2);
 				return 0;
 			} else {
 				if (buffer == NULL) {
 					buffer = (char*)malloc(size);
 					if (buffer == NULL) {
+						__end_critical_region(2);
 						return -1;
 					}
 					file->file_state.free_buffer = 1;
@@ -81,7 +96,10 @@ int setvbuf(FILE* file, char* buffer, int mode, size_t size)
 				file->buffer = (unsigned char*)buffer;
 				file->buffer_ptr = (unsigned char*)buffer;
 				file->buffer_size = size;
+				file->buffer_length = 0;
+				file->buffer_alignment = 0;
 				file->buffer_position = 0;
+				__end_critical_region(2);
 				return 0;
 			}
 		} else {

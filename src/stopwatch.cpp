@@ -3,6 +3,7 @@
 extern "C" float __cvt_sll_flt(u32 lo, u32 hi);
 
 extern char lbl_8032F860[]; // small-data string used by target
+extern float lbl_8032F850;  // 8.0f
 extern float lbl_8032F854;  // 0.0f
 
 /*
@@ -51,13 +52,9 @@ void CStopWatch::Stop() { OSStopStopwatch(this); }
  */
 float CStopWatch::Get()
 {
-	// Match target: convert accumulated ticks (total) into microseconds as float.
-	u32* p = (u32*)&this->total;
-	u32 lo = p[0];
-	u32 hi = p[1];
-	float ticks = __cvt_sll_flt(lo, hi);
-	float denom = (float)(OS_TIMER_CLOCK / 125000);
-	return (8.0f * ticks) / denom;
+	double ticks = (double)__cvt_sll_flt(*(u32*)&this->total, *((u32*)&this->total + 1));
+	return lbl_8032F850 *
+	       (float)(ticks / (double)(float)(((OS_TIMER_CLOCK / 500000) * 0x8235) >> 3));
 }
 
 /*
@@ -100,12 +97,9 @@ void CProfile::ProfStart() { OSResetStopwatch(this); }
  */
 void CProfile::ProfEnd()
 {
-	u32* p = (u32*)&this->total;
-	u32 lo = p[0];
-	u32 hi = p[1];
-	float ticks = __cvt_sll_flt(lo, hi);
-	float denom = (float)(OS_TIMER_CLOCK / 125000);
-	m_lastTime = (8.0f * ticks) / denom;
+	double ticks = (double)__cvt_sll_flt(*(u32*)&this->total, *((u32*)&this->total + 1));
+	m_lastTime = lbl_8032F850 *
+	             (float)(ticks / (double)(float)(((OS_TIMER_CLOCK / 500000) * 0x8235) >> 3));
 
 	u32 next = m_frame + 1;
 	m_frame = next;

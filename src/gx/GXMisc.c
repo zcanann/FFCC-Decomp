@@ -195,6 +195,15 @@ void GXPokeAlphaMode(GXCompare func, u8 threshold) {
     GX_SET_PE_REG(3, reg);
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801A20BC
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void GXPokeAlphaRead(GXAlphaReadMode mode) {
     u32 reg;
     u32 mode_bits;
@@ -240,6 +249,15 @@ void GXPokeColorUpdate(GXBool update_enable) {
     GX_SET_PE_REG(1, reg);
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801A2190
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void GXPokeDstAlpha(GXBool enable, u8 alpha) {
     u32 reg;
     u32 alpha_bits;

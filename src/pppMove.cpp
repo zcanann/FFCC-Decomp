@@ -9,6 +9,11 @@ struct PppMoveObj {
     f32 z;           // 0x8
 };
 
+struct PppMoveOffsets {
+    u32 a;           // 0x0
+    u32 b;           // 0x4
+};
+
 /*
  * --INFO--
  * PAL Address: 0x80065b18
@@ -43,28 +48,26 @@ void pppMoveCon(void* basePtr, PppMoveData* data)
  */
 void pppMove(void* basePtr, PppMoveInput* input, PppMoveData* data1, PppMoveData* data2)
 {
-    if (lbl_8032ED70 != 0) {
+    PppMoveOffsets* offsets = (PppMoveOffsets*)data1->ptrData;
+    PppMoveObj* a = (PppMoveObj*)((u8*)basePtr + offsets->a + 0x80);
+    PppMoveObj* b = (PppMoveObj*)((u8*)basePtr + offsets->b + 0x80);
+
+    (void)data2;
+
+    if (lbl_8032ED70 != 0U) {
         return;
     }
-    
-    // Get data structure pointers  
-    void* data2Ptr = data2->ptrData;
-    void* data1Ptr = data1->ptrData;
-    
+
     u32 inputId = *(u32*)input;
-    u32 baseId = *((u32*)((u8*)basePtr + 0xc));
-    
-    // Direct address calculation for data objects
-    f32* data2Obj = (f32*)((u8*)basePtr + *(u32*)data2Ptr + 0x80);
-    f32* data1Obj = (f32*)((u8*)basePtr + *(u32*)data1Ptr + 0x80);
-    
+    u32 baseId = *(u32*)((u8*)basePtr + 0xc);
+
     if (inputId == baseId) {
-        data2Obj[0] += input->x;
-        data2Obj[1] += input->y;
-        data2Obj[2] += input->z;
+        b->x += input->x;
+        b->y += input->y;
+        b->z += input->z;
     }
-    
-    data1Obj[0] += data2Obj[0];
-    data1Obj[1] += data2Obj[1];
-    data1Obj[2] += data2Obj[2];
+
+    a->x += b->x;
+    a->y += b->y;
+    a->z += b->z;
 }

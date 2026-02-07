@@ -16,10 +16,9 @@ extern _pppMngSt* gPppMngSt;
  */
 void pppPointApMtxCon(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal)
 {
-	unsigned long* serialized = *(unsigned long**)((char*)pppPDataVal + 0xc);
-	unsigned long offset = serialized[1] + 0x81;
-	unsigned char zero = 0;
-	((unsigned char*)pppPObject)[offset] = zero;
+	unsigned long data = *(unsigned long*)((char*)pppPDataVal + 0xC);
+	pppPObject = (_pppPObject*)((char*)pppPObject + *(unsigned long*)(data + 0x4));
+	*((unsigned char*)pppPObject + 0x81) = 0;
 }
 
 /*

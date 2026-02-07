@@ -195,13 +195,28 @@ void GXPokeAlphaMode(GXCompare func, u8 threshold) {
     GX_SET_PE_REG(3, reg);
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801A20BC
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void GXPokeAlphaRead(GXAlphaReadMode mode) {
     u32 reg;
+    u32 mode_bits;
+    u32 one;
+    u32 out;
 
     reg = 0;
-    SET_REG_FIELD(693, reg, 2, 0, mode);
-    SET_REG_FIELD(693, reg, 1, 2, 1);
-    GX_SET_PE_REG(4, reg);
+    mode_bits = mode;
+    SET_REG_FIELD(693, reg, 2, 0, mode_bits);
+    one = 1;
+    out = reg;
+    SET_REG_FIELD(693, out, 1, 2, one);
+    GX_SET_PE_REG(4, out);
 }
 
 void GXPokeAlphaUpdate(GXBool update_enable) {
@@ -234,12 +249,28 @@ void GXPokeColorUpdate(GXBool update_enable) {
     GX_SET_PE_REG(1, reg);
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801A2190
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void GXPokeDstAlpha(GXBool enable, u8 alpha) {
-    u32 reg = 0;
+    u32 reg;
+    u32 alpha_bits;
+    u32 enable_bits;
+    u32 out;
 
-    SET_REG_FIELD(747, reg, 8, 0, alpha);
-    SET_REG_FIELD(748, reg, 1, 8, enable);
-    GX_SET_PE_REG(2, reg);
+    reg = 0;
+    alpha_bits = alpha;
+    SET_REG_FIELD(747, reg, 8, 0, alpha_bits);
+    enable_bits = enable;
+    out = reg;
+    SET_REG_FIELD(748, out, 1, 8, enable_bits);
+    GX_SET_PE_REG(2, out);
 }
 
 void GXPokeDither(GXBool dither) {

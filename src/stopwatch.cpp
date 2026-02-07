@@ -2,7 +2,7 @@
 
 extern "C" float __cvt_sll_flt(u32 lo, u32 hi);
 
-extern char lbl_8032F860[]; // small-data string used by target
+extern char lbl_8032F860;
 extern float lbl_8032F854;  // 0.0f
 
 /*
@@ -51,7 +51,6 @@ void CStopWatch::Stop() { OSStopStopwatch(this); }
  */
 float CStopWatch::Get()
 {
-	// Match target: convert accumulated ticks (total) into microseconds as float.
 	u32* p = (u32*)&this->total;
 	u32 lo = p[0];
 	u32 hi = p[1];
@@ -67,7 +66,7 @@ float CStopWatch::Get()
  */
 CProfile::CProfile(char* name)
 {
-	OSInitStopwatch(this, lbl_8032F860);
+	OSInitStopwatch(this, &lbl_8032F860);
 	OSResetStopwatch(this);
 
 	OSStopwatch tmp;

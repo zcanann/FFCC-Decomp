@@ -118,7 +118,7 @@ tools/objdiff-cli --version  # Should show v3.6.1+
 This is likely the starting point for the agent.
 
 ### Step 1 - Select Target & Gather Context (automated)
-Run the selector once. It prints several random viable targets with symbol summaries.
+Run the selector once. It prints several random viable targets with symbol summaries. You should strongly bias towards functions that are large and have 0% match scores. There is the most to be gained from these.
 
 ```sh
 python3 tools/agent_select_target.py
@@ -183,7 +183,7 @@ Prefer changes that are source-plausible:
 - removing obviously redundant variables/branches
 - matching struct/field semantics (names and meaning)
 
-For initial stabs at large functions, hacky function bodies are permissable.
+EXCEPTION: If making a first pass at a large function, mangled code is tolerable.
 
 ### Step 8 - Create Pull Request (if improvement is real + plausible)
 

@@ -1,4 +1,5 @@
 #include "ffcc/quadobj.h"
+#include "ffcc/color.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -31,29 +32,36 @@ void CGQuadObj::onDestroy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80119788
+ * PAL Size: 424b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGQuadObj::onDraw()
 {
     if (m_vertexCount != 0 && (CFlatFlags & 0x10000) != 0) {
-        u32 white = 0xFFFFFFFF;
-        GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)&white);
+        CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+        GXSetChanMatColor(GX_COLOR0A0, white.color);
         GXLoadPosMtxImm(gFlatPosMtx, GX_PNMTX0);
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, (u32)m_vertexCount * 6);
 
         int i = 0;
-        while (i < (int)m_vertexCount) {
-            int next = (i + 1) % (int)m_vertexCount;
-            
-            GXPosition3f32(m_vertices[i].x, m_yBase, m_vertices[i].z);
-            GXPosition3f32(m_vertices[next].x, m_yBase, m_vertices[next].z);
-            GXPosition3f32(m_vertices[i].x, m_yBase + m_yHeight, m_vertices[i].z);
-            GXPosition3f32(m_vertices[next].x, m_yBase + m_yHeight, m_vertices[next].z);
-            GXPosition3f32(m_vertices[i].x, m_yBase, m_vertices[i].z);
-            GXPosition3f32(m_vertices[i].x, m_yBase + m_yHeight, m_vertices[i].z);
-            
+        QuadVertex* pVertex = m_vertices;
+        while (i < (int)(u32)m_vertexCount) {
+            int nextIdx = i + 1;
             i++;
+            GXPosition3f32(pVertex->x, m_yBase, pVertex->z);
+            int next = nextIdx - (nextIdx / (int)(u32)m_vertexCount) * (u32)m_vertexCount;
+            GXPosition3f32(m_vertices[next].x, m_yBase, m_vertices[next].z);
+            GXPosition3f32(pVertex->x, m_yBase + m_yHeight, pVertex->z);
+            next = nextIdx - (nextIdx / (int)(u32)m_vertexCount) * (u32)m_vertexCount;
+            GXPosition3f32(m_vertices[next].x, m_yBase + m_yHeight, m_vertices[next].z);
+            GXPosition3f32(pVertex->x, m_yBase, pVertex->z);
+            QuadVertex* current = pVertex;
+            pVertex++;
+            GXPosition3f32(current->x, m_yBase + m_yHeight, current->z);
         }
     }
 }

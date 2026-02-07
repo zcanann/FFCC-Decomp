@@ -14,7 +14,6 @@ extern "C" {
     void CacheDumpTexture__12CMaterialSetFiP13CAmemCacheSet(CMaterialSet*, unsigned int, void*);
 }
 
-void* pppShapeSt_GetTexture(long*, CMaterialSet*, int&);
 void pppDrawShp(long*, short, CMaterialSet*, unsigned char);
 void pppDrawShp(tagOAN3_SHAPE*, CMaterialSet*, unsigned char);
 void pppSetShapeMaterial0(pppShapeSt*, tagOAN3_SHAPE*, CMaterialSet*, char **);

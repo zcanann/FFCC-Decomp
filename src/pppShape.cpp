@@ -18,7 +18,7 @@ extern "C" {
  * JP Address: TODO
  * JP Size: TODO
  */
-void* pppShapeSt_GetTexture(long* animData, CMaterialSet* materialSet, int& textureIndex)
+void* pppShapeSt::GetTexture(long* animData, CMaterialSet* materialSet, int& textureIndex)
 {
     int shapePtr = (int)animData + *(short*)((int)animData + 0x10) + 8;
     textureIndex = (unsigned int)*(unsigned char*)(shapePtr + 2);

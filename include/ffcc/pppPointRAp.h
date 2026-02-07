@@ -9,7 +9,7 @@ extern "C" {
 #endif
 
 void pppPointRApCon(_pppMngSt* mngSt, _pppPDataVal* dataVal);
-void pppPointRAp(_pppMngSt* mngSt, _pppPDataVal* dataVal);
+void pppPointRAp(void* mngSt, void* dataVal, void* ctrlTable);
 
 #ifdef __cplusplus
 }

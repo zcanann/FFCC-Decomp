@@ -1155,20 +1155,29 @@ void GXSetTexCoordBias(GXTexCoordID coord, u8 s_enable, u8 t_enable) {
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801A46D0
+ * PAL Size: 184b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 static void __SetSURegs(u32 tmap, u32 tcoord) {
-    u32 w;
-    u32 h;
-    u8 s_bias;
-    u8 t_bias;
+    u32 image0;
+    u32 mode0;
+    s32 bias;
 
-    w = GET_REG_FIELD(__GXData->tImage0[tmap], 10, 0);
-    h = GET_REG_FIELD(__GXData->tImage0[tmap], 10, 10);
-    SET_REG_FIELD(2089, __GXData->suTs0[tcoord], 16, 0, w);
-    SET_REG_FIELD(2090, __GXData->suTs1[tcoord], 16, 0, h);
-    s_bias = GET_REG_FIELD(__GXData->tMode0[tmap], 2, 0) == 1;
-    t_bias = GET_REG_FIELD(__GXData->tMode0[tmap], 2, 2) == 1;
-    SET_REG_FIELD(2096, __GXData->suTs0[tcoord], 1, 16, s_bias);
-    SET_REG_FIELD(2097, __GXData->suTs1[tcoord], 1, 16, t_bias);
+    image0 = __GXData->tImage0[tmap];
+    __GXData->suTs0[tcoord] = (__GXData->suTs0[tcoord] & 0xFFFF0000) | (image0 & 0x3FF);
+    __GXData->suTs1[tcoord] = (__GXData->suTs1[tcoord] & 0xFFFF0000) | ((image0 >> 10) & 0x3FF);
+
+    mode0 = __GXData->tMode0[tmap];
+    bias = __cntlzw(1 - (mode0 & 3));
+    __GXData->suTs0[tcoord] = (__GXData->suTs0[tcoord] & ~0x10000) | (((u32)(bias >> 5)) << 16);
+    bias = __cntlzw(1 - ((mode0 >> 2) & 3));
+    __GXData->suTs1[tcoord] = (__GXData->suTs1[tcoord] & ~0x10000) | (((u32)(bias >> 5)) << 16);
     GX_WRITE_RAS_REG(__GXData->suTs0[tcoord]);
     GX_WRITE_RAS_REG(__GXData->suTs1[tcoord]);
     __GXData->bpSentNot = 0;

@@ -225,8 +225,6 @@ void __AXOutQuit(void) {
     OSRestoreInterrupts(old);
 }
 
-AXCallback AXRegisterCallback(AXCallback callback) {
-    AXCallback oldCB = __AXUserFrameCallback;
+void AXRegisterCallback(AXCallback callback) {
     __AXUserFrameCallback = callback;
-    return oldCB;
 }

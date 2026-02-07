@@ -1,309 +1,338 @@
-
+#include "dolphin.h"
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x8017B494
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void PPCMfmsr(void)
+u32 PPCMfmsr(void)
 {
-	// TODO
+    asm { mfmsr r3 }
 }
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x8017B49C
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void PPCMtmsr(void)
+void PPCMtmsr(register u32 newMSR)
 {
-	// TODO
+    asm { mtmsr newMSR }
 }
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x8017B4A4
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void PPCMfhid0(void)
+u32 PPCMfhid0(void)
 {
-	// TODO
+    asm { mfspr r3, HID0 }
 }
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x8017B4AC
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void PPCMthid0(void)
+void PPCMthid0(register u32 newHID0)
 {
-	// TODO
+    asm { mtspr HID0, newHID0 }
 }
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x8017B4B4
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void PPCMfl2cr(void)
+u32 PPCMfl2cr(void)
 {
-	// TODO
+    asm { mfspr r3, L2CR }
 }
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x8017B4BC
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void PPCMtl2cr(void)
+void PPCMtl2cr(register u32 newL2cr)
 {
-	// TODO
+    asm { mtspr L2CR, newL2cr }
 }
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x8017B4C4
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void PPCMtdec(void)
+void PPCMtdec(register u32 newDec)
 {
-	// TODO
+    asm { mtdec newDec }
 }
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x8017B4CC
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void PPCSync(void)
 {
-	// TODO
+    asm { sc }
 }
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x8017B4D4
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void PPCHalt(void)
 {
-	// TODO
+    asm {
+        sync
+    loop:
+        nop
+        li r3, 0
+        nop
+        b loop
+    }
 }
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x8017B4E8
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void PPCMtmmcr0(void)
+void PPCMtmmcr0(register u32 newMMCR0)
 {
-	// TODO
+    asm { mtspr MMCR0, newMMCR0 }
 }
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x8017B4F0
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void PPCMtmmcr1(void)
+void PPCMtmmcr1(register u32 newMMCR1)
 {
-	// TODO
+    asm { mtspr MMCR1, newMMCR1 }
 }
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x8017B4F8
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void PPCMtpmc1(void)
+void PPCMtpmc1(register u32 newPMC1)
 {
-	// TODO
+    asm { mtspr PMC1, newPMC1 }
 }
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x8017B500
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void PPCMtpmc2(void)
+void PPCMtpmc2(register u32 newPMC2)
 {
-	// TODO
+    asm { mtspr PMC2, newPMC2 }
 }
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x8017B508
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void PPCMtpmc3(void)
+void PPCMtpmc3(register u32 newPMC3)
 {
-	// TODO
+    asm { mtspr PMC3, newPMC3 }
 }
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x8017B510
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void PPCMtpmc4(void)
+void PPCMtpmc4(register u32 newPMC4)
 {
-	// TODO
+    asm { mtspr PMC4, newPMC4 }
 }
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x8017B518
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void PPCMffpscr(void)
+u32 PPCMffpscr(void)
 {
-	// TODO
+    register u32 out;
+
+    asm {
+        stwu r1, -0x18(r1)
+        stfd f31, 0x10(r1)
+        mffs f31
+        stfd f31, 0x8(r1)
+        lwz out, 0xc(r1)
+        lfd f31, 0x10(r1)
+        addi r1, r1, 0x18
+    }
+
+    return out;
 }
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x8017B538
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void PPCMtfpscr(void)
+void PPCMtfpscr(register u32 newFPSCR)
 {
-	// TODO
+    asm {
+        stwu r1, -0x20(r1)
+        stfd f31, 0x18(r1)
+        li r4, 0
+        stw r4, 0x10(r1)
+        stw newFPSCR, 0x14(r1)
+        lfd f31, 0x10(r1)
+        mtfsf 255, f31
+        lfd f31, 0x18(r1)
+        addi r1, r1, 0x20
+    }
 }
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x8017B560
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void PPCMfhid2(void)
+u32 PPCMfhid2(void)
 {
-	// TODO
+    asm { mfspr r3, HID2 }
 }
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x8017B568
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void PPCMthid2(void)
+void PPCMthid2(register u32 newHID2)
 {
-	// TODO
+    asm { mtspr HID2, newHID2 }
 }
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x8017B570
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void PPCMtwpar(void)
+void PPCMtwpar(register u32 newWPAR)
 {
-	// TODO
+    asm { mtspr WPAR, newWPAR }
 }
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x8017B578
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void PPCDisableSpeculation(void)
 {
-	// TODO
+    PPCMthid0(PPCMfhid0() | HID0_SPD);
 }
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x8017B5A0
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void PPCSetFpNonIEEEMode(void)
 {
-	// TODO
+    asm { mtfsb1 29 }
 }

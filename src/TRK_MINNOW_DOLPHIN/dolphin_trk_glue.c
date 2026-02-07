@@ -12,6 +12,7 @@ s32 _MetroTRK_Has_Framing;
 s32 gReadCount;
 s32 gReadPos;
 s32 gWritePos;
+extern volatile u8 TRK_Use_BBA;
 
 DBCommTable gDBCommTable = {};
 
@@ -102,7 +103,12 @@ DSError TRKInitializeIntDrivenUART(u32 param_0, u32 param_1, u32 param_2,
     return DS_NoError;
 }
 
-void EnableEXI2Interrupts(void) { gDBCommTable.init_interrupts_func(); }
+void EnableEXI2Interrupts(void)
+{
+    if (TRK_Use_BBA == 0 && gDBCommTable.init_interrupts_func != NULL) {
+        gDBCommTable.init_interrupts_func();
+    }
+}
 
 int TRKPollUART(void) 
 {

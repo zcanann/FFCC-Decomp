@@ -9,6 +9,10 @@ extern _pppMngSt* gPppMngSt;
  * --INFO--
  * PAL Address: 0x800de348
  * PAL Size: 24b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppPointApMtxCon(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal)
 {
@@ -26,6 +30,10 @@ void pppPointApMtxCon(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal)
  * --INFO--
  * PAL Address: 0x800de210  
  * PAL Size: 312b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppPointApMtx(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal, _pppMngSt* pppMngSt)
 {

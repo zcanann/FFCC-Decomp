@@ -56,4 +56,6 @@ void pppMatrixXYZ(pppFMATRIX& matrix, PPPCREATEPARAM* param)
 
     // Set translation components from position
     matrix.value[0][3] = param->m_positionOffsetPtr->x;
+    matrix.value[1][3] = param->m_positionOffsetPtr->y;
+    matrix.value[2][3] = param->m_positionOffsetPtr->z;
 }

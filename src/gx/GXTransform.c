@@ -443,6 +443,7 @@ void __GXSetViewport(void) {
     GX_WRITE_XF_REG_F(31, oz);
 }
 
+#pragma dont_inline on
 void GXSetViewportJitter(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz, u32 field) {
     CHECK_GXBEGIN(903, "GXSetViewport");  // not the correct function name
 
@@ -460,6 +461,7 @@ void GXSetViewportJitter(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz,
     __GXSetViewport();
     __GXData->bpSentNot = 1;
 }
+#pragma dont_inline reset
 
 void GXSetViewport(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz) {
     GXSetViewportJitter(left, top, wd, ht, nearz, farz, 1);

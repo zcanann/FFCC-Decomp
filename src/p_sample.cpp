@@ -81,40 +81,56 @@ void CSamplePcs::func1()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	4
+ * PAL Address: 0x8001fe74
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSamplePcs::onScriptChanging(char*)
+void CProcess::onScriptChanging(char*)
 {
 	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	4
+ * PAL Address: 0x8001fe78
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSamplePcs::onScriptChanged(char*, int)
+void CProcess::onScriptChanged(char*, int)
 {
 	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	4
+ * PAL Address: 0x8001fe7c
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSamplePcs::onMapChanging(int, int)
+void CProcess::onMapChanging(int, int)
 {
 	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	4
+ * PAL Address: 0x8001fe80
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSamplePcs::onMapChanged(int, int, int)
+void CProcess::onMapChanged(int, int, int)
 {
 	return;
 }

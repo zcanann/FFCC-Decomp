@@ -12,8 +12,9 @@ extern _pppMngSt* gPppMngSt;
  */
 void pppPointApMtxCon(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal)
 {
-	unsigned long offset = *((unsigned long*)((char*)pppPDataVal + 0xc));
-	*((unsigned char*)pppPObject + offset + 0x81) = 0;
+	char* ptr = (char*)pppPObject;
+	ptr += (int)((void**)((char*)pppPDataVal + 0xc))[0];
+	ptr[0x81] = 0;
 }
 
 /*

@@ -2,16 +2,18 @@
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800de6d0
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppVertexApMtxCon(_pppPObject* obj, PVertexApMtx* vtx)
 {
-	// Get base address from vtx offset 0xc
-	char* base = *(char**)((char*)vtx + 0xc);
-	// Calculate final address: obj + base + 0x80
-	char* target = (char*)obj + (int)base + 0x80;
-	// Zero out two shorts at the target location
+	int offset = **(int**)((char*)vtx + 0xc);
+	char* target = (char*)obj + offset + 0x80;
+
 	*(short*)target = 0;
 	*(short*)(target + 2) = 0;
 }

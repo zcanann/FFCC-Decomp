@@ -214,16 +214,12 @@ void __init_file(FILE* file, file_modes mode, unsigned char* buffer, int buffer_
  * JP Size: TODO
  */
 int __flush_line_buffered_output_files(void) {
-    FILE* file = &__files[0];
     int result = 0;
+    FILE* file = &__files[0];
     unsigned char* file_bytes;
     unsigned short mode_bits;
 
-    while (1) {
-        if (file == NULL) {
-            break;
-        }
-
+    while (file != NULL) {
         file_bytes = (unsigned char*)file;
         mode_bits = *(unsigned short*)(file_bytes + 4);
         if ((((mode_bits >> 6) & 7) != 0) && (((file_bytes[4] >> 1) & 1) != 0) &&

@@ -4,6 +4,8 @@
 
 #include "dolphin/gx/__gx.h"
 
+extern u32 __cvt_fp2unsigned(f64 d);
+
 void GXProject(f32 x, f32 y, f32 z, const Mtx mtx, const f32* pm, const f32* vp, f32* sx, f32* sy, f32* sz) {
     Vec peye;
     f32 xc;
@@ -99,18 +101,13 @@ void GXSetProjection(const Mtx44 mtx, GXProjectionType type) {
 void GXSetProjectionv(const f32* ptr) {
     CHECK_GXBEGIN(339, "GXSetProjectionv");
 
-    __GXData->projType = ptr[0] == 0.0f ? GX_PERSPECTIVE : GX_ORTHOGRAPHIC;
-
-#if DEBUG
+    __GXData->projType = __cvt_fp2unsigned((f64)ptr[0]);
     __GXData->projMtx[0] = ptr[1];
     __GXData->projMtx[1] = ptr[2];
     __GXData->projMtx[2] = ptr[3];
     __GXData->projMtx[3] = ptr[4];
     __GXData->projMtx[4] = ptr[5];
     __GXData->projMtx[5] = ptr[6];
-#else
-    Copy6Floats(&ptr[1], __GXData->projMtx);
-#endif
 
     __GXSetProjection();
     __GXData->bpSentNot = 1;
@@ -121,18 +118,13 @@ void GXSetProjectionv(const f32* ptr) {
 void GXGetProjectionv(f32* ptr) {
     ASSERTMSGLINE(370, ptr, "GXGet*: invalid null pointer");
 
-    ptr[0] = (u32)__GXData->projType != GX_PERSPECTIVE ? 1.0f : 0.0f;
-
-#if DEBUG
+    ptr[0] = (f32)__GXData->projType;
     ptr[1] = __GXData->projMtx[0];
     ptr[2] = __GXData->projMtx[1];
     ptr[3] = __GXData->projMtx[2];
     ptr[4] = __GXData->projMtx[3];
     ptr[5] = __GXData->projMtx[4];
     ptr[6] = __GXData->projMtx[5];
-#else
-    Copy6Floats(__GXData->projMtx, &ptr[1]);
-#endif
 }
 
 static void WriteMTXPS4x3(const register f32 mtx[3][4], register volatile f32* dest) {

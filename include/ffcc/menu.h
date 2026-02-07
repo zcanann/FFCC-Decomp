@@ -1,7 +1,9 @@
 #ifndef _FFCC_MENU_H_
 #define _FFCC_MENU_H_
 
-class CMenu
+#include "ffcc/ref.h"
+
+class CMenu : public CRef
 {
 public:
     CMenu();

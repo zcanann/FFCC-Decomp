@@ -15,7 +15,7 @@ void DrawGoOutMenu()
  * Address:	TODO
  * Size:	TODO
  */
-void getFreeCaravanIdx(CMemoryCardMan::Mc::SaveDat*)
+void getFreeCaravanIdx(Mc::SaveDat*)
 {
 	// TODO
 }

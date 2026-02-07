@@ -206,10 +206,10 @@ public:
     void GetMaxAnimWait();
     void BindMcObj();
     void DrawFilter(unsigned char, unsigned char, unsigned char, unsigned char);
-    void CopyNowCaravanDat(CMemoryCardMan::Mc::SaveDat*);
-    void SetCaravanWork(CMemoryCardMan::Mc::SaveDat*);
-    void GetSameCharaData(CMemoryCardMan::Mc::SaveDat*, CMemoryCardMan::Mc::SaveDat*, int, int);
-    void CheckSameMcFormatID(CMemoryCardMan::Mc::SaveDat*, CMemoryCardMan::Mc::SaveDat*);
+    void CopyNowCaravanDat(Mc::SaveDat*);
+    void SetCaravanWork(Mc::SaveDat*);
+    void GetSameCharaData(Mc::SaveDat*, Mc::SaveDat*, int, int);
+    void CheckSameMcFormatID(Mc::SaveDat*, Mc::SaveDat*);
     void IsAsyncCharaLoadFinish();
     void AlphaNormal();
     void AlphaAdd();

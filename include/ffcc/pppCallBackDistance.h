@@ -13,8 +13,9 @@ struct pppCallBackDistance {
 };
 
 struct UnkB {
-    u32 m_dataValIndex;
-    u16 m_initWOrk;
+    u32 m_unk0;
+    f32 m_dataValIndex;
+    s16 m_initWOrk;
 };
 
 struct UnkC {

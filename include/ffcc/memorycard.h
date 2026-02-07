@@ -6,19 +6,16 @@
 #include "ffcc/manager.h"
 
 class CStage;
+namespace Mc
+{
+class SaveDat
+{
+};
+}
 
 class CMemoryCardMan : public CManager
 {
 public:
-    class Mc
-    {
-    public:
-        class SaveDat
-        {
-            public:
-        };
-    };
-
     CMemoryCardMan();
 
     void Init();
@@ -52,8 +49,8 @@ public:
 
     void MakeSaveData();
     void SetLoadData();
-    unsigned int CalcCrc(Mc::SaveDat*);
-    unsigned int ChkCrc(Mc::SaveDat*);
+    unsigned int CalcCrc(::Mc::SaveDat*);
+    unsigned int ChkCrc(::Mc::SaveDat*);
 
     int DummySave();
     int DummyLoad();
@@ -64,8 +61,8 @@ public:
     void EncodeData();
     void DecodeData();
 
-    void CalcSaveDatHpMax(Mc::SaveDat*);
-    void Odekake(int, Mc::SaveDat&, int, Mc::SaveDat&, int);
+    void CalcSaveDatHpMax(::Mc::SaveDat*);
+    void Odekake(int, ::Mc::SaveDat&, int, ::Mc::SaveDat&, int);
 
     // void* vtable;           // 0x00
     int m_result;              // 0x04

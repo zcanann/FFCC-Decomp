@@ -1007,7 +1007,7 @@ void CMenuPcs::DrawFilter(unsigned char, unsigned char, unsigned char, unsigned 
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::CopyNowCaravanDat(CMemoryCardMan::Mc::SaveDat*)
+void CMenuPcs::CopyNowCaravanDat(Mc::SaveDat*)
 {
 	// TODO
 }
@@ -1017,7 +1017,7 @@ void CMenuPcs::CopyNowCaravanDat(CMemoryCardMan::Mc::SaveDat*)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::SetCaravanWork(CMemoryCardMan::Mc::SaveDat*)
+void CMenuPcs::SetCaravanWork(Mc::SaveDat*)
 {
 	// TODO
 }
@@ -1027,7 +1027,7 @@ void CMenuPcs::SetCaravanWork(CMemoryCardMan::Mc::SaveDat*)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::GetSameCharaData(CMemoryCardMan::Mc::SaveDat*, CMemoryCardMan::Mc::SaveDat*, int, int)
+void CMenuPcs::GetSameCharaData(Mc::SaveDat*, Mc::SaveDat*, int, int)
 {
 	// TODO
 }
@@ -1037,7 +1037,7 @@ void CMenuPcs::GetSameCharaData(CMemoryCardMan::Mc::SaveDat*, CMemoryCardMan::Mc
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::CheckSameMcFormatID(CMemoryCardMan::Mc::SaveDat*, CMemoryCardMan::Mc::SaveDat*)
+void CMenuPcs::CheckSameMcFormatID(Mc::SaveDat*, Mc::SaveDat*)
 {
 	// TODO
 }

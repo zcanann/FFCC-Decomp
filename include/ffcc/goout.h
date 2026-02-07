@@ -13,7 +13,7 @@ class McCtrl;
 
 extern CMenuPcs MenuPcs;
 
-void getFreeCaravanIdx(CMemoryCardMan::Mc::SaveDat*);
+void getFreeCaravanIdx(Mc::SaveDat*);
 void CalcGoOutMenu();
 void DrawGoOutMenu();
 

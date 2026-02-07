@@ -35,11 +35,12 @@ void pppRandUpFloat(void* param1, void* param2, void* param3) {
         return;
     }
 
-    int* p1 = (int*)param1;
+    char* base = (char*)param1;
     RandUpFloatParam* p2 = (RandUpFloatParam*)param2;
     RandUpFloatCtx* p3 = (RandUpFloatCtx*)param3;
+    float* valuePtr;
 
-    int id = p1[3];
+    int id = *(int*)(base + 0xC);
     if (id == 0) {
         float value = RandF__5CMathFv(&math);
 
@@ -47,27 +48,19 @@ void pppRandUpFloat(void* param1, void* param2, void* param3) {
             value = (value + RandF__5CMathFv(&math)) * lbl_8032FFF8;
         }
 
-        int outIndex = *p3->outputOffset;
-        float* outValue = (float*)((char*)param1 + outIndex + 0x80);
-        *outValue = value;
-        return;
+        valuePtr = (float*)(base + *p3->outputOffset + 0x80);
+        *valuePtr = value;
+    } else {
+        if (p2->targetId != id) {
+            return;
+        }
+        valuePtr = (float*)(base + *p3->outputOffset + 0x80);
     }
 
-    if (p2->targetId != id) {
-        return;
-    }
-
-    int outIndex = *p3->outputOffset;
-    float* outValue = (float*)((char*)param1 + outIndex + 0x80);
-
-    int sourceIndex = p2->sourceOffset;
     float* source = &lbl_801EADC8;
-    if (sourceIndex != -1) {
-        source = (float*)((char*)param1 + sourceIndex + 0x80);
+    if (p2->sourceOffset != -1) {
+        source = (float*)(base + p2->sourceOffset + 0x80);
     }
 
-    float blend = p2->blend;
-    float current = *source;
-    float output = *outValue;
-    *source = current + (blend * output);
+    *source = *source + (p2->blend * *valuePtr);
 }

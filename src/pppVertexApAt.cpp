@@ -1,69 +1,134 @@
 #include "ffcc/pppVertexApAt.h"
+#include "ffcc/math.h"
+#include "ffcc/partMng.h"
+
+#include <dolphin/types.h>
+
+struct VertexApAtEntry
+{
+    u16 unk0;
+    s16 maxValue;
+    u32 unk4;
+};
+
+struct VertexApAtEnv
+{
+    u8 unk0[0x10];
+    VertexApAtEntry* entries;
+};
+
+struct _pppPDataVal;
+
+extern CMath math;
+extern int lbl_8032ED70;
+extern unsigned char* lbl_8032ED50;
+extern VertexApAtEnv* lbl_8032ED54;
+extern "C" f32 RandF__5CMathFv(CMath*);
+extern _pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80064cc8
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppVertexApAtCon(_pppPObject* obj, PVertexApAt* data)
 {
-	// Based on assembly: lwz r4, 0xc(r4) -> lwz r4, 0x0(r4) -> addi r4, r4, 0x80 -> add r4, r3, r4
-	void* dataPtr = *(void**)((char*)data + 0xc);
-	int baseOffset = *(int*)dataPtr;
-	void* targetPtr = (char*)obj + baseOffset + 0x80;
-	
-	*(short*)targetPtr = 0;
-	*((short*)targetPtr + 1) = 0;
+    s32 offset = **(s32**)((u8*)data + 0xC);
+    u16* state = (u16*)((u8*)obj + offset + 0x80);
+    state[0] = 0;
+    state[1] = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80064ce8
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void apea(_pppPObject*, PVertexApAt*, unsigned short)
 {
-	// TODO
+    // Intentionally empty.
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80064b08
+ * PAL Size: 444b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppVertexApAt(_pppPObject* obj, PVertexApAt* data, void* param3)
+void pppVertexApAt(_pppPObject* parent, PVertexApAt* data, void* ctrl)
 {
-	// Based on assembly analysis - complex function with loops and object creation
-	void* dataPtr = *(void**)((char*)data + 0xc);
-	void* basePtr = *(void**)dataPtr;
-	void* targetPtr = (char*)obj + (int)basePtr + 0x80;
-	
-	// Assembly shows checks for global flags and branches
-	int globalFlag = *(int*)0x8032ED70; // Global flag check
-	if (globalFlag == 0) {
-		short value = *(short*)((char*)data + 0x4);
-		if (value < 0) return;
-		
-		unsigned short currentValue = *(unsigned short*)((char*)targetPtr + 0x2);
-		if (currentValue != 0) {
-			// Complex loop logic would go here
-			// For now, simplified version
-			return;
-		}
-		
-		// Function calls pppCreatePObject and sets various values
-		// This is a simplified placeholder implementation
-		unsigned char loopCount = *(unsigned char*)((char*)data + 0x6);
-		for (int i = 0; i < loopCount; i++) {
-			// Loop body would implement object creation logic
-		}
-	}
-	
-	// Set final values
-	unsigned char finalValue = *(unsigned char*)((char*)data + 0x7);
-	*(short*)((char*)targetPtr + 0x2) = finalValue;
-	
-	if (*(short*)((char*)targetPtr + 0x2) > 0) {
-		(*(short*)((char*)targetPtr + 0x2))--;
-	}
+    s32 stateOffset = **(s32**)((u8*)ctrl + 0xC);
+    u16* state = (u16*)((u8*)parent + stateOffset + 0x80);
+
+    if (lbl_8032ED70 == 0) {
+        s32 entryIndex = *(s16*)((u8*)data + 0x4);
+
+        if (entryIndex >= 0) {
+            if (state[1] == 0) {
+                VertexApAtEntry* entry = &lbl_8032ED54->entries[entryIndex];
+                s32 mode = *(u8*)((u8*)data + 0x8);
+                s32 count = *(u8*)((u8*)data + 0x6);
+
+                if (mode == 0) {
+                    do {
+                        if (state[0] >= (u16)entry->maxValue) {
+                            state[0] = 0;
+                        }
+
+                        u16 outValue = state[0];
+                        state[0] = outValue + 1;
+
+                        u32 childId = *(u32*)((u8*)data + 0xC);
+                        if ((childId + 0x10000) != 0xFFFF) {
+                            _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (childId << 4));
+                            _pppPObject* child;
+
+                            if (childData == 0) {
+                                child = 0;
+                            } else {
+                                child = pppCreatePObject((_pppMngSt*)lbl_8032ED50, childData);
+                                *(void**)((u8*)child + 0x4) = parent;
+                            }
+
+                            *(u16*)((u8*)child + *(u32*)((u8*)data + 0x10) + 0x80) = outValue;
+                        }
+                    } while (count-- != 0);
+                } else if (mode == 1) {
+                    do {
+                        u16 outValue = (u16)(RandF__5CMathFv(&math) * (f32)entry->maxValue);
+                        u32 childId = *(u32*)((u8*)data + 0xC);
+
+                        if ((childId + 0x10000) != 0xFFFF) {
+                            _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (childId << 4));
+                            _pppPObject* child;
+
+                            if (childData == 0) {
+                                child = 0;
+                            } else {
+                                child = pppCreatePObject((_pppMngSt*)lbl_8032ED50, childData);
+                                *(void**)((u8*)child + 0x4) = parent;
+                            }
+
+                            *(u16*)((u8*)child + *(u32*)((u8*)data + 0x10) + 0x80) = outValue;
+                        }
+                    } while (count-- != 0);
+                }
+
+                state[1] = *(u8*)((u8*)data + 0x7);
+            }
+
+            state[1]--;
+        }
+    }
 }

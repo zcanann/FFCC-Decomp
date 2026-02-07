@@ -262,15 +262,8 @@ void GXSetTevKColor(GXTevKColorID id, GXColor color) {
 
     CHECK_GXBEGIN(833, "GXSetTevKColor");
 
-    regRA = (0xE0 + id * 2) << 24;
-    regRA |= color.r;
-    regRA |= color.a << 12;
-    regRA |= 8 << 20;
-
-    regBG = (0xE1 + id * 2) << 24;
-    regBG |= color.b;
-    regBG |= color.g << 12;
-    regBG |= 8 << 20;
+    regRA = ((0xE0 + id * 2) << 24) | color.r | (color.a << 12) | (8 << 20);
+    regBG = ((0xE1 + id * 2) << 24) | color.b | (color.g << 12) | (8 << 20);
 
     GX_WRITE_RAS_REG(regRA);
     GX_WRITE_RAS_REG(regBG);
@@ -354,10 +347,7 @@ void GXSetAlphaCompare(GXCompare comp0, u8 ref0, GXAlphaOp op, GXCompare comp1, 
     u32 reg;
 
     CHECK_GXBEGIN(1046, "GXSetAlphaCompare");
-    reg = 0xF3000000;
-
-    reg |= ref0 & 0xFF;
-    reg |= (ref1 & 0xFF) << 8;
+    reg = 0xF3000000 | (ref0 & 0xFF) | ((ref1 & 0xFF) << 8);
     reg |= (comp0 & 7) << 16;
     reg |= (comp1 & 7) << 19;
     reg |= (op & 3) << 22;

@@ -15,8 +15,8 @@ extern float FLOAT_803331d8;
  */
 void pppDrawMatrixLoc(_pppPObject* param_1)
 {
-    Vec local_38;
     Vec local_2c;
+    Vec local_38;
     Vec local_20[2];
     
     local_2c.z = FLOAT_803331d8;

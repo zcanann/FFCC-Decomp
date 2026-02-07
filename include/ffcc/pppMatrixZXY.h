@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-void pppMatrixZXY(pppFMATRIX* matrix, void* scaleData, pppIVECTOR4* angle);
+void pppMatrixZXY(void* target, void* unused, void* param);
 
 #ifdef __cplusplus
 }

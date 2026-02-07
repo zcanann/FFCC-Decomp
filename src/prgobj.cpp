@@ -32,6 +32,84 @@ void CGPrgObj::onFrame()
 
 /*
  * --INFO--
+ * PAL Address: 0x80127010
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGPrgObj::onCancelStat(int)
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80127014
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGPrgObj::onChangeStat(int)
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80127018
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGPrgObj::onFramePreCalc()
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012701C
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGPrgObj::onFramePostCalc()
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80127020
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGPrgObj::onFrameStat()
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80127024
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGPrgObj::onChangePrg(int)
+{
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

@@ -67,24 +67,6 @@ When updating functions, include version-specific address and size information:
 
 **Key relationships:** Unit -> Object file -> Source file. Use symbols for context, Ghidra decomp for low match score functions.
 
-## State Tracking & Memory
-
-### Automation Notes
-
-## OpenClaw
-- **Main log**: `~/.openclaw/workspace/memory/ffcc-decomp-notes.md`
-- **Session state**: `~/.openclaw/workspace/memory/decomp-state.json`
-
-Update these files to track progress and avoid cycling through failed targets.
-
-## Codex
-
-No action required.
-
-## Scope (current)
-- **Target version:** **PAL** (`GCCP01`) - required for now.
-  - Do not attempt other versions until PAL is substantially complete.
-
 ## Preconditions (one-time setup)
 Skip the preconditions step unless errors are encountered indicating lack of initial setup.
 
@@ -106,6 +88,7 @@ From repo root:
 ```sh
 python3 configure.py --version GCCP01
 ```
+Note: GCCP01 is PAL, which is the only version we are working on currently. Do not attempt to swtich versions.
 
 ### 3) Build once
 ```sh
@@ -190,6 +173,7 @@ The goal is to match what the **original FFCC authors likely wrote**, not merely
 Reject/avoid changes that look like "compiler coaxing," e.g.:
 - contrived temporaries and reordering that a human wouldn't naturally write
 - intentionally odd sequencing unless there's strong evidence
+- using hardcoded offsets to objects instead of making member variables
 - changes that preserve output but reduce readability without a clear original-source rationale
 - **explanatory comments that add no real information** (e.g., "Plausible original behavior: ...")
 
@@ -268,20 +252,3 @@ Before creating any FFCC-Decomp PR:
 6. **Build**: `ninja`
 7. **Analyze**: `build/tools/objdiff-cli diff -p . -u <unit> -o - <symbol>`
 8. **If real improvement**: commit, push, create PR with technical details
-
-**Constraints**: One branch per unit, 30-60 min time limit.
-
----
-
-## Notes / troubleshooting
-
-### Missing `main.dol`
-If you see:
-- `orig/GCCP01/sys/main.dol not found`
-You haven't synced the original files into `orig/GCCP01/`.
-
-### Endpoint gotcha (Moltbook-style)
-Not applicable here.
-
-
-

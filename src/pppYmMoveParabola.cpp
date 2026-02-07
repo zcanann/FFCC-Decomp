@@ -25,28 +25,39 @@ extern int DAT_8032ed70;      // Global flag
  */
 extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, struct UnkC* dataPtr)
 {
-    f32 zero = FLOAT_80330e1c;
     _pppMngSt* pppMngSt = pppMngStPtr;
+    Vec* savedPosition = (Vec*)((u8*)pppMngSt + 0x58);
+    Vec* paramVec0 = (Vec*)((u8*)pppMngSt + 0x68);
     f32* pfVar = (f32*)((u8*)&basePtr->field0_0x0 + 8 + *dataPtr->m_serializedDataOffsets);
-    
-    // Initialize velocity components
+
+    f32 fVar2 = FLOAT_80330e1c;
     pfVar[2] = FLOAT_80330e1c;
-    pfVar[1] = zero;
-    *pfVar = zero;
+    pfVar[1] = fVar2;
+    *pfVar = fVar2;
     *(u16*)(pfVar + 3) = 1;
-    
+
     if (Game.game.m_currentSceneId == 7) {
-        // Get matrix position for initialization
-        f32 matrixX = pppMngStPtr->m_matrix.value[0][3];
-        f32 matrixY = pppMngStPtr->m_matrix.value[1][3];
-        f32 matrixZ = pppMngStPtr->m_matrix.value[2][3];
-        
-        pfVar[4] = matrixX;
-        pfVar[5] = matrixY;
-        pfVar[6] = matrixZ;
-        
-        // Add offset to X component
-        pfVar[4] = pfVar[4] + FLOAT_80330e18;
+        Vec matrixPos;
+        Vec basePos;
+        Vec resultPos;
+
+        pppCopyVector(*(Vec*)(pfVar + 4), *savedPosition);
+
+        matrixPos.x = pppMngStPtr->m_matrix.value[0][3];
+        matrixPos.y = pppMngStPtr->m_matrix.value[1][3];
+        matrixPos.z = pppMngStPtr->m_matrix.value[2][3];
+
+        basePos.x = pfVar[4];
+        basePos.y = pfVar[5];
+        basePos.z = pfVar[6];
+
+        pppAddVector(*(Vec*)(pfVar + 4), basePos, matrixPos);
+
+        resultPos.x = pfVar[4];
+        resultPos.y = pfVar[5];
+        resultPos.z = pfVar[6];
+        pppCopyVector(*paramVec0, resultPos);
+        paramVec0->x = paramVec0->x + FLOAT_80330e18;
     }
 }
 

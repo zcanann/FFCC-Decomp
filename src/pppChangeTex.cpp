@@ -1,10 +1,34 @@
 #include "ffcc/pppChangeTex.h"
+#include "ffcc/graphic.h"
 #include "dolphin/gx.h"
 
-// Simple approach using direct memory access 
+struct _pppMngStChangeTex {
+	char _pad0[0xd8];
+	void* m_charaObj;
+};
+
+struct _pppEnvStChangeTex {
+	void* m_stagePtr;
+	CMaterialSet* m_materialSetPtr;
+	CMapMesh** m_mapMeshPtr;
+};
+
 extern char MaterialMan[];
 extern void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
 extern void GXCallDisplayList(void*, unsigned int);
+extern _pppMngStChangeTex* pppMngStPtr;
+extern _pppEnvStChangeTex* lbl_8032ED54;
+extern float FLOAT_80332040;
+
+extern "C" {
+	int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
+	void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int stage, int rasSel, int texSel);
+	void pppInitBlendMode__Fv(void);
+	void _WaitDrawDone__8CGraphicFPci(CGraphic* graphic, const char* file, int line);
+	void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
+	int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
+	void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
+}
 
 /*
  * --INFO--
@@ -141,42 +165,137 @@ void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void*
 
 /*
  * --INFO--
- * Address:	8013f744
- * Size:	64b
+ * PAL Address: 0x8013f744
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppConstructChangeTex(void)
+void pppConstructChangeTex(pppChangeTex* changeTex, UnkC* data)
 {
-	// Simple initialization pattern
-	float data[16];
-	
-	data[0] = 0.0f;
-	data[1] = 0.0f; 
-	data[2] = 0.0f;
-	data[3] = 0.0f;
-	data[4] = 0.0f;
-	data[6] = 0.0f;
-	data[7] = 0.0f;
-	data[9] = 0.0f;
+	float init = FLOAT_80332040;
+	float* state = (float*)((char*)changeTex + data->m_serializedDataOffsets[2] + 0x80);
+	int* stateInt = (int*)state;
+
+	state[0] = init;
+	state[2] = init;
+	state[1] = init;
+	stateInt[6] = 0;
+	stateInt[9] = (int)pppMngStPtr;
+	stateInt[7] = 0;
+	stateInt[3] = 0;
+	stateInt[4] = 0;
 }
 
 /*
  * --INFO--
- * Address:	8013f720
- * Size:	36b
+ * PAL Address: 0x8013f720
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppConstruct2ChangeTex(void)
+void pppConstruct2ChangeTex(pppChangeTex* changeTex, UnkC* data)
 {
-	// Simple stub
+	float* state = (float*)((char*)changeTex + data->m_serializedDataOffsets[2] + 0x80);
+	float init = FLOAT_80332040;
+
+	state[0] = init;
+	state[2] = init;
+	state[1] = init;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8013f504
+ * PAL Size: 540b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppDestructChangeTex(void)
+void pppDestructChangeTex(pppChangeTex* changeTex, UnkC* data)
 {
-	// TODO
+	unsigned int i;
+	unsigned int j;
+	int model = 0;
+	int dataOffset = data->m_serializedDataOffsets[2];
+	void* handle0;
+	void* handle1;
+	void* handle2;
+
+	_WaitDrawDone__8CGraphicFPci(&Graphic, "pppChangeTex.cpp", 0x9d);
+
+	handle0 = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)changeTex + 0x98 + dataOffset), 0);
+	handle1 = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)changeTex + 0x98 + dataOffset), 1);
+	handle2 = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)changeTex + 0x98 + dataOffset), 2);
+
+	if (handle0 != 0) {
+		model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle0);
+		*(void**)(model + 0xe4) = 0;
+		*(void**)(model + 0xe8) = 0;
+		*(void**)(model + 0xf4) = 0;
+		*(void**)(model + 0xfc) = 0;
+		*(void**)(model + 0x104) = 0;
+	}
+	if (handle1 != 0) {
+		int model1 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle1);
+		if (model1 != 0) {
+			*(void**)(model1 + 0xe4) = 0;
+			*(void**)(model1 + 0xe8) = 0;
+			*(void**)(model1 + 0xf4) = 0;
+			*(void**)(model1 + 0xfc) = 0;
+			*(void**)(model1 + 0x104) = 0;
+		}
+	}
+	if (handle2 != 0) {
+		int model2 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle2);
+		if (model2 != 0) {
+			*(void**)(model2 + 0xe4) = 0;
+			*(void**)(model2 + 0xe8) = 0;
+			*(void**)(model2 + 0xf4) = 0;
+			*(void**)(model2 + 0xfc) = 0;
+			*(void**)(model2 + 0x104) = 0;
+		}
+	}
+
+	void** stageArray = *(void***)((char*)changeTex + 0x90 + dataOffset);
+	void** meshArray = *(void***)((char*)changeTex + 0x8c + dataOffset);
+	if ((stageArray == 0) || (meshArray == 0)) {
+		return;
+	}
+
+	int meshList = *(int*)(model + 0xac);
+	unsigned int meshCount = *(unsigned int*)(*(int*)(model + 0xa4) + 0xc);
+	for (i = 0; i < meshCount; i++) {
+		unsigned int dlCount = *(unsigned int*)(*(int*)(meshList + 8) + 0x4c);
+		void** dlEntries = (void**)*stageArray;
+		for (j = 0; j < dlCount; j++) {
+			if (dlEntries[0] != 0) {
+				pppHeapUseRate__FPQ27CMemory6CStage(dlEntries[0]);
+				dlEntries[0] = 0;
+			}
+			dlEntries++;
+		}
+
+		if (*stageArray != 0) {
+			pppHeapUseRate__FPQ27CMemory6CStage(*stageArray);
+			*stageArray = 0;
+		}
+		if (*meshArray != 0) {
+			pppHeapUseRate__FPQ27CMemory6CStage(*meshArray);
+			*meshArray = 0;
+		}
+
+		stageArray++;
+		meshArray++;
+		meshList += 0x14;
+	}
+
+	pppHeapUseRate__FPQ27CMemory6CStage(*(void**)((char*)changeTex + 0x90 + dataOffset));
+	pppHeapUseRate__FPQ27CMemory6CStage(*(void**)((char*)changeTex + 0x8c + dataOffset));
 }
 
 /*
@@ -188,7 +307,7 @@ void pppDestructChangeTex(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameChangeTex(void)
+void pppFrameChangeTex(pppChangeTex*, UnkB*, UnkC*)
 {
 	// TODO: This is a very complex function that needs proper type definitions
 	// Basic structure from Ghidra decomp shows:
@@ -211,10 +330,22 @@ void pppFrameChangeTex(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8013ef94
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppRenderChangeTex(void)
+void pppRenderChangeTex(pppChangeTex*, UnkB* step, UnkC*)
 {
-	// TODO
+	unsigned int local_8[2];
+
+	if (step->m_dataValIndex != 0xffff) {
+		local_8[0] = 0;
+		GetTexture__8CMapMeshFP12CMaterialSetRi(
+		    lbl_8032ED54->m_mapMeshPtr[step->m_dataValIndex], lbl_8032ED54->m_materialSetPtr, (int&)local_8[0]);
+		_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+		pppInitBlendMode__Fv();
+	}
 }

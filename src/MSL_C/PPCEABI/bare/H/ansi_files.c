@@ -154,7 +154,6 @@ FILE* __find_unopened_file(void) {
 
     memset(file, 0, 0x50);
     file->is_dynamically_allocated = 1;
-
     prev->next_file_struct = file;
 
     return file;
@@ -171,7 +170,6 @@ FILE* __find_unopened_file(void) {
  */
 void __init_file(FILE* file, file_modes mode, unsigned char* buffer, int buffer_size) {
     unsigned char* state_bytes;
-    unsigned short mode_bits;
 
     file->handle = 0;
     file->file_mode = mode;
@@ -193,8 +191,7 @@ void __init_file(FILE* file, file_modes mode, unsigned char* buffer, int buffer_
     file->buffer_ptr = file->buffer;
     file->buffer_length = 0;
 
-    mode_bits = *(unsigned short*)((unsigned char*)file + 4);
-    if (((mode_bits >> 6) & 7) == __disk_file) {
+    if (file->file_mode.file_kind == __disk_file) {
         file->position_fn = __position_file;
         file->read_fn = __read_file;
         file->write_fn = __write_file;
@@ -216,18 +213,10 @@ void __init_file(FILE* file, file_modes mode, unsigned char* buffer, int buffer_
 int __flush_line_buffered_output_files(void) {
     FILE* file = &__files[0];
     int result = 0;
-    unsigned char* file_bytes;
-    unsigned short mode_bits;
 
-    while (1) {
-        if (file == NULL) {
-            break;
-        }
-
-        file_bytes = (unsigned char*)file;
-        mode_bits = *(unsigned short*)(file_bytes + 4);
-        if ((((mode_bits >> 6) & 7) != 0) && (((file_bytes[4] >> 1) & 1) != 0) &&
-            ((file_bytes[8] >> 5) == 1)) {
+    while (file != NULL) {
+        if ((file->file_mode.file_kind != __closed_file) && file->file_mode.buffer_mode &&
+            (file->file_state.io_state == __writing)) {
             if (fflush(file) != 0) {
                 result = -1;
             }

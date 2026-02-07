@@ -1,7 +1,27 @@
 #include "ffcc/pppRandUpInt.h"
 #include "ffcc/math.h"
+#include "types.h"
 
 extern CMath math;
+extern s32 lbl_8032ED70;
+extern f32 lbl_80330018;
+extern f64 lbl_80330020;
+extern s32 lbl_801EADC8;
+extern "C" {
+f32 RandF__5CMathFv(CMath*);
+}
+
+struct PppRandUpIntParam2 {
+    s32 field0;
+    s32 field4;
+    u32 field8;
+    u8 fieldC;
+};
+
+struct PppRandUpIntParam3 {
+    u8 unk0[0xC];
+    s32* fieldC;
+};
 
 /*
  * --INFO--
@@ -12,77 +32,51 @@ extern CMath math;
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRandUpInt(int index, void* param2, void* param3)
+void pppRandUpInt(void* param1, void* param2, void* param3)
 {
-    if (param2 == 0 || param3 == 0) {
+    if (lbl_8032ED70 != 0) {
         return;
     }
-    
-    int* p2 = (int*)param2;
-    int* p3 = (int*)param3;
-    
-    // Check condition at offset 0xc of param2  
-    if (p2[3] == 0) {
-        // First RandF call - generates random float
-        math.RandF();
-        
-        // Check byte at offset 0xc of param2
-        unsigned char* p2_bytes = (unsigned char*)param2;
-        if (p2_bytes[12] != 0) {
-            // Second RandF call 
-            math.RandF();
+
+    PppRandUpIntParam3* out = (PppRandUpIntParam3*)param3;
+    u8* base = (u8*)param1;
+    PppRandUpIntParam2* in = (PppRandUpIntParam2*)param2;
+    f32* valuePtr;
+
+    s32 baseState = *(s32*)(base + 0xC);
+    if (baseState == 0) {
+        f32 value = RandF__5CMathFv((CMath*)&math);
+        if (in->fieldC != 0) {
+            value = (value + RandF__5CMathFv((CMath*)&math)) * lbl_80330018;
         }
-        
-        // Work with param3 data
-        int* param3_data = (int*)p3[3];
-        int* param3_base = (int*)(*param3_data);
-        int offset = param3_base[0] + 0x80;
-        float* target_location = (float*)((char*)index + offset);
-        // Store some calculated value (implementation details unclear)
+
+        valuePtr = (f32*)(base + *out->fieldC + 0x80);
+        *valuePtr = value;
     } else {
-        // Different branch when p2[3] != 0
-        int p2_val = p2[0];
-        if (p2_val == p2[3]) {
-            int* param3_data = (int*)p3[3];
-            int* param3_base = (int*)(*param3_data);
-            int offset = param3_base[0] + 0x80;
-            float* target_location = (float*)((char*)index + offset);
-            
-            int p2_field = p2[1];
-            void* data_source;
-            if (p2_field == -1) {
-                // Use some default data location
-                extern void* lbl_801EADC8;
-                data_source = &lbl_801EADC8;
-            } else {
-                // Calculate with p2_field + 0x80
-                data_source = (void*)((char*)index + p2_field + 0x80);
-            }
-            
-            int multiplier = p2[2];
-            
-            // Load float from data source and perform conversion
-            float source_value = *(float*)data_source;
-            
-            // Convert multiplier to double via 4330 magic number method
-            union {
-                struct { unsigned int hi, lo; } parts;
-                double d;
-            } temp;
-            temp.parts.hi = 0x43300000;
-            temp.parts.lo = (unsigned int)multiplier;
-            
-            // Magic number subtraction for integer to double conversion
-            double double_multiplier = temp.d - 4503599627370496.0; // 0x43300000 00000000
-            
-            // Final calculation
-            float result = (float)double_multiplier * source_value;
-            
-            // Convert to integer and back for truncation
-            int int_result = (int)result;
-            int existing_value = *(int*)data_source;
-            int final_result = existing_value + int_result;
-            *(int*)data_source = final_result;
+        if (in->field0 != baseState) {
+            return;
         }
+
+        valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
+
+    s32* target;
+    if (in->field4 == -1) {
+        target = &lbl_801EADC8;
+    } else {
+        target = (s32*)(base + in->field4 + 0x80);
+    }
+
+    union {
+        f64 d;
+        struct {
+            u32 hi;
+            u32 lo;
+        } parts;
+    } cvt;
+    cvt.parts.hi = 0x43300000;
+    cvt.parts.lo = in->field8;
+
+    s32 delta = (s32)((cvt.d - lbl_80330020) * *valuePtr);
+    *target += delta;
 }

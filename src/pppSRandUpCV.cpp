@@ -1,95 +1,96 @@
 #include "ffcc/pppSRandUpCV.h"
 #include "ffcc/math.h"
+#include "dolphin/types.h"
 
 extern CMath math;
 extern int lbl_8032ED70;
-
-// Forward declaration to handle RandF return value
-extern "C" float RandF__5CMathFv();
+extern u8 lbl_801EADC8[];
+extern "C" float RandF__5CMathFv(CMath* instance);
 
 /*
  * --INFO--
- * PAL Address: 80064114
+ * PAL Address: 0x80064114
  * PAL Size: 656b
  * EN Address: TODO
  * EN Size: TODO
- * JP Address: TODO  
+ * JP Address: TODO
  * JP Size: TODO
  */
-void pppSRandUpCV(void* param1, void* param2)
+void pppSRandUpCV(void* param1, void* param2, void* param3)
 {
-    if (lbl_8032ED70 != 0) return;
-    
-    // Check if indices match
-    int currentIndex = *((int*)param2);
-    int targetIndex = *((int*)param1 + 3);
-    if (currentIndex != targetIndex) return;
-    
-    // Get data offset and calculate target array
-    int dataOffset = *((int*)param2 + 3);
-    float* target = (float*)((char*)param1 + dataOffset + 0x80);
-    
-    unsigned char flag = *((unsigned char*)param2 + 12);
-    
-    // Generate first random float value
-    float randVal1 = RandF__5CMathFv();
-    if (flag != 0) {
-        float randVal2 = RandF__5CMathFv();
-        randVal1 = (randVal1 + randVal2) * 0.5f;
+    float* target;
+
+    if (lbl_8032ED70 != 0) {
+        return;
     }
-    target[0] = randVal1;
-    
-    // Generate second random float value  
-    randVal1 = RandF__5CMathFv();
-    if (flag != 0) {
-        float randVal2 = RandF__5CMathFv();
-        randVal1 = (randVal1 + randVal2) * 0.5f;
+
+    {
+        int** basePtr = (int**)((char*)param3 + 0xc);
+        int offset = **basePtr;
+        target = (float*)((char*)param1 + offset + 0x80);
     }
-    target[1] = randVal1;
-    
-    // Generate third random float value
-    randVal1 = RandF__5CMathFv();
-    if (flag != 0) {
-        float randVal2 = RandF__5CMathFv();
-        randVal1 = (randVal1 + randVal2) * 0.5f;
+
+    if (*(int*)param2 == *((int*)param1 + 3)) {
+        u8 flag = *((u8*)param2 + 0xc);
+        float value;
+
+        value = RandF__5CMathFv(&math);
+        if (flag != 0) {
+            value = (value + RandF__5CMathFv(&math)) * 0.5f;
+        }
+        target[0] = value;
+
+        value = RandF__5CMathFv(&math);
+        if (flag != 0) {
+            value = (value + RandF__5CMathFv(&math)) * 0.5f;
+        }
+        target[1] = value;
+
+        value = RandF__5CMathFv(&math);
+        if (flag != 0) {
+            value = (value + RandF__5CMathFv(&math)) * 0.5f;
+        }
+        target[2] = value;
+
+        value = RandF__5CMathFv(&math);
+        if (flag != 0) {
+            value = (value + RandF__5CMathFv(&math)) * 0.5f;
+        }
+        target[3] = value;
     }
-    target[2] = randVal1;
-    
-    // Generate fourth random float value
-    randVal1 = RandF__5CMathFv();
-    if (flag != 0) {
-        float randVal2 = RandF__5CMathFv();
-        randVal1 = (randVal1 + randVal2) * 0.5f;
+
+    {
+        int colorOffset = *((int*)param2 + 1);
+        u8* colors;
+
+        if (colorOffset == -1) {
+            colors = lbl_801EADC8;
+        } else {
+            colors = (u8*)((char*)param1 + colorOffset + 0x80);
+        }
+
+        {
+            s8 base = *((s8*)param2 + 8);
+            int delta = (int)(base * target[0]);
+            colors[0] = (u8)(colors[0] + delta);
+        }
+
+        {
+            s8 base = *((s8*)param2 + 9);
+            int delta = (int)(base * target[1]);
+            colors[1] = (u8)(colors[1] + delta);
+        }
+
+        {
+            s8 base = *((s8*)param2 + 10);
+            int delta = (int)(base * target[2]);
+            colors[2] = (u8)(colors[2] + delta);
+        }
+
+        {
+            s8 base = *((s8*)param2 + 11);
+            int delta = (int)(base * target[3]);
+            colors[3] = (u8)(colors[3] + delta);
+        }
     }
-    target[3] = randVal1;
-    
-    // Get target color array pointer
-    int colorOffset = *((int*)param2 + 1);
-    unsigned char* targetColors;
-    if (colorOffset == -1) {
-        extern unsigned char lbl_801EADC8[];
-        targetColors = lbl_801EADC8;
-    } else {
-        targetColors = (unsigned char*)((char*)param1 + colorOffset + 0x80);
-    }
-    
-    // Apply random modifications to first byte value
-    signed char baseValue1 = *((signed char*)param2 + 8);
-    int adjustment1 = (int)(baseValue1 * target[0]);
-    targetColors[0] += (unsigned char)adjustment1;
-    
-    // Apply random modifications to second byte value
-    signed char baseValue2 = *((signed char*)param2 + 9);
-    int adjustment2 = (int)(baseValue2 * target[1]);
-    targetColors[1] += (unsigned char)adjustment2;
-    
-    // Apply random modifications to third byte value
-    signed char baseValue3 = *((signed char*)param2 + 10);
-    int adjustment3 = (int)(baseValue3 * target[2]);
-    targetColors[2] += (unsigned char)adjustment3;
-    
-    // Apply random modifications to fourth byte value
-    signed char baseValue4 = *((signed char*)param2 + 11);
-    int adjustment4 = (int)(baseValue4 * target[3]);
-    targetColors[3] += (unsigned char)adjustment4;
 }

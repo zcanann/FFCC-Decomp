@@ -81,7 +81,6 @@ static void ExternalInterruptHandler(register __OSException exception, register 
 extern void __RAS_OSDisableInterrupts_begin(void);
 extern void __RAS_OSDisableInterrupts_end(void);
 
-#ifdef __GEKKO__
 asm BOOL OSDisableInterrupts(void) {
     nofralloc
 entry    __RAS_OSDisableInterrupts_begin
@@ -118,7 +117,6 @@ _restore:
     rlwinm  r3, r4, 17, 31, 31
     blr
 }
-#endif
 
 __OSInterruptHandler __OSSetInterruptHandler(__OSInterrupt interrupt, __OSInterruptHandler handler) {
     __OSInterruptHandler oldHandler;

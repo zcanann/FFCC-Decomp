@@ -10,12 +10,19 @@ typedef struct {
 } pppScreenQuake;
 
 typedef struct {
-    int m_dataValIndex;
     int m_graphId;
-    int m_arg3;
+    float m_dataValIndex;
     float m_initWOrk;
     float m_stepValue;
-    float *m_payload;
+    float m_arg3;
+    float m_initWOrk2;
+    float m_stepValue2;
+    float m_arg4;
+    float m_initWOrk3;
+    float m_stepValue3;
+    float m_quakeParam0;
+    float m_quakeParam1;
+    float m_quakeParam2;
 } UnkB;
 
 typedef struct {

@@ -87,24 +87,20 @@ void pppFrameScreenQuake(pppScreenQuake *quake, UnkB *param2, UnkC *param3)
 	if (DAT_8032ed70 == 0) {
 		float *value = (float *)((int)(&quake->field0_0x0 + 2) + *param3->m_serializedDataOffsets);
 		
-		CalcGraphValue((float)param2->m_dataValIndex, (_pppPObject*)&quake->field0_0x0, param2->m_graphId, 
+		CalcGraphValue(param2->m_dataValIndex, (_pppPObject*)&quake->field0_0x0, param2->m_graphId, 
 		               value, value + 1, value + 2, &param2->m_initWOrk, &param2->m_stepValue);
 		               
-		CalcGraphValue((float)param2->m_arg3, (_pppPObject*)&quake->field0_0x0, param2->m_graphId,
-		               value + 3, value + 4, value + 5, param2->m_payload, param2->m_payload + 4);
+		CalcGraphValue(param2->m_arg3, (_pppPObject*)&quake->field0_0x0, param2->m_graphId,
+		               value + 3, value + 4, value + 5, &param2->m_initWOrk2, &param2->m_stepValue2);
 		               
-		CalcGraphValue(*(float*)(param2->m_payload + 8), (_pppPObject*)&quake->field0_0x0, param2->m_graphId,
-		               value + 6, value + 7, value + 8, param2->m_payload + 0xc, param2->m_payload + 0x10);
+		CalcGraphValue(param2->m_arg4, (_pppPObject*)&quake->field0_0x0, param2->m_graphId,
+		               value + 6, value + 7, value + 8, &param2->m_initWOrk3, &param2->m_stepValue3);
 		               
-		CameraPcs.SetQuakeParameter((int)*value, (int)value[3], (short)value[6], 
-		                            (short)*(float*)(param2->m_payload + 0x14),
-		                            *(float*)(param2->m_payload + 0x18),
-		                            *(float*)(param2->m_payload + 0x1c),
-		                            *(float*)(param2->m_payload + 0x20),
-		                            *(float*)(param2->m_payload + 0x24),
-		                            *(float*)(param2->m_payload + 0x28),
-		                            *(float*)(param2->m_payload + 0x2c),
-		                            1);
+		SetQuakeParameter__10CCameraPcsFiissffffffi(&CameraPcs, 1, 0, 0, 0,
+		                                            *value, value[3], value[6],
+		                                            param2->m_quakeParam0,
+		                                            param2->m_quakeParam1,
+		                                            param2->m_quakeParam2, 1);
 	}
 }
 

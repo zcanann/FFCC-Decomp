@@ -18,31 +18,6 @@ struct YmCallBackParam {
     s16 m_initWOrk;
 };
 
-static f32 GetMngStPosX(const _pppMngSt* mngSt)
-{
-    return *(const f32*)((const u8*)mngSt + 0x84);
-}
-
-static f32 GetMngStPosY(const _pppMngSt* mngSt)
-{
-    return *(const f32*)((const u8*)mngSt + 0x94);
-}
-
-static f32 GetMngStPosZ(const _pppMngSt* mngSt)
-{
-    return *(const f32*)((const u8*)mngSt + 0xA4);
-}
-
-static s16 GetMngStKind(const _pppMngSt* mngSt)
-{
-    return *(const s16*)((const u8*)mngSt + 0x74);
-}
-
-static s16 GetMngStNodeIndex(const _pppMngSt* mngSt)
-{
-    return *(const s16*)((const u8*)mngSt + 0x76);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x800a6090
@@ -75,27 +50,29 @@ void pppDestructYmCallBack(void)
 void pppFrameYmCallBack(void* pppYmCallBack, void* param_2)
 {
     _pppMngSt* pppMngSt;
+    _pppMngSt* mngStBase;
     YmCallBackObj* ymCallBack;
     YmCallBackParam* frameParam;
     Vec position;
     s32 mngStIndex;
+    u32 graphId;
 
-    pppMngSt = pppMngStPtr;
     ymCallBack = (YmCallBackObj*)pppYmCallBack;
     frameParam = (YmCallBackParam*)param_2;
+    graphId = ymCallBack->m_graphId;
+    pppMngSt = pppMngStPtr;
 
-    if (((s32)ymCallBack->m_graphId / 0x1000) == (s32)frameParam->m_graphId) {
-        _pppMngSt* mngStBase;
-
-        position.x = GetMngStPosX(pppMngSt);
-        position.y = GetMngStPosY(pppMngSt);
-        position.z = GetMngStPosZ(pppMngSt);
+    if ((((s32)graphId >> 0xC) + (((s32)graphId < 0) && ((graphId & 0xFFF) != 0))) ==
+        (s32)frameParam->m_graphId) {
+        position.x = pppMngSt->m_matrix.value[0][3];
+        position.y = pppMngSt->m_matrix.value[1][3];
+        position.z = pppMngSt->m_matrix.value[2][3];
         PSMTXMultVec(ppvWorldMatrix, &position, &position);
 
         mngStBase = (_pppMngSt*)((u8*)&PartMng + 0x2A18);
-        mngStIndex = pppMngSt - mngStBase;
-        Game.game.ParticleFrameCallback(mngStIndex, (s32)GetMngStKind(pppMngSt),
-                                        (s32)GetMngStNodeIndex(pppMngSt),
+        mngStIndex = ((s32)((u8*)pppMngSt - (u8*)mngStBase)) / 0x158;
+        Game.game.ParticleFrameCallback(mngStIndex, (s32)pppMngSt->m_kind,
+                                        (s32)pppMngSt->m_nodeIndex,
                                         (s32)frameParam->m_initWOrk, (s32)frameParam->m_graphId,
                                         &position);
     }

@@ -85,87 +85,133 @@ bool CUSB::IsConnected()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002261c
+ * PAL Size: 168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CUSB::AddMessageCallback(MessageCallback callback, void* callerContext)
 {
-	for (int i = 0; i < 8; i++)
+	CUSBCallbackEntry* callbackEntry = m_callbacks;
+	int slot = 0;
+	int remaining = 8;
+
+	while (true)
 	{
-		if (m_callbacks[i].m_inUse == 0)
+		if (callbackEntry->m_inUse == 0)
 		{
-			m_callbacks[i].m_inUse = 1;
-			m_callbacks[i].m_callback = callback;
-			m_callbacks[i].m_callerContext = callerContext;
-			return;
+			callbackEntry->m_inUse = 1;
+			callbackEntry->m_callback = callback;
+			callbackEntry->m_callerContext = callerContext;
+			goto done;
 		}
 
-		if (m_callbacks[i].m_callback == callback)
+		if (callbackEntry->m_callback == callback)
 		{
 			System.Printf("CUSB.AddMessageCallback: 同じ");
-			return;
+			goto done;
+		}
+
+		slot++;
+		callbackEntry++;
+		remaining--;
+		if (remaining == 0)
+		{
+			goto done;
 		}
 	}
 
-	System.Printf("CUSB.AddMessageCallback: イベント");
+done:
+	if (slot == 8)
+	{
+		System.Printf("CUSB.AddMessageCallback: イベント");
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002249c
+ * PAL Size: 384b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CUSB::RemoveMessageCallback(MessageCallback callback)
 {
-    if (m_callbacks[0].m_inUse && m_callbacks[0].m_callback == callback)
-    {
-        m_callbacks[0].m_inUse = 0;
-        return;
-    }
+	int slot = 0;
 
-    if (m_callbacks[1].m_inUse && m_callbacks[1].m_callback == callback)
-    {
-        m_callbacks[1].m_inUse = 0;
-        return;
-    }
+	if (!m_callbacks[0].m_inUse || m_callbacks[0].m_callback != callback)
+	{
+		slot = 1;
+		if (!m_callbacks[1].m_inUse || m_callbacks[1].m_callback != callback)
+		{
+			slot = 2;
+			if (!m_callbacks[2].m_inUse || m_callbacks[2].m_callback != callback)
+			{
+				slot = 3;
+				if (!m_callbacks[3].m_inUse || m_callbacks[3].m_callback != callback)
+				{
+					slot = 4;
+					if (!m_callbacks[4].m_inUse || m_callbacks[4].m_callback != callback)
+					{
+						slot = 5;
+						if (!m_callbacks[5].m_inUse || m_callbacks[5].m_callback != callback)
+						{
+							slot = 6;
+							if (!m_callbacks[6].m_inUse || m_callbacks[6].m_callback != callback)
+							{
+								slot = 7;
+								if (!m_callbacks[7].m_inUse || m_callbacks[7].m_callback != callback)
+								{
+									slot = 8;
+								}
+								else
+								{
+									m_callbacks[7].m_inUse = 0;
+								}
+							}
+							else
+							{
+								m_callbacks[6].m_inUse = 0;
+							}
+						}
+						else
+						{
+							m_callbacks[5].m_inUse = 0;
+						}
+					}
+					else
+					{
+						m_callbacks[4].m_inUse = 0;
+					}
+				}
+				else
+				{
+					m_callbacks[3].m_inUse = 0;
+				}
+			}
+			else
+			{
+				m_callbacks[2].m_inUse = 0;
+			}
+		}
+		else
+		{
+			m_callbacks[1].m_inUse = 0;
+		}
+	}
+	else
+	{
+		m_callbacks[0].m_inUse = 0;
+	}
 
-    if (m_callbacks[2].m_inUse && m_callbacks[2].m_callback == callback)
-    {
-        m_callbacks[2].m_inUse = 0;
-        return;
-    }
-
-    if (m_callbacks[3].m_inUse && m_callbacks[3].m_callback == callback)
-    {
-        m_callbacks[3].m_inUse = 0;
-        return;
-    }
-
-    if (m_callbacks[4].m_inUse && m_callbacks[4].m_callback == callback)
-    {
-        m_callbacks[4].m_inUse = 0;
-        return;
-    }
-
-    if (m_callbacks[5].m_inUse && m_callbacks[5].m_callback == callback)
-    {
-        m_callbacks[5].m_inUse = 0;
-        return;
-    }
-
-    if (m_callbacks[6].m_inUse && m_callbacks[6].m_callback == callback)
-    {
-        m_callbacks[6].m_inUse = 0;
-        return;
-    }
-
-    if (m_callbacks[7].m_inUse && m_callbacks[7].m_callback == callback)
-    {
-        m_callbacks[7].m_inUse = 0;
-        return;
-    }
-
-    System.Printf("RemoveMessageCallback: callback not found\n");
+	if (slot == 8)
+	{
+		System.Printf("RemoveMessageCallback: callback not found\n");
+	}
 }
 
 /*

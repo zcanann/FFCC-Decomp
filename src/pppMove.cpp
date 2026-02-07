@@ -1,6 +1,6 @@
 #include "ffcc/pppMove.h"
 
-extern u32 lbl_8032ED70;   // Global enable flag
+extern int lbl_8032ED70;   // Global enable flag
 extern f32 lbl_8032FED8;   // Zero constant
 
 struct PppMoveObj {
@@ -41,29 +41,25 @@ void pppMoveCon(void* basePtr, PppMoveData* data)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppMove(void* basePtr, PppMoveInput* input, PppMoveData* data1, PppMoveData* data2)
+void pppMove(void* basePtr, PppMoveInput* input, PppMoveData* data)
 {
+    void* dataPtr = data->ptrData;
+    f32* data1Obj = (f32*)((u8*)basePtr + *((u32*)dataPtr + 0) + 0x80);
+    f32* data2Obj = (f32*)((u8*)basePtr + *((u32*)dataPtr + 1) + 0x80);
+
     if (lbl_8032ED70 != 0) {
         return;
     }
-    
-    // Get data structure pointers  
-    void* data2Ptr = data2->ptrData;
-    void* data1Ptr = data1->ptrData;
-    
+
     u32 inputId = *(u32*)input;
-    u32 baseId = *((u32*)((u8*)basePtr + 0xc));
-    
-    // Direct address calculation for data objects
-    f32* data2Obj = (f32*)((u8*)basePtr + *(u32*)data2Ptr + 0x80);
-    f32* data1Obj = (f32*)((u8*)basePtr + *(u32*)data1Ptr + 0x80);
-    
+    u32 baseId = *(u32*)((u8*)basePtr + 0xc);
+
     if (inputId == baseId) {
         data2Obj[0] += input->x;
         data2Obj[1] += input->y;
         data2Obj[2] += input->z;
     }
-    
+
     data1Obj[0] += data2Obj[0];
     data1Obj[1] += data2Obj[1];
     data1Obj[2] += data2Obj[2];

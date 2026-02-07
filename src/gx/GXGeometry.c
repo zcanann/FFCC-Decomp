@@ -104,22 +104,38 @@ void GXEnableTexOffsets(GXTexCoordID coord, u8 line_enable, u8 point_enable) {
     __GXData->bpSentNot = 0;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801A2728
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void GXSetCullMode(GXCullMode mode) {
-    GXCullMode hwMode;
+    u32 reg;
 
     CHECK_GXBEGIN(557, "GXSetCullMode");
 #if DEBUG
+    GXCullMode hwMode;
+
     switch (mode) {
     case GX_CULL_FRONT: hwMode = GX_CULL_BACK;  break;
     case GX_CULL_BACK:  hwMode = GX_CULL_FRONT; break;
     default:            hwMode = mode;          break;
     }
-#else
-    hwMode = (mode >> 1) & 1;
-    __rlwimi(hwMode, mode, 1, 30, 30);
-#endif
-
     SET_REG_FIELD(570, __GXData->genMode, 2, 14, hwMode);
+#else
+    if (mode == GX_CULL_BACK) {
+        mode = GX_CULL_FRONT;
+    } else if ((mode < GX_CULL_BACK) && (mode > GX_CULL_NONE)) {
+        mode = GX_CULL_BACK;
+    }
+
+    reg = __GXData->genMode;
+    __GXData->genMode = (reg & 0xFFFF3FFF) | ((u32)mode << 14);
+#endif
     __GXData->dirtyState |= 4;
 }
 

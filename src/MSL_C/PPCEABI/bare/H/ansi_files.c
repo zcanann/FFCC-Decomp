@@ -137,7 +137,7 @@ unsigned int __flush_all() {
  */
 FILE* __find_unopened_file(void) {
     FILE* file = &__files[0];
-    FILE* prev = NULL;
+    FILE* prev;
 
     while (file != NULL) {
         if (file->file_mode.file_kind == __closed_file) {
@@ -148,14 +148,12 @@ FILE* __find_unopened_file(void) {
     }
 
     file = (FILE*)malloc(0x50);
-    if (file == NULL) {
-        return NULL;
+    if (file != NULL) {
+        memset(file, 0, 0x50);
+        file->is_dynamically_allocated = 1;
+
+        prev->next_file_struct = file;
     }
-
-    memset(file, 0, 0x50);
-    file->is_dynamically_allocated = 1;
-
-    prev->next_file_struct = file;
 
     return file;
 }

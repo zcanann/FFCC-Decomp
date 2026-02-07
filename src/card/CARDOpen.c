@@ -123,7 +123,10 @@ s32 CARDFastOpen(s32 chan, s32 fileNo, CARDFileInfo* fileInfo) {
 
     dir = __CARDGetDirBlock(card);
     ent = &dir[fileNo];
-    result = __CARDIsReadable(card, ent);
+    result = __CARDIsWritable(card, ent);
+    if (result == CARD_RESULT_NOPERM && (ent->permission & 0x4))
+        result = CARD_RESULT_READY;
+
     if (0 <= result) {
         if (!CARDIsValidBlockNo(card, ent->startBlock))
             result = CARD_RESULT_BROKEN;

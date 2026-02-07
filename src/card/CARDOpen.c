@@ -21,14 +21,12 @@ BOOL __CARDCompareFileName(CARDDir* ent, const char* fileName) {
 }
 
 s32 __CARDAccess(CARDControl* card, CARDDir* ent) {
-    const DVDDiskID* diskID = card->diskID;
-
     if (ent->gameName[0] == 0xFF)
         return CARD_RESULT_NOFILE;
 
-    if (diskID == &__CARDDiskNone
-     || (memcmp(ent->gameName, diskID->gameName, sizeof(ent->gameName)) == 0
-      && memcmp(ent->company, diskID->company, sizeof(ent->company)) == 0))
+    if (card->diskID == &__CARDDiskNone
+     || (memcmp(ent, card->diskID, sizeof(ent->gameName)) == 0
+      && memcmp(ent->company, card->diskID->company, sizeof(ent->company)) == 0))
         return CARD_RESULT_READY;
 
     return CARD_RESULT_NOPERM;

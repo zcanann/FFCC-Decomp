@@ -69,7 +69,7 @@ void pppFrameCallBackDistance(pppCallBackDistance* param1, UnkB* param2, UnkC* p
     dVar4 = (f64)PSVECDistance(&local_1c, &pppMngStPtr->m_scale);
     p_Var1 = pppMngStPtr;
 
-    if ((dVar4 <= (f64)(f32)param2->m_dataValIndex) ||
+    if ((dVar4 <= (f64)param2->m_dataValIndex) ||
         ((f64)*(f32*)((s32)(&param1->field0_0x0 + 2) + iVar3) <= dVar4)) {
         local_28.x = pppMngStPtr->m_matrix.value[0][3];
         local_28.y = pppMngStPtr->m_matrix.value[1][3];

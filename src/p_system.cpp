@@ -95,38 +95,32 @@ void CSystemPcs::destroy()
  */
 void CSystemPcs::calc()
 {
-	unsigned short uVar2;
-	int iVar1;
-	
+	unsigned short buttons;
+	int i;
+
 	if (Pad._452_4_ == 0) {
-		// Calculate controller index and read button data
-		// Complex controller selection logic from Ghidra
-		int controllerIndex = Pad._448_4_;
-		int indexCalc = (~((int)~(controllerIndex - 4 | 4 - controllerIndex) >> 0x1f) & 4U);
-		unsigned char* padData = (unsigned char*)&Pad;
-		uVar2 = *(unsigned short*)(padData + 0x36 + indexCalc * 0x54);
+		i = Pad._448_4_;
+		buttons = *(unsigned short*)(((unsigned char*)&Pad) +
+		                             ((~((int)~(i - 4 | 4 - i) >> 0x1f) & 4U) * 0x54 + 0x36));
+	} else {
+		buttons = 0;
 	}
-	else {
-		uVar2 = 0;
+
+	if ((buttons & 0x1000) != 0) {
+		return;
 	}
-	
-	if ((uVar2 & 0x1000) == 0) { // Not START/MENU button
-		if ((uVar2 & 0x100) == 0) { // Not A button
-			if (((uVar2 & 0x800) == 0) && ((uVar2 & 0x40) != 0)) { // Not Y button, but L trigger
-				iVar1 = Pad._448_4_ + 1;
-				if (iVar1 == 0) {
-					iVar1 = Pad._448_4_ + 2;
-				}
-				Pad._448_4_ = iVar1;
-				if (3 < iVar1) {
-					Pad._448_4_ = -1;
-				}
-			}
+	if ((buttons & 0x100) != 0) {
+		((CDbgMenuPcs*)0x80306708)->Add();
+		return;
+	}
+	if (((buttons & 0x800) == 0) && ((buttons & 0x40) != 0)) {
+		i = Pad._448_4_ + 1;
+		if (i == 0) {
+			i = Pad._448_4_ + 2;
 		}
-		else {
-			// A button pressed - add debug menu entry  
-			// TODO: Need to properly call debug menu function
-			// The original assembly shows: bl Add__11CDbgMenuPcsFv
+		Pad._448_4_ = i;
+		if (3 < i) {
+			Pad._448_4_ = -1;
 		}
 	}
 }

@@ -317,9 +317,10 @@ void GXSetFieldMask(GXBool odd_mask, GXBool even_mask) {
     u32 reg;
 
     CHECK_GXBEGIN(608, "GXSetFieldMask");
-    reg = 0x44000000;
-    reg |= even_mask;
-    reg |= odd_mask << 1;
+    reg = 0;
+    SET_REG_FIELD(611, reg, 1, 0, even_mask);
+    SET_REG_FIELD(612, reg, 1, 1, odd_mask);
+    SET_REG_FIELD(613, reg, 8, 24, 0x44);
     GX_WRITE_RAS_REG(reg);
     __GXData->bpSentNot = 0;
 }

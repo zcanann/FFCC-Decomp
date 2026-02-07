@@ -4,9 +4,19 @@
 
 #include <dolphin/os.h>
 #include "string.h"
+#include "types.h"
 
 char DAT_8032ec6c;
 int DAT_8032ec68;
+
+extern void* __vt__8CManager;
+extern void* lbl_801E8668;
+extern void* lbl_801E8830;
+extern u32 lbl_801E8690[];
+extern u32 lbl_801E869C[];
+extern u32 lbl_801E86A8[];
+extern u32 lbl_801E86B4[];
+extern CUSBPcs USBPcs;
 
 
 /*
@@ -58,7 +68,7 @@ void CUSBPcs::Quit()
  */
 void* CUSBPcs::GetTable(unsigned long param)
 {
-    return (void*)(param * 0x15c - 0x7fe1794c);
+    return (void*)((char*)lbl_801E86B4 + (param * 0x15c));
 }
 
 /*
@@ -241,10 +251,27 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
  */
 extern "C" void __sinit_p_usb_cpp()
 {
-    // Static initialization for CUSBPcs global object
-    // Sets up USBPcs process manager vtable and function pointers
-    extern CUSBPcs USBPcs;
-    
-    // Initialize vtable entries based on Ghidra decompilation
-    // This sets up the virtual function table for the global USBPcs instance
+    *(void**)&USBPcs = &__vt__8CManager;
+    *(void**)&USBPcs = &lbl_801E8668;
+
+    u32 a0 = lbl_801E8690[0];
+    u32 a1 = lbl_801E8690[1];
+    u32 a2 = lbl_801E8690[2];
+    u32 b0 = lbl_801E869C[0];
+    u32 b1 = lbl_801E869C[1];
+    u32 b2 = lbl_801E869C[2];
+    u32 c0 = lbl_801E86A8[0];
+    u32 c1 = lbl_801E86A8[1];
+    u32 c2 = lbl_801E86A8[2];
+
+    *(void**)&USBPcs = &lbl_801E8830;
+    lbl_801E86B4[1] = a0;
+    lbl_801E86B4[2] = a1;
+    lbl_801E86B4[3] = a2;
+    lbl_801E86B4[4] = b0;
+    lbl_801E86B4[5] = b1;
+    lbl_801E86B4[6] = b2;
+    lbl_801E86B4[7] = c0;
+    lbl_801E86B4[8] = c1;
+    lbl_801E86B4[9] = c2;
 }

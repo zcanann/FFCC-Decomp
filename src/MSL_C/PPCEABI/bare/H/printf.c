@@ -49,7 +49,7 @@ typedef struct {
     int precision;
 } print_format;
 
-static const char* parse_format(const char *format_string, va_list *arg, print_format *format) {
+static const char* parse_format_801B860C(const char *format_string, va_list *arg, print_format *format) {
     print_format f;
     const char* s = format_string;
     int c;
@@ -289,7 +289,7 @@ static const char* parse_format(const char *format_string, va_list *arg, print_f
     return ((const char*)s + 1);
 }
 
-static char* long2str(long num, char* buff, print_format format)
+static char* long2str_801B83B4(long num, char* buff, print_format format)
 {
     unsigned long unsigned_num, base;
     char* p;
@@ -394,7 +394,7 @@ static char* long2str(long num, char* buff, print_format format)
     return p;
 }
 
-static char* longlong2str(long long num, char* pBuf, print_format fmt)
+static char* longlong2str_801B80A0(long long num, char* pBuf, print_format fmt)
 {
     unsigned long long unsigned_num, base;
     char* p;
@@ -559,7 +559,7 @@ static char * double2hex(long double num, char * buff, print_format format)  {
     exp_format.conversion_char = 'd';
 
     exp = (short) ((*(short*) &ld & 0x7FFF) >> 4) - 0x3FF;
-    p = long2str(exp, buff, exp_format);
+    p = long2str_801B83B4(exp, buff, exp_format);
     if (format.conversion_char == 'a')
         *--p = 'p';
     else
@@ -939,7 +939,7 @@ static int __pformatter(void *(*WriteProc)(void*, const char*, size_t), void *Wr
         }
 
         format_ptr = curr_format;
-        format_ptr = parse_format(format_ptr, (va_list*)arg, &format);
+        format_ptr = parse_format_801B860C(format_ptr, (va_list*)arg, &format);
 
         switch (format.conversion_char) {
             case 'd':
@@ -963,12 +963,12 @@ static int __pformatter(void *(*WriteProc)(void*, const char*, size_t), void *Wr
                 }
 
                 if (format.argument_options == long_long_argument) {
-                    if (!(buff_ptr = longlong2str(long_long_num, buff + 512, format))) {
+                    if (!(buff_ptr = longlong2str_801B80A0(long_long_num, buff + 512, format))) {
                         goto conversion_error;
                     }
                 }
                 else {
-                    if (!(buff_ptr = long2str(long_num, buff + 512, format))) {
+                    if (!(buff_ptr = long2str_801B83B4(long_num, buff + 512, format))) {
                         goto conversion_error;
                     }
                 }
@@ -999,12 +999,12 @@ static int __pformatter(void *(*WriteProc)(void*, const char*, size_t), void *Wr
                 }
 
                 if (format.argument_options == long_long_argument) {
-                    if (!(buff_ptr = longlong2str(long_long_num, buff + 512, format))) {
+                    if (!(buff_ptr = longlong2str_801B80A0(long_long_num, buff + 512, format))) {
                         goto conversion_error;
                     }
                 }
                 else {
-                    if (!(buff_ptr = long2str(long_num, buff + 512, format))) {
+                    if (!(buff_ptr = long2str_801B83B4(long_num, buff + 512, format))) {
                         goto conversion_error;
                     }
                 }

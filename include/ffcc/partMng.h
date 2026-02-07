@@ -39,6 +39,8 @@ struct pppShapeSt
     char m_name[32];         // 0x8
     short m_refCount;        // 0x28
     unsigned char m_inUse;   // 0x2a
+
+    void* GetTexture(long*, CMaterialSet*, int&);
 }; // Size 0x2c
 
 struct pppModelSt

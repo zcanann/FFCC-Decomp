@@ -70,10 +70,19 @@ void pppConstructConstrainCameraForLoc(void)
  * --INFO--
  * PAL Address: 0x80167EA0
  * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppConstruct2ConstrainCameraForLoc(void)
+void pppConstruct2ConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraForLoc,
+                                        pppConstrainCameraForLocData* data)
 {
-	// TODO - implement based on Ghidra decomp
+    float fVar1 = FLOAT_803331a8;
+    float* value = (float*)((char*)constrainCameraForLoc + 0x80 + data->m_serializedDataOffsets[2]);
+    value[2] = fVar1;
+    value[1] = fVar1;
+    value[0] = fVar1;
 }
 
 /*
@@ -97,10 +106,19 @@ void pppDestructConstrainCameraForLoc(void)
  * --INFO--
  * PAL Address: 80167ec4  
  * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void fn_80167EC4(void)
+void fn_80167EC4(pppConstrainCameraForLoc* constrainCameraForLoc, pppConstrainCameraForLocData* data)
 {
-	// TODO - implement based on assembly patterns
+    float fVar1 = FLOAT_803331a8;
+    float* value = (float*)((char*)constrainCameraForLoc + 0x80 + data->m_serializedDataOffsets[2]);
+    value[2] = fVar1;
+    value[1] = fVar1;
+    value[0] = fVar1;
+    *(pppConstrainCameraForLoc**)((char*)value + 0x40) = constrainCameraForLoc;
 }
 
 /*

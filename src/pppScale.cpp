@@ -6,42 +6,43 @@ extern int DAT_8032ed70;
  * --INFO--
  * PAL Address: 0x800630f0
  * PAL Size: 96b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppScale(void* obj, void* param2, void* param3)
 {
-	void* dataPtr = *((void**)((char*)param3 + 0x0c));
-	
 	if (DAT_8032ed70 != 0) {
 		return;
 	}
-	
-	if (*((int*)((char*)param2 + 0x08)) == *((int*)((char*)obj + 0x08))) {
-		float scale = *((float*)((char*)param2 + 0x0c));
-		float* pfVar2 = (float*)((char*)obj + *((int*)((char*)dataPtr + 0x04)) + 0x80);
-		pfVar2[0] += scale;
-		pfVar2[1] += scale;  
-		pfVar2[2] += scale;
+
+	if (*((int*)((char*)param2 + 0x00)) != *((int*)((char*)obj + 0x0c))) {
+		return;
 	}
-	
-	float* pfVar1 = (float*)((char*)obj + *((int*)((char*)dataPtr + 0x00)) + 0x80);
-	float* pfVar2 = (float*)((char*)obj + *((int*)((char*)dataPtr + 0x04)) + 0x80);
-	
-	pfVar1[0] = pfVar2[0];
-	pfVar1[1] = pfVar2[1];
-	pfVar1[2] = pfVar2[2];
+
+	int* data = *((int**)((char*)param3 + 0x0c));
+	float* scale = (float*)((char*)obj + data[0] + 0x80);
+	scale[0] += *((float*)((char*)param2 + 0x08));
+	scale[1] += *((float*)((char*)param2 + 0x0c));
+	scale[2] += *((float*)((char*)param2 + 0x10));
 }
 
 /*
  * --INFO--
  * PAL Address: 0x800630cc
  * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppScaleCon(void* obj, void* param)
 {
-	void* dataPtr = *((void**)((char*)param + 0x0c));
-	float* puVar2 = (float*)((char*)obj + *((int*)((char*)dataPtr + 0x04)) + 0x80);
+	int* data = *((int**)((char*)param + 0x0c));
+	float* value = (float*)((char*)obj + data[0] + 0x80);
 	
-	puVar2[2] = 1.0f;
-	puVar2[1] = 1.0f;
-	*puVar2 = 1.0f;
+	value[2] = 1.0f;
+	value[1] = 1.0f;
+	value[0] = 1.0f;
 }

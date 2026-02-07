@@ -317,19 +317,21 @@ void GXSetFieldMask(GXBool odd_mask, GXBool even_mask) {
     u32 reg;
 
     CHECK_GXBEGIN(608, "GXSetFieldMask");
-    reg = 0x44000000;
-    reg |= even_mask;
-    reg |= odd_mask << 1;
+    reg = ((u32)(u8)odd_mask << 1) | (u32)(u8)even_mask | 0x44000000;
     GX_WRITE_RAS_REG(reg);
     __GXData->bpSentNot = 0;
 }
 
 void GXSetFieldMode(GXBool field_mode, GXBool half_aspect_ratio) {
     u32 reg;
+    u32 lp_size;
 
     CHECK_GXBEGIN(637, "GXSetFieldMode");
-    SET_REG_FIELD(641, __GXData->lpSize, 1, 22, half_aspect_ratio);
-    GX_WRITE_RAS_REG(__GXData->lpSize);
+    lp_size = __GXData->lpSize;
+    lp_size &= ~0x200;
+    lp_size |= (u32)(u8)half_aspect_ratio << 9;
+    __GXData->lpSize = lp_size;
+    GX_WRITE_RAS_REG(lp_size);
     __GXFlushTextureState();
     reg = field_mode | 0x68000000;
     GX_WRITE_RAS_REG(reg);

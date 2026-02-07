@@ -225,6 +225,15 @@ void __AXOutQuit(void) {
     OSRestoreInterrupts(old);
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x80192D98
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void AXRegisterCallback(AXCallback callback) {
     __AXUserFrameCallback = callback;
 }

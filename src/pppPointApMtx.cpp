@@ -9,17 +9,26 @@ extern _pppMngSt* gPppMngSt;
  * --INFO--
  * PAL Address: 0x800de348
  * PAL Size: 24b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppPointApMtxCon(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal)
 {
-	unsigned long offset = *((unsigned long*)((char*)pppPDataVal + 0xc));
-	*((unsigned char*)pppPObject + offset + 0x81) = 0;
+	unsigned long data = *(unsigned long*)((char*)pppPDataVal + 0xC);
+	pppPObject = (_pppPObject*)((char*)pppPObject + *(unsigned long*)(data + 0x4));
+	*((unsigned char*)pppPObject + 0x81) = 0;
 }
 
 /*
  * --INFO--
  * PAL Address: 0x800de210  
  * PAL Size: 312b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppPointApMtx(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal, _pppMngSt* pppMngSt)
 {

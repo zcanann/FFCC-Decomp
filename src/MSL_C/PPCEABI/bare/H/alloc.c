@@ -620,6 +620,52 @@ static void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long s
     return (char*)sub_block + 4;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801b1f30
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void* __pool_alloc(__mem_pool* pool, unsigned long size) {
+    __mem_pool_obj* pool_obj;
+
+    if (size == 0) {
+        return 0;
+    }
+
+    if (size >= 0xFFFFFFD0UL) {
+        return 0;
+    }
+
+    pool_obj = (__mem_pool_obj*)pool;
+    if (size <= 68) {
+        return allocate_from_fixed_pools(pool_obj, size);
+    }
+
+    return allocate_from_var_pools(pool_obj, size);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801b1e5c
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void* malloc(size_t size) {
+    void* ptr;
+
+    __begin_critical_region(malloc_pool_access);
+    ptr = __pool_alloc(get_malloc_pool(), size);
+    __end_critical_region(malloc_pool_access);
+    return ptr;
+}
+
 void __pool_free(__mem_pool* pool, void* ptr) {
     __mem_pool_obj* pool_obj;
     unsigned long size;

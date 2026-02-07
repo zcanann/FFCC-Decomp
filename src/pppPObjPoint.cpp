@@ -14,34 +14,29 @@ void pppPObjPoint(PppPointData* pointData, PppObjData* objData, PppContainer* co
     if (lbl_8032ED70 != 0) {
         return;
     }
-    
-    void* containerData = container->ptrData;
-    s32 objId = objData->id;
-    s32 pointId = pointData->id;  
-    void* dataPtr = *(void**)containerData;
-    
-    if (objId == pointId) {
+
+    u8* pointBase = (u8*)pointData;
+    s32 pointOffset = *(s32*)container->ptrData;
+    PppPointObj* objPtr = (PppPointObj*)(pointBase + pointOffset + 0x80);
+
+    if (objData->id == pointData->id) {
         void* vectorPtr;
-        
+
         if ((objData->field_4 + 0x10000) == 0xFFFF) {
             extern u32 lbl_801EADC8;
             vectorPtr = (void*)&lbl_801EADC8;
         } else {
-            void* globalData = lbl_8032ED50;
-            void* arrayPtr = *((void**)((u8*)globalData + 0xD4));
+            void* arrayPtr = *(void**)((u8*)lbl_8032ED50 + 0xD4);
             u32 index = objData->field_4 << 4;
-            void* entry = (u8*)arrayPtr + index;
-            void* basePtr = *((void**)((u8*)entry + 0x4));
-            vectorPtr = (u8*)objData->data + (u32)basePtr + 0x80;
+            u32 baseOffset = *(u32*)((u8*)arrayPtr + index + 4);
+            vectorPtr = (u8*)objData->data + baseOffset + 0x80;
         }
-        
-        PppPointObj* objPtr = (PppPointObj*)((u8*)pointData + (u32)dataPtr + 0x80);
+
         objPtr->vecPtr = vectorPtr;
     }
-    
-    PppPointObj* objPtr = (PppPointObj*)((u8*)pointData + (u32)dataPtr + 0x80);
+
     f32* src = (f32*)objPtr->vecPtr;
     objPtr->x = src[0];
-    objPtr->y = src[1]; 
+    objPtr->y = src[1];
     objPtr->z = src[2];
 }

@@ -128,6 +128,7 @@ public:
     void MakeNumMonName(char*, int, int);
     const char* GetLangString();
     void SetNextScript(CGame::CNextScript* nextScript);
+    void SetNextScriptNewGame();
     void IsWorldMap();
     void IsPartyExist(int);
     void GetItemName(int);

@@ -2,126 +2,126 @@
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x801c931c
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void udp_cc_post_stop(void)
+int udp_cc_initialize(void)
 {
-	// TODO
+	return -1;
 }
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x801c9314
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void udp_cc_pre_continue(void)
+int udp_cc_shutdown(void)
 {
-	// TODO
+	return -1;
 }
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x801c930c
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void udp_cc_peek(void)
+int udp_cc_open(void)
 {
-	// TODO
+	return -1;
 }
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x801c9304
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void udp_cc_write(void)
+int udp_cc_close(void)
 {
-	// TODO
+	return -1;
 }
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x801c92fc
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void udp_cc_read(void)
+int udp_cc_read(void)
 {
-	// TODO
+	return 0;
 }
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x801c92f4
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void udp_cc_close(void)
+int udp_cc_write(void)
 {
-	// TODO
+	return 0;
 }
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x801c92ec
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void udp_cc_open(void)
+int udp_cc_peek(void)
 {
-	// TODO
+	return 0;
 }
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x801c92e4
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void udp_cc_shutdown(void)
+int udp_cc_pre_continue(void)
 {
-	// TODO
+	return -1;
 }
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x801c92dc
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void udp_cc_initialize(void)
+int udp_cc_post_stop(void)
 {
-	// TODO
+	return -1;
 }

@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-void pppRandUpInt(int index, void* param2, void* param3);
+void pppRandUpInt(void* param1, void* param2, void* param3);
 
 #ifdef __cplusplus
 }

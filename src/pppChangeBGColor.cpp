@@ -6,16 +6,28 @@ extern int DAT_8032ed70;
 
 /*
  * --INFO--
- * PAL Address: 0x8012d454
- * PAL Size: 4b
+ * PAL Address: 0x8012d3fc
+ * PAL Size: 84b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConChangeBGColor(void)
+void pppFrameChangeBGColor(struct pppChangeBGColor* pppChangeBGColor, struct UnkB* param_2, struct UnkC* param_3)
 {
-	return;
+	if (DAT_8032ed70 != 0) {
+		return;
+	}
+
+	unsigned char* mapMng = (unsigned char*)&MapMng;
+	unsigned char* data = (unsigned char*)pppChangeBGColor + param_3->m_serializedDataOffsets[1] + 0x80;
+
+	mapMng += 0x20000;
+	mapMng[0x2989] = 1;
+	mapMng[0x2990] = data[8];
+	mapMng[0x2991] = data[9];
+	mapMng[0x2992] = data[10];
+	mapMng[0x2993] = data[11];
 }
 
 /*
@@ -34,30 +46,14 @@ void pppDesChangeBGColor(void)
 
 /*
  * --INFO--
- * PAL Address: 0x8012d3fc
- * PAL Size: 84b
+ * PAL Address: 0x8012d454
+ * PAL Size: 4b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameChangeBGColor(struct pppChangeBGColor* pppChangeBGColor, struct UnkB* param_2, struct UnkC* param_3)
+void pppConChangeBGColor(void)
 {
-	if (DAT_8032ed70 != 0) {
-		return;
-	}
-	
-	int iVar1 = param_3->m_serializedDataOffsets[1];
-	iVar1 += 0x80;  // Add offset first
-	
-	// Access MapMng fields using byte pointer arithmetic to match assembly
-	char* mapMngPtr = (char*)&MapMng;
-	char* indexedPtr = (char*)pppChangeBGColor + iVar1;
-	
-	*(mapMngPtr + 0x22989) = 1;  // _141705_1_
-	*(mapMngPtr + 0x22990) = *(indexedPtr + 0x8);  // _141712_1_
-	*(mapMngPtr + 0x22991) = *(indexedPtr + 0x9);  // _141713_1_
-	*(mapMngPtr + 0x22992) = *(indexedPtr + 0xa);  // _141714_1_
-	*(mapMngPtr + 0x22993) = *(indexedPtr + 0xb);  // _141715_1_
 	return;
 }

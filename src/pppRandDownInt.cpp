@@ -4,7 +4,6 @@
 extern CMath math;
 extern int lbl_8032ED70;
 
-// Forward declaration to handle return type mismatch
 extern "C" float RandF__5CMathFv();
 
 /*
@@ -16,63 +15,42 @@ extern "C" float RandF__5CMathFv();
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRandDownInt(int index, void* param2, void* param3)
+void pppRandDownInt(void* param1, void* param2, void* param3)
 {
+    int* p1 = (int*)param1;
+    int* p2 = (int*)param2;
+    int* p3 = (int*)param3;
+
     if (lbl_8032ED70 != 0) {
         return;
     }
-    
-    int* p2 = (int*)param2;
-    int* p3 = (int*)param3;
-    
-    // Check if p2[3] (fieldC) is null  
-    if (p2[3] == 0) {
-        // Generate random value
+
+    if (p1[3] == 0) {
         float randValue = RandF__5CMathFv();
         randValue = -randValue;
-        
-        // Check byte at offset 0xC of param2
+
         unsigned char* p2_bytes = (unsigned char*)param2;
         if (p2_bytes[0xC] != 0) {
             float rand2 = RandF__5CMathFv();
             randValue = randValue - rand2;
-            randValue = randValue * 100.0f; // Constant from lbl_8032FF58
+            randValue = randValue * 100.0f;
         }
-        
-        // Store result - access pattern from objdiff
-        if (p3[3] != 0) {
-            int* p3_data = (int*)p3[3];
-            int offset = p3_data[0] + 0x80;
-            float* target = (float*)((char*)&index + offset);
-            *target = randValue;
-        }
-    } else {
-        // Check if p2[0] matches value from p2[3]
-        int* p2_data = (int*)p2[3];
-        if (p2[0] == p2_data[0]) {
-            if (p3[3] != 0) {
-                int* p3_data = (int*)p3[3];
-                int offset = p3_data[0] + 0x80;
-            }
-        }
+
+        int* p3_data = (int*)p3[3];
+        *(float*)((char*)p1 + p3_data[0] + 0x80) = randValue;
+        return;
     }
-    
-    // Process p2[1] (field4) - reorder based on objdiff analysis
+
+    if (p2[0] != p1[3]) {
+        return;
+    }
+
     if (p2[1] != -1) {
-        // Pre-calculate key values to match original order
         int multiplier = p2[2];
         int* p3_data = (int*)p3[3];
-        int base_offset = p3_data[0] + 0x80;
-        
-        // Source calculation - this was a key difference in objdiff
-        float* source = (float*)((char*)&index + base_offset);
-        
-        // Target calculation
-        int target_offset = p2[1] + 0x80;
-        int* target = (int*)((char*)&index + target_offset);
-        
-        // Calculate result
-        int result = (int)(*source * (float)multiplier) + *target;
-        *target = result;
+        float source = *(float*)((char*)p1 + p3_data[0] + 0x80);
+        int* target = (int*)((char*)p1 + p2[1] + 0x80);
+
+        *target = *target + (int)(source * (float)multiplier);
     }
 }

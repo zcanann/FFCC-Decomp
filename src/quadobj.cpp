@@ -1,4 +1,5 @@
 #include "ffcc/quadobj.h"
+#include "ffcc/color.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -8,7 +9,7 @@ static const float MinBounds = -10000000.0;
 static const float EPS = 0.0;
 
 extern u32 CFlatFlags;     // CFlat._4764_4_
-extern Mtx gFlatPosMtx;    // at 0x802687ac
+extern void* CameraPcs;    // matrix at +0x4
 
 /*
  * --INFO--
@@ -31,29 +32,41 @@ void CGQuadObj::onDestroy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8010b4a8
+ * PAL Size: 424b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGQuadObj::onDraw()
 {
-    if (m_vertexCount != 0 && (CFlatFlags & 0x10000) != 0) {
-        u32 white = 0xFFFFFFFF;
+    if ((m_vertexCount != 0) && ((CFlatFlags & 0x10000) != 0)) {
+        CColor white(0xff, 0xff, 0xff, 0xff);
         GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)&white);
-        GXLoadPosMtxImm(gFlatPosMtx, GX_PNMTX0);
+        MtxPtr posMtx = (MtxPtr)((char*)&CameraPcs + 0x4);
+        GXLoadPosMtxImm(posMtx, GX_PNMTX0);
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, (u32)m_vertexCount * 6);
 
         int i = 0;
-        while (i < (int)m_vertexCount) {
-            int next = (i + 1) % (int)m_vertexCount;
-            
-            GXPosition3f32(m_vertices[i].x, m_yBase, m_vertices[i].z);
-            GXPosition3f32(m_vertices[next].x, m_yBase, m_vertices[next].z);
-            GXPosition3f32(m_vertices[i].x, m_yBase + m_yHeight, m_vertices[i].z);
-            GXPosition3f32(m_vertices[next].x, m_yBase + m_yHeight, m_vertices[next].z);
-            GXPosition3f32(m_vertices[i].x, m_yBase, m_vertices[i].z);
-            GXPosition3f32(m_vertices[i].x, m_yBase + m_yHeight, m_vertices[i].z);
-            
-            i++;
+        QuadVertex* pVert = m_vertices;
+        while (i < (int)(u32)m_vertexCount) {
+            int next = i + 1;
+            i = i + 1;
+
+            GXPosition3f32(pVert->x, m_yBase, pVert->z);
+
+            int idx = next - (next / (int)(u32)m_vertexCount) * (u32)m_vertexCount;
+            GXPosition3f32(m_vertices[idx].x, m_yBase, m_vertices[idx].z);
+
+            GXPosition3f32(pVert->x, m_yBase + m_yHeight, pVert->z);
+
+            idx = next - (next / (int)(u32)m_vertexCount) * (u32)m_vertexCount;
+            GXPosition3f32(m_vertices[idx].x, m_yBase + m_yHeight, m_vertices[idx].z);
+
+            GXPosition3f32(pVert->x, m_yBase, pVert->z);
+            pVert++;
+            GXPosition3f32(pVert[-1].x, m_yBase + m_yHeight, pVert[-1].z);
         }
     }
 }

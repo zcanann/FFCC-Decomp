@@ -1,6 +1,6 @@
 #include "ffcc/mapshadow.h"
 #include "ffcc/mapocttree.h"
-#include "ffcc/map.h"
+#include "ffcc/CPtrArray.h"
 #include "ffcc/vector.h"
 #include <dolphin/mtx.h>
 
@@ -10,18 +10,59 @@ extern double DOUBLE_8032fce8;
 extern float FLOAT_8032fcf0;
 extern float FLOAT_8032fce0;
 
-// MapMng is already declared in map.h
+class CMapMng;
+extern CMapMng MapMng;
 
 /*
  * --INFO--
  * PAL Address: 0x8004c71c
  * PAL Size: 236b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapShadowInsertOctTree(CMapShadow::TARGET mapShadow, COctTree& octTree)
 {
-	// TODO: Simplified implementation for now
-	// Need better understanding of CMapShadow structure and TARGET enum
+	u32 i;
+	u32 mapShadowCount;
+	u32 shadowBits;
+	CPtrArray<CMapShadow>* mapShadowArray;
+
 	octTree.ClearShadow();
+
+	shadowBits = *(u32*)(*(u32*)((char*)&octTree + 0x8) + 0x3c);
+	if (shadowBits == 0) {
+		return;
+	}
+
+	mapShadowArray = (CPtrArray<CMapShadow>*)((char*)&MapMng + 0x21434);
+	i = 0;
+	while (true) {
+		mapShadowCount = mapShadowArray->GetSize();
+		if (i >= mapShadowCount) {
+			break;
+		}
+
+		if ((shadowBits & (1U << i)) != 0) {
+			CMapShadow* shadow = (*mapShadowArray)[i];
+
+			if ((*((u8*)mapShadow + (u32)shadow + 0xf0) != 0) && (*(u8*)((char*)shadow + 0x7) == 0)) {
+				int model = *(int*)((char*)shadow + 0xc);
+				Vec pos;
+				CBound* bound;
+
+				pos.x = *(float*)(model + 0xc4);
+				pos.y = *(float*)(model + 0xd4);
+				pos.z = *(float*)(model + 0xe4);
+
+				bound = (CBound*)((char*)shadow + ((int)mapShadow * 0x18 + 0xc0));
+				octTree.InsertShadow(i, pos, *bound);
+			}
+		}
+
+		i++;
+	}
 }
 
 /*

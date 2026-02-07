@@ -17,8 +17,10 @@ extern _pppMngSt* gPppMngSt;
 void pppPointApMtxCon(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal)
 {
 	unsigned long data = *(unsigned long*)((char*)pppPDataVal + 0xC);
-	pppPObject = (_pppPObject*)((char*)pppPObject + *(unsigned long*)(data + 0x4));
-	*((unsigned char*)pppPObject + 0x81) = 0;
+	unsigned long offset = *(unsigned long*)(data + 0x4);
+	_pppPObject* object = (_pppPObject*)((char*)pppPObject + offset);
+
+	*(unsigned char*)((char*)object + 0x81) = 0;
 }
 
 /*
@@ -32,42 +34,45 @@ void pppPointApMtxCon(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal)
  */
 void pppPointApMtx(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal, _pppMngSt* pppMngSt)
 {
-	unsigned long param2 = *((unsigned long*)((char*)pppPDataVal + 0x10));
-	Mtx* pMatrix = (Mtx*)((char*)pppPObject + param2 + 0x80);
-	unsigned char* pFlag = (unsigned char*)pMatrix + 1;
-	
+	unsigned long matrixOffset;
+	Mtx* matrix;
+	Vec* sourcePos;
+
+	(void)pppMngSt;
+	matrixOffset = *(unsigned long*)((char*)pppPDataVal + 0x10);
+	matrix = (Mtx*)((char*)pppPObject + matrixOffset + 0x80);
+
 	if (gPppGlobalFlag == 0) {
-		if (*pFlag == 0) {
-			if ((param2 + 1) != 0xFFFF) {  // This generates addic. r0, r5, 0x1
+		if (*((unsigned char*)matrix + 1) == 0) {
+			if ((matrixOffset + 1) != 0xFFFF) {
 				pppCreatePObject(gPppMngSt, pppPDataVal);
 			}
 		}
 	}
-	
-	unsigned long param3 = *((unsigned long*)((char*)pppPDataVal + 0x8));
-	Vec* pSrcPos = (Vec*)((char*)pppPObject + param3 + 0x80);
-	
+
+	sourcePos = (Vec*)((char*)pppPObject + *(unsigned long*)((char*)pppPDataVal + 0x8) + 0x80);
+
 	if (*((unsigned char*)pppPDataVal + 0xd) == 0) {
-		PSMTXIdentity(*pMatrix);
-		(*pMatrix)[0][3] = pSrcPos->x;
-		(*pMatrix)[1][3] = pSrcPos->y;
-		(*pMatrix)[2][3] = pSrcPos->z;
+		PSMTXIdentity(*matrix);
+		(*matrix)[0][3] = sourcePos->x;
+		(*matrix)[1][3] = sourcePos->y;
+		(*matrix)[2][3] = sourcePos->z;
 	} else {
-		Mtx* worldMatrix = (Mtx*)((char*)gPppMngSt + 0x78);
-		PSMTXCopy(*worldMatrix, *pMatrix);
-		
 		Vec result;
-		PSMTXMultVec(*worldMatrix, pSrcPos, &result);
-		
-		(*pMatrix)[0][3] = result.x;
-		(*pMatrix)[1][3] = result.y;
-		(*pMatrix)[2][3] = result.z;
+		Mtx* worldMatrix = (Mtx*)((char*)gPppMngSt + 0x78);
+
+		PSMTXCopy(*worldMatrix, *matrix);
+		PSMTXMultVec(*worldMatrix, sourcePos, &result);
+
+		(*matrix)[0][3] = result.x;
+		(*matrix)[1][3] = result.y;
+		(*matrix)[2][3] = result.z;
 	}
-	
-	*pFlag = *((unsigned char*)pppPDataVal + 0xc);
-	
-	unsigned char counter = *pFlag;
+
+	*((unsigned char*)matrix + 1) = *((unsigned char*)pppPDataVal + 0xc);
+
+	unsigned char counter = *((unsigned char*)matrix + 1);
 	if (counter != 0) {
-		*pFlag = counter - 1;
+		*((unsigned char*)matrix + 1) = counter - 1;
 	}
 }

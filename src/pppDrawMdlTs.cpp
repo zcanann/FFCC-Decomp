@@ -70,8 +70,11 @@ void pppDrawMdlTsCon3(struct _pppPObject* obj, struct PDrawMdlTs* data)
  */
 void pppDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct PDrawMdlTs* param)
 {
+    struct PDrawMdlTs* stream = param;
+    struct PDrawMdlTs* input = data;
+
     // Get texture coordinate offset 
-    void* inner = *((void**)((char*)data + 0xc));
+    void* inner = *((void**)((char*)stream + 0xc));
     void* inner2 = *((void**)((char*)inner + 0x8));
     float* texCoords = (float*)((char*)obj + (int)inner2 + 0x80);
     
@@ -87,19 +90,19 @@ void pppDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct PDraw
     texCoords[3] += texCoords[4];  // offset 0xc += offset 0x10
     
     // Check if object id matches
-    int objId = *((int*)param);
+    int objId = *((int*)input);
     int objFieldC = *((int*)((char*)obj + 0xc));
     if (objId != objFieldC) {
         return;
     }
     
     // Apply parameter offsets to texture coordinates
-    texCoords[0] += *((float*)((char*)param + 0x14));  // offset 0x0
-    texCoords[1] += *((float*)((char*)param + 0x18));  // offset 0x4
-    texCoords[2] += *((float*)((char*)param + 0x1c));  // offset 0x8
-    texCoords[3] += *((float*)((char*)param + 0x20));  // offset 0xc
-    texCoords[4] += *((float*)((char*)param + 0x24));  // offset 0x10
-    texCoords[5] += *((float*)((char*)param + 0x28));  // offset 0x14
+    texCoords[0] += *((float*)((char*)input + 0x14));  // offset 0x0
+    texCoords[1] += *((float*)((char*)input + 0x18));  // offset 0x4
+    texCoords[2] += *((float*)((char*)input + 0x1c));  // offset 0x8
+    texCoords[3] += *((float*)((char*)input + 0x20));  // offset 0xc
+    texCoords[4] += *((float*)((char*)input + 0x24));  // offset 0x10
+    texCoords[5] += *((float*)((char*)input + 0x28));  // offset 0x14
 }
 
 /*

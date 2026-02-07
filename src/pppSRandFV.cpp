@@ -1,8 +1,11 @@
 #include "ffcc/pppSRandFV.h"
 #include "ffcc/math.h"
-#include "ffcc/vector.h"
 
 extern CMath math;
+extern int lbl_8032ED70;
+extern float lbl_80330098;
+extern float lbl_801EADC8;
+extern "C" float RandF__5CMathFv(CMath*);
 
 /*
  * --INFO--
@@ -33,81 +36,63 @@ void randf(unsigned char)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppSRandFV(void)
+void pppSRandFV(void* param1, void* param2, void* param3)
 {
-    // Based on assembly analysis: complex 3D vector randomization with conditional logic
-    // Assembly shows: multiple CMath::RandF() calls, vector operations, branch conditions
-    
-    float randValue1, randValue2, randValue3;
-    float tempX, tempY, tempZ;
-    CVector vec1(0.0f, 0.0f, 0.0f);
-    CVector vec2(1.0f, 1.0f, 1.0f);
-    CVector vec3(2.0f, 2.0f, 2.0f);
-    
-    // Generate random values for X component
-    math.RandF();
-    randValue1 = 0.5f;  // Placeholder for return value
-    
-    // Conditional logic for X
-    if (randValue1 > 0.0f) {
-        math.RandF();
-        randValue2 = 0.3f;  // Placeholder
-        tempX = randValue1 + randValue2;
+    int* p1 = (int*)param1;
+    int* p2 = (int*)param2;
+    int* p3 = (int*)param3;
+
+    if (lbl_8032ED70 != 0) {
+        return;
+    }
+
+    if (p1[3] == 0) {
+        int* indexPtr = *(int**)((char*)p3 + 0xC);
+        float* outVec = (float*)((char*)p1 + *indexPtr + 0x80);
+        unsigned char blendTwice = ((unsigned char*)p2)[0x18];
+        float randVal;
+
+        randVal = RandF__5CMathFv(&math);
+        if (blendTwice != 0) {
+            randVal = randVal + RandF__5CMathFv(&math);
+        } else {
+            randVal = randVal * lbl_80330098;
+        }
+        outVec[0] = randVal;
+
+        randVal = RandF__5CMathFv(&math);
+        if (blendTwice != 0) {
+            randVal = randVal + RandF__5CMathFv(&math);
+        } else {
+            randVal = randVal * lbl_80330098;
+        }
+        outVec[1] = randVal;
+
+        randVal = RandF__5CMathFv(&math);
+        if (blendTwice != 0) {
+            randVal = randVal + RandF__5CMathFv(&math);
+        } else {
+            randVal = randVal * lbl_80330098;
+        }
+        outVec[2] = randVal;
+        return;
+    }
+
+    if (p2[0] != p1[3]) {
+        return;
+    }
+
+    int* indexPtr = *(int**)((char*)p3 + 0xC);
+    float* randomVec = (float*)((char*)p1 + *indexPtr + 0x80);
+    float* targetVec;
+
+    if (p2[1] == -1) {
+        targetVec = &lbl_801EADC8;
     } else {
-        tempX = randValue1 * 2.0f;
+        targetVec = (float*)((char*)p1 + p2[1] + 0x80);
     }
-    vec1.x = tempX;
-    
-    // Generate random values for Y component
-    math.RandF();
-    randValue1 = 0.7f;  // Placeholder
-    
-    if (randValue1 > 0.0f) {
-        math.RandF();
-        randValue2 = 0.4f;  // Placeholder
-        tempY = randValue1 + randValue2;
-    } else {
-        tempY = randValue1 * 2.0f;
-    }
-    vec1.y = tempY;
-    
-    // Generate random values for Z component
-    math.RandF();
-    randValue1 = 0.9f;  // Placeholder
-    
-    if (randValue1 > 0.0f) {
-        math.RandF();
-        randValue2 = 0.1f;  // Placeholder
-        tempZ = randValue1 + randValue2;
-    } else {
-        tempZ = randValue1 * 2.0f;
-    }
-    vec1.z = tempZ;
-    
-    // Complex vector operations (from assembly analysis)
-    // Multiple floating-point multiply-subtract-add operations
-    vec2.x = vec1.x * vec3.x - vec1.x + vec2.x;
-    vec2.y = vec1.y * vec3.y - vec1.y + vec2.y;
-    vec2.z = vec1.z * vec3.z - vec1.z + vec2.z;
-    
-    // Additional calculations
-    tempX = vec2.x + vec1.x * 0.5f;
-    tempY = vec2.y + vec1.y * 0.5f;
-    tempZ = vec2.z + vec1.z * 0.5f;
-    
-    // More conditional processing
-    if (tempX > 1.0f) {
-        tempX = tempX - 1.0f;
-    }
-    if (tempY > 1.0f) {
-        tempY = tempY - 1.0f;
-    }
-    if (tempZ > 1.0f) {
-        tempZ = tempZ - 1.0f;
-    }
-    
-    // Final vector assignment
-    vec3.x = tempX;
-    vec3.y = tempY;
-    vec3.z = tempZ;
+
+    targetVec[0] = targetVec[0] + (*(float*)((char*)p2 + 8) * randomVec[0] - *(float*)((char*)p2 + 8));
+    targetVec[1] = targetVec[1] + (*(float*)((char*)p2 + 0xC) * randomVec[1] - *(float*)((char*)p2 + 0xC));
+    targetVec[2] = targetVec[2] + (*(float*)((char*)p2 + 0x10) * randomVec[2] - *(float*)((char*)p2 + 0x10));
 }

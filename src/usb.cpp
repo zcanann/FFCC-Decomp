@@ -179,10 +179,14 @@ void CUSB::Printf(char*, ...)
 
 /*
  * --INFO--
- * Address: 80022704
- * Size: 32b
+ * PAL Address: 0x80022704
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __sinit_usb_cpp()
+extern "C" void __sinit_usb_cpp()
 {
 	USB.m_managerStringTable = &PTR_PTR_DAT_801e88a4;
 }

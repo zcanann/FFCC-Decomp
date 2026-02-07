@@ -13,6 +13,10 @@ class CProcess : public CManager
 {
 public:
     CProcess();
+    void onScriptChanging(char*);
+    void onScriptChanged(char*, int);
+    void onMapChanging(int, int);
+    void onMapChanged(int, int, int);
 
     virtual void ScriptChanging(char*);
     virtual void ScriptChanged(char*, int);

@@ -12,5 +12,10 @@
  */
 void pppSpMatrix(void* mtx, void* src, void* data)
 {
-    PSMTXConcat(*((Mtx*)((char*)src + 0x80)), *((Mtx*)((char*)mtx + 0x10)), *((Mtx*)((char*)src + *((u32*)((char*)data + 0xc)))));
+    u32 offset = **((u32**)((char*)data + 0xc));
+    Mtx* mtxSrc = (Mtx*)((char*)mtx + offset + 0x80);
+    Mtx* mtxOut = (Mtx*)((char*)mtx + 0x10);
+
+    (void)src;
+    PSMTXConcat(*mtxSrc, *mtxOut, *mtxOut);
 }

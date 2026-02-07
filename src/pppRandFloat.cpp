@@ -23,12 +23,12 @@ void pppRandFloat(void* param1, void* param2, void* param3)
     void* ctx = param3;
     int index = *(int*)(base + 0xC);
 
-    if (lbl_8032ED70 != 0) {
-        return;
-    }
+    if (lbl_8032ED70 == 0) {
+        RandFloatParam* data = (RandFloatParam*)param2;
+        RandFloatCtx* ctx = (RandFloatCtx*)param3;
 
-    if (index == 0) {
-        float out = RandF__5CMathFv(&math);
+        if (index == 0) {
+            float out = RandF__5CMathFv(&math);
 
         if (*(unsigned char*)((char*)param + 0xC) != 0) {
             out += RandF__5CMathFv(&math);

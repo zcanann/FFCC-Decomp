@@ -123,6 +123,15 @@ int AXFXDelayInit(AXFX_DELAY* delay) {
     AXFXDelaySettings(delay);
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x80196934
+ * PAL Size: 144b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 int AXFXDelayShutdown(AXFX_DELAY* delay) {
     BOOL old;
 
@@ -138,10 +147,6 @@ int AXFXDelayShutdown(AXFX_DELAY* delay) {
     if (delay->sur) {
         __AXFXFree(delay->sur);
     }
-
-    delay->left = NULL;
-    delay->right = NULL;
-    delay->sur = NULL;
 
     OSRestoreInterrupts(old);
     return 1;

@@ -78,4 +78,8 @@ void pppRandFV(void* basePtr, void* dataPtr, void* outputPtr)
         float cur = dest[2];
         dest[2] = cur + (mul * factor - mul);
     }
+
+    srcAddr[0] = srcAddr[0] + (*(float*)((char*)p3 + 8) * destVal - *(float*)((char*)p3 + 8));
+    srcAddr[1] = srcAddr[1] + (*(float*)((char*)p3 + 12) * destVal - *(float*)((char*)p3 + 12));
+    srcAddr[2] = srcAddr[2] + (*(float*)((char*)p3 + 16) * destVal - *(float*)((char*)p3 + 16));
 }

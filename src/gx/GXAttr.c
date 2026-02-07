@@ -535,9 +535,8 @@ void GXGetVtxAttrFmtv(GXVtxFmt fmt, GXVtxAttrFmtList* vat) {
 
 void GXSetArray(GXAttr attr, void* base_ptr, u8 stride) {
     GXAttr cpAttr;
+    s32 regAddr;
     u32 phyAddr;
-
-    attr;  // needed to match
 
     CHECK_GXBEGIN(963, "GXSetArray");
     if (attr == GX_VA_NBT) {
@@ -549,7 +548,16 @@ void GXSetArray(GXAttr attr, void* base_ptr, u8 stride) {
     phyAddr = (u32)base_ptr & 0x3FFFFFFF;
 
     GX_WRITE_SOME_REG2(8, cpAttr | 0xA0, phyAddr, cpAttr - 12);
+    regAddr = cpAttr - 12;
+    if (regAddr >= 0 && regAddr < 4) {
+        __GXData->indexBase[regAddr] = phyAddr;
+    }
+
     GX_WRITE_SOME_REG3(8, cpAttr | 0xB0, stride, cpAttr - 12);
+    regAddr = cpAttr - 12;
+    if (regAddr >= 0 && regAddr < 4) {
+        __GXData->indexStride[regAddr] = stride;
+    }
 }
 
 void GXInvalidateVtxCache(void) {

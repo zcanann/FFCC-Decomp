@@ -5,8 +5,8 @@
 extern "C" {
 #endif
 
-void pppKeLnsLpCon(void);
-void pppKeLnsLpCon2(void);
+void pppKeLnsLpCon(void* pObject, void* pPart);
+void pppKeLnsLpCon2(void* pObject, void* pPart);
 void pppKeLnsLpDraw(void);
 void pppKeLnsFlsCon(void);
 void pppKeLnsFlsDraw(void);

@@ -21,14 +21,14 @@ BOOL __CARDCompareFileName(CARDDir* ent, const char* fileName) {
 }
 
 s32 __CARDAccess(CARDControl* card, CARDDir* ent) {
-    const DVDDiskID* diskID = card->diskID;
-
     if (ent->gameName[0] == 0xFF)
         return CARD_RESULT_NOFILE;
 
-    if (diskID == &__CARDDiskNone
-     || (memcmp(ent->gameName, diskID->gameName, sizeof(ent->gameName)) == 0
-      && memcmp(ent->company, diskID->company, sizeof(ent->company)) == 0))
+    if (card->diskID == &__CARDDiskNone)
+        return CARD_RESULT_READY;
+
+    if (memcmp(ent->gameName, card->diskID->gameName, sizeof(ent->gameName)) == 0
+     && memcmp(ent->company, card->diskID->company, sizeof(ent->company)) == 0)
         return CARD_RESULT_READY;
 
     return CARD_RESULT_NOPERM;
@@ -123,7 +123,10 @@ s32 CARDFastOpen(s32 chan, s32 fileNo, CARDFileInfo* fileInfo) {
 
     dir = __CARDGetDirBlock(card);
     ent = &dir[fileNo];
-    result = __CARDIsReadable(card, ent);
+    result = __CARDIsWritable(card, ent);
+    if (result == CARD_RESULT_NOPERM && (ent->permission & 0x4))
+        result = CARD_RESULT_READY;
+
     if (0 <= result) {
         if (!CARDIsValidBlockNo(card, ent->startBlock))
             result = CARD_RESULT_BROKEN;

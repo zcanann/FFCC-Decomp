@@ -13,8 +13,12 @@
  */
 void pppWDrawMatrixLoop(_pppPObject* param_1)
 {
-    PSMTXConcat(ppvCameraMatrix0, param_1->m_localMatrix.value, (param_1 + 1)->m_localMatrix.value);
-    PSVECScale((Vec*)((char*)param_1 + 0x40), (Vec*)((char*)param_1 + 0x40), (pppMngStPtr->m_scale).x);
-    PSVECScale((Vec*)((char*)param_1 + 0x50), (Vec*)((char*)param_1 + 0x50), (pppMngStPtr->m_scale).y);
-    PSVECScale((Vec*)((char*)param_1 + 0x60), (Vec*)((char*)param_1 + 0x60), (pppMngStPtr->m_scale).z);
+    char* base = (char*)param_1;
+    Mtx* worldMtx = (Mtx*)(base + 0x38);
+
+    PSMTXConcat(ppvCameraMatrix0, *(Mtx*)(base + 0x4), *worldMtx);
+
+    PSVECScale((Vec*)(base + 0x40), (Vec*)(base + 0x40), *(float*)((char*)pppMngStPtr + 0x64));
+    PSVECScale((Vec*)(base + 0x50), (Vec*)(base + 0x50), *(float*)((char*)pppMngStPtr + 0x68));
+    PSVECScale((Vec*)(base + 0x60), (Vec*)(base + 0x60), *(float*)((char*)pppMngStPtr + 0x6c));
 }

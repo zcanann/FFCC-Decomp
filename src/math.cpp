@@ -1,5 +1,7 @@
 #include "ffcc/math.h"
 
+#include "dolphin/mtx.h"
+#include "string.h"
 /*
  * --INFO--
  * Address:	TODO
@@ -22,12 +24,17 @@ CMath::CMath()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001c290
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMath::Init()
 {
-	// TODO
+	PSMTXIdentity((MtxPtr)((char*)this + 4));
+	memset((char*)this + 0x34, 0, 0x30);
 }
 
 /*

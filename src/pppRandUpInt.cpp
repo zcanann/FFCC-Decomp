@@ -3,10 +3,9 @@
 #include "types.h"
 
 extern CMath math;
-extern s32 lbl_8032ED70;
 extern f32 lbl_80330018;
 extern f64 lbl_80330020;
-extern s32 lbl_801EADC8;
+extern s32 lbl_801EADC8[];
 extern "C" {
 f32 RandF__5CMathFv(CMath*);
 }
@@ -34,6 +33,8 @@ struct PppRandUpIntParam3 {
  */
 void pppRandUpInt(void* param1, void* param2, void* param3)
 {
+    extern u32 lbl_8032ED70;
+
     if (lbl_8032ED70 != 0) {
         return;
     }
@@ -45,9 +46,9 @@ void pppRandUpInt(void* param1, void* param2, void* param3)
 
     s32 baseState = *(s32*)(base + 0xC);
     if (baseState == 0) {
-        f32 value = RandF__5CMathFv((CMath*)&math);
+        f32 value = RandF__5CMathFv(&math);
         if (in->fieldC != 0) {
-            value = (value + RandF__5CMathFv((CMath*)&math)) * lbl_80330018;
+            value = (value + RandF__5CMathFv(&math)) * lbl_80330018;
         }
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
@@ -62,7 +63,7 @@ void pppRandUpInt(void* param1, void* param2, void* param3)
 
     s32* target;
     if (in->field4 == -1) {
-        target = &lbl_801EADC8;
+        target = lbl_801EADC8;
     } else {
         target = (s32*)(base + in->field4 + 0x80);
     }
@@ -77,6 +78,7 @@ void pppRandUpInt(void* param1, void* param2, void* param3)
     cvt.parts.hi = 0x43300000;
     cvt.parts.lo = in->field8;
 
-    s32 delta = (s32)((cvt.d - lbl_80330020) * *valuePtr);
+    f64 source = *valuePtr;
+    s32 delta = (s32)((cvt.d - lbl_80330020) * source);
     *target += delta;
 }

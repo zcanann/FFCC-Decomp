@@ -9,6 +9,11 @@ struct PppMoveObj {
     f32 z;           // 0x8
 };
 
+struct PppMoveOffsets {
+    u32 a;           // 0x0
+    u32 b;           // 0x4
+};
+
 /*
  * --INFO--
  * PAL Address: 0x80065b18
@@ -55,9 +60,9 @@ void pppMove(void* basePtr, PppMoveInput* input, PppMoveData* data)
     u32 baseId = *(u32*)((u8*)basePtr + 0xc);
 
     if (inputId == baseId) {
-        data2Obj[0] += input->x;
-        data2Obj[1] += input->y;
-        data2Obj[2] += input->z;
+        b->x += input->x;
+        b->y += input->y;
+        b->z += input->z;
     }
 
     data1Obj[0] += data2Obj[0];

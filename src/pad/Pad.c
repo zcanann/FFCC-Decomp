@@ -67,7 +67,7 @@ static void SPEC1_MakeStatus(s32 chan, PADStatus *status, u32 data[2]);
 static s8 ClampS8(s8 var, s8 org);
 static u8 ClampU8(u8 var, u8 org);
 static void SPEC2_MakeStatus(s32 chan, PADStatus *status, u32 data[2]);
-static BOOL OnReset(BOOL f);
+static BOOL OnReset2(BOOL f);
 void __PADDisableXPatch(void);
 BOOL __PADDisableRumble(BOOL disable);
 
@@ -80,7 +80,7 @@ static u32 CmdCalibrate = 0x42000000;
 static u32 CmdProbeDevice[4];
 
 static OSResetFunctionInfo ResetFunctionInfo = {
-    OnReset,
+    OnReset2,
     127,
     NULL,
     NULL,
@@ -784,7 +784,7 @@ void PADSetAnalogMode(u32 mode) {
 
 static void (*SamplingCallback)();
 
-static BOOL OnReset(BOOL final) {
+static BOOL OnReset2(BOOL final) {
     BOOL sync;
     static BOOL recalibrated = FALSE;
 

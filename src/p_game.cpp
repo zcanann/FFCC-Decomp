@@ -132,7 +132,7 @@ void CGamePcs::draw0()
  */
 void CGamePcs::draw1()
 {
-	// TODO
+    game.Draw2();
 }
 
 /*
@@ -142,7 +142,7 @@ void CGamePcs::draw1()
  */
 void CGamePcs::draw2()
 {
-	// TODO
+    game.Draw3();
 }
 
 /*

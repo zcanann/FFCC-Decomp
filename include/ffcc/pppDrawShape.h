@@ -7,7 +7,7 @@ extern "C" {
 
 void pppDrawShapeConstruct(void* pppShape, void* data);
 void pppCalcShape(void* pppShape, void* data, void* additionalData);
-void pppDrawShape(void);
+void pppDrawShape(void* pppShape, void* data, void* additionalData);
 
 #ifdef __cplusplus
 }

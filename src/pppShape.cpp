@@ -81,12 +81,38 @@ void pppShapeSetUseTexture(tagOAN3_SHAPE*, unsigned char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800658fc
+ * PAL Size: 240b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppCacheLoadShapeTexture(pppShapeSt*, CMaterialSet*)
+void pppCacheLoadShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
 {
-	// TODO
+    char textureUsed[256];
+    void* animData = shapeSt->m_animData;
+
+    memset(textureUsed, 0, 256);
+
+    void* currentFrame = animData;
+    for (int frameIndex = 0; frameIndex < *(short*)((int)animData + 6); frameIndex++) {
+        short shapeOffset = *(short*)((int)currentFrame + 0x10);
+        int shapeEntryOffset = 0;
+
+        for (int shapeIndex = 0; shapeIndex < *(short*)((int)animData + shapeOffset + 2); shapeIndex++) {
+            int entryPtr = shapeEntryOffset + shapeOffset;
+            shapeEntryOffset += 8;
+            textureUsed[*(unsigned char*)((int)animData + entryPtr + 10)] = 1;
+        }
+        currentFrame = (void*)((int)currentFrame + 8);
+    }
+
+    for (unsigned int textureIndex = 0; textureIndex < 256; textureIndex++) {
+        if (textureUsed[textureIndex] != 0) {
+            materialSet->CacheLoadTexture(textureIndex, (CAmemCacheSet*)CAMemCacheSet);
+        }
+    }
 }
 
 /*

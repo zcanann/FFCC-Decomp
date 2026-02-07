@@ -1,5 +1,7 @@
 #include "ffcc/pppFilter.h"
 
+extern volatile int lbl_8032ED70;
+
 /*
  * --INFO--
  * Address:	TODO
@@ -22,12 +24,16 @@ void pppDestructFilter(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015a8c8
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppFrameFilter(void)
 {
-	// TODO
+	(void)(lbl_8032ED70 == 0);
 }
 
 /*

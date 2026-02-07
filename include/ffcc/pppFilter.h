@@ -6,6 +6,7 @@ struct pppFilter {
 };
 
 struct UnkB {
+    unsigned int m_unk0;
     unsigned int m_dataValIndex;
 };
 

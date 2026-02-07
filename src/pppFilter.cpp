@@ -6,7 +6,7 @@ class CMaterialSet;
 struct _pppEnvStLite {
     void* m_stagePtr;
     CMaterialSet* m_materialSetPtr;
-    CMapMesh* m_mapMeshPtr;
+    CMapMesh** m_mapMeshPtr;
 };
 
 extern _pppEnvStLite* pppEnvStPtr;
@@ -73,7 +73,7 @@ void pppRenderFilter(pppFilter* pppFilterObj, UnkB* param_2, UnkC* param_3)
 
 	int textureIndex = 0;
 	int textureBase = GetTexture__8CMapMeshFP12CMaterialSetRi(
-	    &pppEnvStPtr->m_mapMeshPtr[param_2->m_dataValIndex], pppEnvStPtr->m_materialSetPtr, textureIndex);
+	    pppEnvStPtr->m_mapMeshPtr[param_2->m_dataValIndex], pppEnvStPtr->m_materialSetPtr, textureIndex);
 	RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
 	    &DAT_8032ec70, FLOAT_803320c8, FLOAT_803320c8, FLOAT_803320cc, FLOAT_803320d0, (_GXTexObj*)(textureBase + 0x28),
 	    0, 0, (_GXColor*)((char*)pppFilterObj + serializedOffset + 0x88), GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);

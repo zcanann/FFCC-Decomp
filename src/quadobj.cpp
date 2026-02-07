@@ -1,4 +1,5 @@
 #include "ffcc/quadobj.h"
+#include "ffcc/color.h"
 
 #include "ffcc/color.h"
 

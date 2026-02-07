@@ -1,4 +1,7 @@
 #include "ffcc/quadobj.h"
+#include "ffcc/color.h"
+
+#include "ffcc/color.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -31,29 +34,43 @@ void CGQuadObj::onDestroy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8010b4a8
+ * PAL Size: 424b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGQuadObj::onDraw()
 {
     if (m_vertexCount != 0 && (CFlatFlags & 0x10000) != 0) {
-        u32 white = 0xFFFFFFFF;
-        GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)&white);
+        CColor color(0xff, 0xff, 0xff, 0xff);
+        GXSetChanMatColor(GX_COLOR0A0, color.color);
         GXLoadPosMtxImm(gFlatPosMtx, GX_PNMTX0);
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, (u32)m_vertexCount * 6);
 
         int i = 0;
+        QuadVertex* vert = m_vertices;
         while (i < (int)m_vertexCount) {
-            int next = (i + 1) % (int)m_vertexCount;
-            
-            GXPosition3f32(m_vertices[i].x, m_yBase, m_vertices[i].z);
-            GXPosition3f32(m_vertices[next].x, m_yBase, m_vertices[next].z);
-            GXPosition3f32(m_vertices[i].x, m_yBase + m_yHeight, m_vertices[i].z);
-            GXPosition3f32(m_vertices[next].x, m_yBase + m_yHeight, m_vertices[next].z);
-            GXPosition3f32(m_vertices[i].x, m_yBase, m_vertices[i].z);
-            GXPosition3f32(m_vertices[i].x, m_yBase + m_yHeight, m_vertices[i].z);
-            
+            int next = i + 1;
             i++;
+
+            GXPosition3f32(vert->x, m_yBase, vert->z);
+            GXPosition3f32(
+                m_vertices[next - (next / (int)(u32)m_vertexCount) * (u32)m_vertexCount].x,
+                m_yBase,
+                m_vertices[next - (next / (int)(u32)m_vertexCount) * (u32)m_vertexCount].z
+            );
+            GXPosition3f32(vert->x, m_yBase + m_yHeight, vert->z);
+            GXPosition3f32(
+                m_vertices[next - (next / (int)(u32)m_vertexCount) * (u32)m_vertexCount].x,
+                m_yBase + m_yHeight,
+                m_vertices[next - (next / (int)(u32)m_vertexCount) * (u32)m_vertexCount].z
+            );
+            GXPosition3f32(vert->x, m_yBase, vert->z);
+            GXPosition3f32(vert->x, m_yBase + m_yHeight, vert->z);
+
+            vert++;
         }
     }
 }
@@ -70,47 +87,44 @@ int CGQuadObj::GetCID()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8010b3a8
+ * PAL Size: 256b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 bool CGQuadObj::isInner(Vec* vec)
 {
     u32 count = (u32)m_vertexCount;
-    
-    if (count != 0) {
-        float px = vec->x;
-        float pz = vec->z;
-        
-        if ((m_bboxMinX <= px && m_bboxMinZ <= pz) && 
-            (px <= m_bboxMaxX && pz <= m_bboxMaxZ)) {
-            if (m_yBase <= vec->y && vec->y <= m_yBase + m_yHeight) {
-                u32 i = 0;
-                u32 remaining = count;
-                QuadVertex* pVert = m_vertices;
-                
-                while (remaining != 0) {
-                    float z0 = pVert->z;
-                    float x0 = pVert->x;
-                    int next = ((i + 1) - ((int)(i + 1) / (int)count) * count);
-                    float cross = (m_vertices[next].x - x0) * (pz - z0) - 
-                                  (m_vertices[next].z - z0) * (px - x0);
-                    
-                    if (cross < EPS) {
-                        break;
-                    }
-                    
-                    pVert++;
-                    i++;
-                    remaining--;
+    float px;
+    float pz;
+
+    if (((count != 0 && (px = vec->x, m_bboxMinX <= px)) && (pz = vec->z, m_bboxMinZ <= pz)) &&
+        ((px <= m_bboxMaxX) && (pz <= m_bboxMaxZ))) {
+        if ((m_yBase <= vec->y) && (vec->y <= m_yBase + m_yHeight)) {
+            u32 i = 0;
+            u32 remaining = count;
+            QuadVertex* pVert = m_vertices;
+
+            while (remaining != 0) {
+                float z0 = pVert->z;
+                float x0 = pVert->x;
+                int next = (i + 1) - ((int)(i + 1) / (int)count) * count;
+                float cross = (m_vertices[next].x - x0) * (pz - z0) - (m_vertices[next].z - z0) * (px - x0);
+                if (cross < EPS) {
+                    break;
                 }
-                
-                if (i == count) {
-                    return true;
-                }
+                pVert++;
+                i++;
+                remaining--;
+            }
+            if (i == count) {
+                return true;
             }
         }
     }
-    
+
     return false;
 }
 

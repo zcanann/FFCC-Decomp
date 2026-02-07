@@ -443,6 +443,11 @@ void __GXSetViewport(void) {
     GX_WRITE_XF_REG_F(31, oz);
 }
 
+void GXSetViewport(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz) {
+    GXSetViewportJitter(left, top, wd, ht, nearz, farz, 1);
+}
+
+#pragma dont_inline on
 void GXSetViewportJitter(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz, u32 field) {
     CHECK_GXBEGIN(903, "GXSetViewport");  // not the correct function name
 
@@ -461,9 +466,7 @@ void GXSetViewportJitter(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz,
     __GXData->bpSentNot = 1;
 }
 
-void GXSetViewport(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz) {
-    GXSetViewportJitter(left, top, wd, ht, nearz, farz, 1);
-}
+#pragma dont_inline reset
 
 void GXGetViewportv(f32* vp) {
     ASSERTMSGLINE(968, vp, "GXGet*: invalid null pointer");

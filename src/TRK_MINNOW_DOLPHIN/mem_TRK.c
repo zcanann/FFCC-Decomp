@@ -8,7 +8,8 @@
 #pragma dont_inline on
 /* 8036F580-8036F638 369EC0 00B8+00 0/0 1/1 0/0 .text            TRK_fill_mem */
 void TRK_fill_mem(void* dst, int val, u32 n) {
-    u32 v, i, j;
+    u32 v, i;
+    u32* p32;
     v = (u8)val;
 
     ((u8*)dst) = ((u8*)dst) - 1;
@@ -27,19 +28,27 @@ void TRK_fill_mem(void* dst, int val, u32 n) {
         if (v)
             v |= v << 24 | v << 16 | v << 8;
 
-        ((u32*)dst) = ((u32*)(((u8*)dst) + 4)) - 1;
         ((u32*)dst) = ((u32*)(((u8*)dst) + 1)) - 1;
 
-        i = n / 32;
+        i = n >> 5;
 
         if (i) {
+            p32 = (u32*)dst;
             do {
-                for (j = 0; j < 8; j++)
-                    *++((u32*)dst) = v;
+                p32[1] = v;
+                p32[2] = v;
+                p32[3] = v;
+                p32[4] = v;
+                p32[5] = v;
+                p32[6] = v;
+                p32[7] = v;
+                p32 += 8;
+                *p32 = v;
             } while (--i);
+            dst = p32;
         }
 
-        i = (n / 4) % 8;
+        i = (n >> 2) & 7;
 
         if (i) {
             do {
@@ -49,7 +58,7 @@ void TRK_fill_mem(void* dst, int val, u32 n) {
 
         ((u8*)dst) = ((u8*)(((u32*)dst) + 1)) - 1;
 
-        n %= 4;
+        n &= 3;
     }
 
     if (n)

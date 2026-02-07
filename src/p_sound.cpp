@@ -1,5 +1,9 @@
 #include "ffcc/p_sound.h"
 
+#include "ffcc/sound.h"
+
+extern unsigned char CFlat[];
+
 /*
  * --INFO--
  * Address:	TODO
@@ -12,80 +16,115 @@ CSoundPcs::CSoundPcs()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800d8808
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CSoundPcs::Init()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800d8804
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CSoundPcs::Quit()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800d87f0
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSoundPcs::GetTable(unsigned long)
+void* CSoundPcs::GetTable(unsigned long index)
 {
-	// TODO
+    extern unsigned char lbl_802105B0[];
+    return lbl_802105B0 + (index * 0x15C);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800d87ec
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CSoundPcs::create()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800d87c4
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CSoundPcs::createLoad()
 {
-	// TODO
+    Sound.LoadBlock();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800d8774
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CSoundPcs::destroy()
 {
-	// TODO
+    Sound.CancelLoadWaveASync();
+    Sound.StopStream();
+    Sound.StopAndFreeAllSe(1);
+    Sound.FreeBlock();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800d874c
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CSoundPcs::calc()
 {
-	// TODO
+    Sound.Frame();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800d8710
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CSoundPcs::draw()
 {
-	// TODO
+    if ((*(unsigned int*)(CFlat + 0x129C) & 0x400000) != 0) {
+        Sound.Draw();
+    }
 }

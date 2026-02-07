@@ -12,6 +12,12 @@ public:
     void onCreate();
     void onDestroy();
     void onFrame();
+    void onCancelStat(int);
+    void onChangeStat(int);
+    void onFramePreCalc();
+    void onFramePostCalc();
+    void onFrameStat();
+    void onChangePrg(int);
     void changeStat(int, int, int);
     void changeSubStat(int subState);
     void addSubStat();

@@ -16,30 +16,35 @@ void pppVertexAttend(void* r3, void* r4, void* r5)
     if (count < 0) {
         return;
     }
-    
-    void** data = (void**)((u8*)r5 + 0xc);
-    void* data1 = data[0];
-    void* data2 = data[1];
-    
-    void* lbl_8032ED54 = *(void**)((u8*)r5 + 0x10);
-    void* matrix_ptr = (void*)((u8*)lbl_8032ED54 + (count << 3));
-    
-    s16 matrix_index = *(s16*)matrix_ptr;
-    void* matrix_data_ptr = (void*)((u32*)((u8*)lbl_8032ED54 + 8) + (matrix_index << 2));
-    void* vertex_data = (void*)((u32*)matrix_data_ptr + 11);
-    
-    u16 vertex_index = *(u16*)((u8*)r3 + (*(u32*)data1 + 0x80));
-    vertex_index <<= 1;
-    
-    u16 vertex_offset = *(u16*)((u8*)data2 + vertex_index);
-    vertex_offset *= 12;
-    
-    Vec* vertex_src = (Vec*)((u8*)vertex_data + vertex_offset);
-    Vec result;
-    Mtx* matrix = (Mtx*)((u8*)r3 + 4 + 16);
-    
-    PSMTXMultVec(*matrix, vertex_src, &result);
-    
-    Vec* output = (Vec*)((u8*)r3 + (*(u32*)data2 + 0x80));
-    *output = result;
+
+    void* streamData = *(void**)((u8*)r5 + 0xc);
+    u32 sourceOffset = *(u32*)streamData + 0x80;
+    u32 destOffset = *(u32*)((u8*)streamData + 4) + 0x80;
+    u8* output = (u8*)r3 + destOffset;
+
+    extern void* lbl_8032ED54;
+    u8* tableA = *(u8**)((u8*)lbl_8032ED54 + 0x10);
+    u8* entry = tableA + (count << 3);
+    s16 modelIndex = *(s16*)entry;
+
+    u8* tableB = *(u8**)((u8*)lbl_8032ED54 + 8);
+    u8* model = *(u8**)(tableB + (modelIndex << 2));
+    u8* vertexData = *(u8**)(model + 0x2c);
+
+    u16 sourceIndex = *(u16*)((u8*)r3 + sourceOffset);
+    u8* indexTable = *(u8**)((u8*)streamData + 4);
+    u16 vertexIndex = *(u16*)(indexTable + (sourceIndex << 1));
+    u8* vertex = vertexData + (vertexIndex * 12);
+
+    Vec transformed;
+    transformed.x = *(f32*)(vertex + 0);
+    transformed.y = *(f32*)(vertex + 4);
+    transformed.z = *(f32*)(vertex + 8);
+
+    Mtx* mtx = (Mtx*)((u8*)*(void**)((u8*)r3 + 4) + 0x10);
+    PSMTXMultVec(*mtx, &transformed, &transformed);
+
+    *(f32*)(output + 0) = transformed.x;
+    *(f32*)(output + 4) = transformed.y;
+    *(f32*)(output + 8) = transformed.z;
 }

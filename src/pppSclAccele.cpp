@@ -1,5 +1,23 @@
 #include "ffcc/pppSclAccele.h"
 
+extern int lbl_8032ED70;
+extern float lbl_80330050;
+
+typedef struct {
+    int m_graphId;
+    int m_pad;
+    float m_x;
+    float m_y;
+    float m_z;
+} PppSclAcceleStep;
+
+typedef struct {
+    int m_pad0;
+    int m_pad1;
+    int m_pad2;
+    int* m_offsets;
+} PppSclAcceleConfig;
+
 /*
  * --INFO--
  * PAL Address: 0x80063150
@@ -11,13 +29,13 @@
  */
 void pppSclAcceleCon(void* arg1, void* arg2)
 {
-	void* ptr = (void*)((int*)((char*)arg2 + 0xC))[0];
-	ptr = (void*)((int*)((char*)ptr + 0x4))[0];
-	float* value = (float*)((char*)arg1 + (int)ptr + 0x80);
+    PppSclAcceleConfig* config = (PppSclAcceleConfig*)arg2;
+    float* accel = (float*)((char*)arg1 + config->m_offsets[1] + 0x80);
+    float zero = lbl_80330050;
 
-	value[2] = 0.0f;
-	value[1] = 0.0f;
-	value[0] = 0.0f;
+    accel[2] = zero;
+    accel[1] = zero;
+    accel[0] = zero;
 }
 
 /*
@@ -31,24 +49,22 @@ void pppSclAcceleCon(void* arg1, void* arg2)
  */
 void pppSclAccele(void* arg1, void* arg2, void* arg3)
 {
-	int* data = (int*)((int*)((char*)arg3 + 0xC))[0];
-	int data1 = data[0];
-	int data2 = data[1];
+    PppSclAcceleConfig* config = (PppSclAcceleConfig*)arg3;
+    PppSclAcceleStep* step = (PppSclAcceleStep*)arg2;
+    float* scale = (float*)((char*)arg1 + config->m_offsets[0] + 0x80);
+    float* accel = (float*)((char*)arg1 + config->m_offsets[1] + 0x80);
 
-	extern int lbl_8032ED70;
-	if (lbl_8032ED70 != 0) {
-		return;
-	}
+    if (lbl_8032ED70 != 0) {
+        return;
+    }
 
-	float* ptr1 = (float*)((char*)arg1 + data1 + 0x80);
-	float* ptr2 = (float*)((char*)arg1 + data2 + 0x80);
-	if (((int*)arg2)[0] == ((int*)arg1)[3]) {
-		ptr2[0] += ((float*)arg2)[2];
-		ptr2[1] += ((float*)arg2)[3];
-		ptr2[2] += ((float*)arg2)[4];
-	}
+    if (step->m_graphId == ((int*)arg1)[3]) {
+        accel[0] += step->m_x;
+        accel[1] += step->m_y;
+        accel[2] += step->m_z;
+    }
 
-	ptr1[0] += ptr2[0];
-	ptr1[1] += ptr2[1];
-	ptr1[2] += ptr2[2];
+    scale[0] += accel[0];
+    scale[1] += accel[1];
+    scale[2] += accel[2];
 }

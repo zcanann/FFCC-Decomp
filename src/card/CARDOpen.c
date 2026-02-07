@@ -24,11 +24,9 @@ s32 __CARDAccess(CARDControl* card, CARDDir* ent) {
     if (ent->gameName[0] == 0xFF)
         return CARD_RESULT_NOFILE;
 
-    if (card->diskID == &__CARDDiskNone)
-        return CARD_RESULT_READY;
-
-    if (memcmp(ent->gameName, card->diskID->gameName, sizeof(ent->gameName)) == 0
-     && memcmp(ent->company, card->diskID->company, sizeof(ent->company)) == 0)
+    if (card->diskID == &__CARDDiskNone
+     || (memcmp(ent, card->diskID, sizeof(ent->gameName)) == 0
+      && memcmp(ent->company, card->diskID->company, sizeof(ent->company)) == 0))
         return CARD_RESULT_READY;
 
     return CARD_RESULT_NOPERM;
@@ -57,16 +55,14 @@ s32 __CARDIsWritable(CARDControl* card, CARDDir* ent) {
 }
 
 s32 __CARDIsPublic(CARDDir* ent) {
-    u8 perm;
-
     if (ent->gameName[0] == 0xFF) {
         return CARD_RESULT_NOFILE;
     }
 
-    perm = ent->permission & __CARDPermMask;
-    if (perm & 0x4) {
+    if ((ent->permission & 4) != 0) {
         return CARD_RESULT_READY;
     }
+
     return CARD_RESULT_NOPERM;
 }
 
@@ -123,7 +119,10 @@ s32 CARDFastOpen(s32 chan, s32 fileNo, CARDFileInfo* fileInfo) {
 
     dir = __CARDGetDirBlock(card);
     ent = &dir[fileNo];
-    result = __CARDIsReadable(card, ent);
+    result = __CARDIsWritable(card, ent);
+    if (result == CARD_RESULT_NOPERM && (ent->permission & 0x4))
+        result = CARD_RESULT_READY;
+
     if (0 <= result) {
         if (!CARDIsValidBlockNo(card, ent->startBlock))
             result = CARD_RESULT_BROKEN;

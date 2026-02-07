@@ -1,4 +1,5 @@
 #include "ffcc/ME_AppRequest.h"
+#include "ffcc/zlist.h"
 
 /*
  * --INFO--
@@ -62,12 +63,28 @@ void CMaterialEditorPcs::GetRsdItemR()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004dd10
+ * PAL Size: 96b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMaterialEditorPcs::SetRsdIndex()
+int CMaterialEditorPcs::SetRsdIndex()
 {
-	// TODO
+    ZLIST* list = reinterpret_cast<ZLIST*>(reinterpret_cast<char*>(this) + 0xB4);
+    int index = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0xC4);
+    int* rsd = reinterpret_cast<int*>(list->GetDataIdx(index));
+
+    if (rsd == nullptr) {
+        return 0;
+    }
+    if (*rsd == 0) {
+        return 0;
+    }
+
+    *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0xBC) = *rsd;
+    return 1;
 }
 
 /*

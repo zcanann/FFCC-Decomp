@@ -11,7 +11,7 @@ public:
 	
     void Init();
     void Quit();
-    int GetTable(unsigned long);
+    void* GetTable(unsigned long);
 
     void SetFirstZone();
 

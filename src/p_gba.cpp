@@ -26,7 +26,7 @@ CGbaPcs::CGbaPcs()
  */
 void CGbaPcs::Init()
 {
-	m_stage = 0;
+	m_stage = (CMemory::CStage*)0;
 	GBAInit();
 }
 
@@ -49,10 +49,12 @@ void CGbaPcs::Quit()
  * JP Address: TODO
  * JP Size: TODO
  */
-int CGbaPcs::GetTable(unsigned long index)
+void* CGbaPcs::GetTable(unsigned long tableIndex)
 {
-	extern char lbl_8020F328[];
-	return (int)(lbl_8020F328 + index * 0x15c);
+	extern unsigned char lbl_8020F328[];
+	unsigned long offset = tableIndex;
+	offset *= 0x15c;
+	return lbl_8020F328 + offset;
 }
 
 /*

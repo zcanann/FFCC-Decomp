@@ -1,5 +1,20 @@
 #include "ffcc/pppPointAp.h"
 
+#include <dolphin/mtx.h>
+#include <dolphin/types.h>
+
+struct _pppMngSt;
+struct _pppPDataVal;
+
+struct _pppPObject {
+    void* unk0;
+    void* owner;
+};
+
+extern int lbl_8032ED70;
+extern _pppMngSt* lbl_8032ED50;
+extern _pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
+
 /*
  * --INFO--
  * PAL Address: 0x80060d08
@@ -11,10 +26,9 @@
  */
 void pppPointApCon(void* param1, void* param2)
 {
-    int** param2_ptr = (int**)param2;
-    int* data = (int*)param2_ptr[3];
-    int base_addr = data[1];
-    ((char*)param1 + base_addr)[0x81] = 0;
+    u32* data = *(u32**)((u8*)param2 + 0xC);
+    param1 = (u8*)param1 + data[1];
+    *((u8*)param1 + 0x81) = 0;
 }
 
 /*
@@ -28,61 +42,36 @@ void pppPointApCon(void* param1, void* param2)
  */
 void pppPointAp(void* param1, void* param2, void* param3)
 {
-    // Extract data from param3
-    int** data_ptr = (int**)((char*)param3 + 0xc);
-    float* src_data = (float*)*data_ptr;
-    
-    // Convert float to int for indexing - this generates fctiwz
-    int index = (int)src_data[1];
-    char* target_ptr = (char*)param1 + index + 0x80;
-    
-    // Check for global condition
-    extern int lbl_8032ED70;
+    Vec* src = *(Vec**)((u8*)param3 + 0xC);
+    s32 index = (s32)src->y;
+    u8* target = (u8*)param1 + index + 0x80;
+
     if (lbl_8032ED70 == 0) {
-        // Check flag at target location
-        if (target_ptr[1] == 0) {
-            // Check for valid object ID
-            int obj_id = ((int*)param2)[1];
-            if (obj_id != 0xFFFF) {
-                // Create object
-                extern int lbl_8032ED50;
-                int* mgr_ptr = (int*)&lbl_8032ED50;
-                void* obj_data = (void*)(mgr_ptr[0x34/4] + (obj_id * 16));
-                if (obj_data) {
-                    // Call object creation function
-                    extern void* pppCreatePObject__FP9_pppMngStP12_pppPDataVal(void* mgr, void* data);
-                    void* obj = pppCreatePObject__FP9_pppMngStP12_pppPDataVal(&lbl_8032ED50, obj_data);
-                    if (obj) {
-                        ((void**)obj)[1] = param1;
-                        
-                        // Handle coordinate transformation
-                        signed char transform_flag = ((signed char*)param2)[0xd];
-                        int offset = ((int*)param2)[2];
-                        float* dest_coords = (float*)((char*)obj + offset + 0x80);
-                        
-                        if (transform_flag == 0) {
-                            // Direct copy of 3 floats from source data
-                            dest_coords[0] = src_data[0];
-                            dest_coords[1] = src_data[1]; 
-                            dest_coords[2] = src_data[2];
-                        } else {
-                            // Matrix transformation
-                            extern void PSMTXMultVec(void* mtx, void* src, void* dst);
-                            PSMTXMultVec((void*)((char*)&lbl_8032ED50 + 0x78), src_data, dest_coords);
-                        }
-                        
-                        // Set flag from param2
-                        unsigned char flag_val = ((unsigned char*)param2)[0xc];
-                        target_ptr[1] = flag_val;
+        if ((s8)target[1] == 0) {
+            u32 objId = *(u32*)((u8*)param2 + 0x4);
+            if ((objId + 0x10000) != 0xFFFF) {
+                _pppPDataVal* objData = (_pppPDataVal*)(*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (objId << 4));
+
+                if (objData != 0) {
+                    _pppPObject* obj = pppCreatePObject(lbl_8032ED50, objData);
+                    obj->owner = param1;
+
+                    Vec* dst = (Vec*)((u8*)obj + *(u32*)((u8*)param2 + 0x8) + 0x80);
+                    if (*(u8*)((u8*)param2 + 0xD) == 0) {
+                        dst->x = src->x;
+                        dst->y = src->y;
+                        dst->z = src->z;
+                    } else {
+                        PSMTXMultVec((MtxPtr)((u8*)lbl_8032ED50 + 0x78), src, dst);
                     }
+
+                    target[1] = *(u8*)((u8*)param2 + 0xC);
                 }
             }
         }
-        
-        // Decrement counter flag
-        signed char count = target_ptr[1];
-        if (count > 0) {
-            target_ptr[1] = count - 1;
+
+        if ((s8)target[1] > 0) {
+            target[1]--;
         }
     }
 }

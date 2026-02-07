@@ -16,13 +16,18 @@ extern float FLOAT_80330edc;
 
 extern "C" {
     int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(struct CMapMng*, void*, void*, unsigned int);
+    void CalcHitPosition__7CMapObjFP3Vec(void*, void*);
     void* pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
 }
 
 /*
  * --INFO--
- * PAL Address: 800d8c18
+ * PAL Address: 0x800d8c18
  * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppConstructYmCheckBGHeight(void)
 {
@@ -31,8 +36,12 @@ void pppConstructYmCheckBGHeight(void)
 
 /*
  * --INFO--
- * PAL Address: 800d8abc  
+ * PAL Address: 0x800d8abc
  * PAL Size: 348b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(struct pppYmCheckBGHeight* pppYmCheckBGHeight, struct UnkC* param_2)
 {
@@ -80,7 +89,7 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(struct pppYmCheckBGHeight* pp
 		
 		iVar1 = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &local_60, &local_6c, 0xffffffff);
 		if (iVar1 != 0) {
-			// TODO: CalcHitPosition call - need to find correct MapMng member
+			CalcHitPosition__7CMapObjFP3Vec(*(void**)((char*)&MapMng + 0x22A88), auStack_78);
 			if ((float)(dVar2 - (double)(float)param_2->m_serializedDataOffsets) <= local_74) {
 				dVar2 = (double)(local_74 + (float)param_2->m_unk0x8);
 			}

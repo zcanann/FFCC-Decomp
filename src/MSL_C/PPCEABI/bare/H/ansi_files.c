@@ -137,7 +137,7 @@ unsigned int __flush_all() {
  */
 FILE* __find_unopened_file(void) {
     FILE* file = &__files[0];
-    FILE* prev = NULL;
+    FILE* prev;
 
     while (file != NULL) {
         if (file->file_mode.file_kind == __closed_file) {
@@ -211,7 +211,6 @@ void __init_file(FILE* file, file_modes mode, unsigned char* buffer, int buffer_
  * JP Size: TODO
  */
 int __flush_line_buffered_output_files(void) {
-    FILE* file = &__files[0];
     int result = 0;
 
     while (file != NULL) {

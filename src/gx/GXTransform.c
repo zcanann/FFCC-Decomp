@@ -562,22 +562,26 @@ void GXGetScissor(u32* left, u32* top, u32* wd, u32* ht) {
     *ht = bm - tp + 1;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801A68C8
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void GXSetScissorBoxOffset(s32 x_off, s32 y_off) {
-    u32 reg = 0;
-    u32 hx;
-    u32 hy;
+    u32 reg;
 
     CHECK_GXBEGIN(1119, "GXSetScissorBoxOffset");
 
     ASSERTMSGLINE(1122, (u32)(x_off + 342) < 2048, "GXSetScissorBoxOffset: Invalid X offset");
     ASSERTMSGLINE(1124, (u32)(y_off + 342) < 2048, "GXSetScissorBoxOffset: Invalid Y offset");
 
-    hx = (u32)(x_off + 342) >> 1;
-    hy = (u32)(y_off + 342) >> 1;
-
-    SET_REG_FIELD(1129, reg, 10, 0, hx);
-    SET_REG_FIELD(1130, reg, 10, 10, hy);
-    SET_REG_FIELD(1131, reg, 8, 24, 0x59);
+    reg = ((u32)(x_off + 342) >> 1) & 0x3FF;
+    reg |= (((u32)(y_off + 342) >> 1) & 0x3FF) << 10;
+    reg |= 0x59000000;
     GX_WRITE_RAS_REG(reg);
     __GXData->bpSentNot = 0;
 }

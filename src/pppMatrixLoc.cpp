@@ -10,17 +10,15 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppMatrixLoc(void* target, void* param)
+void pppMatrixLoc(void* target, void* unused, void* param)
 {
-    // Initialize matrix to identity (matrix is at offset 0x10)
+    (void)unused;
+
+    int* offsetPtr = *(int**)((char*)param + 0xC);
+    f32* posData = (f32*)((char*)target + *offsetPtr + 0x80);
+
     PSMTXIdentity((MtxPtr)((char*)target + 0x10));
-    
-    // Get position data pointer from param+0xc, then add target+0x80  
-    int dataOffset = *(int*)((char*)param + 0xc);
-    f32* posData = (f32*)((char*)target + dataOffset + 0x80);
-    
-    // Store position values in matrix translation column
-    *(f32*)((char*)target + 0x1c) = posData[0];  // X translation  
-    *(f32*)((char*)target + 0x2c) = posData[1];  // Y translation
-    *(f32*)((char*)target + 0x3c) = posData[2];  // Z translation
+    *(f32*)((char*)target + 0x1C) = posData[0];
+    *(f32*)((char*)target + 0x2C) = posData[1];
+    *(f32*)((char*)target + 0x3C) = posData[2];
 }

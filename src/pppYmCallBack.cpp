@@ -5,6 +5,44 @@
 
 #include <dolphin/mtx.h>
 
+extern CPartMng PartMng;
+
+struct YmCallBackObj {
+    u8 m_pad0[0xc];
+    u32 m_graphId;
+};
+
+struct YmCallBackParam {
+    u32 m_unk0;
+    s16 m_graphId;
+    s16 m_initWOrk;
+};
+
+static f32 GetMngStPosX(const _pppMngSt* mngSt)
+{
+    return *(const f32*)((const u8*)mngSt + 0x84);
+}
+
+static f32 GetMngStPosY(const _pppMngSt* mngSt)
+{
+    return *(const f32*)((const u8*)mngSt + 0x94);
+}
+
+static f32 GetMngStPosZ(const _pppMngSt* mngSt)
+{
+    return *(const f32*)((const u8*)mngSt + 0xA4);
+}
+
+static s16 GetMngStKind(const _pppMngSt* mngSt)
+{
+    return *(const s16*)((const u8*)mngSt + 0x74);
+}
+
+static s16 GetMngStNodeIndex(const _pppMngSt* mngSt)
+{
+    return *(const s16*)((const u8*)mngSt + 0x76);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800a6090
@@ -27,44 +65,38 @@ void pppDestructYmCallBack(void)
 
 /*
  * --INFO--
- * PAL Address: 0x800a5fcc
+ * PAL Address: 0x800A5FCC
  * PAL Size: 192b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppFrameYmCallBack(void* pppYmCallBack, void* param_2)
 {
-	_pppMngSt* p_Var1;
-	int iVar2;
-	unsigned int uVar3;
-	Vec local_18;
-	
-	p_Var1 = pppMngStPtr;
-	
-	// Get graph ID from pppYmCallBack object (assumed structure)
-	uVar3 = *(unsigned int*)((char*)pppYmCallBack + 0xc); // m_graphId access
-	
-	// Graph ID comparison with bit shifting
-	if (((int)uVar3 >> 0xc) + (unsigned int)((int)uVar3 < 0 && (uVar3 & 0xfff) != 0) == 
-		*(short*)((char*)param_2 + 4)) {
-		
-		// Extract position from pppMngStPtr matrix
-		local_18.x = p_Var1->m_matrix.value[0][3];
-		local_18.y = p_Var1->m_matrix.value[1][3]; 
-		local_18.z = p_Var1->m_matrix.value[2][3];
-		
-		// Transform position using world matrix
-		PSMTXMultVec(ppvWorldMatrix, &local_18, &local_18);
-		
-		// Complex calculation for first parameter
-		iVar2 = (int)&p_Var1[0x5f2411].m_scale / 0x158 + ((int)&p_Var1[0x5f2411].m_scale >> 0x1f);
-		
-		// Call particle frame callback
-		Game.game.ParticleFrameCallback(
-			iVar2 - (iVar2 >> 0x1f),
-			(int)p_Var1->m_kind,
-			(int)p_Var1->m_nodeIndex, 
-			*(short*)((char*)param_2 + 6),
-			*(short*)((char*)param_2 + 4),
-			&local_18
-		);
-	}
+    _pppMngSt* pppMngSt;
+    YmCallBackObj* ymCallBack;
+    YmCallBackParam* frameParam;
+    Vec position;
+    s32 mngStIndex;
+
+    pppMngSt = pppMngStPtr;
+    ymCallBack = (YmCallBackObj*)pppYmCallBack;
+    frameParam = (YmCallBackParam*)param_2;
+
+    if (((s32)ymCallBack->m_graphId / 0x1000) == (s32)frameParam->m_graphId) {
+        _pppMngSt* mngStBase;
+
+        position.x = GetMngStPosX(pppMngSt);
+        position.y = GetMngStPosY(pppMngSt);
+        position.z = GetMngStPosZ(pppMngSt);
+        PSMTXMultVec(ppvWorldMatrix, &position, &position);
+
+        mngStBase = (_pppMngSt*)((u8*)&PartMng + 0x2A18);
+        mngStIndex = pppMngSt - mngStBase;
+        Game.game.ParticleFrameCallback(mngStIndex, (s32)GetMngStKind(pppMngSt),
+                                        (s32)GetMngStNodeIndex(pppMngSt),
+                                        (s32)frameParam->m_initWOrk, (s32)frameParam->m_graphId,
+                                        &position);
+    }
 }

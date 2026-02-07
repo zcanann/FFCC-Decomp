@@ -55,16 +55,14 @@ s32 __CARDIsWritable(CARDControl* card, CARDDir* ent) {
 }
 
 s32 __CARDIsPublic(CARDDir* ent) {
-    u8 perm;
-
     if (ent->gameName[0] == 0xFF) {
         return CARD_RESULT_NOFILE;
     }
 
-    perm = ent->permission & __CARDPermMask;
-    if (perm & 0x4) {
+    if ((ent->permission & 4) != 0) {
         return CARD_RESULT_READY;
     }
+
     return CARD_RESULT_NOPERM;
 }
 

@@ -15,7 +15,7 @@ void pppConstructConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir
     extern float DAT_803320c4;
     
     float uVar1 = DAT_803320c4;
-    float* puVar2 = (float*)((int)(&pppConstrainCameraDir->field0_0x0 + 2) + *param_2->m_serializedDataOffsets);
+    float* puVar2 = (float*)((char*)pppConstrainCameraDir + *param_2->m_serializedDataOffsets + 0x80);
     puVar2[2] = DAT_803320c4;
     puVar2[1] = uVar1;
     puVar2[0] = uVar1;
@@ -35,7 +35,7 @@ void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDi
     extern float DAT_803320c4;
     
     float uVar1 = DAT_803320c4;
-    float* puVar2 = (float*)((int)(&pppConstrainCameraDir->field0_0x0 + 2) + *param_2->m_serializedDataOffsets);
+    float* puVar2 = (float*)((char*)pppConstrainCameraDir + *param_2->m_serializedDataOffsets + 0x80);
     puVar2[2] = DAT_803320c4;
     puVar2[1] = uVar1;
     puVar2[0] = uVar1;
@@ -77,7 +77,7 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, Un
     _pppMngSt* pppMngSt = pppMngStPtr;
 
     if (DAT_8032ed70 == 0) {
-        float* value = (float*)((int)(&pppConstrainCameraDir->field0_0x0 + 2) + *param_3->m_serializedDataOffsets);
+        float* value = (float*)((char*)pppConstrainCameraDir + *param_3->m_serializedDataOffsets + 0x80);
         
         // Call CalcGraphValue function
         extern void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, float*, int, float*, float*, float*, float*, float*);

@@ -1,5 +1,7 @@
 #include "ffcc/pppCallBackDistance.h"
 #include "ffcc/partMng.h"
+#include "ffcc/game.h"
+#include "ffcc/p_game.h"
 #include <dolphin/mtx.h>
 
 /*
@@ -17,17 +19,16 @@ void pppConstructCallBackDistance(pppCallBackDistance* param1, UnkC* param2)
     Vec local_1c;
     f64 dVar3;
     s32 iVar1;
-    
-    if (param2 && param2->m_serializedDataOffsets) {
-        iVar1 = *param2->m_serializedDataOffsets;
-        local_28.x = pppMngStPtr->m_position.x;
-        local_28.y = pppMngStPtr->m_position.y;
-        local_28.z = pppMngStPtr->m_position.z;
-        local_1c.x = pppMngStPtr->m_scale.x;
-        local_1c.y = pppMngStPtr->m_scale.y;
-        local_1c.z = pppMngStPtr->m_scale.z;
-        dVar3 = (f64)PSVECDistance(&local_28, &local_1c);
-    }
+
+    iVar1 = *param2->m_serializedDataOffsets;
+    local_28.x = pppMngStPtr->m_matrix.value[0][3];
+    local_28.y = pppMngStPtr->m_matrix.value[1][3];
+    local_28.z = pppMngStPtr->m_matrix.value[2][3];
+    local_1c.x = pppMngStPtr->m_scale.x;
+    local_1c.y = pppMngStPtr->m_scale.y;
+    local_1c.z = pppMngStPtr->m_scale.z;
+    dVar3 = (f64)PSVECDistance(&local_28, &local_1c);
+    *(f32*)((s32)(&param1->field0_0x0 + 2) + iVar1) = (f32)dVar3;
 }
 
 /*
@@ -54,20 +55,32 @@ void pppDestructCallBackDistance(void)
  */
 void pppFrameCallBackDistance(pppCallBackDistance* param1, UnkB* param2, UnkC* param3)
 {
+    _pppMngSt* p_Var1;
+    u32 uVar2;
+    s32 iVar3;
     Vec local_28;
     Vec local_1c;
     f64 dVar4;
-    
-    if (param2 && param3) {
-        local_1c.x = pppMngStPtr->m_position.x;
-        local_1c.y = pppMngStPtr->m_position.y;
-        local_1c.z = pppMngStPtr->m_position.z;
-        dVar4 = (f64)PSVECDistance(&local_1c, &pppMngStPtr->m_scale);
-        
-        if (dVar4 <= (f64)(f32)param2->m_dataValIndex) {
-            local_28.x = pppMngStPtr->m_position.x;
-            local_28.y = pppMngStPtr->m_position.y;
-            local_28.z = pppMngStPtr->m_position.z;
-        }
+
+    local_1c.x = pppMngStPtr->m_matrix.value[0][3];
+    iVar3 = *param3->m_serializedDataOffsets;
+    local_1c.y = pppMngStPtr->m_matrix.value[1][3];
+    local_1c.z = pppMngStPtr->m_matrix.value[2][3];
+    dVar4 = (f64)PSVECDistance(&local_1c, &pppMngStPtr->m_scale);
+    p_Var1 = pppMngStPtr;
+
+    if ((dVar4 <= (f64)(f32)param2->m_dataValIndex) ||
+        ((f64)*(f32*)((s32)(&param1->field0_0x0 + 2) + iVar3) <= dVar4)) {
+        local_28.x = pppMngStPtr->m_matrix.value[0][3];
+        local_28.y = pppMngStPtr->m_matrix.value[1][3];
+        local_28.z = pppMngStPtr->m_matrix.value[2][3];
+        PSMTXMultVec(ppvWorldMatrix, &local_28, &local_28);
+        uVar2 = *(u32*)&param1->field0_0x0;
+        iVar3 = (s32)&p_Var1[0x5f2411].m_scale / 0x158 + ((s32)&p_Var1[0x5f2411].m_scale >> 0x1f);
+        Game.game.ParticleFrameCallback(iVar3 - (iVar3 >> 0x1f), (s32)p_Var1->m_kind,
+                                        (s32)p_Var1->m_nodeIndex, (s32)param2->m_initWOrk,
+                                        ((s32)uVar2 >> 0xc) +
+                                            (u32)((s32)uVar2 < 0 && (uVar2 & 0xfff) != 0),
+                                        &local_28);
     }
 }

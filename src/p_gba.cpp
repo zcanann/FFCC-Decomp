@@ -3,6 +3,7 @@
 #include "ffcc/gbaque.h"
 #include "ffcc/memory.h"
 #include "ffcc/system.h"
+#include <dolphin/gba/GBA.h>
 
 /*
  * --INFO--
@@ -16,12 +17,17 @@ CGbaPcs::CGbaPcs()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800979cc
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGbaPcs::Init()
 {
-	// TODO
+	m_stage = (CMemory::CStage*)0;
+	GBAInit();
 }
 
 /*
@@ -36,12 +42,19 @@ void CGbaPcs::Quit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800979b4
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGbaPcs::GetTable(unsigned long)
+void* CGbaPcs::GetTable(unsigned long tableIndex)
 {
-	// TODO
+	extern unsigned char lbl_8020F328[];
+	unsigned long offset = tableIndex;
+	offset *= 0x15c;
+	return lbl_8020F328 + offset;
 }
 
 /*

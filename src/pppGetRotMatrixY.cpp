@@ -2,17 +2,23 @@
 
 #include "ffcc/pppsintbl.h"
 
+extern float ppvSinTbl[];
+
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800649c0
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppGetRotMatrixY(pppFMATRIX& mtx, long angle)
 {  
 	float zero = 0.0f; // FLOAT_8032febc
 	float one = 1.0f; // FLOAT_8032feb8
-	float sinValue = pppSinFromTable(angle);
-	float cosValue = pppCosFromTable(angle);
+	float sinValue = *(float*)((unsigned char*)ppvSinTbl + (angle & 0xFFFC));
+	float cosValue = *(float*)((unsigned char*)ppvSinTbl + ((angle + 0x4000) & 0xFFFC));
 
 	mtx.value[0][0] = cosValue;
 	mtx.value[0][1] = zero;

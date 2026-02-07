@@ -317,15 +317,9 @@ void PPCMtwpar(register u32 newWPAR)
 asm void PPCDisableSpeculation(void)
 {
     nofralloc
-    mflr r0
-    stw r0, 0x4(r1)
-    stwu r1, -0x8(r1)
-    bl PPCMfhid0
+    mfspr r3, HID0
     ori r3, r3, HID0_SPD
-    bl PPCMthid0
-    lwz r0, 0xc(r1)
-    addi r1, r1, 0x8
-    mtlr r0
+    mtspr HID0, r3
     blr
 }
 

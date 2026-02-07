@@ -1,27 +1,48 @@
 #include "ffcc/pppColMove.h"
 
+extern int lbl_8032ED70;
+
+typedef struct {
+    short x;
+    short y;
+    short z;
+    short w;
+} pppColMoveVec4S;
+
+typedef struct {
+    int id;
+    int pad;
+    pppColMoveVec4S move;
+} pppColMoveInput;
+
 /*
  * --INFO--
  * PAL Address: 0x80065000
  * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppColMoveCon(void* param1, void* param2)
 {
-    int** ptr_array = (int**)param2;
-    int* temp_ptr = ptr_array[3];  // Load from offset 0xC
-    temp_ptr = (int*)temp_ptr[1]; // Load from offset 0x4 
-    short* target = (short*)((char*)param1 + (int)temp_ptr + 0x80);
-    
-    target[3] = 0;  // offset 0x6
-    target[2] = 0;  // offset 0x4
-    target[1] = 0;  // offset 0x2 
-    target[0] = 0;  // offset 0x0
+    int* data = ((int**)param2)[3];
+    pppColMoveVec4S* target = (pppColMoveVec4S*)((char*)param1 + data[1] + 0x80);
+
+    target->w = 0;
+    target->z = 0;
+    target->y = 0;
+    target->x = 0;
 }
 
 /*
  * --INFO--
  * PAL Address: 0x80065028
  * PAL Size: 188b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppColMove(void* param1, void* param2, void* param3)
 {

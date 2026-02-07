@@ -29,7 +29,7 @@ void pppWDrawMatrixFront(struct _pppPObject* param_1)
 	
 	PSMTXMultVec(ppvCameraMatrix0, &local_18, &local_18);
 	
-	param_1[1].m_graphId = (s32)local_18.x;
-	param_1[1].m_localMatrix.value[0][3] = local_18.y;
-	param_1[1].m_localMatrix.value[1][3] = local_18.z;
+	param_1[1].m_localMatrix.value[0][3] = local_18.x;
+	param_1[1].m_localMatrix.value[1][3] = local_18.y;
+	param_1[1].m_localMatrix.value[2][3] = local_18.z;
 }

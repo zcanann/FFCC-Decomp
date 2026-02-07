@@ -90,10 +90,10 @@ void CMapShadow::Calc()
 void CMapShadow::Draw()
 {
 	int iVar1;
-	Vec VStack_38;
-	Vec local_2c;
-	Vec local_20;
 	Vec local_14;
+	Vec local_20;
+	Vec local_2c;
+	Vec VStack_38;
 	
 	iVar1 = *(int*)((char*)this + 0xc);
 	local_14.x = *(float*)(iVar1 + 0xc4);

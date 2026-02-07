@@ -27,45 +27,40 @@ struct RandFloatCtx {
  * PAL Size: 268b
  * EN Address: TODO
  * EN Size: TODO
- * JP Address: TODO  
+ * JP Address: TODO
  * JP Size: TODO
  */
 void pppRandFloat(void* param1, void* param2, void* param3)
 {
     int* base = (int*)param1;
-    RandFloatParam* data = (RandFloatParam*)param2;
-    RandFloatCtx* ctx = (RandFloatCtx*)param3;
     int index = base[3];
 
-    if (lbl_8032ED70 != 0) {
-        return;
-    }
+    if (lbl_8032ED70 == 0) {
+        RandFloatParam* data = (RandFloatParam*)param2;
+        RandFloatCtx* ctx = (RandFloatCtx*)param3;
 
-    if (index == 0) {
-        float out = RandF__5CMathFv(&math);
+        if (index == 0) {
+            float out = RandF__5CMathFv(&math);
 
-        if (data->randomTwice != 0) {
-            out += RandF__5CMathFv(&math);
-        } else {
-            out *= lbl_8032FF88;
+            if (data->randomTwice != 0) {
+                out = out + RandF__5CMathFv(&math);
+            } else {
+                out = out * lbl_8032FF88;
+            }
+
+            *(float*)((char*)base + (*ctx->outputOffset + 0x80)) = out;
+        } else if (data->targetId == index) {
+            int outputOffset = *ctx->outputOffset;
+            int sourceOffset = data->sourceOffset;
+            float* source;
+
+            if (sourceOffset == -1) {
+                source = &lbl_801EADC8;
+            } else {
+                source = (float*)((char*)base + (sourceOffset + 0x80));
+            }
+
+            *source = *source + (data->blend * *(float*)((char*)base + (outputOffset + 0x80)) - data->blend);
         }
-
-        int outputOffset = *ctx->outputOffset;
-        *(float*)((char*)param1 + outputOffset + 0x80) = out;
-        return;
-    }
-
-    if (data->targetId == index) {
-        int outputOffset = *ctx->outputOffset;
-        float* outputValue = (float*)((char*)param1 + outputOffset + 0x80);
-        float* source;
-
-        if (data->sourceOffset == -1) {
-            source = &lbl_801EADC8;
-        } else {
-            source = (float*)((char*)param1 + data->sourceOffset + 0x80);
-        }
-
-        *source = *source + (data->blend * *outputValue - data->blend);
     }
 }

@@ -11,45 +11,49 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppMatrixZXY(pppFMATRIX* matrix, void* data, pppIVECTOR4* angle)
+void pppMatrixZXY(void* target, void* unused, void* param)
 {
-	Vec tempVec1, tempVec2, tempVec3;
-	
-	// Get rotation matrix first
-	pppGetRotMatrixZXY(*matrix, angle);
-	
-	// Extract data pointer to float array at offset 0xc
-	float* scalePtr = *(float**)((char*)data + 0xc);
-	
-	// Scale X axis (first column)
-	tempVec1.x = matrix->value[0][0];
-	tempVec1.y = matrix->value[1][0];  
-	tempVec1.z = matrix->value[2][0];
-	PSVECScale(&tempVec1, &tempVec1, scalePtr[0]);
-	matrix->value[0][0] = tempVec1.x;
-	matrix->value[1][0] = tempVec1.y;
-	matrix->value[2][0] = tempVec1.z;
-	
-	// Scale Y axis (second column)
-	tempVec2.x = matrix->value[0][1];
-	tempVec2.y = matrix->value[1][1];
-	tempVec2.z = matrix->value[2][1];
-	PSVECScale(&tempVec2, &tempVec2, scalePtr[1]);
-	matrix->value[0][1] = tempVec2.x;
-	matrix->value[1][1] = tempVec2.y;
-	matrix->value[2][1] = tempVec2.z;
-	
-	// Scale Z axis (third column)
-	tempVec3.x = matrix->value[0][2];
-	tempVec3.y = matrix->value[1][2];
-	tempVec3.z = matrix->value[2][2];
-	PSVECScale(&tempVec3, &tempVec3, scalePtr[2]);
-	matrix->value[0][2] = tempVec3.x;
-	matrix->value[1][2] = tempVec3.y;
-	matrix->value[2][2] = tempVec3.z;
-	
-	// Set translation values from data structure
-	matrix->value[0][3] = scalePtr[3];
-	matrix->value[1][3] = scalePtr[4];
-	matrix->value[2][3] = scalePtr[5];
+    (void)unused;
+
+    f32* matrix = (f32*)target;
+    u32* offsets = (u32*)*(void**)((u8*)param + 0xC);
+    u32 translationOffset = offsets[0];
+    u32 scaleOffset = offsets[2];
+    u32 angleOffset = offsets[1];
+    f32* translation = (f32*)((u8*)target + translationOffset + 0x80);
+    f32* scale = (f32*)((u8*)target + scaleOffset + 0x80);
+    pppIVECTOR4* angle = (pppIVECTOR4*)((u8*)target + angleOffset + 0x80);
+    Vec temp1;
+    Vec temp2;
+    Vec temp3;
+
+    pppGetRotMatrixZXY(*(pppFMATRIX*)(matrix + 4), angle);
+
+    temp1.x = matrix[4];
+    temp1.y = matrix[8];
+    temp1.z = matrix[12];
+    PSVECScale(&temp1, &temp1, scale[0]);
+    matrix[4] = temp1.x;
+    matrix[8] = temp1.y;
+    matrix[12] = temp1.z;
+
+    temp2.x = matrix[5];
+    temp2.y = matrix[9];
+    temp2.z = matrix[13];
+    PSVECScale(&temp2, &temp2, scale[1]);
+    matrix[5] = temp2.x;
+    matrix[9] = temp2.y;
+    matrix[13] = temp2.z;
+
+    temp3.x = matrix[6];
+    temp3.y = matrix[10];
+    temp3.z = matrix[14];
+    PSVECScale(&temp3, &temp3, scale[2]);
+    matrix[6] = temp3.x;
+    matrix[10] = temp3.y;
+    matrix[14] = temp3.z;
+
+    matrix[7] = translation[0];
+    matrix[11] = translation[1];
+    matrix[15] = translation[2];
 }

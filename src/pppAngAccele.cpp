@@ -1,5 +1,22 @@
 #include "ffcc/pppAngAccele.h"
 
+extern int lbl_8032ED70;
+
+typedef struct {
+    int unk0;
+    int unk4;
+    int unk8;
+    int* serializedDataOffsets;
+} pppAngAcceleObj;
+
+typedef struct {
+    int* graphIdPtr;
+    int unk4;
+    int x;
+    int y;
+    int z;
+} pppAngAcceleData;
+
 /*
  * --INFO--
  * PAL Address: 0x80064d3c
@@ -7,30 +24,25 @@
  */
 void pppAngAccele(void* particleSystem, void* particleData)
 {
-    extern int lbl_8032ED70;
-    
+    pppAngAcceleObj* obj = (pppAngAcceleObj*)particleSystem;
+    pppAngAcceleData* data = (pppAngAcceleData*)particleData;
+    int* offsets = obj->serializedDataOffsets;
+    int* angularVelocity = (int*)((char*)obj + offsets[0] + 0x80);
+    int* angularAccel = (int*)((char*)obj + offsets[1] + 0x80);
+
     if (lbl_8032ED70 != 0) {
         return;
     }
-    
-    void** systemPtr = (void**)((int*)particleSystem)[3];
-    void* particleIdPtr = *(void**)particleData;
-    void* angularVelocityPtr = systemPtr[0];
-    int particleId = *(int*)particleIdPtr;
-    void* angularAccelPtr = systemPtr[1];
-    
-    char* angularVelocityBase = (char*)particleSystem + (int)angularVelocityPtr + 0x80;
-    char* angularAccelBase = (char*)particleSystem + (int)angularAccelPtr + 0x80;
-    
-    if (particleId == (int)angularVelocityPtr) {
-        *(int*)(angularAccelBase + 0x0) += *(int*)((char*)particleData + 0x8);
-        *(int*)(angularAccelBase + 0x4) += *(int*)((char*)particleData + 0xc);
-        *(int*)(angularAccelBase + 0x8) += *(int*)((char*)particleData + 0x10);
+
+    if (*(data->graphIdPtr) == offsets[0]) {
+        angularAccel[0] += data->x;
+        angularAccel[1] += data->y;
+        angularAccel[2] += data->z;
     }
-    
-    *(int*)(angularVelocityBase + 0x0) += *(int*)(angularAccelBase + 0x0);
-    *(int*)(angularVelocityBase + 0x4) += *(int*)(angularAccelBase + 0x4);
-    *(int*)(angularVelocityBase + 0x8) += *(int*)(angularAccelBase + 0x8);
+
+    angularVelocity[0] += angularAccel[0];
+    angularVelocity[1] += angularAccel[1];
+    angularVelocity[2] += angularAccel[2];
 }
 
 /*

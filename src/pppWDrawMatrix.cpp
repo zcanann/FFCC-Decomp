@@ -14,12 +14,13 @@
  */
 void pppWDrawMatrix(_pppPObject* pppPObject)
 {
-    char* base = (char*)pppPObject;
-    Mtx* worldMtx = (Mtx*)(base + 0x40);
+    register char* p = (char*)pppPObject;
 
-    PSMTXConcat(ppvCameraMatrix0, *(Mtx*)(base + 0x4), *worldMtx);
-
-    PSVECScale((Vec*)worldMtx, (Vec*)worldMtx, *(float*)((char*)pppMngStPtr + 0x64));
-    PSVECScale((Vec*)(base + 0x50), (Vec*)(base + 0x50), *(float*)((char*)pppMngStPtr + 0x68));
-    PSVECScale((Vec*)(base + 0x60), (Vec*)(base + 0x60), *(float*)((char*)pppMngStPtr + 0x6c));
+    PSMTXConcat(ppvCameraMatrix0, *(Mtx*)(p + 0x10), *(Mtx*)(p + 0x40));
+    PSVECScale((Vec*)(p + 0x40), (Vec*)(p + 0x40),
+               *(float*)((char*)pppMngStPtr + 0x28));
+    PSVECScale((Vec*)(p + 0x50), (Vec*)(p + 0x50),
+               *(float*)((char*)pppMngStPtr + 0x2c));
+    PSVECScale((Vec*)(p + 0x60), (Vec*)(p + 0x60),
+               *(float*)((char*)pppMngStPtr + 0x30));
 }

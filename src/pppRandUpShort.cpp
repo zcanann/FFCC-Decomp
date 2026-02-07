@@ -1,5 +1,6 @@
 #include "ffcc/pppRandUpShort.h"
 #include "ffcc/math.h"
+#include "dolphin/types.h"
 
 extern CMath math;
 extern int lbl_8032ED70;
@@ -14,76 +15,40 @@ extern short lbl_801EADC8;
  */
 void pppRandUpShort(void* param1, void* param2, void* param3)
 {
-    // Cast parameters based on assembly analysis
     int* p1 = (int*)param1;
-    
-    struct ParamStruct2 {
-        int field0;           // offset 0
-        int field4;           // offset 4
-        short field8;         // offset 8 
-        unsigned char fieldA; // offset 10
-    }* p2 = (struct ParamStruct2*)param2;
-    
-    struct ParamStruct3 {
-        void* fieldC;         // offset 12
-    }* p3 = (struct ParamStruct3*)param3;
-    
-    // Check global flag first
+    int* p2 = (int*)param2;
+    int*** p3 = (int***)param3;
+
     if (lbl_8032ED70 != 0) {
         return;
     }
-    
-    // Check field at offset 12 of first parameter
+
     if (p1[3] == 0) {
-        // Generate random float
         math.RandF();
-        float randVal = 1.0f; // Placeholder for random value
-        
-        // Check if second random needed
-        if (p2->fieldA != 0) {
+
+        float randVal = 1.0f;
+        if (*(u8*)((char*)p2 + 0xA) != 0) {
             math.RandF();
-            randVal += 1.0f; // Add second random value
+            randVal += 1.0f;
         }
-        
-        // Scale by constant
+
         randVal *= lbl_80330038;
-        
-        // Store to calculated memory location
-        void** basePtr = (void**)p3->fieldC;
-        int* indexPtr = (int*)*basePtr;
-        float* targetAddr = (float*)((char*)param1 + (*indexPtr + 0x80));
-        *targetAddr = randVal;
-        
-    } else {
-        // Check if fields match
-        if (p2->field0 != p1[3]) {
-            return;
-        }
-        
-        // Calculate target address for final operation
-        void** basePtr = (void**)p3->fieldC;
-        int* indexPtr = (int*)*basePtr;
-        float* sourceAddr = (float*)((char*)param1 + (*indexPtr + 0x80));
-        
-        short* targetShort;
-        if (p2->field4 == -1) {
-            targetShort = &lbl_801EADC8;
-        } else {
-            targetShort = (short*)((char*)param1 + (p2->field4 + 0x80));
-        }
-        
-        // Perform floating point to integer conversion and arithmetic
-        short multiplier = p2->field8;
-        float sourceValue = *sourceAddr;
-        
-        // Convert multiplier to double, subtract magic constant, multiply by source
-        double multiplierD = (double)multiplier;
-        double result = multiplierD - lbl_80330040;
-        result *= sourceValue;
-        
-        // Convert to integer and add to existing value
-        int intResult = (int)result;
-        short currentValue = *targetShort;
-        *targetShort = currentValue + (short)intResult;
+        *(float*)((char*)p1 + (***p3 + 0x80)) = randVal;
+        return;
     }
+
+    if (p2[0] != p1[3]) {
+        return;
+    }
+
+    float* src = (float*)((char*)p1 + ***p3);
+    short* dst;
+    if (p2[1] == -1) {
+        dst = &lbl_801EADC8;
+    } else {
+        dst = (short*)((char*)p1 + p2[1] + 0x80);
+    }
+
+    int add = (int)(((double)*(short*)((char*)p2 + 8) - lbl_80330040) * *(float*)((char*)src + 0x80));
+    *dst = *dst + add;
 }

@@ -100,30 +100,42 @@ static void DisableWriteGatherPipe(void) {
     PPCMthid2(hid2);
 }
 
-static GXTexRegion*__GXDefaultTexRegionCallback(const GXTexObj* t_obj, GXTexMapID id) {
-    GXTexFmt fmt;
-    u8 mm;
+/*
+ * --INFO--
+ * PAL Address: 0x8019EF44
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static GXTexRegion* __GXDefaultTexRegionCallback(const GXTexObj* t_obj, GXTexMapID id) {
+    u8* gx;
+    u32* regionCount;
+    u32 count;
+    u32 offset;
 
-    fmt = GXGetTexObjFmt(t_obj);
-    mm = GXGetTexObjMipMap(t_obj);
-    id = (GXTexMapID)(id % GX_MAX_TEXMAP);
+    (void)id;
+    gx = (u8*)__GXData;
 
-    switch (fmt) {
-    case GX_TF_RGBA8:
-        if (mm) {
-            return &__GXData->TexRegions2[id];
-        }
-        return &__GXData->TexRegions1[id];
+    switch (GXGetTexObjFmt(t_obj)) {
     case GX_TF_C4:
     case GX_TF_C8:
     case GX_TF_C14X2:
-        return &__GXData->TexRegions0[id];
+        regionCount = (u32*)(gx + 0x2CC);
+        count = *regionCount;
+        *regionCount = count + 1;
+        offset = ((count & 3) << 4) + 0x288;
+        break;
     default:
-        if (mm) {
-            return &__GXData->TexRegions1[id];
-        }
-        return &__GXData->TexRegions0[id];
+        regionCount = (u32*)(gx + 0x2C8);
+        count = *regionCount;
+        *regionCount = count + 1;
+        offset = ((count & 7) << 4) + 0x208;
+        break;
     }
+
+    return (GXTexRegion*)(gx + offset);
 }
 
 static GXTlutRegion* __GXDefaultTlutRegionCallback(u32 idx) {

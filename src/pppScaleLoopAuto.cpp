@@ -120,19 +120,16 @@ void pppScaleLoopAutoCon(void* arg1, void* arg2)
 	float* targetData = (float*)targetPtr;
 	char* targetBytes = (char*)targetPtr;
 	
-	// Initialize float values to 0.0f - including 0x24 offset
-	targetData[0] = 0.0f;
-	targetData[1] = 0.0f; 
 	targetData[2] = 0.0f;
-	targetData[4] = 0.0f;
-	targetData[5] = 0.0f;
+	targetData[1] = 0.0f;
+	targetData[0] = 0.0f;
 	targetData[6] = 0.0f;
-	targetData[9] = 0.0f;
-	
-	// Initialize byte values to 0 - complete sequence
+	targetData[5] = 0.0f;
+	targetData[4] = 0.0f;
 	targetBytes[28] = 0;
 	targetBytes[29] = 0;
-	*(short*)(targetBytes + 30) = 0;  // Use 16-bit store for 30-31
-	targetBytes[32] = 0;
+	*(short*)(targetBytes + 30) = 0;
 	targetBytes[33] = 0;
+	targetBytes[32] = 0;
+	targetData[9] = 0.0f;
 }

@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-void pppMatrixLoc(void* target, void* param);
+void pppMatrixLoc(void* target, void* arg1, void* param);
 
 #ifdef __cplusplus
 }

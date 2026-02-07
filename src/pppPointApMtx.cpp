@@ -5,6 +5,17 @@
 extern int gPppGlobalFlag;
 extern _pppMngSt* gPppMngSt;
 
+struct _pppPointApMtxDataVal
+{
+	u32 unk0;
+	u32 unk4;
+	u32 srcOffset;
+	u8 frameCount;
+	u8 useWorldMtx;
+	u16 pad;
+	u32 mtxOffset;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x800de348
@@ -12,8 +23,10 @@ extern _pppMngSt* gPppMngSt;
  */
 void pppPointApMtxCon(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal)
 {
-	unsigned long offset = *((unsigned long*)((char*)pppPDataVal + 0xc));
-	*((unsigned char*)pppPObject + offset + 0x81) = 0;
+	_pppPointApMtxDataVal* dataVal = (_pppPointApMtxDataVal*)pppPDataVal;
+	u32 offset = dataVal->frameCount;
+	pppPObject = (_pppPObject*)((u8*)pppPObject + offset);
+	*((unsigned char*)pppPObject + 0x81) = 0;
 }
 
 /*
@@ -23,9 +36,10 @@ void pppPointApMtxCon(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal)
  */
 void pppPointApMtx(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal, _pppMngSt* pppMngSt)
 {
-	unsigned long param2 = *((unsigned long*)((char*)pppPDataVal + 0x10));
-	Mtx* pMatrix = (Mtx*)((char*)pppPObject + param2 + 0x80);
-	unsigned char* pFlag = (unsigned char*)pMatrix + 1;
+	_pppPointApMtxDataVal* dataVal = (_pppPointApMtxDataVal*)pppPDataVal;
+	u32 param2 = dataVal->mtxOffset;
+	Mtx* pMatrix = (Mtx*)((u8*)pppPObject + param2 + 0x80);
+	u8* pFlag = (u8*)pMatrix + 1;
 	
 	if (gPppGlobalFlag == 0) {
 		if (*pFlag == 0) {
@@ -35,16 +49,16 @@ void pppPointApMtx(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal, _pppMngSt
 		}
 	}
 	
-	unsigned long param3 = *((unsigned long*)((char*)pppPDataVal + 0x8));
-	Vec* pSrcPos = (Vec*)((char*)pppPObject + param3 + 0x80);
+	u32 param3 = dataVal->srcOffset;
+	Vec* pSrcPos = (Vec*)((u8*)pppPObject + param3 + 0x80);
 	
-	if (*((unsigned char*)pppPDataVal + 0xd) == 0) {
+	if (dataVal->useWorldMtx == 0) {
 		PSMTXIdentity(*pMatrix);
 		(*pMatrix)[0][3] = pSrcPos->x;
 		(*pMatrix)[1][3] = pSrcPos->y;
 		(*pMatrix)[2][3] = pSrcPos->z;
 	} else {
-		Mtx* worldMatrix = (Mtx*)((char*)gPppMngSt + 0x78);
+		Mtx* worldMatrix = (Mtx*)((u8*)gPppMngSt + 0x78);
 		PSMTXCopy(*worldMatrix, *pMatrix);
 		
 		Vec result;
@@ -55,9 +69,9 @@ void pppPointApMtx(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal, _pppMngSt
 		(*pMatrix)[2][3] = result.z;
 	}
 	
-	*pFlag = *((unsigned char*)pppPDataVal + 0xc);
+	*pFlag = dataVal->frameCount;
 	
-	unsigned char counter = *pFlag;
+	u8 counter = *pFlag;
 	if (counter != 0) {
 		*pFlag = counter - 1;
 	}

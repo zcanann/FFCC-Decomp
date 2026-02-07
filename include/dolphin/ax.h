@@ -282,7 +282,7 @@ u32 AXGetMode(void);
 extern AXPROFILE __AXLocalProfile;
 
 void AXSetStepMode(u32 i);
-AXCallback AXRegisterCallback(AXCallback callback);
+void AXRegisterCallback(AXCallback callback);
 
 // AXProf
 void AXInitProfile(AXPROFILE* profile, u32 maxProfiles);

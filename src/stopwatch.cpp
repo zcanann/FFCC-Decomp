@@ -64,7 +64,7 @@ float CStopWatch::Get()
  */
 CProfile::CProfile(char* name)
 {
-	OSInitStopwatch(this, lbl_8032F860);
+	OSInitStopwatch(this, &lbl_8032F860);
 	OSResetStopwatch(this);
 
 	OSStopwatch tmp;

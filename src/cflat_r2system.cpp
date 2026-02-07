@@ -1,4 +1,19 @@
 #include "ffcc/cflat_r2system.h"
+#include "ffcc/game.h"
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B8F80
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGame::SetNextScriptNewGame()
+{
+    m_nextScript.m_flags = 1;
+}
 
 /*
  * --INFO--

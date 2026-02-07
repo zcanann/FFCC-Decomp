@@ -5,6 +5,21 @@ extern CMath math;
 extern int lbl_8032ED70;
 extern float lbl_8032FFF8;
 extern float lbl_801EADC8;
+extern "C" float RandF__5CMathFv(CMath* instance);
+
+struct RandUpFloatParam {
+    int targetId;
+    int sourceOffset;
+    float blend;
+    unsigned char randomTwice;
+};
+
+struct RandUpFloatCtx {
+    void* unk0;
+    void* unk4;
+    void* unk8;
+    int* outputOffset;
+};
 
 /*
  * --INFO--
@@ -21,36 +36,38 @@ void pppRandUpFloat(void* param1, void* param2, void* param3) {
     }
 
     int* p1 = (int*)param1;
-    int* p2 = (int*)param2;
-    int* p3 = (int*)param3;
+    RandUpFloatParam* p2 = (RandUpFloatParam*)param2;
+    RandUpFloatCtx* p3 = (RandUpFloatCtx*)param3;
 
     int id = p1[3];
     if (id == 0) {
-        math.RandF();
-        float value = 1.0f;
+        float value = RandF__5CMathFv(&math);
 
-        if (((unsigned char*)param2)[0xC] != 0) {
-            math.RandF();
-            value = (value + 0.5f) * lbl_8032FFF8;
+        if (p2->randomTwice != 0) {
+            value = (value + RandF__5CMathFv(&math)) * lbl_8032FFF8;
         }
 
-        int outIndex = *(int*)p3[3];
-        *(float*)((char*)param1 + outIndex + 0x80) = value;
+        int outIndex = *p3->outputOffset;
+        float* outValue = (float*)((char*)param1 + outIndex + 0x80);
+        *outValue = value;
         return;
     }
 
-    if (p2[0] != id) {
+    if (p2->targetId != id) {
         return;
     }
 
-    int outIndex = *(int*)p3[3];
+    int outIndex = *p3->outputOffset;
     float* outValue = (float*)((char*)param1 + outIndex + 0x80);
 
-    int sourceIndex = p2[1];
+    int sourceIndex = p2->sourceOffset;
     float* source = &lbl_801EADC8;
     if (sourceIndex != -1) {
         source = (float*)((char*)param1 + sourceIndex + 0x80);
     }
 
-    *source = *source + (*(float*)((char*)param2 + 8) * *outValue);
+    float blend = p2->blend;
+    float current = *source;
+    float output = *outValue;
+    *source = current + (blend * output);
 }

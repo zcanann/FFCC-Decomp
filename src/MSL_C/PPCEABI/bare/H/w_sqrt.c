@@ -1,15 +1,16 @@
+int __ieee754_sqrt(void);
 
 
 /*
  * --INFO--
- * JP Address: 
- * JP Size: 
- * PAL Address: 
- * PAL Size: 
- * EN Address: 
- * EN Size: 
+ * PAL Address: 0x801D6A54
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void sqrt(void)
 {
-	// TODO
+	__ieee754_sqrt();
 }

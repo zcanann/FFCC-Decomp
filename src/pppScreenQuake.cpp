@@ -6,6 +6,7 @@ extern float FLOAT_80331fc8;
 extern int DAT_8032ed70;
 
 void CalcGraphValue(float param1, _pppPObject *param2, int param3, float *param4, float *param5, float *param6, float *param7, float *param8);
+extern "C" void SetQuakeParameter__10CCameraPcsFiissffffffi(CCameraPcs*, int, int, short, short, float, float, float, float, float, float, int);
 
 /*
  * --INFO--
@@ -68,10 +69,8 @@ void pppCon2ScreenQuake(pppScreenQuake *quake, UnkC *param2)
  */
 void pppDesScreenQuake(void)
 {
-	double dVar1 = (double)FLOAT_80331fc8;
-	CameraPcs.SetQuakeParameter((int)dVar1, (int)dVar1, (short)dVar1, (short)dVar1, 
-	                            (float)dVar1, (float)dVar1, (float)dVar1, (float)dVar1, 
-	                            (float)dVar1, (float)dVar1, 1);
+	float value = FLOAT_80331fc8;
+	SetQuakeParameter__10CCameraPcsFiissffffffi(&CameraPcs, 0, 0, 0, 0, value, value, value, value, value, value, 1);
 }
 
 /*

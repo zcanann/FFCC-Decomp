@@ -93,15 +93,31 @@ void GXGetPointSize(u8* pointSize, GXTexOffset* texOffsets) {
     *texOffsets = GET_REG_FIELD(__GXData->lpSize, 3, 19);
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801A26CC
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void GXEnableTexOffsets(GXTexCoordID coord, u8 line_enable, u8 point_enable) {
+    GXData* data;
+    u32 reg;
+
     CHECK_GXBEGIN(529, "GXEnableTexOffsets");
 
     ASSERTMSGLINE(531, coord < GX_MAX_TEXCOORD, "GXEnableTexOffsets: Invalid coordinate Id");
-
-    SET_REG_FIELD(533, __GXData->suTs0[coord], 1, 18, line_enable);
-    SET_REG_FIELD(534, __GXData->suTs0[coord], 1, 19, point_enable);
-    GX_WRITE_RAS_REG(__GXData->suTs0[coord]);
-    __GXData->bpSentNot = 0;
+    data = __GXData;
+    reg = data->suTs0[coord];
+    reg = __rlwimi(reg, line_enable, 18, 13, 13);
+    data->suTs0[coord] = reg;
+    reg = data->suTs0[coord];
+    reg = __rlwimi(reg, point_enable, 19, 12, 12);
+    data->suTs0[coord] = reg;
+    GX_WRITE_RAS_REG(data->suTs0[coord]);
+    data->bpSentNot = 0;
 }
 
 /*

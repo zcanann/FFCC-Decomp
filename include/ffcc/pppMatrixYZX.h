@@ -1,13 +1,11 @@
 #ifndef _PPP_MATRIXYZX_H_
 #define _PPP_MATRIXYZX_H_
 
-#include "ffcc/partMng.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppMatrixYZX(pppFMATRIX& out, pppIVECTOR4* angle);
+void pppMatrixYZX(void* target, void* unused, void* param);
 
 #ifdef __cplusplus
 }

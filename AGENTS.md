@@ -160,7 +160,7 @@ WARNING: If the function parameters do not match, the match score cannot be impr
 
 DO NOT TRUST GHIDRA BEYOND GETTING A FEEL FOR THE FUNCTION. GHIDRA IS A GUIDELINE. OBJDIFF IS THE REAL SOURCE OF TRUTH FOR HOW CLOSE WE ARE.
 
-### Step 2 - Create branch: `git checkout -b pr/<unit>`
+### Step 2 - Create branch: `git checkout -b pr/<unit>/$(date -u +%s)`
 
 ### Step 3 - Edit source files in `src/` and `include/`
 Make small changes: types, signedness, struct layout, control flow, constants.
@@ -262,7 +262,7 @@ Before creating any FFCC-Decomp PR:
 
 1. **Select target**: `python3 tools/agent_select_target.py`
 2. **Symbols are included** in the selector output (manual extract is optional)  
-3. **Create branch from clean main**: `git checkout main && git pull origin main && git checkout -b pr/<unit>`
+3. **Create branch from clean main**: `git checkout main && git pull origin main && git checkout -b pr/<unit>/$(date -u +%s)`
 4. **Update state files** (in agent workspace, not project directory)
 5. **Edit source** (use Ghidra decomp for low-match functions)
 6. **Build**: `ninja`

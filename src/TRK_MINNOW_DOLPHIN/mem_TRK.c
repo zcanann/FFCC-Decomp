@@ -8,7 +8,8 @@
 #pragma dont_inline on
 /* 8036F580-8036F638 369EC0 00B8+00 0/0 1/1 0/0 .text            TRK_fill_mem */
 void TRK_fill_mem(void* dst, int val, u32 n) {
-    u32 v, i, j;
+    u32 v, i;
+    u32* p;
     v = (u8)val;
 
     ((u8*)dst) = ((u8*)dst) - 1;
@@ -27,29 +28,43 @@ void TRK_fill_mem(void* dst, int val, u32 n) {
         if (v)
             v |= v << 24 | v << 16 | v << 8;
 
-        ((u32*)dst) = ((u32*)(((u8*)dst) + 4)) - 1;
-        ((u32*)dst) = ((u32*)(((u8*)dst) + 1)) - 1;
+        p = (u32*)(((u8*)dst) - 3);
 
-        i = n / 32;
-
-        if (i) {
-            do {
-                for (j = 0; j < 8; j++)
-                    *++((u32*)dst) = v;
-            } while (--i);
-        }
-
-        i = (n / 4) % 8;
+        i = n >> 5;
 
         if (i) {
             do {
-                *++((u32*)dst) = v;
+                p[1] = v;
+                p = p + 1;
+                p[1] = v;
+                p = p + 1;
+                p[1] = v;
+                p = p + 1;
+                p[1] = v;
+                p = p + 1;
+                p[1] = v;
+                p = p + 1;
+                p[1] = v;
+                p = p + 1;
+                p[1] = v;
+                p = p + 1;
+                p[1] = v;
+                p = p + 1;
             } while (--i);
         }
 
-        ((u8*)dst) = ((u8*)(((u32*)dst) + 1)) - 1;
+        i = (n >> 2) & 7;
 
-        n %= 4;
+        if (i) {
+            do {
+                p[1] = v;
+                p = p + 1;
+            } while (--i);
+        }
+
+        ((u8*)dst) = ((u8*)(p + 1)) - 1;
+
+        n = n - (n / 4) * 4;
     }
 
     if (n)

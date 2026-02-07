@@ -15,23 +15,28 @@
  */
 void pppParMoveLine(_pppPObject* param_1, int param_2)
 {
-    _pppMngSt* pppMngSt = pppMngStPtr;
+    _pppMngSt* pppMngSt;
+    void* moveParam;
     Vec local_1c;
     Vec VStack_28;
-    float fVar1 = 0.0f;
-    Vec* position = (Vec*)((char*)pppMngSt + 0x8);
-    Vec* previousPosition = (Vec*)((char*)pppMngSt + 0x48);
+    Vec* position;
+    float fVar1;
+
+    moveParam = (void*)param_2;
+    pppMngSt = pppMngStPtr;
+    position = (Vec*)((char*)pppMngSt + 0x8);
+    fVar1 = 0.0f;
 
     PSVECSubtract((Vec*)((char*)pppMngSt + 0x68), (Vec*)((char*)pppMngSt + 0x58), &local_1c);
 
-    previousPosition->x = position->x;
-    previousPosition->y = position->y;
-    previousPosition->z = position->z;
+    *(float*)((char*)pppMngSt + 0x48) = position->x;
+    *(float*)((char*)pppMngSt + 0x4C) = position->y;
+    *(float*)((char*)pppMngSt + 0x50) = position->z;
 
     if ((fVar1 != local_1c.x) || (fVar1 != local_1c.y) || (fVar1 != local_1c.z)) {
         PSVECNormalize(&local_1c, &VStack_28);
 
-        float scaleValue = *(float*)(param_2 + 4) * *(float*)((char*)pppMngSt + 0x54);
+        float scaleValue = *(float*)((char*)moveParam + 4) * *(float*)((char*)pppMngSt + 0x54);
         PSVECScale(&VStack_28, &local_1c, scaleValue);
         PSVECAdd(&local_1c, position, position);
     }

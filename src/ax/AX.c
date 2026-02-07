@@ -10,7 +10,14 @@ const char* __AXVersion = "<< Dolphin SDK - AX\trelease build: Apr  5 2004 04:15
 #endif
 
 void AXInit(void) {
-    AXInitEx(0);
+    OSRegisterVersion(__AXVersion);
+
+    __AXAllocInit();
+    __AXVPBInit();
+    __AXSPBInit();
+    __AXAuxInit();
+    __AXClInit();
+    __AXOutInit(0);
 }
 
 void AXInitEx(u32 outputBufferMode) {

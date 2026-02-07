@@ -226,21 +226,17 @@ void PPCMtpmc4(register u32 newPMC4)
  * JP Address: TODO
  * JP Size: TODO
  */
-u32 PPCMffpscr(void)
+asm u32 PPCMffpscr(void)
 {
-    register u32 out;
-
-    asm {
-        stwu r1, -0x18(r1)
-        stfd f31, 0x10(r1)
-        mffs f31
-        stfd f31, 0x8(r1)
-        lwz out, 0xc(r1)
-        lfd f31, 0x10(r1)
-        addi r1, r1, 0x18
-    }
-
-    return out;
+    nofralloc
+    stwu r1, -0x18(r1)
+    stfd f31, 0x10(r1)
+    mffs f31
+    stfd f31, 0x8(r1)
+    lwz r3, 0xc(r1)
+    lfd f31, 0x10(r1)
+    addi r1, r1, 0x18
+    blr
 }
 
 /*
@@ -252,19 +248,19 @@ u32 PPCMffpscr(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void PPCMtfpscr(register u32 newFPSCR)
+asm void PPCMtfpscr(register u32 newFPSCR)
 {
-    asm {
-        stwu r1, -0x20(r1)
-        stfd f31, 0x18(r1)
-        li r4, 0
-        stw r4, 0x10(r1)
-        stw newFPSCR, 0x14(r1)
-        lfd f31, 0x10(r1)
-        mtfsf 255, f31
-        lfd f31, 0x18(r1)
-        addi r1, r1, 0x20
-    }
+    nofralloc
+    stwu r1, -0x20(r1)
+    stfd f31, 0x18(r1)
+    li r4, 0
+    stw r4, 0x10(r1)
+    stw newFPSCR, 0x14(r1)
+    lfd f31, 0x10(r1)
+    mtfsf 255, f31
+    lfd f31, 0x18(r1)
+    addi r1, r1, 0x20
+    blr
 }
 
 /*
@@ -318,9 +314,19 @@ void PPCMtwpar(register u32 newWPAR)
  * JP Address: TODO
  * JP Size: TODO
  */
-void PPCDisableSpeculation(void)
+asm void PPCDisableSpeculation(void)
 {
-    PPCMthid0(PPCMfhid0() | HID0_SPD);
+    nofralloc
+    mflr r0
+    stw r0, 0x4(r1)
+    stwu r1, -0x8(r1)
+    bl PPCMfhid0
+    ori r3, r3, HID0_SPD
+    bl PPCMthid0
+    lwz r0, 0xc(r1)
+    addi r1, r1, 0x8
+    mtlr r0
+    blr
 }
 
 /*

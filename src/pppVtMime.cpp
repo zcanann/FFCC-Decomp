@@ -82,7 +82,7 @@ void pppDrawVtMime(void* param1, void* param2, void* param3)
 	void** memPtr = (void**)((char*)target + 0xC);
 	if (*memPtr == 0) {
 		// Allocate memory for vertex data
-		extern void* pppMemAlloc__FUlPQ27CMemory6CStagePci(int size, void* stage, const char* info, int param);
+		extern void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long size, void* stage, char* info, int param);
 		extern void* lbl_8032ED54;
 		void* stage = *(void**)lbl_8032ED54;
 		
@@ -112,7 +112,7 @@ void pppDrawVtMime(void* param1, void* param2, void* param3)
 		}
 		
 		// Flush data cache
-		extern void DCFlushRange(void* ptr, int size);
+		extern void DCFlushRange(void* ptr, unsigned long size);
 		DCFlushRange(*memPtr, vertCount * 0xC);
 	}
 	

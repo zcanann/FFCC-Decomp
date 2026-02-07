@@ -2,6 +2,8 @@
 #include "ffcc/pad.h"
 #include "ffcc/p_dbgmenu.h"
 
+extern unsigned char lbl_801EA0F4[];
+
 /*
  * --INFO--
  * PAL Address: 0x80047d7c
@@ -57,7 +59,9 @@ void CSystemPcs::Quit()
  */
 int CSystemPcs::GetTable(unsigned long index)
 {
-	return index * 0x15c + -0x7fe15f0c;
+	unsigned char* table = lbl_801EA0F4;
+	unsigned long offset = index * 0x15c;
+	return (int)(table + offset);
 }
 
 /*

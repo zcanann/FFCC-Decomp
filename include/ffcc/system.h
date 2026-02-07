@@ -60,7 +60,6 @@ public:
     unsigned int GetCounter();
     bool IsGdev();
     void DumpMapFile(void*);
-    void OSPanic(...);
     static void errorHandler(unsigned short, OSContext*, unsigned long, unsigned long);
 
     // void* vtable;             // 0x0000 (4 bytes)

@@ -356,10 +356,14 @@ void CSystem::errorHandler(unsigned short, OSContext*, unsigned long, unsigned l
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800223dc
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void OSPanic(...)
+void OSPanic(const char* file, int line, const char* msg, ...)
 {
 	// TODO
 }

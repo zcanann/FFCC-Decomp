@@ -14,7 +14,7 @@ public:
     void AddRsdList(ZLIST*);
     void SetRsdFlag();
     void GetRsdItemR();
-    void SetRsdIndex();
+    int SetRsdIndex();
     void GetRsdItem();
 };
 

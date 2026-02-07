@@ -1,18 +1,22 @@
 #include "ffcc/pppGetRotMatrixX.h"
 
-#include "ffcc/pppsintbl.h"
+extern float ppvSinTbl[];
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005f794
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppGetRotMatrixX(pppFMATRIX& mtx, long angle)
 {
-    float zero = 0.0f; // FLOAT_8032feb4
-    float one = 1.0f; // FLOAT_8032feb0
-    float sinValue = pppSinFromTable(angle);
-    float cosValue = pppCosFromTable(angle);
+    float one = 1.0f;
+    float zero = 0.0f;
+    float sinValue = *(float*)((unsigned char*)ppvSinTbl + (angle & 0xFFFC));
+    float cosValue = *(float*)((unsigned char*)ppvSinTbl + ((angle + 0x4000) & 0xFFFC));
 
     mtx.value[0][0] = one;
     mtx.value[0][1] = zero;
@@ -23,7 +27,7 @@ void pppGetRotMatrixX(pppFMATRIX& mtx, long angle)
     mtx.value[1][1] = cosValue;
     mtx.value[1][2] = -sinValue;
     mtx.value[1][3] = zero;
-	
+
     mtx.value[2][0] = zero;
     mtx.value[2][1] = sinValue;
     mtx.value[2][2] = cosValue;

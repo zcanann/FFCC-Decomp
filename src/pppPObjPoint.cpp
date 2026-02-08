@@ -3,7 +3,7 @@
 
 extern s32 lbl_8032ED70;
 extern void* lbl_8032ED50;
-extern u32 lbl_801EADC8;
+extern u8 lbl_801EADC8[32];
 
 /*
  * --INFO--
@@ -19,17 +19,17 @@ void pppPObjPoint(PppPointData* pointData, PppObjData* objData, PppContainer* co
     PppPointObj* objPtr = (PppPointObj*)((u8*)pointData + *(s32*)container->ptrData + 0x80);
 
     if (objData->id == pointData->id) {
-        float* vectorPtr;
+        u32 vectorAddr;
 
         if ((objData->field_4 + 0x10000) == 0xFFFF) {
-            vectorPtr = (float*)(u32)&lbl_801EADC8;
+            vectorAddr = (u32)&lbl_801EADC8;
         } else {
-            void* arrayPtr = *(void**)((u8*)lbl_8032ED50 + 0xD4);
-            u32 index = objData->field_4 << 4;
-            vectorPtr = (float*)((u8*)objData->data + *(u32*)((u8*)arrayPtr + index + 4) + 0x80);
+            u32 index = (objData->field_4 << 4) + 4;
+            u32 tableAddr = *(u32*)((u8*)lbl_8032ED50 + 0xD4);
+            vectorAddr = (u32)objData->data + *(u32*)(tableAddr + index) + 0x80;
         }
 
-        objPtr->vecPtr = vectorPtr;
+        objPtr->vecPtr = (void*)vectorAddr;
     }
 
     objPtr->x = ((f32*)objPtr->vecPtr)[0];

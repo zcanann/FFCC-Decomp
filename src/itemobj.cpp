@@ -32,32 +32,61 @@ void CGItemObj::onFramePreCalc()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80126f08
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGItemObj::onFramePostCalc()
 {
-	// TODO
+	unsigned char* self = (unsigned char*)this;
+	unsigned int stateBits = ((unsigned int)self[0x50] << 0x1c) | ((unsigned int)self[0x50] >> 4);
+
+	if ((int)stateBits < 0 && *(int*)(self + 0x550) == 0) {
+		*(int*)(self + 0x94) = *(int*)(self + 0x94) - 1;
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80126ee0
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGItemObj::onChangeStat(int)
+void CGItemObj::onChangeStat(int state)
 {
-	// TODO
+	unsigned char* self = (unsigned char*)this;
+
+	if (state >= 0x26 && state <= 0x27) {
+		*(unsigned int*)(self + 0x1c0) = *(unsigned int*)(self + 0x1c0) & 0xfff7fffe;
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80126eb4
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGItemObj::onCancelStat(int)
 {
-	// TODO
+	extern float FLOAT_80331b18;
+	unsigned char* self = (unsigned char*)this;
+
+	if (*(int*)(self + 0x520) == 0x1b) {
+		*(unsigned int*)(self + 0x1c0) = *(unsigned int*)(self + 0x1c0) | 2;
+		*(float*)(self + 0x17c) = FLOAT_80331b18;
+		*(float*)(self + 0x178) = FLOAT_80331b18;
+		*(float*)(self + 0x174) = FLOAT_80331b18;
+	}
 }
 
 /*
@@ -182,12 +211,21 @@ void CGItemObj::loadModel()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80124fac
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGItemObj::onNewFinished()
 {
-	// TODO
+	extern int DAT_8032ee90;
+	unsigned char* self = (unsigned char*)this;
+
+	*(int*)(self + 0x568) = *(int*)(self + 0x144);
+	*(unsigned short*)(self + 0x560) = (unsigned short)((DAT_8032ee90 >> 3) & 1);
+	loadModel();
 }
 
 /*

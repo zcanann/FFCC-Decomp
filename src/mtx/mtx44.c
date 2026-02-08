@@ -355,10 +355,18 @@ asm void PSMTX44Transpose(const register Mtx44 src, register Mtx44 xPose) {
         b = tmp;   \
     }
 
+/*
+ * --INFO--
+ * PAL Address: 0x8018680c
+ * PAL Size: 1008b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 u32 C_MTX44Inverse(const Mtx44 src, Mtx44 inv) {
     Mtx44 gjm;
     s32 i;
-    s32 j;
     s32 k;
     f32 w;
     f32 max;
@@ -395,18 +403,38 @@ u32 C_MTX44Inverse(const Mtx44 src, Mtx44 inv) {
         }
 
         w = 1.0f / gjm[i][i];
-        for (j = 0; j < 4; j++) {
-            gjm[i][j] *= w;
-            inv[i][j] *= w;
-        }
+        gjm[i][0] *= w;
+        inv[i][0] *= w;
+        gjm[i][1] *= w;
+        inv[i][1] *= w;
+        gjm[i][2] *= w;
+        inv[i][2] *= w;
+        gjm[i][3] *= w;
+        inv[i][3] *= w;
 
-        for (k = 0; k < 4; k++) {
+        for (k = 0; k < 4; k += 2) {
             if (k != i) {
                 w = gjm[k][i];
-                for (j = 0; j < 4; j++) {
-                    gjm[k][j] -= gjm[i][j] * w;
-                    inv[k][j] -= inv[i][j] * w;
-                }
+                gjm[k][0] -= gjm[i][0] * w;
+                inv[k][0] -= inv[i][0] * w;
+                gjm[k][1] -= gjm[i][1] * w;
+                inv[k][1] -= inv[i][1] * w;
+                gjm[k][2] -= gjm[i][2] * w;
+                inv[k][2] -= inv[i][2] * w;
+                gjm[k][3] -= gjm[i][3] * w;
+                inv[k][3] -= inv[i][3] * w;
+            }
+
+            if (k + 1 != i) {
+                w = gjm[k + 1][i];
+                gjm[k + 1][0] -= gjm[i][0] * w;
+                inv[k + 1][0] -= inv[i][0] * w;
+                gjm[k + 1][1] -= gjm[i][1] * w;
+                inv[k + 1][1] -= inv[i][1] * w;
+                gjm[k + 1][2] -= gjm[i][2] * w;
+                inv[k + 1][2] -= inv[i][2] * w;
+                gjm[k + 1][3] -= gjm[i][3] * w;
+                inv[k + 1][3] -= inv[i][3] * w;
             }
         }
     }

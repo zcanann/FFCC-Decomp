@@ -2,7 +2,12 @@
 #include "ffcc/pad.h"
 #include "ffcc/p_dbgmenu.h"
 
+extern unsigned int lbl_801EA0D0[];
+extern unsigned int lbl_801EA0DC[];
+extern unsigned int lbl_801EA0E8[];
+extern unsigned int lbl_801EA270[];
 extern unsigned char lbl_801EA0F4[];
+extern unsigned int lbl_8032ED08;
 
 /*
  * --INFO--
@@ -13,9 +18,24 @@ extern unsigned char lbl_801EA0F4[];
  * JP Address: TODO
  * JP Size: TODO
  */
-void __sinit_p_system_cpp(void)
+extern "C" void __sinit_p_system_cpp(void)
 {
-	// TODO: Static initialization
+    unsigned int* table = reinterpret_cast<unsigned int*>(lbl_801EA0F4);
+    unsigned int* desc0 = lbl_801EA0D0;
+    unsigned int* desc1 = lbl_801EA0DC;
+    unsigned int* desc2 = lbl_801EA0E8;
+
+    lbl_8032ED08 = reinterpret_cast<unsigned int>(lbl_801EA270);
+
+    table[1] = desc0[0];
+    table[2] = desc0[1];
+    table[3] = desc0[2];
+    table[4] = desc1[0];
+    table[5] = desc1[1];
+    table[6] = desc1[2];
+    table[7] = desc2[0];
+    table[8] = desc2[1];
+    table[9] = desc2[2];
 }
 
 /*

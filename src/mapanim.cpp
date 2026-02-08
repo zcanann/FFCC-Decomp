@@ -47,7 +47,7 @@ static char s_ptrarray_grow_error[] = "CPtrArray grow error";
  * JP Size: TODO
  */
 template <>
-CPtrArray<CMapAnimNode*>::CPtrArray()
+CPtrArray<CMapAnimKeyDt*>::CPtrArray()
 {
     m_vtable = lbl_801EA488;
     m_numItems = 0;
@@ -68,7 +68,7 @@ CPtrArray<CMapAnimNode*>::CPtrArray()
  * JP Size: TODO
  */
 template <>
-CPtrArray<CMapAnimNode*>::~CPtrArray()
+CPtrArray<CMapAnimKeyDt*>::~CPtrArray()
 {
     RemoveAll();
 }
@@ -83,7 +83,7 @@ CPtrArray<CMapAnimNode*>::~CPtrArray()
  * JP Size: TODO
  */
 template <>
-int CPtrArray<CMapAnimNode*>::Add(CMapAnimNode* item)
+int CPtrArray<CMapAnimKeyDt*>::Add(CMapAnimKeyDt* item)
 {
     if (setSize(m_numItems + 1) == 0) {
         return 0;
@@ -104,7 +104,7 @@ int CPtrArray<CMapAnimNode*>::Add(CMapAnimNode* item)
  * JP Size: TODO
  */
 template <>
-int CPtrArray<CMapAnimNode*>::GetSize()
+int CPtrArray<CMapAnimKeyDt*>::GetSize()
 {
     return m_numItems;
 }
@@ -119,7 +119,7 @@ int CPtrArray<CMapAnimNode*>::GetSize()
  * JP Size: TODO
  */
 template <>
-CMapAnimNode* CPtrArray<CMapAnimNode*>::GetAt(unsigned long index)
+CMapAnimKeyDt* CPtrArray<CMapAnimKeyDt*>::GetAt(unsigned long index)
 {
     return m_items[index];
 }
@@ -134,7 +134,7 @@ CMapAnimNode* CPtrArray<CMapAnimNode*>::GetAt(unsigned long index)
  * JP Size: TODO
  */
 template <>
-CMapAnimNode* CPtrArray<CMapAnimNode*>::operator[](unsigned long index)
+CMapAnimKeyDt* CPtrArray<CMapAnimKeyDt*>::operator[](unsigned long index)
 {
     return GetAt(index);
 }
@@ -149,7 +149,7 @@ CMapAnimNode* CPtrArray<CMapAnimNode*>::operator[](unsigned long index)
  * JP Size: TODO
  */
 template <>
-void CPtrArray<CMapAnimNode*>::RemoveAll()
+void CPtrArray<CMapAnimKeyDt*>::RemoveAll()
 {
     if (m_items != 0) {
         __dla__FPv(m_items);
@@ -169,7 +169,7 @@ void CPtrArray<CMapAnimNode*>::RemoveAll()
  * JP Size: TODO
  */
 template <>
-void CPtrArray<CMapAnimNode*>::SetStage(CMemory::CStage* stage)
+void CPtrArray<CMapAnimKeyDt*>::SetStage(CMemory::CStage* stage)
 {
     m_stage = stage;
 }
@@ -184,9 +184,9 @@ void CPtrArray<CMapAnimNode*>::SetStage(CMemory::CStage* stage)
  * JP Size: TODO
  */
 template <>
-int CPtrArray<CMapAnimNode*>::setSize(unsigned long newSize)
+int CPtrArray<CMapAnimKeyDt*>::setSize(unsigned long newSize)
 {
-    CMapAnimNode** newItems;
+    CMapAnimKeyDt** newItems;
 
     if ((unsigned long)m_size < newSize) {
         if (m_size == 0) {
@@ -198,7 +198,7 @@ int CPtrArray<CMapAnimNode*>::setSize(unsigned long newSize)
             m_size = m_size << 1;
         }
 
-        newItems = (CMapAnimNode**)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+        newItems = (CMapAnimKeyDt**)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
             &Memory, m_size << 2, m_stage, s_collection_ptrarray_h, 0xFA, 0);
         if (newItems == 0) {
             return 0;

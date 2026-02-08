@@ -96,14 +96,16 @@ void CSystemPcs::destroy()
 void CSystemPcs::calc()
 {
 	unsigned short buttons;
+	unsigned int mask;
 	int i;
+	int next;
 
-	if (Pad._452_4_ == 0) {
-		i = Pad._448_4_;
-		buttons = *(unsigned short*)(((unsigned char*)&Pad) +
-		                             ((~((int)~(i - 4 | 4 - i) >> 0x1f) & 4U) * 0x54 + 0x36));
-	} else {
+	if (Pad._452_4_ != 0) {
 		buttons = 0;
+	} else {
+		i = Pad._448_4_;
+		mask = ((unsigned int)~(((i - 4) | (4 - i)) >> 31) & 1) << 2;
+		buttons = *(unsigned short*)(((unsigned char*)&Pad) + mask * 0x54 + 0x36);
 	}
 
 	if ((buttons & 0x1000) != 0) {
@@ -114,12 +116,13 @@ void CSystemPcs::calc()
 		return;
 	}
 	if (((buttons & 0x800) == 0) && ((buttons & 0x40) != 0)) {
-		i = Pad._448_4_ + 1;
-		if (i == 0) {
-			i = Pad._448_4_ + 2;
+		i = Pad._448_4_;
+		next = i + 1;
+		if (next == 0) {
+			next = i + 2;
 		}
-		Pad._448_4_ = i;
-		if (3 < i) {
+		Pad._448_4_ = next;
+		if (next > 3) {
 			Pad._448_4_ = -1;
 		}
 	}

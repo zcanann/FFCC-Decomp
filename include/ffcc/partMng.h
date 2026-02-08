@@ -127,21 +127,21 @@ struct PPPIFPARAM
     unsigned char m_hitFlags;       // 0x7
 }; // Size 0x8
 
+struct pppProg
+{
+    char* m_pppName;                 // 0x0
+    char* m_unkPtr;                  // 0x4
+    void* m_pppFunctionOperation;    // 0x8
+    void* m_unkPtr2;                 // 0xC
+    CGObject* m_objects[3];          // 0x10
+    void* m_pppFunctionConstructor;  // 0x1C
+    void* m_pppFunctionConstructor2; // 0x20
+    void* m_pppFunctionConstructor3; // 0x24
+    void* m_pppFunctionDestructor;   // 0x28
+}; // Size 0x2c
+
 struct _pppDataHead
 {
-    struct pppProg
-    {
-        char* m_pppName;                 // 0x0
-        char* m_unkPtr;                  // 0x4
-        void* m_pppFunctionOperation;    // 0x8
-        void* m_unkPtr2;                 // 0xC
-        CGObject* m_objects[3];          // 0x10
-        void* m_pppFunctionConstructor;  // 0x1C
-        void* m_pppFunctionConstructor2; // 0x20
-        void* m_pppFunctionConstructor3; // 0x24
-        void* m_pppFunctionDestructor;   // 0x28
-    }; // Size 0x2c
-
     unsigned int m_version;           // 0x0
     unsigned short m_partCount;       // 0x4
     unsigned short m_cacheChunkCount; // 0x6

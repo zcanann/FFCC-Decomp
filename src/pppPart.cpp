@@ -915,32 +915,101 @@ void _pppStartPart(_pppMngSt*, long*, int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppInitPdt(long* progOffsetReconstructionTable, _pppDataHead::pppProg* pppProg)
+void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
 {
-	// Basic pointer relocation - simplified implementation
+	int pppProgRelocCount = *(int*)((int)progOffsetReconstructionTable + progOffsetReconstructionTable[2]);
+	int pdtRelocCount = *(int*)((int)progOffsetReconstructionTable + progOffsetReconstructionTable[3]);
+	int* pppProgRelocs = (int*)((int)progOffsetReconstructionTable + progOffsetReconstructionTable[2]) + 1;
+	int* pdtRelocs = (int*)((int)progOffsetReconstructionTable + progOffsetReconstructionTable[3]) + 1;
+	int* table = (int*)(progOffsetReconstructionTable + 6);
+
 	if (progOffsetReconstructionTable[6] == 0) {
 		return;
 	}
-	
-	// Process program offset reconstruction
-	long* currentEntry = progOffsetReconstructionTable + 6;
-	
-	// Simple reconstruction loop
+
+	int* entry = table;
+	int* head = 0;
 	do {
-		*currentEntry = (long)progOffsetReconstructionTable + *currentEntry;
-		
-		// Process sub-entries (simplified)
-		short subEntryCount = *(short*)((long)currentEntry + 0x26);
-		for (int i = 0; i < subEntryCount; i++) {
-			// Basic pointer updates
-			currentEntry[10] = (long)(pppProg + currentEntry[10]);
-			currentEntry[0xc] = (long)progOffsetReconstructionTable + currentEntry[0xc];
-			currentEntry[0xd] = (long)progOffsetReconstructionTable + currentEntry[0xd];
-			currentEntry += 4;
+		head = entry;
+		*head = (int)progOffsetReconstructionTable + *head;
+		entry = head;
+
+		for (int i = 0; i < *(short*)((int)head + 0x26); i++) {
+			entry[10] = (int)(pppProg + entry[10]);
+			entry[12] = (int)progOffsetReconstructionTable + entry[12];
+			entry[13] = (int)progOffsetReconstructionTable + entry[13];
+			entry += 4;
 		}
-		
-		currentEntry = (long*)*currentEntry;
-	} while (*currentEntry != 0);
+
+		entry = (int*)*head;
+	} while (*(int*)*head != 0);
+
+	int processed = 0;
+	*entry = 0;
+	if (pppProgRelocCount > 0) {
+		if (pppProgRelocCount > 8) {
+			unsigned int blocks = (unsigned int)(pppProgRelocCount - 1) >> 3;
+			int* reloc = pppProgRelocs;
+			if (pppProgRelocCount - 8 > 0) {
+				do {
+					processed += 8;
+					reloc[0] = (int)(pppProg + reloc[0]);
+					reloc[1] = (int)(pppProg + reloc[1]);
+					reloc[2] = (int)(pppProg + reloc[2]);
+					reloc[3] = (int)(pppProg + reloc[3]);
+					reloc[4] = (int)(pppProg + reloc[4]);
+					reloc[5] = (int)(pppProg + reloc[5]);
+					reloc[6] = (int)(pppProg + reloc[6]);
+					reloc[7] = (int)(pppProg + reloc[7]);
+					reloc += 8;
+					blocks--;
+				} while (blocks != 0);
+			}
+		}
+
+		int remain = pppProgRelocCount - processed;
+		int* reloc = pppProgRelocs + processed;
+		if (processed < pppProgRelocCount) {
+			do {
+				*reloc = (int)(pppProg + *reloc);
+				reloc++;
+				remain--;
+			} while (remain != 0);
+		}
+	}
+
+	processed = 0;
+	if (pdtRelocCount > 0) {
+		if (pdtRelocCount > 8) {
+			unsigned int blocks = (unsigned int)(pdtRelocCount - 1) >> 3;
+			int* reloc = pdtRelocs;
+			if (pdtRelocCount - 8 > 0) {
+				do {
+					processed += 8;
+					reloc[0] += (int)progOffsetReconstructionTable;
+					reloc[1] += (int)progOffsetReconstructionTable;
+					reloc[2] += (int)progOffsetReconstructionTable;
+					reloc[3] += (int)progOffsetReconstructionTable;
+					reloc[4] += (int)progOffsetReconstructionTable;
+					reloc[5] += (int)progOffsetReconstructionTable;
+					reloc[6] += (int)progOffsetReconstructionTable;
+					reloc[7] += (int)progOffsetReconstructionTable;
+					reloc += 8;
+					blocks--;
+				} while (blocks != 0);
+			}
+		}
+
+		int remain = pdtRelocCount - processed;
+		int* reloc = pdtRelocs + processed;
+		if (processed < pdtRelocCount) {
+			do {
+				*reloc += (int)progOffsetReconstructionTable;
+				reloc++;
+				remain--;
+			} while (remain != 0);
+		}
+	}
 }
 
 /*
@@ -952,7 +1021,7 @@ void pppInitPdt(long* progOffsetReconstructionTable, _pppDataHead::pppProg* pppP
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppInitData(_pppDataHead* pppDataHead, _pppDataHead::pppProg* pppProg, int param_3)
+void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 {
 	// Convert relative offsets to absolute addresses
 	pppDataHead->m_cacheChunks = (int)&pppDataHead->m_version + pppDataHead->m_cacheChunks;

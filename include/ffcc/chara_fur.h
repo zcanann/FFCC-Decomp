@@ -3,6 +3,7 @@
 
 #include "ffcc/charaobj.h"
 #include "ffcc/color.h"
+#include "ffcc/vector.h"
 
 #include <dolphin/gx.h>
 
@@ -24,6 +25,10 @@ class CHairSet
 {
 public:
     CHairSet();
+
+    CVector m_vec0;
+    CVector m_vec1;
+    CColor m_colors[2];
 };
 
 #endif // _FFCC_CGCHARAOBJ_H_

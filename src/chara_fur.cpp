@@ -58,9 +58,8 @@ void nearColor(CColor, CColor)
  * Size:	TODO
  */
 CHairSet::CHairSet()
-{
-	// TODO
-}
+    : m_vec0(), m_vec1()
+{}
 
 /*
  * --INFO--

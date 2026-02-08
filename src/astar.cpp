@@ -1,6 +1,8 @@
 #include "ffcc/astar.h"
 
 #include "ffcc/charaobj.h"
+#include "ffcc/color.h"
+#include "ffcc/graphic.h"
 #include "ffcc/pad.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/system.h"
@@ -15,6 +17,10 @@ static const float kPolyGroupTopOffsetY = 5.0f;  // FLOAT_80332090
 static const float kPolyGroupAabbMax = 1.0e10f;  // FLOAT_80332094
 static const float kPolyGroupAabbMin = -1.0e10f; // FLOAT_80332098
 static const float kInfiniteCost = 10000000.0f;  // FLOAT_8033209c
+static const float kDrawAStarSphereRadius = 5.0f;
+
+extern Mtx gFlatPosMtx;
+extern int DAT_8032ed70;
 
 /*
  * --INFO--
@@ -486,12 +492,93 @@ void CAStar::calcAStar()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80141eb4
+ * PAL Size: 700b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CAStar::drawAStar()
 {
-	// TODO
+	if ((DAT_8032ed70 & 0x400) == 0)
+	{
+		return;
+	}
+
+	int frameGroup = System.m_frameCounter / 0x1e;
+
+	if (System.m_frameCounter == frameGroup * 0x1e)
+	{
+		for (int group = 0; group < 64; ++group)
+		{
+			unsigned char r = static_cast<unsigned char>((group * 41 + System.m_frameCounter) & 0xFF);
+			unsigned char g = static_cast<unsigned char>((group * 71 + (System.m_frameCounter >> 1)) & 0xFF);
+			unsigned char b = static_cast<unsigned char>((group * 17 + (System.m_frameCounter >> 2)) & 0xFF);
+			CColor color(r, g, b, 0xFF);
+			MapMng.SetIdGrpColor(group, 0, color.color);
+		}
+	}
+
+	if (m_currentGroup != 0 && m_previousGroup != 0)
+	{
+		CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+		Graphic.DrawSphere(gFlatPosMtx, &m_lastGroupPos, kDrawAStarSphereRadius, &white.color);
+	}
+
+	for (int i = 0; i < 64; ++i)
+	{
+		CAPos& portal = m_portals[i];
+
+		if (portal.m_groupA == 0 || portal.m_groupB == 0)
+		{
+			continue;
+		}
+
+		CColor yellow(0xFF, 0xFF, 0x00, 0xFF);
+		Graphic.DrawSphere(gFlatPosMtx, &portal.m_position, kDrawAStarSphereRadius, &yellow.color);
+
+		for (int side = 0; side < 2; ++side)
+		{
+			unsigned char group = (side == 0) ? portal.m_groupA : portal.m_groupB;
+
+			if (group == 0)
+			{
+				continue;
+			}
+
+			for (int j = 0; j < 64; ++j)
+			{
+				if (i == j)
+				{
+					continue;
+				}
+
+				CAPos& other = m_portals[j];
+
+				if (other.m_groupA == 0 || other.m_groupB == 0)
+				{
+					continue;
+				}
+
+				if (other.m_groupA != group && other.m_groupB != group)
+				{
+					continue;
+				}
+
+				GXLoadPosMtxImm(gFlatPosMtx, GX_PNMTX0);
+				GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 2);
+				GXPosition3f32(
+					portal.m_position.x,
+					portal.m_position.y + kPolyGroupTopOffsetY,
+					portal.m_position.z);
+				GXPosition3f32(
+					other.m_position.x,
+					other.m_position.y + kPolyGroupTopOffsetY,
+					other.m_position.z);
+			}
+		}
+	}
 }
 
 /*

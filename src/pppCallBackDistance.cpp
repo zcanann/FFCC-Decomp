@@ -15,15 +15,17 @@
  */
 void pppConstructCallBackDistance(pppCallBackDistance* param1, UnkC* param2)
 {
+    char* owner;
     Vec local_28;
     Vec local_1c;
     f64 dVar3;
     s32 iVar1;
 
     iVar1 = *param2->m_serializedDataOffsets;
-    local_28.x = pppMngStPtr->m_matrix.value[0][3];
-    local_28.y = pppMngStPtr->m_matrix.value[1][3];
-    local_28.z = pppMngStPtr->m_matrix.value[2][3];
+    owner = (char*)pppMngStPtr->m_owner;
+    local_28.x = *(float*)(owner + 0x15c);
+    local_28.y = *(float*)(owner + 0x160);
+    local_28.z = *(float*)(owner + 0x164);
     local_1c.x = pppMngStPtr->m_scale.x;
     local_1c.y = pppMngStPtr->m_scale.y;
     local_1c.z = pppMngStPtr->m_scale.z;

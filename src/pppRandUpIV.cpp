@@ -49,39 +49,39 @@ void randint(int param1, float param2)
  */
 extern "C" void pppRandUpIV(void* param1, void* param2, void* param3)
 {
-    u8* base = (u8*)param1;
     PppRandUpIVParam2* in = (PppRandUpIVParam2*)param2;
+    u8* base = (u8*)param1;
     PppRandUpIVParam3* out = (PppRandUpIVParam3*)param3;
     f32* valuePtr;
     s32* target;
-    f32 value;
+    f32 scale;
 
-    if (DAT_8032ed70 != 0) {
-        return;
-    }
+    if (DAT_8032ed70 == 0) {
+        if (in->field0 == *(s32*)(base + 0xC)) {
+            f32 value = RandF__5CMathFv(&math);
 
-    if (in->field0 != *(s32*)(base + 0xC)) {
-        return;
-    }
+            if (in->field18 != 0) {
+                value = (value + RandF__5CMathFv(&math)) * DAT_80330028;
+            }
 
-    value = RandF__5CMathFv(&math);
-    if (in->field18 != 0) {
-        value = (value + RandF__5CMathFv(&math)) * DAT_80330028;
-    }
+            valuePtr = (f32*)(base + *out->fieldC + 0x80);
+            *valuePtr = value;
+        } else if (in->field0 != *(s32*)(base + 0xC)) {
+            return;
+        } else {
+            valuePtr = (f32*)(base + *out->fieldC + 0x80);
+        }
 
-    valuePtr = (f32*)(base + *out->fieldC + 0x80);
-    *valuePtr = value;
+        if (in->field4 == -1) {
+            target = &DAT_801EADC8;
+        } else {
+            target = (s32*)(base + in->field4 + 0x80);
+        }
 
-    if (in->field4 == -1) {
-        target = &DAT_801EADC8;
-    } else {
-        target = (s32*)(base + in->field4 + 0x80);
-    }
+        scale = *valuePtr;
 
-    {
-        f32 randValue = *valuePtr;
-        target[0] += (s32)((f64)in->field8 * (f64)randValue);
-        target[1] += (s32)((f64)in->fieldC * (f64)randValue);
-        target[2] += (s32)((f64)in->field10 * (f64)randValue);
+        target[0] += (s32)((f32)in->field8 * scale);
+        target[1] += (s32)((f32)in->fieldC * scale);
+        target[2] += (s32)((f32)in->field10 * scale);
     }
 }

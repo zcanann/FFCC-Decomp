@@ -7,8 +7,8 @@ public:
 	CRedSound();
 	~CRedSound();
 
-	void GetAutoID();
-	void EntryStandbyID(int);
+	unsigned int GetAutoID();
+	int* EntryStandbyID(int);
 	void Init(void*, int, int, int);
 	void Start();
 	void End();

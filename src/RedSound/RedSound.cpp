@@ -16,6 +16,7 @@ extern CRedDriver CRedDriver_8032f4c0;
 extern CRedMemory DAT_8032f480;
 extern CRedEntry DAT_8032e154;
 extern int DAT_8032f408; // Debug flag
+extern unsigned int DAT_8032f4c4; // Auto ID counter
 extern char DAT_8032e17c[]; // Buffer for memset
 extern void* DAT_8032e170; // Registration memory
 extern FILE DAT_8021d1a8; // File handle for fflush
@@ -45,9 +46,13 @@ CRedSound::~CRedSound()
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::GetAutoID()
+unsigned int CRedSound::GetAutoID()
 {
-	// TODO
+	do {
+		DAT_8032f4c4 = (DAT_8032f4c4 + 1) & 0x7FFFFFFF;
+	} while (DAT_8032f4c4 == 0);
+
+	return DAT_8032f4c4;
 }
 
 /*
@@ -55,9 +60,20 @@ void CRedSound::GetAutoID()
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::EntryStandbyID(int)
+int* CRedSound::EntryStandbyID(int id)
 {
-	// TODO
+	int* slot = (int*)DAT_8032e17c;
+	int* end = (int*)(DAT_8032e17c + 0x100);
+
+	while (slot < end) {
+		if (*slot == 0) {
+			*slot = id;
+			return slot;
+		}
+		++slot;
+	}
+
+	return 0;
 }
 
 /*
@@ -643,10 +659,10 @@ void CRedSound::TestProcess(int)
  * Size:	TODO
  */
 // Forward declaration
+extern "C" void* __ct__10CRedDriverFv(void*);
 extern "C" void __dt__10CRedDriverFv(void*);
 
 void __sinit_RedSound_cpp(void)
 {
-	// Initialize the global CRedDriver object and register for destruction
-	__register_global_object(&CRedDriver_8032f4c0, __dt__10CRedDriverFv, &DAT_8032e170);
+	__register_global_object(__ct__10CRedDriverFv(&CRedDriver_8032f4c0), __dt__10CRedDriverFv, &DAT_8032e170);
 }

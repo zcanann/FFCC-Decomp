@@ -103,6 +103,10 @@ u32 TRKTargetTranslate(u32 param_0)
 		}
 	}
 
+	if ((param_0 >= 0x7E000000) && (param_0 <= 0x80000000)) {
+		return param_0;
+	}
+
 	return param_0 & 0x3FFFFFFF | 0x80000000;
 }
 

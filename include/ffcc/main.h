@@ -2,6 +2,6 @@
 #define _FFCC_MAIN_H_
 
 void game(int, char**);
-void main(void);
+void main(int, char**);
 
 #endif // _FFCC_MAIN_H_

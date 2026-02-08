@@ -1,8 +1,25 @@
 #include "ffcc/system.h"
 
+#include "ffcc/file.h"
+#include "ffcc/fontman.h"
+#include "ffcc/graphic.h"
+#include "ffcc/materialman.h"
+#include "ffcc/math.h"
+#include "ffcc/memory.h"
+#include "ffcc/memorycard.h"
+#include "ffcc/pad.h"
+#include "ffcc/sound.h"
+#include "ffcc/textureman.h"
+
 #include "dolphin/os.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/printf.h"
 #include "PowerPC_EABI_Support/Runtime/ptmf.h"
+#include <string.h>
+
+extern CMath Math;
+extern CTextureMan TextureMan;
+extern CMaterialMan MaterialMan;
+extern CFontMan FontMan;
 
 /*
  * --INFO--
@@ -16,12 +33,101 @@ CSystem::CSystem()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80022080
+ * PAL Size: 856b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CSystem::Init()
 {
-	// TODO
+    m_initialized = 1;
+    m_currentOrder = (COrder*)0;
+    m_currentOrderIndex = 0;
+
+    OSInit();
+
+    m_execParam = 3;
+    Memory.Init();
+    Sound.Init();
+    Math.Init();
+    File.Init();
+    Pad.Init();
+    Graphic.Init();
+    TextureMan.Init();
+    MaterialMan.Init();
+    FontMan.Init();
+    MemoryCardMan.Init();
+
+    m_orderCount = 0;
+    m_orderSentinel.m_priority = 0xFF;
+    m_orderSentinel.m_next = &m_orderSentinel;
+    m_orderSentinel.m_previous = &m_orderSentinel;
+    m_freeOrderHead.m_next = &m_orderPool[0];
+    for (int i = 0; i < 128; i++)
+    {
+        if (i == 127)
+        {
+            m_orderPool[i].m_next = &m_freeOrderHead;
+        }
+        else
+        {
+            m_orderPool[i].m_next = &m_orderPool[i + 1];
+        }
+    }
+
+    m_ownerThread = OSGetCurrentThread();
+    m_scenegraphStepMode = 0;
+    m_frameCounter = 0;
+    m_mapStage = (CStage*)0;
+    m_mapBuffer = (void*)0;
+    m_mapSize = 0;
+
+    OSErrorHandler handler = (OSErrorHandler)errorHandler;
+    OSSetErrorHandler(0, handler);
+    OSSetErrorHandler(1, handler);
+    OSSetErrorHandler(2, handler);
+    OSSetErrorHandler(3, handler);
+    OSSetErrorHandler(5, handler);
+    OSSetErrorHandler(0xb, handler);
+    OSSetErrorHandler(0xd, handler);
+    OSSetErrorHandler(0xe, handler);
+    OSSetErrorHandler(0xf, handler);
+
+    if (OSGetConsoleSimulatedMemSize() == 0x3000000)
+    {
+        m_mapStage = (CStage*)Memory.CreateStage(0x400000, (char*)"CSystem", 1);
+        CFile::CHandle* fileHandle = File.Open((char*)"gamePalM.map", 0, CFile::PRI_LOW);
+        if (fileHandle != (CFile::CHandle*)0)
+        {
+            m_mapSize = File.GetLength(fileHandle);
+            m_mapBuffer = new unsigned char[m_mapSize];
+            if (m_mapBuffer != (void*)0)
+            {
+                unsigned int offset = 0;
+                for (unsigned int remaining = m_mapSize; remaining != 0;)
+                {
+                    unsigned int chunkSize = 0x100000;
+                    if (remaining < chunkSize)
+                    {
+                        chunkSize = remaining;
+                    }
+
+                    fileHandle->m_length = chunkSize;
+                    fileHandle->m_currentOffset = offset;
+                    File.Read(fileHandle);
+                    File.SyncCompleted(fileHandle);
+                    memcpy((unsigned char*)m_mapBuffer + offset, File.m_readBuffer, chunkSize);
+
+                    offset += chunkSize;
+                    remaining -= chunkSize;
+                }
+            }
+            File.Close(fileHandle);
+            Printf((char*)"%s", (char*)"");
+        }
+    }
 }
 
 /*

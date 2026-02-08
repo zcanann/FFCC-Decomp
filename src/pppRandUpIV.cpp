@@ -1,19 +1,45 @@
 #include "ffcc/pppRandUpIV.h"
 #include "ffcc/math.h"
+#include "types.h"
 
-extern int DAT_8032ed70;
-extern float DAT_80330028;
-extern double DAT_80330030;
+extern s32 DAT_8032ed70;
+extern f32 DAT_80330028;
+extern f64 DAT_80330030;
 extern CMath math;
+extern s32 DAT_801EADC8;
+
+extern "C" {
+float RandF__5CMathFv(CMath*);
+}
+
+struct PppRandUpIVParam2 {
+    s32 field0;
+    s32 field4;
+    s32 field8;
+    s32 fieldC;
+    s32 field10;
+    u8 field14[4];
+    u8 field18;
+};
+
+struct PppRandUpIVParam3 {
+    u8 field0[0xC];
+    s32* fieldC;
+};
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void randint(int param1, float param2)
 {
-	// TODO: Implementation needed
+    float temp = (float)param1 * param2;
+    (void)temp;
 }
 
 /*
@@ -21,68 +47,41 @@ void randint(int param1, float param2)
  * PAL Address: 0x80062e0c
  * PAL Size: 404b
  */
-void pppRandUpIV(void* obj, void* param2, void* param3)
+extern "C" void pppRandUpIV(void* param1, void* param2, void* param3)
 {
-	// Early exit if global flag is set
-	if (DAT_8032ed70 != 0) {
-		return;
-	}
-	
-	// Compare object IDs
-	int param2Val = *((int*)((char*)param2 + 0x00));
-	int objVal = *((int*)((char*)obj + 0x0c));
-	
-	if (param2Val != objVal) {
-		return;
-	}
-	
-	// Get data pointer and calculate base address
-	void* dataPtr = *((void**)((char*)param3 + 0x0c));
-	int dataIndex = *((int*)dataPtr);
-	char* floatBase = (char*)obj + dataIndex + 0x80;
-	
-	// Generate base random value
-	math.RandF(); // Result stored in f1, then copied to f31
-	
-	// Check random flag - if set, generate second random and scale
-	unsigned char randFlag = *((unsigned char*)((char*)param2 + 0x18));
-	if (randFlag != 0) {
-		math.RandF(); // Second random call
-		// Assembly: fadds f1, f31, f1; fmuls f31, f1, f0
-		// Combined random values multiplied by scale factor
-	}
-	
-	// Store random value to float array (assembly shows stfs f31, 0x0(r5))
-	// This is a placeholder - actual value comes from f31 register
-	*((float*)floatBase) = 0.5f; // Simplified
-	
-	// Get source data pointer based on param2[1]
-	int sourceIndex = *((int*)((char*)param2 + 0x04));
-	void* sourceData;
-	
-	if (sourceIndex != -1) {
-		sourceData = (char*)obj + sourceIndex + 0x80;
-	} else {
-		sourceData = (void*)0x801EADC8; // Default global data
-	}
-	
-	// Process X component (param2[2])
-	int xVal = *((int*)((char*)param2 + 0x08));
-	// Assembly shows: signed->unsigned conversion, fsubs, fmuls, fctiwz
-	float floatVal = *((float*)floatBase);
-	float xScaled = (float)xVal * floatVal;
-	int xResult = (int)xScaled;
-	*((int*)sourceData) += xResult;
-	
-	// Process Y component (param2[3])
-	int yVal = *((int*)((char*)param2 + 0x0c));
-	float yScaled = (float)yVal * floatVal;
-	int yResult = (int)yScaled;
-	*((int*)((char*)sourceData + 4)) += yResult;
-	
-	// Process Z component (param2[4])
-	int zVal = *((int*)((char*)param2 + 0x10));
-	float zScaled = (float)zVal * floatVal;
-	int zResult = (int)zScaled;
-	*((int*)((char*)sourceData + 8)) += zResult;
+    u8* base = (u8*)param1;
+    PppRandUpIVParam2* in = (PppRandUpIVParam2*)param2;
+    PppRandUpIVParam3* out = (PppRandUpIVParam3*)param3;
+    f32* valuePtr;
+    s32* target;
+    f32 value;
+
+    if (DAT_8032ed70 != 0) {
+        return;
+    }
+
+    if (in->field0 != *(s32*)(base + 0xC)) {
+        return;
+    }
+
+    value = RandF__5CMathFv(&math);
+    if (in->field18 != 0) {
+        value = (value + RandF__5CMathFv(&math)) * DAT_80330028;
+    }
+
+    valuePtr = (f32*)(base + *out->fieldC + 0x80);
+    *valuePtr = value;
+
+    if (in->field4 == -1) {
+        target = &DAT_801EADC8;
+    } else {
+        target = (s32*)(base + in->field4 + 0x80);
+    }
+
+    {
+        f32 randValue = *valuePtr;
+        target[0] += (s32)((f64)in->field8 * (f64)randValue);
+        target[1] += (s32)((f64)in->fieldC * (f64)randValue);
+        target[2] += (s32)((f64)in->field10 * (f64)randValue);
+    }
 }

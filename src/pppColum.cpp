@@ -1,6 +1,18 @@
 #include "ffcc/pppColum.h"
+#include "ffcc/math.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
+
+extern int lbl_8032ED70;
+extern CMath Math;
+extern void* DAT_8032ec70;
+
+extern "C" {
+void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+float RandF__5CMathFf(float, CMath*);
+unsigned char GetNoise__5CUtilFUc(void*, unsigned int);
+void pppCalcFrameShape__FPlRsRsRss(long*, short&, short&, short&, short);
+}
 
 /*
  * --INFO--
@@ -49,16 +61,35 @@ void pppDestructColum(pppColum *column, UnkC *param_2)
  */
 void pppFrameColum(pppColum *column, UnkB *param_2, UnkC *param_3)
 {
-    unsigned char *puVar4 = (unsigned char *)((char*)column + 0x80 + param_3->m_serializedDataOffsets[3]);
-    if (*(int *)(puVar4 + 8) == 0) {
-        // Basic memory allocation - simplified for now
-        *(int *)(puVar4 + 8) = 1; // Mark as allocated
-    }
-    if (param_2->m_dataValIndex != 0xffff) {
-        // Basic shape calculation - simplified for now
-        *(short *)(puVar4) = 0;
-        *(short *)(puVar4 + 2) = 0;  
-        *(short *)(puVar4 + 4) = 0;
+    unsigned char* work = (unsigned char*)((char*)column + 0x80 + param_3->m_serializedDataOffsets[3]);
+
+    if (lbl_8032ED70 == 0) {
+        unsigned char count = *((unsigned char*)&param_2->m_arg3 + 1);
+
+        if (*(void**)(work + 8) == 0) {
+            float* values;
+            char* payload = param_2->m_payload;
+            unsigned int i;
+
+            *(void**)(work + 8) = pppMemAlloc__FUlPQ27CMemory6CStagePci(
+                (unsigned long)count * 0xc, pppEnvStPtr->m_stagePtr, (char*)"pppColum.cpp", 0x7d);
+
+            values = (float*)*(void**)(work + 8);
+            for (i = 0; i < count; i++) {
+                values[0] = RandF__5CMathFf(*(float*)(payload + 4), &Math) + *(float*)payload;
+                values[1] = RandF__5CMathFf(*(float*)(payload + 0xc), &Math) + *(float*)(payload + 8);
+                ((unsigned char*)values)[8] = GetNoise__5CUtilFUc(&DAT_8032ec70, (unsigned char)payload[0x16]);
+                ((unsigned char*)values)[9] = GetNoise__5CUtilFUc(&DAT_8032ec70, (unsigned char)payload[0x17]);
+                ((unsigned char*)values)[10] = GetNoise__5CUtilFUc(&DAT_8032ec70, (unsigned char)payload[0x18]);
+                values += 3;
+            }
+        }
+
+        if (param_2->m_dataValIndex != 0xffff) {
+            short* shape = (short*)work;
+            long* shapeTable = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
+            pppCalcFrameShape__FPlRsRsRss(shapeTable, shape[0], shape[1], shape[2], (short)param_2->m_initWOrk);
+        }
     }
 }
 

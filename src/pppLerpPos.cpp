@@ -79,15 +79,17 @@ void pppDestructLerpPos(struct pppLerpPos* pppLerpPos, struct UnkC* param_2)
 void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct UnkB* param_2, struct UnkC* param_3)
 {
     _pppMngSt* pppMngSt;
-    s32 i;
     s32 dataOffset;
-    s32 countMinusOne;
-    s32 step;
-    Vec* history;
-    float* prevFloat;
-    Vec sum;
-    Vec prev;
+    s32 iVar1;
+    s32 iVar2;
+    s32 iVar4;
+    s32 iVar5;
+    float* pfVar6;
+    s32 iVar7;
+    Vec local_38;
+    Vec local_2c;
     u32 count;
+    Vec** historyPtr;
 
     if (DAT_8032ed70 != 0) {
         return;
@@ -95,52 +97,53 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct UnkB* param_2, struct
 
     pppMngSt = pppMngStPtr;
     dataOffset = *param_3->m_serializedDataOffsets;
-    history = *(Vec**)((u8*)pppLerpPos + 0x80 + dataOffset);
+    historyPtr = (Vec**)((u8*)pppLerpPos + 0x80 + dataOffset);
 
-    if (history == 0) {
-        count = (u32)param_2->m_dataValIndex;
-        history = (Vec*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-            count * (u32)sizeof(Vec), pppEnvStPtr->m_stagePtr, s_pppLerpPos_cpp_801dd418, 0x37);
-        *(Vec**)((u8*)pppLerpPos + 0x80 + dataOffset) = history;
-        step = 0;
-        for (i = 0; i < (s32)count; i++) {
-            *(f32*)((u8*)history + step) = pppMngStPtr->m_matrix.value[0][3];
-            *(f32*)((u8*)history + step + 4) = pppMngStPtr->m_matrix.value[1][3];
-            *(f32*)((u8*)history + step + 8) = pppMngStPtr->m_matrix.value[2][3];
-            step += sizeof(Vec);
+    if (*historyPtr == 0) {
+        *historyPtr = (Vec*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+            (u32)(u8)param_2->m_dataValIndex * 0xc, pppEnvStPtr->m_stagePtr, s_pppLerpPos_cpp_801dd418, 0x37);
+
+        iVar5 = 0;
+        for (iVar7 = 0; iVar7 < (s32)(u8)param_2->m_dataValIndex; iVar7 = iVar7 + 1) {
+            iVar4 = iVar5 + 4;
+            iVar1 = iVar5 + 8;
+            *(f32*)((u8*)*historyPtr + iVar5) = pppMngStPtr->m_matrix.value[0][3];
+            iVar5 = iVar5 + 0xc;
+            *(f32*)((u8*)*historyPtr + iVar4) = pppMngStPtr->m_matrix.value[1][3];
+            *(f32*)((u8*)*historyPtr + iVar1) = pppMngStPtr->m_matrix.value[2][3];
         }
     } else {
-        sum.x = FLOAT_80331bf8;
-        sum.y = FLOAT_80331bf8;
-        sum.z = FLOAT_80331bf8;
+        local_2c.x = FLOAT_80331bf8;
+        local_2c.y = FLOAT_80331bf8;
+        local_2c.z = FLOAT_80331bf8;
 
-        countMinusOne = (s32)param_2->m_dataValIndex - 1;
-        step = countMinusOne * (s32)sizeof(Vec);
-        while (0 < countMinusOne) {
-            prevFloat = (float*)((u8*)history + step - (s32)sizeof(Vec));
-            prev.x = prevFloat[0];
-            prev.y = prevFloat[1];
-            prev.z = prevFloat[2];
-            pppCopyVector__FR3Vec3Vec((void*)((u8*)history + step), &prev);
-            step -= sizeof(Vec);
-            countMinusOne--;
+        iVar5 = (u8)param_2->m_dataValIndex - 1;
+        iVar7 = iVar5 * 0xc;
+        while (0 < iVar5) {
+            pfVar6 = (f32*)((u8*)*historyPtr + iVar7 - 0xc);
+            local_38.x = *pfVar6;
+            local_38.y = pfVar6[1];
+            local_38.z = pfVar6[2];
+            pppCopyVector__FR3Vec3Vec((void*)((u8*)*historyPtr + iVar7), &local_38);
+            iVar7 = iVar7 - 0xc;
+            iVar5 = iVar5 - 1;
         }
 
-        history[0].x = pppMngStPtr->m_matrix.value[0][3];
-        history[0].y = pppMngStPtr->m_matrix.value[1][3];
-        history[0].z = pppMngStPtr->m_matrix.value[2][3];
+        (*(Vec**)((u8*)pppLerpPos + 0x80 + dataOffset))->x = pppMngStPtr->m_matrix.value[0][3];
+        *(f32*)((u8*)*historyPtr + 4) = pppMngStPtr->m_matrix.value[1][3];
+        *(f32*)((u8*)*historyPtr + 8) = pppMngStPtr->m_matrix.value[2][3];
 
-        count = (u32)param_2->m_dataValIndex;
-        step = 0;
-        for (i = 0; i < (s32)count; i++) {
-            PSVECAdd((Vec*)((u8*)history + step), &sum, &sum);
-            step += sizeof(Vec);
+        iVar7 = 0;
+        for (iVar5 = 0, count = (u32)(u8)param_2->m_dataValIndex; iVar5 < (s32)count; iVar5 = iVar5 + 1) {
+            PSVECAdd((Vec*)((u8*)*historyPtr + iVar7), &local_2c, &local_2c);
+            iVar7 = iVar7 + 0xc;
         }
 
-        PSVECScale(&sum, &sum, FLOAT_80331bfc / (f32)count);
-        pppMngStPtr->m_matrix.value[0][3] = sum.x;
-        pppMngStPtr->m_matrix.value[1][3] = sum.y;
-        pppMngStPtr->m_matrix.value[2][3] = sum.z;
+        iVar2 = (s32)count;
+        PSVECScale(&local_2c, &local_2c, FLOAT_80331bfc / (f32)iVar2);
+        pppMngStPtr->m_matrix.value[0][3] = local_2c.x;
+        pppMngStPtr->m_matrix.value[1][3] = local_2c.y;
+        pppMngStPtr->m_matrix.value[2][3] = local_2c.z;
         pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
     }
 }

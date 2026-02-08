@@ -1,11 +1,16 @@
 #include "ffcc/file.h"
 
+#include "ffcc/p_game.h"
 #include "ffcc/system.h"
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80013968
+ * PAL Size: 416b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CFile::CFile()
 {
@@ -116,7 +121,7 @@ DVDDiskID* CFile::GetCurrentDiskID()
  * Size:	TODO
  */
 
-CFile::CHandle* CFile::Open(const char* path, unsigned long userParam, CFile::PRI pri)
+CFile::CHandle* CFile::Open(char* path, unsigned long userParam, CFile::PRI pri)
 {
     if (1) // g_Game.game.gameWork._5076_1_ != 0
     {
@@ -363,60 +368,51 @@ void CFile::SyncCompleted(CFile::CHandle* fileHandle)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800134f4
+ * PAL Size: 280b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFile::kick()
 {
-    CHandle* handle = CheckQueue();
-
-    if (handle != 0)
+	if (CheckQueue() == 0)
 	{
-        return;
-    }
+		CHandle* sentinel = &m_fileHandle;
+		CHandle* cur = sentinel->m_previous;
 
-    CHandle* sentinel = &m_fileHandle;
-    CHandle* cur = sentinel->m_previous;
-
-    u8 gameFlag = 1; // g_Game.game.gameWork._5076_1_;
-
-    while (cur != sentinel)
-	{
-        if (gameFlag == 0 || cur->m_priority == PRI_CRITICAL)
+		do
 		{
-            int status = cur->m_completionStatus;
-
-            if (status == 1 || status == 4)
+			if ((Game.game.m_gameWork.m_gamePaused == 0 || cur->m_priority == PRI_CRITICAL)
+			    && (cur->m_completionStatus == 1 || cur->m_completionStatus == 4))
 			{
-                cur->m_completionStatus = 2;
+				cur->m_completionStatus = 2;
 
-                u32 readSize = cur->m_chunkSize + 0x1FU;
-                readSize &= ~0x1FU; // align to 0x20
+				u32 readSize = (cur->m_chunkSize + 0x1F) & ~0x1F; // align to 0x20
 
-                if (readSize > 0x100000U)
+				if (0x100000U < readSize && System.m_execParam != 0)
 				{
-					//  && System._4700_4_ >= 1) {
-                    System.Printf("" /* &DAT_801D5DCC */, cur->m_name, readSize);
-                }
+					System.Printf("" /* &DAT_801D5DCC */, cur->m_name, readSize);
+				}
 
-                DVDReadAsyncPrio(
-                    &cur->m_dvdFileInfo,
-                    m_readBuffer,
-                    (s32)readSize,
-                    (s32)cur->m_currentOffset,
-                    0,
-                    2
-                );
+				DVDReadAsyncPrio(&cur->m_dvdFileInfo, m_readBuffer, (s32)readSize,
+					(s32)cur->m_currentOffset, 0, 2);
+				cur->m_nextOffset = cur->m_currentOffset + readSize;
 
-                cur->m_nextOffset = cur->m_currentOffset + readSize;
+				if (cur->m_completionStatus != 3)
+				{
+					return;
+				}
 
-                kick();
-                return;
-            }
-        }
+				kick();
+				return;
+			}
 
-        cur = cur->m_previous;
-    }
+			cur = cur->m_previous;
+		}
+		while (cur != sentinel);
+	}
 }
 
 /*

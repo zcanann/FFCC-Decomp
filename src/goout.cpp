@@ -83,12 +83,89 @@ void CGoOutMenu::CalcMemCardProc()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8016c564
+ * PAL Size: 1156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGoOutMenu::SetMemCardError()
+int CGoOutMenu::SetMemCardError()
 {
-	// TODO
+    int result = 1;
+    const int memCardResult = field_0x4;
+
+    if (memCardResult == -5) {
+        field_0x36 = -1;
+        field_0x40 = 0;
+        field_0x44 = 1;
+        field_0x45 = 0;
+        field_0x34 = 3;
+        field_0x48 = 0;
+        field_0x3c = 0;
+    } else if (memCardResult < -5) {
+        if (memCardResult == -13 || memCardResult == -6) {
+            SetGoOutMode(3);
+            return 1;
+        }
+
+        if ((memCardResult == -999 || memCardResult == -1000) && field_0x1 == 1) {
+            field_0x36 = -1;
+            field_0x40 = 0;
+            field_0x44 = 1;
+        } else if (field_0x1 == 3) {
+            field_0x36 = -1;
+            field_0x40 = 0;
+            field_0x44 = 1;
+            field_0x45 = 0;
+            field_0x34 = 0xd;
+            field_0x48 = 0;
+            field_0x3c = 0;
+        } else if (field_0x1 == 2) {
+            field_0x36 = -1;
+            field_0x40 = 0;
+            field_0x44 = 1;
+            field_0x45 = 0;
+            field_0x34 = 0xf;
+            field_0x48 = 0;
+            field_0x3c = 0;
+        }
+    } else if (memCardResult == -1 || memCardResult == -3) {
+        field_0x36 = -1;
+        field_0x40 = 0;
+        field_0x44 = 1;
+        field_0x45 = 0;
+        field_0x34 = 1;
+        field_0x48 = 0;
+        field_0x3c = 0;
+    } else if (memCardResult == -2) {
+        field_0x36 = -1;
+        field_0x40 = 0;
+        field_0x44 = 1;
+        field_0x45 = 0;
+        field_0x34 = 2;
+        field_0x48 = 0;
+        field_0x3c = 0;
+    } else if (memCardResult == -4) {
+        if (field_0x1 != 1) {
+            field_0x36 = -1;
+            field_0x40 = 0;
+            field_0x44 = 1;
+            field_0x45 = 0;
+            field_0x34 = 0x13;
+            field_0x48 = 0;
+            field_0x3c = 0;
+        } else {
+            field_0x36 = -1;
+            field_0x40 = 0;
+            field_0x44 = 1;
+        }
+    } else if (memCardResult == 1) {
+        result = 0;
+    }
+
+    field_0x18 = 2;
+    return result;
 }
 
 /*

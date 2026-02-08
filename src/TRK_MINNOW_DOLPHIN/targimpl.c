@@ -127,8 +127,14 @@ asm void __TRK_set_MSR(register u32 msr) {
 asm void WriteFPSCR(register f64* fpscr) {
 #ifdef __MWERKS__ // clang-format off
     nofralloc
-    lfd f0, 0(r3)
-    mtfsf 0xff, f0
+    stwu r1, -0x40(r1)
+    stfd f31, 0x10(r1)
+    psq_st f31, 0x20(r1), 0, 0
+    lfd f31, 0(r3)
+    mtfsf 0xff, f31
+    psq_l f31, 0x20(r1), 0, 0
+    lfd f31, 0x10(r1)
+    addi r1, r1, 0x40
     blr
 #endif // clang-format on
 }
@@ -145,8 +151,14 @@ asm void WriteFPSCR(register f64* fpscr) {
 asm void ReadFPSCR(register f64* fpscr) {
 #ifdef __MWERKS__ // clang-format off
     nofralloc
-    mffs f0
-    stfd f0, 0(r3)
+    stwu r1, -0x40(r1)
+    stfd f31, 0x10(r1)
+    psq_st f31, 0x20(r1), 0, 0
+    mffs f31
+    stfd f31, 0(r3)
+    psq_l f31, 0x20(r1), 0, 0
+    lfd f31, 0x10(r1)
+    addi r1, r1, 0x40
     blr
 #endif // clang-format on
 }

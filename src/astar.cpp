@@ -902,7 +902,10 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 	cyl.m_radius2 = 0.0f;
 	cyl.m_height2 = 0.0f;
 
-	MapMng.CheckHitCylinderNear(&cyl, reinterpret_cast<Vec*>(&bottom), mask);
+	if (MapMng.CheckHitCylinderNear(&cyl, reinterpret_cast<Vec*>(&bottom), mask) != 0)
+	{
+		polygonGroup = lbl_8032EC90[0x47];
+	}
 
 	return 0;
 }

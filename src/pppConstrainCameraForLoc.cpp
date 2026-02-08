@@ -13,7 +13,8 @@ extern int DAT_8032ed70;
 
 // Function signatures from Ghidra decomp
 extern "C" int GetModelPtr__FP8CGObject(CGObject*);
-void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, void*, void*, void*, void*, void*);
+void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, pppConstrainCameraForLoc*, int, float*,
+                                                 float*, float*, float*, float*);
 
 /*
  * --INFO--
@@ -89,16 +90,33 @@ void pppConstruct2ConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCamer
  * --INFO--
  * PAL Address: 0x80167DD4
  * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppDestructConstrainCameraForLoc(void)
+void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraForLoc,
+                                      pppConstrainCameraForLocParams* params,
+                                      pppConstrainCameraForLocData* data)
 {
+	float* value;
+	int modelPtr;
+
 	if (DAT_8032ed70 == 0) {
-		// Based on Ghidra decomp pattern
-		CGObject* obj = *(CGObject**)((char*)pppMngStPtr + 0xd8);
-		int modelPtr = GetModelPtr__FP8CGObject(obj);
-		
-		// Set up callback
+		value = (float*)((char*)constrainCameraForLoc + 0x80 + data->m_serializedDataOffsets[2]);
+		modelPtr = GetModelPtr__FP8CGObject(*(CGObject**)((char*)pppMngStPtr + 0xd8));
+		*(float**)(modelPtr + 0xe4) = value;
+		*(pppConstrainCameraForLocParams**)(modelPtr + 0xe8) = params;
 		*(void**)(modelPtr + 0xec) = (void*)CC_BeforeCalcMatrixCallback;
+		CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
+		    params->m_dataValIndex,
+		    constrainCameraForLoc,
+		    params->m_graphId,
+		    value,
+		    value + 1,
+		    value + 2,
+		    &params->m_initWork,
+		    &params->m_stepValue);
 	}
 }
 

@@ -1,4 +1,5 @@
 #include "ffcc/pppYmTracer.h"
+#include "ffcc/pppPart.h"
 
 extern f32 FLOAT_803306e8;
 
@@ -93,10 +94,9 @@ void pppConstruct2YmTracer(pppYmTracer* pppYmTracer, UnkC* param_2)
  */
 void pppDestructYmTracer(pppYmTracer* pppYmTracer, UnkC* param_2)
 {
-    void** ptr = (void**)((char*)pppYmTracer + 0xa8 + *(int*)param_2);
-    if (*ptr != nullptr) {
-        // Call some heap usage function - simplified for now
-        // pppHeapUseRate__FPQ27CMemory6CStage(*ptr);
+    CMemory::CStage** stagePtr = (CMemory::CStage**)((char*)pppYmTracer + 0xa8 + *(int*)param_2);
+    if (*stagePtr != nullptr) {
+        pppHeapUseRate(*stagePtr);
     }
 }
 

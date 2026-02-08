@@ -188,7 +188,7 @@ void pppCopyMatrix(pppFMATRIX& dest, pppFMATRIX source)
  * Address:	TODO
  * Size:	TODO
  */
-void pppMulMatrix(pppFMATRIX& ab, pppFMATRIX& a, pppFMATRIX& b)
+void pppMulMatrix(pppFMATRIX& ab, pppFMATRIX a, pppFMATRIX b)
 { 
 	PSMTXConcat(a.value, b.value, ab.value);
 }

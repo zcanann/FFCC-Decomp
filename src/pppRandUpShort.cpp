@@ -3,52 +3,67 @@
 #include "dolphin/types.h"
 
 extern CMath math;
-extern int lbl_8032ED70;
-extern float lbl_80330038; 
-extern double lbl_80330040;
-extern short lbl_801EADC8;
+extern s32 lbl_8032ED70;
+extern f32 lbl_80330038;
+extern f64 lbl_80330040;
+extern s16 lbl_801EADC8;
+
+struct PppRandUpShortParam2 {
+    s32 field0;
+    s32 field4;
+    s16 field8;
+    u8 fieldA;
+};
+
+struct PppRandUpShortParam3 {
+    u8 unk0[0xC];
+    s32* fieldC;
+};
 
 /*
  * --INFO--
  * PAL Address: 0x80062fa0
  * PAL Size: 300b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppRandUpShort(void* param1, void* param2, void* param3)
 {
-    int* p1 = (int*)param1;
-    int* p2 = (int*)param2;
-    int*** p3 = (int***)param3;
-
     if (lbl_8032ED70 != 0) {
         return;
     }
 
-    if (p1[3] == 0) {
+    s32* base = (s32*)param1;
+    PppRandUpShortParam2* in = (PppRandUpShortParam2*)param2;
+    s32*** out = (s32***)param3;
+    s32 baseState = base[3];
+
+    if (baseState == 0) {
         math.RandF();
-
-        float randVal = 1.0f;
-        if (*(u8*)((char*)p2 + 0xA) != 0) {
+        f32 value = 1.0f;
+        if (in->fieldA != 0) {
             math.RandF();
-            randVal += 1.0f;
+            value += 1.0f;
         }
-
-        randVal *= lbl_80330038;
-        *(float*)((char*)p1 + (***p3 + 0x80)) = randVal;
+        value *= lbl_80330038;
+        *(f32*)((u8*)base + ***out + 0x80) = value;
         return;
     }
 
-    if (p2[0] != p1[3]) {
+    if (in->field0 != baseState) {
         return;
     }
 
-    float* src = (float*)((char*)p1 + ***p3);
-    short* dst;
-    if (p2[1] == -1) {
-        dst = &lbl_801EADC8;
+    s16* target;
+
+    if (in->field4 == -1) {
+        target = &lbl_801EADC8;
     } else {
-        dst = (short*)((char*)p1 + p2[1] + 0x80);
+        target = (s16*)((u8*)base + in->field4 + 0x80);
     }
 
-    int add = (int)(((double)*(short*)((char*)p2 + 8) - lbl_80330040) * *(float*)((char*)src + 0x80));
-    *dst = *dst + add;
+    s32 delta = (s32)(((f64)in->field8 - lbl_80330040) * *(f32*)((u8*)base + ***out + 0x80));
+    *target = (s16)(*target + delta);
 }

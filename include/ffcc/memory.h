@@ -18,7 +18,7 @@ public:
     public:
         void initBlock();
         void quitBlock();
-        void alloc(unsigned long, char*, unsigned long, int);
+        void* alloc(unsigned long, char*, unsigned long, int);
         void setDefaultParam(unsigned long);
         void resDefaultParam();
         void setParam(void*, unsigned long);
@@ -102,6 +102,7 @@ public:
 };
 
 void* operator new(unsigned long size, CMemory::CStage* stage, char* file, int line);
+void* operator new[](unsigned long size, CMemory::CStage* stage, char* file, int line);
 
 extern CMemory Memory;
 

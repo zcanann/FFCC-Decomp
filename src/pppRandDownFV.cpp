@@ -1,6 +1,6 @@
 #include "ffcc/pppRandDownFV.h"
 #include "ffcc/math.h"
-#include "dolphin/types.h"
+#include "types.h"
 
 extern CMath math[];
 extern "C" f32 RandF__5CMathFv(CMath*);
@@ -14,7 +14,7 @@ extern "C" f32 RandF__5CMathFv(CMath*);
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRandDownFV(void* r3, void* r4, void* r5)
+void pppRandDownFV(void* param1, void* param2, void* param3)
 {
     extern int lbl_8032ED70;
     extern f32 lbl_8032FF40;

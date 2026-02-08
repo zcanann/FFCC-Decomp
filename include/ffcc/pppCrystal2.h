@@ -23,16 +23,18 @@ struct pppCrystal2 {
 };
 
 struct UnkB {
-    u32 m_dataValIndex;
+    s32 m_graphId;
+    s32 m_dataValIndex;
     u16 m_initWOrk;
-    char pad[6];
-    u32 m_stepValue;
+    u8 _pad0[2];
+    f32 m_stepValue;
     u8 m_arg3;
-    char pad2[3];
-    u8 m_payload[28];  // payload array
+    u8 m_payload[6];
+    u8 _pad1[1];
 };
 
 struct UnkC {
+    u8 _pad0[0xC];
     s32* m_serializedDataOffsets;
 };
 

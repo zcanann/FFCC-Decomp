@@ -92,24 +92,42 @@ bool CUSB::IsConnected()
  */
 void CUSB::AddMessageCallback(MessageCallback callback, void* callerContext)
 {
-	for (int i = 0; i < 8; i++)
+	CUSBCallbackEntry* callbackEntry;
+	int i;
+	int remaining;
+
+	callbackEntry = m_callbacks;
+	i = 0;
+	remaining = 8;
+	while (true)
 	{
-		if (m_callbacks[i].m_inUse == 0)
+		if (callbackEntry->m_inUse == 0)
 		{
-			m_callbacks[i].m_inUse = 1;
-			m_callbacks[i].m_callback = callback;
-			m_callbacks[i].m_callerContext = callerContext;
-			return;
+			callbackEntry->m_inUse = 1;
+			callbackEntry->m_callback = callback;
+			callbackEntry->m_callerContext = callerContext;
+			break;
 		}
 
-		if (m_callbacks[i].m_callback == callback)
+		if (callbackEntry->m_callback == callback)
 		{
 			System.Printf("CUSB.AddMessageCallback: 同じ");
-			return;
+			break;
+		}
+
+		i++;
+		callbackEntry++;
+		remaining--;
+		if (remaining == 0)
+		{
+			break;
 		}
 	}
 
-	System.Printf("CUSB.AddMessageCallback: イベント");
+	if (i == 8)
+	{
+		System.Printf("CUSB.AddMessageCallback: イベント");
+	}
 }
 
 /*

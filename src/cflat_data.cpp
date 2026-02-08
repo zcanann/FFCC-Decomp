@@ -45,38 +45,42 @@ CFlatData::~CFlatData()
  */
 void CFlatData::Create(void* filePtr)
 {
+	CFlatData* self = this;
 	for (int i = 0; i < m_dataCount; i++)
 	{
-		if (m_data[i].m_data != nullptr)
+		if (self->m_data[0].m_data != nullptr)
 		{
-			operator delete(m_data[i].m_data);
-			m_data[i].m_data = nullptr;
+			operator delete(self->m_data[0].m_data);
+			self->m_data[0].m_data = nullptr;
 		}
-		if (m_data[i].m_strings != nullptr)
+		if (self->m_data[0].m_strings != nullptr)
 		{
-			operator delete(m_data[i].m_strings);
-			m_data[i].m_strings = (char**)nullptr;
+			operator delete(self->m_data[0].m_strings);
+			self->m_data[0].m_strings = (char**)nullptr;
 		}
-		if (m_data[i].m_stringBuf != nullptr)
+		if (self->m_data[0].m_stringBuf != nullptr)
 		{
-			operator delete(m_data[i].m_stringBuf);
-			m_data[i].m_stringBuf = (char*)nullptr;
+			operator delete(self->m_data[0].m_stringBuf);
+			self->m_data[0].m_stringBuf = (char*)nullptr;
 		}
+		self = (CFlatData*)&self->m_data[0].m_stringBuf;
 	}
 	m_dataCount = 0;
 
+	self = this;
 	for (int i = 0; i < m_tableCount; i++)
 	{
-		if (m_tabl[i].m_strings != nullptr)
+		if (self->m_tabl[0].m_strings != nullptr)
 		{
-			operator delete(m_tabl[i].m_strings);
-			m_tabl[i].m_strings = (char**)nullptr;
+			operator delete(self->m_tabl[0].m_strings);
+			self->m_tabl[0].m_strings = (char**)nullptr;
 		}
-		if (m_tabl[i].m_stringBuf != nullptr)
+		if (self->m_tabl[0].m_stringBuf != nullptr)
 		{
-			operator delete(m_tabl[i].m_stringBuf);
-			m_tabl[i].m_stringBuf = (char*)nullptr;
+			operator delete(self->m_tabl[0].m_stringBuf);
+			self->m_tabl[0].m_stringBuf = (char*)nullptr;
 		}
+		self = (CFlatData*)&self->m_data[0].m_numStrings;
 	}
 	m_tableCount = 0;
 
@@ -107,61 +111,65 @@ void CFlatData::Create(void* filePtr)
 				memcpy(m_mesBuffer, chunkFile.GetAddress(), chunk.m_size);
 
 				unsigned char* base = chunkFile.GetAddress();
+				self = this;
 				for (int i = 0; i < m_mesCount; i++)
 				{
-					m_mesPtr[i] = m_mesBuffer + (chunkFile.GetAddress() - base);
+					self->m_mesPtr[0] = m_mesBuffer + (chunkFile.GetAddress() - base);
 					chunkFile.GetString();
+					self = (CFlatData*)self->m_data;
 				}
 				continue;
 			}
 
-			if (chunk.m_id == 0x44415441) // 'DATA'
+			if (chunk.m_id < 0x4D455320)
 			{
-				DataEntry& entry = m_data[m_dataCount];
-				entry.m_size = chunk.m_arg0;
-				entry.m_data = new (Game.game.m_mainStage, (char*)"cflat_data.cpp", 0x45) unsigned char[chunk.m_arg0];
-				chunkFile.Get(entry.m_data, chunk.m_arg0);
-
-				if (chunk.m_version == 0)
+				if (chunk.m_id == 0x44415441) // 'DATA'
 				{
-					entry.m_numStrings = 0;
-					entry.m_strings = (char**)nullptr;
-					entry.m_stringBuf = (char*)nullptr;
-				}
-				else
-				{
-					entry.m_numStrings = chunkFile.Get4();
-					entry.m_strings = (char**)new (Game.game.m_mainStage, (char*)"cflat_data.cpp", 0x4C)
-						unsigned char[entry.m_numStrings * sizeof(char*)];
-					entry.m_stringBuf = new (Game.game.m_mainStage, (char*)"cflat_data.cpp", 0x4D)
-						char[entry.m_numStrings];
-					memcpy(entry.m_stringBuf, chunkFile.GetAddress(), entry.m_numStrings);
+					m_data[m_dataCount].m_size = chunk.m_arg0;
+					m_data[m_dataCount].m_data =
+						new (Game.game.m_mainStage, (char*)"cflat_data.cpp", 0x45) unsigned char[chunk.m_arg0];
+					chunkFile.Get(m_data[m_dataCount].m_data, chunk.m_arg0);
 
-					unsigned char* base = chunkFile.GetAddress();
-					for (int i = 0; i < entry.m_numStrings; i++)
+					if (chunk.m_version == 0)
 					{
-						entry.m_strings[i] = entry.m_stringBuf + (chunkFile.GetAddress() - base);
-						chunkFile.GetString();
+						m_data[m_dataCount].m_numStrings = 0;
+						m_data[m_dataCount].m_stringBuf = (char*)nullptr;
+						m_data[m_dataCount].m_strings = (char**)nullptr;
 					}
+					else
+					{
+						m_data[m_dataCount].m_numStrings = chunkFile.Get4();
+						m_data[m_dataCount].m_strings = (char**)new (Game.game.m_mainStage, (char*)"cflat_data.cpp", 0x4C)
+							unsigned char[m_data[m_dataCount].m_numStrings * sizeof(char*)];
+						m_data[m_dataCount].m_stringBuf =
+							new (Game.game.m_mainStage, (char*)"cflat_data.cpp", 0x4D) char[m_data[m_dataCount].m_numStrings];
+						memcpy(m_data[m_dataCount].m_stringBuf, chunkFile.GetAddress(), m_data[m_dataCount].m_numStrings);
+
+						unsigned char* base = chunkFile.GetAddress();
+						for (int i = 0; i < m_data[m_dataCount].m_numStrings; i++)
+						{
+							m_data[m_dataCount].m_strings[i] =
+								m_data[m_dataCount].m_stringBuf + (chunkFile.GetAddress() - base);
+							chunkFile.GetString();
+						}
+					}
+
+					m_dataCount++;
 				}
-
-				m_dataCount++;
-				continue;
 			}
-
-			if (chunk.m_id == 0x5441424C) // 'TABL'
+			else if (chunk.m_id == 0x5441424C) // 'TABL'
 			{
-				TableEntry& table = m_tabl[m_tableCount];
-				table.m_numEntries = chunk.m_arg0;
-				table.m_strings = (char**)new (Game.game.m_mainStage, (char*)"cflat_data.cpp", 0x65)
+				m_tabl[m_tableCount].m_numEntries = chunk.m_arg0;
+				m_tabl[m_tableCount].m_strings = (char**)new (Game.game.m_mainStage, (char*)"cflat_data.cpp", 0x65)
 					unsigned char[chunk.m_arg0 * sizeof(char*)];
-				table.m_stringBuf = new (Game.game.m_mainStage, (char*)"cflat_data.cpp", 0x66) char[chunk.m_size];
-				memcpy(table.m_stringBuf, chunkFile.GetAddress(), chunk.m_size);
+				m_tabl[m_tableCount].m_stringBuf =
+					new (Game.game.m_mainStage, (char*)"cflat_data.cpp", 0x66) char[chunk.m_size];
+				memcpy(m_tabl[m_tableCount].m_stringBuf, chunkFile.GetAddress(), chunk.m_size);
 
 				unsigned char* base = chunkFile.GetAddress();
-				for (int i = 0; i < table.m_numEntries; i++)
+				for (int i = 0; i < m_tabl[m_tableCount].m_numEntries; i++)
 				{
-					table.m_strings[i] = table.m_stringBuf + (chunkFile.GetAddress() - base);
+					m_tabl[m_tableCount].m_strings[i] = m_tabl[m_tableCount].m_stringBuf + (chunkFile.GetAddress() - base);
 					chunkFile.GetString();
 				}
 

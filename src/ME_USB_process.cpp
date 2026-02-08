@@ -13,7 +13,7 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-CMaterialEditorPcs* MemFree__18CMaterialEditorPcsFPv(CMaterialEditorPcs* materialEditorPcs, void* ptr)
+extern "C" CMaterialEditorPcs* MemFree__18CMaterialEditorPcsFPv(CMaterialEditorPcs* materialEditorPcs, void* ptr)
 {
     if (ptr != 0) {
         Memory.Free(ptr);
@@ -30,7 +30,7 @@ CMaterialEditorPcs* MemFree__18CMaterialEditorPcsFPv(CMaterialEditorPcs* materia
  * JP Address: TODO
  * JP Size: TODO
  */
-void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialEditorPcs)
+extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialEditorPcs)
 {
     // Access USB stream data
     CUSBStreamData* usbStream = &materialEditorPcs->m_usbStream;

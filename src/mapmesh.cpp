@@ -1,5 +1,53 @@
 #include "ffcc/mapmesh.h"
 
+class CMaterial;
+
+template <class T>
+class CPtrArray
+{
+public:
+    void** m_vtable;
+    int m_size;
+    int m_numItems;
+    int m_defaultSize;
+    T* m_items;
+    CMemory::CStage* m_stage;
+    int m_growCapacity;
+
+    T GetAt(unsigned long index);
+    T operator[](unsigned long index);
+};
+
+/*
+ * --INFO--
+ * PAL Address: 0x800287a0
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CMaterial* CPtrArray<CMaterial*>::operator[](unsigned long index)
+{
+    return GetAt(index);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800287c0
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CMaterial* CPtrArray<CMaterial*>::GetAt(unsigned long index)
+{
+    return m_items[index];
+}
+
 /*
  * --INFO--
  * Address:	TODO

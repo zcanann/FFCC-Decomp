@@ -6,28 +6,7 @@ extern int lbl_8032ED70;
 extern float lbl_80330080;
 extern unsigned char lbl_801EADC8[];
 
-// Forward declaration to handle RandF return value
-extern "C" float RandF__5CMathFv();
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void randfloat(float, float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void randf(unsigned char)
-{
-	// TODO
-}
+extern "C" float RandF__5CMathFv(CMath*);
 
 /*
  * --INFO--

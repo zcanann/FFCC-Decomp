@@ -279,6 +279,37 @@ out_loop:
 #endif // clang-format on
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801abef8
+ * PAL Size: 196b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+DSError TRKTargetAccessARAM(u32 p1, u32 p2, u32* p3, BOOL read)
+{
+    DSError error = DS_NoError;
+    TRKExceptionStatus tempExceptionStatus = gTRKExceptionStatus;
+
+    gTRKExceptionStatus.exceptionDetected = FALSE;
+
+    if (read) {
+        TRK__read_aram(p1, p2, p3);
+    } else {
+        TRK__write_aram(p1, p2, p3);
+    }
+
+    if (gTRKExceptionStatus.exceptionDetected) {
+        error = DS_CWDSException;
+        *p3   = 0;
+    }
+
+    gTRKExceptionStatus = tempExceptionStatus;
+    return error;
+}
+
 #pragma dont_inline on
 DSError TRKTargetAccessMemory(void* data, u32 start, size_t* length,
                               MemoryAccessOptions accessOptions, BOOL read)
@@ -332,6 +363,38 @@ DSError TRKTargetReadInstruction(void* data, u32 start)
     if (error == DS_NoError && registersLength != 4) {
         error = DS_InvalidMemory;
     }
+
+    return error;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801abef8
+ * PAL Size: 196b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+DSError TRKTargetAccessARAM(u32 p1, u32 p2, u32* p3, BOOL read)
+{
+    DSError error = DS_NoError;
+    TRKExceptionStatus tempExceptionStatus = gTRKExceptionStatus;
+
+    gTRKExceptionStatus.exceptionDetected = FALSE;
+
+    if (read) {
+        TRK__read_aram((int)p1, p2, p3);
+    } else {
+        TRK__write_aram((int)p1, p2, p3);
+    }
+
+    if (gTRKExceptionStatus.exceptionDetected) {
+        error = DS_CWDSException;
+        *p3 = 0;
+    }
+
+    gTRKExceptionStatus = tempExceptionStatus;
 
     return error;
 }

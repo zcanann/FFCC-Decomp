@@ -131,16 +131,17 @@ void GXSetIndTexCoordScale(GXIndTexStageID ind_state, GXIndTexScale scale_s, GXI
     __GXData->bpSentNot = 0;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801a4ebc
+ * PAL Size: 276b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void GXSetIndTexOrder(GXIndTexStageID ind_stage, GXTexCoordID tex_coord, GXTexMapID tex_map) {
     CHECK_GXBEGIN(302, "GXSetIndTexOrder");
-
-    if (tex_map == GX_TEXMAP_NULL) {
-        tex_map = GX_TEXMAP0;
-    }
-
-    if (tex_coord == GX_TEXCOORD_NULL) {
-        tex_coord = GX_TEXCOORD0;
-    }
 
     ASSERTMSGLINE(314, tex_map < GX_MAX_TEXMAP, "GXSetIndTexOrder: Invalid direct texture Id");
     ASSERTMSGLINE(315, tex_coord < GX_MAX_TEXCOORD, "GXSetIndTexOrder: Invalid texture coord");

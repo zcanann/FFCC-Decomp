@@ -28,8 +28,11 @@ void THPSimpleDecode(void);
 void CheckPrefetch();
 void VideoDecode(unsigned char*);
 s32 THPSimpleDrawCurrentFrame(GXRenderModeObj*, int, int, int, int);
-void MixAudio(short*, short*, unsigned long);
-void THPAudioMixCallback();
+void MixAudio__FPsPsUl(short*, short*, unsigned long);
+void THPAudioMixCallback__Fv();
+
+#define MixAudio MixAudio__FPsPsUl
+#define THPAudioMixCallback THPAudioMixCallback__Fv
 
 #ifdef __cplusplus
 }

@@ -1,5 +1,8 @@
 #include "ffcc/THPSimple.h"
 #include "dolphin/thp/THPDraw.h"
+#include <dolphin/ai.h>
+#include <dolphin/os.h>
+#include <dolphin/os/OSCache.h>
 
 struct THPSimpleControl {
     u8 pad0[0x80];
@@ -13,6 +16,13 @@ struct THPSimpleControl {
 };
 
 THPSimpleControl SimpleControl;
+
+extern s32 lbl_8032EE4C;
+extern void (*lbl_8032EE50)(void);
+extern s16* lbl_8032EE54;
+extern s16* lbl_8032EE58;
+extern s32 lbl_8032EE5C;
+extern s16 WorkBuffer_32_[];
 
 /*
  * --INFO--
@@ -227,5 +237,39 @@ void MixAudio(short*, short*, unsigned long)
  */
 void THPAudioMixCallback()
 {
-	// TODO
+	u32 interruptState;
+	s16* workBuffer;
+
+	if (lbl_8032EE5C == 0) {
+		lbl_8032EE4C ^= 1;
+		workBuffer = reinterpret_cast<s16*>(reinterpret_cast<u8*>(WorkBuffer_32_) + lbl_8032EE4C * 0x280);
+		AIInitDMA((u32)workBuffer, 0x280);
+		interruptState = OSEnableInterrupts();
+		MixAudio(workBuffer, (short*)0, 0xA0);
+		DCFlushRange(workBuffer, 0x280);
+		OSRestoreInterrupts(interruptState);
+		return;
+	}
+
+	if (lbl_8032EE5C == 1) {
+		if (lbl_8032EE54 != NULL) {
+			lbl_8032EE58 = lbl_8032EE54;
+		}
+		lbl_8032EE50();
+		lbl_8032EE54 = reinterpret_cast<s16*>(AIGetDMAStartAddr() + 0x80000000);
+	} else {
+		lbl_8032EE50();
+		lbl_8032EE58 = reinterpret_cast<s16*>(AIGetDMAStartAddr() + 0x80000000);
+	}
+
+	lbl_8032EE4C ^= 1;
+	workBuffer = reinterpret_cast<s16*>(reinterpret_cast<u8*>(WorkBuffer_32_) + lbl_8032EE4C * 0x280);
+	AIInitDMA((u32)workBuffer, 0x280);
+	interruptState = OSEnableInterrupts();
+	if (lbl_8032EE58 != NULL) {
+		DCInvalidateRange(lbl_8032EE58, 0x280);
+	}
+	MixAudio(workBuffer, lbl_8032EE58, 0xA0);
+	DCFlushRange(workBuffer, 0x280);
+	OSRestoreInterrupts(interruptState);
 }

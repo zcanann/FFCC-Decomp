@@ -10,6 +10,7 @@ void VECMultAdd(Vec*, Vec*, Vec*, float);
 class CBound
 {
 public:
+    CBound();
     void SetFrustum(Vec&, float(*)[4]);
     void CheckFrustum0(CBound&);
     void CheckFrustum0(float);

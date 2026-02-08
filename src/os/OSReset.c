@@ -161,7 +161,7 @@ void __OSDoHotReset(u32 resetCode) {
     OSDisableInterrupts();
     __VIRegs[1] = 0;
     ICFlashInvalidate();
-    Reset(resetCode * 8);
+    Reset(resetCode << 3);
 }
 
 void __OSShutdownDevices(BOOL doRecal) {
@@ -191,50 +191,100 @@ void __OSShutdownDevices(BOOL doRecal) {
 }
 
 void OSResetSystem(BOOL reset, u32 resetCode, BOOL forceMenu) {
+    OSResetFunctionInfo* info;
+    int err;
     OSSram* sram;
+    OSThread* thread;
+    OSThread* next;
+    BOOL disableRecalibration = TRUE;
 
     OSDisableScheduler();
+    __OSStopAudioSystem();
 
-    if (reset == OS_RESET_RESTART && forceMenu) {
+    if (reset == OS_RESET_SHUTDOWN) {
+        disableRecalibration = __PADDisableRecalibration(TRUE);
+    }
+
+    do {
+        info = ResetFunctionQueue.head;
+        err = 0;
+        while (info != NULL && err == 0) {
+            err |= !info->func(FALSE);
+            info = info->next;
+        }
+        err |= !__OSSyncSram();
+    } while (err != 0);
+
+    if (reset == OS_RESET_HOTRESET && forceMenu) {
         sram = __OSLockSram();
         sram->flags |= 0x40;
         __OSUnlockSram(1);
-
-        resetCode = 0;
+        while (!__OSSyncSram()) {}
     }
 
-    if (reset == OS_RESET_SHUTDOWN ||
-        (reset == OS_RESET_RESTART && (bootThisDol || resetCode + 0x3fff0000 == 0)))
-    {
-        __OSShutdownDevices(FALSE);
-    } else {
-        __OSShutdownDevices(TRUE);
+    OSDisableInterrupts();
+    info = ResetFunctionQueue.head;
+    err = 0;
+    while (info != NULL && err == 0) {
+        err |= !info->func(TRUE);
+        info = info->next;
     }
+    __OSSyncSram();
+    LCDisable();
 
     if (reset == OS_RESET_HOTRESET) {
-        __OSDoHotReset(resetCode);
+        OSDisableInterrupts();
+        __VIRegs[1] = 0;
+        ICFlashInvalidate();
+        Reset(resetCode << 3);
     } else if (reset == OS_RESET_RESTART) {
-        if (forceMenu == TRUE) {
-            OSReport("OSResetSystem(): You can't specify TRUE to forceMenu if you restart. Ignored\n");
+        for (thread = __OSActiveThreadQueue.head; thread != NULL; thread = next) {
+            next = thread->linkActive.next;
+            switch (thread->state) {
+            case 1:
+            case 4:
+                OSCancelThread(thread);
+                break;
+            default:
+                break;
+            }
         }
+
         OSEnableScheduler();
-        __OSReboot(resetCode, bootThisDol);
+        __OSReboot(resetCode, forceMenu);
     }
 
-    memset(OSPhysicalToCached(0x40), 0, 0x8c);
-    memset(OSPhysicalToCached(0xd4), 0, 0x14);
-    memset(OSPhysicalToCached(0xf4), 0, 4);
-    memset(OSPhysicalToCached(0x3000), 0, 0xc0);
-    memset(OSPhysicalToCached(0x30c8), 0, 0xc);
-    memset(OSPhysicalToCached(0x30e2), 0, 1);
+    for (thread = __OSActiveThreadQueue.head; thread != NULL; thread = next) {
+        next = thread->linkActive.next;
+        switch (thread->state) {
+        case 1:
+        case 4:
+            OSCancelThread(thread);
+            break;
+        default:
+            break;
+        }
+    }
+
+    memset((void*)0x80000040, 0, 0x8c);
+    memset((void*)0x800000d4, 0, 0x14);
+    memset((void*)0x800000f4, 0, 4);
+    memset((void*)0x80003000, 0, 0xc0);
+    memset((void*)0x800030c8, 0, 0xc);
+    memset((void*)0x800030e2, 0, 1);
+
+    __PADDisableRecalibration(disableRecalibration);
 }
 
 u32 OSGetResetCode() {
     u32 resetCode;
-    if (__OSRebootParams.valid)
-        resetCode = 0x80000000 | __OSRebootParams.restartCode;
-    else
-        resetCode = (__PIRegs[9] & 0xFFFFFFF8) >> 3;
+    if (*(volatile u8*)0x800030e2 != 0) {
+        resetCode = 0x80000000;
+    } else {
+        resetCode = *(volatile u32*)0xCC003024;
+        resetCode &= ~7;
+        resetCode >>= 3;
+    }
 
     return resetCode;
 }

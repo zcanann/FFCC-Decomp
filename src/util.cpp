@@ -140,7 +140,7 @@ void CUtil::ConvF2IVector2d(S16Vec2d&, Vec2d&, long)
  * Address:	TODO
  * Size:	TODO
  */
-void CUtil::RenderQuadNoTex(Vec&, Vec&, _GXColor)
+void CUtil::RenderQuadNoTex(Vec, Vec, _GXColor)
 {
 	// TODO
 }
@@ -154,7 +154,7 @@ void CUtil::RenderQuadNoTex(Vec&, Vec&, _GXColor)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CUtil::RenderQuad(Vec& pos1, Vec& pos2, _GXColor color, Vec2d* uv1, Vec2d* uv2)
+void CUtil::RenderQuad(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv2)
 {
 	float u1, v1, u2, v2;
 	
@@ -206,7 +206,7 @@ void CUtil::RenderQuad(Vec& pos1, Vec& pos2, _GXColor color, Vec2d* uv1, Vec2d* 
  * JP Address: TODO
  * JP Size: TODO
  */
-void CUtil::RenderQuadTex2(Vec& pos1, Vec& pos2, _GXColor color, Vec2d* uv1, Vec2d* uv2)
+void CUtil::RenderQuadTex2(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d* uv2)
 {
 	float u1, v1, u2, v2;
 	
@@ -402,7 +402,7 @@ void CUtil::GetNumPolygonFromDL(void*, unsigned long)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CUtil::GetDirectVector(Vec* param_2, Vec* param_3, Vec& param_4)
+void CUtil::GetDirectVector(Vec* param_2, Vec* param_3, Vec param_4)
 {
 	Vec local_vec;
 	

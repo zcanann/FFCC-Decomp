@@ -10,7 +10,6 @@ static int YearDays[MONTH_MAX] = {0,   31,  59,  90,  120, 151,
 static int LeapYearDays[MONTH_MAX] = {0,   31,  60,  91,  121, 152,
                                       182, 213, 244, 274, 305, 335};
 
-#ifdef __GEKKO__
 asm OSTime OSGetTime(void) {
 jump:
     nofralloc
@@ -41,7 +40,6 @@ asm static void __SetTime(OSTime time) {
     mttbl r4
     blr
 }
-#endif
 
 void __OSSetTime(OSTime time) {
     BOOL enabled;
@@ -80,13 +78,11 @@ OSTime __OSTimeToSystemTime(OSTime time) {
     return result;
 }
 
-#ifdef __GEKKO__
 asm void __OSSetTick(register OSTick newTicks) {
     nofralloc
     mttbl newTicks
     blr
 }
-#endif
 
 static int IsLeapYear(int year) {
     return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);

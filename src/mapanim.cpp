@@ -32,6 +32,7 @@ public:
 extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
+extern "C" void* lbl_801EA488[];
 
 static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
 static char s_ptrarray_grow_error[] = "CPtrArray grow error";
@@ -48,9 +49,9 @@ static char s_ptrarray_grow_error[] = "CPtrArray grow error";
 template <>
 CPtrArray<CMapAnimNode*>::CPtrArray()
 {
-    m_vtable = 0;
-    m_size = 0;
+    m_vtable = lbl_801EA488;
     m_numItems = 0;
+    m_size = 0;
     m_defaultSize = 0x10;
     m_items = 0;
     m_stage = 0;
@@ -84,12 +85,13 @@ CPtrArray<CMapAnimNode*>::~CPtrArray()
 template <>
 int CPtrArray<CMapAnimNode*>::Add(CMapAnimNode* item)
 {
-    int success = setSize(m_numItems + 1);
-    if (success != 0) {
-        m_items[m_numItems] = item;
-        m_numItems++;
+    if (setSize(m_numItems + 1) == 0) {
+        return 0;
     }
-    return success;
+
+    m_items[m_numItems] = item;
+    m_numItems++;
+    return 1;
 }
 
 /*

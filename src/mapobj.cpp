@@ -1,4 +1,31 @@
 #include "ffcc/mapobj.h"
+#include "ffcc/math.h"
+
+extern float lbl_8032F938;
+extern float lbl_8032F93C;
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002BE10
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CBound::CBound()
+{
+    float* bounds = (float*)this;
+    float max = lbl_8032F93C;
+    float min = lbl_8032F938;
+
+    bounds[2] = min;
+    bounds[1] = min;
+    bounds[0] = min;
+    bounds[5] = max;
+    bounds[4] = max;
+    bounds[3] = max;
+}
 
 /*
  * --INFO--

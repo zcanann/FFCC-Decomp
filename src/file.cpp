@@ -1,5 +1,7 @@
 #include "ffcc/file.h"
 
+#include <string.h>
+
 #include "ffcc/system.h"
 
 /*
@@ -116,7 +118,7 @@ DVDDiskID* CFile::GetCurrentDiskID()
  * Size:	TODO
  */
 
-CFile::CHandle* CFile::Open(const char* path, unsigned long userParam, CFile::PRI pri)
+CFile::CHandle* CFile::Open(char* path, unsigned long userParam, CFile::PRI pri)
 {
     if (1) // g_Game.game.gameWork._5076_1_ != 0
     {
@@ -134,10 +136,7 @@ CFile::CHandle* CFile::Open(const char* path, unsigned long userParam, CFile::PR
 
     DVDFileInfo fi;
 	
-    if (!DVDFastOpen(entry, &fi))
-	{
-        return 0;
-	}
+    DVDFastOpen(entry, &fi);
 
     handle = m_freeList;
 	
@@ -166,7 +165,7 @@ CFile::CHandle* CFile::Open(const char* path, unsigned long userParam, CFile::PR
     handle->m_completionStatus = 0;
     handle->m_closedFlag = 0;
     handle->m_flags = 0;
-    // strncpy(handle->m_name, path, sizeof(handle->m_name));
+    strcpy(handle->m_name, path);
     handle->m_chunkSize = fi.length;
     handle->m_currentOffset = 0;
     handle->m_nextOffset = 0;

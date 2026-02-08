@@ -43,7 +43,7 @@ public:
 	void Quit();
 	void Frame();
 	DVDDiskID* GetCurrentDiskID();
-	CHandle* Open(const char* path, unsigned long userParam, PRI pri);
+	CHandle* Open(char* path, unsigned long userParam, PRI pri);
 	int GetLength(CHandle* handle);
 	void BackAllFilesToQueue(CHandle* handle);
 	void Read(CHandle* handle);

@@ -736,28 +736,48 @@ void CMemoryCardMan::SetLoadData()
  */
 unsigned int CMemoryCardMan::CalcCrc(Mc::SaveDat* saveData)
 {
+    unsigned char byte;
+    int i;
+    unsigned char* ptr;
+    unsigned int crc;
     unsigned char* data = (unsigned char*)saveData;
-    if (data == nullptr) {
+
+    if (data == nullptr)
+    {
         data = (unsigned char*)m_saveBuffer;
     }
-    
-    unsigned int crc = 0xFFFFFFFF;
-    
-    // Process first 0x1c (28) bytes
-    for (int i = 0; i < 0x1c; i++) {
-        unsigned char byte = data[i];
+
+    crc = 0xFFFFFFFF;
+    i = 0x1C;
+    ptr = data;
+    while (true)
+    {
+        i--;
+        if (i < 0)
+        {
+            break;
+        }
+
+        byte = *ptr;
+        ptr++;
         crc = (crc << 8) ^ crcTable[(crc >> 24) ^ byte];
     }
-    
-    // Skip 4 bytes (CRC location at 0x1c), continue from 0x20
-    data += 0x20;
-    
-    // Process remaining 0x8bb0 (35760) bytes
-    for (int i = 0; i < 0x8bb0; i++) {
-        unsigned char byte = data[i];
+
+    ptr = data + 0x20;
+    i = 0x8BB0;
+    while (true)
+    {
+        i--;
+        if (i < 0)
+        {
+            break;
+        }
+
+        byte = *ptr;
+        ptr++;
         crc = (crc << 8) ^ crcTable[(crc >> 24) ^ byte];
     }
-    
+
     return ~crc;
 }
 
@@ -772,37 +792,42 @@ unsigned int CMemoryCardMan::CalcCrc(Mc::SaveDat* saveData)
  */
 unsigned int CMemoryCardMan::ChkCrc(Mc::SaveDat* saveData)
 {
+    unsigned char byte;
+    unsigned int crc;
+    int i;
+    unsigned char* ptr;
     unsigned char* data = (unsigned char*)saveData;
-    if (data == nullptr) {
+
+    if (data == nullptr)
+    {
         data = (unsigned char*)m_saveBuffer;
     }
-    if (data == nullptr) {
-        data = (unsigned char*)m_saveBuffer;
+
+    ptr = data;
+    if (data == nullptr)
+    {
+        ptr = (unsigned char*)m_saveBuffer;
     }
-    
-    unsigned int crc = 0xFFFFFFFF;
-    
-    // Process first 0x1c (28) bytes
-    for (int i = 0; i < 0x1c; i++) {
-        unsigned char byte = data[i];
+
+    crc = 0xFFFFFFFF;
+    i = 0x1C;
+    while (i = i - 1, -1 < i)
+    {
+        byte = *ptr;
+        ptr++;
         crc = (crc << 8) ^ crcTable[(crc >> 24) ^ byte];
     }
-    
-    // Skip 4 bytes (CRC location at 0x1c), continue from 0x20
-    unsigned char* dataPtr = data + 0x20;
-    
-    // Process remaining 0x8bb0 (35760) bytes
-    for (int i = 0; i < 0x8bb0; i++) {
-        unsigned char byte = dataPtr[i];
+
+    ptr += 0x20 - 0x1C;
+    i = 0x8BB0;
+    while (i = i - 1, -1 < i)
+    {
+        byte = *ptr;
+        ptr++;
         crc = (crc << 8) ^ crcTable[(crc >> 24) ^ byte];
     }
-    
-    // Get stored CRC from offset 0x1c
-    unsigned int storedCrc = *(unsigned int*)(data + 0x1c);
-    
-    // Compare calculated CRC with stored CRC
-    // Return 1 if they match, 0 if they don't
-    return (~crc == storedCrc) ? 1 : 0;
+
+    return (unsigned int)__cntlzw((~crc) - *(unsigned int*)(data + 0x1C)) >> 5;
 }
 
 /*

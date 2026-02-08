@@ -56,6 +56,10 @@ public:
     void Quit();
     void SetTexture(_GXTexMapID, CTexture*);
     void SetTextureTev(CTexture*);
+
+private:
+    void* m_vtable;
+    CMemory::CStage* m_memoryStage;
 };
 
 #endif // _FFCC_PPP_TEXTUREMAN_H_

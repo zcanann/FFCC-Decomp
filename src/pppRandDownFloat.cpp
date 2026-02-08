@@ -1,25 +1,26 @@
 #include "ffcc/pppRandDownFloat.h"
 #include "ffcc/math.h"
+#include "types.h"
 
-extern CMath math;
-extern int lbl_8032ED70; // Global state flag
-extern float lbl_8032FF38; // Float constant  
-extern float lbl_801EADC8; // Another float constant
+extern CMath math[];
+extern s32 lbl_8032ED70;
+extern f32 lbl_8032FF38;
+extern f32 lbl_801EADC8[];
 extern "C" float RandF__5CMathFv(CMath*);
 
-typedef struct {
-    int field0;
-    int field4;
-    float field8;
-    unsigned char fieldC;
-} PppRandDownFloatParam;
+struct RandDownFloatParam {
+    s32 targetId;
+    s32 sourceOffset;
+    f32 blend;
+    u8 randomTwice;
+};
 
-typedef struct {
-    void* field0;
-    void* field4;
-    void* field8;
-    int* fieldC;
-} PppRandDownFloatState;
+struct RandDownFloatCtx {
+    void* unk0;
+    void* unk4;
+    void* unk8;
+    s32* outputOffset;
+};
 
 /*
  * --INFO--
@@ -30,37 +31,39 @@ typedef struct {
  * JP Address: TODO  
  * JP Size: TODO
  */
-void pppRandDownFloat(void* r3, void* r4, void* r5) {
-    int* obj = (int*)r3;
-    PppRandDownFloatState* state = (PppRandDownFloatState*)r5;
-    PppRandDownFloatParam* param = (PppRandDownFloatParam*)r4;
+void pppRandDownFloat(void* param1, void* param2, void* param3)
+{
+    u8* base = (u8*)param1;
+    RandDownFloatCtx* ctx = (RandDownFloatCtx*)param3;
+    RandDownFloatParam* in = (RandDownFloatParam*)param2;
+    f32* out;
 
     if (lbl_8032ED70 != 0) {
         return;
     }
 
-    if (obj[3] == 0) {
-        float value = RandF__5CMathFv(&math);
-        value = -value;
-
-        if (param->fieldC != 0) {
-            value = (value - RandF__5CMathFv(&math)) * lbl_8032FF38;
+    s32 state = *(s32*)(base + 0xC);
+    if (state == 0) {
+        f32 value = -RandF__5CMathFv(math);
+        if (in->randomTwice != 0) {
+            value = (value - RandF__5CMathFv(math)) * lbl_8032FF38;
         }
 
-        *(float*)((char*)obj + *state->fieldC + 0x80) = value;
-        return;
-    }
-
-    if (param->field0 == obj[3]) {
-        float* dst = (float*)((char*)obj + *state->fieldC + 0x80);
-        float* src;
-
-        if (param->field4 == -1) {
-            src = &lbl_801EADC8;
-        } else {
-            src = (float*)((char*)obj + param->field4 + 0x80);
+        out = (f32*)(base + *ctx->outputOffset + 0x80);
+        *out = value;
+    } else {
+        if (in->targetId != state) {
+            return;
         }
-
-        *src += param->field8 * *dst;
+        out = (f32*)(base + *ctx->outputOffset + 0x80);
     }
+
+    f32* source;
+    if (in->sourceOffset == -1) {
+        source = &lbl_801EADC8[0];
+    } else {
+        source = (f32*)(base + in->sourceOffset + 0x80);
+    }
+
+    *source = *source + (in->blend * *out);
 }

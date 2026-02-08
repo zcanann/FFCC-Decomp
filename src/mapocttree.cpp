@@ -318,54 +318,50 @@ void CMaterialMan::InitEnv()
  */
 int CBound::CheckCross(CBound& other)
 {
-	float thisMin, thisMax, otherMin, otherMax;
-	bool crossX, crossY, crossZ;
-	
-	// Cast to float arrays for easy access
 	float* thisBound = (float*)this;
 	float* otherBound = (float*)&other;
-	
-	// Check X axis overlap
-	thisMin = thisBound[0];
-	otherMin = otherBound[0];
-	thisMax = thisBound[3];
-	otherMax = otherBound[3];
-	
-	if (otherMin <= thisMin) {
-		crossX = (thisMin <= otherMin) || (thisMin <= otherMax);
+	int cross;
+
+	if (otherBound[0] <= thisBound[0]) {
+		cross = 0;
+		if (thisBound[0] <= otherBound[0]) {
+			cross = 1;
+		} else if (thisBound[0] <= otherBound[3]) {
+			cross = 1;
+		}
 	} else {
-		crossX = (otherMin <= thisMax);
+		cross = otherBound[0] <= thisBound[3];
 	}
-	
-	if (!crossX) return 0;
-	
-	// Check Y axis overlap
-	thisMin = thisBound[1];
-	otherMin = otherBound[1];  
-	thisMax = thisBound[4];
-	otherMax = otherBound[4];
-	
-	if (otherMin <= thisMin) {
-		crossY = (thisMin <= otherMin) || (thisMin <= otherMax);
+	if (!cross) {
+		return 0;
+	}
+
+	if (otherBound[1] <= thisBound[1]) {
+		cross = 0;
+		if (thisBound[1] <= otherBound[1]) {
+			cross = 1;
+		} else if (thisBound[1] <= otherBound[4]) {
+			cross = 1;
+		}
 	} else {
-		crossY = (otherMin <= thisMax);
+		cross = otherBound[1] <= thisBound[4];
 	}
-	
-	if (!crossY) return 0;
-	
-	// Check Z axis overlap
-	thisMin = thisBound[2];
-	otherMin = otherBound[2];
-	thisMax = thisBound[5];
-	otherMax = otherBound[5];
-	
-	if (otherMin <= thisMin) {
-		crossZ = (thisMin <= otherMin) || (thisMin <= otherMax);
+	if (!cross) {
+		return 0;
+	}
+
+	if (otherBound[2] <= thisBound[2]) {
+		cross = 0;
+		if (thisBound[2] <= otherBound[2]) {
+			cross = 1;
+		} else if (thisBound[2] <= otherBound[5]) {
+			cross = 1;
+		}
 	} else {
-		crossZ = (otherMin <= thisMax);
+		cross = otherBound[2] <= thisBound[5];
 	}
-	
-	return crossZ ? 1 : 0;
+
+	return cross;
 }
 
 /*

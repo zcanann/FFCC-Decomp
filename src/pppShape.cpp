@@ -173,12 +173,20 @@ void pppCacheDumpShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80065794
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppGetShapePos(long*, short, Vec&, Vec&, int)
+void pppGetShapePos(long* animData, short frameIndex, Vec& minPos, Vec& maxPos, int shapeIndex)
 {
-	// TODO
+    int shapeBase = *(short*)((int)animData + frameIndex * 8 + 0x10);
+    int shapeEntry = *(int*)((int)animData + shapeBase + 0xc + shapeIndex * 8);
+
+    memcpy(&minPos, (void*)(shapeEntry + 3), 0xc);
+    memcpy(&maxPos, (void*)(shapeEntry + 0x2b), 0xc);
 }
 
 /*
@@ -193,10 +201,30 @@ void pppGetShapeUV(long*, short, Vec2d&, Vec2d&, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80065678
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppCalcFrameShape(long*, short&, short&, short&, short)
+void pppCalcFrameShape(long* animData, short& currentFrame, short& drawFrame, short& frameTime,
+                       short deltaTime)
 {
-	// TODO
+    drawFrame = currentFrame;
+    frameTime += deltaTime;
+
+    short duration = *(short*)((int)animData + currentFrame * 8 + 0x12);
+    if (frameTime < duration) {
+        return;
+    }
+
+    frameTime -= duration;
+    currentFrame += 1;
+    if (currentFrame < *(short*)((int)animData + 6)) {
+        return;
+    }
+
+    currentFrame = 0;
+    frameTime = 0;
 }

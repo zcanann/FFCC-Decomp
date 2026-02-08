@@ -6,7 +6,7 @@ extern CMath math;
 extern s32 lbl_8032ED70;
 extern f32 lbl_80330018;
 extern f64 lbl_80330020;
-extern s32 lbl_801EADC8;
+extern s32 lbl_801EADC8[];
 extern "C" {
 f32 RandF__5CMathFv(CMath*);
 }
@@ -14,7 +14,7 @@ f32 RandF__5CMathFv(CMath*);
 struct PppRandUpIntParam2 {
     s32 field0;
     s32 field4;
-    u32 field8;
+    s32 field8;
     u8 fieldC;
 };
 
@@ -38,16 +38,16 @@ void pppRandUpInt(void* param1, void* param2, void* param3)
         return;
     }
 
-    PppRandUpIntParam3* out = (PppRandUpIntParam3*)param3;
     u8* base = (u8*)param1;
     PppRandUpIntParam2* in = (PppRandUpIntParam2*)param2;
+    PppRandUpIntParam3* out = (PppRandUpIntParam3*)param3;
     f32* valuePtr;
 
     s32 baseState = *(s32*)(base + 0xC);
     if (baseState == 0) {
-        f32 value = RandF__5CMathFv((CMath*)&math);
+        f32 value = RandF__5CMathFv(&math);
         if (in->fieldC != 0) {
-            value = (value + RandF__5CMathFv((CMath*)&math)) * lbl_80330018;
+            value = (value + RandF__5CMathFv(&math)) * lbl_80330018;
         }
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
@@ -56,13 +56,12 @@ void pppRandUpInt(void* param1, void* param2, void* param3)
         if (in->field0 != baseState) {
             return;
         }
-
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
 
     s32* target;
     if (in->field4 == -1) {
-        target = &lbl_801EADC8;
+        target = lbl_801EADC8;
     } else {
         target = (s32*)(base + in->field4 + 0x80);
     }

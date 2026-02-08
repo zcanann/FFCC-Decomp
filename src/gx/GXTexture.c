@@ -668,9 +668,9 @@ void GXInitTlutObj(GXTlutObj* tlut_obj, void* lut, GXTlutFmt fmt, u16 n_entries)
     ASSERTMSGLINEV(1354, n_entries <= 0x4000, "%s: number of entries exceeds maximum", "GXInitTlutObj");
     ASSERTMSGLINEV(1356, ((u32)lut & 0x1F) == 0, "%s: %s pointer not aligned to 32B", "GXInitTlutObj", "Tlut");
     t->tlut = 0;
-    SET_REG_FIELD(1359, t->tlut, 2, 10, fmt);
-    SET_REG_FIELD(1360, t->loadTlut0, 21, 0, ((u32)lut & 0x3FFFFFFF) >> 5);
-    SET_REG_FIELD(1361, t->loadTlut0, 8, 24, 0x64);
+    t->tlut = (t->tlut & 0xFFFFF3FF) | ((u32)fmt << 10);
+    t->loadTlut0 = (t->loadTlut0 & 0xFFE00000) | (((u32)lut >> 5) & 0x1FFFFFF);
+    t->loadTlut0 = (t->loadTlut0 & 0x00FFFFFF) | 0x64000000;
     t->numEntries = n_entries;
 }
 
@@ -859,10 +859,9 @@ void GXInitTlutRegion(GXTlutRegion* region, u32 tmem_addr, GXTlutSize tlut_size)
     ASSERTMSGLINEV(1655, (tmem_addr & 0x1FF) == 0, "%s: tmem pointer is not aligned to 512B", "GXInitTlutRegion");
     ASSERTMSGLINEV(1656, tlut_size <= 0x400, "%s: tlut size exceeds 16K", "GXInitTlutRegion");
     t->loadTlut1 = 0;
-    tmem_addr -= 0x80000;
-    SET_REG_FIELD(1660, t->loadTlut1, 10, 0, tmem_addr >> 9);
-    SET_REG_FIELD(1661, t->loadTlut1, 11, 10, tlut_size);
-    SET_REG_FIELD(1662, t->loadTlut1, 8, 24, 0x65);
+    t->loadTlut1 = (t->loadTlut1 & 0xFFFFFC00) | ((tmem_addr - 0x80000U) >> 9);
+    t->loadTlut1 = (t->loadTlut1 & 0xFFE003FF) | ((u32)tlut_size << 10);
+    t->loadTlut1 = (t->loadTlut1 & 0x00FFFFFF) | 0x65000000;
 }
 
 void GXGetTlutRegionAll(const GXTlutRegion* region, u32* tmem_addr, GXTlutSize* tlut_size) {
@@ -1164,10 +1163,10 @@ void GXSetTexCoordBias(GXTexCoordID coord, u8 s_enable, u8 t_enable) {
  * JP Address: TODO
  * JP Size: TODO
  */
-static void __SetSURegs(u32 tmap, u32 tcoord) {
+static void __SetSURegs(int tmap, int tcoord) {
     u32 image0;
     u32 mode0;
-    s32 bias;
+    u32 bias;
 
     image0 = __GXData->tImage0[tmap];
     __GXData->suTs0[tcoord] = (__GXData->suTs0[tcoord] & 0xFFFF0000) | (image0 & 0x3FF);
@@ -1175,9 +1174,9 @@ static void __SetSURegs(u32 tmap, u32 tcoord) {
 
     mode0 = __GXData->tMode0[tmap];
     bias = __cntlzw(1 - (mode0 & 3));
-    __GXData->suTs0[tcoord] = (__GXData->suTs0[tcoord] & ~0x10000) | (((u32)(bias >> 5)) << 16);
+    __GXData->suTs0[tcoord] = (__GXData->suTs0[tcoord] & 0xFFFEFFFF) | ((bias & 0x1FE0) << 11);
     bias = __cntlzw(1 - ((mode0 >> 2) & 3));
-    __GXData->suTs1[tcoord] = (__GXData->suTs1[tcoord] & ~0x10000) | (((u32)(bias >> 5)) << 16);
+    __GXData->suTs1[tcoord] = (__GXData->suTs1[tcoord] & 0xFFFEFFFF) | ((bias & 0x1FE0) << 11);
     GX_WRITE_RAS_REG(__GXData->suTs0[tcoord]);
     GX_WRITE_RAS_REG(__GXData->suTs1[tcoord]);
     __GXData->bpSentNot = 0;

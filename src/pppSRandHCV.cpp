@@ -1,57 +1,136 @@
 #include "ffcc/pppSRandHCV.h"
 #include "ffcc/math.h"
+#include "dolphin/types.h"
+
+extern CMath math;
+extern int lbl_8032ED70;
+extern float lbl_803300A0;
+extern s16 lbl_801EADC8[];
+extern "C" float RandF__5CMathFv(CMath* instance);
 
 /*
  * --INFO--
  * PAL Address: TODO
  * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void randshort(short value, float range)
 {
-    // Implementation needed
+	(void)value;
+	(void)range;
 }
 
 /*
  * --INFO--
  * PAL Address: TODO 
  * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void randf(unsigned char flag)
 {
-    // Implementation needed  
+	(void)flag;
 }
 
 /*
  * --INFO--
  * PAL Address: 80063e34
  * PAL Size: 736b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppSRandHCV(void* data1, void* data2)
+void pppSRandHCV(void* data1, void* data2, void* data3)
 {
-    CMath math;
-    
-    // Check global disable flag from assembly reference
-    extern int lbl_8032ED70;
-    if (lbl_8032ED70 != 0) return;
-    
-    // Based on assembly analysis - this function generates random HCV values
-    // and applies them to some data structure with conditional behavior
-    float* vec = (float*)((char*)data1 + 0x80);
-    
-    // Generate random values for 4 components (X, Y, Z, W based on assembly offsets)
-    for (int i = 0; i < 4; i++) {
-        math.RandF();
-        
-        // Apply conditional logic based on flag at offset 0x10
-        unsigned char flag = *((unsigned char*)data2 + 0x10);
-        float result;
-        if (flag != 0) {
-            math.RandF();
-            result = 1.0f; // Placeholder - actual value comes from RandF result
-        } else {
-            result = 0.5f; // Based on lbl_803300A0 reference in assembly
-        }
-        
-        vec[i] = result;
-    }
+	float* rand_values;
+
+	if (lbl_8032ED70 != 0) {
+		return;
+	}
+
+	if (*(int*)data2 == *((int*)data1 + 3)) {
+		int** base_ptr = (int**)((char*)data3 + 0xc);
+		int offset = **base_ptr;
+		u8 flag = *((u8*)data2 + 0x10);
+		float value;
+		rand_values = (float*)((char*)data1 + offset + 0x80);
+
+		value = RandF__5CMathFv(&math);
+		if (flag != 0) {
+			value = value + RandF__5CMathFv(&math);
+		} else {
+			value = value * lbl_803300A0;
+		}
+		rand_values[0] = value;
+
+		value = RandF__5CMathFv(&math);
+		if (flag != 0) {
+			value = value + RandF__5CMathFv(&math);
+		} else {
+			value = value * lbl_803300A0;
+		}
+		rand_values[1] = value;
+
+		value = RandF__5CMathFv(&math);
+		if (flag != 0) {
+			value = value + RandF__5CMathFv(&math);
+		} else {
+			value = value * lbl_803300A0;
+		}
+		rand_values[2] = value;
+
+		value = RandF__5CMathFv(&math);
+		if (flag != 0) {
+			value = value + RandF__5CMathFv(&math);
+		} else {
+			value = value * lbl_803300A0;
+		}
+		rand_values[3] = value;
+	} else {
+		int** base_ptr = (int**)((char*)data3 + 0xc);
+		int offset = **base_ptr;
+		rand_values = (float*)((char*)data1 + offset + 0x80);
+	}
+
+	s16* target_color;
+	int color_offset = *((int*)data2 + 1);
+	if (color_offset == -1) {
+		target_color = lbl_801EADC8;
+	} else {
+		target_color = (s16*)((char*)data1 + color_offset + 0x80);
+	}
+
+	{
+		s16 base = *(s16*)((char*)data2 + 0x8);
+		s16 current = target_color[0];
+		s8 delta = (s8)((float)base * rand_values[0] - (float)current);
+		target_color[0] = (s16)(current + delta);
+	}
+
+	{
+		s16 base = *(s16*)((char*)data2 + 0xa);
+		s16 current = target_color[1];
+		s8 delta = (s8)((float)base * rand_values[1] - (float)current);
+		target_color[1] = (s16)(current + delta);
+	}
+
+	{
+		s16 base = *(s16*)((char*)data2 + 0xc);
+		s16 current = target_color[2];
+		s8 delta = (s8)((float)base * rand_values[2] - (float)current);
+		target_color[2] = (s16)(current + delta);
+	}
+
+	{
+		s16 base = *(s16*)((char*)data2 + 0xe);
+		s16 current = target_color[3];
+		s8 delta = (s8)((float)base * rand_values[3] - (float)current);
+		target_color[3] = (s16)(current + delta);
+	}
 }

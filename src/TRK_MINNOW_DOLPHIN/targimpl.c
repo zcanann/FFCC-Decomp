@@ -367,38 +367,6 @@ DSError TRKTargetReadInstruction(void* data, u32 start)
     return error;
 }
 
-/*
- * --INFO--
- * PAL Address: 0x801abef8
- * PAL Size: 196b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-DSError TRKTargetAccessARAM(u32 p1, u32 p2, u32* p3, BOOL read)
-{
-    DSError error = DS_NoError;
-    TRKExceptionStatus tempExceptionStatus = gTRKExceptionStatus;
-
-    gTRKExceptionStatus.exceptionDetected = FALSE;
-
-    if (read) {
-        TRK__read_aram((int)p1, p2, p3);
-    } else {
-        TRK__write_aram((int)p1, p2, p3);
-    }
-
-    if (gTRKExceptionStatus.exceptionDetected) {
-        error = DS_CWDSException;
-        *p3 = 0;
-    }
-
-    gTRKExceptionStatus = tempExceptionStatus;
-
-    return error;
-}
-
 DSError TRKTargetAccessDefault(u32 firstRegister, u32 lastRegister,
                                TRKBuffer* b, size_t* registersLengthPtr,
                                BOOL read)
@@ -1288,38 +1256,6 @@ DSError TRKPPCAccessSpecialReg(void* value, u32* access_func, BOOL read)
     (*asm_access)((u32*)value, (void*)&TRKvalue128_temp);
 
     return DS_NoError;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801abef8
- * PAL Size: 196b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-DSError TRKTargetAccessARAM(u32 p1, u32 p2, u32* p3, BOOL read)
-{
-    DSError error = DS_NoError;
-    TRKExceptionStatus exceptionStatus = gTRKExceptionStatus;
-
-    gTRKExceptionStatus.exceptionDetected = FALSE;
-
-    if (read) {
-        TRK__read_aram((int)p1, p2, p3);
-    } else {
-        TRK__write_aram((int)p1, p2, p3);
-    }
-
-    if (gTRKExceptionStatus.exceptionDetected) {
-        error = DS_CWDSException;
-        *p3   = 0;
-    }
-
-    gTRKExceptionStatus = exceptionStatus;
-
-    return error;
 }
 
 void TRKTargetSetInputPendingPtr(void* ptr) { gTRKState.inputPendingPtr = ptr; }

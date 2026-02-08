@@ -3,6 +3,7 @@
 
 class CChunkFile
 {
+public:
 	class CChunk
 	{
 	public:

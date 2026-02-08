@@ -1202,7 +1202,7 @@ void PSMTXReflect(register Mtx m, const register Vec *p, const register Vec *n)
 }
 #endif
 
-void C_MTXLookAt(Mtx m, const Vec *camPos, const Vec *camUp, const Vec *target)
+void C_MTXLookAt(Mtx m, const Point3d* camPos, const Vec* camUp, const Point3d* target)
 {
     Vec vLook, vRight, vUp;
 
@@ -1217,17 +1217,17 @@ void C_MTXLookAt(Mtx m, const Vec *camPos, const Vec *camUp, const Vec *target)
     m[0][0] = vRight.x;
     m[0][1] = vRight.y;
     m[0][2] = vRight.z;
-    m[0][3] = -(camPos->x * vRight.x + camPos->y * vRight.y + camPos->z * vRight.z);
+    m[0][3] = -camPos->x * vRight.x - camPos->y * vRight.y - camPos->z * vRight.z;
 
     m[1][0] = vUp.x;
     m[1][1] = vUp.y;
     m[1][2] = vUp.z;
-    m[1][3] = -(camPos->x * vUp.x + camPos->y * vUp.y + camPos->z * vUp.z);
+    m[1][3] = -camPos->x * vUp.x - camPos->y * vUp.y - camPos->z * vUp.z;
 
     m[2][0] = vLook.x;
     m[2][1] = vLook.y;
     m[2][2] = vLook.z;
-    m[2][3] = -(camPos->x * vLook.x + camPos->y * vLook.y + camPos->z * vLook.z);
+    m[2][3] = -camPos->x * vLook.x - camPos->y * vLook.y - camPos->z * vLook.z;
 }
 
 void C_MTXLightFrustum(Mtx m, float t, float b, float l, float r, float n, float scaleS, float scaleT, float transS, float transT)

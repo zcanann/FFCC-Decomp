@@ -5748,20 +5748,41 @@ int JoyBus::GBAReady(int portIndex)
  */
 int JoyBus::SendAllStat(int portIndex)
 {
-    ThreadParam& threadParam = m_threadParams[portIndex];
-    const int port = threadParam.m_portIndex;
+    ThreadParam* threadParam = &m_threadParams[portIndex];
+    int port = threadParam->m_portIndex;
 
-    threadParam.m_state = 0;
-    threadParam.m_altState = 0;
+    threadParam->m_state = 0;
+    threadParam->m_altState = 0;
 
     OSWaitSemaphore(&m_accessSemaphores[port]);
-	
-	// TODO: The compiler is either somehow unrolling this, or our assumptions are wrong about recvQueue format
-    for (int i = 0; i < 64; i++)
+
+    unsigned int* cmdQueue = m_cmdQueueData[port];
+    unsigned int* recvQueue = m_recvQueueEntriesArr[port];
+    int i = 8;
+
+    do
     {
-        m_cmdQueueData[port][i] = 0;
-        m_recvQueueEntriesArr[port][i] = 0;
-    }
+        cmdQueue[0] = 0;
+        recvQueue[0] = 0;
+        cmdQueue[1] = 0;
+        recvQueue[1] = 0;
+        cmdQueue[2] = 0;
+        recvQueue[2] = 0;
+        cmdQueue[3] = 0;
+        recvQueue[3] = 0;
+        cmdQueue[4] = 0;
+        recvQueue[4] = 0;
+        cmdQueue[5] = 0;
+        recvQueue[5] = 0;
+        cmdQueue[6] = 0;
+        recvQueue[6] = 0;
+        cmdQueue[7] = 0;
+        recvQueue[7] = 0;
+
+        cmdQueue += 8;
+        recvQueue += 8;
+        i--;
+    } while (i != 0);
 
     m_cmdCount[port] = 0;
     m_secCmdCount[port] = 0;

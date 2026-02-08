@@ -188,14 +188,8 @@ apply_font_yes:
     short* windowInfo = *(short**)((char*)this + 0x848);
     int x = (int)((windowInfo[2] - yesWidth) * 0.5f + windowInfo[0]);
     if (right != 0) {
-        const char* noText = 0;
-        if ((languageId >= 1) && (languageId <= 5)) {
-            noText = lbl_8021672C[languageId - 1];
-        }
-        if (noText != 0) {
-            const int noWidth = GetWidth__5CFontFPc(font, noText);
-            x += yesWidth - noWidth;
-        }
+        const int noWidth = GetWidth__5CFontFPc(font, lbl_8021672C[languageId - 1]);
+        x += yesWidth - noWidth;
     }
     return x - 0x1e;
 }
@@ -243,14 +237,8 @@ apply_font_slot:
     short* windowInfo = *(short**)((char*)this + 0x848);
     int x = (int)((windowInfo[2] - slotAWidth) * 0.5f + windowInfo[0]);
     if (right != 0) {
-        const char* slotBText = 0;
-        if ((languageId >= 1) && (languageId <= 6)) {
-            slotBText = lbl_80216740[languageId - 1];
-        }
-        if (slotBText != 0) {
-            const int slotBWidth = GetWidth__5CFontFPc(font, slotBText);
-            x += slotAWidth - slotBWidth;
-        }
+        const int slotBWidth = GetWidth__5CFontFPc(font, lbl_80216740[languageId - 1]);
+        x += slotAWidth - slotBWidth;
     }
     return x - 0x1e;
 }

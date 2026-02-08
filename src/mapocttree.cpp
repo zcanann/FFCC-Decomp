@@ -3,12 +3,23 @@
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 8002d9fc
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void setbit32(unsigned long*, unsigned long)
+void setbit32(unsigned long* arg0, unsigned long arg1)
 {
-	// TODO
+	unsigned long* bits;
+	unsigned long offset;
+	unsigned long mask;
+
+	bits = (unsigned long*)((unsigned char*)arg0 + ((arg1 >> 3) & 0x1ffffffc));
+	offset = arg1 & 0x1f;
+	mask = 1UL << offset;
+	*bits |= mask;
 }
 
 /*

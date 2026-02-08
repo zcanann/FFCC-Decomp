@@ -152,7 +152,7 @@ void RedDelete(int address)
  * JP Address: TODO
  * JP Size: TODO
  */
-void RedDelete(unsigned int param_1)
+void RedDelete(void* param_1)
 {
 	RedDelete((int)param_1);
 }
@@ -297,7 +297,7 @@ void RedDeleteA(int address)
  * JP Address: TODO
  * JP Size: TODO
  */
-void RedDeleteA(unsigned int param_1)
+void RedDeleteA(void* param_1)
 {
 	RedDeleteA((int)param_1);
 }
@@ -325,60 +325,84 @@ void CRedMemory::Init(int param1, int param2, int param3, int param4)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c05c8
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedMemory::GetMainBufferAddress()
+int CRedMemory::GetMainBufferAddress()
 {
-	// TODO
+	return DAT_8032f490;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c05d0
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedMemory::GetMainBufferSize()
+int CRedMemory::GetMainBufferSize()
 {
-	// TODO
+	return DAT_8032f498;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c05d8
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedMemory::GetMainBankAddress()
+int* CRedMemory::GetMainBankAddress()
 {
-	// TODO
+	return DAT_8032f4a0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c05e0
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedMemory::GetABufferAddress()
+int CRedMemory::GetABufferAddress()
 {
-	// TODO
+	return DAT_8032f494;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c05e8
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedMemory::GetABufferSize()
+int CRedMemory::GetABufferSize()
 {
-	// TODO
+	return DAT_8032f49c;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c05f0
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedMemory::GetABankAddress()
+int* CRedMemory::GetABankAddress()
 {
-	// TODO
+	return DAT_8032f4a4;
 }

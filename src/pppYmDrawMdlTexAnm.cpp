@@ -1,20 +1,73 @@
 #include "ffcc/pppYmDrawMdlTexAnm.h"
 #include "dolphin/os.h"
 
+struct pppYmDrawMdlTexAnmWork {
+    u32 m_frame;
+    u32 m_wait;
+    u32 m_tilesU;
+    u32 m_tilesV;
+    f32 m_perU;
+    f32 m_perV;
+};
+
+struct CMapMeshUVLayout {
+    u8 _pad0[0x06];
+    u16 m_uvCount;
+    u8 _pad1[0x30];
+    s16* m_uvPairs;
+};
+
+extern f32 FLOAT_8033054c;
+extern _pppEnvSt* pppEnvStPtr;
+extern char DAT_801d9c54[];
+extern char s_PerU___0_2f_PerV___0_2f_801d9c38[];
+
 extern "C" {
 
 /*
  * --INFO--
- * PAL Address: 8008aa84
- * PAL Size: TODO
+ * PAL Address: 0x8008aa84
+ * PAL Size: 316b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmDrawMdlTexAnm(void* param1, void* param2, void* param3)
+void pppConstructYmDrawMdlTexAnm(pppYmDrawMdlTexAnm* param1, pppYmDrawMdlTexAnmOffsets* param2, void* param3)
 {
-    // Basic constructor - initialize texture animation system
+    pppYmDrawMdlTexAnmWork* work;
+    CMapMesh* mapMesh;
+    CMapMeshUVLayout* uvLayout;
+    s16* uvPairs;
+    int i;
+
+    (void)param3;
+    work = (pppYmDrawMdlTexAnmWork*)((u8*)param1 + 0x80 + param2->m_serializedDataOffsets[2]);
+    work->m_frame = 0;
+    work->m_wait = 0x200;
+
+    OSReport(DAT_801d9c54);
+
+    work->m_perU = FLOAT_8033054c;
+    work->m_perV = FLOAT_8033054c;
+
+    mapMesh = pppEnvStPtr->m_mapMeshPtr;
+    if (mapMesh != NULL) {
+        uvLayout = (CMapMeshUVLayout*)mapMesh;
+        uvPairs = uvLayout->m_uvPairs;
+        for (i = 0; i < (int)uvLayout->m_uvCount; i++) {
+            const f32 u = (f32)uvPairs[0];
+            const f32 v = (f32)uvPairs[1];
+            if (work->m_perU < u) {
+                work->m_perU = u;
+            }
+            if (work->m_perV < v) {
+                work->m_perV = v;
+            }
+            uvPairs += 2;
+        }
+        OSReport(s_PerU___0_2f_PerV___0_2f_801d9c38, work->m_perU, work->m_perV);
+    }
 }
 
 /*
@@ -26,8 +79,11 @@ void pppConstructYmDrawMdlTexAnm(void* param1, void* param2, void* param3)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructYmDrawMdlTexAnm(void* param1, void* param2, void* param3)
+void pppDestructYmDrawMdlTexAnm(pppYmDrawMdlTexAnm* param1, pppYmDrawMdlTexAnmOffsets* param2, void* param3)
 {
+    (void)param1;
+    (void)param2;
+    (void)param3;
     // Reset texture animation state
     // Reset animation counters and UV coordinates
 }
@@ -41,8 +97,11 @@ void pppDestructYmDrawMdlTexAnm(void* param1, void* param2, void* param3)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmDrawMdlTexAnm(void* param1, void* param2, void* param3)
+void pppFrameYmDrawMdlTexAnm(pppYmDrawMdlTexAnm* param1, pppYmDrawMdlTexAnmStep* param2, pppYmDrawMdlTexAnmOffsets* param3)
 {
+    (void)param1;
+    (void)param2;
+    (void)param3;
     // Update texture animation frame
     // Handle UV coordinate updates and frame counting
 }
@@ -56,8 +115,11 @@ void pppFrameYmDrawMdlTexAnm(void* param1, void* param2, void* param3)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderYmDrawMdlTexAnm(void* param1, void* param2, void* param3)
+void pppRenderYmDrawMdlTexAnm(pppYmDrawMdlTexAnm* param1, pppYmDrawMdlTexAnmStep* param2, pppYmDrawMdlTexAnmOffsets* param3)
 {
+    (void)param1;
+    (void)param2;
+    (void)param3;
     // Render texture animated models
     // Matrix transformations and model drawing
 }

@@ -3,6 +3,8 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/errno.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/math.h"
 
+static const double one = 1.0, tiny = 1.0e-300;
+
 /*
  * --INFO--
  * PAL Address: 0x801D677C
@@ -105,19 +107,24 @@ double __ieee754_sqrt(double x) {
     }
 
     if ((ix0 | ix1) != 0) {
-        if (q1 == 0xffffffff) {
-            q1 = 0;
-            q += 1;
-        } else {
-            q1 += (q1 & 1);
+        z = one - tiny;
+        if (z >= one) {
+            z = one + tiny;
+            if (q1 == 0xffffffff) {
+                q1 = 0;
+                q += 1;
+            } else {
+                q1 += (q1 & 1);
+            }
         }
     }
 
-    ix0 = (q >> 1) + 0x3fe00000 + (m << 20);
+    ix0 = (q >> 1) + 0x3fe00000;
     ix1 = q1 >> 1;
     if ((q & 1) != 0) {
         ix1 |= 0x80000000;
     }
+    ix0 += (m << 20);
     __HI(z) = ix0;
     __LO(z) = ix1;
     return z;

@@ -46,7 +46,7 @@ void pppConstructYmTracer(pppYmTracer* pppYmTracer, UnkC* param_2)
     f32* pfVar2;
     
     fVar1 = FLOAT_803306e8;
-    pfVar2 = (f32*)((int)(&pppYmTracer->field0_0x0 + 2) + *(int*)param_2);
+    pfVar2 = (f32*)((int)(&pppYmTracer->field0_0x0 + 2) + *param_2->m_serializedDataOffsets);
     
     pfVar2[10] = 0.0f;
     pfVar2[9] = 0.0f;
@@ -78,7 +78,7 @@ void pppConstruct2YmTracer(pppYmTracer* pppYmTracer, UnkC* param_2)
 {
     int iVar1;
     
-    iVar1 = *(int*)param_2;
+    iVar1 = *param_2->m_serializedDataOffsets;
     *(u16*)((char*)pppYmTracer + 0xae + iVar1) = 0;
     *(u16*)((char*)pppYmTracer + 0xac + iVar1) = 0;
 }
@@ -94,7 +94,7 @@ void pppConstruct2YmTracer(pppYmTracer* pppYmTracer, UnkC* param_2)
  */
 void pppDestructYmTracer(pppYmTracer* pppYmTracer, UnkC* param_2)
 {
-    CMemory::CStage** stagePtr = (CMemory::CStage**)((char*)pppYmTracer + 0xa8 + *(int*)param_2);
+    CMemory::CStage** stagePtr = (CMemory::CStage**)((char*)pppYmTracer + 0xa8 + *param_2->m_serializedDataOffsets);
     if (*stagePtr != nullptr) {
         pppHeapUseRate(*stagePtr);
     }

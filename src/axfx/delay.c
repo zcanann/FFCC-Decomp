@@ -40,36 +40,21 @@ void AXFXDelayCallback(AXFX_BUFFERUPDATE* bufferUpdate, AXFX_DELAY* delay) {
     delay->currentPos[2] = (s32) ((delay->currentPos[2] + 1) % delay->currentSize[2]);
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801966E8
+ * PAL Size: 516b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 int AXFXDelaySettings(AXFX_DELAY* delay) {
     u32 i;
     s32* l;
     s32* r;
     s32* s;
     BOOL old;
-
-    ASSERTMSGLINE(67, delay->delay[0] >= 10 && delay->delay[0] <= 5000 &&
-                     delay->delay[1] >= 10 && delay->delay[1] <= 5000 &&
-                     delay->delay[2] >= 10 && delay->delay[2] <= 5000 &&
-                     delay->feedback[0] >= 0 && delay->feedback[0] <= 100 &&
-                     delay->feedback[1] >= 0 && delay->feedback[1] <= 100 &&
-                     delay->feedback[2] >= 0 && delay->feedback[2] <= 100 &&
-                     delay->output[0] >= 0 && delay->output[0] <= 100 &&
-                     delay->output[1] >= 0 && delay->output[1] <= 100 &&
-                     delay->output[2] >= 0 && delay->output[2] <= 100,
-                     "The value of specified parameter is out of range.");
-
-    if (delay->delay[0] < 10 || delay->delay[0] > 5000 ||
-        delay->delay[1] < 10 || delay->delay[1] > 5000 ||
-        delay->delay[2] < 10 || delay->delay[2] > 5000 ||
-        delay->feedback[0] < 0 || delay->feedback[0] > 100 ||
-        delay->feedback[1] < 0 || delay->feedback[1] > 100 ||
-        delay->feedback[2] < 0 || delay->feedback[2] > 100 ||
-        delay->output[0] < 0 || delay->output[0] > 100 ||
-        delay->output[1] < 0 || delay->output[1] > 100 ||
-        delay->output[2] < 0 || delay->output[2] > 100)
-    {
-        return 0;
-    }
 
     AXFXDelayShutdown(delay);
     old = OSDisableInterrupts();
@@ -84,13 +69,6 @@ int AXFXDelaySettings(AXFX_DELAY* delay) {
     delay->left = __AXFXAlloc(delay->currentSize[0] * 0xA0 * 4);
     delay->right = __AXFXAlloc(delay->currentSize[1] * 0xA0 * 4);
     delay->sur = __AXFXAlloc(delay->currentSize[2] * 0xA0 * 4);
-
-    ASSERTMSGLINE(98, delay->left && delay->right && delay->sur, "Can't allocate the memory.");
-
-    if (delay->left == NULL || delay->right == NULL || delay->sur == NULL) {
-        AXFXDelayShutdown(delay);
-        return 0;
-    }
 
     l = delay->left;
     r = delay->right;

@@ -3,6 +3,8 @@
 
 extern CMath math;
 extern int lbl_8032ED70;
+extern float lbl_80330080;
+extern unsigned char lbl_801EADC8[];
 
 // Forward declaration to handle RandF return value
 extern "C" float RandF__5CMathFv();
@@ -36,46 +38,56 @@ void randf(unsigned char)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppSRandDownFV(void* param1, void* param2)
+void pppSRandDownFV(void* param1, void* param2, void* param3)
 {
-    if (lbl_8032ED70 != 0) return;
-    
-    // Check if indices match
-    int currentIndex = *((int*)param2);
-    int targetIndex = *((int*)param1 + 3);
-    if (currentIndex != targetIndex) return;
-    
-    // Get data offset and calculate target array
-    int dataOffset = *((int*)param2 + 3);
-    float* target = (float*)((char*)param1 + dataOffset + 0x80);
-    
-    unsigned char flag = *((unsigned char*)param2 + 12);
-    
-    // Generate 3 random float values (FV = Float Vector, 3D)
-    for (int i = 0; i < 3; i++) {
-        float randVal = -RandF__5CMathFv();  // Negative for "Down"
-        if (flag != 0) {
-            float randVal2 = -RandF__5CMathFv();  
-            randVal = (randVal + randVal2) * 0.5f;
+    if (lbl_8032ED70 != 0) {
+        return;
+    }
+
+    if (*(int*)((char*)param1 + 0xC) == 0) {
+        int dataOffset = **(int**)((char*)param3 + 0xC);
+        float* randomVec = (float*)((char*)param1 + dataOffset + 0x80);
+        unsigned char blendTwice = *(unsigned char*)((char*)param2 + 0x18);
+        float randVal;
+
+        randVal = -RandF__5CMathFv();
+        if (blendTwice != 0) {
+            randVal = (randVal - RandF__5CMathFv()) * lbl_80330080;
         }
-        target[i] = randVal;
+        randomVec[0] = randVal;
+
+        randVal = -RandF__5CMathFv();
+        if (blendTwice != 0) {
+            randVal = (randVal - RandF__5CMathFv()) * lbl_80330080;
+        }
+        randomVec[1] = randVal;
+
+        randVal = -RandF__5CMathFv();
+        if (blendTwice != 0) {
+            randVal = (randVal - RandF__5CMathFv()) * lbl_80330080;
+        }
+        randomVec[2] = randVal;
+        return;
     }
-    
-    // Get target color array pointer  
-    int colorOffset = *((int*)param2 + 1);
-    unsigned char* targetColors;
-    if (colorOffset == -1) {
-        extern unsigned char lbl_801EADC8[];
-        targetColors = lbl_801EADC8;
-    } else {
-        targetColors = (unsigned char*)((char*)param1 + colorOffset + 0x80);
+
+    if (*(int*)param2 != *(int*)((char*)param1 + 0xC)) {
+        return;
     }
-    
-    // Apply random modifications to 3 float values
-    for (int i = 0; i < 3; i++) {
-        float baseValue = *((float*)param2 + 2 + i);  // Different offset for FV
-        float randomMult = target[i];
-        float adjustment = baseValue * randomMult;
-        targetColors[i] += (unsigned char)adjustment;  // Addition to target
+
+    {
+        int dataOffset = **(int**)((char*)param3 + 0xC);
+        float* randomVec = (float*)((char*)param1 + dataOffset + 0x80);
+        int targetOffset = *(int*)((char*)param2 + 4);
+        unsigned char* target;
+
+        if (targetOffset == -1) {
+            target = lbl_801EADC8;
+        } else {
+            target = (unsigned char*)((char*)param1 + targetOffset + 0x80);
+        }
+
+        target[0] = (unsigned char)(target[0] + (int)(*(float*)((char*)param2 + 8) * randomVec[0]));
+        target[1] = (unsigned char)(target[1] + (int)(*(float*)((char*)param2 + 0xC) * randomVec[1]));
+        target[2] = (unsigned char)(target[2] + (int)(*(float*)((char*)param2 + 0x10) * randomVec[2]));
     }
 }

@@ -18,16 +18,24 @@ extern int DAT_8032ed70;
  */
 void pppConstructLocationTitle2(struct pppLocationTitle2* locationTitle, struct UnkC* unkC)
 {
-    float fVar1;
-    u32* puVar2;
-    
-    fVar1 = 1.0f; // FLOAT_80330f48 constant placeholder
-    puVar2 = (u32*)((char*)locationTitle + 8 + *unkC->m_serializedDataOffsets);
-    *puVar2 = 0;
-    *(u16*)(puVar2 + 1) = 0;
-    puVar2[4] = *(u32*)&fVar1;
-    puVar2[3] = *(u32*)&fVar1;
-    puVar2[2] = *(u32*)&fVar1;
+    struct LocationTitle2Work {
+        void* data;
+        u16 count;
+        u16 pad;
+        float scaleX;
+        float scaleY;
+        float scaleZ;
+    };
+    float one;
+    LocationTitle2Work* work;
+
+    one = 1.0f;
+    work = (LocationTitle2Work*)((char*)locationTitle + 8 + *unkC->m_serializedDataOffsets);
+    work->data = 0;
+    work->count = 0;
+    work->scaleZ = one;
+    work->scaleY = one;
+    work->scaleX = one;
 }
 
 /*

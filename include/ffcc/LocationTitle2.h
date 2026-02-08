@@ -21,6 +21,7 @@ struct UnkB {
 };
 
 struct UnkC {
+    char pad[0xC];
     s32* m_serializedDataOffsets;
 };
 

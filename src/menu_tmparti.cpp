@@ -203,8 +203,117 @@ unsigned int CMenuPcs::TmpArtiOpen()
  */
 void CMenuPcs::TmpArtiCtrl()
 {
-	// Basic control logic placeholder
-	Sound.PlaySe(3, 0x40, 0x7f, 0);
+	bool bVar1;
+	float fVar2;
+	unsigned short uVar3;
+	unsigned int uVar4;
+	unsigned int uVar5;
+	int iVar6;
+	int iVar7;
+	int iVar8;
+	unsigned int uVar9;
+
+	bVar1 = false;
+	*(short *)(*(int *)((char *)this + 0x82c) + 0x32) = *(short *)(*(int *)((char *)this + 0x82c) + 0x30);
+	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+		bVar1 = true;
+	}
+
+	if (bVar1) {
+		uVar3 = 0;
+	} else {
+		uVar3 = Pad._8_2_;
+	}
+
+	if (uVar3 == 0) {
+		bVar1 = false;
+	} else if ((uVar3 & 0x20) == 0) {
+		if ((uVar3 & 0x40) == 0) {
+			if ((uVar3 & 0x100) == 0) {
+				if ((uVar3 & 0x200) != 0) {
+					*(unsigned char *)(*(int *)((char *)this + 0x82c) + 0xd) = 1;
+					Sound.PlaySe(3, 0x40, 0x7f, 0);
+					bVar1 = true;
+				} else {
+					bVar1 = false;
+				}
+			} else {
+				Sound.PlaySe(4, 0x40, 0x7f, 0);
+				bVar1 = false;
+			}
+		} else {
+			*(short *)(*(int *)((char *)this + 0x82c) + 0x1e) = -1;
+			Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+			bVar1 = true;
+		}
+	} else {
+		*(short *)(*(int *)((char *)this + 0x82c) + 0x1e) = 1;
+		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+		bVar1 = true;
+	}
+
+	fVar2 = 1.0f;
+	uVar4 = Game.game.m_scriptFoodBase[0];
+	if (bVar1) {
+		iVar6 = *(int *)((char *)this + 0x850) + 8;
+		for (iVar7 = 0; iVar7 < **(short **)((char *)this + 0x850); iVar7 = iVar7 + 1) {
+			*(float *)(iVar6 + 0x10) = fVar2;
+			*(float *)(iVar6 + 0x14) = fVar2;
+			iVar6 = iVar6 + 0x40;
+		}
+
+		uVar5 = (unsigned int)*(short *)(uVar4 + 0xbaa);
+		iVar7 = 0;
+		iVar6 = (uVar5 - 1) * 0x40;
+		if (-1 < (int)(uVar5 - 1)) {
+			uVar9 = uVar5 >> 3;
+			if (uVar9 != 0) {
+				do {
+					iVar8 = *(int *)((char *)this + 0x850) + iVar6 + 8;
+					*(int *)(iVar8 + 0x24) = iVar7;
+					*(unsigned int *)(iVar8 + 0x28) = 3;
+					iVar8 = *(int *)((char *)this + 0x850) + iVar6 + -0x38;
+					*(int *)(iVar8 + 0x24) = iVar7 + 1;
+					*(unsigned int *)(iVar8 + 0x28) = 3;
+					iVar8 = *(int *)((char *)this + 0x850) + iVar6 + -0x78;
+					*(int *)(iVar8 + 0x24) = iVar7 + 2;
+					*(unsigned int *)(iVar8 + 0x28) = 3;
+					iVar8 = *(int *)((char *)this + 0x850) + iVar6 + -0xb8;
+					*(int *)(iVar8 + 0x24) = iVar7 + 3;
+					*(unsigned int *)(iVar8 + 0x28) = 3;
+					iVar8 = *(int *)((char *)this + 0x850) + iVar6 + -0xf8;
+					*(int *)(iVar8 + 0x24) = iVar7 + 4;
+					*(unsigned int *)(iVar8 + 0x28) = 3;
+					iVar8 = *(int *)((char *)this + 0x850) + iVar6 + -0x138;
+					*(int *)(iVar8 + 0x24) = iVar7 + 5;
+					*(unsigned int *)(iVar8 + 0x28) = 3;
+					iVar8 = *(int *)((char *)this + 0x850) + iVar6 + -0x178;
+					*(int *)(iVar8 + 0x24) = iVar7 + 6;
+					*(unsigned int *)(iVar8 + 0x28) = 3;
+					iVar8 = iVar6 + -0x1b8;
+					iVar6 = iVar6 + -0x200;
+					iVar8 = *(int *)((char *)this + 0x850) + iVar8;
+					*(int *)(iVar8 + 0x24) = iVar7 + 7;
+					iVar7 = iVar7 + 8;
+					*(unsigned int *)(iVar8 + 0x28) = 3;
+					uVar9 = uVar9 - 1;
+				} while (uVar9 != 0);
+				uVar5 = uVar5 & 7;
+				if (uVar5 == 0) {
+					return;
+				}
+			}
+			do {
+				iVar8 = iVar6 + 8;
+				iVar6 = iVar6 + -0x40;
+				iVar8 = *(int *)((char *)this + 0x850) + iVar8;
+				*(int *)(iVar8 + 0x24) = iVar7;
+				iVar7 = iVar7 + 1;
+				*(unsigned int *)(iVar8 + 0x28) = 3;
+				uVar5 = uVar5 - 1;
+			} while (uVar5 != 0);
+		}
+	}
 }
 
 /*

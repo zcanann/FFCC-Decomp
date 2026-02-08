@@ -237,27 +237,17 @@ int __OSCheckSram(void) {
 }
 
 int __OSReadROM(void * buffer, s32 length, s32 offset) {
-    int err;
-    u32 cmd;
+    OSSram* sram;
+    int mode;
 
-    ASSERTLINE(497, length <= 1024);
-    DCInvalidateRange(buffer, length);
-    if (EXILock(0, 1, NULL) == 0) {
-        return 0;
-    }
-    if (EXISelect(0, 1, 3) == 0) {
-        EXIUnlock(0);
-        return 0;
-    }
-    cmd = offset << 6;
-    err = 0;
-    err |= !EXIImm(0, &cmd, 4, 1, 0);
-    err |= !EXISync(0);
-    err |= !EXIDma(0, buffer, length, 0, NULL);
-    err |= !EXISync(0);
-    err |= !EXIDeselect(0);
-    EXIUnlock(0);
-    return !err;
+    (void)buffer;
+    (void)length;
+    (void)offset;
+
+    sram = __OSLockSram();
+    mode = (sram->flags & 4) ? 1 : 0;
+    __OSUnlockSram(0);
+    return mode;
 }
 
 static void __OSReadROMCallback(s32 chan) {

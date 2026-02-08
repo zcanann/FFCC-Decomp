@@ -19,16 +19,18 @@ void pppConstructCallBackDistance(pppCallBackDistance* param1, UnkC* param2)
     Vec local_1c;
     f64 dVar3;
     s32 iVar1;
+    f32* pDataVal;
 
     iVar1 = *param2->m_serializedDataOffsets;
+    pDataVal = (f32*)((u8*)param1 + 0x80 + iVar1);
     local_28.x = pppMngStPtr->m_matrix.value[0][3];
     local_28.y = pppMngStPtr->m_matrix.value[1][3];
     local_28.z = pppMngStPtr->m_matrix.value[2][3];
-    local_1c.x = pppMngStPtr->m_scale.x;
-    local_1c.y = pppMngStPtr->m_scale.y;
-    local_1c.z = pppMngStPtr->m_scale.z;
+    local_1c.x = *(f32*)((u8*)pppMngStPtr + 0x68);
+    local_1c.y = *(f32*)((u8*)pppMngStPtr + 0x6c);
+    local_1c.z = *(f32*)((u8*)pppMngStPtr + 0x70);
     dVar3 = (f64)PSVECDistance(&local_28, &local_1c);
-    *(f32*)((s32)(&param1->field0_0x0 + 2) + iVar1) = (f32)dVar3;
+    *pDataVal = (f32)dVar3;
 }
 
 /*

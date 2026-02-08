@@ -136,15 +136,14 @@ void pppDrawShape2(void* param1, void* param2, void* param3)
     ShapeControlData* controlData = (ShapeControlData*)param2;
     ShapeState* shapeData = (ShapeState*)((u8*)param1 + runtimeData->shapeDataOffset + 0x80);
     void* posData = (u8*)param1 + runtimeData->posDataOffset + 0x80;
-    s16 type = controlData->type;
 
-    if ((u16)type == 0xFFFF) {
+    if ((u16)controlData->type == 0xFFFF) {
         return;
     }
 
-    void* shapeSpec = ((void**)*(void**)((u8*)lbl_8032ED54 + 0xC))[type];
-    void* currentShape = (u8*)shapeSpec + ((u32)shapeData->currentId << 3) + 0x10;
-    void* materialData = *(void**)((u8*)lbl_8032ED54 + 0x4);
+    void** shapeTables = *(void***)((u8*)lbl_8032ED54 + 0xC);
+    void* shapeSpec = *(void**)((u8*)shapeTables + ((u32)controlData->type << 2));
+    ShapeSpecEntry* shape = (ShapeSpecEntry*)((u8*)shapeSpec + ((u32)shapeData->currentId << 3) + 0x10);
 
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
         posData,
@@ -160,6 +159,5 @@ void pppDrawShape2(void* param1, void* param2, void* param3)
     );
 
     pppSetBlendMode__FUc(controlData->blendMode);
-
-    pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(currentShape, materialData, controlData->blendMode);
+    pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(shape, *(void**)((u8*)lbl_8032ED54 + 0x4), controlData->blendMode);
 }

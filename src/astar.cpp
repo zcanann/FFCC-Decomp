@@ -21,6 +21,7 @@ static const float kDrawAStarSphereRadius = 5.0f;
 
 extern Mtx gFlatPosMtx;
 extern int DAT_8032ed70;
+extern unsigned char lbl_8032EC90[];
 
 /*
  * --INFO--
@@ -900,7 +901,10 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 	cyl.m_radius2 = 0.0f;
 	cyl.m_height2 = 0.0f;
 
-	MapMng.CheckHitCylinderNear(&cyl, reinterpret_cast<Vec*>(&bottom), mask);
+	if (MapMng.CheckHitCylinderNear(&cyl, reinterpret_cast<Vec*>(&bottom), mask) != 0)
+	{
+		polygonGroup = lbl_8032EC90[0x47];
+	}
 
 	return polygonGroup;
 }
@@ -937,15 +941,7 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 
 	unsigned long mask = static_cast<unsigned long>(hitAttributeMask);
 
-	// Debug override is still unlinked, keep it commented:
-	// if (DbgMenuPcs._10844_4_ & 1) {
-	//	 mask = m_hitAttributeMask;
-	// }
-
 	MapMng.CheckHitCylinderNear(&cyl, reinterpret_cast<Vec*>(&bottom), mask);
-
-	// TODO: when DAT_8032ec90 is named, plug the group byte in here:
-	// polygonGroup = *(unsigned char*)(DAT_8032ec90 + 0x47);
 
 	return polygonGroup;
 }

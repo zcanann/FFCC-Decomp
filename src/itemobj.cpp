@@ -1,4 +1,19 @@
 #include "ffcc/itemobj.h"
+#include "ffcc/prgobj.h"
+
+/*
+ * --INFO--
+ * PAL Address: 0x80124b80
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CGPrgObj::getReplaceStat(int state)
+{
+	return state;
+}
 
 /*
  * --INFO--

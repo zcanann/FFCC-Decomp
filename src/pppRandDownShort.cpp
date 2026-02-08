@@ -1,7 +1,14 @@
 #include "ffcc/pppRandDownShort.h"
 #include "ffcc/math.h"
+#include "types.h"
 
-extern CMath math;
+extern CMath math[];
+extern "C" f32 RandF__5CMathFv(CMath*);
+
+extern s32 lbl_8032ED70;
+extern f32 lbl_8032FF78;
+extern f64 lbl_8032FF80;
+extern s16 lbl_801EADC8;
 
 /*
  * --INFO--
@@ -14,73 +21,48 @@ extern CMath math;
  */
 void pppRandDownShort(void* r3, void* r4, void* r5)
 {
-    // Check global flag first - assembly shows early return if this is 0
-    extern int lbl_8032ED70;
-    if (lbl_8032ED70 == 0) return;
-    
-    // Cast parameters based on register usage (r3->r30, r4->r31, r5->r29)
-    u8* param1 = (u8*)r3;  // r30
-    u8* param2 = (u8*)r4;  // r31  
-    u8* param3 = (u8*)r5;  // r29
-    
-    // Check param1[0xc] - if zero, take first branch
-    s32 p1_field_c = *(s32*)(param1 + 0xc);
-    if (p1_field_c == 0) {
-        // Generate random numbers
-        math.RandF();
-        f32 randomVal = 0.0f; // Placeholder since RandF() is void
-        
-        // Check param2[0xa] byte
-        u8 p2_field_a = *(u8*)(param2 + 0xa);
-        if (p2_field_a != 0) {
-            math.RandF();
-            // Do some calculation with second random
-            extern f32 lbl_8032FF78;
-            randomVal = randomVal * lbl_8032FF78;
-        }
-        
-        // Calculate target address and store result
-        u32* p3_field_c = (u32*)(param3 + 0xc);
-        u32* base_ptr = (u32*)*p3_field_c;
-        u32 offset = *base_ptr + 0x80;
-        f32* target = (f32*)(param1 + offset);
-        *target = randomVal;
-        
-    } else {
-        // Check if param2[0] matches param1[0xc]
-        s32 p2_field_0 = *(s32*)param2;
-        if (p2_field_0 != p1_field_c) return;
-        
-        // Calculate target memory location
-        u32* p3_field_c = (u32*)(param3 + 0xc);
-        u32* base_ptr = (u32*)*p3_field_c;
-        u32 base_offset = *base_ptr + 0x80;
-        
-        // Get param2[4]
-        s32 p2_field_4 = *(s32*)(param2 + 4);
-        s16* target_ptr;
-        
-        if (p2_field_4 == -1) {
-            extern s16 lbl_801EADC8;
-            target_ptr = &lbl_801EADC8;
+    u8* param1 = (u8*)r3;
+    u8* param2 = (u8*)r4;
+    u8* param3 = (u8*)r5;
+    f32* valuePtr;
+
+    if (lbl_8032ED70 == 0) {
+        s32 baseState = *(s32*)(param1 + 0xC);
+        if (baseState == 0) {
+            f32 value = -RandF__5CMathFv(&math[0]);
+
+            if (*(u8*)(param2 + 0xA) != 0) {
+                value = (value - RandF__5CMathFv(&math[0])) * lbl_8032FF78;
+            }
+
+            valuePtr = (f32*)(param1 + **(s32**)(param3 + 0xC) + 0x80);
+            *valuePtr = value;
         } else {
-            target_ptr = (s16*)(param1 + p2_field_4 + 0x80);
+            if (*(s32*)(param2 + 0) != baseState) {
+                return;
+            }
+
+            valuePtr = (f32*)(param1 + **(s32**)(param3 + 0xC) + 0x80);
         }
-        
-        // Get param2[8] (multiplier)
-        u16 multiplier = *(u16*)(param2 + 8);
-        
-        // Load current values and do arithmetic
-        f32 mem_val = *(f32*)(param1 + base_offset);
-        s16 current_short = *target_ptr;
-        
-        // Float conversion and arithmetic from assembly
-        extern f64 lbl_8032FF80;  // Used for float conversion
-        f32 mult_f = (f32)multiplier;
-        f32 result = mult_f * mem_val;
-        s16 delta = (s16)result;
-        
-        // Store result back
-        *target_ptr = current_short + delta;
+
+        s16* target;
+        if (*(s32*)(param2 + 4) == -1) {
+            target = &lbl_801EADC8;
+        } else {
+            target = (s16*)(param1 + *(s32*)(param2 + 4) + 0x80);
+        }
+
+        union {
+            f64 d;
+            struct {
+                u32 hi;
+                u32 lo;
+            } bits;
+        } cvt;
+
+        cvt.bits.hi = 0x43300000;
+        cvt.bits.lo = *(u16*)(param2 + 8);
+
+        *target = (s16)(*target + (s32)((f32)(cvt.d - lbl_8032FF80) * *valuePtr));
     }
 }

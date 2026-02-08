@@ -1,4 +1,18 @@
 #include "ffcc/THPSimple.h"
+#include "dolphin/thp/THPDraw.h"
+
+struct THPSimpleControl {
+    u8 pad0[0x80];
+    s32 texWidth;
+    s32 texHeight;
+    u8 pad88[0xAC];
+    u32* yImage;
+    u32* uImage;
+    u32* vImage;
+    s32 curFrame;
+};
+
+THPSimpleControl SimpleControl;
 
 /*
  * --INFO--
@@ -172,12 +186,28 @@ void VideoDecode(unsigned char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80104594
+ * PAL Size: 152b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void THPSimpleDrawCurrentFrame(void)
+s32 THPSimpleDrawCurrentFrame(GXRenderModeObj* obj, int x, int y, int polyWidth, int polyHeight)
 {
-	// TODO
+	s16 drawHeight;
+
+	if (SimpleControl.curFrame < 0) {
+		return -1;
+	}
+
+	THPGXYuv2RgbSetup(obj);
+	drawHeight = static_cast<s16>(polyHeight);
+	THPGXYuv2RgbDraw(SimpleControl.yImage, SimpleControl.uImage, SimpleControl.vImage, static_cast<s16>(x),
+	                 static_cast<s16>(y), static_cast<s16>(SimpleControl.texWidth),
+	                 static_cast<s16>(SimpleControl.texHeight), static_cast<s16>(polyWidth), drawHeight);
+	THPGXRestore();
+	return SimpleControl.curFrame;
 }
 
 /*

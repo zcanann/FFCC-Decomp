@@ -174,7 +174,9 @@ void GXSetCoPlanar(GXBool enable) {
 
     CHECK_GXBEGIN(613, "GXSetCoPlanar");
 
-    SET_REG_FIELD(615, __GXData->genMode, 1, 19, enable);
+    reg = __GXData->genMode;
+    reg = (reg & 0xFFF7FFFF) | ((u32)enable << 19);
+    __GXData->genMode = reg;
     reg = 0xFE080000;
     GX_WRITE_RAS_REG(reg);
     GX_WRITE_RAS_REG(__GXData->genMode);

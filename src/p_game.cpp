@@ -1,6 +1,7 @@
 #include "ffcc/p_game.h"
 
 extern "C" void __sinit_p_game_cpp();
+extern "C" char lbl_801E9F2C[];
 
 /*
  * --INFO--
@@ -56,7 +57,7 @@ void CGamePcs::Quit()
  */
 int CGamePcs::GetTable(unsigned long param)
 {
-    return param * 0x15c - 0x7fe160d4;
+    return (int)(lbl_801E9F2C + param * 0x15c);
 }
 
 /*

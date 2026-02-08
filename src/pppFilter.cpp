@@ -14,6 +14,7 @@ extern float FLOAT_803320c8;
 extern float FLOAT_803320cc;
 extern float FLOAT_803320d0;
 extern CUtil DAT_8032ec70;
+extern int lbl_8032ED70;
 
 extern "C" {
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
@@ -53,7 +54,10 @@ void pppDestructFilter(void)
  */
 void pppFrameFilter(void)
 {
-	return;
+	volatile int* stateFlag = &lbl_8032ED70;
+	if (*stateFlag == 0) {
+		return;
+	}
 }
 
 /*

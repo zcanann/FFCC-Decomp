@@ -3,10 +3,10 @@
 
 int RedNew(int);
 void RedDelete(int);
-void RedDelete(unsigned int);
+void RedDelete(void*);
 int RedNewA(int, int, int);
 void RedDeleteA(int);
-void RedDeleteA(unsigned int);
+void RedDeleteA(void*);
 
 class CRedMemory
 {
@@ -15,12 +15,12 @@ public:
 	~CRedMemory();
 
 	void Init(int, int, int, int);
-	void GetMainBufferAddress();
-	void GetMainBufferSize();
-	void GetMainBankAddress();
-	void GetABufferAddress();
-	void GetABufferSize();
-	void GetABankAddress();
+	int GetMainBufferAddress();
+	int GetMainBufferSize();
+	int* GetMainBankAddress();
+	int GetABufferAddress();
+	int GetABufferSize();
+	int* GetABankAddress();
 };
 
 #endif // _FFCC_REDSOUND_REDMEMORY_H

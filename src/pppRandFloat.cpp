@@ -32,35 +32,46 @@ struct RandFloatCtx {
  */
 void pppRandFloat(void* param1, void* param2, void* param3)
 {
-    int* base = (int*)param1;
-    int index = base[3];
+    int index;
+    int outputOffset;
+    RandFloatCtx* ctx;
+    RandFloatParam* data;
+    float* source;
+    float* output;
+    char* base;
+    float value;
 
-    if (lbl_8032ED70 == 0) {
-        RandFloatParam* data = (RandFloatParam*)param2;
-        RandFloatCtx* ctx = (RandFloatCtx*)param3;
+    if (lbl_8032ED70 != 0) {
+        return;
+    }
 
-        if (index == 0) {
-            float out = RandF__5CMathFv(&math);
+    base = (char*)param1;
+    index = ((int*)base)[3];
+    ctx = (RandFloatCtx*)param3;
+    data = (RandFloatParam*)param2;
 
-            if (data->randomTwice != 0) {
-                out = out + RandF__5CMathFv(&math);
-            } else {
-                out = out * lbl_8032FF88;
-            }
-
-            *(float*)((char*)base + (*ctx->outputOffset + 0x80)) = out;
-        } else if (data->targetId == index) {
-            int outputOffset = *ctx->outputOffset;
-            int sourceOffset = data->sourceOffset;
-            float* source;
-
-            if (sourceOffset == -1) {
-                source = &lbl_801EADC8;
-            } else {
-                source = (float*)((char*)base + (sourceOffset + 0x80));
-            }
-
-            *source = *source + (data->blend * *(float*)((char*)base + (outputOffset + 0x80)) - data->blend);
+    if (index == 0) {
+        value = RandF__5CMathFv(&math);
+        if (data->randomTwice != 0) {
+            value += RandF__5CMathFv(&math);
+        } else {
+            value *= lbl_8032FF88;
         }
+
+        outputOffset = *ctx->outputOffset;
+        output = (float*)(base + outputOffset + 0x80);
+        *output = value;
+        return;
+    }
+
+    if (data->targetId == index) {
+        outputOffset = *ctx->outputOffset;
+        output = (float*)(base + outputOffset + 0x80);
+        if (data->sourceOffset == -1) {
+            source = &lbl_801EADC8;
+        } else {
+            source = (float*)(base + data->sourceOffset + 0x80);
+        }
+        *source = *source + (data->blend * *output - data->blend);
     }
 }

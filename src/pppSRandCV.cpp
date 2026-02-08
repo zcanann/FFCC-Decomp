@@ -1,12 +1,23 @@
 #include "ffcc/pppSRandCV.h"
 #include "ffcc/math.h"
+#include "dolphin/types.h"
 
 extern CMath math;
 extern int lbl_8032ED70;
+extern u8 lbl_801EADC8[];
+extern "C" float RandF__5CMathFv(CMath* instance);
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef struct SRandCVParams {
+    s32 index;
+    s32 colorOffset;
+    s8 delta[4];
+    s32* valueOffset;
+    u8 flag;
+} SRandCVParams;
 
 /*
  * --INFO--
@@ -17,58 +28,53 @@ extern "C" {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppSRandCV(void* param1, void* param2)
+void pppSRandCV(void* param1, void* param2, void* param3)
 {
-    // Global state check - assembly shows comparison with lbl_8032ED70
-    if (lbl_8032ED70 == 0) {
-        // First branch: check if param2[0] == param1[0xc]  
-        if (*(int*)param2 == *(int*)((char*)param1 + 0xc)) {
-            // Get data pointer from param2[0xc]
-            int dataPtr = *(int*)((char*)param2 + 0xc);
-            dataPtr = *(int*)dataPtr; // Dereference
-            float* targetData = (float*)((char*)param1 + dataPtr + 0x80);
-            
-            unsigned char flag = *((unsigned char*)param2 + 0xc);
-            
-            // Generate 4 random values for RGBA channels
-            for (int i = 0; i < 4; i++) {
-                math.RandF(); // First random call
-                float baseRand = 1.0f; // Placeholder for random result
-                
-                if (flag != 0) {
-                    math.RandF(); // Second random call
-                    float extraRand = 0.5f; // Placeholder for second random
-                    targetData[i] = baseRand + extraRand;
-                } else {
-                    targetData[i] = baseRand * 2.0f; // Assembly shows lbl_80330060 (2.0f)
-                }
-            }
-        } else {
-            // Alternative path when indices don't match
-            int altDataPtr = *(int*)((char*)param2 + 0xc);
-            altDataPtr = *(int*)altDataPtr + 0x80;
-            float* sourceData = (float*)((char*)param1 + altDataPtr);
-            
-            // Get sprite data pointer
-            int spriteIndex = *(int*)((char*)param2 + 0x4);
-            unsigned char* spriteData;
-            if (spriteIndex == -1) {
-                spriteData = (unsigned char*)0x801EADC8; // From assembly
+    SRandCVParams* params = (SRandCVParams*)param2;
+    s32** sourceOffsets = (s32**)((u8*)param3 + 0xc);
+    float* values;
+
+    if (lbl_8032ED70 != 0) {
+        return;
+    }
+
+    if (params->index == *(s32*)((u8*)param1 + 0xc)) {
+        int i;
+
+        values = (float*)((u8*)param1 + **sourceOffsets + 0x80);
+        for (i = 0; i < 4; i++) {
+            float value = RandF__5CMathFv(&math);
+            if (params->flag != 0) {
+                value += RandF__5CMathFv(&math);
             } else {
-                spriteData = (unsigned char*)((char*)param1 + spriteIndex + 0x80);
+                value *= 2.0f;
             }
-            
-            // Process 4 channels with color interpolation
-            for (int channel = 0; channel < 4; channel++) {
-                signed char deltaValue = *((signed char*)param2 + 0x8 + channel);
-                unsigned char currentValue = spriteData[channel];
-                float sourceValue = sourceData[channel];
-                
-                // Color interpolation: result = delta * source - delta
-                float interpolation = (float)deltaValue * sourceValue - (float)deltaValue;
-                int modification = (int)interpolation;
-                spriteData[channel] = currentValue + modification;
-            }
+            values[i] = value;
+        }
+        return;
+    }
+
+    values = (float*)((u8*)param1 + *params->valueOffset + 0x80);
+    {
+        u8* colors;
+        int i;
+
+        if (params->colorOffset == -1) {
+            colors = lbl_801EADC8;
+        } else {
+            colors = (u8*)param1 + params->colorOffset + 0x80;
+        }
+
+        for (i = 0; i < 2; i++) {
+            s8 delta0 = params->delta[(i * 2) + 0];
+            s8 delta1 = params->delta[(i * 2) + 1];
+            u8 color0 = colors[(i * 2) + 0];
+            u8 color1 = colors[(i * 2) + 1];
+            int add0 = (int)(((double)delta0 * (double)values[(i * 2) + 0]) - (double)color0);
+            int add1 = (int)(((double)delta1 * (double)values[(i * 2) + 1]) - (double)color1);
+
+            colors[(i * 2) + 0] = (u8)(color0 + add0);
+            colors[(i * 2) + 1] = (u8)(color1 + add1);
         }
     }
 }

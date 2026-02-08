@@ -442,12 +442,13 @@ bool CSystem::IsGdev()
  * Address:	TODO
  * Size:	TODO
  */
-void CSystem::DumpMapFile(void*)
+CSystem* CSystem::DumpMapFile(void* name)
 {
 	// TODO: Where the hell do we get these from?
 	// There is very obviously <not> a stopwatch at position 0 in this class. Maybe leftover debug code?
-	OSInitStopwatch((OSStopwatch*)this, (char*)nullptr);
+	OSInitStopwatch((OSStopwatch*)this, (char*)name);
 	OSResetStopwatch((OSStopwatch*)this);
+	return this;
 }
 
 /*

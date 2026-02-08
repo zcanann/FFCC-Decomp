@@ -20,6 +20,7 @@ extern unsigned int DAT_8032f4c4; // Auto ID counter
 extern char DAT_8032e17c[]; // Buffer for memset
 extern void* DAT_8032e170; // Registration memory
 extern FILE DAT_8021d1a8; // File handle for fflush
+extern "C" void __dl__FPv(void*);
 
 /*
  * --INFO--
@@ -39,6 +40,23 @@ CRedSound::CRedSound()
 CRedSound::~CRedSound()
 {
 	End();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801cca38
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" CRedSound* dtor_801CCA38(CRedSound* redSound, short param_2)
+{
+    if ((redSound != 0) && (0 < param_2)) {
+        __dl__FPv(redSound);
+    }
+    return redSound;
 }
 
 /*
@@ -655,14 +673,18 @@ void CRedSound::TestProcess(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd8bc
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 // Forward declaration
 extern "C" void* __ct__10CRedDriverFv(void*);
 extern "C" void __dt__10CRedDriverFv(void*);
 
-void __sinit_RedSound_cpp(void)
+extern "C" void __sinit_RedSound_cpp(void)
 {
 	__register_global_object(__ct__10CRedDriverFv(&CRedDriver_8032f4c0), __dt__10CRedDriverFv, &DAT_8032e170);
 }

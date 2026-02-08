@@ -23,6 +23,7 @@ public:
 class CBound
 {
 public:
+	CBound();
 	void operator=(const CBound&);
 	void SetMinMax(Vec*, Vec*);
 	int CheckCross(CBound&);

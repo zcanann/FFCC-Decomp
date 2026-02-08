@@ -20,28 +20,28 @@ extern "C" {
  */
 void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, UnkC* param_2)
 {
+	Vec* dest;
 	Vec local_38;
 	Vec local_2c;
-	Vec dest;
-	Vec temp1;
+	Vec local_20;
+	f32 fVar1;
 
-	(void)pppYmTraceMove;
-	(void)param_2;
-
-	local_2c.x = 0.0f;
-	local_2c.y = 0.0f;
-	local_2c.z = 0.0f;
-	temp1.x = 1.0f;
-	temp1.y = 1.0f;
-	temp1.z = 1.0f;
-	pppSubVector__FR3Vec3Vec3Vec(&dest, &temp1, &local_2c);
-	local_38.x = dest.x;
-	local_38.y = dest.y;
-	local_38.z = dest.z;
-	pppCopyVector__FR3Vec3Vec(&dest, &local_38);
-	dest.x = 0.0f;
-	dest.y = 0.0f;
-	dest.z = 0.0f;
+	local_2c.x = *(f32*)((u8*)pppMngStPtr + 0x58);
+	local_2c.y = *(f32*)((u8*)pppMngStPtr + 0x5c);
+	dest = (Vec*)((u8*)(&pppYmTraceMove->field0_0x0 + 2) + *param_2->m_serializedDataOffsets);
+	local_2c.z = *(f32*)((u8*)pppMngStPtr + 0x60);
+	local_20.x = *(f32*)((u8*)pppMngStPtr + 0x68);
+	local_20.y = *(f32*)((u8*)pppMngStPtr + 0x6c);
+	local_20.z = *(f32*)((u8*)pppMngStPtr + 0x70);
+	pppSubVector__FR3Vec3Vec3Vec((Vec*)&dest[1].y, &local_20, &local_2c);
+	local_38.x = dest[1].y;
+	local_38.y = dest[1].z;
+	local_38.z = dest[2].x;
+	pppCopyVector__FR3Vec3Vec(dest, &local_38);
+	fVar1 = 0.0f;
+	dest[3].x = 0.0f;
+	dest[2].z = fVar1;
+	dest[2].y = fVar1;
 }
 
 /*

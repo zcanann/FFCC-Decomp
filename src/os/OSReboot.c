@@ -97,7 +97,7 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
 
     while (Prepared != TRUE) {
 #if SDK_REVISION < 1
-        if (!DVDCheckDisk() || OS_TIMER_CLOCK < (OSGetTime() - start))
+        if (!DVDCheckDisk() || (OSGetTime() - start) > OS_TIMER_CLOCK)
 #else
         if (!DVDCheckDisk())
 #endif
@@ -117,7 +117,7 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
 
         while (DVDGetCommandBlockStatus(&streamCancelBlock)) {
 #if SDK_REVISION < 1
-            if (!DVDCheckDisk() || OS_TIMER_CLOCK < (OSGetTime() - start))
+            if (!DVDCheckDisk() || (OSGetTime() - start) > OS_TIMER_CLOCK)
 #else
             if (!DVDCheckDisk())
 #endif
@@ -137,7 +137,7 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
 
     while (DVDGetCommandBlockStatus(&appLoaderReadBlock)) {
 #if SDK_REVISION < 1
-        if (!DVDCheckDisk() || OS_TIMER_CLOCK < (OSGetTime() - start))
+        if (!DVDCheckDisk() || (OSGetTime() - start) > OS_TIMER_CLOCK)
 #else
         if (!DVDCheckDisk())
 #endif
@@ -147,7 +147,7 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
     }
 
     rebootSize = OSRoundUp32B(FatalParam.rebootSize);
-    DVDReadAbsAsyncPrio(&rebootReadBlock, (void*)0x81300000, rebootSize, FatalParam.size + 0x2460, NULL, 0);
+    DVDReadAbsAsyncPrio(&rebootReadBlock, (void*)0x81300000, rebootSize, FatalParam.size + 0x20 + 0x2440, NULL, 0);
 
 #if SDK_REVISION < 1
     start = OSGetTime();
@@ -155,7 +155,7 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
 
     while (DVDGetCommandBlockStatus(&rebootReadBlock)) {
 #if SDK_REVISION < 1
-        if (!DVDCheckDisk() || OS_TIMER_CLOCK < (OSGetTime() - start))
+        if (!DVDCheckDisk() || (OSGetTime() - start) > OS_TIMER_CLOCK)
 #else
         if (!DVDCheckDisk())
 #endif

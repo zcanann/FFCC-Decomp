@@ -24,7 +24,7 @@ public:
     void CmdDismantle(int);
     void DrawUniteList();
     void UniteOpenAnim(int);
-    void UniteCloseAnim(int);
+    int UniteCloseAnim(int);
     void CmdOpen1();
     void CmdClose1();
     void CmdOpen2();

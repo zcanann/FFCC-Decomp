@@ -3,9 +3,20 @@
 
 #include <dolphin/types.h>
 
-// Forward declarations
-struct UnkB;
-struct UnkC;
+struct UnkB {
+    s32 m_graphId;
+    u32 m_dataValIndex;
+    s32 m_initWOrk;
+    f32 m_stepValue;
+    s32 m_arg3;
+    u8 m_payload[0x20];
+};
+
+struct UnkC {
+    u8 _pad[0xC];
+    s32* m_serializedDataOffsets;
+};
+
 struct TRACE_POLYGON;
 
 // Basic structure for pppYmTracer - based on Ghidra analysis

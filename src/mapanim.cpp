@@ -10,8 +10,8 @@ class CPtrArray
 {
 public:
     void** m_vtable;
-    int m_size;
     int m_numItems;
+    int m_size;
     int m_defaultSize;
     T* m_items;
     CMemory::CStage* m_stage;
@@ -50,8 +50,8 @@ template <>
 CPtrArray<CMapAnimNode*>::CPtrArray()
 {
     m_vtable = lbl_801EA488;
-    m_numItems = 0;
     m_size = 0;
+    m_numItems = 0;
     m_defaultSize = 0x10;
     m_items = 0;
     m_stage = 0;
@@ -199,7 +199,71 @@ int CPtrArray<CMapAnimNode*>::setSize(unsigned long newSize)
         }
 
         newItems = (CMapAnimNode**)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-            &Memory, m_size << 2, m_stage, s_collection_ptrarray_h, 0xFA, 0);
+            &Memory, (unsigned long)(m_size << 2), m_stage, s_collection_ptrarray_h, 0xFA, 0);
+        if (newItems == 0) {
+            return 0;
+        }
+
+        if (m_items != 0) {
+            memcpy(newItems, m_items, m_numItems << 2);
+        }
+        if (m_items != 0) {
+            __dla__FPv(m_items);
+            m_items = 0;
+        }
+        m_items = newItems;
+    }
+
+    return 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8004b070
+ * PAL Size: 112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+int CPtrArray<CMapAnimKeyDt*>::Add(CMapAnimKeyDt* item)
+{
+    if (setSize(m_numItems + 1) == 0) {
+        return 0;
+    }
+
+    m_items[m_numItems] = item;
+    m_numItems++;
+    return 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8004b0e0
+ * PAL Size: 240b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+int CPtrArray<CMapAnimKeyDt*>::setSize(unsigned long newSize)
+{
+    CMapAnimKeyDt** newItems;
+
+    if ((unsigned long)m_size < newSize) {
+        if (m_size == 0) {
+            m_size = m_defaultSize;
+        } else {
+            if (m_growCapacity == 0) {
+                System.Printf(s_ptrarray_grow_error);
+            }
+            m_size = m_size << 1;
+        }
+
+        newItems = (CMapAnimKeyDt**)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+            &Memory, (unsigned long)(m_size << 2), m_stage, s_collection_ptrarray_h, 0xFA, 0);
         if (newItems == 0) {
             return 0;
         }

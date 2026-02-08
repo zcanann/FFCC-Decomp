@@ -25,9 +25,9 @@ public:
     void ConvI2FVector(Vec&, S16Vec&, long);
     void ConvF2IVector(S16Vec&, Vec&, long);
     void ConvF2IVector2d(S16Vec2d&, Vec2d&, long);
-    void RenderQuadNoTex(Vec&, Vec&, _GXColor);
-    void RenderQuad(Vec&, Vec&, _GXColor, Vec2d*, Vec2d*);
-    void RenderQuadTex2(Vec&, Vec&, _GXColor, Vec2d*, Vec2d*);
+    void RenderQuadNoTex(Vec, Vec, _GXColor);
+    void RenderQuad(Vec, Vec, _GXColor, Vec2d*, Vec2d*);
+    void RenderQuadTex2(Vec, Vec, _GXColor, Vec2d*, Vec2d*);
     void DisableIndMtx();
     void BeginQuadEnv();
     void EndQuadEnv();
@@ -41,7 +41,7 @@ public:
     void ReWriteDisplayList(void*, unsigned long, unsigned long);
     void CalcBoundaryBoxQuantized(Vec*, Vec*, S16Vec*, unsigned long, unsigned long);
     void GetNumPolygonFromDL(void*, unsigned long);
-    void GetDirectVector(Vec*, Vec*, Vec&);
+    void GetDirectVector(Vec*, Vec*, Vec);
     void InitConstantRegister();
     void SSepa(char*);
     void SNl();

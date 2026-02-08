@@ -3,15 +3,52 @@
 #include "ffcc/sound.h"
 
 extern unsigned char CFlat[];
+extern unsigned int lbl_80210580[];
+extern unsigned int lbl_8021058C[];
+extern unsigned int lbl_80210598[];
+extern unsigned int lbl_802105A4[];
+extern unsigned int lbl_802105B0[];
+extern unsigned int lbl_8021072C;
+extern unsigned int lbl_8032EDE0;
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800d880c
+ * PAL Size: 188b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-CSoundPcs::CSoundPcs()
+extern "C" void __sinit_p_sound_cpp(void)
 {
-	// TODO
+    unsigned int a0 = lbl_80210580[0];
+    unsigned int a1 = lbl_80210580[1];
+    unsigned int a2 = lbl_80210580[2];
+    unsigned int b0 = lbl_8021058C[0];
+    unsigned int b1 = lbl_8021058C[1];
+    unsigned int b2 = lbl_8021058C[2];
+    unsigned int c0 = lbl_80210598[0];
+    unsigned int c1 = lbl_80210598[1];
+    unsigned int c2 = lbl_80210598[2];
+    unsigned int d0 = lbl_802105A4[0];
+    unsigned int d1 = lbl_802105A4[1];
+    unsigned int d2 = lbl_802105A4[2];
+
+    lbl_8032EDE0 = reinterpret_cast<unsigned int>(&lbl_8021072C);
+
+    lbl_802105B0[1] = a0;
+    lbl_802105B0[2] = a1;
+    lbl_802105B0[3] = a2;
+    lbl_802105B0[4] = b0;
+    lbl_802105B0[5] = b1;
+    lbl_802105B0[6] = b2;
+    lbl_802105B0[7] = c0;
+    lbl_802105B0[8] = c1;
+    lbl_802105B0[9] = c2;
+    lbl_802105B0[12] = d0;
+    lbl_802105B0[13] = d1;
+    lbl_802105B0[14] = d2;
 }
 
 /*
@@ -51,8 +88,7 @@ void CSoundPcs::Quit()
  */
 void* CSoundPcs::GetTable(unsigned long index)
 {
-    extern unsigned char lbl_802105B0[];
-    return lbl_802105B0 + (index * 0x15C);
+    return reinterpret_cast<unsigned char*>(lbl_802105B0) + (index * 0x15C);
 }
 
 /*

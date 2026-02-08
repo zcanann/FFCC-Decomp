@@ -18,10 +18,21 @@ public:
     void Frame();
     void SaveReplayData();
 
+    void* _0_4_;
     short _4_2_;
+    short _6_2_;
     short _8_2_;
+    short _a_2_;
+    unsigned char _c_1_[0x19c];
+    unsigned int _1a8_4_;
+    void* _1ac_4_;
+    unsigned char* _1b0_4_;
     int _448_4_;
     int _452_4_;
+    int _1bc_4_;
+    unsigned int _1c0_4_;
+    unsigned int _1c4_4_;
+    unsigned int _1c8_4_;
 };
 
 extern CPad Pad;

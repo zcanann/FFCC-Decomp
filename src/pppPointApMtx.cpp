@@ -1,9 +1,9 @@
 #include "ffcc/pppPointApMtx.h"
-#include "ffcc/pppPart.h"
 #include <dolphin/mtx.h>
 
 extern int gPppGlobalFlag;
 extern _pppMngSt* gPppMngSt;
+extern "C" _pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
 
 /*
  * --INFO--
@@ -34,45 +34,50 @@ void pppPointApMtxCon(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal)
  */
 void pppPointApMtx(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal, _pppMngSt* pppMngSt)
 {
-	unsigned long matrixOffset;
-	Mtx* matrix;
-	Vec* sourcePos;
+	Vec pos;
+	u32* offsets = *(u32**)((u8*)pppMngSt + 0xC);
+	Vec* source = (Vec*)((u8*)pppPObject + offsets[0] + 0x80);
+	Mtx* target = (Mtx*)((u8*)pppPObject + offsets[1] + 0x80);
 
-	(void)pppMngSt;
-	matrixOffset = *(unsigned long*)((char*)pppPDataVal + 0x10);
-	matrix = (Mtx*)((char*)pppPObject + matrixOffset + 0x80);
+	if (gPppGlobalFlag != 0) {
+		return;
+	}
 
-	if (gPppGlobalFlag == 0) {
-		if (*((unsigned char*)matrix + 1) == 0) {
-			if ((matrixOffset + 1) != 0xFFFF) {
-				pppCreatePObject(gPppMngSt, pppPDataVal);
-			}
+	if (((u8*)target)[1] == 0) {
+		u32 objectId = *(u32*)((u8*)pppPDataVal + 4);
+		_pppPObject* object;
+		_pppPDataVal* objectData;
+		Mtx* matrix;
+
+		if ((objectId + 0x10000) == 0xFFFF) {
+			return;
+		}
+
+		objectData = (_pppPDataVal*)(*(u32*)((u8*)gPppMngSt + 0xD4) + (objectId << 4));
+		if (objectData != 0) {
+			object = (_pppPObject*)pppCreatePObject(gPppMngSt, objectData);
+			goto object_ready;
+		}
+		object = 0;
+
+	object_ready:
+		*(void**)((u8*)object + 4) = pppPObject;
+
+		matrix = (Mtx*)((u8*)object + *(u32*)((u8*)pppPDataVal + 8) + 0x80);
+		if (((u8*)pppPDataVal)[0xD] == 0) {
+			PSMTXIdentity(*matrix);
+			(*matrix)[0][3] = source->x;
+			(*matrix)[1][3] = source->x;
+			(*matrix)[2][3] = source->x;
+		} else {
+			PSMTXCopy(*(Mtx*)((u8*)gPppMngSt + 0x78), *matrix);
+			PSMTXMultVec(*(Mtx*)((u8*)gPppMngSt + 0x78), source, &pos);
+			(*matrix)[0][3] = pos.x;
+			(*matrix)[1][3] = pos.y;
+			(*matrix)[2][3] = pos.z;
 		}
 	}
 
-	sourcePos = (Vec*)((char*)pppPObject + *(unsigned long*)((char*)pppPDataVal + 0x8) + 0x80);
-
-	if (*((unsigned char*)pppPDataVal + 0xd) == 0) {
-		PSMTXIdentity(*matrix);
-		(*matrix)[0][3] = sourcePos->x;
-		(*matrix)[1][3] = sourcePos->y;
-		(*matrix)[2][3] = sourcePos->z;
-	} else {
-		Vec result;
-		Mtx* worldMatrix = (Mtx*)((char*)gPppMngSt + 0x78);
-
-		PSMTXCopy(*worldMatrix, *matrix);
-		PSMTXMultVec(*worldMatrix, sourcePos, &result);
-
-		(*matrix)[0][3] = result.x;
-		(*matrix)[1][3] = result.y;
-		(*matrix)[2][3] = result.z;
-	}
-
-	*((unsigned char*)matrix + 1) = *((unsigned char*)pppPDataVal + 0xc);
-
-	unsigned char counter = *((unsigned char*)matrix + 1);
-	if (counter != 0) {
-		*((unsigned char*)matrix + 1) = counter - 1;
-	}
+	((u8*)target)[1] = ((u8*)pppPDataVal)[0xC];
+	((u8*)target)[1]--;
 }

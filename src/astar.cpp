@@ -5,6 +5,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/pad.h"
 #include "ffcc/partyobj.h"
+#include "ffcc/p_dbgmenu.h"
 #include "ffcc/system.h"
 #include "ffcc/vector.h"
 
@@ -21,6 +22,8 @@ static const float kDrawAStarSphereRadius = 5.0f;
 
 extern Mtx gFlatPosMtx;
 extern int DAT_8032ed70;
+extern CDbgMenuPcs DbgMenuPcs;
+extern unsigned char DAT_8032ec90[];
 
 /*
  * --INFO--
@@ -876,7 +879,6 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
  */
 unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 {
-	unsigned char polygonGroup = 0;
 	unsigned long mask = m_hitAttributeMask;
 	
 	CVector bottom(kPolyGroupBaseX, kPolyGroupBaseY, kPolyGroupBaseZ);
@@ -902,7 +904,7 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 
 	MapMng.CheckHitCylinderNear(&cyl, reinterpret_cast<Vec*>(&bottom), mask);
 
-	return polygonGroup;
+	return 0;
 }
 
 /*
@@ -912,41 +914,73 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
  */
 unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 {
-	unsigned char polygonGroup = 0;
+	unsigned char polygonGroup;
+	unsigned int* dbgMenuRaw = reinterpret_cast<unsigned int*>(&DbgMenuPcs);
+	if ((dbgMenuRaw[0x10844 / sizeof(unsigned int)] & 1) == 0)
+	{
+		CVector bottom(kPolyGroupBaseX, kPolyGroupBaseY, kPolyGroupBaseZ);
+		CVector top(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z);
+		CMapCylinder cyl;
 
-	CVector bottom(kPolyGroupBaseX, kPolyGroupBaseY, kPolyGroupBaseZ);
-	CVector top(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z);
-	CMapCylinder cyl;
+		cyl.m_bottom.x = top.x;
+		cyl.m_bottom.y = top.y;
+		cyl.m_bottom.z = top.z;
+		cyl.m_direction.x = bottom.x;
+		cyl.m_direction.y = bottom.y;
+		cyl.m_direction.z = bottom.z;
+		cyl.m_radius = kPolyGroupBaseZ;
+		cyl.m_height = kPolyGroupAabbMax;
+		cyl.m_top.x = kPolyGroupAabbMax;
+		cyl.m_top.y = kPolyGroupAabbMax;
+		cyl.m_top.z = kPolyGroupAabbMax;
+		cyl.m_direction2.x = kPolyGroupAabbMin;
+		cyl.m_direction2.y = kPolyGroupAabbMin;
+		cyl.m_direction2.z = kPolyGroupAabbMin;
+		cyl.m_radius2 = 0.0f;
+		cyl.m_height2 = 0.0f;
 
-	cyl.m_bottom.x = top.x;
-	cyl.m_bottom.y = top.y;
-	cyl.m_bottom.z = top.z;
-	cyl.m_direction.x = bottom.x;
-	cyl.m_direction.y = bottom.y;
-	cyl.m_direction.z = bottom.z;
-	cyl.m_radius = kPolyGroupBaseZ;
-	cyl.m_height = kPolyGroupAabbMax;
-	cyl.m_top.x = kPolyGroupAabbMax;
-	cyl.m_top.y = kPolyGroupAabbMax;
-	cyl.m_top.z = kPolyGroupAabbMax;
-	cyl.m_direction2.x = kPolyGroupAabbMin;
-	cyl.m_direction2.y = kPolyGroupAabbMin;
-	cyl.m_direction2.z = kPolyGroupAabbMin;
-	cyl.m_radius2 = 0.0f;
-	cyl.m_height2 = 0.0f;
+		if (MapMng.CheckHitCylinderNear(&cyl, reinterpret_cast<Vec*>(&bottom), static_cast<unsigned long>(hitAttributeMask)) == 0)
+		{
+			polygonGroup = 0;
+		}
+		else
+		{
+			polygonGroup = DAT_8032ec90[0x47];
+		}
+	}
+	else
+	{
+		unsigned long mask = m_hitAttributeMask;
+		CVector bottom(kPolyGroupBaseX, kPolyGroupBaseY, kPolyGroupBaseZ);
+		CVector top(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z);
+		CMapCylinder cyl;
 
-	unsigned long mask = static_cast<unsigned long>(hitAttributeMask);
+		cyl.m_bottom.x = top.x;
+		cyl.m_bottom.y = top.y;
+		cyl.m_bottom.z = top.z;
+		cyl.m_direction.x = bottom.x;
+		cyl.m_direction.y = bottom.y;
+		cyl.m_direction.z = bottom.z;
+		cyl.m_radius = kPolyGroupBaseZ;
+		cyl.m_height = kPolyGroupAabbMax;
+		cyl.m_top.x = kPolyGroupAabbMax;
+		cyl.m_top.y = kPolyGroupAabbMax;
+		cyl.m_top.z = kPolyGroupAabbMax;
+		cyl.m_direction2.x = kPolyGroupAabbMin;
+		cyl.m_direction2.y = kPolyGroupAabbMin;
+		cyl.m_direction2.z = kPolyGroupAabbMin;
+		cyl.m_radius2 = 0.0f;
+		cyl.m_height2 = 0.0f;
 
-	// Debug override is still unlinked, keep it commented:
-	// if (DbgMenuPcs._10844_4_ & 1) {
-	//	 mask = m_hitAttributeMask;
-	// }
-
-	MapMng.CheckHitCylinderNear(&cyl, reinterpret_cast<Vec*>(&bottom), mask);
-
-	// TODO: when DAT_8032ec90 is named, plug the group byte in here:
-	// polygonGroup = *(unsigned char*)(DAT_8032ec90 + 0x47);
-
+		if (MapMng.CheckHitCylinderNear(&cyl, reinterpret_cast<Vec*>(&bottom), mask) == 0)
+		{
+			polygonGroup = 0;
+		}
+		else
+		{
+			polygonGroup = DAT_8032ec90[0x47];
+		}
+	}
 	return polygonGroup;
 }
 

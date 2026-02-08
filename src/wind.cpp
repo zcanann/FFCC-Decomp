@@ -7,6 +7,8 @@
 #include "ffcc/vector.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/math.h"
+#include "ffcc/goout.h"
+#include "ffcc/p_game.h"
 
 extern CGraphic Graphic;
 extern CCameraPcs CameraPcs;
@@ -17,6 +19,8 @@ extern "C" int Rand__5CMathFUl(CMath*, unsigned long);
 extern "C" float RandF__5CMathFv(CMath*);
 
 extern float FLOAT_80330ef0;
+extern float FLOAT_80330ef4;
+extern float FLOAT_80330ef8;
 extern float FLOAT_80330f20;
 extern float FLOAT_80330f24;
 extern float FLOAT_80330f28;
@@ -24,7 +28,12 @@ extern float FLOAT_80330f2c;
 extern float FLOAT_80330f30;
 extern float FLOAT_80330f34;
 extern float FLOAT_80330f38;
+extern float FLOAT_80330f18;
+extern double DOUBLE_80330f00;
+extern double DOUBLE_80330f08;
+extern double DOUBLE_80330f10;
 extern double DOUBLE_80330f40;
+extern double DAT_8032ec20;
 
 /*
  * --INFO--
@@ -143,12 +152,97 @@ void CWind::Draw()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800d9840
+ * PAL Size: 748b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CWind::Calc(Vec*, const Vec*, int)
+void CWind::Calc(Vec* out, const Vec* pos, int randomize)
 {
-	// TODO
+    u8* obj = (u8*)this;
+    Vec tmp;
+    double d;
+    double inv;
+    double nx;
+    double nz;
+    double yRand;
+    float f;
+    u32 clsMask;
+    int cls;
+
+    out->x = FLOAT_80330ef0;
+    out->y = FLOAT_80330ef0;
+    out->z = FLOAT_80330ef0;
+
+    if ((*(s32*)((u8*)&MenuPcs + 0x740) == 2) || (Game.game.m_gameWork.m_gamePaused != 0)) {
+        return;
+    }
+
+    for (int i = 0; i < 32; i++, obj += 100) {
+        if ((s8)obj[0] >= 0) {
+            continue;
+        }
+
+        if (*(s32*)(obj + 0x1C) == 0) {
+            if (randomize == 0) {
+                PSVECAdd(out, (Vec*)(obj + 0x58), out);
+            } else {
+                PSVECScale((Vec*)(obj + 0x58), &tmp, (float)RandF__5CMathFv(&Math));
+                PSVECAdd(out, &tmp, out);
+            }
+            continue;
+        }
+
+        if ((*(float*)(obj + 0x0C) < pos->x) && (*(float*)(obj + 0x10) < pos->z) &&
+            (pos->x < *(float*)(obj + 0x14)) && (pos->z < *(float*)(obj + 0x18))) {
+            nz = (double)(pos->z - *(float*)(obj + 8));
+            nx = (double)(pos->x - *(float*)(obj + 4));
+            d = (double)(float)(nx * nx + (double)(float)(nz * nz));
+            if (d < (double)FLOAT_80330ef4) {
+                d = (double)FLOAT_80330ef4;
+            }
+
+            if (*(s32*)(obj + 0x1C) == 2) {
+                if (d < (double)*(float*)(obj + 0x34)) {
+                    yRand = (double)(FLOAT_80330ef8 - *(float*)(obj + 0x38) * *(float*)(obj + 0x38));
+                    if (d <= (double)FLOAT_80330ef0) {
+                        if (DOUBLE_80330f10 <= d) {
+                            f = (float)d;
+                            clsMask = (u32)f & 0x7f800000;
+                            if (clsMask == 0x7f800000) {
+                                cls = (((u32)f & 0x7fffff) == 0) ? 2 : 1;
+                            } else if ((clsMask < 0x7f800000) && (clsMask == 0)) {
+                                cls = (((u32)f & 0x7fffff) == 0) ? 3 : 5;
+                            } else {
+                                cls = 4;
+                            }
+                            if (cls == 1) {
+                                d = DAT_8032ec20;
+                            }
+                        } else {
+                            d = DAT_8032ec20;
+                        }
+                    } else {
+                        inv = 1.0 / sqrt(d);
+                        inv = DOUBLE_80330f00 * inv * -(d * inv * inv - DOUBLE_80330f08);
+                        inv = DOUBLE_80330f00 * inv * -(d * inv * inv - DOUBLE_80330f08);
+                        d = (double)(float)(d * DOUBLE_80330f00 * inv * -(d * inv * inv - DOUBLE_80330f08));
+                    }
+
+                    inv = (double)(float)(yRand / d);
+                    out->x = (float)(nx * inv + (double)out->x);
+                    yRand = (double)RandF__5CMathFv(&Math);
+                    out->y = (float)((double)(float)(FLOAT_80330f18 + yRand) * (double)(float)(FLOAT_80330ef8 - *(float*)(obj + 0x38) * *(float*)(obj + 0x38)) + (double)out->y);
+                    out->z = (float)(nz * inv + (double)out->z);
+                }
+            } else {
+                PSVECScale((Vec*)(obj + 0x58), &tmp, FLOAT_80330ef8 - (float)(d / (double)*(float*)(obj + 0x34)));
+                PSVECAdd(out, &tmp, out);
+            }
+        }
+    }
 }
 
 /*

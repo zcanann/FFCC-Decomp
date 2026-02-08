@@ -1,5 +1,41 @@
 #include "ffcc/memory.h"
 
+static char s_memory_cpp[] = "memory.cpp";
+
+/*
+ * --INFO--
+ * PAL Address: 0x8001FD8C
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void* operator new(unsigned long size, CMemory::CStage* stage, char* file, int line)
+{
+    if (file == (char*)nullptr) {
+        file = s_memory_cpp;
+    }
+    return stage->alloc(size, file, line, 0);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8001FD4C
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void* operator new[](unsigned long size, CMemory::CStage* stage, char* file, int line)
+{
+    if (file == (char*)nullptr) {
+        file = s_memory_cpp;
+    }
+    return stage->alloc(size, file, line, 0);
+}
+
 /*
  * --INFO--
  * Address:	TODO
@@ -215,9 +251,9 @@ void CMemory::CStage::quitBlock()
  * Address:	TODO
  * Size:	TODO
  */
-void CMemory::CStage::alloc(unsigned long, char*, unsigned long, int)
+void* CMemory::CStage::alloc(unsigned long, char*, unsigned long, int)
 {
-	// TODO
+	return (void*)nullptr;
 }
 
 /*

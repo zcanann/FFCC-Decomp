@@ -1,5 +1,7 @@
 #include "ffcc/pppRain.h"
 #include "ffcc/memory.h"
+#include "ffcc/p_game.h"
+#include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "dolphin/gx.h"
 
@@ -79,8 +81,68 @@ void pppDestructRain(struct pppRain* pppRain, struct RAIN_DATA* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameRain(struct pppRain*, struct PRain*, struct RAIN_DATA*)
+void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DATA* param_3)
 {
+    int i;
+    u16 count;
+    RainWork* work;
+    RainDrop* drop;
+    RainParam* rain;
+
+    if (DAT_8032ed70 != 0) {
+        return;
+    }
+
+    rain = (RainParam*)param_2;
+    count = *(u16*)&param_2->payload[0];
+    work = (RainWork*)((u8*)pppRain + 0x80 + param_3->m_serializedDataOffsets[2]);
+    if (work->drops == 0) {
+        work->drops = (float*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+            (u32)count * sizeof(RainDrop),
+            pppEnvStPtr->m_stagePtr,
+            (char*)"pppRain.cpp",
+            0x7f);
+        drop = (RainDrop*)work->drops;
+        for (i = 0; i < count; i++) {
+            InitDrop(rain, drop);
+            drop++;
+        }
+    }
+
+    work->accelY += work->accelZ;
+    work->moveY += work->accelY;
+    if (rain->m_graphId == *(s32*)pppRain) {
+        work->moveY += *(float*)&param_2->payload[4];
+        work->accelY += *(float*)&param_2->payload[8];
+        work->accelZ += *(float*)&param_2->payload[0xc];
+    }
+
+    drop = (RainDrop*)work->drops;
+    for (i = 0; i < count; i++) {
+        drop->posX = -(drop->dirX * work->moveY - drop->posX);
+        drop->posY -= rain->driftY;
+        drop->posZ = -(drop->dirZ * work->moveY - drop->posZ);
+        drop->life--;
+        if (drop->life < 1) {
+            InitDrop(rain, drop);
+        }
+        drop++;
+    }
+
+    if (DAT_8032ed78 == 0) {
+        float posX = CameraPcs._212_4_;
+        float posY = CameraPcs._216_4_;
+        float posZ = CameraPcs._220_4_;
+        if (Game.game.m_currentSceneId == 7) {
+            posX = ppvCameraMatrix0[0][3];
+            posY = ppvCameraMatrix0[1][3];
+            posZ = ppvCameraMatrix0[2][3];
+        }
+        pppMngStPtr->m_matrix.value[0][3] = posX;
+        pppMngStPtr->m_matrix.value[1][3] = posY;
+        pppMngStPtr->m_matrix.value[2][3] = posZ;
+        pppSetFpMatrix__FP9_pppMngSt(pppMngStPtr);
+    }
 }
 
 /*

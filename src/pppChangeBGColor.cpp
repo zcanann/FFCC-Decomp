@@ -1,8 +1,8 @@
 #include "ffcc/pppChangeBGColor.h"
-#include "ffcc/map.h"
 
 // External global variables 
 extern int DAT_8032ed70;
+extern unsigned char MapMng[];
 
 /*
  * --INFO--
@@ -15,13 +15,17 @@ extern int DAT_8032ed70;
  */
 void pppFrameChangeBGColor(struct pppChangeBGColor* pppChangeBGColor, struct UnkB* param_2, struct UnkC* param_3)
 {
+	int iVar1;
+	unsigned char* data;
+	unsigned char* mapMng;
+
 	if (DAT_8032ed70 != 0) {
 		return;
 	}
 
-	unsigned char* mapMng = (unsigned char*)&MapMng;
-	unsigned char* data = (unsigned char*)pppChangeBGColor + param_3->m_serializedDataOffsets[1] + 0x80;
-
+	iVar1 = param_3->m_serializedDataOffsets[1];
+	mapMng = MapMng;
+	data = (unsigned char*)pppChangeBGColor + iVar1 + 0x80;
 	mapMng += 0x20000;
 	mapMng[0x2989] = 1;
 	mapMng[0x2990] = data[8];

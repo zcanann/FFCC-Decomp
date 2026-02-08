@@ -2,6 +2,7 @@
 #include "ffcc/math.h"
 
 extern CMath math;
+extern "C" float RandF__5CMathFv(CMath*);
 extern int lbl_8032ED70;
 extern float lbl_8032FF90;
 extern float lbl_801EADC8;
@@ -18,23 +19,20 @@ extern float lbl_801EADC8;
 void pppRandFV(void* param1, void* param2, void* param3)
 {
     int* p1 = (int*)param1;
-    int* p2 = (int*)param2;
     int* p3 = (int*)param3;
+    int* p2 = (int*)param2;
 
     if (lbl_8032ED70 != 0) {
         return;
     }
 
     if (p1[3] == 0) {
-        float randVal = 1.0f;
-
-        math.RandF();
+        float randVal = RandF__5CMathFv(&math);
 
         if (((unsigned char*)p3)[0x18] != 0) {
-            math.RandF();
-            randVal = randVal + 1.0f;
+            randVal += RandF__5CMathFv(&math);
         } else {
-            randVal = randVal * lbl_8032FF90;
+            randVal *= lbl_8032FF90;
         }
 
         int* indexPtr = *(int**)((char*)p2 + 0xC);
@@ -48,14 +46,16 @@ void pppRandFV(void* param1, void* param2, void* param3)
 
     int* indexPtr = *(int**)((char*)p2 + 0xC);
     float* destAddr = (float*)((char*)p1 + *indexPtr + 0x80);
+    int srcOffset = p3[1];
     float* srcAddr;
-    float destVal = *destAddr;
 
-    if (p3[1] == -1) {
+    if (srcOffset == -1) {
         srcAddr = &lbl_801EADC8;
     } else {
-        srcAddr = (float*)((char*)p1 + p3[1] + 0x80);
+        srcAddr = (float*)((char*)p1 + srcOffset + 0x80);
     }
+
+    float destVal = *destAddr;
 
     srcAddr[0] = srcAddr[0] + (*(float*)((char*)p3 + 8) * destVal - *(float*)((char*)p3 + 8));
     srcAddr[1] = srcAddr[1] + (*(float*)((char*)p3 + 12) * destVal - *(float*)((char*)p3 + 12));

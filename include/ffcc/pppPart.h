@@ -43,7 +43,7 @@ void pppSetRowVector(pppFMATRIX& pppFMtx, Vec& vecA, Vec& vecB, Vec& vecC, Vec& 
 void pppNormalize(Vec& dest, Vec source);
 void pppOuterProduct(Vec& ab, Vec a, Vec b);
 void pppCopyMatrix(pppFMATRIX& dest, pppFMATRIX source);
-void pppMulMatrix(pppFMATRIX& ab, pppFMATRIX& a, pppFMATRIX& );
+void pppMulMatrix(pppFMATRIX& ab, pppFMATRIX a, pppFMATRIX b);
 void pppCopyVector(Vec& dest, Vec source);
 void pppSubVector(Vec& dest, Vec a, Vec b);
 float pppVectorLength(Vec vec);

@@ -31,6 +31,12 @@ class CMapHitFace
 {
 public:
     CMapHitFace();
+
+    // TODO: decode concrete fields used by collision and rendering.
+    unsigned char _unk0[0x10]; // 0x00
+    Vec m_boundsMin;            // 0x10
+    Vec m_boundsMax;            // 0x1c
+    unsigned char _unk28[0x28]; // 0x28
 };
 
 class CMapHit
@@ -51,6 +57,13 @@ public:
     void Draw();
     void DrawWire();
     void DrawNormal();
+
+    unsigned short m_vertexCount; // 0x00
+    unsigned short m_faceCount;   // 0x02
+    Vec m_positionMin;            // 0x04
+    Vec m_positionMax;            // 0x10
+    Vec* m_vertices;              // 0x1c
+    CMapHitFace* m_faces;         // 0x20
 };
 
 #endif // _FFCC_MAPHIT_H_

@@ -32,22 +32,52 @@ CMapCylinder::CMapCylinder()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80026dec
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CMapHit::CMapHit()
 {
-	// TODO
+    m_positionMin.x = 0.0f;
+    m_positionMin.y = 0.0f;
+    m_positionMin.z = 0.0f;
+
+    m_positionMax.x = 1.0f;
+    m_positionMax.y = 1.0f;
+    m_positionMax.z = 1.0f;
+
+    m_vertexCount = 0;
+    m_faceCount = 0;
+    m_vertices = 0;
+    m_faces = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80026d5c
+ * PAL Size: 144b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CMapHit::~CMapHit()
 {
-	// TODO
+    if (m_vertices != 0) {
+        delete[] m_vertices;
+        m_vertices = 0;
+    }
+
+    if (m_faces != 0) {
+        delete[] m_faces;
+        m_faces = 0;
+    }
+
+    m_vertexCount = 0;
+    m_faceCount = 0;
 }
 
 /*
@@ -182,10 +212,20 @@ void CMapHit::DrawNormal()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80026d38
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CMapHitFace::CMapHitFace()
 {
-	// TODO
+    m_boundsMin.x = 0.0f;
+    m_boundsMin.y = 0.0f;
+    m_boundsMin.z = 0.0f;
+
+    m_boundsMax.x = 1.0f;
+    m_boundsMax.y = 1.0f;
+    m_boundsMax.z = 1.0f;
 }

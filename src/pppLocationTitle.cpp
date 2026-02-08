@@ -29,14 +29,15 @@ extern void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsig
  */
 void pppConstructLocationTitle(pppLocationTitle* pppLocationTitle, UnkC* param_2)
 {
-    float fVar1 = 0.0f; // TODO: Find correct constant FLOAT_80330ee0
-    u32* puVar2 = (u32*)((int)(&pppLocationTitle->field0_0x0 + 2) + *param_2->m_serializedDataOffsets);
-    
-    *puVar2 = 0;
-    *(u16*)(puVar2 + 1) = 0;
-    puVar2[4] = *(u32*)&fVar1;
-    puVar2[3] = *(u32*)&fVar1;
-    puVar2[2] = *(u32*)&fVar1;
+    s32* serializedOffsets = *(s32**)((u8*)param_2 + 0xC);
+    u8* base = (u8*)pppLocationTitle + *serializedOffsets + 0x80;
+    float value = 0.0f;
+
+    *(u32*)(base + 0x0) = 0;
+    *(u16*)(base + 0x4) = 0;
+    *(float*)(base + 0x10) = value;
+    *(float*)(base + 0xC) = value;
+    *(float*)(base + 0x8) = value;
 }
 
 /*
@@ -50,11 +51,12 @@ void pppConstructLocationTitle(pppLocationTitle* pppLocationTitle, UnkC* param_2
  */
 void pppDestructLocationTitle(pppLocationTitle* pppLocationTitle, UnkC* param_2)
 {
-    int iVar1 = *param_2->m_serializedDataOffsets;
-    
-    if (*(void**)((int)(&pppLocationTitle->field0_0x0 + 2) + iVar1) != NULL) {
-        pppHeapUseRate(*(CMemory::CStage**)((int)(&pppLocationTitle->field0_0x0 + 2) + iVar1));
-        *(u32*)((int)(&pppLocationTitle->field0_0x0 + 2) + iVar1) = 0;
+    s32* serializedOffsets = *(s32**)((u8*)param_2 + 0xC);
+    s32 fieldOffset = *serializedOffsets + 0x80;
+
+    if (*(CMemory::CStage**)((u8*)pppLocationTitle + fieldOffset) != NULL) {
+        pppHeapUseRate(*(CMemory::CStage**)((u8*)pppLocationTitle + fieldOffset));
+        *(u32*)((u8*)pppLocationTitle + fieldOffset) = 0;
     }
 }
 

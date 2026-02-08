@@ -10,7 +10,7 @@ extern "C" {
 #endif
 
 void pppVertexApLcCon(_pppPObject*, PVertexApLc*);
-void pppVertexApLc(_pppPObject*, PVertexApLc*, Vec*);
+void pppVertexApLc(_pppPObject*, PVertexApLc*, void*);
 
 #ifdef __cplusplus
 }

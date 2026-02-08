@@ -1,11 +1,12 @@
 #include "ffcc/pppRandUpFloat.h"
-#include "ffcc/math.h"
 
-extern CMath math;
+extern class CMath {
+public:
+    float RandF(void);
+} math;
 extern int lbl_8032ED70;
 extern float lbl_8032FFF8;
 extern float lbl_801EADC8;
-extern "C" float RandF__5CMathFv(CMath* instance);
 
 struct RandUpFloatParam {
     int targetId;
@@ -36,16 +37,16 @@ void pppRandUpFloat(void* param1, void* param2, void* param3) {
     }
 
     char* base = (char*)param1;
-    RandUpFloatParam* p2 = (RandUpFloatParam*)param2;
     RandUpFloatCtx* p3 = (RandUpFloatCtx*)param3;
+    RandUpFloatParam* p2 = (RandUpFloatParam*)param2;
     float* valuePtr;
 
     int id = *(int*)(base + 0xC);
     if (id == 0) {
-        float value = RandF__5CMathFv(&math);
+        float value = math.RandF();
 
         if (p2->randomTwice != 0) {
-            value = (value + RandF__5CMathFv(&math)) * lbl_8032FFF8;
+            value = (value + math.RandF()) * lbl_8032FFF8;
         }
 
         valuePtr = (float*)(base + *p3->outputOffset + 0x80);
@@ -57,9 +58,12 @@ void pppRandUpFloat(void* param1, void* param2, void* param3) {
         valuePtr = (float*)(base + *p3->outputOffset + 0x80);
     }
 
-    float* source = &lbl_801EADC8;
-    if (p2->sourceOffset != -1) {
-        source = (float*)(base + p2->sourceOffset + 0x80);
+    int sourceOffset = p2->sourceOffset;
+    float* source;
+    if (sourceOffset == -1) {
+        source = &lbl_801EADC8;
+    } else {
+        source = (float*)(base + sourceOffset + 0x80);
     }
 
     *source = *source + (p2->blend * *valuePtr);

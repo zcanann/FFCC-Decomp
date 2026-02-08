@@ -5,6 +5,7 @@
 #include "TRK_MINNOW_DOLPHIN/ppc/Generic/targimpl.h"
 #include "TRK_MINNOW_DOLPHIN/ppc/Generic/flush_cache.h"
 #include "dolphin/ar.h"
+#include "dolphin/os/OSReset.h"
 #include "stddef.h"
 
 #define EXCEPTIONMASK_ADDR 0x80000044
@@ -28,7 +29,16 @@ static u32 TRK_ISR_OFFSETS[15] = { PPC_SystemReset,
 	                               PPC_SystemManagementInterrupt,
 	                               PPC_ThermalManagementInterrupt };
 
-__declspec(section ".init") void __TRK_reset(void) { __TRK_copy_vectors(); }
+/*
+ * --INFO--
+ * PAL Address: 0x800053E0
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+__declspec(section ".init") void __TRK_reset(void) { OSResetSystem(0, 0, 0); }
 
 asm void InitMetroTRK()
 {
@@ -89,6 +99,60 @@ asm void InitMetroTRK()
 	blr
 initCommTableSuccess:
 	b TRK_main //Jump to TRK_main
+#endif // clang-format on
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801ADAD8
+ * PAL Size: 148b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+asm void InitMetroTRK_BBA(void)
+{
+#ifdef __MWERKS__ // clang-format off
+	nofralloc
+
+	addi r1, r1, -4
+	stw r3, 0(r1)
+	lis r3, gTRKCPUState@h
+	ori r3, r3, gTRKCPUState@l
+	stmw r0, ProcessorState_PPC.Default.GPR(r3)
+	lwz r4, 0(r1)
+	addi r1, r1, 4
+	stw r1, ProcessorState_PPC.Default.GPR[1](r3)
+	stw r4, ProcessorState_PPC.Default.GPR[3](r3)
+	mflr r4
+	stw r4, ProcessorState_PPC.Default.LR(r3)
+	stw r4, ProcessorState_PPC.Default.PC(r3)
+	mfcr r4
+	stw r4, ProcessorState_PPC.Default.CR(r3)
+	mfmsr r4
+	ori r3, r4, (1 << (31 - 16))
+	mtmsr r3
+	mtsrr1 r4
+	bl TRKSaveExtended1Block
+	lis r3, gTRKCPUState@h
+	ori r3, r3, gTRKCPUState@l
+	lmw r0, ProcessorState_PPC.Default.GPR(r3)
+	li r0, 0
+	mtspr  0x3f2, r0
+	mtspr  0x3f5, r0
+	lis r1, _db_stack_addr@h
+	ori r1, r1, _db_stack_addr@l
+	li r3, 2
+	bl InitMetroTRKCommTable
+	cmpwi r3, 1
+	bne initCommTableSuccessBBA
+	lwz r4, ProcessorState_PPC.Default.LR(r3)
+	mtlr r4
+	lmw r0, ProcessorState_PPC.Default.GPR(r3)
+	blr
+initCommTableSuccessBBA:
+	b TRK_main
 #endif // clang-format on
 }
 

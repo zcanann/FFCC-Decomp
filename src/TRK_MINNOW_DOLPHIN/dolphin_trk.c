@@ -5,6 +5,7 @@
 #include "TRK_MINNOW_DOLPHIN/ppc/Generic/targimpl.h"
 #include "TRK_MINNOW_DOLPHIN/ppc/Generic/flush_cache.h"
 #include "dolphin/ar.h"
+#include "dolphin/ar/__ar.h"
 #include "dolphin/os/OSReset.h"
 #include "stddef.h"
 
@@ -12,6 +13,7 @@
 
 static u32 lc_base;
 extern u32 _db_stack_addr;
+extern void* TRK_memcpy(void* dst, const void* src, unsigned int n);
 
 static u32 TRK_ISR_OFFSETS[15] = { PPC_SystemReset,
 	                               PPC_MachineCheck,
@@ -203,4 +205,185 @@ DSError TRKInitializeTarget()
 	gTRKState.msr       = __TRK_get_MSR();
 	lc_base             = 0xE0000000;
 	return DS_NoError;
+}
+
+static asm void dataCacheBlockInvalidate(register void* param_1)
+{
+#ifdef __MWERKS__ // clang-format off
+	nofralloc
+	dcbi 0, param_1
+	blr
+#endif // clang-format on
+}
+
+static asm void dataCacheBlockFlush(register void* param_1)
+{
+#ifdef __MWERKS__ // clang-format off
+	nofralloc
+	dcbf 0, param_1
+	blr
+#endif // clang-format on
+}
+
+static asm void trkSync(register int param_1)
+{
+#ifdef __MWERKS__ // clang-format off
+	nofralloc
+	sync
+	blr
+#endif // clang-format on
+}
+
+void TRK__write_aram(register u32 param_1, register u32 param_2, u32* param_3)
+{
+	u32 uVar1;
+	u32 uVar2;
+	u16 sVar3;
+	u16 sVar4;
+	u32 iVar5;
+	u32 uVar6;
+	u32 uVar7;
+	u8 auStack_60[60];
+
+	if (param_2 < 0x4000) {
+		return;
+	}
+	if (0x8000000 < param_2 + *param_3) {
+		return;
+	}
+	uVar1 = param_2 & 0xFFFFFFE0;
+	iVar5 = 0;
+	uVar2 = (*param_3 + (param_2 & 0x1F) + 0x1F) & 0xFFFFFFE0;
+	uVar7 = (uVar2 + 0x1F) >> 5;
+	if (uVar2 != 0) {
+		uVar6 = (uVar2 + 0x1F) >> 8;
+		if (uVar6 != 0) {
+			do {
+				dataCacheBlockFlush((void*)(param_1 + iVar5));
+				dataCacheBlockFlush((void*)(param_1 + iVar5 + 0x20));
+				dataCacheBlockFlush((void*)(param_1 + iVar5 + 0x40));
+				dataCacheBlockFlush((void*)(param_1 + iVar5 + 0x60));
+				dataCacheBlockFlush((void*)(param_1 + iVar5 + 0x80));
+				dataCacheBlockFlush((void*)(param_1 + iVar5 + 0xA0));
+				dataCacheBlockFlush((void*)(param_1 + iVar5 + 0xC0));
+				dataCacheBlockFlush((void*)(param_1 + iVar5 + 0xE0));
+				iVar5 += 0x100;
+				uVar6--;
+			} while (uVar6 != 0);
+			uVar7 &= 7;
+			if (uVar7 == 0) {
+				goto LAB_801adc44;
+			}
+		}
+		do {
+			dataCacheBlockFlush((void*)(param_1 + iVar5));
+			iVar5 += 0x20;
+			uVar7--;
+		} while (uVar7 != 0);
+	}
+LAB_801adc44:
+	do {
+		iVar5 = ARGetDMAStatus();
+	} while (iVar5 != 0);
+
+	sVar3 = __ARGetInterruptStatus();
+	uVar7 = 0x8000000;
+	if ((param_2 & 0x1F) != 0) {
+		dataCacheBlockInvalidate(auStack_60);
+		__ARClearInterrupt();
+		ARStartDMA(1, (u32)auStack_60, uVar1, 0x20);
+		do {
+			sVar4 = __ARGetInterruptStatus();
+		} while (sVar4 == 0);
+		TRK_memcpy((void*)param_1, auStack_60, param_2 & 0x1F);
+		dataCacheBlockFlush((void*)param_1);
+		uVar7 = uVar1;
+	}
+
+	param_2 += *param_3;
+	uVar6 = param_2 & 0x1F;
+	if (uVar6 != 0) {
+		if ((param_2 & 0xFFFFFFE0) != uVar7) {
+			dataCacheBlockInvalidate(auStack_60);
+			__ARClearInterrupt();
+			ARStartDMA(1, (u32)auStack_60, param_2 & 0xFFFFFFE0, 0x20);
+			do {
+				sVar4 = __ARGetInterruptStatus();
+			} while (sVar4 == 0);
+		}
+		TRK_memcpy((void*)(param_1 + param_2), auStack_60 + uVar6, 0x20 - uVar6);
+		dataCacheBlockFlush((void*)(param_1 + param_2));
+	}
+	trkSync(0);
+	__ARClearInterrupt();
+	ARStartDMA(0, param_1, uVar1, uVar2);
+	if (sVar3 == 0) {
+		do {
+			sVar3 = __ARGetInterruptStatus();
+		} while (sVar3 == 0);
+		__ARClearInterrupt();
+	}
+}
+
+void TRK__read_aram(register u32 param_1, register u32 param_2, u32* param_3)
+{
+	u32 uVar1;
+	u32 uVar2;
+	u16 sVar3;
+	u16 sVar4;
+	u32 iVar5;
+	u32 uVar6;
+	u32 uVar7;
+
+	if (param_2 < 0x4000) {
+		return;
+	}
+	if (0x8000000 < param_2 + *param_3) {
+		return;
+	}
+
+	iVar5 = 0;
+	uVar1 = (*param_3 + (param_2 & 0x1F) + 0x1F) & 0xFFFFFFE0;
+	uVar2 = (uVar1 + 0x1F) >> 5;
+	if (uVar1 != 0) {
+		uVar6 = (uVar1 + 0x1F) >> 8;
+		uVar7 = uVar2;
+		if (uVar6 != 0) {
+			do {
+				dataCacheBlockInvalidate((void*)(param_1 + iVar5));
+				dataCacheBlockInvalidate((void*)(param_1 + iVar5 + 0x20));
+				dataCacheBlockInvalidate((void*)(param_1 + iVar5 + 0x40));
+				dataCacheBlockInvalidate((void*)(param_1 + iVar5 + 0x60));
+				dataCacheBlockInvalidate((void*)(param_1 + iVar5 + 0x80));
+				dataCacheBlockInvalidate((void*)(param_1 + iVar5 + 0xA0));
+				dataCacheBlockInvalidate((void*)(param_1 + iVar5 + 0xC0));
+				dataCacheBlockInvalidate((void*)(param_1 + iVar5 + 0xE0));
+				iVar5 += 0x100;
+				uVar6--;
+			} while (uVar6 != 0);
+			uVar7 = uVar2 & 7;
+			uVar2 = uVar7;
+			if (uVar7 == 0) {
+				goto LAB_801ade28;
+			}
+		}
+		do {
+			dataCacheBlockInvalidate((void*)(param_1 + iVar5));
+			iVar5 += 0x20;
+			uVar7--;
+		} while (uVar7 != 0);
+	}
+LAB_801ade28:
+	do {
+		uVar2 = ARGetDMAStatus();
+	} while (uVar2 != 0);
+	sVar3 = __ARGetInterruptStatus();
+	__ARClearInterrupt();
+	ARStartDMA(1, param_1, param_2 & 0xFFFFFFE0, uVar1);
+	do {
+		sVar4 = __ARGetInterruptStatus();
+	} while (sVar4 == 0);
+	if (sVar3 == 0) {
+		__ARClearInterrupt();
+	}
 }

@@ -347,10 +347,8 @@ void GXSetAlphaCompare(GXCompare comp0, u8 ref0, GXAlphaOp op, GXCompare comp1, 
     u32 reg;
 
     CHECK_GXBEGIN(1046, "GXSetAlphaCompare");
-    reg = 0xF3000000 | (ref0 & 0xFF) | ((ref1 & 0xFF) << 8);
-    reg |= (comp0 & 7) << 16;
-    reg |= (comp1 & 7) << 19;
-    reg |= (op & 3) << 22;
+    reg = ((ref1 & 0xFF) << 8) | (ref0 & 0xFF) | 0xF3000000 | ((comp0 & 0xFFC7) << 16) | (comp1 << 19);
+    reg = (reg & 0xFF3FFFFF) | (op << 22);
 
     GX_WRITE_RAS_REG(reg);
     __GXData->bpSentNot = 0;

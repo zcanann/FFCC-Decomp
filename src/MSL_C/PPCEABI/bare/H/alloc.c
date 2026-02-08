@@ -312,54 +312,61 @@ void deallocate_from_fixed_pools(__mem_pool_obj* pool_obj, void* ptr, unsigned l
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801B27F4
+ * PAL Size: 180b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 static Block* link_new_block(__mem_pool_obj* pool_obj, unsigned long size) {
-    Block* new_block;
+    Block* block;
     unsigned long aligned_size;
-    
-    aligned_size = (size + 31) & 0xfffffff8;
+
+    aligned_size = (size + 0x1F) & 0xFFFFFFF8;
     if (aligned_size < 0x10000) {
         aligned_size = 0x10000;
     }
-    
-    new_block = (Block*)__sys_alloc(aligned_size);
-    if (new_block == 0) {
-        return 0;
+
+    block = (Block*)__sys_alloc(aligned_size);
+    if (block != 0) {
+        Block_construct(block, aligned_size);
+        if (pool_obj->start_ == 0) {
+            pool_obj->start_ = block;
+            block->prev = block;
+            block->next = block;
+        } else {
+            block->prev = pool_obj->start_->prev;
+            block->prev->next = block;
+            block->next = pool_obj->start_;
+            block->next->prev = block;
+            pool_obj->start_ = block;
+        }
     }
-    
-    Block_construct(new_block, aligned_size);
-    
-    if (pool_obj->start_ == 0) {
-        pool_obj->start_ = new_block;
-        new_block->prev = new_block;
-        new_block->next = new_block;
-    } else {
-        new_block->prev = pool_obj->start_->prev;
-        new_block->next = pool_obj->start_;
-        new_block->prev->next = new_block;
-        new_block->next->prev = new_block;
-        pool_obj->start_ = new_block;
-    }
-    
-    return new_block;
+    return block;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801B2A8C
+ * PAL Size: 568b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 static void Block_construct(Block* block, unsigned long size) {
     SubBlock* sb;
-    SubBlock** start_ptr;
-    
+
     block->size = size | 3;
-    block->max_size = size - 24;
-    
     sb = (SubBlock*)((char*)block + 16);
     sb->size = size - 24;
     sb->block = (Block*)((unsigned long)block | 1);
-    
-    start_ptr = &Block_start(block);
-    *start_ptr = sb;
-    sb->prev = sb;
-    sb->next = sb;
-    
-    SubBlock_set_free(sb);
+    block->max_size = size - 24;
+    Block_start(block) = 0;
+    Block_link(block, sb);
 }
 
 static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {

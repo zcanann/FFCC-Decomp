@@ -4,9 +4,9 @@
 class CMenuPcs
 {
 public:
-    void GetMcStr(int);
-    void GetMcWinMessBuff(int);
-    void GetWinMess(int);
+    const char* GetMcStr(int);
+    const char* const* GetMcWinMessBuff(int);
+    const char* GetWinMess(int);
     void GetYesNoXPos(int);
     void GetSlotABXPos(int);
 };

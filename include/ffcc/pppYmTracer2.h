@@ -6,15 +6,17 @@
 struct PYmTracer2;
 struct TRACE_POLYGON;
 
-// Forward declarations
-struct UnkB;
-struct UnkC;
+struct UnkB {
+    u32 m_dataValIndex;
+};
+
+struct UnkC {
+    u8 _pad[0xC];
+    s32* m_serializedDataOffsets;
+};
 
 struct pppYmTracer2 {
-    // Based on Ghidra analysis - contains serialized data
-    u8* m_serializedData;
-    // Add padding for pppPObject structure
-    char pad[0x80]; // Placeholder - actual structure size may differ
+    u8 _pad[0x80];
 };
 
 #ifdef __cplusplus

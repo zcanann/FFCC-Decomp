@@ -287,7 +287,7 @@ void pppHeapUseRate(CMemory::CStage* stage)
 /*
  * --INFO--
  * PAL Address: 80056c74
- * PAL Size: 76b
+ * PAL Size: 44b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -295,21 +295,7 @@ void pppHeapUseRate(CMemory::CStage* stage)
  */
 void pppHeapCheckLeak(CMemory::CStage* stage)
 {
-	unsigned long totalSize;
-	unsigned long usedSize;
-	unsigned long freeSize;
-	
-	stage->heapInfo(totalSize, usedSize, freeSize);
-	
-	if (totalSize == 0) {
-		totalSize = 10000;
-	}
-	else {
-		totalSize = (unsigned long)(usedSize * 10000) / totalSize;
-	}
-	
-	// Note: Original returns the percentage but this signature expects void
-	// The percentage calculation is kept for proper assembly matching
+	stage->heapWalker(2, 0, 0xFFFFFFFF);
 }
 
 /*

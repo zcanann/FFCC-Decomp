@@ -1,18 +1,23 @@
 #include "ffcc/pppConstrainCameraDir2.h"
+#include "ffcc/partMng.h"
+#include "ffcc/pppConstrainCameraDir.h"
 #include <dolphin/mtx.h>
 
 extern int DAT_8032ed70;
-extern int DAT_8032ed78;
-extern void* pppMngStPtr;
-extern void* CameraPcs;
+extern char DAT_8032ed78;
+extern _pppMngSt* pppMngStPtr;
+extern struct {
+    float _224_4_, _228_4_, _232_4_, _236_4_, _240_4_, _244_4_, _252_4_;
+    Mtx m_cameraMatrix;
+} CameraPcs;
 extern float FLOAT_803331e0;
 extern float FLOAT_803331e4;
 extern float FLOAT_803331e8;
 extern int DAT_8032ec70;
 
-void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
-void GetDirectVector__5CUtilFP3VecP3Vec3Vec(void*, float*, float*, float*);
-void pppSetFpMatrix__FP9_pppMngSt(void*);
+void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, pppConstrainCameraDir*, int, float*, float*, float*, float*, float*);
+void GetDirectVector__5CUtilFP3VecP3Vec3Vec(void*, Vec*, Vec*, Vec*);
+void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
 
 /*
  * --INFO--
@@ -25,7 +30,7 @@ void pppSetFpMatrix__FP9_pppMngSt(void*);
  */
 void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, UnkB* param_2, UnkC* param_3)
 {
-	void* pppMngSt;
+	_pppMngSt* pppMngSt;
 	float fVar1;
 	float* value;
 	double dVar2;
@@ -52,60 +57,59 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, UnkB* param_2, 
 
 	pppMngSt = pppMngStPtr;
 	if (DAT_8032ed70 == 0) {
-		value = (float*)((char*)param_1 + 0x80 + *((int*)((char*)param_3 + 0x0c)));
+		value = (float*)((char*)param_1 + *param_3->m_serializedDataOffsets + 0x80);
 		
 		CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-			*((float*)((char*)param_2 + 0x00)),
+			param_2->m_dataValIndex,
 			param_1,
-			*((int*)((char*)param_2 + 0x04)),
+			param_2->m_graphId,
 			value,
 			value + 1,
 			value + 2,
-			(float*)((char*)param_2 + 0x08),
-			(float*)((char*)param_2 + 0x0c));
+			&param_2->m_initWOrk,
+			&param_2->m_stepValue);
 
-		if ((DAT_8032ed78 != 1) &&
-			((*((char*)param_2 + 0x11) != 0) || (*((char*)param_2 + 0x10) != 0))) {
+		if ((DAT_8032ed78 != 1) && (((char*)&param_2->m_arg3)[1] != 0 || param_2->m_arg3 != 0)) {
 			
-			local_cc = *((float*)((char*)&CameraPcs + 0xec));
-			local_c8 = *((float*)((char*)&CameraPcs + 0xf0));
-			local_c4 = *((float*)((char*)&CameraPcs + 0xf4));
+			local_cc = CameraPcs._236_4_;
+			local_c8 = CameraPcs._240_4_;
+			local_c4 = CameraPcs._244_4_;
 			
-			PSMTXCopy(*((Mtx*)((char*)&CameraPcs + 0x70)), MStack_84);
+			PSMTXCopy(CameraPcs.m_cameraMatrix, MStack_84);
 			
-			dVar5 = (double)*((float*)((char*)&CameraPcs + 0xe0));
-			dVar4 = (double)*((float*)((char*)&CameraPcs + 0xe4));
-			dVar3 = (double)*((float*)((char*)&CameraPcs + 0xe8));
-			dVar2 = (double)(FLOAT_803331e0 + ((*((float*)((char*)&CameraPcs + 0xfc)) - FLOAT_803331e4) / FLOAT_803331e4));
+			dVar5 = (double)CameraPcs._224_4_;
+			dVar4 = (double)CameraPcs._228_4_;
+			dVar3 = (double)CameraPcs._232_4_;
+			dVar2 = (double)(FLOAT_803331e0 + ((CameraPcs._252_4_ - FLOAT_803331e4) / FLOAT_803331e4));
 			
-			PSMTXIdentity(*((Mtx*)((char*)pppMngStPtr + 0x10)));
+			PSMTXIdentity(pppMngStPtr->m_matrix.value);
 			fVar1 = FLOAT_803331e0;
-			*((float*)((char*)pppMngSt + 0x70)) = (float)((double)FLOAT_803331e8 * dVar2);
-			*((float*)((char*)pppMngSt + 0x74)) = (float)dVar2;
-			*((float*)((char*)pppMngSt + 0x78)) = fVar1;
+			pppMngSt->m_scale.x = (float)((double)FLOAT_803331e8 * dVar2);
+			pppMngSt->m_scale.y = (float)dVar2;
+			pppMngSt->m_scale.z = fVar1;
 			
-			PSMTXScale(MStack_b4, *((float*)((char*)pppMngSt + 0x70)), *((float*)((char*)pppMngSt + 0x74)), *((float*)((char*)pppMngSt + 0x78)));
+			PSMTXScale(MStack_b4, pppMngSt->m_scale.x, pppMngSt->m_scale.y, pppMngSt->m_scale.z);
 			
-			if (*((char*)param_2 + 0x11) != 0) {
-				PSMTXInverse(MStack_84, *((Mtx*)((char*)pppMngStPtr + 0x10)));
+			if (((char*)&param_2->m_arg3)[1] != 0) {
+				PSMTXInverse(MStack_84, pppMngStPtr->m_matrix.value);
 			}
 			
-			PSMTXConcat(MStack_b4, *((Mtx*)((char*)pppMngStPtr + 0x10)), *((Mtx*)((char*)pppMngStPtr + 0x10)));
+			PSMTXConcat(MStack_b4, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
 			
-			if (*((char*)param_2 + 0x10) != 0) {
+			if (param_2->m_arg3 != 0) {
 				dVar2 = (double)*value;
 				local_c0.x = (float)((double)local_cc * dVar2 + dVar5);
 				local_c0.y = (float)((double)local_c8 * dVar2 + dVar4);
 				local_c0.z = (float)((double)local_c4 * dVar2 + dVar3);
 			}
 			
-			dVar2 = (double)*((float*)((char*)param_1 + 0x40));
-			dVar3 = (double)*((float*)((char*)param_1 + 0x50));
+			dVar2 = (double)((_pppPObject*)param_1)->m_localMatrix.value[0][3];
+			dVar3 = (double)((_pppPObject*)param_1)->m_localMatrix.value[1][3];
 			local_108 = local_cc;
 			local_104 = local_c8;
 			local_100 = local_c4;
 			
-			GetDirectVector__5CUtilFP3VecP3Vec3Vec((void*)&DAT_8032ec70, &local_d8, &local_e4, &local_108);
+			GetDirectVector__5CUtilFP3VecP3Vec3Vec((void*)&DAT_8032ec70, (Vec*)&local_d8, (Vec*)&local_e4, (Vec*)&local_108);
 			
 			local_f0.x = (float)(dVar2 * (double)local_d8);
 			local_f0.y = (float)(dVar2 * (double)local_d4);
@@ -117,9 +121,9 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, UnkB* param_2, 
 			PSVECAdd(&local_c0, &local_f0, &local_c0);
 			PSVECAdd(&local_c0, &local_fc, &local_c0);
 			
-			*((float*)((char*)pppMngStPtr + 0x1c)) = local_c0.x;
-			*((float*)((char*)pppMngStPtr + 0x2c)) = local_c0.y;
-			*((float*)((char*)pppMngStPtr + 0x3c)) = local_c0.z;
+			pppMngStPtr->m_matrix.value[0][3] = local_c0.x;
+			pppMngStPtr->m_matrix.value[1][3] = local_c0.y;
+			pppMngStPtr->m_matrix.value[2][3] = local_c0.z;
 			
 			pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
 		}

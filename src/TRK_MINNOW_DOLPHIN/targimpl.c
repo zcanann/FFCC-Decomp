@@ -849,50 +849,36 @@ DSError TRKTargetInterrupt(TRKEvent* event)
 
 DSError TRKTargetAddStopInfo(TRKBuffer* buffer)
 {
-    DSError error;
+    u8 stopInfo[0x40];
     u32 instruction;
-    s32 i;
 
-    error = TRKAppendBuffer1_ui32(buffer, gTRKCPUState.Default.PC);
-    if (error == DS_NoError) {
-        error = TRKTargetReadInstruction(&instruction, gTRKCPUState.Default.PC);
-    }
-    if (error == DS_NoError)
-        error = TRKAppendBuffer1_ui32(buffer, instruction);
-    if (error == DS_NoError)
-        error = TRKAppendBuffer1_ui16(buffer, gTRKCPUState.Extended1.exceptionID);
+    memset(stopInfo, 0, sizeof(stopInfo));
+    *(u32*)&stopInfo[0x0] = sizeof(stopInfo);
+    stopInfo[0x4]         = DSMSG_NotifyStopped;
+    *(u32*)&stopInfo[0xC] = gTRKCPUState.Default.PC;
 
-    if (error == DS_NoError) {
-        for (i = 0; i < 32; i++) {
-            error = TRKAppendBuffer1_ui32(buffer, (u16) gTRKCPUState.Default.GPR[i]);
-        }
-        for (i = 0; i < 32; i++) {
-            error = TRKAppendBuffer1_ui64(buffer, (u16) gTRKCPUState.Float.FPR[i]);
-        }
-    }
+    TRKTargetReadInstruction(&instruction, gTRKCPUState.Default.PC);
+    *(u32*)&stopInfo[0x10] = instruction;
+    *(u32*)&stopInfo[0x14] = (u16)gTRKCPUState.Extended1.exceptionID;
 
-    return error;
+    return TRKAppendBuffer_ui8(buffer, stopInfo, sizeof(stopInfo));
 }
 
 DSError TRKTargetAddExceptionInfo(TRKBuffer* buffer)
 {
-    DSError error;
-    u32 local_10;
+    u8 exceptionInfo[0x40];
+    u32 instruction;
 
-    error = TRKAppendBuffer1_ui32(buffer, gTRKExceptionStatus.exceptionInfo.PC);
-    if (error == 0) {
-        error = TRKTargetReadInstruction(&local_10,
-                                         gTRKExceptionStatus.exceptionInfo.PC);
-    }
-    if (error == 0) {
-        error = TRKAppendBuffer1_ui32(buffer, local_10);
-    }
-    if (error == 0) {
-        error = TRKAppendBuffer1_ui16(
-            buffer, gTRKExceptionStatus.exceptionInfo.exceptionID);
-    }
+    memset(exceptionInfo, 0, sizeof(exceptionInfo));
+    *(u32*)&exceptionInfo[0x0] = sizeof(exceptionInfo);
+    exceptionInfo[0x4]         = DSMSG_NotifyException;
+    *(u32*)&exceptionInfo[0xC] = gTRKExceptionStatus.exceptionInfo.PC;
 
-    return error;
+    TRKTargetReadInstruction(&instruction, gTRKExceptionStatus.exceptionInfo.PC);
+    *(u32*)&exceptionInfo[0x10] = instruction;
+    *(u32*)&exceptionInfo[0x14] = (u16)gTRKExceptionStatus.exceptionInfo.exceptionID;
+
+    return TRKAppendBuffer_ui8(buffer, exceptionInfo, sizeof(exceptionInfo));
 }
 
 static DSError TRKTargetEnableTrace(BOOL val)

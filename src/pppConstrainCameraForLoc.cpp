@@ -103,20 +103,16 @@ void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraF
 	int modelPtr;
 
 	if (DAT_8032ed70 == 0) {
-		value = (float*)((char*)constrainCameraForLoc + 0x80 + data->m_serializedDataOffsets[2]);
-		modelPtr = GetModelPtr__FP8CGObject(*(CGObject**)((char*)pppMngStPtr + 0xd8));
+		float* value = (float*)((char*)constrainCameraForLoc + 0x80 + data->m_serializedDataOffsets[2]);
+		CGObject* obj = *(CGObject**)((char*)pppMngStPtr + 0xd8);
+		int modelPtr = GetModelPtr__FP8CGObject(obj);
 		*(float**)(modelPtr + 0xe4) = value;
 		*(pppConstrainCameraForLocParams**)(modelPtr + 0xe8) = params;
 		*(void**)(modelPtr + 0xec) = (void*)CC_BeforeCalcMatrixCallback;
-		CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-		    params->m_dataValIndex,
-		    constrainCameraForLoc,
-		    params->m_graphId,
-		    value,
-		    value + 1,
-		    value + 2,
-		    &params->m_initWork,
-		    &params->m_stepValue);
+
+		CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(params->m_dataValIndex, constrainCameraForLoc,
+		                                             params->m_graphId, value, value + 1, value + 2,
+		                                             &params->m_initWork, &params->m_stepValue);
 	}
 }
 

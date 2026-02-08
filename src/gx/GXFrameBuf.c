@@ -197,20 +197,31 @@ void GXSetDispCopyFrame2Field(GXCopyMode mode) {
     SET_REG_FIELD(1411, __GXData->cpTex, 2, 12, 0);
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801A2BCC
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void GXSetCopyClamp(GXFBClamp clamp) {
-    u8 clmpB;
-    u8 clmpT;
+    GXData* gx;
+    u32 clmpB;
+    u32 clmpT;
 
     CHECK_GXBEGIN(1431, "GXSetCopyClamp");
+    gx = __GXData;
 
-    clmpT = (clamp & GX_CLAMP_TOP) == 1;
-    clmpB = (clamp & GX_CLAMP_BOTTOM) == 2;
+    clmpT = ((u32)__cntlzw((clamp & GX_CLAMP_TOP) - GX_CLAMP_TOP) >> 5) & 0xFF;
+    clmpB = ((u32)__cntlzw((clamp & GX_CLAMP_BOTTOM) - GX_CLAMP_BOTTOM) >> 4) & 0x1FE;
 
-    SET_REG_FIELD(1435, __GXData->cpDisp, 1, 0, clmpT);
-    SET_REG_FIELD(1436, __GXData->cpDisp, 1, 1, clmpB);
+    gx->cpDisp = (gx->cpDisp & ~1) | clmpT;
+    gx->cpDisp = (gx->cpDisp & ~2) | clmpB;
 
-    SET_REG_FIELD(1438, __GXData->cpTex, 1, 0, clmpT);
-    SET_REG_FIELD(1439, __GXData->cpTex, 1, 1, clmpB);
+    gx->cpTex = (gx->cpTex & ~1) | clmpT;
+    gx->cpTex = (gx->cpTex & ~2) | clmpB;
 }
 
 static u32 __GXGetNumXfbLines(u32 efbHt, u32 iScale) {

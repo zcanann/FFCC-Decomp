@@ -117,8 +117,12 @@ DVDDiskID* CFile::GetCurrentDiskID()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80013968
+ * PAL Size: 416b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 
 CFile::CHandle* CFile::Open(char* path, unsigned long userParam, CFile::PRI pri)

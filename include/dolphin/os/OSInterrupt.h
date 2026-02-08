@@ -107,7 +107,7 @@ __OSInterruptHandler __OSSetInterruptHandler(__OSInterrupt interrupt, __OSInterr
 
 __OSInterruptHandler __OSGetInterruptHandler(__OSInterrupt interrupt);
 
-void __OSDispatchInterrupt(__OSException exception, OSContext* context);
+void fn_8017E818(__OSException exception, OSContext* context);
 
 OSInterruptMask OSGetInterruptMask(void);
 OSInterruptMask OSSetInterruptMask(OSInterruptMask mask);

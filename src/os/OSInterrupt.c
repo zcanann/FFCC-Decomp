@@ -352,7 +352,7 @@ OSInterruptMask __OSUnmaskInterrupts(OSInterruptMask global) {
     return prev;
 }
 
-void __OSDispatchInterrupt(__OSException exception, OSContext* context) {
+void fn_8017E818(__OSException exception, OSContext* context) {
     u32 intsr;
     u32 reg;
     OSInterruptMask cause;
@@ -502,6 +502,6 @@ static asm void ExternalInterruptHandler(register __OSException exception,
     OS_EXCEPTION_SAVE_GPRS(context)
 
     stwu r1, -0x8(r1)
-    b __OSDispatchInterrupt
+    b fn_8017E818
 }
 #endif

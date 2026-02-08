@@ -48,7 +48,7 @@ __OSInterruptHandler __OSGetInterruptHandler(__OSInterrupt interrupt);
 void __OSInterruptInit(void);
 OSInterruptMask __OSMaskInterrupts(OSInterruptMask global);
 OSInterruptMask __OSUnmaskInterrupts(OSInterruptMask global);
-void __OSDispatchInterrupt(__OSException exception, OSContext* context);
+void fn_8017E818(__OSException exception, OSContext* context);
 void __OSModuleInit(void);
 
 // OSMemory

@@ -1,6 +1,7 @@
 #include "ffcc/mapshadow.h"
 #include "ffcc/mapocttree.h"
 #include "ffcc/CPtrArray.h"
+#include "ffcc/materialman.h"
 #include "ffcc/vector.h"
 #include <dolphin/mtx.h>
 
@@ -74,31 +75,30 @@ void CMapShadow::Init()
 {
 	float fVar1;
 	float fVar2;
-	double dVar3;
-	int iVar4;
-	unsigned int uVar5;
-	unsigned int uVar6;
-	
-	// Access material data through MapMng structure  
-	iVar4 = *(int*)((char*)&MapMng + 8 + *(unsigned short*)((char*)this + 4) * 4);
-	dVar3 = DOUBLE_8032fcf8;
-	iVar4 = *(int *)(iVar4 + 0x3c);
-	uVar6 = *(unsigned int *)(iVar4 + 100);
-	uVar5 = *(unsigned int *)(iVar4 + 0x68);
-	*((char*)this + 7) = (char)*(unsigned int *)(iVar4 + 0x6c);
-	fVar1 = (float)((double)((long long)(uVar6) + 0x4330000000000000ULL) - dVar3);
-	fVar2 = (float)((double)((long long)(uVar5) + 0x4330000000000000ULL) - dVar3);
-	
+	float fVar3;
+	float fVar4;
+	double dVar5;
+	int iVar6;
+	u32 uVar7;
+	u32 uVar8;
+
+	iVar6 = (int)(((CPtrArray<CMaterial>*)((char*)&MapMng + 8))->operator[](*(u16*)((char*)this + 4)));
+	dVar5 = DOUBLE_8032fcf8;
+	iVar6 = *(int*)(iVar6 + 0x3c);
+	uVar8 = *(u32*)(iVar6 + 100);
+	uVar7 = *(u32*)(iVar6 + 0x68);
+	*((char*)this + 7) = (char)*(u32*)(iVar6 + 0x6c);
+	fVar1 = (float)((double)((long long)uVar8 + 0x4330000000000000ULL) - dVar5);
+	fVar2 = (float)((double)((long long)uVar7 + 0x4330000000000000ULL) - dVar5);
+	fVar3 = *(float*)((char*)this + 0xa8);
+	fVar4 = (float)(DOUBLE_8032fce8 * (double)fVar3);
+	fVar3 = (float)((double)FLOAT_8032fcf0 * (double)fVar3);
 	if (*((char*)this + 6) == 0) {
-		C_MTXLightOrtho((MtxPtr)((char*)this + 0x48), -fVar2, fVar2, -fVar1, fVar1,
-						(float)(DOUBLE_8032fce8 * (double)*(float*)((char*)this + 0xa8)),
-						(float)((double)FLOAT_8032fcf0 * (double)*(float*)((char*)this + 0xa8)),
-						FLOAT_8032fcf0, FLOAT_8032fcf0);
+		C_MTXLightOrtho((MtxPtr)((char*)this + 0x48), -fVar2, fVar2, -fVar1, fVar1, fVar4, fVar3,
+		                FLOAT_8032fcf0, FLOAT_8032fcf0);
 	} else {
-		C_MTXLightFrustum((MtxPtr)((char*)this + 0x48), -fVar2, fVar2, -fVar1, fVar1, *(float*)((char*)this + 0xac),
-						  (float)(DOUBLE_8032fce8 * (double)*(float*)((char*)this + 0xa8)),
-						  (float)((double)FLOAT_8032fcf0 * (double)*(float*)((char*)this + 0xa8)),
-						  FLOAT_8032fcf0, FLOAT_8032fcf0);
+		C_MTXLightFrustum((MtxPtr)((char*)this + 0x48), -fVar2, fVar2, -fVar1, fVar1,
+		                  *(float*)((char*)this + 0xac), fVar4, fVar3, FLOAT_8032fcf0, FLOAT_8032fcf0);
 	}
 }
 

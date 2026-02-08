@@ -11,6 +11,17 @@ extern double DOUBLE_8032fce8;
 extern float FLOAT_8032fcf0;
 extern float FLOAT_8032fce0;
 
+static inline float U32ToFloatViaDouble(u32 value, double bias)
+{
+    union {
+        u64 u;
+        double d;
+    } cvt;
+
+    cvt.u = 0x4330000000000000ULL | (u64)value;
+    return (float)(cvt.d - bias);
+}
+
 class CMapMng;
 extern CMapMng MapMng;
 
@@ -74,7 +85,6 @@ void CMapShadow::Init()
 	float fVar1;
 	float fVar2;
 	float fVar3;
-	float fVar4;
 	double dVar5;
 	int iVar6;
 	u32 uVar7;
@@ -86,17 +96,20 @@ void CMapShadow::Init()
 	uVar8 = *(u32*)(iVar6 + 100);
 	uVar7 = *(u32*)(iVar6 + 0x68);
 	*((char*)this + 7) = (char)*(u32*)(iVar6 + 0x6c);
-	fVar1 = (float)((double)((long long)uVar8 + 0x4330000000000000ULL) - dVar5);
-	fVar2 = (float)((double)((long long)uVar7 + 0x4330000000000000ULL) - dVar5);
+	fVar1 = U32ToFloatViaDouble(uVar8, dVar5);
+	fVar2 = U32ToFloatViaDouble(uVar7, dVar5);
 	fVar3 = *(float*)((char*)this + 0xa8);
-	fVar4 = (float)(DOUBLE_8032fce8 * (double)fVar3);
-	fVar3 = (float)((double)FLOAT_8032fcf0 * (double)fVar3);
 	if (*((char*)this + 6) == 0) {
-		C_MTXLightOrtho((MtxPtr)((char*)this + 0x48), -fVar2, fVar2, -fVar1, fVar1, fVar4, fVar3,
+		C_MTXLightOrtho((MtxPtr)((char*)this + 0x48), -fVar2, fVar2, -fVar1, fVar1,
+		                (float)(DOUBLE_8032fce8 * (double)fVar3),
+		                (float)((double)FLOAT_8032fcf0 * (double)fVar3),
 		                FLOAT_8032fcf0, FLOAT_8032fcf0);
 	} else {
 		C_MTXLightFrustum((MtxPtr)((char*)this + 0x48), -fVar2, fVar2, -fVar1, fVar1,
-		                  *(float*)((char*)this + 0xac), fVar4, fVar3, FLOAT_8032fcf0, FLOAT_8032fcf0);
+		                  *(float*)((char*)this + 0xac),
+		                  (float)(DOUBLE_8032fce8 * (double)fVar3),
+		                  (float)((double)FLOAT_8032fcf0 * (double)fVar3),
+		                  FLOAT_8032fcf0, FLOAT_8032fcf0);
 	}
 }
 

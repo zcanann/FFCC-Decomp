@@ -1,4 +1,64 @@
 #include "ffcc/pppVertexApLc.h"
+#include "ffcc/math.h"
+#include "ffcc/partMng.h"
+
+struct VertexApLcEntry
+{
+    s16 vertexSetIndex;
+    s16 maxValue;
+    u16* vertexIndices;
+};
+
+struct VertexApLcEnv
+{
+    u8 unk0[0x8];
+    void* unk8;
+    u8 unkC[0x4];
+    VertexApLcEntry* entries;
+};
+
+struct VertexApLcData
+{
+    u8 unk0[0x4];
+    s16 entryIndex;
+    u8 spawnCount;
+    u8 spawnDelay;
+    u8 mode;
+    u8 unk9;
+    u16 unkA;
+    u32 childId;
+    u32 childPosOffset;
+};
+
+struct VertexApLcState
+{
+    u16 index;
+    u16 countdown;
+};
+
+struct VertexApLcCtrl
+{
+    u8 unk0[0xC];
+    s32* stateOffset;
+};
+
+struct VertexApLcSource
+{
+    u8 unk0[0x2C];
+    Vec* points;
+};
+
+struct _pppPDataVal;
+
+extern CMath math;
+extern int lbl_8032ED70;
+extern u8* lbl_8032ED50;
+extern VertexApLcEnv* lbl_8032ED54;
+
+extern "C" {
+f32 RandF__5CMathFv(CMath*);
+_pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
+}
 
 /*
  * --INFO--
@@ -11,14 +71,11 @@
  */
 void pppVertexApLcCon(_pppPObject* obj, PVertexApLc* apLc)
 {
-    // Initialize vertex application light counter data
-    void** apLc_data = (void**)((char*)apLc + 0xc);
-    void** data_base = (void**)*apLc_data;
-    void* data_ptr = *data_base;
-    data_ptr = (char*)data_ptr + 0x80;
-    short* target = (short*)((char*)obj + (int)data_ptr);
-    target[0] = 0;
-    target[1] = 0;
+    s32 offset = **(s32**)((u8*)apLc + 0xC);
+    u16* state = (u16*)((u8*)obj + offset + 0x80);
+
+    state[0] = 0;
+    state[1] = 0;
 }
 
 /*
@@ -30,32 +87,81 @@ void pppVertexApLcCon(_pppPObject* obj, PVertexApLc* apLc)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppVertexApLc(_pppPObject* obj, PVertexApLc* apLc, Vec* vec)
+void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
 {
-    void** apLc_data = (void**)((char*)apLc + 0xc);
-    void* vertex_data = *(void**)(*apLc_data);
-    
-    // Early return if no vertex data
-    if (!vertex_data) {
+    VertexApLcData* data = (VertexApLcData*)dataRaw;
+    VertexApLcCtrl* ctrl = (VertexApLcCtrl*)ctrlRaw;
+    s32 stateOffset = *ctrl->stateOffset;
+    VertexApLcState* state = (VertexApLcState*)((u8*)parent + stateOffset + 0x80);
+
+    if (lbl_8032ED70 != 0) {
         return;
     }
-    
-    // Early return if vertex index is negative
-    short vertex_index = *(short*)((char*)apLc + 4);
-    if (vertex_index < 0) {
+
+    if (data->entryIndex < 0) {
         return;
     }
-    
-    // Get vertex count from PVertexApLc at offset 6
-    unsigned char vertex_count = *(unsigned char*)((char*)apLc + 6);
-    unsigned char i = 0;
-    
-    // Process each vertex
-    while (i < vertex_count) {
-        vertex_count--;
-        if (vertex_count == 0) {
-            return;
+
+    if (state->countdown == 0) {
+        VertexApLcEntry* entry = &lbl_8032ED54->entries[data->entryIndex];
+        Vec* points = *(Vec**)((u8*)parent + 0x70);
+
+        if (points == 0) {
+            u32* srcTable = *(u32**)((u8*)lbl_8032ED54 + 0x8);
+            VertexApLcSource* src = *(VertexApLcSource**)((u8*)srcTable + (entry->vertexSetIndex * 4));
+            points = src->points;
         }
-        i++;
+
+        u8 count = data->spawnCount;
+
+        if (data->mode == 0) {
+            do {
+                if (state->index >= (u16)entry->maxValue) {
+                    state->index = 0;
+                }
+
+                u16 vertexIndex = entry->vertexIndices[state->index];
+                state->index++;
+
+                Vec vtx = points[vertexIndex];
+
+                if ((data->childId + 0x10000) != 0xFFFF) {
+                    _pppPObject* child;
+                    _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (data->childId << 4));
+
+                    if (childData == 0) {
+                        child = 0;
+                    } else {
+                        child = pppCreatePObject((_pppMngSt*)lbl_8032ED50, childData);
+                        *(void**)((u8*)child + 0x4) = parent;
+                    }
+
+                    *(Vec*)((u8*)child + data->childPosOffset + 0x80) = vtx;
+                }
+            } while (count-- != 0);
+        } else if (data->mode == 1) {
+            do {
+                u16 vertexIndex = entry->vertexIndices[(s32)(RandF__5CMathFv(&math) * (f32)entry->maxValue)];
+                Vec vtx = points[vertexIndex];
+
+                if ((data->childId + 0x10000) != 0xFFFF) {
+                    _pppPObject* child;
+                    _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (data->childId << 4));
+
+                    if (childData == 0) {
+                        child = 0;
+                    } else {
+                        child = pppCreatePObject((_pppMngSt*)lbl_8032ED50, childData);
+                        *(void**)((u8*)child + 0x4) = parent;
+                    }
+
+                    *(Vec*)((u8*)child + data->childPosOffset + 0x80) = vtx;
+                }
+            } while (count-- != 0);
+        }
+
+        state->countdown = data->spawnDelay;
     }
+
+    state->countdown--;
 }

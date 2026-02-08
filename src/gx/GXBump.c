@@ -18,24 +18,25 @@ do { \
 } while (0)
 #endif
 
+#pragma dont_inline on
 void GXSetTevIndirect(GXTevStageID tev_stage, GXIndTexStageID ind_stage, GXIndTexFormat format, GXIndTexBiasSel bias_sel, GXIndTexMtxID matrix_sel, GXIndTexWrap wrap_s, GXIndTexWrap wrap_t, GXBool add_prev, GXBool utc_lod, GXIndTexAlphaSel alpha_sel) {
     u32 reg;
 
     CHECK_GXBEGIN(146, "GXInitIndTexture");
-    reg = 0;
-    SET_REG_FIELD(148, reg, 2, 0, ind_stage);
-    SET_REG_FIELD(149, reg, 2, 2, format);
-    SET_REG_FIELD(150, reg, 3, 4, bias_sel);
-    SET_REG_FIELD(151, reg, 2, 7, alpha_sel);
-    SET_REG_FIELD(152, reg, 4, 9, matrix_sel);
-    SET_REG_FIELD(153, reg, 3, 13, wrap_s);
-    SET_REG_FIELD(154, reg, 3, 16, wrap_t);
-    SET_REG_FIELD(155, reg, 1, 19, utc_lod);
-    SET_REG_FIELD(156, reg, 1, 20, add_prev);
-    SET_REG_FIELD(157, reg, 8, 24, tev_stage + 16);
+    reg = ind_stage;
+    reg = (reg & 0xFFFFFFF3U) | ((u32)format << 2);
+    reg = (reg & 0xFFFFFF8FU) | ((u32)bias_sel << 4);
+    reg = (reg & 0xFFFFFE7FU) | ((u32)alpha_sel << 7);
+    reg = (reg & 0xFFFFE1FFU) | ((u32)matrix_sel << 9);
+    reg = (reg & 0xFFFF1FFFU) | ((u32)wrap_s << 13);
+    reg = (reg & 0xFFF8FFFFU) | ((u32)wrap_t << 16);
+    reg = (reg & 0xFFF7FFFFU) | ((u32)utc_lod << 19);
+    reg = (reg & 0xFFEFFFFFU) | ((u32)add_prev << 20);
+    reg |= (u32)(tev_stage + 16) << 24;
     GX_WRITE_SOME_REG5(GX_LOAD_BP_REG, reg);
     __GXData->bpSentNot = 0;
 }
+#pragma dont_inline reset
 
 void GXSetIndTexMtx(GXIndTexMtxID mtx_id, const f32 offset[2][3], s8 scale_exp) {
     s32 mtx[6];

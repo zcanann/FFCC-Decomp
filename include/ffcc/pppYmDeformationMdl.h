@@ -5,15 +5,21 @@
 
 // Forward declarations
 struct VYmDeformationMdl;
-struct UnkB;
 
 struct UnkC {
     s32* m_serializedDataOffsets;
 };
 
+struct UnkB {
+    s32 m_graphId;
+    u16 m_dataValIndex;
+    s16 m_initWOrk;
+    f32 m_stepValue;
+    f32 m_arg3;
+    f32* m_payload;
+};
+
 struct pppYmDeformationMdl {
-    u8* m_serializedData;
-    // Add padding for pppPObject structure + field_0x80 offset
     char pad[0x80];
 };
 
@@ -25,9 +31,9 @@ extern "C" {
 #endif
 
 void pppConstructYmDeformationMdl(pppYmDeformationMdl*, struct UnkC*);
-void pppConstruct2YmDeformationMdl(void);
+void pppConstruct2YmDeformationMdl(pppYmDeformationMdl*, struct UnkC*);
 void pppDestructYmDeformationMdl(void);
-void pppFrameYmDeformationMdl(void* pppYmDeformationMdl, void* param_2, void* param_3);
+void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, UnkB* param_2, UnkC* param_3);
 void pppRenderYmDeformationMdl(void* pppYmDeformationMdl, void* param_2, void* param_3);
 
 #ifdef __cplusplus

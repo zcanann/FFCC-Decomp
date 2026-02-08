@@ -129,7 +129,7 @@ void CMesMenu::CloseRequest(int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMesMenu::SetPos(float x, float y, float z)
+void CMesMenu::SetPos(float x, float y)
 {
 	*(float*)((char*)this + 0x3d74) = x;
 	*(float*)((char*)this + 0x3d78) = y;

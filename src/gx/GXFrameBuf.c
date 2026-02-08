@@ -322,21 +322,13 @@ void GXSetCopyClear(GXColor clear_clr, u32 clear_z) {
     CHECK_GXBEGIN(1596, "GXSetCopyClear");
     ASSERTMSGLINE(1598, clear_z <= 0xFFFFFF, "GXSetCopyClear: Z clear value is out of range");
 
-    reg = 0;
-    SET_REG_FIELD(1601, reg, 8, 0, clear_clr.r);
-    SET_REG_FIELD(1602, reg, 8, 8, clear_clr.a);
-    SET_REG_FIELD(1602, reg, 8, 24, 0x4F);
+    reg = ((u32)clear_clr.a << 8) | clear_clr.r | 0x4F000000;
     GX_WRITE_RAS_REG(reg);
 
-    reg = 0;
-    SET_REG_FIELD(1607, reg, 8, 0, clear_clr.b);
-    SET_REG_FIELD(1608, reg, 8, 8, clear_clr.g);
-    SET_REG_FIELD(1608, reg, 8, 24, 0x50);
+    reg = ((u32)clear_clr.g << 8) | clear_clr.b | 0x50000000;
     GX_WRITE_RAS_REG(reg);
 
-    reg = 0;
-    SET_REG_FIELD(1613, reg, 24, 0, clear_z);
-    SET_REG_FIELD(1613, reg, 8, 24, 0x51);
+    reg = (clear_z & 0xFFFFFF) | 0x51000000;
     GX_WRITE_RAS_REG(reg);
     __GXData->bpSentNot = 0;
 }

@@ -5,14 +5,15 @@
 #include "ffcc/system.h"
 #include <dolphin/gba/GBA.h>
 
+CGbaPcs GbaPcs;
+
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-CGbaPcs::CGbaPcs()
+CGbaPcs::CGbaPcs() : CProcess()
 {
-	// TODO
 }
 
 /*

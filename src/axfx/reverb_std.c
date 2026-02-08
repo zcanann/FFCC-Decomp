@@ -11,7 +11,7 @@ static int DLcreate(AXFX_REVSTD_DELAYLINE* dl, s32 max_length);
 static void DLdelete(AXFX_REVSTD_DELAYLINE* dl);
 static int ReverbSTDCreate(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 mix, f32 damping, f32 predelay);
 static int ReverbSTDModify(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 mix, f32 damping, f32 predelay);
-static void HandleReverb(s32* sptr, AXFX_REVSTD_WORK* rv);
+static void HandleReverb2(s32* sptr, AXFX_REVSTD_WORK* rv);
 static void ReverbSTDCallback(s32* left, s32* right, s32* surround, AXFX_REVSTD_WORK* rv);
 static void ReverbSTDFree(AXFX_REVSTD_WORK* rv);
 
@@ -170,7 +170,7 @@ const static f32 value0_3 = 0.3f;
 const static f32 value0_6 = 0.6f;
 const static double i2fMagic = 4503601774854144.0;
 
-asm static void HandleReverb(register s32* sptr, register AXFX_REVSTD_WORK* rv) {
+asm static void HandleReverb2(register s32* sptr, register AXFX_REVSTD_WORK* rv) {
     nofralloc
 	stwu r1, -144(r1)
 	stmw r17, 8(r1)
@@ -432,7 +432,7 @@ L_0000090C:
 }
 
 static void ReverbSTDCallback(s32* left, s32* right, s32* surround, AXFX_REVSTD_WORK* rv) {
-    HandleReverb(left, rv);
+    HandleReverb2(left, rv);
 }
 
 static void ReverbSTDFree(AXFX_REVSTD_WORK* rv) {

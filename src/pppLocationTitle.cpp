@@ -10,6 +10,14 @@ static int GetGraphFrameFromId(u32 graphId)
     return ((int)graphId >> 12) + (int)((graphId & 0x80000000) != 0 && (graphId & 0xFFF) != 0);
 }
 
+extern void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float,
+                                                                       unsigned char, unsigned char,
+                                                                       unsigned char, unsigned char,
+                                                                       unsigned char, unsigned char,
+                                                                       unsigned char);
+extern void pppSetBlendMode__FUc(unsigned char);
+extern void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
+
 /*
  * --INFO--
  * PAL Address: 0x800d92cc

@@ -52,12 +52,23 @@ void CGraphicPcs::create()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004769c
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGraphicPcs::SetDOFParameter(char, char, float, float, float, float, float, int)
+void CGraphicPcs::SetDOFParameter(signed char flagA, signed char flagB, float nearZ, float farZ, float focus, float blurNear, float blurFar, int mode)
 {
-	// TODO
+	*(char*)((char*)this + 0xc4) = flagB;
+	*(float*)((char*)this + 0xc8) = nearZ;
+	*(float*)((char*)this + 0xcc) = farZ;
+	*(char*)((char*)this + 0xe0) = flagA;
+	*(int*)((char*)this + 0xd0) = mode;
+	*(float*)((char*)this + 0xd4) = focus;
+	*(float*)((char*)this + 0xd8) = blurNear;
+	*(float*)((char*)this + 0xdc) = blurFar;
 }
 
 /*

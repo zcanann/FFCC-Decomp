@@ -55,32 +55,45 @@ void pppDestructCallBackDistance(void)
  */
 void pppFrameCallBackDistance(pppCallBackDistance* param1, UnkB* param2, UnkC* param3)
 {
-    _pppMngSt* p_Var1;
-    u32 uVar2;
-    s32 iVar3;
-    Vec local_28;
-    Vec local_1c;
-    f64 dVar4;
+    _pppMngSt* mngSt;
+    u8* mngBytes;
+    u32 graphId;
+    s32 dataOffset;
+    s32 frameIndex;
+    s32 graphChunk;
+    s32 graphAdjust;
+    Vec worldPos;
+    Vec particlePos;
+    f32 distance;
 
-    local_1c.x = pppMngStPtr->m_matrix.value[0][3];
-    iVar3 = *param3->m_serializedDataOffsets;
-    local_1c.y = pppMngStPtr->m_matrix.value[1][3];
-    local_1c.z = pppMngStPtr->m_matrix.value[2][3];
-    dVar4 = (f64)PSVECDistance(&local_1c, &pppMngStPtr->m_scale);
-    p_Var1 = pppMngStPtr;
+    mngSt = pppMngStPtr;
+    mngBytes = (u8*)mngSt;
+    particlePos.x = *(f32*)(mngBytes + 0x10);
+    dataOffset = *param3->m_serializedDataOffsets;
+    particlePos.y = *(f32*)(mngBytes + 0x20);
+    particlePos.z = *(f32*)(mngBytes + 0x30);
+    distance = PSVECDistance(&particlePos, (Vec*)(mngBytes + 0x64));
+    mngSt = pppMngStPtr;
+    mngBytes = (u8*)mngSt;
 
-    if ((dVar4 <= (f64)param2->m_dataValIndex) ||
-        ((f64)*(f32*)((s32)(&param1->field0_0x0 + 2) + iVar3) <= dVar4)) {
-        local_28.x = pppMngStPtr->m_matrix.value[0][3];
-        local_28.y = pppMngStPtr->m_matrix.value[1][3];
-        local_28.z = pppMngStPtr->m_matrix.value[2][3];
-        PSMTXMultVec(ppvWorldMatrix, &local_28, &local_28);
-        uVar2 = *(u32*)&param1->field0_0x0;
-        iVar3 = (s32)&p_Var1[0x5f2411].m_scale / 0x158 + ((s32)&p_Var1[0x5f2411].m_scale >> 0x1f);
-        Game.game.ParticleFrameCallback(iVar3 - (iVar3 >> 0x1f), (s32)p_Var1->m_kind,
-                                        (s32)p_Var1->m_nodeIndex, (s32)param2->m_initWOrk,
-                                        ((s32)uVar2 >> 0xc) +
-                                            (u32)((s32)uVar2 < 0 && (uVar2 & 0xfff) != 0),
-                                        &local_28);
+    if ((distance <= param2->m_dataValIndex) || (*(f32*)((u8*)param1 + dataOffset + 8) <= distance)) {
+        worldPos.x = *(f32*)(mngBytes + 0x10);
+        worldPos.y = *(f32*)(mngBytes + 0x20);
+        worldPos.z = *(f32*)(mngBytes + 0x30);
+        PSMTXMultVec(ppvWorldMatrix, &worldPos, &worldPos);
+
+        frameIndex = (s32)(mngBytes + 0x42E55C58) / 0x158 + ((s32)(mngBytes + 0x42E55C58) >> 0x1f);
+        frameIndex = frameIndex - (frameIndex >> 0x1f);
+
+        graphId = *(u32*)&param1->field0_0x0;
+        graphChunk = (s32)graphId >> 0xc;
+        graphAdjust = 0;
+        if (((s32)graphId < 0) && ((graphId & 0xfff) != 0)) {
+            graphAdjust = 1;
+        }
+
+        Game.game.ParticleFrameCallback(frameIndex, (s32)*(s16*)(mngBytes + 0xb0),
+                                        (s32)*(s16*)(mngBytes + 0xb2), (s32)param2->m_initWOrk,
+                                        graphChunk + graphAdjust, &worldPos);
     }
 }

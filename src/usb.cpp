@@ -2,6 +2,8 @@
 
 #include "ffcc/system.h"
 
+extern void* __vt__8CManager;
+
 /*
  * --INFO--
  * Address:	TODO
@@ -188,5 +190,6 @@ void CUSB::Printf(char*, ...)
  */
 extern "C" void __sinit_usb_cpp()
 {
-	USB.m_managerStringTable = &PTR_PTR_DAT_801e88a4;
+	*(volatile void**)&USB = &__vt__8CManager;
+	*(volatile void**)&USB = &PTR_PTR_DAT_801e88a4;
 }

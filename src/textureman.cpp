@@ -12,22 +12,30 @@ CTextureMan::CTextureMan()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003BDF4
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CTextureMan::Init()
 {
-	// TODO
+	m_memoryStage = Memory.CreateStage(0x40000, (char*)"CTexture.texture", 0);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003BDC4
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CTextureMan::Quit()
 {
-	// TODO
+	Memory.DestroyStage(m_memoryStage);
 }
 
 /*

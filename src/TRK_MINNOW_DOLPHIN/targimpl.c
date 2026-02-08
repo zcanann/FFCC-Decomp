@@ -119,12 +119,34 @@ asm void __TRK_set_MSR(register u32 msr) {
  * --INFO--
  * PAL Address: 0x801abed4
  * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 asm void WriteFPSCR(register f64* fpscr) {
 #ifdef __MWERKS__ // clang-format off
     nofralloc
     lfd f0, 0(r3)
     mtfsf 0xff, f0
+    blr
+#endif // clang-format on
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801abeb0
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+asm void ReadFPSCR(register f64* fpscr) {
+#ifdef __MWERKS__ // clang-format off
+    nofralloc
+    mffs f0
+    stfd f0, 0(r3)
     blr
 #endif // clang-format on
 }
@@ -1127,7 +1149,13 @@ DSError TRKPPCAccessFPRegister(void* srcDestPtr, u32 fpr, BOOL read)
 
         error = TRKPPCAccessSpecialReg(srcDestPtr, instructionData1, read);
     } else if (fpr == 0x20) {
-        *(u64*)srcDestPtr &= 0xFFFFFFFF;
+        if (read) {
+            ReadFPSCR(srcDestPtr);
+        } else {
+            WriteFPSCR(srcDestPtr);
+        }
+
+        DSFetch_u64(srcDestPtr) &= 0xFFFFFFFF;
     } else if (fpr == 0x21) {
         if (!read) {
             *(u32*)srcDestPtr = *((u32*)(srcDestPtr) + 1);

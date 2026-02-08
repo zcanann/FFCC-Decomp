@@ -6515,15 +6515,29 @@ void DEBPRINT(char*, ...)
  */
 unsigned short JoyBus::Crc16(int len, unsigned char* data, unsigned short* crc)
 {
-    while (len-- > 0)
+    unsigned int c;
+    unsigned char b;
+    unsigned int idx;
+    unsigned int hi;
+
+    goto check_len;
+
+loop:
+    c = *crc;
+    b = *data;
+    data = data + 1;
+    idx = (unsigned int)((int)c >> 8);
+    idx = (unsigned char)idx;
+    idx = idx ^ (unsigned int)b;
+    hi = c << 8;
+    *crc = (unsigned short)(hi ^ JoyBusCrcTable[idx]);
+
+check_len:
+    len = len - 1;
+
+    if (len >= 0)
     {
-        unsigned short c = *crc;
-        unsigned char b = *data++;
-
-        unsigned char idx = (unsigned char)((c >> 8) ^ b);
-        unsigned short hi = (unsigned short)(c << 8);
-
-        *crc = hi ^ JoyBusCrcTable[idx];
+        goto loop;
     }
 
     return (unsigned short)~(*crc);

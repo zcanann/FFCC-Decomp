@@ -1,5 +1,6 @@
 #include "ffcc/wmm_str.h"
 #include "ffcc/p_game.h"
+#include "ffcc/fontman.h"
 
 extern const char* lbl_80215BD8[];
 extern const char* lbl_80215BE8[];
@@ -26,6 +27,14 @@ extern const char* lbl_802163E4[];
 extern const char* lbl_80216420[];
 
 extern const char lbl_8021645C[];
+extern const char* lbl_8021672C[];
+extern const char* lbl_80216740[];
+
+extern "C" void SetMargin__5CFontFf(float, CFont*);
+extern "C" void SetShadow__5CFontFi(CFont*, int);
+extern "C" void SetScale__5CFontFf(float, CFont*);
+extern "C" void SetTlut__5CFontFi(CFont*, int);
+extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
 
 /*
  * --INFO--
@@ -146,9 +155,49 @@ const char* CMenuPcs::GetWinMess(int index)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::GetYesNoXPos(int)
+int CMenuPcs::GetYesNoXPos(int right)
 {
-	// TODO
+    static const char sYes[] = "\0Yes";
+    static const char sJa[] = "\0Ja";
+    static const char sOui[] = "\0Oui";
+
+    const unsigned int languageId = Game.game.m_gameWork.m_languageId;
+    const char* yesText = sOui;
+    if (languageId != 3) {
+        if (languageId < 3) {
+            if ((languageId != 1) && (languageId != 0)) {
+                yesText = sJa;
+                goto apply_font_yes;
+            }
+        } else {
+            yesText = sYes;
+            if ((languageId == 5) || (languageId < 5)) {
+                goto apply_font_yes;
+            }
+        }
+        yesText = sYes;
+    }
+
+apply_font_yes:
+    CFont* font = *(CFont**)((char*)this + 0xf8);
+    SetMargin__5CFontFf(1.0f, font);
+    SetShadow__5CFontFi(font, 0);
+    SetScale__5CFontFf(1.0f, font);
+
+    const int yesWidth = GetWidth__5CFontFPc(font, yesText + 1);
+    short* windowInfo = *(short**)((char*)this + 0x848);
+    int x = (int)((windowInfo[2] - yesWidth) * 0.5f + windowInfo[0]);
+    if (right != 0) {
+        const char* noText = 0;
+        if ((languageId >= 1) && (languageId <= 5)) {
+            noText = lbl_8021672C[languageId - 1];
+        }
+        if (noText != 0) {
+            const int noWidth = GetWidth__5CFontFPc(font, noText);
+            x += yesWidth - noWidth;
+        }
+    }
+    return x - 0x1e;
 }
 
 /*
@@ -160,7 +209,48 @@ void CMenuPcs::GetYesNoXPos(int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::GetSlotABXPos(int)
+int CMenuPcs::GetSlotABXPos(int right)
 {
-	// TODO
+    static const char sSlotA[] = "\0Slot A";
+    static const char sSteckplatzA[] = "\0Steckplatz A";
+    static const char sRanuraA[] = "\0Ranura A";
+
+    const unsigned int languageId = Game.game.m_gameWork.m_languageId;
+    const char* slotAText = sSlotA;
+    if (languageId != 3) {
+        if (languageId < 3) {
+            if ((languageId != 1) && (languageId != 0)) {
+                slotAText = sSteckplatzA;
+                goto apply_font_slot;
+            }
+        } else {
+            slotAText = sRanuraA;
+            if ((languageId == 5) || (languageId < 5)) {
+                goto apply_font_slot;
+            }
+        }
+        slotAText = sSlotA;
+    }
+
+apply_font_slot:
+    CFont* font = *(CFont**)((char*)this + 0xf8);
+    SetMargin__5CFontFf(1.0f, font);
+    SetShadow__5CFontFi(font, 0);
+    SetScale__5CFontFf(1.0f, font);
+    SetTlut__5CFontFi(font, 0x23);
+
+    const int slotAWidth = GetWidth__5CFontFPc(font, slotAText + 1);
+    short* windowInfo = *(short**)((char*)this + 0x848);
+    int x = (int)((windowInfo[2] - slotAWidth) * 0.5f + windowInfo[0]);
+    if (right != 0) {
+        const char* slotBText = 0;
+        if ((languageId >= 1) && (languageId <= 6)) {
+            slotBText = lbl_80216740[languageId - 1];
+        }
+        if (slotBText != 0) {
+            const int slotBWidth = GetWidth__5CFontFPc(font, slotBText);
+            x += slotAWidth - slotBWidth;
+        }
+    }
+    return x - 0x1e;
 }

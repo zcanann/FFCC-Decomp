@@ -104,6 +104,7 @@ s32 CARDFastOpen(s32 chan, s32 fileNo, CARDFileInfo* fileInfo) {
     CARDControl* card;
     CARDDir* dir;
     CARDDir* ent;
+    u8 perm;
     s32 result;
 
     ASSERTLINE(278, 0 <= fileNo && fileNo < CARD_MAX_FILE);
@@ -119,8 +120,22 @@ s32 CARDFastOpen(s32 chan, s32 fileNo, CARDFileInfo* fileInfo) {
 
     dir = __CARDGetDirBlock(card);
     ent = &dir[fileNo];
-    result = __CARDIsWritable(card, ent);
-    if (result == CARD_RESULT_NOPERM && (ent->permission & 0x4))
+    result = __CARDAccess(card, ent);
+    if (result == CARD_RESULT_NOPERM) {
+        perm = ent->permission & __CARDPermMask;
+        if (perm & CARD_ATTR_GLOBAL
+         && (memcmp(ent->gameName, __CARDDiskNone.gameName, sizeof(ent->gameName)) == 0
+          && memcmp(ent->company, __CARDDiskNone.company, sizeof(ent->company)) == 0))
+        {
+            result = CARD_RESULT_READY;
+        } else if (perm & CARD_ATTR_COMPANY
+                && (memcmp(ent->gameName, __CARDDiskNone.gameName, sizeof(ent->gameName)) == 0
+                 && memcmp(ent->company, card->diskID->company, sizeof(ent->company)) == 0))
+        {
+            result = CARD_RESULT_READY;
+        }
+    }
+    if (result == CARD_RESULT_NOPERM && (ent->permission & CARD_ATTR_PUBLIC))
         result = CARD_RESULT_READY;
 
     if (0 <= result) {

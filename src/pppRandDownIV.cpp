@@ -1,41 +1,32 @@
 #include "ffcc/pppRandDownIV.h"
 #include "ffcc/math.h"
+#include "types.h"
 
 extern CMath math;
-extern int lbl_8032ED70;
-extern float lbl_8032FF68;
-extern float lbl_801EADC8[32];
-extern "C" float RandF__5CMathFv(CMath* instance);
+extern s32 lbl_8032ED70;
+extern f32 lbl_8032FF68;
+extern f64 lbl_8032FF70;
+extern s32 lbl_801EADC8;
 
-struct RandDownIVParam {
-    int targetId;
-    int sourceOffset;
-    int x;
-    int y;
-    int z;
-    unsigned char randomTwice;
-};
-
-struct RandDownIVCtx {
-    void* unk0;
-    void* unk4;
-    void* unk8;
-    int* outputOffset;
-};
-
-/*
- * --INFO--
- * PAL Address: 0x80061a88
- * PAL Size: 404b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void randint(int param1, float param2)
-{
+extern "C" {
+f32 RandF__5CMathFv(CMath*);
 }
 
+struct PppRandDownIVParam2 {
+    s32 field0;
+    s32 field4;
+    s32 field8;
+    s32 fieldC;
+    s32 field10;
+    u8 field14[4];
+    u8 field18;
+};
+
+struct PppRandDownIVParam3 {
+    u8 field0[0xC];
+    s32* fieldC;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x80061a88
@@ -45,38 +36,44 @@ void randint(int param1, float param2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRandDownIV(void* arg1, void* arg2, void* arg3)
+extern "C" void pppRandDownIV(void* param1, void* param2, void* param3)
 {
-    int* objectWords = (int*)arg1;
-    RandDownIVParam* data = (RandDownIVParam*)arg2;
-    RandDownIVCtx* ctx = (RandDownIVCtx*)arg3;
-    float* output;
-    int* source;
-    float randomValue;
+    u8* base = (u8*)param1;
+    PppRandDownIVParam2* in = (PppRandDownIVParam2*)param2;
+    PppRandDownIVParam3* out = (PppRandDownIVParam3*)param3;
+    f32* valuePtr;
+    s32* target;
+    f32 value;
 
     if (lbl_8032ED70 != 0) {
         return;
     }
 
-    if (data->targetId != objectWords[3]) {
+    if (in->field0 == *(s32*)(base + 0xC)) {
+        value = -RandF__5CMathFv(&math);
+        if (in->field18 != 0) {
+            value = (value - RandF__5CMathFv(&math)) * lbl_8032FF68;
+        }
+
+        valuePtr = (f32*)(base + *out->fieldC + 0x80);
+        *valuePtr = value;
+    }
+
+    if (in->field0 != *(s32*)(base + 0xC)) {
         return;
     }
 
-    randomValue = -RandF__5CMathFv(&math);
-    if (data->randomTwice != 0) {
-        randomValue = (randomValue - RandF__5CMathFv(&math)) * lbl_8032FF68;
-    }
-
-    output = (float*)((char*)arg1 + *ctx->outputOffset + 0x80);
-    *output = randomValue;
-
-    if (data->sourceOffset == -1) {
-        source = (int*)&lbl_801EADC8[0];
+    valuePtr = (f32*)(base + *out->fieldC + 0x80);
+    if (in->field4 == -1) {
+        target = &lbl_801EADC8;
     } else {
-        source = (int*)((char*)arg1 + data->sourceOffset + 0x80);
+        target = (s32*)(base + in->field4 + 0x80);
     }
 
-    source[0] += (int)((float)data->x * *output);
-    source[1] += (int)((float)data->y * *output);
-    source[2] += (int)((float)data->z * *output);
+    {
+        f32 randValue = *valuePtr;
+        target[0] += (s32)((f64)in->field8 * (f64)randValue);
+        target[1] += (s32)((f64)in->fieldC * (f64)randValue);
+        target[2] += (s32)((f64)in->field10 * (f64)randValue);
+    }
 }

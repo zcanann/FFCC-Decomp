@@ -1,5 +1,7 @@
 #include "ffcc/pppCorona.h"
 
+extern float lbl_803310C8;
+
 /*
  * --INFO--
  * PAL Address: 0x800df5e4
@@ -9,31 +11,16 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructCorona(void* param1, void* param2)
+void pppConstructCorona(pppCorona* param1, UnkC* param2)
 {
-    // Based on objdiff expected assembly pattern  
-    // Function works with offsets and stores shorts/floats
-    char* p1 = (char*)param1;
-    char** p2 = (char**)param2;
-    
-    if (p2) {
-        char** base = (char**)*(p2 + 3); // offset 0xc from param2
-        if (base) {
-            int offset_val = (int)*(base + 3); // offset 0xc from base
-            char* target = p1 + offset_val + 0x80;
-            
-            // Store three shorts as 0
-            *((short*)target) = 0;
-            *((short*)(target + 2)) = 0;
-            *((short*)(target + 4)) = 0;
-            
-            // Store three floats with a constant value  
-            float constant = 0.0f; // Will need to find the right constant
-            *((float*)(target + 8)) = constant;
-            *((float*)(target + 0xc)) = constant; 
-            *((float*)(target + 0x10)) = constant;
-        }
-    }
+    float fVar1 = lbl_803310C8;
+    u16* puVar2 = (u16*)((u8*)param1 + 0x80 + param2->m_serializedDataOffsets[3]);
+    puVar2[2] = 0;
+    puVar2[1] = 0;
+    puVar2[0] = 0;
+    *(float*)(puVar2 + 8) = fVar1;
+    *(float*)(puVar2 + 6) = fVar1;
+    *(float*)(puVar2 + 4) = fVar1;
 }
 
 /*
@@ -58,7 +45,7 @@ void pppDestructCorona(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameCorona(void* param1, void* param2)
+void pppFrameCorona(pppCorona* param1, UnkC* param2)
 {
     // Placeholder implementation - complex function with many operations
 }
@@ -72,7 +59,7 @@ void pppFrameCorona(void* param1, void* param2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderCorona(void* param1, void* param2)
+void pppRenderCorona(pppCorona* param1, UnkC* param2)
 {
     // Placeholder implementation - very complex rendering function
 }

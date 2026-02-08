@@ -25,7 +25,7 @@ typedef struct pppConstrainCameraForLocData {
     int* m_serializedDataOffsets;
 } pppConstrainCameraForLocData;
 
-void CC_BeforeCalcMatrixCallback(CChara::CModel*, void*, void*);
+int CC_BeforeCalcMatrixCallback(CChara::CModel*, void*, void*);
 
 #ifdef __cplusplus
 extern "C" {

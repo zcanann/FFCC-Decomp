@@ -30,6 +30,7 @@ public:
     void putParticle(int, int, CGObject*, float, int);
     void putParticleTrace(int, int, CGObject*, float, int);
     void putParticleBindTrace(int, int, CGObject*, float, int);
+    int getReplaceStat(int);
     void getTargetRot(CGPrgObj*);
     void rotTarget(CGPrgObj*);
     void dstTargetRot(CGPrgObj*);

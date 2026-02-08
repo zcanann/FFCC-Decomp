@@ -1,5 +1,11 @@
 #include "ffcc/pppSRandDownHCV.h"
 #include "ffcc/math.h"
+#include "dolphin/types.h"
+
+extern CMath math;
+extern int lbl_8032ED70;
+extern s16 lbl_801EADC8[];
+extern "C" float RandF__5CMathFv(CMath* instance);
 
 /*
  * --INFO--
@@ -10,77 +16,82 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppSRandDownHCV(void* param1, void* param2)
+void pppSRandDownHCV(void* param1, void* param2, void* param3)
 {
-    extern int lbl_8032ED70;
-    if (lbl_8032ED70 != 0) return;
-    
-    CMath math;
-    
-    unsigned int* p1 = (unsigned int*)param1;
-    unsigned char* p2_bytes = (unsigned char*)param2;
-    short* p2_shorts = (short*)param2;
-    
-    // Check if indices match
-    int currentIndex = *((int*)param2);
-    int targetIndex = p1[3];
-    if (currentIndex != targetIndex) {
-        // Handle different path - still generate random data
-        int dataOffset = *((int*)param2 + 3);
-        float* target = (float*)((char*)param1 + dataOffset + 0x80);
-        
-        unsigned char flag = p2_bytes[0x10];
-        
-        // Generate 4 random float values
-        for (int i = 0; i < 4; i++) {
-            math.RandF();
-            float randVal = -1.0f; // Placeholder - RandF result stored elsewhere
-            if (flag != 0) {
-                math.RandF();
-                float randVal2 = 0.5f; // Placeholder for second random
-                randVal = (-randVal - randVal2) * 0.5f;
-            }
-            target[i] = randVal;
-        }
-        return;
-    }
-    
-    // Main path when indices match
-    int dataOffset = *((int*)param2 + 3);
-    float* target = (float*)((char*)param1 + dataOffset + 0x80);
-    
-    unsigned char flag = p2_bytes[0x10];
-    
-    // Generate 4 random float values and store them
-    for (int i = 0; i < 4; i++) {
-        math.RandF();
-        float randVal = -1.0f; // Placeholder - RandF result stored elsewhere
-        if (flag != 0) {
-            math.RandF();
-            float randVal2 = 0.5f; // Placeholder for second random
-            randVal = (-randVal - randVal2) * 0.5f;
-        }
-        target[i] = randVal;
-    }
-    
-    // Get target short array pointer
-    int shortOffset = *((int*)param2 + 1);
-    short* targetColors;
-    if (shortOffset == -1) {
-        extern short lbl_801EADC8[];
-        targetColors = lbl_801EADC8;
-    } else {
-        targetColors = (short*)((char*)param1 + shortOffset + 0x80);
-    }
-    
-    // Apply random modifications to 4 short values
-    for (int i = 0; i < 4; i++) {
-        short baseValue = p2_shorts[4 + i]; // +0x8, +0xa, +0xc, +0xe offsets
-        float randomMult = target[i];
-        int adjustment = (int)(baseValue * randomMult);
-        short currentValue = targetColors[i];
-        targetColors[i] = currentValue + (short)adjustment;
-    }
+	if (lbl_8032ED70 != 0) {
+		return;
+	}
+
+	float* target;
+
+	if (*(int*)param2 == *((int*)param1 + 3)) {
+		int** base_ptr = (int**)((char*)param3 + 0xc);
+		int offset = **base_ptr;
+		target = (float*)((char*)param1 + offset + 0x80);
+
+		u8 flag = *((u8*)param2 + 0x10);
+		float value;
+
+		value = -RandF__5CMathFv(&math);
+		if (flag != 0) {
+			value = (value - RandF__5CMathFv(&math)) * 0.5f;
+		}
+		target[0] = value;
+
+		value = -RandF__5CMathFv(&math);
+		if (flag != 0) {
+			value = (value - RandF__5CMathFv(&math)) * 0.5f;
+		}
+		target[1] = value;
+
+		value = -RandF__5CMathFv(&math);
+		if (flag != 0) {
+			value = (value - RandF__5CMathFv(&math)) * 0.5f;
+		}
+		target[2] = value;
+
+		value = -RandF__5CMathFv(&math);
+		if (flag != 0) {
+			value = (value - RandF__5CMathFv(&math)) * 0.5f;
+		}
+		target[3] = value;
+	} else if (*(int*)param2 != *((int*)param1 + 3)) {
+		int** base_ptr = (int**)((char*)param3 + 0xc);
+		int offset = **base_ptr;
+		target = (float*)((char*)param1 + offset + 0x80);
+	}
+
+	s16* target_colors;
+	int color_offset = *((int*)param2 + 1);
+	if (color_offset == -1) {
+		target_colors = lbl_801EADC8;
+	} else {
+		target_colors = (s16*)((char*)param1 + color_offset + 0x80);
+	}
+
+	{
+		s16 base = *(s16*)((char*)param2 + 0x8);
+		s8 delta = (s8)(base * target[0]);
+		target_colors[0] = (s16)(target_colors[0] + delta);
+	}
+
+	{
+		s16 base = *(s16*)((char*)param2 + 0xa);
+		s8 delta = (s8)(base * target[1]);
+		target_colors[1] = (s16)(target_colors[1] + delta);
+	}
+
+	{
+		s16 base = *(s16*)((char*)param2 + 0xc);
+		s8 delta = (s8)(base * target[2]);
+		target_colors[2] = (s16)(target_colors[2] + delta);
+	}
+
+	{
+		s16 base = *(s16*)((char*)param2 + 0xe);
+		s8 delta = (s8)(base * target[3]);
+		target_colors[3] = (s16)(target_colors[3] + delta);
+	}
 }
 
 /*

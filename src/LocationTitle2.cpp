@@ -1,4 +1,5 @@
 #include "ffcc/LocationTitle2.h"
+#include "ffcc/pppPart.h"
 #include <string.h>
 
 // External function declarations
@@ -9,7 +10,7 @@ extern int DAT_8032ed70;
 
 /*
  * --INFO--
- * PAL Address: 0x80065cb8
+ * PAL Address: 0x800da90c
  * PAL Size: 48b
  * EN Address: TODO
  * EN Size: TODO
@@ -26,21 +27,21 @@ void pppConstructLocationTitle2(struct pppLocationTitle2* locationTitle, struct 
         float scaleY;
         float scaleZ;
     };
-    float one;
+    float value;
     LocationTitle2Work* work;
 
-    one = 1.0f;
+    value = 0.0f;
     work = (LocationTitle2Work*)((char*)locationTitle + 8 + *unkC->m_serializedDataOffsets);
     work->data = 0;
     work->count = 0;
-    work->scaleZ = one;
-    work->scaleY = one;
-    work->scaleX = one;
+    work->scaleZ = value;
+    work->scaleY = value;
+    work->scaleX = value;
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80065b3c  
+ * PAL Address: 0x800da8b8
  * PAL Size: 84b
  * EN Address: TODO
  * EN Size: TODO
@@ -49,19 +50,21 @@ void pppConstructLocationTitle2(struct pppLocationTitle2* locationTitle, struct 
  */
 void pppDestructLocationTitle2(struct pppLocationTitle2* locationTitle, struct UnkC* unkC) 
 {
-    int iVar1;
-    
-    iVar1 = *unkC->m_serializedDataOffsets;
-    if (*(void**)((char*)locationTitle + 8 + iVar1) != 0) {
-        // pppHeapUseRate call - function name unclear
-        // *(void**)((char*)locationTitle + 8 + iVar1) function call here
-        *(void**)((char*)locationTitle + 8 + iVar1) = 0;
+    int serializedOffset;
+    CMemory::CStage** stagePtr;
+
+    serializedOffset = *unkC->m_serializedDataOffsets;
+    stagePtr = (CMemory::CStage**)((char*)locationTitle + 8 + serializedOffset);
+
+    if (*stagePtr != 0) {
+        pppHeapUseRate(*stagePtr);
+        *stagePtr = 0;
     }
 }
 
 /*
  * --INFO--
- * PAL Address: 0x80065b90
+ * PAL Address: 0x800da3f8
  * PAL Size: 1216b  
  * EN Address: TODO
  * EN Size: TODO
@@ -102,7 +105,7 @@ void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, struct UnkB
 
 /*
  * --INFO--
- * PAL Address: 0x80065c50
+ * PAL Address: 0x800da0b4
  * PAL Size: 836b
  * EN Address: TODO  
  * EN Size: TODO

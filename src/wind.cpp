@@ -9,6 +9,7 @@
 #include "ffcc/math.h"
 #include "ffcc/goout.h"
 #include "ffcc/p_game.h"
+#include "ffcc/system.h"
 
 extern CGraphic Graphic;
 extern CCameraPcs CameraPcs;
@@ -34,6 +35,8 @@ extern double DOUBLE_80330f08;
 extern double DOUBLE_80330f10;
 extern double DOUBLE_80330f40;
 extern double DAT_8032ec20;
+extern char DAT_801db528[];
+extern char DAT_801db548[];
 
 /*
  * --INFO--
@@ -277,22 +280,196 @@ void CWind::AddAmbient(float, float)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800d9538
+ * PAL Size: 416b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CWind::AddDiffuse(const Vec*, float, float, float)
+int CWind::AddDiffuse(const Vec* pos, float radius, float dir, float speed)
 {
-	// TODO
+	u8* freeObj = 0;
+	int freeIdx = 0;
+	u8* scan = (u8*)this;
+
+	for (int group = 0; group < 4; group++) {
+		freeObj = scan;
+		if ((s8)freeObj[0] >= 0) {
+			break;
+		}
+
+		freeObj = scan + 100;
+		if ((s8)freeObj[0] >= 0) {
+			freeIdx += 1;
+			break;
+		}
+
+		freeObj = scan + 200;
+		if ((s8)freeObj[0] >= 0) {
+			freeIdx += 2;
+			break;
+		}
+
+		freeObj = scan + 300;
+		if ((s8)freeObj[0] >= 0) {
+			freeIdx += 3;
+			break;
+		}
+
+		freeObj = scan + 400;
+		if ((s8)freeObj[0] >= 0) {
+			freeIdx += 4;
+			break;
+		}
+
+		freeObj = scan + 500;
+		if ((s8)freeObj[0] >= 0) {
+			freeIdx += 5;
+			break;
+		}
+
+		freeObj = scan + 600;
+		if ((s8)freeObj[0] >= 0) {
+			freeIdx += 6;
+			break;
+		}
+
+		freeObj = scan + 700;
+		if ((s8)freeObj[0] >= 0) {
+			freeIdx += 7;
+			break;
+		}
+
+		freeIdx += 8;
+		scan += 800;
+		freeObj = 0;
+	}
+
+	if (freeObj == 0) {
+		System.Printf(DAT_801db548, freeIdx);
+		return -1;
+	}
+
+	*(s32*)(freeObj + 0x1C) = 1;
+	freeObj[0] = (freeObj[0] & 0x7F) | 0x80;
+
+	int id = *(s32*)((u8*)this + 0xC80);
+	*(s32*)((u8*)this + 0xC80) = id + 1;
+	*(s32*)(freeObj + 0x20) = id;
+
+	*(float*)(freeObj + 0x48) = dir;
+	*(float*)(freeObj + 0x44) = dir;
+	*(float*)(freeObj + 0x40) = dir;
+
+	*(float*)(freeObj + 0x54) = speed;
+	*(float*)(freeObj + 0x50) = speed;
+	*(float*)(freeObj + 0x4C) = speed;
+
+	*(float*)(freeObj + 0x30) = radius;
+	*(float*)(freeObj + 0x34) = radius * radius;
+
+	*(float*)(freeObj + 0x04) = pos->x;
+	*(float*)(freeObj + 0x08) = pos->z;
+	*(float*)(freeObj + 0x0C) = pos->x - radius;
+	*(float*)(freeObj + 0x10) = pos->z - radius;
+	*(float*)(freeObj + 0x14) = pos->x + radius;
+	*(float*)(freeObj + 0x18) = pos->z + radius;
+
+	return *(s32*)(freeObj + 0x20);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800d93bc
+ * PAL Size: 380b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CWind::AddSphere(const Vec*, float, float, int)
+int CWind::AddSphere(const Vec* pos, float radius, float speed, int life)
 {
-	// TODO
+	u8* freeObj = 0;
+	int freeIdx = 0;
+	u8* scan = (u8*)this;
+
+	for (int group = 0; group < 4; group++) {
+		freeObj = scan;
+		if ((s8)freeObj[0] >= 0) {
+			break;
+		}
+
+		freeObj = scan + 100;
+		if ((s8)freeObj[0] >= 0) {
+			freeIdx += 1;
+			break;
+		}
+
+		freeObj = scan + 200;
+		if ((s8)freeObj[0] >= 0) {
+			freeIdx += 2;
+			break;
+		}
+
+		freeObj = scan + 300;
+		if ((s8)freeObj[0] >= 0) {
+			freeIdx += 3;
+			break;
+		}
+
+		freeObj = scan + 400;
+		if ((s8)freeObj[0] >= 0) {
+			freeIdx += 4;
+			break;
+		}
+
+		freeObj = scan + 500;
+		if ((s8)freeObj[0] >= 0) {
+			freeIdx += 5;
+			break;
+		}
+
+		freeObj = scan + 600;
+		if ((s8)freeObj[0] >= 0) {
+			freeIdx += 6;
+			break;
+		}
+
+		freeObj = scan + 700;
+		if ((s8)freeObj[0] >= 0) {
+			freeIdx += 7;
+			break;
+		}
+
+		freeIdx += 8;
+		scan += 800;
+		freeObj = 0;
+	}
+
+	if (freeObj == 0) {
+		System.Printf(DAT_801db528, life, freeIdx);
+		return -1;
+	}
+
+	*(s32*)(freeObj + 0x1C) = 2;
+	freeObj[0] = (freeObj[0] & 0x7F) | 0x80;
+
+	int id = *(s32*)((u8*)this + 0xC80);
+	*(s32*)((u8*)this + 0xC80) = id + 1;
+	*(s32*)(freeObj + 0x20) = id;
+
+	*(float*)(freeObj + 0x54) = speed;
+	*(float*)(freeObj + 0x50) = speed;
+	*(float*)(freeObj + 0x4C) = speed;
+
+	*(float*)(freeObj + 0x2C) = radius;
+	*(s32*)(freeObj + 0x24) = life;
+	*(s32*)(freeObj + 0x28) = 0;
+	*(float*)(freeObj + 0x04) = pos->x;
+	*(float*)(freeObj + 0x08) = pos->z;
+
+	return *(s32*)(freeObj + 0x20);
 }
 
 /*

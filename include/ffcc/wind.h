@@ -28,8 +28,8 @@ public:
     void searchFreeObj();
     void getObj(int);
     void AddAmbient(float, float);
-    void AddDiffuse(const Vec*, float, float, float);
-    void AddSphere(const Vec*, float, float, int);
+    int AddDiffuse(const Vec*, float, float, float);
+    int AddSphere(const Vec*, float, float, int);
     void ChangePower(int, float);
 
 private:

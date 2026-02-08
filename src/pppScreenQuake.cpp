@@ -2,11 +2,10 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/partMng.h"
 
-extern float FLOAT_80331fc8;
-extern int DAT_8032ed70;
+extern float lbl_80331FC8;
+extern int lbl_8032ED70;
 
-void CalcGraphValue(float param1, _pppPObject *param2, int param3, float *param4, float *param5, float *param6, float *param7, float *param8);
-extern "C" void SetQuakeParameter__10CCameraPcsFiissffffffi(CCameraPcs*, int, int, short, short, float, float, float, float, float, float, int);
+void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, _pppPObject*, int, float*, float*, float*, float*, float*);
 
 /*
  * --INFO--
@@ -19,7 +18,7 @@ extern "C" void SetQuakeParameter__10CCameraPcsFiissffffffi(CCameraPcs*, int, in
  */
 void pppConScreenQuake(pppScreenQuake *quake, UnkC *param2)
 {
-	float val = FLOAT_80331fc8;
+	float val = lbl_80331FC8;
 	float *data = (float *)((char *)&quake->field0_0x0 + 128 + *param2->m_serializedDataOffsets);
 	
 	data[0] = val;
@@ -44,7 +43,7 @@ void pppConScreenQuake(pppScreenQuake *quake, UnkC *param2)
  */
 void pppCon2ScreenQuake(pppScreenQuake *quake, UnkC *param2)
 {
-	float val = FLOAT_80331fc8;
+	float val = lbl_80331FC8;
 	float *data = (float *)((char *)&quake->field0_0x0 + 128 + *param2->m_serializedDataOffsets);
 	
 	data[0] = val;
@@ -69,8 +68,8 @@ void pppCon2ScreenQuake(pppScreenQuake *quake, UnkC *param2)
  */
 void pppDesScreenQuake(void)
 {
-	float value = FLOAT_80331fc8;
-	SetQuakeParameter__10CCameraPcsFiissffffffi(&CameraPcs, 0, 0, 0, 0, value, value, value, value, value, value, 1);
+	float value = lbl_80331FC8;
+	CameraPcs.SetQuakeParameter(0, 0, 0, 0, value, value, value, value, value, value, 1);
 }
 
 /*
@@ -84,23 +83,20 @@ void pppDesScreenQuake(void)
  */
 void pppFrameScreenQuake(pppScreenQuake *quake, UnkB *param2, UnkC *param3)
 {
-	if (DAT_8032ed70 == 0) {
+	if (lbl_8032ED70 == 0) {
 		float *value = (float *)((int)(&quake->field0_0x0 + 2) + *param3->m_serializedDataOffsets);
 		
-		CalcGraphValue(param2->m_dataValIndex, (_pppPObject*)&quake->field0_0x0, param2->m_graphId, 
+		CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(param2->m_dataValIndex, (_pppPObject*)&quake->field0_0x0, param2->m_graphId, 
 		               value, value + 1, value + 2, &param2->m_initWOrk, &param2->m_stepValue);
 		               
-		CalcGraphValue(param2->m_arg3, (_pppPObject*)&quake->field0_0x0, param2->m_graphId,
+		CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(param2->m_arg3, (_pppPObject*)&quake->field0_0x0, param2->m_graphId,
 		               value + 3, value + 4, value + 5, &param2->m_initWOrk2, &param2->m_stepValue2);
 		               
-		CalcGraphValue(param2->m_arg4, (_pppPObject*)&quake->field0_0x0, param2->m_graphId,
+		CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(param2->m_arg4, (_pppPObject*)&quake->field0_0x0, param2->m_graphId,
 		               value + 6, value + 7, value + 8, &param2->m_initWOrk3, &param2->m_stepValue3);
 		               
-		SetQuakeParameter__10CCameraPcsFiissffffffi(&CameraPcs, 1, 0, 0, 0,
-		                                            *value, value[3], value[6],
-		                                            param2->m_quakeParam0,
-		                                            param2->m_quakeParam1,
-		                                            param2->m_quakeParam2, 1);
+		CameraPcs.SetQuakeParameter(1, 0, 0, 0, *value, value[3], value[6], param2->m_quakeParam0, param2->m_quakeParam1,
+		                            param2->m_quakeParam2, 1);
 	}
 }
 

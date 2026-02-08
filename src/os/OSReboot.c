@@ -25,8 +25,7 @@ typedef struct {
 
 static AppLoaderStruct FatalParam;
 
-#ifdef __GEKKO__
-static asm void Run(register void* entryPoint) {
+asm void Run(register void* entryPoint) {
     nofralloc
 
     sync
@@ -34,7 +33,6 @@ static asm void Run(register void* entryPoint) {
     mtlr entryPoint
     blr
 }
-#endif
 
 static void Callback(s32, DVDCommandBlock*) {
     Prepared = TRUE;

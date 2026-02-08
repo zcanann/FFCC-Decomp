@@ -1,73 +1,88 @@
 #include "ffcc/pppRandChar.h"
 #include "ffcc/math.h"
+#include "types.h"
 
 extern CMath math;
-extern int lbl_8032ED70;         // Global state flag
-extern float lbl_8032FEF8;       // Float constant 0.5
-extern unsigned char lbl_801EADC8[32]; // Character array
+extern s32 lbl_8032ED70;
+extern f32 lbl_8032FEF8;
+extern f64 lbl_8032FF00;
+extern u8 lbl_801EADC8[32];
+extern "C" f32 RandF__5CMathFv(CMath* instance);
+
+struct RandCharParam {
+    s32 targetId;
+    s32 sourceOffset;
+    u8 scale;
+    u8 randomTwice;
+};
+
+struct RandCharCtx {
+    u8 _pad[0xC];
+    s32* outputOffset;
+};
 
 /*
  * --INFO--
- * Address:	80060EFC
- * Size:	320 bytes (0x140)
+ * PAL Address: 0x80060efc
+ * PAL Size: 320b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppRandChar(void* r3, void* r4, void* r5)
+extern "C" void pppRandChar(void* param1, void* param2, void* param3)
 {
-    // Cast parameters based on memory access patterns from assembly
-    int* p1 = (int*)r3;
-    
-    struct ParamStruct2 {
-        int field0;           // offset 0
-        int field4;           // offset 4  
-        unsigned char field8; // offset 8 - byte
-        unsigned char field9; // offset 9 - byte  
-    }* p2 = (struct ParamStruct2*)r4;
-    
-    struct ParamStruct3 {
-        int fieldC;          // offset 0x0C
-    }* p3_ptr = (struct ParamStruct3*)((char*)r5 + 0x0C);
-    
-    if (lbl_8032ED70 == 0) {
-        int val = p1[3]; // offset 0x0C
-        if (val == 0) {
-            math.RandF(); // This returns float in f1 register  
-            float randVal = 1.0f; // Placeholder - RandF() return value
-            
-            if (p2->field9 != 0) {
-                math.RandF();
-                float randVal2 = 1.0f; // Placeholder
-                randVal = randVal + randVal2; // fadds f0, f31, f1
-            } else {
-                randVal = randVal * lbl_8032FEF8; // fmuls f0, f31, f0 (should be 0.5)
-            }
-            
-            int* data = (int*)p3_ptr;
-            int offset = data[0] + 0x80;
-            float* target = (float*)((char*)r3 + offset);
-            *target = randVal;
-        } else {
-            if (p2->field0 == val) {
-                int* data = (int*)p3_ptr;
-                int offset = data[0] + 0x80;
-                float* source = (float*)((char*)r3 + offset);
-                unsigned char* target;
-                
-                if (p2->field4 == -1) {
-                    target = lbl_801EADC8;
-                } else {
-                    target = (unsigned char*)r3 + (p2->field4 + 0x80);
-                }
-                
-                unsigned char charVal = p2->field8;
-                float sourceVal = *source;
-                unsigned char targetVal = target[0];
-                
-                // Floating point arithmetic as seen in assembly
-                float charFloat = (float)charVal;
-                float result = charFloat * sourceVal - (float)targetVal;
-                int finalVal = (int)result;
-                target[0] = (unsigned char)(targetVal + finalVal);
-            }
-        }
+    if (lbl_8032ED70 != 0) {
+        return;
     }
+
+    u8* base = (u8*)param1;
+    RandCharParam* in = (RandCharParam*)param2;
+    RandCharCtx* ctx = (RandCharCtx*)param3;
+    f32* valuePtr;
+
+    s32 state = *(s32*)(base + 0xC);
+    if (state == 0) {
+        f32 value = RandF__5CMathFv(&math);
+        if (in->randomTwice != 0) {
+            value = value + RandF__5CMathFv(&math);
+        } else {
+            value = value * lbl_8032FEF8;
+        }
+
+        valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
+        *valuePtr = value;
+    } else {
+        if (in->targetId != state) {
+            return;
+        }
+        valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
+    }
+
+    u8* target;
+    if (in->sourceOffset == -1) {
+        target = lbl_801EADC8;
+    } else {
+        target = base + in->sourceOffset + 0x80;
+    }
+
+    union {
+        f64 d;
+        struct {
+            u32 hi;
+            u32 lo;
+        } parts;
+    } cvt;
+
+    u8 current = *target;
+    cvt.parts.hi = 0x43300000;
+    cvt.parts.lo = in->scale;
+    f64 scaleAsDouble = cvt.d - lbl_8032FF00;
+
+    cvt.parts.hi = 0x43300000;
+    cvt.parts.lo = current;
+    f64 currentAsDouble = cvt.d - lbl_8032FF00;
+
+    s32 delta = (s32)(scaleAsDouble * *valuePtr - currentAsDouble);
+    *target = (u8)(current + delta);
 }

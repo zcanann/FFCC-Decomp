@@ -6,11 +6,9 @@
 class CSamplePcs : public CProcess
 {
 public:
-    CSamplePcs();
-
     void Init();
     void Quit();
-    void GetTable(unsigned long);
+    int GetTable(unsigned long);
 
     void create();
     void destroy();

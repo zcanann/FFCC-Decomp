@@ -28,4 +28,6 @@ private:
     CMemory::CStage* m_stage;
 };
 
+extern CGbaPcs GbaPcs;
+
 #endif // _FFCC_P_GBA_H_

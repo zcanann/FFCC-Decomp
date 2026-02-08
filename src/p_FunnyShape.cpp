@@ -5,6 +5,7 @@ struct _GXTexObj;
 struct OSFS_TEXTURE_ST;
 
 // CPtrArray template class definition based on Ghidra decomp analysis
+// TODO: This should be using CPtrArray.h surely?
 template <class T>
 class CPtrArray
 {

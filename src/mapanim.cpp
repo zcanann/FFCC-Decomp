@@ -4,6 +4,7 @@
 
 #include <string.h>
 
+// TODO: This should be using CPtrArray.h surely?
 template <class T>
 class CPtrArray
 {

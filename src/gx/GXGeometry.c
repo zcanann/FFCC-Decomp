@@ -5,24 +5,22 @@
 #include "dolphin/gx/__gx.h"
 
 void __GXSetDirtyState(void) {
-    u32 dState = __GXData->dirtyState;
-
-    if (dState & 1) {
+    if (__GXData->dirtyState & 1) {
         __GXSetSUTexRegs();
     }
-    if (dState & 2) {
+    if (__GXData->dirtyState & 2) {
         __GXUpdateBPMask();
     }
-    if (dState & 4) {
+    if (__GXData->dirtyState & 4) {
         __GXSetGenMode();
     }
-    if (dState & 8) {
+    if (__GXData->dirtyState & 8) {
         __GXSetVCD();
     }
-    if (dState & 0x10) {
+    if (__GXData->dirtyState & 0x10) {
         __GXSetVAT();
     }
-    if (dState & 0x18) {
+    if (__GXData->dirtyState & 0x18) {
         __GXCalculateVLim();
     }
 

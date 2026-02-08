@@ -39,6 +39,7 @@ int InitMetroTRKCommTable(int hwId);
 void EnableEXI2Interrupts(void);
 void TRK_board_display(char* str);
 void TRKUARTInterruptHandler();
+void InitializeProgramEndTrap(void);
 
 #ifdef __cplusplus
 }

@@ -2,6 +2,7 @@
 #include "TRK_MINNOW_DOLPHIN/ppc/Generic/targimpl.h"
 #include "OdemuExi2/odemuexi/DebuggerDriver.h"
 #include "amcstubs/AmcExi2Stubs.h"
+#include "dolphin/base/PPCArch.h"
 #include "PowerPC_EABI_Support/MetroTRK/trk.h"
 
 #define BUFF_LEN 4362
@@ -176,6 +177,25 @@ UARTError TRKReadUARTPoll(u8* arg0)
 void ReserveEXI2Port(void) { gDBCommTable.open_func(); }
 
 void UnreserveEXI2Port(void) { gDBCommTable.close_func(); }
+
+/*
+ * --INFO--
+ * PAL Address: 0x801AE160
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void InitializeProgramEndTrap(void)
+{
+    static const u32 EndofProgramInstruction = 0x00454E44;
+    register u8* ppcHalt = (u8*)PPCHalt;
+
+    TRK_memcpy(ppcHalt + 4, &EndofProgramInstruction, 4);
+    ICInvalidateRange(ppcHalt + 4, 4);
+    DCFlushRange(ppcHalt + 4, 4);
+}
 
 void TRK_board_display(char* str) { OSReport(str); }
 

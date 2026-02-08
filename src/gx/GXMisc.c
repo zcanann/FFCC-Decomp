@@ -287,11 +287,12 @@ void GXPokeARGB(u16 x, u16 y, u32 color) {
 }
 
 void GXPeekZ(u16 x, u16 y, u32* z) {
-    u32 addr = (u32)OSPhysicalToUncached(0x08000000);
+    u32 addr;
 
-    SET_REG_FIELD(812, addr, 10, 2, x);
-    SET_REG_FIELD(813, addr, 10, 12, y);
-    SET_REG_FIELD(813, addr, 2, 22, 1);
+    addr = (u32)OSPhysicalToUncached(0x08000000);
+    addr = (addr & ~(0x3FF << 2)) | ((u32)x << 2);
+    addr = (addr & ~(0x3FF << 12)) | ((u32)y << 12);
+    addr = (addr & ~(0x3 << 22)) | (1 << 22);
     *z = *(u32*)addr;
 }
 

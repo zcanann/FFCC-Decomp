@@ -17,6 +17,7 @@ extern u32 lbl_801E869C[];
 extern u32 lbl_801E86A8[];
 extern u32 lbl_801E86B4[];
 extern CUSBPcs USBPcs;
+void* operator new[](unsigned long, CMemory::CStage*, char*, int);
 
 
 /*
@@ -162,35 +163,28 @@ static inline unsigned int Align32(unsigned int x)
     return (x + 0x1F) & ~0x1F;
 }
 
-static inline unsigned int Swap32(unsigned int x)
-{
-    unsigned int tmp = x;
-    return __lwbrx((void*)&tmp, 4);
-}
-
 int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
 {
     unsigned int count      = (unsigned int)(elemSize * elemCount);
     unsigned int packetSize = Align32(count + 0x40);
 
-    // Prefer big stage if present, else small stage (matches target).
     CMemory::CStage* stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
 
-    unsigned int* packet  = new unsigned int[packetSize >> 2];
+    unsigned int* packet  = new (stage, (char*)"p_usb.cpp", 0x1ca) unsigned int[packetSize >> 2];
     unsigned int* sendBuf = (unsigned int*)nullptr;
 
     int result = 0;
 
-    // Header
-    packet[0]  = 4;
     packet[1]  = packetSize;
-    packet[8]  = Swap32(count);
-    packet[9]  = Swap32((unsigned int)code);
-    packet[10] = Swap32((unsigned int)elemCount);
+    packet[0]  = 4;
+    packet[8]  = (count << 24) | ((count >> 8) & 0xFF) << 16 | ((count >> 16) & 0xFF) << 8 | (count >> 24);
+    packet[9]  = ((unsigned int)code << 24) | ((((unsigned int)code >> 8) & 0xFF) << 16) |
+                ((((unsigned int)code >> 16) & 0xFF) << 8) | ((unsigned int)code >> 24);
+    packet[10] = ((unsigned int)elemCount << 24) | ((((unsigned int)elemCount >> 8) & 0xFF) << 16) |
+                ((((unsigned int)elemCount >> 16) & 0xFF) << 8) | ((unsigned int)elemCount >> 24);
     packet[11] = 0;
-    packet[12] = Swap32(count);
+    packet[12] = (count << 24) | ((count >> 8) & 0xFF) << 16 | ((count >> 16) & 0xFF) << 8 | (count >> 24);
 
-    // Payload
     memcpy((unsigned char*)packet + 0x40, src, count);
 
     do
@@ -198,44 +192,44 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
         if (!USB.IsConnected())
             break;
 
-        // Target reloads stage selection here too.
         stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
 
         unsigned int sendSize = Align32(packet[1]);
 
-        sendBuf = new unsigned int[sendSize >> 2];
+        sendBuf = new (stage, (char*)"p_usb.cpp", 0x19e) unsigned int[sendSize >> 2];
         memcpy(sendBuf, packet, sendSize);
 
-        // Swap only the first two words (matches target doing lwbrx on [0] and [1]).
-        sendBuf[0] = Swap32(sendBuf[0]);
-        sendBuf[1] = Swap32(sendBuf[1]);
+        unsigned int tmp = packet[0];
+        sendBuf[0] = (tmp << 24) | ((tmp >> 8) & 0xFF) << 16 | ((tmp >> 16) & 0xFF) << 8 | (tmp >> 24);
+
+        tmp = packet[1];
+        sendBuf[1] = (tmp << 24) | ((tmp >> 8) & 0xFF) << 16 | ((tmp >> 16) & 0xFF) << 8 | (tmp >> 24);
 
         DCFlushRange(sendBuf, sendSize);
         DCInvalidateRange(sendBuf, sendSize);
 
         if (!USB.Write(sendBuf, (int)sendSize))
         {
-            delete[] sendBuf;
+            operator delete(sendBuf);
             sendBuf = (unsigned int*)nullptr;
             break;
         }
 
         if (!USB.SendMessage(0, (MCCChannel)9))
         {
-            delete[] sendBuf;
+            operator delete(sendBuf);
             sendBuf = (unsigned int*)nullptr;
             break;
         }
 
-        delete[] sendBuf;
+        operator delete(sendBuf);
         sendBuf = (unsigned int*)nullptr;
 
         result = 1;
     } while (0);
 
-    // Target always reaches a single cleanup for the packet.
     if (packet != (unsigned int*)nullptr)
-        delete[] packet;
+        operator delete(packet);
 
     return result;
 }

@@ -6,7 +6,7 @@ extern CMath math;
 extern s32 lbl_8032ED70;
 extern f32 lbl_8032FF58;
 extern f64 lbl_8032FF60;
-extern s32 lbl_801EADC8;
+extern s32 lbl_801EADC8[];
 
 extern "C" {
 f32 RandF__5CMathFv(CMath*);
@@ -62,7 +62,7 @@ void pppRandDownInt(void* param1, void* param2, void* param3)
 
     s32* target;
     if (in->field4 == -1) {
-        target = &lbl_801EADC8;
+        target = lbl_801EADC8;
     } else {
         target = (s32*)(base + in->field4 + 0x80);
     }

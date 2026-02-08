@@ -26,13 +26,11 @@ void CMapShadowInsertOctTree(CMapShadow::TARGET mapShadow, COctTree& octTree)
 {
 	u32 i;
 	u32 mapShadowCount;
-	u32 shadowBits;
 	CPtrArray<CMapShadow>* mapShadowArray;
 
 	octTree.ClearShadow();
 
-	shadowBits = *(u32*)(*(u32*)((char*)&octTree + 0x8) + 0x3c);
-	if (shadowBits == 0) {
+	if (*(u32*)(*(u32*)((char*)&octTree + 0x8) + 0x3c) == 0) {
 		return;
 	}
 
@@ -44,21 +42,20 @@ void CMapShadowInsertOctTree(CMapShadow::TARGET mapShadow, COctTree& octTree)
 			break;
 		}
 
-		if ((shadowBits & (1U << i)) != 0) {
-			CMapShadow* shadow = (*mapShadowArray)[i];
+		CMapShadow* shadow;
+		if (((*(u32*)(*(u32*)((char*)&octTree + 0x8) + 0x3c) & (1U << i)) != 0) &&
+		    ((shadow = (*mapShadowArray)[i]), (*((u8*)mapShadow + (u32)shadow + 0xf0) != 0)) &&
+		    (*(u8*)((char*)shadow + 0x7) == 0)) {
+			int model = *(int*)((char*)shadow + 0xc);
+			Vec pos;
+			CBound* bound;
 
-			if ((*((u8*)mapShadow + (u32)shadow + 0xf0) != 0) && (*(u8*)((char*)shadow + 0x7) == 0)) {
-				int model = *(int*)((char*)shadow + 0xc);
-				Vec pos;
-				CBound* bound;
+			pos.x = *(float*)(model + 0xc4);
+			pos.y = *(float*)(model + 0xd4);
+			pos.z = *(float*)(model + 0xe4);
 
-				pos.x = *(float*)(model + 0xc4);
-				pos.y = *(float*)(model + 0xd4);
-				pos.z = *(float*)(model + 0xe4);
-
-				bound = (CBound*)((char*)shadow + ((int)mapShadow * 0x18 + 0xc0));
-				octTree.InsertShadow(i, pos, *bound);
-			}
+			bound = (CBound*)((char*)shadow + ((int)mapShadow * 0x18 + 0xc0));
+			octTree.InsertShadow(i, pos, *bound);
 		}
 
 		i++;

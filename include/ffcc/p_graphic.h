@@ -15,7 +15,7 @@ public:
     void create();
     void destroy();
 
-    void SetDOFParameter(char, char, float, float, float, float, float, int);
+    void SetDOFParameter(signed char, signed char, float, float, float, float, float, int);
     void SetBlurParameter(int, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, short);
 
     void calc();

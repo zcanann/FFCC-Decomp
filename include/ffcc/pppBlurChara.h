@@ -5,22 +5,26 @@
 #include <dolphin/types.h>
 
 struct pppBlurChara {
-    int field0_0x0[2];
+    union {
+        void* ptr;
+        struct {
+            u32 m_graphId;
+        };
+    } field0_0x0;
 };
 
 struct UnkB {
     s32 m_graphId;
     s32 m_dataValIndex;
-    u16 m_initWOrk;
-    u8 _pad0[2];
-    float m_stepValue;
-    u8 m_arg3;
-    u8 m_payload[6];
-    u8 _pad1[1];
+    s16 m_initWOrk;
+    u16 _pad0;
+    f32 m_stepValue;
+    f32 m_arg3;
+    u8 m_payload[8];
 };
 
 struct UnkC {
-    u8 _pad0[0xC];
+    u8 _pad0[0x0C];
     s32* m_serializedDataOffsets;
 };
 

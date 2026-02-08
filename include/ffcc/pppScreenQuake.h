@@ -26,6 +26,9 @@ typedef struct {
 } UnkB;
 
 typedef struct {
+    int m_unk0;
+    int m_unk4;
+    int m_unk8;
     int *m_serializedDataOffsets;
 } UnkC;
 

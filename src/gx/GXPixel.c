@@ -250,10 +250,14 @@ void GXSetZMode(GXBool compare_enable, GXCompare func, GXBool update_enable) {
 }
 
 void GXSetZCompLoc(GXBool before_tex) {
+    GXData *gx;
+
     CHECK_GXBEGIN(474, "GXSetZCompLoc");
-    SET_REG_FIELD(475, __GXData->peCtrl, 1, 6, before_tex);
-    GX_WRITE_RAS_REG(__GXData->peCtrl);
-    __GXData->bpSentNot = 0;
+
+    gx = __GXData;
+    gx->peCtrl = (gx->peCtrl & 0xFFFFFFBF) | ((u32)(u8)before_tex << 6);
+    GX_WRITE_RAS_REG(gx->peCtrl);
+    gx->bpSentNot = 0;
 }
 
 void GXSetPixelFmt(GXPixelFmt pix_fmt, GXZFmt16 z_fmt) {

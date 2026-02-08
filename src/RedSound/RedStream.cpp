@@ -28,9 +28,56 @@ void _StreamStop(RedStreamDATA*)
  * Address:	TODO
  * Size:	TODO
  */
-void _ArrangeStreamDataNoLoop(RedStreamDATA*, int, int)
+void _ArrangeStreamDataNoLoop(RedStreamDATA* param_1, int param_2, int param_3)
 {
-	// TODO
+	unsigned char* dstBuffer;
+	int streamStruct;
+	int dmaDstOffset;
+
+	param_2 &= 1;
+
+	do {
+		dstBuffer = (unsigned char*)(*(int*)((int)param_1 + 0xc) + param_2 * 0x1000);
+		streamStruct = *(int*)((int)param_1 + 4);
+
+		memcpy(dstBuffer, (void*)(*(int*)((int)param_1 + 8) + *(int*)((int)param_1 + 0x120)), 0x1000);
+		*(int*)((int)param_1 + 0x120) += 0x1000;
+		if (*(int*)((int)param_1 + 0x118) <= *(int*)((int)param_1 + 0x120)) {
+			*(int*)((int)param_1 + 0x120) = 0;
+		}
+
+		if (*(short*)((int)param_1 + 0x2a) == 2) {
+			memcpy(dstBuffer + 0x2000, (void*)(*(int*)((int)param_1 + 8) + *(int*)((int)param_1 + 0x120)), 0x1000);
+			*(int*)((int)param_1 + 0x120) += 0x1000;
+			if (*(int*)((int)param_1 + 0x118) <= *(int*)((int)param_1 + 0x120)) {
+				*(int*)((int)param_1 + 0x120) = 0;
+			}
+		}
+
+		dmaDstOffset = *(int*)((int)param_1 + 0x12c) + param_2 * 0x1000;
+		RedDmaEntry(0x8001, 0, (int)dstBuffer, dmaDstOffset, 0x1000, 0, 0);
+
+		if ((param_2 == 0) && (*(int*)(streamStruct + 0x14) != 0)) {
+			*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1ec) = (unsigned short)*dstBuffer;
+			*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1f0) = 0;
+			*(unsigned short*)(*(int*)(streamStruct + 0x14) + 0x1ee) = 0;
+			*(unsigned int*)(*(int*)(streamStruct + 0x14) + 0x1c) |= 0x100000;
+		}
+
+		if (*(short*)((int)param_1 + 0x2a) == 2) {
+			RedDmaEntry(0x8001, 0, (int)(dstBuffer + 0x2000), dmaDstOffset + 0x2000, 0x1000, 0, 0);
+			if ((param_2 == 0) && (*(int*)(streamStruct + 0xd4) != 0)) {
+				*(unsigned short*)(*(int*)(streamStruct + 0xd4) + 0x1ec) = (unsigned short)dstBuffer[0x2000];
+				*(unsigned short*)(*(int*)(streamStruct + 0xd4) + 0x1f0) = 0;
+				*(unsigned short*)(*(int*)(streamStruct + 0xd4) + 0x1ee) = 0;
+				*(unsigned int*)(*(int*)(streamStruct + 0xd4) + 0x1c) |= 0x100000;
+			}
+		}
+
+		param_3 -= 0x1000;
+		param_2 ^= 1;
+		*(int*)((int)param_1 + 0x124) += 0x200;
+	} while (0 < param_3);
 }
 
 /*

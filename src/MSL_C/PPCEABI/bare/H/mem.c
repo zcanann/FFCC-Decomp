@@ -121,6 +121,15 @@ reverse_copy:
 	return dst;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x8000543C
+ * PAL Size: 184b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void __fill_mem(void* dst, int c, size_t count)
 {
 	unsigned int alignBytes;
@@ -139,30 +148,36 @@ void __fill_mem(void* dst, int c, size_t count)
 			count -= alignBytes;
 			do {
 				alignBytes--;
-				*++bytePtr = c;
+				*++bytePtr = fillValue;
 			} while (alignBytes != 0);
 		}
 
 		if (fillValue != 0) {
-			fillValue = fillValue | (fillValue << 8) | (fillValue << 24) | (fillValue << 16);
+			fillValue = (fillValue << 24) | (fillValue << 16) | (fillValue << 8) | fillValue;
 		}
 
 		wordPtr = (unsigned int*)(bytePtr - 3);
-		for (words = count >> 5; words != 0; words--) {
-			wordPtr[1] = fillValue;
-			wordPtr[2] = fillValue;
-			wordPtr[3] = fillValue;
-			wordPtr[4] = fillValue;
-			wordPtr[5] = fillValue;
-			wordPtr[6] = fillValue;
-			wordPtr[7] = fillValue;
-			wordPtr += 8;
-			*wordPtr = fillValue;
+		words = count >> 5;
+		if (words != 0) {
+			do {
+				wordPtr[1] = fillValue;
+				wordPtr[2] = fillValue;
+				wordPtr[3] = fillValue;
+				wordPtr[4] = fillValue;
+				wordPtr[5] = fillValue;
+				wordPtr[6] = fillValue;
+				wordPtr[7] = fillValue;
+				wordPtr += 8;
+				*wordPtr = fillValue;
+			} while (--words != 0);
 		}
 
-		for (words = (count >> 2) & 7; words != 0; words--) {
-			wordPtr++;
-			*wordPtr = fillValue;
+		words = (count >> 2) & 7;
+		if (words != 0) {
+			do {
+				wordPtr++;
+				*wordPtr = fillValue;
+			} while (--words != 0);
 		}
 
 		bytePtr = (unsigned char*)((unsigned int)wordPtr + 3);

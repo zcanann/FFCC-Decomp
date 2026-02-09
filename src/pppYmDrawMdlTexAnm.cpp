@@ -81,11 +81,35 @@ void pppConstructYmDrawMdlTexAnm(pppYmDrawMdlTexAnm* param1, pppYmDrawMdlTexAnmO
  */
 void pppDestructYmDrawMdlTexAnm(pppYmDrawMdlTexAnm* param1, pppYmDrawMdlTexAnmOffsets* param2, void* param3)
 {
-    (void)param1;
-    (void)param2;
     (void)param3;
-    // Reset texture animation state
-    // Reset animation counters and UV coordinates
+    pppYmDrawMdlTexAnmWork* work;
+    CMapMesh* mapMesh;
+    CMapMeshUVLayout* uvLayout;
+    s16* uvPairs;
+    u32 frameIndex;
+    u32 frameU;
+    u32 i;
+
+    work = (pppYmDrawMdlTexAnmWork*)((u8*)param1 + 0x80 + param2->m_serializedDataOffsets[2]);
+    frameIndex = work->m_frame;
+    if ((frameIndex != 0) && ((mapMesh = pppEnvStPtr->m_mapMeshPtr) != NULL)) {
+        uvLayout = (CMapMeshUVLayout*)mapMesh;
+        uvPairs = uvLayout->m_uvPairs;
+        frameU = frameIndex / work->m_tilesU;
+
+        for (i = 0; i < (u32)uvLayout->m_uvCount; i++) {
+            uvPairs[0] = (s16)(-((f32)(frameIndex - frameU * work->m_tilesU) * work->m_perU) - (f32)uvPairs[0]);
+            uvPairs[1] = (s16)(-((f32)frameU * work->m_perV) - (f32)uvPairs[1]);
+            uvPairs += 2;
+        }
+
+        DCFlushRange(uvLayout->m_uvPairs, (u32)uvLayout->m_uvCount << 2);
+    }
+
+    work->m_frame = 0;
+    work->m_tilesV = 0;
+    work->m_tilesU = 0;
+    work->m_wait = 0x200;
 }
 
 /*

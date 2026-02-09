@@ -12,7 +12,7 @@ public:
     void DeleteRsdItem(RSDLISTITEM*);
     void DeleteColAnmData(ZCANMGRP**, int);
     void AddRsdList(ZLIST*);
-    void SetRsdFlag();
+    int SetRsdFlag();
     void GetRsdItemR();
     int SetRsdIndex();
     void GetRsdItem();

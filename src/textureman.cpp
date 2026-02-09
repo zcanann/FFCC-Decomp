@@ -1,5 +1,7 @@
 #include "ffcc/textureman.h"
 
+extern CTextureMan TextureMan;
+
 /*
  * --INFO--
  * Address:	TODO
@@ -296,4 +298,32 @@ void CTextureSet::ReleaseTextureIdx(int, CAmemCacheSet*)
 void CTexture::GetNumTlut()
 {
 	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003B894
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void* CTexture::operator new(unsigned long size, CMemory::CStage*, char* file, int line)
+{
+	return ::operator new(size, TextureMan.m_memoryStage, file, line);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003AC74
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void* CTextureSet::operator new(unsigned long size, CMemory::CStage*, char* file, int line)
+{
+	return ::operator new(size, TextureMan.m_memoryStage, file, line);
 }

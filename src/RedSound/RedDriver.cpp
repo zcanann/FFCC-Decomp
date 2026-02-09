@@ -547,9 +547,9 @@ void _DmaCallback(unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void RedDmaEntry(int, int, int, int, int, void (*) (void*), void*)
+int RedDmaEntry(int, int, int, int, int, void (*) (void*), void*)
 {
-	// TODO
+	return 0;
 }
 
 /*
@@ -557,9 +557,9 @@ void RedDmaEntry(int, int, int, int, int, void (*) (void*), void*)
  * Address:	TODO
  * Size:	TODO
  */
-void RedDmaSearchID(int)
+int RedDmaSearchID(int)
 {
-	// TODO
+	return 0;
 }
 
 /*

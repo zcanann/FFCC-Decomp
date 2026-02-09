@@ -65,7 +65,34 @@ void pppRandUpCV(void* param1, void* param2, void* param3)
             int add = (int)((float)delta * scale);
             colors[3] = (u8)(colors[3] + add);
         }
+        *(f32*)(base + *ctx->valueOffset + 0x80) = value;
+    } else if (in->index != state) {
+        return;
     }
+
+    f32 scale = *(f32*)(base + *ctx->valueOffset + 0x80);
+
+    u8* target;
+    if (in->colorOffset == -1) {
+        target = lbl_801EADC8;
+    } else {
+        target = base + in->colorOffset + 0x80;
+    }
+
+    RandUpCVConv cvt;
+    cvt.parts.hi = 0x43300000;
+
+    cvt.parts.lo = (u32)((s32)in->delta[0] ^ 0x8000);
+    target[0] = (u8)(target[0] + (s32)((cvt.d - lbl_8032FF10) * scale));
+
+    cvt.parts.lo = (u32)((s32)in->delta[1] ^ 0x8000);
+    target[1] = (u8)(target[1] + (s32)((cvt.d - lbl_8032FF10) * scale));
+
+    cvt.parts.lo = (u32)((s32)in->delta[2] ^ 0x8000);
+    target[2] = (u8)(target[2] + (s32)((cvt.d - lbl_8032FF10) * scale));
+
+    cvt.parts.lo = (u32)((s32)in->delta[3] ^ 0x8000);
+    target[3] = (u8)(target[3] + (s32)((cvt.d - lbl_8032FF10) * scale));
 }
 
 /*

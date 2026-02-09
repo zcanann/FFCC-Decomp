@@ -62,11 +62,14 @@ void __GXSendFlushPrim(void) {
 }
 
 void GXSetLineWidth(u8 width, GXTexOffset texOffsets) {
+    GXData* data;
+
     CHECK_GXBEGIN(440, "GXSetLineWidth");
-    SET_REG_FIELD(441, __GXData->lpSize, 8, 0, width);
-    SET_REG_FIELD(442, __GXData->lpSize, 3, 16, texOffsets);
-    GX_WRITE_RAS_REG(__GXData->lpSize);
-    __GXData->bpSentNot = 0;
+    data = __GXData;
+    data->lpSize = (data->lpSize & 0xFFFFFF00) | ((u32)width & 0xFF);
+    data->lpSize = (data->lpSize & 0xFFF8FFFF) | ((u32)texOffsets << 16);
+    GX_WRITE_RAS_REG(data->lpSize);
+    data->bpSentNot = 0;
 }
 
 void GXGetLineWidth(u8* width, GXTexOffset* texOffsets) {
@@ -77,11 +80,14 @@ void GXGetLineWidth(u8* width, GXTexOffset* texOffsets) {
 }
 
 void GXSetPointSize(u8 pointSize, GXTexOffset texOffsets) {
+    GXData* data;
+
     CHECK_GXBEGIN(484, "GXSetPointSize");
-    SET_REG_FIELD(485, __GXData->lpSize, 8, 8, pointSize);
-    SET_REG_FIELD(486, __GXData->lpSize, 3, 19, texOffsets);
-    GX_WRITE_RAS_REG(__GXData->lpSize);
-    __GXData->bpSentNot = 0;
+    data = __GXData;
+    data->lpSize = (data->lpSize & 0xFFFF00FF) | (((u32)pointSize & 0xFF) << 8);
+    data->lpSize = (data->lpSize & 0xFFC7FFFF) | ((u32)texOffsets << 19);
+    GX_WRITE_RAS_REG(data->lpSize);
+    data->bpSentNot = 0;
 }
 
 void GXGetPointSize(u8* pointSize, GXTexOffset* texOffsets) {
@@ -102,19 +108,16 @@ void GXGetPointSize(u8* pointSize, GXTexOffset* texOffsets) {
  */
 void GXEnableTexOffsets(GXTexCoordID coord, u8 line_enable, u8 point_enable) {
     GXData* data;
-    u32 reg;
+    u32 idx;
 
     CHECK_GXBEGIN(529, "GXEnableTexOffsets");
 
     ASSERTMSGLINE(531, coord < GX_MAX_TEXCOORD, "GXEnableTexOffsets: Invalid coordinate Id");
     data = __GXData;
-    reg = data->suTs0[coord];
-    reg = __rlwimi(reg, line_enable, 18, 13, 13);
-    data->suTs0[coord] = reg;
-    reg = data->suTs0[coord];
-    reg = __rlwimi(reg, point_enable, 19, 12, 12);
-    data->suTs0[coord] = reg;
-    GX_WRITE_RAS_REG(data->suTs0[coord]);
+    idx = (u32)coord;
+    data->suTs0[idx] = (data->suTs0[idx] & 0xFFFBFFFF) | (((u32)line_enable & 0xFF) << 18);
+    data->suTs0[idx] = (data->suTs0[idx] & 0xFFF7FFFF) | (((u32)point_enable & 0xFF) << 19);
+    GX_WRITE_RAS_REG(data->suTs0[idx]);
     data->bpSentNot = 0;
 }
 

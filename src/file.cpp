@@ -1,7 +1,62 @@
 #include "ffcc/file.h"
 
+#include "ffcc/color.h"
+#include "ffcc/fontman.h"
+#include "ffcc/goout.h"
+#include "ffcc/graphic.h"
 #include "ffcc/p_game.h"
+#include "ffcc/sound.h"
 #include "ffcc/system.h"
+#include "ffcc/util.h"
+
+#include <dolphin/gx.h>
+#include <dolphin/os/OSCache.h>
+#include <dolphin/vi.h>
+
+#include <string.h>
+
+extern CFontMan FontMan;
+extern CUtil DAT_8032ec70;
+extern void* DAT_8023802c;
+extern void* DAT_80238030;
+
+static char s_fileCpp[] = "file.cpp";
+static char s_drawErrorFmt[] = "CFile::drawError %d";
+
+static const char* s_diskErrorText[4][6][3] = {
+    {
+        {"Disk read error.", "Please check the Game Disc.", ""},
+        {"Erreur de lecture du disque.", "Veuillez verifier le disque.", ""},
+        {"Lesefehler auf der Disk.", "Bitte uberprufen Sie die Disk.", ""},
+        {"Errore di lettura disco.", "Controllare il disco di gioco.", ""},
+        {"Error de lectura del disco.", "Comprueba el disco de juego.", ""},
+        {"Disc read error.", "Please check the Game Disc.", ""},
+    },
+    {
+        {"Wrong Game Disc.", "Please insert the correct disc.", ""},
+        {"Mauvais disque.", "Inserez le disque correct.", ""},
+        {"Falsche Disk.", "Bitte richtige Disk einlegen.", ""},
+        {"Disco errato.", "Inserire il disco corretto.", ""},
+        {"Disco incorrecto.", "Inserta el disco correcto.", ""},
+        {"Wrong game disc.", "Please insert the correct disc.", ""},
+    },
+    {
+        {"Disc cover is open.", "Please close the disc cover.", ""},
+        {"Capot du disque ouvert.", "Fermez le capot du disque.", ""},
+        {"Disc-Abdeckung ist offen.", "Bitte Abdeckung schliessen.", ""},
+        {"Sportello disco aperto.", "Chiudere lo sportello disco.", ""},
+        {"Tapa del disco abierta.", "Cierra la tapa del disco.", ""},
+        {"Disc cover open.", "Please close the disc cover.", ""},
+    },
+    {
+        {"A fatal error has occurred.", "Turn off the power and refer", "to the Nintendo GameCube manual."},
+        {"Une erreur fatale est survenue.", "Eteignez la console et consultez", "le manuel Nintendo GameCube."},
+        {"Ein schwerer Fehler ist aufgetreten.", "Konsole ausschalten und im", "Nintendo GameCube-Handbuch nachsehen."},
+        {"Si e verificato un errore grave.", "Spegnere e consultare il", "manuale Nintendo GameCube."},
+        {"Se ha producido un error grave.", "Apaga la consola y consulta", "el manual de Nintendo GameCube."},
+        {"A fatal error has occurred.", "Turn off the power and refer", "to the Nintendo GameCube manual."},
+    },
+};
 
 /*
  * --INFO--
@@ -473,10 +528,173 @@ CFile::CHandle* CFile::CheckQueue()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80012bb8
+ * PAL Size: 1696b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFile::DrawError(DVDFileInfo&, int)
+void CFile::DrawError(DVDFileInfo& info, int errorCode)
 {
-	// TODO
+    _GXTexObj backupTexObj;
+    m_isDiskError = 1;
+
+    do
+    {
+        if (System.m_execParam != 0)
+        {
+            System.Printf(s_drawErrorFmt, errorCode);
+        }
+
+        CFont* font = MenuPcs.GetFont22();
+        bool usingFallbackFont = (font == 0);
+        if (usingFallbackFont)
+        {
+            font = *(CFont**)((char*)&FontMan + 8);
+        }
+
+        if (font == 0)
+        {
+            m_isDiskError = 0;
+            return;
+        }
+
+        Graphic._WaitDrawDone(s_fileCpp, 0x2CC);
+
+        bool compactLayout = (!usingFallbackFont && DAT_80238030 != 0);
+        if (compactLayout)
+        {
+            Graphic.GetBackBufferRect2(DAT_80238030, &backupTexObj, 0, 0, 0x280, 0x70, 0, GX_NEAR, GX_TF_RGBA8, 0);
+
+            DAT_8032ec70.RenderColorQuad(0.0f, 0.0f, 640.0f, 112.0f, CColor(0, 0, 0, 255).color);
+            memcpy((void*)((char*)DAT_80238030 + 0x46000), (void*)((char*)DAT_8023802c + 0x34800), 0x29400);
+            DCFlushRange((void*)((char*)DAT_80238030 + 0x46000), 0x29400);
+        }
+        else
+        {
+            DAT_8032ec70.RenderColorQuad(0.0f, 0.0f, 640.0f, 448.0f, CColor(0, 0, 0, 255).color);
+        }
+
+        font->SetScale(1.0f);
+        font->SetShadow(1);
+        font->SetMargin(0.0f);
+        font->SetZMode(0, 0);
+        font->SetColor(CColor(255, 255, 255, 255).color);
+        font->SetTlut(usingFallbackFont ? -1 : 7);
+        font->DrawInit();
+
+        int msgIndex = 0;
+        switch (errorCode)
+        {
+        case 4:
+        case 6:
+            msgIndex = 2;
+            break;
+        case 5:
+            msgIndex = 1;
+            break;
+        case 0x0B:
+            msgIndex = 0;
+            break;
+        case -1:
+            msgIndex = 3;
+            m_fatalDiskErrorFlag = 1;
+            break;
+        default:
+            break;
+        }
+
+        unsigned int language = Game.game.m_gameWork.m_languageId;
+        if (language >= 6)
+        {
+            language = 0;
+        }
+
+        const char* const* lines = s_diskErrorText[msgIndex][language];
+        unsigned int baseY = compactLayout ? 0x20 : 200;
+
+        if (strlen(lines[2]) == 0)
+        {
+            font->SetPosX(64.0f);
+            font->SetPosY((float)baseY);
+            font->SetPosZ(0.0f);
+            font->Draw((char*)lines[0]);
+            font->SetPosX(64.0f);
+            font->SetPosY((float)(baseY + 0x1C));
+            font->SetPosZ(0.0f);
+            font->Draw((char*)lines[1]);
+        }
+        else
+        {
+            font->SetPosX(64.0f);
+            font->SetPosY((float)((int)baseY - 14));
+            font->SetPosZ(0.0f);
+            font->Draw((char*)lines[0]);
+            font->SetPosX(64.0f);
+            font->SetPosY((float)(baseY + 14));
+            font->SetPosZ(0.0f);
+            font->Draw((char*)lines[1]);
+            font->SetPosX(64.0f);
+            font->SetPosY((float)(baseY + 42));
+            font->SetPosZ(0.0f);
+            font->Draw((char*)lines[2]);
+        }
+
+        font->DrawQuit();
+
+        if (compactLayout)
+        {
+            GXSetDispCopySrc(0, 0, 0x280, 0x70);
+            GXSetDispCopyDst(0x280, 0x70);
+            GXCopyDisp((void*)((char*)DAT_8023802c + 0x34800), GX_FALSE);
+        }
+        else
+        {
+            GXSetDispCopySrc(0, 0, 0x280, 0x1C0);
+            GXSetDispCopyDst(0x280, 0x1C0);
+            GXCopyDisp(DAT_8023802c, GX_FALSE);
+        }
+
+        Graphic._WaitDrawDone(s_fileCpp, 0x329);
+        Graphic.SetStdDispCopySrc();
+        Graphic.SetStdDispCopyDst();
+        Graphic._WaitDrawDone(s_fileCpp, 0x32D);
+        VIWaitForRetrace();
+        Sound.PauseDiscError(1);
+        VISetBlack(FALSE);
+        VIFlush();
+
+        while (DVDGetCommandBlockStatus(&info.cb) == errorCode)
+        {
+            VIWaitForRetrace();
+        }
+
+        if (compactLayout)
+        {
+            DAT_8032ec70.RenderTextureQuad(0.0f, 0.0f, 640.0f, 112.0f, &backupTexObj, 0, 0, 0, GX_BL_SRCALPHA,
+                                           GX_BL_INVSRCALPHA);
+            memcpy((void*)((char*)DAT_8023802c + 0x34800), (void*)((char*)DAT_80238030 + 0x46000), 0x29400);
+            DCFlushRange((void*)((char*)DAT_8023802c + 0x34800), 0x29400);
+        }
+        else
+        {
+            DAT_8032ec70.RenderColorQuad(0.0f, 0.0f, 640.0f, 448.0f, CColor(0, 0, 0, 255).color);
+            GXCopyDisp(DAT_8023802c, GX_FALSE);
+        }
+
+        Graphic._WaitDrawDone(s_fileCpp, 0x35B);
+        m_fatalDiskErrorFlag = 0;
+
+        int status = DVDGetCommandBlockStatus(&info.cb);
+        while (status == 1)
+        {
+            VIWaitForRetrace();
+            status = DVDGetCommandBlockStatus(&info.cb);
+        }
+        errorCode = status;
+    } while (errorCode == 0x0B || (errorCode >= 4 && errorCode <= 6) || errorCode == -1);
+
+    Sound.PauseDiscError(0);
+    m_isDiskError = 0;
 }

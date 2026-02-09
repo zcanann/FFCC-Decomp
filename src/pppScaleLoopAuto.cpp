@@ -50,9 +50,9 @@ void pppScaleLoopAuto(void* arg1, void* arg2, void* arg3)
 		if (counter <= 0) return;
 		scaleTarget[32] = counter - 1;
 		float deltaValue = scaleData[9];
-		scaleData[0] += deltaValue;
-		scaleData[1] += deltaValue;
-		scaleData[2] += deltaValue;
+		scaleData[4] += deltaValue;
+		scaleData[5] += deltaValue;
+		scaleData[6] += deltaValue;
 		return;
 	}
 	
@@ -61,9 +61,9 @@ void pppScaleLoopAuto(void* arg1, void* arg2, void* arg3)
 		if (counter <= 0) return;
 		scaleTarget[33] = counter - 1;
 		float deltaValue = scaleData[9];
-		scaleData[0] += deltaValue;
-		scaleData[1] += deltaValue;
-		scaleData[2] += deltaValue;
+		scaleData[4] += deltaValue;
+		scaleData[5] += deltaValue;
+		scaleData[6] += deltaValue;
 		return;
 	}
 	
@@ -71,7 +71,7 @@ void pppScaleLoopAuto(void* arg1, void* arg2, void* arg3)
 	scaleTarget[29]++;
 	unsigned char cycleLimit = ((char*)arg2)[28];
 	signed char currentCycle = scaleTarget[29];
-	if ((unsigned char)currentCycle >= cycleLimit) {
+	if ((unsigned char)currentCycle > cycleLimit) {
 		scaleTarget[29] = 0;
 		*(short*)(scaleTarget + 30) = 0;
 		scaleTarget[32] = ((char*)arg2)[29];
@@ -96,9 +96,9 @@ void pppScaleLoopAuto(void* arg1, void* arg2, void* arg3)
 	float scaleFactor = baseScale * sineValue * scaleRange;
 	
 	scaleData[9] = scaleFactor;
-	scaleData[0] += scaleFactor;
-	scaleData[1] += scaleFactor;
-	scaleData[2] += scaleFactor;
+	scaleData[4] += scaleFactor;
+	scaleData[5] += scaleFactor;
+	scaleData[6] += scaleFactor;
 }
 
 /*

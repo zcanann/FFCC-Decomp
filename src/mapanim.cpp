@@ -75,6 +75,27 @@ CPtrArray<CMapAnimNode*>::~CPtrArray()
 
 /*
  * --INFO--
+ * PAL Address: 0x8004ae60
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" CPtrArray<CMapAnimNode*>* dtor_8004AE60(CPtrArray<CMapAnimNode*>* ptrArray, short param_2)
+{
+    if (ptrArray != 0) {
+        ptrArray->m_vtable = lbl_801EA488;
+        ptrArray->RemoveAll();
+        if (0 < param_2) {
+            __dl__FPv(ptrArray);
+        }
+    }
+    return ptrArray;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8004aebc
  * PAL Size: 112b
  * EN Address: TODO

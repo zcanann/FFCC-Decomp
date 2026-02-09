@@ -12,11 +12,15 @@ struct UnkC {
 
 struct UnkB {
     s32 m_graphId;
-    u16 m_dataValIndex;
-    s16 m_initWOrk;
+    s32 m_dataValIndex;
+    f32 m_initWOrk;
     f32 m_stepValue;
     f32 m_arg3;
-    f32* m_payload;
+    f32 m_payload0;
+    f32 m_payload1;
+    f32 m_payload2;
+    s16 m_payload3;
+    u8 m_payloadBytes[0x1A];
 };
 
 struct pppYmDeformationMdl {

@@ -3,6 +3,41 @@
 
 extern float lbl_8032F938;
 extern float lbl_8032F93C;
+extern float lbl_8032F944;
+extern float lbl_8032F948;
+extern float lbl_8032F958;
+
+namespace {
+static inline unsigned char* Ptr(CMapObj* self, unsigned int offset)
+{
+    return reinterpret_cast<unsigned char*>(self) + offset;
+}
+
+static inline void*& PtrAt(CMapObj* self, unsigned int offset)
+{
+    return *reinterpret_cast<void**>(Ptr(self, offset));
+}
+
+static inline unsigned char& U8At(CMapObj* self, unsigned int offset)
+{
+    return *reinterpret_cast<unsigned char*>(Ptr(self, offset));
+}
+
+static inline unsigned short& U16At(CMapObj* self, unsigned int offset)
+{
+    return *reinterpret_cast<unsigned short*>(Ptr(self, offset));
+}
+
+static inline int& S32At(CMapObj* self, unsigned int offset)
+{
+    return *reinterpret_cast<int*>(Ptr(self, offset));
+}
+
+static inline float& F32At(CMapObj* self, unsigned int offset)
+{
+    return *reinterpret_cast<float*>(Ptr(self, offset));
+}
+}
 
 /*
  * --INFO--
@@ -29,12 +64,16 @@ CBound::CBound()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002BEFC
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CMapObj::CMapObj()
 {
-	// TODO
+    Init();
 }
 
 /*
@@ -49,12 +88,58 @@ CMapObj::~CMapObj()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002BF2C
+ * PAL Size: 196b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapObj::Init()
 {
-	// TODO
+    U8At(this, 0x1B) = 1;
+    U8At(this, 0x1C) = 1;
+    S32At(this, 0x0) = 0;
+    S32At(this, 0xC) = 0;
+    S32At(this, 0xEC) = 0;
+
+    U8At(this, 0x15) = 0x7E;
+    U8At(this, 0x14) = 0x7E;
+    U8At(this, 0x1F) = 0xFF;
+    U8At(this, 0x20) = 0;
+    U8At(this, 0x27) = 0;
+    U8At(this, 0x21) = 0;
+
+    U16At(this, 0x2E) = 0xFFFF;
+    U16At(this, 0x30) = 0xFFFF;
+    U16At(this, 0x32) = 0xFFFF;
+    U8At(this, 0x18) = 1;
+    U8At(this, 0x19) = 1;
+    U16At(this, 0x34) = 0xFFFF;
+
+    F32At(this, 0x48) = lbl_8032F948;
+    F32At(this, 0x44) = lbl_8032F948;
+    F32At(this, 0x4C) = lbl_8032F948;
+    F32At(this, 0x50) = lbl_8032F958;
+
+    U16At(this, 0x2C) = 0;
+    U16At(this, 0x2A) = 0;
+    U16At(this, 0x28) = 0;
+    U8At(this, 0x24) = 0xFF;
+    U8At(this, 0x23) = 0xFF;
+    S32At(this, 0x10) = 0;
+    U16At(this, 0x16) = 0xFFFF;
+    U8At(this, 0x22) = 1;
+    S32At(this, 0x3C) = -1;
+
+    F32At(this, 0x60) = lbl_8032F944;
+    F32At(this, 0x5C) = lbl_8032F944;
+    F32At(this, 0x58) = lbl_8032F944;
+    U8At(this, 0x1A) = 0;
+    F32At(this, 0x40) = lbl_8032F944;
+    U8At(this, 0x25) = 1;
+    U8At(this, 0x26) = 0;
+    S32At(this, 0x38) = -1;
 }
 
 /*
@@ -249,12 +334,27 @@ void CMapObj::CalcHitPosition(Vec*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800287D0
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapObj::SetMime(int, int, int)
+void CMapObj::SetMime(int mode, int target, int type)
 {
-	// TODO
+    unsigned char* mime = reinterpret_cast<unsigned char*>(PtrAt(this, 0xEC));
+
+    *reinterpret_cast<int*>(mime + 0x20) = mode;
+    *reinterpret_cast<int*>(mime + 0x1C) = mode;
+
+    if (*reinterpret_cast<int*>(mime + 0x28) < target) {
+        target = *reinterpret_cast<int*>(mime + 0x28);
+    }
+
+    *reinterpret_cast<int*>(mime + 0x24) = target;
+    *(mime + 0x17) = static_cast<unsigned char>(type);
+    *(mime + 0x18) = 1;
 }
 
 /*

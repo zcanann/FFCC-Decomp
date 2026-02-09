@@ -25,7 +25,7 @@ void pppSRandDownFV(void* param1, void* param2, void* param3)
         float x;
         float y;
         float z;
-        unsigned char _pad[8];
+        unsigned char _pad[4];
         unsigned char blendTwice;
     };
     struct SelectInfo {
@@ -46,21 +46,22 @@ void pppSRandDownFV(void* param1, void* param2, void* param3)
 
     if (*reinterpret_cast<int*>(self + 0xC) == 0) {
         randVec = reinterpret_cast<float*>(self + *sel->offsetPtr + 0x80);
+        unsigned char blendTwice = cfg->blendTwice;
 
         float value = -RandF__5CMathFv(&math);
-        if (cfg->blendTwice != 0) {
+        if (blendTwice != 0) {
             value = (value - RandF__5CMathFv(&math)) * lbl_80330080;
         }
         randVec[0] = value;
 
         value = -RandF__5CMathFv(&math);
-        if (cfg->blendTwice != 0) {
+        if (blendTwice != 0) {
             value = (value - RandF__5CMathFv(&math)) * lbl_80330080;
         }
         randVec[1] = value;
 
         value = -RandF__5CMathFv(&math);
-        if (cfg->blendTwice != 0) {
+        if (blendTwice != 0) {
             value = (value - RandF__5CMathFv(&math)) * lbl_80330080;
         }
         randVec[2] = value;

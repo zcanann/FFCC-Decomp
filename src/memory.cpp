@@ -38,6 +38,38 @@ void* operator new[](unsigned long size, CMemory::CStage* stage, char* file, int
 
 /*
  * --INFO--
+ * PAL Address: 0x8001FC24
+ * PAL Size: 296b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void operator delete(void* ptr) throw()
+{
+    if (ptr != (void*)nullptr) {
+        Memory.Free(ptr);
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8001FAFC
+ * PAL Size: 296b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void operator delete[](void* ptr) throw()
+{
+    if (ptr != (void*)nullptr) {
+        Memory.Free(ptr);
+    }
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

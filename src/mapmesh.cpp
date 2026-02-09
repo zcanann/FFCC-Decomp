@@ -88,36 +88,6 @@ static inline CMaterialSet* DefaultMaterialSet()
 
 /*
  * --INFO--
- * PAL Address: 0x800287a0
- * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-CMaterial* CPtrArray<CMaterial*>::operator[](unsigned long index)
-{
-    return GetAt(index);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800287c0
- * PAL Size: 16b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-template <>
-CMaterial* CPtrArray<CMaterial*>::GetAt(unsigned long index)
-{
-    return m_items[index];
-}
-
-/*
- * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
@@ -402,18 +372,53 @@ void CMapMesh::DrawPart(CMaterialSet* materialSet, int drawMaterialPart)
  */
 void* CMapMesh::GetTexture(CMaterialSet* materialSet, int& textureIndex)
 {
+    int* drawEntry;
+
     if (U16At(this, 0xA) == 0) {
         return 0;
     }
 
-    MeshDrawEntry* entry = DrawEntries(this);
-    if (entry->size == 0) {
+    drawEntry = reinterpret_cast<int*>(PtrAt(this, 0x40));
+    if (*drawEntry == 0) {
         return 0;
     }
 
-    textureIndex = entry->materialIdx;
-    CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>(reinterpret_cast<unsigned char*>(materialSet) + 8))[entry->materialIdx];
+    unsigned short materialIdx = *reinterpret_cast<unsigned short*>(drawEntry + 2);
+    textureIndex = materialIdx;
+
+    CMaterial* material =
+        (*reinterpret_cast<CPtrArray<CMaterial*>*>(reinterpret_cast<unsigned char*>(materialSet) + 8))[materialIdx];
     return *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(material) + 0x3C);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800287a0
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CMaterial* CPtrArray<CMaterial*>::operator[](unsigned long index)
+{
+    return GetAt(index);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800287c0
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CMaterial* CPtrArray<CMaterial*>::GetAt(unsigned long index)
+{
+    return m_items[index];
 }
 
 /*

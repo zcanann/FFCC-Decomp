@@ -22,12 +22,53 @@ void CGPrgObj::onDestroy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801278DC
+ * PAL Size: 500b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPrgObj::onFrame()
 {
-	// TODO
+	if ((m_weaponNodeFlags & 0x8000) != 0) {
+		m_animFlags &= 0x7f;
+		onFramePreCalc();
+
+		if (m_stateFrameGate == 0) {
+			m_stateFrame++;
+		} else {
+			m_stateFrameGate = 0;
+		}
+
+		if (m_subFrameGate == 0) {
+			m_subFrame++;
+		} else {
+			m_subFrameGate = 0;
+		}
+
+		onFrameStat();
+		onFramePostCalc();
+
+		if ((m_animFlags & 0x80) != 0) {
+			if (m_reqAnimId == -1) {
+				if (m_currentAnimSlot > -1) {
+					*reinterpret_cast<float*>(m_lastBgAttr) = 0.0f;
+					CancelAnim(0);
+				}
+			} else {
+				if ((m_animFlags & 0x20) != 0) {
+					*reinterpret_cast<float*>(m_lastBgAttr) = 1.0f;
+				} else {
+					*reinterpret_cast<float*>(m_lastBgAttr) = 0.0f;
+				}
+
+				PlayAnim(m_reqAnimId, (m_animFlags & 0x40) ? -1 : 0, 0, -1, -1, 0);
+			}
+
+			m_animFlags &= 0x7f;
+		}
+	}
 }
 
 /*

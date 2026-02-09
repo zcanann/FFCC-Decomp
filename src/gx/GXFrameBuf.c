@@ -423,7 +423,7 @@ void GXSetCopyFilter(GXBool aa, const u8 sample_pattern[12][2], GXBool vf, const
 
 void GXSetDispCopyGamma(GXGamma gamma) {
     CHECK_GXBEGIN(1741, "GXSetDispCopyGamma");
-    SET_REG_FIELD(1742, __GXData->cpDisp, 2, 7, gamma);
+    __GXData->cpDisp = (__GXData->cpDisp & 0xFFFFFE7F) | ((u32)gamma << 7);
 }
 
 #if DEBUG

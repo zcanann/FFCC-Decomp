@@ -153,24 +153,32 @@ CMapMesh::CMapMesh()
  * JP Address: TODO
  * JP Size: TODO
  */
-CMapMesh::~CMapMesh()
+extern "C" CMapMesh* dtor_80028648(CMapMesh* mapMesh, short param_2)
 {
-    if (PtrAt(this, 0x24) != 0) {
-        __dla__FPv(PtrAt(this, 0x24));
-        PtrAt(this, 0x24) = 0;
+    if (mapMesh != 0) {
+        if (PtrAt(mapMesh, 0x24) != 0) {
+            __dla__FPv(PtrAt(mapMesh, 0x24));
+            PtrAt(mapMesh, 0x24) = 0;
+        }
+
+        if (PtrAt(mapMesh, 0x28) != 0) {
+            __dla__FPv(PtrAt(mapMesh, 0x28));
+            PtrAt(mapMesh, 0x28) = 0;
+        }
+
+        U16At(mapMesh, 0x0) = 0;
+        U16At(mapMesh, 0x2) = 0;
+        U16At(mapMesh, 0x4) = 0;
+        U16At(mapMesh, 0x8) = 0;
+        U16At(mapMesh, 0x6) = 0;
+        U16At(mapMesh, 0xA) = 0;
+
+        if (0 < param_2) {
+            __dl__FPv(mapMesh);
+        }
     }
 
-    if (PtrAt(this, 0x28) != 0) {
-        __dla__FPv(PtrAt(this, 0x28));
-        PtrAt(this, 0x28) = 0;
-    }
-
-    U16At(this, 0x0) = 0;
-    U16At(this, 0x2) = 0;
-    U16At(this, 0x4) = 0;
-    U16At(this, 0x8) = 0;
-    U16At(this, 0x6) = 0;
-    U16At(this, 0xA) = 0;
+    return mapMesh;
 }
 
 /*

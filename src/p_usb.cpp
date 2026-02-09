@@ -9,6 +9,8 @@
 char DAT_8032ec6c;
 int DAT_8032ec68;
 
+extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
+
 extern void* __vt__8CManager;
 extern void* lbl_801E8668;
 extern void* lbl_801E8830;
@@ -17,6 +19,8 @@ extern u32 lbl_801E869C[];
 extern u32 lbl_801E86A8[];
 extern u32 lbl_801E86B4[];
 extern CUSBPcs USBPcs;
+
+static char s_p_usb_cpp[] = "p_usb.cpp";
 
 
 /*
@@ -168,6 +172,15 @@ static inline unsigned int Swap32(unsigned int x)
     return __lwbrx((void*)&tmp, 4);
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x8001ff6c
+ * PAL Size: 532b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
 {
     unsigned int count      = (unsigned int)(elemSize * elemCount);
@@ -176,7 +189,7 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
     // Prefer big stage if present, else small stage (matches target).
     CMemory::CStage* stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
 
-    unsigned int* packet  = new unsigned int[packetSize >> 2];
+    unsigned int* packet = (unsigned int*)__nwa__FUlPQ27CMemory6CStagePci(packetSize, stage, s_p_usb_cpp, 0x1ca);
     unsigned int* sendBuf = (unsigned int*)nullptr;
 
     int result = 0;
@@ -203,7 +216,7 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
 
         unsigned int sendSize = Align32(packet[1]);
 
-        sendBuf = new unsigned int[sendSize >> 2];
+        sendBuf = (unsigned int*)__nwa__FUlPQ27CMemory6CStagePci(sendSize, stage, s_p_usb_cpp, 0x19e);
         memcpy(sendBuf, packet, sendSize);
 
         // Swap only the first two words (matches target doing lwbrx on [0] and [1]).

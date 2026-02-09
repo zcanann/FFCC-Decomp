@@ -66,6 +66,7 @@ public:
     void drawShadowEnd();
     void drawShadowChrBegin();
     void SetFullScreenShadow(float (*)[4], long);
+    void SetFullScreenShadowCamLen(float);
     void drawShadowEndAll();
 
     // Material editor

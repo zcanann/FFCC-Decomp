@@ -206,6 +206,7 @@ public:
     void GetMaxAnimWait();
     void BindMcObj();
     void DrawFilter(unsigned char, unsigned char, unsigned char, unsigned char);
+    CFont* GetFont22();
     void CopyNowCaravanDat(Mc::SaveDat*);
     void SetCaravanWork(Mc::SaveDat*);
     void GetSameCharaData(Mc::SaveDat*, Mc::SaveDat*, int, int);

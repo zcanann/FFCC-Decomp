@@ -19,6 +19,7 @@ public:
     void SetStereo(int);
     void SetBgmMasterVolume(int);
     void SetSeMasterVolume(int);
+    void SeMaxVolume(int);
     void create(int);
     void destroy();
     void Realloc(int);

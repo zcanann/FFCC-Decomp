@@ -33,12 +33,9 @@ struct RandFloatCtx {
 void pppRandFloat(void* param1, void* param2, void* param3)
 {
     int index;
-    int outputOffset;
-    RandFloatCtx* ctx;
-    RandFloatParam* data;
-    float* source;
-    float* output;
     char* base;
+    RandFloatParam* data;
+    RandFloatCtx* ctx;
     float value;
 
     if (lbl_8032ED70 != 0) {
@@ -46,9 +43,9 @@ void pppRandFloat(void* param1, void* param2, void* param3)
     }
 
     base = (char*)param1;
-    index = ((int*)base)[3];
-    ctx = (RandFloatCtx*)param3;
     data = (RandFloatParam*)param2;
+    ctx = (RandFloatCtx*)param3;
+    index = ((int*)base)[3];
 
     if (index == 0) {
         value = RandF__5CMathFv(&math);
@@ -58,20 +55,21 @@ void pppRandFloat(void* param1, void* param2, void* param3)
             value *= lbl_8032FF88;
         }
 
-        outputOffset = *ctx->outputOffset;
-        output = (float*)(base + outputOffset + 0x80);
-        *output = value;
+        *(float*)(base + *ctx->outputOffset + 0x80) = value;
         return;
     }
 
     if (data->targetId == index) {
-        outputOffset = *ctx->outputOffset;
-        output = (float*)(base + outputOffset + 0x80);
+        int outputOffset = *ctx->outputOffset;
+        int sourceOffset = data->sourceOffset;
+        float* source;
+
         if (data->sourceOffset == -1) {
             source = &lbl_801EADC8;
         } else {
-            source = (float*)(base + data->sourceOffset + 0x80);
+            source = (float*)(base + sourceOffset + 0x80);
         }
-        *source = *source + (data->blend * *output - data->blend);
+
+        *source = *source + (data->blend * *(float*)(base + outputOffset + 0x80) - data->blend);
     }
 }

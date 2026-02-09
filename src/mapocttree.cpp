@@ -1,6 +1,9 @@
 #include "ffcc/mapocttree.h"
 #include "ffcc/materialman.h"
 
+extern float lbl_8032F96C;
+extern float lbl_8032F970;
+
 /*
  * --INFO--
  * PAL Address: 8002d9fc
@@ -29,7 +32,9 @@ void setbit32(unsigned long* arg0, unsigned long arg1)
  */
 COctTree::COctTree()
 {
-	// TODO
+	*(unsigned int*)((unsigned char*)this + 0x4) = 0;
+	*(unsigned int*)((unsigned char*)this + 0x8) = 0;
+	*(unsigned int*)((unsigned char*)this + 0x48) = 0;
 }
 
 /*
@@ -329,50 +334,19 @@ void CMaterialMan::InitEnv()
  */
 int CBound::CheckCross(CBound& other)
 {
-	float* thisBound = (float*)this;
-	float* otherBound = (float*)&other;
-	int cross;
+	float* a = (float*)this;
+	float* b = (float*)&other;
 
-	if (otherBound[0] <= thisBound[0]) {
-		cross = 0;
-		if (thisBound[0] <= otherBound[0]) {
-			cross = 1;
-		} else if (thisBound[0] <= otherBound[3]) {
-			cross = 1;
-		}
-	} else {
-		cross = otherBound[0] <= thisBound[3];
-	}
-	if (!cross) {
+	if ((b[0] > a[3]) || (a[0] > b[3])) {
 		return 0;
 	}
-
-	if (otherBound[1] <= thisBound[1]) {
-		cross = 0;
-		if (thisBound[1] <= otherBound[1]) {
-			cross = 1;
-		} else if (thisBound[1] <= otherBound[4]) {
-			cross = 1;
-		}
-	} else {
-		cross = otherBound[1] <= thisBound[4];
-	}
-	if (!cross) {
+	if ((b[1] > a[4]) || (a[1] > b[4])) {
 		return 0;
 	}
-
-	if (otherBound[2] <= thisBound[2]) {
-		cross = 0;
-		if (thisBound[2] <= otherBound[2]) {
-			cross = 1;
-		} else if (thisBound[2] <= otherBound[5]) {
-			cross = 1;
-		}
-	} else {
-		cross = otherBound[2] <= thisBound[5];
+	if ((b[2] > a[5]) || (a[2] > b[5])) {
+		return 0;
 	}
-
-	return cross;
+	return 1;
 }
 
 /*
@@ -382,5 +356,15 @@ int CBound::CheckCross(CBound& other)
  */
 COctNode::COctNode()
 {
-	// TODO
+	float min = lbl_8032F96C;
+	float max = lbl_8032F970;
+
+	*(float*)((unsigned char*)this + 0x0) = min;
+	*(float*)((unsigned char*)this + 0x4) = min;
+	*(float*)((unsigned char*)this + 0x8) = min;
+	*(float*)((unsigned char*)this + 0xC) = max;
+	*(float*)((unsigned char*)this + 0x10) = max;
+	*(float*)((unsigned char*)this + 0x14) = max;
+	*(void**)((unsigned char*)this + 0x44) = 0;
+	*(void**)((unsigned char*)this + 0x48) = 0;
 }

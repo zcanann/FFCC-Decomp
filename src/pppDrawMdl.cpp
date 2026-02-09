@@ -1,5 +1,14 @@
 #include "ffcc/pppDrawMdl.h"
 #include "ffcc/pppPart.h"
+#include "dolphin/types.h"
+
+extern "C" {
+extern void* lbl_8032ED54;
+void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+    void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
+void pppSetBlendMode__FUc(unsigned char);
+void pppDrawMesh__FP10pppModelStP3Veci(void*, void*, int);
+}
 
 /*
  * --INFO--
@@ -24,29 +33,25 @@ void pppDrawMdl(_pppPObject* pObject, PDrawMdl* drawMdl, _pppCtrlTable* ctrlTabl
 {
     _pppPObject* obj = pObject;
     PDrawMdl* mdl = drawMdl;
-    unsigned int value = *(unsigned int*)((char*)mdl + 0x4);
-    if ((value >> 16) == 0xFFFF) {
+
+    if ((*(u32*)((u8*)mdl + 4) >> 16) == 0xFFFF) {
         return;
     }
 
-    typedef void (*SetDrawEnvFn)(pppFMATRIX*, pppCVECTOR*, float, unsigned char, unsigned char,
-                                 unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
-    SetDrawEnvFn setDrawEnv = (SetDrawEnvFn)pppSetDrawEnv;
-    setDrawEnv((pppFMATRIX*)((char*)obj + *(int*)*(int**)((char*)ctrlTable + 0xC) + 0x88),
-               (pppCVECTOR*)((char*)obj + 0x40),
-               *(float*)((char*)mdl + 0x10),
-               *(unsigned char*)((char*)mdl + 0x14),
-               *(unsigned char*)((char*)mdl + 0xA),
-               *(unsigned char*)((char*)mdl + 0x9),
-               *(unsigned char*)((char*)mdl + 0xB),
-               *(unsigned char*)((char*)mdl + 0xC),
-               *(unsigned char*)((char*)mdl + 0xD),
-               *(unsigned char*)((char*)mdl + 0xE));
+    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+        (u8*)obj + *(int*)*(int**)((u8*)ctrlTable + 0xC) + 0x88,
+        (u8*)obj + 0x40,
+        *(float*)((u8*)mdl + 0x10),
+        *(u8*)((u8*)mdl + 0x14),
+        *(u8*)((u8*)mdl + 0xA),
+        *(u8*)((u8*)mdl + 0x9),
+        *(u8*)((u8*)mdl + 0xB),
+        *(u8*)((u8*)mdl + 0xC),
+        *(u8*)((u8*)mdl + 0xD),
+        *(u8*)((u8*)mdl + 0xE));
 
-    pppSetBlendMode(*(unsigned char*)((char*)mdl + 0x9));
+    pppSetBlendMode__FUc(*(u8*)((u8*)mdl + 0x9));
 
-    extern void* lbl_8032ED54;
-    void** modelsArray = (void**)*(void**)((char*)&lbl_8032ED54 + 0x8);
-    pppDrawMesh((pppModelSt*)modelsArray[*(unsigned int*)((char*)mdl + 0x4)],
-                *(Vec**)((char*)obj + 0x70), 1);
+    void** modelsArray = *(void***)((u8*)lbl_8032ED54 + 0x8);
+    pppDrawMesh__FP10pppModelStP3Veci(modelsArray[*(u32*)((u8*)mdl + 0x4)], *(void**)((u8*)obj + 0x70), 1);
 }

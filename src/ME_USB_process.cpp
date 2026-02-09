@@ -3,6 +3,32 @@
 #include "ffcc/USBStreamData.h"
 #include "ffcc/memory.h"
 #include "ffcc/system.h"
+#include "dolphin/os/OSCache.h"
+
+#include <string.h>
+
+#define BSWAP32(val) ((u32)(((u32)(val) << 24) | (((u32)(val) & 0xff00) << 8) | (((u32)(val) & 0xff0000) >> 8) | ((u32)(val) >> 24)))
+
+extern "C" void ClearTextureData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialEditorPcs);
+extern "C" void SetRsdIndex__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialEditorPcs);
+extern "C" void SetRsdFlag__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialEditorPcs);
+
+namespace {
+static inline u8* Ptr(CMaterialEditorPcs* self, u32 offset)
+{
+    return reinterpret_cast<u8*>(self) + offset;
+}
+
+static inline CUSBStreamData* UsbStream(CMaterialEditorPcs* self)
+{
+    return reinterpret_cast<CUSBStreamData*>(Ptr(self, 0x8));
+}
+
+static inline u32& U32At(CMaterialEditorPcs* self, u32 offset)
+{
+    return *reinterpret_cast<u32*>(Ptr(self, offset));
+}
+}
 
 /*
  * --INFO--
@@ -32,71 +58,41 @@ extern "C" CMaterialEditorPcs* MemFree__18CMaterialEditorPcsFPv(CMaterialEditorP
  */
 extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialEditorPcs)
 {
-    // Access USB stream data
-    CUSBStreamData* usbStream = &materialEditorPcs->m_usbStream;
-    
-    switch (usbStream->m_packetCode) {
-        case 1:
-            // Matrix/camera data handling - endian swapping for floats and vectors
-            // Simplified implementation for now
-            break;
-            
-        case 3:
-            // Set stage default to enabled state
-            // TODO: Set appropriate flag for stage enable
-            break;
-            
-        case 4:
-            // Set stage default to disabled state  
-            // TODO: Set appropriate flag for stage disable
-            break;
-            
-        case 0x10:
-            // Vertex data processing with memory allocation
-            // Complex vertex buffer setup with endian conversion
-            break;
-            
-        case 0x12:
-            // Secondary vertex data processing
-            break;
-            
-        case 0x13:
-            // Normal and UV coordinate data processing
-            break;
-            
-        case 0x20:
-            // Texture data processing with GX texture object initialization
-            break;
-            
-        case 0x21:
-            // Clear texture data flag
-            // materialEditorPcs->textureDataFlag = 1;
-            // ClearTextureData__18CMaterialEditorPcsFv(materialEditorPcs);
-            break;
-            
-        case 0x22:
-            // Reset texture data flag
-            // materialEditorPcs->textureDataFlag = 0;
-            break;
-            
-        case 0x31:
-            // Material property data copy
-            break;
-            
-        case 0x40:
-            // Reset resource display list
-            break;
-            
-        case 0x41:
-            // Add item to resource display list
-            break;
-            
-        case 0x42:
-            // Set stage loading parameters with endian swap
-            break;
-            
-        case 0x43:
-            // Set resource flags
-            break;
+    CUSBStreamData* usb = UsbStream(materialEditorPcs);
+
+    switch (usb->m_packetCode) {
+    case 1:
+        memcpy(Ptr(materialEditorPcs, 0xEC), usb->m_data, 0x120);
+        for (int i = 0; i < 0x20; i++) {
+            U32At(materialEditorPcs, 0xEC + i * 4) = BSWAP32(U32At(materialEditorPcs, 0xEC + i * 4));
+        }
+        memcpy(Ptr(materialEditorPcs, 0x16C), Ptr(materialEditorPcs, 0xEC), 0x30);
+        DCStoreRange(Ptr(materialEditorPcs, 0xEC), 0x120);
+        break;
+    case 3:
+        U32At(materialEditorPcs, 0x1C) = 1;
+        break;
+    case 4:
+        U32At(materialEditorPcs, 0x1C) = 0;
+        break;
+    case 0x21:
+        U32At(materialEditorPcs, 0xE8) = 1;
+        ClearTextureData__18CMaterialEditorPcsFv(materialEditorPcs);
+        break;
+    case 0x22:
+        U32At(materialEditorPcs, 0xE8) = 0;
+        break;
+    case 0x42:
+        memcpy(Ptr(materialEditorPcs, 0x20), usb->m_data, 4);
+        U32At(materialEditorPcs, 0x20) = BSWAP32(U32At(materialEditorPcs, 0x20));
+        DCStoreRange(Ptr(materialEditorPcs, 0x20), 4);
+        SetRsdIndex__18CMaterialEditorPcsFv(materialEditorPcs);
+        break;
+    case 0x43:
+        memcpy(Ptr(materialEditorPcs, 0xC0), usb->m_data, 4);
+        U32At(materialEditorPcs, 0xC0) = BSWAP32(U32At(materialEditorPcs, 0xC0));
+        SetRsdFlag__18CMaterialEditorPcsFv(materialEditorPcs);
+        DCStoreRange(Ptr(materialEditorPcs, 0xC0), 4);
+        break;
     }
 }

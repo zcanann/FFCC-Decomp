@@ -24,41 +24,52 @@ static const char lbl_801d6a5c[] = "sp";
  */
 void game(int argc, char** argv)
 {
-    bool copyScriptName = false;
-    bool parseLanguage = false;
+    bool copyScriptName;
+    bool parseLanguage;
+    int i;
+    char** argument;
 
     Game.game.Init();
     strcpy(reinterpret_cast<char*>(0x8022b7b4), lbl_801d6a40);
 
     if (argc != 0) {
-        for (int i = 1; i < argc; i++) {
-            char* argument = argv[i];
+        argument = argv + 1;
+        copyScriptName = false;
+        parseLanguage = false;
+        for (i = 1; i < argc; i++) {
+            char c;
 
             if (copyScriptName) {
-                strcpy(reinterpret_cast<char*>(0x8022b7b4), argument);
+                strcpy(reinterpret_cast<char*>(0x8022b7b4), *argument);
                 copyScriptName = false;
             } else if (parseLanguage) {
-                if ((strcmp(argument, lbl_801d6a48) == 0) || (strcmp(argument, lbl_801d6a4c) == 0)) {
+                if ((strcmp(*argument, lbl_801d6a48) == 0) || (strcmp(*argument, lbl_801d6a4c) == 0)) {
                     Game.game.m_gameWork.m_languageId = 1;
-                } else if (strcmp(argument, lbl_801d6a50) == 0) {
+                } else if (strcmp(*argument, lbl_801d6a50) == 0) {
                     Game.game.m_gameWork.m_languageId = 2;
-                } else if (strcmp(argument, lbl_801d6a58) == 0) {
+                } else if (strcmp(*argument, lbl_801d6a58) == 0) {
                     Game.game.m_gameWork.m_languageId = 3;
-                } else if (strcmp(argument, lbl_801d6a5c) == 0) {
+                } else if (strcmp(*argument, lbl_801d6a5c) == 0) {
                     Game.game.m_gameWork.m_languageId = 4;
-                } else if (strcmp(argument, lbl_801d6a54) == 0) {
+                } else if (strcmp(*argument, lbl_801d6a54) == 0) {
                     Game.game.m_gameWork.m_languageId = 5;
                 } else {
                     Game.game.m_gameWork.m_languageId = 0;
                 }
                 parseLanguage = false;
-            } else if ((argument[0] == '-') || (argument[0] == '/')) {
-                if (argument[1] == 'f') {
-                    copyScriptName = true;
-                } else if (argument[1] == 'l') {
-                    parseLanguage = true;
+            } else {
+                c = (*argument)[0];
+                if ((c == '-') || (c == '/')) {
+                    c = (*argument)[1];
+                    if (c == 'l') {
+                        parseLanguage = true;
+                    } else if ((c < 'l') && (c == 'f')) {
+                        copyScriptName = true;
+                    }
                 }
             }
+
+            argument++;
         }
     }
 

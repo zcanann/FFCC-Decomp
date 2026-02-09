@@ -2,9 +2,12 @@
 #include "ffcc/math.h"
 
 extern CMath math;
-
-// Forward declaration for RandF with float parameter and return
 extern "C" float RandF__5CMathFf(float param, CMath* math);
+extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
+
+struct YmLaserOffsets {
+	int m_serializedDataOffsets[3];
+};
 
 /*
  * --INFO--
@@ -17,31 +20,30 @@ extern "C" float RandF__5CMathFf(float param, CMath* math);
  */
 extern "C" void pppConstructYmLaser(void* pppYmLaser, void* param_2)
 {
-	// Based on Ghidra decompilation: initialize laser object data
-	float* floatArray = (float*)((char*)pppYmLaser + 0x8); // Approximate offset from Ghidra
-	float constantVal = 1.0f; // Placeholder for FLOAT_80330dc0
-	
-	// Initialize multiple float values as shown in Ghidra
-	floatArray[0] = constantVal;
-	floatArray[1] = constantVal;
-	floatArray[2] = constantVal;
-	floatArray[3] = constantVal;
-	floatArray[4] = constantVal;
-	floatArray[5] = constantVal;
-	floatArray[6] = constantVal;
-	floatArray[7] = 0.0f;
-	floatArray[8] = constantVal;
-	floatArray[9] = constantVal;
-	floatArray[10] = constantVal;
-	
-	// Initialize byte and short fields to 0
-	*((unsigned char*)&floatArray[11]) = 0;
-	*((unsigned char*)&floatArray[11] + 1) = 0;
-	*((unsigned char*)&floatArray[11] + 2) = 0;
-	
-	// Generate random float value
-	float randVal = RandF__5CMathFf(1.0f, &math);
-	floatArray[14] = randVal;
+	YmLaserOffsets* offsets = (YmLaserOffsets*)param_2;
+	float one = 1.0f;
+	float* work = (float*)((unsigned char*)pppYmLaser + 0x88 + offsets->m_serializedDataOffsets[2]);
+
+	*work = one;
+	work[1] = one;
+	work[2] = one;
+	work[3] = one;
+	work[4] = one;
+	work[5] = one;
+	work[6] = one;
+	work[7] = 0.0f;
+	work[8] = one;
+	work[9] = one;
+	work[10] = one;
+
+	*((unsigned char*)work + 0x2c) = 0;
+	*((unsigned char*)work + 0x2d) = 0;
+	*((unsigned char*)work + 0x2e) = 0;
+	*((unsigned short*)work + 0x18) = 0;
+	*((unsigned short*)work + 0x19) = 0;
+	*((unsigned short*)work + 0x1a) = 0;
+
+	work[14] = RandF__5CMathFf(1.0f, &math);
 }
 
 /*
@@ -55,23 +57,20 @@ extern "C" void pppConstructYmLaser(void* pppYmLaser, void* param_2)
  */
 extern "C" void pppConstruct2YmLaser(void* pppYmLaser, void* param_2)
 {
-	float fVar1 = 1.0f; // FLOAT_80330dc0 placeholder
-	
-	int iVar2 = *(int*)((char*)param_2 + 8); // param_2->m_serializedDataOffsets[2] - approximate offset
-	
-	// Initialize float fields with the constant value
-	*(float*)((char*)pppYmLaser + 0x98 + iVar2) = 1.0f;
-	*(float*)((char*)pppYmLaser + 0x94 + iVar2) = fVar1;
-	*(float*)((char*)pppYmLaser + 0x90 + iVar2) = fVar1;
-	*(float*)((char*)pppYmLaser + 0x8c + iVar2) = fVar1;
-	*(float*)((char*)pppYmLaser + 0x88 + iVar2) = fVar1;
-	*(float*)((char*)pppYmLaser + 0x84 + iVar2) = fVar1;
-	*(float*)((char*)pppYmLaser + 0xa8 + iVar2) = fVar1;
-	*(float*)((char*)pppYmLaser + 0xa4 + iVar2) = fVar1;
-	*(float*)((char*)pppYmLaser + 0xa0 + iVar2) = fVar1;
-	
-	// Set byte field to 0
-	*((char*)pppYmLaser + 0xac + iVar2) = 0;
+	YmLaserOffsets* offsets = (YmLaserOffsets*)param_2;
+	float one = 1.0f;
+	int dataOffset = offsets->m_serializedDataOffsets[2];
+
+	*(float*)((unsigned char*)pppYmLaser + 0x98 + dataOffset) = one;
+	*(float*)((unsigned char*)pppYmLaser + 0x94 + dataOffset) = one;
+	*(float*)((unsigned char*)pppYmLaser + 0x90 + dataOffset) = one;
+	*(float*)((unsigned char*)pppYmLaser + 0x8c + dataOffset) = one;
+	*(float*)((unsigned char*)pppYmLaser + 0x88 + dataOffset) = one;
+	*(float*)((unsigned char*)pppYmLaser + 0x84 + dataOffset) = one;
+	*(float*)((unsigned char*)pppYmLaser + 0xa8 + dataOffset) = one;
+	*(float*)((unsigned char*)pppYmLaser + 0xa4 + dataOffset) = one;
+	*(float*)((unsigned char*)pppYmLaser + 0xa0 + dataOffset) = one;
+	*((unsigned char*)pppYmLaser + 0xac + dataOffset) = 0;
 }
 
 /*
@@ -85,16 +84,13 @@ extern "C" void pppConstruct2YmLaser(void* pppYmLaser, void* param_2)
  */
 extern "C" void pppDestructYmLaser(void* pppYmLaser, void* param_2)
 {
-	int iVar1;
-	void** serializedDataOffsets = (void**)((char*)param_2 + 8); // Approximate offset for m_serializedDataOffsets
-	
-	iVar1 = *(int*)((char*)serializedDataOffsets + 8); // param_2->m_serializedDataOffsets[2]
-	void** stagePtr = (void**)((char*)pppYmLaser + 0x9c + iVar1); // field_0x9c + iVar1 offset
-	
-	if (*stagePtr != 0) {
-		// Call pppHeapUseRate function (placeholder - actual function call needed)
-		// pppHeapUseRate__FPQ27CMemory6CStage(*stagePtr);
-		*stagePtr = 0; // Set to 0
+	YmLaserOffsets* offsets = (YmLaserOffsets*)param_2;
+	int dataOffset = offsets->m_serializedDataOffsets[2];
+	void** stage = (void**)((unsigned char*)pppYmLaser + 0x9c + dataOffset);
+
+	if (*stage != 0) {
+		pppHeapUseRate__FPQ27CMemory6CStage(*stage);
+		*stage = 0;
 	}
 }
 

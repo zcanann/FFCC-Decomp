@@ -4,6 +4,10 @@
 
 #include "dolphin/os/__os.h"
 
+#ifndef __GEKKO__
+#define __GEKKO__
+#endif
+
 #define HID2 920
 
 // prototypes

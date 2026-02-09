@@ -1,7 +1,19 @@
 #include "ffcc/file.h"
 
+#include "ffcc/fontman.h"
+#include "ffcc/goout.h"
+#include "ffcc/graphic.h"
+#include "ffcc/util.h"
 #include "ffcc/p_game.h"
 #include "ffcc/system.h"
+
+#include <dolphin/vi.h>
+
+#include <string.h>
+
+extern CUtil DAT_8032ec70;
+extern void* DAT_80238030;
+extern char* l_tError[4][6][3];
 
 /*
  * --INFO--
@@ -476,7 +488,130 @@ CFile::CHandle* CFile::CheckQueue()
  * Address:	TODO
  * Size:	TODO
  */
-void CFile::DrawError(DVDFileInfo&, int)
+void CFile::DrawError(DVDFileInfo& dvdFileInfo, int errorCode)
 {
-	// TODO
+    static char s_file_cpp[] = "file.cpp";
+
+    _GXTexObj backTexObj;
+
+    m_isDiskError = 1;
+
+    do {
+        if (System.m_execParam != 0) {
+            System.Printf((char*)"CFile::drawError(%d)\n", errorCode);
+        }
+
+        CFont* font = MenuPcs.GetFont22();
+
+        if (font == 0) {
+            m_isDiskError = 0;
+            return;
+        }
+
+        Graphic._WaitDrawDone(s_file_cpp, 0x2CC);
+        Graphic.GetBackBufferRect2(DAT_80238030, &backTexObj, 0, 0, 0x280, 0x70, 0, GX_NEAR, GX_TF_RGBA8, 0);
+
+        _GXColor black = {0x00, 0x00, 0x00, 0xFF};
+        DAT_8032ec70.RenderColorQuad(0.0f, 0.0f, 640.0f, 112.0f, black);
+
+        font->SetScale(1.0f);
+        font->SetShadow(1);
+        font->SetMargin(0.0f);
+        font->SetZMode(0, 0);
+
+        _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
+        font->SetColor(white);
+        font->SetTlut(0);
+        font->DrawInit();
+
+        int baseY = 200;
+        int errorIndex = 0;
+
+        switch (errorCode) {
+        case 4:
+        case 6:
+            errorIndex = 2;
+            break;
+        case 5:
+            errorIndex = 1;
+            break;
+        case 0x0B:
+            errorIndex = 0;
+            break;
+        case -1:
+            errorIndex = 3;
+            m_fatalDiskErrorFlag = 1;
+            break;
+        }
+
+        unsigned int languageId = Game.game.m_gameWork.m_languageId;
+        if (languageId >= 6) {
+            languageId = 0;
+        }
+
+        char** text = l_tError[errorIndex][languageId];
+        bool hasThirdLine = (text[2] != 0) && (strlen(text[2]) != 0);
+
+        font->SetPosX(20.0f);
+
+        if (!hasThirdLine) {
+            font->SetPosY((float)baseY);
+            font->SetPosZ(0.0f);
+            font->Draw(text[0]);
+
+            font->SetPosX(20.0f);
+            font->SetPosY((float)(baseY + 0x1C));
+            font->SetPosZ(0.0f);
+            font->Draw(text[1]);
+        } else {
+            font->SetPosY((float)(baseY - 0x0E));
+            font->SetPosZ(0.0f);
+            font->Draw(text[0]);
+
+            font->SetPosX(20.0f);
+            font->SetPosY((float)(baseY + 0x0E));
+            font->SetPosZ(0.0f);
+            font->Draw(text[1]);
+
+            font->SetPosX(20.0f);
+            font->SetPosY((float)(baseY + 0x2A));
+            font->SetPosZ(0.0f);
+            font->Draw(text[2]);
+        }
+
+        font->DrawQuit();
+
+        GXSetDispCopySrc(0, 0, 0x280, 0x70);
+        GXSetDispCopyDst(0x280, 0x70);
+        GXCopyDisp(DAT_80238030, GX_FALSE);
+
+        Graphic._WaitDrawDone(s_file_cpp, 0x329);
+        Graphic.SetStdDispCopySrc();
+        Graphic.SetStdDispCopyDst();
+        Graphic._WaitDrawDone(s_file_cpp, 0x32D);
+
+        VIWaitForRetrace();
+        Sound.PauseDiscError(1);
+        VISetBlack(0);
+        VIFlush();
+
+        int dvdStatus;
+        do {
+            dvdStatus = DVDGetCommandBlockStatus(&dvdFileInfo.cb);
+            if (dvdStatus == errorCode) {
+                VIWaitForRetrace();
+            }
+        } while (dvdStatus == errorCode);
+
+        m_fatalDiskErrorFlag = 0;
+        while (dvdStatus == 1) {
+            VIWaitForRetrace();
+            dvdStatus = DVDGetCommandBlockStatus(&dvdFileInfo.cb);
+        }
+
+        errorCode = dvdStatus;
+    } while ((errorCode == 0x0B) || ((unsigned int)(errorCode - 4) < 3) || (errorCode == -1));
+
+    Sound.PauseDiscError(0);
+    m_isDiskError = 0;
 }

@@ -20,8 +20,6 @@ extern u32 lbl_801E86A8[];
 extern u32 lbl_801E86B4[];
 extern CUSBPcs USBPcs;
 
-static char s_p_usb_cpp[] = "p_usb.cpp";
-
 
 /*
  * --INFO--
@@ -82,20 +80,16 @@ void* CUSBPcs::GetTable(unsigned long param)
  */
 void CUSBPcs::IsBigAlloc(int param_2)
 {
-    if (param_2 != 0)
-    {
-        if (m_bigStage == (CMemory::CStage*)nullptr)
-        {
+    if (param_2 != 0) {
+        if (m_bigStage == (CMemory::CStage*)nullptr) {
             m_bigStage = Memory.CreateStage(0x100000, "CUSBPcs", 0);
         }
+        return;
     }
-    else
-    {
-        if (m_bigStage != (CMemory::CStage*)nullptr)
-        {
-            Memory.DestroyStage(m_bigStage);
-            m_bigStage = (CMemory::CStage*)nullptr;
-        }
+
+    if (m_bigStage != (CMemory::CStage*)nullptr) {
+        Memory.DestroyStage(m_bigStage);
+        m_bigStage = (CMemory::CStage*)nullptr;
     }
 }
 
@@ -189,7 +183,7 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
     // Prefer big stage if present, else small stage (matches target).
     CMemory::CStage* stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
 
-    unsigned int* packet = (unsigned int*)__nwa__FUlPQ27CMemory6CStagePci(packetSize, stage, s_p_usb_cpp, 0x1ca);
+    unsigned int* packet = (unsigned int*)__nwa__FUlPQ27CMemory6CStagePci(packetSize, stage, "p_usb.cpp", 0x1ca);
     unsigned int* sendBuf = (unsigned int*)nullptr;
 
     int result = 0;
@@ -216,7 +210,7 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
 
         unsigned int sendSize = Align32(packet[1]);
 
-        sendBuf = (unsigned int*)__nwa__FUlPQ27CMemory6CStagePci(sendSize, stage, s_p_usb_cpp, 0x19e);
+        sendBuf = (unsigned int*)__nwa__FUlPQ27CMemory6CStagePci(sendSize, stage, "p_usb.cpp", 0x19e);
         memcpy(sendBuf, packet, sendSize);
 
         // Swap only the first two words (matches target doing lwbrx on [0] and [1]).
@@ -264,27 +258,18 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
  */
 extern "C" void __sinit_p_usb_cpp()
 {
-    *(void**)&USBPcs = &__vt__8CManager;
-    *(void**)&USBPcs = &lbl_801E8668;
+    void** base = (void**)&USBPcs;
+    base[0] = &__vt__8CManager;
+    base[0] = &lbl_801E8668;
+    base[0] = &lbl_801E8830;
 
-    u32 a0 = lbl_801E8690[0];
-    u32 a1 = lbl_801E8690[1];
-    u32 a2 = lbl_801E8690[2];
-    u32 b0 = lbl_801E869C[0];
-    u32 b1 = lbl_801E869C[1];
-    u32 b2 = lbl_801E869C[2];
-    u32 c0 = lbl_801E86A8[0];
-    u32 c1 = lbl_801E86A8[1];
-    u32 c2 = lbl_801E86A8[2];
-
-    *(void**)&USBPcs = &lbl_801E8830;
-    lbl_801E86B4[1] = a0;
-    lbl_801E86B4[2] = a1;
-    lbl_801E86B4[3] = a2;
-    lbl_801E86B4[4] = b0;
-    lbl_801E86B4[5] = b1;
-    lbl_801E86B4[6] = b2;
-    lbl_801E86B4[7] = c0;
-    lbl_801E86B4[8] = c1;
-    lbl_801E86B4[9] = c2;
+    lbl_801E86B4[1] = lbl_801E8690[0];
+    lbl_801E86B4[2] = lbl_801E8690[1];
+    lbl_801E86B4[3] = lbl_801E8690[2];
+    lbl_801E86B4[4] = lbl_801E869C[0];
+    lbl_801E86B4[5] = lbl_801E869C[1];
+    lbl_801E86B4[6] = lbl_801E869C[2];
+    lbl_801E86B4[7] = lbl_801E86A8[0];
+    lbl_801E86B4[8] = lbl_801E86A8[1];
+    lbl_801E86B4[9] = lbl_801E86A8[2];
 }

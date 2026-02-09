@@ -4,6 +4,8 @@
 #include <dolphin/os.h>
 #include <string.h>
 
+extern "C" int rand(void);
+
 /*
  * --INFO--
  * PAL Address: 0x80089da0
@@ -43,30 +45,38 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct UnkB* param_2, struct
  */
 void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, struct UnkC* param_2)
 {
-    unsigned char* data;
+    struct KeShpTail3XConArg {
+        char pad[0xc];
+        int* m_serializedDataOffsets;
+    };
+    unsigned char* work;
+    unsigned char* anglePtr;
     int i;
-    
-    // Get data pointer based on Ghidra analysis
-    data = (unsigned char*)((int)(&obj->pppPObject + 2));
-    
-    // Initialize flags to zero
-    data[0x1c3] = 0;
-    data[0x1c2] = 0;
-    
-    // Clear some memory areas
-    memset(data, 0, 8);
-    memset(data + 8, 0, 8);
-    memset(data + 0x10, 0, 8);
-    memset(data + 0x18, 0, 8);
-    memset(data + 0x20, 0, 8);
-    memset(data + 0x28, 0, 8);
-    
-    // Initialize array elements
-    for (i = 0; i < 0x1c; i++) {
-        *(float*)(data + 0x30 + i * 12) = 1.0f;
-        *(float*)(data + 0x34 + i * 12) = 1.0f;  
-        *(float*)(data + 0x38 + i * 12) = 1.0f;
-    }
+
+    work = (unsigned char*)((char*)&obj->pppPObject + 8 + *(reinterpret_cast<KeShpTail3XConArg*>(param_2)->m_serializedDataOffsets));
+    work[0x1c3] = 0;
+    work[0x1c2] = 0;
+    *(u16*)(work + 0x1bc) = 0;
+    *(u32*)(work + 0x1b8) = 0;
+    *(u16*)(work + 0x1c0) = (u16)rand();
+    memset(work, 0, 8);
+    memset(work + 8, 0, 8);
+    memset(work + 0x10, 0, 8);
+    memset(work + 0x18, 0, 8);
+    memset(work + 0x20, 0, 8);
+    memset(work + 0x28, 0, 8);
+
+    anglePtr = work;
+    i = 0;
+    do {
+        *(s16*)(anglePtr + 0x180) = (s16)(rand() % 0x168);
+        anglePtr += 2;
+        *(float*)(work + 0x38) = 1.0f;
+        *(float*)(work + 0x34) = 1.0f;
+        *(float*)(work + 0x30) = 1.0f;
+        work += 0xc;
+        i++;
+    } while (i < 0x1c);
 }
 
 /*

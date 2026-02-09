@@ -1,5 +1,7 @@
 #include "ffcc/pppMiasma.h"
 
+#include <string.h>
+
 extern int DAT_8032ed70;
 
 /*
@@ -24,22 +26,35 @@ void CreateScaleMatrix(_pppPObject*, float)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80109b6c
+ * PAL Size: 5604b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppRenderMiasma(void)
+void pppRenderMiasma(pppMiasma*, void*, pppMiasmaCtrl*)
 {
 	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80109b08
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppConstructMiasma(void)
+void pppConstructMiasma(pppMiasma* pppMiasma, pppMiasmaCtrl* param_2)
 {
-	// TODO
+    u8* work;
+
+    work = (u8*)pppMiasma + 0x80 + param_2->m_serializedDataOffsets[2];
+    memset(work, 0, 8);
+    memset(work + 8, 0, 8);
+    memset(work + 0x10, 0, 8);
 }
 
 /*
@@ -51,9 +66,14 @@ void pppConstructMiasma(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstruct2Miasma(void)
+void pppConstruct2Miasma(pppMiasma* pppMiasma, pppMiasmaCtrl* param_2)
 {
-	return;
+    u8* work;
+
+    work = (u8*)pppMiasma + 0x80 + param_2->m_serializedDataOffsets[2];
+    memset(work, 0, 8);
+    memset(work + 8, 0, 8);
+    memset(work + 0x10, 0, 8);
 }
 
 /*

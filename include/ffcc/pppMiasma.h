@@ -40,9 +40,9 @@ void CreateScaleMatrix(_pppPObject*, float);
 extern "C" {
 #endif
 
-void pppRenderMiasma(void);
-void pppConstructMiasma(void);
-void pppConstruct2Miasma(void);
+void pppRenderMiasma(pppMiasma*, void*, pppMiasmaCtrl*);
+void pppConstructMiasma(pppMiasma*, pppMiasmaCtrl*);
+void pppConstruct2Miasma(pppMiasma*, pppMiasmaCtrl*);
 void pppDestructMiasma(void);
 void pppFrameMiasma(pppMiasma*, pppMiasmaFrameStep*, pppMiasmaCtrl*);
 

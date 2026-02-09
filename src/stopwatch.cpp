@@ -61,8 +61,12 @@ float CStopWatch::Get()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80022FEC
+ * PAL Size: 112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CProfile::CProfile(char* name)
 {
@@ -73,8 +77,9 @@ CProfile::CProfile(char* name)
 	OSInitStopwatch(&tmp, name);
 	OSResetStopwatch(&tmp);
 
-	m_maxTime = lbl_8032F854;
-	m_lastTime = lbl_8032F854;
+	float time = lbl_8032F854;
+	m_maxTime = time;
+	m_lastTime = time;
 	m_frame = 0;
 }
 

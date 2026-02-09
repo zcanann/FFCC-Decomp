@@ -27,8 +27,7 @@ typedef struct RandUpHCVParams {
  */
 void randshort(short value, float factor)
 {
-    float scaled = (float)value * factor;
-    (void)scaled;
+    return;
 }
 
 /*
@@ -42,51 +41,50 @@ void randshort(short value, float factor)
  */
 extern "C" void pppRandUpHCV(void* p1, void* p2, void* p3)
 {
-    RandUpHCVParams* params = (RandUpHCVParams*)p2;
-    int id = *(int*)((char*)p1 + 0xC);
-
     if (lbl_8032ED70 != 0) {
         return;
     }
 
-    if (params->index == id) {
-        float randValue = RandF__5CMathFv(&math);
+    RandUpHCVParams* params = (RandUpHCVParams*)p2;
+    if (params->index == *(int*)((char*)p1 + 0xC)) {
+        float rand_value = RandF__5CMathFv(&math);
         if (params->flag != 0) {
-            randValue = (randValue + RandF__5CMathFv(&math)) * lbl_80330008;
+            rand_value = (rand_value + RandF__5CMathFv(&math)) * lbl_80330008;
         }
 
-        int dataOffset = **(int**)((char*)p3 + 0xC);
-        *(float*)((char*)p1 + dataOffset + 0x80) = randValue;
-    }
-
-    if (params->index != id) {
+        int data_offset = **(int**)((char*)p3 + 0xC);
+        *(float*)((char*)p1 + data_offset + 0x80) = rand_value;
+    } else if (params->index != *(int*)((char*)p1 + 0xC)) {
         return;
     }
 
-    int dataOffset = **(int**)((char*)p3 + 0xC);
-    float scale = *(float*)((char*)p1 + dataOffset + 0x80);
-
+    int data_offset = **(int**)((char*)p3 + 0xC);
+    float* random_value = (float*)((char*)p1 + data_offset + 0x80);
+    int color_offset = params->colorOffset;
     s16* target;
-    if (params->colorOffset == -1) {
+
+    if (color_offset == -1) {
         target = lbl_801EADC8;
     } else {
-        target = (s16*)((char*)p1 + params->colorOffset + 0x80);
+        target = (s16*)((char*)p1 + color_offset + 0x80);
     }
 
+    float scale = random_value[0];
+
     {
-        int add = (int)((double)params->delta[0] * (double)scale);
-        target[0] = (s16)(target[0] + add);
+        s16 base = params->delta[0];
+        target[0] = (s16)(target[0] + (int)((float)base * scale));
     }
     {
-        int add = (int)((double)params->delta[1] * (double)scale);
-        target[1] = (s16)(target[1] + add);
+        s16 base = params->delta[1];
+        target[1] = (s16)(target[1] + (int)((float)base * scale));
     }
     {
-        int add = (int)((double)params->delta[2] * (double)scale);
-        target[2] = (s16)(target[2] + add);
+        s16 base = params->delta[2];
+        target[2] = (s16)(target[2] + (int)((float)base * scale));
     }
     {
-        int add = (int)((double)params->delta[3] * (double)scale);
-        target[3] = (s16)(target[3] + add);
+        s16 base = params->delta[3];
+        target[3] = (s16)(target[3] + (int)((float)base * scale));
     }
 }

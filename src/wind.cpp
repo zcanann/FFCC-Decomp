@@ -5,15 +5,18 @@
 #include "ffcc/graphic.h"
 #include "ffcc/color.h"
 #include "ffcc/vector.h"
-#include "ffcc/p_camera.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/math.h"
 #include "ffcc/goout.h"
 #include "ffcc/p_game.h"
 #include "ffcc/system.h"
 
 extern CGraphic Graphic;
-extern CCameraPcs CameraPcs;
-extern u32 CFlat; // Temporary - needs proper declaration
+extern struct {
+    char _0[4];
+    Mtx m_cameraMatrix;
+} CameraPcs;
+extern unsigned char CFlat[];
 extern CMath Math;
 
 extern "C" int Rand__5CMathFUl(CMath*, unsigned long);
@@ -30,6 +33,7 @@ extern float FLOAT_80330f30;
 extern float FLOAT_80330f34;
 extern float FLOAT_80330f38;
 extern float FLOAT_80330f18;
+extern float FLOAT_80330f1c;
 extern double DOUBLE_80330f00;
 extern double DOUBLE_80330f08;
 extern double DOUBLE_80330f10;
@@ -146,12 +150,52 @@ void CWind::Frame()
 
 /*
  * --INFO--
- * Address:	800d9b2c
- * Size:	564
+ * PAL Address: 0x800d9b2c
+ * PAL Size: 564b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CWind::Draw()
 {
-	// TODO: Implement wind rendering
+    u8* obj = (u8*)this;
+    Mtx viewMtx;
+
+    PSMTXCopy(CameraPcs.m_cameraMatrix, viewMtx);
+    _GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)5, (_GXLogicOp)1);
+    GXSetZCompLoc(0);
+    _GXSetAlphaCompare((_GXCompare)6, 1, (_GXAlphaOp)0, (_GXCompare)7, 0);
+    GXSetZMode(1, (_GXCompare)3, 1);
+    GXSetCullMode((_GXCullMode)1);
+    GXSetNumTevStages(1);
+    _GXSetTevOp((_GXTevStageID)0, (_GXTevMode)4);
+    _GXSetTevOrder((_GXTevStageID)0, (_GXTexCoordID)0xff, (_GXTexMapID)0xff, (_GXChannelID)4);
+    GXSetNumChans(1);
+    GXSetChanCtrl((_GXChannelID)0, 0, (_GXColorSrc)0, (_GXColorSrc)0, 0, (_GXDiffuseFn)2, (_GXAttnFn)1);
+    GXSetChanCtrl((_GXChannelID)2, 0, (_GXColorSrc)0, (_GXColorSrc)0, 0, (_GXDiffuseFn)2, (_GXAttnFn)2);
+    GXClearVtxDesc();
+    GXSetVtxDesc((_GXAttr)9, (_GXAttrType)1);
+    GXSetVtxAttrFmt((_GXVtxFmt)0, (_GXAttr)9, (_GXCompCnt)1, (_GXCompType)4, 0);
+
+    if ((*(u32*)(CFlat + 0x129c) & 0x800000) != 0) {
+        for (int i = 0; i < 32; i++, obj += 100) {
+            if ((s8)obj[0] >= 0) {
+                continue;
+            }
+
+            if (*(s32*)(obj + 0x1C) == 1) {
+                CColor color(0xff, 0xff, 0, 0xff);
+                CVector pos(*(float*)(obj + 4), FLOAT_80330ef0, *(float*)(obj + 8));
+                Graphic.DrawSphere(viewMtx, (Vec*)&pos, *(float*)(obj + 0x30), &color.color);
+            } else {
+                int alpha = (int)(FLOAT_80330f1c * (FLOAT_80330ef8 - *(float*)(obj + 0x38)));
+                CColor color(0xff, 0xff, 0x80, alpha);
+                CVector pos(*(float*)(obj + 4), FLOAT_80330ef0, *(float*)(obj + 8));
+                Graphic.DrawSphere(viewMtx, (Vec*)&pos, *(float*)(obj + 0x30), &color.color);
+            }
+        }
+    }
 }
 
 /*

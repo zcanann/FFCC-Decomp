@@ -4,6 +4,7 @@
 #include "ffcc/mapobj.h"
 
 #include <dolphin/gx.h>
+#include <dolphin/mtx.h>
 
 class CChunkFile;
 class CMapObj;
@@ -16,7 +17,6 @@ class CMapAnimNode;
 class CMapAnimKeyDt;
 class CMapShadow;
 class CMemory;
-struct Vec;
 
 void setDbgLight(int, Vec&, _GXColor&);
 void GXSetTexCoordGen();
@@ -105,8 +105,8 @@ public:
     void ShowMapMeshID(int, int);
     void SetMapObjPrioID(int, unsigned char);
     void SetMapObjTransRate(int, float, float, float);
-    void SetMapObjWorldMapLightIdx(int, _GXColor, Vec&);
-    void SetMapObjWorldMapLightID(int, _GXColor, Vec&);
+    void SetMapObjWorldMapLightIdx(int, _GXColor, Vec);
+    void SetMapObjWorldMapLightID(int, _GXColor, Vec);
     void SetDrawRangeOctTree(float);
     void SetDrawRangeMapObj(float);
     void SetDraw(unsigned char);

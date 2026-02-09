@@ -685,19 +685,62 @@ void CMapMng::SetMapObjTransRate(int, float, float, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMng::SetMapObjWorldMapLightIdx(int, _GXColor, Vec&)
+void CMapMng::SetMapObjWorldMapLightIdx(int, _GXColor, Vec)
 {
 	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002f47c
+ * PAL Size: 204b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapMng::SetMapObjWorldMapLightID(int, _GXColor, Vec&)
+void CMapMng::SetMapObjWorldMapLightID(int id, _GXColor color, Vec position)
 {
-	// TODO
+	int i;
+	int objCount;
+	int objIndex;
+	unsigned int packedColor;
+	unsigned int posX;
+	unsigned int posY;
+	unsigned int posZ;
+	unsigned char* mapObj;
+	unsigned char* mapObjLight;
+
+	objCount = *(short*)((unsigned char*)this + 0xC);
+	objIndex = 0;
+	for (i = 0; i < objCount; i++) {
+		mapObj = (unsigned char*)this + 0x70 + i * 0xF0;
+		if (*(unsigned short*)(mapObj + 0x2E) == (unsigned short)id) {
+			objIndex = i;
+			goto found;
+		}
+	}
+	objIndex = -1;
+
+found:
+	packedColor = *(unsigned int*)&color;
+	posX = *(unsigned int*)((unsigned char*)&position + 0);
+	posY = *(unsigned int*)((unsigned char*)&position + 4);
+	posZ = *(unsigned int*)((unsigned char*)&position + 8);
+
+	mapObj = (unsigned char*)this + 0x70 + objIndex * 0xF0;
+	mapObjLight = *(unsigned char**)(mapObj + 0xEC);
+	if (*(int*)(mapObjLight + 4) == 1) {
+		*(unsigned char*)(mapObjLight + 8) = (unsigned char)(packedColor >> 24);
+		*(unsigned char*)(mapObjLight + 9) = (unsigned char)(packedColor >> 16);
+		*(unsigned char*)(mapObjLight + 10) = (unsigned char)(packedColor >> 8);
+		*(unsigned char*)(mapObjLight + 0xB) = (unsigned char)packedColor;
+		*(unsigned int*)(mapObj + 0x70) = posX;
+		*(unsigned int*)(mapObj + 0x74) = posY;
+		*(unsigned int*)(mapObj + 0x78) = posZ;
+		*(unsigned char*)(mapObj + 0x1C) = 1;
+		*(unsigned char*)(mapObj + 0x1B) = 1;
+	}
 }
 
 /*

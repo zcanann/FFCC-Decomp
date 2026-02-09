@@ -34,7 +34,7 @@ void pppConstructYmDeformationMdl(pppYmDeformationMdl*, struct UnkC*);
 void pppConstruct2YmDeformationMdl(pppYmDeformationMdl*, struct UnkC*);
 void pppDestructYmDeformationMdl(void);
 void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, UnkB* param_2, UnkC* param_3);
-void pppRenderYmDeformationMdl(void* pppYmDeformationMdl, void* param_2, void* param_3);
+void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, UnkB* param_2, UnkC* param_3);
 
 #ifdef __cplusplus
 }

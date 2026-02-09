@@ -2,6 +2,9 @@
 
 class CMaterial;
 
+extern "C" void __dl__FPv(void* ptr);
+extern "C" void __dla__FPv(void* ptr);
+
 template <class T>
 class CPtrArray
 {
@@ -17,6 +20,28 @@ public:
     T GetAt(unsigned long index);
     T operator[](unsigned long index);
 };
+
+namespace {
+static inline unsigned char* Ptr(CMapMesh* self, unsigned int offset)
+{
+    return reinterpret_cast<unsigned char*>(self) + offset;
+}
+
+static inline void*& PtrAt(CMapMesh* self, unsigned int offset)
+{
+    return *reinterpret_cast<void**>(Ptr(self, offset));
+}
+
+static inline int& S32At(CMapMesh* self, unsigned int offset)
+{
+    return *reinterpret_cast<int*>(Ptr(self, offset));
+}
+
+static inline unsigned short& U16At(CMapMesh* self, unsigned int offset)
+{
+    return *reinterpret_cast<unsigned short*>(Ptr(self, offset));
+}
+}
 
 /*
  * --INFO--
@@ -60,42 +85,110 @@ CMapMesh::CMapMesh()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80028648
+ * PAL Size: 152b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CMapMesh::~CMapMesh()
 {
-	// TODO
+    if (PtrAt(this, 0x24) != 0) {
+        __dla__FPv(PtrAt(this, 0x24));
+        PtrAt(this, 0x24) = 0;
+    }
+
+    if (PtrAt(this, 0x28) != 0) {
+        __dla__FPv(PtrAt(this, 0x28));
+        PtrAt(this, 0x28) = 0;
+    }
+
+    U16At(this, 0x0) = 0;
+    U16At(this, 0x2) = 0;
+    U16At(this, 0x4) = 0;
+    U16At(this, 0x8) = 0;
+    U16At(this, 0x6) = 0;
+    U16At(this, 0xA) = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800286e0
+ * PAL Size: 116b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapMesh::Destroy()
 {
-	// TODO
+    if (PtrAt(this, 0x24) != 0) {
+        __dla__FPv(PtrAt(this, 0x24));
+        PtrAt(this, 0x24) = 0;
+    }
+
+    if (PtrAt(this, 0x28) != 0) {
+        __dla__FPv(PtrAt(this, 0x28));
+        PtrAt(this, 0x28) = 0;
+    }
+
+    U16At(this, 0x0) = 0;
+    U16At(this, 0x2) = 0;
+    U16At(this, 0x4) = 0;
+    U16At(this, 0x8) = 0;
+    U16At(this, 0x6) = 0;
+    U16At(this, 0xA) = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800285dc
+ * PAL Size: 108b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapMesh::Ptr2Off()
 {
-	// TODO
+    if (S32At(this, 0x24) == 0) {
+        return;
+    }
+
+    S32At(this, 0x2C) -= S32At(this, 0x24);
+    S32At(this, 0x30) -= S32At(this, 0x24);
+    S32At(this, 0x34) -= S32At(this, 0x24);
+    S32At(this, 0x38) -= S32At(this, 0x24);
+    S32At(this, 0x3C) -= S32At(this, 0x24);
+    S32At(this, 0x40) -= S32At(this, 0x24);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80028540
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapMesh::Off2Ptr()
 {
-	// TODO
+    int iterOffset = 0;
+
+    S32At(this, 0x2C) += S32At(this, 0x24);
+    S32At(this, 0x30) += S32At(this, 0x24);
+    S32At(this, 0x34) += S32At(this, 0x24);
+    S32At(this, 0x38) += S32At(this, 0x24);
+    S32At(this, 0x3C) += S32At(this, 0x24);
+    S32At(this, 0x40) += S32At(this, 0x24);
+
+    for (int i = 0; i < static_cast<int>(U16At(this, 0xA)); i++) {
+        int entry = S32At(this, 0x40) + iterOffset;
+        iterOffset += 0x10;
+        *reinterpret_cast<int*>(entry + 4) = S32At(this, 0x24) + *reinterpret_cast<int*>(entry + 0xC);
+    }
 }
 
 /*

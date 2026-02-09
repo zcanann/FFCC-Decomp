@@ -9,6 +9,11 @@ struct YmLaserOffsets {
 	int m_serializedDataOffsets[3];
 };
 
+struct YmLaserParam {
+	unsigned char pad[0xc];
+	YmLaserOffsets* offsets;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x800d3780
@@ -20,9 +25,9 @@ struct YmLaserOffsets {
  */
 extern "C" void pppConstructYmLaser(void* pppYmLaser, void* param_2)
 {
-	YmLaserOffsets* offsets = (YmLaserOffsets*)param_2;
+	YmLaserParam* data = (YmLaserParam*)param_2;
 	float one = 1.0f;
-	float* work = (float*)((unsigned char*)pppYmLaser + 0x88 + offsets->m_serializedDataOffsets[2]);
+	float* work = (float*)((unsigned char*)pppYmLaser + 0x88 + data->offsets->m_serializedDataOffsets[2]);
 
 	*work = one;
 	work[1] = one;
@@ -57,9 +62,9 @@ extern "C" void pppConstructYmLaser(void* pppYmLaser, void* param_2)
  */
 extern "C" void pppConstruct2YmLaser(void* pppYmLaser, void* param_2)
 {
-	YmLaserOffsets* offsets = (YmLaserOffsets*)param_2;
+	YmLaserParam* data = (YmLaserParam*)param_2;
 	float one = 1.0f;
-	int dataOffset = offsets->m_serializedDataOffsets[2];
+	int dataOffset = data->offsets->m_serializedDataOffsets[2];
 
 	*(float*)((unsigned char*)pppYmLaser + 0x98 + dataOffset) = one;
 	*(float*)((unsigned char*)pppYmLaser + 0x94 + dataOffset) = one;

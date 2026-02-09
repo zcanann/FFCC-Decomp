@@ -36,71 +36,63 @@ void pppConstructYmLookOn(struct pppYmLookOn* pppYmLookOn, struct UnkC* param_2)
 void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct UnkB* param_2, struct UnkC* param_3)
 {
     struct _pppMngSt* pppMngSt;
-    int iVar1;
-    float fVar2;
+    int dataOffset;
+    u8* owner;
     Vec local_58;
     Vec local_4c;
     Vec local_40;
     Vec local_34;
     Vec local_28;
     Vec local_1c[2];
-    
+
     pppMngSt = pppMngStPtr;
-    if (DAT_8032ed70 == 0) {
-        // Access velocity from pppMngSt - this will need proper struct definition
-        fVar2 = 0.0f; // Placeholder for (pppMngStPtr->m_velocity).y;
-        iVar1 = *param_3->m_serializedDataOffsets;
-        
-        if ((fVar2 != 0.0f) || (*((int*)((char*)(&pppYmLookOn->field0_0x0[2]) + iVar1)) != 0)) {
-            *((float*)((char*)(&pppYmLookOn->field0_0x0[2]) + iVar1)) = fVar2;
-            if (fVar2 == 0.0f) {
-                fVar2 = *((float*)((char*)(&pppYmLookOn->field0_0x0[2]) + iVar1));
+    if (DAT_8032ed70 != 0) {
+        return;
+    }
+
+    owner = *(u8**)((u8*)pppMngStPtr + 0xdc);
+    dataOffset = *param_3->m_serializedDataOffsets;
+    if ((owner != nullptr) || (*(int*)((u8*)(&pppYmLookOn->field0_0x0[2]) + dataOffset) != 0)) {
+        *(u8**)((u8*)(&pppYmLookOn->field0_0x0[2]) + dataOffset) = owner;
+        if (owner == nullptr) {
+            owner = *(u8**)((u8*)(&pppYmLookOn->field0_0x0[2]) + dataOffset);
+        }
+
+        local_4c.x = *(f32*)(owner + 0x15c);
+        local_4c.y = *(f32*)(owner + 0x160) + (f32)param_2->m_dataValIndex;
+        local_4c.z = *(f32*)(owner + 0x164);
+        local_58.x = *(f32*)((u8*)pppMngStPtr + 0x84);
+        local_58.y = *(f32*)((u8*)pppMngStPtr + 0x94);
+        local_58.z = *(f32*)((u8*)pppMngStPtr + 0xa4);
+        PSVECSubtract(&local_58, &local_4c, local_1c);
+
+        if (((FLOAT_80330ec8 != local_1c[0].x) || (FLOAT_80330ec8 != local_1c[0].y)) ||
+            (FLOAT_80330ec8 != local_1c[0].z)) {
+            PSVECNormalize(local_1c, &local_40);
+            local_28.z = -local_40.x;
+            local_28.x = local_40.z;
+            local_28.y = FLOAT_80330ec8;
+            if ((FLOAT_80330ec8 == local_40.z) && (FLOAT_80330ec8 == local_28.z)) {
+                local_28.x = FLOAT_80330ecc;
+                local_28.z = FLOAT_80330ec8;
+                local_34.x = FLOAT_80330ec8;
+                local_34.y = FLOAT_80330ec8;
+                local_34.z = FLOAT_80330ecc;
+            } else {
+                PSVECNormalize(&local_28, &local_28);
+                PSVECCrossProduct(&local_40, &local_28, &local_34);
+                PSVECNormalize(&local_34, &local_34);
             }
-            
-            // Access matrix data - placeholder implementation
-            local_4c.x = 0.0f; // *(float*)((int)fVar2 + 0x15c);
-            local_4c.z = 0.0f; // *(float*)((int)fVar2 + 0x164);
-            local_4c.y = 0.0f + (float)param_2->m_dataValIndex; // *(float*)((int)fVar2 + 0x160) + (float)param_2->m_dataValIndex;
-            
-            // Access pppMngSt matrix - placeholder
-            local_58.x = 0.0f; // (pppMngStPtr->m_matrix).value[0][3];
-            local_58.y = 0.0f; // (pppMngStPtr->m_matrix).value[1][3];
-            local_58.z = 0.0f; // (pppMngStPtr->m_matrix).value[2][3];
-            
-            PSVECSubtract(&local_58, &local_4c, local_1c);
-            
-            if (((FLOAT_80330ec8 != local_1c[0].x) || (FLOAT_80330ec8 != local_1c[0].y)) ||
-               (FLOAT_80330ec8 != local_1c[0].z)) {
-                PSVECNormalize(local_1c, &local_40);
-                local_28.z = -local_40.x;
-                local_28.x = local_40.z;
-                local_28.y = FLOAT_80330ec8;
-                
-                if ((FLOAT_80330ec8 == local_40.z) && (FLOAT_80330ec8 == local_28.z)) {
-                    local_28.x = FLOAT_80330ecc;
-                    local_28.z = FLOAT_80330ec8;
-                    local_34.x = FLOAT_80330ec8;
-                    local_34.y = FLOAT_80330ec8;
-                    local_34.z = FLOAT_80330ecc;
-                } else {
-                    PSVECNormalize(&local_28, &local_28);
-                    PSVECCrossProduct(&local_40, &local_28, &local_34);
-                    PSVECNormalize(&local_34, &local_34);
-                }
-                
-                // Set matrix values - placeholder
-                //(pppMngStPtr->m_matrix).value[0][0] = local_28.x;
-                //(pppMngStPtr->m_matrix).value[1][0] = local_28.y;
-                //(pppMngStPtr->m_matrix).value[2][0] = local_28.z;
-                //(pppMngStPtr->m_matrix).value[0][1] = local_34.x;
-                //(pppMngStPtr->m_matrix).value[1][1] = local_34.y;
-                //(pppMngStPtr->m_matrix).value[2][1] = local_34.z;
-                //(pppMngStPtr->m_matrix).value[0][2] = local_40.x;
-                //(pppMngStPtr->m_matrix).value[1][2] = local_40.y;
-                //(pppMngStPtr->m_matrix).value[2][2] = local_40.z;
-                
-                pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
-            }
+            *(f32*)((u8*)pppMngStPtr + 0x78) = local_28.x;
+            *(f32*)((u8*)pppMngStPtr + 0x88) = local_28.y;
+            *(f32*)((u8*)pppMngStPtr + 0x98) = local_28.z;
+            *(f32*)((u8*)pppMngStPtr + 0x7c) = local_34.x;
+            *(f32*)((u8*)pppMngStPtr + 0x8c) = local_34.y;
+            *(f32*)((u8*)pppMngStPtr + 0x9c) = local_34.z;
+            *(f32*)((u8*)pppMngStPtr + 0x80) = local_40.x;
+            *(f32*)((u8*)pppMngStPtr + 0x90) = local_40.y;
+            *(f32*)((u8*)pppMngStPtr + 0xa0) = local_40.z;
+            pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
         }
     }
 }

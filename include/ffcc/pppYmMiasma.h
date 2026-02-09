@@ -8,7 +8,8 @@ struct pppYmMiasma {
 };
 struct UnkB;
 struct UnkC {
-    s32 m_serializedDataOffsets[3];
+    u8 m_pad_0x0[0xc];
+    s32* m_serializedDataOffsets;
 };
 struct VYmMiasma;
 struct PYmMiasma;

@@ -118,8 +118,12 @@ void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, _PARTICLE_DAT
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80090dec
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, UnkC* param_2)
 {
@@ -142,8 +146,12 @@ void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, UnkC* param_2)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80090dc8
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, UnkC* param_2)
 {
@@ -157,8 +165,12 @@ void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, UnkC* param_2)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80090d90
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, UnkC* param_2)
 {

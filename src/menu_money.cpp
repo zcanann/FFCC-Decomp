@@ -1,5 +1,42 @@
 #include "ffcc/menu_money.h"
+#include "ffcc/p_game.h"
+#include "ffcc/pad.h"
+#include "ffcc/sound.h"
+
 #include <string.h>
+
+namespace {
+unsigned int DAT_8032eee0 = 0;
+signed char s_place[16];
+
+static unsigned short GetPadHoldMask() {
+    return *reinterpret_cast<unsigned short*>(reinterpret_cast<char*>(&Pad) + 0x20);
+}
+
+static void UpdateDigits(unsigned int value, signed char* outDigits) {
+    int div = 10000000;
+    bool started = false;
+
+    for (int i = 0; i < 8; ++i) {
+        if (!started && div <= static_cast<int>(value)) {
+            started = true;
+        }
+
+        if (started || div <= static_cast<int>(value) || i > 6) {
+            int digit = static_cast<int>(value) / div;
+            if (digit > 9) {
+                digit = 9;
+            }
+            outDigits[i] = static_cast<signed char>(digit);
+            value -= digit * static_cast<unsigned int>(div);
+        } else {
+            outDigits[i] = -1;
+        }
+
+        div /= 10;
+    }
+}
+} // namespace
 
 /*
  * --INFO--
@@ -163,71 +200,131 @@ void CMenuPcs::MoneyDraw()
  */
 void CMenuPcs::MoneyCtrlCur()
 {
-	// Get pad input (simplified for now)
-	unsigned short uVar3 = 0; // Pad input buttons
-	unsigned short uVar4 = 1; // Assume some input available for testing
-	
-	if (uVar4 == 0) {
+	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.game.m_scriptFoodBase[0]);
+
+	unsigned short press = 0;
+	unsigned short hold = 0;
+	if (Pad._452_4_ == 0 && Pad._448_4_ == -1) {
+		press = Pad._8_2_;
+		hold = GetPadHoldMask();
+	}
+
+	if (hold == 0) {
 		return;
 	}
-	
-	int iVar11 = (int)*(short *)(*(int *)((char*)this + 0x82c) + 0x30);
-	
-	// Handle input based on current state
-	if (iVar11 != 0) {
-		// Handle digit selection mode
-		if ((uVar4 & 8) == 0) {
-			if ((uVar4 & 4) != 0) {
-				int iVar5 = *(int *)((char*)this + 0x82c) + iVar11 * 2;
-				if (*(short *)(iVar5 + 0x26) < 1) {
-					*(short *)(iVar5 + 0x26) = *(short *)(iVar5 + 0x26) + 1;
-				} else {
-					*(short *)(iVar5 + 0x26) = 0;
-				}
-				// PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7f, 0);
+
+	int menuState = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c);
+	short mode = *reinterpret_cast<short*>(menuState + 0x30);
+
+	int maxDigits = 1;
+	int maxGil = caravanWork->m_gil;
+	while (maxDigits < 8 && maxGil >= 10) {
+		maxGil /= 10;
+		++maxDigits;
+	}
+
+	if (mode != 0) {
+		short* selectedFlag = reinterpret_cast<short*>(menuState + mode * 2 + 0x26);
+		if ((hold & 8) != 0) {
+			*selectedFlag = (*selectedFlag == 0) ? 1 : static_cast<short>(*selectedFlag - 1);
+			Sound.PlaySe(1, 0x40, 0x7f, 0);
+		} else if ((hold & 4) != 0) {
+			*selectedFlag = (*selectedFlag < 1) ? 1 : 0;
+			Sound.PlaySe(1, 0x40, 0x7f, 0);
+		}
+
+		if ((hold & 0xC) != 0) {
+			return;
+		}
+
+		if ((press & 0x200) != 0) {
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 10) = 2;
+			*reinterpret_cast<short*>(menuState + 0x12) += 1;
+			Sound.PlaySe(3, 0x40, 0x7f, 0);
+			return;
+		}
+
+		if ((press & 0x100) != 0) {
+			if (*selectedFlag == 0) {
+				caravanWork->FGPutGil(static_cast<int>(DAT_8032eee0));
+				DAT_8032eee0 = 0;
+				UpdateDigits(static_cast<unsigned int>(caravanWork->m_gil), &s_place[0]);
+				UpdateDigits(0, &s_place[8]);
 			}
+			*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 10) = 2;
+			*reinterpret_cast<short*>(menuState + 0x12) += 1;
+			Sound.PlaySe(2, 0x40, 0x7f, 0);
+		}
+		return;
+	}
+
+	short cursor = *reinterpret_cast<short*>(menuState + 0x26);
+	unsigned int placeValue = 1;
+	for (int i = 0; i < cursor; ++i) {
+		placeValue *= 10;
+	}
+
+	if ((hold & 8) != 0) {
+		if (caravanWork->m_gil == 0) {
+			Sound.PlaySe(4, 0x40, 0x7f, 0);
 		} else {
-			int iVar5 = *(int *)((char*)this + 0x82c) + iVar11 * 2;
-			if (*(short *)(iVar5 + 0x26) == 0) {
-				*(short *)(iVar5 + 0x26) = 1;
+			unsigned int maxValue = static_cast<unsigned int>(caravanWork->m_gil);
+			unsigned int nextValue = DAT_8032eee0 + placeValue;
+			DAT_8032eee0 = (nextValue < maxValue) ? nextValue : maxValue;
+			UpdateDigits(DAT_8032eee0, &s_place[8]);
+			Sound.PlaySe(1, 0x40, 0x7f, 0);
+		}
+	} else if ((hold & 4) != 0) {
+		if (DAT_8032eee0 == 0) {
+			Sound.PlaySe(4, 0x40, 0x7f, 0);
+		} else {
+			DAT_8032eee0 = (DAT_8032eee0 >= placeValue) ? (DAT_8032eee0 - placeValue) : 0;
+			UpdateDigits(DAT_8032eee0, &s_place[8]);
+			Sound.PlaySe(1, 0x40, 0x7f, 0);
+		}
+	}
+
+	if ((hold & 1) != 0) {
+		if (cursor < maxDigits - 1) {
+			*reinterpret_cast<short*>(menuState + 0x26) = cursor + 1;
+			Sound.PlaySe(1, 0x40, 0x7f, 0);
+		} else {
+			Sound.PlaySe(4, 0x40, 0x7f, 0);
+		}
+	} else if ((hold & 2) != 0) {
+		if (cursor == 0) {
+			Sound.PlaySe(4, 0x40, 0x7f, 0);
+		} else {
+			*reinterpret_cast<short*>(menuState + 0x26) = cursor - 1;
+			Sound.PlaySe(1, 0x40, 0x7f, 0);
+		}
+	}
+
+	if ((hold & 0xF) == 0) {
+		if ((press & 0x20) != 0) {
+			*reinterpret_cast<short*>(menuState + 0x1e) = 1;
+			Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+			return;
+		}
+		if ((press & 0x40) != 0) {
+			*reinterpret_cast<short*>(menuState + 0x1e) = -1;
+			Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+			return;
+		}
+		if ((press & 0x200) != 0) {
+			*reinterpret_cast<char*>(menuState + 0xd) = 1;
+			Sound.PlaySe(3, 0x40, 0x7f, 0);
+			return;
+		}
+		if ((press & 0x100) != 0) {
+			if (DAT_8032eee0 < 1) {
+				Sound.PlaySe(4, 0x40, 0x7f, 0);
 			} else {
-				*(short *)(iVar5 + 0x26) = *(short *)(iVar5 + 0x26) + -1;
-			}
-			// PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7f, 0);
-		}
-	} else {
-		// Handle main money amount controls
-		if ((uVar4 & 8) == 0) {
-			if ((uVar4 & 4) != 0) {
-				// Decrease money amount
-				// PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7f, 0);
-			}
-		} else {
-			// Increase money amount  
-			// PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7f, 0);
-		}
-		
-		// Handle left/right digit navigation
-		if ((uVar4 & 1) == 0) {
-			if ((uVar4 & 2) != 0) {
-				short sVar1 = *(short *)(*(int *)((char*)this + 0x82c) + 0x26);
-				if (sVar1 == 0) {
-					// PlaySe__6CSoundFiiii(&Sound, 4, 0x40, 0x7f, 0);
-				} else {
-					*(short *)(*(int *)((char*)this + 0x82c) + 0x26) = sVar1 + -1;
-					// PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7f, 0);
-				}
-			}
-		} else {
-			// PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7f, 0);
-		}
-		
-		// Handle confirm/cancel buttons
-		if ((uVar4 & 0xf) == 0) {
-			if ((uVar3 & 0x100) != 0) {
-				// PlaySe__6CSoundFiiii(&Sound, 2, 0x40, 0x7f, 0);
-			} else if ((uVar3 & 0x200) != 0) {
-				// PlaySe__6CSoundFiiii(&Sound, 3, 0x40, 0x7f, 0);
+				*reinterpret_cast<char*>(menuState + 9) = 2;
+				*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 10) = 0;
+				*reinterpret_cast<short*>(menuState + 0x12) = 0;
+				*reinterpret_cast<short*>(menuState + 0x30) = 1;
+				Sound.PlaySe(2, 0x40, 0x7f, 0);
 			}
 		}
 	}

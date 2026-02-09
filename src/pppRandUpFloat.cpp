@@ -1,25 +1,25 @@
 #include "ffcc/pppRandUpFloat.h"
+#include "ffcc/math.h"
+#include "types.h"
 
-extern class CMath {
-public:
-    float RandF(void);
-} math;
-extern int lbl_8032ED70;
-extern float lbl_8032FFF8;
-extern float lbl_801EADC8;
+extern CMath math;
+extern s32 lbl_8032ED70;
+extern f32 lbl_8032FFF8;
+extern f32 lbl_801EADC8;
+extern "C" {
+f32 RandF__5CMathFv(CMath*);
+}
 
 struct RandUpFloatParam {
-    int targetId;
-    int sourceOffset;
-    float blend;
-    unsigned char randomTwice;
+    s32 targetId;
+    s32 sourceOffset;
+    f32 blend;
+    u8 randomTwice;
 };
 
 struct RandUpFloatCtx {
-    void* unk0;
-    void* unk4;
-    void* unk8;
-    int* outputOffset;
+    u8 unk0[0xC];
+    s32* outputOffset;
 };
 
 /*
@@ -36,35 +36,36 @@ void pppRandUpFloat(void* param1, void* param2, void* param3) {
         return;
     }
 
-    char* base = (char*)param1;
+    u8* base = (u8*)param1;
     RandUpFloatCtx* p3 = (RandUpFloatCtx*)param3;
     RandUpFloatParam* p2 = (RandUpFloatParam*)param2;
-    float* valuePtr;
+    f32* valuePtr;
 
-    int id = *(int*)(base + 0xC);
+    s32 id = *(s32*)(base + 0xC);
     if (id == 0) {
-        float value = math.RandF();
+        f32 value = RandF__5CMathFv(&math);
 
         if (p2->randomTwice != 0) {
-            value = (value + math.RandF()) * lbl_8032FFF8;
+            value = (value + RandF__5CMathFv(&math)) * lbl_8032FFF8;
         }
 
-        valuePtr = (float*)(base + *p3->outputOffset + 0x80);
+        valuePtr = (f32*)(base + *p3->outputOffset + 0x80);
         *valuePtr = value;
     } else {
         if (p2->targetId != id) {
             return;
         }
-        valuePtr = (float*)(base + *p3->outputOffset + 0x80);
+        valuePtr = (f32*)(base + *p3->outputOffset + 0x80);
     }
 
-    int sourceOffset = p2->sourceOffset;
-    float* source;
+    s32 sourceOffset = p2->sourceOffset;
+    f32* source;
     if (sourceOffset == -1) {
         source = &lbl_801EADC8;
     } else {
-        source = (float*)(base + sourceOffset + 0x80);
+        source = (f32*)(base + sourceOffset + 0x80);
     }
 
-    *source = *source + (p2->blend * *valuePtr);
+    f32 delta = p2->blend * *valuePtr;
+    *source = *source + delta;
 }

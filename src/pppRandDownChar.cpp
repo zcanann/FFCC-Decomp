@@ -2,23 +2,26 @@
 #include "ffcc/math.h"
 #include "types.h"
 
-extern CMath math;
+extern CMath math[];
 extern s32 lbl_8032ED70;
 extern f32 lbl_8032FF18;
 extern f64 lbl_8032FF20;
-extern u8 lbl_801EADC8;
-extern "C" f32 RandF__5CMathFv(CMath* instance);
+extern u8 lbl_801EADC8[];
 
-struct RandDownCharParam {
-    s32 targetId;
-    s32 sourceOffset;
-    u8 scale;
-    u8 randomTwice;
+extern "C" {
+f32 RandF__5CMathFv(CMath*);
+}
+
+struct PppRandDownCharParam2 {
+    s32 field0;
+    s32 field4;
+    u8 field8;
+    u8 field9;
 };
 
-struct RandDownCharCtx {
-    u8 _pad[0xC];
-    s32* outputOffset;
+struct PppRandDownCharParam3 {
+    u8 unk0[0xC];
+    s32* fieldC;
 };
 
 /*
@@ -30,38 +33,38 @@ struct RandDownCharCtx {
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRandDownChar(void* param1, void* param2, void* param3)
+void pppRandDownChar(void* param1, void* param2, void* param3)
 {
     if (lbl_8032ED70 != 0) {
         return;
     }
 
     u8* base = (u8*)param1;
-    RandDownCharParam* in = (RandDownCharParam*)param2;
-    RandDownCharCtx* ctx = (RandDownCharCtx*)param3;
+    PppRandDownCharParam2* in = (PppRandDownCharParam2*)param2;
+    PppRandDownCharParam3* out = (PppRandDownCharParam3*)param3;
     f32* valuePtr;
 
-    s32 state = *(s32*)(base + 0xC);
-    if (state == 0) {
-        f32 value = -RandF__5CMathFv(&math);
-        if (in->randomTwice != 0) {
-            value = (value - RandF__5CMathFv(&math)) * lbl_8032FF18;
+    s32 baseState = *(s32*)(base + 0xC);
+    if (baseState == 0) {
+        f32 value = -RandF__5CMathFv(math);
+        if (in->field9 != 0) {
+            value = lbl_8032FF18 * (value - RandF__5CMathFv(math));
         }
 
-        valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
+        valuePtr = (f32*)(base + *out->fieldC + 0x80);
         *valuePtr = value;
     } else {
-        if (in->targetId != state) {
+        if (in->field0 != baseState) {
             return;
         }
-        valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
+        valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
 
     u8* target;
-    if (in->sourceOffset == -1) {
-        target = &lbl_801EADC8;
+    if (in->field4 == -1) {
+        target = lbl_801EADC8;
     } else {
-        target = base + in->sourceOffset + 0x80;
+        target = (u8*)(base + in->field4 + 0x80);
     }
 
     union {
@@ -71,9 +74,10 @@ extern "C" void pppRandDownChar(void* param1, void* param2, void* param3)
             u32 lo;
         } parts;
     } cvt;
+    u8 scale = in->field8;
     cvt.parts.hi = 0x43300000;
-    cvt.parts.lo = in->scale;
+    cvt.parts.lo = scale;
 
-    s32 delta = (s32)((cvt.d - lbl_8032FF20) * *valuePtr);
+    s32 delta = (s32)((float)(cvt.d - lbl_8032FF20) * *valuePtr);
     *target = (u8)(*target + delta);
 }

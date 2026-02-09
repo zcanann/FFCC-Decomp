@@ -1,5 +1,6 @@
 #include "ffcc/pppCrystal.h"
 #include "ffcc/memory.h"
+#include "ffcc/pppPart.h"
 
 /*
  * --INFO--
@@ -28,11 +29,11 @@ void MakeRefractionMap(HSD_ImageBuffer*)
  */
 void pppConstructCrystal(struct pppCrystal* pppCrystal, struct UnkC* param_2)
 {
-	int iVar1;
-	
-	iVar1 = param_2->m_serializedDataOffsets[2];
-	*(unsigned int*)((char*)pppCrystal + 8 + iVar1) = 0;
-	*(unsigned int*)((char*)pppCrystal + 8 + iVar1 + 4) = 0;
+	s32 iVar1 = param_2->m_serializedDataOffsets[2];
+	u32* data = (u32*)((char*)pppCrystal + iVar1 + 8);
+
+	data[0] = 0;
+	data[1] = 0;
 }
 
 /*
@@ -46,20 +47,20 @@ void pppConstructCrystal(struct pppCrystal* pppCrystal, struct UnkC* param_2)
  */
 void pppDestructCrystal(struct pppCrystal* pppCrystal, struct UnkC* param_2)
 {
-	void* stage;
-	void** puVar1;
+	CMemory::CStage* stage;
+	u32* puVar1;
 	
-	puVar1 = (void**)((char*)(pppCrystal) + 8 + param_2->m_serializedDataOffsets[2]);
-	stage = puVar1[0];
-	if ((stage != 0) && (*(void**)stage != 0)) {
-		// TODO: pppHeapUseRate((CMemory::CStage*)*(void**)stage);
-		*(void**)stage = 0;
+	puVar1 = (u32*)((char*)pppCrystal + 8 + param_2->m_serializedDataOffsets[2]);
+	stage = (CMemory::CStage*)puVar1[0];
+	if ((stage != 0) && (*(CMemory::CStage**)stage != 0)) {
+		pppHeapUseRate(*(CMemory::CStage**)stage);
+		*(u32*)stage = 0;
 	}
 	if (stage != 0) {
-		// TODO: pppHeapUseRate((CMemory::CStage*)stage);
+		pppHeapUseRate(stage);
 	}
-	if (puVar1[1] != 0) {
-		// TODO: pppHeapUseRate((CMemory::CStage*)puVar1[1]);
+	if ((CMemory::CStage*)puVar1[1] != 0) {
+		pppHeapUseRate((CMemory::CStage*)puVar1[1]);
 		puVar1[1] = 0;
 	}
 }

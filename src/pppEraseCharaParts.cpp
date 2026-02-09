@@ -5,7 +5,7 @@
 #include <dolphin/gx.h>
 
 extern CMaterialMan MaterialMan;
-extern unsigned int DAT_8032ed70;
+extern int DAT_8032ed70;
 
 extern "C" {
 void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);

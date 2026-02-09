@@ -157,21 +157,21 @@ void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, UnkB* pa
         psVar1 = (s16*)((u8*)pppYmDeformationMdl + 0x80 + param_3->m_serializedDataOffsets[2]);
 
         CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-            (float)param_2->m_initWOrk, pppYmDeformationMdl, param_2->m_graphId, (float*)(psVar1 + 2),
+            param_2->m_initWOrk, pppYmDeformationMdl, param_2->m_graphId, (float*)(psVar1 + 2),
             (float*)(psVar1 + 4), (float*)(psVar1 + 6), &param_2->m_stepValue, &param_2->m_arg3);
         CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-            *param_2->m_payload, pppYmDeformationMdl, param_2->m_graphId, (float*)(psVar1 + 8),
-            (float*)(psVar1 + 10), (float*)(psVar1 + 0xC), param_2->m_payload + 1, param_2->m_payload + 2);
+            param_2->m_payload0, pppYmDeformationMdl, param_2->m_graphId, (float*)(psVar1 + 8),
+            (float*)(psVar1 + 10), (float*)(psVar1 + 0xC), &param_2->m_payload1, &param_2->m_payload2);
 
         if (DAT_8032ed78 == 0) {
             if (*(u8*)(psVar1 + 1) == 0) {
                 *psVar1 = *psVar1 - (s16)(int)*(float*)(psVar1 + 8);
-                if ((int)*psVar1 < -(int)(s16)param_2->m_payload[3]) {
+                if ((int)*psVar1 < -(int)param_2->m_payload3) {
                     *(u8*)(psVar1 + 1) = 1;
                 }
             } else {
                 *psVar1 = *psVar1 + (s16)(int)*(float*)(psVar1 + 8);
-                if ((s16)param_2->m_payload[3] < *psVar1) {
+                if (param_2->m_payload3 < *psVar1) {
                     *(u8*)(psVar1 + 1) = 0;
                 }
             }
@@ -191,7 +191,7 @@ void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, UnkB* pa
 void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, UnkB* param_2, UnkC* param_3)
 {
     short* state = (short*)((u8*)pppYmDeformationMdl + 0x80 + param_3->m_serializedDataOffsets[2]);
-    u8* control = (u8*)param_2->m_payload;
+    u8* control = (u8*)&param_2->m_payload0;
     int textureIndex = 0;
 
     if (param_2->m_dataValIndex == 0xFFFF) {

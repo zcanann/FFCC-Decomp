@@ -200,8 +200,10 @@ void CSystem::ExecScenegraph()
  */
 unsigned int CSystem::AddScenegraph(CProcess* process, int arg)
 {
+    typedef void* (*GetScenegraphBlockFn)(CProcess*, int);
+    GetScenegraphBlockFn getScenegraphBlock = *(GetScenegraphBlockFn*)((u8*)*(void**)process + 0x10);
     int insertIndex = 0;
-    u32* description = (u32*)this; // process->GetScenegraphBlock(arg));
+    u32* description = (u32*)getScenegraphBlock(process, arg);
     u32* entry = description + 7;
 	
     if (__ptmf_test((__ptmf*)(description + 1)))
@@ -259,7 +261,9 @@ unsigned int CSystem::AddScenegraph(CProcess* process, int arg)
  */
 void CSystem::RemoveScenegraph(CProcess* process, int arg)
 {
-    void* descBlock = (void*)this; // proc->GetScenegraphBlock(arg);
+    typedef void* (*GetScenegraphBlockFn)(CProcess*, int);
+    GetScenegraphBlockFn getScenegraphBlock = *(GetScenegraphBlockFn*)((u8*)*(void**)process + 0x10);
+    void* descBlock = getScenegraphBlock(process, arg);
     COrder* order = m_orderSentinel.m_next;
 	
     while (order != &m_orderSentinel)
@@ -279,10 +283,9 @@ void CSystem::RemoveScenegraph(CProcess* process, int arg)
         order = next;
     }
 	
-	// TODO: Obviously wrong
-    if (__ptmf_test((__ptmf*)descBlock + 0x10) != 0)
+    if (__ptmf_test((__ptmf*)((u8*)descBlock + 0x10)) != 0)
     {
-        __ptmf_scall();
+        __ptmf_scall(process);
     }
 }
 

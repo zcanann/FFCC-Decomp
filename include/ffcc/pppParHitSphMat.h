@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-void pppParHitSphMat(void);
+void pppParHitSphMat(void* param1, void* param2, void* param3);
 
 #ifdef __cplusplus
 }

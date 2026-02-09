@@ -2,6 +2,28 @@
 
 #include "dolphin/mtx.h"
 #include "string.h"
+
+CMath math;
+
+extern void* __vt__8CManager;
+extern void* __vt__5CMath;
+
+/*
+ * --INFO--
+ * PAL Address: 0x8001c2d0
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_math_cpp()
+{
+    char* const base = reinterpret_cast<char*>(&math);
+    *reinterpret_cast<void**>(base) = &__vt__8CManager;
+    *reinterpret_cast<void**>(base) = &__vt__5CMath;
+}
+
 /*
  * --INFO--
  * Address:	TODO

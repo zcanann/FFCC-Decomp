@@ -1,4 +1,6 @@
 #include "ffcc/menu_lst.h"
+#include "ffcc/pad.h"
+#include "ffcc/sound.h"
 #include <string.h>
 
 /*
@@ -120,12 +122,79 @@ void CMenuPcs::MLstOpen()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80174e94
+ * PAL Size: 892b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::MLstCtrl()
 {
-	// TODO
+	unsigned short press = 0;
+	unsigned short hold = 0;
+	bool resetAnim = false;
+
+	if (Pad._452_4_ == 0 && Pad._448_4_ == -1) {
+		press = Pad._8_2_;
+		hold = *reinterpret_cast<unsigned short*>(reinterpret_cast<char*>(&Pad) + 0x20);
+	}
+
+	if (hold != 0) {
+		int menuState = *(int*)((char*)this + 0x82c);
+		short* cursor = (short*)(menuState + 0x26);
+
+		if ((hold & 0x48) != 0) {
+			if (*cursor == 0) {
+				*cursor = 8;
+			} else {
+				*cursor = *cursor - 1;
+			}
+			Sound.PlaySe(1, 0x40, 0x7f, 0);
+		} else if ((hold & 0x24) != 0) {
+			if (*cursor < 8) {
+				*cursor = *cursor + 1;
+			} else {
+				*cursor = 0;
+			}
+			Sound.PlaySe(1, 0x40, 0x7f, 0);
+		}
+
+		if ((hold & 0x6c) == 0) {
+			if ((press & 0x100) != 0) {
+				Sound.PlaySe(2, 0x40, 0x7f, 0);
+				resetAnim = true;
+			} else if ((press & 0x200) != 0) {
+				*(char*)(menuState + 0xd) = (char)0xff;
+				Sound.PlaySe(3, 0x40, 0x7f, 0);
+				resetAnim = true;
+			}
+		}
+	}
+
+	if (!resetAnim) {
+		return;
+	}
+
+	short itemCount = **(short**)((char*)this + 0x850);
+	int listBase = *(int*)((char*)this + 0x850);
+	int item = listBase + 8;
+
+	for (int i = 0; i < itemCount; i++) {
+		*(float*)(item + 0x10) = 1.0f;
+		*(float*)(item + 0x14) = 1.0f;
+		item += 0x40;
+	}
+
+	int startFrame = 0;
+	for (int i = itemCount - 1; i >= 0; i--) {
+		int entry = listBase + i * 0x40 + 8;
+		*(int*)(entry + 0x24) = startFrame;
+		*(int*)(entry + 0x28) = 4;
+		startFrame++;
+	}
+
+	*(short*)(*(int*)((char*)this + 0x82c) + 0x22) = 0;
 }
 
 /*

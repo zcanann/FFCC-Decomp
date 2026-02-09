@@ -31,7 +31,7 @@ public:
 	u8 _pad_0x30[0x30];
 	float m_lastTime; // 0x60
 	float m_maxTime;  // 0x64
-	u32 m_frame;      // 0x68
+	int m_frame;      // 0x68
 };
 
 #endif // _FFCC_STOPWATCH_H

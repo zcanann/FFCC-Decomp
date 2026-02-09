@@ -94,8 +94,12 @@ void CProfile::ProfStart() { OSResetStopwatch(this); }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80022ec8
+ * PAL Size: 200b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CProfile::ProfEnd()
 {
@@ -106,7 +110,7 @@ void CProfile::ProfEnd()
 	float denom = (float)(OS_TIMER_CLOCK / 125000);
 	m_lastTime = (8.0f * ticks) / denom;
 
-	u32 next = m_frame + 1;
+	int next = m_frame + 1;
 	m_frame = next;
 	if (next == 0x5A)
 	{

@@ -1,6 +1,16 @@
 #include "ffcc/pppYmDeformationScreen.h"
 
 struct pppYmDeformationScreen;
+struct YmDeformationScreenOffsetData {
+	int unk0;
+	int unk1;
+	int offset;
+};
+
+struct YmDeformationScreenParam {
+	char pad[0xc];
+	YmDeformationScreenOffsetData* offsetData;
+};
 
 /*
  * --INFO--
@@ -9,20 +19,18 @@ struct pppYmDeformationScreen;
  */
 void pppConstructYmDeformationScreen(pppYmDeformationScreen* obj, void* param2)
 {
-	// Get offset directly from param2 structure
-	int offset = *(int*)((char*)param2 + 8);
-	char* basePtr = (char*)obj + offset;
+	int offset = ((YmDeformationScreenParam*)param2)->offsetData->offset;
+	char* basePtr = (char*)obj + offset + 0x80;
 	float zero = 0.0f;
-	
-	// Initialize fields
-	*(short*)(basePtr + 0x84) = 0;
-	*(char*)(basePtr + 0x86) = 1;
-	*(float*)(basePtr + 0x88) = zero;
-	*(float*)(basePtr + 0x8c) = zero;
-	*(float*)(basePtr + 0x90) = zero;
-	*(float*)(basePtr + 0x94) = zero;
-	*(float*)(basePtr + 0x98) = zero;
-	*(float*)(basePtr + 0x9c) = zero;
+
+	*(short*)(basePtr + 0x4) = 0;
+	*(char*)(basePtr + 0x6) = 1;
+	*(float*)(basePtr + 0x10) = zero;
+	*(float*)(basePtr + 0xc) = zero;
+	*(float*)(basePtr + 0x8) = zero;
+	*(float*)(basePtr + 0x1c) = zero;
+	*(float*)(basePtr + 0x18) = zero;
+	*(float*)(basePtr + 0x14) = zero;
 }
 
 /*
@@ -32,18 +40,16 @@ void pppConstructYmDeformationScreen(pppYmDeformationScreen* obj, void* param2)
  */
 void pppConstruct2YmDeformationScreen(pppYmDeformationScreen* obj, void* param2)
 {
-	// Get offset directly from param2 structure
-	int offset = *(int*)((char*)param2 + 8);
-	char* basePtr = (char*)obj + offset;
 	float zero = 0.0f;
-	
-	// Initialize float fields only
-	*(float*)(basePtr + 0x88) = zero;
-	*(float*)(basePtr + 0x8c) = zero;
-	*(float*)(basePtr + 0x90) = zero;
-	*(float*)(basePtr + 0x94) = zero;
-	*(float*)(basePtr + 0x98) = zero;
-	*(float*)(basePtr + 0x9c) = zero;
+	int offset = ((YmDeformationScreenParam*)param2)->offsetData->offset;
+	char* basePtr = (char*)obj + offset + 0x80;
+
+	*(float*)(basePtr + 0x10) = zero;
+	*(float*)(basePtr + 0xc) = zero;
+	*(float*)(basePtr + 0x8) = zero;
+	*(float*)(basePtr + 0x1c) = zero;
+	*(float*)(basePtr + 0x18) = zero;
+	*(float*)(basePtr + 0x14) = zero;
 }
 
 /*

@@ -107,32 +107,55 @@ void CUtil::GetSplinePos(Vec&, Vec&, Vec&, Vec&, Vec&, float, float)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800248fc
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CUtil::ConvI2FVector(Vec&, S16Vec&, long)
+void CUtil::ConvI2FVector(Vec& out, S16Vec in, long shift)
 {
-	// TODO
+	float scale = (float)(1 << shift);
+
+	out.x = (float)in.x / scale;
+	out.y = (float)in.y / scale;
+	out.z = (float)in.z / scale;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80024864
+ * PAL Size: 152b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CUtil::ConvF2IVector(S16Vec&, Vec&, long)
+void CUtil::ConvF2IVector(S16Vec& out, Vec in, long shift)
 {
-	// TODO
+	float scale = (float)(1 << shift);
+
+	out.x = (short)(in.x * scale);
+	out.y = (short)(in.y * scale);
+	out.z = (short)(in.z * scale);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800247f4
+ * PAL Size: 112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CUtil::ConvF2IVector2d(S16Vec2d&, Vec2d&, long)
+void CUtil::ConvF2IVector2d(S16Vec2d& out, Vec2d in, long shift)
 {
-	// TODO
+	float scale = (float)(1 << shift);
+
+	out.x = (short)(in.x * scale);
+	out.y = (short)(in.y * scale);
 }
 
 /*

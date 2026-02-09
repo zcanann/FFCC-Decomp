@@ -140,12 +140,16 @@ void CFunnyShapePcs::Quit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004e5cc
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFunnyShapePcs::GetTable(unsigned long)
+int CFunnyShapePcs::GetTable(unsigned long index)
 {
-	// TODO
+    return static_cast<int>(index) * 0x15c + -0x7fe15858;
 }
 
 /*

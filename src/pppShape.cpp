@@ -36,17 +36,65 @@ void* pppShapeSt::GetTexture(long* animData, CMaterialSet* materialSet, int& tex
  */
 void pppDrawShp(long* animData, short frameIndex, CMaterialSet* materialSet, unsigned char blendMode)
 {
-    // TODO: Implement function body
+    int shapePtr = (int)animData + *(short*)((int)animData + frameIndex * 8 + 0x10);
+
+    *(int*)((char*)&MaterialMan + 296) = *(int*)((char*)&MaterialMan + 284);
+    *(int*)((char*)&MaterialMan + 300) = *(int*)((char*)&MaterialMan + 288);
+    *(int*)((char*)&MaterialMan + 304) = *(int*)((char*)&MaterialMan + 292);
+    *(int*)((char*)&MaterialMan + 64) = *(int*)((char*)&MaterialMan + 72);
+
+    SetMaterialPart__12CMaterialManFP12CMaterialSetii(&MaterialMan, materialSet,
+                                                      *(unsigned char*)(shapePtr + 10), 0);
+
+    GXClearVtxDesc();
+    GXSetVtxDesc((GXAttr)9, GX_DIRECT);
+    GXSetVtxDesc((GXAttr)11, GX_DIRECT);
+    GXSetVtxDesc((GXAttr)13, GX_DIRECT);
+
+    int current = shapePtr;
+    for (int i = 0; i < *(short*)(shapePtr + 2); i++) {
+        if (blendMode == 0xFF) {
+            pppSetBlendMode__FUc(*(unsigned char*)(current + 8));
+        }
+        GXCallDisplayList(*(void**)(current + 0xc), 0x60);
+        current += 8;
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80065a94
+ * PAL Size: 224b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppDrawShp(tagOAN3_SHAPE*, CMaterialSet*, unsigned char)
+void pppDrawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned char blendMode)
 {
-	// TODO
+    int shapePtr = (int)shape;
+
+    *(int*)((char*)&MaterialMan + 296) = *(int*)((char*)&MaterialMan + 284);
+    *(int*)((char*)&MaterialMan + 300) = *(int*)((char*)&MaterialMan + 288);
+    *(int*)((char*)&MaterialMan + 304) = *(int*)((char*)&MaterialMan + 292);
+    *(int*)((char*)&MaterialMan + 64) = *(int*)((char*)&MaterialMan + 72);
+
+    SetMaterialPart__12CMaterialManFP12CMaterialSetii(&MaterialMan, materialSet,
+                                                      *(unsigned char*)(shapePtr + 10), 0);
+
+    GXClearVtxDesc();
+    GXSetVtxDesc((GXAttr)9, GX_DIRECT);
+    GXSetVtxDesc((GXAttr)11, GX_DIRECT);
+    GXSetVtxDesc((GXAttr)13, GX_DIRECT);
+
+    int current = shapePtr;
+    for (int i = 0; i < *(short*)(shapePtr + 2); i++) {
+        if (blendMode == 0xFF) {
+            pppSetBlendMode__FUc(*(unsigned char*)(current + 8));
+        }
+        GXCallDisplayList(*(void**)(current + 0xc), 0x60);
+        current += 8;
+    }
 }
 
 /*
@@ -191,12 +239,25 @@ void pppGetShapePos(long* animData, short frameIndex, Vec& minPos, Vec& maxPos, 
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800656dc
+ * PAL Size: 184b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppGetShapeUV(long*, short, Vec2d&, Vec2d&, int)
+void pppGetShapeUV(long* animData, short frameIndex, Vec2d& minUv, Vec2d& maxUv, int shapeIndex)
 {
-	// TODO
+    int shapeBase = *(short*)((int)animData + frameIndex * 8 + 0x10);
+    int shapeEntry = *(int*)((int)animData + shapeBase + 0xc + shapeIndex * 8);
+    float* minUvF = (float*)&minUv;
+    float* maxUvF = (float*)&maxUv;
+    const float uvScale = 1.0f / 4096.0f;
+
+    minUvF[0] = (float)*(short*)(shapeEntry + 0x13) * uvScale;
+    minUvF[1] = (float)*(short*)(shapeEntry + 0x15) * uvScale;
+    maxUvF[0] = (float)*(short*)(shapeEntry + 0x3b) * uvScale;
+    maxUvF[1] = (float)*(short*)(shapeEntry + 0x3d) * uvScale;
 }
 
 /*

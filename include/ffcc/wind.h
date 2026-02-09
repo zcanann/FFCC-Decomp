@@ -27,7 +27,7 @@ public:
     void Calc(Vec*, const Vec*, int);
     void searchFreeObj();
     void getObj(int);
-    void AddAmbient(float, float);
+    int AddAmbient(float, float);
     int AddDiffuse(const Vec*, float, float, float);
     int AddSphere(const Vec*, float, float, int);
     void ChangePower(int, float);

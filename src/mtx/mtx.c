@@ -1285,13 +1285,13 @@ void C_MTXLightOrtho(Mtx m, f32 t, f32 b, f32 l, f32 r, float scaleS, float scal
     m[0][0] = (2.0f * tmp * scaleS);
     m[0][1] = 0.0f;
     m[0][2] = 0.0f;
-    m[0][3] = ((-(r + l) * tmp) * scaleS) + transS;
+    m[0][3] = transS + scaleS * tmp * -(r + l);
 
     tmp = 1.0f / (t - b);
     m[1][0] = 0.0f;
     m[1][1] = (2.0f * tmp) * scaleT;
     m[1][2] = 0.0f;
-    m[1][3] = ((-(t + b) * tmp) * scaleT) + transT;
+    m[1][3] = transT + scaleT * tmp * -(t + b);
 
     m[2][0] = 0.0f;
     m[2][1] = 0.0f;

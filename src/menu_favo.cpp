@@ -1,4 +1,6 @@
 #include "ffcc/menu_favo.h"
+#include "ffcc/pad.h"
+#include "ffcc/sound.h"
 
 /*
  * --INFO--
@@ -141,12 +143,51 @@ void CMenuPcs::FavoOpen()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80162e94
+ * PAL Size: 400b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::FavoCtrl()
 {
-	// TODO
+	bool activeInput = false;
+	unsigned short press;
+	bool doReset;
+
+	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+		activeInput = true;
+	}
+
+	if (activeInput) {
+		press = 0;
+	} else {
+		press = Pad._8_2_;
+	}
+
+	doReset = false;
+	if (press != 0) {
+		if ((press & 0x20) != 0) {
+			*(short *)(*(int *)((char *)this + 0x82c) + 0x1e) = 1;
+			Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+			doReset = true;
+		} else if ((press & 0x40) != 0) {
+			*(short *)(*(int *)((char *)this + 0x82c) + 0x1e) = -1;
+			Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+			doReset = true;
+		} else if ((press & 0x100) != 0) {
+			Sound.PlaySe(4, 0x40, 0x7f, 0);
+		} else if ((press & 0x200) != 0) {
+			*(char *)(*(int *)((char *)this + 0x82c) + 0xd) = 1;
+			Sound.PlaySe(3, 0x40, 0x7f, 0);
+			doReset = true;
+		}
+	}
+
+	if (doReset) {
+		FavoInit0();
+	}
 }
 
 /*

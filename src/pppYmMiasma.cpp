@@ -6,10 +6,13 @@
 
 extern int rand();
 extern float ppvSinTbl[];
+extern float FLOAT_80330644;
 extern float FLOAT_8033065c;
 extern float FLOAT_80330664;
+extern u32 DAT_80330658;
 extern double RandF__5CMathFf(double, void*);
 extern void pppNormalize__FR3Vec3Vec(float*, Vec*);
+extern void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern char Math;
 
 /*
@@ -118,9 +121,23 @@ void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, _PARTICLE_DAT
  * Address:	TODO
  * Size:	TODO
  */
-void pppConstructYmMiasma(void)
+void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, UnkC* param_2)
 {
-    // Constructor stub
+    float fVar1 = FLOAT_80330644;
+    u32* work = (u32*)((u8*)pppYmMiasma_ + 8 + param_2->m_serializedDataOffsets[2]);
+
+    work[0] = 0;
+    ((float*)work)[7] = fVar1;
+    ((float*)work)[8] = fVar1;
+    ((float*)work)[9] = fVar1;
+    *((u8*)(work + 2)) = 0;
+    work[4] = DAT_80330658;
+    ((float*)work)[5] = fVar1;
+    ((float*)work)[6] = fVar1;
+    ((float*)work)[0xc] = fVar1;
+    ((float*)work)[0xb] = fVar1;
+    ((float*)work)[10] = fVar1;
+    *((u8*)(work + 0xd)) = 0;
 }
 
 /*
@@ -128,9 +145,14 @@ void pppConstructYmMiasma(void)
  * Address:	TODO
  * Size:	TODO
  */
-void pppConstruct2YmMiasma(void)
+void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, UnkC* param_2)
 {
-    // Secondary constructor stub
+    int offset = param_2->m_serializedDataOffsets[2];
+    float fVar1 = FLOAT_80330644;
+
+    *(float*)((u8*)pppYmMiasma_ + 0x9c + offset) = fVar1;
+    *(float*)((u8*)pppYmMiasma_ + 0xa0 + offset) = fVar1;
+    *(float*)((u8*)pppYmMiasma_ + 0xa4 + offset) = fVar1;
 }
 
 /*
@@ -138,9 +160,13 @@ void pppConstruct2YmMiasma(void)
  * Address:	TODO
  * Size:	TODO
  */
-void pppDestructYmMiasma(void)
+void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, UnkC* param_2)
 {
-    // Destructor stub
+    void* stage = *(void**)((u8*)pppYmMiasma_ + 8 + param_2->m_serializedDataOffsets[2]);
+
+    if (stage != 0) {
+        pppHeapUseRate__FPQ27CMemory6CStage(stage);
+    }
 }
 
 /*
@@ -148,8 +174,11 @@ void pppDestructYmMiasma(void)
  * Address:	80090aa4
  * Size:	748b
  */
-void pppFrameYmMiasma(void)
+void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, UnkB* param_2, UnkC* param_3)
 {
+    (void)pppYmMiasma_;
+    (void)param_2;
+    (void)param_3;
     // Frame update function - based on Ghidra analysis this manages particle lifecycle
     if (!pppEnvStPtr || !pppMngStPtr) return;
     
@@ -161,7 +190,10 @@ void pppFrameYmMiasma(void)
  * Address:	TODO
  * Size:	TODO
  */
-void pppRenderYmMiasma(void)
+void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, UnkB* param_2, UnkC* param_3)
 {
+    (void)pppYmMiasma_;
+    (void)param_2;
+    (void)param_3;
     // Render function stub
 }

@@ -6,7 +6,7 @@ typedef void (*MTRCallbackType)(int);
 
 static MTRCallbackType MTRCallback;
 
-static void (*DBGCallback)(u32, OSContext*);
+static void (*DBGCallback)(s16);
 
 static u32 SendMailData;
 
@@ -242,7 +242,7 @@ static BOOL DBGReadStatus(u32* p1) {
 }
 #pragma dont_inline reset
 
-static void MWCallback(u32 a, OSContext* b) {
+static void MWCallback(s16 a) {
     EXIInputFlag = TRUE;
     if (MTRCallback) {
         MTRCallback(0);
@@ -252,7 +252,7 @@ static void MWCallback(u32 a, OSContext* b) {
 static void DBGHandler(s16 a, OSContext* b) {
     *__PIRegs = 0x1000;
     if (DBGCallback) {
-        DBGCallback(a, b);
+        DBGCallback(a);
     }
 }
 

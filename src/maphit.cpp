@@ -41,13 +41,13 @@ CMapCylinder::CMapCylinder()
  */
 CMapHit::CMapHit()
 {
-    m_positionMin.x = 0.0f;
-    m_positionMin.y = 0.0f;
     m_positionMin.z = 0.0f;
+    m_positionMin.y = 0.0f;
+    m_positionMin.x = 0.0f;
 
-    m_positionMax.x = 1.0f;
-    m_positionMax.y = 1.0f;
     m_positionMax.z = 1.0f;
+    m_positionMax.y = 1.0f;
+    m_positionMax.x = 1.0f;
 
     m_vertexCount = 0;
     m_faceCount = 0;
@@ -221,11 +221,11 @@ void CMapHit::DrawNormal()
  */
 CMapHitFace::CMapHitFace()
 {
-    m_boundsMin.x = 0.0f;
-    m_boundsMin.y = 0.0f;
     m_boundsMin.z = 0.0f;
+    m_boundsMin.y = 0.0f;
+    m_boundsMin.x = 0.0f;
 
-    m_boundsMax.x = 1.0f;
-    m_boundsMax.y = 1.0f;
     m_boundsMax.z = 1.0f;
+    m_boundsMax.y = 1.0f;
+    m_boundsMax.x = 1.0f;
 }

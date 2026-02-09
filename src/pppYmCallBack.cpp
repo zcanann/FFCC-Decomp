@@ -6,6 +6,7 @@
 #include <dolphin/mtx.h>
 
 extern CPartMng PartMng;
+extern unsigned char* lbl_8032ED50;
 
 struct YmCallBackObj {
     u8 m_pad0[0xc];
@@ -49,10 +50,9 @@ void pppDestructYmCallBack(void)
  */
 void pppFrameYmCallBack(void* pppYmCallBack, void* param_2)
 {
-    _pppMngSt* pppMngSt;
-    _pppMngSt* mngStBase;
     YmCallBackObj* ymCallBack;
     YmCallBackParam* frameParam;
+    unsigned char* mngSt;
     Vec position;
     s32 mngStIndex;
     u32 graphId;
@@ -60,19 +60,17 @@ void pppFrameYmCallBack(void* pppYmCallBack, void* param_2)
     ymCallBack = (YmCallBackObj*)pppYmCallBack;
     frameParam = (YmCallBackParam*)param_2;
     graphId = ymCallBack->m_graphId;
-    pppMngSt = pppMngStPtr;
+    mngSt = lbl_8032ED50;
 
-    if ((((s32)graphId >> 0xC) + (((s32)graphId < 0) && ((graphId & 0xFFF) != 0))) ==
-        (s32)frameParam->m_graphId) {
-        position.x = pppMngSt->m_matrix.value[0][3];
-        position.y = pppMngSt->m_matrix.value[1][3];
-        position.z = pppMngSt->m_matrix.value[2][3];
+    if (((s32)graphId / 0x1000) == (s32)frameParam->m_graphId) {
+        position.x = *(f32*)(mngSt + 0x84);
+        position.y = *(f32*)(mngSt + 0x94);
+        position.z = *(f32*)(mngSt + 0xA4);
         PSMTXMultVec(ppvWorldMatrix, &position, &position);
 
-        mngStBase = (_pppMngSt*)((u8*)&PartMng + 0x2A18);
-        mngStIndex = ((s32)((u8*)pppMngSt - (u8*)mngStBase)) / 0x158;
-        Game.game.ParticleFrameCallback(mngStIndex, (s32)pppMngSt->m_kind,
-                                        (s32)pppMngSt->m_nodeIndex,
+        mngStIndex = ((s32)(mngSt - ((u8*)&PartMng + 0x2A18))) / 0x158;
+        Game.game.ParticleFrameCallback(mngStIndex, (s32)*(s16*)(mngSt + 0x74),
+                                        (s32)*(s16*)(mngSt + 0x76),
                                         (s32)frameParam->m_initWOrk, (s32)frameParam->m_graphId,
                                         &position);
     }

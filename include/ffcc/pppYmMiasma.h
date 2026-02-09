@@ -1,6 +1,15 @@
 #ifndef _FFCC_PPP_YMMIASMA_H_
 #define _FFCC_PPP_YMMIASMA_H_
 
+#include <dolphin/types.h>
+
+struct pppYmMiasma {
+    u32 field0_0x0;
+};
+struct UnkB;
+struct UnkC {
+    s32 m_serializedDataOffsets[3];
+};
 struct VYmMiasma;
 struct PYmMiasma;
 struct _pppPObject;
@@ -15,11 +24,11 @@ void RenderParticle(_pppPObject*, PYmMiasma*, _PARTICLE_DATA*);
 extern "C" {
 #endif
 
-void pppConstructYmMiasma(void);
-void pppConstruct2YmMiasma(void);
-void pppDestructYmMiasma(void);
-void pppFrameYmMiasma(void);
-void pppRenderYmMiasma(void);
+void pppConstructYmMiasma(pppYmMiasma*, UnkC*);
+void pppConstruct2YmMiasma(pppYmMiasma*, UnkC*);
+void pppDestructYmMiasma(pppYmMiasma*, UnkC*);
+void pppFrameYmMiasma(pppYmMiasma*, UnkB*, UnkC*);
+void pppRenderYmMiasma(pppYmMiasma*, UnkB*, UnkC*);
 
 #ifdef __cplusplus
 }

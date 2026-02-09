@@ -258,16 +258,10 @@ static void DBGHandler(s16 a, OSContext* b) {
 
 void DBInitComm(u8** a, MTRCallbackType b) {
     BOOL interrupts = OSDisableInterrupts();
-    {
-        pEXIInputFlag = (u8*)EXIInputFlag;
-        pEXIInputFlag = &EXIInputFlag;
-
-        *a = pEXIInputFlag;
-
-        MTRCallback = b;
-
-        DBGEXIInit();
-    }
+    pEXIInputFlag = &EXIInputFlag;
+    *a = pEXIInputFlag;
+    MTRCallback = b;
+    DBGEXIInit();
     OSRestoreInterrupts(interrupts);
 }
 
@@ -306,9 +300,15 @@ u32 DBQueryData(void) {
 
 BOOL DBRead(u32* buffer, s32 count) {
     u32 interrupts = OSDisableInterrupts();
-    u32 v = SendMailData & 0x10000 ? 0x1000 : 0;
+    u32 v;
 
-    DBGRead(v + 0x1e000, buffer, ROUND_UP(count, 4));
+    if ((SendMailData & 0x10000) == 0) {
+        v = 0;
+    } else {
+        v = 0x1000;
+    }
+
+    DBGRead(v + 0x1e000, buffer, (count + 3U) & ~3U);
 
     RecvDataLeng = 0;
     EXIInputFlag = 0;

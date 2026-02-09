@@ -3,8 +3,8 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppYmEnv.h"
 
-extern float FLOAT_80331fc8;
-extern int DAT_8032ed70;
+extern float lbl_80331FC8;
+extern int lbl_8032ED70;
 
 /*
  * --INFO--
@@ -17,7 +17,7 @@ extern int DAT_8032ed70;
  */
 void pppConScreenQuake(pppScreenQuake *quake, UnkC *param2)
 {
-	float val = FLOAT_80331fc8;
+	float val = lbl_80331FC8;
 	float *data = (float *)((char *)&quake->field0_0x0 + 128 + *param2->m_serializedDataOffsets);
 	
 	data[0] = val;
@@ -42,7 +42,7 @@ void pppConScreenQuake(pppScreenQuake *quake, UnkC *param2)
  */
 void pppCon2ScreenQuake(pppScreenQuake *quake, UnkC *param2)
 {
-	float val = FLOAT_80331fc8;
+	float val = lbl_80331FC8;
 	float *data = (float *)((char *)&quake->field0_0x0 + 128 + *param2->m_serializedDataOffsets);
 	
 	data[0] = val;
@@ -67,7 +67,7 @@ void pppCon2ScreenQuake(pppScreenQuake *quake, UnkC *param2)
  */
 void pppDesScreenQuake(void)
 {
-	float value = FLOAT_80331fc8;
+	float value = lbl_80331FC8;
 	CameraPcs.SetQuakeParameter(0, 0, 0, 0, value, value, value, value, value, value, 1);
 }
 
@@ -82,7 +82,7 @@ void pppDesScreenQuake(void)
  */
 void pppFrameScreenQuake(pppScreenQuake *quake, UnkB *param2, UnkC *param3)
 {
-	if (DAT_8032ed70 == 0) {
+	if (lbl_8032ED70 == 0) {
 		float *value = (float *)((char *)quake + 0x80 + *param3->m_serializedDataOffsets);
 
 		CalcGraphValue((_pppPObject *)&quake->field0_0x0, param2->m_graphId, value[0], value[1], value[2], param2->m_dataValIndex, param2->m_initWOrk, param2->m_stepValue);

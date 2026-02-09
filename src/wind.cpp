@@ -547,10 +547,45 @@ int CWind::AddSphere(const Vec* pos, float radius, float speed, int life)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800d92fc
+ * PAL Size: 192b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CWind::ChangePower(int, float)
+void CWind::ChangePower(int id, float power)
 {
-	// TODO
+	u8* found = 0;
+	u8* scan = (u8*)this;
+
+	for (int group = 0; group < 8; group++) {
+		found = scan;
+		if (((s8)found[0] < 0) && (id == *(s32*)(scan + 0x20))) {
+			break;
+		}
+
+		found = scan + 100;
+		if (((s8)found[0] < 0) && (id == *(s32*)(scan + 0x84))) {
+			break;
+		}
+
+		found = scan + 200;
+		if (((s8)found[0] < 0) && (id == *(s32*)(scan + 0xE8))) {
+			break;
+		}
+
+		found = scan + 300;
+		if (((s8)found[0] < 0) && (id == *(s32*)(scan + 0x14C))) {
+			break;
+		}
+
+		scan += 400;
+		found = 0;
+	}
+
+	if (found != 0) {
+		*(float*)(found + 0x54) = power;
+		*(float*)(found + 0x4C) = power;
+	}
 }

@@ -12,7 +12,7 @@ extern "C" {
 #endif
 
 void pppVertexApCon(_pppPObject*, PVertexAp*);
-void pppVertexAp(void);
+void pppVertexAp(_pppPObject*, PVertexAp*, void*);
 
 #ifdef __cplusplus
 }

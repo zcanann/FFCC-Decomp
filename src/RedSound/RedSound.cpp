@@ -603,12 +603,23 @@ void CRedSound::StreamPause(int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd728
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::SetWaveData(int, void*, int)
+unsigned int CRedSound::SetWaveData(int waveID, void* waveData, int waveSize)
 {
-	// TODO
+	unsigned int id = GetAutoID();
+	int* standbyID = EntryStandbyID(id);
+
+	if (standbyID != 0) {
+		CRedDriver_8032f4c0.SetWaveData((int)standbyID, waveID, waveData, waveSize);
+	}
+
+	return id;
 }
 
 /*

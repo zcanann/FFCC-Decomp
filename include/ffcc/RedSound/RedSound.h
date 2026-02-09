@@ -63,7 +63,7 @@ public:
 	void StreamVolume(int, int, int);
 	void StreamPause(int, int);
 
-	void SetWaveData(int, void*, int);
+	unsigned int SetWaveData(int, void*, int);
 	void ClearWaveData(int);
 	void ClearWaveDataM(int, int, int, int);
 	void ClearWaveBank(int);

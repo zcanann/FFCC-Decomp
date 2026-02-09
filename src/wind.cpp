@@ -280,10 +280,11 @@ void CWind::getObj(int)
  */
 int CWind::AddAmbient(float dir, float speed)
 {
-	u8* freeObj = 0;
+	u8* freeObj;
 	u8* scan = (u8*)this;
+	int group = 4;
 
-	for (int group = 0; group < 4; group++) {
+	do {
 		freeObj = scan;
 		if ((s8)freeObj[0] >= 0) {
 			break;
@@ -325,6 +326,10 @@ int CWind::AddAmbient(float dir, float speed)
 		}
 
 		scan += 800;
+		group--;
+	} while (group != 0);
+
+	if (group == 0) {
 		freeObj = 0;
 	}
 

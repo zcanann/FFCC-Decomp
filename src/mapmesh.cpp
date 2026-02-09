@@ -37,6 +37,11 @@ static inline int& S32At(CMapMesh* self, unsigned int offset)
     return *reinterpret_cast<int*>(Ptr(self, offset));
 }
 
+static inline float& F32At(CMapMesh* self, unsigned int offset)
+{
+    return *reinterpret_cast<float*>(Ptr(self, offset));
+}
+
 static inline unsigned short& U16At(CMapMesh* self, unsigned int offset)
 {
     return *reinterpret_cast<unsigned short*>(Ptr(self, offset));
@@ -80,7 +85,25 @@ CMaterial* CPtrArray<CMaterial*>::GetAt(unsigned long index)
  */
 CMapMesh::CMapMesh()
 {
-	// TODO
+    const float minInit = 10000000000.0f;
+    const float maxInit = -10000000000.0f;
+
+    F32At(this, 0x14) = minInit;
+    F32At(this, 0x10) = minInit;
+    F32At(this, 0xC) = minInit;
+    F32At(this, 0x20) = maxInit;
+    F32At(this, 0x1C) = maxInit;
+    F32At(this, 0x18) = maxInit;
+
+    S32At(this, 0x24) = 0;
+    S32At(this, 0x28) = 0;
+    S32At(this, 0x2C) = 0;
+    S32At(this, 0x30) = 0;
+    S32At(this, 0x34) = 0;
+    S32At(this, 0x3C) = 0;
+    S32At(this, 0x38) = 0;
+    S32At(this, 0x40) = 0;
+    U16At(this, 0xA) = 0;
 }
 
 /*

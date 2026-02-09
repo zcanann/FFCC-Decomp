@@ -307,62 +307,67 @@ char* strstr(const char* str, const char* pat)
 	return NULL;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801b8c58
+ * PAL Size: 316b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 char* strtok(char* str, const char* delim)
 {
-	char delimiter_table[32];  // 256 bits / 8 = 32 bytes
-	unsigned char bVar2;
-	char* pbVar1;
-	char* pbVar3;
-	char* pbVar4;
-	int i;
-	
-	// Initialize delimiter bit table
-	for (i = 0; i < 32; i++) {
-		delimiter_table[i] = 0;
-	}
-	
-	// If new string provided, use it
+	unsigned char delimiter_table[32] = { 0 };
+	unsigned char current;
+	unsigned char* token_start;
+	unsigned char* scan;
+	unsigned char* token_end;
+
 	if (str != NULL) {
 		strtok_ptr = str;
 	}
-	
-	// Build delimiter bit table
-	pbVar3 = (char*)(delim - 1);
+
+	scan = (unsigned char*)delim - 1;
 	while (1) {
-		pbVar3 = pbVar3 + 1;
-		bVar2 = *pbVar3;
-		if (bVar2 == 0) break;
-		delimiter_table[bVar2 >> 3] |= (1 << (bVar2 & 7));
+		scan++;
+		current = *scan;
+		if (current == 0) {
+			break;
+		}
+		delimiter_table[current >> 3] |= (unsigned char)(1 << (current & 7));
 	}
-	
-	// Skip leading delimiters
-	pbVar3 = strtok_ptr - 1;
+
+	token_start = (unsigned char*)strtok_ptr - 1;
 	do {
-		pbVar3 = pbVar3 + 1;
-		bVar2 = *pbVar3;
-		if (bVar2 == 0) break;
-	} while ((delimiter_table[bVar2 >> 3] & (1 << (bVar2 & 7))) != 0);
-	
-	pbVar1 = pbVar3;
-	if (bVar2 == 0) {
+		token_start++;
+		current = *token_start;
+		if (current == 0) {
+			break;
+		}
+	} while ((delimiter_table[current >> 3] & (1 << (current & 7))) != 0);
+
+	scan = token_start;
+	if (current == 0) {
 		strtok_ptr = NULL;
 		return NULL;
 	}
-	
-	// Find end of token
+
 	do {
-		pbVar4 = pbVar1;
-		pbVar1 = pbVar4 + 1;
-		bVar2 = *pbVar1;
-		if (bVar2 == 0) break;
-	} while ((delimiter_table[bVar2 >> 3] & (1 << (bVar2 & 7))) == 0);
-	
-	if (bVar2 == 0) {
+		token_end = scan;
+		scan = token_end + 1;
+		current = *scan;
+		if (current == 0) {
+			break;
+		}
+	} while ((delimiter_table[current >> 3] & (1 << (current & 7))) == 0);
+
+	if (current == 0) {
 		strtok_ptr = NULL;
 	} else {
-		strtok_ptr = pbVar4 + 2;
-		*pbVar1 = 0;
+		strtok_ptr = (char*)(token_end + 2);
+		*scan = 0;
 	}
-	
-	return pbVar3;
+
+	return (char*)token_start;
 }

@@ -26,7 +26,7 @@ public:
     void DrawMeshCharaShadow(unsigned short, unsigned short);
     void Draw(CMaterialSet*);
     void DrawPart(CMaterialSet*, int);
-    void GetTexture(CMaterialSet*, int&);
+    void* GetTexture(CMaterialSet*, int&);
     void SetDisplayListMaterial(CMaterialSet*, char**, CAmemCacheSet*);
     void pppCacheLoadModelTexture(CMaterialSet*, CAmemCacheSet*);
     void pppCacheUnLoadModelTexture(CMaterialSet*, CAmemCacheSet*);

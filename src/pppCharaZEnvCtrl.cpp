@@ -1,5 +1,6 @@
 #include "ffcc/pppCharaZEnvCtrl.h"
 #include "ffcc/partMng.h"
+#include "dolphin/gx/GXPixel.h"
 
 extern unsigned int DAT_8032ed70;
 
@@ -10,16 +11,17 @@ int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: 0x8013e668
+ * PAL Size: 44b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void CharaZEnvCtrl_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
+void CharaZEnvCtrl_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void* data, int)
 {
-	// TODO
+    unsigned char* zModeState = (unsigned char*)data;
+    GXSetZMode((GXBool)zModeState[4], GX_LEQUAL, (GXBool)zModeState[5]);
 }
 
 /*

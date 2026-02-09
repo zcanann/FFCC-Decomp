@@ -1,7 +1,11 @@
 #include "ffcc/pppRandUpCV.h"
 #include "ffcc/math.h"
+#include "dolphin/types.h"
 
 extern CMath math;
+extern int lbl_8032ED70;
+extern u8 lbl_801EADC8[];
+extern "C" float RandF__5CMathFv(CMath* instance);
 
 /*
  * --INFO--
@@ -12,74 +16,69 @@ extern CMath math;
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRandUpCV(void* param1, void* param2, void* param3) {
-    int* p1 = (int*)param1;
-    int* p2 = (int*)param2;
-    int* p3 = (int*)param3;
-    float multiplier;
-    
-    // Check global state variable
-    extern int lbl_8032ED70;
+void pppRandUpCV(void* param1, void* param2, void* param3)
+{
+    u8* colors;
+
     if (lbl_8032ED70 != 0) {
         return;
     }
-    
-    // Check if first param matches third param offset
-    if (p2[0] != p1[3]) {
-        if (p2[0] == -1) {
-            // Use global default color
-            extern unsigned char lbl_801EADC8[4];
-            unsigned char* color = lbl_801EADC8;
-            
-            // Process color components 
-            if (((unsigned char*)p2)[12] != 0) {
-                math.RandF();
-                math.RandF();
-                multiplier = 0.5f; // Simplified placeholder
-            }
-            
-            // Get base value
-            float* basePtr = (float*)((unsigned char*)p3[3] + 0x80 + p1[0]);
-            float baseValue = *basePtr;
-            
-            // Update color components
-            for (int i = 0; i < 4; i++) {
-                signed char delta = ((signed char*)p2)[8 + i];
-                unsigned char currentColor = color[i];
-                
-                float variation = (float)delta * baseValue;
-                int newValue = currentColor + (int)variation;
-                
-                color[i] = (unsigned char)newValue;
-            }
-        } else {
-            // Use computed base address
-            unsigned char* base = (unsigned char*)p1 + 0x80 + p2[1];
-            
-            // Get base value
-            float* basePtr = (float*)((unsigned char*)p3[3] + 0x80 + p1[0]);
-            float baseValue = *basePtr;
-            
-            // Update color components
-            for (int i = 0; i < 4; i++) {
-                signed char delta = ((signed char*)p2)[8 + i];
-                unsigned char currentColor = base[i];
-                
-                float variation = (float)delta * baseValue;
-                int newValue = currentColor + (int)variation;
-                
-                base[i] = (unsigned char)newValue;
-            }
+
+    if (*(int*)param2 == *((int*)param1 + 3)) {
+        return;
+    }
+
+    if (*(int*)param2 == -1) {
+        if (*((u8*)param2 + 0xc) != 0) {
+            RandF__5CMathFv(&math);
+            RandF__5CMathFv(&math);
+        }
+        colors = lbl_801EADC8;
+    } else {
+        colors = (u8*)((char*)param1 + *((int*)param2 + 1) + 0x80);
+    }
+
+    {
+        int valueOffset = *(int*)param1 + 0x80;
+        float scale = *(float*)((char*)*(void**)((char*)param3 + 0xc) + valueOffset);
+
+        {
+            s8 delta = *((s8*)param2 + 8);
+            int add = (int)((float)delta * scale);
+            colors[0] = (u8)(colors[0] + add);
+        }
+
+        {
+            s8 delta = *((s8*)param2 + 9);
+            int add = (int)((float)delta * scale);
+            colors[1] = (u8)(colors[1] + add);
+        }
+
+        {
+            s8 delta = *((s8*)param2 + 10);
+            int add = (int)((float)delta * scale);
+            colors[2] = (u8)(colors[2] + add);
+        }
+
+        {
+            s8 delta = *((s8*)param2 + 11);
+            int add = (int)((float)delta * scale);
+            colors[3] = (u8)(colors[3] + add);
         }
     }
 }
 
 /*
  * --INFO--
- * Address: TODO  
- * Size: TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void randchar(char, float)
+void randchar(char value, float multiplier)
 {
-    // TODO - appears to be unused based on objdiff
+    (void)value;
+    (void)multiplier;
 }

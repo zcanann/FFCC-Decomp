@@ -22,6 +22,8 @@ extern void* DAT_80238030;
 
 static char s_fileCpp[] = "file.cpp";
 static char s_drawErrorFmt[] = "CFile::drawError %d";
+static char s_queueWarnAnyFmt[] = "BackAllFilesToQueue: %s";
+static char s_queueWarnTargetFmt[] = "BackAllFilesToQueue: %s (%s)";
 
 static const char* s_diskErrorText[4][6][3] = {
     {
@@ -273,25 +275,23 @@ void CFile::BackAllFilesToQueue(CHandle* fileHandle)
 		{
             if (fileHandle == 0)
 			{
-                // if (System._4700_4_ > 2)
+                if ((unsigned int)System.m_execParam > 2)
 				{
-                    // System.Printf(DAT_801D5EFC, inFlight->m_name);
+                    System.Printf(s_queueWarnAnyFmt, inFlight->m_name);
                 }
             }
 			else
 			{
-                // if (System._4700_4_ > 1)
+                if ((unsigned int)System.m_execParam > 1)
 				{
-                    // System.Printf(DAT_801D5E28, inFlight->m_name, fileHandle->m_name);
+                    System.Printf(s_queueWarnTargetFmt, inFlight->m_name, fileHandle->m_name);
                 }
             }
 
-            // Put it back into the ready state.
             inFlight->m_completionStatus = 1;
         }
 		else
 		{
-            // This is the specific handle we're targeting: mark as idle.
             inFlight->m_completionStatus = 0;
         }
     }

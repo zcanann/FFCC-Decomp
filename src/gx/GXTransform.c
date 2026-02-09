@@ -471,12 +471,12 @@ void GXSetViewportJitter(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz,
 void GXGetViewportv(f32* vp) {
     ASSERTMSGLINE(968, vp, "GXGet*: invalid null pointer");
 
-    ((u32*)vp)[0] = ((u32*)&__GXData->vpLeft)[0];
-    ((u32*)vp)[1] = ((u32*)&__GXData->vpLeft)[1];
-    ((u32*)vp)[2] = ((u32*)&__GXData->vpLeft)[2];
-    ((u32*)vp)[3] = ((u32*)&__GXData->vpLeft)[3];
-    ((u32*)vp)[4] = ((u32*)&__GXData->vpLeft)[4];
-    ((u32*)vp)[5] = ((u32*)&__GXData->vpLeft)[5];
+    vp[0] = __GXData->vpLeft;
+    vp[1] = __GXData->vpTop;
+    vp[2] = __GXData->vpWd;
+    vp[3] = __GXData->vpHt;
+    vp[4] = __GXData->vpNearz;
+    vp[5] = __GXData->vpFarz;
 }
 
 #define GX_WRITE_XF_REG_F_(addr, value) \

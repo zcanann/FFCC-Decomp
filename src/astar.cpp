@@ -5,6 +5,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/pad.h"
 #include "ffcc/partyobj.h"
+#include "ffcc/p_dbgmenu.h"
 #include "ffcc/system.h"
 #include "ffcc/vector.h"
 
@@ -917,6 +918,12 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 {
 	unsigned char polygonGroup = 0;
+	unsigned long mask = static_cast<unsigned long>(hitAttributeMask);
+
+	if ((DbgMenuPcs.GetDbgFlag() & 1) != 0)
+	{
+		mask = m_hitAttributeMask;
+	}
 
 	CVector bottom(kPolyGroupBaseX, kPolyGroupBaseY, kPolyGroupBaseZ);
 	CVector top(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z);
@@ -939,9 +946,10 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 	cyl.m_radius2 = 0.0f;
 	cyl.m_height2 = 0.0f;
 
-	unsigned long mask = static_cast<unsigned long>(hitAttributeMask);
-
-	MapMng.CheckHitCylinderNear(&cyl, reinterpret_cast<Vec*>(&bottom), mask);
+	if (MapMng.CheckHitCylinderNear(&cyl, reinterpret_cast<Vec*>(&bottom), mask) != 0)
+	{
+		polygonGroup = lbl_8032EC90[0x47];
+	}
 
 	return polygonGroup;
 }

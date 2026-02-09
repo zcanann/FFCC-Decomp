@@ -43,6 +43,9 @@ public:
     void Add();
     void Add(int, int, CDMParam&);
     void Delete(int);
+    int GetDbgFlag();
 };
+
+extern CDbgMenuPcs DbgMenuPcs;
 
 #endif // _FFCC_P_DBGMENU_H_

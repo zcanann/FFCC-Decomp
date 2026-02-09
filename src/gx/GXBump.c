@@ -39,9 +39,9 @@ void GXSetTevIndirect(GXTevStageID tev_stage, GXIndTexStageID ind_stage, GXIndTe
 #pragma dont_inline reset
 
 void GXSetIndTexMtx(GXIndTexMtxID mtx_id, const f32 offset[2][3], s8 scale_exp) {
-    s32 mtx[6];
-    u32 reg;
     u32 id;
+    u32 scale;
+    u32 reg;
 
     CHECK_GXBEGIN(186, "GXSetIndTexMtx");
 
@@ -66,32 +66,25 @@ void GXSetIndTexMtx(GXIndTexMtxID mtx_id, const f32 offset[2][3], s8 scale_exp) 
         break;
     }
 
-    mtx[0] = (int)(1024.0f * offset[0][0]) & 0x7FF;
-    mtx[1] = (int)(1024.0f * offset[1][0]) & 0x7FF;
-    scale_exp += 17;
-    reg = 0;
-    SET_REG_FIELD(208, reg, 11, 0, mtx[0]);
-    SET_REG_FIELD(209, reg, 11, 11, mtx[1]);
-    SET_REG_FIELD(210, reg, 2, 22, scale_exp & 3);
-    SET_REG_FIELD(211, reg, 8, 24, id * 3 + 6);
+    id *= 3;
+    scale = (u8)(s8)(scale_exp + 17);
+
+    reg = ((s32)(1024.0f * offset[0][0]) & 0x7FF);
+    reg |= ((s32)(1024.0f * offset[1][0]) & 0x7FF) << 11;
+    reg |= (scale & 3) << 22;
+    reg |= (id + 6) << 24;
     GX_WRITE_SOME_REG5(GX_LOAD_BP_REG, reg);
 
-    mtx[2] = (int)(1024.0f * offset[0][1]) & 0x7FF;
-    mtx[3] = (int)(1024.0f * offset[1][1]) & 0x7FF;
-    reg = 0;
-    SET_REG_FIELD(217, reg, 11, 0, mtx[2]);
-    SET_REG_FIELD(218, reg, 11, 11, mtx[3]);
-    SET_REG_FIELD(219, reg, 2, 22, (scale_exp >> 2) & 3);
-    SET_REG_FIELD(220, reg, 8, 24, id * 3 + 7);
+    reg = ((s32)(1024.0f * offset[0][1]) & 0x7FF);
+    reg |= ((s32)(1024.0f * offset[1][1]) & 0x7FF) << 11;
+    reg |= (scale & 0xC) << 20;
+    reg |= (id + 7) << 24;
     GX_WRITE_SOME_REG5(GX_LOAD_BP_REG, reg);
 
-    mtx[4] = (int)(1024.0f * offset[0][2]) & 0x7FF;
-    mtx[5] = (int)(1024.0f * offset[1][2]) & 0x7FF;
-    reg = 0;
-    SET_REG_FIELD(226, reg, 11, 0, mtx[4]);
-    SET_REG_FIELD(227, reg, 11, 11, mtx[5]);
-    SET_REG_FIELD(228, reg, 2, 22, (scale_exp >> 4) & 3);
-    SET_REG_FIELD(229, reg, 8, 24, id * 3 + 8);
+    reg = ((s32)(1024.0f * offset[0][2]) & 0x7FF);
+    reg |= ((s32)(1024.0f * offset[1][2]) & 0x7FF) << 11;
+    reg |= (scale & 0x30) << 18;
+    reg |= (id + 8) << 24;
     GX_WRITE_SOME_REG5(GX_LOAD_BP_REG, reg);
 
     __GXData->bpSentNot = 0;

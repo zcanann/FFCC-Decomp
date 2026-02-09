@@ -38,6 +38,8 @@ void pppRandFloat(void* param1, void* param2, void* param3)
     RandFloatCtx* ctx;
     float* source;
     char* base;
+    RandFloatParam* data;
+    RandFloatCtx* ctx;
     float value;
 
     if (lbl_8032ED70 != 0) {

@@ -4,6 +4,7 @@
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include <string.h>
 
 static int GetGraphFrameFromId(u32 graphId)
 {
@@ -17,6 +18,26 @@ extern void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, voi
                                                                        unsigned char);
 extern void pppSetBlendMode__FUc(unsigned char);
 extern void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
+extern int DAT_8032ed70;
+extern "C" int rand(void);
+extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+
+struct LocationTitleWork {
+    void* m_particles;
+    u16 m_count;
+    u16 m_pad;
+    float m_cur;
+    float m_vel;
+    float m_acc;
+};
+
+struct LocationTitleParticle {
+    Vec m_pos;
+    u32 m_color;
+    float m_frame;
+    s16 m_shapeA;
+    s16 m_shapeB;
+};
 
 /*
  * --INFO--
@@ -71,9 +92,134 @@ void pppDestructLocationTitle(pppLocationTitle* pppLocationTitle, UnkC* param_2)
  */
 void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, UnkB* param_2, UnkC* param_3)
 {
-    // TODO: Complex implementation with matrix operations
-    // This is a very large function that needs careful implementation
-    // Based on Ghidra decompilation with matrix math, memory allocation, etc.
+    int colorOffset;
+    LocationTitleWork* work;
+    u16 maxCount;
+    u32 graphId;
+    int graphFrame;
+
+    if (DAT_8032ed70 != 0) {
+        return;
+    }
+
+    colorOffset = param_3->m_serializedDataOffsets[1];
+    work = (LocationTitleWork*)((u8*)pppLocationTitle + 8 + *param_3->m_serializedDataOffsets);
+    rand();
+
+    if (param_2->m_dataValIndex == 0xFFFF) {
+        return;
+    }
+
+    long* shapeTable = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
+    work->m_vel += work->m_acc;
+    work->m_cur += work->m_vel;
+
+    if (param_2->m_graphId == *(u32*)pppLocationTitle) {
+        work->m_cur += param_2->m_arg3;
+        work->m_vel += *(float*)param_2->m_payload;
+        work->m_acc += *(float*)((u8*)param_2->m_payload + 4);
+    }
+
+    maxCount = *(u16*)((u8*)&param_2->m_initWOrk + 2);
+    if (work->m_particles == NULL) {
+        LocationTitleParticle* particle;
+
+        work->m_particles =
+            pppMemAlloc__FUlPQ27CMemory6CStagePci(maxCount * sizeof(LocationTitleParticle),
+                                                  pppEnvStPtr->m_stagePtr, (char*)"pppLocationTitle.cpp", 0x6d);
+        particle = (LocationTitleParticle*)work->m_particles;
+
+        for (u16 i = 0; i < maxCount; i++) {
+            particle->m_pos.x = 0.0f;
+            particle->m_pos.y = 0.0f;
+            particle->m_pos.z = 0.0f;
+            memcpy(&particle->m_color, (u8*)pppLocationTitle + 0x88 + colorOffset, 4);
+            particle->m_frame = work->m_cur;
+
+            if (*(s16*)((u8*)shapeTable + 6) != 0) {
+                s16 shape = (s16)(rand() % *(s16*)((u8*)shapeTable + 6));
+                particle->m_shapeA = shape;
+                particle->m_shapeB = shape;
+            } else {
+                particle->m_shapeA = 0;
+                particle->m_shapeB = 0;
+            }
+
+            particle++;
+        }
+    }
+
+    if (work->m_count + 1 >= maxCount) {
+        return;
+    }
+
+    graphId = *(u32*)pppLocationTitle;
+    graphFrame = GetGraphFrameFromId(graphId);
+    if (graphFrame < *(u16*)((u8*)param_2->m_payload + 8)) {
+        return;
+    }
+
+    {
+        LocationTitleParticle* particles = (LocationTitleParticle*)work->m_particles;
+        u16 count = work->m_count;
+        pppFMATRIX localMatrix;
+        pppFMATRIX managerMatrix;
+        pppFMATRIX resultMatrix;
+
+        localMatrix = *(pppFMATRIX*)((u8*)pppLocationTitle + 4);
+        managerMatrix = pppMngStPtr->m_matrix;
+        pppMulMatrix(resultMatrix, managerMatrix, localMatrix);
+
+        particles[count].m_pos.x = resultMatrix.value[0][3];
+        particles[count].m_pos.y = resultMatrix.value[1][3];
+        particles[count].m_pos.z = resultMatrix.value[2][3];
+
+        if ((s16)count - 1 < 0) {
+            particles[count].m_frame = work->m_cur;
+            memcpy(&particles[count].m_color, (u8*)pppLocationTitle + 0x88 + colorOffset, 4);
+        } else {
+            particles[count - 1].m_frame = work->m_cur;
+            memcpy(&particles[count - 1].m_color, (u8*)pppLocationTitle + 0x88 + colorOffset, 4);
+        }
+
+        work->m_count = count + 1;
+    }
+
+    if (work->m_count > 1) {
+        LocationTitleParticle* particles = (LocationTitleParticle*)work->m_particles;
+        Vec subVec;
+        Vec interp[50];
+        u16 count = work->m_count;
+        u8 stepCount = *(u8*)&param_2->m_stepValue;
+        int startIndex = count - 2;
+        int inserted = 0;
+        float inv = 1.0f / (float)(stepCount + 1);
+
+        PSVECSubtract(&particles[count - 1].m_pos, &particles[startIndex].m_pos, &subVec);
+
+        for (u8 i = 0; i < stepCount; i++) {
+            float t = (float)(i + 1) * inv;
+            Vec scaled;
+
+            PSVECScale(&subVec, &scaled, t);
+            PSVECAdd(&particles[startIndex].m_pos, &scaled, &interp[i]);
+            inserted++;
+            work->m_count++;
+
+            if (maxCount <= work->m_count + 1) {
+                break;
+            }
+        }
+
+        pppCopyVector(particles[startIndex + inserted + 1].m_pos, particles[startIndex + 1].m_pos);
+
+        for (int i = 0; i < inserted; i++) {
+            LocationTitleParticle* dst = &particles[startIndex + i + 1];
+            pppCopyVector(dst->m_pos, interp[i]);
+            memcpy(&dst->m_color, (u8*)pppLocationTitle + 0x88 + colorOffset, 4);
+            dst->m_frame = work->m_cur;
+        }
+    }
 }
 
 /*

@@ -17,6 +17,8 @@ public:
     CTexture();
     ~CTexture();
 
+    static void* operator new(unsigned long, CMemory::CStage*, char*, int);
+
     void InitTexObj();
     void Create(CChunkFile&, CMemory::CStage*, CAmemCacheSet*, int, int);
     void CacheLoadTexture(CAmemCacheSet*);
@@ -41,6 +43,8 @@ public:
     CTextureSet();
     ~CTextureSet();
 
+    static void* operator new(unsigned long, CMemory::CStage*, char*, int);
+
     void Create(void*, CMemory::CStage*, int, CAmemCacheSet*, int, int);
     void Create(CChunkFile&, CMemory::CStage*, int, CAmemCacheSet*, int, int);
     void Find(char*);
@@ -56,6 +60,9 @@ public:
     void Quit();
     void SetTexture(_GXTexMapID, CTexture*);
     void SetTextureTev(CTexture*);
+
+    friend class CTexture;
+    friend class CTextureSet;
 
 private:
     void* m_vtable;

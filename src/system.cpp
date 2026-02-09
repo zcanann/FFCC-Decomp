@@ -291,13 +291,13 @@ void CSystem::RemoveScenegraph(CProcess* process, int arg)
  * Address:	TODO
  * Size:	TODO
  */
-void CSystem::ScriptChanging(char*)
+void CSystem::ScriptChanging(char* script)
 {
 	for (COrder* order = m_orderSentinel.m_next; order != &m_orderSentinel; order = order->m_next)
 	{
 		if (order->m_entry == (void*)((int)order->m_descBlock + 0x1c))
 		{
-			//(**(code **)((int)*order->m_owner + 0x14))(order->m_owner,param_2);
+			order->m_owner->ScriptChanging(script);
 		}
 	}
 }
@@ -307,13 +307,13 @@ void CSystem::ScriptChanging(char*)
  * Address:	TODO
  * Size:	TODO
  */
-void CSystem::ScriptChanged(char*, int)
+void CSystem::ScriptChanged(char* script, int value)
 {
 	for (COrder* order = m_orderSentinel.m_next; order != &m_orderSentinel; order = order->m_next)
 	{
 		if (order->m_entry == (void*)((int)order->m_descBlock + 0x1c))
 		{
-			//(**(code **)((int)*order->m_owner + 0x18))(order->m_owner,param_2,param_3);
+			order->m_owner->ScriptChanged(script, value);
 		}
 	}
 }
@@ -323,13 +323,13 @@ void CSystem::ScriptChanged(char*, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CSystem::MapChanging(int, int)
+void CSystem::MapChanging(int mapId, int mapVariant)
 {
 	for (COrder* order = m_orderSentinel.m_next; order != &m_orderSentinel; order = order->m_next)
 	{
 		if (order->m_entry == (void*)((int)order->m_descBlock + 0x1c))
 		{
-			//(**(code **)((int)*order->m_owner + 0x1c))(order->m_owner,param_2,param_3)
+			order->m_owner->MapChanging(mapId, mapVariant);
 		}
 	}
 }
@@ -339,13 +339,13 @@ void CSystem::MapChanging(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CSystem::MapChanged(int, int, int)
+void CSystem::MapChanged(int mapId, int mapVariant, int changedByForce)
 {
 	for (COrder* order = m_orderSentinel.m_next; order != &m_orderSentinel; order = order->m_next)
 	{
 		if (order->m_entry == (void*)((int)order->m_descBlock + 0x1c))
 		{
-			//(**(code **)((int)*order->m_owner + 0x20))(order->m_owner,param_2,param_3,param_4);
+			order->m_owner->MapChanged(mapId, mapVariant, changedByForce);
 		}
 	}
 }

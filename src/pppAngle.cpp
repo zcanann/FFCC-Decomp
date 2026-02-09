@@ -43,7 +43,7 @@ void pppAngleCon(void* dest, void* param)
     int offset = offsetPtr[0];
     
     int* ptr = (int*)((char*)dest + offset + 0x80);
-    ptr[0] = 0;
-    ptr[1] = 0;
     ptr[2] = 0;
+    ptr[1] = 0;
+    ptr[0] = 0;
 }

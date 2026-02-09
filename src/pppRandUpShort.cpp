@@ -1,54 +1,79 @@
 #include "ffcc/pppRandUpShort.h"
 #include "ffcc/math.h"
-#include "dolphin/types.h"
+#include "types.h"
 
 extern CMath math;
-extern int lbl_8032ED70;
-extern float lbl_80330038; 
-extern double lbl_80330040;
-extern short lbl_801EADC8;
+extern s32 lbl_8032ED70;
+extern f32 lbl_80330038;
+extern f64 lbl_80330040;
+extern s16 lbl_801EADC8;
+extern "C" f32 RandF__5CMathFv(CMath* instance);
+
+struct RandUpShortParam {
+    s32 targetId;
+    s32 sourceOffset;
+    s16 scale;
+    u8 randomTwice;
+};
+
+struct RandUpShortCtx {
+    u8 _pad[0xC];
+    s32* outputOffset;
+};
 
 /*
  * --INFO--
  * PAL Address: 0x80062fa0
  * PAL Size: 300b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppRandUpShort(void* param1, void* param2, void* param3)
+extern "C" void pppRandUpShort(void* param1, void* param2, void* param3)
 {
-    int* p1 = (int*)param1;
-    int* p2 = (int*)param2;
-    int*** p3 = (int***)param3;
-
     if (lbl_8032ED70 != 0) {
         return;
     }
 
-    if (p1[3] == 0) {
-        math.RandF();
+    u8* base = (u8*)param1;
+    RandUpShortParam* in = (RandUpShortParam*)param2;
+    RandUpShortCtx* ctx = (RandUpShortCtx*)param3;
+    f32* valuePtr;
 
-        float randVal = 1.0f;
-        if (*(u8*)((char*)p2 + 0xA) != 0) {
-            math.RandF();
-            randVal += 1.0f;
+    s32 state = *(s32*)(base + 0xC);
+    if (state == 0) {
+        f32 value = RandF__5CMathFv(&math);
+        if (in->randomTwice != 0) {
+            value = (value + RandF__5CMathFv(&math)) * lbl_80330038;
         }
 
-        randVal *= lbl_80330038;
-        *(float*)((char*)p1 + (***p3 + 0x80)) = randVal;
-        return;
-    }
-
-    if (p2[0] != p1[3]) {
-        return;
-    }
-
-    float* src = (float*)((char*)p1 + ***p3);
-    short* dst;
-    if (p2[1] == -1) {
-        dst = &lbl_801EADC8;
+        valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
+        *valuePtr = value;
     } else {
-        dst = (short*)((char*)p1 + p2[1] + 0x80);
+        if (in->targetId != state) {
+            return;
+        }
+        valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
     }
 
-    int add = (int)(((double)*(short*)((char*)p2 + 8) - lbl_80330040) * *(float*)((char*)src + 0x80));
-    *dst = *dst + add;
+    s16* target;
+    if (in->sourceOffset == -1) {
+        target = &lbl_801EADC8;
+    } else {
+        target = (s16*)(base + in->sourceOffset + 0x80);
+    }
+
+    union {
+        f64 d;
+        struct {
+            u32 hi;
+            u32 lo;
+        } parts;
+    } cvt;
+    cvt.parts.hi = 0x43300000;
+    cvt.parts.lo = (u16)in->scale;
+
+    s32 delta = (s32)((cvt.d - lbl_80330040) * *valuePtr);
+    *target = (s16)(*target + delta);
 }

@@ -536,13 +536,17 @@ void CGame::MakeNumMonName(char*, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 80013e70
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 const char* CGame::GetLangString()
 {
     static const char* const sLangDirs[] =
-	{
+    {
         "jp/",
         "uk/",
         "gr/",
@@ -550,14 +554,16 @@ const char* CGame::GetLangString()
         "fr/",
         "sp/"
     };
+    const char* localLangDirs[6];
 
-    // Safety in case languageId is out of range.
-    if (m_gameWork.m_languageId >= sizeof(sLangDirs) / sizeof(sLangDirs[0]))
-	{
-        return sLangDirs[0];
-    }
+    localLangDirs[0] = sLangDirs[0];
+    localLangDirs[1] = sLangDirs[1];
+    localLangDirs[2] = sLangDirs[2];
+    localLangDirs[3] = sLangDirs[3];
+    localLangDirs[4] = sLangDirs[4];
+    localLangDirs[5] = sLangDirs[5];
 
-    return sLangDirs[m_gameWork.m_languageId];
+    return localLangDirs[m_gameWork.m_languageId];
 }
 
 /*

@@ -5,6 +5,7 @@
 
 extern "C" {
 extern void abort();
+extern void __dl__FPv(void*);
 extern void __dla__FPv(void*);
 }
 
@@ -38,14 +39,17 @@ extern void terminate() { thandler(); }
 extern void unexpected() { uhandler(); }
 } // namespace std
 
-/**
- * @note Address: 801AFA6C
- * @note Size: 184b
+/*
+ * --INFO--
+ * PAL Address: 0x801AFA6C
+ * PAL Size: 184b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-extern "C" void dtor_801AFA6C() {
-	// TODO: Implement destructor function
-	// Based on address 801AFA6C, size 184 bytes
-}
+class __partial_array_destructor;
+extern "C" __partial_array_destructor* dtor_801AFA6C(__partial_array_destructor* self, short shouldDelete);
 
 /**
  * @note Address: 801afc28
@@ -152,13 +156,11 @@ extern "C" char __throw_catch_compare(const char* throwtype, const char* catchty
 }
 
 class __partial_array_destructor {
-private:
+public:
 	void* p;
 	size_t size;
 	size_t n;
 	ConstructorDestructor dtor;
-
-public:
 	size_t i;
 
 	__partial_array_destructor(void* array, size_t elementsize, size_t nelements, ConstructorDestructor destructor)
@@ -183,32 +185,91 @@ public:
 	}
 };
 
-/**
- * @note Address: 801afb24
- * @note Size: 260b
- */
-extern "C" void* __construct_new_array(void* ptr, ConstructorDestructor ctor, ConstructorDestructor dtor, size_t elementSize, size_t count) {
-	// TODO: Implement new array construction
-	return nullptr;
+extern "C" __partial_array_destructor* dtor_801AFA6C(__partial_array_destructor* self, short shouldDelete)
+{
+	char* ptr;
+
+	if (self != nullptr) {
+		if ((self->i < self->n) && (self->dtor != nullptr)) {
+			ptr = (char*)self->p + self->size * self->i;
+			while (self->i != 0) {
+				ptr -= self->size;
+				DTORCALL_COMPLETE(self->dtor, ptr);
+				self->i = self->i - 1;
+			}
+		}
+
+		if (0 < shouldDelete) {
+			__dl__FPv(self);
+		}
+	}
+
+	return self;
 }
 
-/**
- * @note Address: 801af970
- * @note Size: 252b
+/*
+ * --INFO--
+ * PAL Address: 0x801AFB24
+ * PAL Size: 260b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-extern "C" void __construct_array(void* ptr, ConstructorDestructor ctor, ConstructorDestructor dtor, size_t size, size_t n) {
-	void* current = ptr;
+extern "C" void* __construct_new_array(void* ptr, ConstructorDestructor ctor, ConstructorDestructor dtor, size_t elementSize, size_t count)
+{
+	void* current;
 	size_t i;
-	
-	for (i = 0; i < n; i++) {
-		CTORCALL_COMPLETE(ctor, current);
-		current = (void*)((char*)current + size);
+
+	if (ptr != nullptr) {
+		((size_t*)ptr)[0] = elementSize;
+		((size_t*)ptr)[1] = count;
+		ptr = (char*)ptr + ARRAY_HEADER_SIZE;
+
+		if (ctor != nullptr) {
+			current = ptr;
+			for (i = 0; i < count; i = i + 1) {
+				CTORCALL_COMPLETE(ctor, current);
+				current = (char*)current + elementSize;
+			}
+
+			if ((i < count) && (dtor != nullptr)) {
+				current = (char*)ptr + elementSize * i;
+				for (; i != 0; i = i - 1) {
+					current = (char*)current - elementSize;
+					DTORCALL_COMPLETE(dtor, current);
+				}
+			}
+		}
 	}
-	
-	if (i < n && dtor != nullptr) {
-		current = (void*)((char*)ptr + size * i);
-		for (; i != 0; i--) {
-			current = (void*)((char*)current - size);
+
+	return ptr;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801AF970
+ * PAL Size: 252b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __construct_array(void* ptr, ConstructorDestructor ctor, ConstructorDestructor dtor, size_t size, size_t n)
+{
+	void* current;
+	size_t i;
+
+	current = ptr;
+	for (i = 0; i < n; i = i + 1) {
+		CTORCALL_COMPLETE(ctor, current);
+		current = (char*)current + size;
+	}
+
+	if ((i < n) && (dtor != nullptr)) {
+		current = (char*)ptr + size * i;
+		for (; i != 0; i = i - 1) {
+			current = (char*)current - size;
 			DTORCALL_COMPLETE(dtor, current);
 		}
 	}

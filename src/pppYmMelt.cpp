@@ -1,7 +1,25 @@
 #include "ffcc/pppYmMelt.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/map.h"
+#include "ffcc/maphit.h"
 
 extern float lbl_80330AF0;
+extern float FLOAT_80330b10;
+extern float FLOAT_80330b14;
+extern float FLOAT_80330b18;
+extern CMapMng MapMng;
+
+extern "C" {
+int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned int);
+void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
+void DCFlushRange(void*, unsigned long);
+}
+
+struct YmMeltVertex
+{
+    Vec m_position;
+    u8 m_color[4];
+};
 
 /*
  * --INFO--
@@ -15,12 +33,82 @@ void InitPolygonData(PYmMelt*, VERTEX_DATA*, short)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800A5D5C
+ * PAL Size: 624b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CalcPolygonHeight(PYmMelt*, VERTEX_DATA*, _GXColor*, float)
+void CalcPolygonHeight(PYmMelt*, VERTEX_DATA* param_2, _GXColor* param_3, float param_4)
 {
-	// TODO
+    s32 i;
+    s32 pointCount;
+    float savedY;
+    Vec worldBase;
+    CMapCylinder cylinder;
+    Vec hitPosition;
+    YmMeltVertex* vertex;
+
+    pointCount = param_2->m_gridSize + 1;
+    pointCount *= pointCount;
+    savedY = ((Vec*)((u8*)pppMngStPtr + 0x58))->y;
+
+    worldBase.x = pppMngStPtr->m_matrix.value[0][3];
+    worldBase.y = pppMngStPtr->m_matrix.value[1][3] + param_2->m_collisionYOffset;
+    worldBase.z = pppMngStPtr->m_matrix.value[2][3];
+
+    for (i = 0; i < pointCount; i++) {
+        vertex = (YmMeltVertex*)param_3 + i;
+        vertex->m_color[0] = param_3->r;
+        vertex->m_color[1] = param_3->g;
+        vertex->m_color[2] = param_3->b;
+        vertex->m_color[3] = param_3->a;
+
+        pppAddVector(vertex->m_position, vertex->m_position, worldBase);
+
+        cylinder.m_bottom = vertex->m_position;
+        cylinder.m_direction.x = 0.0f;
+        cylinder.m_direction.y = FLOAT_80330b10;
+        cylinder.m_direction.z = 0.0f;
+        cylinder.m_radius = 0.0f;
+        cylinder.m_height = 0.0f;
+        cylinder.m_top.x = FLOAT_80330b14;
+        cylinder.m_top.y = FLOAT_80330b14;
+        cylinder.m_top.z = FLOAT_80330b14;
+        cylinder.m_direction2.x = FLOAT_80330b18;
+        cylinder.m_direction2.y = FLOAT_80330b18;
+        cylinder.m_direction2.z = FLOAT_80330b18;
+        cylinder.m_radius2 = FLOAT_80330b18;
+        cylinder.m_height2 = FLOAT_80330b18;
+
+        if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &cylinder, &cylinder.m_direction,
+                                                                   0xFFFFFFFF) == 0) {
+            vertex->m_position.y = savedY;
+            if (param_2->m_hideWhenNoGround != 0) {
+                vertex->m_color[0] = 0;
+                vertex->m_color[1] = 0;
+                vertex->m_color[2] = 0;
+                vertex->m_color[3] = 0;
+            }
+        } else {
+            CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A88), &vertex->m_position);
+            if (vertex->m_position.y < savedY - param_2->m_maxDropDistance) {
+                vertex->m_position.y = savedY;
+                if (param_2->m_hideWhenNoGround != 0) {
+                    vertex->m_color[0] = 0;
+                    vertex->m_color[1] = 0;
+                    vertex->m_color[2] = 0;
+                    vertex->m_color[3] = 0;
+                }
+            }
+        }
+
+        vertex->m_position.y += param_2->m_heightBias;
+        vertex->m_position.y -= param_4;
+    }
+
+    DCFlushRange(param_3, pointCount * 0x10);
 }
 
 /*

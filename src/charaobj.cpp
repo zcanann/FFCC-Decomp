@@ -41,6 +41,32 @@ void CGPrgObj::onFrameAlwaysAfter()
 
 /*
  * --INFO--
+ * PAL Address: 0x8010B688
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGPrgObj::onDamaged(CGPrgObj*)
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8010B68C
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGPrgObj::onAttacked(CGPrgObj*)
+{
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

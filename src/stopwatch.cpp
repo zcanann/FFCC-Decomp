@@ -3,6 +3,7 @@
 extern "C" float __cvt_sll_flt(u32 lo, u32 hi);
 
 extern char lbl_8032F860;
+extern float lbl_8032F850;
 extern float lbl_8032F854;  // 0.0f
 
 /*
@@ -55,8 +56,9 @@ float CStopWatch::Get()
 	u32 lo = p[0];
 	u32 hi = p[1];
 	float ticks = __cvt_sll_flt(lo, hi);
-	float denom = (float)(OS_TIMER_CLOCK / 125000);
-	return (8.0f * ticks) / denom;
+	u32 scaled = (OS_TIMER_CLOCK / 500000) * 0x8235;
+	float denom = (float)(scaled >> 3);
+	return lbl_8032F850 * (ticks / denom);
 }
 
 /*
@@ -112,8 +114,9 @@ void CProfile::ProfEnd()
 	u32 lo = p[0];
 	u32 hi = p[1];
 	float ticks = __cvt_sll_flt(lo, hi);
-	float denom = (float)(OS_TIMER_CLOCK / 125000);
-	m_lastTime = (8.0f * ticks) / denom;
+	u32 scaled = (OS_TIMER_CLOCK / 500000) * 0x8235;
+	float denom = (float)(scaled >> 3);
+	m_lastTime = lbl_8032F850 * (ticks / denom);
 
 	int next = m_frame + 1;
 	m_frame = next;

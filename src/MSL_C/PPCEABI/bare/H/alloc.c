@@ -325,25 +325,27 @@ static Block* link_new_block(__mem_pool_obj* pool_obj, unsigned long size) {
     Block* block;
     unsigned long aligned_size;
 
-    aligned_size = (size + 0x1F) & 0xFFFFFFF8;
+    aligned_size = (size + 0x1FUL) & 0xFFFFFFF8;
     if (aligned_size < 0x10000) {
         aligned_size = 0x10000;
     }
 
     block = (Block*)__sys_alloc(aligned_size);
-    if (block != 0) {
-        Block_construct(block, aligned_size);
-        if (pool_obj->start_ == 0) {
-            pool_obj->start_ = block;
-            block->prev = block;
-            block->next = block;
-        } else {
-            block->prev = pool_obj->start_->prev;
-            block->prev->next = block;
-            block->next = pool_obj->start_;
-            block->next->prev = block;
-            pool_obj->start_ = block;
-        }
+    if (block == 0) {
+        return 0;
+    }
+
+    Block_construct(block, aligned_size);
+    if (pool_obj->start_ == 0) {
+        pool_obj->start_ = block;
+        block->prev = block;
+        block->next = block;
+    } else {
+        block->prev = pool_obj->start_->prev;
+        block->prev->next = block;
+        block->next = pool_obj->start_;
+        block->next->prev = block;
+        pool_obj->start_ = block;
     }
     return block;
 }

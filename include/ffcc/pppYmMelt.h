@@ -11,7 +11,14 @@ struct PYmMelt
 
 struct VERTEX_DATA
 {
-
+    u8 _pad0[0xA];
+    u16 m_gridSize;
+    u8 _padC[0x14];
+    float m_heightBias;
+    float m_collisionYOffset;
+    float m_maxDropDistance;
+    u8 _pad2C[2];
+    u8 m_hideWhenNoGround;
 };
 
 struct PYmMeltDataOffsets {

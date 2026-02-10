@@ -620,7 +620,7 @@ extern "C" void* PTR_PTR_s_CChara_801fcd24;
  * PAL Address: 80073ad4
  * PAL Size: 32b
  */
-void __sinit_chara_cpp(void)
+extern "C" void __sinit_chara_cpp(void)
 {
 	Chara.field0_0x0.object.base_object.object.m_id = (u32)&PTR_PTR_s_CChara_801fcd24;
 }

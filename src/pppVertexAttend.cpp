@@ -1,6 +1,28 @@
 #include "ffcc/pppVertexAttend.h"
 #include "dolphin/mtx.h"
 
+struct VertexAttendStream
+{
+    s32 sourceOffset;
+    s32 destOffset;
+};
+
+struct VertexAttendModel
+{
+    u8 pad0[0x2C];
+    Vec* vertexData;
+};
+
+struct VertexAttendEnv
+{
+    u8 pad0[0x8];
+    VertexAttendModel** modelTable;
+    u8 padC[0x4];
+    s16* vertexSetTable;
+};
+
+extern VertexAttendEnv* lbl_8032ED54;
+
 /*
  * --INFO--
  * PAL Address: 0x80064f6c
@@ -12,39 +34,28 @@
  */
 void pppVertexAttend(void* r3, void* r4, void* r5)
 {
-    s16 count = *(s16*)((u8*)r4 + 0xc);
-    if (count < 0) {
+    s16 entryIndex = *(s16*)((u8*)r4 + 0xC);
+
+    if (entryIndex < 0) {
         return;
     }
 
-    void* streamData = *(void**)((u8*)r5 + 0xc);
-    u32 sourceOffset = *(u32*)streamData + 0x80;
-    u32 destOffset = *(u32*)((u8*)streamData + 4) + 0x80;
-    u8* output = (u8*)r3 + destOffset;
-
-    extern void* lbl_8032ED54;
-    u8* tableA = *(u8**)((u8*)lbl_8032ED54 + 0x10);
-    u8* entry = tableA + (count << 3);
-    s16 modelIndex = *(s16*)entry;
-
-    u8* tableB = *(u8**)((u8*)lbl_8032ED54 + 8);
-    u8* model = *(u8**)(tableB + (modelIndex << 2));
-    u8* vertexData = *(u8**)(model + 0x2c);
-
-    u16 sourceIndex = *(u16*)((u8*)r3 + sourceOffset);
-    u8* indexTable = *(u8**)((u8*)streamData + 4);
-    u16 vertexIndex = *(u16*)(indexTable + (sourceIndex << 1));
-    u8* vertex = vertexData + (vertexIndex * 12);
-
+    VertexAttendStream* stream = *(VertexAttendStream**)((u8*)r5 + 0xC);
     Vec transformed;
-    transformed.x = *(f32*)(vertex + 0);
-    transformed.y = *(f32*)(vertex + 4);
-    transformed.z = *(f32*)(vertex + 8);
+    s16 modelIndex = *(s16*)((u8*)lbl_8032ED54->vertexSetTable + (entryIndex << 3));
+    u16 sourceIndex = *(u16*)((u8*)r3 + stream->sourceOffset + 0x80);
+    u16 vertexIndex = *(u16*)((u8*)stream->destOffset + (sourceIndex << 1));
+    Vec* sourceVertex = (Vec*)((u8*)lbl_8032ED54->modelTable[modelIndex]->vertexData + (vertexIndex * 0xC));
+    u8* output = (u8*)r3 + stream->destOffset;
+
+    transformed.x = sourceVertex->x;
+    transformed.y = sourceVertex->y;
+    transformed.z = sourceVertex->z;
 
     Mtx* mtx = (Mtx*)((u8*)*(void**)((u8*)r3 + 4) + 0x10);
     PSMTXMultVec(*mtx, &transformed, &transformed);
 
-    *(f32*)(output + 0) = transformed.x;
-    *(f32*)(output + 4) = transformed.y;
-    *(f32*)(output + 8) = transformed.z;
+    *(f32*)((u8*)output + 0x80) = transformed.x;
+    *(f32*)((u8*)output + 0x84) = transformed.y;
+    *(f32*)((u8*)output + 0x88) = transformed.z;
 }

@@ -6,7 +6,7 @@ struct RedStreamDATA;
 void _SearchEmptyStreamData();
 void _StreamStop(RedStreamDATA*);
 int _ArrangeStreamDataNoLoop(RedStreamDATA*, int, int);
-int _ArrangeStreamDataLoop(RedStreamDATA*, unsigned int, int);
+int _ArrangeStreamDataLoop(RedStreamDATA*, int, int);
 
 void StreamStop(int);
 void StreamPlay(int, void*, int, int, int);

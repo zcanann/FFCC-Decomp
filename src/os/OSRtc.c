@@ -321,9 +321,6 @@ u32 OSGetProgressiveMode(void) {
 }
 
 void OSSetProgressiveMode(u32 on) {
-#ifndef DEBUG
-    u32 padding[1];
-#endif
     OSSram* sram;
 
     ASSERTLINE(670, on == OS_PROGRESSIVE_MODE_OFF || on == OS_PROGRESSIVE_MODE_ON);

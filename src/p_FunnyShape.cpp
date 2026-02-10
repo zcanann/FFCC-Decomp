@@ -1,9 +1,11 @@
 #include "ffcc/p_FunnyShape.h"
 #include "ffcc/FunnyShape.h"
 #include "ffcc/USBStreamData.h"
+#include "ffcc/graphic.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_usb.h"
 #include "dolphin/gx/GXFrameBuffer.h"
+#include "dolphin/mtx.h"
 
 #include <string.h>
 
@@ -32,7 +34,11 @@ extern "C" void __dl__FPv(void* ptr);
 extern "C" void __dla__FPv(void* ptr);
 
 extern f32 lbl_8032FD14;
+extern f32 lbl_8032FD10;
+extern f32 lbl_8032FD18;
 extern f32 lbl_8032FD24;
+extern f32 lbl_8032FD28;
+extern f32 lbl_8032FD2C;
 extern CMemory Memory;
 extern CUSBPcs USBPcs;
 
@@ -246,12 +252,52 @@ void CFunnyShapePcs::calcViewer()
 
 /*
  * --INFO--
- * Address: TODO
- * Size: TODO
+ * PAL Address: 0x8004e210
+ * PAL Size: 528b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFunnyShapePcs::drawViewer()
 {
-    // TODO
+    Mtx44 ortho;
+    Mtx view;
+    Vec eye = {0.0f, 0.0f, 0.0f};
+    Vec at = {0.0f, 0.0f, 0.0f};
+    Vec up = {0.0f, 1.0f, 0.0f};
+    static char s_funnyShapeFmt[] = "FunnyShape %c";
+    static char s_spinner[] = "|/-\\";
+    static int frameCount;
+
+    C_MTXOrtho(ortho, lbl_8032FD10, lbl_8032FD14, lbl_8032FD14, lbl_8032FD10, lbl_8032FD10, lbl_8032FD18);
+    GXSetProjection(ortho, GX_ORTHOGRAPHIC);
+    C_MTXLookAt(view, reinterpret_cast<Point3d*>(&eye), &up, reinterpret_cast<Point3d*>(&at));
+    GXLoadPosMtxImm(view, GX_PNMTX0);
+
+    GXClearVtxDesc();
+    GXSetNumChans(1);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+
+    if ((Ptr(this, 0x6178)[0] & 1) != 0) {
+        FunnyShape(this)->RenderTexture();
+    }
+    if ((Ptr(this, 0x6178)[0] & 4) != 0) {
+        FunnyShape(this)->RenderShape();
+    }
+    if ((Ptr(this, 0x6178)[0] & 8) != 0) {
+        FunnyShape(this)->Render();
+    }
+
+    frameCount++;
+    if (frameCount > 100000) {
+        frameCount = 0;
+    }
+
+    GXSetViewport(lbl_8032FD24, lbl_8032FD24, lbl_8032FD28, lbl_8032FD2C, lbl_8032FD24, lbl_8032FD10);
+    Graphic.Printf(s_funnyShapeFmt, s_spinner[(frameCount >> 4) & 3]);
 }
 
 /*

@@ -93,22 +93,88 @@ void CMenuPcs::MoneyOpen()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 8015f588
+ * PAL Size: 256b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::MoneyCtrl()
 {
-	// TODO
+	int state = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c);
+	int resetAnim = 0;
+
+	*reinterpret_cast<short*>(state + 0x32) = *reinterpret_cast<short*>(state + 0x30);
+	short mode = *reinterpret_cast<short*>(state + 0x30);
+	if (mode == 0 || (mode != 0 && *reinterpret_cast<short*>(state + 0x12) == 1)) {
+		MoneyCtrlCur();
+		resetAnim = *reinterpret_cast<short*>(state + 0x1e) != 0;
+	} else if (mode == 1 && *reinterpret_cast<short*>(state + 0x12) == 0) {
+		if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 10) == 1) {
+			resetAnim = 0;
+			*reinterpret_cast<short*>(state + 0x12) = 1;
+		}
+	} else if (
+		mode == 1 && *reinterpret_cast<short*>(state + 0x12) == 2 &&
+		*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 10) == 3
+	) {
+		resetAnim = 0;
+		*reinterpret_cast<short*>(state + 0x12) = 0;
+		*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x30) = 0;
+		*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x22) = 0;
+	}
+
+	if (resetAnim != 0) {
+		int menuObj = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
+		*reinterpret_cast<float*>(menuObj + 0x18) = 1.0f;
+		*reinterpret_cast<int*>(menuObj + 0x2c) = 0;
+		*reinterpret_cast<int*>(menuObj + 0x30) = 10;
+		*reinterpret_cast<int*>(menuObj + 0x28) = 0;
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 8015f40c
+ * PAL Size: 380b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::MoneyClose()
 {
-	// TODO
+	int doneCount = 0;
+	int menuState = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c);
+
+	*reinterpret_cast<short*>(menuState + 0x22) = static_cast<short>(*reinterpret_cast<short*>(menuState + 0x22) + 1);
+	int entryCount = static_cast<int>(**reinterpret_cast<short**>(reinterpret_cast<char*>(this) + 0x850));
+	short* entry = *reinterpret_cast<short**>(reinterpret_cast<char*>(this) + 0x850) + 4;
+	int time = static_cast<int>(*reinterpret_cast<short*>(menuState + 0x22));
+	for (int i = 0; i < entryCount; ++i) {
+		if (*reinterpret_cast<int*>(entry + 0x12) <= time) {
+			int duration = *reinterpret_cast<int*>(entry + 0x14);
+			if (time < *reinterpret_cast<int*>(entry + 0x12) + duration) {
+				*reinterpret_cast<int*>(entry + 0x10) = *reinterpret_cast<int*>(entry + 0x10) + 1;
+				float t = static_cast<float>(*reinterpret_cast<int*>(entry + 0x10)) / static_cast<float>(duration);
+				*reinterpret_cast<float*>(entry + 8) = 1.0f - t;
+				if ((*reinterpret_cast<unsigned int*>(entry + 0x16) & 2) == 0) {
+					float delta = 1.0f - t;
+					*reinterpret_cast<float*>(entry + 0x18) = (*reinterpret_cast<float*>(entry + 0x1c) - static_cast<float>(*entry)) * delta;
+					*reinterpret_cast<float*>(entry + 0x1a) = (*reinterpret_cast<float*>(entry + 0x1e) - static_cast<float>(entry[1])) * delta;
+				}
+			} else {
+				doneCount += 1;
+				*reinterpret_cast<float*>(entry + 8) = 0.0f;
+				*reinterpret_cast<float*>(entry + 0x18) = 0.0f;
+				*reinterpret_cast<float*>(entry + 0x1a) = 0.0f;
+			}
+		}
+		entry += 0x20;
+	}
+
+	(void)doneCount;
 }
 
 /*

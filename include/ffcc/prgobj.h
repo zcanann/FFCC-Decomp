@@ -12,6 +12,9 @@ public:
     void onCreate();
     void onDestroy();
     void onFrame();
+    void bonus(int, int, CGPrgObj*);
+    void onFrameAlways();
+    void onFrameAlwaysAfter();
     void onCancelStat(int);
     void onChangeStat(int);
     void onFramePreCalc();

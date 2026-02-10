@@ -2,6 +2,45 @@
 
 /*
  * --INFO--
+ * PAL Address: 0x8010b67c
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGPrgObj::bonus(int, int, CGPrgObj*)
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8010b680
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGPrgObj::onFrameAlways()
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8010b684
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGPrgObj::onFrameAlwaysAfter()
+{
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

@@ -878,9 +878,9 @@ void JoyBus::ThreadMain(void* arg)
  * Address:	TODO
  * Size:	TODO
  */
-void* JoyBus::_ThreadMain(void* param)
+void JoyBus::_ThreadMain(void* param)
 {
-	return nullptr;
+    Joybus.ThreadMain(param);
 }
 
 /*
@@ -906,7 +906,7 @@ void JoyBus::ThreadInit()
 
         OSCreateThread(
             thread,
-            JoyBus::_ThreadMain,
+            (void* (*)(void*))JoyBus::_ThreadMain,
             threadParam,
             stackBase,
             sizeof(m_sendBuffer[0]),
@@ -6265,7 +6265,7 @@ void JoyBus::RestartThread()
 
         OSCreateThread(
             &jbA->m_threads[i],
-            JoyBus::_ThreadMain,
+            (void* (*)(void*))JoyBus::_ThreadMain,
             &jbB->m_threadParams[i],
             stackBase,
             sizeof(jbA->m_sendBuffer[0]),

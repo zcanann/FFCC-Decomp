@@ -72,7 +72,7 @@ public:
     void ReleaseSem(int portIndex);
 
     void ThreadMain(void* arg);
-    static void* _ThreadMain(void* arg);
+    static void _ThreadMain(void* arg);
     void ThreadInit();
     void ThreadSleep(long long);
 

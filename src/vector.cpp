@@ -42,9 +42,9 @@ CVector::CVector(const Vec& vec)
  */
 void CVector::Identity()
 {
-	this->x = 0.0f;
-	this->y = 0.0f;
 	this->z = 0.0f;
+	this->y = 0.0f;
+	this->x = 0.0f;
 }
 
 /*

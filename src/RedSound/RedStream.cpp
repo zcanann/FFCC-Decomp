@@ -88,7 +88,7 @@ int _ArrangeStreamDataNoLoop(RedStreamDATA* param_1, int param_2, int param_3)
  * Address:	801cbc6c
  * Size:	856b
  */
-int _ArrangeStreamDataLoop(RedStreamDATA* param_1, unsigned int param_2, int param_3)
+int _ArrangeStreamDataLoop(RedStreamDATA* param_1, int param_2, int param_3)
 {
 	unsigned int* puVar1;
 	unsigned int* puVar3;

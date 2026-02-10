@@ -301,34 +301,23 @@ void CFile::BackAllFilesToQueue(CHandle* fileHandle)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800137b0
+ * PAL Size: 192b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFile::Read(CFile::CHandle* fileHandle)
 {
 	BackAllFilesToQueue(fileHandle);
-
 	fileHandle->m_completionStatus = 2;
-
-	u32 readSize = fileHandle->m_chunkSize;
-
-	// align to 0x20
-	readSize = (readSize + 0x1FU) & ~0x1FU;
-
-	if (readSize > 0x100000U) // && System._4700_4_ != 0
+	u32 readSize = (fileHandle->m_chunkSize + 0x1FU) & ~0x1FU;
+	if (readSize > 0x100000U && System.m_execParam != 0)
 	{
-		// Printf(&System, &DAT_801d5dcc, fileHandle->path, readSize);
+		System.Printf("", fileHandle->m_name, readSize);
 	}
-
-	DVDReadAsyncPrio(
-		&fileHandle->m_dvdFileInfo,
-		m_readBuffer,
-		(s32)readSize,
-		(s32)fileHandle->m_currentOffset,
-		0,
-		2
-	);
-
+	DVDReadAsyncPrio(&fileHandle->m_dvdFileInfo, m_readBuffer, readSize, fileHandle->m_currentOffset, 0, 2);
 	fileHandle->m_nextOffset = fileHandle->m_currentOffset + readSize;
 	SyncCompleted(fileHandle);
 }

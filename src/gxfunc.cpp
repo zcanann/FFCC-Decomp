@@ -277,12 +277,13 @@ void _GXSetTevSwapMode(_GXTevStageID stage, _GXTevSwapSel rasSel, _GXTevSwapSel 
  */
 void _GXSetTevSwapModeTable(_GXTevSwapSel table, _GXTevColorChan red, _GXTevColorChan green, _GXTevColorChan blue, _GXTevColorChan alpha)
 {
-	if (s_GXSetTevSwapModeTable_Reg[table].red != red || s_GXSetTevSwapModeTable_Reg[table].green != green ||
-	    s_GXSetTevSwapModeTable_Reg[table].blue != blue || s_GXSetTevSwapModeTable_Reg[table].alpha != alpha) {
-		s_GXSetTevSwapModeTable_Reg[table].red = red;
-		s_GXSetTevSwapModeTable_Reg[table].green = green;
-		s_GXSetTevSwapModeTable_Reg[table].blue = blue;
-		s_GXSetTevSwapModeTable_Reg[table].alpha = alpha;
+	int tableOff = table * 0x10;
+	int* entry = (int*)((char*)s_GXSetTevSwapModeTable_Reg + tableOff);
+	if (entry[0] != red || entry[1] != green || entry[2] != blue || entry[3] != alpha) {
+		entry[0] = red;
+		entry[1] = green;
+		entry[2] = blue;
+		entry[3] = alpha;
 		GXSetTevSwapModeTable(table, red, green, blue, alpha);
 	}
 }

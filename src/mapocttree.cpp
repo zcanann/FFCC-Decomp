@@ -3,6 +3,7 @@
 
 extern float lbl_8032F96C;
 extern float lbl_8032F970;
+static unsigned long s_clearFlagMask;
 
 /*
  * --INFO--
@@ -149,12 +150,16 @@ void ClearLight_r(COctNode*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 8002e004
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void COctTree::ClearLight()
 {
-	// TODO
+	ClearLight_r(*(COctNode**)((unsigned char*)this + 0x4));
 }
 
 /*
@@ -189,12 +194,16 @@ void ClearShadow_r(COctNode*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 8002da1c
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void COctTree::ClearShadow()
 {
-	// TODO
+	ClearShadow_r(*(COctNode**)((unsigned char*)this + 0x4));
 }
 
 /*
@@ -239,12 +248,17 @@ void ClearFlag_r(COctNode*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 8002d2dc
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void COctTree::ClearFlag(unsigned long)
+void COctTree::ClearFlag(unsigned long flag)
 {
-	// TODO
+	s_clearFlagMask = ~flag;
+	ClearFlag_r(*(COctNode**)((unsigned char*)this + 0x4));
 }
 
 /*

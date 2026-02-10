@@ -15,6 +15,8 @@ public:
     void bonus(int, int, CGPrgObj*);
     void onFrameAlways();
     void onFrameAlwaysAfter();
+    void onDamaged(CGPrgObj*);
+    void onAttacked(CGPrgObj*);
     void onCancelStat(int);
     void onChangeStat(int);
     void onFramePreCalc();

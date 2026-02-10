@@ -19,7 +19,8 @@ void pppKeShpTail(void* obj, void* param_2)
 		return;
 	}
 
-	u32 serializedOffset = **(u32**)((u8*)param_2 + 0xc);
+	int serializedOffset = **(int**)((u8*)param_2 + 0xc);
+	u8* tail = (u8*)obj + serializedOffset + 0x80;
 	if (*(u32*)((u8*)obj + 0xc) == 0) {
 		Vec local_14;
 		Vec local_30;
@@ -28,17 +29,17 @@ void pppKeShpTail(void* obj, void* param_2)
 		local_14.z = *(f32*)((u8*)obj + 0x3c);
 		pppCopyVector(local_30, local_14);
 
-		u8* tail = (u8*)obj + serializedOffset + 0x80;
 		u8 count = tail[0];
-		u8* tailVec = tail + 8;
-		while (count != 0) {
-			pppCopyVector(*(Vec*)tailVec, local_30);
-			tailVec += 0xc;
-			count--;
+		Vec* tailVec = (Vec*)(tail + 8);
+		if (count != 0) {
+			do {
+				pppCopyVector(*tailVec, local_30);
+				tailVec++;
+				count--;
+			} while (count != 0);
 		}
 	}
 
-	u8* tail = (u8*)obj + serializedOffset + 0x80;
 	if (tail[1] == 0) {
 		tail[1] = tail[0];
 	}

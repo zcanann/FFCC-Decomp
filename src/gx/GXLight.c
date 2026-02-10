@@ -525,8 +525,10 @@ void GXSetNumChans(u8 nChans) {
     CHECK_GXBEGIN(857, "GXSetNumChans");
     ASSERTMSGLINE(858, nChans <= 2, "GXSetNumChans: nChans > 2");
 
-    SET_REG_FIELD(860, __GXData->genMode, 3, 4, nChans);
-    GX_WRITE_XF_REG(9, nChans);
+    __GXData->genMode = (__GXData->genMode & ~0x70) | ((u32)(nChans & 0xFF) << 4);
+    GX_WRITE_U8(0x10);
+    GX_WRITE_U32(0x1009);
+    GX_WRITE_U32(nChans & 0xFF);
     __GXData->dirtyState |= 4;
 }
 

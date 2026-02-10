@@ -2,7 +2,7 @@
 #include "ffcc/math.h"
 #include "types.h"
 
-extern CMath math;
+extern CMath math[];
 extern s32 lbl_8032ED70;
 extern f32 lbl_8032FEF8;
 extern f64 lbl_8032FF00;
@@ -43,11 +43,11 @@ extern "C" void pppRandChar(void* param1, void* param2, void* param3)
 
     s32 state = *(s32*)(base + 0xC);
     if (state == 0) {
-        f32 value = RandF__5CMathFv(&math);
+        f32 value = RandF__5CMathFv(math);
         if (in->randomTwice != 0) {
-            value = value + RandF__5CMathFv(&math);
+            value += RandF__5CMathFv(math);
         } else {
-            value = value * lbl_8032FEF8;
+            value *= lbl_8032FEF8;
         }
 
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
@@ -77,12 +77,9 @@ extern "C" void pppRandChar(void* param1, void* param2, void* param3)
     u8 current = *target;
     cvt.parts.hi = 0x43300000;
     cvt.parts.lo = in->scale;
-    f64 scaleAsDouble = cvt.d - lbl_8032FF00;
-
-    cvt.parts.hi = 0x43300000;
+    f64 scaled = cvt.d - lbl_8032FF00;
     cvt.parts.lo = current;
-    f64 currentAsDouble = cvt.d - lbl_8032FF00;
 
-    s32 delta = (s32)(scaleAsDouble * *valuePtr - currentAsDouble);
+    s32 delta = (s32)(scaled * *valuePtr - (cvt.d - lbl_8032FF00));
     *target = (u8)(current + delta);
 }

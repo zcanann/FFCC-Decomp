@@ -11,17 +11,6 @@ extern double DOUBLE_8032fce8;
 extern float FLOAT_8032fcf0;
 extern float FLOAT_8032fce0;
 
-static inline float U32ToFloatViaDouble(u32 value, double bias)
-{
-    union {
-        u64 u;
-        double d;
-    } cvt;
-
-    cvt.u = 0x4330000000000000ULL | (u64)value;
-    return (float)(cvt.d - bias);
-}
-
 class CMapMng;
 extern CMapMng MapMng;
 
@@ -36,42 +25,36 @@ extern CMapMng MapMng;
  */
 void CMapShadowInsertOctTree(CMapShadow::TARGET mapShadow, COctTree& octTree)
 {
+	CMapShadow* shadow;
+	int model;
 	u32 i;
 	u32 mapShadowCount;
-	CPtrArray<CMapShadow>* mapShadowArray;
+	Vec pos;
+	CBound* bound;
 
 	octTree.ClearShadow();
+	if (*(u32*)(*(u32*)((char*)&octTree + 0x8) + 0x3c) != 0) {
+		i = 0;
+		while (true) {
+			mapShadowCount = ((CPtrArray<CMapShadow>*)((char*)&MapMng + 0x21434))->GetSize();
+			if (mapShadowCount <= i) {
+				break;
+			}
 
-	if (*(u32*)(*(u32*)((char*)&octTree + 0x8) + 0x3c) == 0) {
-		return;
-	}
-
-	mapShadowArray = (CPtrArray<CMapShadow>*)((char*)&MapMng + 0x21434);
-	i = 0;
-	while (true) {
-		mapShadowCount = mapShadowArray->GetSize();
-		if (i >= mapShadowCount) {
-			break;
-		}
-
-		CMapShadow* shadow;
-		if ((*(u32*)(*(u32*)((char*)&octTree + 0x8) + 0x3c) & (1U << i)) != 0) {
-			shadow = (*mapShadowArray)[i];
-			if ((*((u8*)mapShadow + (u32)shadow + 0xf0) != 0) && (*(u8*)((char*)shadow + 0x7) == 0)) {
-				int model = *(int*)((char*)shadow + 0xc);
-				Vec pos;
-				CBound* bound;
-
+			if (((*(u32*)(*(u32*)((char*)&octTree + 0x8) + 0x3c) & (1U << i)) != 0)
+			    && ((shadow = (*(CPtrArray<CMapShadow>*)((char*)&MapMng + 0x21434))[i]),
+			        (*((char*)shadow + (int)mapShadow + 0xf0) != 0))
+			    && (*(char*)((char*)shadow + 0x7) == 0)) {
+				model = *(int*)((char*)shadow + 0xc);
 				pos.x = *(float*)(model + 0xc4);
 				pos.y = *(float*)(model + 0xd4);
 				pos.z = *(float*)(model + 0xe4);
 
-				bound = (CBound*)((char*)shadow + ((int)mapShadow * 0x18 + 0xc0));
+				bound = (CBound*)((char*)shadow + (int)mapShadow * 0x18 + 0xc0);
 				octTree.InsertShadow(i, pos, *bound);
 			}
+			i++;
 		}
-
-		i++;
 	}
 }
 
@@ -89,6 +72,10 @@ void CMapShadow::Init()
 	int iVar6;
 	u32 uVar7;
 	u32 uVar8;
+	union {
+		u64 u;
+		double d;
+	} cvt;
 
 	iVar6 = (int)(((CPtrArray<CMaterial>*)((char*)&MapMng + 8))->operator[](*(u16*)((char*)this + 4)));
 	dVar5 = DOUBLE_8032fcf8;
@@ -96,8 +83,10 @@ void CMapShadow::Init()
 	uVar8 = *(u32*)(iVar6 + 100);
 	uVar7 = *(u32*)(iVar6 + 0x68);
 	*((char*)this + 7) = (char)*(u32*)(iVar6 + 0x6c);
-	fVar1 = U32ToFloatViaDouble(uVar8, dVar5);
-	fVar2 = U32ToFloatViaDouble(uVar7, dVar5);
+	cvt.u = 0x4330000000000000ULL | (u64)uVar8;
+	fVar1 = (float)(cvt.d - dVar5);
+	cvt.u = 0x4330000000000000ULL | (u64)uVar7;
+	fVar2 = (float)(cvt.d - dVar5);
 	fVar3 = *(float*)((char*)this + 0xa8);
 	if (*((char*)this + 6) == 0) {
 		C_MTXLightOrtho((MtxPtr)((char*)this + 0x48), -fVar2, fVar2, -fVar1, fVar1,

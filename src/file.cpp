@@ -700,3 +700,18 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
     Sound.PauseDiscError(0);
     m_isDiskError = 0;
 }
+
+/*
+ * --INFO--
+ * PAL Address: 0x80013d50
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_file_cpp(void)
+{
+    extern void* __vt__5CFile[];
+    *(void**)&File = __vt__5CFile;
+}

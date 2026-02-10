@@ -912,46 +912,73 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80141550
+ * PAL Size: 468b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 {
-	unsigned char polygonGroup = 0;
-	unsigned long mask = static_cast<unsigned long>(hitAttributeMask);
-
-	if ((DbgMenuPcs.GetDbgFlag() & 1) != 0)
+	if ((DbgMenuPcs.GetDbgFlag() & 1) == 0)
 	{
-		mask = m_hitAttributeMask;
+		CVector bottom(kPolyGroupBaseX, kPolyGroupBaseY, kPolyGroupBaseZ);
+		CVector top(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z);
+		CMapCylinder cyl;
+
+		cyl.m_bottom.x = top.x;
+		cyl.m_bottom.y = top.y;
+		cyl.m_bottom.z = top.z;
+		cyl.m_direction.x = bottom.x;
+		cyl.m_direction.y = bottom.y;
+		cyl.m_direction.z = bottom.z;
+		cyl.m_radius = kPolyGroupBaseZ;
+		cyl.m_height = kPolyGroupAabbMax;
+		cyl.m_top.x = kPolyGroupAabbMax;
+		cyl.m_top.y = kPolyGroupAabbMax;
+		cyl.m_top.z = kPolyGroupAabbMax;
+		cyl.m_direction2.x = kPolyGroupAabbMin;
+		cyl.m_direction2.y = kPolyGroupAabbMin;
+		cyl.m_direction2.z = kPolyGroupAabbMin;
+		cyl.m_radius2 = 0.0f;
+		cyl.m_height2 = 0.0f;
+
+		if (MapMng.CheckHitCylinderNear(&cyl, reinterpret_cast<Vec*>(&bottom), static_cast<unsigned long>(hitAttributeMask)) != 0)
+		{
+			return lbl_8032EC90[0x47];
+		}
+	}
+	else
+	{
+		CVector bottom(kPolyGroupBaseX, kPolyGroupBaseY, kPolyGroupBaseZ);
+		CVector top(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z);
+		CMapCylinder cyl;
+
+		cyl.m_bottom.x = top.x;
+		cyl.m_bottom.y = top.y;
+		cyl.m_bottom.z = top.z;
+		cyl.m_direction.x = bottom.x;
+		cyl.m_direction.y = bottom.y;
+		cyl.m_direction.z = bottom.z;
+		cyl.m_radius = kPolyGroupBaseZ;
+		cyl.m_height = kPolyGroupAabbMax;
+		cyl.m_top.x = kPolyGroupAabbMax;
+		cyl.m_top.y = kPolyGroupAabbMax;
+		cyl.m_top.z = kPolyGroupAabbMax;
+		cyl.m_direction2.x = kPolyGroupAabbMin;
+		cyl.m_direction2.y = kPolyGroupAabbMin;
+		cyl.m_direction2.z = kPolyGroupAabbMin;
+		cyl.m_radius2 = 0.0f;
+		cyl.m_height2 = 0.0f;
+
+		if (MapMng.CheckHitCylinderNear(&cyl, reinterpret_cast<Vec*>(&bottom), m_hitAttributeMask) != 0)
+		{
+			return lbl_8032EC90[0x47];
+		}
 	}
 
-	CVector bottom(kPolyGroupBaseX, kPolyGroupBaseY, kPolyGroupBaseZ);
-	CVector top(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z);
-	CMapCylinder cyl;
-
-	cyl.m_bottom.x = top.x;
-	cyl.m_bottom.y = top.y;
-	cyl.m_bottom.z = top.z;
-	cyl.m_direction.x = bottom.x;
-	cyl.m_direction.y = bottom.y;
-	cyl.m_direction.z = bottom.z;
-	cyl.m_radius = kPolyGroupBaseZ;
-	cyl.m_height = kPolyGroupAabbMax;
-	cyl.m_top.x = kPolyGroupAabbMax;
-	cyl.m_top.y = kPolyGroupAabbMax;
-	cyl.m_top.z = kPolyGroupAabbMax;
-	cyl.m_direction2.x = kPolyGroupAabbMin;
-	cyl.m_direction2.y = kPolyGroupAabbMin;
-	cyl.m_direction2.z = kPolyGroupAabbMin;
-	cyl.m_radius2 = 0.0f;
-	cyl.m_height2 = 0.0f;
-
-	if (MapMng.CheckHitCylinderNear(&cyl, reinterpret_cast<Vec*>(&bottom), mask) != 0)
-	{
-		polygonGroup = lbl_8032EC90[0x47];
-	}
-
-	return polygonGroup;
+	return 0;
 }
 
 /*

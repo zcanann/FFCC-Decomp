@@ -2,6 +2,17 @@
 #include "ffcc/memory.h"
 #include "ffcc/pppPart.h"
 
+#include <dolphin/gx.h>
+#include <math.h>
+
+extern int DAT_8032ed70;
+extern "C" unsigned int __cvt_fp2unsigned(double);
+extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+
+int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
+
+static char s_pppCrystalCpp[] = "pppCrystal.cpp";
+
 /*
  * --INFO--
  * Address:	TODO
@@ -72,42 +83,114 @@ void pppDestructCrystal(struct pppCrystal* pppCrystal, struct UnkC* param_2)
  */
 void pppFrameCrystal(struct pppCrystal* pppCrystal, struct UnkB* param_2, struct UnkC* param_3)
 {
-	float fVar1;
-	unsigned int uVar2;
-	float fVar3;
-	int iVar4;
-	int iVar5;
-	unsigned char uVar6;
-	unsigned char* puVar7;
-	int* piVar8;
-	int* piVar9;
-	unsigned int uVar10;
-	unsigned int uVar11;
-	double dVar12;
-	unsigned int local_e4;
-	
-	if (*(int*)0x8032ed70 == 0) {
-		piVar9 = (int*)((char*)pppCrystal + 8 + param_3->m_serializedDataOffsets[2]);
-		if (param_2->m_dataValIndex != 0xffff) {
-			local_e4 = 0;
-			// GetTexture call - placeholder for now
-			// GetTexture__8CMapMeshFP12CMaterialSetRi(...);
-			
-			if (param_2->m_payload[0] == '\0') {
-				if (param_2->m_initWOrk == 0xffff) {
-					return;
-				}
-				// GetTexture call - placeholder for now
-			}
-			
-			if ((param_2->m_payload[0] == '\x01') && (*piVar9 == 0)) {
-				// Memory allocation and texture setup
-				// iVar4 = pppMemAlloc__FUlPQ27CMemory6CStagePci(...);
-				// *piVar9 = iVar4;
-				// ... complex texture generation code follows
-				// DCFlushRange, GXInitTexObj calls
-			}
+	int* refractionData;
+	int* textureInfo;
+	u16 dataValIndex;
+	u16 initWork;
+	u8* payload;
+	int textureIndex;
+	int textureBase;
+	int textureSize;
+	u32 y;
+	u32 x;
+
+	if (DAT_8032ed70 != 0) {
+		return;
+	}
+
+	refractionData = (int*)((u8*)pppCrystal + param_3->m_serializedDataOffsets[2] + 8);
+	dataValIndex = *(u16*)((u8*)param_2 + 4);
+	if (dataValIndex == 0xFFFF) {
+		return;
+	}
+
+	payload = (u8*)param_2 + 0x14;
+	textureIndex = 0;
+	textureBase = GetTexture__8CMapMeshFP12CMaterialSetRi(
+		&pppEnvStPtr->m_mapMeshPtr[dataValIndex], pppEnvStPtr->m_materialSetPtr, textureIndex);
+	(void)textureBase;
+
+	if (payload[0] == 0) {
+		initWork = *(u16*)((u8*)param_2 + 8);
+		if (initWork == 0xFFFF) {
+			return;
 		}
+		GetTexture__8CMapMeshFP12CMaterialSetRi(
+			&pppEnvStPtr->m_mapMeshPtr[initWork], pppEnvStPtr->m_materialSetPtr, textureIndex);
+	}
+
+	if ((payload[0] != 1) || (refractionData[0] != 0)) {
+		return;
+	}
+
+	refractionData[0] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+		0x18, pppEnvStPtr->m_stagePtr, s_pppCrystalCpp, 0xA7);
+	if (refractionData[0] == 0) {
+		return;
+	}
+
+	textureInfo = (int*)refractionData[0];
+	textureSize = (int)GXGetTexBufferSize(0x20, 0x20, GX_TF_IA8, GX_FALSE, 0);
+	textureInfo[0] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+		textureSize, pppEnvStPtr->m_stagePtr, s_pppCrystalCpp, 0xAC);
+	textureInfo[1] = GX_TF_IA8;
+	textureInfo[2] = 0x20;
+	textureInfo[3] = 0x20;
+	textureInfo[4] = 0x100;
+	textureInfo[5] = textureSize;
+
+	if (textureInfo[0] == 0) {
+		return;
+	}
+
+	{
+		const float start = -1.0f;
+		const float step = 2.0f / (float)(textureInfo[2] - 1);
+		float yy = start;
+
+		for (y = 0; y < (u32)textureInfo[3]; ++y) {
+			float xx = start;
+			const float y2 = yy * yy;
+
+			for (x = 0; x < (u32)textureInfo[2]; ++x) {
+				float magnitude = xx * xx + y2;
+				float normal = 0.0f;
+
+				if (magnitude > 1.0f) {
+					normal = 1.0f / sqrtf(magnitude);
+				} else if (magnitude > 0.0f) {
+					normal = sqrtf(magnitude);
+				}
+
+				if (normal > 0.8f) {
+					normal = 0.8f;
+				}
+
+				{
+					const u8 nx =
+						(u8)__cvt_fp2unsigned((double)(xx * normal * 127.0f + 128.0f));
+					const u8 ny =
+						(u8)__cvt_fp2unsigned((double)(yy * normal * 127.0f + 128.0f));
+					u8* pixel = (u8*)(textureInfo[0] +
+						(y >> 2) * (textureInfo[2] & 0x1FFFFFFCU) * 8 +
+						(x & 0x1FFFFFFC) * 8 +
+						((x & 3) + (y & 3) * 4) * 2);
+
+					pixel[0] = nx;
+					pixel[1] = ny;
+				}
+				xx += step;
+			}
+			yy += step;
+		}
+	}
+
+	DCFlushRange((void*)textureInfo[0], textureInfo[5]);
+	refractionData[1] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+		0x20, pppEnvStPtr->m_stagePtr, s_pppCrystalCpp, 0xB4);
+	if (refractionData[1] != 0) {
+		GXInitTexObj((GXTexObj*)refractionData[1], (void*)textureInfo[0], (u16)textureInfo[2],
+			(u16)textureInfo[3], GX_TF_IA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
 	}
 }
 

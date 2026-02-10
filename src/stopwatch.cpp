@@ -52,7 +52,7 @@ void CStopWatch::Stop() { OSStopStopwatch(this); }
  */
 float CStopWatch::Get()
 {
-	u32* p = (u32*)&this->total;
+	volatile u32* p = (volatile u32*)&this->total;
 	u32 lo = p[0];
 	u32 hi = p[1];
 	float ticks = __cvt_sll_flt(lo, hi);

@@ -263,6 +263,7 @@ int CFile::GetLength(CFile::CHandle* fileHandle)
  * Address:	TODO
  * Size:	TODO
  */
+#pragma dont_inline on
 void CFile::BackAllFilesToQueue(CHandle* fileHandle)
 {
     CHandle* inFlight;
@@ -296,6 +297,7 @@ void CFile::BackAllFilesToQueue(CHandle* fileHandle)
         }
     }
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--

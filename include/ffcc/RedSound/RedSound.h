@@ -14,7 +14,7 @@ public:
 	void End();
 	void GetProgramTime();
 	void ReportPrint(int);
-	void ReportStandby(int);
+	int ReportStandby(int);
 
 	void DMAEntry(int, int, int, int, int, void (*)(void*), void*);
 	void DMACheck(int);
@@ -59,7 +59,7 @@ public:
 	void StreamPlayState(int);
 	void GetStreamPlayPoint(int, int*, int*);
 	void StreamStop(int);
-	void StreamPlay(void*, int, int, int);
+	int StreamPlay(void*, int, int, int);
 	void StreamVolume(int, int, int);
 	void StreamPause(int, int);
 

@@ -193,12 +193,32 @@ void CRedSound::ReportPrint(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801ccd9c
+ * PAL Size: 152b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::ReportStandby(int)
+int CRedSound::ReportStandby(int id)
 {
-	// TODO
+	int i;
+
+	if (id == 0) {
+		for (i = 0; i < 0x40; i++) {
+			if (((int*)DAT_8032e17c)[i] != 0) {
+				return 1;
+			}
+		}
+	} else {
+		for (i = 0; i < 0x40; i++) {
+			if (((int*)DAT_8032e17c)[i] == id) {
+				return 1;
+			}
+		}
+	}
+
+	return 0;
 }
 
 /*
@@ -573,12 +593,27 @@ void CRedSound::StreamStop(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd5d8
+ * PAL Size: 224b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::StreamPlay(void*, int, int, int)
+int CRedSound::StreamPlay(void* data, int param_3, int param_4, int param_5)
 {
-	// TODO
+	int id = 0;
+	char* streamData = (char*)data;
+
+	if ((streamData[0] == 'S') && (streamData[1] == 'T') && (streamData[2] == 'R')) {
+		id = GetAutoID();
+		CRedDriver_8032f4c0.StreamPlay(id, data, param_3, param_4, param_5);
+	} else if (DAT_8032f408 != 0) {
+		OSReport("[%s] %s STREAM : This data was not stream data. %s\n", "RedSound", "", "");
+		fflush(&DAT_8021d1a8);
+	}
+
+	return id;
 }
 
 /*

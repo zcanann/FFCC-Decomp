@@ -47,7 +47,7 @@ void pppUnitMatrix(pppFMATRIX& pppFMtx)
  * Address:	TODO
  * Size:	TODO
  */
-void pppRotMatrix(pppFMATRIX& dst, pppFMATRIX& src, const Vec& rot)
+void pppRotMatrix(pppFMATRIX& dst, pppFMATRIX src, Vec rot)
 {
 	pppFMATRIX Rx;
 	pppFMATRIX Ry;

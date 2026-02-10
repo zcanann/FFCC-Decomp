@@ -33,7 +33,7 @@ struct pppCVECTOR
 
 _pppMngSt* pppStopSe(_pppMngSt* pppMngSt, PPPSEST* pppSest);
 void pppUnitMatrix(pppFMATRIX& pppFMtx);
-void pppRotMatrix(pppFMATRIX&, pppFMATRIX, Vec&);
+void pppRotMatrix(pppFMATRIX&, pppFMATRIX, Vec);
 void pppApplyMatrix(Vec& destination, pppFMATRIX pppFMatrix, Vec source);
 void pppAddVector(Vec& ab, Vec a, Vec b);
 void pppScaleVectorXYZ(Vec& outVec, Vec inVec, float scale);

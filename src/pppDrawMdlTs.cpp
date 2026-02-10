@@ -122,9 +122,7 @@ void pppDrawDrawMdlTs0(_pppPObject*, PDrawMdlTs*, _pppCtrlTable*)
  */
 void pppDrawDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _pppCtrlTable* ctrl)
 {
-    // Check if texture ID is valid (not 0xffff)
-    short texId = *((short*)((char*)data + 0x4));
-    if ((texId & 0xffff0000) == 0xffff0000) {
+    if (*((int*)((char*)data + 0x4)) == -1) {
         return;
     }
     
@@ -155,7 +153,7 @@ void pppDrawDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _
     MaterialMan.SetTexScroll(texCoords[0], texCoords[3], 0.0f, 0.0f);
     
     // Set blend mode
-    pppSetBlendMode(blendMode);
+    pppSetBlendMode(*((u8*)((char*)data + 0x9)));
     
     // Draw mesh
     int meshId = *((int*)((char*)data + 0x4));

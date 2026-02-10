@@ -85,9 +85,13 @@ void __AXOutNewFrame(u32 lessDspCycles) {
 }
 
 void __AXOutAiCallback(void) {
+    OSTime time = __AXOsTime;
+
     if (__AXOutDspReady == 0) {
-        __AXOsTime = OSGetTime();
+        time = OSGetTime();
     }
+
+    __AXOsTime = time;
 
     if (__AXOutDspReady == 1) {
         __AXOutDspReady = 0;
@@ -95,12 +99,6 @@ void __AXOutAiCallback(void) {
     } else {
         __AXOutDspReady = 2;
         DSPAssertTask(&__AXDSPTask);
-    }
-
-    if (__AXOutputBufferMode == 1) {
-        AIInitDMA((u32)__AXOutBuffer[__AXAiDmaFrame], 0x280);
-        __AXAiDmaFrame++;
-        __AXAiDmaFrame %= 3;
     }
 }
 

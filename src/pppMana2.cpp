@@ -1,4 +1,8 @@
 #include "ffcc/pppMana2.h"
+#include "ffcc/graphic.h"
+#include "ffcc/pppPart.h"
+
+extern char lbl_801DC4D0[];
 
 /*
  * --INFO--
@@ -42,12 +46,21 @@ void pppFrameMana2(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80107e48
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppRenderMana2(void)
 {
-	// TODO
+    Graphic.Printf(lbl_801DC4D0);
+    GXSetNumTevStages(1);
+    GXSetNumTexGens(1);
+    GXSetNumChans(1);
+    Graphic.SetViewport();
+    pppInitBlendMode();
 }
 
 /*

@@ -3,6 +3,37 @@
 #include "ffcc/partyobj.h"
 #include "ffcc/system.h"
 #include "ffcc/vector.h"
+#include "ffcc/p_dbgmenu.h"
+
+extern "C" {
+void Quit__12CFlatRuntimeFv(void*);
+void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
+void Quit__11CDbgMenuPcsFv(void*);
+void Quit__6CMcPcsFv(void*);
+void Quit__7CGbaPcsFv(void*);
+void Quit__8CMenuPcsFv(void*);
+void Quit__7CUSBPcsFv(void*);
+void Quit__6CCharaFv(void*);
+void Quit__9CCharaPcsFv(void*);
+void Quit__9CLightPcsFv(void*);
+void Quit__7CMapPcsFv(void*);
+void Quit__18CMaterialEditorPcsFv(void*);
+void Quit__14CFunnyShapePcsFv(void*);
+void Quit__11CGraphicPcsFv(void*);
+void Quit__10CCameraPcsFv(void*);
+unsigned char CFlat[];
+unsigned char McPcs[];
+unsigned char GbaPcs[];
+unsigned char MenuPcs[];
+unsigned char USBPcs[];
+unsigned char Chara[];
+unsigned char LightPcs[];
+unsigned char MapPcs[];
+unsigned char MaterialEditorPcs[];
+unsigned char FunnyShapePcs[];
+unsigned char GraphicsPcs[];
+unsigned char CameraPcs[];
+}
 
 static const float FLOAT_8032f688 = 1.0E+10;
 static const float FLOAT_8032f68c = -1.0E+10;
@@ -44,12 +75,35 @@ void CGame::Init()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80015f14
+ * PAL Size: 248b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::Quit()
 {
-	// TODO
+	Quit__12CFlatRuntimeFv(CFlat);
+
+	if (m_debugStage != 0) {
+		DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_debugStage);
+	}
+
+	DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_mainStage);
+	Quit__11CDbgMenuPcsFv(&DbgMenuPcs);
+	Quit__6CMcPcsFv(McPcs);
+	Quit__7CGbaPcsFv(&GbaPcs);
+	Quit__8CMenuPcsFv(MenuPcs);
+	Quit__7CUSBPcsFv(USBPcs);
+	Quit__6CCharaFv(Chara);
+	Quit__9CCharaPcsFv(&CharaPcs);
+	Quit__9CLightPcsFv(LightPcs);
+	Quit__7CMapPcsFv(MapPcs);
+	Quit__18CMaterialEditorPcsFv(MaterialEditorPcs);
+	Quit__14CFunnyShapePcsFv(FunnyShapePcs);
+	Quit__11CGraphicPcsFv(GraphicsPcs);
+	Quit__10CCameraPcsFv(&CameraPcs);
 }
 
 /*

@@ -27,15 +27,13 @@ typedef struct ShapeControlData {
     u8 _pad2[1];
     u8 blendMode;
     u8 paramE;
-    u8 _pad3[1];
-    float scale;
-    u8 _pad4[4];
     u8 param14;
+    float scale;
 } ShapeControlData;
 
 typedef struct ShapeSpecEntry {
     s16 offset;
-    s16 maxValue;
+    u16 maxValue;
     u8 flags;
 } ShapeSpecEntry;
 
@@ -78,13 +76,14 @@ void pppCalcShape(void* pppShape, void* data, void* additionalData)
 	ShapeRuntimeData* runtimeData = *(ShapeRuntimeData**)((u8*)additionalData + 0xC);
 	ShapeControlData* controlData = (ShapeControlData*)data;
 	ShapeState* shapeData = (ShapeState*)((u8*)pppShape + runtimeData->shapeDataOffset + 0x80);
+	u16 type = controlData->type;
 
-	if ((u16)controlData->type == 0xFFFF) {
+	if (type == 0xFFFF) {
 		return;
 	}
 
 	void** shapeTables = *(void***)((u8*)lbl_8032ED54 + 0xC);
-	void* shapeSpec = *(void**)((u8*)shapeTables + ((u32)controlData->type << 2));
+	void* shapeSpec = *(void**)((u8*)shapeTables + ((u32)type << 2));
 	ShapeSpecEntry* shape = (ShapeSpecEntry*)((u8*)shapeSpec + ((u32)shapeData->counter << 3) + 0x10);
 
 	shapeData->currentId = shapeData->counter;
@@ -123,13 +122,14 @@ void pppDrawShape(void* pppShape, void* data, void* additionalData)
 	ShapeControlData* controlData = (ShapeControlData*)data;
 	ShapeState* shapeData = (ShapeState*)((u8*)pppShape + runtimeData->shapeDataOffset + 0x80);
 	void* posData = (u8*)pppShape + runtimeData->posDataOffset + 0x80;
+	u16 type = controlData->type;
 
-	if ((u16)controlData->type == 0xFFFF) {
+	if (type == 0xFFFF) {
 		return;
 	}
 
 	void** shapeTables = *(void***)((u8*)lbl_8032ED54 + 0xC);
-	void* shapeSpec = *(void**)((u8*)shapeTables + ((u32)controlData->type << 2));
+	void* shapeSpec = *(void**)((u8*)shapeTables + ((u32)type << 2));
 	ShapeSpecEntry* shape = (ShapeSpecEntry*)((u8*)shapeSpec + ((u32)shapeData->currentId << 3) + 0x10);
 	void* drawShape = (u8*)shapeSpec + shape->offset;
 

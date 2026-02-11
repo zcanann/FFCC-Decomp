@@ -94,12 +94,8 @@ void CUSB::AddMessageCallback(MessageCallback callback, void* callerContext)
 {
 	CUSBCallbackEntry* callbackEntry;
 	int i;
-	int remaining;
 
-	callbackEntry = m_callbacks;
-	i = 0;
-	remaining = 8;
-	while (true)
+	for (callbackEntry = m_callbacks, i = 0; i < 8; callbackEntry++, i++)
 	{
 		if (callbackEntry->m_inUse == 0)
 		{
@@ -112,14 +108,6 @@ void CUSB::AddMessageCallback(MessageCallback callback, void* callerContext)
 		if (callbackEntry->m_callback == callback)
 		{
 			System.Printf("CUSB.AddMessageCallback: 同じ");
-			break;
-		}
-
-		i++;
-		callbackEntry++;
-		remaining--;
-		if (remaining == 0)
-		{
 			break;
 		}
 	}
@@ -137,55 +125,22 @@ void CUSB::AddMessageCallback(MessageCallback callback, void* callerContext)
  */
 void CUSB::RemoveMessageCallback(MessageCallback callback)
 {
-    if (m_callbacks[0].m_inUse && m_callbacks[0].m_callback == callback)
+    CUSBCallbackEntry* callbackEntry;
+    int i;
+
+    for (callbackEntry = m_callbacks, i = 0; i < 8; callbackEntry++, i++)
     {
-        m_callbacks[0].m_inUse = 0;
-        return;
+        if (callbackEntry->m_inUse != 0 && callbackEntry->m_callback == callback)
+        {
+            callbackEntry->m_inUse = 0;
+            break;
+        }
     }
 
-    if (m_callbacks[1].m_inUse && m_callbacks[1].m_callback == callback)
+    if (i == 8)
     {
-        m_callbacks[1].m_inUse = 0;
-        return;
+        System.Printf("RemoveMessageCallback: callback not found\n");
     }
-
-    if (m_callbacks[2].m_inUse && m_callbacks[2].m_callback == callback)
-    {
-        m_callbacks[2].m_inUse = 0;
-        return;
-    }
-
-    if (m_callbacks[3].m_inUse && m_callbacks[3].m_callback == callback)
-    {
-        m_callbacks[3].m_inUse = 0;
-        return;
-    }
-
-    if (m_callbacks[4].m_inUse && m_callbacks[4].m_callback == callback)
-    {
-        m_callbacks[4].m_inUse = 0;
-        return;
-    }
-
-    if (m_callbacks[5].m_inUse && m_callbacks[5].m_callback == callback)
-    {
-        m_callbacks[5].m_inUse = 0;
-        return;
-    }
-
-    if (m_callbacks[6].m_inUse && m_callbacks[6].m_callback == callback)
-    {
-        m_callbacks[6].m_inUse = 0;
-        return;
-    }
-
-    if (m_callbacks[7].m_inUse && m_callbacks[7].m_callback == callback)
-    {
-        m_callbacks[7].m_inUse = 0;
-        return;
-    }
-
-    System.Printf("RemoveMessageCallback: callback not found\n");
 }
 
 /*

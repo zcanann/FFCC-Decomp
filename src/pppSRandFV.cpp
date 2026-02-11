@@ -4,7 +4,7 @@
 extern CMath math;
 extern int lbl_8032ED70;
 extern float lbl_80330098;
-extern float lbl_801EADC8;
+extern float lbl_801EADC8[];
 extern "C" float RandF__5CMathFv(CMath*);
 
 /*
@@ -38,61 +38,75 @@ void randf(unsigned char)
  */
 void pppSRandFV(void* param1, void* param2, void* param3)
 {
-    int* p1 = (int*)param1;
-    int* p2 = (int*)param2;
-    int* p3 = (int*)param3;
+    struct Param {
+        int index;
+        int offset;
+        float x;
+        float y;
+        float z;
+        unsigned char _pad[4];
+        unsigned char blendTwice;
+    };
+    struct SelectInfo {
+        int _pad0;
+        int _pad1;
+        int _pad2;
+        int* offsetPtr;
+    };
+    unsigned char* self = reinterpret_cast<unsigned char*>(param1);
+    Param* cfg = reinterpret_cast<Param*>(param2);
+    SelectInfo* sel = reinterpret_cast<SelectInfo*>(param3);
+    float* randVec;
 
     if (lbl_8032ED70 != 0) {
         return;
     }
 
-    if (p1[3] == 0) {
-        int* indexPtr = *(int**)((char*)p3 + 0xC);
-        float* outVec = (float*)((char*)p1 + *indexPtr + 0x80);
-        unsigned char blendTwice = ((unsigned char*)p2)[0x18];
-        float randVal;
+    if (*reinterpret_cast<int*>(self + 0xC) == 0) {
+        randVec = reinterpret_cast<float*>(self + *sel->offsetPtr + 0x80);
+        unsigned char blendTwice = cfg->blendTwice;
+        float value;
 
-        randVal = RandF__5CMathFv(&math);
+        value = RandF__5CMathFv(&math);
         if (blendTwice != 0) {
-            randVal = randVal + RandF__5CMathFv(&math);
+            value = value + RandF__5CMathFv(&math);
         } else {
-            randVal = randVal * lbl_80330098;
+            value = value * lbl_80330098;
         }
-        outVec[0] = randVal;
+        randVec[0] = value;
 
-        randVal = RandF__5CMathFv(&math);
+        value = RandF__5CMathFv(&math);
         if (blendTwice != 0) {
-            randVal = randVal + RandF__5CMathFv(&math);
+            value = value + RandF__5CMathFv(&math);
         } else {
-            randVal = randVal * lbl_80330098;
+            value = value * lbl_80330098;
         }
-        outVec[1] = randVal;
+        randVec[1] = value;
 
-        randVal = RandF__5CMathFv(&math);
+        value = RandF__5CMathFv(&math);
         if (blendTwice != 0) {
-            randVal = randVal + RandF__5CMathFv(&math);
+            value = value + RandF__5CMathFv(&math);
         } else {
-            randVal = randVal * lbl_80330098;
+            value = value * lbl_80330098;
         }
-        outVec[2] = randVal;
+        randVec[2] = value;
         return;
     }
 
-    if (p2[0] != p1[3]) {
+    if (cfg->index != *reinterpret_cast<int*>(self + 0xC)) {
         return;
     }
 
-    int* indexPtr = *(int**)((char*)p3 + 0xC);
-    float* randomVec = (float*)((char*)p1 + *indexPtr + 0x80);
+    randVec = reinterpret_cast<float*>(self + *sel->offsetPtr + 0x80);
     float* targetVec;
 
-    if (p2[1] == -1) {
-        targetVec = &lbl_801EADC8;
+    if (cfg->offset == -1) {
+        targetVec = lbl_801EADC8;
     } else {
-        targetVec = (float*)((char*)p1 + p2[1] + 0x80);
+        targetVec = reinterpret_cast<float*>(self + cfg->offset + 0x80);
     }
 
-    targetVec[0] = targetVec[0] + (*(float*)((char*)p2 + 8) * randomVec[0] - *(float*)((char*)p2 + 8));
-    targetVec[1] = targetVec[1] + (*(float*)((char*)p2 + 0xC) * randomVec[1] - *(float*)((char*)p2 + 0xC));
-    targetVec[2] = targetVec[2] + (*(float*)((char*)p2 + 0x10) * randomVec[2] - *(float*)((char*)p2 + 0x10));
+    targetVec[0] += cfg->x * randVec[0] - cfg->x;
+    targetVec[1] += cfg->y * randVec[1] - cfg->y;
+    targetVec[2] += cfg->z * randVec[2] - cfg->z;
 }

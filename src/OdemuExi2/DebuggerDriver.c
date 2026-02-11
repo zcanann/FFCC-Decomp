@@ -164,50 +164,61 @@ static BOOL DBGReadMailbox(u32* p1) {
 #pragma dont_inline reset
 
 static BOOL DBGRead(u32 count, u32* buffer, s32 param3) {
-    BOOL total = FALSE;
-    u32* buf_p = (u32*)buffer;
-    u32 v1;
-    u32 v;
+    u32 busyFlag;
+    u32 regs;
+    u32 result;
+    u32 value;
 
-    DBGEXISelect(4);
+    value = ((count & 0x1fffc) << 8) | 0x20000000;
+    regs = __EXIRegs[10];
+    __EXIRegs[10] = (regs & 0x405) | 0xc0;
 
-    v1 = (count & 0x1fffc) << 8 | 0x20000000;
-    total |= IS_FALSE(DBGEXIImm(&v1, sizeof(v1), 1));
-    total |= IS_FALSE(DBGEXISync());
+    result = ((u32)__cntlzw(DBGEXIImm(&value, 4, TRUE))) >> 5;
+    do {
+        busyFlag = __EXIRegs[13];
+    } while (busyFlag & 1);
 
-    while (param3) {
-        total |= IS_FALSE(DBGEXIImm(&v, sizeof(v), 0));
-        total |= IS_FALSE(DBGEXISync());
-
-        *buf_p++ = v;
+    while (param3 != 0) {
+        result |= ((u32)__cntlzw(DBGEXIImm(&value, 4, FALSE))) >> 5;
+        do {
+            busyFlag = __EXIRegs[13];
+        } while (busyFlag & 1);
 
         param3 -= 4;
+        *buffer++ = value;
         if (param3 < 0) {
             param3 = 0;
         }
     }
 
-    total |= IS_FALSE(DBGEXIDeselect());
-    return IS_FALSE(total);
+    regs = __EXIRegs[10];
+    __EXIRegs[10] = regs & 0x405;
+    return ((u32)__cntlzw(result)) >> 5;
 }
 
 static BOOL DBGWrite(u32 count, void* buffer, s32 param3) {
-    BOOL total = FALSE;
-    u32* buf_p = (u32*)buffer;
-    u32 v1;
-    u32 v;
+    u32 busyFlag;
+    u32 regs;
+    u32 result;
+    u32* data;
+    u32 value;
 
-    DBGEXISelect(4);
+    value = ((count & 0x1fffc) << 8) | 0xa0000000;
+    regs = __EXIRegs[10];
+    __EXIRegs[10] = (regs & 0x405) | 0xc0;
 
-    v1 = (count & 0x1fffc) << 8 | 0xa0000000;
-    total |= IS_FALSE(DBGEXIImm(&v1, sizeof(v1), 1));
-    total |= IS_FALSE(DBGEXISync());
+    result = ((u32)__cntlzw(DBGEXIImm(&value, 4, TRUE))) >> 5;
+    do {
+        busyFlag = __EXIRegs[13];
+    } while (busyFlag & 1);
 
+    data = (u32*)buffer;
     while (param3 != 0) {
-        v = *buf_p++;
-
-        total |= IS_FALSE(DBGEXIImm(&v, sizeof(v), 1));
-        total |= IS_FALSE(DBGEXISync());
+        value = *data++;
+        result |= ((u32)__cntlzw(DBGEXIImm(&value, 4, TRUE))) >> 5;
+        do {
+            busyFlag = __EXIRegs[13];
+        } while (busyFlag & 1);
 
         param3 -= 4;
         if (param3 < 0) {
@@ -215,8 +226,9 @@ static BOOL DBGWrite(u32 count, void* buffer, s32 param3) {
         }
     }
 
-    total |= IS_FALSE(DBGEXIDeselect());
-    return IS_FALSE(total);
+    regs = __EXIRegs[10];
+    __EXIRegs[10] = regs & 0x405;
+    return ((u32)__cntlzw(result)) >> 5;
 }
 
 inline static BOOL _DBGReadStatus(u32* p1) {

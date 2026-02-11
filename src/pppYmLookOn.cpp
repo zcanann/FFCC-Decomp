@@ -21,7 +21,8 @@ void pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
  */
 void pppConstructYmLookOn(struct pppYmLookOn* pppYmLookOn, struct UnkC* param_2)
 {
-    *((int*)((char*)(&pppYmLookOn->field0_0x0[2]) + *param_2->m_serializedDataOffsets)) = 0;
+    int dataOffset = **(int**)param_2;
+    *(int*)((char*)pppYmLookOn + dataOffset + 8) = 0;
 }
 
 /*

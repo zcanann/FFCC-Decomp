@@ -19,6 +19,7 @@ extern "C" void SetVtxFmt_POS_CLR_TEX__5CUtilFv(void*);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
+extern "C" void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
 
 extern int DAT_8032ed70;
 extern int DAT_801eadc8;
@@ -148,142 +149,176 @@ void pppDestructYmTracer2(pppYmTracer2* pppYmTracer2, UnkC* param_2)
  */
 void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, UnkB* param_2, UnkC* param_3)
 {
-    YmTracer2Step* step = (YmTracer2Step*)param_2;
+    YmTracer2Step* step;
     u8* work;
     s32 colorOffset;
     bool useFallback;
-    TraceEntry* entries;
+    Vec* source;
+    Vec* pVVar10;
+    u32 i;
+    u16 maxCount;
 
     if (DAT_8032ed70 != 0) {
         return;
     }
 
+    step = (YmTracer2Step*)param_2;
+    useFallback = false;
     colorOffset = param_3->m_serializedDataOffsets[1];
     work = (u8*)pppYmTracer2 + 0x80 + *param_3->m_serializedDataOffsets;
-
     if (step->m_initWOrk == -1) {
         *(void**)(work + 0x20) = &DAT_801eadc8;
     } else {
-        *(void**)(work + 0x20) = (void*)((u8*)pppMngStPtr + step->m_stepValue);
+        *(void**)(work + 0x20) = (u8*)pppMngStPtr + step->m_stepValue;
     }
-
     if (step->m_arg3 == -1) {
         *(void**)(work + 0x24) = &DAT_801eadc8;
     } else {
-        *(void**)(work + 0x24) = (void*)((u8*)pppMngStPtr + *(s32*)step->m_payload);
+        *(void**)(work + 0x24) = (u8*)pppMngStPtr + *(s32*)step->m_payload;
     }
 
-    useFallback = false;
-    if (*(void**)(work + 0x28) == NULL) {
-        u16 maxCount = *(u16*)(step->m_payload + 4);
-        TraceEntry* it;
+    if (*(void**)(work + 0x28) == nullptr) {
+        float* pfVar6;
 
         useFallback = true;
-        *(u16*)(work + 0x30) = (u16)((u32)step->m_payload[8] / *(u16*)(step->m_payload + 6));
+        maxCount = *(u16*)(step->m_payload + 4);
+        *(u16*)(work + 0x30) = (u16)step->m_payload[8] / *(u16*)(step->m_payload + 6);
         *(void**)(work + 0x28) =
-            pppMemAlloc__FUlPQ27CMemory6CStagePci((u32)maxCount * sizeof(TraceEntry), pppEnvStPtr->m_stagePtr,
+            pppMemAlloc__FUlPQ27CMemory6CStagePci((u32)maxCount * 0x28, pppEnvStPtr->m_stagePtr,
                                                   s_pppYmTracer2_cpp_801dc4b8, 0xAD);
-
-        it = (TraceEntry*)(*(void**)(work + 0x28));
-        for (s32 i = 0; i < (s32)maxCount; i++) {
-            it->flags[0] = 0;
-            it->flags[7] = 0;
-            it->pos.x = FLOAT_80331840;
-            it->pos.y = FLOAT_80331840;
-            it->pos.z = FLOAT_80331840;
-            it->targetPos.x = FLOAT_80331840;
-            it->targetPos.y = FLOAT_80331840;
-            it->targetPos.z = FLOAT_80331840;
-            it++;
+        pfVar6 = (float*)(*(void**)(work + 0x28));
+        for (s32 iVar8 = 0; iVar8 < (s32)(u32)maxCount; iVar8++) {
+            *(u8*)(pfVar6 + 8) = 0;
+            *(u8*)((u8*)pfVar6 + 0x1f) = 0;
+            pfVar6[2] = FLOAT_80331840;
+            pfVar6[1] = FLOAT_80331840;
+            pfVar6[0] = FLOAT_80331840;
+            pfVar6[6] = FLOAT_80331840;
+            pfVar6[5] = FLOAT_80331840;
+            pfVar6[4] = FLOAT_80331840;
+            pfVar6 += 10;
         }
     }
 
-    entries = (TraceEntry*)(*(void**)(work + 0x28));
-    entries[0].flags[0] = 1;
+    source = (Vec*)(*(void**)(work + 0x28));
+    *(u8*)&source[2].z = 1;
+    pVVar10 = source;
 
-    for (u32 i = 0; i < (u32)(step->m_payload[9] + 1); i++) {
-        s32 last = *(u16*)(step->m_payload + 4) - 2;
+    for (i = 0; (s32)i < (s32)(step->m_payload[9] + 1); i++) {
+        s32 iVar8;
+        float* pfVar6;
 
-        while ((s32)i <= last) {
-            entries[last + 1].flags[0] = entries[last].flags[0];
-            pppCopyVector(entries[last + 1].pos, entries[last].pos);
-            pppCopyVector(entries[last + 1].targetPos, entries[last].targetPos);
-            entries[last + 1].flags[1] = entries[last].flags[1];
-            entries[last + 1].flags[5] = entries[last].flags[5];
-            entries[last + 1].flags[6] = entries[last].flags[6];
-            entries[last + 1].flags[7] = entries[last].flags[7];
-            last--;
+        iVar8 = *(u16*)(step->m_payload + 4) - 2;
+        pfVar6 = (float*)((u8*)source + iVar8 * 0x28);
+        for (; (s32)i <= iVar8; iVar8--) {
+            Vec local_a8;
+            Vec local_9c;
+            Vec* dest;
+
+            *(u8*)(pfVar6 + 0x12) = *(u8*)(pfVar6 + 8);
+            local_a8.x = pfVar6[0];
+            local_a8.y = pfVar6[1];
+            local_a8.z = pfVar6[2];
+            dest = (Vec*)((u8*)source + (iVar8 + 1) * 0x28);
+            pppCopyVector__FR3Vec3Vec(dest, &local_a8);
+            local_9c.x = pfVar6[4];
+            local_9c.y = pfVar6[5];
+            local_9c.z = pfVar6[6];
+            pppCopyVector__FR3Vec3Vec((Vec*)&dest[1].y, &local_9c);
+            *(u8*)(pfVar6 + 0x11) = *(u8*)(pfVar6 + 7);
+            *(u8*)((u8*)pfVar6 + 0x45) = *(u8*)((u8*)pfVar6 + 0x1d);
+            *(u8*)((u8*)pfVar6 + 0x46) = *(u8*)((u8*)pfVar6 + 0x1e);
+            *(u8*)((u8*)pfVar6 + 0x47) = *(u8*)((u8*)pfVar6 + 0x1f);
+            pfVar6 -= 10;
         }
 
         {
-            float* srcA = *(float**)(work + 0x20);
-            float* srcB = *(float**)(work + 0x24);
-            TraceEntry* entry = &entries[i];
+            float fVar2;
 
-            *(float*)(work + 0x0) = srcA[0];
-            *(float*)(work + 0x4) = srcA[1];
-            *(float*)(work + 0x8) = srcA[2];
-            entry->pos.x = srcA[0];
-            entry->pos.y = srcA[1];
-            entry->pos.z = srcA[2];
-
-            *(float*)(work + 0x10) = srcB[0];
-            *(float*)(work + 0x14) = srcB[1];
-            *(float*)(work + 0x18) = srcB[2];
-            entry->targetPos.x = srcB[0];
-            entry->targetPos.y = srcB[1];
-            entry->targetPos.z = srcB[2];
-
-            entry->flags[1] = ((u8*)pppYmTracer2)[colorOffset + 0x88];
-            entry->flags[2] = ((u8*)pppYmTracer2)[colorOffset + 0x89];
-            entry->flags[3] = ((u8*)pppYmTracer2)[colorOffset + 0x8A];
+            fVar2 = **(float**)(work + 0x20);
+            *(float*)(work + 0) = fVar2;
+            pVVar10->x = fVar2;
+            fVar2 = *(float*)(*(u32*)(work + 0x20) + 4);
+            *(float*)(work + 4) = fVar2;
+            pVVar10->y = fVar2;
+            fVar2 = *(float*)(*(u32*)(work + 0x20) + 8);
+            *(float*)(work + 8) = fVar2;
+            pVVar10->z = fVar2;
+            fVar2 = **(float**)(work + 0x24);
+            *(float*)(work + 0x10) = fVar2;
+            pVVar10[1].y = fVar2;
+            fVar2 = *(float*)(*(u32*)(work + 0x24) + 4);
+            *(float*)(work + 0x14) = fVar2;
+            pVVar10[1].z = fVar2;
+            fVar2 = *(float*)(*(u32*)(work + 0x24) + 8);
+            *(float*)(work + 0x18) = fVar2;
+            pVVar10[2].x = fVar2;
+            *(u8*)&pVVar10[2].y = ((u8*)pppYmTracer2)[colorOffset + 0x88];
+            *((u8*)&pVVar10[2].y + 1) = ((u8*)pppYmTracer2)[colorOffset + 0x89];
+            *((u8*)&pVVar10[2].y + 2) = ((u8*)pppYmTracer2)[colorOffset + 0x8A];
         }
 
         if (i == 0) {
-            Mtx tmpMtx;
-            PSMTXConcat(pppMngStPtr->m_matrix.value, *(Mtx*)((u8*)pppYmTracer2 + 4), tmpMtx);
-            PSMTXMultVec(tmpMtx, &entries[0].pos, &entries[0].pos);
-            PSMTXMultVec(tmpMtx, &entries[0].targetPos, &entries[0].targetPos);
-        } else if (!useFallback) {
-            Mtx tmpMtx;
-            u32 numer = i ^ 0x80000000;
-            u32 denom = (u32)(step->m_payload[9] + 1) ^ 0x80000000;
-            float t = (FLOAT_80331860 / (float)((double)((u64)0x4330000000000000ULL | denom) - DOUBLE_80331858)) *
-                      (float)((double)((u64)0x4330000000000000ULL | numer) - DOUBLE_80331858);
+            Mtx MStack_78;
 
-            if (GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(t, pppMngStPtr, tmpMtx) == 0) {
+            PSMTXConcat(pppMngStPtr->m_matrix.value, *(Mtx*)((u8*)pppYmTracer2 + 4), MStack_78);
+            PSMTXMultVec(MStack_78, source, source);
+            PSMTXMultVec(MStack_78, (Vec*)&source[1].y, (Vec*)&source[1].y);
+        } else if (!useFallback) {
+            Mtx MStack_78;
+            u32 uStack_44;
+            u32 uStack_3c;
+            float t;
+
+            uStack_3c = i ^ 0x80000000;
+            uStack_44 = (u32)(step->m_payload[9] + 1) ^ 0x80000000;
+            t = (FLOAT_80331860 / (float)((double)((u64)0x43300000 << 32 | uStack_44) - DOUBLE_80331858)) *
+                (float)((double)((u64)0x43300000 << 32 | uStack_3c) - DOUBLE_80331858);
+            if (GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(t, pppMngStPtr, MStack_78) == 0) {
                 useFallback = true;
             } else {
-                PSMTXConcat(tmpMtx, *(Mtx*)((u8*)pppYmTracer2 + 4), tmpMtx);
-                PSMTXMultVec(tmpMtx, &entries[i].pos, &entries[i].pos);
-                PSMTXMultVec(tmpMtx, &entries[i].targetPos, &entries[i].targetPos);
+                PSMTXConcat(MStack_78, *(Mtx*)((u8*)pppYmTracer2 + 4), MStack_78);
+                PSMTXMultVec(MStack_78, pVVar10, pVVar10);
+                PSMTXMultVec(MStack_78, (Vec*)&pVVar10[1].y, (Vec*)&pVVar10[1].y);
             }
         }
+        pVVar10 = (Vec*)&pVVar10[3].y;
     }
 
     if (useFallback) {
-        for (s32 i = 0; i < (s32)*(u16*)(step->m_payload + 4); i++) {
-            pppCopyVector(entries[i].pos, entries[0].pos);
-            pppCopyVector(entries[i].targetPos, entries[0].targetPos);
+        Vec* pVVar10_2 = source;
+
+        for (s32 iVar4 = 0; iVar4 < (s32)(u32)*(u16*)(step->m_payload + 4); iVar4++) {
+            Vec local_84;
+            Vec local_90;
+
+            local_84.x = source->x;
+            local_84.y = source->y;
+            local_84.z = source->z;
+            pppCopyVector__FR3Vec3Vec(pVVar10_2, &local_84);
+            local_90.x = source[1].y;
+            local_90.y = source[1].z;
+            local_90.z = source[2].x;
+            pppCopyVector__FR3Vec3Vec((Vec*)&pVVar10_2[1].y, &local_90);
+            pVVar10_2 = (Vec*)&pVVar10_2[3].y;
         }
     }
 
     {
-        s16 visibleCount = 0;
-        u16 maxCount = *(u16*)(step->m_payload + 4);
-        s16 stepAlpha = *(u16*)(work + 0x30);
+        s16 visibleCount;
 
-        for (s32 i = 0; i < (s32)maxCount; i++) {
-            s16 alpha = (s16)step->m_payload[8] - (s16)i * stepAlpha;
-            if (alpha < 0 || entries[i].flags[0] == 0) {
-                entries[i].flags[7] = 0;
+        visibleCount = 0;
+        for (s32 iVar4 = 0; iVar4 < (s32)(u32)*(u16*)(step->m_payload + 4); iVar4++) {
+            s16 alpha = (u16)step->m_payload[8] - (s16)iVar4 * *(s16*)(work + 0x30);
+            if (alpha < 0 || *(char*)&source[2].z == '\0') {
+                *(u8*)((u8*)&source[2].y + 3) = 0;
             } else {
-                entries[i].flags[7] = (u8)alpha;
+                *(u8*)((u8*)&source[2].y + 3) = (u8)alpha;
                 visibleCount++;
             }
+            source = (Vec*)&source[3].y;
         }
-
-        *(s16*)(work + 0x2C) = visibleCount;
+        *(s16*)(work + 0x2c) = visibleCount;
     }
 }
 

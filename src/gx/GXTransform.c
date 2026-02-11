@@ -449,6 +449,14 @@ void GXSetViewport(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz) {
 
 #pragma dont_inline on
 void GXSetViewportJitter(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz, u32 field) {
+    f32 sx;
+    f32 sy;
+    f32 sz;
+    f32 ox;
+    f32 oy;
+    f32 oz;
+    f32 zmax;
+
     CHECK_GXBEGIN(903, "GXSetViewport");  // not the correct function name
 
     if (field == 0) {
@@ -461,8 +469,27 @@ void GXSetViewportJitter(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz,
     __GXData->vpHt = ht;
     __GXData->vpNearz = nearz;
     __GXData->vpFarz = farz;
-    
-    __GXSetViewport();
+
+    sx = wd * 0.5f;
+    sy = -ht * 0.5f;
+    zmax = __GXData->zScale * farz;
+    sz = zmax - (__GXData->zScale * nearz);
+    ox = 342.0f + (left + sx);
+    oy = 342.0f + (top + (ht * 0.5f));
+    oz = zmax + __GXData->zOffset;
+
+    if (__GXData->zOffset != 0.0f) {
+        __GXSetRange(nearz, __GXData->zScale);
+    }
+
+    GX_WRITE_U8(0x10);
+    GX_WRITE_U32(0x5101A);
+    GX_WRITE_XF_REG_F(26, sx);
+    GX_WRITE_XF_REG_F(27, sy);
+    GX_WRITE_XF_REG_F(28, sz);
+    GX_WRITE_XF_REG_F(29, ox);
+    GX_WRITE_XF_REG_F(30, oy);
+    GX_WRITE_XF_REG_F(31, oz);
     __GXData->bpSentNot = 1;
 }
 

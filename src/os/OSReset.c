@@ -277,11 +277,18 @@ void OSResetSystem(BOOL reset, u32 resetCode, BOOL forceMenu) {
 }
 
 u32 OSGetResetCode() {
+    u32 code;
+
     if (*(volatile u8*)0x800030e2 != 0) {
-        return 0x80000000;
+        code = 0x80000000;
+        goto out;
     }
 
-    return *(volatile u32*)0xCC003024 >> 3;
+    code = __PIRegs[PI_RESETCODE];
+    code &= ~0x7;
+    code >>= 3;
+out:
+    return code;
 }
 
 u32 OSSetBootDol(u32 dolOffset) {

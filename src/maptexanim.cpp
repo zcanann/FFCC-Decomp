@@ -2,6 +2,10 @@
 #include "ffcc/system.h"
 
 extern "C" void Calc__11CMapTexAnimFP12CMaterialSetP11CTextureSet(CMapTexAnim*, CMaterialSet*, CTextureSet*);
+extern "C" void __dt__4CRefFv(void*, int);
+extern "C" void __dl__FPv(void*);
+extern "C" void* PTR_PTR_s_CMapTexAnimSet_801e896c;
+extern "C" void* PTR_PTR_s_CMapTexAnim_801ea9a4;
 
 namespace {
 static inline unsigned char* Ptr(void* p, unsigned int offset)
@@ -47,12 +51,33 @@ CMapTexAnimSet::CMapTexAnimSet()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800335d0
+ * PAL Size: 188b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CMapTexAnimSet::~CMapTexAnimSet()
 {
-	// TODO
+    unsigned char* const p = reinterpret_cast<unsigned char*>(this);
+    const short count = *reinterpret_cast<short*>(p + 8);
+
+    *reinterpret_cast<void**>(p) = &PTR_PTR_s_CMapTexAnimSet_801e896c;
+
+    for (int i = 0; i < count; i++) {
+        int* entry = *reinterpret_cast<int**>(p + 0xC + (i * 4));
+        if (entry != 0) {
+            const int refCount = entry[1];
+            entry[1] = refCount - 1;
+            if ((refCount - 1) == 0 && entry != 0) {
+                (*reinterpret_cast<void (**)(int*, int)>(*entry + 8))(entry, 1);
+            }
+            *reinterpret_cast<int**>(p + 0xC + (i * 4)) = 0;
+        }
+    }
+
+    __dt__4CRefFv(this, 0);
 }
 
 /*
@@ -171,10 +196,40 @@ CMapTexAnim::CMapTexAnim()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80050320
+ * PAL Size: 220b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CMapTexAnim::~CMapTexAnim()
 {
-	// TODO
+    unsigned char* const p = reinterpret_cast<unsigned char*>(this);
+
+    *reinterpret_cast<void**>(p) = &PTR_PTR_s_CMapTexAnim_801ea9a4;
+
+    __dl__FPv(*reinterpret_cast<void**>(p + 0x20));
+    *reinterpret_cast<void**>(p + 0x20) = 0;
+
+    if (this != reinterpret_cast<CMapTexAnim*>(-0x24)) {
+        if (*reinterpret_cast<void**>(p + 0x3C) != 0) {
+            __dl__FPv(*reinterpret_cast<void**>(p + 0x3C));
+            *reinterpret_cast<void**>(p + 0x3C) = 0;
+        }
+        if (*reinterpret_cast<void**>(p + 0x40) != 0) {
+            __dl__FPv(*reinterpret_cast<void**>(p + 0x40));
+            *reinterpret_cast<void**>(p + 0x40) = 0;
+        }
+        if (*reinterpret_cast<void**>(p + 0x44) != 0) {
+            __dl__FPv(*reinterpret_cast<void**>(p + 0x44));
+            *reinterpret_cast<void**>(p + 0x44) = 0;
+        }
+        if (*reinterpret_cast<void**>(p + 0x48) != 0) {
+            __dl__FPv(*reinterpret_cast<void**>(p + 0x48));
+            *reinterpret_cast<void**>(p + 0x48) = 0;
+        }
+    }
+
+    __dt__4CRefFv(this, 0);
 }

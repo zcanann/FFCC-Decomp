@@ -1,5 +1,74 @@
 #include "ffcc/partMng.h"
 
+extern "C" void __dl__FPv(void* ptr);
+
+/*
+ * --INFO--
+ * PAL Address: 0x80059220
+ * PAL Size: 24b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+pppShapeSt::pppShapeSt()
+{
+    m_refCount = 0;
+    m_inUse = 0;
+    m_animData = 0;
+    m_displayListData = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800591A4
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+pppShapeSt::~pppShapeSt()
+{
+    if (m_animData != 0) {
+        __dl__FPv(m_animData);
+        m_animData = 0;
+    }
+
+    if (m_displayListData != 0) {
+        __dl__FPv(m_displayListData);
+        m_displayListData = 0;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8005961C
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+pppModelSt::pppModelSt()
+{
+    m_refCount = 0;
+    m_isUsed = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800595C8
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+pppModelSt::~pppModelSt()
+{
+}
+
 /*
  * --INFO--
  * Address:	TODO

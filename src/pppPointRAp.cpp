@@ -31,7 +31,9 @@ static inline float pppTrigSample(s32 angle)
 void pppPointRApCon(_pppMngSt* mngSt, _pppPDataVal* dataVal)
 {
     u32* ctrlData = *(u32**)((u8*)dataVal + 0xC);
-    ((u8*)mngSt)[ctrlData[1] + 0x81] = 0;
+    u32 offset = ctrlData[1];
+    u8* state = (u8*)mngSt + offset;
+    state[0x81] = 0;
 }
 
 /*

@@ -12,11 +12,11 @@ extern "C" {
 
 void checkError();
 void _kami_DVDREAD(DVDFileInfo*, void*, long, long);
-void THPSimpleInit(void);
+s32 THPSimpleInit(s32);
 void THPSimpleQuit(void);
 s32 THPSimpleOpen(const char*);
 s32 THPSimpleClose(void);
-void THPSimpleCalcNeedMemory(void);
+s32 THPSimpleCalcNeedMemory(void);
 void THPSimpleSetBuffer(void);
 void ReadFrameAsync();
 void __THPSimpleDVDCallback(long, DVDFileInfo*);

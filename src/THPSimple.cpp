@@ -1,8 +1,10 @@
 #include "ffcc/THPSimple.h"
+#include "ffcc/file.h"
 #include "dolphin/dvd.h"
 #include "dolphin/thp/THPDraw.h"
 #include "dolphin/thp/THPFile.h"
 #include "dolphin/thp/THPInfo.h"
+#include "dolphin/thp/THPPlayer.h"
 #include <dolphin/ai.h>
 #include <dolphin/os.h>
 #include <dolphin/os/OSCache.h>
@@ -77,22 +79,73 @@ void _kami_DVDREAD(DVDFileInfo*, void*, long, long)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8010585c
+ * PAL Size: 288b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void THPSimpleInit(void)
+s32 THPSimpleInit(s32 audioMixMode)
 {
-	// TODO
+    u32 interruptState;
+    s16* workBuffer;
+
+    File.CheckQueue();
+    memset(&SimpleControl, 0, sizeof(SimpleControl));
+    LCEnable();
+
+    if (THPInit() == FALSE) {
+        return 0;
+    }
+
+    interruptState = OSDisableInterrupts();
+    lbl_8032EE4C = 0;
+    lbl_8032EE54 = (s16*)NULL;
+    lbl_8032EE58 = (s16*)NULL;
+    lbl_8032EE5C = audioMixMode;
+    lbl_8032EE50 = AIRegisterDMACallback(THPAudioMixCallback);
+
+    if ((lbl_8032EE50 == NULL) && (lbl_8032EE5C != 0)) {
+        AIRegisterDMACallback((AIDCallback)NULL);
+        OSRestoreInterrupts(interruptState);
+        return 0;
+    }
+
+    OSRestoreInterrupts(interruptState);
+
+    if (lbl_8032EE5C == 0) {
+        memset(WorkBuffer_32_, 0, 0x500);
+        DCFlushRange(WorkBuffer_32_, 0x500);
+        workBuffer = reinterpret_cast<s16*>(reinterpret_cast<u8*>(WorkBuffer_32_) + lbl_8032EE4C * 0x280);
+        AIInitDMA((u32)workBuffer, 0x280);
+        AIStartDMA();
+    }
+
+    lbl_8032EE48 = 1;
+    return 1;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80105808
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void THPSimpleQuit(void)
 {
-	// TODO
+    u32 interruptState;
+
+    LCDisable();
+    interruptState = OSDisableInterrupts();
+    if (lbl_8032EE50 != NULL) {
+        AIRegisterDMACallback(lbl_8032EE50);
+    }
+    OSRestoreInterrupts(interruptState);
+    lbl_8032EE48 = 0;
 }
 
 /*
@@ -228,12 +281,33 @@ s32 THPSimpleClose(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80105174
+ * PAL Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void THPSimpleCalcNeedMemory(void)
+s32 THPSimpleCalcNeedMemory(void)
 {
-	// TODO
+    s32 need;
+    s32 framePixels;
+
+    if (SimpleControl.isOpen == 0) {
+        return 0;
+    }
+
+    framePixels = static_cast<s32>(SimpleControl.videoInfo.mXSize * SimpleControl.videoInfo.mYSize);
+    need = ((SimpleControl.header.mBufferSize + 0x1F) * 8) & ~0xFF;
+    need += (framePixels + 0x1F) & ~0x1F;
+    need += (((u32)framePixels >> 2) + 0x1F) & ~0x1F;
+    need += (((u32)framePixels >> 2) + 0x1F) & ~0x1F;
+
+    if (SimpleControl.hasAudio != 0) {
+        need += ((SimpleControl.header.mAudioMaxSamples * 4 + 0x1F) & ~0x1F) * 3;
+    }
+
+    return need + 0x1000;
 }
 
 /*
@@ -278,22 +352,30 @@ void THPSimplePreLoad(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80104c1c
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void THPSimpleAudioStart(void)
 {
-	// TODO
+    SimpleControl.isBufferSet = 1;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80104c08
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void THPSimpleAudioStop(void)
 {
-	// TODO
+    SimpleControl.isBufferSet = 0;
 }
 
 /*

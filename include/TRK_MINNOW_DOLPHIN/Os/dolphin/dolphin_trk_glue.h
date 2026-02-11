@@ -18,11 +18,14 @@ typedef int (*DBCommWriteFunc)(const void*, size_t);
 typedef struct DBCommTable {
 	DBCommInitFunc initialize_func;
 	DBCommFunc init_interrupts_func;
+	DBCommFunc shutdown_func;
 	DBPollFunc peek_func;
 	DBCommReadFunc read_func;
 	DBCommWriteFunc write_func;
 	DBCommFunc open_func;
 	DBCommFunc close_func;
+	DBCommFunc pre_continue_func;
+	DBCommFunc post_stop_func;
 } DBCommTable;
 
 DSError TRKInitializeIntDrivenUART(u32 param_0, u32 param_1, u32 param_2,

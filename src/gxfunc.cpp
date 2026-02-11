@@ -240,10 +240,13 @@ void _GXSetAlphaCompare(_GXCompare comp0, unsigned char ref0, _GXAlphaOp op, _GX
  */
 void _GXSetTevOrder(_GXTevStageID stage, _GXTexCoordID coord, _GXTexMapID map, _GXChannelID channel)
 {
-	if (s_GXSetTevOrder_Reg[stage].coord != coord || s_GXSetTevOrder_Reg[stage].map != map || s_GXSetTevOrder_Reg[stage].channel != channel) {
-		s_GXSetTevOrder_Reg[stage].coord = coord;
-		s_GXSetTevOrder_Reg[stage].map = map;
-		s_GXSetTevOrder_Reg[stage].channel = channel;
+	int stageOff = stage * 0xC;
+	int* entry = (int*)((char*)s_GXSetTevOrder_Reg + stageOff);
+
+	if (entry[0] != coord || entry[1] != map || entry[2] != channel) {
+		entry[0] = coord;
+		entry[1] = map;
+		entry[2] = channel;
 		GXSetTevOrder(stage, coord, map, channel);
 	}
 }
@@ -259,9 +262,12 @@ void _GXSetTevOrder(_GXTevStageID stage, _GXTexCoordID coord, _GXTexMapID map, _
  */
 void _GXSetTevSwapMode(_GXTevStageID stage, _GXTevSwapSel rasSel, _GXTevSwapSel texSel)
 {
-	if (s_GXSetTevSwapMode_Reg[stage].rasSel != rasSel || s_GXSetTevSwapMode_Reg[stage].texSel != texSel) {
-		s_GXSetTevSwapMode_Reg[stage].rasSel = rasSel;
-		s_GXSetTevSwapMode_Reg[stage].texSel = texSel;
+	int stageOff = stage * 8;
+	int* entry = (int*)((char*)s_GXSetTevSwapMode_Reg + stageOff);
+
+	if (entry[0] != rasSel || entry[1] != texSel) {
+		entry[0] = rasSel;
+		entry[1] = texSel;
 		GXSetTevSwapMode(stage, rasSel, texSel);
 	}
 }

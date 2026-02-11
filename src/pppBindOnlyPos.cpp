@@ -1,7 +1,7 @@
 #include "ffcc/pppBindOnlyPos.h"
 
-extern int DAT_8032ed70;
-extern int* DAT_8032ed50;
+extern int lbl_8032ED70;
+extern int* lbl_8032ED50;
 
 /*
  * --INFO--
@@ -28,9 +28,9 @@ void pppConstructBindOnlyPos(void)
  */
 void pppFrameBindOnlyPos(void)
 {
-	if (DAT_8032ed70 != 0) {
+	if (lbl_8032ED70 != 0) {
 		return;
 	}
 
-	(void)(*(volatile unsigned int*)((char*)DAT_8032ed50 + 0xd8) == 0);
+	*(volatile unsigned int*)((char*)lbl_8032ED50 + 0xd8);
 }

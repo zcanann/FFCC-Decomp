@@ -1,6 +1,7 @@
 #include "ffcc/math.h"
 
 #include "dolphin/mtx.h"
+#include "math.h"
 #include "string.h"
 
 CMath math;
@@ -251,12 +252,86 @@ void CMath::CalcSpline(Vec*, Vec*, Vec*, Vec*, Vec*, float, float, float, float,
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001a708
+ * PAL Size: 2328b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMath::MakeSpline1Dtable(int, float*, float*, float*)
+void CMath::MakeSpline1Dtable(int count, float* x, float* y, float* outSecondDerivatives)
 {
-	// TODO
+    if (count <= 0) {
+        return;
+    }
+
+    const int n = count;
+    float* h = new float[n];
+    float* slope = new float[n];
+    float* matrix = new float[n * n];
+    float* rhs = new float[n];
+
+    for (int i = 0; i < n; ++i) {
+        h[i] = x[i + 1] - x[i];
+        slope[i] = (y[i + 1] - y[i]) / h[i];
+    }
+
+    memset(matrix, 0, sizeof(float) * n * n);
+    for (int i = 0; i < n; ++i) {
+        const int prev = (i + n - 1) % n;
+        const int next = (i + 1) % n;
+        matrix[i * n + prev] = h[prev];
+        matrix[i * n + i] = 2.0f * (h[prev] + h[i]);
+        matrix[i * n + next] = h[i];
+        rhs[i] = 6.0f * (slope[i] - slope[prev]);
+    }
+
+    for (int col = 0; col < n; ++col) {
+        int pivotRow = col;
+        float pivotAbs = fabsf(matrix[col * n + col]);
+        for (int row = col + 1; row < n; ++row) {
+            const float candAbs = fabsf(matrix[row * n + col]);
+            if (pivotAbs < candAbs) {
+                pivotAbs = candAbs;
+                pivotRow = row;
+            }
+        }
+
+        if (pivotRow != col) {
+            for (int k = col; k < n; ++k) {
+                const float tmp = matrix[col * n + k];
+                matrix[col * n + k] = matrix[pivotRow * n + k];
+                matrix[pivotRow * n + k] = tmp;
+            }
+            const float tmpRhs = rhs[col];
+            rhs[col] = rhs[pivotRow];
+            rhs[pivotRow] = tmpRhs;
+        }
+
+        const float pivot = matrix[col * n + col];
+        for (int row = col + 1; row < n; ++row) {
+            const float scale = matrix[row * n + col] / pivot;
+            matrix[row * n + col] = 0.0f;
+            for (int k = col + 1; k < n; ++k) {
+                matrix[row * n + k] -= scale * matrix[col * n + k];
+            }
+            rhs[row] -= scale * rhs[col];
+        }
+    }
+
+    for (int row = n - 1; row >= 0; --row) {
+        float value = rhs[row];
+        for (int col = row + 1; col < n; ++col) {
+            value -= matrix[row * n + col] * outSecondDerivatives[col];
+        }
+        outSecondDerivatives[row] = value / matrix[row * n + row];
+    }
+    outSecondDerivatives[n] = outSecondDerivatives[0];
+
+    delete[] rhs;
+    delete[] matrix;
+    delete[] slope;
+    delete[] h;
 }
 
 /*

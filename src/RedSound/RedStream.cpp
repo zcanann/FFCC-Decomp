@@ -3,14 +3,14 @@
 #include "ffcc/RedSound/RedExecute.h"
 #include <string.h>
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void _SearchEmptyStreamData()
-{
-	// TODO
+extern void* DAT_8032f438;
+extern int DAT_8021d1a8;
+
+extern "C" {
+void RedDelete__FPv(void*);
+void RedDeleteA__Fi(int);
+int PitchCompute__Fiiii(int, int, int, int);
+int fflush(void*);
 }
 
 /*
@@ -18,9 +18,51 @@ void _SearchEmptyStreamData()
  * Address:	TODO
  * Size:	TODO
  */
-void _StreamStop(RedStreamDATA*)
+unsigned int _SearchEmptyStreamData()
 {
-	// TODO
+	unsigned int streamData;
+
+	streamData = (unsigned int)DAT_8032f438;
+	do {
+		if (*(int*)(streamData + 0x10c) == 0) {
+			return streamData;
+		}
+		streamData += 0x130;
+	} while (streamData < (unsigned int)DAT_8032f438 + 0x4c0);
+
+	return 0;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+void _StreamStop(RedStreamDATA* streamData)
+{
+	fflush(&DAT_8021d1a8);
+	if (*(int*)((int)streamData + 0x10c) != 0) {
+		*(int*)((int)streamData + 0x10c) = 0;
+		*(int*)((int)streamData + 0x110) = 0;
+		if (*(int*)((int)streamData + 0xc) != 0) {
+			RedDelete__FPv((void*)*(int*)((int)streamData + 0xc));
+			*(int*)((int)streamData + 0xc) = 0;
+		}
+		if (*(int*)((int)streamData + 0x12c) != 0) {
+			RedDeleteA__Fi(*(int*)((int)streamData + 0x12c));
+			*(int*)((int)streamData + 0x12c) = 0;
+		}
+		*(unsigned int*)(*(int*)((int)streamData + 4) + 0x90) |= 2;
+		*(unsigned char*)(*(int*)((int)streamData + 0) + 0x26) &= 0xfd;
+		*(unsigned char*)(*(int*)((int)streamData + 4) + 0x1a) &= 0xfd;
+		*(int*)(*(int*)((int)streamData + 4) + 0x8c) = 0;
+		if (*(short*)((int)streamData + 0x2a) == 2) {
+			*(unsigned int*)(*(int*)((int)streamData + 4) + 0x150) |= 2;
+			*(unsigned char*)(*(int*)((int)streamData + 0) + 0x17a) &= 0xfd;
+			*(unsigned char*)(*(int*)((int)streamData + 4) + 0xda) &= 0xfd;
+			*(int*)(*(int*)((int)streamData + 4) + 0x14c) = 0;
+		}
+	}
 }
 
 /*
@@ -207,7 +249,7 @@ int _ArrangeStreamDataLoop(RedStreamDATA* param_1, int param_2, int param_3)
  * Address:	TODO
  * Size:	TODO
  */
-void StreamStop(int)
+void StreamStop(int param_1)
 {
 	// TODO
 }
@@ -227,9 +269,37 @@ void StreamPlay(int, void*, int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void SetStreamVolume(int, int, int)
+void SetStreamVolume(int param_1, int param_2, int param_3)
 {
-	// TODO
+	int iVar1;
+	unsigned int streamData;
+
+	if (param_3 < 1) {
+		iVar1 = 1;
+	} else {
+		iVar1 = (param_3 * 200) / 0x3c + (param_3 * 200 >> 0x1f);
+		iVar1 -= (iVar1 >> 0x1f);
+	}
+	param_2 &= 0x7f;
+	streamData = (unsigned int)DAT_8032f438;
+	if (param_2 != 0) {
+		param_2 = ((param_2 + 1) * 0x100 - 1) * 0x1000 | 0x800;
+	}
+
+	do {
+		if ((*(int*)(streamData + 0x10c) != 0) &&
+		    ((param_1 == -1) || (param_1 == *(int*)(streamData + 0x10c)))) {
+			if (iVar1 < 1) {
+				*(unsigned int*)(streamData + 0xf0) = (unsigned int)param_2;
+				*(int*)(streamData + 0xf8) = 0;
+			} else {
+				*(int*)(streamData + 0xf4) =
+				    (int)((unsigned int)param_2 - *(int*)(streamData + 0xf0)) / iVar1;
+				*(int*)(streamData + 0xf8) = iVar1;
+			}
+		}
+		streamData += 0x130;
+	} while (streamData < (unsigned int)DAT_8032f438 + 0x4c0);
 }
 
 /*
@@ -237,9 +307,39 @@ void SetStreamVolume(int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void StreamPause(int, int)
+void StreamPause(int param_1, int param_2)
 {
-	// TODO
+	unsigned int streamData;
+
+	streamData = (unsigned int)DAT_8032f438;
+	do {
+		if ((*(int*)(streamData + 0x10c) != 0) &&
+		    ((param_1 == -1) || (param_1 == *(int*)(streamData + 0x10c)))) {
+			int voiceData = *(int*)(streamData + 4);
+			if (param_2 == 1) {
+				if (*(int*)(voiceData + 0x14) != 0) {
+					*(int*)(voiceData + 0x9c) = 0;
+					*(unsigned int*)(voiceData + 0x90) |= 0x10;
+					if (*(short*)(streamData + 0x2a) == 2) {
+						*(int*)(voiceData + 0x15c) = 0;
+						*(unsigned int*)(voiceData + 0x150) |= 0x10;
+					}
+				}
+			} else if (*(int*)(voiceData + 0x14) != 0) {
+				int pitch = PitchCompute__Fiiii(0x3c00000, 0, *(int*)(streamData + 0x24), 0);
+				if (*(short*)(streamData + 0x2a) == 2) {
+					*(int*)(voiceData + 0x9c) = pitch;
+					*(unsigned int*)(voiceData + 0x90) |= 0x10;
+					*(int*)(voiceData + 0x15c) = pitch;
+					*(unsigned int*)(voiceData + 0x150) |= 0x10;
+				} else {
+					*(int*)(voiceData + 0x9c) = pitch;
+					*(unsigned int*)(voiceData + 0x90) |= 0x10;
+				}
+			}
+		}
+		streamData += 0x130;
+	} while (streamData < (unsigned int)DAT_8032f438 + 0x4c0);
 }
 
 /*

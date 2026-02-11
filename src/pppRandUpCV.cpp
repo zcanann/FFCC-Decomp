@@ -5,30 +5,8 @@
 extern CMath math;
 extern s32 lbl_8032ED70;
 extern f32 lbl_8032FF08;
-extern f64 lbl_8032FF10;
 extern u8 lbl_801EADC8[32];
 extern "C" f32 RandF__5CMathFv(CMath* instance);
-
-struct RandUpCVParams {
-    s32 index;
-    s32 colorOffset;
-    s8 delta[4];
-    u8 randomTwice;
-    u8 pad[3];
-};
-
-struct RandUpCVCtx {
-    u8 _pad[0xC];
-    s32* valueOffset;
-};
-
-union RandUpCVConv {
-    f64 d;
-    struct {
-        u32 hi;
-        u32 lo;
-    } parts;
-};
 
 /*
  * --INFO--
@@ -45,44 +23,50 @@ void pppRandUpCV(void* param1, void* param2, void* param3)
         return;
     }
 
-    u8* base = (u8*)param1;
-    RandUpCVParams* in = (RandUpCVParams*)param2;
-    RandUpCVCtx* ctx = (RandUpCVCtx*)param3;
-    s32 state = *(s32*)(base + 0xC);
-
-    if (in->index == state) {
+    if (*(int*)param2 == *((int*)param1 + 3)) {
         f32 value = RandF__5CMathFv(&math);
-        if (in->randomTwice != 0) {
+        if (*((u8*)param2 + 0xC) != 0) {
             value = (value + RandF__5CMathFv(&math)) * lbl_8032FF08;
         }
-        *(f32*)(base + *ctx->valueOffset + 0x80) = value;
-    } else if (in->index != state) {
+        int valueOffset = **(int**)((char*)param3 + 0xC);
+        *(f32*)((char*)param1 + valueOffset + 0x80) = value;
+    }
+
+    if (*(int*)param2 != *((int*)param1 + 3)) {
         return;
     }
 
-    f32 scale = *(f32*)(base + *ctx->valueOffset + 0x80);
+    int valueOffset = **(int**)((char*)param3 + 0xC);
+    f32* randomValue = (f32*)((char*)param1 + valueOffset + 0x80);
+    f32 scale = randomValue[0];
 
+    int colorOffset = *((int*)param2 + 1);
     u8* target;
-    if (in->colorOffset == -1) {
+    if (colorOffset == -1) {
         target = lbl_801EADC8;
     } else {
-        target = base + in->colorOffset + 0x80;
+        target = (u8*)((char*)param1 + colorOffset + 0x80);
     }
 
-    RandUpCVConv cvt;
-    cvt.parts.hi = 0x43300000;
+    {
+        s8 value = *(s8*)((char*)param2 + 0x8);
+        target[0] = (u8)(target[0] + (int)((f32)value * scale));
+    }
 
-    cvt.parts.lo = (u32)((s32)in->delta[0] ^ 0x8000);
-    target[0] = (u8)(target[0] + (s32)((cvt.d - lbl_8032FF10) * scale));
+    {
+        s8 value = *(s8*)((char*)param2 + 0x9);
+        target[1] = (u8)(target[1] + (int)((f32)value * scale));
+    }
 
-    cvt.parts.lo = (u32)((s32)in->delta[1] ^ 0x8000);
-    target[1] = (u8)(target[1] + (s32)((cvt.d - lbl_8032FF10) * scale));
+    {
+        s8 value = *(s8*)((char*)param2 + 0xA);
+        target[2] = (u8)(target[2] + (int)((f32)value * scale));
+    }
 
-    cvt.parts.lo = (u32)((s32)in->delta[2] ^ 0x8000);
-    target[2] = (u8)(target[2] + (s32)((cvt.d - lbl_8032FF10) * scale));
-
-    cvt.parts.lo = (u32)((s32)in->delta[3] ^ 0x8000);
-    target[3] = (u8)(target[3] + (s32)((cvt.d - lbl_8032FF10) * scale));
+    {
+        s8 value = *(s8*)((char*)param2 + 0xB);
+        target[3] = (u8)(target[3] + (int)((f32)value * scale));
+    }
 }
 
 /*

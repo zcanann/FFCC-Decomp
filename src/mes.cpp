@@ -172,11 +172,8 @@ void CMes::Draw()
  */
 void CMes::SetPosition(float x, float y)
 {
-	// Store position in data array (using offsets that might match original)
-	float* xPos = (float*)&mData[0x0C];
-	float* yPos = (float*)&mData[0x10];
-	*xPos = x;
-	*yPos = y;
+	*(float*)&mData[0x3c90] = x;
+	*(float*)&mData[0x3c94] = y;
 }
 
 /*

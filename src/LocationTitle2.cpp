@@ -9,6 +9,7 @@
 
 // External function declarations
 extern "C" int rand(void);
+extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 
 // External data references
 extern int DAT_8032ed70;
@@ -114,32 +115,130 @@ void pppDestructLocationTitle2(struct pppLocationTitle2* locationTitle, struct U
  */
 void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, struct UnkB* unkB, struct UnkC* unkC)
 {
-    int iVar1;
-    int iVar2;
-    int* piVar12;
-    
-    if (DAT_8032ed70 == 0) {
-        iVar2 = unkC->m_serializedDataOffsets[1];
-        piVar12 = (int*)((char*)locationTitle + 8 + *unkC->m_serializedDataOffsets);
-        
-        // Random function call
-        rand();
-        
-        if (unkB->m_dataValIndex != 0xffff) {
-            // Basic frame processing logic based on decomp
-            piVar12[3] = (int)((float)piVar12[3] + (float)piVar12[4]);
-            piVar12[2] = (int)((float)piVar12[2] + (float)piVar12[3]);
-            
-            if (unkB->m_initWOrk == locationTitle->pad[0]) { // field0_0x0.m_graphId
-                piVar12[2] = (int)((float)piVar12[2] + (float)unkB->m_arg3);
-                piVar12[3] = (int)((float)piVar12[3] + *(float*)unkB->m_payload);
-                piVar12[4] = (int)((float)piVar12[4] + *(float*)((u8*)unkB->m_payload + 4));
+    int colorOffset;
+    LocationTitle2Work* work;
+    u16 maxCount;
+    long* shapeTable;
+    int graphFrame;
+    u32 graphId;
+    pppFMATRIX* localMatrix;
+    const float kInterpScale = 1.0f;
+
+    if (DAT_8032ed70 != 0) {
+        return;
+    }
+
+    colorOffset = unkC->m_serializedDataOffsets[1];
+    graphId = *(u32*)locationTitle;
+    localMatrix = (pppFMATRIX*)((u8*)locationTitle + 4);
+    work = (LocationTitle2Work*)((u8*)locationTitle + 8 + *unkC->m_serializedDataOffsets);
+    rand();
+
+    if (unkB->m_dataValIndex == 0xFFFF) {
+        return;
+    }
+
+    shapeTable = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + unkB->m_dataValIndex * 4);
+    work->m_vel += work->m_acc;
+    work->m_cur += work->m_vel;
+
+    if (*(u32*)((u8*)unkB + 8) == graphId) {
+        work->m_cur += unkB->m_arg3;
+        work->m_vel += *(float*)unkB->m_payload;
+        work->m_acc += *(float*)((u8*)unkB->m_payload + 4);
+    }
+
+    maxCount = *(u16*)((u8*)&unkB->m_initWOrk + 2);
+    if (work->m_particles == 0) {
+        LocationTitle2Particle* particles;
+
+        work->m_particles = pppMemAlloc__FUlPQ27CMemory6CStagePci(
+            maxCount * sizeof(LocationTitle2Particle), pppEnvStPtr->m_stagePtr, (char*)"LocationTitle2.cpp",
+            0x70);
+        memset(work->m_particles, 0, maxCount * sizeof(LocationTitle2Particle));
+
+        particles = (LocationTitle2Particle*)work->m_particles;
+        for (u16 i = 0; i < maxCount; i++) {
+            memcpy(&particles[i].m_color, (u8*)locationTitle + 0x88 + colorOffset, 4);
+            particles[i].m_scaleX = localMatrix->value[0][0];
+            particles[i].m_scaleY = localMatrix->value[1][1];
+            particles[i].m_scaleZ = localMatrix->value[2][2];
+
+            if (*(s16*)((u8*)shapeTable + 6) != 0) {
+                particles[i].m_shape = (s16)(rand() % *(s16*)((u8*)shapeTable + 6));
+            } else {
+                particles[i].m_shape = 0;
             }
-            
-            // Memory allocation logic if needed
-            if (*piVar12 == 0) {
-                // Complex memory allocation and setup logic would go here
+        }
+    }
+
+    if (work->m_count + 1 >= maxCount) {
+        return;
+    }
+
+    graphFrame = GetGraphFrameFromId(graphId);
+    {
+        LocationTitle2Particle* particles = (LocationTitle2Particle*)work->m_particles;
+        u16 count = work->m_count;
+        pppFMATRIX resultMatrix;
+
+        pppMulMatrix(resultMatrix, pppMngStPtr->m_matrix, *localMatrix);
+
+        particles[count].m_pos.x = resultMatrix.value[0][3];
+        particles[count].m_pos.y = resultMatrix.value[1][3];
+        particles[count].m_pos.z = resultMatrix.value[2][3] + kInterpScale;
+        particles[count].m_frame = (s16)graphFrame;
+
+        if ((s16)count - 1 < 0) {
+            memcpy(&particles[count].m_color, (u8*)locationTitle + 0x88 + colorOffset, 4);
+        } else {
+            memcpy(&particles[count - 1].m_color, (u8*)locationTitle + 0x88 + colorOffset, 4);
+        }
+
+        work->m_count = count + 1;
+    }
+
+    if (work->m_count > 1) {
+        LocationTitle2Particle* particles = (LocationTitle2Particle*)work->m_particles;
+        Vec subVec;
+        Vec interp[50];
+        u16 count = work->m_count;
+        u8 stepCount = *(u8*)&unkB->m_stepValue;
+        int startIndex = count - 2;
+        int inserted = 0;
+        float inv = kInterpScale / (float)(stepCount + 1);
+
+        PSVECSubtract(&particles[count - 1].m_pos, &particles[startIndex].m_pos, &subVec);
+
+        for (u8 i = 0; i < stepCount; i++) {
+            float t = (float)(i + 1) * inv;
+            Vec scaled;
+
+            PSVECScale(&subVec, &scaled, t);
+            PSVECAdd(&particles[startIndex].m_pos, &scaled, &interp[i]);
+            inserted++;
+            work->m_count++;
+
+            if (maxCount <= work->m_count + 1) {
+                break;
             }
+        }
+
+        particles[startIndex + inserted + 1].m_pos = particles[startIndex + 1].m_pos;
+
+        for (int i = 0; i < inserted; i++) {
+            LocationTitle2Particle* dst = &particles[startIndex + i + 1];
+
+            interp[i].z += kInterpScale;
+            dst->m_pos = interp[i];
+            memcpy(&dst->m_color, (u8*)locationTitle + 0x88 + colorOffset, 4);
+            dst->m_scaleX = localMatrix->value[0][0];
+            dst->m_scaleY = localMatrix->value[1][1];
+            dst->m_scaleZ = localMatrix->value[2][2];
+            dst->m_frame = (s16)graphFrame;
+            dst->m_pad0 = 0;
+            dst->m_shape = 0;
+            dst->m_pad1 = 0;
         }
     }
 }

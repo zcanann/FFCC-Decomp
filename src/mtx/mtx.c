@@ -821,13 +821,21 @@ void C_MTXRotAxisRad(Mtx m, const Vec *axis, f32 rad)
 #ifdef GEKKO
 #define qr0 0
 
-void PSMTXRotAxisRad(register Mtx m, const Vec *axis, register f32 rad)
+/*
+ * --INFO--
+ * PAL Address: 0x80185d4c
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void __PSMTXRotAxisRadInternal(register f32 sT, register f32 cT, register Mtx m, const Vec *axis)
 {
+    register f32 rad;
     register f32 tmp0, tmp1, tmp2, tmp3, tmp4;
     register f32 tmp5, tmp6, tmp7, tmp8, tmp9;
 
-    register f32 sT;
-    register f32 cT;
     register f32 oneMinusCosT;
     register f32 zero;
     Vec axisNormalized;
@@ -835,8 +843,6 @@ void PSMTXRotAxisRad(register Mtx m, const Vec *axis, register f32 rad)
 
     zero = 0.0f;
     axisNormalizedPtr = &axisNormalized;
-    sT = sinf(rad);
-    cT = cosf(rad);
     oneMinusCosT = 1.0f - cT;
 
     PSVECNormalize(axis, axisNormalizedPtr);
@@ -871,6 +877,25 @@ void PSMTXRotAxisRad(register Mtx m, const Vec *axis, register f32 rad)
 		psq_st     tmp5, 0x28(m), 0, qr0
   }
 #endif // clang-format on
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80185dfc
+ * PAL Size: 112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void PSMTXRotAxisRad(register Mtx m, const Vec *axis, register f32 rad)
+{
+    register f32 sT;
+    register f32 cT;
+
+    sT = sinf(rad);
+    cT = cosf(rad);
+    __PSMTXRotAxisRadInternal(sT, cT, m, axis);
 }
 
 #endif

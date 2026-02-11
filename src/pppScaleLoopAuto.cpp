@@ -1,4 +1,8 @@
 #include "ffcc/pppScaleLoopAuto.h"
+#include <dolphin/types.h>
+
+extern int lbl_8032ED70;
+extern float lbl_801EC9F0[];
 
 /*
  * --INFO--
@@ -11,94 +15,81 @@
  */
 void pppScaleLoopAuto(void* arg1, void* arg2, void* arg3)
 {
-	extern int lbl_8032ED70;
-	if (lbl_8032ED70 != 0) return;
-	
-	int* arg2Data = (int*)arg2;
-	int* arg3Data0 = (int*)((int**)arg3)[0];
-	int* arg1Data = (int*)arg1;
-	
-	// Check condition for first operation
-	if (arg2Data[0] == arg1Data[3]) {
-		float* targetPtr = (float*)((char*)arg1 + (int)arg3Data0 + 0x80);
-		float* arg2Float = (float*)arg2;
-		targetPtr[0] += arg2Float[2];
-		targetPtr[1] += arg2Float[3];
-		targetPtr[2] += arg2Float[4];
-	}
-	
-	// Load scale data structure
-	int** arg3Ptrs = (int**)arg3;
-	int* scaleDataPtr = (int*)arg3Ptrs[3][0];
-	char* scaleTarget = (char*)arg1 + (int)scaleDataPtr + 0x80;
-	float* scaleData = (float*)scaleTarget;
-	
-	// Check initialization flag
-	if (scaleTarget[28] == 0) {
-		scaleTarget[28] = 1;
-		scaleData[4] = scaleData[0];
-		scaleData[5] = scaleData[1];
-		scaleData[6] = scaleData[2];
-		scaleTarget[32] = ((char*)arg2)[29];
-		scaleTarget[33] = ((char*)arg2)[30];
-		return;
-	}
-	
-	short currentAngle = *(short*)(scaleTarget + 30);
-	if (currentAngle < 90) {
-		signed char counter = scaleTarget[32];
-		if (counter <= 0) return;
-		scaleTarget[32] = counter - 1;
-		float deltaValue = scaleData[9];
-		scaleData[4] += deltaValue;
-		scaleData[5] += deltaValue;
-		scaleData[6] += deltaValue;
-		return;
-	}
-	
-	if (currentAngle < 270) {
-		signed char counter = scaleTarget[33];
-		if (counter <= 0) return;
-		scaleTarget[33] = counter - 1;
-		float deltaValue = scaleData[9];
-		scaleData[4] += deltaValue;
-		scaleData[5] += deltaValue;
-		scaleData[6] += deltaValue;
-		return;
-	}
-	
-	// Handle cycle completion
-	scaleTarget[29]++;
-	unsigned char cycleLimit = ((char*)arg2)[28];
-	signed char currentCycle = scaleTarget[29];
-	if ((unsigned char)currentCycle > cycleLimit) {
-		scaleTarget[29] = 0;
-		*(short*)(scaleTarget + 30) = 0;
-		scaleTarget[32] = ((char*)arg2)[29];
-		scaleTarget[33] = ((char*)arg2)[30];
-		return;
-	}
-	
-	// Calculate angle increment and update angle
-	int angleIncrement = 360 / (int)cycleLimit;
-	currentAngle += angleIncrement;
-	*(short*)(scaleTarget + 30) = currentAngle;
-	
-	// Advanced sine table lookup using fixed-point arithmetic
-	extern float lbl_801EC9F0[];
-	int angleScaled = currentAngle * 32768;
-	int angleNormalized = angleScaled / 360;
-	int tableLookup = (angleNormalized & 0x3FFC) >> 2;
-	float sineValue = lbl_801EC9F0[tableLookup];
-	
-	float baseScale = ((float*)arg2)[6];
-	float scaleRange = ((float*)arg2)[8];
-	float scaleFactor = baseScale * sineValue * scaleRange;
-	
-	scaleData[9] = scaleFactor;
-	scaleData[4] += scaleFactor;
-	scaleData[5] += scaleFactor;
-	scaleData[6] += scaleFactor;
+    if (lbl_8032ED70 != 0) {
+        return;
+    }
+
+    u32* ctrlA = *(u32**)arg3;
+    u32* ctrlB = *(u32**)((u8*)arg3 + 0xC);
+    u8* workA = (u8*)arg1 + ctrlA[0] + 0x80;
+    u8* workB = (u8*)arg1 + ctrlB[0] + 0x80;
+    f32* workBF = (f32*)workB;
+
+    if (*(u32*)((u8*)arg2 + 0x0) == *(u32*)((u8*)arg1 + 0xC)) {
+        *(f32*)(workA + 0x0) += *(f32*)((u8*)arg2 + 0x8);
+        *(f32*)(workA + 0x4) += *(f32*)((u8*)arg2 + 0xC);
+        *(f32*)(workA + 0x8) += *(f32*)((u8*)arg2 + 0x10);
+    }
+
+    if (workB[28] == 0) {
+        workB[28] = 1;
+        workBF[4] = workBF[0];
+        workBF[5] = workBF[1];
+        workBF[6] = workBF[2];
+        workB[32] = *((u8*)arg2 + 29);
+        workB[33] = *((u8*)arg2 + 30);
+        return;
+    }
+
+    s16 angle = *(s16*)(workB + 30);
+    if (angle < 90) {
+        s8 cnt = *(s8*)(workB + 32);
+        if (cnt <= 0) {
+            return;
+        }
+
+        *(s8*)(workB + 32) = cnt - 1;
+        workBF[4] += workBF[9];
+        workBF[5] += workBF[9];
+        workBF[6] += workBF[9];
+        return;
+    }
+
+    if (angle < 270) {
+        s8 cnt = *(s8*)(workB + 33);
+        if (cnt <= 0) {
+            return;
+        }
+
+        *(s8*)(workB + 33) = cnt - 1;
+        workBF[4] += workBF[9];
+        workBF[5] += workBF[9];
+        workBF[6] += workBF[9];
+        return;
+    }
+
+    workB[29]++;
+    if (workB[29] > *((u8*)arg2 + 28)) {
+        workB[29] = 0;
+        *(s16*)(workB + 30) = 0;
+        workB[32] = *((u8*)arg2 + 29);
+        workB[33] = *((u8*)arg2 + 30);
+        return;
+    }
+
+    angle += 360 / (s32)(*((u8*)arg2 + 28));
+    *(s16*)(workB + 30) = angle;
+
+    {
+        s32 tableAngle = (angle * 32768) / 360;
+        f32 sinVal = *(f32*)((u8*)lbl_801EC9F0 + (tableAngle & 0x3FFC));
+        f32 delta = (*(f32*)((u8*)arg2 + 24) * sinVal) * *(f32*)((u8*)arg2 + 32);
+
+        workBF[9] = delta;
+        workBF[4] += delta;
+        workBF[5] += delta;
+        workBF[6] += delta;
+    }
 }
 
 /*

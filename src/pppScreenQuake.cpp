@@ -18,17 +18,17 @@ extern int lbl_8032ED70;
 void pppConScreenQuake(pppScreenQuake *quake, UnkC *param2)
 {
 	float val = lbl_80331FC8;
-	float *data = (float *)((char *)&quake->field0_0x0 + 128 + *param2->m_serializedDataOffsets);
+	float* data = (float*)((char *)&quake->field0_0x0 + 128 + *param2->m_serializedDataOffsets);
 	
-	data[0] = val;
-	data[1] = val;
 	data[2] = val;
-	data[3] = val;
-	data[4] = val;
+	data[1] = val;
+	data[0] = val;
 	data[5] = val;
-	data[6] = val;
-	data[7] = val;
+	data[4] = val;
+	data[3] = val;
 	data[8] = val;
+	data[7] = val;
+	data[6] = val;
 }
 
 /*
@@ -43,17 +43,17 @@ void pppConScreenQuake(pppScreenQuake *quake, UnkC *param2)
 void pppCon2ScreenQuake(pppScreenQuake *quake, UnkC *param2)
 {
 	float val = lbl_80331FC8;
-	float *data = (float *)((char *)&quake->field0_0x0 + 128 + *param2->m_serializedDataOffsets);
+	float* data = (float*)((char *)&quake->field0_0x0 + 128 + *param2->m_serializedDataOffsets);
 	
-	data[0] = val;
-	data[1] = val;
 	data[2] = val;
-	data[3] = val;
-	data[4] = val;
+	data[1] = val;
+	data[0] = val;
 	data[5] = val;
-	data[6] = val;
-	data[7] = val;
+	data[4] = val;
+	data[3] = val;
 	data[8] = val;
+	data[7] = val;
+	data[6] = val;
 }
 
 /*

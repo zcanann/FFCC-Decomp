@@ -5,6 +5,8 @@ struct Vec2d {
 	float x, y;
 };
 
+CUtil DAT_8032ec70;
+
 /*
  * --INFO--
  * Address:	TODO

@@ -132,34 +132,36 @@ void CSystem::Init()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80021fb4
+ * PAL Size: 204b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CSystem::Quit()
 {
-	if (m_mapBuffer != nullptr)
-	{
-		delete[]m_mapBuffer;
-		m_mapBuffer = nullptr;
-	}
-	
-	if (m_mapStage != (CStage*)0x0)
-	{
-		// DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory,m_mapStage);
-	}
-	
-	/*
-	Quit__14CMemoryCardManFv(&MemoryCardMan);
-	Quit__8CFontManFv(&FontMan);
-	Quit__11CTextureManFv(&TextureMan);
-	Quit__12CMaterialManFv(&MaterialMan);
-	Quit__8CGraphicFv(&Graphic);
-	Quit__4CPadFv(&Pad);
-	Quit__5CFileFv(&File);
-	Quit__6CSoundFv(&Sound);
-	Quit__7CMemoryFv(&Memory);
-	Quit__5CMathFv(&Math);
-	*/
+    if (m_mapBuffer != nullptr)
+    {
+        delete[](unsigned char*)m_mapBuffer;
+        m_mapBuffer = nullptr;
+    }
+
+    if (m_mapStage != nullptr)
+    {
+        Memory.DestroyStage((CMemory::CStage*)m_mapStage);
+    }
+
+    MemoryCardMan.Quit();
+    FontMan.Quit();
+    TextureMan.Quit();
+    MaterialMan.Quit();
+    Graphic.Quit();
+    Pad.Quit();
+    File.Quit();
+    Sound.Quit();
+    Memory.Quit();
+    Math.Quit();
 }
 
 /*

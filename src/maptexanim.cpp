@@ -96,15 +96,17 @@ void CMapTexAnim::SetMapTexAnim(int, int, int)
  */
 void CMapTexAnimSet::Calc()
 {
-    int iter = reinterpret_cast<int>(this);
-    const short count = S16At(this, 0x8);
-    CMaterialSet* materialSet = *reinterpret_cast<CMaterialSet**>(Ptr(this, 0x10C));
-    CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(Ptr(this, 0x110));
+    int param_1;
+    int iVar1;
+    int iVar2;
 
-    for (int i = 0; i < count; i++) {
+    param_1 = (int)this;
+    iVar2 = param_1;
+    for (iVar1 = 0; iVar1 < *(short*)(param_1 + 8); iVar1 = iVar1 + 1) {
         Calc__11CMapTexAnimFP12CMaterialSetP11CTextureSet(
-            *reinterpret_cast<CMapTexAnim**>(iter + 0xC), materialSet, textureSet);
-        iter += 4;
+            *(CMapTexAnim**)(iVar2 + 0xC), *(CMaterialSet**)(param_1 + 0x10C),
+            *(CTextureSet**)(param_1 + 0x110));
+        iVar2 = iVar2 + 4;
     }
 }
 

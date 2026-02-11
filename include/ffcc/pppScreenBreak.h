@@ -5,6 +5,8 @@
 
 class PScreenBreak;
 class VScreenBreak;
+struct UnkB;
+struct UnkC;
 
 void SB_BeforeCalcMatrixCallback(CChara::CModel*, void*, void*);
 void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*)[4], int);
@@ -19,7 +21,7 @@ extern "C" {
 void pppConScreenBreak(void);
 void pppCon2ScreenBreak(void);
 void pppDesScreenBreak(void);
-void pppFrameScreenBreak(void);
+void pppFrameScreenBreak(PScreenBreak*, UnkB*, UnkC*);
 void pppRenderScreenBreak(void);
 
 #ifdef __cplusplus

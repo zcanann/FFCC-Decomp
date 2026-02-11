@@ -36,6 +36,29 @@ CFlatData::~CFlatData()
 
 /*
  * --INFO--
+ * PAL Address: 0x800980b4
+ * PAL Size: 292b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" CFlatData* dtor_800980B4(CFlatData* flatData, short shouldDelete)
+{
+	if (flatData != nullptr)
+	{
+		flatData->Destroy();
+		if (shouldDelete > 0)
+		{
+			operator delete(flatData);
+		}
+	}
+
+	return flatData;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80097be8
  * PAL Size: 1228b
  * EN Address: TODO

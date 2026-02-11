@@ -99,12 +99,39 @@ void CUtil::GetNoise(unsigned char)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800249ac
+ * PAL Size: 396b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CUtil::GetSplinePos(Vec&, Vec&, Vec&, Vec&, Vec&, float, float)
+void CUtil::GetSplinePos(Vec& out, Vec p0, Vec p1, Vec p2, Vec p3, float t, float scale)
 {
-	// TODO
+	Vec tan0;
+	Vec tan1;
+
+	PSVECSubtract(&p2, &p0, &tan0);
+	PSVECScale(&tan0, &tan0, scale);
+	PSVECSubtract(&p3, &p1, &tan1);
+	PSVECScale(&tan1, &tan1, scale);
+
+	float t2 = t * t;
+	float t3 = t2 * t;
+
+	extern float lbl_8032f8ac;
+	extern float lbl_8032f8b0;
+	extern float lbl_8032f8b4;
+	extern float lbl_8032f88c;
+
+	float h01 = (lbl_8032f8b4 * t3) + (lbl_8032f8b0 * t2);
+	float h00 = lbl_8032f88c + (lbl_8032f8ac * t3) - (lbl_8032f8b0 * t2);
+	float h10 = t - ((lbl_8032f8ac * t2) - t3);
+	float h11 = t3 - t2;
+
+	out.x = (h11 * tan1.x) + (h10 * tan0.x) + (h00 * p1.x) + (h01 * p2.x);
+	out.y = (h11 * tan1.y) + (h10 * tan0.y) + (h00 * p1.y) + (h01 * p2.y);
+	out.z = (h11 * tan1.z) + (h10 * tan0.z) + (h00 * p1.z) + (h01 * p2.z);
 }
 
 /*

@@ -5,6 +5,7 @@
 #include <dolphin/mtx.h>
 
 extern CPartMng PartMng;
+extern u8* lbl_8032ED50;
 
 /*
  * --INFO--
@@ -59,34 +60,34 @@ void pppDestructCallBackDistance(void)
  */
 void pppFrameCallBackDistance(pppCallBackDistance* param1, UnkB* param2, UnkC* param3)
 {
-    _pppMngSt* pppMngSt;
+    u8* pppMngSt;
     u32 graphId;
     s32 dataOffset;
     f64 distance;
-    Vec worldPos;
-    Vec particlePos;
+    Vec local_28;
+    Vec local_1c;
 
-    particlePos.x = pppMngStPtr->m_matrix.value[0][3];
+    pppMngSt = lbl_8032ED50;
+    local_1c.x = *(f32*)(pppMngSt + 0x84);
     dataOffset = *param3->m_serializedDataOffsets;
-    particlePos.y = pppMngStPtr->m_matrix.value[1][3];
-    particlePos.z = pppMngStPtr->m_matrix.value[2][3];
-    distance = (f64)PSVECDistance(&particlePos, (Vec*)((u8*)pppMngStPtr + 0x64));
-    pppMngSt = pppMngStPtr;
+    local_1c.y = *(f32*)(pppMngSt + 0x94);
+    local_1c.z = *(f32*)(pppMngSt + 0xA4);
+    distance = (f64)PSVECDistance(&local_1c, (Vec*)(pppMngSt + 0x64));
 
     if ((distance <= (double)(f32)param2->m_dataValIndex) ||
         ((double)*(f32*)((u8*)(&param1->field0_0x0 + 2) + dataOffset) <= distance)) {
-        worldPos.x = pppMngStPtr->m_matrix.value[0][3];
-        worldPos.y = pppMngStPtr->m_matrix.value[1][3];
-        worldPos.z = pppMngStPtr->m_matrix.value[2][3];
-        PSMTXMultVec(ppvWorldMatrix, &worldPos, &worldPos);
+        local_28.x = *(f32*)(pppMngSt + 0x84);
+        local_28.y = *(f32*)(pppMngSt + 0x94);
+        local_28.z = *(f32*)(pppMngSt + 0xA4);
+        PSMTXMultVec(ppvWorldMatrix, &local_28, &local_28);
 
         graphId = *(u32*)&param1->field0_0x0;
         dataOffset = ((s32)((u8*)pppMngSt - ((u8*)&PartMng + 0x2A18))) / 0x158;
-
-        Game.game.ParticleFrameCallback(dataOffset, (s32)pppMngSt->m_kind, (s32)pppMngSt->m_nodeIndex,
+        Game.game.ParticleFrameCallback(dataOffset, (s32)*(s16*)(pppMngSt + 0x74),
+                                        (s32)*(s16*)(pppMngSt + 0x76),
                                         (s32)*(s16*)&param2->m_initWOrk,
                                         ((s32)graphId >> 0xC) +
                                             (((s32)graphId < 0) && ((graphId & 0xFFF) != 0)),
-                                        &worldPos);
+                                        &local_28);
     }
 }

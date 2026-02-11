@@ -1,18 +1,34 @@
 #include "ffcc/pppYmTracer2.h"
+#include "ffcc/mapmesh.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppYmEnv.h"
+#include "ffcc/util.h"
 
+#include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" int GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(float, _pppMngSt*, Mtx);
+extern "C" void pppSetBlendMode__FUc(unsigned char);
+extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+    void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char,
+    unsigned char);
+extern "C" int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh*, CMaterialSet*, int&);
+extern "C" void SetVtxFmt_POS_CLR_TEX__5CUtilFv(void*);
+extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
+extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
+extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 
 extern int DAT_8032ed70;
 extern int DAT_801eadc8;
 extern float FLOAT_80331840;
+extern float FLOAT_80331844;
+extern float FLOAT_80331848;
 extern float FLOAT_80331860;
+extern double DOUBLE_80331850;
 extern double DOUBLE_80331858;
+extern CUtil DAT_8032ec70;
 
 static char s_pppYmTracer2_cpp_801dc4b8[] = "pppYmTracer2.cpp";
 
@@ -273,10 +289,105 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, UnkB* param_2, UnkC* param_3)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801035dc
+ * PAL Size: 984b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppRenderYmTracer2(pppYmTracer2*, UnkB*, UnkC*)
+void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, UnkB* param_2, UnkC* param_3)
 {
-	// TODO
+    YmTracer2Step* step = (YmTracer2Step*)param_2;
+    s32 dataOffset = *param_3->m_serializedDataOffsets;
+    s32 colorOffset = param_3->m_serializedDataOffsets[1];
+    TraceEntry* entries = *(TraceEntry**)((u8*)pppYmTracer2 + 0x80 + dataOffset + 0x28);
+    CMapMesh* mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[step->m_dataValIndex];
+    CTexture* texture;
+    int textureIndex;
+    u16 visibleCount;
+    float uvStep;
+    float alphaScale;
+
+    if (step->m_dataValIndex == 0xFFFF) {
+        return;
+    }
+
+    pppSetBlendMode__FUc(step->m_payload[10]);
+    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+        (void*)((u8*)pppYmTracer2 + 0x88 + colorOffset), (void*)&ppvCameraMatrix0, FLOAT_80331840, step->m_payload[0xC],
+        step->m_payload[0xB], step->m_payload[10], 0, 1, 1, 0);
+    SetVtxFmt_POS_CLR_TEX__5CUtilFv(&DAT_8032ec70);
+
+    textureIndex = 0;
+    texture = (CTexture*)GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, pppEnvStPtr->m_materialSetPtr, textureIndex);
+    if (texture == nullptr) {
+        return;
+    }
+
+    GXLoadTexObj((GXTexObj*)((u8*)texture + 0x28), GX_TEXMAP0);
+    GXSetNumChans(1);
+    GXSetNumTexGens(1);
+    GXSetNumTevStages(1);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
+    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 0);
+    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
+
+    if ((*(u8*)((u8*)texture + 0x60) == 8) || (*(u8*)((u8*)texture + 0x60) == 9)) {
+        SetUpPaletteEnv(texture);
+    }
+
+    if (step->m_payload[0xD] == 0) {
+        _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 0);
+    } else {
+        _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+    }
+
+    visibleCount = *(u16*)((u8*)pppYmTracer2 + 0x80 + dataOffset + 0x2C);
+    uvStep = FLOAT_80331844 / (float)visibleCount;
+    GXSetCullMode(GX_CULL_NONE);
+
+    if (visibleCount > 1) {
+        alphaScale = ((float)((double)((u64)0x4330000000000000ULL | (u32)((u8*)pppYmTracer2)[colorOffset + 0x8B]) -
+                               DOUBLE_80331850)) /
+                     FLOAT_80331848;
+        if (alphaScale < FLOAT_80331840) {
+            alphaScale = FLOAT_80331840;
+        }
+        if (alphaScale > FLOAT_80331844) {
+            alphaScale = FLOAT_80331844;
+        }
+
+        GXBegin((GXPrimitive)0x98, GX_VTXFMT7, (u16)(visibleCount - 1) * 4);
+        for (u16 i = 0; i < (u16)(visibleCount - 1); i++) {
+            float u0 = (float)i * uvStep;
+            float u1 = (float)(i + 1) * uvStep;
+            TraceEntry* current = &entries[i];
+            TraceEntry* next = &entries[i + 1];
+            u8 currentAlpha = (u8)(alphaScale * current->flags[7]);
+            u8 nextAlpha = (u8)(alphaScale * next->flags[7]);
+            u32 currentColor = ((u32)current->flags[1] << 24) | ((u32)current->flags[2] << 16) |
+                               ((u32)current->flags[3] << 8) | currentAlpha;
+            u32 nextColor =
+                ((u32)next->flags[1] << 24) | ((u32)next->flags[2] << 16) | ((u32)next->flags[3] << 8) | nextAlpha;
+
+            GXPosition3f32(current->targetPos.x, current->targetPos.y, current->targetPos.z);
+            GXColor1u32(currentColor);
+            GXTexCoord2f32(u0, FLOAT_80331844);
+
+            GXPosition3f32(current->pos.x, current->pos.y, current->pos.z);
+            GXColor1u32(currentColor);
+            GXTexCoord2f32(u0, FLOAT_80331840);
+
+            GXPosition3f32(next->targetPos.x, next->targetPos.y, next->targetPos.z);
+            GXColor1u32(nextColor);
+            GXTexCoord2f32(u1, FLOAT_80331844);
+
+            GXPosition3f32(next->pos.x, next->pos.y, next->pos.z);
+            GXColor1u32(nextColor);
+            GXTexCoord2f32(u1, FLOAT_80331840);
+        }
+    }
 }

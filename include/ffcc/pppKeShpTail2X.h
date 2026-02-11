@@ -9,8 +9,8 @@ extern "C" {
 
 void pppKeShpTail2X(void);
 void pppKeShpTail2XDraw(void);
-void pppKeShpTail2XCon(void);
-void pppKeShpTail2XDes(void);
+void pppKeShpTail2XCon(void*, void*);
+void pppKeShpTail2XDes(void*, void*);
 void U8ToF32(pppFVECTOR4*, unsigned char*);
 
 #ifdef __cplusplus

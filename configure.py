@@ -656,9 +656,12 @@ config.libs = [
             Object(NonMatching, "db/db.c"),
         ],
     ),
-    DolphinLib(
-        "mtx",
-        [
+    {
+        "lib": "mtx",
+        "mw_version": "GC/1.2.5n",
+        "cflags": [*cflags_base, "-DGEKKO"],
+        "progress_category": "sdk",
+        "objects": [
             Object(NonMatching, "mtx/mtx.c"),
             Object(NonMatching, "mtx/mtxvec.c"),
             Object(NonMatching, "mtx/mtx44.c"),
@@ -667,7 +670,7 @@ config.libs = [
             Object(NonMatching, "mtx/quat.c"),
             Object(NonMatching, "mtx/psmtx.c"),
         ],
-    ),
+    },
     DolphinLib(
         "dvd",
         [

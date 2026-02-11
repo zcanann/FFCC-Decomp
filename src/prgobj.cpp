@@ -151,12 +151,27 @@ void CGPrgObj::onChangePrg(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80127838
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGPrgObj::changeStat(int, int, int)
+void CGPrgObj::changeStat(int state, int subState, int stateArg)
 {
-	// TODO
+	int oldState = getReplaceStat(state);
+	if (oldState != -1) {
+		onCancelStat(state);
+		m_stateArg = stateArg;
+		onChangeStat(state);
+		m_lastStateId = oldState;
+		m_stateFrame = 0;
+		m_stateFrameGate = 1;
+		m_subState = subState;
+		m_subFrame = 0;
+		m_subFrameGate = 1;
+	}
 }
 
 /*
@@ -185,12 +200,19 @@ void CGPrgObj::addSubStat()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801277C8
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGPrgObj::reqAnim(int, int, int)
+void CGPrgObj::reqAnim(int animId, int loop, int direct)
 {
-	// TODO
+	m_animFlags = (m_animFlags & 0x7f) | 0x80;
+	m_reqAnimId = animId;
+	m_animFlags = ((loop << 6) & 0x40) | (m_animFlags & 0xbf);
+	m_animFlags = ((direct << 5) & 0x20) | (m_animFlags & 0xdf);
 }
 
 /*

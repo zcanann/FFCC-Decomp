@@ -14,16 +14,16 @@ typedef struct ShapeRuntimeData {
 } ShapeRuntimeData;
 
 typedef struct ShapeState {
-    u16 value;
-    u16 counter;
-    u16 currentId;
+    s16 value;
+    s16 counter;
+    s16 currentId;
 } ShapeState;
 
 typedef struct ShapeControlData {
     u8 _pad0[4];
     u16 type;
     u8 _pad1[2];
-    u32 step;
+    s32 step;
     u8 _pad2[1];
     u8 blendMode;
     u8 paramE;
@@ -76,9 +76,9 @@ void pppCalcShape(void* pppShape, void* data, void* additionalData)
 	ShapeRuntimeData* runtimeData = *(ShapeRuntimeData**)((u8*)additionalData + 0xC);
 	ShapeControlData* controlData = (ShapeControlData*)data;
 	ShapeState* shapeData = (ShapeState*)((u8*)pppShape + runtimeData->shapeDataOffset + 0x80);
-	u16 type = controlData->type;
+	s16 type = controlData->type;
 
-	if (type == 0xFFFF) {
+	if ((u16)type == 0xFFFF) {
 		return;
 	}
 
@@ -87,13 +87,13 @@ void pppCalcShape(void* pppShape, void* data, void* additionalData)
 	ShapeSpecEntry* shape = (ShapeSpecEntry*)((u8*)shapeSpec + ((u32)shapeData->counter << 3) + 0x10);
 
 	shapeData->currentId = shapeData->counter;
-	shapeData->value = (u16)(shapeData->value + controlData->step);
-	if (shapeData->value >= (u16)shape->maxValue) {
-		shapeData->value = (u16)(shapeData->value - shape->maxValue);
+	shapeData->value = shapeData->value + controlData->step;
+	if (shapeData->value >= shape->maxValue) {
+		shapeData->value = shapeData->value - shape->maxValue;
 	}
 
 	shapeData->counter++;
-	if (shapeData->counter < (u16)*(s16*)((u8*)shapeSpec + 0x6)) {
+	if (shapeData->counter < *(s16*)((u8*)shapeSpec + 0x6)) {
 		return;
 	}
 

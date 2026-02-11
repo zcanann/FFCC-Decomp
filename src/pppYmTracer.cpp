@@ -1,17 +1,33 @@
 #include "ffcc/pppYmTracer.h"
+#include "ffcc/mapmesh.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/pppYmEnv.h"
 #include "ffcc/util.h"
 
+#include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
 extern f32 FLOAT_803306e8;
 extern f32 FLOAT_803306ec;
+extern u32 DAT_803306e0;
+extern u32 DAT_803306e4;
 extern f64 DOUBLE_803306f8;
 extern s32 DAT_8032ed70;
 extern s32 DAT_801eadc8;
 extern CUtil DAT_8032ec70;
 
-extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" {
+void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+void pppSetBlendMode__FUc(unsigned char);
+void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+    void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char,
+    unsigned char);
+int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh*, CMaterialSet*, int&);
+void SetVtxFmt_POS_CLR_TEX__5CUtilFv(void*);
+void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
+void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
+void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
+}
 
 static char s_pppYmTracer_cpp_801d9ce0[] = "pppYmTracer.cpp";
 
@@ -320,5 +336,99 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, UnkB* param_2, UnkC* param_3)
  */
 void pppRenderYmTracer(pppYmTracer* pppYmTracer, UnkB* param_2, UnkC* param_3)
 {
-    // TODO - Complex function, implement later
+    f32* work;
+    TRACE_POLYGON* polygons;
+    CMapMesh* mapMesh;
+    CTexture* texture;
+    u16 count;
+    f32 uvStep;
+    int textureIndex;
+
+    if (param_2->m_dataValIndex == 0xFFFF) {
+        return;
+    }
+
+    work = (f32*)((int)(&pppYmTracer->field0_0x0 + 2) + *param_3->m_serializedDataOffsets);
+    polygons = (TRACE_POLYGON*)(u32)work[10];
+    count = *(u16*)(work + 0xB);
+    if (polygons == nullptr || count < 2) {
+        return;
+    }
+
+    mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex];
+    pppSetBlendMode__FUc(param_2->m_payload[10]);
+    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+        (void*)((char*)pppYmTracer + 0x88 + param_3->m_serializedDataOffsets[1]), (void*)&ppvCameraMatrix0,
+        FLOAT_803306e8, param_2->m_payload[0xC], param_2->m_payload[0xB], param_2->m_payload[10], 0, 1, 1, 0);
+    SetVtxFmt_POS_CLR_TEX__5CUtilFv(&DAT_8032ec70);
+
+    textureIndex = 0;
+    texture = (CTexture*)GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, pppEnvStPtr->m_materialSetPtr, textureIndex);
+    if (texture == nullptr) {
+        return;
+    }
+
+    GXLoadTexObj((GXTexObj*)((u8*)texture + 0x28), GX_TEXMAP0);
+    GXSetNumChans(1);
+    GXSetNumTexGens(1);
+    GXSetNumTevStages(1);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
+    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 0);
+    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
+
+    if ((*(u8*)((u8*)texture + 0x60) == 8) || (*(u8*)((u8*)texture + 0x60) == 9)) {
+        SetUpPaletteEnv(texture);
+    }
+
+    uvStep = FLOAT_803306ec / (f32)(count - 1);
+    GXSetCullMode(GX_CULL_NONE);
+
+    for (u16 i = 0; i < (u16)(count - 1); i++) {
+        TRACE_POLYGON* current = &polygons[i];
+        TRACE_POLYGON* next = &polygons[i + 1];
+        f32 u0;
+        f32 u1;
+        u32 color0;
+        u32 color1;
+
+        if (current->life <= 0) {
+            continue;
+        }
+        if (current->to.x == FLOAT_803306e8 || current->to.y == FLOAT_803306e8 || current->to.z == FLOAT_803306e8) {
+            continue;
+        }
+        if (current->from.x == FLOAT_803306e8 || current->from.y == FLOAT_803306e8 || current->from.z == FLOAT_803306e8) {
+            continue;
+        }
+        if (next->to.x == FLOAT_803306e8 || next->to.y == FLOAT_803306e8 || next->to.z == FLOAT_803306e8) {
+            continue;
+        }
+        if (next->from.x == FLOAT_803306e8 || next->from.y == FLOAT_803306e8 || next->from.z == FLOAT_803306e8) {
+            continue;
+        }
+
+        u0 = (f32)i * uvStep;
+        u1 = (f32)(i + 1) * uvStep;
+        color0 = (DAT_803306e0 & 0xFFFFFF00) | current->alpha;
+        color1 = (DAT_803306e4 & 0xFFFFFF00) | next->alpha;
+
+        GXBegin((GXPrimitive)0x98, GX_VTXFMT7, 4);
+        GXPosition3f32(current->to.x, current->to.y, current->to.z);
+        GXColor1u32(color0);
+        GXTexCoord2f32(u0, FLOAT_803306ec);
+
+        GXPosition3f32(current->from.x, current->from.y, current->from.z);
+        GXColor1u32(color0);
+        GXTexCoord2f32(u0, FLOAT_803306e8);
+
+        GXPosition3f32(next->to.x, next->to.y, next->to.z);
+        GXColor1u32(color1);
+        GXTexCoord2f32(u1, FLOAT_803306ec);
+
+        GXPosition3f32(next->from.x, next->from.y, next->from.z);
+        GXColor1u32(color1);
+        GXTexCoord2f32(u1, FLOAT_803306e8);
+    }
 }

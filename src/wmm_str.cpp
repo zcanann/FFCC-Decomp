@@ -190,7 +190,7 @@ apply_font_yes:
 
     const int yesWidth = GetWidth__5CFontFPc(font, yesText + 1);
     short* windowInfo = *(short**)((char*)this + 0x848);
-    int x = (int)((windowInfo[2] - yesWidth) * 0.5f + windowInfo[0]);
+    int x = (int)(((double)(windowInfo[2] - yesWidth) * 0.5) + (double)windowInfo[0]);
     if (right != 0) {
         const int noWidth = GetWidth__5CFontFPc(font, lbl_8021672C[languageId - 1]);
         x += yesWidth - noWidth;

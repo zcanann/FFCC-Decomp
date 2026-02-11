@@ -18,20 +18,18 @@ extern "C" float RandF__5CMathFv(CMath* instance);
  */
 void pppSRandUpCV(void* param1, void* param2, void* param3)
 {
-    float* target;
-
     if (lbl_8032ED70 != 0) {
         return;
     }
 
-    {
-        int** basePtr = (int**)((char*)param3 + 0xc);
-        int offset = **basePtr;
-        target = (float*)((char*)param1 + offset + 0x80);
-    }
+    float* target;
 
     if (*(int*)param2 == *((int*)param1 + 3)) {
-        u8 flag = *((u8*)param2 + 0xc);
+        int** base_ptr = (int**)((char*)param3 + 0xc);
+        int offset = **base_ptr;
+        target = (float*)((char*)param1 + offset + 0x80);
+
+        u8 flag = *((u8*)param2 + 0x10);
         float value;
 
         value = RandF__5CMathFv(&math);
@@ -57,40 +55,41 @@ void pppSRandUpCV(void* param1, void* param2, void* param3)
             value = (value + RandF__5CMathFv(&math)) * 0.5f;
         }
         target[3] = value;
+    } else if (*(int*)param2 != *((int*)param1 + 3)) {
+        int** base_ptr = (int**)((char*)param3 + 0xc);
+        int offset = **base_ptr;
+        target = (float*)((char*)param1 + offset + 0x80);
+    }
+
+    int color_offset = *((int*)param2 + 1);
+    u8* target_colors;
+    if (color_offset == -1) {
+        target_colors = lbl_801EADC8;
+    } else {
+        target_colors = (u8*)((char*)param1 + color_offset + 0x80);
     }
 
     {
-        int colorOffset = *((int*)param2 + 1);
-        u8* colors;
+        s8 base = *(s8*)((char*)param2 + 0x8);
+        int delta = (int)(base * target[0]);
+        target_colors[0] = (u8)(target_colors[0] + delta);
+    }
 
-        if (colorOffset == -1) {
-            colors = lbl_801EADC8;
-        } else {
-            colors = (u8*)((char*)param1 + colorOffset + 0x80);
-        }
+    {
+        s8 base = *(s8*)((char*)param2 + 0x9);
+        int delta = (int)(base * target[1]);
+        target_colors[1] = (u8)(target_colors[1] + delta);
+    }
 
-        {
-            s8 base = *((s8*)param2 + 8);
-            int delta = (int)(base * target[0]);
-            colors[0] = (u8)(colors[0] + delta);
-        }
+    {
+        s8 base = *(s8*)((char*)param2 + 0xA);
+        int delta = (int)(base * target[2]);
+        target_colors[2] = (u8)(target_colors[2] + delta);
+    }
 
-        {
-            s8 base = *((s8*)param2 + 9);
-            int delta = (int)(base * target[1]);
-            colors[1] = (u8)(colors[1] + delta);
-        }
-
-        {
-            s8 base = *((s8*)param2 + 10);
-            int delta = (int)(base * target[2]);
-            colors[2] = (u8)(colors[2] + delta);
-        }
-
-        {
-            s8 base = *((s8*)param2 + 11);
-            int delta = (int)(base * target[3]);
-            colors[3] = (u8)(colors[3] + delta);
-        }
+    {
+        s8 base = *(s8*)((char*)param2 + 0xB);
+        int delta = (int)(base * target[3]);
+        target_colors[3] = (u8)(target_colors[3] + delta);
     }
 }

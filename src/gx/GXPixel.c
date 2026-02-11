@@ -315,15 +315,13 @@ void GXSetFieldMask(GXBool odd_mask, GXBool even_mask) {
 }
 
 void GXSetFieldMode(GXBool field_mode, GXBool half_aspect_ratio) {
+    GXData* gx;
     u32 reg;
-    u32 lp_size;
 
     CHECK_GXBEGIN(637, "GXSetFieldMode");
-    lp_size = __GXData->lpSize;
-    lp_size &= ~0x00400000;
-    lp_size |= (u32)(u8)half_aspect_ratio << 22;
-    __GXData->lpSize = lp_size;
-    GX_WRITE_RAS_REG(lp_size);
+    gx = __GXData;
+    gx->lpSize = (gx->lpSize & ~0x00400000) | ((u32)(u8)half_aspect_ratio << 22);
+    GX_WRITE_RAS_REG(gx->lpSize);
     __GXFlushTextureState();
     reg = (u32)(u8)field_mode | 0x68000000;
     GX_WRITE_RAS_REG(reg);

@@ -19,7 +19,7 @@ s32 THPSimpleClose(void);
 s32 THPSimpleCalcNeedMemory(void);
 s32 THPSimpleSetBuffer(u8*);
 void ReadFrameAsync();
-void __THPSimpleDVDCallback(long, DVDFileInfo*);
+void __THPSimpleDVDCallback__FlP11DVDFileInfo(long, DVDFileInfo*);
 s32 THPSimplePreLoad(s32);
 void THPSimpleAudioStart(void);
 void THPSimpleAudioStop(void);
@@ -33,6 +33,7 @@ void THPAudioMixCallback__Fv();
 
 #define MixAudio MixAudio__FPsPsUl
 #define THPAudioMixCallback THPAudioMixCallback__Fv
+#define __THPSimpleDVDCallback __THPSimpleDVDCallback__FlP11DVDFileInfo
 
 #ifdef __cplusplus
 }

@@ -4,7 +4,7 @@
 #include "dolphin/types.h"
 
 struct pppLaser {
-    u8 field_0x0[0x98];
+    u8 field_0x0[0x84];
     f32 field_0x84;     // 0x84
     f32 field_0x88;     // 0x88
     f32 field_0x8c;     // 0x8c
@@ -23,8 +23,13 @@ struct UnkB {
     u8 placeholder[0x100];
 };
 
-struct UnkC {
+struct UnkCLaserOffsets {
     int m_serializedDataOffsets[3];
+};
+
+struct UnkC {
+    u8 unk_00[0xc];
+    UnkCLaserOffsets* offsets;
 };
 
 #ifdef __cplusplus

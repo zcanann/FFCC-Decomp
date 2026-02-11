@@ -30,23 +30,23 @@ void pppStopSe__FP9_pppMngStP7PPPSEST(_pppMngSt*, PPPSEST*);
 void pppConstructLaser(struct pppLaser *pppLaser, struct UnkC *param_2)
 {
     f32 fVar1 = FLOAT_80333428;
-    f32* pfVar3 = (f32*)((u8*)&pppLaser->field_0x88 + param_2->m_serializedDataOffsets[2]);
+    f32* pfVar3 = (f32*)((u8*)&pppLaser->field_0x88 + param_2->offsets->m_serializedDataOffsets[2]);
     int local_24;
     int local_28;
     Vec local_20;
     Vec local_14;
 
     *pfVar3 = FLOAT_80333428;
-    pfVar3[1] = fVar1;
-    pfVar3[2] = fVar1;
-    pfVar3[3] = fVar1;
-    pfVar3[4] = fVar1;
-    pfVar3[5] = fVar1;
     pfVar3[6] = fVar1;
+    pfVar3[5] = fVar1;
+    pfVar3[4] = fVar1;
+    pfVar3[3] = fVar1;
+    pfVar3[2] = fVar1;
+    pfVar3[1] = fVar1;
     pfVar3[7] = 0.0f;
-    pfVar3[8] = fVar1;
-    pfVar3[9] = fVar1;
     pfVar3[10] = fVar1;
+    pfVar3[9] = fVar1;
+    pfVar3[8] = fVar1;
 
     *((u8*)pfVar3 + 0x2c) = 0;
     *((u8*)pfVar3 + 0x2d) = 0;
@@ -91,8 +91,8 @@ void pppConstructLaser(struct pppLaser *pppLaser, struct UnkC *param_2)
  */
 void pppConstruct2Laser(struct pppLaser *pppLaser, struct UnkC *param_2)
 {
-    f32 fVar1 = 1.0f; // FLOAT_80333428 placeholder
-    int iVar2 = param_2->m_serializedDataOffsets[2];
+    f32 fVar1 = FLOAT_80333428;
+    int iVar2 = param_2->offsets->m_serializedDataOffsets[2];
     
     *(f32*)((u8*)&pppLaser->field_0x98 + iVar2) = fVar1;
     *(f32*)((u8*)&pppLaser->field_0x94 + iVar2) = fVar1;
@@ -117,7 +117,7 @@ void pppConstruct2Laser(struct pppLaser *pppLaser, struct UnkC *param_2)
  */
 void pppDestructLaser(struct pppLaser *pppLaser, struct UnkC *param_2)
 {
-    int iVar1 = param_2->m_serializedDataOffsets[2];
+    int iVar1 = param_2->offsets->m_serializedDataOffsets[2];
     void *pfVar3 = *(void **)((u8*)&pppLaser->field_0x9c + iVar1);
     if (pfVar3 != 0) {
         pppHeapUseRate__FPQ27CMemory6CStage(pfVar3);

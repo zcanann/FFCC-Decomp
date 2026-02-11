@@ -40,6 +40,9 @@ struct pppShapeSt
     short m_refCount;        // 0x28
     unsigned char m_inUse;   // 0x2a
 
+    pppShapeSt();
+    ~pppShapeSt();
+
     void* GetTexture(long*, CMaterialSet*, int&);
 }; // Size 0x2c
 
@@ -50,6 +53,9 @@ struct pppModelSt
     short m_refCount;       // 0x64
     short m_cacheId;        // 0x66
     unsigned char m_isUsed; // 0x68
+
+    pppModelSt();
+    ~pppModelSt();
 }; // Size 0x6c
 
 struct PPPCREATEPARAM

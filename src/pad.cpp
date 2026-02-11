@@ -14,7 +14,6 @@
 CPad Pad;
 
 void* operator new[](unsigned long, CMemory::CStage*, char*, int);
-extern void* __vt__8CManager;
 extern void* lbl_801E8864;
 
 /*
@@ -28,11 +27,9 @@ extern void* lbl_801E8864;
  */
 extern "C" void __sinit_pad_cpp()
 {
-	char* const base = reinterpret_cast<char*>(&Pad);
-	*reinterpret_cast<void**>(base) = &__vt__8CManager;
-	*reinterpret_cast<void**>(base) = &lbl_801E8864;
-	Pad._448_4_ = 0;
-	Pad._452_4_ = 0;
+	Pad._0_4_ = &lbl_801E8864;
+	Pad._1b4_4_ = 0;
+	Pad._1b8_4_ = 0;
 }
 
 /*
@@ -60,63 +57,45 @@ CPad::CPad()
  */
 void CPad::Init()
 {
-	char* const base = reinterpret_cast<char*>(this);
+	FILE* fp;
+	int frames;
+	unsigned int size;
+
 	PADInit();
-	memset(base + 4, 0, 0x1A4);
+	memset(reinterpret_cast<char*>(this) + 4, 0, 0x1A4);
+	_1a8_4_ = 0;
+	_1ac_4_ = 0;
+	_1b0_4_ = 0;
+	_1bc_4_ = 0;
+	_1c0_4_ = 0xFFFFFFFF;
+	_1c8_4_ = 1;
 
-	*reinterpret_cast<unsigned int*>(base + 0x1A8) = 0;
-	*reinterpret_cast<unsigned int*>(base + 0x1AC) = 0;
-	*reinterpret_cast<unsigned int*>(base + 0x1B0) = 0;
-	*reinterpret_cast<unsigned int*>(base + 0x1BC) = 0;
-	*reinterpret_cast<unsigned int*>(base + 0x1C0) = 0xFFFFFFFF;
-	*reinterpret_cast<unsigned int*>(base + 0x1C8) = 1;
-
-	if (!System.IsGdev())
+	if (System.IsGdev() != 0)
 	{
-		return;
+		_1ac_4_ = Memory.CreateStage(0x800000, (char*)"pad.cpp", 1);
+		if (_1ac_4_ != 0)
+		{
+			_1b0_4_ = new (reinterpret_cast<CMemory::CStage*>(_1ac_4_), (char*)"pad.cpp", 0x54) unsigned char[0x69780C];
+			if ((_1b4_4_ == 0) || ((fp = fopen("replay.dat", "rb")) == 0))
+			{
+				*reinterpret_cast<unsigned int*>(_1b0_4_) = 0xC;
+				*reinterpret_cast<unsigned int*>(_1b0_4_ + 8) = 0;
+				*reinterpret_cast<unsigned int*>(_1b0_4_ + 4) = 1;
+			}
+			else
+			{
+				fseek(fp, 0, 2);
+				size = ftell(fp);
+				fseek(fp, 0, 0);
+				fread(_1b0_4_, 1, size, fp);
+				fclose(fp);
+				*reinterpret_cast<unsigned int*>(_1b0_4_ + 4) = 0;
+				frames = *reinterpret_cast<int*>(_1b0_4_ + 8);
+				frames = frames / 0x1E + (frames >> 0x1F);
+				System.Printf((char*)"replay frames=%d\n", frames - (frames >> 0x1F));
+			}
+		}
 	}
-
-	CMemory::CStage* stage = Memory.CreateStage(0x800000, (char*)"pad.cpp", 1);
-	*reinterpret_cast<CMemory::CStage**>(base + 0x1AC) = stage;
-	if (stage == nullptr)
-	{
-		return;
-	}
-
-	unsigned char* replayBuf = new (stage, (char*)"pad.cpp", 0x54) unsigned char[0x69780C];
-	*reinterpret_cast<unsigned char**>(base + 0x1B0) = replayBuf;
-	if (replayBuf == nullptr)
-	{
-		return;
-	}
-
-	if ((*reinterpret_cast<int*>(base + 0x1B4) == 0))
-	{
-		reinterpret_cast<int*>(replayBuf)[0] = 0xC;
-		reinterpret_cast<int*>(replayBuf)[1] = 1;
-		reinterpret_cast<int*>(replayBuf)[2] = 0;
-		return;
-	}
-
-	FILE* fp = fopen("replay.dat", "rb");
-	if (fp == nullptr)
-	{
-		reinterpret_cast<int*>(replayBuf)[0] = 0xC;
-		reinterpret_cast<int*>(replayBuf)[1] = 1;
-		reinterpret_cast<int*>(replayBuf)[2] = 0;
-		return;
-	}
-
-	fseek(fp, 0, 2);
-	unsigned int size = ftell(fp);
-	fseek(fp, 0, 0);
-	fread(replayBuf, 1, size, fp);
-	fclose(fp);
-
-	reinterpret_cast<unsigned int*>(replayBuf)[1] = 0;
-	int frames = reinterpret_cast<int*>(replayBuf)[2];
-	frames = frames / 0x1E + (frames >> 0x1F);
-	System.Printf((char*)"replay frames=%d\n", frames - (frames >> 0x1F));
 }
 
 /*

@@ -66,20 +66,6 @@ extern "C" void pppRandChar(void* param1, void* param2, void* param3)
         target = base + in->sourceOffset + 0x80;
     }
 
-    union {
-        f64 d;
-        struct {
-            u32 hi;
-            u32 lo;
-        } parts;
-    } cvt;
-
-    u8 current = *target;
-    cvt.parts.hi = 0x43300000;
-    cvt.parts.lo = in->scale;
-    f64 scaled = cvt.d - lbl_8032FF00;
-    cvt.parts.lo = current;
-
-    s32 delta = (s32)(scaled * *valuePtr - (cvt.d - lbl_8032FF00));
-    *target = (u8)(current + delta);
+    s32 delta = (s32)((f32)in->scale * *valuePtr - (f32)*target);
+    *target = (u8)(*target + delta);
 }

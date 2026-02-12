@@ -24,6 +24,8 @@ extern Mtx gFlatPosMtx;
 extern int DAT_8032ed70;
 extern unsigned char lbl_8032EC90[];
 
+CAStar AStar;
+
 /*
  * --INFO--
  * Address:	TODO
@@ -31,7 +33,7 @@ extern unsigned char lbl_8032EC90[];
  */
 CAStar::CAStar()
 {
-	// TODO
+	reset();
 }
 
 /*

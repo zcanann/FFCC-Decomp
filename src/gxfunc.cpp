@@ -132,12 +132,14 @@ void _GXSetTevOp(_GXTevStageID stage, _GXTevMode mode)
  */
 void _GXSetTevColorIn(_GXTevStageID stage, _GXTevColorArg a, _GXTevColorArg b, _GXTevColorArg c, _GXTevColorArg d)
 {
-	if (s_GXSetTevColorIn_Reg[stage].a != a || s_GXSetTevColorIn_Reg[stage].b != b || s_GXSetTevColorIn_Reg[stage].c != c ||
-	    s_GXSetTevColorIn_Reg[stage].d != d) {
-		s_GXSetTevColorIn_Reg[stage].a = a;
-		s_GXSetTevColorIn_Reg[stage].b = b;
-		s_GXSetTevColorIn_Reg[stage].c = c;
-		s_GXSetTevColorIn_Reg[stage].d = d;
+	int stageOff = stage * 0x10;
+	int* entry = (int*)((char*)s_GXSetTevColorIn_Reg + stageOff);
+
+	if (entry[0] != a || entry[1] != b || entry[2] != c || entry[3] != d) {
+		entry[0] = a;
+		entry[1] = b;
+		entry[2] = c;
+		entry[3] = d;
 		GXSetTevColorIn(stage, a, b, c, d);
 	}
 }
@@ -153,12 +155,14 @@ void _GXSetTevColorIn(_GXTevStageID stage, _GXTevColorArg a, _GXTevColorArg b, _
  */
 void _GXSetTevAlphaIn(_GXTevStageID stage, _GXTevAlphaArg a, _GXTevAlphaArg b, _GXTevAlphaArg c, _GXTevAlphaArg d)
 {
-	if (s_GXSetTevAlphaIn_Reg[stage].a != a || s_GXSetTevAlphaIn_Reg[stage].b != b || s_GXSetTevAlphaIn_Reg[stage].c != c ||
-	    s_GXSetTevAlphaIn_Reg[stage].d != d) {
-		s_GXSetTevAlphaIn_Reg[stage].a = a;
-		s_GXSetTevAlphaIn_Reg[stage].b = b;
-		s_GXSetTevAlphaIn_Reg[stage].c = c;
-		s_GXSetTevAlphaIn_Reg[stage].d = d;
+	int stageOff = stage * 0x10;
+	int* entry = (int*)((char*)s_GXSetTevAlphaIn_Reg + stageOff);
+
+	if (entry[0] != a || entry[1] != b || entry[2] != c || entry[3] != d) {
+		entry[0] = a;
+		entry[1] = b;
+		entry[2] = c;
+		entry[3] = d;
 		GXSetTevAlphaIn(stage, a, b, c, d);
 	}
 }

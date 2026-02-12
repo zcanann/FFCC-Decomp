@@ -85,6 +85,39 @@ CMapHit::~CMapHit()
 
 /*
  * --INFO--
+ * PAL Address: 0x80026d5c
+ * PAL Size: 144b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" CMapHit* dtor_80026D5C(CMapHit* mapHit, short shouldDelete)
+{
+    if (mapHit != 0) {
+        if (mapHit->m_vertices != 0) {
+            delete[] mapHit->m_vertices;
+            mapHit->m_vertices = 0;
+        }
+
+        if (mapHit->m_faces != 0) {
+            delete[] mapHit->m_faces;
+            mapHit->m_faces = 0;
+        }
+
+        mapHit->m_vertexCount = 0;
+        mapHit->m_faceCount = 0;
+
+        if (shouldDelete > 0) {
+            operator delete(mapHit);
+        }
+    }
+
+    return mapHit;
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

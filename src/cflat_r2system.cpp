@@ -2,7 +2,14 @@
 #include "ffcc/game.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_menu.h"
+#include "ffcc/p_tina.h"
 #include "ffcc/sound.h"
+#include "ffcc/USBStreamData.h"
+
+static inline CUSBStreamData* UsbStream(CPartPcs* self)
+{
+    return reinterpret_cast<CUSBStreamData*>((char*)self + 0x8);
+}
 
 /*
  * --INFO--
@@ -58,6 +65,20 @@ CFont* CMenuPcs::GetFont22()
 void CSound::SeMaxVolume(int volume)
 {
     *(int*)((char*)this + 0x22BC) = volume;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B8FA8
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CPartPcs::pppSetDebugHide(unsigned char hide)
+{
+    UsbStream(this)->m_disableShokiDraw = hide;
 }
 
 /*

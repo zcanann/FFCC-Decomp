@@ -37,16 +37,18 @@ void pppSRandDownFV(void* param1, void* param2, void* param3)
 
     unsigned char* self = reinterpret_cast<unsigned char*>(param1);
     Param* cfg = reinterpret_cast<Param*>(param2);
-    SelectInfo* sel = reinterpret_cast<SelectInfo*>(param3);
     float* randVec;
+    int currentIndex;
 
     if (lbl_8032ED70 != 0) {
         return;
     }
 
-    if (*reinterpret_cast<int*>(self + 0xC) == 0) {
-        randVec = reinterpret_cast<float*>(self + *sel->offsetPtr + 0x80);
+    currentIndex = *reinterpret_cast<int*>(self + 0xC);
+    if (currentIndex == 0) {
+        int offset = *reinterpret_cast<SelectInfo*>(param3)->offsetPtr;
         unsigned char blendTwice = cfg->blendTwice;
+        randVec = reinterpret_cast<float*>(self + offset + 0x80);
 
         float value = -RandF__5CMathFv(&math);
         if (blendTwice != 0) {
@@ -66,10 +68,10 @@ void pppSRandDownFV(void* param1, void* param2, void* param3)
         }
         randVec[2] = value;
     } else {
-        if (cfg->index != *reinterpret_cast<int*>(self + 0xC)) {
+        if (cfg->index != currentIndex) {
             return;
         }
-        randVec = reinterpret_cast<float*>(self + *sel->offsetPtr + 0x80);
+        randVec = reinterpret_cast<float*>(self + *reinterpret_cast<SelectInfo*>(param3)->offsetPtr + 0x80);
     }
 
     float* target;
@@ -79,7 +81,16 @@ void pppSRandDownFV(void* param1, void* param2, void* param3)
         target = reinterpret_cast<float*>(self + cfg->offset + 0x80);
     }
 
-    target[0] += cfg->x * randVec[0];
-    target[1] += cfg->y * randVec[1];
-    target[2] += cfg->z * randVec[2];
+    {
+        float value = cfg->x * randVec[0];
+        target[0] = target[0] + value;
+    }
+    {
+        float value = cfg->y * randVec[1];
+        target[1] = target[1] + value;
+    }
+    {
+        float value = cfg->z * randVec[2];
+        target[2] = target[2] + value;
+    }
 }

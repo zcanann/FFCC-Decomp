@@ -11,11 +11,11 @@ public:
     CPtrArray();
     ~CPtrArray();
     
-    int GetSize() const;
+    int GetSize();
     bool Add(T* item);
     void RemoveAll();
-    T* GetAt(unsigned int index) const;
-    T* operator[](unsigned int index) const;
+    T* GetAt(unsigned long index);
+    T* operator[](unsigned long index);
     
 private:
     bool setSize(unsigned int newSize);
@@ -46,19 +46,19 @@ CPtrArray<T>::~CPtrArray()
 }
 
 template <class T>
-int CPtrArray<T>::GetSize() const
+int CPtrArray<T>::GetSize()
 {
     return m_numItems;
 }
 
 template <class T>
-T* CPtrArray<T>::GetAt(unsigned int index) const
+T* CPtrArray<T>::GetAt(unsigned long index)
 {
     return m_items[index];
 }
 
 template <class T>
-T* CPtrArray<T>::operator[](unsigned int index) const
+T* CPtrArray<T>::operator[](unsigned long index)
 {
     return GetAt(index);
 }

@@ -1,6 +1,6 @@
 #include "ffcc/pppMove.h"
 
-extern u32 lbl_8032ED70;   // Global enable flag
+extern s32 lbl_8032ED70;   // Global enable flag
 extern f32 lbl_8032FED8;   // Zero constant
 
 struct PppMoveObj {
@@ -54,12 +54,12 @@ void pppMove(void* basePtr, PppMoveInput* input, PppMoveData* data1, PppMoveData
 
     (void)data2;
 
-    if (lbl_8032ED70 != 0U) {
+    if (lbl_8032ED70 != 0) {
         return;
     }
 
-    u32 inputId = *(u32*)input;
-    u32 baseId = *(u32*)((u8*)basePtr + 0xc);
+    s32 inputId = *(s32*)input;
+    s32 baseId = *(s32*)((u8*)basePtr + 0xc);
 
     if (inputId == baseId) {
         b->x += input->x;

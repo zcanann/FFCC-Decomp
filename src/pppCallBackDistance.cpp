@@ -20,20 +20,18 @@ void pppConstructCallBackDistance(pppCallBackDistance* param1, UnkC* param2)
 {
     Vec local_28;
     Vec local_1c;
-    f64 dVar3;
-    s32 iVar1;
-    f32* pDataVal;
+    s32 dataOffset;
+    f32* distancePtr;
 
-    iVar1 = *param2->m_serializedDataOffsets;
-    pDataVal = (f32*)((u8*)param1 + 0x80 + iVar1);
+    dataOffset = *param2->m_serializedDataOffsets;
+    distancePtr = (f32*)((u8*)param1 + dataOffset + 0x8);
     local_28.x = pppMngStPtr->m_matrix.value[0][3];
     local_28.y = pppMngStPtr->m_matrix.value[1][3];
     local_28.z = pppMngStPtr->m_matrix.value[2][3];
     local_1c.x = *(f32*)((u8*)pppMngStPtr + 0x68);
     local_1c.y = *(f32*)((u8*)pppMngStPtr + 0x6c);
     local_1c.z = *(f32*)((u8*)pppMngStPtr + 0x70);
-    dVar3 = (f64)PSVECDistance(&local_28, &local_1c);
-    *pDataVal = (f32)dVar3;
+    *distancePtr = PSVECDistance(&local_28, &local_1c);
 }
 
 /*
@@ -63,7 +61,7 @@ void pppFrameCallBackDistance(pppCallBackDistance* param1, UnkB* param2, UnkC* p
     u8* pppMngSt;
     u32 graphId;
     s32 dataOffset;
-    f64 distance;
+    f32 distance;
     Vec local_28;
     Vec local_1c;
 
@@ -72,10 +70,9 @@ void pppFrameCallBackDistance(pppCallBackDistance* param1, UnkB* param2, UnkC* p
     dataOffset = *param3->m_serializedDataOffsets;
     local_1c.y = *(f32*)(pppMngSt + 0x94);
     local_1c.z = *(f32*)(pppMngSt + 0xA4);
-    distance = (f64)PSVECDistance(&local_1c, (Vec*)(pppMngSt + 0x64));
+    distance = PSVECDistance(&local_1c, (Vec*)(pppMngSt + 0x64));
 
-    if ((distance <= (double)(f32)param2->m_dataValIndex) ||
-        ((double)*(f32*)((u8*)(&param1->field0_0x0 + 2) + dataOffset) <= distance)) {
+    if ((distance <= param2->m_dataValIndex) || (*(f32*)((u8*)param1 + dataOffset + 0x8) <= distance)) {
         local_28.x = *(f32*)(pppMngSt + 0x84);
         local_28.y = *(f32*)(pppMngSt + 0x94);
         local_28.z = *(f32*)(pppMngSt + 0xA4);

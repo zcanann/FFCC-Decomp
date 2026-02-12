@@ -2,8 +2,10 @@
 
 #include "ffcc/memory.h"
 #include "ffcc/system.h"
+#include "ffcc/joybus.h"
 
 #include "dolphin/pad.h"
+#include "dolphin/si.h"
 
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/file_io.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/FILE_POS.h"
@@ -135,7 +137,72 @@ void CPad::Quit()
  */
 void CPad::Frame()
 {
-	// Frame update for controller input
+	PADStatus status[4];
+	u16 joyBusData[8];
+
+	PADRead(status);
+	PADClamp(status);
+
+	_1c4_4_ = 0;
+	for (int i = 0; i < 4; i++)
+	{
+		u16 ctrlMode = static_cast<u16>(Joybus.GetCtrlMode(i)) & 0x3FFF;
+		u16 flags = static_cast<u16>((__cntlzw(0x40000 - SIProbe(i)) << 10) & 0x8000);
+		u16 packedMode = static_cast<u16>(flags | ctrlMode);
+		if (((packedMode & 0x8000) != 0) && ((packedMode & 0x3FFF) == 0))
+		{
+			packedMode = static_cast<u16>(packedMode | 0x4000);
+		}
+
+		joyBusData[i * 2] = packedMode;
+		joyBusData[i * 2 + 1] = 0;
+		if ((packedMode & 0x8000) != 0)
+		{
+			joyBusData[i * 2 + 1] = static_cast<u16>(Joybus.GetPadData(i));
+		}
+	}
+
+	if ((_1b0_4_ != 0) && (_1bc_4_ >= 0))
+	{
+		int* replayFlags = reinterpret_cast<int*>(_1b0_4_ + 4);
+		if (*replayFlags == 0)
+		{
+			if (_1bc_4_ < 0x1A5E0)
+			{
+				for (int i = 0; i < 4; i++)
+				{
+					u16 originalButtons = status[i].button;
+					const u8* src = _1b0_4_ + _1bc_4_ * 0x40 + i * 0x0C + 0x0C;
+					const u16* replayJoyBus = reinterpret_cast<const u16*>(_1b0_4_ + _1bc_4_ * 0x40 + i * 4 + 0x3C);
+					status[i] = *reinterpret_cast<const PADStatus*>(src);
+					joyBusData[i * 2] = replayJoyBus[0];
+					joyBusData[i * 2 + 1] = replayJoyBus[1];
+					if ((originalButtons & PAD_TRIGGER_Z) != 0)
+					{
+						status[i].button = static_cast<u16>(status[i].button | originalButtons);
+					}
+				}
+			}
+		}
+		else
+		{
+			int* replayFrames = reinterpret_cast<int*>(_1b0_4_ + 8);
+			if (*replayFrames < 0x1A5E0)
+			{
+				for (int i = 0; i < 4; i++)
+				{
+					u8* dst = _1b0_4_ + *replayFrames * 0x40 + i * 0x0C + 0x0C;
+					u16* dstJoyBus = reinterpret_cast<u16*>(_1b0_4_ + *replayFrames * 0x40 + i * 4 + 0x3C);
+					*reinterpret_cast<PADStatus*>(dst) = status[i];
+					dstJoyBus[0] = joyBusData[i * 2];
+					dstJoyBus[1] = joyBusData[i * 2 + 1];
+				}
+
+				(*replayFrames)++;
+				*reinterpret_cast<int*>(_1b0_4_) += 0x40;
+			}
+		}
+	}
 }
 
 /*

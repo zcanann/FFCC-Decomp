@@ -74,6 +74,7 @@ public:
     void StartMiruraEvent();
     void EndMiruraEvent();
 
+    void pppSetDebugHide(unsigned char);
     void SetUSBData();
 };
 

@@ -1,6 +1,7 @@
 #include "ffcc/pppPart.h"
 
 #include "ffcc/map.h"
+#include "ffcc/p_game.h"
 #include "ffcc/memory.h"
 #include "ffcc/sound.h"
 #include "ffcc/p_camera.h"
@@ -884,12 +885,91 @@ void pppCacheDumpShape(short*, _pppDataHead*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 80055308
+ * PAL Size: 1376b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _pppStartPart(_pppMngSt*, long*, int)
+void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 {
-	// TODO
+	struct pppProgramSetDefRaw
+	{
+		pppProgramSetDefRaw* m_next;
+		int m_unk4;
+		int m_unk8;
+		int m_unkC;
+		int m_startFrame;
+	};
+
+	struct pppPDataValRaw
+	{
+		pppProgramSetDefRaw* m_programSetDef;
+		int m_nextSpawnTime;
+		_pppPObjLink* m_objHead;
+		short m_activeCount;
+		unsigned char m_index;
+		unsigned char m_pad;
+	};
+
+	pppMngStPtr = pppMngSt;
+
+	unsigned char* mngBytes = (unsigned char*)pppMngSt;
+	*(int*)(mngBytes + 0x24) = (int)pdt[0];
+	*(unsigned char*)(mngBytes + 0xF4) = (unsigned char)pdt[1];
+	*(unsigned char*)(mngBytes + 0xE6) = 0;
+
+	short* modelList = (short*)((unsigned char*)pdt + pdt[4]);
+	short* shapeList = (short*)((unsigned char*)pdt + pdt[5]);
+
+	if (Game.game.m_currentSceneId != 7) {
+		pppCacheLoadModel(modelList, (_pppDataHead*)pdt);
+		pppCacheLoadShape(shapeList, (_pppDataHead*)pdt);
+		*(unsigned char*)(mngBytes + 0xF5) = 1;
+	}
+
+	int controlOffset = (int)pdt[2];
+	int programOffset = (int)pdt[3];
+	int controlCount = *(int*)((unsigned char*)pdt + controlOffset);
+	int programCount = *(int*)((unsigned char*)pdt + programOffset);
+
+	*(int*)(mngBytes + 0xB4) = controlCount;
+	*(int*)(mngBytes + 0xB8) = programCount;
+	*(void**)(mngBytes + 0xCC) = (void*)((int*)((unsigned char*)pdt + controlOffset) + 1);
+	*(void**)(mngBytes + 0xD0) = (void*)((int*)((unsigned char*)pdt + programOffset) + 1);
+	*(int*)(mngBytes + 0x34) = 0;
+	*(int*)(mngBytes + 0xAC) = 0;
+
+	pppPDataValRaw* pDataVals = 0;
+	if (programCount > 0) {
+		pDataVals = (pppPDataValRaw*)new (pppEnvStPtr->m_stagePtr, (char*)"pppPart.cpp", 0x585) unsigned char[programCount * 0x10];
+	}
+	*(void**)(mngBytes + 0xC8) = pDataVals;
+
+	pppProgramSetDefRaw* programSet = (pppProgramSetDefRaw*)(pdt + 6);
+	for (int i = 0; i < programCount && programSet != 0 && pDataVals != 0; i++) {
+		pDataVals[i].m_programSetDef = programSet;
+		pDataVals[i].m_nextSpawnTime = programSet->m_startFrame;
+		pDataVals[i].m_objHead = 0;
+		pDataVals[i].m_activeCount = 0;
+		pDataVals[i].m_index = (unsigned char)i;
+		pDataVals[i].m_pad = 0;
+		programSet = programSet->m_next;
+	}
+
+	if (runControlPrograms != 0) {
+		void** controlTable = (void**)*(void**)(mngBytes + 0xCC);
+		for (int i = 0; i < controlCount; i++) {
+			unsigned char* controlEntry = (unsigned char*)controlTable[i];
+			if (controlEntry != 0) {
+				void (*fn)(_pppMngSt*) = *(void (**)(_pppMngSt*))(controlEntry + 0x10);
+				if (fn != 0) {
+					fn(pppMngSt);
+				}
+			}
+		}
+	}
 }
 
 /*

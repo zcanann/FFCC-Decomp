@@ -789,3 +789,5 @@ CGame::CGameWork::CGameWork()
 {
 	// TODO
 }
+
+template class CPtrArray<CMapLightHolder*>;

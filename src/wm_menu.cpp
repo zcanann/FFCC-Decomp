@@ -2,6 +2,30 @@
 
 #include "ffcc/p_game.h"
 
+extern "C" void* __vt__Q212CFlatRuntime7CObject[];
+extern "C" void* __vt__8CGBaseObj[];
+extern "C" void* __vt__8CGObject[];
+
+/*
+ * --INFO--
+ * PAL Address: 0x80102e9c
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CMenuPcs::EffectInfo::EffectInfo()
+{
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	void*** const vtable = reinterpret_cast<void***>(bytes + 0x54);
+
+	*vtable = __vt__Q212CFlatRuntime7CObject;
+	bytes[0x44] &= 0xEF;
+	*vtable = __vt__8CGBaseObj;
+	*vtable = __vt__8CGObject;
+}
+
 /*
  * --INFO--
  * Address:	TODO

@@ -523,9 +523,9 @@ void CGame::GetParticleSpecialInfo(PPPIFPARAM&, int&, int&)
  * Address:	TODO
  * Size:	TODO
  */
-void CGame::GetPartyObj(int)
+CGPartyObj* CGame::GetPartyObj(int index)
 {
-	// TODO
+    return m_partyObjArr[index];
 }
 
 /*

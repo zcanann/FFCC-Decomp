@@ -67,4 +67,6 @@ public:
 	CATemp m_bestPath;                      // 0x2420
 }; // Size 0x24a8
 
+extern CAStar AStar;
+
 #endif // _FFCC_ASTAR_H_

@@ -205,19 +205,22 @@ int CRedSound::ReportStandby(int id)
 	int i;
 
 	if (id == 0) {
-		for (i = 0; i < 0x40; i++) {
-			if (((int*)DAT_8032e17c)[i] != 0) {
+		i = 0;
+		do {
+			if (DAT_8032e17c[i] != 0) {
 				return 1;
 			}
-		}
+			i++;
+		} while (i < 0x40);
 	} else {
-		for (i = 0; i < 0x40; i++) {
-			if (((int*)DAT_8032e17c)[i] == id) {
+		i = 0;
+		do {
+			if (id == DAT_8032e17c[i]) {
 				return 1;
 			}
-		}
+			i++;
+		} while (i < 0x40);
 	}
-
 	return 0;
 }
 
@@ -466,9 +469,11 @@ void CRedSound::SeStopMG(int, int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::SePlay(int, int, int, int, int)
+int CRedSound::SePlay(int seID, int sepID, int unk, int volume, int pitch)
 {
-	// TODO
+	int autoID = GetAutoID();
+	CRedDriver_8032f4c0.SePlay(seID, sepID, autoID, unk, volume, pitch);
+	return autoID;
 }
 
 /*
@@ -664,10 +669,10 @@ void CRedSound::StreamPause(int streamID, int pause)
 unsigned int CRedSound::SetWaveData(int waveID, void* waveData, int waveSize)
 {
 	unsigned int id = GetAutoID();
-	int* standbyID = EntryStandbyID(id);
+	int standbyID = (int)EntryStandbyID(id);
 
 	if (standbyID != 0) {
-		CRedDriver_8032f4c0.SetWaveData((int)standbyID, waveID, waveData, waveSize);
+		CRedDriver_8032f4c0.SetWaveData(standbyID, waveID, waveData, waveSize);
 	}
 
 	return id;

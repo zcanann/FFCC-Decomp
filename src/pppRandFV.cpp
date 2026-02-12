@@ -1,11 +1,27 @@
 #include "ffcc/pppRandFV.h"
 #include "ffcc/math.h"
+#include "types.h"
 
 extern CMath math;
-extern "C" float RandF__5CMathFv(CMath*);
-extern int lbl_8032ED70;
-extern float lbl_8032FF90;
-extern float lbl_801EADC8;
+extern s32 lbl_8032ED70;
+extern f32 lbl_8032FF90;
+extern f32 lbl_801EADC8[];
+extern "C" f32 RandF__5CMathFv(CMath*);
+
+struct PppRandFVParam2 {
+    s32 field0;
+    s32 field4;
+    f32 field8;
+    f32 fieldC;
+    f32 field10;
+    u8 unk14[0x18 - 0x14];
+    u8 field18;
+};
+
+struct PppRandFVParam3 {
+    u8 unk0[0xC];
+    s32* fieldC;
+};
 
 /*
  * --INFO--
@@ -18,46 +34,42 @@ extern float lbl_801EADC8;
  */
 void pppRandFV(void* param1, void* param2, void* param3)
 {
-    int* p1 = (int*)param1;
-    int* p3 = (int*)param3;
-    int* p2 = (int*)param2;
-
     if (lbl_8032ED70 != 0) {
         return;
     }
 
-    if (p1[3] == 0) {
-        float randVal = RandF__5CMathFv(&math);
+    u8* base = (u8*)param1;
+    PppRandFVParam2* in = (PppRandFVParam2*)param2;
+    PppRandFVParam3* out = (PppRandFVParam3*)param3;
+    f32* valuePtr;
 
-        if (((unsigned char*)p3)[0x18] != 0) {
-            randVal += RandF__5CMathFv(&math);
+    s32 state = *(s32*)(base + 0xC);
+    if (state == 0) {
+        f32 value = RandF__5CMathFv(&math);
+        if (in->field18 != 0) {
+            value += RandF__5CMathFv(&math);
         } else {
-            randVal *= lbl_8032FF90;
+            value *= lbl_8032FF90;
         }
 
-        int* indexPtr = *(int**)((char*)p2 + 0xC);
-        *(float*)((char*)p1 + *indexPtr + 0x80) = randVal;
-        return;
-    }
-
-    if (p3[0] != p1[3]) {
-        return;
-    }
-
-    int* indexPtr = *(int**)((char*)p2 + 0xC);
-    float* destAddr = (float*)((char*)p1 + *indexPtr + 0x80);
-    int srcOffset = p3[1];
-    float* srcAddr;
-
-    if (srcOffset == -1) {
-        srcAddr = &lbl_801EADC8;
+        valuePtr = (f32*)(base + *out->fieldC + 0x80);
+        *valuePtr = value;
     } else {
-        srcAddr = (float*)((char*)p1 + srcOffset + 0x80);
+        if (in->field0 != state) {
+            return;
+        }
+        valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
 
-    float destVal = *destAddr;
+    f32* target;
+    if (in->field4 == -1) {
+        target = lbl_801EADC8;
+    } else {
+        target = (f32*)(base + in->field4 + 0x80);
+    }
 
-    srcAddr[0] = srcAddr[0] + (*(float*)((char*)p3 + 8) * destVal - *(float*)((char*)p3 + 8));
-    srcAddr[1] = srcAddr[1] + (*(float*)((char*)p3 + 12) * destVal - *(float*)((char*)p3 + 12));
-    srcAddr[2] = srcAddr[2] + (*(float*)((char*)p3 + 16) * destVal - *(float*)((char*)p3 + 16));
+    f32 scale = *valuePtr;
+    target[0] = target[0] + in->field8 * scale;
+    target[1] = target[1] + in->fieldC * scale;
+    target[2] = target[2] + in->field10 * scale;
 }

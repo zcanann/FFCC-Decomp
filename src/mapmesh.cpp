@@ -269,19 +269,18 @@ void CMapMesh::SetRenderArray()
  */
 void CMapMesh::DrawMesh(unsigned short startIdx, unsigned short count)
 {
-    unsigned int remaining = count;
-    MeshDrawEntry* entry = DrawEntries(this) + startIdx;
+    unsigned int remaining = count & 0xFFFF;
+    MeshDrawEntry* entry = DrawEntries(this) + (startIdx & 0xFFFF);
 
     while (remaining != 0) {
+        remaining--;
         if (entry->size != 0) {
-            CMaterialSet* materialSet = DefaultMaterialSet();
-            SetBlendMode__12CMaterialManFP12CMaterialSeti(MaterialMan, materialSet, entry->materialIdx);
-            SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(MaterialMan, materialSet, entry->materialIdx, 0,
-                                                                       1);
+            SetBlendMode__12CMaterialManFP12CMaterialSeti(MaterialMan, DefaultMaterialSet(), entry->materialIdx);
+            SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(MaterialMan, DefaultMaterialSet(),
+                                                                       entry->materialIdx, 0, 1);
             GXCallDisplayList(entry->displayList, entry->size);
         }
         entry++;
-        remaining--;
     }
 }
 
@@ -380,23 +379,18 @@ void CMapMesh::DrawPart(CMaterialSet* materialSet, int drawMaterialPart)
  */
 void* CMapMesh::GetTexture(CMaterialSet* materialSet, int& textureIndex)
 {
-    int* drawEntry;
-
-    if (U16At(this, 0xA) == 0) {
-        return 0;
-    }
-
-    drawEntry = reinterpret_cast<int*>(PtrAt(this, 0x40));
-    if (*drawEntry == 0) {
+    int* drawEntry = reinterpret_cast<int*>(PtrAt(this, 0x40));
+    if ((U16At(this, 0xA) == 0) || (*drawEntry == 0)) {
         return 0;
     }
 
     unsigned short materialIdx = *reinterpret_cast<unsigned short*>(drawEntry + 2);
     textureIndex = materialIdx;
-
-    CMaterial* material =
-        (*reinterpret_cast<CPtrArray<CMaterial*>*>(reinterpret_cast<unsigned char*>(materialSet) + 8))[materialIdx];
-    return *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(material) + 0x3C);
+    return *reinterpret_cast<void**>(
+        reinterpret_cast<unsigned char*>(
+            (*reinterpret_cast<CPtrArray<CMaterial*>*>(reinterpret_cast<unsigned char*>(materialSet) + 8))[materialIdx]
+        ) +
+        0x3C);
 }
 
 /*

@@ -16,6 +16,7 @@ static const float kPppZero = 0.0; // FLOAT_8032fddc
 static const float kPppOne = 1.0; // FLOAT_8032fdfc
 static const double kScaleConstA = 4503601774854144.0; // DOUBLE_803304b0
 static const float kScaleConstB = 0.017453292f; // FLOAT_803304a8
+extern "C" unsigned char lbl_8032ED85;
 
 /*
  * --INFO--
@@ -1210,7 +1211,7 @@ void pppDrawMesh(pppModelSt*, Vec*, int)
  */
 void pppInitBlendMode()
 {
-	// TODO
+	lbl_8032ED85 = 0xFF;
 }
 
 /*

@@ -83,7 +83,7 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(struct pppYmCheckBGHeight* pp
         cyl.m_height = FLOAT_80330ed0;
         hitResult = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, (CMapCylinder*)&cyl, &cyl.m_direction, 0xffffffff);
         if ((hitResult != 0) &&
-            (CalcHitPosition__7CMapObjFP3Vec(*(void**)((char*)&MapMng + 0x22A88), &hitPos),
+            (CalcHitPosition__7CMapObjFP3Vec(*(void**)((char*)&MapMng + 0x22A78), &hitPos),
              (float)(currentY - (double)param_2->m_serializedDataOffsets) <= hitPos.y)) {
             currentY = (double)(hitPos.y + param_2->m_unk0x8);
         }

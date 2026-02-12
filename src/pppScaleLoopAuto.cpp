@@ -4,6 +4,19 @@
 extern int lbl_8032ED70;
 extern float lbl_801EC9F0[];
 
+struct pppScaleLoopAutoWork {
+    float m_scale[3];
+    u8 _pad0x0c[4];
+    float m_baseScale[3];
+    u8 m_initialized;
+    u8 m_step;
+    s16 m_angle;
+    s8 m_countA;
+    s8 m_countB;
+    u8 _pad0x22[2];
+    float m_delta;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x8012b4f4
@@ -19,76 +32,73 @@ void pppScaleLoopAuto(void* arg1, void* arg2, void* arg3)
         return;
     }
 
-    u32* ctrlA = *(u32**)arg3;
-    u32* ctrlB = *(u32**)((u8*)arg3 + 0xC);
-    u8* workA = (u8*)arg1 + ctrlA[0] + 0x80;
-    u8* workB = (u8*)arg1 + ctrlB[0] + 0x80;
-    f32* workBF = (f32*)workB;
+    int* offsets = (int*)((u8*)arg3 + 0xC);
+    pppScaleLoopAutoWork* work = (pppScaleLoopAutoWork*)((u8*)arg1 + offsets[0] + 0x80);
 
     if (*(u32*)((u8*)arg2 + 0x0) == *(u32*)((u8*)arg1 + 0xC)) {
-        *(f32*)(workA + 0x0) += *(f32*)((u8*)arg2 + 0x8);
-        *(f32*)(workA + 0x4) += *(f32*)((u8*)arg2 + 0xC);
-        *(f32*)(workA + 0x8) += *(f32*)((u8*)arg2 + 0x10);
+        work->m_scale[0] += *(f32*)((u8*)arg2 + 0x8);
+        work->m_scale[1] += *(f32*)((u8*)arg2 + 0xC);
+        work->m_scale[2] += *(f32*)((u8*)arg2 + 0x10);
     }
 
-    if (workB[28] == 0) {
-        workB[28] = 1;
-        workBF[4] = workBF[0];
-        workBF[5] = workBF[1];
-        workBF[6] = workBF[2];
-        workB[32] = *((u8*)arg2 + 29);
-        workB[33] = *((u8*)arg2 + 30);
+    if (work->m_initialized == 0) {
+        work->m_initialized = 1;
+        work->m_baseScale[0] = work->m_scale[0];
+        work->m_baseScale[1] = work->m_scale[1];
+        work->m_baseScale[2] = work->m_scale[2];
+        work->m_countA = *((u8*)arg2 + 29);
+        work->m_countB = *((u8*)arg2 + 30);
         return;
     }
 
-    s16 angle = *(s16*)(workB + 30);
+    s16 angle = work->m_angle;
     if (angle < 90) {
-        s8 cnt = *(s8*)(workB + 32);
+        s8 cnt = work->m_countA;
         if (cnt <= 0) {
             return;
         }
 
-        *(s8*)(workB + 32) = cnt - 1;
-        workBF[4] += workBF[9];
-        workBF[5] += workBF[9];
-        workBF[6] += workBF[9];
+        work->m_countA = cnt - 1;
+        work->m_scale[0] = work->m_baseScale[0] + work->m_delta;
+        work->m_scale[1] = work->m_baseScale[1] + work->m_delta;
+        work->m_scale[2] = work->m_baseScale[2] + work->m_delta;
         return;
     }
 
     if (angle < 270) {
-        s8 cnt = *(s8*)(workB + 33);
+        s8 cnt = work->m_countB;
         if (cnt <= 0) {
             return;
         }
 
-        *(s8*)(workB + 33) = cnt - 1;
-        workBF[4] += workBF[9];
-        workBF[5] += workBF[9];
-        workBF[6] += workBF[9];
+        work->m_countB = cnt - 1;
+        work->m_scale[0] = work->m_baseScale[0] + work->m_delta;
+        work->m_scale[1] = work->m_baseScale[1] + work->m_delta;
+        work->m_scale[2] = work->m_baseScale[2] + work->m_delta;
         return;
     }
 
-    workB[29]++;
-    if (workB[29] > *((u8*)arg2 + 28)) {
-        workB[29] = 0;
-        *(s16*)(workB + 30) = 0;
-        workB[32] = *((u8*)arg2 + 29);
-        workB[33] = *((u8*)arg2 + 30);
+    work->m_step++;
+    if (work->m_step > *((u8*)arg2 + 28)) {
+        work->m_step = 0;
+        work->m_angle = 0;
+        work->m_countA = *((u8*)arg2 + 29);
+        work->m_countB = *((u8*)arg2 + 30);
         return;
     }
 
     angle += 360 / (s32)(*((u8*)arg2 + 28));
-    *(s16*)(workB + 30) = angle;
+    work->m_angle = angle;
 
     {
-        s32 tableAngle = (angle * 32768) / 360;
+        s32 tableAngle = (s32)(((f64)((s32)work->m_angle << 15)) / 360.0);
         f32 sinVal = *(f32*)((u8*)lbl_801EC9F0 + (tableAngle & 0x3FFC));
         f32 delta = (*(f32*)((u8*)arg2 + 24) * sinVal) * *(f32*)((u8*)arg2 + 32);
 
-        workBF[9] = delta;
-        workBF[4] += delta;
-        workBF[5] += delta;
-        workBF[6] += delta;
+        work->m_delta = delta;
+        work->m_scale[0] = work->m_baseScale[0] + delta;
+        work->m_scale[1] = work->m_baseScale[1] + delta;
+        work->m_scale[2] = work->m_baseScale[2] + delta;
     }
 }
 

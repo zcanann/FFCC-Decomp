@@ -117,11 +117,11 @@ void pppConstructYmTracer(pppYmTracer* pppYmTracer, UnkC* param_2)
  */
 void pppConstruct2YmTracer(pppYmTracer* pppYmTracer, UnkC* param_2)
 {
-    int iVar1;
+    u8* work;
 
-    iVar1 = *param_2->m_serializedDataOffsets;
-    *(u16*)((char*)pppYmTracer + 0xae + iVar1) = 0;
-    *(u16*)((char*)pppYmTracer + 0xac + iVar1) = 0;
+    work = (u8*)pppYmTracer + *param_2->m_serializedDataOffsets;
+    *(u16*)(work + 0xAE) = 0;
+    *(u16*)(work + 0xAC) = 0;
 }
 
 /*

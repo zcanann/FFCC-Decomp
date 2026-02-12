@@ -7,6 +7,8 @@
 extern "C" {
     extern CMaterialMan MaterialMan;
     extern void* CAMemCacheSet;
+    unsigned short FindTexName__12CMaterialSetFPcPl(CMaterialSet* materialSet, char* textureName,
+                                                     long* outIndex);
 }
 
 /*
@@ -109,12 +111,30 @@ void pppSetShapeMaterial0(pppShapeSt*, tagOAN3_SHAPE*, CMaterialSet*, char **)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800659ec
+ * PAL Size: 168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppSetShapeMaterial(pppShapeSt*, CMaterialSet*, char **)
+void pppSetShapeMaterial(pppShapeSt* shapeSt, CMaterialSet* materialSet, char** textureNames)
 {
-	// TODO
+    void* animData = shapeSt->m_animData;
+    void* currentFrame = animData;
+
+    for (int frameIndex = 0; frameIndex < *(short*)((int)animData + 6); frameIndex++) {
+        int shapeEntry = (int)animData + *(short*)((int)currentFrame + 0x10);
+
+        for (int shapeIndex = 0; shapeIndex < *(short*)(shapeEntry + 2); shapeIndex++) {
+            *(unsigned char*)(shapeEntry + 10) =
+                FindTexName__12CMaterialSetFPcPl(materialSet, textureNames[*(unsigned char*)(shapeEntry + 10)], 0);
+            *(int*)(shapeEntry + 0xc) = (int)shapeSt->m_displayListData + *(int*)(shapeEntry + 0xc);
+            shapeEntry += 8;
+        }
+
+        currentFrame = (void*)((int)currentFrame + 8);
+    }
 }
 
 /*

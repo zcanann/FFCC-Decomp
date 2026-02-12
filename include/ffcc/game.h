@@ -119,7 +119,7 @@ public:
     void GetFoodLevel(int, int);
     void GetTargetCursor(int, Vec&, Vec&);
     void GetParticleSpecialInfo(PPPIFPARAM&, int&, int&);
-    void GetPartyObj(int);
+    CGPartyObj* GetPartyObj(int);
     void MakeArtItemName(char*, int, int);
     void MakeArtsItemNames(char*, int);
     void MakeNumItemName(char*, int, int);

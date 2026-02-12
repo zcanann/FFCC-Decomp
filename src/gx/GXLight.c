@@ -522,14 +522,19 @@ void GXSetChanMatColor(GXChannelID chan, GXColor mat_color) {
 }
 
 void GXSetNumChans(u8 nChans) {
+    u32 n;
+    GXData* data;
+
     CHECK_GXBEGIN(857, "GXSetNumChans");
     ASSERTMSGLINE(858, nChans <= 2, "GXSetNumChans: nChans > 2");
 
-    __GXData->genMode = (__GXData->genMode & ~0x70) | ((u32)(nChans & 0xFF) << 4);
+    data = __GXData;
+    n = nChans;
+    data->genMode = (data->genMode & ~0x70) | (n << 4);
     GX_WRITE_U8(0x10);
     GX_WRITE_U32(0x1009);
-    GX_WRITE_U32(nChans & 0xFF);
-    __GXData->dirtyState |= 4;
+    GX_WRITE_U32(n);
+    data->dirtyState |= 4;
 }
 
 void GXSetChanCtrl(GXChannelID chan, GXBool enable, GXColorSrc amb_src, GXColorSrc mat_src, u32 light_mask, GXDiffuseFn diff_fn, GXAttnFn attn_fn) {

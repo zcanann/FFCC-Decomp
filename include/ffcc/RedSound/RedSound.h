@@ -45,7 +45,7 @@ public:
 	void SePlayState(int);
 	void SeStop(int);
 	void SeStopMG(int, int, int, int);
-	void SePlay(int, int, int, int, int);
+	int SePlay(int, int, int, int, int);
 	void SeMasterVolume(int);
 	void SeFadeOut(int, int);
 	void SeVolume(int, int, int);

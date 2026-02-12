@@ -830,7 +830,7 @@ void C_MTXRotAxisRad(Mtx m, const Vec *axis, f32 rad)
  * JP Address: TODO
  * JP Size: TODO
  */
-void __PSMTXRotAxisRadInternal(register f32 sT, register f32 cT, register Mtx m, const Vec *axis)
+void __PSMTXRotAxisRadInternal(register f32 sT, register f32 cT, register Mtx m, register const Vec *axis)
 {
     register f32 rad;
     register f32 tmp0, tmp1, tmp2, tmp3, tmp4;
@@ -838,6 +838,13 @@ void __PSMTXRotAxisRadInternal(register f32 sT, register f32 cT, register Mtx m,
 
     register f32 oneMinusCosT;
     register f32 zero;
+    register f32 half = 0.5f;
+    register f32 three = 3.0f;
+    register f32 FP2, FP3;
+    register f32 xx_zz, xx_yy;
+    register f32 square_sum;
+    register f32 ret_sqrt;
+    register f32 n_0, n_1;
     Vec axisNormalized;
     register Vec *axisNormalizedPtr;
 
@@ -845,7 +852,24 @@ void __PSMTXRotAxisRadInternal(register f32 sT, register f32 cT, register Mtx m,
     axisNormalizedPtr = &axisNormalized;
     oneMinusCosT = 1.0f - cT;
 
-    PSVECNormalize(axis, axisNormalizedPtr);
+    #ifdef __MWERKS__ // clang-format off
+    asm {
+		psq_l       FP2, 0(axis), 0, 0;
+		ps_mul      xx_yy, FP2, FP2;
+		psq_l       FP3, 8(axis), 1, 0;
+		ps_madd     xx_zz, FP3, FP3, xx_yy;
+		ps_sum0     square_sum, xx_zz, FP3, xx_yy;
+		frsqrte     ret_sqrt, square_sum;
+		fmuls       n_0, ret_sqrt, ret_sqrt;
+		fmuls       n_1, ret_sqrt, half;
+		fnmsubs     n_0, n_0, square_sum, three;
+		fmuls       ret_sqrt, n_0, n_1;
+		ps_muls0    FP2, FP2, ret_sqrt;
+		psq_st      FP2, 0(axisNormalizedPtr), 0, 0;
+		ps_muls0    FP3, FP3, ret_sqrt;
+		psq_st      FP3, 8(axisNormalizedPtr), 1, 0;
+    }
+    #endif // clang-format on
 
 #ifdef __MWERKS__ // clang-format off
   asm {

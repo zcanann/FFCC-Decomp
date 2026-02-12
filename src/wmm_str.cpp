@@ -162,11 +162,12 @@ const char* CMenuPcs::GetWinMess(int index)
 int CMenuPcs::GetYesNoXPos(int right)
 {
     static const char sYes[] = "\0Yes";
+    static const char sSi[] = "\0Si";
     static const char sJa[] = "\0Ja";
     static const char sOui[] = "\0Oui";
 
     const unsigned int languageId = Game.game.m_gameWork.m_languageId;
-    const char* yesText = sOui;
+    const char* yesText = sSi;
     if (languageId != 3) {
         if (languageId < 3) {
             if ((languageId != 1) && (languageId != 0)) {
@@ -174,8 +175,8 @@ int CMenuPcs::GetYesNoXPos(int right)
                 goto apply_font_yes;
             }
         } else {
-            yesText = sYes;
-            if ((languageId == 5) || (languageId < 5)) {
+            yesText = sSi;
+            if ((languageId == 5) || ((yesText = sOui), languageId < 5)) {
                 goto apply_font_yes;
             }
         }
@@ -223,7 +224,7 @@ int CMenuPcs::GetSlotABXPos(int right)
             }
         } else {
             slotAText = sRanuraA;
-            if ((languageId == 5) || (languageId < 5)) {
+            if ((languageId == 5) || ((slotAText = sSlotA), languageId < 5)) {
                 goto apply_font_slot;
             }
         }
@@ -239,7 +240,7 @@ apply_font_slot:
 
     const int slotAWidth = GetWidth__5CFontFPc(font, slotAText + 1);
     short* windowInfo = *(short**)((char*)this + 0x848);
-    int x = (int)((windowInfo[2] - slotAWidth) * 0.5f + windowInfo[0]);
+    int x = (int)(((double)(windowInfo[2] - slotAWidth) * 0.5) + (double)windowInfo[0]);
     if (right != 0) {
         const int slotBWidth = GetWidth__5CFontFPc(font, lbl_80216740[languageId - 1]);
         x += slotAWidth - slotBWidth;

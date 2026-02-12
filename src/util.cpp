@@ -1,4 +1,22 @@
 #include "ffcc/util.h"
+#include "ffcc/gxfunc.h"
+
+extern float lbl_8032f888;
+extern float lbl_8032f88c;
+extern float lbl_8032f8a0;
+extern float lbl_8032f8a4;
+extern float lbl_8032f8a8;
+
+extern struct {
+    float _212_4_;
+    float _216_4_;
+    float _220_4_;
+    float _224_4_;
+    float _228_4_;
+    float _232_4_;
+    Mtx m_cameraMatrix;
+    Mtx44 m_screenMatrix;
+} CameraPcs;
 
 // Vec2d definition 
 struct Vec2d {
@@ -347,12 +365,83 @@ void CUtil::EndQuadEnv()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80023ed0
+ * PAL Size: 956b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CUtil::ClearZBufferRect(float, float, float, float)
+void CUtil::ClearZBufferRect(float x, float y, float width, float height)
 {
-	// TODO
+    Mtx modelMtx;
+    Mtx cameraMtx;
+    Mtx44 orthoMtx;
+    Mtx44 screenMtx;
+    GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
+    float indMtx[2][3] = {
+        {0.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 0.0f},
+    };
+
+    float x2 = x + width;
+    float y2 = y + height;
+
+    PSMTXIdentity(modelMtx);
+    GXLoadPosMtxImm(modelMtx, 0);
+    GXSetCurrentMtx(0);
+
+    C_MTXOrtho(orthoMtx, lbl_8032f888, lbl_8032f8a0, lbl_8032f888, lbl_8032f8a4, lbl_8032f888, lbl_8032f88c);
+    GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
+
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetNumTexGens(1);
+    GXSetNumChans(1);
+    GXSetNumTevStages(1);
+    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
+    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetTevDirect(GX_TEVSTAGE0);
+    GXSetNumIndStages(0);
+    GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
+    GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
+    GXSetIndTexMtx(GX_ITM_2, indMtx, 1);
+    GXSetZMode(GX_TRUE, GX_ALWAYS, GX_TRUE);
+
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+    GXSetNumTexGens(0);
+    GXSetChanAmbColor(GX_COLOR0A0, white);
+    GXSetChanMatColor(GX_COLOR0A0, white);
+    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+
+    GXSetColorUpdate(GX_FALSE);
+    GXSetAlphaUpdate(GX_FALSE);
+
+    GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
+    GXPosition3f32(x, y, lbl_8032f8a8);
+    GXColor1u32(*reinterpret_cast<u32*>(&white));
+    GXPosition3f32(x2, y, lbl_8032f8a8);
+    GXColor1u32(*reinterpret_cast<u32*>(&white));
+    GXPosition3f32(x2, y2, lbl_8032f8a8);
+    GXColor1u32(*reinterpret_cast<u32*>(&white));
+    GXPosition3f32(x, y2, lbl_8032f8a8);
+    GXColor1u32(*reinterpret_cast<u32*>(&white));
+
+    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+    PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+    GXLoadPosMtxImm(cameraMtx, 0);
+    GXSetProjection(screenMtx, GX_PERSPECTIVE);
+    GXSetColorUpdate(GX_TRUE);
+    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
 }
 
 /*

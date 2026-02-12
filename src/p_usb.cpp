@@ -177,73 +177,60 @@ static inline unsigned int Swap32(unsigned int x)
  */
 int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
 {
-    unsigned int count      = (unsigned int)(elemSize * elemCount);
-    unsigned int packetSize = Align32(count + 0x40);
+    unsigned int count = (unsigned int)(elemSize * elemCount);
+    unsigned int packetSize = (count + 0x5F) & ~0x1F;
 
-    // Prefer big stage if present, else small stage (matches target).
-    CMemory::CStage* stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
+    CMemory::CStage* stage = m_bigStage;
+    if (stage == (CMemory::CStage*)nullptr) {
+        stage = m_smallStage;
+    }
 
     unsigned int* packet = (unsigned int*)__nwa__FUlPQ27CMemory6CStagePci(packetSize, stage, "p_usb.cpp", 0x1ca);
-    unsigned int* sendBuf = (unsigned int*)nullptr;
-
-    int result = 0;
-
-    // Header
-    packet[0]  = 4;
-    packet[1]  = packetSize;
-    packet[8]  = Swap32(count);
-    packet[9]  = Swap32((unsigned int)code);
+    packet[1] = packetSize;
+    packet[0] = 4;
+    packet[9] = Swap32((unsigned int)code);
     packet[10] = Swap32((unsigned int)elemCount);
-    packet[11] = 0;
     packet[12] = Swap32(count);
+    packet[11] = 0;
+    packet[8] = Swap32(count);
+    memcpy(packet + 0x10, src, count);
 
-    // Payload
-    memcpy((unsigned char*)packet + 0x40, src, count);
+    int result;
+    if (!USB.IsConnected()) {
+        result = 0;
+    } else {
+        stage = m_bigStage;
+        if (stage == (CMemory::CStage*)nullptr) {
+            stage = m_smallStage;
+        }
 
-    do
-    {
-        if (!USB.IsConnected())
-            break;
-
-        // Target reloads stage selection here too.
-        stage = (m_bigStage != (CMemory::CStage*)nullptr) ? m_bigStage : m_smallStage;
-
-        unsigned int sendSize = Align32(packet[1]);
-
-        sendBuf = (unsigned int*)__nwa__FUlPQ27CMemory6CStagePci(sendSize, stage, "p_usb.cpp", 0x19e);
+        unsigned int sendSize = (packet[1] + 0x1F) & ~0x1F;
+        unsigned int* sendBuf = (unsigned int*)__nwa__FUlPQ27CMemory6CStagePci(sendSize, stage, "p_usb.cpp", 0x19e);
         memcpy(sendBuf, packet, sendSize);
 
-        // Swap only the first two words (matches target doing lwbrx on [0] and [1]).
-        sendBuf[0] = Swap32(sendBuf[0]);
-        sendBuf[1] = Swap32(sendBuf[1]);
+        unsigned int word = packet[0];
+        sendBuf[0] = Swap32(word);
+        word = packet[1];
+        sendBuf[1] = Swap32(word);
 
         DCFlushRange(sendBuf, sendSize);
         DCInvalidateRange(sendBuf, sendSize);
 
-        if (!USB.Write(sendBuf, (int)sendSize))
-        {
+        if (!USB.Write(sendBuf, sendSize)) {
             delete[] sendBuf;
-            sendBuf = (unsigned int*)nullptr;
-            break;
-        }
-
-        if (!USB.SendMessage(0, (MCCChannel)9))
-        {
+            result = 0;
+        } else if (!USB.SendMessage(0, (MCCChannel)9)) {
             delete[] sendBuf;
-            sendBuf = (unsigned int*)nullptr;
-            break;
+            result = 0;
+        } else {
+            delete[] sendBuf;
+            result = 1;
         }
+    }
 
-        delete[] sendBuf;
-        sendBuf = (unsigned int*)nullptr;
-
-        result = 1;
-    } while (0);
-
-    // Target always reaches a single cleanup for the packet.
-    if (packet != (unsigned int*)nullptr)
+    if (packet != (unsigned int*)nullptr) {
         delete[] packet;
-
+    }
     return result;
 }
 

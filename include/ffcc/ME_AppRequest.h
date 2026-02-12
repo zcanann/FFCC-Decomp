@@ -11,7 +11,7 @@ public:
     void ResetRsdList(ZLIST*);
     void DeleteRsdItem(RSDLISTITEM*);
     void DeleteColAnmData(ZCANMGRP**, int);
-    void AddRsdList(ZLIST*);
+    int AddRsdList(ZLIST*);
     int SetRsdFlag();
     void GetRsdItemR();
     int SetRsdIndex();

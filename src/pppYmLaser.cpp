@@ -1,7 +1,7 @@
 #include "ffcc/pppYmLaser.h"
 #include "ffcc/math.h"
 
-extern CMath math;
+extern CMath Math;
 extern "C" float RandF__5CMathFf(float param, CMath* math);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
 
@@ -29,26 +29,24 @@ extern "C" void pppConstructYmLaser(void* pppYmLaser, void* param_2)
 	float one = 1.0f;
 	float* work = (float*)((unsigned char*)pppYmLaser + 0x88 + data->offsets->m_serializedDataOffsets[2]);
 
-	*work = one;
-	work[1] = one;
-	work[2] = one;
-	work[3] = one;
-	work[4] = one;
-	work[5] = one;
+	*work = 1.0f;
 	work[6] = one;
+	work[5] = one;
+	work[4] = one;
+	work[3] = one;
+	work[2] = one;
+	work[1] = one;
 	work[7] = 0.0f;
-	work[8] = one;
-	work[9] = one;
 	work[10] = one;
-
+	work[9] = one;
+	work[8] = one;
 	*((unsigned char*)work + 0x2c) = 0;
 	*((unsigned char*)work + 0x2d) = 0;
 	*((unsigned char*)work + 0x2e) = 0;
-	*((unsigned short*)work + 0x18) = 0;
-	*((unsigned short*)work + 0x19) = 0;
-	*((unsigned short*)work + 0x1a) = 0;
-
-	work[14] = RandF__5CMathFf(1.0f, &math);
+	*((unsigned short*)((unsigned char*)work + 0x30)) = 0;
+	*((unsigned short*)((unsigned char*)work + 0x34)) = 0;
+	*((unsigned short*)((unsigned char*)work + 0x32)) = 0;
+	work[14] = RandF__5CMathFf(1.0f, &Math);
 }
 
 /*

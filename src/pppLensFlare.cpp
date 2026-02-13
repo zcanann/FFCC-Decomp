@@ -35,22 +35,22 @@ extern "C" void GXPeekZ(unsigned short, unsigned short, unsigned int*);
 void pppConstructLensFlare(void* obj, void* param)
 {
 	void* dataPtr = *((void**)((char*)param + 0x0c));
-	int offset = *((int*)((char*)dataPtr + 0x08));
+	char* work = (char*)obj + *((int*)((char*)dataPtr + 0x08)) + 0x80;
 
 	float initValue = FLOAT_80331060;
 
-	*((float*)((char*)obj + offset + 0x98)) = FLOAT_80331060;
-	*((float*)((char*)obj + offset + 0x94)) = initValue;
-	*((float*)((char*)obj + offset + 0x90)) = initValue;
-	*((float*)((char*)obj + offset + 0xa8)) = initValue;
-	*((float*)((char*)obj + offset + 0xa4)) = initValue;
-	*((float*)((char*)obj + offset + 0xa0)) = initValue;
+	*((float*)(work + 0x18)) = initValue;
+	*((float*)(work + 0x14)) = initValue;
+	*((float*)(work + 0x10)) = initValue;
+	*((float*)(work + 0x28)) = initValue;
+	*((float*)(work + 0x24)) = initValue;
+	*((float*)(work + 0x20)) = initValue;
 
-	*((short*)((char*)obj + offset + 0xb0)) = 0;
-	*((short*)((char*)obj + offset + 0xae)) = 0;
-	*((short*)((char*)obj + offset + 0xac)) = 0;
-	*((char*)obj + offset + 0xb2) = 0;
-	*((float*)((char*)obj + offset + 0xb4)) = initValue;
+	*((short*)(work + 0x30)) = 0;
+	*((short*)(work + 0x2e)) = 0;
+	*((short*)(work + 0x2c)) = 0;
+	*(work + 0x32) = 0;
+	*((float*)(work + 0x34)) = initValue;
 }
 
 /*

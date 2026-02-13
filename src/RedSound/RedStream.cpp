@@ -246,12 +246,27 @@ int _ArrangeStreamDataLoop(RedStreamDATA* param_1, int param_2, int param_3)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cbfc4
+ * PAL Size: 112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void StreamStop(int param_1)
 {
-	// TODO
+	void (*stopFn)(RedStreamDATA*);
+	unsigned int streamData;
+
+	stopFn = _StreamStop;
+	streamData = (unsigned int)DAT_8032f438;
+	do {
+		if ((*(int*)(streamData + 0x10c) != 0) &&
+		    ((param_1 == -1) || (param_1 == *(int*)(streamData + 0x10c)))) {
+			stopFn((RedStreamDATA*)streamData);
+		}
+		streamData += 0x130;
+	} while (streamData < (unsigned int)DAT_8032f438 + 0x4c0);
 }
 
 /*

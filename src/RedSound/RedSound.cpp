@@ -226,12 +226,16 @@ int CRedSound::ReportStandby(int id)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cce34
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::DMAEntry(int, int, int, int, int, void (*) (void*), void*)
+void CRedSound::DMAEntry(int type, int src, int dst, int length, int flags, void (*callback)(void*), void* userData)
 {
-	// TODO
+	RedDmaEntry(type, src, dst, length, flags, callback, userData);
 }
 
 /*
@@ -416,12 +420,16 @@ void CRedSound::ClearSeSepData(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd200
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::ClearSeSepDataMG(int, int, int, int)
+void CRedSound::ClearSeSepDataMG(int bank, int sep, int group, int kind)
 {
-	// TODO
+	CRedDriver_8032f4c0.ClearSeSepDataMG(bank, sep, group, kind);
 }
 
 /*
@@ -456,12 +464,16 @@ void CRedSound::SeStop(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd2c8
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::SeStopMG(int, int, int, int)
+void CRedSound::SeStopMG(int bank, int sep, int group, int kind)
 {
-	// TODO
+	CRedDriver_8032f4c0.SeStopMG(bank, sep, group, kind);
 }
 
 /*

@@ -599,26 +599,13 @@ u32 GXGetTexObjTlut(const GXTexObj* tex_obj) {
 
 void GXLoadTexObjPreLoaded(GXTexObj* obj, GXTexRegion* region, GXTexMapID id) {
     __GXTlutRegionInt* tlr;
-    u32 m0;
-    u32 m1;
-    u32 img0;
-    u32 img1;
-    u32 img2;
-    u32 img3;
     __GXTexObjInt* t = (__GXTexObjInt*)obj;
     __GXTexRegionInt* r = (__GXTexRegionInt*)region;
 
     ASSERTMSGLINE(1257, obj, "Texture Object Pointer is null");
-    ASSERTMSGLINE(1257, region, "TexRegion Object Pointer is null");
+    ASSERTMSGLINE(1258, region, "TexRegion Object Pointer is null");
     CHECK_GXBEGIN(1259, "GXLoadTexObjPreLoaded");
     ASSERTMSGLINEV(1260, id < GX_MAX_TEXMAP, "%s: invalid texture map ID", "GXLoadTexObj");
-
-    m0 = t->mode0;
-    m1 = t->mode1;
-    img0 = t->image0;
-    img1 = r->image1;
-    img2 = r->image2;
-    img3 = t->image3;
 
     SET_REG_FIELD(1271, t->mode0, 8, 24, GXTexMode0Ids[id]);
     SET_REG_FIELD(1272, t->mode1, 8, 24, GXTexMode1Ids[id]);

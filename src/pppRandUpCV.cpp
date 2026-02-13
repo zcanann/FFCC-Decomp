@@ -2,11 +2,23 @@
 #include "ffcc/math.h"
 #include "types.h"
 
-extern CMath math;
+extern CMath math[];
 extern s32 lbl_8032ED70;
 extern f32 lbl_8032FF08;
 extern u8 lbl_801EADC8[32];
 extern "C" f32 RandF__5CMathFv(CMath* instance);
+
+struct RandUpCVParam {
+    s32 targetId;
+    s32 sourceOffset;
+    s8 delta[4];
+    u8 randomTwice;
+};
+
+struct RandUpCVCtx {
+    u8 _pad[0xC];
+    s32* outputOffset;
+};
 
 /*
  * --INFO--
@@ -19,53 +31,52 @@ extern "C" f32 RandF__5CMathFv(CMath* instance);
  */
 void pppRandUpCV(void* param1, void* param2, void* param3)
 {
+    u8* base = (u8*)param1;
+    RandUpCVParam* in = (RandUpCVParam*)param2;
+    RandUpCVCtx* ctx = (RandUpCVCtx*)param3;
+    f32* valuePtr;
+
     if (lbl_8032ED70 != 0) {
         return;
     }
 
-    if (*(int*)param2 == *((int*)param1 + 3)) {
-        f32 value = RandF__5CMathFv(&math);
-        if (*((u8*)param2 + 0xC) != 0) {
-            value = (value + RandF__5CMathFv(&math)) * lbl_8032FF08;
+    if (in->targetId == *(s32*)(base + 0xC)) {
+        f32 value = RandF__5CMathFv(math);
+        if (in->randomTwice != 0) {
+            value = (value + RandF__5CMathFv(math)) * lbl_8032FF08;
         }
-        int valueOffset = **(int**)((char*)param3 + 0xC);
-        *(f32*)((char*)param1 + valueOffset + 0x80) = value;
-    }
 
-    if (*(int*)param2 != *((int*)param1 + 3)) {
+        valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
+        *valuePtr = value;
+    } else {
         return;
     }
 
-    int valueOffset = **(int**)((char*)param3 + 0xC);
-    f32* randomValue = (f32*)((char*)param1 + valueOffset + 0x80);
-    f32 scale = randomValue[0];
+    valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
+    f32 scale = *valuePtr;
 
-    int colorOffset = *((int*)param2 + 1);
+    s32 colorOffset = in->sourceOffset;
     u8* target;
     if (colorOffset == -1) {
         target = lbl_801EADC8;
     } else {
-        target = (u8*)((char*)param1 + colorOffset + 0x80);
+        target = base + colorOffset + 0x80;
     }
 
     {
-        s8 value = *(s8*)((char*)param2 + 0x8);
-        target[0] = (u8)(target[0] + (int)((f32)value * scale));
+        target[0] = (u8)(target[0] + (s32)((f32)in->delta[0] * scale));
     }
 
     {
-        s8 value = *(s8*)((char*)param2 + 0x9);
-        target[1] = (u8)(target[1] + (int)((f32)value * scale));
+        target[1] = (u8)(target[1] + (s32)((f32)in->delta[1] * scale));
     }
 
     {
-        s8 value = *(s8*)((char*)param2 + 0xA);
-        target[2] = (u8)(target[2] + (int)((f32)value * scale));
+        target[2] = (u8)(target[2] + (s32)((f32)in->delta[2] * scale));
     }
 
     {
-        s8 value = *(s8*)((char*)param2 + 0xB);
-        target[3] = (u8)(target[3] + (int)((f32)value * scale));
+        target[3] = (u8)(target[3] + (s32)((f32)in->delta[3] * scale));
     }
 }
 

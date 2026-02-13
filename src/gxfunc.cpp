@@ -178,13 +178,16 @@ void _GXSetTevAlphaIn(_GXTevStageID stage, _GXTevAlphaArg a, _GXTevAlphaArg b, _
  */
 void _GXSetTevColorOp(_GXTevStageID stage, _GXTevOp op, _GXTevBias bias, _GXTevScale scale, unsigned char clamp, _GXTevRegID outReg)
 {
-	if (s_GXSetTevColorOp_Reg[stage].op != op || s_GXSetTevColorOp_Reg[stage].bias != bias || s_GXSetTevColorOp_Reg[stage].scale != scale ||
-	    s_GXSetTevColorOp_Reg[stage].clamp != clamp || s_GXSetTevColorOp_Reg[stage].outReg != outReg) {
-		s_GXSetTevColorOp_Reg[stage].op = op;
-		s_GXSetTevColorOp_Reg[stage].bias = bias;
-		s_GXSetTevColorOp_Reg[stage].scale = scale;
-		s_GXSetTevColorOp_Reg[stage].clamp = clamp;
-		s_GXSetTevColorOp_Reg[stage].outReg = outReg;
+	int stageOff = stage * 0x14;
+	char* entry = (char*)s_GXSetTevColorOp_Reg + stageOff;
+
+	if (*(int*)(entry + 0x0) != op || *(int*)(entry + 0x4) != bias || *(int*)(entry + 0x8) != scale || *(entry + 0xC) != clamp ||
+	    *(int*)(entry + 0x10) != outReg) {
+		*(int*)(entry + 0x0) = op;
+		*(int*)(entry + 0x4) = bias;
+		*(int*)(entry + 0x8) = scale;
+		*(entry + 0xC) = clamp;
+		*(int*)(entry + 0x10) = outReg;
 		GXSetTevColorOp(stage, op, bias, scale, clamp, outReg);
 	}
 }
@@ -200,13 +203,16 @@ void _GXSetTevColorOp(_GXTevStageID stage, _GXTevOp op, _GXTevBias bias, _GXTevS
  */
 void _GXSetTevAlphaOp(_GXTevStageID stage, _GXTevOp op, _GXTevBias bias, _GXTevScale scale, unsigned char clamp, _GXTevRegID outReg)
 {
-	if (s_GXSetTevAlphaOp_Reg[stage].op != op || s_GXSetTevAlphaOp_Reg[stage].bias != bias || s_GXSetTevAlphaOp_Reg[stage].scale != scale ||
-	    s_GXSetTevAlphaOp_Reg[stage].clamp != clamp || s_GXSetTevAlphaOp_Reg[stage].outReg != outReg) {
-		s_GXSetTevAlphaOp_Reg[stage].op = op;
-		s_GXSetTevAlphaOp_Reg[stage].bias = bias;
-		s_GXSetTevAlphaOp_Reg[stage].scale = scale;
-		s_GXSetTevAlphaOp_Reg[stage].clamp = clamp;
-		s_GXSetTevAlphaOp_Reg[stage].outReg = outReg;
+	int stageOff = stage * 0x14;
+	char* entry = (char*)s_GXSetTevAlphaOp_Reg + stageOff;
+
+	if (*(int*)(entry + 0x0) != op || *(int*)(entry + 0x4) != bias || *(int*)(entry + 0x8) != scale || *(entry + 0xC) != clamp ||
+	    *(int*)(entry + 0x10) != outReg) {
+		*(int*)(entry + 0x0) = op;
+		*(int*)(entry + 0x4) = bias;
+		*(int*)(entry + 0x8) = scale;
+		*(entry + 0xC) = clamp;
+		*(int*)(entry + 0x10) = outReg;
 		GXSetTevAlphaOp(stage, op, bias, scale, clamp, outReg);
 	}
 }

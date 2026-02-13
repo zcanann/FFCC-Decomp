@@ -152,7 +152,7 @@ void pppFrameLensFlare(void* obj, void* param2, void* param3)
 			*alphaPtr = 0xff;
 		} else {
 			unsigned int scaledAlpha = *alphaPtr * (0xff / totalSamples);
-			if ((scaledAlpha & 0xff) < 0x100) {
+			if (scaledAlpha < 0x100) {
 				*alphaPtr = (unsigned char)scaledAlpha;
 			} else {
 				*alphaPtr = 0xff;

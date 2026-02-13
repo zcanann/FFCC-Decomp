@@ -34,12 +34,20 @@ static inline u32& U32At(CFunnyShape* self, u32 offset)
  */
 CFunnyShape::CFunnyShape()
 {
-    // Large class structure with multiple buffers
-    // Clear main buffer area first
+    PtrAt(this, 0x6010) = 0;
     memset(this, 0, 0x6000);
-    
-    // Initialize specific buffer areas (from Ghidra decomp analysis)
-    // Note: exact field layout unknown, using byte offsets from decomp
+    memset(Ptr(this, 0x6000), 0, 0x10);
+    memset(Ptr(this, 0x60D8), 0, 0x10);
+    memset(Ptr(this, 0x6014), 0, 0x40);
+
+    for (s32 i = 0; i < 0x10; i++) {
+        u32 offs = static_cast<u32>(i) * 4;
+        PtrAt(this, 0x6014 + offs) = 0;
+        PtrAt(this, 0x6054 + offs) = 0;
+        PtrAt(this, 0x6094 + offs) = 0;
+    }
+
+    U32At(this, 0x60D4) = 0;
 }
 
 /*
@@ -80,6 +88,54 @@ CFunnyShape::~CFunnyShape()
             PtrAt(this, 0x6054 + offs) = 0;
         }
     }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80051d80
+ * PAL Size: 204b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" CFunnyShape* dtor_80051D80(CFunnyShape* funnyShape, short shouldDelete)
+{
+    if (funnyShape != 0) {
+        if (PtrAt(funnyShape, 0x6010) != 0) {
+            __dla__FPv(PtrAt(funnyShape, 0x6010));
+            PtrAt(funnyShape, 0x6010) = 0;
+        }
+
+        if (PtrAt(funnyShape, 0x600C) != 0) {
+            __dla__FPv(PtrAt(funnyShape, 0x600C));
+            PtrAt(funnyShape, 0x600C) = 0;
+        }
+
+        for (s32 i = 0; i < 0x10; i++) {
+            u32 offs = static_cast<u32>(i) * 4;
+            if (PtrAt(funnyShape, 0x6094 + offs) != 0) {
+                __dla__FPv(PtrAt(funnyShape, 0x6094 + offs));
+                PtrAt(funnyShape, 0x6094 + offs) = 0;
+            }
+
+            if (PtrAt(funnyShape, 0x6014 + offs) != 0) {
+                __dl__FPv(PtrAt(funnyShape, 0x6014 + offs));
+                PtrAt(funnyShape, 0x6014 + offs) = 0;
+            }
+
+            if (PtrAt(funnyShape, 0x6054 + offs) != 0) {
+                __dl__FPv(PtrAt(funnyShape, 0x6054 + offs));
+                PtrAt(funnyShape, 0x6054 + offs) = 0;
+            }
+        }
+
+        if (shouldDelete > 0) {
+            __dl__FPv(funnyShape);
+        }
+    }
+
+    return funnyShape;
 }
 
 /*

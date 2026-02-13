@@ -88,9 +88,10 @@ void pppCalcShape(void* pppShape, void* data, void* additionalData)
 
 	shapeData->currentId = shapeData->counter;
 	shapeData->value = (u16)(shapeData->value + controlData->step);
-	if (shapeData->value >= (u16)shape->maxValue) {
-		shapeData->value = (u16)(shapeData->value - shape->maxValue);
+	if (shapeData->value < (u16)shape->maxValue) {
+		return;
 	}
+	shapeData->value = (u16)(shapeData->value - shape->maxValue);
 
 	shapeData->counter++;
 	if (shapeData->counter < (u16)*(s16*)((u8*)shapeSpec + 0x6)) {

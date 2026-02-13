@@ -668,11 +668,32 @@ void CRedSound::StreamPause(int streamID, int pause)
  */
 unsigned int CRedSound::SetWaveData(int waveID, void* waveData, int waveSize)
 {
-	unsigned int id = GetAutoID();
-	int standbyID = (int)EntryStandbyID(id);
+	unsigned int id;
+	int* slot;
+	int* end;
 
-	if (standbyID != 0) {
-		CRedDriver_8032f4c0.SetWaveData(standbyID, waveID, waveData, waveSize);
+	do {
+		DAT_8032f4c4 = (DAT_8032f4c4 + 1) & 0x7FFFFFFF;
+	} while (DAT_8032f4c4 == 0);
+
+	id = DAT_8032f4c4;
+	slot = (int*)DAT_8032e17c;
+	end = (int*)(DAT_8032e17c + 0x100);
+
+	while (slot < end) {
+		if (*slot == 0) {
+			*slot = id;
+			break;
+		}
+		++slot;
+	}
+
+	if (slot >= end) {
+		slot = 0;
+	}
+
+	if (slot != 0) {
+		CRedDriver_8032f4c0.SetWaveData((int)slot, waveID, waveData, waveSize);
 	}
 
 	return id;

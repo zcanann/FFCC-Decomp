@@ -196,7 +196,7 @@ void OSResetSystem(BOOL reset, u32 resetCode, BOOL forceMenu) {
     OSSram* sram;
     OSThread* thread;
     OSThread* next;
-    BOOL disableRecalibration = TRUE;
+    BOOL disableRecalibration;
 
     OSDisableScheduler();
     __OSStopAudioSystem();

@@ -405,12 +405,22 @@ void CMapAnim::ReadOtmAnim(CChunkFile&)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004a560
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapAnim::Calc(long)
+void CMapAnim::Calc(long frame)
 {
-	// TODO
+    CPtrArray<CMapAnimNode*>* mapAnimNodes = reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this);
+    int count = mapAnimNodes->GetSize();
+
+    for (int i = 0; i < count; i++) {
+        CMapAnimNode* node = (*mapAnimNodes)[i];
+        node->Interp((int)frame);
+    }
 }
 
 /*
@@ -425,10 +435,19 @@ void CMapAnimRun::Calc(long)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004a4a0
+ * PAL Size: 24b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapAnimRun::Start(int, int, int)
+void CMapAnimRun::Start(int startFrame, int endFrame, int loop)
 {
-	// TODO
+    int* data = reinterpret_cast<int*>(this);
+
+    data[1] = startFrame;
+    data[2] = endFrame;
+    reinterpret_cast<unsigned char*>(this)[0x0C] = static_cast<unsigned char>(loop);
+    data[0] = data[1];
 }

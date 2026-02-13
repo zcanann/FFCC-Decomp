@@ -124,7 +124,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
         u8 count = data->spawnCount;
 
         if (data->mode == 0) {
-            while (count != 0) {
+            do {
                 if (state->index >= (u16)entry->maxValue) {
                     state->index = 0;
                 }
@@ -158,10 +158,9 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                     }
                 }
 
-                count--;
-            }
+            } while (--count != 0);
         } else if (data->mode == 1) {
-            while (count != 0) {
+            do {
                 u16 vertexIndex = entry->vertexIndices[(s32)(RandF__5CMathFv(&math) * (f32)entry->maxValue)];
                 Vec vtx = points[vertexIndex];
 
@@ -189,8 +188,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                     }
                 }
 
-                count--;
-            }
+            } while (--count != 0);
         }
 
         state->countdown = data->spawnDelay;

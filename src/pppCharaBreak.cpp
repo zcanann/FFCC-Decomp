@@ -2,6 +2,50 @@
 
 /*
  * --INFO--
+ * PAL Address: 0x801411DC
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void CharaBreak_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f(void)
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801411E0
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void CharaBreak_BeforeMeshLockEnvCallback__FPQ26CChara6CModelPvPvi(void)
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801411E4
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" u32 CharaBreak_BeforeCalcMatrixCallback__FPQ26CChara6CModelPvPv(u32 value, void* modelData, void* meshData)
+{
+    if (*(u32*)((u8*)modelData + 0x44) == 0) {
+        return value;
+    }
+
+    return (u32)__cntlzw(1 - (u32)*((u8*)meshData + 0x42)) >> 5;
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

@@ -340,9 +340,6 @@ void pppRenderBlurChara(pppBlurChara* blurChara, UnkB* param_2, UnkC* param_3)
                                                                pppEnvStPtr->m_materialSetPtr, textureIndex);
     } else {
         unsigned int div = *((unsigned char*)&param_2->m_dataValIndex + 2);
-        if (div == 0) {
-            div = 1;
-        }
         Graphic.CreateSmallBackTexture(DAT_80238030, &smallBackTex, 0x140 / div, 0xE0 / div, GX_NEAR, GX_TF_I8, 0);
     }
 
@@ -431,7 +428,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, UnkB* param_2, UnkC* param_3)
     PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
     inVec.x = FLOAT_80331030;
     inVec.y = FLOAT_80331030;
-    inVec.z = -param_2->m_stepValue;
+    inVec.z = -(PSVECDistance(&cameraPos, &objPos) - param_2->m_stepValue);
     inVec.w = FLOAT_8033103c;
     MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(0, screenMtx, &inVec, &outVec);
 

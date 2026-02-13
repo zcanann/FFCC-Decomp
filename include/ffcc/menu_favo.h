@@ -11,7 +11,7 @@ class CMenuPcs
 public:
     void FavoInit();
     void FavoInit0();
-    void FavoOpen();
+    bool FavoOpen();
     void FavoCtrl();
     void FavoClose();
     void FavoDraw();

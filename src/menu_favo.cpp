@@ -133,12 +133,55 @@ void CMenuPcs::FavoInit0()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80163024
+ * PAL Size: 432b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::FavoOpen()
+bool CMenuPcs::FavoOpen()
 {
-	// TODO
+	short* psVar4;
+	int iVar5;
+	int iVar6;
+	int iVar7;
+	int iVar8;
+
+	if (*(char*)(*(int*)((char*)this + 0x82c) + 0xb) == 0) {
+		FavoInit();
+	}
+
+	iVar5 = 0;
+	*(short*)(*(int*)((char*)this + 0x82c) + 0x22) = *(short*)(*(int*)((char*)this + 0x82c) + 0x22) + 1;
+	iVar6 = (int)**(short**)&field_0x850;
+	psVar4 = *(short**)&field_0x850 + 4;
+	iVar7 = (int)*(short*)(*(int*)((char*)this + 0x82c) + 0x22);
+	iVar8 = iVar6;
+	if (0 < iVar6) {
+		do {
+			if (*(int*)(psVar4 + 0x12) <= iVar7) {
+				if (iVar7 < *(int*)(psVar4 + 0x12) + *(int*)(psVar4 + 0x14)) {
+					*(int*)(psVar4 + 0x10) = *(int*)(psVar4 + 0x10) + 1;
+					*(float*)(psVar4 + 8) = (float)*(int*)(psVar4 + 0x10) / (float)*(int*)(psVar4 + 0x14);
+					if ((*(unsigned int*)(psVar4 + 0x16) & 2) == 0) {
+						float fVar1 = (float)*(int*)(psVar4 + 0x10) / (float)*(int*)(psVar4 + 0x14);
+						*(float*)(psVar4 + 0x18) = (*(float*)(psVar4 + 0x1c) - (float)psVar4[0]) * fVar1;
+						*(float*)(psVar4 + 0x1a) = (*(float*)(psVar4 + 0x1e) - (float)psVar4[1]) * fVar1;
+					}
+				} else {
+					iVar5 = iVar5 + 1;
+					*(float*)(psVar4 + 8) = 1.0f;
+					*(float*)(psVar4 + 0x18) = 0.0f;
+					*(float*)(psVar4 + 0x1a) = 0.0f;
+				}
+			}
+			psVar4 = psVar4 + 0x20;
+			iVar8 = iVar8 + -1;
+		} while (iVar8 != 0);
+	}
+
+	return iVar6 == iVar5;
 }
 
 /*

@@ -66,7 +66,7 @@ struct pppAlignmentScale* pppFrameAlignmentScale(struct pppAlignmentScale* align
         distance = (double)PSVECDistance(&cameraPos, &objPos);
         distanceScale = (float)(distance / (double)data->m_unk0x4);
         scale = FLOAT_80331920;
-        if (FLOAT_80331920 < distanceScale) {
+        if (distanceScale > FLOAT_80331920) {
             scale = (distanceScale - FLOAT_80331920) * data->m_unk0x8 + FLOAT_80331920;
         }
 

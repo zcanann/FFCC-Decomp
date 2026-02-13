@@ -193,7 +193,7 @@ void __TRK_copy_vectors(void)
 	mask = *(u32*)TRKTargetTranslate(0x44);
 
 	for (i = 0; i <= 14; ++i) {
-		if (mask & (1 << i)) {
+		if ((mask & (1 << i)) && i != 4) {
 			TRK_copy_vector(TRK_ISR_OFFSETS[i]);
 		}
 	}

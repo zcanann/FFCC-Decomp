@@ -26,6 +26,15 @@ struct PYmMeltDataOffsets {
     s32* m_serializedDataOffsets;
 };
 
+struct YmMeltCtrl {
+    s32 m_graphId;
+    u16 m_dataValIndex;
+    u16 m_initWOrk;
+    f32 m_stepValue;
+    f32 m_arg3;
+    u8 m_payload[0x20];
+};
+
 void InitPolygonData(PYmMelt*, VERTEX_DATA*, short);
 void CalcPolygonHeight(PYmMelt*, VERTEX_DATA*, _GXColor*, float);
 
@@ -35,7 +44,7 @@ extern "C" {
 
 void pppConstructYmMelt(PYmMelt*, PYmMeltDataOffsets*);
 void pppDestructYmMelt(PYmMelt*, PYmMeltDataOffsets*);
-void pppFrameYmMelt(void);
+void pppFrameYmMelt(PYmMelt*, YmMeltCtrl*, PYmMeltDataOffsets*);
 void pppRenderYmMelt(void);
 
 #ifdef __cplusplus

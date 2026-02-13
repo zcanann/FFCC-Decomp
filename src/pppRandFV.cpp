@@ -2,7 +2,7 @@
 #include "ffcc/math.h"
 #include "types.h"
 
-extern CMath math;
+extern CMath math[];
 extern s32 lbl_8032ED70;
 extern f32 lbl_8032FF90;
 extern f32 lbl_801EADC8[];
@@ -39,15 +39,15 @@ void pppRandFV(void* param1, void* param2, void* param3)
     }
 
     u8* base = (u8*)param1;
-    PppRandFVParam2* in = (PppRandFVParam2*)param2;
     PppRandFVParam3* out = (PppRandFVParam3*)param3;
+    PppRandFVParam2* in = (PppRandFVParam2*)param2;
     f32* valuePtr;
 
     s32 state = *(s32*)(base + 0xC);
     if (state == 0) {
-        f32 value = RandF__5CMathFv(&math);
+        f32 value = RandF__5CMathFv(math);
         if (in->field18 != 0) {
-            value += RandF__5CMathFv(&math);
+            value += RandF__5CMathFv(math);
         } else {
             value *= lbl_8032FF90;
         }
@@ -69,7 +69,7 @@ void pppRandFV(void* param1, void* param2, void* param3)
     }
 
     f32 scale = *valuePtr;
-    target[0] = target[0] + in->field8 * scale;
-    target[1] = target[1] + in->fieldC * scale;
-    target[2] = target[2] + in->field10 * scale;
+    target[0] = in->field8 * scale + target[0];
+    target[1] = in->fieldC * scale + target[1];
+    target[2] = in->field10 * scale + target[2];
 }

@@ -372,62 +372,92 @@ static void Block_construct(Block* block, unsigned long size) {
 }
 
 static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
-    SubBlock** start_ptr;
+    SubBlock** start_ptr = &Block_start(block);
+    SubBlock* start = *start_ptr;
     SubBlock* current;
-    SubBlock* best_fit = 0;
     unsigned long current_size;
-    unsigned long best_size = 0xFFFFFFFF;
-    
-    start_ptr = &Block_start(block);
-    current = *start_ptr;
-    
-    if (current == 0) {
+    unsigned long max_size;
+
+    if (start == 0) {
         block->max_size = 0;
         return 0;
     }
-    
+
+    current = start;
+    current_size = SubBlock_size(start);
+    max_size = current_size;
+
     do {
-        current_size = SubBlock_size(current);
         if (requested_size <= current_size) {
-            if (current_size < best_size) {
-                best_fit = current;
-                best_size = current_size;
+            if ((current_size - requested_size) > 0x4F) {
+                SubBlock* remainder = (SubBlock*)((char*)current + requested_size);
+                unsigned long old_header = current->size;
+                unsigned long block_link = ((unsigned long)current->block & 0xFFFFFFFEUL) | 1;
+                unsigned long is_alloc_clz = __cntlzw(old_header & 2);
+                unsigned long has_alloc_neighbor_clz;
+
+                current->block = (Block*)block_link;
+                current->size = requested_size;
+                has_alloc_neighbor_clz = __cntlzw(is_alloc_clz >> 5);
+
+                if ((old_header & 4) != 0) {
+                    current->size |= 4;
+                }
+
+                if ((has_alloc_neighbor_clz >> 5) == 0) {
+                    *((unsigned long*)remainder - 1) = requested_size;
+                } else {
+                    current->size |= 2;
+                    remainder->size |= 4;
+                }
+
+                remainder->block = (Block*)block_link;
+                requested_size = (old_header & 0xFFFFFFF8) - requested_size;
+                remainder->size = requested_size;
+
+                if ((has_alloc_neighbor_clz >> 5) == 0) {
+                    *(unsigned long*)((char*)remainder + requested_size - 4) = requested_size;
+                } else {
+                    remainder->size |= 6;
+                    *(unsigned long*)((char*)remainder + requested_size) |= 4;
+                }
+
+                if ((is_alloc_clz >> 5) != 0) {
+                    remainder->next = current->next;
+                    remainder->next->prev = remainder;
+                    remainder->prev = current;
+                    current->next = remainder;
+                }
             }
+
+            *start_ptr = current->next;
+            current_size = SubBlock_size(current);
+            current->size |= 2;
+            *(unsigned long*)((char*)current + current_size) |= 4;
+
+            if (*start_ptr == current) {
+                *start_ptr = current->next;
+            }
+
+            if (*start_ptr == current) {
+                *start_ptr = 0;
+                block->max_size = 0;
+            } else {
+                current->next->prev = current->prev;
+                current->prev->next = current->next;
+            }
+            return current;
         }
+
         current = current->next;
-    } while (current != *start_ptr);
-    
-    if (best_fit == 0) {
-        return 0;
-    }
-    
-    if (best_size > requested_size + 80) {
-        SubBlock* remainder = (SubBlock*)((char*)best_fit + requested_size);
-        remainder->size = best_size - requested_size;
-        remainder->block = best_fit->block;
-        remainder->next = best_fit->next;
-        remainder->prev = best_fit;
-        best_fit->next->prev = remainder;
-        best_fit->next = remainder;
-        
-        SubBlock_set_size(best_fit, requested_size);
-        SubBlock_set_free(remainder);
-    }
-    
-    if (*start_ptr == best_fit) {
-        *start_ptr = best_fit->next;
-    }
-    if (*start_ptr == best_fit) {
-        *start_ptr = 0;
-        block->max_size = 0;
-    } else {
-        best_fit->next->prev = best_fit->prev;
-        best_fit->prev->next = best_fit->next;
-    }
-    
-    best_fit->size |= 2;
-    
-    return best_fit;
+        current_size = SubBlock_size(current);
+        if (max_size < current_size) {
+            max_size = current_size;
+        }
+    } while (current != start);
+
+    block->max_size = max_size;
+    return 0;
 }
 
 static void* allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long size) {

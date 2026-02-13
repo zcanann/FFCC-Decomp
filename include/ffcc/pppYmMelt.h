@@ -45,7 +45,7 @@ extern "C" {
 void pppConstructYmMelt(PYmMelt*, PYmMeltDataOffsets*);
 void pppDestructYmMelt(PYmMelt*, PYmMeltDataOffsets*);
 void pppFrameYmMelt(PYmMelt*, YmMeltCtrl*, PYmMeltDataOffsets*);
-void pppRenderYmMelt(void);
+void pppRenderYmMelt(PYmMelt*, YmMeltCtrl*, PYmMeltDataOffsets*);
 
 #ifdef __cplusplus
 }

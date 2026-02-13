@@ -1,6 +1,7 @@
 #ifndef _FFCC_PPP_TEXTUREMAN_H_
 #define _FFCC_PPP_TEXTUREMAN_H_
 
+#include "ffcc/manager.h"
 #include "ffcc/memory.h"
 
 #include <dolphin/gx.h>
@@ -51,11 +52,9 @@ public:
     void ReleaseTextureIdx(int, CAmemCacheSet*);
 };
 
-class CTextureMan
+class CTextureMan : public CManager
 {
 public:
-    CTextureMan();
-
     void Init();
     void Quit();
     void SetTexture(_GXTexMapID, CTexture*);
@@ -65,7 +64,6 @@ public:
     friend class CTextureSet;
 
 private:
-    void* m_vtable;
     CMemory::CStage* m_memoryStage;
 };
 

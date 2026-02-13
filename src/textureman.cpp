@@ -3,7 +3,7 @@
 
 #include <string.h>
 
-extern CTextureMan TextureMan;
+CTextureMan TextureMan;
 extern CMemory Memory;
 extern CSystem System;
 
@@ -305,16 +305,6 @@ template <>
 CTexture* CPtrArray<CTexture*>::GetAt(unsigned long index)
 {
     return m_items[index];
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CTextureMan::CTextureMan()
-{
-	// TODO
 }
 
 /*

@@ -20,8 +20,8 @@ CMenu::CMenu()
 
 /*
  * --INFO--
- * PAL Address: 0x8009b488
- * PAL Size: 72b
+ * PAL Address: 0x8009b448
+ * PAL Size: 96b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO

@@ -182,7 +182,7 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
     }
 
     rain = (RainParam*)param_2;
-    count = *(u16*)&param_2->payload[0];
+    count = *(u16*)&param_2->payload[0] & 0x7fff;
     work = (RainWork*)((u8*)pppRain + 0x80 + param_3->m_serializedDataOffsets[2]);
     if (work->drops == 0) {
         work->drops = (float*)pppMemAlloc__FUlPQ27CMemory6CStagePci(

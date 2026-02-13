@@ -15,6 +15,12 @@ struct VRyjMegaBirth
     Vec m_accelerationAxis;
 };
 
+struct PRyjMegaBirthOffsets
+{
+    u8 _pad0[0xC];
+    s32* m_serializedDataOffsets;
+};
+
 void get_rand(void);
 void get_noise(unsigned char);
 void alloc_check(VRyjMegaBirth*, PRyjMegaBirth*);
@@ -28,7 +34,7 @@ void set_matrix(_pppPObject*, pppFMATRIX&, PRyjMegaBirth*, VRyjMegaBirth*, _PART
 extern "C" {
 #endif
 
-void pppRyjMegaBirth(void);
+void pppRyjMegaBirth(_pppPObject*, PRyjMegaBirth*, PRyjMegaBirthOffsets*);
 void pppRyjDrawMegaBirth(void);
 void pppRyjMegaBirthCon(void);
 void pppRyjMegaBirthDes(void);

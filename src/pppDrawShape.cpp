@@ -89,7 +89,7 @@ void pppCalcShape(void* pppShape, void* data, void* additionalData)
 
 	shapeData->currentId = shapeData->counter;
 	shapeData->value = (u16)(shapeData->value + controlData->step);
-	if (shapeData->value < (u16)shape->maxValue) {
+	if (shapeData->value < shape->maxValue) {
 		return;
 	}
 	shapeData->value = (u16)(shapeData->value - shape->maxValue);
@@ -131,7 +131,7 @@ void pppDrawShape(void* pppShape, void* data, void* additionalData)
 	}
 
 	void** shapeTables = *(void***)((u8*)lbl_8032ED54 + 0xC);
-	void* shapeSpec = *(void**)((u8*)shapeTables + ((u32)type << 2));
+	void* shapeSpec = *(void**)((u8*)shapeTables + (type << 2));
 	ShapeSpecEntry* shape = (ShapeSpecEntry*)((u8*)shapeSpec + ((u32)shapeData->currentId << 3) + 0x10);
 	void* drawShape = (u8*)shapeSpec + shape->offset;
 

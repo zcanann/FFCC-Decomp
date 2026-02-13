@@ -184,65 +184,57 @@ DVDDiskID* CFile::GetCurrentDiskID()
 
 CFile::CHandle* CFile::Open(char* path, unsigned long userParam, CFile::PRI pri)
 {
-    if (1) // g_Game.game.gameWork._5076_1_ != 0
+    if (Game.game.m_gameWork.m_gamePaused != 0)
     {
         pri = CFile::PRI_CRITICAL;
     }
 
     CHandle* handle = 0;
-
-    s32 entry = DVDConvertPathToEntrynum(path);
-	
-    if (entry == -1)
-	{
-        return 0;
-	}
-
-    DVDFileInfo fi;
-	
-    if (!DVDFastOpen(entry, &fi))
-	{
-        return 0;
-	}
-
-    handle = m_freeList;
-	
-    if (!handle)
-	{
-        return 0;
-	}
-
-    m_freeList = handle->m_previous;
     CHandle* sentinel = &m_fileHandle;
     CHandle* it = sentinel->m_previous;
+    DVDFileInfo fi;
 
     while (it != sentinel && it->m_priority <= pri)
     {
         it = it->m_previous;
     }
 
-    CHandle* next = it->m_next;
-    handle->m_previous = it;
-    handle->m_next = next;
-    next->m_previous = handle;
-    it->m_next = handle;
-    handle->m_priority = pri;
-    handle->m_userParam = userParam;
-    handle->m_length = fi.length;
-    handle->m_completionStatus = 0;
-    handle->m_closedFlag = 0;
-    handle->m_flags = 0;
-    // strncpy(handle->m_name, path, sizeof(handle->m_name));
-    handle->m_chunkSize = fi.length;
-    handle->m_currentOffset = 0;
-    handle->m_nextOffset = 0;
-    handle->m_dvdFileInfo = fi;
-    handle->m_dvdFileInfo.cb.userData = handle;
-	
-    // if (!handle && System._4700_4_ != 0)
-	// {
-    //     System.Printf(&DAT_801d5f9c, path);
-    // }
+    s32 entry = DVDConvertPathToEntrynum(path);
+
+    if (entry != -1)
+	{
+        DVDFastOpen(entry, &fi);
+
+        handle = m_freeList;
+
+        if (handle != 0)
+		{
+            CHandle* next = it->m_next;
+
+            m_freeList = handle->m_previous;
+            handle->m_previous = it;
+            handle->m_next = next;
+            next->m_previous = handle;
+            it->m_next = handle;
+            handle->m_priority = pri;
+            handle->m_userParam = userParam;
+            handle->m_length = fi.length;
+            handle->m_completionStatus = 0;
+            handle->m_closedFlag = 0;
+            handle->m_flags = 0;
+            strcpy(handle->m_name, path);
+            handle->m_chunkSize = fi.length;
+            handle->m_currentOffset = 0;
+            handle->m_nextOffset = 0;
+            handle->m_dvdFileInfo = fi;
+            handle->m_dvdFileInfo.cb.userData = handle;
+        }
+	}
+
+    if (handle == 0 && System.m_execParam != 0)
+	{
+        System.Printf(s_queueWarnAnyFmt, path);
+    }
 
     return handle;
 }

@@ -21,8 +21,7 @@ void pppParHitSph(struct _pppPObject* param_1, int param_2)
 {
     _pppMngSt* pppMngSt;
     float radius;
-    u32 local_a8;
-    u32 local_a4;
+    _GXColor local_a8;
     Vec local_a0;
     Vec local_94;
     Vec local_88;
@@ -44,7 +43,10 @@ void pppParHitSph(struct _pppPObject* param_1, int param_2)
     }
     
     if ((*(unsigned int*)(CFlat + 0x129c) & 0x200000) != 0) {
-        local_a4 = 0xFFFFFFFF;
+        local_a8.r = 0xFF;
+        local_a8.g = 0xFF;
+        local_a8.b = 0xFF;
+        local_a8.a = 0xFF;
         PSMTXIdentity(MStack_78);
         PSMTXIdentity(local_48);
         local_48[0][0] = radius;
@@ -55,7 +57,6 @@ void pppParHitSph(struct _pppPObject* param_1, int param_2)
         local_48[0][3] = local_a0.x;
         local_48[1][3] = local_a0.y;
         local_48[2][3] = local_a0.z;
-        local_a8 = local_a4;
-        Graphic.DrawSphere(local_48, *(_GXColor*)&local_a8);
+        Graphic.DrawSphere(local_48, local_a8);
     }
 }

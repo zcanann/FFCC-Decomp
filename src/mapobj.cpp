@@ -39,6 +39,8 @@ static inline float& F32At(CMapObj* self, unsigned int offset)
 }
 }
 
+extern "C" void __dl__FPv(void*);
+
 /*
  * --INFO--
  * PAL Address: 0x8002BE10
@@ -78,12 +80,49 @@ CMapObj::CMapObj()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002BE7C
+ * PAL Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CMapObj::~CMapObj()
 {
-	// TODO
+    void* attr = PtrAt(this, 0xEC);
+    if (attr != 0) {
+        (*(void (**)(void*, int))(*reinterpret_cast<unsigned int*>(attr) + 8))(attr, 1);
+        PtrAt(this, 0xEC) = 0;
+    }
+
+    Init();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002BE7C
+ * PAL Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" CMapObj* dtor_8002BE7C(CMapObj* mapObj, short param_2)
+{
+    if (mapObj != 0) {
+        void* attr = PtrAt(mapObj, 0xEC);
+        if (attr != 0) {
+            (*(void (**)(void*, int))(*reinterpret_cast<unsigned int*>(attr) + 8))(attr, 1);
+            PtrAt(mapObj, 0xEC) = 0;
+        }
+
+        mapObj->Init();
+        if (0 < param_2) {
+            __dl__FPv(mapObj);
+        }
+    }
+
+    return mapObj;
 }
 
 /*

@@ -36,25 +36,21 @@ void pppConstructLensFlare(void* obj, void* param)
 {
 	void* dataPtr = *((void**)((char*)param + 0x0c));
 	int offset = *((int*)((char*)dataPtr + 0x08));
-	
+
 	float initValue = FLOAT_80331060;
-	
-	// Initialize float fields
-	*((float*)((char*)obj + offset + 0x98)) = initValue;
+
+	*((float*)((char*)obj + offset + 0x98)) = FLOAT_80331060;
 	*((float*)((char*)obj + offset + 0x94)) = initValue;
 	*((float*)((char*)obj + offset + 0x90)) = initValue;
 	*((float*)((char*)obj + offset + 0xa8)) = initValue;
 	*((float*)((char*)obj + offset + 0xa4)) = initValue;
 	*((float*)((char*)obj + offset + 0xa0)) = initValue;
-	*((float*)((char*)obj + offset + 0xb4)) = initValue;
-	
-	// Initialize short fields
+
 	*((short*)((char*)obj + offset + 0xb0)) = 0;
 	*((short*)((char*)obj + offset + 0xae)) = 0;
 	*((short*)((char*)obj + offset + 0xac)) = 0;
-	
-	// Initialize byte field
 	*((char*)obj + offset + 0xb2) = 0;
+	*((float*)((char*)obj + offset + 0xb4)) = initValue;
 }
 
 /*

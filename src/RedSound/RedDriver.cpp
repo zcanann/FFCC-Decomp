@@ -1,6 +1,7 @@
 #include "ffcc/RedSound/RedDriver.h"
 #include "ffcc/RedSound/RedMemory.h"
 #include "ffcc/RedSound/RedEntry.h"
+#include "ffcc/RedSound/RedStream.h"
 #include "dolphin/ar.h"
 #include "dolphin/ax.h"
 #include "dolphin/os.h"
@@ -404,42 +405,58 @@ void _SePause(int*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bda34
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _StreamStop(int*)
+void _StreamStop(int* param_1)
 {
-	// TODO
+	StreamStop(*param_1);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bda64
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _StreamPlay(int*)
+void _StreamPlay(int* param_1)
 {
-	// TODO
+	StreamPlay(param_1[0], (void*)param_1[1], param_1[2], param_1[3], param_1[4]);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bdaa4
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _StreamVolume(int*)
+void _StreamVolume(int* param_1)
 {
-	// TODO
+	SetStreamVolume(param_1[0], param_1[1], param_1[2]);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bdadc
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _StreamPause(int*)
+void _StreamPause(int* param_1)
 {
-	// TODO
+	StreamPause(param_1[0], param_1[1]);
 }
 
 /*
@@ -1174,22 +1191,30 @@ void CRedDriver::GetStreamPlayPoint(int, int*, int*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bfa74
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::StreamStop(int)
+void CRedDriver::StreamStop(int param_1)
 {
-	// TODO
+	_EntryExecCommand(_StreamStop, param_1, 0, 0, 0, 0, 0, 0);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bfabc
+ * PAL Size: 96b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::StreamPlay(int, void*, int, int, int)
+void CRedDriver::StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5)
 {
-	// TODO
+	_EntryExecCommand(_StreamPlay, param_1, (int)param_2, param_3, param_4, param_5, 0, 0);
 }
 
 /*

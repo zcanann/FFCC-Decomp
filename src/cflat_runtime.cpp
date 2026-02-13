@@ -35,12 +35,17 @@ void CFlatRuntime::Init()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006996c
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFlatRuntime::Quit()
 {
-	// TODO
+	delete[] (char*)*(void**)((char*)this + 0xC);
+	delete[] (char*)*(void**)((char*)this + 0x10);
 }
 
 /*

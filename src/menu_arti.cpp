@@ -2,6 +2,11 @@
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
 
+extern double DOUBLE_80332fb0;
+extern double DOUBLE_80332fe0;
+extern float FLOAT_80332fa8;
+extern float FLOAT_80332fac;
+
 /*
  * --INFO--
  * Address:	TODO
@@ -141,12 +146,72 @@ void CMenuPcs::ArtiInit1()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80160828
+ * PAL Size: 432b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::ArtiOpen()
+unsigned int CMenuPcs::ArtiOpen()
 {
-	// TODO
+	float fVar1;
+	double dVar2;
+	double dVar3;
+	short* psVar4;
+	int iVar5;
+	int iVar6;
+	int iVar7;
+	int iVar8;
+
+	if (*(char*)(*(int*)((char*)this + 0x82c) + 0xb) == '\0') {
+		ArtiInit();
+	}
+
+	iVar5 = 0;
+	*(short*)(*(int*)((char*)this + 0x82c) + 0x22) = *(short*)(*(int*)((char*)this + 0x82c) + 0x22) + 1;
+	iVar6 = (int)**(short**)((char*)this + 0x850);
+	psVar4 = *(short**)((char*)this + 0x850) + 4;
+	iVar7 = (int)*(short*)(*(int*)((char*)this + 0x82c) + 0x22);
+	iVar8 = iVar6;
+	if (0 < iVar6) {
+		do {
+			dVar3 = DOUBLE_80332fe0;
+			fVar1 = FLOAT_80332fa8;
+			if (*(int*)(psVar4 + 0x12) <= iVar7) {
+				if (iVar7 < *(int*)(psVar4 + 0x12) + *(int*)(psVar4 + 0x14)) {
+					*(int*)(psVar4 + 0x10) = *(int*)(psVar4 + 0x10) + 1;
+					dVar2 = DOUBLE_80332fb0;
+					*(float*)(psVar4 + 8) =
+					    (float)((DOUBLE_80332fb0 /
+					             ((double)(((unsigned int)*(unsigned int*)(psVar4 + 0x14) ^ 0x80000000U) | 0x4330000000000000ULL) - dVar3)) *
+					            ((double)(((unsigned int)*(unsigned int*)(psVar4 + 0x10) ^ 0x80000000U) | 0x4330000000000000ULL) - dVar3));
+					if ((*(unsigned int*)(psVar4 + 0x16) & 2) == 0) {
+						fVar1 = (float)((dVar2 /
+						                 ((double)(((unsigned int)*(unsigned int*)(psVar4 + 0x14) ^ 0x80000000U) | 0x4330000000000000ULL) - dVar3)) *
+						                ((double)(((unsigned int)*(unsigned int*)(psVar4 + 0x10) ^ 0x80000000U) | 0x4330000000000000ULL) - dVar3));
+						*(float*)(psVar4 + 0x18) =
+						    (*(float*)(psVar4 + 0x1c) -
+						     (float)((double)(((unsigned int)(int)*psVar4 ^ 0x80000000U) | 0x4330000000000000ULL) - dVar3)) *
+						    fVar1;
+						*(float*)(psVar4 + 0x1a) =
+						    (*(float*)(psVar4 + 0x1e) -
+						     (float)((double)(((unsigned int)(int)psVar4[1] ^ 0x80000000U) | 0x4330000000000000ULL) - dVar3)) *
+						    fVar1;
+					}
+				} else {
+					iVar5 = iVar5 + 1;
+					*(float*)(psVar4 + 8) = FLOAT_80332fac;
+					*(float*)(psVar4 + 0x18) = fVar1;
+					*(float*)(psVar4 + 0x1a) = fVar1;
+				}
+			}
+			psVar4 = psVar4 + 0x20;
+			iVar8 = iVar8 + -1;
+		} while (iVar8 != 0);
+	}
+
+	return (unsigned int)(iVar6 == iVar5);
 }
 
 /*

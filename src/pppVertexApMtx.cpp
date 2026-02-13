@@ -139,8 +139,6 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 				u16 vertexIndex = entry->vertexIndices[state->index];
 				state->index++;
 
-				Vec vtx = points[vertexIndex];
-
 				if ((data->childId + 0x10000) != 0xFFFF) {
 					_pppPObject* child;
 					_pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (data->childId << 4));
@@ -155,7 +153,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 					Vec transformed;
 					Mtx* outMtx = (Mtx*)((u8*)child + data->childMtxOffset + 0x80);
 
-					PSMTXMultVec(*(Mtx*)((u8*)parent + 0x10), &vtx, &transformed);
+					PSMTXMultVec(*(Mtx*)((u8*)parent + 0x10), &points[vertexIndex], &transformed);
 
 					if (data->useWorldMtx == 0) {
 						PSMTXIdentity(*outMtx);
@@ -177,7 +175,6 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 		} else if (data->mode == 1) {
 			do {
 				u16 vertexIndex = entry->vertexIndices[(s32)(RandF__5CMathFv(&math) * (f32)entry->maxValue)];
-				Vec vtx = points[vertexIndex];
 
 				if ((data->childId + 0x10000) != 0xFFFF) {
 					_pppPObject* child;
@@ -193,7 +190,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 					Vec transformed;
 					Mtx* outMtx = (Mtx*)((u8*)child + data->childMtxOffset + 0x80);
 
-					PSMTXMultVec(*(Mtx*)((u8*)parent + 0x10), &vtx, &transformed);
+					PSMTXMultVec(*(Mtx*)((u8*)parent + 0x10), &points[vertexIndex], &transformed);
 
 					if (data->useWorldMtx == 0) {
 						PSMTXIdentity(*outMtx);

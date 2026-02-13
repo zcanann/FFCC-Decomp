@@ -17,25 +17,6 @@ typedef struct RandHCVParams {
     u8 pad[3];
 } RandHCVParams;
 
-typedef union DoubleConv {
-    struct {
-        unsigned int hi;
-        unsigned int lo;
-    } parts;
-    double d;
-} DoubleConv;
-
-typedef struct RandHCVConv {
-    DoubleConv d0;
-    DoubleConv c0;
-    DoubleConv d1;
-    DoubleConv c1;
-    DoubleConv d2;
-    DoubleConv c2;
-    DoubleConv d3;
-    DoubleConv c3;
-} RandHCVConv;
-
 /*
  * --INFO--
  * PAL Address: TODO
@@ -104,63 +85,29 @@ void pppRandHCV(void* p1, void* p2, void* p3) {
     }
 
     float scale = *scalePtr;
-    const double bias = lbl_8032FFA0;
-    RandHCVConv conv;
 
     {
-        s16 delta = params->delta[0];
         s16 current = target[0];
-        conv.d0.parts.hi = 0x43300000;
-        conv.d0.parts.lo = (unsigned int)((int)delta ^ 0x8000);
-        conv.c0.parts.hi = 0x43300000;
-        conv.c0.parts.lo = (unsigned int)((int)current ^ 0x8000);
-        double value = conv.d0.d - bias;
-        double baseValue = conv.c0.d - bias;
-        double result = value * (double)scale - baseValue;
-        int add = (int)result;
-        target[0] = (s16)(current + add);
+        s16 base = params->delta[0];
+        target[0] = (s16)(current + (int)((float)base * scale - (float)current));
     }
 
     {
-        s16 delta = params->delta[1];
         s16 current = target[1];
-        conv.d1.parts.hi = 0x43300000;
-        conv.d1.parts.lo = (unsigned int)((int)delta ^ 0x8000);
-        conv.c1.parts.hi = 0x43300000;
-        conv.c1.parts.lo = (unsigned int)((int)current ^ 0x8000);
-        double value = conv.d1.d - bias;
-        double baseValue = conv.c1.d - bias;
-        double result = value * (double)scale - baseValue;
-        int add = (int)result;
-        target[1] = (s16)(current + add);
+        s16 base = params->delta[1];
+        target[1] = (s16)(current + (int)((float)base * scale - (float)current));
     }
 
     {
-        s16 delta = params->delta[2];
         s16 current = target[2];
-        conv.d2.parts.hi = 0x43300000;
-        conv.d2.parts.lo = (unsigned int)((int)delta ^ 0x8000);
-        conv.c2.parts.hi = 0x43300000;
-        conv.c2.parts.lo = (unsigned int)((int)current ^ 0x8000);
-        double value = conv.d2.d - bias;
-        double baseValue = conv.c2.d - bias;
-        double result = value * (double)scale - baseValue;
-        int add = (int)result;
-        target[2] = (s16)(current + add);
+        s16 base = params->delta[2];
+        target[2] = (s16)(current + (int)((float)base * scale - (float)current));
     }
 
     {
-        s16 delta = params->delta[3];
         s16 current = target[3];
-        conv.d3.parts.hi = 0x43300000;
-        conv.d3.parts.lo = (unsigned int)((int)delta ^ 0x8000);
-        conv.c3.parts.hi = 0x43300000;
-        conv.c3.parts.lo = (unsigned int)((int)current ^ 0x8000);
-        double value = conv.d3.d - bias;
-        double baseValue = conv.c3.d - bias;
-        double result = value * (double)scale - baseValue;
-        int add = (int)result;
-        target[3] = (s16)(current + add);
+        s16 base = params->delta[3];
+        target[3] = (s16)(current + (int)((float)base * scale - (float)current));
     }
 }
 

@@ -89,7 +89,6 @@ void CMapShadow::Init()
 	cvt.parts.hi = 0x43300000;
 	cvt.parts.lo = uVar8;
 	fVar1 = (float)(cvt.d - dVar5);
-	cvt.parts.hi = 0x43300000;
 	cvt.parts.lo = uVar7;
 	fVar2 = (float)(cvt.d - dVar5);
 	fVar3 = *(float*)((char*)this + 0xa8);

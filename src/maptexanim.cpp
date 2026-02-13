@@ -63,12 +63,12 @@ static inline CMapTexAnim*& AnimAt(CMapTexAnimSet* self, int index)
 
 static inline void* MaterialAt(CMaterialSet* materialSet, unsigned long index)
 {
-    return (*reinterpret_cast<CPtrArray<CMaterial>*>(Ptr(materialSet, 8)))[static_cast<int>(index)];
+    return (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8)))[static_cast<int>(index)];
 }
 
 static inline void* TextureAt(CTextureSet* textureSet, unsigned long index)
 {
-    return (*reinterpret_cast<CPtrArray<CTexture>*>(Ptr(textureSet, 8)))[static_cast<int>(index)];
+    return (*reinterpret_cast<CPtrArray<CTexture*>*>(Ptr(textureSet, 8)))[static_cast<int>(index)];
 }
 
 static inline void ReplaceRef(void** slot, void* ref)
@@ -340,39 +340,37 @@ void CMapTexAnimSet::Calc()
 void CMapTexAnimSet::SetMapTexAnim(int materialId, int frameStart, int frameEnd, int wrapMode)
 {
     bool found = false;
-    const short count = S16At(this, 0x8);
+    unsigned char* animPtr = reinterpret_cast<unsigned char*>(this);
 
-    for (int i = 0; i < count; i++) {
-        CMapTexAnim* anim = AnimAt(this, i);
-        if (S16At(anim, 0x12) != static_cast<short>(materialId)) {
-            continue;
-        }
-
-        if (U8At(anim, 0x15) == 0) {
-            S16At(anim, 0xE) = static_cast<short>(frameStart);
-            F32At(anim, 0x1C) = static_cast<float>(S16At(anim, 0xE));
-            int clampedEnd = frameEnd;
-            if (S16At(anim, 0xC) < frameEnd) {
-                clampedEnd = S16At(anim, 0xC);
+    for (int i = 0; i < S16At(this, 8); i++) {
+        CMapTexAnim* anim = *reinterpret_cast<CMapTexAnim**>(animPtr + 0xC);
+        if (S16At(anim, 0x12) == static_cast<short>(materialId)) {
+            if (U8At(anim, 0x15) == 0) {
+                int end = frameEnd;
+                S16At(anim, 0xE) = static_cast<short>(frameStart);
+                F32At(anim, 0x1C) = static_cast<float>(static_cast<short>(frameStart));
+                if (S16At(anim, 0xC) < frameEnd) {
+                    end = S16At(anim, 0xC);
+                }
+                S16At(anim, 0x10) = static_cast<short>(end);
+                U8At(anim, 0x16) = static_cast<unsigned char>(wrapMode);
+            } else {
+                int end = frameEnd;
+                S32At(anim, 0x30) = frameStart;
+                S32At(anim, 0x2C) = frameStart;
+                if (S32At(anim, 0x38) < frameEnd) {
+                    end = S32At(anim, 0x38);
+                }
+                S32At(anim, 0x34) = end;
+                U8At(anim, 0x27) = static_cast<unsigned char>(wrapMode);
+                U8At(anim, 0x28) = 1;
             }
-            S16At(anim, 0x10) = static_cast<short>(clampedEnd);
-            U8At(anim, 0x16) = static_cast<unsigned char>(wrapMode);
-        } else {
-            S32At(anim, 0x30) = frameStart;
-            S32At(anim, 0x2C) = frameStart;
-            int clampedKeyEnd = frameEnd;
-            if (S32At(anim, 0x38) < frameEnd) {
-                clampedKeyEnd = S32At(anim, 0x38);
-            }
-            S32At(anim, 0x34) = clampedKeyEnd;
-            U8At(anim, 0x27) = static_cast<unsigned char>(wrapMode);
-            U8At(anim, 0x28) = 1;
+            found = true;
         }
-
-        found = true;
+        animPtr += 4;
     }
 
-    if (!found && System.m_execParam != 0) {
+    if (found == false && System.m_execParam != 0) {
         System.Printf("%s: material id (%d) not found\n", "SetMapTexAnim", materialId);
     }
 }

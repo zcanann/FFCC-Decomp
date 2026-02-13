@@ -24,8 +24,8 @@ static s32 GetGraphFrameFromId(u32 graphId)
 void pppConstructCallBackDistance(pppCallBackDistance* param1, UnkC* param2)
 {
     u8* pppMngSt;
-    Vec local_28;
     Vec local_1c;
+    Vec local_28;
     s32 dataOffset;
     f32* distancePtr;
 
@@ -71,8 +71,8 @@ void pppFrameCallBackDistance(pppCallBackDistance* param1, UnkB* param2, UnkC* p
     u32 graphId;
     f32 distance;
     f32* oldDistance;
-    Vec local_28;
     Vec local_1c;
+    Vec local_28;
 
     pppMngSt = lbl_8032ED50;
     local_1c.x = *(f32*)(pppMngSt + 0x84);

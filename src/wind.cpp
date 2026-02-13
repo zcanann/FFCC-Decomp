@@ -58,92 +58,105 @@ void CWind::ClearAll()
 
 /*
  * --INFO--
- * Address:	800d9d60
- * Size:	764
+ * PAL Address: 0x800d9d60
+ * PAL Size: 764b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CWind::Frame()
 {
-    u8* obj = (u8*)this;
+    u8* obj;
+    int i;
+    int rnd;
+    float f0;
+    float f1;
+    float f2;
+    double d0;
 
-    for (int i = 0; i < 32; i++, obj += 100) {
-        if ((s8)obj[0] >= 0) {
-            continue;
-        }
+    obj = (u8*)this;
+    i = 0;
 
-        int rnd = Rand__5CMathFUl(&Math, 10);
-        if (rnd == 0) {
-            float rate = FLOAT_80330f24;
-            if (Rand__5CMathFUl(&Math, 3) == 0) {
-                rate = FLOAT_80330f20;
-            }
-
-            *(float*)(obj + 0x54) = *(float*)(obj + 0x54) + (*(float*)(obj + 0x4C) * rate);
-
-            float clamped = FLOAT_80330ef0;
-            float value = *(float*)(obj + 0x54);
-            if (clamped <= value) {
-                clamped = value;
-                if (*(float*)(obj + 0x4C) < value) {
-                    clamped = *(float*)(obj + 0x4C);
+    while (true) {
+        if ((obj[0] & 0x80) != 0) {
+            rnd = Rand__5CMathFUl(&Math, 10);
+            if (rnd == 0) {
+                rnd = Rand__5CMathFUl(&Math, 3);
+                f1 = FLOAT_80330ef0;
+                f0 = FLOAT_80330f24;
+                if (rnd == 0) {
+                    f0 = FLOAT_80330f20;
                 }
-            }
-            *(float*)(obj + 0x54) = clamped;
-        }
 
-        int type = *(int*)(obj + 0x1C);
-        if (((type == 0) || (type == 1)) &&
-            (Rand__5CMathFUl(&Math, 0x1E) == 0) &&
-            (*(float*)(obj + 0x50) < (FLOAT_80330f28 * *(float*)(obj + 0x4C)))) {
-            float rate = FLOAT_80330f30;
-            if (Rand__5CMathFUl(&Math, 3) == 0) {
-                rate = FLOAT_80330f2c;
-            }
-
-            *(float*)(obj + 0x48) = *(float*)(obj + 0x48) + (*(float*)(obj + 0x40) * rate);
-
-            float value = *(float*)(obj + 0x48);
-            float clamped = *(float*)(obj + 0x40);
-            if (clamped <= value) {
-                float max = FLOAT_80330f34 + clamped;
-                clamped = value;
-                if (max < value) {
-                    clamped = max;
+                *(float*)(obj + 0x54) = *(float*)(obj + 0x4C) * f0 + *(float*)(obj + 0x54);
+                f0 = *(float*)(obj + 0x54);
+                if ((f1 <= f0) && ((f1 = f0), (*(float*)(obj + 0x4C) < f0))) {
+                    f1 = *(float*)(obj + 0x4C);
                 }
-            }
-            *(float*)(obj + 0x48) = clamped;
-        }
-
-        if (type == 2) {
-            *(int*)(obj + 0x28) = *(int*)(obj + 0x28) + 1;
-            if (*(u32*)(obj + 0x24) <= *(u32*)(obj + 0x28)) {
-                obj[0] = obj[0] & 0x7F;
-                continue;
+                *(float*)(obj + 0x54) = f1;
             }
 
-            *(float*)(obj + 0x38) =
-                (float)(((double)*(int*)(obj + 0x28) - DOUBLE_80330f40) /
-                        ((double)*(int*)(obj + 0x24) - DOUBLE_80330f40));
-            *(float*)(obj + 0x30) = *(float*)(obj + 0x2C) * *(float*)(obj + 0x38);
-            *(float*)(obj + 0x34) = *(float*)(obj + 0x30) * *(float*)(obj + 0x30);
-            *(float*)(obj + 0x0C) = *(float*)(obj + 4) - *(float*)(obj + 0x30);
-            *(float*)(obj + 0x10) = *(float*)(obj + 8) - *(float*)(obj + 0x30);
-            *(float*)(obj + 0x14) = *(float*)(obj + 4) + *(float*)(obj + 0x30);
-            *(float*)(obj + 0x18) = *(float*)(obj + 8) + *(float*)(obj + 0x30);
+            if ((((*(int*)(obj + 0x1C) == 0) || (*(int*)(obj + 0x1C) == 1)) &&
+                 ((rnd = Rand__5CMathFUl(&Math, 0x1E)), rnd == 0)) &&
+                (*(float*)(obj + 0x50) < FLOAT_80330f28 * *(float*)(obj + 0x4C))) {
+                rnd = Rand__5CMathFUl(&Math, 3);
+                f0 = FLOAT_80330f30;
+                if (rnd == 0) {
+                    f0 = FLOAT_80330f2c;
+                }
+
+                *(float*)(obj + 0x48) = *(float*)(obj + 0x40) * f0 + *(float*)(obj + 0x48);
+                f0 = *(float*)(obj + 0x48);
+                f1 = *(float*)(obj + 0x40);
+                if ((f1 <= f0) && ((f2 = FLOAT_80330f34 + f1), (f1 = f0), (f2 < f0))) {
+                    f1 = f2;
+                }
+                *(float*)(obj + 0x48) = f1;
+            }
+
+            if (*(int*)(obj + 0x1C) == 2) {
+                *(int*)(obj + 0x28) = *(int*)(obj + 0x28) + 1;
+                if (*(u32*)(obj + 0x24) <= *(u32*)(obj + 0x28)) {
+                    obj[0] = obj[0] & 0x7F;
+                    goto next;
+                }
+
+                *(float*)(obj + 0x38) = (float)(((double)*(int*)(obj + 0x28) - DOUBLE_80330f40) /
+                                                ((double)*(int*)(obj + 0x24) - DOUBLE_80330f40));
+                *(float*)(obj + 0x30) = *(float*)(obj + 0x2C) * *(float*)(obj + 0x38);
+                *(float*)(obj + 0x34) = *(float*)(obj + 0x30) * *(float*)(obj + 0x30);
+                *(float*)(obj + 0x0C) = *(float*)(obj + 4) - *(float*)(obj + 0x30);
+                *(float*)(obj + 0x10) = *(float*)(obj + 8) - *(float*)(obj + 0x30);
+                *(float*)(obj + 0x14) = *(float*)(obj + 4) + *(float*)(obj + 0x30);
+                *(float*)(obj + 0x18) = *(float*)(obj + 8) + *(float*)(obj + 0x30);
+            }
+
+            *(float*)(obj + 0x50) = FLOAT_80330f38 * (*(float*)(obj + 0x54) - *(float*)(obj + 0x50)) +
+                                    *(float*)(obj + 0x50);
+            d0 = (double)RandF__5CMathFv(&Math);
+            *(float*)(obj + 0x44) = *(float*)(obj + 0x44) +
+                                    (float)((double)FLOAT_80330f2c * d0 +
+                                            (double)(FLOAT_80330f38 *
+                                                         (*(float*)(obj + 0x48) - *(float*)(obj + 0x44)) -
+                                                     FLOAT_80330f28));
+
+            if ((*(int*)(obj + 0x1C) == 0) || (*(int*)(obj + 0x1C) == 1)) {
+                d0 = (double)sin((double)*(float*)(obj + 0x44));
+                *(float*)(obj + 0x58) = *(float*)(obj + 0x50) * (float)d0;
+                d0 = (double)RandF__5CMathFv(&Math);
+                *(float*)(obj + 0x5C) =
+                    *(float*)(obj + 0x50) * (float)((double)FLOAT_80330f20 * d0 + (double)FLOAT_80330f24);
+                d0 = (double)cos((double)*(float*)(obj + 0x44));
+                *(float*)(obj + 0x60) = *(float*)(obj + 0x50) * (float)d0;
+            }
         }
 
-        *(float*)(obj + 0x50) =
-            *(float*)(obj + 0x50) + (FLOAT_80330f38 * (*(float*)(obj + 0x54) - *(float*)(obj + 0x50)));
-
-        *(float*)(obj + 0x44) = *(float*)(obj + 0x44) +
-                                ((FLOAT_80330f2c * RandF__5CMathFv(&Math)) +
-                                 ((FLOAT_80330f38 * (*(float*)(obj + 0x48) - *(float*)(obj + 0x44))) -
-                                  FLOAT_80330f28));
-
-        if ((type == 0) || (type == 1)) {
-            *(float*)(obj + 0x58) = *(float*)(obj + 0x50) * (float)sin((double)*(float*)(obj + 0x44));
-            *(float*)(obj + 0x5C) = *(float*)(obj + 0x50) *
-                                    (FLOAT_80330f20 * RandF__5CMathFv(&Math) + FLOAT_80330f24);
-            *(float*)(obj + 0x60) = *(float*)(obj + 0x50) * (float)cos((double)*(float*)(obj + 0x44));
+    next:
+        i = i + 1;
+        obj = obj + 100;
+        if (0x1F < i) {
+            return;
         }
     }
 }

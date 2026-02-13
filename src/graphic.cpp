@@ -421,7 +421,7 @@ void CGraphic::GetBackBufferRect2(void*, _GXTexObj*, int, int, int, int, int, _G
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGraphic::RenderTexQuadGrouad(Vec& pos1, Vec& pos2, _GXColor color1, _GXColor color2, _GXColor color3, _GXColor color4)
+void CGraphic::RenderTexQuadGrouad(Vec pos1, Vec pos2, _GXColor color1, _GXColor color2, _GXColor color3, _GXColor color4)
 {
 	GXBegin(GX_QUADS, GX_VTXFMT7, 4);
 	
@@ -455,7 +455,7 @@ void CGraphic::RenderTexQuadGrouad(Vec& pos1, Vec& pos2, _GXColor color1, _GXCol
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGraphic::RenderNoTexQuadGrouad(Vec& pos1, Vec& pos2, _GXColor color1, _GXColor color2, _GXColor color3, _GXColor color4)
+void CGraphic::RenderNoTexQuadGrouad(Vec pos1, Vec pos2, _GXColor color1, _GXColor color2, _GXColor color3, _GXColor color4)
 {
 	GXBegin(GX_QUADS, GX_VTXFMT6, 4);
 	

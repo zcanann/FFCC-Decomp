@@ -74,8 +74,8 @@ public:
     void GetBackBufferRect(int&, int&, int&, int&, int);
     void GetBackBufferRect2(void*, _GXTexObj*, int, int, int, int, int, _GXTexFilter, _GXTexFmt, int);
 
-    void RenderTexQuadGrouad(Vec&, Vec&, _GXColor, _GXColor, _GXColor, _GXColor);
-    void RenderNoTexQuadGrouad(Vec&, Vec&, _GXColor, _GXColor, _GXColor, _GXColor);
+    void RenderTexQuadGrouad(Vec, Vec, _GXColor, _GXColor, _GXColor, _GXColor);
+    void RenderNoTexQuadGrouad(Vec, Vec, _GXColor, _GXColor, _GXColor, _GXColor);
 
     void RenderDOF(char, char, float, float, Vec&, int);
 

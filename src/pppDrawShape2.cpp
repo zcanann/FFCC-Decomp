@@ -21,7 +21,7 @@ typedef struct ShapeRuntimeData {
 
 typedef struct ShapeSpecEntry {
     s16 offset;
-    u16 maxValue;
+    s16 maxValue;
     u8 flags;
 } ShapeSpecEntry;
 
@@ -75,14 +75,14 @@ void pppCalcShape2(void* param1, void* param2, void* param3)
     ShapeRuntimeData* runtimeData = *(ShapeRuntimeData**)((u8*)param3 + 0xC);
     ShapeControlData* controlData = (ShapeControlData*)param2;
     ShapeState* shapeData = (ShapeState*)((u8*)param1 + runtimeData->shapeDataOffset + 0x80);
-    u32 type = controlData->type;
+    s16 type = *(s16*)((u8*)controlData + 0x4);
 
-    if (type == 0xFFFF) {
+    if (type == -1) {
         return;
     }
 
     void** shapeTables = *(void***)((u8*)lbl_8032ED54 + 0xC);
-    void* shapeSpec = *(void**)((u8*)shapeTables + (type << 2));
+    void* shapeSpec = *(void**)((u8*)shapeTables + ((u16)type << 2));
     ShapeSpecEntry* shape = (ShapeSpecEntry*)((u8*)shapeSpec + ((u32)shapeData->counter << 3) + 0x10);
 
     shapeData->currentId = shapeData->counter;
@@ -93,7 +93,7 @@ void pppCalcShape2(void* param1, void* param2, void* param3)
     shapeData->value = (u16)(shapeData->value - shape->maxValue);
 
     shapeData->counter++;
-    if (shapeData->counter < (u16)*(s16*)((u8*)shapeSpec + 0x6)) {
+    if (shapeData->counter < *(s16*)((u8*)shapeSpec + 0x6)) {
         return;
     }
 

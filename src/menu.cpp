@@ -1,5 +1,9 @@
 #include "ffcc/menu.h"
 
+extern "C" void* __vt__5CMenu[];
+extern "C" CRef* dtor_80043D10(CRef*, short);
+extern "C" void __dl__FPv(void*);
+
 /*
  * --INFO--
  * PAL Address: 0x8009b4a8
@@ -25,6 +29,28 @@ CMenu::CMenu()
  */
 CMenu::~CMenu()
 {
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8009b448
+ * PAL Size: 96b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" CMenu* dtor_8009B448(CMenu* menu, short shouldDelete)
+{
+	if (menu != 0) {
+		*(void***)menu = __vt__5CMenu;
+		dtor_80043D10(menu, 0);
+		if (0 < shouldDelete) {
+			__dl__FPv(menu);
+		}
+	}
+
+	return menu;
 }
 
 /*

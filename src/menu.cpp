@@ -1,8 +1,8 @@
 #include "ffcc/menu.h"
 
+extern "C" void* __vt__5CMenu[];
+extern "C" CRef* dtor_80043D10(CRef*, short);
 extern "C" void __dl__FPv(void*);
-extern "C" void* __vt__5CMenu;
-extern "C" CRef* dtor_80043D10(CRef* ref, short param_2);
 
 /*
  * --INFO--
@@ -40,12 +40,12 @@ CMenu::~CMenu()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" CMenu* dtor_8009B448(CMenu* menu, short param_2)
+extern "C" CMenu* dtor_8009B448(CMenu* menu, short shouldDelete)
 {
 	if (menu != 0) {
-		*(void**)menu = &__vt__5CMenu;
+		*(void***)menu = __vt__5CMenu;
 		dtor_80043D10(menu, 0);
-		if (0 < param_2) {
+		if (0 < shouldDelete) {
 			__dl__FPv(menu);
 		}
 	}

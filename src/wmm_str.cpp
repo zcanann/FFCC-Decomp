@@ -47,23 +47,18 @@ extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
  */
 const char* CMenuPcs::GetMcStr(int index)
 {
-    const unsigned int languageId = Game.game.m_gameWork.m_languageId;
-    if (languageId == 3) {
+    switch (Game.game.m_gameWork.m_languageId) {
+    case 2:
+        return lbl_80215BE8[index];
+    case 3:
         return lbl_80215BF8[index];
+    case 4:
+        return lbl_80215C08[index];
+    case 5:
+        return lbl_80215C18[index];
+    default:
+        return lbl_80215BD8[index];
     }
-    if (languageId < 3) {
-        if ((languageId != 1) && (languageId != 0)) {
-            return lbl_80215BE8[index];
-        }
-    } else {
-        if (languageId == 5) {
-            return lbl_80215C18[index];
-        }
-        if (languageId < 5) {
-            return lbl_80215C08[index];
-        }
-    }
-    return lbl_80215BD8[index];
 }
 
 /*
@@ -77,59 +72,47 @@ const char* CMenuPcs::GetMcStr(int index)
  */
 const char* const* CMenuPcs::GetMcWinMessBuff(int group)
 {
-    const unsigned int languageId = Game.game.m_gameWork.m_languageId;
-    if (group != 0) {
-        if (group != 1) {
-            if (languageId == 3) {
-                return lbl_802161BC;
-            }
-            if (languageId < 3) {
-                if ((languageId != 1) && (languageId != 0)) {
-                    return lbl_80216140;
-                }
-            } else {
-                if (languageId == 5) {
-                    return lbl_802162B4;
-                }
-                if (languageId < 5) {
-                    return lbl_80216238;
-                }
-            }
+    switch (group) {
+    case 0:
+        switch (Game.game.m_gameWork.m_languageId) {
+        case 2:
+            return lbl_80215D14;
+        case 3:
+            return lbl_80215E00;
+        case 4:
+            return lbl_80215EEC;
+        case 5:
+            return lbl_80215FD8;
+        default:
+            return lbl_80215C28;
+        }
+    case 1:
+        switch (Game.game.m_gameWork.m_languageId) {
+        case 2:
+            return lbl_8021636C;
+        case 3:
+            return lbl_802163A8;
+        case 4:
+            return lbl_802163E4;
+        case 5:
+            return lbl_80216420;
+        default:
+            return lbl_80216330;
+        }
+    default:
+        switch (Game.game.m_gameWork.m_languageId) {
+        case 2:
+            return lbl_80216140;
+        case 3:
+            return lbl_802161BC;
+        case 4:
+            return lbl_80216238;
+        case 5:
+            return lbl_802162B4;
+        default:
             return lbl_802160C4;
         }
-        if (languageId == 3) {
-            return lbl_802163A8;
-        }
-        if (languageId < 3) {
-            if ((languageId != 1) && (languageId != 0)) {
-                return lbl_8021636C;
-            }
-        } else {
-            if (languageId == 5) {
-                return lbl_80216420;
-            }
-            if (languageId < 5) {
-                return lbl_802163E4;
-            }
-        }
-        return lbl_80216330;
     }
-    if (languageId == 3) {
-        return lbl_80215E00;
-    }
-    if (languageId < 3) {
-        if ((languageId != 1) && (languageId != 0)) {
-            return lbl_80215D14;
-        }
-    } else {
-        if (languageId == 5) {
-            return lbl_80215FD8;
-        }
-        if (languageId < 5) {
-            return lbl_80215EEC;
-        }
-    }
-    return lbl_80215C28;
 }
 
 /*

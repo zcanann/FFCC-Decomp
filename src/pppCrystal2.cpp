@@ -62,7 +62,7 @@ void pppDestructCrystal2(pppCrystal2* pppCrystal2, UnkC* param_2)
     u32* puVar1;
     CMemory::CStage* stage;
 
-    puVar1 = (u32*)((u8*)pppCrystal2 + param_2->m_serializedDataOffsets[2] + 8);
+    puVar1 = (u32*)((u8*)pppCrystal2 + param_2->m_serializedDataOffsets[2] + 0x80);
     stage = (CMemory::CStage*)puVar1[0];
     
     if ((CMemory::CStage*)puVar1[1] != 0) {

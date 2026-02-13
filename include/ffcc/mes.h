@@ -23,11 +23,11 @@ public:
     void addString(char**, int);
     void GET_2(char**);
     void GET_1(char**);
-    void GetWait();
+    int GetWait();
     void Calc();
     void Draw();
     void SetPosition(float, float);
-    void useFlag(int, int);
+    int useFlag(int, int);
     void addFlag(class CFlag&);
     void MakeAgbString(char*, char*, int, int);
     void drawTagString(CFont*, char*, int, int, int);

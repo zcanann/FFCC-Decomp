@@ -87,12 +87,98 @@ void CMes::Set(char* text, int param)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009af54
+ * PAL Size: 528b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMes::Next()
 {
-	// TODO
+	if (*(int*)((char*)this + 4) != 0)
+	{
+		int entryCount = *(int*)((char*)this + 0x3c0c);
+		unsigned char* flagEntry = (unsigned char*)((char*)this + *(int*)((char*)this + 0x3c10) * 6 + 0x3c14);
+
+		while (*(int*)((char*)this + 0x3c10) < entryCount)
+		{
+			unsigned char type = flagEntry[0];
+			if (type != 3)
+			{
+				if (type == 1)
+				{
+					int idx = (unsigned int)flagEntry[2] * 4 + 0x3cc0;
+					*(int*)((char*)this + idx) = *(int*)((char*)this + idx) + 1;
+				}
+				else if (type != 0)
+				{
+					*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) = (int)*(short*)(flagEntry + 4);
+				}
+			}
+
+			flagEntry += 6;
+			*(int*)((char*)this + 0x3c10) = *(int*)((char*)this + 0x3c10) + 1;
+		}
+
+		*(int*)((char*)this + 8) = 0;
+		*(int*)((char*)this + 0x3c10) = 0;
+		*(int*)((char*)this + 0x3c0c) = 0;
+		*(float*)((char*)this + 0x3c88) = 0.0f;
+		*(float*)((char*)this + 0x3c84) = 0.0f;
+		*(float*)((char*)this + 0x3c90) = 0.0f;
+		*(float*)((char*)this + 0x3c8c) = 0.0f;
+		*(int*)((char*)this + 0x3c80) = 0;
+		*(int*)((char*)this + 0x3c7c) = 0;
+		*(int*)((char*)this + 0x3cac) = 0;
+
+		char tempFlags[0x50];
+		memcpy(tempFlags, (char*)this + 0x3cc0, sizeof(tempFlags));
+		addString((char**)((char*)this + 4), 0);
+		memcpy((char*)this + 0x3cc0, tempFlags, sizeof(tempFlags));
+
+		int i = 0;
+		float* curr = (float*)((char*)this + 0xc);
+		while (i < *(int*)((char*)this + 8))
+		{
+			float* start = curr;
+			i++;
+			curr = start + 5;
+
+			int remaining = *(int*)((char*)this + 8) - i;
+			if (i < *(int*)((char*)this + 8))
+			{
+				do
+				{
+					if (((*(unsigned char*)((char*)start + 0xe) >> 4) != (*(unsigned char*)((char*)curr + 0xe) >> 4)) ||
+					    (*(short*)(start + 2) != *(short*)(curr + 2)))
+					{
+						break;
+					}
+					i++;
+					curr += 5;
+					remaining--;
+				} while (remaining != 0);
+			}
+
+			unsigned int runLength = (unsigned int)(((char*)curr - (char*)start) / 0x14);
+			float groupWidth = (curr[-5] - start[0]) + start[1] + *(float*)((char*)this + 0x3d3c);
+			while (runLength != 0)
+			{
+				unsigned char align = *(unsigned char*)((char*)start + 0xe) >> 4;
+				if (align == 1)
+				{
+					start[0] = 0.5f * (*(float*)((char*)this + 0x3ca4) - groupWidth) + start[0];
+				}
+				else if (align == 2)
+				{
+					start[0] = start[0] + (*(float*)((char*)this + 0x3ca4) - groupWidth);
+				}
+				start += 5;
+				runLength--;
+			}
+		}
+	}
 }
 
 /*
@@ -137,12 +223,20 @@ void CMes::GET_1(char **)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80099440
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMes::GetWait()
+int CMes::GetWait()
 {
-	// TODO
+	if (*(int*)((char*)this + 0x3c7c) < *(int*)((char*)this + 0x3c80))
+	{
+		return *(int*)((char*)this + 0x3c78);
+	}
+	return 0;
 }
 
 /*
@@ -178,12 +272,49 @@ void CMes::SetPosition(float x, float y)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80098bc4
+ * PAL Size: 192b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMes::useFlag(int, int)
+int CMes::useFlag(int maxCount, int stopOnClear)
 {
-	// TODO
+	unsigned char* flagEntry = (unsigned char*)((char*)this + *(int*)((char*)this + 0x3c10) * 6 + 0x3c14);
+	while (true)
+	{
+		if (maxCount <= *(int*)((char*)this + 0x3c10))
+		{
+			return 1;
+		}
+
+		unsigned char type = flagEntry[0];
+		if (type != 3)
+		{
+			if (type < 3)
+			{
+				if (type == 1)
+				{
+					int idx = (unsigned int)flagEntry[2] * 4 + 0x3cc0;
+					*(int*)((char*)this + idx) = *(int*)((char*)this + idx) + 1;
+				}
+				else if (type != 0)
+				{
+					*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) = (int)*(short*)(flagEntry + 4);
+				}
+			}
+			else if ((type < 5) &&
+			         (*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) == 0) &&
+			         (stopOnClear == 0))
+			{
+				return 0;
+			}
+		}
+
+		flagEntry += 6;
+		*(int*)((char*)this + 0x3c10) = *(int*)((char*)this + 0x3c10) + 1;
+	}
 }
 
 /*

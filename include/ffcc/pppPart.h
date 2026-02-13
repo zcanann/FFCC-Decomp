@@ -57,7 +57,7 @@ unsigned long pppMngStHeapCheckLeak(CMemory::CStage* stage);
 void pppMngStHeapCheck(CMemory::CStage* stage);
 void callCon2Prog(_pppPObject*);
 void callConProg(_pppPObject*);
-void pppCreatePObject(_pppMngSt*, _pppPDataVal*);
+_pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
 void pppDeletePObject(_pppPObject*);
 void _pppAllFreePObject(_pppMngSt*);
 void pppSetBindChrSync(_pppMngSt*);

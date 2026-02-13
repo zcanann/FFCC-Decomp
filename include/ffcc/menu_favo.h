@@ -13,7 +13,7 @@ public:
     void FavoInit0();
     bool FavoOpen();
     void FavoCtrl();
-    void FavoClose();
+    bool FavoClose();
     void FavoDraw();
     void FavoCtrlCur();
 

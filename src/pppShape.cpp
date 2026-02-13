@@ -11,6 +11,24 @@ extern "C" {
                                                      long* outIndex);
 }
 
+class CMaterial;
+
+template <class T>
+class CPtrArray
+{
+public:
+    void** m_vtable;
+    int m_size;
+    int m_numItems;
+    int m_defaultSize;
+    T* m_items;
+    void* m_stage;
+    int m_growCapacity;
+
+    T GetAt(unsigned long index);
+    T operator[](unsigned long index);
+};
+
 /*
  * --INFO--
  * PAL Address: 0x80065c6c
@@ -22,9 +40,12 @@ extern "C" {
  */
 void* pppShapeSt::GetTexture(long* animData, CMaterialSet* materialSet, int& textureIndex)
 {
-    int shapePtr = (int)animData + *(short*)((int)animData + 0x10) + 8;
-    textureIndex = (unsigned int)*(unsigned char*)(shapePtr + 2);
-    return 0;
+    int shapeEntry = (int)animData + *(short*)((int)animData + 0x10) + 8;
+    unsigned char materialIndex = *(unsigned char*)(shapeEntry + 2);
+    textureIndex = materialIndex;
+    CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>((char*)materialSet + 8))
+                              [materialIndex];
+    return *(void**)((char*)material + 0x3C);
 }
 
 /*

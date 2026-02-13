@@ -12,18 +12,18 @@ public:
     ~CPtrArray();
     
     int GetSize();
-    bool Add(T* item);
+    bool Add(T item);
     void RemoveAll();
-    T* GetAt(unsigned long index);
-    T* operator[](unsigned long index);
+    T GetAt(unsigned long index);
+    T operator[](unsigned long index);
     
 private:
-    bool setSize(unsigned int newSize);
+    bool setSize(unsigned long newSize);
             
     unsigned long m_size;
     unsigned long m_numItems;
     unsigned long m_defaultSize;
-    T** m_items;
+    T* m_items;
     CMemory::CStage* m_stage;
     int m_growCapacity;
 };
@@ -52,19 +52,19 @@ int CPtrArray<T>::GetSize()
 }
 
 template <class T>
-T* CPtrArray<T>::GetAt(unsigned long index)
+T CPtrArray<T>::GetAt(unsigned long index)
 {
     return m_items[index];
 }
 
 template <class T>
-T* CPtrArray<T>::operator[](unsigned long index)
+T CPtrArray<T>::operator[](unsigned long index)
 {
     return GetAt(index);
 }
 
 template <class T>
-bool CPtrArray<T>::Add(T* item)
+bool CPtrArray<T>::Add(T item)
 {
     bool success = setSize(m_numItems + 1);
     if (success) {
@@ -86,9 +86,9 @@ void CPtrArray<T>::RemoveAll()
 }
 
 template <class T>
-bool CPtrArray<T>::setSize(unsigned int newSize)
+bool CPtrArray<T>::setSize(unsigned long newSize)
 {
-    T** newItems;
+    T* newItems;
     
     if (m_size < newSize) {
         if (m_size == 0) {
@@ -101,7 +101,7 @@ bool CPtrArray<T>::setSize(unsigned int newSize)
         }
         
         // Allocate new buffer (simplified - would need proper memory management)
-        newItems = new T*[m_size];
+        newItems = new T[m_size];
         if (newItems == 0) {
             return false;
         }

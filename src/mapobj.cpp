@@ -41,6 +41,9 @@ static inline float& F32At(CMapObj* self, unsigned int offset)
 
 extern "C" void __dl__FPv(void*);
 
+template class CPtrArray<CMapAnimRun*>;
+template class CPtrArray<CMapShadow*>;
+
 /*
  * --INFO--
  * PAL Address: 0x8002BE10

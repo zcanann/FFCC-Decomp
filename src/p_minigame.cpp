@@ -1,5 +1,7 @@
 #include "ffcc/p_minigame.h"
 
+extern CMiniGamePcs MiniGamePcs;
+
 /*
  * --INFO--
  * Address:	TODO
@@ -42,12 +44,16 @@ void AdjustGbaImageRegistry(char*, char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012b09c
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _OpenCallback(MgGbaThreadParam*, void*)
+void _OpenCallback(MgGbaThreadParam* param, void* context)
 {
-	// TODO
+    MiniGamePcs.OpenCallback(param, context);
 }
 
 /*
@@ -92,22 +98,30 @@ void GbaThreadReadInitialCode(MgGbaThreadParam*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801290a0
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _GbaThreadMain(void*)
+void _GbaThreadMain(void* param)
 {
-	// TODO
+    MiniGamePcs.GbaThreadMain(param);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80128574
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _MngThreadMain(void*)
+void _MngThreadMain(void* param)
 {
-	// TODO
+    MiniGamePcs.MngThreadMain(param);
 }
 
 /*

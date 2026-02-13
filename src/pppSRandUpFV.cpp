@@ -5,6 +5,7 @@ extern CMath math;
 extern int lbl_8032ED70;
 extern float lbl_803300C0;
 extern float lbl_801EADC8[];
+extern "C" float RandF__5CMathFv(CMath*);
 
 /*
  * --INFO--
@@ -37,62 +38,78 @@ void randf(unsigned char param)
  */
 extern "C" void pppSRandUpFV(void* param1, void* param2, void* param3)
 {
-    if (lbl_8032ED70 != 0) return;
-    
-    int* field_c = (int*)((char*)param1 + 0xC);
-    if (*field_c == 0) {
-        int* param3_field_c = (int*)((char*)param3 + 0xC);
-        int offset = *(int*)*param3_field_c;
-        float* vector_ptr = (float*)((char*)param1 + offset + 0x80);
-        
-        unsigned char flag = *((unsigned char*)param2 + 0x18);
-        
-        // X component
-        math.RandF();
-        float rand_x = 1.0f; // TODO: get actual random value
-        if (flag != 0) {
-            math.RandF();
-            float rand_x2 = 1.0f; // TODO: get actual random value
-            rand_x = (rand_x + rand_x2) * lbl_803300C0;
+    struct Param {
+        int index;
+        int offset;
+        float x;
+        float y;
+        float z;
+        unsigned char _pad[4];
+        unsigned char blendTwice;
+    };
+    struct SelectInfo {
+        int _pad0;
+        int _pad1;
+        int _pad2;
+        int* offsetPtr;
+    };
+
+    unsigned char* self = reinterpret_cast<unsigned char*>(param1);
+    Param* cfg = reinterpret_cast<Param*>(param2);
+    float* randVec;
+    int currentIndex;
+
+    if (lbl_8032ED70 != 0) {
+        return;
+    }
+
+    currentIndex = *reinterpret_cast<int*>(self + 0xC);
+    if (currentIndex == 0) {
+        int offset = *reinterpret_cast<SelectInfo*>(param3)->offsetPtr;
+        unsigned char blendTwice = cfg->blendTwice;
+        randVec = reinterpret_cast<float*>(self + offset + 0x80);
+
+        float value = RandF__5CMathFv(&math);
+        if (blendTwice != 0) {
+            value = (value + RandF__5CMathFv(&math)) * lbl_803300C0;
         }
-        vector_ptr[0] = rand_x;
-        
-        // Y component  
-        math.RandF();
-        float rand_y = 1.0f; // TODO: get actual random value
-        if (flag != 0) {
-            math.RandF();
-            float rand_y2 = 1.0f; // TODO: get actual random value
-            rand_y = (rand_y + rand_y2) * lbl_803300C0;
+        randVec[0] = value;
+
+        value = RandF__5CMathFv(&math);
+        if (blendTwice != 0) {
+            value = (value + RandF__5CMathFv(&math)) * lbl_803300C0;
         }
-        vector_ptr[1] = rand_y;
-        
-        // Z component
-        math.RandF();
-        float rand_z = 1.0f; // TODO: get actual random value
-        if (flag != 0) {
-            math.RandF();
-            float rand_z2 = 1.0f; // TODO: get actual random value
-            rand_z = (rand_z + rand_z2) * lbl_803300C0;
+        randVec[1] = value;
+
+        value = RandF__5CMathFv(&math);
+        if (blendTwice != 0) {
+            value = (value + RandF__5CMathFv(&math)) * lbl_803300C0;
         }
-        vector_ptr[2] = rand_z;
+        randVec[2] = value;
     } else {
-        if (*(int*)param2 != *field_c) return;
-        
-        int* param3_field_c = (int*)((char*)param3 + 0xC);
-        int offset = *(int*)*param3_field_c;
-        float* vector_ptr = (float*)((char*)param1 + offset + 0x80);
-        
-        int field_4 = *((int*)param2 + 1);
-        float* scale_ptr;
-        if (field_4 == -1) {
-            scale_ptr = lbl_801EADC8;
-        } else {
-            scale_ptr = (float*)((char*)param1 + field_4 + 0x80);
+        if (cfg->index != currentIndex) {
+            return;
         }
-        
-        scale_ptr[0] += *((float*)param2 + 2) * vector_ptr[0];
-        scale_ptr[1] += *((float*)param2 + 3) * vector_ptr[1];
-        scale_ptr[2] += *((float*)param2 + 4) * vector_ptr[2];
+        randVec = reinterpret_cast<float*>(self + *reinterpret_cast<SelectInfo*>(param3)->offsetPtr + 0x80);
+    }
+
+    float* target;
+    if (cfg->offset == -1) {
+        target = lbl_801EADC8;
+    } else {
+        target = reinterpret_cast<float*>(self + cfg->offset + 0x80);
+    }
+
+    {
+        float value = cfg->x * randVec[0];
+        target[0] = target[0] + value;
+    }
+    {
+        float value = cfg->y * randVec[1];
+        target[1] = target[1] + value;
+    }
+    {
+        float value = cfg->z * randVec[2];
+        target[2] = target[2] + value;
     }
 }

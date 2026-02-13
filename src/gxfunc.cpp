@@ -224,11 +224,11 @@ void _GXSetAlphaCompare(_GXCompare comp0, unsigned char ref0, _GXAlphaOp op, _GX
 {
 	if (s_GXSetAlphaCompare_Reg.comp0 != comp0 || s_GXSetAlphaCompare_Reg.alphaOp != op || s_GXSetAlphaCompare_Reg.comp1 != comp1 ||
 	    s_GXSetAlphaCompare_Reg.ref0 != ref0 || s_GXSetAlphaCompare_Reg.ref1 != ref1) {
-		s_GXSetAlphaCompare_Reg.ref0 = ref0;
-		s_GXSetAlphaCompare_Reg.ref1 = ref1;
 		s_GXSetAlphaCompare_Reg.comp0 = comp0;
 		s_GXSetAlphaCompare_Reg.alphaOp = op;
 		s_GXSetAlphaCompare_Reg.comp1 = comp1;
+		s_GXSetAlphaCompare_Reg.ref0 = ref0;
+		s_GXSetAlphaCompare_Reg.ref1 = ref1;
 		GXSetAlphaCompare(comp0, ref0, op, comp1, ref1);
 	}
 }

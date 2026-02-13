@@ -1,19 +1,37 @@
 #include "ffcc/pppYmMiasma.h"
 #include "ffcc/partMng.h"
+#include "ffcc/p_game.h"
 
 #include <dolphin/mtx.h>
 #include <dolphin/gx.h>
+#include <string.h>
 
 extern int rand();
 extern float ppvSinTbl[];
+extern float FLOAT_80330640;
 extern float FLOAT_80330644;
+extern float FLOAT_80330650;
+extern float FLOAT_80330654;
 extern float FLOAT_8033065c;
+extern float FLOAT_80330660;
 extern float FLOAT_80330664;
 extern u32 DAT_80330658;
+extern int DAT_8032ed70;
+extern double DOUBLE_80330648;
 extern double RandF__5CMathFf(double, void*);
 extern void pppNormalize__FR3Vec3Vec(float*, Vec*);
 extern void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern char Math;
+extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" void pppSubVector__FR3Vec3Vec3Vec(Vec*, const Vec*, const Vec*);
+extern "C" void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
+extern "C" void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
+extern "C" void pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*, pppFMATRIX*);
+extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+    void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char,
+    unsigned char);
+extern "C" void pppSetBlendMode__FUc(unsigned char);
+extern "C" void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
 
 /*
  * --INFO--
@@ -188,13 +206,92 @@ void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, UnkC* param_2)
  */
 void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, UnkB* param_2, UnkC* param_3)
 {
-    (void)pppYmMiasma_;
-    (void)param_2;
-    (void)param_3;
-    // Frame update function - based on Ghidra analysis this manages particle lifecycle
-    if (!pppEnvStPtr || !pppMngStPtr) return;
-    
-    // Basic frame processing
+    static char sPppYmMiasmaCpp[] = "pppYmMiasma.cpp";
+    int* step = (int*)param_2;
+    int* work;
+    int i;
+    int particle;
+    int count;
+    Vec matrixPos;
+    Vec oldPos;
+    Vec delta;
+
+    if (DAT_8032ed70 != 0) {
+        return;
+    }
+
+    work = (int*)((u8*)pppYmMiasma_ + 8 + param_3->m_serializedDataOffsets[2]);
+
+    if (step[0] == *(int*)pppYmMiasma_) {
+        work[7] = (int)((float)work[7] + (float)step[0x16]);
+        work[8] = (int)((float)work[8] + (float)step[0x17]);
+        work[9] = (int)((float)work[9] + (float)step[0x18]);
+    }
+
+    count = (int)(u32) * (u16*)(step + 3);
+    if (work[0] == 0) {
+        work[0] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+            (unsigned long)count * 0x50, pppEnvStPtr->m_stagePtr, sPppYmMiasmaCpp, 0x18d);
+        particle = work[0];
+        for (i = 0; i < count; i++) {
+            InitParticleData((VYmMiasma*)work, (_pppPObject*)pppYmMiasma_, (PYmMiasma*)step, (_PARTICLE_DATA*)particle);
+            particle += 0x50;
+        }
+    }
+
+    *((u8*)(work + 2)) = (u8)(*((u8*)(work + 2)) + 1);
+    work[1] = (int)((float)work[1] - (float)step[0x1b]);
+    if ((float)work[1] < FLOAT_80330644) {
+        work[1] = (int)FLOAT_80330644;
+    }
+
+    if (*((u8*)(step + 0x19)) < *((u8*)(work + 2))) {
+        int r;
+        s16 angleDelta;
+        u32 signBit;
+        u32 angleIdx;
+
+        *((u8*)(work + 2)) = 0;
+        work[1] = step[6];
+
+        r = rand();
+        angleDelta = (s16)r - (s16)(r / (int)*(s16*)(step + 0x1a)) * *(s16*)(step + 0x1a);
+        signBit = (u32)(int)angleDelta >> 31;
+        if ((((int)angleDelta & 1U) ^ signBit) == signBit) {
+            angleDelta = -angleDelta;
+        }
+
+        angleIdx = (u32)((FLOAT_80330650 * FLOAT_80330640 * (float)(s16)(angleDelta + *(s16*)((u8*)step + 0x66))) /
+                         FLOAT_80330654);
+        work[4] = *(int*)((u8*)ppvSinTbl + ((angleIdx + 0x4000) & 0xfffc));
+        work[5] = (int)FLOAT_80330644;
+        work[6] = *(int*)((u8*)ppvSinTbl + (angleIdx & 0xfffc));
+    }
+
+    work[8] = (int)((float)work[8] + (float)work[9]);
+    work[7] = (int)((float)work[7] + (float)work[8]);
+
+    particle = work[0];
+    for (i = 0; i < count; i++) {
+        UpdateParticleData((_pppPObject*)pppYmMiasma_, (_pppCtrlTable*)param_3, (PYmMiasma*)step, (_PARTICLE_DATA*)particle);
+        particle += 0x50;
+    }
+
+    matrixPos.x = pppMngStPtr->m_matrix.value[0][3];
+    matrixPos.y = pppMngStPtr->m_matrix.value[1][3];
+    matrixPos.z = pppMngStPtr->m_matrix.value[2][3];
+    oldPos.x = *(float*)(work + 10);
+    oldPos.y = *(float*)(work + 0xb);
+    oldPos.z = *(float*)(work + 0xc);
+
+    pppSubVector__FR3Vec3Vec3Vec(&delta, &matrixPos, &oldPos);
+    if ((double)PSVECDistance(&matrixPos, (Vec*)(work + 10)) == (double)FLOAT_80330644) {
+        *((u8*)(work + 0xd)) = 0;
+    } else {
+        *((u8*)(work + 0xd)) = 0xff;
+    }
+
+    pppCopyVector__FR3Vec3Vec((Vec*)(work + 10), &matrixPos);
 }
 
 /*
@@ -204,8 +301,61 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, UnkB* param_2, UnkC* param_3)
  */
 void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, UnkB* param_2, UnkC* param_3)
 {
-    (void)pppYmMiasma_;
-    (void)param_2;
-    (void)param_3;
-    // Render function stub
+    float* particle = (float*)((u8*)pppYmMiasma_ + 8 + param_3->m_serializedDataOffsets[2]);
+    u8* step = (u8*)param_2;
+    u16 count = *(u16*)(step + 0x10);
+
+    GXSetTevSwapMode((GXTevStageID)0, (GXTevSwapSel)0, (GXTevSwapSel)0);
+
+    for (int i = 0; i < (int)count; i++) {
+        u16 dataValIndex = *(u16*)(step + 4);
+        if (dataValIndex != 0xffff) {
+            long* shapeTable = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
+            pppFMATRIX model;
+            pppFMATRIX scaleMatrix;
+            pppFMATRIX rotMatrix;
+            Mtx rotMtx;
+            Vec pos;
+            GXColor amb;
+            u8 blend = step[0x18 + 0x1e];
+
+            pppUnitMatrix__FR10pppFMATRIX(&model);
+            model.value[2][2] = particle[0x10];
+            model.value[0][0] = pppMngStPtr->m_scale.x * model.value[2][2];
+            model.value[1][1] = pppMngStPtr->m_scale.y * model.value[2][2];
+            model.value[2][2] = pppMngStPtr->m_scale.z * model.value[2][2];
+
+            PSMTXRotRad(rotMtx, 'z', FLOAT_80330640 * (float)*(s16*)((u8*)particle + 0x38));
+            scaleMatrix = model;
+            memcpy(rotMatrix.value, rotMtx, sizeof(Mtx));
+            pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&model, &rotMatrix, &scaleMatrix);
+
+            pos.x = particle[0];
+            pos.y = particle[1];
+            pos.z = particle[2];
+            if (Game.game.m_currentSceneId == 7) {
+                PSMTXMultVec(ppvWorldMatrix, &pos, &pos);
+            } else {
+                PSMTXMultVec(ppvCameraMatrix0, &pos, &pos);
+            }
+
+            model.value[0][3] = pos.x;
+            model.value[1][3] = pos.y;
+            model.value[2][3] = pos.z;
+
+            pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+                0, &model, FLOAT_80330644, step[0x18 + 0x61], step[0x18 + 0x60], blend, 0, 1, 1, 0);
+
+            amb.r = *(u8*)((u8*)particle + 0x20);
+            amb.g = *(u8*)((u8*)particle + 0x22);
+            amb.b = *(u8*)((u8*)particle + 0x24);
+            amb.a = *(u8*)((u8*)particle + 0x26);
+            GXSetChanAmbColor(GX_COLOR0A0, amb);
+            pppSetBlendMode__FUc(blend);
+            pppDrawShp__FPlsP12CMaterialSetUc(
+                shapeTable, *(s16*)((u8*)particle + 0x4e), pppEnvStPtr->m_materialSetPtr, blend);
+        }
+
+        particle += 0x14;
+    }
 }

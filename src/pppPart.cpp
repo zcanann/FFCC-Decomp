@@ -280,7 +280,7 @@ void pppMemFree(void*)
  */
 void pppHeapUseRate(CMemory::CStage* stage)
 { 
-	if (stage != (CMemory::CStage *)nullptr)
+	if (stage != (CMemory::CStage*)0)
 	{
 		Memory.Free(stage);
 	}
@@ -305,8 +305,20 @@ void pppHeapCheckLeak(CMemory::CStage* stage)
  * Address:	TODO
  * Size:	TODO
  */
-void pppMngStHeapCheckLeak(CMemory::CStage* stage)
+unsigned long pppMngStHeapCheckLeak(CMemory::CStage* stage)
 {
+	unsigned long heapTotal;
+	unsigned long heapUseRate;
+	unsigned long heapUnused;
+
+	stage->heapInfo(heapTotal, heapUseRate, heapUnused);
+	if (heapTotal == 0) {
+		heapTotal = 10000;
+	} else {
+		heapTotal = (heapUseRate * 10000) / heapTotal;
+	}
+
+	return heapTotal;
 }
 
 /*

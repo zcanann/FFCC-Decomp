@@ -53,7 +53,7 @@ void pppMemAlloc(unsigned long, CMemory::CStage*, char*, int);
 void pppMemFree(void*);
 void pppHeapUseRate(CMemory::CStage* stage);
 void pppHeapCheckLeak(CMemory::CStage* stage);
-void pppMngStHeapCheckLeak(CMemory::CStage* stage);
+unsigned long pppMngStHeapCheckLeak(CMemory::CStage* stage);
 void pppMngStHeapCheck(CMemory::CStage* stage);
 void callCon2Prog(_pppPObject*);
 void callConProg(_pppPObject*);

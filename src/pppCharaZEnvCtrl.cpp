@@ -68,12 +68,16 @@ void pppDesCharaZEnvCtrl(void)
  */
 void pppFrameCharaZEnvCtrl(pppCharaZEnvCtrl* pppCharaZEnvCtrl, UnkB* param_2, UnkC* param_3)
 {
-	if (DAT_8032ed70 == 0) {
-		int dataOffset = *(int*)((char*)param_3 + 0xc);
-		void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)pppMngStPtr + 0x8), 0);
-		int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
-		*(void**)(model + 0xe4) = (void*)((int)(&pppCharaZEnvCtrl->field0_0x0 + 2) + dataOffset);
-		*(UnkB**)(model + 0xe8) = param_2;
-		*(void (**)(CChara::CModel*, void*, void*, int))(model + 0xf4) = CharaZEnvCtrl_BeforeMeshLockEnvCallback;
+	if (DAT_8032ed70 != 0U) {
+		return;
 	}
+
+	::pppCharaZEnvCtrl* self = pppCharaZEnvCtrl;
+	int dataOffset = (int)*(void**)((char*)param_3 + 0xc);
+	void* owner = *(void**)((char*)pppMngStPtr + 0x8);
+	void* handle = GetCharaHandlePtr__FP8CGObjectl(owner, 0);
+	int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+	*(void**)(model + 0xe4) = (void*)((char*)self + dataOffset + 0x10);
+	*(UnkB**)(model + 0xe8) = param_2;
+	*(void (**)(CChara::CModel*, void*, void*, int))(model + 0xf4) = CharaZEnvCtrl_BeforeMeshLockEnvCallback;
 }

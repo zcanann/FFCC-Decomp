@@ -58,10 +58,12 @@ void pppConstructCrystal(struct pppCrystal* pppCrystal, struct UnkC* param_2)
  */
 void pppDestructCrystal(struct pppCrystal* pppCrystal, struct UnkC* param_2)
 {
+	s32 serializedOffset;
 	CMemory::CStage* stage;
 	u32* puVar1;
 	
-	puVar1 = (u32*)((char*)pppCrystal + 8 + param_2->m_serializedDataOffsets[2]);
+	serializedOffset = param_2->m_serializedDataOffsets[2];
+	puVar1 = (u32*)((char*)pppCrystal + 0x80 + serializedOffset);
 	stage = (CMemory::CStage*)puVar1[0];
 	if ((stage != 0) && (*(CMemory::CStage**)stage != 0)) {
 		pppHeapUseRate(*(CMemory::CStage**)stage);

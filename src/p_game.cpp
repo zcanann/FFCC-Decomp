@@ -204,7 +204,7 @@ void CGamePcs::draw0()
  */
 void CGamePcs::draw1()
 {
-    game.Draw2();
+    Game.game.Draw2();
 }
 
 /*
@@ -218,7 +218,7 @@ void CGamePcs::draw1()
  */
 void CGamePcs::draw2()
 {
-    game.Draw3();
+    Game.game.Draw3();
 }
 
 /*

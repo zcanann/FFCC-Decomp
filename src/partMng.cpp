@@ -1,4 +1,5 @@
 #include "ffcc/partMng.h"
+#include "ffcc/pppPart.h"
 
 extern "C" void __dl__FPv(void* ptr);
 
@@ -621,12 +622,27 @@ void CPartMng::pppPartDead()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80059c44
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartMng::pppPartInit()
 {
-	// TODO
+	char* pppMngSt = reinterpret_cast<char*>(this);
+	int i = 0;
+
+	*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x8) = 0;
+	do {
+		int baseTime = *reinterpret_cast<int*>(pppMngSt + 0x14);
+		if (baseTime != -0x1000 && baseTime < 0) {
+			_pppInitPart(reinterpret_cast<_pppMngSt*>(pppMngSt));
+		}
+		pppMngSt += 0x158;
+		i++;
+	} while (i < 0x180);
 }
 
 /*

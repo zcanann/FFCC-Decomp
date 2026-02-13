@@ -1,6 +1,9 @@
 #include "ffcc/gobject.h"
 
 #include "ffcc/p_game.h"
+#include "ffcc/partMng.h"
+
+extern CPartMng PartMng;
 
 static const float sBgDefaultGravityY = 0.0;
 static bool sBgCollisionActive;
@@ -41,12 +44,43 @@ void CGObject::onCreate()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80081dd8
+ * PAL Size: 204b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGObject::onDestroy()
 {
-	// TODO
+    if (m_charaModelHandle != (CCharaPcs::CHandle*)0) {
+        PartMng.pppDeleteCHandle(m_charaModelHandle);
+    }
+
+    if (m_weaponModelHandle != (CCharaPcs::CHandle*)0) {
+        PartMng.pppDeleteCHandle(m_weaponModelHandle);
+    }
+
+    if (m_shieldModelHandle != (CCharaPcs::CHandle*)0) {
+        PartMng.pppDeleteCHandle(m_shieldModelHandle);
+    }
+
+    if (m_charaModelHandle != (CCharaPcs::CHandle*)0) {
+        delete m_charaModelHandle;
+        m_charaModelHandle = (CCharaPcs::CHandle*)0;
+    }
+
+    if (m_weaponModelHandle != (CCharaPcs::CHandle*)0) {
+        delete m_weaponModelHandle;
+        m_weaponModelHandle = (CCharaPcs::CHandle*)0;
+    }
+
+    if (m_shieldModelHandle != (CCharaPcs::CHandle*)0) {
+        delete m_shieldModelHandle;
+        m_shieldModelHandle = (CCharaPcs::CHandle*)0;
+    }
+
+    m_scriptHandle = (void**)0;
 }
 
 /*

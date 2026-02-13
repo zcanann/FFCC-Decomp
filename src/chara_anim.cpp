@@ -1,16 +1,57 @@
 #include "ffcc/chara_anim.h"
 #include "ffcc/chunkfile.h"
+#include "ffcc/memory.h"
+#include "ffcc/system.h"
 
 #include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
+#include <string.h>
 
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
+extern "C" void __ct__Q26CChara9CAnimNodeFv(void*);
 extern "C" void __dt__Q26CChara9CAnimNodeFv(void*, int);
+extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dla__FPv(void*);
+extern "C" void __dl__FPv(void*);
 extern "C" void gqrInit__6CCharaFUlUlUl(void*, unsigned long, unsigned long, unsigned long);
 
 extern "C" unsigned char Chara[];
 extern "C" void* PTR_PTR_s_CChara_CAnim_80210534;
+extern "C" char s_chara_anim_cpp_801da980[];
+extern "C" char DAT_801da990[];
+
+namespace {
+static inline unsigned char* Ptr(void* p, unsigned int offset)
+{
+	return reinterpret_cast<unsigned char*>(p) + offset;
+}
+
+static inline int& S32At(void* p, unsigned int offset)
+{
+	return *reinterpret_cast<int*>(Ptr(p, offset));
+}
+
+static inline unsigned int& U32At(void* p, unsigned int offset)
+{
+	return *reinterpret_cast<unsigned int*>(Ptr(p, offset));
+}
+
+static inline unsigned short& U16At(void* p, unsigned int offset)
+{
+	return *reinterpret_cast<unsigned short*>(Ptr(p, offset));
+}
+
+static inline unsigned char& U8At(void* p, unsigned int offset)
+{
+	return *reinterpret_cast<unsigned char*>(Ptr(p, offset));
+}
+
+static inline unsigned int FourCC(char a, char b, char c, char d)
+{
+	return (static_cast<unsigned int>(a) << 24) | (static_cast<unsigned int>(b) << 16) |
+	       (static_cast<unsigned int>(c) << 8) | static_cast<unsigned int>(d);
+}
+}
 
 /*
  * --INFO--
@@ -137,24 +178,120 @@ CChara::CAnim::~CAnim()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800BF984
+ * PAL Size: 960b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 {
-	// Store stage pointer
-	*(CMemory::CStage**)((char*)this + 0x2c) = stage;
-	
-	// Initialize basic member variables
-	*(short*)((char*)this + 0xe) = 0;
-	*(void**)((char*)this + 0x14) = 0;
-	*(void**)((char*)this + 0x20) = 0;
-	*(int*)((char*)this + 0x1c) = 0;
-	*(short*)((char*)this + 0x10) = 0;
-	*(char*)((char*)this + 9) = 0;
-	*(unsigned int*)((char*)this + 0x18) = 0;
-	
-	// TODO: Parse chunk file data when CChunkFile interface is available
+	CChunkFile chunkFile(data);
+	CChunkFile::CChunk chunk;
+
+	*reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x2C)) = stage;
+
+	while (true) {
+		if (!chunkFile.GetNextChunk(chunk)) {
+			return;
+		}
+
+		if (chunk.m_id != FourCC('C', 'H', 'A', ' ')) {
+			continue;
+		}
+
+		if (chunk.m_arg0 < 2) {
+			break;
+		}
+
+		chunkFile.PushChunk();
+		while (chunkFile.GetNextChunk(chunk)) {
+			if (chunk.m_id != FourCC('A', 'N', 'I', 'M')) {
+				continue;
+			}
+
+			U16At(this, 0xE) = static_cast<unsigned short>(chunk.m_arg0);
+			void* nodeArray = __nwa__FUlPQ27CMemory6CStagePci(
+			    static_cast<unsigned long>(U16At(this, 0xE) * 0x18 + 0x10), stage, s_chara_anim_cpp_801da980, 0x5F);
+			nodeArray = __construct_new_array(
+			    nodeArray, reinterpret_cast<ConstructorDestructor>(__ct__Q26CChara9CAnimNodeFv),
+			    reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara9CAnimNodeFv), 0x18, U16At(this, 0xE));
+			*reinterpret_cast<void**>(Ptr(this, 0x14)) = nodeArray;
+
+			int nodeOffset = 0;
+			chunkFile.PushChunk();
+			while (chunkFile.GetNextChunk(chunk)) {
+				if (chunk.m_id == FourCC('I', 'N', 'F', 'O')) {
+					U8At(this, 0xA) = static_cast<unsigned char>(chunkFile.Get4());
+					U8At(this, 0xB) = static_cast<unsigned char>(chunkFile.Get4());
+					U8At(this, 0xC) = static_cast<unsigned char>(chunkFile.Get4());
+				} else if (chunk.m_id == FourCC('F', 'R', 'A', 'M')) {
+					U16At(this, 0x10) = static_cast<unsigned short>(chunkFile.Get4());
+				} else if (chunk.m_id == FourCC('B', 'A', 'N', 'K')) {
+					const unsigned int bankSize = chunk.m_size;
+					U32At(this, 0x1C) = (bankSize + 0x1F) & ~0x1FU;
+					*reinterpret_cast<void**>(Ptr(this, 0x20)) =
+					    __nwa__FUlPQ27CMemory6CStagePci(bankSize, stage, s_chara_anim_cpp_801da980, 0x7C);
+					chunkFile.Get(*reinterpret_cast<void**>(Ptr(this, 0x20)), bankSize);
+
+					const int amemBase = S32At(Chara, 8308);
+					const int amemOffset = S32At(reinterpret_cast<void*>(S32At(Chara, 8284)), 8);
+					Memory.CopyToAMemorySync(*reinterpret_cast<void**>(Ptr(this, 0x20)),
+					                         reinterpret_cast<void*>(amemBase + amemOffset), U32At(this, 0x1C));
+
+					S32At(this, 0x28) = amemBase;
+					S32At(Chara, 8308) = amemBase + S32At(this, 0x1C);
+
+					if (*reinterpret_cast<void**>(Ptr(this, 0x20)) != 0) {
+						__dl__FPv(*reinterpret_cast<void**>(Ptr(this, 0x20)));
+						*reinterpret_cast<void**>(Ptr(this, 0x20)) = 0;
+					}
+				} else if (chunk.m_id == FourCC('N', 'O', 'D', 'E')) {
+					unsigned char* const node = Ptr(*reinterpret_cast<void**>(Ptr(this, 0x14)), nodeOffset);
+					nodeOffset += 0x18;
+
+					CChunkFile::CChunk nodeChunk;
+					chunkFile.PushChunk();
+					while (chunkFile.GetNextChunk(nodeChunk)) {
+						if (nodeChunk.m_id == FourCC('N', 'A', 'M', 'E')) {
+							strcpy(reinterpret_cast<char*>(node), chunkFile.GetString());
+						} else if (nodeChunk.m_id == FourCC('D', 'A', 'T', 'A')) {
+							unsigned int shift = 0;
+							for (int i = 0; i < 9; i++, shift += 2) {
+								const int type = static_cast<int>(chunkFile.Get4());
+								const unsigned int dataOffset = chunkFile.Get4();
+								const unsigned int mode = (type == 0) ? 0U : ((type == 1) ? 1U : 2U);
+
+								if (i == 0) {
+									U32At(node, 0x10) = dataOffset;
+								}
+
+								const unsigned int flags = U32At(node, 0x14);
+								U32At(node, 0x14) =
+								    ((((flags >> 0xD) & 0x3FFFF) | ((mode << shift) & 0x3FFFFU)) << 0xD) |
+								    (flags & 0x80001FFFU);
+
+								if (i > 5 && type != 0) {
+									U8At(node, 0x14) = static_cast<unsigned char>((U8At(node, 0x14) & 0x7F) | 0x80);
+								}
+							}
+						}
+					}
+					chunkFile.PopChunk();
+				} else if (chunk.m_id == FourCC('I', 'N', 'T', 'P')) {
+					*reinterpret_cast<char*>(Ptr(this, 9)) = static_cast<char>(chunk.m_arg0);
+					U32At(this, 0x18) = chunkFile.Get4();
+				}
+			}
+			chunkFile.PopChunk();
+		}
+		chunkFile.PopChunk();
+	}
+
+	if (static_cast<unsigned int>(System.m_execParam) >= 2U) {
+		System.Printf(DAT_801da990);
+	}
 }
 
 /*

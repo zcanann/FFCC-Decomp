@@ -50,19 +50,13 @@ void pppDestructYmCallBack(void)
  */
 void pppFrameYmCallBack(void* pppYmCallBack, void* param_2)
 {
-    YmCallBackObj* ymCallBack;
-    YmCallBackParam* frameParam;
-    unsigned char* mngSt;
+    YmCallBackParam* frameParam = (YmCallBackParam*)param_2;
+    YmCallBackObj* ymCallBack = (YmCallBackObj*)pppYmCallBack;
+    unsigned char* mngSt = lbl_8032ED50;
     Vec position;
     s32 mngStIndex;
-    u32 graphId;
 
-    ymCallBack = (YmCallBackObj*)pppYmCallBack;
-    frameParam = (YmCallBackParam*)param_2;
-    graphId = ymCallBack->m_graphId;
-    mngSt = lbl_8032ED50;
-
-    if (((s32)graphId / 0x1000) == (s32)frameParam->m_graphId) {
+    if (((s32)ymCallBack->m_graphId / 0x1000) == (s32)frameParam->m_graphId) {
         position.x = *(f32*)(mngSt + 0x84);
         position.y = *(f32*)(mngSt + 0x94);
         position.z = *(f32*)(mngSt + 0xA4);

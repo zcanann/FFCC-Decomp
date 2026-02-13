@@ -33,11 +33,11 @@ public:
     void rotateToMatrix(float(*)[4], Vec*);
     void SRTToMatrix(float(*)[4], SRT*);
     void SRTToMatrixRT(float(*)[4], SRT*);
-    void Rand(unsigned long);
-    void RandF(float);
-    void RandF();
-    void RandPM(unsigned long);
-    void RandFPM(float);
+    int Rand(unsigned long);
+    float RandF(float);
+    float RandF();
+    int RandPM(unsigned long);
+    float RandFPM(float);
     void MTX44MultVec4(float(*)[4], Vec*, Vec4d*);
     void MTX44MultVec4(float(*)[4], Vec4d*, Vec4d*);
     void MTXGetScale(float(*)[4], Vec*);

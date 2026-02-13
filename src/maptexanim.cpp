@@ -235,37 +235,40 @@ void CMapTexAnimSet::Calc()
  */
 void CMapTexAnimSet::SetMapTexAnim(int materialId, int frameStart, int frameEnd, int wrapMode)
 {
-    bool found = false;
-    const short count = S16At(this, 0x8);
+    bool found;
+    int iVar4;
+    int iVar6;
 
-    for (int i = 0; i < count; i++) {
-        CMapTexAnim* anim = AnimAt(this, i);
-        if (S16At(anim, 0x12) != static_cast<short>(materialId)) {
-            continue;
-        }
+    found = false;
+    iVar4 = (int)this;
+    for (iVar6 = 0; iVar6 < *(short*)((unsigned char*)this + 8); iVar6++) {
+        int iVar5 = *(int*)(iVar4 + 0xC);
+        if (*(short*)(iVar5 + 0x12) == (short)materialId) {
+            if (*(char*)(iVar5 + 0x15) == '\0') {
+                *(short*)(iVar5 + 0xE) = (short)frameStart;
+                *(float*)(iVar5 + 0x1C) = (float)((short)frameStart);
 
-        if (U8At(anim, 0x15) == 0) {
-            S16At(anim, 0xE) = static_cast<short>(frameStart);
-            F32At(anim, 0x1C) = static_cast<float>(S16At(anim, 0xE));
-            int clampedEnd = frameEnd;
-            if (S16At(anim, 0xC) < frameEnd) {
-                clampedEnd = S16At(anim, 0xC);
+                int iVar2 = frameEnd;
+                if (*(short*)(iVar5 + 0xC) < frameEnd) {
+                    iVar2 = (int)*(short*)(iVar5 + 0xC);
+                }
+                *(short*)(iVar5 + 0x10) = (short)iVar2;
+                *(unsigned char*)(iVar5 + 0x16) = (unsigned char)wrapMode;
+            } else {
+                *(int*)(iVar5 + 0x30) = frameStart;
+                *(int*)(iVar5 + 0x2C) = frameStart;
+
+                int iVar2 = frameEnd;
+                if (*(int*)(iVar5 + 0x38) < frameEnd) {
+                    iVar2 = *(int*)(iVar5 + 0x38);
+                }
+                *(int*)(iVar5 + 0x34) = iVar2;
+                *(unsigned char*)(iVar5 + 0x27) = (unsigned char)wrapMode;
+                *(unsigned char*)(iVar5 + 0x28) = 1;
             }
-            S16At(anim, 0x10) = static_cast<short>(clampedEnd);
-            U8At(anim, 0x16) = static_cast<unsigned char>(wrapMode);
-        } else {
-            S32At(anim, 0x30) = frameStart;
-            S32At(anim, 0x2C) = frameStart;
-            int clampedKeyEnd = frameEnd;
-            if (S32At(anim, 0x38) < frameEnd) {
-                clampedKeyEnd = S32At(anim, 0x38);
-            }
-            S32At(anim, 0x34) = clampedKeyEnd;
-            U8At(anim, 0x27) = static_cast<unsigned char>(wrapMode);
-            U8At(anim, 0x28) = 1;
+            found = true;
         }
-
-        found = true;
+        iVar4 = iVar4 + 4;
     }
 
     if (!found && System.m_execParam != 0) {

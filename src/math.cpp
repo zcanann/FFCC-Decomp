@@ -4,6 +4,8 @@
 #include "math.h"
 #include "string.h"
 
+extern "C" int rand(void);
+
 CMath math;
 
 extern void* __vt__8CManager;
@@ -102,52 +104,91 @@ void CMath::SRTToMatrixRT(float (*) [4], SRT*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001bf9c
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMath::Rand(unsigned long)
+int CMath::Rand(unsigned long max)
 {
-	// TODO
+    if (max == 0) {
+        return 0;
+    }
+
+    return rand() % max;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001bf30
+ * PAL Size: 108b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMath::RandF(float)
+float CMath::RandF(float scale)
 {
-	// TODO
+    if (scale == 0.0f) {
+        return 0.0f;
+    }
+
+    return scale * ((float)rand() * (1.0f / 32768.0f));
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001beec
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMath::RandF()
+float CMath::RandF()
 {
-	// TODO
+    return (float)rand() * (1.0f / 32768.0f);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001be98
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMath::RandPM(unsigned long)
+int CMath::RandPM(unsigned long max)
 {
-	// TODO
+    unsigned int value;
+
+    if (max == 0) {
+        return 0;
+    }
+
+    value = (unsigned int)rand() * 0xFFFE - 0x7FFF;
+    return (int)(value - (value / max) * max);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001be28
+ * PAL Size: 112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMath::RandFPM(float)
+float CMath::RandFPM(float scale)
 {
-	// TODO
+    if (scale == 0.0f) {
+        return 0.0f;
+    }
+
+    return scale * (((float)rand() * (2.0f / 32768.0f)) - 1.0f);
 }
 
 /*

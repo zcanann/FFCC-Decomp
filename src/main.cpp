@@ -24,9 +24,11 @@ static const char lbl_801d6a5c[] = "sp";
  */
 void game(int argc, char** argv)
 {
+    char c;
+    int cmp;
+    int i;
     bool copyScriptName;
     bool parseLanguage;
-    int i;
     char** argument;
 
     Game.game.Init();
@@ -37,24 +39,40 @@ void game(int argc, char** argv)
         copyScriptName = false;
         parseLanguage = false;
         for (i = 1; i < argc; i++) {
-            char c;
-
             if (copyScriptName) {
                 strcpy(reinterpret_cast<char*>(0x8022b7b4), *argument);
                 copyScriptName = false;
             } else if (parseLanguage) {
-                if ((strcmp(*argument, lbl_801d6a48) == 0) || (strcmp(*argument, lbl_801d6a4c) == 0)) {
+                cmp = strcmp(*argument, lbl_801d6a48);
+                if (cmp == 0) {
                     Game.game.m_gameWork.m_languageId = 1;
-                } else if (strcmp(*argument, lbl_801d6a50) == 0) {
-                    Game.game.m_gameWork.m_languageId = 2;
-                } else if (strcmp(*argument, lbl_801d6a58) == 0) {
-                    Game.game.m_gameWork.m_languageId = 3;
-                } else if (strcmp(*argument, lbl_801d6a5c) == 0) {
-                    Game.game.m_gameWork.m_languageId = 4;
-                } else if (strcmp(*argument, lbl_801d6a54) == 0) {
-                    Game.game.m_gameWork.m_languageId = 5;
                 } else {
-                    Game.game.m_gameWork.m_languageId = 0;
+                    cmp = strcmp(*argument, lbl_801d6a4c);
+                    if (cmp == 0) {
+                        Game.game.m_gameWork.m_languageId = 1;
+                    } else {
+                        cmp = strcmp(*argument, lbl_801d6a50);
+                        if (cmp == 0) {
+                            Game.game.m_gameWork.m_languageId = 2;
+                        } else {
+                            cmp = strcmp(*argument, lbl_801d6a58);
+                            if (cmp == 0) {
+                                Game.game.m_gameWork.m_languageId = 3;
+                            } else {
+                                cmp = strcmp(*argument, lbl_801d6a5c);
+                                if (cmp == 0) {
+                                    Game.game.m_gameWork.m_languageId = 4;
+                                } else {
+                                    cmp = strcmp(*argument, lbl_801d6a54);
+                                    if (cmp == 0) {
+                                        Game.game.m_gameWork.m_languageId = 5;
+                                    } else {
+                                        Game.game.m_gameWork.m_languageId = 0;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
                 parseLanguage = false;
             } else {

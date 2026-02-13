@@ -1,26 +1,125 @@
 #include "ffcc/maphit.h"
 
+#include <math.h>
+
 extern CMapCylinder g_hit_cyl;
 extern CMapCylinder g_hit_cyl_min;
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80026e24
+ * PAL Size: 2308b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void FindIntersection(const Vec&, const Vec&, const CMapCylinder&, float&)
+void FindIntersection(const Vec& start, const Vec& direction, const CMapCylinder& cyl, float& outT)
 {
-	// TODO
+    outT = -1.0f;
+
+    Vec axis = cyl.m_direction2;
+    f32 axisLen = PSVECMag(&axis);
+    if (axisLen <= 0.0f) {
+        return;
+    }
+    PSVECScale(&axis, &axis, 1.0f / axisLen);
+
+    Vec orthogonal;
+    if (fabsf(axis.x) < fabsf(axis.y) || fabsf(axis.x) < fabsf(axis.z)) {
+        orthogonal.x = 0.0f;
+        orthogonal.y = axis.z;
+        orthogonal.z = -axis.y;
+    } else {
+        orthogonal.x = -axis.y;
+        orthogonal.y = axis.x;
+        orthogonal.z = 0.0f;
+    }
+    PSVECNormalize(&orthogonal, &orthogonal);
+
+    Vec bitangent;
+    PSVECCrossProduct(&axis, &orthogonal, &bitangent);
+
+    Vec relStart;
+    PSVECSubtract(&start, &cyl.m_top, &relStart);
+
+    const f32 px = PSVECDotProduct(&orthogonal, &relStart);
+    const f32 py = PSVECDotProduct(&bitangent, &relStart);
+    const f32 pz = PSVECDotProduct(&axis, &relStart);
+
+    const f32 vx = PSVECDotProduct(&orthogonal, &direction);
+    const f32 vy = PSVECDotProduct(&bitangent, &direction);
+    const f32 vz = PSVECDotProduct(&axis, &direction);
+
+    const f32 radius = cyl.m_radius2;
+    const f32 halfHeight = cyl.m_height2;
+
+    f32 bestT = -1.0f;
+
+    const f32 a = vx * vx + vy * vy;
+    const f32 b = 2.0f * (px * vx + py * vy);
+    const f32 c = (px * px + py * py) - (radius * radius);
+    if (a > 0.0f) {
+        const f32 disc = b * b - 4.0f * a * c;
+        if (disc >= 0.0f) {
+            const f32 sqrtDisc = sqrtf(disc);
+            const f32 inv2a = 0.5f / a;
+            f32 t0 = (-b - sqrtDisc) * inv2a;
+            f32 t1 = (-b + sqrtDisc) * inv2a;
+            if (t0 > t1) {
+                const f32 tmp = t0;
+                t0 = t1;
+                t1 = tmp;
+            }
+
+            if (t0 >= 0.0f) {
+                const f32 z0 = pz + t0 * vz;
+                if (-halfHeight <= z0 && z0 <= halfHeight) {
+                    bestT = t0;
+                }
+            }
+
+            if (bestT < 0.0f && t1 >= 0.0f) {
+                const f32 z1 = pz + t1 * vz;
+                if (-halfHeight <= z1 && z1 <= halfHeight) {
+                    bestT = t1;
+                }
+            }
+        }
+    }
+
+    if (fabsf(vz) > 0.0f) {
+        const f32 capZ[2] = { -halfHeight, halfHeight };
+        for (int i = 0; i < 2; i++) {
+            const f32 t = (capZ[i] - pz) / vz;
+            if (t < 0.0f) {
+                continue;
+            }
+            if (bestT >= 0.0f && t >= bestT) {
+                continue;
+            }
+
+            const f32 x = px + t * vx;
+            const f32 y = py + t * vy;
+            if ((x * x + y * y) <= radius * radius) {
+                bestT = t;
+            }
+        }
+    }
+
+    outT = bestT;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address: TODO
+ * Size: TODO
  */
-void CheckLineCylinder(const Vec&, const Vec&, const CMapCylinder&, float&)
+void CheckLineCylinder(const Vec& start, const Vec& end, const CMapCylinder& cyl, float& outT)
 {
-	// TODO
+    Vec line;
+    PSVECSubtract(&end, &start, &line);
+    FindIntersection(start, line, cyl, outT);
 }
 
 /*

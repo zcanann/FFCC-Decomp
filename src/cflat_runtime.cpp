@@ -1,5 +1,12 @@
 #include "ffcc/cflat_runtime.h"
 
+extern "C" {
+void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
+char s_cflat_runtime_cpp_801d8ef8[];
+void* __vt__12CFlatRuntime[];
+void* __vt__Q212CFlatRuntime7CObject[];
+}
+
 /*
  * --INFO--
  * Address:	TODO
@@ -7,7 +14,17 @@
  */
 CFlatRuntime::CFlatRuntime()
 {
-	// TODO
+	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
+
+	*reinterpret_cast<void***>(self) = __vt__12CFlatRuntime;
+	*reinterpret_cast<void***>(self + 0x1204) = __vt__Q212CFlatRuntime7CObject;
+	self[0x123C] &= 0xEF;
+	*reinterpret_cast<void***>(self + 0x124C) = __vt__Q212CFlatRuntime7CObject;
+	self[0x1284] &= 0xEF;
+	self[0x1294] = 0;
+	self[0x1298] = 1;
+
+	clear();
 }
 
 /*
@@ -21,6 +38,7 @@ CFlatRuntime::CFlatRuntime()
  */
 CFlatRuntime::~CFlatRuntime()
 {
+	Quit();
 }
 
 /*
@@ -30,7 +48,13 @@ CFlatRuntime::~CFlatRuntime()
  */
 void CFlatRuntime::Init()
 {
-	// TODO
+	typedef void* (*GetStageFn)(CFlatRuntime*);
+	GetStageFn getStage = reinterpret_cast<GetStageFn>((*reinterpret_cast<void***>(this))[0x11]);
+
+	*reinterpret_cast<void**>(reinterpret_cast<char*>(this) + 0xC) =
+		__nwa__FUlPQ27CMemory6CStagePci(0x3000, getStage(this), s_cflat_runtime_cpp_801d8ef8, 0x2A);
+	*reinterpret_cast<void**>(reinterpret_cast<char*>(this) + 0x10) =
+		__nwa__FUlPQ27CMemory6CStagePci(0x14880, getStage(this), s_cflat_runtime_cpp_801d8ef8, 0x2B);
 }
 
 /*

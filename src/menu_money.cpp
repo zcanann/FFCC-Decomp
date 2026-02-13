@@ -102,35 +102,34 @@ void CMenuPcs::MoneyOpen()
  */
 void CMenuPcs::MoneyCtrl()
 {
-	int state = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c);
-	int resetAnim = 0;
+	int iVar2 = 0;
+	int iVar3 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c);
+	short sVar1;
 
-	*reinterpret_cast<short*>(state + 0x32) = *reinterpret_cast<short*>(state + 0x30);
-	short mode = *reinterpret_cast<short*>(state + 0x30);
-	if (mode == 0 || (mode != 0 && *reinterpret_cast<short*>(state + 0x12) == 1)) {
+	*reinterpret_cast<short*>(iVar3 + 0x32) = *reinterpret_cast<short*>(iVar3 + 0x30);
+	sVar1 = *reinterpret_cast<short*>(iVar3 + 0x30);
+	if ((sVar1 == 0) || ((sVar1 != 0 && (*reinterpret_cast<short*>(iVar3 + 0x12) == 1)))) {
 		MoneyCtrlCur();
-		resetAnim = *reinterpret_cast<short*>(state + 0x1e) != 0;
-	} else if (mode == 1 && *reinterpret_cast<short*>(state + 0x12) == 0) {
+		iVar2 = static_cast<int>(*reinterpret_cast<short*>(iVar3 + 0x1e));
+	} else if ((sVar1 == 1) && (*reinterpret_cast<short*>(iVar3 + 0x12) == 0)) {
 		if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 10) == 1) {
-			resetAnim = 0;
-			*reinterpret_cast<short*>(state + 0x12) = 1;
+			iVar2 = 0;
+			*reinterpret_cast<short*>(iVar3 + 0x12) = 1;
 		}
-	} else if (
-		mode == 1 && *reinterpret_cast<short*>(state + 0x12) == 2 &&
-		*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 10) == 3
-	) {
-		resetAnim = 0;
-		*reinterpret_cast<short*>(state + 0x12) = 0;
+	} else if (((sVar1 == 1) && (*reinterpret_cast<short*>(iVar3 + 0x12) == 2)) &&
+		       (*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 10) == 3)) {
+		iVar2 = 0;
+		*reinterpret_cast<short*>(iVar3 + 0x12) = 0;
 		*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x30) = 0;
 		*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x22) = 0;
 	}
 
-	if (resetAnim != 0) {
-		int menuObj = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
-		*reinterpret_cast<float*>(menuObj + 0x18) = 1.0f;
-		*reinterpret_cast<int*>(menuObj + 0x2c) = 0;
-		*reinterpret_cast<int*>(menuObj + 0x30) = 10;
-		*reinterpret_cast<int*>(menuObj + 0x28) = 0;
+	if (iVar2 != 0) {
+		iVar2 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
+		*reinterpret_cast<float*>(iVar2 + 0x18) = 1.0f;
+		*reinterpret_cast<int*>(iVar2 + 0x2c) = 0;
+		*reinterpret_cast<int*>(iVar2 + 0x30) = 10;
+		*reinterpret_cast<int*>(iVar2 + 0x28) = 0;
 	}
 }
 

@@ -875,8 +875,12 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80141724
+ * PAL Size: 252b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 {
@@ -901,8 +905,6 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 	cyl.m_direction2.x = kPolyGroupAabbMin;
 	cyl.m_direction2.y = kPolyGroupAabbMin;
 	cyl.m_direction2.z = kPolyGroupAabbMin;
-	cyl.m_radius2 = 0.0f;
-	cyl.m_height2 = 0.0f;
 
 	if (MapMng.CheckHitCylinderNear(&cyl, reinterpret_cast<Vec*>(&bottom), mask) != 0)
 	{
@@ -943,10 +945,8 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 		cyl.m_direction2.x = kPolyGroupAabbMin;
 		cyl.m_direction2.y = kPolyGroupAabbMin;
 		cyl.m_direction2.z = kPolyGroupAabbMin;
-		cyl.m_radius2 = 0.0f;
-		cyl.m_height2 = 0.0f;
 
-		if (MapMng.CheckHitCylinderNear(&cyl, reinterpret_cast<Vec*>(&bottom), static_cast<unsigned long>(hitAttributeMask)) != 0)
+		if (MapMng.CheckHitCylinderNear(&cyl, reinterpret_cast<Vec*>(&bottom), hitAttributeMask) != 0)
 		{
 			return lbl_8032EC90[0x47];
 		}
@@ -971,8 +971,6 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 		cyl.m_direction2.x = kPolyGroupAabbMin;
 		cyl.m_direction2.y = kPolyGroupAabbMin;
 		cyl.m_direction2.z = kPolyGroupAabbMin;
-		cyl.m_radius2 = 0.0f;
-		cyl.m_height2 = 0.0f;
 
 		if (MapMng.CheckHitCylinderNear(&cyl, reinterpret_cast<Vec*>(&bottom), m_hitAttributeMask) != 0)
 		{

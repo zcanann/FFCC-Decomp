@@ -358,8 +358,8 @@ void GXLoadNrmMtxIndx3x3(u16 mtx_indx, u32 id) {
 
 void GXSetCurrentMtx(u32 id) {
     CHECK_GXBEGIN(708, "GXSetCurrentMtx");
-    SET_REG_FIELD(712, __GXData->matIdxA, 6, 0, id);
-    __GXSetMatrixIndex(GX_VA_PNMTXIDX);
+    __GXData->matIdxA = (__GXData->matIdxA & 0xFFFFFFC0) | id;
+    __GXSetMatrixIndex(0);
 }
 
 void GXLoadTexMtxImm(const f32 mtx[][4], u32 id, GXTexMtxType type) {

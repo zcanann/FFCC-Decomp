@@ -1,6 +1,7 @@
 #include "ffcc/mapanim.h"
 #include "ffcc/memory.h"
 #include "ffcc/system.h"
+#include "dolphin/mtx.h"
 
 #include <string.h>
 
@@ -302,6 +303,62 @@ int CPtrArray<CMapAnimKeyDt*>::setSize(unsigned long newSize)
     return 1;
 }
 
+struct CMapAnimNodeTrackKey
+{
+    unsigned int frame;
+    Vec value;
+};
+
+struct CMapAnimNodeTrack
+{
+    unsigned int count;
+    CMapAnimNodeTrackKey* keys;
+};
+
+struct CMapAnimNodeTracks
+{
+    CMapAnimNodeTrack position;
+    CMapAnimNodeTrack rotation;
+    CMapAnimNodeTrack scale;
+};
+
+static void interpTrack(Vec* out, CMapAnimNodeTrack* track, unsigned int frame, unsigned int loopFrameCount)
+{
+    if (track->count == 1) {
+        *out = track->keys[0].value;
+        return;
+    }
+
+    CMapAnimNodeTrackKey* current = track->keys;
+    for (unsigned int i = 0; i < track->count; i++, current++) {
+        unsigned int nextIndex = i + 1;
+        if (nextIndex >= track->count) {
+            nextIndex = 0;
+        }
+
+        CMapAnimNodeTrackKey* next = track->keys + nextIndex;
+        unsigned int endFrame = next->frame;
+        if (nextIndex == 0) {
+            endFrame += loopFrameCount;
+        }
+
+        if ((current->frame <= frame) && (frame < endFrame)) {
+            int frameRange = static_cast<int>(endFrame - current->frame);
+            float t = 0.0f;
+            if (frameRange != 0) {
+                t = static_cast<float>(frame - current->frame) / static_cast<float>(frameRange);
+            }
+
+            Vec currentScaled;
+            Vec nextScaled;
+            PSVECScale(&current->value, &currentScaled, t);
+            PSVECScale(&next->value, &nextScaled, 1.0f - t);
+            PSVECAdd(&currentScaled, &nextScaled, out);
+            break;
+        }
+    }
+}
+
 
 /*
  * --INFO--
@@ -355,12 +412,30 @@ void CMapAnimNode::ReadOtmAnimNode(CChunkFile&, CMapAnim*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004a9b4
+ * PAL Size: 996b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapAnimNode::Interp(int)
+void CMapAnimNode::Interp(int frame)
 {
-	// TODO
+    unsigned char* node = reinterpret_cast<unsigned char*>(this);
+    unsigned char* target = *reinterpret_cast<unsigned char**>(node + 0x00);
+    unsigned char* run = *reinterpret_cast<unsigned char**>(node + 0x04);
+    CMapAnimNodeTracks* tracks = *reinterpret_cast<CMapAnimNodeTracks**>(node + 0x08);
+
+    int startFrame = *reinterpret_cast<int*>(run + 0x1C);
+    unsigned int loopFrameCount = static_cast<unsigned int>((*(reinterpret_cast<int*>(run + 0x20)) - startFrame) + 1);
+    unsigned int frameInLoop =
+        static_cast<unsigned int>(startFrame) +
+        (static_cast<unsigned int>(frame) - ((static_cast<unsigned int>(frame) / loopFrameCount) * loopFrameCount));
+
+    interpTrack(reinterpret_cast<Vec*>(target + 0x64), &tracks->position, frameInLoop, loopFrameCount);
+    interpTrack(reinterpret_cast<Vec*>(target + 0x70), &tracks->rotation, frameInLoop, loopFrameCount);
+    interpTrack(reinterpret_cast<Vec*>(target + 0x7C), &tracks->scale, frameInLoop, loopFrameCount);
+    target[0x1B] = 1;
 }
 
 /*

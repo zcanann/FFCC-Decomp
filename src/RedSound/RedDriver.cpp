@@ -103,7 +103,7 @@ extern void InitReverb();
  * JP Address: TODO
  * JP Size: TODO
  */
-void __sinit_RedDriver_cpp()
+extern "C" void __sinit_RedDriver_cpp(void)
 {
     void* uVar1;
     

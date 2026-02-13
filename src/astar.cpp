@@ -884,9 +884,8 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
  */
 unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 {
-	unsigned char polygonGroup = 0;
 	unsigned long mask = m_hitAttributeMask;
-	
+
 	CVector bottom(kPolyGroupBaseX, kPolyGroupBaseY, kPolyGroupBaseZ);
 	CVector top(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z);
 	CMapCylinder cyl;
@@ -908,10 +907,10 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 
 	if (MapMng.CheckHitCylinderNear(&cyl, reinterpret_cast<Vec*>(&bottom), mask) != 0)
 	{
-		polygonGroup = lbl_8032EC90[0x47];
+		return lbl_8032EC90[0x47];
 	}
 
-	return polygonGroup;
+	return 0;
 }
 
 /*

@@ -1,9 +1,15 @@
 #include "ffcc/mapocttree.h"
+#include "ffcc/maphit.h"
 #include "ffcc/materialman.h"
 
 extern float lbl_8032F96C;
 extern float lbl_8032F970;
 static unsigned long s_clearFlagMask;
+static CBound s_bound;
+static CMapCylinder s_cyl;
+
+extern "C" void __dl__FPv(void*);
+extern "C" void __dla__FPv(void*);
 
 /*
  * --INFO--
@@ -40,12 +46,45 @@ COctTree::COctTree()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002f384
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 COctTree::~COctTree()
 {
-	// TODO
+	COctNode* rootNode = *(COctNode**)((unsigned char*)this + 0x4);
+
+	if (rootNode != 0) {
+		__dla__FPv(rootNode);
+		*(COctNode**)((unsigned char*)this + 0x4) = 0;
+	}
+
+	*(void**)((unsigned char*)this + 0x8) = 0;
+	*(unsigned short*)((unsigned char*)this + 0x2) = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002f384
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" COctTree* dtor_8002F384(COctTree* octTree, short param_2)
+{
+	if (octTree != 0) {
+		octTree->~COctTree();
+		if (0 < param_2) {
+			__dl__FPv(octTree);
+		}
+	}
+
+	return octTree;
 }
 
 /*
@@ -381,4 +420,34 @@ COctNode::COctNode()
 	*(float*)((unsigned char*)this + 0x14) = max;
 	*(void**)((unsigned char*)this + 0x44) = 0;
 	*(void**)((unsigned char*)this + 0x48) = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8002f410
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_mapocttree_cpp()
+{
+	float max = lbl_8032F970;
+	float min = lbl_8032F96C;
+	float* bounds = (float*)&s_bound;
+
+	bounds[0] = min;
+	bounds[1] = min;
+	bounds[2] = min;
+	bounds[3] = max;
+	bounds[4] = max;
+	bounds[5] = max;
+
+	s_cyl.m_direction2.y = min;
+	s_cyl.m_direction2.x = min;
+	s_cyl.m_top.z = min;
+	s_cyl.m_height2 = max;
+	s_cyl.m_radius2 = max;
+	s_cyl.m_direction2.z = max;
 }

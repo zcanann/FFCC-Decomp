@@ -41,6 +41,7 @@ extern f32 lbl_8032FD28;
 extern f32 lbl_8032FD2C;
 extern CMemory Memory;
 extern CUSBPcs USBPcs;
+extern unsigned char m_table__14CFunnyShapePcs[];
 
 namespace {
 static char s_CFunnyShapePcs[] = "CFunnyShapePcs";
@@ -188,7 +189,7 @@ void CFunnyShapePcs::Quit()
  */
 int CFunnyShapePcs::GetTable(unsigned long index)
 {
-    return static_cast<int>(index) * 0x15c + -0x7fe15858;
+    return reinterpret_cast<int>(m_table__14CFunnyShapePcs + index * 0x15C);
 }
 
 /*

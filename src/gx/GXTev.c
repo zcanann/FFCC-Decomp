@@ -432,9 +432,13 @@ void GXSetTevOrder(GXTevStageID stage, GXTexCoordID coord, GXTexMapID map, GXCha
 }
 
 void GXSetNumTevStages(u8 nStages) {
+    u32 reg;
+
     CHECK_GXBEGIN(1187, "GXSetNumTevStages");
 
     ASSERTMSGLINE(1189, nStages != 0 && nStages <= 16, "GXSetNumTevStages: Exceed max number of tex stages");
-    SET_REG_FIELD(1190, __GXData->genMode, 4, 10, nStages - 1);
+    reg = __GXData->genMode;
+    reg = (reg & 0xFFFFC3FF) | (((nStages & 0xFF) - 1) << 10);
+    __GXData->genMode = reg;
     __GXData->dirtyState |= 4;
 }

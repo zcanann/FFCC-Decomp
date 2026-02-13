@@ -146,23 +146,23 @@ void GXSetFogRangeAdj(GXBool enable, u16 center, const GXFogAdjTable *table) {
 
     if (enable) {
         ASSERTMSGLINE(334, table != NULL, "GXSetFogRangeAdj: table pointer is null");
-        
+
         range_adj = (table->r[0] & 0xfff) | ((table->r[1] & 0xfff) << 12) | 0xe9000000;
         GX_WRITE_RAS_REG(range_adj);
-        
+
         range_adj = (table->r[2] & 0xfff) | ((table->r[3] & 0xfff) << 12) | 0xea000000;
         GX_WRITE_RAS_REG(range_adj);
-        
+
         range_adj = (table->r[4] & 0xfff) | ((table->r[5] & 0xfff) << 12) | 0xeb000000;
         GX_WRITE_RAS_REG(range_adj);
-        
+
         range_adj = (table->r[6] & 0xfff) | ((table->r[7] & 0xfff) << 12) | 0xec000000;
         GX_WRITE_RAS_REG(range_adj);
-        
+
         range_adj = (table->r[8] & 0xfff) | ((table->r[9] & 0xfff) << 12) | 0xed000000;
         GX_WRITE_RAS_REG(range_adj);
     }
-    
+
     range_adj = ((center + 342) & 0x3ff) | (enable << 10) | 0xe8000000;
     GX_WRITE_RAS_REG(range_adj);
     __GXData->bpSentNot = 0;
@@ -250,28 +250,23 @@ void GXSetZCompLoc(GXBool before_tex) {
 
 void GXSetPixelFmt(GXPixelFmt pix_fmt, GXZFmt16 z_fmt) {
     u32 oldPeCtrl;
-    u8 aa;
     static u32 p2f[8] = { 0, 1, 2, 3, 4, 4, 4, 5 };
 
     CHECK_GXBEGIN(511, "GXSetPixelFmt");
     oldPeCtrl = __GXData->peCtrl;
     ASSERTMSGLINE(515, pix_fmt >= GX_PF_RGB8_Z24 && pix_fmt <= GX_PF_YUV420, "Invalid Pixel format");
-    SET_REG_FIELD(517, __GXData->peCtrl, 3, 0, p2f[pix_fmt]);
-    SET_REG_FIELD(518, __GXData->peCtrl, 3, 3, z_fmt);
+    __GXData->peCtrl = (__GXData->peCtrl & ~0x7) | p2f[pix_fmt];
+    __GXData->peCtrl = (__GXData->peCtrl & ~0x38) | ((u32)z_fmt << 3);
 
     if (oldPeCtrl != __GXData->peCtrl) {
         GX_WRITE_RAS_REG(__GXData->peCtrl);
-        if (pix_fmt == GX_PF_RGB565_Z16)
-            aa = 1;
-        else
-            aa = 0;
-        SET_REG_FIELD(527, __GXData->genMode, 1, 9, aa);
+        __GXData->genMode = (__GXData->genMode & ~0x200) | ((u32)(pix_fmt == GX_PF_RGB565_Z16) << 9);
         __GXData->dirtyState |= 4;
     }
 
     if (p2f[pix_fmt] == 4) {
-        SET_REG_FIELD(534, __GXData->cmode1, 2, 9, (pix_fmt - 4) & 0x3);
-        SET_REG_FIELD(534, __GXData->cmode1, 8, 24, 0x42);
+        __GXData->cmode1 = (__GXData->cmode1 & ~0x600) | (((pix_fmt - 4) << 9) & 0x600);
+        __GXData->cmode1 = (__GXData->cmode1 & ~0xFF000000) | 0x42000000;
         GX_WRITE_RAS_REG(__GXData->cmode1);
     }
 

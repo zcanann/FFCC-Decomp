@@ -1,10 +1,14 @@
 #include "ffcc/memorycard.h"
 #include "ffcc/file.h"
+#include "ffcc/memory.h"
 #include "ffcc/system.h"
 
 #include "dolphin/card.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/printf.h"
 #include "string.h"
+
+extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 
 // CRC32 lookup table
 static const unsigned int crcTable[256] = {
@@ -64,8 +68,12 @@ CMemoryCardMan::CMemoryCardMan()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c4d24
+ * PAL Size: 148b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMemoryCardMan::Init()
 {
@@ -73,24 +81,28 @@ void CMemoryCardMan::Init()
 
     m_result = 0;
     m_opDoneFlag = 0;
-    m_currentSlot = -1;
+    m_currentSlot = (char)0xFF;
     m_state = 0;
     m_saveBuffer = (char*)nullptr;
 
-    // m_stage = Memory.CreateStage(0x16000, s_CMemoryCardMan_801dae0c, 0);
-    // m_mountWorkArea = __nwa__(0xA000,  mStage, s_memorycard_cpp_801daea8, 0x88);
+    m_stage = (CStage*)Memory.CreateStage(0x16000, (char*)"CMemoryCardMan", 0);
+    m_mountWorkArea = __nwa__FUlPQ27CMemory6CStagePci(0xA000, (CMemory::CStage*)m_stage, (char*)"memorycard.cpp", 0x88);
 
-    m_currentSlot = -1;
+    m_currentSlot = (char)0xFF;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c4ccc
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMemoryCardMan::Quit()
 { 
-  m_currentSlot = -1;
+  m_currentSlot = (char)0xFF;
   
   if (m_mountWorkArea != (void*)nullptr)
   {
@@ -98,7 +110,7 @@ void CMemoryCardMan::Quit()
     m_mountWorkArea = (void*)nullptr;
   }
   
-  // DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory,mStage);
+  DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, (CMemory::CStage*)m_stage);
 }
 
 /*

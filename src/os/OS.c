@@ -49,18 +49,21 @@ extern u32 __PADSpec;
 extern u8 __ArenaLo[];
 extern char _stack_addr[];
 extern u8 __ArenaHi[];
+extern volatile u32 BOOT_REGION_START AT_ADDRESS(0x812FDFF0);
+extern volatile u32 BOOT_REGION_END AT_ADDRESS(0x812FDFEC);
 
 static OSBootInfo* BootInfo;
 static u32* BI2DebugFlag;
 static u32 BI2DebugFlagHolder;
-
-OSTime __OSStartTime;
-BOOL __OSInIPL;
-void (**OSExceptionTable)(u8, OSContext*);
-BOOL AreWeInitialized;
-f32 ZeroPS[2];
-f64 ZeroF;
 BOOL __OSIsGcam;
+f64 ZeroF;
+f32 ZeroPS[2];
+BOOL AreWeInitialized;
+void (**OSExceptionTable)(u8, OSContext*);
+static void* __OSSavedRegionEnd;
+static void* __OSSavedRegionStart;
+BOOL __OSInIPL;
+OSTime __OSStartTime;
 
 // prototypes
 static void __OSInitFPRs(void);
@@ -190,28 +193,33 @@ u32 OSGetConsoleType(void) {
 #define NULL 0
 
 static void ClearArena(void) {
-    if (!((OSGetResetCode() & 0x80000000) ? TRUE : FALSE)) {
+    if (!(OSGetResetCode() & 0x80000000)) {
+        __OSSavedRegionStart = NULL;
+        __OSSavedRegionEnd = NULL;
         memset(OSGetArenaLo(), 0, (u32)OSGetArenaHi() - (u32)OSGetArenaLo());
         return;
     }
 
-    if (*(u32*)&__OSRebootParams.regionStart == 0) {
+    __OSSavedRegionStart = (void*)BOOT_REGION_START;
+    __OSSavedRegionEnd = (void*)BOOT_REGION_END;
+
+    if (__OSSavedRegionStart == NULL) {
         memset(OSGetArenaLo(), 0, (u32)OSGetArenaHi() - (u32)OSGetArenaLo());
         return;
     }
 
-    ASSERTLINE(683, __OSRebootParams.regionEnd != NULL);
+    ASSERTLINE(683, __OSSavedRegionEnd != NULL);
 
-    if ((u32)OSGetArenaLo() < *(u32*)&__OSRebootParams.regionStart) {
-        if ((u32)OSGetArenaHi() <= *(u32*)&__OSRebootParams.regionStart) {
+    if ((u32)OSGetArenaLo() < (u32)__OSSavedRegionStart) {
+        if ((u32)OSGetArenaHi() <= (u32)__OSSavedRegionStart) {
             memset(OSGetArenaLo(), 0, (u32)OSGetArenaHi() - (u32)OSGetArenaLo());
             return;
         }
 
-        memset(OSGetArenaLo(), 0, *(u32*)&__OSRebootParams.regionStart - (u32)OSGetArenaLo());
+        memset(OSGetArenaLo(), 0, (u32)__OSSavedRegionStart - (u32)OSGetArenaLo());
 
-        if ((u32)OSGetArenaHi() > (u32)__OSRebootParams.regionEnd) {
-            memset(__OSRebootParams.regionEnd, 0, (u32)OSGetArenaHi() - (u32)__OSRebootParams.regionEnd);
+        if ((u32)OSGetArenaHi() > (u32)__OSSavedRegionEnd) {
+            memset(__OSSavedRegionEnd, 0, (u32)OSGetArenaHi() - (u32)__OSSavedRegionEnd);
         }
     }
 }

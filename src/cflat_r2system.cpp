@@ -6,9 +6,11 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/p_map.h"
 #include "ffcc/p_menu.h"
+#include "ffcc/p_minigame.h"
 #include "ffcc/p_tina.h"
 #include "ffcc/sound.h"
 #include "ffcc/USBStreamData.h"
+#include <string.h>
 
 static inline CUSBStreamData* UsbStream(CPartPcs* self)
 {
@@ -160,6 +162,76 @@ extern "C" int CheckHitCylinderNear__7CMapPcsFP3VecP3VecfUl(
 extern "C" unsigned char* GetTmpFrameBuffer__8CGraphicFv(CGraphic* graphic)
 {
     return *(unsigned char**)((char*)graphic + 0x7208);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9068
+ * PAL Size: 96b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CMiniGamePcs::GetMiniGameParam(int id)
+{
+    if (id == 0x2002) {
+        return *(signed char*)((char*)this + 0x649A);
+    }
+    if (id < 0x2002) {
+        if (id == 0x2000) {
+            return *(signed char*)((char*)this + 0x6498);
+        }
+        if (id > 0x1FFF) {
+            return *(signed char*)((char*)this + 0x6499);
+        }
+    } else if (id < 0x2004) {
+        return *(signed char*)((char*)this + 0x649B);
+    }
+    return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B90C8
+ * PAL Size: 220b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMiniGamePcs::SetMiniGameParam(int id, int value)
+{
+    if ((unsigned int)System.m_execParam > 2U) {
+        System.Printf("SetMiniGameParam no 0x%04x data[%d]\n", id, value);
+    }
+
+    if (id == 0x1202) {
+        *(unsigned char*)((char*)this + 0x134B) |= (unsigned char)(1 << value);
+    } else if (id < 0x1202) {
+        if (id == 0x1102) {
+            *(unsigned char*)((char*)this + 0x1348) = 1;
+        } else if (id > 0x1100 && id < 0x1102) {
+            *(signed char*)((char*)this + 0x1350) = (signed char)value;
+        }
+    } else if (id < 0x1204) {
+        *(unsigned char*)((char*)this + 0x134B) &= (unsigned char)~(1 << value);
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B91A4
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGame::CGameWork::ClearEvtWork()
+{
+    memset(m_eventFlags, 0, sizeof(m_eventFlags));
+    memset(m_eventWork, 0, sizeof(m_eventWork));
 }
 
 /*

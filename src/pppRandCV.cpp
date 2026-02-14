@@ -1,18 +1,19 @@
 #include "ffcc/pppRandCV.h"
 #include "ffcc/math.h"
+#include "dolphin/types.h"
 
-extern CMath math;
+extern CMath math[];
 extern int lbl_8032ED70;
 extern float lbl_8032FF08;
 extern unsigned char lbl_801EADC8[32];
 extern "C" float RandF__5CMathFv(CMath* instance);
 
 typedef struct RandCVParams {
-	int index;
-	int colorOffset;
-	signed char delta[4];
-	unsigned char flag;
-	unsigned char pad[3];
+    int index;
+    int colorOffset;
+    s8 delta[4];
+    u8 flag;
+    u8 pad[3];
 } RandCVParams;
 
 /*

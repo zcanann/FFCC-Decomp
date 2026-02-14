@@ -29,7 +29,7 @@ public:
     void reqAnim(int, int, int);
     void isLoopAnim();
     void isLoopAnimDirect();
-    void playSe3D(int, int, int, int, Vec*);
+    int playSe3D(int, int, int, int, Vec*);
     void changePrg(int);
     void putParticle(int, int, Vec*, float, int);
     void putParticle(int, int, CGObject*, float, int);

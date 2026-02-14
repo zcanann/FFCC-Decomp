@@ -1,8 +1,38 @@
 #include "ffcc/menu_tmparti.h"
+#include "ffcc/fontman.h"
 #include "ffcc/sound.h"
 #include "ffcc/pad.h"
 #include "ffcc/p_game.h"
 #include <string.h>
+
+extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
+
+extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
+extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
+extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float, float, float, float, float, float, float, float, float);
+extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(CMenuPcs*, int, int, int, float, int, float);
+extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
+
+extern "C" void SetMargin__5CFontFf(float, CFont*);
+extern "C" void SetShadow__5CFontFi(CFont*, int);
+extern "C" void SetScale__5CFontFf(float, CFont*);
+extern "C" void DrawInit__5CFontFv(CFont*);
+extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
+extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
+extern "C" void SetPosX__5CFontFf(float, CFont*);
+extern "C" void SetPosY__5CFontFf(float, CFont*);
+extern "C" void Draw__5CFontFPc(CFont*, const char*);
+
+struct TmpArtiTableEntry {
+    int count;
+    const char** strings;
+    char* stringBuf;
+};
+
+struct TmpArtiFlatData {
+    char pad0[0x6C];
+    TmpArtiTableEntry table[8];
+};
 
 /*
  * --INFO--
@@ -448,7 +478,81 @@ unsigned int CMenuPcs::TmpArtiClose()
  */
 void CMenuPcs::TmpArtiDraw()
 {
-	// Basic rendering placeholder
+	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+
+	unsigned int scriptFood = Game.game.m_scriptFoodBase[0];
+	short* entry = (short*)(*(int*)((char*)this + 0x850) + 8);
+	int count = **(short**)((char*)this + 0x850);
+	unsigned int foodPtr = scriptFood;
+
+	for (int i = 0; i < count; i++) {
+		int tex = *(int*)(entry + 0xE);
+		if (tex >= 0) {
+			float alpha = *(float*)(entry + 8);
+			if (*(short*)(foodPtr + 0x1F6) < 0) {
+				tex = 0x34;
+				alpha *= 0.5f;
+			}
+
+			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
+
+			GXColor color = { 0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f) };
+			GXSetChanMatColor(GX_COLOR0A0, color);
+
+			DrawRect__8CMenuPcsFUlfffffffff(this, 0,
+				(float)entry[0], (float)entry[1], (float)entry[2], (float)entry[3],
+				*(float*)(entry + 4), *(float*)(entry + 6),
+				*(float*)(entry + 10), *(float*)(entry + 10), 0.0f);
+		}
+
+		foodPtr += 2;
+		entry += 0x20;
+	}
+
+	entry = *(short**)((char*)this + 0x850) + 4;
+	foodPtr = scriptFood;
+	for (int i = 0; i < 4; i++) {
+		short icon = *(short*)(foodPtr + 0x1F6);
+		if (icon >= 0) {
+			const int iconX = (int)entry[0] + (int)entry[2] - 0x10;
+			const int iconY = (int)entry[1] + 5;
+			DrawSingleIcon__8CMenuPcsFiiifif(this, (int)icon, iconX, iconY, *(float*)(entry + 8), 0, 0.0f);
+		}
+		entry += 0x20;
+		foodPtr += 2;
+	}
+
+	CFont* font = *(CFont**)((char*)this + 0x108);
+	SetMargin__5CFontFf(1.0f, font);
+	SetShadow__5CFontFi(font, 0);
+	SetScale__5CFontFf(1.0f, font);
+	DrawInit__5CFontFv(font);
+
+	const TmpArtiFlatData* flatData = (const TmpArtiFlatData*)&Game.game.m_cFlatDataArr[1];
+	entry = (short*)(*(int*)((char*)this + 0x850) + 8);
+	foodPtr = scriptFood;
+	for (int i = 0; i < 4; i++) {
+		short itemId = *(short*)(foodPtr + 0x1F6);
+		if (itemId >= 0) {
+			const float alpha = *(float*)(entry + 8);
+			GXColor textColor = { 0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f) };
+			SetColor__5CFontF8_GXColor(font, &textColor);
+
+			const char* text = flatData->table[0].strings[itemId * 5 + 4];
+			const int width = GetWidth__5CFontFPc(font, text);
+			const float posX = (((float)entry[2] - (float)width) * 0.5f) + (float)entry[0];
+			const float posY = (float)entry[1] + 10.0f;
+
+			SetPosX__5CFontFf(posX, font);
+			SetPosY__5CFontFf(posY, font);
+			Draw__5CFontFPc(font, text);
+		}
+		entry += 0x20;
+		foodPtr += 2;
+	}
+
+	DrawInit__8CMenuPcsFv(this);
 }
 
 /*

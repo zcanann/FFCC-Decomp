@@ -80,17 +80,17 @@ void CMapShadow::Init()
 	fVar1 = (float)((double)uVar8);
 	fVar2 = (float)((double)uVar7);
 	fVar3 = *(float*)((char*)this + 0xa8);
-	if (*(s8*)((char*)this + 6) == 0) {
-		C_MTXLightOrtho((MtxPtr)((char*)this + 0x48), -fVar2, fVar2, -fVar1, fVar1,
-		                (float)(DOUBLE_8032fce8 * (double)fVar3),
-		                (float)((double)FLOAT_8032fcf0 * (double)fVar3),
-		                FLOAT_8032fcf0, FLOAT_8032fcf0);
-	} else {
+	if (*(s8*)((char*)this + 6) != 0) {
 		C_MTXLightFrustum((MtxPtr)((char*)this + 0x48), -fVar2, fVar2, -fVar1, fVar1,
 		                  *(float*)((char*)this + 0xac),
 		                  (float)(DOUBLE_8032fce8 * (double)fVar3),
 		                  (float)((double)FLOAT_8032fcf0 * (double)fVar3),
 		                  FLOAT_8032fcf0, FLOAT_8032fcf0);
+	} else {
+		C_MTXLightOrtho((MtxPtr)((char*)this + 0x48), -fVar2, fVar2, -fVar1, fVar1,
+		                (float)(DOUBLE_8032fce8 * (double)fVar3),
+		                (float)((double)FLOAT_8032fcf0 * (double)fVar3),
+		                FLOAT_8032fcf0, FLOAT_8032fcf0);
 	}
 }
 

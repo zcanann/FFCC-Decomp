@@ -108,24 +108,27 @@ void pppFrameEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, UnkB* param
 {
     void* handle;
     int model;
+    s32* offsets;
     int colorIndex;
-    u8* colorPtr;
+    u8* dstColor;
+    u8* srcColor;
 
     if (DAT_8032ed70 == 0) {
-        colorIndex = *param_3->m_serializedDataOffsets;
-        colorPtr =
-            (u8*)((int)(&pppEraseCharaParts->field0_0x0 + 2) + param_3->m_serializedDataOffsets[1]);
+        offsets = param_3->m_serializedDataOffsets;
+        colorIndex = offsets[0];
+        dstColor = (u8*)((char*)pppEraseCharaParts + 2 + offsets[1]);
+        srcColor = (u8*)((char*)pppEraseCharaParts + 0x88 + colorIndex);
         handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)pppMngStPtr + 0x8), 0);
         model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
 
-        *(u8**)(model + 0xE4) = colorPtr;
+        *(u8**)(model + 0xE4) = dstColor;
         *(UnkB**)(model + 0xE8) = param_2;
 
-        colorPtr[0] = pppEraseCharaParts->field_0x88[colorIndex];
-        colorPtr[1] = pppEraseCharaParts->field_0x88[colorIndex + 1];
-        colorPtr[2] = pppEraseCharaParts->field_0x88[colorIndex + 2];
-        colorPtr[3] = pppEraseCharaParts->field_0x88[colorIndex + 3];
+        dstColor[0] = srcColor[0];
+        dstColor[1] = srcColor[1];
+        dstColor[2] = srcColor[2];
+        dstColor[3] = srcColor[3];
 
-        DCFlushRange(colorPtr, 4);
+        DCFlushRange(dstColor, 4);
     }
 }

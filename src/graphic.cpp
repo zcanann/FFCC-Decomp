@@ -1,6 +1,7 @@
 #include "ffcc/graphic.h"
 
 #include "ffcc/pppfunctbl.h"
+#include "ffcc/system.h"
 
 /*
  * --INFO--
@@ -134,22 +135,30 @@ void CGraphic::EndFrame()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800196e0
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGraphic::SetDrawDoneDebugData(char)
+void CGraphic::SetDrawDoneDebugData(signed char drawDoneId)
 {
-	// TODO
+	GXSetDrawSync((u16)(((System.m_currentOrderIndex & 0xFF) << 8) | (drawDoneId & 0xFF)));
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800196b8
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGraphic::SetDrawDoneDebugDataPartControl(int)
+void CGraphic::SetDrawDoneDebugDataPartControl(int partControl)
 {
-	// TODO
+	GXSetDrawSync((u16)(partControl | 0x8000));
 }
 
 /*

@@ -39,7 +39,7 @@ public:
     void SetViewport();
     void BeginFrame();
     void EndFrame();
-    void SetDrawDoneDebugData(char);
+    void SetDrawDoneDebugData(signed char);
     void SetDrawDoneDebugDataPartControl(int);
     void _WaitDrawDone(char*, int);
     void Thread();

@@ -4,6 +4,16 @@
 #include <string.h>
 
 extern CMath math;
+extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
+
+struct UnkC {
+    unsigned char _pad[0xC];
+    int* m_serializedDataOffsets;
+};
+
+struct pppBreathModel {
+    unsigned char _pad[8];
+};
 
 /*
  * --INFO--
@@ -201,22 +211,79 @@ extern "C" void pppRenderBreathModel(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800db18c
+ * PAL Size: 120b
  */
-void pppConstructBreathModel(void)
+extern "C" void pppConstructBreathModel(pppBreathModel* pppBreathModel, UnkC* param_2)
 {
-	// TODO
+    Mtx* work = (Mtx*)((unsigned char*)pppBreathModel + 0x80 + *param_2->m_serializedDataOffsets);
+    unsigned char* state = (unsigned char*)work;
+
+    PSMTXIdentity(*work);
+
+    work[1][2][0] = 0.0f;
+    work[1][1][3] = 0.0f;
+    work[1][1][2] = 0.0f;
+    work[1][0][0] = 0.0f;
+    work[1][0][1] = 0.0f;
+    work[1][0][2] = 0.0f;
+    work[1][0][3] = 0.0f;
+    work[1][1][0] = 0.0f;
+
+    *(short*)(state + 0x46) = 10000;
+    *(short*)(state + 0x4A) = 0;
+    *(short*)(state + 0x4E) = 0;
+    *(state + 0x50) = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800db094
+ * PAL Size: 248b
  */
-void pppDestructBreathModel(void)
+extern "C" void pppDestructBreathModel(pppBreathModel* pppBreathModel, UnkC* param_2)
 {
-	// TODO
+    unsigned char* work = (unsigned char*)pppBreathModel + 0x80 + *param_2->m_serializedDataOffsets;
+    void** particleData = (void**)(work + 0x30);
+
+    if (particleData[0] != NULL) {
+        pppHeapUseRate__FPQ27CMemory6CStage(particleData[0]);
+        particleData[0] = NULL;
+    }
+
+    if (particleData[1] != NULL) {
+        pppHeapUseRate__FPQ27CMemory6CStage(particleData[1]);
+        particleData[1] = NULL;
+    }
+
+    if (particleData[2] != NULL) {
+        pppHeapUseRate__FPQ27CMemory6CStage(particleData[2]);
+        particleData[2] = NULL;
+    }
+
+    if (particleData[3] != NULL) {
+        int i;
+        unsigned char* group = (unsigned char*)particleData[3];
+
+        for (i = 0; i < *(short*)(work + 0x54); i++) {
+            void** groupData = (void**)(group + 4);
+
+            if (groupData[0] != NULL) {
+                pppHeapUseRate__FPQ27CMemory6CStage(groupData[0]);
+                groupData[0] = NULL;
+            }
+
+            if (groupData[1] != NULL) {
+                pppHeapUseRate__FPQ27CMemory6CStage(groupData[1]);
+                groupData[1] = NULL;
+            }
+
+            group += 0x5C;
+        }
+
+        pppHeapUseRate__FPQ27CMemory6CStage(particleData[3]);
+        particleData[3] = NULL;
+    }
 }
 
 /*

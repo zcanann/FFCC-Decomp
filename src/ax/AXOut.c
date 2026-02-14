@@ -85,13 +85,9 @@ void __AXOutNewFrame(u32 lessDspCycles) {
 }
 
 void __AXOutAiCallback(void) {
-    OSTime time = __AXOsTime;
-
     if (__AXOutDspReady == 0) {
-        time = OSGetTime();
+        __AXOsTime = OSGetTime();
     }
-
-    __AXOsTime = time;
 
     if (__AXOutDspReady == 1) {
         __AXOutDspReady = 0;

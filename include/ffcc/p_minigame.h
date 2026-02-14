@@ -54,6 +54,8 @@ public:
     void MiniGameEnd();
 
     void CallMiniGameParam(int, int, int);
+    int GetMiniGameParam(int);
+    void SetMiniGameParam(int, int);
     void SetNumPlayer();
 };
 

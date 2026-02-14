@@ -29,7 +29,7 @@ void pppSRandDownHCV(void* param1, void* param2, void* param3)
 		int offset = **base_ptr;
 		target = (float*)((char*)param1 + offset + 0x80);
 
-		u8 flag = *((u8*)param2 + 0x10);
+		int flag = *((u8*)param2 + 0x10);
 		float value;
 
 		value = -RandF__5CMathFv(&math);
@@ -55,7 +55,7 @@ void pppSRandDownHCV(void* param1, void* param2, void* param3)
 			value = (value - RandF__5CMathFv(&math)) * 0.5f;
 		}
 		target[3] = value;
-	} else if (*(int*)param2 != *((int*)param1 + 3)) {
+	} else {
 		int** base_ptr = (int**)((char*)param3 + 0xc);
 		int offset = **base_ptr;
 		target = (float*)((char*)param1 + offset + 0x80);

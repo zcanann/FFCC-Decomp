@@ -117,22 +117,26 @@ void CSamplePcs::func1()
  */
 extern "C" void __sinit_p_sample_cpp(void)
 {
-	unsigned int a0 = lbl_801E8498[0];
-	unsigned int a1 = lbl_801E8498[1];
-	unsigned int a2 = lbl_801E8498[2];
-	unsigned int b0 = lbl_801E84A4[0];
-	unsigned int b1 = lbl_801E84A4[1];
-	unsigned int b2 = lbl_801E84A4[2];
-	unsigned int c0 = lbl_801E84B0[0];
-	unsigned int c1 = lbl_801E84B0[1];
-	unsigned int c2 = lbl_801E84B0[2];
-	unsigned int d0 = lbl_801E84BC[0];
-	unsigned int d1 = lbl_801E84BC[1];
-	unsigned int d2 = lbl_801E84BC[2];
+	unsigned int* a = lbl_801E8498;
+	unsigned int* b = lbl_801E84A4;
 	unsigned int* table = (unsigned int*)lbl_801E84C8;
+	unsigned int* c = lbl_801E84B0;
+	unsigned int* d = lbl_801E84BC;
+
+	unsigned int a1 = a[1];
+	unsigned int a2 = a[2];
+	unsigned int b0 = b[0];
+	unsigned int b1 = b[1];
+	unsigned int b2 = b[2];
+	unsigned int c0 = c[0];
+	unsigned int c1 = c[1];
+	unsigned int c2 = c[2];
+	unsigned int d0 = d[0];
+	unsigned int d1 = d[1];
+	unsigned int d2 = d[2];
+	unsigned int a0 = a[0];
 
 	lbl_8032EC60 = (unsigned int)&lbl_801E8644;
-
 	table[1] = a0;
 	table[2] = a1;
 	table[3] = a2;

@@ -721,20 +721,309 @@ bool CMemoryCardMan::IsBrokenFile()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c369c
+ * PAL Size: 2576b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMemoryCardMan::MakeSaveData()
 {
+    static const char s_magic0[] = "FFCC";
+    static const char s_magic1[] = "GCCP";
+    static const char s_magic2[] = "SAVE";
+    static const char s_magic3[] = "DATA";
+
+    if (m_saveBuffer == (char*)nullptr)
+    {
+        m_saveBuffer = new char[0xA000];
+        if (m_saveBuffer == (char*)nullptr)
+        {
+            if (System.m_execParam != 0)
+            {
+                System.Printf("%s", 0);
+            }
+            return;
+        }
+    }
+
+    memset(m_saveBuffer, 0, 0xA000);
+
+    u8* save = reinterpret_cast<u8*>(m_saveBuffer);
+    u8* game = Game + 0x10;
+    u8* gameWork = game + 0x08;
+
+    const u64 now = OSGetTime();
+    memcpy(save + 0x8AD0, &now, sizeof(now));
+
+    memcpy(save + 0x00, s_magic0, strlen(s_magic0));
+    memcpy(save + 0x04, s_magic1, strlen(s_magic1));
+    memcpy(save + 0x08, s_magic2, strlen(s_magic2));
+    memcpy(save + 0x0C, s_magic3, strlen(s_magic3));
+    save[0x10] = 'E';
+    save[0x11] = static_cast<u8>(*reinterpret_cast<u32*>(gameWork + 0x13D8) & 0xFF);
+    save[0x12] = 0;
+    *reinterpret_cast<u32*>(save + 0x18) = *reinterpret_cast<u32*>(gameWork + 0x13D8);
+
+    for (int i = 0; i < 4; i++)
+    {
+        const int wm = *reinterpret_cast<int*>(gameWork + 0x18 + i * 4);
+        if (wm < 0 || wm >= 9)
+        {
+            *reinterpret_cast<int*>(gameWork + 0x18 + i * 4) = -1;
+            continue;
+        }
+        u8* cv = game + 0x13F0 + wm * 0xC30;
+        if (*reinterpret_cast<int*>(cv + 0x3A4) == 0 || cv[0xBA5] != 0)
+        {
+            *reinterpret_cast<int*>(gameWork + 0x18 + i * 4) = -1;
+        }
+    }
+
+    save[0x20] = gameWork[0x08];
+    save[0x21] = gameWork[0x09];
+    save[0x22] = gameWork[0x0A];
+    save[0x23] = gameWork[0x0B];
+    *reinterpret_cast<int*>(save + 0x24) = *reinterpret_cast<int*>(gameWork + 0x0C);
+    *reinterpret_cast<int*>(save + 0x28) = *reinterpret_cast<int*>(gameWork + 0x10);
+    *reinterpret_cast<int*>(save + 0x2C) = *reinterpret_cast<int*>(gameWork + 0x14);
+    memcpy(save + 0x30, gameWork + 0x18, 0x10);
+    memcpy(save + 0x40, gameWork + 0x28, 0x3C);
+    memcpy(save + 0x7C, gameWork + 0x64, 0x3C);
+    *reinterpret_cast<int*>(save + 0xB8) = *reinterpret_cast<int*>(gameWork + 0x10B4);
+    memcpy(save + 0xC0, gameWork + 0xA0, 0x1000);
+    memcpy(save + 0x10C0, gameWork + 0x10A0, 0x10);
+    memcpy(save + 0x10D0, gameWork + 0x10CC, 0x100);
+    memcpy(save + 0x11D0, gameWork + 0x11CC, 0x200);
+    *reinterpret_cast<u32*>(save + 0x13D0) = *reinterpret_cast<u32*>(gameWork + 0x13E0);
+    *reinterpret_cast<u32*>(save + 0x13D4) = *reinterpret_cast<u32*>(gameWork + 0x13E4);
+    *reinterpret_cast<u32*>(save + 0x13D8) = *reinterpret_cast<u32*>(gameWork + 0x13D8);
+    save[0x13DC] = gameWork[0x13D6];
+    save[0x13DD] = gameWork[0x13DD];
+    save[0x13DE] = gameWork[0x13DE];
+    save[0x13DF] = gameWork[0x13DF];
+    save[0x13E0] = gameWork[0x01] ? 1 : 0;
+    save[0x13E1] = gameWork[0x02] ? 1 : 0;
+    save[0x13E2] = gameWork[0x03] ? 1 : 0;
+    save[0x13E3] = gameWork[0x04] ? 1 : 0;
+    save[0x13E4] = gameWork[0x05] ? 1 : 0;
+
+    for (int c = 0; c < 8; c++)
+    {
+        u8* dst = save + 0x14D0 + c * 0x9C0;
+        u8* cv = game + 0x13F0 + c * 0xC30;
+
+        if (*reinterpret_cast<int*>(cv + 0x3A4) == 0)
+        {
+            *reinterpret_cast<int*>(cv + 0xC20) = 0;
+            cv[0xC1E] = 0;
+        }
+        else if (cv[0xC1E] == 0)
+        {
+            *reinterpret_cast<int*>(cv + 0xC20) = *reinterpret_cast<int*>(gameWork + 0x13D8);
+            cv[0xC1E] = 1;
+        }
+
+        memcpy(dst + 0x00, cv + 0x14, 0x10);
+        memcpy(dst + 0x12, cv + 0x3B8, 0x0E);
+        *reinterpret_cast<u16*>(dst + 0x28) = *reinterpret_cast<u16*>(cv + 0x3C4);
+        *reinterpret_cast<u16*>(dst + 0x2A) = *reinterpret_cast<u16*>(cv + 0xB4);
+        memcpy(dst + 0x2C, cv + 0x3DC, 0x0A);
+        memcpy(dst + 0x34, cv + 0x3AC, 0x08);
+        memcpy(dst + 0x3C, cv + 0xB6, 0x80);
+        *reinterpret_cast<u32*>(dst + 0xB8) = *reinterpret_cast<u32*>(cv + 0x3B4);
+        *reinterpret_cast<u32*>(dst + 0xBC) = 0;
+        *reinterpret_cast<u32*>(dst + 0xC0) = 0;
+        *reinterpret_cast<u32*>(dst + 0xC4) = 0;
+        memcpy(dst + 0xC8, cv + 0x3CA, 0x10);
+        *reinterpret_cast<u32*>(dst + 0xD8) = *reinterpret_cast<u32*>(cv + 0x3E8);
+        memcpy(dst + 0x104, cv + 0x3EC, 100 * 0x0C);
+
+        for (int artifact = 0; artifact < 96; artifact++)
+        {
+            const int slot = artifact >> 5;
+            const u32 bit = 1u << (artifact & 31);
+            if (*reinterpret_cast<s16*>(cv + 0x136 + artifact * 2) > 0)
+            {
+                *reinterpret_cast<u32*>(dst + 0xBC + slot * 4) |= bit;
+            }
+        }
+
+        memcpy(dst + 0x0C8, cv + 0x3CA, 0x10);
+        memcpy(dst + 0x0C8 + 0x100, cv + 0x4CA, 0x2B0);
+
+        memcpy(dst + 0x0C4 + 0x4D4, cv + 0x204, 0x10);
+        memcpy(dst + 0x0D4 + 0x4D4, cv + 0x214, 0x10);
+
+        *reinterpret_cast<int*>(dst + 0x1A84) = *reinterpret_cast<int*>(cv + 0x3A4);
+        memcpy(dst + 0x1A88, cv + 0x8A4, 0x100);
+        memcpy(dst + 0x1B88, cv + 0x9A4, 0x200);
+        *reinterpret_cast<int*>(dst + 0x1D88) = *reinterpret_cast<int*>(cv + 0x3A8);
+        *reinterpret_cast<int*>(dst + 0x1D8C) = *reinterpret_cast<int*>(cv + 0x3AC);
+        dst[0x1D90] = cv[0xBA5];
+        dst[0x1D91] = cv[0xBA6];
+        dst[0x1D92] = cv[0xC1E];
+        *reinterpret_cast<int*>(dst + 0x1D94) = *reinterpret_cast<int*>(cv + 0xC20);
+        *reinterpret_cast<int*>(dst + 0x1D98) = *reinterpret_cast<int*>(cv + 0xC28);
+        *reinterpret_cast<int*>(dst + 0x1D9C) = *reinterpret_cast<int*>(cv + 0xC2C);
+        *reinterpret_cast<int*>(dst + 0x1DA0) = *reinterpret_cast<int*>(cv + 0xC24);
+        *reinterpret_cast<int*>(dst + 0x1DA4) = *reinterpret_cast<int*>(cv + 0x10);
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c2dbc
+ * PAL Size: 2272b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMemoryCardMan::SetLoadData()
 {
+    static const char s_magic0[] = "FFCC";
+    static const char s_magic1[] = "GCCP";
+    static const char s_magic2[] = "SAVE";
+    static const char s_magic3[] = "DATA";
+
+    if (m_saveBuffer == (char*)nullptr)
+    {
+        return;
+    }
+
+    u8* save = reinterpret_cast<u8*>(m_saveBuffer);
+    u8* game = Game + 0x10;
+    u8* gameWork = game + 0x08;
+
+    if (save[0x00] != s_magic0[0] || save[0x01] != s_magic0[1] || save[0x02] != s_magic0[2] || save[0x03] != s_magic0[3])
+    {
+        return;
+    }
+    if (save[0x04] != s_magic1[0] || save[0x05] != s_magic1[1] || save[0x06] != s_magic1[2] || save[0x07] != s_magic1[3])
+    {
+        return;
+    }
+    if (save[0x08] != s_magic2[0] || save[0x09] != s_magic2[1] || save[0x0A] != s_magic2[2] || save[0x0B] != s_magic2[3])
+    {
+        return;
+    }
+    if (save[0x0C] != s_magic3[0] || save[0x0D] != s_magic3[1] || save[0x0E] != s_magic3[2] || save[0x0F] != s_magic3[3])
+    {
+        return;
+    }
+    if (save[0x10] != 'E')
+    {
+        return;
+    }
+
+    gameWork[0x08] = save[0x20];
+    gameWork[0x09] = save[0x21];
+    gameWork[0x0A] = save[0x22];
+    gameWork[0x0B] = save[0x23];
+    *reinterpret_cast<int*>(gameWork + 0x0C) = *reinterpret_cast<int*>(save + 0x24);
+    *reinterpret_cast<int*>(gameWork + 0x10) = *reinterpret_cast<int*>(save + 0x28);
+    *reinterpret_cast<int*>(gameWork + 0x14) = *reinterpret_cast<int*>(save + 0x2C);
+    memcpy(gameWork + 0x18, save + 0x30, 0x10);
+    memcpy(gameWork + 0x28, save + 0x40, 0x3C);
+    memcpy(gameWork + 0x64, save + 0x7C, 0x3C);
+    *reinterpret_cast<int*>(gameWork + 0x10B4) = *reinterpret_cast<int*>(save + 0xB8);
+    memcpy(gameWork + 0xA0, save + 0xC0, 0x1000);
+    memcpy(gameWork + 0x10A0, save + 0x10C0, 0x10);
+    memcpy(gameWork + 0x10CC, save + 0x10D0, 0x100);
+    memcpy(gameWork + 0x11CC, save + 0x11D0, 0x200);
+    *reinterpret_cast<u32*>(gameWork + 0x13E0) = *reinterpret_cast<u32*>(save + 0x13D0);
+    *reinterpret_cast<u32*>(gameWork + 0x13E4) = *reinterpret_cast<u32*>(save + 0x13D4);
+    *reinterpret_cast<u32*>(gameWork + 0x13D8) = *reinterpret_cast<u32*>(save + 0x13D8);
+    gameWork[0x13D6] = save[0x13DC];
+    Sound.SetBgmMasterVolume(static_cast<s8>(save[0x13DD]));
+    Sound.SetSeMasterVolume(static_cast<s8>(save[0x13DE]));
+    Sound.SetStereo(static_cast<s8>(save[0x13DF]));
+    gameWork[0x01] = (save[0x13E0] != 0);
+    gameWork[0x02] = (save[0x13E1] != 0);
+    gameWork[0x03] = (save[0x13E2] != 0);
+    gameWork[0x04] = (save[0x13E3] != 0);
+    gameWork[0x05] = (save[0x13E4] != 0);
+
+    for (int c = 0; c < 8; c++)
+    {
+        u8* src = save + 0x14D0 + c * 0x9C0;
+        u8* cv = game + 0x13F0 + c * 0xC30;
+
+        int itemCount = 0;
+        for (int i = 0; i < 64; i++)
+        {
+            if (*reinterpret_cast<s16*>(src + 0x3C + i * 2) != -1)
+            {
+                itemCount++;
+            }
+        }
+        if (itemCount != *reinterpret_cast<u16*>(src + 0x2A))
+        {
+            *reinterpret_cast<u16*>(src + 0x2A) = static_cast<u16>(itemCount);
+        }
+
+        memcpy(cv + 0x14, src + 0x00, 0x10);
+        memcpy(cv + 0x3B8, src + 0x12, 0x0E);
+        *reinterpret_cast<u16*>(cv + 0x3C4) = *reinterpret_cast<u16*>(src + 0x28);
+        *reinterpret_cast<u16*>(cv + 0xB4) = *reinterpret_cast<u16*>(src + 0x2A);
+        memcpy(cv + 0x3DC, src + 0x2C, 0x0A);
+        memcpy(cv + 0x3AC, src + 0x34, 0x08);
+        memcpy(cv + 0xB6, src + 0x3C, 0x80);
+        *reinterpret_cast<u32*>(cv + 0x3B4) = *reinterpret_cast<u32*>(src + 0xB8);
+        *reinterpret_cast<u32*>(cv + 0x200) = *reinterpret_cast<u32*>(src + 0xBC);
+        memcpy(cv + 0x3CA, src + 0xC8, 0x10);
+        *reinterpret_cast<u32*>(cv + 0x3E8) = *reinterpret_cast<u32*>(src + 0xD8);
+        memcpy(cv + 0x3EC, src + 0x104, 100 * 0x0C);
+
+        for (int artifact = 0; artifact < 96; artifact++)
+        {
+            const int slot = artifact >> 5;
+            const u32 bit = 1u << (artifact & 31);
+            if ((*reinterpret_cast<u32*>(src + 0xBC + slot * 4) & bit) == 0)
+            {
+                *reinterpret_cast<s16*>(cv + 0x136 + artifact * 2) = -1;
+            }
+            else
+            {
+                *reinterpret_cast<s16*>(cv + 0x136 + artifact * 2) = static_cast<s16>(0x9F + artifact);
+            }
+        }
+
+        memcpy(cv + 0x204, src + 0x598, 0x10);
+        memcpy(cv + 0x214, src + 0x5A8, 0x10);
+
+        *reinterpret_cast<int*>(cv + 0x3A4) = *reinterpret_cast<int*>(src + 0x1A84);
+        memcpy(cv + 0x8A4, src + 0x1A88, 0x100);
+        memcpy(cv + 0x9A4, src + 0x1B88, 0x200);
+        *reinterpret_cast<int*>(cv + 0x3A8) = *reinterpret_cast<int*>(src + 0x1D88);
+        *reinterpret_cast<int*>(cv + 0x3AC) = *reinterpret_cast<int*>(src + 0x1D8C);
+        cv[0xBA5] = src[0x1D90];
+        cv[0xBA6] = src[0x1D91];
+        cv[0xC1E] = src[0x1D92];
+        *reinterpret_cast<int*>(cv + 0xC20) = *reinterpret_cast<int*>(src + 0x1D94);
+        *reinterpret_cast<int*>(cv + 0xC24) = *reinterpret_cast<int*>(src + 0x1DA0);
+        *reinterpret_cast<int*>(cv + 0xC28) = *reinterpret_cast<int*>(src + 0x1D98);
+        *reinterpret_cast<int*>(cv + 0xC2C) = *reinterpret_cast<int*>(src + 0x1D9C);
+        *reinterpret_cast<int*>(cv + 0x10) = *reinterpret_cast<int*>(src + 0x1DA4);
+
+    }
+
+    for (int i = 0; i < 4; i++)
+    {
+        const int wm = *reinterpret_cast<int*>(gameWork + 0x18 + i * 4);
+        if (wm < 0 || wm >= 9)
+        {
+            *reinterpret_cast<int*>(gameWork + 0x18 + i * 4) = -1;
+            continue;
+        }
+        u8* cv = game + 0x13F0 + wm * 0xC30;
+        if (*reinterpret_cast<int*>(cv + 0x3A4) == 0 || cv[0xBA5] != 0)
+        {
+            *reinterpret_cast<int*>(gameWork + 0x18 + i * 4) = -1;
+        }
+    }
 }
 
 /*

@@ -73,10 +73,7 @@ void CMapShadow::Init()
 	u32 uVar7;
 	u32 uVar8;
 	union {
-		struct {
-			u32 hi;
-			u32 lo;
-		} parts;
+		u64 bits;
 		double d;
 	} cvt;
 
@@ -85,14 +82,13 @@ void CMapShadow::Init()
 	iVar6 = *(int*)(iVar6 + 0x3c);
 	uVar8 = *(u32*)(iVar6 + 100);
 	uVar7 = *(u32*)(iVar6 + 0x68);
-	*((char*)this + 7) = (char)*(u32*)(iVar6 + 0x6c);
-	cvt.parts.hi = 0x43300000;
-	cvt.parts.lo = uVar8;
+	*((u8*)this + 7) = *(u8*)(iVar6 + 0x6c);
+	cvt.bits = 0x4330000000000000ULL | (u64)uVar8;
 	fVar1 = (float)(cvt.d - dVar5);
-	cvt.parts.lo = uVar7;
+	cvt.bits = 0x4330000000000000ULL | (u64)uVar7;
 	fVar2 = (float)(cvt.d - dVar5);
 	fVar3 = *(float*)((char*)this + 0xa8);
-	if (*((char*)this + 6) == 0) {
+	if (*(s8*)((char*)this + 6) == 0) {
 		C_MTXLightOrtho((MtxPtr)((char*)this + 0x48), -fVar2, fVar2, -fVar1, fVar1,
 		                (float)(DOUBLE_8032fce8 * (double)fVar3),
 		                (float)((double)FLOAT_8032fcf0 * (double)fVar3),

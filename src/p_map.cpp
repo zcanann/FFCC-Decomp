@@ -1,5 +1,9 @@
 #include "ffcc/p_map.h"
 
+extern "C" void __dl__FPv(void*);
+
+struct CRelProfile;
+
 /*
  * --INFO--
  * Address:	TODO
@@ -218,4 +222,22 @@ void CMapPcs::drawAfterViewer()
 void CMapPcs::GetMapLightHolder(long, _GXColor*, Vec*)
 {
 	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80036254
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" CRelProfile* __dt__11CRelProfileFv(CRelProfile* self, short shouldDelete)
+{
+	if ((self != 0) && (shouldDelete > 0))
+	{
+		__dl__FPv(self);
+	}
+	return self;
 }

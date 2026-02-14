@@ -276,9 +276,9 @@ void GXSetTevKColorSel(GXTevStageID stage, GXTevKColorSel sel) {
 
     Kreg = &__GXData->tevKsel[stage >> 1];
     if (stage & 1) {
-        SET_REG_FIELD(0x36E, *Kreg, 5, 14, sel);
+        *Kreg = (*Kreg & 0xFFF83FFF) | ((u32)sel << 14);
     } else {
-        SET_REG_FIELD(0x370, *Kreg, 5, 4, sel);
+        *Kreg = (*Kreg & 0xFFFFFE0F) | ((u32)sel << 4);
     }
 
     GX_WRITE_RAS_REG(*Kreg);
@@ -293,9 +293,9 @@ void GXSetTevKAlphaSel(GXTevStageID stage, GXTevKAlphaSel sel) {
 
     Kreg = &__GXData->tevKsel[stage >> 1];
     if (stage & 1) {
-        SET_REG_FIELD(911, *Kreg, 5, 19, sel);
+        *Kreg = (*Kreg & 0xFF07FFFF) | ((u32)sel << 19);
     } else {
-        SET_REG_FIELD(913, *Kreg, 5, 9, sel);
+        *Kreg = (*Kreg & 0xFFFFC1FF) | ((u32)sel << 9);
     }
 
     GX_WRITE_RAS_REG(*Kreg);

@@ -216,9 +216,9 @@ void CCaravanWork::ChgCmdLst(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CCaravanWork::ChgEquipPos(int, int)
+void CCaravanWork::ChgEquipPos(int idx, int equip)
 {
-	// TODO
+	m_equipment[idx] = equip;
 }
 
 /*
@@ -226,9 +226,21 @@ void CCaravanWork::ChgEquipPos(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CCaravanWork::CanAddComList(int)
+int CCaravanWork::CanAddComList(int count)
 {
-	// TODO
+	int slotCount = m_numCmdListSlots;
+	unsigned short* slot = m_commandListInventorySlotRef;
+
+	if (slotCount > 2) {
+		for (int i = slotCount - 2; i != 0; i--) {
+			if ((*slot == 0xFFFF) && (--count == 0)) {
+				break;
+			}
+			slot++;
+		}
+	}
+
+	return count == 0;
 }
 
 /*

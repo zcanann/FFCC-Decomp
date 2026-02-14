@@ -207,10 +207,11 @@ void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, UnkC* param_2)
 void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, UnkB* param_2, UnkC* param_3)
 {
     static char sPppYmMiasmaCpp[] = "pppYmMiasma.cpp";
-    int* step = (int*)param_2;
-    int* work;
+    u8* step = (u8*)param_2;
+    u8* workBytes;
+    float* work;
     int i;
-    int particle;
+    u8* particle;
     int count;
     Vec matrixPos;
     Vec oldPos;
@@ -220,58 +221,59 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, UnkB* param_2, UnkC* param_3)
         return;
     }
 
-    work = (int*)((u8*)pppYmMiasma_ + 8 + param_3->m_serializedDataOffsets[2]);
+    workBytes = (u8*)pppYmMiasma_ + 8 + param_3->m_serializedDataOffsets[2];
+    work = (float*)workBytes;
 
-    if (step[0] == *(int*)pppYmMiasma_) {
-        work[7] = (int)((float)work[7] + (float)step[0x16]);
-        work[8] = (int)((float)work[8] + (float)step[0x17]);
-        work[9] = (int)((float)work[9] + (float)step[0x18]);
+    if (*(int*)step == *(int*)pppYmMiasma_) {
+        work[7] = work[7] + *(float*)(step + 0x58);
+        work[8] = work[8] + *(float*)(step + 0x5c);
+        work[9] = work[9] + *(float*)(step + 0x60);
     }
 
-    count = (int)(u32) * (u16*)(step + 3);
-    if (work[0] == 0) {
-        work[0] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+    count = (int)*(u16*)(step + 0xc);
+    if (*(u32*)workBytes == 0) {
+        *(u32*)workBytes = (u32)pppMemAlloc__FUlPQ27CMemory6CStagePci(
             (unsigned long)count * 0x50, pppEnvStPtr->m_stagePtr, sPppYmMiasmaCpp, 0x18d);
-        particle = work[0];
+        particle = (u8*)(u32) * (u32*)workBytes;
         for (i = 0; i < count; i++) {
-            InitParticleData((VYmMiasma*)work, (_pppPObject*)pppYmMiasma_, (PYmMiasma*)step, (_PARTICLE_DATA*)particle);
+            InitParticleData((VYmMiasma*)workBytes, (_pppPObject*)pppYmMiasma_, (PYmMiasma*)step, (_PARTICLE_DATA*)particle);
             particle += 0x50;
         }
     }
 
-    *((u8*)(work + 2)) = (u8)(*((u8*)(work + 2)) + 1);
-    work[1] = (int)((float)work[1] - (float)step[0x1b]);
-    if ((float)work[1] < FLOAT_80330644) {
-        work[1] = (int)FLOAT_80330644;
+    workBytes[8] = (u8)(workBytes[8] + 1);
+    work[1] = work[1] - *(float*)(step + 0x6c);
+    if (work[1] < FLOAT_80330644) {
+        work[1] = FLOAT_80330644;
     }
 
-    if (*((u8*)(step + 0x19)) < *((u8*)(work + 2))) {
+    if (*(u8*)(step + 0x64) < workBytes[8]) {
         int r;
         s16 angleDelta;
         u32 signBit;
         u32 angleIdx;
 
-        *((u8*)(work + 2)) = 0;
-        work[1] = step[6];
+        workBytes[8] = 0;
+        work[1] = *(float*)(step + 0x18);
 
         r = rand();
-        angleDelta = (s16)r - (s16)(r / (int)*(s16*)(step + 0x1a)) * *(s16*)(step + 0x1a);
+        angleDelta = (s16)r - (s16)(r / (int)*(s16*)(step + 0x68)) * *(s16*)(step + 0x68);
         signBit = (u32)(int)angleDelta >> 31;
         if ((((int)angleDelta & 1U) ^ signBit) == signBit) {
             angleDelta = -angleDelta;
         }
 
-        angleIdx = (u32)((FLOAT_80330650 * FLOAT_80330640 * (float)(s16)(angleDelta + *(s16*)((u8*)step + 0x66))) /
+        angleIdx = (u32)((FLOAT_80330650 * FLOAT_80330640 * (float)(s16)(angleDelta + *(s16*)(step + 0x66))) /
                          FLOAT_80330654);
-        work[4] = *(int*)((u8*)ppvSinTbl + ((angleIdx + 0x4000) & 0xfffc));
-        work[5] = (int)FLOAT_80330644;
-        work[6] = *(int*)((u8*)ppvSinTbl + (angleIdx & 0xfffc));
+        work[4] = *(float*)((u8*)ppvSinTbl + ((angleIdx + 0x4000) & 0xfffc));
+        work[5] = FLOAT_80330644;
+        work[6] = *(float*)((u8*)ppvSinTbl + (angleIdx & 0xfffc));
     }
 
-    work[8] = (int)((float)work[8] + (float)work[9]);
-    work[7] = (int)((float)work[7] + (float)work[8]);
+    work[8] = work[8] + work[9];
+    work[7] = work[7] + work[8];
 
-    particle = work[0];
+    particle = (u8*)(u32) * (u32*)workBytes;
     for (i = 0; i < count; i++) {
         UpdateParticleData((_pppPObject*)pppYmMiasma_, (_pppCtrlTable*)param_3, (PYmMiasma*)step, (_PARTICLE_DATA*)particle);
         particle += 0x50;
@@ -280,15 +282,15 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, UnkB* param_2, UnkC* param_3)
     matrixPos.x = pppMngStPtr->m_matrix.value[0][3];
     matrixPos.y = pppMngStPtr->m_matrix.value[1][3];
     matrixPos.z = pppMngStPtr->m_matrix.value[2][3];
-    oldPos.x = *(float*)(work + 10);
-    oldPos.y = *(float*)(work + 0xb);
-    oldPos.z = *(float*)(work + 0xc);
+    oldPos.x = work[10];
+    oldPos.y = work[11];
+    oldPos.z = work[12];
 
     pppSubVector__FR3Vec3Vec3Vec(&delta, &matrixPos, &oldPos);
     if ((double)PSVECDistance(&matrixPos, (Vec*)(work + 10)) == (double)FLOAT_80330644) {
-        *((u8*)(work + 0xd)) = 0;
+        workBytes[0x34] = 0;
     } else {
-        *((u8*)(work + 0xd)) = 0xff;
+        workBytes[0x34] = 0xff;
     }
 
     pppCopyVector__FR3Vec3Vec((Vec*)(work + 10), &matrixPos);

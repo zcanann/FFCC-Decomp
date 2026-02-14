@@ -97,7 +97,6 @@ int __OSCallResetFunctions(BOOL final) {
     return 1;
 }
 
-#ifdef __GEKKO__
 static asm void Reset(u32 resetCode) {
     nofralloc
     b L_000001BC
@@ -138,7 +137,6 @@ L_00000200:
 L_00000208:
     b L_000001A0
 }
-#endif
 
 static void KillThreads(void) {
     OSThread* thread;

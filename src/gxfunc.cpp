@@ -178,16 +178,14 @@ void _GXSetTevAlphaIn(_GXTevStageID stage, _GXTevAlphaArg a, _GXTevAlphaArg b, _
  */
 void _GXSetTevColorOp(_GXTevStageID stage, _GXTevOp op, _GXTevBias bias, _GXTevScale scale, unsigned char clamp, _GXTevRegID outReg)
 {
-	int stageOff = stage * 0x14;
-	char* entry = (char*)s_GXSetTevColorOp_Reg + stageOff;
+	GXTevColorOpReg* entry = &s_GXSetTevColorOp_Reg[stage];
 
-	if (*(int*)(entry + 0x0) != op || *(int*)(entry + 0x4) != bias || *(int*)(entry + 0x8) != scale || *(entry + 0xC) != clamp ||
-	    *(int*)(entry + 0x10) != outReg) {
-		*(int*)(entry + 0x0) = op;
-		*(int*)(entry + 0x4) = bias;
-		*(int*)(entry + 0x8) = scale;
-		*(entry + 0xC) = clamp;
-		*(int*)(entry + 0x10) = outReg;
+	if (entry->op != op || entry->bias != bias || entry->scale != scale || entry->clamp != clamp || entry->outReg != outReg) {
+		entry->op = op;
+		entry->bias = bias;
+		entry->scale = scale;
+		entry->clamp = clamp;
+		entry->outReg = outReg;
 		GXSetTevColorOp(stage, op, bias, scale, clamp, outReg);
 	}
 }
@@ -203,16 +201,14 @@ void _GXSetTevColorOp(_GXTevStageID stage, _GXTevOp op, _GXTevBias bias, _GXTevS
  */
 void _GXSetTevAlphaOp(_GXTevStageID stage, _GXTevOp op, _GXTevBias bias, _GXTevScale scale, unsigned char clamp, _GXTevRegID outReg)
 {
-	int stageOff = stage * 0x14;
-	char* entry = (char*)s_GXSetTevAlphaOp_Reg + stageOff;
+	GXTevAlphaOpReg* entry = &s_GXSetTevAlphaOp_Reg[stage];
 
-	if (*(int*)(entry + 0x0) != op || *(int*)(entry + 0x4) != bias || *(int*)(entry + 0x8) != scale || *(entry + 0xC) != clamp ||
-	    *(int*)(entry + 0x10) != outReg) {
-		*(int*)(entry + 0x0) = op;
-		*(int*)(entry + 0x4) = bias;
-		*(int*)(entry + 0x8) = scale;
-		*(entry + 0xC) = clamp;
-		*(int*)(entry + 0x10) = outReg;
+	if (entry->op != op || entry->bias != bias || entry->scale != scale || entry->clamp != clamp || entry->outReg != outReg) {
+		entry->op = op;
+		entry->bias = bias;
+		entry->scale = scale;
+		entry->clamp = clamp;
+		entry->outReg = outReg;
 		GXSetTevAlphaOp(stage, op, bias, scale, clamp, outReg);
 	}
 }

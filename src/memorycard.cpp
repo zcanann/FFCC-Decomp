@@ -8,6 +8,7 @@
 #include "string.h"
 
 extern unsigned char Game[];
+CMemoryCardMan MemoryCardMan;
 
 // CRC32 lookup table
 static const unsigned int crcTable[256] = {

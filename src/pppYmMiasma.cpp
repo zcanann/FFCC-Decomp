@@ -145,15 +145,17 @@ void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, _PARTICLE_DAT
  */
 void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, UnkC* param_2)
 {
+    u32 value;
     float fVar1 = FLOAT_80330644;
     u32* work = (u32*)((u8*)pppYmMiasma_ + 8 + param_2->m_serializedDataOffsets[2]);
 
+    value = DAT_80330658;
     work[0] = 0;
     ((float*)work)[7] = fVar1;
     ((float*)work)[8] = fVar1;
     ((float*)work)[9] = fVar1;
     *((u8*)(work + 2)) = 0;
-    work[4] = DAT_80330658;
+    work[4] = value;
     ((float*)work)[5] = fVar1;
     ((float*)work)[6] = fVar1;
     ((float*)work)[0xc] = fVar1;
@@ -176,7 +178,7 @@ void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, UnkC* param_2)
     int offset = param_2->m_serializedDataOffsets[2];
     float fVar1 = FLOAT_80330644;
 
-    *(float*)((u8*)pppYmMiasma_ + 0x9c + offset) = fVar1;
+    *(float*)((u8*)pppYmMiasma_ + 0x9c + offset) = FLOAT_80330644;
     *(float*)((u8*)pppYmMiasma_ + 0xa0 + offset) = fVar1;
     *(float*)((u8*)pppYmMiasma_ + 0xa4 + offset) = fVar1;
 }
@@ -192,10 +194,8 @@ void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, UnkC* param_2)
  */
 void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, UnkC* param_2)
 {
-    void* stage = *(void**)((u8*)pppYmMiasma_ + 8 + param_2->m_serializedDataOffsets[2]);
-
-    if (stage != 0) {
-        pppHeapUseRate__FPQ27CMemory6CStage(stage);
+    if (*(void**)((u8*)pppYmMiasma_ + 8 + param_2->m_serializedDataOffsets[2]) != 0) {
+        pppHeapUseRate__FPQ27CMemory6CStage(*(void**)((u8*)pppYmMiasma_ + 8 + param_2->m_serializedDataOffsets[2]));
     }
 }
 

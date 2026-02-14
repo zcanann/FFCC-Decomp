@@ -30,6 +30,7 @@ void pppConstructMana2(pppMana2* pppMana2, UnkC* param_2)
 {
     CGObject* gObject;
     void* handle;
+    u32 model;
     u32* work;
 
     gObject = *(CGObject**)((char*)pppMngStPtr + 0x8);
@@ -38,31 +39,35 @@ void pppConstructMana2(pppMana2* pppMana2, UnkC* param_2)
 
     handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
     GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    model = *(u32*)((char*)handle + 0x168);
+    *(u32*)(model + 0x98) = 0x3F;
+    work[1] = (u32)pppMngStPtr;
 
     work[0] = 0;
     work[1] = 0;
     work[8] = 0;
     work[9] = 0;
+    work[15] = 0;
+    work[16] = 0;
+    work[18] = 0;
+    work[19] = 0;
+    work[20] = 0;
+    work[21] = 0;
+    work[22] = 0;
+    work[24] = 0;
+    work[17] = 0;
+    work[23] = 0;
+    work[29] = 0;
+    work[28] = 0;
+    work[30] = 0;
+    work[31] = 0;
+    work[25] = 0;
+    work[26] = 0;
+    work[27] = 0;
     work[10] = 0;
     work[11] = 0;
     work[12] = 0;
     work[13] = 0;
-    work[15] = 0;
-    work[16] = 0;
-    work[17] = 0;
-    work[18] = 0;
-    work[20] = 0;
-    work[21] = 0;
-    work[22] = 0;
-    work[23] = 0;
-    work[24] = 0;
-    work[25] = 0;
-    work[26] = 0;
-    work[27] = 0;
-    work[28] = 0;
-    work[29] = 0;
-    work[30] = 0;
-    work[31] = 0;
     *(u8*)(work + 0x38) = 0xFF;
     PSMTXIdentity((float (*)[4])(work + 0x20));
     PSMTXIdentity((float (*)[4])(work + 0x2C));

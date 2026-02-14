@@ -32,7 +32,7 @@ void game(int argc, char** argv)
     char** argument;
 
     Game.game.Init();
-    strcpy(reinterpret_cast<char*>(0x8022b7b4), lbl_801d6a40);
+    strcpy(Game.game.m_currentScriptName, lbl_801d6a40);
 
     if (argc != 0) {
         argument = argv + 1;
@@ -40,7 +40,7 @@ void game(int argc, char** argv)
         parseLanguage = false;
         for (i = 1; i < argc; i++) {
             if (copyScriptName) {
-                strcpy(reinterpret_cast<char*>(0x8022b7b4), *argument);
+                strcpy(Game.game.m_currentScriptName, *argument);
                 copyScriptName = false;
             } else if (parseLanguage) {
                 cmp = strcmp(*argument, lbl_801d6a48);

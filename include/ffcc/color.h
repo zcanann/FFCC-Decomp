@@ -10,6 +10,7 @@ public:
 	CColor(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 	CColor(CColor& other);
 	CColor(_GXColor& other);
+	operator _GXColor();
 
 	union {
 		GXColor color;

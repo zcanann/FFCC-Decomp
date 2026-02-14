@@ -1,6 +1,7 @@
 #include "ffcc/pppPart.h"
 
 #include "ffcc/map.h"
+#include "ffcc/maphit.h"
 #include "ffcc/p_game.h"
 #include "ffcc/memory.h"
 #include "ffcc/sound.h"
@@ -18,6 +19,7 @@ static const double kScaleConstA = 4503601774854144.0; // DOUBLE_803304b0
 static const float kScaleConstB = 0.017453292f; // FLOAT_803304a8
 extern "C" unsigned char lbl_8032ED85;
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
+extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 extern CPartMng PartMng;
 
 /*
@@ -1472,10 +1474,47 @@ void pppInitDrawEnv(unsigned char)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 80053d04
+ * PAL Size: 876b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppHitCylinderSendSystem(_pppMngSt*, Vec*, Vec*, float, float)
+unsigned int pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* position, Vec* direction, float radius, float height)
 {
-	// TODO
+	unsigned int result = 0;
+
+	if (height != kPppZero)
+	{
+		CMapCylinder cylinder;
+		cylinder.m_bottom = *position;
+		cylinder.m_direction = *direction;
+		cylinder.m_radius = radius;
+		cylinder.m_height = height;
+		cylinder.m_radius2 = 1.0f;
+		cylinder.m_height2 = 1.0f;
+
+		const unsigned int cylinderAttribute = *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(pppMngSt) + 0xC0);
+		if (MapMng.CheckHitCylinder(&cylinder, direction, cylinderAttribute) != 0)
+		{
+			if (Game.game.m_currentSceneId == 7)
+			{
+				*reinterpret_cast<u8*>(reinterpret_cast<u8*>(pppMngSt) + 0xE5) = 1;
+				pppStopSe(pppMngSt, reinterpret_cast<PPPSEST*>(reinterpret_cast<u8*>(pppMngSt) + 0x11C));
+			}
+			else
+			{
+				Vec hitPosition;
+				int hitClass;
+				CalcHitPosition__7CMapObjFP3Vec(*(void**)(reinterpret_cast<u8*>(&MapMng) + 0x22A88), &hitPosition);
+				hitClass = *reinterpret_cast<int*>(reinterpret_cast<u8*>(pppMngSt) + 4) / 0xAC;
+				Game.game.HitParticleBG(hitClass, static_cast<int>(pppMngSt->m_kind), static_cast<int>(pppMngSt->m_nodeIndex), &hitPosition, reinterpret_cast<PPPIFPARAM*>(reinterpret_cast<u8*>(pppMngSt) + 0x130));
+			}
+
+			result = 1;
+		}
+	}
+
+	return result;
 }

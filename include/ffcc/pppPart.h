@@ -87,7 +87,7 @@ void pppSetBlendMode(unsigned char);
 void pppClearDrawEnv(void);
 void pppSetDrawEnv(pppCVECTOR*, pppFMATRIX*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
 void pppInitDrawEnv(unsigned char);
-void pppHitCylinderSendSystem(_pppMngSt*, Vec*, Vec*, float, float);
+unsigned int pppHitCylinderSendSystem(_pppMngSt*, Vec*, Vec*, float, float);
 void CGObject_GetModelAlpha(CGObject*);
 void CGObject_IsDisp(CGObject*);
 void CGObject_IsFirstDraw(CGObject*);

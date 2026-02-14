@@ -3,7 +3,7 @@
 #include "ffcc/math.h"
 #include <dolphin/types.h>
 
-extern CMath math;
+extern CMath math[];
 extern int lbl_8032ED70;
 extern unsigned char* lbl_8032ED50;
 extern float lbl_801EC9F0[];
@@ -13,11 +13,6 @@ extern float lbl_8032FEF0;
 extern "C" float RandF__5CMathFv(CMath* instance);
 
 extern _pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
-
-static inline float pppTrigSample(s32 angle)
-{
-    return *(float*)((u8*)lbl_801EC9F0 + (angle & 0xFFFC));
-}
 
 /*
  * --INFO--
@@ -72,16 +67,16 @@ void pppPointRAp(void* mngSt, void* dataVal, void* ctrlTable)
             *(void**)((u8*)obj + 0x4) = mngSt;
         }
 
-        s32 angleA = (s32)(lbl_8032FEE8 * RandF__5CMathFv(&math) - lbl_8032FEEC);
+        float* trig = lbl_801EC9F0;
+        s32 angleA = (s32)(lbl_8032FEE8 * RandF__5CMathFv(math) - lbl_8032FEEC);
         float scaleA = *(float*)((u8*)dataVal + 0x4);
-        float yOff = scaleA * pppTrigSample(angleA);
-        float zOff = scaleA * pppTrigSample(angleA + 0x4000);
-
-        s32 angleB = (s32)(lbl_8032FEF0 * (lbl_8032FEE8 * RandF__5CMathFv(&math)));
+        float yOff = scaleA * *(float*)((u8*)trig + (angleA & 0xFFFC));
+        float zOff = scaleA * *(float*)((u8*)trig + ((angleA + 0x4000) & 0xFFFC));
+        s32 angleB = (s32)(lbl_8032FEF0 * (lbl_8032FEE8 * RandF__5CMathFv(math)));
         Vec* dstPos = (Vec*)((u8*)obj + *(u32*)((u8*)dataVal + 0x10) + 0x80);
         Vec* dstVel = (Vec*)((u8*)obj + *(u32*)((u8*)dataVal + 0x18) + 0x80);
-        float xOff = zOff * pppTrigSample(angleB);
-        zOff *= pppTrigSample(angleB + 0x4000);
+        float xOff = zOff * *(float*)((u8*)trig + (angleB & 0xFFFC));
+        zOff *= *(float*)((u8*)trig + ((angleB + 0x4000) & 0xFFFC));
 
         dstPos->x = srcPos->x + xOff;
         dstPos->y = srcPos->y + yOff;

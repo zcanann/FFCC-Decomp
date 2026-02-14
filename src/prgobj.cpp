@@ -1,4 +1,6 @@
 #include "ffcc/prgobj.h"
+#include "ffcc/charaobj.h"
+#include "ffcc/partyobj.h"
 
 /*
  * --INFO--
@@ -327,12 +329,60 @@ void CGPrgObj::dstTargetRot(CGPrgObj*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80127084
+ * PAL Size: 348b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGPrgObj::ClassControl(int, int)
+void CGPrgObj::ClassControl(int classControl, int value)
 {
-	// TODO
+	switch (classControl) {
+	case 0:
+		reinterpret_cast<CGPartyObj*>(this)->ChangeCommandMode(value);
+		break;
+	case 1:
+		reinterpret_cast<CGPartyObj*>(this)->changeMotionMode(value);
+		break;
+	case 2:
+		if ((((char)m_weaponNodeFlags) >> 7) != value) {
+			onChangePrg(value);
+			m_weaponNodeFlags = (m_weaponNodeFlags & 0x7FFF) | ((value & 1) << 15);
+		}
+		break;
+	case 3:
+	{
+		unsigned char* classFlags = reinterpret_cast<unsigned char*>(this) + 0x6B8;
+		*classFlags = (*classFlags & 0xF7) | ((value & 1) << 3);
+		break;
+	}
+	case 4:
+	{
+		int oldState = getReplaceStat(value);
+		if (oldState != -1) {
+			onCancelStat(value);
+			m_stateArg = 0;
+			onChangeStat(value);
+			m_lastStateId = oldState;
+			m_stateFrame = 0;
+			m_stateFrameGate = 1;
+			m_subState = 0;
+			m_subFrame = 0;
+			m_subFrameGate = 1;
+		}
+		break;
+	}
+	case 5:
+		reinterpret_cast<CGCharaObj*>(this)->ClearAllSta();
+		break;
+	case 6:
+		*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x560) = value;
+		break;
+	case 7:
+		reinterpret_cast<CGPartyObj*>(this)->setAlive(1, 0);
+		break;
+	}
 }
 
 /*

@@ -2,6 +2,7 @@
 
 extern "C" {
 void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
+void __dl__FPv(void*);
 char s_cflat_runtime_cpp_801d8ef8[];
 void* __vt__12CFlatRuntime[];
 void* __vt__Q212CFlatRuntime7CObject[];
@@ -39,6 +40,30 @@ CFlatRuntime::CFlatRuntime()
 CFlatRuntime::~CFlatRuntime()
 {
 	Quit();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80069a2c
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" CFlatRuntime* dtor_80069A2C(CFlatRuntime* flatRuntime, short shouldDelete)
+{
+	if (flatRuntime != 0) {
+		typedef void (*QuitFn)(CFlatRuntime*);
+
+		*(void***)flatRuntime = __vt__12CFlatRuntime;
+		reinterpret_cast<QuitFn>((*reinterpret_cast<void***>(flatRuntime))[4])(flatRuntime);
+		if (0 < shouldDelete) {
+			__dl__FPv(flatRuntime);
+		}
+	}
+
+	return flatRuntime;
 }
 
 /*

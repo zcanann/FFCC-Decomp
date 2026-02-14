@@ -9,18 +9,40 @@
 #include "ffcc/memorycard.h"
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
+#include "ffcc/stopwatch.h"
+#include "ffcc/gbaque.h"
 #include "ffcc/textureman.h"
 
+#include "dolphin/gx/GXPerf.h"
 #include "dolphin/os.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/printf.h"
 #include "PowerPC_EABI_Support/Runtime/ptmf.h"
+#include "ffcc/p_game.h"
+#include "ffcc/p_minigame.h"
 #include <string.h>
 
 extern CMath Math;
 extern CTextureMan TextureMan;
 extern CMaterialMan MaterialMan;
 extern CFontMan FontMan;
+extern "C" int __cntlzw(unsigned int);
+extern CMiniGamePcs MiniGamePcs;
+extern unsigned char CFlat[];
 CSystem System;
+
+static inline unsigned short ReadPadWord(unsigned int baseOffset, unsigned int padIndex)
+{
+    return *(unsigned short*)((unsigned char*)&Pad + baseOffset + padIndex * 0x54);
+}
+
+static inline unsigned int ResolvePadIndex(unsigned int port)
+{
+    if (Pad._448_4_ == (int)port)
+    {
+        return 0;
+    }
+    return port;
+}
 
 /*
  * --INFO--
@@ -188,12 +210,207 @@ void CSystem::Printf(char* fmt, ...)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80021934
+ * PAL Size: 1480b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CSystem::ExecScenegraph()
 {
-	// TODO
+    unsigned short stepTrigger = 0;
+    unsigned short perfTrigger = 0;
+    CStopWatch watch((char*)-1);
+
+    if (Game.game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != Game.game.m_gameWork.m_gamePaused)
+    {
+        Graphic._WaitDrawDone((char*)"system.cpp", 0x219);
+        Game.game.m_gameWork.m_gamePaused = Game.game.m_gameWork.m_singleShopOrSmithMenuActiveFlag;
+        if (Game.game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != 0)
+        {
+            Sound.PauseAllSe(1);
+            File.BackAllFilesToQueue((CFile::CHandle*)0);
+        }
+        else
+        {
+            Sound.PauseAllSe(0);
+        }
+    }
+
+    Pad.Frame();
+    File.Frame();
+    Memory.Frame();
+
+    if (Pad._452_4_ == 0)
+    {
+        const unsigned int stepPad = (Pad._448_4_ == 4) ? 4 : 0;
+        stepTrigger = ReadPadWord(0x36, stepPad);
+        perfTrigger = ReadPadWord(0x34, stepPad);
+    }
+
+    if ((stepTrigger & 0xC) != 0)
+    {
+        if ((stepTrigger & 8) != 0)
+        {
+            m_scenegraphStepMode = (unsigned int)__cntlzw((unsigned int)m_scenegraphStepMode) >> 5;
+        }
+        else if ((stepTrigger & 4) != 0)
+        {
+            if (m_scenegraphStepMode == 2)
+            {
+                m_scenegraphStepMode = 3;
+            }
+            else if (m_scenegraphStepMode == 3)
+            {
+                m_scenegraphStepMode = 4;
+            }
+            else if (m_scenegraphStepMode == 4)
+            {
+                m_scenegraphStepMode = 5;
+            }
+            else
+            {
+                m_scenegraphStepMode = 2;
+            }
+        }
+    }
+
+    if (((*(unsigned int*)((unsigned char*)&MiniGamePcs + 0x6484) & 0x40) != 0) &&
+        (Game.game.m_gameWork.m_gamePaused == 0))
+    {
+        for (unsigned int port = 0; port < 4; port++)
+        {
+            const bool forceOff = (Pad._452_4_ != 0) || ((port == 0) && (Pad._448_4_ != -1));
+            const unsigned short trigger = forceOff ? 0 : ReadPadWord(0xA, ResolvePadIndex(port));
+            const unsigned short held = forceOff ? 0 : ReadPadWord(0x8, ResolvePadIndex(port));
+
+            if (((trigger | held) & 0x1000) != 0)
+            {
+                if (m_scenegraphStepMode == 2)
+                {
+                    Sound.PauseAllSe(0);
+                    m_scenegraphStepMode = 0;
+                    GbaQue.ClrShopMode();
+                    GbaQue.SetPauseMode(0);
+                }
+                else if ((*(unsigned int*)(CFlat + 0x12A0) & 0x10) != 0)
+                {
+                    Sound.PauseAllSe(1);
+                    m_scenegraphStepMode = 2;
+                    GbaQue.SetPauseMode(1);
+                }
+            }
+        }
+    }
+
+    unsigned int drawToggle;
+    if (m_scenegraphStepMode == 1)
+    {
+        drawToggle = ((unsigned int)__cntlzw(m_frameCounter & 3) >> 5) & 0xFF;
+    }
+    else
+    {
+        drawToggle = 1;
+    }
+
+    unsigned int stepGate = 0;
+    if (m_scenegraphStepMode == 4)
+    {
+        stepGate = ((-(int)(m_frameCounter & 3)) >> 31);
+    }
+    else if (m_scenegraphStepMode < 4)
+    {
+        if (m_scenegraphStepMode == 2)
+        {
+            stepGate = 1;
+        }
+        else if (m_scenegraphStepMode > 2)
+        {
+            stepGate = ((-(int)(m_frameCounter & 7)) >> 31);
+        }
+    }
+    else if (m_scenegraphStepMode < 6)
+    {
+        stepGate = m_frameCounter & 1;
+    }
+
+    int index = 0;
+    for (COrder* order = m_orderSentinel.m_next;
+         order != &m_orderSentinel;
+         order = order->m_next, index++)
+    {
+        m_currentOrder = order;
+        m_currentOrderIndex = index;
+
+        unsigned int flags = *(unsigned int*)((unsigned char*)order->m_entry + 0x10);
+        unsigned int skip;
+        if ((flags & 1) == 0)
+        {
+            skip = stepGate;
+            if ((stepGate != 0) && (drawToggle != 0) && ((flags & 4) != 0))
+            {
+                skip = 0;
+            }
+        }
+        else
+        {
+            skip = (drawToggle == 0);
+        }
+
+        if (Game.game.m_gameWork.m_gamePaused == 0)
+        {
+            if ((flags & 0x10) != 0)
+            {
+                skip = 1;
+            }
+        }
+        else
+        {
+            if ((flags & 8) == 0)
+            {
+                skip = 1;
+            }
+            if ((flags & 0x10) != 0)
+            {
+                skip = 0;
+            }
+        }
+
+        if (skip == 0)
+        {
+            watch.Reset();
+            watch.Start();
+            if ((flags & 1) != 0)
+            {
+                Graphic.SetDrawDoneDebugData(-1);
+            }
+            __ptmf_scall(order->m_owner);
+            watch.Stop();
+            order->m_lastTime = watch.Get();
+
+            watch.Start();
+            if ((perfTrigger & 1) != 0)
+            {
+                Graphic._WaitDrawDone((char*)"system.cpp", 0x2CA);
+                GXReadGP0Metric();
+                GXReadGP1Metric();
+            }
+            watch.Stop();
+            if ((perfTrigger & 1) != 0)
+            {
+                order->m_lastTime = watch.Get();
+            }
+            watch.Get();
+        }
+        else
+        {
+            order->m_lastTime = 0.0f;
+        }
+    }
+
+    m_currentOrder = (COrder*)0;
+    m_frameCounter++;
 }
 
 /*

@@ -8,7 +8,7 @@ extern float FLOAT_80330ecc;
 struct _pppMngSt;
 extern struct _pppMngSt* pppMngStPtr;
 
-void pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
+extern "C" void pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
 
 /*
  * --INFO--

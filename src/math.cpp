@@ -704,12 +704,49 @@ void CMath::MakeSpline1Dtable(int count, float* x, float* y, float* outSecondDer
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001a62c
+ * PAL Size: 220b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMath::Spline1D(int, float, float*, float*, float*)
+float CMath::Spline1D(int lastIndex, float t, float* x, float* y, float* secondDerivatives)
 {
-	// TODO
+    float period = x[lastIndex] - x[0];
+
+    while (x[lastIndex] < t) {
+        t -= period;
+    }
+
+    while (t < x[0]) {
+        t += period;
+    }
+
+    int low = 0;
+    int high = lastIndex;
+    while (low < high) {
+        int mid = (low + high) / 2;
+        if (x[mid] < t) {
+            low = mid + 1;
+        }
+        else {
+            high = mid;
+        }
+    }
+
+    if (low > 0) {
+        low--;
+    }
+
+    float sd0 = secondDerivatives[low];
+    float dt = t - x[low];
+    float dx = x[low + 1] - x[low];
+
+    return dt * (dt * (0.5f * sd0 + (dt * (secondDerivatives[low + 1] - sd0)) / dx) -
+                 (dx * (0.33333334f * sd0 + secondDerivatives[low + 1]) -
+                  (y[low + 1] - y[low]) / dx)) +
+           y[low];
 }
 
 /*

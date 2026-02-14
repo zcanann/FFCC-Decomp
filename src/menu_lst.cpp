@@ -1,7 +1,28 @@
 #include "ffcc/menu_lst.h"
+#include "ffcc/fontman.h"
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
+#include "ffcc/system.h"
 #include <string.h>
+
+extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
+extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
+extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
+extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float, float, float, float, float, float, float, float, float);
+extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
+extern "C" void DrawCursor__8CMenuPcsFiif(CMenuPcs*, int, int, float);
+extern "C" void DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(CMenuPcs*, int, CFont*, int, int, GXColor, int, float, float);
+
+extern "C" void SetMargin__5CFontFf(float, CFont*);
+extern "C" void SetShadow__5CFontFi(CFont*, int);
+extern "C" void SetScale__5CFontFf(float, CFont*);
+extern "C" void DrawInit__5CFontFv(CFont*);
+extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
+extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
+extern "C" void SetPosX__5CFontFf(float, CFont*);
+extern "C" void SetPosY__5CFontFf(float, CFont*);
+extern "C" void Draw__5CFontFPc(CFont*, const char*);
+extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
 
 /*
  * --INFO--
@@ -264,12 +285,94 @@ int CMenuPcs::MLstClose()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8017474c
+ * PAL Size: 1436b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::MLstDraw()
 {
-	// TODO
+	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+
+	int menuState = *(int*)((char*)this + 0x82c);
+	int listBase = *(int*)((char*)this + 0x850);
+	short menuMode = *(short*)(menuState + 0x10);
+	short cursor = *(short*)(menuState + 0x26);
+	short* item = (short*)(listBase + 8);
+	int itemCount = **(short**)((char*)this + 0x850);
+
+	for (int i = 0; i < itemCount; i++) {
+		int tex = *(int*)(item + 0xe);
+		if (tex >= 0) {
+			float x = (float)item[0];
+			float y = (float)item[1];
+			float w = (float)item[2];
+			float h = (float)item[3];
+			float alpha = *(float*)(item + 8);
+
+			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
+			GXColor color = {0xff, 0xff, 0xff, (unsigned char)(255.0f * alpha)};
+			GXSetChanMatColor(GX_COLOR0A0, color);
+
+			float v = 0.0f;
+			if ((menuMode == 1) && (i == cursor)) {
+				x += 6.0f;
+				v += h;
+			}
+
+			DrawRect__8CMenuPcsFUlfffffffff(this, 0, x, y, w, h, 0.0f, v, *(float*)(item + 10), *(float*)(item + 10), 0.0f);
+
+			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x5c);
+			v = 0.0f;
+			if ((menuMode == 1) && (i == cursor)) {
+				v += h;
+			}
+			DrawRect__8CMenuPcsFUlfffffffff(this, 0, -((48.0f * 1.5f) - (float)item[0]), (float)item[1] - 6.0f, 48.0f, 48.0f, 0.0f, v, *(float*)(item + 10), *(float*)(item + 10), 0.0f);
+		}
+		item += 0x20;
+	}
+
+	CFont* font = *(CFont**)((char*)this + 0x108);
+	SetMargin__5CFontFf(1.0f, font);
+	SetShadow__5CFontFi(font, 0);
+	SetScale__5CFontFf(1.0f, font);
+	DrawInit__5CFontFv(font);
+
+	item = (short*)(listBase + 8);
+	for (int i = 0; i < itemCount; i++) {
+		GXColor color = {0xff, 0xff, 0xff, (unsigned char)(255.0f * *(float*)(item + 8))};
+		SetColor__5CFontF8_GXColor(font, &color);
+
+		const char* text = GetMenuStr__8CMenuPcsFi(this, i + 0x2e);
+		GetWidth__5CFontFPc(font, text);
+
+		float textX = (float)(item[0] + 0x28);
+		float textY = (float)(item[1] + 3);
+		if ((menuMode == 1) && (i == cursor)) {
+			textX += 6.0f;
+		}
+
+		SetPosX__5CFontFf(textX, font);
+		SetPosY__5CFontFf(textY, font);
+		Draw__5CFontFPc(font, text);
+
+		item += 0x20;
+	}
+
+	DrawInit__8CMenuPcsFv(this);
+	if (menuMode == 1) {
+		short* curItem = (short*)(listBase + cursor * 0x40 + 8);
+		int cursorY = (int)((float)curItem[1] + (((float)curItem[3] - 32.0f) * 1.5f));
+		int cursorX = (int)((float)curItem[0] - 56.0f + (float)(System.m_frameCounter & 7));
+		DrawCursor__8CMenuPcsFiif(this, cursorX, cursorY, 1.0f);
+	}
+
+	DrawInit__8CMenuPcsFv(this);
+	GXColor helpColor = {0xff, 0xff, 0xff, (unsigned char)(255.0f * *(float*)(listBase + 0x18))};
+	DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(this, cursor + 0x25c, font, 0, -20, helpColor, 0, 1.0f, 0.0f);
 }
 
 /*

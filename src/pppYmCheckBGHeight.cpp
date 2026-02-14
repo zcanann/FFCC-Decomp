@@ -30,7 +30,7 @@ struct CMapCylinderRaw
 extern "C" {
     int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(struct CMapMng*, CMapCylinder*, Vec*, unsigned int);
     void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
-    void* pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
+    void pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
 }
 
 /*
@@ -61,17 +61,17 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(struct pppYmCheckBGHeight* pp
     if (DAT_8032ed70 == 0) {
         _pppMngSt* pppMngSt = pppMngStPtr;
         int hitResult;
-        double currentY;
+        float currentY;
         CMapCylinderRaw cyl;
         Vec hitPos;
 
         cyl.m_direction.x = FLOAT_80330ed0;
         cyl.m_direction.y = FLOAT_80330ed4;
         cyl.m_direction.z = FLOAT_80330ed0;
-        currentY = (double)pppMngSt->m_matrix.value[1][3];
+        currentY = pppMngSt->m_matrix.value[1][3];
         cyl.m_bottom.x = pppMngSt->m_matrix.value[0][3];
         cyl.m_bottom.z = pppMngSt->m_matrix.value[2][3];
-        cyl.m_bottom.y = (float)(currentY + (double)param_2->m_unk0x4);
+        cyl.m_bottom.y = currentY + param_2->m_unk0x4;
         cyl.m_direction2.x = FLOAT_80330ed8;
         cyl.m_direction2.y = FLOAT_80330ed8;
         cyl.m_direction2.z = FLOAT_80330ed8;
@@ -85,18 +85,18 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(struct pppYmCheckBGHeight* pp
         hitResult = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, (CMapCylinder*)&cyl, &cyl.m_direction, 0xffffffff);
         if (hitResult != 0) {
             CalcHitPosition__7CMapObjFP3Vec(*(void**)((char*)&MapMng + 0x22A78), &hitPos);
-            if ((float)(currentY - (double)param_2->m_serializedDataOffsets) <= hitPos.y) {
-                currentY = (double)(hitPos.y + param_2->m_unk0x8);
+            if (currentY - param_2->m_serializedDataOffsets <= hitPos.y) {
+                currentY = hitPos.y + param_2->m_unk0x8;
             }
         }
-        pppMngSt->m_position.y = (float)currentY;
-        *((float*)pppMngSt + 0x17) = (float)currentY;
-        *((float*)pppMngSt + 0x1B) = (float)currentY;
-        *((float*)pppMngSt + 0x13) = (float)currentY;
+        pppMngSt->m_position.y = currentY;
+        *((float*)pppMngSt + 0x17) = currentY;
+        *((float*)pppMngSt + 0x1B) = currentY;
+        *((float*)pppMngSt + 0x13) = currentY;
         pppMngSt->m_matrix.value[0][3] = pppMngSt->m_position.x;
         pppMngSt->m_matrix.value[1][3] = pppMngSt->m_position.y;
         pppMngSt->m_matrix.value[2][3] = pppMngSt->m_position.z;
-        pppYmCheckBGHeight = (struct pppYmCheckBGHeight*)pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
+        pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
     }
     return pppYmCheckBGHeight;
 }

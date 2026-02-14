@@ -790,10 +790,37 @@ unsigned int CMath::Hsb2Rgb(int hue, int saturation, int brightness)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001a2f8
+ * PAL Size: 236b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMath::DstRot(float, float)
+float CMath::DstRot(float from, float to)
 {
-	// TODO
+    const double s0 = (double)(float)sin((double)from);
+    const double c0 = (double)(float)cos((double)from);
+    const double s1 = (double)(float)sin((double)to);
+    const double c1 = (double)(float)cos((double)to);
+
+    const double dot = (double)(float)(s0 * s1 + (double)(float)(c0 * c1));
+    double angle = 0.0;
+
+    if (angle != dot) {
+        angle = -1.0;
+        if (angle <= dot) {
+            angle = dot;
+            if (1.0 < dot) {
+                angle = 1.0;
+            }
+        }
+
+        angle = (double)(float)acos(angle);
+        if ((float)(s0 * c1 - (double)(float)(s1 * c0)) < 0.0f) {
+            angle = -angle;
+        }
+    }
+
+    return (float)angle;
 }

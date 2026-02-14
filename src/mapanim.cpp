@@ -578,11 +578,8 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
  */
 void CMapAnim::Calc(long frame)
 {
-    CPtrArray<CMapAnimNode*>* mapAnimNodes = reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this);
-    int count = mapAnimNodes->GetSize();
-
-    for (int i = 0; i < count; i++) {
-        CMapAnimNode* node = (*mapAnimNodes)[i];
+    for (int i = 0; i < reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this)->GetSize(); i++) {
+        CMapAnimNode* node = reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this)->m_items[i];
         node->Interp((int)frame);
     }
 }

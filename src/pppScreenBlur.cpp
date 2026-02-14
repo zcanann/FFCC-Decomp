@@ -1,8 +1,14 @@
 #include "ffcc/pppScreenBlur.h"
-#include "ffcc/graphic.h"
 #include "ffcc/pppPart.h"
 #include "global.h"
 #include <dolphin/gx.h>
+
+extern "C" {
+void InitBlurParameter__8CGraphicFv(void* graphic);
+void RenderBlur__8CGraphicFiUcUcUcUcs(void* graphic, int enable, u8 r, u8 g, u8 b, u8 strength, s16 work);
+}
+
+extern char Graphic[];
 
 typedef struct {
     u8 data[0x80];
@@ -40,7 +46,7 @@ void pppConScreenBlur(void* param1, void* param2)
     pppScreenBlurOffsets* offsets = (pppScreenBlurOffsets*)param2;
     s32 blurOffset = offsets->m_serializedDataOffsets[1] + 0x80;
 
-    Graphic.InitBlurParameter();
+    InitBlurParameter__8CGraphicFv(Graphic);
     blur->data[blurOffset] = 0;
 }
 
@@ -69,7 +75,7 @@ void pppCon2ScreenBlur(void)
  */
 void pppDesScreenBlur(void)
 {
-    Graphic.InitBlurParameter();
+    InitBlurParameter__8CGraphicFv(Graphic);
 }
 
 /*
@@ -109,8 +115,8 @@ void pppRenderScreenBlur(void* param1, void* param2, void* param3)
 
     blurParam->m_blurB = 0;
     blurMask = __cntlzw((u32)blur->data[blurActiveOffset]);
-    Graphic.RenderBlur(blurMask >> 5, blurParam->m_blurR, blurParam->m_blurG, blurParam->m_blurB,
-                       blur->data[blurValueOffset + 0x0B], blurParam->m_initWOrk);
+    RenderBlur__8CGraphicFiUcUcUcUcs(Graphic, blurMask >> 5, blurParam->m_blurR, blurParam->m_blurG,
+                                     blurParam->m_blurB, blur->data[blurValueOffset + 0x0B], blurParam->m_initWOrk);
     pppInitBlendMode();
     GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
     blur->data[blurActiveOffset] = 1;

@@ -3,7 +3,9 @@
 
 #include "ffcc/partMng.h"
 
-typedef _PARTICLE_DATA PRyjMegaBirth; // Size 0x140
+struct PRyjMegaBirth : _PARTICLE_DATA
+{
+}; // Size 0x140
 
 struct VRyjMegaBirth
 {

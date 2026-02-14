@@ -1,4 +1,6 @@
 #include "ffcc/pppYmMana.h"
+#include "ffcc/graphic.h"
+#include "ffcc/pppPart.h"
 
 /*
  * --INFO--
@@ -82,12 +84,20 @@ void pppFrameYmMana(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800d6908
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppRenderYmMana(void)
 {
-	// TODO
+    GXSetNumTevStages(1);
+    GXSetNumTexGens(1);
+    GXSetNumChans(1);
+    Graphic.SetViewport();
+    pppInitBlendMode();
 }
 
 /*

@@ -323,6 +323,7 @@ void deallocate_from_fixed_pools(__mem_pool_obj* pool_obj, void* ptr, unsigned l
  */
 static Block* link_new_block(__mem_pool_obj* pool_obj, unsigned long size) {
     Block* block;
+    Block* start;
     unsigned long aligned_size;
 
     aligned_size = (size + 0x1FUL) & 0xFFFFFFF8;
@@ -336,17 +337,17 @@ static Block* link_new_block(__mem_pool_obj* pool_obj, unsigned long size) {
     }
 
     Block_construct(block, aligned_size);
-    if (pool_obj->start_ == 0) {
-        pool_obj->start_ = block;
+    start = pool_obj->start_;
+    if (start == 0) {
         block->prev = block;
         block->next = block;
     } else {
-        block->prev = pool_obj->start_->prev;
+        block->prev = start->prev;
         block->prev->next = block;
-        block->next = pool_obj->start_;
+        block->next = start;
         block->next->prev = block;
-        pool_obj->start_ = block;
     }
+    pool_obj->start_ = block;
     return block;
 }
 

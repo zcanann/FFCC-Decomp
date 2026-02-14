@@ -95,27 +95,27 @@ void GXSetIndTexCoordScale(GXIndTexStageID ind_state, GXIndTexScale scale_s, GXI
 
     switch (ind_state) {
     case GX_INDTEXSTAGE0:
-        SET_REG_FIELD(253, __GXData->IndTexScale0, 4, 0, scale_s);
-        SET_REG_FIELD(254, __GXData->IndTexScale0, 4, 4, scale_t);
-        SET_REG_FIELD(254, __GXData->IndTexScale0, 8, 24, 0x25);
+        __GXData->IndTexScale0 = (__GXData->IndTexScale0 & 0xFFFFFFF0) | (u32)scale_s;
+        __GXData->IndTexScale0 = (__GXData->IndTexScale0 & 0xFFFFFF0F) | ((u32)scale_t << 4);
+        __GXData->IndTexScale0 = (__GXData->IndTexScale0 & 0x00FFFFFF) | 0x25000000;
         GX_WRITE_SOME_REG5(GX_LOAD_BP_REG, __GXData->IndTexScale0);
         break;
     case GX_INDTEXSTAGE1:
-        SET_REG_FIELD(259, __GXData->IndTexScale0, 4, 8, scale_s);
-        SET_REG_FIELD(260, __GXData->IndTexScale0, 4, 12, scale_t);
-        SET_REG_FIELD(260, __GXData->IndTexScale0, 8, 24, 0x25);
+        __GXData->IndTexScale0 = (__GXData->IndTexScale0 & 0xFFFFF0FF) | ((u32)scale_s << 8);
+        __GXData->IndTexScale0 = (__GXData->IndTexScale0 & 0xFFFF0FFF) | ((u32)scale_t << 12);
+        __GXData->IndTexScale0 = (__GXData->IndTexScale0 & 0x00FFFFFF) | 0x25000000;
         GX_WRITE_SOME_REG5(GX_LOAD_BP_REG, __GXData->IndTexScale0);
         break;
     case GX_INDTEXSTAGE2:
-        SET_REG_FIELD(265, __GXData->IndTexScale1, 4, 0, scale_s);
-        SET_REG_FIELD(266, __GXData->IndTexScale1, 4, 4, scale_t);
-        SET_REG_FIELD(266, __GXData->IndTexScale1, 8, 24, 0x26);
+        __GXData->IndTexScale1 = (__GXData->IndTexScale1 & 0xFFFFFFF0) | (u32)scale_s;
+        __GXData->IndTexScale1 = (__GXData->IndTexScale1 & 0xFFFFFF0F) | ((u32)scale_t << 4);
+        __GXData->IndTexScale1 = (__GXData->IndTexScale1 & 0x00FFFFFF) | 0x26000000;
         GX_WRITE_SOME_REG5(GX_LOAD_BP_REG, __GXData->IndTexScale1);
         break;
     case GX_INDTEXSTAGE3:
-        SET_REG_FIELD(0x10F, __GXData->IndTexScale1, 4, 8, scale_s);
-        SET_REG_FIELD(0x110, __GXData->IndTexScale1, 4, 12, scale_t);
-        SET_REG_FIELD(0x110, __GXData->IndTexScale1, 8, 24, 0x26);
+        __GXData->IndTexScale1 = (__GXData->IndTexScale1 & 0xFFFFF0FF) | ((u32)scale_s << 8);
+        __GXData->IndTexScale1 = (__GXData->IndTexScale1 & 0xFFFF0FFF) | ((u32)scale_t << 12);
+        __GXData->IndTexScale1 = (__GXData->IndTexScale1 & 0x00FFFFFF) | 0x26000000;
         GX_WRITE_SOME_REG5(GX_LOAD_BP_REG, __GXData->IndTexScale1);
         break;
     default:

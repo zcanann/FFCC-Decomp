@@ -7,8 +7,8 @@ extern unsigned int lbl_80210580[];
 extern unsigned int lbl_8021058C[];
 extern unsigned int lbl_80210598[];
 extern unsigned int lbl_802105A4[];
-extern unsigned int lbl_802105B0[];
-extern unsigned int lbl_8021072C;
+extern unsigned char lbl_802105B0[];
+extern unsigned int lbl_8021072C[];
 extern unsigned int lbl_8032EDE0;
 
 /*
@@ -22,33 +22,38 @@ extern unsigned int lbl_8032EDE0;
  */
 extern "C" void __sinit_p_sound_cpp(void)
 {
-    unsigned int a0 = lbl_80210580[0];
-    unsigned int a1 = lbl_80210580[1];
-    unsigned int a2 = lbl_80210580[2];
-    unsigned int b0 = lbl_8021058C[0];
-    unsigned int b1 = lbl_8021058C[1];
-    unsigned int b2 = lbl_8021058C[2];
-    unsigned int c0 = lbl_80210598[0];
-    unsigned int c1 = lbl_80210598[1];
-    unsigned int c2 = lbl_80210598[2];
-    unsigned int d0 = lbl_802105A4[0];
-    unsigned int d1 = lbl_802105A4[1];
-    unsigned int d2 = lbl_802105A4[2];
+    unsigned int* a = lbl_80210580;
+    unsigned int* b = lbl_8021058C;
+    unsigned int* table = (unsigned int*)lbl_802105B0;
+    unsigned int* c = lbl_80210598;
+    unsigned int* d = lbl_802105A4;
 
-    lbl_8032EDE0 = reinterpret_cast<unsigned int>(&lbl_8021072C);
+    unsigned int a1 = a[1];
+    unsigned int a2 = a[2];
+    unsigned int b0 = b[0];
+    unsigned int b1 = b[1];
+    unsigned int b2 = b[2];
+    unsigned int c0 = c[0];
+    unsigned int c1 = c[1];
+    unsigned int c2 = c[2];
+    unsigned int d0 = d[0];
+    unsigned int d1 = d[1];
+    unsigned int d2 = d[2];
+    unsigned int a0 = a[0];
 
-    lbl_802105B0[1] = a0;
-    lbl_802105B0[2] = a1;
-    lbl_802105B0[3] = a2;
-    lbl_802105B0[4] = b0;
-    lbl_802105B0[5] = b1;
-    lbl_802105B0[6] = b2;
-    lbl_802105B0[7] = c0;
-    lbl_802105B0[8] = c1;
-    lbl_802105B0[9] = c2;
-    lbl_802105B0[12] = d0;
-    lbl_802105B0[13] = d1;
-    lbl_802105B0[14] = d2;
+    lbl_8032EDE0 = (unsigned int)&lbl_8021072C;
+    table[1] = a0;
+    table[2] = a1;
+    table[3] = a2;
+    table[4] = b0;
+    table[5] = b1;
+    table[6] = b2;
+    table[7] = c0;
+    table[8] = c1;
+    table[9] = c2;
+    table[12] = d0;
+    table[13] = d1;
+    table[14] = d2;
 }
 
 /*
@@ -88,7 +93,7 @@ void CSoundPcs::Quit()
  */
 void* CSoundPcs::GetTable(unsigned long index)
 {
-    return reinterpret_cast<unsigned char*>(lbl_802105B0) + (index * 0x15C);
+    return lbl_802105B0 + (index * 0x15C);
 }
 
 /*

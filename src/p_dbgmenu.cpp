@@ -408,12 +408,150 @@ void CDbgMenuPcs::searchFreeCDM()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012bb0c
+ * PAL Size: 576b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CDbgMenuPcs::searchID(int, CDbgMenuPcs::CDM&)
+int CDbgMenuPcs::searchID(int id, CDbgMenuPcs::CDM& root)
 {
-	// TODO
+	int* next;
+	CDM* result;
+	CDM* node = &root;
+	do {
+		if (*(int*)((char*)node + 0x38) == id) {
+			return (int)node;
+		}
+		CDM* first = *(CDM**)((char*)node + 0x50);
+		CDM* cur1 = first;
+		if (first != 0) {
+			do {
+				result = cur1;
+				if (*(int*)((char*)cur1 + 0x38) == id) {
+					goto level1_done;
+				}
+				CDM* first2 = *(CDM**)((char*)cur1 + 0x50);
+				CDM* cur2 = first2;
+				if (first2 != 0) {
+					do {
+						result = cur2;
+						if (*(int*)((char*)cur2 + 0x38) == id) {
+							goto level2_done;
+						}
+						CDM* first3 = *(CDM**)((char*)cur2 + 0x50);
+						CDM* cur3 = first3;
+						if (first3 != 0) {
+							do {
+								result = cur3;
+								if (*(int*)((char*)cur3 + 0x38) == id) {
+									goto level3_done;
+								}
+								CDM* first4 = *(CDM**)((char*)cur3 + 0x50);
+								CDM* cur4 = first4;
+								if (first4 != 0) {
+									do {
+										result = cur4;
+										if (*(int*)((char*)cur4 + 0x38) == id) {
+											goto level4_done;
+										}
+										CDM* first5 = *(CDM**)((char*)cur4 + 0x50);
+										CDM* cur5 = first5;
+										if (first5 != 0) {
+											do {
+												result = cur5;
+												if (*(int*)((char*)cur5 + 0x38) == id) {
+													goto level5_done;
+												}
+												CDM* first6 = *(CDM**)((char*)cur5 + 0x50);
+												CDM* cur6 = first6;
+												if (first6 != 0) {
+													do {
+														result = cur6;
+														if (*(int*)((char*)cur6 + 0x38) == id) {
+															goto level6_done;
+														}
+														CDM* first7 = *(CDM**)((char*)cur6 + 0x50);
+														CDM* cur7 = first7;
+														if (first7 != 0) {
+															do {
+																result = cur7;
+																if ((*(int*)((char*)cur7 + 0x38) == id) ||
+																	((*(CDM**)((char*)cur7 + 0x50) != 0 &&
+																	  (result = (CDM*)searchID(
+																		  id, **(CDM**)((char*)cur7 + 0x50)),
+																	   result != 0)))) {
+																	goto level7_done;
+																}
+																next = (int*)((char*)cur7 + 0x48);
+																cur7 = (CDM*)*next;
+															} while ((CDM*)*next != first7);
+															result = 0;
+level7_done:
+															if (result != 0) {
+																goto level6_done;
+															}
+														}
+														next = (int*)((char*)cur6 + 0x48);
+														cur6 = (CDM*)*next;
+													} while ((CDM*)*next != first6);
+													result = 0;
+level6_done:
+													if (result != 0) {
+														goto level5_done;
+													}
+												}
+												next = (int*)((char*)cur5 + 0x48);
+												cur5 = (CDM*)*next;
+											} while ((CDM*)*next != first5);
+											result = 0;
+level5_done:
+											if (result != 0) {
+												goto level4_done;
+											}
+										}
+										next = (int*)((char*)cur4 + 0x48);
+										cur4 = (CDM*)*next;
+									} while ((CDM*)*next != first4);
+									result = 0;
+level4_done:
+									if (result != 0) {
+										goto level3_done;
+									}
+								}
+								next = (int*)((char*)cur3 + 0x48);
+								cur3 = (CDM*)*next;
+							} while ((CDM*)*next != first3);
+							result = 0;
+level3_done:
+							if (result != 0) {
+								goto level2_done;
+							}
+						}
+						next = (int*)((char*)cur2 + 0x48);
+						cur2 = (CDM*)*next;
+					} while ((CDM*)*next != first2);
+					result = 0;
+level2_done:
+					if (result != 0) {
+						goto level1_done;
+					}
+				}
+				next = (int*)((char*)cur1 + 0x48);
+				cur1 = (CDM*)*next;
+			} while ((CDM*)*next != first);
+			result = 0;
+level1_done:
+			if (result != 0) {
+				return (int)result;
+			}
+		}
+		node = *(CDM**)((char*)node + 0x48);
+		if (node == &root) {
+			return 0;
+		}
+	} while (1);
 }
 
 /*
@@ -438,12 +576,81 @@ void CDbgMenuPcs::CDMParam::operator= (const CDbgMenuPcs::CDMParam&)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012b710
+ * PAL Size: 432b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CDbgMenuPcs::Add(int, int, CDbgMenuPcs::CDMParam&)
+void CDbgMenuPcs::Add(int parentID, int id, CDbgMenuPcs::CDMParam& param)
 {
-	// TODO
+	int parent = searchID(parentID, *(CDM*)((char*)this + 8));
+	int freeIdx = 0;
+	int remaining = 0x80;
+	int cur = (int)this;
+	u32* menu;
+	do {
+		if ((s8)*(u8*)(cur + 0x90) >= 0) {
+			menu = (u32*)((char*)this + freeIdx * 0x54 + 0x5C);
+			goto found_slot;
+		}
+		cur += 0x54;
+		freeIdx++;
+		remaining--;
+	} while (remaining != 0);
+	menu = 0;
+
+found_slot:
+	memset(menu + 0xD, 0, 0x20);
+	*(u8*)(menu + 0xD) = (*(u8*)(menu + 0xD) & 0x7F) | 0x80;
+
+	u32* src = (u32*)&param;
+	menu[0] = src[0];
+	menu[1] = src[1];
+	menu[2] = src[2];
+	menu[3] = src[3];
+	menu[4] = src[4];
+	menu[5] = src[5];
+	menu[6] = src[6];
+	menu[7] = src[7];
+	menu[8] = src[8];
+	menu[9] = src[9];
+	menu[10] = src[10];
+	menu[11] = src[11];
+	menu[12] = src[12];
+
+	menu[0x13] = parent;
+	menu[0x11] = (u32)menu;
+	menu[0x12] = (u32)menu;
+	menu[0x0E] = id;
+
+	int child = *(int*)(parent + 0x50);
+	if (child == 0) {
+		*(u32**)(parent + 0x50) = menu;
+		if ((menu[1] & 1) != 0) {
+			*(u8*)(menu + 0xD) = (*(u8*)(menu + 0xD) & 0xBF) | 0x40;
+			*(u32**)((char*)this + 0x2A64) = menu;
+		}
+		if ((menu[1] & 2) != 0) {
+			*(u32**)((char*)this + 0x2A60) = menu;
+		}
+	} else {
+		bool found = false;
+		do {
+			if (!found && ((*(u32*)(child + 4) & 1) != 0)) {
+				found = true;
+				*(u8*)(child + 0x34) = (*(u8*)(child + 0x34) & 0xBF) | 0x40;
+				*(int*)((char*)this + 0x2A64) = child;
+			}
+			child = *(int*)(child + 0x48);
+		} while (child != *(int*)(parent + 0x50));
+
+		*(u32**)(*(int*)(child + 0x44) + 0x48) = menu;
+		menu[0x11] = *(u32*)(child + 0x44);
+		*(u32**)(child + 0x44) = menu;
+		menu[0x12] = child;
+	}
 }
 
 /*

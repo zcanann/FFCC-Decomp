@@ -1,10 +1,24 @@
 #include "ffcc/pppScreenQuake.h"
-#include "ffcc/p_camera.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppYmEnv.h"
 
 extern float lbl_80331FC8;
 extern int lbl_8032ED70;
+extern unsigned char CameraPcs[];
+
+extern "C" void SetQuakeParameter__10CCameraPcsFiissffffffi(
+    void*,
+    int,
+    int,
+    short,
+    short,
+    float,
+    float,
+    float,
+    float,
+    float,
+    float,
+    int);
 
 /*
  * --INFO--
@@ -68,7 +82,7 @@ void pppCon2ScreenQuake(pppScreenQuake *quake, UnkC *param2)
 void pppDesScreenQuake(void)
 {
 	float value = lbl_80331FC8;
-	CameraPcs.SetQuakeParameter(0, 0, 0, 0, value, value, value, value, value, value, 1);
+	SetQuakeParameter__10CCameraPcsFiissffffffi(&CameraPcs, 0, 0, 0, 0, value, value, value, value, value, value, 1);
 }
 
 /*
@@ -89,7 +103,19 @@ void pppFrameScreenQuake(pppScreenQuake *quake, UnkB *param2, UnkC *param3)
 		CalcGraphValue((_pppPObject *)&quake->field0_0x0, param2->m_graphId, value[3], value[4], value[5], param2->m_arg3, param2->m_initWOrk2, param2->m_stepValue2);
 		CalcGraphValue((_pppPObject *)&quake->field0_0x0, param2->m_graphId, value[6], value[7], value[8], param2->m_arg4, param2->m_initWOrk3, param2->m_stepValue3);
 
-		CameraPcs.SetQuakeParameter(1, 0, 0, 0, value[0], value[3], value[6], param2->m_quakeParam0, param2->m_quakeParam1, param2->m_quakeParam2, 1);
+		SetQuakeParameter__10CCameraPcsFiissffffffi(
+		    &CameraPcs,
+		    1,
+		    0,
+		    0,
+		    0,
+		    value[0],
+		    value[3],
+		    value[6],
+		    param2->m_quakeParam0,
+		    param2->m_quakeParam1,
+		    param2->m_quakeParam2,
+		    1);
 	}
 }
 

@@ -68,25 +68,17 @@ void CMapShadow::Init()
 	float fVar1;
 	float fVar2;
 	float fVar3;
-	double dVar5;
 	int iVar6;
 	u32 uVar7;
 	u32 uVar8;
-	union {
-		u64 bits;
-		double d;
-	} cvt;
 
 	iVar6 = (int)(((CPtrArray<CMaterial>*)((char*)&MapMng + 8))->operator[](*(u16*)((char*)this + 4)));
-	dVar5 = DOUBLE_8032fcf8;
 	iVar6 = *(int*)(iVar6 + 0x3c);
 	uVar8 = *(u32*)(iVar6 + 100);
 	uVar7 = *(u32*)(iVar6 + 0x68);
 	*((u8*)this + 7) = *(u8*)(iVar6 + 0x6c);
-	cvt.bits = 0x4330000000000000ULL | (u64)uVar8;
-	fVar1 = (float)(cvt.d - dVar5);
-	cvt.bits = 0x4330000000000000ULL | (u64)uVar7;
-	fVar2 = (float)(cvt.d - dVar5);
+	fVar1 = (float)((double)uVar8);
+	fVar2 = (float)((double)uVar7);
 	fVar3 = *(float*)((char*)this + 0xa8);
 	if (*(s8*)((char*)this + 6) == 0) {
 		C_MTXLightOrtho((MtxPtr)((char*)this + 0x48), -fVar2, fVar2, -fVar1, fVar1,

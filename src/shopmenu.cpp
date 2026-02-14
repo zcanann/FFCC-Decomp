@@ -1,4 +1,71 @@
 #include "ffcc/shopmenu.h"
+#include "ffcc/p_game.h"
+
+extern "C" {
+void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
+void _WaitDrawDone__8CGraphicFPci(void*, char*, int);
+void SetMode__9CShopMenuFi(void*, int);
+int LoadMenuPdt__8CPartPcsFPc(void*, char*);
+}
+
+extern char s_shopmenu_cpp_801ded8c[];
+extern char DAT_80332e54[];
+extern unsigned char MenuPcs[];
+extern unsigned char PartPcs[];
+extern void* Graphic;
+
+namespace {
+static inline CShopMenu** GetShopMenuPtr(CMenuPcs* menuPcs) {
+    return reinterpret_cast<CShopMenu**>(reinterpret_cast<unsigned char*>(menuPcs) + 0x878);
+}
+
+static void CreateShopMenuCommon(CMenuPcs* menuPcs, int mode, int line) {
+    void* stage = *reinterpret_cast<void**>(MenuPcs + 0xEC);
+    if (Game.game.m_gameWork.m_menuStageMode != 0) {
+        stage = *reinterpret_cast<void**>(MenuPcs + 0xF4);
+    }
+
+    CShopMenu* shopMenu = static_cast<CShopMenu*>(__nw__FUlPQ27CMemory6CStagePci(
+        0x158, stage, s_shopmenu_cpp_801ded8c, line));
+    *GetShopMenuPtr(menuPcs) = shopMenu;
+    shopMenu = *GetShopMenuPtr(menuPcs);
+
+    _WaitDrawDone__8CGraphicFPci(&Graphic, s_shopmenu_cpp_801ded8c, 0x2FE);
+    *reinterpret_cast<void**>(shopMenu) = 0;
+    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x20) = Game.game.m_scriptFoodBase[0];
+    SetMode__9CShopMenuFi(shopMenu, mode);
+    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(shopMenu) + 0x18) =
+        LoadMenuPdt__8CPartPcsFPc(PartPcs, DAT_80332e54);
+}
+} // namespace
+
+/*
+ * --INFO--
+ * PAL Address: 0x801589d0
+ * PAL Size: 292b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::CreateShopMenu()
+{
+	CreateShopMenuCommon(this, 0, 0x2E2);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801588ac
+ * PAL Size: 292b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMenuPcs::CreateSmithMenu()
+{
+	CreateShopMenuCommon(this, 9, 0x2E9);
+}
 
 /*
  * --INFO--

@@ -19,6 +19,7 @@ extern u8* lbl_8032ED50;
 void pppConstructCallBackDistance(pppCallBackDistance* param1, UnkC* param2)
 {
     u8* pppMngSt;
+    u8* objPosBase;
     Vec local_1c;
     Vec local_28;
     s32 dataOffset;
@@ -26,10 +27,11 @@ void pppConstructCallBackDistance(pppCallBackDistance* param1, UnkC* param2)
 
     pppMngSt = lbl_8032ED50;
     dataOffset = *param2->m_serializedDataOffsets;
-    distancePtr = (f32*)((u8*)param1 + dataOffset + 0x8);
-    local_28.x = *(f32*)(pppMngSt + 0x84);
-    local_28.y = *(f32*)(pppMngSt + 0x94);
-    local_28.z = *(f32*)(pppMngSt + 0xA4);
+    distancePtr = (f32*)((u8*)param1 + dataOffset + 0x80);
+    objPosBase = *(u8**)(pppMngSt + 0xDC);
+    local_28.x = *(f32*)(objPosBase + 0x15C);
+    local_28.y = *(f32*)(objPosBase + 0x160);
+    local_28.z = *(f32*)(objPosBase + 0x164);
     local_1c.x = *(f32*)(pppMngSt + 0x68);
     local_1c.y = *(f32*)(pppMngSt + 0x6C);
     local_1c.z = *(f32*)(pppMngSt + 0x70);
@@ -61,34 +63,31 @@ void pppDestructCallBackDistance(void)
 void pppFrameCallBackDistance(pppCallBackDistance* param1, UnkB* param2, UnkC* param3)
 {
     u8* pppMngSt;
-    s32 dataOffset;
+    s32 valueOffset;
+    s32 partIndex;
     s32 graphFrame;
-    u32 graphId;
     f32 distance;
     Vec local_1c;
     Vec local_28;
 
     pppMngSt = lbl_8032ED50;
     local_1c.x = *(f32*)(pppMngSt + 0x84);
-    dataOffset = *param3->m_serializedDataOffsets;
+    valueOffset = *param3->m_serializedDataOffsets + 0x80;
     local_1c.y = *(f32*)(pppMngSt + 0x94);
     local_1c.z = *(f32*)(pppMngSt + 0xA4);
     distance = PSVECDistance(&local_1c, (Vec*)(pppMngSt + 0x68));
 
     if ((distance <= param2->m_dataValIndex) ||
-        (*(f32*)((u8*)param1 + dataOffset + 0x8) <= distance)) {
+        (*(f32*)((u8*)param1 + valueOffset) <= distance)) {
+        pppMngSt = lbl_8032ED50;
         local_28.x = *(f32*)(pppMngSt + 0x84);
         local_28.y = *(f32*)(pppMngSt + 0x94);
         local_28.z = *(f32*)(pppMngSt + 0xA4);
         PSMTXMultVec(ppvWorldMatrix, &local_28, &local_28);
 
-        graphId = *(u32*)&param1->field0_0x0;
-        graphFrame = (s32)graphId >> 12;
-        if ((s32)graphId < 0 && (graphId & 0xFFF) != 0) {
-            graphFrame += 1;
-        }
-        dataOffset = ((s32)((u8*)pppMngSt - ((u8*)&PartMng + 0x2A18))) / 0x158;
-        Game.game.ParticleFrameCallback(dataOffset, (s32)*(s16*)(pppMngSt + 0x74),
+        partIndex = ((s32)((u8*)pppMngSt - ((u8*)&PartMng + 0x2A18))) / 0x158;
+        graphFrame = *(s32*)((u8*)param1 + 0xC) / 0x1000;
+        Game.game.ParticleFrameCallback(partIndex, (s32)*(s16*)(pppMngSt + 0x74),
                                         (s32)*(s16*)(pppMngSt + 0x76),
                                         (s32)*(s16*)&param2->m_initWOrk, graphFrame,
                                         &local_28);

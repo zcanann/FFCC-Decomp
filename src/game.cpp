@@ -21,11 +21,17 @@ void Quit__18CMaterialEditorPcsFv(void*);
 void Quit__14CFunnyShapePcsFv(void*);
 void Quit__11CGraphicPcsFv(void*);
 void Quit__10CCameraPcsFv(void*);
+void createLoad__9CSoundPcsFv(void*);
+void createLoad__9CCharaPcsFv(void*);
+void createLoad__8CPartPcsFv(void*);
+void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 unsigned char CFlat[];
 unsigned char McPcs[];
 unsigned char GbaPcs[];
 unsigned char MenuPcs[];
 unsigned char USBPcs[];
+unsigned char SoundPcs[];
+unsigned char PartPcs[];
 unsigned char Chara[];
 unsigned char LightPcs[];
 unsigned char MapPcs[];
@@ -33,6 +39,7 @@ unsigned char MaterialEditorPcs[];
 unsigned char FunnyShapePcs[];
 unsigned char GraphicsPcs[];
 unsigned char CameraPcs[];
+extern const char DAT_801d61dc[];
 }
 
 static const float FLOAT_8032f688 = 1.0E+10;
@@ -113,7 +120,15 @@ void CGame::Quit()
  */
 void CGame::LoadLogoWaitingData()
 {
-	// TODO
+	if (m_assetsLoadedFlag == 0) {
+		createLoad__9CSoundPcsFv(SoundPcs);
+		createLoad__9CCharaPcsFv(&CharaPcs);
+		createLoad__8CPartPcsFv(&PartPcs);
+		m_assetsLoadedFlag = 1;
+		if (System.m_execParam > 2) {
+			Printf__7CSystemFPce(&System, DAT_801d61dc);
+		}
+	}
 }
 
 /*

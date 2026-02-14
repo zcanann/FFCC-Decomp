@@ -5,6 +5,7 @@
 
 extern CMath math;
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
+extern float lbl_80330F70;
 
 struct UnkC {
     unsigned char _pad[0xC];
@@ -218,22 +219,24 @@ extern "C" void pppConstructBreathModel(pppBreathModel* pppBreathModel, UnkC* pa
 {
     Mtx* work = (Mtx*)((unsigned char*)pppBreathModel + 0x80 + *param_2->m_serializedDataOffsets);
     unsigned char* state = (unsigned char*)work;
+    float fVar1;
 
     PSMTXIdentity(*work);
+    fVar1 = lbl_80330F70;
 
-    work[1][2][0] = 0.0f;
-    work[1][1][3] = 0.0f;
-    work[1][1][2] = 0.0f;
-    work[1][0][0] = 0.0f;
-    work[1][0][1] = 0.0f;
-    work[1][0][2] = 0.0f;
-    work[1][0][3] = 0.0f;
-    work[1][1][0] = 0.0f;
+    work[1][2][0] = lbl_80330F70;
+    work[1][1][3] = fVar1;
+    work[1][1][2] = fVar1;
+    work[1][0][0] = fVar1;
+    work[1][0][1] = fVar1;
+    work[1][0][2] = fVar1;
+    work[1][0][3] = fVar1;
+    work[1][1][0] = fVar1;
 
     *(short*)(state + 0x46) = 10000;
     *(short*)(state + 0x4A) = 0;
     *(short*)(state + 0x4E) = 0;
-    *(state + 0x50) = 0;
+    *(unsigned char*)(state + 0x50) = 0;
 }
 
 /*
@@ -291,9 +294,34 @@ extern "C" void pppDestructBreathModel(pppBreathModel* pppBreathModel, UnkC* par
  * Address:	TODO
  * Size:	TODO
  */
-void IsDeadGroupBreath(PBreathModel*, VBreathModel*, short)
+void IsDeadGroupBreath(PBreathModel* pBreathModel, VBreathModel* vBreathModel, short groupIndex)
 {
-	// TODO
+    int i;
+    int groupTable = *(int*)((unsigned char*)vBreathModel + 0x3C) + (int)groupIndex * 0x5C;
+    bool isDead = true;
+    float zero = lbl_80330F70;
+    int* groupData = (int*)groupTable;
+
+    for (i = 0; i < *(unsigned short*)((unsigned char*)pBreathModel + 0x10); i++) {
+        if ((*(signed char*)(groupData[1] + i) != -1) || (*(signed char*)(groupData[2] + i) != 1)) {
+            isDead = false;
+            break;
+        }
+    }
+
+    if (isDead) {
+        for (i = 0; i < *(unsigned short*)((unsigned char*)pBreathModel + 0x10); i++) {
+            *(unsigned char*)(groupData[2] + i) = 0xFF;
+            groupData[3] = (int)zero;
+            groupData[4] = (int)zero;
+            groupData[5] = (int)zero;
+            groupData[6] = (int)zero;
+            groupData[7] = (int)zero;
+            groupData[8] = (int)zero;
+            groupData[9] = (int)zero;
+        }
+        groupData[0] = 0;
+    }
 }
 
 /*
@@ -301,9 +329,25 @@ void IsDeadGroupBreath(PBreathModel*, VBreathModel*, short)
  * Address:	TODO
  * Size:	TODO
  */
-void SearchIndex(PBreathModel*, VBreathModel*, short&, short&, short)
+void SearchIndex(PBreathModel* pBreathModel, VBreathModel* vBreathModel, short& slotIndex, short& groupIndex, short particleIndex)
 {
-	// TODO
+    int groupTable = *(int*)((unsigned char*)vBreathModel + 0x3C);
+    short g;
+    short s;
+
+    for (g = 0; g < *(unsigned short*)((unsigned char*)pBreathModel + 0x12); g++) {
+        for (s = 0; s < *(unsigned short*)((unsigned char*)pBreathModel + 0x10); s++) {
+            if ((int)particleIndex == (int)*(signed char*)(*(int*)(groupTable + 4) + s)) {
+                slotIndex = s;
+                groupIndex = g;
+                return;
+            }
+        }
+        groupTable += 0x5C;
+    }
+
+    slotIndex = -1;
+    groupIndex = -1;
 }
 
 /*
@@ -311,7 +355,15 @@ void SearchIndex(PBreathModel*, VBreathModel*, short&, short&, short)
  * Address:	TODO
  * Size:	TODO
  */
-void IsExistGroupParticle(PBreathModel*, VBreathModel*, short)
+void IsExistGroupParticle(PBreathModel* pBreathModel, VBreathModel* vBreathModel, short particleIndex)
 {
-	// TODO
+    short slotIndex;
+    short groupIndex;
+    int* groupArray;
+
+    SearchIndex(pBreathModel, vBreathModel, slotIndex, groupIndex, particleIndex);
+    if (groupIndex != -1) {
+        groupArray = *(int**)((unsigned char*)vBreathModel + 0x3C);
+        *(unsigned char*)(groupArray[groupIndex * 0x17 + 1] + slotIndex) = 0xFF;
+    }
 }

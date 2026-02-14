@@ -1,6 +1,13 @@
 #include "ffcc/pppYmMegaBirthShpTail3.h"
 #include "ffcc/pppPart.h"
 #include "dolphin/mtx.h"
+#include <string.h>
+
+extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
+extern "C" void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
+extern int rand();
+extern float FLOAT_803305a4;
+extern pppFMATRIX MatUnit3;
 
 /*
  * --INFO--
@@ -41,10 +48,31 @@ void alloc_check(VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppConstructYmMegaBirthShpTail3(void)
+void pppConstructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTail3_, UnkC* param_2)
 {
-    // Matrix initialization and setup based on Ghidra decomp
-    // TODO: Need proper structure access pattern
+    pppFMATRIX* work = (pppFMATRIX*)((u8*)pppYmMegaBirthShpTail3_ + 8 + param_2->m_serializedDataOffsets[2]);
+    float initVal;
+
+    pppUnitMatrix__FR10pppFMATRIX(work);
+    initVal = FLOAT_803305a4;
+    work[1].value[0][2] = FLOAT_803305a4;
+    work[1].value[0][1] = initVal;
+    work[1].value[0][0] = initVal;
+    work[1].value[0][3] = 0.0f;
+    work[1].value[1][0] = 0.0f;
+    work[1].value[1][1] = 0.0f;
+    work[1].value[1][2] = 0.0f;
+    *(u16*)(work[1].value[1] + 3) = 0;
+    *(u16*)((u8*)work[1].value[1] + 0xe) = 0;
+    *(u16*)(work[1].value[1] + 3) = 10000;
+    *(u16*)work[2].value[2] = (u16)rand();
+    pppUnitMatrix__FR10pppFMATRIX(&MatUnit3);
+    memset(work[1].value + 2, 0, 8);
+    memset(work[1].value[2] + 2, 0, 8);
+    memset(work + 2, 0, 8);
+    memset(work[2].value[0] + 2, 0, 8);
+    memset(work[2].value + 1, 0, 8);
+    memset(work[2].value[1] + 2, 0, 8);
 }
 
 /*
@@ -52,9 +80,25 @@ extern "C" void pppConstructYmMegaBirthShpTail3(void)
  * Address:	TODO
  * Size:	TODO
  */
-void pppDestructYmMegaBirthShpTail3(void)
+void pppDestructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTail3_, UnkC* param_2)
 {
-	// TODO
+    int offset = param_2->m_serializedDataOffsets[2];
+    void** ptrBc = (void**)((u8*)&pppYmMegaBirthShpTail3_->field_0xbc + offset);
+    void** ptrC0 = (void**)((u8*)&pppYmMegaBirthShpTail3_->field_0xc0 + offset);
+    void** ptrC4 = (void**)((u8*)&pppYmMegaBirthShpTail3_->field_0xc4 + offset);
+
+    if (*ptrBc != 0) {
+        pppHeapUseRate__FPQ27CMemory6CStage(*ptrBc);
+        *ptrBc = 0;
+    }
+    if (*ptrC0 != 0) {
+        pppHeapUseRate__FPQ27CMemory6CStage(*ptrC0);
+        *ptrC0 = 0;
+    }
+    if (*ptrC4 != 0) {
+        pppHeapUseRate__FPQ27CMemory6CStage(*ptrC4);
+        *ptrC4 = 0;
+    }
 }
 
 /*
@@ -179,7 +223,7 @@ void calc_particle(_pppPObject*, VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, V
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppFrameYmMegaBirthShpTail3(void)
+void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, UnkC*)
 {
     // Particle frame processing
     // TODO: Implement frame update logic
@@ -190,7 +234,7 @@ extern "C" void pppFrameYmMegaBirthShpTail3(void)
  * Address:	TODO
  * Size:	TODO
  */
-void pppRenderYmMegaBirthShpTail3(void)
+void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3*, UnkB*, UnkC*)
 {
 	// TODO
 }

@@ -16,8 +16,8 @@
 CPad Pad;
 
 void* operator new[](unsigned long, CMemory::CStage*, char*, int);
-extern void* __vt__8CManager;
-extern void* lbl_801E8864;
+extern "C" char __vt__8CManager[];
+extern "C" char lbl_801E8864[];
 
 /*
  * --INFO--
@@ -30,9 +30,9 @@ extern void* lbl_801E8864;
  */
 extern "C" void __sinit_pad_cpp()
 {
-	volatile void** base = (volatile void**)&Pad;
-	*base = &__vt__8CManager;
-	*base = &lbl_801E8864;
+	void* vtbl = __vt__8CManager;
+	*reinterpret_cast<void**>(&Pad) = vtbl;
+	*reinterpret_cast<void**>(&Pad) = lbl_801E8864;
 	Pad._1b4_4_ = 0;
 	Pad._1b8_4_ = 0;
 }
@@ -118,7 +118,7 @@ void CPad::Quit()
 	void* replayBuf = *reinterpret_cast<void**>(base + 0x1B0);
 	if (replayBuf != nullptr)
 	{
-		operator delete(replayBuf);
+		operator delete[](replayBuf);
 		*reinterpret_cast<void**>(base + 0x1B0) = nullptr;
 	}
 

@@ -46,7 +46,6 @@ struct pppAlignmentScale* pppFrameAlignmentScale(struct pppAlignmentScale* align
 {
     float scale;
     float distanceScale;
-    double distance;
     float zero;
     struct _pppMngSt* pppMngSt;
     Vec cameraPos;
@@ -63,8 +62,7 @@ struct pppAlignmentScale* pppFrameAlignmentScale(struct pppAlignmentScale* align
         objPos.y = pppMngStPtr->m_matrix.value[1][3];
         objPos.z = pppMngStPtr->m_matrix.value[2][3];
 
-        distance = (double)PSVECDistance(&cameraPos, &objPos);
-        distanceScale = (float)(distance / (double)data->m_unk0x4);
+        distanceScale = PSVECDistance(&cameraPos, &objPos) / data->m_unk0x4;
         scale = FLOAT_80331920;
         if (distanceScale > FLOAT_80331920) {
             scale = (distanceScale - FLOAT_80331920) * data->m_unk0x8 + FLOAT_80331920;

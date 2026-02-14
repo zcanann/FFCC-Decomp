@@ -218,8 +218,7 @@ extern "C" __partial_array_destructor* dtor_801AFA6C(__partial_array_destructor*
  */
 extern "C" void* __construct_new_array(void* ptr, ConstructorDestructor ctor, ConstructorDestructor dtor, size_t elementSize, size_t count)
 {
-	void* current;
-	size_t i;
+	char* current;
 
 	if (ptr != nullptr) {
 		((size_t*)ptr)[0] = elementSize;
@@ -227,19 +226,15 @@ extern "C" void* __construct_new_array(void* ptr, ConstructorDestructor ctor, Co
 		ptr = (char*)ptr + ARRAY_HEADER_SIZE;
 
 		if (ctor != nullptr) {
-			current = ptr;
-			for (i = 0; i < count; i = i + 1) {
-				CTORCALL_COMPLETE(ctor, current);
-				current = (char*)current + elementSize;
-			}
+			__partial_array_destructor pdestructor(ptr, elementSize, count, dtor);
 
-			if ((i < count) && (dtor != nullptr)) {
-				current = (char*)ptr + elementSize * i;
-				for (; i != 0; i = i - 1) {
-					current = (char*)current - elementSize;
-					DTORCALL_COMPLETE(dtor, current);
-				}
+			current = (char*)ptr;
+			pdestructor.i = 0;
+			for (; pdestructor.i < count; pdestructor.i = pdestructor.i + 1) {
+				CTORCALL_COMPLETE(ctor, current);
+				current = current + elementSize;
 			}
+			pdestructor.i = count;
 		}
 	}
 
@@ -257,21 +252,17 @@ extern "C" void* __construct_new_array(void* ptr, ConstructorDestructor ctor, Co
  */
 extern "C" void __construct_array(void* ptr, ConstructorDestructor ctor, ConstructorDestructor dtor, size_t size, size_t n)
 {
-	void* current;
-	size_t i;
+	if (ctor != nullptr) {
+		__partial_array_destructor pdestructor(ptr, size, n, dtor);
+		char* current;
 
-	current = ptr;
-	for (i = 0; i < n; i = i + 1) {
-		CTORCALL_COMPLETE(ctor, current);
-		current = (char*)current + size;
-	}
-
-	if ((i < n) && (dtor != nullptr)) {
-		current = (char*)ptr + size * i;
-		for (; i != 0; i = i - 1) {
-			current = (char*)current - size;
-			DTORCALL_COMPLETE(dtor, current);
+		current = (char*)ptr;
+		pdestructor.i = 0;
+		for (; pdestructor.i < n; pdestructor.i = pdestructor.i + 1) {
+			CTORCALL_COMPLETE(ctor, current);
+			current = current + size;
 		}
+		pdestructor.i = n;
 	}
 }
 

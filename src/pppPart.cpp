@@ -5,6 +5,8 @@
 #include "ffcc/memory.h"
 #include "ffcc/sound.h"
 #include "ffcc/p_camera.h"
+#include "ffcc/graphic.h"
+#include "ffcc/p_light.h"
 #include "ffcc/pppGetRotMatrixXYZ.h"
 #include "ffcc/pppGetRotMatrixXZY.h"
 #include "ffcc/pppGetRotMatrixYXZ.h"
@@ -18,7 +20,23 @@ static const double kScaleConstA = 4503601774854144.0; // DOUBLE_803304b0
 static const float kScaleConstB = 0.017453292f; // FLOAT_803304a8
 extern "C" unsigned char lbl_8032ED85;
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
+extern "C" unsigned char MaterialMan[];
+extern "C" float ppvScreenMatrix[4][4];
+extern "C" float FLOAT_8032ed60;
+extern "C" float FLOAT_8032ed8c;
+extern "C" double DOUBLE_8032fdf0;
+extern "C" float FLOAT_8032fdf8;
+extern "C" unsigned int DAT_8032fdd8;
+extern "C" unsigned char DAT_8032ed84;
+extern "C" unsigned char DAT_8032ed86;
+extern "C" unsigned char DAT_8032ed87;
+extern "C" unsigned char DAT_8032ed88;
+extern "C" unsigned char DAT_8032ed89;
+extern "C" unsigned char DAT_8032ed8a;
+extern "C" unsigned char DAT_8032ed8b;
+extern "C" void SetPart__9CLightPcsFQ29CLightPcs6TARGETPvUc(CLightPcs*, int, void*, unsigned char);
 extern CPartMng PartMng;
+extern CLightPcs LightPcs;
 
 /*
  * --INFO--
@@ -1442,22 +1460,121 @@ void pppSetBlendMode(unsigned char)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 800543f8
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppClearDrawEnv()
 {
-	// TODO
+	if (kPppZero != FLOAT_8032ed8c) {
+		FLOAT_8032ed8c = kPppZero;
+		ppvScreenMatrix[2][3] = FLOAT_8032ed60;
+		GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 80054108
+ * PAL Size: 752b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppSetDrawEnv(pppCVECTOR*, pppFMATRIX*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char)
+void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsigned char lightTarget, unsigned char fogIndex, unsigned char fogParam, unsigned char cullMode, unsigned char zEnable, unsigned char colorUpdate, unsigned char zWrite)
 {
-	// TODO
+	double depthOffset = (double)depth;
+	if (DOUBLE_8032fdf0 != depthOffset) {
+		float sortDepth = *(float*)((u8*)pppMngStPtr + 0x114);
+		depthOffset = (double)((float)(depthOffset * (double)FLOAT_8032fdf8) / -sortDepth);
+	}
+
+	if ((double)FLOAT_8032ed8c != depthOffset) {
+		FLOAT_8032ed8c = (float)depthOffset;
+		ppvScreenMatrix[2][3] = FLOAT_8032ed60 + (float)depthOffset;
+		GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
+	}
+
+	*(u32*)(MaterialMan + 0x48) = 0x000ACE0F;
+	*(u32*)(MaterialMan + 0x44) = 0xFFFFFFFF;
+	*(u8*)(MaterialMan + 0x4C) = 0xFF;
+	*(u32*)(MaterialMan + 0x11C) = 0;
+	*(u32*)(MaterialMan + 0x120) = 0x1E;
+	*(u32*)(MaterialMan + 0x124) = 0;
+	*(u8*)(MaterialMan + 0x205) = 0xFF;
+	*(u8*)(MaterialMan + 0x206) = 0xFF;
+	*(u32*)(MaterialMan + 0x58) = 0;
+	*(u32*)(MaterialMan + 0x5C) = 0;
+	*(u8*)(MaterialMan + 0x208) = 0;
+	*(u32*)(MaterialMan + 0x128) = 0;
+	*(u32*)(MaterialMan + 0x12C) = 0x1E;
+	*(u32*)(MaterialMan + 0x130) = 0;
+	*(u32*)(MaterialMan + 0x40) = 0x000ACE0F;
+
+	if (DAT_8032ed84 != lightTarget) {
+		DAT_8032ed84 = lightTarget;
+		SetPart__9CLightPcsFQ29CLightPcs6TARGETPvUc(&LightPcs, 2, pppMngStPtr, lightTarget);
+	}
+
+	if (pppMtx != 0) {
+		GXLoadPosMtxImm(pppMtx->value, GX_PNMTX0);
+		if (lightTarget != 0) {
+			Mtx nrmMtx;
+			nrmMtx[0][0] = pppMtx->value[0][0];
+			nrmMtx[1][0] = pppMtx->value[1][0];
+			nrmMtx[2][0] = pppMtx->value[2][0];
+			nrmMtx[0][1] = pppMtx->value[0][1];
+			nrmMtx[1][1] = pppMtx->value[1][1];
+			nrmMtx[2][1] = pppMtx->value[2][1];
+			nrmMtx[0][2] = pppMtx->value[0][2];
+			nrmMtx[1][2] = pppMtx->value[1][2];
+			nrmMtx[2][2] = pppMtx->value[2][2];
+			nrmMtx[0][3] = kPppZero;
+			nrmMtx[1][3] = kPppZero;
+			nrmMtx[2][3] = kPppZero;
+			GXLoadNrmMtxImm(nrmMtx, GX_PNMTX0);
+		}
+	}
+
+	_GXColor fixedColor;
+	*(u32*)&fixedColor = DAT_8032fdd8;
+	if (lightTarget < 2) {
+		if (pppColor != 0) {
+			GXSetChanAmbColor(GX_COLOR0A0, *(_GXColor*)pppColor->rgba);
+		}
+		GXSetChanMatColor(GX_COLOR0A0, fixedColor);
+	} else {
+		if (pppColor != 0) {
+			GXSetChanMatColor(GX_COLOR0A0, *(_GXColor*)pppColor->rgba);
+		}
+		GXSetChanAmbColor(GX_COLOR0A0, fixedColor);
+	}
+
+	if ((DAT_8032ed86 != fogIndex) || (DAT_8032ed87 != fogParam)) {
+		DAT_8032ed86 = fogIndex;
+		DAT_8032ed87 = fogParam;
+		Graphic.SetFog((int)fogIndex, fogParam != 0);
+	}
+
+	if (DAT_8032ed88 != cullMode) {
+		DAT_8032ed88 = cullMode;
+		GXSetCullMode((GXCullMode)cullMode);
+	}
+
+	if ((DAT_8032ed89 != zEnable) || (DAT_8032ed8b != zWrite)) {
+		DAT_8032ed8b = zWrite;
+		DAT_8032ed89 = zEnable;
+		GXSetZMode((GXBool)zEnable, GX_LEQUAL, (GXBool)zWrite);
+	}
+
+	if (DAT_8032ed8a != colorUpdate) {
+		DAT_8032ed8a = colorUpdate;
+		GXSetColorUpdate((GXBool)colorUpdate);
+	}
 }
 
 /*

@@ -634,12 +634,68 @@ void CMath::Line1D(int, float, float*, float*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001a3e4
+ * PAL Size: 412b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMath::Hsb2Rgb(int, int, int)
+unsigned int CMath::Hsb2Rgb(int hue, int saturation, int brightness)
 {
-	// TODO
+    int sat = (saturation * 0xFF) / 100;
+    int val = (brightness * 0xFF) / 100;
+
+    if (sat < 0) {
+        sat = -sat;
+    }
+    if (val < 0) {
+        val = -val;
+    }
+
+    unsigned char v = (unsigned char)val;
+    unsigned int rgba;
+    if (sat == 0) {
+        rgba = ((unsigned int)v << 24) | ((unsigned int)v << 16) | ((unsigned int)v << 8);
+    }
+    else {
+        int m = ((0xFF - sat) * val) / 0xFF;
+        int sector = hue / 60;
+        int fraction = (hue - (sector * 60)) * (val - m);
+        int x = fraction / 60;
+
+        unsigned char lo = (unsigned char)m;
+        unsigned char hi = (unsigned char)val;
+        unsigned char midUp = (unsigned char)(m + x);
+        unsigned char midDown = (unsigned char)(val - x);
+
+        if (hue < 60) {
+            rgba = ((unsigned int)midUp << 24) | ((unsigned int)lo << 16) | ((unsigned int)lo << 8);
+        }
+        else if (hue < 120) {
+            rgba = ((unsigned int)hi << 24) | ((unsigned int)lo << 16) | ((unsigned int)midDown << 8);
+        }
+        else if (hue < 180) {
+            rgba = ((unsigned int)hi << 16) | ((unsigned int)midUp << 8) | (unsigned int)lo;
+            rgba <<= 8;
+        }
+        else if (hue < 240) {
+            rgba = ((unsigned int)midDown << 16) | ((unsigned int)hi << 8) | (unsigned int)lo;
+            rgba <<= 8;
+        }
+        else if (hue < 300) {
+            rgba = ((unsigned int)lo << 16) | ((unsigned int)hi << 8) | (unsigned int)midUp;
+            rgba <<= 8;
+        }
+        else if (hue < 360) {
+            rgba = ((unsigned int)lo << 24) | ((unsigned int)midDown << 16) | ((unsigned int)hi << 8);
+        }
+        else {
+            rgba = 0;
+        }
+    }
+
+    return rgba | 0xFF;
 }
 
 /*

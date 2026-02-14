@@ -47,7 +47,7 @@ public:
     void MakeSpline1Dtable(int, float*, float*, float*);
     void Spline1D(int, float, float*, float*, float*);
     void Line1D(int, float, float*, float*);
-    void Hsb2Rgb(int, int, int);
+    unsigned int Hsb2Rgb(int, int, int);
     void DstRot(float, float);
 };
 

@@ -262,22 +262,41 @@ void CGPartyObj::endTargetParticle()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011F574
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGPartyObj::isDispTarget()
+int CGPartyObj::isDispTarget()
 {
-	// TODO
+	if ((m_lastStateId == 2 || m_lastStateId == 6) &&
+	    (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x668) != 0)) {
+		return 1;
+	}
+
+	return 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011F520
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGPartyObj::isRideTarget()
+int CGPartyObj::isRideTarget()
 {
-	// TODO
+	if ((m_lastStateId == 2 || m_lastStateId == 6) &&
+	    (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x668) != 0) &&
+	    ((*reinterpret_cast<unsigned char*>(this) + 0x6B8) & 0x80) != 0) {
+		return 1;
+	}
+
+	return 0;
 }
 
 /*

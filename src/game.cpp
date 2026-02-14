@@ -460,22 +460,34 @@ void CGame::LoadScript(char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001458c
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::LoadInit()
 {
-	// TODO
+	for (int i = 0; i < 8; ++i) {
+		m_caravanWorkArr[i].LoadInit();
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80014540
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::LoadFinished()
 {
-	// TODO
+	for (int i = 0; i < 8; ++i) {
+		m_caravanWorkArr[i].LoadFinished();
+	}
 }
 
 /*

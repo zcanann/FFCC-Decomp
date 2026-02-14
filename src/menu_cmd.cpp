@@ -84,54 +84,110 @@ void CMenuPcs::CmdCtrl()
 int CMenuPcs::CmdClose()
 {
 	u8* self = reinterpret_cast<u8*>(this);
-	u8* cmd = *reinterpret_cast<u8**>(self + 0x82c);
-	if (cmd[8] == 0) {
+	s32 cmd = *reinterpret_cast<s32*>(self + 0x82c);
+	if (*reinterpret_cast<u8*>(cmd + 8) == 0) {
 		if (UniteCloseAnim(-1) != 0) {
 			*reinterpret_cast<s16*>(cmd + 0x22) = 0;
-			cmd[8] = 1;
+			*reinterpret_cast<u8*>(cmd + 8) = 1;
 		}
 		return 0;
 	}
 
-	s16& closeTimer = *reinterpret_cast<s16*>(cmd + 0x22);
-	closeTimer++;
+	s32 doneCount = 0;
+	*reinterpret_cast<s16*>(cmd + 0x22) = *reinterpret_cast<s16*>(cmd + 0x22) + 1;
 
 	s16* list = *reinterpret_cast<s16**>(self + 0x850);
-	u16 count = static_cast<u16>(list[0]);
+	u32 count = static_cast<u32>(list[0]);
 	s16* entry = list + 4;
-	int doneCount = 0;
+	s32 closeTimer = static_cast<s32>(*reinterpret_cast<s16*>(cmd + 0x22));
+	u32 remaining = count;
 
-	for (u16 i = 0; i < count; i++) {
-		s32 start = *reinterpret_cast<s32*>(entry + 0x12);
-		s32 duration = *reinterpret_cast<s32*>(entry + 0x14);
-		if (start <= closeTimer) {
-			if (closeTimer < (start + duration)) {
-				s32& frame = *reinterpret_cast<s32*>(entry + 0x10);
-				frame++;
-				float t = 1.0f;
-				if (duration > 0) {
-					t -= static_cast<float>(frame) / static_cast<float>(duration);
+	if (remaining != 0) {
+		do {
+			if (*reinterpret_cast<s32*>(entry + 0x12) <= closeTimer) {
+				if (closeTimer < (*reinterpret_cast<s32*>(entry + 0x12) + *reinterpret_cast<s32*>(entry + 0x14))) {
+					*reinterpret_cast<s32*>(entry + 0x10) = *reinterpret_cast<s32*>(entry + 0x10) + 1;
+					*reinterpret_cast<float*>(entry + 8) =
+					    static_cast<float>(
+					        -((1.0 / static_cast<double>(*reinterpret_cast<s32*>(entry + 0x14))) *
+					              static_cast<double>(*reinterpret_cast<s32*>(entry + 0x10)) -
+					          1.0));
+					if (static_cast<double>(*reinterpret_cast<float*>(entry + 8)) < 0.0) {
+						*reinterpret_cast<float*>(entry + 8) = 0.0f;
+					}
+				} else {
+					doneCount = doneCount + 1;
+					*reinterpret_cast<float*>(entry + 8) = 0.0f;
 				}
-				if (t < 0.0f) {
-					t = 0.0f;
-				}
-				*reinterpret_cast<float*>(entry + 8) = t;
-			} else {
-				doneCount++;
-				*reinterpret_cast<float*>(entry + 8) = 0.0f;
 			}
-		}
-		entry += 0x20;
+			entry = entry + 0x20;
+			remaining = remaining - 1;
+		} while (remaining != 0);
 	}
 
-	if (doneCount == count) {
+	if (list[0] == doneCount) {
 		entry = list + 4;
-		for (u16 i = 0; i < count; i++) {
-			*reinterpret_cast<s32*>(entry + 0x12) = 0;
-			*reinterpret_cast<s32*>(entry + 0x14) = 0;
-			*reinterpret_cast<s32*>(entry + 0x10) = 1;
-			*reinterpret_cast<float*>(entry + 8) = 0.0f;
-			entry += 0x20;
+		if (count != 0) {
+			u32 blockCount = count >> 3;
+			if (blockCount != 0) {
+				do {
+					entry[0x12] = 0;
+					entry[0x13] = 0;
+					entry[0x14] = 0;
+					entry[0x15] = 1;
+					*reinterpret_cast<float*>(entry + 8) = 0.0f;
+					entry[0x32] = 0;
+					entry[0x33] = 0;
+					entry[0x34] = 0;
+					entry[0x35] = 1;
+					*reinterpret_cast<float*>(entry + 0x28) = 0.0f;
+					entry[0x52] = 0;
+					entry[0x53] = 0;
+					entry[0x54] = 0;
+					entry[0x55] = 1;
+					*reinterpret_cast<float*>(entry + 0x48) = 0.0f;
+					entry[0x72] = 0;
+					entry[0x73] = 0;
+					entry[0x74] = 0;
+					entry[0x75] = 1;
+					*reinterpret_cast<float*>(entry + 0x68) = 0.0f;
+					entry[0x92] = 0;
+					entry[0x93] = 0;
+					entry[0x94] = 0;
+					entry[0x95] = 1;
+					*reinterpret_cast<float*>(entry + 0x88) = 0.0f;
+					entry[0xb2] = 0;
+					entry[0xb3] = 0;
+					entry[0xb4] = 0;
+					entry[0xb5] = 1;
+					*reinterpret_cast<float*>(entry + 0xa8) = 0.0f;
+					entry[0xd2] = 0;
+					entry[0xd3] = 0;
+					entry[0xd4] = 0;
+					entry[0xd5] = 1;
+					*reinterpret_cast<float*>(entry + 200) = 0.0f;
+					entry[0xf2] = 0;
+					entry[0xf3] = 0;
+					entry[0xf4] = 0;
+					entry[0xf5] = 1;
+					*reinterpret_cast<float*>(entry + 0xe8) = 0.0f;
+					entry = entry + 0x100;
+					blockCount = blockCount - 1;
+				} while (blockCount != 0);
+				count = count & 7;
+				if (count == 0) {
+					return 1;
+				}
+			}
+			do {
+				entry[0x12] = 0;
+				entry[0x13] = 0;
+				entry[0x14] = 0;
+				entry[0x15] = 1;
+				*reinterpret_cast<float*>(entry + 8) = 0.0f;
+				entry = entry + 0x20;
+				count = count - 1;
+			} while (count != 0);
 		}
 		return 1;
 	}

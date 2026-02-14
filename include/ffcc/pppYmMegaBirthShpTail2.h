@@ -28,6 +28,12 @@ struct VYmMegaBirthShpTail2
     Vec m_tailScaleDirection;           // 0x44
 };
 
+struct UnkB;
+struct UnkC {
+    u8 m_pad_0x0[0xc];
+    s32* m_serializedDataOffsets;
+};
+
 void get_rand(void);
 void U8ToF32(pppFVECTOR4*, unsigned char*);
 void alloc_check(VYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*);
@@ -39,10 +45,10 @@ void calc_particle(_pppPObject*, VYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*, V
 extern "C" {
 #endif
 
-void pppConstructYmMegaBirthShpTail2(void);
-void pppDestructYmMegaBirthShpTail2(void);
-void pppFrameYmMegaBirthShpTail2(void);
-void pppRenderYmMegaBirthShpTail2(void);
+void pppConstructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2*, UnkC*);
+void pppDestructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2*, UnkC*);
+void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*, UnkC*);
+void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2*, UnkB*, UnkC*);
 
 #ifdef __cplusplus
 }

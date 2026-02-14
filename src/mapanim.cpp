@@ -1,4 +1,5 @@
 #include "ffcc/mapanim.h"
+#include "ffcc/chunkfile.h"
 #include "ffcc/memory.h"
 #include "ffcc/system.h"
 #include "dolphin/mtx.h"
@@ -32,12 +33,15 @@ public:
 
 extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
+extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void* lbl_801EA488[];
 extern unsigned char MapMng[];
 
 static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
 static char s_ptrarray_grow_error[] = "CPtrArray grow error";
+static char s_mapanim_cpp[] = "mapanim.cpp";
 
 /*
  * --INFO--
@@ -475,12 +479,92 @@ CMapAnim::~CMapAnim()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004a5d8
+ * PAL Size: 728b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapAnim::ReadOtmAnim(CChunkFile&)
+void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
 {
-	// TODO
+    struct CMapAnimNodeData
+    {
+        unsigned char* target;
+        CMapAnim* mapAnim;
+        CMapAnimKeyDt* keyData;
+    };
+
+    struct CMapAnimKeyDtData
+    {
+        unsigned int positionCount;
+        CMapAnimNodeTrackKey* position;
+        unsigned int rotationCount;
+        CMapAnimNodeTrackKey* rotation;
+        unsigned int scaleCount;
+        CMapAnimNodeTrackKey* scale;
+    };
+
+    CChunkFile::CChunk chunk;
+    CPtrArray<CMapAnimNode*>* mapAnimNodes = reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this);
+    CPtrArray<CMapAnimKeyDt*>* keyDtArray = reinterpret_cast<CPtrArray<CMapAnimKeyDt*>*>(MapMng + 0x21418);
+    CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(MapMng);
+
+    chunkFile.PushChunk();
+    while (chunkFile.GetNextChunk(chunk)) {
+        if (chunk.m_id == 0x4652414D) {
+            reinterpret_cast<int*>(this)[7] = static_cast<int>(chunkFile.Get4());
+            reinterpret_cast<int*>(this)[8] = static_cast<int>(chunkFile.Get4());
+            continue;
+        }
+
+        if (chunk.m_id != 0x4E4F4445) {
+            continue;
+        }
+
+        CMapAnimNodeData* node = static_cast<CMapAnimNodeData*>(__nw__FUlPQ27CMemory6CStagePci(0xC, stage, s_mapanim_cpp, 0xC2));
+        if (node != 0) {
+            node->keyData = 0;
+        }
+        node->mapAnim = this;
+
+        chunkFile.PushChunk();
+        while (chunkFile.GetNextChunk(chunk)) {
+            if (chunk.m_id == 0x4E494458) {
+                node->target = MapMng + (static_cast<int>(chunkFile.Get4()) * 0xF0);
+            } else if (chunk.m_id == 0x5452414E) {
+                CMapAnimKeyDtData* keyData =
+                    static_cast<CMapAnimKeyDtData*>(__nw__FUlPQ27CMemory6CStagePci(0x18, stage, s_mapanim_cpp, 0x4C));
+                if (keyData != 0) {
+                    keyData->position = 0;
+                    keyData->rotation = 0;
+                    keyData->scale = 0;
+                }
+
+                node->keyData = reinterpret_cast<CMapAnimKeyDt*>(keyData);
+                keyDtArray->Add(node->keyData);
+                keyData->positionCount = chunk.m_size >> 4;
+                keyData->position = static_cast<CMapAnimNodeTrackKey*>(
+                    __nwa__FUlPQ27CMemory6CStagePci(keyData->positionCount << 4, stage, s_mapanim_cpp, 0x4F));
+                memcpy(keyData->position, chunkFile.GetAddress(), chunk.m_size);
+            } else if (chunk.m_id == 0x524F5420) {
+                CMapAnimKeyDtData* keyData = reinterpret_cast<CMapAnimKeyDtData*>(node->keyData);
+                keyData->rotationCount = chunk.m_size >> 4;
+                keyData->rotation = static_cast<CMapAnimNodeTrackKey*>(
+                    __nwa__FUlPQ27CMemory6CStagePci(keyData->rotationCount << 4, stage, s_mapanim_cpp, 0x55));
+                memcpy(keyData->rotation, chunkFile.GetAddress(), chunk.m_size);
+            } else if (chunk.m_id == 0x5343414C) {
+                CMapAnimKeyDtData* keyData = reinterpret_cast<CMapAnimKeyDtData*>(node->keyData);
+                keyData->scaleCount = chunk.m_size >> 4;
+                keyData->scale = static_cast<CMapAnimNodeTrackKey*>(
+                    __nwa__FUlPQ27CMemory6CStagePci(keyData->scaleCount << 4, stage, s_mapanim_cpp, 0x5B));
+                memcpy(keyData->scale, chunkFile.GetAddress(), chunk.m_size);
+            }
+        }
+        chunkFile.PopChunk();
+        mapAnimNodes->Add(reinterpret_cast<CMapAnimNode*>(node));
+    }
+    chunkFile.PopChunk();
 }
 
 /*

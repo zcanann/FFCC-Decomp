@@ -37,6 +37,7 @@ extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*,
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void* lbl_801EA488[];
+extern "C" CPtrArray<CMapAnimNode*>* __ct__26CPtrArray_P12CMapAnimNode_Fv(CPtrArray<CMapAnimNode*>*);
 extern unsigned char MapMng[];
 
 static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
@@ -464,7 +465,10 @@ void CMapAnimNode::interp(Vec*, CMapAnimKey*, int, int)
  */
 CMapAnim::CMapAnim()
 {
-	// TODO
+    typedef CPtrArray<CMapAnimNode*>* (*CtorFn)(CPtrArray<CMapAnimNode*>*);
+    CtorFn ctorFn = __ct__26CPtrArray_P12CMapAnimNode_Fv;
+    CPtrArray<CMapAnimNode*>* mapAnimNodes = ctorFn(reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this));
+    mapAnimNodes->SetStage(*reinterpret_cast<CMemory::CStage**>(MapMng));
 }
 
 /*

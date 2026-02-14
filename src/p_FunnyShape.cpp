@@ -32,6 +32,7 @@ public:
 
 extern "C" void __dl__FPv(void* ptr);
 extern "C" void __dla__FPv(void* ptr);
+extern "C" int __cntlzw(unsigned int);
 
 extern f32 lbl_8032FD14;
 extern f32 lbl_8032FD10;
@@ -140,33 +141,43 @@ CFunnyShapePcs::~CFunnyShapePcs()
  */
 void CFunnyShapePcs::Init()
 {
-    Ptr(this, 0x8)[0] = 0x7F;
-    Ptr(this, 0x8)[1] = 0x7F;
-    Ptr(this, 0x8)[2] = 0x7F;
-    Ptr(this, 0x8)[3] = 0xFF;
-    Ptr(this, 0x8)[4] = 0x3F;
-    Ptr(this, 0x8)[5] = 0x3F;
-    Ptr(this, 0x8)[6] = 0x3F;
-    Ptr(this, 0x8)[7] = 0xFF;
-    *reinterpret_cast<f32*>(Ptr(this, 0x18)) = lbl_8032FD24;
-    *reinterpret_cast<f32*>(Ptr(this, 0x1C)) = lbl_8032FD24;
-    *reinterpret_cast<f32*>(Ptr(this, 0x20)) = lbl_8032FD14;
+    unsigned char* self = Ptr(this, 0);
+    const unsigned int clz0 = static_cast<unsigned int>(__cntlzw(0));
+    const unsigned int clz1 = static_cast<unsigned int>(__cntlzw(1));
+    const unsigned int clz2 = static_cast<unsigned int>(__cntlzw(2));
+    unsigned char level;
 
-    Ptr(this, 0x10)[0] = 0x3F;
-    Ptr(this, 0x10)[1] = 0x3F;
-    Ptr(this, 0x10)[2] = 0x3F;
-    Ptr(this, 0x10)[3] = 0xFF;
-    *reinterpret_cast<f32*>(Ptr(this, 0x24)) = lbl_8032FD24;
-    *reinterpret_cast<f32*>(Ptr(this, 0x28)) = lbl_8032FD24;
-    *reinterpret_cast<f32*>(Ptr(this, 0x2C)) = lbl_8032FD14;
+    self[0x8] = 0x7F;
+    self[0x9] = 0x7F;
+    self[0xA] = 0x7F;
+    self[0xB] = 0xFF;
 
-    Ptr(this, 0x14)[0] = 0x3F;
-    Ptr(this, 0x14)[1] = 0x3F;
-    Ptr(this, 0x14)[2] = 0x3F;
-    Ptr(this, 0x14)[3] = 0xFF;
-    *reinterpret_cast<f32*>(Ptr(this, 0x30)) = lbl_8032FD24;
-    *reinterpret_cast<f32*>(Ptr(this, 0x34)) = lbl_8032FD24;
-    *reinterpret_cast<f32*>(Ptr(this, 0x38)) = lbl_8032FD14;
+    level = static_cast<unsigned char>(-static_cast<int>((clz0 >> 5) & 1)) & 0x3F;
+    self[0xC] = level;
+    self[0xD] = level;
+    self[0xE] = level;
+    self[0xF] = 0xFF;
+    *reinterpret_cast<f32*>(self + 0x18) = lbl_8032FD24;
+    *reinterpret_cast<f32*>(self + 0x1C) = lbl_8032FD24;
+    *reinterpret_cast<f32*>(self + 0x20) = lbl_8032FD14;
+
+    level = static_cast<unsigned char>(-static_cast<int>((clz1 >> 5) & 1)) & 0x3F;
+    self[0x10] = level;
+    self[0x11] = level;
+    self[0x12] = level;
+    self[0x13] = 0xFF;
+    *reinterpret_cast<f32*>(self + 0x24) = lbl_8032FD24;
+    *reinterpret_cast<f32*>(self + 0x28) = lbl_8032FD24;
+    *reinterpret_cast<f32*>(self + 0x2C) = lbl_8032FD14;
+
+    level = static_cast<unsigned char>(-static_cast<int>((clz2 >> 5) & 1)) & 0x3F;
+    self[0x14] = level;
+    self[0x15] = level;
+    self[0x16] = level;
+    self[0x17] = 0xFF;
+    *reinterpret_cast<f32*>(self + 0x30) = lbl_8032FD24;
+    *reinterpret_cast<f32*>(self + 0x34) = lbl_8032FD24;
+    *reinterpret_cast<f32*>(self + 0x38) = lbl_8032FD14;
 }
 
 /*

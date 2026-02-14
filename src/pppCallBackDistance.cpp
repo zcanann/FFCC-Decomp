@@ -7,11 +7,6 @@
 extern CPartMng PartMng;
 extern u8* lbl_8032ED50;
 
-static s32 GetGraphFrameFromId(u32 graphId)
-{
-    return ((s32)graphId >> 12) + (s32)((graphId & 0x80000000) != 0 && (graphId & 0xFFF) != 0);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x80141318
@@ -70,7 +65,6 @@ void pppFrameCallBackDistance(pppCallBackDistance* param1, UnkB* param2, UnkC* p
     s32 graphFrame;
     u32 graphId;
     f32 distance;
-    f32* oldDistance;
     Vec local_1c;
     Vec local_28;
 
@@ -79,17 +73,20 @@ void pppFrameCallBackDistance(pppCallBackDistance* param1, UnkB* param2, UnkC* p
     dataOffset = *param3->m_serializedDataOffsets;
     local_1c.y = *(f32*)(pppMngSt + 0x94);
     local_1c.z = *(f32*)(pppMngSt + 0xA4);
-    distance = PSVECDistance(&local_1c, (Vec*)(pppMngSt + 0x64));
-    oldDistance = (f32*)((u8*)param1 + dataOffset + 0x8);
+    distance = PSVECDistance(&local_1c, (Vec*)(pppMngSt + 0x68));
 
-    if ((distance <= param2->m_dataValIndex) || (*oldDistance <= distance)) {
+    if ((distance <= param2->m_dataValIndex) ||
+        (*(f32*)((u8*)param1 + dataOffset + 0x8) <= distance)) {
         local_28.x = *(f32*)(pppMngSt + 0x84);
         local_28.y = *(f32*)(pppMngSt + 0x94);
         local_28.z = *(f32*)(pppMngSt + 0xA4);
         PSMTXMultVec(ppvWorldMatrix, &local_28, &local_28);
 
         graphId = *(u32*)&param1->field0_0x0;
-        graphFrame = GetGraphFrameFromId(graphId);
+        graphFrame = (s32)graphId >> 12;
+        if ((s32)graphId < 0 && (graphId & 0xFFF) != 0) {
+            graphFrame += 1;
+        }
         dataOffset = ((s32)((u8*)pppMngSt - ((u8*)&PartMng + 0x2A18))) / 0x158;
         Game.game.ParticleFrameCallback(dataOffset, (s32)*(s16*)(pppMngSt + 0x74),
                                         (s32)*(s16*)(pppMngSt + 0x76),

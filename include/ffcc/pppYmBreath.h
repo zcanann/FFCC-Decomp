@@ -2,6 +2,8 @@
 #define _PPP_YMBREATH_H_
 
 struct _pppPObject;
+struct pppYmBreath;
+struct UnkC;
 struct VYmBreath;
 struct PYmBreath;
 struct VColor;
@@ -21,9 +23,9 @@ extern "C" {
 
 void pppFrameYmBreath(void);
 void pppRenderYmBreath(void);
-void pppConstructYmBreath(void);
+void pppConstructYmBreath(pppYmBreath*, UnkC*);
 void pppConstruct2YmBreath(void);
-void pppDestructYmBreath(void);
+void pppDestructYmBreath(pppYmBreath*, UnkC*);
 
 #ifdef __cplusplus
 }

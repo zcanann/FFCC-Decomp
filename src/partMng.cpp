@@ -1,7 +1,21 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/cflat_runtime.h"
 
 extern "C" void __dl__FPv(void* ptr);
+
+/*
+ * --INFO--
+ * PAL Address: 0x8005f618
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CFlatRuntime::CObject::onNewFinished()
+{
+}
 
 /*
  * --INFO--

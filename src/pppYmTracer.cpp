@@ -84,26 +84,26 @@ void copyPolygonData(TRACE_POLYGON*, TRACE_POLYGON*)
 void pppConstructYmTracer(pppYmTracer* pppYmTracer, UnkC* param_2)
 {
     f32 fVar1;
-    f32* pfVar2;
+    u8* work;
 
     fVar1 = FLOAT_803306e8;
-    pfVar2 = (f32*)((int)(&pppYmTracer->field0_0x0 + 2) + *param_2->m_serializedDataOffsets);
+    work = (u8*)pppYmTracer + 0x80 + *param_2->m_serializedDataOffsets;
 
-    pfVar2[10] = 0.0f;
-    pfVar2[9] = 0.0f;
-    pfVar2[8] = 0.0f;
-    *(u16*)(pfVar2 + 0xb) = 0;
+    *(u32*)(work + 0x28) = 0;
+    *(u32*)(work + 0x24) = 0;
+    *(u32*)(work + 0x20) = 0;
+    *(u16*)(work + 0x2C) = 0;
 
-    pfVar2[3] = fVar1;
-    pfVar2[2] = fVar1;
-    pfVar2[1] = fVar1;
-    pfVar2[0] = fVar1;
-    pfVar2[7] = fVar1;
-    pfVar2[6] = fVar1;
-    pfVar2[5] = fVar1;
-    pfVar2[4] = fVar1;
+    *(f32*)(work + 0xC) = fVar1;
+    *(f32*)(work + 0x8) = fVar1;
+    *(f32*)(work + 0x4) = fVar1;
+    *(f32*)(work + 0x0) = fVar1;
+    *(f32*)(work + 0x1C) = fVar1;
+    *(f32*)(work + 0x18) = fVar1;
+    *(f32*)(work + 0x14) = fVar1;
+    *(f32*)(work + 0x10) = fVar1;
 
-    *(u16*)((int)pfVar2 + 0x2e) = 0;
+    *(u16*)(work + 0x2E) = 0;
 }
 
 /*
@@ -174,7 +174,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, UnkB* param_2, UnkC* param_3)
         return;
     }
 
-    work = (f32*)((int)(&pppYmTracer->field0_0x0 + 2) + *param_3->m_serializedDataOffsets);
+    work = (f32*)((u8*)pppYmTracer + 0x10 + *param_3->m_serializedDataOffsets);
     entries = (TRACE_POLYGON*)(u32)work[10];
     maxCount = *(u16*)(param_2->m_payload + 4);
 
@@ -348,7 +348,7 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, UnkB* param_2, UnkC* param_3)
         return;
     }
 
-    work = (f32*)((int)(&pppYmTracer->field0_0x0 + 2) + *param_3->m_serializedDataOffsets);
+    work = (f32*)((u8*)pppYmTracer + 0x10 + *param_3->m_serializedDataOffsets);
     polygons = (TRACE_POLYGON*)(u32)work[10];
     count = *(u16*)(work + 0xB);
     if (polygons == nullptr || count < 2) {

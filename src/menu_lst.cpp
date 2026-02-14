@@ -152,44 +152,75 @@ void CMenuPcs::MLstOpen()
  */
 void CMenuPcs::MLstCtrl()
 {
-	unsigned short press = 0;
-	unsigned short hold = 0;
-	bool resetAnim = false;
+	bool blocked;
+	bool resetAnim;
+	unsigned short press;
+	unsigned short hold;
+	unsigned int itemCount;
+	int i;
+	int item;
+	int startFrame;
+	int offset;
+	unsigned int chunkCount;
+	int menuState;
 
-	if (Pad._452_4_ == 0 && Pad._448_4_ == -1) {
+	blocked = false;
+	if (Pad._452_4_ != 0 || Pad._448_4_ != -1) {
+		blocked = true;
+	}
+	if (blocked) {
+		press = 0;
+	} else {
 		press = Pad._8_2_;
+	}
+
+	blocked = false;
+	if (Pad._452_4_ != 0 || Pad._448_4_ != -1) {
+		blocked = true;
+	}
+	if (blocked) {
+		hold = 0;
+	} else {
 		hold = *reinterpret_cast<unsigned short*>(reinterpret_cast<char*>(&Pad) + 0x20);
 	}
 
-	if (hold != 0) {
-		int menuState = *(int*)((char*)this + 0x82c);
-		short* cursor = (short*)(menuState + 0x26);
-
-		if ((hold & 0x48) != 0) {
-			if (*cursor == 0) {
-				*cursor = 8;
-			} else {
-				*cursor = *cursor - 1;
+	if (hold == 0) {
+		resetAnim = false;
+	} else {
+		menuState = *(int*)((char*)this + 0x82c);
+		if ((hold & 0x48) == 0) {
+			if ((hold & 0x24) != 0) {
+				if (*(short*)(menuState + 0x26) < 8) {
+					*(short*)(menuState + 0x26) = *(short*)(menuState + 0x26) + 1;
+				} else {
+					*(short*)(menuState + 0x26) = 0;
+				}
+				Sound.PlaySe(1, 0x40, 0x7f, 0);
 			}
-			Sound.PlaySe(1, 0x40, 0x7f, 0);
-		} else if ((hold & 0x24) != 0) {
-			if (*cursor < 8) {
-				*cursor = *cursor + 1;
+		} else {
+			if (*(short*)(menuState + 0x26) == 0) {
+				*(short*)(menuState + 0x26) = 8;
 			} else {
-				*cursor = 0;
+				*(short*)(menuState + 0x26) = *(short*)(menuState + 0x26) - 1;
 			}
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		}
 
 		if ((hold & 0x6c) == 0) {
-			if ((press & 0x100) != 0) {
+			if ((press & 0x100) == 0) {
+				if ((press & 0x200) == 0) {
+					resetAnim = false;
+				} else {
+					*(char*)(*(int*)((char*)this + 0x82c) + 0xd) = (char)0xff;
+					Sound.PlaySe(3, 0x40, 0x7f, 0);
+					resetAnim = true;
+				}
+			} else {
 				Sound.PlaySe(2, 0x40, 0x7f, 0);
 				resetAnim = true;
-			} else if ((press & 0x200) != 0) {
-				*(char*)(menuState + 0xd) = (char)0xff;
-				Sound.PlaySe(3, 0x40, 0x7f, 0);
-				resetAnim = true;
 			}
+		} else {
+			resetAnim = false;
 		}
 	}
 
@@ -197,22 +228,63 @@ void CMenuPcs::MLstCtrl()
 		return;
 	}
 
-	short itemCount = **(short**)((char*)this + 0x850);
-	int listBase = *(int*)((char*)this + 0x850);
-	int item = listBase + 8;
-
-	for (int i = 0; i < itemCount; i++) {
+	item = *(int*)((char*)this + 0x850) + 8;
+	for (i = 0; (itemCount = (unsigned int)**(short**)((char*)this + 0x850)), i < (int)itemCount; i++) {
 		*(float*)(item + 0x10) = 1.0f;
 		*(float*)(item + 0x14) = 1.0f;
 		item += 0x40;
 	}
 
-	int startFrame = 0;
-	for (int i = itemCount - 1; i >= 0; i--) {
-		int entry = listBase + i * 0x40 + 8;
-		*(int*)(entry + 0x24) = startFrame;
-		*(int*)(entry + 0x28) = 4;
-		startFrame++;
+	startFrame = 0;
+	offset = ((int)itemCount - 1) * 0x40;
+	if (-1 < (int)(itemCount - 1)) {
+		chunkCount = itemCount >> 3;
+		if (chunkCount != 0) {
+			do {
+				item = *(int*)((char*)this + 0x850) + offset + 8;
+				*(int*)(item + 0x24) = startFrame;
+				*(int*)(item + 0x28) = 4;
+				item = *(int*)((char*)this + 0x850) + offset - 0x38;
+				*(int*)(item + 0x24) = startFrame + 1;
+				*(int*)(item + 0x28) = 4;
+				item = *(int*)((char*)this + 0x850) + offset - 0x78;
+				*(int*)(item + 0x24) = startFrame + 2;
+				*(int*)(item + 0x28) = 4;
+				item = *(int*)((char*)this + 0x850) + offset - 0xb8;
+				*(int*)(item + 0x24) = startFrame + 3;
+				*(int*)(item + 0x28) = 4;
+				item = *(int*)((char*)this + 0x850) + offset - 0xf8;
+				*(int*)(item + 0x24) = startFrame + 4;
+				*(int*)(item + 0x28) = 4;
+				item = *(int*)((char*)this + 0x850) + offset - 0x138;
+				*(int*)(item + 0x24) = startFrame + 5;
+				*(int*)(item + 0x28) = 4;
+				item = *(int*)((char*)this + 0x850) + offset - 0x178;
+				*(int*)(item + 0x24) = startFrame + 6;
+				*(int*)(item + 0x28) = 4;
+				item = *(int*)((char*)this + 0x850) + offset - 0x1b8;
+				offset -= 0x200;
+				*(int*)(item + 0x24) = startFrame + 7;
+				startFrame += 8;
+				*(int*)(item + 0x28) = 4;
+				chunkCount--;
+			} while (chunkCount != 0);
+
+			itemCount &= 7;
+			if (itemCount == 0) {
+				*(short*)(*(int*)((char*)this + 0x82c) + 0x22) = 0;
+				return;
+			}
+		}
+
+		do {
+			item = *(int*)((char*)this + 0x850) + offset + 8;
+			offset -= 0x40;
+			*(int*)(item + 0x24) = startFrame;
+			startFrame++;
+			*(int*)(item + 0x28) = 4;
+			itemCount--;
+		} while (itemCount != 0);
 	}
 
 	*(short*)(*(int*)((char*)this + 0x82c) + 0x22) = 0;

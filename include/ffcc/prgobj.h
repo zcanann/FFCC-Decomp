@@ -36,7 +36,7 @@ public:
     void putParticleTrace(int, int, CGObject*, float, int);
     void putParticleBindTrace(int, int, CGObject*, float, int);
     int getReplaceStat(int);
-    void getTargetRot(CGPrgObj*);
+    float getTargetRot(CGPrgObj*);
     void rotTarget(CGPrgObj*);
     void dstTargetRot(CGPrgObj*);
     void ClassControl(int, int);

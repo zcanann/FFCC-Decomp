@@ -1,9 +1,14 @@
 #include "ffcc/prgobj.h"
 #include "ffcc/charaobj.h"
+#include "ffcc/math.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/sound.h"
+#include "ffcc/vector.h"
+
+#include <math.h>
 
 extern "C" int PlaySe3D__6CSoundFiP3Vecffi(CSound*, int, Vec*, float, float, int);
+extern CMath Math;
 
 /*
  * --INFO--
@@ -322,32 +327,77 @@ void CGPrgObj::putParticleBindTrace(int, int, CGObject*, float, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012732C
+ * PAL Size: 144b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGPrgObj::getTargetRot(CGPrgObj*)
+float CGPrgObj::getTargetRot(CGPrgObj* target)
 {
-	// TODO
+	float targetRot;
+	CVector targetPos(target->m_worldPosition);
+	CVector basePos(m_worldPosition);
+	CVector deltaPos;
+
+	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
+	targetRot = 0.0f;
+	if (deltaPos.x != 0.0f && deltaPos.z != 0.0f) {
+		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
+	}
+
+	return targetRot;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80127290
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGPrgObj::rotTarget(CGPrgObj*)
+void CGPrgObj::rotTarget(CGPrgObj* target)
 {
-	// TODO
+	float targetRot;
+	CVector targetPos(target->m_worldPosition);
+	CVector basePos(m_worldPosition);
+	CVector deltaPos;
+
+	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
+	targetRot = 0.0f;
+	if (deltaPos.x != 0.0f && deltaPos.z != 0.0f) {
+		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
+	}
+
+	m_rotTargetY = targetRot;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801271E0
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGPrgObj::dstTargetRot(CGPrgObj*)
+void CGPrgObj::dstTargetRot(CGPrgObj* target)
 {
-	// TODO
+	float targetRot;
+	CVector targetPos(target->m_worldPosition);
+	CVector basePos(m_worldPosition);
+	CVector deltaPos;
+
+	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
+	targetRot = 0.0f;
+	if (deltaPos.x != 0.0f && deltaPos.z != 0.0f) {
+		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
+	}
+
+	Math.DstRot(m_rotBaseY, 3.1415927f + targetRot);
 }
 
 /*

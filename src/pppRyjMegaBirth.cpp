@@ -2,6 +2,9 @@
 #include <string.h>
 
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
+
+static Mtx g_matUnit;
 
 static char s_pppRyjMegaBirth_cpp[] = "pppRyjMegaBirth.cpp";
 
@@ -202,9 +205,23 @@ void pppRyjDrawMegaBirth(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRyjMegaBirthCon(void)
+void pppRyjMegaBirthCon(_pppPObject* pObject, PRyjMegaBirthOffsets* offsets)
 {
-	// Constructor implementation
+	u8* work = (u8*)pObject + 0x80 + offsets->m_serializedDataOffsets[2];
+
+	PSMTXIdentity(*(Mtx*)work);
+	*(f32*)(work + 0x30) = 0.0f;
+	*(f32*)(work + 0x34) = 0.0f;
+	*(f32*)(work + 0x38) = 0.0f;
+	*(void**)(work + 0x3C) = 0;
+	*(void**)(work + 0x40) = 0;
+	*(void**)(work + 0x44) = 0;
+	*(void**)(work + 0x48) = 0;
+	*(u16*)(work + 0x4C) = 0;
+	*(u16*)(work + 0x4E) = 0;
+	*(u16*)(work + 0x4C) = 10000;
+
+	PSMTXIdentity(g_matUnit);
 }
 
 /*
@@ -216,7 +233,25 @@ void pppRyjMegaBirthCon(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRyjMegaBirthDes(void)
+void pppRyjMegaBirthDes(_pppPObject* pObject, PRyjMegaBirthOffsets* offsets)
 {
-	// Destructor - cleanup particle memory allocations
+	u8* work = (u8*)pObject + 0x80 + offsets->m_serializedDataOffsets[2];
+
+	if (*(void**)(work + 0x3C) != 0)
+	{
+		pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(work + 0x3C));
+		*(void**)(work + 0x3C) = 0;
+	}
+
+	if (*(void**)(work + 0x40) != 0)
+	{
+		pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(work + 0x40));
+		*(void**)(work + 0x40) = 0;
+	}
+
+	if (*(void**)(work + 0x44) != 0)
+	{
+		pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(work + 0x44));
+		*(void**)(work + 0x44) = 0;
+	}
 }

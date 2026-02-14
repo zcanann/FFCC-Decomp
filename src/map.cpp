@@ -2,6 +2,7 @@
 #include "ffcc/maptexanim.h"
 
 extern "C" unsigned long UnkMaterialSetGetter(void*);
+extern "C" void __dla__FPv(void*);
 
 /*
  * --INFO--
@@ -75,6 +76,46 @@ template <>
 void CPtrArray<CMaterial*>::SetGrow(int growCapacity)
 {
     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x14) = growCapacity;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80033d24
+ * PAL Size: 112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+bool CPtrArray<CMapLightHolder*>::Add(CMapLightHolder* item)
+{
+    bool success = setSize(m_numItems + 1);
+    if (success) {
+        m_items[m_numItems] = item;
+        m_numItems++;
+    }
+    return success;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80033d94
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+void CPtrArray<CMapLightHolder*>::RemoveAll()
+{
+    if (m_items != 0) {
+        __dla__FPv(m_items);
+        m_items = 0;
+    }
+    m_size = 0;
+    m_numItems = 0;
 }
 
 /*

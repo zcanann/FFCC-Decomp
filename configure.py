@@ -537,6 +537,7 @@ config.libs = [
             Object(NonMatching, "pppShape.cpp"),
             Object(NonMatching, "pppSpMatrix.cpp"),
             Object(NonMatching, "pppSRandCV.cpp"),
+            Object(NonMatching, "pppSRandDownCV.cpp"),
             Object(NonMatching, "pppSRandDownFV.cpp"),
             Object(NonMatching, "pppSRandDownHCV.cpp"),
             Object(NonMatching, "pppSRandFV.cpp"),

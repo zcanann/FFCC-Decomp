@@ -1,104 +1,116 @@
 #include "ffcc/pppSRandDownCV.h"
 #include "ffcc/math.h"
+#include "dolphin/types.h"
+
+extern CMath math;
+extern int lbl_8032ED70;
+extern u8 lbl_801EADC8[];
+extern float lbl_80330070;
+extern "C" float RandF__5CMathFv(CMath* instance);
 
 /*
  * --INFO--
- * PAL Address: 800635b0
+ * PAL Address: 0x800635b0
  * PAL Size: 656b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppSRandDownCV(void* param1, void* param2)
+void pppSRandDownCV(void* param1, void* param2, void* param3)
 {
-    extern int lbl_8032ED70;
-    if (lbl_8032ED70 != 0) return;
-    
-    CMath math;
-    
-    unsigned int* p1 = (unsigned int*)param1;
-    unsigned char* p2_bytes = (unsigned char*)param2;
-    unsigned char* p2_colors = (unsigned char*)param2;
-    
-    // Check if indices match
-    int currentIndex = *((int*)param2);
-    int targetIndex = p1[3];
-    if (currentIndex != targetIndex) {
-        // Handle different path - still generate random data
-        int dataOffset = *((int*)param2 + 3);
-        float* target = (float*)((char*)param1 + dataOffset + 0x80);
-        
-        unsigned char flag = p2_bytes[0x10];
-        
-        // Generate 4 random float values
-        for (int i = 0; i < 4; i++) {
-            math.RandF();
-            float randVal = -1.0f; // Placeholder - RandF result stored elsewhere
-            if (flag != 0) {
-                math.RandF();
-                float randVal2 = 0.5f; // Placeholder for second random
-                randVal = (-randVal - randVal2) * 0.5f;
-            }
-            target[i] = randVal;
-        }
+    if (lbl_8032ED70 != 0) {
         return;
     }
-    
-    // Main path when indices match
-    int dataOffset = *((int*)param2 + 3);
-    float* target = (float*)((char*)param1 + dataOffset + 0x80);
-    
-    unsigned char flag = p2_bytes[0x10];
-    
-    // Generate 4 random float values and store them
-    for (int i = 0; i < 4; i++) {
-        math.RandF();
-        float randVal = -1.0f; // Placeholder - RandF result stored elsewhere
-        if (flag != 0) {
-            math.RandF();
-            float randVal2 = 0.5f; // Placeholder for second random
-            randVal = (-randVal - randVal2) * 0.5f;
-        }
-        target[i] = randVal;
-    }
-    
-    // Get target color array pointer (bytes instead of shorts for CV)
-    int colorOffset = *((int*)param2 + 1);
-    unsigned char* targetColors;
-    if (colorOffset == -1) {
-        extern unsigned char lbl_801EADC8[];
-        targetColors = lbl_801EADC8;
-    } else {
-        targetColors = (unsigned char*)((char*)param1 + colorOffset + 0x80);
-    }
-    
-    // Apply random modifications to 4 color values (bytes instead of shorts)
-    for (int i = 0; i < 4; i++) {
-        unsigned char baseValue = p2_colors[4 + i]; // +0x4, +0x5, +0x6, +0x7 offsets
-        float randomMult = target[i];
-        int adjustment = (int)(baseValue * randomMult);
-        unsigned char currentValue = targetColors[i];
-        targetColors[i] = currentValue + (unsigned char)adjustment;
-    }
-}
 
-/*
- * --INFO--
- * Address: TODO 
- * Size: TODO
- */
-void randchar(char val, float mult)
-{
-    // TODO - likely unused based on assembly
+    float* target;
+
+    if (*(int*)param2 == *((int*)param1 + 3)) {
+        int** base_ptr = (int**)((char*)param3 + 0xC);
+        int offset = **base_ptr;
+        target = (float*)((char*)param1 + offset + 0x80);
+
+        u8 flag = *((u8*)param2 + 0xC);
+        float value;
+
+        value = -RandF__5CMathFv(&math);
+        if (flag != 0) {
+            value = (value - RandF__5CMathFv(&math)) * lbl_80330070;
+        }
+        target[0] = value;
+
+        value = -RandF__5CMathFv(&math);
+        if (flag != 0) {
+            value = (value - RandF__5CMathFv(&math)) * lbl_80330070;
+        }
+        target[1] = value;
+
+        value = -RandF__5CMathFv(&math);
+        if (flag != 0) {
+            value = (value - RandF__5CMathFv(&math)) * lbl_80330070;
+        }
+        target[2] = value;
+
+        value = -RandF__5CMathFv(&math);
+        if (flag != 0) {
+            value = (value - RandF__5CMathFv(&math)) * lbl_80330070;
+        }
+        target[3] = value;
+    } else {
+        int** base_ptr = (int**)((char*)param3 + 0xC);
+        int offset = **base_ptr;
+        target = (float*)((char*)param1 + offset + 0x80);
+    }
+
+    int color_offset = *((int*)param2 + 1);
+    u8* target_colors;
+    if (color_offset == -1) {
+        target_colors = lbl_801EADC8;
+    } else {
+        target_colors = (u8*)((char*)param1 + color_offset + 0x80);
+    }
+
+    {
+        s8 base = *(s8*)((char*)param2 + 0x8);
+        int delta = (int)(base * target[0]);
+        target_colors[0] = (u8)(target_colors[0] + delta);
+    }
+
+    {
+        s8 base = *(s8*)((char*)param2 + 0x9);
+        int delta = (int)(base * target[1]);
+        target_colors[1] = (u8)(target_colors[1] + delta);
+    }
+
+    {
+        s8 base = *(s8*)((char*)param2 + 0xA);
+        int delta = (int)(base * target[2]);
+        target_colors[2] = (u8)(target_colors[2] + delta);
+    }
+
+    {
+        s8 base = *(s8*)((char*)param2 + 0xB);
+        int delta = (int)(base * target[3]);
+        target_colors[3] = (u8)(target_colors[3] + delta);
+    }
 }
 
 /*
  * --INFO--
  * Address: TODO
- * Size: TODO  
+ * Size: TODO
  */
-void randf(unsigned char flag)
+void randchar(char, float)
 {
-    // TODO - likely unused based on assembly
+    // TODO
+}
+
+/*
+ * --INFO--
+ * Address: TODO
+ * Size: TODO
+ */
+void randf(unsigned char)
+{
+    // TODO
 }

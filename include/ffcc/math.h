@@ -12,9 +12,9 @@ class CBound
 public:
     CBound();
     void SetFrustum(Vec&, float(*)[4]);
-    void CheckFrustum0(CBound&);
-    void CheckFrustum0(float);
-    void CheckFrustum(Vec&, float(*)[4], float);
+    int CheckFrustum0(CBound&);
+    int CheckFrustum0(float);
+    int CheckFrustum(Vec&, float(*)[4], float);
 };
 
 class SRT

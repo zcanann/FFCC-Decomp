@@ -5,8 +5,11 @@
 #include "string.h"
 
 extern "C" int rand(void);
+extern "C" int __cntlzw(unsigned int);
 
 CMath math;
+static Vec s_f_vpos;
+static Mtx s_f_lvmtx;
 
 extern void* __vt__8CManager;
 extern void* __vt__5CMath;
@@ -193,42 +196,276 @@ float CMath::RandFPM(float scale)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001bdd8
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CBound::SetFrustum(Vec&, float (*) [4])
+void CBound::SetFrustum(Vec& viewPos, float (*viewMatrix)[4])
 {
-	// TODO
+    s_f_vpos.x = viewPos.x;
+    s_f_vpos.y = viewPos.y;
+    s_f_vpos.z = viewPos.z;
+    PSMTXCopy(viewMatrix, s_f_lvmtx);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001b99c
+ * PAL Size: 1084b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CBound::CheckFrustum0(CBound&)
+int CBound::CheckFrustum0(CBound& outBound)
 {
-	// TODO
+    float* const in = reinterpret_cast<float*>(this);
+    float* const out = reinterpret_cast<float*>(&outBound);
+    Vec inVec;
+    Vec outVec;
+    out[0] = 3.40282347e38f;
+    out[1] = 3.40282347e38f;
+    out[2] = 3.40282347e38f;
+    out[3] = -3.40282347e38f;
+    out[4] = -3.40282347e38f;
+    out[5] = -3.40282347e38f;
+
+    if ((in[3] < s_f_vpos.x) || (in[4] < s_f_vpos.y) || (in[5] < s_f_vpos.z) || (s_f_vpos.x < in[0]) || (s_f_vpos.y < in[1]) ||
+        (s_f_vpos.z < in[2])) {
+        unsigned int andMask = 0xF;
+        unsigned int orMask = 0;
+
+        for (int i = 0; i < 2; ++i) {
+            inVec.x = in[(i == 0) ? 0 : 3];
+            for (int j = 0; j < 2; ++j) {
+                inVec.y = in[(j == 0) ? 1 : 4];
+                for (int k = 0; k < 2; ++k) {
+                    inVec.z = in[(k == 0) ? 2 : 5];
+                    PSMTXMultVec(s_f_lvmtx, &inVec, &outVec);
+
+                    if (out[0] < outVec.x) {
+                        outVec.x = out[0];
+                    }
+                    out[0] = outVec.x;
+                    if (out[1] < outVec.y) {
+                        outVec.y = out[1];
+                    }
+                    out[1] = outVec.y;
+                    if (out[2] < outVec.z) {
+                        outVec.z = out[2];
+                    }
+                    out[2] = outVec.z;
+
+                    if (outVec.x < out[3]) {
+                        outVec.x = out[3];
+                    }
+                    out[3] = outVec.x;
+                    if (outVec.y < out[4]) {
+                        outVec.y = out[4];
+                    }
+                    out[4] = outVec.y;
+                    if (outVec.z < out[5]) {
+                        outVec.z = out[5];
+                    }
+                    out[5] = outVec.z;
+
+                    const double z = (double)outVec.z;
+                    unsigned int code;
+                    if (z <= 0.0) {
+                        if ((double)outVec.x <= -z) {
+                            if (z <= (double)outVec.x) {
+                                code = 0;
+                            } else {
+                                code = 2;
+                            }
+                        } else {
+                            code = 1;
+                        }
+                        if ((double)outVec.y <= -z) {
+                            if ((double)outVec.y < z) {
+                                code |= 8;
+                            }
+                        } else {
+                            code |= 4;
+                        }
+                    } else {
+                        if ((double)outVec.x <= -z) {
+                            if (z <= (double)outVec.x) {
+                                code = 0x10;
+                            } else {
+                                code = 0x12;
+                            }
+                        } else {
+                            code = 0x11;
+                        }
+                        if ((double)outVec.y <= -z) {
+                            if ((double)outVec.y < z) {
+                                code |= 0x18;
+                            }
+                        } else {
+                            code |= 0x14;
+                        }
+                    }
+
+                    andMask &= code;
+                    orMask |= code;
+                }
+            }
+        }
+
+        if (andMask == 0) {
+            return ((__cntlzw(orMask) >> 5) + 1);
+        }
+        return 0;
+    }
+
+    for (int i = 0; i < 2; ++i) {
+        inVec.x = in[(i == 0) ? 0 : 3];
+        for (int j = 0; j < 2; ++j) {
+            inVec.y = in[(j == 0) ? 1 : 4];
+            for (int k = 0; k < 2; ++k) {
+                inVec.z = in[(k == 0) ? 2 : 5];
+                PSMTXMultVec(s_f_lvmtx, &inVec, &outVec);
+
+                if (out[0] < outVec.x) {
+                    outVec.x = out[0];
+                }
+                out[0] = outVec.x;
+                if (out[1] < outVec.y) {
+                    outVec.y = out[1];
+                }
+                out[1] = outVec.y;
+                if (out[2] < outVec.z) {
+                    outVec.z = out[2];
+                }
+                out[2] = outVec.z;
+
+                if (outVec.x < out[3]) {
+                    outVec.x = out[3];
+                }
+                out[3] = outVec.x;
+                if (outVec.y < out[4]) {
+                    outVec.y = out[4];
+                }
+                out[4] = outVec.y;
+                if (outVec.z < out[5]) {
+                    outVec.z = out[5];
+                }
+                out[5] = outVec.z;
+            }
+        }
+    }
+
+    return 1;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001b728
+ * PAL Size: 628b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CBound::CheckFrustum0(float)
+int CBound::CheckFrustum0(float farPlane)
 {
-	// TODO
+    float* const in = reinterpret_cast<float*>(this);
+    Vec inVec;
+    Vec outVec;
+
+    if ((in[3] < s_f_vpos.x) || (in[4] < s_f_vpos.y) || (in[5] < s_f_vpos.z) || (s_f_vpos.x < in[0]) || (s_f_vpos.y < in[1]) ||
+        (s_f_vpos.z < in[2])) {
+        double maxZ = -3.40282347e38;
+        unsigned int andMask = 0xF;
+        unsigned int orMask = 0;
+
+        for (int i = 0; i < 2; ++i) {
+            inVec.x = in[(i == 0) ? 0 : 3];
+            for (int j = 0; j < 2; ++j) {
+                inVec.y = in[(j == 0) ? 1 : 4];
+                for (int k = 0; k < 2; ++k) {
+                    inVec.z = in[(k == 0) ? 2 : 5];
+                    PSMTXMultVec(s_f_lvmtx, &inVec, &outVec);
+
+                    const double z = (double)outVec.z;
+                    if (maxZ < z) {
+                        maxZ = z;
+                    }
+
+                    unsigned int code;
+                    if (z <= 0.0) {
+                        if ((double)outVec.x <= -z) {
+                            if (z <= (double)outVec.x) {
+                                code = 0;
+                            } else {
+                                code = 2;
+                            }
+                        } else {
+                            code = 1;
+                        }
+                        if ((double)outVec.y <= -z) {
+                            if ((double)outVec.y < z) {
+                                code |= 8;
+                            }
+                        } else {
+                            code |= 4;
+                        }
+                    } else {
+                        if ((double)outVec.x <= -z) {
+                            if (z <= (double)outVec.x) {
+                                code = 0x10;
+                            } else {
+                                code = 0x12;
+                            }
+                        } else {
+                            code = 0x11;
+                        }
+                        if ((double)outVec.y <= -z) {
+                            if ((double)outVec.y < z) {
+                                code |= 0x18;
+                            }
+                        } else {
+                            code |= 0x14;
+                        }
+                    }
+
+                    andMask &= code;
+                    orMask |= code;
+                }
+            }
+        }
+
+        if ((double)farPlane <= maxZ) {
+            if (andMask == 0) {
+                return ((__cntlzw(orMask) >> 5) + 1);
+            }
+            return 0;
+        }
+        return 0;
+    }
+    return 1;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001b6ac
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CBound::CheckFrustum(Vec&, float (*) [4], float)
+int CBound::CheckFrustum(Vec& viewPos, float (*viewMatrix)[4], float farPlane)
 {
-	// TODO
+    s_f_vpos.x = viewPos.x;
+    s_f_vpos.y = viewPos.y;
+    s_f_vpos.z = viewPos.z;
+    PSMTXCopy(viewMatrix, s_f_lvmtx);
+    return CheckFrustum0(farPlane);
 }
 
 /*

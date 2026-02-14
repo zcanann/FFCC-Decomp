@@ -11,21 +11,12 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeDMatDraw(_pppPObject* pObject)
+void pppKeDMatDraw(_pppPObject* pObject, void*, _pppCtrlTable* ctrlTable)
 {
-    pppFMATRIX localMatrix;
-    pppFMATRIX worldMatrix;
-    pppFMATRIX resultMatrix;
-    
-    // Load local matrix from pObject structure at offset 0x10
-    localMatrix = *(pppFMATRIX*)((char*)pObject + 0x10);
-    
-    // Copy world matrix from global matrix
-    worldMatrix = *(pppFMATRIX*)&ppvWorldMatrix;
-    
-    // Multiply matrices: result = world * local
-    pppMulMatrix(resultMatrix, worldMatrix, localMatrix);
-    
-    // Copy result to target location at offset 0x80
-    pppCopyMatrix(*(pppFMATRIX*)((char*)pObject + 0x80), resultMatrix);
+    unsigned int targetOffset = *(unsigned int*)(*(char**)((char*)ctrlTable + 0xC) + 4) + 0x80;
+    pppFMATRIX* targetMatrix = (pppFMATRIX*)((char*)pObject + targetOffset);
+    pppFMATRIX* resultMatrix = (pppFMATRIX*)((char*)pObject + 0x40);
+
+    pppMulMatrix(*resultMatrix, *(pppFMATRIX*)&ppvWorldMatrix, *(pppFMATRIX*)((char*)pObject + 0x10));
+    pppCopyMatrix(*targetMatrix, *resultMatrix);
 }

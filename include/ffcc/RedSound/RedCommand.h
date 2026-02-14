@@ -6,7 +6,7 @@ struct RedSeINFO;
 struct RedWaveHeadWD;
 
 void _EraseAttribute(int, int);
-void _EraseTime(int);
+int _EraseTime(int);
 void SearchSeEmptyTrack(int, int, int);
 void SeStopID(int);
 void SeStopMG(int, int, int, int);

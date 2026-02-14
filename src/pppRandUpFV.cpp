@@ -2,7 +2,7 @@
 #include "ffcc/math.h"
 #include "types.h"
 
-extern CMath math;
+extern CMath math[];
 extern s32 lbl_8032ED70;
 extern f32 lbl_80330000;
 extern f32 lbl_801EADC8[];
@@ -32,27 +32,28 @@ struct PppRandUpFVParam3 {
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRandUpFV(void* param1, void* param2, void* param3) {
+void pppRandUpFV(void* param1, void* param2, void* param3)
+{
     if (lbl_8032ED70 != 0) {
         return;
     }
 
     u8* base = (u8*)param1;
-    PppRandUpFVParam2* in = (PppRandUpFVParam2*)param2;
     PppRandUpFVParam3* out = (PppRandUpFVParam3*)param3;
+    PppRandUpFVParam2* in = (PppRandUpFVParam2*)param2;
     f32* valuePtr;
 
-    s32 baseState = *(s32*)(base + 0xC);
-    if (baseState == 0) {
-        f32 value = RandF__5CMathFv(&math);
+    s32 state = *(s32*)(base + 0xC);
+    if (state == 0) {
+        f32 value = RandF__5CMathFv(math);
         if (in->field18 != 0) {
-            value = (value + RandF__5CMathFv(&math)) * lbl_80330000;
+            value = (value + RandF__5CMathFv(math)) * lbl_80330000;
         }
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
         *valuePtr = value;
     } else {
-        if (in->field0 != baseState) {
+        if (in->field0 != state) {
             return;
         }
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
@@ -66,7 +67,10 @@ extern "C" void pppRandUpFV(void* param1, void* param2, void* param3) {
     }
 
     f32 scale = *valuePtr;
-    target[0] = target[0] + in->field8 * scale;
-    target[1] = target[1] + in->fieldC * scale;
-    target[2] = target[2] + in->field10 * scale;
+    f32 value = in->field8 * scale;
+    target[0] = target[0] + value;
+    value = in->fieldC * scale;
+    target[1] = target[1] + value;
+    value = in->field10 * scale;
+    target[2] = target[2] + value;
 }

@@ -30,5 +30,4 @@ CCharaPcs CharaPcs;
 CGamePcs Game;
 CPad Pad;
 CSound Sound;
-CSystem System;
 CUSB USB;

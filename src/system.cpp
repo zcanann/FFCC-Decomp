@@ -20,6 +20,7 @@ extern CMath Math;
 extern CTextureMan TextureMan;
 extern CMaterialMan MaterialMan;
 extern CFontMan FontMan;
+CSystem System;
 
 /*
  * --INFO--

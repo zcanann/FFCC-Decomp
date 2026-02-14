@@ -129,11 +129,12 @@ int CMaterialEditorPcs::SetRsdFlag()
     int index = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0xC4);
     int* rsd = reinterpret_cast<int*>(list->GetDataIdx(index));
 
-    if (rsd != nullptr) {
-        rsd[3] = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0xC0);
+    if (rsd == 0) {
+        return 0;
     }
 
-    return rsd != nullptr;
+    rsd[3] = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0xC0);
+    return 1;
 }
 
 /*

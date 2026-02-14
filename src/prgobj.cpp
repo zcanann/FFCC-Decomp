@@ -40,12 +40,16 @@ void CGPrgObj::onCreate()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80127AD0
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPrgObj::onDestroy()
 {
-	// TODO
+	CGObject::onDestroy();
 }
 
 /*

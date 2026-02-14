@@ -116,9 +116,9 @@ void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, Un
     float fVar1;
     int iVar2;
 
-    fVar1 = 1.0f;
+    fVar1 = FLOAT_80330dac;
     iVar2 = param_2->m_serializedDataOffsets[2];
-    *(float*)((u8*)pppYmDeformationMdl_ + 0x8C + iVar2) = 1.0f;
+    *(float*)((u8*)pppYmDeformationMdl_ + 0x8C + iVar2) = FLOAT_80330dac;
     *(float*)((u8*)pppYmDeformationMdl_ + 0x88 + iVar2) = fVar1;
     *(float*)((u8*)pppYmDeformationMdl_ + 0x84 + iVar2) = fVar1;
     *(float*)((u8*)pppYmDeformationMdl_ + 0x98 + iVar2) = fVar1;
@@ -153,26 +153,26 @@ void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, UnkB* pa
 {
     s16* psVar1;
 
-    if ((DAT_8032ed70 == 0) && (param_2->m_dataValIndex != 0xFFFF)) {
-        psVar1 = (s16*)((u8*)pppYmDeformationMdl + 0x80 + param_3->m_serializedDataOffsets[2]);
-
+    if ((DAT_8032ed70 == 0) &&
+        ((psVar1 = (s16*)((u8*)pppYmDeformationMdl + 0x80 + param_3->m_serializedDataOffsets[2])),
+         (param_2->m_dataValIndex != 0xFFFF))) {
         CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-            param_2->m_initWOrk, pppYmDeformationMdl, param_2->m_graphId, (float*)(psVar1 + 2),
+            (float)param_2->m_initWOrk, pppYmDeformationMdl, param_2->m_graphId, (float*)(psVar1 + 2),
             (float*)(psVar1 + 4), (float*)(psVar1 + 6), &param_2->m_stepValue, &param_2->m_arg3);
         CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-            param_2->m_payload0, pppYmDeformationMdl, param_2->m_graphId, (float*)(psVar1 + 8),
+            (float)param_2->m_payload0, pppYmDeformationMdl, param_2->m_graphId, (float*)(psVar1 + 8),
             (float*)(psVar1 + 10), (float*)(psVar1 + 0xC), &param_2->m_payload1, &param_2->m_payload2);
 
         if (DAT_8032ed78 == 0) {
-            if (*(u8*)(psVar1 + 1) == 0) {
-                *psVar1 = *psVar1 - (s16)(int)*(float*)(psVar1 + 8);
-                if ((int)*psVar1 < -(int)param_2->m_payload3) {
-                    *(u8*)(psVar1 + 1) = 1;
-                }
-            } else {
+            if (*(u8*)(psVar1 + 1) != 0) {
                 *psVar1 = *psVar1 + (s16)(int)*(float*)(psVar1 + 8);
                 if (param_2->m_payload3 < *psVar1) {
                     *(u8*)(psVar1 + 1) = 0;
+                }
+            } else {
+                *psVar1 = *psVar1 - (s16)(int)*(float*)(psVar1 + 8);
+                if ((int)*psVar1 < -(int)param_2->m_payload3) {
+                    *(u8*)(psVar1 + 1) = 1;
                 }
             }
         }

@@ -167,9 +167,15 @@ void GXSetIndTexOrder(GXIndTexStageID ind_stage, GXTexCoordID tex_coord, GXTexMa
 }
 
 void GXSetNumIndStages(u8 nIndStages) {
+    u32 reg;
+
     CHECK_GXBEGIN(353, "GXSetNumIndStages");
     ASSERTMSGLINE(355, nIndStages <= 4, "GXSetNumIndStages: Exceeds max. number of indirect texture stages");
-    SET_REG_FIELD(356, __GXData->genMode, 3, 16, nIndStages);
+
+    reg = __GXData->genMode;
+    reg = (reg & 0xFFF8FFFFU) | ((u32)nIndStages << 16);
+    __GXData->genMode = reg;
+
     __GXData->dirtyState |= 6;
 }
 

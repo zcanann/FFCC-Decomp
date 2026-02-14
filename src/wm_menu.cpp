@@ -258,22 +258,36 @@ void CMenuPcs::CalcGoOutSelCharInit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800fc20c
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::SetMenuCharaAnim(int, int)
+void CMenuPcs::SetMenuCharaAnim(int charaIndex, int animIndex)
 {
-	// TODO
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const menuCharaAnims = *reinterpret_cast<unsigned char**>(bytes + 0x844);
+
+	reinterpret_cast<int*>(menuCharaAnims + charaIndex * 0x14 + 4)[0] = animIndex;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800fc1f4
+ * PAL Size: 24b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::IsMenuCharaAnimIdle(int)
+unsigned int CMenuPcs::IsMenuCharaAnimIdle(int charaIndex)
 {
-	// TODO
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const menuCharaAnims = *reinterpret_cast<unsigned char**>(bytes + 0x844);
+
+	return static_cast<unsigned int>(__cntlzw(reinterpret_cast<unsigned int*>(menuCharaAnims + charaIndex * 0x14)[0])) >> 5 & 0xff;
 }
 
 /*

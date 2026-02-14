@@ -132,7 +132,7 @@ public:
     void CalcGoOutSelChar(unsigned char, unsigned char);
     void CalcGoOutSelCharInit();
     void SetMenuCharaAnim(int, int);
-    void IsMenuCharaAnimIdle(int);
+    unsigned int IsMenuCharaAnimIdle(int);
     void drawWorld();
     void DrawMainMenu();
     void DrawDiaryMenu();

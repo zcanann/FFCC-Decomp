@@ -82,7 +82,7 @@ public:
     void FGPutGil(int);
     void ChgCmdLst(int, int);
     void ChgEquipPos(int, int);
-    void CanAddComList(int);
+    int CanAddComList(int);
     void AddComList(int, int*);
     void DeleteCmdList(int, int);
     void AddItem(int, int*);

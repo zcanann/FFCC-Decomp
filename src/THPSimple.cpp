@@ -58,6 +58,7 @@ extern void (*lbl_8032EE50)(void);
 extern s16* lbl_8032EE54;
 extern s16* lbl_8032EE58;
 extern s32 lbl_8032EE5C;
+extern u16 lbl_802111E8[];
 extern s16 WorkBuffer_32_[];
 
 /*
@@ -760,12 +761,141 @@ s32 THPSimpleDrawCurrentFrame(GXRenderModeObj* obj, int x, int y, int polyWidth,
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80104240
+ * PAL Size: 852b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void MixAudio(short*, short*, unsigned long)
+void MixAudio(short* output, short* input, unsigned long samples)
 {
-	// TODO
+    u16 volume;
+    f32 nextVolume;
+    s32 mixedSample;
+    s16* audioPtr;
+    u32 availableSamples;
+    u32 i;
+    u32 playIndex;
+
+    if (input == NULL) {
+        if ((SimpleControl.isOpen == 0) || (SimpleControl.isBufferSet != 1) || (SimpleControl.hasAudio == 0)) {
+            memset(output, 0, samples << 2);
+        } else {
+            do {
+                playIndex = static_cast<u32>(SimpleControl.audioPlayIndex);
+                availableSamples = SimpleControl.audioBuffer[playIndex].mValidSample;
+                if (availableSamples == 0) {
+                    memset(output, 0, samples << 2);
+                    return;
+                }
+                if (samples <= availableSamples) {
+                    availableSamples = static_cast<u32>(samples);
+                }
+
+                audioPtr = SimpleControl.audioBuffer[playIndex].mCurPtr;
+                for (i = availableSamples; i != 0; i--) {
+                    nextVolume = SimpleControl.unk_C8;
+                    if (SimpleControl.unk_D0 != 0) {
+                        SimpleControl.unk_D0 -= 1;
+                        nextVolume = SimpleControl.unk_C4 + SimpleControl.unk_CC;
+                    }
+                    SimpleControl.unk_C4 = nextVolume;
+                    volume = lbl_802111E8[static_cast<s32>(SimpleControl.unk_C4)];
+
+                    mixedSample = static_cast<s32>((static_cast<u32>(volume) * static_cast<s32>(*audioPtr)) >> 15);
+                    if (mixedSample < -0x8000) {
+                        mixedSample = -0x8000;
+                    }
+                    if (mixedSample > 0x7FFF) {
+                        mixedSample = 0x7FFF;
+                    }
+                    *output = static_cast<s16>(mixedSample);
+
+                    mixedSample = static_cast<s32>((static_cast<u32>(volume) * static_cast<s32>(audioPtr[1])) >> 15);
+                    if (mixedSample < -0x8000) {
+                        mixedSample = -0x8000;
+                    }
+                    if (mixedSample > 0x7FFF) {
+                        mixedSample = 0x7FFF;
+                    }
+                    output[1] = static_cast<s16>(mixedSample);
+
+                    output += 2;
+                    audioPtr += 2;
+                }
+
+                samples -= availableSamples;
+                SimpleControl.audioBuffer[playIndex].mValidSample -= availableSamples;
+                SimpleControl.audioBuffer[playIndex].mCurPtr = audioPtr;
+                if (SimpleControl.audioBuffer[playIndex].mValidSample == 0) {
+                    SimpleControl.audioPlayIndex += 1;
+                    if (SimpleControl.audioPlayIndex > 2) {
+                        SimpleControl.audioPlayIndex = 0;
+                    }
+                }
+            } while (samples != 0);
+        }
+    } else if ((SimpleControl.isOpen == 0) || (SimpleControl.isBufferSet != 1) || (SimpleControl.hasAudio == 0)) {
+        memcpy(output, input, samples << 2);
+    } else {
+        do {
+            playIndex = static_cast<u32>(SimpleControl.audioPlayIndex);
+            availableSamples = SimpleControl.audioBuffer[playIndex].mValidSample;
+            if (availableSamples == 0) {
+                memcpy(output, input, samples << 2);
+                return;
+            }
+            if (samples <= availableSamples) {
+                availableSamples = static_cast<u32>(samples);
+            }
+
+            audioPtr = SimpleControl.audioBuffer[playIndex].mCurPtr;
+            for (i = availableSamples; i != 0; i--) {
+                nextVolume = SimpleControl.unk_C8;
+                if (SimpleControl.unk_D0 != 0) {
+                    SimpleControl.unk_D0 -= 1;
+                    nextVolume = SimpleControl.unk_C4 + SimpleControl.unk_CC;
+                }
+                SimpleControl.unk_C4 = nextVolume;
+                volume = lbl_802111E8[static_cast<s32>(SimpleControl.unk_C4)];
+
+                mixedSample = static_cast<s32>(*input) +
+                              static_cast<s32>((static_cast<u32>(volume) * static_cast<s32>(*audioPtr)) >> 15);
+                if (mixedSample < -0x8000) {
+                    mixedSample = -0x8000;
+                }
+                if (mixedSample > 0x7FFF) {
+                    mixedSample = 0x7FFF;
+                }
+                *output = static_cast<s16>(mixedSample);
+
+                mixedSample = static_cast<s32>(input[1]) +
+                              static_cast<s32>((static_cast<u32>(volume) * static_cast<s32>(audioPtr[1])) >> 15);
+                if (mixedSample < -0x8000) {
+                    mixedSample = -0x8000;
+                }
+                if (mixedSample > 0x7FFF) {
+                    mixedSample = 0x7FFF;
+                }
+                output[1] = static_cast<s16>(mixedSample);
+
+                output += 2;
+                input += 2;
+                audioPtr += 2;
+            }
+
+            samples -= availableSamples;
+            SimpleControl.audioBuffer[playIndex].mValidSample -= availableSamples;
+            SimpleControl.audioBuffer[playIndex].mCurPtr = audioPtr;
+            if (SimpleControl.audioBuffer[playIndex].mValidSample == 0) {
+                SimpleControl.audioPlayIndex += 1;
+                if (SimpleControl.audioPlayIndex > 2) {
+                    SimpleControl.audioPlayIndex = 0;
+                }
+            }
+        } while (samples != 0);
+    }
 }
 
 /*

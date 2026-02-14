@@ -1,5 +1,7 @@
 #include "ffcc/pppLight.h"
 
+extern float lbl_80330F60;
+
 /*
  * --INFO--
  * PAL Address: 0x800dab00
@@ -17,16 +19,17 @@ void pppLightCon3(void* param1, void* param2)
 	void** ptr2 = (void**)*ptr1;
 	void* ptr3 = *ptr2;
 	char* base = (char*)param1 + (int)ptr3 + 0x80;
+	float zero = lbl_80330F60;
 	
 	// Clear some integer values
 	*(int*)((char*)base + 0x10) = 0;
 	*(int*)((char*)base + 0x14) = 0;
 	
 	// Set float values to 0.0f
-	*(float*)((char*)base + 0x20) = 0.0f;
-	*(float*)((char*)base + 0x2c) = 0.0f;
-	*(float*)((char*)base + 0x38) = 0.0f;
-	*(float*)((char*)base + 0x44) = 0.0f;
+	*(float*)((char*)base + 0x20) = zero;
+	*(float*)((char*)base + 0x2c) = zero;
+	*(float*)((char*)base + 0x38) = zero;
+	*(float*)((char*)base + 0x44) = zero;
 }
 
 /*
@@ -45,6 +48,7 @@ void pppLightCon(void* param1, void* param2)
 	void** ptr2 = (void**)*ptr1;
 	void* ptr3 = *ptr2;
 	char* base = (char*)param1 + (int)ptr3 + 0x80;
+	float zero = lbl_80330F60;
 	
 	// Clear integer values
 	*(int*)((char*)base + 0x0) = 0;
@@ -55,18 +59,18 @@ void pppLightCon(void* param1, void* param2)
 	*(int*)((char*)base + 0x14) = 0;
 	
 	// Clear float values
-	*(float*)((char*)base + 0x18) = 0.0f;
-	*(float*)((char*)base + 0x1c) = 0.0f;
-	*(float*)((char*)base + 0x20) = 0.0f;
-	*(float*)((char*)base + 0x24) = 0.0f;
-	*(float*)((char*)base + 0x28) = 0.0f;
-	*(float*)((char*)base + 0x2c) = 0.0f;
-	*(float*)((char*)base + 0x30) = 0.0f;
-	*(float*)((char*)base + 0x34) = 0.0f;
-	*(float*)((char*)base + 0x38) = 0.0f;
-	*(float*)((char*)base + 0x3c) = 0.0f;
-	*(float*)((char*)base + 0x40) = 0.0f;
-	*(float*)((char*)base + 0x44) = 0.0f;
+	*(float*)((char*)base + 0x20) = zero;
+	*(float*)((char*)base + 0x1c) = zero;
+	*(float*)((char*)base + 0x18) = zero;
+	*(float*)((char*)base + 0x2c) = zero;
+	*(float*)((char*)base + 0x28) = zero;
+	*(float*)((char*)base + 0x24) = zero;
+	*(float*)((char*)base + 0x38) = zero;
+	*(float*)((char*)base + 0x34) = zero;
+	*(float*)((char*)base + 0x30) = zero;
+	*(float*)((char*)base + 0x44) = zero;
+	*(float*)((char*)base + 0x40) = zero;
+	*(float*)((char*)base + 0x3c) = zero;
 }
 
 /*

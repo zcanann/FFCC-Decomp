@@ -1,5 +1,7 @@
 #include "ffcc/sound.h"
 
+#include "ffcc/RedSound/RedSound.h"
+
 /*
  * --INFO--
  * Address:	TODO
@@ -42,32 +44,46 @@ void CSound::Quit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c7f20
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::SetStereo(int)
+void CSound::SetStereo(int stereo)
 {
-	// TODO
+    reinterpret_cast<CRedSound*>(this)->SetSoundMode((u32)__cntlzw(stereo) >> 5);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c7ef8
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::SetBgmMasterVolume(int)
+void CSound::SetBgmMasterVolume(int volume)
 {
-	// TODO
+    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22B0) = volume;
+    reinterpret_cast<CRedSound*>(this)->MusicMasterVolume(volume);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c7ed0
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::SetSeMasterVolume(int)
+void CSound::SetSeMasterVolume(int volume)
 {
-	// TODO
+    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22B4) = volume;
+    reinterpret_cast<CRedSound*>(this)->SeMasterVolume(volume);
 }
 
 /*

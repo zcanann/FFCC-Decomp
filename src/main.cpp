@@ -81,7 +81,7 @@ void game(int argc, char** argv)
                     c = (*argument)[1];
                     if (c == 'l') {
                         parseLanguage = true;
-                    } else if ((c < 'l') && (c == 'f')) {
+                    } else if (c == 'f') {
                         copyScriptName = true;
                     }
                 }

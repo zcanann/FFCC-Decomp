@@ -22,7 +22,7 @@ static terminate_handler thandler = dthandler;
  * @note Address: N/A
  * @note Size: 0x28
  */
-static void duhandler() { terminate(); }
+static void duhandler() { thandler(); }
 
 static unexpected_handler uhandler = duhandler;
 

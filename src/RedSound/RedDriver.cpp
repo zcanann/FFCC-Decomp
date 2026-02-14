@@ -2,6 +2,8 @@
 #include "ffcc/RedSound/RedMemory.h"
 #include "ffcc/RedSound/RedEntry.h"
 #include "ffcc/RedSound/RedStream.h"
+#include "ffcc/RedSound/RedCommand.h"
+#include "ffcc/RedSound/RedExecute.h"
 #include "dolphin/ar.h"
 #include "dolphin/ax.h"
 #include "dolphin/os.h"
@@ -21,8 +23,14 @@ extern "C" {
     void* RedNew__Fi(int);
     void RedDelete__FPv(void*);
     void* memcpy(void*, const void*, unsigned long);
+    void* memmove(void*, const void*, unsigned long);
     void* memset(void*, int, unsigned long);
+    void SetMusicData__9CRedEntryFP12RedMusicHEAD(void*, void*);
+    int SetSeSepData__9CRedEntryFP12RedSeSepHEAD(void*, void*);
+    void ClearSeSepData__9CRedEntryFi(void*, int);
+    void ClearSeSepDataMG__9CRedEntryFiiii(void*, int, int, int, int);
     int SearchMusicSequence__9CRedEntryFi(void*, int);
+    int SearchSeSepSequence__9CRedEntryFi(void*, int);
     void MusicStop__Fi(int);
     void MusicPlay__Fiii(int, int, int);
     void AXSetCompressor(int);
@@ -48,6 +56,7 @@ extern int DAT_8032f448;
 extern int DAT_8032f47c;
 extern int DAT_8032f478;
 extern int DAT_8032f424;
+extern int DAT_8032f440;
 extern int DAT_8032f43c;
 extern int DAT_8032f3b8;
 extern int DAT_8032e12c;
@@ -138,9 +147,9 @@ void _SetReverbDepth(int*)
  * Address:	TODO
  * Size:	TODO
  */
-void _SetMusicData(int*)
+void _SetMusicData(int* param_1)
 {
-	// TODO
+    SetMusicData__9CRedEntryFP12RedMusicHEAD(&DAT_8032e154, (void*)*param_1);
 }
 
 /*
@@ -148,9 +157,15 @@ void _SetMusicData(int*)
  * Address:	TODO
  * Size:	TODO
  */
-void _MusicStop(int*)
+void _MusicStop(int* param_1)
 {
-	// TODO
+    MusicStop__Fi(*param_1);
+    if ((*param_1 == -1) || (*(int*)DAT_8032f428 == *param_1)) {
+        *(int*)DAT_8032f428 = -1;
+    }
+    if (*(int*)DAT_8032f428 < 0) {
+        DAT_8032f424 = 0;
+    }
 }
 
 /*
@@ -228,9 +243,18 @@ void _MusicCrossPlaySequence(int* param_1)
  * Address:	TODO
  * Size:	TODO
  */
-void _MusicNextPlaySequence(int*)
+void _MusicNextPlaySequence(int* param_1)
 {
-	// TODO
+    int iVar1;
+
+    if ((((*param_1 != *(int*)((int)DAT_8032f3f0 + 0x470)) &&
+          (*param_1 != *(int*)((int)DAT_8032f3f0 + 0x904))) &&
+         (*param_1 != *(int*)((int)DAT_8032f3f0 + 0xd98))) &&
+        ((iVar1 = SearchMusicSequence__9CRedEntryFi(&DAT_8032e154, *param_1)), -1 < iVar1)) {
+        *(int*)DAT_8032f428 = *param_1;
+        ((int*)DAT_8032f428)[1] = param_1[1];
+        ((int*)DAT_8032f428)[2] = param_1[2];
+    }
 }
 
 /*
@@ -238,9 +262,19 @@ void _MusicNextPlaySequence(int*)
  * Address:	TODO
  * Size:	TODO
  */
-void _MusicMasterVolume(int*)
+void _MusicMasterVolume(int* param_1)
 {
-	// TODO
+    unsigned int* puVar1;
+
+    DAT_8032f430 = *param_1 & 0x7f;
+    puVar1 = DAT_8032f444;
+    if (DAT_8032f430 != 0) {
+        DAT_8032f430 = (DAT_8032f430 + 1) * 4 - 1;
+    }
+    do {
+        puVar1[0x2e] = puVar1[0x2e] | 2;
+        puVar1 += 0x30;
+    } while (puVar1 < DAT_8032f444 + 0xc00);
 }
 
 /*
@@ -248,9 +282,13 @@ void _MusicMasterVolume(int*)
  * Address:	TODO
  * Size:	TODO
  */
-void _MusicVolume(int*)
+void _MusicVolume(int* param_1)
 {
-	// TODO
+    if (param_1[3] == 1) {
+        *(int*)DAT_8032f428 = -1;
+        DAT_8032f424 = 0;
+    }
+    SetMusicVolume(param_1[0], param_1[1], param_1[2], param_1[3]);
 }
 
 /*
@@ -258,9 +296,9 @@ void _MusicVolume(int*)
  * Address:	TODO
  * Size:	TODO
  */
-void _SetMusicPhraseStop(int*)
+void _SetMusicPhraseStop(int* param_1)
 {
-	// TODO
+    DAT_8032f424 = *param_1;
 }
 
 /*
@@ -268,9 +306,27 @@ void _SetMusicPhraseStop(int*)
  * Address:	TODO
  * Size:	TODO
  */
-void _SetSeBlockData(int*)
+void _SetSeBlockData(int* param_1)
 {
-	// TODO
+    unsigned int uVar1;
+    unsigned char* puVar2;
+
+    uVar1 = (unsigned int)*param_1 & 3;
+    if ((&DAT_8032e12c)[uVar1] != 0) {
+        RedDelete__FPv((void*)(&DAT_8032e12c)[uVar1]);
+        (&DAT_8032e12c)[uVar1] = 0;
+    }
+    if (param_1[1] != 0) {
+        puVar2 = (unsigned char*)param_1[1];
+        puVar2[0] = 'S';
+        puVar2[1] = 'e';
+        puVar2[2] = 'B';
+        puVar2[3] = 'l';
+        puVar2[4] = 'o';
+        puVar2[5] = 'c';
+        puVar2[6] = 'k';
+        (&DAT_8032e12c)[uVar1] = param_1[1];
+    }
 }
 
 /*
@@ -278,9 +334,9 @@ void _SetSeBlockData(int*)
  * Address:	TODO
  * Size:	TODO
  */
-void _SetSeSepData(int*)
+void _SetSeSepData(int* param_1)
 {
-	// TODO
+    SetSeSepData__9CRedEntryFP12RedSeSepHEAD(&DAT_8032e154, (void*)*param_1);
 }
 
 /*
@@ -288,9 +344,9 @@ void _SetSeSepData(int*)
  * Address:	TODO
  * Size:	TODO
  */
-void _ClearSeSepData(int*)
+void _ClearSeSepData(int* param_1)
 {
-	// TODO
+    ClearSeSepData__9CRedEntryFi(&DAT_8032e154, *param_1);
 }
 
 /*
@@ -298,9 +354,9 @@ void _ClearSeSepData(int*)
  * Address:	TODO
  * Size:	TODO
  */
-void _ClearSeSepDataMG(int*)
+void _ClearSeSepDataMG(int* param_1)
 {
-	// TODO
+    ClearSeSepDataMG__9CRedEntryFiiii(&DAT_8032e154, param_1[0], param_1[1], param_1[2], param_1[3]);
 }
 
 /*
@@ -308,9 +364,9 @@ void _ClearSeSepDataMG(int*)
  * Address:	TODO
  * Size:	TODO
  */
-void _SeStop(int*)
+void _SeStop(int* param_1)
 {
-	// TODO
+    SeStopID(param_1[0]);
 }
 
 /*
@@ -318,9 +374,9 @@ void _SeStop(int*)
  * Address:	TODO
  * Size:	TODO
  */
-void _SeStopMG(int*)
+void _SeStopMG(int* param_1)
 {
-	// TODO
+    SeStopMG(param_1[0], param_1[1], param_1[2], param_1[3]);
 }
 
 /*
@@ -328,9 +384,10 @@ void _SeStopMG(int*)
  * Address:	TODO
  * Size:	TODO
  */
-void _SeBlockPlay(int*)
+void _SeBlockPlay(int* param_1)
 {
-	// TODO
+    DAT_8032f440 = param_1[5];
+    SeBlockPlay(param_1[0], param_1[1], param_1[2], param_1[3], param_1[4]);
 }
 
 /*
@@ -338,9 +395,15 @@ void _SeBlockPlay(int*)
  * Address:	TODO
  * Size:	TODO
  */
-void _SeSepPlay(int*)
+void _SeSepPlay(int* param_1)
 {
-	// TODO
+    int iVar1;
+
+    iVar1 = SetSeSepData__9CRedEntryFP12RedSeSepHEAD(&DAT_8032e154, (void*)param_1[1]);
+    if (iVar1 != 0) {
+        DAT_8032f440 = param_1[4];
+        SeSepPlay(param_1[0], *(int*)(iVar1 + 8), param_1[2], param_1[3]);
+    }
 }
 
 /*
@@ -348,9 +411,15 @@ void _SeSepPlay(int*)
  * Address:	TODO
  * Size:	TODO
  */
-void _SeSepPlaySequence(int*)
+void _SeSepPlaySequence(int* param_1)
 {
-	// TODO
+    int iVar1;
+
+    iVar1 = SearchSeSepSequence__9CRedEntryFi(&DAT_8032e154, param_1[1]);
+    if (-1 < iVar1) {
+        DAT_8032f440 = param_1[4];
+        SeSepPlay(param_1[0], param_1[1], param_1[2], param_1[3]);
+    }
 }
 
 /*
@@ -358,9 +427,19 @@ void _SeSepPlaySequence(int*)
  * Address:	TODO
  * Size:	TODO
  */
-void _SeMasterVolume(int*)
+void _SeMasterVolume(int* param_1)
 {
-	// TODO
+    unsigned int* puVar1;
+
+    DAT_8032f434 = *param_1 & 0x7f;
+    puVar1 = DAT_8032f444;
+    if (DAT_8032f434 != 0) {
+        DAT_8032f434 = (DAT_8032f434 + 1) * 4 - 1;
+    }
+    do {
+        puVar1[0x2e] = puVar1[0x2e] | 2;
+        puVar1 += 0x30;
+    } while (puVar1 < DAT_8032f444 + 0xc00);
 }
 
 /*
@@ -368,9 +447,9 @@ void _SeMasterVolume(int*)
  * Address:	TODO
  * Size:	TODO
  */
-void _SeVolume(int*)
+void _SeVolume(int* param_1)
 {
-	// TODO
+    SetSeVolume(param_1[0], param_1[1], param_1[2], param_1[3]);
 }
 
 /*
@@ -378,9 +457,9 @@ void _SeVolume(int*)
  * Address:	TODO
  * Size:	TODO
  */
-void _SePan(int*)
+void _SePan(int* param_1)
 {
-	// TODO
+    SetSePan(param_1[0], param_1[1], param_1[2]);
 }
 
 /*
@@ -388,9 +467,9 @@ void _SePan(int*)
  * Address:	TODO
  * Size:	TODO
  */
-void _SePitch(int*)
+void _SePitch(int* param_1)
 {
-	// TODO
+    SetSePitch(param_1[0], param_1[1], param_1[2]);
 }
 
 /*
@@ -398,9 +477,9 @@ void _SePitch(int*)
  * Address:	TODO
  * Size:	TODO
  */
-void _SePause(int*)
+void _SePause(int* param_1)
 {
-	// TODO
+    SePause(param_1[0], param_1[1]);
 }
 
 /*
@@ -524,9 +603,46 @@ void RedSleep(int)
  * Address:	TODO
  * Size:	TODO
  */
-void _MainThread(void*)
+int _MainThread(void*)
 {
-	// TODO
+    int iVar1;
+    int iVar2;
+    int iVar3;
+    unsigned int uVar4;
+
+    DAT_8032f3c4 = DAT_8032f3c4 | 1;
+    while (DAT_8032f3c0 != 0) {
+        OSWaitSemaphore(&DAT_8032d778);
+        if (DAT_8032f3c0 != 0) {
+            iVar2 = OSGetTick();
+            iVar1 = (int)DAT_8032f3f0;
+            iVar3 = DAT_8032f3b8;
+            uVar4 = (unsigned int)(DAT_8032f3b8 - DAT_8032f458);
+            if (*(short*)(iVar1 + 0x48e) != 0) {
+                *(unsigned int*)(iVar1 + 0x478) = *(unsigned int*)(iVar1 + 0x478) + uVar4;
+            }
+            DAT_8032f458 = iVar3;
+            if (4 < uVar4) {
+                uVar4 = 4;
+            }
+            MainControl(uVar4);
+            StreamControl();
+            _ExecuteCommand();
+            if ((-1 < *(int*)DAT_8032f428) && (*(int*)(iVar1 + 0x470) < 0)) {
+                _MusicPlaySequence((int*)DAT_8032f428);
+                *(int*)DAT_8032f428 = -1;
+                DAT_8032f424 = 0;
+            }
+            do {
+                iVar3 = OSTryWaitSemaphore(&DAT_8032d778);
+            } while (0 < iVar3);
+            memmove((int*)DAT_8032f3cc + 1, DAT_8032f3cc, 0x18c);
+            iVar3 = OSGetTick();
+            *(int*)DAT_8032f3cc = iVar3 - iVar2;
+        }
+    }
+    DAT_8032f3c4 = DAT_8032f3c4 & ~1;
+    return 0;
 }
 
 /*

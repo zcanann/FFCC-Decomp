@@ -38,7 +38,7 @@ void DeltaTimeSumup(unsigned char**);
 void GetMyEntryID();
 void _MyAlarmHandler(OSAlarm*, OSContext*);
 void RedSleep(int);
-void _MainThread(void*);
+int _MainThread(void*);
 void _WaveSettingThread(void*);
 void _DMACheckProcess();
 void _DmaCallback(unsigned long);

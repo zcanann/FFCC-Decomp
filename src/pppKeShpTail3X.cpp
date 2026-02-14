@@ -1,5 +1,7 @@
 #include "ffcc/pppKeShpTail3X.h"
+#include "ffcc/pppPart.h"
 #include "ffcc/partMng.h"
+#include "ffcc/pppShape.h"
 #include <dolphin/mtx.h>
 #include <dolphin/os.h>
 #include <string.h>
@@ -23,8 +25,12 @@ struct KeShpTail3XOffsets {
 
 extern "C" {
 void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
+void pppCopyMatrix__FR10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*);
+void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
 void pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*, pppFMATRIX*);
 }
+extern Mtx ppvWorldMatrix;
+extern _pppEnvSt* pppEnvStPtr;
 
 /*
  * --INFO--
@@ -157,7 +163,71 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct UnkB* param_2, struct Unk
  */
 void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct UnkB* param_2, struct UnkC* param_3)
 {
-	// TODO
+    KeShpTail3XStep* step;
+    s16* work;
+    long* shape;
+    u8 count;
+    u8 blendMode;
+    pppFMATRIX local;
+    pppFMATRIX world;
+    pppFMATRIX out;
+    u8 headIndex;
+    s32 i;
+
+    step = (KeShpTail3XStep*)param_2;
+    if (step->m_dataValIndex == -1) {
+        return;
+    }
+
+    work = (s16*)((u8*)&obj->pppPObject + 8 + ((KeShpTail3XOffsets*)param_3)->m_serializedDataOffsets[0]);
+    shape = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
+    if (shape == NULL) {
+        return;
+    }
+
+    count = step->m_payload[8];
+    if (count == 0) {
+        return;
+    }
+
+    blendMode = step->m_payload[10];
+    pppSetBlendMode(blendMode);
+    pppSetDrawEnv((pppCVECTOR*)((u8*)obj + 0x88 + ((KeShpTail3XOffsets*)param_3)->m_serializedDataOffsets[1]),
+                  (pppFMATRIX*)0, 1.0f, step->m_payload[0xc], step->m_payload[0xb], blendMode, (u8)0, (u8)1, (u8)1,
+                  (u8)0);
+
+    pppCopyMatrix__FR10pppFMATRIX10pppFMATRIX(&local, &obj->pppPObject.m_localMatrix);
+    pppCopyMatrix__FR10pppFMATRIX10pppFMATRIX(&world, (pppFMATRIX*)&ppvWorldMatrix);
+
+    headIndex = ((u8*)work)[0x1c2];
+    for (i = 0; i < count; i++) {
+        u8 index = headIndex + i;
+        s16 shapeFrame = 0;
+        Vec* pos;
+
+        if (index >= 0x1c) {
+            index -= 0x1c;
+        }
+
+        pos = (Vec*)(work + (index * 6) + 0x18);
+        if (step->m_payload[0x3f] == 1) {
+            pppUnitMatrix__FR10pppFMATRIX(&out);
+            out.value[0][3] = pos->x;
+            out.value[1][3] = pos->y;
+            out.value[2][3] = pos->z;
+            pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&out, &world, &out);
+        } else {
+            out = local;
+            out.value[0][3] = pos->x;
+            out.value[1][3] = pos->y;
+            out.value[2][3] = pos->z;
+        }
+
+        GXLoadPosMtxImm(out.value, 0);
+        pppDrawShp(shape, shapeFrame, pppEnvStPtr->m_materialSetPtr, blendMode);
+    }
+
+    pppSetBlendMode(3);
 }
 
 /*

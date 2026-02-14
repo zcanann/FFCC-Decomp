@@ -89,11 +89,11 @@ extern "C" void pppDestructYmLaser(void* pppYmLaser, void* param_2)
 {
 	YmLaserOffsets* offsets = (YmLaserOffsets*)param_2;
 	int dataOffset = offsets->m_serializedDataOffsets[2];
-	void** stage = (void**)((unsigned char*)pppYmLaser + 0x9c + dataOffset);
+	void* stage = *(void**)((unsigned char*)pppYmLaser + 0x9c + dataOffset);
 
-	if (*stage != 0) {
-		pppHeapUseRate__FPQ27CMemory6CStage(*stage);
-		*stage = 0;
+	if (stage != 0) {
+		pppHeapUseRate__FPQ27CMemory6CStage(stage);
+		*(void**)((unsigned char*)pppYmLaser + 0x9c + dataOffset) = 0;
 	}
 }
 

@@ -135,8 +135,6 @@ void GXSetIndTexCoordScale(GXIndTexStageID ind_state, GXIndTexScale scale_s, GXI
  * JP Size: TODO
  */
 void GXSetIndTexOrder(GXIndTexStageID ind_stage, GXTexCoordID tex_coord, GXTexMapID tex_map) {
-    u32 iref;
-
     CHECK_GXBEGIN(302, "GXSetIndTexOrder");
 
     ASSERTMSGLINE(314, tex_map < GX_MAX_TEXMAP, "GXSetIndTexOrder: Invalid direct texture Id");
@@ -144,28 +142,20 @@ void GXSetIndTexOrder(GXIndTexStageID ind_stage, GXTexCoordID tex_coord, GXTexMa
 
     switch (ind_stage) {
     case GX_INDTEXSTAGE0:
-        iref = __GXData->iref;
-        iref = (iref & 0xFFFFFFF8) | (u32)tex_map;
-        iref = (iref & 0xFFFFFFC7) | ((u32)tex_coord << 3);
-        __GXData->iref = iref;
+        __GXData->iref = (__GXData->iref & 0xFFFFFFF8) | (u32)tex_map;
+        __GXData->iref = (__GXData->iref & 0xFFFFFFC7) | ((u32)tex_coord << 3);
         break;
     case GX_INDTEXSTAGE1:
-        iref = __GXData->iref;
-        iref = (iref & 0xFFFFFE3F) | ((u32)tex_map << 6);
-        iref = (iref & 0xFFFFF1FF) | ((u32)tex_coord << 9);
-        __GXData->iref = iref;
+        __GXData->iref = (__GXData->iref & 0xFFFFFE3F) | ((u32)tex_map << 6);
+        __GXData->iref = (__GXData->iref & 0xFFFFF1FF) | ((u32)tex_coord << 9);
         break;
     case GX_INDTEXSTAGE2:
-        iref = __GXData->iref;
-        iref = (iref & 0xFFFF8FFF) | ((u32)tex_map << 12);
-        iref = (iref & 0xFFFC7FFF) | ((u32)tex_coord << 15);
-        __GXData->iref = iref;
+        __GXData->iref = (__GXData->iref & 0xFFFF8FFF) | ((u32)tex_map << 12);
+        __GXData->iref = (__GXData->iref & 0xFFFC7FFF) | ((u32)tex_coord << 15);
         break;
     case GX_INDTEXSTAGE3:
-        iref = __GXData->iref;
-        iref = (iref & 0xFFE3FFFF) | ((u32)tex_map << 18);
-        iref = (iref & 0xFF1FFFFF) | ((u32)tex_coord << 21);
-        __GXData->iref = iref;
+        __GXData->iref = (__GXData->iref & 0xFFE3FFFF) | ((u32)tex_map << 18);
+        __GXData->iref = (__GXData->iref & 0xFF1FFFFF) | ((u32)tex_coord << 21);
         break;
     default:
         ASSERTMSGLINE(335, 0, "GXSetIndTexOrder: Invalid Indirect Stage Id");

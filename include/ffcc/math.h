@@ -45,7 +45,7 @@ public:
     void CrossCheckEllipseCapsule(Vec*, float*, Vec*, Vec*, float, Vec*, float, float);
     void CalcSpline(Vec*, Vec*, Vec*, Vec*, Vec*, float, float, float, float, float);
     void MakeSpline1Dtable(int, float*, float*, float*);
-    void Spline1D(int, float, float*, float*, float*);
+    float Spline1D(int, float, float*, float*, float*);
     void Line1D(int, float, float*, float*);
     unsigned int Hsb2Rgb(int, int, int);
     float DstRot(float, float);

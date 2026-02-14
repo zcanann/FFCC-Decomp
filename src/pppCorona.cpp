@@ -116,16 +116,18 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, UnkC* param3)
     Vec viewDir;
     Vec fromOrigin;
     long* shape;
+    s32 shapeId;
     float scale;
 
     shape = (long*)0;
-    work = (CoronaWork*)((u8*)param1 + 0x80 + param3->m_serializedDataOffsets[2]);
+    work = (CoronaWork*)((u8*)param1 + 0x80 + param3->m_serializedDataOffsets[3]);
 
-    if ((param2->m_dataValIndex | 0xFFFF0000U) == 0xFFFFFFFF) {
+    shapeId = param2->m_dataValIndex;
+    if (shapeId == 0xFFFF) {
         return;
     }
 
-    shape = *(long**)(*(u32*)((u8*)pppEnvStPtr + 0x4) + param2->m_dataValIndex * 4);
+    shape = *(long**)(*(u32*)((u8*)pppEnvStPtr + 0x4) + shapeId * 4);
 
     PSMTXIdentity(mtx.value);
 

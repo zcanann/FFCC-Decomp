@@ -47,7 +47,16 @@ static BOOL DBGEXISync() {
     return TRUE;
 }
 
-static BOOL DBGEXIImm(void* buffer, s32 bytecounter, u32 write) {
+/*
+ * --INFO--
+ * PAL Address: 0x801bcc74
+ * PAL Size: 664b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static BOOL DBGEXIImm(void* buffer, s32 bytecounter, s32 write) {
     s32 i;
     s32 rem;
     u32 value;
@@ -196,26 +205,34 @@ static BOOL DBGRead(u32 count, u32* buffer, s32 param3) {
     return ((u32)__cntlzw(result)) >> 5;
 }
 
-static BOOL DBGWrite(u32 count, void* buffer, s32 param3) {
+/*
+ * --INFO--
+ * PAL Address: 0x801bca10
+ * PAL Size: 220b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+static BOOL DBGWrite(u32 count, u32* buffer, s32 param3) {
     u32 busyFlag;
     u32 regs;
     u32 result;
-    u32* data;
-    u32 value;
+    u32 cmd;
+    u32 word;
 
-    value = ((count & 0x1fffc) << 8) | 0xa0000000;
+    cmd = ((count & 0x1fffc) << 8) | 0xa0000000;
     regs = __EXIRegs[10];
     __EXIRegs[10] = (regs & 0x405) | 0xc0;
 
-    result = ((u32)__cntlzw(DBGEXIImm(&value, 4, TRUE))) >> 5;
+    result = ((u32)__cntlzw(DBGEXIImm(&cmd, 4, TRUE))) >> 5;
     do {
         busyFlag = __EXIRegs[13];
     } while (busyFlag & 1);
 
-    data = (u32*)buffer;
     while (param3 != 0) {
-        value = *data++;
-        result |= ((u32)__cntlzw(DBGEXIImm(&value, 4, TRUE))) >> 5;
+        word = *buffer++;
+        result |= ((u32)__cntlzw(DBGEXIImm(&word, 4, TRUE))) >> 5;
         do {
             busyFlag = __EXIRegs[13];
         } while (busyFlag & 1);

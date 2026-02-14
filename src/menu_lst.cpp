@@ -301,58 +301,110 @@ void CMenuPcs::MLstCtrl()
  */
 int CMenuPcs::MLstClose()
 {
-	int completedItems = 0;
-	
-	// Increment animation frame counter
-	*(short*)((char*)this + 0x82c + 0x22) += 1;
-	int currentFrame = *(short*)((char*)this + 0x82c + 0x22);
-	
-	int itemCount = **(short**)((char*)this + 0x850);
-	short* itemPtr = *(short**)((char*)this + 0x850) + 4;
-	
-	// Update each item's fade-out animation
-	for (int i = 0; i < itemCount; i++) {
-		int startFrame = *(int*)(itemPtr + 0x12);
-		int duration = *(int*)(itemPtr + 0x14);
-		
-		if (startFrame <= currentFrame) {
-			if (currentFrame < startFrame + duration) {
-				// Animate fade-out
-				*(int*)(itemPtr + 0x10) += 1;
-				int progress = *(int*)(itemPtr + 0x10);
-				
-				// Calculate fade-out alpha (1.0 - progress/duration)
-				float alpha = 1.0f - (float)progress / (float)duration;
-				if (alpha < 0.0f) {
-					alpha = 0.0f;
+	int completedItems;
+	int currentFrame;
+	unsigned int itemCount;
+	unsigned int remaining;
+	short* item;
+
+	completedItems = 0;
+	*(short*)(*(int*)((char*)this + 0x82c) + 0x22) = *(short*)(*(int*)((char*)this + 0x82c) + 0x22) + 1;
+	itemCount = (unsigned int)**(short**)((char*)this + 0x850);
+	item = *(short**)((char*)this + 0x850) + 4;
+	currentFrame = (int)*(short*)(*(int*)((char*)this + 0x82c) + 0x22);
+	remaining = itemCount;
+
+	if (0 < (int)itemCount) {
+		do {
+			if (*(int*)(item + 0x12) <= currentFrame) {
+				if (currentFrame < *(int*)(item + 0x12) + *(int*)(item + 0x14)) {
+					*(int*)(item + 0x10) = *(int*)(item + 0x10) + 1;
+					*(float*)(item + 8) = 1.0f - (float)*(int*)(item + 0x10) / (float)*(int*)(item + 0x14);
+					if (*(float*)(item + 8) < 0.0f) {
+						*(float*)(item + 8) = 0.0f;
+					}
+				} else {
+					completedItems = completedItems + 1;
+					*(float*)(item + 8) = 0.0f;
 				}
-				*(float*)(itemPtr + 8) = alpha;
-			} else {
-				// Animation complete
-				completedItems++;
-				*(float*)(itemPtr + 8) = 0.0f;
 			}
-		}
-		
-		itemPtr += 0x20;
+
+			item = item + 0x20;
+			remaining = remaining - 1;
+		} while (remaining != 0);
 	}
-	
-	// Check if all animations are complete
-	if (itemCount == completedItems) {
-		// Reset all animation states
-		itemPtr = *(short**)((char*)this + 0x850) + 4;
-		for (int i = 0; i < itemCount; i++) {
-			*(short*)(itemPtr + 0x12) = 0;  // Reset start frame
-			*(short*)(itemPtr + 0x13) = 0;
-			*(short*)(itemPtr + 0x14) = 0;  // Reset duration
-			*(short*)(itemPtr + 0x15) = 1;
-			*(float*)(itemPtr + 8) = 0.0f;  // Zero alpha
-			itemPtr += 0x20;
+
+	if (**(short**)((char*)this + 0x850) == completedItems) {
+		item = *(short**)((char*)this + 0x850) + 4;
+		if (0 < (int)itemCount) {
+			remaining = itemCount >> 3;
+			if (remaining != 0) {
+				do {
+					item[0x12] = 0;
+					item[0x13] = 0;
+					item[0x14] = 0;
+					item[0x15] = 1;
+					*(float*)(item + 8) = 0.0f;
+					item[0x32] = 0;
+					item[0x33] = 0;
+					item[0x34] = 0;
+					item[0x35] = 1;
+					*(float*)(item + 0x28) = 0.0f;
+					item[0x52] = 0;
+					item[0x53] = 0;
+					item[0x54] = 0;
+					item[0x55] = 1;
+					*(float*)(item + 0x48) = 0.0f;
+					item[0x72] = 0;
+					item[0x73] = 0;
+					item[0x74] = 0;
+					item[0x75] = 1;
+					*(float*)(item + 0x68) = 0.0f;
+					item[0x92] = 0;
+					item[0x93] = 0;
+					item[0x94] = 0;
+					item[0x95] = 1;
+					*(float*)(item + 0x88) = 0.0f;
+					item[0xb2] = 0;
+					item[0xb3] = 0;
+					item[0xb4] = 0;
+					item[0xb5] = 1;
+					*(float*)(item + 0xa8) = 0.0f;
+					item[0xd2] = 0;
+					item[0xd3] = 0;
+					item[0xd4] = 0;
+					item[0xd5] = 1;
+					*(float*)(item + 200) = 0.0f;
+					item[0xf2] = 0;
+					item[0xf3] = 0;
+					item[0xf4] = 0;
+					item[0xf5] = 1;
+					*(float*)(item + 0xe8) = 0.0f;
+					item = item + 0x100;
+					remaining = remaining - 1;
+				} while (remaining != 0);
+
+				itemCount = itemCount & 7;
+				if (itemCount == 0) {
+					return 1;
+				}
+			}
+
+			do {
+				item[0x12] = 0;
+				item[0x13] = 0;
+				item[0x14] = 0;
+				item[0x15] = 1;
+				*(float*)(item + 8) = 0.0f;
+				item = item + 0x20;
+				itemCount = itemCount - 1;
+			} while (itemCount != 0);
 		}
-		return 1;  // Close animation complete
+
+		return 1;
 	}
-	
-	return 0;  // Still animating
+
+	return 0;
 }
 
 /*

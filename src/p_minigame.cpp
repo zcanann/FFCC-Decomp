@@ -1,6 +1,40 @@
 #include "ffcc/p_minigame.h"
 
 extern CMiniGamePcs MiniGamePcs;
+extern unsigned int lbl_802121A8[];
+extern unsigned int lbl_802121B4[];
+extern unsigned int lbl_802121C0[];
+extern unsigned int lbl_802121CC[];
+extern unsigned int lbl_80212348[];
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012b19c
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_p_minigame_cpp(void)
+{
+    unsigned int* table = lbl_802121CC;
+    unsigned int* desc0 = lbl_802121A8;
+    unsigned int* desc1 = lbl_802121B4;
+    unsigned int* desc2 = lbl_802121C0;
+
+    *reinterpret_cast<unsigned int*>(&MiniGamePcs) = reinterpret_cast<unsigned int>(lbl_80212348);
+
+    table[1] = desc0[0];
+    table[2] = desc0[1];
+    table[3] = desc0[2];
+    table[4] = desc1[0];
+    table[5] = desc1[1];
+    table[6] = desc1[2];
+    table[7] = desc2[0];
+    table[8] = desc2[1];
+    table[9] = desc2[2];
+}
 
 /*
  * --INFO--

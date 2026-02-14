@@ -1,11 +1,25 @@
 #ifndef _PPP_YMDEFORMATIONSHP_H_
 #define _PPP_YMDEFORMATIONSHP_H_
 
+#include <dolphin/types.h>
+
 struct _pppPObject;
+struct pppYmDeformationShp;
 struct VYmDeformationShp;
 struct Vec;
 struct Vec2d;
 struct Vec4d;
+struct UnkB {
+    s32 m_graphId;
+    s32 m_dataValIndex;
+    f32 m_payload[6];
+    s16 m_payload3;
+    u8 m_pad_0x22[0x1a];
+};
+struct UnkC {
+    u8 m_pad_0x0[0xc];
+    s32* m_serializedDataOffsets;
+};
 
 void SetUpIndWarp(VYmDeformationShp*);
 void calcBoundaryBox(Vec&, Vec&, Vec4d*);
@@ -20,11 +34,11 @@ void RenderDeformationShape(_pppPObject*, VYmDeformationShp*, Vec*, Vec2d*);
 extern "C" {
 #endif
 
-void pppConstructYmDeformationShp(void);
-void pppConstruct2YmDeformationShp(void);
+void pppConstructYmDeformationShp(pppYmDeformationShp*, UnkC*);
+void pppConstruct2YmDeformationShp(pppYmDeformationShp*, UnkC*);
 void pppDestructYmDeformationShp(void);
-void pppFrameYmDeformationShp(void);
-void pppRenderYmDeformationShp(void);
+void pppFrameYmDeformationShp(pppYmDeformationShp*, UnkB*, UnkC*);
+void pppRenderYmDeformationShp(pppYmDeformationShp*, UnkB*, UnkC*);
 
 #ifdef __cplusplus
 }

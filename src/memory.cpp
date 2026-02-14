@@ -1,6 +1,8 @@
 #include "ffcc/memory.h"
 
 static char s_memory_cpp[] = "memory.cpp";
+extern void* PTR_PTR_s_CMemory_801e8488;
+extern CMemory Memory;
 
 /*
  * --INFO--
@@ -17,6 +19,20 @@ void* operator new(unsigned long size, CMemory::CStage* stage, char* file, int l
         file = s_memory_cpp;
     }
     return stage->alloc(size, file, line, 0);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8001FE54
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_memory_cpp(void)
+{
+    *reinterpret_cast<void**>(&Memory) = &PTR_PTR_s_CMemory_801e8488;
 }
 
 /*

@@ -7,6 +7,13 @@ struct VertexAttendStream
     s32 destOffset;
 };
 
+struct VertexSetEntry
+{
+    s16 modelIndex;
+    u8 pad2[2];
+    u16* vertexRemap;
+};
+
 struct VertexAttendModel
 {
     u8 pad0[0x2C];
@@ -18,7 +25,7 @@ struct VertexAttendEnv
     u8 pad0[0x8];
     VertexAttendModel** modelTable;
     u8 padC[0x4];
-    s16* vertexSetTable;
+    VertexSetEntry* vertexSetTable;
 };
 
 extern VertexAttendEnv* lbl_8032ED54;
@@ -41,12 +48,13 @@ void pppVertexAttend(void* r3, void* r4, void* r5)
     }
 
     VertexAttendStream* stream = *(VertexAttendStream**)((u8*)r5 + 0xC);
+    MtxPtr matrix = (MtxPtr)((u8*)*(void**)((u8*)r3 + 4) + 0x10);
     Vec transformed;
-    Vec* transformedPtr = &transformed;
-    u8* output = (u8*)r3 + stream->destOffset;
+    u8* output = (u8*)r3 + stream->destOffset + 0x80;
     u16 sourceIndex = *(u16*)((u8*)r3 + stream->sourceOffset + 0x80);
-    s16 modelIndex = ((s16*)lbl_8032ED54->vertexSetTable)[(u32)entryIndex * 4];
-    u16 vertexIndex = *(u16*)(output + ((u32)sourceIndex << 1));
+    VertexSetEntry* setEntry = &lbl_8032ED54->vertexSetTable[entryIndex];
+    u16 vertexIndex = setEntry->vertexRemap[sourceIndex];
+    s16 modelIndex = setEntry->modelIndex;
     Vec* sourceVertex =
         (Vec*)((u8*)lbl_8032ED54->modelTable[modelIndex]->vertexData + (vertexIndex * sizeof(Vec)));
 
@@ -54,9 +62,9 @@ void pppVertexAttend(void* r3, void* r4, void* r5)
     transformed.y = sourceVertex->y;
     transformed.z = sourceVertex->z;
 
-    PSMTXMultVec(*(Mtx*)((u8*)*(void**)((u8*)r3 + 4) + 0x10), transformedPtr, transformedPtr);
+    PSMTXMultVec(matrix, &transformed, &transformed);
 
-    *(f32*)((u8*)output + 0x80) = transformed.x;
-    *(f32*)((u8*)output + 0x84) = transformed.y;
-    *(f32*)((u8*)output + 0x88) = transformed.z;
+    *(f32*)(output + 0) = transformed.x;
+    *(f32*)(output + 4) = transformed.y;
+    *(f32*)(output + 8) = transformed.z;
 }

@@ -34,6 +34,7 @@ extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void* lbl_801EA488[];
+extern unsigned char MapMng[];
 
 static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
 static char s_ptrarray_grow_error[] = "CPtrArray grow error";
@@ -450,8 +451,12 @@ void CMapAnimNode::interp(Vec*, CMapAnimKey*, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004a970
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CMapAnim::CMapAnim()
 {
@@ -500,12 +505,46 @@ void CMapAnim::Calc(long frame)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004a4b8
+ * PAL Size: 168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapAnimRun::Calc(long)
+void CMapAnimRun::Calc(long frame)
 {
-	// TODO
+    struct CMapAnimRunData
+    {
+        int currentFrame;
+        int startFrame;
+        int endFrame;
+        int triggerFrame;
+        unsigned char loop;
+        unsigned char _pad11;
+        unsigned short mapAnimIndex;
+    };
+
+    CMapAnimRunData* run = reinterpret_cast<CMapAnimRunData*>(this);
+    CPtrArray<CMapAnim*>* mapAnims = reinterpret_cast<CPtrArray<CMapAnim*>*>(MapMng + 0x213FC);
+
+    if (run->currentFrame < 0) {
+        if (run->triggerFrame != frame) {
+            return;
+        }
+        run->currentFrame = run->startFrame;
+    }
+
+    mapAnims->m_items[run->mapAnimIndex]->Calc(run->currentFrame);
+    run->currentFrame++;
+
+    if (run->endFrame < run->currentFrame) {
+        if (run->loop == 0) {
+            run->currentFrame = -1;
+        } else {
+            run->currentFrame = 0;
+        }
+    }
 }
 
 /*
@@ -523,6 +562,6 @@ void CMapAnimRun::Start(int startFrame, int endFrame, int loop)
 
     data[1] = startFrame;
     data[2] = endFrame;
-    reinterpret_cast<unsigned char*>(this)[0x0C] = static_cast<unsigned char>(loop);
+    reinterpret_cast<unsigned char*>(this)[0x10] = static_cast<unsigned char>(loop);
     data[0] = data[1];
 }

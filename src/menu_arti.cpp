@@ -216,22 +216,92 @@ unsigned int CMenuPcs::ArtiOpen()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801607d4
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::ArtiCtrl()
+int CMenuPcs::ArtiCtrl()
 {
-	// TODO
+	int result;
+
+	*(short*)(*(int*)((char*)this + 0x82c) + 0x32) = *(short*)(*(int*)((char*)this + 0x82c) + 0x30);
+	result = ArtiCtrlCur();
+	if (result != 0) {
+		ArtiInit1();
+	}
+
+	return result;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80160658
+ * PAL Size: 380b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::ArtiClose()
+unsigned int CMenuPcs::ArtiClose()
 {
-	// TODO
+	float fVar1;
+	double dVar2;
+	double dVar3;
+	int iVar4;
+	short* psVar5;
+	int iVar6;
+	int iVar7;
+	int iVar8;
+
+	iVar4 = 0;
+	*(short*)(*(int*)((char*)this + 0x82c) + 0x22) = *(short*)(*(int*)((char*)this + 0x82c) + 0x22) + 1;
+	iVar6 = (int)**(short**)((char*)this + 0x850);
+	psVar5 = *(short**)((char*)this + 0x850) + 4;
+	iVar7 = (int)*(short*)(*(int*)((char*)this + 0x82c) + 0x22);
+	iVar8 = iVar6;
+	if (0 < iVar6) {
+		do {
+			dVar3 = DOUBLE_80332fe0;
+			fVar1 = FLOAT_80332fa8;
+			if (*(int*)(psVar5 + 0x12) <= iVar7) {
+				if (iVar7 < *(int*)(psVar5 + 0x12) + *(int*)(psVar5 + 0x14)) {
+					*(int*)(psVar5 + 0x10) = *(int*)(psVar5 + 0x10) + 1;
+					dVar2 = DOUBLE_80332fb0;
+					*(float*)(psVar5 + 8) =
+					    (float)-((DOUBLE_80332fb0 /
+					              ((double)(((unsigned int)*(unsigned int*)(psVar5 + 0x14) ^ 0x80000000U) | 0x4330000000000000ULL) - dVar3)) *
+					             ((double)(((unsigned int)*(unsigned int*)(psVar5 + 0x10) ^ 0x80000000U) | 0x4330000000000000ULL) - dVar3) -
+					             DOUBLE_80332fb0);
+					if ((*(unsigned int*)(psVar5 + 0x16) & 2) == 0) {
+						fVar1 = (float)-((dVar2 /
+						                  ((double)(((unsigned int)*(unsigned int*)(psVar5 + 0x14) ^ 0x80000000U) | 0x4330000000000000ULL) - dVar3)) *
+						                 ((double)(((unsigned int)*(unsigned int*)(psVar5 + 0x10) ^ 0x80000000U) | 0x4330000000000000ULL) - dVar3) -
+						                 dVar2);
+						*(float*)(psVar5 + 0x18) =
+						    (*(float*)(psVar5 + 0x1c) -
+						     (float)((double)(((unsigned int)(int)*psVar5 ^ 0x80000000U) | 0x4330000000000000ULL) - dVar3)) *
+						    fVar1;
+						*(float*)(psVar5 + 0x1a) =
+						    (*(float*)(psVar5 + 0x1e) -
+						     (float)((double)(((unsigned int)(int)psVar5[1] ^ 0x80000000U) | 0x4330000000000000ULL) - dVar3)) *
+						    fVar1;
+					}
+				} else {
+					iVar4 = iVar4 + 1;
+					*(float*)(psVar5 + 8) = FLOAT_80332fa8;
+					*(float*)(psVar5 + 0x18) = fVar1;
+					*(float*)(psVar5 + 0x1a) = fVar1;
+				}
+			}
+			psVar5 = psVar5 + 0x20;
+			iVar8 = iVar8 + -1;
+		} while (iVar8 != 0);
+	}
+
+	return (unsigned int)(iVar6 == iVar4);
 }
 
 /*
@@ -246,44 +316,98 @@ void CMenuPcs::ArtiDraw()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015fa28
+ * PAL Size: 812b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CMenuPcs::ArtiCtrlCur()
 {
-    // Simplified implementation to get it compiling
-    // TODO: Properly implement controller input handling
-    
-    // Check for basic pad input
-    unsigned short uVar3 = Pad._8_2_;
-    unsigned short uVar4 = Pad._8_2_; // Using same field temporarily
-    
-    if (uVar4 == 0) {
-        return 0;
-    }
-    
-    // Basic navigation logic (simplified)
-    if ((uVar4 & 4) != 0) {
-        // Down movement
-        Sound.PlaySe(1, 0x40, 0x7f, 0);
-    }
-    
-    if ((uVar4 & 8) != 0) {
-        // Up movement  
-        Sound.PlaySe(1, 0x40, 0x7f, 0);
-    }
-    
-    if ((uVar3 & 0x20) != 0) {
-        // A button
-        Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-        return 1;
-    }
-    
-    if ((uVar3 & 0x40) != 0) {
-        // B button
-        Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-        return 1;
-    }
-    
-    return 0;
+	short sVar1;
+	bool bVar2;
+	unsigned short uVar3;
+	unsigned short uVar4;
+	int iVar5;
+	int iVar6;
+
+	bVar2 = false;
+	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+		bVar2 = true;
+	}
+	if (bVar2) {
+		uVar3 = 0;
+	} else {
+		uVar3 = Pad._8_2_;
+	}
+
+	bVar2 = false;
+	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+		bVar2 = true;
+	}
+	if (bVar2) {
+		uVar4 = 0;
+	} else {
+		uVar4 = *(unsigned short*)((char*)&Pad + 0x20);
+	}
+
+	if (uVar4 == 0) {
+		return 0;
+	}
+
+	iVar5 = *(int*)((char*)this + 0x82c);
+	if ((uVar4 & 8) == 0) {
+		if ((uVar4 & 4) != 0) {
+			iVar6 = iVar5 + *(short*)(iVar5 + 0x30) * 2;
+			sVar1 = *(short*)(iVar6 + 0x26);
+			if (sVar1 < 7) {
+				*(short*)(iVar6 + 0x26) = sVar1 + 1;
+				Sound.PlaySe(1, 0x40, 0x7f, 0);
+			} else if ((int)*(short*)(iVar5 + 0x34) + (int)sVar1 < 0x48) {
+				*(short*)(iVar5 + 0x34) = *(short*)(iVar5 + 0x34) + 1;
+				Sound.PlaySe(1, 0x40, 0x7f, 0);
+			} else {
+				Sound.PlaySe(4, 0x40, 0x7f, 0);
+			}
+		}
+	} else {
+		iVar6 = iVar5 + *(short*)(iVar5 + 0x30) * 2;
+		sVar1 = *(short*)(iVar6 + 0x26);
+		if (sVar1 == 0) {
+			if (*(short*)(iVar5 + 0x34) == 0) {
+				Sound.PlaySe(4, 0x40, 0x7f, 0);
+			} else {
+				*(short*)(iVar5 + 0x34) = *(short*)(iVar5 + 0x34) + -1;
+				Sound.PlaySe(1, 0x40, 0x7f, 0);
+			}
+		} else {
+			*(short*)(iVar6 + 0x26) = sVar1 + -1;
+			Sound.PlaySe(1, 0x40, 0x7f, 0);
+		}
+	}
+
+	if ((uVar4 & 0xc) == 0) {
+		if ((uVar3 & 0x20) != 0) {
+			*(short*)(*(int*)((char*)this + 0x82c) + 0x1e) = 1;
+			Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+			return 1;
+		}
+		if ((uVar3 & 0x40) != 0) {
+			*(short*)(*(int*)((char*)this + 0x82c) + 0x1e) = -1;
+			Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+			return 1;
+		}
+		if ((uVar3 & 0x100) == 0) {
+			if ((uVar3 & 0x200) != 0) {
+				*(char*)(*(int*)((char*)this + 0x82c) + 0xd) = 1;
+				Sound.PlaySe(3, 0x40, 0x7f, 0);
+				return 1;
+			}
+		} else {
+			Sound.PlaySe(4, 0x40, 0x7f, 0);
+		}
+	}
+
+	return 0;
 }

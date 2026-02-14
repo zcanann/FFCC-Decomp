@@ -1,6 +1,8 @@
 #include "ffcc/map.h"
 #include "ffcc/maptexanim.h"
 
+extern "C" unsigned long UnkMaterialSetGetter(void*);
+
 /*
  * --INFO--
  * Address:	TODO
@@ -526,9 +528,22 @@ void CMapMng::SetMeshCameraSemiTransAlpha(unsigned short, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMng::GetMapObjIdx(unsigned short)
+int CMapMng::GetMapObjIdx(unsigned short id)
 {
-	// TODO
+    int objCount = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(this) + 0xC);
+    int objIndex = 0;
+    unsigned char* mapObj = reinterpret_cast<unsigned char*>(this);
+
+    while (0 < objCount) {
+        if (*reinterpret_cast<unsigned short*>(mapObj + 0x982) == id) {
+            return objIndex;
+        }
+        mapObj += 0xF0;
+        objIndex++;
+        objCount--;
+    }
+
+    return -1;
 }
 
 /*
@@ -536,9 +551,21 @@ void CMapMng::GetMapObjIdx(unsigned short)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMng::GetMaterialID(unsigned char)
+CMaterial* CMapMng::GetMaterialID(unsigned char materialId)
 {
-	// TODO
+    unsigned long index = 0;
+    unsigned char* materialSet = *reinterpret_cast<unsigned char**>(reinterpret_cast<unsigned char*>(this) + 0x213D4);
+    CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(materialSet + 8);
+
+    while (index < UnkMaterialSetGetter(materials)) {
+        CMaterial* material = (*materials)[index];
+        if (material != 0 && reinterpret_cast<unsigned char*>(material)[0xA6] == materialId) {
+            return (*materials)[index];
+        }
+        index++;
+    }
+
+    return 0;
 }
 
 /*
@@ -546,9 +573,22 @@ void CMapMng::GetMaterialID(unsigned char)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMng::GetMapObjEffectIdx(unsigned short)
+int CMapMng::GetMapObjEffectIdx(unsigned short effectId)
 {
-	// TODO
+    int objCount = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(this) + 0xC);
+    int objIndex = 0;
+    unsigned char* mapObj = reinterpret_cast<unsigned char*>(this);
+
+    while (0 < objCount) {
+        if (*reinterpret_cast<unsigned short*>(mapObj + 0x984) == effectId) {
+            return objIndex;
+        }
+        mapObj += 0xF0;
+        objIndex++;
+        objCount--;
+    }
+
+    return -1;
 }
 
 /*
@@ -608,7 +648,7 @@ void CMapMng::SetMapObjMime(int, int, int, int)
  */
 void CMapMng::SetMapTexAnim(int materialId, int frameStart, int frameEnd, int wrapMode)
 {
-    CMapTexAnimSet* mapTexAnimSet = reinterpret_cast<CMapTexAnimSet*>(reinterpret_cast<unsigned char*>(this) + 0x213DC);
+    CMapTexAnimSet* mapTexAnimSet = *reinterpret_cast<CMapTexAnimSet**>(reinterpret_cast<unsigned char*>(this) + 0x213DC);
     mapTexAnimSet->SetMapTexAnim(materialId, frameStart, frameEnd, wrapMode);
 }
 
@@ -627,9 +667,23 @@ void CMapMng::ShowMapObj(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMng::ShowMapObjID(int, int)
+void CMapMng::ShowMapObjID(int id, int show)
 {
-	// TODO
+    int objCount = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(this) + 0xC);
+    unsigned char* mapObj = reinterpret_cast<unsigned char*>(this);
+
+    for (int i = 0; i < objCount; i++) {
+        if (*reinterpret_cast<unsigned short*>(mapObj + 0x982) == static_cast<unsigned int>(id)) {
+            if (show != 0) {
+                *reinterpret_cast<unsigned char*>(mapObj + 0x96C) =
+                    static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(mapObj + 0x96C) | 1);
+            } else {
+                *reinterpret_cast<unsigned char*>(mapObj + 0x96C) =
+                    static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(mapObj + 0x96C) & 0xFE);
+            }
+        }
+        mapObj += 0xF0;
+    }
 }
 
 /*
@@ -657,9 +711,23 @@ void CMapMng::ShowMapObjChildID(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMng::ShowMapMeshID(int, int)
+void CMapMng::ShowMapMeshID(int id, int show)
 {
-	// TODO
+    int objCount = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(this) + 0xC);
+    unsigned char* mapObj = reinterpret_cast<unsigned char*>(this);
+
+    for (int i = 0; i < objCount; i++) {
+        if (*reinterpret_cast<unsigned short*>(mapObj + 0x988) == static_cast<unsigned int>(id)) {
+            if (show != 0) {
+                *reinterpret_cast<unsigned char*>(mapObj + 0x96C) =
+                    static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(mapObj + 0x96C) | 1);
+            } else {
+                *reinterpret_cast<unsigned char*>(mapObj + 0x96C) =
+                    static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(mapObj + 0x96C) & 0xFE);
+            }
+        }
+        mapObj += 0xF0;
+    }
 }
 
 /*
@@ -667,9 +735,19 @@ void CMapMng::ShowMapMeshID(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMng::SetMapObjPrioID(int, unsigned char)
+void CMapMng::SetMapObjPrioID(int id, unsigned char prio)
 {
-	// TODO
+    int i = 0;
+    unsigned char* mapObj = reinterpret_cast<unsigned char*>(this);
+
+    while (i < *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(this) + 0xC)) {
+        if (static_cast<int>(*reinterpret_cast<unsigned short*>(mapObj + 0x982)) == id) {
+            *reinterpret_cast<unsigned char*>(mapObj + 0x969) = prio;
+            *reinterpret_cast<unsigned char*>(mapObj + 0x968) = prio;
+        }
+        mapObj += 0xF0;
+        i++;
+    }
 }
 
 /*
@@ -677,9 +755,12 @@ void CMapMng::SetMapObjPrioID(int, unsigned char)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMng::SetMapObjTransRate(int, float, float, float)
+void CMapMng::SetMapObjTransRate(int mapObjIndex, float x, float y, float z)
 {
-	// TODO
+    unsigned char* mapObj = reinterpret_cast<unsigned char*>(this) + (mapObjIndex * 0xF0) + 0x954;
+    *reinterpret_cast<float*>(mapObj + 0x58) = x;
+    *reinterpret_cast<float*>(mapObj + 0x5C) = y;
+    *reinterpret_cast<float*>(mapObj + 0x60) = z;
 }
 
 /*
@@ -703,46 +784,40 @@ void CMapMng::SetMapObjWorldMapLightIdx(int, _GXColor, Vec)
  */
 void CMapMng::SetMapObjWorldMapLightID(int id, _GXColor color, Vec position)
 {
-	int i;
-	int objCount;
-	int objIndex;
-	unsigned int packedColor;
-	unsigned int posX;
-	unsigned int posY;
-	unsigned int posZ;
-	unsigned char* mapObj;
-	unsigned char* mapObjLight;
+    int objIndex = 0;
+    int numMapObj = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(this) + 0xC);
+    unsigned char* scan = reinterpret_cast<unsigned char*>(this);
 
-	objCount = *(short*)((unsigned char*)this + 0xC);
-	objIndex = 0;
-	for (i = 0; i < objCount; i++) {
-		mapObj = (unsigned char*)this + 0x70 + i * 0xF0;
-		if (*(unsigned short*)(mapObj + 0x2E) == (unsigned short)id) {
-			objIndex = i;
-			goto found;
-		}
-	}
-	objIndex = -1;
+    while (0 < numMapObj) {
+        if (*reinterpret_cast<unsigned short*>(scan + 0x982) == static_cast<unsigned short>(id)) {
+            goto found;
+        }
+        scan += 0xF0;
+        objIndex++;
+        numMapObj--;
+    }
+    objIndex = -1;
 
 found:
-	packedColor = *(unsigned int*)&color;
-	posX = *(unsigned int*)((unsigned char*)&position + 0);
-	posY = *(unsigned int*)((unsigned char*)&position + 4);
-	posZ = *(unsigned int*)((unsigned char*)&position + 8);
+    const unsigned int packedColor = *reinterpret_cast<unsigned int*>(&color);
+    const float posX = position.x;
+    const float posY = position.y;
+    const float posZ = position.z;
+    unsigned char* mapObj = reinterpret_cast<unsigned char*>(this) + (objIndex * 0xF0) + 0x954;
+    unsigned char* mapObjLight = *reinterpret_cast<unsigned char**>(mapObj + 0xEC);
 
-	mapObj = (unsigned char*)this + 0x70 + objIndex * 0xF0;
-	mapObjLight = *(unsigned char**)(mapObj + 0xEC);
-	if (*(int*)(mapObjLight + 4) == 1) {
-		*(unsigned char*)(mapObjLight + 8) = (unsigned char)(packedColor >> 24);
-		*(unsigned char*)(mapObjLight + 9) = (unsigned char)(packedColor >> 16);
-		*(unsigned char*)(mapObjLight + 10) = (unsigned char)(packedColor >> 8);
-		*(unsigned char*)(mapObjLight + 0xB) = (unsigned char)packedColor;
-		*(unsigned int*)(mapObj + 0x70) = posX;
-		*(unsigned int*)(mapObj + 0x74) = posY;
-		*(unsigned int*)(mapObj + 0x78) = posZ;
-		*(unsigned char*)(mapObj + 0x1C) = 1;
-		*(unsigned char*)(mapObj + 0x1B) = 1;
-	}
+    if (*reinterpret_cast<int*>(mapObjLight + 4) == 1) {
+        const unsigned char* colorBytes = reinterpret_cast<const unsigned char*>(&packedColor);
+        *reinterpret_cast<unsigned char*>(mapObjLight + 8) = colorBytes[0];
+        *reinterpret_cast<unsigned char*>(mapObjLight + 9) = colorBytes[1];
+        *reinterpret_cast<unsigned char*>(mapObjLight + 10) = colorBytes[2];
+        *reinterpret_cast<unsigned char*>(mapObjLight + 11) = colorBytes[3];
+        *reinterpret_cast<float*>(mapObj + 0x70) = posX;
+        *reinterpret_cast<float*>(mapObj + 0x74) = posY;
+        *reinterpret_cast<float*>(mapObj + 0x78) = posZ;
+        *reinterpret_cast<unsigned char*>(mapObj + 0x1C) = 1;
+        *reinterpret_cast<unsigned char*>(mapObj + 0x1B) = 1;
+    }
 }
 
 /*

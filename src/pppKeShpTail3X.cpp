@@ -175,11 +175,13 @@ void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, struct UnkC* param_2)
         char pad[0xc];
         int* m_serializedDataOffsets;
     };
-    unsigned char* work;
     unsigned char* anglePtr;
+    unsigned char* work;
+    int* serializedDataOffsets;
     int i;
 
-    work = (unsigned char*)((char*)&obj->pppPObject + 8 + *(reinterpret_cast<KeShpTail3XConArg*>(param_2)->m_serializedDataOffsets));
+    serializedDataOffsets = reinterpret_cast<KeShpTail3XConArg*>(param_2)->m_serializedDataOffsets;
+    work = (unsigned char*)((u32)obj + (u32)(*serializedDataOffsets + 8));
     work[0x1c3] = 0;
     work[0x1c2] = 0;
     *(u16*)(work + 0x1bc) = 0;

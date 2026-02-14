@@ -38,6 +38,11 @@ struct UnkC {
 extern int DAT_8032ed70;
 extern int DAT_802381a0;
 extern float FLOAT_80331cc0;
+extern float FLOAT_80331cc4;
+extern float FLOAT_80331cd0;
+extern float FLOAT_80331ce8;
+extern float FLOAT_80331cec;
+extern float FLOAT_80331cf0;
 extern char MaterialMan[];
 extern char s_pppScreenBreak_cpp_801dd4d4[];
 extern CGraphic GraphicsPcs;
@@ -78,12 +83,38 @@ void SB_BeforeCalcMatrixCallback(CChara::CModel*, void*, void*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012e130
+ * PAL Size: 296b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
 {
-	// TODO
+    extern struct {
+        float _224_4_, _228_4_, _232_4_, _236_4_, _240_4_, _244_4_;
+    } CameraPcs;
+
+    Vec local_50;
+    GXLightObj local_44;
+    unsigned char colorStorage[4];
+    unsigned int colorPacked;
+
+    local_50.x = CameraPcs._236_4_ - (FLOAT_80331ce8 + CameraPcs._224_4_);
+    local_50.y = CameraPcs._240_4_ - (FLOAT_80331ce8 + CameraPcs._228_4_);
+    local_50.z = CameraPcs._244_4_ - (FLOAT_80331ce8 + CameraPcs._232_4_);
+    PSVECNormalize(&local_50, &local_50);
+
+    GXInitSpecularDirHA(&local_44, local_50.x, local_50.y, local_50.z, FLOAT_80331cc4, FLOAT_80331cd0, FLOAT_80331cc4);
+    GXInitLightAttn(&local_44, FLOAT_80331cc4, FLOAT_80331cc4, FLOAT_80331cd0, FLOAT_80331cec, FLOAT_80331cc4,
+                    FLOAT_80331cf0);
+
+    colorPacked = *(unsigned int*)__ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, 0xFF);
+    GXInitLightColor(&local_44, *(GXColor*)&colorPacked);
+    GXLoadLightObjImm(&local_44, (GXLightID)1);
+    GXSetChanCtrl((GXChannelID)0, 1, (GXColorSrc)0, (GXColorSrc)1, 1, (GXDiffuseFn)2, (GXAttnFn)0);
+    GXSetChanCtrl((GXChannelID)2, 0, (GXColorSrc)0, (GXColorSrc)1, 0, (GXDiffuseFn)0, (GXAttnFn)2);
 }
 
 /*

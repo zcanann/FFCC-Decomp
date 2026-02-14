@@ -3,7 +3,7 @@
 
 #include "ffcc/partMng.h"
 
-typedef _PARTICLE_DATA PRyjMegaBirthModel; // Size 0x140
+struct PRyjMegaBirthModel : _PARTICLE_DATA {}; // Size 0x140
 
 struct VRyjMegaBirthModel
 {
@@ -17,7 +17,7 @@ void calc_particle(_pppPObject*, VRyjMegaBirthModel*, PRyjMegaBirthModel*, VColo
 void birth(_pppPObject*, VRyjMegaBirthModel*, PRyjMegaBirthModel*, VColor*, _PARTICLE_DATA*, _PARTICLE_WMAT*, _PARTICLE_COLOR*);
 void calc(_pppPObject*, VRyjMegaBirthModel*, PRyjMegaBirthModel*, _PARTICLE_DATA*, VColor*, _PARTICLE_COLOR*);
 void init_matrix(_pppPObject*, pppFMATRIX&, PRyjMegaBirthModel*, VRyjMegaBirthModel*);
-void set_matrix(_pppPObject*, pppFMATRIX&, pppFMATRIX&, PRyjMegaBirthModel*, _PARTICLE_DATA*, _PARTICLE_WMAT*, pppFMATRIX&, unsigned char);
+void set_matrix(_pppPObject*, pppFMATRIX, pppFMATRIX, PRyjMegaBirthModel*, _PARTICLE_DATA*, _PARTICLE_WMAT*, pppFMATRIX&, unsigned char);
 
 #ifdef __cplusplus
 extern "C" {

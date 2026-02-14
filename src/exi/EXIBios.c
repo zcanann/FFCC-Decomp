@@ -94,6 +94,8 @@ int EXIImm(s32 chan, void* buf, s32 len, u32 type, EXICallback callback) {
     EXIControl* exi;
     BOOL enabled;
     u32 data;
+    s32 immLen;
+    u8* ptr;
     int i;
 
     exi = &Ecb[chan];
@@ -103,7 +105,7 @@ int EXIImm(s32 chan, void* buf, s32 len, u32 type, EXICallback callback) {
     ASSERTLINE(407, type < MAX_TYPE);
     enabled = OSDisableInterrupts();
 
-    if ((exi->state & STATE_BUSY) || !(exi->state & STATE_SELECTED)) {
+    if ((exi->state & (STATE_DMA | STATE_IMM)) || !(exi->state & STATE_SELECTED)) {
         OSRestoreInterrupts(enabled);
         return 0;
     }
@@ -116,15 +118,20 @@ int EXIImm(s32 chan, void* buf, s32 len, u32 type, EXICallback callback) {
 
     exi->state |= STATE_IMM;
     if (type != 0) {
+        ptr = (u8*)buf;
         data = 0;
         for(i = 0; i < len; i++) {
-            data |= ((u8*)buf)[i] << ((3 - i) * 8);
+            data |= (u32)ptr[i] << (24 - (i * 8));
         }
         __EXIRegs[(chan * 5) + 4] = data;
     }
 
     exi->immBuf = buf;
-    exi->immLen = (type != 1) ? len : 0; 
+    immLen = len;
+    if (type == EXI_WRITE) {
+        immLen = 0;
+    }
+    exi->immLen = immLen;
     __EXIRegs[(chan * 5) + 3] = (type << 2) | 1 | ((len - 1) << 4);
     OSRestoreInterrupts(enabled);
     return 1;

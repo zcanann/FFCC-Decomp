@@ -109,28 +109,26 @@ void GXSetProjection(const Mtx44 mtx, GXProjectionType type) {
 }
 
 void GXSetProjectionv(const f32* ptr) {
-    GXData* gx = __GXData;
-
     CHECK_GXBEGIN(339, "GXSetProjectionv");
 
-    gx->projType = __cvt_fp2unsigned((f64)ptr[0]);
-    gx->projMtx[0] = ptr[1];
-    gx->projMtx[1] = ptr[2];
-    gx->projMtx[2] = ptr[3];
-    gx->projMtx[3] = ptr[4];
-    gx->projMtx[4] = ptr[5];
-    gx->projMtx[5] = ptr[6];
+    __GXData->projType = (u32)ptr[0];
+    __GXData->projMtx[0] = ptr[1];
+    __GXData->projMtx[1] = ptr[2];
+    __GXData->projMtx[2] = ptr[3];
+    __GXData->projMtx[3] = ptr[4];
+    __GXData->projMtx[4] = ptr[5];
+    __GXData->projMtx[5] = ptr[6];
 
     GX_WRITE_U8(0x10);
     GX_WRITE_U32(0x00061020);
-    GX_WRITE_F32(gx->projMtx[0]);
-    GX_WRITE_F32(gx->projMtx[1]);
-    GX_WRITE_F32(gx->projMtx[2]);
-    GX_WRITE_F32(gx->projMtx[3]);
-    GX_WRITE_F32(gx->projMtx[4]);
-    GX_WRITE_F32(gx->projMtx[5]);
-    GX_WRITE_U32(gx->projType);
-    gx->bpSentNot = 1;
+    GX_WRITE_F32(__GXData->projMtx[0]);
+    GX_WRITE_F32(__GXData->projMtx[1]);
+    GX_WRITE_F32(__GXData->projMtx[2]);
+    GX_WRITE_F32(__GXData->projMtx[3]);
+    GX_WRITE_F32(__GXData->projMtx[4]);
+    GX_WRITE_F32(__GXData->projMtx[5]);
+    GX_WRITE_U32(__GXData->projType);
+    __GXData->bpSentNot = 1;
 }
 
 #define qr0 0

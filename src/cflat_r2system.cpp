@@ -288,6 +288,52 @@ extern "C" void SetTexShadowColor__9CCharaPcsF8_GXColor(void* charaPcs, const un
 
 /*
  * --INFO--
+ * PAL Address: 0x800B9228
+ * PAL Size: 28b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void SetTexShadowPos__9CCharaPcsFP3Vec(void* charaPcs, Vec* vec)
+{
+    float* self = (float*)((char*)charaPcs + 0x17C);
+
+    self[0] = vec->x;
+    self[1] = vec->y;
+    self[2] = vec->z;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9244
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void SetEvtWord__12CCaravanWorkFis(CCaravanWork* caravanWork, int evtWordIndex, short evtWord)
+{
+    caravanWork->m_evtWordArr[evtWordIndex] = evtWord;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9254
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" int GetEvtWord__12CCaravanWorkFi(CCaravanWork* caravanWork, int evtWordIndex)
+{
+    return caravanWork->m_evtWordArr[evtWordIndex];
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

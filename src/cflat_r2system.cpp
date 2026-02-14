@@ -1,4 +1,5 @@
 #include "ffcc/cflat_r2system.h"
+#include "ffcc/color.h"
 #include "ffcc/game.h"
 #include "ffcc/graphic.h"
 #include "ffcc/map.h"
@@ -288,6 +289,20 @@ extern "C" void SetTexShadowColor__9CCharaPcsF8_GXColor(void* charaPcs, const un
 
 /*
  * --INFO--
+ * PAL Address: 0x800B9220
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CColor::operator _GXColor()
+{
+    return color;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800B9228
  * PAL Size: 28b
  * EN Address: TODO
@@ -330,6 +345,50 @@ extern "C" void SetEvtWord__12CCaravanWorkFis(CCaravanWork* caravanWork, int evt
 extern "C" int GetEvtWord__12CCaravanWorkFi(CCaravanWork* caravanWork, int evtWordIndex)
 {
     return caravanWork->m_evtWordArr[evtWordIndex];
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9264
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void SetEvtFlag__12CCaravanWorkFii(CCaravanWork* caravanWork, int evtFlagIndex, int value)
+{
+    unsigned char* evtFlags = reinterpret_cast<unsigned char*>(caravanWork->m_evtWorkArr);
+    int sign = evtFlagIndex >> 31;
+    int byteIndex = (evtFlagIndex >> 3) + (int)(evtFlagIndex < 0 && (evtFlagIndex & 7) != 0);
+    int bitIndex =
+        ((sign * 8) | ((int)(((unsigned int)evtFlagIndex * 0x20000000u + (unsigned int)sign) >> 29))) - sign;
+    unsigned char mask = (unsigned char)(1u << bitIndex);
+
+    if (value != 0) {
+        evtFlags[byteIndex] |= mask;
+    } else {
+        evtFlags[byteIndex] &= (unsigned char)~mask;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B92DC
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" int GetEvtFlag__12CCaravanWorkFi(CCaravanWork* caravanWork, int evtFlagIndex)
+{
+    unsigned char* evtFlags = reinterpret_cast<unsigned char*>(caravanWork->m_evtWorkArr);
+    int byteIndex = evtFlagIndex / 8;
+    int bitIndex = evtFlagIndex - byteIndex * 8;
+    unsigned char mask = (unsigned char)(1u << bitIndex);
+
+    return (evtFlags[byteIndex] & mask) != 0;
 }
 
 /*

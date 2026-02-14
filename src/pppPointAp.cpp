@@ -31,8 +31,8 @@ extern _pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
 void pppPointApCon(void* param1, void* param2)
 {
     _pppPointApOffsets* data = *(_pppPointApOffsets**)((u8*)param2 + 0xC);
-    u32 offset = data->targetOffset + 0x81;
-    ((u8*)param1)[offset] = 0;
+    u8* target = (u8*)param1 + data->targetOffset;
+    target[0x81] = 0;
 }
 
 /*

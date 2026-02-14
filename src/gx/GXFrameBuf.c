@@ -349,20 +349,29 @@ u32 GXSetDispCopyYScale(f32 vscale) {
 }
 
 void GXSetCopyClear(GXColor clear_clr, u32 clear_z) {
-    u32 reg;
+    GXData* gx;
+    u32 regA;
+    u32 regGB;
 
     CHECK_GXBEGIN(1596, "GXSetCopyClear");
     ASSERTMSGLINE(1598, clear_z <= 0xFFFFFF, "GXSetCopyClear: Z clear value is out of range");
 
-    reg = ((u32)clear_clr.a << 8) | clear_clr.r | 0x4F000000;
-    GX_WRITE_RAS_REG(reg);
+    regA = ((u32)clear_clr.a << 8) | clear_clr.r;
+    regA = (regA & 0xFFFF) | 0x4F000000;
+    GX_WRITE_U8(0x61);
+    GX_WRITE_U32(regA);
 
-    reg = ((u32)clear_clr.g << 8) | clear_clr.b | 0x50000000;
-    GX_WRITE_RAS_REG(reg);
+    regGB = ((u32)clear_clr.g << 8) | clear_clr.b;
+    regGB = (regGB & 0xFFFF) | 0x50000000;
+    GX_WRITE_U8(0x61);
+    GX_WRITE_U32(regGB);
 
-    reg = (clear_z & 0xFFFFFF) | 0x51000000;
-    GX_WRITE_RAS_REG(reg);
-    __GXData->bpSentNot = 0;
+    regA = (clear_z & 0xFFFFFF) | 0x51000000;
+    GX_WRITE_U8(0x61);
+    GX_WRITE_U32(regA);
+
+    gx = __GXData;
+    gx->bpSentNot = 0;
 }
 
 void GXSetCopyFilter(GXBool aa, const u8 sample_pattern[12][2], GXBool vf, const u8 vfilter[7]) {

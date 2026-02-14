@@ -45,15 +45,91 @@ CFlatData::~CFlatData()
  */
 extern "C" CFlatData* dtor_800980B4(CFlatData* flatData, short shouldDelete)
 {
-	if (flatData != nullptr)
+	struct DataEntryLayout
 	{
-		flatData->Destroy();
-		if (shouldDelete > 0)
-		{
-			operator delete(flatData);
-		}
+		unsigned int m_size;
+		void* m_data;
+		int m_numStrings;
+		char** m_strings;
+		char* m_stringBuf;
+	};
+
+	struct TableEntryLayout
+	{
+		int m_numEntries;
+		char** m_strings;
+		char* m_stringBuf;
+	};
+
+	struct FlatDataLayout
+	{
+		int m_dataCount;
+		DataEntryLayout m_data[5];
+		int m_tableCount;
+		TableEntryLayout m_tabl[8];
+		int m_mesCount;
+		char* m_mesBuffer;
+	};
+
+	FlatDataLayout* self;
+	FlatDataLayout* layout;
+
+	if (flatData == nullptr)
+	{
+		return flatData;
 	}
 
+	layout = (FlatDataLayout*)flatData;
+	self = layout;
+	for (int i = 0; i < layout->m_dataCount; i++)
+	{
+		if (self->m_data[0].m_data != nullptr)
+		{
+			operator delete(self->m_data[0].m_data);
+			self->m_data[0].m_data = nullptr;
+		}
+		if (self->m_data[0].m_strings != nullptr)
+		{
+			operator delete(self->m_data[0].m_strings);
+			self->m_data[0].m_strings = (char**)nullptr;
+		}
+		if (self->m_data[0].m_stringBuf != nullptr)
+		{
+			operator delete(self->m_data[0].m_stringBuf);
+			self->m_data[0].m_stringBuf = (char*)nullptr;
+		}
+		self = (FlatDataLayout*)&self->m_data[0].m_stringBuf;
+	}
+	layout->m_dataCount = 0;
+
+	self = layout;
+	for (int i = 0; i < layout->m_tableCount; i++)
+	{
+		if (self->m_tabl[0].m_strings != nullptr)
+		{
+			operator delete(self->m_tabl[0].m_strings);
+			self->m_tabl[0].m_strings = (char**)nullptr;
+		}
+		if (self->m_tabl[0].m_stringBuf != nullptr)
+		{
+			operator delete(self->m_tabl[0].m_stringBuf);
+			self->m_tabl[0].m_stringBuf = (char*)nullptr;
+		}
+		self = (FlatDataLayout*)&self->m_data[0].m_numStrings;
+	}
+	layout->m_tableCount = 0;
+
+	if (layout->m_mesBuffer != nullptr)
+	{
+		operator delete(layout->m_mesBuffer);
+		layout->m_mesBuffer = (char*)nullptr;
+	}
+	layout->m_mesCount = 0;
+
+	if (shouldDelete > 0)
+	{
+		operator delete(flatData);
+	}
 	return flatData;
 }
 

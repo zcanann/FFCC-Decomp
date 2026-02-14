@@ -1,6 +1,8 @@
 #ifndef _FFCC_PPP_RINGMENU_H_
 #define _FFCC_PPP_RINGMENU_H_
 
+#include "ffcc/menu.h"
+
 class CFont;
 class CCaravanWork;
 class CGame;
@@ -8,7 +10,7 @@ class CMenuPcs;
 
 void drawCommand(int, CFont*, float, float, CCaravanWork*, int, float, float);
 
-class CRingMenu
+class CRingMenu : public CMenu
 {
 public:
     CRingMenu();

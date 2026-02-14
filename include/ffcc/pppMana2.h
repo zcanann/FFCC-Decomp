@@ -9,6 +9,11 @@ struct Vec;
 struct Vec2d;
 struct _GXColor;
 struct VMana2;
+struct pppMana2;
+struct UnkB;
+struct UnkC {
+    s32* m_serializedDataOffsets;
+};
 
 void Mana2_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
 void Mana2_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*)[4], int);
@@ -24,10 +29,10 @@ void CalcWaterReflectionVector(Vec*, Vec*, Vec*, long, Vec*, float (*)[4], _GXCo
 extern "C" {
 #endif
 
-void pppConstructMana2(void);
-void pppDestructMana2(void);
-void pppFrameMana2(void);
-void pppRenderMana2(void);
+void pppConstructMana2(pppMana2*, UnkC*);
+void pppDestructMana2(pppMana2*, UnkC*);
+void pppFrameMana2(pppMana2*, UnkB*, UnkC*);
+void pppRenderMana2(pppMana2*, UnkB*, UnkC*);
 
 #ifdef __cplusplus
 }

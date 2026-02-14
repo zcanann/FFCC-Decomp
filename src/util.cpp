@@ -335,12 +335,46 @@ void CUtil::DisableIndMtx()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800242e8
+ * PAL Size: 348b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CUtil::BeginQuadEnv()
 {
-	// TODO
+    Mtx modelMtx;
+    Mtx44 orthoMtx;
+    float indMtx[2][3] = {
+        {0.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 0.0f},
+    };
+
+    PSMTXIdentity(modelMtx);
+    GXLoadPosMtxImm(modelMtx, 0);
+    GXSetCurrentMtx(0);
+
+    C_MTXOrtho(orthoMtx, lbl_8032f888, lbl_8032f8a0, lbl_8032f888, lbl_8032f8a4, lbl_8032f888,
+               lbl_8032f88c);
+    GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
+
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetNumTexGens(1);
+    GXSetNumChans(1);
+    GXSetNumTevStages(1);
+    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
+    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE,
+                  GX_AF_SPEC);
+    GXSetTevDirect(GX_TEVSTAGE0);
+    GXSetNumIndStages(0);
+    GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
+    GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
+    GXSetIndTexMtx(GX_ITM_2, indMtx, 1);
 }
 
 /*

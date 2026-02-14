@@ -427,7 +427,6 @@ void GXLoadLightObjIndx(u32 lt_obj_indx, GXLightID light) {
 
 void GXSetChanAmbColor(GXChannelID chan, GXColor amb_color) {
     u32 reg;
-    u32 rgb;
     u32 colIdx;
 
     CHECK_GXBEGIN(661, "GXSetChanAmbColor");
@@ -435,14 +434,12 @@ void GXSetChanAmbColor(GXChannelID chan, GXColor amb_color) {
     switch (chan) {
     case GX_COLOR0:
         reg = __GXData->ambColor[GX_COLOR0];
-        rgb = GXCOLOR_AS_U32(amb_color) >> 8;
-        SET_REG_FIELD(675, reg, 24, 8, rgb);
+        reg = (reg & ~0xFFFFFF) | (GXCOLOR_AS_U32(amb_color) & 0xFFFFFF);
         colIdx = 0;
         break;
     case GX_COLOR1:
         reg = __GXData->ambColor[GX_COLOR1];
-        rgb = GXCOLOR_AS_U32(amb_color) >> 8;
-        SET_REG_FIELD(690, reg, 24, 8, rgb);
+        reg = (reg & ~0xFFFFFF) | (GXCOLOR_AS_U32(amb_color) & 0xFFFFFF);
         colIdx = 1;
         break;
     case GX_ALPHA0:

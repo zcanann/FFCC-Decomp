@@ -204,10 +204,29 @@ void GXSetTexCopyDst(u16 wd, u16 ht, GXTexFmt fmt, GXBool mipmap) {
     SET_REG_FIELD(1393, __GXData->cpTex, 3, 4, peTexFmt);
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801A2BA4
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void GXSetDispCopyFrame2Field(GXCopyMode mode) {
+    GXData* gx;
+    u32 reg;
+
     CHECK_GXBEGIN(1410, "GXSetDispCopyFrame2Field");
-    SET_REG_FIELD(1411, __GXData->cpDisp, 2, 12, mode);
-    SET_REG_FIELD(1411, __GXData->cpTex, 2, 12, 0);
+    gx = __GXData;
+
+    reg = gx->cpDisp;
+    reg = (u32)__rlwimi(reg, mode, 12, 18, 19);
+    gx->cpDisp = reg;
+
+    reg = gx->cpTex;
+    reg = (u32)__rlwimi(reg, 0, 12, 18, 19);
+    gx->cpTex = reg;
 }
 
 /*

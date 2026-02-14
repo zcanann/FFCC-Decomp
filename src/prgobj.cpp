@@ -8,7 +8,15 @@
 #include <math.h>
 
 extern "C" int PlaySe3D__6CSoundFiP3Vecffi(CSound*, int, Vec*, float, float, int);
+extern "C" void ResetParticleWork__13CFlatRuntime2Fii(void*, int, int);
+extern "C" void SetParticleWorkScale__13CFlatRuntime2Ff(void*, float);
+extern "C" void SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
+extern "C" void SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
+extern "C" void SetParticleWorkPos__13CFlatRuntime2FR3Vecf(void*, Vec&, float);
+extern "C" void SetParticleWorkSe__13CFlatRuntime2Fiii(void*, int, int, int);
+extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
 extern CMath Math;
+extern unsigned char CFlat[];
 
 /*
  * --INFO--
@@ -287,42 +295,83 @@ void CGPrgObj::changePrg(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801275AC
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGPrgObj::putParticle(int, int, Vec*, float, int)
+void CGPrgObj::putParticle(int no, int dataNo, Vec* pos, float scale, int seNo)
 {
-	// TODO
+	ResetParticleWork__13CFlatRuntime2Fii(CFlat, no, dataNo);
+	SetParticleWorkScale__13CFlatRuntime2Ff(CFlat, scale);
+	SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, *pos, 0.0f);
+	if (seNo != 0) {
+		SetParticleWorkSe__13CFlatRuntime2Fiii(CFlat, seNo, 2, 0);
+	}
+	PutParticleWork__13CFlatRuntime2Fv(CFlat);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80127510
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGPrgObj::putParticle(int, int, CGObject*, float, int)
+void CGPrgObj::putParticle(int no, int dataNo, CGObject* traceObj, float scale, int seNo)
 {
-	// TODO
+	ResetParticleWork__13CFlatRuntime2Fii(CFlat, no, dataNo);
+	SetParticleWorkScale__13CFlatRuntime2Ff(CFlat, scale);
+	SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, this);
+	if (seNo != 0) {
+		SetParticleWorkSe__13CFlatRuntime2Fiii(CFlat, seNo, 2, 0);
+	}
+	PutParticleWork__13CFlatRuntime2Fv(CFlat);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80127474
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGPrgObj::putParticleTrace(int, int, CGObject*, float, int)
+void CGPrgObj::putParticleTrace(int no, int dataNo, CGObject* obj, float scale, int seNo)
 {
-	// TODO
+	ResetParticleWork__13CFlatRuntime2Fii(CFlat, no, dataNo);
+	SetParticleWorkScale__13CFlatRuntime2Ff(CFlat, scale);
+	SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, this);
+	PutParticleWork__13CFlatRuntime2Fv(CFlat);
+	if (seNo != 0) {
+		SetParticleWorkSe__13CFlatRuntime2Fiii(CFlat, seNo, 2, 0);
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801273BC
+ * PAL Size: 184b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGPrgObj::putParticleBindTrace(int, int, CGObject*, float, int)
+void CGPrgObj::putParticleBindTrace(int no, int dataNo, CGObject* obj, float scale, int seNo)
 {
-	// TODO
+	ResetParticleWork__13CFlatRuntime2Fii(CFlat, no, dataNo);
+	SetParticleWorkScale__13CFlatRuntime2Ff(CFlat, scale);
+	SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, this);
+	SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, obj);
+	PutParticleWork__13CFlatRuntime2Fv(CFlat);
+	if (seNo != 0) {
+		SetParticleWorkSe__13CFlatRuntime2Fiii(CFlat, seNo, 2, 0);
+	}
 }
 
 /*

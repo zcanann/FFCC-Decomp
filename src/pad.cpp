@@ -16,6 +16,7 @@
 CPad Pad;
 
 void* operator new[](unsigned long, CMemory::CStage*, char*, int);
+extern void* __vt__8CManager;
 extern void* lbl_801E8864;
 
 /*
@@ -29,7 +30,9 @@ extern void* lbl_801E8864;
  */
 extern "C" void __sinit_pad_cpp()
 {
-	Pad._0_4_ = &lbl_801E8864;
+	volatile void** base = (volatile void**)&Pad;
+	*base = &__vt__8CManager;
+	*base = &lbl_801E8864;
 	Pad._1b4_4_ = 0;
 	Pad._1b8_4_ = 0;
 }

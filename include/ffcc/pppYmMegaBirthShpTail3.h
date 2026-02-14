@@ -3,6 +3,18 @@
 
 #include "ffcc/partMng.h"
 
+struct pppYmMegaBirthShpTail3
+{
+    _pppPObject field0_0x0;    // 0x0
+    pppFMATRIX field_0x40;     // 0x40
+    char field_0x70[0x4c];     // 0x70 - padding/other fields
+    unsigned int field_0xbc;   // 0xbc
+    unsigned int field_0xc0;   // 0xc0
+    unsigned int field_0xc4;   // 0xc4
+    unsigned int field_0xc8;   // 0xc8
+    char m_data[0x500];        // 0xcc - additional data
+};
+
 struct VYmMegaBirthShpTail3
 {
     _PARTICLE_DATA m_baseData;  // 0x0 - 0x140
@@ -15,6 +27,13 @@ struct PYmMegaBirthShpTail3
     float m_colorDeltaAdd[4];   // 0x30 - 0x40
     float m_sizeVal;            // 0x40 - 0x44
 }; // Size 0x44+
+
+struct UnkB;
+struct UnkC
+{
+    u8 m_pad_0x0[0xc];
+    s32* m_serializedDataOffsets;
+};
 
 // Helper functions  
 void pppScaleVectorXYZ(float scale, Vec* result, const Vec* input);
@@ -31,10 +50,10 @@ void calc_particle(_pppPObject*, VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, V
 extern "C" {
 #endif
 
-void pppConstructYmMegaBirthShpTail3(void);
-void pppDestructYmMegaBirthShpTail3(void);
-void pppFrameYmMegaBirthShpTail3(void);
-void pppRenderYmMegaBirthShpTail3(void);
+void pppConstructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3*, UnkC*);
+void pppDestructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3*, UnkC*);
+void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, UnkC*);
+void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3*, UnkB*, UnkC*);
 
 #ifdef __cplusplus
 }

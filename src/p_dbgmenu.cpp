@@ -4,6 +4,10 @@
 #include <dolphin/gx.h>
 #include <string.h>
 
+extern unsigned char CFlat[];
+extern unsigned char DAT_8032e698;
+extern unsigned char DAT_8032ecd8;
+
 /*
  * --INFO--
  * PAL Address: 0x8012d288
@@ -130,12 +134,93 @@ void CDbgMenuPcs::draw()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012cac0
+ * PAL Size: 592b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CDbgMenuPcs::calcMenu(CDbgMenuPcs::CDM*)
+void CDbgMenuPcs::calcMenu(CDbgMenuPcs::CDM* menu)
 {
-	// TODO
+	CDM* head = menu;
+	do {
+		*(CDM**)((char*)this + 0x2A5C) = menu;
+		switch (*(int*)((char*)menu + 0x38)) {
+		case 100:
+			*(u32*)((char*)menu + 0x30) = *(u32*)(CFlat + 0x12A4) != 0;
+			break;
+		case 0x65:
+			*(u32*)((char*)menu + 0x30) = *(signed char*)(CFlat + 0x12E4) < 0;
+			break;
+		case 0x66:
+			*(u32*)((char*)menu + 0x30) = ((*(u8*)(CFlat + 0x12E4) >> 3) & 1) != 0;
+			break;
+		case 0x67:
+			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 0) & 1;
+			break;
+		case 0x68:
+			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 1) & 1;
+			break;
+		case 0x69:
+			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 2) & 1;
+			break;
+		case 0x6A:
+			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 3) & 1;
+			break;
+		case 0x6B:
+			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 4) & 1;
+			break;
+		case 0x6C:
+			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 5) & 1;
+			break;
+		case 0x6D:
+			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 6) & 1;
+			break;
+		case 0x6E:
+			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 7) & 1;
+			break;
+		case 0x6F:
+			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 8) & 1;
+			break;
+		case 0x70:
+			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 9) & 1;
+			break;
+		case 0x71:
+			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 10) & 1;
+			break;
+		case 0x72:
+			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 11) & 1;
+			break;
+		case 0x73:
+			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 12) & 1;
+			break;
+		case 0x75:
+			*(u32*)((char*)menu + 0x30) = DAT_8032ecd8 != 0;
+			break;
+		case 0x76:
+			*(u32*)((char*)menu + 0x30) = DAT_8032e698 != 0;
+			break;
+		case 0x78:
+			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 13) & 1;
+			break;
+		case 0x79:
+			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 14) & 1;
+			break;
+		case 0x7A:
+			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 15) & 1;
+			break;
+		}
+
+		*(int*)((char*)menu + 0x3C) = *(int*)((char*)*(CDM**)((char*)menu + 0x4C) + 0x10) + *(int*)((char*)menu + 0x10);
+		*(int*)((char*)menu + 0x40) = *(int*)((char*)*(CDM**)((char*)menu + 0x4C) + 0x14) + *(int*)((char*)menu + 0x14);
+
+		if (*(CDM**)((char*)menu + 0x50) != 0) {
+			calcMenu(*(CDM**)((char*)menu + 0x50));
+		}
+
+		menu = *(CDM**)((char*)menu + 0x48);
+	} while (menu != head);
 }
 
 /*

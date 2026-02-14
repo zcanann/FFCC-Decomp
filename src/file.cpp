@@ -4,6 +4,7 @@
 #include "ffcc/fontman.h"
 #include "ffcc/goout.h"
 #include "ffcc/graphic.h"
+#include "ffcc/memory.h"
 #include "ffcc/p_game.h"
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
@@ -21,6 +22,7 @@ extern void* DAT_8023802c;
 extern void* DAT_80238030;
 
 static char s_fileCpp[] = "file.cpp";
+static char s_cFile[] = "CFile";
 static char s_drawErrorFmt[] = "CFile::drawError %d";
 static char s_queueWarnAnyFmt[] = "BackAllFilesToQueue: %s";
 static char s_queueWarnTargetFmt[] = "BackAllFilesToQueue: %s (%s)";
@@ -95,36 +97,24 @@ void CFile::Init()
 
     const int kHandleCount = 0x80;
 
-    m_stage = 0; // TODO: hook up real stage creation once CStage is decomped.
+    m_stage = Memory.CreateStage(0x10ac00, s_cFile, 0);
     m_fatalDiskErrorFlag = 0;
     m_isDiskError = 0;
-    m_readBuffer = new unsigned char[0x100000]; // TODO: replace with stage allocator
-	m_handlePoolHead.m_nextOffset = (u32)(new unsigned char[kHandleCount * sizeof(CHandle)]); // TODO: replace with stage-aware array allocation
+    m_readBuffer = new ((CMemory::CStage*)m_stage, s_fileCpp, 0x2b) unsigned char[0x100000];
+    m_handlePoolHead.m_nextOffset = (u32)(new ((CMemory::CStage*)m_stage, s_fileCpp, 0x2e) CHandle[kHandleCount]);
 
     CHandle* pool = (CHandle*)m_handlePoolHead.m_nextOffset;
 
     m_fileHandle.m_next = &m_fileHandle;
     m_fileHandle.m_previous = &m_fileHandle;
     m_fileHandle.m_priority = PRI_SENTINEL;
+    m_handlePoolHead.m_next = pool;
     m_freeList = pool;
 
     CHandle* freeSentinel = (CHandle*)&m_freeListSentinelDummy;
 
-    for (int i = 0; i < kHandleCount; i++)
-	{
-        CHandle* handle = &pool[i];
-        CHandle* next;
-
-        if (i == kHandleCount - 1)
-		{
-            next = freeSentinel;
-        }
-		else
-		{
-            next = &pool[i + 1];
-        }
-
-        handle->m_next = next;
+    for (int i = 0; i < kHandleCount; i++) {
+        pool[i].m_previous = (i == kHandleCount - 1) ? freeSentinel : &pool[i + 1];
     }
 }
 

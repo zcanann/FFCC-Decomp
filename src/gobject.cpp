@@ -571,7 +571,7 @@ void CGObject::CancelAnim(int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGObject::PlayAnim(int slot, int param2, int param3, int param4, int param5, char* animData)
+void CGObject::PlayAnim(int slot, int param2, int param3, int param4, int param5, signed char* animData)
 {
 	m_currentAnimSlot = m_animQueue[slot - 0x41];
 	

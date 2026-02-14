@@ -42,18 +42,19 @@ void pppVertexAttend(void* r3, void* r4, void* r5)
 
     VertexAttendStream* stream = *(VertexAttendStream**)((u8*)r5 + 0xC);
     Vec transformed;
-    s16 modelIndex = *(s16*)((u8*)lbl_8032ED54->vertexSetTable + (entryIndex << 3));
-    u16 sourceIndex = *(u16*)((u8*)r3 + stream->sourceOffset + 0x80);
-    u16 vertexIndex = *(u16*)((u8*)stream->destOffset + (sourceIndex << 1));
-    Vec* sourceVertex = (Vec*)((u8*)lbl_8032ED54->modelTable[modelIndex]->vertexData + (vertexIndex * 0xC));
+    Vec* transformedPtr = &transformed;
     u8* output = (u8*)r3 + stream->destOffset;
+    u16 sourceIndex = *(u16*)((u8*)r3 + stream->sourceOffset + 0x80);
+    s16 modelIndex = ((s16*)lbl_8032ED54->vertexSetTable)[(u32)entryIndex * 4];
+    u16 vertexIndex = *(u16*)(output + ((u32)sourceIndex << 1));
+    Vec* sourceVertex =
+        (Vec*)((u8*)lbl_8032ED54->modelTable[modelIndex]->vertexData + (vertexIndex * sizeof(Vec)));
 
     transformed.x = sourceVertex->x;
     transformed.y = sourceVertex->y;
     transformed.z = sourceVertex->z;
 
-    Mtx* mtx = (Mtx*)((u8*)*(void**)((u8*)r3 + 4) + 0x10);
-    PSMTXMultVec(*mtx, &transformed, &transformed);
+    PSMTXMultVec(*(Mtx*)((u8*)*(void**)((u8*)r3 + 4) + 0x10), transformedPtr, transformedPtr);
 
     *(f32*)((u8*)output + 0x80) = transformed.x;
     *(f32*)((u8*)output + 0x84) = transformed.y;

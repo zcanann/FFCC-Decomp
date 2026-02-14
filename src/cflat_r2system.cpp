@@ -236,6 +236,58 @@ void CGame::CGameWork::ClearEvtWork()
 
 /*
  * --INFO--
+ * PAL Address: 0x800B91EC
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void SetShadowAuto__10CCameraPcsFi(void* camera, int enable)
+{
+    *(int*)((char*)camera + 0x434) = enable;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B91F4
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void SetTexShadowRadius__9CCharaPcsFf(void* charaPcs, float texShadowRadius)
+{
+    *(float*)((char*)charaPcs + 0x188) = texShadowRadius;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B91FC
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void SetTexShadowColor__9CCharaPcsF8_GXColor(void* charaPcs, const unsigned char* color)
+{
+    unsigned char* self = (unsigned char*)charaPcs;
+    unsigned char v;
+
+    v = color[0];
+    self[0x18C] = v;
+    v = color[1];
+    self[0x18D] = v;
+    v = color[2];
+    self[0x18E] = v;
+    v = color[3];
+    self[0x18F] = v;
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

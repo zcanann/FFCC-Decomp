@@ -490,12 +490,49 @@ void CMath::MTX44MultVec4(float (*) [4], Vec4d*, Vec4d*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001b544
+ * PAL Size: 360b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMath::MTXGetScale(float (*) [4], Vec*)
+void CMath::MTXGetScale(float (*mtx)[4], Vec* outScale)
 {
-	// TODO
+    Vec xAxis;
+    Vec yAxis;
+    Vec zAxis;
+    Vec temp;
+
+    xAxis.x = mtx[0][0];
+    xAxis.y = mtx[1][0];
+    xAxis.z = mtx[2][0];
+    yAxis.x = mtx[0][1];
+    yAxis.y = mtx[1][1];
+    yAxis.z = mtx[2][1];
+    zAxis.x = mtx[0][2];
+    zAxis.y = mtx[1][2];
+    zAxis.z = mtx[2][2];
+
+    outScale->x = PSVECMag(&xAxis);
+    PSVECNormalize(&xAxis, &xAxis);
+
+    PSVECScale(&xAxis, &temp, PSVECDotProduct(&xAxis, &yAxis));
+    PSVECSubtract(&yAxis, &temp, &yAxis);
+    outScale->y = PSVECMag(&yAxis);
+    PSVECNormalize(&yAxis, &yAxis);
+
+    PSVECScale(&yAxis, &temp, PSVECDotProduct(&yAxis, &zAxis));
+    PSVECSubtract(&zAxis, &temp, &zAxis);
+    PSVECScale(&xAxis, &temp, PSVECDotProduct(&xAxis, &zAxis));
+    PSVECSubtract(&zAxis, &temp, &zAxis);
+    outScale->z = PSVECMag(&zAxis);
+    PSVECNormalize(&zAxis, &zAxis);
+
+    PSVECCrossProduct(&yAxis, &zAxis, &temp);
+    if (PSVECDotProduct(&xAxis, &temp) < 0.0f) {
+        PSVECScale(outScale, outScale, -1.0f);
+    }
 }
 
 /*

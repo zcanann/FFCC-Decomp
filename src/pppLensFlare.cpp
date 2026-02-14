@@ -187,11 +187,11 @@ void pppRenderLensFlare(void* obj, void* param2, void* param3)
 	int iVar2 = unkC->m_serializedDataOffsets[2];
 	int iVar1 = unkC->m_serializedDataOffsets[1];
 	
+	long* shape = 0;
+
 	if ((unkB->m_dataValIndex != 0xffff) &&
-		(*(((char*)obj) + iVar2 + 0xb2) != 0)) {
-		
-		unsigned int* puVar3 = *(unsigned int**)
-			(*(int*)&pppEnvStPtr->m_particleColors[0] + unkB->m_dataValIndex * 4);
+		(shape = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + unkB->m_dataValIndex * 4),
+		 *(((char*)obj) + iVar2 + 0xb2) != 0)) {
 		
 		pppCVECTOR local_70;
 		Vec local_6c;
@@ -218,8 +218,7 @@ void pppRenderLensFlare(void* obj, void* param2, void* param3)
 		local_6c.y = local_60.y;
 		local_6c.z = local_60.z;
 		
-		Vec* targetVec = (Vec*)(((char*)obj) + iVar2 + 0xa0);
-		pppCopyVector(*targetVec, local_6c);
+		pppCopyVector(*(Vec*)(((char*)obj) + iVar2 + 0xa0), local_6c);
 		
 		GXLoadPosMtxImm(local_54, 0);
 		
@@ -236,7 +235,7 @@ void pppRenderLensFlare(void* obj, void* param2, void* param3)
 		
 		pppSetBlendMode(*((unsigned char*)(&unkB->m_arg3) + 2));
 		
-		pppDrawShp((long*)puVar3, *(short*)(((char*)obj) + iVar2 + 0xae),
+		pppDrawShp(shape, *(short*)(((char*)obj) + iVar2 + 0xae),
 			pppEnvStPtr->m_materialSetPtr, *((unsigned char*)(&unkB->m_arg3) + 2));
 		
 		pppSetBlendMode(3);

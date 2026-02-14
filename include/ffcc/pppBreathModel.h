@@ -3,6 +3,8 @@
 
 struct _pppPObject;
 struct _pppMngSt;
+struct pppBreathModel;
+struct UnkC;
 struct VBreathModel;
 struct PBreathModel;
 struct VColor;
@@ -25,8 +27,8 @@ extern "C" {
 
 void pppFrameBreathModel(void);
 void pppRenderBreathModel(void);
-void pppConstructBreathModel(void);
-void pppDestructBreathModel(void);
+void pppConstructBreathModel(pppBreathModel*, UnkC*);
+void pppDestructBreathModel(pppBreathModel*, UnkC*);
 
 #ifdef __cplusplus
 }

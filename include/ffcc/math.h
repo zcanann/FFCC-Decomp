@@ -48,7 +48,7 @@ public:
     void Spline1D(int, float, float*, float*, float*);
     void Line1D(int, float, float*, float*);
     unsigned int Hsb2Rgb(int, int, int);
-    void DstRot(float, float);
+    float DstRot(float, float);
 };
 
 #endif // _FFCC_CMATH_H_

@@ -241,17 +241,12 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct UnkB* param_2, struct
  */
 void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, struct UnkC* param_2)
 {
-    struct KeShpTail3XConArg {
-        char pad[0xc];
-        int* m_serializedDataOffsets;
-    };
     unsigned char* anglePtr;
     unsigned char* work;
-    int* serializedDataOffsets;
     int i;
+    float one;
 
-    serializedDataOffsets = reinterpret_cast<KeShpTail3XConArg*>(param_2)->m_serializedDataOffsets;
-    work = (unsigned char*)((u32)obj + (u32)(*serializedDataOffsets + 8));
+    work = (unsigned char*)((u8*)&obj->pppPObject + 8 + ((KeShpTail3XOffsets*)param_2)->m_serializedDataOffsets[0]);
     work[0x1c3] = 0;
     work[0x1c2] = 0;
     *(u16*)(work + 0x1bc) = 0;
@@ -264,14 +259,16 @@ void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, struct UnkC* param_2)
     memset(work + 0x20, 0, 8);
     memset(work + 0x28, 0, 8);
 
-    anglePtr = work;
+    one = 1.0f;
     i = 0;
+    anglePtr = work;
     do {
-        *(s16*)(anglePtr + 0x180) = (s16)(rand() % 0x168);
+        s32 rnd = rand();
+        *(s16*)(anglePtr + 0x180) = (s16)(rnd - (rnd / 0x168) * 0x168);
         anglePtr += 2;
-        *(float*)(work + 0x38) = 1.0f;
-        *(float*)(work + 0x34) = 1.0f;
-        *(float*)(work + 0x30) = 1.0f;
+        *(float*)(work + 0x38) = one;
+        *(float*)(work + 0x34) = one;
+        *(float*)(work + 0x30) = one;
         work += 0xc;
         i++;
     } while (i < 0x1c);

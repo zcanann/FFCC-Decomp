@@ -7,6 +7,7 @@
 
 extern CPartMng PartMng;
 extern unsigned char* lbl_8032ED50;
+extern "C" void ParticleFrameCallback__5CGameFiiiiiP3Vec(CGame*, int, int, int, int, int, Vec*);
 
 struct YmCallBackObj {
     u8 m_pad0[0xc];
@@ -52,20 +53,20 @@ void pppFrameYmCallBack(void* pppYmCallBack, void* param_2)
 {
     YmCallBackParam* frameParam = (YmCallBackParam*)param_2;
     YmCallBackObj* ymCallBack = (YmCallBackObj*)pppYmCallBack;
-    unsigned char* mngSt = lbl_8032ED50;
+    unsigned char* mngSt;
     Vec position;
     s32 mngStIndex;
 
     if (((s32)ymCallBack->m_graphId / 0x1000) == (s32)frameParam->m_graphId) {
+        mngSt = lbl_8032ED50;
         position.x = *(f32*)(mngSt + 0x84);
         position.y = *(f32*)(mngSt + 0x94);
         position.z = *(f32*)(mngSt + 0xA4);
         PSMTXMultVec(ppvWorldMatrix, &position, &position);
 
         mngStIndex = ((s32)(mngSt - ((u8*)&PartMng + 0x2A18))) / 0x158;
-        Game.game.ParticleFrameCallback(mngStIndex, (s32)*(s16*)(mngSt + 0x74),
-                                        (s32)*(s16*)(mngSt + 0x76),
-                                        (s32)frameParam->m_initWOrk, (s32)frameParam->m_graphId,
-                                        &position);
+        ParticleFrameCallback__5CGameFiiiiiP3Vec(
+            &Game.game, mngStIndex, (s32)*(s16*)(mngSt + 0x74), (s32)*(s16*)(mngSt + 0x76),
+            (s32)frameParam->m_initWOrk, (s32)frameParam->m_graphId, &position);
     }
 }

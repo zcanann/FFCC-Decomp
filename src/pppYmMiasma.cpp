@@ -175,12 +175,12 @@ void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, UnkC* param_2)
  */
 void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, UnkC* param_2)
 {
-    int offset = param_2->m_serializedDataOffsets[2];
+    u8* workBytes = (u8*)pppYmMiasma_ + 0x80 + param_2->m_serializedDataOffsets[2];
     float fVar1 = FLOAT_80330644;
 
-    *(float*)((u8*)pppYmMiasma_ + 0x9c + offset) = FLOAT_80330644;
-    *(float*)((u8*)pppYmMiasma_ + 0xa0 + offset) = fVar1;
-    *(float*)((u8*)pppYmMiasma_ + 0xa4 + offset) = fVar1;
+    *(float*)(workBytes + 0x1c) = FLOAT_80330644;
+    *(float*)(workBytes + 0x20) = fVar1;
+    *(float*)(workBytes + 0x24) = fVar1;
 }
 
 /*

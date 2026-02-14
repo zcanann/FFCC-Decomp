@@ -1,6 +1,31 @@
 #include "ffcc/pppCorona.h"
+#include "ffcc/partMng.h"
+#include "ffcc/pppPart.h"
+#include "ffcc/pppShape.h"
 
+#include <dolphin/gx.h>
+#include <dolphin/mtx.h>
+
+extern s32 DAT_8032ed70;
+extern float lbl_803310C0;
+extern float lbl_803310C4;
 extern float lbl_803310C8;
+extern float lbl_803310CC;
+extern double lbl_803310D0;
+
+struct CoronaWork {
+    s16 m_shapeX;
+    s16 m_shapeY;
+    s16 m_shapeZ;
+    u8 _pad0[2];
+    float m_scaleX;
+    float m_scaleY;
+    float m_scaleZ;
+    Vec m_cameraOffset;
+    Vec m_translate;
+    u8 _pad1[6];
+    u8 m_alpha;
+};
 
 /*
  * --INFO--
@@ -45,9 +70,33 @@ void pppDestructCorona(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameCorona(pppCorona* param1, UnkC* param2)
+void pppFrameCorona(pppCorona* param1, CoronaParam* param2, UnkC* param3)
 {
-    // Placeholder implementation - complex function with many operations
+    CoronaWork* work;
+    long* shape;
+    s32 shapeId;
+
+    if (DAT_8032ed70 != 0) {
+        return;
+    }
+
+    work = (CoronaWork*)((u8*)param1 + 0x80 + param3->m_serializedDataOffsets[3]);
+    work->m_scaleY = work->m_scaleY + work->m_scaleZ;
+    work->m_scaleX = work->m_scaleX + work->m_scaleY;
+
+    shapeId = param2->m_dataValIndex;
+    if ((shapeId | 0xFFFF0000U) == 0xFFFFFFFF) {
+        return;
+    }
+
+    shape = *(long**)(*(u32*)((u8*)pppEnvStPtr + 0xC) + shapeId * 4);
+    pppCalcFrameShape(shape, work->m_shapeX, work->m_shapeY, work->m_shapeZ, param2->m_shapeStep);
+
+    if (param2->m_graphId == *(s32*)((u8*)param1 + 0xC)) {
+        work->m_scaleX += param2->m_addX;
+        work->m_scaleY += param2->m_addY;
+        work->m_scaleZ += param2->m_addZ;
+    }
 }
 
 /*
@@ -59,7 +108,54 @@ void pppFrameCorona(pppCorona* param1, UnkC* param2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderCorona(pppCorona* param1, UnkC* param2)
+void pppRenderCorona(pppCorona* param1, CoronaParam* param2, UnkC* param3)
 {
-    // Placeholder implementation - very complex rendering function
+    CoronaWork* work;
+    pppCVECTOR color;
+    pppFMATRIX mtx;
+    Vec viewDir;
+    Vec fromOrigin;
+    long* shape;
+    float scale;
+
+    shape = (long*)0;
+    work = (CoronaWork*)((u8*)param1 + 0x80 + param3->m_serializedDataOffsets[2]);
+
+    if ((param2->m_dataValIndex | 0xFFFF0000U) == 0xFFFFFFFF) {
+        return;
+    }
+
+    shape = *(long**)(*(u32*)((u8*)pppEnvStPtr + 0x4) + param2->m_dataValIndex * 4);
+
+    PSMTXIdentity(mtx.value);
+
+    viewDir.x = lbl_803310C0;
+    viewDir.y = lbl_803310C4;
+    viewDir.z = lbl_803310C8;
+    PSVECSubtract(&viewDir, &work->m_cameraOffset, &fromOrigin);
+
+    scale = param2->m_distMin;
+    if (PSVECMag(&fromOrigin) < param2->m_distRange) {
+        float t = PSVECMag(&fromOrigin) / param2->m_distRange;
+        scale = param2->m_distMin + (param2->m_distMax - param2->m_distMin) * (lbl_803310CC - t);
+    }
+
+    mtx.value[0][0] = pppMngStPtr->m_scale.x * *(float*)((u8*)param1 + 0x40) * scale;
+    mtx.value[1][1] = pppMngStPtr->m_scale.y * *(float*)((u8*)param1 + 0x54) * scale;
+    mtx.value[2][2] = pppMngStPtr->m_scale.z * *(float*)((u8*)param1 + 0x68) * scale;
+    mtx.value[0][3] = work->m_translate.x;
+    mtx.value[1][3] = work->m_translate.y;
+    mtx.value[2][3] = work->m_translate.z;
+
+    GXLoadPosMtxImm(mtx.value, 0);
+
+    color.rgba[0] = param2->m_colorR;
+    color.rgba[1] = param2->m_colorG;
+    color.rgba[2] = param2->m_colorB;
+    color.rgba[3] = (u8)(s32)(work->m_scaleX * (f32)((f64)work->m_alpha - lbl_803310D0));
+
+    pppSetDrawEnv(&color, &mtx, lbl_803310C8, param2->m_drawA, param2->m_drawB, param2->m_blendMode, 0, 1, 1,
+                  0);
+    pppSetBlendMode(param2->m_blendMode);
+    pppDrawShp(shape, work->m_shapeY, pppEnvStPtr->m_materialSetPtr, param2->m_blendMode);
 }

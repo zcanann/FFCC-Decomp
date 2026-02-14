@@ -374,86 +374,86 @@ static void Block_construct(Block* block, unsigned long size) {
 
 static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
     unsigned long start_offset;
-    SubBlock* start;
-    SubBlock* current;
     unsigned long current_size;
     unsigned long max_size;
+    unsigned long* start;
+    unsigned long* current;
 
-    start_offset = (block->size & 0xFFFFFFF8) - 4;
-    start = *(SubBlock**)((char*)block + start_offset);
+    start_offset = (block->size & 0xFFFFFFF8UL) - 4;
+    start = (unsigned long*)*(SubBlock**)((char*)block + start_offset);
     if (start == 0) {
         block->max_size = 0;
         return 0;
     }
 
     current = start;
-    current_size = start->size & 0xFFFFFFF8;
+    current_size = *current & 0xFFFFFFF8UL;
     max_size = current_size;
 
     do {
         if (requested_size <= current_size) {
             if (0x4F < current_size - requested_size) {
-                SubBlock* remainder = (SubBlock*)((char*)current + requested_size);
-                unsigned long old_header = current->size;
-                unsigned long block_link = ((unsigned long)current->block & 0xFFFFFFFEUL) | 1;
+                unsigned long* remainder = (unsigned long*)((char*)current + requested_size);
+                unsigned long old_header = *current;
+                unsigned long block_link = current[1] & 0xFFFFFFFEUL | 1;
                 unsigned long is_alloc_clz;
                 unsigned long has_alloc_neighbor_clz;
 
-                current->block = (Block*)block_link;
+                current[1] = block_link;
                 is_alloc_clz = __cntlzw(old_header & 2);
-                current->size = requested_size;
+                *current = requested_size;
                 has_alloc_neighbor_clz = __cntlzw(is_alloc_clz >> 5);
                 if ((old_header & 4) != 0) {
-                    current->size |= 4;
+                    *current |= 4;
                 }
 
                 if ((has_alloc_neighbor_clz >> 5) == 0) {
-                    *((unsigned long*)remainder - 1) = requested_size;
+                    remainder[-1] = requested_size;
                 } else {
-                    current->size |= 2;
-                    remainder->size |= 4;
+                    *current |= 2;
+                    *remainder |= 4;
                 }
 
-                remainder->block = (Block*)block_link;
-                requested_size = (old_header & 0xFFFFFFF8) - requested_size;
-                remainder->size = requested_size;
+                remainder[1] = block_link;
+                requested_size = (old_header & 0xFFFFFFF8UL) - requested_size;
+                *remainder = requested_size;
                 if ((has_alloc_neighbor_clz >> 5) == 0) {
                     *(unsigned long*)((char*)remainder + (requested_size - 4)) = requested_size;
                 } else {
-                    remainder->size |= 4;
-                    remainder->size |= 2;
+                    *remainder |= 4;
+                    *remainder |= 2;
                     *(unsigned long*)((char*)remainder + requested_size) |= 4;
                 }
 
                 if ((is_alloc_clz >> 5) != 0) {
-                    remainder->next = current->next;
-                    remainder->next->prev = remainder;
-                    remainder->prev = current;
-                    current->next = remainder;
+                    remainder[3] = current[3];
+                    *(unsigned long*)(remainder[3] + 8) = (unsigned long)remainder;
+                    remainder[2] = (unsigned long)current;
+                    current[3] = (unsigned long)remainder;
                 }
             }
 
-            *(SubBlock**)((char*)block + start_offset) = current->next;
-            current_size = current->size & 0xFFFFFFF8;
-            current->size |= 2;
+            *(SubBlock**)((char*)block + start_offset) = (SubBlock*)current[3];
+            current_size = *current & 0xFFFFFFF8UL;
+            *current |= 2;
             *(unsigned long*)((char*)current + current_size) |= 4;
 
-            if (*(SubBlock**)((char*)block + start_offset) == current) {
-                *(SubBlock**)((char*)block + start_offset) = current->next;
+            if (*(unsigned long**)((char*)block + start_offset) == current) {
+                *(SubBlock**)((char*)block + start_offset) = (SubBlock*)current[3];
             }
 
-            if (*(SubBlock**)((char*)block + start_offset) == current) {
+            if (*(unsigned long**)((char*)block + start_offset) == current) {
                 *(SubBlock**)((char*)block + start_offset) = 0;
                 block->max_size = 0;
             } else {
-                current->next->prev = current->prev;
-                current->prev->next = current->next;
+                *(unsigned long*)(current[3] + 8) = current[2];
+                *(unsigned long*)(current[2] + 12) = current[3];
             }
-            return current;
+            return (SubBlock*)current;
         }
 
-        current = current->next;
-        current_size = current->size & 0xFFFFFFF8;
+        current = (unsigned long*)current[3];
+        current_size = *current & 0xFFFFFFF8UL;
         if (max_size < current_size) {
             max_size = current_size;
         }
@@ -510,7 +510,6 @@ static void* soft_allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned lon
     unsigned long aligned_size;
     Block* current_block;
     SubBlock* result;
-    unsigned long block_available;
     
     aligned_size = (size + 0xF) & 0xFFFFFFF8;
     if (aligned_size < 0x50) {
@@ -522,21 +521,17 @@ static void* soft_allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned lon
     
     if (current_block != 0) {
         do {
-            if (aligned_size <= current_block->max_size) {
-                result = Block_subBlock(current_block, aligned_size);
-                if (result != 0) {
-                    pool_obj->start_ = current_block;
-                    return (char*)result + 8;
-                }
+            if ((aligned_size <= current_block->max_size) &&
+                ((result = Block_subBlock(current_block, aligned_size)) != 0)) {
+                pool_obj->start_ = current_block;
+                return (char*)result + 8;
             }
-            
-            if (current_block->max_size > 8) {
-                block_available = current_block->max_size - 8;
-                if (*available_size < block_available) {
-                    *available_size = block_available;
-                }
+
+            if ((8 < current_block->max_size) &&
+                (*available_size < current_block->max_size - 8)) {
+                *available_size = current_block->max_size - 8;
             }
-            
+
             current_block = current_block->next;
         } while (current_block != pool_obj->start_);
     }

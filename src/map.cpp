@@ -35,6 +35,50 @@ void CMapKeyFrame::Get()
 
 /*
  * --INFO--
+ * PAL Address: 0x80033d0c
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" unsigned long UnkMaterialSetGetter(void* ptrArray)
+{
+    return *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned char*>(ptrArray) + 4);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80033d14
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+void CPtrArray<CMaterial*>::SetDefaultSize(unsigned long defaultSize)
+{
+    *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned char*>(this) + 8) = defaultSize;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80033d1c
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+void CPtrArray<CMaterial*>::SetGrow(int growCapacity)
+{
+    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x14) = growCapacity;
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

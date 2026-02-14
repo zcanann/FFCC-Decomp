@@ -1,4 +1,18 @@
 #include "ffcc/cflat_runtime2.h"
+#include "ffcc/baseobj.h"
+
+/*
+ * --INFO--
+ * PAL Address: 0x8006a058
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGBaseObj::InitFinished()
+{
+}
 
 /*
  * --INFO--

@@ -221,11 +221,11 @@ void GXSetDispCopyFrame2Field(GXCopyMode mode) {
     gx = __GXData;
 
     reg = gx->cpDisp;
-    reg = (u32)__rlwimi(reg, mode, 12, 18, 19);
+    reg = (reg & 0xFFFFCFFF) | ((u32)mode << 12);
     gx->cpDisp = reg;
 
     reg = gx->cpTex;
-    reg = (u32)__rlwimi(reg, 0, 12, 18, 19);
+    reg &= 0xFFFFCFFF;
     gx->cpTex = reg;
 }
 

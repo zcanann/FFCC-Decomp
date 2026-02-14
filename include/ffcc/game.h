@@ -41,6 +41,7 @@ public:
         void Init();
         void InitNewGame();
         void ClearScriptChange();
+        void ClearEvtWork();
 
         unsigned char m_menuStageMode;                   // 0x00
         unsigned char m_gameInitFlag;                    // 0x01

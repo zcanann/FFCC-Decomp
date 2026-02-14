@@ -1,11 +1,16 @@
 #include "ffcc/mapmesh.h"
+#include "ffcc/chunkfile.h"
 
 #include <dolphin/gx.h>
+#include <dolphin/os/OSCache.h>
+
+#include <string.h>
 
 class CMaterial;
 
 extern "C" void __dl__FPv(void* ptr);
 extern "C" void __dla__FPv(void* ptr);
+extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long size, CMemory::CStage* stage, char* file, int line);
 extern char MaterialMan[];
 extern unsigned char MapMng[];
 
@@ -83,6 +88,11 @@ static inline MeshDrawEntry* DrawEntries(CMapMesh* self)
 static inline CMaterialSet* DefaultMaterialSet()
 {
     return *reinterpret_cast<CMaterialSet**>(MapMng + 0x21434);
+}
+
+static inline unsigned int Align32(unsigned int value)
+{
+    return (value + 0x1F) & ~0x1FU;
 }
 }
 
@@ -235,9 +245,200 @@ void CMapMesh::Off2Ptr()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMesh::ReadOtmMesh(CChunkFile&, CMemory::CStage*, int, int)
+void CMapMesh::ReadOtmMesh(CChunkFile& chunkFile, CMemory::CStage* stage, int usePreallocated, int halfColor)
 {
-	// TODO
+    // TODO: chunk tags should move to shared constants once map format headers are restored.
+    const unsigned int CHUNK_COLR = 0x434F4C52;
+    const unsigned int CHUNK_DLHD = 0x444C4844;
+    const unsigned int CHUNK_DLST = 0x444C5354;
+    const unsigned int CHUNK_NBT = 0x4E425420;
+    const unsigned int CHUNK_NORM = 0x4E4F524D;
+    const unsigned int CHUNK_UV = 0x55562020;
+    const unsigned int CHUNK_VERT = 0x56455254;
+    const unsigned int CHUNK_BOFF = 0x424F4646;
+
+    // Re-read in a pre-pass to compute required allocation size.
+    unsigned int workSize = 0;
+    CChunkFile::CChunk chunk;
+    CChunkFile prepass = chunkFile;
+    prepass.PushChunk();
+    while (prepass.GetNextChunk(chunk)) {
+        if (chunk.m_id == CHUNK_NORM || chunk.m_id == CHUNK_COLR || chunk.m_id == CHUNK_NBT ||
+            chunk.m_id == CHUNK_UV || chunk.m_id == CHUNK_VERT) {
+            workSize = Align32(workSize) + chunk.m_size;
+        } else if (chunk.m_id == CHUNK_DLHD) {
+            U16At(this, 0xA) = static_cast<unsigned short>(chunk.m_arg0);
+            workSize = Align32(workSize) + (static_cast<unsigned int>(U16At(this, 0xA)) * 0x10U);
+            prepass.PushChunk();
+            while (prepass.GetNextChunk(chunk)) {
+                if (chunk.m_id == CHUNK_DLST) {
+                    prepass.Align(0x20);
+                    if (chunk.m_arg0 != 0) {
+                        workSize = Align32(workSize) + Align32(chunk.m_arg0);
+                    }
+                    prepass.Align(0x20);
+                }
+            }
+            prepass.PopChunk();
+        }
+    }
+    prepass.PopChunk();
+    workSize = Align32(workSize);
+
+    CChunkFile reader = chunkFile;
+    unsigned int cursor = 0;
+    reader.PushChunk();
+    while (reader.GetNextChunk(chunk)) {
+        if (chunk.m_id == CHUNK_VERT) {
+            S32At(this, 0x24) = reinterpret_cast<int>(
+                __nwa__FUlPQ27CMemory6CStagePci(workSize, stage,
+                                                const_cast<char*>("mapmesh.cpp"), 0x13A));
+
+            const float minInit = 10000000000.0f;
+            const float maxInit = -10000000000.0f;
+            U16At(this, 0x0) = static_cast<unsigned short>(chunk.m_size / 0xC);
+            S32At(this, 0x2C) = static_cast<int>(Align32(S32At(this, 0x24)));
+            F32At(this, 0x14) = minInit;
+            F32At(this, 0x10) = minInit;
+            F32At(this, 0xC) = minInit;
+            F32At(this, 0x20) = maxInit;
+            F32At(this, 0x1C) = maxInit;
+            F32At(this, 0x18) = maxInit;
+            cursor = S32At(this, 0x2C) + chunk.m_size;
+
+            for (unsigned int i = 0; i < static_cast<unsigned int>(U16At(this, 0x0)); i++) {
+                float* vert = reinterpret_cast<float*>(S32At(this, 0x2C) + i * 0xC);
+                vert[0] = reader.GetF4();
+                vert[1] = reader.GetF4();
+                vert[2] = reader.GetF4();
+
+                if (F32At(this, 0xC) > vert[0]) {
+                    F32At(this, 0xC) = vert[0];
+                }
+                if (F32At(this, 0x10) > vert[1]) {
+                    F32At(this, 0x10) = vert[1];
+                }
+                if (F32At(this, 0x14) > vert[2]) {
+                    F32At(this, 0x14) = vert[2];
+                }
+                if (F32At(this, 0x18) < vert[0]) {
+                    F32At(this, 0x18) = vert[0];
+                }
+                if (F32At(this, 0x1C) < vert[1]) {
+                    F32At(this, 0x1C) = vert[1];
+                }
+                if (F32At(this, 0x20) < vert[2]) {
+                    F32At(this, 0x20) = vert[2];
+                }
+            }
+        } else if (chunk.m_id == CHUNK_NORM) {
+            U16At(this, 0x2) = static_cast<unsigned short>(chunk.m_size / 6);
+            S32At(this, 0x30) = static_cast<int>(Align32(cursor));
+            cursor = S32At(this, 0x30) + chunk.m_size;
+
+            for (unsigned int i = 0; i < static_cast<unsigned int>(U16At(this, 0x2)); i++) {
+                unsigned short* norm = reinterpret_cast<unsigned short*>(S32At(this, 0x30) + i * 6);
+                norm[0] = reader.Get2();
+                norm[1] = reader.Get2();
+                norm[2] = reader.Get2();
+            }
+        } else if (chunk.m_id == CHUNK_UV) {
+            U16At(this, 0x6) = static_cast<unsigned short>(chunk.m_size >> 2);
+            S32At(this, 0x38) = static_cast<int>(Align32(cursor));
+            cursor = S32At(this, 0x38) + chunk.m_size;
+
+            for (unsigned int i = 0; i < static_cast<unsigned int>(U16At(this, 0x6)); i++) {
+                unsigned short* uv = reinterpret_cast<unsigned short*>(S32At(this, 0x38) + i * 4);
+                uv[0] = reader.Get2();
+                uv[1] = reader.Get2();
+            }
+        } else if (chunk.m_id == CHUNK_COLR) {
+            U16At(this, 0x8) = static_cast<unsigned short>(chunk.m_size >> 2);
+            S32At(this, 0x3C) = static_cast<int>(Align32(cursor));
+            cursor = S32At(this, 0x3C) + chunk.m_size;
+
+            for (unsigned int i = 0; i < static_cast<unsigned int>(U16At(this, 0x8)); i++) {
+                unsigned char* rgba = reinterpret_cast<unsigned char*>(S32At(this, 0x3C) + i * 4);
+                rgba[0] = reader.Get1();
+                rgba[1] = reader.Get1();
+                rgba[2] = reader.Get1();
+                rgba[3] = reader.Get1();
+                if (halfColor != 0) {
+                    rgba[0] = static_cast<unsigned char>(rgba[0] >> 1);
+                    rgba[1] = static_cast<unsigned char>(rgba[1] >> 1);
+                    rgba[2] = static_cast<unsigned char>(rgba[2] >> 1);
+                }
+            }
+        } else if (chunk.m_id == CHUNK_BOFF) {
+            float x = reader.GetF4();
+            float y = reader.GetF4();
+            float z = reader.GetF4();
+            F32At(this, 0xC) -= x;
+            F32At(this, 0x10) -= y;
+            F32At(this, 0x14) -= z;
+            F32At(this, 0x18) += x;
+            F32At(this, 0x1C) += y;
+            F32At(this, 0x20) += z;
+        } else if (chunk.m_id == CHUNK_DLHD) {
+            U16At(this, 0xA) = static_cast<unsigned short>(chunk.m_arg0);
+            if (usePreallocated == 0) {
+                S32At(this, 0x40) = static_cast<int>(Align32(cursor));
+            } else {
+                S32At(this, 0x28) = reinterpret_cast<int>(__nwa__FUlPQ27CMemory6CStagePci(
+                    workSize, stage,
+                    const_cast<char*>("mapmesh.cpp"), 0x1D5));
+                S32At(this, 0x40) = S32At(this, 0x28);
+            }
+
+            cursor = S32At(this, 0x40) + (static_cast<unsigned int>(U16At(this, 0xA)) * 0x10U);
+            for (unsigned int i = 0; i < static_cast<unsigned int>(U16At(this, 0xA)); i++) {
+                int entry = S32At(this, 0x40) + i * 0x10;
+                *reinterpret_cast<unsigned int*>(entry + 0) = 0;
+                *reinterpret_cast<unsigned int*>(entry + 4) = 0;
+            }
+
+            unsigned int dlOffset = 0;
+            reader.PushChunk();
+            while (reader.GetNextChunk(chunk)) {
+                if (chunk.m_id == CHUNK_DLST) {
+                    int entry = S32At(this, 0x40) + dlOffset;
+                    dlOffset += 0x10;
+                    *reinterpret_cast<unsigned short*>(entry + 8) = reader.Get2();
+                    *reinterpret_cast<unsigned int*>(entry + 0) = chunk.m_arg0;
+
+                    reader.Align(0x20);
+                    *reinterpret_cast<unsigned int*>(entry + 4) = 0;
+                    if (*reinterpret_cast<unsigned int*>(entry + 0) != 0) {
+                        *reinterpret_cast<unsigned int*>(entry + 4) = Align32(cursor);
+                        if (usePreallocated == 0) {
+                            *reinterpret_cast<int*>(entry + 0xC) =
+                                *reinterpret_cast<int*>(entry + 4) - S32At(this, 0x24);
+                        } else {
+                            *reinterpret_cast<int*>(entry + 0xC) =
+                                *reinterpret_cast<int*>(entry + 4) - S32At(this, 0x28);
+                        }
+
+                        cursor = *reinterpret_cast<unsigned int*>(entry + 4) + Align32(chunk.m_arg0);
+                        memset(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(entry + 4)), 0,
+                               Align32(chunk.m_arg0));
+                        reader.Get(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(entry + 4)),
+                                   chunk.m_arg0);
+                        DCFlushRange(reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(entry + 4)),
+                                     Align32(chunk.m_arg0));
+                    }
+                    reader.Align(0x20);
+                }
+            }
+            reader.PopChunk();
+
+            DCFlushRange(PtrAt(this, 0x2C), static_cast<unsigned int>(U16At(this, 0x0)) * 0xC);
+            DCFlushRange(PtrAt(this, 0x30), static_cast<unsigned int>(U16At(this, 0x2)) * 0xC);
+            DCFlushRange(PtrAt(this, 0x34), static_cast<unsigned int>(U16At(this, 0x4)) * 0x12);
+            DCFlushRange(PtrAt(this, 0x3C), static_cast<unsigned int>(U16At(this, 0x8)) * 0xC);
+            DCFlushRange(PtrAt(this, 0x38), static_cast<unsigned int>(U16At(this, 0x6)) * 0xC);
+        }
+    }
+    reader.PopChunk();
 }
 
 /*

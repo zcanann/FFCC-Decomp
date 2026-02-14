@@ -63,7 +63,7 @@ public:
     bool IsLoopAnim(int mode);
     void IsAnimFinished(int);
     void CancelAnim(int);
-    void PlayAnim(int, int, int, int, int, char*);
+    void PlayAnim(int, int, int, int, int, signed char*);
     void SetDispItemName(int);
     void DrawDebug(CFont*);
     void SetPosBG(Vec*, int);

@@ -22,38 +22,22 @@ extern unsigned int lbl_8032EDE0;
  */
 extern "C" void __sinit_p_sound_cpp(void)
 {
-    unsigned int* a = lbl_80210580;
-    unsigned int* b = lbl_8021058C;
     unsigned int* table = (unsigned int*)lbl_802105B0;
-    unsigned int* c = lbl_80210598;
-    unsigned int* d = lbl_802105A4;
-
-    unsigned int a1 = a[1];
-    unsigned int a2 = a[2];
-    unsigned int b0 = b[0];
-    unsigned int b1 = b[1];
-    unsigned int b2 = b[2];
-    unsigned int c0 = c[0];
-    unsigned int c1 = c[1];
-    unsigned int c2 = c[2];
-    unsigned int d0 = d[0];
-    unsigned int d1 = d[1];
-    unsigned int d2 = d[2];
-    unsigned int a0 = a[0];
 
     lbl_8032EDE0 = (unsigned int)&lbl_8021072C;
-    table[1] = a0;
-    table[2] = a1;
-    table[3] = a2;
-    table[4] = b0;
-    table[5] = b1;
-    table[6] = b2;
-    table[7] = c0;
-    table[8] = c1;
-    table[9] = c2;
-    table[12] = d0;
-    table[13] = d1;
-    table[14] = d2;
+
+    table[1] = lbl_80210580[0];
+    table[2] = lbl_80210580[1];
+    table[3] = lbl_80210580[2];
+    table[4] = lbl_8021058C[0];
+    table[5] = lbl_8021058C[1];
+    table[6] = lbl_8021058C[2];
+    table[7] = lbl_80210598[0];
+    table[8] = lbl_80210598[1];
+    table[9] = lbl_80210598[2];
+    table[12] = lbl_802105A4[0];
+    table[13] = lbl_802105A4[1];
+    table[14] = lbl_802105A4[2];
 }
 
 /*

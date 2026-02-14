@@ -58,7 +58,7 @@ public:
     void Init();
     void Quit();
     void SetTexture(_GXTexMapID, CTexture*);
-    void SetTextureTev(CTexture*);
+    int SetTextureTev(CTexture*);
 
     friend class CTexture;
     friend class CTextureSet;

@@ -1,4 +1,5 @@
 #include "ffcc/map.h"
+#include "ffcc/maptexanim.h"
 
 /*
  * --INFO--
@@ -605,9 +606,10 @@ void CMapMng::SetMapObjMime(int, int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMng::SetMapTexAnim(int, int, int, int)
+void CMapMng::SetMapTexAnim(int materialId, int frameStart, int frameEnd, int wrapMode)
 {
-	// TODO
+    CMapTexAnimSet* mapTexAnimSet = reinterpret_cast<CMapTexAnimSet*>(reinterpret_cast<unsigned char*>(this) + 0x213DC);
+    mapTexAnimSet->SetMapTexAnim(materialId, frameStart, frameEnd, wrapMode);
 }
 
 /*

@@ -118,7 +118,7 @@ void init_matrix(_pppPObject*, pppFMATRIX&, PRyjMegaBirthModel*, VRyjMegaBirthMo
  * Address:	TODO
  * Size:	TODO
  */
-void set_matrix(_pppPObject*, pppFMATRIX&, pppFMATRIX&, PRyjMegaBirthModel*, _PARTICLE_DATA*, _PARTICLE_WMAT*, pppFMATRIX&, unsigned char)
+void set_matrix(_pppPObject*, pppFMATRIX, pppFMATRIX, PRyjMegaBirthModel*, _PARTICLE_DATA*, _PARTICLE_WMAT*, pppFMATRIX&, unsigned char)
 {
 	// TODO
 }

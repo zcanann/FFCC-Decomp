@@ -36,8 +36,8 @@ extern "C" {
 
 void pppRyjMegaBirth(_pppPObject*, PRyjMegaBirth*, PRyjMegaBirthOffsets*);
 void pppRyjDrawMegaBirth(void);
-void pppRyjMegaBirthCon(void);
-void pppRyjMegaBirthDes(void);
+void pppRyjMegaBirthCon(_pppPObject*, PRyjMegaBirthOffsets*);
+void pppRyjMegaBirthDes(_pppPObject*, PRyjMegaBirthOffsets*);
 
 #ifdef __cplusplus
 }

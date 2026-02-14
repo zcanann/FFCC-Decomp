@@ -1,6 +1,9 @@
 #include "ffcc/prgobj.h"
 #include "ffcc/charaobj.h"
 #include "ffcc/partyobj.h"
+#include "ffcc/sound.h"
+
+extern "C" int PlaySe3D__6CSoundFiP3Vecffi(CSound*, int, Vec*, float, float, int);
 
 /*
  * --INFO--
@@ -239,12 +242,32 @@ void CGPrgObj::isLoopAnimDirect()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80127650
+ * PAL Size: 208b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGPrgObj::playSe3D(int, int, int, int, Vec*)
+int CGPrgObj::playSe3D(int seNo, int volume, int dist, int pitch, Vec* pos)
 {
-	// TODO
+	int handle;
+
+	if (seNo == 0 || seNo == 0xFFFF) {
+		return -1;
+	}
+
+	if (pos == nullptr) {
+		pos = &m_worldPosition;
+	}
+
+	handle = PlaySe3D__6CSoundFiP3Vecffi(&Sound, seNo, pos, (float)volume, (float)dist, 0);
+
+	if (pitch != 0) {
+		Sound.ChangeSe3DPitch(handle, pitch, 0);
+	}
+
+	return handle;
 }
 
 /*

@@ -2,7 +2,7 @@
 #include "ffcc/math.h"
 #include "dolphin/types.h"
 
-extern CMath math;
+extern CMath math[];
 extern int lbl_8032ED70;
 extern float lbl_8032FF98;
 extern double lbl_8032FFA0;
@@ -56,9 +56,9 @@ void pppRandHCV(void* p1, void* p2, void* p3) {
     }
 
     if (params->index == id) {
-        float randValue = RandF__5CMathFv(&math);
+        float randValue = RandF__5CMathFv(math);
         if (params->flag != 0) {
-            randValue = randValue + RandF__5CMathFv(&math);
+            randValue = randValue + RandF__5CMathFv(math);
         } else {
             randValue = randValue * lbl_8032FF98;
         }

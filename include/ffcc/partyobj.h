@@ -59,8 +59,8 @@ public:
     void putTargetParticle(int, int);
     void endTargetParticle();
 
-    void isDispTarget();
-    void isRideTarget();
+    int isDispTarget();
+    int isRideTarget();
     void checkTargetParticle();
     void moveCenterTargetParticle();
 

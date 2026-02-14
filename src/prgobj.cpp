@@ -20,12 +20,22 @@ extern unsigned char CFlat[];
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80127AF0
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPrgObj::onCreate()
 {
-	// TODO
+	CGObject::onCreate();
+	m_lastStateId = 0;
+	m_stateArg = 0;
+	m_animFlags &= 0x7F;
+	m_animFlags &= 0xBF;
+	m_animFlags &= 0xDF;
+	m_reqAnimId = -1;
 }
 
 /*
@@ -235,22 +245,38 @@ void CGPrgObj::reqAnim(int animId, int loop, int direct)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012776C
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGPrgObj::isLoopAnim()
+int CGPrgObj::isLoopAnim()
 {
-	// TODO
+	if ((m_animFlags & 0x80) != 0 || (m_animFlags & 0x40) != 0 || !IsLoopAnim(2)) {
+		return 0;
+	}
+
+	return 1;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80127720
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGPrgObj::isLoopAnimDirect()
+int CGPrgObj::isLoopAnimDirect()
 {
-	// TODO
+	if ((m_animFlags & 0x40) != 0 || !IsLoopAnim(2)) {
+		return 0;
+	}
+
+	return 1;
 }
 
 /*
@@ -509,12 +535,28 @@ void CGPrgObj::ClassControl(int classControl, int value)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80127028
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGPrgObj::GetClassControl(int)
+int CGPrgObj::GetClassControl(int classControl)
 {
-	// TODO
+	if (classControl == 9) {
+		return reinterpret_cast<CGPartyObj*>(this)->isRideTarget();
+	}
+
+	if (classControl < 9) {
+		if (classControl > 7) {
+			return reinterpret_cast<CGPartyObj*>(this)->isDispTarget();
+		}
+	} else if (classControl < 11) {
+		return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x560);
+	}
+
+	return 0;
 }
 
 /*

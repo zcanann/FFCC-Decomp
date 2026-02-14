@@ -27,8 +27,8 @@ public:
     void changeSubStat(int subState);
     void addSubStat();
     void reqAnim(int, int, int);
-    void isLoopAnim();
-    void isLoopAnimDirect();
+    int isLoopAnim();
+    int isLoopAnimDirect();
     int playSe3D(int, int, int, int, Vec*);
     void changePrg(int);
     void putParticle(int, int, Vec*, float, int);
@@ -40,7 +40,7 @@ public:
     void rotTarget(CGPrgObj*);
     void dstTargetRot(CGPrgObj*);
     void ClassControl(int, int);
-    void GetClassControl(int);
+    int GetClassControl(int);
     int GetCID();
 
     int m_stateFrameGate;      // 0x518

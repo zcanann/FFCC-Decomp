@@ -747,22 +747,30 @@ found:
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002f46c
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapMng::SetDrawRangeOctTree(float)
+void CMapMng::SetDrawRangeOctTree(float drawRange)
 {
-	// TODO
+    *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x22A70) = -drawRange;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002f45c
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapMng::SetDrawRangeMapObj(float)
+void CMapMng::SetDrawRangeMapObj(float drawRange)
 {
-	// TODO
+    *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x22A74) = -drawRange;
 }
 
 /*

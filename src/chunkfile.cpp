@@ -83,43 +83,50 @@ void CChunkFile::PopChunk()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 80012988
+ * PAL Size: 192b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 bool CChunkFile::GetNextChunk(CChunk& outChunk)
 {
     int skip;
+    unsigned int alignedSize;
 
-	if (m_lastChunkSize < 0)
-	{
-		skip = 0;
-	}
-	else {
-		skip = ((m_lastChunkSize + 15) / 16) * 16 + 16;
-	}
+    if (m_lastChunkSize < 0) {
+        skip = 0;
+    } else {
+        alignedSize = static_cast<unsigned int>(m_lastChunkSize + 0xF);
+        skip = (((int)alignedSize >> 4) + ((int)alignedSize < 0 && (alignedSize & 0xF) != 0)) * 0x10 + 0x10;
+    }
 
     m_scopeOffset += skip;
     m_headerPtr += skip;
     m_cursor = m_headerPtr;
 
-    if (m_scopeSize <= m_scopeOffset)
-	{
+    if ((int)m_scopeSize <= m_scopeOffset) {
         return false;
-	}
+    }
 
-    outChunk.m_id = *(unsigned int*)m_cursor;
-    m_cursor += 4;
+    unsigned int* word = reinterpret_cast<unsigned int*>(m_cursor);
+    m_cursor = reinterpret_cast<unsigned char*>(word + 1);
+    outChunk.m_id = *word;
 
-    outChunk.m_size = *(unsigned int*)m_cursor;
-    m_cursor += 4;
+    unsigned char* raw = m_cursor;
+    m_cursor = raw + 4;
+    outChunk.m_size = *reinterpret_cast<unsigned int*>(raw);
 
-    outChunk.m_arg0 = *(unsigned int*)m_cursor;
-    m_cursor += 4;
+    int* value = reinterpret_cast<int*>(m_cursor);
+    m_cursor = reinterpret_cast<unsigned char*>(value + 1);
+    outChunk.m_arg0 = *value;
 
-    outChunk.m_version = *(unsigned int*)m_cursor;
-    m_cursor += 4;
+    value = reinterpret_cast<int*>(m_cursor);
+    m_cursor = reinterpret_cast<unsigned char*>(value + 1);
+    outChunk.m_version = *value;
 
-    m_lastChunkSize = outChunk.m_size;
+    m_lastChunkSize = static_cast<int>(outChunk.m_size);
 
     return true;
 }

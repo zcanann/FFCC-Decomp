@@ -1,7 +1,5 @@
 #include "ffcc/p_sound.h"
 
-#include "ffcc/sound.h"
-
 extern unsigned char CFlat[];
 extern unsigned int lbl_80210580[];
 extern unsigned int lbl_8021058C[];
@@ -10,6 +8,17 @@ extern unsigned int lbl_802105A4[];
 extern unsigned char lbl_802105B0[];
 extern unsigned int lbl_8021072C[];
 extern unsigned int lbl_8032EDE0;
+class CSound;
+extern CSound Sound[];
+extern "C" {
+void LoadBlock__6CSoundFv(CSound*);
+void CancelLoadWaveASync__6CSoundFv(CSound*);
+void StopStream__6CSoundFv(CSound*);
+void StopAndFreeAllSe__6CSoundFi(CSound*, int);
+void FreeBlock__6CSoundFv(CSound*);
+void Frame__6CSoundFv(CSound*);
+void Draw__6CSoundFv(CSound*);
+}
 
 /*
  * --INFO--
@@ -104,7 +113,7 @@ void CSoundPcs::create()
  */
 void CSoundPcs::createLoad()
 {
-    Sound.LoadBlock();
+    LoadBlock__6CSoundFv(Sound);
 }
 
 /*
@@ -118,10 +127,10 @@ void CSoundPcs::createLoad()
  */
 void CSoundPcs::destroy()
 {
-    Sound.CancelLoadWaveASync();
-    Sound.StopStream();
-    Sound.StopAndFreeAllSe(1);
-    Sound.FreeBlock();
+    CancelLoadWaveASync__6CSoundFv(Sound);
+    StopStream__6CSoundFv(Sound);
+    StopAndFreeAllSe__6CSoundFi(Sound, 1);
+    FreeBlock__6CSoundFv(Sound);
 }
 
 /*
@@ -135,7 +144,7 @@ void CSoundPcs::destroy()
  */
 void CSoundPcs::calc()
 {
-    Sound.Frame();
+    Frame__6CSoundFv(Sound);
 }
 
 /*
@@ -150,6 +159,6 @@ void CSoundPcs::calc()
 void CSoundPcs::draw()
 {
     if ((*(unsigned int*)(CFlat + 0x129C) & 0x400000) != 0) {
-        Sound.Draw();
+        Draw__6CSoundFv(Sound);
     }
 }

@@ -14,26 +14,22 @@
 void pppDrawMatrixFront(_pppPObject* param_1)
 {
     Vec localPos;
-    
-    // Apply scale transformation from global manager state  
+
     PSMTXScaleApply(
         *(Mtx*)((char*)param_1 + 0x10),
         *(Mtx*)((char*)param_1 + 0x40),
-        pppMngStPtr->m_scale.x,
-        pppMngStPtr->m_scale.y, 
-        pppMngStPtr->m_scale.z
+        *(f32*)((char*)pppMngStPtr + 0x28),
+        *(f32*)((char*)pppMngStPtr + 0x2C),
+        *(f32*)((char*)pppMngStPtr + 0x30)
     );
-    
-    // Extract position from local matrix (offsets from assembly analysis)
+
     localPos.x = *(float*)((char*)param_1 + 0x1c);
-    localPos.y = *(float*)((char*)param_1 + 0x2c);  
+    localPos.y = *(float*)((char*)param_1 + 0x2c);
     localPos.z = *(float*)((char*)param_1 + 0x3c);
-    
-    // Transform position to world space
+
     PSMTXMultVec(ppvWorldMatrix, &localPos, &localPos);
-    
-    // Store transformed position (offsets from assembly analysis)
+
     *(float*)((char*)param_1 + 0x4c) = localPos.x;
-    *(float*)((char*)param_1 + 0x5c) = localPos.y; 
+    *(float*)((char*)param_1 + 0x5c) = localPos.y;
     *(float*)((char*)param_1 + 0x6c) = localPos.z;
 }

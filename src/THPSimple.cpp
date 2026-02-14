@@ -68,7 +68,11 @@ extern s16 WorkBuffer_32_[];
  */
 void checkError()
 {
-	// TODO
+    s32 status = DVDGetCommandBlockStatus(&SimpleControl.fileInfo.cb);
+
+    if ((status == 0xB) || ((status - 4U) < 3) || (status == -1)) {
+        File.DrawError(SimpleControl.fileInfo, status);
+    }
 }
 
 /*

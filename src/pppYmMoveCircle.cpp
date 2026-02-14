@@ -78,7 +78,6 @@ extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCirc
 extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleStep* stepData, pppYmMoveCircleOffsets* offsetData)
 {
     pppYmMoveCircleWork* work;
-    Vec currentPos;
     Vec nextPos;
     s32 tableIndex;
 
@@ -114,8 +113,7 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
     nextPos.y = *(f32*)((u8*)lbl_8032ED50 + 0xC);
     nextPos.z = (work->m_radius * -(*(f32*)((u8*)lbl_801EC9F0 + (tableIndex & 0xFFFC)))) + work->m_center.z;
 
-    pppCopyVector(currentPos, *(Vec*)((u8*)lbl_8032ED50 + 0x8));
-    pppCopyVector(*(Vec*)((u8*)lbl_8032ED50 + 0x48), currentPos);
+    pppCopyVector(*(Vec*)((u8*)lbl_8032ED50 + 0x48), *(Vec*)((u8*)lbl_8032ED50 + 0x8));
     pppCopyVector(*(Vec*)((u8*)lbl_8032ED50 + 0x8), nextPos);
 
     *(f32*)((u8*)lbl_8032ED50 + 0x84) = nextPos.x;

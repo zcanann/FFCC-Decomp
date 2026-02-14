@@ -1,7 +1,7 @@
 #include "ffcc/pppSRandUpFV.h"
 #include "ffcc/math.h"
 
-extern CMath math;
+extern CMath math[];
 extern int lbl_8032ED70;
 extern float lbl_803300C0;
 extern float lbl_801EADC8[];
@@ -69,21 +69,21 @@ extern "C" void pppSRandUpFV(void* param1, void* param2, void* param3)
         unsigned char blendTwice = cfg->blendTwice;
         randVec = reinterpret_cast<float*>(self + offset + 0x80);
 
-        float value = RandF__5CMathFv(&math);
+        float value = RandF__5CMathFv(math);
         if (blendTwice != 0) {
-            value = (value + RandF__5CMathFv(&math)) * lbl_803300C0;
+            value = (value + RandF__5CMathFv(math)) * lbl_803300C0;
         }
         randVec[0] = value;
 
-        value = RandF__5CMathFv(&math);
+        value = RandF__5CMathFv(math);
         if (blendTwice != 0) {
-            value = (value + RandF__5CMathFv(&math)) * lbl_803300C0;
+            value = (value + RandF__5CMathFv(math)) * lbl_803300C0;
         }
         randVec[1] = value;
 
-        value = RandF__5CMathFv(&math);
+        value = RandF__5CMathFv(math);
         if (blendTwice != 0) {
-            value = (value + RandF__5CMathFv(&math)) * lbl_803300C0;
+            value = (value + RandF__5CMathFv(math)) * lbl_803300C0;
         }
         randVec[2] = value;
     } else {

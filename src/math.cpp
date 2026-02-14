@@ -126,12 +126,36 @@ void CMath::SRTToMatrix(float (*out)[4], SRT* srt)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001bfe0
+ * PAL Size: 324b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMath::SRTToMatrixRT(float (*) [4], SRT*)
+void CMath::SRTToMatrixRT(float (*out)[4], SRT* srt)
 {
-	// TODO
+    float* const s = reinterpret_cast<float*>(srt);
+
+    const double sx = (double)(float)sin((double)s[3]);
+    const double cx = (double)(float)cos((double)s[3]);
+    const double sy = (double)(float)sin((double)s[4]);
+    const double cy = (double)(float)cos((double)s[4]);
+    const double sz = (double)(float)sin((double)s[5]);
+    const double cz = (double)(float)cos((double)s[5]);
+
+    out[0][0] = (float)(cy * cz);
+    out[1][0] = (float)(cy * sz);
+    out[2][0] = (float)-sy;
+    out[0][1] = (float)(cz * (double)(float)(sx * sy) - (double)(float)(cx * sz));
+    out[1][1] = (float)(sz * (double)(float)(sx * sy) + (double)(float)(cx * cz));
+    out[2][1] = (float)(sx * cy);
+    out[0][2] = (float)(cz * (double)(float)(cx * sy) + (double)(float)(sx * sz));
+    out[1][2] = (float)(sz * (double)(float)(cx * sy) - (double)(float)(sx * cz));
+    out[2][2] = (float)(cx * cy);
+    out[0][3] = s[0];
+    out[1][3] = s[1];
+    out[2][3] = s[2];
 }
 
 /*

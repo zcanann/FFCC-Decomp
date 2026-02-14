@@ -1,4 +1,5 @@
 #include "ffcc/pppVtMime.h"
+#include "ffcc/graphic.h"
 
 struct VtMimeCtrl
 {
@@ -39,7 +40,6 @@ struct VtMimeEnv
 
 extern int lbl_8032ED70;
 extern VtMimeEnv* lbl_8032ED54;
-extern void* Graphic;
 static char s_pppVtMime_cpp[] = "pppVtMime.cpp";
 
 extern "C" {
@@ -151,9 +151,9 @@ void pppVtMimeCon(void* param1, void* param2, void* param3)
 {
     VtMimeState* state = (VtMimeState*)((char*)param1 + **(int**)((char*)param2 + 0xC) + 0x80);
 
-    state->value = 0.0f;
-    state->velocity = 0.0f;
     state->accel = 0.0f;
+    state->velocity = 0.0f;
+    state->value = 0.0f;
     state->vertexBuffer = 0;
 }
 
@@ -170,9 +170,9 @@ void pppVtMimeCon2(void* param1, void* param2, void* param3)
 {
     VtMimeState* state = (VtMimeState*)((char*)param1 + **(int**)((char*)param2 + 0xC) + 0x80);
 
-    state->value = 0.0f;
-    state->velocity = 0.0f;
     state->accel = 0.0f;
+    state->velocity = 0.0f;
+    state->value = 0.0f;
 }
 
 /*
@@ -189,7 +189,7 @@ void pppVtMimeDes(void* param1, void* param2)
     VtMimeState* state = (VtMimeState*)((char*)param1 + **(int**)((char*)param2 + 0xC) + 0x80);
 
     if (state->vertexBuffer != 0) {
-        _WaitDrawDone__8CGraphicFPci(Graphic, s_pppVtMime_cpp, 0x50);
+        _WaitDrawDone__8CGraphicFPci(&Graphic, s_pppVtMime_cpp, 0x50);
         pppHeapUseRate__FPQ27CMemory6CStage(state->vertexBuffer);
         state->vertexBuffer = 0;
     }

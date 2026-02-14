@@ -1,5 +1,6 @@
 #include "ffcc/memorycard.h"
 #include "ffcc/file.h"
+#include "ffcc/math.h"
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
 
@@ -8,6 +9,7 @@
 #include "string.h"
 
 extern unsigned char Game[];
+extern CMath Math;
 CMemoryCardMan MemoryCardMan;
 
 // CRC32 lookup table
@@ -1824,11 +1826,170 @@ void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat* saveDat)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c18fc
+ * PAL Size: 1572b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMemoryCardMan::Odekake(int, Mc::SaveDat&, int, Mc::SaveDat&, int)
+void CMemoryCardMan::Odekake(int mode, Mc::SaveDat& srcSave, int srcChar, Mc::SaveDat& dstSave, int dstChar)
 {
+    u8* srcSaveData = reinterpret_cast<u8*>(&srcSave);
+    u8* dstSaveData = reinterpret_cast<u8*>(&dstSave);
+    u8* srcCharData = srcSaveData + srcChar * 0x9C0 + 0x14D0;
+    u8* dstCharData = dstSaveData + dstChar * 0x9C0 + 0x14D0;
+
+    if (mode == 0)
+    {
+        memcpy(dstCharData + 0xBC, srcCharData + 0xBC, 0x0C);
+
+        u8* srcWork = srcSaveData + srcChar * 0x208;
+        for (int i = 0; i < 2; i++)
+        {
+            srcWork[0xC0] = 0;
+            srcWork[0xC1] = 0;
+            srcWork[0xC2] = 0;
+            srcWork[0xC3] = 0;
+            srcWork[0xC4] = 0;
+            srcWork[0xC5] = 0;
+            srcWork[0xC6] = 0;
+            srcWork[0xC7] = 0;
+            srcWork[0x100] = 0;
+            srcWork[0x101] = 0;
+            srcWork[0x102] = 0;
+            srcWork[0x103] = 0;
+            srcWork[0x104] = 0;
+            srcWork[0x105] = 0;
+            srcWork[0x106] = 0;
+            srcWork[0x107] = 0;
+            srcWork[0x140] = 0;
+            srcWork[0x141] = 0;
+            srcWork[0x142] = 0;
+            srcWork[0x143] = 0;
+            srcWork[0x144] = 0;
+            srcWork[0x145] = 0;
+            srcWork[0x146] = 0;
+            srcWork[0x147] = 0;
+            srcWork[0x180] = 0;
+            srcWork[0x181] = 0;
+            srcWork[0x182] = 0;
+            srcWork[0x183] = 0;
+            srcWork[0x184] = 0;
+            srcWork[0x185] = 0;
+            srcWork[0x186] = 0;
+            srcWork[0x187] = 0;
+            srcWork += 0x100;
+        }
+
+        dstCharData[0x8C0] = 0;
+        srcCharData[0x8C2] = 0;
+        memset(srcCharData, 0, 0x9C0);
+        dstCharData[0x6C2] = 0;
+        dstCharData[0x6C3] = 0x0C;
+    }
+    else
+    {
+        memset(dstCharData, 0, 0x9C0);
+
+        *reinterpret_cast<u16*>(dstCharData + 0x00) = *reinterpret_cast<u16*>(srcCharData + 0x00);
+        *reinterpret_cast<u16*>(dstCharData + 0x02) = *reinterpret_cast<u16*>(srcCharData + 0x02);
+        *reinterpret_cast<u16*>(dstCharData + 0x04) = *reinterpret_cast<u16*>(srcCharData + 0x04);
+        *reinterpret_cast<u16*>(dstCharData + 0x06) = *reinterpret_cast<u16*>(srcCharData + 0x06);
+        *reinterpret_cast<u16*>(dstCharData + 0x08) = *reinterpret_cast<u16*>(srcCharData + 0x08);
+        *reinterpret_cast<u16*>(dstCharData + 0x0A) = *reinterpret_cast<u16*>(srcCharData + 0x0A);
+        *reinterpret_cast<u16*>(dstCharData + 0x0C) = *reinterpret_cast<u16*>(srcCharData + 0x0C);
+        *reinterpret_cast<u16*>(dstCharData + 0x0E) = *reinterpret_cast<u16*>(srcCharData + 0x0E);
+        *reinterpret_cast<u16*>(dstCharData + 0x10) = *reinterpret_cast<u16*>(srcCharData + 0x10);
+        memcpy(dstCharData + 0x12, srcCharData + 0x12, 0x12);
+        *reinterpret_cast<u16*>(dstCharData + 0x24) = *reinterpret_cast<u16*>(srcCharData + 0x24);
+        *reinterpret_cast<u16*>(dstCharData + 0x26) = *reinterpret_cast<u16*>(srcCharData + 0x26);
+        *reinterpret_cast<u16*>(dstCharData + 0x2A) = *reinterpret_cast<u16*>(srcCharData + 0x2A);
+        *reinterpret_cast<u16*>(dstCharData + 0x2C) = *reinterpret_cast<u16*>(srcCharData + 0x2C);
+        *reinterpret_cast<u16*>(dstCharData + 0x2E) = *reinterpret_cast<u16*>(srcCharData + 0x2E);
+        *reinterpret_cast<u16*>(dstCharData + 0x30) = *reinterpret_cast<u16*>(srcCharData + 0x30);
+        *reinterpret_cast<u16*>(dstCharData + 0x32) = *reinterpret_cast<u16*>(srcCharData + 0x32);
+        memcpy(dstCharData + 0x34, srcCharData + 0x34, 8);
+        memcpy(dstCharData + 0xBC, srcCharData + 0xBC, 0x0C);
+        *reinterpret_cast<u32*>(dstCharData + 0xE8) = *reinterpret_cast<u32*>(srcCharData + 0xE8);
+        memcpy(dstCharData + 0xF0, srcCharData + 0xF0, 0x10);
+        *reinterpret_cast<u32*>(dstCharData + 0x5B4) = *reinterpret_cast<u32*>(srcCharData + 0x5B4);
+        memcpy(dstCharData + 0x5B8, srcCharData + 0x5B8, 0x100);
+        memcpy(dstCharData + 0x6B8, srcCharData + 0x6B8, 0x200);
+        *reinterpret_cast<u32*>(dstCharData + 0x8B8) = *reinterpret_cast<u32*>(srcCharData + 0x8B8);
+        *reinterpret_cast<u32*>(dstCharData + 0x8BC) = *reinterpret_cast<u32*>(srcCharData + 0x8BC);
+        dstCharData[0x8C2] = srcCharData[0x8C2];
+        *reinterpret_cast<u32*>(dstCharData + 0x8C4) = *reinterpret_cast<u32*>(srcCharData + 0x8C4);
+        *reinterpret_cast<u32*>(dstCharData + 0x8C8) = *reinterpret_cast<u32*>(srcSaveData + 0x13D0);
+        *reinterpret_cast<u32*>(dstCharData + 0x8CC) = *reinterpret_cast<u32*>(srcSaveData + 0x13D4);
+        *reinterpret_cast<u32*>(dstCharData + 0x8D0) = *reinterpret_cast<u32*>(srcSaveData + 0x13D8);
+
+        u8* dstWork = dstSaveData + dstChar * 0x200;
+        for (int i = 0; i < 8; i++)
+        {
+            u8* item = dstWork + dstChar * 8;
+            int row = 0;
+            for (int j = 0; j < 2; j++)
+            {
+                item[0xC0] = ((i == 0) && (row == 0)) ? 0x32 : 0;
+                item[0xC1] = ((i == 0) && (row == -1)) ? 0x32 : 0;
+                item[0xC2] = ((i == 0) && (row == -2)) ? 0x32 : 0;
+                item[0xC3] = ((i == 0) && (row == -3)) ? 0x32 : 0;
+                row += 4;
+                item += 4;
+            }
+            dstWork += 0x40;
+        }
+
+        memset(dstCharData + 0xC8, 0xFF, 0x10);
+        memset(dstCharData + 0xD8, 0, 0x10);
+        dstCharData[0x28] = 0;
+        dstCharData[0x29] = 0;
+        memset(dstCharData + 0x3C, 0xFF, 0x80);
+
+        int artifact = static_cast<int>(*reinterpret_cast<s16*>(dstCharData + 0x34));
+        if (artifact >= 0 && artifact < 0x40)
+        {
+            artifact = artifact * 2 + 0x3C;
+            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<u16*>(srcCharData + artifact);
+            *reinterpret_cast<s16*>(dstCharData + 0x28) = *reinterpret_cast<s16*>(dstCharData + 0x28) + 1;
+        }
+
+        artifact = static_cast<int>(*reinterpret_cast<s16*>(dstCharData + 0x36));
+        if (artifact >= 0 && artifact < 0x40)
+        {
+            artifact = artifact * 2 + 0x3C;
+            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<u16*>(srcCharData + artifact);
+            *reinterpret_cast<s16*>(dstCharData + 0x28) = *reinterpret_cast<s16*>(dstCharData + 0x28) + 1;
+        }
+
+        artifact = static_cast<int>(*reinterpret_cast<s16*>(dstCharData + 0x38));
+        if (artifact >= 0 && artifact < 0x40)
+        {
+            artifact = artifact * 2 + 0x3C;
+            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<u16*>(srcCharData + artifact);
+            *reinterpret_cast<s16*>(dstCharData + 0x28) = *reinterpret_cast<s16*>(dstCharData + 0x28) + 1;
+        }
+
+        artifact = static_cast<int>(*reinterpret_cast<s16*>(dstCharData + 0x3A));
+        if (artifact >= 0 && artifact < 0x40)
+        {
+            artifact = artifact * 2 + 0x3C;
+            *reinterpret_cast<u16*>(dstCharData + artifact) = *reinterpret_cast<u16*>(srcCharData + artifact);
+            *reinterpret_cast<s16*>(dstCharData + 0x28) = *reinterpret_cast<s16*>(dstCharData + 0x28) + 1;
+        }
+
+        srcCharData[0x8C0] = 1;
+        dstCharData[0x8C1] = 1;
+        dstCharData[0x6C2] = 0;
+        dstCharData[0x6C3] = 3;
+    }
+
+    *reinterpret_cast<u32*>(srcSaveData + 0x18) = Math.Rand(0x7FFFFFFF);
+    *reinterpret_cast<u32*>(srcSaveData + 0x1C) = CalcCrc(reinterpret_cast<Mc::SaveDat*>(srcSaveData));
+
+    *reinterpret_cast<u32*>(dstSaveData + 0x18) = Math.Rand(0x7FFFFFFF);
+    *reinterpret_cast<u32*>(dstSaveData + 0x1C) = CalcCrc(reinterpret_cast<Mc::SaveDat*>(dstSaveData));
 }
 
 /*

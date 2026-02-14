@@ -125,7 +125,7 @@ int CMaterialEditorPcs::AddRsdList(ZLIST* zlist)
  */
 int CMaterialEditorPcs::SetRsdFlag()
 {
-    ZLIST* list = reinterpret_cast<ZLIST*>(reinterpret_cast<char*>(this) + 0xB4);
+    ZLIST* list = reinterpret_cast<ZLIST*>(reinterpret_cast<char*>(this) + 0xD8);
     int index = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0xC4);
     int* rsd = reinterpret_cast<int*>(list->GetDataIdx(index));
 
@@ -157,9 +157,9 @@ void CMaterialEditorPcs::GetRsdItemR()
  */
 int CMaterialEditorPcs::SetRsdIndex()
 {
-    ZLIST* list = reinterpret_cast<ZLIST*>(reinterpret_cast<char*>(this) + 0xB4);
+    ZLIST* list = reinterpret_cast<ZLIST*>(reinterpret_cast<char*>(this) + 0xD8);
     int index = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0xC4);
-    int* rsd = reinterpret_cast<int*>(list->GetDataIdx(index));
+    unsigned int* rsd = reinterpret_cast<unsigned int*>(list->GetDataIdx(index));
 
     if (rsd == nullptr) {
         return 0;
@@ -168,7 +168,7 @@ int CMaterialEditorPcs::SetRsdIndex()
         return 0;
     }
 
-    *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0xBC) = *rsd;
+    *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(this) + 0xBC) = *rsd;
     return 1;
 }
 

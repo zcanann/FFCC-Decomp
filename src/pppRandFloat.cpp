@@ -1,24 +1,25 @@
 #include "ffcc/pppRandFloat.h"
 #include "ffcc/math.h"
+#include "types.h"
 
-extern CMath math;
-extern int lbl_8032ED70;
-extern float lbl_8032FF88;
-extern float lbl_801EADC8;
+extern CMath math[];
+extern s32 lbl_8032ED70;
+extern f32 lbl_8032FF88;
+extern f32 lbl_801EADC8;
 extern "C" float RandF__5CMathFv(CMath* instance);
 
 struct RandFloatParam {
-    int targetId;
-    int sourceOffset;
-    float blend;
-    unsigned char randomTwice;
+    s32 targetId;
+    s32 sourceOffset;
+    f32 blend;
+    u8 randomTwice;
 };
 
 struct RandFloatCtx {
     void* unk0;
     void* unk4;
     void* unk8;
-    int* outputOffset;
+    s32* outputOffset;
 };
 
 /*
@@ -32,44 +33,41 @@ struct RandFloatCtx {
  */
 void pppRandFloat(void* param1, void* param2, void* param3)
 {
-    int index;
-    char* base;
-    RandFloatParam* data;
-    RandFloatCtx* ctx;
-    float value;
+    RandFloatParam* in = (RandFloatParam*)param2;
+    RandFloatCtx* ctx = (RandFloatCtx*)param3;
+    u8* base;
+    f32* valuePtr;
 
     if (lbl_8032ED70 != 0) {
         return;
     }
 
-    base = (char*)param1;
-    data = (RandFloatParam*)param2;
-    ctx = (RandFloatCtx*)param3;
-    index = ((int*)base)[3];
+    base = (u8*)param1;
+    s32 state = *(s32*)(base + 0xC);
 
-    if (index == 0) {
-        value = RandF__5CMathFv(&math);
-        if (data->randomTwice != 0) {
-            value += RandF__5CMathFv(&math);
+    if (state == 0) {
+        f32 value = RandF__5CMathFv(math);
+        if (in->randomTwice != 0) {
+            value += RandF__5CMathFv(math);
         } else {
             value *= lbl_8032FF88;
         }
 
-        *(float*)(base + *ctx->outputOffset + 0x80) = value;
-        return;
-    }
-
-    if (data->targetId == index) {
-        int outputOffset = *ctx->outputOffset;
-        int sourceOffset = data->sourceOffset;
-        float* source;
-
-        if (data->sourceOffset == -1) {
-            source = &lbl_801EADC8;
-        } else {
-            source = (float*)(base + sourceOffset + 0x80);
+        valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
+        *valuePtr = value;
+    } else {
+        if (in->targetId != state) {
+            return;
         }
-
-        *source = *source + (data->blend * *(float*)(base + outputOffset + 0x80) - data->blend);
+        valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
     }
+
+    f32* source;
+    if (in->sourceOffset == -1) {
+        source = &lbl_801EADC8;
+    } else {
+        source = (f32*)(base + in->sourceOffset + 0x80);
+    }
+
+    *source = *source + (in->blend * *valuePtr - in->blend);
 }

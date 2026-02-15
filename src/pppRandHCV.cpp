@@ -69,7 +69,7 @@ void pppRandHCV(void* p1, void* p2, void* p3) {
 
         randomValue = (float*)(base + *ctx->outputOffset + 0x80);
         *randomValue = value;
-    } else {
+    } else if (params->index != *(int*)(base + 0xC)) {
         return;
     }
 

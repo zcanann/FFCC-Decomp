@@ -170,7 +170,8 @@ void MakeWave(Vec*, unsigned short*, float*, Vec*, float, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned short* param_4, float param_5)
+extern "C" void CreateWaterMesh__FP3VecP3VecP5Vec2dPUsf2(
+    Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned short* param_4, float param_5, float)
 {
     float* pos;
     float* normal;
@@ -276,7 +277,8 @@ void CalculateNormal(VMana2*)
  * Address:	TODO
  * Size:	TODO
  */
-void CalcWaterReflectionVector(Vec*, Vec*, Vec*, long, Vec*, float (*) [4], _GXColor*, Vec2d*)
+extern "C" void CalcWaterReflectionVector__FP3VecP3VecP3Vecl3VecPA4_fP8_GXColorP5Vec2d2(
+    Vec*, Vec*, Vec*, long, Vec, float (*) [4], _GXColor*, Vec2d*, Vec2d*)
 {
 	// TODO
 }

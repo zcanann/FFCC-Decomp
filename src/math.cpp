@@ -11,6 +11,13 @@ CMath math;
 static Vec s_f_vpos;
 static Mtx s_f_lvmtx;
 
+struct Vec4d {
+    float x;
+    float y;
+    float z;
+    float w;
+};
+
 extern void* __vt__8CManager;
 extern void* __vt__5CMath;
 
@@ -590,22 +597,137 @@ void CMath::MTXGetScale(float (*mtx)[4], Vec* outScale)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001b240
+ * PAL Size: 772b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMath::CrossCheckSphereVector(Vec*, float*, Vec*, Vec*, Vec*, float)
+int CMath::CrossCheckSphereVector(Vec* outPos, float* outT, Vec* p0, Vec* p1, Vec* ellipseScale, float scale)
 {
-	// TODO
+    const float sumA = scale + p0->x;
+    const float yScale = sumA / (p1->x + p0->x);
+    const float radiusSq = sumA * sumA;
+
+    Vec rel;
+    PSVECSubtract(p1, ellipseScale, &rel);
+
+    Vec relScaled = rel;
+    relScaled.y *= yScale;
+
+    Vec dir;
+    dir.x = p0->y;
+    dir.y = p0->z * yScale;
+    dir.z = p1->z;
+
+    if (PSVECDotProduct(&relScaled, &relScaled) < radiusSq) {
+        if (outT != NULL) {
+            *outT = 0.0f;
+        }
+        if (outPos != NULL) {
+            *outPos = rel;
+        }
+    }
+    else {
+        const float proj = PSVECDotProduct(&dir, &relScaled);
+        if (proj > 0.0f) {
+            return 0;
+        }
+
+        const float dirLenSq = PSVECDotProduct(&dir, &dir);
+        const float det = proj * proj - dirLenSq * (PSVECDotProduct(&relScaled, &relScaled) - radiusSq);
+        if (det < 0.0f) {
+            return 0;
+        }
+
+        const float dist = -proj - sqrtf(det);
+        if (dist <= 0.0f || dirLenSq < dist) {
+            return 0;
+        }
+
+        if (outT != NULL) {
+            *outT = dist / dirLenSq;
+        }
+        if (outPos != NULL) {
+            Vec offset;
+            PSVECScale(&dir, &offset, dist / dirLenSq);
+            PSVECAdd(&rel, &offset, outPos);
+        }
+    }
+
+    if (outPos != NULL) {
+        PSVECSubtract(outPos, &rel, outPos);
+        outPos->y /= yScale;
+        PSVECAdd(outPos, p1, outPos);
+    }
+    return 1;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001b020
+ * PAL Size: 544b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMath::CrossCheckEllipseCapsule(Vec*, float*, Vec*, Vec*, float, Vec*, float, float)
+void CMath::CrossCheckEllipseCapsule(Vec* outCoeffs, float* outCoeffScalar, Vec* p0, Vec* p1, float radius, Vec* p2,
+                                     float scaleA, float scaleB)
 {
-	// TODO
+    const float r2 = radius * radius;
+    Vec4d coeffs;
+    coeffs.w = radius * r2;
+    coeffs.z = (2.0f * coeffs.w) - (3.0f * r2);
+    coeffs.x = 1.0f + ((3.0f * coeffs.w) - (3.0f * r2));
+    coeffs.y = radius - ((3.0f * r2) - coeffs.w);
+    coeffs.w = coeffs.w - r2;
+
+    Mtx44 control;
+    control[0][0] = p1->x;
+    control[1][0] = p1->y;
+    control[2][0] = p1->z;
+    control[3][0] = 1.0f;
+    control[0][2] = p2->x;
+    control[1][2] = p2->y;
+    control[2][2] = p2->z;
+    control[3][2] = 1.0f;
+
+    float t0 = 0.0f;
+    if (scaleA + radius != 0.0f) {
+        t0 = scaleA / (scaleA + radius);
+    }
+
+    Vec tangent;
+    Vec tmp;
+    PSVECSubtract(p2, p1, &tangent);
+    PSVECSubtract(p1, p0, &tmp);
+    PSVECAdd(&tangent, &tmp, &tangent);
+    PSVECScale(&tangent, &tangent, t0 * scaleA);
+    control[0][1] = tangent.x;
+    control[1][1] = tangent.y;
+    control[2][1] = tangent.z;
+    control[3][1] = 1.0f;
+
+    float t1 = 0.0f;
+    if (scaleA + scaleB != 0.0f) {
+        t1 = scaleA / (scaleA + scaleB);
+    }
+
+    PSVECSubtract(outCoeffs, p2, &tangent);
+    PSVECSubtract(p2, p1, &tmp);
+    PSVECAdd(&tangent, &tmp, &tangent);
+    PSVECScale(&tangent, &tangent, t1 * scaleA);
+    control[0][3] = tangent.x;
+    control[1][3] = tangent.y;
+    control[2][3] = tangent.z;
+    control[3][3] = 1.0f;
+
+    MTX44MultVec4(control, &coeffs, &coeffs);
+    outCoeffScalar[0] = coeffs.x;
+    outCoeffScalar[1] = coeffs.y;
+    outCoeffScalar[2] = coeffs.z;
 }
 
 /*

@@ -20,7 +20,7 @@ public:
     ~CTexAnimSet();
 
     void Create(CChunkFile&, CMemory::CStage*);
-    void Duplicate(CMemory::CStage*);
+    CTexAnimSet* Duplicate(CMemory::CStage*);
     void AttachMaterialSet(CMaterialSet*);
     void AddFrame();
     void Change(char*, float, ANIM_TYPE);

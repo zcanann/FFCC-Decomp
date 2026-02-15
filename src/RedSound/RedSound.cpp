@@ -322,22 +322,30 @@ void CRedSound::SetReverbDepth(int bank, int sep, int depth)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801ccf74
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::SetMusicData(void*)
+void CRedSound::SetMusicData(void* musicData)
 {
-	// TODO
+	CRedDriver_8032f4c0.SetMusicData(musicData);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801ccfa0
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::ReentryMusicData(int)
+void CRedSound::ReentryMusicData(int bank)
 {
-	// TODO
+	CRedDriver_8032f4c0.ReentryMusicData(bank);
 }
 
 /*
@@ -436,12 +444,16 @@ void CRedSound::SetSeBlockData(int bank, void* blockData)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd1a8
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::SetSeSepData(void*)
+void CRedSound::SetSeSepData(void* seSepData)
 {
-	// TODO
+	CRedDriver_8032f4c0.SetSeSepData(seSepData);
 }
 
 /*

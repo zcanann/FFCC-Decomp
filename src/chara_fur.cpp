@@ -176,6 +176,21 @@ extern "C" void SaveFurTexBuffer__6CCharaFPUs(CChara*, unsigned short* outTexels
 
 /*
  * --INFO--
+ * PAL Address: 0x800e12a0
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void LoadFurTexBuffer__6CCharaFPUs(CChara* chara, unsigned short* inTexels)
+{
+	memcpy(Chara + 4, inTexels, 0x2000);
+	CalcMogScore__6CCharaFv(chara);
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

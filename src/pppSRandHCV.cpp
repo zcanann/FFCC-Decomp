@@ -2,7 +2,7 @@
 #include "ffcc/math.h"
 #include "dolphin/types.h"
 
-extern CMath math[];
+extern CMath math;
 extern int lbl_8032ED70;
 extern float lbl_803300A0;
 extern s16 lbl_801EADC8[];
@@ -59,41 +59,50 @@ void pppSRandHCV(void* data1, void* data2, void* data3)
 		int offset = **base_ptr;
 		target = (float*)((char*)data1 + offset + 0x80);
 
-		u8 flag = *((u8*)data2 + 0x10);
-		float value;
-
-		value = RandF__5CMathFv(math);
-		if (flag != 0) {
-			value = value + RandF__5CMathFv(math);
-		} else {
-			value = value * lbl_803300A0;
+		{
+			u8 flag = *((u8*)data2 + 0x10);
+			float value = RandF__5CMathFv(&math);
+			if (flag != 0) {
+				value = value + RandF__5CMathFv(&math);
+			} else {
+				value = value * lbl_803300A0;
+			}
+			target[0] = value;
 		}
-		target[0] = value;
 
-		value = RandF__5CMathFv(math);
-		if (flag != 0) {
-			value = value + RandF__5CMathFv(math);
-		} else {
-			value = value * lbl_803300A0;
+		{
+			u8 flag = *((u8*)data2 + 0x10);
+			float value = RandF__5CMathFv(&math);
+			if (flag != 0) {
+				value = value + RandF__5CMathFv(&math);
+			} else {
+				value = value * lbl_803300A0;
+			}
+			target[1] = value;
 		}
-		target[1] = value;
 
-		value = RandF__5CMathFv(math);
-		if (flag != 0) {
-			value = value + RandF__5CMathFv(math);
-		} else {
-			value = value * lbl_803300A0;
+		{
+			u8 flag = *((u8*)data2 + 0x10);
+			float value = RandF__5CMathFv(&math);
+			if (flag != 0) {
+				value = value + RandF__5CMathFv(&math);
+			} else {
+				value = value * lbl_803300A0;
+			}
+			target[2] = value;
 		}
-		target[2] = value;
 
-		value = RandF__5CMathFv(math);
-		if (flag != 0) {
-			value = value + RandF__5CMathFv(math);
-		} else {
-			value = value * lbl_803300A0;
+		{
+			u8 flag = *((u8*)data2 + 0x10);
+			float value = RandF__5CMathFv(&math);
+			if (flag != 0) {
+				value = value + RandF__5CMathFv(&math);
+			} else {
+				value = value * lbl_803300A0;
+			}
+			target[3] = value;
 		}
-		target[3] = value;
-	} else if (*(int*)data2 != *((int*)data1 + 3)) {
+	} else {
 		int** base_ptr = (int**)((char*)data3 + 0xc);
 		int offset = **base_ptr;
 		target = (float*)((char*)data1 + offset + 0x80);

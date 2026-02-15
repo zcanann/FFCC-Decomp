@@ -22,7 +22,7 @@ void pppConScreenBreak(PScreenBreak*, UnkC*);
 void pppCon2ScreenBreak(PScreenBreak*, UnkC*);
 void pppDesScreenBreak(PScreenBreak*, UnkC*);
 void pppFrameScreenBreak(PScreenBreak*, UnkB*, UnkC*);
-void pppRenderScreenBreak(void);
+void pppRenderScreenBreak(PScreenBreak*, UnkB*, UnkC*);
 
 #ifdef __cplusplus
 }

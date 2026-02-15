@@ -537,20 +537,17 @@ int EXIDeselect(s32 chan) {
 
 static void EXIIntrruptHandler(__OSInterrupt interrupt, OSContext* context) {
     s32 chan;
-    EXICallback callback;
+    OSContext exceptionContext;
 
     chan = ((s16)interrupt - 9) / 3;
 
     ASSERTLINE(1071, 0 <= chan && chan < MAX_CHAN);
     REG(chan, 0) = (REG(chan, 0) & 0x7F5) | 2;
 
-    callback = Ecb[chan].exiCallback;
-    if (callback) {
-        OSContext exceptionContext;
-
+    if (Ecb[chan].exiCallback) {
         OSClearContext(&exceptionContext);
         OSSetCurrentContext(&exceptionContext);
-        callback(chan, context);
+        Ecb[chan].exiCallback(chan, context);
         OSClearContext(&exceptionContext);
         OSSetCurrentContext(context);
     }

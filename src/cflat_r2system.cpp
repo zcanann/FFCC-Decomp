@@ -31,12 +31,6 @@ struct CMapCylinderRaw
     float m_height2;
 };
 
-struct CSystemErrorLevelSlot
-{
-    char m_pad[0x3CDC];
-    int m_value;
-};
-
 extern "C" {
 int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned long);
 void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
@@ -651,7 +645,37 @@ extern "C" int IsUse__8CMesMenuFv(void* mesMenu)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" int GetErrorLevel__7CSystemFv(void* system)
+extern "C" int GetErrorLevel__7CSystemFv(void* system, int index)
+{
+    char* indexed = (char*)system + index * 4;
+    return *(int*)(indexed + 0x3CDC);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B94EC
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void GetMes__9CFlatDataFi(void* flatData, int index, int value)
+{
+    char* indexed = (char*)flatData + index * 4;
+    *(int*)(indexed + 0x3CDC) = value;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B94FC
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" int GetNumMes__9CFlatDataFv(void* flatData)
 {
     int index = *(int*)((char*)system + 0x125C);
     int offset = (index * 4) + 0x3CDC;

@@ -35,6 +35,12 @@ struct VertexApAtData
     s32 childValueOffset;
 };
 
+struct VertexApAtState
+{
+    u16 index;
+    u16 countdown;
+};
+
 struct _pppPDataVal;
 
 extern CMath math;
@@ -89,68 +95,70 @@ void pppVertexApAt(_pppPObject* parent, PVertexApAt* data, void* ctrl)
     VertexApAtData* vtxData = (VertexApAtData*)data;
     VertexApAtCtrl* vtxCtrl = (VertexApAtCtrl*)ctrl;
     s32 stateOffset = *vtxCtrl->stateOffset;
-    u16* state = (u16*)((u8*)parent + stateOffset + 0x80);
+    VertexApAtState* state = (VertexApAtState*)((u8*)parent + stateOffset + 0x80);
 
-    if (lbl_8032ED70 == 0) {
-        s32 entryIndex = vtxData->entryIndex;
+    if (lbl_8032ED70 != 0) {
+        return;
+    }
 
-        if (entryIndex >= 0) {
-            if (state[1] == 0) {
-                VertexApAtEntry* entry = &lbl_8032ED54->entries[entryIndex];
-                s32 count = vtxData->spawnCount;
+    if (vtxData->entryIndex < 0) {
+        return;
+    }
 
-                switch (vtxData->mode) {
-                case 0:
-                    do {
-                        if (state[0] >= (u16)entry->maxValue) {
-                            state[0] = 0;
-                        }
+    if (state->countdown == 0) {
+        VertexApAtEntry* entry = &lbl_8032ED54->entries[vtxData->entryIndex];
+        u8 count = vtxData->spawnCount;
 
-                        u16 outValue = state[0];
-                        state[0] = outValue + 1;
-
-                        s32 childId = vtxData->childId;
-                        if ((u16)childId != 0xFFFF) {
-                            _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (childId << 4));
-                            _pppPObject* child;
-
-                            if (childData == 0) {
-                                child = 0;
-                            } else {
-                                child = pppCreatePObject((_pppMngSt*)lbl_8032ED50, childData);
-                                *(void**)((u8*)child + 0x4) = parent;
-                            }
-
-                            *(u16*)((u8*)child + vtxData->childValueOffset + 0x80) = outValue;
-                        }
-                    } while (count-- != 0);
-                    break;
-                case 1:
-                    do {
-                        u16 outValue = (u16)(RandF__5CMathFv(&math) * (f32)entry->maxValue);
-                        s32 childId = vtxData->childId;
-
-                        if ((u16)childId != 0xFFFF) {
-                            _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (childId << 4));
-                            _pppPObject* child;
-
-                            if (childData == 0) {
-                                child = 0;
-                            } else {
-                                child = pppCreatePObject((_pppMngSt*)lbl_8032ED50, childData);
-                                *(void**)((u8*)child + 0x4) = parent;
-                            }
-
-                            *(u16*)((u8*)child + vtxData->childValueOffset + 0x80) = outValue;
-                        }
-                    } while (count-- != 0);
-                    break;
+        switch (vtxData->mode) {
+        case 0:
+            do {
+                if (state->index >= (u16)entry->maxValue) {
+                    state->index = 0;
                 }
 
-                state[1] = vtxData->waitFrames;
-            }
+                u16 outValue = state->index;
+                state->index++;
 
-            state[1]--;
+                s32 childId = vtxData->childId;
+                if ((u16)childId != 0xFFFF) {
+                    _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (childId << 4));
+                    _pppPObject* child;
+
+                    if (childData == 0) {
+                        child = 0;
+                    } else {
+                        child = pppCreatePObject((_pppMngSt*)lbl_8032ED50, childData);
+                        *(void**)((u8*)child + 0x4) = parent;
+                    }
+
+                    *(u16*)((u8*)child + vtxData->childValueOffset + 0x80) = outValue;
+                }
+            } while (count-- != 0);
+            break;
+        case 1:
+            do {
+                u16 outValue = (u16)(RandF__5CMathFv(&math) * (f32)entry->maxValue);
+                s32 childId = vtxData->childId;
+
+                if ((u16)childId != 0xFFFF) {
+                    _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (childId << 4));
+                    _pppPObject* child;
+
+                    if (childData == 0) {
+                        child = 0;
+                    } else {
+                        child = pppCreatePObject((_pppMngSt*)lbl_8032ED50, childData);
+                        *(void**)((u8*)child + 0x4) = parent;
+                    }
+
+                    *(u16*)((u8*)child + vtxData->childValueOffset + 0x80) = outValue;
+                }
+            } while (count-- != 0);
+            break;
         }
+
+        state->countdown = vtxData->waitFrames;
     }
+
+    state->countdown--;
 }

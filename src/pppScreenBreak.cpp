@@ -37,6 +37,7 @@ struct UnkC {
 
 extern int DAT_8032ed70;
 extern int DAT_802381a0;
+extern void* DAT_80238034;
 extern float FLOAT_80331cc0;
 extern float FLOAT_80331cc4;
 extern float FLOAT_80331cd0;
@@ -44,6 +45,7 @@ extern float FLOAT_80331ce8;
 extern float FLOAT_80331cec;
 extern float FLOAT_80331cf0;
 extern char MaterialMan[];
+extern char s_f999_root_801dd4c8[];
 extern char s_pppScreenBreak_cpp_801dd4d4[];
 extern CGraphic GraphicsPcs;
 extern _pppMngSt* pppMngStPtr;
@@ -70,6 +72,7 @@ int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
 void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 void pppHeapUseRate__FPQ27CMemory6CStage(void*);
+void SearchNode__Q26CChara6CModelFPc(CChara::CModel*, char*);
 }
 
 /*
@@ -401,10 +404,22 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, UnkB* param_2, UnkC* para
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012d458
+ * PAL Size: 168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppRenderScreenBreak(void)
+void pppRenderScreenBreak(PScreenBreak* pppScreenBreak, UnkB*, UnkC* param_3)
 {
-	// TODO
+    s32 dataOffset = param_3->m_serializedDataOffsets[2];
+    void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
+    CChara::CModel* model = (CChara::CModel*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    SearchNode__Q26CChara6CModelFPc(model, s_f999_root_801dd4c8);
+    if (*(u8*)((u8*)pppScreenBreak + 0xA4 + dataOffset) == 0) {
+        Graphic.GetBackBufferRect2(DAT_80238034, (_GXTexObj*)((u8*)pppScreenBreak + 0x90 + dataOffset), 0, 0, 0x280,
+                                   0x1C0, 0, GX_LINEAR, GX_TF_RGBA8, 0);
+        *(u8*)((u8*)pppScreenBreak + 0xA4 + dataOffset) = 1;
+    }
 }

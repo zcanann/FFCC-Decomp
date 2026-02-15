@@ -250,32 +250,44 @@ void CRedSound::DMACheck(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cceb4
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::SetSoundMode(int)
+void CRedSound::SetSoundMode(int mode)
 {
-	// TODO
+	CRedDriver_8032f4c0.SetSoundMode(mode);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801ccee0
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedSound::GetSoundMode()
 {
-	// TODO
+	CRedDriver_8032f4c0.GetSoundMode();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801ccf04
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::SetReverb(int, int)
+void CRedSound::SetReverb(int bank, int kind)
 {
-	// TODO
+	CRedDriver_8032f4c0.SetReverb(bank, kind);
 }
 
 /*

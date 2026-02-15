@@ -338,58 +338,30 @@ void CWind::getObj(int)
 int CWind::AddAmbient(float dir, float speed)
 {
 	u8* freeObj;
-	u8* scan = (u8*)this;
-	int group = 4;
+	u8* scan;
+	int group;
 
+	scan = (u8*)this;
+	group = 4;
 	do {
 		freeObj = scan;
-		if ((s8)freeObj[0] >= 0) {
-			break;
-		}
-
-		freeObj = scan + 100;
-		if ((s8)freeObj[0] >= 0) {
-			break;
-		}
-
-		freeObj = scan + 200;
-		if ((s8)freeObj[0] >= 0) {
-			break;
-		}
-
-		freeObj = scan + 300;
-		if ((s8)freeObj[0] >= 0) {
-			break;
-		}
-
-		freeObj = scan + 400;
-		if ((s8)freeObj[0] >= 0) {
-			break;
-		}
-
-		freeObj = scan + 500;
-		if ((s8)freeObj[0] >= 0) {
-			break;
-		}
-
-		freeObj = scan + 600;
-		if ((s8)freeObj[0] >= 0) {
-			break;
-		}
-
-		freeObj = scan + 700;
-		if ((s8)freeObj[0] >= 0) {
-			break;
+		if (((s8)scan[0] >= 0) ||
+		    ((freeObj = scan + 100), (s8)freeObj[0] >= 0) ||
+		    ((freeObj = scan + 200), (s8)freeObj[0] >= 0) ||
+		    ((freeObj = scan + 300), (s8)freeObj[0] >= 0) ||
+		    ((freeObj = scan + 400), (s8)freeObj[0] >= 0) ||
+		    ((freeObj = scan + 500), (s8)freeObj[0] >= 0) ||
+		    ((freeObj = scan + 600), (s8)freeObj[0] >= 0) ||
+		    ((freeObj = scan + 700), (s8)freeObj[0] >= 0)) {
+			goto found;
 		}
 
 		scan += 800;
 		group--;
 	} while (group != 0);
 
-	if (group == 0) {
-		freeObj = 0;
-	}
-
+	freeObj = 0;
+found:
 	if (freeObj == 0) {
 		System.Printf(DAT_801db568);
 		return -1;

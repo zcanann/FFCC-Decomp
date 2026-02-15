@@ -26,6 +26,7 @@ static char s_cFile[] = "CFile";
 static char s_drawErrorFmt[] = "CFile::drawError %d";
 static char s_queueWarnAnyFmt[] = "BackAllFilesToQueue: %s";
 static char s_queueWarnTargetFmt[] = "BackAllFilesToQueue: %s (%s)";
+static char s_closeWarnFmt[] = "Close: %s";
 
 static const char* s_diskErrorText[4][6][3] = {
     {
@@ -356,9 +357,9 @@ void CFile::ReadASync(CFile::CHandle* fileHandle)
  */
 void CFile::Close(CFile::CHandle* fileHandle)
 {
-	if (fileHandle->m_completionStatus == 2) //  && (1 < (uint)System._4700_4_)
+	if ((fileHandle->m_completionStatus == 2) && (1 < (unsigned int)System.m_execParam))
 	{
-		// Printf(&System,&DAT_801d5e04,fileHandle->name);
+		System.Printf(s_closeWarnFmt, fileHandle->m_name);
 	}
 
 	DVDClose(&fileHandle->m_dvdFileInfo);

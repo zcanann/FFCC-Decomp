@@ -33,6 +33,7 @@ struct CMapCylinderRaw
 extern "C" {
 int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned long);
 void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
+int GetWait__4CMesFv(void*);
 }
 
 /*
@@ -597,6 +598,54 @@ extern "C" void SyncCompleted__Q25CFile7CHandleFv(CFile::CHandle* fileHandle)
 extern "C" void Read__Q25CFile7CHandleFv(CFile::CHandle* fileHandle)
 {
     File.Read(fileHandle);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9478
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void ReqScreenCapture__11CGraphicPcsFv(void* graphicPcs)
+{
+    *(int*)((char*)graphicPcs + 0xBC) = 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9484
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" int IsUse__8CMesMenuFv(void* mesMenu)
+{
+    if (*(int*)((char*)mesMenu + 8) == 0) {
+        return 0;
+    }
+    if (*(int*)((char*)mesMenu + 0xC) >= 2) {
+        return 0;
+    }
+    return GetWait__4CMesFv((char*)mesMenu + 0x1C) != 4;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B94DC
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" int GetErrorLevel__7CSystemFv(CSystem* system)
+{
+    return system->m_execParam;
 }
 
 /*

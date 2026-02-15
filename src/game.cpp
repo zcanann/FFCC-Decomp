@@ -4,12 +4,20 @@
 #include "ffcc/system.h"
 #include "ffcc/vector.h"
 #include "ffcc/p_dbgmenu.h"
+#include "ffcc/p_minigame.h"
+
+#include <string.h>
+
+extern CMiniGamePcs MiniGamePcs;
 
 #include <dolphin/os/OSMemory.h>
 #include <dolphin/os/OSRtc.h>
 #include <string.h>
 
 extern "C" {
+unsigned int AddScenegraph__7CSystemFP8CProcessi(CSystem*, void*, int);
+void RemoveScenegraph__7CSystemFP8CProcessi(CSystem*, void*, int);
+void ExecScenegraph__7CSystemFv(CSystem*);
 void Quit__12CFlatRuntimeFv(void*);
 void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 void Quit__11CDbgMenuPcsFv(void*);
@@ -61,6 +69,8 @@ unsigned char MaterialEditorPcs[];
 unsigned char FunnyShapePcs[];
 unsigned char GraphicsPcs[];
 unsigned char CameraPcs[];
+unsigned char DAT_8032ed00[];
+unsigned char DAT_8032ed08[];
 extern const char DAT_801d61dc[];
 }
 
@@ -205,12 +215,122 @@ void CGame::LoadLogoWaitingData()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800157a8
+ * PAL Size: 1764b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::Exec()
 {
-	// TODO
+	AddScenegraph__7CSystemFP8CProcessi(&System, DAT_8032ed08, 0);
+	AddScenegraph__7CSystemFP8CProcessi(&System, GraphicsPcs, 0);
+	AddScenegraph__7CSystemFP8CProcessi(&System, LightPcs, 0);
+	AddScenegraph__7CSystemFP8CProcessi(&System, &MiniGamePcs, 0);
+
+	do {
+		m_cfdLoadedFlag = 0;
+		m_assetsLoadedFlag = 0;
+
+		Memory.IncHeapWalkerLevel();
+
+		m_currentSceneId = m_sceneId;
+		m_currentMapId = m_mapId;
+		m_currentMapVariantId = m_mapVariant;
+		strcpy(m_currentScriptName, m_sceneScript + 4);
+
+		switch (m_currentSceneId) {
+		case 2:
+			AddScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 1);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &CharaPcs, 1);
+			break;
+		case 3:
+			AddScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 2);
+			AddScenegraph__7CSystemFP8CProcessi(&System, MapPcs, 1);
+			AddScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 6);
+			break;
+		case 4:
+			AddScenegraph__7CSystemFP8CProcessi(&System, MenuPcs, 0);
+			AddScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 0);
+			AddScenegraph__7CSystemFP8CProcessi(&System, MapPcs, 0);
+			AddScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 6);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &CharaPcs, 0);
+			AddScenegraph__7CSystemFP8CProcessi(&System, DAT_8032ed00, 0);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &PartPcs, 0);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &GbaPcs, 0);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &DbgMenuPcs, 0);
+			AddScenegraph__7CSystemFP8CProcessi(&System, McPcs, 0);
+			AddScenegraph__7CSystemFP8CProcessi(&System, SoundPcs, 0);
+			break;
+		case 5:
+			AddScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 3);
+			AddScenegraph__7CSystemFP8CProcessi(&System, MaterialEditorPcs, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, LightPcs, 0);
+			break;
+		case 6:
+			AddScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 4);
+			AddScenegraph__7CSystemFP8CProcessi(&System, FunnyShapePcs, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, LightPcs, 0);
+			break;
+		case 7:
+			AddScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 5);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &CharaPcs, 2);
+			AddScenegraph__7CSystemFP8CProcessi(&System, MapPcs, 1);
+			AddScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 6);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &PartPcs, 1);
+			break;
+		}
+
+		ExecScenegraph__7CSystemFv(&System);
+
+		switch (m_currentSceneId) {
+		case 2:
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 1);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CharaPcs, 1);
+			break;
+		case 3:
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 2);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 6);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, MapPcs, 1);
+			break;
+		case 4:
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, SoundPcs, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, McPcs, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 6);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, MapPcs, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CharaPcs, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &PartPcs, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &GbaPcs, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, DAT_8032ed00, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, MenuPcs, 0);
+			break;
+		case 5:
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 3);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, MaterialEditorPcs, 0);
+			break;
+		case 6:
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 4);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, FunnyShapePcs, 0);
+			break;
+		case 7:
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 5);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 6);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CharaPcs, 2);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, MapPcs, 1);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &PartPcs, 1);
+			break;
+		}
+
+		Memory.HeapWalker();
+		Memory.DecHeapWalkerLevel();
+	} while (m_sceneId != 0);
+
+	RemoveScenegraph__7CSystemFP8CProcessi(&System, &MiniGamePcs, 0);
+	RemoveScenegraph__7CSystemFP8CProcessi(&System, LightPcs, 0);
+	RemoveScenegraph__7CSystemFP8CProcessi(&System, GraphicsPcs, 0);
+	RemoveScenegraph__7CSystemFP8CProcessi(&System, DAT_8032ed08, 0);
 }
 
 /*

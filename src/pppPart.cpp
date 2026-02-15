@@ -325,10 +325,14 @@ void pppHeapCheckLeak(CMemory::CStage* stage)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 80056ca0
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-unsigned long pppMngStHeapCheckLeak(CMemory::CStage* stage)
+extern "C" unsigned long pppHeapCheckLeak__FPQ27CMemory6CStage2(CMemory::CStage* stage)
 {
 	unsigned long heapTotal;
 	unsigned long heapUseRate;

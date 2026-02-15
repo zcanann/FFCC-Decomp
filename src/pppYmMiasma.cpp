@@ -22,6 +22,8 @@ extern double DOUBLE_80330648;
 extern double RandF__5CMathFf(double, void*);
 extern void pppNormalize__FR3Vec3Vec(float*, Vec*);
 extern void pppHeapUseRate__FPQ27CMemory6CStage(void*);
+extern float pppVectorLength__F3Vec(Vec*);
+extern void pppCalcFrameShape__FPlRsRsRss(long*, short*, short*, short*, short);
 extern char Math;
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppSubVector__FR3Vec3Vec3Vec(Vec*, const Vec*, const Vec*);
@@ -138,36 +140,116 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
  */
 void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
 {
-    u8* particle;
-    s32 lifeTime;
-    s32 age;
-    float lifeFactor;
+    u8* vData = (u8*)pppPObject + ((UnkC*)pppCtrlTable)->m_serializedDataOffsets[2] + 0x80;
+    u8* particle = (u8*)particleData;
+    u8* ymData = (u8*)pYmMiasma;
+    s16 fadeFrames;
+    s16 colorDecayFrames;
+    Vec worldPos;
+    Vec basePos;
+    Vec delta;
+    Vec impulse;
+    long* shapeTable;
+    float minDist;
 
-    (void)pppPObject;
-    (void)pppCtrlTable;
-
-    if (particleData == NULL || pYmMiasma == NULL) {
-        return;
+    fadeFrames = *(s16*)(particle + 0x44);
+    if (fadeFrames > 0) {
+        *(s16*)(particle + 0x26) =
+            *(s16*)(particle + 0x26) + (u8)(*(u8*)(ymData + 0x27) - *(s16*)(particle + 0x26)) / fadeFrames;
+        *(s16*)(particle + 0x44) = fadeFrames - 1;
     }
 
-    particle = (u8*)particleData;
-
-    age = *(s32*)(particle + 0x68) + 1;
-    *(s32*)(particle + 0x68) = age;
-    lifeTime = *(s32*)(particle + 0x64);
-    if (age >= lifeTime) {
-        return;
+    colorDecayFrames = *(s16*)(particle + 0x46);
+    if (*(s16*)(particle + 0x28) <= colorDecayFrames && *(u8*)(particle + 0x48) == 0) {
+        *(s16*)(particle + 0x26) = *(s16*)(particle + 0x26) - (*(s16*)(particle + 0x26) / colorDecayFrames);
+        *(s16*)(particle + 0x46) = colorDecayFrames - 1;
     }
 
-    *(float*)(particle + 0x0C) += *(float*)(particle + 0x10);
-    *(float*)(particle + 0x1C) += *(float*)(particle + 0x14);
-    *(float*)(particle + 0x2C) += *(float*)(particle + 0x18);
+    if (*(u8*)(particle + 0x48) != 0) {
+        *(s16*)(particle + 0x20) = *(s16*)(particle + 0x20) + *(s16*)(particle + 0x30);
+        *(s16*)(particle + 0x22) = *(s16*)(particle + 0x22) + *(s16*)(particle + 0x32);
+        *(s16*)(particle + 0x24) = *(s16*)(particle + 0x24) + *(s16*)(particle + 0x34);
+        *(s16*)(particle + 0x26) = *(s16*)(particle + 0x26) + *(s16*)(particle + 0x36);
 
-    *(float*)(particle + 0x34) -= 0.01f;
+        if (*(s16*)(particle + 0x20) > 0xff) {
+            *(s16*)(particle + 0x20) = 0xff;
+        }
+        if (*(s16*)(particle + 0x22) > 0xff) {
+            *(s16*)(particle + 0x22) = 0xff;
+        }
+        if (*(s16*)(particle + 0x24) > 0xff) {
+            *(s16*)(particle + 0x24) = 0xff;
+        }
+        if (*(s16*)(particle + 0x26) > 0xff) {
+            *(s16*)(particle + 0x26) = 0xff;
+        }
 
-    lifeFactor = (float)age / (float)lifeTime;
-    *(float*)(particle + 0x60) =
-        *(float*)(particle + 0x58) * (1.0f - lifeFactor) + *(float*)(particle + 0x5C) * lifeFactor;
+        if (*(s16*)(particle + 0x20) < 0) {
+            *(s16*)(particle + 0x20) = 0;
+        }
+        if (*(s16*)(particle + 0x22) < 0) {
+            *(s16*)(particle + 0x22) = 0;
+        }
+        if (*(s16*)(particle + 0x24) < 0) {
+            *(s16*)(particle + 0x24) = 0;
+        }
+        if (*(s16*)(particle + 0x26) < 0) {
+            *(s16*)(particle + 0x26) = 0;
+            *(s16*)(particle + 0x28) = 0;
+        }
+    }
+
+    *(s16*)(particle + 0x28) = *(s16*)(particle + 0x28) - 1;
+    if (*(s16*)(particle + 0x28) < 0) {
+        InitParticleData((VYmMiasma*)vData, pppPObject, pYmMiasma, particleData);
+    }
+
+    worldPos.x = *(float*)(particle + 0x00);
+    worldPos.y = *(float*)(particle + 0x04);
+    worldPos.z = *(float*)(particle + 0x08);
+    pppCopyVector__FR3Vec3Vec(&worldPos, &worldPos);
+    PSMTXMultVec(ppvWorldMatrix, &worldPos, &worldPos);
+
+    if (Game.game.m_currentSceneId != 7) {
+        basePos.x = pppMngStPtr->m_matrix.value[0][3];
+        basePos.y = pppMngStPtr->m_matrix.value[1][3];
+        basePos.z = pppMngStPtr->m_matrix.value[2][3];
+        PSMTXMultVec(ppvWorldMatrix, &basePos, &basePos);
+    }
+
+    pppSubVector__FR3Vec3Vec3Vec(&delta, &basePos, &worldPos);
+    minDist = *(float*)(vData + 0x1c) - *(float*)(ymData + 0x1c);
+    if (pppVectorLength__F3Vec(&delta) < minDist) {
+        *(float*)(particle + 0x3c) = *(float*)(particle + 0x3c) + *(float*)(ymData + 0x20);
+        *(u8*)(particle + 0x48) = 1;
+    }
+
+    if (*(float*)(particle + 0x3c) < *(float*)(ymData + 0x4c)) {
+        *(float*)(particle + 0x3c) = *(float*)(ymData + 0x4c);
+    }
+
+    *(float*)(particle + 0x00) = *(float*)(particle + 0x00) + *(float*)(particle + 0x3c) * *(float*)(particle + 0x10);
+    *(float*)(particle + 0x04) = *(float*)(particle + 0x04) + *(float*)(ymData + 0x44);
+    *(float*)(particle + 0x08) = *(float*)(particle + 0x08) + *(float*)(particle + 0x3c) * *(float*)(particle + 0x18);
+    *(float*)(particle + 0x3c) = *(float*)(particle + 0x3c) - *(float*)(ymData + 0x38);
+
+    if (*(float*)(vData + 0x04) != FLOAT_80330644 && *(u8*)(particle + 0x48) == 0) {
+        impulse.x = *(float*)(vData + 0x10);
+        impulse.y = *(float*)(vData + 0x14);
+        impulse.z = *(float*)(vData + 0x18);
+        PSVECScale(&impulse, &impulse, *(float*)(particle + 0x3c));
+        pppAddVector__FR3Vec3Vec3Vec((Vec*)particle, (Vec*)particle, &impulse);
+    }
+
+    if ((u16)*(u32*)(ymData + 0x04) != 0xffff) {
+        shapeTable = *(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + *(u32*)(ymData + 0x04) * 4);
+        pppCalcFrameShape__FPlRsRsRss(
+            shapeTable,
+            (short*)(particle + 0x4c),
+            (short*)(particle + 0x4e),
+            (short*)(particle + 0x4a),
+            (short)*(u32*)(ymData + 0x08));
+    }
 }
 
 /*

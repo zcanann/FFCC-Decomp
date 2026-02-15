@@ -18,11 +18,15 @@ void pppDrawMatrixLoc(_pppPObject* param_1)
     Vec local_2c;
     Vec local_38;
     Vec local_20[2];
-    
+    Mtx* srcMtx;
+    Mtx* dstMtx;
+
+    srcMtx = *(Mtx**)((char*)param_1 + 0x10);
     local_2c.z = FLOAT_803331d8;
+    dstMtx = *(Mtx**)((char*)param_1 + 0x40);
     local_2c.y = FLOAT_803331d8;
     local_2c.x = FLOAT_803331d8;
-    PSMTXCopy(*(Mtx*)((char*)param_1 + 0x10), *(Mtx*)((char*)param_1 + 0x40));
+    PSMTXCopy(*srcMtx, *dstMtx);
     PSMTXMultVec(ppvWorldMatrix, &local_2c, &local_2c);
     local_38.x = *(float*)((char*)param_1 + 0x4c);
     local_38.y = *(float*)((char*)param_1 + 0x5c);

@@ -177,6 +177,7 @@ int RedNewA(int size, int offset, int maxSize)
 	if (DAT_8032f4a4[0x7FF] >= 1) {
 		if (DAT_8032f408) {
 			OSReport(s__s_sA_Memory_Bank_Full____s_801e78b5, &DAT_801e78a3, &DAT_80333d20, &DAT_80333d28);
+			fflush(&DAT_8021d1a8);
 		}
 		return 0;
 	}
@@ -317,12 +318,14 @@ void RedDeleteA(void* param_1)
  */
 void CRedMemory::Init(int param1, int param2, int param3, int param4)
 {
-	DAT_8032f498 = param2 + -0x4000;
-	DAT_8032f4a4 = (int*)(param1 + 0x2000);
+	int* bankA = (int*)(param1 + 0x2000);
+
+	DAT_8032f498 = param2 - 0x4000;
+	DAT_8032f4a4 = bankA;
 	DAT_8032f490 = param1 + 0x4000;
 	DAT_8032f4a0 = (int*)param1;
 	memset((void*)param1, 0, 0x2000);
-	memset(DAT_8032f4a4, 0, 0x2000);
+	memset(bankA, 0, 0x2000);
 	DAT_8032f494 = param3;
 	DAT_8032f49c = param4;
 }

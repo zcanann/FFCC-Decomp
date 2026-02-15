@@ -174,9 +174,90 @@ void SetParticleMatrix(_pppPObject*, VBreathModel*, PARTICLE_DATA*, PARTICLE_WMA
  * Address:	TODO
  * Size:	TODO
  */
-void UpdateParticle(VBreathModel*, PBreathModel*, PARTICLE_DATA*, VColor*, PARTICLE_COLOR*)
+void UpdateParticle(VBreathModel*, PBreathModel* pBreathModel, PARTICLE_DATA* particleData, VColor* vColor, PARTICLE_COLOR* particleColor)
 {
-	// TODO
+    unsigned char* breath = (unsigned char*)pBreathModel;
+    unsigned char* particle = (unsigned char*)particleData;
+    unsigned int alpha = (unsigned int)*(unsigned char*)((unsigned char*)vColor + 0x0B);
+    Vec step;
+
+    if (particleColor != NULL) {
+        float* color = (float*)particleColor;
+        color[0] += color[4];
+        color[1] += color[5];
+        color[2] += color[6];
+        color[3] += color[7];
+        color[4] += *(float*)(breath + 0x38);
+        color[5] += *(float*)(breath + 0x3C);
+        color[6] += *(float*)(breath + 0x40);
+        color[7] += *(float*)(breath + 0x44);
+        alpha += (unsigned int)(int)color[3];
+        if (alpha > 0xFF) {
+            alpha = 0xFF;
+        }
+    }
+
+    *(float*)(particle + 0x58) += *(float*)(particle + 0x5C);
+    if ((*(unsigned char*)(breath + 0xC1) & 0x10) == 0) {
+        *(float*)(particle + 0x5C) += *(float*)(breath + 0x98);
+    } else {
+        *(float*)(particle + 0x5C) += *(float*)(breath + 0x98) + *(float*)(particle + 0x60);
+    }
+
+    while (*(float*)(particle + 0x58) >= 6.2831855f) {
+        *(float*)(particle + 0x58) -= 6.2831855f;
+    }
+    while (*(float*)(particle + 0x58) < 0.0f) {
+        *(float*)(particle + 0x58) += 6.2831855f;
+    }
+
+    *(float*)(particle + 0x64) += *(float*)(particle + 0x70);
+    *(float*)(particle + 0x68) += *(float*)(particle + 0x74);
+    *(float*)(particle + 0x6C) += *(float*)(particle + 0x78);
+
+    if ((*(unsigned char*)(breath + 0xC0) & 0x10) == 0) {
+        *(float*)(particle + 0x70) += *(float*)(breath + 0x70);
+        *(float*)(particle + 0x74) += *(float*)(breath + 0x74);
+        *(float*)(particle + 0x78) += *(float*)(breath + 0x78);
+    } else {
+        *(float*)(particle + 0x70) += *(float*)(breath + 0x70) + *(float*)(particle + 0x7C);
+        *(float*)(particle + 0x74) += *(float*)(breath + 0x74) + *(float*)(particle + 0x80);
+        *(float*)(particle + 0x78) += *(float*)(breath + 0x78) + *(float*)(particle + 0x84);
+    }
+
+    *(float*)(particle + 0x8C) += *(float*)(breath + 0xA4);
+    if (*(char*)(breath + 0xC8) == '\0') {
+        float start = *(float*)(breath + 0xA0);
+        float delta = *(float*)(breath + 0xA4);
+        if ((start > 0.0f) && (delta < 0.0f)) {
+            if (*(float*)(particle + 0x8C) < 0.0f) {
+                *(float*)(particle + 0x8C) = 0.0f;
+            }
+        } else if ((start < 0.0f) && (delta > 0.0f) && (0.0f < *(float*)(particle + 0x8C))) {
+            *(float*)(particle + 0x8C) = 0.0f;
+        }
+    }
+
+    PSVECScale((Vec*)(particle + 0x3C), &step, *(float*)(particle + 0x8C));
+    PSVECAdd(&step, (Vec*)(particle + 0x30), (Vec*)(particle + 0x30));
+
+    if (*(short*)(breath + 0x20) != 0) {
+        *(short*)(particle + 0x50) -= 1;
+    }
+    *(unsigned char*)(particle + 0x90) += 1;
+
+    if ((*(char*)(particle + 0x54) != '\0') &&
+        ((int)(unsigned int)*(unsigned char*)(particle + 0x90) <= (int)*(char*)(particle + 0x54))) {
+        *(float*)(particle + 0x88) -= (float)alpha / (float)(unsigned int)*(unsigned char*)(particle + 0x54);
+    }
+
+    if ((*(char*)(particle + 0x55) != '\0') &&
+        ((int)*(short*)(particle + 0x50) <= (int)*(char*)(particle + 0x55))) {
+        unsigned int fadeFrames = (unsigned int)*(unsigned char*)(breath + 0x23);
+        if (fadeFrames != 0) {
+            *(float*)(particle + 0x88) += (float)alpha / (float)fadeFrames;
+        }
+    }
 }
 
 /*

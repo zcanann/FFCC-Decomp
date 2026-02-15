@@ -6,7 +6,7 @@ class CMenuPcs
 public:
     void CompaInit();
     void CompaInit0();
-    void CompaOpen();
+    bool CompaOpen();
     void CompaCtrl();
     void CompaClose();
     void CompaDraw();

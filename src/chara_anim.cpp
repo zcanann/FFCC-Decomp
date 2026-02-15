@@ -14,8 +14,13 @@ extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*
 extern "C" void __dla__FPv(void*);
 extern "C" void __dl__FPv(void*);
 extern "C" void gqrInit__6CCharaFUlUlUl(void*, unsigned long, unsigned long, unsigned long);
+extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
+extern "C" void SetGroup__7CMemoryFPvi(CMemory*, void*, int);
+extern "C" void CopyFromAMemorySync__7CMemoryFPvPvUl(CMemory*, void*, void*, unsigned long);
+extern "C" int TryReleaseAnimBank__9CCharaPcsFi(void*, int);
 
 extern "C" unsigned char Chara[];
+extern unsigned char CharaPcs[];
 extern "C" void* PTR_PTR_s_CChara_CAnim_80210534;
 extern "C" char s_chara_anim_cpp_801da980[];
 extern "C" char DAT_801da990[];
@@ -356,78 +361,91 @@ void CChara::CAnimNode::Create(CChunkFile&)
  */
 void CChara::CAnimNode::Interp(CChara::CAnim* anim, SRT* srt, float frame)
 {
-	// Memory management for animation data
-	if (*(int*)((char*)anim + 0x20) == 0) {
-		// TODO: Allocate memory for animation data if needed
-		return;
+	if (S32At(anim, 0x20) == 0) {
+		while (true) {
+			if (S32At(anim, 0x20) != 0) {
+				void* bank = *reinterpret_cast<void**>(Ptr(anim, 0x20));
+				SetGroup__7CMemoryFPvi(&Memory, bank, 1);
+				CopyFromAMemorySync__7CMemoryFPvPvUl(
+				    &Memory, bank, reinterpret_cast<void*>(S32At(anim, 0x28) + S32At(reinterpret_cast<void*>(S32At(Chara, 8284)), 8)),
+				    U32At(anim, 0x1C));
+				break;
+			}
+
+			*reinterpret_cast<void**>(Ptr(anim, 0x20)) = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+			    &Memory, U32At(anim, 0x1C), *reinterpret_cast<CMemory::CStage**>(Ptr(anim, 0x2C)), s_chara_anim_cpp_801da980, 0x160, 1);
+
+			if (S32At(anim, 0x20) != 0) {
+				continue;
+			}
+			if (TryReleaseAnimBank__9CCharaPcsFi(CharaPcs, S32At(anim, 0x1C)) == 0) {
+				return;
+			}
+		}
 	}
-	
-	*(int*)((char*)anim + 0x24) = 0;
-	
-	float frameFloat = frame;
-	unsigned int frameInt = (unsigned int)frameFloat;
-	float frameFrac = frameFloat - (float)frameInt;
-	
-	if (frameInt == *(unsigned short*)((char*)anim + 0x10) - 1) {
+
+	S32At(anim, 0x24) = 0;
+
+	const unsigned int frameInt = static_cast<unsigned int>(frame);
+	float frameFrac = frame - static_cast<float>(frameInt);
+	if (frameInt == static_cast<unsigned int>(U16At(anim, 0x10) - 1)) {
 		frameFrac = 0.0f;
 	}
-	
-	unsigned int animFlags = *(unsigned int*)((char*)this + 0x14) >> 0xd & 0x3ffff;
-	int frameIndex = frameInt * 2;
-	float* animData = (float*)(*(int*)((char*)this + 0x10) + *(int*)((char*)anim + 0x20));
-	float* outData = (float*)srt;
-	
-	// Process 3 components (likely translation)
+
+	unsigned int animFlags = (U32At(this, 0x14) >> 0xD) & 0x3FFFF;
+	const int frameByteOffset = static_cast<int>(frameInt * 2);
+	float* animData = reinterpret_cast<float*>(S32At(this, 0x10) + S32At(anim, 0x20));
+	float* outData = reinterpret_cast<float*>(srt);
+
+	float baseValue = 0.0f;
 	for (int i = 0; i < 3; i++) {
-		unsigned int componentType = animFlags & 3;
-		if (componentType == 0) {
-			*outData = 0.0f;
-		} else if (componentType == 1) {
+		if ((animFlags & 3) == 0) {
+			*outData = baseValue;
+		} else if ((animFlags & 3) == 1) {
 			*outData = *animData;
-			animData = (float*)((char*)animData + 2);
+			animData = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(animData) + 2);
 		} else {
-			float value1 = *(float*)((char*)animData + frameIndex);
-			float value2 = *(float*)((char*)animData + frameIndex + 2);
-			*outData = (value2 - value1) * frameFrac + value1;
-			animData = (float*)((char*)animData + (*(unsigned short*)((char*)anim + 0x10) + 1) * 2);
+			const float v1 = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(animData) + frameByteOffset);
+			*outData = (*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(animData) + frameByteOffset + 2) - v1) * frameFrac + v1;
+			animData = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(animData) + (U16At(anim, 0x10) + 1) * 2);
 		}
-		animFlags = animFlags >> 2;
+
+		baseValue = 0.0f;
+		animFlags = static_cast<unsigned int>(static_cast<int>(animFlags) >> 2);
 		outData++;
 	}
-	
-	// Process next 3 components (likely rotation)
+
+	float scaleDefault = 0.0f;
 	for (int i = 0; i < 3; i++) {
-		unsigned int componentType = animFlags & 3;
-		if (componentType == 0) {
-			*outData = 0.0f;
-		} else if (componentType == 1) {
+		if ((animFlags & 3) == 0) {
+			*outData = baseValue;
+		} else if ((animFlags & 3) == 1) {
 			*outData = *animData;
-			animData = (float*)((char*)animData + 2);
+			animData = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(animData) + 2);
 		} else {
-			float value1 = *(float*)((char*)animData + frameIndex);
-			float value2 = *(float*)((char*)animData + frameIndex + 2);
-			*outData = (value2 - value1) * frameFrac + value1;
-			animData = (float*)((char*)animData + (*(unsigned short*)((char*)anim + 0x10) + 1) * 2);
+			const float v1 = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(animData) + frameByteOffset);
+			*outData = (*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(animData) + frameByteOffset + 2) - v1) * frameFrac + v1;
+			animData = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(animData) + (U16At(anim, 0x10) + 1) * 2);
 		}
-		animFlags = animFlags >> 2;
+
+		scaleDefault = 1.0f;
+		animFlags = static_cast<unsigned int>(static_cast<int>(animFlags) >> 2);
 		outData++;
 	}
-	
-	// Process final 3 components (likely scale)  
+
 	for (int i = 0; i < 3; i++) {
-		unsigned int componentType = animFlags & 3;
-		if (componentType == 0) {
-			*outData = 1.0f;
-		} else if (componentType == 1) {
+		if ((animFlags & 3) == 0) {
+			*outData = scaleDefault;
+		} else if ((animFlags & 3) == 1) {
 			*outData = *animData;
-			animData = (float*)((char*)animData + 2);
+			animData = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(animData) + 2);
 		} else {
-			float value1 = *(float*)((char*)animData + frameIndex);
-			float value2 = *(float*)((char*)animData + frameIndex + 2);
-			*outData = (value2 - value1) * frameFrac + value1;
-			animData = (float*)((char*)animData + (*(unsigned short*)((char*)anim + 0x10) + 1) * 2);
+			const float v1 = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(animData) + frameByteOffset);
+			*outData = (*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(animData) + frameByteOffset + 2) - v1) * frameFrac + v1;
+			animData = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(animData) + (U16At(anim, 0x10) + 1) * 2);
 		}
-		animFlags = animFlags >> 2;
+
+		animFlags = static_cast<unsigned int>(static_cast<int>(animFlags) >> 2);
 		outData++;
 	}
 }

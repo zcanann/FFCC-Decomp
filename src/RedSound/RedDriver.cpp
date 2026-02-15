@@ -1117,12 +1117,36 @@ void CRedDriver::SetSeBlockData(int, void*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bf16c
+ * PAL Size: 288b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::SetSeSepData(void*)
+void CRedDriver::SetSeSepData(void* param_1)
 {
-	// TODO
+    int iVar1;
+    int iVar2;
+    void* pvVar3;
+    char* pcVar4;
+
+    pcVar4 = (char*)param_1;
+    if ((((pcVar4[0] == 'S') && (pcVar4[1] == 'e')) && (pcVar4[2] == 'S')) &&
+        ((pcVar4[3] == 'e' && (pcVar4[4] == 'p')))) {
+        iVar1 = *(int*)(pcVar4 + 0xc) & 0x7fffffff;
+        pvVar3 = RedNew__Fi(iVar1);
+        if (pvVar3 != 0) {
+            memcpy(pvVar3, param_1, iVar1);
+            iVar2 = *(int*)((int)pvVar3 + 8);
+            _EntryExecCommand(_SetSeSepData, (int)pvVar3, 0, 0, 0, 0, 0, 0);
+            (void)iVar2;
+        }
+        return;
+    }
+    if (DAT_8032f408 != 0) {
+        OSReport("SE Sep Header was broken.\n");
+    }
 }
 
 /*
@@ -1157,12 +1181,50 @@ void CRedDriver::ReentrySeSepData(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bf384
+ * PAL Size: 288b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::SePlayState(int)
+int CRedDriver::SePlayState(int param_1)
 {
-	// TODO
+    unsigned int uVar1;
+    int* piVar2;
+    int* piVar3;
+    int iVar4;
+
+    uVar1 = OSDisableInterrupts();
+    iVar4 = 0;
+    piVar3 = *(int**)((int)DAT_8032f3f0 + 0xdbc);
+    while (piVar3 < (int*)(*(int*)((int)DAT_8032f3f0 + 0xdbc) + 0x2a80)) {
+        if ((*piVar3 != 0) && ((param_1 == -1 || (piVar3[0x3e] == param_1)))) {
+            iVar4 = 1;
+            break;
+        }
+        piVar3 = piVar3 + 0x55;
+    }
+    if (iVar4 == 0) {
+        piVar3 = (int*)DAT_8032f3dc;
+        while (piVar3 != (int*)DAT_8032f3d8) {
+            piVar2 = piVar3;
+            if (((*piVar2 != 0) &&
+                ((((void (*)(int*))*piVar2 == _SeBlockPlay) ||
+                  (((void (*)(int*))*piVar2 == _SeSepPlay))) ||
+                 ((void (*)(int*))*piVar2 == _SeSepPlaySequence))) &&
+                ((param_1 == -1 || (param_1 == piVar2[1])))) {
+                iVar4 = 1;
+                break;
+            }
+            piVar3 = piVar2 + 8;
+            if (piVar3 == (int*)DAT_8032f3d4 + 0x800) {
+                piVar3 = (int*)DAT_8032f3d4;
+            }
+        }
+    }
+    OSRestoreInterrupts(uVar1);
+    return iVar4;
 }
 
 /*

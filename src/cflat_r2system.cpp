@@ -651,10 +651,39 @@ extern "C" int IsUse__8CMesMenuFv(void* mesMenu)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" int GetErrorLevel__7CSystemFv(void* system)
+extern "C" int GetErrorLevel__7CSystemFv(void* system, int index)
 {
-    int index = *(int*)((char*)system + 0x125C);
-    return *(int*)((char*)system + index * 4 + 0x3CDC);
+    char* entry = (char*)system + index * 4;
+    return *(int*)(entry + 0x3CDC);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B94EC
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void GetMes__9CFlatDataFi(void* flatData, int index, int value)
+{
+    char* entry = (char*)flatData + index * 4;
+    *(int*)(entry + 0x3CDC) = value;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B94FC
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" int GetNumMes__9CFlatDataFv(void* flatData)
+{
+    return *(int*)((char*)flatData + 0x125C);
 }
 
 /*

@@ -9,6 +9,7 @@
 #include "ffcc/p_map.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/p_minigame.h"
+#include "ffcc/partMng.h"
 #include "ffcc/p_tina.h"
 #include "ffcc/sound.h"
 #include "ffcc/USBStreamData.h"
@@ -676,6 +677,108 @@ extern "C" void GetMes__9CFlatDataFi(void* flatData, int index, int value)
 extern "C" int GetNumMes__9CFlatDataFv(void* flatData)
 {
     return *(int*)((char*)flatData + 0x125C);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9504
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" int GetSysMes__5CGameFi(void* game, int index)
+{
+    return ((int*)((char*)game + 0x3CDC))[index + 1];
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9514
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" char* GetNumSysMes__5CGameFv(void* game, int index)
+{
+    return ((char**)((char*)game + 0xE1E0))[index];
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9538
+ * PAL Size: 116b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __ct__14PPPCREATEPARAMFv(PPPCREATEPARAM* pppCreateParam)
+{
+    pppCreateParam->m_positionOffsetPtr = 0;
+    pppCreateParam->m_rotationPtr = 0;
+    pppCreateParam->m_scalePtr = 0;
+    pppCreateParam->m_extraPositionPtr = 0;
+    pppCreateParam->m_paramA = 0;
+    pppCreateParam->m_paramB = 0;
+    pppCreateParam->m_lookTargetPtr = 0;
+    pppCreateParam->m_objectHitMask = 0;
+    pppCreateParam->m_cylinderAttribute = 0;
+    pppCreateParam->m_paramC = 1.0f;
+    pppCreateParam->m_paramD = 1.0f;
+    pppCreateParam->m_owner = 0;
+    pppCreateParam->m_soundEffectParams.m_soundEffectSlot = -1;
+    pppCreateParam->m_soundEffectParams.m_soundEffectStopFlag = 0;
+    pppCreateParam->m_soundEffectParams.m_soundEffectKind = 1;
+    pppCreateParam->m_soundEffectParams.m_soundEffectStartedOnce = 0;
+    pppCreateParam->m_soundEffectParams.unkSoundEffectRelated = 0;
+    pppCreateParam->m_soundEffectParams.m_soundEffectStartFrame = 0;
+    pppCreateParam->m_soundEffectParams.m_soundEffectFadeFrames = 30;
+    pppCreateParam->m_soundEffectParams.m_soundEffectHandle = -1;
+    pppCreateParam->m_hitParamA = 0;
+    pppCreateParam->m_hitParamB = 0;
+    pppCreateParam->m_hitObjectCount = 0;
+    pppCreateParam->m_hitFlags = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9548
+ * PAL Size: 116b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __ct__14PPPCREATEPARAMFv2(PPPCREATEPARAM* pppCreateParam)
+{
+    pppCreateParam->m_positionOffsetPtr = 0;
+    pppCreateParam->m_rotationPtr = 0;
+    pppCreateParam->m_scalePtr = 0;
+    pppCreateParam->m_extraPositionPtr = 0;
+    pppCreateParam->m_paramA = 0;
+    pppCreateParam->m_paramB = 0;
+    pppCreateParam->m_lookTargetPtr = 0;
+    pppCreateParam->m_objectHitMask = 0;
+    pppCreateParam->m_cylinderAttribute = 0;
+    pppCreateParam->m_paramC = 1.0f;
+    pppCreateParam->m_paramD = 1.0f;
+    pppCreateParam->m_owner = 0;
+    pppCreateParam->m_soundEffectParams.m_soundEffectSlot = -1;
+    pppCreateParam->m_soundEffectParams.m_soundEffectStopFlag = 0;
+    pppCreateParam->m_soundEffectParams.m_soundEffectKind = 1;
+    pppCreateParam->m_soundEffectParams.m_soundEffectStartedOnce = 0;
+    pppCreateParam->m_soundEffectParams.unkSoundEffectRelated = 0;
+    pppCreateParam->m_soundEffectParams.m_soundEffectStartFrame = 0;
+    pppCreateParam->m_soundEffectParams.m_soundEffectFadeFrames = 30;
+    pppCreateParam->m_soundEffectParams.m_soundEffectHandle = -1;
+    pppCreateParam->m_hitParamA = 0;
+    pppCreateParam->m_hitParamB = 0;
+    pppCreateParam->m_hitObjectCount = 0;
+    pppCreateParam->m_hitFlags = 0;
 }
 
 /*

@@ -7,6 +7,7 @@
 #include "ffcc/p_minigame.h"
 #include "ffcc/map.h"
 #include "ffcc/sound.h"
+#include "ffcc/graphic.h"
 
 #include <string.h>
 
@@ -61,6 +62,11 @@ void ClearAll__5CWindFv(void*);
 void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
 void Init__12CFlatRuntimeFv(void*);
 void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
+void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
+void MapChanging__7CSystemFii(CSystem*, int, int);
+void MapChanged__7CSystemFiii(CSystem*, int, int, int);
+void LoadMap__7CMapPcsFiiPvUlUc(void*, int, int, void*, unsigned long, unsigned char);
+void LoadFieldPdt__8CPartPcsFiiPvUlUc(void*, int, int, void*, unsigned long, unsigned char);
 unsigned char CFlat[];
 unsigned char PartMng[];
 unsigned char McPcs[];
@@ -80,6 +86,7 @@ unsigned char DAT_8032ed00[];
 unsigned char DAT_8032ed08[];
 unsigned char Wind[];
 extern const char DAT_801d61dc[];
+extern const char s_game_cpp_801d6190[];
 }
 
 static const float FLOAT_8032f688 = 1.0E+10;
@@ -341,14 +348,63 @@ void CGame::Exec()
 	RemoveScenegraph__7CSystemFP8CProcessi(&System, DAT_8032ed08, 0);
 }
 
+static const char s_defaultTownName[] = "Tipa";
+static const char s_italianTownName[] = "TipaItalia";
+
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80015610
+ * PAL Size: 408b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::Create()
 {
-	// TODO
+    int mapVariant;
+    int mapId;
+
+    m_nextScript.m_flags = 1;
+    clearWork();
+
+    memset(&m_gameWork.m_gameDataStartMarker, 0, 0x13E1);
+    memset(m_gameWork.m_wmBackupParams, 0xFF, sizeof(m_gameWork.m_wmBackupParams));
+
+    m_gameWork.m_scriptSysVal0 = 0;
+    m_gameWork.m_scriptSysVal1 = 0;
+    m_gameWork.m_scriptSysVal2 = 0;
+    m_gameWork.m_scriptSysVal3 = 1;
+    m_gameWork.m_chaliceElement = 1;
+
+    if (m_gameWork.m_languageId == 3) {
+        strcpy(m_gameWork.m_townName, s_italianTownName);
+    } else {
+        strcpy(m_gameWork.m_townName, s_defaultTownName);
+    }
+
+    m_gameWork.m_gameInitFlag = 1;
+
+    if (strlen(m_startScriptName) != 0) {
+        strcpy(m_nextScript.m_name, m_startScriptName);
+        m_newGameFlag = 1;
+    }
+
+    if (m_newGameFlag == 0) {
+        mapVariant = m_currentMapVariantId;
+        mapId = m_currentMapId;
+
+        _WaitDrawDone__8CGraphicFPci(&Graphic, s_game_cpp_801d6190, 0x24E);
+        MapChanging__7CSystemFii(&System, mapId, mapVariant);
+
+        m_currentMapId = mapId;
+        m_currentMapVariantId = mapVariant;
+
+        LoadMap__7CMapPcsFiiPvUlUc(MapPcs, mapId, mapVariant, 0, 0, 0);
+        LoadFieldPdt__8CPartPcsFiiPvUlUc(&PartPcs, mapId, mapVariant, 0, 0, 0);
+
+        MapChanged__7CSystemFiii(&System, mapId, mapVariant, 1);
+    }
 }
 
 /*

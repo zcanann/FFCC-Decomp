@@ -156,12 +156,17 @@ void CMemory::Draw()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001EC80
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMemory::SetGroup(void*, int)
+void CMemory::SetGroup(void* ptr, int group)
 {
-	// TODO
+    unsigned char* header = reinterpret_cast<unsigned char*>(ptr) - 0x3e;
+    *header = (*header & 0x0F) | (static_cast<unsigned char>(group) << 4);
 }
 
 /*
@@ -206,22 +211,30 @@ void CMemory::Free(void*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001E6E0
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMemory::IncHeapWalkerLevel()
 {
-	// TODO
+    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x7794) += 1;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001E6D0
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMemory::DecHeapWalkerLevel()
 {
-	// TODO
+    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x7794) -= 1;
 }
 
 /*

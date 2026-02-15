@@ -506,22 +506,30 @@ int CRedSound::SePlay(int seID, int sepID, int unk, int volume, int pitch)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd378
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::SeMasterVolume(int)
+void CRedSound::SeMasterVolume(int volume)
 {
-	// TODO
+	CRedDriver_8032f4c0.SeMasterVolume(volume);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd3a4
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::SeFadeOut(int, int)
+void CRedSound::SeFadeOut(int seID, int frameCount)
 {
-	// TODO
+	CRedDriver_8032f4c0.SeFadeOut(seID, frameCount);
 }
 
 /*
@@ -568,52 +576,72 @@ void CRedSound::SePitch(int seID, int pitch, int fadeTime)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd48c
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::SePause(int, int)
+void CRedSound::SePause(int seID, int pause)
 {
-	// TODO
+	CRedDriver_8032f4c0.SePause(seID, pause);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd4c0
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::GetSeVolume(int, int)
+void CRedSound::GetSeVolume(int seID, int outVolume)
 {
-	// TODO
+	CRedDriver_8032f4c0.GetSeVolume(seID, outVolume);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd4f4
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::ReportSeLoop(int)
+void CRedSound::ReportSeLoop(int mode)
 {
-	// TODO
+	CRedDriver_8032f4c0.ReportSeLoop(mode);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd520
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedSound::DisplaySePlayInfo()
 {
-	// TODO
+	CRedDriver_8032f4c0.DisplaySePlayInfo();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd544
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::StreamPlayState(int)
+void CRedSound::StreamPlayState(int streamID)
 {
-	// TODO
+	CRedDriver_8032f4c0.StreamPlayState(streamID);
 }
 
 /*

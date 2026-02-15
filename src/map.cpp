@@ -3,16 +3,22 @@
 #include "ffcc/math.h"
 #include "ffcc/memory.h"
 #include "ffcc/maptexanim.h"
+#include "ffcc/system.h"
+
+#include <string.h>
 
 extern "C" unsigned long UnkMaterialSetGetter(void*);
 extern "C" void __dla__FPv(void*);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" float Spline1D__5CMathFifPfPfPf(CMath*, int, float, float*, float*, float*);
 extern "C" float Line1D__5CMathFifPfPf(CMath*, int, float, float*, float*);
 extern "C" void MakeSpline1Dtable__5CMathFiPfPfPf(CMath*, int, float*, float*, float*);
 extern CMath Math;
 
 static char s_map_cpp[] = "map.cpp";
+static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
+static char s_ptrarray_grow_error[] = "CPtrArray grow error";
 
 namespace {
 static inline unsigned char* Ptr(void* p, unsigned int offset)
@@ -136,6 +142,9 @@ void CPtrArray<CMaterial*>::SetGrow(int growCapacity)
     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x14) = growCapacity;
 }
 
+template <>
+bool CPtrArray<CMapLightHolder*>::setSize(unsigned long newSize);
+
 /*
  * --INFO--
  * PAL Address: 0x80033d24
@@ -186,6 +195,53 @@ void CPtrArray<CMapLightHolder*>::SetStage(CMemory::CStage* stage)
 {
     *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(this) + 0x14) = stage;
 }
+
+/*
+ * --INFO--
+ * PAL Address: 0x80033de8
+ * PAL Size: 240b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+bool CPtrArray<CMapLightHolder*>::setSize(unsigned long newSize)
+{
+    CMapLightHolder** newItems;
+
+    if (m_size < newSize) {
+        if (m_size == 0) {
+            m_size = m_defaultSize;
+        } else {
+            if (m_growCapacity == 0) {
+                System.Printf(s_ptrarray_grow_error);
+            }
+            m_size = m_size << 1;
+        }
+
+        newItems = (CMapLightHolder**)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+            &Memory, m_size << 2, m_stage, s_collection_ptrarray_h, 0xFA, 0);
+        if (newItems == 0) {
+            return false;
+        }
+
+        if (m_items != 0) {
+            memcpy(newItems, m_items, m_numItems << 2);
+        }
+        if (m_items != 0) {
+            __dla__FPv(m_items);
+            m_items = 0;
+        }
+
+        m_items = newItems;
+    }
+
+    return true;
+}
+
+template <>
+bool CPtrArray<CMapAnim*>::setSize(unsigned long newSize);
 
 /*
  * --INFO--
@@ -335,20 +391,21 @@ bool CPtrArray<CMapAnim*>::setSize(unsigned long newSize)
         if (m_size == 0) {
             m_size = m_defaultSize;
         } else {
+            if (m_growCapacity == 0) {
+                System.Printf(s_ptrarray_grow_error);
+            }
             m_size = m_size << 1;
         }
 
-        newItems = new CMapAnim*[m_size];
+        newItems = (CMapAnim**)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+            &Memory, m_size << 2, m_stage, s_collection_ptrarray_h, 0xFA, 0);
         if (newItems == 0) {
             return false;
         }
 
         if (m_items != 0) {
-            for (unsigned long i = 0; i < m_numItems; i++) {
-                newItems[i] = m_items[i];
-            }
+            memcpy(newItems, m_items, m_numItems << 2);
         }
-
         if (m_items != 0) {
             __dla__FPv(m_items);
             m_items = 0;

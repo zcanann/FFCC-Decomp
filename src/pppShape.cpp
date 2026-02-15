@@ -320,20 +320,18 @@ void pppGetShapeUV(long* animData, short frameIndex, Vec2d& minUv, Vec2d& maxUv,
 void pppCalcFrameShape(long* animData, short& currentFrame, short& drawFrame, short& frameTime,
                        short deltaTime)
 {
-    drawFrame = currentFrame;
-    frameTime += deltaTime;
-
-    short duration = *(short*)((int)animData + currentFrame * 8 + 0x12);
-    if (frameTime < duration) {
+    short frame = currentFrame;
+    drawFrame = frame;
+    frameTime = frameTime + deltaTime;
+    frame = *(short*)((int)animData + frame * 8 + 0x12);
+    if (frameTime < frame) {
         return;
     }
-
-    frameTime -= duration;
-    currentFrame += 1;
+    frameTime = frameTime - frame;
+    currentFrame = currentFrame + 1;
     if (currentFrame < *(short*)((int)animData + 6)) {
         return;
     }
-
     currentFrame = 0;
     frameTime = 0;
 }

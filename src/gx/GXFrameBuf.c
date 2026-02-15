@@ -349,19 +349,20 @@ u32 GXSetDispCopyYScale(f32 vscale) {
 }
 
 void GXSetCopyClear(GXColor clear_clr, u32 clear_z) {
-    GXData* gx;
     u32 regA;
     u32 regGB;
 
     CHECK_GXBEGIN(1596, "GXSetCopyClear");
     ASSERTMSGLINE(1598, clear_z <= 0xFFFFFF, "GXSetCopyClear: Z clear value is out of range");
 
-    regA = ((u32)clear_clr.a << 8) | clear_clr.r;
+    regA = clear_clr.a;
+    regA = (regA << 8) | clear_clr.r;
     regA = (regA & 0xFFFF) | 0x4F000000;
     GX_WRITE_U8(0x61);
     GX_WRITE_U32(regA);
 
-    regGB = ((u32)clear_clr.g << 8) | clear_clr.b;
+    regGB = clear_clr.g;
+    regGB = (regGB << 8) | clear_clr.b;
     regGB = (regGB & 0xFFFF) | 0x50000000;
     GX_WRITE_U8(0x61);
     GX_WRITE_U32(regGB);
@@ -370,8 +371,7 @@ void GXSetCopyClear(GXColor clear_clr, u32 clear_z) {
     GX_WRITE_U8(0x61);
     GX_WRITE_U32(regA);
 
-    gx = __GXData;
-    gx->bpSentNot = 0;
+    __GXData->bpSentNot = 0;
 }
 
 /*

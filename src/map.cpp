@@ -178,6 +178,36 @@ void CPtrArray<CMapLightHolder*>::RemoveAll()
 
 /*
  * --INFO--
+ * PAL Address: 0x80033de0
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+void CPtrArray<CMapLightHolder*>::SetStage(CMemory::CStage* stage)
+{
+    m_stage = stage;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80033ed8
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+int CPtrArray<CMapAnimRun*>::GetSize()
+{
+    return m_numItems;
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

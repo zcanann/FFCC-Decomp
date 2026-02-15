@@ -107,8 +107,6 @@ void game(int argc, char** argv)
 void main(int argc, char** argv)
 {
     if (argc != 0) {
-        int* padFlags = reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Pad) + 0x1B4);
-
         for (int i = 1; i < argc; i++) {
             const char* argument = argv[i];
 
@@ -116,13 +114,10 @@ void main(int argc, char** argv)
                 continue;
             }
 
-            if (argument[1] == 'w') {
-                padFlags[1] = 1;
-                continue;
-            }
-
             if (argument[1] == 'r') {
-                padFlags[0] = 1;
+                Pad._1b4_4_ = 1;
+            } else if (argument[1] == 'w') {
+                Pad._1b8_4_ = 1;
             }
         }
     }

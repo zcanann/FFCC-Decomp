@@ -1,4 +1,31 @@
 #include "ffcc/materialman.h"
+#include "ffcc/textureman.h"
+
+extern "C" unsigned long UnkMaterialSetGetter(void*);
+
+namespace {
+static inline unsigned char* Ptr(void* p, unsigned int offset)
+{
+    return reinterpret_cast<unsigned char*>(p) + offset;
+}
+
+typedef void (*VirtualDtorFn)(void*, int);
+
+static void ReleaseRef(void* object)
+{
+    if (object == 0) {
+        return;
+    }
+
+    int& refCount = *reinterpret_cast<int*>(Ptr(object, 4));
+    int nextRefCount = refCount - 1;
+    refCount = nextRefCount;
+    if (nextRefCount == 0) {
+        void** vtable = *reinterpret_cast<void***>(object);
+        reinterpret_cast<VirtualDtorFn>(vtable[2])(object, 1);
+    }
+}
+}
 
 /*
  * --INFO--
@@ -458,6 +485,50 @@ void CMaterialMan::GetMemoryStage()
 void CMaterial::IncNumTexture()
 {
 	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003c1b8
+ * PAL Size: 312b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMaterialSet::ReleaseTag(CTextureSet* textureSet, int pdtSlotIndex, CAmemCacheSet* amemCacheSet)
+{
+    void* materials = Ptr(this, 8);
+    unsigned long index = 0;
+
+    while (index < UnkMaterialSetGetter(materials)) {
+        CMaterial** materialItems = *reinterpret_cast<CMaterial***>(Ptr(materials, 0xC));
+        if (materialItems == 0) {
+            break;
+        }
+
+        CMaterial* material = materialItems[index];
+        if ((material != 0) && (*reinterpret_cast<int*>(Ptr(material, 0x9C)) == pdtSlotIndex)) {
+            int numTexture = static_cast<int>(*reinterpret_cast<unsigned short*>(Ptr(material, 0x18)));
+
+            for (int i = 0; i < numTexture; i++) {
+                void*& textureRef = *reinterpret_cast<void**>(Ptr(material, 0x3C + (i * 4)));
+                if (textureRef != 0) {
+                    ReleaseRef(textureRef);
+                    textureRef = 0;
+                }
+
+                short textureIndex = *reinterpret_cast<short*>(Ptr(material, 0x1A + (i * 2)));
+                textureSet->ReleaseTextureIdx(static_cast<int>(textureIndex), amemCacheSet);
+                textureRef = 0;
+            }
+
+            ReleaseRef(material);
+            materialItems[index] = 0;
+        }
+
+        index++;
+    }
 }
 
 /*

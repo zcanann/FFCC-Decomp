@@ -33,6 +33,41 @@ public:
 extern "C" void __dl__FPv(void* ptr);
 extern "C" void __dla__FPv(void* ptr);
 extern "C" int __cntlzw(unsigned int);
+extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
+extern "C" CUSBStreamData* __ct__14CUSBStreamDataFv(CUSBStreamData*);
+extern "C" CFunnyShape* __ct__11CFunnyShapeFv(CFunnyShape*);
+
+extern void* __vt__8CManager;
+extern void* lbl_801E8668;
+extern void* lbl_801EA924;
+extern u32 DAT_801EA778;
+extern u32 DAT_801EA77C;
+extern u32 PTR_createViewer__14CFunnyShapePcsFv_801EA780;
+extern u32 DAT_801EA784;
+extern u32 DAT_801EA788;
+extern u32 PTR_destroyViewer__14CFunnyShapePcsFv_801EA78C;
+extern u32 DAT_801EA790;
+extern u32 DAT_801EA794;
+extern u32 PTR_calcViewer__14CFunnyShapePcsFv_801EA798;
+extern u32 DAT_801EA79C;
+extern u32 DAT_801EA7A0;
+extern u32 PTR_drawViewer__14CFunnyShapePcsFv_801EA7A4;
+extern u32 DAT_801EA7AC;
+extern u32 DAT_801EA7B0;
+extern u32 DAT_801EA7B4;
+extern u32 DAT_801EA7B8;
+extern u32 DAT_801EA7BC;
+extern u32 DAT_801EA7C0;
+extern u32 DAT_801EA7C4;
+extern u32 DAT_801EA7C8;
+extern u32 DAT_801EA7CC;
+extern u32 DAT_801EA7D8;
+extern u32 DAT_801EA7DC;
+extern u32 DAT_801EA7E0;
+extern unsigned char ARRAY_8026D728[];
+extern unsigned char FunnyShapePcs[];
+extern "C" CFunnyShapePcs* __dt__14CFunnyShapePcsFv(CFunnyShapePcs* self, short shouldDelete);
+extern "C" CPtrArray<OSFS_TEXTURE_ST*>* dtor_8004EAD0(CPtrArray<OSFS_TEXTURE_ST*>* ptrArray, short shouldDelete);
 
 extern f32 lbl_8032FD14;
 extern f32 lbl_8032FD10;
@@ -62,6 +97,57 @@ static inline CFunnyShape* FunnyShape(CFunnyShapePcs* self)
     return reinterpret_cast<CFunnyShape*>(Ptr(self, 0x1C));
 }
 } // namespace
+
+/*
+ * --INFO--
+ * PAL Address: 0x8004e844
+ * PAL Size: 288b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_p_FunnyShape_cpp(void)
+{
+    volatile void** base = reinterpret_cast<volatile void**>(FunnyShapePcs);
+    CPtrArray<OSFS_TEXTURE_ST*>* texData = reinterpret_cast<CPtrArray<OSFS_TEXTURE_ST*>*>(FunnyShapePcs + 0x61BC);
+    CPtrArray<_GXTexObj*>* gxTex = reinterpret_cast<CPtrArray<_GXTexObj*>*>(FunnyShapePcs + 0x61D8);
+    *base = &__vt__8CManager;
+    *base = &lbl_801E8668;
+    *base = &lbl_801EA924;
+
+    __ct__14CUSBStreamDataFv(reinterpret_cast<CUSBStreamData*>(FunnyShapePcs + 0x8));
+    __ct__11CFunnyShapeFv(reinterpret_cast<CFunnyShape*>(FunnyShapePcs + 0x1C));
+
+    texData->size = 0;
+    texData->numItems = 0;
+    texData->defaultSize = 0x10;
+    texData->items = 0;
+    texData->stage = 0;
+    texData->growCapacity = 1;
+
+    gxTex->size = 0;
+    gxTex->numItems = 0;
+    gxTex->defaultSize = 0x10;
+    gxTex->items = 0;
+    gxTex->stage = 0;
+    gxTex->growCapacity = 1;
+
+    __register_global_object(FunnyShapePcs, reinterpret_cast<void*>(__dt__14CFunnyShapePcsFv), ARRAY_8026D728);
+
+    DAT_801EA7AC = DAT_801EA778;
+    DAT_801EA7B0 = DAT_801EA77C;
+    DAT_801EA7B4 = PTR_createViewer__14CFunnyShapePcsFv_801EA780;
+    DAT_801EA7B8 = DAT_801EA784;
+    DAT_801EA7BC = DAT_801EA788;
+    DAT_801EA7C0 = PTR_destroyViewer__14CFunnyShapePcsFv_801EA78C;
+    DAT_801EA7C4 = DAT_801EA790;
+    DAT_801EA7C8 = DAT_801EA794;
+    DAT_801EA7CC = PTR_calcViewer__14CFunnyShapePcsFv_801EA798;
+    DAT_801EA7D8 = DAT_801EA79C;
+    DAT_801EA7DC = DAT_801EA7A0;
+    DAT_801EA7E0 = PTR_drawViewer__14CFunnyShapePcsFv_801EA7A4;
+}
 
 template <class T>
 CPtrArray<T>::CPtrArray()
@@ -129,7 +215,7 @@ CFunnyShapePcs::CFunnyShapePcs()
 CFunnyShapePcs::~CFunnyShapePcs()
 {
     reinterpret_cast<CPtrArray<_GXTexObj*>*>(Ptr(this, 0x61D8))->~CPtrArray<_GXTexObj*>();
-    reinterpret_cast<CPtrArray<OSFS_TEXTURE_ST*>*>(Ptr(this, 0x61BC))->~CPtrArray<OSFS_TEXTURE_ST*>();
+    dtor_8004EAD0(reinterpret_cast<CPtrArray<OSFS_TEXTURE_ST*>*>(Ptr(this, 0x61BC)), -1);
     FunnyShape(this)->~CFunnyShape();
     UsbStream(this)->~CUSBStreamData();
 }
@@ -380,6 +466,31 @@ void CPtrArray<OSFS_TEXTURE_ST*>::DeleteAndRemoveAll()
         offset += 4;
     }
     RemoveAll();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8004ead0
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" CPtrArray<OSFS_TEXTURE_ST*>* dtor_8004EAD0(CPtrArray<OSFS_TEXTURE_ST*>* ptrArray, short shouldDelete)
+{
+    if (ptrArray != 0) {
+        if (ptrArray->items != 0) {
+            __dla__FPv(ptrArray->items);
+            ptrArray->items = 0;
+        }
+        ptrArray->size = 0;
+        ptrArray->numItems = 0;
+        if (shouldDelete > 0) {
+            __dl__FPv(ptrArray);
+        }
+    }
+    return ptrArray;
 }
 
 template class CPtrArray<_GXTexObj*>;

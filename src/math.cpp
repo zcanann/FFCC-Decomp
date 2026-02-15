@@ -611,22 +611,71 @@ int CBound::CheckFrustum(Vec& viewPos, float (*viewMatrix)[4], float farPlane)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001a230
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMath::MTX44MultVec4(float (*) [4], Vec*, Vec4d*)
+void CMath::MTX44MultVec4(float (*mtx)[4], Vec* src, Vec4d* dst)
 {
-	// TODO
+    const float x = src->x;
+    const float y = src->y;
+    const float z = src->z;
+
+    const float m10 = mtx[1][0];
+    const float m11 = mtx[1][1];
+    const float m12 = mtx[1][2];
+    const float m13 = mtx[1][3];
+    const float m20 = mtx[2][0];
+    const float m21 = mtx[2][1];
+    const float m22 = mtx[2][2];
+    const float m23 = mtx[2][3];
+    const float m30 = mtx[3][0];
+    const float m31 = mtx[3][1];
+    const float m32 = mtx[3][2];
+    const float m33 = mtx[3][3];
+
+    dst->x = z * mtx[0][2] + x * mtx[0][0] + mtx[0][3] + y * mtx[0][1];
+    dst->y = z * m12 + x * m10 + m13 + y * m11;
+    dst->z = z * m22 + x * m20 + m23 + y * m21;
+    dst->w = z * m32 + x * m30 + m33 + y * m31;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001a294
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMath::MTX44MultVec4(float (*) [4], Vec4d*, Vec4d*)
+void CMath::MTX44MultVec4(float (*mtx)[4], Vec4d* src, Vec4d* dst)
 {
-	// TODO
+    const float x = src->x;
+    const float y = src->y;
+    const float z = src->z;
+    const float w = src->w;
+
+    const float m10 = mtx[1][0];
+    const float m11 = mtx[1][1];
+    const float m12 = mtx[1][2];
+    const float m13 = mtx[1][3];
+    const float m20 = mtx[2][0];
+    const float m21 = mtx[2][1];
+    const float m22 = mtx[2][2];
+    const float m23 = mtx[2][3];
+    const float m30 = mtx[3][0];
+    const float m31 = mtx[3][1];
+    const float m32 = mtx[3][2];
+    const float m33 = mtx[3][3];
+
+    dst->x = z * mtx[0][2] + x * mtx[0][0] + w * mtx[0][3] + y * mtx[0][1];
+    dst->y = z * m12 + x * m10 + w * m13 + y * m11;
+    dst->z = z * m22 + x * m20 + w * m23 + y * m21;
+    dst->w = z * m32 + x * m30 + w * m33 + y * m31;
 }
 
 /*

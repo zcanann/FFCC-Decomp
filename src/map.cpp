@@ -897,12 +897,17 @@ void CMapMng::SetMapAnimID(int, int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002f6d4
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapMng::SetMapObjMime(int, int, int, int)
+void CMapMng::SetMapObjMime(int mapObjIndex, int mode, int target, int type)
 {
-	// TODO
+    CMapObj* mapObj = reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(this) + (mapObjIndex * 0xF0) + 0x954);
+    mapObj->SetMime(mode, target, type);
 }
 
 /*

@@ -526,32 +526,44 @@ void CRedSound::SeFadeOut(int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd3d8
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::SeVolume(int, int, int)
+void CRedSound::SeVolume(int seID, int volume, int fadeTime)
 {
-	// TODO
+	CRedDriver_8032f4c0.SeVolume(seID, volume, fadeTime);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd414
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::SePan(int, int, int)
+void CRedSound::SePan(int seID, int pan, int fadeTime)
 {
-	// TODO
+	CRedDriver_8032f4c0.SePan(seID, pan, fadeTime);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd450
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::SePitch(int, int, int)
+void CRedSound::SePitch(int seID, int pitch, int fadeTime)
 {
-	// TODO
+	CRedDriver_8032f4c0.SePitch(seID, pitch, fadeTime);
 }
 
 /*

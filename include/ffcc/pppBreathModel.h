@@ -25,8 +25,8 @@ void IsExistGroupParticle(PBreathModel*, VBreathModel*, short);
 extern "C" {
 #endif
 
-void pppFrameBreathModel(void);
-void pppRenderBreathModel(void);
+void pppFrameBreathModel(pppBreathModel*, PBreathModel*, UnkC*);
+void pppRenderBreathModel(pppBreathModel*, PBreathModel*, UnkC*);
 void pppConstructBreathModel(pppBreathModel*, UnkC*);
 void pppDestructBreathModel(pppBreathModel*, UnkC*);
 

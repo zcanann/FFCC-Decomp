@@ -7,11 +7,14 @@
 #include <dolphin/gba/GBA.h>
 #include "dolphin/os.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/printf.h"
+#include <Runtime.PPCEABI.H/NMWException.h>
 
 #include "string.h"
 
 extern int DAT_800000f8 = 0;
 extern int DAT_8032edb8 = 0;
+extern "C" void __dt__6JoyBusFv(void*);
+extern unsigned char ARRAY_802eaab0[];
 
 const unsigned short JoyBusCrcTable[256] =
 {
@@ -6574,8 +6577,14 @@ int CFile::IsDiskError()
  * JP Address: TODO
  * JP Size: TODO
  */
-void __sinit_joybus_cpp()
+extern "C" void __sinit_joybus_cpp()
 {
+    JoyBus* threadParamBase;
+    JoyBus* cmdCountBase;
+    JoyBus* semBase;
+    JoyBus* stateBase;
+    int i;
+
     Joybus.m_threadRunningMask = 0;
     Joybus.m_binLoaded = false;
     Joybus.m_fileBaseA_dup = 0;
@@ -6584,16 +6593,15 @@ void __sinit_joybus_cpp()
     Joybus.m_fileBaseA = 0;
     Joybus.m_fileBaseB = 0;
     
-    for (int i = 0; i < 4; i++)
+    for (i = 0; i < 4; i++)
     {
         Joybus.m_letterBuffer[i] = 0;
         Joybus.m_letterSizeArr[i] = 0;
     }
-    
+
     strcpy(Joybus.m_pathBuf, "dvd_gba/");
     strcat(Joybus.m_pathBuf, "ffcc_cli.bin", 128UL);
-    
-    // Initialize various memory regions with memset
+
     memset((void*)0x802ec7d0, 0, 0x4000);
     memset((void*)0x802f08f0, 0, 8);
     memset((void*)0x802f08f8, 0, 0x400);
@@ -6604,19 +6612,30 @@ void __sinit_joybus_cpp()
     
     Joybus.m_mapId = 0xff;
     Joybus.m_stageId = 0xff;
-    
-    // Initialize thread parameters and related arrays
-    for (int i = 0; i < 4; i++)
+
+    threadParamBase = &Joybus;
+    cmdCountBase = &Joybus;
+    semBase = &Joybus;
+    stateBase = &Joybus;
+    i = 0;
+    do
     {
-        Joybus.m_threadParams[i].m_gbaStatus = 1;
-        Joybus.m_threadParams[i].m_padType = 0x40;
-        Joybus.m_cmdCount[i] = 0;
-        Joybus.m_secCmdCount[i] = 0;
-        OSInitSemaphore(&Joybus.m_accessSemaphores[i], 1);
-        Joybus.m_ctrlModeArr[i] = 0;
-        Joybus.m_nextModeTypeArr[i] = 0;
-        Joybus.m_modeXArr[i] = 0;
-        Joybus.m_stateCodeArr[i] = 0xff;
-        Joybus.m_stateFlagArr[i] = 0;
-    }
+        threadParamBase->m_threadParams[0].m_gbaStatus = 1;
+        threadParamBase->m_threadParams[0].m_padType = 0x40;
+        cmdCountBase->m_cmdCount[0] = 0;
+        cmdCountBase->m_secCmdCount[0] = 0;
+        OSInitSemaphore(semBase->m_accessSemaphores, 1);
+        stateBase->m_ctrlModeArr[0] = 0;
+        i = i + 1;
+        threadParamBase = reinterpret_cast<JoyBus*>(threadParamBase->m_pathBuf + 0x3c);
+        stateBase->m_nextModeTypeArr[0] = 0;
+        cmdCountBase = reinterpret_cast<JoyBus*>(cmdCountBase->m_pathBuf + 4);
+        semBase = reinterpret_cast<JoyBus*>(semBase->m_pathBuf + 0xc);
+        stateBase->m_modeXArr[0] = 0;
+        stateBase->m_stateCodeArr[0] = 0xff;
+        stateBase->m_stateFlagArr[0] = 0;
+        stateBase = reinterpret_cast<JoyBus*>(stateBase->m_pathBuf + 1);
+    } while (i < 4);
+
+    __register_global_object(&Joybus, reinterpret_cast<void*>(__dt__6JoyBusFv), ARRAY_802eaab0);
 }

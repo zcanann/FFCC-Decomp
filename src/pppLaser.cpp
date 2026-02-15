@@ -102,7 +102,7 @@ struct CMapCylinderRaw {
 void pppConstructLaser(struct pppLaser *pppLaser, struct UnkC *param_2)
 {
     f32 fVar1 = FLOAT_80333428;
-    f32* pfVar3 = (f32*)((u8*)&pppLaser->field_0x88 + param_2->offsets->m_serializedDataOffsets[2]);
+    f32* pfVar3 = (f32*)((u8*)pppLaser + 0x88 + param_2->offsets->m_serializedDataOffsets[2]);
     int local_24;
     int local_28;
     Vec local_20;
@@ -123,9 +123,9 @@ void pppConstructLaser(struct pppLaser *pppLaser, struct UnkC *param_2)
     *((u8*)pfVar3 + 0x2c) = 0;
     *((u8*)pfVar3 + 0x2d) = 0;
     *((u8*)pfVar3 + 0x2e) = 0;
-    *((u16*)pfVar3 + 0x18) = 0;
-    *((u16*)pfVar3 + 0x19) = 0;
-    *((u16*)pfVar3 + 0x1a) = 0;
+    *((u16*)pfVar3 + 0xc) = 0;
+    *((u16*)pfVar3 + 0xd) = 0;
+    *((u16*)((u8*)pfVar3 + 0x32)) = 0;
 
     pfVar3[14] = RandF__5CMathFf(FLOAT_8033345c, &Math);
     *((u8*)pfVar3 + 0x4c) = 1;
@@ -137,12 +137,10 @@ void pppConstructLaser(struct pppLaser *pppLaser, struct UnkC *param_2)
     } else {
         GetTargetCursor__5CGameFiR3VecR3Vec(&Game.game, local_28, (Vec*)(pfVar3 + 0x10), &local_20);
 
-        {
-            u8* partyObj = (u8*)GetPartyObj__5CGameFi(&Game.game, local_28);
-            local_14.x = *(f32*)(partyObj + 0x15c);
-            local_14.y = *(f32*)(partyObj + 0x160);
-            local_14.z = *(f32*)(partyObj + 0x164);
-        }
+        u8* partyObj = (u8*)GetPartyObj__5CGameFi(&Game.game, local_28);
+        local_14.x = *(f32*)(partyObj + 0x15c);
+        local_14.y = *(f32*)(partyObj + 0x160);
+        local_14.z = *(f32*)(partyObj + 0x164);
 
         if (local_24 == 0x200) {
             pfVar3[15] = PSVECDistance((Vec*)(pfVar3 + 0x10), &local_14);

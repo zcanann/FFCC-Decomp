@@ -35,6 +35,9 @@ public:
 		unsigned int m_chunkSize;
 		unsigned int m_currentOffset;
 		unsigned int m_nextOffset;
+
+		void SyncCompleted();
+		void Read();
 	};
 
 	CFile();
@@ -47,6 +50,7 @@ public:
 	int GetLength(CHandle* handle);
 	void BackAllFilesToQueue(CHandle* handle);
 	void Read(CHandle* handle);
+	void* GetBuffer();
 	void LockBuffer();
 	void UnlockBuffer();
 	void ReadASync(CHandle* handle);

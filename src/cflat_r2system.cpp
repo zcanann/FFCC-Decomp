@@ -566,9 +566,9 @@ extern "C" void Close__Q25CFile7CHandleFv(CFile::CHandle* fileHandle)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void* GetBuffer__5CFileFv(CFile* file)
+void* CFile::GetBuffer()
 {
-    return file->m_readBuffer;
+    return m_readBuffer;
 }
 
 /*
@@ -580,9 +580,9 @@ extern "C" void* GetBuffer__5CFileFv(CFile* file)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SyncCompleted__Q25CFile7CHandleFv(CFile::CHandle* fileHandle)
+void CFile::CHandle::SyncCompleted()
 {
-    File.SyncCompleted(fileHandle);
+    File.SyncCompleted(this);
 }
 
 /*
@@ -594,9 +594,9 @@ extern "C" void SyncCompleted__Q25CFile7CHandleFv(CFile::CHandle* fileHandle)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void Read__Q25CFile7CHandleFv(CFile::CHandle* fileHandle)
+void CFile::CHandle::Read()
 {
-    File.Read(fileHandle);
+    File.Read(this);
 }
 
 /*

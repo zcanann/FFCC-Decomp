@@ -200,6 +200,71 @@ int CPtrArray<CMapAnimRun*>::GetSize()
 
 /*
  * --INFO--
+ * PAL Address: 0x800340f0
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+void CPtrArray<CMapAnimRun*>::RemoveAll()
+{
+    if (m_items != 0) {
+        __dla__FPv(m_items);
+        m_items = 0;
+    }
+    m_size = 0;
+    m_numItems = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003413c
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CMapAnimRun* CPtrArray<CMapAnimRun*>::operator[](unsigned long index)
+{
+    return GetAt(index);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80034170
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+void CPtrArray<CMapAnimRun*>::SetStage(CMemory::CStage* stage)
+{
+    m_stage = stage;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80034a44
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CMapAnimRun* CPtrArray<CMapAnimRun*>::GetAt(unsigned long index)
+{
+    return m_items[index];
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

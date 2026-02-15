@@ -1,5 +1,10 @@
 #include "ffcc/p_dbgmenu.h"
 #include "ffcc/graphic.h"
+#include "ffcc/p_chara.h"
+#include "ffcc/p_tina.h"
+#include "ffcc/partMng.h"
+#include "ffcc/pad.h"
+#include "ffcc/sound.h"
 #include "ffcc/system.h"
 #include <dolphin/gx.h>
 #include <string.h>
@@ -9,6 +14,20 @@ extern unsigned char DAT_8032e698;
 extern unsigned char DAT_8032ecd8;
 extern char s_Debug_80331c90[];
 extern u32 PTR_DAT_80212524;
+extern CPartMng PartMng;
+extern unsigned char PartPcs[];
+extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+	void* flatRuntime, void* object, int p1, int p2, int p3, void* stack, void* stack2);
+
+static inline u16 ReadDbgButtons()
+{
+	if (Pad._452_4_ != 0) {
+		return 0;
+	}
+
+	const u32 padIndex = (Pad._448_4_ == 4) ? 0 : 4;
+	return *(u16*)((u8*)&Pad + 8 + padIndex * 0x54);
+}
 
 /*
  * --INFO--
@@ -116,12 +135,142 @@ void CDbgMenuPcs::selectPrev()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012cd88
+ * PAL Size: 1144b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CDbgMenuPcs::calc()
 {
-	// TODO
+	if (*(int*)((char*)this + 0x58) == 0) {
+		return;
+	}
+
+	u16 buttons = ReadDbgButtons();
+	if ((buttons & 0x100) != 0) {
+		CDM* selected = *(CDM**)((char*)this + 0x2A64);
+		switch (*(int*)((char*)selected + 0x38)) {
+		case 100:
+			*(u32*)(CFlat + 0x12A4) = ~*(u32*)(CFlat + 0x12A4);
+			break;
+		case 0x65: {
+			*(u8*)(CFlat + 0x12E4) ^= 0x80;
+			int stack[3];
+			stack[0] = 0;
+			stack[1] = ((*(s8*)(CFlat + 0x12E4) < 0) ? -1 : 0);
+			stack[2] = 0;
+			SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+				CFlat, 0, 1, 9, 3, stack, 0);
+			break;
+		}
+		case 0x66:
+			*(u8*)(CFlat + 0x12E4) ^= 4;
+			break;
+		case 0x67:
+			*(u32*)((char*)this + 4) ^= 1;
+			break;
+		case 0x68:
+			*(u32*)((char*)this + 4) ^= 2;
+			break;
+		case 0x69:
+			*(u32*)((char*)this + 4) ^= 4;
+			break;
+		case 0x6A:
+			*(u32*)((char*)this + 4) ^= 8;
+			break;
+		case 0x6B:
+			*(u32*)((char*)this + 4) ^= 0x10;
+			break;
+		case 0x6C:
+			*(u32*)((char*)this + 4) ^= 0x20;
+			break;
+		case 0x6D:
+			*(u32*)((char*)this + 4) ^= 0x40;
+			break;
+		case 0x6E:
+			*(u32*)((char*)this + 4) ^= 0x80;
+			break;
+		case 0x6F:
+			*(u32*)((char*)this + 4) ^= 0x100;
+			break;
+		case 0x70:
+			*(u32*)((char*)this + 4) ^= 0x200;
+			break;
+		case 0x71:
+			*(u32*)((char*)this + 4) ^= 0x400;
+			break;
+		case 0x72:
+			*(u32*)((char*)this + 4) ^= 0x800;
+			reinterpret_cast<CPartPcs*>(PartPcs)->pppSetDebugHide(
+				((*(u32*)((char*)this + 4) & 0x800) != 0) ? 1 : 0);
+			break;
+		case 0x73:
+			*(u32*)((char*)this + 4) ^= 0x1000;
+			break;
+		case 0x74:
+			Sound.CheckDriver(1);
+			break;
+		case 0x75:
+			DAT_8032ecd8 = 1 - DAT_8032ecd8;
+			break;
+		case 0x76:
+			DAT_8032e698 = 1 - DAT_8032e698;
+			PartMng.pppDumpMngSt();
+			break;
+		case 0x77:
+			CharaPcs.DumpLoad();
+			break;
+		case 0x78:
+			*(u32*)((char*)this + 4) ^= 0x2000;
+			break;
+		case 0x79:
+			*(u32*)((char*)this + 4) ^= 0x4000;
+			break;
+		case 0x7A:
+			*(u32*)((char*)this + 4) ^= 0x8000;
+			break;
+		}
+	}
+
+	buttons = ReadDbgButtons();
+	if ((buttons & 4) != 0) {
+		CDM* start = *(CDM**)((char*)this + 0x2A64);
+		*(u8*)((char*)start + 0x34) &= 0xBF;
+		do {
+			*(CDM**)((char*)this + 0x2A64) = *(CDM**)((char*)*(CDM**)((char*)this + 0x2A64) + 0x48);
+		} while ((*(u32*)((char*)*(CDM**)((char*)this + 0x2A64) + 4) & 1) == 0 &&
+				 *(CDM**)((char*)this + 0x2A64) != start);
+		*(u8*)((char*)*(CDM**)((char*)this + 0x2A64) + 0x34) =
+			(*(u8*)((char*)*(CDM**)((char*)this + 0x2A64) + 0x34) & 0xBF) | 0x40;
+	}
+
+	buttons = ReadDbgButtons();
+	if ((buttons & 8) != 0) {
+		CDM* start = *(CDM**)((char*)this + 0x2A64);
+		*(u8*)((char*)start + 0x34) &= 0xBF;
+		do {
+			*(CDM**)((char*)this + 0x2A64) = *(CDM**)((char*)*(CDM**)((char*)this + 0x2A64) + 0x44);
+		} while ((*(u32*)((char*)*(CDM**)((char*)this + 0x2A64) + 4) & 1) == 0 &&
+				 *(CDM**)((char*)this + 0x2A64) != start);
+		*(u8*)((char*)*(CDM**)((char*)this + 0x2A64) + 0x34) =
+			(*(u8*)((char*)*(CDM**)((char*)this + 0x2A64) + 0x34) & 0xBF) | 0x40;
+	}
+
+	if (*(int*)((char*)this + 0x58) != 0) {
+		calcMenu(*(CDM**)((char*)this + 0x58));
+	}
+
+	buttons = ReadDbgButtons();
+	if ((buttons & 0x200) != 0) {
+		memset((char*)this + 0x5C, 0, 0x2A00);
+		*(u32*)((char*)this + 0x58) = 0;
+		*(u32*)((char*)this + 0x2A60) = 0;
+		*(u32*)((char*)this + 0x2A64) = 0;
+	}
+
+	Pad._452_4_ = 1;
 }
 
 /*

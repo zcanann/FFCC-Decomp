@@ -2,6 +2,7 @@
 #define _FFCC_CFLAT_RUNTIME2_H_
 
 #include "ffcc/cflat_runtime.h"
+#include "ffcc/memory.h"
 #include "ffcc/p_chara.h"
 
 #include <dolphin/gx.h>
@@ -24,8 +25,8 @@ class CFlatRuntime2
 	CFlatRuntime2();
 	~CFlatRuntime2();
 
-	void getStage();
-	void getDebugStage();
+	CMemory::CStage* getStage();
+	CMemory::CStage* getDebugStage();
 
 	void onNewObject(CFlatRuntime::CObject*);
 	void onDeleteObject(CFlatRuntime::CObject*);

@@ -117,7 +117,7 @@ public:
     void LoadInit();
     void LoadFinished();
     void GetBossArtifact(int, int);
-    void GetFoodLevel(int, int);
+    int GetFoodLevel(int, int);
     void GetTargetCursor(int, Vec&, Vec&);
     void GetParticleSpecialInfo(PPPIFPARAM&, int&, int&);
     CGPartyObj* GetPartyObj(int);

@@ -97,10 +97,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
             direction.x = FLOAT_80330e18;
             direction.z = FLOAT_80330e1c;
         } else {
-            // Simplified direction calculation
-            direction.x = pppMngSt->m_position.x;
-            direction.y = pppMngSt->m_position.y;
-            direction.z = pppMngSt->m_position.z;
+            PSVECSubtract((Vec*)((u8*)pppMngSt + 0x68), (Vec*)((u8*)pppMngSt + 0x58), &direction);
         }
         
         // Normalize the direction vector
@@ -130,15 +127,18 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
             pppAddVector(newPosition, offset, basePos);
         } else {
             Vec basePos;
-            basePos.x = pppMngSt->m_position.x;
-            basePos.y = pppMngSt->m_position.y;
-            basePos.z = pppMngSt->m_position.z;
+            basePos.x = *(f32*)((u8*)pppMngSt + 0x58);
+            basePos.y = *(f32*)((u8*)pppMngSt + 0x5c);
+            basePos.z = *(f32*)((u8*)pppMngSt + 0x60);
             Vec offset;
             offset.x = horizontalX;
             offset.y = verticalY;
             offset.z = horizontalZ;
             pppAddVector(newPosition, offset, basePos);
         }
+
+        pppCopyVector(*(Vec*)((u8*)pppMngSt + 0x48), *(Vec*)((u8*)pppMngSt + 0x8));
+        pppCopyVector(*(Vec*)((u8*)pppMngSt + 0x8), newPosition);
         
         // Update matrix with new position
         pppMngStPtr->m_matrix.value[0][3] = newPosition.x;

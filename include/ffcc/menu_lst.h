@@ -8,7 +8,7 @@ public:
     void MLstInit1();
     void MLstOpen();
     void MLstCtrl();
-    int MLstClose();
+    void MLstClose();
     void MLstDraw();
     void MLstCtrlCur();
 };

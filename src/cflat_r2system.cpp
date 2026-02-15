@@ -33,6 +33,7 @@ struct CMapCylinderRaw
 extern "C" {
 int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned long);
 void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
+int GetWait__4CMesFv(void*);
 }
 
 /*
@@ -566,9 +567,9 @@ extern "C" void Close__Q25CFile7CHandleFv(CFile::CHandle* fileHandle)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void* GetBuffer__5CFileFv(CFile* file)
+void* CFile::GetBuffer()
 {
-    return file->m_readBuffer;
+    return m_readBuffer;
 }
 
 /*
@@ -580,9 +581,9 @@ extern "C" void* GetBuffer__5CFileFv(CFile* file)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void SyncCompleted__Q25CFile7CHandleFv(CFile::CHandle* fileHandle)
+void CFile::CHandle::SyncCompleted()
 {
-    File.SyncCompleted(fileHandle);
+    File.SyncCompleted(this);
 }
 
 /*
@@ -594,9 +595,95 @@ extern "C" void SyncCompleted__Q25CFile7CHandleFv(CFile::CHandle* fileHandle)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void Read__Q25CFile7CHandleFv(CFile::CHandle* fileHandle)
+void CFile::CHandle::Read()
 {
-    File.Read(fileHandle);
+    File.Read(this);
+}
+
+extern "C" int GetWait__4CMesFv(void*);
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9478
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void ReqScreenCapture__11CGraphicPcsFv(void* graphicPcs)
+{
+    *(int*)((char*)graphicPcs + 0xBC) = 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9484
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" int IsUse__8CMesMenuFv(void* mesMenu)
+{
+    if (*(int*)((char*)mesMenu + 8) != 0 && *(int*)((char*)mesMenu + 0xC) < 2 &&
+        GetWait__4CMesFv((char*)mesMenu + 0x1C) != 4) {
+        return 1;
+    }
+
+    return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B94DC
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" int GetErrorLevel__7CSystemFv(void* system)
+{
+    int index = *(int*)((char*)system + 0x125C);
+    return *(int*)((char*)system + index * 4 + 0x3CDC);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9478
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void ReqScreenCapture__11CGraphicPcsFv(void* graphicPcs)
+{
+    *(int*)((char*)graphicPcs + 0xBC) = 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9484
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" int IsUse__8CMesMenuFv(void* mesMenu)
+{
+    int result = 0;
+    int wait;
+
+    if ((*(int*)((char*)mesMenu + 0x8) != 0) && (*(int*)((char*)mesMenu + 0xC) < 2) &&
+        ((wait = GetWait__4CMesFv((char*)mesMenu + 0x1C)), wait != 4)) {
+        result = 1;
+    }
+
+    return result;
 }
 
 /*

@@ -3,6 +3,7 @@
 #include "ffcc/map.h"
 #include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
+#include "ffcc/graphic.h"
 
 #include <string.h>
 
@@ -17,11 +18,15 @@ extern f32 FLOAT_80333454;
 extern f32 FLOAT_80333458;
 extern f32 FLOAT_8033345c;
 extern f32 FLOAT_8033342c;
+extern f32 FLOAT_80333430;
 extern f64 DOUBLE_80333440;
+extern f64 DOUBLE_80333438;
 extern s32 DAT_8032ed70;
 extern void* DAT_8032ec70;
+extern u32 CFlatFlags;
 extern CMapMng MapMng;
 extern Mtx ppvCameraMatrix0;
+extern CGraphic Graphic;
 
 extern "C" {
 f32 RandF__5CMathFf(f32, CMath*);
@@ -44,9 +49,11 @@ int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
 void pppSetBlendMode__FUc(u8);
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
 void SetVtxFmt_POS_CLR_TEX__5CUtilFv(void*);
+void SetVtxFmt_POS_CLR__5CUtilFv(void*);
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
+void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 void _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
     int, int, int, int, int);
 void _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(
@@ -56,6 +63,9 @@ void _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevA
 void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(
     int, int, int, int, int, int);
 void pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*, pppFMATRIX*);
+void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
+void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, u8);
+void pppInitBlendMode__Fv(void);
 }
 
 static char s_pppLaser_cpp[] = "pppLaser.cpp";
@@ -342,16 +352,32 @@ void pppRenderLaser(struct pppLaser *pppLaser, struct UnkB *param_2, struct UnkC
 {
     LaserStep* step = (LaserStep*)param_2;
     _pppPObject* baseObj = (_pppPObject*)pppLaser;
+    Vec* points;
     int colorOffset = param_3->offsets->m_serializedDataOffsets[1];
     float* work = (float*)((u8*)&pppLaser->field_0x88 + param_3->offsets->m_serializedDataOffsets[2]);
+    u32 count;
+    u32 i;
     u32 color;
+    u32 colorBase;
+    u32 color0;
+    u32 color1;
+    u8 alpha0;
+    u8 alphaStep;
+    u8 alphaMax;
     float halfWidth;
     float length;
+    float u0;
+    float u1;
+    float uvStep;
     pppFMATRIX localMtx;
     pppFMATRIX worldMtx;
     pppFMATRIX viewMtx;
     pppFMATRIX modelView;
     pppFMATRIX mtxOut;
+    pppFMATRIX shapeMtx;
+    Mtx tempMtx;
+    Vec shapePos;
+    _GXColor debugColor;
     int tex;
 
     if (step->m_dataValIndex == 0xFFFF) {
@@ -418,4 +444,150 @@ void pppRenderLaser(struct pppLaser *pppLaser, struct UnkB *param_2, struct UnkC
     GXPosition3f32(0.0f, halfWidth, length);
     GXColor1u32(color);
     GXTexCoord2f32(FLOAT_8033342c, work[0]);
+
+    if (step->m_stepValue != 0) {
+        long* shape = *(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)step->m_stepValue * 4);
+        pppUnitMatrix__FR10pppFMATRIX(&shapeMtx);
+        shapeMtx.value[0][0] = *(float*)(step->m_payload + 0x30) * pppMngStPtr->m_scale.x;
+        shapeMtx.value[1][1] = *(float*)(step->m_payload + 0x30) * pppMngStPtr->m_scale.y;
+        shapeMtx.value[2][2] = shapeMtx.value[0][0];
+        if (work[0xe] != FLOAT_80333428) {
+            PSMTXRotRad(tempMtx, 'z', work[0xe]);
+            PSMTXConcat(shapeMtx.value, tempMtx, shapeMtx.value);
+        }
+        PSMTXMultVec(ppvCameraMatrix0, (Vec*)(u32)work[7], &shapePos);
+        shapeMtx.value[0][3] = shapePos.x;
+        shapeMtx.value[1][3] = shapePos.y;
+        shapeMtx.value[2][3] = shapePos.z;
+        GXLoadPosMtxImm(shapeMtx.value, GX_PNMTX0);
+        pppDrawShp__FPlsP12CMaterialSetUc(shape, *(s16*)(work + 0xd), pppEnvStPtr->m_materialSetPtr, step->m_payload[0x1c]);
+
+        count = (u32)step->m_payload[0x1e];
+        if (count > 1) {
+            uvStep = FLOAT_8033342c / ((float)(double)count - (float)DOUBLE_80333438);
+            if (step->m_initWOrk == 0xFFFF) {
+                _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
+                _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+            } else {
+                tex = GetTextureFromRSD__FiP9_pppEnvSt(step->m_initWOrk, pppEnvStPtr);
+                _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 0);
+                GXLoadTexObj((GXTexObj*)(tex + 0x28), GX_TEXMAP0);
+            }
+
+            GXLoadPosMtxImm(ppvCameraMatrix0, GX_PNMTX0);
+            alphaMax = step->m_payload[0x2b];
+            alphaStep = (u8)((u32)alphaMax / count);
+            colorBase = *(u32*)(step->m_payload + 0x28) & 0xFFFFFF00;
+            points = (Vec*)(u32)work[7];
+
+            GXBegin(GX_TRIANGLES, GX_VTXFMT7, (u16)((count - 1) * 3));
+            for (i = 0; i < count - 1; i++) {
+                alpha0 = (u8)(alphaMax - (u8)(alphaStep * i));
+                color0 = colorBase | alpha0;
+                color1 = colorBase | (u8)(alphaMax - (u8)(alphaStep * (i + 1)));
+                u0 = (float)i * uvStep;
+                u1 = (float)(i + 1) * uvStep;
+
+                GXPosition3f32(work[8], work[9], work[10]);
+                GXColor1u32(color0);
+                GXTexCoord2f32(u0, FLOAT_8033342c);
+
+                GXPosition3f32(points[i].x, points[i].y, points[i].z);
+                GXColor1u32(color0);
+                GXTexCoord2f32(u0, FLOAT_80333428);
+
+                GXPosition3f32(points[i + 1].x, points[i + 1].y, points[i + 1].z);
+                GXColor1u32(color1);
+                GXTexCoord2f32(u1, FLOAT_80333428);
+            }
+        }
+
+        if ((CFlatFlags & 0x200000) != 0) {
+            SetVtxFmt_POS_CLR__5CUtilFv(&DAT_8032ec70);
+            _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
+            _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+            GXSetNumTexGens(0);
+            pppSetBlendMode__FUc(1);
+
+            debugColor.r = 0x80;
+            debugColor.g = 0xFF;
+            debugColor.b = 0x80;
+            debugColor.a = 0xFF;
+            GXSetChanAmbColor(GX_COLOR0A0, debugColor);
+            GXSetPointSize(0x28, GX_TO_ZERO);
+            GXBegin(GX_POINTS, GX_VTXFMT7, (u16)(count - 1));
+            for (i = 0; i < count - 1; i++) {
+                GXPosition3f32(points[i].x, points[i].y, points[i].z);
+                GXColor1u32(*(u32*)&debugColor);
+            }
+
+            debugColor.r = 0x80;
+            debugColor.g = 0x80;
+            debugColor.b = 0xFF;
+            debugColor.a = 0xFF;
+            GXSetChanAmbColor(GX_COLOR0A0, debugColor);
+            GXSetLineWidth(0x14, GX_TO_ZERO);
+            GXBegin(GX_LINES, GX_VTXFMT7, (u16)((count - 1) * 4));
+            for (i = 0; i < count - 1; i++) {
+                GXPosition3f32(points[i].x, points[i].y, points[i].z);
+                GXColor1u32(*(u32*)&debugColor);
+                GXPosition3f32(points[i + 1].x, points[i + 1].y, points[i + 1].z);
+                GXColor1u32(*(u32*)&debugColor);
+                GXPosition3f32(points[i].x, points[i].y, points[i].z);
+                GXColor1u32(*(u32*)&debugColor);
+                GXPosition3f32(work[8], work[9], work[10]);
+                GXColor1u32(*(u32*)&debugColor);
+            }
+
+            GXSetLineWidth(8, GX_TO_ZERO);
+            GXSetPointSize(8, GX_TO_ZERO);
+            GXSetZMode(1, GX_LEQUAL, 0);
+
+            PSMTXIdentity(tempMtx);
+            tempMtx[0][0] = *(float*)((u8*)pppMngStPtr + 0x64) * *(float*)(step->m_payload + 0x24);
+            tempMtx[1][1] = tempMtx[0][0];
+            tempMtx[2][2] = PSVECDistance((Vec*)(u32)work[7], (Vec*)(work + 8));
+            PSMTXConcat(baseObj->m_localMatrix.value, tempMtx, tempMtx);
+            PSMTXConcat(pppMngStPtr->m_matrix.value, tempMtx, tempMtx);
+            PSMTXConcat(ppvCameraMatrix0, tempMtx, tempMtx);
+            shapePos.x = FLOAT_80333428;
+            shapePos.y = FLOAT_80333428;
+            shapePos.z = FLOAT_8033342c;
+            PSMTXMultVec(tempMtx, &shapePos, &shapePos);
+            tempMtx[0][3] = shapePos.x;
+            tempMtx[1][3] = shapePos.y;
+            tempMtx[2][3] = shapePos.z;
+            debugColor.r = 0xFF;
+            debugColor.g = 0xFF;
+            debugColor.b = 0xFF;
+            debugColor.a = 0xFF;
+            Graphic.DrawSphere(tempMtx, debugColor);
+
+            for (i = 0; i < count; i++) {
+                if ((points[i].x == FLOAT_80333428) && (points[i].y == FLOAT_80333428) && (points[i].z == FLOAT_80333428)) {
+                    continue;
+                }
+                PSMTXIdentity(tempMtx);
+                tempMtx[0][0] = FLOAT_80333430;
+                tempMtx[1][1] = FLOAT_80333430;
+                tempMtx[2][2] = FLOAT_80333430;
+                tempMtx[0][3] = points[i].x;
+                tempMtx[1][3] = points[i].y;
+                tempMtx[2][3] = points[i].z;
+                PSMTXConcat(ppvCameraMatrix0, tempMtx, tempMtx);
+                Graphic.DrawSphere(tempMtx, debugColor);
+            }
+
+            PSMTXIdentity(tempMtx);
+            tempMtx[0][0] = FLOAT_80333430;
+            tempMtx[1][1] = FLOAT_80333430;
+            tempMtx[2][2] = FLOAT_80333430;
+            tempMtx[0][3] = work[8];
+            tempMtx[1][3] = work[9];
+            tempMtx[2][3] = work[10];
+            PSMTXConcat(ppvCameraMatrix0, tempMtx, tempMtx);
+            Graphic.DrawSphere(tempMtx, debugColor);
+            pppInitBlendMode__Fv();
+        }
+    }
 }

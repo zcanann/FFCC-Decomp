@@ -7,6 +7,8 @@ extern float lbl_8032F970;
 static unsigned long s_clearFlagMask;
 static CBound s_bound;
 static CMapCylinder s_cyl;
+static Vec s_mvec;
+static unsigned long s_checkHitCylinderMask;
 
 extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
@@ -319,22 +321,121 @@ void COctTree::ClearFlag(unsigned long flag)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002cef0
+ * PAL Size: 1004b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int COctTree::CheckHitCylinder_r(COctNode*)
+int COctTree::CheckHitCylinder_r(COctNode* node)
 {
-	// TODO
+	float* bounds = (float*)node;
+	CMapHit* mapHit;
+	unsigned short meshStart;
+	unsigned short meshEnd;
+
+	if ((s_cyl.m_top.z > bounds[3]) || (bounds[0] > s_cyl.m_direction2.z)) {
+		return 0;
+	}
+	if ((s_cyl.m_direction2.x > bounds[4]) || (bounds[1] > s_cyl.m_radius2)) {
+		return 0;
+	}
+	if ((s_cyl.m_direction2.y > bounds[5]) || (bounds[2] > s_cyl.m_height2)) {
+		return 0;
+	}
+
+	if (*(void**)((unsigned char*)this + 0x8) == 0) {
+		return 0;
+	}
+
+	mapHit = *(CMapHit**)(*(unsigned char**)((unsigned char*)this + 0x8) + 0xc);
+	if (mapHit == 0) {
+		return 0;
+	}
+
+	meshStart = *(unsigned short*)((unsigned char*)node + 0x3c);
+	meshEnd = *(unsigned short*)((unsigned char*)node + 0x3e);
+	if ((meshEnd != 0) &&
+		(mapHit->CheckHitCylinder(&s_cyl, &s_mvec, meshStart, meshEnd, s_checkHitCylinderMask) != 0)) {
+		return 1;
+	}
+
+	COctNode** children = (COctNode**)((unsigned char*)node + 0x1c);
+	for (int i = 0; i < 8; i++) {
+		COctNode* child = children[i];
+		if (child == 0) {
+			return 0;
+		}
+		if (CheckHitCylinder_r(child) != 0) {
+			return 1;
+		}
+	}
+
+	return 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002cd38
+ * PAL Size: 440b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int COctTree::CheckHitCylinder(CMapCylinder*, Vec*, unsigned long)
+int COctTree::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long flag)
 {
-	// TODO
+	float minValue;
+	float maxValue;
+	float margin;
+	Mtx inverseMtx;
+	unsigned char* thisBytes = (unsigned char*)this;
+	unsigned char* mapData = *(unsigned char**)(thisBytes + 0x8);
+
+	if ((*thisBytes != 2) || (mapData == 0) || (*(CMapHit**)(mapData + 0xc) == 0)) {
+		return 0;
+	}
+
+	PSMTXInverse((MtxPtr)(mapData + 0xb8), inverseMtx);
+	PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &s_cyl.m_bottom);
+	PSMTXMultVec(inverseMtx, &cylinder->m_direction, &s_cyl.m_direction);
+	PSMTXMultVecSR(inverseMtx, (Vec*)&cylinder->m_radius, (Vec*)&s_cyl.m_radius);
+	PSMTXMultVecSR(inverseMtx, move, &s_mvec);
+
+	s_cyl.m_top.y = cylinder->m_top.y;
+	margin = s_cyl.m_top.y;
+
+	minValue = s_cyl.m_direction.x;
+	maxValue = s_cyl.m_bottom.x;
+	if (maxValue < minValue) {
+		minValue = s_cyl.m_bottom.x;
+		maxValue = s_cyl.m_direction.x;
+	}
+	s_cyl.m_direction2.z = maxValue + margin;
+	s_cyl.m_top.z = minValue - margin;
+
+	minValue = s_cyl.m_direction.y;
+	maxValue = s_cyl.m_bottom.y;
+	if (maxValue < minValue) {
+		minValue = s_cyl.m_bottom.y;
+		maxValue = s_cyl.m_direction.y;
+	}
+	s_cyl.m_radius2 = maxValue + margin;
+	s_cyl.m_direction2.x = minValue - margin;
+
+	minValue = s_cyl.m_direction.z;
+	maxValue = s_cyl.m_bottom.z;
+	if (maxValue < minValue) {
+		minValue = s_cyl.m_bottom.z;
+		maxValue = s_cyl.m_direction.z;
+	}
+	s_cyl.m_height2 = maxValue + margin;
+	s_cyl.m_direction2.y = minValue - margin;
+
+	s_checkHitCylinderMask = flag;
+
+	return CheckHitCylinder_r(*(COctNode**)(thisBytes + 0x4));
 }
 
 /*

@@ -8,7 +8,7 @@ struct RedWaveHeadWD;
 void _EraseAttribute(int, int);
 int _EraseTime(int);
 void SearchSeEmptyTrack(int, int, int);
-void SeStopID(int);
+int SeStopID(int);
 void SeStopMG(int, int, int, int);
 void _SePlayStart(RedSeINFO*, int, int, int, int);
 void SeBlockPlay(int, int, int, int, int);

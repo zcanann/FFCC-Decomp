@@ -44,7 +44,7 @@ extern "C" void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, u
  * JP Address: TODO
  * JP Size: TODO
  */
-void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* pYmMiasma, _PARTICLE_DATA* particleData)
+void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
 {
     u8* vData = (u8*)vYmMiasma;
     u8* ymData = (u8*)pYmMiasma;
@@ -136,38 +136,38 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
  * Address:	80090e3c
  * Size:	1016b
  */
-void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PYmMiasma* pYmMiasma, _PARTICLE_DATA* particleData)
+void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
 {
-    float deltaTime;
-    Vec velocity;
-    
-    if (!particleData || !pYmMiasma) return;
-    
-    // Age the particle
-    particleData->m_age++;
-    
-    // Early exit if particle is dead
-    if (particleData->m_age >= particleData->m_lifeTime) {
+    u8* particle;
+    s32 lifeTime;
+    s32 age;
+    float lifeFactor;
+
+    (void)pppPObject;
+    (void)pppCtrlTable;
+
+    if (particleData == NULL || pYmMiasma == NULL) {
         return;
     }
-    
-    // Apply velocity to position
-    deltaTime = 1.0f; // Frame time
-    velocity.x = particleData->m_matrix[1][0] * deltaTime;
-    velocity.y = particleData->m_matrix[1][1] * deltaTime;
-    velocity.z = particleData->m_matrix[1][2] * deltaTime;
-    
-    // Update position matrix
-    particleData->m_matrix[0][3] += velocity.x;
-    particleData->m_matrix[1][3] += velocity.y;  
-    particleData->m_matrix[2][3] += velocity.z;
-    
-    // Apply gravity or other forces
-    particleData->m_velocity.y -= 0.01f; // Gravity
-    
-    // Update size over lifetime
-    float lifeFactor = (float)particleData->m_age / (float)particleData->m_lifeTime;
-    particleData->m_sizeVal = particleData->m_sizeStart * (1.0f - lifeFactor) + particleData->m_sizeEnd * lifeFactor;
+
+    particle = (u8*)particleData;
+
+    age = *(s32*)(particle + 0x68) + 1;
+    *(s32*)(particle + 0x68) = age;
+    lifeTime = *(s32*)(particle + 0x64);
+    if (age >= lifeTime) {
+        return;
+    }
+
+    *(float*)(particle + 0x0C) += *(float*)(particle + 0x10);
+    *(float*)(particle + 0x1C) += *(float*)(particle + 0x14);
+    *(float*)(particle + 0x2C) += *(float*)(particle + 0x18);
+
+    *(float*)(particle + 0x34) -= 0.01f;
+
+    lifeFactor = (float)age / (float)lifeTime;
+    *(float*)(particle + 0x60) =
+        *(float*)(particle + 0x58) * (1.0f - lifeFactor) + *(float*)(particle + 0x5C) * lifeFactor;
 }
 
 /*
@@ -175,7 +175,7 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
  * Address:	TODO
  * Size:	TODO
  */
-void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, _PARTICLE_DATA* particleData)
+void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
 {
     // Basic rendering setup
     if (!particleData) return;
@@ -283,7 +283,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, UnkB* param_2, UnkC* param_3)
             (unsigned long)count * 0x50, pppEnvStPtr->m_stagePtr, sPppYmMiasmaCpp, 0x18d);
         particle = (u8*)(u32) * (u32*)workBytes;
         for (i = 0; i < count; i++) {
-            InitParticleData((VYmMiasma*)workBytes, (_pppPObject*)pppYmMiasma_, (PYmMiasma*)step, (_PARTICLE_DATA*)particle);
+            InitParticleData((VYmMiasma*)workBytes, (_pppPObject*)pppYmMiasma_, (PYmMiasma*)step, (PARTICLE_DATA*)particle);
             particle += 0x50;
         }
     }
@@ -322,7 +322,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, UnkB* param_2, UnkC* param_3)
 
     particle = (u8*)(u32) * (u32*)workBytes;
     for (i = 0; i < count; i++) {
-        UpdateParticleData((_pppPObject*)pppYmMiasma_, (_pppCtrlTable*)param_3, (PYmMiasma*)step, (_PARTICLE_DATA*)particle);
+        UpdateParticleData((_pppPObject*)pppYmMiasma_, (_pppCtrlTable*)param_3, (PYmMiasma*)step, (PARTICLE_DATA*)particle);
         particle += 0x50;
     }
 

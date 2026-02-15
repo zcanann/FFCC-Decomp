@@ -6,11 +6,12 @@ class CMenuPcs
 public:
     void ItemInit();
     void ItemInit1();
-    bool ItemOpen();
-    void ItemCtrl();
+    void ItemOpen();
+    int ItemCtrl();
     void ItemClose();
     void ItemDraw();
-    void ItemCtrlCur();
+    int ItemCtrlCur();
+    void SingLifeInit(int);
 };
 
 #endif // _FFCC_MENU_ITEM_H_

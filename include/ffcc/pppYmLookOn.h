@@ -6,14 +6,16 @@ extern "C" {
 #endif
 
 struct pppYmLookOn {
-    int field0_0x0[2]; // Placeholder structure based on Ghidra access patterns
+    int field0_0x0[2];
 };
 
 struct UnkB {
-    int m_dataValIndex;
+    int m_graphId;
+    float m_dataValIndex;
 };
 
 struct UnkC {
+    unsigned char pad[0x0C];
     int* m_serializedDataOffsets;
 };
 

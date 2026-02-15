@@ -378,12 +378,39 @@ CMapAnimKeyDt::CMapAnimKeyDt()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004ad98
+ * PAL Size: 148b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CMapAnimKeyDt::~CMapAnimKeyDt()
 {
-	// TODO
+    struct CMapAnimKeyDtData
+    {
+        unsigned int positionCount;
+        CMapAnimNodeTrackKey* position;
+        unsigned int rotationCount;
+        CMapAnimNodeTrackKey* rotation;
+        unsigned int scaleCount;
+        CMapAnimNodeTrackKey* scale;
+    };
+
+    CMapAnimKeyDtData* keyData = reinterpret_cast<CMapAnimKeyDtData*>(this);
+
+    if (keyData->position != 0) {
+        __dla__FPv(keyData->position);
+        keyData->position = 0;
+    }
+    if (keyData->rotation != 0) {
+        __dla__FPv(keyData->rotation);
+        keyData->rotation = 0;
+    }
+    if (keyData->scale != 0) {
+        __dla__FPv(keyData->scale);
+        keyData->scale = 0;
+    }
 }
 
 /*

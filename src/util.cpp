@@ -264,11 +264,9 @@ void CUtil::ConvI2FVector(Vec& out, S16Vec in, long shift)
  */
 void CUtil::ConvF2IVector(S16Vec& out, Vec in, long shift)
 {
-	float scale = (float)(1 << shift);
-
-	out.x = (short)(in.x * scale);
-	out.y = (short)(in.y * scale);
-	out.z = (short)(in.z * scale);
+	out.x = (short)(int)(in.x * (float)(1 << shift));
+	out.y = (short)(int)(in.y * (float)(1 << shift));
+	out.z = (short)(int)(in.z * (float)(1 << shift));
 }
 
 /*
@@ -282,10 +280,8 @@ void CUtil::ConvF2IVector(S16Vec& out, Vec in, long shift)
  */
 void CUtil::ConvF2IVector2d(S16Vec2d& out, Vec2d in, long shift)
 {
-	float scale = (float)(1 << shift);
-
-	out.x = (short)(in.x * scale);
-	out.y = (short)(in.y * scale);
+	out.x = (short)(int)(in.x * (float)(1 << shift));
+	out.y = (short)(int)(in.y * (float)(1 << shift));
 }
 
 /*

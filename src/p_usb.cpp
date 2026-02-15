@@ -80,16 +80,13 @@ void* CUSBPcs::GetTable(unsigned long param)
  */
 void CUSBPcs::IsBigAlloc(int param_2)
 {
-    if (param_2 != 0) {
-        if (m_bigStage == (CMemory::CStage*)nullptr) {
-            m_bigStage = Memory.CreateStage(0x100000, "CUSBPcs", 0);
+    if ((param_2 == 0) || (m_bigStage != (CMemory::CStage*)nullptr)) {
+        if ((param_2 == 0) && (m_bigStage != (CMemory::CStage*)nullptr)) {
+            Memory.DestroyStage(m_bigStage);
+            m_bigStage = (CMemory::CStage*)nullptr;
         }
-        return;
-    }
-
-    if (m_bigStage != (CMemory::CStage*)nullptr) {
-        Memory.DestroyStage(m_bigStage);
-        m_bigStage = (CMemory::CStage*)nullptr;
+    } else {
+        m_bigStage = Memory.CreateStage(0x100000, "CUSBPcs", 0);
     }
 }
 

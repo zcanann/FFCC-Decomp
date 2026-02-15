@@ -248,7 +248,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
 void pppConstructEmission(pppEmission* pppEmission_, UnkC* param_2) {
     float baseScale = FLOAT_803311f8;
     int offset = param_2->m_serializedDataOffsets[2];
-    int* state = (int*)((u8*)pppEmission_ + 8 + offset);
+    int* state = (int*)((u8*)pppEmission_ + 0x80 + offset);
 
     state[1] = 0;
     *(u8*)(state + 2) = 0x80;
@@ -296,7 +296,7 @@ void pppConstruct2Emission(pppEmission* pppEmission_, UnkC* param_2) {
  * JP Size: TODO
  */
 void pppDestructEmission(pppEmission* pppEmission_, UnkC* param_2) {
-    int* state = (int*)((u8*)pppEmission_ + 8 + param_2->m_serializedDataOffsets[2]);
+    int* state = (int*)((u8*)pppEmission_ + 0x80 + param_2->m_serializedDataOffsets[2]);
     void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
 
@@ -331,7 +331,7 @@ void pppFrameEmission(pppEmission* pppEmission_, UnkB* param_2, UnkC* param_3) {
     }
 
     int dataSet = param_3->m_serializedDataOffsets[1];
-    int* state = (int*)((u8*)pppEmission_ + 8 + param_3->m_serializedDataOffsets[2]);
+    int* state = (int*)((u8*)pppEmission_ + 0x80 + param_3->m_serializedDataOffsets[2]);
 
     void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);

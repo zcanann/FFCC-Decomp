@@ -325,7 +325,7 @@ LAB_801adc44:
 	}
 }
 
-void TRK__read_aram(register u32 param_1, register u32 param_2, u32* param_3)
+void TRK__read_aram(u32 param_1, u32 param_2, u32* param_3)
 {
 	u32 uVar1;
 	u32 uVar2;

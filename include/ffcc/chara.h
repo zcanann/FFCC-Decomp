@@ -157,6 +157,7 @@ class CChara
     void ResetAmem(int);
     void TimeMogFur();
     void CalcMogScore();
+    void ChangeMogMode(int);
 };
 
 #endif // _FFCC_CHARA_H_

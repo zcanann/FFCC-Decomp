@@ -155,6 +155,7 @@ asm void InitMetroTRK_BBA(void)
 	blr
 initCommTableSuccessBBA:
 	b TRK_main
+	blr
 #endif // clang-format on
 }
 

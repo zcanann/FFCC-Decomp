@@ -85,10 +85,10 @@ u32 __OSIsDebuggerPresent(void) {
 }
 
 /* clang-format off */
-#ifdef __GEKKO__
 asm void __OSFPRInit(void) {
     // clang-format off
     nofralloc
+entry __OSFPRInit
 
     mfmsr r3
     ori r3, r3, 0x2000
@@ -171,7 +171,6 @@ skip_ps_init:
     blr
     // clang-format on
 }
-#endif
 
 static void DisableWriteGatherPipe(void) {
     u32 hid2;
@@ -470,9 +469,9 @@ static void OSExceptionInit(void) {
     DBPrintf("Exceptions initialized...\n");
 }
 
-#ifdef __GEKKO__
-static asm void __OSDBIntegrator(void) {
+asm void __OSDBIntegrator(void) {
     nofralloc
+entry __OSDBIntegrator
 entry __OSDBINTSTART
     li      r5, OS_DBINTERFACE_ADDR
     mflr    r3
@@ -485,16 +484,14 @@ entry __OSDBINTSTART
     blr
 entry __OSDBINTEND
 }
-#endif
 
-#ifdef __GEKKO__
-static asm void __OSDBJump(void) {
+asm void __OSDBJump(void) {
     nofralloc
+entry __OSDBJump
 entry __OSDBJUMPSTART
     bla     OS_DBJUMPPOINT_ADDR
 entry __OSDBJUMPEND
 }
-#endif
 
 __OSExceptionHandler __OSSetExceptionHandler(__OSException exception, __OSExceptionHandler handler) {
     __OSExceptionHandler oldHandler;
@@ -635,5 +632,9 @@ u32 __OSGetDIConfig(void) {
 }
 
 void OSRegisterVersion(const char* id) {
-    OSReport(id);
+    (void)id;
+    asm {
+        crclr 6
+    }
+    OSReport(__OSVersion);
 }

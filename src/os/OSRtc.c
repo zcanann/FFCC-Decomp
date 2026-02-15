@@ -186,13 +186,6 @@ static int UnlockSram(int commit, u32 offset) {
             Scb.offset = offset;
         }
 
-        if (Scb.offset <= 0x14) {
-            OSSramEx* sram = (OSSramEx*)(Scb.sram + sizeof(OSSram));
-            if (((u32)sram->gbs & 0x7c00) == 0x5000 || ((u32)sram->gbs & 0xc0) == 0xc0) {
-                sram->gbs = 0;
-            }
-        }
-
         Scb.sync = WriteSram(&Scb.sram[Scb.offset], Scb.offset, SRAM_SIZE - Scb.offset);
         if (Scb.sync != 0) {
             Scb.offset = SRAM_SIZE;
@@ -285,7 +278,7 @@ int __OSReadROMAsync(void* buffer, s32 length, s32 offset, void (*callback)()) {
     return !err;
 }
 
-void OSGetSoundMode(u32 mode) {
+void OSSetSoundMode(u32 mode) {
     OSSram* sram;
 
     ASSERTLINE(617, mode == OS_SOUND_MODE_MONO || mode == OS_SOUND_MODE_STEREO);
@@ -300,7 +293,7 @@ void OSGetSoundMode(u32 mode) {
     __OSUnlockSram(TRUE);
 }
 
-u32 OSSetSoundMode(void) {
+u32 OSGetSoundMode(void) {
     OSSram* sram;
     u32 mode;
 
@@ -310,7 +303,7 @@ u32 OSSetSoundMode(void) {
     return mode;
 }
 
-void OSGetProgressiveMode(u32 on) {
+void OSSetProgressiveMode(u32 on) {
     OSSram* sram;
 
     ASSERTLINE(670, on == OS_PROGRESSIVE_MODE_OFF || on == OS_PROGRESSIVE_MODE_ON);
@@ -328,7 +321,7 @@ void OSGetProgressiveMode(u32 on) {
     __OSUnlockSram(TRUE);
 }
 
-u32 OSSetProgressiveMode(void) {
+u32 OSGetProgressiveMode(void) {
     OSSram* sram;
     u32 on;
 

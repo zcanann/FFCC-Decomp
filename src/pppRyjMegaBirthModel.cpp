@@ -1,4 +1,9 @@
 #include "ffcc/pppRyjMegaBirthModel.h"
+#include <string.h>
+
+extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
+extern float FLOAT_80330498;
+extern float FLOAT_8033049c;
 
 /*
  * --INFO--
@@ -125,20 +130,59 @@ void set_matrix(_pppPObject*, pppFMATRIX, pppFMATRIX, PRyjMegaBirthModel*, _PART
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80084260
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppRyjMegaBirthModelCon(void)
+void pppRyjMegaBirthModelCon(_pppPObject* pObject, PRyjMegaBirthModelOffsets* offsets)
 {
-	// TODO
+    u8* work = (u8*)pObject + 0x80 + offsets->m_serializedDataOffsets[2];
+    float value0 = FLOAT_80330498;
+    float value1 = FLOAT_8033049c;
+
+    memset(work, 0, 0xC);
+    *(void**)(work + 0xC) = 0;
+    *(void**)(work + 0x10) = 0;
+    *(void**)(work + 0x14) = 0;
+    *(void**)(work + 0x18) = 0;
+    *(u16*)(work + 0x1C) = 10000;
+    *(u16*)(work + 0x1E) = 0;
+    *(float*)(work + 0x20) = value0;
+    *(float*)(work + 0x24) = value1;
+    *(float*)(work + 0x28) = value0;
+    *(float*)(work + 0x2C) = value0;
+    *(float*)(work + 0x30) = value1;
+    *(float*)(work + 0x34) = value0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800841e4
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppRyjMegaBirthModelDes(void)
+void pppRyjMegaBirthModelDes(_pppPObject* pObject, PRyjMegaBirthModelOffsets* offsets)
 {
-	// TODO
+    u8* work = (u8*)pObject + 0x80 + offsets->m_serializedDataOffsets[2];
+
+    if (*(void**)(work + 0xC) != 0) {
+        pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(work + 0xC));
+        *(void**)(work + 0xC) = 0;
+    }
+
+    if (*(void**)(work + 0x10) != 0) {
+        pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(work + 0x10));
+        *(void**)(work + 0x10) = 0;
+    }
+
+    if (*(void**)(work + 0x14) != 0) {
+        pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(work + 0x14));
+        *(void**)(work + 0x14) = 0;
+    }
 }

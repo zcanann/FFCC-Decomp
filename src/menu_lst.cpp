@@ -299,7 +299,7 @@ void CMenuPcs::MLstCtrl()
  * JP Address: TODO  
  * JP Size: TODO
  */
-int CMenuPcs::MLstClose()
+void CMenuPcs::MLstClose()
 {
 	int completedItems;
 	int currentFrame;
@@ -386,7 +386,7 @@ int CMenuPcs::MLstClose()
 
 				itemCount = itemCount & 7;
 				if (itemCount == 0) {
-					return 1;
+					return;
 				}
 			}
 
@@ -401,10 +401,8 @@ int CMenuPcs::MLstClose()
 			} while (itemCount != 0);
 		}
 
-		return 1;
+		return;
 	}
-
-	return 0;
 }
 
 /*

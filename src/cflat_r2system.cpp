@@ -475,6 +475,48 @@ extern "C" void SetMapShadeColor__9CCharaPcsFi6CColor(void* charaPcs, int shadeI
 
 /*
  * --INFO--
+ * PAL Address: 0x800B93C0
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void SetNoFreeMergeMask__9CCharaPcsFi(void* charaPcs, int mask)
+{
+    *(int*)((char*)charaPcs + 0x718) = mask;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B93C8
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void ResetDefaultGroup__7CMemoryFv(void* memory)
+{
+    *(int*)((char*)memory + 0x779C) = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B93D4
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void SetDefaultGroup__7CMemoryFi(void* memory, int group)
+{
+    *(int*)((char*)memory + 0x779C) = group;
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

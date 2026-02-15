@@ -1,6 +1,8 @@
 #include "ffcc/materialman.h"
 #include "ffcc/textureman.h"
 
+#include <string.h>
+
 extern "C" unsigned long UnkMaterialSetGetter(void*);
 
 namespace {
@@ -539,6 +541,35 @@ void CMaterialSet::ReleaseTag(CTextureSet* textureSet, int pdtSlotIndex, CAmemCa
 void CMaterialSet::AddMaterial(CMaterial*, int)
 {
 	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003c690
+ * PAL Size: 140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+unsigned long CMaterialSet::Find(char* name)
+{
+    void* materials = Ptr(this, 8);
+    unsigned long index = 0;
+
+    while (index < UnkMaterialSetGetter(materials)) {
+        CMaterial** materialItems = *reinterpret_cast<CMaterial***>(Ptr(materials, 0xC));
+        if (materialItems != 0) {
+            CMaterial* material = materialItems[index];
+            if ((material != 0) && (strcmp(reinterpret_cast<char*>(Ptr(material, 8)), name) == 0)) {
+                return index;
+            }
+        }
+
+        index++;
+    }
+
+    return 0xFFFFFFFF;
 }
 
 /*

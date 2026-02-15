@@ -186,13 +186,6 @@ static int UnlockSram(int commit, u32 offset) {
             Scb.offset = offset;
         }
 
-        if (Scb.offset <= 0x14) {
-            OSSramEx* sram = (OSSramEx*)(Scb.sram + sizeof(OSSram));
-            if (((u32)sram->gbs & 0x7c00) == 0x5000 || ((u32)sram->gbs & 0xc0) == 0xc0) {
-                sram->gbs = 0;
-            }
-        }
-
         Scb.sync = WriteSram(&Scb.sram[Scb.offset], Scb.offset, SRAM_SIZE - Scb.offset);
         if (Scb.sync != 0) {
             Scb.offset = SRAM_SIZE;

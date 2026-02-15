@@ -24,8 +24,11 @@ void Quit__10CCameraPcsFv(void*);
 void createLoad__9CSoundPcsFv(void*);
 void createLoad__9CCharaPcsFv(void*);
 void createLoad__8CPartPcsFv(void*);
+void pppDeleteAll__8CPartMngFv(void*);
+void pppDestroyAll__8CPartMngFv(void*);
 void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 unsigned char CFlat[];
+unsigned char PartMng[];
 unsigned char McPcs[];
 unsigned char GbaPcs[];
 unsigned char MenuPcs[];
@@ -242,12 +245,17 @@ void CGame::ChangeMap(int mapId, int mapVariant, int param4, int param5)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80014e44
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::ScriptChanging(char*)
 {
-	// TODO
+	pppDeleteAll__8CPartMngFv(PartMng);
+	pppDestroyAll__8CPartMngFv(PartMng);
 }
 
 /*

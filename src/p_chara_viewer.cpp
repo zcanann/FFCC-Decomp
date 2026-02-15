@@ -42,21 +42,6 @@ extern "C" void* memset(void*, int, unsigned long);
 extern "C" char* strcpy(char*, const char*);
 extern "C" int sprintf(char*, const char*, ...);
 
-namespace {
-static void releaseRef(void** slot)
-{
-    int* ref = (int*)*slot;
-    if (ref != 0) {
-        int count = ref[1] - 1;
-        ref[1] = count;
-        if (count == 0) {
-            (*(void (**)(void*, int))(*(int*)ref + 8))(ref, 1);
-        }
-        *slot = 0;
-    }
-}
-} // namespace
-
 /*
  * --INFO--
  * PAL Address: 0x800BF094
@@ -206,27 +191,77 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
 extern "C" void destroyViewer__9CCharaPcsFv(void* param_1)
 {
     unsigned char* p = (unsigned char*)param_1;
+    int* ref;
+    int count;
     unsigned int i;
 
     Destroy__6CCharaFv(Chara);
     DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(LightPcs, 0);
     DAT_8032edc0 = 0;
 
-    releaseRef((void**)(p + 0x1A0));
+    ref = *(int**)(p + 0x1A0);
+    if (ref != 0) {
+        count = ref[1];
+        ref[1] = count - 1;
+        if ((count - 1 == 0) && (ref != 0)) {
+            (*(void (**)(void*, int))(*(int*)ref + 8))(ref, 1);
+        }
+        *(void**)(p + 0x1A0) = 0;
+    }
 
     i = 0;
     do {
-        releaseRef((void**)(p + 0x190 + i * 4));
-        releaseRef((void**)(p + 0x198 + i * 4));
-        releaseRef((void**)(p + 0x2B0 + i * 4));
+        ref = *(int**)(p + 0x190 + i * 4);
+        if (ref != 0) {
+            count = ref[1];
+            ref[1] = count - 1;
+            if ((count - 1 == 0) && (ref != 0)) {
+                (*(void (**)(void*, int))(*(int*)ref + 8))(ref, 1);
+            }
+            *(void**)(p + 0x190 + i * 4) = 0;
+        }
+        ref = *(int**)(p + 0x198 + i * 4);
+        if (ref != 0) {
+            count = ref[1];
+            ref[1] = count - 1;
+            if ((count - 1 == 0) && (ref != 0)) {
+                (*(void (**)(void*, int))(*(int*)ref + 8))(ref, 1);
+            }
+            *(void**)(p + 0x198 + i * 4) = 0;
+        }
+        ref = *(int**)(p + 0x2B0 + i * 4);
+        if (ref != 0) {
+            count = ref[1];
+            ref[1] = count - 1;
+            if ((count - 1 == 0) && (ref != 0)) {
+                (*(void (**)(void*, int))(*(int*)ref + 8))(ref, 1);
+            }
+            *(void**)(p + 0x2B0 + i * 4) = 0;
+        }
         i++;
     } while (i < 2);
 
-    releaseRef((void**)(p + 0x2B8));
+    ref = *(int**)(p + 0x2B8);
+    if (ref != 0) {
+        count = ref[1];
+        ref[1] = count - 1;
+        if ((count - 1 == 0) && (ref != 0)) {
+            (*(void (**)(void*, int))(*(int*)ref + 8))(ref, 1);
+        }
+        *(void**)(p + 0x2B8) = 0;
+    }
 
     i = 0;
     do {
-        releaseRef((void**)(p + 0x1B0 + i * 4));
+        ref = *(int**)(p + 0x1B0 + i * 4);
+        if (ref != 0) {
+            count = ref[1];
+            ref[1] = count - 1;
+            if ((count - 1 == 0) && (ref != 0)) {
+                (*(void (**)(void*, int))(*(int*)ref + 8))(ref, 1);
+            }
+            *(void**)(p + 0x1B0 + i * 4) = 0;
+        }
         i++;
     } while (i < 0x40);
 

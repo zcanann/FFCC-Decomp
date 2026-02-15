@@ -18,7 +18,7 @@ void SB_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int);
 extern "C" {
 #endif
 
-void pppConScreenBreak(void);
+void pppConScreenBreak(PScreenBreak*, UnkC*);
 void pppCon2ScreenBreak(void);
 void pppDesScreenBreak(void);
 void pppFrameScreenBreak(PScreenBreak*, UnkB*, UnkC*);

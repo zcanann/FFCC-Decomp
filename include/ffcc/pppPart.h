@@ -49,7 +49,7 @@ void pppSubVector(Vec& dest, Vec a, Vec b);
 float pppVectorLength(Vec vec);
 void pppCreateHeap(_pppEnvSt* pppEnvSt, unsigned long param_2);
 void pppDestroyHeap(_pppEnvSt* pppEnvSt);
-void pppMemAlloc(unsigned long, CMemory::CStage*, char*, int);
+void* pppMemAlloc(unsigned long, CMemory::CStage*, char*, int);
 void pppMemFree(void*);
 void pppHeapUseRate(CMemory::CStage* stage);
 void pppHeapCheckLeak(CMemory::CStage* stage);

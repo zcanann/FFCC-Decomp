@@ -177,6 +177,7 @@ int RedNewA(int size, int offset, int maxSize)
 	if (DAT_8032f4a4[0x7FF] >= 1) {
 		if (DAT_8032f408) {
 			OSReport(s__s_sA_Memory_Bank_Full____s_801e78b5, &DAT_801e78a3, &DAT_80333d20, &DAT_80333d28);
+			fflush(&DAT_8021d1a8);
 		}
 		return 0;
 	}

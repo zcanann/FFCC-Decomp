@@ -1,6 +1,16 @@
 #include "ffcc/itemobj.h"
 #include "ffcc/prgobj.h"
 
+#include <string.h>
+
+extern "C" void onCreate__8CGPrgObjFv(void*);
+extern "C" void onDestroy__8CGPrgObjFv(void*);
+extern "C" int GetFreeParticleSlot__13CFlatRuntime2Fv(void*);
+extern "C" void DeleteParticleSlot__13CFlatRuntime2Fii(void*, int);
+extern "C" void __dt__Q29CCharaPcs7CHandleFv(void*, int);
+
+extern unsigned char CFlat[];
+
 /*
  * --INFO--
  * PAL Address: 0x80124b80
@@ -17,22 +27,48 @@ int CGPrgObj::getReplaceStat(int state)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80126f94
+ * PAL Size: 116b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGItemObj::onCreate()
 {
-	// TODO
+	unsigned char* self = (unsigned char*)this;
+
+	onCreate__8CGPrgObjFv(self);
+	self[0x54d] &= 0x7f;
+	*(int*)(self + 0x550) = 0;
+	*(int*)(self + 0x558) = 0;
+	*(unsigned short*)(self + 0x560) = 0;
+	*(unsigned short*)(self + 0x562) = 0;
+	*(int*)(self + 0x564) = 0;
+	*(int*)(self + 0x56c) = 0;
+	memset(self + 0x570, 0, 0xc);
+	*(int*)(self + 0x55c) = GetFreeParticleSlot__13CFlatRuntime2Fv(CFlat);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80126f3c
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGItemObj::onDestroy()
 {
-	// TODO
+	unsigned char* self = (unsigned char*)this;
+
+	if (*(int*)(self + 0x564) != 0) {
+		__dt__Q29CCharaPcs7CHandleFv(*(void**)(self + 0x564), 1);
+	}
+
+	DeleteParticleSlot__13CFlatRuntime2Fii(CFlat, *(int*)(self + 0x55c));
+	onDestroy__8CGPrgObjFv(self);
 }
 
 /*

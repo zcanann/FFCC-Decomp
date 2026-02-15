@@ -90,26 +90,36 @@ static void CompleteTransfer(s32 chan) {
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801821A4
+ * PAL Size: 604b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 int EXIImm(s32 chan, void* buf, s32 len, u32 type, EXICallback callback) {
     EXIControl* exi;
     BOOL enabled;
     u32 data;
-    int i;
+    u8* immBuf;
+    s32 i;
 
-    exi = &Ecb[chan];
-    ASSERTLINE(404, exi->state & STATE_SELECTED);
+    ASSERTLINE(404, Ecb[chan].state & STATE_SELECTED);
     ASSERTLINE(405, 0 <= chan && chan < MAX_CHAN);
     ASSERTLINE(406, 0 < len && len <= MAX_IMM);
     ASSERTLINE(407, type < MAX_TYPE);
-    enabled = OSDisableInterrupts();
 
+    enabled = OSDisableInterrupts();
+    exi = &Ecb[chan];
     if ((exi->state & STATE_BUSY) || !(exi->state & STATE_SELECTED)) {
         OSRestoreInterrupts(enabled);
         return 0;
     }
 
     exi->tcCallback = callback;
-    if (exi->tcCallback) {
+    if (exi->tcCallback != 0) {
         EXIClearInterrupts(chan, 0, 1, 0);
         __OSUnmaskInterrupts(0x200000U >> (chan * 3));
     }
@@ -117,14 +127,21 @@ int EXIImm(s32 chan, void* buf, s32 len, u32 type, EXICallback callback) {
     exi->state |= STATE_IMM;
     if (type != 0) {
         data = 0;
-        for(i = 0; i < len; i++) {
-            data |= ((u8*)buf)[i] << ((3 - i) * 8);
+        immBuf = buf;
+        i = 0;
+        while (i < len) {
+            data |= *immBuf++ << ((3 - i) * 8);
+            i++;
         }
         __EXIRegs[(chan * 5) + 4] = data;
     }
 
     exi->immBuf = buf;
-    exi->immLen = (type != 1) ? len : 0; 
+    i = len;
+    if (type == 1) {
+        i = 0;
+    }
+    exi->immLen = i;
     __EXIRegs[(chan * 5) + 3] = (type << 2) | 1 | ((len - 1) << 4);
     OSRestoreInterrupts(enabled);
     return 1;

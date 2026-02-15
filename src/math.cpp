@@ -618,29 +618,34 @@ int CBound::CheckFrustum(Vec& viewPos, float (*viewMatrix)[4], float farPlane)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMath::MTX44MultVec4(float (*mtx)[4], Vec* src, Vec4d* dst)
-{
-    const float x = src->x;
-    const float y = src->y;
-    const float z = src->z;
-
-    const float m10 = mtx[1][0];
-    const float m11 = mtx[1][1];
-    const float m12 = mtx[1][2];
-    const float m13 = mtx[1][3];
-    const float m20 = mtx[2][0];
-    const float m21 = mtx[2][1];
-    const float m22 = mtx[2][2];
-    const float m23 = mtx[2][3];
-    const float m30 = mtx[3][0];
-    const float m31 = mtx[3][1];
-    const float m32 = mtx[3][2];
-    const float m33 = mtx[3][3];
-
-    dst->x = z * mtx[0][2] + x * mtx[0][0] + mtx[0][3] + y * mtx[0][1];
-    dst->y = z * m12 + x * m10 + m13 + y * m11;
-    dst->z = z * m22 + x * m20 + m23 + y * m21;
-    dst->w = z * m32 + x * m30 + m33 + y * m31;
+extern "C" asm void MTX44MultVec4__5CMathFPA4_fP3VecP5Vec4d(register void* self, register float (*mtx)[4], register Vec* src,
+                                                              register Vec4d* dst) {
+    nofralloc
+    psq_l f0, 0x0(src), 0, 0
+    psq_l f1, 0x8(src), 1, 0
+    psq_l f2, 0x0(mtx), 0, 0
+    psq_l f3, 0x8(mtx), 0, 0
+    ps_mul f12, f0, f2
+    psq_l f4, 0x10(mtx), 0, 0
+    ps_madd f13, f1, f3, f12
+    psq_l f5, 0x18(mtx), 0, 0
+    ps_sum0 f2, f13, f13, f13
+    psq_l f6, 0x20(mtx), 0, 0
+    ps_mul f12, f0, f4
+    psq_l f7, 0x28(mtx), 0, 0
+    ps_madd f13, f1, f5, f12
+    psq_l f8, 0x30(mtx), 0, 0
+    ps_sum1 f2, f13, f2, f13
+    psq_l f9, 0x38(mtx), 0, 0
+    psq_st f2, 0x0(dst), 0, 0
+    ps_mul f12, f0, f6
+    ps_madd f13, f1, f7, f12
+    ps_sum0 f2, f13, f13, f13
+    ps_mul f12, f0, f8
+    ps_madd f13, f1, f9, f12
+    ps_sum1 f2, f13, f2, f13
+    psq_st f2, 0x8(dst), 0, 0
+    blr
 }
 
 /*
@@ -652,30 +657,34 @@ void CMath::MTX44MultVec4(float (*mtx)[4], Vec* src, Vec4d* dst)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMath::MTX44MultVec4(float (*mtx)[4], Vec4d* src, Vec4d* dst)
-{
-    const float x = src->x;
-    const float y = src->y;
-    const float z = src->z;
-    const float w = src->w;
-
-    const float m10 = mtx[1][0];
-    const float m11 = mtx[1][1];
-    const float m12 = mtx[1][2];
-    const float m13 = mtx[1][3];
-    const float m20 = mtx[2][0];
-    const float m21 = mtx[2][1];
-    const float m22 = mtx[2][2];
-    const float m23 = mtx[2][3];
-    const float m30 = mtx[3][0];
-    const float m31 = mtx[3][1];
-    const float m32 = mtx[3][2];
-    const float m33 = mtx[3][3];
-
-    dst->x = z * mtx[0][2] + x * mtx[0][0] + w * mtx[0][3] + y * mtx[0][1];
-    dst->y = z * m12 + x * m10 + w * m13 + y * m11;
-    dst->z = z * m22 + x * m20 + w * m23 + y * m21;
-    dst->w = z * m32 + x * m30 + w * m33 + y * m31;
+extern "C" asm void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(register void* self, register float (*mtx)[4],
+                                                                register Vec4d* src, register Vec4d* dst) {
+    nofralloc
+    psq_l f0, 0x0(src), 0, 0
+    psq_l f1, 0x8(src), 0, 0
+    psq_l f2, 0x0(mtx), 0, 0
+    psq_l f3, 0x8(mtx), 0, 0
+    ps_mul f12, f0, f2
+    psq_l f4, 0x10(mtx), 0, 0
+    ps_madd f13, f1, f3, f12
+    psq_l f5, 0x18(mtx), 0, 0
+    ps_sum0 f2, f13, f13, f13
+    psq_l f6, 0x20(mtx), 0, 0
+    ps_mul f12, f0, f4
+    psq_l f7, 0x28(mtx), 0, 0
+    ps_madd f13, f1, f5, f12
+    psq_l f8, 0x30(mtx), 0, 0
+    ps_sum1 f2, f13, f2, f13
+    psq_l f9, 0x38(mtx), 0, 0
+    psq_st f2, 0x0(dst), 0, 0
+    ps_mul f12, f0, f6
+    ps_madd f13, f1, f7, f12
+    ps_sum0 f2, f13, f13, f13
+    ps_mul f12, f0, f8
+    ps_madd f13, f1, f9, f12
+    ps_sum1 f2, f13, f2, f13
+    psq_st f2, 0x8(dst), 0, 0
+    blr
 }
 
 /*

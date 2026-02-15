@@ -314,16 +314,14 @@ void CMapTexAnim::SetMapTexAnim(int, int, int)
  */
 void CMapTexAnimSet::Calc()
 {
-    int param_1;
     int iVar1;
     int iVar2;
 
-    param_1 = (int)this;
-    iVar2 = param_1;
-    for (iVar1 = 0; iVar1 < *(short*)(param_1 + 8); iVar1 = iVar1 + 1) {
+    iVar2 = (int)this;
+    for (iVar1 = 0; iVar1 < *(short*)((int)this + 8); iVar1 = iVar1 + 1) {
         Calc__11CMapTexAnimFP12CMaterialSetP11CTextureSet(
-            *(CMapTexAnim**)(iVar2 + 0xC), *(CMaterialSet**)(param_1 + 0x10C),
-            *(CTextureSet**)(param_1 + 0x110));
+            *(CMapTexAnim**)(iVar2 + 0xC), *(CMaterialSet**)((int)this + 0x10C),
+            *(CTextureSet**)((int)this + 0x110));
         iVar2 = iVar2 + 4;
     }
 }

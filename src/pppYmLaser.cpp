@@ -89,6 +89,21 @@ struct CMapCylinderRaw {
 	float m_height2;
 };
 
+struct pppYmLaser {
+	u8 field_0x0[0x84];
+	f32 field_0x84;
+	f32 field_0x88;
+	f32 field_0x8c;
+	f32 field_0x90;
+	f32 field_0x94;
+	f32 field_0x98;
+	f32 field_0x9c;
+	f32 field_0xa0;
+	f32 field_0xa4;
+	f32 field_0xa8;
+	u8 field_0xac;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x800d3780
@@ -98,30 +113,31 @@ struct CMapCylinderRaw {
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppConstructYmLaser(void* pppYmLaser, void* param_2)
+extern "C" void pppConstructYmLaser(void* pppYmLaser_, void* param_2_)
 {
-	YmLaserParam* data = (YmLaserParam*)param_2;
-	float one = 1.0f;
-	float* work = (float*)((unsigned char*)pppYmLaser + 0x88 + data->offsets->m_serializedDataOffsets[2]);
+	pppYmLaser* pppYmLaser = (struct pppYmLaser*)pppYmLaser_;
+	YmLaserParam* param_2 = (YmLaserParam*)param_2_;
+	f32* work = (f32*)((u8*)pppYmLaser + 0x80 + param_2->offsets->m_serializedDataOffsets[2]);
+	f32 one = FLOAT_80330dc0;
 
-	*work = 1.0f;
+	*work = one;
 	work[6] = one;
 	work[5] = one;
 	work[4] = one;
 	work[3] = one;
 	work[2] = one;
 	work[1] = one;
-	work[7] = 0.0f;
+	*(u32*)((u8*)work + 0x1c) = 0;
 	work[10] = one;
 	work[9] = one;
 	work[8] = one;
-	*((unsigned char*)work + 0x2c) = 0;
-	*((unsigned char*)work + 0x2d) = 0;
-	*((unsigned char*)work + 0x2e) = 0;
-	*((unsigned short*)((unsigned char*)work + 0x30)) = 0;
-	*((unsigned short*)((unsigned char*)work + 0x34)) = 0;
-	*((unsigned short*)((unsigned char*)work + 0x32)) = 0;
-	work[14] = RandF__5CMathFf(1.0f, &Math);
+	*((u8*)work + 0x2c) = 0;
+	*((u8*)work + 0x2d) = 0;
+	*((u8*)work + 0x2e) = 0;
+	*((u16*)((u8*)work + 0x30)) = 0;
+	*((u16*)((u8*)work + 0x34)) = 0;
+	*((u16*)((u8*)work + 0x32)) = 0;
+	work[14] = RandF__5CMathFf(FLOAT_80330dc0, &Math);
 }
 
 /*
@@ -133,22 +149,23 @@ extern "C" void pppConstructYmLaser(void* pppYmLaser, void* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppConstruct2YmLaser(void* pppYmLaser, void* param_2)
+extern "C" void pppConstruct2YmLaser(void* pppYmLaser_, void* param_2_)
 {
-	YmLaserParam* data = (YmLaserParam*)param_2;
-	float one = 1.0f;
-	int dataOffset = data->offsets->m_serializedDataOffsets[2];
+	pppYmLaser* pppYmLaser = (struct pppYmLaser*)pppYmLaser_;
+	YmLaserParam* param_2 = (YmLaserParam*)param_2_;
+	f32 one = FLOAT_80330dc0;
+	s32 dataOffset = param_2->offsets->m_serializedDataOffsets[2];
 
-	*(float*)((unsigned char*)pppYmLaser + 0x98 + dataOffset) = one;
-	*(float*)((unsigned char*)pppYmLaser + 0x94 + dataOffset) = one;
-	*(float*)((unsigned char*)pppYmLaser + 0x90 + dataOffset) = one;
-	*(float*)((unsigned char*)pppYmLaser + 0x8c + dataOffset) = one;
-	*(float*)((unsigned char*)pppYmLaser + 0x88 + dataOffset) = one;
-	*(float*)((unsigned char*)pppYmLaser + 0x84 + dataOffset) = one;
-	*(float*)((unsigned char*)pppYmLaser + 0xa8 + dataOffset) = one;
-	*(float*)((unsigned char*)pppYmLaser + 0xa4 + dataOffset) = one;
-	*(float*)((unsigned char*)pppYmLaser + 0xa0 + dataOffset) = one;
-	*((unsigned char*)pppYmLaser + 0xac + dataOffset) = 0;
+	*(f32*)((u8*)&pppYmLaser->field_0x98 + dataOffset) = one;
+	*(f32*)((u8*)&pppYmLaser->field_0x94 + dataOffset) = one;
+	*(f32*)((u8*)&pppYmLaser->field_0x90 + dataOffset) = one;
+	*(f32*)((u8*)&pppYmLaser->field_0x8c + dataOffset) = one;
+	*(f32*)((u8*)&pppYmLaser->field_0x88 + dataOffset) = one;
+	*(f32*)((u8*)&pppYmLaser->field_0x84 + dataOffset) = one;
+	*(f32*)((u8*)&pppYmLaser->field_0xa8 + dataOffset) = one;
+	*(f32*)((u8*)&pppYmLaser->field_0xa4 + dataOffset) = one;
+	*(f32*)((u8*)&pppYmLaser->field_0xa0 + dataOffset) = one;
+	*((u8*)&pppYmLaser->field_0xac + dataOffset) = 0;
 }
 
 /*
@@ -160,15 +177,16 @@ extern "C" void pppConstruct2YmLaser(void* pppYmLaser, void* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppDestructYmLaser(void* pppYmLaser, void* param_2)
+extern "C" void pppDestructYmLaser(void* pppYmLaser_, void* param_2_)
 {
-	YmLaserOffsets* offsets = (YmLaserOffsets*)param_2;
-	int dataOffset = offsets->m_serializedDataOffsets[2];
-	void* stage = *(void**)((unsigned char*)pppYmLaser + 0x9c + dataOffset);
+	pppYmLaser* pppYmLaser = (struct pppYmLaser*)pppYmLaser_;
+	YmLaserOffsets* param_2 = (YmLaserOffsets*)param_2_;
+	s32 dataOffset = param_2->m_serializedDataOffsets[2];
+	void* stage = *(void**)((u8*)&pppYmLaser->field_0x9c + dataOffset);
 
 	if (stage != 0) {
 		pppHeapUseRate__FPQ27CMemory6CStage(stage);
-		*(void**)((unsigned char*)pppYmLaser + 0x9c + dataOffset) = 0;
+		*(void**)((u8*)&pppYmLaser->field_0x9c + dataOffset) = 0;
 	}
 }
 

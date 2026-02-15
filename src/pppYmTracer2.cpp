@@ -33,15 +33,6 @@ extern CUtil DAT_8032ec70;
 
 static char s_pppYmTracer2_cpp_801dc4b8[] = "pppYmTracer2.cpp";
 
-struct YmTracer2Step {
-    s32 m_graphId;
-    s32 m_dataValIndex;
-    s32 m_initWOrk;
-    s32 m_stepValue;
-    s32 m_arg3;
-    u8* m_payload;
-};
-
 struct TraceEntry {
     Vec pos;
     float pad0;
@@ -149,7 +140,6 @@ void pppDestructYmTracer2(pppYmTracer2* pppYmTracer2, UnkC* param_2)
  */
 void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, UnkB* param_2, UnkC* param_3)
 {
-    YmTracer2Step* step;
     u8* work;
     s32 colorOffset;
     bool useFallback;
@@ -162,14 +152,14 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, UnkB* param_2, UnkC* param_3)
         return;
     }
 
-    step = (YmTracer2Step*)param_2;
+    UnkB* step = param_2;
     useFallback = false;
     colorOffset = param_3->m_serializedDataOffsets[1];
     work = (u8*)pppYmTracer2 + 0x80 + *param_3->m_serializedDataOffsets;
     if (step->m_initWOrk == -1) {
         *(void**)(work + 0x20) = &DAT_801eadc8;
     } else {
-        *(void**)(work + 0x20) = (u8*)&pppMngStPtr->m_kind + step->m_initWOrk * 0x10 + step->m_stepValue;
+        *(void**)(work + 0x20) = (u8*)&pppMngStPtr->m_kind + step->m_initWOrk * 0x10 + (s32)step->m_stepValue;
     }
     if (step->m_arg3 == -1) {
         *(void**)(work + 0x24) = &DAT_801eadc8;
@@ -333,7 +323,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, UnkB* param_2, UnkC* param_3)
  */
 void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, UnkB* param_2, UnkC* param_3)
 {
-    YmTracer2Step* step = (YmTracer2Step*)param_2;
+    UnkB* step = param_2;
     s32 dataOffset = *param_3->m_serializedDataOffsets;
     s32 colorOffset = param_3->m_serializedDataOffsets[1];
     TraceEntry* entries = *(TraceEntry**)((u8*)pppYmTracer2 + 0x80 + dataOffset + 0x28);

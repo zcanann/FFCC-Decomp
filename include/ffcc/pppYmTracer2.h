@@ -7,7 +7,12 @@ struct PYmTracer2;
 struct TRACE_POLYGON;
 
 struct UnkB {
+    s32 m_graphId;
     u32 m_dataValIndex;
+    s32 m_initWOrk;
+    f32 m_stepValue;
+    s32 m_arg3;
+    u8 m_payload[0x20];
 };
 
 struct UnkC {

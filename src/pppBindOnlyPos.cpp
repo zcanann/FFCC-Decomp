@@ -32,5 +32,7 @@ void pppFrameBindOnlyPos(void)
 		return;
 	}
 
-	*(volatile unsigned int*)((char*)lbl_8032ED50 + 0xd8);
+	if (*(volatile unsigned int*)((char*)lbl_8032ED50 + 0xd8) != 0) {
+		return;
+	}
 }

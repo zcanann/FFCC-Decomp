@@ -2,7 +2,7 @@
 #include "ffcc/math.h"
 #include "dolphin/types.h"
 
-extern CMath math;
+extern CMath math[];
 extern int lbl_8032ED70;
 extern u8 lbl_801EADC8[];
 extern float lbl_80330070;
@@ -33,30 +33,30 @@ void pppSRandDownCV(void* param1, void* param2, void* param3)
         u8 flag = *((u8*)param2 + 0xC);
         float value;
 
-        value = -RandF__5CMathFv(&math);
+        value = -RandF__5CMathFv(math);
         if (flag != 0) {
-            value = (value - RandF__5CMathFv(&math)) * lbl_80330070;
+            value = (value - RandF__5CMathFv(math)) * lbl_80330070;
         }
         target[0] = value;
 
-        value = -RandF__5CMathFv(&math);
+        value = -RandF__5CMathFv(math);
         if (flag != 0) {
-            value = (value - RandF__5CMathFv(&math)) * lbl_80330070;
+            value = (value - RandF__5CMathFv(math)) * lbl_80330070;
         }
         target[1] = value;
 
-        value = -RandF__5CMathFv(&math);
+        value = -RandF__5CMathFv(math);
         if (flag != 0) {
-            value = (value - RandF__5CMathFv(&math)) * lbl_80330070;
+            value = (value - RandF__5CMathFv(math)) * lbl_80330070;
         }
         target[2] = value;
 
-        value = -RandF__5CMathFv(&math);
+        value = -RandF__5CMathFv(math);
         if (flag != 0) {
-            value = (value - RandF__5CMathFv(&math)) * lbl_80330070;
+            value = (value - RandF__5CMathFv(math)) * lbl_80330070;
         }
         target[3] = value;
-    } else {
+    } else if (*(int*)param2 != *((int*)param1 + 3)) {
         int** base_ptr = (int**)((char*)param3 + 0xC);
         int offset = **base_ptr;
         target = (float*)((char*)param1 + offset + 0x80);

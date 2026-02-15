@@ -280,12 +280,16 @@ void CRedSound::SetReverb(int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801ccf38
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::SetReverbDepth(int, int, int)
+void CRedSound::SetReverbDepth(int bank, int sep, int depth)
 {
-	// TODO
+	CRedDriver_8032f4c0.SetReverbDepth(bank, sep, depth);
 }
 
 /*
@@ -680,34 +684,11 @@ void CRedSound::StreamPause(int streamID, int pause)
  */
 unsigned int CRedSound::SetWaveData(int waveID, void* waveData, int waveSize)
 {
-	unsigned int id;
-	int* slot;
-	int* end;
-
-	do {
-		DAT_8032f4c4 = (DAT_8032f4c4 + 1) & 0x7FFFFFFF;
-	} while (DAT_8032f4c4 == 0);
-
-	id = DAT_8032f4c4;
-	slot = (int*)DAT_8032e17c;
-	end = (int*)(DAT_8032e17c + 0x100);
-
-	while (slot < end) {
-		if (*slot == 0) {
-			*slot = id;
-			break;
-		}
-		++slot;
-	}
-
-	if (slot >= end) {
-		slot = 0;
-	}
-
+	unsigned int id = GetAutoID();
+	int* slot = EntryStandbyID(id);
 	if (slot != 0) {
 		CRedDriver_8032f4c0.SetWaveData((int)slot, waveID, waveData, waveSize);
 	}
-
 	return id;
 }
 
@@ -723,12 +704,16 @@ void CRedSound::ClearWaveData(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd7d0
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::ClearWaveDataM(int, int, int, int)
+void CRedSound::ClearWaveDataM(int bank, int sep, int group, int kind)
 {
-	// TODO
+	CRedDriver_8032f4c0.ClearWaveDataM(bank, sep, group, kind);
 }
 
 /*

@@ -46,7 +46,7 @@ public:
     void CalcSpline(Vec*, Vec*, Vec*, Vec*, Vec*, float, float, float, float, float);
     void MakeSpline1Dtable(int, float*, float*, float*);
     float Spline1D(int, float, float*, float*, float*);
-    void Line1D(int, float, float*, float*);
+    float Line1D(int, float, float*, float*);
     unsigned int Hsb2Rgb(int, int, int);
     float DstRot(float, float);
 };

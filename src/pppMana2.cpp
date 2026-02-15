@@ -32,9 +32,11 @@ void pppConstructMana2(pppMana2* pppMana2, UnkC* param_2)
     void* handle;
     u32 model;
     u32* work;
+    s32 workOffset;
 
-    gObject = *(CGObject**)((char*)pppMngStPtr + 0x8);
-    work = (u32*)((char*)pppMana2 + 2 + param_2->m_serializedDataOffsets[2]);
+    gObject = *(CGObject**)((char*)pppMngStPtr + 0xDC);
+    workOffset = *(s32*)((char*)param_2 + 0xC);
+    work = (u32*)((char*)pppMana2 + 0x80 + workOffset);
     gObject->m_stepSlopeLimit = FLOAT_803318fc;
 
     handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);

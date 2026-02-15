@@ -6,7 +6,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-extern s32 DAT_8032ed70;
+extern _pppEnvSt* lbl_8032ED54;
 extern float lbl_803310C0;
 extern float lbl_803310C4;
 extern float lbl_803310C8;
@@ -80,7 +80,7 @@ void pppFrameCorona(pppCorona* param1, CoronaParam* param2, UnkC* param3)
     long** shape;
     s32 shapeId;
 
-    if (DAT_8032ed70 != 0) {
+    if (lbl_8032ED70 != 0) {
         return;
     }
 
@@ -93,7 +93,7 @@ void pppFrameCorona(pppCorona* param1, CoronaParam* param2, UnkC* param3)
         return;
     }
 
-    shape = *(long***)(*(u32*)((u8*)pppEnvStPtr + 0xC) + shapeId * 4);
+    shape = *(long***)(*(u32*)((u8*)lbl_8032ED54 + 0xC) + shapeId * 4);
     pppCalcFrameShape(*shape, work->m_shapeX, work->m_shapeY, work->m_shapeZ, param2->m_shapeStep);
 
     if (param2->m_graphId == *(s32*)((u8*)param1 + 0xC)) {
@@ -133,7 +133,7 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, UnkC* param3)
         return;
     }
 
-    shape = *(long***)(*(u32*)((u8*)pppEnvStPtr + 0xC) + shapeId * 4);
+    shape = *(long***)(*(u32*)((u8*)lbl_8032ED54 + 0xC) + shapeId * 4);
 
     PSMTXIdentity(mtx.value);
 
@@ -149,9 +149,9 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, UnkC* param3)
                 (param2->m_distMax - param2->m_distMin) * (lbl_803310CC - (mag / param2->m_distRange));
     }
 
-    mtx.value[0][0] = *(float*)((u8*)pppMngStPtr + 0x28) * *(float*)((u8*)param1 + 0x40) * scale;
-    mtx.value[1][1] = *(float*)((u8*)pppMngStPtr + 0x2C) * *(float*)((u8*)param1 + 0x54) * scale;
-    mtx.value[2][2] = *(float*)((u8*)pppMngStPtr + 0x30) * *(float*)((u8*)param1 + 0x68) * scale;
+    mtx.value[0][0] = *(float*)((u8*)lbl_8032ED50 + 0x28) * *(float*)((u8*)param1 + 0x40) * scale;
+    mtx.value[1][1] = *(float*)((u8*)lbl_8032ED50 + 0x2C) * *(float*)((u8*)param1 + 0x54) * scale;
+    mtx.value[2][2] = *(float*)((u8*)lbl_8032ED50 + 0x30) * *(float*)((u8*)param1 + 0x68) * scale;
     mtx.value[0][3] = vecWork->m_translate.x;
     mtx.value[1][3] = vecWork->m_translate.y;
     mtx.value[2][3] = vecWork->m_translate.z;
@@ -166,5 +166,5 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, UnkC* param3)
     pppSetDrawEnv(&color, (pppFMATRIX*)0, lbl_803310C8, param2->m_drawA, param2->m_drawB, param2->m_blendMode, 0, 1,
                   1, 0);
     pppSetBlendMode(param2->m_blendMode);
-    pppDrawShp(*shape, work->m_shapeY, pppEnvStPtr->m_materialSetPtr, param2->m_blendMode);
+    pppDrawShp(*shape, work->m_shapeY, lbl_8032ED54->m_materialSetPtr, param2->m_blendMode);
 }

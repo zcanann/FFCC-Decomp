@@ -1,5 +1,6 @@
 #include "ffcc/util.h"
 #include "ffcc/gxfunc.h"
+#include <string.h>
 
 extern float lbl_8032f888;
 extern float lbl_8032f88c;
@@ -145,12 +146,24 @@ void CUtil::SetVtxFmt_POS_CLR_TEX0_TEX1()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80024bb4
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CUtil::SetOrthoEnv()
 {
-	// TODO
+    Mtx modelMtx;
+    Mtx44 orthoMtx;
+
+    PSMTXIdentity(modelMtx);
+    GXLoadPosMtxImm(modelMtx, 0);
+    GXSetCurrentMtx(0);
+    C_MTXOrtho(orthoMtx, lbl_8032f888, lbl_8032f8a0, lbl_8032f888, lbl_8032f8a4, lbl_8032f888,
+               lbl_8032f88c);
+    GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
 }
 
 /*
@@ -395,12 +408,22 @@ void CUtil::RenderQuadTex2(Vec pos1, Vec pos2, _GXColor color, Vec2d* uv1, Vec2d
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80024444
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CUtil::DisableIndMtx()
 {
-	// TODO
+    float indMtx[2][3];
+
+    GXSetNumIndStages(0);
+    memset(indMtx, 0, sizeof(indMtx));
+    GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
+    GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
+    GXSetIndTexMtx(GX_ITM_2, indMtx, 1);
 }
 
 /*
@@ -1161,12 +1184,23 @@ void CUtil::GetDirectVector(Vec* param_2, Vec* param_3, Vec param_4)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80022724
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CUtil::InitConstantRegister()
 {
-	// TODO
+    int i = 0;
+
+    do {
+        GXSetTevKColorSel((GXTevStageID)i, (GXTevKColorSel)6);
+        GXSetTevKAlphaSel((GXTevStageID)i, (GXTevKAlphaSel)0);
+        _GXSetTevSwapMode((GXTevStageID)i, (_GXTevSwapSel)0, (_GXTevSwapSel)0);
+        i++;
+    } while (i < 0x10);
 }
 
 /*

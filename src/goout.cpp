@@ -1,5 +1,42 @@
 #include "ffcc/goout.h"
 
+extern CGoOutMenu g_GoOutMenu;
+extern CGoOutMenu* g_pGoOutMenu;
+extern "C" int GetYesNoXPos__8CMenuPcsFi(CMenuPcs*, int);
+
+struct CMenuPcsGoOutLayout
+{
+    unsigned char unk0[2092];
+    int field_2092;
+    unsigned char unk2096[24];
+    int field_2120;
+};
+
+static inline signed short ReadMenuShort(int base, int offset)
+{
+    return *reinterpret_cast<signed short*>(base + offset);
+}
+
+static inline void WriteMenuShort(int base, int offset, signed short value)
+{
+    *reinterpret_cast<signed short*>(base + offset) = value;
+}
+
+static inline unsigned char ReadGoOutU8(CGoOutMenu& menu, int offset)
+{
+    return *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(&menu) + offset);
+}
+
+static inline signed short ReadGoOutS16(CGoOutMenu& menu, int offset)
+{
+    return *reinterpret_cast<signed short*>(reinterpret_cast<unsigned char*>(&menu) + offset);
+}
+
+static inline signed char ReadGoOutS8(CGoOutMenu& menu, int offset)
+{
+    return *reinterpret_cast<signed char*>(reinterpret_cast<unsigned char*>(&menu) + offset);
+}
+
 static unsigned short GetGoOutInputMask()
 {
     if (Pad._452_4_ != 0 || Pad._448_4_ != -1) {
@@ -11,12 +48,61 @@ static unsigned short GetGoOutInputMask()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80168130
+ * PAL Size: 676b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void DrawGoOutMenu()
 {
-	// TODO
+    CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
+    g_pGoOutMenu = &g_GoOutMenu;
+
+    if (ReadGoOutU8(g_GoOutMenu, 0x44) == 3) {
+        MenuPcs.DrawInit();
+        MenuPcs.DrawCMakeMenu();
+        if (ReadGoOutS16(g_GoOutMenu, 0x36) == 1 && ReadMenuShort(menuPcsLayout.field_2092, 0x20) != 0) {
+            WriteMenuShort(menuPcsLayout.field_2092, 0x1C, 8);
+            g_GoOutMenu.SetMainMode(1);
+            WriteMenuShort(menuPcsLayout.field_2092, 0x20, 0);
+        }
+    } else if (ReadGoOutU8(g_GoOutMenu, 0x44) == 2) {
+        if (ReadGoOutU8(g_GoOutMenu, 0x29) != 0) {
+            MenuPcs.DrawInit();
+            MenuPcs.DrawCMakeMenu();
+        }
+        if (ReadGoOutS8(g_GoOutMenu, 0x24) > 0xD && ReadGoOutS8(g_GoOutMenu, 0x24) < 0xF) {
+            MenuPcs.DrawLoadMenu();
+        }
+        if (ReadGoOutS8(g_GoOutMenu, 0x24) == 1 && ReadMenuShort(menuPcsLayout.field_2092, 0x20) != 0) {
+            WriteMenuShort(menuPcsLayout.field_2092, 0x1C, 8);
+            g_GoOutMenu.SetMainMode(1);
+            WriteMenuShort(menuPcsLayout.field_2092, 0x20, 0);
+        }
+    }
+
+    if (ReadGoOutS16(g_GoOutMenu, 0x54) != -1) {
+        MenuPcs.DrawMcWin(-1, 0);
+        if (ReadMenuShort(menuPcsLayout.field_2120, 0xA) == 1) {
+            const int message = static_cast<int>(ReadGoOutS16(g_GoOutMenu, 0x54));
+            MenuPcs.DrawMcWinMess(message, (message >= 0x1E) ? 2 : 0);
+        }
+    }
+
+    if (ReadMenuShort(menuPcsLayout.field_2120, 0xA) == 1 && ReadGoOutU8(g_GoOutMenu, 0x71) != 0) {
+        const int cursorY = ReadMenuShort(menuPcsLayout.field_2120, 2) + ReadMenuShort(menuPcsLayout.field_2120, 6) - 0x3E;
+
+        if (ReadGoOutU8(g_GoOutMenu, 0x73) == 0) {
+            const int cursorX = GetYesNoXPos__8CMenuPcsFi(&MenuPcs, ReadGoOutU8(g_GoOutMenu, 0x70));
+            MenuPcs.DrawCursor(cursorX, cursorY, 1.0f);
+        } else {
+            const int cursorX = ReadMenuShort(menuPcsLayout.field_2120, 0) + 0x20;
+            const int localY = ReadGoOutS16(g_GoOutMenu, 0x76) + ReadGoOutU8(g_GoOutMenu, 0x70) * 0x1E;
+            MenuPcs.DrawCursor(cursorX, localY, 1.0f);
+        }
+    }
 }
 
 /*

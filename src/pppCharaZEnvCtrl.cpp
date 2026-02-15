@@ -8,6 +8,8 @@ struct UnkC {
     unsigned char pad0[0xC];
     int* m_serializedDataOffsets;
 };
+extern int lbl_8032ED70;
+extern u8* lbl_8032ED50;
 
 extern "C" {
 void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);

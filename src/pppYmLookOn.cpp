@@ -21,8 +21,8 @@ void pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
  */
 void pppConstructYmLookOn(struct pppYmLookOn* pppYmLookOn, struct UnkC* param_2)
 {
-    int dataOffset = **(int**)param_2;
-    *(int*)((char*)pppYmLookOn + dataOffset + 8) = 0;
+    int dataOffset = *param_2->m_serializedDataOffsets;
+    *(int*)((char*)pppYmLookOn + dataOffset + 0x80) = 0;
 }
 
 /*
@@ -53,10 +53,10 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct UnkB* param_2, str
 
     owner = *(u8**)((u8*)pppMngStPtr + 0xdc);
     dataOffset = *param_3->m_serializedDataOffsets;
-    if ((owner != nullptr) || (*(int*)((u8*)(&pppYmLookOn->field0_0x0[2]) + dataOffset) != 0)) {
-        *(u8**)((u8*)(&pppYmLookOn->field0_0x0[2]) + dataOffset) = owner;
+    if ((owner != nullptr) || (*(int*)((u8*)pppYmLookOn + dataOffset + 0x80) != 0)) {
+        *(u8**)((u8*)pppYmLookOn + dataOffset + 0x80) = owner;
         if (owner == nullptr) {
-            owner = *(u8**)((u8*)(&pppYmLookOn->field0_0x0[2]) + dataOffset);
+            owner = *(u8**)((u8*)pppYmLookOn + dataOffset + 0x80);
         }
 
         local_4c.x = *(f32*)(owner + 0x15c);

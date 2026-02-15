@@ -1,6 +1,7 @@
 #include "ffcc/sound.h"
 
 #include "ffcc/RedSound/RedSound.h"
+#include "ffcc/system.h"
 
 /*
  * --INFO--
@@ -588,32 +589,67 @@ void CSound::IsDebugPrint(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c50c8
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::PauseAllSe(int)
+void CSound::PauseAllSe(int pause)
 {
-	// TODO
+    int paused = (-pause | pause) >> 31;
+    reinterpret_cast<CRedSound*>(this)->SePause(-1, paused);
+    reinterpret_cast<CRedSound*>(this)->StreamPause(-1, paused);
+    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22D0) = pause;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c5050
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::AddNoFreeSeGroup(int)
+void CSound::AddNoFreeSeGroup(int group)
 {
-	// TODO
+    short* noFreeSeGroups = reinterpret_cast<short*>(reinterpret_cast<u8*>(this) + 0x22C0);
+    for (int i = 0; i < 4; i++) {
+        if (noFreeSeGroups[i] == -1) {
+            noFreeSeGroups[i] = group;
+            return;
+        }
+    }
+
+    if (System.m_execParam != 0) {
+        System.Printf("%s", (char*)nullptr);
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c4fd8
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::AddNoFreeWave(int)
+void CSound::AddNoFreeWave(int wave)
 {
-	// TODO
+    short* noFreeWaves = reinterpret_cast<short*>(reinterpret_cast<u8*>(this) + 0x22C8);
+    for (int i = 0; i < 4; i++) {
+        if (noFreeWaves[i] == -1) {
+            noFreeWaves[i] = wave;
+            return;
+        }
+    }
+
+    if (System.m_execParam != 0) {
+        System.Printf("%s", (char*)nullptr);
+    }
 }
 
 /*

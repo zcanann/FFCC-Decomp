@@ -94,24 +94,27 @@ void CMaterialEditorPcs::DeleteColAnmData(ZCANMGRP **, int)
  */
 int CMaterialEditorPcs::AddRsdList(ZLIST* zlist)
 {
-	CMemory::CStage* stage = *(CMemory::CStage**)(MaterialEditorPcs + 4);
-	int* entry = (int*)__nw__FUlPQ27CMemory6CStagePci(0x10, stage, s_ME_AppRequest_cpp_801d7da8, 0x61);
-	if (entry == 0) {
-		return 0;
-	}
+    int* tail = (int*)__nw__FUlPQ27CMemory6CStagePci(0x10, *(CMemory::CStage**)(MaterialEditorPcs + 4),
+                                                     s_ME_AppRequest_cpp_801d7da8, 0x61);
+    if (tail == 0) {
+        return 0;
+    }
 
-	memset(entry, 0, 0x10);
-	int rsdItem = (int)__nw__FUlPQ27CMemory6CStagePci(0x1c, stage, s_ME_AppRequest_cpp_801d7da8, 0x67);
-	if (rsdItem == 0) {
-		__dl__FPv(entry);
-		return 0;
-	}
+    memset(tail, 0, 0x10);
+    int rsdItem = (int)__nw__FUlPQ27CMemory6CStagePci(0x1c, *(CMemory::CStage**)(MaterialEditorPcs + 4),
+                                                      s_ME_AppRequest_cpp_801d7da8, 0x67);
+    if (rsdItem == 0) {
+        if (tail != 0) {
+            __dl__FPv(tail);
+        }
+        return 0;
+    }
 
-	memset((void*)rsdItem, 0, 0x1c);
-	entry[0] = rsdItem;
-	entry[3] = 1;
-	zlist->AddTail(entry);
-	return 1;
+    memset((void*)rsdItem, 0, 0x1c);
+    *tail = rsdItem;
+    tail[3] = 1;
+    zlist->AddTail(tail);
+    return 1;
 }
 
 /*

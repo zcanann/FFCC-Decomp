@@ -1,4 +1,9 @@
 #include "ffcc/fontman.h"
+#include "PowerPC_EABI_Support/Runtime/NMWException.h"
+
+extern CFontMan FontMan;
+extern void* ARRAY_802ea170;
+extern "C" void __dt__8CFontManFv(void*);
 
 /*
  * --INFO--
@@ -292,10 +297,28 @@ void CFont::getNextChar(char **, unsigned short*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80092d2c
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __sinit_fontman_cpp(void)
+void* CFont::operator new(unsigned long size, CMemory::CStage* stage, char* file, int line)
 {
-	// TODO
+	return ::operator new(size, stage, file, line);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800930e0
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_fontman_cpp(void)
+{
+	__register_global_object(&FontMan, __dt__8CFontManFv, &ARRAY_802ea170);
 }

@@ -29,13 +29,28 @@ public:
 
 extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
+extern "C" void __ct__4CRefFv(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
+extern "C" void* PTR_PTR_s_CTexAnimSet_801e9c6c;
+extern "C" float FLOAT_8032fb38;
 
 extern CMemory Memory;
 extern CSystem System;
 
 static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
 static char s_ptrarray_grow_error[] = "CPtrArray grow error";
+
+namespace {
+static inline unsigned char* Ptr(void* p, unsigned int offset)
+{
+    return reinterpret_cast<unsigned char*>(p) + offset;
+}
+
+static inline float& F32At(void* p, unsigned int offset)
+{
+    return *reinterpret_cast<float*>(Ptr(p, offset));
+}
+}
 
 /*
  * --INFO--
@@ -462,9 +477,27 @@ CTexAnim* CPtrArray<CTexAnim*>::GetAt(unsigned long index)
 {
     return m_items[index];
 }
+/*
+ * --INFO--
+ * PAL Address: 0x80044a9c
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 CTexAnimSet::CTexAnimSet()
 {
-	// TODO
+    __ct__4CRefFv(this);
+    *reinterpret_cast<void**>(this) = &PTR_PTR_s_CTexAnimSet_801e9c6c;
+    CPtrArray<CTexAnim*>* const arr = reinterpret_cast<CPtrArray<CTexAnim*>*>(Ptr(this, 8));
+    arr->m_size = 0;
+    arr->m_numItems = 0;
+    arr->m_defaultSize = 0x10;
+    arr->m_items = 0;
+    arr->m_stage = 0;
+    arr->m_growCapacity = 1;
+    F32At(this, 0x24) = FLOAT_8032fb38;
 }
 
 /*

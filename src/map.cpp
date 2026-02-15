@@ -181,6 +181,28 @@ void CPtrArray<CMapLightHolder*>::RemoveAll()
  * Address:	TODO
  * Size:	TODO
  */
+template <>
+void CPtrArray<CMapLightHolder*>::SetStage(CMemory::CStage* stage)
+{
+    *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(this) + 0x14) = stage;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+template <>
+int CPtrArray<CMapAnimRun*>::GetSize()
+{
+    return m_numItems;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
 int CMapKeyFrame::Get(int& key0, int& key1, float& blend)
 {
     const unsigned char mode = *reinterpret_cast<unsigned char*>(Ptr(this, 0));

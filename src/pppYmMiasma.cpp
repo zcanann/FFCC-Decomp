@@ -15,6 +15,7 @@ extern float FLOAT_80330654;
 extern float FLOAT_8033065c;
 extern float FLOAT_80330660;
 extern float FLOAT_80330664;
+extern float FLOAT_80330668;
 extern u32 DAT_80330658;
 extern int DAT_8032ed70;
 extern double DOUBLE_80330648;
@@ -24,6 +25,7 @@ extern void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern char Math;
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppSubVector__FR3Vec3Vec3Vec(Vec*, const Vec*, const Vec*);
+extern "C" void pppAddVector__FR3Vec3Vec3Vec(Vec*, const Vec*, const Vec*);
 extern "C" void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
 extern "C" void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
 extern "C" void pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*, pppFMATRIX*);
@@ -35,53 +37,98 @@ extern "C" void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, u
 
 /*
  * --INFO--
- * Address:	80091234
- * Size:	872b
+ * PAL Address: 0x80091234
+ * PAL Size: 872b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* pYmMiasma, _PARTICLE_DATA* particleData)
+void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
 {
-    u32 randVal;
-    float sinVal, cosVal;
-    u16 angleVal;
-    s16 lifeTimeVariation;
-    float radiusFactor, heightOffset;
-    Vec direction, tempPos;
-    
-    // Random angle generation for particle direction
-    randVal = rand();
-    angleVal = (u16)(randVal & 0xFFFF);
-    sinVal = ppvSinTbl[(angleVal & 0xFFFF) >> 2];
-    cosVal = ppvSinTbl[((angleVal + 0x4000) & 0xFFFF) >> 2];
-    
-    // Calculate random radius factor 
-    radiusFactor = (float)randVal * FLOAT_8033065c - FLOAT_80330664;
-    
-    // Set particle velocity/direction based on random values
-    particleData->m_matrix[0][0] = sinVal * radiusFactor;
-    particleData->m_matrix[1][0] = sinVal * radiusFactor;
-    
-    // Random height offset
-    heightOffset = RandF__5CMathFf((double)*(float *)((char*)pYmMiasma + 0x40), &Math);
-    particleData->m_matrix[0][1] = heightOffset;
-    particleData->m_matrix[1][1] = heightOffset;
-    
-    particleData->m_matrix[0][2] = cosVal * radiusFactor;
-    particleData->m_matrix[1][2] = cosVal * radiusFactor;
-    
-    // Normalize direction vector
-    tempPos.x = particleData->m_matrix[1][0];
-    tempPos.y = particleData->m_matrix[1][1];  
-    tempPos.z = particleData->m_matrix[1][2];
-    pppNormalize__FR3Vec3Vec((float*)particleData->m_matrix[1], &tempPos);
-    
-    // Initialize lifetime with variation
-    lifeTimeVariation = (s16)randVal % *(s16*)((char*)pYmMiasma + 0x30);
-    particleData->m_lifeTime = *(u8*)((char*)pYmMiasma + 0x24);
-    particleData->m_age = 0;
-    
-    // Color initialization
-    particleData->m_colorDeltaAdd[0] = *(float*)((char*)pYmMiasma + 0x34);
-    particleData->m_colorDeltaAdd[1] = *(float*)((char*)pYmMiasma + 0x10) + radiusFactor;
+    u8* vData = (u8*)vYmMiasma;
+    u8* ymData = (u8*)pYmMiasma;
+    u8* particle = (u8*)particleData;
+    u32 r0;
+    u32 angleIndex;
+    s16 life;
+    int colorEntry;
+    int r1;
+    Vec normalized;
+    Vec managerPos;
+    Vec particleOffset;
+    double randScale;
+    double scaledRadius;
+    float spread;
+    float parityScale;
+    u32 parityBits;
+
+    (void)pppPObject;
+
+    r0 = rand();
+    randScale = (double)(FLOAT_8033065c * (float)r0);
+
+    colorEntry = **(int**)(*(int*)&pppEnvStPtr->m_particleColors[0] + *(int*)(ymData + 4) * 4);
+    r1 = rand();
+    life = (s16)r1 - (s16)(r1 / (int)*(s16*)(colorEntry + 6)) * *(s16*)(colorEntry + 6);
+    *(s16*)(particle + 0x5A) = life;
+    *(s16*)(particle + 0x58) = life;
+
+    angleIndex = (u32)(FLOAT_80330650 * FLOAT_80330654 * (float)((double)FLOAT_80330660 * randScale) -
+                       FLOAT_80330664);
+    *(s16*)(particle + 0x44) = (s16)(r0 % 0x168);
+
+    scaledRadius = randScale * (double)*(float*)(ymData + 0x3C);
+    spread = (float)((double)*(float*)(vData + 0x1C) + scaledRadius);
+
+    *(float*)(particle + 0x00) = ppvSinTbl[((angleIndex + 0x4000) & 0xFFFF) >> 2] * spread;
+    *(float*)(particle + 0x10) = *(float*)(particle + 0x00);
+    *(float*)(particle + 0x04) = (float)RandF__5CMathFf((double)*(float*)(ymData + 0x40), &Math);
+    *(float*)(particle + 0x14) = *(float*)(particle + 0x04);
+    *(float*)(particle + 0x08) = ppvSinTbl[(angleIndex & 0xFFFF) >> 2] * spread;
+    *(float*)(particle + 0x18) = *(float*)(particle + 0x08);
+
+    normalized.x = *(float*)(particle + 0x10);
+    normalized.y = *(float*)(particle + 0x14);
+    normalized.z = *(float*)(particle + 0x18);
+    pppNormalize__FR3Vec3Vec((float*)(particle + 0x10), &normalized);
+
+    if (Game.game.m_currentSceneId != 7) {
+        managerPos.x = pppMngStPtr->m_matrix.value[0][3];
+        managerPos.y = pppMngStPtr->m_matrix.value[1][3];
+        managerPos.z = pppMngStPtr->m_matrix.value[2][3];
+
+        particleOffset.x = *(float*)(particle + 0x00);
+        particleOffset.y = *(float*)(particle + 0x04);
+        particleOffset.z = *(float*)(particle + 0x08);
+        pppAddVector__FR3Vec3Vec3Vec((Vec*)particle, &particleOffset, &managerPos);
+    }
+
+    *(u16*)(particle + 0x22) = (u16)*(u8*)(ymData + 0x48) +
+                               ((s16)r0 - (s16)((int)r0 / (int)(u32)*(u8*)(ymData + 0x49)) *
+                                              (u16)*(u8*)(ymData + 0x49));
+    *(u16*)(particle + 0x20) = (u16)*(u8*)(ymData + 0x24);
+    *(u16*)(particle + 0x22) = (u16)*(u8*)(ymData + 0x25);
+    *(u16*)(particle + 0x21) = (u16)*(u8*)(ymData + 0x26);
+    *(u16*)(particle + 0x26) = 0;
+
+    *(s16*)(particle + 0x3C) = ((*(s16*)(ymData + 0x28) >> 7) - (u16)*(u8*)(ymData + 0x24)) / *(s16*)(ymData + 0x30);
+    *(s16*)(particle + 0x3E) = ((*(s16*)(ymData + 0x2A) >> 7) - (u16)*(u8*)(ymData + 0x25)) / *(s16*)(ymData + 0x30);
+    *(s16*)(particle + 0x40) = ((*(s16*)(ymData + 0x2C) >> 7) - (u16)*(u8*)(ymData + 0x26)) / *(s16*)(ymData + 0x30);
+    *(s16*)(particle + 0x42) = ((*(s16*)(ymData + 0x2E) >> 7) - (u16)*(u8*)(ymData + 0x27)) / *(s16*)(ymData + 0x30);
+
+    *(float*)(particle + 0x48) = *(float*)(ymData + 0x34);
+
+    scaledRadius = scaledRadius * (double)*(float*)(ymData + 0x14);
+    parityScale = (float)scaledRadius;
+    parityBits = (u32)scaledRadius;
+    if (((parityBits & 1U) ^ (parityBits >> 31)) != (parityBits >> 31)) {
+        parityScale = parityScale * FLOAT_80330668;
+    }
+    *(float*)(particle + 0x4C) = *(float*)(ymData + 0x10) + parityScale;
+    *(u16*)(particle + 0x50) = *(u16*)(ymData + 0x50);
+    *(u16*)(particle + 0x52) = *(u16*)(ymData + 0x52);
+    *(u8*)(particle + 0x54) = 0;
 }
 
 /*
@@ -89,38 +136,38 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
  * Address:	80090e3c
  * Size:	1016b
  */
-void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PYmMiasma* pYmMiasma, _PARTICLE_DATA* particleData)
+void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
 {
-    float deltaTime;
-    Vec velocity;
-    
-    if (!particleData || !pYmMiasma) return;
-    
-    // Age the particle
-    particleData->m_age++;
-    
-    // Early exit if particle is dead
-    if (particleData->m_age >= particleData->m_lifeTime) {
+    u8* particle;
+    s32 lifeTime;
+    s32 age;
+    float lifeFactor;
+
+    (void)pppPObject;
+    (void)pppCtrlTable;
+
+    if (particleData == NULL || pYmMiasma == NULL) {
         return;
     }
-    
-    // Apply velocity to position
-    deltaTime = 1.0f; // Frame time
-    velocity.x = particleData->m_matrix[1][0] * deltaTime;
-    velocity.y = particleData->m_matrix[1][1] * deltaTime;
-    velocity.z = particleData->m_matrix[1][2] * deltaTime;
-    
-    // Update position matrix
-    particleData->m_matrix[0][3] += velocity.x;
-    particleData->m_matrix[1][3] += velocity.y;  
-    particleData->m_matrix[2][3] += velocity.z;
-    
-    // Apply gravity or other forces
-    particleData->m_velocity.y -= 0.01f; // Gravity
-    
-    // Update size over lifetime
-    float lifeFactor = (float)particleData->m_age / (float)particleData->m_lifeTime;
-    particleData->m_sizeVal = particleData->m_sizeStart * (1.0f - lifeFactor) + particleData->m_sizeEnd * lifeFactor;
+
+    particle = (u8*)particleData;
+
+    age = *(s32*)(particle + 0x68) + 1;
+    *(s32*)(particle + 0x68) = age;
+    lifeTime = *(s32*)(particle + 0x64);
+    if (age >= lifeTime) {
+        return;
+    }
+
+    *(float*)(particle + 0x0C) += *(float*)(particle + 0x10);
+    *(float*)(particle + 0x1C) += *(float*)(particle + 0x14);
+    *(float*)(particle + 0x2C) += *(float*)(particle + 0x18);
+
+    *(float*)(particle + 0x34) -= 0.01f;
+
+    lifeFactor = (float)age / (float)lifeTime;
+    *(float*)(particle + 0x60) =
+        *(float*)(particle + 0x58) * (1.0f - lifeFactor) + *(float*)(particle + 0x5C) * lifeFactor;
 }
 
 /*
@@ -128,7 +175,7 @@ void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PY
  * Address:	TODO
  * Size:	TODO
  */
-void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, _PARTICLE_DATA* particleData)
+void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
 {
     // Basic rendering setup
     if (!particleData) return;
@@ -236,7 +283,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, UnkB* param_2, UnkC* param_3)
             (unsigned long)count * 0x50, pppEnvStPtr->m_stagePtr, sPppYmMiasmaCpp, 0x18d);
         particle = (u8*)(u32) * (u32*)workBytes;
         for (i = 0; i < count; i++) {
-            InitParticleData((VYmMiasma*)workBytes, (_pppPObject*)pppYmMiasma_, (PYmMiasma*)step, (_PARTICLE_DATA*)particle);
+            InitParticleData((VYmMiasma*)workBytes, (_pppPObject*)pppYmMiasma_, (PYmMiasma*)step, (PARTICLE_DATA*)particle);
             particle += 0x50;
         }
     }
@@ -275,7 +322,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, UnkB* param_2, UnkC* param_3)
 
     particle = (u8*)(u32) * (u32*)workBytes;
     for (i = 0; i < count; i++) {
-        UpdateParticleData((_pppPObject*)pppYmMiasma_, (_pppCtrlTable*)param_3, (PYmMiasma*)step, (_PARTICLE_DATA*)particle);
+        UpdateParticleData((_pppPObject*)pppYmMiasma_, (_pppCtrlTable*)param_3, (PYmMiasma*)step, (PARTICLE_DATA*)particle);
         particle += 0x50;
     }
 

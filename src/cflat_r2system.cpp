@@ -654,7 +654,8 @@ extern "C" int IsUse__8CMesMenuFv(void* mesMenu)
 extern "C" int GetErrorLevel__7CSystemFv(void* system)
 {
     int index = *(int*)((char*)system + 0x125C);
-    return *(int*)((char*)system + index * 4 + 0x3CDC);
+    int offset = (index * 4) + 0x3CDC;
+    return *(int*)((char*)system + offset);
 }
 
 /*

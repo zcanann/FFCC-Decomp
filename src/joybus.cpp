@@ -111,6 +111,20 @@ static inline unsigned int MakeJoyCmd16(unsigned short opcode, unsigned char arg
 
 /*
  * --INFO--
+ * PAL Address: 0x800b138c
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+unsigned int CSystem::GetCounter()
+{
+	return m_frameCounter;
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

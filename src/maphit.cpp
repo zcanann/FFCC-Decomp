@@ -483,12 +483,90 @@ int CMapHit::CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned short, unsigned 
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800273f4
+ * PAL Size: 1376b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapHit::Draw()
 {
-	// TODO
+    static const u32 kOverlayColor = 0x40FF40FF;
+    static const u32 kBaseColorA = 0xFFFFFFFF;
+    static const u32 kBaseColorB = 0x808080FF;
+    static const u32 kFaceStride = 0x98;
+
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_NRM, GX_NRM_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_NRM, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+
+    for (int faceIndex = 0; faceIndex < m_faceCount; ++faceIndex) {
+        unsigned char* face = Ptr(m_faces, faceIndex * kFaceStride);
+        if ((face[0x4B] & 1) != 0) {
+            continue;
+        }
+
+        const unsigned char vertexCount = face[0x46];
+        const float nx = *reinterpret_cast<float*>(face + 0x00);
+        const float ny = *reinterpret_cast<float*>(face + 0x04);
+        const float nz = *reinterpret_cast<float*>(face + 0x08);
+        const unsigned short* indices = reinterpret_cast<unsigned short*>(face + 0x48);
+
+        GXBegin(GX_TRIANGLES, GX_VTXFMT7, static_cast<u16>(vertexCount * 3));
+        for (int i = 0; i < vertexCount; ++i) {
+            Vec* vertex = m_vertices + indices[i];
+            GXPosition3f32(vertex->x, vertex->y, vertex->z);
+            GXNormal3f32(nx, ny, nz);
+            GXColor1u32(kBaseColorA);
+        }
+
+        GXBegin(GX_TRIANGLES, GX_VTXFMT7, static_cast<u16>(vertexCount * 3));
+        for (int i = vertexCount - 1; i >= 0; --i) {
+            Vec* vertex = m_vertices + indices[i];
+            GXPosition3f32(vertex->x, vertex->y, vertex->z);
+            GXNormal3f32(nx, ny, nz);
+            GXColor1u32(kBaseColorB);
+        }
+    }
+
+    GXClearVtxDesc();
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+
+    for (int faceIndex = 0; faceIndex < m_faceCount; ++faceIndex) {
+        unsigned char* face = Ptr(m_faces, faceIndex * kFaceStride);
+        if ((face[0x4B] & 1) == 0) {
+            face[0x4B] = 0;
+            continue;
+        }
+
+        face[0x4B] = 0;
+        face[0x4B] = 0;
+
+        const unsigned char vertexCount = face[0x46];
+        const unsigned short* indices = reinterpret_cast<unsigned short*>(face + 0x48);
+
+        GXBegin(GX_TRIANGLES, GX_VTXFMT7, static_cast<u16>(vertexCount * 3));
+        for (int i = 0; i < vertexCount; ++i) {
+            Vec* vertex = m_vertices + indices[i];
+            GXPosition3f32(vertex->x, vertex->y, vertex->z);
+            GXColor1u32(kOverlayColor);
+        }
+
+        GXBegin(GX_TRIANGLES, GX_VTXFMT7, static_cast<u16>(vertexCount * 3));
+        for (int i = vertexCount - 1; i >= 0; --i) {
+            Vec* vertex = m_vertices + indices[i];
+            GXPosition3f32(vertex->x, vertex->y, vertex->z);
+            GXColor1u32(kOverlayColor);
+        }
+    }
 }
 
 /*

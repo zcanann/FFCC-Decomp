@@ -13,6 +13,7 @@ extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), 
 extern "C" void* __vt__9CMaterial[];
 extern CMemory Memory;
 extern unsigned char MaterialMan[];
+static const char s_materialStageName[] = "material";
 
 namespace {
 static inline unsigned char* Ptr(void* p, unsigned int offset)
@@ -130,7 +131,8 @@ CMaterialMan::CMaterialMan()
  */
 void CMaterialMan::Init()
 {
-	// TODO
+	*reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x218)) = Memory.CreateStage(0x20000, const_cast<char*>(s_materialStageName), 0);
+	*Ptr(this, 0x204) = 0x30;
 }
 
 /*
@@ -140,7 +142,7 @@ void CMaterialMan::Init()
  */
 void CMaterialMan::Quit()
 {
-	// TODO
+	Memory.DestroyStage(*reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x218)));
 }
 
 /*
@@ -701,6 +703,33 @@ void CMaterialSet::ReleaseTag(CTextureSet* textureSet, int pdtSlotIndex, CAmemCa
 void CMaterialSet::AddMaterial(CMaterial*, int)
 {
 	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003c71c
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMaterialSet::CacheDumpTexture(int materialIndex, CAmemCacheSet* amemCacheSet)
+{
+    CMaterial* material =
+        (*reinterpret_cast<CMaterial***>(Ptr(this, 0x14)))[materialIndex];
+    if (material == 0) {
+        return;
+    }
+
+    int numTexture = static_cast<int>(*reinterpret_cast<unsigned short*>(Ptr(material, 0x18)));
+    CTexture** texture = reinterpret_cast<CTexture**>(Ptr(material, 0x3C));
+    for (int i = 0; i < numTexture; i++) {
+        if (*texture != 0) {
+            (*texture)->CacheUnLoadTexture(amemCacheSet);
+        }
+        texture++;
+    }
 }
 
 /*

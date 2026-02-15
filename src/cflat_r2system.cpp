@@ -647,8 +647,7 @@ extern "C" int IsUse__8CMesMenuFv(void* mesMenu)
  */
 extern "C" int GetErrorLevel__7CSystemFv(void* system, int index)
 {
-    char* indexed = (char*)system + index * 4;
-    return *(int*)(indexed + 0x3CDC);
+    return ((int*)((char*)system + 0x3CDC))[index];
 }
 
 /*
@@ -662,8 +661,7 @@ extern "C" int GetErrorLevel__7CSystemFv(void* system, int index)
  */
 extern "C" void GetMes__9CFlatDataFi(void* flatData, int index, int value)
 {
-    char* indexed = (char*)flatData + index * 4;
-    *(int*)(indexed + 0x3CDC) = value;
+    ((int*)((char*)flatData + 0x3CDC))[index] = value;
 }
 
 /*

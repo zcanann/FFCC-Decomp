@@ -54,8 +54,8 @@ extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCirc
     double angle = acos((double)PSVECDotProduct(&temp2, &temp1));
     work->m_angle = lbl_80330D90 * (f32)angle;
 
-    if (!((temp1.x <= lbl_80330D7C && temp1.z >= lbl_80330D7C) ||
-          (temp1.x > lbl_80330D7C && temp1.z < lbl_80330D7C))) {
+    if ((temp1.x <= lbl_80330D7C && temp1.z < lbl_80330D7C) ||
+        (temp1.x > lbl_80330D7C && temp1.z >= lbl_80330D7C)) {
         work->m_angle = lbl_80330D78 - work->m_angle;
     }
 

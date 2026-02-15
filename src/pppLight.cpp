@@ -1,7 +1,21 @@
 #include "ffcc/pppLight.h"
+#include "dolphin/mtx.h"
 
 extern float lbl_80330F60;
+extern float lbl_80330F64;
+extern float lbl_80330F68;
+extern float lbl_80330F6C;
 extern int lbl_8032ED70;
+extern unsigned char lbl_8032ED78;
+extern unsigned char lbl_8032ED79;
+extern unsigned char* lbl_8032ED50;
+extern unsigned char lbl_801EADC8[];
+
+extern "C" {
+void __ct__Q29CLightPcs6CLightFv(void*);
+void Add__9CLightPcsFPQ29CLightPcs6CLight(void*, void*);
+unsigned char LightPcs[];
+}
 
 /*
  * --INFO--
@@ -85,209 +99,142 @@ void pppLightCon(void* param1, void* param2)
  */
 void pppLight(void* param1, void* param2, void* param3)
 {
-	char* r28 = (char*)param1;
-	char* r29 = (char*)param2;
+	unsigned char* pppMng = (unsigned char*)param1;
+	unsigned char* lightParam = (unsigned char*)param2;
+	unsigned char* work = pppMng + *(int*)(*(unsigned char**)((unsigned char*)param3 + 0xc)) + 0x80;
+	unsigned char lightData[0xb0];
+	Vec sourcePos;
+	Vec targetPos;
 
-	if (lbl_8032ED70 != 0) {
-		return;
-	}
+	if (lbl_8032ED70 == 0) {
+		*(float*)(work + 0x1c) = *(float*)(work + 0x1c) + *(float*)(work + 0x20);
+		*(float*)(work + 0x18) = *(float*)(work + 0x18) + *(float*)(work + 0x1c);
+		*(float*)(work + 0x28) = *(float*)(work + 0x28) + *(float*)(work + 0x2c);
+		*(float*)(work + 0x24) = *(float*)(work + 0x24) + *(float*)(work + 0x28);
+		*(float*)(work + 0x34) = *(float*)(work + 0x34) + *(float*)(work + 0x38);
+		*(float*)(work + 0x30) = *(float*)(work + 0x30) + *(float*)(work + 0x34);
+		*(float*)(work + 0x40) = *(float*)(work + 0x40) + *(float*)(work + 0x44);
+		*(float*)(work + 0x3c) = *(float*)(work + 0x3c) + *(float*)(work + 0x40);
 
-	void** ptr1 = (void**)((char*)param3 + 0xc);
-	void* ptr2 = *ptr1;
-	char* r30 = r28 + (int)ptr2 + 0x80;
+		*(short*)(work + 0x8) = *(short*)(work + 0x8) + *(short*)(work + 0x10);
+		*(short*)(work + 0xa) = *(short*)(work + 0xa) + *(short*)(work + 0x12);
+		*(short*)(work + 0xc) = *(short*)(work + 0xc) + *(short*)(work + 0x14);
+		*(short*)(work + 0xe) = *(short*)(work + 0xe) + *(short*)(work + 0x16);
 
-	float f1, f0;
-	
-	// Load and accumulate float values at various offsets
-	f1 = *(float*)(r30 + 0x1c);
-	f0 = *(float*)(r30 + 0x20);
-	f0 = f1 + f0;
-	*(float*)(r30 + 0x1c) = f0;
-	
-	f1 = *(float*)(r30 + 0x18);
-	f0 = *(float*)(r30 + 0x1c);
-	f0 = f1 + f0;
-	*(float*)(r30 + 0x18) = f0;
-	
-	f1 = *(float*)(r30 + 0x28);
-	f0 = *(float*)(r30 + 0x2c);
-	f0 = f1 + f0;
-	*(float*)(r30 + 0x28) = f0;
-	
-	f1 = *(float*)(r30 + 0x24);
-	f0 = *(float*)(r30 + 0x28);
-	f0 = f1 + f0;
-	*(float*)(r30 + 0x24) = f0;
-	
-	// More float accumulations for additional offsets
-	f1 = *(float*)(r30 + 0x34);
-	f0 = *(float*)(r30 + 0x38);
-	f0 = f1 + f0;
-	*(float*)(r30 + 0x34) = f0;
-	
-	f1 = *(float*)(r30 + 0x30);
-	f0 = *(float*)(r30 + 0x34);
-	f0 = f1 + f0;
-	*(float*)(r30 + 0x30) = f0;
-	
-	f1 = *(float*)(r30 + 0x40);
-	f0 = *(float*)(r30 + 0x44);
-	f0 = f1 + f0;
-	*(float*)(r30 + 0x40) = f0;
-	
-	f1 = *(float*)(r30 + 0x3c);
-	f0 = *(float*)(r30 + 0x40);
-	f0 = f1 + f0;
-	*(float*)(r30 + 0x3c) = f0;
-	
-	// Integer accumulation operations with half-word loads
-	short r3, r0;
-	
-	r3 = *(short*)(r30 + 0x8);
-	r0 = *(short*)(r30 + 0x10);
-	r0 = r3 + r0;
-	*(short*)(r30 + 0x8) = r0;
-	
-	r3 = *(short*)(r30 + 0xa);
-	r0 = *(short*)(r30 + 0x12);
-	r0 = r3 + r0;
-	*(short*)(r30 + 0xa) = r0;
-	
-	r3 = *(short*)(r30 + 0xc);
-	r0 = *(short*)(r30 + 0x14);
-	r0 = r3 + r0;
-	*(short*)(r30 + 0xc) = r0;
-	
-	r3 = *(short*)(r30 + 0xe);
-	r0 = *(short*)(r30 + 0x16);
-	r0 = r3 + r0;
-	*(short*)(r30 + 0xe) = r0;
-	
-	// Check if we should process param2 data
-	int r3_int = *(int*)(r29 + 0x0);
-	int r0_int = *(int*)(r28 + 0xc);
-	if (r3_int != r0_int) {
-		return; // Early exit if IDs don't match
+		*(short*)(work + 0x0) = *(short*)(work + 0x0) + *(short*)(work + 0x8);
+		*(short*)(work + 0x2) = *(short*)(work + 0x2) + *(short*)(work + 0xa);
+		*(short*)(work + 0x4) = *(short*)(work + 0x4) + *(short*)(work + 0xc);
+		*(short*)(work + 0x6) = *(short*)(work + 0x6) + *(short*)(work + 0xe);
+
+		if (*(int*)lightParam == *(int*)(pppMng + 0xc)) {
+			*(short*)(work + 0x0) = *(short*)(work + 0x0) + *(short*)(lightParam + 0x8);
+			*(short*)(work + 0x2) = *(short*)(work + 0x2) + *(short*)(lightParam + 0xa);
+			*(short*)(work + 0x4) = *(short*)(work + 0x4) + *(short*)(lightParam + 0xc);
+			*(short*)(work + 0x6) = *(short*)(work + 0x6) + *(short*)(lightParam + 0xe);
+			*(short*)(work + 0x8) = *(short*)(work + 0x8) + *(short*)(lightParam + 0x10);
+			*(short*)(work + 0xa) = *(short*)(work + 0xa) + *(short*)(lightParam + 0x12);
+			*(short*)(work + 0xc) = *(short*)(work + 0xc) + *(short*)(lightParam + 0x14);
+			*(short*)(work + 0xe) = *(short*)(work + 0xe) + *(short*)(lightParam + 0x16);
+			*(short*)(work + 0x10) = *(short*)(work + 0x10) + *(short*)(lightParam + 0x18);
+			*(short*)(work + 0x12) = *(short*)(work + 0x12) + *(short*)(lightParam + 0x1a);
+			*(short*)(work + 0x14) = *(short*)(work + 0x14) + *(short*)(lightParam + 0x1c);
+			*(short*)(work + 0x16) = *(short*)(work + 0x16) + *(short*)(lightParam + 0x1e);
+			*(float*)(work + 0x18) = *(float*)(work + 0x18) + *(float*)(lightParam + 0x20);
+			*(float*)(work + 0x1c) = *(float*)(work + 0x1c) + *(float*)(lightParam + 0x24);
+			*(float*)(work + 0x20) = *(float*)(work + 0x20) + *(float*)(lightParam + 0x28);
+			*(float*)(work + 0x24) = *(float*)(work + 0x24) + *(float*)(lightParam + 0x2c);
+			*(float*)(work + 0x28) = *(float*)(work + 0x28) + *(float*)(lightParam + 0x30);
+			*(float*)(work + 0x2c) = *(float*)(work + 0x2c) + *(float*)(lightParam + 0x34);
+			*(float*)(work + 0x30) = *(float*)(work + 0x30) + *(float*)(lightParam + 0x38);
+			*(float*)(work + 0x34) = *(float*)(work + 0x34) + *(float*)(lightParam + 0x3c);
+			*(float*)(work + 0x38) = *(float*)(work + 0x38) + *(float*)(lightParam + 0x40);
+			*(float*)(work + 0x3c) = *(float*)(work + 0x3c) + *(float*)(lightParam + 0x4c);
+			*(float*)(work + 0x40) = *(float*)(work + 0x40) + *(float*)(lightParam + 0x50);
+			*(float*)(work + 0x44) = *(float*)(work + 0x44) + *(float*)(lightParam + 0x54);
+		}
+
+		__ct__Q29CLightPcs6CLightFv(lightData);
+
+		sourcePos.x = *(float*)(pppMng + 0x1c);
+		sourcePos.y = *(float*)(pppMng + 0x2c);
+		sourcePos.z = *(float*)(pppMng + 0x3c);
+		PSMTXMultVec((MtxPtr)(lbl_8032ED50 + 0x78), &sourcePos, &sourcePos);
+
+		*(float*)(lightData + 0xc) = sourcePos.x;
+		*(float*)(lightData + 0x10) = sourcePos.y;
+		*(float*)(lightData + 0x14) = sourcePos.z;
+		*(float*)(lightData + 0x24) = *(float*)(work + 0x24);
+		*(float*)(lightData + 0x28) = *(float*)(work + 0x18);
+		*(float*)(lightData + 0x30) = lbl_80330F64;
+		*(unsigned char**)(lightData + 0x6c) = lbl_8032ED50;
+		*(int*)(lightData + 0x70) = 0;
+
+		int c0 = *(short*)(work + 0x0) >> 7;
+		int c1 = *(short*)(work + 0x2) >> 7;
+		int c2 = *(short*)(work + 0x4) >> 7;
+		int c3 = *(short*)(work + 0x6) >> 7;
+		lightData[0x58] = (unsigned char)c0;
+		lightData[0x59] = (unsigned char)c1;
+		lightData[0x5a] = (unsigned char)c2;
+		lightData[0x5b] = (unsigned char)c3;
+
+		if (lightParam[0x5a] != 0) {
+			lightData[0x5c] = (unsigned char)c0;
+			lightData[0x5d] = (unsigned char)c1;
+			lightData[0x5e] = (unsigned char)c2;
+			lightData[0x5f] = (unsigned char)c3;
+		} else {
+			*(int*)(lightData + 0x5c) = 0;
+		}
+
+		if (lightParam[0x5b] != 0) {
+			lightData[0x60] = lightData[0x58];
+			lightData[0x61] = lightData[0x59];
+			lightData[0x62] = lightData[0x5a];
+			lightData[0x63] = lightData[0x5b];
+		} else {
+			*(int*)(lightData + 0x60) = 0;
+		}
+
+		if (lightParam[0x59] == 0) {
+			*(int*)(lightData + 0x58) = 0;
+		}
+
+		if (lbl_8032ED78 == 0 && lbl_8032ED79 == 0) {
+			if (lightParam[0x58] == 0) {
+				*(int*)(lightData + 0x8) = 0;
+				*(float*)(lightData + 0x40) = lbl_80330F60;
+				*(float*)(lightData + 0x44) = lbl_80330F60;
+				*(float*)(lightData + 0x48) = lbl_80330F64;
+				*(float*)(lightData + 0x4c) = lbl_80330F68;
+				Add__9CLightPcsFPQ29CLightPcs6CLight(LightPcs, lightData);
+			} else {
+				unsigned char* obj;
+
+				*(int*)(lightData + 0x8) = 1;
+				if (*(int*)(lightParam + 0x44) == -1) {
+					obj = lbl_801EADC8;
+				} else {
+					int objId = *(int*)(lightParam + 0x44);
+					obj = *(unsigned char**)(*(unsigned char**)(lbl_8032ED50 + 0xd4) + (objId << 4) + 0x4);
+				}
+
+				targetPos.x = *(float*)(obj + 0x1c);
+				targetPos.y = *(float*)(obj + 0x2c);
+				targetPos.z = *(float*)(obj + 0x3c);
+				PSMTXMultVec((MtxPtr)(lbl_8032ED50 + 0x78), &targetPos, &targetPos);
+
+				PSVECSubtract(&targetPos, &sourcePos, (Vec*)(lightData + 0x40));
+				PSVECNormalize((Vec*)(lightData + 0x40), (Vec*)(lightData + 0x40));
+				*(float*)(lightData + 0x4c) = lbl_80330F6C * *(float*)(work + 0x30);
+
+				if (lightParam[0x58] == 2) {
+					*(float*)(lightData + 0x50) = *(float*)(work + 0x3c);
+					lightData[0x57] = 1;
+				}
+
+				Add__9CLightPcsFPQ29CLightPcs6CLight(LightPcs, lightData);
+			}
+		}
 	}
-	
-	// Process input deltas from param2
-	r3 = *(short*)(r30 + 0x0);
-	r0 = *(short*)(r29 + 0x8);
-	r0 = r3 + r0;
-	*(short*)(r30 + 0x0) = r0;
-	
-	r3 = *(short*)(r30 + 0x2);
-	r0 = *(short*)(r29 + 0xa);
-	r0 = r3 + r0;
-	*(short*)(r30 + 0x2) = r0;
-	
-	r3 = *(short*)(r30 + 0x4);
-	r0 = *(short*)(r29 + 0xc);
-	r0 = r3 + r0;
-	*(short*)(r30 + 0x4) = r0;
-	
-	r3 = *(short*)(r30 + 0x6);
-	r0 = *(short*)(r29 + 0xe);
-	r0 = r3 + r0;
-	*(short*)(r30 + 0x6) = r0;
-	
-	// Additional accumulations with more param2 offsets
-	r3 = *(short*)(r30 + 0x8);
-	r0 = *(short*)(r29 + 0x10);
-	r0 = r3 + r0;
-	*(short*)(r30 + 0x8) = r0;
-	
-	r3 = *(short*)(r30 + 0xa);
-	r0 = *(short*)(r29 + 0x12);
-	r0 = r3 + r0;
-	*(short*)(r30 + 0xa) = r0;
-	
-	// Float operations with param2 data
-	f1 = *(float*)(r30 + 0x18);
-	f0 = *(float*)(r29 + 0x20);
-	f0 = f1 + f0;
-	*(float*)(r30 + 0x18) = f0;
-	
-	f1 = *(float*)(r30 + 0x1c);
-	f0 = *(float*)(r29 + 0x24);
-	f0 = f1 + f0;
-	*(float*)(r30 + 0x1c) = f0;
-	
-	f1 = *(float*)(r30 + 0x20);
-	f0 = *(float*)(r29 + 0x28);
-	f0 = f1 + f0;
-	*(float*)(r30 + 0x20) = f0;
-	
-	f1 = *(float*)(r30 + 0x24);
-	f0 = *(float*)(r29 + 0x2c);
-	f0 = f1 + f0;
-	*(float*)(r30 + 0x24) = f0;
-	
-	f1 = *(float*)(r30 + 0x28);
-	f0 = *(float*)(r29 + 0x30);
-	f0 = f1 + f0;
-	*(float*)(r30 + 0x28) = f0;
-	
-	f1 = *(float*)(r30 + 0x2c);
-	f0 = *(float*)(r29 + 0x34);
-	f0 = f1 + f0;
-	*(float*)(r30 + 0x2c) = f0;
-	
-	f1 = *(float*)(r30 + 0x30);
-	f0 = *(float*)(r29 + 0x38);
-	f0 = f1 + f0;
-	*(float*)(r30 + 0x30) = f0;
-	
-	f1 = *(float*)(r30 + 0x34);
-	f0 = *(float*)(r29 + 0x3c);
-	f0 = f1 + f0;
-	*(float*)(r30 + 0x34) = f0;
-	
-	f1 = *(float*)(r30 + 0x38);
-	f0 = *(float*)(r29 + 0x40);
-	f0 = f1 + f0;
-	*(float*)(r30 + 0x38) = f0;
-	
-	f1 = *(float*)(r30 + 0x3c);
-	f0 = *(float*)(r29 + 0x4c);
-	f0 = f1 + f0;
-	*(float*)(r30 + 0x3c) = f0;
-	
-	f1 = *(float*)(r30 + 0x40);
-	f0 = *(float*)(r29 + 0x50);
-	f0 = f1 + f0;
-	*(float*)(r30 + 0x40) = f0;
-	
-	f1 = *(float*)(r30 + 0x44);
-	f0 = *(float*)(r29 + 0x54);
-	f0 = f1 + f0;
-	*(float*)(r30 + 0x44) = f0;
-	
-	// Color processing - convert signed 16-bit to 8-bit values  
-	// Assembly showed shift-right by 7 operations
-	unsigned char color_vals[4];
-	color_vals[0] = (unsigned char)(*(short*)(r30 + 0x0) >> 7);
-	color_vals[1] = (unsigned char)(*(short*)(r30 + 0x2) >> 7);
-	color_vals[2] = (unsigned char)(*(short*)(r30 + 0x4) >> 7);
-	color_vals[3] = (unsigned char)(*(short*)(r30 + 0x6) >> 7);
-	
-	// Various flag checks observed in assembly
-	unsigned char flag1 = *(unsigned char*)(r29 + 0x5a);
-	unsigned char flag2 = *(unsigned char*)(r29 + 0x5b);
-	unsigned char flag3 = *(unsigned char*)(r29 + 0x58);
-	
-	if (flag1 != 0) {
-		// Store color values
-		color_vals[0] = (unsigned char)(*(short*)(r30 + 0x0) >> 7);
-		color_vals[1] = (unsigned char)(*(short*)(r30 + 0x2) >> 7); 
-		color_vals[2] = (unsigned char)(*(short*)(r30 + 0x4) >> 7);
-		color_vals[3] = (unsigned char)(*(short*)(r30 + 0x6) >> 7);
-	}
-	
-	// Matrix transformation operations that were in the assembly
-	// This looks like setting up a 3x4 matrix and doing vector operations
-	float matrix_pos[3];
-	matrix_pos[0] = *(float*)(r28 + 0x1c);
-	matrix_pos[1] = *(float*)(r28 + 0x2c);
-	matrix_pos[2] = *(float*)(r28 + 0x3c);
 }

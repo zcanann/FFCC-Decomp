@@ -1,23 +1,63 @@
 #include "ffcc/monobj.h"
+#include "ffcc/charaobj.h"
+
+#include <string.h>
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011A4CC
+ * PAL Size: 168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::onCreate()
 {
-	// TODO
+	CGCharaObj* charaObj = reinterpret_cast<CGCharaObj*>(this);
+	charaObj->onCreate();
+
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	*reinterpret_cast<unsigned int*>(mon + 0x6C4) = static_cast<unsigned int>(-1);
+	*reinterpret_cast<unsigned short*>(mon + 0x6E4) = 0;
+	*reinterpret_cast<unsigned short*>(mon + 0x6E6) = 0;
+	*reinterpret_cast<unsigned int*>(mon + 0x6C8) = 0;
+	*reinterpret_cast<unsigned int*>(mon + 0x6CC) = 0;
+	mon[0x6B4] = 0;
+	mon[0x6B8] = 0;
+	mon[0x6B9] = 0;
+	mon[0x6BA] = 0;
+	mon[0x6BC] = 0;
+	mon[0x6BD] = 0;
+	mon[0x6BE] = 0;
+	*reinterpret_cast<unsigned int*>(mon + 0x6F0) = 0;
+	*reinterpret_cast<unsigned int*>(mon + 0x6F4) = 0;
+	mon[0x6BF] = 0;
+	mon[0x6C0] = 0;
+	mon[0x6C2] = 0;
+	mon[0x6C3] = 0;
+	*reinterpret_cast<unsigned int*>(mon + 0x6D8) = 0;
+	*reinterpret_cast<unsigned int*>(mon + 0x6DC) = 0;
+	mon[0x6BB] = 0;
+	*reinterpret_cast<unsigned int*>(mon + 0x704) = 0;
+	memset(mon + 0x70C, 0, 0x34);
+	*reinterpret_cast<unsigned int*>(mon + 0x6E0) = 0;
+	mon[0x6C1] = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011A4AC
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::onDestroy()
 {
-	// TODO
+	CGCharaObj* charaObj = reinterpret_cast<CGCharaObj*>(this);
+	charaObj->onDestroy();
 }
 
 /*

@@ -224,7 +224,8 @@ void pppFrameLaser(struct pppLaser *pppLaser, struct UnkB *param_2, struct UnkC 
         return;
     }
 
-    if (work[7] == 0.0f) {
+    bool resetPoints = (work[7] == 0.0f);
+    if (resetPoints) {
         work[7] = (float)(u32)pppMemAlloc__FUlPQ27CMemory6CStagePci(
             (u32)step->m_payload[0x1e] * 0xc, pppEnvStPtr->m_stagePtr, s_pppLaser_cpp, 0x7d);
         memset((void*)(u32)work[7], 0, (u32)step->m_payload[0x1e] * 0xc);
@@ -260,17 +261,19 @@ void pppFrameLaser(struct pppLaser *pppLaser, struct UnkB *param_2, struct UnkC 
             work[9] = tempMtx[1][3];
             work[10] = tempMtx[2][3];
             PSMTXMultVec(tempMtx, &localB, points);
-        } else {
+        } else if (!resetPoints) {
             double denom = ((double)(int)step->m_payload[0x3a] + 1.0) - DOUBLE_80333440;
             double t = (FLOAT_80333448 / (float)denom) * ((double)(int)i - DOUBLE_80333440);
             if (GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f((float)t, pppMngStPtr, charaMtx) == 0) {
-                for (int k = 0; k < (int)(u32)step->m_payload[0x1e]; k++) {
-                    points[k] = points[0];
-                }
-                return;
+                resetPoints = true;
+            } else {
+                PSMTXConcat(charaMtx, baseObj->m_localMatrix.value, charaMtx);
+                PSMTXMultVec(charaMtx, &localB, &points[i]);
             }
-            PSMTXConcat(charaMtx, baseObj->m_localMatrix.value, charaMtx);
-            PSMTXMultVec(charaMtx, &localB, &points[i]);
+        }
+
+        if ((i != 0) && resetPoints) {
+            continue;
         }
 
         localPos.x = work[8];
@@ -332,6 +335,13 @@ void pppFrameLaser(struct pppLaser *pppLaser, struct UnkB *param_2, struct UnkC 
             } else {
                 (*hitFrame)++;
             }
+        }
+    }
+
+    if (resetPoints) {
+        Vec* points = (Vec*)(u32)work[7];
+        for (int i = 0; i < (int)(u32)step->m_payload[0x1e]; i++) {
+            pppCopyVector__FR3Vec3Vec(&points[i], &points[0]);
         }
     }
 }

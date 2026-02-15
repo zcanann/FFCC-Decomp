@@ -56,51 +56,34 @@ extern "C" {
  * JP Address: TODO
  * JP Size: TODO
  */
-void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* param_3, int param_4, int param_5, float (*param_6) [4])
+extern "C" void ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2(CChara::CModel* model, void* param_2, void* param_3, int param_4, int param_5, float (*param_6) [4])
 {
 	char flag = *(char*)((char*)param_3 + 0x14);
-	
+	char* materialMan = MaterialMan;
+	char* mesh = *(char**)((char*)model + 0xAC) + param_4 * 0x14;
+	char* displayList = *(char**)(*(int*)(mesh + 8) + 0x50) + param_5 * 0xC;
+
 	if (flag == 0) {
-		// Set MaterialMan field at offset 0xd0 to param_2 + 0x1c + 0x28
-		int offset = (int)param_2 + 0x1c + 0x28;
-		*(int*)(MaterialMan + 0xd0) = offset;
-		
-		// Set other MaterialMan fields based on Ghidra decomp
-		*(int*)(MaterialMan + 0x44) = 0xFFFFFFFF;
-		*(char*)(MaterialMan + 0x4c) = 0xFF;
-		*(int*)(MaterialMan + 0x11c) = 0;
-		*(int*)(MaterialMan + 0x120) = 0x1E;
-		*(int*)(MaterialMan + 0x124) = 0;
-		*(char*)(MaterialMan + 0x205) = 0xFF;
-		*(char*)(MaterialMan + 0x206) = 0xFF;
-		*(int*)(MaterialMan + 0x58) = 0;
-		*(int*)(MaterialMan + 0x5c) = 0;
-		*(char*)(MaterialMan + 0x208) = 0;
-		*(int*)(MaterialMan + 0x48) = 0xADE0F;
-		*(int*)(MaterialMan + 0x128) = 0;
-		*(int*)(MaterialMan + 0x12c) = 0x1E;
-		*(int*)(MaterialMan + 0x130) = 0;
-		*(int*)(MaterialMan + 0x40) = 0xADE0F;
+		*(int*)(materialMan + 0xd0) = *(int*)((char*)param_2 + 0x1c) + 0x28;
+		*(int*)(materialMan + 0x44) = 0xFFFFFFFF;
+		*(char*)(materialMan + 0x4c) = 0xFF;
+		*(int*)(materialMan + 0x11c) = 0;
+		*(int*)(materialMan + 0x120) = 0x1E;
+		*(int*)(materialMan + 0x124) = 0;
+		*(char*)(materialMan + 0x205) = 0xFF;
+		*(char*)(materialMan + 0x206) = 0xFF;
+		*(int*)(materialMan + 0x58) = 0;
+		*(int*)(materialMan + 0x5c) = 0;
+		*(char*)(materialMan + 0x208) = 0;
+		*(int*)(materialMan + 0x48) = 0xADE0F;
+		*(int*)(materialMan + 0x128) = 0;
+		*(int*)(materialMan + 0x12c) = 0x1E;
+		*(int*)(materialMan + 0x130) = 0;
+		*(int*)(materialMan + 0x40) = 0xADE0F;
 	}
-	
-	// Get display list info
-	char* meshes = (char*)model + 0xac;
-	void* mesh_data = *(void**)(meshes + param_4 * 0x14 + 8);
-	void* display_lists = *(void**)((char*)mesh_data + 0x50);
-	void* display_list = (void*)((char*)display_lists + param_5 * 0xc);
-	
-	// Call SetMaterial
-	void* model_data = *(void**)((char*)model + 0xa4);
-	void* material_set = *(void**)((char*)model_data + 0x24);
-	unsigned short material_id = *(unsigned short*)((char*)display_list + 8);
-	SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(MaterialMan, material_set, material_id, 0, 0);
-	
-	// Call GXCallDisplayList if flag allows
-	if (flag == 1 || flag == 0) {
-		void* dl_data = *(void**)display_list;
-		unsigned int dl_size = *(unsigned int*)((char*)display_list + 4);
-		GXCallDisplayList(dl_data, dl_size);
-	}
+	SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
+	    MaterialMan, *(void**)(*(int*)((char*)model + 0xA4) + 0x24), *(unsigned short*)(displayList + 8), 0, 0);
+	GXCallDisplayList(*(void**)displayList, *(unsigned int*)(displayList + 4));
 }
 
 /*
@@ -112,7 +95,7 @@ void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* pa
  * JP Address: TODO
  * JP Size: TODO
  */
-void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* param_3, int param_4, float (*param_5) [4])
+extern "C" void ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2(CChara::CModel* model, void* param_2, void* param_3, int param_4, float (*param_5) [4])
 {
 	if (*(char*)((char*)param_3 + 0x14) != 0) {
 		int texture_info = *(int*)((char*)param_2 + 0x1c);
@@ -344,8 +327,8 @@ void pppFrameChangeTex(pppChangeTex* changeTex, UnkB* step, UnkC* data)
 	((int*)value)[9] = (int)pppEnvStPtr;
 	*(float**)(model0 + 0xE4) = value;
 	*(UnkB**)(model0 + 0xE8) = step;
-	*(void**)(model0 + 0xFC) = (void*)ChangeTex_DrawMeshDLCallback;
-	*(void**)(model0 + 0x104) = (void*)ChangeTex_AfterDrawMeshCallback;
+	*(void**)(model0 + 0xFC) = (void*)ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2;
+	*(void**)(model0 + 0x104) = (void*)ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2;
 
 	value[7] = (float)GetTextureFromRSD__FiP9_pppEnvSt(step->m_dataValIndex, pppEnvStPtr);
 
@@ -357,8 +340,8 @@ void pppFrameChangeTex(pppChangeTex* changeTex, UnkB* step, UnkC* data)
 		if (model1 != 0) {
 			*(float**)(model1 + 0xE4) = value;
 			*(UnkB**)(model1 + 0xE8) = step;
-			*(void**)(model1 + 0xFC) = (void*)ChangeTex_DrawMeshDLCallback;
-			*(void**)(model1 + 0x104) = (void*)ChangeTex_AfterDrawMeshCallback;
+			*(void**)(model1 + 0xFC) = (void*)ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2;
+			*(void**)(model1 + 0x104) = (void*)ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2;
 		}
 	}
 
@@ -367,8 +350,8 @@ void pppFrameChangeTex(pppChangeTex* changeTex, UnkB* step, UnkC* data)
 		if (model2 != 0) {
 			*(float**)(model2 + 0xE4) = value;
 			*(UnkB**)(model2 + 0xE8) = step;
-			*(void**)(model2 + 0xFC) = (void*)ChangeTex_DrawMeshDLCallback;
-			*(void**)(model2 + 0x104) = (void*)ChangeTex_AfterDrawMeshCallback;
+			*(void**)(model2 + 0xFC) = (void*)ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2;
+			*(void**)(model2 + 0x104) = (void*)ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2;
 		}
 	}
 

@@ -141,20 +141,6 @@ void pppDestructYmTracer(pppYmTracer* pppYmTracer, UnkC* param_2)
     }
 }
 
-static void shiftTraceEntries(TRACE_POLYGON* entries, s32 count)
-{
-    for (s32 i = count - 2; i >= 0; i--) {
-        entries[i + 1].life = entries[i].life;
-        entries[i + 1].decay = entries[i].decay;
-        pppCopyVector(entries[i + 1].from, entries[i].from);
-        pppCopyVector(entries[i + 1].to, entries[i].to);
-        entries[i + 1].colorR = entries[i].colorR;
-        entries[i + 1].colorG = entries[i].colorG;
-        entries[i + 1].colorB = entries[i].colorB;
-        entries[i + 1].alpha = entries[i].alpha;
-    }
-}
-
 /*
  * --INFO--
  * PAL Address: 800934c4
@@ -201,7 +187,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, UnkB* param_2, UnkC* param_3)
         if (param_2->m_initWOrk == -1) {
             work[8] = (f32)(u32)&DAT_801eadc8;
         } else {
-            work[8] = (f32)(u32)((u8*)&pppMngStPtr->m_kind + (s32)param_2->m_stepValue);
+            work[8] = (f32)(u32)((u8*)&pppMngStPtr->m_kind + param_2->m_stepValue);
         }
 
         if (param_2->m_arg3 == -1) {
@@ -212,7 +198,16 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, UnkB* param_2, UnkC* param_3)
     }
 
     if (*(u16*)(work + 0xB) + 1 < maxCount) {
-        shiftTraceEntries(entries, maxCount);
+        for (s32 i = maxCount - 2; i >= 0; i--) {
+            entries[i + 1].life = entries[i].life;
+            entries[i + 1].decay = entries[i].decay;
+            pppCopyVector(entries[i + 1].from, entries[i].from);
+            pppCopyVector(entries[i + 1].to, entries[i].to);
+            entries[i + 1].colorR = entries[i].colorR;
+            entries[i + 1].colorG = entries[i].colorG;
+            entries[i + 1].colorB = entries[i].colorB;
+            entries[i + 1].alpha = entries[i].alpha;
+        }
 
         entries[0].life = *(s16*)(param_2->m_payload + 6);
         entries[0].alpha = param_2->m_payload[8];
@@ -295,7 +290,16 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, UnkB* param_2, UnkC* param_3)
             }
 
             for (s32 i = 0; i < splineCount; i++) {
-                shiftTraceEntries(entries, maxCount);
+                for (s32 j = maxCount - 2; j > 1; j--) {
+                    entries[j + 1].life = entries[j].life;
+                    entries[j + 1].decay = entries[j].decay;
+                    pppCopyVector(entries[j + 1].from, entries[j].from);
+                    pppCopyVector(entries[j + 1].to, entries[j].to);
+                    entries[j + 1].colorR = entries[j].colorR;
+                    entries[j + 1].colorG = entries[j].colorG;
+                    entries[j + 1].colorB = entries[j].colorB;
+                    entries[j + 1].alpha = entries[j].alpha;
+                }
             }
 
             for (s32 i = 0; i < splineCount; i++) {
@@ -351,10 +355,6 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, UnkB* param_2, UnkC* param_3)
     work = (f32*)((u8*)pppYmTracer + 0x10 + *param_3->m_serializedDataOffsets);
     polygons = (TRACE_POLYGON*)(u32)work[10];
     count = *(u16*)(work + 0xB);
-    if (polygons == nullptr || count < 2) {
-        return;
-    }
-
     mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex];
     pppSetBlendMode__FUc(param_2->m_payload[10]);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
@@ -386,48 +386,47 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, UnkB* param_2, UnkC* param_3)
     GXSetCullMode(GX_CULL_NONE);
 
     for (u16 i = 0; i < (u16)(count - 1); i++) {
-        TRACE_POLYGON* current = &polygons[i];
-        TRACE_POLYGON* next = &polygons[i + 1];
+        f32* poly = (f32*)(polygons + i);
         f32 u0;
         f32 u1;
         u32 color0;
         u32 color1;
 
-        if (current->life <= 0) {
+        if (*(s16*)(poly + 8) <= 0) {
             continue;
         }
-        if (current->to.x == FLOAT_803306e8 || current->to.y == FLOAT_803306e8 || current->to.z == FLOAT_803306e8) {
+        if (poly[4] == FLOAT_803306e8 || poly[5] == FLOAT_803306e8 || poly[6] == FLOAT_803306e8) {
             continue;
         }
-        if (current->from.x == FLOAT_803306e8 || current->from.y == FLOAT_803306e8 || current->from.z == FLOAT_803306e8) {
+        if (poly[0] == FLOAT_803306e8 || poly[1] == FLOAT_803306e8 || poly[2] == FLOAT_803306e8) {
             continue;
         }
-        if (next->to.x == FLOAT_803306e8 || next->to.y == FLOAT_803306e8 || next->to.z == FLOAT_803306e8) {
+        if (poly[14] == FLOAT_803306e8 || poly[15] == FLOAT_803306e8 || poly[16] == FLOAT_803306e8) {
             continue;
         }
-        if (next->from.x == FLOAT_803306e8 || next->from.y == FLOAT_803306e8 || next->from.z == FLOAT_803306e8) {
+        if (poly[10] == FLOAT_803306e8 || poly[11] == FLOAT_803306e8 || poly[12] == FLOAT_803306e8) {
             continue;
         }
 
         u0 = (f32)i * uvStep;
         u1 = (f32)(i + 1) * uvStep;
-        color0 = (DAT_803306e0 & 0xFFFFFF00) | current->alpha;
-        color1 = (DAT_803306e4 & 0xFFFFFF00) | next->alpha;
+        color0 = (DAT_803306e0 & 0xFFFFFF00) | *(u8*)((u8*)poly + 0x1F);
+        color1 = (DAT_803306e4 & 0xFFFFFF00) | *(u8*)((u8*)poly + 0x47);
 
         GXBegin((GXPrimitive)0x98, GX_VTXFMT7, 4);
-        GXPosition3f32(current->to.x, current->to.y, current->to.z);
+        GXPosition3f32(poly[4], poly[5], poly[6]);
         GXColor1u32(color0);
         GXTexCoord2f32(u0, FLOAT_803306ec);
 
-        GXPosition3f32(current->from.x, current->from.y, current->from.z);
+        GXPosition3f32(poly[0], poly[1], poly[2]);
         GXColor1u32(color0);
         GXTexCoord2f32(u0, FLOAT_803306e8);
 
-        GXPosition3f32(next->to.x, next->to.y, next->to.z);
+        GXPosition3f32(poly[14], poly[15], poly[16]);
         GXColor1u32(color1);
         GXTexCoord2f32(u1, FLOAT_803306ec);
 
-        GXPosition3f32(next->from.x, next->from.y, next->from.z);
+        GXPosition3f32(poly[10], poly[11], poly[12]);
         GXColor1u32(color1);
         GXTexCoord2f32(u1, FLOAT_803306e8);
     }

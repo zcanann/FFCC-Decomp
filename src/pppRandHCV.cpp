@@ -17,6 +17,11 @@ typedef struct RandHCVParams {
     u8 pad[3];
 } RandHCVParams;
 
+typedef struct RandHCVCtx {
+    u8 pad[0xC];
+    int* outputOffset;
+} RandHCVCtx;
+
 /*
  * --INFO--
  * PAL Address: TODO
@@ -45,39 +50,39 @@ void randshort(short value, float factor) {
 extern "C" {
 
 void pppRandHCV(void* p1, void* p2, void* p3) {
+    u8* base = (u8*)p1;
     RandHCVParams* params = (RandHCVParams*)p2;
-    float* scalePtr;
+    RandHCVCtx* ctx = (RandHCVCtx*)p3;
+    float* randomValue;
 
     if (lbl_8032ED70 != 0) {
         return;
     }
 
-    if (params->index == *(int*)((char*)p1 + 0xc)) {
-        float randValue = RandF__5CMathFv(math);
+    if (params->index == *(int*)(base + 0xC)) {
+        float value = RandF__5CMathFv(math);
         if (params->flag != 0) {
-            randValue = randValue + RandF__5CMathFv(math);
+            value += RandF__5CMathFv(math);
         } else {
-            randValue = randValue * lbl_8032FF98;
+            value *= lbl_8032FF98;
         }
 
-        scalePtr = (float*)((char*)p1 + **(int**)((char*)p3 + 0xc) + 0x80);
-        *scalePtr = randValue;
-    }
-
-    if (params->index != *(int*)((char*)p1 + 0xc)) {
+        randomValue = (float*)(base + *ctx->outputOffset + 0x80);
+        *randomValue = value;
+    } else if (params->index != *(int*)(base + 0xC)) {
         return;
     }
 
-    scalePtr = (float*)((char*)p1 + **(int**)((char*)p3 + 0xc) + 0x80);
+    randomValue = (float*)(base + *ctx->outputOffset + 0x80);
 
     s16* target;
     if (params->colorOffset == -1) {
         target = lbl_801EADC8;
     } else {
-        target = (s16*)((char*)p1 + params->colorOffset + 0x80);
+        target = (s16*)(base + params->colorOffset + 0x80);
     }
 
-    float scale = *scalePtr;
+    float scale = *randomValue;
 
     {
         s16 current = target[0];

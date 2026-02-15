@@ -3,6 +3,7 @@
 #include "ffcc/charaobj.h"
 #include "ffcc/color.h"
 #include "ffcc/graphic.h"
+#include "ffcc/math.h"
 #include "ffcc/pad.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/p_dbgmenu.h"
@@ -23,6 +24,11 @@ static const float kDrawAStarSphereRadius = 5.0f;
 extern Mtx gFlatPosMtx;
 extern int DAT_8032ed70;
 extern unsigned char lbl_8032EC90[];
+extern char lbl_801DD6A8[];
+extern char lbl_801DD6B4[];
+extern char lbl_803320A0[];
+extern CMath Math;
+extern "C" int __cntlzw(unsigned int);
 
 CAStar AStar;
 
@@ -505,81 +511,85 @@ void CAStar::calcAStar()
  */
 void CAStar::drawAStar()
 {
-	if ((DAT_8032ed70 & 0x400) == 0)
+	if ((DAT_8032ed70 & 0x400) != 0)
 	{
-		return;
-	}
+		int frameGroup = System.m_frameCounter / 0x1e + (System.m_frameCounter >> 31);
 
-	int frameGroup = System.m_frameCounter / 0x1e;
-
-	if (System.m_frameCounter == frameGroup * 0x1e)
-	{
-		for (int group = 0; group < 64; ++group)
+		if (System.m_frameCounter == (frameGroup - (frameGroup >> 31)) * 0x1e)
 		{
-			unsigned char r = static_cast<unsigned char>((group * 41 + System.m_frameCounter) & 0xFF);
-			unsigned char g = static_cast<unsigned char>((group * 71 + (System.m_frameCounter >> 1)) & 0xFF);
-			unsigned char b = static_cast<unsigned char>((group * 17 + (System.m_frameCounter >> 2)) & 0xFF);
-			CColor color(r, g, b, 0xFF);
-			MapMng.SetIdGrpColor(group, 0, color.color);
-		}
-	}
-
-	if (m_currentGroup != 0 && m_previousGroup != 0)
-	{
-		CColor white(0xFF, 0xFF, 0xFF, 0xFF);
-		Graphic.DrawSphere(gFlatPosMtx, &m_lastGroupPos, kDrawAStarSphereRadius, &white.color);
-	}
-
-	for (int i = 0; i < 64; ++i)
-	{
-		CAPos& portal = m_portals[i];
-
-		if (portal.m_groupA == 0 || portal.m_groupB == 0)
-		{
-			continue;
+			for (int group = 0; group < 64; ++group)
+			{
+				unsigned char b = static_cast<unsigned char>(Math.Rand(0xff));
+				unsigned char g = static_cast<unsigned char>(Math.Rand(0xff));
+				unsigned char r = static_cast<unsigned char>(Math.Rand(0xff));
+				CColor color(r, g, b, 0xFF);
+				MapMng.SetIdGrpColor(group, 0, color.color);
+			}
 		}
 
-		CColor yellow(0xFF, 0xFF, 0x00, 0xFF);
-		Graphic.DrawSphere(gFlatPosMtx, &portal.m_position, kDrawAStarSphereRadius, &yellow.color);
-
-		for (int side = 0; side < 2; ++side)
+		bool hasGroups = false;
+		if (m_currentGroup != 0 && m_previousGroup != 0)
 		{
-			unsigned char group = (side == 0) ? portal.m_groupA : portal.m_groupB;
+			hasGroups = true;
+		}
 
-			if (group == 0)
+		if (hasGroups)
+		{
+			CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+			Graphic.DrawSphere(gFlatPosMtx, &m_lastGroupPos, kDrawAStarSphereRadius, &white.color);
+		}
+
+		for (int i = 0; i < 64; ++i)
+		{
+			CAPos& portal = m_portals[i];
+
+			if (portal.m_groupA == 0 || portal.m_groupB == 0)
 			{
 				continue;
 			}
 
-			for (int j = 0; j < 64; ++j)
+			CColor yellow(0xFF, 0xFF, 0x00, 0xFF);
+			Graphic.DrawSphere(gFlatPosMtx, &portal.m_position, kDrawAStarSphereRadius, &yellow.color);
+
+			for (int side = 0; side < 2; ++side)
 			{
-				if (i == j)
+				unsigned char group = (side == 0) ? portal.m_groupA : portal.m_groupB;
+
+				if (group == 0)
 				{
 					continue;
 				}
 
-				CAPos& other = m_portals[j];
-
-				if (other.m_groupA == 0 || other.m_groupB == 0)
+				for (int j = 0; j < 64; ++j)
 				{
-					continue;
-				}
+					if (i == j)
+					{
+						continue;
+					}
 
-				if (other.m_groupA != group && other.m_groupB != group)
-				{
-					continue;
-				}
+					CAPos& other = m_portals[j];
 
-				GXLoadPosMtxImm(gFlatPosMtx, GX_PNMTX0);
-				GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 2);
-				GXPosition3f32(
-					portal.m_position.x,
-					portal.m_position.y + kPolyGroupTopOffsetY,
-					portal.m_position.z);
-				GXPosition3f32(
-					other.m_position.x,
-					other.m_position.y + kPolyGroupTopOffsetY,
-					other.m_position.z);
+					if (other.m_groupA == 0 || other.m_groupB == 0)
+					{
+						continue;
+					}
+
+					if (other.m_groupA != group && other.m_groupB != group)
+					{
+						continue;
+					}
+
+					GXLoadPosMtxImm(gFlatPosMtx, GX_PNMTX0);
+					GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 2);
+					GXPosition3f32(
+						portal.m_position.x,
+						portal.m_position.y + kPolyGroupTopOffsetY,
+						portal.m_position.z);
+					GXPosition3f32(
+						other.m_position.x,
+						other.m_position.y + kPolyGroupTopOffsetY,
+						other.m_position.z);
+				}
 			}
 		}
 	}
@@ -603,8 +613,7 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 		m_lastSeenGroup   = static_cast<unsigned char>(gPartyObj->m_aStarGroupId);
 	}
 
-	// Debug draw current A* group on screen (originally Graphic.Printf).
-	// Graphic.Printf(10, 10, "A* GROUP=%d", static_cast<int>(gPartyObj->m_aStarGroupId));
+	Graphic.Printf(10, 10, lbl_801DD6A8, static_cast<int>(gPartyObj->m_aStarGroupId));
 
 	bool padBusy = false;
 
@@ -620,8 +629,7 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 	}
 	else
 	{
-		// Decompiled junk: originally came from a cntlzw pattern.
-		// (void)countLeadingZeros(static_cast<unsigned int>(Pad._448_4_));
+		__cntlzw(static_cast<unsigned int>(Pad._448_4_));
 		trig1 = Pad._8_2_;
 	}
 
@@ -643,8 +651,7 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 	}
 	else
 	{
-		// Decompiled junk: originally came from a cntlzw pattern.
-		// (void)countLeadingZeros(static_cast<unsigned int>(Pad._448_4_));
+		__cntlzw(static_cast<unsigned int>(Pad._448_4_));
 		trig2 = Pad._4_2_;
 	}
 
@@ -715,7 +722,7 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 	portal.m_groupA = groupLow;
 	portal.m_groupB = groupHigh;
 
-	// System.Printf(DAT_803320a0);
+	System.Printf(lbl_803320A0);
 
 	for (int i = 0; i < 64; ++i)
 	{
@@ -730,7 +737,7 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 		if (used)
 		{
 			System.Printf(
-				"addAStar(%.5f, %.5f, %.5f, %d, %d, 0, 0);\n",
+				lbl_801DD6B4,
 				static_cast<double>(p.m_position.x),
 				static_cast<double>(p.m_position.y),
 				static_cast<double>(p.m_position.z),

@@ -48,13 +48,6 @@ struct VertexApLcSource
     Vec* points;
 };
 
-struct VecWord3
-{
-    u32 x;
-    u32 y;
-    u32 z;
-};
-
 struct _pppPDataVal;
 
 extern CMath math;
@@ -64,8 +57,8 @@ extern VertexApLcEnv* lbl_8032ED54;
 
 extern "C" {
 f32 RandF__5CMathFv(CMath*);
-_pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
 }
+_pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
 
 /*
  * --INFO--
@@ -117,7 +110,6 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
             points = src->points;
         }
 
-        VecWord3* pointWords = (VecWord3*)points;
         u8 count = data->spawnCount;
 
         if (data->mode == 0) {
@@ -128,7 +120,10 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
 
                 u16 vertexIndex = entry->vertexIndices[state->index];
                 state->index++;
-                VecWord3 vtxWords = pointWords[vertexIndex];
+                Vec* vertex = &points[vertexIndex];
+                f32 x = vertex->x;
+                f32 y = vertex->y;
+                f32 z = vertex->z;
 
                 if ((data->childId + 0x10000) != 0xFFFF) {
                     _pppPObject* child;
@@ -141,16 +136,19 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
                         *(void**)((u8*)child + 0x4) = parent;
                     }
 
-                    u32* dst = (u32*)((u8*)child + data->childPosOffset + 0x80);
-                    dst[0] = vtxWords.x;
-                    dst[1] = vtxWords.y;
-                    dst[2] = vtxWords.z;
+                    Vec* dst = (Vec*)((u8*)child + data->childPosOffset + 0x80);
+                    dst->x = x;
+                    dst->y = y;
+                    dst->z = z;
                 }
             } while (count-- != 0);
         } else if (data->mode == 1) {
             do {
                 u16 vertexIndex = entry->vertexIndices[(s32)(RandF__5CMathFv(&math) * (f32)entry->maxValue)];
-                VecWord3 vtxWords = pointWords[vertexIndex];
+                Vec* vertex = &points[vertexIndex];
+                f32 x = vertex->x;
+                f32 y = vertex->y;
+                f32 z = vertex->z;
 
                 if ((data->childId + 0x10000) != 0xFFFF) {
                     _pppPObject* child;
@@ -163,10 +161,10 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
                         *(void**)((u8*)child + 0x4) = parent;
                     }
 
-                    u32* dst = (u32*)((u8*)child + data->childPosOffset + 0x80);
-                    dst[0] = vtxWords.x;
-                    dst[1] = vtxWords.y;
-                    dst[2] = vtxWords.z;
+                    Vec* dst = (Vec*)((u8*)child + data->childPosOffset + 0x80);
+                    dst->x = x;
+                    dst->y = y;
+                    dst->z = z;
                 }
             } while (count-- != 0);
         }

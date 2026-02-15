@@ -155,6 +155,9 @@ class CChara
     void SetAmemStage(CMemory::CStage*);
     void GetMemoryStage();
     void ResetAmem(int);
+    void TimeMogFur();
+    void CalcMogScore();
+    void ChangeMogMode(int);
 };
 
 #endif // _FFCC_CHARA_H_

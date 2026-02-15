@@ -1,5 +1,7 @@
 #include "ffcc/p_dbgmenu.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/graphic.h"
+#include "ffcc/pad.h"
 #include "ffcc/system.h"
 #include <dolphin/gx.h>
 #include <string.h>
@@ -7,6 +9,19 @@
 extern unsigned char CFlat[];
 extern unsigned char DAT_8032e698;
 extern unsigned char DAT_8032ecd8;
+extern unsigned char CharaPcs[];
+extern unsigned char PartMng[];
+extern unsigned char PartPcs[];
+extern unsigned char Sound[];
+extern char s_Debug_80331c90[];
+extern u32 PTR_DAT_80212524;
+
+extern "C" int __cntlzw(unsigned int);
+extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+    void*, int, int, int, int, void*, void*);
+extern "C" void CheckDriver__6CSoundFi(void*, int);
+extern "C" void pppDumpMngSt__8CPartMngFv(void*);
+extern "C" void DumpLoad__9CCharaPcsFv(void*);
 
 /*
  * --INFO--
@@ -119,7 +134,168 @@ void CDbgMenuPcs::selectPrev()
  */
 void CDbgMenuPcs::calc()
 {
-	// TODO
+	unsigned short padInput;
+	unsigned int flags;
+	int menuPtr;
+	int cursorPtr;
+	int stackData[3];
+
+	if (*(int*)((char*)this + 0x58) == 0) {
+		return;
+	}
+
+	if (Pad._452_4_ == 0) {
+		padInput = *(unsigned short*)((unsigned char*)&Pad._8_2_ +
+		                              ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) *
+		                               0x54));
+	} else {
+		padInput = 0;
+	}
+
+	if ((padInput & 0x100) != 0) {
+		switch (*(int*)(*(int*)((char*)this + 0x2a5c) + 0x38)) {
+		case 100:
+			*(unsigned int*)(CFlat + 0x12A4) = ~*(unsigned int*)(CFlat + 0x12A4);
+			break;
+		case 0x65:
+			stackData[0] = 0;
+			stackData[2] = 0;
+			flags = (unsigned int)__cntlzw((int)((signed char)CFlat[0x12E4] >> 7));
+			flags = ((int)(char)(flags >> 5) & 1U) << 7 | ((unsigned char)CFlat[0x12E4] & 0x7F);
+			CFlat[0x12E4] = (unsigned char)flags;
+			stackData[1] = (int)(flags << 0x18) >> 0x1f;
+			SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+			    CFlat, 0, 1, 9, 3, stackData, 0);
+			break;
+		case 0x66:
+			flags = (unsigned int)__cntlzw((int)(char)((int)((unsigned int)(unsigned char)CFlat[0x12E4] << 0x1d) >> 0x1f));
+			CFlat[0x12E4] = (unsigned char)((((int)(char)(flags >> 5) << 2) & 4) | (CFlat[0x12E4] & 0xFB));
+			break;
+		case 0x67:
+			*(unsigned int*)((char*)this + 4) ^= 1;
+			break;
+		case 0x68:
+			*(unsigned int*)((char*)this + 4) ^= 2;
+			break;
+		case 0x69:
+			*(unsigned int*)((char*)this + 4) ^= 4;
+			break;
+		case 0x6A:
+			*(unsigned int*)((char*)this + 4) ^= 8;
+			break;
+		case 0x6B:
+			*(unsigned int*)((char*)this + 4) ^= 0x10;
+			break;
+		case 0x6C:
+			*(unsigned int*)((char*)this + 4) ^= 0x20;
+			break;
+		case 0x6D:
+			*(unsigned int*)((char*)this + 4) ^= 0x40;
+			break;
+		case 0x6E:
+			*(unsigned int*)((char*)this + 4) ^= 0x80;
+			break;
+		case 0x6F:
+			*(unsigned int*)((char*)this + 4) ^= 0x100;
+			break;
+		case 0x70:
+			*(unsigned int*)((char*)this + 4) ^= 0x200;
+			break;
+		case 0x71:
+			*(unsigned int*)((char*)this + 4) ^= 0x400;
+			break;
+		case 0x72:
+			*(unsigned int*)((char*)this + 4) ^= 0x800;
+			flags = (unsigned int)__cntlzw(*(unsigned int*)((char*)this + 4) & 0x800);
+			PartPcs[0x34] = (unsigned char)(flags >> 5);
+			break;
+		case 0x73:
+			*(unsigned int*)((char*)this + 4) ^= 0x1000;
+			break;
+		case 0x74:
+			CheckDriver__6CSoundFi(Sound, 1);
+			break;
+		case 0x75:
+			DAT_8032ecd8 = 1 - DAT_8032ecd8;
+			break;
+		case 0x76:
+			DAT_8032e698 = 1 - DAT_8032e698;
+			pppDumpMngSt__8CPartMngFv(PartMng);
+			break;
+		case 0x77:
+			DumpLoad__9CCharaPcsFv(CharaPcs);
+			break;
+		case 0x78:
+			*(unsigned int*)((char*)this + 4) ^= 0x2000;
+			break;
+		case 0x79:
+			*(unsigned int*)((char*)this + 4) ^= 0x4000;
+			break;
+		case 0x7A:
+			*(unsigned int*)((char*)this + 4) ^= 0x8000;
+			break;
+		}
+	}
+
+	if (Pad._452_4_ == 0) {
+		padInput = *(unsigned short*)((unsigned char*)&Pad._8_2_ +
+		                              ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) *
+		                               0x54));
+	} else {
+		padInput = 0;
+	}
+	if ((padInput & 4) != 0) {
+		menuPtr = *(int*)((char*)this + 0x2a5c);
+		*(unsigned char*)(menuPtr + 0x34) &= 0xBF;
+		do {
+			*(int*)((char*)this + 0x2a5c) = *(int*)(*(int*)((char*)this + 0x2a5c) + 0x48);
+			cursorPtr = *(int*)((char*)this + 0x2a5c);
+			if ((*(unsigned int*)(cursorPtr + 4) & 1) != 0) {
+				break;
+			}
+		} while (menuPtr != cursorPtr);
+		*(unsigned char*)(cursorPtr + 0x34) = (*(unsigned char*)(cursorPtr + 0x34) & 0xBF) | 0x40;
+	}
+
+	if (Pad._452_4_ == 0) {
+		padInput = *(unsigned short*)((unsigned char*)&Pad._8_2_ +
+		                              ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) *
+		                               0x54));
+	} else {
+		padInput = 0;
+	}
+	if ((padInput & 8) != 0) {
+		menuPtr = *(int*)((char*)this + 0x2a5c);
+		*(unsigned char*)(menuPtr + 0x34) &= 0xBF;
+		do {
+			*(int*)((char*)this + 0x2a5c) = *(int*)(*(int*)((char*)this + 0x2a5c) + 0x44);
+			cursorPtr = *(int*)((char*)this + 0x2a5c);
+			if ((*(unsigned int*)(cursorPtr + 4) & 1) != 0) {
+				break;
+			}
+		} while (menuPtr != cursorPtr);
+		*(unsigned char*)(cursorPtr + 0x34) = (*(unsigned char*)(cursorPtr + 0x34) & 0xBF) | 0x40;
+	}
+
+	if (*(int*)((char*)this + 0x58) != 0) {
+		calcMenu(*(CDM**)((char*)this + 0x58));
+	}
+
+	if (Pad._452_4_ == 0) {
+		padInput = *(unsigned short*)((unsigned char*)&Pad._8_2_ +
+		                              ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) *
+		                               0x54));
+	} else {
+		padInput = 0;
+	}
+	if ((padInput & 0x200) != 0) {
+		memset((char*)this + 0x5C, 0, 0x2A00);
+		*(int*)((char*)this + 0x58) = 0;
+		*(int*)((char*)this + 0x2A60) = 0;
+		*(int*)((char*)this + 0x2A5C) = 0;
+	}
+
+	Pad._452_4_ = 1;
 }
 
 /*
@@ -238,11 +414,29 @@ void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM*)
  * Address:	TODO
  * Size:	TODO
  */
-void CDbgMenuPcs::changeVtxFmt(int)
+void CDbgMenuPcs::changeVtxFmt(int vtxFmt)
 {
-	// TODO
-}
+    int& currentVtxFmt = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x2A68);
 
+    if (currentVtxFmt != vtxFmt) {
+        if (vtxFmt == 1) {
+            GXClearVtxDesc();
+            GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+            GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+            GXSetVtxAttrFmt(GX_VTXFMT1, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+            GXSetVtxAttrFmt(GX_VTXFMT1, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+            GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPEC);
+            _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+            _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+        } else if (vtxFmt == 0) {
+            GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPEC);
+            _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+            _GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
+        }
+
+        currentVtxFmt = vtxFmt;
+    }
+}
 /*
  * --INFO--
  * PAL Address: 0x8012c274
@@ -556,12 +750,79 @@ level1_done:
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012b8c0
+ * PAL Size: 588b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CDbgMenuPcs::Add()
 {
-	// TODO
+	if (*(int*)((char*)this + 0x58) != 0) {
+		return;
+	}
+
+	u32 rootParam[13];
+	u32 nodeParam[13];
+	u32 actionParam[13];
+	u32* menuDefs = &PTR_DAT_80212524;
+
+	memset(rootParam, 0, sizeof(rootParam));
+	memset(nodeParam, 0, sizeof(nodeParam));
+
+	rootParam[0] = 0;
+	rootParam[1] = 0;
+	rootParam[2] = 0;
+	rootParam[3] = 0;
+	rootParam[4] = 100;
+	rootParam[5] = 0x32;
+	rootParam[6] = 0xDC;
+	rootParam[7] = 0x180;
+	rootParam[8] = 0;
+	rootParam[9] = (u32)s_Debug_80331c90;
+	rootParam[10] = 0;
+	rootParam[11] = 0;
+	rootParam[12] = 0;
+	Add(0, 10, *(CDMParam*)rootParam);
+
+	int y = 10;
+	for (int i = 0; i < 0x17; i++) {
+		memset(nodeParam, 0, sizeof(nodeParam));
+		nodeParam[0] = 1;
+		nodeParam[1] = 0;
+		nodeParam[2] = 0;
+		nodeParam[3] = 0;
+		nodeParam[4] = 10;
+		nodeParam[5] = y;
+		nodeParam[6] = 0;
+		nodeParam[7] = 0;
+		nodeParam[8] = 0;
+		nodeParam[9] = menuDefs[0];
+		nodeParam[10] = 0;
+		nodeParam[11] = 0;
+		nodeParam[12] = 0;
+		Add(10, 1, *(CDMParam*)nodeParam);
+
+		memset(actionParam, 0, sizeof(actionParam));
+		actionParam[0] = menuDefs[2];
+		actionParam[1] = menuDefs[3];
+		actionParam[2] = 0;
+		actionParam[3] = 0;
+		actionParam[4] = 0xB4;
+		actionParam[5] = y;
+		actionParam[6] = 0;
+		actionParam[7] = 0;
+		actionParam[8] = 0;
+		actionParam[9] = 0;
+		actionParam[10] = 0;
+		actionParam[11] = 0;
+		actionParam[12] = 0;
+		Add(10, menuDefs[1], *(CDMParam*)actionParam);
+
+		menuDefs += 4;
+		y += 0x10;
+	}
 }
 
 /*

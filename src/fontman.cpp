@@ -1,9 +1,11 @@
 #include "ffcc/fontman.h"
 #include "PowerPC_EABI_Support/Runtime/NMWException.h"
+#include <dolphin/mtx.h>
 
 extern CFontMan FontMan;
 extern void* ARRAY_802ea170;
 extern "C" void __dt__8CFontManFv(void*);
+extern unsigned char CameraPcs[];
 
 /*
  * --INFO--
@@ -227,12 +229,19 @@ void CFont::DrawInit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800925d0
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFont::DrawQuit()
 {
-	// TODO
+    Mtx44 screenMtx;
+
+    PSMTX44Copy((float(*)[4])(CameraPcs + 0x48), screenMtx);
+    GXSetProjection(screenMtx, GX_PERSPECTIVE);
 }
 
 /*

@@ -250,32 +250,44 @@ void CRedSound::DMACheck(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cceb4
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::SetSoundMode(int)
+void CRedSound::SetSoundMode(int mode)
 {
-	// TODO
+	CRedDriver_8032f4c0.SetSoundMode(mode);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801ccee0
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedSound::GetSoundMode()
 {
-	// TODO
+	CRedDriver_8032f4c0.GetSoundMode();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801ccf04
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::SetReverb(int, int)
+void CRedSound::SetReverb(int bank, int kind)
 {
-	// TODO
+	CRedDriver_8032f4c0.SetReverb(bank, kind);
 }
 
 /*
@@ -317,9 +329,9 @@ void CRedSound::ReentryMusicData(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::MusicStop(int)
+void CRedSound::MusicStop(int id)
 {
-	// TODO
+	CRedDriver_8032f4c0.MusicStop(id);
 }
 
 /*
@@ -327,9 +339,9 @@ void CRedSound::MusicStop(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::MusicPlay(int, int, int)
+void CRedSound::MusicPlay(int id, int vol, int fadeTime)
 {
-	// TODO
+	CRedDriver_8032f4c0.MusicPlay(id, vol, fadeTime);
 }
 
 /*
@@ -337,9 +349,9 @@ void CRedSound::MusicPlay(int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::MusicCrossPlay(int, int, int)
+void CRedSound::MusicCrossPlay(int id, int vol, int fadeTime)
 {
-	// TODO
+	CRedDriver_8032f4c0.MusicCrossPlay(id, vol, fadeTime);
 }
 
 /*
@@ -347,9 +359,9 @@ void CRedSound::MusicCrossPlay(int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::MusicNextPlay(int, int, int)
+void CRedSound::MusicNextPlay(int id, int vol, int fadeTime)
 {
-	// TODO
+	CRedDriver_8032f4c0.MusicNextPlay(id, vol, fadeTime);
 }
 
 /*
@@ -357,9 +369,9 @@ void CRedSound::MusicNextPlay(int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::MusicMasterVolume(int)
+void CRedSound::MusicMasterVolume(int volume)
 {
-	// TODO
+	CRedDriver_8032f4c0.MusicMasterVolume(volume);
 }
 
 /*
@@ -367,9 +379,9 @@ void CRedSound::MusicMasterVolume(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::MusicFadeOut(int, int)
+void CRedSound::MusicFadeOut(int id, int fadeTime)
 {
-	// TODO
+	CRedDriver_8032f4c0.MusicFadeOut(id, fadeTime);
 }
 
 /*
@@ -377,9 +389,9 @@ void CRedSound::MusicFadeOut(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::MusicVolume(int, int, int)
+void CRedSound::MusicVolume(int id, int volume, int fadeTime)
 {
-	// TODO
+	CRedDriver_8032f4c0.MusicVolume(id, volume, fadeTime);
 }
 
 /*
@@ -387,9 +399,9 @@ void CRedSound::MusicVolume(int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::SetMusicPhraseStop(int)
+void CRedSound::SetMusicPhraseStop(int id)
 {
-	// TODO
+	CRedDriver_8032f4c0.SetMusicPhraseStop(id);
 }
 
 /*
@@ -494,102 +506,142 @@ int CRedSound::SePlay(int seID, int sepID, int unk, int volume, int pitch)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd378
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::SeMasterVolume(int)
+void CRedSound::SeMasterVolume(int volume)
 {
-	// TODO
+	CRedDriver_8032f4c0.SeMasterVolume(volume);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd3a4
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::SeFadeOut(int, int)
+void CRedSound::SeFadeOut(int seID, int frameCount)
 {
-	// TODO
+	CRedDriver_8032f4c0.SeFadeOut(seID, frameCount);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd3d8
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::SeVolume(int, int, int)
+void CRedSound::SeVolume(int seID, int volume, int frameCount)
 {
-	// TODO
+	CRedDriver_8032f4c0.SeVolume(seID, volume, frameCount);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd414
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::SePan(int, int, int)
+void CRedSound::SePan(int seID, int pan, int frameCount)
 {
-	// TODO
+	CRedDriver_8032f4c0.SePan(seID, pan, frameCount);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd450
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::SePitch(int, int, int)
+void CRedSound::SePitch(int seID, int pitch, int frameCount)
 {
-	// TODO
+	CRedDriver_8032f4c0.SePitch(seID, pitch, frameCount);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd48c
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::SePause(int, int)
+void CRedSound::SePause(int seID, int pause)
 {
-	// TODO
+	CRedDriver_8032f4c0.SePause(seID, pause);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd4c0
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::GetSeVolume(int, int)
+void CRedSound::GetSeVolume(int seID, int outVolume)
 {
-	// TODO
+	CRedDriver_8032f4c0.GetSeVolume(seID, outVolume);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd4f4
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::ReportSeLoop(int)
+void CRedSound::ReportSeLoop(int mode)
 {
-	// TODO
+	CRedDriver_8032f4c0.ReportSeLoop(mode);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd520
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedSound::DisplaySePlayInfo()
 {
-	// TODO
+	CRedDriver_8032f4c0.DisplaySePlayInfo();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd544
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::StreamPlayState(int)
+void CRedSound::StreamPlayState(int streamID)
 {
-	// TODO
+	CRedDriver_8032f4c0.StreamPlayState(streamID);
 }
 
 /*
@@ -682,6 +734,7 @@ void CRedSound::StreamPause(int streamID, int pause)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 unsigned int CRedSound::SetWaveData(int waveID, void* waveData, int waveSize)
 {
 	unsigned int id = GetAutoID();
@@ -691,6 +744,7 @@ unsigned int CRedSound::SetWaveData(int waveID, void* waveData, int waveSize)
 	}
 	return id;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--

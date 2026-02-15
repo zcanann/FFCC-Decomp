@@ -6,6 +6,41 @@
 #include <dolphin/gba/GBA.h>
 
 CGbaPcs GbaPcs;
+extern "C" void* lbl_8020F4A4;
+extern "C" unsigned int lbl_8020F2F8[];
+extern "C" unsigned int lbl_8020F304[];
+extern "C" unsigned int lbl_8020F310[];
+extern "C" unsigned int lbl_8020F31C[];
+extern "C" unsigned int lbl_8020F328[];
+
+/*
+ * --INFO--
+ * PAL Address: 0x800979f4
+ * PAL Size: 212b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_p_gba_cpp(void)
+{
+	volatile void** base = reinterpret_cast<volatile void**>(&GbaPcs);
+	*base = &lbl_8020F4A4;
+
+	unsigned int* dst = lbl_8020F328;
+	dst[0x004 / 4] = lbl_8020F2F8[0];
+	dst[0x008 / 4] = lbl_8020F2F8[1];
+	dst[0x00C / 4] = lbl_8020F2F8[2];
+	dst[0x010 / 4] = lbl_8020F304[0];
+	dst[0x014 / 4] = lbl_8020F304[1];
+	dst[0x018 / 4] = lbl_8020F304[2];
+	dst[0x01C / 4] = lbl_8020F310[0];
+	dst[0x020 / 4] = lbl_8020F310[1];
+	dst[0x024 / 4] = lbl_8020F310[2];
+	dst[0x030 / 4] = lbl_8020F31C[0];
+	dst[0x034 / 4] = lbl_8020F31C[1];
+	dst[0x038 / 4] = lbl_8020F31C[2];
+}
 
 /*
  * --INFO--
@@ -52,10 +87,9 @@ void CGbaPcs::Quit()
  */
 void* CGbaPcs::GetTable(unsigned long tableIndex)
 {
-	extern unsigned char lbl_8020F328[];
 	unsigned long offset = tableIndex;
 	offset *= 0x15c;
-	return lbl_8020F328 + offset;
+	return reinterpret_cast<unsigned char*>(lbl_8020F328) + offset;
 }
 
 /*

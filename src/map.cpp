@@ -189,6 +189,149 @@ void CPtrArray<CMapLightHolder*>::SetStage(CMemory::CStage* stage)
 
 /*
  * --INFO--
+ * PAL Address: 0x80033f54
+ * PAL Size: 112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+bool CPtrArray<CMapAnim*>::Add(CMapAnim* item)
+{
+    bool success = setSize(m_numItems + 1);
+    if (success) {
+        m_items[m_numItems] = item;
+        m_numItems++;
+    }
+    return success;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80033fc4
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+int CPtrArray<CMapAnim*>::GetSize()
+{
+    return m_numItems;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80033fcc
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+void CPtrArray<CMapAnim*>::RemoveAll()
+{
+    if (m_items != 0) {
+        __dla__FPv(m_items);
+        m_items = 0;
+    }
+    m_size = 0;
+    m_numItems = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80034018
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CMapAnim* CPtrArray<CMapAnim*>::operator[](unsigned long index)
+{
+    return GetAt(index);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80034038
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+void CPtrArray<CMapAnim*>::SetStage(CMemory::CStage* stage)
+{
+    m_stage = stage;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80034040
+ * PAL Size: 240b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+bool CPtrArray<CMapAnim*>::setSize(unsigned long newSize)
+{
+    CMapAnim** newItems;
+
+    if (m_size < newSize) {
+        if (m_size == 0) {
+            m_size = m_defaultSize;
+        } else {
+            m_size = m_size << 1;
+        }
+
+        newItems = new CMapAnim*[m_size];
+        if (newItems == 0) {
+            return false;
+        }
+
+        if (m_items != 0) {
+            for (unsigned long i = 0; i < m_numItems; i++) {
+                newItems[i] = m_items[i];
+            }
+        }
+
+        if (m_items != 0) {
+            __dla__FPv(m_items);
+            m_items = 0;
+        }
+
+        m_items = newItems;
+    }
+
+    return true;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80034260
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CMapAnim* CPtrArray<CMapAnim*>::GetAt(unsigned long index)
+{
+    return m_items[index];
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
@@ -196,6 +339,71 @@ template <>
 int CPtrArray<CMapAnimRun*>::GetSize()
 {
     return m_numItems;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800340f0
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+void CPtrArray<CMapAnimRun*>::RemoveAll()
+{
+    if (m_items != 0) {
+        __dla__FPv(m_items);
+        m_items = 0;
+    }
+    m_size = 0;
+    m_numItems = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003413c
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CMapAnimRun* CPtrArray<CMapAnimRun*>::operator[](unsigned long index)
+{
+    return GetAt(index);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80034170
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+void CPtrArray<CMapAnimRun*>::SetStage(CMemory::CStage* stage)
+{
+    m_stage = stage;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80034a44
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CMapAnimRun* CPtrArray<CMapAnimRun*>::GetAt(unsigned long index)
+{
+    return m_items[index];
 }
 
 /*
@@ -897,12 +1105,17 @@ void CMapMng::SetMapAnimID(int, int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002f6d4
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapMng::SetMapObjMime(int, int, int, int)
+void CMapMng::SetMapObjMime(int mapObjIndex, int mode, int target, int type)
 {
-	// TODO
+    CMapObj* mapObj = reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(this) + (mapObjIndex * 0xF0) + 0x954);
+    mapObj->SetMime(mode, target, type);
 }
 
 /*

@@ -24,13 +24,14 @@ struct pppBlurCharaWork {
     int m_captureBuffer;
     void* m_ownerObj;
     int m_smallTexObj;
-    int m_savedModelField;
+    float m_savedModelField;
 };
 
 extern int DAT_8032ed70;
 extern void* DAT_80238030;
 extern CUtil DAT_8032ec70;
 extern char MaterialMan[];
+extern unsigned char* lbl_8032ED50;
 
 extern float FLOAT_80331030;
 extern float FLOAT_80331034;
@@ -210,7 +211,7 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
 void pppConstructBlurChara(pppBlurChara* blurChara, UnkC* data)
 {
     pppBlurCharaWork* work = GetBlurWork(blurChara, data);
-    void* ownerObj = *(void**)((char*)pppMngStPtr + 0xD8);
+    void* ownerObj = *(void**)(lbl_8032ED50 + 0xDC);
     void* handle;
     int model;
 
@@ -221,7 +222,7 @@ void pppConstructBlurChara(pppBlurChara* blurChara, UnkC* data)
     *(void**)(model + 0x108) = (void*)BlurChara_AfterDrawModelCallback;
     work->m_captureBuffer = 0;
     work->m_smallTexObj = 0;
-    work->m_savedModelField = *(int*)(model + 0x9C);
+    work->m_savedModelField = *(float*)(model + 0x9C);
 }
 
 /*
@@ -253,7 +254,7 @@ void pppDestructBlurChara(pppBlurChara* blurChara, UnkC* data)
         work->m_smallTexObj = 0;
     }
 
-    *(int*)(model + 0x9C) = work->m_savedModelField;
+    *(float*)(model + 0x9C) = work->m_savedModelField;
 }
 
 /*

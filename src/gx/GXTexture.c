@@ -712,7 +712,7 @@ void GXLoadTlut(GXTlutObj* tlut_obj, u32 tlut_name) {
 }
 
 void GXInitTexCacheRegion(GXTexRegion* region, u8 is_32b_mipmap, u32 tmem_even, GXTexCacheSize size_even, u32 tmem_odd, GXTexCacheSize size_odd) {
-    u32 WidthExp2;
+    u32 widthExp2;
     __GXTexRegionInt* t = (__GXTexRegionInt*)region;
 
     ASSERTMSGLINE(1484, region, "TexRegion Object Pointer is null");
@@ -722,13 +722,13 @@ void GXInitTexCacheRegion(GXTexRegion* region, u8 is_32b_mipmap, u32 tmem_even, 
 
     switch (size_even) {
     case GX_TEXCACHE_32K:
-        WidthExp2 = 3;
+        widthExp2 = 3;
         break;
     case GX_TEXCACHE_128K:
-        WidthExp2 = 4;
+        widthExp2 = 4;
         break;
     case GX_TEXCACHE_512K:
-        WidthExp2 = 5;
+        widthExp2 = 5;
         break;
     default:
         ASSERTMSGLINEV(1498, 0, "%s: Invalid %s size", "GXInitTexCacheRegion", "tmem even");
@@ -736,23 +736,23 @@ void GXInitTexCacheRegion(GXTexRegion* region, u8 is_32b_mipmap, u32 tmem_even, 
     }
 
     t->image1 = 0;
-    SET_REG_FIELD(1503, t->image1, 15, 0, tmem_even >> 5);
-    SET_REG_FIELD(1504, t->image1, 3, 15, WidthExp2);
-    SET_REG_FIELD(1505, t->image1, 3, 18, WidthExp2);
-    SET_REG_FIELD(1506, t->image1, 1, 21, 0);
+    t->image1 = (t->image1 & 0xFFFF8000) | (tmem_even >> 5);
+    t->image1 = (t->image1 & 0xFFFC7FFF) | (widthExp2 << 15);
+    t->image1 = (t->image1 & 0xFFE3FFFF) | (widthExp2 << 18);
+    t->image1 &= 0xFFDFFFFF;
 
     switch (size_odd) {
     case GX_TEXCACHE_32K:
-        WidthExp2 = 3;
+        widthExp2 = 3;
         break;
     case GX_TEXCACHE_128K:
-        WidthExp2 = 4;
+        widthExp2 = 4;
         break;
     case GX_TEXCACHE_512K:
-        WidthExp2 = 5;
+        widthExp2 = 5;
         break;
     case GX_TEXCACHE_NONE:
-        WidthExp2 = 0;
+        widthExp2 = 0;
         break;
     default:
         ASSERTMSGLINEV(1514, 0, "%s: Invalid %s size", "GXInitTexCacheRegion", "tmem odd");
@@ -760,9 +760,9 @@ void GXInitTexCacheRegion(GXTexRegion* region, u8 is_32b_mipmap, u32 tmem_even, 
     }
 
     t->image2 = 0;
-    SET_REG_FIELD(1519, t->image2, 15, 0, tmem_odd >> 5);
-    SET_REG_FIELD(1520, t->image2, 3, 15, WidthExp2);
-    SET_REG_FIELD(1521, t->image2, 3, 18, WidthExp2);
+    t->image2 = (t->image2 & 0xFFFF8000) | (tmem_odd >> 5);
+    t->image2 = (t->image2 & 0xFFFC7FFF) | (widthExp2 << 15);
+    t->image2 = (t->image2 & 0xFFE3FFFF) | (widthExp2 << 18);
     t->is32bMipmap = is_32b_mipmap;
     t->isCached = 1;
 }
@@ -1153,17 +1153,20 @@ void GXSetTexCoordBias(GXTexCoordID coord, u8 s_enable, u8 t_enable) {
 static void __SetSURegs(int tmap, int tcoord) {
     u32 image0;
     u32 mode0;
-    u32 bias;
+    u32 bias0;
+    u32 bias1;
 
     image0 = __GXData->tImage0[tmap];
     __GXData->suTs0[tcoord] = (__GXData->suTs0[tcoord] & 0xFFFF0000) | (image0 & 0x3FF);
     __GXData->suTs1[tcoord] = (__GXData->suTs1[tcoord] & 0xFFFF0000) | ((image0 >> 10) & 0x3FF);
 
     mode0 = __GXData->tMode0[tmap];
-    bias = __cntlzw(1 - (mode0 & 3));
-    __GXData->suTs0[tcoord] = (__GXData->suTs0[tcoord] & 0xFFFEFFFF) | ((bias & 0x1FE0) << 11);
-    bias = __cntlzw(1 - ((mode0 >> 2) & 3));
-    __GXData->suTs1[tcoord] = (__GXData->suTs1[tcoord] & 0xFFFEFFFF) | ((bias & 0x1FE0) << 11);
+    bias1 = 1 - ((mode0 >> 2) & 3);
+    bias0 = 1 - (mode0 & 3);
+    bias0 = __cntlzw(bias0);
+    __GXData->suTs0[tcoord] = (__GXData->suTs0[tcoord] & 0xFFFEFFFF) | ((bias0 & 0x1FE0) << 11);
+    bias1 = __cntlzw(bias1);
+    __GXData->suTs1[tcoord] = (__GXData->suTs1[tcoord] & 0xFFFEFFFF) | ((bias1 & 0x1FE0) << 11);
     GX_WRITE_RAS_REG(__GXData->suTs0[tcoord]);
     GX_WRITE_RAS_REG(__GXData->suTs1[tcoord]);
     __GXData->bpSentNot = 0;

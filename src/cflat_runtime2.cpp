@@ -1,5 +1,137 @@
 #include "ffcc/cflat_runtime2.h"
 #include "ffcc/baseobj.h"
+#include "ffcc/p_game.h"
+
+namespace {
+
+typedef unsigned char u8;
+
+static inline float& ParticleWorkSpeed(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x16F0);
+}
+
+static inline float* &ParticleWorkScalePtr(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<float**>(reinterpret_cast<u8*>(runtime) + 0x16D4);
+}
+
+static inline float& ParticleWorkScaleX(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x1758);
+}
+
+static inline float& ParticleWorkScaleY(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x175C);
+}
+
+static inline float& ParticleWorkScaleZ(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x1760);
+}
+
+static inline float* &ParticleWorkTargetPtr(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<float**>(reinterpret_cast<u8*>(runtime) + 0x16D8);
+}
+
+static inline float& ParticleWorkTargetX(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x1764);
+}
+
+static inline float& ParticleWorkTargetY(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x1768);
+}
+
+static inline float& ParticleWorkTargetZ(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x176C);
+}
+
+static inline float*& ParticleWorkPosPtr(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<float**>(reinterpret_cast<u8*>(runtime) + 0x16CC);
+}
+
+static inline float*& ParticleWorkPosVecPtr(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<float**>(reinterpret_cast<u8*>(runtime) + 0x16D0);
+}
+
+static inline float& ParticleWorkPosX(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x1740);
+}
+
+static inline float& ParticleWorkPosY(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x1744);
+}
+
+static inline float& ParticleWorkPosZ(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x1748);
+}
+
+static inline float& ParticleWorkPosAngle(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x1750);
+}
+
+static inline float& ParticleWorkPosVecBase(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x174C);
+}
+
+static inline CFlatRuntime::CObject*& ParticleWorkBind(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<CFlatRuntime::CObject**>(reinterpret_cast<u8*>(runtime) + 0x16E0);
+}
+
+static inline int& ParticleWorkColor0(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<int*>(reinterpret_cast<u8*>(runtime) + 0x16E8);
+}
+
+static inline int& ParticleWorkColor1(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<int*>(reinterpret_cast<u8*>(runtime) + 0x16EC);
+}
+
+static inline float& ParticleWorkColorLerp(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x16F4);
+}
+
+static inline int& ParticleWorkSeNo(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<int*>(reinterpret_cast<u8*>(runtime) + 0x16FC);
+}
+
+static inline u8& ParticleWorkSeKind(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<u8*>(reinterpret_cast<u8*>(runtime) + 0x1701);
+}
+
+static inline int& ParticleWorkSeParam(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<int*>(reinterpret_cast<u8*>(runtime) + 0x1704);
+}
+
+static inline int& ParticleWorkParamNo(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<int*>(reinterpret_cast<u8*>(runtime) + 0x1710);
+}
+
+static inline short& ParticleWorkParamId(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<short*>(reinterpret_cast<u8*>(runtime) + 0x1714);
+}
+
+} // namespace
 
 /*
  * --INFO--
@@ -46,22 +178,30 @@ CFlatRuntime2::CParticleWork::CParticleWork()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006E09C
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::getStage()
+CMemory::CStage* CFlatRuntime2::getStage()
 {
-	// TODO
+	return Game.game.m_mainStage;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006E088
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::getDebugStage()
+CMemory::CStage* CFlatRuntime2::getDebugStage()
 {
-	// TODO
+	return Game.game.m_debugStage;
 }
 
 /*
@@ -366,22 +506,38 @@ void CFlatRuntime2::SetParticleWorkNo(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006A2FC
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::SetParticleWorkPos(Vec&, float)
+void CFlatRuntime2::SetParticleWorkPos(Vec& vec, float angle)
 {
-	// TODO
+	ParticleWorkPosX(this) = vec.x;
+	ParticleWorkPosY(this) = vec.y;
+	ParticleWorkPosZ(this) = vec.z;
+	ParticleWorkPosAngle(this) = 180.0f * angle / 3.1415927f;
+	ParticleWorkPosPtr(this) = &ParticleWorkPosX(this);
+	ParticleWorkPosVecPtr(this) = &ParticleWorkPosVecBase(this);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006A2D8
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::SetParticleWorkTarget(Vec&)
+void CFlatRuntime2::SetParticleWorkTarget(Vec& vec)
 {
-	// TODO
+	ParticleWorkTargetX(this) = vec.x;
+	ParticleWorkTargetY(this) = vec.y;
+	ParticleWorkTargetZ(this) = vec.z;
+	ParticleWorkTargetPtr(this) = &ParticleWorkTargetX(this);
 }
 
 /*
@@ -396,22 +552,35 @@ void CFlatRuntime2::SetParticleWorkVector(float, float)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006A1F8
+ * PAL Size: 24b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::SetParticleWorkScale(float)
+void CFlatRuntime2::SetParticleWorkScale(float scale)
 {
-	// TODO
+	ParticleWorkScaleZ(this) = scale;
+	ParticleWorkScaleY(this) = scale;
+	ParticleWorkScaleX(this) = scale;
+	ParticleWorkScalePtr(this) = &ParticleWorkScaleX(this);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006A1E8
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::SetParticleWorkCol(int, int, float)
+void CFlatRuntime2::SetParticleWorkCol(int color0, int color1, float lerp)
 {
-	// TODO
+	ParticleWorkColor0(this) = color0;
+	ParticleWorkColor1(this) = color1;
+	ParticleWorkColorLerp(this) = lerp;
 }
 
 /*
@@ -426,42 +595,65 @@ void CFlatRuntime2::SetParticleWorkTrace(CFlatRuntime::CObject*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006A1D8
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::SetParticleWorkSpeed(float)
+void CFlatRuntime2::SetParticleWorkSpeed(float speed)
 {
-	// TODO
+	ParticleWorkSpeed(this) = speed;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006A1D0
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::SetParticleWorkBind(CFlatRuntime::CObject*)
+void CFlatRuntime2::SetParticleWorkBind(CFlatRuntime::CObject* object)
 {
-	// TODO
+	ParticleWorkBind(this) = object;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006A1B0
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::SetParticleWorkParam(int, CFlatRuntime::CObject*)
+void CFlatRuntime2::SetParticleWorkParam(int paramNo, CFlatRuntime::CObject* object)
 {
-	// TODO
+	ParticleWorkParamNo(this) = paramNo;
+	if (object == 0) {
+		ParticleWorkParamId(this) = 0;
+	} else {
+		ParticleWorkParamId(this) = *reinterpret_cast<short*>(reinterpret_cast<u8*>(object) + 0x30);
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006A1A0
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::SetParticleWorkSe(int, int, int)
+void CFlatRuntime2::SetParticleWorkSe(int seNo, int seKind, int seParam)
 {
-	// TODO
+	ParticleWorkSeNo(this) = seNo;
+	ParticleWorkSeKind(this) = static_cast<u8>(seKind);
+	ParticleWorkSeParam(this) = seParam;
 }
 
 /*

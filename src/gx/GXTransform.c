@@ -571,7 +571,8 @@ void GXSetZScaleOffset(f32 scale, f32 offset) {
 void GXSetScissor(u32 left, u32 top, u32 wd, u32 ht) {
     u32 topOrigin;
     u32 leftOrigin;
-    GXData* gx;
+    u32 bottom;
+    u32 right;
 
     CHECK_GXBEGIN(1048, "GXSetScissor");
     ASSERTMSGLINE(1049, left < 1706, "GXSetScissor: Left origin > 1708");
@@ -579,18 +580,19 @@ void GXSetScissor(u32 left, u32 top, u32 wd, u32 ht) {
     ASSERTMSGLINE(1051, left + wd < 1706, "GXSetScissor: right edge > 1708");
     ASSERTMSGLINE(1052, top + ht < 1706, "GXSetScissor: bottom edge > 1708");
 
-    gx = __GXData;
-    topOrigin = top + 0x156;
     leftOrigin = left + 0x156;
+    topOrigin = top + 0x156;
+    right = (leftOrigin + wd) - 1;
+    bottom = (topOrigin + ht) - 1;
 
-    gx->suScis0 = (gx->suScis0 & 0xFFFFF800) | topOrigin;
-    gx->suScis0 = (gx->suScis0 & 0xFF800FFF) | (leftOrigin << 12);
-    gx->suScis1 = (gx->suScis1 & 0xFFFFF800) | (topOrigin + ht - 1);
-    gx->suScis1 = (gx->suScis1 & 0xFF800FFF) | ((leftOrigin + wd - 1) << 12);
+    __GXData->suScis0 = (__GXData->suScis0 & 0xFFFFF800) | topOrigin;
+    __GXData->suScis0 = (__GXData->suScis0 & 0xFF800FFF) | (leftOrigin << 12);
+    __GXData->suScis1 = (__GXData->suScis1 & 0xFFFFF800) | bottom;
+    __GXData->suScis1 = (__GXData->suScis1 & 0xFF800FFF) | (right << 12);
 
-    GX_WRITE_RAS_REG(gx->suScis0);
-    GX_WRITE_RAS_REG(gx->suScis1);
-    gx->bpSentNot = 0;
+    GX_WRITE_RAS_REG(__GXData->suScis0);
+    GX_WRITE_RAS_REG(__GXData->suScis1);
+    __GXData->bpSentNot = 0;
 }
 
 void GXGetScissor(u32* left, u32* top, u32* wd, u32* ht) {

@@ -167,78 +167,90 @@ void MakeWave(Vec*, unsigned short*, float*, Vec*, float, float)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8010701c
+ * PAL Size: 404b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CreateWaterMesh(Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned short* param_4, float param_5)
+extern "C" int CreateWaterMesh__FP3VecP3VecP5Vec2dPUsf2(
+    Vec* param_1, Vec* param_2, Vec2d* param_3, unsigned short* param_4, float param_5, float)
 {
-    float* pos;
-    float* normal;
-    float* uv;
-    unsigned short* idx;
-    float x;
-    float z;
-    short start;
+    float* pPos;
+    float* pNormal;
+    float* pUv;
+    unsigned short* pIdx;
+    float xPos;
+    float zPos;
+    int idxOffset;
     int row;
     int pair;
-    const float zero = 0.0f;
-    const float one = 1.0f;
-    const float stepScale = 0.125f;
+    int rowCounter;
+    int colCounter;
+    const float fZero = 0.0f;
+    const float fOne = 1.0f;
+    const float fStepScale = 0.125f;
     float radius = 0.0f;
     float step = 0.0f;
 
-    pos = (float*)param_1;
-    normal = (float*)param_2;
-    uv = (float*)param_3;
-    idx = param_4;
+    pPos = (float*)param_1;
+    pNormal = (float*)param_2;
+    pUv = (float*)param_3;
+    pIdx = param_4;
 
-    radius = param_5 * one;
-    step = param_5 * stepScale;
-    z = radius;
+    radius = param_5 * fOne;
+    rowCounter = 0;
+    step = param_5 * fStepScale;
+    for (zPos = radius; -radius <= zPos; zPos -= step) {
+        colCounter = 0;
+        for (xPos = -radius; xPos <= radius; xPos += step) {
+            pPos[0] = xPos;
+            pPos[1] = fZero;
+            pPos[2] = zPos;
+            pPos += 3;
 
-    for (row = 0; row <= 16; row++) {
-        x = -radius;
-        for (pair = 0; pair <= 16; pair++) {
-            pos[0] = x;
-            pos[1] = zero;
-            pos[2] = z;
-            pos += 3;
+            pNormal[0] = fZero;
+            pNormal[1] = fOne;
+            pNormal[2] = fZero;
+            pNormal += 3;
 
-            normal[0] = zero;
-            normal[1] = one;
-            normal[2] = zero;
-            normal += 3;
-
-            uv[0] = (float)pair * stepScale;
-            uv[1] = (float)row * stepScale;
-            uv += 2;
-
-            x += step;
+            pUv[0] = (float)((double)colCounter * (double)fStepScale);
+            pUv[1] = (float)((double)rowCounter * (double)fStepScale);
+            pUv += 2;
+            colCounter++;
         }
-        z -= step;
+        rowCounter++;
     }
 
-    start = 0;
-    for (row = 0; row < 16; row++) {
-        short v = start;
-        for (pair = 0; pair < 8; pair++) {
-            idx[0] = v;
-            idx[1] = v + 1;
-            idx[2] = v + 0x12;
-            idx[3] = v + 0x12;
-            idx[4] = v + 0x11;
-            idx[5] = v;
-            idx[6] = v + 1;
-            idx[7] = v + 2;
-            idx[8] = v + 0x13;
-            idx[9] = v + 0x13;
-            idx[10] = v + 0x12;
-            idx[11] = v + 1;
-            idx += 12;
-            v += 2;
-        }
-        start += 0x11;
-    }
+    idxOffset = 0;
+    row = 0;
+    colCounter = 0;
+    do {
+        pair = 8;
+        rowCounter = colCounter;
+        do {
+            *(short*)((char*)pIdx + idxOffset) = rowCounter;
+            *(short*)((char*)pIdx + idxOffset + 2) = rowCounter + 1;
+            *(short*)((char*)pIdx + idxOffset + 4) = rowCounter + 0x12;
+            *(short*)((char*)pIdx + idxOffset + 6) = rowCounter + 0x12;
+            *(short*)((char*)pIdx + idxOffset + 8) = rowCounter + 0x11;
+            *(short*)((char*)pIdx + idxOffset + 10) = rowCounter;
+            *(short*)((char*)pIdx + idxOffset + 12) = rowCounter + 1;
+            *(short*)((char*)pIdx + idxOffset + 14) = rowCounter + 2;
+            *(short*)((char*)pIdx + idxOffset + 16) = rowCounter + 0x13;
+            *(short*)((char*)pIdx + idxOffset + 18) = rowCounter + 0x13;
+            *(short*)((char*)pIdx + idxOffset + 20) = rowCounter + 0x12;
+            *(short*)((char*)pIdx + idxOffset + 22) = rowCounter + 1;
+            idxOffset += 0x18;
+            pair--;
+            rowCounter += 2;
+        } while (pair != 0);
+        row++;
+        colCounter += 0x11;
+    } while (row < 0x10);
+
+    return 1;
 }
 
 /*
@@ -276,7 +288,8 @@ void CalculateNormal(VMana2*)
  * Address:	TODO
  * Size:	TODO
  */
-void CalcWaterReflectionVector(Vec*, Vec*, Vec*, long, Vec*, float (*) [4], _GXColor*, Vec2d*)
+extern "C" void CalcWaterReflectionVector__FP3VecP3VecP3Vecl3VecPA4_fP8_GXColorP5Vec2d2(
+    Vec*, Vec*, Vec*, long, Vec, float (*) [4], _GXColor*, Vec2d*, Vec2d*)
 {
 	// TODO
 }

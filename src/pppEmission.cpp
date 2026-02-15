@@ -57,24 +57,6 @@ void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, floa
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
 }
 
-static void SetEmissionMaterialDefaults() {
-    *(int*)(MaterialMan + 0x44) = -1;
-    *(u8*)(MaterialMan + 0x4C) = 0xFF;
-    *(int*)(MaterialMan + 0x11C) = 0;
-    *(int*)(MaterialMan + 0x120) = 0x1E;
-    *(int*)(MaterialMan + 0x124) = 0;
-    *(u8*)(MaterialMan + 0x205) = 0xFF;
-    *(u8*)(MaterialMan + 0x206) = 0xFF;
-    *(int*)(MaterialMan + 0x58) = 0;
-    *(int*)(MaterialMan + 0x5C) = 0;
-    *(u8*)(MaterialMan + 0x208) = 0;
-    *(int*)(MaterialMan + 0x48) = 0xECE0F;
-    *(int*)(MaterialMan + 0x128) = 0;
-    *(int*)(MaterialMan + 0x12C) = 0x1E;
-    *(int*)(MaterialMan + 0x130) = 0;
-    *(int*)(MaterialMan + 0x40) = 0xECE0F;
-}
-
 /*
  * --INFO--
  * PAL Address: 0x800E6B98
@@ -151,7 +133,21 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                 int remaining = *(int*)(meshData + 0x4C);
                 char* displayList = *(char**)(meshData + 0x50);
                 while (--remaining >= 0) {
-                    SetEmissionMaterialDefaults();
+                    *(int*)(MaterialMan + 0x44) = -1;
+                    *(u8*)(MaterialMan + 0x4C) = 0xFF;
+                    *(int*)(MaterialMan + 0x11C) = 0;
+                    *(int*)(MaterialMan + 0x120) = 0x1E;
+                    *(int*)(MaterialMan + 0x124) = 0;
+                    *(u8*)(MaterialMan + 0x205) = 0xFF;
+                    *(u8*)(MaterialMan + 0x206) = 0xFF;
+                    *(int*)(MaterialMan + 0x58) = 0;
+                    *(int*)(MaterialMan + 0x5C) = 0;
+                    *(u8*)(MaterialMan + 0x208) = 0;
+                    *(int*)(MaterialMan + 0x48) = 0xECE0F;
+                    *(int*)(MaterialMan + 0x128) = 0;
+                    *(int*)(MaterialMan + 0x12C) = 0x1E;
+                    *(int*)(MaterialMan + 0x130) = 0;
+                    *(int*)(MaterialMan + 0x40) = 0xECE0F;
                     void* modelData = *(void**)((char*)model + 0xA4);
                     void* materialSet = *(void**)((char*)modelData + 0x24);
                     SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
@@ -192,7 +188,21 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
                 int remaining = *(int*)(meshData + 0x4C);
                 char* displayList = *(char**)(meshData + 0x50);
                 while (--remaining >= 0) {
-                    SetEmissionMaterialDefaults();
+                    *(int*)(MaterialMan + 0x44) = -1;
+                    *(u8*)(MaterialMan + 0x4C) = 0xFF;
+                    *(int*)(MaterialMan + 0x11C) = 0;
+                    *(int*)(MaterialMan + 0x120) = 0x1E;
+                    *(int*)(MaterialMan + 0x124) = 0;
+                    *(u8*)(MaterialMan + 0x205) = 0xFF;
+                    *(u8*)(MaterialMan + 0x206) = 0xFF;
+                    *(int*)(MaterialMan + 0x58) = 0;
+                    *(int*)(MaterialMan + 0x5C) = 0;
+                    *(u8*)(MaterialMan + 0x208) = 0;
+                    *(int*)(MaterialMan + 0x48) = 0xECE0F;
+                    *(int*)(MaterialMan + 0x128) = 0;
+                    *(int*)(MaterialMan + 0x12C) = 0x1E;
+                    *(int*)(MaterialMan + 0x130) = 0;
+                    *(int*)(MaterialMan + 0x40) = 0xECE0F;
                     void* modelData = *(void**)((char*)model + 0xA4);
                     void* materialSet = *(void**)((char*)modelData + 0x24);
                     SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
@@ -238,7 +248,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
 void pppConstructEmission(pppEmission* pppEmission_, UnkC* param_2) {
     float baseScale = FLOAT_803311f8;
     int offset = param_2->m_serializedDataOffsets[2];
-    int* state = (int*)((u8*)pppEmission_ + 8 + offset);
+    int* state = (int*)((u8*)pppEmission_ + 0x80 + offset);
 
     state[1] = 0;
     *(u8*)(state + 2) = 0x80;
@@ -286,7 +296,7 @@ void pppConstruct2Emission(pppEmission* pppEmission_, UnkC* param_2) {
  * JP Size: TODO
  */
 void pppDestructEmission(pppEmission* pppEmission_, UnkC* param_2) {
-    int* state = (int*)((u8*)pppEmission_ + 8 + param_2->m_serializedDataOffsets[2]);
+    int* state = (int*)((u8*)pppEmission_ + 0x80 + param_2->m_serializedDataOffsets[2]);
     void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
 
@@ -321,7 +331,7 @@ void pppFrameEmission(pppEmission* pppEmission_, UnkB* param_2, UnkC* param_3) {
     }
 
     int dataSet = param_3->m_serializedDataOffsets[1];
-    int* state = (int*)((u8*)pppEmission_ + 8 + param_3->m_serializedDataOffsets[2]);
+    int* state = (int*)((u8*)pppEmission_ + 0x80 + param_3->m_serializedDataOffsets[2]);
 
     void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
@@ -336,7 +346,7 @@ void pppFrameEmission(pppEmission* pppEmission_, UnkB* param_2, UnkC* param_3) {
     *((u8*)state + 10) = *((u8*)pppEmission_ + 0x8A + dataSet);
     *((u8*)state + 11) = baseAlpha;
 
-    float alphaScale = (float)(((double)(int)baseAlpha - DOUBLE_803311e8) / FLOAT_803311e0);
+    double alphaScale = (double)((float)baseAlpha / FLOAT_803311e0);
 
     CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
         param_2->m_stepValue, pppEmission_, param_2->m_graphId,
@@ -374,7 +384,7 @@ void pppFrameEmission(pppEmission* pppEmission_, UnkB* param_2, UnkC* param_3) {
                 RandF__5CMathFf(FLOAT_803311e4, &Math);
 
                 int r = rand();
-                s16 lifeJitter = (payload[0xD] != 0) ? (s16)(r % payload[0xD]) : 0;
+                s16 lifeJitter = (s16)(r % payload[0xD]);
                 s16 safeJitter = (lifeJitter > 0) ? lifeJitter : 1;
 
                 *(u16*)(particle + 3) = (u16)payload[0xF] + safeJitter;
@@ -384,7 +394,7 @@ void pppFrameEmission(pppEmission* pppEmission_, UnkB* param_2, UnkC* param_3) {
                 float randOffset = RandF__5CMathFf(*(float*)(payload + 4), &Math);
                 particle[0] = ((float)i * randOffset) + FLOAT_803311e4;
                 *(u16*)(particle + 1) = 0;
-                *((s8*)particle + 0xE) = (s8)((int)payload[0xB] / (int)fade);
+                *((u8*)particle + 0xE) = (u8)((int)payload[0xB] / (int)fade);
                 particle += 4;
             }
         }
@@ -396,7 +406,7 @@ void pppFrameEmission(pppEmission* pppEmission_, UnkB* param_2, UnkC* param_3) {
 
             if (*(s16*)(particle + 3) < 1) {
                 if (*(s16*)((u8*)particle + 10) < (s16)(u16)payload[0xC]) {
-                    *(u16*)(particle + 1) = (u16)(*(s16*)(particle + 1) - (u8)(*((s8*)particle + 0xE)));
+                    *(u16*)(particle + 1) = (u16)(*(s16*)(particle + 1) - *((u8*)particle + 0xE));
                 } else {
                     *(u16*)(particle + 1) = (u16)payload[0xB];
                 }
@@ -406,7 +416,7 @@ void pppFrameEmission(pppEmission* pppEmission_, UnkB* param_2, UnkC* param_3) {
             }
 
             *(s16*)((u8*)particle + 10) = *(s16*)((u8*)particle + 10) - 1;
-            int alpha = (int)((float)(*(s16*)(particle + 1)) * alphaScale);
+            int alpha = (int)((double)(float)*(s16*)(particle + 1) * alphaScale);
 
             if (*(s16*)((u8*)particle + 10) < 1) {
                 s16 jitter = 0;

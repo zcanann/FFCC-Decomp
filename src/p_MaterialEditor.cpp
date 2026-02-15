@@ -6,6 +6,7 @@
 extern "C" int __cntlzw(unsigned int);
 
 extern CUSBPcs USBPcs;
+extern unsigned char m_table__18CMaterialEditorPcs[];
 extern class CCameraPcs {
 public:
     Mtx m_cameraMatrix;
@@ -186,9 +187,9 @@ void CMaterialEditorPcs::Quit()
  * Address:	TODO
  * Size:	TODO
  */
-void CMaterialEditorPcs::GetTable(unsigned long)
+int CMaterialEditorPcs::GetTable(unsigned long index)
 {
-	// TODO
+    return reinterpret_cast<int>(m_table__18CMaterialEditorPcs + index * 0x15C);
 }
 
 /*

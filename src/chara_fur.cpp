@@ -1,6 +1,120 @@
 #include "ffcc/chara_fur.h"
 #include "ffcc/chara.h"
 #include "ffcc/charaobj.h"
+#include "ffcc/sound.h"
+#include "ffcc/system.h"
+
+#include <string.h>
+
+/*
+ * --INFO--
+ * PAL Address: 0x800df618
+ * PAL Size: 480b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CChara::TimeMogFur()
+{
+	unsigned int* const timeStamp = reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x2014);
+	unsigned short* const texels = reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(this) + 4);
+
+	if (*timeStamp + 0x1A5E0 < System.m_frameCounter) {
+		*timeStamp = System.m_frameCounter;
+		if (static_cast<unsigned int>(System.m_execParam) > 2U) {
+			System.Printf("");
+		}
+		if (static_cast<unsigned int>(System.m_execParam) > 2U) {
+			System.Printf("");
+		}
+		if (static_cast<unsigned int>(System.m_execParam) > 2U) {
+			System.Printf("");
+		}
+	}
+
+	memset(reinterpret_cast<unsigned char*>(this) + 0x2018, 0, 0x40);
+
+	for (unsigned int y = 0; y < 0x40; y++) {
+		for (unsigned int x = 0; x < 0x40; x++) {
+			int light;
+			int r;
+			int g;
+			int b;
+			int a;
+			unsigned int newA;
+			unsigned int tileIndex = ((((x >> 2) & 1) + (((y >> 2) & 1) * 4) + (x >> 3) * 0x10 + (y >> 3) * 0x100) * 2) +
+			                         (((x & 3) + ((y & 3) * 4)) * 2);
+			unsigned short packed = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + tileIndex);
+
+			a = (packed >> 12) & 7;
+			light = 7 - a;
+			r = light + ((packed >> 8) & 0xF) + 4;
+			g = light + ((packed >> 4) & 0xF) + 4;
+			b = light + (packed & 0xF) + 4;
+
+			if (r > 0xF) {
+				r = 0xF;
+			}
+			if (g > 0xF) {
+				g = 0xF;
+			}
+			if (b > 0xF) {
+				b = 0xF;
+			}
+
+			newA = static_cast<unsigned int>(a + 2);
+			if (newA > 7) {
+				newA = 7;
+			}
+
+			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + tileIndex) =
+			    static_cast<unsigned short>((b & 0xF) | ((g & 0xF) << 4) | ((r & 0xF) << 8) | ((newA & 7) << 12));
+		}
+	}
+
+	CalcMogScore();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800df7f8
+ * PAL Size: 2224b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CChara::CalcMogScore()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800e10c0
+ * PAL Size: 136b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CChara::ChangeMogMode(int mogMode)
+{
+	int* const mogSoundHandle = reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x200c);
+
+	if (mogMode == 0) {
+		if (*mogSoundHandle != 0) {
+			Sound.StopSe(*mogSoundHandle);
+			*mogSoundHandle = 0;
+		}
+	} else {
+		memset(reinterpret_cast<unsigned char*>(this) + 0x1FE8, 0, 0x2C);
+		*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x200c) = 0x140;
+		*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x2010) = 0xE0;
+		*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x2004) = 0;
+	}
+}
 
 /*
  * --INFO--

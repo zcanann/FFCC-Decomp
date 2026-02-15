@@ -30,7 +30,7 @@ struct CMapCylinderRaw
 extern "C" {
     int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(struct CMapMng*, CMapCylinder*, Vec*, unsigned int);
     void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
-    void pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
+    void* pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
 }
 
 /*
@@ -58,8 +58,9 @@ void pppConstructYmCheckBGHeight(void)
  */
 struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(struct pppYmCheckBGHeight* pppYmCheckBGHeight, struct UnkC* param_2)
 {
+    _pppMngSt* pppMngSt = pppMngStPtr;
+
     if (DAT_8032ed70 == 0) {
-        _pppMngSt* pppMngSt = pppMngStPtr;
         int hitResult;
         float currentY;
         CMapCylinderRaw cyl;
@@ -96,7 +97,7 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(struct pppYmCheckBGHeight* pp
         pppMngStPtr->m_matrix.value[0][3] = pppMngSt->m_position.x;
         pppMngStPtr->m_matrix.value[1][3] = pppMngSt->m_position.y;
         pppMngStPtr->m_matrix.value[2][3] = pppMngSt->m_position.z;
-        pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
+        pppYmCheckBGHeight = (struct pppYmCheckBGHeight*)pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
     }
     return pppYmCheckBGHeight;
 }

@@ -3,6 +3,7 @@
 
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
+extern s32 DAT_8032ed70;
 
 static Mtx g_matUnit;
 
@@ -60,12 +61,112 @@ void calc(VRyjMegaBirth*, PRyjMegaBirth*, _PARTICLE_DATA*, VColor*, _PARTICLE_CO
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80082b10
+ * PAL Size: 440b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void calc_particle(_pppPObject*, VRyjMegaBirth*, PRyjMegaBirth*, VColor*)
+void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* param, VColor* color)
 {
-	// TODO
+	s16 duration;
+	u16 frame;
+	s32 colorSet;
+	s32 frameData;
+	s32 i;
+	s32 emitCount;
+	s32 maxParticles;
+	_PARTICLE_COLOR* colorData;
+	PARTICLE_WMAT* worldMats;
+	_PARTICLE_DATA* particle;
+	u8* paramPayload;
+	u16* particleLife;
+	u16* particleFrameTimer;
+	u16* particleFrameIndex;
+	u16* emitRate;
+	u16* emitPerFrame;
+
+	emitCount = 0;
+	particle = (_PARTICLE_DATA*)work->m_particleBlock;
+	worldMats = work->m_worldMatrixBlock;
+	colorData = work->m_colorBlock;
+	maxParticles = work->m_numParticles;
+	paramPayload = (u8*)param;
+	emitRate = (u16*)(paramPayload + 0xB4);
+	emitPerFrame = (u16*)(paramPayload + 0xB6);
+
+	if ((DAT_8032ed70 == 0) && (paramPayload[0x16] != 0))
+	{
+		work->m_emitTimer = work->m_emitTimer + 1;
+
+		for (i = 0; i < maxParticles; i = i + 1)
+		{
+			particleLife = (u16*)((u8*)particle + 0x22);
+			particleFrameTimer = (u16*)((u8*)particle + 0x1C);
+			particleFrameIndex = (u16*)((u8*)particle + 0x1E);
+
+			if (*(s16*)particleLife == 0)
+			{
+				if ((*emitRate <= work->m_emitTimer) && (emitCount < (s32)(*emitPerFrame)))
+				{
+					birth(pObject, work, param, color, particle, (_PARTICLE_WMAT*)worldMats, colorData);
+					emitCount = emitCount + 1;
+				}
+			}
+			else
+			{
+				calc(work, param, particle, color, colorData);
+
+				frame = *(u16*)((u8*)particle + 0x1E);
+				colorSet = **(s32**)(*(s32*)&pppEnvStPtr->m_particleColors[0] +
+				                     (s32)paramPayload[0x05] * 4);
+				*(u16*)((u8*)particle + 0x20) = frame;
+				frameData = colorSet + (u32)frame * 8 + 0x10;
+
+				*(s16*)((u8*)particle + 0x1C) = *(s16*)((u8*)particle + 0x1C) + *(s16*)(paramPayload + 0x08);
+				frame = *particleFrameTimer;
+				duration = *(s16*)(frameData + 2);
+
+				if ((s32)duration <= (s32)frame)
+				{
+					*particleFrameTimer = frame - duration;
+					*particleFrameIndex = *particleFrameIndex + 1;
+
+					if ((s32)*(s16*)(colorSet + 6) <= (s32)(*particleFrameIndex))
+					{
+						if ((*(u8*)(frameData + 4) & 0x80) == 0)
+						{
+							*particleFrameTimer = 0;
+							*particleFrameIndex = *particleFrameIndex - 1;
+						}
+						else
+						{
+							*particleFrameIndex = 0;
+							*particleFrameTimer = 0;
+						}
+					}
+				}
+			}
+
+			if (worldMats != 0)
+			{
+				worldMats = worldMats + 1;
+			}
+
+			if (colorData != 0)
+			{
+				colorData = colorData + 1;
+			}
+
+			particle = (_PARTICLE_DATA*)((u8*)particle + 0x60);
+		}
+
+		if (emitCount > 0)
+		{
+			work->m_emitTimer = 0;
+		}
+	}
 }
 
 /*

@@ -10,11 +10,13 @@ struct PRyjMegaBirth : _PARTICLE_DATA
 struct VRyjMegaBirth
 {
     Mtx m_worldMatrix;
-    Vec *m_particleBlock;
-    u32 m_numParticles;
-    PARTICLE_WMAT *m_worldMatrixBlock;
-    _PARTICLE_COLOR *m_colorBlock;
     Vec m_accelerationAxis;
+    Vec* m_particleBlock;
+    PARTICLE_WMAT* m_worldMatrixBlock;
+    _PARTICLE_COLOR* m_colorBlock;
+    void* m_meshData;
+    u16 m_numParticles;
+    u16 m_emitTimer;
 };
 
 struct PRyjMegaBirthOffsets

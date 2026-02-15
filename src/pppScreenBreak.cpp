@@ -212,12 +212,16 @@ void InitPieceData(CChara::CModel*, PScreenBreak*, VScreenBreak*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012da00
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void SB_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
 {
-	// TODO
+    GXSetZMode(GX_TRUE, (GXCompare)7, GX_TRUE);
 }
 
 /*

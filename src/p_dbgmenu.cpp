@@ -7,6 +7,8 @@
 extern unsigned char CFlat[];
 extern unsigned char DAT_8032e698;
 extern unsigned char DAT_8032ecd8;
+extern char s_Debug_80331c90[];
+extern u32 PTR_DAT_80212524;
 
 /*
  * --INFO--
@@ -556,12 +558,79 @@ level1_done:
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012b8c0
+ * PAL Size: 588b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CDbgMenuPcs::Add()
 {
-	// TODO
+	if (*(int*)((char*)this + 0x58) != 0) {
+		return;
+	}
+
+	u32 rootParam[13];
+	u32 nodeParam[13];
+	u32 actionParam[13];
+	u32* menuDefs = &PTR_DAT_80212524;
+
+	memset(rootParam, 0, sizeof(rootParam));
+	memset(nodeParam, 0, sizeof(nodeParam));
+
+	rootParam[0] = 0;
+	rootParam[1] = 0;
+	rootParam[2] = 0;
+	rootParam[3] = 0;
+	rootParam[4] = 100;
+	rootParam[5] = 0x32;
+	rootParam[6] = 0xDC;
+	rootParam[7] = 0x180;
+	rootParam[8] = 0;
+	rootParam[9] = (u32)s_Debug_80331c90;
+	rootParam[10] = 0;
+	rootParam[11] = 0;
+	rootParam[12] = 0;
+	Add(0, 10, *(CDMParam*)rootParam);
+
+	int y = 10;
+	for (int i = 0; i < 0x17; i++) {
+		memset(nodeParam, 0, sizeof(nodeParam));
+		nodeParam[0] = 1;
+		nodeParam[1] = 0;
+		nodeParam[2] = 0;
+		nodeParam[3] = 0;
+		nodeParam[4] = 10;
+		nodeParam[5] = y;
+		nodeParam[6] = 0;
+		nodeParam[7] = 0;
+		nodeParam[8] = 0;
+		nodeParam[9] = menuDefs[0];
+		nodeParam[10] = 0;
+		nodeParam[11] = 0;
+		nodeParam[12] = 0;
+		Add(10, 1, *(CDMParam*)nodeParam);
+
+		memset(actionParam, 0, sizeof(actionParam));
+		actionParam[0] = menuDefs[2];
+		actionParam[1] = menuDefs[3];
+		actionParam[2] = 0;
+		actionParam[3] = 0;
+		actionParam[4] = 0xB4;
+		actionParam[5] = y;
+		actionParam[6] = 0;
+		actionParam[7] = 0;
+		actionParam[8] = 0;
+		actionParam[9] = 0;
+		actionParam[10] = 0;
+		actionParam[11] = 0;
+		actionParam[12] = 0;
+		Add(10, menuDefs[1], *(CDMParam*)actionParam);
+
+		menuDefs += 4;
+		y += 0x10;
+	}
 }
 
 /*

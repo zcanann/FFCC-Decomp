@@ -1,6 +1,8 @@
 #include "ffcc/RedSound/RedCommand.h"
 #include "ffcc/RedSound/RedEntry.h"
+#include "ffcc/RedSound/RedMemory.h"
 #include "ffcc/RedSound/RedMidiCtrl.h"
+#include <string.h>
 
 extern CRedEntry DAT_8032e154;
 extern void* DAT_8032f3f0;
@@ -278,12 +280,69 @@ void _MusicPlayStart(RedMusicHEAD*, RedWaveHeadWD*, int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cb5f0
+ * PAL Size: 480b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void MusicStop(int)
+void MusicStop(int seId)
 {
-	// TODO
+	unsigned int* musicBase = (unsigned int*)DAT_8032f3f0;
+	unsigned int* music = musicBase;
+
+	do {
+		if ((seId == -1) || (((int)music[0x11c] >= 0) && (music[0x11c] == (unsigned int)seId))) {
+			unsigned int musicId = music[0x11c];
+			music[0x122] = 0;
+			music[0x11c] = -1;
+			if (*(short*)((char*)music + 0x48e) != 0) {
+				unsigned int* seTrack = DAT_8032f444;
+				do {
+					if ((*music <= *seTrack) &&
+					    (*seTrack <
+					     *music + (unsigned int)*(unsigned char*)((char*)music + 0x491) *
+					                   0x154)) {
+						seTrack[0x25] &= 0xfffffff3;
+						seTrack[0x24] &= 0xfffffffe;
+						seTrack[0x24] |= 2;
+						*((unsigned char*)seTrack + 0x1a) &= 0xfb;
+						*seTrack = 0;
+						seTrack[0x23] = 0;
+					}
+					seTrack += 0x30;
+				} while (seTrack < DAT_8032f444 + 0xc00);
+
+				int* track = (int*)*music;
+				do {
+					if (*track != 0) {
+						KeyOnReserveClear((RedKeyOnDATA*)DAT_8032f3fc, (RedTrackDATA*)track);
+						*track = 0;
+					}
+					track += 0x55;
+				} while (track < (int*)(*music +
+				                        (unsigned int)*(unsigned char*)((char*)music + 0x491) *
+				                            0x154));
+
+				*(short*)((char*)music + 0x48e) = 0;
+				*(unsigned char*)((char*)music + 0x491) = 0;
+				RedDelete((void*)*music);
+				*music = 0;
+				DAT_8032e154.WaveHistoryManager(0, music[0x11f]);
+				DAT_8032e154.MusicHistoryManager(0, musicId);
+			}
+		}
+		music += 0x125;
+	} while (music < musicBase + 0x24a);
+
+	if (((int)musicBase[0x11c] < 0) && ((int)musicBase[0x241] >= 0)) {
+		memcpy(musicBase, musicBase + 0x125, 0x494);
+		*(short*)((char*)musicBase + 0x922) = 0;
+		*(unsigned char*)((char*)musicBase + 0x925) = 0;
+		musicBase[0x241] = -1;
+		musicBase[0x125] = 0;
+	}
 }
 
 /*

@@ -1,5 +1,6 @@
 #include "ffcc/gobjwork.h"
 #include "ffcc/p_game.h"
+#include <string.h>
 
 /*
  * --INFO--
@@ -83,22 +84,36 @@ void CCaravanWork::LoadInit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a2994
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCaravanWork::ClearEvtWork()
 {
-	// TODO
+	memset(m_evtWorkArr, 0, sizeof(m_evtWorkArr));
+	memset(m_evtWordArr, 0, sizeof(m_evtWordArr));
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a293c
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCaravanWork::LoadFinished()
 {
-	// TODO
+	if (m_shopState == 0) {
+		return;
+	}
+
+	m_baseDataIndex = (m_id / 100) - 1;
+	m_romWorkPtr = reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[0] + (m_baseDataIndex * 0x1D0) + 0x10);
 }
 
 /*
@@ -355,12 +370,17 @@ void CCaravanWork::AddTmpArtifact(int, int*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a1bb0
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::CanAddGil(int)
+int CCaravanWork::CanAddGil(int gilAmount)
 {
-	// TODO
+	int totalGil = m_gil + gilAmount;
+	return (totalGil >= 0 && totalGil < 100000000);
 }
 
 /*

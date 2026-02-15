@@ -65,32 +65,43 @@ void CMapShadowInsertOctTree(CMapShadow::TARGET mapShadow, COctTree& octTree)
  */
 void CMapShadow::Init()
 {
-	float fVar1;
-	float fVar2;
-	float fVar3;
-	int iVar6;
-	u32 uVar7;
-	u32 uVar8;
+	float width;
+	float height;
+	float scale;
+	int material;
+	int materialArray;
+	u32 materialWidth;
+	u32 materialHeight;
+	u32 materialMode;
+	union {
+		double d;
+		struct {
+			u32 hi;
+			u32 lo;
+		} parts;
+	} cvt;
 
-	iVar6 = (int)(((CPtrArray<CMaterial>*)((char*)&MapMng + 8))->operator[](*(u16*)((char*)this + 4)));
-	iVar6 = *(int*)(iVar6 + 0x3c);
-	uVar8 = *(u32*)(iVar6 + 100);
-	uVar7 = *(u32*)(iVar6 + 0x68);
-	*((u8*)this + 7) = *(u8*)(iVar6 + 0x6c);
-	fVar1 = (float)((double)uVar8);
-	fVar2 = (float)((double)uVar7);
-	fVar3 = *(float*)((char*)this + 0xa8);
+	materialArray = *(int*)((char*)&MapMng + 0x213d4);
+	material = (int)(((CPtrArray<CMaterial>*)(materialArray + 8))->operator[](*(u16*)((char*)this + 4)));
+	material = *(int*)(material + 0x3c);
+	materialWidth = *(u32*)(material + 0x64);
+	materialHeight = *(u32*)(material + 0x68);
+	materialMode = *(u32*)(material + 0x6c);
+	*((u8*)this + 7) = materialMode;
+	cvt.parts.hi = 0x43300000;
+	cvt.parts.lo = materialWidth;
+	width = (float)(cvt.d - DOUBLE_8032fcf8);
+	cvt.parts.lo = materialHeight;
+	height = (float)(cvt.d - DOUBLE_8032fcf8);
+	scale = *(float*)((char*)this + 0xa8);
 	if (*(s8*)((char*)this + 6) != 0) {
-		C_MTXLightFrustum((MtxPtr)((char*)this + 0x48), -fVar2, fVar2, -fVar1, fVar1,
-		                  *(float*)((char*)this + 0xac),
-		                  (float)(DOUBLE_8032fce8 * (double)fVar3),
-		                  (float)((double)FLOAT_8032fcf0 * (double)fVar3),
-		                  FLOAT_8032fcf0, FLOAT_8032fcf0);
+		C_MTXLightFrustum((MtxPtr)((char*)this + 0x48), -height, height, -width, width, *(float*)((char*)this + 0xac),
+		                  (float)(DOUBLE_8032fce8 * (double)scale), FLOAT_8032fcf0 * scale, FLOAT_8032fcf0,
+		                  FLOAT_8032fcf0);
 	} else {
-		C_MTXLightOrtho((MtxPtr)((char*)this + 0x48), -fVar2, fVar2, -fVar1, fVar1,
-		                (float)(DOUBLE_8032fce8 * (double)fVar3),
-		                (float)((double)FLOAT_8032fcf0 * (double)fVar3),
-		                FLOAT_8032fcf0, FLOAT_8032fcf0);
+		C_MTXLightOrtho((MtxPtr)((char*)this + 0x48), -height, height, -width, width,
+		                (float)(DOUBLE_8032fce8 * (double)scale), FLOAT_8032fcf0 * scale, FLOAT_8032fcf0,
+		                FLOAT_8032fcf0);
 	}
 }
 

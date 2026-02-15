@@ -39,6 +39,12 @@ struct VertexApState
     u16 countdown;
 };
 
+struct VertexApCtrl
+{
+    u8 unk0[0xC];
+    s32* stateOffset;
+};
+
 struct VertexApSource
 {
     u8 unk0[0x2C];
@@ -68,12 +74,10 @@ _pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
  */
 void pppVertexApCon(_pppPObject* pobj, PVertexAp* vtxAp)
 {
-	int* vtxApPtr = (int*)vtxAp;
-	int offset = vtxApPtr[3]; // 0xc offset (12 bytes / 4 = index 3)
-	int* basePtr = (int*)offset;
-	short* ptr = (short*)((char*)pobj + *basePtr + 0x80);
-	ptr[0] = 0;
-	ptr[1] = 0;
+    s32 offset = **(s32**)((u8*)vtxAp + 0xC);
+    u16* state = (u16*)((u8*)pobj + offset + 0x80);
+    state[0] = 0;
+    state[1] = 0;
 }
 
 /*
@@ -93,7 +97,9 @@ void pppVertexApCon(_pppPObject* pobj, PVertexAp* vtxAp)
 void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
 {
     VertexApData* data = (VertexApData*)dataRaw;
-    VertexApState* state = (VertexApState*)((u8*)parent + **(s32**)((u8*)ctrlRaw + 0xC) + 0x80);
+    VertexApCtrl* ctrl = (VertexApCtrl*)ctrlRaw;
+    s32 stateOffset = *ctrl->stateOffset;
+    VertexApState* state = (VertexApState*)((u8*)parent + stateOffset + 0x80);
 
     if (lbl_8032ED70 != 0) {
         return;
@@ -113,9 +119,10 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
             points = src->points;
         }
 
-        s32 count = data->spawnCount;
+        u8 count = data->spawnCount;
 
-        if (data->mode == 0) {
+        switch (data->mode) {
+        case 0:
             do {
                 if (state->index >= (u16)entry->maxValue) {
                     state->index = 0;
@@ -124,10 +131,10 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                 u16 vertexIndex = entry->vertexIndices[state->index];
                 state->index++;
 
-                if ((data->childId + 0x10000) != 0xFFFF) {
+                s32 childId = data->childId;
+                if ((u16)childId != 0xFFFF) {
+                    _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (childId << 4));
                     _pppPObject* child;
-                    _pppPDataVal* childData =
-                        (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (data->childId << 4));
 
                     if (childData == 0) {
                         child = 0;
@@ -148,14 +155,15 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                     }
                 }
             } while (count-- != 0);
-        } else if (data->mode == 1) {
+            break;
+        case 1:
             do {
                 u16 vertexIndex = entry->vertexIndices[(s32)(RandF__5CMathFv(&math) * (f32)entry->maxValue)];
+                s32 childId = data->childId;
 
-                if ((data->childId + 0x10000) != 0xFFFF) {
+                if ((u16)childId != 0xFFFF) {
+                    _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (childId << 4));
                     _pppPObject* child;
-                    _pppPDataVal* childData =
-                        (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (data->childId << 4));
 
                     if (childData == 0) {
                         child = 0;
@@ -176,6 +184,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                     }
                 }
             } while (count-- != 0);
+            break;
         }
 
         state->countdown = data->spawnDelay;

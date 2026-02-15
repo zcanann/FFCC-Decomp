@@ -4,6 +4,7 @@
 #include <string.h>
 
 extern "C" unsigned long UnkMaterialSetGetter(void*);
+static const char s_materialStageName[] = "material";
 
 namespace {
 static inline unsigned char* Ptr(void* p, unsigned int offset)
@@ -66,7 +67,8 @@ CMaterialMan::CMaterialMan()
  */
 void CMaterialMan::Init()
 {
-	// TODO
+	*reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x218)) = Memory.CreateStage(0x20000, const_cast<char*>(s_materialStageName), 0);
+	*Ptr(this, 0x204) = 0x30;
 }
 
 /*
@@ -76,7 +78,7 @@ void CMaterialMan::Init()
  */
 void CMaterialMan::Quit()
 {
-	// TODO
+	Memory.DestroyStage(*reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x218)));
 }
 
 /*

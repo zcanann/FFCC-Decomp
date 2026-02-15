@@ -358,7 +358,72 @@ void GXSetVtxAttrFmt(GXVtxFmt vtxfmt, GXAttr attr, GXCompCnt cnt, GXCompType typ
     va = &__GXData->vatA[vtxfmt];
     vb = &__GXData->vatB[vtxfmt];
     vc = &__GXData->vatC[vtxfmt];
-    SETVAT(va, vb, vc, attr, cnt, type, frac);
+    switch (attr) {
+    case GX_VA_POS:
+        *va = (*va & ~1) | cnt;
+        *va = (*va & ~0xE) | ((u32)type << 1);
+        *va = (*va & ~0x1F0) | (((u32)frac & 0xFF) << 4);
+        break;
+    case GX_VA_NRM:
+    case GX_VA_NBT:
+        *va = (*va & ~0x1C00) | ((u32)type << 10);
+        if (cnt == GX_NRM_NBT3) {
+            *va = (*va & ~0x200) | 0x200;
+            *va = (*va & ~0x80000000) | 0x80000000;
+        } else {
+            *va = (*va & ~0x200) | ((u32)cnt << 9);
+            *va &= ~0x80000000;
+        }
+        break;
+    case GX_VA_CLR0:
+        *va = (*va & ~0x2000) | ((u32)cnt << 13);
+        *va = (*va & ~0x1C000) | ((u32)type << 14);
+        break;
+    case GX_VA_CLR1:
+        *va = (*va & ~0x20000) | ((u32)cnt << 17);
+        *va = (*va & ~0x1C0000) | ((u32)type << 18);
+        break;
+    case GX_VA_TEX0:
+        *va = (*va & ~0x200000) | ((u32)cnt << 21);
+        *va = (*va & ~0x1C00000) | ((u32)type << 22);
+        *va = (*va & ~0x3E000000) | ((u32)frac << 25);
+        break;
+    case GX_VA_TEX1:
+        *vb = (*vb & ~1) | cnt;
+        *vb = (*vb & ~0xE) | ((u32)type << 1);
+        *vb = (*vb & ~0x1F0) | (((u32)frac & 0xFF) << 4);
+        break;
+    case GX_VA_TEX2:
+        *vb = (*vb & ~0x200) | ((u32)cnt << 9);
+        *vb = (*vb & ~0x1C00) | ((u32)type << 10);
+        *vb = (*vb & ~0x3E000) | (((u32)frac & 0xFF) << 13);
+        break;
+    case GX_VA_TEX3:
+        *vb = (*vb & ~0x40000) | ((u32)cnt << 18);
+        *vb = (*vb & ~0x380000) | ((u32)type << 19);
+        *vb = (*vb & ~0x7C00000) | (((u32)frac & 0xFF) << 22);
+        break;
+    case GX_VA_TEX4:
+        *vb = (*vb & ~0x8000000) | ((u32)cnt << 27);
+        *vb = (*vb & ~0x70000000) | ((u32)type << 28);
+        *vc = (*vc & ~0x1F) | ((u32)frac & 0xFF);
+        break;
+    case GX_VA_TEX5:
+        *vc = (*vc & ~0x20) | ((u32)cnt << 5);
+        *vc = (*vc & ~0x1C0) | ((u32)type << 6);
+        *vc = (*vc & ~0x3E00) | (((u32)frac & 0xFF) << 9);
+        break;
+    case GX_VA_TEX6:
+        *vc = (*vc & ~0x4000) | ((u32)cnt << 14);
+        *vc = (*vc & ~0x38000) | ((u32)type << 15);
+        *vc = (*vc & ~0x7C0000) | (((u32)frac & 0xFF) << 18);
+        break;
+    case GX_VA_TEX7:
+        *vc = (*vc & ~0x800000) | ((u32)cnt << 23);
+        *vc = (*vc & ~0x7000000) | ((u32)type << 24);
+        *vc = (*vc & ~0xF8000000) | ((u32)frac << 27);
+        break;
+    }
 
 #ifdef DEBUG
     __GXVerifyVATImm(attr, cnt, type, frac);

@@ -851,22 +851,30 @@ void CPartMng::pppEndPart(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80057e40
+ * PAL Size: 24b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartMng::pppGetIfDt(short)
+PPPIFPARAM* CPartMng::pppGetIfDt(short index)
 {
-	// TODO
+	return reinterpret_cast<PPPIFPARAM*>(reinterpret_cast<char*>(this) + (index * 0x158) + 0x130);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80057e2c
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartMng::pppShowIdx(short, unsigned char)
+void CPartMng::pppShowIdx(short index, unsigned char visible)
 {
-	// TODO
+	reinterpret_cast<unsigned char*>(this)[(index * 0x158) + 0xe9] = visible;
 }
 
 /*

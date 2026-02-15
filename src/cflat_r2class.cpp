@@ -1,4 +1,9 @@
 #include "ffcc/cflat_r2class.h"
+#include "ffcc/gobject.h"
+
+extern "C" int __cntlzw(unsigned int);
+extern "C" int IsAnimFinished__8CGObjectFi(CGObject*, int);
+extern "C" void push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(CFlatRuntime2*, CFlatRuntime::CObject*, int);
 
 namespace {
 
@@ -17,6 +22,14 @@ static inline unsigned int CallEngineFlags(void* engineObject)
 	return fn(engineObject);
 }
 
+static inline unsigned int CallEngineFunc48Arg(void* engineObject, unsigned int arg0)
+{
+	typedef unsigned int (*EngineFn)(void*, unsigned int);
+	void** vtable = *reinterpret_cast<void***>(reinterpret_cast<u8*>(engineObject) + 0x48);
+	EngineFn fn = reinterpret_cast<EngineFn>(vtable[2]);
+	return fn(engineObject, arg0);
+}
+
 } // namespace
 
 /*
@@ -31,12 +44,57 @@ void SAFE_CAST_MON_WORK(CGObjWork*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800bb700
+ * PAL Size: 8520b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject*, int, int, int&)
+void CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int command, int& outResult)
 {
-	// TODO
+	CGObject* engineObject = reinterpret_cast<CGObject*>(object->m_engineObject);
+	unsigned int* localBase = object->m_localBase;
+
+	switch (command) {
+		case -0x9F: {
+			unsigned int finished = static_cast<unsigned int>(IsAnimFinished__8CGObjectFi(engineObject, 0));
+			int topBit = __cntlzw(finished);
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, (topBit >> 5) & 0xFF);
+			outResult = 0;
+			break;
+		}
+		case -0x9E:
+			engineObject->m_groundHitOffset.x += static_cast<float>(localBase[0]);
+			engineObject->m_groundHitOffset.y += static_cast<float>(localBase[1]);
+			engineObject->m_groundHitOffset.z += static_cast<float>(localBase[2]);
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x9D:
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(
+			    this, object, static_cast<int>(CallEngineFunc48Arg(engineObject, localBase[0])));
+			outResult = 0;
+			break;
+		case -0x9C:
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, static_cast<int>(engineObject->m_bgColMask));
+			outResult = 0;
+			break;
+		case -0x9A:
+			engineObject->PlayAnim(
+			    static_cast<int>(localBase[0]), 1, 1, static_cast<short>(localBase[1]), static_cast<short>(localBase[2]), 0);
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x99:
+			engineObject->PlayAnim(
+			    static_cast<int>(localBase[0]), 0, 1, static_cast<short>(localBase[1]), static_cast<short>(localBase[2]), 0);
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		default:
+			break;
+	}
 }
 
 /*

@@ -157,12 +157,55 @@ void CLightPcs::GetTable(unsigned long)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004a1e4
+ * PAL Size: 152b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CLightPcs::create()
 {
-	// TODO
+    int i = 2;
+    char* ptr = (char*)this;
+
+    do {
+        *(u8*)(ptr + 0x1CEC) = 0;
+        *(u32*)(ptr + 0x1CF0) = 0;
+        *(u8*)(ptr + 0x1E24) = 0;
+        *(u32*)(ptr + 0x1E28) = 0;
+        *(u8*)(ptr + 0x1F5C) = 0;
+        *(u32*)(ptr + 0x1F60) = 0;
+        *(u8*)(ptr + 0x2094) = 0;
+        *(u32*)(ptr + 0x2098) = 0;
+        *(u8*)(ptr + 0x21CC) = 0;
+        *(u32*)(ptr + 0x21D0) = 0;
+        *(u8*)(ptr + 0x2304) = 0;
+        *(u32*)(ptr + 0x2308) = 0;
+        *(u8*)(ptr + 0x243C) = 0;
+        *(u32*)(ptr + 0x2440) = 0;
+        *(u8*)(ptr + 0x2574) = 0;
+        *(u32*)(ptr + 0x2578) = 0;
+        *(u8*)(ptr + 0x26AC) = 0;
+        *(u32*)(ptr + 0x26B0) = 0;
+        *(u8*)(ptr + 0x27E4) = 0;
+        *(u32*)(ptr + 0x27E8) = 0;
+        *(u8*)(ptr + 0x291C) = 0;
+        *(u32*)(ptr + 0x2920) = 0;
+        *(u8*)(ptr + 0x2A54) = 0;
+        *(u32*)(ptr + 0x2A58) = 0;
+        *(u8*)(ptr + 0x2B8C) = 0;
+        *(u32*)(ptr + 0x2B90) = 0;
+        *(u8*)(ptr + 0x2CC4) = 0;
+        *(u32*)(ptr + 0x2CC8) = 0;
+        *(u8*)(ptr + 0x2DFC) = 0;
+        *(u32*)(ptr + 0x2E00) = 0;
+        *(u8*)(ptr + 0x2F34) = 0;
+        *(u32*)(ptr + 0x2F38) = 0;
+
+        ptr += 0x1380;
+        i--;
+    } while (i != 0);
 }
 
 /*

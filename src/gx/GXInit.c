@@ -110,32 +110,23 @@ static void DisableWriteGatherPipe(void) {
  * JP Size: TODO
  */
 static GXTexRegion* __GXDefaultTexRegionCallback(const GXTexObj* t_obj, GXTexMapID id) {
-    u8* gx;
-    u32* regionCount;
     u32 count;
-    u32 offset;
+    u8* gx = (u8*)__GXData;
 
     (void)id;
-    gx = (u8*)__GXData;
 
     switch (GXGetTexObjFmt(t_obj)) {
     case GX_TF_C4:
     case GX_TF_C8:
     case GX_TF_C14X2:
-        regionCount = (u32*)(gx + 0x2CC);
-        count = *regionCount;
-        *regionCount = count + 1;
-        offset = ((count & 3) << 4) + 0x288;
-        break;
+        count = *(u32*)(gx + 0x2CC);
+        *(u32*)(gx + 0x2CC) = count + 1;
+        return (GXTexRegion*)(gx + (((count & 3) << 4) + 0x288));
     default:
-        regionCount = (u32*)(gx + 0x2C8);
-        count = *regionCount;
-        *regionCount = count + 1;
-        offset = ((count & 7) << 4) + 0x208;
-        break;
+        count = *(u32*)(gx + 0x2C8);
+        *(u32*)(gx + 0x2C8) = count + 1;
+        return (GXTexRegion*)(gx + (((count & 7) << 4) + 0x208));
     }
-
-    return (GXTexRegion*)(gx + offset);
 }
 
 static GXTlutRegion* __GXDefaultTlutRegionCallback(u32 idx) {

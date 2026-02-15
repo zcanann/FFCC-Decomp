@@ -745,6 +745,54 @@ extern "C" int GetErrorLevel__7CSystemFv(void* system, int index)
 
 /*
  * --INFO--
+ * PAL Address: 0x800B9478
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void ReqScreenCapture__11CGraphicPcsFv(void* graphicPcs)
+{
+    *(int*)((char*)graphicPcs + 0xBC) = 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9484
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" int IsUse__8CMesMenuFv(void* mesMenu)
+{
+    if (*(int*)((char*)mesMenu + 8) == 0) {
+        return 0;
+    }
+    if (*(int*)((char*)mesMenu + 0xC) >= 2) {
+        return 0;
+    }
+    return GetWait__4CMesFv((char*)mesMenu + 0x1C) != 4;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B94DC
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" int GetErrorLevel__7CSystemFv(CSystem* system)
+{
+    return system->m_execParam;
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

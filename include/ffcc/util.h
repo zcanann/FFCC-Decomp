@@ -20,7 +20,7 @@ public:
     void SetVtxFmt_POS_TEX0_TEX1();
     void SetVtxFmt_POS_CLR_TEX0_TEX1();
     void SetOrthoEnv();
-    void GetNoise(unsigned char);
+    int GetNoise(unsigned char);
     void GetSplinePos(Vec&, Vec, Vec, Vec, Vec, float, float);
     void ConvI2FVector(Vec&, S16Vec, long);
     void ConvF2IVector(S16Vec&, Vec, long);
@@ -37,7 +37,7 @@ public:
     void RenderTextureQuad(float, float, float, float, CTexture*, Vec2d*, Vec2d*, _GXColor*, _GXBlendFactor, _GXBlendFactor);
     void SetPaletteEnv(CTexture*);
     void CalcUV(float&, float&, unsigned long, unsigned long, unsigned long, unsigned long);
-    void IsHasDrawFmtDL(unsigned char);
+    int IsHasDrawFmtDL(unsigned char);
     void ReWriteDisplayList(void*, unsigned long, unsigned long);
     void CalcBoundaryBoxQuantized(Vec*, Vec*, S16Vec*, unsigned long, unsigned long);
     int GetNumPolygonFromDL(void*, unsigned long);

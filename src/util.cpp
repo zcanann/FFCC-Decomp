@@ -6,6 +6,7 @@ extern float lbl_8032f88c;
 extern float lbl_8032f8a0;
 extern float lbl_8032f8a4;
 extern float lbl_8032f8a8;
+extern CMath Math;
 
 extern struct {
     float _212_4_;
@@ -114,12 +115,18 @@ void CUtil::SetOrthoEnv()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80024b38
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CUtil::GetNoise(unsigned char)
+int CUtil::GetNoise(unsigned char noise)
 {
-	// TODO
+    float maxNoise = (float)(noise * 2);
+    float minNoise = (float)(noise >> 1);
+    return (int)(maxNoise * Math.RandF() - minNoise);
 }
 
 /*
@@ -839,22 +846,42 @@ void CUtil::SetPaletteEnv(CTexture* texture)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80022d0c
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CUtil::CalcUV(float&, float&, unsigned long, unsigned long, unsigned long, unsigned long)
+void CUtil::CalcUV(float& u, float& v, unsigned long x, unsigned long y, unsigned long width, unsigned long height)
 {
-	// TODO
+    u = (float)x / (float)width;
+    v = (float)y / (float)height;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80022ca4
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CUtil::IsHasDrawFmtDL(unsigned char)
+int CUtil::IsHasDrawFmtDL(unsigned char cmd)
 {
-	// TODO
+    switch (cmd & 0xF8) {
+    case 0x80:
+    case 0x90:
+    case 0x98:
+    case 0xA0:
+    case 0xA8:
+    case 0xB0:
+    case 0xB8:
+        return 1;
+    default:
+        return 0;
+    }
 }
 
 /*

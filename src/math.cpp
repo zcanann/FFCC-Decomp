@@ -751,12 +751,41 @@ float CMath::Spline1D(int lastIndex, float t, float* x, float* y, float* secondD
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001a580
+ * PAL Size: 172b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMath::Line1D(int, float, float*, float*)
+float CMath::Line1D(int lastIndex, float x, float* x_arr, float* y_arr)
 {
-	// TODO
+    float period = x_arr[lastIndex] - x_arr[0];
+
+    while (x_arr[lastIndex] < x) {
+        x -= period;
+    }
+
+    while (x < x_arr[0]) {
+        x += period;
+    }
+
+    int low = 0;
+    int high = lastIndex;
+    while (low < high) {
+        int mid = (low + high) / 2;
+        if (x_arr[mid] < x) {
+            low = mid + 1;
+        } else {
+            high = mid;
+        }
+    }
+
+    if (low > 0) {
+        low--;
+    }
+
+    return ((x - x_arr[low]) / (x_arr[low + 1] - x_arr[low])) * (y_arr[low + 1] - y_arr[low]) + y_arr[low];
 }
 
 /*

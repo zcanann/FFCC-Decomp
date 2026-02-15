@@ -1017,34 +1017,47 @@ static BOOL TRKTargetCheckStep()
 
 DSError TRKTargetSingleStep(u32 count, BOOL stepOver)
 {
-    DSError error = DS_NoError;
-
     if (stepOver) {
-        error = DS_UnsupportedError;
-    } else {
-        gTRKStepStatus.type  = DSSTEP_IntoCount;
-        gTRKStepStatus.count = count;
-        error                = TRKTargetDoStep();
+        return DS_UnsupportedError;
     }
 
-    return error;
+    gTRKStepStatus.type   = DSSTEP_IntoCount;
+    gTRKStepStatus.active = TRUE;
+    gTRKStepStatus.count  = count;
+
+    MWTRACE(1, "TargetDoStep:\n");
+    TRKTargetEnableTrace(TRUE);
+
+    if (gTRKStepStatus.type == DSSTEP_IntoCount
+        || gTRKStepStatus.type == DSSTEP_OverCount) {
+        gTRKStepStatus.count--;
+    }
+
+    TRKTargetSetStopped(FALSE);
+    return DS_NoError;
 }
 
 DSError TRKTargetStepOutOfRange(u32 rangeStart, u32 rangeEnd, BOOL stepOver)
 {
-    DSError error = DS_NoError;
-
     if (stepOver) {
-        // Stepping over isn't supported for PowerPC
-        error = DS_UnsupportedError;
-    } else {
-        gTRKStepStatus.type = DSSTEP_IntoRange;
-        gTRKStepStatus.rangeStart = rangeStart;
-        gTRKStepStatus.rangeEnd   = rangeEnd;
-        error                     = TRKTargetDoStep();
+        return DS_UnsupportedError;
     }
 
-    return error;
+    gTRKStepStatus.type       = DSSTEP_IntoRange;
+    gTRKStepStatus.active     = TRUE;
+    gTRKStepStatus.rangeStart = rangeStart;
+    gTRKStepStatus.rangeEnd   = rangeEnd;
+
+    MWTRACE(1, "TargetDoStep:\n");
+    TRKTargetEnableTrace(TRUE);
+
+    if (gTRKStepStatus.type == DSSTEP_IntoCount
+        || gTRKStepStatus.type == DSSTEP_OverCount) {
+        gTRKStepStatus.count--;
+    }
+
+    TRKTargetSetStopped(FALSE);
+    return DS_NoError;
 }
 
 u32 TRKTargetGetPC() { return gTRKCPUState.Default.PC; }

@@ -112,7 +112,7 @@ public:
     void CacheUnLoadTexture(int, CAmemCacheSet*);
     void CacheRefCnt0UpTexture(int, CAmemCacheSet*);
     void CacheDumpTexture(int, CAmemCacheSet*);
-    void Find(char*);
+    unsigned long Find(char*);
     void SetPartFromTextureSet(CTextureSet*, int);
     void ReleaseTag(CTextureSet*, int, CAmemCacheSet*);
     void AddMaterial(CMaterial*, int);

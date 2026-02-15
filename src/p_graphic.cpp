@@ -1,5 +1,11 @@
 #include "ffcc/p_graphic.h"
+#include "ffcc/graphic.h"
+#include "ffcc/memory.h"
+#include "ffcc/p_minigame.h"
+#include "ffcc/pad.h"
 #include "types.h"
+
+extern "C" int sprintf(char*, const char*, ...);
 
 extern void* __vt__8CManager;
 extern void* lbl_801E8668;
@@ -17,6 +23,11 @@ extern u32 lbl_801E9CF0[];
 extern u32 lbl_801E9CFC[];
 extern u32 lbl_801E9D08[];
 extern CGraphicPcs GraphicsPcs;
+extern CMiniGamePcs MiniGamePcs;
+extern char* PTR_DAT_801e9e64[];
+extern char DAT_8032fbf4[];
+extern char DAT_8032fbf8[];
+extern char s__c_c_c_c_c_c_c_c_c_c_801d7bf8[];
 
 /*
  * --INFO--
@@ -200,12 +211,81 @@ void CGraphicPcs::drawFlip()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80047248
+ * PAL Size: 736b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphicPcs::drawEnd()
 {
-	// TODO
+	const u32 miniGameFlags = *(u32*)((u8*)&MiniGamePcs + 0x6484);
+	char debugInputString[256];
+	char debugPadString[256];
+
+	if ((miniGameFlags & 0x10) != 0) {
+		Graphic.DrawDebugString();
+	}
+
+	if ((miniGameFlags & 1) != 0) {
+		drawBar();
+	}
+
+	if ((miniGameFlags & 0x10) != 0) {
+		Graphic.InitDebugString();
+
+		if (System.m_scenegraphStepMode != 0) {
+			Graphic.DrawDebugStringDirect(0x10, 0x10, PTR_DAT_801e9e64[System.m_scenegraphStepMode], 0xC);
+		}
+
+		if (Pad._448_4_ != -1) {
+			sprintf(debugPadString, DAT_8032fbf4, Pad._448_4_ + 1);
+			Graphic.DrawDebugStringDirect(0x10, 0x11, debugPadString, 0xC);
+		}
+
+		short x = 0x10;
+		for (u32 port = 0; port < 4; port++) {
+			bool suppress = false;
+			if (Pad._452_4_ == 0) {
+				if ((port == 0) && (Pad._448_4_ != -1)) {
+					suppress = true;
+				}
+			} else {
+				suppress = true;
+			}
+
+			u16 buttons = 0;
+			if (!suppress) {
+				u32 portIndex = port;
+				if ((int)port == Pad._448_4_) {
+					portIndex = 0;
+				}
+				buttons = *(u16*)((u8*)&Pad + 4 + portIndex * 0x54);
+			}
+
+			const char down = ((buttons & 8) != 0) ? 'U' : ' ';
+			const char left = ((buttons & 4) != 0) ? 'D' : ' ';
+			const char l = ((buttons & 1) != 0) ? 'L' : ' ';
+			const char r = ((buttons & 2) != 0) ? 'R' : ' ';
+			const char b = ((buttons & 0x200) != 0) ? 'B' : ' ';
+			const char a = ((buttons & 0x100) != 0) ? 'A' : ' ';
+			const char start = ((buttons & 0x1000) != 0) ? 'S' : ' ';
+			const char s = ((buttons & 0x10) != 0) ? 's' : ' ';
+			const char z = ((buttons & 0x40) != 0) ? 'l' : ' ';
+			const char c = ((buttons & 0x20) != 0) ? 'r' : ' ';
+
+			sprintf(debugInputString, s__c_c_c_c_c_c_c_c_c_c_801d7bf8, down, left, l, r, b, a, start, s, z, c);
+			Graphic.DrawDebugStringDirect(x, 0x1A8, debugInputString, 8);
+			x += 0x60;
+		}
+
+		sprintf(debugInputString, DAT_8032fbf8, System.m_frameCounter);
+		Graphic.DrawDebugStringDirect(x, 0x1A8, debugInputString, 8);
+	}
+
+	Memory.Draw();
+	Graphic.EndFrame();
 }
 
 /*

@@ -167,12 +167,12 @@ void __AXOutInit(u32 outputBufferMode) {
 #ifdef DEBUG
     OSReport("Initializing AXOut code module\n");
 #endif
+    (void)outputBufferMode;
     ASSERTLINE(404, ((u32)&__AXOutBuffer[0][0] & 0x1F) == 0);
     ASSERTLINE(405, ((u32)&__AXOutBuffer[1][0] & 0x1F) == 0);
     ASSERTLINE(406, ((u32)&__AXOutBuffer[2][0] & 0x1F) == 0);
     ASSERTLINE(407, ((u32)&__AXOutSBuffer[0] & 0x1F) == 0);
 
-    __AXOutputBufferMode = outputBufferMode;
     __AXOutFrame = 0;
     __AXAiDmaFrame = 0;
     __AXDebugSteppingMode = 0;
@@ -185,23 +185,11 @@ void __AXOutInit(u32 outputBufferMode) {
 
     __AXOutInitDSP();
     AIRegisterDMACallback(__AXOutAiCallback);
-
-    if (__AXOutputBufferMode == 1) {
-        __AXNextFrame(__AXOutSBuffer, &__AXOutBuffer[2][0]);
-    } else {
-        __AXNextFrame(__AXOutSBuffer, &__AXOutBuffer[1][0]);
-    }
+    __AXNextFrame(__AXOutSBuffer, &__AXOutBuffer[1][0]);
 
     __AXOutDspReady = 1;
     __AXUserFrameCallback = NULL;
-
-    if (__AXOutputBufferMode == 1) {
-        AIInitDMA((u32)&__AXOutBuffer[__AXAiDmaFrame][0], sizeof(__AXOutBuffer[0]));
-        __AXAiDmaFrame++;
-        __AXAiDmaFrame &= 1;
-    } else {
-        AIInitDMA((u32)&__AXOutBuffer[__AXOutFrame][0], sizeof(__AXOutBuffer[0]));
-    }
+    AIInitDMA((u32)&__AXOutBuffer[__AXOutFrame][0], sizeof(__AXOutBuffer[0]));
 
     AIStartDMA();
 }

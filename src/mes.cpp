@@ -241,12 +241,95 @@ int CMes::GetWait()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800992d0
+ * PAL Size: 368b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMes::Calc()
 {
-	// TODO
+	if (*(int*)((char*)this + 8) == 0)
+	{
+		return;
+	}
+
+	int textEntry = (int)((char*)this + 0xC);
+	unsigned int maxAdvance = 0;
+	for (int i = 0; i < *(int*)((char*)this + 8); i++)
+	{
+		if ((int)(unsigned int)*(unsigned short*)(textEntry + 0xC) <= *(int*)((char*)this + 0x3C80))
+		{
+			unsigned char fadeMax = *(unsigned char*)(textEntry + 0xF) >> 4;
+			unsigned char fadeCurr = (*(unsigned char*)(textEntry + 0xF) & 0xF) + 1;
+			if (fadeCurr < fadeMax)
+			{
+				fadeMax = fadeCurr;
+			}
+			*(unsigned char*)(textEntry + 0xF) =
+			    (unsigned char)((fadeMax & 0xF) | (*(unsigned char*)(textEntry + 0xF) & 0xF0));
+			maxAdvance = (unsigned int)*(unsigned char*)(textEntry + 0x13);
+		}
+		textEntry += 0x14;
+	}
+
+	unsigned char* flagEntry =
+	    (unsigned char*)((char*)this + *(int*)((char*)this + 0x3C10) * 6 + 0x3C14);
+	while (true)
+	{
+		if ((int)maxAdvance <= *(int*)((char*)this + 0x3C10))
+		{
+			break;
+		}
+
+		unsigned char type = *flagEntry;
+		if (type != 3)
+		{
+			if (type < 3)
+			{
+				if (type == 1)
+				{
+					int idx = (unsigned int)flagEntry[2] * 4 + 0x3CC0;
+					*(int*)((char*)this + idx) = *(int*)((char*)this + idx) + 1;
+				}
+				else if (type != 0)
+				{
+					*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3CC0) =
+					    (int)*(short*)(flagEntry + 4);
+				}
+			}
+			else if ((type < 5) &&
+			         (*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3CC0) == 0))
+			{
+				goto doneAdvance;
+			}
+		}
+
+		flagEntry += 6;
+		*(int*)((char*)this + 0x3C10) = *(int*)((char*)this + 0x3C10) + 1;
+	}
+
+	{
+		int next = *(int*)((char*)this + 0x3C80) + 1;
+		if (next > 0x7FFE)
+		{
+			next = 0x7FFF;
+		}
+		*(int*)((char*)this + 0x3C80) = next;
+	}
+
+doneAdvance:
+	if (*(int*)((char*)this + 0x3CAC) != 0)
+	{
+		int next = *(int*)((char*)this + 0x3CBC) + 1;
+		int max = *(int*)((char*)this + 0x3CB8);
+		if (next < max)
+		{
+			max = next;
+		}
+		*(int*)((char*)this + 0x3CBC) = max;
+	}
 }
 
 /*

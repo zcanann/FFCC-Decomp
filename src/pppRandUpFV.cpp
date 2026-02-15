@@ -47,7 +47,7 @@ void pppRandUpFV(void* param1, void* param2, void* param3)
     if (state == 0) {
         f32 value = RandF__5CMathFv(math);
         if (in->field18 != 0) {
-            value = (value + RandF__5CMathFv(math)) * lbl_80330000;
+            value = lbl_80330000 * (value + RandF__5CMathFv(math));
         }
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
@@ -59,13 +59,7 @@ void pppRandUpFV(void* param1, void* param2, void* param3)
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
 
-    f32* target;
-    if (in->field4 == -1) {
-        target = lbl_801EADC8;
-    } else {
-        target = (f32*)(base + in->field4 + 0x80);
-    }
-
+    f32* target = (in->field4 == -1) ? lbl_801EADC8 : (f32*)(base + in->field4 + 0x80);
     f32 scale = *valuePtr;
     f32 value = in->field8 * scale;
     target[0] = target[0] + value;

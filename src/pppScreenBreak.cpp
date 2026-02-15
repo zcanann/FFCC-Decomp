@@ -1,12 +1,15 @@
 #include "ffcc/pppScreenBreak.h"
 
 #include "ffcc/graphic.h"
+#include "ffcc/math.h"
 #include "ffcc/materialman.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/util.h"
 
 #include "dolphin/gx.h"
 #include "dolphin/os/OSCache.h"
+#include <string.h>
 
 struct PScreenBreak {
     float field0_0x0;
@@ -37,12 +40,21 @@ struct UnkC {
 
 extern int DAT_8032ed70;
 extern int DAT_802381a0;
+extern CMath Math;
+extern CUtil DAT_8032ec70;
 extern float FLOAT_80331cc0;
 extern float FLOAT_80331cc4;
+extern float FLOAT_80331cc8;
+extern float FLOAT_80331ccc;
 extern float FLOAT_80331cd0;
+extern float FLOAT_80331cd4;
+extern float FLOAT_80331cd8;
 extern float FLOAT_80331ce8;
 extern float FLOAT_80331cec;
 extern float FLOAT_80331cf0;
+extern float DAT_801dd4bc;
+extern float DAT_801dd4c0;
+extern float DAT_801dd4c4;
 extern char MaterialMan[];
 extern char s_pppScreenBreak_cpp_801dd4d4[];
 extern CGraphic GraphicsPcs;
@@ -69,6 +81,7 @@ void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
 int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
 void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+float RandF__5CMathFf(float, CMath*);
 }
 
 /*
@@ -198,12 +211,129 @@ void GXSetTexCoordGen(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012da2c
+ * PAL Size: 1020b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void InitPieceData(CChara::CModel*, PScreenBreak*, VScreenBreak*)
+void InitPieceData(CChara::CModel* model, PScreenBreak* pppScreenBreak, VScreenBreak* param_3)
 {
-	// TODO
+    s16 globalMaxX = -0x7FFF;
+    s16 globalMaxY = -0x7FFF;
+    s16 globalMaxZ = -0x7FFF;
+    Vec* piece = *(Vec**)((u8*)param_3 + 0xC);
+    u8* mesh = *(u8**)((u8*)model + 0xAC);
+    u32 meshCount = *(u32*)(*(u8**)((u8*)model + 0xA4) + 0xC);
+
+    memset(piece, 0, meshCount * 0x3C);
+
+    for (u32 i = 0; i < meshCount; i++) {
+        u8* meshData = *(u8**)(mesh + 8);
+        u8* node = *(u8**)((u8*)model + 0xA8) + (*(s32*)(meshData + 0x5C) * 0xC0);
+        s16* pos = *(s16**)(meshData + 0x18);
+        s32 vertCount = *(s32*)(meshData + 0x14);
+        s16 maxX = -0x7FFF;
+        s16 maxY = -0x7FFF;
+        s16 maxZ = -0x7FFF;
+        s16 minX = 0x7FFF;
+        s16 minY = 0x7FFF;
+        s16 minZ = 0x7FFF;
+        S16Vec center;
+        Vec axis;
+        float speed;
+        float randRange;
+        u8 alpha;
+
+        node[0xBC] &= 0x7F;
+        PSMTXIdentity(*(Mtx*)(node + 0x14));
+
+        for (s32 j = 0; j < vertCount; j++) {
+            s16 x = pos[0];
+            s16 y = pos[1];
+            s16 z = pos[2];
+
+            if (globalMaxX < x) {
+                globalMaxX = x;
+            }
+            if (globalMaxY < y) {
+                globalMaxY = y;
+            }
+            if (globalMaxZ < z) {
+                globalMaxZ = z;
+            }
+
+            if (maxX < x) {
+                maxX = x;
+            }
+            if (maxY < y) {
+                maxY = y;
+            }
+            if (maxZ < z) {
+                maxZ = z;
+            }
+
+            if (x < minX) {
+                minX = x;
+            }
+            if (y < minY) {
+                minY = y;
+            }
+            if (z < minZ) {
+                minZ = z;
+            }
+
+            pos += 3;
+        }
+
+        center.x = maxX + minX;
+        center.y = maxY + minY;
+        center.z = maxZ + minZ;
+        DAT_8032ec70.ConvI2FVector(piece[3], center, *(long*)(*(u8**)((u8*)model + 0xA4) + 0x34));
+        PSVECScale(&piece[3], &piece[3], FLOAT_80331ccc);
+
+        if (piece[3].x > FLOAT_80331cc8) {
+            piece[0].x = RandF__5CMathFf(FLOAT_80331cc8, &Math);
+        } else if (piece[3].x < -FLOAT_80331cc8) {
+            piece[0].x = -RandF__5CMathFf(FLOAT_80331cc8, &Math);
+        } else {
+            piece[0].x = piece[3].x;
+        }
+
+        piece[0].y = FLOAT_80331cd0;
+        piece[0].z = FLOAT_80331cd4;
+        PSVECNormalize(&piece[0], &piece[0]);
+
+        axis.x = DAT_801dd4bc;
+        axis.y = DAT_801dd4c0;
+        axis.z = DAT_801dd4c4;
+        PSVECCrossProduct(&piece[0], &axis, &piece[2]);
+
+        speed = *(float*)((u8*)pppScreenBreak + 0x38);
+        randRange = RandF__5CMathFf(*(float*)((u8*)pppScreenBreak + 0x3C), &Math);
+        PSVECScale(&piece[0], &piece[0], speed + randRange);
+
+        piece[1].x = FLOAT_80331cc4;
+        piece[1].y = FLOAT_80331cc4;
+        piece[1].z = FLOAT_80331cc4;
+        piece[4].x = FLOAT_80331cc4;
+
+        alpha = *(u8*)((u8*)pppScreenBreak + 0x34);
+        piece[4].y = FLOAT_80331cd8 * (FLOAT_80331cc0 + RandF__5CMathFf((float)alpha, &Math));
+        *(u8*)&piece[4].z = 0;
+
+        mesh += 0x14;
+        piece += 5;
+    }
+
+    {
+        S16Vec globalMax;
+        globalMax.x = globalMaxX;
+        globalMax.y = globalMaxY;
+        globalMax.z = globalMaxZ;
+        DAT_8032ec70.ConvI2FVector(*(Vec*)((u8*)param_3 + 0x18), globalMax, *(long*)(*(u8**)((u8*)model + 0xA4) + 0x34));
+    }
 }
 
 /*

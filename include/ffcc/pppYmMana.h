@@ -23,7 +23,7 @@ void CreateWaterMesh(Vec*, Vec*, Vec2d*, unsigned short*, float);
 void UpdateWaterMesh(VYmMana*);
 void RenderWaterMesh(VYmMana*);
 void CalculateNormal(VYmMana*);
-void CalcWaterReflectionVector(Vec*, Vec*, Vec*, long, Vec&, float (*)[4], _GXColor*, Vec2d*);
+void CalcWaterReflectionVector(Vec*, Vec*, Vec*, long, Vec, float (*)[4], _GXColor*, Vec2d*);
 void CalcReflectionVector2(Vec*, S16Vec*, S16Vec*, long, unsigned long, unsigned long, float (*)[4], void*, unsigned long, _GXColor*, S16Vec2d*, S16Vec2d*, CChara::CNode*, PYmMana*, VYmMana*);
 
 #ifdef __cplusplus

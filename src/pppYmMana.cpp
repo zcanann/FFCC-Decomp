@@ -1,6 +1,25 @@
 #include "ffcc/pppYmMana.h"
 #include "ffcc/graphic.h"
+#include "ffcc/p_game.h"
 #include "ffcc/pppPart.h"
+
+extern Mtx ppvCameraMatrix0;
+
+extern float FLOAT_80330e4c;
+extern float FLOAT_80330e58;
+extern float FLOAT_80330e5c;
+extern float FLOAT_80330e68;
+
+extern struct {
+    float _224_4_;
+    float _228_4_;
+    float _232_4_;
+} CameraPcs;
+
+struct Vec2d {
+    float x;
+    float y;
+};
 
 /*
  * --INFO--
@@ -172,12 +191,87 @@ void CalculateNormal(VYmMana*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800d50dc
+ * PAL Size: 700b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CalcWaterReflectionVector(Vec*, Vec*, Vec*, long, Vec&, float (*) [4], _GXColor*, Vec2d*)
+extern "C" void CalcWaterReflectionVector__FP3VecP3VecP3Vecl3VecPA4_fP8_GXColorP5Vec2d(
+    Vec* reflectionVec, Vec* positions, Vec* normals, long count, Vec waterOrigin, float (*matrix)[4], _GXColor* color, Vec2d* texCoord)
 {
-	// TODO
+    Vec cameraPos;
+    Vec objPos;
+    Vec transformedCameraPos;
+    Vec reflected;
+    Mtx inverseMtx;
+    Mtx matrixNoTranslate;
+    long i;
+
+    (void)waterOrigin;
+
+    if (Game.game.m_currentSceneId == 7) {
+        cameraPos.x = ppvCameraMatrix0[0][3];
+        cameraPos.y = ppvCameraMatrix0[1][3];
+        cameraPos.z = ppvCameraMatrix0[2][3];
+    } else {
+        cameraPos.x = CameraPcs._224_4_;
+        cameraPos.y = CameraPcs._228_4_;
+        cameraPos.z = CameraPcs._232_4_;
+    }
+
+    transformedCameraPos.x = FLOAT_80330e4c;
+    transformedCameraPos.y = FLOAT_80330e4c;
+    transformedCameraPos.z = FLOAT_80330e4c;
+
+    PSMTXCopy(matrix, matrixNoTranslate);
+    objPos.x = matrixNoTranslate[0][3];
+    objPos.y = matrixNoTranslate[1][3];
+    objPos.z = matrixNoTranslate[2][3];
+    matrixNoTranslate[0][3] = transformedCameraPos.x;
+    matrixNoTranslate[1][3] = transformedCameraPos.y;
+    matrixNoTranslate[2][3] = transformedCameraPos.z;
+    PSMTXInverse(matrixNoTranslate, inverseMtx);
+
+    PSVECSubtract(&objPos, &cameraPos, &cameraPos);
+    PSVECScale(&cameraPos, &cameraPos, FLOAT_80330e68);
+    PSMTXMultVec(inverseMtx, &cameraPos, &transformedCameraPos);
+
+    for (i = 0; i < count; i++) {
+        PSVECSubtract(positions, &transformedCameraPos, &reflected);
+        C_VECReflect(&reflected, normals, reflectionVec);
+        PSMTXMultVec(matrixNoTranslate, reflectionVec, reflectionVec);
+        PSVECNormalize(reflectionVec, reflectionVec);
+
+        color->r = 0x80;
+        if (reflectionVec->z < FLOAT_80330e4c) {
+            color->g = 0xff;
+            color->b = 0x80;
+            color->a = 0x7f;
+            texCoord->x = -reflectionVec->x / (FLOAT_80330e58 - reflectionVec->z);
+            texCoord->y = -reflectionVec->y / (FLOAT_80330e58 - reflectionVec->z);
+        } else {
+            color->g = 0x80;
+            color->b = 0xff;
+            color->a = 0xbc;
+            texCoord->x = -reflectionVec->x / (FLOAT_80330e58 + reflectionVec->z);
+            texCoord->y = -reflectionVec->y / (FLOAT_80330e58 + reflectionVec->z);
+        }
+
+        positions++;
+        reflectionVec++;
+        normals++;
+        color++;
+        texCoord->x = texCoord->x * FLOAT_80330e5c;
+        texCoord->x = texCoord->x + FLOAT_80330e5c;
+        texCoord->y = texCoord->y * FLOAT_80330e5c;
+        texCoord->y = texCoord->y + FLOAT_80330e5c;
+        texCoord++;
+    }
+
+    DCFlushRange(reflectionVec - count, count * sizeof(Vec));
+    DCFlushRange(texCoord - count, count * sizeof(Vec2d));
 }
 
 /*

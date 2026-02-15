@@ -2,7 +2,10 @@
 #define _FFCC_FUNNYSHAPE_H_
 
 class FS_tagOAN3_SHAPE;
-class Vec2d;
+struct Vec2d {
+    float x;
+    float y;
+};
 
 class CFunnyShape
 {
@@ -17,7 +20,7 @@ public:
 	void RenderShape();
 	void ClearAnmData();
 	void ClearTextureData();
-	void RenderShape(FS_tagOAN3_SHAPE*, Vec2d&, float);
+	void RenderShape(FS_tagOAN3_SHAPE*, Vec2d, float);
 	void SetDefaultStage();
 };
 

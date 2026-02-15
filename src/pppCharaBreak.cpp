@@ -1,15 +1,28 @@
 #include "ffcc/pppCharaBreak.h"
 
+#include "ffcc/graphic.h"
+
 #include "dolphin/gx.h"
 #include "dolphin/mtx.h"
 
 extern char MaterialMan[];
+extern CGraphic Graphic;
 extern struct {
     float _224_4_, _228_4_, _232_4_, _236_4_, _240_4_, _244_4_, _252_4_;
     Mtx m_cameraMatrix;
 } CameraPcs;
+extern char s_pppCharaBreak_cpp_801dd690[];
+extern float FLOAT_80332048;
 extern void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void* materialMan, void* materialSet,
                                                                         unsigned int materialIdx, int, int);
+extern "C" {
+void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
+void pppHeapUseRate__FPQ27CMemory6CStage(void*);
+void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
+void pppInitBlendMode__Fv(void);
+void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
+void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
+}
 
 /*
  * --INFO--
@@ -178,50 +191,158 @@ void UpdatePolygonData(PCharaBreak*, VCharaBreak*, CChara::CModel*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801400B0
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppConstructCharaBreak(void)
+void pppConstructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
+{
+    int dataOffset = data->m_serializedDataOffsets[2];
+
+    *(u32*)((u8*)charaBreak + 0x9C + dataOffset) = 0;
+    *(float*)((u8*)charaBreak + 0x8C + dataOffset) = FLOAT_80332048;
+    *(float*)((u8*)charaBreak + 0x88 + dataOffset) = FLOAT_80332048;
+    *(float*)((u8*)charaBreak + 0x84 + dataOffset) = FLOAT_80332048;
+    *(float*)((u8*)charaBreak + 0x98 + dataOffset) = FLOAT_80332048;
+    *(float*)((u8*)charaBreak + 0x94 + dataOffset) = FLOAT_80332048;
+    *(float*)((u8*)charaBreak + 0x90 + dataOffset) = FLOAT_80332048;
+    *(u32*)((u8*)charaBreak + 0xC4 + dataOffset) = 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80140080
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstruct2CharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
+{
+    int dataOffset = data->m_serializedDataOffsets[2];
+
+    *(float*)((u8*)charaBreak + 0x8C + dataOffset) = FLOAT_80332048;
+    *(float*)((u8*)charaBreak + 0x88 + dataOffset) = FLOAT_80332048;
+    *(float*)((u8*)charaBreak + 0x84 + dataOffset) = FLOAT_80332048;
+    *(float*)((u8*)charaBreak + 0x98 + dataOffset) = FLOAT_80332048;
+    *(float*)((u8*)charaBreak + 0x94 + dataOffset) = FLOAT_80332048;
+    *(float*)((u8*)charaBreak + 0x90 + dataOffset) = FLOAT_80332048;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8013FF14
+ * PAL Size: 364b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppDestructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
+{
+    _WaitDrawDone__8CGraphicFPci(&Graphic, s_pppCharaBreak_cpp_801dd690, 0x319);
+
+    int dataOffset = data->m_serializedDataOffsets[2];
+    u8* model = *(u8**)((u8*)charaBreak + 0xC0 + dataOffset);
+    void** perMeshBuffers = *(void***)((u8*)charaBreak + 0x9C + dataOffset);
+    u8* mesh = *(u8**)(model + 0xAC);
+
+    *(u32*)(model + 0xE4) = 0;
+    *(u32*)(model + 0xE8) = 0;
+    *(u32*)(model + 0xF4) = 0;
+    *(u32*)(model + 0xFC) = 0;
+    *(u32*)(model + 0x104) = 0;
+    *(u32*)(model + 0xEC) = 0;
+
+    if (perMeshBuffers != NULL) {
+        u32 meshCount = *(u32*)(*(u8**)(model + 0xA4) + 0xC);
+        for (u32 meshIndex = 0; meshIndex < meshCount; meshIndex++) {
+            int* dlEntries = (int*)perMeshBuffers[meshIndex];
+            u32 dlCount = *(u32*)(*(u8**)(mesh + 8) + 0x4C);
+
+            if (dlEntries != NULL) {
+                for (u32 dlIndex = 0; dlIndex < dlCount; dlIndex++) {
+                    int dlInfo = dlEntries[dlIndex];
+                    if (dlInfo != 0) {
+                        if (*(void**)dlInfo != NULL) {
+                            pppHeapUseRate__FPQ27CMemory6CStage(*(void**)dlInfo);
+                            *(u32*)dlInfo = 0;
+                        }
+                        if (*(void**)(dlInfo + 0xC) != NULL) {
+                            pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(dlInfo + 0xC));
+                            *(u32*)(dlInfo + 0xC) = 0;
+                        }
+                    }
+                    if (dlInfo != 0) {
+                        pppHeapUseRate__FPQ27CMemory6CStage((void*)dlInfo);
+                        dlEntries[dlIndex] = 0;
+                    }
+                }
+            }
+
+            if (perMeshBuffers[meshIndex] != NULL) {
+                pppHeapUseRate__FPQ27CMemory6CStage(perMeshBuffers[meshIndex]);
+                perMeshBuffers[meshIndex] = NULL;
+            }
+            mesh += 0x14;
+        }
+    }
+
+    if (perMeshBuffers != NULL) {
+        pppHeapUseRate__FPQ27CMemory6CStage(perMeshBuffers);
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8013FAA0
+ * PAL Size: 1140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppFrameCharaBreak(pppCharaBreak*, CharaBreakUnkB*, CharaBreakUnkC*)
 {
 	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8013F9D0
+ * PAL Size: 208b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppConstruct2CharaBreak(void)
+void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB*, CharaBreakUnkC* data)
 {
-	// TODO
-}
+    int colorOffset = data->m_serializedDataOffsets[0];
+    u8* work = (u8*)charaBreak + 0x80 + data->m_serializedDataOffsets[2];
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppDestructCharaBreak(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppFrameCharaBreak(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void pppRenderCharaBreak(void)
-{
-	// TODO
+    if (*(u32*)(work + 0x44) != 0) {
+        _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+        pppInitBlendMode__Fv();
+        pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+            (u8*)charaBreak + 0x88 + colorOffset,
+            (u8*)charaBreak + 0x40,
+            FLOAT_80332048,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            0);
+        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 2, 2, 3);
+        work[0] = 0xFF;
+        work[1] = 0xFF;
+        work[2] = 0xFF;
+        work[3] = *((u8*)charaBreak + 0x8B + colorOffset);
+    }
 }

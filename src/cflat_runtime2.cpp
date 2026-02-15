@@ -91,6 +91,11 @@ static inline CFlatRuntime::CObject*& ParticleWorkBind(CFlatRuntime2* runtime)
 	return *reinterpret_cast<CFlatRuntime::CObject**>(reinterpret_cast<u8*>(runtime) + 0x16E0);
 }
 
+static inline CFlatRuntime::CObject*& ParticleWorkTrace(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<CFlatRuntime::CObject**>(reinterpret_cast<u8*>(runtime) + 0x16E4);
+}
+
 static inline int& ParticleWorkColor0(CFlatRuntime2* runtime)
 {
 	return *reinterpret_cast<int*>(reinterpret_cast<u8*>(runtime) + 0x16E8);
@@ -588,9 +593,9 @@ void CFlatRuntime2::SetParticleWorkCol(int color0, int color1, float lerp)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::SetParticleWorkTrace(CFlatRuntime::CObject*)
+void CFlatRuntime2::SetParticleWorkTrace(CFlatRuntime::CObject* object)
 {
-	// TODO
+	ParticleWorkTrace(this) = object;
 }
 
 /*

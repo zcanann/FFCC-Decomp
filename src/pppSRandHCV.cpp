@@ -110,28 +110,28 @@ void pppSRandHCV(void* data1, void* data2, void* data3)
 	{
 		s16 current = target_color[0];
 		s16 base = *(s16*)((char*)data2 + 8);
-		s8 delta = (s8)((float)base * target[0] - (float)current);
+		s8 delta = (s8)((float)base * target[0] - (float)base);
 		target_color[0] = (s16)(current + delta);
 	}
 
 	{
 		s16 current = target_color[1];
 		s16 base = *(s16*)((char*)data2 + 0xa);
-		s8 delta = (s8)((float)base * target[1] - (float)current);
+		s8 delta = (s8)((float)base * target[1] - (float)base);
 		target_color[1] = (s16)(current + delta);
 	}
 
 	{
 		s16 current = target_color[2];
 		s16 base = *(s16*)((char*)data2 + 0xc);
-		s8 delta = (s8)((float)base * target[2] - (float)current);
+		s8 delta = (s8)((float)base * target[2] - (float)base);
 		target_color[2] = (s16)(current + delta);
 	}
 
 	{
 		s16 current = target_color[3];
 		s16 base = *(s16*)((char*)data2 + 0xe);
-		s8 delta = (s8)((float)base * target[3] - (float)current);
+		s8 delta = (s8)((float)base * target[3] - (float)base);
 		target_color[3] = (s16)(current + delta);
 	}
 }

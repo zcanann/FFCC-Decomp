@@ -5,9 +5,8 @@
 
 #include <dolphin/mtx.h>
 
-extern CPartMng PartMng;
+extern u8 PartMng[];
 extern unsigned char* lbl_8032ED50;
-extern "C" void ParticleFrameCallback__5CGameFiiiiiP3Vec(CGame*, int, int, int, int, int, Vec*);
 
 struct YmCallBackObj {
     u8 m_pad0[0xc];
@@ -64,9 +63,10 @@ void pppFrameYmCallBack(void* pppYmCallBack, void* param_2)
         position.z = *(f32*)(mngSt + 0xA4);
         PSMTXMultVec(ppvWorldMatrix, &position, &position);
 
-        mngStIndex = ((s32)(mngSt - ((u8*)&PartMng + 0x2A18))) / 0x158;
-        ParticleFrameCallback__5CGameFiiiiiP3Vec(
-            &Game.game, mngStIndex, (s32)*(s16*)(mngSt + 0x74), (s32)*(s16*)(mngSt + 0x76),
-            (s32)frameParam->m_initWOrk, (s32)frameParam->m_graphId, &position);
+        mngStIndex = ((s32)(mngSt - (PartMng + 0x2A18))) / 0x158;
+        Game.game.ParticleFrameCallback(mngStIndex, (s32)*(s16*)(mngSt + 0x74),
+                                        (s32)*(s16*)(mngSt + 0x76),
+                                        (s32)frameParam->m_initWOrk, (s32)frameParam->m_graphId,
+                                        &position);
     }
 }

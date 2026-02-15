@@ -169,12 +169,12 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, UnkB* param_2, UnkC* param_3)
     if (step->m_initWOrk == -1) {
         *(void**)(work + 0x20) = &DAT_801eadc8;
     } else {
-        *(void**)(work + 0x20) = (u8*)pppMngStPtr + step->m_stepValue;
+        *(void**)(work + 0x20) = (u8*)&pppMngStPtr->m_kind + step->m_initWOrk * 0x10 + step->m_stepValue;
     }
     if (step->m_arg3 == -1) {
         *(void**)(work + 0x24) = &DAT_801eadc8;
     } else {
-        *(void**)(work + 0x24) = (u8*)pppMngStPtr + *(s32*)step->m_payload;
+        *(void**)(work + 0x24) = (u8*)&pppMngStPtr->m_kind + step->m_arg3 * 0x10 + *(s32*)step->m_payload;
     }
 
     if (*(void**)(work + 0x28) == nullptr) {

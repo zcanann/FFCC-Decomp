@@ -1,15 +1,62 @@
 #include "ffcc/menu_arti.h"
+#include "ffcc/fontman.h"
 #include "ffcc/pad.h"
+#include "ffcc/p_game.h"
 #include "ffcc/sound.h"
+#include "ffcc/system.h"
 #include <string.h>
 
 extern double DOUBLE_80332fb0;
+extern double DOUBLE_80332fb8;
 extern double DOUBLE_80332fe0;
 extern float FLOAT_80332fa8;
 extern float FLOAT_80332fac;
+extern float FLOAT_80332fc0;
+extern float FLOAT_80332fc4;
+extern float FLOAT_80332fc8;
+extern float FLOAT_80332fcc;
+extern float FLOAT_80332fd0;
+extern float FLOAT_80332fd4;
+extern float FLOAT_80332fd8;
 extern float FLOAT_80332fe8;
 extern float FLOAT_80332fec;
 extern float FLOAT_80332ff0;
+
+extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
+extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
+extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
+extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float, float, float, float, float, float, float, float, float);
+extern "C" void DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(CMenuPcs*, unsigned long, float, float, float, float, float, float, GXColor*, float, float, float);
+extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(CMenuPcs*, int, int, int, float, int, float);
+extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
+extern "C" float CalcListPos__8CMenuPcsFiii(CMenuPcs*, int, int, int);
+extern "C" void DrawListPosMark__8CMenuPcsFfff(CMenuPcs*, float, float, float);
+extern "C" void DrawCursor__8CMenuPcsFiif(CMenuPcs*, int, int, float);
+extern "C" void DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(CMenuPcs*, int, CFont*, int, int, GXColor, int, float, float);
+extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
+
+extern "C" void SetMargin__5CFontFf(float, CFont*);
+extern "C" void SetShadow__5CFontFi(CFont*, int);
+extern "C" void SetScale__5CFontFf(float, CFont*);
+extern "C" void DrawInit__5CFontFv(CFont*);
+extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
+extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
+extern "C" void SetPosX__5CFontFf(float, CFont*);
+extern "C" void SetPosY__5CFontFf(float, CFont*);
+extern "C" void Draw__5CFontFPc(CFont*, const char*);
+
+struct ArtiFlatTableEntry
+{
+	int count;
+	const char** strings;
+	char* stringBuf;
+};
+
+struct ArtiFlatData
+{
+	char pad0[0x6C];
+	ArtiFlatTableEntry table[8];
+};
 
 /*
  * --INFO--
@@ -446,7 +493,190 @@ unsigned int CMenuPcs::ArtiClose()
  */
 void CMenuPcs::ArtiDraw()
 {
-	// TODO
+	bool hasSelectedArtifact = false;
+	int selectedArtifactId = -1;
+	u32 scriptFood = Game.game.m_scriptFoodBase[0];
+
+	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+
+	short state = *(short*)(*(int*)((char*)this + 0x82c) + 0x10);
+	short* entry = (short*)(*(int*)((char*)this + 0x850) + 8);
+	int count = **(short**)((char*)this + 0x850);
+	int drawIndex = 0;
+
+	for (int i = 0; i < count; i++) {
+		int tex = *(int*)(entry + 0xe);
+		if (tex >= 0) {
+			float x = (float)entry[0];
+			float y = (float)entry[1];
+			float w = (float)entry[2];
+			float h = (float)entry[3];
+			float u = *(float*)(entry + 4);
+			float v = *(float*)(entry + 6);
+			float alpha = *(float*)(entry + 8);
+			float uvScale = *(float*)(entry + 10);
+
+			if (i == 0) {
+				SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 1);
+				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
+
+				GXColor colors[4] = {
+					{0xFF, 0xFF, 0xFF, 0xFF},
+					{0xFF, 0xFF, 0xFF, 0xFF},
+					{0xFF, 0xFF, 0xFF, 0xFF},
+					{0xFF, 0xFF, 0xFF, 0xFF},
+				};
+				GXSetChanMatColor(GX_COLOR0A0, colors[0]);
+
+				float fillW = alpha * w;
+				if (fillW > 0.0f) {
+					DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
+						this, 0, x, y, fillW, h, u, v, colors, 1.0f, 1.0f, 0.0f);
+					x += fillW;
+					u += fillW;
+				}
+
+				if (fillW > 0.0f && fillW < w) {
+					GXColor fadeColors[4] = {
+						{0xFF, 0xFF, 0xFF, 0x00},
+						{0xFF, 0xFF, 0xFF, 0x00},
+						{0xFF, 0xFF, 0xFF, 0x00},
+						{0xFF, 0xFF, 0xFF, 0x00},
+					};
+					float remainW = (48.0f / (float)*(int*)(entry + 0x14)) * w;
+					DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(
+						this, 0, x, y, remainW, h, u, v, fadeColors, 1.0f, 1.0f, 0.0f);
+				}
+
+				SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+			} else {
+				float itemAlpha = alpha;
+				if (tex == 0x37) {
+					short itemCount = *(short*)(scriptFood + (drawIndex + *(short*)(*(int*)((char*)this + 0x82c) + 0x34)) * 2 + 0x136);
+					if (itemCount < 1) {
+						tex = 0x34;
+						itemAlpha *= 0.5f;
+					}
+
+					if (tex == 0x37 && drawIndex == *(short*)(*(int*)((char*)this + 0x82c) + 0x26)) {
+						v += h;
+					}
+					drawIndex++;
+				}
+
+				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
+				GXColor color = {0xFF, 0xFF, 0xFF, (u8)(255.0f * itemAlpha)};
+				GXSetChanMatColor(GX_COLOR0A0, color);
+				DrawRect__8CMenuPcsFUlfffffffff(this, 0, x, y, w, h, u, v, uvScale, uvScale, 0.0f);
+			}
+		}
+		entry += 0x20;
+	}
+
+	CFont* listFont = *(CFont**)((char*)this + 0x108);
+	SetMargin__5CFontFf(0.0f, listFont);
+	SetShadow__5CFontFi(listFont, 0);
+	SetScale__5CFontFf(0.875f, listFont);
+	DrawInit__5CFontFv(listFont);
+
+	short* listStart = (short*)(*(int*)((char*)this + 0x850) + 8);
+	int listCount = **(short**)((char*)this + 0x850);
+	for (int i = 0; i < listCount; i++) {
+		if (*(int*)(listStart + 0xe) == 0x37) {
+			break;
+		}
+		listStart += 0x20;
+	}
+
+	const ArtiFlatData* flatData = reinterpret_cast<const ArtiFlatData*>(&Game.game.m_cFlatDataArr[1]);
+	for (int i = 0; i < 8; i++) {
+		u8 alpha = (u8)(255.0f * *(float*)(listStart + 8));
+		GXColor color = {0xFF, 0xFF, 0xFF, alpha};
+		SetColor__5CFontF8_GXColor(listFont, &color);
+
+		int menuIndex = i + *(short*)(*(int*)((char*)this + 0x82c) + 0x34);
+		short itemCount = *(short*)(scriptFood + menuIndex * 2 + 0x136);
+		const char* text;
+		if (itemCount < 1) {
+			text = GetMenuStr__8CMenuPcsFi(this, 0x14);
+		} else {
+			text = flatData->table[0].strings[itemCount * 5 + 4];
+			if (menuIndex == (int)*(short*)(*(int*)((char*)this + 0x82c) + 0x26) + (int)*(short*)(*(int*)((char*)this + 0x82c) + 0x34)) {
+				hasSelectedArtifact = true;
+				selectedArtifactId = itemCount;
+			}
+		}
+
+		GetWidth__5CFontFPc(listFont, text);
+		SetPosX__5CFontFf((float)(listStart[0] + 0x1c), listFont);
+		SetPosY__5CFontFf((float)(listStart[1] + 0xb) - 5.0f, listFont);
+		Draw__5CFontFPc(listFont, text);
+		listStart += 0x20;
+	}
+
+	DrawInit__8CMenuPcsFv(this);
+
+	listStart = (short*)(*(int*)((char*)this + 0x850) + 8);
+	listCount = **(short**)((char*)this + 0x850);
+	for (int i = 0; i < listCount; i++) {
+		if (*(int*)(listStart + 0xe) == 0x37) {
+			break;
+		}
+		listStart += 0x20;
+	}
+
+	for (int i = 0; i < 8; i++) {
+		short itemCount = *(short*)(scriptFood + (i + *(short*)(*(int*)((char*)this + 0x82c) + 0x34)) * 2 + 0x136);
+		if (itemCount > 0) {
+			int iconY = (int)((float)listStart[1] + 6.0f - 1.0f);
+			int iconX = (int)((float)(listStart[0] + listStart[2] - 0x10));
+			DrawSingleIcon__8CMenuPcsFiiifif(this, itemCount, iconX, iconY, *(float*)(listStart + 8), 0, 0.0f);
+		}
+		listStart += 0x20;
+	}
+
+	if (state == 1) {
+		int menuData = *(int*)((char*)this + 0x850);
+		float mark = CalcListPos__8CMenuPcsFiii(this, *(short*)(*(int*)((char*)this + 0x82c) + 0x34), 0x49, 0);
+		if (mark > 0.0f) {
+			DrawListPosMark__8CMenuPcsFfff(this, (float)*(short*)(menuData + 8), (float)*(short*)(menuData + 10), mark);
+		}
+	}
+
+	if (state == 1) {
+		short* cursorBase = (short*)(*(int*)((char*)this + 0x850) + 8);
+		int cursorCount = **(short**)((char*)this + 0x850);
+		for (int i = 0; i < cursorCount; i++) {
+			if (*(int*)(cursorBase + 0xe) == 0x37) {
+				break;
+			}
+			cursorBase += 0x20;
+		}
+
+		cursorBase += *(short*)(*(int*)((char*)this + 0x82c) + 0x26) * 0x20;
+		int cursorY = (int)(((float)(cursorBase[3] - 0x20) * 0.5f) + (float)cursorBase[1]);
+		int cursorX = (int)((float)(cursorBase[0] - 0x14) + (float)(System.m_frameCounter & 7));
+		DrawCursor__8CMenuPcsFiif(this, cursorX, cursorY, 1.0f);
+	}
+
+	CFont* helpFont = *(CFont**)((char*)this + 0xf8);
+	u8 helpAlpha = (u8)(FLOAT_80332fc0 * *(float*)(*(int*)((char*)this + 0x850) + 0x18));
+	if (!hasSelectedArtifact) {
+		selectedArtifactId = -1;
+	}
+
+	if (selectedArtifactId == -1) {
+		const char* text = GetMenuStr__8CMenuPcsFi(this, 0x14);
+		GXColor color = {0xFF, 0xFF, 0xFF, helpAlpha};
+		SetColor__5CFontF8_GXColor(helpFont, &color);
+		SetPosX__5CFontFf(0.0f, helpFont);
+		SetPosY__5CFontFf(FLOAT_80332fcc, helpFont);
+		Draw__5CFontFPc(helpFont, text);
+	} else {
+		GXColor helpColor = {0xFF, 0xFF, 0xFF, helpAlpha};
+		DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(this, selectedArtifactId, helpFont, 0, -20, helpColor, 0, 1.0f, 0.0f);
+	}
 }
 
 /*

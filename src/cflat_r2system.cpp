@@ -4,6 +4,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/map.h"
 #include "ffcc/maphit.h"
+#include "ffcc/mes.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_map.h"
 #include "ffcc/p_menu.h"
@@ -28,6 +29,12 @@ struct CMapCylinderRaw
     Vec m_direction2;
     float m_radius2;
     float m_height2;
+};
+
+struct CSystemErrorLevelSlot
+{
+    char m_pad[0x3CDC];
+    int m_value;
 };
 
 extern "C" {
@@ -684,6 +691,56 @@ extern "C" int IsUse__8CMesMenuFv(void* mesMenu)
     }
 
     return result;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9478
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void ReqScreenCapture__11CGraphicPcsFv(void* graphicPcs)
+{
+    *(int*)((char*)graphicPcs + 0xBC) = 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9484
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" int IsUse__8CMesMenuFv(void* mesMenu)
+{
+    unsigned char result = 0;
+
+    if ((*(int*)((char*)mesMenu + 0x8) != 0) && (*(int*)((char*)mesMenu + 0xC) <= 1)) {
+        if (((CMes*)((char*)mesMenu + 0x1C))->GetWait() != 4) {
+            result = 1;
+        }
+    }
+
+    return (int)result;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B94DC
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" int GetErrorLevel__7CSystemFv(void* system, int index)
+{
+    return ((CSystemErrorLevelSlot*)((char*)system + (index << 2)))->m_value;
 }
 
 /*

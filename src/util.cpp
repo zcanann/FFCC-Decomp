@@ -32,7 +32,23 @@ struct CTextureLite {
     GXTlutObj m_tlutObj1;
 };
 
+extern void* lbl_801E88C4;
+
 CUtil DAT_8032ec70;
+
+/*
+ * --INFO--
+ * PAL Address: 0x80024e48
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_util_cpp(void)
+{
+    *reinterpret_cast<void**>(&DAT_8032ec70) = &lbl_801E88C4;
+}
 
 /*
  * --INFO--

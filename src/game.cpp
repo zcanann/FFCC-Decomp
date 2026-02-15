@@ -5,6 +5,8 @@
 #include "ffcc/vector.h"
 #include "ffcc/p_dbgmenu.h"
 #include "ffcc/p_minigame.h"
+#include "ffcc/map.h"
+#include "ffcc/sound.h"
 
 #include <string.h>
 
@@ -19,7 +21,9 @@ unsigned int AddScenegraph__7CSystemFP8CProcessi(CSystem*, void*, int);
 void RemoveScenegraph__7CSystemFP8CProcessi(CSystem*, void*, int);
 void ExecScenegraph__7CSystemFv(CSystem*);
 void Quit__12CFlatRuntimeFv(void*);
+void Destroy__13CFlatRuntime2Fv(void*);
 void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
+void DestroyMap__7CMapMngFv(void*);
 void Quit__11CDbgMenuPcsFv(void*);
 void Quit__6CMcPcsFv(void*);
 void Quit__7CGbaPcsFv(void*);
@@ -51,6 +55,9 @@ void Init__8CMenuPcsFv(void*);
 void Init__7CGbaPcsFv(void*);
 void Init__6CMcPcsFv(void*);
 void Init__11CDbgMenuPcsFv(void*);
+void Reset__9CCharaPcsFQ29CCharaPcs5RESET(void*, int);
+void StopAndFreeAllSe__6CSoundFi(void*, int);
+void ClearAll__5CWindFv(void*);
 void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
 void Init__12CFlatRuntimeFv(void*);
 void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
@@ -71,6 +78,7 @@ unsigned char GraphicsPcs[];
 unsigned char CameraPcs[];
 unsigned char DAT_8032ed00[];
 unsigned char DAT_8032ed08[];
+unsigned char Wind[];
 extern const char DAT_801d61dc[];
 }
 
@@ -365,12 +373,47 @@ void CGame::InitNewGame()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80015280
+ * PAL Size: 668b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::clearWork()
 {
-	// TODO
+    int i;
+    int j;
+    int k;
+
+    Destroy__13CFlatRuntime2Fv(CFlat);
+
+    for (i = 0; i < 4; i++) {
+        m_cFlatDataArr[i].Destroy();
+        unkCFlatData0[i] = 0;
+        m_partyObjArr[i] = 0;
+        m_scriptFoodBase[i] = 0;
+    }
+
+    unk_flat3_0xc7d0 = 0;
+
+    for (i = 0; i < 4; i++) {
+        for (j = 0; j < 16; j++) {
+            for (k = 0; k < 2; k++) {
+                m_scriptWork[i][j][k] = 0;
+            }
+        }
+    }
+
+    m_gameWork.m_soundOptionFlag = 0;
+    m_gameWork.m_gameOverFlag = 0;
+
+    DestroyMap__7CMapMngFv(&MapMng);
+    Reset__9CCharaPcsFQ29CCharaPcs5RESET(&CharaPcs, 0);
+    StopAndFreeAllSe__6CSoundFi(&Sound, 0);
+    ClearAll__5CWindFv(Wind);
+
+    *((u8*)&Sound + 0x8892) = 0x7F;
 }
 
 /*

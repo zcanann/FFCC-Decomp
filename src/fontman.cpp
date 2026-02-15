@@ -246,12 +246,19 @@ void CFont::DrawQuit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009255c
+ * PAL Size: 116b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFont::Draw(char*)
+void CFont::Draw(char* text)
 {
-	// TODO
+	unsigned char* cursor = reinterpret_cast<unsigned char*>(text);
+	for (; *cursor != '\0'; cursor++) {
+		Draw(static_cast<unsigned short>(*cursor));
+	}
 }
 
 /*

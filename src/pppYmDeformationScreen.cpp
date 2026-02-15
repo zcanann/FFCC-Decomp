@@ -57,7 +57,7 @@ struct _pppEnvStYmDeformationScreen {
 
 extern int DAT_8032ed70;
 extern char DAT_8032ed78;
-extern void* DAT_80238030;
+extern char DAT_80238030[];
 extern CUtil DAT_8032ec70;
 extern float ppvScreenMatrix[4][4];
 
@@ -159,65 +159,63 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 	Mtx44 screenMtx;
 	float* work;
 	short* angle;
+	char* direction;
 	float cameraX;
 	float cameraY;
 	float cameraZ;
 	YmDeformationScreenStep* step;
 
-	if (DAT_8032ed70 != 0) {
-		return;
-	}
+	if (DAT_8032ed70 == 0) {
+		step = (YmDeformationScreenStep*)param2;
+		work = (float*)((char*)param1 + 0x80 + ((YmDeformationScreenData*)param3)->m_serializedDataOffsets[2]);
+		angle = (short*)(work + 1);
+		direction = (char*)work + 6;
 
-	step = (YmDeformationScreenStep*)param2;
-	work = (float*)((char*)param1 + 0x80 + ((YmDeformationScreenData*)param3)->m_serializedDataOffsets[2]);
-	angle = (short*)(work + 1);
+		CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
+			step->m_initWOrk, param1, step->m_graphId, work + 2, work + 3, work + 4, &step->m_stepValue, &step->m_arg3);
+		CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
+			step->m_payload0, param1, step->m_graphId, work + 5, work + 6, work + 7, &step->m_payload1, &step->m_payload2);
 
-	CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-		step->m_initWOrk, param1, step->m_graphId, work + 2, work + 3, work + 4, &step->m_stepValue, &step->m_arg3);
-	CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-		step->m_payload0, param1, step->m_graphId, work + 5, work + 6, work + 7, &step->m_payload1, &step->m_payload2);
+		if (DAT_8032ed78 == 0) {
+			if (*direction != 0) {
+				*angle = *angle + (short)(int)work[5];
+				if (step->m_payload3 < *angle) {
+					*direction = 0;
+				}
+			} else {
+				*angle = *angle - (short)(int)work[5];
+				if ((int)*angle < -(int)step->m_payload3) {
+					*direction = 1;
+				}
+			}
 
-	if (DAT_8032ed78 != 0) {
-		return;
-	}
+			if (((_pppPObject*)param1)->m_graphId == 0) {
+				PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+				inVec.x = 0.0f;
+				inVec.y = 0.0f;
+				inVec.z = -*(float*)((char*)&step->m_payload0 + 0x10);
+				inVec.w = 1.0f;
+				MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(DAT_80238030, screenMtx, &inVec, &outVec);
+				if (outVec.w != 0.0f) {
+					outVec.z /= outVec.w;
+				}
+				work[0] = outVec.z;
+			}
 
-	if (*((char*)work + 6) == 0) {
-		*angle = *angle - (short)(int)work[5];
-		if ((int)*angle < -(int)step->m_payload3) {
-			*((char*)work + 6) = 1;
+			cameraX = CameraPcs._212_4_;
+			cameraY = CameraPcs._216_4_;
+			cameraZ = CameraPcs._220_4_;
+			if (Game.game.m_currentSceneId == 7) {
+				cameraX = ppvCameraMatrix0[0][3];
+				cameraY = ppvCameraMatrix0[1][3];
+				cameraZ = ppvCameraMatrix0[2][3];
+			}
+			pppMngStPtr->m_matrix.value[0][3] = cameraX;
+			pppMngStPtr->m_matrix.value[1][3] = cameraY;
+			pppMngStPtr->m_matrix.value[2][3] = cameraZ;
+			pppSetFpMatrix__FP9_pppMngSt(pppMngStPtr);
 		}
-	} else {
-		*angle = *angle + (short)(int)work[5];
-		if (step->m_payload3 < *angle) {
-			*((char*)work + 6) = 0;
-		}
 	}
-
-	if (((_pppPObject*)param1)->m_graphId == 0) {
-		PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-		inVec.x = 0.0f;
-		inVec.y = 0.0f;
-		inVec.z = -*(float*)((char*)&step->m_payload0 + 0x10);
-		inVec.w = 1.0f;
-		MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(0, screenMtx, &inVec, &outVec);
-		if (outVec.w != 0.0f) {
-			outVec.z /= outVec.w;
-		}
-		work[0] = outVec.z;
-	}
-
-	cameraX = CameraPcs._212_4_;
-	cameraY = CameraPcs._216_4_;
-	cameraZ = CameraPcs._220_4_;
-	if (Game.game.m_currentSceneId == 7) {
-		cameraX = ppvCameraMatrix0[0][3];
-		cameraY = ppvCameraMatrix0[1][3];
-		cameraZ = ppvCameraMatrix0[2][3];
-	}
-	pppMngStPtr->m_matrix.value[0][3] = cameraX;
-	pppMngStPtr->m_matrix.value[1][3] = cameraY;
-	pppMngStPtr->m_matrix.value[2][3] = cameraZ;
-	pppSetFpMatrix__FP9_pppMngSt(pppMngStPtr);
 }
 
 /*

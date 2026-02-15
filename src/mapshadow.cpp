@@ -6,7 +6,6 @@
 #include <dolphin/mtx.h>
 
 // External constants referenced in decompilation
-extern double DOUBLE_8032fcf8;
 extern double DOUBLE_8032fce8;
 extern float FLOAT_8032fcf0;
 extern float FLOAT_8032fce0;
@@ -73,13 +72,6 @@ void CMapShadow::Init()
 	u32 materialWidth;
 	u32 materialHeight;
 	u32 materialMode;
-	union {
-		double d;
-		struct {
-			u32 hi;
-			u32 lo;
-		} parts;
-	} cvt;
 
 	materialArray = *(int*)((char*)&MapMng + 0x213d4);
 	material = (int)(((CPtrArray<CMaterial>*)(materialArray + 8))->operator[](*(u16*)((char*)this + 4)));
@@ -88,11 +80,8 @@ void CMapShadow::Init()
 	materialHeight = *(u32*)(material + 0x68);
 	materialMode = *(u32*)(material + 0x6c);
 	*((u8*)this + 7) = materialMode;
-	cvt.parts.hi = 0x43300000;
-	cvt.parts.lo = materialWidth;
-	width = (float)(cvt.d - DOUBLE_8032fcf8);
-	cvt.parts.lo = materialHeight;
-	height = (float)(cvt.d - DOUBLE_8032fcf8);
+	width = (float)materialWidth;
+	height = (float)materialHeight;
 	scale = *(float*)((char*)this + 0xa8);
 	if (*(s8*)((char*)this + 6) != 0) {
 		C_MTXLightFrustum((MtxPtr)((char*)this + 0x48), -height, height, -width, width, *(float*)((char*)this + 0xac),

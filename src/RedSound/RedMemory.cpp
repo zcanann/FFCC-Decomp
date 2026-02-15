@@ -318,12 +318,14 @@ void RedDeleteA(void* param_1)
  */
 void CRedMemory::Init(int param1, int param2, int param3, int param4)
 {
-	DAT_8032f498 = param2 + -0x4000;
-	DAT_8032f4a4 = (int*)(param1 + 0x2000);
+	int* bankA = (int*)(param1 + 0x2000);
+
+	DAT_8032f498 = param2 - 0x4000;
+	DAT_8032f4a4 = bankA;
 	DAT_8032f490 = param1 + 0x4000;
 	DAT_8032f4a0 = (int*)param1;
 	memset((void*)param1, 0, 0x2000);
-	memset(DAT_8032f4a4, 0, 0x2000);
+	memset(bankA, 0, 0x2000);
 	DAT_8032f494 = param3;
 	DAT_8032f49c = param4;
 }

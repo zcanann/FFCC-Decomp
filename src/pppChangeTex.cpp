@@ -82,6 +82,7 @@ extern "C" void ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2(CCh
 		*(int*)(MaterialMan + 0x130) = 0;
 		*(int*)(MaterialMan + 0x40) = 0xADE0F;
 	}
+
 	SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
 	    MaterialMan, *(void**)(*(int*)((char*)model + 0xA4) + 0x24), *(unsigned short*)(displayList + 8), 0, 0);
 	if ((flag == 1) || (flag == 0)) {

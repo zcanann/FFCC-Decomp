@@ -57,7 +57,10 @@ void pppParHitSphMat(void* param1, void* param2, void* param3)
     pppHitCylinderSendSystem((_pppMngSt*)pppMngSt, &local_94, &local_88, radius, hitLength);
 
     if ((*(u32*)(CFlat + 0x129c) & 0x200000) != 0) {
-        local_7c = *(_GXColor*)(step + 0xC);
+        local_7c.r = 0xFF;
+        local_7c.g = 0xFF;
+        local_7c.b = 0xFF;
+        local_7c.a = 0xFF;
         PSMTXIdentity(MStack_78);
         PSMTXIdentity(local_48);
         local_48[0][0] = radius;

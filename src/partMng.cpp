@@ -1,9 +1,11 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/cflat_runtime.h"
+#include "ffcc/file.h"
 
 extern "C" void __dl__FPv(void* ptr);
 extern "C" void pppPartInit__8CPartMngFv2(CPartMng* partMng);
+extern "C" unsigned int CheckSum__FPvi(void*, int);
 
 struct CPtrArrayBare {
     unsigned long m_size;
@@ -660,6 +662,38 @@ void CPartMng::pppPartDead()
 
 /*
  * --INFO--
+ * PAL Address: 0x8005992c
+ * PAL Size: 252b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void fn_8005992C(CPartMng* partMng)
+{
+    char* base = reinterpret_cast<char*>(partMng);
+    for (int i = 0; i < 0x10; i++) {
+        CFile::CHandle** handleSlot = reinterpret_cast<CFile::CHandle**>(base + 0x2378c + (i * 4));
+        CFile::CHandle* handle = *handleSlot;
+        if (handle != 0 && File.IsCompleted(handle)) {
+            int len = File.GetLength(handle);
+            void* readBuffer = File.m_readBuffer;
+            void* amemCursor = *reinterpret_cast<void**>(base + 0x236f8);
+
+            Memory.CopyToAMemorySync(readBuffer, amemCursor, (len + 0x1f) & ~0x1f);
+            *reinterpret_cast<int*>(base + 0x2370c + (i * 4)) = len;
+            *reinterpret_cast<unsigned int*>(base + 0x2374c + (i * 4)) = CheckSum__FPvi(readBuffer, len);
+            (*reinterpret_cast<int*>(base + 0x23700))++;
+            *reinterpret_cast<char**>(base + 0x236f8) += len;
+
+            File.Close(handle);
+            *handleSlot = 0;
+        }
+    }
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80059c44
  * PAL Size: 104b
  * EN Address: TODO
@@ -1004,4 +1038,33 @@ void CPartMng::pppDeleteAll()
 void CPartMng::pppDestroyAll()
 {
 	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8005f6dc
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __ct__9_pppMngStFv(_pppMngSt* pppMngSt)
+{
+    char* base = reinterpret_cast<char*>(pppMngSt);
+    PPPSEST* soundEffectData = reinterpret_cast<PPPSEST*>(base + 0x11c);
+    PPPIFPARAM* hitParams = reinterpret_cast<PPPIFPARAM*>(base + 0x130);
+
+    soundEffectData->m_soundEffectHandle = -1;
+    soundEffectData->m_soundEffectSlot = -1;
+    soundEffectData->m_soundEffectStopFlag = 0;
+    soundEffectData->m_soundEffectKind = 1;
+    soundEffectData->m_soundEffectStartFrame = 0;
+    soundEffectData->m_soundEffectStartedOnce = 0;
+    soundEffectData->m_soundEffectFadeFrames = 30;
+
+    hitParams->m_particleIndex = 0;
+    hitParams->m_classId = 0;
+    hitParams->m_hitObjectCount = 0;
+    hitParams->m_hitFlags = 0;
 }

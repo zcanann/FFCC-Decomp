@@ -141,20 +141,6 @@ void pppDestructYmTracer(pppYmTracer* pppYmTracer, UnkC* param_2)
     }
 }
 
-static void shiftTraceEntries(TRACE_POLYGON* entries, s32 count)
-{
-    for (s32 i = count - 2; i >= 0; i--) {
-        entries[i + 1].life = entries[i].life;
-        entries[i + 1].decay = entries[i].decay;
-        pppCopyVector(entries[i + 1].from, entries[i].from);
-        pppCopyVector(entries[i + 1].to, entries[i].to);
-        entries[i + 1].colorR = entries[i].colorR;
-        entries[i + 1].colorG = entries[i].colorG;
-        entries[i + 1].colorB = entries[i].colorB;
-        entries[i + 1].alpha = entries[i].alpha;
-    }
-}
-
 /*
  * --INFO--
  * PAL Address: 800934c4
@@ -201,7 +187,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, UnkB* param_2, UnkC* param_3)
         if (param_2->m_initWOrk == -1) {
             work[8] = (f32)(u32)&DAT_801eadc8;
         } else {
-            work[8] = (f32)(u32)((u8*)&pppMngStPtr->m_kind + (s32)param_2->m_stepValue);
+            work[8] = (f32)(u32)((u8*)&pppMngStPtr->m_kind + param_2->m_stepValue);
         }
 
         if (param_2->m_arg3 == -1) {
@@ -212,7 +198,16 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, UnkB* param_2, UnkC* param_3)
     }
 
     if (*(u16*)(work + 0xB) + 1 < maxCount) {
-        shiftTraceEntries(entries, maxCount);
+        for (s32 i = maxCount - 2; i >= 0; i--) {
+            entries[i + 1].life = entries[i].life;
+            entries[i + 1].decay = entries[i].decay;
+            pppCopyVector(entries[i + 1].from, entries[i].from);
+            pppCopyVector(entries[i + 1].to, entries[i].to);
+            entries[i + 1].colorR = entries[i].colorR;
+            entries[i + 1].colorG = entries[i].colorG;
+            entries[i + 1].colorB = entries[i].colorB;
+            entries[i + 1].alpha = entries[i].alpha;
+        }
 
         entries[0].life = *(s16*)(param_2->m_payload + 6);
         entries[0].alpha = param_2->m_payload[8];
@@ -295,7 +290,16 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, UnkB* param_2, UnkC* param_3)
             }
 
             for (s32 i = 0; i < splineCount; i++) {
-                shiftTraceEntries(entries, maxCount);
+                for (s32 j = maxCount - 2; j > 1; j--) {
+                    entries[j + 1].life = entries[j].life;
+                    entries[j + 1].decay = entries[j].decay;
+                    pppCopyVector(entries[j + 1].from, entries[j].from);
+                    pppCopyVector(entries[j + 1].to, entries[j].to);
+                    entries[j + 1].colorR = entries[j].colorR;
+                    entries[j + 1].colorG = entries[j].colorG;
+                    entries[j + 1].colorB = entries[j].colorB;
+                    entries[j + 1].alpha = entries[j].alpha;
+                }
             }
 
             for (s32 i = 0; i < splineCount; i++) {

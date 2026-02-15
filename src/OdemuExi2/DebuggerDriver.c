@@ -154,21 +154,28 @@ static BOOL DBGWriteMailbox(u32 p1) {
 
 #pragma dont_inline on
 static BOOL DBGReadMailbox(u32* p1) {
-    BOOL total = FALSE;
-    u32 v;
+    u32 busyFlag;
+    u32 regs;
+    u32 result;
+    u32 cmd;
 
-    DBGEXISelect(4);
+    regs = __EXIRegs[10];
+    __EXIRegs[10] = (regs & 0x405) | 0xc0;
 
-    v = 0x60000000;
-    total |= IS_FALSE(DBGEXIImm(&v, 2, 1));
-    total |= IS_FALSE(DBGEXISync());
+    cmd = 0x60000000;
+    result = ((u32)__cntlzw(DBGEXIImm(&cmd, 2, TRUE))) >> 5;
+    do {
+        busyFlag = __EXIRegs[13];
+    } while (busyFlag & 1);
 
-    total |= IS_FALSE(DBGEXIImm(p1, 4, 0));
-    total |= IS_FALSE(DBGEXISync());
+    result |= ((u32)__cntlzw(DBGEXIImm(p1, 4, FALSE))) >> 5;
+    do {
+        busyFlag = __EXIRegs[13];
+    } while (busyFlag & 1);
 
-    total |= IS_FALSE(DBGEXIDeselect());
-
-    return IS_FALSE(total);
+    regs = __EXIRegs[10];
+    __EXIRegs[10] = regs & 0x405;
+    return ((u32)__cntlzw(result)) >> 5;
 }
 #pragma dont_inline reset
 
@@ -249,21 +256,28 @@ static BOOL DBGWrite(u32 count, u32* buffer, s32 param3) {
 }
 
 inline static BOOL _DBGReadStatus(u32* p1) {
-    BOOL total = FALSE;
-    u32 v;
+    u32 busyFlag;
+    u32 regs;
+    u32 result;
+    u32 cmd;
 
-    DBGEXISelect(4);
+    regs = __EXIRegs[10];
+    __EXIRegs[10] = (regs & 0x405) | 0xc0;
 
-    v = 1 << 30;
-    total |= IS_FALSE(DBGEXIImm(&v, 2, 1));
-    total |= IS_FALSE(DBGEXISync());
+    cmd = 0x40000000;
+    result = ((u32)__cntlzw(DBGEXIImm(&cmd, 2, TRUE))) >> 5;
+    do {
+        busyFlag = __EXIRegs[13];
+    } while (busyFlag & 1);
 
-    total |= IS_FALSE(DBGEXIImm(p1, 4, 0));
-    total |= IS_FALSE(DBGEXISync());
+    result |= ((u32)__cntlzw(DBGEXIImm(p1, 4, FALSE))) >> 5;
+    do {
+        busyFlag = __EXIRegs[13];
+    } while (busyFlag & 1);
 
-    total |= IS_FALSE(DBGEXIDeselect());
-
-    return IS_FALSE(total);
+    regs = __EXIRegs[10];
+    __EXIRegs[10] = regs & 0x405;
+    return ((u32)__cntlzw(result)) >> 5;
 }
 #pragma dont_inline on
 static BOOL DBGReadStatus(u32* p1) {

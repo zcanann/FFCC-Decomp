@@ -58,14 +58,11 @@ extern "C" {
  */
 extern "C" void ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2(CChara::CModel* model, void* param_2, void* param_3, int param_4, int param_5, float (*param_6) [4])
 {
-	char flag = *(char*)((char*)param_3 + 0x14);
-	
-	if (flag == 0) {
-		// Set MaterialMan field at offset 0xd0 to param_2 + 0x1c + 0x28
-		int offset = (int)param_2 + 0x1c + 0x28;
-		*(int*)(MaterialMan + 0xd0) = offset;
-		
-		// Set other MaterialMan fields based on Ghidra decomp
+	void* meshData = *(void**)((char*)model + param_4 * 0x14 + 0xb4);
+	void* displayList = (void*)(*(int*)((char*)meshData + 0x50) + param_5 * 0xc);
+
+	if (*(char*)((char*)param_3 + 0x14) == 0) {
+		*(int*)(MaterialMan + 0x208) = *(int*)((char*)param_2 + 0x1c) + 0x28;
 		*(int*)(MaterialMan + 0x44) = 0xFFFFFFFF;
 		*(char*)(MaterialMan + 0x4c) = 0xFF;
 		*(int*)(MaterialMan + 0x11c) = 0;
@@ -82,25 +79,10 @@ extern "C" void ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2(CCh
 		*(int*)(MaterialMan + 0x130) = 0;
 		*(int*)(MaterialMan + 0x40) = 0xADE0F;
 	}
-	
-	// Get display list info
-	char* meshes = (char*)model + 0xac;
-	void* mesh_data = *(void**)(meshes + param_4 * 0x14 + 8);
-	void* display_lists = *(void**)((char*)mesh_data + 0x50);
-	void* display_list = (void*)((char*)display_lists + param_5 * 0xc);
-	
-	// Call SetMaterial
-	void* model_data = *(void**)((char*)model + 0xa4);
-	void* material_set = *(void**)((char*)model_data + 0x24);
-	unsigned short material_id = *(unsigned short*)((char*)display_list + 8);
-	SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(MaterialMan, material_set, material_id, 0, 0);
-	
-	// Call GXCallDisplayList if flag allows
-	if (flag == 1 || flag == 0) {
-		void* dl_data = *(void**)display_list;
-		unsigned int dl_size = *(unsigned int*)((char*)display_list + 4);
-		GXCallDisplayList(dl_data, dl_size);
-	}
+
+	SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
+	    MaterialMan, *(void**)(*(int*)((char*)model + 0xa4) + 0x24), *(unsigned short*)((char*)displayList + 8), 0, 0);
+	GXCallDisplayList(*(void**)displayList, *(unsigned int*)((char*)displayList + 4));
 }
 
 /*

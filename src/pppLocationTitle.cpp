@@ -136,14 +136,9 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, UnkB* param_2, Un
             memcpy(&particle->m_color, (u8*)pppLocationTitle + 0x88 + colorOffset, 4);
             particle->m_frame = work->m_cur;
 
-            if (*(s16*)((u8*)shapeTable + 6) != 0) {
-                s16 shape = (s16)(rand() % *(s16*)((u8*)shapeTable + 6));
-                particle->m_shapeA = shape;
-                particle->m_shapeB = shape;
-            } else {
-                particle->m_shapeA = 0;
-                particle->m_shapeB = 0;
-            }
+            s16 shape = (s16)(rand() % *(s16*)((u8*)shapeTable + 6));
+            particle->m_shapeA = shape;
+            particle->m_shapeB = shape;
 
             particle++;
         }

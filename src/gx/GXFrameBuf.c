@@ -475,11 +475,19 @@ static void __GXVerifCopy(void* dest, u8 clear) {
 }
 #endif
 
+/*
+ * --INFO--
+ * PAL Address: 0x801A31E0
+ * PAL Size: 348b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void GXCopyDisp(void* dest, GXBool clear) {
+    GXData* gx;
     u32 reg;
-    u32 tempPeCtrl;
-    u32 phyAddr;
-    u8 changePeCtrl;
+    GXBool changePeCtrl;
 
     CHECK_GXBEGIN(1833, "GXCopyDisp");
 
@@ -487,52 +495,58 @@ void GXCopyDisp(void* dest, GXBool clear) {
     __GXVerifCopy(dest, clear);
 #endif
 
+    gx = __GXData;
     if (clear) {
-        reg = __GXData->zmode;
-        SET_REG_FIELD(0, reg, 1, 0, 1);
-        SET_REG_FIELD(0, reg, 3, 1, 7);
-        GX_WRITE_RAS_REG(reg);
-
-        reg = __GXData->cmode0;
-        SET_REG_FIELD(0, reg, 1, 0, 0);
-        SET_REG_FIELD(0, reg, 1, 1, 0);
-        GX_WRITE_RAS_REG(reg);
+        GX_WRITE_U8(0x61);
+        GX_WRITE_U32((gx->zmode & 0xFFFFFFF0) | 0xF);
+        GX_WRITE_U8(0x61);
+        GX_WRITE_U32(gx->cmode0 & 0xFFFFFFFC);
     }
 
     changePeCtrl = FALSE;
-
-    if ((clear || (u32)GET_REG_FIELD(__GXData->peCtrl, 3, 0) == 3) && (u32)GET_REG_FIELD(__GXData->peCtrl, 1, 6) == 1) {
-        changePeCtrl = TRUE;
-        tempPeCtrl = __GXData->peCtrl;
-        SET_REG_FIELD(0, tempPeCtrl, 1, 6, 0);
-        GX_WRITE_RAS_REG(tempPeCtrl);
+    if (!clear) {
+        if ((gx->peCtrl & 7) != 3) {
+            goto skipPeCtrlWrite;
+        }
     }
 
-    GX_WRITE_RAS_REG(__GXData->cpDispSrc);
-    GX_WRITE_RAS_REG(__GXData->cpDispSize);
-    GX_WRITE_RAS_REG(__GXData->cpDispStride);
+    if (((gx->peCtrl >> 6) & 1) == 1) {
+        changePeCtrl = TRUE;
+        GX_WRITE_U8(0x61);
+        GX_WRITE_U32(gx->peCtrl & 0xFFFFFFBF);
+    }
 
-    phyAddr = (u32)dest & 0x3FFFFFFF;
-    reg = 0;
-    SET_REG_FIELD(1872, reg, 21, 0, phyAddr >> 5);
-    SET_REG_FIELD(1876, reg, 8, 24, 0x4B);
-    GX_WRITE_RAS_REG(reg);
+skipPeCtrlWrite:
+    GX_WRITE_U8(0x61);
+    GX_WRITE_U32(gx->cpDispSrc);
+    GX_WRITE_U8(0x61);
+    GX_WRITE_U32(gx->cpDispSize);
+    GX_WRITE_U8(0x61);
+    GX_WRITE_U32(gx->cpDispStride);
 
-    SET_REG_FIELD(1876, __GXData->cpDisp, 1, 11, clear);
-    SET_REG_FIELD(1876, __GXData->cpDisp, 1, 14, 1);
-    SET_REG_FIELD(1876, __GXData->cpDisp, 8, 24, 0x52);
-    GX_WRITE_RAS_REG(__GXData->cpDisp);
+    reg = (((u32)dest >> 5) & 0xFFFFFF) | 0x4B000000;
+    GX_WRITE_U8(0x61);
+    GX_WRITE_U32(reg);
+
+    gx->cpDisp = (gx->cpDisp & 0xFFFFF7FF) | ((u32)clear << 11);
+    gx->cpDisp = (gx->cpDisp & 0xFFFFBFFF) | 0x4000;
+    gx->cpDisp = (gx->cpDisp & 0x00FFFFFF) | 0x52000000;
+    GX_WRITE_U8(0x61);
+    GX_WRITE_U32(gx->cpDisp);
 
     if (clear) {
-        GX_WRITE_RAS_REG(__GXData->zmode);
-        GX_WRITE_RAS_REG(__GXData->cmode0);
+        GX_WRITE_U8(0x61);
+        GX_WRITE_U32(gx->zmode);
+        GX_WRITE_U8(0x61);
+        GX_WRITE_U32(gx->cmode0);
     }
 
     if (changePeCtrl) {
-        GX_WRITE_RAS_REG(__GXData->peCtrl);
+        GX_WRITE_U8(0x61);
+        GX_WRITE_U32(gx->peCtrl);
     }
 
-    __GXData->bpSentNot = 0;
+    gx->bpSentNot = 0;
 }
 
 void GXCopyTex(void* dest, GXBool clear) {

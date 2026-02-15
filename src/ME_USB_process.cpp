@@ -57,10 +57,11 @@ static inline CMemory::CStage* MaterialEditorStage()
  */
 extern "C" CMaterialEditorPcs* MemFree__18CMaterialEditorPcsFPv(CMaterialEditorPcs* materialEditorPcs, void* ptr)
 {
-    if (ptr != 0) {
-        materialEditorPcs = Free__7CMemoryFPv(&Memory, ptr);
+    if (ptr == nullptr) {
+        return materialEditorPcs;
     }
-    return materialEditorPcs;
+
+    return Free__7CMemoryFPv(&Memory, ptr);
 }
 
 /*

@@ -63,7 +63,7 @@ void pppDestructCallBackDistance(void)
 void pppFrameCallBackDistance(pppCallBackDistance* param1, UnkB* param2, UnkC* param3)
 {
     u8* pppMngSt = lbl_8032ED50;
-    s32 dataOffset = *param3->m_serializedDataOffsets;
+    s32 distanceOffset = *param3->m_serializedDataOffsets + 0x80;
     f32 distance;
     Vec local_1c;
     Vec local_28;
@@ -74,10 +74,11 @@ void pppFrameCallBackDistance(pppCallBackDistance* param1, UnkB* param2, UnkC* p
     distance = PSVECDistance(&local_1c, (Vec*)(pppMngSt + 0x68));
 
     if ((distance <= param2->m_dataValIndex) ||
-        (*(f32*)((u8*)param1 + dataOffset + 0x80) <= distance)) {
+        (*(f32*)((u8*)param1 + distanceOffset) <= distance)) {
         s32 partIndex;
         s32 graphFrame;
 
+        pppMngSt = lbl_8032ED50;
         local_28.x = *(f32*)(pppMngSt + 0x84);
         local_28.y = *(f32*)(pppMngSt + 0x94);
         local_28.z = *(f32*)(pppMngSt + 0xA4);

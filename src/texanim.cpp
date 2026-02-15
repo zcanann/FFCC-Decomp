@@ -843,22 +843,67 @@ void CTexAnimSet::AddFrame()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004401c
+ * PAL Size: 208b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CTexAnimSet::Change(char*, float, CTexAnimSet::ANIM_TYPE)
+void CTexAnimSet::Change(char* name, float frame, CTexAnimSet::ANIM_TYPE mode)
 {
-	// TODO
+    CPtrArray<CTexAnim*>* texAnims = reinterpret_cast<CPtrArray<CTexAnim*>*>(Ptr(this, 8));
+
+    for (unsigned int i = 0; i < static_cast<unsigned int>(texAnims->GetSize()); i++) {
+        CTexAnim* texAnim = (*texAnims)[i];
+        CPtrArray<CTexAnimSeq*>* seqs =
+            reinterpret_cast<CPtrArray<CTexAnimSeq*>*>(Ptr(*reinterpret_cast<void**>(Ptr(texAnim, 8)), 0x110));
+
+        int seqIdx = -1;
+        for (unsigned int j = 0; j < static_cast<unsigned int>(seqs->GetSize()); j++) {
+            CTexAnimSeq* seq = (*seqs)[j];
+            if (strcmp(name, reinterpret_cast<char*>(Ptr(seq, 8))) == 0) {
+                seqIdx = static_cast<int>(j);
+                break;
+            }
+        }
+
+        if (seqIdx >= 0) {
+            S32At(texAnim, 0x0C) = seqIdx;
+            F32At(texAnim, 0x10) = frame;
+            S32At(texAnim, 0x14) = static_cast<int>(mode);
+            return;
+        }
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80043f48
+ * PAL Size: 212b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CTexAnimSet::SetTexGen()
 {
-	// TODO
+    CPtrArray<CTexAnim*>* texAnims = reinterpret_cast<CPtrArray<CTexAnim*>*>(Ptr(this, 8));
+
+    for (unsigned int i = 0; i < static_cast<unsigned int>(texAnims->GetSize()); i++) {
+        CTexAnim* texAnim = (*texAnims)[i];
+        void* refData = *reinterpret_cast<void**>(Ptr(texAnim, 8));
+        int* material = reinterpret_cast<int*>(*reinterpret_cast<void**>(Ptr(refData, 0x108)));
+        if (material != 0) {
+            int* texSrt = material + (S32At(refData, 0x10C) * 5);
+            U32At(texSrt, 0x50) = U32At(texAnim, 0x18);
+            U32At(texSrt, 0x54) = U32At(texAnim, 0x1C);
+            F32At(texSrt, 0x58) = FLOAT_8032fb38;
+            F32At(texSrt, 0x5C) = FLOAT_8032fb38;
+            U8At(texSrt, 0x4C) = (F32At(texSrt, 0x58) != FLOAT_8032fb38);
+            U8At(texSrt, 0x4D) = (F32At(texSrt, 0x5C) != FLOAT_8032fb38);
+        }
+    }
 }
 
 /*

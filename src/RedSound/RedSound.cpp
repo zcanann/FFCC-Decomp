@@ -682,6 +682,7 @@ void CRedSound::StreamPause(int streamID, int pause)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 unsigned int CRedSound::SetWaveData(int waveID, void* waveData, int waveSize)
 {
 	unsigned int id = GetAutoID();
@@ -691,6 +692,7 @@ unsigned int CRedSound::SetWaveData(int waveID, void* waveData, int waveSize)
 	}
 	return id;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--

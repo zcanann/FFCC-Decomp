@@ -116,6 +116,64 @@ void CChara::ChangeMogMode(int mogMode)
 	}
 }
 
+extern "C" unsigned char Chara[];
+extern "C" void CalcMogScore__6CCharaFv(CChara*);
+
+/*
+ * --INFO--
+ * PAL Address: 0x800e1148
+ * PAL Size: 292b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void InitFurTexBuffer__6CCharaFv(CChara* chara)
+{
+	int i = 0;
+	int row = 0;
+	do {
+		int inner = 0;
+		int idx0 = row << 1;
+		int count = 8;
+		do {
+			int idxBase = inner + row;
+			*reinterpret_cast<unsigned short*>(Chara + idx0 + 4) = 0x7FFF;
+			idx0 += 0x10;
+			*reinterpret_cast<unsigned short*>(Chara + ((idxBase + 1) << 1) + 4) = 0x7FFF;
+			inner += 8;
+			*reinterpret_cast<unsigned short*>(Chara + ((idxBase + 2) << 1) + 4) = 0x7FFF;
+			*reinterpret_cast<unsigned short*>(Chara + ((idxBase + 3) << 1) + 4) = 0x7FFF;
+			*reinterpret_cast<unsigned short*>(Chara + ((idxBase + 4) << 1) + 4) = 0x7FFF;
+			*reinterpret_cast<unsigned short*>(Chara + ((idxBase + 5) << 1) + 4) = 0x7FFF;
+			*reinterpret_cast<unsigned short*>(Chara + ((idxBase + 6) << 1) + 4) = 0x7FFF;
+			*reinterpret_cast<unsigned short*>(Chara + ((idxBase + 7) << 1) + 4) = 0x7FFF;
+			count--;
+		} while (count != 0);
+		i++;
+		row += 0x40;
+	} while (i < 0x40);
+
+	*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(chara) + 0x2004) = 0;
+	*reinterpret_cast<unsigned int*>(Chara + 0x2014) = System.m_frameCounter;
+	memset(reinterpret_cast<unsigned char*>(chara) + 0x2018, 0, 0x40);
+	CalcMogScore__6CCharaFv(chara);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800e126c
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void SaveFurTexBuffer__6CCharaFPUs(CChara*, unsigned short* outTexels)
+{
+	memcpy(outTexels, Chara + 4, 0x2000);
+}
+
 /*
  * --INFO--
  * Address:	TODO

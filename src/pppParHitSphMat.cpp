@@ -15,41 +15,49 @@ extern unsigned char CFlat[];
  */
 void pppParHitSphMat(void* param1, void* param2, void* param3)
 {
-    s32* offsets = *(s32**)((u8*)param3 + 0xC);
-    Vec local_a0;
-    Vec local_94;
     Vec local_88;
+    Vec local_94;
+    Vec local_a0;
     _GXColor local_7c;
     Mtx MStack_78;
     Mtx local_48;
+    u8* pppMngSt = lbl_8032ED50;
+    u8* data = (u8*)param1;
+    u8* step = (u8*)param2;
+    f32 hitLength;
+    f32 radius;
 
     local_88.x = 0.0f;
     local_88.y = 0.0f;
     local_88.z = 0.0f;
 
-    if (((u8*)param2)[0xC] != 0) {
-        Vec* src = (Vec*)((u8*)param1 + offsets[1] + 0x80);
-        PSMTXMultVec((MtxPtr)((u8*)lbl_8032ED50 + 0x78), src, &local_94);
-    } else {
-        local_94.x = *(f32*)((u8*)lbl_8032ED50 + 0x84);
-        local_94.y = *(f32*)((u8*)lbl_8032ED50 + 0x94);
-        local_94.z = *(f32*)((u8*)lbl_8032ED50 + 0xA4);
+    if (step[0xC] != 0) {
+        s32* offsets = *(s32**)((u8*)param3 + 0xC);
+        Vec* src = (Vec*)(data + offsets[1] + 0x80);
 
-        Vec* src = (Vec*)((u8*)param1 + offsets[1] + 0x80);
+        PSMTXMultVec((MtxPtr)(pppMngSt + 0x78), src, &local_94);
+    } else {
+        s32* offsets = *(s32**)((u8*)param3 + 0xC);
+        Vec* src = (Vec*)(data + offsets[1] + 0x80);
+
+        local_94.x = *(f32*)(pppMngSt + 0x84);
+        local_94.y = *(f32*)(pppMngSt + 0x94);
+        local_94.z = *(f32*)(pppMngSt + 0xA4);
         local_94.x = local_94.x + src->x;
         local_94.y = local_94.y + src->y;
         local_94.z = local_94.z + src->z;
     }
 
-    if (*(f32*)((u8*)param2 + 4) != 0.0f) {
-        PSVECSubtract((Vec*)((u8*)lbl_8032ED50 + 8), (Vec*)((u8*)lbl_8032ED50 + 0x48), &local_88);
+    hitLength = *(f32*)(step + 4);
+    if (hitLength != 0.0f) {
+        PSVECSubtract((Vec*)(pppMngSt + 8), (Vec*)(pppMngSt + 0x48), &local_88);
     }
 
-    f32 radius = *(f32*)((u8*)lbl_8032ED50 + 0x64) * *(f32*)((u8*)param2 + 8);
-    pppHitCylinderSendSystem((_pppMngSt*)lbl_8032ED50, &local_94, &local_88, radius, *(f32*)((u8*)param2 + 4));
+    radius = *(f32*)(pppMngSt + 0x64) * *(f32*)(step + 8);
+    pppHitCylinderSendSystem((_pppMngSt*)pppMngSt, &local_94, &local_88, radius, hitLength);
 
     if ((*(u32*)(CFlat + 0x129c) & 0x200000) != 0) {
-        local_7c = *(_GXColor*)((u8*)param2 + 0xC);
+        local_7c = *(_GXColor*)(step + 0xC);
         PSMTXIdentity(MStack_78);
         PSMTXIdentity(local_48);
         local_48[0][0] = radius;

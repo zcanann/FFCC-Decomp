@@ -558,6 +558,33 @@ void CMaterialSet::AddMaterial(CMaterial*, int)
 
 /*
  * --INFO--
+ * PAL Address: 0x8003c71c
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMaterialSet::CacheDumpTexture(int materialIndex, CAmemCacheSet* amemCacheSet)
+{
+    CMaterial* material =
+        (*reinterpret_cast<CMaterial***>(Ptr(this, 0x14)))[materialIndex];
+    if (material == 0) {
+        return;
+    }
+
+    int numTexture = static_cast<int>(*reinterpret_cast<unsigned short*>(Ptr(material, 0x18)));
+    CTexture** texture = reinterpret_cast<CTexture**>(Ptr(material, 0x3C));
+    for (int i = 0; i < numTexture; i++) {
+        if (*texture != 0) {
+            (*texture)->CacheUnLoadTexture(amemCacheSet);
+        }
+        texture++;
+    }
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8003c690
  * PAL Size: 140b
  * EN Address: TODO

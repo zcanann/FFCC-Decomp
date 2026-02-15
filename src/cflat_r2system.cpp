@@ -4,6 +4,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/map.h"
 #include "ffcc/maphit.h"
+#include "ffcc/mes.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_map.h"
 #include "ffcc/p_menu.h"
@@ -30,9 +31,16 @@ struct CMapCylinderRaw
     float m_height2;
 };
 
+struct CSystemErrorLevelSlot
+{
+    char m_pad[0x3CDC];
+    int m_value;
+};
+
 extern "C" {
 int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned long);
 void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
+int GetWait__4CMesFv(void*);
 }
 
 /*

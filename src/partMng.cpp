@@ -3,6 +3,30 @@
 #include "ffcc/cflat_runtime.h"
 
 extern "C" void __dl__FPv(void* ptr);
+extern "C" void pppPartInit__8CPartMngFv2(CPartMng* partMng);
+
+struct CPtrArrayBare {
+    unsigned long m_size;
+    unsigned long m_numItems;
+    unsigned long m_defaultSize;
+    void* m_items;
+    CMemory::CStage* m_stage;
+    int m_growCapacity;
+};
+
+/*
+ * --INFO--
+ * PAL Address: 0x8005f61c
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void SetGrow__21CPtrArray(CPtrArrayBare* ptrArray, int growCapacity)
+{
+    ptrArray->m_growCapacity = growCapacity;
+}
 
 /*
  * --INFO--
@@ -15,20 +39,6 @@ extern "C" void __dl__FPv(void* ptr);
  */
 void CFlatRuntime::CObject::onNewFinished()
 {
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8005f61c
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void SetGrow__21CPtrArray(void* ptrArray, unsigned int growCapacity)
-{
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(ptrArray) + 0x18) = growCapacity;
 }
 
 /*
@@ -657,12 +667,12 @@ void CPartMng::pppPartDead()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CPartMng::pppPartInit()
+extern "C" void pppPartInit__8CPartMngFv2(CPartMng* partMng)
 {
-	char* pppMngSt = reinterpret_cast<char*>(this);
+	char* pppMngSt = reinterpret_cast<char*>(partMng);
 	int i = 0;
 
-	*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x8) = 0;
+	*reinterpret_cast<int*>(reinterpret_cast<char*>(partMng) + 0x8) = 0;
 	do {
 		int baseTime = *reinterpret_cast<int*>(pppMngSt + 0x14);
 		if (baseTime != -0x1000 && baseTime < 0) {
@@ -671,6 +681,11 @@ void CPartMng::pppPartInit()
 		pppMngSt += 0x158;
 		i++;
 	} while (i < 0x180);
+}
+
+void CPartMng::pppPartInit()
+{
+    pppPartInit__8CPartMngFv2(this);
 }
 
 /*
@@ -865,22 +880,30 @@ void CPartMng::pppEndPart(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80057e40
+ * PAL Size: 24b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartMng::pppGetIfDt(short)
+PPPIFPARAM* CPartMng::pppGetIfDt(short index)
 {
-	// TODO
+	return reinterpret_cast<PPPIFPARAM*>(reinterpret_cast<char*>(this) + (index * 0x158) + 0x130);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80057e2c
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartMng::pppShowIdx(short, unsigned char)
+void CPartMng::pppShowIdx(short index, unsigned char visible)
 {
-	// TODO
+	reinterpret_cast<unsigned char*>(this)[(index * 0x158) + 0xe9] = visible;
 }
 
 /*

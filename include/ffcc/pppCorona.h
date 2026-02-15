@@ -19,7 +19,7 @@ struct UnkC {
 
 struct CoronaParam {
     s32 m_graphId;
-    u16 m_dataValIndex;
+    s32 m_dataValIndex;
     u8 m_colorR;
     u8 m_colorG;
     u8 m_colorB;

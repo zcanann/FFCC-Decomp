@@ -391,6 +391,88 @@ extern "C" int GetEvtFlag__12CCaravanWorkFi(CCaravanWork* caravanWork, int evtFl
     return (evtFlags[byteIndex] & mask) != 0;
 }
 
+extern "C" int m_tempVar__4CMes[];
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B931C
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void SetTempValue__4CMesFii(int index, int value)
+{
+    m_tempVar__4CMes[index] = value;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9330
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" unsigned short GetGbaButtonDown__4CPadFl(void* pad, long padIndex)
+{
+    bool isInvalidPad = false;
+    unsigned int result;
+
+    if (*(int*)((char*)pad + 0x1C4) == 0) {
+        if (padIndex != 0) {
+            goto done_check;
+        }
+        if (*(int*)((char*)pad + 0x1C0) == -1) {
+            goto done_check;
+        }
+    }
+    isInvalidPad = true;
+
+done_check:
+    if (isInvalidPad) {
+        result = 0;
+    } else {
+        int activePad = *(int*)((char*)pad + 0x1C0);
+        int idx;
+        char* slot;
+
+        padIndex = padIndex &
+                   ~((int)~(activePad - padIndex | padIndex - activePad) >> 31);
+        idx = (int)padIndex * 0x54;
+        slot = (char*)pad + idx;
+        result = *(unsigned short*)(slot + 0xA);
+    }
+
+    return (unsigned short)result;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9394
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void SetMapShadeColor__9CCharaPcsFi6CColor(void* charaPcs, int shadeIndex, const unsigned char* color)
+{
+    unsigned int self = (unsigned int)charaPcs + shadeIndex * 4;
+    unsigned char value1;
+    unsigned char value2;
+
+    value1 = color[1];
+    *(unsigned char*)(self + 0x12C) = color[0];
+    value2 = color[2];
+    *(unsigned char*)(self + 0x12D) = value1;
+    value1 = color[3];
+    *(unsigned char*)(self + 0x12E) = value2;
+    *(unsigned char*)(self + 0x12F) = value1;
+}
+
 /*
  * --INFO--
  * Address:	TODO

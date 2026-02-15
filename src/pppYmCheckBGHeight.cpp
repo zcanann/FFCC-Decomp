@@ -93,9 +93,9 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(struct pppYmCheckBGHeight* pp
         *((float*)pppMngSt + 0x17) = currentY;
         *((float*)pppMngSt + 0x1B) = currentY;
         *((float*)pppMngSt + 0x13) = currentY;
-        pppMngSt->m_matrix.value[0][3] = pppMngSt->m_position.x;
-        pppMngSt->m_matrix.value[1][3] = pppMngSt->m_position.y;
-        pppMngSt->m_matrix.value[2][3] = pppMngSt->m_position.z;
+        pppMngStPtr->m_matrix.value[0][3] = pppMngSt->m_position.x;
+        pppMngStPtr->m_matrix.value[1][3] = pppMngSt->m_position.y;
+        pppMngStPtr->m_matrix.value[2][3] = pppMngSt->m_position.z;
         pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
     }
     return pppYmCheckBGHeight;

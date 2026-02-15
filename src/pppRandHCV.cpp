@@ -46,16 +46,13 @@ extern "C" {
 
 void pppRandHCV(void* p1, void* p2, void* p3) {
     RandHCVParams* params = (RandHCVParams*)p2;
-    int id = *(int*)((char*)p1 + 0xc);
-    int* baseIndex;
-    int baseOffset;
     float* scalePtr;
 
     if (lbl_8032ED70 != 0) {
         return;
     }
 
-    if (params->index == id) {
+    if (params->index == *(int*)((char*)p1 + 0xc)) {
         float randValue = RandF__5CMathFv(math);
         if (params->flag != 0) {
             randValue = randValue + RandF__5CMathFv(math);
@@ -63,19 +60,15 @@ void pppRandHCV(void* p1, void* p2, void* p3) {
             randValue = randValue * lbl_8032FF98;
         }
 
-        baseIndex = *(int**)((char*)p3 + 0xc);
-        baseOffset = *baseIndex;
-        scalePtr = (float*)((char*)p1 + baseOffset + 0x80);
+        scalePtr = (float*)((char*)p1 + **(int**)((char*)p3 + 0xc) + 0x80);
         *scalePtr = randValue;
     }
 
-    if (params->index != id) {
+    if (params->index != *(int*)((char*)p1 + 0xc)) {
         return;
     }
 
-    baseIndex = *(int**)((char*)p3 + 0xc);
-    baseOffset = *baseIndex;
-    scalePtr = (float*)((char*)p1 + baseOffset + 0x80);
+    scalePtr = (float*)((char*)p1 + **(int**)((char*)p3 + 0xc) + 0x80);
 
     s16* target;
     if (params->colorOffset == -1) {

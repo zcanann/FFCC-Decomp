@@ -13,12 +13,12 @@ struct CGObject;
 struct CTexture;
 struct Vec;
 
-void GetModelPtr(CGObject*);
+CChara::CModel* GetModelPtr(CGObject*);
 void GetCharaNodeFrameMatrix(_pppMngSt*, float, float (*)[4]);
 void CalcGraphValue(_pppPObject*, long, float&, float&, float&, float, float&, float&);
 void GetTextureFromRSD(int, _pppEnvSt*);
-void GetCharaModelPtr(CCharaPcs::CHandle*);
-void GetCharaHandlePtr(CGObject*, long);
+CChara::CModel* GetCharaModelPtr(CCharaPcs::CHandle*);
+CCharaPcs::CHandle* GetCharaHandlePtr(CGObject*, long);
 void DisableIndWarp(_GXTevStageID, _GXIndTexStageID);
 void SetUpPaletteEnv(CTexture*);
 void genParaboloidMap(void*, unsigned long*, unsigned short, _GXVtxFmt);

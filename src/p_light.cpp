@@ -217,12 +217,54 @@ void CLightPcs::Clear()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80049acc
+ * PAL Size: 1032b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CLightPcs::Add(CLightPcs::CLight*)
+void CLightPcs::Add(CLightPcs::CLight* light)
 {
-	// TODO
+    float radius = *(float*)((char*)light + 0x1c);
+    float maxDist = *(float*)((char*)light + 0x20);
+    float intensity = *(float*)((char*)light + 0x28);
+    unsigned int colorMask = 0x01010101;
+
+    if (maxDist >= FLOAT_8032fc14) {
+        maxDist = radius;
+    }
+
+    float absRadius = radius;
+    if (radius < FLOAT_8032fc14) {
+        absRadius = -radius;
+    }
+
+    if (*(int*)((char*)light + 0x50) == 0) {
+        reinterpret_cast<unsigned char*>(&colorMask)[0] = 0;
+    }
+    if (*(int*)((char*)light + 0x54) == 0) {
+        reinterpret_cast<unsigned char*>(&colorMask)[1] = 0;
+    }
+    if (*(int*)((char*)light + 0x58) == 0) {
+        reinterpret_cast<unsigned char*>(&colorMask)[2] = 0;
+    }
+
+    int index = *(int*)((char*)this + 0xb8);
+    *(int*)((char*)this + 0xb8) = index + 1;
+
+    unsigned int* dst = (unsigned int*)((char*)this + 0x63c + index * 0xb0);
+    unsigned int* src = (unsigned int*)light;
+    for (int i = 0; i < 0x2c; i++) {
+        dst[i] = src[i];
+    }
+
+    float atten = absRadius * FLOAT_8032fc18 * intensity;
+    float radiusSq = radius * radius;
+    dst[8] = *(unsigned int*)&maxDist;
+    dst[9] = *(unsigned int*)&atten;
+    dst[0x18] = colorMask;
+    dst[0x2b] = *(unsigned int*)&radiusSq;
 }
 
 /*

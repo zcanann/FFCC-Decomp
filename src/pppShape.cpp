@@ -59,7 +59,11 @@ void* pppShapeSt::GetTexture(long* animData, CMaterialSet* materialSet, int& tex
  */
 void pppDrawShp(long* animData, short frameIndex, CMaterialSet* materialSet, unsigned char blendMode)
 {
-    int shapePtr = (int)animData + *(short*)((int)animData + frameIndex * 8 + 0x10);
+    int iVar1;
+    int iVar2;
+
+    int shapePtr = (int)animData;
+    shapePtr = shapePtr + *(short*)(shapePtr + frameIndex * 8 + 0x10);
 
     *(int*)((char*)&MaterialMan + 296) = *(int*)((char*)&MaterialMan + 284);
     *(int*)((char*)&MaterialMan + 300) = *(int*)((char*)&MaterialMan + 288);
@@ -74,13 +78,13 @@ void pppDrawShp(long* animData, short frameIndex, CMaterialSet* materialSet, uns
     GXSetVtxDesc((GXAttr)11, GX_DIRECT);
     GXSetVtxDesc((GXAttr)13, GX_DIRECT);
 
-    int current = shapePtr;
-    for (int i = 0; i < *(short*)(shapePtr + 2); i++) {
+    iVar1 = shapePtr;
+    for (iVar2 = 0; iVar2 < *(short*)(shapePtr + 2); iVar2 = iVar2 + 1) {
         if (blendMode == 0xFF) {
-            pppSetBlendMode__FUc(*(unsigned char*)(current + 8));
+            pppSetBlendMode__FUc(*(unsigned char*)(iVar1 + 8));
         }
-        GXCallDisplayList(*(void**)(current + 0xc), 0x60);
-        current += 8;
+        GXCallDisplayList(*(void**)(iVar1 + 0xc), 0x60);
+        iVar1 = iVar1 + 8;
     }
 }
 
@@ -95,6 +99,9 @@ void pppDrawShp(long* animData, short frameIndex, CMaterialSet* materialSet, uns
  */
 void pppDrawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned char blendMode)
 {
+    int iVar1;
+    int iVar2;
+
     int shapePtr = (int)shape;
 
     *(int*)((char*)&MaterialMan + 296) = *(int*)((char*)&MaterialMan + 284);
@@ -110,13 +117,13 @@ void pppDrawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned char b
     GXSetVtxDesc((GXAttr)11, GX_DIRECT);
     GXSetVtxDesc((GXAttr)13, GX_DIRECT);
 
-    int current = shapePtr;
-    for (int i = 0; i < *(short*)(shapePtr + 2); i++) {
+    iVar2 = shapePtr;
+    for (iVar1 = 0; iVar1 < *(short*)(shapePtr + 2); iVar1 = iVar1 + 1) {
         if (blendMode == 0xFF) {
-            pppSetBlendMode__FUc(*(unsigned char*)(current + 8));
+            pppSetBlendMode__FUc(*(unsigned char*)(iVar2 + 8));
         }
-        GXCallDisplayList(*(void**)(current + 0xc), 0x60);
-        current += 8;
+        GXCallDisplayList(*(void**)(iVar2 + 0xc), 0x60);
+        iVar2 = iVar2 + 8;
     }
 }
 

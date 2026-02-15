@@ -338,14 +338,14 @@ static Block* link_new_block(__mem_pool_obj* pool_obj, unsigned long size) {
 
     Block_construct(block, aligned_size);
     start = pool_obj->start_;
-    if (start == 0) {
-        block->prev = block;
-        block->next = block;
-    } else {
+    if (start != 0) {
         block->prev = start->prev;
         block->prev->next = block;
         block->next = start;
         block->next->prev = block;
+    } else {
+        block->prev = block;
+        block->next = block;
     }
     pool_obj->start_ = block;
     return block;

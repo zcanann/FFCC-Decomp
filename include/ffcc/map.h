@@ -28,10 +28,10 @@ public:
     CMapKeyFrame();
     ~CMapKeyFrame();
 
-    void Get();
-    void Get(int&, int&, float&);
+    float Get();
+    int Get(int&, int&, float&);
     void Calc();
-    void IsRun();
+    int IsRun();
     void ReadJun(CChunkFile&, int);
     void ReadFrame(CChunkFile&, int);
     void ReadKey(CChunkFile&, int);

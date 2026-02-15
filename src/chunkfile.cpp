@@ -201,12 +201,13 @@ unsigned int CChunkFile::Get4()
  */
 float CChunkFile::GetF4()
 {
-    float value;
-    unsigned int* cursor = (unsigned int*)m_cursor;
-    unsigned int bits = *cursor;
-    m_cursor = (unsigned char*)(cursor + 1);
-    *(unsigned int*)&value = bits;
-    return value;
+    union {
+        unsigned int bits;
+        float value;
+    } u;
+
+    u.bits = Get4();
+    return u.value;
 }
 
 /*

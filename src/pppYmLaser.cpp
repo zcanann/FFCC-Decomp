@@ -1,9 +1,37 @@
 #include "ffcc/pppYmLaser.h"
 #include "ffcc/math.h"
+#include "ffcc/map.h"
+#include "ffcc/partMng.h"
+
+#include <string.h>
 
 extern CMath Math;
 extern "C" float RandF__5CMathFf(float param, CMath* math);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
+extern struct _pppMngSt* pppMngStPtr;
+extern s32 DAT_8032ed70;
+extern CMapMng MapMng;
+extern f32 FLOAT_80330dc0;
+extern f32 FLOAT_80330de0;
+extern f32 FLOAT_80330de4;
+extern f32 FLOAT_80330de8;
+extern f32 FLOAT_80330dec;
+extern f64 DOUBLE_80330dd8;
+
+extern "C" {
+void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
+void pppCalcFrameShape__FPlRsRsRss(long*, short&, short&, short&, short);
+void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
+void pppSubVector__FR3Vec3Vec3Vec(Vec*, const Vec*, const Vec*);
+int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, void*, void*, u32);
+void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
+int GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(float, _pppMngSt*, Mtx);
+int pppCreatePObject__FP9_pppMngStP12_pppPDataVal(_pppMngSt*, void*);
+void pppHitCylinderSendSystem__FP9_pppMngStP3VecP3Vecff(_pppMngSt*, Vec*, Vec*, float, float);
+}
+
+static char s_pppYmLaser_cpp[] = "pppYmLaser.cpp";
 
 struct YmLaserOffsets {
 	int m_serializedDataOffsets[3];
@@ -12,6 +40,26 @@ struct YmLaserOffsets {
 struct YmLaserParam {
 	unsigned char pad[0xc];
 	YmLaserOffsets* offsets;
+};
+
+struct YmLaserStep {
+	s32 m_graphId;
+	s32 m_dataValIndex;
+	u16 m_initWOrk;
+	u16 m_stepValue;
+	s32 m_arg3;
+	u8* m_payload;
+};
+
+struct CMapCylinderRaw {
+	Vec m_bottom;
+	Vec m_direction;
+	float m_radius;
+	float m_height;
+	Vec m_top;
+	Vec m_direction2;
+	float m_radius2;
+	float m_height2;
 };
 
 /*
@@ -108,7 +156,133 @@ extern "C" void pppDestructYmLaser(void* pppYmLaser, void* param_2)
  */
 extern "C" void pppFrameYmLaser(void* pppYmLaser, void* param_2, void* param_3)
 {
-	// TODO - Complex frame logic with particles and collision detection
+	YmLaserStep* step = (YmLaserStep*)param_2;
+	YmLaserParam* data = (YmLaserParam*)param_3;
+	_pppPObject* baseObj = (_pppPObject*)pppYmLaser;
+	float* work = (float*)((unsigned char*)pppYmLaser + 0x88 + data->offsets->m_serializedDataOffsets[2]);
+	Vec localA;
+	Vec localB;
+	Vec localPos;
+	CMapCylinderRaw cyl;
+	Mtx charaMtx;
+	Mtx tempMtx;
+	bool emptyHistory = (work[7] == 0.0f);
+
+	if ((DAT_8032ed70 != 0) || (step->m_stepValue == 1)) {
+		return;
+	}
+
+	if (emptyHistory) {
+		work[7] = (float)(u32)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+			(u32)step->m_payload[0x1e] * 0xc, pppEnvStPtr->m_stagePtr, s_pppYmLaser_cpp, 0x5d);
+		memset((void*)(u32)work[7], 0, (u32)step->m_payload[0x1e] * 0xc);
+	}
+
+	CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
+		*(float*)(step->m_payload + 0x10), baseObj, step->m_graphId, work + 4, work + 5, work + 6,
+		(float*)(step->m_payload + 0x14), (float*)(step->m_payload + 0x18));
+	CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
+		*(float*)(step->m_payload + 4), baseObj, step->m_graphId, work + 1, work + 2, work + 3,
+		(float*)(step->m_payload + 8), (float*)(step->m_payload + 0xc));
+
+	pppCalcFrameShape__FPlRsRsRss(
+		*(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)step->m_stepValue * 4), *(short*)((u8*)work + 0x32),
+		*(short*)(work + 0xd), *(short*)(work + 0xc), *(short*)(step->m_payload + 0x2c));
+
+	for (u32 i = 0; i < (u32)step->m_payload[0x3a] + 1; i++) {
+		Vec* points = (Vec*)(u32)work[7];
+		int max = (int)step->m_payload[0x1e] - 2;
+
+		for (int j = max; (int)i <= j; j--) {
+			localA = points[j];
+			pppCopyVector__FR3Vec3Vec(&points[j + 1], &localA);
+		}
+
+		localB.x = FLOAT_80330dc0;
+		localB.y = FLOAT_80330dc0;
+		localB.z = work[0];
+
+		if (i == 0) {
+			PSMTXConcat(pppMngStPtr->m_matrix.value, baseObj->m_localMatrix.value, tempMtx);
+			work[8] = tempMtx[0][3];
+			work[9] = tempMtx[1][3];
+			work[10] = tempMtx[2][3];
+			PSMTXMultVec(tempMtx, &localB, points);
+		} else if (!emptyHistory) {
+			double t = (FLOAT_80330de0 / (float)((double)(int)(step->m_payload[0x3a] + 1) - DOUBLE_80330dd8)) *
+				(float)((double)(int)i - DOUBLE_80330dd8);
+			if (GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f((float)t, pppMngStPtr, charaMtx) == 0) {
+				emptyHistory = true;
+			} else {
+				PSMTXConcat(charaMtx, baseObj->m_localMatrix.value, charaMtx);
+				PSMTXMultVec(charaMtx, &localB, &points[i]);
+			}
+		}
+
+		localPos.x = work[8];
+		localPos.y = work[9];
+		localPos.z = work[10];
+		pppSubVector__FR3Vec3Vec3Vec(&localA, &points[i], &localPos);
+		PSVECScale(&localA, &localA, FLOAT_80330de4);
+
+		cyl.m_bottom = localPos;
+		cyl.m_direction = localA;
+		cyl.m_radius = FLOAT_80330de8;
+		cyl.m_height = FLOAT_80330dec;
+		cyl.m_radius2 = FLOAT_80330dec;
+		cyl.m_height2 = FLOAT_80330dec;
+
+		bool hit = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
+					   &MapMng, &cyl, &cyl.m_direction, 0xffffffff) != 0;
+		if (hit) {
+			CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A88), &points[i]);
+			work[0] = PSVECDistance(&points[i], (Vec*)(work + 8));
+		} else if (i == 0) {
+			work[0] += work[1];
+		}
+
+		if (i == 0) {
+			localB.z = work[0];
+			PSMTXMultVec(tempMtx, &localB, &points[0]);
+		}
+
+		if (step->m_payload[0x3b] == 0) {
+			pppHitCylinderSendSystem__FP9_pppMngStP3VecP3Vecff(
+				pppMngStPtr, (Vec*)(work + 8), &localA, pppMngStPtr->m_ownerScale * *(float*)(step->m_payload + 0x24),
+				*(float*)(step->m_payload + 0x20));
+		}
+
+		if (step->m_payload[0x3c] == 0) {
+			u8* hitFrame = (u8*)work + 0x2d;
+			bool canCreate = (u8)step->m_payload[0x1d] <= *hitFrame;
+			if (canCreate) {
+				*hitFrame = 0;
+			} else {
+				(*hitFrame)++;
+			}
+
+			if (canCreate && hit && step->m_arg3 != -1) {
+				u8* dataVals = *(u8**)((u8*)pppMngStPtr + 0xc8);
+				int created = 0;
+				if (dataVals != 0) {
+					created = pppCreatePObject__FP9_pppMngStP12_pppPDataVal(pppMngStPtr, dataVals + step->m_arg3 * 0x10);
+					*(void**)(created + 4) = pppYmLaser;
+				}
+
+				if (created != 0) {
+					*(Vec*)(created + *(int*)step->m_payload + 0x80) = points[i];
+					*(float*)(created + *(int*)step->m_payload + 0x84) += *(float*)(step->m_payload + 0x34);
+				}
+			}
+		}
+	}
+
+	if (emptyHistory) {
+		Vec* points = (Vec*)(u32)work[7];
+		for (int i = 0; i < (int)(u32)step->m_payload[0x1e]; i++) {
+			points[i] = points[0];
+		}
+	}
 }
 
 /*

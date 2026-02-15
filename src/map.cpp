@@ -1,7 +1,25 @@
 #include "ffcc/map.h"
+#include "ffcc/chunkfile.h"
+#include "ffcc/math.h"
+#include "ffcc/memory.h"
 #include "ffcc/maptexanim.h"
 
 extern "C" unsigned long UnkMaterialSetGetter(void*);
+extern "C" void __dla__FPv(void*);
+extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" float Spline1D__5CMathFifPfPfPf(CMath*, int, float, float*, float*, float*);
+extern "C" float Line1D__5CMathFifPfPf(CMath*, int, float, float*, float*);
+extern "C" void MakeSpline1Dtable__5CMathFiPfPfPf(CMath*, int, float*, float*, float*);
+extern CMath Math;
+
+static char s_map_cpp[] = "map.cpp";
+
+namespace {
+static inline unsigned char* Ptr(void* p, unsigned int offset)
+{
+    return reinterpret_cast<unsigned char*>(p) + offset;
+}
+}
 
 /*
  * --INFO--
@@ -10,7 +28,16 @@ extern "C" unsigned long UnkMaterialSetGetter(void*);
  */
 CMapKeyFrame::CMapKeyFrame()
 {
-	// TODO
+    *reinterpret_cast<int*>(Ptr(this, 0)) = 0;
+    *reinterpret_cast<int*>(Ptr(this, 4)) = 0;
+    *reinterpret_cast<int*>(Ptr(this, 8)) = 0;
+    *reinterpret_cast<int*>(Ptr(this, 0xC)) = 0;
+    *reinterpret_cast<int*>(Ptr(this, 0x10)) = 0;
+    *reinterpret_cast<int*>(Ptr(this, 0x14)) = 0;
+    *reinterpret_cast<int*>(Ptr(this, 0x18)) = 0;
+    *reinterpret_cast<int*>(Ptr(this, 0x1C)) = 0;
+    *reinterpret_cast<int*>(Ptr(this, 0x20)) = 0;
+    *reinterpret_cast<int*>(Ptr(this, 0x24)) = 0;
 }
 
 /*
@@ -20,7 +47,27 @@ CMapKeyFrame::CMapKeyFrame()
  */
 CMapKeyFrame::~CMapKeyFrame()
 {
-	// TODO
+    void*& junTable = *reinterpret_cast<void**>(Ptr(this, 0x18));
+    void*& keyFrame = *reinterpret_cast<void**>(Ptr(this, 0x1C));
+    void*& keyValue = *reinterpret_cast<void**>(Ptr(this, 0x20));
+    void*& splineTable = *reinterpret_cast<void**>(Ptr(this, 0x24));
+
+    if (junTable != 0) {
+        __dla__FPv(junTable);
+        junTable = 0;
+    }
+    if (keyFrame != 0) {
+        __dla__FPv(keyFrame);
+        keyFrame = 0;
+    }
+    if (keyValue != 0) {
+        __dla__FPv(keyValue);
+        keyValue = 0;
+    }
+    if (splineTable != 0) {
+        __dla__FPv(splineTable);
+        splineTable = 0;
+    }
 }
 
 /*
@@ -28,9 +75,21 @@ CMapKeyFrame::~CMapKeyFrame()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapKeyFrame::Get()
+float CMapKeyFrame::Get()
 {
-	// TODO
+    const int keyCount = static_cast<int>(*reinterpret_cast<unsigned char*>(Ptr(this, 2)));
+    const int currentFrame = *reinterpret_cast<int*>(Ptr(this, 8));
+    float* keyValue = reinterpret_cast<float*>(*reinterpret_cast<void**>(Ptr(this, 0x20)));
+    float* keyFrame = reinterpret_cast<float*>(*reinterpret_cast<void**>(Ptr(this, 0x1C)));
+    float* splineTable = reinterpret_cast<float*>(*reinterpret_cast<void**>(Ptr(this, 0x24)));
+
+    if (*reinterpret_cast<unsigned char*>(Ptr(this, 0)) == 1) {
+        return Spline1D__5CMathFifPfPfPf(&Math, keyCount - 1, static_cast<float>(currentFrame), keyValue, keyFrame, splineTable);
+    }
+    if (*reinterpret_cast<unsigned char*>(Ptr(this, 0)) == 0) {
+        return Line1D__5CMathFifPfPf(&Math, keyCount - 1, static_cast<float>(currentFrame), keyValue, keyFrame);
+    }
+    return 0.0f;
 }
 
 /*
@@ -79,12 +138,117 @@ void CPtrArray<CMaterial*>::SetGrow(int growCapacity)
 
 /*
  * --INFO--
+ * PAL Address: 0x80033d24
+ * PAL Size: 112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+bool CPtrArray<CMapLightHolder*>::Add(CMapLightHolder* item)
+{
+    bool success = setSize(m_numItems + 1);
+    if (success) {
+        m_items[m_numItems] = item;
+        m_numItems++;
+    }
+    return success;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80033d94
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+void CPtrArray<CMapLightHolder*>::RemoveAll()
+{
+    if (m_items != 0) {
+        __dla__FPv(m_items);
+        m_items = 0;
+    }
+    m_size = 0;
+    m_numItems = 0;
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-void CMapKeyFrame::Get(int&, int&, float&)
+template <>
+void CPtrArray<CMapLightHolder*>::SetStage(CMemory::CStage* stage)
 {
-	// TODO
+    *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(this) + 0x14) = stage;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+template <>
+int CPtrArray<CMapAnimRun*>::GetSize()
+{
+    return m_numItems;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+int CMapKeyFrame::Get(int& key0, int& key1, float& blend)
+{
+    const unsigned char mode = *reinterpret_cast<unsigned char*>(Ptr(this, 0));
+    const int keyCount = static_cast<int>(*reinterpret_cast<unsigned char*>(Ptr(this, 2)));
+    const int currentFrame = *reinterpret_cast<int*>(Ptr(this, 8));
+    unsigned char* junTable = *reinterpret_cast<unsigned char**>(Ptr(this, 0x18));
+    float* keyFrame = reinterpret_cast<float*>(*reinterpret_cast<void**>(Ptr(this, 0x1C)));
+    float* keyValue = reinterpret_cast<float*>(*reinterpret_cast<void**>(Ptr(this, 0x20)));
+    float* splineTable = reinterpret_cast<float*>(*reinterpret_cast<void**>(Ptr(this, 0x24)));
+
+    if (mode == 1) {
+        blend = Spline1D__5CMathFifPfPfPf(&Math, keyCount - 1, static_cast<float>(currentFrame), keyValue, keyFrame, splineTable);
+    } else if (mode == 0) {
+        blend = Line1D__5CMathFifPfPf(&Math, keyCount - 1, static_cast<float>(currentFrame), keyValue, keyFrame);
+    } else {
+        blend = 0.0f;
+        key0 = junTable[0];
+        key1 = key0;
+        return 0;
+    }
+
+    if (blend > 0.0f) {
+        const float junMax = static_cast<float>(*reinterpret_cast<unsigned char*>(Ptr(this, 1)) - 1);
+        if (blend < junMax) {
+            key0 = static_cast<int>(blend);
+            key1 = static_cast<int>(1.0f + blend);
+            blend = blend - static_cast<float>(key0);
+            key0 = junTable[key0];
+            if (blend == 0.0f) {
+                key1 = key0;
+                return 0;
+            }
+            key1 = junTable[key1];
+            return 1;
+        }
+
+        key0 = junTable[*reinterpret_cast<unsigned char*>(Ptr(this, 1)) - 1];
+        key1 = key0;
+        blend = 1.0f;
+        return 0;
+    }
+
+    key0 = junTable[0];
+    key1 = key0;
+    blend = 0.0f;
+    return 0;
 }
 
 /*
@@ -94,7 +258,27 @@ void CMapKeyFrame::Get(int&, int&, float&)
  */
 void CMapKeyFrame::Calc()
 {
-	// TODO
+    int& currentFrame = *reinterpret_cast<int*>(Ptr(this, 8));
+    const int startFrame = *reinterpret_cast<int*>(Ptr(this, 0xC));
+    const int endFrame = *reinterpret_cast<int*>(Ptr(this, 0x10));
+    unsigned char& loop = *reinterpret_cast<unsigned char*>(Ptr(this, 3));
+    unsigned char& isRun = *reinterpret_cast<unsigned char*>(Ptr(this, 4));
+
+    currentFrame++;
+    if (currentFrame <= endFrame) {
+        return;
+    }
+    if (startFrame == endFrame) {
+        isRun = 0;
+        return;
+    }
+    if (loop != 0) {
+        currentFrame = startFrame;
+        return;
+    }
+
+    currentFrame = endFrame;
+    isRun = 0;
 }
 
 /*
@@ -102,9 +286,9 @@ void CMapKeyFrame::Calc()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapKeyFrame::IsRun()
+int CMapKeyFrame::IsRun()
 {
-	// TODO
+    return *reinterpret_cast<unsigned char*>(Ptr(this, 4));
 }
 
 /*
@@ -112,9 +296,16 @@ void CMapKeyFrame::IsRun()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapKeyFrame::ReadJun(CChunkFile&, int)
+void CMapKeyFrame::ReadJun(CChunkFile& chunkFile, int count)
 {
-	// TODO
+    *reinterpret_cast<unsigned char*>(Ptr(this, 1)) = static_cast<unsigned char>(count);
+    *reinterpret_cast<void**>(Ptr(this, 0x18)) = __nwa__FUlPQ27CMemory6CStagePci(
+        static_cast<unsigned long>(*reinterpret_cast<unsigned char*>(Ptr(this, 1))),
+        *reinterpret_cast<CMemory::CStage**>(&MapMng), s_map_cpp, 0xC1);
+
+    for (int i = 0; i < static_cast<int>(*reinterpret_cast<unsigned char*>(Ptr(this, 1))); i++) {
+        (*reinterpret_cast<unsigned char**>(Ptr(this, 0x18)))[i] = chunkFile.Get1();
+    }
 }
 
 /*
@@ -122,9 +313,16 @@ void CMapKeyFrame::ReadJun(CChunkFile&, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapKeyFrame::ReadFrame(CChunkFile&, int)
+void CMapKeyFrame::ReadFrame(CChunkFile& chunkFile, int)
 {
-	// TODO
+    const int startFrame = static_cast<int>(chunkFile.Get4());
+    const int endFrame = static_cast<int>(chunkFile.Get4());
+
+    *reinterpret_cast<int*>(Ptr(this, 0xC)) = startFrame;
+    *reinterpret_cast<int*>(Ptr(this, 8)) = startFrame;
+    *reinterpret_cast<int*>(Ptr(this, 0x10)) = endFrame;
+    *reinterpret_cast<int*>(Ptr(this, 0x14)) = endFrame;
+    *reinterpret_cast<unsigned char*>(Ptr(this, 0)) = static_cast<unsigned char>(chunkFile.Get4());
 }
 
 /*
@@ -132,9 +330,31 @@ void CMapKeyFrame::ReadFrame(CChunkFile&, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapKeyFrame::ReadKey(CChunkFile&, int)
+void CMapKeyFrame::ReadKey(CChunkFile& chunkFile, int count)
 {
-	// TODO
+    *reinterpret_cast<unsigned char*>(Ptr(this, 4)) = 1;
+    *reinterpret_cast<unsigned char*>(Ptr(this, 2)) = static_cast<unsigned char>(count);
+    *reinterpret_cast<void**>(Ptr(this, 0x1C)) = __nwa__FUlPQ27CMemory6CStagePci(
+        static_cast<unsigned long>(static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(Ptr(this, 2))) << 2),
+        *reinterpret_cast<CMemory::CStage**>(&MapMng), s_map_cpp, 0xD5);
+    *reinterpret_cast<void**>(Ptr(this, 0x20)) = __nwa__FUlPQ27CMemory6CStagePci(
+        static_cast<unsigned long>(static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(Ptr(this, 2))) << 2),
+        *reinterpret_cast<CMemory::CStage**>(&MapMng), s_map_cpp, 0xD6);
+
+    for (int i = 0; i < static_cast<int>(*reinterpret_cast<unsigned char*>(Ptr(this, 2))); i++) {
+        reinterpret_cast<float*>(*reinterpret_cast<void**>(Ptr(this, 0x1C)))[i] = chunkFile.GetF4();
+        reinterpret_cast<float*>(*reinterpret_cast<void**>(Ptr(this, 0x20)))[i] = chunkFile.GetF4();
+    }
+
+    if (*reinterpret_cast<unsigned char*>(Ptr(this, 0)) == 1) {
+        *reinterpret_cast<void**>(Ptr(this, 0x24)) = __nwa__FUlPQ27CMemory6CStagePci(
+            static_cast<unsigned long>(static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(Ptr(this, 2))) << 2),
+            *reinterpret_cast<CMemory::CStage**>(&MapMng), s_map_cpp, 0xDE);
+        MakeSpline1Dtable__5CMathFiPfPfPf(&Math, static_cast<int>(*reinterpret_cast<unsigned char*>(Ptr(this, 2))) - 1,
+            reinterpret_cast<float*>(*reinterpret_cast<void**>(Ptr(this, 0x20))),
+            reinterpret_cast<float*>(*reinterpret_cast<void**>(Ptr(this, 0x1C))),
+            reinterpret_cast<float*>(*reinterpret_cast<void**>(Ptr(this, 0x24))));
+    }
 }
 
 /*

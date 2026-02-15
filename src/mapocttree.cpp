@@ -223,12 +223,29 @@ void COctTree::InsertLight(long, Vec&, float, unsigned long)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002da40
+ * PAL Size: 408b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void ClearShadow_r(COctNode*)
+void ClearShadow_r(COctNode* node)
 {
-	// TODO
+	unsigned char* nodeBytes = (unsigned char*)node;
+
+	if (*(unsigned short*)(nodeBytes + 0x3e) != 0) {
+		*(void**)(nodeBytes + 0x44) = 0;
+	}
+
+	COctNode** children = (COctNode**)(nodeBytes + 0x1c);
+	for (int i = 0; i < 8; i++) {
+		COctNode* child = children[i];
+		if (child == 0) {
+			return;
+		}
+		ClearShadow_r(child);
+	}
 }
 
 /*

@@ -1,4 +1,5 @@
 #include "ffcc/pppYmEnv.h"
+#include "ffcc/gobject.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/partMng.h"
 
@@ -36,14 +37,26 @@ struct CTextureLite {
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800e602c
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GetModelPtr(CGObject*)
+CChara::CModel* GetModelPtr(CGObject* gObject)
 {
-	// TODO
-}
+    if (gObject == 0) {
+        return 0;
+    }
 
+    CCharaPcs::CHandle* handle = gObject->m_charaModelHandle;
+    if (handle == 0) {
+        return 0;
+    }
+
+    return handle->m_model;
+}
 /*
  * --INFO--
  * Address:	TODO
@@ -56,14 +69,25 @@ void GetCharaNodeFrameMatrix(_pppMngSt*, float, float (*) [4])
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800e58c0
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CalcGraphValue(_pppPObject*, long, float&, float&, float&, float, float&, float&)
+void CalcGraphValue(_pppPObject* object, long graphId, float& value, float& velocity, float& acceleration, float addValue,
+                    float& velocityAdd, float& accelerationAdd)
 {
-	// TODO
-}
+    velocity += acceleration;
+    value += velocity;
 
+    if (graphId == object->m_graphId) {
+        value += addValue;
+        velocity += velocityAdd;
+        acceleration += accelerationAdd;
+    }
+}
 /*
  * --INFO--
  * PAL Address: 0x800e5870
@@ -88,24 +112,51 @@ void GetTextureFromRSD(int mapMeshIndex, _pppEnvSt* env)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800e5858
+ * PAL Size: 24b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GetCharaModelPtr(CCharaPcs::CHandle*)
+CChara::CModel* GetCharaModelPtr(CCharaPcs::CHandle* handle)
 {
-	// TODO
+    if (handle == 0) {
+        return 0;
+    }
+
+    return handle->m_model;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800e57f0
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GetCharaHandlePtr(CGObject*, long)
+CCharaPcs::CHandle* GetCharaHandlePtr(CGObject* gObject, long modelType)
 {
-	// TODO
-}
+    if (gObject == 0) {
+        return 0;
+    }
 
+    if (modelType == 1) {
+        if (gObject->m_weaponModelHandle != 0) {
+            return gObject->m_weaponModelHandle;
+        }
+    } else if (modelType < 1) {
+        if (modelType >= 0 && gObject->m_charaModelHandle != 0) {
+            return gObject->m_charaModelHandle;
+        }
+    } else if (modelType < 3 && gObject->m_shieldModelHandle != 0) {
+        return gObject->m_shieldModelHandle;
+    }
+
+    return 0;
+}
 /*
  * --INFO--
  * PAL Address: 0x800e5780

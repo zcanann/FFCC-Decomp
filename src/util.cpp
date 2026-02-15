@@ -472,22 +472,22 @@ void CUtil::BeginQuadEnv()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void GXSetTexCoordGen(void)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002428c
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CUtil::EndQuadEnv()
 {
-	// TODO
+    Mtx cameraMtx;
+    Mtx44 screenMtx;
+
+    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+    PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+    GXLoadPosMtxImm(cameraMtx, 0);
+    GXSetProjection(screenMtx, GX_PERSPECTIVE);
 }
 
 /*

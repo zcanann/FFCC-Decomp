@@ -3,7 +3,9 @@
 
 #include "ffcc/partMng.h"
 
-typedef _PARTICLE_DATA PYmMegaBirthShpTail2; // Size 0x140
+struct PYmMegaBirthShpTail2 : _PARTICLE_DATA
+{
+};
 
 struct pppYmMegaBirthShpTail2
 {

@@ -1,4 +1,5 @@
 #include "ffcc/menu_item.h"
+#include <string.h>
 
 typedef signed short s16;
 typedef unsigned char u8;
@@ -22,12 +23,127 @@ struct MenuItemOpenAnim {
 
 /*
  * --INFO--
- * Address:\tTODO
- * Size:\tTODO
+ * PAL Address: 0x8015aeb0
+ * PAL Size: 680b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::ItemInit()
 {
-    // TODO
+    s16* itemState = *(s16**)((u8*)this + 0x82C);
+    s16* itemList = *(s16**)((u8*)this + 0x850);
+    u8* itemListBytes = (u8*)itemList;
+    const float zero = 0.0f;
+    const float one = 1.0f;
+
+    memset(itemList, 0, 0x1008);
+
+    int entryBase = (int)itemList + 8;
+    for (int i = 0; i < 8; i++) {
+        *(float*)(entryBase + 0x14) = one;
+        *(float*)(entryBase + 0x54) = one;
+        *(float*)(entryBase + 0x94) = one;
+        *(float*)(entryBase + 0xD4) = one;
+        *(float*)(entryBase + 0x114) = one;
+        *(float*)(entryBase + 0x154) = one;
+        *(float*)(entryBase + 0x194) = one;
+        *(float*)(entryBase + 0x1D4) = one;
+        entryBase += 0x200;
+    }
+
+    *(int*)(itemListBytes + 0x24) = 0x2E;
+    *(s16*)(itemListBytes + 8) = 0x68;
+    *(s16*)(itemListBytes + 0xA) = 0x28;
+    *(s16*)(itemListBytes + 0xC) = 0x78;
+    *(s16*)(itemListBytes + 0xE) = 0x108;
+    *(float*)(itemListBytes + 0x10) = zero;
+    *(float*)(itemListBytes + 0x14) = zero;
+    *(float*)(itemListBytes + 0x1C) = one;
+    *(int*)(itemListBytes + 0x2C) = 5;
+    *(int*)(itemListBytes + 0x30) = 5;
+
+    *(int*)(itemListBytes + 0x64) = 0x47;
+    *(s16*)(itemListBytes + 0x48) = 0x50;
+    *(s16*)(itemListBytes + 0x4A) = 0xE;
+    *(s16*)(itemListBytes + 0x4C) = 0x30;
+    *(s16*)(itemListBytes + 0x4E) = 0x30;
+    *(float*)(itemListBytes + 0x50) = zero;
+    *(float*)(itemListBytes + 0x54) = zero;
+    *(float*)(itemListBytes + 0x5C) = one;
+    *(int*)(itemListBytes + 0x6C) = 0;
+    *(int*)(itemListBytes + 0x70) = 5;
+
+    *(int*)(itemListBytes + 0xA4) = 0x47;
+    *(s16*)(itemListBytes + 0x88) = 0x55;
+    *(s16*)(itemListBytes + 0x8C) = 0x30;
+    *(s16*)(itemListBytes + 0x8E) = 0x30;
+    *(s16*)(itemListBytes + 0x8A) = 0x150 - *(s16*)(itemListBytes + 0x8E);
+    *(float*)(itemListBytes + 0x90) = zero;
+    *(float*)(itemListBytes + 0x94) = zero;
+    *(float*)(itemListBytes + 0x9C) = one;
+    *(int*)(itemListBytes + 0xAC) = 0;
+    *(int*)(itemListBytes + 0xB0) = 5;
+
+    *(int*)(itemListBytes + 0xF4) = 2;
+    *(int*)(itemListBytes + 0xE4) = 0x2E;
+    *(s16*)(itemListBytes + 0xC8) = 0x50;
+    *(s16*)(itemListBytes + 0xCA) = 8;
+    *(s16*)(itemListBytes + 0xCC) = 0x48;
+    *(s16*)(itemListBytes + 0xCE) = 0x140;
+    *(float*)(itemListBytes + 0xD0) = zero;
+    *(float*)(itemListBytes + 0xD4) = zero;
+    *(int*)(itemListBytes + 0xEC) = 0;
+    *(int*)(itemListBytes + 0xF0) = 5;
+
+    s16 yOffset = 0;
+    s16 count = 4;
+    int offset = 0x100;
+    for (int i = 0; i < 4; i++) {
+        s16* itemA = (s16*)(itemListBytes + offset + 8);
+        itemA[0x16] = 0;
+        itemA[0x17] = 2;
+        itemA[0xE] = 0;
+        itemA[0xF] = 0x37;
+        count += 2;
+
+        s16 nextYOffset = yOffset + 0x20;
+        itemA[0] = *(s16*)(itemListBytes + 8) + 0x24;
+        itemA[1] = *(s16*)(itemListBytes + 0xA) + yOffset;
+        itemA[2] = 200;
+        itemA[3] = 0x28;
+        *(float*)(itemA + 4) = zero;
+        *(float*)(itemA + 6) = zero;
+        itemA[0x12] = 0;
+        itemA[0x13] = 7;
+        itemA[0x14] = 0;
+        itemA[0x15] = 5;
+
+        int offsetB = offset + 0x48;
+        offset += 0x80;
+        s16* itemB = (s16*)(itemListBytes + offsetB);
+        itemB[0x16] = 0;
+        itemB[0x17] = 2;
+        itemB[0xE] = 0;
+        itemB[0xF] = 0x37;
+        itemB[0] = *(s16*)(itemListBytes + 8) + 0x24;
+        itemB[1] = *(s16*)(itemListBytes + 0xA) + nextYOffset;
+        itemB[2] = 200;
+        itemB[3] = 0x28;
+        *(float*)(itemB + 4) = zero;
+        *(float*)(itemB + 6) = zero;
+        itemB[0x12] = 0;
+        itemB[0x13] = 7;
+        itemB[0x14] = 0;
+        itemB[0x15] = 5;
+
+        yOffset += 0x40;
+    }
+
+    itemList[0] = count;
+    itemState[0x13] = 0;
+    *((u8*)itemState + 0xB) = 1;
 }
 
 /*

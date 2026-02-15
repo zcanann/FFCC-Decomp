@@ -7,12 +7,14 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/graphic.h"
 #include "ffcc/p_light.h"
+#include "ffcc/materialman.h"
 #include "ffcc/pppGetRotMatrixXYZ.h"
 #include "ffcc/pppGetRotMatrixXZY.h"
 #include "ffcc/pppGetRotMatrixYXZ.h"
 #include "ffcc/pppGetRotMatrixYZX.h"
 #include "ffcc/pppGetRotMatrixZXY.h"
 #include "ffcc/pppGetRotMatrixZYX.h"
+#include "ffcc/gxfunc.h"
 
 static const float kPppZero = 0.0; // FLOAT_8032fddc
 static const float kPppOne = 1.0; // FLOAT_8032fdfc
@@ -35,6 +37,7 @@ extern "C" unsigned char DAT_8032ed89;
 extern "C" unsigned char DAT_8032ed8a;
 extern "C" unsigned char DAT_8032ed8b;
 extern "C" void SetPart__9CLightPcsFQ29CLightPcs6TARGETPvUc(CLightPcs*, int, void*, unsigned char);
+extern "C" void InitVtxFmt__12CMaterialManFi11_GXCompTypei11_GXCompTypei11_GXCompTypei(CMaterialMan*, int, _GXCompType, int, _GXCompType, int, _GXCompType, int);
 extern CPartMng PartMng;
 extern CLightPcs LightPcs;
 
@@ -1450,12 +1453,46 @@ void pppInitBlendMode()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 80054440
+ * PAL Size: 316b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppSetBlendMode(unsigned char)
+void pppSetBlendMode(unsigned char blendMode)
 {
-	// TODO
+	if ((blendMode != 0xFF) && (lbl_8032ED85 != blendMode))
+	{
+		lbl_8032ED85 = blendMode;
+		if (blendMode == 2)
+		{
+			_GXSetBlendMode((_GXBlendMode)3, (_GXBlendFactor)4, (_GXBlendFactor)1, (_GXLogicOp)5);
+			_GXSetAlphaCompare((_GXCompare)7, 0, (_GXAlphaOp)0, (_GXCompare)7, 0xFF);
+			GXSetZCompLoc((GXBool)1);
+		}
+		else if (blendMode < 2)
+		{
+			if (blendMode == 0)
+			{
+				_GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)5, (_GXLogicOp)5);
+				_GXSetAlphaCompare((_GXCompare)7, 0, (_GXAlphaOp)0, (_GXCompare)7, 0xFF);
+				GXSetZCompLoc((GXBool)1);
+			}
+			else
+			{
+				_GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)1, (_GXLogicOp)5);
+				_GXSetAlphaCompare((_GXCompare)7, 0, (_GXAlphaOp)0, (_GXCompare)7, 0xFF);
+				GXSetZCompLoc((GXBool)1);
+			}
+		}
+		else if (blendMode < 4)
+		{
+			_GXSetBlendMode((_GXBlendMode)0, (_GXBlendFactor)6, (_GXBlendFactor)5, (_GXLogicOp)5);
+			_GXSetAlphaCompare((_GXCompare)7, 0, (_GXAlphaOp)0, (_GXCompare)7, 0xFF);
+			GXSetZCompLoc((GXBool)1);
+		}
+	}
 }
 
 /*
@@ -1579,12 +1616,41 @@ void pppSetDrawEnv(pppCVECTOR* pppColor, pppFMATRIX* pppMtx, float depth, unsign
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 80054070
+ * PAL Size: 152b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppInitDrawEnv(unsigned char)
+void pppInitDrawEnv(unsigned char useZeroDepth)
 {
-	// TODO
+	InitVtxFmt__12CMaterialManFi11_GXCompTypei11_GXCompTypei11_GXCompTypei(
+		(CMaterialMan*)MaterialMan,
+		-1,
+		(_GXCompType)4,
+		0,
+		(_GXCompType)3,
+		0xE,
+		(_GXCompType)3,
+		10
+	);
+
+	DAT_8032ed84 = 0xFF;
+	lbl_8032ED85 = 0xFF;
+	DAT_8032ed86 = 0xFF;
+	DAT_8032ed88 = 0xFF;
+	DAT_8032ed89 = 0xFF;
+	DAT_8032ed8a = 0xFF;
+	DAT_8032ed8b = 0xFF;
+
+	FLOAT_8032ed8c = kPppOne;
+	if (useZeroDepth != 0)
+	{
+		FLOAT_8032ed8c = kPppZero;
+	}
+
+	LightPcs.SetNumDiffuse(0);
 }
 
 /*

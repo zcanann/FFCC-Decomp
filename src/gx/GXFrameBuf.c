@@ -326,7 +326,7 @@ f32 GXGetYScaleFactor(u16 efbHeight, u16 xfbHeight) {
 }
 
 u32 GXSetDispCopyYScale(f32 vscale) {
-    u8 enable;
+    GXData* gx;
     u32 iScale;
     u32 ht;
     u32 reg;
@@ -335,16 +335,15 @@ u32 GXSetDispCopyYScale(f32 vscale) {
 
     ASSERTMSGLINE(1559, vscale >= 1.0f, "GXSetDispCopyYScale: Vertical scale must be >= 1.0");
 
-    iScale = (u32) (256.0f / vscale) & 0x1FF;
-    enable = (iScale != 256);
+    iScale = (u32)(256.0f / vscale) & 0x1FF;
+    gx = __GXData;
 
-    reg = 0;
-    SET_REG_FIELD(1566, reg, 9, 0, iScale);
-    SET_REG_FIELD(1566, reg, 8, 24, 0x4E);
+    reg = (iScale & 0x1FF) | 0x4E000000;
     GX_WRITE_RAS_REG(reg);
-    __GXData->bpSentNot = 0;
-    SET_REG_FIELD(1571, __GXData->cpDisp, 1, 10, enable);
-    ht = (u32)GET_REG_FIELD(__GXData->cpDispSize, 10, 10) + 1;
+    gx->bpSentNot = 0;
+    gx->cpDisp = (gx->cpDisp & ~0x400) | ((iScale != 0x100) << 10);
+    ht = ((u32)gx->cpDispSize >> 10) & 0x3FF;
+    ht++;
     return __GXGetNumXfbLines(ht, iScale);
 }
 

@@ -684,6 +684,8 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
  */
 extern "C" void __sinit_file_cpp(void)
 {
+    extern void* __vt__8CManager[];
     extern void* __vt__5CFile[];
+    *(void**)&File = __vt__8CManager;
     *(void**)&File = __vt__5CFile;
 }

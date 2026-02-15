@@ -103,16 +103,16 @@ void CalcPolygonHeight(PYmMelt*, VERTEX_DATA* param_2, _GXColor* param_3, float 
     pointCount *= pointCount;
     savedY = ((Vec*)((u8*)pppMngStPtr + 0x58))->y;
 
-    worldBase.x = pppMngStPtr->m_matrix.value[0][3];
-    worldBase.y = pppMngStPtr->m_matrix.value[1][3] + param_2->m_collisionYOffset;
-    worldBase.z = pppMngStPtr->m_matrix.value[2][3];
-
     for (i = 0; i < pointCount; i++) {
         vertex = (YmMeltVertex*)param_3 + i;
         vertex->m_color[0] = param_3->r;
         vertex->m_color[1] = param_3->g;
         vertex->m_color[2] = param_3->b;
         vertex->m_color[3] = param_3->a;
+
+        worldBase.x = pppMngStPtr->m_matrix.value[0][3];
+        worldBase.y = pppMngStPtr->m_matrix.value[1][3] + param_2->m_collisionYOffset;
+        worldBase.z = pppMngStPtr->m_matrix.value[2][3];
 
         pppAddVector(vertex->m_position, vertex->m_position, worldBase);
 

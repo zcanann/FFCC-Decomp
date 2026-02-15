@@ -670,10 +670,12 @@ void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc sr
 }
 
 void GXSetNumTexGens(u8 nTexGens) {
+    u32 texGens = nTexGens;
+
     CHECK_GXBEGIN(1172, "GXSetNumTexGens");
-    __GXData->genMode = (__GXData->genMode & ~0xF) | nTexGens;
+    __GXData->genMode = (__GXData->genMode & ~0xF) | texGens;
     GX_WRITE_U8(0x10);
     GX_WRITE_U32(0x103F);
-    GX_WRITE_U32(nTexGens);
+    GX_WRITE_U32(texGens);
     __GXData->dirtyState |= 4;
 }

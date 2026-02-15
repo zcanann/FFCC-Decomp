@@ -233,7 +233,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
  */
 void CMenuPcs::TmpArtiCtrl()
 {
-	bool bVar1;
+	int iVar1;
 	float fVar2;
 	unsigned short uVar3;
 	unsigned int uVar4;
@@ -243,48 +243,42 @@ void CMenuPcs::TmpArtiCtrl()
 	int iVar8;
 	unsigned int uVar9;
 
-	bVar1 = false;
+	iVar1 = 0;
 	*(short *)(*(int *)((char *)this + 0x82c) + 0x32) = *(short *)(*(int *)((char *)this + 0x82c) + 0x30);
 	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
-		bVar1 = true;
+		iVar1 = 1;
 	}
 
-	if (bVar1) {
+	if (iVar1 != 0) {
 		uVar3 = 0;
 	} else {
 		uVar3 = Pad._8_2_;
 	}
 
 	if (uVar3 == 0) {
-		bVar1 = false;
-	} else if ((uVar3 & 0x20) == 0) {
-		if ((uVar3 & 0x40) == 0) {
-			if ((uVar3 & 0x100) == 0) {
-				if ((uVar3 & 0x200) != 0) {
-					*(unsigned char *)(*(int *)((char *)this + 0x82c) + 0xd) = 1;
-					Sound.PlaySe(3, 0x40, 0x7f, 0);
-					bVar1 = true;
-				} else {
-					bVar1 = false;
-				}
-			} else {
-				Sound.PlaySe(4, 0x40, 0x7f, 0);
-				bVar1 = false;
-			}
-		} else {
-			*(short *)(*(int *)((char *)this + 0x82c) + 0x1e) = -1;
-			Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-			bVar1 = true;
-		}
-	} else {
+		iVar1 = 0;
+	} else if ((uVar3 & 0x20) != 0) {
 		*(short *)(*(int *)((char *)this + 0x82c) + 0x1e) = 1;
 		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-		bVar1 = true;
+		iVar1 = 1;
+	} else if ((uVar3 & 0x40) != 0) {
+		*(short *)(*(int *)((char *)this + 0x82c) + 0x1e) = -1;
+		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+		iVar1 = 1;
+	} else if ((uVar3 & 0x100) != 0) {
+		Sound.PlaySe(4, 0x40, 0x7f, 0);
+		iVar1 = 0;
+	} else if ((uVar3 & 0x200) != 0) {
+		*(unsigned char *)(*(int *)((char *)this + 0x82c) + 0xd) = 1;
+		Sound.PlaySe(3, 0x40, 0x7f, 0);
+		iVar1 = 1;
+	} else {
+		iVar1 = 0;
 	}
 
 	fVar2 = 1.0f;
 	uVar4 = Game.game.m_scriptFoodBase[0];
-	if (bVar1) {
+	if (iVar1 != 0) {
 		iVar6 = *(int *)((char *)this + 0x850) + 8;
 		for (iVar7 = 0; iVar7 < **(short **)((char *)this + 0x850); iVar7 = iVar7 + 1) {
 			*(float *)(iVar6 + 0x10) = fVar2;

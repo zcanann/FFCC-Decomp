@@ -78,6 +78,19 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
     CUSBStreamData* usb = UsbStream(materialEditorPcs);
 
     switch (usb->m_packetCode) {
+    case 0x21:
+        U32At(materialEditorPcs, 0xE8) = 1;
+        ClearTextureData__18CMaterialEditorPcsFv(materialEditorPcs);
+        break;
+    case 0x22:
+        U32At(materialEditorPcs, 0xE8) = 0;
+        break;
+    case 3:
+        U32At(materialEditorPcs, 0x1C) = 1;
+        break;
+    case 4:
+        U32At(materialEditorPcs, 0x1C) = 0;
+        break;
     case 1:
         memcpy(Ptr(materialEditorPcs, 0xEC), usb->m_data, 0x120);
         for (int i = 0; i < 0x20; i++) {
@@ -85,12 +98,6 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         }
         memcpy(Ptr(materialEditorPcs, 0x16C), Ptr(materialEditorPcs, 0xEC), 0x30);
         DCStoreRange(Ptr(materialEditorPcs, 0xEC), 0x120);
-        break;
-    case 3:
-        U32At(materialEditorPcs, 0x1C) = 1;
-        break;
-    case 4:
-        U32At(materialEditorPcs, 0x1C) = 0;
         break;
     case 0x10: {
         u32** rsdItemRef = reinterpret_cast<u32**>(GetRsdItem__18CMaterialEditorPcsFv(materialEditorPcs));
@@ -162,13 +169,6 @@ extern "C" void SetUSBData__18CMaterialEditorPcsFv(CMaterialEditorPcs* materialE
         DCStoreRange(reinterpret_cast<void*>(rsdItem[5]), dataSize);
         break;
     }
-    case 0x21:
-        U32At(materialEditorPcs, 0xE8) = 1;
-        ClearTextureData__18CMaterialEditorPcsFv(materialEditorPcs);
-        break;
-    case 0x22:
-        U32At(materialEditorPcs, 0xE8) = 0;
-        break;
     case 0x31: {
         u32 size = usb->m_sizeBytes;
         u8* dstBuffer = reinterpret_cast<u8*>(_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(

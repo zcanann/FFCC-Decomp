@@ -76,7 +76,7 @@ void pppSRandCV(void* param1, void* param2, void* param3)
     int color_offset = *((int*)param2 + 1);
     u8* target_color;
     if (color_offset == -1) {
-        target_color = lbl_801EADC8;
+        target_colors = lbl_801EADC8;
     } else {
         target_color = (u8*)((char*)param1 + color_offset + 0x80);
     }

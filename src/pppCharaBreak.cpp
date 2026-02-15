@@ -5,6 +5,20 @@
 #include "dolphin/gx.h"
 #include "dolphin/mtx.h"
 
+#include <string.h>
+
+struct _pppMngStCharaBreak {
+    u8 _pad0[0xD8];
+    void* m_charaObj;
+};
+
+extern _pppMngStCharaBreak* pppMngStPtr;
+extern struct _pppEnvSt {
+    CMemory::CStage* m_stagePtr;
+} *pppEnvStPtr;
+extern s32 DAT_8032ed70;
+extern u8 DAT_8032ed78;
+extern char DAT_8032ec70[];
 extern char MaterialMan[];
 extern CGraphic Graphic;
 extern struct {
@@ -13,9 +27,18 @@ extern struct {
 } CameraPcs;
 extern char s_pppCharaBreak_cpp_801dd690[];
 extern float FLOAT_80332048;
+extern float FLOAT_8033204c;
+extern float FLOAT_80332050;
 extern void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void* materialMan, void* materialSet,
                                                                         unsigned int materialIdx, int, int);
 extern "C" {
+void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
+int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
+void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
+void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+void CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(void*, void*, void*, void*, unsigned long, unsigned long);
+void ReWriteDisplayList__5CUtilFPvUlUl(void*, void*, unsigned long, unsigned long);
+int GetNumPolygonFromDL__5CUtilFPvUl(void*, void*);
 void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
@@ -306,9 +329,169 @@ void pppDestructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameCharaBreak(pppCharaBreak*, CharaBreakUnkB*, CharaBreakUnkC*)
+void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBreakUnkC* data)
 {
-	// TODO
+    u8* work;
+    int model;
+    void* handle;
+    u8* payload;
+    u8* mesh;
+    u32 meshCount;
+    u32 i;
+
+    if (DAT_8032ed70 != 0) {
+        return;
+    }
+
+    work = (u8*)charaBreak + 0x80 + data->m_serializedDataOffsets[2];
+    if (*(u32*)(work + 0x44) == 0) {
+        return;
+    }
+
+    handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
+    model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    *(u32*)(work + 0x40) = model;
+
+    CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf((float)*(s32*)((u8*)step + 4),
+                                                 charaBreak,
+                                                 *(s32*)step,
+                                                 (float*)(work + 4),
+                                                 (float*)(work + 8),
+                                                 (float*)(work + 0xC),
+                                                 (float*)((u8*)step + 8),
+                                                 (float*)((u8*)step + 0xC));
+
+    payload = *(u8**)((u8*)step + 0x14);
+    CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(*(float*)(payload + 0x14),
+                                                 charaBreak,
+                                                 *(s32*)step,
+                                                 (float*)(work + 0x10),
+                                                 (float*)(work + 0x14),
+                                                 (float*)(work + 0x18),
+                                                 (float*)(payload + 0x18),
+                                                 (float*)(payload + 0x1C));
+
+    *(u32*)(model + 0xE4) = (u32)work;
+    *(u32*)(model + 0xE8) = (u32)step;
+    *(u32*)(model + 0xF4) = (u32)CharaBreak_BeforeMeshLockEnvCallback__FPQ26CChara6CModelPvPvi;
+    *(u32*)(model + 0xFC) = (u32)CharaBreak_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f;
+    *(u32*)(model + 0x104) = (u32)CharaBreak_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f;
+    *(u32*)(model + 0xEC) = (u32)CharaBreak_BeforeCalcMatrixCallback__FPQ26CChara6CModelPvPv;
+
+    if (*(s32*)step == *(s32*)charaBreak) {
+        if (*(float*)(payload + 4) == FLOAT_80332048 && *(float*)(payload + 8) == FLOAT_80332048 &&
+            *(float*)(payload + 0xC) == FLOAT_80332048) {
+            *(float*)(payload + 4) = FLOAT_8033204c;
+            *(float*)(payload + 8) = FLOAT_80332048;
+            *(float*)(payload + 0xC) = FLOAT_80332048;
+        } else {
+            PSVECNormalize((Vec*)(payload + 4), (Vec*)(payload + 4));
+        }
+    }
+
+    mesh = *(u8**)(model + 0xAC);
+    meshCount = *(u32*)(*(u8**)(model + 0xA4) + 0xC);
+
+    if (*(u32*)(work + 0x1C) == 0) {
+        *(float*)(work + 0x3C) = FLOAT_80332050;
+        *(u32*)(work + 0x1C) = (u32)pppMemAlloc__FUlPQ27CMemory6CStagePci(meshCount << 2, pppEnvStPtr->m_stagePtr,
+                                                                            s_pppCharaBreak_cpp_801dd690, 0x3D0);
+        if (*(u32*)(work + 0x1C) == 0) {
+            goto fail;
+        }
+
+        for (i = 0; i < meshCount; i++) {
+            *(u32*)(*(u32*)(work + 0x1C) + (i << 2)) = 0;
+        }
+
+        for (i = 0; i < meshCount; i++) {
+            int meshRef = *(u32*)(mesh + 8);
+            if (strcmp((char*)meshRef, "") == 0) {
+                CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(
+                    DAT_8032ec70,
+                    (void*)(work + 0x20),
+                    (void*)(work + 0x30),
+                    *(void**)(mesh + 0x10),
+                    *(u32*)(meshRef + 0x14),
+                    *(u32*)(*(u32*)(model + 0xA4) + 0x34));
+            }
+
+            *(u32*)(*(u32*)(work + 0x1C) + (i << 2)) =
+                (u32)pppMemAlloc__FUlPQ27CMemory6CStagePci(*(u32*)(meshRef + 0x4C) << 2, pppEnvStPtr->m_stagePtr,
+                                                            s_pppCharaBreak_cpp_801dd690, 0x3E9);
+            if (*(u32*)(*(u32*)(work + 0x1C) + (i << 2)) == 0) {
+                goto fail;
+            }
+
+            {
+                int displayListCount = *(s32*)(meshRef + 0x4C);
+                int* dlEntries = *(int**)(*(u32*)(work + 0x1C) + (i << 2));
+                for (int dl = 0; dl < displayListCount; dl++) {
+                    dlEntries[dl] = 0;
+                }
+            }
+
+            {
+                int displayListCount = *(s32*)(meshRef + 0x4C);
+                u8* displayList = *(u8**)(meshRef + 0x50);
+                int* dlEntries = (int*)(*(u32*)(*(u32*)(work + 0x1C) + (i << 2)) + ((displayListCount - 1) << 2));
+                for (int dl = displayListCount - 1; dl >= 0; dl--) {
+                    int dlPair = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(0x10, pppEnvStPtr->m_stagePtr,
+                                                                             s_pppCharaBreak_cpp_801dd690, 0x3FC);
+                    *dlEntries = dlPair;
+                    if (dlPair == 0) {
+                        goto fail;
+                    }
+
+                    *(u32*)(dlPair + 0) = 0;
+                    *(u32*)(dlPair + 4) = *(u32*)(displayList + 4);
+                    *(u32*)(dlPair + 0xC) = 0;
+
+                    *(u32*)(dlPair + 0) = (u32)pppMemAlloc__FUlPQ27CMemory6CStagePci(*(u32*)(displayList + 4),
+                                                                                       pppEnvStPtr->m_stagePtr,
+                                                                                       s_pppCharaBreak_cpp_801dd690,
+                                                                                       0x40B);
+                    if (*(u32*)(dlPair + 0) == 0) {
+                        goto fail;
+                    }
+
+                    memcpy(*(void**)dlPair, *(void**)displayList, *(u32*)(displayList + 4));
+                    ReWriteDisplayList__5CUtilFPvUlUl(DAT_8032ec70, *(void**)dlPair, *(u32*)(displayList + 4), 1);
+
+                    *(u16*)(dlPair + 8) = (u16)GetNumPolygonFromDL__5CUtilFPvUl(DAT_8032ec70, *(void**)dlPair);
+                    *(u32*)(dlPair + 0xC) = (u32)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+                        *(u16*)(dlPair + 8) * 0x34, pppEnvStPtr->m_stagePtr, s_pppCharaBreak_cpp_801dd690, 0x423);
+                    if (*(u32*)(dlPair + 0xC) == 0) {
+                        goto fail;
+                    }
+
+                    CreatePolygon((POLYGON_DATA*)*(u32*)(dlPair + 0xC), *(void**)displayList, *(u32*)(displayList + 4),
+                                  (CChara::CModel*)model, (CChara::CMesh*)mesh);
+                    InitPolygonParameter((PCharaBreak*)step, (VCharaBreak*)work, (POLYGON_DATA*)*(u32*)(dlPair + 0xC),
+                                         *(u16*)(dlPair + 8), (CChara::CModel*)model, (CChara::CMesh*)mesh);
+
+                    dlEntries--;
+                    displayList += 0xC;
+                }
+            }
+
+            mesh += 0x14;
+        }
+    }
+
+    if (DAT_8032ed78 == 0) {
+        UpdatePolygonData((PCharaBreak*)step, (VCharaBreak*)work, (CChara::CModel*)model);
+    }
+    return;
+
+fail:
+    *(u32*)(work + 0x44) = 0;
+    *(u32*)(model + 0xE4) = 0;
+    *(u32*)(model + 0xE8) = 0;
+    *(u32*)(model + 0xF4) = 0;
+    *(u32*)(model + 0xFC) = 0;
+    *(u32*)(model + 0x104) = 0;
+    *(u32*)(model + 0xEC) = 0;
 }
 
 /*

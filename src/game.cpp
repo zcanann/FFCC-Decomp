@@ -5,6 +5,10 @@
 #include "ffcc/vector.h"
 #include "ffcc/p_dbgmenu.h"
 
+#include <dolphin/os/OSMemory.h>
+#include <dolphin/os/OSRtc.h>
+#include <string.h>
+
 extern "C" {
 void Quit__12CFlatRuntimeFv(void*);
 void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
@@ -24,6 +28,21 @@ void Quit__10CCameraPcsFv(void*);
 void createLoad__9CSoundPcsFv(void*);
 void createLoad__9CCharaPcsFv(void*);
 void createLoad__8CPartPcsFv(void*);
+void Init__10CCameraPcsFv(void*);
+void Init__11CGraphicPcsFv(void*);
+void Init__6CCharaFv(void*);
+void Init__9CLightPcsFv(void*);
+void Init__9CCharaPcsFv(void*);
+void Init__7CMapPcsFv(void*);
+void Init__18CMaterialEditorPcsFv(void*);
+void Init__14CFunnyShapePcsFv(void*);
+void Init__7CUSBPcsFv(void*);
+void Init__8CMenuPcsFv(void*);
+void Init__7CGbaPcsFv(void*);
+void Init__6CMcPcsFv(void*);
+void Init__11CDbgMenuPcsFv(void*);
+void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
+void Init__12CFlatRuntimeFv(void*);
 void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 unsigned char CFlat[];
 unsigned char McPcs[];
@@ -46,6 +65,8 @@ static const float FLOAT_8032f688 = 1.0E+10;
 static const float FLOAT_8032f68c = -1.0E+10;
 static const float FLOAT_8032f690 = 0.0;    
 static const float FLOAT_8032f694 = 0.001;
+static const char s_mainStageName[] = "game_main";
+static const char s_debugStageName[] = "game_debug";
 
 // Uninitialized
 static float FLOAT_8032ec40;
@@ -72,12 +93,60 @@ CGame::~CGame()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001600c
+ * PAL Size: 476b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::Init()
 {
-	// TODO
+    u32 progressiveMode = OSGetProgressiveMode();
+
+    if (progressiveMode == 3) {
+        m_gameWork.m_languageId = 5;
+    } else if (progressiveMode < 3) {
+        if (progressiveMode == 1) {
+            m_gameWork.m_languageId = 2;
+        } else if (progressiveMode != 0) {
+            m_gameWork.m_languageId = 4;
+        } else {
+            m_gameWork.m_languageId = 1;
+        }
+    } else if ((progressiveMode < 5) && (progressiveMode != 5)) {
+        m_gameWork.m_languageId = 3;
+    } else {
+        m_gameWork.m_languageId = 1;
+    }
+
+    Init__10CCameraPcsFv(&CameraPcs);
+    Init__11CGraphicPcsFv(GraphicsPcs);
+    Init__6CCharaFv(Chara);
+    Init__9CLightPcsFv(LightPcs);
+    Init__9CCharaPcsFv(&CharaPcs);
+    Init__7CMapPcsFv(MapPcs);
+    Init__18CMaterialEditorPcsFv(MaterialEditorPcs);
+    Init__14CFunnyShapePcsFv(FunnyShapePcs);
+    Init__7CUSBPcsFv(USBPcs);
+    Init__8CMenuPcsFv(MenuPcs);
+    Init__7CGbaPcsFv(&GbaPcs);
+    Init__6CMcPcsFv(McPcs);
+    Init__11CDbgMenuPcsFv(&DbgMenuPcs);
+
+    m_mainStage = (CMemory::CStage*)CreateStage__7CMemoryFUlPci(&Memory, 0x106000, s_mainStageName, 0);
+    if (OSGetConsoleSimulatedMemSize() == 0x3000000) {
+        m_debugStage = (CMemory::CStage*)CreateStage__7CMemoryFUlPci(&Memory, 0x220000, s_debugStageName, 1);
+    }
+
+    m_sceneId = 4;
+    m_mapId = 3;
+    m_mapVariant = 0;
+    memset(m_currentScriptName, 0, sizeof(m_currentScriptName));
+    memset(m_startScriptName, 0, sizeof(m_startScriptName));
+    m_frameCounterEnable = 1;
+    Init__12CFlatRuntimeFv(CFlat);
+    unkFloat_0xca10 = FLOAT_8032f694;
 }
 
 /*
@@ -649,12 +718,32 @@ const char* CGame::GetLangString()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800b9928
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::SetNextScript(CGame::CNextScript* nextScript)
 { 
-	nextScript->m_flags = 1;
+    memcpy(&m_nextScript, nextScript, sizeof(CNextScript));
+    m_newGameFlag = 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800b91a4
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGame::CGameWork::ClearEvtWork()
+{
+    memset(m_eventFlags, 0, sizeof(m_eventFlags));
+    memset(m_eventWork, 0, sizeof(m_eventWork));
 }
 
 /*

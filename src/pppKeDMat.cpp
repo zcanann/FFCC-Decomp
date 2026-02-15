@@ -13,10 +13,11 @@
  */
 void pppKeDMatDraw(_pppPObject* pObject, void*, _pppCtrlTable* ctrlTable)
 {
-    unsigned int targetOffset = *(unsigned int*)(*(char**)((char*)ctrlTable + 0xC) + 4) + 0x80;
-    pppFMATRIX* targetMatrix = (pppFMATRIX*)((char*)pObject + targetOffset);
-    pppFMATRIX* resultMatrix = (pppFMATRIX*)((char*)pObject + 0x40);
+    int targetOffset = *(int*)(*(char**)((char*)ctrlTable + 0xC) + 4);
+    char* object = (char*)pObject;
+    pppFMATRIX* resultMatrix = (pppFMATRIX*)(object + 0x40);
+    pppFMATRIX* targetMatrix = (pppFMATRIX*)(object + targetOffset + 0x80);
 
-    pppMulMatrix(*resultMatrix, *(pppFMATRIX*)&ppvWorldMatrix, *(pppFMATRIX*)((char*)pObject + 0x10));
+    pppMulMatrix(*resultMatrix, *(pppFMATRIX*)&ppvWorldMatrix, *(pppFMATRIX*)(object + 0x10));
     pppCopyMatrix(*targetMatrix, *resultMatrix);
 }

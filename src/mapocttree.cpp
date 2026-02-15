@@ -1,5 +1,8 @@
 #include "ffcc/mapocttree.h"
+#include "ffcc/chunkfile.h"
+#include "ffcc/map.h"
 #include "ffcc/maphit.h"
+#include "ffcc/memory.h"
 #include "ffcc/materialman.h"
 
 extern float lbl_8032F96C;
@@ -14,6 +17,23 @@ static int s_insertShadowDepth;
 
 extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
+extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" void __ct__8COctNodeFv(void*);
+extern "C" void* __construct_new_array(void*, void*, void*, unsigned long, unsigned long);
+
+static char s_mapocttree_cpp[] = "mapocttree.cpp";
+
+namespace {
+static inline unsigned char* Ptr(void* ptr, unsigned int offset)
+{
+    return reinterpret_cast<unsigned char*>(ptr) + offset;
+}
+
+static inline COctNode* GetMapObjByIndex(unsigned short index)
+{
+    return reinterpret_cast<COctNode*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x960 + (index * 0xF0));
+}
+}
 
 /*
  * --INFO--
@@ -93,12 +113,118 @@ extern "C" COctTree* dtor_8002F384(COctTree* octTree, short param_2)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002ef9c
+ * PAL Size: 952b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void COctTree::ReadOtmOctTree(CChunkFile&)
+void COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
 {
-	// TODO
+    CChunkFile::CChunk chunk;
+
+    *Ptr(this, 1) = 0;
+    chunkFile.PushChunk();
+
+    for (;;) {
+        if (!chunkFile.GetNextChunk(chunk)) {
+            chunkFile.PopChunk();
+            return;
+        }
+
+        if (chunk.m_id == 'OBJN') {
+            unsigned short objIndex = chunkFile.Get2();
+            *reinterpret_cast<void**>(Ptr(this, 8)) = GetMapObjByIndex(objIndex);
+
+            unsigned char* mapObj = *reinterpret_cast<unsigned char**>(Ptr(this, 8));
+            if (mapObj[0x1E] == 4) {
+                mapObj[0x15] = 0xFF;
+                mapObj[0x14] = 0xFF;
+                mapObj[0x22] = 0;
+            } else if (mapObj[0x1E] == 3) {
+                mapObj[0x22] = 0;
+            }
+            continue;
+        }
+
+        if (chunk.m_id == 'NODN') {
+            unsigned short nodeCount = chunkFile.Get2();
+            *reinterpret_cast<unsigned short*>(Ptr(this, 2)) = nodeCount;
+            void* rootNode = __nwa__FUlPQ27CMemory6CStagePci(
+                nodeCount * 0x4C + 0x10, *reinterpret_cast<CMemory::CStage**>(&MapMng), s_mapocttree_cpp, 0x59);
+            *reinterpret_cast<void**>(Ptr(this, 4)) = __construct_new_array(
+                rootNode, reinterpret_cast<void*>(__ct__8COctNodeFv), 0, 0x4C, nodeCount);
+            continue;
+        }
+
+        if (chunk.m_id == 'INFO') {
+            *Ptr(this, 1) = chunkFile.Get1();
+            continue;
+        }
+
+        if (chunk.m_id == 'TYPE') {
+            *Ptr(this, 0) = static_cast<unsigned char>(chunkFile.Get2());
+            continue;
+        }
+
+        if (chunk.m_id != 'TREE') {
+            continue;
+        }
+
+        chunkFile.PushChunk();
+        while (chunkFile.GetNextChunk(chunk)) {
+            if (chunk.m_id != 'NODE') {
+                continue;
+            }
+
+            chunkFile.PushChunk();
+            COctNode* node = 0;
+            while (chunkFile.GetNextChunk(chunk)) {
+                if (chunk.m_id == 'OBJ ') {
+                    unsigned short nodeIndex = chunkFile.Get2();
+                    node = reinterpret_cast<COctNode*>(Ptr(*reinterpret_cast<void**>(Ptr(this, 4)), nodeIndex * 0x4C));
+
+                    *reinterpret_cast<unsigned short*>(Ptr(node, 0x3C)) = chunkFile.Get2();
+                    *reinterpret_cast<unsigned short*>(Ptr(node, 0x3E)) = chunkFile.Get2();
+                    continue;
+                }
+
+                if (node == 0) {
+                    continue;
+                }
+
+                if (chunk.m_id == 'BOND') {
+                    *reinterpret_cast<float*>(Ptr(node, 0x00)) = chunkFile.GetF4();
+                    *reinterpret_cast<float*>(Ptr(node, 0x04)) = chunkFile.GetF4();
+                    *reinterpret_cast<float*>(Ptr(node, 0x08)) = chunkFile.GetF4();
+                    *reinterpret_cast<float*>(Ptr(node, 0x0C)) = chunkFile.GetF4();
+                    *reinterpret_cast<float*>(Ptr(node, 0x10)) = chunkFile.GetF4();
+                    *reinterpret_cast<float*>(Ptr(node, 0x14)) = chunkFile.GetF4();
+                    continue;
+                }
+
+                if (chunk.m_id == 'CHLD') {
+                    int childCount = 0;
+
+                    for (int i = 0; i < 8; i++) {
+                        unsigned short childIndex = chunkFile.Get2();
+                        if (childIndex != 0xFFFF) {
+                            COctNode* child = reinterpret_cast<COctNode*>(Ptr(*reinterpret_cast<void**>(Ptr(this, 4)), childIndex * 0x4C));
+                            *reinterpret_cast<COctNode**>(Ptr(node, 0x1C + (childCount * 4))) = child;
+                            childCount++;
+                        }
+                    }
+
+                    for (int i = childCount; i < 8; i++) {
+                        *reinterpret_cast<COctNode**>(Ptr(node, 0x1C + (i * 4))) = 0;
+                    }
+                }
+            }
+            chunkFile.PopChunk();
+        }
+        chunkFile.PopChunk();
+    }
 }
 
 /*

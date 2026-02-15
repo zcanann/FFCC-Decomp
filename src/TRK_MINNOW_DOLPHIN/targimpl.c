@@ -441,11 +441,15 @@ DSError TRKTargetAccessFP(u32 firstRegister, u32 lastRegister, TRKBuffer* b,
          (current <= lastRegister) && (error == DS_NoError);
          current++, *registersLengthPtr += sizeof(f64)) {
         if (read) {
-            TRKPPCAccessFPRegister(&temp, current, read);
-            error = TRKAppendBuffer1_ui64(b, temp);
-        } else {
-            TRKReadBuffer1_ui64(b, &temp);
             error = TRKPPCAccessFPRegister(&temp, current, read);
+            if (error == DS_NoError) {
+                error = TRKAppendBuffer1_ui64(b, temp);
+            }
+        } else {
+            error = TRKReadBuffer1_ui64(b, &temp);
+            if (error == DS_NoError) {
+                error = TRKPPCAccessFPRegister(&temp, current, read);
+            }
         }
     }
 
@@ -1035,7 +1039,6 @@ DSError TRKTargetStepOutOfRange(u32 rangeStart, u32 rangeEnd, BOOL stepOver)
         error = DS_UnsupportedError;
     } else {
         gTRKStepStatus.type = DSSTEP_IntoRange;
-        // gTRKStepStatus.active = TRUE;
         gTRKStepStatus.rangeStart = rangeStart;
         gTRKStepStatus.rangeEnd   = rangeEnd;
         error                     = TRKTargetDoStep();

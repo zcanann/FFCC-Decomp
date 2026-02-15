@@ -222,48 +222,53 @@ CFunnyShapePcs::~CFunnyShapePcs()
 
 /*
  * --INFO--
- * Address: TODO
- * Size: TODO
+ * PAL Address: 0x8004e5e4
+ * PAL Size: 184b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFunnyShapePcs::Init()
 {
     unsigned char* self = Ptr(this, 0);
     const unsigned int clz0 = static_cast<unsigned int>(__cntlzw(0));
     const unsigned int clz1 = static_cast<unsigned int>(__cntlzw(1));
-    const unsigned int clz2 = static_cast<unsigned int>(__cntlzw(2));
     unsigned char level;
+    const f32 value24 = lbl_8032FD24;
+    const f32 value14 = lbl_8032FD14;
 
     self[0x8] = 0x7F;
     self[0x9] = 0x7F;
     self[0xA] = 0x7F;
-    self[0xB] = 0xFF;
-
     level = static_cast<unsigned char>(-static_cast<int>((clz0 >> 5) & 1)) & 0x3F;
+    self[0xB] = 0xFF;
     self[0xC] = level;
+    const unsigned int clz2 = static_cast<unsigned int>(__cntlzw(2));
     self[0xD] = level;
     self[0xE] = level;
     self[0xF] = 0xFF;
-    *reinterpret_cast<f32*>(self + 0x18) = lbl_8032FD24;
-    *reinterpret_cast<f32*>(self + 0x1C) = lbl_8032FD24;
-    *reinterpret_cast<f32*>(self + 0x20) = lbl_8032FD14;
+    *reinterpret_cast<f32*>(self + 0x18) = value24;
+    *reinterpret_cast<f32*>(self + 0x1C) = value24;
+    *reinterpret_cast<f32*>(self + 0x20) = value14;
 
     level = static_cast<unsigned char>(-static_cast<int>((clz1 >> 5) & 1)) & 0x3F;
     self[0x10] = level;
     self[0x11] = level;
     self[0x12] = level;
     self[0x13] = 0xFF;
-    *reinterpret_cast<f32*>(self + 0x24) = lbl_8032FD24;
-    *reinterpret_cast<f32*>(self + 0x28) = lbl_8032FD24;
-    *reinterpret_cast<f32*>(self + 0x2C) = lbl_8032FD14;
+    *reinterpret_cast<f32*>(self + 0x24) = value24;
+    *reinterpret_cast<f32*>(self + 0x28) = value24;
+    *reinterpret_cast<f32*>(self + 0x2C) = value14;
 
     level = static_cast<unsigned char>(-static_cast<int>((clz2 >> 5) & 1)) & 0x3F;
     self[0x14] = level;
     self[0x15] = level;
     self[0x16] = level;
     self[0x17] = 0xFF;
-    *reinterpret_cast<f32*>(self + 0x30) = lbl_8032FD24;
-    *reinterpret_cast<f32*>(self + 0x34) = lbl_8032FD24;
-    *reinterpret_cast<f32*>(self + 0x38) = lbl_8032FD14;
+    *reinterpret_cast<f32*>(self + 0x30) = value24;
+    *reinterpret_cast<f32*>(self + 0x34) = value24;
+    *reinterpret_cast<f32*>(self + 0x38) = value14;
 }
 
 /*

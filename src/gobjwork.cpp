@@ -1,4 +1,5 @@
 #include "ffcc/gobjwork.h"
+#include "ffcc/partyobj.h"
 #include "ffcc/p_game.h"
 #include <string.h>
 
@@ -290,12 +291,20 @@ void CCaravanWork::AddItem(int, int*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a1ee8
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::SetArtifact(int, int)
+void CCaravanWork::SetArtifact(int artifactIndex, int enabled)
 {
-	// TODO
+	unsigned short artifact = 0xFFFF;
+	if (enabled != 0) {
+		artifact = (short)artifactIndex + 0x9F;
+	}
+	m_artifacts[artifactIndex] = artifact;
 }
 
 /*
@@ -475,12 +484,16 @@ void CCaravanWork::CalcStatus()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009fa20
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCaravanWork::CanPlayerUseItem()
 {
-	// TODO
+	((CGPartyObj*)m_ownerObj)->canPlayerUseItem();
 }
 
 /*
@@ -615,12 +628,16 @@ void CCaravanWork::GetNextCmdListIdx(int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009f280
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCaravanWork::CanPlayerPutItem()
 {
-	// TODO
+	((CGPartyObj*)m_ownerObj)->canPlayerPutItem();
 }
 
 /*
@@ -635,12 +652,17 @@ void CCaravanWork::GetCurrentWeaponItem(int&, int&)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009f1d8
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::SetCurrentWeaponIdx(int)
+void CCaravanWork::SetCurrentWeaponIdx(int weaponIdx)
 {
-	// TODO
+	m_weaponIdx = (short)weaponIdx;
+	CheckAndResetCurrentWeaponIdx(weaponIdx);
 }
 
 /*

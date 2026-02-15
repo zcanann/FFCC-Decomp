@@ -18,8 +18,8 @@ struct Vec4d {
     float w;
 };
 
-extern void* __vt__8CManager;
-extern void* __vt__5CMath;
+extern void* __vt__8CManager[];
+extern void* __vt__5CMath[];
 
 /*
  * --INFO--
@@ -32,9 +32,9 @@ extern void* __vt__5CMath;
  */
 extern "C" void __sinit_math_cpp()
 {
-    char* const base = reinterpret_cast<char*>(&math);
-    *reinterpret_cast<void**>(base) = &__vt__8CManager;
-    *reinterpret_cast<void**>(base) = &__vt__5CMath;
+    volatile void** base = (volatile void**)&math;
+    *base = __vt__8CManager;
+    *base = __vt__5CMath;
 }
 
 /*

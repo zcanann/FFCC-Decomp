@@ -250,22 +250,119 @@ void CMenuPcs::CmdCtrlCur()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8014d0c4
+ * PAL Size: 432b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::CmdOpen0()
+unsigned int CMenuPcs::CmdOpen0()
 {
-	// TODO
+	u8* self = reinterpret_cast<u8*>(this);
+	u8* menuState = *reinterpret_cast<u8**>(self + 0x82c);
+
+	*reinterpret_cast<s16*>(menuState + 0x22) = static_cast<s16>(*reinterpret_cast<s16*>(menuState + 0x22) + 1);
+	s32 time = static_cast<s32>(*reinterpret_cast<s16*>(menuState + 0x22));
+	s32 selectedOffset = static_cast<s32>(*reinterpret_cast<s16*>(menuState + 0x26)) * 0x40 + 8;
+
+	if (time < 5) {
+		*reinterpret_cast<s16*>(*reinterpret_cast<u8**>(self + 0x850) + selectedOffset) =
+		    static_cast<s16>(*reinterpret_cast<s16*>(*reinterpret_cast<u8**>(self + 0x850) + selectedOffset) - 0x13);
+	}
+
+	s16* base = *reinterpret_cast<s16**>(self + 0x850);
+	s32 doneCount = 0;
+	s32 entryCount = static_cast<s32>(base[1]) - static_cast<s32>(base[0]);
+	s16* entry = base + base[0] * 0x20 + 4;
+
+	for (s32 i = 0; i < entryCount; i++) {
+		if (*reinterpret_cast<s32*>(entry + 0x12) <= time) {
+			if (time < (*reinterpret_cast<s32*>(entry + 0x12) + *reinterpret_cast<s32*>(entry + 0x14))) {
+				*reinterpret_cast<s32*>(entry + 0x10) = *reinterpret_cast<s32*>(entry + 0x10) + 1;
+				const f64 denom = static_cast<f64>(*reinterpret_cast<s32*>(entry + 0x14));
+				const f64 numer = static_cast<f64>(*reinterpret_cast<s32*>(entry + 0x10));
+
+				*reinterpret_cast<f32*>(entry + 8) = static_cast<f32>(numer / denom);
+				if ((*reinterpret_cast<u32*>(entry + 0x16) & 2) == 0) {
+					const f32 t = static_cast<f32>(numer / denom);
+					*reinterpret_cast<f32*>(entry + 0x18) =
+					    (*reinterpret_cast<f32*>(entry + 0x1c) - static_cast<f32>(entry[0])) * t;
+					*reinterpret_cast<f32*>(entry + 0x1a) =
+					    (*reinterpret_cast<f32*>(entry + 0x1e) - static_cast<f32>(entry[1])) * t;
+				}
+			} else {
+				doneCount++;
+				*reinterpret_cast<f32*>(entry + 8) = 1.0f;
+				*reinterpret_cast<f32*>(entry + 0x18) = 0.0f;
+				*reinterpret_cast<f32*>(entry + 0x1a) = 0.0f;
+			}
+		}
+		entry += 0x20;
+	}
+
+	return static_cast<unsigned int>(entryCount == doneCount);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8014cef8
+ * PAL Size: 460b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::CmdClose0()
+unsigned int CMenuPcs::CmdClose0()
 {
-	// TODO
+	u8* self = reinterpret_cast<u8*>(this);
+	u8* menuState = *reinterpret_cast<u8**>(self + 0x82c);
+
+	*reinterpret_cast<s16*>(menuState + 0x22) = static_cast<s16>(*reinterpret_cast<s16*>(menuState + 0x22) + 1);
+	s32 time = static_cast<s32>(*reinterpret_cast<s16*>(menuState + 0x22));
+	s32 selectedOffset = static_cast<s32>(*reinterpret_cast<s16*>(menuState + 0x26)) * 0x40 + 8;
+
+	if (time > 7) {
+		*reinterpret_cast<s16*>(*reinterpret_cast<u8**>(self + 0x850) + selectedOffset) =
+		    static_cast<s16>(*reinterpret_cast<s16*>(*reinterpret_cast<u8**>(self + 0x850) + selectedOffset) + 0x13);
+	}
+
+	s16* base = *reinterpret_cast<s16**>(self + 0x850);
+	s32 doneCount = 0;
+	s32 entryCount = static_cast<s32>(base[1]) - static_cast<s32>(base[0]);
+	s16* entry = base + base[0] * 0x20 + 4;
+
+	for (s32 i = 0; i < entryCount; i++) {
+		if (*reinterpret_cast<s32*>(entry + 0x12) <= time) {
+			if (time < (*reinterpret_cast<s32*>(entry + 0x12) + *reinterpret_cast<s32*>(entry + 0x14))) {
+				*reinterpret_cast<s32*>(entry + 0x10) = *reinterpret_cast<s32*>(entry + 0x10) + 1;
+				const f64 denom = static_cast<f64>(*reinterpret_cast<s32*>(entry + 0x14));
+				const f64 numer = static_cast<f64>(*reinterpret_cast<s32*>(entry + 0x10));
+
+				*reinterpret_cast<f32*>(entry + 8) = static_cast<f32>(1.0 - (numer / denom));
+				if ((*reinterpret_cast<u32*>(entry + 0x16) & 2) == 0) {
+					const f32 t = static_cast<f32>(1.0 - (numer / denom));
+					*reinterpret_cast<f32*>(entry + 0x18) =
+					    (*reinterpret_cast<f32*>(entry + 0x1c) - static_cast<f32>(entry[0])) * t;
+					*reinterpret_cast<f32*>(entry + 0x1a) =
+					    (*reinterpret_cast<f32*>(entry + 0x1e) - static_cast<f32>(entry[1])) * t;
+				}
+			} else {
+				doneCount++;
+				*reinterpret_cast<f32*>(entry + 8) = 0.0f;
+				*reinterpret_cast<f32*>(entry + 0x18) = 0.0f;
+				*reinterpret_cast<f32*>(entry + 0x1a) = 0.0f;
+			}
+		}
+		entry += 0x20;
+	}
+
+	if (entryCount == doneCount) {
+		*reinterpret_cast<s16*>(*reinterpret_cast<u8**>(self + 0x850) + selectedOffset) =
+		    *reinterpret_cast<s16*>(*reinterpret_cast<u8**>(self + 0x850) + 8);
+	}
+
+	return static_cast<unsigned int>(entryCount == doneCount);
 }
 
 /*

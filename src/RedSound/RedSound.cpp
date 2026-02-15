@@ -317,9 +317,9 @@ void CRedSound::ReentryMusicData(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::MusicStop(int)
+void CRedSound::MusicStop(int id)
 {
-	// TODO
+	CRedDriver_8032f4c0.MusicStop(id);
 }
 
 /*
@@ -327,9 +327,9 @@ void CRedSound::MusicStop(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::MusicPlay(int, int, int)
+void CRedSound::MusicPlay(int id, int vol, int fadeTime)
 {
-	// TODO
+	CRedDriver_8032f4c0.MusicPlay(id, vol, fadeTime);
 }
 
 /*
@@ -337,9 +337,9 @@ void CRedSound::MusicPlay(int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::MusicCrossPlay(int, int, int)
+void CRedSound::MusicCrossPlay(int id, int vol, int fadeTime)
 {
-	// TODO
+	CRedDriver_8032f4c0.MusicCrossPlay(id, vol, fadeTime);
 }
 
 /*
@@ -347,9 +347,9 @@ void CRedSound::MusicCrossPlay(int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::MusicNextPlay(int, int, int)
+void CRedSound::MusicNextPlay(int id, int vol, int fadeTime)
 {
-	// TODO
+	CRedDriver_8032f4c0.MusicNextPlay(id, vol, fadeTime);
 }
 
 /*
@@ -357,9 +357,9 @@ void CRedSound::MusicNextPlay(int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::MusicMasterVolume(int)
+void CRedSound::MusicMasterVolume(int volume)
 {
-	// TODO
+	CRedDriver_8032f4c0.MusicMasterVolume(volume);
 }
 
 /*
@@ -367,9 +367,9 @@ void CRedSound::MusicMasterVolume(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::MusicFadeOut(int, int)
+void CRedSound::MusicFadeOut(int id, int fadeTime)
 {
-	// TODO
+	CRedDriver_8032f4c0.MusicFadeOut(id, fadeTime);
 }
 
 /*
@@ -377,9 +377,9 @@ void CRedSound::MusicFadeOut(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::MusicVolume(int, int, int)
+void CRedSound::MusicVolume(int id, int volume, int fadeTime)
 {
-	// TODO
+	CRedDriver_8032f4c0.MusicVolume(id, volume, fadeTime);
 }
 
 /*
@@ -387,9 +387,9 @@ void CRedSound::MusicVolume(int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::SetMusicPhraseStop(int)
+void CRedSound::SetMusicPhraseStop(int id)
 {
-	// TODO
+	CRedDriver_8032f4c0.SetMusicPhraseStop(id);
 }
 
 /*

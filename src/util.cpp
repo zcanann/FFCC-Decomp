@@ -859,32 +859,193 @@ void CUtil::IsHasDrawFmtDL(unsigned char)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80022b80
+ * PAL Size: 292b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CUtil::ReWriteDisplayList(void*, unsigned long, unsigned long)
+void CUtil::ReWriteDisplayList(void* dlData, unsigned long dlSize, unsigned long copyFlags)
 {
-	// TODO
+	u8* data = (u8*)dlData;
+	u8* current = data;
+	u8* end = data + dlSize;
+
+	while (current < end) {
+		u8 cmd = *current;
+		u32 count = *(u16*)(current + 1);
+		u8 primitive = cmd & 0xF8;
+		bool isPrimitive = false;
+		current += 3;
+
+		switch (primitive) {
+			case 0x80:
+			case 0x90:
+			case 0x98:
+			case 0xA0:
+			case 0xA8:
+			case 0xB0:
+			case 0xB8:
+				isPrimitive = true;
+				break;
+		}
+
+		if (!isPrimitive) {
+			break;
+		}
+
+		while (count != 0) {
+			u16 value = *(u16*)current;
+
+			if ((copyFlags & 1) != 0) {
+				*(u16*)(current + 4) = value;
+			}
+			if ((copyFlags & 2) != 0) {
+				*(u16*)(current + 6) = value;
+			}
+
+			if ((cmd & 7) == 2) {
+				if ((copyFlags & 2) != 0) {
+					*(u16*)(current + 8) = value;
+				}
+				current += 10;
+			} else {
+				current += 8;
+			}
+
+			count--;
+		}
+	}
+
+	DCFlushRange(dlData, dlSize);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002295c
+ * PAL Size: 548b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CUtil::CalcBoundaryBoxQuantized(Vec*, Vec*, S16Vec*, unsigned long, unsigned long)
+void CUtil::CalcBoundaryBoxQuantized(Vec* minOut, Vec* maxOut, S16Vec* vecs, unsigned long count, unsigned long shift)
 {
-	// TODO
+	s16 minX = 0x7FFF;
+	s16 minY = 0x7FFF;
+	s16 minZ = 0x7FFF;
+	s16 maxX = -0x7FFF;
+	s16 maxY = -0x7FFF;
+	s16 maxZ = -0x7FFF;
+
+	for (unsigned long i = 0; i < count; i++) {
+		if (vecs->x < minX) {
+			minX = vecs->x;
+		}
+		if (vecs->y < minY) {
+			minY = vecs->y;
+		}
+		if (vecs->z < minZ) {
+			minZ = vecs->z;
+		}
+		if (vecs->x > maxX) {
+			maxX = vecs->x;
+		}
+		if (vecs->y > maxY) {
+			maxY = vecs->y;
+		}
+		if (vecs->z > maxZ) {
+			maxZ = vecs->z;
+		}
+		vecs++;
+	}
+
+	float scale = (float)(1 << shift);
+
+	minOut->x = (float)minX / scale;
+	minOut->y = (float)minY / scale;
+	minOut->z = (float)minZ / scale;
+	maxOut->x = (float)maxX / scale;
+	maxOut->y = (float)maxY / scale;
+	maxOut->z = (float)maxZ / scale;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80022818
+ * PAL Size: 324b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CUtil::GetNumPolygonFromDL(void*, unsigned long)
+int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
 {
-	// TODO
+	u8* data = (u8*)dlData;
+	int polygonCount = 0;
+	bool running = true;
+
+	while (running) {
+		u8 cmd = *data;
+		u16 count16 = *(u16*)(data + 1);
+		u32 count = count16;
+		u8 primitive = cmd & 0xF8;
+		bool isPrimitive = false;
+
+		data += 3;
+
+		switch (primitive) {
+			case 0x80:
+			case 0x90:
+			case 0x98:
+			case 0xA0:
+			case 0xA8:
+			case 0xB0:
+			case 0xB8:
+				isPrimitive = true;
+				break;
+		}
+
+		if (!isPrimitive) {
+			running = false;
+			continue;
+		}
+
+		if (primitive == 0x90) {
+			polygonCount += count / 3;
+		} else if (primitive == 0x98) {
+			polygonCount += (int)count - 2;
+		}
+
+		if ((cmd & 7) == 2) {
+			if (count != 0) {
+				u32 qwords = count16 >> 3;
+				while (qwords != 0) {
+					data += 0x50;
+					qwords--;
+				}
+				count &= 7;
+				while (count != 0) {
+					data += 10;
+					count--;
+				}
+			}
+		} else if (count != 0) {
+			u32 qwords = count16 >> 3;
+			while (qwords != 0) {
+				data += 0x40;
+				qwords--;
+			}
+			count &= 7;
+			while (count != 0) {
+				data += 8;
+				count--;
+			}
+		}
+	}
+
+	return polygonCount;
 }
 
 /*

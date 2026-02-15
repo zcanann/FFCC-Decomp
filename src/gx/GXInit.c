@@ -490,6 +490,8 @@ void __GXInitGX(void) {
     GXSetChanAmbColor(GX_COLOR1A1, black);
     GXSetChanMatColor(GX_COLOR1A1, white);
     GXInvalidateTexAll();
+    *(u32*)((u8*)__GXData + 0x2C8) = 0;
+    *(u32*)((u8*)__GXData + 0x2CC) = 0;
     GXSetTexRegionCallback((GXTexRegionCallback)__GXDefaultTexRegionCallback);
     GXSetTlutRegionCallback(__GXDefaultTlutRegionCallback);
 

@@ -23,14 +23,13 @@ extern "C" {
 void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, UnkC* param_2)
 {
 	Vec* dest;
-	Vec local_38;
-	Vec local_2c;
 	Vec local_20;
-	f32 fVar1;
+	Vec local_2c;
+	Vec local_38;
 
 	local_2c.x = *(f32*)((u8*)pppMngStPtr + 0x58);
 	local_2c.y = *(f32*)((u8*)pppMngStPtr + 0x5c);
-	dest = (Vec*)((u8*)(&pppYmTraceMove->field0_0x0 + 2) + *param_2->m_serializedDataOffsets);
+	dest = (Vec*)((u8*)pppYmTraceMove + 0x80 + *param_2->m_serializedDataOffsets);
 	local_2c.z = *(f32*)((u8*)pppMngStPtr + 0x60);
 	local_20.x = *(f32*)((u8*)pppMngStPtr + 0x68);
 	local_20.y = *(f32*)((u8*)pppMngStPtr + 0x6c);
@@ -40,10 +39,9 @@ void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, UnkC* param_2)
 	local_38.y = dest[1].z;
 	local_38.z = dest[2].x;
 	pppCopyVector__FR3Vec3Vec(dest, &local_38);
-	fVar1 = 0.0f;
 	dest[3].x = 0.0f;
-	dest[2].z = fVar1;
-	dest[2].y = fVar1;
+	dest[2].z = 0.0f;
+	dest[2].y = 0.0f;
 }
 
 /*
@@ -79,7 +77,7 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, UnkB* param_2, UnkC* pa
 	}
 
 	owner = *(u8**)((u8*)pppMngStPtr + 0xdc);
-	dest = (Vec*)((u8*)(&pppYmTraceMove->field0_0x0 + 2) + *param_3->m_serializedDataOffsets);
+	dest = (Vec*)((u8*)pppYmTraceMove + 0x80 + *param_3->m_serializedDataOffsets);
 	dest[2].z = dest[2].z + dest[3].x;
 	dest[2].y = dest[2].y + dest[2].z;
 
@@ -108,7 +106,7 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, UnkB* param_2, UnkC* pa
 		local_a4.z = *(f32*)((u8*)pppMngStPtr + 0x10);
 		pppSubVector__FR3Vec3Vec3Vec(&local_20, &local_b0, &local_a4);
 
-		local_20.y = local_20.y + *(f32*)param_2->m_payload;
+		local_20.y = local_20.y + param_2->m_payload;
 		local_5c.x = local_20.x;
 		local_5c.y = local_20.y;
 		local_5c.z = local_20.z;

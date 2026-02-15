@@ -4,10 +4,8 @@
 #include <dolphin/types.h>
 
 struct pppYmTraceMove {
-    union {
-        void* ptr;
-        s32 m_graphId;
-    } field0_0x0;
+    char pad[0x0c];
+    s32 m_graphId;
 };
 
 struct UnkB {
@@ -20,6 +18,7 @@ struct UnkB {
 };
 
 struct UnkC {
+    char pad[0x0c];
     s32* m_serializedDataOffsets;
 };
 

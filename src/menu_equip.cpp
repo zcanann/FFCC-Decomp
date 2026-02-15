@@ -1,11 +1,16 @@
 #include "ffcc/menu_equip.h"
 #include "ffcc/joybus.h"
+#include "ffcc/p_game.h"
 #include <string.h>
 
 typedef signed short s16;
 typedef unsigned char u8;
 
 extern "C" int GetItemType__8CMenuPcsFii(CMenuPcs*, int, int);
+extern "C" int EquipCtrlCur__8CMenuPcsFv(CMenuPcs*);
+extern "C" int EquipOpen0__8CMenuPcsFv(CMenuPcs*);
+extern "C" int EquipClose0__8CMenuPcsFv(CMenuPcs*);
+extern "C" void CmdInit1__8CMenuPcsFv(CMenuPcs*);
 
 extern float FLOAT_80332eb8;
 extern float FLOAT_80332ee0;
@@ -388,12 +393,66 @@ int CMenuPcs::EquipOpen()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015ceb4
+ * PAL Size: 596b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::EquipCtrl()
 {
-	// TODO
+	int state = 0;
+	u8* self = reinterpret_cast<u8*>(this);
+	u8* equipState = *reinterpret_cast<u8**>(self + 0x82c);
+	s16 mode;
+
+	*reinterpret_cast<s16*>(equipState + 0x32) = *reinterpret_cast<s16*>(equipState + 0x30);
+	mode = *reinterpret_cast<s16*>(equipState + 0x30);
+
+	if ((mode == 0) || ((mode != 0) && (*reinterpret_cast<s16*>(equipState + 0x12) == 1))) {
+		state = EquipCtrlCur__8CMenuPcsFv(this);
+	} else if ((mode == 1) && (*reinterpret_cast<s16*>(equipState + 0x12) == 0)) {
+		state = EquipOpen0__8CMenuPcsFv(this);
+		if (state != 0) {
+			state = 0;
+			*reinterpret_cast<s16*>(equipState + 0x12) = *reinterpret_cast<s16*>(equipState + 0x12) + 1;
+		}
+	} else if ((mode == 1) && (*reinterpret_cast<s16*>(equipState + 0x12) == 2) && (EquipClose0__8CMenuPcsFv(this) != 0)) {
+		*reinterpret_cast<s16*>(equipState + 0x12) = 0;
+		*reinterpret_cast<s16*>(equipState + 0x30) = 0;
+		*reinterpret_cast<s16*>(equipState + 0x22) = 0;
+		CmdInit1__8CMenuPcsFv(this);
+		state = 0;
+	}
+
+	if (state != 0) {
+		float fVar = FLOAT_80332ee0;
+		int menuData = *reinterpret_cast<int*>(self + 0x850);
+		s16 count = **reinterpret_cast<s16**>(self + 0x850);
+		int item = menuData + 8;
+
+		for (int i = 0; i < count; i++) {
+			*reinterpret_cast<float*>(item + 0x10) = fVar;
+			*reinterpret_cast<float*>(item + 0x14) = fVar;
+			item += 0x40;
+		}
+
+		u32 caravanWork = Game.game.m_scriptFoodBase[0];
+		u32 equipCount = static_cast<u32>(*reinterpret_cast<s16*>(caravanWork + 0xbaa));
+		int index = 0;
+		int offset = static_cast<int>(equipCount - 1) * 0x40;
+
+		if (static_cast<int>(equipCount - 1) >= 0) {
+			for (u32 i = 0; i < equipCount; i++) {
+				int slot = menuData + offset + 8;
+				*reinterpret_cast<int*>(slot + 0x24) = index;
+				*reinterpret_cast<int*>(slot + 0x28) = 3;
+				index++;
+				offset -= 0x40;
+			}
+		}
+	}
 }
 
 /*

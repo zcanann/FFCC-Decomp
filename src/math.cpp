@@ -282,144 +282,198 @@ void CBound::SetFrustum(Vec& viewPos, float (*viewMatrix)[4])
  */
 int CBound::CheckFrustum0(CBound& outBound)
 {
-    float* const in = reinterpret_cast<float*>(this);
-    float* const out = reinterpret_cast<float*>(&outBound);
-    Vec inVec;
-    Vec outVec;
-    out[0] = 3.40282347e38f;
-    out[1] = 3.40282347e38f;
-    out[2] = 3.40282347e38f;
-    out[3] = -3.40282347e38f;
-    out[4] = -3.40282347e38f;
-    out[5] = -3.40282347e38f;
+    float fVar1;
+    float fVar2;
+    unsigned int uVar3;
+    int iVar4;
+    unsigned int uVar5;
+    int iVar6;
+    unsigned int uVar7;
+    int iVar8;
+    double dVar9;
+    double dVar10;
+    float* param_1 = reinterpret_cast<float*>(this);
+    float* param_2 = reinterpret_cast<float*>(&outBound);
+    Vec local_48;
+    Vec local_3c;
 
-    if ((in[3] < s_f_vpos.x) || (in[4] < s_f_vpos.y) || (in[5] < s_f_vpos.z) || (s_f_vpos.x < in[0]) || (s_f_vpos.y < in[1]) ||
-        (s_f_vpos.z < in[2])) {
-        unsigned int andMask = 0xF;
-        unsigned int orMask = 0;
-
-        for (int i = 0; i < 2; ++i) {
-            inVec.x = in[(i == 0) ? 0 : 3];
-            for (int j = 0; j < 2; ++j) {
-                inVec.y = in[(j == 0) ? 1 : 4];
-                for (int k = 0; k < 2; ++k) {
-                    inVec.z = in[(k == 0) ? 2 : 5];
-                    PSMTXMultVec(s_f_lvmtx, &inVec, &outVec);
-
-                    if (out[0] < outVec.x) {
-                        outVec.x = out[0];
+    fVar2 = -3.40282347e38f;
+    fVar1 = 3.40282347e38f;
+    param_2[2] = 3.40282347e38f;
+    param_2[1] = fVar1;
+    *param_2 = fVar1;
+    param_2[5] = fVar2;
+    param_2[4] = fVar2;
+    param_2[3] = fVar2;
+    if ((((param_1[3] < s_f_vpos.x) || (param_1[4] < s_f_vpos.y)) || (param_1[5] < s_f_vpos.z)) ||
+        ((s_f_vpos.x < *param_1 || (s_f_vpos.y < param_1[1])) || (s_f_vpos.z < param_1[2]))) {
+        dVar10 = (double)0.0f;
+        uVar5 = 0xF;
+        uVar7 = 0;
+        iVar8 = 0;
+        do {
+            if (iVar8 == 0) {
+                local_3c.x = *param_1;
+            } else {
+                local_3c.x = param_1[3];
+            }
+            iVar6 = 0;
+            do {
+                if (iVar6 == 0) {
+                    local_3c.y = param_1[1];
+                } else {
+                    local_3c.y = param_1[4];
+                }
+                iVar4 = 0;
+                do {
+                    if (iVar4 == 0) {
+                        local_3c.z = param_1[2];
+                    } else {
+                        local_3c.z = param_1[5];
                     }
-                    out[0] = outVec.x;
-                    if (out[1] < outVec.y) {
-                        outVec.y = out[1];
+                    PSMTXMultVec(s_f_lvmtx, &local_3c, &local_48);
+                    fVar1 = local_48.x;
+                    if (*param_2 < local_48.x) {
+                        fVar1 = *param_2;
                     }
-                    out[1] = outVec.y;
-                    if (out[2] < outVec.z) {
-                        outVec.z = out[2];
+                    *param_2 = fVar1;
+                    fVar1 = local_48.y;
+                    if (param_2[1] < local_48.y) {
+                        fVar1 = param_2[1];
                     }
-                    out[2] = outVec.z;
-
-                    if (outVec.x < out[3]) {
-                        outVec.x = out[3];
+                    param_2[1] = fVar1;
+                    fVar1 = local_48.z;
+                    if (param_2[2] < local_48.z) {
+                        fVar1 = param_2[2];
                     }
-                    out[3] = outVec.x;
-                    if (outVec.y < out[4]) {
-                        outVec.y = out[4];
+                    param_2[2] = fVar1;
+                    fVar1 = local_48.x;
+                    if (local_48.x < param_2[3]) {
+                        fVar1 = param_2[3];
                     }
-                    out[4] = outVec.y;
-                    if (outVec.z < out[5]) {
-                        outVec.z = out[5];
+                    param_2[3] = fVar1;
+                    fVar1 = local_48.y;
+                    if (local_48.y < param_2[4]) {
+                        fVar1 = param_2[4];
                     }
-                    out[5] = outVec.z;
-
-                    const double z = (double)outVec.z;
-                    unsigned int code;
-                    if (z <= 0.0) {
-                        if ((double)outVec.x <= -z) {
-                            if (z <= (double)outVec.x) {
-                                code = 0;
+                    param_2[4] = fVar1;
+                    fVar1 = local_48.z;
+                    if (local_48.z < param_2[5]) {
+                        fVar1 = param_2[5];
+                    }
+                    param_2[5] = fVar1;
+                    dVar9 = (double)local_48.z;
+                    if (dVar9 <= dVar10) {
+                        if ((double)local_48.x <= -dVar9) {
+                            if (dVar9 <= (double)local_48.x) {
+                                uVar3 = 0;
                             } else {
-                                code = 2;
+                                uVar3 = 2;
                             }
                         } else {
-                            code = 1;
+                            uVar3 = 1;
                         }
-                        if ((double)outVec.y <= -z) {
-                            if ((double)outVec.y < z) {
-                                code |= 8;
+                        if ((double)local_48.y <= -dVar9) {
+                            if ((double)local_48.y < dVar9) {
+                                uVar3 = uVar3 | 8;
                             }
                         } else {
-                            code |= 4;
+                            uVar3 = uVar3 | 4;
                         }
                     } else {
-                        if ((double)outVec.x <= -z) {
-                            if (z <= (double)outVec.x) {
-                                code = 0x10;
+                        if ((double)local_48.x <= -dVar9) {
+                            if (dVar9 <= (double)local_48.x) {
+                                uVar3 = 0x10;
                             } else {
-                                code = 0x12;
+                                uVar3 = 0x12;
                             }
                         } else {
-                            code = 0x11;
+                            uVar3 = 0x11;
                         }
-                        if ((double)outVec.y <= -z) {
-                            if ((double)outVec.y < z) {
-                                code |= 0x18;
+                        if ((double)local_48.y <= -dVar9) {
+                            if ((double)local_48.y < dVar9) {
+                                uVar3 = uVar3 | 0x18;
                             }
                         } else {
-                            code |= 0x14;
+                            uVar3 = uVar3 | 0x14;
                         }
                     }
-
-                    andMask &= code;
-                    orMask |= code;
-                }
+                    iVar4 = iVar4 + 1;
+                    uVar5 = uVar5 & uVar3;
+                    uVar7 = uVar7 | uVar3;
+                } while (iVar4 < 2);
+                iVar6 = iVar6 + 1;
+            } while (iVar6 < 2);
+            iVar8 = iVar8 + 1;
+        } while (iVar8 < 2);
+        if (uVar5 == 0) {
+            uVar5 = (unsigned int)__cntlzw(uVar7);
+            iVar8 = (int)(uVar5 >> 5) + 1;
+        } else {
+            iVar8 = 0;
+        }
+    } else {
+        iVar8 = 0;
+        do {
+            if (iVar8 == 0) {
+                local_3c.x = *param_1;
+            } else {
+                local_3c.x = param_1[3];
             }
-        }
-
-        if (andMask == 0) {
-            return ((__cntlzw(orMask) >> 5) + 1);
-        }
-        return 0;
+            iVar6 = 0;
+            do {
+                if (iVar6 == 0) {
+                    local_3c.y = param_1[1];
+                } else {
+                    local_3c.y = param_1[4];
+                }
+                iVar4 = 0;
+                do {
+                    if (iVar4 == 0) {
+                        local_3c.z = param_1[2];
+                    } else {
+                        local_3c.z = param_1[5];
+                    }
+                    PSMTXMultVec(s_f_lvmtx, &local_3c, &local_48);
+                    fVar1 = local_48.x;
+                    if (*param_2 < local_48.x) {
+                        fVar1 = *param_2;
+                    }
+                    *param_2 = fVar1;
+                    fVar1 = local_48.y;
+                    if (param_2[1] < local_48.y) {
+                        fVar1 = param_2[1];
+                    }
+                    param_2[1] = fVar1;
+                    fVar1 = local_48.z;
+                    if (param_2[2] < local_48.z) {
+                        fVar1 = param_2[2];
+                    }
+                    param_2[2] = fVar1;
+                    fVar1 = local_48.x;
+                    if (local_48.x < param_2[3]) {
+                        fVar1 = param_2[3];
+                    }
+                    param_2[3] = fVar1;
+                    fVar1 = local_48.y;
+                    if (local_48.y < param_2[4]) {
+                        fVar1 = param_2[4];
+                    }
+                    param_2[4] = fVar1;
+                    fVar1 = local_48.z;
+                    if (local_48.z < param_2[5]) {
+                        fVar1 = param_2[5];
+                    }
+                    iVar4 = iVar4 + 1;
+                    param_2[5] = fVar1;
+                } while (iVar4 < 2);
+                iVar6 = iVar6 + 1;
+            } while (iVar6 < 2);
+            iVar8 = iVar8 + 1;
+        } while (iVar8 < 2);
+        iVar8 = 1;
     }
-
-    for (int i = 0; i < 2; ++i) {
-        inVec.x = in[(i == 0) ? 0 : 3];
-        for (int j = 0; j < 2; ++j) {
-            inVec.y = in[(j == 0) ? 1 : 4];
-            for (int k = 0; k < 2; ++k) {
-                inVec.z = in[(k == 0) ? 2 : 5];
-                PSMTXMultVec(s_f_lvmtx, &inVec, &outVec);
-
-                if (out[0] < outVec.x) {
-                    outVec.x = out[0];
-                }
-                out[0] = outVec.x;
-                if (out[1] < outVec.y) {
-                    outVec.y = out[1];
-                }
-                out[1] = outVec.y;
-                if (out[2] < outVec.z) {
-                    outVec.z = out[2];
-                }
-                out[2] = outVec.z;
-
-                if (outVec.x < out[3]) {
-                    outVec.x = out[3];
-                }
-                out[3] = outVec.x;
-                if (outVec.y < out[4]) {
-                    outVec.y = out[4];
-                }
-                out[4] = outVec.y;
-                if (outVec.z < out[5]) {
-                    outVec.z = out[5];
-                }
-                out[5] = outVec.z;
-            }
-        }
-    }
-
-    return 1;
+    return iVar8;
 }
 
 /*
@@ -433,81 +487,108 @@ int CBound::CheckFrustum0(CBound& outBound)
  */
 int CBound::CheckFrustum0(float farPlane)
 {
-    float* const in = reinterpret_cast<float*>(this);
-    Vec inVec;
-    Vec outVec;
+    unsigned int uVar1;
+    int iVar2;
+    unsigned int uVar3;
+    int iVar4;
+    unsigned int uVar5;
+    int iVar6;
+    double dVar7;
+    double dVar8;
+    double dVar9;
+    float* param_1 = reinterpret_cast<float*>(this);
+    Vec local_48;
+    Vec local_3c;
 
-    if ((in[3] < s_f_vpos.x) || (in[4] < s_f_vpos.y) || (in[5] < s_f_vpos.z) || (s_f_vpos.x < in[0]) || (s_f_vpos.y < in[1]) ||
-        (s_f_vpos.z < in[2])) {
-        double maxZ = -3.40282347e38;
-        unsigned int andMask = 0xF;
-        unsigned int orMask = 0;
-
-        for (int i = 0; i < 2; ++i) {
-            inVec.x = in[(i == 0) ? 0 : 3];
-            for (int j = 0; j < 2; ++j) {
-                inVec.y = in[(j == 0) ? 1 : 4];
-                for (int k = 0; k < 2; ++k) {
-                    inVec.z = in[(k == 0) ? 2 : 5];
-                    PSMTXMultVec(s_f_lvmtx, &inVec, &outVec);
-
-                    const double z = (double)outVec.z;
-                    if (maxZ < z) {
-                        maxZ = z;
+    if ((((param_1[3] < s_f_vpos.x) || (param_1[4] < s_f_vpos.y)) || (param_1[5] < s_f_vpos.z)) ||
+        ((s_f_vpos.x < *param_1 || (s_f_vpos.y < param_1[1])) || (s_f_vpos.z < param_1[2]))) {
+        dVar8 = (double)-3.40282347e38f;
+        dVar9 = (double)0.0f;
+        uVar3 = 0xF;
+        uVar5 = 0;
+        iVar6 = 0;
+        do {
+            if (iVar6 == 0) {
+                local_3c.x = *param_1;
+            } else {
+                local_3c.x = param_1[3];
+            }
+            iVar4 = 0;
+            do {
+                if (iVar4 == 0) {
+                    local_3c.y = param_1[1];
+                } else {
+                    local_3c.y = param_1[4];
+                }
+                iVar2 = 0;
+                do {
+                    if (iVar2 == 0) {
+                        local_3c.z = param_1[2];
+                    } else {
+                        local_3c.z = param_1[5];
                     }
-
-                    unsigned int code;
-                    if (z <= 0.0) {
-                        if ((double)outVec.x <= -z) {
-                            if (z <= (double)outVec.x) {
-                                code = 0;
+                    PSMTXMultVec(s_f_lvmtx, &local_3c, &local_48);
+                    dVar7 = (double)local_48.z;
+                    if (dVar8 < dVar7) {
+                        dVar8 = dVar7;
+                    }
+                    if (dVar7 <= dVar9) {
+                        if ((double)local_48.x <= -dVar7) {
+                            if (dVar7 <= (double)local_48.x) {
+                                uVar1 = 0;
                             } else {
-                                code = 2;
+                                uVar1 = 2;
                             }
                         } else {
-                            code = 1;
+                            uVar1 = 1;
                         }
-                        if ((double)outVec.y <= -z) {
-                            if ((double)outVec.y < z) {
-                                code |= 8;
+                        if ((double)local_48.y <= -dVar7) {
+                            if ((double)local_48.y < dVar7) {
+                                uVar1 = uVar1 | 8;
                             }
                         } else {
-                            code |= 4;
+                            uVar1 = uVar1 | 4;
                         }
                     } else {
-                        if ((double)outVec.x <= -z) {
-                            if (z <= (double)outVec.x) {
-                                code = 0x10;
+                        if ((double)local_48.x <= -dVar7) {
+                            if (dVar7 <= (double)local_48.x) {
+                                uVar1 = 0x10;
                             } else {
-                                code = 0x12;
+                                uVar1 = 0x12;
                             }
                         } else {
-                            code = 0x11;
+                            uVar1 = 0x11;
                         }
-                        if ((double)outVec.y <= -z) {
-                            if ((double)outVec.y < z) {
-                                code |= 0x18;
+                        if ((double)local_48.y <= -dVar7) {
+                            if ((double)local_48.y < dVar7) {
+                                uVar1 = uVar1 | 0x18;
                             }
                         } else {
-                            code |= 0x14;
+                            uVar1 = uVar1 | 0x14;
                         }
                     }
-
-                    andMask &= code;
-                    orMask |= code;
-                }
+                    iVar2 = iVar2 + 1;
+                    uVar3 = uVar3 & uVar1;
+                    uVar5 = uVar5 | uVar1;
+                } while (iVar2 < 2);
+                iVar4 = iVar4 + 1;
+            } while (iVar4 < 2);
+            iVar6 = iVar6 + 1;
+        } while (iVar6 < 2);
+        if ((double)farPlane <= dVar8) {
+            if (uVar3 == 0) {
+                uVar3 = (unsigned int)__cntlzw(uVar5);
+                iVar6 = (int)(uVar3 >> 5) + 1;
+            } else {
+                iVar6 = 0;
             }
+        } else {
+            iVar6 = 0;
         }
-
-        if ((double)farPlane <= maxZ) {
-            if (andMask == 0) {
-                return ((__cntlzw(orMask) >> 5) + 1);
-            }
-            return 0;
-        }
-        return 0;
+    } else {
+        iVar6 = 1;
     }
-    return 1;
+    return iVar6;
 }
 
 /*

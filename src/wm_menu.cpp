@@ -275,6 +275,24 @@ void CMenuPcs::SetMenuCharaAnim(int charaIndex, int animIndex)
 
 /*
  * --INFO--
+ * PAL Address: 0x800fc220
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void SetMenuCharaAnim__8CMenuPcsFii2(CMenuPcs* menuPcs)
+{
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(menuPcs);
+	unsigned char* const data = *reinterpret_cast<unsigned char**>(bytes + 0x828);
+
+	data[0xA] = 0;
+	data[0xE] = 0;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800fc1f4
  * PAL Size: 24b
  * EN Address: TODO

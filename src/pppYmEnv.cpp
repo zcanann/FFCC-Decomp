@@ -3,6 +3,8 @@
 #include "ffcc/mapmesh.h"
 #include "ffcc/partMng.h"
 
+#include <math.h>
+
 extern "C" {
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
 void _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
@@ -258,12 +260,96 @@ void SetUpPaletteEnv(CTexture* texture)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800e4fb8
+ * PAL Size: 1316b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void genParaboloidMap(void*, unsigned long*, unsigned short, _GXVtxFmt)
+void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize, unsigned short detail, _GXVtxFmt vtxFmt)
 {
-	// TODO
+    static const char s_pppYmEnv_cpp[] = "pppYmEnv.cpp";
+    static const char s_exiting[] = "Exiting";
+    static const char s_display_list_alloc_error[] = "Error allocating display list. Need %u bytes\n";
+    const float kZero = 0.0f;
+    const float kOne = 1.0f;
+    const float kPi = 3.1415927f;
+    const float kHalfPi = 1.5707964f;
+    const float kNormalScale = 0.5f;
+
+    const unsigned int rings = detail;
+    const int ringVertexCount = rings + 1;
+    const unsigned int displayListSize = ((ringVertexCount + (rings - 2) * ringVertexCount * 2) * 0x18 + 0x1F) & ~0x1F;
+
+    DCInvalidateRange(displayListBuffer, displayListSize);
+    GXBeginDisplayList(displayListBuffer, displayListSize);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_NRM, GX_DIRECT);
+    GXSetVtxAttrFmt((GXVtxFmt)vtxFmt, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt((GXVtxFmt)vtxFmt, GX_VA_NRM, GX_NRM_XYZ, GX_F32, 0);
+
+    const float latStep = kHalfPi / (float)rings;
+    const float firstLat = latStep;
+    const float firstRingSin = (float)sin(firstLat);
+    const float firstRingCos = (float)cos(firstLat);
+
+    GXBegin(GX_TRIANGLEFAN, (GXVtxFmt)vtxFmt, rings + 2);
+    GXPosition3f32(kZero, kZero, kOne);
+    GXNormal3f32(kZero, kZero, kOne);
+
+    for (unsigned int i = 0; i <= rings; i++) {
+        const float lon = (2.0f * kPi * (float)i) / (float)rings;
+        const float lonSin = (float)sin(lon);
+        const float lonCos = (float)cos(lon);
+
+        const float x = firstRingSin * lonCos;
+        const float y = firstRingSin * lonSin;
+        const float z = firstRingCos;
+
+        GXPosition3f32(x, y, z);
+        GXNormal3f32(kNormalScale * x * z, kNormalScale * y * z, z * z);
+    }
+
+    for (unsigned int ring = 2; ring < rings; ring++) {
+        const float upperLat = (kHalfPi * (float)(ring - 1)) / (float)rings;
+        const float lowerLat = (kHalfPi * (float)ring) / (float)rings;
+
+        const float upperSin = (float)sin(upperLat);
+        const float upperCos = (float)cos(upperLat);
+        const float lowerSin = (float)sin(lowerLat);
+        const float lowerCos = (float)cos(lowerLat);
+
+        if ((float)fabs(upperCos) < 1.0e-6f || (float)fabs(lowerCos) < 1.0e-6f) {
+            break;
+        }
+
+        GXBegin(GX_TRIANGLESTRIP, (GXVtxFmt)vtxFmt, ringVertexCount * 2);
+        for (unsigned int i = 0; i <= rings; i++) {
+            const float lon = (2.0f * kPi * (float)i) / (float)rings;
+            const float lonSin = (float)sin(lon);
+            const float lonCos = (float)cos(lon);
+
+            const float lx = lowerSin * lonCos;
+            const float ly = lowerSin * lonSin;
+            GXPosition3f32(lx, ly, lowerCos);
+            GXNormal3f32(kNormalScale * lx * lowerCos, kNormalScale * ly * lowerCos, lowerCos * lowerCos);
+
+            const float ux = upperSin * lonCos;
+            const float uy = upperSin * lonSin;
+            GXPosition3f32(ux, uy, upperCos);
+            GXNormal3f32(kNormalScale * ux * upperCos, kNormalScale * uy * upperCos, upperCos * upperCos);
+        }
+    }
+
+    *outDisplayListSize = GXEndDisplayList();
+    if (displayListSize < *outDisplayListSize) {
+        OSReport(s_display_list_alloc_error, displayListSize);
+        OSPanic(s_pppYmEnv_cpp, 0x19f, s_exiting);
+    }
+
+    DCFlushRange(displayListBuffer, *outDisplayListSize);
 }
 
 /*

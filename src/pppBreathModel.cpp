@@ -217,26 +217,26 @@ extern "C" void pppRenderBreathModel(void)
  */
 extern "C" void pppConstructBreathModel(pppBreathModel* pppBreathModel, UnkC* param_2)
 {
-    Mtx* work = (Mtx*)((unsigned char*)pppBreathModel + 0x80 + *param_2->m_serializedDataOffsets);
-    unsigned char* state = (unsigned char*)work;
+    unsigned char* state = (unsigned char*)pppBreathModel + 0x80 + *param_2->m_serializedDataOffsets;
     float fVar1;
 
-    PSMTXIdentity(*work);
+    PSMTXIdentity(*(Mtx*)state);
     fVar1 = lbl_80330F70;
 
-    work[1][2][0] = lbl_80330F70;
-    work[1][1][3] = fVar1;
-    work[1][1][2] = fVar1;
-    work[1][0][0] = fVar1;
-    work[1][0][1] = fVar1;
-    work[1][0][2] = fVar1;
-    work[1][0][3] = fVar1;
-    work[1][1][0] = fVar1;
+    *(float*)(state + 0x50) = lbl_80330F70;
+    *(float*)(state + 0x4C) = fVar1;
+    *(float*)(state + 0x48) = fVar1;
 
-    *(short*)(state + 0x46) = 10000;
-    *(short*)(state + 0x4A) = 0;
-    *(short*)(state + 0x4E) = 0;
-    *(unsigned char*)(state + 0x50) = 0;
+    *(int*)(state + 0x30) = 0;
+    *(int*)(state + 0x34) = 0;
+    *(int*)(state + 0x38) = 0;
+    *(int*)(state + 0x3C) = 0;
+    *(int*)(state + 0x40) = 0;
+
+    *(short*)(state + 0x44) = 10000;
+    *(short*)(state + 0x54) = 0;
+    *(short*)(state + 0x56) = 0;
+    *(unsigned char*)(state + 0x58) = 0;
 }
 
 /*

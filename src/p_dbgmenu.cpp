@@ -59,52 +59,77 @@ CDbgMenuPcs::CDbgMenuPcs()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012d260
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CDbgMenuPcs::Init()
 {
-	// TODO
+	*(u32*)((char*)this + 0x40) = 0;
+	*(u32*)((char*)this + 0x20) = 0x280;
+	*(u32*)((char*)this + 0x24) = 0x1C0;
+	*(u32*)((char*)this + 4) = 0x8940;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012d25c
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CDbgMenuPcs::Quit()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012d248
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CDbgMenuPcs::GetTable(unsigned long)
+int CDbgMenuPcs::GetTable(unsigned long index)
 {
-	// TODO
+	return index * 0x15C + -0x7FDEDC38;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012d204
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CDbgMenuPcs::create()
 {
-	// TODO
+	memset((char*)this + 0x5C, 0, 0x2A00);
+	*(u32*)((char*)this + 0x2A60) = 0;
+	*(u32*)((char*)this + 0x2A64) = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012d200
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CDbgMenuPcs::destroy()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -300,12 +325,23 @@ void CDbgMenuPcs::calc()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012cd10
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CDbgMenuPcs::draw()
 {
-	// TODO
+	*(s32*)((char*)this + 0x2A68) = -1;
+	Graphic.InitDebugString();
+	_GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)5, (_GXLogicOp)1);
+	GXSetNumChans(1);
+	if (*(CDM**)((char*)this + 0x58) != 0) {
+		drawMenu(*(CDM**)((char*)this + 0x58));
+	}
+	Graphic.SetViewport();
 }
 
 /*
@@ -956,12 +992,17 @@ void CDbgMenuPcs::CDMParam::Clear()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012d3b4
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CDbgMenuPcs::CDM::CDM()
 {
-	// TODO
+	memset(this, 0, 0x34);
+	memset((char*)this + 0x34, 0, 0x20);
 }
 
 /*

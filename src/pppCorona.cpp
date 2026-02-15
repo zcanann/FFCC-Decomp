@@ -21,10 +21,14 @@ struct CoronaWork {
     float m_scaleX;
     float m_scaleY;
     float m_scaleZ;
+    u8 _pad1[0x24];
+    u8 m_alpha;
+};
+
+struct CoronaVecWork {
+    u8 _pad0[0x10];
     Vec m_cameraOffset;
     Vec m_translate;
-    u8 _pad1[6];
-    u8 m_alpha;
 };
 
 /*
@@ -73,7 +77,7 @@ void pppDestructCorona(void)
 void pppFrameCorona(pppCorona* param1, CoronaParam* param2, UnkC* param3)
 {
     CoronaWork* work;
-    long* shape;
+    long** shape;
     s32 shapeId;
 
     if (DAT_8032ed70 != 0) {
@@ -85,12 +89,12 @@ void pppFrameCorona(pppCorona* param1, CoronaParam* param2, UnkC* param3)
     work->m_scaleX = work->m_scaleX + work->m_scaleY;
 
     shapeId = param2->m_dataValIndex;
-    if ((shapeId | 0xFFFF0000U) == 0xFFFFFFFF) {
+    if (shapeId == 0xFFFF) {
         return;
     }
 
-    shape = *(long**)(*(u32*)((u8*)pppEnvStPtr + 0xC) + shapeId * 4);
-    pppCalcFrameShape(shape, work->m_shapeX, work->m_shapeY, work->m_shapeZ, param2->m_shapeStep);
+    shape = *(long***)(*(u32*)((u8*)pppEnvStPtr + 0xC) + shapeId * 4);
+    pppCalcFrameShape(*shape, work->m_shapeX, work->m_shapeY, work->m_shapeZ, param2->m_shapeStep);
 
     if (param2->m_graphId == *(s32*)((u8*)param1 + 0xC)) {
         work->m_scaleX += param2->m_addX;
@@ -111,43 +115,46 @@ void pppFrameCorona(pppCorona* param1, CoronaParam* param2, UnkC* param3)
 void pppRenderCorona(pppCorona* param1, CoronaParam* param2, UnkC* param3)
 {
     CoronaWork* work;
+    CoronaVecWork* vecWork;
     pppCVECTOR color;
     pppFMATRIX mtx;
     Vec viewDir;
     Vec fromOrigin;
-    long* shape;
+    long** shape;
     s32 shapeId;
+    float mag;
     float scale;
 
-    shape = (long*)0;
     work = (CoronaWork*)((u8*)param1 + 0x80 + param3->m_serializedDataOffsets[3]);
+    vecWork = (CoronaVecWork*)((u8*)param1 + 0x80 + param3->m_serializedDataOffsets[2]);
 
     shapeId = param2->m_dataValIndex;
     if (shapeId == 0xFFFF) {
         return;
     }
 
-    shape = *(long**)(*(u32*)((u8*)pppEnvStPtr + 0x4) + shapeId * 4);
+    shape = *(long***)(*(u32*)((u8*)pppEnvStPtr + 0xC) + shapeId * 4);
 
     PSMTXIdentity(mtx.value);
 
     viewDir.x = lbl_803310C0;
     viewDir.y = lbl_803310C4;
     viewDir.z = lbl_803310C8;
-    PSVECSubtract(&viewDir, &work->m_cameraOffset, &fromOrigin);
+    PSVECSubtract(&vecWork->m_cameraOffset, &viewDir, &fromOrigin);
 
+    mag = PSVECMag(&fromOrigin);
     scale = param2->m_distMin;
-    if (PSVECMag(&fromOrigin) < param2->m_distRange) {
-        float t = PSVECMag(&fromOrigin) / param2->m_distRange;
-        scale = param2->m_distMin + (param2->m_distMax - param2->m_distMin) * (lbl_803310CC - t);
+    if (mag < param2->m_distRange) {
+        scale = param2->m_distMin +
+                (param2->m_distMax - param2->m_distMin) * (lbl_803310CC - (mag / param2->m_distRange));
     }
 
-    mtx.value[0][0] = pppMngStPtr->m_scale.x * *(float*)((u8*)param1 + 0x40) * scale;
-    mtx.value[1][1] = pppMngStPtr->m_scale.y * *(float*)((u8*)param1 + 0x54) * scale;
-    mtx.value[2][2] = pppMngStPtr->m_scale.z * *(float*)((u8*)param1 + 0x68) * scale;
-    mtx.value[0][3] = work->m_translate.x;
-    mtx.value[1][3] = work->m_translate.y;
-    mtx.value[2][3] = work->m_translate.z;
+    mtx.value[0][0] = *(float*)((u8*)pppMngStPtr + 0x28) * *(float*)((u8*)param1 + 0x40) * scale;
+    mtx.value[1][1] = *(float*)((u8*)pppMngStPtr + 0x2C) * *(float*)((u8*)param1 + 0x54) * scale;
+    mtx.value[2][2] = *(float*)((u8*)pppMngStPtr + 0x30) * *(float*)((u8*)param1 + 0x68) * scale;
+    mtx.value[0][3] = vecWork->m_translate.x;
+    mtx.value[1][3] = vecWork->m_translate.y;
+    mtx.value[2][3] = vecWork->m_translate.z;
 
     GXLoadPosMtxImm(mtx.value, 0);
 
@@ -156,8 +163,8 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, UnkC* param3)
     color.rgba[2] = param2->m_colorB;
     color.rgba[3] = (u8)(s32)(work->m_scaleX * (f32)((f64)work->m_alpha - lbl_803310D0));
 
-    pppSetDrawEnv(&color, &mtx, lbl_803310C8, param2->m_drawA, param2->m_drawB, param2->m_blendMode, 0, 1, 1,
-                  0);
+    pppSetDrawEnv(&color, (pppFMATRIX*)0, lbl_803310C8, param2->m_drawA, param2->m_drawB, param2->m_blendMode, 0, 1,
+                  1, 0);
     pppSetBlendMode(param2->m_blendMode);
-    pppDrawShp(shape, work->m_shapeY, pppEnvStPtr->m_materialSetPtr, param2->m_blendMode);
+    pppDrawShp(*shape, work->m_shapeY, pppEnvStPtr->m_materialSetPtr, param2->m_blendMode);
 }

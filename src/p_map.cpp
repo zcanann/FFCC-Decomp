@@ -1,4 +1,11 @@
 #include "ffcc/p_map.h"
+#include "ffcc/gxfunc.h"
+#include "ffcc/graphic.h"
+#include "ffcc/map.h"
+#include "ffcc/materialman.h"
+#include "ffcc/p_camera.h"
+
+#include <dolphin/mtx.h>
 
 extern void* __vt__8CManager;
 extern void* lbl_801E8668;
@@ -35,12 +42,24 @@ extern unsigned int lbl_801E8AD8[];
 extern unsigned int lbl_8032ECC8;
 extern unsigned int lbl_8032ECCC;
 extern unsigned int lbl_8032ECD0;
+extern unsigned int CFlatFlags;
+extern CMaterialMan MaterialMan;
 
 extern "C" void __dl__FPv(void*);
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
+extern "C" void DrawBound__8CGraphicFR6CBound8_GXColor(CGraphic*, void*, _GXColor);
 
 struct CRelProfile;
 extern "C" CRelProfile* __dt__11CRelProfileFv(CRelProfile* self, short shouldDelete);
+
+struct CBoundHack {
+    float p0;
+    float p1;
+    float p2;
+    float p3;
+    float p4;
+    float p5;
+};
 
 /*
  * --INFO--
@@ -244,12 +263,61 @@ void CMapPcs::drawAfter()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80034988
+ * PAL Size: 540b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapPcs::drawAfterViewer()
 {
-	// TODO
+    if (*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x178) == 0) {
+        if (*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x180) != 0) {
+            CBoundHack bound;
+            _GXColor debugColor;
+
+            MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA6, 0xA);
+
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228DC) =
+                *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0);
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228E0) =
+                *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4);
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228E4) =
+                *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
+
+            GXSetColorUpdate(GX_TRUE);
+            GXSetAlphaUpdate(GX_FALSE);
+            GXSetCullMode(GX_CULL_BACK);
+            GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+
+            _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+            _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+            _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+            _GXSetTevSwapModeTable(GX_TEV_SWAP3, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+            _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+            _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
+            _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
+            _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
+
+            MapMng.DrawAfter();
+
+            if ((CFlatFlags & 0x02000000) != 0) {
+                debugColor.r = 0xFF;
+                debugColor.g = 0xFF;
+                debugColor.b = 0x80;
+                debugColor.a = 0xFF;
+
+                bound.p0 = *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0x414);
+                bound.p1 = *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0x418);
+                bound.p2 = *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0x41C);
+                bound.p3 = *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0x420);
+                bound.p4 = *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0x424);
+                bound.p5 = *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0x428);
+                DrawBound__8CGraphicFR6CBound8_GXColor(&Graphic, &bound, debugColor);
+            }
+        }
+    }
 }
 
 /*

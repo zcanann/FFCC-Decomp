@@ -19,6 +19,20 @@ void CFlatRuntime::CObject::onNewFinished()
 
 /*
  * --INFO--
+ * PAL Address: 0x8005f61c
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void SetGrow__21CPtrArray(void* ptrArray, unsigned int growCapacity)
+{
+    *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(ptrArray) + 0x18) = growCapacity;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80059220
  * PAL Size: 24b
  * EN Address: TODO

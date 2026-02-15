@@ -10,6 +10,7 @@
 #include "dolphin/ai.h"
 #include "dolphin/ar.h"
 #include "dolphin/ax.h"
+#include "dolphin/axart.h"
 
 // Global variables (external declarations)
 extern CRedDriver CRedDriver_8032f4c0;
@@ -19,8 +20,12 @@ extern int DAT_8032f408; // Debug flag
 extern unsigned int DAT_8032f4c4; // Auto ID counter
 extern char DAT_8032e17c[]; // Buffer for memset
 extern void* DAT_8032e170; // Registration memory
+extern void* DAT_8032f4c8; // Internal sound state buffer
 extern FILE DAT_8021d1a8; // File handle for fflush
-extern "C" void __dl__FPv(void*);
+extern "C" {
+	void __dl__FPv(void*);
+	void* RedNew__Fi(int);
+}
 
 /*
  * --INFO--
@@ -153,22 +158,33 @@ void CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801ccd0c
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedSound::Start()
 {
-	// TODO
+	DAT_8032f4c8 = RedNew__Fi(0x100);
+	memset(DAT_8032f4c8, 0, 0x100);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801ccd44
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedSound::End()
 {
-	// TODO
+	CRedDriver_8032f4c0.End();
+	AXARTQuit();
+	AXQuit();
 }
 
 /*
@@ -406,12 +422,16 @@ void CRedSound::SetMusicPhraseStop(int id)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd174
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::SetSeBlockData(int, void*)
+void CRedSound::SetSeBlockData(int bank, void* blockData)
 {
-	// TODO
+	CRedDriver_8032f4c0.SetSeBlockData(bank, blockData);
 }
 
 /*

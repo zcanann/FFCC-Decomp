@@ -24,6 +24,9 @@ static const float kDrawAStarSphereRadius = 5.0f;
 extern Mtx gFlatPosMtx;
 extern int DAT_8032ed70;
 extern unsigned char lbl_8032EC90[];
+extern char lbl_801DD6A8[];
+extern char lbl_801DD6B4[];
+extern char lbl_803320A0[];
 extern CMath Math;
 extern "C" int __cntlzw(unsigned int);
 
@@ -734,7 +737,7 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 		if (used)
 		{
 			System.Printf(
-				"addAStar(%.5f, %.5f, %.5f, %d, %d, 0, 0);\n",
+				lbl_801DD6B4,
 				static_cast<double>(p.m_position.x),
 				static_cast<double>(p.m_position.y),
 				static_cast<double>(p.m_position.z),

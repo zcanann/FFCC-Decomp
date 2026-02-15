@@ -1,6 +1,7 @@
 #include "ffcc/chara_fur.h"
 #include "ffcc/chara.h"
 #include "ffcc/charaobj.h"
+#include "ffcc/sound.h"
 #include "ffcc/system.h"
 
 #include <string.h>
@@ -87,6 +88,32 @@ void CChara::TimeMogFur()
 void CChara::CalcMogScore()
 {
 	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800e10c0
+ * PAL Size: 136b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CChara::ChangeMogMode(int mogMode)
+{
+	int* const mogSoundHandle = reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x200c);
+
+	if (mogMode == 0) {
+		if (*mogSoundHandle != 0) {
+			Sound.StopSe(*mogSoundHandle);
+			*mogSoundHandle = 0;
+		}
+	} else {
+		memset(reinterpret_cast<unsigned char*>(this) + 0x1FE8, 0, 0x2C);
+		*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x200c) = 0x140;
+		*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x2010) = 0xE0;
+		*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x2004) = 0;
+	}
 }
 
 /*

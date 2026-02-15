@@ -626,35 +626,23 @@ void CMapAnim::Calc(long frame)
  */
 void CMapAnimRun::Calc(long frame)
 {
-    struct CMapAnimRunData
-    {
-        int currentFrame;
-        int startFrame;
-        int endFrame;
-        int triggerFrame;
-        unsigned char loop;
-        unsigned char _pad11;
-        unsigned short mapAnimIndex;
-    };
+    int* run = reinterpret_cast<int*>(this);
 
-    CMapAnimRunData* run = reinterpret_cast<CMapAnimRunData*>(this);
-    CPtrArray<CMapAnim*>* mapAnims = reinterpret_cast<CPtrArray<CMapAnim*>*>(MapMng + 0x213FC);
-
-    if (run->currentFrame < 0) {
-        if (run->triggerFrame != frame) {
+    if (run[0] < 0) {
+        if (run[3] != frame) {
             return;
         }
-        run->currentFrame = run->startFrame;
+        run[0] = run[1];
     }
 
-    mapAnims->m_items[run->mapAnimIndex]->Calc(run->currentFrame);
-    run->currentFrame++;
+    reinterpret_cast<CMapAnim**>(MapMng + 0x2140C)[reinterpret_cast<unsigned short*>(this)[9]]->Calc(run[0]);
+    run[0] = run[0] + 1;
 
-    if (run->endFrame < run->currentFrame) {
-        if (run->loop == 0) {
-            run->currentFrame = -1;
+    if (run[2] < run[0]) {
+        if (reinterpret_cast<unsigned char*>(this)[0x10] == 0) {
+            run[0] = -1;
         } else {
-            run->currentFrame = 0;
+            run[0] = 0;
         }
     }
 }

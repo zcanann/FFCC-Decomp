@@ -133,6 +133,9 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
             offset.z = horizontalZ;
             pppAddVector(newPosition, offset, basePos);
         }
+
+        pppCopyVector(*(Vec*)((u8*)pppMngSt + 0x48), *(Vec*)((u8*)pppMngSt + 0x8));
+        pppCopyVector(*(Vec*)((u8*)pppMngSt + 0x8), newPosition);
         
         pppCopyVector(*previousPosition, *currentPosition);
         pppCopyVector(*currentPosition, newPosition);

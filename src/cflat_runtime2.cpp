@@ -2,6 +2,72 @@
 #include "ffcc/baseobj.h"
 #include "ffcc/p_game.h"
 
+template <int count>
+class CLine;
+
+template <>
+class CLine<64>
+{
+public:
+	CLine();
+	void Draw();
+
+private:
+	u8 m_0x00[0x18];
+	u32 m_numPoints;
+	u8 m_0x1C[0x14];
+	Vec m_points[64];
+};
+
+CLine<64>::CLine()
+{
+	m_numPoints = 0;
+}
+
+void CLine<64>::Draw()
+{
+	if (m_numPoints == 0) {
+		return;
+	}
+
+	GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(m_numPoints & 0xFFFF));
+	u32 i = 0;
+	u8* it = reinterpret_cast<u8*>(this);
+	while (i < m_numPoints) {
+		GXWGFifo.f32 = *reinterpret_cast<float*>(it + 0x30);
+		GXWGFifo.f32 = *reinterpret_cast<float*>(it + 0x34);
+		GXWGFifo.f32 = *reinterpret_cast<float*>(it + 0x38);
+		it += 0xC;
+		i++;
+	}
+
+	const float yOffset = 1.0f;
+	GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(m_numPoints & 0xFFFF));
+	i = 0;
+	it = reinterpret_cast<u8*>(this);
+	while (i < m_numPoints) {
+		GXWGFifo.f32 = *reinterpret_cast<float*>(it + 0x30);
+		GXWGFifo.f32 = yOffset + *reinterpret_cast<float*>(it + 0x34);
+		GXWGFifo.f32 = *reinterpret_cast<float*>(it + 0x38);
+		it += 0xC;
+		i++;
+	}
+
+	GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, (u16)((m_numPoints & 0x7FFF) << 1));
+	i = 0;
+	it = reinterpret_cast<u8*>(this);
+	while (i < m_numPoints) {
+		GXWGFifo.f32 = *reinterpret_cast<float*>(it + 0x30);
+		GXWGFifo.f32 = *reinterpret_cast<float*>(it + 0x34);
+		GXWGFifo.f32 = *reinterpret_cast<float*>(it + 0x38);
+		GXWGFifo.f32 = *reinterpret_cast<float*>(it + 0x30);
+		GXWGFifo.f32 = yOffset + *reinterpret_cast<float*>(it + 0x34);
+		GXWGFifo.f32 = *reinterpret_cast<float*>(it + 0x38);
+		it += 0xC;
+		i++;
+	}
+}
+
 namespace {
 
 typedef unsigned char u8;

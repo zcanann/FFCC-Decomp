@@ -390,7 +390,7 @@ void CMapObj::SetMime(int mode, int target, int type)
     *reinterpret_cast<int*>(mime + 0x20) = mode;
     *reinterpret_cast<int*>(mime + 0x1C) = mode;
 
-    if (*reinterpret_cast<int*>(mime + 0x28) < target) {
+    if (target > *reinterpret_cast<int*>(mime + 0x28)) {
         target = *reinterpret_cast<int*>(mime + 0x28);
     }
 

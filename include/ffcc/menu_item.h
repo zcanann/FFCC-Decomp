@@ -6,7 +6,7 @@ class CMenuPcs
 public:
     void ItemInit();
     void ItemInit1();
-    void ItemOpen();
+    bool ItemOpen();
     void ItemCtrl();
     void ItemClose();
     void ItemDraw();

@@ -40,7 +40,7 @@ public:
     void IsHasDrawFmtDL(unsigned char);
     void ReWriteDisplayList(void*, unsigned long, unsigned long);
     void CalcBoundaryBoxQuantized(Vec*, Vec*, S16Vec*, unsigned long, unsigned long);
-    void GetNumPolygonFromDL(void*, unsigned long);
+    int GetNumPolygonFromDL(void*, unsigned long);
     void GetDirectVector(Vec*, Vec*, Vec);
     void InitConstantRegister();
     void SSepa(char*);

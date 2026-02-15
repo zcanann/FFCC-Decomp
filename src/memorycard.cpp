@@ -1796,19 +1796,19 @@ void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat* saveDat)
             
             // Calculate total HP bonus from equipped accessories
             unsigned int totalHpBonus = 0;
+            unsigned int itemData = *(unsigned int*)(Game + 0xC5B8);
             
             if (equippedItems[0] >= 0) {
-                // TODO: Access Game.game.unkCFlatData0[2] + itemID * 0x48 + 6
-                totalHpBonus += 0; // Placeholder
+                totalHpBonus = (unsigned int)*(unsigned short*)(itemData + equippedItems[0] * 0x48 + 6);
             }
             if (equippedItems[1] >= 0) {
-                totalHpBonus += 0; // Placeholder
+                totalHpBonus += *(unsigned short*)(itemData + equippedItems[1] * 0x48 + 6);
             }
             if (equippedItems[2] >= 0) {
-                totalHpBonus += 0; // Placeholder
+                totalHpBonus += *(unsigned short*)(itemData + equippedItems[2] * 0x48 + 6);
             }
             if (equippedItems[3] >= 0) {
-                totalHpBonus += 0; // Placeholder
+                totalHpBonus += *(unsigned short*)(itemData + equippedItems[3] * 0x48 + 6);
             }
             
             // Calculate final HP max (base 8 + bonuses, capped at 16)

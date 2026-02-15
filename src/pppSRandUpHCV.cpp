@@ -57,25 +57,21 @@ void pppSRandUpHCV(void* param1, void* param2, void* param3)
 		if (flag != 0) {
 			value = (value + RandF__5CMathFv(math)) * lbl_80330008;
 		}
-		target[0] = value;
 
 		value = RandF__5CMathFv(math);
 		if (flag != 0) {
 			value = (value + RandF__5CMathFv(math)) * lbl_80330008;
 		}
-		target[1] = value;
 
 		value = RandF__5CMathFv(math);
 		if (flag != 0) {
 			value = (value + RandF__5CMathFv(math)) * lbl_80330008;
 		}
-		target[2] = value;
 
 		value = RandF__5CMathFv(math);
 		if (flag != 0) {
 			value = (value + RandF__5CMathFv(math)) * lbl_80330008;
 		}
-		target[3] = value;
 	} else {
 		int** base_ptr = (int**)((char*)param3 + 0xc);
 		int offset = **base_ptr;

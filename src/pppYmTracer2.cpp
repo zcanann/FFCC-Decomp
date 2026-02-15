@@ -81,7 +81,7 @@ void copyPolygonData(TRACE_POLYGON*, TRACE_POLYGON*)
  */
 void pppConstructYmTracer2(pppYmTracer2* pppYmTracer2, UnkC* param_2)
 {
-	float fVar1 = 1.0f; // FLOAT_80331840 placeholder
+	float fVar1 = FLOAT_80331844;
 	unsigned char* puVar2 = (unsigned char*)pppYmTracer2 + 0x80 + *param_2->m_serializedDataOffsets;
 	
 	*(u32*)(puVar2 + 0x28) = 0;
@@ -116,8 +116,8 @@ void pppConstruct2YmTracer2(pppYmTracer2* pppYmTracer2, UnkC* param_2)
 {
 	unsigned char* iVar1 = (unsigned char*)pppYmTracer2 + 0x80 + *param_2->m_serializedDataOffsets;
 	
-	*(short*)(iVar1 + 0x2c) = 0;
 	*(short*)(iVar1 + 0x2e) = 0;
+	*(short*)(iVar1 + 0x2c) = 0;
 	*(short*)(iVar1 + 0x32) = 0;
 }
 
@@ -149,77 +149,81 @@ void pppDestructYmTracer2(pppYmTracer2* pppYmTracer2, UnkC* param_2)
  */
 void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, UnkB* param_2, UnkC* param_3)
 {
-    YmTracer2Step* step;
-    u8* work;
-    s32 colorOffset;
     bool useFallback;
-    Vec* source;
+    float fVar2;
+    s16 alpha;
+    s32 iVar4;
+    float* pfVar6;
+    void* pWorkPtr;
+    s32 iVar8;
+    s16 visibleCount;
+    Vec* dest;
     Vec* pVVar10;
     u32 i;
-    u16 maxCount;
+    Vec* source;
+    u8* work;
+    YmTracer2Step* step = (YmTracer2Step*)param_2;
 
     if (DAT_8032ed70 != 0) {
         return;
     }
 
-    step = (YmTracer2Step*)param_2;
     useFallback = false;
-    colorOffset = param_3->m_serializedDataOffsets[1];
+    iVar4 = param_3->m_serializedDataOffsets[1];
     work = (u8*)pppYmTracer2 + 0x80 + *param_3->m_serializedDataOffsets;
+
     if (step->m_initWOrk == -1) {
-        *(void**)(work + 0x20) = &DAT_801eadc8;
+        pWorkPtr = &DAT_801eadc8;
     } else {
-        *(void**)(work + 0x20) = (u8*)&pppMngStPtr->m_kind + step->m_initWOrk * 0x10 + step->m_stepValue;
+        pWorkPtr = (u8*)&pppMngStPtr->m_kind + step->m_initWOrk * 0x10 + step->m_stepValue;
     }
+    *(void**)(work + 0x20) = pWorkPtr;
+
     if (step->m_arg3 == -1) {
-        *(void**)(work + 0x24) = &DAT_801eadc8;
+        pWorkPtr = &DAT_801eadc8;
     } else {
-        *(void**)(work + 0x24) = (u8*)&pppMngStPtr->m_kind + step->m_arg3 * 0x10 + *(s32*)step->m_payload;
+        pWorkPtr = (u8*)&pppMngStPtr->m_kind + step->m_arg3 * 0x10 + *(s32*)step->m_payload;
     }
+    *(void**)(work + 0x24) = pWorkPtr;
 
-    if (*(void**)(work + 0x28) == nullptr) {
-        float* pfVar6;
-
+    if (*(u32*)(work + 0x28) == 0) {
         useFallback = true;
-        maxCount = *(u16*)(step->m_payload + 4);
         *(u16*)(work + 0x30) = (u16)step->m_payload[8] / *(u16*)(step->m_payload + 6);
-        *(void**)(work + 0x28) =
-            pppMemAlloc__FUlPQ27CMemory6CStagePci((u32)maxCount * 0x28, pppEnvStPtr->m_stagePtr,
-                                                  s_pppYmTracer2_cpp_801dc4b8, 0xAD);
-        pfVar6 = (float*)(*(void**)(work + 0x28));
-        for (s32 iVar8 = 0; iVar8 < (s32)(u32)maxCount; iVar8++) {
+        *(void**)(work + 0x28) = pppMemAlloc__FUlPQ27CMemory6CStagePci(
+            (u32)*(u16*)(step->m_payload + 4) * 0x28, pppEnvStPtr->m_stagePtr, s_pppYmTracer2_cpp_801dc4b8, 0xAD);
+
+        fVar2 = FLOAT_80331840;
+        pfVar6 = *(float**)(work + 0x28);
+        for (iVar8 = 0; iVar8 < (s32)(u32)*(u16*)(step->m_payload + 4); iVar8++) {
             *(u8*)(pfVar6 + 8) = 0;
             *(u8*)((u8*)pfVar6 + 0x1f) = 0;
-            pfVar6[2] = FLOAT_80331840;
-            pfVar6[1] = FLOAT_80331840;
-            pfVar6[0] = FLOAT_80331840;
-            pfVar6[6] = FLOAT_80331840;
-            pfVar6[5] = FLOAT_80331840;
-            pfVar6[4] = FLOAT_80331840;
+            pfVar6[2] = fVar2;
+            pfVar6[1] = fVar2;
+            *pfVar6 = fVar2;
+            pfVar6[6] = fVar2;
+            pfVar6[5] = fVar2;
+            pfVar6[4] = fVar2;
             pfVar6 += 10;
         }
     }
 
-    source = (Vec*)(*(void**)(work + 0x28));
+    source = *(Vec**)(work + 0x28);
     *(u8*)&source[2].z = 1;
     pVVar10 = source;
 
     for (i = 0; (s32)i < (s32)(step->m_payload[9] + 1); i++) {
-        s32 iVar8;
-        float* pfVar6;
-
         iVar8 = *(u16*)(step->m_payload + 4) - 2;
         pfVar6 = (float*)((u8*)source + iVar8 * 0x28);
+
         for (; (s32)i <= iVar8; iVar8--) {
             Vec local_a8;
             Vec local_9c;
-            Vec* dest;
 
             *(u8*)(pfVar6 + 0x12) = *(u8*)(pfVar6 + 8);
-            local_a8.x = pfVar6[0];
+            local_a8.x = *pfVar6;
+            dest = (Vec*)((u8*)source + (iVar8 + 1) * 0x28);
             local_a8.y = pfVar6[1];
             local_a8.z = pfVar6[2];
-            dest = (Vec*)((u8*)source + (iVar8 + 1) * 0x28);
             pppCopyVector__FR3Vec3Vec(dest, &local_a8);
             local_9c.x = pfVar6[4];
             local_9c.y = pfVar6[5];
@@ -232,31 +236,27 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, UnkB* param_2, UnkC* param_3)
             pfVar6 -= 10;
         }
 
-        {
-            float fVar2;
-
-            fVar2 = **(float**)(work + 0x20);
-            *(float*)(work + 0) = fVar2;
-            pVVar10->x = fVar2;
-            fVar2 = *(float*)(*(u32*)(work + 0x20) + 4);
-            *(float*)(work + 4) = fVar2;
-            pVVar10->y = fVar2;
-            fVar2 = *(float*)(*(u32*)(work + 0x20) + 8);
-            *(float*)(work + 8) = fVar2;
-            pVVar10->z = fVar2;
-            fVar2 = **(float**)(work + 0x24);
-            *(float*)(work + 0x10) = fVar2;
-            pVVar10[1].y = fVar2;
-            fVar2 = *(float*)(*(u32*)(work + 0x24) + 4);
-            *(float*)(work + 0x14) = fVar2;
-            pVVar10[1].z = fVar2;
-            fVar2 = *(float*)(*(u32*)(work + 0x24) + 8);
-            *(float*)(work + 0x18) = fVar2;
-            pVVar10[2].x = fVar2;
-            *(u8*)&pVVar10[2].y = ((u8*)pppYmTracer2)[colorOffset + 0x88];
-            *((u8*)&pVVar10[2].y + 1) = ((u8*)pppYmTracer2)[colorOffset + 0x89];
-            *((u8*)&pVVar10[2].y + 2) = ((u8*)pppYmTracer2)[colorOffset + 0x8A];
-        }
+        fVar2 = **(float**)(work + 0x20);
+        *(float*)work = fVar2;
+        pVVar10->x = fVar2;
+        fVar2 = *(float*)(*(s32*)(work + 0x20) + 4);
+        *(float*)(work + 4) = fVar2;
+        pVVar10->y = fVar2;
+        fVar2 = *(float*)(*(s32*)(work + 0x20) + 8);
+        *(float*)(work + 8) = fVar2;
+        pVVar10->z = fVar2;
+        fVar2 = **(float**)(work + 0x24);
+        *(float*)(work + 0x10) = fVar2;
+        pVVar10[1].y = fVar2;
+        fVar2 = *(float*)(*(s32*)(work + 0x24) + 4);
+        *(float*)(work + 0x14) = fVar2;
+        pVVar10[1].z = fVar2;
+        fVar2 = *(float*)(*(s32*)(work + 0x24) + 8);
+        *(float*)(work + 0x18) = fVar2;
+        pVVar10[2].x = fVar2;
+        *(u8*)&pVVar10[2].y = ((u8*)pppYmTracer2)[iVar4 + 0x88];
+        *((u8*)&pVVar10[2].y + 1) = ((u8*)pppYmTracer2)[iVar4 + 0x89];
+        *((u8*)&pVVar10[2].y + 2) = ((u8*)pppYmTracer2)[iVar4 + 0x8A];
 
         if (i == 0) {
             Mtx MStack_78;
@@ -268,13 +268,13 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, UnkB* param_2, UnkC* param_3)
             Mtx MStack_78;
             u32 uStack_44;
             u32 uStack_3c;
-            float t;
 
             uStack_3c = i ^ 0x80000000;
-            uStack_44 = (u32)(step->m_payload[9] + 1) ^ 0x80000000;
-            t = (FLOAT_80331860 / (float)((double)((u64)0x43300000 << 32 | uStack_44) - DOUBLE_80331858)) *
-                (float)((double)((u64)0x43300000 << 32 | uStack_3c) - DOUBLE_80331858);
-            if (GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(t, pppMngStPtr, MStack_78) == 0) {
+            uStack_44 = (step->m_payload[9] + 1) ^ 0x80000000;
+            if (GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(
+                    (FLOAT_80331860 / (float)((double)((u64)0x43300000 << 32 | uStack_44) - DOUBLE_80331858)) *
+                        (float)((double)((u64)0x43300000 << 32 | uStack_3c) - DOUBLE_80331858),
+                    pppMngStPtr, MStack_78) == 0) {
                 useFallback = true;
             } else {
                 PSMTXConcat(MStack_78, *(Mtx*)((u8*)pppYmTracer2 + 4), MStack_78);
@@ -282,44 +282,44 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, UnkB* param_2, UnkC* param_3)
                 PSMTXMultVec(MStack_78, (Vec*)&pVVar10[1].y, (Vec*)&pVVar10[1].y);
             }
         }
+
         pVVar10 = (Vec*)&pVVar10[3].y;
     }
 
     if (useFallback) {
-        Vec* pVVar10_2 = source;
+        Vec* pFallback = source;
 
-        for (s32 iVar4 = 0; iVar4 < (s32)(u32)*(u16*)(step->m_payload + 4); iVar4++) {
+        for (iVar4 = 0; iVar4 < (s32)(u32)*(u16*)(step->m_payload + 4); iVar4++) {
             Vec local_84;
             Vec local_90;
 
             local_84.x = source->x;
             local_84.y = source->y;
             local_84.z = source->z;
-            pppCopyVector__FR3Vec3Vec(pVVar10_2, &local_84);
+            pppCopyVector__FR3Vec3Vec(pFallback, &local_84);
             local_90.x = source[1].y;
             local_90.y = source[1].z;
             local_90.z = source[2].x;
-            pppCopyVector__FR3Vec3Vec((Vec*)&pVVar10_2[1].y, &local_90);
-            pVVar10_2 = (Vec*)&pVVar10_2[3].y;
+            pppCopyVector__FR3Vec3Vec((Vec*)&pFallback[1].y, &local_90);
+            pFallback = (Vec*)&pFallback[3].y;
         }
     }
 
-    {
-        s16 visibleCount;
+    visibleCount = 0;
+    for (iVar4 = 0; iVar4 < (s32)(u32)*(u16*)(step->m_payload + 4); iVar4++) {
+        bool dead;
 
-        visibleCount = 0;
-        for (s32 iVar4 = 0; iVar4 < (s32)(u32)*(u16*)(step->m_payload + 4); iVar4++) {
-            s16 alpha = (u16)step->m_payload[8] - (s16)iVar4 * *(s16*)(work + 0x30);
-            if (alpha < 0 || *(char*)&source[2].z == '\0') {
-                *(u8*)((u8*)&source[2].y + 3) = 0;
-            } else {
-                *(u8*)((u8*)&source[2].y + 3) = (u8)alpha;
-                visibleCount++;
-            }
-            source = (Vec*)&source[3].y;
+        alpha = (u16)step->m_payload[8] - (s16)iVar4 * *(s16*)(work + 0x30);
+        dead = *(char*)&source[2].z == '\0';
+        if (alpha < 0 || dead) {
+            *(u8*)((u8*)&source[2].y + 3) = 0;
+        } else if (!dead) {
+            *(u8*)((u8*)&source[2].y + 3) = (u8)alpha;
+            visibleCount++;
         }
-        *(s16*)(work + 0x2c) = visibleCount;
+        source = (Vec*)&source[3].y;
     }
+    *(s16*)(work + 0x2c) = visibleCount;
 }
 
 /*

@@ -10,6 +10,12 @@ struct VRyjMegaBirthModel
 
 };
 
+struct PRyjMegaBirthModelOffsets
+{
+    u8 _pad0[0xC];
+    s32* m_serializedDataOffsets;
+};
+
 void get_rand(void);
 void get_noise(unsigned char);
 void alloc_check(VRyjMegaBirthModel*, PRyjMegaBirthModel*);
@@ -25,8 +31,8 @@ extern "C" {
 
 void pppRyjMegaBirthModel(void);
 void pppRyjDrawMegaBirthModel(void);
-void pppRyjMegaBirthModelCon(void);
-void pppRyjMegaBirthModelDes(void);
+void pppRyjMegaBirthModelCon(_pppPObject*, PRyjMegaBirthModelOffsets*);
+void pppRyjMegaBirthModelDes(_pppPObject*, PRyjMegaBirthModelOffsets*);
 
 #ifdef __cplusplus
 }

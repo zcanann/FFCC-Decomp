@@ -108,7 +108,7 @@ void main(int argc, char** argv)
 {
     if (argc != 0) {
         for (int i = 1; i < argc; i++) {
-            const char* argument = argv[i];
+            char* argument = argv[i];
             char command;
 
             if ((argument[0] != '-') && (argument[0] != '/')) {
@@ -118,7 +118,7 @@ void main(int argc, char** argv)
             command = argument[1];
             if (command == 'w') {
                 *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Pad) + 0x1B8) = 1;
-            } else if (command == 'r') {
+            } else if ((command < 'w') && (command == 'r')) {
                 *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Pad) + 0x1B4) = 1;
             }
         }

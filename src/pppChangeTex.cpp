@@ -56,7 +56,7 @@ extern "C" {
  * JP Address: TODO
  * JP Size: TODO
  */
-void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* param_3, int param_4, int param_5, float (*param_6) [4])
+extern "C" void ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2(CChara::CModel* model, void* param_2, void* param_3, int param_4, int param_5, float (*param_6) [4])
 {
 	char flag = *(char*)((char*)param_3 + 0x14);
 	
@@ -112,7 +112,7 @@ void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* pa
  * JP Address: TODO
  * JP Size: TODO
  */
-void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* param_3, int param_4, float (*param_5) [4])
+extern "C" void ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2(CChara::CModel* model, void* param_2, void* param_3, int param_4, float (*param_5) [4])
 {
 	if (*(char*)((char*)param_3 + 0x14) != 0) {
 		int texture_info = *(int*)((char*)param_2 + 0x1c);
@@ -344,8 +344,8 @@ void pppFrameChangeTex(pppChangeTex* changeTex, UnkB* step, UnkC* data)
 	((int*)value)[9] = (int)pppEnvStPtr;
 	*(float**)(model0 + 0xE4) = value;
 	*(UnkB**)(model0 + 0xE8) = step;
-	*(void**)(model0 + 0xFC) = (void*)ChangeTex_DrawMeshDLCallback;
-	*(void**)(model0 + 0x104) = (void*)ChangeTex_AfterDrawMeshCallback;
+	*(void**)(model0 + 0xFC) = (void*)ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2;
+	*(void**)(model0 + 0x104) = (void*)ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2;
 
 	value[7] = (float)GetTextureFromRSD__FiP9_pppEnvSt(step->m_dataValIndex, pppEnvStPtr);
 
@@ -357,8 +357,8 @@ void pppFrameChangeTex(pppChangeTex* changeTex, UnkB* step, UnkC* data)
 		if (model1 != 0) {
 			*(float**)(model1 + 0xE4) = value;
 			*(UnkB**)(model1 + 0xE8) = step;
-			*(void**)(model1 + 0xFC) = (void*)ChangeTex_DrawMeshDLCallback;
-			*(void**)(model1 + 0x104) = (void*)ChangeTex_AfterDrawMeshCallback;
+			*(void**)(model1 + 0xFC) = (void*)ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2;
+			*(void**)(model1 + 0x104) = (void*)ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2;
 		}
 	}
 
@@ -367,8 +367,8 @@ void pppFrameChangeTex(pppChangeTex* changeTex, UnkB* step, UnkC* data)
 		if (model2 != 0) {
 			*(float**)(model2 + 0xE4) = value;
 			*(UnkB**)(model2 + 0xE8) = step;
-			*(void**)(model2 + 0xFC) = (void*)ChangeTex_DrawMeshDLCallback;
-			*(void**)(model2 + 0x104) = (void*)ChangeTex_AfterDrawMeshCallback;
+			*(void**)(model2 + 0xFC) = (void*)ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2;
+			*(void**)(model2 + 0x104) = (void*)ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2;
 		}
 	}
 

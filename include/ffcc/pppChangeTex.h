@@ -33,8 +33,14 @@ struct UnkC {
     s32* m_serializedDataOffsets;
 };
 
-void ChangeTex_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[4]);
-void ChangeTex_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*)[4]);
+#ifdef __cplusplus
+extern "C" {
+#endif
+void ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2(CChara::CModel*, void*, void*, int, int, float (*)[4]);
+void ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2(CChara::CModel*, void*, void*, int, float (*)[4]);
+#ifdef __cplusplus
+}
+#endif
 
 #ifdef __cplusplus
 extern "C" {

@@ -3,11 +3,13 @@
 #include <dolphin/mtx.h>
 #include <dolphin/gx/GXVert.h>
 #include <math.h>
+#include <string.h>
 
 #include "PowerPC_EABI_Support/Runtime/MWCPlusLib.h"
 
 extern "C" void __ct__Q29CLightPcs6CLightFv(void*);
 extern "C" void __ct__Q29CLightPcs10CBumpLightFv(void*);
+extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 
 extern void* __vt__8CManager;
 extern void* lbl_801E8668;
@@ -48,6 +50,7 @@ public:
 } CameraPcs;
 
 CLightPcs LightPcs;
+static char s_p_light_cpp[] = "p_light.cpp";
 
 static inline double U32ToDouble(unsigned int value)
 {
@@ -322,12 +325,81 @@ void CLightPcs::GetFreeBumpLight(CLightPcs::TARGET)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004975c
+ * PAL Size: 880b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CLightPcs::AddBump(CLightPcs::CLight*, CLightPcs::TARGET, CMemory::CStage*, int)
+CLightPcs::CBumpLight* CLightPcs::AddBump(CLightPcs::CLight* srcLight, CLightPcs::TARGET target,
+                                          CMemory::CStage* stage, int count)
 {
-	// TODO
+    char* base = (char*)this + (int)target * 0x9c0;
+    char* slot = 0;
+
+    for (int i = 0; i < 8; i++) {
+        char* entry = base + i * 0x138 + 0x1c3c;
+        if (*(u8*)(entry + 0xb0) == 0) {
+            slot = entry;
+            break;
+        }
+    }
+
+    if (slot == 0) {
+        if (System.m_execParam != 0) {
+            System.Printf((char*)"BUMP LIGHT FULL\n");
+        }
+        return 0;
+    }
+
+    memcpy(slot, srcLight, 0xb0);
+
+    float* fslot = (float*)slot;
+    if (fslot[8] >= fslot[7]) {
+        fslot[8] = fslot[7];
+    }
+
+    fslot[0x2b] = fslot[7] * fslot[7];
+    fslot[9] = fslot[7];
+    if (fslot[9] < FLOAT_8032fc14) {
+        fslot[9] = -fslot[9];
+    }
+    fslot[9] = fslot[9] * FLOAT_8032fc18 * fslot[10];
+
+    slot[0x63] = 1;
+    slot[0x62] = 1;
+    slot[0x61] = 1;
+    slot[0x60] = 1;
+
+    if (*(u32*)(slot + 0x50) == 0) {
+        slot[0x60] = 0;
+    }
+    if (*(u32*)(slot + 0x54) == 0) {
+        slot[0x61] = 0;
+    }
+    if (*(u32*)(slot + 0x58) == 0) {
+        slot[0x62] = 0;
+    }
+
+    slot[0xb2] = (char)target;
+    *(u32*)(slot + 0xb0) = 1;
+    slot[0xb3] = (char)count;
+
+    int texSize = GXGetTexBufferSize(0x40, 0x40, 3, 0, 0);
+    *(u32*)(slot + 0xb4) = (u32)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+        &Memory, texSize * count, stage, s_p_light_cpp, 0x13b, 0);
+
+    char* texObj = slot + 0xb8;
+    int texOffset = 0;
+    for (int i = 0; i < count; i++) {
+        GXInitTexObj((GXTexObj*)texObj, (void*)(*(u32*)(slot + 0xb4) + texOffset), (u16)0x40, (u16)0x40, (GXTexFmt)3,
+                     (GXTexWrapMode)0, (GXTexWrapMode)0, (u8)0);
+        texOffset += texSize;
+        texObj += 0x20;
+    }
+
+    return (CLightPcs::CBumpLight*)slot;
 }
 
 /*

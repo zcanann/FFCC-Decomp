@@ -45,7 +45,7 @@ public:
     void Clear();
     void Add(CLightPcs::CLight*);
     void GetFreeBumpLight(CLightPcs::TARGET);
-    void AddBump(CLightPcs::CLight*, CLightPcs::TARGET, CMemory::CStage*, int);
+    CLightPcs::CBumpLight* AddBump(CLightPcs::CLight*, CLightPcs::TARGET, CMemory::CStage*, int);
     void SetMapColorAlpha(float (*)[4], _GXColor, _GXColor, unsigned char, float, float, float, unsigned char);
     void SetAmbient(_GXColor);
     void SetAmbientAlpha(float);

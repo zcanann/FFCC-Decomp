@@ -638,20 +638,6 @@ CSystem::COrder* CSystem::GetOrder(int index)
 
 /*
  * --INFO--
- * PAL Address: 0x800b138c
- * PAL Size: 8b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-unsigned int CSystem::GetCounter()
-{
-	return m_frameCounter;
-}
-
-/*
- * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

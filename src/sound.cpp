@@ -171,7 +171,7 @@ extern "C" void Draw__9CLine(CLine* line)
     }
 }
 
-extern "C" void CalcBound__9CLine(CLine* line)
+extern "C" void CalcBound__9CLine2(CLine* line)
 {
     line->min.x = FLOAT_80330d10;
     line->min.y = FLOAT_80330d10;

@@ -316,42 +316,44 @@ void DBInitInterrupts(void) {
     __OSUnmaskInterrupts(0x40);
 }
 
-static void CheckMailBox(void) {
-    u32 v;
-    DBGReadStatus(&v);
-    if (v & 1) {
-        DBGReadMailbox(&v);
-        v &= 0x1fffffff;
-
-        if ((v & 0x1f000000) == 0x1f000000) {
-            SendMailData = v;
-            RecvDataLeng = v & 0x7fff;
-            EXIInputFlag = 1;
-        }
-    }
-}
-
 u32 DBQueryData(void) {
+    u32 value;
+    u32 interrupts;
+    u32 mailbox[3];
+
     EXIInputFlag = 0;
-    if (!RecvDataLeng) {
-        BOOL interrupts = OSDisableInterrupts();
-        CheckMailBox();
+    if (RecvDataLeng == 0) {
+        interrupts = OSDisableInterrupts();
+        DBGReadStatus(mailbox);
+        value = mailbox[0];
+        if ((mailbox[0] & 1) != 0) {
+            DBGReadMailbox(mailbox);
+            value = mailbox[0] & 0x1fffffff;
+            if ((mailbox[0] & 0x1f000000) == 0x1f000000) {
+                RecvDataLeng = mailbox[0] & 0x7fff;
+                EXIInputFlag = 1;
+                SendMailData = value;
+            }
+        }
+        mailbox[0] = value;
         OSRestoreInterrupts(interrupts);
     }
     return RecvDataLeng;
 }
 
 BOOL DBRead(u32* buffer, s32 count) {
-    u32 interrupts = OSDisableInterrupts();
-    u32 v;
+    BOOL interrupts;
+    s32 value;
+
+    interrupts = OSDisableInterrupts();
 
     if ((SendMailData & 0x10000) == 0) {
-        v = 0;
+        value = 0;
     } else {
-        v = 0x1000;
+        value = 0x1000;
     }
 
-    DBGRead(v + 0x1e000, buffer, (count + 3U) & ~3U);
+    DBGRead(value + 0x1e000, buffer, (count + 3U) & 0xfffffffc);
 
     RecvDataLeng = 0;
     EXIInputFlag = 0;

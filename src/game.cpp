@@ -61,8 +61,13 @@ void StopAndFreeAllSe__6CSoundFi(void*, int);
 void ClearAll__5CWindFv(void*);
 void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
 void Init__12CFlatRuntimeFv(void*);
+int Load__13CFlatRuntime2FPc(void*, char*);
+void ResetNewGame__13CFlatRuntime2Fv(void*);
+void InitFurTexBuffer__6CCharaFv(void*);
 void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
+void ScriptChanging__7CSystemFPc(CSystem*, char*);
+void ScriptChanged__7CSystemFPci(CSystem*, char*, int);
 void MapChanging__7CSystemFii(CSystem*, int, int);
 void MapChanged__7CSystemFiii(CSystem*, int, int, int);
 void LoadMap__7CMapPcsFiiPvUlUc(void*, int, int, void*, unsigned long, unsigned char);
@@ -87,6 +92,14 @@ unsigned char DAT_8032ed08[];
 unsigned char Wind[];
 extern const char DAT_801d61dc[];
 extern const char s_game_cpp_801d6190[];
+extern const char DAT_801d619c[];
+extern const char DAT_801d61b8[];
+extern const char DAT_801d6214[];
+extern const char DAT_801d6234[];
+extern const char DAT_8032f698[];
+extern const char DAT_8032f6a0[];
+extern const char DAT_8032f6a4[];
+extern const char DAT_8032f6ac[];
 }
 
 static const float FLOAT_8032f688 = 1.0E+10;
@@ -494,12 +507,85 @@ void CGame::clearWorkScript()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80014ff8
+ * PAL Size: 648b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::CheckScriptChange()
 {
-	// TODO
+    if (m_newGameFlag == 0) {
+        return;
+    }
+
+    m_newGameFlag = 0;
+    _WaitDrawDone__8CGraphicFPci(&Graphic, s_game_cpp_801d6190, 0x205);
+
+    if (System.m_execParam > 2) {
+        Printf__7CSystemFPce(&System, DAT_801d619c);
+    }
+
+    ScriptChanging__7CSystemFPc(&System, m_nextScript.m_name);
+
+    if (strcmp(m_nextScript.m_name, DAT_8032f698) != 0) {
+        if (m_cfdLoadedFlag == 0) {
+            Destroy__13CFlatRuntime2Fv(CFlat);
+            loadCfd();
+            m_cfdLoadedFlag = 1;
+
+            if (System.m_execParam > 2) {
+                Printf__7CSystemFPce(&System, DAT_801d61b8);
+            }
+        }
+
+        if (m_assetsLoadedFlag == 0) {
+            createLoad__9CSoundPcsFv(SoundPcs);
+            createLoad__9CCharaPcsFv(&CharaPcs);
+            createLoad__8CPartPcsFv(&PartPcs);
+            m_assetsLoadedFlag = 1;
+
+            if (System.m_execParam > 2) {
+                Printf__7CSystemFPce(&System, DAT_801d61dc);
+            }
+        }
+    }
+
+    int scriptResult = Load__13CFlatRuntime2FPc(CFlat, m_nextScript.m_name);
+    strcpy(m_currentScriptName, m_nextScript.m_name);
+
+    if (m_nextScript.m_flags != 0) {
+        const char* townName = DAT_8032f6ac;
+
+        Printf__7CSystemFPce(&System, DAT_8032f6a0);
+        Printf__7CSystemFPce(&System, DAT_801d6214);
+        Printf__7CSystemFPce(&System, DAT_8032f6a0);
+
+        memset(&m_gameWork.m_gameDataStartMarker, 0, 0x13E1);
+        memset(m_gameWork.m_wmBackupParams, 0xFF, sizeof(m_gameWork.m_wmBackupParams));
+
+        m_gameWork.m_scriptSysVal0 = 0;
+        m_gameWork.m_scriptSysVal1 = 0;
+        m_gameWork.m_scriptSysVal2 = 0;
+        m_gameWork.m_scriptSysVal3 = 1;
+        m_gameWork.m_chaliceElement = 1;
+
+        if (m_gameWork.m_languageId == 3) {
+            townName = DAT_8032f6a4;
+        }
+
+        strcpy(m_gameWork.m_townName, townName);
+        ResetNewGame__13CFlatRuntime2Fv(CFlat);
+        InitFurTexBuffer__6CCharaFv(Chara);
+        m_nextScript.m_flags = 0;
+    }
+
+    ScriptChanged__7CSystemFPci(&System, m_nextScript.m_name, scriptResult);
+
+    if (System.m_execParam > 2) {
+        Printf__7CSystemFPce(&System, DAT_801d6234);
+    }
 }
 
 /*

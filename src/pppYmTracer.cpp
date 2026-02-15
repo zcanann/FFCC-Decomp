@@ -19,6 +19,7 @@ extern CUtil DAT_8032ec70;
 extern "C" {
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 void pppSetBlendMode__FUc(unsigned char);
+void pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*, pppFMATRIX*);
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
     void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char,
     unsigned char);
@@ -187,13 +188,13 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, UnkB* param_2, UnkC* param_3)
         if (param_2->m_initWOrk == -1) {
             work[8] = (f32)(u32)&DAT_801eadc8;
         } else {
-            work[8] = (f32)(u32)((u8*)&pppMngStPtr->m_kind + param_2->m_stepValue);
+            work[8] = (f32)(u32)((u8*)&pppMngStPtr->m_kind + param_2->m_initWOrk * 0x10 + param_2->m_stepValue);
         }
 
         if (param_2->m_arg3 == -1) {
             work[9] = (f32)(u32)&DAT_801eadc8;
         } else {
-            work[9] = (f32)(u32)((u8*)&pppMngStPtr->m_kind + *(s32*)param_2->m_payload);
+            work[9] = (f32)(u32)((u8*)&pppMngStPtr->m_kind + param_2->m_arg3 * 0x10 + *(s32*)param_2->m_payload);
         }
     }
 
@@ -233,13 +234,11 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, UnkB* param_2, UnkC* param_3)
         }
 
         {
-            pppFMATRIX local;
-            pppFMATRIX world;
+            pppFMATRIX local = *(pppFMATRIX*)((u8*)pppYmTracer + 4);
+            pppFMATRIX world = pppMngStPtr->m_matrix;
             pppFMATRIX result;
 
-            pppCopyMatrix(local, *(pppFMATRIX*)((u8*)pppYmTracer + 4));
-            pppCopyMatrix(world, pppMngStPtr->m_matrix);
-            pppMulMatrix(result, world, local);
+            pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&result, &world, &local);
             PSMTXMultVec(result.value, &entries[0].from, &entries[0].from);
             PSMTXMultVec(result.value, &entries[0].to, &entries[0].to);
         }

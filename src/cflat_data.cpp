@@ -73,62 +73,61 @@ extern "C" CFlatData* dtor_800980B4(CFlatData* flatData, short shouldDelete)
 
 	FlatDataLayout* self;
 	FlatDataLayout* layout;
+	int i;
 
-	if (flatData == nullptr)
+	if (flatData != nullptr)
 	{
-		return flatData;
-	}
+		layout = (FlatDataLayout*)flatData;
+		self = layout;
+		for (i = 0; i < layout->m_dataCount; i++)
+		{
+			if (self->m_data[0].m_data != nullptr)
+			{
+				operator delete(self->m_data[0].m_data);
+				self->m_data[0].m_data = nullptr;
+			}
+			if (self->m_data[0].m_strings != nullptr)
+			{
+				operator delete(self->m_data[0].m_strings);
+				self->m_data[0].m_strings = (char**)nullptr;
+			}
+			if (self->m_data[0].m_stringBuf != nullptr)
+			{
+				operator delete(self->m_data[0].m_stringBuf);
+				self->m_data[0].m_stringBuf = (char*)nullptr;
+			}
+			self = (FlatDataLayout*)&self->m_data[0].m_stringBuf;
+		}
+		layout->m_dataCount = 0;
 
-	layout = (FlatDataLayout*)flatData;
-	self = layout;
-	for (int i = 0; i < layout->m_dataCount; i++)
-	{
-		if (self->m_data[0].m_data != nullptr)
+		self = layout;
+		for (i = 0; i < layout->m_tableCount; i++)
 		{
-			operator delete(self->m_data[0].m_data);
-			self->m_data[0].m_data = nullptr;
+			if (self->m_tabl[0].m_strings != nullptr)
+			{
+				operator delete(self->m_tabl[0].m_strings);
+				self->m_tabl[0].m_strings = (char**)nullptr;
+			}
+			if (self->m_tabl[0].m_stringBuf != nullptr)
+			{
+				operator delete(self->m_tabl[0].m_stringBuf);
+				self->m_tabl[0].m_stringBuf = (char*)nullptr;
+			}
+			self = (FlatDataLayout*)&self->m_data[0].m_numStrings;
 		}
-		if (self->m_data[0].m_strings != nullptr)
-		{
-			operator delete(self->m_data[0].m_strings);
-			self->m_data[0].m_strings = (char**)nullptr;
-		}
-		if (self->m_data[0].m_stringBuf != nullptr)
-		{
-			operator delete(self->m_data[0].m_stringBuf);
-			self->m_data[0].m_stringBuf = (char*)nullptr;
-		}
-		self = (FlatDataLayout*)&self->m_data[0].m_stringBuf;
-	}
-	layout->m_dataCount = 0;
+		layout->m_tableCount = 0;
 
-	self = layout;
-	for (int i = 0; i < layout->m_tableCount; i++)
-	{
-		if (self->m_tabl[0].m_strings != nullptr)
+		if (layout->m_mesBuffer != nullptr)
 		{
-			operator delete(self->m_tabl[0].m_strings);
-			self->m_tabl[0].m_strings = (char**)nullptr;
+			operator delete(layout->m_mesBuffer);
+			layout->m_mesBuffer = (char*)nullptr;
 		}
-		if (self->m_tabl[0].m_stringBuf != nullptr)
+		layout->m_mesCount = 0;
+
+		if (0 < shouldDelete)
 		{
-			operator delete(self->m_tabl[0].m_stringBuf);
-			self->m_tabl[0].m_stringBuf = (char*)nullptr;
+			operator delete(flatData);
 		}
-		self = (FlatDataLayout*)&self->m_data[0].m_numStrings;
-	}
-	layout->m_tableCount = 0;
-
-	if (layout->m_mesBuffer != nullptr)
-	{
-		operator delete(layout->m_mesBuffer);
-		layout->m_mesBuffer = (char*)nullptr;
-	}
-	layout->m_mesCount = 0;
-
-	if (shouldDelete > 0)
-	{
-		operator delete(flatData);
 	}
 	return flatData;
 }

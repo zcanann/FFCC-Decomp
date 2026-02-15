@@ -3,6 +3,30 @@
 #include "ffcc/cflat_runtime.h"
 
 extern "C" void __dl__FPv(void* ptr);
+extern "C" void pppPartInit__8CPartMngFv2(CPartMng* partMng);
+
+struct CPtrArrayBare {
+    unsigned long m_size;
+    unsigned long m_numItems;
+    unsigned long m_defaultSize;
+    void* m_items;
+    CMemory::CStage* m_stage;
+    int m_growCapacity;
+};
+
+/*
+ * --INFO--
+ * PAL Address: 0x8005f61c
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void SetGrow__21CPtrArray(CPtrArrayBare* ptrArray, int growCapacity)
+{
+    ptrArray->m_growCapacity = growCapacity;
+}
 
 /*
  * --INFO--
@@ -643,12 +667,12 @@ void CPartMng::pppPartDead()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CPartMng::pppPartInit()
+extern "C" void pppPartInit__8CPartMngFv2(CPartMng* partMng)
 {
-	char* pppMngSt = reinterpret_cast<char*>(this);
+	char* pppMngSt = reinterpret_cast<char*>(partMng);
 	int i = 0;
 
-	*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x8) = 0;
+	*reinterpret_cast<int*>(reinterpret_cast<char*>(partMng) + 0x8) = 0;
 	do {
 		int baseTime = *reinterpret_cast<int*>(pppMngSt + 0x14);
 		if (baseTime != -0x1000 && baseTime < 0) {
@@ -657,6 +681,11 @@ void CPartMng::pppPartInit()
 		pppMngSt += 0x158;
 		i++;
 	} while (i < 0x180);
+}
+
+void CPartMng::pppPartInit()
+{
+    pppPartInit__8CPartMngFv2(this);
 }
 
 /*

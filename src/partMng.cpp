@@ -1,8 +1,19 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/cflat_runtime.h"
+#include "ffcc/file.h"
 
 extern "C" void __dl__FPv(void* ptr);
+extern "C" unsigned long CheckSum__FPvi(void* data, int size);
+
+struct CPtrArrayRaw {
+    unsigned long m_size;
+    unsigned long m_numItems;
+    unsigned long m_defaultSize;
+    void* m_items;
+    CMemory::CStage* m_stage;
+    int m_growCapacity;
+};
 
 /*
  * --INFO--
@@ -15,6 +26,55 @@ extern "C" void __dl__FPv(void* ptr);
  */
 void CFlatRuntime::CObject::onNewFinished()
 {
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8005f61c
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void SetGrow__21CPtrArray(CPtrArrayRaw* ptrArray, unsigned int growCapacity)
+{
+    ptrArray->m_growCapacity = growCapacity;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8005992c
+ * PAL Size: 252b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void fn_8005992C(int param_1)
+{
+    int i = 0;
+    int slot = param_1;
+
+    do {
+        CFile::CHandle* handle = *reinterpret_cast<CFile::CHandle**>(slot + 0x2378c);
+        if (handle != 0 && File.IsCompleted(handle)) {
+            void* readBuffer = File.m_readBuffer;
+            int length = File.GetLength(handle);
+
+            Memory.CopyToAMemorySync(readBuffer, *reinterpret_cast<void**>(param_1 + 0x236f8), (length + 0x1fU) & ~0x1fU);
+            *reinterpret_cast<int*>(slot + 0x2370c) = length;
+            *reinterpret_cast<unsigned long*>(slot + 0x2374c) = CheckSum__FPvi(readBuffer, length);
+
+            *reinterpret_cast<int*>(param_1 + 0x23700) = *reinterpret_cast<int*>(param_1 + 0x23700) + 1;
+            *reinterpret_cast<int*>(param_1 + 0x236f8) = *reinterpret_cast<int*>(param_1 + 0x236f8) + length;
+
+            File.Close(handle);
+            *reinterpret_cast<CFile::CHandle**>(slot + 0x2378c) = 0;
+        }
+        i++;
+        slot += 4;
+    } while (i < 0x10);
 }
 
 /*

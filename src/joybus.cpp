@@ -4,6 +4,7 @@
 #include "ffcc/gbaque.h"
 #include "ffcc/system.h"
 
+#include <dolphin/gba/GBA.h>
 #include "dolphin/os.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/printf.h"
 
@@ -1193,12 +1194,7 @@ int JoyBus::SendGBA(ThreadParam* threadParam)
 
     OSWaitSemaphore(&m_accessSemaphores[port]);
     count = m_cmdCount[port];
-	
-    if (count > 0)
-	{
-        firstCmd = m_cmdQueueData[port][0];
-	}
-	
+    firstCmd = m_cmdQueueData[port][0];
     OSSignalSemaphore(&m_accessSemaphores[port]);
 
     if (static_cast<int>(count) < 1)
@@ -1206,15 +1202,11 @@ int JoyBus::SendGBA(ThreadParam* threadParam)
         return 0;
 	}
 
+    char isSingle = GbaQue.IsSingleMode(port);
 
-	// TODO
-    // bool isSingle = (IsSingleMode__8GbaQueueFi(&GbaQue, port) != 0);
-    bool isSingle = (bool)this;
-
-    if (!isSingle || port == 1)
+    if (isSingle == 0 || port == 1)
     {
-		// TODO: gba.c
-        threadParam->m_gbaStatus = (int)this; // GBAGetStatus(port, &threadParam->m_unk3);
+        threadParam->m_gbaStatus = GBAGetStatus(port, &threadParam->m_unk3);
     }
     else
     {
@@ -1236,8 +1228,7 @@ int JoyBus::SendGBA(ThreadParam* threadParam)
 		return 0;
 	}
 
-	// TODO: Gba.c
-    int gbaResult = (int)this; // GBAWrite(port, &firstCmd, &threadParam->m_unk3);
+    int gbaResult = GBAWrite(port, (unsigned char*)&firstCmd, &threadParam->m_unk3);
 	
     threadParam->m_gbaStatus = gbaResult;
 
@@ -1324,7 +1315,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
 
             if (sub == 0x03)
             {
-                // TODO: ClrLetterLstFlg__8GbaQueueFi(&GbaQue, port);
+                GbaQue.ClrLetterLstFlg(port);
                 GbaQue.SetQueue(port, prevCmd);
 
                 threadParam->m_state = '!';
@@ -1333,7 +1324,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
             }
             else if (sub == 0x02)
             {
-                // TODO: ClrLetterDatFlg__8GbaQueueFi(&GbaQue, port);
+                GbaQue.ClrLetterDatFlg(port);
                 GbaQue.SetQueue(port, prevCmd);
 
                 threadParam->m_state = '%';
@@ -1342,7 +1333,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
             }
             else if (sub == 0x06)
             {
-                // TODO: ClrSellFlg__8GbaQueueFi(&GbaQue, port);
+                GbaQue.ClrSellFlg(port);
                 GbaQue.SetQueue(port, prevCmd);
 
                 threadParam->m_state = '5';
@@ -1351,7 +1342,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
             }
             else if (sub == 0x07)
             {
-                // TODO: ClrBuyFlg__8GbaQueueFi(&GbaQue, port);
+                GbaQue.ClrBuyFlg(port);
                 GbaQue.SetQueue(port, prevCmd);
 
                 threadParam->m_state = '7';
@@ -1360,7 +1351,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
             }
             else if (sub == 0x08)
             {
-                // TODO: ClrMkSmithFlg__8GbaQueueFi(&GbaQue, port);
+                GbaQue.ClrMkSmithFlg(port);
                 GbaQue.SetQueue(port, prevCmd);
 
                 threadParam->m_state = '9';
@@ -1369,7 +1360,7 @@ int JoyBus::GBARecvSend(ThreadParam* threadParam, unsigned int* cmdOut)
             }
             else if (sub == 0x09)
             {
-                // TODO: ClrArtiDatFlg__8GbaQueueFi(&GbaQue, port);
+                GbaQue.ClrArtiDatFlg(port);
                 GbaQue.SetQueue(port, prevCmd);
 
                 threadParam->m_state = 'A';

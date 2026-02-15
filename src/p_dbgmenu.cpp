@@ -1,4 +1,5 @@
 #include "ffcc/p_dbgmenu.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/graphic.h"
 #include "ffcc/system.h"
 #include <dolphin/gx.h>
@@ -240,11 +241,29 @@ void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM*)
  * Address:	TODO
  * Size:	TODO
  */
-void CDbgMenuPcs::changeVtxFmt(int)
+void CDbgMenuPcs::changeVtxFmt(int vtxFmt)
 {
-	// TODO
-}
+    int& currentVtxFmt = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x2A68);
 
+    if (currentVtxFmt != vtxFmt) {
+        if (vtxFmt == 1) {
+            GXClearVtxDesc();
+            GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+            GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+            GXSetVtxAttrFmt(GX_VTXFMT1, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+            GXSetVtxAttrFmt(GX_VTXFMT1, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+            GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPEC);
+            _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+            _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+        } else if (vtxFmt == 0) {
+            GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPEC);
+            _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+            _GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
+        }
+
+        currentVtxFmt = vtxFmt;
+    }
+}
 /*
  * --INFO--
  * PAL Address: 0x8012c274

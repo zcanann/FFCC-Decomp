@@ -1,6 +1,7 @@
 #include "ffcc/p_dbgmenu.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/graphic.h"
+#include "ffcc/pad.h"
 #include "ffcc/system.h"
 #include <dolphin/gx.h>
 #include <string.h>
@@ -8,8 +9,19 @@
 extern unsigned char CFlat[];
 extern unsigned char DAT_8032e698;
 extern unsigned char DAT_8032ecd8;
+extern unsigned char CharaPcs[];
+extern unsigned char PartMng[];
+extern unsigned char PartPcs[];
+extern unsigned char Sound[];
 extern char s_Debug_80331c90[];
 extern u32 PTR_DAT_80212524;
+
+extern "C" int __cntlzw(unsigned int);
+extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+    void*, int, int, int, int, void*, void*);
+extern "C" void CheckDriver__6CSoundFi(void*, int);
+extern "C" void pppDumpMngSt__8CPartMngFv(void*);
+extern "C" void DumpLoad__9CCharaPcsFv(void*);
 
 /*
  * --INFO--
@@ -122,7 +134,168 @@ void CDbgMenuPcs::selectPrev()
  */
 void CDbgMenuPcs::calc()
 {
-	// TODO
+	unsigned short padInput;
+	unsigned int flags;
+	int menuPtr;
+	int cursorPtr;
+	int stackData[3];
+
+	if (*(int*)((char*)this + 0x58) == 0) {
+		return;
+	}
+
+	if (Pad._452_4_ == 0) {
+		padInput = *(unsigned short*)((unsigned char*)&Pad._8_2_ +
+		                              ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) *
+		                               0x54));
+	} else {
+		padInput = 0;
+	}
+
+	if ((padInput & 0x100) != 0) {
+		switch (*(int*)(*(int*)((char*)this + 0x2a5c) + 0x38)) {
+		case 100:
+			*(unsigned int*)(CFlat + 0x12A4) = ~*(unsigned int*)(CFlat + 0x12A4);
+			break;
+		case 0x65:
+			stackData[0] = 0;
+			stackData[2] = 0;
+			flags = (unsigned int)__cntlzw((int)((signed char)CFlat[0x12E4] >> 7));
+			flags = ((int)(char)(flags >> 5) & 1U) << 7 | ((unsigned char)CFlat[0x12E4] & 0x7F);
+			CFlat[0x12E4] = (unsigned char)flags;
+			stackData[1] = (int)(flags << 0x18) >> 0x1f;
+			SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+			    CFlat, 0, 1, 9, 3, stackData, 0);
+			break;
+		case 0x66:
+			flags = (unsigned int)__cntlzw((int)(char)((int)((unsigned int)(unsigned char)CFlat[0x12E4] << 0x1d) >> 0x1f));
+			CFlat[0x12E4] = (unsigned char)((((int)(char)(flags >> 5) << 2) & 4) | (CFlat[0x12E4] & 0xFB));
+			break;
+		case 0x67:
+			*(unsigned int*)((char*)this + 4) ^= 1;
+			break;
+		case 0x68:
+			*(unsigned int*)((char*)this + 4) ^= 2;
+			break;
+		case 0x69:
+			*(unsigned int*)((char*)this + 4) ^= 4;
+			break;
+		case 0x6A:
+			*(unsigned int*)((char*)this + 4) ^= 8;
+			break;
+		case 0x6B:
+			*(unsigned int*)((char*)this + 4) ^= 0x10;
+			break;
+		case 0x6C:
+			*(unsigned int*)((char*)this + 4) ^= 0x20;
+			break;
+		case 0x6D:
+			*(unsigned int*)((char*)this + 4) ^= 0x40;
+			break;
+		case 0x6E:
+			*(unsigned int*)((char*)this + 4) ^= 0x80;
+			break;
+		case 0x6F:
+			*(unsigned int*)((char*)this + 4) ^= 0x100;
+			break;
+		case 0x70:
+			*(unsigned int*)((char*)this + 4) ^= 0x200;
+			break;
+		case 0x71:
+			*(unsigned int*)((char*)this + 4) ^= 0x400;
+			break;
+		case 0x72:
+			*(unsigned int*)((char*)this + 4) ^= 0x800;
+			flags = (unsigned int)__cntlzw(*(unsigned int*)((char*)this + 4) & 0x800);
+			PartPcs[0x34] = (unsigned char)(flags >> 5);
+			break;
+		case 0x73:
+			*(unsigned int*)((char*)this + 4) ^= 0x1000;
+			break;
+		case 0x74:
+			CheckDriver__6CSoundFi(Sound, 1);
+			break;
+		case 0x75:
+			DAT_8032ecd8 = 1 - DAT_8032ecd8;
+			break;
+		case 0x76:
+			DAT_8032e698 = 1 - DAT_8032e698;
+			pppDumpMngSt__8CPartMngFv(PartMng);
+			break;
+		case 0x77:
+			DumpLoad__9CCharaPcsFv(CharaPcs);
+			break;
+		case 0x78:
+			*(unsigned int*)((char*)this + 4) ^= 0x2000;
+			break;
+		case 0x79:
+			*(unsigned int*)((char*)this + 4) ^= 0x4000;
+			break;
+		case 0x7A:
+			*(unsigned int*)((char*)this + 4) ^= 0x8000;
+			break;
+		}
+	}
+
+	if (Pad._452_4_ == 0) {
+		padInput = *(unsigned short*)((unsigned char*)&Pad._8_2_ +
+		                              ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) *
+		                               0x54));
+	} else {
+		padInput = 0;
+	}
+	if ((padInput & 4) != 0) {
+		menuPtr = *(int*)((char*)this + 0x2a5c);
+		*(unsigned char*)(menuPtr + 0x34) &= 0xBF;
+		do {
+			*(int*)((char*)this + 0x2a5c) = *(int*)(*(int*)((char*)this + 0x2a5c) + 0x48);
+			cursorPtr = *(int*)((char*)this + 0x2a5c);
+			if ((*(unsigned int*)(cursorPtr + 4) & 1) != 0) {
+				break;
+			}
+		} while (menuPtr != cursorPtr);
+		*(unsigned char*)(cursorPtr + 0x34) = (*(unsigned char*)(cursorPtr + 0x34) & 0xBF) | 0x40;
+	}
+
+	if (Pad._452_4_ == 0) {
+		padInput = *(unsigned short*)((unsigned char*)&Pad._8_2_ +
+		                              ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) *
+		                               0x54));
+	} else {
+		padInput = 0;
+	}
+	if ((padInput & 8) != 0) {
+		menuPtr = *(int*)((char*)this + 0x2a5c);
+		*(unsigned char*)(menuPtr + 0x34) &= 0xBF;
+		do {
+			*(int*)((char*)this + 0x2a5c) = *(int*)(*(int*)((char*)this + 0x2a5c) + 0x44);
+			cursorPtr = *(int*)((char*)this + 0x2a5c);
+			if ((*(unsigned int*)(cursorPtr + 4) & 1) != 0) {
+				break;
+			}
+		} while (menuPtr != cursorPtr);
+		*(unsigned char*)(cursorPtr + 0x34) = (*(unsigned char*)(cursorPtr + 0x34) & 0xBF) | 0x40;
+	}
+
+	if (*(int*)((char*)this + 0x58) != 0) {
+		calcMenu(*(CDM**)((char*)this + 0x58));
+	}
+
+	if (Pad._452_4_ == 0) {
+		padInput = *(unsigned short*)((unsigned char*)&Pad._8_2_ +
+		                              ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) *
+		                               0x54));
+	} else {
+		padInput = 0;
+	}
+	if ((padInput & 0x200) != 0) {
+		memset((char*)this + 0x5C, 0, 0x2A00);
+		*(int*)((char*)this + 0x58) = 0;
+		*(int*)((char*)this + 0x2A60) = 0;
+		*(int*)((char*)this + 0x2A5C) = 0;
+	}
+
+	Pad._452_4_ = 1;
 }
 
 /*

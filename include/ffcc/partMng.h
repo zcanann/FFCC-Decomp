@@ -481,7 +481,7 @@ public:
     void pppDeletePart(int);
     void pppEndPart(int);
 
-    void pppGetIfDt(short);
+    PPPIFPARAM* pppGetIfDt(short);
     void pppShowIdx(short, unsigned char);
     void pppFieldShowFpNo(short, unsigned char);
     void pppFieldEndFpNo(short);

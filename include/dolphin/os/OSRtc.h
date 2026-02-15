@@ -65,16 +65,16 @@ typedef struct SramControl {
     void (*callback)();
 } SramControl;
 
-u32 OSGetSoundMode(void);
 void OSSetSoundMode(u32 mode);
+u32 OSGetSoundMode(void);
 u32 OSGetVideoMode(void);
 void OSSetVideoMode(u32 mode);
 u8 OSGetLanguage(void);
 void OSSetLanguage(u8 language);
 u16 OSGetGbsMode(void);
 void OSSetGbsMode(u16 mode);
-u32 OSGetProgressiveMode(void);
 void OSSetProgressiveMode(u32 on);
+u32 OSGetProgressiveMode(void);
 u32 OSGetEuRgb60Mode(void);
 void OSSetEuRgb60Mode(u32 on);
 u16 OSGetWirelessID(s32 chan);

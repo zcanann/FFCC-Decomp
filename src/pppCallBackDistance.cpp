@@ -6,6 +6,7 @@
 
 extern CPartMng PartMng;
 extern u8* lbl_8032ED50;
+extern "C" void ParticleFrameCallback__5CGameFiiiiiP3Vec(CGame*, int, int, int, int, int, Vec*);
 
 /*
  * --INFO--
@@ -62,34 +63,31 @@ void pppDestructCallBackDistance(void)
  */
 void pppFrameCallBackDistance(pppCallBackDistance* param1, UnkB* param2, UnkC* param3)
 {
-    u8* pppMngSt;
-    s32 valueOffset;
-    s32 partIndex;
-    s32 graphFrame;
+    u8* pppMngSt = lbl_8032ED50;
+    s32 dataOffset = *param3->m_serializedDataOffsets;
     f32 distance;
     Vec local_1c;
     Vec local_28;
 
-    pppMngSt = lbl_8032ED50;
     local_1c.x = *(f32*)(pppMngSt + 0x84);
-    valueOffset = *param3->m_serializedDataOffsets + 0x80;
     local_1c.y = *(f32*)(pppMngSt + 0x94);
     local_1c.z = *(f32*)(pppMngSt + 0xA4);
     distance = PSVECDistance(&local_1c, (Vec*)(pppMngSt + 0x68));
 
     if ((distance <= param2->m_dataValIndex) ||
-        (*(f32*)((u8*)param1 + valueOffset) <= distance)) {
-        pppMngSt = lbl_8032ED50;
+        (*(f32*)((u8*)param1 + dataOffset + 0x80) <= distance)) {
+        s32 partIndex;
+        s32 graphFrame;
+
         local_28.x = *(f32*)(pppMngSt + 0x84);
         local_28.y = *(f32*)(pppMngSt + 0x94);
         local_28.z = *(f32*)(pppMngSt + 0xA4);
         PSMTXMultVec(ppvWorldMatrix, &local_28, &local_28);
 
-        partIndex = ((s32)((u8*)pppMngSt - ((u8*)&PartMng + 0x2A18))) / 0x158;
-        graphFrame = *(s32*)((u8*)param1 + 0xC) / 0x1000;
-        Game.game.ParticleFrameCallback(partIndex, (s32)*(s16*)(pppMngSt + 0x74),
-                                        (s32)*(s16*)(pppMngSt + 0x76),
-                                        (s32)*(s16*)&param2->m_initWOrk, graphFrame,
-                                        &local_28);
+        partIndex = ((s32)(pppMngSt - ((u8*)&PartMng + 0x2A18))) / 0x158;
+        graphFrame = (s32)(*(u32*)((u8*)param1 + 0xC)) / 0x1000;
+        ParticleFrameCallback__5CGameFiiiiiP3Vec(
+            &Game.game, partIndex, (s32)*(s16*)(pppMngSt + 0x74), (s32)*(s16*)(pppMngSt + 0x76),
+            (s32)*(s16*)&param2->m_initWOrk, graphFrame, &local_28);
     }
 }

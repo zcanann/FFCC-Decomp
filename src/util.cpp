@@ -64,42 +64,82 @@ void CUtil::Quit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80024de0
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CUtil::SetVtxFmt_POS_CLR()
 {
-	// TODO
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80024d54
+ * PAL Size: 140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CUtil::SetVtxFmt_POS_CLR_TEX()
 {
-	// TODO
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80024cc8
+ * PAL Size: 140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CUtil::SetVtxFmt_POS_TEX0_TEX1()
 {
-	// TODO
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX1, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_TEX1, GX_TEX_ST, GX_F32, 0);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80024c18
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CUtil::SetVtxFmt_POS_CLR_TEX0_TEX1()
 {
-	// TODO
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX1, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_TEX1, GX_TEX_ST, GX_F32, 0);
 }
 
 /*
@@ -214,12 +254,28 @@ void CUtil::ConvF2IVector2d(S16Vec2d& out, Vec2d in, long shift)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80024748
+ * PAL Size: 172b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CUtil::RenderQuadNoTex(Vec, Vec, _GXColor)
+void CUtil::RenderQuadNoTex(Vec pos1, Vec pos2, _GXColor color)
 {
-	// TODO
+    GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
+
+    GXPosition3f32(pos1.x, pos1.y, pos1.z);
+    GXColor1u32(*reinterpret_cast<u32*>(&color));
+
+    GXPosition3f32(pos2.x, pos1.y, pos1.z);
+    GXColor1u32(*reinterpret_cast<u32*>(&color));
+
+    GXPosition3f32(pos2.x, pos2.y, pos1.z);
+    GXColor1u32(*reinterpret_cast<u32*>(&color));
+
+    GXPosition3f32(pos1.x, pos2.y, pos1.z);
+    GXColor1u32(*reinterpret_cast<u32*>(&color));
 }
 
 /*

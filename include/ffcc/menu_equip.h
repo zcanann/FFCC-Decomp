@@ -7,7 +7,7 @@ public:
     void EquipInit();
     void EquipInit0();
     void EquipInit1();
-    void EquipOpen();
+    int EquipOpen();
     void EquipCtrl();
     void EquipClose();
     void EquipDraw();

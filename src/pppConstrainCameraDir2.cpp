@@ -38,7 +38,9 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, UnkB* param_2, 
 	float fVar4;
 	float fVar5;
 	unsigned char* flags;
-	Vec local_108;
+	float local_108;
+	float local_104;
+	float local_100;
 	Vec local_fc;
 	Vec local_f0;
 	float local_e4;
@@ -105,11 +107,11 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, UnkB* param_2, 
 			
 			fVar2 = ((_pppPObject*)param_1)->m_localMatrix.value[0][3];
 			fVar3 = ((_pppPObject*)param_1)->m_localMatrix.value[1][3];
-			local_108.x = local_cc;
-			local_108.y = local_c8;
-			local_108.z = local_c4;
+			local_108 = local_cc;
+			local_104 = local_c8;
+			local_100 = local_c4;
 			
-			GetDirectVector__5CUtilFP3VecP3Vec3Vec((void*)&DAT_8032ec70, (Vec*)&local_d8, (Vec*)&local_e4, &local_108);
+			GetDirectVector__5CUtilFP3VecP3Vec3Vec((void*)&DAT_8032ec70, (Vec*)&local_d8, (Vec*)&local_e4, (Vec*)&local_108);
 			
 			local_f0.x = fVar2 * local_d8;
 			local_f0.y = fVar2 * local_d4;

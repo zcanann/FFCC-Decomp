@@ -517,6 +517,48 @@ extern "C" void SetDefaultGroup__7CMemoryFi(void* memory, int group)
 
 /*
  * --INFO--
+ * PAL Address: 0x800B93DC
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void SetCharaAllocStage__9CCharaPcsFi(void* charaPcs, int stage)
+{
+    *(int*)((char*)charaPcs + 0xE4) = stage;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B93E4
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void SetUseDOF__11CGraphicPcsFi(void* graphicPcs, int enabled)
+{
+    *(int*)((char*)graphicPcs + 0xC0) = enabled;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B93EC
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void Close__Q25CFile7CHandleFv(CFile::CHandle* fileHandle)
+{
+    File.Close(fileHandle);
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

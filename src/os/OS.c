@@ -632,9 +632,5 @@ u32 __OSGetDIConfig(void) {
 }
 
 void OSRegisterVersion(const char* id) {
-    (void)id;
-    asm {
-        crclr 6
-    }
-    OSReport(__OSVersion);
+    OSReport("%s\n", id);
 }

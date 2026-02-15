@@ -218,6 +218,7 @@ extern "C" __partial_array_destructor* dtor_801AFA6C(__partial_array_destructor*
  */
 extern "C" void* __construct_new_array(void* ptr, ConstructorDestructor ctor, ConstructorDestructor dtor, size_t elementSize, size_t count)
 {
+	size_t i;
 	char* current;
 
 	if (ptr != nullptr) {
@@ -226,15 +227,19 @@ extern "C" void* __construct_new_array(void* ptr, ConstructorDestructor ctor, Co
 		ptr = (char*)ptr + ARRAY_HEADER_SIZE;
 
 		if (ctor != nullptr) {
-			__partial_array_destructor pdestructor(ptr, elementSize, count, dtor);
-
 			current = (char*)ptr;
-			pdestructor.i = 0;
-			for (; pdestructor.i < count; pdestructor.i = pdestructor.i + 1) {
+			for (i = 0; i < count; i = i + 1) {
 				CTORCALL_COMPLETE(ctor, current);
 				current = current + elementSize;
 			}
-			pdestructor.i = count;
+
+			if ((i < count) && (dtor != nullptr)) {
+				current = (char*)ptr + elementSize * i;
+				for (; i != 0; i = i - 1) {
+					current = current - elementSize;
+					DTORCALL_COMPLETE(dtor, current);
+				}
+			}
 		}
 	}
 
@@ -252,17 +257,23 @@ extern "C" void* __construct_new_array(void* ptr, ConstructorDestructor ctor, Co
  */
 extern "C" void __construct_array(void* ptr, ConstructorDestructor ctor, ConstructorDestructor dtor, size_t size, size_t n)
 {
-	if (ctor != nullptr) {
-		__partial_array_destructor pdestructor(ptr, size, n, dtor);
-		char* current;
+	size_t i;
+	char* current;
 
+	if (ctor != nullptr) {
 		current = (char*)ptr;
-		pdestructor.i = 0;
-		for (; pdestructor.i < n; pdestructor.i = pdestructor.i + 1) {
+		for (i = 0; i < n; i = i + 1) {
 			CTORCALL_COMPLETE(ctor, current);
 			current = current + size;
 		}
-		pdestructor.i = n;
+
+		if ((i < n) && (dtor != nullptr)) {
+			current = (char*)ptr + size * i;
+			for (; i != 0; i = i - 1) {
+				current = current - size;
+				DTORCALL_COMPLETE(dtor, current);
+			}
+		}
 	}
 }
 

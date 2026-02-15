@@ -13,10 +13,9 @@ struct pppYmTraceMove {
 struct UnkB {
     s32 m_graphId;
     f32 m_dataValIndex;
-    s16 m_initWOrk;
+    f32 m_initWOrk;
     f32 m_stepValue;
-    s16 m_arg3;
-    u16 pad;
+    f32 m_arg3;
     f32* m_payload;
 };
 

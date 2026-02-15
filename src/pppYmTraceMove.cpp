@@ -84,9 +84,9 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, UnkB* param_2, UnkC* pa
 	dest[2].y = dest[2].y + dest[2].z;
 
 	if (param_2->m_graphId == pppYmTraceMove->field0_0x0.m_graphId) {
-		dest[2].y = dest[2].y + (f32)param_2->m_initWOrk;
+		dest[2].y = dest[2].y + param_2->m_initWOrk;
 		dest[2].z = dest[2].z + param_2->m_stepValue;
-		dest[3].x = dest[3].x + (f32)param_2->m_arg3;
+		dest[3].x = dest[3].x + param_2->m_arg3;
 	}
 
 	if (owner == nullptr) {

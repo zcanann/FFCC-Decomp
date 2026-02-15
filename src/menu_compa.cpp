@@ -123,7 +123,7 @@ void CMenuPcs::CompaInit0()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::CompaOpen()
+bool CMenuPcs::CompaOpen()
 {
 	int menuState = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c);
 	if (*reinterpret_cast<char*>(menuState + 0xb) == 0) {
@@ -135,6 +135,7 @@ void CMenuPcs::CompaOpen()
 
 	int entryCount = static_cast<int>(**reinterpret_cast<short**>(reinterpret_cast<char*>(this) + 0x850));
 	short* entry = *reinterpret_cast<short**>(reinterpret_cast<char*>(this) + 0x850) + 4;
+	int completeCount = 0;
 	for (int i = 0; i < entryCount; ++i) {
 		if (*reinterpret_cast<int*>(entry + 0x12) <= time) {
 			int duration = *reinterpret_cast<int*>(entry + 0x14);
@@ -150,6 +151,7 @@ void CMenuPcs::CompaOpen()
 						(*reinterpret_cast<float*>(entry + 0x1e) - static_cast<float>(entry[1])) * t;
 				}
 			} else {
+				completeCount = completeCount + 1;
 				*reinterpret_cast<float*>(entry + 8) = 1.0f;
 				*reinterpret_cast<float*>(entry + 0x18) = 0.0f;
 				*reinterpret_cast<float*>(entry + 0x1a) = 0.0f;
@@ -158,6 +160,7 @@ void CMenuPcs::CompaOpen()
 
 		entry += 0x20;
 	}
+	return entryCount == completeCount;
 }
 
 /*

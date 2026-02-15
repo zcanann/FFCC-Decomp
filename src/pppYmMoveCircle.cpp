@@ -12,6 +12,7 @@ struct pppYmMoveCircleWork {
     f32 m_radius;
     f32 m_radiusStep;
     f32 m_radiusStepStep;
+    f32 m_unk1C;
     Vec m_center;
     u8 m_hasInit;
 };
@@ -26,6 +27,7 @@ extern f32 lbl_80330D84;
 extern f32 lbl_80330D88;
 extern f32 lbl_80330D8C;
 extern f32 lbl_80330D90;
+extern "C" double acos(double);
 
 /*
  * --INFO--

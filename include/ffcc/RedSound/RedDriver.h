@@ -77,7 +77,7 @@ public:
 	void ClearSeSepDataMG(int, int, int, int);
 	void ReentrySeSepData(int);
 
-	void SePlayState(int);
+	int SePlayState(int);
 	void SeStop(int);
 	void SeStopMG(int, int, int, int);
 	void SePlay(int, int, int, int, int, int);

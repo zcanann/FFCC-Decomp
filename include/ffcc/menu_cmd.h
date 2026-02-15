@@ -15,8 +15,8 @@ public:
     int CmdClose();
     void CmdDraw();
     void CmdCtrlCur();
-    void CmdOpen0();
-    void CmdClose0();
+    unsigned int CmdOpen0();
+    unsigned int CmdClose0();
     void GetCmdItem();
     void ChkCmdActive(int);
     void ChkUnite(int, int (*)[2]);

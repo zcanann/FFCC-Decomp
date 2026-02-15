@@ -1,4 +1,5 @@
 #include "ffcc/p_dbgmenu.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/graphic.h"
 #include "ffcc/p_chara.h"
 #include "ffcc/p_tina.h"
@@ -12,6 +13,10 @@
 extern unsigned char CFlat[];
 extern unsigned char DAT_8032e698;
 extern unsigned char DAT_8032ecd8;
+extern unsigned char CharaPcs[];
+extern unsigned char PartMng[];
+extern unsigned char PartPcs[];
+extern unsigned char Sound[];
 extern char s_Debug_80331c90[];
 extern u32 PTR_DAT_80212524;
 extern CPartMng PartMng;
@@ -28,6 +33,13 @@ static inline u16 ReadDbgButtons()
 	const u32 padIndex = (Pad._448_4_ == 4) ? 0 : 4;
 	return *(u16*)((u8*)&Pad + 8 + padIndex * 0x54);
 }
+
+extern "C" int __cntlzw(unsigned int);
+extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+    void*, int, int, int, int, void*, void*);
+extern "C" void CheckDriver__6CSoundFi(void*, int);
+extern "C" void pppDumpMngSt__8CPartMngFv(void*);
+extern "C" void DumpLoad__9CCharaPcsFv(void*);
 
 /*
  * --INFO--
@@ -389,11 +401,29 @@ void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM*)
  * Address:	TODO
  * Size:	TODO
  */
-void CDbgMenuPcs::changeVtxFmt(int)
+void CDbgMenuPcs::changeVtxFmt(int vtxFmt)
 {
-	// TODO
-}
+    int& currentVtxFmt = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x2A68);
 
+    if (currentVtxFmt != vtxFmt) {
+        if (vtxFmt == 1) {
+            GXClearVtxDesc();
+            GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+            GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+            GXSetVtxAttrFmt(GX_VTXFMT1, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+            GXSetVtxAttrFmt(GX_VTXFMT1, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+            GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPEC);
+            _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+            _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+        } else if (vtxFmt == 0) {
+            GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPEC);
+            _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+            _GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
+        }
+
+        currentVtxFmt = vtxFmt;
+    }
+}
 /*
  * --INFO--
  * PAL Address: 0x8012c274

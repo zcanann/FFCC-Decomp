@@ -1,4 +1,6 @@
 #include "ffcc/texanim.h"
+#include "ffcc/chunkfile.h"
+#include "ffcc/materialman.h"
 #include "ffcc/system.h"
 #include "ffcc/math.h"
 
@@ -33,8 +35,14 @@ public:
 extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
 extern "C" void __ct__4CRefFv(void*);
+extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void* PTR_PTR_s_CTexAnimSet_801e9c6c;
+extern "C" void* PTR_PTR_s_CTexAnim_801e9c54;
+extern "C" void* PTR_PTR_s_CTexAnimSeq_801e9c24;
+extern "C" void* PTR_PTR_s_CTexAnim_CRefData_801e9c3c;
+extern "C" char s_texanim_cpp_801d7adc[];
+extern "C" char DAT_8032fb48[];
 extern "C" float FLOAT_8032fb38;
 extern "C" int Rand__5CMathFUl(CMath*, unsigned long);
 
@@ -72,6 +80,19 @@ static inline unsigned int& U32At(void* p, unsigned int offset)
 static inline unsigned char& U8At(void* p, unsigned int offset)
 {
     return *reinterpret_cast<unsigned char*>(Ptr(p, offset));
+}
+
+static inline void ReleaseRef(void** slot)
+{
+    int* ref = reinterpret_cast<int*>(*slot);
+    if (ref != 0) {
+        const int nextRefCount = ref[1] - 1;
+        ref[1] = nextRefCount;
+        if (nextRefCount == 0) {
+            reinterpret_cast<void (**)(int*, int)>(*ref)[2](ref, 1);
+        }
+        *slot = 0;
+    }
 }
 }
 
@@ -535,32 +556,198 @@ CTexAnimSet::~CTexAnimSet()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800446a0
+ * PAL Size: 900b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CTexAnimSet::Create(CChunkFile&, CMemory::CStage*)
+void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
 {
-	// TODO
+    CPtrArray<CTexAnim*>* texAnims = reinterpret_cast<CPtrArray<CTexAnim*>*>(Ptr(this, 8));
+    CChunkFile::CChunk chunk;
+
+    texAnims->SetStage(stage);
+    chunkFile.PushChunk();
+    while (chunkFile.GetNextChunk(chunk)) {
+        if (chunk.m_id == 0x54414E4D) {
+            CTexAnim* texAnim =
+                static_cast<CTexAnim*>(__nw__FUlPQ27CMemory6CStagePci(0x24, stage, s_texanim_cpp_801d7adc, 0x3F));
+            if (texAnim != 0) {
+                __ct__4CRefFv(texAnim);
+                *reinterpret_cast<void**>(texAnim) = &PTR_PTR_s_CTexAnim_801e9c54;
+                *reinterpret_cast<void**>(Ptr(texAnim, 8)) = 0;
+                S32At(texAnim, 0x0C) = 0;
+                F32At(texAnim, 0x10) = FLOAT_8032fb38;
+                S32At(texAnim, 0x14) = -2;
+                F32At(texAnim, 0x18) = FLOAT_8032fb38;
+                F32At(texAnim, 0x1C) = FLOAT_8032fb38;
+                F32At(texAnim, 0x20) = FLOAT_8032fb38;
+            }
+
+            ReleaseRef(reinterpret_cast<void**>(Ptr(texAnim, 8)));
+            void* refData = __nw__FUlPQ27CMemory6CStagePci(0x12C, stage, s_texanim_cpp_801d7adc, 0xD3);
+            if (refData != 0) {
+                __ct__4CRefFv(refData);
+                *reinterpret_cast<void**>(refData) = &PTR_PTR_s_CTexAnim_CRefData_801e9c3c;
+                CPtrArray<CTexAnimSeq*>* const seqs = reinterpret_cast<CPtrArray<CTexAnimSeq*>*>(Ptr(refData, 0x110));
+                seqs->m_size = 0;
+                seqs->m_numItems = 0;
+                seqs->m_defaultSize = 0x10;
+                seqs->m_items = 0;
+                seqs->m_stage = 0;
+                seqs->m_growCapacity = 1;
+                *reinterpret_cast<void**>(Ptr(refData, 0x108)) = 0;
+                S32At(refData, 0x10C) = 0;
+            }
+            *reinterpret_cast<void**>(Ptr(texAnim, 8)) = refData;
+            reinterpret_cast<CPtrArray<CTexAnimSeq*>*>(Ptr(refData, 0x110))->SetStage(stage);
+
+            chunkFile.PushChunk();
+            while (chunkFile.GetNextChunk(chunk)) {
+                if (chunk.m_id == 0x53455120) {
+                    CTexAnimSeq* seq = static_cast<CTexAnimSeq*>(
+                        __nw__FUlPQ27CMemory6CStagePci(0x118, stage, s_texanim_cpp_801d7adc, 0xE2));
+                    if (seq != 0) {
+                        __ct__4CRefFv(seq);
+                        *reinterpret_cast<void**>(seq) = &PTR_PTR_s_CTexAnimSeq_801e9c24;
+                        S32At(seq, 0x10C) = 0;
+                        U8At(seq, 0x110) = 0;
+                    }
+
+                    CChunkFile::CChunk subChunk;
+                    chunkFile.PushChunk();
+                    while (chunkFile.GetNextChunk(subChunk)) {
+                        if (subChunk.m_id == 0x4B455920) {
+                            S32At(seq, 0x10C) = static_cast<int>(subChunk.m_size / 0x30);
+                            void* keys = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+                                &Memory, static_cast<unsigned long>(subChunk.m_size), stage,
+                                s_texanim_cpp_801d7adc, 0x1D4, 0);
+                            *reinterpret_cast<void**>(Ptr(seq, 0x114)) = keys;
+                            memcpy(keys, chunkFile.GetAddress(), subChunk.m_size);
+                        } else if (subChunk.m_id < 0x4B455920) {
+                            if (subChunk.m_id == 0x494E464F) {
+                                U32At(seq, 0x108) = chunkFile.Get4();
+                                chunkFile.Get4();
+
+                                const unsigned char bit7 = static_cast<unsigned char>(chunkFile.Get4() << 7);
+                                U8At(seq, 0x110) = (U8At(seq, 0x110) & 0x7F) | bit7;
+                                const unsigned char bit6 = static_cast<unsigned char>((chunkFile.Get4() << 6) & 0x40);
+                                U8At(seq, 0x110) = (U8At(seq, 0x110) & 0xBF) | bit6;
+                                const unsigned char bit5 =
+                                    static_cast<unsigned char>((strcmp(reinterpret_cast<char*>(Ptr(seq, 8)), DAT_8032fb48) == 0)
+                                                                    ? 0x20
+                                                                    : 0);
+                                U8At(seq, 0x110) = (U8At(seq, 0x110) & 0xDF) | bit5;
+                            }
+                        } else if (subChunk.m_id == 0x4E414D45) {
+                            strcpy(reinterpret_cast<char*>(Ptr(seq, 8)), chunkFile.GetString());
+                        }
+                    }
+                    chunkFile.PopChunk();
+                    reinterpret_cast<CPtrArray<CTexAnimSeq*>*>(Ptr(refData, 0x110))->Add(seq);
+                } else if ((chunk.m_id < 0x53455120) && (chunk.m_id == 0x4E414D45)) {
+                    S32At(refData, 0x10C) = static_cast<int>(chunk.m_arg0);
+                    strcpy(reinterpret_cast<char*>(Ptr(refData, 8)), chunkFile.GetString());
+                }
+            }
+            chunkFile.PopChunk();
+            texAnims->Add(texAnim);
+        }
+    }
+    chunkFile.PopChunk();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80044540
+ * PAL Size: 352b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CTexAnimSet::Duplicate(CMemory::CStage*)
+CTexAnimSet* CTexAnimSet::Duplicate(CMemory::CStage* stage)
 {
-	// TODO
+    CTexAnimSet* dup =
+        static_cast<CTexAnimSet*>(__nw__FUlPQ27CMemory6CStagePci(0x28, stage, s_texanim_cpp_801d7adc, 0x54));
+    if (dup != 0) {
+        __ct__4CRefFv(dup);
+        *reinterpret_cast<void**>(dup) = &PTR_PTR_s_CTexAnimSet_801e9c6c;
+        CPtrArray<CTexAnim*>* const arr = reinterpret_cast<CPtrArray<CTexAnim*>*>(Ptr(dup, 8));
+        arr->m_size = 0;
+        arr->m_numItems = 0;
+        arr->m_defaultSize = 0x10;
+        arr->m_items = 0;
+        arr->m_stage = 0;
+        arr->m_growCapacity = 1;
+        F32At(dup, 0x24) = FLOAT_8032fb38;
+    }
+
+    CPtrArray<CTexAnim*>* const dstArray = reinterpret_cast<CPtrArray<CTexAnim*>*>(Ptr(dup, 8));
+    CPtrArray<CTexAnim*>* const srcArray = reinterpret_cast<CPtrArray<CTexAnim*>*>(Ptr(this, 8));
+    dstArray->SetStage(stage);
+    for (unsigned long i = 0; i < static_cast<unsigned long>(srcArray->GetSize()); i++) {
+        CTexAnim* const src = (*srcArray)[i];
+        CTexAnim* const copy =
+            static_cast<CTexAnim*>(__nw__FUlPQ27CMemory6CStagePci(0x24, stage, s_texanim_cpp_801d7adc, 0xF4));
+        if (copy != 0) {
+            __ct__4CRefFv(copy);
+            *reinterpret_cast<void**>(copy) = &PTR_PTR_s_CTexAnim_801e9c54;
+            *reinterpret_cast<void**>(Ptr(copy, 8)) = 0;
+            S32At(copy, 0x0C) = 0;
+            F32At(copy, 0x10) = FLOAT_8032fb38;
+            S32At(copy, 0x14) = -2;
+            F32At(copy, 0x18) = FLOAT_8032fb38;
+            F32At(copy, 0x1C) = FLOAT_8032fb38;
+            F32At(copy, 0x20) = FLOAT_8032fb38;
+        }
+
+        *reinterpret_cast<void**>(Ptr(copy, 8)) = *reinterpret_cast<void**>(Ptr(src, 8));
+        S32At(*reinterpret_cast<void**>(Ptr(copy, 8)), 4) = S32At(*reinterpret_cast<void**>(Ptr(copy, 8)), 4) + 1;
+        S32At(copy, 0x0C) = S32At(src, 0x0C);
+        U32At(copy, 0x10) = U32At(src, 0x10);
+        S32At(copy, 0x14) = S32At(src, 0x14);
+        U32At(copy, 0x18) = U32At(src, 0x18);
+        U32At(copy, 0x1C) = U32At(src, 0x1C);
+        U32At(copy, 0x20) = U32At(src, 0x20);
+        dstArray->Add(copy);
+    }
+
+    F32At(dup, 0x24) = F32At(this, 0x24);
+    return dup;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80044440
+ * PAL Size: 256b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CTexAnimSet::AttachMaterialSet(CMaterialSet*)
+void CTexAnimSet::AttachMaterialSet(CMaterialSet* materialSet)
 {
-	// TODO
+    CPtrArray<CTexAnim*>* texAnims = reinterpret_cast<CPtrArray<CTexAnim*>*>(Ptr(this, 8));
+
+    for (unsigned long i = 0; i < static_cast<unsigned long>(texAnims->GetSize()); i++) {
+        CTexAnim* texAnim = (*texAnims)[i];
+        void* refData = *reinterpret_cast<void**>(Ptr(texAnim, 8));
+        void** materialRef = reinterpret_cast<void**>(Ptr(refData, 0x108));
+        ReleaseRef(materialRef);
+
+        if (materialSet != 0) {
+            const long materialIdx = static_cast<long>(materialSet->Find(reinterpret_cast<char*>(Ptr(refData, 8))));
+            if (materialIdx >= 0) {
+                CMaterial* material =
+                    (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8)))[static_cast<unsigned long>(materialIdx)];
+                *materialRef = material;
+                S32At(material, 4) = S32At(material, 4) + 1;
+            }
+        }
+    }
 }
 
 /*

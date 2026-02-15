@@ -77,7 +77,7 @@ public:
     void RenderTexQuadGrouad(Vec, Vec, _GXColor, _GXColor, _GXColor, _GXColor);
     void RenderNoTexQuadGrouad(Vec, Vec, _GXColor, _GXColor, _GXColor, _GXColor);
 
-    void RenderDOF(char, char, float, float, Vec&, int);
+    void RenderDOF(signed char, signed char, float, float, Vec, int);
 
     void CreateSmallBackTexture(void*, _GXTexObj*, long, long, _GXTexFilter, _GXTexFmt, unsigned long);
 

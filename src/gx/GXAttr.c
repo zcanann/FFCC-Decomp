@@ -396,19 +396,15 @@ void GXSetVtxAttrFmtv(GXVtxFmt vtxfmt, const GXVtxAttrFmtList* list) {
 
 void __GXSetVAT(void) {
     s32 i;
-    u32 dirty = __GXData->dirtyVAT;
-    
-    i = 0;
-    do {
-        if (dirty & 1) {
-            GX_WRITE_SOME_REG4(8, i | 0x70, __GXData->vatA[i], i - 12);
-            GX_WRITE_SOME_REG4(8, i | 0x80, __GXData->vatB[i], i - 12);
-            GX_WRITE_SOME_REG4(8, i | 0x90, __GXData->vatC[i], i - 12);
-        }
+    u8 b;
 
-        dirty >>= 1;
-        i++;
-    } while (dirty != 0);
+    for (b = 0, i = 0; b < 8; b++, i++) {
+        if ((__GXData->dirtyVAT & (u8)(1 << b)) != 0) {
+            GX_WRITE_SOME_REG4(8, b | 0x70, __GXData->vatA[i], i - 12);
+            GX_WRITE_SOME_REG4(8, b | 0x80, __GXData->vatB[i], i - 12);
+            GX_WRITE_SOME_REG4(8, b | 0x90, __GXData->vatC[i], i - 12);
+        }
+    }
 
     __GXData->dirtyVAT = 0;
 }

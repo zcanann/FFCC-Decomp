@@ -594,22 +594,39 @@ void CGame::GetBossArtifact(int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800143ec
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGame::GetFoodLevel(int, int)
+int CGame::GetFoodLevel(int playerIndex, int foodIndex)
 {
-	// TODO
+    s16 level = reinterpret_cast<s16*>(m_scriptFoodBase[playerIndex] + 0x3B8)[foodIndex];
+    return level;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800143a4
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGame::GetTargetCursor(int, Vec&, Vec&)
+void CGame::GetTargetCursor(int playerIndex, Vec& posA, Vec& posB)
 {
-	// TODO
+    f32* cursorPos = reinterpret_cast<f32*>(m_scriptFoodBase[playerIndex] + 0xBAC);
+
+    posA.x = cursorPos[0];
+    posA.y = cursorPos[1];
+    posA.z = cursorPos[2];
+
+    posB.x = cursorPos[3];
+    posB.y = cursorPos[4];
+    posB.z = cursorPos[5];
 }
 
 /*

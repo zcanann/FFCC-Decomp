@@ -1,10 +1,16 @@
 #include "ffcc/FunnyShape.h"
+#include "ffcc/gxfunc.h"
 #include "types.h"
 
+#include <dolphin/gx.h>
 #include <string.h>
 
 extern "C" void __dl__FPv(void* ptr);
 extern "C" void __dla__FPv(void* ptr);
+extern u32 DAT_8032fd60;
+extern float FLOAT_8032fd6c;
+extern float FLOAT_8032fd90;
+extern float FLOAT_8032fd94;
 
 namespace {
 static inline u8* Ptr(CFunnyShape* self, u32 offset)
@@ -180,12 +186,64 @@ void CFunnyShape::RenderTexture()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80051110
+ * PAL Size: 620b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFunnyShape::RenderShape()
 {
-	// TODO
+    if ((U32At(this, 0x60D4) != 0) && (PtrAt(this, 0x6010) != 0)) {
+        struct Vec2dPair {
+            float x;
+            float y;
+        };
+
+        u32 color = DAT_8032fd60;
+        Vec2dPair origin;
+        origin.x = FLOAT_8032fd90;
+        origin.y = FLOAT_8032fd94;
+
+        GXClearVtxDesc();
+        GXSetVtxDesc(static_cast<GXAttr>(9), static_cast<GXAttrType>(1));
+        GXSetVtxDesc(static_cast<GXAttr>(0xB), static_cast<GXAttrType>(1));
+        GXSetVtxDesc(static_cast<GXAttr>(0xD), static_cast<GXAttrType>(1));
+        GXSetVtxAttrFmt(static_cast<GXVtxFmt>(0), static_cast<GXAttr>(9), static_cast<GXCompCnt>(1), static_cast<GXCompType>(4), 0);
+        GXSetVtxAttrFmt(static_cast<GXVtxFmt>(0), static_cast<GXAttr>(0xB), static_cast<GXCompCnt>(1), static_cast<GXCompType>(5), 0);
+        GXSetVtxAttrFmt(static_cast<GXVtxFmt>(0), static_cast<GXAttr>(0xD), static_cast<GXCompCnt>(1), static_cast<GXCompType>(4), 0);
+        GXSetNumTexGens(1);
+        GXSetNumTevStages(1);
+        GXSetTexCoordGen2(static_cast<GXTexCoordID>(0), static_cast<GXTexGenType>(1), static_cast<GXTexGenSrc>(4),
+                          static_cast<u32>(0x3C), static_cast<GXBool>(0), static_cast<u32>(0x7D));
+        _GXSetTevOrder(static_cast<GXTevStageID>(0), static_cast<GXTexCoordID>(0), static_cast<GXTexMapID>(0),
+                       static_cast<GXChannelID>(4));
+        _GXSetBlendMode(static_cast<GXBlendMode>(1), static_cast<GXBlendFactor>(4), static_cast<GXBlendFactor>(2),
+                        static_cast<GXLogicOp>(3));
+        GXLoadTexObj(reinterpret_cast<_GXTexObj*>(PtrAt(this, 0x6014)), static_cast<GXTexMapID>(0));
+        GXSetNumChans(1);
+        GXSetChanCtrl(static_cast<GXChannelID>(0), static_cast<GXBool>(0), static_cast<GXColorSrc>(0), static_cast<GXColorSrc>(1),
+                      static_cast<u32>(0), static_cast<GXDiffuseFn>(2), static_cast<GXAttnFn>(1));
+        GXSetChanCtrl(static_cast<GXChannelID>(2), static_cast<GXBool>(0), static_cast<GXColorSrc>(0), static_cast<GXColorSrc>(1),
+                      static_cast<u32>(0), static_cast<GXDiffuseFn>(0), static_cast<GXAttnFn>(2));
+        GXSetNumTevStages(1);
+        _GXSetTevOrder(static_cast<GXTevStageID>(0), static_cast<GXTexCoordID>(0), static_cast<GXTexMapID>(0),
+                       static_cast<GXChannelID>(4));
+        _GXSetTevColorIn(static_cast<GXTevStageID>(0), static_cast<GXTevColorArg>(0xF), static_cast<GXTevColorArg>(8),
+                         static_cast<GXTevColorArg>(0xA), static_cast<GXTevColorArg>(0xF));
+        _GXSetTevColorOp(static_cast<GXTevStageID>(0), static_cast<GXTevOp>(0), static_cast<GXTevBias>(0),
+                         static_cast<GXTevScale>(0), 1, static_cast<GXTevRegID>(0));
+        _GXSetTevAlphaIn(static_cast<GXTevStageID>(0), static_cast<GXTevAlphaArg>(7), static_cast<GXTevAlphaArg>(4),
+                         static_cast<GXTevAlphaArg>(5), static_cast<GXTevAlphaArg>(7));
+        _GXSetTevAlphaOp(static_cast<GXTevStageID>(0), static_cast<GXTevOp>(0), static_cast<GXTevBias>(0),
+                         static_cast<GXTevScale>(1), 1, static_cast<GXTevRegID>(0));
+        _GXSetAlphaCompare(static_cast<GXCompare>(7), 0, static_cast<GXAlphaOp>(0), static_cast<GXCompare>(7), 0);
+        GXSetZMode(static_cast<GXBool>(1), static_cast<GXCompare>(3), static_cast<GXBool>(0));
+        GXSetChanAmbColor(static_cast<GXChannelID>(0), *reinterpret_cast<_GXColor*>(&color));
+        GXSetChanMatColor(static_cast<GXChannelID>(0), *reinterpret_cast<_GXColor*>(&color));
+        RenderShape(reinterpret_cast<FS_tagOAN3_SHAPE*>(PtrAt(this, 0x6010)), *reinterpret_cast<Vec2d*>(&origin), FLOAT_8032fd6c);
+    }
 }
 
 /*

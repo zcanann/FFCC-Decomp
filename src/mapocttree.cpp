@@ -9,6 +9,8 @@ static CBound s_bound;
 static CMapCylinder s_cyl;
 static Vec s_mvec;
 static unsigned long s_checkHitCylinderMask;
+static unsigned long s_insertShadowBitIndex;
+static int s_insertShadowDepth;
 
 extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
@@ -266,22 +268,124 @@ void COctTree::ClearShadow()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002d628
+ * PAL Size: 980b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void InsertShadow_r(COctNode*)
+void InsertShadow_r(COctNode* node)
 {
-	// TODO
+	bool overlap = false;
+
+	if (s_bound.CheckCross(*(CBound*)node) != 0) {
+		overlap = true;
+	}
+
+	if (overlap != false) {
+		if ((s_insertShadowDepth > 2) && (*(unsigned short*)((unsigned char*)node + 0x3e) != 0)) {
+			unsigned long byteOffset = (s_insertShadowBitIndex >> 3) & 0x1ffffffc;
+			unsigned long* bits = (unsigned long*)((unsigned char*)node + 0x48 + byteOffset);
+			*bits |= 1UL << (s_insertShadowBitIndex & 0x1f);
+		}
+
+		COctNode** children = (COctNode**)((unsigned char*)node + 0x1c);
+		for (int i = 0; i < 8; i++) {
+			COctNode* child = children[i];
+			if (child == 0) {
+				return;
+			}
+
+			s_insertShadowDepth++;
+
+			overlap = false;
+
+			if (s_bound.CheckCross(*(CBound*)child) != 0) {
+				overlap = true;
+			}
+
+			if (overlap != false) {
+				if ((s_insertShadowDepth > 2) && (*(unsigned short*)((unsigned char*)child + 0x3e) != 0)) {
+					unsigned long byteOffset = (s_insertShadowBitIndex >> 3) & 0x1ffffffc;
+					unsigned long* bits = (unsigned long*)((unsigned char*)child + 0x48 + byteOffset);
+					*bits |= 1UL << (s_insertShadowBitIndex & 0x1f);
+				}
+
+				COctNode** childChildren = (COctNode**)((unsigned char*)child + 0x1c);
+				for (int j = 0; j < 8; j++) {
+					COctNode* child2 = childChildren[j];
+					if (child2 == 0) {
+						break;
+					}
+
+					s_insertShadowDepth++;
+
+					if (s_bound.CheckCross(*(CBound*)child2) != 0) {
+						if ((s_insertShadowDepth > 2) &&
+							(*(unsigned short*)((unsigned char*)child2 + 0x3e) != 0)) {
+							setbit32((unsigned long*)((unsigned char*)child2 + 0x48), s_insertShadowBitIndex);
+						}
+
+						COctNode** child2Children = (COctNode**)((unsigned char*)child2 + 0x1c);
+						for (int k = 0; k < 8; k++) {
+							COctNode* child3 = child2Children[k];
+							if (child3 == 0) {
+								break;
+							}
+
+							s_insertShadowDepth++;
+							InsertShadow_r(child3);
+							s_insertShadowDepth--;
+						}
+					}
+
+					s_insertShadowDepth--;
+				}
+			}
+
+			s_insertShadowDepth--;
+		}
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002d550
+ * PAL Size: 216b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void COctTree::InsertShadow(long, Vec&, CBound&)
+void COctTree::InsertShadow(long bitIndex, Vec& position, CBound& bound)
 {
-	// TODO
+	Mtx inverseMtx;
+	Vec localPosition;
+	unsigned char* thisBytes = (unsigned char*)this;
+	float* srcBound = (float*)&bound;
+	float* dstBound = (float*)&s_bound;
+
+	if (*thisBytes != 0) {
+		return;
+	}
+
+	s_insertShadowBitIndex = bitIndex;
+	PSMTXInverse((MtxPtr)(*(unsigned char**)(thisBytes + 0x8) + 0xb8), inverseMtx);
+	PSMTXMultVec(inverseMtx, &position, &localPosition);
+
+	dstBound[0] = srcBound[0];
+	dstBound[1] = srcBound[1];
+	dstBound[2] = srcBound[2];
+	dstBound[3] = srcBound[3];
+	dstBound[4] = srcBound[4];
+	dstBound[5] = srcBound[5];
+
+	PSVECAdd((Vec*)&s_bound, &localPosition, (Vec*)&s_bound);
+	PSVECAdd((Vec*)((unsigned char*)&s_bound + 0xc), &localPosition, (Vec*)((unsigned char*)&s_bound + 0xc));
+
+	s_insertShadowDepth = 0;
+	InsertShadow_r(*(COctNode**)(thisBytes + 0x4));
 }
 
 /*

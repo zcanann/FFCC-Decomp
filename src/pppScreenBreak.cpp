@@ -69,6 +69,7 @@ void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
 int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
 void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 }
 
 /*
@@ -256,22 +257,51 @@ void pppConScreenBreak(PScreenBreak* pppScreenBreak, UnkC* param_2)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012d90c
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppCon2ScreenBreak(void)
+void pppCon2ScreenBreak(PScreenBreak* pppScreenBreak, UnkC* param_2)
 {
-	// TODO
+    float* value = (float*)((u8*)&pppScreenBreak->field0_0x0 + 8 + param_2->m_serializedDataOffsets[2]);
+    value[2] = FLOAT_80331cc4;
+    value[1] = FLOAT_80331cc4;
+    value[0] = FLOAT_80331cc4;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012d870
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppDesScreenBreak(void)
+void pppDesScreenBreak(PScreenBreak* pppScreenBreak, UnkC* param_2)
 {
-	// TODO
+    s32 dataOffset = param_2->m_serializedDataOffsets[2];
+    void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
+    int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    if (model != 0) {
+        *(void**)(model + 0xF0) = NULL;
+        *(void**)(model + 0xFC) = NULL;
+        *(void**)(model + 0xF4) = NULL;
+        *(void**)(model + 0xE4) = NULL;
+        *(void**)(model + 0xE8) = NULL;
+        *(void**)(model + 0xEC) = NULL;
+    }
+    if (*(void**)((u8*)pppScreenBreak + 0x8C + dataOffset) != NULL) {
+        pppHeapUseRate__FPQ27CMemory6CStage(*(void**)((u8*)pppScreenBreak + 0x8C + dataOffset));
+        *(void**)((u8*)pppScreenBreak + 0x8C + dataOffset) = NULL;
+    }
+    if (*(void**)((u8*)pppScreenBreak + 0x90 + dataOffset) != NULL) {
+        pppHeapUseRate__FPQ27CMemory6CStage(*(void**)((u8*)pppScreenBreak + 0x90 + dataOffset));
+        *(void**)((u8*)pppScreenBreak + 0x90 + dataOffset) = NULL;
+    }
 }
 
 /*

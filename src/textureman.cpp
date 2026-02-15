@@ -159,7 +159,7 @@ void CPtrArray<CTexture*>::SetAt(unsigned long index, CTexture* item)
 template <>
 int CPtrArray<CTexture*>::GetSize()
 {
-    return m_numItems;
+    return m_size;
 }
 
 /*

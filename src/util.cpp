@@ -23,6 +23,13 @@ struct Vec2d {
 	float x, y;
 };
 
+struct CTextureLite {
+    u8 pad_0x0[0x28];
+    GXTexObj m_texObj;
+    GXTlutObj m_tlutObj0;
+    GXTlutObj m_tlutObj1;
+};
+
 CUtil DAT_8032ec70;
 
 /*
@@ -555,32 +562,279 @@ void CUtil::RenderColorQuad(float x, float y, float width, float height, _GXColo
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800235c0
+ * PAL Size: 1420b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CUtil::RenderTextureQuad(float, float, float, float, _GXTexObj*, Vec2d*, Vec2d*, _GXColor*, _GXBlendFactor, _GXBlendFactor)
+void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTexObj* texObj, Vec2d* uv1, Vec2d* uv2,
+                              _GXColor* color, _GXBlendFactor srcBlend, _GXBlendFactor dstBlend)
 {
-	// TODO
+    Mtx modelMtx;
+    Mtx cameraMtx;
+    Mtx44 orthoMtx;
+    Mtx44 screenMtx;
+    float indMtx[2][3] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
+    GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
+    float x2 = x + width;
+    float y2 = y + height;
+
+    PSMTXIdentity(modelMtx);
+    GXLoadPosMtxImm(modelMtx, 0);
+    GXSetCurrentMtx(0);
+
+    C_MTXOrtho(orthoMtx, lbl_8032f888, lbl_8032f8a0, lbl_8032f888, lbl_8032f8a4, lbl_8032f888, lbl_8032f88c);
+    GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
+
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetNumTexGens(1);
+    GXSetNumChans(1);
+    GXSetNumTevStages(1);
+    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
+    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+    GXSetTevDirect(GX_TEVSTAGE0);
+    GXSetNumIndStages(0);
+    GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
+    GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
+    GXSetIndTexMtx(GX_ITM_2, indMtx, 1);
+
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+    _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
+    GXLoadTexObj(texObj, GX_TEXMAP0);
+
+    GXSetChanAmbColor(GX_COLOR0A0, white);
+    GXSetChanMatColor(GX_COLOR0A0, white);
+    _GXSetBlendMode(GX_BM_BLEND, srcBlend, dstBlend, GX_LO_SET);
+
+    if (GXGetTexObjFmt(texObj) == GX_TF_I8) {
+        _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_RED, GX_CH_RED, GX_CH_RED);
+        _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP1);
+    }
+
+    float u1 = lbl_8032f888;
+    float v1 = lbl_8032f888;
+    float u2 = lbl_8032f88c;
+    float v2 = lbl_8032f88c;
+    if (uv1 != 0 && uv2 != 0) {
+        u1 = uv1->x;
+        v1 = uv1->y;
+        u2 = uv2->x;
+        v2 = uv2->y;
+    }
+
+    u32 colorValue = 0xFFFFFFFF;
+    if (color != 0) {
+        colorValue = *reinterpret_cast<u32*>(color);
+    }
+
+    GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
+    GXPosition3f32(x, y, lbl_8032f888);
+    GXColor1u32(colorValue);
+    GXTexCoord2f32(u1, v1);
+
+    GXPosition3f32(x2, y, lbl_8032f888);
+    GXColor1u32(colorValue);
+    GXTexCoord2f32(u2, v1);
+
+    GXPosition3f32(x2, y2, lbl_8032f888);
+    GXColor1u32(colorValue);
+    GXTexCoord2f32(u2, v2);
+
+    GXPosition3f32(x, y2, lbl_8032f888);
+    GXColor1u32(colorValue);
+    GXTexCoord2f32(u1, v2);
+
+    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+    PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+    GXLoadPosMtxImm(cameraMtx, 0);
+    GXSetProjection(screenMtx, GX_PERSPECTIVE);
+
+    if (GXGetTexObjFmt(texObj) == GX_TF_I8) {
+        _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80023014
+ * PAL Size: 1452b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CUtil::RenderTextureQuad(float, float, float, float, CTexture*, Vec2d*, Vec2d*, _GXColor*, _GXBlendFactor, _GXBlendFactor)
+void CUtil::RenderTextureQuad(float x, float y, float width, float height, CTexture* texture, Vec2d* uv1, Vec2d* uv2,
+                              _GXColor* color, _GXBlendFactor srcBlend, _GXBlendFactor dstBlend)
 {
-	// TODO
+    CTextureLite* textureLite = reinterpret_cast<CTextureLite*>(texture);
+
+    Mtx modelMtx;
+    Mtx cameraMtx;
+    Mtx44 orthoMtx;
+    Mtx44 screenMtx;
+    float indMtx[2][3] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
+    GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
+    float x2 = x + width;
+    float y2 = y + height;
+
+    PSMTXIdentity(modelMtx);
+    GXLoadPosMtxImm(modelMtx, 0);
+    GXSetCurrentMtx(0);
+
+    C_MTXOrtho(orthoMtx, lbl_8032f888, lbl_8032f8a0, lbl_8032f888, lbl_8032f8a4, lbl_8032f888, lbl_8032f88c);
+    GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
+
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetNumTexGens(1);
+    GXSetNumChans(1);
+    GXSetNumTevStages(1);
+    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
+    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+    GXSetTevDirect(GX_TEVSTAGE0);
+    GXSetNumIndStages(0);
+    GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
+    GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
+    GXSetIndTexMtx(GX_ITM_2, indMtx, 1);
+
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+    _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
+    GXLoadTexObj(&textureLite->m_texObj, GX_TEXMAP0);
+
+    GXSetChanAmbColor(GX_COLOR0A0, white);
+    GXSetChanMatColor(GX_COLOR0A0, white);
+    _GXSetBlendMode(GX_BM_BLEND, srcBlend, dstBlend, GX_LO_SET);
+
+    u8 textureFormat = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(texture) + 0x60);
+    if (textureFormat == 1) {
+        _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_RED, GX_CH_RED, GX_CH_RED);
+        _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP1);
+    } else if (textureFormat == 8 || textureFormat == 9) {
+        SetPaletteEnv(texture);
+    }
+
+    float u1 = lbl_8032f888;
+    float v1 = lbl_8032f888;
+    float u2 = lbl_8032f88c;
+    float v2 = lbl_8032f88c;
+    if (uv1 != 0 && uv2 != 0) {
+        u1 = uv1->x;
+        v1 = uv1->y;
+        u2 = uv2->x;
+        v2 = uv2->y;
+    }
+
+    u32 colorValue = 0xFFFFFFFF;
+    if (color != 0) {
+        colorValue = *reinterpret_cast<u32*>(color);
+    }
+
+    GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
+    GXPosition3f32(x, y, lbl_8032f888);
+    GXColor1u32(colorValue);
+    GXTexCoord2f32(u1, v1);
+
+    GXPosition3f32(x2, y, lbl_8032f888);
+    GXColor1u32(colorValue);
+    GXTexCoord2f32(u2, v1);
+
+    GXPosition3f32(x2, y2, lbl_8032f888);
+    GXColor1u32(colorValue);
+    GXTexCoord2f32(u2, v2);
+
+    GXPosition3f32(x, y2, lbl_8032f888);
+    GXColor1u32(colorValue);
+    GXTexCoord2f32(u1, v2);
+
+    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+    PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+    GXLoadPosMtxImm(cameraMtx, 0);
+    GXSetProjection(screenMtx, GX_PERSPECTIVE);
+
+    if (GXGetTexObjFmt(&textureLite->m_texObj) == GX_TF_I8) {
+        _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80022d70
+ * PAL Size: 676b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CUtil::SetPaletteEnv(CTexture*)
+void CUtil::SetPaletteEnv(CTexture* texture)
 {
-	// TODO
+    CTextureLite* textureLite = reinterpret_cast<CTextureLite*>(texture);
+    GXColor tevColor2 = {0xFF, 0xFF, 0x00, 0x00};
+    GXColor tevColor3 = {0x00, 0x00, 0xFF, 0xFF};
+
+    GXSetNumTevStages(3);
+    GXSetNumTexGens(1);
+    GXSetTevColor(GX_TEVREG1, tevColor2);
+    GXSetTevColor(GX_TEVREG2, tevColor3);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
+
+    _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_ALPHA, GX_CH_ALPHA, GX_CH_ALPHA);
+    _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_BLUE, GX_CH_BLUE, GX_CH_BLUE, GX_CH_ALPHA);
+
+    GXSetTevDirect(GX_TEVSTAGE0);
+    _GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_C1, GX_CC_ZERO);
+    _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_FALSE, GX_TEVPREV);
+    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP1);
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+
+    GXSetTevDirect(GX_TEVSTAGE1);
+    _GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_TEXC, GX_CC_C2, GX_CC_CPREV);
+    _GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_KONST, GX_CA_TEXA, GX_CA_ZERO);
+    _GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG0);
+    _GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG0);
+    _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP2);
+    _GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP1, GX_COLOR_NULL);
+
+    GXSetTevDirect(GX_TEVSTAGE2);
+    _GXSetTevColorIn(GX_TEVSTAGE2, GX_CC_ZERO, GX_CC_CPREV, GX_CC_RASC, GX_CC_ZERO);
+    _GXSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_APREV, GX_CA_RASA, GX_CA_ZERO);
+    _GXSetTevColorOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG0);
+    _GXSetTevAlphaOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG0);
+    _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    _GXSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+
+    GXInitTexObjTlut(&textureLite->m_texObj, GX_TLUT0);
+    GXLoadTexObj(&textureLite->m_texObj, GX_TEXMAP0);
+    GXInitTexObjTlut(&textureLite->m_texObj, GX_TLUT1);
+    GXLoadTexObj(&textureLite->m_texObj, GX_TEXMAP1);
+    GXLoadTlut(&textureLite->m_tlutObj0, GX_TLUT0);
+    GXLoadTlut(&textureLite->m_tlutObj1, GX_TLUT1);
 }
 
 /*

@@ -56,13 +56,15 @@ void EraseCharaParts_DrawMeshDLCallback(CChara::CModel* model, void* param_2, vo
  */
 void pppConstructEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, UnkC* param_2)
 {
+    s32* serializedDataOffsets;
     void* handle;
     int model;
     u8* colorPtr;
     void* gObject;
 
+    serializedDataOffsets = *(s32**)((u8*)param_2 + 0xC);
     gObject = *(void**)((char*)pppMngStPtr + 0x8);
-    colorPtr = (u8*)((int)(&pppEraseCharaParts->field0_0x0 + 2) + param_2->m_serializedDataOffsets[1]);
+    colorPtr = (u8*)pppEraseCharaParts + 0x80 + serializedDataOffsets[1];
     colorPtr[0] = 0x80;
     colorPtr[1] = 0x80;
     colorPtr[2] = 0x80;

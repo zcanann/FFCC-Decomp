@@ -3,6 +3,22 @@
 #include "ffcc/pppfunctbl.h"
 #include "ffcc/system.h"
 
+extern void* lbl_801E8408;
+
+/*
+ * --INFO--
+ * PAL Address: 0x80019f68
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_graphic_cpp(void)
+{
+	*(void**)&Graphic = &lbl_801E8408;
+}
+
 /*
  * --INFO--
  * Address:	TODO

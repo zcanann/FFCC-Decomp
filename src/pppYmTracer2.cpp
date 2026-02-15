@@ -307,13 +307,10 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, UnkB* param_2, UnkC* param_3)
 
     visibleCount = 0;
     for (iVar4 = 0; iVar4 < (s32)(u32)*(u16*)(step->m_payload + 4); iVar4++) {
-        bool dead;
-
         alpha = (u16)step->m_payload[8] - (s16)iVar4 * *(s16*)(work + 0x30);
-        dead = *(char*)&source[2].z == '\0';
-        if (alpha < 0 || dead) {
+        if ((alpha < 0) || ((useFallback = *(char*)&source[2].z == '\0'), useFallback)) {
             *(u8*)((u8*)&source[2].y + 3) = 0;
-        } else if (!dead) {
+        } else if (!useFallback) {
             *(u8*)((u8*)&source[2].y + 3) = (u8)alpha;
             visibleCount++;
         }

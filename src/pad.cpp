@@ -64,7 +64,7 @@ void CPad::Init()
 {
 	FILE* fp;
 	int frames;
-	unsigned int size;
+	int size;
 
 	PADInit();
 	memset(reinterpret_cast<char*>(this) + 4, 0, 0x1A4);
@@ -81,13 +81,7 @@ void CPad::Init()
 		if (_1ac_4_ != 0)
 		{
 			_1b0_4_ = new (reinterpret_cast<CMemory::CStage*>(_1ac_4_), (char*)"pad.cpp", 0x54) unsigned char[0x69780C];
-			if ((_1b4_4_ == 0) || ((fp = fopen("replay.dat", "rb")) == 0))
-			{
-				*reinterpret_cast<unsigned int*>(_1b0_4_) = 0xC;
-				*reinterpret_cast<unsigned int*>(_1b0_4_ + 8) = 0;
-				*reinterpret_cast<unsigned int*>(_1b0_4_ + 4) = 1;
-			}
-			else
+			if ((_1b4_4_ != 0) && ((fp = fopen("replay.dat", "rb")) != 0))
 			{
 				fseek(fp, 0, 2);
 				size = ftell(fp);
@@ -98,6 +92,12 @@ void CPad::Init()
 				frames = *reinterpret_cast<int*>(_1b0_4_ + 8);
 				frames = frames / 0x1E + (frames >> 0x1F);
 				System.Printf((char*)"replay frames=%d\n", frames - (frames >> 0x1F));
+			}
+			else
+			{
+				*reinterpret_cast<unsigned int*>(_1b0_4_) = 0xC;
+				*reinterpret_cast<unsigned int*>(_1b0_4_ + 8) = 0;
+				*reinterpret_cast<unsigned int*>(_1b0_4_ + 4) = 1;
 			}
 		}
 	}

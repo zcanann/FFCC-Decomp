@@ -371,8 +371,8 @@ void CMapTexAnimSet::SetMapTexAnim(int materialId, int frameStart, int frameEnd,
         setPtr += 4;
     }
 
-    if ((!found) && (System.m_execParam >= 1)) {
-        System.Printf("%s: material id (%d) not found\n", "SetMapTexAnim", materialId);
+    if ((!found) && (System.m_execParam != 0)) {
+        System.Printf("SetMapTexAnim: material id (%d) not found\n", materialId);
     }
 }
 

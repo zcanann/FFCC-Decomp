@@ -12,6 +12,7 @@ struct pppYmMoveCircleWork {
     f32 m_radius;
     f32 m_radiusStep;
     f32 m_radiusStepStep;
+    f32 m_unk1C;
     Vec m_center;
     u8 m_hasInit;
 };
@@ -26,6 +27,7 @@ extern f32 lbl_80330D84;
 extern f32 lbl_80330D88;
 extern f32 lbl_80330D8C;
 extern f32 lbl_80330D90;
+extern "C" double acos(double);
 
 /*
  * --INFO--
@@ -38,8 +40,8 @@ extern f32 lbl_80330D90;
  */
 extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleOffsets* offsetData)
 {
-    Vec temp1;
     Vec temp2;
+    Vec temp1;
     u8* pppMngSt = lbl_8032ED50;
     pppYmMoveCircleWork* work = (pppYmMoveCircleWork*)((u8*)basePtr + *offsetData->m_serializedDataOffsets + 0x80);
 
@@ -49,7 +51,8 @@ extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCirc
     temp2.x = lbl_80330D7C;
     temp2.y = lbl_80330D8C;
     temp2.z = lbl_80330D7C;
-    work->m_angle = lbl_80330D90 * (f32)acos(PSVECDotProduct(&temp2, &temp1));
+    double angle = acos((double)PSVECDotProduct(&temp2, &temp1));
+    work->m_angle = lbl_80330D90 * (f32)angle;
 
     if (!((temp1.x <= lbl_80330D7C && temp1.z >= lbl_80330D7C) ||
           (temp1.x > lbl_80330D7C && temp1.z < lbl_80330D7C))) {

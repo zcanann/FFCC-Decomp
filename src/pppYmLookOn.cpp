@@ -47,12 +47,12 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct UnkB* param_2, str
     Vec local_28;
     Vec local_1c;
 
-    pppMngSt = pppMngStPtr;
     if (DAT_8032ed70 != 0) {
         return;
     }
 
-    owner = *(u8**)((u8*)pppMngStPtr + 0xdc);
+    pppMngSt = pppMngStPtr;
+    owner = *(u8**)((u8*)pppMngSt + 0xdc);
     dataOffset = *param_3->m_serializedDataOffsets;
     cachedOwner = (u8**)((u8*)pppYmLookOn + dataOffset + 0x80);
     if ((owner != nullptr) || (*cachedOwner != nullptr)) {

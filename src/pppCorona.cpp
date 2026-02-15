@@ -11,7 +11,6 @@ extern float lbl_803310C0;
 extern float lbl_803310C4;
 extern float lbl_803310C8;
 extern float lbl_803310CC;
-extern double lbl_803310D0;
 
 struct CoronaWork {
     s16 m_shapeX;
@@ -28,7 +27,10 @@ struct CoronaWork {
 struct CoronaVecWork {
     u8 _pad0[0x10];
     Vec m_cameraOffset;
+    u8 _pad1[4];
     Vec m_translate;
+    u8 _pad2[6];
+    u8 m_alpha;
 };
 
 /*
@@ -118,8 +120,8 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, UnkC* param3)
     CoronaVecWork* vecWork;
     pppCVECTOR color;
     pppFMATRIX mtx;
-    Vec viewDir;
     Vec fromOrigin;
+    Vec viewDir;
     long** shape;
     s32 shapeId;
     float mag;
@@ -145,8 +147,8 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, UnkC* param3)
     mag = PSVECMag(&fromOrigin);
     scale = param2->m_distMin;
     if (mag < param2->m_distRange) {
-        scale = param2->m_distMin +
-                (param2->m_distMax - param2->m_distMin) * (lbl_803310CC - (mag / param2->m_distRange));
+        scale = (param2->m_distMax - param2->m_distMin) * (lbl_803310CC - (mag / param2->m_distRange));
+        scale = param2->m_distMin + scale;
     }
 
     mtx.value[0][0] = *(float*)((u8*)lbl_8032ED50 + 0x28) * *(float*)((u8*)param1 + 0x40) * scale;
@@ -161,7 +163,7 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, UnkC* param3)
     color.rgba[0] = param2->m_colorR;
     color.rgba[1] = param2->m_colorG;
     color.rgba[2] = param2->m_colorB;
-    color.rgba[3] = (u8)(s32)(work->m_scaleX * (f32)((f64)work->m_alpha - lbl_803310D0));
+    color.rgba[3] = (u8)(s32)(work->m_scaleX * (f32)vecWork->m_alpha);
 
     pppSetDrawEnv(&color, (pppFMATRIX*)0, lbl_803310C8, param2->m_drawA, param2->m_drawB, param2->m_blendMode, 0, 1,
                   1, 0);

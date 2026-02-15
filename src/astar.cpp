@@ -3,6 +3,7 @@
 #include "ffcc/charaobj.h"
 #include "ffcc/color.h"
 #include "ffcc/graphic.h"
+#include "ffcc/math.h"
 #include "ffcc/pad.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/p_dbgmenu.h"
@@ -23,6 +24,7 @@ static const float kDrawAStarSphereRadius = 5.0f;
 extern Mtx gFlatPosMtx;
 extern int DAT_8032ed70;
 extern unsigned char lbl_8032EC90[];
+extern CMath Math;
 
 CAStar AStar;
 
@@ -516,9 +518,9 @@ void CAStar::drawAStar()
 	{
 		for (int group = 0; group < 64; ++group)
 		{
-			unsigned char r = static_cast<unsigned char>((group * 41 + System.m_frameCounter) & 0xFF);
-			unsigned char g = static_cast<unsigned char>((group * 71 + (System.m_frameCounter >> 1)) & 0xFF);
-			unsigned char b = static_cast<unsigned char>((group * 17 + (System.m_frameCounter >> 2)) & 0xFF);
+			unsigned char b = static_cast<unsigned char>(Math.Rand(0xff));
+			unsigned char g = static_cast<unsigned char>(Math.Rand(0xff));
+			unsigned char r = static_cast<unsigned char>(Math.Rand(0xff));
 			CColor color(r, g, b, 0xFF);
 			MapMng.SetIdGrpColor(group, 0, color.color);
 		}

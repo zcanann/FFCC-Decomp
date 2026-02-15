@@ -219,18 +219,21 @@ void pppDestructChangeTex(pppChangeTex* changeTex, UnkC* data)
 {
 	unsigned int i;
 	unsigned int j;
-	int model = 0;
+	int model;
 	int dataOffset = data->m_serializedDataOffsets[2];
 	void* handle0;
 	void* handle1;
 	void* handle2;
+	void* stage;
+	void* mesh;
 
-	_WaitDrawDone__8CGraphicFPci(&Graphic, "pppChangeTex.cpp", 0x9d);
+	_WaitDrawDone__8CGraphicFPci(&Graphic, s_pppChangeTex_cpp_801dd660, 0x9d);
 
 	handle0 = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)changeTex + 0x98 + dataOffset), 0);
 	handle1 = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)changeTex + 0x98 + dataOffset), 1);
 	handle2 = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)changeTex + 0x98 + dataOffset), 2);
 
+	model = 0;
 	if (handle0 != 0) {
 		model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle0);
 		*(void**)(model + 0xe4) = 0;
@@ -260,41 +263,47 @@ void pppDestructChangeTex(pppChangeTex* changeTex, UnkC* data)
 		}
 	}
 
-	void** stageArray = *(void***)((char*)changeTex + 0x90 + dataOffset);
-	void** meshArray = *(void***)((char*)changeTex + 0x8c + dataOffset);
-	if ((stageArray == 0) || (meshArray == 0)) {
-		return;
-	}
+	stage = *(void**)((char*)changeTex + 0x90 + dataOffset);
+	if (stage != 0) {
+		mesh = *(void**)((char*)changeTex + 0x8c + dataOffset);
+		if (mesh != 0) {
+			int meshList = *(int*)(model + 0xac);
+			void** stageArray = (void**)stage;
+			void** meshArray = (void**)mesh;
 
-	int meshList = *(int*)(model + 0xac);
-	unsigned int meshCount = *(unsigned int*)(*(int*)(model + 0xa4) + 0xc);
-	for (i = 0; i < meshCount; i++) {
-		unsigned int dlCount = *(unsigned int*)(*(int*)(meshList + 8) + 0x4c);
-		void** dlEntries = (void**)*stageArray;
-		for (j = 0; j < dlCount; j++) {
-			if (dlEntries[0] != 0) {
-				pppHeapUseRate__FPQ27CMemory6CStage(dlEntries[0]);
-				dlEntries[0] = 0;
+			for (i = 0; i < *(unsigned int*)(*(int*)(model + 0xa4) + 0xc); i++) {
+				unsigned int dlCount = *(unsigned int*)(*(int*)(meshList + 8) + 0x4c);
+				void** dlEntries = (void**)*stageArray;
+				for (j = 0; j < dlCount; j++) {
+					if (*dlEntries != 0) {
+						pppHeapUseRate__FPQ27CMemory6CStage(*dlEntries);
+						*dlEntries = 0;
+					}
+					dlEntries++;
+				}
+
+				if (*stageArray != 0) {
+					pppHeapUseRate__FPQ27CMemory6CStage(*stageArray);
+					*stageArray = 0;
+				}
+				if (*meshArray != 0) {
+					pppHeapUseRate__FPQ27CMemory6CStage(*meshArray);
+					*meshArray = 0;
+				}
+
+				stageArray++;
+				meshArray++;
+				meshList += 0x14;
 			}
-			dlEntries++;
-		}
 
-		if (*stageArray != 0) {
-			pppHeapUseRate__FPQ27CMemory6CStage(*stageArray);
-			*stageArray = 0;
+			if (stage != 0) {
+				pppHeapUseRate__FPQ27CMemory6CStage(stage);
+			}
+			if (mesh != 0) {
+				pppHeapUseRate__FPQ27CMemory6CStage(mesh);
+			}
 		}
-		if (*meshArray != 0) {
-			pppHeapUseRate__FPQ27CMemory6CStage(*meshArray);
-			*meshArray = 0;
-		}
-
-		stageArray++;
-		meshArray++;
-		meshList += 0x14;
 	}
-
-	pppHeapUseRate__FPQ27CMemory6CStage(*(void**)((char*)changeTex + 0x90 + dataOffset));
-	pppHeapUseRate__FPQ27CMemory6CStage(*(void**)((char*)changeTex + 0x8c + dataOffset));
 }
 
 /*

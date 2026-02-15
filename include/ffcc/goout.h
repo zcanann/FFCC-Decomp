@@ -70,7 +70,11 @@ private:
     char field_0x1e;
     char field_0x1f;
     int field_0x20;
-    char field_0x24[8];
+    char field_0x24;
+    char field_0x25;
+    char field_0x26;
+    char field_0x27;
+    int field_0x28;
     char field_0x2c;
     char field_0x2d;
     int field_0x30;

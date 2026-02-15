@@ -497,12 +497,95 @@ void CGoOutMenu::DrawGoOut()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80169c18
+ * PAL Size: 1108b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGoOutMenu::SetDelMode(unsigned char)
+void CGoOutMenu::SetDelMode(unsigned char mode)
 {
-	// TODO
+    field_0x24 = mode;
+
+    switch (field_0x24) {
+    case 1:
+        field_0x36 = -1;
+        field_0x34 = 10;
+        break;
+    case 2:
+        field_0x45 = 0;
+        field_0x34 = -1;
+        field_0x48 = 0;
+        field_0x3c = 0;
+
+        if (field_0x26 == 0) {
+            MenuPcs.InitSaveLoadMenu();
+        }
+
+        MenuPcs.SetMenuCharaAnim(field_0x28, 0);
+        field_0x26 = 1;
+        break;
+    case 3:
+        if (Game.game.m_caravanWorkArr[field_0x28].m_caravanLocalFlags == 0) {
+            int validCount = 0;
+
+            for (int i = 0; i < 8; i++) {
+                const CCaravanWork& caravan = Game.game.m_caravanWorkArr[i];
+                if (caravan.m_shopState != 0 && caravan.m_caravanLocalFlags == 0) {
+                    validCount++;
+                }
+            }
+
+            if (validCount < 2) {
+                SetMenuStr(0, 4, "This character cannot be deleted.", "",
+                           "At least one non-guest character", "must remain.");
+                field_0x25 = 2;
+                SetDelMode(0);
+                return;
+            }
+        }
+
+        SetMenuStr(0, 2, "Delete this character?", "  Yes   No");
+        field_0x46 = 1;
+        break;
+    case 4:
+        SetMenuStr(0, 4, "Deleted characters", "cannot be restored.", "Are you sure?",
+                   "  Yes   No");
+        field_0x46 = 1;
+        break;
+    case 5:
+        if (Game.game.m_caravanWorkArr[field_0x28].m_caravanLocalFlags == 0) {
+            SetMenuStr(0, 1, "The character has been deleted.");
+        } else {
+            SetMenuStr(0, 8, "The guest character has been deleted.",
+                       "Please restore the character's original save data.", "",
+                       "To restore a character who is abroad,", "first select \"Delete Character\",",
+                       "then select the character you wish to restore.", "", "");
+        }
+
+        field_0x46 = 1;
+        MenuPcs.SetMenuCharaAnim(field_0x28, 5);
+        break;
+    case 6:
+        SetMenuStr(0, 6, "This character is currently abroad",
+                   "and cannot be deleted here. If you", "wish to delete the character's",
+                   "original data, you must first", "restore it. Proceed?", "  Yes   No");
+        field_0x46 = 1;
+        break;
+    case 7:
+        SetMenuStr(0, 5, "This will restore the character", "to the state it was in before transfer.",
+                   "It will also prevent the transferred character", "from returning to this save location.",
+                   "  Yes   No");
+        field_0x46 = 1;
+        break;
+    case 8:
+        MenuPcs.SetMenuCharaAnim(field_0x28, 3);
+        SetMenuStr(0, 1, "The character has been restored.");
+        break;
+    default:
+        break;
+    }
 }
 
 /*

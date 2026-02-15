@@ -559,6 +559,48 @@ extern "C" void Close__Q25CFile7CHandleFv(CFile::CHandle* fileHandle)
 
 /*
  * --INFO--
+ * PAL Address: 0x800B9418
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void* CFile::GetBuffer()
+{
+    return m_readBuffer;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9420
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CFile::CHandle::SyncCompleted()
+{
+    File.SyncCompleted(this);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B944C
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CFile::CHandle::Read()
+{
+    File.Read(this);
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

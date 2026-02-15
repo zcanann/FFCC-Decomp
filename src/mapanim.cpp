@@ -493,10 +493,8 @@ void CMapAnimNode::interp(Vec*, CMapAnimKey*, int, int)
  */
 CMapAnim::CMapAnim()
 {
-    typedef CPtrArray<CMapAnimNode*>* (*CtorFn)(CPtrArray<CMapAnimNode*>*);
-    CtorFn ctorFn = __ct__26CPtrArray_P12CMapAnimNode_Fv;
-    CPtrArray<CMapAnimNode*>* mapAnimNodes = ctorFn(reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this));
-    mapAnimNodes->SetStage(*reinterpret_cast<CMemory::CStage**>(MapMng));
+    __ct__26CPtrArray_P12CMapAnimNode_Fv(reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this));
+    reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this)->SetStage(*reinterpret_cast<CMemory::CStage**>(MapMng));
 }
 
 /*

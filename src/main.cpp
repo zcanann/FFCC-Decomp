@@ -107,19 +107,22 @@ void game(int argc, char** argv)
 void main(int argc, char** argv)
 {
     if (argc != 0) {
+        int* padFlags = reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Pad) + 0x1B4);
+
         for (int i = 1; i < argc; i++) {
-            char* argument = argv[i];
-            char command;
+            const char* argument = argv[i];
 
             if ((argument[0] != '-') && (argument[0] != '/')) {
                 continue;
             }
 
-            command = argument[1];
-            if (command == 'w') {
-                *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Pad) + 0x1B8) = 1;
-            } else if ((command < 'w') && (command == 'r')) {
-                *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Pad) + 0x1B4) = 1;
+            if (argument[1] == 'w') {
+                padFlags[1] = 1;
+                continue;
+            }
+
+            if (argument[1] == 'r') {
+                padFlags[0] = 1;
             }
         }
     }

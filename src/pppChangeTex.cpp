@@ -58,32 +58,31 @@ extern "C" {
  */
 extern "C" void ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2(CChara::CModel* model, void* param_2, void* param_3, int param_4, int param_5, float (*param_6) [4])
 {
-	char flag = *(char*)((char*)param_3 + 0x14);
-	char* materialMan = MaterialMan;
-	char* mesh = *(char**)((char*)model + 0xAC) + param_4 * 0x14;
-	char* displayList = *(char**)(*(int*)(mesh + 8) + 0x50) + param_5 * 0xC;
+	void* meshData = *(void**)((char*)model + param_4 * 0x14 + 0xb4);
+	void* displayList = (void*)(*(int*)((char*)meshData + 0x50) + param_5 * 0xc);
 
-	if (flag == 0) {
-		*(int*)(materialMan + 0xd0) = *(int*)((char*)param_2 + 0x1c) + 0x28;
-		*(int*)(materialMan + 0x44) = 0xFFFFFFFF;
-		*(char*)(materialMan + 0x4c) = 0xFF;
-		*(int*)(materialMan + 0x11c) = 0;
-		*(int*)(materialMan + 0x120) = 0x1E;
-		*(int*)(materialMan + 0x124) = 0;
-		*(char*)(materialMan + 0x205) = 0xFF;
-		*(char*)(materialMan + 0x206) = 0xFF;
-		*(int*)(materialMan + 0x58) = 0;
-		*(int*)(materialMan + 0x5c) = 0;
-		*(char*)(materialMan + 0x208) = 0;
-		*(int*)(materialMan + 0x48) = 0xADE0F;
-		*(int*)(materialMan + 0x128) = 0;
-		*(int*)(materialMan + 0x12c) = 0x1E;
-		*(int*)(materialMan + 0x130) = 0;
-		*(int*)(materialMan + 0x40) = 0xADE0F;
+	if (*(char*)((char*)param_3 + 0x14) == 0) {
+		*(int*)(MaterialMan + 0x208) = *(int*)((char*)param_2 + 0x1c) + 0x28;
+		*(int*)(MaterialMan + 0x44) = 0xFFFFFFFF;
+		*(char*)(MaterialMan + 0x4c) = 0xFF;
+		*(int*)(MaterialMan + 0x11c) = 0;
+		*(int*)(MaterialMan + 0x120) = 0x1E;
+		*(int*)(MaterialMan + 0x124) = 0;
+		*(char*)(MaterialMan + 0x205) = 0xFF;
+		*(char*)(MaterialMan + 0x206) = 0xFF;
+		*(int*)(MaterialMan + 0x58) = 0;
+		*(int*)(MaterialMan + 0x5c) = 0;
+		*(char*)(MaterialMan + 0x208) = 0;
+		*(int*)(MaterialMan + 0x48) = 0xADE0F;
+		*(int*)(MaterialMan + 0x128) = 0;
+		*(int*)(MaterialMan + 0x12c) = 0x1E;
+		*(int*)(MaterialMan + 0x130) = 0;
+		*(int*)(MaterialMan + 0x40) = 0xADE0F;
 	}
+
 	SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
-	    MaterialMan, *(void**)(*(int*)((char*)model + 0xA4) + 0x24), *(unsigned short*)(displayList + 8), 0, 0);
-	GXCallDisplayList(*(void**)displayList, *(unsigned int*)(displayList + 4));
+	    MaterialMan, *(void**)(*(int*)((char*)model + 0xa4) + 0x24), *(unsigned short*)((char*)displayList + 8), 0, 0);
+	GXCallDisplayList(*(void**)displayList, *(unsigned int*)((char*)displayList + 4));
 }
 
 /*

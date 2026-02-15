@@ -635,5 +635,5 @@ u32 __OSGetDIConfig(void) {
 }
 
 void OSRegisterVersion(const char* id) {
-    OSReport("%s\n", id);
+    OSReport(id);
 }

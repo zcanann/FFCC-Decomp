@@ -215,6 +215,7 @@ void GXSetTexCopyDst(u16 wd, u16 ht, GXTexFmt fmt, GXBool mipmap) {
  */
 void GXSetDispCopyFrame2Field(GXCopyMode mode) {
     GXData* gx;
+    u32* cpTex;
     u32 reg;
 
     CHECK_GXBEGIN(1410, "GXSetDispCopyFrame2Field");
@@ -224,9 +225,10 @@ void GXSetDispCopyFrame2Field(GXCopyMode mode) {
     reg = (reg & 0xFFFFCFFF) | ((u32)mode << 12);
     gx->cpDisp = reg;
 
-    reg = gx->cpTex;
+    cpTex = &gx->cpTex;
+    reg = *cpTex;
     reg &= 0xFFFFCFFF;
-    gx->cpTex = reg;
+    *cpTex = reg;
 }
 
 /*

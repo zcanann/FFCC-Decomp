@@ -6,6 +6,8 @@
 #include "types.h"
 
 extern "C" int sprintf(char*, const char*, ...);
+extern "C" double sin(double);
+extern "C" double cos(double);
 
 extern void* __vt__8CManager;
 extern void* lbl_801E8668;
@@ -360,12 +362,49 @@ void CGraphicPcs::drawSFRect(float, float, float, float, _GXColor, _GXColor)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800462b8
+ * PAL Size: 596b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGraphicPcs::drawSFCircle(int, int, int, int, _GXColor, _GXColor)
+void CGraphicPcs::drawSFCircle(int innerRadius, int centerX, int outerRadius, int centerY, _GXColor innerColor, _GXColor outerColor)
 {
-	// TODO
+    float ringPoints[32][4];
+    const float step = 0.19634955f;
+
+    for (int i = 0; i < 32; i++) {
+        const double angle = (double)step * (double)i;
+        const float s = (float)sin(angle);
+        const float c = (float)cos(angle);
+
+        ringPoints[i][0] = s * (float)innerRadius + (float)centerX;
+        ringPoints[i][1] = c * (float)innerRadius + (float)centerY;
+        ringPoints[i][2] = s * (float)outerRadius + (float)centerX;
+        ringPoints[i][3] = c * (float)outerRadius + (float)centerY;
+    }
+
+    GXBegin((GXPrimitive)0x80, GX_VTXFMT0, 0x80);
+    for (int i = 0; i < 32; i++) {
+        const int next = (i + 1) & 0x1F;
+
+        GXPosition3f32(ringPoints[i][0], ringPoints[i][1], 0.0f);
+        GXColor1u32(*(u32*)&innerColor);
+        GXTexCoord2u16(0, 0);
+
+        GXPosition3f32(ringPoints[next][0], ringPoints[next][1], 0.0f);
+        GXColor1u32(*(u32*)&innerColor);
+        GXTexCoord2u16(0, 0);
+
+        GXPosition3f32(ringPoints[next][2], ringPoints[next][3], 0.0f);
+        GXColor1u32(*(u32*)&outerColor);
+        GXTexCoord2u16(0, 0);
+
+        GXPosition3f32(ringPoints[i][2], ringPoints[i][3], 0.0f);
+        GXColor1u32(*(u32*)&outerColor);
+        GXTexCoord2u16(0, 0);
+    }
 }
 
 /*

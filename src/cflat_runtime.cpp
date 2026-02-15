@@ -1,4 +1,5 @@
 #include "ffcc/cflat_runtime.h"
+#include <string.h>
 
 extern "C" {
 void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
@@ -429,12 +430,16 @@ void CFlatRuntime::systemFunc(CFlatRuntime::CObject*, int, int, int&)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80065cf0
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFlatRuntime::ResetPerformance()
 {
-	// TODO
+	memset((u8*)this + 0x48, 0, 0x804);
 }
 
 /*
@@ -449,12 +454,16 @@ void CFlatRuntime::PrintPerformance()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800695fc
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CFlatRuntime::CClass::CClass()
 {
-	// TODO
+	*(u32*)((u8*)this + 0x228) = 2;
 }
 
 /*

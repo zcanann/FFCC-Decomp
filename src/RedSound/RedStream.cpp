@@ -30,16 +30,20 @@ int fflush(void*);
 unsigned int _SearchEmptyStreamData()
 {
 	unsigned int streamData;
+	unsigned int result;
 
 	streamData = (unsigned int)DAT_8032f438;
 	do {
 		if (*(int*)(streamData + 0x10c) == 0) {
-			return streamData;
+			result = streamData;
+			goto done;
 		}
 		streamData += 0x130;
 	} while (streamData < (unsigned int)DAT_8032f438 + 0x4c0);
 
-	return 0;
+	result = 0;
+done:
+	return result;
 }
 
 /*

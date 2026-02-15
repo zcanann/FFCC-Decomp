@@ -24,7 +24,11 @@ static const float kDrawAStarSphereRadius = 5.0f;
 extern Mtx gFlatPosMtx;
 extern int DAT_8032ed70;
 extern unsigned char lbl_8032EC90[];
+extern char lbl_801DD6A8[];
+extern char lbl_801DD6B4[];
+extern char lbl_803320A0[];
 extern CMath Math;
+extern "C" int __cntlzw(unsigned int);
 
 CAStar AStar;
 
@@ -609,8 +613,7 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 		m_lastSeenGroup   = static_cast<unsigned char>(gPartyObj->m_aStarGroupId);
 	}
 
-	// Debug draw current A* group on screen (originally Graphic.Printf).
-	// Graphic.Printf(10, 10, "A* GROUP=%d", static_cast<int>(gPartyObj->m_aStarGroupId));
+	Graphic.Printf(10, 10, lbl_801DD6A8, static_cast<int>(gPartyObj->m_aStarGroupId));
 
 	bool padBusy = false;
 
@@ -626,8 +629,7 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 	}
 	else
 	{
-		// Decompiled junk: originally came from a cntlzw pattern.
-		// (void)countLeadingZeros(static_cast<unsigned int>(Pad._448_4_));
+		__cntlzw(static_cast<unsigned int>(Pad._448_4_));
 		trig1 = Pad._8_2_;
 	}
 
@@ -649,8 +651,7 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 	}
 	else
 	{
-		// Decompiled junk: originally came from a cntlzw pattern.
-		// (void)countLeadingZeros(static_cast<unsigned int>(Pad._448_4_));
+		__cntlzw(static_cast<unsigned int>(Pad._448_4_));
 		trig2 = Pad._4_2_;
 	}
 
@@ -721,7 +722,7 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 	portal.m_groupA = groupLow;
 	portal.m_groupB = groupHigh;
 
-	// System.Printf(DAT_803320a0);
+	System.Printf(lbl_803320A0);
 
 	for (int i = 0; i < 64; ++i)
 	{
@@ -736,7 +737,7 @@ void CAStar::addRealTime(CGPartyObj* gPartyObj)
 		if (used)
 		{
 			System.Printf(
-				"addAStar(%.5f, %.5f, %.5f, %d, %d, 0, 0);\n",
+				lbl_801DD6B4,
 				static_cast<double>(p.m_position.x),
 				static_cast<double>(p.m_position.y),
 				static_cast<double>(p.m_position.z),

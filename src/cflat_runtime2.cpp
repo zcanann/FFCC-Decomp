@@ -51,6 +51,41 @@ static inline float& ParticleWorkTargetZ(CFlatRuntime2* runtime)
 	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x176C);
 }
 
+static inline float*& ParticleWorkPosPtr(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<float**>(reinterpret_cast<u8*>(runtime) + 0x16CC);
+}
+
+static inline float*& ParticleWorkPosVecPtr(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<float**>(reinterpret_cast<u8*>(runtime) + 0x16D0);
+}
+
+static inline float& ParticleWorkPosX(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x1740);
+}
+
+static inline float& ParticleWorkPosY(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x1744);
+}
+
+static inline float& ParticleWorkPosZ(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x1748);
+}
+
+static inline float& ParticleWorkPosAngle(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x1750);
+}
+
+static inline float& ParticleWorkPosVecBase(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<float*>(reinterpret_cast<u8*>(runtime) + 0x174C);
+}
+
 static inline CFlatRuntime::CObject*& ParticleWorkBind(CFlatRuntime2* runtime)
 {
 	return *reinterpret_cast<CFlatRuntime::CObject**>(reinterpret_cast<u8*>(runtime) + 0x16E0);
@@ -471,12 +506,21 @@ void CFlatRuntime2::SetParticleWorkNo(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006A2FC
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::SetParticleWorkPos(Vec&, float)
+void CFlatRuntime2::SetParticleWorkPos(Vec& vec, float angle)
 {
-	// TODO
+	ParticleWorkPosX(this) = vec.x;
+	ParticleWorkPosY(this) = vec.y;
+	ParticleWorkPosZ(this) = vec.z;
+	ParticleWorkPosAngle(this) = 180.0f * angle / 3.1415927f;
+	ParticleWorkPosPtr(this) = &ParticleWorkPosX(this);
+	ParticleWorkPosVecPtr(this) = &ParticleWorkPosVecBase(this);
 }
 
 /*

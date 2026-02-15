@@ -1,5 +1,6 @@
 #include "ffcc/pppYmMegaBirthShpTail2.h"
 #include "ffcc/pppPart.h"
+#include <dolphin/mtx.h>
 
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern "C" void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
@@ -112,12 +113,113 @@ void birth(_pppPObject*, VYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*, VColor*, 
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8008b824
+ * PAL Size: 772b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void calc(_pppPObject*, VYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*, _PARTICLE_DATA*, VColor*, _PARTICLE_COLOR*)
+extern "C" void calc__FP11_pppPObjectP20VYmMegaBirthShpTail2P20PYmMegaBirthShpTail2P14_PARTICLE_DATAP6VColorP15_PARTICLE_COLOR(
+    _pppPObject* pppPObject, VYmMegaBirthShpTail2* vYmMegaBirthShpTail2,
+    PYmMegaBirthShpTail2* pYmMegaBirthShpTail2, _PARTICLE_DATA*, VColor* vColor, _PARTICLE_COLOR* particleColor)
 {
-	// TODO
+    u8* color = (u8*)vColor;
+    u32 alpha = 0;
+    float* blend = (float*)(color + 0x30);
+    float* velocityScale = (float*)(color + 0x28);
+    float* tailScale = (float*)(color + 0x2c);
+    u8* frameState = color + 0x30;
+    u8 frameWindow;
+    u8 fadeInFrames;
+    u8 historyIndex;
+    u16 frameIndex;
+    int colorTable;
+    int frameEntry;
+    s16 frameDuration;
+    Vec local;
+    Vec scaled;
+
+    if (particleColor != 0) {
+        alpha = ((u8*)particleColor)[0xb];
+    }
+
+    *velocityScale = *velocityScale + pYmMegaBirthShpTail2->m_colorDeltaAdd[2];
+    *tailScale = *tailScale + pYmMegaBirthShpTail2->m_sizeVal;
+
+    local.x = *(float*)(color + 0x10);
+    local.y = *(float*)(color + 0x14);
+    local.z = *(float*)(color + 0x18);
+    scaled.x = local.x * *velocityScale;
+    scaled.y = local.y * *velocityScale;
+    scaled.z = local.z * *velocityScale;
+    *(float*)(color + 0x00) = *(float*)(color + 0x00) + scaled.x;
+    *(float*)(color + 0x04) = *(float*)(color + 0x04) + scaled.y;
+    *(float*)(color + 0x08) = *(float*)(color + 0x08) + scaled.z;
+
+    scaled.x = vYmMegaBirthShpTail2->m_tailScaleDirection.x * *tailScale;
+    scaled.y = vYmMegaBirthShpTail2->m_tailScaleDirection.y * *tailScale;
+    scaled.z = vYmMegaBirthShpTail2->m_tailScaleDirection.z * *tailScale;
+    *(float*)(color + 0x00) = *(float*)(color + 0x00) + scaled.x;
+    *(float*)(color + 0x04) = *(float*)(color + 0x04) + scaled.y;
+    *(float*)(color + 0x08) = *(float*)(color + 0x08) + scaled.z;
+
+    if (*(s16*)((u8*)&pYmMegaBirthShpTail2->m_matrix[1] + 0x4) != 0) {
+        *(s16*)(color + 0x22) = *(s16*)(color + 0x22) - 1;
+    }
+
+    frameState[4] = frameState[4] + 1;
+    frameWindow = frameState[5];
+    if ((frameWindow != 0) && (frameState[4] <= frameWindow)) {
+        *blend = *blend - ((float)alpha / (float)frameWindow);
+        if (*blend < lbl_80330560) {
+            *blend = lbl_80330560;
+        }
+    }
+
+    if ((frameState[6] != 0) && (*(u16*)(color + 0x22) <= frameState[6])) {
+        fadeInFrames = *((u8*)&pYmMegaBirthShpTail2->m_matrix[1] + 7);
+        if (fadeInFrames != 0) {
+            *blend = *blend + ((float)alpha / (float)fadeInFrames);
+            if (*blend > 1.0f) {
+                *blend = 1.0f;
+            }
+        }
+    }
+
+    if (frameState[8] == 0) {
+        frameState[8] = frameState[7];
+    }
+    frameState[8] = frameState[8] - 1;
+    historyIndex = frameState[8];
+
+    PSMTXMultVec(pppPObject->m_localMatrix.value, (Vec*)(color + 0x0),
+                 (Vec*)(color + ((historyIndex + 5) * sizeof(VColor)) + 0x4));
+
+    frameIndex = *(u16*)(color + 0x1e);
+    colorTable = **(int**)(*(int*)&pppEnvStPtr->m_particleColors[0] +
+                           (int)pYmMegaBirthShpTail2->m_matrix[0][1] * 4);
+    *(u16*)(color + 0x20) = frameIndex;
+
+    frameEntry = colorTable + (u32)frameIndex * 8 + 0x10;
+    *(s16*)(color + 0x1c) = *(s16*)(color + 0x1c) + *(s16*)((u8*)pYmMegaBirthShpTail2->m_matrix[0] + 8);
+    frameDuration = *(s16*)(frameEntry + 2);
+    if ((int)frameDuration <= *(u16*)(color + 0x1c)) {
+        *(u16*)(color + 0x1c) = *(u16*)(color + 0x1c) - frameDuration;
+        *(s16*)(color + 0x1e) = *(s16*)(color + 0x1e) + 1;
+        if ((int)*(s16*)(colorTable + 6) <= *(u16*)(color + 0x1e)) {
+            if ((*(u8*)(frameEntry + 4) & 0x80) == 0) {
+                color[0x1c] = 0;
+                color[0x1d] = 0;
+                *(s16*)(color + 0x1e) = *(s16*)(color + 0x1e) - 1;
+            } else {
+                color[0x1e] = 0;
+                color[0x1f] = 0;
+                color[0x1c] = 0;
+                color[0x1d] = 0;
+            }
+        }
+    }
 }
 
 /*

@@ -185,8 +185,8 @@ BOOL OSRestoreInterrupts(BOOL level);
 #define OS_SOUND_MODE_MONO   0
 #define OS_SOUND_MODE_STEREO 1
 
-u32 OSGetSoundMode(void);
-void OSSetSoundMode(u32 mode);
+void OSGetSoundMode(u32 mode);
+u32 OSSetSoundMode(void);
 
 __declspec(weak) void OSReport(const char* msg, ...);
 __declspec(weak) void OSPanic(const char* file, int line, const char* msg, ...);

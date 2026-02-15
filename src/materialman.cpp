@@ -505,27 +505,38 @@ void CMaterialSet::ReleaseTag(CTextureSet* textureSet, int pdtSlotIndex, CAmemCa
 
     while (index < UnkMaterialSetGetter(materials)) {
         CMaterial** materialItems = *reinterpret_cast<CMaterial***>(Ptr(materials, 0xC));
-        if (materialItems == 0) {
-            break;
-        }
-
         CMaterial* material = materialItems[index];
         if ((material != 0) && (*reinterpret_cast<int*>(Ptr(material, 0x9C)) == pdtSlotIndex)) {
             int numTexture = static_cast<int>(*reinterpret_cast<unsigned short*>(Ptr(material, 0x18)));
+            unsigned char* textureIndex = Ptr(material, 0x1A);
+            unsigned char* textureRef = Ptr(material, 0x3C);
 
             for (int i = 0; i < numTexture; i++) {
-                void*& textureRef = *reinterpret_cast<void**>(Ptr(material, 0x3C + (i * 4)));
-                if (textureRef != 0) {
-                    ReleaseRef(textureRef);
-                    textureRef = 0;
+                void* object = *reinterpret_cast<void**>(textureRef);
+                if (object != 0) {
+                    int& refCount = *reinterpret_cast<int*>(Ptr(object, 4));
+                    int nextRefCount = refCount - 1;
+                    refCount = nextRefCount;
+                    if (nextRefCount == 0) {
+                        void** vtable = *reinterpret_cast<void***>(object);
+                        reinterpret_cast<VirtualDtorFn>(vtable[2])(object, 1);
+                    }
+                    *reinterpret_cast<void**>(textureRef) = 0;
                 }
 
-                short textureIndex = *reinterpret_cast<short*>(Ptr(material, 0x1A + (i * 2)));
-                textureSet->ReleaseTextureIdx(static_cast<int>(textureIndex), amemCacheSet);
-                textureRef = 0;
+                textureSet->ReleaseTextureIdx(static_cast<int>(*reinterpret_cast<short*>(textureIndex)), amemCacheSet);
+                *reinterpret_cast<void**>(textureRef) = 0;
+                textureRef += 4;
+                textureIndex += 2;
             }
 
-            ReleaseRef(material);
+            int& refCount = *reinterpret_cast<int*>(Ptr(material, 4));
+            int nextRefCount = refCount - 1;
+            refCount = nextRefCount;
+            if (nextRefCount == 0) {
+                void** vtable = *reinterpret_cast<void***>(material);
+                reinterpret_cast<VirtualDtorFn>(vtable[2])(material, 1);
+            }
             materialItems[index] = 0;
         }
 

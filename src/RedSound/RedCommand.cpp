@@ -9,12 +9,45 @@ extern unsigned int* DAT_8032f444;
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801ca038
+ * PAL Size: 364b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _EraseAttribute(int, int)
+void _EraseAttribute(int eraseTrack, int attrMask)
 {
-	// TODO
+	int* trackBasePtr = (int*)((char*)DAT_8032f3f0 + 0xdbc);
+	int* track = (int*)*trackBasePtr;
+
+	do {
+		if ((*track != 0) && ((int)*(unsigned char*)((char*)track + 0x14f) <= eraseTrack) &&
+		    ((((unsigned int)*(unsigned char*)(track + 0x54)) & (unsigned int)attrMask) != 0)) {
+			unsigned char trackNo;
+			unsigned int* seTrack;
+
+			KeyOnReserveClear((RedKeyOnDATA*)DAT_8032f3fc, (RedTrackDATA*)track);
+			track[0x3e] = 0;
+			track[0x41] = 0;
+			*track = 0;
+			track[0x16] = 0;
+
+			trackNo = *(unsigned char*)((char*)track + 0x14e);
+			((unsigned char*)DAT_8032f444)[trackNo * 0xc0 + 0x1a] &= (unsigned char)0xfa;
+			seTrack = (unsigned int*)((unsigned char*)DAT_8032f444 + trackNo * 0xc0);
+			seTrack[0x25] &= 0xfffffff7;
+			seTrack[0x24] &= 0xfffffffe;
+			seTrack[0x24] |= 2;
+			seTrack[0x23] = 0;
+
+			DAT_8032e154.SeSepHistoryManager(0, track[0x3d]);
+			if (track[6] != 0) {
+				DAT_8032e154.WaveHistoryManager(0, *(short*)(track[6] + 2));
+			}
+		}
+		track += 0x55;
+	} while (track < (int*)(*trackBasePtr + 0x2a80));
 }
 
 /*
@@ -108,12 +141,49 @@ void SearchSeEmptyTrack(int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801ca4b8
+ * PAL Size: 384b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void SeStopID(int)
+int SeStopID(int seId)
 {
-	// TODO
+	int* trackBasePtr = (int*)((char*)DAT_8032f3f0 + 0xdbc);
+	int* track;
+
+	*(unsigned int*)((char*)DAT_8032f3f0 + 0x1244) = 0;
+	track = (int*)*trackBasePtr;
+	do {
+		if ((*track != 0) && ((seId == -1) || (track[0x3e] == seId))) {
+			unsigned char trackNo;
+			unsigned int* seTrack;
+
+			KeyOnReserveClear((RedKeyOnDATA*)DAT_8032f3fc, (RedTrackDATA*)track);
+			track[0x3e] = 0;
+			track[0x41] = 0;
+			*track = 0;
+			track[0x16] = 0;
+
+			trackNo = *(unsigned char*)((char*)track + 0x14e);
+			((unsigned char*)DAT_8032f444)[trackNo * 0xc0 + 0x1a] &= (unsigned char)0xfa;
+			seTrack = (unsigned int*)((unsigned char*)DAT_8032f444 + trackNo * 0xc0);
+			seTrack[0x25] &= 0xfffffff7;
+			seTrack[0x24] &= 0xfffffffe;
+			seTrack[0x24] |= 2;
+			seTrack[0] = 0;
+			seTrack[0x23] = 0;
+
+			if (track[6] != 0) {
+				DAT_8032e154.WaveHistoryManager(0, *(short*)(track[6] + 2));
+			}
+			DAT_8032e154.SeSepHistoryManager(0, track[0x3d]);
+		}
+		track += 0x55;
+	} while (track < (int*)(*trackBasePtr + 0x2a80));
+
+	return 0;
 }
 
 /*

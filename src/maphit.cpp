@@ -1,9 +1,24 @@
 #include "ffcc/maphit.h"
+#include "ffcc/chunkfile.h"
+#include "ffcc/map.h"
+#include "ffcc/memory.h"
+#include "ffcc/system.h"
 
 #include <math.h>
 
 extern CMapCylinder g_hit_cyl;
 extern CMapCylinder g_hit_cyl_min;
+
+namespace {
+static char s_maphit_cpp[] = "maphit.cpp";
+static const float s_large_pos = 3.4e38f;
+static const float s_large_neg = -3.4e38f;
+
+static inline unsigned char* Ptr(void* p, unsigned int offset)
+{
+    return reinterpret_cast<unsigned char*>(p) + offset;
+}
+}
 
 /*
  * --INFO--
@@ -217,12 +232,163 @@ extern "C" CMapHit* dtor_80026D5C(CMapHit* mapHit, short shouldDelete)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800266f0
+ * PAL Size: 1608b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapHit::ReadOtmHit(CChunkFile&)
+void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
 {
-	// TODO
+    CChunkFile::CChunk chunk;
+    CMemory::CStage* const stage = *reinterpret_cast<CMemory::CStage**>(&MapMng);
+
+    chunkFile.PushChunk();
+
+    while (chunkFile.GetNextChunk(chunk)) {
+        if (chunk.m_id == 'HITV') {
+            m_vertexCount = static_cast<unsigned short>(chunk.m_arg0);
+            m_vertices = new (stage, s_maphit_cpp, 0x143) Vec[m_vertexCount];
+
+            m_positionMin.x = s_large_pos;
+            m_positionMin.y = s_large_pos;
+            m_positionMin.z = s_large_pos;
+            m_positionMax.x = s_large_neg;
+            m_positionMax.y = s_large_neg;
+            m_positionMax.z = s_large_neg;
+
+            for (unsigned int i = 0; i < m_vertexCount; i++) {
+                Vec& v = m_vertices[i];
+                v.x = chunkFile.GetF4();
+                v.y = chunkFile.GetF4();
+                v.z = chunkFile.GetF4();
+
+                if (v.x < m_positionMin.x) {
+                    m_positionMin.x = v.x;
+                }
+                if (v.y < m_positionMin.y) {
+                    m_positionMin.y = v.y;
+                }
+                if (v.z < m_positionMin.z) {
+                    m_positionMin.z = v.z;
+                }
+
+                if (m_positionMax.x < v.x) {
+                    m_positionMax.x = v.x;
+                }
+                if (m_positionMax.y < v.y) {
+                    m_positionMax.y = v.y;
+                }
+                if (m_positionMax.z < v.z) {
+                    m_positionMax.z = v.z;
+                }
+            }
+
+            m_positionMin.x -= 0.1f;
+            m_positionMin.y -= 0.1f;
+            m_positionMin.z -= 0.1f;
+            m_positionMax.x += 0.1f;
+            m_positionMax.y += 0.1f;
+            m_positionMax.z += 0.1f;
+        } else if (chunk.m_id == 'HITF') {
+            m_faceCount = static_cast<unsigned short>(chunk.m_arg0);
+            m_faces = new (stage, s_maphit_cpp, 0x159) CMapHitFace[m_faceCount];
+
+            for (unsigned int faceIdx = 0; faceIdx < m_faceCount; faceIdx++) {
+                chunkFile.Align(4);
+
+                unsigned char* face = Ptr(&m_faces[faceIdx], 0);
+                float* nrm = reinterpret_cast<float*>(face + 0x00);
+
+                nrm[0] = chunkFile.GetF4();
+                nrm[1] = chunkFile.GetF4();
+                nrm[2] = chunkFile.GetF4();
+                nrm[3] = chunkFile.GetF4();
+
+                face[0x44] = chunkFile.Get1();
+                face[0x45] = chunkFile.Get1();
+                face[0x46] = chunkFile.Get1();
+                face[0x47] = chunkFile.Get1();
+                face[0x4E] = 0;
+                face[0x4F] = 0;
+
+                const unsigned int vertexCount = face[0x46];
+                for (unsigned int i = 0; i < vertexCount; i++) {
+                    *reinterpret_cast<float*>(face + 0x2C + i * 8 + 0) = 0.0f;
+                    *reinterpret_cast<float*>(face + 0x2C + i * 8 + 4) = 0.0f;
+                }
+
+                if (chunk.m_version == 0) {
+                    chunkFile.Align(4);
+                    for (unsigned int i = 0; i < vertexCount; i++) {
+                        (void)chunkFile.GetF4();
+                        (void)chunkFile.GetF4();
+                    }
+                    *reinterpret_cast<float*>(face + 0x28) = 0.0f;
+                } else if (chunk.m_version == 1) {
+                    *reinterpret_cast<float*>(face + 0x28) = chunkFile.GetF4();
+                    chunkFile.Align(4);
+                } else {
+                    *reinterpret_cast<float*>(face + 0x28) = chunkFile.GetF4();
+                    chunkFile.Align(4);
+                    for (unsigned int i = 0; i < vertexCount; i++) {
+                        *reinterpret_cast<float*>(face + 0x2C + i * 8 + 0) = chunkFile.GetF4() * 0.01f;
+                        *reinterpret_cast<float*>(face + 0x2C + i * 8 + 4) = chunkFile.GetF4() * 0.01f;
+                    }
+                }
+
+                float* boundsMin = reinterpret_cast<float*>(face + 0x10);
+                float* boundsMax = reinterpret_cast<float*>(face + 0x1C);
+                boundsMin[0] = s_large_pos;
+                boundsMin[1] = s_large_pos;
+                boundsMin[2] = s_large_pos;
+                boundsMax[0] = s_large_neg;
+                boundsMax[1] = s_large_neg;
+                boundsMax[2] = s_large_neg;
+
+                for (unsigned int i = 0; i < vertexCount; i++) {
+                    const unsigned short idx = chunkFile.Get2();
+                    *reinterpret_cast<unsigned short*>(face + 0x48 + i * 2) = idx;
+
+                    const Vec& v = m_vertices[idx];
+                    if (v.x < boundsMin[0]) {
+                        boundsMin[0] = v.x;
+                    }
+                    if (v.y < boundsMin[1]) {
+                        boundsMin[1] = v.y;
+                    }
+                    if (v.z < boundsMin[2]) {
+                        boundsMin[2] = v.z;
+                    }
+
+                    if (boundsMax[0] < v.x) {
+                        boundsMax[0] = v.x;
+                    }
+                    if (boundsMax[1] < v.y) {
+                        boundsMax[1] = v.y;
+                    }
+                    if (boundsMax[2] < v.z) {
+                        boundsMax[2] = v.z;
+                    }
+                }
+
+                float width = *reinterpret_cast<float*>(face + 0x28) * 0.5f;
+                boundsMin[0] -= (0.1f + width);
+                boundsMin[1] -= (0.1f + width);
+                boundsMin[2] -= (0.1f + width);
+                boundsMax[0] += (0.1f + width);
+                boundsMax[1] += (0.1f + width);
+                boundsMax[2] += (0.1f + width);
+                *reinterpret_cast<float*>(face + 0x28) = 1.0f - width;
+            }
+        } else if (chunk.m_id == 'NAME') {
+            char* mapHitName = chunkFile.GetString();
+            MapMng.AttachMapHit(this, mapHitName);
+        }
+    }
+
+    chunkFile.PopChunk();
 }
 
 /*

@@ -259,6 +259,51 @@ CMapAnim* CPtrArray<CMapAnim*>::operator[](unsigned long index)
 
 /*
  * --INFO--
+ * PAL Address: 0x80034130
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+int CPtrArray<CMapAnimNode*>::GetSize()
+{
+    return m_numItems;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80034138
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CMapAnimNode* CPtrArray<CMapAnimNode*>::operator[](unsigned long index)
+{
+    return GetAt(index);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80034270
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CMapAnimNode* CPtrArray<CMapAnimNode*>::GetAt(unsigned long index)
+{
+    return m_items[index];
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80034038
  * PAL Size: 8b
  * EN Address: TODO

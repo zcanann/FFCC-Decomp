@@ -4,6 +4,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/map.h"
 #include "ffcc/maphit.h"
+#include "ffcc/mes.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_map.h"
 #include "ffcc/p_menu.h"
@@ -28,6 +29,12 @@ struct CMapCylinderRaw
     Vec m_direction2;
     float m_radius2;
     float m_height2;
+};
+
+struct CSystemErrorLevelSlot
+{
+    char m_pad[0x3CDC];
+    int m_value;
 };
 
 extern "C" {

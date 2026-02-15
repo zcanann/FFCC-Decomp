@@ -28,7 +28,7 @@ struct VtMimeSource
 {
     short vertexCount;
     unsigned char pad2[0x2A];
-    float* positions;
+    float positions[6];
 };
 
 struct VtMimeEnv
@@ -91,22 +91,27 @@ void pppDrawVtMime(void* param1, void* param2, void* param3)
 
     int vertIdx1 = *(int*)((char*)param2 + 0x4);
     int vertIdx2 = *(int*)((char*)param2 + 0x8);
+    unsigned int maskedIdx;
 
-    if ((vertIdx1 & 0xFFFF0000) == 0xFFFF0000) {
+    maskedIdx = (unsigned int)vertIdx1;
+    maskedIdx &= 0xFFFF0000;
+    if (maskedIdx + 0x00010000 == 0) {
         return;
     }
-    if ((vertIdx2 & 0xFFFF0000) == 0xFFFF0000) {
+    maskedIdx = (unsigned int)vertIdx2;
+    maskedIdx &= 0xFFFF0000;
+    if (maskedIdx + 0x00010000 == 0) {
         return;
     }
 
     void* dataBase = *(void**)*(void**)((char*)param3 + 0xC);
     char* target = (char*)param1 + (int)dataBase + 0x80;
     void* globalData = *(void**)((char*)lbl_8032ED54 + 0x8);
-    void* vert1Data = *(void**)((char*)globalData + (vertIdx1 * 4));
-    void* vert2Data = *(void**)((char*)globalData + (vertIdx2 * 4));
-    float* vert1Pos = (float*)((char*)vert1Data + 0x2C);
-    float* vert2Pos = (float*)((char*)vert2Data + 0x2C);
-    short vertCount = *(short*)vert1Data;
+    VtMimeSource* vert1Data = *(VtMimeSource**)((char*)globalData + (vertIdx1 * 4));
+    VtMimeSource* vert2Data = *(VtMimeSource**)((char*)globalData + (vertIdx2 * 4));
+    float* vert1Pos = vert1Data->positions;
+    float* vert2Pos = vert2Data->positions;
+    short vertCount = vert1Data->vertexCount;
     void** memPtr = (void**)(target + 0xC);
 
     if (*memPtr == 0) {
@@ -116,20 +121,25 @@ void pppDrawVtMime(void* param1, void* param2, void* param3)
     if (vertCount > 0) {
         float* outputVerts = (float*)*memPtr;
         float interpFactor = *(float*)target;
+        float* src1 = vert1Pos;
+        float* src2 = vert2Pos;
         int i;
 
         for (i = 0; i < vertCount; i++) {
-            float v1X = vert1Pos[i * 6 + 0];
-            float v2X = vert2Pos[i * 6 + 0];
+            float v1X = src1[0];
+            float v2X = src2[0];
             outputVerts[i * 3 + 0] = v1X + interpFactor * (v2X - v1X);
 
-            float v1Y = vert1Pos[i * 6 + 1];
-            float v2Y = vert2Pos[i * 6 + 1];
+            float v1Y = src1[1];
+            float v2Y = src2[1];
             outputVerts[i * 3 + 1] = v1Y + interpFactor * (v2Y - v1Y);
 
-            float v1Z = vert1Pos[i * 6 + 2];
-            float v2Z = vert2Pos[i * 6 + 2];
+            float v1Z = src1[2];
+            float v2Z = src2[2];
             outputVerts[i * 3 + 2] = v1Z + interpFactor * (v2Z - v1Z);
+
+            src1 += 6;
+            src2 += 6;
         }
 
         DCFlushRange(*memPtr, (unsigned long)(vertCount * 0xC));

@@ -4,8 +4,20 @@
 #include "ffcc/system.h"
 #include "ffcc/vector.h"
 #include "ffcc/p_dbgmenu.h"
+#include "ffcc/p_minigame.h"
+
+#include <string.h>
+
+extern CMiniGamePcs MiniGamePcs;
+
+#include <dolphin/os/OSMemory.h>
+#include <dolphin/os/OSRtc.h>
+#include <string.h>
 
 extern "C" {
+unsigned int AddScenegraph__7CSystemFP8CProcessi(CSystem*, void*, int);
+void RemoveScenegraph__7CSystemFP8CProcessi(CSystem*, void*, int);
+void ExecScenegraph__7CSystemFv(CSystem*);
 void Quit__12CFlatRuntimeFv(void*);
 void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 void Quit__11CDbgMenuPcsFv(void*);
@@ -24,8 +36,26 @@ void Quit__10CCameraPcsFv(void*);
 void createLoad__9CSoundPcsFv(void*);
 void createLoad__9CCharaPcsFv(void*);
 void createLoad__8CPartPcsFv(void*);
+void pppDeleteAll__8CPartMngFv(void*);
+void pppDestroyAll__8CPartMngFv(void*);
+void Init__10CCameraPcsFv(void*);
+void Init__11CGraphicPcsFv(void*);
+void Init__6CCharaFv(void*);
+void Init__9CLightPcsFv(void*);
+void Init__9CCharaPcsFv(void*);
+void Init__7CMapPcsFv(void*);
+void Init__18CMaterialEditorPcsFv(void*);
+void Init__14CFunnyShapePcsFv(void*);
+void Init__7CUSBPcsFv(void*);
+void Init__8CMenuPcsFv(void*);
+void Init__7CGbaPcsFv(void*);
+void Init__6CMcPcsFv(void*);
+void Init__11CDbgMenuPcsFv(void*);
+void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
+void Init__12CFlatRuntimeFv(void*);
 void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 unsigned char CFlat[];
+unsigned char PartMng[];
 unsigned char McPcs[];
 unsigned char GbaPcs[];
 unsigned char MenuPcs[];
@@ -39,6 +69,8 @@ unsigned char MaterialEditorPcs[];
 unsigned char FunnyShapePcs[];
 unsigned char GraphicsPcs[];
 unsigned char CameraPcs[];
+unsigned char DAT_8032ed00[];
+unsigned char DAT_8032ed08[];
 extern const char DAT_801d61dc[];
 }
 
@@ -46,6 +78,8 @@ static const float FLOAT_8032f688 = 1.0E+10;
 static const float FLOAT_8032f68c = -1.0E+10;
 static const float FLOAT_8032f690 = 0.0;    
 static const float FLOAT_8032f694 = 0.001;
+static const char s_mainStageName[] = "game_main";
+static const char s_debugStageName[] = "game_debug";
 
 // Uninitialized
 static float FLOAT_8032ec40;
@@ -72,12 +106,60 @@ CGame::~CGame()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001600c
+ * PAL Size: 476b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::Init()
 {
-	// TODO
+    u32 progressiveMode = OSGetProgressiveMode();
+
+    if (progressiveMode == 3) {
+        m_gameWork.m_languageId = 5;
+    } else if (progressiveMode < 3) {
+        if (progressiveMode == 1) {
+            m_gameWork.m_languageId = 2;
+        } else if (progressiveMode != 0) {
+            m_gameWork.m_languageId = 4;
+        } else {
+            m_gameWork.m_languageId = 1;
+        }
+    } else if ((progressiveMode < 5) && (progressiveMode != 5)) {
+        m_gameWork.m_languageId = 3;
+    } else {
+        m_gameWork.m_languageId = 1;
+    }
+
+    Init__10CCameraPcsFv(&CameraPcs);
+    Init__11CGraphicPcsFv(GraphicsPcs);
+    Init__6CCharaFv(Chara);
+    Init__9CLightPcsFv(LightPcs);
+    Init__9CCharaPcsFv(&CharaPcs);
+    Init__7CMapPcsFv(MapPcs);
+    Init__18CMaterialEditorPcsFv(MaterialEditorPcs);
+    Init__14CFunnyShapePcsFv(FunnyShapePcs);
+    Init__7CUSBPcsFv(USBPcs);
+    Init__8CMenuPcsFv(MenuPcs);
+    Init__7CGbaPcsFv(&GbaPcs);
+    Init__6CMcPcsFv(McPcs);
+    Init__11CDbgMenuPcsFv(&DbgMenuPcs);
+
+    m_mainStage = (CMemory::CStage*)CreateStage__7CMemoryFUlPci(&Memory, 0x106000, s_mainStageName, 0);
+    if (OSGetConsoleSimulatedMemSize() == 0x3000000) {
+        m_debugStage = (CMemory::CStage*)CreateStage__7CMemoryFUlPci(&Memory, 0x220000, s_debugStageName, 1);
+    }
+
+    m_sceneId = 4;
+    m_mapId = 3;
+    m_mapVariant = 0;
+    memset(m_currentScriptName, 0, sizeof(m_currentScriptName));
+    memset(m_startScriptName, 0, sizeof(m_startScriptName));
+    m_frameCounterEnable = 1;
+    Init__12CFlatRuntimeFv(CFlat);
+    unkFloat_0xca10 = FLOAT_8032f694;
 }
 
 /*
@@ -133,12 +215,122 @@ void CGame::LoadLogoWaitingData()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800157a8
+ * PAL Size: 1764b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::Exec()
 {
-	// TODO
+	AddScenegraph__7CSystemFP8CProcessi(&System, DAT_8032ed08, 0);
+	AddScenegraph__7CSystemFP8CProcessi(&System, GraphicsPcs, 0);
+	AddScenegraph__7CSystemFP8CProcessi(&System, LightPcs, 0);
+	AddScenegraph__7CSystemFP8CProcessi(&System, &MiniGamePcs, 0);
+
+	do {
+		m_cfdLoadedFlag = 0;
+		m_assetsLoadedFlag = 0;
+
+		Memory.IncHeapWalkerLevel();
+
+		m_currentSceneId = m_sceneId;
+		m_currentMapId = m_mapId;
+		m_currentMapVariantId = m_mapVariant;
+		strcpy(m_currentScriptName, m_sceneScript + 4);
+
+		switch (m_currentSceneId) {
+		case 2:
+			AddScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 1);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &CharaPcs, 1);
+			break;
+		case 3:
+			AddScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 2);
+			AddScenegraph__7CSystemFP8CProcessi(&System, MapPcs, 1);
+			AddScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 6);
+			break;
+		case 4:
+			AddScenegraph__7CSystemFP8CProcessi(&System, MenuPcs, 0);
+			AddScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 0);
+			AddScenegraph__7CSystemFP8CProcessi(&System, MapPcs, 0);
+			AddScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 6);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &CharaPcs, 0);
+			AddScenegraph__7CSystemFP8CProcessi(&System, DAT_8032ed00, 0);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &PartPcs, 0);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &GbaPcs, 0);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &DbgMenuPcs, 0);
+			AddScenegraph__7CSystemFP8CProcessi(&System, McPcs, 0);
+			AddScenegraph__7CSystemFP8CProcessi(&System, SoundPcs, 0);
+			break;
+		case 5:
+			AddScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 3);
+			AddScenegraph__7CSystemFP8CProcessi(&System, MaterialEditorPcs, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, LightPcs, 0);
+			break;
+		case 6:
+			AddScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 4);
+			AddScenegraph__7CSystemFP8CProcessi(&System, FunnyShapePcs, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, LightPcs, 0);
+			break;
+		case 7:
+			AddScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 5);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &CharaPcs, 2);
+			AddScenegraph__7CSystemFP8CProcessi(&System, MapPcs, 1);
+			AddScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 6);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &PartPcs, 1);
+			break;
+		}
+
+		ExecScenegraph__7CSystemFv(&System);
+
+		switch (m_currentSceneId) {
+		case 2:
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 1);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CharaPcs, 1);
+			break;
+		case 3:
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 2);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 6);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, MapPcs, 1);
+			break;
+		case 4:
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, SoundPcs, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, McPcs, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 6);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, MapPcs, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CharaPcs, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &PartPcs, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &GbaPcs, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, DAT_8032ed00, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, MenuPcs, 0);
+			break;
+		case 5:
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 3);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, MaterialEditorPcs, 0);
+			break;
+		case 6:
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 4);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, FunnyShapePcs, 0);
+			break;
+		case 7:
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 5);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 6);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CharaPcs, 2);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, MapPcs, 1);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &PartPcs, 1);
+			break;
+		}
+
+		Memory.HeapWalker();
+		Memory.DecHeapWalkerLevel();
+	} while (m_sceneId != 0);
+
+	RemoveScenegraph__7CSystemFP8CProcessi(&System, &MiniGamePcs, 0);
+	RemoveScenegraph__7CSystemFP8CProcessi(&System, LightPcs, 0);
+	RemoveScenegraph__7CSystemFP8CProcessi(&System, GraphicsPcs, 0);
+	RemoveScenegraph__7CSystemFP8CProcessi(&System, DAT_8032ed08, 0);
 }
 
 /*
@@ -242,12 +434,17 @@ void CGame::ChangeMap(int mapId, int mapVariant, int param4, int param5)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80014e44
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::ScriptChanging(char*)
 {
-	// TODO
+	pppDeleteAll__8CPartMngFv(PartMng);
+	pppDestroyAll__8CPartMngFv(PartMng);
 }
 
 /*
@@ -517,22 +714,39 @@ void CGame::GetBossArtifact(int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800143ec
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGame::GetFoodLevel(int, int)
+int CGame::GetFoodLevel(int playerIndex, int foodIndex)
 {
-	// TODO
+    s16 level = reinterpret_cast<s16*>(m_scriptFoodBase[playerIndex] + 0x3B8)[foodIndex];
+    return level;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800143a4
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGame::GetTargetCursor(int, Vec&, Vec&)
+void CGame::GetTargetCursor(int playerIndex, Vec& posA, Vec& posB)
 {
-	// TODO
+    f32* cursorPos = reinterpret_cast<f32*>(m_scriptFoodBase[playerIndex] + 0xBAC);
+
+    posA.x = cursorPos[0];
+    posA.y = cursorPos[1];
+    posA.z = cursorPos[2];
+
+    posB.x = cursorPos[3];
+    posB.y = cursorPos[4];
+    posB.z = cursorPos[5];
 }
 
 /*
@@ -649,12 +863,32 @@ const char* CGame::GetLangString()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800b9928
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::SetNextScript(CGame::CNextScript* nextScript)
 { 
-	nextScript->m_flags = 1;
+    memcpy(&m_nextScript, nextScript, sizeof(CNextScript));
+    m_newGameFlag = 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800b91a4
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGame::CGameWork::ClearEvtWork()
+{
+    memset(m_eventFlags, 0, sizeof(m_eventFlags));
+    memset(m_eventWork, 0, sizeof(m_eventWork));
 }
 
 /*

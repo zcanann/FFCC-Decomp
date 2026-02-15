@@ -189,7 +189,7 @@ void pppCacheLoadShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
     char textureUsed[256];
     void* animData = shapeSt->m_animData;
 
-    memset(textureUsed, 0, 256);
+    memset(textureUsed, 0, 0x100);
 
     void* currentFrame = animData;
     for (int frameIndex = 0; frameIndex < *(short*)((int)animData + 6); frameIndex++) {
@@ -204,11 +204,15 @@ void pppCacheLoadShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
         currentFrame = (void*)((int)currentFrame + 8);
     }
 
-    for (unsigned int textureIndex = 0; textureIndex < 256; textureIndex++) {
-        if (textureUsed[textureIndex] != 0) {
+    char* texturePtr = textureUsed;
+    unsigned int textureIndex = 0;
+    do {
+        if (*texturePtr != 0) {
             materialSet->CacheLoadTexture(textureIndex, (CAmemCacheSet*)CAMemCacheSet);
         }
-    }
+        textureIndex++;
+        texturePtr++;
+    } while (textureIndex < 0x100);
 }
 
 /*
@@ -245,7 +249,7 @@ void pppCacheDumpShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
     char textureUsed[256];
     void* animData = shapeSt->m_animData;
     
-    memset(textureUsed, 0, 256);
+    memset(textureUsed, 0, 0x100);
     
     void* currentFrame = animData;
     for (int frameIndex = 0; frameIndex < *(short*)((int)animData + 6); frameIndex++) {
@@ -260,11 +264,15 @@ void pppCacheDumpShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
         currentFrame = (void*)((int)currentFrame + 8);
     }
     
-    for (unsigned int textureIndex = 0; textureIndex < 256; textureIndex++) {
-        if (textureUsed[textureIndex] != 0) {
+    char* texturePtr = textureUsed;
+    unsigned int textureIndex = 0;
+    do {
+        if (*texturePtr != 0) {
             CacheDumpTexture__12CMaterialSetFiP13CAmemCacheSet(materialSet, textureIndex, CAMemCacheSet);
         }
-    }
+        textureIndex++;
+        texturePtr++;
+    } while (textureIndex < 0x100);
 }
 
 /*

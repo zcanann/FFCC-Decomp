@@ -171,12 +171,108 @@ void SetParticleMatrix(_pppPObject*, VBreathModel*, PARTICLE_DATA*, PARTICLE_WMA
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800dbfd4
+ * PAL Size: 940b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void UpdateParticle(VBreathModel*, PBreathModel*, PARTICLE_DATA*, VColor*, PARTICLE_COLOR*)
+void UpdateParticle(VBreathModel*, PBreathModel* pBreathModel, PARTICLE_DATA* particleData, VColor* vColor,
+                    PARTICLE_COLOR* particleColor)
 {
-	// TODO
+    unsigned int alpha = (unsigned int)*(unsigned char*)((unsigned char*)vColor + 0xB);
+    Vec scaledDirection;
+    unsigned char fadeInFrames;
+    unsigned char fadeOutStart;
+
+    if (particleColor != NULL) {
+        *(float*)((unsigned char*)particleColor + 0x0) += *(float*)((unsigned char*)particleColor + 0x10);
+        *(float*)((unsigned char*)particleColor + 0x4) += *(float*)((unsigned char*)particleColor + 0x14);
+        *(float*)((unsigned char*)particleColor + 0x8) += *(float*)((unsigned char*)particleColor + 0x18);
+        *(float*)((unsigned char*)particleColor + 0xC) += *(float*)((unsigned char*)particleColor + 0x1C);
+
+        *(float*)((unsigned char*)particleColor + 0x10) += *(float*)((unsigned char*)pBreathModel + 0x38);
+        *(float*)((unsigned char*)particleColor + 0x14) += *(float*)((unsigned char*)pBreathModel + 0x3C);
+        *(float*)((unsigned char*)particleColor + 0x18) += *(float*)((unsigned char*)pBreathModel + 0x40);
+        *(float*)((unsigned char*)particleColor + 0x1C) += *(float*)((unsigned char*)pBreathModel + 0x44);
+
+        alpha = (unsigned int)*(unsigned char*)((unsigned char*)vColor + 0xB) +
+                (int)*(float*)((unsigned char*)particleColor + 0xC);
+        if ((int)alpha > 0xFF) {
+            alpha = 0xFF;
+        }
+    }
+
+    *(float*)((unsigned char*)particleData + 0x58) += *(float*)((unsigned char*)particleData + 0x5C);
+    if ((*(unsigned char*)((unsigned char*)pBreathModel + 0xC1) & 0x10) == 0) {
+        *(float*)((unsigned char*)particleData + 0x5C) += *(float*)((unsigned char*)pBreathModel + 0x98);
+    } else {
+        *(float*)((unsigned char*)particleData + 0x5C) +=
+            *(float*)((unsigned char*)pBreathModel + 0x98) + *(float*)((unsigned char*)particleData + 0x60);
+    }
+
+    while (*(float*)((unsigned char*)particleData + 0x58) >= 6.2831855f) {
+        *(float*)((unsigned char*)particleData + 0x58) -= 6.2831855f;
+    }
+    while (*(float*)((unsigned char*)particleData + 0x58) < 0.0f) {
+        *(float*)((unsigned char*)particleData + 0x58) += 6.2831855f;
+    }
+
+    *(float*)((unsigned char*)particleData + 0x64) += *(float*)((unsigned char*)particleData + 0x70);
+    *(float*)((unsigned char*)particleData + 0x68) += *(float*)((unsigned char*)particleData + 0x74);
+    *(float*)((unsigned char*)particleData + 0x6C) += *(float*)((unsigned char*)particleData + 0x78);
+
+    if ((*(unsigned char*)((unsigned char*)pBreathModel + 0xC0) & 0x10) == 0) {
+        *(float*)((unsigned char*)particleData + 0x70) += *(float*)((unsigned char*)pBreathModel + 0x70);
+        *(float*)((unsigned char*)particleData + 0x74) += *(float*)((unsigned char*)pBreathModel + 0x74);
+        *(float*)((unsigned char*)particleData + 0x78) += *(float*)((unsigned char*)pBreathModel + 0x78);
+    } else {
+        *(float*)((unsigned char*)particleData + 0x70) +=
+            *(float*)((unsigned char*)pBreathModel + 0x70) + *(float*)((unsigned char*)particleData + 0x7C);
+        *(float*)((unsigned char*)particleData + 0x74) +=
+            *(float*)((unsigned char*)pBreathModel + 0x74) + *(float*)((unsigned char*)particleData + 0x80);
+        *(float*)((unsigned char*)particleData + 0x78) +=
+            *(float*)((unsigned char*)pBreathModel + 0x78) + *(float*)((unsigned char*)particleData + 0x84);
+    }
+
+    *(float*)((unsigned char*)particleData + 0x8C) += *(float*)((unsigned char*)pBreathModel + 0xA4);
+    if (*(char*)((unsigned char*)pBreathModel + 0xC8) == 0) {
+        if ((*(float*)((unsigned char*)pBreathModel + 0xA0) <= 0.0f) ||
+            (0.0f <= *(float*)((unsigned char*)pBreathModel + 0xA4))) {
+            if ((*(float*)((unsigned char*)pBreathModel + 0xA0) < 0.0f) &&
+                ((0.0f < *(float*)((unsigned char*)pBreathModel + 0xA4)) &&
+                 (0.0f < *(float*)((unsigned char*)particleData + 0x8C)))) {
+                *(float*)((unsigned char*)particleData + 0x8C) = 0.0f;
+            }
+        } else if (*(float*)((unsigned char*)particleData + 0x8C) < 0.0f) {
+            *(float*)((unsigned char*)particleData + 0x8C) = 0.0f;
+        }
+    }
+
+    PSVECScale((Vec*)((unsigned char*)particleData + 0x3C), &scaledDirection,
+               *(float*)((unsigned char*)particleData + 0x8C));
+    PSVECAdd(&scaledDirection, (Vec*)((unsigned char*)particleData + 0x30),
+             (Vec*)((unsigned char*)particleData + 0x30));
+
+    if (*(short*)((unsigned char*)pBreathModel + 0x20) != 0) {
+        *(short*)((unsigned char*)particleData + 0x50) =
+            *(short*)((unsigned char*)particleData + 0x50) - 1;
+    }
+
+    *(char*)((unsigned char*)particleData + 0x90) = *(char*)((unsigned char*)particleData + 0x90) + 1;
+    fadeInFrames = *(unsigned char*)((unsigned char*)particleData + 0x54);
+    if ((fadeInFrames != 0) &&
+        ((int)(unsigned int)*(unsigned char*)((unsigned char*)particleData + 0x90) <= (int)fadeInFrames)) {
+        *(float*)((unsigned char*)particleData + 0x88) -= (float)alpha / (float)fadeInFrames;
+    }
+
+    fadeOutStart = *(unsigned char*)((unsigned char*)particleData + 0x55);
+    if ((fadeOutStart != 0) &&
+        ((int)*(short*)((unsigned char*)particleData + 0x50) <= (int)(char)fadeOutStart)) {
+        *(float*)((unsigned char*)particleData + 0x88) +=
+            (float)alpha / (float)(unsigned int)*(unsigned char*)((unsigned char*)pBreathModel + 0x23);
+    }
 }
 
 /*

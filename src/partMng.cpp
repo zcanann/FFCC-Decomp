@@ -2,10 +2,12 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/cflat_runtime.h"
 #include "ffcc/file.h"
+#include "ffcc/graphic.h"
 
 extern "C" void __dl__FPv(void* ptr);
 extern "C" void pppPartInit__8CPartMngFv2(CPartMng* partMng);
 extern "C" unsigned int CheckSum__FPvi(void*, int);
+static char s_partMng_cpp_801d8230[] = "partMng.cpp";
 
 struct CPtrArrayBare {
     unsigned long m_size;
@@ -652,12 +654,33 @@ void CPartMng::pppPartDrawAfter()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80059cac
+ * PAL Size: 184b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartMng::pppPartDead()
 {
-	// TODO
+    Graphic._WaitDrawDone(s_partMng_cpp_801d8230, 0xb3d);
+
+    char* pppMngSt = reinterpret_cast<char*>(this);
+    for (int i = 0; i < 0x180; i++) {
+        int baseTime = *reinterpret_cast<int*>(pppMngSt + 0x14);
+        if (baseTime != -0x1000 && baseTime < 0) {
+            unsigned char isFinished = *reinterpret_cast<unsigned char*>(pppMngSt + 0xe6);
+            unsigned char endRequested = *reinterpret_cast<unsigned char*>(pppMngSt + 0xe5);
+            if (isFinished != 0 || endRequested != 0) {
+                pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(*reinterpret_cast<char**>(pppMngSt) + 4);
+                pppMngStPtr = reinterpret_cast<_pppMngSt*>(pppMngSt);
+                _pppAllFreePObject(reinterpret_cast<_pppMngSt*>(pppMngSt));
+            }
+        }
+        pppMngSt += 0x158;
+    }
+
+    Graphic._WaitDrawDone(s_partMng_cpp_801d8230, 0xb5d);
 }
 
 /*

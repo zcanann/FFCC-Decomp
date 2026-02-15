@@ -2,6 +2,220 @@
 
 #include "ffcc/RedSound/RedSound.h"
 #include "ffcc/system.h"
+#include "dolphin/gx.h"
+#include "dolphin/mtx.h"
+#include <math.h>
+
+extern float FLOAT_80330ce8;
+extern float FLOAT_80330cec;
+extern float FLOAT_80330cf0;
+extern float FLOAT_80330cf4;
+extern float FLOAT_80330d10;
+extern float FLOAT_80330d30;
+extern double DOUBLE_80330d18;
+extern double DOUBLE_80330d20;
+extern double DOUBLE_80330d28;
+extern float DAT_8032ec20;
+
+struct CLineSegment {
+    Vec delta;
+    Vec normal;
+    float length;
+    float startLength;
+};
+
+struct CLine {
+    Vec min;
+    Vec max;
+    u32 pointCount;
+    u32 unused;
+    float unk20[4];
+    Vec points[10];
+    CLineSegment segments[9];
+    float totalLength;
+};
+
+extern "C" void __ct__9CLine(CLine* line)
+{
+    line->pointCount = 0;
+}
+
+extern "C" int Calc__9CLine(double maxDistance, CLine* line, Vec* outPos, float* outDistance, u32* outIndex,
+                             float* outT, const Vec* queryPos)
+{
+    const bool infiniteRange = ((float)maxDistance == FLOAT_80330cec);
+    float bestDistance = infiniteRange ? FLOAT_80330d10 : (float)maxDistance;
+    const float maxDistanceSq = (float)(maxDistance * maxDistance);
+    int found = 0;
+    u32 bestIndex = 0;
+    float bestT = FLOAT_80330cec;
+    Vec bestPos;
+
+    for (u32 i = 0; i + 1 < line->pointCount; i++) {
+        Vec candidate = line->points[i];
+        float distanceSq = PSVECSquareDistance(&candidate, queryPos);
+        if (distanceSq < maxDistanceSq || infiniteRange) {
+            float distance = distanceSq;
+            if (distanceSq <= FLOAT_80330cec) {
+                distance = DAT_8032ec20;
+            } else {
+                distance = (float)sqrt(distanceSq);
+            }
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                bestPos = candidate;
+                bestIndex = i;
+                bestT = FLOAT_80330cec;
+                found = 1;
+            }
+        }
+
+        if (i + 1 == line->pointCount - 1) {
+            candidate = line->points[i + 1];
+            distanceSq = PSVECSquareDistance(&candidate, queryPos);
+            if (distanceSq < maxDistanceSq || infiniteRange) {
+                float distance = distanceSq;
+                if (distanceSq <= FLOAT_80330cec) {
+                    distance = DAT_8032ec20;
+                } else {
+                    distance = (float)sqrt(distanceSq);
+                }
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    bestPos = candidate;
+                    bestIndex = i;
+                    bestT = FLOAT_80330cf0;
+                    found = 1;
+                }
+            }
+        }
+
+        const CLineSegment& segment = line->segments[i];
+        const float dotQuery = PSVECDotProduct(queryPos, &segment.delta);
+        const float dotStart = PSVECDotProduct(&line->points[i], &segment.delta);
+        const float t = (dotQuery - dotStart) / (segment.length * segment.length);
+        if (((FLOAT_80330cec <= t) && (t <= FLOAT_80330cf0)) || infiniteRange) {
+            Vec scaled;
+            Vec projected;
+            PSVECScale(&segment.delta, &scaled, t);
+            PSVECAdd(&line->points[i], &scaled, &projected);
+            const float distance = PSVECDistance(queryPos, &projected);
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                bestPos = projected;
+                bestIndex = i;
+                bestT = t;
+                found = 1;
+            }
+        }
+    }
+
+    if (found != 0) {
+        if (outPos != nullptr) {
+            *outPos = bestPos;
+        }
+        if (outDistance != nullptr) {
+            *outDistance = bestDistance;
+        }
+        if (outIndex != nullptr) {
+            *outIndex = bestIndex;
+        }
+        if (outT != nullptr) {
+            *outT = bestT;
+        }
+    }
+
+    return found;
+}
+
+extern "C" void Draw__9CLine(CLine* line)
+{
+    if (line->pointCount == 0) {
+        return;
+    }
+
+    GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(line->pointCount & 0xFFFF));
+    u32 i = 0;
+    u32* coord = reinterpret_cast<u32*>(&line->points[0]);
+    while (i < line->pointCount) {
+        GXWGFifo.u32 = coord[0];
+        GXWGFifo.u32 = coord[1];
+        GXWGFifo.u32 = coord[2];
+        coord += 3;
+        i++;
+    }
+
+    GXBegin((GXPrimitive)0xB0, GX_VTXFMT0, (u16)(line->pointCount & 0xFFFF));
+    i = 0;
+    coord = reinterpret_cast<u32*>(&line->points[0]);
+    while (i < line->pointCount) {
+        GXWGFifo.u32 = coord[0];
+        GXWGFifo.f32 = FLOAT_80330cf4 + reinterpret_cast<float*>(coord)[1];
+        GXWGFifo.u32 = coord[2];
+        coord += 3;
+        i++;
+    }
+
+    GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, (u16)((line->pointCount & 0x7FFF) << 1));
+    i = 0;
+    coord = reinterpret_cast<u32*>(&line->points[0]);
+    while (i < line->pointCount) {
+        GXWGFifo.u32 = coord[0];
+        GXWGFifo.u32 = coord[1];
+        GXWGFifo.u32 = coord[2];
+        GXWGFifo.u32 = coord[0];
+        GXWGFifo.f32 = FLOAT_80330cf4 + reinterpret_cast<float*>(coord)[1];
+        GXWGFifo.u32 = coord[2];
+        coord += 3;
+        i++;
+    }
+}
+
+extern "C" void CalcBound__9CLine(CLine* line)
+{
+    line->min.x = FLOAT_80330d10;
+    line->min.y = FLOAT_80330d10;
+    line->min.z = FLOAT_80330d10;
+    line->max.x = FLOAT_80330d30;
+    line->max.y = FLOAT_80330d30;
+    line->max.z = FLOAT_80330d30;
+    line->totalLength = FLOAT_80330cec;
+
+    for (u32 i = 0; i < line->pointCount; i++) {
+        const Vec& point = line->points[i];
+
+        if (point.x < line->min.x) {
+            line->min.x = point.x;
+        }
+        if (point.y < line->min.y) {
+            line->min.y = point.y;
+        }
+        if (point.z < line->min.z) {
+            line->min.z = point.z;
+        }
+
+        if (line->max.x < point.x) {
+            line->max.x = point.x;
+        }
+        if (line->max.y < point.y) {
+            line->max.y = point.y;
+        }
+        if (line->max.z < point.z) {
+            line->max.z = point.z;
+        }
+
+        if (i != 0) {
+            CLineSegment& segment = line->segments[i - 1];
+            PSVECSubtract(&line->points[i], &line->points[i - 1], &segment.delta);
+            segment.length = PSVECMag(&segment.delta);
+            segment.startLength = line->totalLength;
+            line->totalLength += segment.length;
+            if (segment.length != FLOAT_80330cec) {
+                PSVECNormalize(&segment.delta, &segment.normal);
+            }
+        }
+    }
+}
 
 /*
  * --INFO--

@@ -1,6 +1,7 @@
 #include "ffcc/pppLight.h"
 
 extern float lbl_80330F60;
+extern int lbl_8032ED70;
 
 /*
  * --INFO--
@@ -84,20 +85,17 @@ void pppLightCon(void* param1, void* param2)
  */
 void pppLight(void* param1, void* param2, void* param3)
 {
-	// Based on assembly analysis - complex lighting calculation function
 	char* r28 = (char*)param1;
 	char* r29 = (char*)param2;
-	
-	// Get base pointer from param3 structure  
+
+	if (lbl_8032ED70 != 0) {
+		return;
+	}
+
 	void** ptr1 = (void**)((char*)param3 + 0xc);
-	void** ptr2 = (void**)*ptr1;
-	void* ptr3 = *ptr2;
-	char* r30 = r28 + (int)ptr3 + 0x80;
-	
-	// Early return check - appears to check some global flag
-	// if (some_global_flag != 0) return;
-	
-	// Float accumulation operations from assembly
+	void* ptr2 = *ptr1;
+	char* r30 = r28 + (int)ptr2 + 0x80;
+
 	float f1, f0;
 	
 	// Load and accumulate float values at various offsets

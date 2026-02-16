@@ -628,16 +628,13 @@ void GXInvalidateVtxCache(void) {
 
 void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc src_param, u32 mtx, GXBool normalize, u32 pt_texmtx) {
     u32 reg = 0;
-    u32 row;
-    u32 bumprow;  // unused
-    u32 form;
+    u32 row = 5;
+    u32 form = 0;
     GXAttr mtxIdAttr;
 
     CHECK_GXBEGIN(1030, "GXSetTexCoordGen");
     ASSERTMSGLINE(1031, dst_coord < GX_MAX_TEXCOORD, "GXSetTexCoordGen: Invalid coordinate Id");
 
-    form = 0;
-    row = 5;
     switch (src_param) {
     case GX_TG_POS:     row = 0; form = 1; break;
     case GX_TG_NRM:     row = 1; form = 1; break;
@@ -653,13 +650,15 @@ void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc sr
     case GX_TG_TEX5:    row = 10; break;
     case GX_TG_TEX6:    row = 11; break;
     case GX_TG_TEX7:    row = 12; break;
-    case GX_TG_TEXCOORD0: bumprow; break;
-    case GX_TG_TEXCOORD1: bumprow; break;
-    case GX_TG_TEXCOORD2: bumprow; break;
-    case GX_TG_TEXCOORD3: bumprow; break;
-    case GX_TG_TEXCOORD4: bumprow; break;
-    case GX_TG_TEXCOORD5: bumprow; break;
-    case GX_TG_TEXCOORD6: bumprow; break;
+    case GX_TG_TEXCOORD0:
+    case GX_TG_TEXCOORD1:
+    case GX_TG_TEXCOORD2:
+    case GX_TG_TEXCOORD3:
+    case GX_TG_TEXCOORD4:
+    case GX_TG_TEXCOORD5:
+    case GX_TG_TEXCOORD6:
+        row = 2;
+        break;
     default:
         ASSERTMSGLINE(1059, 0, "GXSetTexCoordGen: Invalid source parameter");
         break;
@@ -667,16 +666,10 @@ void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc sr
 
     switch (func) {
     case GX_TG_MTX2x4:
-        SET_REG_FIELD(1069, reg, 1, 1, 0);
-        SET_REG_FIELD(1069, reg, 1, 2, form);
-        SET_REG_FIELD(1071, reg, 3, 4, 0);
-        SET_REG_FIELD(1071, reg, 5, 7, row);
+        reg = (form << 2) | 2U | (row << 7);
         break;
     case GX_TG_MTX3x4:
-        SET_REG_FIELD(1076, reg, 1, 1, 1);
-        SET_REG_FIELD(1076, reg, 1, 2, form);
-        SET_REG_FIELD(1076, reg, 3, 4, 0);
-        SET_REG_FIELD(1078, reg, 5, 7, row);
+        reg = (form << 2) | (row << 7);
         break;
     case GX_TG_BUMP0:
     case GX_TG_BUMP1:
@@ -687,22 +680,15 @@ void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc sr
     case GX_TG_BUMP6:
     case GX_TG_BUMP7:
         ASSERTMSGLINE(1091, src_param >= 12 && src_param <= 18, "GXSetTexCoordGen:  Bump source texture value is invalid");
-        SET_REG_FIELD(1093, reg, 1, 1, 0);
-        SET_REG_FIELD(1093, reg, 1, 2, form);
-        SET_REG_FIELD(1095, reg, 3, 4, 1);
-        SET_REG_FIELD(1095, reg, 5, 7, row);
-        SET_REG_FIELD(1096, reg, 3, 12, src_param - 12);
-        SET_REG_FIELD(1097, reg, 3, 15, func - 2);
+        reg = (form << 2) | 0x10 | (row << 7) | (((src_param - 12) << 12) & 0x7000) | ((func - 2) << 15);
         break;
     case GX_TG_SRTG:
-        SET_REG_FIELD(1102, reg, 1, 1, 0);
-        SET_REG_FIELD(1102, reg, 1, 2, form);
         if (src_param == GX_TG_COLOR0) {
-            SET_REG_FIELD(0, reg, 3, 4, 2);
+            reg = (form << 2) | 0x20;
         } else {
-            SET_REG_FIELD(0, reg, 3, 4, 3);
+            reg = (form << 2) | 0x30;
         }
-        SET_REG_FIELD(0, reg, 5, 7, 2);
+        reg |= 0x100;
         break;
     default:
         ASSERTMSGLINE(1113, 0, "GXSetTexCoordGen:  Invalid function");
@@ -710,20 +696,18 @@ void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc sr
     }
 
     GX_WRITE_XF_REG(dst_coord + 0x40, reg);
-    reg = 0;
-    SET_REG_FIELD(1132, reg, 6, 0, pt_texmtx - 64);
-    SET_REG_FIELD(1133, reg, 1, 8, normalize);
+    reg = ((pt_texmtx - 64U) & 0xFFFFFEFF) | (((u32)normalize & 0xFF) << 8);
     GX_WRITE_XF_REG(dst_coord + 0x50, reg);
 
     switch (dst_coord) {
-    case GX_TEXCOORD0: SET_REG_FIELD(1147, __GXData->matIdxA, 6, 6, mtx);  break;
-    case GX_TEXCOORD1: SET_REG_FIELD(1148, __GXData->matIdxA, 6, 12, mtx); break;
-    case GX_TEXCOORD2: SET_REG_FIELD(1149, __GXData->matIdxA, 6, 18, mtx); break;
-    case GX_TEXCOORD3: SET_REG_FIELD(1150, __GXData->matIdxA, 6, 24, mtx); break;
-    case GX_TEXCOORD4: SET_REG_FIELD(1151, __GXData->matIdxB, 6, 0, mtx);  break;
-    case GX_TEXCOORD5: SET_REG_FIELD(1152, __GXData->matIdxB, 6, 6, mtx);  break;
-    case GX_TEXCOORD6: SET_REG_FIELD(1153, __GXData->matIdxB, 6, 12, mtx); break;
-    default:           SET_REG_FIELD(1154, __GXData->matIdxB, 6, 18, mtx); break;
+    case GX_TEXCOORD0: __GXData->matIdxA = (__GXData->matIdxA & 0xFFFFF03F) | (mtx << 6); break;
+    case GX_TEXCOORD1: __GXData->matIdxA = (__GXData->matIdxA & 0xFFFC0FFF) | (mtx << 12); break;
+    case GX_TEXCOORD2: __GXData->matIdxA = (__GXData->matIdxA & 0xFF03FFFF) | (mtx << 18); break;
+    case GX_TEXCOORD3: __GXData->matIdxA = (__GXData->matIdxA & 0xC0FFFFFF) | (mtx << 24); break;
+    case GX_TEXCOORD4: __GXData->matIdxB = (__GXData->matIdxB & 0xFFFFFFC0) | mtx; break;
+    case GX_TEXCOORD5: __GXData->matIdxB = (__GXData->matIdxB & 0xFFFFF03F) | (mtx << 6); break;
+    case GX_TEXCOORD6: __GXData->matIdxB = (__GXData->matIdxB & 0xFFFC0FFF) | (mtx << 12); break;
+    default:           __GXData->matIdxB = (__GXData->matIdxB & 0xFF03FFFF) | (mtx << 18); break;
     }
 
     mtxIdAttr = dst_coord + 1;

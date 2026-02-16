@@ -612,8 +612,8 @@ struct CharaGlobal {
 	} field0_0x0;
 } Chara;
 
-// External vtable reference
-extern "C" void* PTR_PTR_s_CChara_801fcd24;
+extern "C" void* __vt__8CManager;
+extern "C" void* lbl_801FCD24;
 
 /*
  * --INFO--
@@ -622,5 +622,7 @@ extern "C" void* PTR_PTR_s_CChara_801fcd24;
  */
 extern "C" void __sinit_chara_cpp(void)
 {
-	Chara.field0_0x0.object.base_object.object.m_id = (u32)&PTR_PTR_s_CChara_801fcd24;
+	u32* charaBase = (u32*)&Chara;
+	*charaBase = (u32)&__vt__8CManager;
+	*charaBase = (u32)&lbl_801FCD24;
 }

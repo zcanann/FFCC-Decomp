@@ -922,22 +922,60 @@ void CGame::ParticleFrameCallback(int, int, int, int, int, Vec*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001462c
+ * PAL Size: 136b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGame::SaveScript(char*)
+void CGame::SaveScript(char* scriptData)
 {
-	// TODO
+    memset(scriptData, 0, 0x800);
+
+    int scriptOffset = 0;
+    int entryOffset = 0;
+    int i = 0;
+    int count = *(int*)(CFlat + 4);
+    u8* table = *(u8**)(CFlat + 8);
+    u32* values = *(u32**)(CFlat + 12);
+
+    while (i < count) {
+        if ((table[entryOffset + 1] & 0x20) != 0) {
+            *(u32*)(scriptData + scriptOffset) = values[i];
+            scriptOffset += 4;
+        }
+        entryOffset += 4;
+        ++i;
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800145d8
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGame::LoadScript(char*)
+void CGame::LoadScript(char* scriptData)
 {
-	// TODO
+    int scriptOffset = 0;
+    int entryOffset = 0;
+    int i = 0;
+    int count = *(int*)(CFlat + 4);
+    u8* table = *(u8**)(CFlat + 8);
+    u32* values = *(u32**)(CFlat + 12);
+
+    while (i < count) {
+        if ((table[entryOffset + 1] & 0x20) != 0) {
+            values[i] = *(u32*)(scriptData + scriptOffset);
+            scriptOffset += 4;
+        }
+        entryOffset += 4;
+        ++i;
+    }
 }
 
 /*

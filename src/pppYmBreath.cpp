@@ -34,12 +34,92 @@ void BirthParticle(_pppPObject*, VYmBreath*, PYmBreath*, VColor*, PARTICLE_DATA*
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c0e18
+ * PAL Size: 884b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void UpdateParticle(VYmBreath*, PYmBreath*, PARTICLE_DATA*, VColor*, PARTICLE_COLOR*)
+void UpdateParticle(VYmBreath* vYmBreath, PYmBreath* pYmBreath, PARTICLE_DATA* particleData, VColor* vColor,
+                    PARTICLE_COLOR* particleColor)
 {
-	// TODO
+    unsigned char* breath = (unsigned char*)pYmBreath;
+    unsigned char* particle = (unsigned char*)particleData;
+    unsigned char* color = (unsigned char*)particleColor;
+    unsigned int alpha = (unsigned int)*(unsigned char*)((unsigned char*)vColor + 0x0B);
+    Vec step;
+
+    (void)vYmBreath;
+
+    if (color != NULL) {
+        *(float*)(color + 0x00) += *(float*)(color + 0x10);
+        *(float*)(color + 0x04) += *(float*)(color + 0x14);
+        *(float*)(color + 0x08) += *(float*)(color + 0x18);
+        *(float*)(color + 0x0C) += *(float*)(color + 0x1C);
+        *(float*)(color + 0x10) += *(float*)(breath + 0x3C);
+        *(float*)(color + 0x14) += *(float*)(breath + 0x40);
+        *(float*)(color + 0x18) += *(float*)(breath + 0x44);
+        *(float*)(color + 0x1C) += *(float*)(breath + 0x48);
+        alpha += (unsigned int)(int)*(float*)(color + 0x0C);
+        if (alpha > 0xFF) {
+            alpha = 0xFF;
+        }
+    }
+
+    *(float*)(particle + 0x58) += *(float*)(particle + 0x5C);
+    if ((*(unsigned char*)(breath + 0xC2) & 0x10) == 0) {
+        *(float*)(particle + 0x5C) += *(float*)(breath + 0x98);
+    } else {
+        *(float*)(particle + 0x5C) += *(float*)(breath + 0x98) + *(float*)(particle + 0x60);
+    }
+
+    while (*(float*)(particle + 0x58) >= 6.2831855f) {
+        *(float*)(particle + 0x58) -= 6.2831855f;
+    }
+    while (*(float*)(particle + 0x58) < 0.0f) {
+        *(float*)(particle + 0x58) += 6.2831855f;
+    }
+
+    *(float*)(particle + 0x64) += *(float*)(particle + 0x6C);
+    *(float*)(particle + 0x68) += *(float*)(particle + 0x70);
+    if ((*(unsigned char*)(breath + 0xC1) & 0x10) == 0) {
+        *(float*)(particle + 0x6C) += *(float*)(breath + 0x70);
+        *(float*)(particle + 0x70) += *(float*)(breath + 0x74);
+    } else {
+        *(float*)(particle + 0x6C) += *(float*)(breath + 0x70) + *(float*)(particle + 0x74);
+        *(float*)(particle + 0x70) += *(float*)(breath + 0x74) + *(float*)(particle + 0x78);
+    }
+
+    *(float*)(particle + 0x80) += *(float*)(breath + 0xA4);
+    if (*(char*)(breath + 0xC8) == '\0') {
+        float start = *(float*)(breath + 0xA0);
+        float delta = *(float*)(breath + 0xA4);
+        if ((start > 0.0f) && (delta < 0.0f)) {
+            if (*(float*)(particle + 0x80) < 0.0f) {
+                *(float*)(particle + 0x80) = 0.0f;
+            }
+        } else if ((start < 0.0f) && (delta > 0.0f) && (0.0f < *(float*)(particle + 0x80))) {
+            *(float*)(particle + 0x80) = 0.0f;
+        }
+    }
+
+    PSVECScale((Vec*)(particle + 0x3C), &step, *(float*)(particle + 0x80));
+    PSVECAdd(&step, (Vec*)(particle + 0x30), (Vec*)(particle + 0x30));
+
+    if (*(short*)(breath + 0x24) != 0) {
+        *(short*)(particle + 0x50) -= 1;
+    }
+    *(unsigned char*)(particle + 0x84) += 1;
+
+    if ((*(char*)(particle + 0x54) != '\0') &&
+        ((int)(unsigned int)*(unsigned char*)(particle + 0x84) <= (int)*(char*)(particle + 0x54))) {
+        *(float*)(particle + 0x7C) -= (float)alpha / (float)(unsigned int)*(unsigned char*)(particle + 0x54);
+    }
+
+    if ((*(char*)(particle + 0x55) != '\0') && ((int)*(short*)(particle + 0x50) <= (int)*(char*)(particle + 0x55))) {
+        *(float*)(particle + 0x7C) += (float)alpha / (float)(unsigned int)*(unsigned char*)(breath + 0x27);
+    }
 }
 
 /*

@@ -864,6 +864,39 @@ void CCameraPcs::SetFullScreenShadowEnable(unsigned char enable)
 
 /*
  * --INFO--
+ * PAL Address: 0x800B965C
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void GetViewMatrix__10CCameraPcsFPA4_f(void* camera, Mtx matrix)
+{
+    PSMTXCopy((MtxPtr)((char*)camera + 4), matrix);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9680
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void VECLerp(Vec* a, Vec* b, Vec* out, float t)
+{
+    Vec scaledA;
+    Vec scaledB;
+
+    PSVECScale(a, &scaledA, 1.0f - t);
+    PSVECScale(b, &scaledB, t);
+    PSVECAdd(&scaledA, &scaledB, out);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800B9920
  * PAL Size: 8b
  * EN Address: TODO

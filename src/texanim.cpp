@@ -56,6 +56,11 @@ extern double DOUBLE_8032fb40;
 static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
 static char s_ptrarray_grow_error[] = "CPtrArray grow error";
 
+inline void* operator new(unsigned long, void* p)
+{
+    return p;
+}
+
 namespace {
 static inline unsigned char* Ptr(void* p, unsigned int offset)
 {
@@ -591,13 +596,7 @@ void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
             if (refData != 0) {
                 __ct__4CRefFv(refData);
                 *reinterpret_cast<void**>(refData) = &PTR_PTR_s_CTexAnim_CRefData_801e9c3c;
-                CPtrArray<CTexAnimSeq*>* const seqs = reinterpret_cast<CPtrArray<CTexAnimSeq*>*>(Ptr(refData, 0x110));
-                seqs->m_size = 0;
-                seqs->m_numItems = 0;
-                seqs->m_defaultSize = 0x10;
-                seqs->m_items = 0;
-                seqs->m_stage = 0;
-                seqs->m_growCapacity = 1;
+                new (Ptr(refData, 0x110)) CPtrArray<CTexAnimSeq*>();
                 *reinterpret_cast<void**>(Ptr(refData, 0x108)) = 0;
                 S32At(refData, 0x10C) = 0;
             }

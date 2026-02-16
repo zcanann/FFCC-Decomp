@@ -14,7 +14,7 @@ public:
     void CmdCtrl();
     int CmdClose();
     void CmdDraw();
-    void CmdCtrlCur();
+    unsigned int CmdCtrlCur();
     unsigned int CmdOpen0();
     unsigned int CmdClose0();
     void GetCmdItem();

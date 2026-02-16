@@ -72,6 +72,13 @@ void MapChanging__7CSystemFii(CSystem*, int, int);
 void MapChanged__7CSystemFiii(CSystem*, int, int, int);
 void LoadMap__7CMapPcsFiiPvUlUc(void*, int, int, void*, unsigned long, unsigned char);
 void LoadFieldPdt__8CPartPcsFiiPvUlUc(void*, int, int, void*, unsigned long, unsigned char);
+void Draw__13CFlatRuntime2Fv(void*);
+void Draw__5CWindFv(void*);
+void Frame__13CFlatRuntime2Fii(void*, int, int);
+void CheckMenu__10CGPartyObjFv(void);
+void AfterFrame__12CFlatRuntimeFi(void*, int);
+void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+    void*, int, int, int, int, void*, void*);
 unsigned char CFlat[];
 unsigned char PartMng[];
 unsigned char McPcs[];
@@ -766,43 +773,61 @@ void CGame::Calc()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80014964
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::Calc2()
 {
-	// CFlat.Frame(0, 1);
+	Frame__13CFlatRuntime2Fii(CFlat, 0, 1);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80014934
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::Calc3()
 { 
-	// CheckMenu__10CGPartyObjFv();
-	// AfterFrame__12CFlatRuntimeFi(&CFlat,0);
+	CheckMenu__10CGPartyObjFv();
+	AfterFrame__12CFlatRuntimeFi(CFlat, 0);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800148f4
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::Draw()
 {
-	// TODO
+	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+	    CFlat, 0, 1, 6, 0, 0, 0);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800148c0
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::Draw2()
 {
-	// TODO
+	Draw__13CFlatRuntime2Fv(CFlat);
+	Draw__5CWindFv(Wind);
 }
 
 /*

@@ -1,16 +1,26 @@
 #include "ffcc/menu_equip.h"
 #include "ffcc/joybus.h"
+#include "ffcc/pad.h"
 #include "ffcc/p_game.h"
+#include "ffcc/sound.h"
 #include <string.h>
 
 typedef signed short s16;
 typedef unsigned char u8;
+typedef unsigned short u16;
 
 extern "C" int GetItemType__8CMenuPcsFii(CMenuPcs*, int, int);
 extern "C" int EquipCtrlCur__8CMenuPcsFv(CMenuPcs*);
 extern "C" int EquipOpen0__8CMenuPcsFv(CMenuPcs*);
 extern "C" int EquipClose0__8CMenuPcsFv(CMenuPcs*);
+extern "C" int ChkEquipPossible__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" int GetEquipType__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" int EquipChk__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void CmdInit1__8CMenuPcsFv(CMenuPcs*);
+extern "C" void CmdInit2__8CMenuPcsFv(CMenuPcs*);
+extern "C" int CanPlayerPutItem__12CCaravanWorkFv(void*);
+extern "C" void ChgEquipPos__12CCaravanWorkFii(void*, int, int);
+extern "C" void CalcStatus__12CCaravanWorkFv(void*);
 
 extern float FLOAT_80332eb8;
 extern float FLOAT_80332ee0;
@@ -477,32 +487,280 @@ void CMenuPcs::EquipDraw()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015b618
+ * PAL Size: 1592b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::EquipCtrlCur()
+int CMenuPcs::EquipCtrlCur()
 {
-	// TODO
+	bool blocked = false;
+	u16 press;
+	u16 hold;
+	u32 caravanWork = Game.game.m_scriptFoodBase[0];
+
+	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+		blocked = true;
+	}
+	if (blocked) {
+		press = 0;
+	} else {
+		press = Pad._8_2_;
+	}
+
+	blocked = false;
+	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+		blocked = true;
+	}
+	if (blocked) {
+		hold = 0;
+	} else {
+		hold = *reinterpret_cast<u16*>(reinterpret_cast<char*>(&Pad) + 0x20);
+	}
+
+	if (hold == 0) {
+		return 0;
+	}
+
+	int menuState = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c);
+	int mode = static_cast<int>(*reinterpret_cast<s16*>(menuState + 0x30));
+
+	if (mode == 0) {
+		if ((hold & 8) == 0) {
+			if ((hold & 4) != 0) {
+				if (*reinterpret_cast<s16*>(menuState + 0x26) < 3) {
+					*reinterpret_cast<s16*>(menuState + 0x26) = *reinterpret_cast<s16*>(menuState + 0x26) + 1;
+				} else {
+					*reinterpret_cast<s16*>(menuState + 0x26) = 0;
+				}
+				Sound.PlaySe(1, 0x40, 0x7f, 0);
+			}
+		} else {
+			if (*reinterpret_cast<s16*>(menuState + 0x26) == 0) {
+				*reinterpret_cast<s16*>(menuState + 0x26) = 3;
+			} else {
+				*reinterpret_cast<s16*>(menuState + 0x26) = *reinterpret_cast<s16*>(menuState + 0x26) - 1;
+			}
+			Sound.PlaySe(1, 0x40, 0x7f, 0);
+		}
+
+		if ((hold & 0xc) == 0) {
+			if ((press & 0x20) != 0) {
+				*reinterpret_cast<s16*>(menuState + 0x1e) = 1;
+				Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+				return 1;
+			}
+
+			if ((press & 0x40) != 0) {
+				*reinterpret_cast<s16*>(menuState + 0x1e) = -1;
+				Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+				return 1;
+			}
+
+			if ((press & 0x100) == 0) {
+				if ((press & 0x200) != 0) {
+					*reinterpret_cast<u8*>(menuState + 0xd) = 1;
+					Sound.PlaySe(3, 0x40, 0x7f, 0);
+					return 1;
+				}
+			} else if (CanPlayerPutItem__12CCaravanWorkFv(reinterpret_cast<void*>(caravanWork)) == 0) {
+				Sound.PlaySe(4, 0x40, 0x7f, 0);
+			} else {
+				*reinterpret_cast<s16*>(menuState + 0x30) = 1;
+				*reinterpret_cast<s16*>(menuState + 0x12) = 0;
+				*reinterpret_cast<s16*>(menuState + 0x22) = 0;
+				Sound.PlaySe(2, 0x40, 0x7f, 0);
+			}
+		}
+	} else {
+		s16* letterBuffer = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
+
+		if ((hold & 8) == 0) {
+			if ((hold & 4) != 0) {
+				int base = menuState + mode * 2;
+				s16 selected = *reinterpret_cast<s16*>(base + 0x26);
+
+				if (selected < 7) {
+					*reinterpret_cast<s16*>(base + 0x26) = selected + 1;
+				} else if (static_cast<int>(*reinterpret_cast<s16*>(menuState + 0x34)) + static_cast<int>(selected) <
+				           letterBuffer[0] - 1) {
+					*reinterpret_cast<s16*>(menuState + 0x34) = *reinterpret_cast<s16*>(menuState + 0x34) + 1;
+					Sound.PlaySe(1, 0x40, 0x7f, 0);
+				} else {
+					Sound.PlaySe(4, 0x40, 0x7f, 0);
+				}
+
+				Sound.PlaySe(1, 0x40, 0x7f, 0);
+			}
+		} else {
+			int base = menuState + mode * 2;
+			s16 selected = *reinterpret_cast<s16*>(base + 0x26);
+
+			if (selected == 0) {
+				if (*reinterpret_cast<s16*>(menuState + 0x34) == 0) {
+					Sound.PlaySe(4, 0x40, 0x7f, 0);
+				} else {
+					*reinterpret_cast<s16*>(menuState + 0x34) = *reinterpret_cast<s16*>(menuState + 0x34) - 1;
+					Sound.PlaySe(1, 0x40, 0x7f, 0);
+				}
+			} else {
+				*reinterpret_cast<s16*>(base + 0x26) = selected - 1;
+				Sound.PlaySe(1, 0x40, 0x7f, 0);
+			}
+		}
+
+		if ((hold & 0xc) == 0) {
+			if ((press & 0x100) == 0) {
+				if ((press & 0x200) != 0) {
+					*reinterpret_cast<s16*>(menuState + 0x12) = *reinterpret_cast<s16*>(menuState + 0x12) + 1;
+					*reinterpret_cast<s16*>(menuState + 0x22) = 0;
+					CmdInit2__8CMenuPcsFv(this);
+					Sound.PlaySe(3, 0x40, 0x7f, 0);
+				}
+			} else {
+				int index = static_cast<int>(*reinterpret_cast<s16*>(menuState + 0x34)) +
+				            static_cast<int>(*reinterpret_cast<s16*>(menuState + mode * 2 + 0x26));
+				s16* entries = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
+				int equipIndex = static_cast<int>(*reinterpret_cast<s16*>(menuState + 0x26));
+				bool valid = false;
+
+				if ((index >= 0) && (index < entries[0])) {
+					if (index == 0) {
+						if (equipIndex >= 3) {
+							valid = *reinterpret_cast<s16*>(caravanWork + equipIndex * 2 + 0xac) >= 0;
+						}
+					} else {
+						int item = static_cast<int>(*reinterpret_cast<s16*>(caravanWork + entries[index] * 2 + 0xb6));
+						valid = ChkEquipPossible__8CMenuPcsFi(this, item) != 0;
+						if (valid && (GetEquipType__8CMenuPcsFi(this, item) != equipIndex)) {
+							valid = false;
+						}
+					}
+				}
+
+				if (!valid || ((index != 0) && (EquipChk__8CMenuPcsFi(this, entries[index]) != 0))) {
+					Sound.PlaySe(4, 0x40, 0x7f, 0);
+				} else {
+					int item = (index == 0) ? -1 : static_cast<int>(entries[index]);
+					ChgEquipPos__12CCaravanWorkFii(reinterpret_cast<void*>(caravanWork), equipIndex, item);
+					CalcStatus__12CCaravanWorkFv(reinterpret_cast<void*>(caravanWork));
+					*reinterpret_cast<s16*>(menuState + 0x12) = *reinterpret_cast<s16*>(menuState + 0x12) + 1;
+					*reinterpret_cast<s16*>(menuState + 0x22) = 0;
+					CmdInit2__8CMenuPcsFv(this);
+					Sound.PlaySe(2, 0x40, 0x7f, 0);
+				}
+			}
+		}
+	}
+
+	return 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015b468
+ * PAL Size: 432b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::EquipOpen0()
+int CMenuPcs::EquipOpen0()
 {
-	// TODO
+	*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x22) =
+	    *reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x22) + 1;
+	int timer = static_cast<int>(*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x22));
+	int selectedOffset = static_cast<int>(*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x26)) * 0x40 + 8;
+
+	if (timer < 5) {
+		*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + selectedOffset) =
+		    *reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + selectedOffset) - 0x13;
+	}
+
+	s16* menuData = *reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850);
+	int doneCount = 0;
+	int itemCount = static_cast<int>(menuData[1]) - static_cast<int>(menuData[0]);
+	s16* item = menuData + menuData[0] * 0x20 + 4;
+
+	for (int i = 0; i < itemCount; i++) {
+		if (*reinterpret_cast<int*>(item + 0x12) <= timer) {
+			if (timer < (*reinterpret_cast<int*>(item + 0x12) + *reinterpret_cast<int*>(item + 0x14))) {
+				*reinterpret_cast<int*>(item + 0x10) = *reinterpret_cast<int*>(item + 0x10) + 1;
+				float ratio = static_cast<float>(*reinterpret_cast<int*>(item + 0x10)) /
+				              static_cast<float>(*reinterpret_cast<int*>(item + 0x14));
+				*reinterpret_cast<float*>(item + 8) = ratio;
+				if ((*reinterpret_cast<u32*>(item + 0x16) & 2) == 0) {
+					*reinterpret_cast<float*>(item + 0x18) = (*reinterpret_cast<float*>(item + 0x1c) - static_cast<float>(item[0])) * ratio;
+					*reinterpret_cast<float*>(item + 0x1a) = (*reinterpret_cast<float*>(item + 0x1e) - static_cast<float>(item[1])) * ratio;
+				}
+			} else {
+				doneCount++;
+				*reinterpret_cast<float*>(item + 8) = FLOAT_80332ee0;
+				*reinterpret_cast<float*>(item + 0x18) = FLOAT_80332eb8;
+				*reinterpret_cast<float*>(item + 0x1a) = FLOAT_80332eb8;
+			}
+		}
+		item += 0x20;
+	}
+
+	return itemCount == doneCount;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015b264
+ * PAL Size: 516b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::EquipClose0()
+int CMenuPcs::EquipClose0()
 {
-	// TODO
+	*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x22) =
+	    *reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x22) + 1;
+	int timer = static_cast<int>(*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x22));
+	int selectedOffset = static_cast<int>(*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x26)) * 0x40 + 8;
+
+	if (timer > 7) {
+		*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + selectedOffset) =
+		    *reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + selectedOffset) + 0x13;
+	}
+
+	s16* menuData = *reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850);
+	int doneCount = 0;
+	int itemCount = static_cast<int>(menuData[1]) - static_cast<int>(menuData[0]);
+	s16* item = menuData + menuData[0] * 0x20 + 4;
+
+	for (int i = 0; i < itemCount; i++) {
+		if (*reinterpret_cast<int*>(item + 0x12) <= timer) {
+			if (timer < (*reinterpret_cast<int*>(item + 0x12) + *reinterpret_cast<int*>(item + 0x14))) {
+				*reinterpret_cast<int*>(item + 0x10) = *reinterpret_cast<int*>(item + 0x10) + 1;
+				float ratio = FLOAT_80332ee0 - (static_cast<float>(*reinterpret_cast<int*>(item + 0x10)) /
+				                                 static_cast<float>(*reinterpret_cast<int*>(item + 0x14)));
+				*reinterpret_cast<float*>(item + 8) = ratio;
+				if ((*reinterpret_cast<u32*>(item + 0x16) & 2) == 0) {
+					*reinterpret_cast<float*>(item + 0x18) = (*reinterpret_cast<float*>(item + 0x1c) - static_cast<float>(item[0])) * ratio;
+					*reinterpret_cast<float*>(item + 0x1a) = (*reinterpret_cast<float*>(item + 0x1e) - static_cast<float>(item[1])) * ratio;
+				}
+			} else {
+				doneCount++;
+				*reinterpret_cast<float*>(item + 8) = FLOAT_80332eb8;
+				*reinterpret_cast<float*>(item + 0x18) = FLOAT_80332eb8;
+				*reinterpret_cast<float*>(item + 0x1a) = FLOAT_80332eb8;
+			}
+		}
+		item += 0x20;
+	}
+
+	if (itemCount == doneCount) {
+		s16* selected = reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + selectedOffset);
+		*selected = static_cast<s16>(-((static_cast<double>(selected[2]) * 0.5) - 320.0));
+	}
+
+	return itemCount == doneCount;
 }
 
 /*

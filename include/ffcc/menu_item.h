@@ -8,7 +8,7 @@ public:
     void ItemInit1();
     bool ItemOpen();
     int ItemCtrl();
-    void ItemClose();
+    bool ItemClose();
     void ItemDraw();
     int ItemCtrlCur();
     void SingLifeInit(int);

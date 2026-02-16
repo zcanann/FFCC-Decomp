@@ -357,12 +357,43 @@ int CMenuPcs::ItemCtrl()
 
 /*
  * --INFO--
- * Address:\tTODO
- * Size:\tTODO
+ * PAL Address: 0x8015a818
+ * PAL Size: 380b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::ItemClose()
+bool CMenuPcs::ItemClose()
 {
-    // TODO
+    s16* itemState = *(s16**)((u8*)this + 0x82C);
+    s16* itemList = *(s16**)((u8*)this + 0x850);
+    int finished = 0;
+    int count = itemList[0];
+    MenuItemOpenAnim* anim = (MenuItemOpenAnim*)((u8*)itemList + 8);
+
+    itemState[0x11]++;
+
+    for (int i = 0; i < count; i++, anim++) {
+        if (anim->frame <= itemState[0x11]) {
+            if (itemState[0x11] < anim->frame + anim->duration) {
+                anim->frame++;
+                anim->progress = 1.0f - ((float)anim->frame / (float)anim->duration);
+                if ((anim->flags & 2) == 0) {
+                    float t = 1.0f - ((float)anim->frame / (float)anim->duration);
+                    anim->dx = (anim->targetX - (float)anim->x) * t;
+                    anim->dy = (anim->targetY - (float)anim->y) * t;
+                }
+            } else {
+                finished++;
+                anim->progress = 0.0f;
+                anim->dx = 0.0f;
+                anim->dy = 0.0f;
+            }
+        }
+    }
+
+    return count == finished;
 }
 
 /*

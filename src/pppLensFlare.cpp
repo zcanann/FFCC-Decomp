@@ -96,6 +96,10 @@ void pppFrameLensFlare(void* obj, void* param2, void* param3)
 		offset1 = unkC->m_serializedDataOffsets[1];
 		alphaPtr = (unsigned char*)((char*)obj + offset2 + 0xb2);
 
+		u32 colorAlpha = (u8)*((u8*)obj + offset1 + 0x88);
+		double alphaScale =
+			(double)((float)((double)(0x4330000000000000ULL | colorAlpha) - DOUBLE_80331070) * FLOAT_80331064);
+
 		GXGetViewportv(viewport);
 		GXGetProjectionv(projection);
 		PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
@@ -127,12 +131,11 @@ void pppFrameLensFlare(void* obj, void* param2, void* param3)
 
 		*(float*)((char*)obj + offset2 + 0xb4) = PSVECDotProduct(&cameraToObject, &lookDir);
 
-		unsigned int halfWidth = ((unsigned char)unkB->m_arg3) >> 1;
-		unsigned int x0 = ((int)*(float*)((char*)obj + offset2 + 0x90)) & 0xffff;
-		unsigned int y0 = ((int)*(float*)((char*)obj + offset2 + 0x94)) & 0xffff;
-		unsigned int z0 = __cvt_fp2unsigned((double)(FLOAT_8033106c * *(float*)((char*)obj + offset2 + 0x98)));
-		int stride = (short)((unsigned short)(unsigned char)unkB->m_arg3 /
-							 (unsigned short)*((unsigned char*)(&unkB->m_arg3) + 1));
+		u32 halfWidth = ((u8)unkB->m_arg3) >> 1;
+		u32 x0 = ((int)*(float*)((char*)obj + offset2 + 0x90)) & 0xffff;
+		u32 y0 = ((int)*(float*)((char*)obj + offset2 + 0x94)) & 0xffff;
+		u32 z0 = __cvt_fp2unsigned((double)(FLOAT_8033106c * *(float*)((char*)obj + offset2 + 0x98)));
+		int stride = (short)((u16)(u8)unkB->m_arg3 / (u16)*((u8*)(&unkB->m_arg3) + 1));
 
 		for (y = y0 - halfWidth; (int)y <= (int)(y0 + halfWidth); y += stride) {
 			for (x = x0 - halfWidth; (int)x <= (int)(x0 + halfWidth); x += stride) {
@@ -145,23 +148,23 @@ void pppFrameLensFlare(void* obj, void* param2, void* param3)
 			}
 		}
 
-		int sampleDiv = *((unsigned char*)(&unkB->m_arg3) + 1) + 1;
-		unsigned int totalSamples = sampleDiv * sampleDiv;
+		int sampleDiv = *((u8*)(&unkB->m_arg3) + 1) + 1;
+		u32 totalSamples = sampleDiv * sampleDiv;
 
 		if (*alphaPtr == totalSamples) {
 			*alphaPtr = 0xff;
 		} else {
-			unsigned int scaledAlpha = *alphaPtr * (0xff / totalSamples);
-			if (scaledAlpha < 0x100) {
-				*alphaPtr = (unsigned char)scaledAlpha;
+			u32 scaledAlpha = *alphaPtr * (0xff / totalSamples);
+			*alphaPtr = (u8)scaledAlpha;
+			if ((scaledAlpha & 0xff) < 0x100) {
+				*alphaPtr = (u8)scaledAlpha;
 			} else {
 				*alphaPtr = 0xff;
 			}
 		}
 
-		*alphaPtr = (unsigned char)(int)((double)(float)*alphaPtr *
-										 (double)((float)((double)(unsigned char)*((unsigned char*)obj + offset1 + 0x88) - DOUBLE_80331070) *
-												  FLOAT_80331064));
+		u32 alphaU32 = (u8)*alphaPtr;
+		*alphaPtr = (u8)(int)((double)(float)((double)(0x4330000000000000ULL | alphaU32) - DOUBLE_80331070) * alphaScale);
 
 		if (unkB->m_dataValIndex != 0xffff) {
 			long* shapeTable = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + unkB->m_dataValIndex * 4);

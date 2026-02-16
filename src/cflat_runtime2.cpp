@@ -1,14 +1,19 @@
 #include "ffcc/cflat_runtime2.h"
 #include "ffcc/baseobj.h"
+#include "ffcc/partMng.h"
 #include "ffcc/p_game.h"
 #include <string.h>
 
 extern "C" void reset__6CAStarFv(void*);
+extern "C" int __cntlzw(unsigned int);
+extern "C" void Create__9CGBaseObjFv(CGBaseObj*);
+extern "C" void Destroy__9CGBaseObjFv(CGBaseObj*);
 
 extern unsigned char Pad[];
 extern unsigned char GraphicsPcs[];
 extern unsigned char CameraPcs[];
 extern unsigned char DbgMenuPcs[];
+extern CPartMng PartMng;
 
 template <int count>
 class CLine;
@@ -210,6 +215,16 @@ static inline short& ParticleWorkParamId(CFlatRuntime2* runtime)
 	return *reinterpret_cast<short*>(reinterpret_cast<u8*>(runtime) + 0x1714);
 }
 
+static inline int& ParticleWorkNoHi(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<int*>(reinterpret_cast<u8*>(runtime) + 0x1738);
+}
+
+static inline unsigned int& ParticleWorkNoLo(CFlatRuntime2* runtime)
+{
+	return *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(runtime) + 0x173C);
+}
+
 } // namespace
 
 /*
@@ -288,9 +303,12 @@ CMemory::CStage* CFlatRuntime2::getDebugStage()
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::onNewObject(CFlatRuntime::CObject*)
+void CFlatRuntime2::onNewObject(CFlatRuntime::CObject* object)
 {
-	// TODO
+	CGBaseObj* baseObj = reinterpret_cast<CGBaseObj*>(object);
+	u8& isActive = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(baseObj) + 0x4C);
+	isActive = (isActive & 0x7F) | 0x80;
+	Create__9CGBaseObjFv(baseObj);
 }
 
 /*
@@ -298,9 +316,12 @@ void CFlatRuntime2::onNewObject(CFlatRuntime::CObject*)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::onDeleteObject(CFlatRuntime::CObject*)
+void CFlatRuntime2::onDeleteObject(CFlatRuntime::CObject* object)
 {
-	// TODO
+	CGBaseObj* baseObj = reinterpret_cast<CGBaseObj*>(object);
+	Destroy__9CGBaseObjFv(baseObj);
+	u8& isActive = *reinterpret_cast<u8*>(reinterpret_cast<u8*>(baseObj) + 0x4C);
+	isActive &= 0x7F;
 }
 
 /*
@@ -518,9 +539,10 @@ void CFlatRuntime2::loadLayer(int, char*)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::isLoadLayerASyncCompleted(int)
+unsigned int CFlatRuntime2::isLoadLayerASyncCompleted(int layerNo)
 {
-	// TODO
+	unsigned int state = *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x1778 + layerNo * 0xC);
+	return static_cast<unsigned int>(__cntlzw(state)) >> 5;
 }
 
 /*
@@ -578,9 +600,10 @@ void CFlatRuntime2::ResetParticleWork(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::SetParticleWorkNo(int)
+void CFlatRuntime2::SetParticleWorkNo(int workNo)
 {
-	// TODO
+	ParticleWorkNoHi(this) = workNo >> 8;
+	ParticleWorkNoLo(this) = static_cast<unsigned int>(workNo) & 0xFF;
 }
 
 /*
@@ -742,7 +765,7 @@ void CFlatRuntime2::SetParticleWorkSe(int seNo, int seKind, int seParam)
  */
 void CFlatRuntime2::GetFreeParticleSlot()
 {
-	// TODO
+	PartMng.pppGetFreeSlot();
 }
 
 /*
@@ -750,9 +773,11 @@ void CFlatRuntime2::GetFreeParticleSlot()
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::EndParticleSlot(int, int)
+void CFlatRuntime2::EndParticleSlot(int slotNo, int forceEnd)
 {
-	// TODO
+	if (slotNo != 0) {
+		PartMng.pppEndSlot(slotNo, forceEnd);
+	}
 }
 
 /*
@@ -760,9 +785,11 @@ void CFlatRuntime2::EndParticleSlot(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::EndParticle(CCharaPcs::CHandle*)
+void CFlatRuntime2::EndParticle(CCharaPcs::CHandle* handle)
 {
-	// TODO
+	if (handle != 0) {
+		PartMng.pppEndCHandle(handle);
+	}
 }
 
 /*
@@ -770,9 +797,11 @@ void CFlatRuntime2::EndParticle(CCharaPcs::CHandle*)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::DeleteParticleSlot(int, int)
+void CFlatRuntime2::DeleteParticleSlot(int slotNo, int forceDelete)
 {
-	// TODO
+	if (slotNo != 0) {
+		PartMng.pppDeleteSlot(slotNo, forceDelete);
+	}
 }
 
 /*
@@ -780,9 +809,14 @@ void CFlatRuntime2::DeleteParticleSlot(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::IgnoreParticle(int, CFlatRuntime::CObject*)
+void CFlatRuntime2::IgnoreParticle(int slotNo, CFlatRuntime::CObject* object)
 {
-	// TODO
+	u8* ifDt = reinterpret_cast<u8*>(PartMng.pppGetIfDt(static_cast<short>(slotNo)));
+	u8 count = ifDt[6];
+	if (count < 0x10) {
+		ifDt[6] = static_cast<u8>(count + 1);
+		*reinterpret_cast<short*>(ifDt + 8 + count * 2) = object->m_particleId;
+	}
 }
 
 /*
@@ -792,7 +826,7 @@ void CFlatRuntime2::IgnoreParticle(int, CFlatRuntime::CObject*)
  */
 void CFlatRuntime2::initAllFinished()
 {
-	// TODO
+	memset(reinterpret_cast<void*>(0x803001D8), 0, 0x90);
 }
 
 /*

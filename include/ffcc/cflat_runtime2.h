@@ -61,7 +61,7 @@ class CFlatRuntime2
 	void CcClass2D(int, int, Vec*, float, float, int, CGObject **);
 
 	void loadLayer(int, char*);
-	void isLoadLayerASyncCompleted(int);
+	unsigned int isLoadLayerASyncCompleted(int);
 	void loadLayerASync(int, char*);
 	void drawLayer(int, char*, int, int, int, int, int, int, float, float, _GXColor*, int);
 

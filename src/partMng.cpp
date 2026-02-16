@@ -7,6 +7,10 @@
 extern "C" void __dl__FPv(void* ptr);
 extern "C" void pppPartInit__8CPartMngFv2(CPartMng* partMng);
 extern "C" unsigned int CheckSum__FPvi(void*, int);
+extern "C" void __ct__9_pppMngStFv(_pppMngSt* pppMngSt);
+extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
+extern CPartMng PartMng;
+extern PPPCREATEPARAM g_dcp;
 static char s_partMng_cpp_801d8230[] = "partMng.cpp";
 
 struct CPtrArrayBare {
@@ -1061,6 +1065,45 @@ void CPartMng::pppDeleteAll()
 void CPartMng::pppDestroyAll()
 {
 	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8005f624
+ * PAL Size: 184b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_partMng_cpp(void)
+{
+    __construct_array(reinterpret_cast<unsigned char*>(&PartMng) + 0x2A18, (void (*)(void*))__ct__9_pppMngStFv, 0,
+                      sizeof(_pppMngSt), 0x180);
+
+    g_dcp.m_soundEffectParams.m_soundEffectHandle = -1;
+    g_dcp.m_soundEffectParams.m_soundEffectSlot = -1;
+    g_dcp.m_soundEffectParams.m_soundEffectStopFlag = 0;
+    g_dcp.m_soundEffectParams.m_soundEffectKind = 1;
+    g_dcp.m_soundEffectParams.m_soundEffectStartFrame = 0;
+    g_dcp.m_soundEffectParams.m_soundEffectStartedOnce = 0;
+    g_dcp.m_soundEffectParams.m_soundEffectFadeFrames = 30;
+    g_dcp.m_hitParamA = 0;
+    g_dcp.m_hitParamB = 0;
+    g_dcp.m_hitObjectCount = 0;
+    g_dcp.m_hitFlags = 0;
+    g_dcp.m_positionOffsetPtr = 0;
+    g_dcp.m_rotationPtr = 0;
+    g_dcp.m_scalePtr = 0;
+    g_dcp.m_extraPositionPtr = 0;
+    g_dcp.m_paramA = 0;
+    g_dcp.m_paramB = 0;
+    g_dcp.m_lookTargetPtr = 0;
+    g_dcp.m_objectHitMask = 0;
+    g_dcp.m_cylinderAttribute = 0;
+    g_dcp.m_paramC = 1.0f;
+    g_dcp.m_paramD = 1.0f;
+    g_dcp.m_owner = 0;
 }
 
 /*

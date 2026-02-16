@@ -1,6 +1,7 @@
 #include "ffcc/cflat_runtime2.h"
 #include "ffcc/baseobj.h"
 #include "ffcc/p_game.h"
+#include <string.h>
 
 template <int count>
 class CLine;
@@ -819,12 +820,26 @@ void CFlatRuntime2::GetSysControl(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006FA68
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::resetSpawnBit(int)
+void CFlatRuntime2::resetSpawnBit(int spawnBit)
 {
-	// TODO
+	if (spawnBit == -1) {
+		memset(reinterpret_cast<u8*>(this) + 0x12F0, 0, 0x48);
+		return;
+	}
+	if (spawnBit < 0 || spawnBit > 8) {
+		return;
+	}
+
+	u8* ptr = reinterpret_cast<u8*>(this) + (spawnBit << 3);
+	*reinterpret_cast<int*>(ptr + 0x12F4) = 0;
+	*reinterpret_cast<int*>(ptr + 0x12F0) = 0;
 }
 
 /*
@@ -839,10 +854,15 @@ void CFlatRuntime2::resetChangeScript()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006F850
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFlatRuntime2::ResetNewGame()
 {
-	// TODO
+	resetChangeScript();
+	memset(reinterpret_cast<u8*>(this) + 0x12F0, 0, 0x48);
 }

@@ -1,11 +1,83 @@
 #include "ffcc/memory.h"
 #include "ffcc/system.h"
+#include "dolphin/os/OSMemory.h"
 
 static char s_memory_cpp[] = "memory.cpp";
 extern void* PTR_PTR_s_CMemory_801e8488;
 extern CMemory Memory;
 extern char DAT_801d6648[];
+extern char DAT_801d6a7c[];
+extern char DAT_801d6c58[];
 extern "C" void Printf__7CSystemFPce(CSystem* system, char* format, ...);
+
+static int stageGetAllocationMode(CMemory::CStage* stage)
+{
+    return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0x10C);
+}
+
+static int stageGetHeapHead(CMemory::CStage* stage)
+{
+    return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0x110);
+}
+
+static void stageSetHeapHead(CMemory::CStage* stage, int value)
+{
+    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0x110) = value;
+}
+
+static char* stageGetSourceName(CMemory::CStage* stage)
+{
+    return reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(stage) + 0x10);
+}
+
+static bool stageHasUnfreedBlocks(CMemory::CStage* stage)
+{
+    int heapHead = stageGetHeapHead(stage);
+    int node = *reinterpret_cast<int*>(heapHead + 8);
+    while ((*reinterpret_cast<unsigned char*>(node + 2) & 2) == 0) {
+        if ((*reinterpret_cast<unsigned char*>(node + 2) & 4) != 0) {
+            return true;
+        }
+        node = *reinterpret_cast<int*>(node + 8);
+    }
+    return false;
+}
+
+static void stageReleaseMode2Buffer(CMemory::CStage* stage)
+{
+    int ptr = stageGetHeapHead(stage);
+    if (ptr != 0) {
+        if (ptr != 0x10) {
+            operator delete(reinterpret_cast<void*>(ptr));
+        }
+        stageSetHeapHead(stage, 0);
+    }
+}
+
+static void stageMoveToPoolList(CMemory* memory, CMemory::CStage* stage)
+{
+    unsigned char* stageBytes = reinterpret_cast<unsigned char*>(stage);
+    int mode = stageGetAllocationMode(stage);
+    int modeListBase = reinterpret_cast<int>(memory) + mode * 0x27D8 + 4;
+
+    *reinterpret_cast<int*>(*reinterpret_cast<int*>(stageBytes) + 4) = *reinterpret_cast<int*>(stageBytes + 4);
+    **reinterpret_cast<int**>(stageBytes + 4) = *reinterpret_cast<int*>(stageBytes);
+    *reinterpret_cast<int*>(stageBytes + 4) = *reinterpret_cast<int*>(modeListBase + 0x130);
+    *reinterpret_cast<int*>(modeListBase + 0x130) = reinterpret_cast<int>(stage);
+}
+
+static void stageDestroyInternal(CMemory::CStage* stage)
+{
+    if (stageGetAllocationMode(stage) == 2) {
+        stageReleaseMode2Buffer(stage);
+        return;
+    }
+
+    if (stageHasUnfreedBlocks(stage)) {
+        Printf__7CSystemFPce(&System, DAT_801d6a7c, stageGetSourceName(stage));
+        stage->heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
+    }
+}
 
 /*
  * --INFO--
@@ -175,12 +247,41 @@ void CMemory::Init()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001F198
+ * PAL Size: 1832b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMemory::Quit()
 {
-	// TODO
+    CStage* activeStage = *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(this) + 0x7790);
+    stageDestroyInternal(activeStage);
+    stageMoveToPoolList(this, activeStage);
+
+    for (int pass = 0; pass < 3; pass++) {
+        if ((pass != 1) || (OSGetConsoleSimulatedMemSize() == 0x3000000)) {
+            unsigned char* listHeadBytes = reinterpret_cast<unsigned char*>(this) + 4 + pass * 0x110;
+            CStage* listHead = reinterpret_cast<CStage*>(listHeadBytes);
+            CStage* stage = *reinterpret_cast<CStage**>(listHeadBytes + 4);
+
+            while (stage != listHead) {
+                CStage* next = *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(stage) + 4);
+                if ((pass != 0) ||
+                    (stage != *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(this) + 0x778C))) {
+                    Printf__7CSystemFPce(&System, DAT_801d6c58, stageGetSourceName(stage));
+                    stageDestroyInternal(stage);
+                    stageMoveToPoolList(this, stage);
+                }
+                stage = next;
+            }
+        }
+    }
+
+    CStage* rootStage = *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(this) + 0x778C);
+    stageDestroyInternal(rootStage);
+    stageMoveToPoolList(this, rootStage);
 }
 
 /*
@@ -240,12 +341,17 @@ CMemory::CStage* CMemory::CreateStage(unsigned long, char*, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001E834
+ * PAL Size: 404b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMemory::DestroyStage(CMemory::CStage*)
+void CMemory::DestroyStage(CMemory::CStage* stage)
 {
-	// TODO
+    stageDestroyInternal(stage);
+    stageMoveToPoolList(this, stage);
 }
 
 /*

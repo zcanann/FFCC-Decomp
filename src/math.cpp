@@ -1060,19 +1060,14 @@ float CMath::Line1D(int lastIndex, float x, float* x_arr, float* y_arr)
  */
 unsigned int CMath::Hsb2Rgb(int hue, int saturation, int brightness)
 {
-    int sat = (saturation * 0xFF) / 100;
-    int val = (brightness * 0xFF) / 100;
-
-    if (sat < 0) {
-        sat = -sat;
-    }
-    if (val < 0) {
-        val = -val;
-    }
+    int sat = (saturation * 0xFF) / 100 + ((saturation * 0xFF) >> 31);
+    int val = (brightness * 0xFF) / 100 + ((brightness * 0xFF) >> 31);
+    sat -= sat >> 31;
+    val -= val >> 31;
 
     unsigned char v = (unsigned char)val;
     unsigned int rgba;
-    if (sat == 0) {
+    if ((float)sat == 0.0f) {
         rgba = ((unsigned int)v << 24) | ((unsigned int)v << 16) | ((unsigned int)v << 8);
     }
     else {

@@ -461,9 +461,9 @@ void CRedSound::SetSeSepData(void* seSepData)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::ClearSeSepData(int)
+void CRedSound::ClearSeSepData(int id)
 {
-	// TODO
+	CRedDriver_8032f4c0.ClearSeSepData(id);
 }
 
 /*
@@ -485,9 +485,9 @@ void CRedSound::ClearSeSepDataMG(int bank, int sep, int group, int kind)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::ReentrySeSepData(int)
+void CRedSound::ReentrySeSepData(int id)
 {
-	// TODO
+	CRedDriver_8032f4c0.ReentrySeSepData(id);
 }
 
 /*
@@ -495,9 +495,9 @@ void CRedSound::ReentrySeSepData(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::SePlayState(int)
+void CRedSound::SePlayState(int id)
 {
-	// TODO
+	CRedDriver_8032f4c0.SePlayState(id);
 }
 
 /*
@@ -505,9 +505,9 @@ void CRedSound::SePlayState(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::SeStop(int)
+void CRedSound::SeStop(int id)
 {
-	// TODO
+	CRedDriver_8032f4c0.SeStop(id);
 }
 
 /*
@@ -783,9 +783,9 @@ unsigned int CRedSound::SetWaveData(int waveID, void* waveData, int waveSize)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::ClearWaveData(int)
+void CRedSound::ClearWaveData(int id)
 {
-	// TODO
+	CRedDriver_8032f4c0.ClearWaveData(id);
 }
 
 /*
@@ -807,9 +807,9 @@ void CRedSound::ClearWaveDataM(int bank, int sep, int group, int kind)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::ClearWaveBank(int)
+void CRedSound::ClearWaveBank(int id)
 {
-	// TODO
+	CRedDriver_8032f4c0.ClearWaveBank(id);
 }
 
 /*
@@ -817,9 +817,9 @@ void CRedSound::ClearWaveBank(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::ReentryWaveData(int)
+void CRedSound::ReentryWaveData(int id)
 {
-	// TODO
+	CRedDriver_8032f4c0.ReentryWaveData(id);
 }
 
 /*
@@ -829,7 +829,7 @@ void CRedSound::ReentryWaveData(int)
  */
 void CRedSound::DisplayWaveInfo()
 {
-	// TODO
+	CRedDriver_8032f4c0.DisplayWaveInfo();
 }
 
 /*
@@ -837,9 +837,9 @@ void CRedSound::DisplayWaveInfo()
  * Address:	TODO
  * Size:	TODO
  */
-void CRedSound::TestProcess(int)
+void CRedSound::TestProcess(int mode)
 {
-	// TODO
+	CRedDriver_8032f4c0.TestProcess(mode);
 }
 
 /*

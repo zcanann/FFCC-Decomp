@@ -1,10 +1,21 @@
 #include "ffcc/pppMana2.h"
 #include "ffcc/graphic.h"
 #include "ffcc/gobject.h"
+#include "ffcc/p_game.h"
 #include "ffcc/pppPart.h"
 
 extern char lbl_801DC4D0[];
 extern float FLOAT_803318fc;
+extern float FLOAT_80331898;
+extern float FLOAT_8033189c;
+extern float FLOAT_803318a0;
+extern float FLOAT_803318a4;
+extern Mtx ppvCameraMatrix0;
+extern struct {
+    float _224_4_;
+    float _228_4_;
+    float _232_4_;
+} CameraPcs;
 
 extern "C" {
 void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
@@ -413,11 +424,103 @@ void CalculateNormal(VMana2*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8010617c
+ * PAL Size: 700b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 extern "C" void CalcWaterReflectionVector__FP3VecP3VecP3Vecl3VecPA4_fP8_GXColorP5Vec2d2(
-    Vec*, Vec*, Vec*, long, Vec, float (*) [4], _GXColor*, Vec2d*, Vec2d*)
+    Vec* reflectionVec,
+    Vec* positions,
+    Vec* normals,
+    long count,
+    Vec waterOrigin,
+    float (*matrix)[4],
+    _GXColor* color,
+    Vec2d* texCoord,
+    Vec2d*)
 {
-	// TODO
+    Vec cameraPos;
+    Vec objPos;
+    Vec transformedCameraPos;
+    Vec reflected;
+    Mtx inverseMtx;
+    Mtx matrixNoTranslate;
+    float* texCoordFloat;
+    unsigned char* colorBytes;
+    double zero;
+    double half;
+    long i;
+
+    (void)waterOrigin;
+
+    if (Game.game.m_currentSceneId == 7) {
+        cameraPos.x = ppvCameraMatrix0[0][3];
+        cameraPos.y = ppvCameraMatrix0[1][3];
+        cameraPos.z = ppvCameraMatrix0[2][3];
+    } else {
+        cameraPos.x = CameraPcs._224_4_;
+        cameraPos.y = CameraPcs._228_4_;
+        cameraPos.z = CameraPcs._232_4_;
+    }
+
+    transformedCameraPos.x = FLOAT_80331898;
+    transformedCameraPos.y = FLOAT_80331898;
+    transformedCameraPos.z = FLOAT_80331898;
+
+    PSMTXCopy(matrix, matrixNoTranslate);
+    objPos.x = matrixNoTranslate[0][3];
+    objPos.y = matrixNoTranslate[1][3];
+    objPos.z = matrixNoTranslate[2][3];
+    matrixNoTranslate[0][3] = transformedCameraPos.x;
+    matrixNoTranslate[1][3] = transformedCameraPos.y;
+    matrixNoTranslate[2][3] = transformedCameraPos.z;
+    PSMTXInverse(matrixNoTranslate, inverseMtx);
+
+    PSVECSubtract(&objPos, &cameraPos, &cameraPos);
+    PSVECScale(&cameraPos, &cameraPos, FLOAT_8033189c);
+    PSMTXMultVec(inverseMtx, &cameraPos, &transformedCameraPos);
+
+    texCoordFloat = (float*)texCoord;
+    colorBytes = (unsigned char*)color;
+    zero = (double)FLOAT_80331898;
+    half = (double)FLOAT_803318a4;
+
+    for (i = 0; i < count; i++) {
+        PSVECSubtract(positions, &transformedCameraPos, &reflected);
+        C_VECReflect(&reflected, normals, reflectionVec);
+        PSMTXMultVec(matrixNoTranslate, reflectionVec, reflectionVec);
+        PSVECNormalize(reflectionVec, reflectionVec);
+
+        if ((double)reflectionVec->z < zero) {
+            colorBytes[0] = 0x80;
+            colorBytes[1] = 0xff;
+            colorBytes[2] = 0x80;
+            colorBytes[3] = 0x7f;
+            *texCoordFloat = -reflectionVec->x / (FLOAT_803318a0 - reflectionVec->z);
+            texCoordFloat[1] = -reflectionVec->y / (FLOAT_803318a0 - reflectionVec->z);
+        } else {
+            colorBytes[0] = 0x80;
+            colorBytes[1] = 0x80;
+            colorBytes[2] = 0xff;
+            colorBytes[3] = 0xbc;
+            *texCoordFloat = -reflectionVec->x / (FLOAT_803318a0 + reflectionVec->z);
+            texCoordFloat[1] = -reflectionVec->y / (FLOAT_803318a0 + reflectionVec->z);
+        }
+
+        positions++;
+        reflectionVec++;
+        normals++;
+        colorBytes += 4;
+        *texCoordFloat = (float)((double)*texCoordFloat * half);
+        *texCoordFloat = (float)((double)*texCoordFloat + half);
+        texCoordFloat[1] = (float)((double)texCoordFloat[1] * half);
+        texCoordFloat[1] = (float)((double)texCoordFloat[1] + half);
+        texCoordFloat += 2;
+    }
+
+    DCFlushRange(reflectionVec - count, count * sizeof(Vec));
+    DCFlushRange(texCoord, count << 3);
 }

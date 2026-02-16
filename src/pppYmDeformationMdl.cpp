@@ -113,17 +113,15 @@ void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, str
  */
 void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, UnkC* param_2)
 {
-    float fVar1;
-    int iVar2;
+    float fVar1 = FLOAT_80330dac;
+    u8* state = (u8*)pppYmDeformationMdl_ + param_2->m_serializedDataOffsets[2];
 
-    fVar1 = FLOAT_80330dac;
-    iVar2 = param_2->m_serializedDataOffsets[2];
-    *(float*)((u8*)pppYmDeformationMdl_ + 0x8C + iVar2) = FLOAT_80330dac;
-    *(float*)((u8*)pppYmDeformationMdl_ + 0x88 + iVar2) = fVar1;
-    *(float*)((u8*)pppYmDeformationMdl_ + 0x84 + iVar2) = fVar1;
-    *(float*)((u8*)pppYmDeformationMdl_ + 0x98 + iVar2) = fVar1;
-    *(float*)((u8*)pppYmDeformationMdl_ + 0x94 + iVar2) = fVar1;
-    *(float*)((u8*)pppYmDeformationMdl_ + 0x90 + iVar2) = fVar1;
+    *(float*)(state + 0x8C) = fVar1;
+    *(float*)(state + 0x88) = fVar1;
+    *(float*)(state + 0x84) = fVar1;
+    *(float*)(state + 0x98) = fVar1;
+    *(float*)(state + 0x94) = fVar1;
+    *(float*)(state + 0x90) = fVar1;
 }
 
 /*

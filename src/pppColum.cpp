@@ -134,9 +134,10 @@ void pppRenderColum(pppColum *column, UnkB *param_2, UnkC *param_3)
     if (param_2->m_dataValIndex != 0xffff) {
         pppShapeSt* shapeSt = *(pppShapeSt**)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
         int textureIndex = 0;
+        void* texture;
         u8 alpha = *((u8*)column + 0xb2 + iVar5);
 
-        shapeSt->GetTexture((long*)shapeSt->m_animData, pppEnvStPtr->m_materialSetPtr, textureIndex);
+        texture = shapeSt->GetTexture((long*)shapeSt->m_animData, pppEnvStPtr->m_materialSetPtr, textureIndex);
         if (alpha != 0) {
             float* values = *(float**)((u8*)column + 0x88 + iVar7);
             u8 count = *((u8*)&param_2->m_arg3 + 1);
@@ -203,7 +204,7 @@ void pppRenderColum(pppColum *column, UnkB *param_2, UnkC *param_3)
                     _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
                     _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 0);
                     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
-                    GXLoadTexObj((GXTexObj*)(textureIndex + 0x28), GX_TEXMAP0);
+                    GXLoadTexObj((GXTexObj*)((char*)texture + 0x28), GX_TEXMAP0);
                     pppSetBlendMode__FUc(param_2->m_arg3);
 
                     drawScale += values[0];

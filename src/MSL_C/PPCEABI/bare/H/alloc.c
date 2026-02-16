@@ -373,47 +373,47 @@ static void Block_construct(Block* block, unsigned long size) {
 }
 
 static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
-    unsigned long start_offset;
     unsigned long current_size;
     unsigned long max_size;
     unsigned long* start;
     unsigned long* current;
+    int start_offset;
 
     start_offset = (block->size & 0xFFFFFFF8UL) - 4;
-    start = (unsigned long*)*(SubBlock**)((char*)block + start_offset);
+    start = *(unsigned long**)((char*)block + start_offset);
     if (start == 0) {
         block->max_size = 0;
         return 0;
     }
 
+    current_size = *start & 0xFFFFFFF8UL;
     current = start;
-    current_size = *current & 0xFFFFFFF8UL;
     max_size = current_size;
-
     do {
         if (requested_size <= current_size) {
             if (0x4F < current_size - requested_size) {
-                unsigned long* remainder = (unsigned long*)((char*)current + requested_size);
-                unsigned long old_header = *current;
-                unsigned long block_link = current[1] & 0xFFFFFFFEUL | 1;
+                unsigned long* remainder;
+                unsigned long old_header;
+                unsigned long block_link;
                 unsigned long is_alloc_clz;
                 unsigned long has_alloc_neighbor_clz;
 
+                remainder = (unsigned long*)((char*)current + requested_size);
+                old_header = *current;
+                block_link = current[1] & 0xFFFFFFFEUL | 1;
                 current[1] = block_link;
                 is_alloc_clz = __cntlzw(old_header & 2);
                 *current = requested_size;
                 has_alloc_neighbor_clz = __cntlzw(is_alloc_clz >> 5);
-                if ((old_header & 4) != 0) {
+                if (old_header & 4) {
                     *current |= 4;
                 }
-
                 if ((has_alloc_neighbor_clz >> 5) == 0) {
                     remainder[-1] = requested_size;
                 } else {
                     *current |= 2;
                     *remainder |= 4;
                 }
-
                 remainder[1] = block_link;
                 requested_size = (old_header & 0xFFFFFFF8UL) - requested_size;
                 *remainder = requested_size;
@@ -424,26 +424,23 @@ static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
                     *remainder |= 2;
                     *(unsigned long*)((char*)remainder + requested_size) |= 4;
                 }
-
-                if ((is_alloc_clz >> 5) != 0) {
+                if (is_alloc_clz >> 5) {
                     remainder[3] = current[3];
                     *(unsigned long*)(remainder[3] + 8) = (unsigned long)remainder;
                     remainder[2] = (unsigned long)current;
                     current[3] = (unsigned long)remainder;
                 }
             }
-
-            *(SubBlock**)((char*)block + start_offset) = (SubBlock*)current[3];
+            *(unsigned long**)((char*)block + ((block->size & 0xFFFFFFF8UL) - 4)) = (unsigned long*)current[3];
             current_size = *current & 0xFFFFFFF8UL;
             *current |= 2;
             *(unsigned long*)((char*)current + current_size) |= 4;
-
+            start_offset = (block->size & 0xFFFFFFF8UL) - 4;
             if (*(unsigned long**)((char*)block + start_offset) == current) {
-                *(SubBlock**)((char*)block + start_offset) = (SubBlock*)current[3];
+                *(unsigned long**)((char*)block + start_offset) = (unsigned long*)current[3];
             }
-
             if (*(unsigned long**)((char*)block + start_offset) == current) {
-                *(SubBlock**)((char*)block + start_offset) = 0;
+                *(unsigned long**)((char*)block + start_offset) = 0;
                 block->max_size = 0;
             } else {
                 *(unsigned long*)(current[3] + 8) = current[2];
@@ -451,7 +448,6 @@ static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
             }
             return (SubBlock*)current;
         }
-
         current = (unsigned long*)current[3];
         current_size = *current & 0xFFFFFFF8UL;
         if (max_size < current_size) {
@@ -630,9 +626,7 @@ static void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long s
 
     if (fix_start->head_->start_ == 0) {
         fix_start->head_ = fix_start->head_->next_;
-        if (fix_start->tail_->next_ == fix_start->head_) {
-            fix_start->tail_ = fix_start->tail_->prev_;
-        }
+        fix_start->tail_ = fix_start->tail_->next_;
     }
 
     return (char*)sub_block + 4;

@@ -11,9 +11,9 @@ int DAT_8032ec68;
 
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
 
-extern void* __vt__8CManager;
-extern void* lbl_801E8668;
-extern void* lbl_801E8830;
+extern char __vt__8CManager[];
+extern char lbl_801E8668[];
+extern char lbl_801E8830[];
 extern u32 lbl_801E8690[];
 extern u32 lbl_801E869C[];
 extern u32 lbl_801E86A8[];
@@ -156,11 +156,7 @@ static inline unsigned int Align32(unsigned int x)
     return (x + 0x1F) & ~0x1F;
 }
 
-static inline unsigned int Swap32(unsigned int x)
-{
-    unsigned int tmp = x;
-    return __lwbrx((void*)&tmp, 4);
-}
+#define BSWAP32(val) ((u32)(((u32)(val) << 24) | (((u32)(val) & 0xff00) << 8) | (((u32)(val) & 0xff0000) >> 8) | ((u32)(val) >> 24)))
 
 /*
  * --INFO--
@@ -190,11 +186,11 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
     ptr = (unsigned int*)__nwa__FUlPQ27CMemory6CStagePci(value, stage, "p_usb.cpp", 0x1ca);
     ptr[1] = value;
     ptr[0] = 4;
-    ptr[9] = Swap32((unsigned int)code);
-    ptr[10] = Swap32((unsigned int)elemCount);
-    ptr[12] = Swap32(count);
+    ptr[9] = BSWAP32((unsigned int)code);
+    ptr[10] = BSWAP32((unsigned int)elemCount);
+    ptr[12] = BSWAP32(count);
     ptr[11] = 0;
-    ptr[8] = Swap32(count);
+    ptr[8] = BSWAP32(count);
     memcpy(ptr + 0x10, src, count);
 
     if (USB.IsConnected() == 0) {
@@ -209,9 +205,9 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
         memcpy(dstBuffer, ptr, (ptr[1] + 0x1F) & ~0x1F);
 
         value = ptr[0];
-        dstBuffer[0] = Swap32(value);
+        dstBuffer[0] = BSWAP32(value);
         value = ptr[1];
-        dstBuffer[1] = Swap32(value);
+        dstBuffer[1] = BSWAP32(value);
 
         DCFlushRange(dstBuffer, (ptr[1] + 0x1F) & ~0x1F);
         DCInvalidateRange(dstBuffer, (ptr[1] + 0x1F) & ~0x1F);
@@ -245,10 +241,10 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
  */
 extern "C" void __sinit_p_usb_cpp()
 {
-    volatile void** base = (volatile void**)&USBPcs;
-    *base = &__vt__8CManager;
-    *base = &lbl_801E8668;
-    *base = &lbl_801E8830;
+    void** base = (void**)&USBPcs;
+    *base = __vt__8CManager;
+    *base = lbl_801E8668;
+    *base = lbl_801E8830;
 
     u32* dst = lbl_801E86B4 + 1;
     u32* src0 = lbl_801E8690;

@@ -14,6 +14,10 @@ extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned lo
 extern "C" float Spline1D__5CMathFifPfPfPf(CMath*, int, float, float*, float*, float*);
 extern "C" float Line1D__5CMathFifPfPf(CMath*, int, float, float*, float*);
 extern "C" void MakeSpline1Dtable__5CMathFiPfPfPf(CMath*, int, float*, float*, float*);
+extern "C" float lbl_8032F990;
+extern "C" float lbl_8032F994;
+extern "C" float lbl_8032F998;
+extern "C" float lbl_8032F99C;
 extern CMath Math;
 
 static char s_map_cpp[] = "map.cpp";
@@ -1149,12 +1153,25 @@ void CMapMng::GetAnimRunID(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002fdb0
+ * PAL Size: 188b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapMng::SetViewMtx(float (*) [4], float (*) [4])
+void CMapMng::SetViewMtx(float (*viewMtx)[4], float (*projMtx)[4])
 {
-	// TODO
+    float* proj = reinterpret_cast<float*>(projMtx);
+    float scaleY = lbl_8032F994 * proj[5];
+    float scaleX = proj[0];
+    Mtx* viewCopy = reinterpret_cast<Mtx*>(Ptr(this, 0x228F8));
+
+    PSMTXCopy(viewMtx, *viewCopy);
+    PSMTXScaleApply(
+        *viewCopy, *reinterpret_cast<Mtx*>(Ptr(this, 0x22928)), lbl_8032F990 * scaleX, scaleY, lbl_8032F998);
+    PSMTXScaleApply(
+        *viewCopy, *reinterpret_cast<Mtx*>(Ptr(this, 0x22958)), lbl_8032F99C * scaleX, scaleY, lbl_8032F998);
 }
 
 /*

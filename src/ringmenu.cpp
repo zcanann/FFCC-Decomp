@@ -32,22 +32,31 @@ void CRingMenu::Create()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a51e4
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRingMenu::Destroy()
 {
-	// TODO
+	CMenu::Destroy();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a51ac
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRingMenu::GetDispCounter()
+double CRingMenu::GetDispCounter()
 {
-	// TODO
+	const int displayCounter = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x500);
+	return -(static_cast<double>(static_cast<float>(displayCounter) * 0.0625f - 1.0f));
 }
 
 /*

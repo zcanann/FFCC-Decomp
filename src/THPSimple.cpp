@@ -775,7 +775,6 @@ s32 THPSimpleDrawCurrentFrame(GXRenderModeObj* obj, int x, int y, int polyWidth,
 void MixAudio(short* output, short* input, unsigned long samples)
 {
     u16 volume;
-    f32 nextVolume;
     s32 mixedSample;
     s16* audioPtr;
     u32 availableSamples;
@@ -799,12 +798,12 @@ void MixAudio(short* output, short* input, unsigned long samples)
 
                 audioPtr = SimpleControl.audioBuffer[playIndex].mCurPtr;
                 for (i = availableSamples; i != 0; i--) {
-                    nextVolume = SimpleControl.unk_C8;
                     if (SimpleControl.unk_D0 != 0) {
                         SimpleControl.unk_D0 -= 1;
-                        nextVolume = SimpleControl.unk_C4 + SimpleControl.unk_CC;
+                        SimpleControl.unk_C4 = SimpleControl.unk_C4 + SimpleControl.unk_CC;
+                    } else {
+                        SimpleControl.unk_C4 = SimpleControl.unk_C8;
                     }
-                    SimpleControl.unk_C4 = nextVolume;
                     volume = lbl_802111E8[static_cast<s32>(SimpleControl.unk_C4)];
 
                     mixedSample = static_cast<s32>((static_cast<u32>(volume) * static_cast<s32>(*audioPtr)) >> 15);
@@ -856,12 +855,12 @@ void MixAudio(short* output, short* input, unsigned long samples)
 
             audioPtr = SimpleControl.audioBuffer[playIndex].mCurPtr;
             for (i = availableSamples; i != 0; i--) {
-                nextVolume = SimpleControl.unk_C8;
                 if (SimpleControl.unk_D0 != 0) {
                     SimpleControl.unk_D0 -= 1;
-                    nextVolume = SimpleControl.unk_C4 + SimpleControl.unk_CC;
+                    SimpleControl.unk_C4 = SimpleControl.unk_C4 + SimpleControl.unk_CC;
+                } else {
+                    SimpleControl.unk_C4 = SimpleControl.unk_C8;
                 }
-                SimpleControl.unk_C4 = nextVolume;
                 volume = lbl_802111E8[static_cast<s32>(SimpleControl.unk_C4)];
 
                 mixedSample = static_cast<s32>(*input) +

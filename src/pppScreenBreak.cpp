@@ -2,11 +2,15 @@
 
 #include "ffcc/graphic.h"
 #include "ffcc/materialman.h"
+#include "ffcc/math.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/util.h"
 
 #include "dolphin/gx.h"
 #include "dolphin/os/OSCache.h"
+
+#include <string.h>
 
 struct PScreenBreak {
     float field0_0x0;
@@ -40,10 +44,19 @@ extern int DAT_802381a0;
 extern void* DAT_80238034;
 extern float FLOAT_80331cc0;
 extern float FLOAT_80331cc4;
+extern float FLOAT_80331cc8;
+extern float FLOAT_80331ccc;
 extern float FLOAT_80331cd0;
+extern float FLOAT_80331cd4;
+extern float FLOAT_80331cd8;
 extern float FLOAT_80331ce8;
 extern float FLOAT_80331cec;
 extern float FLOAT_80331cf0;
+extern CUtil DAT_8032ec70;
+extern CMath Math;
+extern float DAT_801dd4bc;
+extern float DAT_801dd4c0;
+extern float DAT_801dd4c4;
 extern char MaterialMan[];
 extern char s_f999_root_801dd4c8[];
 extern char s_pppScreenBreak_cpp_801dd4d4[];
@@ -73,6 +86,8 @@ void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, floa
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 void SearchNode__Q26CChara6CModelFPc(CChara::CModel*, char*);
+void ConvI2FVector__5CUtilFR3Vec6S16Vecl(CUtil*, Vec*, S16Vec*, unsigned long);
+float RandF__5CMathFf(float, CMath*);
 }
 
 /*
@@ -202,12 +217,132 @@ void GXSetTexCoordGen(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012da2c
+ * PAL Size: 1020b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void InitPieceData(CChara::CModel*, PScreenBreak*, VScreenBreak*)
+void InitPieceData(CChara::CModel* model, PScreenBreak* pppScreenBreak, VScreenBreak* work)
 {
-	// TODO
+    const u32 meshCount = *(u32*)(*(u8**)model + 0xC);
+    Vec* piece = *(Vec**)((u8*)work + 0xC);
+    s16 maxX = -0x7FFF;
+    s16 maxY = -0x7FFF;
+    s16 maxZ = -0x7FFF;
+    s32 meshList = *(s32*)((u8*)model + 0xAC);
+    const float maxRand = FLOAT_80331cc8;
+    const float minRand = -maxRand;
+    Vec basis;
+
+    memset(piece, 0, meshCount * 0x3C);
+
+    basis.x = DAT_801dd4bc;
+    basis.y = DAT_801dd4c0;
+    basis.z = DAT_801dd4c4;
+
+    for (u32 i = 0; i < meshCount; i++) {
+        s32 refData = *(s32*)(meshList + 8);
+        s32 node = *(s32*)((u8*)model + 0xA8) + (*(s32*)(refData + 0x5C) * 0xC0);
+        s16 minLocalX = 0x7FFF;
+        s16 minLocalY = 0x7FFF;
+        s16 minLocalZ = 0x7FFF;
+        s16 maxLocalX = -0x7FFF;
+        s16 maxLocalY = -0x7FFF;
+        s16 maxLocalZ = -0x7FFF;
+        s32 vertexCount = *(s32*)(refData + 0x14);
+        s32 vertexOffset = 0;
+        s32 vertexBase = *(s32*)(refData + 0x18);
+        S16Vec centerS16;
+        float randVelocity;
+        float angleRand;
+        float maxAngle;
+
+        *(u8*)(node + 0xBC) &= 0x7F;
+        PSMTXIdentity((float(*)[4])(node + 0x14));
+
+        while (vertexCount > 0) {
+            s16 x = *(s16*)(vertexBase + vertexOffset);
+            s16 y = *(s16*)(vertexBase + vertexOffset + 2);
+            s16 z = *(s16*)(vertexBase + vertexOffset + 4);
+
+            if (x > maxX) {
+                maxX = x;
+            }
+            if (y > maxY) {
+                maxY = y;
+            }
+            if (z > maxZ) {
+                maxZ = z;
+            }
+
+            if (x < minLocalX) {
+                minLocalX = x;
+            }
+            if (y < minLocalY) {
+                minLocalY = y;
+            }
+            if (z < minLocalZ) {
+                minLocalZ = z;
+            }
+
+            if (x > maxLocalX) {
+                maxLocalX = x;
+            }
+            if (y > maxLocalY) {
+                maxLocalY = y;
+            }
+            if (z > maxLocalZ) {
+                maxLocalZ = z;
+            }
+
+            vertexOffset += 6;
+            vertexCount--;
+        }
+
+        centerS16.x = maxLocalX + minLocalX;
+        centerS16.y = maxLocalY + minLocalY;
+        centerS16.z = maxLocalZ + minLocalZ;
+        ConvI2FVector__5CUtilFR3Vec6S16Vecl(&DAT_8032ec70, piece + 3, &centerS16, *(u32*)(*(u8**)model + 0x34));
+        PSVECScale(piece + 3, piece + 3, FLOAT_80331ccc);
+
+        randVelocity = piece[3].x;
+        if (randVelocity > maxRand) {
+            randVelocity = RandF__5CMathFf(maxRand, &Math);
+        } else if (randVelocity < minRand) {
+            randVelocity = -RandF__5CMathFf(maxRand, &Math);
+        }
+
+        piece->x = randVelocity;
+        piece->y = FLOAT_80331cd0;
+        piece->z = FLOAT_80331cd4;
+        PSVECNormalize(piece, piece);
+
+        PSVECCrossProduct(piece, &basis, piece + 2);
+
+        randVelocity = *(float*)((u8*)pppScreenBreak + 0x38) + RandF__5CMathFf(*(float*)((u8*)pppScreenBreak + 0x3C), &Math);
+        PSVECScale(piece, piece, randVelocity);
+
+        piece[1].x = FLOAT_80331cc4;
+        piece[1].y = FLOAT_80331cc4;
+        piece[1].z = FLOAT_80331cc4;
+        piece[4].x = FLOAT_80331cc4;
+
+        maxAngle = (float)(u8)*(u8*)((u8*)pppScreenBreak + 0x34);
+        angleRand = RandF__5CMathFf(maxAngle, &Math);
+        piece[4].y = (float)(FLOAT_80331cd8 * ((double)FLOAT_80331cc0 + (double)angleRand));
+        *(u8*)&piece[4].z = 0;
+
+        meshList += 0x14;
+        piece += 5;
+    }
+
+    S16Vec worldMax;
+    worldMax.x = maxX;
+    worldMax.y = maxY;
+    worldMax.z = maxZ;
+    ConvI2FVector__5CUtilFR3Vec6S16Vecl(&DAT_8032ec70, (Vec*)((u8*)work + 0x18), &worldMax, *(u32*)(*(u8**)model + 0x34));
 }
 
 /*

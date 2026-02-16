@@ -375,6 +375,36 @@ int CPtrArray<CMapAnimKeyDt*>::GetSize()
 
 /*
  * --INFO--
+ * PAL Address: 0x800341ac
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CMapAnimKeyDt* CPtrArray<CMapAnimKeyDt*>::operator[](unsigned long index)
+{
+    return GetAt(index);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800341cc
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+void CPtrArray<CMapAnimKeyDt*>::SetStage(CMemory::CStage* stage)
+{
+    m_stage = stage;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80034160
  * PAL Size: 76b
  * EN Address: TODO

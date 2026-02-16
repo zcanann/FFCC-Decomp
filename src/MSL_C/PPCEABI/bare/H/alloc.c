@@ -536,33 +536,29 @@ static void* soft_allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned lon
 }
 
 static void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long size) {
+    const unsigned long* pool_size_ptr;
+    FixStart* fix_start;
+    FixBlock* block;
+    FixBlock* head_block;
+    FixSubBlock* current_sub;
+    FixSubBlock* sub_block;
     unsigned long pool_index;
-    unsigned long client_size;
     unsigned long entry_size;
+    unsigned long client_size;
     unsigned long max_block_count;
     unsigned long block_count;
     unsigned long available_space;
-    unsigned long local_array[4];
+    unsigned long local_available[4];
     unsigned long i;
-    FixStart* fix_start;
-    FixBlock* block;
-    FixSubBlock* sub_block;
-    FixSubBlock* current_sub;
     void* allocation_ptr;
-    const unsigned long* pool_size_ptr;
 
-    pool_index = 0;
-    pool_size_ptr = fix_pool_sizes;
-    while (*pool_size_ptr < size) {
-        pool_size_ptr++;
-        pool_index++;
+    for (pool_index = 0, pool_size_ptr = fix_pool_sizes; *pool_size_ptr < size; pool_size_ptr++, pool_index++) {
     }
 
     fix_start = &pool_obj->fix_start[pool_index];
-    if (fix_start->head_ == 0 || fix_start->head_->start_ == 0) {
+    if ((fix_start->head_ == 0) || (fix_start->head_->start_ == 0)) {
         client_size = *pool_size_ptr;
         entry_size = client_size + 4;
-
         max_block_count = 0xFEC / entry_size;
         block_count = max_block_count;
         if (max_block_count > 0x100) {
@@ -570,18 +566,18 @@ static void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long s
             block_count = max_block_count;
         }
 
-        allocation_ptr = 0;
+        allocation_ptr = pool_obj;
         while ((9 < block_count) &&
-               ((allocation_ptr = soft_allocate_from_var_pools(
-                     pool_obj, block_count * entry_size + 0x14, local_array)) == 0)) {
-            if (local_array[0] < 0x15) {
+               ((allocation_ptr =
+                     soft_allocate_from_var_pools(pool_obj, block_count * entry_size + 0x14, local_available)) == 0)) {
+            if (local_available[0] < 0x15) {
                 block_count = 0;
             } else {
-                block_count = (local_array[0] - 0x14) / entry_size;
+                block_count = (local_available[0] - 0x14) / entry_size;
             }
         }
 
-        if ((allocation_ptr == 0) && (block_count < max_block_count) &&
+        if (((allocation_ptr == 0) && (block_count < max_block_count)) &&
             ((allocation_ptr = allocate_from_var_pools(pool_obj, max_block_count * entry_size + 0x14)) == 0)) {
             return 0;
         }
@@ -599,10 +595,11 @@ static void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long s
         }
 
         block_count = (available_space - 0x14) / entry_size;
+        head_block = fix_start->head_;
         block->prev_ = fix_start->tail_;
-        block->next_ = fix_start->head_;
+        block->next_ = head_block;
         fix_start->tail_->next_ = block;
-        fix_start->head_->prev_ = block;
+        head_block->prev_ = block;
 
         block->client_size_ = client_size;
         current_sub = (FixSubBlock*)((char*)block + 0x14);

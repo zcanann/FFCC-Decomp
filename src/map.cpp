@@ -575,6 +575,41 @@ CMapAnimRun* CPtrArray<CMapAnimRun*>::GetAt(unsigned long index)
 
 /*
  * --INFO--
+ * PAL Address: 0x800341d4
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+int CPtrArray<CMapShadow*>::GetSize()
+{
+    return m_numItems;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800341dc
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+void CPtrArray<CMapShadow*>::RemoveAll()
+{
+    if (m_items != 0) {
+        __dla__FPv(m_items);
+        m_items = 0;
+    }
+    m_size = 0;
+    m_numItems = 0;
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

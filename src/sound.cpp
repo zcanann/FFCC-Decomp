@@ -829,13 +829,19 @@ void CSound::PauseAllSe(int pause)
  */
 void CSound::AddNoFreeSeGroup(int group)
 {
-    short* noFreeSeGroups = reinterpret_cast<short*>(reinterpret_cast<u8*>(this) + 0x22C0);
-    for (int i = 0; i < 4; i++) {
-        if (noFreeSeGroups[i] == -1) {
-            noFreeSeGroups[i] = group;
+    CSound* sound = this;
+    int i = 0;
+    int count = 4;
+
+    do {
+        if (*reinterpret_cast<s16*>(reinterpret_cast<u8*>(sound) + 0x22C0) == -1) {
+            *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C0 + i * 2) = group;
             return;
         }
-    }
+        sound = reinterpret_cast<CSound*>(reinterpret_cast<u8*>(sound) + 2);
+        i++;
+        count--;
+    } while (count != 0);
 
     if (System.m_execParam != 0) {
         System.Printf("%s", (char*)nullptr);
@@ -853,13 +859,19 @@ void CSound::AddNoFreeSeGroup(int group)
  */
 void CSound::AddNoFreeWave(int wave)
 {
-    short* noFreeWaves = reinterpret_cast<short*>(reinterpret_cast<u8*>(this) + 0x22C8);
-    for (int i = 0; i < 4; i++) {
-        if (noFreeWaves[i] == -1) {
-            noFreeWaves[i] = wave;
+    CSound* sound = this;
+    int i = 0;
+    int count = 4;
+
+    do {
+        if (*reinterpret_cast<s16*>(reinterpret_cast<u8*>(sound) + 0x22C8) == -1) {
+            *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C8 + i * 2) = wave;
             return;
         }
-    }
+        sound = reinterpret_cast<CSound*>(reinterpret_cast<u8*>(sound) + 2);
+        i++;
+        count--;
+    } while (count != 0);
 
     if (System.m_execParam != 0) {
         System.Printf("%s", (char*)nullptr);

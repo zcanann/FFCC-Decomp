@@ -552,11 +552,11 @@ int CGPrgObj::GetClassControl(int classControl)
 		return reinterpret_cast<CGPartyObj*>(this)->isRideTarget();
 	}
 
-	if (classControl < 9) {
-		if (classControl > 7) {
-			return reinterpret_cast<CGPartyObj*>(this)->isDispTarget();
-		}
-	} else if (classControl < 11) {
+	if (classControl == 8) {
+		return reinterpret_cast<CGPartyObj*>(this)->isDispTarget();
+	}
+
+	if (classControl == 10) {
 		return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x560);
 	}
 

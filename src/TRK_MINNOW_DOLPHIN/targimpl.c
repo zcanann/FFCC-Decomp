@@ -167,83 +167,83 @@ asm void ReadFPSCR(register f64* fpscr) {
 DSError TRKValidMemory32(const void* addr, size_t length,
                          ValidMemoryOptions readWriteable)
 {
-    DSError err = DS_InvalidMemory; /* assume range is invalid */
+    DSError err;
+    u32 start;
+    u32 end;
+    u32 upperEnd;
 
-    const u8* start;
-    const u8* end;
+    start = (u32)addr;
+    end = (u32)addr + (u32)length - 1;
+    err = DS_InvalidMemory;
 
-    s32 i;
-
-    /*
-    ** Get start and end addresses for the memory range and
-    ** verify that they are reasonable.
-    */
-
-    start = (const u8*)addr;
-    end   = ((const u8*)addr + (length - 1));
-
-    if (end < start)
+    if (end < start) {
         return DS_InvalidMemory;
-
-    /*
-    ** Iterate through the gTRKMemMap array to determine if the requested
-    ** range falls within the valid ranges in the map.
-    */
-
-    for (i = 0; (i < (s32)(sizeof(gTRKMemMap) / sizeof(memRange))); i++) {
-        /*
-        ** If the requested range is not completely above
-        ** the valid range AND it is not completely below
-        ** the valid range then it must overlap somewhere.
-        ** If the requested range overlaps with one of the
-        ** valid ranges, do some additional checking.
-        **
-        */
-
-        if ((start <= (const u8*)gTRKMemMap[i].end)
-            && (end >= (const u8*)gTRKMemMap[i].start)) {
-            /*
-            ** First, verify that the read/write attributes are
-            ** acceptable.  If so, then recursively check any
-            ** part of the requested range that falls before or
-            ** after the valid range.
-            */
-
-            if (((readWriteable == VALIDMEM_Readable)
-                 && !gTRKMemMap[i].readable)
-                || ((readWriteable == VALIDMEM_Writeable)
-                    && !gTRKMemMap[i].writeable)) {
+    } else if ((start <= (u32)gTRKMemMap[0].end)
+               && ((u32)gTRKMemMap[0].start <= end)) {
+        if (((readWriteable == VALIDMEM_Readable) && !gTRKMemMap[0].readable)
+            || ((readWriteable == VALIDMEM_Writeable)
+                && !gTRKMemMap[0].writeable)) {
+            err = DS_InvalidMemory;
+        } else {
+            err = DS_NoError;
+            if (start < (u32)gTRKMemMap[0].start) {
+                upperEnd = (u32)gTRKMemMap[0].start - 1;
                 err = DS_InvalidMemory;
-            } else {
-                err = DS_NoError;
-
-                /*
-                ** If a portion of the requested range falls before
-                ** the current valid range, then recursively
-                ** check it.
-                */
-
-                if (start < (const u8*)gTRKMemMap[i].start)
-                    err = TRKValidMemory32(
-                        start, (u32)((const u8*)gTRKMemMap[i].start - start),
-                        readWriteable);
-
-                /*
-                ** If a portion of the requested range falls after
-                ** the current valid range, then recursively
-                ** check it.
-                ** Note: Only do this step if the previous check
-                ** did not detect invalid access.
-                */
-
-                if ((err == DS_NoError) && (end > (const u8*)gTRKMemMap[i].end))
-                    err = TRKValidMemory32(
-                        (const u8*)gTRKMemMap[i].end,
-                        (u32)(end - (const u8*)gTRKMemMap[i].end),
-                        readWriteable);
+                if ((start <= upperEnd) && (start <= (u32)gTRKMemMap[0].end)
+                    && ((u32)gTRKMemMap[0].start <= upperEnd)) {
+                    if (((readWriteable == VALIDMEM_Readable)
+                         && !gTRKMemMap[0].readable)
+                        || ((readWriteable == VALIDMEM_Writeable)
+                            && !gTRKMemMap[0].writeable)) {
+                        err = DS_InvalidMemory;
+                    } else {
+                        err = DS_NoError;
+                        if (start < (u32)gTRKMemMap[0].start) {
+                            err = TRKValidMemory32(
+                                (const void*)start,
+                                (u32)gTRKMemMap[0].start - start,
+                                readWriteable);
+                        }
+                        if ((err == DS_NoError)
+                            && ((u32)gTRKMemMap[0].end < upperEnd)) {
+                            err = TRKValidMemory32(
+                                (const void*)gTRKMemMap[0].end,
+                                upperEnd - (u32)gTRKMemMap[0].end,
+                                readWriteable);
+                        }
+                    }
+                }
             }
-
-            break;
+            if ((err == DS_NoError) && ((u32)gTRKMemMap[0].end < end)) {
+                err = DS_InvalidMemory;
+                end = ((u32)addr + (u32)length) - 2;
+                if (((u32)gTRKMemMap[0].end <= end)
+                    && ((u32)gTRKMemMap[0].start <= end)) {
+                    if (((readWriteable == VALIDMEM_Readable)
+                         && !gTRKMemMap[0].readable)
+                        || ((readWriteable == VALIDMEM_Writeable)
+                            && !gTRKMemMap[0].writeable)) {
+                        err = DS_InvalidMemory;
+                    } else {
+                        err = DS_NoError;
+                        if ((u32)gTRKMemMap[0].end
+                            < (u32)gTRKMemMap[0].start) {
+                            err = TRKValidMemory32(
+                                (const void*)gTRKMemMap[0].end,
+                                (u32)gTRKMemMap[0].start
+                                    - (u32)gTRKMemMap[0].end,
+                                readWriteable);
+                        }
+                        if ((err == DS_NoError)
+                            && ((u32)gTRKMemMap[0].end < end)) {
+                            err = TRKValidMemory32(
+                                (const void*)gTRKMemMap[0].end,
+                                end - (u32)gTRKMemMap[0].end,
+                                readWriteable);
+                        }
+                    }
+                }
+            }
         }
     }
 

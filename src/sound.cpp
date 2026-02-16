@@ -2,6 +2,8 @@
 
 #include "ffcc/RedSound/RedSound.h"
 #include "ffcc/system.h"
+#include "PowerPC_EABI_Support/Runtime/MWCPlusLib.h"
+#include <Runtime.PPCEABI.H/NMWException.h>
 #include "dolphin/gx.h"
 #include "dolphin/mtx.h"
 #include <math.h>
@@ -16,6 +18,10 @@ extern double DOUBLE_80330d18;
 extern double DOUBLE_80330d20;
 extern double DOUBLE_80330d28;
 extern float DAT_8032ec20;
+extern "C" void* PTR_PTR_s_CSound_8021056c;
+extern "C" void __ct__9CRedSoundFv(void*);
+extern "C" void __dt__6CSoundFv(void*);
+extern void* ARRAY_802f26c8;
 
 struct CLineSegment {
     Vec delta;
@@ -215,6 +221,24 @@ extern "C" void CalcBound__9CLine2(CLine* line)
             }
         }
     }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800c8998
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_sound_cpp(void)
+{
+    *reinterpret_cast<void**>(&Sound) = &PTR_PTR_s_CSound_8021056c;
+    __ct__9CRedSoundFv(&Sound);
+    __construct_array(reinterpret_cast<unsigned char*>(&Sound) + 0x142c, (ConstructorDestructor)__ct__9CLine, 0, 0x1cc,
+                      8);
+    __register_global_object(&Sound, __dt__6CSoundFv, &ARRAY_802f26c8);
 }
 
 /*

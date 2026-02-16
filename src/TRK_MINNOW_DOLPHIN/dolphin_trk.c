@@ -217,6 +217,13 @@ static asm void dataCacheBlockInvalidate(register void* param_1)
 #endif // clang-format on
 }
 
+static inline void dataCacheBlockInvalidateInline(register void* param_1)
+{
+#ifdef __MWERKS__
+	asm { dcbi 0, param_1 }
+#endif
+}
+
 static asm void dataCacheBlockFlush(register void* param_1)
 {
 #ifdef __MWERKS__ // clang-format off
@@ -351,14 +358,14 @@ void TRK__read_aram(u32 param_1, u32 param_2, u32* param_3)
 		uVar7 = uVar2;
 		if (uVar6 != 0) {
 			do {
-				dataCacheBlockInvalidate((void*)(param_1 + iVar5));
-				dataCacheBlockInvalidate((void*)(param_1 + iVar5 + 0x20));
-				dataCacheBlockInvalidate((void*)(param_1 + iVar5 + 0x40));
-				dataCacheBlockInvalidate((void*)(param_1 + iVar5 + 0x60));
-				dataCacheBlockInvalidate((void*)(param_1 + iVar5 + 0x80));
-				dataCacheBlockInvalidate((void*)(param_1 + iVar5 + 0xA0));
-				dataCacheBlockInvalidate((void*)(param_1 + iVar5 + 0xC0));
-				dataCacheBlockInvalidate((void*)(param_1 + iVar5 + 0xE0));
+				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5));
+				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5 + 0x20));
+				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5 + 0x40));
+				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5 + 0x60));
+				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5 + 0x80));
+				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5 + 0xA0));
+				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5 + 0xC0));
+				dataCacheBlockInvalidateInline((void*)(param_1 + iVar5 + 0xE0));
 				iVar5 += 0x100;
 				uVar6--;
 			} while (uVar6 != 0);
@@ -369,7 +376,7 @@ void TRK__read_aram(u32 param_1, u32 param_2, u32* param_3)
 			}
 		}
 		do {
-			dataCacheBlockInvalidate((void*)(param_1 + iVar5));
+			dataCacheBlockInvalidateInline((void*)(param_1 + iVar5));
 			iVar5 += 0x20;
 			uVar7--;
 		} while (uVar7 != 0);

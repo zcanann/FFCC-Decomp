@@ -8,6 +8,7 @@
 #include "ffcc/map.h"
 #include "ffcc/sound.h"
 #include "ffcc/graphic.h"
+#include "ffcc/file.h"
 
 #include <string.h>
 
@@ -107,6 +108,9 @@ extern const char DAT_8032f698[];
 extern const char DAT_8032f6a0[];
 extern const char DAT_8032f6a4[];
 extern const char DAT_8032f6ac[];
+extern const char* lbl_801D60B0[];
+extern const char* lbl_801E8344[];
+int sprintf(char*, const char*, ...);
 }
 
 static const float FLOAT_8032f688 = 1.0E+10;
@@ -671,12 +675,68 @@ void CGame::MapChanged(int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80014b90
+ * PAL Size: 364b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::loadCfd()
 {
-	// TODO
+    struct CFlatDataView
+    {
+        struct DataEntry
+        {
+            unsigned int m_size;
+            void* m_data;
+            int m_numStrings;
+            char** m_strings;
+            char* m_stringBuf;
+        };
+
+        int m_dataCount;
+        DataEntry m_data[5];
+    };
+
+    CFile::CHandle* fileHandle;
+    char pathBuf[268];
+    const char* localLangDirs[6];
+    const char* const* pathFmt = lbl_801E8344;
+
+    localLangDirs[0] = lbl_801D60B0[0];
+    localLangDirs[1] = lbl_801D60B0[1];
+    localLangDirs[2] = lbl_801D60B0[2];
+    localLangDirs[3] = lbl_801D60B0[3];
+    localLangDirs[4] = lbl_801D60B0[4];
+    localLangDirs[5] = lbl_801D60B0[5];
+
+    for (int i = 0; i < 4; ++i) {
+        sprintf(pathBuf, pathFmt[i], localLangDirs[m_gameWork.m_languageId]);
+        fileHandle = File.Open(pathBuf, 0, CFile::PRI_LOW);
+
+        if (fileHandle != 0) {
+            File.Read(fileHandle);
+            File.SyncCompleted(fileHandle);
+            m_cFlatDataArr[i].Create(File.m_readBuffer);
+            File.Close(fileHandle);
+        }
+    }
+
+    const CFlatDataView* flat0 = (const CFlatDataView*)&m_cFlatDataArr[0];
+    const CFlatDataView* flat2 = (const CFlatDataView*)&m_cFlatDataArr[2];
+    const CFlatDataView* flat3 = (const CFlatDataView*)&m_cFlatDataArr[3];
+
+    unkCFlatData0[0] = (unsigned int)flat0->m_data[0].m_data;
+    unkCFlatData0[1] = (unsigned int)flat0->m_data[1].m_data;
+    unkCFlatData0[2] = (unsigned int)flat0->m_data[2].m_data;
+    unkCFlatData0[3] = (unsigned int)flat2->m_data[0].m_data;
+
+    unk_flat3_field_8_0xc7dc = (unsigned int)flat3->m_data[0].m_data;
+    unk_flat3_field_1C_0xc7d8 = (unsigned int)flat3->m_data[1].m_data;
+    unk_flat3_count_0xc7d4 = flat3->m_data[1].m_size / 0x1A;
+    unk_flat3_field_30_0xc7e0 = (unsigned int)flat3->m_data[2].m_data;
+    m_bossArtifactBase = (unsigned int)flat3->m_data[3].m_data;
 }
 
 /*

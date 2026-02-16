@@ -41,7 +41,7 @@ public:
 	void damageDelete();
 	void onHit(int, CGObject*, int, Vec*);
 	void onHitParticle(int, int, int, int, Vec*, PPPIFPARAM*);
-	void getReplaceStat(int);
+	int getReplaceStat(int);
 	void putHitParticleFromItem(CGPrgObj*, int);
 	void setSta(int, int);
 	void effective(int, int, CGPrgObj*, int&);

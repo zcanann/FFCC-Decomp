@@ -45,7 +45,7 @@ public:
     void enableAttackCol(int, int, int);
     void enableDamageCol(int);
 
-    void getReplaceStat(int);
+    int getReplaceStat(int);
 
     void statCharge();
     void statAttackSel();

@@ -17,12 +17,12 @@ public:
     void onFrameAlwaysAfter();
     void onDamaged(CGPrgObj*);
     void onAttacked(CGPrgObj*);
-    void onCancelStat(int);
-    void onChangeStat(int);
-    void onFramePreCalc();
-    void onFramePostCalc();
-    void onFrameStat();
-    void onChangePrg(int);
+    virtual void onCancelStat(int);
+    virtual void onChangeStat(int);
+    virtual void onFramePreCalc();
+    virtual void onFramePostCalc();
+    virtual void onFrameStat();
+    virtual void onChangePrg(int);
     void changeStat(int, int, int);
     void changeSubStat(int subState);
     void addSubStat();
@@ -35,7 +35,7 @@ public:
     void putParticle(int, int, CGObject*, float, int);
     void putParticleTrace(int, int, CGObject*, float, int);
     void putParticleBindTrace(int, int, CGObject*, float, int);
-    int getReplaceStat(int);
+    virtual int getReplaceStat(int);
     float getTargetRot(CGPrgObj*);
     void rotTarget(CGPrgObj*);
     void dstTargetRot(CGPrgObj*);

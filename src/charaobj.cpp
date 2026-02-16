@@ -250,9 +250,10 @@ void CGCharaObj::onHitParticle(int, int, int, int, Vec*, PPPIFPARAM*)
  * Address:	TODO
  * Size:	TODO
  */
-void CGCharaObj::getReplaceStat(int)
+int CGCharaObj::getReplaceStat(int state)
 {
 	// TODO
+	return state;
 }
 
 /*

@@ -9,6 +9,7 @@
 #include "ffcc/sound.h"
 #include "ffcc/graphic.h"
 #include "ffcc/file.h"
+#include "ffcc/partMng.h"
 
 #include <string.h>
 
@@ -44,6 +45,8 @@ void createLoad__9CCharaPcsFv(void*);
 void createLoad__8CPartPcsFv(void*);
 void pppDeleteAll__8CPartMngFv(void*);
 void pppDestroyAll__8CPartMngFv(void*);
+int pppGetIfDt__8CPartMngFs(void*, short);
+void pppEndPart__8CPartMngFi(void*, int);
 void Init__10CCameraPcsFv(void*);
 void Init__11CGraphicPcsFv(void*);
 void Init__6CCharaFv(void*);
@@ -107,6 +110,9 @@ unsigned char DAT_8032ed00[];
 unsigned char DAT_8032ed08[];
 unsigned char Wind[];
 extern const char DAT_801d61dc[];
+extern const char DAT_801d60d4[];
+extern const char DAT_801d6114[];
+extern const char DAT_801d6154[];
 extern const char s_game_cpp_801d6190[];
 extern const char DAT_801d619c[];
 extern const char DAT_801d61b8[];
@@ -928,22 +934,60 @@ void CGame::Draw3()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800147f8
+ * PAL Size: 116b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGame::HitParticleBG(int, int, int, Vec*, PPPIFPARAM*)
+void CGame::HitParticleBG(int effectIndex, int kind, int nodeIndex, Vec* pos, PPPIFPARAM* hitParam)
 {
-	// TODO
+	CFlatRuntime::CStack stack[8];
+	stack[0].m_word = (u32)effectIndex;
+	stack[1].m_word = (u32)kind;
+	stack[2].m_word = (u32)nodeIndex;
+	*(float*)&stack[3].m_word = pos->x;
+	*(float*)&stack[4].m_word = pos->y;
+	*(float*)&stack[5].m_word = pos->z;
+	stack[6].m_word = (u32)hitParam->m_particleIndex;
+	stack[7].m_word = (u32)hitParam->m_classId;
+	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+	    &CFlat, 0, 1, 1, 8, stack, 0);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800146b4
+ * PAL Size: 324b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGame::ParticleFrameCallback(int, int, int, int, int, Vec*)
+void CGame::ParticleFrameCallback(int effectIndex, int scriptLine, int scriptStep, int, int callbackType, Vec* pos)
 {
-	// TODO
+	int ifData = pppGetIfDt__8CPartMngFs(&PartMng, (short)effectIndex);
+	*(u8*)(ifData + 7) |= 1 << callbackType;
+
+	if (callbackType == 0) {
+		if (System.m_execParam > 2) {
+			Printf__7CSystemFPce(&System, DAT_801d60d4, scriptLine, scriptStep, effectIndex, pos);
+		}
+	} else if (callbackType == 1) {
+		*(u8*)(ifData + 7) &= ~2;
+		pppEndPart__8CPartMngFi(&PartMng, effectIndex);
+
+		if (System.m_execParam > 2) {
+			Printf__7CSystemFPce(&System, DAT_801d6114, scriptLine, scriptStep, effectIndex, pos);
+		}
+	} else if (callbackType == 3) {
+		pppEndPart__8CPartMngFi(&PartMng, effectIndex);
+
+		if (System.m_execParam > 2) {
+			Printf__7CSystemFPce(&System, DAT_801d6154, scriptLine, scriptStep, effectIndex, pos);
+		}
+	}
 }
 
 /*

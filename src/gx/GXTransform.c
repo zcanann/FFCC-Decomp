@@ -625,20 +625,15 @@ void GXGetScissor(u32* left, u32* top, u32* wd, u32* ht) {
  */
 void GXSetScissorBoxOffset(s32 x_off, s32 y_off) {
     u32 reg;
-    u32 x;
-    u32 y;
 
     CHECK_GXBEGIN(1119, "GXSetScissorBoxOffset");
 
     ASSERTMSGLINE(1122, (u32)(x_off + 342) < 2048, "GXSetScissorBoxOffset: Invalid X offset");
     ASSERTMSGLINE(1124, (u32)(y_off + 342) < 2048, "GXSetScissorBoxOffset: Invalid Y offset");
 
-    x = (u32)(x_off + 0x156);
-    y = (u32)(y_off + 0x156);
-    reg = (x >> 1) & 0xFFF003FF;
-    reg |= (y << 9) & 0x003FFC00;
-    reg &= 0x00FFFFFF;
-    reg |= 0x59000000;
+    reg = ((u32)(x_off + 0x156) >> 1) & 0x7FF003FF;
+    reg = reg | (((u32)(y_off + 0x156) << 9) & 0x003FFC00);
+    reg = (reg & 0x00FFFFFF) | 0x59000000;
     GX_WRITE_RAS_REG(reg);
     __GXData->bpSentNot = 0;
 }

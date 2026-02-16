@@ -25,6 +25,13 @@ struct VScreenBreak {
     u8 _pad0[0x100];
 };
 
+struct Vec4d {
+    float x;
+    float y;
+    float z;
+    float w;
+};
+
 struct UnkB {
     float m_dataValIndex;
     u16 m_initWOrk;
@@ -57,12 +64,32 @@ extern CMath Math;
 extern float DAT_801dd4bc;
 extern float DAT_801dd4c0;
 extern float DAT_801dd4c4;
+extern float DAT_801dd4b0;
+extern float DAT_801dd4b4;
+extern float DAT_801dd4b8;
 extern char MaterialMan[];
 extern char s_f999_root_801dd4c8[];
 extern char s_pppScreenBreak_cpp_801dd4d4[];
 extern CGraphic GraphicsPcs;
 extern _pppMngSt* pppMngStPtr;
 extern _pppEnvSt* pppEnvStPtr;
+extern float FLOAT_80331cf4;
+
+struct ScreenBreakCameraPcs {
+    u8 _pad0[4];
+    Mtx m_cameraMatrix;
+    u8 _pad34[0x14];
+    Mtx44 m_screenMatrix;
+    u8 _pad88[0x58];
+    float _224_4_;
+    float _228_4_;
+    float _232_4_;
+    float _236_4_;
+    float _240_4_;
+    float _244_4_;
+};
+
+extern ScreenBreakCameraPcs CameraPcs;
 
 extern "C" {
 void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
@@ -88,16 +115,137 @@ void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 void SearchNode__Q26CChara6CModelFPc(CChara::CModel*, char*);
 void ConvI2FVector__5CUtilFR3Vec6S16Vecl(CUtil*, Vec*, S16Vec*, unsigned long);
 float RandF__5CMathFf(float, CMath*);
+void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(void*, Mtx44, Vec4d*, Vec4d*);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012e258
+ * PAL Size: 900b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void SB_BeforeCalcMatrixCallback(CChara::CModel*, void*, void*)
+int SB_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void* param_3)
 {
-	// TODO
+    float* pieceData = *(float**)((u8*)param_2 + 0xC);
+    u8* mesh = *(u8**)((u8*)model + 0xAC);
+    Vec basis;
+    Vec cameraForward;
+    Vec cameraPos;
+    Vec cameraRefPos;
+    Vec cameraOffset;
+    Vec screenOffset;
+    Vec gravityAdd;
+    Vec axis;
+    Vec translation;
+    Vec4d clipInput;
+    Vec4d clipOutput;
+    Quaternion axisQuat;
+    Quaternion meshQuat;
+    Quaternion resultQuat;
+    Mtx cameraMtx;
+    Mtx invCameraMtx;
+    Mtx meshMtx;
+    Mtx transMtx;
+    Mtx invTransMtx;
+    Mtx quatMtx;
+    Mtx44 screenMtx;
+
+    basis.x = DAT_801dd4b0;
+    basis.y = DAT_801dd4b4;
+    basis.z = DAT_801dd4b8;
+
+    cameraForward.x = CameraPcs._236_4_;
+    cameraForward.y = CameraPcs._240_4_;
+    cameraForward.z = CameraPcs._244_4_;
+    cameraRefPos.x = CameraPcs._224_4_;
+    cameraRefPos.y = CameraPcs._228_4_;
+    cameraRefPos.z = CameraPcs._232_4_;
+
+    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+    PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+
+    PSVECCrossProduct(&cameraForward, &basis, &cameraPos);
+    PSVECNormalize(&cameraPos, &cameraPos);
+
+    cameraOffset.x = *(float*)((u8*)param_2 + 0x18) * cameraPos.x + cameraRefPos.x;
+    cameraOffset.y = cameraRefPos.y;
+    cameraOffset.z = *(float*)((u8*)param_2 + 0x18) * cameraPos.z + cameraRefPos.z;
+
+    PSMTXMultVec(cameraMtx, &cameraOffset, (Vec*)&clipInput);
+    clipInput.w = FLOAT_80331cd0;
+    MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(&Math, screenMtx, &clipInput, &clipOutput);
+
+    screenOffset.x = clipOutput.x * cameraForward.x;
+    screenOffset.y = clipOutput.x * cameraForward.y;
+    screenOffset.z = clipOutput.x * cameraForward.z;
+    PSVECAdd(&cameraRefPos, &screenOffset, &screenOffset);
+
+    PSMTXInverse(cameraMtx, invCameraMtx);
+    PSMTXConcat(invCameraMtx, *(Mtx*)((u8*)model + 0x38), *(Mtx*)((u8*)model + 0x38));
+    (*(Mtx*)((u8*)model + 0x38))[0][3] = screenOffset.x;
+    (*(Mtx*)((u8*)model + 0x38))[1][3] = screenOffset.y;
+    (*(Mtx*)((u8*)model + 0x38))[2][3] = screenOffset.z;
+
+    if (*(float*)((u8*)param_3 + 0x30) != FLOAT_80331cc4) {
+        PSVECScale((Vec*)((u8*)param_3 + 0x20), &gravityAdd, *(float*)((u8*)param_3 + 0x30));
+    }
+
+    for (u32 i = 0; i < *(u32*)(*(u8**)((u8*)model + 0xA4) + 0xC); i++) {
+        if (*((char*)pieceData + 0x38) != '\0') {
+            u8* node = *(u8**)((u8*)model + 0xA8) + (*(u32*)(*(u8**)(mesh + 8) + 0x5C) * 0xC0);
+            u8* nodeMtx = node + 0xC;
+
+            *(float*)(node + 0x18) = FLOAT_80331cc4;
+            *(float*)(node + 0x28) = FLOAT_80331cc4;
+            *(float*)(node + 0x38) = FLOAT_80331cc4;
+
+            PSMTXCopy((float(*)[4])nodeMtx, meshMtx);
+            PSMTXIdentity(transMtx);
+            transMtx[0][3] = pieceData[9];
+            transMtx[1][3] = pieceData[10];
+            transMtx[2][3] = pieceData[11];
+            PSMTXInverse(transMtx, invTransMtx);
+
+            axis.x = pieceData[6];
+            axis.y = pieceData[7];
+            axis.z = pieceData[8];
+            C_QUATRotAxisRad(&axisQuat, &axis, pieceData[0xD]);
+            PSMTXQuat(quatMtx, &axisQuat);
+            C_QUATMtx(&meshQuat, meshMtx);
+            PSQUATMultiply(&axisQuat, &meshQuat, &resultQuat);
+            PSMTXQuat(quatMtx, &resultQuat);
+            PSMTXConcat(quatMtx, transMtx, (float(*)[4])nodeMtx);
+
+            pieceData[3] -= pieceData[0];
+            pieceData[4] = pieceData[1] * pieceData[0xC] -
+                           FLOAT_80331cf4 * *(float*)((u8*)param_3 + 0x18) * pieceData[0xC] * pieceData[0xC];
+            pieceData[5] -= pieceData[2];
+
+            if (*(float*)((u8*)param_3 + 0x30) != FLOAT_80331cc4) {
+                pieceData[3] += gravityAdd.x;
+                pieceData[5] += gravityAdd.z;
+            }
+
+            pieceData[0xC] += FLOAT_80331cd0;
+
+            translation.x = invTransMtx[0][3];
+            translation.y = invTransMtx[1][3];
+            translation.z = invTransMtx[2][3];
+            PSVECAdd((Vec*)(pieceData + 3), &translation, &translation);
+            invTransMtx[0][3] = translation.x;
+            invTransMtx[1][3] = translation.y;
+            invTransMtx[2][3] = translation.z;
+            PSMTXConcat(invTransMtx, (float(*)[4])nodeMtx, (float(*)[4])nodeMtx);
+        }
+
+        mesh += 0x14;
+        pieceData += 0xF;
+    }
+
+    return 1;
 }
 
 /*
@@ -111,10 +259,6 @@ void SB_BeforeCalcMatrixCallback(CChara::CModel*, void*, void*)
  */
 void SB_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
 {
-    extern struct {
-        float _224_4_, _228_4_, _232_4_, _236_4_, _240_4_, _244_4_;
-    } CameraPcs;
-
     Vec local_50;
     GXLightObj local_44;
     unsigned char colorStorage[4];

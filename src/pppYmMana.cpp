@@ -207,6 +207,10 @@ extern "C" void CalcWaterReflectionVector__FP3VecP3VecP3Vecl3VecPA4_fP8_GXColorP
     Vec reflected;
     Mtx inverseMtx;
     Mtx matrixNoTranslate;
+    float* texCoordFloat;
+    unsigned char* colorBytes;
+    double zero;
+    double half;
     long i;
 
     (void)waterOrigin;
@@ -238,40 +242,46 @@ extern "C" void CalcWaterReflectionVector__FP3VecP3VecP3Vecl3VecPA4_fP8_GXColorP
     PSVECScale(&cameraPos, &cameraPos, FLOAT_80330e68);
     PSMTXMultVec(inverseMtx, &cameraPos, &transformedCameraPos);
 
+    texCoordFloat = (float*)texCoord;
+    colorBytes = (unsigned char*)color;
+    zero = (double)FLOAT_80330e4c;
+    half = (double)FLOAT_80330e5c;
+
     for (i = 0; i < count; i++) {
         PSVECSubtract(positions, &transformedCameraPos, &reflected);
         C_VECReflect(&reflected, normals, reflectionVec);
         PSMTXMultVec(matrixNoTranslate, reflectionVec, reflectionVec);
         PSVECNormalize(reflectionVec, reflectionVec);
 
-        color->r = 0x80;
-        if (reflectionVec->z < FLOAT_80330e4c) {
-            color->g = 0xff;
-            color->b = 0x80;
-            color->a = 0x7f;
-            texCoord->x = -reflectionVec->x / (FLOAT_80330e58 - reflectionVec->z);
-            texCoord->y = -reflectionVec->y / (FLOAT_80330e58 - reflectionVec->z);
+        if ((double)reflectionVec->z < zero) {
+            colorBytes[0] = 0x80;
+            colorBytes[1] = 0xff;
+            colorBytes[2] = 0x80;
+            colorBytes[3] = 0x7f;
+            *texCoordFloat = -reflectionVec->x / (FLOAT_80330e58 - reflectionVec->z);
+            texCoordFloat[1] = -reflectionVec->y / (FLOAT_80330e58 - reflectionVec->z);
         } else {
-            color->g = 0x80;
-            color->b = 0xff;
-            color->a = 0xbc;
-            texCoord->x = -reflectionVec->x / (FLOAT_80330e58 + reflectionVec->z);
-            texCoord->y = -reflectionVec->y / (FLOAT_80330e58 + reflectionVec->z);
+            colorBytes[0] = 0x80;
+            colorBytes[1] = 0x80;
+            colorBytes[2] = 0xff;
+            colorBytes[3] = 0xbc;
+            *texCoordFloat = -reflectionVec->x / (FLOAT_80330e58 + reflectionVec->z);
+            texCoordFloat[1] = -reflectionVec->y / (FLOAT_80330e58 + reflectionVec->z);
         }
 
         positions++;
         reflectionVec++;
         normals++;
-        color++;
-        texCoord->x = texCoord->x * FLOAT_80330e5c;
-        texCoord->x = texCoord->x + FLOAT_80330e5c;
-        texCoord->y = texCoord->y * FLOAT_80330e5c;
-        texCoord->y = texCoord->y + FLOAT_80330e5c;
-        texCoord++;
+        colorBytes += 4;
+        *texCoordFloat = (float)((double)*texCoordFloat * half);
+        *texCoordFloat = (float)((double)*texCoordFloat + half);
+        texCoordFloat[1] = (float)((double)texCoordFloat[1] * half);
+        texCoordFloat[1] = (float)((double)texCoordFloat[1] + half);
+        texCoordFloat += 2;
     }
 
     DCFlushRange(reflectionVec - count, count * sizeof(Vec));
-    DCFlushRange(texCoord - count, count * sizeof(Vec2d));
+    DCFlushRange(texCoord, count * sizeof(Vec2d));
 }
 
 /*

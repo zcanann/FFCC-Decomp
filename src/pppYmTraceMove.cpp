@@ -79,7 +79,6 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, UnkB* param_2, UnkC* pa
 	Vec local_50;
 	Vec local_44;
 	Vec local_38;
-	Vec local_8c;
 	Vec local_2c;
 	Vec local_20;
 	f32 fVar1;
@@ -100,15 +99,8 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, UnkB* param_2, UnkC* pa
 	}
 
 	if (owner == nullptr) {
-		local_8c.x = dest->x;
-		local_8c.y = dest->y;
-		local_8c.z = dest->z;
-		pppCopyVector__FR3Vec3Vec(&local_20, &local_8c);
-
-		local_8c.x = dest[1].y;
-		local_8c.y = dest[1].z;
-		local_8c.z = dest[2].x;
-		pppCopyVector__FR3Vec3Vec(&local_2c, &local_8c);
+		pppCopyVector__FR3Vec3Vec(&local_20, dest);
+		pppCopyVector__FR3Vec3Vec(&local_2c, (Vec*)&dest[1].y);
 	} else {
 		local_b0.x = *(f32*)(owner + 0x15c);
 		local_b0.y = *(f32*)(owner + 0x160);

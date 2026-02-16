@@ -557,39 +557,45 @@ found:
  */
 void CWind::ChangePower(int id, float power)
 {
-	u8* found = 0;
+	u8* found;
 	u8* scan = (u8*)this;
 	int group = 8;
 
 	do {
 		found = scan;
-		if ((s8)found[0] < 0 && id == *(s32*)(found + 0x20)) {
-			break;
+		if (((s8)found[0] >= 0) || (id != *(s32*)(found + 0x20))) {
+			;
+		} else {
+			goto found_label;
 		}
 
 		found = scan + 100;
-		if ((s8)found[0] < 0 && id == *(s32*)(found + 0x20)) {
-			break;
+		if (((s8)found[0] >= 0) || (id != *(s32*)(found + 0x20))) {
+			;
+		} else {
+			goto found_label;
 		}
 
 		found = scan + 200;
-		if ((s8)found[0] < 0 && id == *(s32*)(found + 0x20)) {
-			break;
+		if (((s8)found[0] >= 0) || (id != *(s32*)(found + 0x20))) {
+			;
+		} else {
+			goto found_label;
 		}
 
 		found = scan + 300;
-		if ((s8)found[0] < 0 && id == *(s32*)(found + 0x20)) {
-			break;
+		if (((s8)found[0] >= 0) || (id != *(s32*)(found + 0x20))) {
+			;
+		} else {
+			goto found_label;
 		}
 
 		scan += 400;
 		group--;
 	} while (group != 0);
+	found = 0;
 
-	if (group == 0) {
-		found = 0;
-	}
-
+found_label:
 	if (found != 0) {
 		*(float*)(found + 0x54) = power;
 		*(float*)(found + 0x4C) = power;

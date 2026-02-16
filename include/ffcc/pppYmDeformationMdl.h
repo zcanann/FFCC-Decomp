@@ -7,6 +7,7 @@
 struct VYmDeformationMdl;
 
 struct UnkC {
+    u8 m_pad_0x0[0xc];
     s32* m_serializedDataOffsets;
 };
 

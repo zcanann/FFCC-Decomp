@@ -756,7 +756,7 @@ extern "C" void __ct__14PPPCREATEPARAMFv2(PPPCREATEPARAM* pppCreateParam)
     pppCreateParam->m_cylinderAttribute = 0;
     pppCreateParam->m_paramC = 1.0f;
     pppCreateParam->m_paramD = 1.0f;
-    pppCreateParam->m_owner = 0;
+    *(unsigned char*)&pppCreateParam->m_owner = 0;
 }
 
 /*

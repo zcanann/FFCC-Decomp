@@ -1,10 +1,12 @@
 #include "ffcc/mapobj.h"
 #include "ffcc/math.h"
+#include <dolphin/mtx.h>
 
 extern float lbl_8032F938;
 extern float lbl_8032F93C;
 extern float lbl_8032F944;
 extern float lbl_8032F948;
+extern float lbl_8032F950;
 extern float lbl_8032F958;
 
 namespace {
@@ -36,6 +38,16 @@ static inline int& S32At(CMapObj* self, unsigned int offset)
 static inline float& F32At(CMapObj* self, unsigned int offset)
 {
     return *reinterpret_cast<float*>(Ptr(self, offset));
+}
+
+static inline CMapObj*& ObjAt(CMapObj* self, unsigned int offset)
+{
+    return *reinterpret_cast<CMapObj**>(Ptr(self, offset));
+}
+
+static inline Mtx& MtxAt(CMapObj* self, unsigned int offset)
+{
+    return *reinterpret_cast<Mtx*>(Ptr(self, offset));
 }
 }
 
@@ -196,32 +208,215 @@ void CMapObj::ReadOtmObj(CChunkFile&)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002A258
+ * PAL Size: 856b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapObj::CalcMtx(float (*) [4], unsigned char)
+void CMapObj::CalcMtx(float (*parentMtx)[4], unsigned char inDirty)
 {
-	// TODO
+    Mtx mtx0;
+    Mtx mtx1;
+    Mtx mtx2;
+    CMapObj* obj = this;
+
+    do {
+        unsigned char dirty = inDirty;
+
+        if (U8At(obj, 0x1B) != 0) {
+            U8At(obj, 0x1B) = 0;
+            if (U8At(obj, 0x1C) != 0) {
+                PSMTXScale(MtxAt(obj, 0x88), F32At(obj, 0x7C), F32At(obj, 0x80), F32At(obj, 0x84));
+                PSMTXRotRad(mtx2, 'x', lbl_8032F950 * F32At(obj, 0x70));
+                PSMTXConcat(mtx2, MtxAt(obj, 0x88), MtxAt(obj, 0x88));
+                PSMTXRotRad(mtx2, 'y', lbl_8032F950 * F32At(obj, 0x74));
+                PSMTXConcat(mtx2, MtxAt(obj, 0x88), MtxAt(obj, 0x88));
+                PSMTXRotRad(mtx2, 'z', lbl_8032F950 * F32At(obj, 0x78));
+                PSMTXConcat(mtx2, MtxAt(obj, 0x88), MtxAt(obj, 0x88));
+                PSMTXTrans(mtx2, F32At(obj, 0x64), F32At(obj, 0x68), F32At(obj, 0x6C));
+                PSMTXConcat(mtx2, MtxAt(obj, 0x88), MtxAt(obj, 0x88));
+            }
+
+            dirty = 1;
+        }
+
+        if (dirty != 0) {
+            PSMTXConcat(*reinterpret_cast<Mtx*>(parentMtx), MtxAt(obj, 0x88), MtxAt(obj, 0xB8));
+        }
+
+        for (CMapObj* child = ObjAt(obj, 0x4); child != 0; child = ObjAt(child, 0x8)) {
+            unsigned char childDirty = dirty;
+
+            if (U8At(child, 0x1B) != 0) {
+                U8At(child, 0x1B) = 0;
+                if (U8At(child, 0x1C) != 0) {
+                    PSMTXScale(MtxAt(child, 0x88), F32At(child, 0x7C), F32At(child, 0x80), F32At(child, 0x84));
+                    PSMTXRotRad(mtx1, 'x', lbl_8032F950 * F32At(child, 0x70));
+                    PSMTXConcat(mtx1, MtxAt(child, 0x88), MtxAt(child, 0x88));
+                    PSMTXRotRad(mtx1, 'y', lbl_8032F950 * F32At(child, 0x74));
+                    PSMTXConcat(mtx1, MtxAt(child, 0x88), MtxAt(child, 0x88));
+                    PSMTXRotRad(mtx1, 'z', lbl_8032F950 * F32At(child, 0x78));
+                    PSMTXConcat(mtx1, MtxAt(child, 0x88), MtxAt(child, 0x88));
+                    PSMTXTrans(mtx1, F32At(child, 0x64), F32At(child, 0x68), F32At(child, 0x6C));
+                    PSMTXConcat(mtx1, MtxAt(child, 0x88), MtxAt(child, 0x88));
+                }
+
+                childDirty = 1;
+            }
+
+            if (childDirty != 0) {
+                PSMTXConcat(MtxAt(obj, 0xB8), MtxAt(child, 0x88), MtxAt(child, 0xB8));
+            }
+
+            for (CMapObj* grandChild = ObjAt(child, 0x4); grandChild != 0; grandChild = ObjAt(grandChild, 0x8)) {
+                unsigned char grandChildDirty = childDirty;
+
+                if (U8At(grandChild, 0x1B) != 0) {
+                    U8At(grandChild, 0x1B) = 0;
+                    if (U8At(grandChild, 0x1C) != 0) {
+                        PSMTXScale(
+                            MtxAt(grandChild, 0x88), F32At(grandChild, 0x7C), F32At(grandChild, 0x80), F32At(grandChild, 0x84));
+                        PSMTXRotRad(mtx0, 'x', lbl_8032F950 * F32At(grandChild, 0x70));
+                        PSMTXConcat(mtx0, MtxAt(grandChild, 0x88), MtxAt(grandChild, 0x88));
+                        PSMTXRotRad(mtx0, 'y', lbl_8032F950 * F32At(grandChild, 0x74));
+                        PSMTXConcat(mtx0, MtxAt(grandChild, 0x88), MtxAt(grandChild, 0x88));
+                        PSMTXRotRad(mtx0, 'z', lbl_8032F950 * F32At(grandChild, 0x78));
+                        PSMTXConcat(mtx0, MtxAt(grandChild, 0x88), MtxAt(grandChild, 0x88));
+                        PSMTXTrans(mtx0, F32At(grandChild, 0x64), F32At(grandChild, 0x68), F32At(grandChild, 0x6C));
+                        PSMTXConcat(mtx0, MtxAt(grandChild, 0x88), MtxAt(grandChild, 0x88));
+                    }
+
+                    grandChildDirty = 1;
+                }
+
+                if (grandChildDirty != 0) {
+                    PSMTXConcat(MtxAt(child, 0xB8), MtxAt(grandChild, 0x88), MtxAt(grandChild, 0xB8));
+                }
+
+                if (ObjAt(grandChild, 0x4) != 0) {
+                    ObjAt(grandChild, 0x4)->CalcMtx(reinterpret_cast<float(*)[4]>(&MtxAt(grandChild, 0xB8)), grandChildDirty);
+                }
+            }
+        }
+
+        obj = ObjAt(obj, 0x8);
+    } while (obj != 0);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002A008
+ * PAL Size: 592b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapObj::SetShow_r(int)
+void CMapObj::SetShow_r(int show)
 {
-	// TODO
+    CMapObj* root = this;
+
+    do {
+        if (show == 0) {
+            U8At(root, 0x18) &= 0xFE;
+        } else {
+            U8At(root, 0x18) |= 1;
+        }
+
+        for (CMapObj* c0 = ObjAt(root, 0x4); c0 != 0; c0 = ObjAt(c0, 0x8)) {
+            if (show == 0) {
+                U8At(c0, 0x18) &= 0xFE;
+            } else {
+                U8At(c0, 0x18) |= 1;
+            }
+
+            for (CMapObj* c1 = ObjAt(c0, 0x4); c1 != 0; c1 = ObjAt(c1, 0x8)) {
+                if (show == 0) {
+                    U8At(c1, 0x18) &= 0xFE;
+                } else {
+                    U8At(c1, 0x18) |= 1;
+                }
+
+                for (CMapObj* c2 = ObjAt(c1, 0x4); c2 != 0; c2 = ObjAt(c2, 0x8)) {
+                    if (show == 0) {
+                        U8At(c2, 0x18) &= 0xFE;
+                    } else {
+                        U8At(c2, 0x18) |= 1;
+                    }
+
+                    for (CMapObj* c3 = ObjAt(c2, 0x4); c3 != 0; c3 = ObjAt(c3, 0x8)) {
+                        if (show == 0) {
+                            U8At(c3, 0x18) &= 0xFE;
+                        } else {
+                            U8At(c3, 0x18) |= 1;
+                        }
+
+                        for (CMapObj* c4 = ObjAt(c3, 0x4); c4 != 0; c4 = ObjAt(c4, 0x8)) {
+                            if (show == 0) {
+                                U8At(c4, 0x18) &= 0xFE;
+                            } else {
+                                U8At(c4, 0x18) |= 1;
+                            }
+
+                            for (CMapObj* c5 = ObjAt(c4, 0x4); c5 != 0; c5 = ObjAt(c5, 0x8)) {
+                                if (show == 0) {
+                                    U8At(c5, 0x18) &= 0xFE;
+                                } else {
+                                    U8At(c5, 0x18) |= 1;
+                                }
+
+                                for (CMapObj* c6 = ObjAt(c5, 0x4); c6 != 0; c6 = ObjAt(c6, 0x8)) {
+                                    if (show == 0) {
+                                        U8At(c6, 0x18) &= 0xFE;
+                                    } else {
+                                        U8At(c6, 0x18) |= 1;
+                                    }
+
+                                    for (CMapObj* c7 = ObjAt(c6, 0x4); c7 != 0; c7 = ObjAt(c7, 0x8)) {
+                                        if (show == 0) {
+                                            U8At(c7, 0x18) &= 0xFE;
+                                        } else {
+                                            U8At(c7, 0x18) |= 1;
+                                        }
+
+                                        if (ObjAt(c7, 0x4) != 0) {
+                                            ObjAt(c7, 0x4)->SetShow_r(show);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        root = ObjAt(root, 0x8);
+    } while (root != 0);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80029FB8
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapObj::SetShow(int)
+void CMapObj::SetShow(int show)
 {
-	// TODO
+    if (show == 0) {
+        U8At(this, 0x18) &= 0xFE;
+    } else {
+        U8At(this, 0x18) |= 1;
+    }
+
+    if (ObjAt(this, 0x4) != 0) {
+        ObjAt(this, 0x4)->SetShow_r(show);
+    }
 }
 
 /*

@@ -71,6 +71,13 @@ void ScriptChanging__7CSystemFPc(CSystem*, char*);
 void ScriptChanged__7CSystemFPci(CSystem*, char*, int);
 void MapChanging__7CSystemFii(CSystem*, int, int);
 void MapChanged__7CSystemFiii(CSystem*, int, int, int);
+void Draw__13CFlatRuntime2Fv(void*);
+void Frame__13CFlatRuntime2Fii(void*, int, int);
+void AfterFrame__12CFlatRuntimeFi(void*, int);
+void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+    void*, int, int, int, int, void*, void*);
+void Draw__5CWindFv(void*);
+void CheckMenu__10CGPartyObjFv();
 void LoadMap__7CMapPcsFiiPvUlUc(void*, int, int, void*, unsigned long, unsigned char);
 void LoadFieldPdt__8CPartPcsFiiPvUlUc(void*, int, int, void*, unsigned long, unsigned char);
 void Draw__13CFlatRuntime2Fv(void*);
@@ -892,12 +899,18 @@ void CGame::Draw2()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001486c
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::Draw3()
 {
-	// TODO
+	Frame__13CFlatRuntime2Fii(CFlat, 0, 2);
+	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+	    CFlat, 0, 1, 5, 0, 0, 0);
 }
 
 /*

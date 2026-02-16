@@ -229,9 +229,6 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
     double nx;
     double nz;
     double yRand;
-    float f;
-    u32 clsMask;
-    int cls;
 
     out->x = FLOAT_80330ef0;
     out->y = FLOAT_80330ef0;
@@ -268,28 +265,9 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
             if (*(s32*)(obj + 0x1C) == 2) {
                 if (d < (double)*(float*)(obj + 0x34)) {
                     yRand = (double)(FLOAT_80330ef8 - *(float*)(obj + 0x38) * *(float*)(obj + 0x38));
-                    if (d <= (double)FLOAT_80330ef0) {
-                        if (DOUBLE_80330f10 <= d) {
-                            f = (float)d;
-                            clsMask = (u32)f & 0x7f800000;
-                            if (clsMask == 0x7f800000) {
-                                cls = (((u32)f & 0x7fffff) == 0) ? 2 : 1;
-                            } else if ((clsMask < 0x7f800000) && (clsMask == 0)) {
-                                cls = (((u32)f & 0x7fffff) == 0) ? 3 : 5;
-                            } else {
-                                cls = 4;
-                            }
-                            if (cls == 1) {
-                                d = DAT_8032ec20;
-                            }
-                        } else {
-                            d = DAT_8032ec20;
-                        }
-                    } else {
-                        inv = 1.0 / sqrt(d);
-                        inv = DOUBLE_80330f00 * inv * -(d * inv * inv - DOUBLE_80330f08);
-                        inv = DOUBLE_80330f00 * inv * -(d * inv * inv - DOUBLE_80330f08);
-                        d = (double)(float)(d * DOUBLE_80330f00 * inv * -(d * inv * inv - DOUBLE_80330f08));
+                    d = sqrt(d);
+                    if (d <= DOUBLE_80330f10) {
+                        d = DAT_8032ec20;
                     }
 
                     inv = (double)(float)(yRand / d);

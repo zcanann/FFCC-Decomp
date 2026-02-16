@@ -99,17 +99,17 @@ void CalcGraphValue(_pppPObject* object, long graphId, float& value, float& velo
  * JP Address: TODO
  * JP Size: TODO
  */
-void GetTextureFromRSD(int mapMeshIndex, _pppEnvSt* env)
+int GetTextureFromRSD(int mapMeshIndex, _pppEnvSt* env)
 {
     int textureIndex;
 
     if (mapMeshIndex == 0xFFFF) {
-        return;
+        return 0;
     }
 
     textureIndex = 0;
-    GetTexture__8CMapMeshFP12CMaterialSetRi(((_pppEnvStYmEnv*)env)->m_mapMeshPtr[mapMeshIndex],
-                                            ((_pppEnvStYmEnv*)env)->m_materialSetPtr, textureIndex);
+    return GetTexture__8CMapMeshFP12CMaterialSetRi(((_pppEnvStYmEnv*)env)->m_mapMeshPtr[mapMeshIndex],
+                                                   ((_pppEnvStYmEnv*)env)->m_materialSetPtr, textureIndex);
 }
 
 /*
@@ -123,11 +123,11 @@ void GetTextureFromRSD(int mapMeshIndex, _pppEnvSt* env)
  */
 CChara::CModel* GetCharaModelPtr(CCharaPcs::CHandle* handle)
 {
-    if (handle == 0) {
-        return 0;
+    if (handle != 0) {
+        return handle->m_model;
     }
 
-    return handle->m_model;
+    return 0;
 }
 
 /*

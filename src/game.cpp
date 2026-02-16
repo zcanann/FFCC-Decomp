@@ -67,10 +67,18 @@ void ResetNewGame__13CFlatRuntime2Fv(void*);
 void InitFurTexBuffer__6CCharaFv(void*);
 void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
+int sprintf(char*, const char*, ...);
 void ScriptChanging__7CSystemFPc(CSystem*, char*);
 void ScriptChanged__7CSystemFPci(CSystem*, char*, int);
 void MapChanging__7CSystemFii(CSystem*, int, int);
 void MapChanged__7CSystemFiii(CSystem*, int, int, int);
+void Draw__13CFlatRuntime2Fv(void*);
+void Frame__13CFlatRuntime2Fii(void*, int, int);
+void AfterFrame__12CFlatRuntimeFi(void*, int);
+void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+    void*, int, int, int, int, void*, void*);
+void Draw__5CWindFv(void*);
+void CheckMenu__10CGPartyObjFv();
 void LoadMap__7CMapPcsFiiPvUlUc(void*, int, int, void*, unsigned long, unsigned char);
 void LoadFieldPdt__8CPartPcsFiiPvUlUc(void*, int, int, void*, unsigned long, unsigned char);
 void Draw__13CFlatRuntime2Fv(void*);
@@ -684,19 +692,16 @@ void CGame::MapChanged(int, int, int)
  */
 void CGame::loadCfd()
 {
-    struct CFlatDataView
+    struct FlatDataEntry
     {
-        struct DataEntry
-        {
-            unsigned int m_size;
-            void* m_data;
-            int m_numStrings;
-            char** m_strings;
-            char* m_stringBuf;
-        };
+        unsigned int m_size;
+        void* m_data;
+    };
 
+    struct FlatDataLayout
+    {
         int m_dataCount;
-        DataEntry m_data[5];
+        FlatDataEntry m_data[5];
     };
 
     CFile::CHandle* fileHandle;
@@ -730,20 +735,17 @@ void CGame::loadCfd()
         pathFmt++;
     } while (i < 4);
 
-    const CFlatDataView* flat0 = (const CFlatDataView*)&m_cFlatDataArr[0];
-    const CFlatDataView* flat2 = (const CFlatDataView*)&m_cFlatDataArr[2];
-    const CFlatDataView* flat3 = (const CFlatDataView*)&m_cFlatDataArr[3];
+    FlatDataLayout* flatData = reinterpret_cast<FlatDataLayout*>(m_cFlatDataArr);
 
-    unkCFlatData0[0] = (unsigned int)flat0->m_data[0].m_data;
-    unkCFlatData0[1] = (unsigned int)flat0->m_data[1].m_data;
-    unkCFlatData0[2] = (unsigned int)flat0->m_data[2].m_data;
-    unkCFlatData0[3] = (unsigned int)flat2->m_data[0].m_data;
-
-    unk_flat3_field_8_0xc7dc = (unsigned int)flat3->m_data[0].m_data;
-    unk_flat3_field_1C_0xc7d8 = (unsigned int)flat3->m_data[1].m_data;
-    unk_flat3_count_0xc7d4 = flat3->m_data[1].m_size / 0x1A;
-    unk_flat3_field_30_0xc7e0 = (unsigned int)flat3->m_data[2].m_data;
-    m_bossArtifactBase = (unsigned int)flat3->m_data[3].m_data;
+    unkCFlatData0[0] = (unsigned int)flatData[0].m_data[0].m_data;
+    unkCFlatData0[1] = (unsigned int)flatData[0].m_data[1].m_data;
+    unkCFlatData0[2] = (unsigned int)flatData[0].m_data[2].m_data;
+    m_scriptFoodBase[0] = (unsigned int)flatData[2].m_data[0].m_data;
+    unk_flat3_field_8_0xc7dc = (unsigned int)flatData[3].m_data[0].m_data;
+    unk_flat3_field_1C_0xc7d8 = (unsigned int)flatData[3].m_data[1].m_data;
+    unk_flat3_count_0xc7d4 = flatData[3].m_data[1].m_size / 0x1A;
+    unk_flat3_field_30_0xc7e0 = (unsigned int)flatData[3].m_data[2].m_data;
+    m_bossArtifactBase = (unsigned int)flatData[3].m_data[3].m_data;
 }
 
 /*
@@ -899,12 +901,18 @@ void CGame::Draw2()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001486c
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::Draw3()
 {
-	// TODO
+	Frame__13CFlatRuntime2Fii(CFlat, 0, 2);
+	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+	    CFlat, 0, 1, 5, 0, 0, 0);
 }
 
 /*

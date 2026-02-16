@@ -147,19 +147,29 @@ void GXSetFogRangeAdj(GXBool enable, u16 center, const GXFogAdjTable *table) {
     if (enable) {
         ASSERTMSGLINE(334, table != NULL, "GXSetFogRangeAdj: table pointer is null");
 
-        range_adj = (table->r[0] & 0xfff) | ((table->r[1] & 0xfff) << 12) | 0xe9000000;
+        range_adj = ((u32)table->r[1] << 12);
+        range_adj = (range_adj & 0x00fff000) | (table->r[0] & 0xfff);
+        range_adj |= 0xe9000000;
         GX_WRITE_RAS_REG(range_adj);
 
-        range_adj = (table->r[2] & 0xfff) | ((table->r[3] & 0xfff) << 12) | 0xea000000;
+        range_adj = ((u32)table->r[3] << 12);
+        range_adj = (range_adj & 0x00fff000) | (table->r[2] & 0xfff);
+        range_adj |= 0xea000000;
         GX_WRITE_RAS_REG(range_adj);
 
-        range_adj = (table->r[4] & 0xfff) | ((table->r[5] & 0xfff) << 12) | 0xeb000000;
+        range_adj = ((u32)table->r[5] << 12);
+        range_adj = (range_adj & 0x00fff000) | (table->r[4] & 0xfff);
+        range_adj |= 0xeb000000;
         GX_WRITE_RAS_REG(range_adj);
 
-        range_adj = (table->r[6] & 0xfff) | ((table->r[7] & 0xfff) << 12) | 0xec000000;
+        range_adj = ((u32)table->r[7] << 12);
+        range_adj = (range_adj & 0x00fff000) | (table->r[6] & 0xfff);
+        range_adj |= 0xec000000;
         GX_WRITE_RAS_REG(range_adj);
 
-        range_adj = (table->r[8] & 0xfff) | ((table->r[9] & 0xfff) << 12) | 0xed000000;
+        range_adj = ((u32)table->r[9] << 12);
+        range_adj = (range_adj & 0x00fff000) | (table->r[8] & 0xfff);
+        range_adj |= 0xed000000;
         GX_WRITE_RAS_REG(range_adj);
     }
 

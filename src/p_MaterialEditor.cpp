@@ -1,16 +1,23 @@
 #include "ffcc/p_MaterialEditor.h"
 #include "ffcc/p_usb.h"
+#include "ffcc/ME_USB_process.h"
 #include <Dolphin/mtx.h>
 #include <Dolphin/gx.h>
+#include <string.h>
 
 extern "C" int __cntlzw(unsigned int);
 
 extern CUSBPcs USBPcs;
 extern unsigned char m_table__18CMaterialEditorPcs[];
+static char s_CMaterialEditorPcs[] = "CMaterialEditorPcs";
 extern class CCameraPcs {
 public:
     Mtx m_cameraMatrix;
 } CameraPcs;
+extern CMemory Memory;
+
+extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
+extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 
 static void WriteU8(void* base, unsigned int offset, unsigned char value) {
     reinterpret_cast<unsigned char*>(base)[offset] = value;
@@ -194,22 +201,83 @@ int CMaterialEditorPcs::GetTable(unsigned long index)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004c234
+ * PAL Size: 204b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMaterialEditorPcs::createViewer()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    CMemory::CStage* stage = reinterpret_cast<CMemory::CStage*>(
+        CreateStage__7CMemoryFUlPci(&Memory, 0x200000, s_CMaterialEditorPcs, 0));
+    GXColor clear;
+    const float kZero = 0.0f;
+
+    WriteU32(self, 0x4, reinterpret_cast<unsigned int>(stage));
+    USBPcs.IsBigAlloc(1);
+
+    clear.r = 0x40;
+    clear.g = 0x40;
+    clear.b = 0x40;
+    clear.a = 0xff;
+    GXSetCopyClear(clear, 0xffffff);
+
+    WriteU32(self, 0x1c, 1);
+    WriteU32(self, 0xe8, 0);
+    memset(self + 0xec, 0, 0x120);
+
+    WriteF32(self, 0xec, kZero);
+    WriteF32(self, 0x100, kZero);
+    WriteF32(self, 0x114, kZero);
+    WriteF32(self, 0x128, kZero);
+
+    PSMTXIdentity(m_unkMatrix.value);
+    m_usbStream.CreateBuffer();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004c138
+ * PAL Size: 252b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMaterialEditorPcs::destroyViewer()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    unsigned char* cursor = self;
+    GXColor clear;
+    unsigned int i = 0;
+
+    USBPcs.IsBigAlloc(0);
+
+    clear.r = 0;
+    clear.g = 0;
+    clear.b = 0;
+    clear.a = 0;
+    GXSetCopyClear(clear, 0xffffff);
+
+    m_usbStream.DeleteBuffer();
+    MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(self + 0xbc)));
+    WriteU32(self, 0x3bc, 0);
+
+    do {
+        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(cursor + 0x2bc)));
+        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(cursor + 0x2fc)));
+        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(cursor + 0x23c)));
+        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(cursor + 0x33c)));
+        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(cursor + 0x37c)));
+        MemFree__18CMaterialEditorPcsFPv(this, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(cursor + 0x27c)));
+        i += 1;
+        cursor += 4;
+    } while (i < 0x10);
+
+    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, reinterpret_cast<void*>(*reinterpret_cast<unsigned int*>(self + 0x4)));
 }
 
 /*

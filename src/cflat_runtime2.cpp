@@ -3,6 +3,13 @@
 #include "ffcc/p_game.h"
 #include <string.h>
 
+extern "C" void reset__6CAStarFv(void*);
+
+extern unsigned char Pad[];
+extern unsigned char GraphicsPcs[];
+extern unsigned char CameraPcs[];
+extern unsigned char DbgMenuPcs[];
+
 template <int count>
 class CLine;
 
@@ -800,8 +807,12 @@ void CFlatRuntime2::reqFinished(int, CFlatRuntime::CObject*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006FAE8
+ * PAL Size: 640b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFlatRuntime2::SysControl(int, int)
 {
@@ -810,12 +821,20 @@ void CFlatRuntime2::SysControl(int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006FAC4
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::GetSysControl(int)
+int CFlatRuntime2::GetSysControl(int controlNo)
 {
-	// TODO
+	if (controlNo != 3) {
+		return 0;
+	}
+
+	return *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x12E8);
 }
 
 /*
@@ -844,12 +863,55 @@ void CFlatRuntime2::resetSpawnBit(int spawnBit)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006F88C
+ * PAL Size: 476b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFlatRuntime2::resetChangeScript()
 {
-	// TODO
+	static const int clearDwordOffsets[] = {
+		0x10404, 0x12A8, 0x12AC, 0x1BF4, 0x2708, 0x321C, 0x3D30, 0x4844, 0x5358, 0x5E6C,
+		0x6980,  0x7494, 0x7FA8, 0x8ABC, 0x95D0, 0xA0E4, 0xABF8, 0xB70C, 0xC220,
+	};
+
+	u8* runtime = reinterpret_cast<u8*>(this);
+	for (u32 i = 0; i < sizeof(clearDwordOffsets) / sizeof(clearDwordOffsets[0]); i++) {
+		*reinterpret_cast<u32*>(runtime + clearDwordOffsets[i]) = 0;
+	}
+
+	for (int i = 0; i < 2; i++) {
+		u8* block = runtime + i * 0xF8;
+		for (int j = 0; j < 16; j++) {
+			block[0x134C + j * 0x14] = 0xFF;
+			block[0x134D + j * 0x14] = 0;
+		}
+	}
+
+	*reinterpret_cast<u32*>(runtime + 0x1040C) = 0;
+	*reinterpret_cast<u32*>(runtime + 0x10410) = 0;
+	*reinterpret_cast<u32*>(runtime + 0x10414) = 0;
+
+	runtime[0x12E4] |= 0x80;
+	runtime[0x12E4] &= 0xDF;
+	runtime[0x12E4] &= 0xEF;
+
+	*reinterpret_cast<u32*>(runtime + 0x12E8) = 0;
+	*reinterpret_cast<u32*>(runtime + 0x12EC) = 0;
+
+	memset(runtime + 0x1041C, 0, 0x14);
+	memset(reinterpret_cast<void*>(0x8030014C), 0, 0x8C);
+
+	runtime[0x12E4] &= 0xFD;
+	runtime[0x12E4] &= 0xF7;
+	runtime[0x12E4] &= 0xFE;
+
+	*reinterpret_cast<u32*>(Pad + 0x1C8) = 1;
+	*reinterpret_cast<u32*>(GraphicsPcs + 0x44) = 0;
+	*reinterpret_cast<u32*>(CameraPcs + 0x434) = 1;
+	reset__6CAStarFv(DbgMenuPcs + 0x2A5C);
 }
 
 /*

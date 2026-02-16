@@ -1,4 +1,5 @@
 #include "ffcc/p_chara_viewer.h"
+#include <dolphin/gx.h>
 #include "dolphin/mtx.h"
 
 extern "C" int DAT_8032edc0;
@@ -8,6 +9,21 @@ extern "C" unsigned char Memory[];
 extern "C" unsigned char Graphic[];
 extern "C" unsigned char File[];
 extern "C" unsigned char USBPcs[];
+extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
+extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
+extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
+extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, unsigned char, int, int,
+                                                                                unsigned char);
+extern "C" void SetFog__8CGraphicFii(void*, int, int);
+extern "C" void SetAmbient__9CLightPcsF8_GXColor(void*, void*);
+extern "C" void SetNumDiffuse__9CLightPcsFUl(void*, unsigned long);
+extern "C" void SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(void*, unsigned long, void*, void*, int);
+extern "C" void SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(void*, int, Vec*, unsigned long);
+extern "C" void Draw__Q26CChara6CModelFPA4_fii(void*, Mtx, int, int);
+extern "C" void DrawFur__Q26CChara6CModelFPA4_fi(void*, Mtx, int);
+extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
+extern "C" void _WaitDrawDone__8CGraphicFPci(void*, const char*, int);
+extern "C" int __cntlzw(unsigned int);
 extern "C" void Destroy__6CCharaFv(void*);
 extern "C" void Create__6CCharaFv(void*);
 extern "C" void DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(void*, int);
@@ -27,6 +43,9 @@ extern "C" void __ct__6CColorFv(void*);
 extern "C" void __ct__6CColorFR6CColor(void*, void*);
 extern "C" char lbl_801DA7E8[];
 extern "C" float lbl_80330BE8;
+extern "C" float lbl_80330BF4;
+extern "C" float lbl_80330BFC;
+extern "C" float lbl_80330C00;
 extern "C" float lbl_80330C28;
 extern "C" float lbl_80330C2C;
 extern "C" float lbl_80330C48;
@@ -41,6 +60,102 @@ extern "C" double lbl_80330C10;
 extern "C" void* memset(void*, int, unsigned long);
 extern "C" char* strcpy(char*, const char*);
 extern "C" int sprintf(char*, const char*, ...);
+
+extern struct {
+    float _212_4_;
+    float _216_4_;
+    float _220_4_;
+    float _224_4_;
+    float _228_4_;
+    float _232_4_;
+    Mtx m_cameraMatrix;
+    Mtx44 m_screenMatrix;
+} CameraPcs;
+
+/*
+ * --INFO--
+ * PAL Address: 0x800BD848
+ * PAL Size: 1680b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
+{
+    unsigned char* p = (unsigned char*)param_1;
+    Mtx cameraMtx;
+    Mtx scratchMtx;
+    Mtx44 projMtx;
+
+    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+    PSMTX44Copy(CameraPcs.m_screenMatrix, projMtx);
+    GXSetProjection(projMtx, GX_PERSPECTIVE);
+
+    if (*(int*)(p + 0x6F8) != 0) {
+        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+        GXSetZCompLoc(GX_FALSE);
+        _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
+        GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+        GXSetCullMode(GX_CULL_FRONT);
+        GXSetNumTevStages(1);
+        _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
+        GXSetNumChans(1);
+        GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, 0, GX_DF_NONE, GX_AF_NONE);
+        GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, 0, GX_DF_NONE, GX_AF_SPEC);
+        GXClearVtxDesc();
+        GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+        GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+        GXLoadPosMtxImm(cameraMtx, 0);
+
+        for (int i = -10; i < 11; i++) {
+            GXColor color;
+            color.r = 0x80;
+            color.g = 0x80;
+            color.b = 0x80;
+            color.a = (i == 0) ? 0x60 : 0x20;
+            GXSetChanMatColor(GX_COLOR0A0, color);
+            float x = (float)i * lbl_80330BFC;
+            GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 4);
+            GXPosition3f32(x, lbl_80330BE8, lbl_80330C00);
+            GXPosition3f32(x, lbl_80330BE8, lbl_80330BF4);
+            GXPosition3f32(lbl_80330BF4, lbl_80330BE8, x);
+            GXPosition3f32(lbl_80330C00, lbl_80330BE8, x);
+        }
+    }
+
+    for (unsigned int i = 0; i < 2; i++) {
+        unsigned char* model = *(unsigned char**)(p + 0x190 + i * 4);
+        if (model != 0) {
+            if (*(int*)(model + 0xB0) == 0) {
+                Printf__8CGraphicFPce(Graphic, lbl_801DA7E8);
+            } else {
+                SetFog__8CGraphicFii(Graphic, 0, 0);
+                SetAmbient__9CLightPcsF8_GXColor(LightPcs, p + 0xE8);
+                SetNumDiffuse__9CLightPcsFUl(LightPcs, 3);
+                for (unsigned int lightIndex = 0; lightIndex < 3; lightIndex++) {
+                    SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(LightPcs, lightIndex, p + 0xF0 + lightIndex * 4,
+                                                             p + 0x108 + lightIndex * 12,
+                                                             (__cntlzw(2 - lightIndex) >> 5) & 0xFF);
+                }
+
+                Vec lightPos;
+                PSMTXCopy((const float(*)[4])(model + 8), scratchMtx);
+                lightPos.x = scratchMtx[0][3];
+                lightPos.y = scratchMtx[1][3];
+                lightPos.z = scratchMtx[2][3];
+                SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(LightPcs, 0, &lightPos, 0xFFFFFFFF);
+
+                Draw__Q26CChara6CModelFPA4_fii(model, cameraMtx, 0, 0);
+                DrawFur__Q26CChara6CModelFPA4_fi(model, cameraMtx, 0);
+                if (i == 0) {
+                    _WaitDrawDone__8CGraphicFPci(Graphic, lbl_801DA7E8 + 0x10, 0x2A7);
+                }
+            }
+        }
+    }
+}
 
 /*
  * --INFO--

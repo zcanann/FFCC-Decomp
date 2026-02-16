@@ -11,7 +11,26 @@ extern void* DAT_8032ec70;
 extern float FLOAT_803305f0;
 extern float FLOAT_803305f4;
 extern float FLOAT_803305f8;
+extern float FLOAT_80330610;
+extern float FLOAT_80330614;
+extern float FLOAT_80330618;
+extern float FLOAT_8033061c;
+extern float FLOAT_8033062c;
+extern float FLOAT_80330630;
 extern CGraphic Graphic;
+extern float ppvScreenMatrix[4][4];
+
+struct Vec2d {
+	float x;
+	float y;
+};
+
+struct Vec4d {
+	float x;
+	float y;
+	float z;
+	float w;
+};
 
 struct _pppEnvStYmDeformationShp {
 	void* m_stagePtr;
@@ -36,6 +55,7 @@ void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int stage, int mode);
 void SetVtxFmt_POS_TEX0_TEX1__5CUtilFv(void* util);
 int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic* graphic, int& left, int& top, int& width, int& height, int copy);
 void DisableIndWarp__F13_GXTevStageID16_GXIndTexStageID(int stage, int indStage);
+void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(void* math, Mtx44 mtx, Vec4d* src, Vec4d* dst);
 }
 
 /*
@@ -216,12 +236,188 @@ void pppFrameYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, UnkB* p
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8008fa20
+ * PAL Size: 2584b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void RenderDeformationShape(_pppPObject*, VYmDeformationShp*, Vec*, Vec2d*)
+void RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* vertices, Vec2d* uvs)
 {
-	// TODO
+	const f32 (*objMtx)[4] = (const f32(*)[4])((u8*)obj + 4);
+	Vec4d projected[4];
+	Vec worldPos;
+	Vec4d clipPos;
+	float maxX;
+	float maxY;
+	float minX;
+	float minY;
+	int left;
+	int top;
+	int width;
+	int height;
+	Mtx texMtx;
+	Mtx tempMtx;
+	Vec origin;
+	Vec cameraPos;
+	Vec projectedObj[4];
+	int maxXIndex;
+	int maxYIndex;
+	float texScaleX;
+	float texScaleY;
+	float offsetX;
+	float offsetY;
+	int i;
+
+	for (i = 0; i < 4; i++) {
+		PSMTXMultVec(objMtx, &vertices[i], &worldPos);
+		clipPos.x = worldPos.x;
+		clipPos.y = worldPos.y;
+		clipPos.z = worldPos.z;
+		clipPos.w = FLOAT_803305f8;
+		MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(0, ppvScreenMatrix, &clipPos, &projected[i]);
+		projected[i].x = projected[i].x / projected[i].w;
+		projected[i].y = projected[i].y / projected[i].w;
+		projected[i].z = projected[i].z / projected[i].w;
+		projected[i].x = FLOAT_80330610 + projected[i].x / FLOAT_80330614;
+		projected[i].y = FLOAT_80330618 - projected[i].y / FLOAT_8033061c;
+	}
+
+	maxX = projected[0].x;
+	maxY = projected[0].y;
+	minX = projected[0].x;
+	minY = projected[0].y;
+	for (i = 1; i < 4; i++) {
+		if (maxX < projected[i].x) {
+			maxX = projected[i].x;
+		}
+		if (maxY < projected[i].y) {
+			maxY = projected[i].y;
+		}
+		if (projected[i].x < minX) {
+			minX = projected[i].x;
+		}
+		if (projected[i].y < minY) {
+			minY = projected[i].y;
+		}
+	}
+
+	if (((int)minX & 1) != 0) {
+		minX = minX - FLOAT_803305f8;
+	}
+	if (((int)minY & 1) != 0) {
+		minY = minY - FLOAT_803305f8;
+	}
+	if (((int)maxX & 1) != 0) {
+		maxX = maxX + FLOAT_803305f8;
+	}
+	if (((int)maxY & 1) != 0) {
+		maxY = maxY + FLOAT_803305f8;
+	}
+
+	left = (int)minX;
+	top = (int)minY;
+	width = (int)maxX - left;
+	height = (int)maxY - top;
+
+	pppSetBlendMode__FUc(3);
+	*(int*)work = GetBackBufferRect__8CGraphicFRiRiRiRii(&Graphic, left, top, width, height, 0);
+	if (*(int*)work == 0) {
+		return;
+	}
+
+	PSMTXIdentity(texMtx);
+	texMtx[0][0] = ppvScreenMatrix[0][0] * (FLOAT_80330610 / (float)width);
+	texMtx[1][1] = ppvScreenMatrix[1][1] * -(FLOAT_80330618 / (float)height);
+	texMtx[1][0] = ppvScreenMatrix[1][0];
+	texMtx[2][0] = ppvScreenMatrix[2][0];
+	texMtx[0][1] = ppvScreenMatrix[0][1];
+	texMtx[2][1] = ppvScreenMatrix[2][1];
+	texMtx[0][2] = 0.0f;
+	texMtx[1][2] = 0.0f;
+	texMtx[2][2] = FLOAT_8033062c;
+
+	PSMTXConcat(texMtx, objMtx, tempMtx);
+	origin.x = FLOAT_803305f4;
+	origin.y = FLOAT_803305f4;
+	origin.z = FLOAT_803305f4;
+	PSMTXMultVec(tempMtx, &origin, &cameraPos);
+	cameraPos.x = cameraPos.x / cameraPos.z;
+	cameraPos.y = cameraPos.y / cameraPos.z;
+	texMtx[0][2] = FLOAT_8033062c + cameraPos.x;
+	texMtx[1][2] = FLOAT_8033062c + cameraPos.y;
+	PSMTXConcat(texMtx, objMtx, tempMtx);
+
+	for (i = 0; i < 4; i++) {
+		PSMTXMultVec(tempMtx, &vertices[i], &projectedObj[i]);
+		projectedObj[i].x = projectedObj[i].x / projectedObj[i].z;
+		projectedObj[i].y = projectedObj[i].y / projectedObj[i].z;
+	}
+
+	maxXIndex = 0;
+	maxYIndex = 0;
+	for (i = 1; i < 4; i++) {
+		if (projected[maxXIndex].x < projected[i].x) {
+			maxXIndex = i;
+		}
+		if (projected[maxYIndex].y < projected[i].y) {
+			maxYIndex = i;
+		}
+	}
+
+	texScaleX = FLOAT_803305f8 / (float)width;
+	texScaleY = FLOAT_803305f8 / (float)height;
+	offsetX = projectedObj[maxXIndex].x - texScaleX * (projected[maxXIndex].x - (float)left);
+	offsetY = projectedObj[maxYIndex].y - texScaleY * (projected[maxYIndex].y - (float)top);
+
+	if (left < 0) {
+		if ((left + width) < 641) {
+			int minIndex = 0;
+			for (i = 1; i < 4; i++) {
+				if (projected[i].x < projected[minIndex].x) {
+					minIndex = i;
+				}
+			}
+			texMtx[0][2] = texMtx[0][2] + (texScaleX * ((float)(left + width) - projected[minIndex].x) +
+			                               projectedObj[minIndex].x - FLOAT_803305f8);
+		} else {
+			texMtx[0][2] = texMtx[0][2] + (FLOAT_80330630 - cameraPos.x);
+		}
+	} else {
+		texMtx[0][2] = texMtx[0][2] + offsetX;
+	}
+
+	if (top < 0) {
+		if ((top + height) < 449) {
+			int minIndex = 0;
+			for (i = 1; i < 4; i++) {
+				if (projected[i].y < projected[minIndex].y) {
+					minIndex = i;
+				}
+			}
+			texMtx[1][2] = texMtx[1][2] + (texScaleY * ((float)(top + height) - projected[minIndex].y) +
+			                               projectedObj[minIndex].y - FLOAT_803305f8);
+		} else {
+			texMtx[1][2] = texMtx[1][2] + (FLOAT_80330630 - cameraPos.y);
+		}
+	} else {
+		texMtx[1][2] = texMtx[1][2] + offsetY;
+	}
+
+	PSMTXConcat(texMtx, objMtx, texMtx);
+	GXLoadTexMtxImm(texMtx, 0x1e, GX_MTX2x4);
+	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_POS, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+	GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_TEXMTX1, GX_FALSE, GX_PTIDENTITY);
+	GXSetIndTexCoordScale(GX_INDTEXSTAGE0, GX_ITS_1, GX_ITS_1);
+	GXLoadTexObj((GXTexObj*)*(int*)work, GX_TEXMAP0);
+
+	GXBegin(GX_QUADS, GX_VTXFMT7, 4);
+	for (i = 0; i < 4; i++) {
+		GXPosition3f32(vertices[i].x, vertices[i].y, vertices[i].z);
+		GXTexCoord2f32(uvs[i].x, uvs[i].y);
+		GXTexCoord2f32(uvs[i].x, uvs[i].y);
+	}
 }
 
 /*

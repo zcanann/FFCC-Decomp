@@ -2,6 +2,7 @@
 #include "ffcc/baseobj.h"
 #include "ffcc/partMng.h"
 #include "ffcc/p_game.h"
+#include <math.h>
 #include <string.h>
 
 extern "C" void reset__6CAStarFv(void*);
@@ -647,9 +648,19 @@ void CFlatRuntime2::SetParticleWorkTarget(Vec& vec)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::SetParticleWorkVector(float, float)
+void CFlatRuntime2::SetParticleWorkVector(float angle1, float angle2)
 {
-	// TODO
+	double cosAngle2 = cos(angle2);
+	double sinAngle1 = sin(angle1);
+	ParticleWorkTargetX(this) = static_cast<float>(sinAngle1 * static_cast<double>(static_cast<float>(cosAngle2))) + ParticleWorkPosX(this);
+
+	double sinAngle2 = sin(angle2);
+	ParticleWorkTargetY(this) = ParticleWorkPosY(this) + static_cast<float>(sinAngle2);
+
+	cosAngle2 = cos(angle2);
+	double cosAngle1 = cos(angle1);
+	ParticleWorkTargetZ(this) = static_cast<float>(cosAngle1 * static_cast<double>(static_cast<float>(cosAngle2))) + ParticleWorkPosZ(this);
+	ParticleWorkTargetPtr(this) = &ParticleWorkTargetX(this);
 }
 
 /*
@@ -834,9 +845,13 @@ void CFlatRuntime2::initAllFinished()
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::reqFinished(int, CFlatRuntime::CObject*)
+void CFlatRuntime2::reqFinished(int reqNo, CFlatRuntime::CObject* object)
 {
-	// TODO
+	if (reqNo == 0xF) {
+		typedef void (*ReqFinishFn)(CFlatRuntime::CObject*);
+		ReqFinishFn fn = *reinterpret_cast<ReqFinishFn*>(*reinterpret_cast<u8**>(object) + 0x10);
+		fn(object);
+	}
 }
 
 /*

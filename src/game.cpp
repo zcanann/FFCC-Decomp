@@ -700,28 +700,35 @@ void CGame::loadCfd()
     };
 
     CFile::CHandle* fileHandle;
-    char pathBuf[268];
+    int i;
+    CFlatData* flatData;
+    const char** pathFmt;
     const char* localLangDirs[6];
-    const char* const* pathFmt = lbl_801E8344;
-
-    localLangDirs[0] = lbl_801D60B0[0];
-    localLangDirs[1] = lbl_801D60B0[1];
-    localLangDirs[2] = lbl_801D60B0[2];
-    localLangDirs[3] = lbl_801D60B0[3];
-    localLangDirs[4] = lbl_801D60B0[4];
-    localLangDirs[5] = lbl_801D60B0[5];
-
-    for (int i = 0; i < 4; ++i) {
-        sprintf(pathBuf, pathFmt[i], localLangDirs[m_gameWork.m_languageId]);
+    char pathBuf[268];
+    
+    i = 0;
+    flatData = m_cFlatDataArr;
+    pathFmt = (const char**)lbl_801E8344;
+    do {
+        localLangDirs[0] = lbl_801D60B0[0];
+        localLangDirs[1] = lbl_801D60B0[1];
+        localLangDirs[2] = lbl_801D60B0[2];
+        localLangDirs[3] = lbl_801D60B0[3];
+        localLangDirs[4] = lbl_801D60B0[4];
+        localLangDirs[5] = lbl_801D60B0[5];
+        sprintf(pathBuf, *pathFmt, localLangDirs[m_gameWork.m_languageId]);
         fileHandle = File.Open(pathBuf, 0, CFile::PRI_LOW);
 
         if (fileHandle != 0) {
             File.Read(fileHandle);
             File.SyncCompleted(fileHandle);
-            m_cFlatDataArr[i].Create(File.m_readBuffer);
+            flatData->Create(File.m_readBuffer);
             File.Close(fileHandle);
         }
-    }
+        i++;
+        flatData++;
+        pathFmt++;
+    } while (i < 4);
 
     const CFlatDataView* flat0 = (const CFlatDataView*)&m_cFlatDataArr[0];
     const CFlatDataView* flat2 = (const CFlatDataView*)&m_cFlatDataArr[2];

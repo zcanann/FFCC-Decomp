@@ -211,13 +211,6 @@ EXCEPTION: If making a first pass at a large function, mangled code is tolerable
 - Branch naming: `pr/unit_name` (e.g., `pr/main_pppMove`)
 - **Why this matters**: Branching from PRs creates dependency chains that contaminate later PRs with unmerged changes
 
-### Memory Location - AGENT WORKSPACE ONLY!
-- **NEVER write notes/memories to the project directory** (`Documents/projects/FFCC-Decomp/`)
-- **ALWAYS write to agent workspace**: `~/.openclaw/workspace/memory/`
-- Project work notes -> `memory/YYYY-MM-DD.md` or `memory/ffcc-decomp-notes.md`
-- State tracking -> `memory/decomp-state.json`
-- **Why this matters**: Project directory is for source code only, not agent notes
-
 ### Code Quality - Clean Source Only!
 - **NO junk comments** in submitted code (no original assembly, no debug notes)
 - **NO commented-out code** unless specifically needed

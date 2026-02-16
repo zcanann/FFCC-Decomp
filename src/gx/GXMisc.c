@@ -205,7 +205,7 @@ void GXPokeAlphaMode(GXCompare func, u8 threshold) {
  * JP Size: TODO
  */
 void GXPokeAlphaRead(GXAlphaReadMode mode) {
-    GX_SET_PE_REG(4, (mode & 0xFFFB) | 4);
+    GX_SET_PE_REG(4, (mode & 0xFFFFFFFB) | 4);
 }
 
 void GXPokeAlphaUpdate(GXBool update_enable) {

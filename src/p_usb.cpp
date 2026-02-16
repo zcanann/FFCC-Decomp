@@ -11,9 +11,9 @@ int DAT_8032ec68;
 
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
 
-extern void* __vt__8CManager;
-extern void* lbl_801E8668;
-extern void* lbl_801E8830;
+extern void* __vt__8CManager[];
+extern void* lbl_801E8668[];
+extern void* lbl_801E8830[];
 extern u32 lbl_801E8690[];
 extern u32 lbl_801E869C[];
 extern u32 lbl_801E86A8[];
@@ -246,9 +246,9 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
 extern "C" void __sinit_p_usb_cpp()
 {
     volatile void** base = (volatile void**)&USBPcs;
-    *base = &__vt__8CManager;
-    *base = &lbl_801E8668;
-    *base = &lbl_801E8830;
+    *base = __vt__8CManager;
+    *base = lbl_801E8668;
+    *base = lbl_801E8830;
 
     u32* dst = lbl_801E86B4 + 1;
     u32* src0 = lbl_801E8690;

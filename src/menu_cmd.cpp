@@ -5,6 +5,22 @@
 
 extern "C" int GetItemType__8CMenuPcsFii(CMenuPcs*, int, int);
 extern "C" int GetItemIcon__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" void CalcStatus__12CCaravanWorkFv(void*);
+extern "C" unsigned int CmdCtrlCur__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int CmdOpen0__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int CmdClose0__8CMenuPcsFv(CMenuPcs*);
+extern "C" void CmdInit1__8CMenuPcsFv(CMenuPcs*);
+extern "C" int UniteOpenAnim__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" unsigned int CmdOpen1__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int CmdClose1__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int CmdClose2__8CMenuPcsFv(CMenuPcs*);
+
+extern double DOUBLE_80332a58;
+extern double DOUBLE_80332a60;
+extern double DOUBLE_80332a68;
+extern double DOUBLE_80332a78;
+extern float FLOAT_80332a70;
+extern float FLOAT_80332a88;
 
 /*
  * --INFO--
@@ -69,12 +85,144 @@ void CMenuPcs::CmdOpen()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8014f4e8
+ * PAL Size: 1424b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CmdCtrl()
 {
-	// TODO
+	u8* self = reinterpret_cast<u8*>(this);
+	u32 actionHandled = 0;
+	s32 caravanWork = Game.game.m_scriptFoodBase[0];
+	s32 cmd = *reinterpret_cast<s32*>(self + 0x82c);
+
+	CalcStatus__12CCaravanWorkFv(reinterpret_cast<void*>(caravanWork));
+
+	*reinterpret_cast<s16*>(cmd + 0x32) = *reinterpret_cast<s16*>(cmd + 0x30);
+
+	s16 mode = *reinterpret_cast<s16*>(cmd + 0x30);
+	s16 state = *reinterpret_cast<s16*>(cmd + 0x12);
+
+	if ((mode == 0) || ((mode != 0) && (state == 1))) {
+		actionHandled = CmdCtrlCur__8CMenuPcsFv(this);
+	} else if ((mode == 1) && (state == 0)) {
+		actionHandled = CmdOpen0__8CMenuPcsFv(this);
+		if (actionHandled != 0) {
+			actionHandled = 0;
+			*reinterpret_cast<s16*>(cmd + 0x12) = static_cast<s16>(*reinterpret_cast<s16*>(cmd + 0x12) + 1);
+		}
+	} else if ((mode == 1) && (state == 2)) {
+		actionHandled = CmdClose0__8CMenuPcsFv(this);
+		if (actionHandled != 0) {
+			if (*reinterpret_cast<u8*>(cmd + 8) == 0) {
+				*reinterpret_cast<s16*>(cmd + 0x12) = static_cast<s16>(*reinterpret_cast<s16*>(cmd + 0x12) + 1);
+			} else {
+				*reinterpret_cast<s16*>(cmd + 0x12) = 0;
+				*reinterpret_cast<s16*>(cmd + 0x30) = 3;
+				*reinterpret_cast<s16*>(cmd + 0x22) = 0;
+				*reinterpret_cast<u8*>(cmd + 8) = 0;
+				CmdInit1__8CMenuPcsFv(this);
+			}
+			actionHandled = 0;
+		}
+	} else if ((mode == 1) && (state == 3)) {
+		actionHandled = static_cast<u32>(UniteOpenAnim__8CMenuPcsFi(this, -1));
+		if (actionHandled != 0) {
+			*reinterpret_cast<s16*>(cmd + 0x12) = 0;
+			*reinterpret_cast<s16*>(cmd + 0x30) = 0;
+			*reinterpret_cast<s16*>(cmd + 0x22) = 0;
+			CmdInit1__8CMenuPcsFv(this);
+			actionHandled = 0;
+		}
+	} else if ((mode == 2) && (state == 0)) {
+		actionHandled = CmdOpen1__8CMenuPcsFv(this);
+		if (actionHandled != 0) {
+			actionHandled = 0;
+			*reinterpret_cast<s16*>(cmd + 0x12) = static_cast<s16>(*reinterpret_cast<s16*>(cmd + 0x12) + 1);
+		}
+	} else if ((mode == 2) && (state == 2)) {
+		actionHandled = CmdClose1__8CMenuPcsFv(this);
+		if (actionHandled != 0) {
+			if (*reinterpret_cast<u8*>(cmd + 8) == 0) {
+				*reinterpret_cast<s16*>(cmd + 0x30) = 0;
+			} else {
+				*reinterpret_cast<s16*>(cmd + 0x14) = 0;
+				*reinterpret_cast<s16*>(cmd + 0x30) = 3;
+			}
+			actionHandled = 0;
+			*reinterpret_cast<s16*>(cmd + 0x12) = 0;
+			*reinterpret_cast<s16*>(cmd + 0x22) = 0;
+		}
+	} else if ((mode == 3) && (state == 0)) {
+		*reinterpret_cast<s16*>(cmd + 0x22) = static_cast<s16>(*reinterpret_cast<s16*>(cmd + 0x22) + 1);
+
+		s32 selected = static_cast<s32>(*reinterpret_cast<s16*>(cmd + 0x26));
+		s32 prev = selected - 1;
+		for (; prev > 2; --prev) {
+			if (*reinterpret_cast<s16*>(caravanWork + prev * 2 + 0x214) >= 0) {
+				break;
+			}
+		}
+
+		s32 next = selected + 1;
+		s32 limit = static_cast<s32>(*reinterpret_cast<s16*>(caravanWork + 0xbaa));
+		for (; next < limit; ++next) {
+			if (*reinterpret_cast<s16*>(caravanWork + next * 2 + 0x214) >= 0) {
+				break;
+			}
+		}
+
+		s16* list = *reinterpret_cast<s16**>(self + 0x850);
+		float minAnim = static_cast<float>(DOUBLE_80332a60);
+		double timer = static_cast<double>(static_cast<s32>(*reinterpret_cast<s16*>(cmd + 0x22)));
+		double anim = -((DOUBLE_80332a68 * timer) - DOUBLE_80332a58);
+		for (s32 i = 0; i < static_cast<s32>(list[0]); i++) {
+			if ((i < prev) || (next < i)) {
+				float value = static_cast<float>(anim);
+				if (static_cast<double>(value) < static_cast<double>(minAnim)) {
+					value = FLOAT_80332a88;
+				}
+				*reinterpret_cast<float*>(list + i * 0x20 + 0x0c) = value;
+			}
+		}
+
+		actionHandled = (static_cast<double>(static_cast<s32>(*reinterpret_cast<s16*>(cmd + 0x22))) >= DOUBLE_80332a78);
+		if (actionHandled != 0) {
+			*reinterpret_cast<s16*>(cmd + mode * 2 + 0x26) = static_cast<s16>(prev);
+			actionHandled = 0;
+			*reinterpret_cast<s16*>(cmd + 0x12) = static_cast<s16>(*reinterpret_cast<s16*>(cmd + 0x12) + 1);
+		}
+	} else if ((mode == 3) && (state == 2)) {
+		actionHandled = CmdClose2__8CMenuPcsFv(this);
+		if (actionHandled != 0) {
+			actionHandled = 0;
+			*reinterpret_cast<s16*>(cmd + 0x12) = 0;
+			*reinterpret_cast<s16*>(cmd + 0x30) = 0;
+			*reinterpret_cast<s16*>(cmd + 0x22) = 0;
+			*reinterpret_cast<u8*>(cmd + 8) = 0;
+		}
+	}
+
+	if (actionHandled == 0) {
+		return;
+	}
+
+	s16* list = *reinterpret_cast<s16**>(self + 0x850);
+	for (s32 i = 0; i < static_cast<s32>(list[0]); i++) {
+		*reinterpret_cast<float*>(list + i * 0x20 + 0x0c) = FLOAT_80332a70;
+		*reinterpret_cast<float*>(list + i * 0x20 + 0x0e) = FLOAT_80332a70;
+	}
+
+	u32 count = static_cast<u32>(*reinterpret_cast<s16*>(caravanWork + 0xbaa));
+	for (s32 i = static_cast<s32>(count) - 1, idx = 0; i >= 0; i--, idx++) {
+		*reinterpret_cast<s32*>(list + i * 0x20 + 0x14) = idx;
+		*reinterpret_cast<s32*>(list + i * 0x20 + 0x16) = 3;
+	}
+
+	*reinterpret_cast<u8*>(cmd + 8) = 0;
 }
 
 /*
@@ -236,7 +384,7 @@ void CMenuPcs::CmdDraw()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::CmdCtrlCur()
+unsigned int CMenuPcs::CmdCtrlCur()
 {
 	// Cursor control for menu commands
 	int cursorPos = 0;
@@ -251,6 +399,8 @@ void CMenuPcs::CmdCtrlCur()
 	for (int i = 0; i < 16; i++) {
 		// Process input states
 	}
+
+	return 0;
 }
 
 /*

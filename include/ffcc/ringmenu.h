@@ -18,7 +18,7 @@ public:
 
     void Create();
     void Destroy();
-    void GetDispCounter();
+    double GetDispCounter();
     void onCalc();
     void onDraw();
     void drawGBA();

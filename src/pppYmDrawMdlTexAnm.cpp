@@ -102,8 +102,8 @@ void pppDestructYmDrawMdlTexAnm(pppYmDrawMdlTexAnm* param1, pppYmDrawMdlTexAnmOf
         uvPairs = uvLayout->m_uvPairs;
         for (i = 0; i < (u32)uvLayout->m_uvCount; i++) {
             u32 frameU = frameIndex / work->m_tilesU;
-            uvPairs[0] = (s16)(-((f32)(frameIndex - frameU * work->m_tilesU) * work->m_perU) - (f32)uvPairs[0]);
-            uvPairs[1] = (s16)(-((f32)frameU * work->m_perV) - (f32)uvPairs[1]);
+            uvPairs[0] = (s16)((f32)uvPairs[0] - ((f32)(frameIndex - frameU * work->m_tilesU) * work->m_perU));
+            uvPairs[1] = (s16)((f32)uvPairs[1] - ((f32)frameU * work->m_perV));
             uvPairs += 2;
         }
 

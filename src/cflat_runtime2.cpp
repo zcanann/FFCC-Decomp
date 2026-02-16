@@ -704,10 +704,10 @@ void CFlatRuntime2::SetParticleWorkBind(CFlatRuntime::CObject* object)
 void CFlatRuntime2::SetParticleWorkParam(int paramNo, CFlatRuntime::CObject* object)
 {
 	ParticleWorkParamNo(this) = paramNo;
-	if (object == 0) {
-		ParticleWorkParamId(this) = 0;
-	} else {
+	if (object != 0) {
 		ParticleWorkParamId(this) = *reinterpret_cast<short*>(reinterpret_cast<u8*>(object) + 0x30);
+	} else {
+		ParticleWorkParamId(this) = 0;
 	}
 }
 

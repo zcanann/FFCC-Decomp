@@ -175,9 +175,10 @@ void CGPartyObj::enableDamageCol(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::getReplaceStat(int)
+int CGPartyObj::getReplaceStat(int state)
 {
 	// TODO
+	return state;
 }
 
 /*

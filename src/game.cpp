@@ -72,8 +72,22 @@ void ScriptChanging__7CSystemFPc(CSystem*, char*);
 void ScriptChanged__7CSystemFPci(CSystem*, char*, int);
 void MapChanging__7CSystemFii(CSystem*, int, int);
 void MapChanged__7CSystemFiii(CSystem*, int, int, int);
+void Draw__13CFlatRuntime2Fv(void*);
+void Frame__13CFlatRuntime2Fii(void*, int, int);
+void AfterFrame__12CFlatRuntimeFi(void*, int);
+void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+    void*, int, int, int, int, void*, void*);
+void Draw__5CWindFv(void*);
+void CheckMenu__10CGPartyObjFv();
 void LoadMap__7CMapPcsFiiPvUlUc(void*, int, int, void*, unsigned long, unsigned char);
 void LoadFieldPdt__8CPartPcsFiiPvUlUc(void*, int, int, void*, unsigned long, unsigned char);
+void Draw__13CFlatRuntime2Fv(void*);
+void Draw__5CWindFv(void*);
+void Frame__13CFlatRuntime2Fii(void*, int, int);
+void CheckMenu__10CGPartyObjFv(void);
+void AfterFrame__12CFlatRuntimeFi(void*, int);
+void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+    void*, int, int, int, int, void*, void*);
 unsigned char CFlat[];
 unsigned char PartMng[];
 unsigned char McPcs[];
@@ -102,6 +116,9 @@ extern const char DAT_8032f698[];
 extern const char DAT_8032f6a0[];
 extern const char DAT_8032f6a4[];
 extern const char DAT_8032f6ac[];
+extern const char* lbl_801D60B0[];
+extern const char* lbl_801E8344[];
+int sprintf(char*, const char*, ...);
 }
 
 static const float FLOAT_8032f688 = 1.0E+10;
@@ -836,53 +853,77 @@ void CGame::Calc()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80014964
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::Calc2()
 {
-	// CFlat.Frame(0, 1);
+	Frame__13CFlatRuntime2Fii(CFlat, 0, 1);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80014934
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::Calc3()
 { 
-	// CheckMenu__10CGPartyObjFv();
-	// AfterFrame__12CFlatRuntimeFi(&CFlat,0);
+	CheckMenu__10CGPartyObjFv();
+	AfterFrame__12CFlatRuntimeFi(CFlat, 0);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800148f4
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::Draw()
 {
-	// TODO
+	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+	    CFlat, 0, 1, 6, 0, 0, 0);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800148c0
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::Draw2()
 {
-	// TODO
+	Draw__13CFlatRuntime2Fv(CFlat);
+	Draw__5CWindFv(Wind);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001486c
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::Draw3()
 {
-	// TODO
+	Frame__13CFlatRuntime2Fii(CFlat, 0, 2);
+	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+	    CFlat, 0, 1, 5, 0, 0, 0);
 }
 
 /*
@@ -907,22 +948,60 @@ void CGame::ParticleFrameCallback(int, int, int, int, int, Vec*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001462c
+ * PAL Size: 136b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGame::SaveScript(char*)
+void CGame::SaveScript(char* scriptData)
 {
-	// TODO
+    memset(scriptData, 0, 0x800);
+
+    int scriptOffset = 0;
+    int entryOffset = 0;
+    int i = 0;
+    int count = *(int*)(CFlat + 4);
+    u8* table = *(u8**)(CFlat + 8);
+    u32* values = *(u32**)(CFlat + 12);
+
+    while (i < count) {
+        if ((table[entryOffset + 1] & 0x20) != 0) {
+            *(u32*)(scriptData + scriptOffset) = values[i];
+            scriptOffset += 4;
+        }
+        entryOffset += 4;
+        ++i;
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800145d8
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGame::LoadScript(char*)
+void CGame::LoadScript(char* scriptData)
 {
-	// TODO
+    int scriptOffset = 0;
+    int entryOffset = 0;
+    int i = 0;
+    int count = *(int*)(CFlat + 4);
+    u8* table = *(u8**)(CFlat + 8);
+    u32* values = *(u32**)(CFlat + 12);
+
+    while (i < count) {
+        if ((table[entryOffset + 1] & 0x20) != 0) {
+            values[i] = *(u32*)(scriptData + scriptOffset);
+            scriptOffset += 4;
+        }
+        entryOffset += 4;
+        ++i;
+    }
 }
 
 /*

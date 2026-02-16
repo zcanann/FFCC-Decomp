@@ -170,89 +170,83 @@ void RedDelete(void* param_1)
  */
 int RedNewA(int size, int offset, int maxSize)
 {
-	if (size < 1 || !DAT_8032f4a4 || !DAT_8032f494) {
+	unsigned int alignedSize;
+	unsigned int moveCount;
+	int result;
+	unsigned int interrupts;
+	int iVar5;
+	int iVar6;
+	int iVar7;
+	int iVar8;
+	int* bestBlock;
+	int* blockPtr;
+	int* scanPtr;
+
+	if (size < 1 || DAT_8032f4a4 == (int*)0 || DAT_8032f494 == 0) {
 		return 0;
 	}
-	
 	if (DAT_8032f4a4[0x7FF] >= 1) {
-		if (DAT_8032f408) {
+		if (DAT_8032f408 != 0) {
 			OSReport(s__s_sA_Memory_Bank_Full____s_801e78b5, &DAT_801e78a3, &DAT_80333d20, &DAT_80333d28);
 			fflush(&DAT_8021d1a8);
 		}
 		return 0;
 	}
-	
-	unsigned int interrupts = OSDisableInterrupts();
-	int baseAddr = DAT_8032f494 + offset;
-	
+
+	interrupts = OSDisableInterrupts();
+	iVar6 = DAT_8032f494 + offset;
 	if (maxSize == 0) {
 		maxSize = DAT_8032f49c;
 	}
 	maxSize = maxSize - offset;
-	
-	unsigned int alignedSize = (size + 0x1F) & 0xFFFFFFE0;
-	int bestFit = -1;
-	int* bestBlock = 0;
-	int* blockPtr = DAT_8032f4a4;
-	
-	// Find first block that comes after our base address
-	while (blockPtr[1] != 0 && blockPtr[0] < baseAddr) {
-		blockPtr += 2;
+	alignedSize = size + 0x1FU & 0xFFFFFFE0;
+	iVar7 = -1;
+	bestBlock = (int*)0;
+	for (blockPtr = DAT_8032f4a4; (blockPtr[1] != 0 && *blockPtr < iVar6); blockPtr = blockPtr + 2) {
 	}
-	
-	int searchSpace = maxSize;
-	int resultAddr = baseAddr;
-	int currentAddr = baseAddr;
-	int* targetBlock = blockPtr;
-	
+	iVar5 = maxSize;
+	result = iVar6;
+	iVar8 = iVar6;
+	scanPtr = blockPtr;
 	if (blockPtr[1] != 0) {
-		// Search through existing blocks for best fit
-		while (blockPtr[1] != 0 && blockPtr < DAT_8032f4a4 + 0x800) {
-			if (currentAddr < baseAddr + maxSize) {
-				if ((int)(currentAddr + alignedSize) <= blockPtr[0]) {
-					bestFit = currentAddr;
-					bestBlock = blockPtr;
-					if (blockPtr[0] - currentAddr < searchSpace) {
-						searchSpace = blockPtr[0] - currentAddr;
+		for (; scanPtr[1] != 0 && scanPtr < DAT_8032f4a4 + 0x800; scanPtr = scanPtr + 2) {
+			if (iVar8 < iVar6 + maxSize) {
+				if ((int)(iVar8 + alignedSize) <= *scanPtr) {
+					iVar7 = iVar8;
+					bestBlock = scanPtr;
+					if (*scanPtr - iVar8 < iVar5) {
+						iVar5 = *scanPtr - iVar8;
 					}
 				}
 			} else {
-				blockPtr = DAT_8032f4a4 + 0x800;
+				scanPtr = DAT_8032f4a4 + 0x800;
 			}
-			currentAddr = blockPtr[0] + blockPtr[1];
-			blockPtr += 2;
+			iVar8 = *scanPtr + scanPtr[1];
 		}
-		
-		resultAddr = bestFit;
-		targetBlock = bestBlock;
-		
-		// Check if we can fit at the end
-		if (blockPtr[1] == 0 && blockPtr < DAT_8032f4a4 + 0x800) {
-			int remainingSpace = (baseAddr + maxSize) - currentAddr;
-			if ((int)alignedSize <= remainingSpace && remainingSpace < searchSpace) {
-				resultAddr = currentAddr;
-				targetBlock = blockPtr;
-			}
+		result = iVar7;
+		blockPtr = bestBlock;
+		if (((scanPtr[1] == 0 && scanPtr < DAT_8032f4a4 + 0x800) &&
+		     (iVar7 = (iVar6 + maxSize) - iVar8, (int)alignedSize <= iVar7)) &&
+		    iVar7 < iVar5) {
+			result = iVar8;
+			blockPtr = scanPtr;
 		}
 	}
-	
-	if (!targetBlock || (unsigned int)(baseAddr + maxSize) < resultAddr + alignedSize) {
+	if (blockPtr == (int*)0 || (unsigned int)(iVar6 + maxSize) < result + alignedSize) {
 		OSRestoreInterrupts(interrupts);
 		return 0;
 	}
-	
-	if (targetBlock[1] > 0) {
-		unsigned int moveCount = (int)DAT_8032f4a4 + (0x2000 - (int)(targetBlock + 2));
-		int entryCount = ((int)moveCount >> 3) + ((int)moveCount < 0 && (moveCount & 7) != 0);
-		if (entryCount > 0) {
-			memmove(targetBlock + 2, targetBlock, entryCount * 8);
+	if (0 < blockPtr[1]) {
+		moveCount = (int)DAT_8032f4a4 + (0x2000 - (int)(blockPtr + 2));
+		iVar6 = ((int)moveCount >> 3) + (unsigned int)((int)moveCount < 0 && (moveCount & 7) != 0);
+		if (0 < iVar6) {
+			memmove(blockPtr + 2, blockPtr, iVar6 * 8);
 		}
 	}
-	
-	targetBlock[0] = resultAddr;
-	targetBlock[1] = alignedSize;
+	*blockPtr = result;
+	blockPtr[1] = alignedSize;
 	OSRestoreInterrupts(interrupts);
-	return resultAddr;
+	return result;
 }
 
 /*

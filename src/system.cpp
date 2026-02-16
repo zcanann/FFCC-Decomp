@@ -12,6 +12,7 @@
 #include "ffcc/stopwatch.h"
 #include "ffcc/gbaque.h"
 #include "ffcc/textureman.h"
+#include "ffcc/usb.h"
 
 #include "dolphin/gx/GXPerf.h"
 #include "dolphin/os.h"
@@ -204,8 +205,7 @@ void CSystem::Printf(char* fmt, ...)
     va_start(args, fmt);
     vsprintf(buffer, fmt, args);
     va_end(args);
-    OSReport(buffer);
-    // USB.Printf(buffer);
+    USB.Printf(buffer);
 }
 
 /*

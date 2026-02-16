@@ -225,6 +225,7 @@ void GXGetLightDir(const GXLightObj* lt_obj, f32* nx, f32* ny, f32* nz) {
 
 void GXInitSpecularDir(GXLightObj* lt_obj, f32 nx, f32 ny, f32 nz) {
     f32 mag;
+    f32 tmp;
     f32 vx;
     f32 vy;
     f32 vz;
@@ -236,9 +237,13 @@ void GXInitSpecularDir(GXLightObj* lt_obj, f32 nx, f32 ny, f32 nz) {
 
     vx = -nx;
     vy = -ny;
-    vz = -nz + 1.0f;
+    vz = 1.0f - nz;
 
-    mag = (vx * vx) + (vy * vy) + (vz * vz);
+    mag = vx * vx;
+    tmp = vy * vy;
+    mag += tmp;
+    tmp = vz * vz;
+    mag += tmp;
     if (mag != 0.0f) {
         mag = 1.0f / sqrtf(mag);
     }

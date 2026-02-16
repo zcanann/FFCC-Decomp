@@ -2,6 +2,7 @@
 #include "dolphin/mtx.h"
 
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
+extern int DAT_8032ed70;
 
 struct UnkC {
     unsigned char _pad[0xC];
@@ -46,9 +47,104 @@ void UpdateParticle(VYmBreath*, PYmBreath*, PARTICLE_DATA*, VColor*, PARTICLE_CO
  * Address:	TODO
  * Size:	TODO
  */
-void UpdateAllParticle(_pppPObject*, VYmBreath*, PYmBreath*, VColor*)
+void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VColor* vColor)
 {
-	// TODO
+    int spawnCount;
+    int particleIndex;
+    int groupIndex;
+    int slotIndex;
+    unsigned char* ymBreathWork = (unsigned char*)vYmBreath;
+    unsigned char* particleData = (unsigned char*)*(void**)(ymBreathWork + 0x30);
+    unsigned char* particleWmat = (unsigned char*)*(void**)(ymBreathWork + 0x34);
+    unsigned char* particleColor = (unsigned char*)*(void**)(ymBreathWork + 0x38);
+    int* groupTable = *(int**)(ymBreathWork + 0x3C);
+    int maxParticleCount = *(int*)(ymBreathWork + 0x40);
+    unsigned short emitInterval = *(unsigned short*)((unsigned char*)pYmBreath + 0x1E);
+    unsigned short emitMaxPerFrame = *(unsigned short*)((unsigned char*)pYmBreath + 0x1C);
+    unsigned short particlesPerGroup = *(unsigned short*)((unsigned char*)pYmBreath + 0x10);
+    unsigned short groupTableCount = *(unsigned short*)((unsigned char*)pYmBreath + 0x12);
+
+    if ((DAT_8032ed70 != 0) || (*(short*)((unsigned char*)pYmBreath + 0xC) == -1)) {
+        return;
+    }
+
+    spawnCount = 0;
+    *(short*)(ymBreathWork + 0x44) = *(short*)(ymBreathWork + 0x44) + 1;
+
+    for (particleIndex = 0; particleIndex < maxParticleCount; particleIndex++) {
+        if (*(short*)(particleData + 0x50) < 1) {
+            short foundSlot = -1;
+            short foundGroup = -1;
+
+            SearchIndex(pYmBreath, vYmBreath, foundSlot, foundGroup, (short)particleIndex);
+            if (foundGroup != -1) {
+                int* group = groupTable + (int)foundGroup * 0x17;
+                *(unsigned char*)(group[1] + foundSlot) = 0xFF;
+                IsDeadGroupBreath(pYmBreath, vYmBreath, foundGroup);
+            }
+
+            if ((emitInterval <= *(unsigned short*)(ymBreathWork + 0x44)) && (spawnCount < (int)emitMaxPerFrame)) {
+                BirthParticle(pppObject, vYmBreath, pYmBreath, vColor, (PARTICLE_DATA*)particleData,
+                              (PARTICLE_WMAT*)particleWmat, (PARTICLE_COLOR*)particleColor);
+                spawnCount++;
+
+                for (groupIndex = 0; groupIndex < (int)groupTableCount; groupIndex++) {
+                    int* group = groupTable + groupIndex * 0x17;
+                    for (slotIndex = 0; slotIndex < (int)particlesPerGroup; slotIndex++) {
+                        if ((*(signed char*)(group[1] + slotIndex) == -1) &&
+                            (*(signed char*)(group[2] + slotIndex) == -1)) {
+                            *(signed char*)(group[1] + slotIndex) = (signed char)particleIndex;
+                            *(unsigned char*)(group[2] + slotIndex) = 1;
+                            groupIndex = (int)groupTableCount;
+                            break;
+                        }
+                    }
+                }
+            }
+        } else {
+            UpdateParticle(vYmBreath, pYmBreath, (PARTICLE_DATA*)particleData, vColor, (PARTICLE_COLOR*)particleColor);
+        }
+
+        particleData += 0x98;
+        if (particleWmat != NULL) {
+            particleWmat += 0x30;
+        }
+        if (particleColor != NULL) {
+            particleColor += 0x20;
+        }
+    }
+
+    if (spawnCount > 0) {
+        *(short*)(ymBreathWork + 0x44) = 0;
+    }
+
+    for (groupIndex = 0; groupIndex < (int)groupTableCount; groupIndex++) {
+        int* group = groupTable + groupIndex * 0x17;
+        if ((group[0] != 1) && (*(signed char*)group[1] != -1) && (*(signed char*)group[2] == 1)) {
+            float* position = (float*)(group + 3);
+            float* velocity = (float*)(group + 6);
+            group[9] = *(int*)((unsigned char*)pYmBreath + 0x14);
+            position[0] = 0.0f;
+            position[1] = 0.0f;
+            position[2] = 0.0f;
+            velocity[0] = 0.0f;
+            velocity[1] = 0.0f;
+            velocity[2] = 1.0f;
+            group[0] = 1;
+        }
+    }
+
+    for (groupIndex = 0; groupIndex < (int)groupTableCount; groupIndex++) {
+        int* group = groupTable + groupIndex * 0x17;
+        if (group[0] != 0) {
+            float* position = (float*)(group + 3);
+            float* velocity = (float*)(group + 6);
+            float step = (float)group[9];
+            position[0] += velocity[0] * step;
+            position[1] += velocity[1] * step;
+            position[2] += velocity[2] * step;
+        }
+    }
 }
 
 /*
@@ -178,9 +274,34 @@ extern "C" void pppDestructYmBreath(pppYmBreath* ymBreath, UnkC* dataOffsets)
  * Address:	TODO
  * Size:	TODO
  */
-void IsDeadGroupBreath(PYmBreath*, VYmBreath*, short)
+void IsDeadGroupBreath(PYmBreath* pYmBreath, VYmBreath* vBreathModel, short groupIndex)
 {
-	// TODO
+    int i;
+    int groupTable = *(int*)((unsigned char*)vBreathModel + 0x3C) + (int)groupIndex * 0x5C;
+    bool isDead = true;
+    float zero = 0.0f;
+    int* groupData = (int*)groupTable;
+
+    for (i = 0; i < *(unsigned short*)((unsigned char*)pYmBreath + 0x10); i++) {
+        if ((*(signed char*)(groupData[1] + i) != -1) || (*(signed char*)(groupData[2] + i) != 1)) {
+            isDead = false;
+            break;
+        }
+    }
+
+    if (isDead) {
+        for (i = 0; i < *(unsigned short*)((unsigned char*)pYmBreath + 0x10); i++) {
+            *(unsigned char*)(groupData[2] + i) = 0xFF;
+            groupData[3] = (int)zero;
+            groupData[4] = (int)zero;
+            groupData[5] = (int)zero;
+            groupData[6] = (int)zero;
+            groupData[7] = (int)zero;
+            groupData[8] = (int)zero;
+            groupData[9] = (int)zero;
+        }
+        groupData[0] = 0;
+    }
 }
 
 /*
@@ -188,9 +309,25 @@ void IsDeadGroupBreath(PYmBreath*, VYmBreath*, short)
  * Address:	TODO
  * Size:	TODO
  */
-void SearchIndex(PYmBreath*, VYmBreath*, short&, short&, short)
+void SearchIndex(PYmBreath* pYmBreath, VYmBreath* vYmBreath, short& slotIndex, short& groupIndex, short particleIndex)
 {
-	// TODO
+    int groupTable = *(int*)((unsigned char*)vYmBreath + 0x3C);
+    short g;
+    short s;
+
+    for (g = 0; g < *(unsigned short*)((unsigned char*)pYmBreath + 0x12); g++) {
+        for (s = 0; s < *(unsigned short*)((unsigned char*)pYmBreath + 0x10); s++) {
+            if ((int)particleIndex == (int)*(signed char*)(*(int*)(groupTable + 4) + s)) {
+                slotIndex = s;
+                groupIndex = g;
+                return;
+            }
+        }
+        groupTable += 0x5C;
+    }
+
+    slotIndex = -1;
+    groupIndex = -1;
 }
 
 /*
@@ -198,7 +335,15 @@ void SearchIndex(PYmBreath*, VYmBreath*, short&, short&, short)
  * Address:	TODO
  * Size:	TODO
  */
-void IsExistGroupParticle(PYmBreath*, VYmBreath*, short)
+void IsExistGroupParticle(PYmBreath* pYmBreath, VYmBreath* vYmBreath, short particleIndex)
 {
-	// TODO
+    short slotIndex;
+    short groupIndex;
+    int* groupArray;
+
+    SearchIndex(pYmBreath, vYmBreath, slotIndex, groupIndex, particleIndex);
+    if (groupIndex != -1) {
+        groupArray = *(int**)((unsigned char*)vYmBreath + 0x3C);
+        *(unsigned char*)(groupArray[groupIndex * 0x17 + 1] + slotIndex) = 0xFF;
+    }
 }

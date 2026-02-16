@@ -13,6 +13,12 @@ namespace {
 static char s_maphit_cpp[] = "maphit.cpp";
 static const float s_large_pos = 3.4e38f;
 static const float s_large_neg = -3.4e38f;
+static const float s_epsilon = 0.0001f;
+static const float s_push = 0.01f;
+
+static CMapHitFace* s_hit_face_min = 0;
+static int s_hit_edge_index = -1;
+static float s_hit_t_min = s_large_pos;
 
 static inline unsigned char* Ptr(void* p, unsigned int offset)
 {
@@ -398,7 +404,7 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
  */
 void CMapHit::CheckHitFaceCylinder(unsigned long)
 {
-	// TODO
+    // TODO
 }
 
 /*
@@ -416,7 +422,7 @@ void CMapCylinder::operator= (const CMapCylinder&)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapHit::GetHitFaceNormal(Vec*)
+void CMapHit::GetHitFaceNormal(Vec* out)
 {
 	// TODO
 }
@@ -426,9 +432,25 @@ void CMapHit::GetHitFaceNormal(Vec*)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapHit::CalcHitSlide(Vec*, float)
+void CMapHit::CalcHitSlide(Vec* out, float y)
 {
-	// TODO
+    if (s_hit_edge_index == -1) {
+        if (s_hit_face_min != 0 && y <= s_hit_face_min->m_boundsMin.y) {
+            float len = PSVECMag(&g_hit_cyl_min.m_direction);
+            if (len > s_epsilon) {
+                PSVECScale(&g_hit_cyl_min.m_direction, out, s_hit_t_min - (s_push / len));
+            } else {
+                out->x = 0.0f;
+                out->y = 0.0f;
+                out->z = 0.0f;
+            }
+            return;
+        }
+    }
+
+    out->x = 0.0f;
+    out->y = 0.0f;
+    out->z = 0.0f;
 }
 
 /*
@@ -436,9 +458,18 @@ void CMapHit::CalcHitSlide(Vec*, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapHit::CalcHitPosition(Vec*)
+void CMapHit::CalcHitPosition(Vec* position)
 {
-	// TODO
+    float len = PSVECMag(&g_hit_cyl_min.m_direction);
+    float push = (s_hit_edge_index == -1) ? s_push : s_epsilon;
+    if (len > s_epsilon) {
+        PSVECScale(&g_hit_cyl_min.m_direction, position, s_hit_t_min - (push / len));
+    } else {
+        position->x = 0.0f;
+        position->y = 0.0f;
+        position->z = 0.0f;
+    }
+    PSVECAdd(&g_hit_cyl_min.m_bottom, position, position);
 }
 
 /*

@@ -1,5 +1,10 @@
 #include "ffcc/menu_cmd.h"
+#include "ffcc/joybus.h"
+#include "ffcc/p_game.h"
 #include "dolphin/types.h"
+
+extern "C" int GetItemType__8CMenuPcsFii(CMenuPcs*, int, int);
+extern "C" int GetItemIcon__8CMenuPcsFi(CMenuPcs*, int);
 
 /*
  * --INFO--
@@ -367,12 +372,71 @@ unsigned int CMenuPcs::CmdClose0()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8014cce0
+ * PAL Size: 536b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::GetCmdItem()
 {
-	// TODO
+	u32 scriptFood = Game.game.m_scriptFoodBase[0];
+	s16* list = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
+	s16* write = list;
+	s32 count = 0;
+	u32 itemIndexPtr = scriptFood + 0xb6;
+
+	for (s32 i = 0; i < 0x40; i++) {
+		s32 itemType = GetItemType__8CMenuPcsFii(this, i, 0);
+		if ((itemType != 0) && (itemType != 5) && (itemType != 6) && (itemType != 8) && (itemType != 9)) {
+			if ((itemType != 1) ||
+			    (static_cast<u32>(GetItemIcon__8CMenuPcsFi(this, *reinterpret_cast<s16*>(itemIndexPtr))) ==
+			     (*reinterpret_cast<u16*>(scriptFood + 0x3e0) & 3))) {
+				write++;
+				*write = static_cast<s16>(i);
+				count++;
+			}
+		}
+		itemIndexPtr += 2;
+	}
+
+	s16* write2 = list + count;
+	u32 artifactPtr = scriptFood;
+	for (s32 i = 0; i < 0x49; i++) {
+		s32 arti = i + 0x9f;
+		if (*reinterpret_cast<s16*>(artifactPtr + 0x136) == arti) {
+			if ((arti > 0xde) && (arti < 0xe4)) {
+				count++;
+				write2++;
+				*write2 = static_cast<s16>(i + 0x40);
+			}
+		}
+		artifactPtr += 2;
+	}
+
+	s16* write3 = list + count;
+	if ((*reinterpret_cast<s16*>(scriptFood + 0x1f6) > 0xde) && (*reinterpret_cast<s16*>(scriptFood + 0x1f6) < 0xe4)) {
+		count++;
+		write3++;
+		*write3 = 0xa0;
+	}
+	if ((*reinterpret_cast<s16*>(scriptFood + 0x1f8) > 0xde) && (*reinterpret_cast<s16*>(scriptFood + 0x1f8) < 0xe4)) {
+		count++;
+		write3++;
+		*write3 = 0xa1;
+	}
+	if ((*reinterpret_cast<s16*>(scriptFood + 0x1fa) > 0xde) && (*reinterpret_cast<s16*>(scriptFood + 0x1fa) < 0xe4)) {
+		count++;
+		write3++;
+		*write3 = 0xa2;
+	}
+	if ((*reinterpret_cast<s16*>(scriptFood + 0x1fc) > 0xde) && (*reinterpret_cast<s16*>(scriptFood + 0x1fc) < 0xe4)) {
+		count++;
+		write3[1] = 0xa3;
+	}
+
+	*reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0)) = static_cast<s16>(count + 2);
 }
 
 /*

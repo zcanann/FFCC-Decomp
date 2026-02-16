@@ -189,7 +189,7 @@ EXCEPTION: If making a first pass at a large function, mangled code is tolerable
 
 **Required steps to create PR:**
 1. **Commit changes**: `git commit -m "Descriptive message"`
-2. **Push branch**: `git push origin pr/<unit>`
+2. **Push branch**: `git push -u origin HEAD`
 3. **Create PR**: `gh pr create --title "..." --body "..."`
 
 **PR description must include:**
@@ -208,7 +208,7 @@ EXCEPTION: If making a first pass at a large function, mangled code is tolerable
 ### Branch Management - ALWAYS FROM MAIN!
 - **ALWAYS branch from `main`**, never from existing PRs
 - Before creating new branch: `git checkout main && git pull origin main`
-- Branch naming: `pr/unit_name` (e.g., `pr/main_pppMove`)
+- Branch naming: `pr/<unit>/$(date -u +%s)` (example: `pr/main/pppMove/1739481600`)
 - **Why this matters**: Branching from PRs creates dependency chains that contaminate later PRs with unmerged changes
 
 ### Code Quality - Clean Source Only!

@@ -123,15 +123,15 @@ public:
 	void reqFinished(int, CFlatRuntime::CObject*);
 	void onDeleteObject(CFlatRuntime::CObject*);
 	void onNewObject(CFlatRuntime::CObject*);
-	void getFreeObject(int);
-	void intToClass(int);
+	CFlatRuntime::CObject* getFreeObject(int);
+	CFlatRuntime::CClass* intToClass(int);
 
-	void onSystemVal(CFlatRuntime::CObject*, int);
-	void onClassSystemVal(CFlatRuntime::CObject*, int);
+	CFlatRuntime::CVal* onSystemVal(CFlatRuntime::CObject*, int);
+	CFlatRuntime::CVal* onClassSystemVal(CFlatRuntime::CObject*, int);
 	void onSetSystemVal(int, CFlatRuntime::CStack*, int);
 	void onSetClassSystemVal(int, CFlatRuntime::CObject*, CFlatRuntime::CStack*, int);
-	void onClassSystemFunc(CFlatRuntime::CObject*, int, int, int&);
-	void onSystemFunc(CFlatRuntime::CObject*, int, int, int&);
+	int onClassSystemFunc(CFlatRuntime::CObject*, int, int, int&);
+	int onSystemFunc(CFlatRuntime::CObject*, int, int, int&);
 };
 
 #endif // _FFCC_CFLAT_RUNTIME_H_

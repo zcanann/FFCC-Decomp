@@ -501,9 +501,9 @@ void CFlatRuntime::onNewObject(CFlatRuntime::CObject*)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::getFreeObject(int)
+CFlatRuntime::CObject* CFlatRuntime::getFreeObject(int)
 {
-	// TODO
+	return 0;
 }
 
 /*
@@ -511,9 +511,9 @@ void CFlatRuntime::getFreeObject(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::intToClass(int)
+CFlatRuntime::CClass* CFlatRuntime::intToClass(int)
 {
-	// TODO
+	return 0;
 }
 
 /*
@@ -521,9 +521,9 @@ void CFlatRuntime::intToClass(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::onSystemVal(CFlatRuntime::CObject*, int)
+CFlatRuntime::CVal* CFlatRuntime::onSystemVal(CFlatRuntime::CObject* object, int)
 {
-	// TODO
+	return reinterpret_cast<CVal*>(reinterpret_cast<u8*>(object) + 0x96C);
 }
 
 /*
@@ -531,9 +531,9 @@ void CFlatRuntime::onSystemVal(CFlatRuntime::CObject*, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::onClassSystemVal(CFlatRuntime::CObject*, int)
+CFlatRuntime::CVal* CFlatRuntime::onClassSystemVal(CFlatRuntime::CObject* object, int)
 {
-	// TODO
+	return reinterpret_cast<CVal*>(reinterpret_cast<u8*>(object) + 0x96C);
 }
 
 /*
@@ -561,9 +561,9 @@ void CFlatRuntime::onSetClassSystemVal(int, CFlatRuntime::CObject*, CFlatRuntime
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::onClassSystemFunc(CFlatRuntime::CObject*, int, int, int&)
+int CFlatRuntime::onClassSystemFunc(CFlatRuntime::CObject*, int, int, int&)
 {
-	// TODO
+	return 0;
 }
 
 /*
@@ -571,7 +571,7 @@ void CFlatRuntime::onClassSystemFunc(CFlatRuntime::CObject*, int, int, int&)
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::onSystemFunc(CFlatRuntime::CObject*, int, int, int&)
+int CFlatRuntime::onSystemFunc(CFlatRuntime::CObject*, int, int, int&)
 {
-	// TODO
+	return 0;
 }

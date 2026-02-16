@@ -8,6 +8,7 @@
 #include "ffcc/map.h"
 #include "ffcc/sound.h"
 #include "ffcc/graphic.h"
+#include "ffcc/file.h"
 
 #include <string.h>
 
@@ -66,6 +67,7 @@ void ResetNewGame__13CFlatRuntime2Fv(void*);
 void InitFurTexBuffer__6CCharaFv(void*);
 void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
+int sprintf(char*, const char*, ...);
 void ScriptChanging__7CSystemFPc(CSystem*, char*);
 void ScriptChanged__7CSystemFPci(CSystem*, char*, int);
 void MapChanging__7CSystemFii(CSystem*, int, int);
@@ -664,12 +666,80 @@ void CGame::MapChanged(int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80014b90
+ * PAL Size: 364b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::loadCfd()
 {
-	// TODO
+    struct FlatDataEntry
+    {
+        unsigned int m_size;
+        void* m_data;
+    };
+
+    struct FlatDataLayout
+    {
+        int m_dataCount;
+        FlatDataEntry m_data[5];
+    };
+
+    static const char* const sLangDirs[] =
+    {
+        "jp/",
+        "uk/",
+        "gr/",
+        "it/",
+        "fr/",
+        "sp/"
+    };
+
+    static const char* const sCfdPathFormats[] =
+    {
+        "dvd/%scft/param.cfd",
+        "dvd/%scft/c_system.cfd",
+        "dvd/%scft/mail_tbl.cfd",
+        "dvd/%scft/newbattle.cfd"
+    };
+
+    char path[0x10C];
+
+    for (int i = 0; i < 4; i++)
+    {
+        const char* localLangDirs[6];
+        localLangDirs[0] = sLangDirs[0];
+        localLangDirs[1] = sLangDirs[1];
+        localLangDirs[2] = sLangDirs[2];
+        localLangDirs[3] = sLangDirs[3];
+        localLangDirs[4] = sLangDirs[4];
+        localLangDirs[5] = sLangDirs[5];
+
+        sprintf(path, sCfdPathFormats[i], localLangDirs[m_gameWork.m_languageId]);
+        CFile::CHandle* handle = File.Open(path, 0, CFile::PRI_LOW);
+
+        if (handle != nullptr)
+        {
+            File.Read(handle);
+            File.SyncCompleted(handle);
+            m_cFlatDataArr[i].Create(File.m_readBuffer);
+            File.Close(handle);
+        }
+    }
+
+    FlatDataLayout* flatData = reinterpret_cast<FlatDataLayout*>(m_cFlatDataArr);
+
+    unkCFlatData0[0] = (unsigned int)flatData[0].m_data[0].m_data;
+    unkCFlatData0[1] = (unsigned int)flatData[0].m_data[1].m_data;
+    unkCFlatData0[2] = (unsigned int)flatData[0].m_data[2].m_data;
+    m_scriptFoodBase[0] = (unsigned int)flatData[2].m_data[0].m_data;
+    unk_flat3_field_8_0xc7dc = (unsigned int)flatData[3].m_data[0].m_data;
+    unk_flat3_field_1C_0xc7d8 = (unsigned int)flatData[3].m_data[1].m_data;
+    unk_flat3_count_0xc7d4 = flatData[3].m_data[1].m_size / 0x1A;
+    unk_flat3_field_30_0xc7e0 = (unsigned int)flatData[3].m_data[2].m_data;
+    m_bossArtifactBase = (unsigned int)flatData[3].m_data[3].m_data;
 }
 
 /*

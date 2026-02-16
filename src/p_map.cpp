@@ -4,6 +4,7 @@
 #include "ffcc/map.h"
 #include "ffcc/materialman.h"
 #include "ffcc/p_camera.h"
+#include "ffcc/p_game.h"
 
 #include <dolphin/mtx.h>
 
@@ -44,6 +45,8 @@ extern unsigned int lbl_8032ECCC;
 extern unsigned int lbl_8032ECD0;
 extern unsigned int CFlatFlags;
 extern CMaterialMan MaterialMan;
+extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
+extern "C" const char s_p_map_cpp_801d7728[];
 
 extern "C" void __dl__FPv(void*);
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
@@ -243,12 +246,58 @@ void CMapPcs::drawBeforeViewer()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80034dc0
+ * PAL Size: 532b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapPcs::drawViewer()
 {
-	// TODO
+    if ((*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x180) != 0) &&
+        (*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x178) == 0)) {
+        Mtx cameraMtx;
+        Mtx44 screenMtx;
+
+        if (Game.game.m_currentSceneId == 3) {
+            _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_map_cpp_801d7728, 0x2C4);
+        }
+
+        MaterialMan.InitVtxFmt(-1, GX_F32, 0, GX_RGBA4, 0xE, GX_RGBA6, 0xA);
+
+        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228DC) =
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0);
+        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228E0) =
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4);
+        *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228E4) =
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
+
+        PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<char*>(&CameraPcs) + 0x4), cameraMtx);
+        PSMTX44Copy(*reinterpret_cast<Mtx44*>(reinterpret_cast<char*>(&CameraPcs) + 0x48), screenMtx);
+        MapMng.SetViewMtx(cameraMtx, screenMtx);
+        Graphic.SetFog(*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&MapMng) + 0x22978), 0);
+
+        GXSetColorUpdate(GX_TRUE);
+        GXSetAlphaUpdate(GX_FALSE);
+        GXSetCullMode(GX_CULL_BACK);
+        GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+
+        _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+        _GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+        _GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+        _GXSetTevSwapModeTable(GX_TEV_SWAP3, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+        _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+        _GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
+        _GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
+        _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
+
+        MapMng.Draw();
+
+        if (Game.game.m_currentSceneId == 3) {
+            _WaitDrawDone__8CGraphicFPci(&Graphic, s_p_map_cpp_801d7728, 0x2E0);
+        }
+    }
 }
 
 /*

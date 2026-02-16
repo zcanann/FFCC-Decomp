@@ -36,8 +36,11 @@ public:
 
 extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
+extern "C" void __ct__4CRefFv(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void* lbl_801E9BA0[];
+extern "C" void* PTR_PTR_s_CTextureSet_801e9b34;
+extern "C" void* PTR_PTR_s_CTexture_801e9b78;
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
@@ -54,6 +57,18 @@ extern "C" void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevS
 
 static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
 static char s_ptrarray_grow_error[] = "CPtrArray grow error";
+
+namespace {
+static inline unsigned char* Ptr(void* p, unsigned int offset)
+{
+    return reinterpret_cast<unsigned char*>(p) + offset;
+}
+
+static inline CPtrArray<CTexture*>* Textures(CTextureSet* textureSet)
+{
+    return reinterpret_cast<CPtrArray<CTexture*>*>(Ptr(textureSet, 8));
+}
+}
 
 /*
  * --INFO--
@@ -446,12 +461,25 @@ int CTextureMan::SetTextureTev(CTexture* texture)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003B988
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CTexture::CTexture()
 {
-	// TODO
+    __ct__4CRefFv(this);
+    *reinterpret_cast<void**>(this) = &PTR_PTR_s_CTexture_801e9b78;
+    *reinterpret_cast<unsigned char*>(Ptr(this, 0x74)) = 0;
+    *reinterpret_cast<void**>(Ptr(this, 0x78)) = 0;
+    *reinterpret_cast<void**>(Ptr(this, 0x7C)) = 0;
+    *reinterpret_cast<unsigned char*>(Ptr(this, 0x70)) = 0;
+    *reinterpret_cast<unsigned char*>(Ptr(this, 0x71)) = 0;
+    *reinterpret_cast<unsigned char*>(Ptr(this, 0x08)) = 0;
+    *reinterpret_cast<short*>(Ptr(this, 0x72)) = -1;
+    *reinterpret_cast<unsigned char*>(Ptr(this, 0x75)) = 0;
 }
 
 /*
@@ -616,12 +644,20 @@ void CTexture::FlushExternalTlut(void*, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003AD30
+ * PAL Size: 96b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CTextureSet::CTextureSet()
 {
-	// TODO
+    __ct__4CRefFv(this);
+    *reinterpret_cast<void**>(this) = &PTR_PTR_s_CTextureSet_801e9b34;
+    Textures(this)->CPtrArray<CTexture*>::CPtrArray();
+    Textures(this)->SetDefaultSize(0x10);
+    Textures(this)->SetStage(TextureMan.m_memoryStage);
 }
 
 /*
@@ -649,7 +685,7 @@ void CTextureSet::Create(void*, CMemory::CStage*, int, CAmemCacheSet*, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CTextureSet::Create(CChunkFile&, CMemory::CStage*, int, CAmemCacheSet*, int, int)
+void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int append, CAmemCacheSet* amemCacheSet, int cacheTag, int useAddress)
 {
 	// TODO
 }

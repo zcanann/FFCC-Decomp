@@ -1,8 +1,10 @@
 #include "ffcc/goout.h"
+#include <string.h>
 
 extern CGoOutMenu g_GoOutMenu;
 extern CGoOutMenu* g_pGoOutMenu;
 extern "C" int GetYesNoXPos__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" int CalcGoOutSelChar__8CMenuPcsFUcUc(CMenuPcs*, unsigned char, unsigned char);
 
 struct CMenuPcsGoOutLayout
 {
@@ -693,12 +695,241 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80168e3c
+ * PAL Size: 3548b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGoOutMenu::CalcDel()
 {
-	// TODO
+    signed char& delMode = reinterpret_cast<signed char&>(field_0x24[0]);
+    signed char& prevMode = reinterpret_cast<signed char&>(field_0x24[1]);
+    int& selectedChara = *reinterpret_cast<int*>(&field_0x24[4]);
+    CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
+
+    const unsigned char selInit = static_cast<unsigned char>(__cntlzw(2 - static_cast<int>(delMode)) >> 5 & 0xFF);
+    const int selResult = CalcGoOutSelChar__8CMenuPcsFUcUc(&MenuPcs, selInit, 0);
+    unsigned short input;
+    unsigned char next;
+
+    switch (delMode) {
+    case 0:
+        if (field_0x45 != 0) {
+            input = GetGoOutInputMask();
+            if ((input & 0x100) != 0) {
+                Sound.PlaySe(2, 0x40, 0x7f, 0);
+                if (prevMode == -1) {
+                    SetMainMode(1);
+                } else {
+                    SetDelMode(prevMode);
+                }
+            }
+        }
+        break;
+    case 2:
+        selectedChara = selResult;
+        if (selectedChara == -2) {
+            SetDelMode(1);
+        } else if (selectedChara != -1) {
+            if (Game.game.m_caravanWorkArr[selectedChara].m_shopBusyFlag == 0) {
+                SetDelMode(3);
+            } else {
+                SetDelMode(6);
+            }
+        }
+        break;
+    case 3:
+        if (field_0x45 == 0) {
+            return;
+        }
+
+        input = GetGoOutInputMask();
+        if ((input & 0x200) != 0) {
+            Sound.PlaySe(3, 0x40, 0x7f, 0);
+            SetDelMode(2);
+        }
+
+        field_0x47 = 1;
+        field74_0x4a = 0xad;
+        field75_0x4c = 0xbc;
+        field_0x49 = 0;
+        next = 0;
+
+        if (ReadMenuShort(menuPcsLayout.field_2120, 0xA) == 1) {
+            input = GetGoOutInputMask();
+            if ((input & 3) == 0) {
+                input = GetGoOutInputMask();
+                if ((input & 0x100) != 0) {
+                    if (field_0x46 == 0) {
+                        Sound.PlaySe(2, 0x40, 0x7f, 0);
+                    } else if (field_0x46 == 1) {
+                        Sound.PlaySe(3, 0x40, 0x7f, 0);
+                    }
+                    next = static_cast<unsigned char>(field_0x46 + 1);
+                }
+            } else {
+                field_0x46 ^= 1;
+                Sound.PlaySe(1, 0x40, 0x7f, 0);
+            }
+        }
+
+        if (next == 2) {
+            SetDelMode(2);
+        } else if (next == 1) {
+            SetDelMode(4);
+        }
+        break;
+    case 4:
+        if (field_0x45 == 0) {
+            return;
+        }
+
+        input = GetGoOutInputMask();
+        if ((input & 0x200) != 0) {
+            Sound.PlaySe(3, 0x40, 0x7f, 0);
+            SetDelMode(2);
+        }
+
+        field_0x47 = 1;
+        field74_0x4a = 0xc2;
+        field75_0x4c = 0xd1;
+        field_0x49 = 0;
+        next = 0;
+
+        if (ReadMenuShort(menuPcsLayout.field_2120, 0xA) == 1) {
+            input = GetGoOutInputMask();
+            if ((input & 3) == 0) {
+                input = GetGoOutInputMask();
+                if ((input & 0x100) != 0) {
+                    if (field_0x46 == 0) {
+                        Sound.PlaySe(2, 0x40, 0x7f, 0);
+                    } else if (field_0x46 == 1) {
+                        Sound.PlaySe(3, 0x40, 0x7f, 0);
+                    }
+                    next = static_cast<unsigned char>(field_0x46 + 1);
+                }
+            } else {
+                field_0x46 ^= 1;
+                Sound.PlaySe(1, 0x40, 0x7f, 0);
+            }
+        }
+
+        if (next == 2) {
+            SetDelMode(2);
+        } else if (next == 1) {
+            SetDelMode(5);
+        }
+        break;
+    case 5:
+        if (field_0x45 != 0 && MenuPcs.IsMenuCharaAnimIdle(selectedChara) != 0) {
+            input = GetGoOutInputMask();
+            if ((input & 0x100) != 0) {
+                Sound.PlaySe(2, 0x40, 0x7f, 0);
+                CCaravanWork& caravanWork = Game.game.m_caravanWorkArr[selectedChara];
+                caravanWork.m_shopState = 0;
+                memset(reinterpret_cast<unsigned char*>(&caravanWork) + 0x9A4, 0, 0x100);
+                memset(reinterpret_cast<unsigned char*>(&caravanWork) + 0xAA4, 0, 0x200);
+                SetDelMode(1);
+            }
+        }
+        break;
+    case 6:
+        if (field_0x45 == 0) {
+            return;
+        }
+
+        input = GetGoOutInputMask();
+        if ((input & 0x200) != 0) {
+            Sound.PlaySe(3, 0x40, 0x7f, 0);
+            SetDelMode(2);
+        }
+
+        field_0x47 = 1;
+        field74_0x4a = 0x97;
+        field75_0x4c = 0xe9;
+        field_0x49 = 0;
+        next = 0;
+
+        if (ReadMenuShort(menuPcsLayout.field_2120, 0xA) == 1) {
+            input = GetGoOutInputMask();
+            if ((input & 3) == 0) {
+                input = GetGoOutInputMask();
+                if ((input & 0x100) != 0) {
+                    if (field_0x46 == 0) {
+                        Sound.PlaySe(2, 0x40, 0x7f, 0);
+                    } else if (field_0x46 == 1) {
+                        Sound.PlaySe(3, 0x40, 0x7f, 0);
+                    }
+                    next = static_cast<unsigned char>(field_0x46 + 1);
+                }
+            } else {
+                field_0x46 ^= 1;
+                Sound.PlaySe(1, 0x40, 0x7f, 0);
+            }
+        }
+
+        if (next == 2) {
+            SetDelMode(2);
+        } else if (next == 1) {
+            SetDelMode(7);
+        }
+        break;
+    case 7:
+        if (field_0x45 == 0) {
+            return;
+        }
+
+        input = GetGoOutInputMask();
+        if ((input & 0x200) != 0) {
+            Sound.PlaySe(3, 0x40, 0x7f, 0);
+            SetDelMode(2);
+        }
+
+        field_0x47 = 1;
+        field74_0x4a = 0x9f;
+        field75_0x4c = 0xdb;
+        field_0x49 = 0;
+        next = 0;
+
+        if (ReadMenuShort(menuPcsLayout.field_2120, 0xA) == 1) {
+            input = GetGoOutInputMask();
+            if ((input & 3) == 0) {
+                input = GetGoOutInputMask();
+                if ((input & 0x100) != 0) {
+                    if (field_0x46 == 0) {
+                        Sound.PlaySe(2, 0x40, 0x7f, 0);
+                    } else if (field_0x46 == 1) {
+                        Sound.PlaySe(3, 0x40, 0x7f, 0);
+                    }
+                    next = static_cast<unsigned char>(field_0x46 + 1);
+                }
+            } else {
+                field_0x46 ^= 1;
+                Sound.PlaySe(1, 0x40, 0x7f, 0);
+            }
+        }
+
+        if (next == 2) {
+            SetDelMode(2);
+        } else if (next == 1) {
+            Game.game.m_caravanWorkArr[selectedChara].m_shopBusyFlag = 0;
+            SetDelMode(8);
+        }
+        break;
+    case 8:
+        if (field_0x45 != 0 && MenuPcs.IsMenuCharaAnimIdle(selectedChara) != 0) {
+            input = GetGoOutInputMask();
+            if ((input & 0x100) != 0) {
+                Sound.PlaySe(2, 0x40, 0x7f, 0);
+                SetDelMode(1);
+            }
+        }
+        break;
+    default:
+        break;
+    }
 }
 
 /*

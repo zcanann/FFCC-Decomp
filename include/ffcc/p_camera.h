@@ -67,6 +67,9 @@ public:
     void drawShadowChrBegin();
     void SetFullScreenShadow(float (*)[4], long);
     void SetFullScreenShadowCamLen(float);
+    void SetFullScreenShadowRot(float, float);
+    void SetFullScreenShadowPos(Vec*, float);
+    void SetFullScreenShadowEnable(unsigned char);
     void drawShadowEndAll();
 
     // Material editor
@@ -86,6 +89,9 @@ public:
 
     // Misc
     void SetOffsetZBuff(float);
+    void SetZRotate(float);
+    void SetPosition(Vec*);
+    void SetRefPosition(Vec*);
     void addWorldMap();
     void SetIsAbsolute(int);
     void SetWorldMapMatrix(float (*)[4]);

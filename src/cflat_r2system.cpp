@@ -818,6 +818,98 @@ extern "C" void IsHitDrawMode__7CMapPcsFc(CMapPcs*, unsigned char drawMode)
 
 /*
  * --INFO--
+ * PAL Address: 0x800B9628
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CCameraPcs::SetFullScreenShadowRot(float rotX, float rotY)
+{
+    *(float*)((char*)this + 0x364) = rotX;
+    *(float*)((char*)this + 0x368) = rotY;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9634
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CCameraPcs::SetFullScreenShadowPos(Vec* position, float len)
+{
+    *(float*)((char*)this + 0x408) = *(float*)((char*)position + 0x0);
+    *(float*)((char*)this + 0x40C) = *(float*)((char*)position + 0x4);
+    *(float*)((char*)this + 0x410) = *(float*)((char*)position + 0x8);
+    *(float*)((char*)this + 0x370) = len;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9654
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CCameraPcs::SetFullScreenShadowEnable(unsigned char enable)
+{
+    *(unsigned char*)((char*)this + 0x404) = enable;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9920
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CCameraPcs::SetZRotate(float zRotate)
+{
+    *(float*)((char*)this + 0x108) = zRotate;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9C28
+ * PAL Size: 28b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CCameraPcs::SetPosition(Vec* position)
+{
+    *(float*)((char*)this + 0xE0) = *(float*)((char*)position + 0x0);
+    *(float*)((char*)this + 0xE4) = *(float*)((char*)position + 0x4);
+    *(float*)((char*)this + 0xE8) = *(float*)((char*)position + 0x8);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9C44
+ * PAL Size: 28b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CCameraPcs::SetRefPosition(Vec* position)
+{
+    *(float*)((char*)this + 0xD4) = *(float*)((char*)position + 0x0);
+    *(float*)((char*)this + 0xD8) = *(float*)((char*)position + 0x4);
+    *(float*)((char*)this + 0xDC) = *(float*)((char*)position + 0x8);
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

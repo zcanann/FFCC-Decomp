@@ -424,16 +424,7 @@ void CMapCylinder::operator= (const CMapCylinder&)
  */
 void CMapHit::GetHitFaceNormal(Vec* out)
 {
-    if (s_hit_face_min != 0) {
-        float* normal = reinterpret_cast<float*>(s_hit_face_min);
-        out->x = normal[0];
-        out->y = normal[1];
-        out->z = normal[2];
-    } else {
-        out->x = 0.0f;
-        out->y = 0.0f;
-        out->z = 0.0f;
-    }
+	// TODO
 }
 
 /*

@@ -251,7 +251,7 @@ void TRK__write_aram(register u32 param_1, register u32 param_2, u32* param_3)
 	u32 iVar5;
 	u32 uVar6;
 	u32 uVar7;
-	u8 auStack_60[60];
+	u8 auStack_60[0x20] __attribute__((aligned(32)));
 
 	if (param_2 < 0x4000) {
 		return;

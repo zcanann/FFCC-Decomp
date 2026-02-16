@@ -352,12 +352,16 @@ void CFile::ReadASync(CFile::CHandle* fileHandle)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001366C
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFile::Close(CFile::CHandle* fileHandle)
 {
-	if ((fileHandle->m_completionStatus == 2) && (1 < (unsigned int)System.m_execParam))
+	if ((fileHandle->m_completionStatus == 2) && (2 <= (unsigned int)System.m_execParam))
 	{
 		System.Printf(s_closeWarnFmt, fileHandle->m_name);
 	}

@@ -15,22 +15,29 @@
 #define CHECK_LISTPTR(line, list)    ASSERTMSGLINE(line, (list) != NULL, "GXSetVtxAttrFmt: list pointer is NULL")
 #define CHECK_MTXIDX(line, attr, type)    ASSERTMSGLINE(line, (attr) > GX_VA_TEX7MTXIDX || (type) <= GX_VA_TEX0MTXIDX, "GXSetVtxDesc: GX_VA_*MTXIDX accepts GX_NONE or GX_DIRECT only")
 
+/*
+ * --INFO--
+ * PAL Address: 0x801A0B10
+ * PAL Size: 344b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 static void __GXXfVtxSpecs(void) {
     u32 nCols;
-    u32 nNrm;
+    s32 nNrm;
     u32 nTex;
     u32 reg;
     u32 vcdHi;
     u32 vcdLo;
 
-    if (__GXData->hasBiNrms == 0) {
-        if (__GXData->hasNrms == 0) {
-            nNrm = 0;
-        } else {
-            nNrm = 1;
-        }
-    } else {
+    if (__GXData->hasBiNrms != 0) {
         nNrm = 2;
+    } else if (__GXData->hasNrms != 0) {
+        nNrm = 1;
+    } else {
+        nNrm = 0;
     }
 
     vcdHi = __GXData->vcdHi;

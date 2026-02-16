@@ -298,18 +298,14 @@ s32 THPSimpleClose(void)
  */
 s32 THPSimpleCalcNeedMemory(void)
 {
-    s32 need;
-    s32 framePixels;
-
     if (SimpleControl.isOpen == 0) {
         return 0;
     }
 
-    framePixels = static_cast<s32>(SimpleControl.videoInfo.mXSize * SimpleControl.videoInfo.mYSize);
-    need = ((SimpleControl.header.mBufferSize + 0x1F) * 8) & ~0xFF;
-    need += (framePixels + 0x1F) & ~0x1F;
-    need += (((u32)framePixels >> 2) + 0x1F) & ~0x1F;
-    need += (((u32)framePixels >> 2) + 0x1F) & ~0x1F;
+    s32 need = ((SimpleControl.header.mBufferSize + 0x1F) * 8) & ~0xFF;
+    need += (SimpleControl.videoInfo.mXSize * SimpleControl.videoInfo.mYSize + 0x1F) & ~0x1F;
+    need += (((SimpleControl.videoInfo.mXSize * SimpleControl.videoInfo.mYSize) >> 2) + 0x1F) & ~0x1F;
+    need += (((SimpleControl.videoInfo.mXSize * SimpleControl.videoInfo.mYSize) >> 2) + 0x1F) & ~0x1F;
 
     if (SimpleControl.hasAudio != 0) {
         need += ((SimpleControl.header.mAudioMaxSamples * 4 + 0x1F) & ~0x1F) * 3;

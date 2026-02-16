@@ -36,6 +36,7 @@ extern "C" {
 int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned long);
 void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 int GetWait__4CMesFv(void*);
+unsigned char DAT_8032ecb8;
 }
 
 /*
@@ -785,6 +786,34 @@ extern "C" void SetWorldMapMatrix__10CCameraPcsFPA4_f(void* camera, Mtx matrix)
 {
     PSMTXCopy(matrix, (MtxPtr)((char*)camera + 0x34));
     PSMTXInverse(matrix, (MtxPtr)((char*)camera + 0x64));
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B95FC
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void GetWorldMapMatrix__10CCameraPcsFPA4_f(void* camera, Mtx matrix)
+{
+    PSMTXCopy((MtxPtr)((char*)camera + 0x34), matrix);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9620
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void IsHitDrawMode__7CMapPcsFc(CMapPcs*, unsigned char drawMode)
+{
+    DAT_8032ecb8 = drawMode;
 }
 
 /*

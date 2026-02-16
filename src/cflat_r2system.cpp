@@ -761,6 +761,34 @@ extern "C" void __ct__14PPPCREATEPARAMFv2(PPPCREATEPARAM* pppCreateParam)
 
 /*
  * --INFO--
+ * PAL Address: 0x800B95AC
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __opR3Vec__7CVectorFv(void)
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B95B0
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void SetWorldMapMatrix__10CCameraPcsFPA4_f(void* camera, Mtx matrix)
+{
+    PSMTXCopy(matrix, (MtxPtr)((char*)camera + 0x34));
+    PSMTXInverse(matrix, (MtxPtr)((char*)camera + 0x64));
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

@@ -91,7 +91,7 @@ class CFlatRuntime2
 	void reqFinished(int, CFlatRuntime::CObject*);
 
 	void SysControl(int, int);
-	void GetSysControl(int);
+	int GetSysControl(int);
 
 	void resetSpawnBit(int);
 	void resetChangeScript();

@@ -4,6 +4,7 @@
 #include "ffcc/RedSound/RedStream.h"
 #include "ffcc/RedSound/RedCommand.h"
 #include "ffcc/RedSound/RedExecute.h"
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/file_io.h"
 #include "dolphin/ar.h"
 #include "dolphin/ax.h"
 #include "dolphin/os.h"
@@ -48,6 +49,7 @@ extern int DAT_8032f404;
 extern int DAT_8032f410;
 extern int DAT_8032f40c;
 extern int DAT_8032f468;
+extern int DAT_8032f484;
 extern int DAT_8032f434;
 extern int DAT_8032f430;
 extern int DAT_8032f488;
@@ -98,6 +100,7 @@ extern OSThread DAT_8032d788;
 extern OSThread DAT_8032de08;
 extern OSThread DAT_8032d460;
 extern ARQRequest DAT_8032dde4;
+extern FILE DAT_8021d1a8;
 
 extern void ReverbAreaAlloc(unsigned long);
 extern void ReverbAreaFree(void*);
@@ -657,12 +660,37 @@ void _WaveSettingThread(void*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bdfac
+ * PAL Size: 280b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void _DMACheckProcess()
 {
-	// TODO
+    int semCount;
+    int* dmaInfo;
+
+    if (DAT_8032f408 != 0) {
+        OSReport("[%s]------DMA_CHECK_PROCESS------\n", "RedDriver");
+        fflush(&DAT_8021d1a8);
+
+        semCount = OSGetSemaphoreCount(&DAT_8032ddd8);
+        OSReport("[%s]Status = %d Semaphore = %d Entry = %d/%d\n", "RedDriver", DAT_8032f468, semCount, DAT_8032f484, DAT_8032f488);
+        fflush(&DAT_8021d1a8);
+    }
+
+    dmaInfo = (int*)&DAT_8032b860;
+    do {
+        if ((*dmaInfo != 0) && (DAT_8032f408 != 0)) {
+            OSReport("[%s]ID = %d MMem = %8.8X AMem = %8.8X Size = %d %d\n", "RedDriver", dmaInfo[0], dmaInfo[2], dmaInfo[3], dmaInfo[4], dmaInfo[5]);
+            fflush(&DAT_8021d1a8);
+        }
+        dmaInfo += 7;
+    } while (dmaInfo < (int*)&DAT_8032d460);
+
+    fflush(&DAT_8021d1a8);
 }
 
 /*

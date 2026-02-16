@@ -965,12 +965,16 @@ void JoyBus::WriteInitialCode(ThreadParam* threadParam)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ae228
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void ThreadAlarmHandler(OSAlarm*, OSContext*)
+void ThreadAlarmHandler(OSAlarm* alarm, OSContext*)
 {
-	// TODO
+    OSResumeThread((OSThread*)alarm->start);
 }
 
 /*

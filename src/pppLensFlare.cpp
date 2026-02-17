@@ -74,11 +74,21 @@ void pppDestructLensFlare(void)
  */
 void pppFrameLensFlare(void* obj, void* param2, void* param3)
 {
-	UnkB* unkB = (UnkB*)param2;
-	UnkC* unkC = (UnkC*)param3;
-	int offset2;
-	int offset1;
+	UnkB* unkB;
+	UnkC* unkC;
 	unsigned char* alphaPtr;
+	unsigned char argA;
+	int offset1;
+	int offset2;
+	int step;
+	u32 halfWidth;
+	u32 x0;
+	u32 y0;
+	u32 z0;
+	u32 x;
+	u32 y;
+	u32 sampleCount;
+	unsigned int zAtPixel;
 	float viewport[6];
 	float projection[7];
 	Mtx cameraMtx;
@@ -87,94 +97,85 @@ void pppFrameLensFlare(void* obj, void* param2, void* param3)
 	Vec lookDir;
 	Vec objectPos;
 	Vec cameraToObject;
-	unsigned int zAtPixel;
-	unsigned int x;
-	unsigned int y;
+	double alphaScale;
 
-	if (DAT_8032ed70 == 0) {
-		offset2 = unkC->m_serializedDataOffsets[2];
-		offset1 = unkC->m_serializedDataOffsets[1];
-		alphaPtr = (unsigned char*)((char*)obj + offset2 + 0xb2);
+	if (DAT_8032ed70 != 0) {
+		return;
+	}
 
-		u32 colorAlpha = (u8)*((u8*)obj + offset1 + 0x88);
-		double alphaScale =
-			(double)((float)((double)(0x4330000000000000ULL | colorAlpha) - DOUBLE_80331070) * FLOAT_80331064);
+	unkB = (UnkB*)param2;
+	unkC = (UnkC*)param3;
+	offset2 = unkC->m_serializedDataOffsets[2];
+	offset1 = unkC->m_serializedDataOffsets[1];
+	alphaPtr = (unsigned char*)((char*)obj + offset2 + 0xb2);
 
-		GXGetViewportv(viewport);
-		GXGetProjectionv(projection);
-		PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+	alphaScale = (double)((float)((double)(0x4330000000000000ULL | (u8)*((u8*)obj + offset1 + 0x88)) - DOUBLE_80331070) *
+						  FLOAT_80331064);
 
-		GXProject(pppMngStPtr->m_matrix.value[0][3], pppMngStPtr->m_matrix.value[1][3],
-				  pppMngStPtr->m_matrix.value[2][3], cameraMtx, projection, viewport,
-				  (float*)((char*)obj + offset2 + 0x90), (float*)((char*)obj + offset2 + 0x94),
-				  (float*)((char*)obj + offset2 + 0x98));
+	GXGetViewportv(viewport);
+	GXGetProjectionv(projection);
+	PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+	GXProject((double)pppMngStPtr->m_matrix.value[0][3], (double)pppMngStPtr->m_matrix.value[1][3],
+			  (double)pppMngStPtr->m_matrix.value[2][3], cameraMtx, projection, viewport,
+			  (float*)((char*)obj + offset2 + 0x90), (float*)((char*)obj + offset2 + 0x94),
+			  (float*)((char*)obj + offset2 + 0x98));
 
-		*alphaPtr = 0;
+	*alphaPtr = 0;
+	cameraPos.x = CameraPcs._224_4_;
+	cameraPos.y = CameraPcs._228_4_;
+	cameraPos.z = CameraPcs._232_4_;
+	cameraLookAt.x = CameraPcs._212_4_;
+	cameraLookAt.y = CameraPcs._216_4_;
+	cameraLookAt.z = CameraPcs._220_4_;
+	PSVECSubtract(&cameraLookAt, &cameraPos, &lookDir);
 
-		cameraPos.x = CameraPcs._224_4_;
-		cameraPos.y = CameraPcs._228_4_;
-		cameraPos.z = CameraPcs._232_4_;
-		cameraLookAt.x = CameraPcs._212_4_;
-		cameraLookAt.y = CameraPcs._216_4_;
-		cameraLookAt.z = CameraPcs._220_4_;
+	objectPos.x = pppMngStPtr->m_matrix.value[0][3];
+	objectPos.y = pppMngStPtr->m_matrix.value[1][3];
+	objectPos.z = pppMngStPtr->m_matrix.value[2][3];
+	PSVECSubtract(&cameraPos, &objectPos, &cameraToObject);
+	PSVECScale(&cameraToObject, &cameraToObject, FLOAT_80331068);
+	PSVECNormalize(&lookDir, &lookDir);
+	PSVECNormalize(&cameraToObject, &cameraToObject);
 
-		PSVECSubtract(&cameraLookAt, &cameraPos, &lookDir);
+	*(float*)((char*)obj + offset2 + 0xb4) = PSVECDotProduct(&cameraToObject, &lookDir);
+	x0 = (int)*(float*)((char*)obj + offset2 + 0x90) & 0xffff;
+	y0 = (int)*(float*)((char*)obj + offset2 + 0x94) & 0xffff;
+	argA = (u8)unkB->m_arg3;
+	halfWidth = argA >> 1;
+	z0 = __cvt_fp2unsigned((double)(FLOAT_8033106c * *(float*)((char*)obj + offset2 + 0x98)));
+	step = (short)((u16)argA / (u16)*((u8*)(&unkB->m_arg3) + 1));
 
-		objectPos.x = pppMngStPtr->m_matrix.value[0][3];
-		objectPos.y = pppMngStPtr->m_matrix.value[1][3];
-		objectPos.z = pppMngStPtr->m_matrix.value[2][3];
-
-		PSVECSubtract(&cameraPos, &objectPos, &cameraToObject);
-		PSVECScale(&cameraToObject, &cameraToObject, FLOAT_80331068);
-		PSVECNormalize(&lookDir, &lookDir);
-		PSVECNormalize(&cameraToObject, &cameraToObject);
-
-		*(float*)((char*)obj + offset2 + 0xb4) = PSVECDotProduct(&cameraToObject, &lookDir);
-
-		u32 halfWidth = ((u8)unkB->m_arg3) >> 1;
-		u32 x0 = ((int)*(float*)((char*)obj + offset2 + 0x90)) & 0xffff;
-		u32 y0 = ((int)*(float*)((char*)obj + offset2 + 0x94)) & 0xffff;
-		u32 z0 = __cvt_fp2unsigned((double)(FLOAT_8033106c * *(float*)((char*)obj + offset2 + 0x98)));
-		int stride = (short)((u16)(u8)unkB->m_arg3 / (u16)*((u8*)(&unkB->m_arg3) + 1));
-
-		for (y = y0 - halfWidth; (int)y <= (int)(y0 + halfWidth); y += stride) {
-			for (x = x0 - halfWidth; (int)x <= (int)(x0 + halfWidth); x += stride) {
-				if (((-1 < (short)x) && (-1 < (short)y)) && ((short)x < 0x281) && ((short)y < 0x1c1)) {
-					GXPeekZ(x & 0xffff, y & 0xffff, &zAtPixel);
-					if (z0 <= zAtPixel) {
-						*alphaPtr = *alphaPtr + 1;
-					}
+	for (y = y0 - halfWidth; (int)y <= (int)(y0 + halfWidth); y += step) {
+		for (x = x0 - halfWidth; (int)x <= (int)(x0 + halfWidth); x += step) {
+			if (((-1 < (short)x) && (-1 < (short)y)) && ((short)x < 0x281) && ((short)y < 0x1c1)) {
+				GXPeekZ((u16)x, (u16)y, &zAtPixel);
+				if (z0 <= zAtPixel) {
+					*alphaPtr = *alphaPtr + 1;
 				}
 			}
 		}
+	}
 
-		int sampleDiv = *((u8*)(&unkB->m_arg3) + 1) + 1;
-		u32 totalSamples = sampleDiv * sampleDiv;
-
-		if (*alphaPtr == totalSamples) {
-			*alphaPtr = 0xff;
+	step = *((u8*)(&unkB->m_arg3) + 1) + 1;
+	sampleCount = step * step;
+	if ((u8)*alphaPtr == sampleCount) {
+		*alphaPtr = 0xff;
+	} else {
+		sampleCount = (u8)*alphaPtr * (0xff / sampleCount);
+		*alphaPtr = (u8)sampleCount;
+		if ((sampleCount & 0xff) < 0x100) {
+			*alphaPtr = (u8)sampleCount;
 		} else {
-			u32 scaledAlpha = *alphaPtr * (0xff / totalSamples);
-			*alphaPtr = (u8)scaledAlpha;
-			if ((scaledAlpha & 0xff) < 0x100) {
-				*alphaPtr = (u8)scaledAlpha;
-			} else {
-				*alphaPtr = 0xff;
-			}
-		}
-
-		u32 alphaU32 = (u8)*alphaPtr;
-		*alphaPtr = (u8)(int)((double)(float)((double)(0x4330000000000000ULL | alphaU32) - DOUBLE_80331070) * alphaScale);
-
-		if (unkB->m_dataValIndex != 0xffff) {
-			long* shapeTable = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + unkB->m_dataValIndex * 4);
-			pppCalcFrameShape(shapeTable, *(short*)((char*)obj + offset2 + 0xac),
-							  *(short*)((char*)obj + offset2 + 0xae),
-							  *(short*)((char*)obj + offset2 + 0xb0),
-							  (short)unkB->m_initWOrk);
+			*alphaPtr = 0xff;
 		}
 	}
-	return;
+
+	*alphaPtr = (u8)(int)((double)(float)((double)(0x4330000000000000ULL | (u8)*alphaPtr) - DOUBLE_80331070) * alphaScale);
+	if (unkB->m_dataValIndex != 0xffff) {
+		long* shapeTable = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + unkB->m_dataValIndex * 4);
+		pppCalcFrameShape(shapeTable, *(short*)((char*)obj + offset2 + 0xac), *(short*)((char*)obj + offset2 + 0xae),
+						  *(short*)((char*)obj + offset2 + 0xb0), (short)unkB->m_initWOrk);
+	}
 }
 
 /*

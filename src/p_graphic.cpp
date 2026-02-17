@@ -525,12 +525,31 @@ void CGraphicPcs::drawSFCircle(int innerRadius, int centerX, int outerRadius, in
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80046218
+ * PAL Size: 160b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGraphicPcs::GetScreenFadeExecutingBit()
+unsigned int CGraphicPcs::GetScreenFadeExecutingBit()
 {
-	// TODO
+    unsigned int result = 0;
+
+    if ((*(int*)((char*)this + 0x14) != 0) || (*(int*)((char*)this + 0x4) != 0)) {
+        result = 1;
+    }
+    if ((*(int*)((char*)this + 0x40) != 0) || (*(int*)((char*)this + 0x30) != 0)) {
+        result |= 2;
+    }
+    if ((*(int*)((char*)this + 0x6C) != 0) || (*(int*)((char*)this + 0x5C) != 0)) {
+        result |= 4;
+    }
+    if ((*(int*)((char*)this + 0x98) != 0) || (*(int*)((char*)this + 0x88) != 0)) {
+        result |= 8;
+    }
+
+    return result;
 }
 
 /*

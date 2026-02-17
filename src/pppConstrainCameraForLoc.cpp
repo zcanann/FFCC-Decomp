@@ -24,79 +24,73 @@ extern "C" void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(pppConstrainCameraFo
 int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
 {
     float* params = (float*)param_2;
-    float sceneValue = params[0];
-    float camDirX = *(float*)((char*)&CameraPcs + 0xec);
-    float camDirY = *(float*)((char*)&CameraPcs + 0xf0);
-    float camDirZ = *(float*)((char*)&CameraPcs + 0xf4);
-    float* graph = *(float**)((char*)params + 0x40);
-    float graphForward = graph[7];
-    float graphUp = graph[11];
-    Vec cameraPos;
-    Vec cameraDir;
-    Vec offset;
-    Vec forwardDir;
-    Vec upDir;
-    Vec scaledForward;
-    Vec scaledUp;
-    Mtx cameraMtx;
-    Mtx inverseMtx;
+    float fVar1 = params[0x10];
+    double dVar2;
+    double dVar3;
+    float local_f8;
+    float local_f4;
+    float local_f0;
+    Vec local_ec;
+    Vec local_e0;
+    Vec local_bc;
+    Vec local_a4;
+    Mtx local_98;
+    Mtx local_68;
 
-    cameraPos.x = *(float*)((char*)&CameraPcs + 0xe0);
-    cameraPos.y = *(float*)((char*)&CameraPcs + 0xe4);
-    cameraPos.z = *(float*)((char*)&CameraPcs + 0xe8);
-    cameraDir.x = camDirX;
-    cameraDir.y = camDirY;
-    cameraDir.z = camDirZ;
+    local_f8 = *(float*)((char*)&CameraPcs + 0xec);
+    local_f4 = *(float*)((char*)&CameraPcs + 0xf0);
+    local_f0 = *(float*)((char*)&CameraPcs + 0xf4);
+    local_bc.x = *(float*)((char*)&CameraPcs + 0xe0);
+    local_bc.y = *(float*)((char*)&CameraPcs + 0xe4);
+    local_bc.z = *(float*)((char*)&CameraPcs + 0xe8);
+    PSMTXCopy(*(Mtx*)((char*)&CameraPcs + 4), local_68);
 
-    PSMTXCopy(*(Mtx*)((char*)&CameraPcs + 4), cameraMtx);
-
-    offset.x = sceneValue * camDirX;
-    offset.y = sceneValue * camDirY;
-    offset.z = sceneValue * camDirZ;
-
+    local_a4.z = params[0];
+    local_a4.x = local_a4.z * local_f8;
+    local_a4.y = local_a4.z * local_f4;
+    local_a4.z = local_a4.z * local_f0;
     if (Game.game.m_currentSceneId == 7) {
-        PSMTXInverse(ppvCameraMatrix0, inverseMtx);
+        PSMTXInverse(ppvCameraMatrix0, local_98);
     } else {
-        PSMTXInverse(cameraMtx, inverseMtx);
+        PSMTXInverse(local_68, local_98);
     }
 
     PSMTXIdentity(*(Mtx*)((char*)model + 0x68));
     PSMTXIdentity(*(Mtx*)((char*)model + 0x38));
-    PSMTXConcat(inverseMtx, *(Mtx*)((char*)model + 0x38), *(Mtx*)((char*)model + 0x38));
+    PSMTXConcat(local_98, *(Mtx*)((char*)model + 0x38), *(Mtx*)((char*)model + 0x38));
+    PSVECAdd(&local_bc, &local_a4, &local_a4);
 
-    PSVECAdd(&cameraPos, &offset, &offset);
+    dVar3 = (double)*(float*)((int)fVar1 + 0x1c);
+    dVar2 = (double)*(float*)((int)fVar1 + 0x2c);
+    GetDirectVector__5CUtilFP3VecP3Vec3Vec((void*)&DAT_8032ec70, (Vec*)&local_e0, (Vec*)&local_ec, (Vec*)&local_f8);
 
-    GetDirectVector__5CUtilFP3VecP3Vec3Vec((void*)&DAT_8032ec70, &forwardDir, &upDir, &cameraDir);
+    local_e0.x = (float)(dVar3 * (double)local_e0.x);
+    local_e0.y = (float)(dVar3 * (double)local_e0.y);
+    local_e0.z = (float)(dVar3 * (double)local_e0.z);
+    local_ec.x = (float)(dVar2 * (double)local_ec.x);
+    local_ec.y = (float)(dVar2 * (double)local_ec.y);
+    local_ec.z = (float)(dVar2 * (double)local_ec.z);
+    PSVECAdd(&local_a4, &local_e0, &local_a4);
+    PSVECAdd(&local_a4, &local_ec, &local_a4);
 
-    scaledForward.x = graphForward * forwardDir.x;
-    scaledForward.y = graphForward * forwardDir.y;
-    scaledForward.z = graphForward * forwardDir.z;
-    scaledUp.x = graphUp * upDir.x;
-    scaledUp.y = graphUp * upDir.y;
-    scaledUp.z = graphUp * upDir.z;
-
-    PSVECAdd(&offset, &scaledForward, &offset);
-    PSVECAdd(&offset, &scaledUp, &offset);
-
+    fVar1 = FLOAT_803331a8;
     *(float*)((char*)model + 0x44) = FLOAT_803331a8;
-    *(float*)((char*)model + 0x54) = FLOAT_803331a8;
-    *(float*)((char*)model + 0x64) = FLOAT_803331a8;
-
+    *(float*)((char*)model + 0x54) = fVar1;
+    *(float*)((char*)model + 0x64) = fVar1;
     if (Game.game.m_currentSceneId == 7) {
-        *(float*)((char*)model + 0x74) = FLOAT_803331a8;
-        *(float*)((char*)model + 0x84) = FLOAT_803331a8;
-        *(float*)((char*)model + 0x94) = FLOAT_803331a8;
+        *(float*)((char*)model + 0x74) = fVar1;
+        *(float*)((char*)model + 0x84) = fVar1;
+        *(float*)((char*)model + 0x94) = fVar1;
     } else {
-        *(float*)((char*)model + 0x74) = offset.x;
-        *(float*)((char*)model + 0x84) = offset.y;
-        *(float*)((char*)model + 0x94) = offset.z;
+        *(float*)((char*)model + 0x74) = local_a4.x;
+        *(float*)((char*)model + 0x84) = local_a4.y;
+        *(float*)((char*)model + 0x94) = local_a4.z;
     }
 
     PSMTXCopy(*(Mtx*)((char*)model + 0x38), *(Mtx*)((char*)params + 0x10));
-
-    params[7] = offset.x;
-    params[11] = offset.y;
-    params[15] = offset.z;
+    params[7] = local_a4.x;
+    params[0xb] = local_a4.y;
+    params[0xf] = local_a4.z;
     return 1;
 }
 

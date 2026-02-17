@@ -4,6 +4,7 @@
 #include "ffcc/p_minigame.h"
 #include "ffcc/pad.h"
 #include "types.h"
+#include <dolphin/mtx.h>
 
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" double sin(double);
@@ -24,6 +25,7 @@ extern u32 lbl_801E9CE4[];
 extern u32 lbl_801E9CF0[];
 extern u32 lbl_801E9CFC[];
 extern u32 lbl_801E9D08[];
+extern int DAT_802381a0;
 extern CGraphicPcs GraphicsPcs;
 extern CMiniGamePcs MiniGamePcs;
 extern char* PTR_DAT_801e9e64[];
@@ -302,12 +304,62 @@ void CGraphicPcs::drawBar()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800465bc
+ * PAL Size: 400b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphicPcs::drawCopy()
 {
-	// TODO
+    char* base = (char*)this;
+
+    if (*(int*)(base + 0xBC) != 0) {
+        Graphic.CopySaveFrameBuffer();
+        *(int*)(base + 0xBC) = 0;
+    }
+
+    if (*(int*)(base + 0xC0) != 0) {
+        Vec targetPos;
+        targetPos.x = *(float*)(base + 0xD4);
+        targetPos.y = *(float*)(base + 0xD8);
+        targetPos.z = *(float*)(base + 0xDC);
+
+        Graphic.RenderDOF(*(signed char*)(base + 0xE0), *(signed char*)(base + 0xC4), *(float*)(base + 0xC8),
+                          *(float*)(base + 0xCC), targetPos, *(int*)(base + 0xD0));
+    }
+
+    int blurInit = 0;
+    if ((*(int*)(base + 0xE4) == 1) && (DAT_802381a0 == 0)) {
+        DAT_802381a0 = 1;
+        Graphic.InitBlurParameter();
+        blurInit = 1;
+        *(unsigned char*)(base + 0xEF) = *(unsigned char*)(base + 0xEE) / *(unsigned char*)(base + 0xEC);
+        *(int*)(base + 0xE8) = 0;
+    }
+
+    if ((*(int*)(base + 0xE4) != 0) || (DAT_802381a0 != 0) || (*(int*)(base + 0xE8) != 0)) {
+        if (*(int*)(base + 0xE4) != DAT_802381a0) {
+            *(int*)(base + 0xE8) = 1;
+        }
+
+        Graphic.RenderBlur(blurInit, *(unsigned char*)(base + 0xF1), *(unsigned char*)(base + 0xF0),
+                           *(unsigned char*)(base + 0xED), *(unsigned char*)(base + 0xEE), *(short*)(base + 0xF2));
+
+        if (*(int*)(base + 0xE8) != 0) {
+            if ((int)((u32)*(unsigned char*)(base + 0xEE) - (u32)*(unsigned char*)(base + 0xEF)) < 1) {
+                *(unsigned char*)(base + 0xEE) = 0;
+                *(int*)(base + 0xE8) = 0;
+                *(int*)(base + 0xE4) = 0;
+                DAT_802381a0 = 0;
+            } else {
+                *(unsigned char*)(base + 0xEE) = *(unsigned char*)(base + 0xEE) - *(unsigned char*)(base + 0xEF);
+            }
+        }
+    }
+
+    drawScreenFade();
 }
 
 /*

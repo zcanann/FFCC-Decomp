@@ -419,12 +419,19 @@ void CMapCylinder::operator= (const CMapCylinder&)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80025dd4
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapHit::GetHitFaceNormal(Vec* out)
 {
-	// TODO
+    float* const normal = reinterpret_cast<float*>(s_hit_face_min);
+    out->x = normal[0];
+    out->y = normal[1];
+    out->z = normal[2];
 }
 
 /*

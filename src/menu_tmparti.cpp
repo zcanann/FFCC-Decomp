@@ -353,7 +353,6 @@ unsigned int CMenuPcs::TmpArtiClose()
 {
 	float fVar1;
 	double dVar2;
-	double dVar3;
 	short *psVar4;
 	int iVar5;
 	unsigned int uVar6;
@@ -369,15 +368,15 @@ unsigned int CMenuPcs::TmpArtiClose()
 	
 	if (0 < (int)uVar6) {
 		do {
-			dVar2 = 4607182418800017408.0; // DOUBLE_80332f40
+			dVar2 = 1.0;
 			if (*(int *)(psVar4 + 0x12) <= iVar7) {
 				if (iVar7 < *(int *)(psVar4 + 0x12) + *(int *)(psVar4 + 0x14)) {
 					*(int *)(psVar4 + 0x10) = *(int *)(psVar4 + 0x10) + 1;
-					dVar3 = 4611686018427387904.0; // DOUBLE_80332f50
-					*(float *)(psVar4 + 8) = (float)-((1.0 /
-						((double)((unsigned int)*(unsigned int *)(psVar4 + 0x14) ^ 0x80000000 | 0x4330000000000000) - dVar2)) * 
-						((double)((unsigned int)*(unsigned int *)(psVar4 + 0x10) ^ 0x80000000 | 0x4330000000000000) - dVar2) - 1.0);
-					if ((double)*(float *)(psVar4 + 8) < dVar3) {
+					*(float *)(psVar4 + 8) =
+					    (float)-(1.0 / ((double)(unsigned int)*(unsigned int *)(psVar4 + 0x14) - dVar2) *
+					            ((double)(unsigned int)*(unsigned int *)(psVar4 + 0x10) - dVar2) -
+					            1.0);
+					if (*(float *)(psVar4 + 8) < 0.0f) {
 						*(float *)(psVar4 + 8) = 0.0f;
 					}
 				}
@@ -398,45 +397,29 @@ unsigned int CMenuPcs::TmpArtiClose()
 			uVar8 = uVar6 >> 3;
 			if (uVar8 != 0) {
 				do {
-					psVar4[0x12] = 0;
-					psVar4[0x13] = 0;
-					psVar4[0x14] = 0;
-					psVar4[0x15] = 1;
+					*(int *)(psVar4 + 0x12) = 0;
+					*(int *)(psVar4 + 0x14) = 1;
 					*(float *)(psVar4 + 8) = fVar1;
-					psVar4[0x32] = 0;
-					psVar4[0x33] = 0;
-					psVar4[0x34] = 0;
-					psVar4[0x35] = 1;
+					*(int *)(psVar4 + 0x32) = 0;
+					*(int *)(psVar4 + 0x34) = 1;
 					*(float *)(psVar4 + 0x28) = fVar1;
-					psVar4[0x52] = 0;
-					psVar4[0x53] = 0;
-					psVar4[0x54] = 0;
-					psVar4[0x55] = 1;
+					*(int *)(psVar4 + 0x52) = 0;
+					*(int *)(psVar4 + 0x54) = 1;
 					*(float *)(psVar4 + 0x48) = fVar1;
-					psVar4[0x72] = 0;
-					psVar4[0x73] = 0;
-					psVar4[0x74] = 0;
-					psVar4[0x75] = 1;
+					*(int *)(psVar4 + 0x72) = 0;
+					*(int *)(psVar4 + 0x74) = 1;
 					*(float *)(psVar4 + 0x68) = fVar1;
-					psVar4[0x92] = 0;
-					psVar4[0x93] = 0;
-					psVar4[0x94] = 0;
-					psVar4[0x95] = 1;
+					*(int *)(psVar4 + 0x92) = 0;
+					*(int *)(psVar4 + 0x94) = 1;
 					*(float *)(psVar4 + 0x88) = fVar1;
-					psVar4[0xb2] = 0;
-					psVar4[0xb3] = 0;
-					psVar4[0xb4] = 0;
-					psVar4[0xb5] = 1;
+					*(int *)(psVar4 + 0xb2) = 0;
+					*(int *)(psVar4 + 0xb4) = 1;
 					*(float *)(psVar4 + 0xa8) = fVar1;
-					psVar4[0xd2] = 0;
-					psVar4[0xd3] = 0;
-					psVar4[0xd4] = 0;
-					psVar4[0xd5] = 1;
+					*(int *)(psVar4 + 0xd2) = 0;
+					*(int *)(psVar4 + 0xd4) = 1;
 					*(float *)(psVar4 + 200) = fVar1;
-					psVar4[0xf2] = 0;
-					psVar4[0xf3] = 0;
-					psVar4[0xf4] = 0;
-					psVar4[0xf5] = 1;
+					*(int *)(psVar4 + 0xf2) = 0;
+					*(int *)(psVar4 + 0xf4) = 1;
 					*(float *)(psVar4 + 0xe8) = fVar1;
 					psVar4 = psVar4 + 0x100;
 					uVar8 = uVar8 - 1;
@@ -447,10 +430,8 @@ unsigned int CMenuPcs::TmpArtiClose()
 				}
 			}
 			do {
-				psVar4[0x12] = 0;
-				psVar4[0x13] = 0;
-				psVar4[0x14] = 0;
-				psVar4[0x15] = 1;
+				*(int *)(psVar4 + 0x12) = 0;
+				*(int *)(psVar4 + 0x14) = 1;
 				*(float *)(psVar4 + 8) = fVar1;
 				psVar4 = psVar4 + 0x20;
 				uVar6 = uVar6 - 1;

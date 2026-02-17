@@ -912,12 +912,9 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 	cyl.m_direction2.y = kPolyGroupAabbMin;
 	cyl.m_direction2.z = kPolyGroupAabbMin;
 
-	if (MapMng.CheckHitCylinderNear(&cyl, reinterpret_cast<Vec*>(&bottom), mask) != 0)
-	{
-		return lbl_8032EC90[0x47];
-	}
-
-	return 0;
+	return (MapMng.CheckHitCylinderNear(&cyl, reinterpret_cast<Vec*>(&bottom), mask) != 0)
+	           ? lbl_8032EC90[0x47]
+	           : 0;
 }
 
 /*

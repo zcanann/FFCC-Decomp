@@ -895,6 +895,52 @@ void VECLerp(Vec* a, Vec* b, Vec* out, float t)
 
 /*
  * --INFO--
+ * PAL Address: 0x800B96F8
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void SetDiffuse__9CCharaPcsFiUlP8_GXColorP3Vec(
+    CCharaPcs* chara, int lightIndex, unsigned long lightSet, _GXColor* color, Vec* direction)
+{
+    char* colorBase = (char*)chara + lightIndex * 0xC + lightSet * 4;
+    colorBase[0xF0] = color->r;
+    colorBase[0xF1] = color->g;
+    colorBase[0xF2] = color->b;
+    colorBase[0xF3] = color->a;
+
+    if (lightIndex != 0) {
+        return;
+    }
+
+    char* dirBase = (char*)chara + lightSet * 0xC;
+    *(float*)(dirBase + 0x108) = direction->x;
+    *(float*)(dirBase + 0x10C) = direction->y;
+    *(float*)(dirBase + 0x110) = direction->z;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9754
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void SetAmbient__9CCharaPcsFiP8_GXColor(CCharaPcs* chara, int index, _GXColor* color)
+{
+    char* base = (char*)chara + index * 4;
+    base[0xE8] = color->r;
+    base[0xE9] = color->g;
+    base[0xEA] = color->b;
+    base[0xEB] = color->a;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800B9920
  * PAL Size: 8b
  * EN Address: TODO

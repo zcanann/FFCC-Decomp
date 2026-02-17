@@ -71,64 +71,67 @@ extern "C" CFlatData* dtor_800980B4(CFlatData* flatData, short shouldDelete)
 		char* m_mesBuffer;
 	};
 
-	FlatDataLayout* self;
 	FlatDataLayout* layout;
+	FlatDataLayout* current;
 	int i;
 
-	if (flatData != nullptr)
+	if (flatData == nullptr)
 	{
-		layout = (FlatDataLayout*)flatData;
-		self = layout;
-		for (i = 0; i < layout->m_dataCount; i++)
-		{
-			if (self->m_data[0].m_data != nullptr)
-			{
-				operator delete(self->m_data[0].m_data);
-				self->m_data[0].m_data = nullptr;
-			}
-			if (self->m_data[0].m_strings != nullptr)
-			{
-				operator delete(self->m_data[0].m_strings);
-				self->m_data[0].m_strings = (char**)nullptr;
-			}
-			if (self->m_data[0].m_stringBuf != nullptr)
-			{
-				operator delete(self->m_data[0].m_stringBuf);
-				self->m_data[0].m_stringBuf = (char*)nullptr;
-			}
-			self = (FlatDataLayout*)&self->m_data[0].m_stringBuf;
-		}
-		layout->m_dataCount = 0;
-
-		self = layout;
-		for (i = 0; i < layout->m_tableCount; i++)
-		{
-			if (self->m_tabl[0].m_strings != nullptr)
-			{
-				operator delete(self->m_tabl[0].m_strings);
-				self->m_tabl[0].m_strings = (char**)nullptr;
-			}
-			if (self->m_tabl[0].m_stringBuf != nullptr)
-			{
-				operator delete(self->m_tabl[0].m_stringBuf);
-				self->m_tabl[0].m_stringBuf = (char*)nullptr;
-			}
-			self = (FlatDataLayout*)&self->m_data[0].m_numStrings;
-		}
-		layout->m_tableCount = 0;
-
-		if (layout->m_mesBuffer != nullptr)
-		{
-			operator delete(layout->m_mesBuffer);
-			layout->m_mesBuffer = (char*)nullptr;
-		}
-		layout->m_mesCount = 0;
-
-		if (0 < shouldDelete)
-		{
-			operator delete(flatData);
-		}
+		return flatData;
 	}
+
+	layout = (FlatDataLayout*)flatData;
+	current = layout;
+	for (i = 0; i < layout->m_dataCount; i++)
+	{
+		if (current->m_data[0].m_data != nullptr)
+		{
+			operator delete(current->m_data[0].m_data);
+			current->m_data[0].m_data = nullptr;
+		}
+		if (current->m_data[0].m_strings != nullptr)
+		{
+			operator delete(current->m_data[0].m_strings);
+			current->m_data[0].m_strings = (char**)nullptr;
+		}
+		if (current->m_data[0].m_stringBuf != nullptr)
+		{
+			operator delete(current->m_data[0].m_stringBuf);
+			current->m_data[0].m_stringBuf = (char*)nullptr;
+		}
+		current = (FlatDataLayout*)&current->m_data[0].m_stringBuf;
+	}
+	layout->m_dataCount = 0;
+
+	current = layout;
+	for (i = 0; i < layout->m_tableCount; i++)
+	{
+		if (current->m_tabl[0].m_strings != nullptr)
+		{
+			operator delete(current->m_tabl[0].m_strings);
+			current->m_tabl[0].m_strings = (char**)nullptr;
+		}
+		if (current->m_tabl[0].m_stringBuf != nullptr)
+		{
+			operator delete(current->m_tabl[0].m_stringBuf);
+			current->m_tabl[0].m_stringBuf = (char*)nullptr;
+		}
+		current = (FlatDataLayout*)&current->m_data[0].m_numStrings;
+	}
+	layout->m_tableCount = 0;
+
+	if (layout->m_mesBuffer != nullptr)
+	{
+		operator delete(layout->m_mesBuffer);
+		layout->m_mesBuffer = (char*)nullptr;
+	}
+	layout->m_mesCount = 0;
+
+	if (0 < shouldDelete)
+	{
+		operator delete(flatData);
+	}
+
 	return flatData;
 }
 

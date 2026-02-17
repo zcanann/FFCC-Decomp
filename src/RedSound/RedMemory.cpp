@@ -26,6 +26,7 @@ extern char DAT_8021d1a8;
 // Function declarations
 extern "C" {
 	void fflush(void*);
+	void __dl__FPv(void*);
 }
 
 /*
@@ -40,12 +41,19 @@ CRedMemory::CRedMemory()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bff38
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-CRedMemory::~CRedMemory()
+extern "C" CRedMemory* __dt__10CRedMemoryFv(CRedMemory* redMemory, int shouldDelete)
 {
-	// TODO
+	if ((redMemory != 0) && (0 < shouldDelete)) {
+		__dl__FPv(redMemory);
+	}
+	return redMemory;
 }
 
 /*

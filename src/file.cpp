@@ -464,9 +464,7 @@ CFile::CHandle* CFile::CheckQueue()
 
     while (handle != sentinel)
     {
-        int completionStatus = handle->m_completionStatus;
-
-        if (completionStatus == 2)
+        if (handle->m_completionStatus == 2)
         {
             int dvdStatus = DVDGetCommandBlockStatus(&handle->m_dvdFileInfo.cb);
 
@@ -477,12 +475,7 @@ CFile::CHandle* CFile::CheckQueue()
             else if (dvdStatus == 0)
             {
                 handle->m_completionStatus = 3;
-                CHandle* next = CheckQueue();
-
-                if (next != 0)
-                {
-                    return next;
-                }
+                return CheckQueue();
             }
             else if (dvdStatus > 0)
             {
@@ -493,7 +486,7 @@ CFile::CHandle* CFile::CheckQueue()
                 handle->m_completionStatus = 4;
             }
         }
-        else if (completionStatus == 3)
+        else if (handle->m_completionStatus == 3)
         {
             return handle;
         }

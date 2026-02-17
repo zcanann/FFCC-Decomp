@@ -1,4 +1,5 @@
 #include "ffcc/fontman.h"
+#include "ffcc/chunkfile.h"
 #include "PowerPC_EABI_Support/Runtime/NMWException.h"
 #include <dolphin/mtx.h>
 #include <math.h>
@@ -6,10 +7,13 @@
 extern CFontMan FontMan;
 extern CTextureMan TextureMan;
 extern void* ARRAY_802ea170;
+extern "C" unsigned char lbl_801FE080[];
 extern "C" void __dt__8CFontManFv(void*);
 extern unsigned char CameraPcs[];
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
+
+static const char s_fontman_cpp[] = "fontman.cpp";
 
 /*
  * --INFO--
@@ -83,12 +87,53 @@ CFont::~CFont()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80092aa4
+ * PAL Size: 648b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFont::Create(void*, CMemory::CStage*)
+void CFont::Create(void* filePtr, CMemory::CStage* stage)
 {
-	// TODO
+    CChunkFile chunkFile;
+    CChunkFile::CChunk chunk;
+
+    m_usesEmbeddedData = static_cast<unsigned char>((filePtr == 0) && (stage == 0));
+    if (m_usesEmbeddedData != 0) {
+        filePtr = lbl_801FE080;
+    }
+
+    chunkFile.SetBuf(filePtr);
+    while (chunkFile.GetNextChunk(chunk)) {
+        if (chunk.m_id == 0x464F4E54) {
+            chunkFile.PushChunk();
+            while (chunkFile.GetNextChunk(chunk)) {
+                if (chunk.m_id == 0x494E464F) {
+                    m_glyphWidth = static_cast<unsigned short>(chunkFile.Get4());
+                    m_glyphHeight = static_cast<unsigned short>(chunkFile.Get4());
+                    m_glyphColumns = static_cast<unsigned short>(chunkFile.Get4());
+                } else if (chunk.m_id == 0x44415441) {
+                    if (m_usesEmbeddedData == 0) {
+                        m_glyphData = ::operator new(chunk.m_size, stage, const_cast<char*>(s_fontman_cpp), 0xCF);
+                        chunkFile.Get(m_glyphData, chunk.m_size);
+                    } else {
+                        m_glyphData = chunkFile.GetAddress();
+                    }
+
+                    unsigned short* bucket = static_cast<unsigned short*>(m_glyphData);
+                    for (int i = 0; i < 64; i++) {
+                        m_glyphBuckets[i] = bucket;
+                        bucket += static_cast<unsigned int>(*bucket) * 4 + 1;
+                    }
+                } else if (chunk.m_id == 0x54585452) {
+                    texturePtr = new (stage, const_cast<char*>(s_fontman_cpp), 0xDF) CTexture;
+                    texturePtr->Create(chunkFile, stage, 0, 0, m_usesEmbeddedData != 0);
+                }
+            }
+            chunkFile.PopChunk();
+        }
+    }
 }
 
 /*

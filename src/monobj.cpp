@@ -682,12 +682,66 @@ void CGMonObj::moveFrame()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011467C
+ * PAL Size: 1272b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+#pragma dont_inline on
+extern "C" void MonObjRelated(CGMonObj* monObj, int* targetIndex)
+{
+	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
+	int* chaseState = reinterpret_cast<int*>(mon + 0x6D8);
+	int* chaseTimer = reinterpret_cast<int*>(mon + 0x6DC);
+	int* targetPartyIdx = reinterpret_cast<int*>(mon + 0x6C4);
+
+	switch (*chaseState) {
+	case 1:
+		if (targetIndex != NULL) {
+			*targetIndex = *targetPartyIdx;
+		}
+		break;
+
+	case 2:
+		if (targetIndex != NULL) {
+			*targetIndex = *targetPartyIdx;
+		}
+		*reinterpret_cast<unsigned char*>(mon + 0x6B8) = 1;
+		break;
+
+	case 5:
+		if (*targetPartyIdx < 0) {
+			memset(mon + 0x70C, 0, 0x34);
+			*chaseState = 0;
+			*chaseTimer = 0;
+			*reinterpret_cast<unsigned char*>(mon + 0x6BB) = 1;
+		}
+		break;
+	}
+
+	if (*reinterpret_cast<unsigned char*>(mon + 0x6BB) == 0) {
+		*chaseTimer += 1;
+	} else {
+		*reinterpret_cast<unsigned char*>(mon + 0x6BB) = 0;
+	}
+}
+#pragma dont_inline off
+
+/*
+ * --INFO--
+ * PAL Address: 0x8011306C
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::logicFuncDefault()
 {
-	// TODO
+	int targetIndex = 0;
+	MonObjRelated(this, &targetIndex);
 }
 
 /*

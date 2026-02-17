@@ -9,7 +9,7 @@ public:
     void MoneyCtrl();
     void MoneyClose();
     void MoneyDraw();
-    void MoneyCtrlCur();
+    int MoneyCtrlCur();
     void MoneySetPlace(int);
 };
 

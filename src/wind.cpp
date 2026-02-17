@@ -377,23 +377,29 @@ int CWind::AddDiffuse(const Vec* pos, float radius, float dir, float speed)
 	u8* freeObj;
 	int freeIdx = 0;
 	u8* scan = (u8*)this;
-	int group = 4;
 
-	do {
+	for (int group = 4; group != 0; group--) {
 		freeObj = scan;
-		if (((((s8)scan[0] >= 0) || ((freeObj = scan + 100), (s8)freeObj[0] >= 0)) ||
-		     ((freeObj = scan + 200), (s8)freeObj[0] >= 0)) ||
-		    (((freeObj = scan + 300), (s8)freeObj[0] >= 0) ||
-		     ((freeObj = scan + 400), (s8)freeObj[0] >= 0)) ||
-		   (((freeObj = scan + 500), (s8)freeObj[0] >= 0) ||
-		    (((freeObj = scan + 600), (s8)freeObj[0] >= 0) ||
-		     ((freeObj = scan + 700), (s8)scan[700] >= 0)))) {
-			goto found;
-		}
-		freeIdx += 7;
-		scan += 800;
-		group--;
-	} while (group != 0);
+		if ((int)((u32)scan[0] << 24) >= 0) goto found;
+		freeObj = scan + 100;
+		if ((int)((u32)freeObj[0] << 24) >= 0) goto found;
+		freeObj = scan + 200;
+		if ((int)((u32)freeObj[0] << 24) >= 0) goto found;
+		freeObj = scan + 300;
+		if ((int)((u32)freeObj[0] << 24) >= 0) goto found;
+		freeObj = scan + 400;
+		if ((int)((u32)freeObj[0] << 24) >= 0) goto found;
+		freeObj = scan + 500;
+		if ((int)((u32)freeObj[0] << 24) >= 0) goto found;
+		freeObj = scan + 600;
+		if ((int)((u32)freeObj[0] << 24) >= 0) goto found;
+		freeObj = scan + 700;
+		if ((int)((u32)scan[700] << 24) >= 0) goto found;
+
+		freeIdx = freeIdx + 7;
+		scan = scan + 800;
+	}
+
 	freeObj = 0;
 
 found:
@@ -403,7 +409,13 @@ found:
 		return -1;
 	}
 
-	*(s32*)(freeObj + 0x1C) = 1;
+	const float x = pos->x;
+	const float z = pos->z;
+
+	freeObj[0x1C] = 0;
+	freeObj[0x1D] = 0;
+	freeObj[0x1E] = 0;
+	freeObj[0x1F] = 1;
 	freeObj[0] = (freeObj[0] & 0x7F) | 0x80;
 
 	int id = *(s32*)((u8*)this + 0xC80);
@@ -421,12 +433,12 @@ found:
 	*(float*)(freeObj + 0x30) = radius;
 	*(float*)(freeObj + 0x34) = radius * radius;
 
-	*(float*)(freeObj + 0x04) = pos->x;
-	*(float*)(freeObj + 0x08) = pos->z;
-	*(float*)(freeObj + 0x0C) = pos->x - radius;
-	*(float*)(freeObj + 0x10) = pos->z - radius;
-	*(float*)(freeObj + 0x14) = pos->x + radius;
-	*(float*)(freeObj + 0x18) = pos->z + radius;
+	*(float*)(freeObj + 0x04) = x;
+	*(float*)(freeObj + 0x08) = z;
+	*(float*)(freeObj + 0x0C) = x - radius;
+	*(float*)(freeObj + 0x10) = z - radius;
+	*(float*)(freeObj + 0x14) = x + radius;
+	*(float*)(freeObj + 0x18) = z + radius;
 
 	return *(s32*)(freeObj + 0x20);
 }

@@ -1128,14 +1128,15 @@ float CMath::DstRot(float from, float to)
     const float dot = s0 * s1 + c0 * c1;
     float angle = 0.0f;
 
-    if (angle != dot) {
-        angle = -1.0f;
-        if (angle <= dot) {
+    if (dot != 0.0f) {
+        if (dot < -1.0f) {
+            angle = -1.0f;
+        } else if (1.0f < dot) {
+            angle = 1.0f;
+        } else {
             angle = dot;
-            if (1.0f < dot) {
-                angle = 1.0f;
-            }
         }
+
         angle = (float)acos((double)angle);
         if (s0 * c1 - s1 * c0 < 0.0f) {
             angle = -angle;

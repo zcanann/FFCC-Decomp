@@ -15,7 +15,7 @@ public:
     int EquipOpen0();
     int EquipClose0();
     void GetEquipItem();
-    void ChkEquipActive(int);
+    int ChkEquipActive(int);
 };
 
 #endif // _FFCC_MENU_EQUIP_H_

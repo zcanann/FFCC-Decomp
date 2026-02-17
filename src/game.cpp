@@ -5,6 +5,7 @@
 #include "ffcc/vector.h"
 #include "ffcc/p_dbgmenu.h"
 #include "ffcc/p_minigame.h"
+#include "ffcc/p_game.h"
 #include "ffcc/map.h"
 #include "ffcc/sound.h"
 #include "ffcc/graphic.h"
@@ -126,12 +127,15 @@ extern const char DAT_8032f6ac[];
 extern const char* lbl_801D60B0[];
 extern const char* lbl_801E8344[];
 int sprintf(char*, const char*, ...);
+int rand(void);
 }
 
 static const float FLOAT_8032f688 = 1.0E+10;
 static const float FLOAT_8032f68c = -1.0E+10;
 static const float FLOAT_8032f690 = 0.0;    
 static const float FLOAT_8032f694 = 0.001;
+static const s16 s_bossArtifactStartTable[] = {0, 4, 8};
+static const float s_ratio[] = {0.4f, 0.55f, 0.7f, 0.85f};
 static const char s_numNameFmt[] = "%d%s";
 static const char s_nameJoinFmt[] = "%s%s%s";
 static const char s_nameSep[] = " ";
@@ -1158,12 +1162,52 @@ void CGame::LoadFinished()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001440c
+ * PAL Size: 308b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGame::GetBossArtifact(int, int)
+int CGame::GetBossArtifact(int ratioIndex, int amount)
 {
-	// TODO
+    s16 stageBase;
+    s16 thresholdA;
+    s16 thresholdB;
+    s16 thresholdC;
+    int stageClass;
+    int baseOffset;
+    int stageIndex;
+    int bucketCount;
+    int randomValue;
+
+    stageClass = Game.game.m_gameWork.m_bossArtifactStageTable[Game.game.m_gameWork.m_bossArtifactStageIndex];
+    if (stageClass > 2) {
+        stageClass = 2;
+    }
+
+    stageBase = s_bossArtifactStartTable[stageClass];
+    baseOffset = (int)((float)amount * s_ratio[ratioIndex]);
+
+    stageIndex = (int)Game.game.m_gameWork.m_bossArtifactStageIndex;
+    randomValue = (int)Game.game.m_bossArtifactBase + stageIndex * 0x168;
+    thresholdA = *(s16*)(randomValue + 0x162);
+    thresholdB = *(s16*)(randomValue + 0x164);
+    thresholdC = *(s16*)(randomValue + 0x166);
+
+    bucketCount = 3;
+    if (baseOffset < thresholdC) {
+        bucketCount = 2;
+        if (baseOffset < thresholdB) {
+            bucketCount = 1;
+            if (baseOffset < thresholdA) {
+                bucketCount = 0;
+            }
+        }
+    }
+
+    baseOffset = rand();
+    return randomValue + 0x20 + (stageBase + (baseOffset - (baseOffset / (bucketCount + 1)) * (bucketCount + 1))) * 8;
 }
 
 /*

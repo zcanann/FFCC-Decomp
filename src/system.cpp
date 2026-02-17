@@ -31,20 +31,6 @@ extern CMiniGamePcs MiniGamePcs;
 extern unsigned char CFlat[];
 CSystem System;
 
-static inline unsigned short ReadPadWord(unsigned int baseOffset, unsigned int padIndex)
-{
-    return *(unsigned short*)((unsigned char*)&Pad + baseOffset + padIndex * 0x54);
-}
-
-static inline unsigned int ResolvePadIndex(unsigned int port)
-{
-    if (Pad._448_4_ == (int)port)
-    {
-        return 0;
-    }
-    return port;
-}
-
 /*
  * --INFO--
  * Address:	TODO
@@ -244,9 +230,9 @@ void CSystem::ExecScenegraph()
 
     if (Pad._452_4_ == 0)
     {
-        const unsigned int stepPad = (Pad._448_4_ == 4) ? 4 : 0;
-        stepTrigger = ReadPadWord(0x36, stepPad);
-        perfTrigger = ReadPadWord(0x34, stepPad);
+        unsigned int stepPad = (Pad._448_4_ == 4) ? 4 : 0;
+        stepTrigger = *(unsigned short*)((unsigned char*)&Pad + 0x36 + stepPad * 0x54);
+        perfTrigger = *(unsigned short*)((unsigned char*)&Pad + 0x34 + stepPad * 0x54);
     }
 
     if ((stepTrigger & 0xC) != 0)
@@ -281,9 +267,27 @@ void CSystem::ExecScenegraph()
     {
         for (unsigned int port = 0; port < 4; port++)
         {
-            const bool forceOff = (Pad._452_4_ != 0) || ((port == 0) && (Pad._448_4_ != -1));
-            const unsigned short trigger = forceOff ? 0 : ReadPadWord(0xA, ResolvePadIndex(port));
-            const unsigned short held = forceOff ? 0 : ReadPadWord(0x8, ResolvePadIndex(port));
+            unsigned short trigger;
+            if ((Pad._452_4_ != 0) || ((port == 0) && (Pad._448_4_ != -1)))
+            {
+                trigger = 0;
+            }
+            else
+            {
+                unsigned int padIndex = (Pad._448_4_ == (int)port) ? 0 : port;
+                trigger = *(unsigned short*)((unsigned char*)&Pad + 0xA + padIndex * 0x54);
+            }
+
+            unsigned short held;
+            if ((Pad._452_4_ != 0) || ((port == 0) && (Pad._448_4_ != -1)))
+            {
+                held = 0;
+            }
+            else
+            {
+                unsigned int padIndex = (Pad._448_4_ == (int)port) ? 0 : port;
+                held = *(unsigned short*)((unsigned char*)&Pad + 0x8 + padIndex * 0x54);
+            }
 
             if (((trigger | held) & 0x1000) != 0)
             {

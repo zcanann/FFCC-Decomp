@@ -83,7 +83,7 @@ public:
     void moveAStar(int, int, Vec&);
     void moveFrame();
     void logicFuncDefault();
-    void calcBranchFuncDefault(int);
+    int calcBranchFuncDefault(int);
     void sysControl(int);
     void onChangePrg(int);
     void footSe();

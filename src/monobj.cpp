@@ -692,22 +692,96 @@ void CGMonObj::logicFuncDefault()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80112FD4
+ * PAL Size: 152b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::calcBranchFuncDefault(int)
+int CGMonObj::calcBranchFuncDefault(int branchType)
 {
-	// TODO
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* script = reinterpret_cast<unsigned char*>(object->m_scriptHandle);
+	unsigned short current = *reinterpret_cast<unsigned short*>(script + 0x1C);
+	unsigned short max = *reinterpret_cast<unsigned short*>(script + 0x1A);
+
+	if (branchType == 1) {
+		if (current < (max >> 1)) {
+			return 1;
+		}
+	} else if (branchType == 2) {
+		if (current < (max / 3)) {
+			return 2;
+		}
+		if (current < ((max * 2) / 3)) {
+			return 1;
+		}
+	}
+
+	return 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80112ED4
+ * PAL Size: 256b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::sysControl(int)
+void CGMonObj::sysControl(int controlType)
 {
-	// TODO
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+
+	switch (controlType) {
+	case 6:
+		*reinterpret_cast<unsigned short*>(mon + 0x6D6) = 0;
+		break;
+
+	case 7:
+		mon[0x6BE] = 1;
+		*reinterpret_cast<unsigned int*>(mon + 0x6D8) = 4;
+		*reinterpret_cast<unsigned int*>(mon + 0x6DC) = 0;
+		mon[0x6BB] = 1;
+		object->m_bgColMask &= 0xFFF7FFFD;
+		object->m_displayFlags &= 0xFFFFFFFE;
+		break;
+
+	case 8:
+		mon[0x6BE] = 0;
+		break;
+
+	case 0xC:
+		mon[0x6C1] = 1;
+		break;
+
+	case 0xD:
+		mon[0x6C1] = 0;
+		break;
+
+	case 0xF:
+		setRepop(0);
+		break;
+
+	case 0x10:
+		object->m_displayFlags |= 0x400000;
+		break;
+
+	case 0x11:
+		object->m_displayFlags &= 0xFFBFFFFF;
+		break;
+
+	case 0x15:
+		object->m_weaponNodeFlags = (object->m_weaponNodeFlags & 0xF7) | 8;
+		break;
+
+	case 0x16:
+		object->m_weaponNodeFlags &= 0xF7;
+		break;
+	}
 }
 
 /*

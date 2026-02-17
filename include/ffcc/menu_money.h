@@ -5,7 +5,7 @@ class CMenuPcs
 {
 public:
     void MoneyInit();
-    void MoneyOpen();
+    bool MoneyOpen();
     void MoneyCtrl();
     void MoneyClose();
     void MoneyDraw();

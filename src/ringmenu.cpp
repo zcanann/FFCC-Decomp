@@ -160,28 +160,28 @@ void CRingMenu::SetBattleButton(int buttonIndex, int newValue)
  */
 void CRingMenu::SetBattleCommand(int buttonGroupIndex, int newCommandId, int newRotation)
 {
-	int slot8 = buttonGroupIndex * 8;
-	int slot12 = buttonGroupIndex * 12;
-	char* self = reinterpret_cast<char*>(this);
-	int* commandCurrent = reinterpret_cast<int*>(self + slot8 + 0x20);
-	int currentCommand = *commandCurrent;
-
 	if (newCommandId == 0) {
 		newCommandId = -1;
 	}
+
+	int slot8 = buttonGroupIndex * 8;
+	int currentCommand = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + slot8 + 0x20);
 
 	if (currentCommand == newCommandId) {
 		return;
 	}
 
 	if (((currentCommand >= 0) && (newCommandId < 0)) || ((currentCommand < 0) && (newCommandId >= 0))) {
-		int* timer2 = reinterpret_cast<int*>(self + slot12 + 0x40);
+		int slot12 = buttonGroupIndex * 12;
+		int* timer2 = reinterpret_cast<int*>(reinterpret_cast<char*>(this) + slot12 + 0x40);
 		*timer2 = 8 - *timer2;
 	}
 
-	*reinterpret_cast<int*>(self + slot8 + 0x24) = currentCommand;
-	*commandCurrent = newCommandId;
+	*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + slot8 + 0x24) = currentCommand;
+	*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + slot8 + 0x20) = newCommandId;
 
+	int slot12 = buttonGroupIndex * 12;
+	char* self = reinterpret_cast<char*>(this);
 	int* timer0 = reinterpret_cast<int*>(self + slot12 + 0x38);
 	*reinterpret_cast<int*>(self + slot12 + 0x3c) = 8 - *timer0;
 	*timer0 = 8 - *timer0;

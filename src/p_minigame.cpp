@@ -200,12 +200,45 @@ void CMiniGamePcs::Quit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012b0d4
+ * PAL Size: 172b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMiniGamePcs::create()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+
+    self[0x1348] = 0;
+    self[0x1350] = 0;
+    *reinterpret_cast<unsigned int*>(self + 0x1354) = 0;
+    *reinterpret_cast<unsigned int*>(self + 0x135C) = 0;
+    self[0x134A] = 0;
+    self[0x134B] = 0xF;
+    self[0x649C] = 0;
+    self[0x134C] = 0;
+
+    if ((self[0x134B] & 1) != 0)
+    {
+        self[0x134C] += 1;
+    }
+
+    if ((self[0x134B] & 2) != 0)
+    {
+        self[0x134C] += 1;
+    }
+
+    if ((self[0x134B] & 4) != 0)
+    {
+        self[0x134C] += 1;
+    }
+
+    if ((self[0x134B] & 8) != 0)
+    {
+        self[0x134C] += 1;
+    }
 }
 
 /*

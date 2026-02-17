@@ -395,12 +395,36 @@ void CTextureMan::Quit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003BD10
+ * PAL Size: 180b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CTextureMan::SetTexture(_GXTexMapID, CTexture*)
+int CTextureMan::SetTexture(_GXTexMapID texMapId, CTexture* texture)
 {
-	// TODO
+    bool usePalette;
+
+    usePalette = false;
+    if ((U8At(texture, 0x60) == 9) || (U8At(texture, 0x60) == 8)) {
+        usePalette = true;
+    }
+
+    if (usePalette) {
+        GXInitTexObjTlut(reinterpret_cast<GXTexObj*>(Ptr(texture, 0x28)), GX_TLUT0);
+    }
+
+    GXLoadTexObj(reinterpret_cast<GXTexObj*>(Ptr(texture, 0x28)), texMapId);
+
+    if (usePalette) {
+        GXInitTexObjTlut(reinterpret_cast<GXTexObj*>(Ptr(texture, 0x28)), GX_TLUT1);
+        GXLoadTexObj(reinterpret_cast<GXTexObj*>(Ptr(texture, 0x28)), static_cast<_GXTexMapID>(texMapId + 1));
+        GXLoadTlut(reinterpret_cast<GXTlutObj*>(Ptr(texture, 0x48)), GX_TLUT0);
+        GXLoadTlut(reinterpret_cast<GXTlutObj*>(Ptr(texture, 0x54)), GX_TLUT1);
+    }
+
+    return 0;
 }
 
 /*
@@ -758,12 +782,47 @@ void CTexture::CheckName(char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003AF64
+ * PAL Size: 204b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CTexture::SetExternalTlut(void*, int)
+void CTexture::SetExternalTlut(void* tlutData, int loadToGX)
 {
-	// TODO
+    int tlutBase;
+    unsigned int numEntries;
+    int offset;
+
+    if (tlutData == 0) {
+        tlutData = PtrAt(this, 0x7C);
+    }
+
+    tlutBase = reinterpret_cast<int>(tlutData);
+    numEntries = 0x10;
+    if (U8At(this, 0x60) == 9) {
+        numEntries = 0x100;
+    }
+
+    GXInitTlutObj(reinterpret_cast<GXTlutObj*>(Ptr(this, 0x48)), reinterpret_cast<void*>(tlutBase), GX_TL_IA8,
+                  static_cast<u16>(numEntries));
+
+    numEntries = 0x10;
+    if (U8At(this, 0x60) == 9) {
+        numEntries = 0x100;
+    }
+    offset = 0x10;
+    if (U8At(this, 0x60) == 9) {
+        offset = 0x100;
+    }
+    GXInitTlutObj(reinterpret_cast<GXTlutObj*>(Ptr(this, 0x54)), reinterpret_cast<void*>(tlutBase + offset * 2), GX_TL_IA8,
+                  static_cast<u16>(numEntries));
+
+    if (loadToGX != 0) {
+        GXLoadTlut(reinterpret_cast<GXTlutObj*>(Ptr(this, 0x48)), GX_TLUT0);
+        GXLoadTlut(reinterpret_cast<GXTlutObj*>(Ptr(this, 0x54)), GX_TLUT1);
+    }
 }
 
 /*

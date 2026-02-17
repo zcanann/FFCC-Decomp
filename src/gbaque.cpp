@@ -88,12 +88,33 @@ void GbaQueue::LoadMask()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800D0AD4
+ * PAL Size: 196b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::SetQueue(int, unsigned int)
+int GbaQueue::SetQueue(int channel, unsigned int value)
 {
-	// TODO
+	int ret;
+	char* compatibilityStr = reinterpret_cast<char*>(accessSemaphores) + 0x28;
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	if (compatibilityStr[channel - 0x18] == 0) {
+		if (*(int*)(compatibilityStr + channel * 4 - 0x28) < 0x40) {
+			ret = 0;
+			*(unsigned int*)(reinterpret_cast<char*>(accessSemaphores) + *(int*)(compatibilityStr + channel * 4 - 0x28) * 4 + channel * 0x100 + 0x30) = value;
+			*(int*)(compatibilityStr + channel * 4 - 0x28) = *(int*)(compatibilityStr + channel * 4 - 0x28) + 1;
+		} else {
+			ret = -1;
+			compatibilityStr[channel - 0x18] = 1;
+		}
+	} else {
+		ret = -1;
+	}
+	OSSignalSemaphore(accessSemaphores + channel);
+	return ret;
 }
 
 /*

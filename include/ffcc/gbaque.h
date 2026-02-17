@@ -29,7 +29,7 @@ public:
     void LoadAll();
     void ClrShopMode();
     void LoadMask();
-    void SetQueue(int, unsigned int);
+    int SetQueue(int, unsigned int);
     void ResetQueue();
     void ExecutQueue();
     void ChgItemData(int, unsigned int);

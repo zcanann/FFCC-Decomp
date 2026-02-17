@@ -1,5 +1,6 @@
 #include "ffcc/p_graphic.h"
 #include "ffcc/graphic.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_minigame.h"
 #include "ffcc/pad.h"
@@ -9,6 +10,7 @@
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" double sin(double);
 extern "C" double cos(double);
+extern "C" void* memset(void*, int, unsigned long);
 
 extern void* __vt__8CManager;
 extern void* lbl_801E8668;
@@ -33,6 +35,9 @@ extern char DAT_8032fbf4[];
 extern char DAT_8032fbf8[];
 extern char s__c_c_c_c_c_c_c_c_c_c_801d7bf8[];
 extern int DAT_802381a0;
+extern "C" float FLOAT_8032fb78;
+extern "C" float FLOAT_8032fbfc;
+extern "C" float FLOAT_8032fc00;
 
 /*
  * --INFO--
@@ -125,12 +130,37 @@ void CGraphicPcs::GetTable(unsigned long)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800476c0
+ * PAL Size: 172b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphicPcs::create()
 {
-	// TODO
+    _InitGxFunc();
+    *(int*)((char*)this + 0xb8) = 0;
+    *(int*)((char*)this + 0xbc) = 0;
+    *(int*)((char*)this + 0xc0) = 0;
+    *(char*)((char*)this + 0xc4) = 1;
+    *(float*)((char*)this + 0xc8) = FLOAT_8032fbfc;
+    *(float*)((char*)this + 0xcc) = FLOAT_8032fc00;
+    *(char*)((char*)this + 0xe0) = 0;
+    *(int*)((char*)this + 0xd0) = 0;
+    *(float*)((char*)this + 0xd4) = FLOAT_8032fb78;
+    *(float*)((char*)this + 0xd8) = FLOAT_8032fb78;
+    *(float*)((char*)this + 0xdc) = FLOAT_8032fb78;
+    memset((char*)this + 4, 0, 0xb0);
+    *(int*)((char*)this + 0xe4) = 0;
+    *(int*)((char*)this + 0xe8) = 0;
+    *(char*)((char*)this + 0xec) = 0;
+    *(char*)((char*)this + 0xed) = 0;
+    *(char*)((char*)this + 0xee) = 0;
+    *(char*)((char*)this + 0xef) = 0;
+    *(char*)((char*)this + 0xf0) = 1;
+    *(char*)((char*)this + 0xf1) = 0;
+    *(short*)((char*)this + 0xf2) = 4;
 }
 
 /*
@@ -156,12 +186,22 @@ void CGraphicPcs::SetDOFParameter(signed char flagA, signed char flagB, float ne
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004767c
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGraphicPcs::SetBlurParameter(int, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, short)
+void CGraphicPcs::SetBlurParameter(int mode, unsigned char r, unsigned char g, unsigned char b, unsigned char a, unsigned char mode2, short scale)
 {
-	// TODO
+    *(int*)((char*)this + 0xe4) = mode;
+    *(char*)((char*)this + 0xec) = r;
+    *(char*)((char*)this + 0xed) = g;
+    *(char*)((char*)this + 0xee) = b;
+    *(char*)((char*)this + 0xf0) = a;
+    *(char*)((char*)this + 0xf1) = mode2;
+    *(short*)((char*)this + 0xf2) = scale;
 }
 
 /*

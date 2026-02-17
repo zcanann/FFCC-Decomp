@@ -1,4 +1,5 @@
 #include "ffcc/goout.h"
+#include "ffcc/wm_menu.h"
 #include <string.h>
 
 extern CGoOutMenu g_GoOutMenu;
@@ -406,13 +407,21 @@ void CGoOutMenu::Destroy()
  */
 void CGoOutMenu::SetGoOutMode(unsigned char mode)
 {
+    CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
+    McCtrl& mcCtrl = *reinterpret_cast<McCtrl*>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0x20);
+
 	field_0x18 = mode;
 	switch(field_0x18) {
 	case 1:
 		field_0x1c = 0;
-		// Menu state initialization
+        WriteMenuShort(menuPcsLayout.field_2092, 0x1E, -1);
+        WriteMenuShort(menuPcsLayout.field_2092, 0x18, 10);
 		break;
 	case 3:
+        if (field_0x36 >= 0) {
+            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
+            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+        }
 		field_0x45 = 0;
 		field_0x34 = 4;
 		field_0x48 = 0;
@@ -420,12 +429,56 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
 		field_0x46 = 1;
 		break;
 	case 4:
+        if (field_0x36 >= 0) {
+            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
+            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+        }
 		field_0x45 = 0;
 		field_0x34 = 5;
 		field_0x48 = 0;
 		field_0x3c = 0;
 		field_0x46 = 1;
 		break;
+    case 5:
+        field_0x4 = mcCtrl.ChkConnect(static_cast<unsigned char>(field_0x2));
+        if (field_0x4 == 1) {
+            mcCtrl.m_saveIndex = static_cast<unsigned char>(field_0x3);
+            mcCtrl.m_cardChannel = static_cast<unsigned char>(field_0x2);
+            mcCtrl.m_previousState = 0;
+            mcCtrl.m_state = 0;
+            mcCtrl.m_lastResult = 0;
+            mcCtrl.m_iteration = 0;
+            mcCtrl.m_userBuffer = 0;
+            mcCtrl.m_createFlag = 0;
+            field_0x1 = 3;
+        }
+        if (field_0x36 >= 0) {
+            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
+            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+        }
+        field_0x45 = 0;
+        field_0x34 = 7;
+        field_0x48 = 0;
+        field_0x3c = 0;
+        break;
+    case 6:
+        if (ReadMenuShort(menuPcsLayout.field_2120, 0xA) == 1) {
+            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 3);
+            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+            field_0x36 = -1;
+            field_0x40 = 0;
+            field_0x44 = 1;
+        }
+        if (field_0x36 >= 0) {
+            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
+            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+        }
+        field_0x45 = 0;
+        field_0x34 = 0xc;
+        field_0x48 = 0;
+        field_0x3c = 0;
+        field_0x46 = 1;
+        break;
 	}
 }
 

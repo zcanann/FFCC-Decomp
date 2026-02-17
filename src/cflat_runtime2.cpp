@@ -12,6 +12,7 @@ extern "C" void Destroy__9CGBaseObjFv(CGBaseObj*);
 extern "C" void* __vt__13CFlatRuntime2[];
 extern "C" CFlatRuntime* __ct__12CFlatRuntimeFv(CFlatRuntime*);
 extern "C" void __ct__9CFlatDataFv(void*);
+extern "C" void pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(CPartMng*, int, int, PPPCREATEPARAM*, int);
 
 extern unsigned char Pad[];
 extern unsigned char GraphicsPcs[];
@@ -630,12 +631,18 @@ void CFlatRuntime2::PutParticle(int, Vec&, float)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006A500
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFlatRuntime2::PutParticleWork()
 {
-	// TODO
+	pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(
+		&PartMng, ParticleWorkNoHi(this), ParticleWorkNoLo(this),
+		reinterpret_cast<PPPCREATEPARAM*>(reinterpret_cast<u8*>(this) + 0x16CC), 1);
 }
 
 /*

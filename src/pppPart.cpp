@@ -10,12 +10,14 @@
 #include "ffcc/materialman.h"
 #include "ffcc/math.h"
 #include "ffcc/gobject.h"
+#include "ffcc/mapmesh.h"
 #include "ffcc/pppGetRotMatrixXYZ.h"
 #include "ffcc/pppGetRotMatrixXZY.h"
 #include "ffcc/pppGetRotMatrixYXZ.h"
 #include "ffcc/pppGetRotMatrixYZX.h"
 #include "ffcc/pppGetRotMatrixZXY.h"
 #include "ffcc/pppGetRotMatrixZYX.h"
+#include "ffcc/pppShape.h"
 #include "ffcc/gxfunc.h"
 
 static const float kPppZero = 0.0; // FLOAT_8032fddc
@@ -39,7 +41,9 @@ extern "C" unsigned char DAT_8032ed89;
 extern "C" unsigned char DAT_8032ed8a;
 extern "C" unsigned char DAT_8032ed8b;
 extern "C" int DAT_8032ed70;
+extern "C" int DAT_8032ed7c;
 extern "C" unsigned char CFlat[];
+extern "C" void* CAMemCacheSet;
 extern "C" void SetPart__9CLightPcsFQ29CLightPcs6TARGETPvUc(CLightPcs*, int, void*, unsigned char);
 extern "C" void InitVtxFmt__12CMaterialManFi11_GXCompTypei11_GXCompTypei11_GXCompTypei(CMaterialMan*, int, _GXCompType, int, _GXCompType, int, _GXCompType, int);
 extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
@@ -764,12 +768,158 @@ void pppDeletePObject(_pppPObject*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 800563fc
+ * PAL Size: 688b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _pppAllFreePObject(_pppMngSt*)
+void _pppAllFreePObject(_pppMngSt* pppMngSt)
 {
-	// TODO
+	struct pppSubProgEntryRaw
+	{
+		pppProg* m_prog;
+		u32 m_initWork;
+		u32 m_unk8;
+		u32 m_unkC;
+	};
+
+	struct pppProgramSetDefRaw
+	{
+		pppProgramSetDefRaw* m_next;
+		u32 m_unk4;
+		u32 m_unk8;
+		u32 m_startFrame;
+		pppSubProgEntryRaw m_subProgEntries[1];
+		u8 m_flags;
+		u8 m_unk21;
+		s16 m_sortKey;
+		u16 m_objBaseSize;
+		s16 m_numStages;
+	};
+
+	struct pppPDataValRaw
+	{
+		pppProgramSetDefRaw* m_programSetDef;
+		s32 m_nextSpawnTime;
+		_pppPObjLink* m_pppPObjLink;
+		s16 m_activeCount;
+		u8 m_index;
+		u8 m_pad;
+	};
+
+	struct pppMngStFreeRaw
+	{
+		u32* m_pppResSet;
+		s32 m_partIndex;
+		u8 m_pad0[0x14 - 0x08];
+		s32 m_baseTime;
+		u8 m_pad1[0xC4 - 0x18];
+		_pppPObjLink m_pppPObjLinkHead;
+		pppPDataValRaw* m_pppPDataVals;
+		u8 m_pad2[0xF5 - 0xCC];
+		u8 m_mapTexLoaded;
+		u8 m_hasMapRef;
+		u8 m_pad3[0x11C - 0xF7];
+		PPPSEST m_soundEffectData;
+	};
+
+	_WaitDrawDone__8CGraphicFPci(&Graphic, s_pppPart_cpp, 0x362);
+
+	_pppMngSt* oldMngSt = pppMngStPtr;
+	pppMngStPtr = pppMngSt;
+
+	pppMngStFreeRaw* mngRaw = (pppMngStFreeRaw*)pppMngSt;
+	if (mngRaw->m_soundEffectData.m_soundEffectSlot >= 0 &&
+		mngRaw->m_soundEffectData.m_soundEffectHandle >= 0)
+	{
+		Sound.FadeOutSe3D(mngRaw->m_soundEffectData.m_soundEffectHandle,
+			mngRaw->m_soundEffectData.m_soundEffectFadeFrames);
+		mngRaw->m_soundEffectData.m_soundEffectHandle = -1;
+	}
+
+	for (_pppPObjLink* obj = mngRaw->m_pppPObjLinkHead.m_next; obj != 0;)
+	{
+		pppPDataValRaw* owner = (pppPDataValRaw*)obj->m_owner;
+		_pppPObjLink* next = obj->m_next;
+		pppProgramSetDefRaw* ownerSet = owner->m_programSetDef;
+		for (s32 stageIndex = 0; stageIndex < ownerSet->m_numStages; stageIndex++)
+		{
+			pppSubProgEntryRaw* entry = &ownerSet->m_subProgEntries[stageIndex];
+			if (entry->m_prog != 0 && entry->m_prog->m_pppFunctionDestructor != 0)
+			{
+				((void (*)(_pppPObjLink*, pppSubProgEntryRaw*))entry->m_prog->m_pppFunctionDestructor)(obj, entry);
+			}
+		}
+
+		owner->m_activeCount--;
+		if (owner->m_activeCount == 0)
+		{
+			owner->m_pppPObjLink = 0;
+		}
+		else if (owner->m_pppPObjLink == obj)
+		{
+			owner->m_pppPObjLink = next;
+		}
+
+		Memory.Free(obj);
+		obj = next;
+	}
+
+	mngRaw->m_pppPObjLinkHead.m_next = 0;
+	if (mngRaw->m_pppPDataVals != 0)
+	{
+		Memory.Free(mngRaw->m_pppPDataVals);
+		mngRaw->m_pppPDataVals = 0;
+	}
+
+	DAT_8032ed7c = 0;
+	mngRaw->m_baseTime = -0x1000;
+
+	if (Game.game.m_currentSceneId != 7)
+	{
+		if (mngRaw->m_hasMapRef != 0)
+		{
+			u32 pppResSet = *mngRaw->m_pppResSet;
+			s16* partResource = (s16*)(*(u32*)(pppResSet + 0x10) + mngRaw->m_partIndex * 8);
+
+			s16 cacheIndex = *partResource;
+			if (cacheIndex != -1)
+			{
+				((CAmemCacheSet*)CAMemCacheSet)->Release(cacheIndex);
+			}
+
+			if (mngRaw->m_mapTexLoaded != 0)
+			{
+				u32 mapTexRef = *(u32*)(partResource + 2);
+				s16* mapMeshIndices = (s16*)(mapTexRef + *(u32*)(mapTexRef + 0x10));
+				s16* shapeIndices = (s16*)(mapTexRef + *(u32*)(mapTexRef + 0x14));
+
+				s16 mapMeshCount = *mapMeshIndices;
+				mapMeshIndices++;
+				for (s16 i = 0; i < mapMeshCount; i++)
+				{
+					CMapMesh* mapMesh = *(CMapMesh**)(*(u32*)(pppResSet + 0x14) + mapMeshIndices[i] * 4);
+					mapMesh->pppCacheDumpModelTexture(pppEnvStPtr->m_materialSetPtr, (CAmemCacheSet*)CAMemCacheSet);
+				}
+
+				s16 shapeCount = *shapeIndices;
+				shapeIndices++;
+				for (s16 i = 0; i < shapeCount; i++)
+				{
+					pppShapeSt* shape = *(pppShapeSt**)(*(u32*)(pppResSet + 0x18) + shapeIndices[i] * 4);
+					pppCacheDumpShapeTexture(shape, pppEnvStPtr->m_materialSetPtr);
+				}
+			}
+		}
+
+		mngRaw->m_mapTexLoaded = 0;
+		mngRaw->m_hasMapRef = 0;
+	}
+
+	_WaitDrawDone__8CGraphicFPci(&Graphic, s_pppPart_cpp, 0x3A1);
+	pppMngStPtr = oldMngSt;
 }
 
 static void InitOwnerFlagsAndScale(_pppMngSt* pppMngSt)

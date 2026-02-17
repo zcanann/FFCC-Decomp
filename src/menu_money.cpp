@@ -57,13 +57,12 @@ void CMenuPcs::MoneyInit()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::MoneyOpen()
+bool CMenuPcs::MoneyOpen()
 {
 	if (*(char *)(*(int *)((char*)this + 0x82c) + 0xb) == '\0') {
 		memset(*(void**)((char*)this + 0x850), 0, 0x1008);
-		
-		// Initialize display elements
-		float fVar1 = 1.0f; // FLOAT_80332f70
+
+		float fVar1 = 1.0f;
 		int iVar8 = *(int *)((char*)this + 0x850) + 8;
 		int iVar15 = 8;
 		do {
@@ -78,17 +77,61 @@ void CMenuPcs::MoneyOpen()
 			iVar8 = iVar8 + 0x200;
 			iVar15 = iVar15 + -1;
 		} while (iVar15 != 0);
-		
-		// Setup base values
+
 		int iVar8_2 = *(int *)((char*)this + 0x850);
 		*(int *)(iVar8_2 + 0x24) = 0x3b;
 		*(short *)(iVar8_2 + 10) = 0x68;
 		*(short *)(iVar8_2 + 0xc) = 0xf8;
 		*(short *)(iVar8_2 + 0xe) = 0x88;
-		
-		// Mark as initialized
+
+		*(short *)(iVar8_2 + 8) = static_cast<short>(-(static_cast<int>(*(short *)(iVar8_2 + 0xc)) / 2));
+		*(float *)(iVar8_2 + 0x10) = 0.0f;
+		*(float *)(iVar8_2 + 0x14) = 0.0f;
+		*(float *)(iVar8_2 + 0x1c) = 1.0f;
+		*(int *)(iVar8_2 + 0x2c) = 0;
+		*(int *)(iVar8_2 + 0x30) = 10;
+		**(short**)((char*)this + 0x850) = 1;
+
+		UpdateDigits(static_cast<unsigned int>(reinterpret_cast<CCaravanWork*>(Game.game.m_scriptFoodBase[0])->m_gil), &s_place[0]);
+		DAT_8032eee0 = 0;
+		UpdateDigits(0, &s_place[8]);
+
+		*(short *)(*(int *)((char*)this + 0x82c) + 0x26) = 0;
 		*(char *)(*(int *)((char*)this + 0x82c) + 0xb) = 1;
 	}
+
+	int doneCount = 0;
+	int menuState = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c);
+
+	*reinterpret_cast<short*>(menuState + 0x22) = static_cast<short>(*reinterpret_cast<short*>(menuState + 0x22) + 1);
+	int entryCount = static_cast<int>(**reinterpret_cast<short**>(reinterpret_cast<char*>(this) + 0x850));
+	short* entry = *reinterpret_cast<short**>(reinterpret_cast<char*>(this) + 0x850) + 4;
+	int time = static_cast<int>(*reinterpret_cast<short*>(menuState + 0x22));
+
+	for (int i = 0; i < entryCount; ++i) {
+		if (*reinterpret_cast<int*>(entry + 0x12) <= time) {
+			int duration = *reinterpret_cast<int*>(entry + 0x14);
+			if (time < *reinterpret_cast<int*>(entry + 0x12) + duration) {
+				*reinterpret_cast<int*>(entry + 0x10) = *reinterpret_cast<int*>(entry + 0x10) + 1;
+				float t = static_cast<float>(*reinterpret_cast<int*>(entry + 0x10)) / static_cast<float>(duration);
+				*reinterpret_cast<float*>(entry + 8) = t;
+				if ((*reinterpret_cast<unsigned int*>(entry + 0x16) & 2) == 0) {
+					*reinterpret_cast<float*>(entry + 0x18) =
+						(*reinterpret_cast<float*>(entry + 0x1c) - static_cast<float>(*entry)) * t;
+					*reinterpret_cast<float*>(entry + 0x1a) =
+						(*reinterpret_cast<float*>(entry + 0x1e) - static_cast<float>(entry[1])) * t;
+				}
+			} else {
+				doneCount += 1;
+				*reinterpret_cast<float*>(entry + 8) = 1.0f;
+				*reinterpret_cast<float*>(entry + 0x18) = 0.0f;
+				*reinterpret_cast<float*>(entry + 0x1a) = 0.0f;
+			}
+		}
+		entry += 0x20;
+	}
+
+	return entryCount == doneCount;
 }
 
 /*

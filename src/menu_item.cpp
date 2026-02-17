@@ -1,8 +1,26 @@
 #include "ffcc/menu_item.h"
+#include "ffcc/pad.h"
+#include "ffcc/p_game.h"
+#include "ffcc/sound.h"
 #include <string.h>
 
 typedef signed short s16;
 typedef unsigned char u8;
+typedef unsigned short u16;
+
+extern "C" int SingGetLetterAttachflg__8CMenuPcsFv(CMenuPcs*);
+extern "C" void LetterSetAttachItem__8CMenuPcsFUii(CMenuPcs*, unsigned int, unsigned int);
+extern "C" int EquipChk__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" int GetItemType__8CMenuPcsFii(CMenuPcs*, int, int);
+extern "C" int CanPlayerUseItem__12CCaravanWorkFv(void*);
+extern "C" int CanPlayerPutItem__12CCaravanWorkFv(void*);
+extern "C" void GetSingWinSize__8CMenuPcsFiPsPsi(CMenuPcs*, int, s16*, s16*, int);
+extern "C" void SetSingWinInfo__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
+extern "C" void FGUseItem__12CCaravanWorkFii(void*, int, int);
+extern "C" void SingLifeInit__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" void CalcStatus__12CCaravanWorkFv(void*);
+extern "C" void FGPutItem__12CCaravanWorkFii(void*, int, int);
+extern "C" void DeleteItemIdx__12CCaravanWorkFii(void*, int, int);
 
 struct MenuItemOpenAnim {
     s16 x;
@@ -408,10 +426,190 @@ void CMenuPcs::ItemDraw()
 
 /*
  * --INFO--
- * Address:\tTODO
- * Size:\tTODO
+ * PAL Address: 0x80159654
+ * PAL Size: 1952b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CMenuPcs::ItemCtrlCur()
 {
+    bool blocked = false;
+    u16 press;
+    u16 hold;
+    int caravanWork = Game.game.m_scriptFoodBase[0];
+
+    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        blocked = true;
+    }
+    if (blocked) {
+        press = 0;
+    } else {
+        press = Pad._8_2_;
+    }
+
+    blocked = false;
+    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        blocked = true;
+    }
+    if (blocked) {
+        hold = 0;
+    } else {
+        hold = *(u16*)((u8*)&Pad + 0x20);
+    }
+
+    if (hold == 0) {
+        return 0;
+    }
+
+    int menuState = *(int*)((u8*)this + 0x82C);
+    s16 letterAttachFlg = SingGetLetterAttachflg__8CMenuPcsFv(this);
+    int mode = (int)*(s16*)(menuState + 0x30);
+
+    if (mode == 0) {
+        if ((hold & 8) == 0) {
+            if ((hold & 4) != 0) {
+                if (*(s16*)(menuState + 0x26) < 7) {
+                    *(s16*)(menuState + 0x26) = *(s16*)(menuState + 0x26) + 1;
+                } else {
+                    s16 scroll = *(s16*)(menuState + 0x34);
+                    if (scroll > 0x3E) {
+                        *(s16*)(menuState + 0x34) = 0;
+                    } else {
+                        *(s16*)(menuState + 0x34) = scroll + 1;
+                    }
+                }
+                Sound.PlaySe(1, 0x40, 0x7F, 0);
+            }
+        } else if (*(s16*)(menuState + 0x26) == 0) {
+            if (*(s16*)(menuState + 0x34) == 0) {
+                *(s16*)(menuState + 0x34) = 0x3F;
+            } else {
+                *(s16*)(menuState + 0x34) = *(s16*)(menuState + 0x34) - 1;
+            }
+            Sound.PlaySe(1, 0x40, 0x7F, 0);
+        } else {
+            *(s16*)(menuState + 0x26) = *(s16*)(menuState + 0x26) - 1;
+            Sound.PlaySe(1, 0x40, 0x7F, 0);
+        }
+
+        if ((hold & 0xC) == 0) {
+            if ((press & 0x20) != 0) {
+                if (letterAttachFlg < 0) {
+                    *(s16*)(menuState + 0x1E) = 1;
+                    Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
+                    return 1;
+                }
+                Sound.PlaySe(4, 0x40, 0x7F, 0);
+            } else if ((press & 0x40) != 0) {
+                if (letterAttachFlg < 0) {
+                    *(s16*)(menuState + 0x1E) = -1;
+                    Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
+                    return 1;
+                }
+                Sound.PlaySe(4, 0x40, 0x7F, 0);
+            } else if ((press & 0x100) != 0) {
+                int idx = (int)*(s16*)(menuState + 0x34) + (int)*(s16*)(menuState + 0x26);
+                if (idx > 0x3F) {
+                    idx -= 0x40;
+                }
+
+                int itemEntry = caravanWork + idx * 2;
+                s16 itemId = *(s16*)(itemEntry + 0xB6);
+
+                if ((itemId < 1) || (EquipChk__8CMenuPcsFi(this, idx) != 0) ||
+                    ((letterAttachFlg >= 0) && (itemId < 0x125))) {
+                    Sound.PlaySe(4, 0x40, 0x7F, 0);
+                } else if (letterAttachFlg >= 0) {
+                    LetterSetAttachItem__8CMenuPcsFUii(this, (unsigned int)idx, 1);
+                    Sound.PlaySe(2, 0x40, 0x7F, 0);
+                    return 1;
+                } else {
+                    *(u8*)(menuState + 9) = 0xC;
+                    int itemType = GetItemType__8CMenuPcsFii(this, idx, 0);
+
+                    if ((itemType == 7) && (CanPlayerUseItem__12CCaravanWorkFv((void*)caravanWork) != 0)) {
+                        *(u8*)(menuState + 9) = *(u8*)(menuState + 9) | 1;
+                    }
+                    if ((itemType != 1) && (CanPlayerPutItem__12CCaravanWorkFv((void*)caravanWork) != 0)) {
+                        *(u8*)(menuState + 9) = *(u8*)(menuState + 9) | 2;
+                    }
+
+                    s16 winW;
+                    s16 winH;
+                    GetSingWinSize__8CMenuPcsFiPsPsi(this, 0, &winW, &winH, 0);
+                    SetSingWinInfo__8CMenuPcsFiiii(this, 0xF0, 0xA0, winW, winH);
+
+                    *(s16*)(*(int*)((u8*)this + 0x848) + 10) = 0;
+                    *(s16*)(menuState + 0x12) = 0;
+                    *(s16*)(menuState + 0x30) = 1;
+                    Sound.PlaySe(2, 0x40, 0x7F, 0);
+                }
+            } else if ((press & 0x200) != 0) {
+                if (letterAttachFlg >= 0) {
+                    LetterSetAttachItem__8CMenuPcsFUii(this, 0, 0xFFFFFFFF);
+                    Sound.PlaySe(3, 0x40, 0x7F, 0);
+                    return 1;
+                }
+                *(u8*)(menuState + 0xD) = 1;
+                Sound.PlaySe(3, 0x40, 0x7F, 0);
+                return 1;
+            }
+        }
+    } else {
+        int optBase = menuState + mode * 2;
+
+        if ((hold & 8) == 0) {
+            if ((hold & 4) != 0) {
+                if (*(s16*)(optBase + 0x26) < 3) {
+                    *(s16*)(optBase + 0x26) = *(s16*)(optBase + 0x26) + 1;
+                } else {
+                    *(s16*)(optBase + 0x26) = 0;
+                }
+                Sound.PlaySe(1, 0x40, 0x7F, 0);
+            }
+        } else {
+            if (*(s16*)(optBase + 0x26) == 0) {
+                *(s16*)(optBase + 0x26) = 3;
+            } else {
+                *(s16*)(optBase + 0x26) = *(s16*)(optBase + 0x26) - 1;
+            }
+            Sound.PlaySe(1, 0x40, 0x7F, 0);
+        }
+
+        if ((hold & 0xC) == 0) {
+            if ((press & 0x100) != 0) {
+                int option = (int)*(s16*)(optBase + 0x26);
+                if (((int)*(char*)(menuState + 9) & (1 << option)) == 0) {
+                    Sound.PlaySe(4, 0x40, 0x7F, 0);
+                } else {
+                    int idx = (int)*(s16*)(menuState + 0x34) + (int)*(s16*)(menuState + 0x26);
+                    if (idx > 0x3F) {
+                        idx -= 0x40;
+                    }
+
+                    if (option == 0) {
+                        FGUseItem__12CCaravanWorkFii((void*)caravanWork, idx, 0);
+                        SingLifeInit__8CMenuPcsFi(this, 0);
+                        CalcStatus__12CCaravanWorkFv((void*)caravanWork);
+                    } else if (option == 1) {
+                        FGPutItem__12CCaravanWorkFii((void*)caravanWork, idx, 0);
+                    } else if (option == 2) {
+                        DeleteItemIdx__12CCaravanWorkFii((void*)caravanWork, idx, 0);
+                    }
+
+                    *(s16*)(*(int*)((u8*)this + 0x848) + 10) = 2;
+                    *(s16*)(menuState + 0x12) = *(s16*)(menuState + 0x12) + 1;
+                    Sound.PlaySe(2, 0x40, 0x7F, 0);
+                }
+            } else if ((press & 0x200) != 0) {
+                *(s16*)(*(int*)((u8*)this + 0x848) + 10) = 2;
+                *(s16*)(menuState + 0x12) = *(s16*)(menuState + 0x12) + 1;
+                Sound.PlaySe(3, 0x40, 0x7F, 0);
+            }
+        }
+    }
+
     return 0;
 }

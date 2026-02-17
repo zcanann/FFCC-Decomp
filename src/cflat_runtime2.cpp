@@ -430,22 +430,66 @@ void CFlatRuntime2::Load(char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006CADC
+ * PAL Size: 168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::FindGObjFirst()
+CGObject* CFlatRuntime2::FindGObjFirst()
 {
-	// TODO
+	typedef int (*GetCIDFn)(CFlatRuntime::CObject*);
+	CFlatRuntime::CObject* const root =
+		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x1204);
+	CFlatRuntime::CObject* object = root->m_next->m_next;
+
+	while (object != root) {
+		if (object->m_classIndex >= 0) {
+			const unsigned int flags = object->m_flags;
+			if ((int)(flags << 24) >= 0 && (int)((flags << 25) | (flags >> 7)) >= 0) {
+				GetCIDFn getCID = reinterpret_cast<GetCIDFn>((*reinterpret_cast<void***>(object))[3]);
+				if ((getCID(object) & 5) == 5) {
+					return reinterpret_cast<CGObject*>(object);
+				}
+			}
+		}
+		object = object->m_next;
+	}
+
+	return 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006CA38
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::FindGObjNext(CGObject*)
+CGObject* CFlatRuntime2::FindGObjNext(CGObject* gObject)
 {
-	// TODO
+	typedef int (*GetCIDFn)(CFlatRuntime::CObject*);
+	CFlatRuntime::CObject* const root =
+		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x1204);
+	CFlatRuntime::CObject* object = reinterpret_cast<CFlatRuntime::CObject*>(gObject)->m_next;
+
+	while (object != root) {
+		if (object->m_classIndex >= 0) {
+			const unsigned int flags = object->m_flags;
+			if ((int)(flags << 24) >= 0 && (int)((flags << 25) | (flags >> 7)) >= 0) {
+				GetCIDFn getCID = reinterpret_cast<GetCIDFn>((*reinterpret_cast<void***>(object))[3]);
+				if ((getCID(object) & 5) == 5) {
+					return reinterpret_cast<CGObject*>(object);
+				}
+			}
+		}
+		object = object->m_next;
+	}
+
+	return 0;
 }
 
 /*

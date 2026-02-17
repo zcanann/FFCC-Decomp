@@ -38,8 +38,8 @@ class CFlatRuntime2
 	void Frame(int, int);
 	void Load(char*);
 
-	void FindGObjFirst();
-	void FindGObjNext(CGObject*);
+	CGObject* FindGObjFirst();
+	CGObject* FindGObjNext(CGObject*);
 
 	void FindGBaseObjFirst();
 	void FindGBaseObjNext(CGBaseObj*);

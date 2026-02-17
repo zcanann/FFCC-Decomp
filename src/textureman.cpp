@@ -1,4 +1,5 @@
 #include "ffcc/textureman.h"
+#include "ffcc/chunkfile.h"
 #include "ffcc/system.h"
 
 #include <string.h>
@@ -54,9 +55,13 @@ extern "C" void _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaA
     int, int, int, int, int);
 extern "C" void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(int, int, int, int,
                                                                                                        int, int);
+extern "C" unsigned short SetData__13CAmemCacheSetFPviQ210CAmemCache4TYPEi(CAmemCacheSet*, void*, int, CAmemCache::TYPE,
+                                                                             int);
 
 static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
 static char s_ptrarray_grow_error[] = "CPtrArray grow error";
+static char s_textureman_cpp[] = "textureman.cpp";
+static char s_error_width_height[] = "Error width %d, height %d\n";
 
 namespace {
 static inline unsigned char* Ptr(void* p, unsigned int offset)
@@ -67,6 +72,31 @@ static inline unsigned char* Ptr(void* p, unsigned int offset)
 static inline CPtrArray<CTexture*>* Textures(CTextureSet* textureSet)
 {
     return reinterpret_cast<CPtrArray<CTexture*>*>(Ptr(textureSet, 8));
+}
+
+static inline unsigned char& U8At(void* p, unsigned int offset)
+{
+    return *reinterpret_cast<unsigned char*>(Ptr(p, offset));
+}
+
+static inline unsigned short& U16At(void* p, unsigned int offset)
+{
+    return *reinterpret_cast<unsigned short*>(Ptr(p, offset));
+}
+
+static inline short& S16At(void* p, unsigned int offset)
+{
+    return *reinterpret_cast<short*>(Ptr(p, offset));
+}
+
+static inline unsigned int& U32At(void* p, unsigned int offset)
+{
+    return *reinterpret_cast<unsigned int*>(Ptr(p, offset));
+}
+
+static inline void*& PtrAt(void* p, unsigned int offset)
+{
+    return *reinterpret_cast<void**>(Ptr(p, offset));
 }
 }
 
@@ -504,12 +534,148 @@ void CTexture::InitTexObj()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003B244
+ * PAL Size: 1260b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CTexture::Create(CChunkFile&, CMemory::CStage*, CAmemCacheSet*, int, int)
+void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheSet* amemCacheSet, int cacheTag, int useAddress)
 {
-	// TODO
+    CChunkFile::CChunk chunk;
+
+    U8At(this, 0x6C) = 1;
+    U8At(this, 0x60) = 6;
+    U8At(this, 0x71) = 0;
+    U8At(this, 0x75) = static_cast<unsigned char>(useAddress);
+
+    chunkFile.PushChunk();
+    while (chunkFile.GetNextChunk(chunk) != 0) {
+        if (chunk.m_id == 0x4E414D45) {
+            strcpy(reinterpret_cast<char*>(Ptr(this, 0x08)), chunkFile.GetString());
+        } else if (chunk.m_id == 0x464D5420) {
+            switch (chunkFile.Get1()) {
+            case 0:
+                U8At(this, 0x60) = 6;
+                break;
+            case 1:
+                U8At(this, 0x60) = 4;
+                break;
+            case 2:
+                U8At(this, 0x60) = 9;
+                break;
+            case 3:
+                U8At(this, 0x60) = 8;
+                break;
+            case 5:
+                U8At(this, 0x60) = 0;
+                break;
+            case 6:
+                U8At(this, 0x60) = 0xE;
+                break;
+            case 7:
+                U8At(this, 0x60) = 3;
+                U8At(this, 0x70) = 1;
+                break;
+            case 8:
+                U8At(this, 0x60) = 3;
+                break;
+            case 9:
+                U8At(this, 0x60) = 1;
+                break;
+            case 10:
+                U8At(this, 0x60) = 0xE;
+                U8At(this, 0x71) = 1;
+                break;
+            }
+
+            U8At(this, 0x74) = chunkFile.Get1();
+            if (chunk.m_arg0 > 3) {
+                U8At(this, 0x6C) = chunkFile.Get1();
+            }
+        } else if (chunk.m_id == 0x53495A45) {
+            U32At(this, 0x64) = chunkFile.Get4();
+            U32At(this, 0x68) = chunkFile.Get4();
+            if ((U32At(this, 0x64) == 0) || (U32At(this, 0x68) == 0)) {
+                System.Printf(s_error_width_height, U32At(this, 0x64), U32At(this, 0x68));
+                chunkFile.PopChunk();
+                return;
+            }
+        } else if (chunk.m_id == 0x494D4147) {
+            if (amemCacheSet == 0) {
+                if (U8At(this, 0x75) == 0) {
+                    PtrAt(this, 0x78) =
+                        _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, chunk.m_size, stage, s_textureman_cpp, 0x15C, 0);
+                    chunkFile.Get(PtrAt(this, 0x78), chunk.m_size);
+                } else {
+                    PtrAt(this, 0x78) = chunkFile.GetAddress();
+                }
+                DCFlushRange(PtrAt(this, 0x78), chunk.m_size);
+                U16At(this, 0x72) = 0xFFFF;
+            } else {
+                void* data = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, chunk.m_size, stage, s_textureman_cpp, 0x150, 0);
+                chunkFile.Get(data, chunk.m_size);
+                U16At(this, 0x72) =
+                    SetData__13CAmemCacheSetFPviQ210CAmemCache4TYPEi(amemCacheSet, data, chunk.m_size, static_cast<CAmemCache::TYPE>(0),
+                                                                     cacheTag);
+                __dl__FPv(data);
+                PtrAt(this, 0x78) = 0;
+            }
+        } else if (chunk.m_id == 0x50414C54) {
+            if (U8At(this, 0x75) == 0) {
+                PtrAt(this, 0x7C) =
+                    _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, chunk.m_size, stage, s_textureman_cpp, 0x178, 0);
+                chunkFile.Get(PtrAt(this, 0x7C), chunk.m_size);
+            } else {
+                PtrAt(this, 0x7C) = chunkFile.GetAddress();
+            }
+            DCFlushRange(PtrAt(this, 0x7C), chunk.m_size);
+        }
+    }
+    chunkFile.PopChunk();
+
+    unsigned int width = U32At(this, 0x64);
+    unsigned int height = U32At(this, 0x68);
+    while ((width & 1) == 0) {
+        width >>= 1;
+    }
+    while ((height & 1) == 0) {
+        height >>= 1;
+    }
+    if ((width != 1) || (height != 1)) {
+        U8At(this, 0x6C) = 0;
+    }
+
+    if (S16At(this, 0x72) != -1) {
+        return;
+    }
+
+    const int format = U8At(this, 0x60);
+    if ((format == 9) || (format == 8)) {
+        GXInitTexObjCI(reinterpret_cast<GXTexObj*>(Ptr(this, 0x28)), PtrAt(this, 0x78), U16At(this, 0x64), U16At(this, 0x68),
+                       static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(U8At(this, 0x6C)),
+                       static_cast<GXTexWrapMode>(U8At(this, 0x6C)), 0, 0);
+
+        unsigned int numEntries = 0x10;
+        if (U8At(this, 0x60) == 9) {
+            numEntries = 0x100;
+        }
+
+        GXInitTlutObj(reinterpret_cast<GXTlutObj*>(Ptr(this, 0x48)), PtrAt(this, 0x7C), GX_TL_IA8, static_cast<u16>(numEntries));
+        GXInitTlutObj(reinterpret_cast<GXTlutObj*>(Ptr(this, 0x54)), Ptr(PtrAt(this, 0x7C), numEntries * 2), GX_TL_IA8,
+                      static_cast<u16>(numEntries));
+    } else {
+        GXInitTexObj(reinterpret_cast<GXTexObj*>(Ptr(this, 0x28)), PtrAt(this, 0x78), U16At(this, 0x64), U16At(this, 0x68),
+                     static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(U8At(this, 0x6C)),
+                     static_cast<GXTexWrapMode>(U8At(this, 0x6C)), 1 - (U8At(this, 0x74) >> 31));
+    }
+
+    const unsigned char maxLod = U8At(this, 0x74);
+    if (maxLod >= 2) {
+        GXInitTexObjLOD(reinterpret_cast<GXTexObj*>(Ptr(this, 0x28)), GX_LINEAR, GX_LINEAR, 0.0f, static_cast<float>(maxLod - 1),
+                        0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    }
 }
 
 /*

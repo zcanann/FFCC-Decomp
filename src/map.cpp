@@ -2,6 +2,7 @@
 #include "ffcc/chunkfile.h"
 #include "ffcc/math.h"
 #include "ffcc/memory.h"
+#include "ffcc/maphit.h"
 #include "ffcc/maptexanim.h"
 #include "ffcc/system.h"
 
@@ -18,6 +19,18 @@ extern "C" float lbl_8032F990;
 extern "C" float lbl_8032F994;
 extern "C" float lbl_8032F998;
 extern "C" float lbl_8032F99C;
+extern "C" int CheckHitCylinder__8COctTreeFP12CMapCylinderP3VecUl(void*, CMapCylinder*, Vec*, unsigned long);
+extern "C" int CheckHitCylinderNear__8COctTreeFP12CMapCylinderP3VecUl(void*, CMapCylinder*, Vec*, unsigned long);
+extern int DAT_8032ec78;
+extern float FLOAT_8032ec80;
+extern unsigned char DAT_8032ec88;
+extern float FLOAT_8032f9a0;
+extern float FLOAT_8032f9a4;
+extern float FLOAT_8032f9a8;
+extern float FLOAT_8032f9ac;
+extern char DAT_801ead4c[];
+extern char DAT_801d7384[];
+extern char DAT_801d73c4[];
 extern CMath Math;
 
 static char s_map_cpp[] = "map.cpp";
@@ -1158,22 +1171,110 @@ void CMapMng::DrawAfter()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003007c
+ * PAL Size: 516b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int CMapMng::CheckHitCylinder(CMapCylinder*, Vec*, unsigned long)
+int CMapMng::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
-	// TODO
+    if ((FLOAT_8032f9a0 == move->x) && (FLOAT_8032f9a0 == move->y) && (FLOAT_8032f9a0 == move->z)) {
+        return 0;
+    }
+
+    if ((move->x <= FLOAT_8032f9a4) && (FLOAT_8032f9a8 <= move->x) && (move->y <= FLOAT_8032f9a4) &&
+        (FLOAT_8032f9a8 <= move->y) && (move->z <= FLOAT_8032f9a4) && (FLOAT_8032f9a8 <= move->z)) {
+        if (static_cast<unsigned int>(System.m_execParam) > 1) {
+            System.Printf(DAT_801ead4c);
+        }
+        if (static_cast<unsigned int>(System.m_execParam) > 1) {
+            System.Printf(DAT_801d73c4, static_cast<double>(move->x), static_cast<double>(move->y), static_cast<double>(move->z));
+        }
+        if (static_cast<unsigned int>(System.m_execParam) > 1) {
+            System.Printf(DAT_801ead4c);
+        }
+    }
+
+    DAT_8032ec78 = -2;
+    FLOAT_8032ec80 = FLOAT_8032f9ac;
+    PSVECAdd(&cylinder->m_bottom, move, &cylinder->m_top);
+
+    for (int i = 0; i < *reinterpret_cast<short*>(Ptr(this, 8)); i++) {
+        unsigned char* octTree = Ptr(this, 0x14 + (i * 0x38));
+        if (CheckHitCylinder__8COctTreeFP12CMapCylinderP3VecUl(octTree, cylinder, move, mask) != 0) {
+            *reinterpret_cast<void**>(Ptr(this, 0x22A78)) = *reinterpret_cast<void**>(octTree + 8);
+            return 1;
+        }
+    }
+
+    for (int i = 0; i < *reinterpret_cast<short*>(Ptr(this, 0xC)); i++) {
+        CMapObj* mapObj = reinterpret_cast<CMapObj*>(Ptr(this, 0x954 + (i * 0xF0)));
+        *reinterpret_cast<CMapObj**>(Ptr(this, 0x22A78)) = mapObj;
+        if (mapObj->CheckHitCylinder(cylinder, move, mask) != 0) {
+            return 1;
+        }
+    }
+
+    return 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002fe6c
+ * PAL Size: 528b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int CMapMng::CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned long)
+int CMapMng::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned long mask)
 {
-	// TODO
+    int hit = 0;
+
+    if ((FLOAT_8032f9a0 == move->x) && (FLOAT_8032f9a0 == move->y) && (FLOAT_8032f9a0 == move->z)) {
+        return 0;
+    }
+
+    if ((move->x <= FLOAT_8032f9a4) && (FLOAT_8032f9a8 <= move->x) && (move->y <= FLOAT_8032f9a4) &&
+        (FLOAT_8032f9a8 <= move->y) && (move->z <= FLOAT_8032f9a4) && (FLOAT_8032f9a8 <= move->z)) {
+        if (static_cast<unsigned int>(System.m_execParam) > 1) {
+            System.Printf(DAT_801ead4c);
+        }
+        if (static_cast<unsigned int>(System.m_execParam) > 1) {
+            System.Printf(DAT_801d7384, static_cast<double>(move->x), static_cast<double>(move->y), static_cast<double>(move->z));
+        }
+        if (static_cast<unsigned int>(System.m_execParam) > 1) {
+            System.Printf(DAT_801ead4c);
+        }
+    }
+
+    DAT_8032ec78 = -2;
+    FLOAT_8032ec80 = FLOAT_8032f9ac;
+    PSVECAdd(&cylinder->m_bottom, move, &cylinder->m_top);
+
+    for (int i = 0; i < *reinterpret_cast<short*>(Ptr(this, 8)); i++) {
+        unsigned char* octTree = Ptr(this, 0x14 + (i * 0x38));
+        DAT_8032ec88 = 0;
+        CheckHitCylinderNear__8COctTreeFP12CMapCylinderP3VecUl(octTree, cylinder, move, mask);
+        if (DAT_8032ec88 != 0) {
+            hit = 1;
+            *reinterpret_cast<void**>(Ptr(this, 0x22A78)) = *reinterpret_cast<void**>(octTree + 8);
+        }
+    }
+
+    for (int i = 0; i < *reinterpret_cast<short*>(Ptr(this, 0xC)); i++) {
+        CMapObj* mapObj = reinterpret_cast<CMapObj*>(Ptr(this, 0x954 + (i * 0xF0)));
+        DAT_8032ec88 = 0;
+        mapObj->CheckHitCylinderNear(cylinder, move, mask);
+        if (DAT_8032ec88 != 0) {
+            hit = 1;
+            *reinterpret_cast<CMapObj**>(Ptr(this, 0x22A78)) = mapObj;
+        }
+    }
+
+    return hit;
 }
 
 /*

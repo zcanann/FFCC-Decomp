@@ -154,18 +154,18 @@ extern "C" void pppConstruct2YmLaser(void* pppYmLaser_, void* param_2_)
 	pppYmLaser* pppYmLaser = (struct pppYmLaser*)pppYmLaser_;
 	YmLaserParam* param_2 = (YmLaserParam*)param_2_;
 	f32 one = FLOAT_80330dc0;
-	s32 dataOffset = param_2->offsets->m_serializedDataOffsets[2];
+	f32* work = (f32*)((u8*)pppYmLaser + 0x80 + param_2->offsets->m_serializedDataOffsets[2]);
 
-	*(f32*)((u8*)&pppYmLaser->field_0x98 + dataOffset) = one;
-	*(f32*)((u8*)&pppYmLaser->field_0x94 + dataOffset) = one;
-	*(f32*)((u8*)&pppYmLaser->field_0x90 + dataOffset) = one;
-	*(f32*)((u8*)&pppYmLaser->field_0x8c + dataOffset) = one;
-	*(f32*)((u8*)&pppYmLaser->field_0x88 + dataOffset) = one;
-	*(f32*)((u8*)&pppYmLaser->field_0x84 + dataOffset) = one;
-	*(f32*)((u8*)&pppYmLaser->field_0xa8 + dataOffset) = one;
-	*(f32*)((u8*)&pppYmLaser->field_0xa4 + dataOffset) = one;
-	*(f32*)((u8*)&pppYmLaser->field_0xa0 + dataOffset) = one;
-	*((u8*)&pppYmLaser->field_0xac + dataOffset) = 0;
+	work[6] = one;
+	work[5] = one;
+	work[4] = one;
+	work[3] = one;
+	work[2] = one;
+	work[1] = one;
+	work[10] = one;
+	work[9] = one;
+	work[8] = one;
+	*((u8*)work + 0x2c) = 0;
 }
 
 /*

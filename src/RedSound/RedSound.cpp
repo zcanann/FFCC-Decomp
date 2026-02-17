@@ -86,14 +86,12 @@ unsigned int CRedSound::GetAutoID()
 int* CRedSound::EntryStandbyID(int id)
 {
 	int* slot = (int*)DAT_8032e17c;
-	int* end = (int*)(DAT_8032e17c + 0x100);
 
-	while (slot < end) {
+	for (int i = 0; i < 0x40; i++, slot++) {
 		if (*slot == 0) {
 			*slot = id;
 			return slot;
 		}
-		++slot;
 	}
 
 	return 0;

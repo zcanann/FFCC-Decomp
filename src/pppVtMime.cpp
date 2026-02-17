@@ -91,16 +91,7 @@ void pppDrawVtMime(void* param1, void* param2, void* param3)
 
     int vertIdx1 = *(int*)((char*)param2 + 0x4);
     int vertIdx2 = *(int*)((char*)param2 + 0x8);
-    unsigned int maskedIdx;
-
-    maskedIdx = (unsigned int)vertIdx1;
-    maskedIdx &= 0xFFFF0000;
-    if (maskedIdx + 0x00010000 == 0) {
-        return;
-    }
-    maskedIdx = (unsigned int)vertIdx2;
-    maskedIdx &= 0xFFFF0000;
-    if (maskedIdx + 0x00010000 == 0) {
+    if (vertIdx1 == 0xFFFF && vertIdx2 == 0xFFFF) {
         return;
     }
 
@@ -111,39 +102,35 @@ void pppDrawVtMime(void* param1, void* param2, void* param3)
     VtMimeSource* vert2Data = *(VtMimeSource**)((char*)globalData + (vertIdx2 * 4));
     float* vert1Pos = vert1Data->positions;
     float* vert2Pos = vert2Data->positions;
-    short vertCount = vert1Data->vertexCount;
+    unsigned short vertCount = (unsigned short)vert1Data->vertexCount;
     void** memPtr = (void**)(target + 0xC);
 
     if (*memPtr == 0) {
         *memPtr = pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(vertCount * 0xC), *(void**)lbl_8032ED54, lbl_801D8520, 0x2B);
     }
 
-    if (vertCount > 0) {
-        float* outputVerts = (float*)*memPtr;
-        float interpFactor = *(float*)target;
-        float* src1 = vert1Pos;
-        float* src2 = vert2Pos;
-        int i;
-
-        for (i = 0; i < vertCount; i++) {
-            float v1X = src1[0];
-            float v2X = src2[0];
-            outputVerts[i * 3 + 0] = v1X + interpFactor * (v2X - v1X);
-
-            float v1Y = src1[1];
-            float v2Y = src2[1];
-            outputVerts[i * 3 + 1] = v1Y + interpFactor * (v2Y - v1Y);
-
-            float v1Z = src1[2];
-            float v2Z = src2[2];
-            outputVerts[i * 3 + 2] = v1Z + interpFactor * (v2Z - v1Z);
-
-            src1 += 6;
-            src2 += 6;
-        }
-
-        DCFlushRange(*memPtr, (unsigned long)(vertCount * 0xC));
+    float* outputVerts = (float*)*memPtr;
+    int remaining = (int)vertCount;
+    int pairCount = remaining >> 1;
+    while (pairCount != 0) {
+        outputVerts[0] = vert1Pos[0] + *(float*)target * (vert2Pos[0] - vert1Pos[0]);
+        outputVerts[1] = vert1Pos[1] + *(float*)target * (vert2Pos[1] - vert1Pos[1]);
+        outputVerts[2] = vert1Pos[2] + *(float*)target * (vert2Pos[2] - vert1Pos[2]);
+        outputVerts[3] = vert1Pos[3] + *(float*)target * (vert2Pos[3] - vert1Pos[3]);
+        outputVerts[4] = vert1Pos[4] + *(float*)target * (vert2Pos[4] - vert1Pos[4]);
+        outputVerts[5] = vert1Pos[5] + *(float*)target * (vert2Pos[5] - vert1Pos[5]);
+        vert1Pos += 6;
+        vert2Pos += 6;
+        outputVerts += 6;
+        pairCount--;
     }
+    if ((remaining & 1) != 0) {
+        outputVerts[0] = vert1Pos[0] + *(float*)target * (vert2Pos[0] - vert1Pos[0]);
+        outputVerts[1] = vert1Pos[1] + *(float*)target * (vert2Pos[1] - vert1Pos[1]);
+        outputVerts[2] = vert1Pos[2] + *(float*)target * (vert2Pos[2] - vert1Pos[2]);
+    }
+
+    DCFlushRange(*memPtr, (unsigned long)(vertCount * 0xC));
 
     *(void**)((char*)param1 + 0x70) = *memPtr;
 }

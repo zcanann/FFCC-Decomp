@@ -1,5 +1,7 @@
 #include "ffcc/RedSound/RedMidiCtrl.h"
 
+extern unsigned int* DAT_8032f444;
+
 /*
  * --INFO--
  * Address:	TODO
@@ -794,12 +796,52 @@ void __MidiCtrl_VibrateDelay(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c93d8
+ * PAL Size: 288b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_TremoloOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_TremoloOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+	unsigned int rateDivisor;
+	int value;
+	int* trackData;
+	unsigned int* voice;
+
+	trackData = (int*)track;
+	trackData[0x28] = (unsigned int)(*(unsigned char*)trackData[0]) << 0xc;
+	if (*(char*)(trackData[0] + 1) == '\0') {
+		rateDivisor = 0x100;
+	} else {
+		rateDivisor = (unsigned int)(*(unsigned char*)(trackData[0] + 1));
+	}
+	trackData[0x26] = 0x100000 / rateDivisor;
+	trackData[0x25] = (int)SineSwing;
+	*(short*)((int)trackData + 0xae) = 0;
+	*(short*)(trackData + 0x2b) = 0;
+	trackData[0] += 3;
+
+	voice = DAT_8032f444;
+	do {
+		if ((int*)*voice == trackData) {
+			value = 0x100;
+			*(short*)(voice + 0xe) = *(short*)(trackData + 0x2c);
+			if (trackData[0x26] >> 0xc != 0) {
+				value = 0x100 / (trackData[0x26] >> 0xc);
+			}
+			if (*(short*)((int)trackData + 0xb2) == 0) {
+				value = 0;
+			} else {
+				value = *(short*)((int)trackData + 0xb2) * value * 4;
+			}
+			voice[0xc] = value;
+			voice[0xd] = 0;
+			voice[0xb] = 0;
+		}
+		voice += 0x30;
+	} while (voice < DAT_8032f444 + 0xc00);
 }
 
 /*

@@ -3,8 +3,16 @@
 #include "ffcc/charaobj.h"
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
+#include "ffcc/textureman.h"
 
 #include <string.h>
+
+template <class T>
+class CPtrArray
+{
+public:
+	T operator[](unsigned long index);
+};
 
 /*
  * --INFO--
@@ -118,6 +126,11 @@ void CChara::ChangeMogMode(int mogMode)
 
 extern "C" unsigned char Chara[];
 extern "C" void CalcMogScore__6CCharaFv(CChara*);
+extern "C" int Find__11CTextureSetFPc(CTextureSet*, char*);
+extern "C" void _WaitDrawDone__8CGraphicFPci(void*, const char*, int);
+extern "C" unsigned char Graphic[];
+extern "C" char lbl_80331114;
+extern "C" char lbl_801DB72C[];
 
 /*
  * --INFO--
@@ -191,32 +204,43 @@ extern "C" void LoadFurTexBuffer__6CCharaFPUs(CChara* chara, unsigned short* inT
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800e12e4
+ * PAL Size: 280b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void mySrand(int)
+void CChara::CModel::InitMogFurTex()
 {
-	// TODO
-}
+	CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(reinterpret_cast<char*>(this) + 0xB0);
+	CPtrArray<CTexture*>* textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<char*>(textureSet) + 8);
+	unsigned int textureIdx = static_cast<unsigned int>(Find__11CTextureSetFPc(textureSet, &lbl_80331114));
+	CTexture* texture = (*textureArray)[textureIdx];
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void myRand(int)
-{
-	// TODO
-}
+	if ((texture != 0) && (*reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(texture) + 0x60) == 4)) {
+		*reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(texture) + 0x60) = 5;
+		_WaitDrawDone__8CGraphicFPci(Graphic, lbl_801DB72C, 0x506);
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void myRandFPM(float)
-{
-	// TODO
+		textureSet = *reinterpret_cast<CTextureSet**>(reinterpret_cast<char*>(this) + 0xB0);
+		textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<char*>(textureSet) + 8);
+		textureIdx = static_cast<unsigned int>(Find__11CTextureSetFPc(textureSet, &lbl_80331114));
+		CTexture* textureData = (*textureArray)[textureIdx];
+		if (textureData != 0) {
+			void* dstBuffer = *reinterpret_cast<void**>(reinterpret_cast<char*>(textureData) + 0x78);
+			int texelCountBytes = *reinterpret_cast<int*>(reinterpret_cast<char*>(textureData) + 0x64) *
+			                      *reinterpret_cast<int*>(reinterpret_cast<char*>(textureData) + 0x68) * 2;
+
+			DCInvalidateRange(dstBuffer, texelCountBytes);
+			memcpy(dstBuffer, Chara + 4, 0x2000);
+			DCFlushRange(dstBuffer, texelCountBytes);
+			GXInvalidateTexAll();
+		}
+
+		texture->InitTexObj();
+		unsigned char flags = *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this) + 0xA0);
+		*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this) + 0xA0) = flags | 0x40;
+	}
 }
 
 /*

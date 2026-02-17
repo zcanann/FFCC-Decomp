@@ -74,9 +74,9 @@ public:
     void IncNumTevStage();
     void GetTexMtxCur();
     void GetTexCoordIdCur();
-    void IncTexCoordIdCur();
-    void IncTexMtxCur();
-    void IncTexMapIdCur();
+    int IncTexCoordIdCur();
+    int IncTexMtxCur();
+    int IncTexMapIdCur();
     void GetTexMapIdCur();
     void SetStdEnv();
     void DecTexCoordIdCur();

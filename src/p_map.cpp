@@ -47,6 +47,7 @@ extern unsigned int CFlatFlags;
 extern CMaterialMan MaterialMan;
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 extern "C" const char s_p_map_cpp_801d7728[];
+extern "C" void Destroy__7CMapMngFv(CMapMng*);
 
 extern "C" void __dl__FPv(void*);
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
@@ -189,22 +190,30 @@ int CMapPcs::IsLoadMapCompleted()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80035958
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapPcs::destroy()
 {
-	// TODO
+    Destroy__7CMapMngFv(&MapMng);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80035940
+ * PAL Size: 24b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapPcs::calcInit()
 {
-	// TODO
+    *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&MapMng) + 0x22989) = 0;
 }
 
 /*
@@ -219,12 +228,16 @@ void CMapPcs::calc()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80035604
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapPcs::calcViewer()
 {
-	// TODO
+    CMapPcs::calc();
 }
 
 /*

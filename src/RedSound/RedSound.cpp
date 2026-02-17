@@ -80,19 +80,23 @@ unsigned int CRedSound::GetAutoID()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801ccaac
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int* CRedSound::EntryStandbyID(int id)
 {
 	int* slot = (int*)DAT_8032e17c;
-
-	for (int i = 0; i < 0x40; i++, slot++) {
+	do {
 		if (*slot == 0) {
 			*slot = id;
 			return slot;
 		}
-	}
+		slot++;
+	} while (slot < (int*)(DAT_8032e17c + 0x100));
 
 	return 0;
 }
@@ -187,12 +191,16 @@ void CRedSound::End()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801ccd70
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedSound::GetProgramTime()
 {
-	// TODO
+	CRedDriver_8032f4c0.GetProgramTime();
 }
 
 /*
@@ -254,12 +262,16 @@ void CRedSound::DMAEntry(int type, int src, int dst, int length, int flags, void
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cce8c
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::DMACheck(int)
+void CRedSound::DMACheck(int id)
 {
-	// TODO
+	RedDmaSearchID(id);
 }
 
 /*

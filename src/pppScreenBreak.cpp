@@ -565,7 +565,9 @@ void pppCon2ScreenBreak(PScreenBreak* pppScreenBreak, UnkC* param_2)
  */
 void pppDesScreenBreak(PScreenBreak* pppScreenBreak, UnkC* param_2)
 {
-    s32 dataOffset = param_2->m_serializedDataOffsets[2];
+    s32* serializedDataOffsets = *(s32**)param_2;
+    s32 dataOffset = serializedDataOffsets[2];
+    u8* pppData = ((u8*)pppScreenBreak + dataOffset + 0x80);
     void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
     if (model != 0) {
@@ -576,13 +578,13 @@ void pppDesScreenBreak(PScreenBreak* pppScreenBreak, UnkC* param_2)
         *(void**)(model + 0xE8) = NULL;
         *(void**)(model + 0xEC) = NULL;
     }
-    if (*(void**)((u8*)pppScreenBreak + 0x8C + dataOffset) != NULL) {
-        pppHeapUseRate__FPQ27CMemory6CStage(*(void**)((u8*)pppScreenBreak + 0x8C + dataOffset));
-        *(void**)((u8*)pppScreenBreak + 0x8C + dataOffset) = NULL;
+    if (*(void**)(pppData + 0xC) != NULL) {
+        pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(pppData + 0xC));
+        *(void**)(pppData + 0xC) = NULL;
     }
-    if (*(void**)((u8*)pppScreenBreak + 0x90 + dataOffset) != NULL) {
-        pppHeapUseRate__FPQ27CMemory6CStage(*(void**)((u8*)pppScreenBreak + 0x90 + dataOffset));
-        *(void**)((u8*)pppScreenBreak + 0x90 + dataOffset) = NULL;
+    if (*(void**)(pppData + 0x10) != NULL) {
+        pppHeapUseRate__FPQ27CMemory6CStage(*(void**)(pppData + 0x10));
+        *(void**)(pppData + 0x10) = NULL;
     }
 }
 

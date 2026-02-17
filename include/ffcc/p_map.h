@@ -16,7 +16,7 @@ public:
 	
     void Init();
     void Quit();
-    void GetTable(unsigned long);
+    void* GetTable(unsigned long);
     void create();
     void createViewer();
     void LoadMap(char*, void*, unsigned long, unsigned char);

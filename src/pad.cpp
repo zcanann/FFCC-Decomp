@@ -131,7 +131,7 @@ void CPad::Quit()
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: 0x80020494
  * PAL Size: 2844b
  * EN Address: TODO
  * EN Size: TODO
@@ -205,6 +205,44 @@ void CPad::Frame()
 				*reinterpret_cast<int*>(_1b0_4_) += 0x40;
 			}
 		}
+	}
+
+	u32 disconnectedMask = 0;
+	for (int i = 0; i < 4; i++)
+	{
+		u32 channelMask = PAD_CHAN0_BIT >> i;
+		s8 err = status[i].err;
+
+		if (err == PAD_ERR_NO_CONTROLLER)
+		{
+			if (Joybus.GBAReady(i) == 0)
+			{
+				disconnectedMask |= channelMask;
+			}
+			_1a8_4_ &= ~channelMask;
+		}
+		else if (err == PAD_ERR_TRANSFER)
+		{
+			_1a8_4_ |= channelMask;
+		}
+		else if (err == PAD_ERR_NOT_READY)
+		{
+			_1a8_4_ &= ~channelMask;
+		}
+		else if (err == PAD_ERR_NONE)
+		{
+			_1a8_4_ |= channelMask;
+		}
+	}
+
+	if ((disconnectedMask & 0xF0000000) != 0)
+	{
+		PADReset(disconnectedMask & 0xF0000000);
+	}
+
+	if (_1bc_4_ >= 0)
+	{
+		_1bc_4_++;
 	}
 }
 

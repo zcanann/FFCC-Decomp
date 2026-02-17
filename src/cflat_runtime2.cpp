@@ -9,6 +9,9 @@ extern "C" void reset__6CAStarFv(void*);
 extern "C" int __cntlzw(unsigned int);
 extern "C" void Create__9CGBaseObjFv(CGBaseObj*);
 extern "C" void Destroy__9CGBaseObjFv(CGBaseObj*);
+extern "C" void* __vt__13CFlatRuntime2[];
+extern "C" CFlatRuntime* __ct__12CFlatRuntimeFv(CFlatRuntime*);
+extern "C" void __ct__9CFlatDataFv(void*);
 
 extern unsigned char Pad[];
 extern unsigned char GraphicsPcs[];
@@ -243,12 +246,61 @@ void CGBaseObj::InitFinished()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006E12C
+ * PAL Size: 1516b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CFlatRuntime2::CFlatRuntime2()
 {
-	// TODO
+	u8* runtime = reinterpret_cast<u8*>(this);
+
+	__ct__12CFlatRuntimeFv(reinterpret_cast<CFlatRuntime*>(this));
+	*reinterpret_cast<void***>(runtime) = __vt__13CFlatRuntime2;
+
+	*reinterpret_cast<int*>(runtime + 0x170C) = -1;
+	*reinterpret_cast<int*>(runtime + 0x16FC) = -1;
+	runtime[0x1700] = 0;
+	runtime[0x1701] = 1;
+	*reinterpret_cast<int*>(runtime + 0x1704) = 0;
+	runtime[0x1702] = 0;
+	*reinterpret_cast<int*>(runtime + 0x1708) = 0x1E;
+	*reinterpret_cast<int*>(runtime + 0x1710) = 0;
+	*reinterpret_cast<short*>(runtime + 0x1714) = 0;
+	runtime[0x1716] = 0;
+	runtime[0x1717] = 0;
+	*reinterpret_cast<int*>(runtime + 0x16CC) = 0;
+	*reinterpret_cast<int*>(runtime + 0x16D0) = 0;
+	*reinterpret_cast<int*>(runtime + 0x16D4) = 0;
+	*reinterpret_cast<int*>(runtime + 0x16D8) = 0;
+	*reinterpret_cast<int*>(runtime + 0x16DC) = 0;
+	*reinterpret_cast<int*>(runtime + 0x16E0) = 0;
+	*reinterpret_cast<int*>(runtime + 0x16E4) = 0;
+	*reinterpret_cast<int*>(runtime + 0x16E8) = 0;
+	*reinterpret_cast<int*>(runtime + 0x16EC) = 0;
+	*reinterpret_cast<float*>(runtime + 0x16F0) = 1.0f;
+	*reinterpret_cast<float*>(runtime + 0x16F4) = 1.0f;
+	runtime[0x16F8] = 0;
+
+	for (int i = 0; i < 16; i++) {
+		*reinterpret_cast<u32*>(runtime + 0x1BDC + i * 0xB14 + 0x18) = 0;
+	}
+
+	__ct__9CFlatDataFv(runtime + 0xCF20);
+	*reinterpret_cast<int*>(runtime + 0x10418) = 0;
+	*reinterpret_cast<int*>(runtime + 0x129C) = 0;
+	*reinterpret_cast<int*>(runtime + 0x12A0) = 0;
+	*reinterpret_cast<int*>(runtime + 0x12A4) = -1;
+	runtime[0x12E4] = (runtime[0x12E4] & 0xFB) | 4;
+	*reinterpret_cast<int*>(runtime + 0x10400) = 0;
+	*reinterpret_cast<int*>(runtime + 0x10408) = 0;
+	memset(runtime + 0x15CC, 0, 0x100);
+	memset(runtime + 0x1770, 0, 0x60);
+
+	resetChangeScript();
+	memset(runtime + 0x12F0, 0, 0x48);
 }
 
 /*

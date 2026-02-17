@@ -134,23 +134,21 @@ void GXSetTexCopySrc(u16 left, u16 top, u16 wd, u16 ht) {
     OLD_SET_REG_FIELD(1272, gx->cpTexSize, 8, 24, 0x4A);
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801BD030
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void GXSetDispCopyDst(u16 wd, u16 ht) {
-    GXData* gx;
-    u16 stride;
-    u32 reg;
-
     ASSERTMSGLINE(1293, (wd & 0xF) == 0, "GXSetDispCopyDst: Width must be a multiple of 16");
     CHECK_GXBEGIN(1294, "GXSetDispCopyDst");
-    gx = __GXData;
-
-    stride = (wd & 0x7FFF) << 1;
-    gx->cpDispStride = 0;
-    reg = gx->cpDispStride;
-    reg = (reg & 0xFFFFFC00) | ((u32)stride >> 5);
-    gx->cpDispStride = reg;
-    reg = gx->cpDispStride;
-    reg = (reg & 0x00FFFFFF) | 0x4D000000;
-    gx->cpDispStride = reg;
+    __GXData->cpDispStride = 0;
+    __GXData->cpDispStride = (__GXData->cpDispStride & 0xFFFFFC00) | ((u32)(wd & 0x7FF0) >> 4);
+    __GXData->cpDispStride = (__GXData->cpDispStride & 0x00FFFFFF) | 0x4D000000;
 }
 
 void GXSetTexCopyDst(u16 wd, u16 ht, GXTexFmt fmt, GXBool mipmap) {

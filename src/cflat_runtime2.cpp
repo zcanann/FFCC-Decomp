@@ -1,6 +1,8 @@
 #include "ffcc/cflat_runtime2.h"
 #include "ffcc/baseobj.h"
+#include "ffcc/monobj.h"
 #include "ffcc/partMng.h"
+#include "ffcc/partyobj.h"
 #include "ffcc/p_game.h"
 #include <math.h>
 #include <string.h>
@@ -26,6 +28,13 @@ extern unsigned char GraphicsPcs[];
 extern unsigned char CameraPcs[];
 extern unsigned char DbgMenuPcs[];
 extern CPartMng PartMng;
+extern "C" void* __vt__Q212CFlatRuntime7CObject[];
+extern "C" void* __vt__9CGBaseObj[];
+extern "C" void* __vt__8CGObject[];
+extern "C" void* __vt__8CGPrgObj[];
+extern "C" void* __vt__10CGCharaObj[];
+extern "C" void* __vt__8CGMonObj[];
+extern "C" void* __vt__10CGPartyObj[];
 
 template <int count>
 class CLine;
@@ -329,6 +338,48 @@ CFlatRuntime2::~CFlatRuntime2()
 CFlatRuntime2::CParticleWork::CParticleWork()
 {
 	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8006E960
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __ct__8CGMonObjFv(CGMonObj* obj)
+{
+	u8* self = reinterpret_cast<u8*>(obj);
+	*reinterpret_cast<void***>(self + 0x48) = __vt__Q212CFlatRuntime7CObject;
+	self[0x38] &= 0xEF;
+	*reinterpret_cast<void***>(self + 0x48) = __vt__9CGBaseObj;
+	*reinterpret_cast<void***>(self + 0x48) = __vt__8CGObject;
+	*reinterpret_cast<void***>(self + 0x48) = __vt__8CGPrgObj;
+	*reinterpret_cast<void***>(self + 0x48) = __vt__10CGCharaObj;
+	*reinterpret_cast<void***>(self + 0x48) = __vt__8CGMonObj;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8006E9BC
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __ct__10CGPartyObjFv(CGPartyObj* obj)
+{
+	u8* self = reinterpret_cast<u8*>(obj);
+	*reinterpret_cast<void***>(self + 0x48) = __vt__Q212CFlatRuntime7CObject;
+	self[0x38] &= 0xEF;
+	*reinterpret_cast<void***>(self + 0x48) = __vt__9CGBaseObj;
+	*reinterpret_cast<void***>(self + 0x48) = __vt__8CGObject;
+	*reinterpret_cast<void***>(self + 0x48) = __vt__8CGPrgObj;
+	*reinterpret_cast<void***>(self + 0x48) = __vt__10CGCharaObj;
+	*reinterpret_cast<void***>(self + 0x48) = __vt__10CGPartyObj;
 }
 
 /*

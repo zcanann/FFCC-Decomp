@@ -3,6 +3,9 @@
 
 class CManager {
 public:
+    virtual void create() {}
+    virtual void destroy() {}
+    virtual void calc() {}
     virtual void ScriptChanging(char*);
     virtual void ScriptChanged(char*, int);
 

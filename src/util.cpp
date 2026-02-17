@@ -32,7 +32,7 @@ struct CTextureLite {
     GXTlutObj m_tlutObj1;
 };
 
-extern void* lbl_801E88C4;
+extern void* lbl_801E88C4[];
 
 CUtil DAT_8032ec70;
 
@@ -47,7 +47,7 @@ CUtil DAT_8032ec70;
  */
 extern "C" void __sinit_util_cpp(void)
 {
-    *reinterpret_cast<void**>(&DAT_8032ec70) = &lbl_801E88C4;
+    *reinterpret_cast<void**>(&DAT_8032ec70) = lbl_801E88C4;
 }
 
 /*

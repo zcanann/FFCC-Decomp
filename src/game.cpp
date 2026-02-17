@@ -528,29 +528,39 @@ void CGame::clearWork()
 {
     int i;
     int j;
-    int k;
 
     Destroy__13CFlatRuntime2Fv(CFlat);
 
     for (i = 0; i < 4; i++) {
         m_cFlatDataArr[i].Destroy();
-        unkCFlatData0[i] = 0;
-        m_partyObjArr[i] = 0;
-        m_scriptFoodBase[i] = 0;
     }
+
+    unkCFlatData0[0] = 0;
+    unkCFlatData0[1] = 0;
+    unkCFlatData0[2] = 0;
+    unkCFlatData0[3] = 0;
+    m_partyObjArr[0] = 0;
+    m_partyObjArr[1] = 0;
+    m_partyObjArr[2] = 0;
+    m_partyObjArr[3] = 0;
+    m_scriptFoodBase[0] = 0;
+    m_scriptFoodBase[1] = 0;
+    m_scriptFoodBase[2] = 0;
+    m_scriptFoodBase[3] = 0;
 
     unk_flat3_0xc7d0 = 0;
 
     for (i = 0; i < 4; i++) {
-        for (j = 0; j < 16; j++) {
-            for (k = 0; k < 2; k++) {
-                m_scriptWork[i][j][k] = 0;
-            }
+        for (j = 0; j < 8; j++) {
+            m_scriptWork[i][j][0] = 0;
+            m_scriptWork[i][j + 8][0] = 0;
+            m_scriptWork[i][j][1] = 0;
+            m_scriptWork[i][j + 8][1] = 0;
         }
     }
 
-    m_gameWork.m_soundOptionFlag = 0;
-    m_gameWork.m_gameOverFlag = 0;
+    m_gameWork.m_soundOptionFlag = '\0';
+    m_gameWork.m_gameOverFlag = '\0';
 
     DestroyMap__7CMapMngFv(&MapMng);
     Reset__9CCharaPcsFQ29CCharaPcs5RESET(&CharaPcs, 0);

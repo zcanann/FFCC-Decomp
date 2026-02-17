@@ -6,10 +6,25 @@
 #include <string.h>
 
 extern "C" int __cntlzw(unsigned int);
+extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
+extern "C" void* __ct__14CUSBStreamDataFv(void* self);
+extern "C" void* __ct__5ZLISTFv(void* self);
+extern "C" void __dt__18CMaterialEditorPcsFv(void* self);
 
 extern CUSBPcs USBPcs;
 extern unsigned char m_table__18CMaterialEditorPcs[];
 static char s_CMaterialEditorPcs[] = "CMaterialEditorPcs";
+extern void* __vt__8CManager;
+extern void* lbl_801E8668;
+extern void* lbl_801EA644;
+extern unsigned char lbl_8026D338[];
+extern unsigned int lbl_801EA498[];
+extern unsigned int lbl_801EA4A4[];
+extern unsigned int lbl_801EA4B0[];
+extern unsigned int lbl_801EA4BC[];
+extern unsigned int lbl_801EA4C8[];
+extern float lbl_8032FCAC;
+extern float lbl_8032FCB0;
 extern class CCameraPcs {
 public:
     Mtx m_cameraMatrix;
@@ -29,6 +44,43 @@ static void WriteU32(void* base, unsigned int offset, unsigned int value) {
 
 static void WriteF32(void* base, unsigned int offset, float value) {
     *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(base) + offset) = value;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8004c588
+ * PAL Size: 280b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_p_MaterialEditor_cpp(void)
+{
+    volatile void** base = reinterpret_cast<volatile void**>(&MaterialEditorPcs);
+    *base = &__vt__8CManager;
+    *base = &lbl_801E8668;
+    *base = &lbl_801EA644;
+
+    unsigned char* self = reinterpret_cast<unsigned char*>(&MaterialEditorPcs);
+    __ct__14CUSBStreamDataFv(self + 0x84);
+    __ct__5ZLISTFv(self + 0xC8);
+    __ct__5ZLISTFv(self + 0xD8);
+    __register_global_object(&MaterialEditorPcs, reinterpret_cast<void*>(__dt__18CMaterialEditorPcsFv), lbl_8026D338);
+
+    unsigned int* dst = lbl_801EA4C8;
+    dst[1] = lbl_801EA498[0];
+    dst[2] = lbl_801EA498[1];
+    dst[3] = lbl_801EA498[2];
+    dst[4] = lbl_801EA4A4[0];
+    dst[5] = lbl_801EA4A4[1];
+    dst[6] = lbl_801EA4A4[2];
+    dst[7] = lbl_801EA4B0[0];
+    dst[8] = lbl_801EA4B0[1];
+    dst[9] = lbl_801EA4B0[2];
+    dst[12] = lbl_801EA4BC[0];
+    dst[13] = lbl_801EA4BC[1];
+    dst[14] = lbl_801EA4BC[2];
 }
 
 /*
@@ -380,10 +432,52 @@ void CMaterialEditorPcs::drawViewer()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004b21c
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMaterialEditorPcs::CreateBoundaryBox(Vec&, Vec&, long, const Vec*)
+void CMaterialEditorPcs::CreateBoundaryBox(Vec& minPos, Vec& maxPos, long count, const Vec* points)
 {
-	// TODO
+    float* minVals = reinterpret_cast<float*>(&minPos);
+    float* maxVals = reinterpret_cast<float*>(&maxPos);
+    const float* src = reinterpret_cast<const float*>(points);
+
+    minVals[0] = lbl_8032FCAC;
+    minVals[1] = lbl_8032FCAC;
+    minVals[2] = lbl_8032FCAC;
+
+    maxVals[0] = lbl_8032FCB0;
+    maxVals[1] = lbl_8032FCB0;
+    maxVals[2] = lbl_8032FCB0;
+
+    if (count < 1) {
+        return;
+    }
+
+    do {
+        if (src[0] < minVals[0]) {
+            minVals[0] = src[0];
+        }
+        if (src[1] < minVals[1]) {
+            minVals[1] = src[1];
+        }
+        if (src[2] < minVals[2]) {
+            minVals[2] = src[2];
+        }
+        if (maxVals[0] < src[0]) {
+            maxVals[0] = src[0];
+        }
+        if (maxVals[1] < src[1]) {
+            maxVals[1] = src[1];
+        }
+        if (maxVals[2] < src[2]) {
+            maxVals[2] = src[2];
+        }
+
+        src += 3;
+        count -= 1;
+    } while (count != 0);
 }

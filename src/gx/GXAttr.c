@@ -276,7 +276,7 @@ void GXGetVtxDescv(GXVtxDescList* vcd) {
 void GXClearVtxDesc(void) {
     CHECK_GXBEGIN(543, "GXClearVtxDesc");
     __GXData->vcdLo = 0;
-    SET_REG_FIELD(0, __GXData->vcdLo, 2, 9, 1);
+    __GXData->vcdLo = (__GXData->vcdLo & ~0x600) | 0x200;
     __GXData->vcdHi = 0;
     __GXData->hasNrms = 0;
     __GXData->hasBiNrms = 0;

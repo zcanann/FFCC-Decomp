@@ -113,13 +113,7 @@ extern "C" void ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2(C
 				extern void GXSetArray(unsigned int, void*, unsigned char);
 				GXSetArray(0xb, (void*)vertex_array, 4);
 				
-				// Set MaterialMan offset based on flag
-				char flag = *(char*)((char*)param_3 + 0x14);
-				if ((flag == 2) || (flag == 3)) {
-					*(int*)(MaterialMan + 0x208) = 0;
-				} else {
-					*(int*)(MaterialMan + 0x208) = texture_info + 0x28;
-				}
+				*(int*)(MaterialMan + 0x208) = texture_info + 0x28;
 				
 				// Process display lists in reverse order
 				int display_list_count = *(int*)((char*)mesh_data + 0x4c);
@@ -466,12 +460,14 @@ void pppFrameChangeTex(pppChangeTex* changeTex, UnkB* step, UnkC* data)
  */
 void pppRenderChangeTex(pppChangeTex*, UnkB* step, UnkC*)
 {
-	unsigned int local_8[2];
+	int textureIndex;
 
 	if (step->m_dataValIndex != 0xffff) {
-		local_8[0] = 0;
+		_pppEnvStChangeTex* env = lbl_8032ED54;
+		CMapMesh* mapMesh = env->m_mapMeshPtr[step->m_dataValIndex];
+		textureIndex = 0;
 		GetTexture__8CMapMeshFP12CMaterialSetRi(
-		    lbl_8032ED54->m_mapMeshPtr[step->m_dataValIndex], lbl_8032ED54->m_materialSetPtr, (int&)local_8[0]);
+		    mapMesh, env->m_materialSetPtr, textureIndex);
 		_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
 		pppInitBlendMode__Fv();
 	}

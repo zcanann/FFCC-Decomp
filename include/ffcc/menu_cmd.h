@@ -29,7 +29,7 @@ public:
     void CmdClose1();
     void CmdOpen2();
     void CmdClose2();
-    void GetSkillStr(int);
+    const char* GetSkillStr(int);
     void GetFontItem();
 };
 

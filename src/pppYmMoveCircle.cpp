@@ -51,8 +51,8 @@ extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCirc
     PSVECSubtract((Vec*)(pppMngSt + 0x68), (Vec*)(pppMngSt + 0x58), &temp1);
     PSVECNormalize(&temp1, &temp1);
 
-    double angle = acos((double)PSVECDotProduct(&temp2, &temp1));
-    work->m_angle = lbl_80330D90 * (f32)angle;
+    f32 angle = acosf(PSVECDotProduct(&temp2, &temp1));
+    work->m_angle = lbl_80330D90 * angle;
 
     if ((temp1.x <= lbl_80330D7C && temp1.z >= lbl_80330D7C) ||
         (temp1.x >= lbl_80330D7C && temp1.z >= lbl_80330D7C)) {
@@ -82,6 +82,8 @@ extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCirc
 extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleStep* stepData, pppYmMoveCircleOffsets* offsetData)
 {
     pppYmMoveCircleWork* work;
+    int* serializedDataOffsets;
+    u8* pppMngSt;
     Vec nextPos;
     s32 tableIndex;
 
@@ -89,7 +91,9 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
         return;
     }
 
-    work = (pppYmMoveCircleWork*)((u8*)basePtr + *offsetData->m_serializedDataOffsets + 0x80);
+    serializedDataOffsets = offsetData->m_serializedDataOffsets;
+    work = (pppYmMoveCircleWork*)((u8*)basePtr + serializedDataOffsets[0] + 0x80);
+    pppMngSt = lbl_8032ED50;
 
     work->m_radiusStep += work->m_radiusStepStep;
     work->m_radius += work->m_radiusStep;
@@ -114,14 +118,14 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
 
     tableIndex = (s32)((lbl_80330D80 * (lbl_80330D84 * work->m_angle)) / lbl_80330D88);
     nextPos.x = (work->m_radius * *(f32*)((u8*)lbl_801EC9F0 + ((tableIndex + 0x4000) & 0xFFFC))) + work->m_center.x;
-    nextPos.y = *(f32*)((u8*)lbl_8032ED50 + 0xC);
+    nextPos.y = *(f32*)(pppMngSt + 0xC);
     nextPos.z = (work->m_radius * -(*(f32*)((u8*)lbl_801EC9F0 + (tableIndex & 0xFFFC)))) + work->m_center.z;
 
-    pppCopyVector(*(Vec*)((u8*)lbl_8032ED50 + 0x48), *(Vec*)((u8*)lbl_8032ED50 + 0x8));
-    pppCopyVector(*(Vec*)((u8*)lbl_8032ED50 + 0x8), nextPos);
+    pppCopyVector(*(Vec*)(pppMngSt + 0x48), *(Vec*)(pppMngSt + 0x8));
+    pppCopyVector(*(Vec*)(pppMngSt + 0x8), nextPos);
 
-    *(f32*)((u8*)lbl_8032ED50 + 0x84) = nextPos.x;
-    *(f32*)((u8*)lbl_8032ED50 + 0x94) = nextPos.y;
-    *(f32*)((u8*)lbl_8032ED50 + 0xA4) = nextPos.z;
-    pppSetFpMatrix((_pppMngSt*)lbl_8032ED50);
+    *(f32*)(pppMngSt + 0x84) = nextPos.x;
+    *(f32*)(pppMngSt + 0x94) = nextPos.y;
+    *(f32*)(pppMngSt + 0xA4) = nextPos.z;
+    pppSetFpMatrix((_pppMngSt*)pppMngSt);
 }

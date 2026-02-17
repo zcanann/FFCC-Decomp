@@ -139,7 +139,7 @@ void CPad::Quit()
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: 0x80020494
  * PAL Size: 2844b
  * EN Address: TODO
  * EN Size: TODO

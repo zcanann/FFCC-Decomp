@@ -34,7 +34,7 @@ struct THPSimpleControl {
     s32 curAudioTrack;             // 0xC0
     f32 unk_C4;                    // 0xC4
     f32 unk_C8;                    // 0xC8
-    u32 unk_CC;                    // 0xCC
+    f32 unk_CC;                    // 0xCC
     s32 unk_D0;                    // 0xD0
     THPReadBuffer readBuffer[8];   // 0xD4
     u32* yImage;                   // 0x134
@@ -246,7 +246,7 @@ s32 THPSimpleOpen(const char* path)
     SimpleControl.curFrame = -1;
     SimpleControl.readFrame = 0;
     SimpleControl.unk_D0 = 0;
-    SimpleControl.unk_CC = 0;
+    SimpleControl.unk_CC = 0.0f;
     SimpleControl.isPreLoaded = 0;
     SimpleControl.isBufferSet = 0;
     SimpleControl.isLooping = 0;
@@ -771,6 +771,7 @@ s32 THPSimpleDrawCurrentFrame(GXRenderModeObj* obj, int x, int y, int polyWidth,
 void MixAudio(short* output, short* input, unsigned long samples)
 {
     u16 volume;
+    f32 volumeIndex;
     s32 mixedSample;
     s16* audioPtr;
     u32 availableSamples;
@@ -794,13 +795,13 @@ void MixAudio(short* output, short* input, unsigned long samples)
 
                 audioPtr = SimpleControl.audioBuffer[playIndex].mCurPtr;
                 for (i = availableSamples; i != 0; i--) {
+                    volumeIndex = SimpleControl.unk_C8;
                     if (SimpleControl.unk_D0 != 0) {
                         SimpleControl.unk_D0 -= 1;
-                        SimpleControl.unk_C4 = SimpleControl.unk_C4 + SimpleControl.unk_CC;
-                    } else {
-                        SimpleControl.unk_C4 = SimpleControl.unk_C8;
+                        volumeIndex = SimpleControl.unk_C4 + SimpleControl.unk_CC;
                     }
-                    volume = lbl_802111E8[static_cast<s32>(SimpleControl.unk_C4)];
+                    SimpleControl.unk_C4 = volumeIndex;
+                    volume = lbl_802111E8[static_cast<s32>(volumeIndex)];
 
                     mixedSample = static_cast<s32>((static_cast<u32>(volume) * static_cast<s32>(*audioPtr)) >> 15);
                     if (mixedSample < -0x8000) {
@@ -851,13 +852,13 @@ void MixAudio(short* output, short* input, unsigned long samples)
 
             audioPtr = SimpleControl.audioBuffer[playIndex].mCurPtr;
             for (i = availableSamples; i != 0; i--) {
+                volumeIndex = SimpleControl.unk_C8;
                 if (SimpleControl.unk_D0 != 0) {
                     SimpleControl.unk_D0 -= 1;
-                    SimpleControl.unk_C4 = SimpleControl.unk_C4 + SimpleControl.unk_CC;
-                } else {
-                    SimpleControl.unk_C4 = SimpleControl.unk_C8;
+                    volumeIndex = SimpleControl.unk_C4 + SimpleControl.unk_CC;
                 }
-                volume = lbl_802111E8[static_cast<s32>(SimpleControl.unk_C4)];
+                SimpleControl.unk_C4 = volumeIndex;
+                volume = lbl_802111E8[static_cast<s32>(volumeIndex)];
 
                 mixedSample = static_cast<s32>(*input) +
                               static_cast<s32>((static_cast<u32>(volume) * static_cast<s32>(*audioPtr)) >> 15);

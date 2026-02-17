@@ -35,6 +35,7 @@ public:
 extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
 extern "C" void __ct__4CRefFv(void*);
+extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void* PTR_PTR_s_CTexAnimSet_801e9c6c;
@@ -1047,12 +1048,22 @@ CTexAnimSeq::CTexAnimSeq()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80043d70
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CTexAnimSeq::~CTexAnimSeq()
 {
-	// TODO
+    *reinterpret_cast<void**>(this) = &PTR_PTR_s_CTexAnimSeq_801e9c24;
+    void** keys = reinterpret_cast<void**>(Ptr(this, 0x114));
+    if (*keys != 0) {
+        __dla__FPv(*keys);
+        *keys = 0;
+    }
+    __dt__4CRefFv(this, 0);
 }
 
 /*

@@ -58,17 +58,16 @@ void pppConstructYmCheckBGHeight(void)
  */
 struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(struct pppYmCheckBGHeight* pppYmCheckBGHeight, struct UnkC* param_2)
 {
-    _pppMngSt* pppMngSt = pppMngStPtr;
-
     if (DAT_8032ed70 == 0) {
-        int hitResult;
+        _pppMngSt* pppMngSt = pppMngStPtr;
+        Vec direction;
         CMapCylinderRaw cyl;
         Vec hitPos;
         float currentY;
 
-        cyl.m_direction.x = FLOAT_80330ed0;
-        cyl.m_direction.y = FLOAT_80330ed4;
-        cyl.m_direction.z = FLOAT_80330ed0;
+        direction.x = FLOAT_80330ed0;
+        direction.y = FLOAT_80330ed4;
+        direction.z = FLOAT_80330ed0;
 
         currentY = ((float*)pppMngSt)[0x94 / sizeof(float)];
         cyl.m_bottom.x = ((float*)pppMngSt)[0x84 / sizeof(float)];
@@ -87,10 +86,9 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(struct pppYmCheckBGHeight* pp
         cyl.m_top.z = FLOAT_80330ed0;
         cyl.m_height = FLOAT_80330ed0;
 
-        hitResult = CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, (CMapCylinder*)&cyl, &cyl.m_direction, 0xffffffff);
-        if (hitResult != 0) {
+        if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, (CMapCylinder*)&cyl, &direction, 0xffffffff) != 0) {
             CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &hitPos);
-            if (currentY - param_2->m_serializedDataOffsets <= hitPos.y) {
+            if (currentY - ((float*)param_2)[3] <= hitPos.y) {
                 currentY = hitPos.y + param_2->m_unk0x8;
             }
         }

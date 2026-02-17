@@ -5,9 +5,9 @@
 #include "ffcc/materialman.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_game.h"
+#include "ffcc/p_light.h"
 
 #include <dolphin/mtx.h>
-
 extern void* __vt__8CManager;
 extern void* lbl_801E8668;
 extern void* lbl_801E900C;
@@ -43,15 +43,28 @@ extern unsigned int lbl_801E8AD8[];
 extern unsigned int lbl_8032ECC8;
 extern unsigned int lbl_8032ECCC;
 extern unsigned int lbl_8032ECD0;
+extern unsigned int lbl_8032ECC0;
+extern unsigned int lbl_8032ECC4;
+extern float DrawRangeDefault;
+extern float lbl_8032FA10;
+extern "C" char lbl_801E8EEC[];
+extern "C" const char lbl_801D7844[];
 extern unsigned int CFlatFlags;
 extern CMaterialMan MaterialMan;
+extern CLightPcs LightPcs;
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 extern "C" const char s_p_map_cpp_801d7728[];
 extern "C" void Destroy__7CMapMngFv(CMapMng*);
+extern "C" void _MapFileRead__7CMapMngFPcRUl(CMapMng*);
 
 extern "C" void __dl__FPv(void*);
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
 extern "C" void DrawBound__8CGraphicFR6CBound8_GXColor(CGraphic*, void*, _GXColor);
+extern "C" int sprintf(char*, const char*, ...);
+extern "C" void* memcpy(void*, const void*, unsigned long);
+extern "C" void* memset(void*, int, unsigned long);
+extern "C" int strcmp(const char*, const char*);
+extern "C" char* strcpy(char*, const char*);
 
 struct CRelProfile;
 extern "C" CRelProfile* __dt__11CRelProfileFv(CRelProfile* self, short shouldDelete);
@@ -155,12 +168,66 @@ void CMapPcs::LoadMap(char*, void*, unsigned long, unsigned char)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80035A84
+ * PAL Size: 844b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapPcs::LoadMap(int, int, void*, unsigned long, unsigned char)
+void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSize, unsigned char mode)
 {
-	// TODO
+    unsigned int prevStageNo = lbl_8032ECC0;
+    unsigned int prevMapNo = lbl_8032ECC4;
+    Vec unusedVec;
+    char mapPath[0x104];
+
+    lbl_8032ECC0 = static_cast<unsigned int>(stageNo);
+    lbl_8032ECC4 = static_cast<unsigned int>(mapNo);
+    sprintf(mapPath, lbl_801D7844, stageNo, mapNo);
+
+    if (mode != 2) {
+        MapMng.DestroyMap();
+        LightPcs.DestroyBumpLightAll(static_cast<CLightPcs::TARGET>(1));
+        MapMng.SetDrawRangeOctTree(DrawRangeDefault);
+        MapMng.SetDrawRangeMapObj(DrawRangeDefault);
+    }
+
+    *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A0) = 0;
+    *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A4) = 0;
+    if (mapSize == 0) {
+        *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A8) = 0;
+    } else if (mode == 1) {
+        *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A8) = 2;
+    } else if (mode == 2) {
+        *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A8) = 3;
+        memset(reinterpret_cast<char*>(&MapMng) + 0x22A2C, 0, 0x40);
+    } else {
+        *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A8) = 1;
+    }
+
+    *reinterpret_cast<void**>(reinterpret_cast<char*>(&MapMng) + 0x22994) = mapPtr;
+    *reinterpret_cast<void**>(reinterpret_cast<char*>(&MapMng) + 0x22998) = mapPtr;
+    *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x2299C) = static_cast<unsigned int>(mapSize);
+
+    MapMng.ReadMtx(mapPath);
+    MapMng.ReadMpl(mapPath);
+    MapMng.ReadOtm(mapPath);
+    MapMng.ReadMid(mapPath);
+
+    if ((mode != 1) && (mode != 2)) {
+        if ((*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x17C) != 0) &&
+            (strcmp(lbl_801E8EEC, mapPath) != 0)) {
+            strcpy(lbl_801E8EEC, mapPath);
+            MapMng.GetDebugPlaySta(0, &unusedVec);
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0) += lbl_8032FA10;
+        }
+    }
+
+    if (mode == 2) {
+        lbl_8032ECC0 = prevStageNo;
+        lbl_8032ECC4 = prevMapNo;
+    }
 }
 
 /*
@@ -218,12 +285,60 @@ void CMapPcs::calcInit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80035624
+ * PAL Size: 796b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapPcs::calc()
 {
-	// TODO
+    Mtx cameraMtx;
+    Mtx44 screenMtx;
+
+    _MapFileRead__7CMapMngFPcRUl(&MapMng);
+    *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228EC) =
+        *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0);
+    *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F0) =
+        *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4);
+    *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) =
+        *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
+
+    if (*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this) + 0x184) == 0) {
+        PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<char*>(&CameraPcs) + 0x4), cameraMtx);
+        PSMTX44Copy(*reinterpret_cast<Mtx44*>(reinterpret_cast<char*>(&CameraPcs) + 0x48), screenMtx);
+    } else {
+        memcpy(cameraMtx, reinterpret_cast<char*>(this) + 0x4, 0x30);
+        memcpy(screenMtx, reinterpret_cast<char*>(this) + 0x34, 0x40);
+    }
+    MapMng.SetViewMtx(cameraMtx, screenMtx);
+
+    if (*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x174) == 0) {
+        *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x178) = 0;
+        MapMng.Calc();
+    } else {
+        MapMng.DestroyMap();
+        LightPcs.DestroyBumpLightAll(static_cast<CLightPcs::TARGET>(1));
+        MapMng.SetDrawRangeOctTree(DrawRangeDefault);
+        MapMng.SetDrawRangeMapObj(DrawRangeDefault);
+        *reinterpret_cast<void**>(reinterpret_cast<char*>(&MapMng) + 0x22994) = 0;
+        *reinterpret_cast<void**>(reinterpret_cast<char*>(&MapMng) + 0x22998) = 0;
+        *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x2299C) = 0;
+        *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A0) = 0;
+        *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A4) = 0;
+        *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A8) = 0;
+        MapMng.ReadMtx(reinterpret_cast<char*>(this) + 0x74);
+        MapMng.ReadMpl(reinterpret_cast<char*>(this) + 0x74);
+        MapMng.ReadOtm(reinterpret_cast<char*>(this) + 0x74);
+        MapMng.ReadMid(reinterpret_cast<char*>(this) + 0x74);
+        if ((*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x17C) != 0) &&
+            (strcmp(lbl_801E8EEC, reinterpret_cast<char*>(this) + 0x74) != 0)) {
+            strcpy(lbl_801E8EEC, reinterpret_cast<char*>(this) + 0x74);
+        }
+        *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x174) = 0;
+        *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x178) = 1;
+    }
 }
 
 /*

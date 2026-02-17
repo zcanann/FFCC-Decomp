@@ -775,10 +775,36 @@ void CMenuPcs::GetEquipItem()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015b158
+ * PAL Size: 268b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::ChkEquipActive(int)
+int CMenuPcs::ChkEquipActive(int index)
 {
-	// TODO
+	unsigned int caravanWork = Game.game.m_scriptFoodBase[0];
+	s16* entries = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
+	int equipIndex = static_cast<int>(*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x26));
+
+	if ((index < 0) || (entries[0] <= index)) {
+		return 0;
+	}
+
+	if (index == 0) {
+		if (equipIndex < 3) {
+			return 0;
+		}
+		return *reinterpret_cast<s16*>(caravanWork + equipIndex * 2 + 0xac) >= 0;
+	}
+
+	int item = static_cast<int>(*reinterpret_cast<s16*>(caravanWork + entries[index] * 2 + 0xb6));
+	int active = ChkEquipPossible__8CMenuPcsFi(this, item);
+
+	if ((active != 0) && (GetEquipType__8CMenuPcsFi(this, item) != equipIndex)) {
+		active = 0;
+	}
+
+	return active;
 }

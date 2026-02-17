@@ -176,12 +176,38 @@ void CGraphicPcs::destroy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800475b0
+ * PAL Size: 200b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphicPcs::calc()
 {
-	// TODO
+    int* timerA = (int*)((char*)this + 0x4);
+    if (*timerA > 0) {
+        *timerA = *timerA - 1;
+        if (*timerA == 0) {
+            *(int*)((char*)this + 0x1c) = 0;
+        }
+    }
+
+    int* timerB = (int*)((char*)this + 0x5c);
+    if (*timerB > 0) {
+        *timerB = *timerB - 1;
+        if (*timerB == 0) {
+            *(int*)((char*)this + 0x74) = 0;
+        }
+    }
+
+    int* timerC = (int*)((char*)this + 0x88);
+    if (*timerC > 0) {
+        *timerC = *timerC - 1;
+        if (*timerC == 0) {
+            *(int*)((char*)this + 0xa0) = 0;
+        }
+    }
 }
 
 /*

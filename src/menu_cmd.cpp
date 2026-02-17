@@ -21,6 +21,11 @@ extern double DOUBLE_80332a68;
 extern double DOUBLE_80332a78;
 extern float FLOAT_80332a70;
 extern float FLOAT_80332a88;
+extern const char* PTR_s_Flamestrike_80214d28[];
+extern const char* PTR_s_Feuer_Hieb_80214d3c[];
+extern const char* PTR_s_Colpo_Fire_80214d50[];
+extern const char* PTR_s_Pyro_Frappe_80214d64[];
+extern const char* PTR_s_Efecto_Fuego_80214d78[];
 
 /*
  * --INFO--
@@ -730,9 +735,24 @@ void CMenuPcs::CmdClose2()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::GetSkillStr(int)
+const char* CMenuPcs::GetSkillStr(int index)
 {
-	// TODO
+	if (Game.game.m_gameWork.m_languageId == '\x03') {
+		return PTR_s_Colpo_Fire_80214d50[index];
+	}
+	if (Game.game.m_gameWork.m_languageId < 3) {
+		if ((Game.game.m_gameWork.m_languageId != '\x01') && (Game.game.m_gameWork.m_languageId != '\0')) {
+			return PTR_s_Feuer_Hieb_80214d3c[index];
+		}
+	} else {
+		if (Game.game.m_gameWork.m_languageId == '\x05') {
+			return PTR_s_Efecto_Fuego_80214d78[index];
+		}
+		if (Game.game.m_gameWork.m_languageId < 5) {
+			return PTR_s_Pyro_Frappe_80214d64[index];
+		}
+	}
+	return PTR_s_Flamestrike_80214d28[index];
 }
 
 /*

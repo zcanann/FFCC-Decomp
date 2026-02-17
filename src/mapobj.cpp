@@ -459,12 +459,47 @@ void CMapObj::Calc()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800293C8
+ * PAL Size: 368b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapObj::SetDrawEnv()
 {
-	// TODO
+    _GXColor mapColor;
+    _GXColor lightColor = *reinterpret_cast<_GXColor*>(&DAT_8032e498);
+    unsigned char* mapMng = reinterpret_cast<unsigned char*>(&MapMng);
+
+    lightColor.a = U8At(this, 0x23);
+    *reinterpret_cast<_GXColor*>(&DAT_8032e498) = lightColor;
+
+    if (U8At(this, 0x21) == 0) {
+        mapColor.r = mapMng[0x2298C];
+        mapColor.g = mapMng[0x2298D];
+        mapColor.b = mapMng[0x2298E];
+        mapColor.a = mapMng[0x2298F];
+    } else {
+        mapColor = *reinterpret_cast<_GXColor*>(Ptr(this, 0xE8));
+    }
+
+    if (mapMng[0x22989] != 0) {
+        mapColor.r = static_cast<unsigned char>((mapColor.r * mapMng[0x22990]) >> 8);
+        mapColor.g = static_cast<unsigned char>((mapColor.g * mapMng[0x22991]) >> 8);
+        mapColor.b = static_cast<unsigned char>((mapColor.b * mapMng[0x22992]) >> 8);
+        mapColor.a = static_cast<unsigned char>((mapColor.a * mapMng[0x22993]) >> 8);
+    }
+
+    if (U8At(this, 0x24) != 0xFF) {
+        unsigned int alphaRate = U8At(this, 0x24);
+        mapColor.r = static_cast<unsigned char>((mapColor.r * alphaRate) >> 8);
+        mapColor.g = static_cast<unsigned char>((mapColor.g * alphaRate) >> 8);
+        mapColor.b = static_cast<unsigned char>((mapColor.b * alphaRate) >> 8);
+    }
+
+    LightPcs.SetMapColorAlpha(MtxAt(this, 0xB8), mapColor, lightColor, U8At(this, 0x26), F32At(this, 0x44), F32At(this, 0x48),
+                              F32At(this, 0x54), (U16At(this, 0x28) >> 7) & 0xFF);
 }
 
 /*

@@ -84,25 +84,25 @@ void pppSRandCV(void* param1, void* param2, void* param3)
 
     {
         s8 base = *(s8*)((char*)param2 + 0x8);
-        int delta = (int)(base * target[0]);
+        int delta = (int)((float)base * target[0] - (float)base);
         target_colors[0] = (u8)(target_colors[0] + delta);
     }
 
     {
         s8 base = *(s8*)((char*)param2 + 0x9);
-        int delta = (int)(base * target[1]);
+        int delta = (int)((float)base * target[1] - (float)base);
         target_colors[1] = (u8)(target_colors[1] + delta);
     }
 
     {
         s8 base = *(s8*)((char*)param2 + 0xA);
-        int delta = (int)(base * target[2]);
+        int delta = (int)((float)base * target[2] - (float)base);
         target_colors[2] = (u8)(target_colors[2] + delta);
     }
 
     {
         s8 base = *(s8*)((char*)param2 + 0xB);
-        int delta = (int)(base * target[3]);
+        int delta = (int)((float)base * target[3] - (float)base);
         target_colors[3] = (u8)(target_colors[3] + delta);
     }
 }

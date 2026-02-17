@@ -6,6 +6,11 @@ extern Mtx ppvCameraMatrix0;
 extern float FLOAT_8032fa30;
 extern float FLOAT_8032fa34;
 extern float FLOAT_8032fa38;
+extern float FLOAT_8032fa5c;
+extern float FLOAT_8032fa8c;
+extern float FLOAT_8032fab0;
+extern float FLOAT_8032fab4;
+extern float FLOAT_8032fab8;
 
 extern "C" {
 void pppEditGetViewPos__FP3Vec(Vec*);
@@ -205,12 +210,41 @@ void CCameraPcs::calcChara()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80038b1c
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCameraPcs::createMap()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    float fVar1;
+    float fVar2;
+    float fVar3;
+    float fVar4;
+    float fVar5;
+    float fVar6;
+
+    fVar2 = FLOAT_8032fa5c;
+    fVar1 = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0x478) = FLOAT_8032fa34;
+    fVar4 = FLOAT_8032fab0;
+    *reinterpret_cast<float*>(self + 0x474) = fVar1;
+    fVar5 = FLOAT_8032fab4;
+    *reinterpret_cast<float*>(self + 0x470) = fVar1;
+    fVar3 = FLOAT_8032fa8c;
+    *reinterpret_cast<float*>(self + 0xE8) = fVar1;
+    fVar6 = FLOAT_8032fab8;
+    *reinterpret_cast<float*>(self + 0xE4) = fVar1;
+    *reinterpret_cast<float*>(self + 0xE0) = fVar1;
+    *reinterpret_cast<float*>(self + 0xF8) = fVar1;
+    *reinterpret_cast<float*>(self + 0x43C) = fVar2;
+    *reinterpret_cast<float*>(self + 0x440) = fVar4;
+    *reinterpret_cast<float*>(self + 0xFC) = fVar5;
+    *reinterpret_cast<float*>(self + 0x100) = fVar3;
+    *reinterpret_cast<float*>(self + 0x104) = fVar6;
 }
 
 /*

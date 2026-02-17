@@ -251,12 +251,13 @@ void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
         }
 
         if (U8At(this, 0x14) != 0) {
-            unsigned short nextFrame = static_cast<unsigned short>(frameIndex + 1);
-            if (nextFrame >= U16At(this, 0xC)) {
+            int nextFrame = static_cast<int>(frameIndex) + 1;
+            if (nextFrame >= static_cast<int>(U16At(this, 0xC))) {
                 nextFrame = 0;
             }
 
-            const unsigned short nextTextureIndex = U16At(*reinterpret_cast<void**>(Ptr(this, 0x20)), nextFrame * 2);
+            const unsigned short nextTextureIndex =
+                U16At(*reinterpret_cast<void**>(Ptr(this, 0x20)), static_cast<unsigned int>(nextFrame) * 2);
             SetMaterialTextureSlot(material, static_cast<unsigned long>(U16At(this, 0xA) + 1), TextureAt(textureSet, nextTextureIndex));
             *reinterpret_cast<char*>(Ptr(material, 0xA4)) =
                 static_cast<char>(FLOAT_8032fd38 * (frameFloat - static_cast<float>(frameIndex)));

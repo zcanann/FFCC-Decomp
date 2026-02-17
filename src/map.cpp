@@ -1436,22 +1436,35 @@ int CMapMng::GetMapObjEffectIdx(unsigned short effectId)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002f8b4
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapMng::SetMapObjLMtx(int, float (*) [4])
+void CMapMng::SetMapObjLMtx(int mapObjIndex, float (*source)[4])
 {
-	// TODO
+    CMapObj* mapObj = reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(this) + (mapObjIndex * 0xF0) + 0x954);
+    PSMTXCopy(source, *reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(mapObj) + 0x88));
+    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(mapObj) + 0x1C) = 1;
+    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(mapObj) + 0x1B) = 1;
+    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(mapObj) + 0x1C) = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002f880
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapMng::GetMapObjWMtx(int, float (*) [4])
+void CMapMng::GetMapObjWMtx(int mapObjIndex, float (*destination)[4])
 {
-	// TODO
+    CMapObj* mapObj = reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(this) + (mapObjIndex * 0xF0) + 0x954);
+    PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<unsigned char*>(mapObj) + 0xB8), destination);
 }
 
 /*

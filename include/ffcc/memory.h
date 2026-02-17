@@ -88,13 +88,13 @@ public:
     void GetFree();
     void GetData(short, char*, int);
     void SetData(void*, int, CAmemCache::TYPE, int);
-    void IsEnable(short);
+    unsigned int IsEnable(short);
     void AddRef(short);
     void Release(short);
     void AmemFreeLowPrio(int);
     void CacheClear();
     void CalcPrio();
-    void AmemGetFreeSize();
+    int AmemGetFreeSize();
     void RefCnt0Clear();
     void RefCnt0Compare();
     void AssertCache();

@@ -35,6 +35,9 @@ extern float FLOAT_8032fc3c;
 extern float FLOAT_8032fc40;
 extern float FLOAT_8032fc44;
 extern float FLOAT_8032fc60;
+extern float FLOAT_8032fc74;
+extern float FLOAT_8032fc84;
+extern float FLOAT_8032fc94;
 extern double DOUBLE_8032fc48;
 extern double DOUBLE_8032fc50;
 extern double DOUBLE_8032fc58;
@@ -244,12 +247,51 @@ void CLightPcs::calc()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80049ed4
+ * PAL Size: 420b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CLightPcs::draw()
 {
-	// TODO
+    Mtx mtx;
+    Vec vec;
+    char* light = (char*)this + 0x63c;
+
+    PSMTXCopy(CameraPcs.m_cameraMatrix, mtx);
+    for (u32 i = 0; i < *(u32*)((char*)this + 0xb8); i++) {
+        if (*(u8*)(light + 0x4f) == 0) {
+            PSMTXMultVec(mtx, (Vec*)(light + 4), &vec);
+            GXInitLightPos((GXLightObj*)(light + 0x6c), vec.x, vec.y, vec.z);
+
+            if (*(u8*)(light + 0x4e) == 0) {
+                PSMTXMultVecSR(mtx, (Vec*)(light + 0x38), &vec);
+                GXInitLightDir((GXLightObj*)(light + 0x6c), vec.x, vec.y, vec.z);
+            } else {
+                GXInitLightDir((GXLightObj*)(light + 0x6c), *(float*)(light + 0x38), *(float*)(light + 0x3c),
+                               *(float*)(light + 0x40));
+            }
+
+            float cutoff = FLOAT_8032fc74;
+            if (*(u32*)light == 1) {
+                cutoff = FLOAT_8032fc94 * *(float*)(light + 0x44);
+            }
+
+            GXInitLightSpot((GXLightObj*)(light + 0x6c), cutoff, (GXSpotFn)*(u8*)(light + 0x4d));
+            GXInitLightAttnK((GXLightObj*)(light + 0x6c), FLOAT_8032fc84 / *(float*)(light + 0x20),
+                             FLOAT_8032fc84 / *(float*)(light + 0x1c), FLOAT_8032fc84 / *(float*)(light + 0x1c));
+        } else {
+            PSMTXMultVecSR(mtx, (Vec*)(light + 0x38), &vec);
+            GXInitSpecularDir((GXLightObj*)(light + 0x6c), vec.x, vec.y, vec.z);
+            GXInitLightAttn((GXLightObj*)(light + 0x6c), FLOAT_8032fc14, FLOAT_8032fc14, FLOAT_8032fc1c,
+                            *(float*)(light + 0x48) * FLOAT_8032fc18, FLOAT_8032fc14,
+                            FLOAT_8032fc1c - (*(float*)(light + 0x48) * FLOAT_8032fc18));
+        }
+
+        light += 0xb0;
+    }
 }
 
 /*

@@ -116,12 +116,22 @@ void CMapPcs::create()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80035DD0
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapPcs::createViewer()
 {
-	// TODO
+    *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x17C) = 0;
+    *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x180) = 1;
+    *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this) + 0x184) = 0;
+
+    MapMng.Create();
+
+    *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x17C) = 1;
 }
 
 /*

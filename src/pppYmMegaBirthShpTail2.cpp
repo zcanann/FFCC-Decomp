@@ -12,6 +12,8 @@ extern float lbl_80330560;
 extern pppFMATRIX g_matUnit2;
 extern s32 DAT_8032ed70;
 
+static char s_pppYmMegaBirthShpTail2_cpp_801d9c68[] = "pppYmMegaBirthShpTail2.cpp";
+
 /*
  * --INFO--
  * Address:	TODO

@@ -528,7 +528,7 @@ void CMapMesh::Draw(CMaterialSet* materialSet)
     unsigned int remaining = U16At(this, 0xA);
 
     if (materialSet == 0) {
-        materialSet = DefaultMaterialSet();
+        materialSet = *reinterpret_cast<CMaterialSet**>(MapMng + 0x21434);
     }
 
     while (remaining != 0) {
@@ -538,8 +538,8 @@ void CMapMesh::Draw(CMaterialSet* materialSet)
                                                                        1);
             GXCallDisplayList(entry->displayList, entry->size);
         }
-        entry++;
         remaining--;
+        entry++;
     }
 }
 

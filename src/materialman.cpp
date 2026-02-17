@@ -537,12 +537,21 @@ CTexScroll::~CTexScroll()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003c66c
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CTexScroll::CTexScroll()
 {
-	// TODO
+    m_type0 = 0;
+    m_type1 = 0;
+    m_u0 = 0.0f;
+    m_v0 = 0.0f;
+    m_u1 = 0.0f;
+    m_v1 = 0.0f;
 }
 
 /*
@@ -726,19 +735,19 @@ void CMaterialSet::AddMaterial(CMaterial*, int)
  */
 void CMaterialSet::CacheDumpTexture(int materialIndex, CAmemCacheSet* amemCacheSet)
 {
-    CMaterial* material =
-        (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8)))[static_cast<unsigned long>(materialIndex)];
+    int material = reinterpret_cast<int>(
+        (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8)))[static_cast<unsigned long>(materialIndex)]);
     if (material == 0) {
         return;
     }
 
-    int numTexture = static_cast<int>(*reinterpret_cast<unsigned short*>(Ptr(material, 0x18)));
-    CTexture** texture = reinterpret_cast<CTexture**>(Ptr(material, 0x3C));
+    int numTexture = static_cast<int>(*reinterpret_cast<unsigned short*>(Ptr(reinterpret_cast<void*>(material), 0x18)));
     for (int i = 0; i < numTexture; i++) {
-        if (*texture != 0) {
-            (*texture)->CacheUnLoadTexture(amemCacheSet);
+        CTexture* texture = *reinterpret_cast<CTexture**>(Ptr(reinterpret_cast<void*>(material), 0x3C));
+        if (texture != 0) {
+            texture->CacheUnLoadTexture(amemCacheSet);
         }
-        texture++;
+        material += 4;
     }
 }
 
@@ -756,17 +765,15 @@ unsigned long CMaterialSet::Find(char* name)
     CPtrArray<CMaterial*>* materialArray = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
     unsigned long index = 0;
 
-    while (true) {
+    do {
         CMaterial* material = (*materialArray)[index];
         if ((material != 0) && (strcmp(reinterpret_cast<char*>(Ptr(material, 8)), name) == 0)) {
             return index;
         }
-
         index++;
-        if (index >= static_cast<unsigned long>(materialArray->GetSize())) {
-            return 0xFFFFFFFF;
-        }
-    }
+    } while (index < static_cast<unsigned long>(materialArray->GetSize()));
+
+    return 0xFFFFFFFF;
 }
 
 /*

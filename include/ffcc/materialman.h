@@ -23,6 +23,15 @@ class CTexScroll
 public:
     CTexScroll();
     ~CTexScroll();
+
+private:
+    unsigned char m_type0;
+    unsigned char m_type1;
+    unsigned char m_pad[2];
+    float m_u0;
+    float m_v0;
+    float m_u1;
+    float m_v1;
 };
 
 class CMaterialMan

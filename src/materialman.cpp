@@ -16,6 +16,16 @@ extern unsigned char MaterialMan[];
 static const char s_materialStageName[] = "material";
 
 namespace {
+template <class T>
+class CPtrArray
+{
+public:
+    int GetSize();
+    int Add(T item);
+    void SetAt(unsigned long index, T item);
+    T operator[](unsigned long index);
+};
+
 static inline unsigned char* Ptr(void* p, unsigned int offset)
 {
     return reinterpret_cast<unsigned char*>(p) + offset;
@@ -556,22 +566,21 @@ void CMaterialMan::GetMemoryStage()
  */
 void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotIndex)
 {
+    CPtrArray<CTexture*>* textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(Ptr(textureSet, 8));
+    CPtrArray<CMaterial*>* materialArray = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
     unsigned long textureIndex = 0;
 
     while (true) {
-        void* textures = Ptr(textureSet, 8);
-        unsigned long textureCount = UnkMaterialSetGetter(textures);
+        unsigned long textureCount = static_cast<unsigned long>(textureArray->GetSize());
         if (textureCount <= textureIndex) {
             return;
         }
 
-        void** textureItems = *reinterpret_cast<void***>(Ptr(textures, 0xC));
-        if (textureItems[textureIndex] != 0) {
-            void* materials = Ptr(this, 8);
+        if ((*textureArray)[textureIndex] != 0) {
             unsigned long materialIndex = textureIndex + 1;
-            unsigned long materialCount = UnkMaterialSetGetter(materials);
+            unsigned long materialCount = static_cast<unsigned long>(materialArray->GetSize());
             if ((materialIndex < materialCount) &&
-                ((*reinterpret_cast<void***>(Ptr(materials, 0xC)))[materialIndex] != 0)) {
+                ((*materialArray)[materialIndex] != 0)) {
                 textureIndex++;
                 continue;
             }
@@ -619,10 +628,11 @@ void CMaterialSet::SetPartFromTextureSet(CTextureSet* textureSet, int pdtSlotInd
             *reinterpret_cast<unsigned short*>(material + 0x1A) = static_cast<unsigned short>(textureIndex);
             *reinterpret_cast<int*>(material + 0x9C) = pdtSlotIndex;
 
+            materialCount = static_cast<unsigned long>(materialArray->GetSize());
             if (materialIndex < materialCount) {
-                SetAtPtrArrayMaterial(materials, materialIndex, material);
+                materialArray->SetAt(materialIndex, reinterpret_cast<CMaterial*>(material));
             } else {
-                AddPtrArrayMaterial(materials, material);
+                materialArray->Add(reinterpret_cast<CMaterial*>(material));
             }
         }
 
@@ -717,7 +727,7 @@ void CMaterialSet::AddMaterial(CMaterial*, int)
 void CMaterialSet::CacheDumpTexture(int materialIndex, CAmemCacheSet* amemCacheSet)
 {
     CMaterial* material =
-        (*reinterpret_cast<CMaterial***>(Ptr(this, 0x14)))[materialIndex];
+        (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8)))[static_cast<unsigned long>(materialIndex)];
     if (material == 0) {
         return;
     }
@@ -743,22 +753,20 @@ void CMaterialSet::CacheDumpTexture(int materialIndex, CAmemCacheSet* amemCacheS
  */
 unsigned long CMaterialSet::Find(char* name)
 {
-    void* materials = Ptr(this, 8);
+    CPtrArray<CMaterial*>* materialArray = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
     unsigned long index = 0;
 
-    while (index < UnkMaterialSetGetter(materials)) {
-        CMaterial** materialItems = *reinterpret_cast<CMaterial***>(Ptr(materials, 0xC));
-        if (materialItems != 0) {
-            CMaterial* material = materialItems[index];
-            if ((material != 0) && (strcmp(reinterpret_cast<char*>(Ptr(material, 8)), name) == 0)) {
-                return index;
-            }
+    while (true) {
+        CMaterial* material = (*materialArray)[index];
+        if ((material != 0) && (strcmp(reinterpret_cast<char*>(Ptr(material, 8)), name) == 0)) {
+            return index;
         }
 
         index++;
+        if (index >= static_cast<unsigned long>(materialArray->GetSize())) {
+            return 0xFFFFFFFF;
+        }
     }
-
-    return 0xFFFFFFFF;
 }
 
 /*

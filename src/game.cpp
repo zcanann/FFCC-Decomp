@@ -131,8 +131,27 @@ static const float FLOAT_8032f688 = 1.0E+10;
 static const float FLOAT_8032f68c = -1.0E+10;
 static const float FLOAT_8032f690 = 0.0;    
 static const float FLOAT_8032f694 = 0.001;
+static const char s_numNameFmt[] = "%d%s";
+static const char s_nameJoinFmt[] = "%s%s%s";
+static const char s_nameSep[] = " ";
+static const char s_nameNoSep[] = "";
 static const char s_mainStageName[] = "game_main";
 static const char s_debugStageName[] = "game_debug";
+
+struct CFlatDataTableEntryView
+{
+    int m_numEntries;
+    char** m_strings;
+    char* m_stringBuf;
+};
+
+struct CFlatDataView
+{
+    int m_dataCount;
+    unsigned char _pad[0x68 - 4];
+    int m_tableCount;
+    CFlatDataTableEntryView m_tabl[8];
+};
 
 // Uninitialized
 static float FLOAT_8032ec40;
@@ -659,12 +678,43 @@ void CGame::ScriptChanging(char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80014d04
+ * PAL Size: 320b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::ScriptChanged(char*, int)
 {
-	// TODO
+    int i;
+    int j;
+    int k;
+
+    for (i = 0; i < 4; i++) {
+        m_partyObjArr[i] = 0;
+        m_scriptFoodBase[i] = 0;
+    }
+
+    unk_flat3_0xc7d0 = 0;
+
+    for (i = 0; i < 4; i++) {
+        for (j = 0; j < 16; j++) {
+            for (k = 0; k < 2; k++) {
+                m_scriptWork[i][j][k] = 0;
+            }
+        }
+    }
+
+    m_gameWork.m_soundOptionFlag = 0;
+    m_gameWork.m_gameOverFlag = 0;
+
+    DestroyMap__7CMapMngFv(&MapMng);
+    Reset__9CCharaPcsFQ29CCharaPcs5RESET(&CharaPcs, 0);
+    StopAndFreeAllSe__6CSoundFi(&Sound, 0);
+    ClearAll__5CWindFv(Wind);
+
+    *((u8*)&Sound + 0x8892) = 0x7F;
 }
 
 /*
@@ -1149,62 +1199,144 @@ CGPartyObj* CGame::GetPartyObj(int index)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800141e0
+ * PAL Size: 240b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGame::MakeArtItemName(char*, int, int)
+char* CGame::MakeArtItemName(char* out, int itemIndex, int count)
 {
-	// TODO
+    CFlatDataView* flatData = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1]);
+    char** itemTable = flatData->m_tabl[0].m_strings;
+
+    if (count < 2) {
+        char* prefix = itemTable[itemIndex * 5];
+        char* itemName = itemTable[itemIndex * 5 + 1];
+        const char* separator = s_nameNoSep;
+        if ((strlen(prefix) != 0) && (m_gameWork.m_languageId != 3) && (m_gameWork.m_languageId != 4)) {
+            separator = s_nameSep;
+        }
+        sprintf(out, s_nameJoinFmt, prefix, separator, itemName);
+    } else {
+        char* pluralName = itemTable[itemIndex * 5 + 3];
+        sprintf(out, s_numNameFmt, count, pluralName);
+    }
+    return out;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80014144
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGame::MakeArtsItemNames(char*, int)
+char* CGame::MakeArtsItemNames(char* out, int itemIndex)
 {
-	// TODO
+    CFlatDataView* flatData = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1]);
+    char** itemTable = flatData->m_tabl[0].m_strings;
+    char* prefix = itemTable[itemIndex * 5 + 2];
+    char* itemName = itemTable[itemIndex * 5 + 3];
+
+    const char* separator = s_nameNoSep;
+    if ((strlen(prefix) != 0) && (m_gameWork.m_languageId != 3) && (m_gameWork.m_languageId != 4)) {
+        separator = s_nameSep;
+    }
+    sprintf(out, s_nameJoinFmt, prefix, separator, itemName);
+    return out;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800140c8
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGame::MakeNumItemName(char*, int, int)
+char* CGame::MakeNumItemName(char* out, int itemIndex, int count)
 {
-	// TODO
+    CFlatDataView* flatData = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1]);
+    char** itemTable = flatData->m_tabl[0].m_strings;
+    char* itemName = itemTable[itemIndex * 5 + ((count < 2) ? 1 : 3)];
+    sprintf(out, s_numNameFmt, count, itemName);
+    return out;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80013fd8
+ * PAL Size: 240b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGame::MakeArtMonName(char*, int, int)
+char* CGame::MakeArtMonName(char* out, int monIndex, int count)
 {
-	// TODO
+    CFlatDataView* flatData = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1]);
+    char** monTable = flatData->m_tabl[1].m_strings;
+
+    if (count < 2) {
+        char* prefix = monTable[monIndex * 5];
+        char* monName = monTable[monIndex * 5 + 1];
+        const char* separator = s_nameNoSep;
+        if ((strlen(prefix) != 0) && (m_gameWork.m_languageId != 3) && (m_gameWork.m_languageId != 4)) {
+            separator = s_nameSep;
+        }
+        sprintf(out, s_nameJoinFmt, prefix, separator, monName);
+    } else {
+        char* pluralName = monTable[monIndex * 5 + 3];
+        sprintf(out, s_numNameFmt, count, pluralName);
+    }
+    return out;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80013f3c
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGame::MakeArtsMonNames(char*, int)
+char* CGame::MakeArtsMonNames(char* out, int monIndex)
 {
-	// TODO
+    CFlatDataView* flatData = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1]);
+    char** monTable = flatData->m_tabl[1].m_strings;
+    char* prefix = monTable[monIndex * 5 + 2];
+    char* monName = monTable[monIndex * 5 + 3];
+
+    const char* separator = s_nameNoSep;
+    if ((strlen(prefix) != 0) && (m_gameWork.m_languageId != 3) && (m_gameWork.m_languageId != 4)) {
+        separator = s_nameSep;
+    }
+    sprintf(out, s_nameJoinFmt, prefix, separator, monName);
+    return out;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80013ec0
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGame::MakeNumMonName(char*, int, int)
+char* CGame::MakeNumMonName(char* out, int monIndex, int count)
 {
-	// TODO
+    CFlatDataView* flatData = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1]);
+    char** monTable = flatData->m_tabl[1].m_strings;
+    char* monName = monTable[monIndex * 5 + ((count < 2) ? 1 : 3)];
+    sprintf(out, s_numNameFmt, count, monName);
+    return out;
 }
 
 /*

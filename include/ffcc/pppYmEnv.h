@@ -14,7 +14,7 @@ struct CTexture;
 struct Vec;
 
 CChara::CModel* GetModelPtr(CGObject*);
-void GetCharaNodeFrameMatrix(_pppMngSt*, float, float (*)[4]);
+int GetCharaNodeFrameMatrix(_pppMngSt*, float, float (*)[4]);
 void CalcGraphValue(_pppPObject*, long, float&, float&, float&, float, float&, float&);
 int GetTextureFromRSD(int, _pppEnvSt*);
 CChara::CModel* GetCharaModelPtr(CCharaPcs::CHandle*);

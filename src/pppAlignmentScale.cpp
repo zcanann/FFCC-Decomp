@@ -10,6 +10,7 @@ extern struct _pppMngSt* pppMngStPtr;
 
 extern class CCameraPcs {
 public:
+    unsigned char _0[0xe0];
     float _224_4_;
     float _228_4_;
     float _232_4_;

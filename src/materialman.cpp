@@ -1,6 +1,8 @@
 #include "ffcc/materialman.h"
 #include "ffcc/textureman.h"
 
+#include <dolphin/mtx.h>
+
 #include <string.h>
 
 extern "C" unsigned long UnkMaterialSetGetter(void*);
@@ -307,12 +309,26 @@ void CMaterialMan::SetMaterialMenu(CMaterialSet*, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003eb24
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMaterialMan::SetObjMatrix(float (*) [4], float (*) [4])
+void CMaterialMan::SetObjMatrix(float (*mtxA) [4], float (*mtxB) [4])
 {
-	// TODO
+    Mtx tmp0;
+    Mtx tmp1;
+
+    PSMTXConcat(mtxA, mtxB, tmp0);
+    GXLoadPosMtxImm(tmp0, GX_PNMTX0);
+    PSMTXCopy(tmp0, tmp1);
+    tmp1[0][3] = 0.0f;
+    tmp1[1][3] = 0.0f;
+    tmp1[2][3] = 0.0f;
+    GXLoadNrmMtxImm(tmp1, GX_PNMTX0);
+    PSMTXCopy(tmp1, reinterpret_cast<MtxPtr>(Ptr(this, 0xE8)));
 }
 
 /*
@@ -397,12 +413,17 @@ void CMaterialMan::InitVtxFmt(int, _GXCompType, int, _GXCompType, int, _GXCompTy
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80041f8c
+ * PAL Size: 24b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMaterialMan::IncNumTevStage()
 {
-	// TODO
+    unsigned int tevStage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    *reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) = ((tevStage & 0xFF) + 1) & 0xFF;
 }
 
 /*
@@ -427,32 +448,50 @@ void CMaterialMan::GetTexCoordIdCur()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80041fa4
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMaterialMan::IncTexCoordIdCur()
+int CMaterialMan::IncTexCoordIdCur()
 {
-	// TODO
+    int texCoordId = *reinterpret_cast<int*>(Ptr(this, 0x124));
+    *reinterpret_cast<int*>(Ptr(this, 0x124)) = texCoordId + 1;
+    return texCoordId;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80041fb8
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMaterialMan::IncTexMtxCur()
+int CMaterialMan::IncTexMtxCur()
 {
-	// TODO
+    int texMtx = *reinterpret_cast<int*>(Ptr(this, 0x120));
+    *reinterpret_cast<int*>(Ptr(this, 0x120)) = texMtx + 3;
+    return texMtx;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80041fcc
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMaterialMan::IncTexMapIdCur()
+int CMaterialMan::IncTexMapIdCur()
 {
-	// TODO
+    int texMapId = *reinterpret_cast<int*>(Ptr(this, 0x11C));
+    *reinterpret_cast<int*>(Ptr(this, 0x11C)) = texMapId + 1;
+    return texMapId;
 }
 
 /*
@@ -467,12 +506,22 @@ void CMaterialMan::GetTexMapIdCur()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80041fe0
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMaterialMan::SetStdEnv()
 {
-	// TODO
+    *reinterpret_cast<int*>(Ptr(this, 0x11C)) = *reinterpret_cast<int*>(Ptr(this, 0x128));
+    *reinterpret_cast<int*>(Ptr(this, 0x134)) = *reinterpret_cast<int*>(Ptr(this, 0x128));
+    *reinterpret_cast<int*>(Ptr(this, 0x120)) = *reinterpret_cast<int*>(Ptr(this, 0x12C));
+    *reinterpret_cast<int*>(Ptr(this, 0x138)) = *reinterpret_cast<int*>(Ptr(this, 0x12C));
+    *reinterpret_cast<int*>(Ptr(this, 0x124)) = *reinterpret_cast<int*>(Ptr(this, 0x130));
+    *reinterpret_cast<int*>(Ptr(this, 0x13C)) = *reinterpret_cast<int*>(Ptr(this, 0x130));
+    *reinterpret_cast<int*>(Ptr(this, 0x48)) = *reinterpret_cast<int*>(Ptr(this, 0x40));
 }
 
 /*

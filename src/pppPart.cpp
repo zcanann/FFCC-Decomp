@@ -8,6 +8,8 @@
 #include "ffcc/graphic.h"
 #include "ffcc/p_light.h"
 #include "ffcc/materialman.h"
+#include "ffcc/math.h"
+#include "ffcc/gobject.h"
 #include "ffcc/pppGetRotMatrixXYZ.h"
 #include "ffcc/pppGetRotMatrixXZY.h"
 #include "ffcc/pppGetRotMatrixYXZ.h"
@@ -36,10 +38,21 @@ extern "C" unsigned char DAT_8032ed88;
 extern "C" unsigned char DAT_8032ed89;
 extern "C" unsigned char DAT_8032ed8a;
 extern "C" unsigned char DAT_8032ed8b;
+extern "C" unsigned char CFlat[];
 extern "C" void SetPart__9CLightPcsFQ29CLightPcs6TARGETPvUc(CLightPcs*, int, void*, unsigned char);
 extern "C" void InitVtxFmt__12CMaterialManFi11_GXCompTypei11_GXCompTypei11_GXCompTypei(CMaterialMan*, int, _GXCompType, int, _GXCompType, int, _GXCompType, int);
+extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
+extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
+extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
+extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 extern CPartMng PartMng;
 extern CLightPcs LightPcs;
+extern CMath Math;
+
+static const char s_pppPart_cpp[] = "pppPart.cpp";
+static const float FLOAT_8032fddc = 0.0f;
+extern "C" float FLOAT_8032fde0;
+extern "C" float FLOAT_8032fde4;
 
 /*
  * --INFO--
@@ -1806,10 +1819,161 @@ void pppInitDrawEnv(unsigned char useZeroDepth)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80053d04
+ * PAL Size: 876b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppHitCylinderSendSystem(_pppMngSt*, Vec*, Vec*, float, float)
+void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, float radius, float cylScale)
 {
-	// TODO
+	struct PppMngStHitRaw
+	{
+		u8 m_pad0[0x74];
+		s16 m_kind;
+		s16 m_nodeIndex;
+		u8 m_pad1[0xBC - 0x78];
+		u32 m_objHitMask;
+		u32 m_cylinderAttribute;
+		u8 m_pad2[0xE5 - 0xC4];
+		u8 m_endRequested;
+		u8 m_pad3[0x11C - 0xE6];
+		PPPSEST m_soundEffectData;
+		PPPIFPARAM m_hitParams;
+		s16 m_hitObjectIds[0x10];
+	};
+
+	struct CMapCylinderRaw
+	{
+		Vec m_bottom;
+		Vec m_direction;
+		float m_radius;
+		float m_height;
+		Vec m_top;
+		Vec m_direction2;
+		float m_radius2;
+		float m_height2;
+	};
+
+	PppMngStHitRaw* hitRaw = (PppMngStHitRaw*)pppMngSt;
+	bool hadHit = false;
+
+	if (FLOAT_8032fddc != cylScale)
+	{
+		CMapCylinderRaw cylinder;
+		cylinder.m_bottom = *origin;
+		cylinder.m_direction.x = FLOAT_8032fde0;
+		cylinder.m_direction.y = FLOAT_8032fde0;
+		cylinder.m_direction.z = FLOAT_8032fde0;
+		cylinder.m_radius = radius;
+		cylinder.m_height = FLOAT_8032fde0;
+		cylinder.m_top = *vector;
+		cylinder.m_direction2.x = FLOAT_8032fde4;
+		cylinder.m_direction2.y = FLOAT_8032fde4;
+		cylinder.m_direction2.z = FLOAT_8032fde4;
+		cylinder.m_radius2 = cylScale;
+		cylinder.m_height2 = FLOAT_8032fde0;
+
+		if (MapMng.CheckHitCylinder((CMapCylinder*)&cylinder, vector, hitRaw->m_cylinderAttribute) != 0)
+		{
+			if (Game.game.m_currentSceneId == 7)
+			{
+				hitRaw->m_endRequested = 1;
+				if ((hitRaw->m_soundEffectData.m_soundEffectSlot >= 0) &&
+					(hitRaw->m_soundEffectData.m_soundEffectHandle >= 0))
+				{
+					Sound.FadeOutSe3D(hitRaw->m_soundEffectData.m_soundEffectHandle,
+						hitRaw->m_soundEffectData.m_soundEffectFadeFrames);
+					hitRaw->m_soundEffectData.m_soundEffectHandle = -1;
+				}
+			}
+			else
+			{
+				Vec hitPos;
+				CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A88), &hitPos);
+				s32 partIndex = ((s32)((u8*)pppMngSt - ((u8*)&PartMng + 0x2A18))) / 0x158;
+				Game.game.HitParticleBG(partIndex, hitRaw->m_kind, hitRaw->m_nodeIndex, &hitPos, &hitRaw->m_hitParams);
+			}
+			hadHit = true;
+		}
+	}
+
+	if (Game.game.m_currentSceneId != 7 && hitRaw->m_hitParams.m_hitObjectCount < 0x10)
+	{
+		s32 partIndex = ((s32)((u8*)pppMngSt - ((u8*)&PartMng + 0x2A18))) / 0x158;
+
+		for (CGObject* gObject = FindGObjFirst__13CFlatRuntime2Fv(&CFlat); gObject != 0;
+			 gObject = FindGObjNext__13CFlatRuntime2FP8CGObject(&CFlat, gObject))
+		{
+			u8 previousCount = hitRaw->m_hitParams.m_hitObjectCount;
+			u8 objectSlot = 0;
+			while ((objectSlot < previousCount) &&
+				   (hitRaw->m_hitObjectIds[objectSlot] != gObject->m_particleId))
+			{
+				objectSlot++;
+			}
+
+			if (objectSlot == previousCount)
+			{
+				for (s32 colliderIndex = 0; colliderIndex < 8; colliderIndex++)
+				{
+					CGObject::DamageCol* damageCol = &gObject->m_damageColliders[colliderIndex];
+
+					if ((gObject->m_bgColMask & 0x80000) == 0 ||
+						(damageCol->m_hitMask & hitRaw->m_objHitMask) == 0)
+					{
+						continue;
+					}
+
+					if ((FLOAT_8032fddc == damageCol->m_innerRadius) &&
+						(FLOAT_8032fddc == damageCol->m_outerRadius))
+					{
+						continue;
+					}
+
+					Vec hitPos;
+					if (Math.CrossCheckSphereVector(
+							&hitPos, 0, origin, vector, (Vec*)&damageCol->m_worldPosition.y, damageCol->m_innerRadius) == 0)
+					{
+						continue;
+					}
+
+					hadHit = true;
+
+					if (Game.game.m_currentSceneId == 7)
+					{
+						_WaitDrawDone__8CGraphicFPci(&Graphic, s_pppPart_cpp, 0xADB);
+						_pppAllFreePObject(pppMngSt);
+						_WaitDrawDone__8CGraphicFPci(&Graphic, s_pppPart_cpp, 0xADD);
+					}
+					else
+					{
+						gObject->HitParticle(partIndex, hitRaw->m_kind, hitRaw->m_nodeIndex, colliderIndex, &hitPos,
+											 &hitRaw->m_hitParams);
+						u8 newCount = hitRaw->m_hitParams.m_hitObjectCount;
+						if (previousCount != newCount)
+						{
+							u8 updatedSlot = 0;
+							while ((updatedSlot < newCount) &&
+								   (hitRaw->m_hitObjectIds[updatedSlot] != gObject->m_particleId))
+							{
+								updatedSlot++;
+							}
+							previousCount = newCount;
+							if (updatedSlot < newCount)
+							{
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if (hadHit)
+	{
+		return;
+	}
 }

@@ -1,12 +1,21 @@
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/gobject.h"
 #include "ffcc/mapmesh.h"
+#include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
+#include "ffcc/pppGetRotMatrixXYZ.h"
+#include "ffcc/pppGetRotMatrixXZY.h"
+#include "ffcc/pppGetRotMatrixYXZ.h"
+#include "ffcc/pppGetRotMatrixYZX.h"
+#include "ffcc/pppGetRotMatrixZXY.h"
+#include "ffcc/pppGetRotMatrixZYX.h"
 
 #include <math.h>
 
 extern "C" {
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh* mapMesh, CMaterialSet* materialSet, int& textureIndex);
+int SearchNodeSk__Q26CChara6CModelFPc(CChara::CModel*, char*);
+void CalcFrameMatrix__Q26CChara6CModelFfPQ26CChara5CNodePA4_f(CChara::CModel*, float, void*, float (*)[4]);
 void _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
     int tevSwapSel, int red, int green, int blue, int alpha);
 void _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
@@ -61,12 +70,269 @@ CChara::CModel* GetModelPtr(CGObject* gObject)
 }
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800e591c
+ * PAL Size: 1808b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GetCharaNodeFrameMatrix(_pppMngSt*, float, float (*) [4])
+int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)[4])
 {
-	// TODO
+    float one = 1.0f;
+    s16 nodeIndex = *(s16*)((u8*)mngSt + 0x76);
+    char* nodeNameBase;
+
+    if (Game.game.m_currentSceneId == 7) {
+        nodeNameBase = (char*)(*(u32*)((u8*)mngSt + 0x0) + nodeIndex * 0x60);
+    } else {
+        nodeNameBase = (char*)(*(u32*)((u8*)mngSt + 0x0) + nodeIndex * 0x60 + 0x20);
+    }
+
+    CGObject* owner = *(CGObject**)((u8*)mngSt + 0xD8);
+    if (owner == 0) {
+        return 0;
+    }
+
+    CChara::CModel* model = GetModelPtr(owner);
+    if (model == 0) {
+        return 0;
+    }
+
+    int skNodeIndex = SearchNodeSk__Q26CChara6CModelFPc(model, nodeNameBase + 0x50);
+    if (skNodeIndex == -1) {
+        return 0;
+    }
+
+    u8* modelBytes = (u8*)model;
+    u16 animFrameMax = 0;
+    void* anim = *(void**)(modelBytes + 0xD0);
+    if (anim != 0) {
+        animFrameMax = *(u16*)((u8*)anim + 0x10);
+    }
+    if (animFrameMax == 0) {
+        return 0;
+    }
+
+    int frameInt = (int)*(float*)(modelBytes + 0xD4);
+    int frameMod = frameInt % (int)animFrameMax;
+    float frame = (float)frameMod;
+    if (frame < 0.0f) {
+        return 0;
+    }
+    if (frame != 0.0f) {
+        frame -= 1.0f;
+    }
+
+    void* nodeList = *(void**)(modelBytes + 0xA8);
+    CalcFrameMatrix__Q26CChara6CModelFfPQ26CChara5CNodePA4_f(model, frame + frameAdd, (u8*)nodeList + skNodeIndex * 0xC0,
+                                                              outMatrix);
+
+    pppFMATRIX localMatrix;
+    switch (*(u8*)((u8*)mngSt + 0xEC)) {
+    case 0:
+        pppGetRotMatrixXYZ(localMatrix, (pppIVECTOR4*)((u8*)mngSt + 0x18));
+        break;
+    case 1:
+        pppGetRotMatrixXZY(localMatrix, (pppIVECTOR4*)((u8*)mngSt + 0x18));
+        break;
+    case 2:
+        pppGetRotMatrixYXZ(localMatrix, (pppIVECTOR4*)((u8*)mngSt + 0x18));
+        break;
+    case 3:
+        pppGetRotMatrixYZX(localMatrix, (pppIVECTOR4*)((u8*)mngSt + 0x18));
+        break;
+    case 4:
+        pppGetRotMatrixZXY(localMatrix, (pppIVECTOR4*)((u8*)mngSt + 0x18));
+        break;
+    case 5:
+        pppGetRotMatrixZYX(localMatrix, (pppIVECTOR4*)((u8*)mngSt + 0x18));
+        break;
+    default:
+        break;
+    }
+
+    u8 matrixMode = *(u8*)((u8*)mngSt + 0xE7);
+    if (matrixMode == 5) {
+        if (*(void**)((u8*)mngSt + 0xE0) != 0) {
+            outMatrix[0][3] += pppMngStPtr->m_position.x;
+            outMatrix[1][3] += pppMngStPtr->m_position.y;
+            outMatrix[2][3] += pppMngStPtr->m_position.z;
+            PSMTXConcat(outMatrix, localMatrix.value, localMatrix.value);
+
+            if (*(float*)((u8*)mngSt + 0x28) != one) {
+                Vec col;
+                col.x = localMatrix.value[0][0];
+                col.y = localMatrix.value[1][0];
+                col.z = localMatrix.value[2][0];
+                PSVECScale(&col, &col, *(float*)((u8*)mngSt + 0x28));
+                localMatrix.value[0][0] = col.x;
+                localMatrix.value[1][0] = col.y;
+                localMatrix.value[2][0] = col.z;
+            }
+            if (*(float*)((u8*)mngSt + 0x2C) != one) {
+                Vec col;
+                col.x = localMatrix.value[0][1];
+                col.y = localMatrix.value[1][1];
+                col.z = localMatrix.value[2][1];
+                PSVECScale(&col, &col, *(float*)((u8*)mngSt + 0x2C));
+                localMatrix.value[0][1] = col.x;
+                localMatrix.value[1][1] = col.y;
+                localMatrix.value[2][1] = col.z;
+            }
+            if (*(float*)((u8*)mngSt + 0x30) != one) {
+                Vec col;
+                col.x = localMatrix.value[0][2];
+                col.y = localMatrix.value[1][2];
+                col.z = localMatrix.value[2][2];
+                PSVECScale(&col, &col, *(float*)((u8*)mngSt + 0x30));
+                localMatrix.value[0][2] = col.x;
+                localMatrix.value[1][2] = col.y;
+                localMatrix.value[2][2] = col.z;
+            }
+            PSMTXCopy(localMatrix.value, outMatrix);
+            return 1;
+        }
+    } else if (matrixMode < 5) {
+        if (matrixMode == 3 && *(void**)((u8*)mngSt + 0xE0) != 0) {
+            Vec pos;
+            PSMTXMultVecSR(outMatrix, &pppMngStPtr->m_position, &pos);
+            outMatrix[0][3] += pos.x;
+            outMatrix[1][3] += pos.y;
+            outMatrix[2][3] += pos.z;
+            PSMTXConcat(outMatrix, localMatrix.value, localMatrix.value);
+
+            Vec col0;
+            Vec col1;
+            Vec col2;
+            col0.x = localMatrix.value[0][0];
+            col0.y = localMatrix.value[1][0];
+            col0.z = localMatrix.value[2][0];
+            PSVECScale(&col0, &col0, *(float*)((u8*)mngSt + 0x28));
+            localMatrix.value[0][0] = col0.x;
+            localMatrix.value[1][0] = col0.y;
+            localMatrix.value[2][0] = col0.z;
+
+            col1.x = localMatrix.value[0][1];
+            col1.y = localMatrix.value[1][1];
+            col1.z = localMatrix.value[2][1];
+            PSVECScale(&col1, &col1, *(float*)((u8*)mngSt + 0x2C));
+            localMatrix.value[0][1] = col1.x;
+            localMatrix.value[1][1] = col1.y;
+            localMatrix.value[2][1] = col1.z;
+
+            col2.x = localMatrix.value[0][2];
+            col2.y = localMatrix.value[1][2];
+            col2.z = localMatrix.value[2][2];
+            PSVECScale(&col2, &col2, *(float*)((u8*)mngSt + 0x30));
+            localMatrix.value[0][2] = col2.x;
+            localMatrix.value[1][2] = col2.y;
+            localMatrix.value[2][2] = col2.z;
+            PSMTXCopy(localMatrix.value, outMatrix);
+            return 1;
+        }
+    } else if (matrixMode < 7 && *(void**)((u8*)mngSt + 0xE0) != 0) {
+        Vec col0;
+        Vec col1;
+        Vec col2;
+        Vec pos;
+        col0.x = outMatrix[0][0];
+        col0.y = outMatrix[1][0];
+        col0.z = outMatrix[2][0];
+        col1.x = outMatrix[0][1];
+        col1.y = outMatrix[1][1];
+        col1.z = outMatrix[2][1];
+        col2.x = outMatrix[0][2];
+        col2.y = outMatrix[1][2];
+        col2.z = outMatrix[2][2];
+        PSVECNormalize(&col0, &col0);
+        PSVECNormalize(&col1, &col1);
+        PSVECNormalize(&col2, &col2);
+        outMatrix[0][0] = col0.x;
+        outMatrix[1][0] = col0.y;
+        outMatrix[2][0] = col0.z;
+        outMatrix[0][1] = col1.x;
+        outMatrix[1][1] = col1.y;
+        outMatrix[2][1] = col1.z;
+        outMatrix[0][2] = col2.x;
+        outMatrix[1][2] = col2.y;
+        outMatrix[2][2] = col2.z;
+
+        PSMTXMultVecSR(outMatrix, &pppMngStPtr->m_position, &pos);
+        PSMTXConcat(outMatrix, localMatrix.value, localMatrix.value);
+        if (*(float*)((u8*)mngSt + 0x28) != one) {
+            Vec col;
+            col.x = localMatrix.value[0][0];
+            col.y = localMatrix.value[1][0];
+            col.z = localMatrix.value[2][0];
+            PSVECScale(&col, &col, *(float*)((u8*)mngSt + 0x28));
+            localMatrix.value[0][0] = col.x;
+            localMatrix.value[1][0] = col.y;
+            localMatrix.value[2][0] = col.z;
+        }
+        if (*(float*)((u8*)mngSt + 0x2C) != one) {
+            Vec col;
+            col.x = localMatrix.value[0][1];
+            col.y = localMatrix.value[1][1];
+            col.z = localMatrix.value[2][1];
+            PSVECScale(&col, &col, *(float*)((u8*)mngSt + 0x2C));
+            localMatrix.value[0][1] = col.x;
+            localMatrix.value[1][1] = col.y;
+            localMatrix.value[2][1] = col.z;
+        }
+        if (*(float*)((u8*)mngSt + 0x30) != one) {
+            Vec col;
+            col.x = localMatrix.value[0][2];
+            col.y = localMatrix.value[1][2];
+            col.z = localMatrix.value[2][2];
+            PSVECScale(&col, &col, *(float*)((u8*)mngSt + 0x30));
+            localMatrix.value[0][2] = col.x;
+            localMatrix.value[1][2] = col.y;
+            localMatrix.value[2][2] = col.z;
+        }
+        localMatrix.value[0][3] += pos.x;
+        localMatrix.value[1][3] += pos.y;
+        localMatrix.value[2][3] += pos.z;
+        PSMTXCopy(localMatrix.value, outMatrix);
+        return 1;
+    }
+
+    if (*(float*)((u8*)mngSt + 0x28) != one) {
+        Vec col;
+        col.x = localMatrix.value[0][0];
+        col.y = localMatrix.value[1][0];
+        col.z = localMatrix.value[2][0];
+        PSVECScale(&col, &col, *(float*)((u8*)mngSt + 0x28));
+        localMatrix.value[0][0] = col.x;
+        localMatrix.value[1][0] = col.y;
+        localMatrix.value[2][0] = col.z;
+    }
+    if (*(float*)((u8*)mngSt + 0x2C) != one) {
+        Vec col;
+        col.x = localMatrix.value[0][1];
+        col.y = localMatrix.value[1][1];
+        col.z = localMatrix.value[2][1];
+        PSVECScale(&col, &col, *(float*)((u8*)mngSt + 0x2C));
+        localMatrix.value[0][1] = col.x;
+        localMatrix.value[1][1] = col.y;
+        localMatrix.value[2][1] = col.z;
+    }
+    if (*(float*)((u8*)mngSt + 0x30) != one) {
+        Vec col;
+        col.x = localMatrix.value[0][2];
+        col.y = localMatrix.value[1][2];
+        col.z = localMatrix.value[2][2];
+        PSVECScale(&col, &col, *(float*)((u8*)mngSt + 0x30));
+        localMatrix.value[0][2] = col.x;
+        localMatrix.value[1][2] = col.y;
+        localMatrix.value[2][2] = col.z;
+    }
+
+    localMatrix.value[0][3] = *(float*)((u8*)mngSt + 0x8);
+    localMatrix.value[1][3] = *(float*)((u8*)mngSt + 0xC);
+    localMatrix.value[2][3] = *(float*)((u8*)mngSt + 0x10);
+    PSMTXCopy(localMatrix.value, outMatrix);
+    return 1;
 }
 
 /*

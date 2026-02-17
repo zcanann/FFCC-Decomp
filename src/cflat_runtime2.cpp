@@ -6,13 +6,20 @@
 #include <string.h>
 
 extern "C" void reset__6CAStarFv(void*);
+extern "C" int sprintf(char*, const char*, ...);
 extern "C" int __cntlzw(unsigned int);
 extern "C" void Create__9CGBaseObjFv(CGBaseObj*);
 extern "C" void Destroy__9CGBaseObjFv(CGBaseObj*);
+extern "C" void Destroy__12CFlatRuntimeFv(CFlatRuntime*);
+extern "C" void Destroy__9CFlatDataFv(void*);
+extern "C" void Close__5CFileFPQ25CFile7CHandle(void*, void*);
 extern "C" void* __vt__13CFlatRuntime2[];
 extern "C" CFlatRuntime* __ct__12CFlatRuntimeFv(CFlatRuntime*);
 extern "C" void __ct__9CFlatDataFv(void*);
 extern "C" void pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(CPartMng*, int, int, PPPCREATEPARAM*, int);
+extern "C" char* GetLangString__5CGameFv(void*);
+extern "C" void* Open__5CFileFPcUlQ25CFile3PRI(void*, char*, unsigned long, int);
+extern "C" void ReadASync__5CFileFPQ25CFile7CHandle(void*, void*);
 
 extern unsigned char Pad[];
 extern unsigned char GraphicsPcs[];
@@ -706,12 +713,32 @@ CGItemObj* CFlatRuntime2::FindGItemObjNext(CGItemObj* gItemObj)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006C5BC
+ * PAL Size: 160b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFlatRuntime2::Destroy()
 {
-	// TODO
+	Destroy__12CFlatRuntimeFv(reinterpret_cast<CFlatRuntime*>(this));
+	Destroy__9CFlatDataFv(reinterpret_cast<u8*>(this) + 0xCF20);
+
+	u8* layer = reinterpret_cast<u8*>(this) + 0x1770;
+	for (int i = 0; i < 8; i++, layer += 0xC) {
+		void* fileHandle = *reinterpret_cast<void**>(layer + 8);
+		if (fileHandle != 0) {
+			Close__5CFileFPQ25CFile7CHandle(&File, fileHandle);
+			*reinterpret_cast<void**>(layer + 8) = 0;
+		}
+
+		void* textureSet = *reinterpret_cast<void**>(layer + 4);
+		if (textureSet != 0) {
+			(*(void (**)(void*, int))(*reinterpret_cast<int*>(textureSet) + 8))(textureSet, 1);
+			*reinterpret_cast<void**>(layer + 4) = 0;
+		}
+	}
 }
 
 /*
@@ -777,12 +804,40 @@ unsigned int CFlatRuntime2::isLoadLayerASyncCompleted(int layerNo)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006AF5C
+ * PAL Size: 244b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::loadLayerASync(int, char*)
+void CFlatRuntime2::loadLayerASync(int layerNo, char* fileName)
 {
-	// TODO
+	const int layerOffset = layerNo * 0xC;
+	u8* layer = reinterpret_cast<u8*>(this) + 0x1770 + layerOffset;
+
+	void* fileHandle = *reinterpret_cast<void**>(layer + 8);
+	if (fileHandle != 0) {
+		Close__5CFileFPQ25CFile7CHandle(&File, fileHandle);
+		*reinterpret_cast<void**>(layer + 8) = 0;
+	}
+
+	void* textureSet = *reinterpret_cast<void**>(layer + 4);
+	if (textureSet != 0) {
+		(*(void (**)(void*, int))(*reinterpret_cast<int*>(textureSet) + 8))(textureSet, 1);
+		*reinterpret_cast<void**>(layer + 4) = 0;
+	}
+
+	char path[0x104];
+	sprintf(path, "dvd:/%s/%s.tex", GetLangString__5CGameFv(&Game.game), fileName);
+
+	fileHandle = Open__5CFileFPcUlQ25CFile3PRI(&File, path, 0, 0);
+	*reinterpret_cast<void**>(layer + 8) = fileHandle;
+	if (fileHandle != 0) {
+		ReadASync__5CFileFPQ25CFile7CHandle(&File, fileHandle);
+	}
+
+	*reinterpret_cast<int*>(layer) = *reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 0xE4);
 }
 
 /*

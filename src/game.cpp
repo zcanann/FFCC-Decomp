@@ -124,6 +124,7 @@ extern const char DAT_8032f698[];
 extern const char DAT_8032f6a0[];
 extern const char DAT_8032f6a4[];
 extern const char DAT_8032f6ac[];
+extern const s16 DAT_8032e3d0[];
 extern const char* lbl_801D60B0[];
 extern const char* lbl_801E8344[];
 int sprintf(char*, const char*, ...);

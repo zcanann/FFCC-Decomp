@@ -97,9 +97,7 @@ void pppVertexApCon(_pppPObject* pobj, PVertexAp* vtxAp)
 void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
 {
     VertexApData* data = (VertexApData*)dataRaw;
-    VertexApCtrl* ctrl = (VertexApCtrl*)ctrlRaw;
-    s32 stateOffset = *ctrl->stateOffset;
-    VertexApState* state = (VertexApState*)((u8*)parent + stateOffset + 0x80);
+    VertexApState* state = (VertexApState*)((u8*)parent + **(s32**)((u8*)ctrlRaw + 0xC) + 0x80);
 
     if (lbl_8032ED70 != 0) {
         return;
@@ -121,8 +119,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
 
         u8 count = data->spawnCount;
 
-        switch (data->mode) {
-        case 0:
+        if (data->mode == 0) {
             do {
                 if (state->index >= (u16)entry->maxValue) {
                     state->index = 0;
@@ -130,11 +127,17 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
 
                 u16 vertexIndex = entry->vertexIndices[state->index];
                 state->index++;
+                Vec* vertex = &points[vertexIndex];
+                f32 x = vertex->x;
+                f32 y = vertex->y;
+                f32 z = vertex->z;
 
-                s32 childId = data->childId;
-                if ((u16)childId != 0xFFFF) {
-                    _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (childId << 4));
+                if ((data->childId + 0x10000) != 0xFFFF) {
                     _pppPObject* child;
+                    _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (data->childId << 4));
+                    Vec pos;
+                    Vec worldPos;
+                    Vec* outPos;
 
                     if (childData == 0) {
                         child = 0;
@@ -143,27 +146,34 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                         *(void**)((u8*)child + 0x4) = parent;
                     }
 
-                    Vec transformed;
-                    Vec* outPos = (Vec*)((u8*)child + data->childPosOffset + 0x80);
-
-                    PSMTXMultVec(*(Mtx*)((u8*)parent + 0x10), &points[vertexIndex], &transformed);
+                    pos.x = x;
+                    pos.y = y;
+                    pos.z = z;
+                    PSMTXMultVec(*(Mtx*)((u8*)parent + 0x10), &pos, &pos);
+                    outPos = (Vec*)((u8*)child + data->childPosOffset + 0x80);
 
                     if (data->useWorldMtx == 0) {
-                        *outPos = transformed;
+                        *outPos = pos;
                     } else {
-                        PSMTXMultVec(*(Mtx*)((u8*)lbl_8032ED50 + 0x78), &transformed, outPos);
+                        PSMTXMultVec(*(Mtx*)((u8*)lbl_8032ED50 + 0x78), &pos, &worldPos);
+                        *outPos = worldPos;
                     }
                 }
             } while (count-- != 0);
-            break;
-        case 1:
+        } else if (data->mode == 1) {
             do {
                 u16 vertexIndex = entry->vertexIndices[(s32)(RandF__5CMathFv(&math) * (f32)entry->maxValue)];
-                s32 childId = data->childId;
+                Vec* vertex = &points[vertexIndex];
+                f32 x = vertex->x;
+                f32 y = vertex->y;
+                f32 z = vertex->z;
 
-                if ((u16)childId != 0xFFFF) {
-                    _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (childId << 4));
+                if ((data->childId + 0x10000) != 0xFFFF) {
                     _pppPObject* child;
+                    _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (data->childId << 4));
+                    Vec pos;
+                    Vec worldPos;
+                    Vec* outPos;
 
                     if (childData == 0) {
                         child = 0;
@@ -172,19 +182,20 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                         *(void**)((u8*)child + 0x4) = parent;
                     }
 
-                    Vec transformed;
-                    Vec* outPos = (Vec*)((u8*)child + data->childPosOffset + 0x80);
-
-                    PSMTXMultVec(*(Mtx*)((u8*)parent + 0x10), &points[vertexIndex], &transformed);
+                    pos.x = x;
+                    pos.y = y;
+                    pos.z = z;
+                    PSMTXMultVec(*(Mtx*)((u8*)parent + 0x10), &pos, &pos);
+                    outPos = (Vec*)((u8*)child + data->childPosOffset + 0x80);
 
                     if (data->useWorldMtx == 0) {
-                        *outPos = transformed;
+                        *outPos = pos;
                     } else {
-                        PSMTXMultVec(*(Mtx*)((u8*)lbl_8032ED50 + 0x78), &transformed, outPos);
+                        PSMTXMultVec(*(Mtx*)((u8*)lbl_8032ED50 + 0x78), &pos, &worldPos);
+                        *outPos = worldPos;
                     }
                 }
             } while (count-- != 0);
-            break;
         }
 
         state->countdown = data->spawnDelay;

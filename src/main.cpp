@@ -114,10 +114,13 @@ void main(int argc, char** argv)
                 continue;
             }
 
-            if (argument[1] == 'r') {
+            switch (argument[1]) {
+            case 'r':
                 Pad._1b4_4_ = 1;
-            } else if (argument[1] == 'w') {
+                break;
+            case 'w':
                 Pad._1b8_4_ = 1;
+                break;
             }
         }
     }

@@ -11,6 +11,7 @@
 extern "C" void __dl__FPv(void* ptr);
 extern "C" void __dla__FPv(void* ptr);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
+extern "C" int rand(void);
 
 extern "C" u32 DAT_8032fd58;
 extern "C" u32 DAT_8032fd5c;
@@ -29,6 +30,8 @@ extern "C" float FLOAT_8032fd94;
 extern "C" float FLOAT_8032fd98;
 extern "C" float FLOAT_8032fd9c;
 extern "C" float FLOAT_8032fda0;
+extern "C" float FLOAT_8032fda4;
+extern "C" float FLOAT_8032fda8;
 
 namespace {
 static inline u8* Ptr(CFunnyShape* self, u32 offset)
@@ -196,22 +199,113 @@ extern "C" CFunnyShape* dtor_80051D80(CFunnyShape* funnyShape, short shouldDelet
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80051b8c
+ * PAL Size: 500b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFunnyShape::InitAnmWork()
 {
-	// TODO
+    const u32 flags = U32At(this, 0);
+    u8* entry = Ptr(this, 0x30);
+    const s16 shapeCount = *reinterpret_cast<s16*>(reinterpret_cast<u8*>(PtrAt(this, 0xC)) + 6);
+    const s16 range = *reinterpret_cast<s16*>(Ptr(this, 0x2A));
+
+    for (s32 i = 0; i < 0x200; i++) {
+        *reinterpret_cast<s32*>(entry) = i;
+        *reinterpret_cast<void**>(entry + 4) = PtrAt(this, 0xC);
+        *reinterpret_cast<float*>(entry + 8) = static_cast<float>(rand() % range);
+        *reinterpret_cast<float*>(entry + 0xC) = static_cast<float>(rand() % range);
+        *reinterpret_cast<float*>(entry + 0x10) = FLOAT_8032fd6c;
+        *reinterpret_cast<s16*>(entry + 0x14) = static_cast<s16>(rand() % shapeCount);
+        *reinterpret_cast<s16*>(entry + 0x16) = 2;
+        *reinterpret_cast<float*>(entry + 0x20) = FLOAT_8032fd6c;
+        *reinterpret_cast<float*>(entry + 0x24) = FLOAT_8032fd6c;
+        *reinterpret_cast<float*>(entry + 0x28) =
+            (FLOAT_8032fda4 * static_cast<float>(rand() % 0x168)) / FLOAT_8032fda8;
+
+        if ((rand() & 1) != 0) {
+            *reinterpret_cast<float*>(entry + 8) *= FLOAT_8032fd80;
+        }
+
+        if ((rand() & 1) != 0) {
+            *reinterpret_cast<float*>(entry + 0xC) *= FLOAT_8032fd80;
+        }
+
+        if ((flags & 0x80) == 0) {
+            *reinterpret_cast<s16*>(entry + 0x14) = 0;
+            *reinterpret_cast<float*>(entry + 8) = FLOAT_8032fd6c;
+            *reinterpret_cast<float*>(entry + 0xC) = FLOAT_8032fd6c;
+        }
+
+        entry += 0x30;
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80051968
+ * PAL Size: 548b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFunnyShape::Update()
 {
-	// TODO
+    if ((Ptr(this, 0x60D4)[0] == 0) || (PtrAt(this, 0xC) == 0)) {
+        return;
+    }
+
+    const u32 lockOrigin = (((U32At(this, 0) >> 7) & 1) ^ 1);
+    u8* entry = Ptr(this, 0x30);
+    const s16 count = *reinterpret_cast<s16*>(Ptr(this, 0x28));
+    const s16 shapeCount = *reinterpret_cast<s16*>(reinterpret_cast<u8*>(PtrAt(this, 0xC)) + 6);
+    const s16 range = *reinterpret_cast<s16*>(Ptr(this, 0x2A));
+
+    for (s32 i = 0; i < count; i++) {
+        s16& timer = *reinterpret_cast<s16*>(entry + 0x16);
+        timer -= 0x200;
+        if (timer < 1) {
+            s16& frame = *reinterpret_cast<s16*>(entry + 0x14);
+            frame += 1;
+            if (frame >= shapeCount) {
+                frame = 0;
+                *reinterpret_cast<float*>(entry + 8) = static_cast<float>(rand() % range);
+                *reinterpret_cast<float*>(entry + 0xC) = static_cast<float>(rand() % range);
+                *reinterpret_cast<float*>(entry + 0x10) = FLOAT_8032fd6c;
+                *reinterpret_cast<s16*>(entry + 0x16) = 2;
+                *reinterpret_cast<float*>(entry + 0x20) = FLOAT_8032fd6c;
+                *reinterpret_cast<float*>(entry + 0x24) = FLOAT_8032fd6c;
+                *reinterpret_cast<float*>(entry + 0x28) =
+                    (FLOAT_8032fda4 * static_cast<float>(rand() % 0x168)) / FLOAT_8032fda8;
+
+                if ((rand() & 1) != 0) {
+                    *reinterpret_cast<float*>(entry + 8) *= FLOAT_8032fd80;
+                }
+
+                if ((rand() & 1) != 0) {
+                    *reinterpret_cast<float*>(entry + 0xC) *= FLOAT_8032fd80;
+                }
+
+                if (lockOrigin != 0) {
+                    *reinterpret_cast<s16*>(entry + 0x14) = 0;
+                    *reinterpret_cast<float*>(entry + 8) = FLOAT_8032fd6c;
+                    *reinterpret_cast<float*>(entry + 0xC) = FLOAT_8032fd6c;
+                }
+            }
+
+            timer = *reinterpret_cast<s16*>(reinterpret_cast<u8*>(PtrAt(this, 0xC)) + frame * 8 + 0x12);
+        }
+
+        if (lockOrigin != 0) {
+            return;
+        }
+
+        entry += 0x30;
+    }
 }
 
 /*

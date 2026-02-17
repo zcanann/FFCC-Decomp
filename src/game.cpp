@@ -70,6 +70,7 @@ void ResetNewGame__13CFlatRuntime2Fv(void*);
 void InitFurTexBuffer__6CCharaFv(void*);
 void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
+int intToClass__13CFlatRuntime2Fi(void*, int);
 int sprintf(char*, const char*, ...);
 void ScriptChanging__7CSystemFPc(CSystem*, char*);
 void ScriptChanged__7CSystemFPci(CSystem*, char*, int);
@@ -476,12 +477,37 @@ void CGame::Destroy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001551c
+ * PAL Size: 212b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::InitNewGame()
 {
-	// TODO
+    const char* townName = DAT_8032f6ac;
+
+    Printf__7CSystemFPce(&System, DAT_8032f6a0);
+    Printf__7CSystemFPce(&System, DAT_801d6214);
+    Printf__7CSystemFPce(&System, DAT_8032f6a0);
+
+    memset(&m_gameWork.m_gameDataStartMarker, 0, 0x13E1);
+    memset(m_gameWork.m_wmBackupParams, 0xFF, sizeof(m_gameWork.m_wmBackupParams));
+
+    m_gameWork.m_scriptSysVal0 = 0;
+    m_gameWork.m_scriptSysVal1 = 0;
+    m_gameWork.m_scriptSysVal2 = 0;
+    m_gameWork.m_scriptSysVal3 = 1;
+    m_gameWork.m_chaliceElement = 1;
+
+    if (m_gameWork.m_languageId == 3) {
+        townName = DAT_8032f6a4;
+    }
+
+    strcpy(m_gameWork.m_townName, townName);
+    ResetNewGame__13CFlatRuntime2Fv(CFlat);
+    InitFurTexBuffer__6CCharaFv(Chara);
 }
 
 /*
@@ -1179,12 +1205,35 @@ void CGame::GetTargetCursor(int playerIndex, Vec& posA, Vec& posB)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800142e4
+ * PAL Size: 184b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGame::GetParticleSpecialInfo(PPPIFPARAM&, int&, int&)
+int CGame::GetParticleSpecialInfo(PPPIFPARAM& ifParam, int& particleIndex, int& specialInfo)
 {
-	// TODO
+    if (ifParam.m_classId == 0) {
+        return 0;
+    }
+
+    char* classObj = reinterpret_cast<char*>(intToClass__13CFlatRuntime2Fi(CFlat, (int)ifParam.m_classId));
+    particleIndex = ifParam.m_particleIndex;
+    if (particleIndex == 0) {
+        return 0;
+    }
+
+    void* behavior = *reinterpret_cast<void**>(classObj + 0x48);
+    void** behaviorVtable = *reinterpret_cast<void***>(behavior);
+    u32 behaviorFlags = reinterpret_cast<u32 (*)(void*)>(behaviorVtable[3])(behavior);
+    if ((behaviorFlags & 0x6D) != 0x6D) {
+        return 0;
+    }
+
+    char* objWork = *reinterpret_cast<char**>(classObj + 0x58);
+    specialInfo = *reinterpret_cast<int*>(objWork + 0x3B4);
+    return 1;
 }
 
 /*

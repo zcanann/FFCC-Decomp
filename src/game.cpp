@@ -123,9 +123,11 @@ extern const char DAT_8032f698[];
 extern const char DAT_8032f6a0[];
 extern const char DAT_8032f6a4[];
 extern const char DAT_8032f6ac[];
+extern const s16 DAT_8032e3d0[];
 extern const char* lbl_801D60B0[];
 extern const char* lbl_801E8344[];
 int sprintf(char*, const char*, ...);
+int rand(void);
 }
 
 static const float FLOAT_8032f688 = 1.0E+10;
@@ -1158,12 +1160,40 @@ void CGame::LoadFinished()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001440c
+ * PAL Size: 308b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGame::GetBossArtifact(int, int)
+int CGame::GetBossArtifact(int artifactLevel, int artifactScore)
 {
-	// TODO
+    int stage = m_gameWork.m_bossArtifactStageTable[m_gameWork.m_bossArtifactStageIndex];
+    if (stage > 2) {
+        stage = 2;
+    }
+
+    int offsetIndex = static_cast<int>((float)artifactScore * ((const float*)lbl_801E8344)[artifactLevel]);
+    char* stageBase = (char*)m_bossArtifactBase + (int)m_gameWork.m_bossArtifactStageIndex * 0x168;
+
+    int poolRange = 3;
+    s16 low = *(s16*)(stageBase + 0x162);
+    s16 mid = *(s16*)(stageBase + 0x164);
+    s16 high = *(s16*)(stageBase + 0x166);
+    if (offsetIndex < high) {
+        poolRange = 2;
+        if (offsetIndex < mid) {
+            poolRange = 1;
+            if (offsetIndex < low) {
+                poolRange = 0;
+            }
+        }
+    }
+
+    int roll = rand();
+    int tableIndex = DAT_8032e3d0[stage] + (roll % (poolRange + 1));
+    return (int)(stageBase + 0x20 + tableIndex * 8);
 }
 
 /*

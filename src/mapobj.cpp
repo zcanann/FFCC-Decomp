@@ -1,5 +1,10 @@
 #include "ffcc/mapobj.h"
+#include "ffcc/map.h"
+#include "ffcc/mapmesh.h"
+#include "ffcc/materialman.h"
 #include "ffcc/math.h"
+#include "ffcc/p_camera.h"
+#include "ffcc/p_light.h"
 #include <dolphin/mtx.h>
 
 extern float lbl_8032F938;
@@ -8,6 +13,9 @@ extern float lbl_8032F944;
 extern float lbl_8032F948;
 extern float lbl_8032F950;
 extern float lbl_8032F958;
+extern unsigned int DAT_8032e498;
+extern CMaterialMan MaterialMan;
+extern CLightPcs LightPcs;
 
 namespace {
 static inline unsigned char* Ptr(CMapObj* self, unsigned int offset)
@@ -471,12 +479,107 @@ void CMapObj::IsDrawAlphaLight()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80029094
+ * PAL Size: 820b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapObj::Draw(unsigned char)
+void CMapObj::Draw(unsigned char priority)
 {
-	// TODO
+    if ((U8At(this, 0x15) != priority) || ((U8At(this, 0x18) & 4) == 0)) {
+        return;
+    }
+
+    _GXColor mapColor;
+    _GXColor lightColor;
+    _GXColor* worldMapColor = reinterpret_cast<_GXColor*>(&DAT_8032e498);
+    unsigned char* mapMng = reinterpret_cast<unsigned char*>(&MapMng);
+    unsigned char* materialMan = reinterpret_cast<unsigned char*>(&MaterialMan);
+
+    Vec lightPos;
+    lightPos.x = F32At(this, 0xC4);
+    lightPos.y = F32At(this, 0xD4);
+    lightPos.z = F32At(this, 0xE4);
+    LightPcs.SetPosition(static_cast<CLightPcs::TARGET>(1), &lightPos, S32At(this, 0x38));
+
+    *reinterpret_cast<unsigned int*>(materialMan + 72) = 0xACE0F;
+    *reinterpret_cast<unsigned int*>(materialMan + 68) = 0xFFFFFFFF;
+    *(materialMan + 76) = 0xFF;
+    *reinterpret_cast<unsigned int*>(materialMan + 296) = 0;
+    *reinterpret_cast<unsigned int*>(materialMan + 284) = 0;
+    *reinterpret_cast<unsigned int*>(materialMan + 300) = 0x1E;
+    *reinterpret_cast<unsigned int*>(materialMan + 288) = 0x1E;
+    *reinterpret_cast<unsigned int*>(materialMan + 304) = 0;
+    *reinterpret_cast<unsigned int*>(materialMan + 292) = 0;
+    *(materialMan + 517) = 0xFF;
+    *(materialMan + 518) = 0xFF;
+    *reinterpret_cast<unsigned int*>(materialMan + 88) = 0;
+    *reinterpret_cast<unsigned int*>(materialMan + 92) = 0;
+    *(materialMan + 520) = 0;
+
+    if (U8At(this, 0x22) != 0) {
+        CameraPcs.SetFullScreenShadow(MtxAt(this, 0xB8), 0);
+    }
+    if (S32At(this, 0x3C) != 0) {
+        MaterialMan.SetShadowBound(static_cast<CMapShadow::TARGET>(1),
+                                   reinterpret_cast<CBound*>(reinterpret_cast<unsigned char*>(PtrAt(this, 0xC)) + 0xC),
+                                   MtxAt(this, 0xB8));
+    }
+
+    *reinterpret_cast<unsigned int*>(materialMan + 296) = *reinterpret_cast<unsigned int*>(materialMan + 284);
+    *reinterpret_cast<unsigned int*>(materialMan + 300) = *reinterpret_cast<unsigned int*>(materialMan + 288);
+    *reinterpret_cast<unsigned int*>(materialMan + 304) = *reinterpret_cast<unsigned int*>(materialMan + 292);
+    *reinterpret_cast<unsigned int*>(materialMan + 64) = *reinterpret_cast<unsigned int*>(materialMan + 72);
+
+    worldMapColor->a = U8At(this, 0x23);
+    if (U8At(this, 0x21) == 0) {
+        mapColor.r = mapMng[0x2298C];
+        mapColor.g = mapMng[0x2298D];
+        mapColor.b = mapMng[0x2298E];
+        mapColor.a = mapMng[0x2298F];
+    } else {
+        mapColor = *reinterpret_cast<_GXColor*>(Ptr(this, 0xE8));
+    }
+
+    if (mapMng[0x22989] != 0) {
+        mapColor.r = static_cast<unsigned char>((mapColor.r * mapMng[0x22990]) >> 8);
+        mapColor.g = static_cast<unsigned char>((mapColor.g * mapMng[0x22991]) >> 8);
+        mapColor.b = static_cast<unsigned char>((mapColor.b * mapMng[0x22992]) >> 8);
+        mapColor.a = static_cast<unsigned char>((mapColor.a * mapMng[0x22993]) >> 8);
+    }
+
+    if (U8At(this, 0x24) != 0xFF) {
+        unsigned int alphaRate = U8At(this, 0x24);
+        mapColor.r = static_cast<unsigned char>((mapColor.r * alphaRate) >> 8);
+        mapColor.g = static_cast<unsigned char>((mapColor.g * alphaRate) >> 8);
+        mapColor.b = static_cast<unsigned char>((mapColor.b * alphaRate) >> 8);
+    }
+
+    lightColor = *worldMapColor;
+    LightPcs.SetMapColorAlpha(MtxAt(this, 0xB8), mapColor, lightColor, U8At(this, 0x26), F32At(this, 0x44), F32At(this, 0x48),
+                              F32At(this, 0x54), (U16At(this, 0x28) >> 7) & 0xFF);
+    LightPcs.SetBumpTexMatirx(MtxAt(this, 0xB8), reinterpret_cast<CLightPcs::CBumpLight*>(PtrAt(this, 0x10)),
+                              reinterpret_cast<Vec*>(Ptr(this, 0x58)), U8At(this, 0x1A));
+
+    if (lbl_8032F944 != F32At(this, 0x40)) {
+        CameraPcs.SetOffsetZBuff(F32At(this, 0x40));
+    }
+    if (U8At(this, 0x27) != 0) {
+        GXSetZMode(1, GX_LEQUAL, 0);
+    }
+
+    CMapMesh* mapMesh = reinterpret_cast<CMapMesh*>(PtrAt(this, 0xC));
+    mapMesh->SetRenderArray();
+    mapMesh->Draw(0);
+
+    if (U8At(this, 0x27) != 0) {
+        GXSetZMode(1, GX_LEQUAL, 1);
+    }
+    if (lbl_8032F944 != F32At(this, 0x40)) {
+        CameraPcs.SetOffsetZBuff(F32At(this, 0x40));
+    }
 }
 
 /*

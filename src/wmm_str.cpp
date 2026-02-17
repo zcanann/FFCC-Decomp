@@ -126,8 +126,8 @@ const char* const* CMenuPcs::GetMcWinMessBuff(int group)
  */
 const char* CMenuPcs::GetWinMess(int index)
 {
-    const unsigned char languageId = Game.game.m_gameWork.m_languageId;
-    if ((languageId == 1u) || (languageId == 0u) || (languageId >= 6u)) {
+    int languageId = Game.game.m_gameWork.m_languageId;
+    if ((languageId == 1) || (languageId < 1) || (languageId >= 6)) {
         return &lbl_8021645C[index * 0x14];
     }
     return &lbl_8021645C[index * 0x14];

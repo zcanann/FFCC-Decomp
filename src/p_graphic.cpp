@@ -25,6 +25,7 @@ extern u32 lbl_801E9CE4[];
 extern u32 lbl_801E9CF0[];
 extern u32 lbl_801E9CFC[];
 extern u32 lbl_801E9D08[];
+extern int DAT_802381a0;
 extern CGraphicPcs GraphicsPcs;
 extern CMiniGamePcs MiniGamePcs;
 extern char* PTR_DAT_801e9e64[];
@@ -304,8 +305,12 @@ void CGraphicPcs::drawBar()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800465bc
+ * PAL Size: 400b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphicPcs::drawCopy()
 {

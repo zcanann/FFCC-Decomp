@@ -65,12 +65,48 @@ CCaravanWork::~CCaravanWork()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a2a64
+ * PAL Size: 312b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCaravanWork::clearCaravanWork()
 {
-	// TODO
+	m_letterCount = 0;
+	m_gil = 0;
+	unk_0x3c8 = 0;
+	unk_0x3c9 = 0;
+	m_equipment[0] = -1;
+	m_equipment[1] = -1;
+	m_equipment[2] = -1;
+	m_equipment[3] = -1;
+	m_inventoryItemCount = 0;
+	memset(m_inventoryItems, 0xFF, 0x148);
+	memset(m_evtWorkArr, 0, 0x100);
+	memset(m_evtWordArr, 0, 0x200);
+	m_tempStatBuffTimer = 0;
+	m_tempStatBuffId = 0;
+	unk_0x3e6 = 0;
+	m_evtState0 = 0;
+	m_evtState1 = 0;
+	memset(m_commandListInventorySlotRef, 0xFF, 0x10);
+	memset(m_commandListExtra, 0, 0x10);
+	memset(&m_bonusCondition, 0, 1);
+	memset(m_equipEffectParams, 0, 7);
+	memset(&m_shopBusyFlag, 0, 1);
+	memset(&m_caravanLocalFlags, 0, 1);
+	m_inventoryItemCount = 0;
+	memset(m_inventoryItems, 0xFF, 0x148);
+	m_progressValue = 0;
+	m_numCmdListSlots = 4;
+	m_baseCmdListSlots = 4;
+	m_currentCmdListIndex = 0;
+	m_weaponIdx = 0;
+	m_equipEffectFlags = 0;
+	unk_0xc1e = 0;
+	m_shopRandSeed = 0;
 }
 
 /*

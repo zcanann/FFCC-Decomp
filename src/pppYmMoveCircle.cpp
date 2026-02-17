@@ -27,7 +27,6 @@ extern f32 lbl_80330D84;
 extern f32 lbl_80330D88;
 extern f32 lbl_80330D8C;
 extern f32 lbl_80330D90;
-extern "C" double acos(double);
 
 /*
  * --INFO--
@@ -45,12 +44,13 @@ extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCirc
     u8* pppMngSt = lbl_8032ED50;
     pppYmMoveCircleWork* work = (pppYmMoveCircleWork*)((u8*)basePtr + *offsetData->m_serializedDataOffsets + 0x80);
 
-    PSVECSubtract((Vec*)(pppMngSt + 0x68), (Vec*)(pppMngSt + 0x58), &temp1);
-    PSVECNormalize(&temp1, &temp1);
-
     temp2.x = lbl_80330D7C;
     temp2.y = lbl_80330D8C;
     temp2.z = lbl_80330D7C;
+
+    PSVECSubtract((Vec*)(pppMngSt + 0x68), (Vec*)(pppMngSt + 0x58), &temp1);
+    PSVECNormalize(&temp1, &temp1);
+
     double angle = acos((double)PSVECDotProduct(&temp2, &temp1));
     work->m_angle = lbl_80330D90 * (f32)angle;
 
@@ -59,12 +59,13 @@ extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCirc
         work->m_angle = lbl_80330D78 - work->m_angle;
     }
 
-    work->m_angleStep = lbl_80330D7C;
-    work->m_angleStepStep = lbl_80330D7C;
-    work->m_angleStepStepStep = lbl_80330D7C;
-    work->m_radius = lbl_80330D7C;
-    work->m_radiusStep = lbl_80330D7C;
-    work->m_radiusStepStep = lbl_80330D7C;
+    f32 zero = lbl_80330D7C;
+    work->m_radiusStepStep = zero;
+    work->m_radiusStep = zero;
+    work->m_radius = zero;
+    work->m_angleStepStepStep = zero;
+    work->m_angleStepStep = zero;
+    work->m_angleStep = zero;
     pppCopyVector(work->m_center, *(Vec*)(pppMngSt + 0x58));
     work->m_hasInit = 0;
 }

@@ -44,14 +44,14 @@ class CFlatRuntime2
 	void FindGBaseObjFirst();
 	void FindGBaseObjNext(CGBaseObj*);
 
-	void FindGQuadObjFirst();
-	void FindGQuadObjNext(CGQuadObj*);
+	CGQuadObj* FindGQuadObjFirst();
+	CGQuadObj* FindGQuadObjNext(CGQuadObj*);
 
-	void FindGMonObjFirst();
-	void FindGMonObjNext(CGMonObj*);
+	CGMonObj* FindGMonObjFirst();
+	CGMonObj* FindGMonObjNext(CGMonObj*);
 
-	void FindGItemObjFirst();
-	void FindGItemObjNext(CGItemObj*);
+	CGItemObj* FindGItemObjFirst();
+	CGItemObj* FindGItemObjNext(CGItemObj*);
 
 	void Destroy();
 	void Calc();

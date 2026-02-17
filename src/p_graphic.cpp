@@ -32,6 +32,7 @@ extern char* PTR_DAT_801e9e64[];
 extern char DAT_8032fbf4[];
 extern char DAT_8032fbf8[];
 extern char s__c_c_c_c_c_c_c_c_c_c_801d7bf8[];
+extern int DAT_802381a0;
 
 /*
  * --INFO--
@@ -313,53 +314,50 @@ void CGraphicPcs::drawBar()
  */
 void CGraphicPcs::drawCopy()
 {
-    char* base = (char*)this;
+	if (*(int*)((u8*)this + 0xBC) != 0) {
+		Graphic.CopySaveFrameBuffer();
+		*(int*)((u8*)this + 0xBC) = 0;
+	}
 
-    if (*(int*)(base + 0xBC) != 0) {
-        Graphic.CopySaveFrameBuffer();
-        *(int*)(base + 0xBC) = 0;
-    }
+	if (*(int*)((u8*)this + 0xC0) != 0) {
+		Vec target;
+		target.x = *(float*)((u8*)this + 0xD4);
+		target.y = *(float*)((u8*)this + 0xD8);
+		target.z = *(float*)((u8*)this + 0xDC);
+		Graphic.RenderDOF(*(signed char*)((u8*)this + 0xE0), *(signed char*)((u8*)this + 0xC4), *(float*)((u8*)this + 0xC8),
+		                  *(float*)((u8*)this + 0xCC), target, *(int*)((u8*)this + 0xD0));
+	}
 
-    if (*(int*)(base + 0xC0) != 0) {
-        Vec targetPos;
-        targetPos.x = *(float*)(base + 0xD4);
-        targetPos.y = *(float*)(base + 0xD8);
-        targetPos.z = *(float*)(base + 0xDC);
+	int initBlur = 0;
+	if ((*(int*)((u8*)this + 0xE4) == 1) && (DAT_802381a0 == 0)) {
+		DAT_802381a0 = 1;
+		Graphic.InitBlurParameter();
+		initBlur = 1;
+		*(u8*)((u8*)this + 0xEF) = *(u8*)((u8*)this + 0xEE) / *(u8*)((u8*)this + 0xEC);
+		*(int*)((u8*)this + 0xE8) = 0;
+	}
 
-        Graphic.RenderDOF(*(signed char*)(base + 0xE0), *(signed char*)(base + 0xC4), *(float*)(base + 0xC8),
-                          *(float*)(base + 0xCC), targetPos, *(int*)(base + 0xD0));
-    }
+	if ((*(int*)((u8*)this + 0xE4) != 0) || (DAT_802381a0 != 0) || (*(int*)((u8*)this + 0xE8) != 0)) {
+		if (*(int*)((u8*)this + 0xE4) != DAT_802381a0) {
+			*(int*)((u8*)this + 0xE8) = 1;
+		}
 
-    int blurInit = 0;
-    if ((*(int*)(base + 0xE4) == 1) && (DAT_802381a0 == 0)) {
-        DAT_802381a0 = 1;
-        Graphic.InitBlurParameter();
-        blurInit = 1;
-        *(unsigned char*)(base + 0xEF) = *(unsigned char*)(base + 0xEE) / *(unsigned char*)(base + 0xEC);
-        *(int*)(base + 0xE8) = 0;
-    }
+		Graphic.RenderBlur(initBlur, *(u8*)((u8*)this + 0xF1), *(u8*)((u8*)this + 0xF0), *(u8*)((u8*)this + 0xED),
+		                   *(u8*)((u8*)this + 0xEE), *(s16*)((u8*)this + 0xF2));
 
-    if ((*(int*)(base + 0xE4) != 0) || (DAT_802381a0 != 0) || (*(int*)(base + 0xE8) != 0)) {
-        if (*(int*)(base + 0xE4) != DAT_802381a0) {
-            *(int*)(base + 0xE8) = 1;
-        }
+		if (*(int*)((u8*)this + 0xE8) != 0) {
+			if ((int)((u32)*(u8*)((u8*)this + 0xEE) - (u32)*(u8*)((u8*)this + 0xEF)) < 1) {
+				*(u8*)((u8*)this + 0xEE) = 0;
+				*(int*)((u8*)this + 0xE8) = 0;
+				*(int*)((u8*)this + 0xE4) = 0;
+				DAT_802381a0 = 0;
+			} else {
+				*(u8*)((u8*)this + 0xEE) = *(u8*)((u8*)this + 0xEE) - *(u8*)((u8*)this + 0xEF);
+			}
+		}
+	}
 
-        Graphic.RenderBlur(blurInit, *(unsigned char*)(base + 0xF1), *(unsigned char*)(base + 0xF0),
-                           *(unsigned char*)(base + 0xED), *(unsigned char*)(base + 0xEE), *(short*)(base + 0xF2));
-
-        if (*(int*)(base + 0xE8) != 0) {
-            if ((int)((u32)*(unsigned char*)(base + 0xEE) - (u32)*(unsigned char*)(base + 0xEF)) < 1) {
-                *(unsigned char*)(base + 0xEE) = 0;
-                *(int*)(base + 0xE8) = 0;
-                *(int*)(base + 0xE4) = 0;
-                DAT_802381a0 = 0;
-            } else {
-                *(unsigned char*)(base + 0xEE) = *(unsigned char*)(base + 0xEE) - *(unsigned char*)(base + 0xEF);
-            }
-        }
-    }
-
-    drawScreenFade();
+	drawScreenFade();
 }
 
 /*

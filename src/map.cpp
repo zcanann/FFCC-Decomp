@@ -614,6 +614,51 @@ void CPtrArray<CMapShadow*>::RemoveAll()
 
 /*
  * --INFO--
+ * PAL Address: 0x80034228
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CMapShadow* CPtrArray<CMapShadow*>::operator[](unsigned long index)
+{
+    return GetAt(index);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80034248
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+void CPtrArray<CMapShadow*>::SetStage(CMemory::CStage* stage)
+{
+    m_stage = stage;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80034290
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CMapShadow* CPtrArray<CMapShadow*>::GetAt(unsigned long index)
+{
+    return m_items[index];
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

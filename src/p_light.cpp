@@ -563,12 +563,56 @@ void CLightPcs::SetBit32(CLightPcs::TARGET, unsigned long*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80048d3c
+ * PAL Size: 444b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CLightPcs::SetPart(CLightPcs::TARGET, void*, unsigned char)
+void CLightPcs::SetPart(CLightPcs::TARGET target, void* part, unsigned char mode)
 {
-	// TODO
+    char* lightPcs = (char*)this;
+
+    if (mode == 0) {
+        GXSetNumChans((u8)1);
+        GXSetChanCtrl((GXChannelID)0, (u8)1, (GXColorSrc)0, (GXColorSrc)1, 0, (GXDiffuseFn)0, (GXAttnFn)2);
+        GXSetChanCtrl((GXChannelID)2, (u8)1, (GXColorSrc)0, (GXColorSrc)1, 0, (GXDiffuseFn)0, (GXAttnFn)2);
+        return;
+    }
+
+    char* bumpSlot = lightPcs + 0x63c;
+    *(u32*)(lightPcs + 0xb0) = 0;
+    *(u32*)(lightPcs + 0xb4) = 0;
+    GXAttnFn attnFn = (GXAttnFn)1;
+
+    for (u32 i = 0; i < *(u32*)(lightPcs + 0xb8); i++) {
+        if ((*(char*)(bumpSlot + 0x60 + (int)target) != '\0') && (*(u32*)(bumpSlot + 0x64) == (u32)part)) {
+            _GXColor lightColor;
+            *(u32*)&lightColor = *(u32*)(bumpSlot + 0x50 + ((int)target * 4));
+            GXInitLightColor((GXLightObj*)(bumpSlot + 0x6c), lightColor);
+            GXLoadLightObjImm((GXLightObj*)(bumpSlot + 0x6c), (GXLightID)(1 << *(u32*)(lightPcs + 0xb0)));
+
+            if (*(char*)(bumpSlot + 0x4f) != '\0') {
+                attnFn = (GXAttnFn)0;
+            }
+
+            *(u32*)(lightPcs + 0xb4) |= 1 << *(u32*)(lightPcs + 0xb0);
+            *(u32*)(lightPcs + 0xb0) += 1;
+            if (*(u32*)(lightPcs + 0xb0) > 7) {
+                break;
+            }
+        }
+        bumpSlot += 0xb0;
+    }
+
+    GXSetNumChans((u8)1);
+    if (mode == 1) {
+        GXSetChanCtrl((GXChannelID)0, (u8)1, (GXColorSrc)0, (GXColorSrc)1, *(u32*)(lightPcs + 0xb4), (GXDiffuseFn)2, attnFn);
+    } else {
+        GXSetChanCtrl((GXChannelID)0, (u8)1, (GXColorSrc)1, (GXColorSrc)0, *(u32*)(lightPcs + 0xb4), (GXDiffuseFn)2, attnFn);
+    }
+    GXSetChanCtrl((GXChannelID)2, (u8)1, (GXColorSrc)0, (GXColorSrc)1, 0, (GXDiffuseFn)0, (GXAttnFn)2);
 }
 
 /*

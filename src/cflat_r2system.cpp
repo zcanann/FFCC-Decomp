@@ -305,6 +305,20 @@ CColor::operator _GXColor()
 
 /*
  * --INFO--
+ * PAL Address: 0x800B9224
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" _GXColor* __opP8_GXColor__6CColorFv(CColor* self)
+{
+    return &self->color;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800B9228
  * PAL Size: 28b
  * EN Address: TODO

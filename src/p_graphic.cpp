@@ -4,6 +4,7 @@
 #include "ffcc/p_minigame.h"
 #include "ffcc/pad.h"
 #include "types.h"
+#include <dolphin/mtx.h>
 
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" double sin(double);
@@ -30,6 +31,7 @@ extern char* PTR_DAT_801e9e64[];
 extern char DAT_8032fbf4[];
 extern char DAT_8032fbf8[];
 extern char s__c_c_c_c_c_c_c_c_c_c_801d7bf8[];
+extern int DAT_802381a0;
 
 /*
  * --INFO--
@@ -307,7 +309,50 @@ void CGraphicPcs::drawBar()
  */
 void CGraphicPcs::drawCopy()
 {
-	// TODO
+	if (*(int*)((u8*)this + 0xBC) != 0) {
+		Graphic.CopySaveFrameBuffer();
+		*(int*)((u8*)this + 0xBC) = 0;
+	}
+
+	if (*(int*)((u8*)this + 0xC0) != 0) {
+		Vec target;
+		target.x = *(float*)((u8*)this + 0xD4);
+		target.y = *(float*)((u8*)this + 0xD8);
+		target.z = *(float*)((u8*)this + 0xDC);
+		Graphic.RenderDOF(*(signed char*)((u8*)this + 0xE0), *(signed char*)((u8*)this + 0xC4), *(float*)((u8*)this + 0xC8),
+		                  *(float*)((u8*)this + 0xCC), target, *(int*)((u8*)this + 0xD0));
+	}
+
+	int initBlur = 0;
+	if ((*(int*)((u8*)this + 0xE4) == 1) && (DAT_802381a0 == 0)) {
+		DAT_802381a0 = 1;
+		Graphic.InitBlurParameter();
+		initBlur = 1;
+		*(u8*)((u8*)this + 0xEF) = *(u8*)((u8*)this + 0xEE) / *(u8*)((u8*)this + 0xEC);
+		*(int*)((u8*)this + 0xE8) = 0;
+	}
+
+	if ((*(int*)((u8*)this + 0xE4) != 0) || (DAT_802381a0 != 0) || (*(int*)((u8*)this + 0xE8) != 0)) {
+		if (*(int*)((u8*)this + 0xE4) != DAT_802381a0) {
+			*(int*)((u8*)this + 0xE8) = 1;
+		}
+
+		Graphic.RenderBlur(initBlur, *(u8*)((u8*)this + 0xF1), *(u8*)((u8*)this + 0xF0), *(u8*)((u8*)this + 0xED),
+		                   *(u8*)((u8*)this + 0xEE), *(s16*)((u8*)this + 0xF2));
+
+		if (*(int*)((u8*)this + 0xE8) != 0) {
+			if ((int)((u32)*(u8*)((u8*)this + 0xEE) - (u32)*(u8*)((u8*)this + 0xEF)) < 1) {
+				*(u8*)((u8*)this + 0xEE) = 0;
+				*(int*)((u8*)this + 0xE8) = 0;
+				*(int*)((u8*)this + 0xE4) = 0;
+				DAT_802381a0 = 0;
+			} else {
+				*(u8*)((u8*)this + 0xEE) = *(u8*)((u8*)this + 0xEE) - *(u8*)((u8*)this + 0xEF);
+			}
+		}
+	}
+
+	drawScreenFade();
 }
 
 /*

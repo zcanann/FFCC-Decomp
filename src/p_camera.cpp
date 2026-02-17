@@ -1,5 +1,18 @@
 #include "ffcc/p_camera.h"
 
+#include <dolphin/mtx.h>
+
+extern Mtx ppvCameraMatrix0;
+extern float FLOAT_8032fa30;
+extern float FLOAT_8032fa34;
+extern float FLOAT_8032fa38;
+
+extern "C" {
+void pppEditGetViewPos__FP3Vec(Vec*);
+void pppEditGetViewMatrix__FPA4_f(float (*)[4]);
+void pppEditGetProjectionMatrix__FPA4_f(float (*)[4]);
+}
+
 /*
  * --INFO--
  * Address:	TODO
@@ -372,42 +385,95 @@ void CCameraPcs::calcFunnyShape()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800363dc
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCameraPcs::createPart()
 {
-	// TODO
+    reinterpret_cast<unsigned char*>(this)[0x404] = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800363d8
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCameraPcs::destroyPart()
 {
-	// TODO
+    return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800362e4
+ * PAL Size: 244b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCameraPcs::calcPart()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    Mtx invCamera;
+    Vec pos;
+
+    if (*reinterpret_cast<int*>(self + 0x494) != 0) {
+        CalcQuake();
+
+        pos.x = ppvCameraMatrix0[0][3];
+        pos.y = ppvCameraMatrix0[1][3];
+        pos.z = ppvCameraMatrix0[2][3];
+
+        PSVECAdd(reinterpret_cast<Vec*>(self + 0x4A4), &pos, &pos);
+
+        ppvCameraMatrix0[0][3] = pos.x;
+        ppvCameraMatrix0[1][3] = pos.y;
+        ppvCameraMatrix0[2][3] = pos.z;
+    }
+
+    *reinterpret_cast<float*>(self + 0xFC) = FLOAT_8032fa30;
+
+    pppEditGetViewPos__FP3Vec(reinterpret_cast<Vec*>(self + 0xE0));
+    pppEditGetViewMatrix__FPA4_f(reinterpret_cast<float(*)[4]>(self + 0x4));
+    pppEditGetProjectionMatrix__FPA4_f(reinterpret_cast<float(*)[4]>(self + 0x94));
+    GXSetProjection(reinterpret_cast<float(*)[4]>(self + 0x94), GX_PERSPECTIVE);
+
+    PSMTXInverse(reinterpret_cast<MtxPtr>(self + 0x4), invCamera);
+
+    *reinterpret_cast<float*>(self + 0xEC) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0xF0) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0xF4) = FLOAT_8032fa38;
+
+    PSMTXMultVecSR(invCamera, reinterpret_cast<Vec*>(self + 0xEC), reinterpret_cast<Vec*>(self + 0xEC));
+    PSVECAdd(reinterpret_cast<Vec*>(self + 0xE0), reinterpret_cast<Vec*>(self + 0xEC), reinterpret_cast<Vec*>(self + 0xD4));
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80036290
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCameraPcs::SetOffsetZBuff(float)
+void CCameraPcs::SetOffsetZBuff(float offset)
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    Mtx44 projection;
+
+    PSMTX44Copy(reinterpret_cast<Mtx44Ptr>(self + 0x94), projection);
+    projection[2][3] += offset;
+    GXSetProjection(projection, GX_PERSPECTIVE);
 }
 
 /*

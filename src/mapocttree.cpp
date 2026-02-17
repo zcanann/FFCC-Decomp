@@ -670,12 +670,166 @@ int COctTree::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long 
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002c8a8
+ * PAL Size: 896b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int COctTree::CheckHitCylinderNear_r(COctNode*)
+int COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 {
-	// TODO
+	bool hit = false;
+	bool axisYOk = false;
+	bool axisXOk = false;
+	float minValue;
+
+	minValue = *reinterpret_cast<float*>(Ptr(octNode, 0x0));
+	if (s_cyl.m_top.z <= minValue) {
+		if (minValue <= s_cyl.m_top.z) {
+			axisXOk = true;
+		} else {
+			axisXOk = minValue <= s_cyl.m_direction2.z;
+		}
+	} else {
+		axisXOk = s_cyl.m_top.z <= *reinterpret_cast<float*>(Ptr(octNode, 0xC));
+	}
+
+	if (axisXOk) {
+		minValue = *reinterpret_cast<float*>(Ptr(octNode, 0x4));
+		if (s_cyl.m_direction2.x <= minValue) {
+			if (minValue <= s_cyl.m_direction2.x) {
+				axisXOk = true;
+			} else {
+				axisXOk = minValue <= s_cyl.m_radius2;
+			}
+		} else {
+			axisXOk = s_cyl.m_direction2.x <= *reinterpret_cast<float*>(Ptr(octNode, 0x10));
+		}
+		if (axisXOk) {
+			axisYOk = true;
+		}
+	}
+
+	if (axisYOk) {
+		minValue = *reinterpret_cast<float*>(Ptr(octNode, 0x8));
+		if (s_cyl.m_direction2.y <= minValue) {
+			if (minValue <= s_cyl.m_direction2.y) {
+				axisYOk = true;
+			} else {
+				axisYOk = minValue <= s_cyl.m_height2;
+			}
+		} else {
+			axisYOk = s_cyl.m_direction2.y <= *reinterpret_cast<float*>(Ptr(octNode, 0x14));
+		}
+		if (axisYOk) {
+			hit = true;
+		}
+	}
+
+	if (!hit) {
+		return 0;
+	}
+
+	if (*reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3E)) != 0) {
+		(*reinterpret_cast<CMapHit**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0xC)))
+		    ->CheckHitCylinderNear(&s_cyl, &s_mvec,
+		                           *reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3C)),
+		                           *reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3E)),
+		                           s_checkHitCylinderMask);
+	}
+
+	for (int i = 0; i < 8; i++) {
+		COctNode* child = *reinterpret_cast<COctNode**>(Ptr(octNode, 0x1C + (i * 4)));
+		if (child == 0) {
+			return 0;
+		}
+
+		hit = false;
+		axisYOk = false;
+		minValue = *reinterpret_cast<float*>(Ptr(child, 0x0));
+		if (s_cyl.m_top.z <= minValue) {
+			if (minValue <= s_cyl.m_top.z) {
+				axisXOk = true;
+			} else {
+				axisXOk = minValue <= s_cyl.m_direction2.z;
+			}
+		} else {
+			axisXOk = s_cyl.m_top.z <= *reinterpret_cast<float*>(Ptr(child, 0xC));
+		}
+
+		if (axisXOk) {
+			minValue = *reinterpret_cast<float*>(Ptr(child, 0x4));
+			if (s_cyl.m_direction2.x <= minValue) {
+				if (minValue <= s_cyl.m_direction2.x) {
+					axisXOk = true;
+				} else {
+					axisXOk = minValue <= s_cyl.m_radius2;
+				}
+			} else {
+				axisXOk = s_cyl.m_direction2.x <= *reinterpret_cast<float*>(Ptr(child, 0x10));
+			}
+			if (axisXOk) {
+				axisYOk = true;
+			}
+		}
+
+		if (axisYOk) {
+			minValue = *reinterpret_cast<float*>(Ptr(child, 0x8));
+			if (s_cyl.m_direction2.y <= minValue) {
+				if (minValue <= s_cyl.m_direction2.y) {
+					axisYOk = true;
+				} else {
+					axisYOk = minValue <= s_cyl.m_height2;
+				}
+			} else {
+				axisYOk = s_cyl.m_direction2.y <= *reinterpret_cast<float*>(Ptr(child, 0x14));
+			}
+			if (axisYOk) {
+				hit = true;
+			}
+		}
+
+		if (!hit) {
+			continue;
+		}
+
+		if (*reinterpret_cast<unsigned short*>(Ptr(child, 0x3E)) != 0) {
+			(*reinterpret_cast<CMapHit**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0xC)))
+			    ->CheckHitCylinderNear(&s_cyl, &s_mvec,
+			                           *reinterpret_cast<unsigned short*>(Ptr(child, 0x3C)),
+			                           *reinterpret_cast<unsigned short*>(Ptr(child, 0x3E)),
+			                           s_checkHitCylinderMask);
+		}
+
+		for (int j = 0; j < 8; j++) {
+			COctNode* grandChild = *reinterpret_cast<COctNode**>(Ptr(child, 0x1C + (j * 4)));
+			if (grandChild == 0) {
+				break;
+			}
+
+			if (reinterpret_cast<CBound*>(grandChild)->CheckCross(s_bound) != 0) {
+				if (*reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3E)) != 0) {
+					(*reinterpret_cast<CMapHit**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0xC)))
+					    ->CheckHitCylinderNear(&s_cyl, &s_mvec,
+					                           *reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3C)),
+					                           *reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3E)),
+					                           s_checkHitCylinderMask);
+				}
+
+				for (int k = 0; k < 8; k++) {
+					COctNode* greatGrandChild =
+					    *reinterpret_cast<COctNode**>(Ptr(grandChild, 0x1C + (k * 4)));
+					if (greatGrandChild == 0) {
+						break;
+					}
+					CheckHitCylinderNear_r(greatGrandChild);
+				}
+			}
+		}
+	}
+
+	return 0;
 }
 
 /*

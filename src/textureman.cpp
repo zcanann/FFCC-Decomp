@@ -1,4 +1,5 @@
 #include "ffcc/textureman.h"
+#include "ffcc/chunkfile.h"
 #include "ffcc/system.h"
 
 #include <string.h>
@@ -57,6 +58,7 @@ extern "C" void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevS
 
 static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
 static char s_ptrarray_grow_error[] = "CPtrArray grow error";
+static char s_textureman_cpp[] = "textureman.cpp";
 
 namespace {
 static inline unsigned char* Ptr(void* p, unsigned int offset)
@@ -672,22 +674,159 @@ CTextureSet::~CTextureSet()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003A9AC
+ * PAL Size: 712b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CTextureSet::Create(void*, CMemory::CStage*, int, CAmemCacheSet*, int, int)
+void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAmemCacheSet* amemCacheSet, int cacheTag, int useAddress)
 {
-	// TODO
+    CChunkFile::CChunk chunk;
+    CChunkFile chunkFile(filePtr);
+
+    while (chunkFile.GetNextChunk(chunk)) {
+        if (chunk.m_id != 0x54455820) {
+            continue;
+        }
+
+        chunkFile.PushChunk();
+        while (chunkFile.GetNextChunk(chunk)) {
+            if (chunk.m_id == 0x5343454E) {
+                chunkFile.PushChunk();
+                while (chunkFile.GetNextChunk(chunk)) {
+                    if (chunk.m_id == 0x54534554) {
+                        if (append == 0) {
+                            Textures(this)->ReleaseAndRemoveAll();
+                        }
+
+                        chunkFile.PushChunk();
+                        while (chunkFile.GetNextChunk(chunk)) {
+                            if (chunk.m_id == 0x54585452) {
+                                CTexture* texture = new (TextureMan.m_memoryStage, s_textureman_cpp, 0x2ED) CTexture;
+                                texture->Create(chunkFile, stage, amemCacheSet, cacheTag, useAddress);
+
+                                if (*reinterpret_cast<unsigned char*>(Ptr(texture, 8)) != 0) {
+                                    int duplicateIdx = -1;
+                                    for (unsigned long i = 0; i < static_cast<unsigned long>(Textures(this)->GetSize()); i++) {
+                                        CTexture* existing = (*Textures(this))[i];
+                                        if ((existing != 0)
+                                            && (strcmp(reinterpret_cast<char*>(Ptr(existing, 8)),
+                                                       reinterpret_cast<char*>(Ptr(texture, 8)))
+                                                == 0)) {
+                                            duplicateIdx = static_cast<int>(i);
+                                            break;
+                                        }
+                                    }
+
+                                    if (duplicateIdx >= 0) {
+                                        if (amemCacheSet != 0) {
+                                            amemCacheSet->DestroyCache(static_cast<int>(*reinterpret_cast<short*>(Ptr(texture, 0x72))));
+                                            amemCacheSet->AmemPrev();
+                                        }
+
+                                        int* refObj = reinterpret_cast<int*>(texture);
+                                        int refCount = refObj[1] - 1;
+                                        refObj[1] = refCount;
+                                        if ((refCount == 0) && (refObj != 0)) {
+                                            (*reinterpret_cast<void (**)(int*, int)>(*refObj + 8))(refObj, 1);
+                                        }
+
+                                        texture = (*Textures(this))[static_cast<unsigned long>(duplicateIdx)];
+                                        *reinterpret_cast<int*>(Ptr(texture, 4)) = *reinterpret_cast<int*>(Ptr(texture, 4)) + 1;
+                                    }
+                                }
+
+                                if (append != 0) {
+                                    for (unsigned long i = 0; i < static_cast<unsigned long>(Textures(this)->GetSize()); i++) {
+                                        if ((*Textures(this))[i] == 0) {
+                                            Textures(this)->SetAt(i, texture);
+                                            goto next_texture;
+                                        }
+                                    }
+                                }
+
+                                Textures(this)->Add(texture);
+                            }
+                        next_texture:;
+                        }
+                        chunkFile.PopChunk();
+                    }
+                }
+                chunkFile.PopChunk();
+            }
+        }
+        chunkFile.PopChunk();
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003A77C
+ * PAL Size: 560b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int append, CAmemCacheSet* amemCacheSet, int cacheTag, int useAddress)
 {
-	// TODO
+    CChunkFile::CChunk chunk;
+
+    if (append == 0) {
+        Textures(this)->ReleaseAndRemoveAll();
+    }
+
+    chunkFile.PushChunk();
+    while (chunkFile.GetNextChunk(chunk)) {
+        if (chunk.m_id == 0x54585452) {
+            CTexture* texture = new (TextureMan.m_memoryStage, s_textureman_cpp, 0x2ED) CTexture;
+            texture->Create(chunkFile, stage, amemCacheSet, cacheTag, useAddress);
+
+            if (*reinterpret_cast<unsigned char*>(Ptr(texture, 8)) != 0) {
+                int duplicateIdx = -1;
+                for (unsigned long i = 0; i < static_cast<unsigned long>(Textures(this)->GetSize()); i++) {
+                    CTexture* existing = (*Textures(this))[i];
+                    if ((existing != 0)
+                        && (strcmp(reinterpret_cast<char*>(Ptr(existing, 8)), reinterpret_cast<char*>(Ptr(texture, 8))) == 0)) {
+                        duplicateIdx = static_cast<int>(i);
+                        break;
+                    }
+                }
+
+                if (duplicateIdx >= 0) {
+                    if (amemCacheSet != 0) {
+                        amemCacheSet->DestroyCache(static_cast<int>(*reinterpret_cast<short*>(Ptr(texture, 0x72))));
+                        amemCacheSet->AmemPrev();
+                    }
+
+                    int* refObj = reinterpret_cast<int*>(texture);
+                    int refCount = refObj[1] - 1;
+                    refObj[1] = refCount;
+                    if ((refCount == 0) && (refObj != 0)) {
+                        (*reinterpret_cast<void (**)(int*, int)>(*refObj + 8))(refObj, 1);
+                    }
+
+                    texture = (*Textures(this))[static_cast<unsigned long>(duplicateIdx)];
+                    *reinterpret_cast<int*>(Ptr(texture, 4)) = *reinterpret_cast<int*>(Ptr(texture, 4)) + 1;
+                }
+            }
+
+            if (append != 0) {
+                for (unsigned long i = 0; i < static_cast<unsigned long>(Textures(this)->GetSize()); i++) {
+                    if ((*Textures(this))[i] == 0) {
+                        Textures(this)->SetAt(i, texture);
+                        goto next_chunk;
+                    }
+                }
+            }
+
+            Textures(this)->Add(texture);
+        next_chunk:;
+        }
+    }
+    chunkFile.PopChunk();
 }
 
 /*

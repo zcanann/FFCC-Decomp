@@ -112,8 +112,8 @@ static void DisableWriteGatherPipe(void) {
 static GXTexRegion* __GXDefaultTexRegionCallback(const GXTexObj* t_obj, GXTexMapID id) {
     u32 count;
     s32 offset;
-    u32 base = (u32)__GXData;
     GXTexFmt format = GXGetTexObjFmt(t_obj);
+    u32 base = (u32)__GXData;
 
     (void)id;
 
@@ -134,7 +134,7 @@ static GXTlutRegion* __GXDefaultTlutRegionCallback(u32 idx) {
     if (idx >= 20) {
         return NULL;
     }
-    return &__GXData->TlutRegions[idx];
+    return (GXTlutRegion*)((u32)__GXData + idx * 0x10 + 0x2D0);
 }
 
 #if DEBUG

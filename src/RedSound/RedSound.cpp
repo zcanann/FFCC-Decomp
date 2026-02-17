@@ -265,7 +265,15 @@ int CRedSound::ReportStandby(int id)
  */
 void CRedSound::DMAEntry(int type, int src, int dst, int length, int flags, void (*callback)(void*), void* userData)
 {
-	RedDmaEntry(type, src, dst, length, flags, callback, userData);
+	int localType = type;
+	int localSrc = src;
+	int localDst = dst;
+	int localLength = length;
+	int localFlags = flags;
+	void (*localCallback)(void*) = callback;
+	void* localUserData = userData;
+
+	RedDmaEntry(localType, localSrc, localDst, localLength, localFlags, localCallback, localUserData);
 }
 
 /*

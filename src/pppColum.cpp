@@ -11,14 +11,9 @@ struct Vec2d {
     float y;
 };
 
-struct ColumOffsets {
-    char pad[0xc];
-    int* m_serializedDataOffsets;
-};
-
-struct ColumParam {
-    ColumOffsets* offsets;
-};
+static inline int* GetColumSerializedDataOffsets(void* param) {
+    return *(int**)((char*)param + 0xc);
+}
 
 extern int lbl_8032ED70;
 extern CMath Math;
@@ -55,9 +50,9 @@ void RenderQuad__5CUtilF3Vec3Vec8_GXColorP5Vec2dP5Vec2d(void*, Vec*, Vec*, GXCol
  */
 void pppRenderColum(pppColum *column, UnkB *param_2, UnkC *param_3)
 {
-    ColumParam* columParam = (ColumParam*)param_3;
-    int iVar7 = columParam->offsets->m_serializedDataOffsets[3];
-    int iVar5 = columParam->offsets->m_serializedDataOffsets[2];
+    int* serializedDataOffsets = GetColumSerializedDataOffsets(param_3);
+    int iVar7 = serializedDataOffsets[3];
+    int iVar5 = serializedDataOffsets[2];
 
     if (param_2->m_dataValIndex != 0xffff) {
         pppShapeSt* shapeSt = *(pppShapeSt**)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
@@ -180,10 +175,9 @@ void pppRenderColum(pppColum *column, UnkB *param_2, UnkC *param_3)
  */
 void pppFrameColum(pppColum *column, UnkB *param_2, UnkC *param_3)
 {
-    ColumParam* columParam = (ColumParam*)param_3;
-
     if (lbl_8032ED70 == 0) {
-        unsigned char* work = (unsigned char*)((char*)column + 0x80 + columParam->offsets->m_serializedDataOffsets[3]);
+        int* serializedDataOffsets = GetColumSerializedDataOffsets(param_3);
+        unsigned char* work = (unsigned char*)((char*)column + 0x80 + serializedDataOffsets[3]);
 
         if (*(void**)(work + 8) == 0) {
             float* values = (float*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
@@ -227,8 +221,8 @@ void pppFrameColum(pppColum *column, UnkB *param_2, UnkC *param_3)
  */
 void pppDestructColum(pppColum *column, UnkC *param_2)
 {
-    ColumParam* columParam = (ColumParam*)param_2;
-    char* work = (char*)column + 0x80 + columParam->offsets->m_serializedDataOffsets[3];
+    int* serializedDataOffsets = GetColumSerializedDataOffsets(param_2);
+    char* work = (char*)column + 0x80 + serializedDataOffsets[3];
 
     if (*(CMemory::CStage**)(work + 8) != 0) {
         pppHeapUseRate(*(CMemory::CStage**)(work + 8));
@@ -247,8 +241,8 @@ void pppDestructColum(pppColum *column, UnkC *param_2)
  */
 void pppConstructColum(pppColum *column, UnkC *param_2)
 {
-    ColumParam* columParam = (ColumParam*)param_2;
-    unsigned short *puVar1 = (unsigned short *)((char*)column + 0x80 + columParam->offsets->m_serializedDataOffsets[3]);
+    int* serializedDataOffsets = GetColumSerializedDataOffsets(param_2);
+    unsigned short *puVar1 = (unsigned short *)((char*)column + 0x80 + serializedDataOffsets[3]);
     puVar1[2] = 0;
     puVar1[1] = 0;
     *puVar1 = 0;

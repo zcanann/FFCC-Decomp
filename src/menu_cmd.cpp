@@ -1,16 +1,23 @@
 #include "ffcc/menu_cmd.h"
 #include "ffcc/joybus.h"
+#include "ffcc/pad.h"
 #include "ffcc/p_game.h"
+#include "ffcc/sound.h"
 #include "dolphin/types.h"
 
 extern "C" int GetItemType__8CMenuPcsFii(CMenuPcs*, int, int);
 extern "C" int GetItemIcon__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" int EquipChk__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void CalcStatus__12CCaravanWorkFv(void*);
+extern "C" void ChgCmdLst__12CCaravanWorkFii(void*, int, int);
+extern "C" void UniteComList__12CCaravanWorkFiii(void*, int, int, int);
 extern "C" unsigned int CmdCtrlCur__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int CmdOpen0__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int CmdClose0__8CMenuPcsFv(CMenuPcs*);
 extern "C" void CmdInit1__8CMenuPcsFv(CMenuPcs*);
+extern "C" void CmdInit2__8CMenuPcsFv(CMenuPcs*);
 extern "C" int UniteOpenAnim__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" int ChkUnite__8CMenuPcsFiPA2_i(CMenuPcs*, int, int (*)[2]);
 extern "C" unsigned int CmdOpen1__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int CmdClose1__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int CmdClose2__8CMenuPcsFv(CMenuPcs*);
@@ -391,18 +398,304 @@ void CMenuPcs::CmdDraw()
  */
 unsigned int CMenuPcs::CmdCtrlCur()
 {
-	// Cursor control for menu commands
-	int cursorPos = 0;
-	int maxPos = 8;
-	
-	// Basic cursor update logic
-	if (cursorPos < maxPos) {
-		cursorPos++;
+	bool blocked = false;
+	u16 press;
+	u16 hold;
+	int caravanWork = Game.game.m_scriptFoodBase[0];
+
+	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+		blocked = true;
 	}
-	
-	// Input handling placeholder
-	for (int i = 0; i < 16; i++) {
-		// Process input states
+	if (blocked) {
+		press = 0;
+	} else {
+		press = Pad._8_2_;
+	}
+
+	blocked = false;
+	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+		blocked = true;
+	}
+	if (blocked) {
+		hold = 0;
+	} else {
+		hold = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(&Pad) + 0x20);
+	}
+
+	if (hold == 0) {
+		return 0;
+	}
+
+	s16* menuState = *reinterpret_cast<s16**>(reinterpret_cast<u8*>(this) + 0x82C);
+	int mode = menuState[0x18];
+
+	if (mode == 0) {
+		s16 cmdCount = *reinterpret_cast<s16*>(caravanWork + 0xBAA);
+
+		if ((hold & 8) == 0) {
+			if ((hold & 4) != 0) {
+				if (menuState[0x13] < cmdCount - 1) {
+					menuState[0x13]++;
+				} else {
+					menuState[0x13] = 2;
+				}
+
+				int cursor = menuState[0x13];
+				if (*reinterpret_cast<s16*>(caravanWork + cursor * 2 + 0x214) < 0) {
+					if (*reinterpret_cast<s16*>(caravanWork + (cursor + 1) * 2 + 0x214) < 0) {
+						if (*reinterpret_cast<s16*>(caravanWork + (cursor + 2) * 2 + 0x214) >= 0) {
+							menuState[0x13] = static_cast<s16>(cursor + 2);
+						}
+					} else {
+						menuState[0x13] = static_cast<s16>(cursor + 1);
+					}
+					if (menuState[0x13] > cmdCount - 1) {
+						menuState[0x13] = 2;
+					}
+				}
+				Sound.PlaySe(1, 0x40, 0x7F, 0);
+			}
+		} else {
+			if (menuState[0x13] < 3) {
+				menuState[0x13] = static_cast<s16>(cmdCount - 1);
+			} else {
+				menuState[0x13]--;
+			}
+
+			int cursor = menuState[0x13];
+			if (*reinterpret_cast<s16*>(caravanWork + cursor * 2 + 0x214) < 0) {
+				if (*reinterpret_cast<s16*>(caravanWork + (cursor - 1) * 2 + 0x214) < 0) {
+					if (*reinterpret_cast<s16*>(caravanWork + (cursor - 2) * 2 + 0x214) >= 0) {
+						menuState[0x13] = static_cast<s16>(cursor - 2);
+					}
+				} else {
+					menuState[0x13] = static_cast<s16>(cursor - 1);
+				}
+			}
+			Sound.PlaySe(1, 0x40, 0x7F, 0);
+		}
+
+		if ((hold & 0xC) == 0) {
+			if ((press & 0x20) != 0) {
+				menuState[0x0F] = 1;
+				Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
+				return 1;
+			}
+			if ((press & 0x40) != 0) {
+				menuState[0x0F] = -1;
+				Sound.PlaySe(0x5A, 0x40, 0x7F, 0);
+				return 1;
+			}
+			if ((press & 0x100) == 0) {
+				if ((press & 0x200) != 0) {
+					*reinterpret_cast<u8*>(menuState + 6) = 1;
+					Sound.PlaySe(3, 0x40, 0x7F, 0);
+					return 1;
+				}
+			} else {
+				if (*reinterpret_cast<s16*>(caravanWork + menuState[0x13] * 2 + 0x214) == 0) {
+					menuState[0x18] = 1;
+				} else {
+					*reinterpret_cast<u8*>(menuState + 6) = 0;
+					menuState[0x18] = 2;
+				}
+				menuState[0x09] = 0;
+				menuState[0x11] = 0;
+				Sound.PlaySe(2, 0x40, 0x7F, 0);
+			}
+		}
+	} else if (mode == 1) {
+		s16* list = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
+		int itemCount = static_cast<int>(list[0]);
+
+		if ((hold & 8) == 0) {
+			if ((hold & 4) != 0) {
+				if (((itemCount < 9) || (menuState[0x14] < 7)) &&
+				    ((itemCount <= 8) || ((itemCount - 1) > menuState[0x14]))) {
+					if (itemCount < 9) {
+						menuState[0x14] = 0;
+					} else if (menuState[0x1A] < itemCount - 1) {
+						menuState[0x1A]++;
+					} else {
+						menuState[0x1A] = 0;
+					}
+				} else {
+					menuState[0x14]++;
+				}
+				Sound.PlaySe(1, 0x40, 0x7F, 0);
+			}
+		} else {
+			if (menuState[0x14] == 0) {
+				if (itemCount < 9) {
+					menuState[0x14] = static_cast<s16>(itemCount - 1);
+					Sound.PlaySe(1, 0x40, 0x7F, 0);
+				} else if (menuState[0x1A] == 0) {
+					menuState[0x1A] = static_cast<s16>(itemCount - 1);
+					Sound.PlaySe(1, 0x40, 0x7F, 0);
+				} else {
+					menuState[0x1A]--;
+					Sound.PlaySe(1, 0x40, 0x7F, 0);
+				}
+			} else {
+				menuState[0x14]--;
+				Sound.PlaySe(1, 0x40, 0x7F, 0);
+			}
+		}
+
+		if ((hold & 0xC) == 0) {
+			if ((press & 0x100) == 0) {
+				if ((press & 0x200) != 0) {
+					menuState[0x09]++;
+					menuState[0x11] = 0;
+					*reinterpret_cast<u8*>(menuState + 4) = 0;
+					CmdInit2__8CMenuPcsFv(this);
+					Sound.PlaySe(3, 0x40, 0x7F, 0);
+				}
+			} else {
+				int selected = static_cast<int>(menuState[0x1A]) + static_cast<int>(menuState[0x14]);
+				if (itemCount <= selected) {
+					selected -= itemCount;
+				}
+
+				u32 canUse = 0;
+				if (selected < 0 || list[0] <= selected) {
+					canUse = 0;
+				} else if (selected == 0) {
+					canUse = static_cast<u32>(*reinterpret_cast<s16*>(caravanWork + menuState[0x13] * 2 + 0x204) >= 0);
+				} else if (selected == 1) {
+					int combo[5][2];
+					canUse = static_cast<u32>(ChkUnite__8CMenuPcsFiPA2_i(this, menuState[0x13], combo) > 0);
+				} else {
+					canUse = static_cast<u32>(EquipChk__8CMenuPcsFi(this, static_cast<int>(list[selected - 1])) != 0);
+				}
+
+				if ((canUse & 0xFF) == 0) {
+					Sound.PlaySe(4, 0x40, 0x7F, 0);
+				} else {
+					if (selected == 0) {
+						ChgCmdLst__12CCaravanWorkFii(reinterpret_cast<void*>(caravanWork), menuState[0x13], -1);
+					} else if (selected != 1) {
+						ChgCmdLst__12CCaravanWorkFii(reinterpret_cast<void*>(caravanWork), menuState[0x13], list[selected - 1]);
+					}
+
+					*reinterpret_cast<u8*>(menuState + 4) = 0;
+					if (selected != 0) {
+						int comboChoice[2][2];
+						int comboCount = ChkUnite__8CMenuPcsFiPA2_i(this, menuState[0x13], comboChoice);
+						if (comboCount == 1) {
+							UniteComList__12CCaravanWorkFiii(reinterpret_cast<void*>(caravanWork), comboChoice[0][1], 0, 0);
+						} else if (comboCount > 1) {
+							*reinterpret_cast<u8*>(menuState + 4) = 1;
+						}
+					}
+
+					menuState[0x09]++;
+					menuState[0x11] = 0;
+					CmdInit2__8CMenuPcsFv(this);
+					Sound.PlaySe(2, 0x40, 0x7F, 0);
+				}
+			}
+		}
+	} else if (mode == 2) {
+		int maxPos;
+		if (DOUBLE_80332a58 == static_cast<double>(*reinterpret_cast<float*>(
+		                         reinterpret_cast<u8*>(*reinterpret_cast<s16**>(reinterpret_cast<u8*>(this) + 0x850)) +
+		                         ((*reinterpret_cast<s16*>(*reinterpret_cast<s16**>(reinterpret_cast<u8*>(this) + 0x850) + 2) + 3) * 0x40 + 0x1C)))) {
+			maxPos = 2;
+		} else {
+			maxPos = 3;
+		}
+
+		if ((hold & 8) == 0) {
+			if ((hold & 4) != 0) {
+				if (menuState[0x15] < maxPos - 1) {
+					menuState[0x15]++;
+				} else {
+					menuState[0x15] = 0;
+				}
+				Sound.PlaySe(1, 0x40, 0x7F, 0);
+			}
+		} else {
+			if (menuState[0x15] == 0) {
+				menuState[0x15] = static_cast<s16>(maxPos - 1);
+			} else {
+				menuState[0x15]--;
+			}
+			Sound.PlaySe(1, 0x40, 0x7F, 0);
+		}
+
+		if ((hold & 0xC) == 0) {
+			menuState[0x0A] = 0;
+			if ((press & 0x100) == 0) {
+				if ((press & 0x200) != 0) {
+					menuState[0x09]++;
+					menuState[0x11] = 0;
+					*reinterpret_cast<u8*>(menuState + 4) = 0xFF;
+					Sound.PlaySe(3, 0x40, 0x7F, 0);
+				}
+			} else {
+				menuState[0x09]++;
+				menuState[0x11] = 0;
+				*reinterpret_cast<u8*>(menuState + 4) = 1;
+				Sound.PlaySe(2, 0x40, 0x7F, 0);
+			}
+		}
+	} else {
+		if ((hold & 0xC) != 0) {
+			int selected = menuState[0x13];
+			int prev = selected - 1;
+			int remaining = selected - 3;
+			int check = caravanWork + prev * 2;
+			if (prev > 2) {
+				do {
+					if (*reinterpret_cast<s16*>(check + 0x214) >= 0) {
+						break;
+					}
+					check -= 2;
+					prev--;
+					remaining--;
+				} while (remaining != 0);
+			}
+
+			int next = selected + 1;
+			remaining = *reinterpret_cast<s16*>(caravanWork + 0xBAA) - next;
+			check = caravanWork + next * 2;
+			if (next < *reinterpret_cast<s16*>(caravanWork + 0xBAA)) {
+				do {
+					if (*reinterpret_cast<s16*>(check + 0x214) >= 0) {
+						break;
+					}
+					check += 2;
+					next++;
+					remaining--;
+				} while (remaining != 0);
+			}
+
+			s16* modeCursor = menuState + mode;
+			if (modeCursor[0x13] == prev) {
+				modeCursor[0x13] = static_cast<s16>(next);
+			} else {
+				modeCursor[0x13] = static_cast<s16>(prev);
+			}
+			Sound.PlaySe(1, 0x40, 0x7F, 0);
+		}
+
+		if ((hold & 0xC) == 0) {
+			*reinterpret_cast<u8*>(menuState + 4) = 0;
+			menuState[0x0A] = 0;
+			if ((press & 0x100) == 0) {
+				if ((press & 0x200) != 0) {
+					*reinterpret_cast<u8*>(menuState + 4) = 0xFF;
+					menuState[0x09]++;
+					menuState[0x11] = 0;
+					Sound.PlaySe(3, 0x40, 0x7F, 0);
+				}
+			} else {
+				menuState[0x09]++;
+				menuState[0x11] = 0;
+				Sound.PlaySe(2, 0x40, 0x7F, 0);
+			}
+		}
 	}
 
 	return 0;
@@ -609,9 +902,10 @@ void CMenuPcs::ChkCmdActive(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::ChkUnite(int, int (*) [2])
+int CMenuPcs::ChkUnite(int, int (*) [2])
 {
 	// TODO
+	return 0;
 }
 
 /*

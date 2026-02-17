@@ -5,6 +5,7 @@
 #include "ffcc/vector.h"
 #include "ffcc/p_dbgmenu.h"
 #include "ffcc/p_minigame.h"
+#include "ffcc/p_game.h"
 #include "ffcc/map.h"
 #include "ffcc/sound.h"
 #include "ffcc/graphic.h"
@@ -134,6 +135,8 @@ static const float FLOAT_8032f688 = 1.0E+10;
 static const float FLOAT_8032f68c = -1.0E+10;
 static const float FLOAT_8032f690 = 0.0;    
 static const float FLOAT_8032f694 = 0.001;
+static const s16 s_bossArtifactStartTable[] = {0, 4, 8};
+static const float s_ratio[] = {0.4f, 0.55f, 0.7f, 0.85f};
 static const char s_numNameFmt[] = "%d%s";
 static const char s_nameJoinFmt[] = "%s%s%s";
 static const char s_nameSep[] = " ";
@@ -1167,33 +1170,45 @@ void CGame::LoadFinished()
  * JP Address: TODO
  * JP Size: TODO
  */
-int CGame::GetBossArtifact(int artifactLevel, int artifactScore)
+int CGame::GetBossArtifact(int ratioIndex, int amount)
 {
-    int stage = m_gameWork.m_bossArtifactStageTable[m_gameWork.m_bossArtifactStageIndex];
-    if (stage > 2) {
-        stage = 2;
+    s16 stageBase;
+    s16 thresholdA;
+    s16 thresholdB;
+    s16 thresholdC;
+    int stageClass;
+    int baseOffset;
+    int stageIndex;
+    int bucketCount;
+    int randomValue;
+
+    stageClass = Game.game.m_gameWork.m_bossArtifactStageTable[Game.game.m_gameWork.m_bossArtifactStageIndex];
+    if (stageClass > 2) {
+        stageClass = 2;
     }
 
-    int offsetIndex = static_cast<int>((float)artifactScore * ((const float*)lbl_801E8344)[artifactLevel]);
-    char* stageBase = (char*)m_bossArtifactBase + (int)m_gameWork.m_bossArtifactStageIndex * 0x168;
+    stageBase = s_bossArtifactStartTable[stageClass];
+    baseOffset = (int)((float)amount * s_ratio[ratioIndex]);
 
-    int poolRange = 3;
-    s16 low = *(s16*)(stageBase + 0x162);
-    s16 mid = *(s16*)(stageBase + 0x164);
-    s16 high = *(s16*)(stageBase + 0x166);
-    if (offsetIndex < high) {
-        poolRange = 2;
-        if (offsetIndex < mid) {
-            poolRange = 1;
-            if (offsetIndex < low) {
-                poolRange = 0;
+    stageIndex = (int)Game.game.m_gameWork.m_bossArtifactStageIndex;
+    randomValue = (int)Game.game.m_bossArtifactBase + stageIndex * 0x168;
+    thresholdA = *(s16*)(randomValue + 0x162);
+    thresholdB = *(s16*)(randomValue + 0x164);
+    thresholdC = *(s16*)(randomValue + 0x166);
+
+    bucketCount = 3;
+    if (baseOffset < thresholdC) {
+        bucketCount = 2;
+        if (baseOffset < thresholdB) {
+            bucketCount = 1;
+            if (baseOffset < thresholdA) {
+                bucketCount = 0;
             }
         }
     }
 
-    int roll = rand();
-    int tableIndex = DAT_8032e3d0[stage] + (roll % (poolRange + 1));
-    return (int)(stageBase + 0x20 + tableIndex * 8);
+    baseOffset = rand();
+    return randomValue + 0x20 + (stageBase + (baseOffset - (baseOffset / (bucketCount + 1)) * (bucketCount + 1))) * 8;
 }
 
 /*

@@ -121,12 +121,12 @@ public:
     void GetTargetCursor(int, Vec&, Vec&);
     void GetParticleSpecialInfo(PPPIFPARAM&, int&, int&);
     CGPartyObj* GetPartyObj(int);
-    void MakeArtItemName(char*, int, int);
-    void MakeArtsItemNames(char*, int);
-    void MakeNumItemName(char*, int, int);
-    void MakeArtMonName(char*, int, int);
-    void MakeArtsMonNames(char*, int);
-    void MakeNumMonName(char*, int, int);
+    char* MakeArtItemName(char*, int, int);
+    char* MakeArtsItemNames(char*, int);
+    char* MakeNumItemName(char*, int, int);
+    char* MakeArtMonName(char*, int, int);
+    char* MakeArtsMonNames(char*, int);
+    char* MakeNumMonName(char*, int, int);
     const char* GetLangString();
     void SetNextScript(CGame::CNextScript* nextScript);
     void SetNextScriptNewGame();

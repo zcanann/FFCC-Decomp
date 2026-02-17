@@ -18,7 +18,7 @@ extern CRedMemory DAT_8032f480;
 extern CRedEntry DAT_8032e154;
 extern int DAT_8032f408; // Debug flag
 extern unsigned int DAT_8032f4c4; // Auto ID counter
-extern char DAT_8032e17c[]; // Buffer for memset
+extern int DAT_8032e17c[0x40]; // Standby ID table
 extern void* DAT_8032e170; // Registration memory
 extern void* DAT_8032f4c8; // Internal sound state buffer
 extern FILE DAT_8021d1a8; // File handle for fflush
@@ -66,8 +66,12 @@ extern "C" CRedSound* dtor_801CCA38(CRedSound* redSound, short param_2)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cca80
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 unsigned int CRedSound::GetAutoID()
 {
@@ -89,14 +93,14 @@ unsigned int CRedSound::GetAutoID()
  */
 int* CRedSound::EntryStandbyID(int id)
 {
-	int* slot = (int*)DAT_8032e17c;
+	int* slot = DAT_8032e17c;
 	do {
 		if (*slot == 0) {
 			*slot = id;
 			return slot;
 		}
 		slot++;
-	} while (slot < (int*)(DAT_8032e17c + 0x100));
+	} while (slot < (DAT_8032e17c + 0x40));
 
 	return 0;
 }
@@ -108,7 +112,7 @@ int* CRedSound::EntryStandbyID(int id)
  */
 void CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 {
-	memset(&DAT_8032e17c, 0, 0x100);
+	memset(DAT_8032e17c, 0, 0x100);
 	
 	if (param_3 < 1 || param_5 < 1) {
 		if (DAT_8032f408 != 0) {
@@ -205,12 +209,16 @@ void CRedSound::GetProgramTime()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801ccd94
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::ReportPrint(int)
+void CRedSound::ReportPrint(int debugFlag)
 {
-	// TODO
+	DAT_8032f408 = debugFlag;
 }
 
 /*

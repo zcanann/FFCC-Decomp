@@ -9,9 +9,15 @@
 #include <string.h>
 
 extern "C" unsigned long UnkMaterialSetGetter(void*);
+extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
+extern "C" void __destroy_arr(void*, void*, unsigned long, unsigned long);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
+extern "C" void __dt__8COctTreeFv(void*, int);
+extern "C" void __dt__7CMapHitFv(void*, int);
+extern "C" void __dt__7CMapObjFv(void*, int);
+extern "C" void __dt__8CMapMeshFv(void*, int);
 extern "C" float Spline1D__5CMathFifPfPfPf(CMath*, int, float, float*, float*, float*);
 extern "C" float Line1D__5CMathFifPfPf(CMath*, int, float, float*, float*);
 extern "C" void MakeSpline1Dtable__5CMathFiPfPfPf(CMath*, int, float*, float*, float*);
@@ -1919,12 +1925,36 @@ void CMapMng::GetFogEnable()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80034750
+ * PAL Size: 476b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CMapMng::~CMapMng()
 {
-	// TODO
+    if (this != 0) {
+        CPtrArray<CMapLightHolder*>* mapLightHolderArr = reinterpret_cast<CPtrArray<CMapLightHolder*>*>(Ptr(this, 0x21450));
+        mapLightHolderArr[0].~CPtrArray();
+        mapLightHolderArr[1].~CPtrArray();
+        if (this != reinterpret_cast<CMapMng*>(0xFFFDEBCC)) {
+            reinterpret_cast<CPtrArray<CMapShadow*>*>(Ptr(this, 0x21434))->~CPtrArray();
+        }
+        if (this != reinterpret_cast<CMapMng*>(0xFFFDEBE8)) {
+            reinterpret_cast<CPtrArray<CMapAnimKeyDt*>*>(Ptr(this, 0x21418))->~CPtrArray();
+        }
+        if (this != reinterpret_cast<CMapMng*>(0xFFFDEC04)) {
+            reinterpret_cast<CPtrArray<CMapAnim*>*>(Ptr(this, 0x213FC))->~CPtrArray();
+        }
+        if (this != reinterpret_cast<CMapMng*>(0xFFFDEC20)) {
+            reinterpret_cast<CPtrArray<CMapAnimRun*>*>(Ptr(this, 0x213E0))->~CPtrArray();
+        }
+        __destroy_arr(Ptr(this, 0x1E954), (void*)__dt__8CMapMeshFv, 0x44, 0xA0);
+        __destroy_arr(Ptr(this, 0x954), (void*)__dt__7CMapObjFv, 0xF0, 0x200);
+        __destroy_arr(Ptr(this, 0x4D4), (void*)__dt__7CMapHitFv, 0x24, 0x20);
+        __destroy_arr(Ptr(this, 0x14), (void*)__dt__8COctTreeFv, 0x4C, 0x10);
+    }
 }
 
 /*

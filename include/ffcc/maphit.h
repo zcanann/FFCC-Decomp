@@ -46,7 +46,7 @@ public:
     ~CMapHit();
 
     void ReadOtmHit(CChunkFile&);
-    void CheckHitFaceCylinder(unsigned long);
+    int CheckHitFaceCylinder(unsigned long);
     void GetHitFaceNormal(Vec*);
     void CalcHitSlide(Vec*, float);
     void CalcHitPosition(Vec*);

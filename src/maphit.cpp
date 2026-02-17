@@ -399,12 +399,60 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80025df4
+ * PAL Size: 2300b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapHit::CheckHitFaceCylinder(unsigned long)
+int CMapHit::CheckHitFaceCylinder(unsigned long mask)
 {
-    // TODO
+    for (int faceIndex = 0; faceIndex < m_faceCount; faceIndex++) {
+        unsigned char* face = Ptr(m_faces, faceIndex * 0x98);
+        unsigned char groupIndex = face[0x47];
+        unsigned char* mapMngBytes = reinterpret_cast<unsigned char*>(&MapMng);
+        unsigned long groupMask = *reinterpret_cast<unsigned long*>(mapMngBytes + 0x214E8 + groupIndex * 0x14);
+        if ((groupMask & mask) == 0) {
+            continue;
+        }
+
+        float* boundsMin = reinterpret_cast<float*>(face + 0x10);
+        float* boundsMax = reinterpret_cast<float*>(face + 0x1C);
+        if (g_hit_cyl.m_direction2.z < boundsMin[0] || boundsMax[0] < g_hit_cyl.m_top.z) {
+            continue;
+        }
+        if (g_hit_cyl.m_radius2 < boundsMin[1] || boundsMax[1] < g_hit_cyl.m_direction2.x) {
+            continue;
+        }
+        if (g_hit_cyl.m_height2 < boundsMin[2] || boundsMax[2] < g_hit_cyl.m_direction2.y) {
+            continue;
+        }
+
+        Vec* normal = reinterpret_cast<Vec*>(face + 0x00);
+        Vec* hitDirection = reinterpret_cast<Vec*>(&g_hit_cyl.m_radius);
+        float dot = PSVECDotProduct(hitDirection, normal);
+        if (dot >= 0.0f) {
+            continue;
+        }
+
+        float hitT;
+        float planeD = *reinterpret_cast<float*>(face + 0x0C);
+        float topY = g_hit_cyl.m_top.y;
+        float hitDot = PSVECDotProduct(&g_hit_cyl.m_bottom, normal);
+        hitT = -((hitDot - (planeD + topY)) / dot);
+        if (hitT < 0.0f || s_hit_t_min <= hitT) {
+            continue;
+        }
+
+        s_hit_t_min = hitT;
+        s_hit_face_min = reinterpret_cast<CMapHitFace*>(face);
+        s_hit_edge_index = -1;
+        g_hit_cyl_min = g_hit_cyl;
+        return 1;
+    }
+
+    return 0;
 }
 
 /*

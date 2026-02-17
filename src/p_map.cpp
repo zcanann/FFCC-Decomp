@@ -95,7 +95,7 @@ CMapPcs::CMapPcs()
  */
 void CMapPcs::Init()
 {
-	// TODO
+	*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x174) = 0;
 }
 
 /*
@@ -113,9 +113,9 @@ void CMapPcs::Quit()
  * Address:	TODO
  * Size:	TODO
  */
-void CMapPcs::GetTable(unsigned long)
+void* CMapPcs::GetTable(unsigned long tableIndex)
 {
-	// TODO
+	return lbl_801E8AD8 + tableIndex * 0x57;
 }
 
 /*

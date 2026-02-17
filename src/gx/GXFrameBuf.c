@@ -165,7 +165,6 @@ void GXSetTexCopyDst(u16 wd, u16 ht, GXTexFmt fmt, GXBool mipmap) {
     u32 colTiles;
     u32 cmpTiles;
     u32 peTexFmt;
-    u32 peTexFmtH;
 
     CHECK_GXBEGIN(1327, "GXSetTexCopyDst");
 
@@ -183,25 +182,22 @@ void GXSetTexCopyDst(u16 wd, u16 ht, GXTexFmt fmt, GXBool mipmap) {
     case GX_TF_IA4:
     case GX_TF_IA8:
     case GX_CTF_YUVA8:
-        SET_REG_FIELD(0, __GXData->cpTex, 2, 15, 3);
+        __GXData->cpTex = (__GXData->cpTex & 0xFFFE7FFF) | 0x18000;
         break;
     default:
-        SET_REG_FIELD(0, __GXData->cpTex, 2, 15, 2);
+        __GXData->cpTex = (__GXData->cpTex & 0xFFFE7FFF) | 0x10000;
         break;
     }
 
-    __GXData->cpTexZ = (fmt & _GX_TF_ZTF) == _GX_TF_ZTF;
-    peTexFmtH = (peTexFmt >> 3) & 1;
-    !peTexFmt;
-    SET_REG_FIELD(1381, __GXData->cpTex, 1, 3, peTexFmtH);
-    peTexFmt = peTexFmt & 7;
+    __GXData->cpTexZ = (u8)((u32)__cntlzw((fmt & _GX_TF_ZTF) - _GX_TF_ZTF) >> 5);
+    __GXData->cpTex = (__GXData->cpTex & 0xFFFFFFF7) | (peTexFmt & 8);
     __GetImageTileCount(fmt, wd, ht, &rowTiles, &colTiles, &cmpTiles);
 
     __GXData->cpTexStride = 0;
-    SET_REG_FIELD(1390, __GXData->cpTexStride, 10,  0, rowTiles * cmpTiles);
-    SET_REG_FIELD(1392, __GXData->cpTexStride,  8, 24, 0x4D);
-    SET_REG_FIELD(1392, __GXData->cpTex, 1, 9, mipmap);
-    SET_REG_FIELD(1393, __GXData->cpTex, 3, 4, peTexFmt);
+    __GXData->cpTexStride = (__GXData->cpTexStride & 0xFFFFFC00) | (rowTiles * cmpTiles);
+    __GXData->cpTexStride = (__GXData->cpTexStride & 0x00FFFFFF) | 0x4D000000;
+    __GXData->cpTex = (__GXData->cpTex & 0xFFFFFDFF) | ((u32)mipmap << 9);
+    __GXData->cpTex = (__GXData->cpTex & 0xFFFFFF8F) | ((peTexFmt & 7) << 4);
 }
 
 /*
@@ -547,7 +543,7 @@ void GXCopyTex(void* dest, GXBool clear) {
     u32 reg;
     u32 tempPeCtrl;
     u32 phyAddr;
-    u8 changePeCtrl;
+    GXBool changePeCtrl;
 
     CHECK_GXBEGIN(1916, "GXCopyTex");
 
@@ -556,27 +552,25 @@ void GXCopyTex(void* dest, GXBool clear) {
 #endif
     if (clear) {
         reg = __GXData->zmode;
-        SET_REG_FIELD(0, reg, 1, 0, 1);
-        SET_REG_FIELD(0, reg, 3, 1, 7);
+        reg = (reg & 0xFFFFFFF0) | 0xF;
         GX_WRITE_RAS_REG(reg);
 
         reg = __GXData->cmode0;
-        SET_REG_FIELD(0, reg, 1, 0, 0);
-        SET_REG_FIELD(0, reg, 1, 1, 0);
+        reg &= 0xFFFFFFFC;
         GX_WRITE_RAS_REG(reg);
     }
 
-    changePeCtrl = 0;
+    changePeCtrl = FALSE;
     tempPeCtrl = __GXData->peCtrl;
 
     if (__GXData->cpTexZ && ((tempPeCtrl & 7) != 3)) {
-        changePeCtrl = 1;
-        SET_REG_FIELD(0, tempPeCtrl, 3, 0, 3);
+        changePeCtrl = TRUE;
+        tempPeCtrl = (tempPeCtrl & 0xFFFFFFF8) | 3;
     }
 
-    if ((clear || ((u32) (tempPeCtrl & 7) == 3)) && ((u32) ((tempPeCtrl >> 6) & 1) == 1)) {
-        changePeCtrl = 1;
-        SET_REG_FIELD(0, tempPeCtrl, 1, 6, 0);
+    if ((clear || ((tempPeCtrl & 7) == 3)) && (((tempPeCtrl >> 6) & 1) == 1)) {
+        changePeCtrl = TRUE;
+        tempPeCtrl &= 0xFFFFFFBF;
     }
 
     if (changePeCtrl) {
@@ -588,14 +582,12 @@ void GXCopyTex(void* dest, GXBool clear) {
     GX_WRITE_RAS_REG(__GXData->cpTexStride);
 
     phyAddr = (u32)dest & 0x3FFFFFFF;
-    reg = 0;
-    SET_REG_FIELD(1965, reg, 21, 0, phyAddr >> 5);
-    SET_REG_FIELD(1965, reg, 8, 24, 0x4B);
+    reg = ((phyAddr >> 5) & 0xFFFFFF) | 0x4B000000;
     GX_WRITE_RAS_REG(reg);
 
-    SET_REG_FIELD(1969, __GXData->cpTex, 1, 11, clear);
-    SET_REG_FIELD(1969, __GXData->cpTex, 1, 14, 0);
-    SET_REG_FIELD(1969, __GXData->cpTex, 8, 24, 0x52);
+    __GXData->cpTex = (__GXData->cpTex & 0xFFFFF7FF) | ((u32)clear << 11);
+    __GXData->cpTex &= 0xFFFFBFFF;
+    __GXData->cpTex = (__GXData->cpTex & 0x00FFFFFF) | 0x52000000;
     GX_WRITE_RAS_REG(__GXData->cpTex);
 
     if (clear) {

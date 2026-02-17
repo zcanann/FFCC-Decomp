@@ -109,29 +109,16 @@ static inline CFunnyShape* FunnyShape(CFunnyShapePcs* self)
  */
 extern "C" void __sinit_p_FunnyShape_cpp(void)
 {
-    volatile void** base = reinterpret_cast<volatile void**>(FunnyShapePcs);
-    CPtrArray<OSFS_TEXTURE_ST*>* texData = reinterpret_cast<CPtrArray<OSFS_TEXTURE_ST*>*>(FunnyShapePcs + 0x61BC);
+    CPtrArray<OSFS_TEXTURE_ST*>* texData =
+        reinterpret_cast<CPtrArray<OSFS_TEXTURE_ST*>*>(FunnyShapePcs + 0x61BC);
     CPtrArray<_GXTexObj*>* gxTex = reinterpret_cast<CPtrArray<_GXTexObj*>*>(FunnyShapePcs + 0x61D8);
-    *base = &__vt__8CManager;
-    *base = &lbl_801E8668;
-    *base = &lbl_801EA924;
+
+    *reinterpret_cast<void**>(FunnyShapePcs) = &lbl_801EA924;
 
     __ct__14CUSBStreamDataFv(reinterpret_cast<CUSBStreamData*>(FunnyShapePcs + 0x8));
     __ct__11CFunnyShapeFv(reinterpret_cast<CFunnyShape*>(FunnyShapePcs + 0x1C));
-
-    texData->size = 0;
-    texData->numItems = 0;
-    texData->defaultSize = 0x10;
-    texData->items = 0;
-    texData->stage = 0;
-    texData->growCapacity = 1;
-
-    gxTex->size = 0;
-    gxTex->numItems = 0;
-    gxTex->defaultSize = 0x10;
-    gxTex->items = 0;
-    gxTex->stage = 0;
-    gxTex->growCapacity = 1;
+    texData->CPtrArray<OSFS_TEXTURE_ST*>::CPtrArray();
+    gxTex->CPtrArray<_GXTexObj*>::CPtrArray();
 
     __register_global_object(FunnyShapePcs, reinterpret_cast<void*>(__dt__14CFunnyShapePcsFv), ARRAY_8026D728);
 

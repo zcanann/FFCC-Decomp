@@ -437,12 +437,56 @@ void CDbgMenuPcs::calcMenu(CDbgMenuPcs::CDM* menu)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012c8d8
+ * PAL Size: 488b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM*)
+void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
 {
-	// TODO
+	static char sStateOn[] = "ON";
+	static char sStateOff[] = "OFF";
+	static char sStateUnknown[] = "?";
+	CDM* head = menu;
+	do {
+		*(CDM**)((char*)this + 0x2A5C) = menu;
+		GXSetViewport((f32)*(s32*)((char*)menu + 0x3C), (f32)*(s32*)((char*)menu + 0x40), 640.0f, 480.0f, 0.0f, 1.0f);
+
+		s32 type = *(s32*)menu;
+		if (type == 2) {
+			s32 state = *(s32*)((char*)menu + 0x30);
+			drawWindow(((-state | state) >> 0x1F) & 2, 1, 1, 0x1E, 0xE, 0);
+			char* stateText = sStateUnknown;
+			if (state == 1) {
+				stateText = sStateOn;
+			} else if (state == 0) {
+				stateText = sStateOff;
+			}
+			drawFont(9, 0x10, 8, stateText);
+		} else if (type < 2) {
+			if (type == 0) {
+				drawWindow(*(u32*)((char*)menu + 0xC), 0, 0, *(u32*)((char*)menu + 0x18), *(u32*)((char*)menu + 0x1C),
+				           *(char**)((char*)menu + 0x24));
+			} else if (type == 1) {
+				drawFont(*(u32*)((char*)menu + 0xC), 0, 0, *(char**)((char*)menu + 0x24));
+			}
+		} else if (type < 4) {
+			s32 state = *(s32*)((char*)menu + 0x30);
+			drawWindow(((-state | state) >> 0x1F) & 2, 1, 1, 0x1E, 0xE, 0);
+		}
+
+		menu = *(CDM**)((char*)menu + 0x48);
+	} while (menu != head);
+
+	menu = head;
+	do {
+		if (*(CDM**)((char*)menu + 0x50) != 0) {
+			drawMenu(*(CDM**)((char*)menu + 0x50));
+		}
+		menu = *(CDM**)((char*)menu + 0x48);
+	} while (menu != head);
 }
 
 /*

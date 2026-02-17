@@ -205,12 +205,16 @@ void CRedSound::GetProgramTime()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801ccd94
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedSound::ReportPrint(int)
+void CRedSound::ReportPrint(int printFlag)
 {
-	// TODO
+	DAT_8032f408 = printFlag;
 }
 
 /*

@@ -151,12 +151,16 @@ void GXSetTexCoordGen(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800d7fcc
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void Mana_BeforeDrawShadowLockEnvCallback(CChara::CModel*, void*, void*, int)
 {
-	// TODO
+	GXSetZMode((GXBool)0, (GXCompare)3, (GXBool)0);
 }
 
 /*

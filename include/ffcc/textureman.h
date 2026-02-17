@@ -57,7 +57,7 @@ class CTextureMan : public CManager
 public:
     void Init();
     void Quit();
-    void SetTexture(_GXTexMapID, CTexture*);
+    int SetTexture(_GXTexMapID, CTexture*);
     int SetTextureTev(CTexture*);
 
     friend class CTexture;

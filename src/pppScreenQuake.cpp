@@ -79,11 +79,26 @@ void pppCon2ScreenQuake(pppScreenQuake *quake, UnkC *param2)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma scheduling off
 void pppDesScreenQuake(void)
 {
 	float value = lbl_80331FC8;
-	SetQuakeParameter__10CCameraPcsFiissffffffi(&CameraPcs, 0, 0, 0, 0, value, value, value, value, value, value, 1);
+
+	SetQuakeParameter__10CCameraPcsFiissffffffi(
+	    &CameraPcs,
+	    0,
+	    0,
+	    0,
+	    0,
+	    value,
+	    value,
+	    value,
+	    value,
+	    value,
+	    value,
+	    1);
 }
+#pragma scheduling reset
 
 /*
  * --INFO--

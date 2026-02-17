@@ -38,6 +38,7 @@ extern "C" unsigned char DAT_8032ed88;
 extern "C" unsigned char DAT_8032ed89;
 extern "C" unsigned char DAT_8032ed8a;
 extern "C" unsigned char DAT_8032ed8b;
+extern "C" int DAT_8032ed70;
 extern "C" unsigned char CFlat[];
 extern "C" void SetPart__9CLightPcsFQ29CLightPcs6TARGETPvUc(CLightPcs*, int, void*, unsigned char);
 extern "C" void InitVtxFmt__12CMaterialManFi11_GXCompTypei11_GXCompTypei11_GXCompTypei(CMaterialMan*, int, _GXCompType, int, _GXCompType, int, _GXCompType, int);
@@ -45,6 +46,7 @@ extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
+extern "C" int PlaySe3D__6CSoundFiP3Vecffi(CSound*, int, Vec*, float, float, int);
 extern CPartMng PartMng;
 extern CLightPcs LightPcs;
 extern CMath Math;
@@ -1557,12 +1559,30 @@ void _pppDeadPart(_pppMngSt*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 800547ec
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _pppInitPart(_pppMngSt*)
+void _pppInitPart(_pppMngSt* pppMngSt)
 {
-	// TODO
+	struct pppMngStInitRaw
+	{
+		u8 m_pad0[0xC4];
+		_pppPObjLink m_pppPObjLinkHead;
+	};
+
+	if (DAT_8032ed70 != 0)
+	{
+		return;
+	}
+
+	for (_pppPObjLink* obj = ((pppMngStInitRaw*)pppMngSt)->m_pppPObjLinkHead.m_next; obj != 0; obj = obj->m_next)
+	{
+		((u8*)obj)[0x7C] = 0;
+	}
 }
 
 /*
@@ -1577,22 +1597,102 @@ void apeaPObject(_pppMngSt*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 80054698
+ * PAL Size: 340b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _pppCalcPart(_pppMngSt*)
+void _pppCalcPart(_pppMngSt* pppMngSt)
 {
-	// TODO
+	struct pppPDataValRaw
+	{
+		void* m_programSetDef;
+		s32 m_nextSpawnTime;
+		_pppPObjLink* m_pppPObjLink;
+		s16 m_activeCount;
+		u8 m_index;
+		u8 m_pad;
+	};
+
+	struct pppMngStCalcRaw
+	{
+		u8 m_pad0[0x34];
+		s32 m_currentFrame;
+		u8 m_pad1[0xB8 - 0x38];
+		s32 m_numPrograms;
+		u8 m_pad2[0xC8 - 0xBC];
+		pppPDataValRaw* m_pppPDataVals;
+		u8 m_pad3[0x11C - 0xCC];
+		PPPSEST m_soundEffectData;
+	};
+
+	pppMngStCalcRaw* mngRaw = (pppMngStCalcRaw*)pppMngSt;
+	PPPSEST* se = &mngRaw->m_soundEffectData;
+	pppFMATRIX* mtx = (pppFMATRIX*)(((u8*)pppMngSt) + 0x78);
+
+	pppMngStPtr = pppMngSt;
+	if (se->m_soundEffectSlot >= 0 &&
+		se->m_soundEffectStartFrame <= mngRaw->m_currentFrame &&
+		se->m_soundEffectStopFlag == 0)
+	{
+		Vec soundPos;
+		soundPos.x = mtx->value[0][3];
+		soundPos.y = mtx->value[1][3];
+		soundPos.z = mtx->value[2][3];
+
+		if (se->m_soundEffectHandle < 0)
+		{
+			if (se->m_soundEffectStartedOnce == 0)
+			{
+				u32 soundTableIndex = (u32)se->m_soundEffectKind - 3;
+				se->m_soundEffectHandle = PlaySe3D__6CSoundFiP3Vecffi(
+					&Sound, se->m_soundEffectSlot, &soundPos,
+					pppEnvStPtr->m_soundVolumeTable[soundTableIndex],
+					pppEnvStPtr->m_soundPitchTable[soundTableIndex], 0);
+				se->m_soundEffectStartedOnce = 1;
+			}
+		}
+		else
+		{
+			Sound.ChangeSe3DPos(se->m_soundEffectHandle, &soundPos);
+		}
+	}
+
+	s32 pDataValOffset = 0;
+	for (s32 i = 0; i < mngRaw->m_numPrograms; i++)
+	{
+		pppPDataValRaw* pDataVal = (pppPDataValRaw*)(((u8*)mngRaw->m_pppPDataVals) + pDataValOffset);
+		if (mngRaw->m_pppPDataVals != 0 && pDataVal != 0 && pDataVal->m_nextSpawnTime <= mngRaw->m_currentFrame)
+		{
+			pDataVal->m_nextSpawnTime = 0x7FFFFFFF;
+			_pppPObject* pObject = pppCreatePObject(pppMngSt, (_pppPDataVal*)pDataVal);
+			if (pObject == 0)
+			{
+				break;
+			}
+			((u8*)pObject)[0x7C] = 0;
+		}
+		pDataValOffset += 0x10;
+	}
+
+	pppCalcPartStd(pppMngSt);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 80054674
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _pppDrawPart(_pppMngSt*)
+void _pppDrawPart(_pppMngSt* pppMngSt)
 {
-	// TODO
+	pppMngStPtr = pppMngSt;
+	pppDrawPartStd(pppMngSt);
 }
 
 /*

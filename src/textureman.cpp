@@ -524,12 +524,40 @@ CTexture::~CTexture()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003B730
+ * PAL Size: 356b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CTexture::InitTexObj()
 {
-	// TODO
+    const int format = U8At(this, 0x60);
+    if ((format == 9) || (format == 8)) {
+        GXInitTexObjCI(reinterpret_cast<GXTexObj*>(Ptr(this, 0x28)), PtrAt(this, 0x78), U16At(this, 0x64), U16At(this, 0x68),
+                       static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(U8At(this, 0x6C)),
+                       static_cast<GXTexWrapMode>(U8At(this, 0x6C)), 0, 0);
+
+        int numEntries = 0x10;
+        if (U8At(this, 0x60) == 9) {
+            numEntries = 0x100;
+        }
+
+        GXInitTlutObj(reinterpret_cast<GXTlutObj*>(Ptr(this, 0x48)), PtrAt(this, 0x7C), GX_TL_IA8, static_cast<u16>(numEntries));
+        GXInitTlutObj(reinterpret_cast<GXTlutObj*>(Ptr(this, 0x54)), Ptr(PtrAt(this, 0x7C), numEntries * 2), GX_TL_IA8,
+                      static_cast<u16>(numEntries));
+    } else {
+        GXInitTexObj(reinterpret_cast<GXTexObj*>(Ptr(this, 0x28)), PtrAt(this, 0x78), U16At(this, 0x64), U16At(this, 0x68),
+                     static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(U8At(this, 0x6C)),
+                     static_cast<GXTexWrapMode>(U8At(this, 0x6C)), 1 - (U8At(this, 0x74) >> 31));
+    }
+
+    const unsigned char maxLod = U8At(this, 0x74);
+    if (maxLod >= 2) {
+        GXInitTexObjLOD(reinterpret_cast<GXTexObj*>(Ptr(this, 0x28)), GX_LINEAR, GX_LINEAR, 0.0f, static_cast<float>(maxLod - 1),
+                        0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    }
 }
 
 /*
@@ -1005,12 +1033,33 @@ void CTextureSet::Find(char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003A5FC
+ * PAL Size: 244b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CTextureSet::ReleaseTextureIdx(int, CAmemCacheSet*)
+void CTextureSet::ReleaseTextureIdx(int idx, CAmemCacheSet* amemCacheSet)
 {
-	// TODO
+    CTexture* texture = (*Textures(this))[static_cast<unsigned long>(idx)];
+    if (texture == 0) {
+        return;
+    }
+
+    if ((S16At(texture, 0x72) != -1) && (*reinterpret_cast<int*>(Ptr(texture, 4)) < 2)) {
+        amemCacheSet->DestroyCache(static_cast<int>(S16At(texture, 0x72)));
+        PtrAt(texture, 0x78) = 0;
+    }
+
+    int* refObj = reinterpret_cast<int*>(texture);
+    int refCount = refObj[1] - 1;
+    refObj[1] = refCount;
+    if ((refCount == 0) && (refObj != 0)) {
+        (*reinterpret_cast<void (**)(int*, int)>(*refObj + 8))(refObj, 1);
+    }
+
+    Textures(this)->SetAt(static_cast<unsigned long>(idx), 0);
 }
 
 /*

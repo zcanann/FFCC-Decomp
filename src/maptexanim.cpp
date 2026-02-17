@@ -337,7 +337,7 @@ void CMapTexAnimSet::Calc()
  */
 void CMapTexAnimSet::SetMapTexAnim(int materialId, int frameStart, int frameEnd, int wrapMode)
 {
-    bool found = false;
+    int found = 0;
     int setPtr = reinterpret_cast<int>(this);
 
     for (int i = 0; i < S16At(this, 8); i++) {
@@ -364,12 +364,12 @@ void CMapTexAnimSet::SetMapTexAnim(int materialId, int frameStart, int frameEnd,
                 S16At(animPtr, 0x10) = static_cast<short>(end);
                 U8At(animPtr, 0x16) = static_cast<unsigned char>(wrapMode);
             }
-            found = true;
+            found = 1;
         }
         setPtr += 4;
     }
 
-    if ((!found) && (System.m_execParam != 0)) {
+    if ((found == 0) && (System.m_execParam != 0)) {
         System.Printf("SetMapTexAnim: material id (%d) not found\n", materialId);
     }
 }

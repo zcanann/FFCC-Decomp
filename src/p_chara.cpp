@@ -5,6 +5,7 @@
 
 extern CMemory Memory;
 extern "C" void __dla__FPv(void*);
+extern "C" void __dl__FPv(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 
 static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
@@ -23,6 +24,7 @@ public:
     int m_growCapacity;
 
     CPtrArray();
+    ~CPtrArray();
     bool Add(T item);
     int GetSize();
     void ReleaseAndRemoveAll();
@@ -46,6 +48,17 @@ CPtrArray<T>::CPtrArray()
     m_items = 0;
     m_stage = 0;
     m_growCapacity = 1;
+}
+
+template <class T>
+CPtrArray<T>::~CPtrArray()
+{
+    if (m_items != 0) {
+        __dla__FPv(m_items);
+        m_items = 0;
+    }
+    m_size = 0;
+    m_numItems = 0;
 }
 
 template <class T>
@@ -180,6 +193,86 @@ template class CPtrArray<CCharaPcs::CLoadPdt*>;
 template class CPtrArray<CCharaPcs::CLoadTexture*>;
 template class CPtrArray<CCharaPcs::CLoadAnim*>;
 template class CPtrArray<CCharaPcs::CLoadModel*>;
+
+/*
+ * --INFO--
+ * PAL Address: 8007b904
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" CPtrArray<CCharaPcs::CLoadPdt*>* dtor_8007B904(CPtrArray<CCharaPcs::CLoadPdt*>* ptrArray, short shouldDelete)
+{
+    if (ptrArray != 0) {
+        ptrArray->~CPtrArray<CCharaPcs::CLoadPdt*>();
+        if (shouldDelete > 0) {
+            __dl__FPv(ptrArray);
+        }
+    }
+    return ptrArray;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 8007b9b4
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" CPtrArray<CCharaPcs::CLoadTexture*>* dtor_8007B9B4(CPtrArray<CCharaPcs::CLoadTexture*>* ptrArray, short shouldDelete)
+{
+    if (ptrArray != 0) {
+        ptrArray->~CPtrArray<CCharaPcs::CLoadTexture*>();
+        if (shouldDelete > 0) {
+            __dl__FPv(ptrArray);
+        }
+    }
+    return ptrArray;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 8007ba64
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" CPtrArray<CCharaPcs::CLoadAnim*>* dtor_8007BA64(CPtrArray<CCharaPcs::CLoadAnim*>* ptrArray, short shouldDelete)
+{
+    if (ptrArray != 0) {
+        ptrArray->~CPtrArray<CCharaPcs::CLoadAnim*>();
+        if (shouldDelete > 0) {
+            __dl__FPv(ptrArray);
+        }
+    }
+    return ptrArray;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 8007bb14
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" CPtrArray<CCharaPcs::CLoadModel*>* dtor_8007BB14(CPtrArray<CCharaPcs::CLoadModel*>* ptrArray, short shouldDelete)
+{
+    if (ptrArray != 0) {
+        ptrArray->~CPtrArray<CCharaPcs::CLoadModel*>();
+        if (shouldDelete > 0) {
+            __dl__FPv(ptrArray);
+        }
+    }
+    return ptrArray;
+}
 
 /*
  * --INFO--

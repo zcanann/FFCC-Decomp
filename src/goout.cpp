@@ -40,6 +40,11 @@ static inline signed char ReadGoOutS8(CGoOutMenu& menu, int offset)
     return *reinterpret_cast<signed char*>(reinterpret_cast<unsigned char*>(&menu) + offset);
 }
 
+static inline void WriteMenuU8(int offset, unsigned char value)
+{
+    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(&MenuPcs) + offset) = value;
+}
+
 static unsigned short GetGoOutInputMask()
 {
     if (Pad._452_4_ != 0 || Pad._448_4_ != -1) {
@@ -328,12 +333,88 @@ void CGoOutMenu::CalcLoadMenu()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8016c1a4
+ * PAL Size: 616b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGoOutMenu::SetMainMode(unsigned char)
+void CGoOutMenu::SetMainMode(unsigned char mode)
 {
-	// TODO
+    CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
+
+    WriteMenuU8(2185, 0);
+    WriteMenuU8(2186, 0);
+    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&MenuPcs) + 2188) = 0;
+
+    if (field_0x2c == 2) {
+        MemoryCardMan.McEnd();
+    }
+
+    const signed char previousMode = field_0x2c;
+    field_0x2c = mode;
+    field_0x30 = 0;
+
+    if (mode == 2) {
+        if (Game.game.m_gameWork.m_mcHasSerial != 1) {
+            SetMenuStr(0, 4,
+                       "This game has not been saved.",
+                       "",
+                       "You must save your game before",
+                       "you can import a character.");
+            field_0x19 = -1;
+            field_0x18 = 0;
+        }
+
+        for (int i = 0; i < 8; i++) {
+            if (Game.game.m_caravanWorkArr[i].m_objType != 0 &&
+                Game.game.m_caravanWorkArr[i].m_caravanLocalFlags != 1) {
+                SetMenuStr(0, 5,
+                           "This game contains character data",
+                           "that has not yet been saved.",
+                           "",
+                           "You must save your game before",
+                           "you can import a character.");
+                field_0x19 = -1;
+                field_0x18 = 0;
+            }
+        }
+
+        field_0x1 = 0;
+        reinterpret_cast<unsigned char*>(this)[0] = 0;
+        field_0x2 = 0;
+        field_0x3 = 0;
+        field_0x4 = -1;
+        field_0x8 = 0;
+        SetGoOutMode(7);
+    } else if (mode < 2) {
+        if (mode != 0) {
+            field_0x46 = 1;
+            if (previousMode != 3) {
+                field_0x46 = 0;
+            }
+
+            MenuPcs.ChgAllModel();
+
+            if (field_0x36 >= 0) {
+                WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
+                WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+            }
+
+            field_0x45 = 0;
+            field_0x34 = 0x1e;
+            field_0x48 = 0;
+            field_0x3c = 0;
+            field_0x14 = 0;
+        }
+    } else if (mode < 4) {
+        MenuPcs.ChgAllModel();
+        WriteMenuU8(2184, 2);
+        field_0x14 = 0;
+        reinterpret_cast<signed char&>(field_0x24[2]) = 0;
+        SetDelMode(2);
+    }
 }
 
 /*

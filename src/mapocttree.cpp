@@ -333,22 +333,112 @@ void COctTree::ClearLight()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002dca8
+ * PAL Size: 860b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void InsertLight_r(COctNode*)
+void InsertLight_r(COctNode* node)
 {
-	// TODO
+	bool overlap = false;
+
+	if ((s_bound.CheckCross(*reinterpret_cast<CBound*>(node))) != 0) {
+		overlap = true;
+	}
+
+	if (!overlap) {
+		return;
+	}
+
+	if (*reinterpret_cast<unsigned short*>(Ptr(node, 0x3E)) != 0) {
+		unsigned long byteOffset = (s_insertShadowBitIndex >> 3) & 0x1ffffffc;
+		unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(node, 0x48 + byteOffset));
+		*bits |= 1UL << (s_insertShadowBitIndex & 0x1f);
+	}
+
+	COctNode** children = reinterpret_cast<COctNode**>(Ptr(node, 0x1C));
+	for (int i = 0; i < 8; i++) {
+		COctNode* child = children[i];
+		if (child == 0) {
+			return;
+		}
+
+		bool childOverlap = false;
+
+		if ((s_bound.CheckCross(*reinterpret_cast<CBound*>(child))) != 0) {
+			childOverlap = true;
+		}
+
+		if (!childOverlap) {
+			continue;
+		}
+
+		if (*reinterpret_cast<unsigned short*>(Ptr(child, 0x3E)) != 0) {
+			unsigned long byteOffset = (s_insertShadowBitIndex >> 3) & 0x1ffffffc;
+			unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(child, 0x48 + byteOffset));
+			*bits |= 1UL << (s_insertShadowBitIndex & 0x1f);
+		}
+
+		COctNode** grandChildren = reinterpret_cast<COctNode**>(Ptr(child, 0x1C));
+		for (int j = 0; j < 8; j++) {
+			COctNode* grandChild = grandChildren[j];
+			if (grandChild == 0) {
+				break;
+			}
+
+			if ((s_bound.CheckCross(*reinterpret_cast<CBound*>(grandChild))) != 0) {
+				if (*reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3E)) != 0) {
+					setbit32(reinterpret_cast<unsigned long*>(Ptr(grandChild, 0x48)), s_insertShadowBitIndex);
+				}
+
+				COctNode** greatGrandChildren = reinterpret_cast<COctNode**>(Ptr(grandChild, 0x1C));
+				for (int k = 0; k < 8; k++) {
+					COctNode* greatGrandChild = greatGrandChildren[k];
+					if (greatGrandChild == 0) {
+						break;
+					}
+					InsertLight_r(greatGrandChild);
+				}
+			}
+		}
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002dbd8
+ * PAL Size: 208b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void COctTree::InsertLight(long, Vec&, float, unsigned long)
+void COctTree::InsertLight(long bitIndex, Vec& position, float radius, unsigned long mask)
 {
-	// TODO
+	unsigned char* thisBytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* mapObj = *reinterpret_cast<unsigned char**>(Ptr(this, 8));
+	Mtx inverseMtx;
+	Vec localPosition;
+
+	if ((*thisBytes != 0) || ((*reinterpret_cast<unsigned long*>(mapObj + 0x38) & mask) == 0)) {
+		return;
+	}
+
+	s_insertShadowBitIndex = bitIndex;
+	PSMTXInverse(reinterpret_cast<MtxPtr>(mapObj + 0xB8), inverseMtx);
+	PSMTXMultVec(inverseMtx, &position, &localPosition);
+
+	float* bound = reinterpret_cast<float*>(&s_bound);
+	bound[0] = localPosition.x - radius;
+	bound[3] = localPosition.x + radius;
+	bound[1] = localPosition.y - radius;
+	bound[2] = localPosition.z - radius;
+	bound[4] = localPosition.y + radius;
+	bound[5] = localPosition.z + radius;
+
+	InsertLight_r(*reinterpret_cast<COctNode**>(Ptr(this, 4)));
 }
 
 /*

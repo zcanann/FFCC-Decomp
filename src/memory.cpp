@@ -484,22 +484,32 @@ void* CMemory::CStage::alloc(unsigned long, char*, unsigned long, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001E2E4
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMemory::CStage::setDefaultParam(unsigned long)
+void CMemory::CStage::setDefaultParam(unsigned long defaultParam)
 {
-	// TODO
+    *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned char*>(this) + 0x108) =
+        defaultParam;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001E2D8
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMemory::CStage::resDefaultParam()
 {
-	// TODO
+    *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned char*>(this) + 0x108) =
+        static_cast<unsigned long>(-1);
 }
 
 /*
@@ -644,22 +654,33 @@ void CAmemCacheSet::RefCnt0Up(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001D45C
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CAmemCacheSet::AmemSetLock()
 {
-	// TODO
+    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x38) =
+        *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x30);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001D44C
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CAmemCacheSet::AmemGetLock()
 {
-	// TODO
+    int lock = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x38);
+    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x34) = lock;
+    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x30) = lock;
 }
 
 /*
@@ -674,12 +695,17 @@ void CAmemCacheSet::AmemAlloc(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001D440
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CAmemCacheSet::AmemPrev()
 {
-	// TODO
+    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x30) =
+        *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x34);
 }
 
 /*
@@ -714,12 +740,18 @@ void CAmemCacheSet::SetData(void*, int, CAmemCache::TYPE, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001CEB0
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CAmemCacheSet::IsEnable(short)
+unsigned int CAmemCacheSet::IsEnable(short index)
 {
-	// TODO
+    int table = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x58);
+    unsigned int value = *reinterpret_cast<unsigned int*>(table + index * 0x1c);
+    return ((0u - value) | value) >> 31;
 }
 
 /*
@@ -784,12 +816,17 @@ void CAmemCacheSet::CalcPrio()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001C630
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CAmemCacheSet::AmemGetFreeSize()
+int CAmemCacheSet::AmemGetFreeSize()
 {
-	// TODO
+    return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x2c) -
+           *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x30);
 }
 
 /*

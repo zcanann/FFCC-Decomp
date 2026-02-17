@@ -82,22 +82,37 @@ void CGMonObj::onFramePreCalc()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011A248
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::flyDown()
 {
-	// TODO
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	CGCharaObj* charaObj = reinterpret_cast<CGCharaObj*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+
+	prgObj->changeStat(0x17, 0, 0);
+	mon[0x6B9] = 1;
+	charaObj->damageDelete();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011A21C
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::flyUp()
 {
-	// TODO
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	prgObj->changeStat(0x16, 0, 0);
 }
 
 /*

@@ -109,8 +109,7 @@ void CMenuPcs::MoneyCtrl()
 	*reinterpret_cast<short*>(iVar3 + 0x32) = *reinterpret_cast<short*>(iVar3 + 0x30);
 	sVar1 = *reinterpret_cast<short*>(iVar3 + 0x30);
 	if ((sVar1 == 0) || ((sVar1 != 0 && (*reinterpret_cast<short*>(iVar3 + 0x12) == 1)))) {
-		MoneyCtrlCur();
-		iVar2 = static_cast<int>(*reinterpret_cast<short*>(iVar3 + 0x1e));
+		iVar2 = MoneyCtrlCur();
 	} else if ((sVar1 == 1) && (*reinterpret_cast<short*>(iVar3 + 0x12) == 0)) {
 		if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 10) == 1) {
 			iVar2 = 0;
@@ -263,7 +262,7 @@ void CMenuPcs::MoneyDraw()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::MoneyCtrlCur()
+int CMenuPcs::MoneyCtrlCur()
 {
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.game.m_scriptFoodBase[0]);
 
@@ -275,7 +274,7 @@ void CMenuPcs::MoneyCtrlCur()
 	}
 
 	if (hold == 0) {
-		return;
+		return 0;
 	}
 
 	int menuState = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c);
@@ -299,14 +298,14 @@ void CMenuPcs::MoneyCtrlCur()
 		}
 
 		if ((hold & 0xC) != 0) {
-			return;
+			return 0;
 		}
 
 		if ((press & 0x200) != 0) {
 			*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 10) = 2;
 			*reinterpret_cast<short*>(menuState + 0x12) += 1;
 			Sound.PlaySe(3, 0x40, 0x7f, 0);
-			return;
+			return 0;
 		}
 
 		if ((press & 0x100) != 0) {
@@ -320,7 +319,7 @@ void CMenuPcs::MoneyCtrlCur()
 			*reinterpret_cast<short*>(menuState + 0x12) += 1;
 			Sound.PlaySe(2, 0x40, 0x7f, 0);
 		}
-		return;
+		return 0;
 	}
 
 	short cursor = *reinterpret_cast<short*>(menuState + 0x26);
@@ -369,17 +368,17 @@ void CMenuPcs::MoneyCtrlCur()
 		if ((press & 0x20) != 0) {
 			*reinterpret_cast<short*>(menuState + 0x1e) = 1;
 			Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-			return;
+			return 1;
 		}
 		if ((press & 0x40) != 0) {
 			*reinterpret_cast<short*>(menuState + 0x1e) = -1;
 			Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-			return;
+			return -1;
 		}
 		if ((press & 0x200) != 0) {
 			*reinterpret_cast<char*>(menuState + 0xd) = 1;
 			Sound.PlaySe(3, 0x40, 0x7f, 0);
-			return;
+			return 0;
 		}
 		if ((press & 0x100) != 0) {
 			if (DAT_8032eee0 < 1) {
@@ -393,6 +392,8 @@ void CMenuPcs::MoneyCtrlCur()
 			}
 		}
 	}
+
+	return 0;
 }
 
 /*

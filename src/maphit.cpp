@@ -8,6 +8,7 @@
 
 extern CMapCylinder g_hit_cyl;
 extern CMapCylinder g_hit_cyl_min;
+extern Vec g_hit_mvec;
 
 namespace {
 static char s_maphit_cpp[] = "maphit.cpp";
@@ -593,9 +594,8 @@ int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned
  */
 int CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, unsigned long mask)
 {
-    (void)position;
-
     g_hit_cyl = *mapCylinder;
+    g_hit_mvec = *position;
     s_hit_t_min = s_large_pos;
     s_hit_face_min = 0;
     s_hit_edge_index = -1;

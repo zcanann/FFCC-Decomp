@@ -1322,12 +1322,18 @@ void CMapMng::SetViewMtx(float (*viewMtx)[4], float (*projMtx)[4])
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002fd9c
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapMng::SetIdGrpMask(int, unsigned long)
+void CMapMng::SetIdGrpMask(int mapIdGrpIndex, unsigned long mask)
 {
-	// TODO
+    int offset = mapIdGrpIndex * 0x14;
+    unsigned char* mapIdGrp = reinterpret_cast<unsigned char*>(this) + offset;
+    *reinterpret_cast<unsigned long*>(mapIdGrp + 0x214E8) = mask;
 }
 
 /*
@@ -1540,12 +1546,25 @@ void CMapMng::ShowMapObjChild(int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002f5f0
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapMng::ShowMapObjChildID(int, int)
+void CMapMng::ShowMapObjChildID(int id, int show)
 {
-	// TODO
+    CMapMng* mapMng = this;
+    int mapObjCount = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(this) + 0xC);
+
+    for (int i = 0; i < mapObjCount; i++) {
+        if (*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(mapMng) + 0x982) ==
+            static_cast<unsigned int>(id)) {
+            reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(mapMng) + 0x954)->SetShow(show);
+        }
+        mapMng = reinterpret_cast<CMapMng*>(reinterpret_cast<unsigned char*>(mapMng) + 0xF0);
+    }
 }
 
 /*

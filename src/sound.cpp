@@ -7,6 +7,7 @@
 #include "dolphin/gx.h"
 #include "dolphin/mtx.h"
 #include <math.h>
+#include <string.h>
 
 extern float FLOAT_80330ce8;
 extern float FLOAT_80330cec;
@@ -21,6 +22,10 @@ extern float DAT_8032ec20;
 extern "C" void* PTR_PTR_s_CSound_8021056c;
 extern "C" void __ct__9CRedSoundFv(void*);
 extern "C" void __dt__6CSoundFv(void*);
+extern "C" unsigned int GetSoundMode__9CRedSoundFv(CRedSound*);
+extern "C" int StreamPlayState__9CRedSoundFi(CRedSound*, int);
+extern "C" int ReentryWaveData__9CRedSoundFi(CRedSound*, int);
+extern "C" int sprintf(char*, const char*, ...);
 extern void* ARRAY_802f26c8;
 
 struct CLineSegment {
@@ -347,12 +352,148 @@ void CSound::destroy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c7a28
+ * PAL Size: 1192b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::Realloc(int)
+void CSound::Realloc(int isMinMemoryMode)
 {
-	// TODO
+    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+
+    CFile::CHandle*& waveFile = *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 0x8);
+    CFile::CHandle*& streamFile = *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 0x2290);
+    int& streamPlaying = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22A0);
+    int& streamID = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x2298);
+
+    if (waveFile != 0) {
+        File.Close(waveFile);
+        waveFile = 0;
+    }
+
+    redSound->SetWaveData(-1, 0, 0);
+
+    bool wasStreaming = false;
+    if (streamPlaying != 0) {
+        if (StreamPlayState__9CRedSoundFi(redSound, streamID) != 0) {
+            wasStreaming = true;
+        }
+    }
+    if (wasStreaming) {
+        redSound->StreamStop(streamID);
+    }
+
+    if (streamFile != 0) {
+        File.Close(streamFile);
+        streamFile = 0;
+    }
+
+    streamPlaying = 0;
+
+    redSound->SeStop(-1);
+    redSound->ClearSeSepData(-1);
+    redSound->ClearWaveData(-3);
+
+    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x28) = 10000000;
+    memset(reinterpret_cast<u8*>(this) + 0x2C, 0, 0x1400);
+    memset(reinterpret_cast<u8*>(this) + 0x22C0, 0xFF, 8);
+    memset(reinterpret_cast<u8*>(this) + 0x22C8, 0xFF, 8);
+
+    redSound->ClearWaveBank(500);
+    redSound->ClearWaveBank(0);
+
+    for (int i = 0; i < 4; i++) {
+        redSound->SetSeBlockData(i, 0);
+    }
+
+    redSound->End();
+
+    int streamHeapSize = (isMinMemoryMode != 0) ? 0x200000 : 0x800000;
+    int waveHeapSize = (isMinMemoryMode != 0) ? 0xE00000 : 0x800000;
+    redSound->Init(*reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0x4), 0x80000, waveHeapSize, streamHeapSize);
+
+    u32 reportFlag = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x22D4);
+    redSound->ReportPrint(((-reportFlag) | reportFlag) >> 31);
+
+    u32 soundMode = GetSoundMode__9CRedSoundFv(redSound);
+    redSound->SetSoundMode((u32)__cntlzw((u32)__cntlzw(soundMode) >> 5) >> 5);
+
+    redSound->MusicMasterVolume(*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22B0));
+    redSound->SeMasterVolume(*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22B4));
+
+    redSound->SetReverb(1, 4);
+    redSound->SetReverbDepth(1, 0x40, 0xF);
+
+    waveFile = 0;
+    streamFile = 0;
+    streamPlaying = 0;
+    memset(reinterpret_cast<u8*>(this) + 0x22C0, 0xFF, 8);
+    memset(reinterpret_cast<u8*>(this) + 0x22C8, 0xFF, 8);
+    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22D0) = 0;
+
+    if (isMinMemoryMode != 0) {
+        return;
+    }
+
+    if (ReentryWaveData__9CRedSoundFi(redSound, 0) == -1) {
+        if (waveFile != 0) {
+            File.Close(waveFile);
+            waveFile = 0;
+        }
+
+        redSound->SetWaveData(-1, 0, 0);
+
+        char wavePath[256];
+        sprintf(wavePath, "dvd/sound/wave/wave_%04d.wd", 0);
+        waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
+        if (waveFile != 0) {
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x14) = File.GetLength(waveFile);
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x18) = 0;
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x20) = 0;
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1C) = 0;
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x24) = 1;
+            while (waveFile != 0) {
+                loadWaveFrame();
+            }
+        }
+    }
+
+    if (ReentryWaveData__9CRedSoundFi(redSound, 500) == -1) {
+        if (waveFile != 0) {
+            File.Close(waveFile);
+            waveFile = 0;
+        }
+
+        redSound->SetWaveData(-1, 0, 0);
+
+        char wavePath[256];
+        sprintf(wavePath, "dvd/sound/wave/wave_%04d.wd", 500);
+        waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
+        if (waveFile != 0) {
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x14) = File.GetLength(waveFile);
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x18) = 0;
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x20) = 0;
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1C) = 1;
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x24) = 1;
+            while (waveFile != 0) {
+                loadWaveFrame();
+            }
+        }
+    }
+
+    for (int i = 0; i < 4; i++) {
+        char sePath[260];
+        sprintf(sePath, "dvd/sound/se/block/se_%03d.seb", i);
+        CFile::CHandle* handle = File.Open(sePath, 0, CFile::PRI_LOW);
+        if (handle != 0) {
+            File.Read(handle);
+            File.SyncCompleted(handle);
+            redSound->SetSeBlockData(i, File.m_readBuffer);
+            File.Close(handle);
+        }
+    }
 }
 
 /*

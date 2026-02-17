@@ -667,18 +667,14 @@ void CMapMesh::SetDisplayListMaterial(CMaterialSet* materialSet, char** textureN
 void CMapMesh::pppCacheLoadModelTexture(CMaterialSet* materialSet, CAmemCacheSet* cacheSet)
 {
     MeshDrawEntry* entry = DrawEntries(this);
-    unsigned int remaining = U16At(this, 0xA);
-
-    while (remaining != 0) {
+    for (unsigned int remaining = U16At(this, 0xA); remaining != 0; remaining--, entry++) {
         if (entry->size != 0) {
             if (entry->materialIdx == 0xFFFF) {
                 entry->materialIdx = 0;
             } else {
-                CacheLoadTexture__12CMaterialSetFiP13CAmemCacheSet(materialSet, entry->materialIdx, cacheSet);
+                CacheLoadTexture__12CMaterialSetFiP13CAmemCacheSet(materialSet, (unsigned int)entry->materialIdx, cacheSet);
             }
         }
-        entry++;
-        remaining--;
     }
 }
 
@@ -714,17 +710,13 @@ void CMapMesh::pppCacheRefCnt0UpModelTexture(CMaterialSet*, CAmemCacheSet*)
 void CMapMesh::pppCacheDumpModelTexture(CMaterialSet* materialSet, CAmemCacheSet* cacheSet)
 {
     MeshDrawEntry* entry = DrawEntries(this);
-    unsigned int remaining = U16At(this, 0xA);
-
-    while (remaining != 0) {
+    for (unsigned int remaining = U16At(this, 0xA); remaining != 0; remaining--, entry++) {
         if (entry->size != 0) {
             if (entry->materialIdx == 0xFFFF) {
                 entry->materialIdx = 0;
             } else {
-                CacheDumpTexture__12CMaterialSetFiP13CAmemCacheSet(materialSet, entry->materialIdx, cacheSet);
+                CacheDumpTexture__12CMaterialSetFiP13CAmemCacheSet(materialSet, (unsigned int)entry->materialIdx, cacheSet);
             }
         }
-        entry++;
-        remaining--;
     }
 }

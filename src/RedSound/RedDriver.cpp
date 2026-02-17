@@ -64,6 +64,9 @@ extern int DAT_8032f3b8;
 extern int DAT_8032e12c;
 extern int DAT_8032f458;
 extern int DAT_8032daac;
+extern int DAT_8032dab0;
+extern void* DAT_8032dab4;
+extern int DAT_8032dab8;
 extern void* DAT_8032f3f0;
 extern void* DAT_8032f418;
 extern int DAT_8032f42c;
@@ -89,6 +92,7 @@ extern void* DAT_8032f464;
 extern void* DAT_8032f45c;
 extern void* DAT_8032f46c;
 extern void* DAT_8032f454;
+extern int DAT_8032f460;
 extern void* DAT_8032b860;
 extern void* DAT_8032c660;
 extern OSSemaphore DAT_8032ddd8;
@@ -1035,12 +1039,37 @@ void CRedDriver::GetSoundMode()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801becd8
+ * PAL Size: 276b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::SetMusicData(void*)
+void CRedDriver::SetMusicData(void* param_1)
 {
-	// TODO
+    char localHeader[0x20];
+    char* musicHeader = (char*)param_1;
+    void* copiedHeader;
+    int headerSize;
+    short musicID;
+
+    if (((musicHeader[0] == 'B') && (musicHeader[1] == 'G')) && (musicHeader[2] == 'M')) {
+        memcpy(localHeader, musicHeader, sizeof(localHeader));
+        headerSize = *(int*)(localHeader + 0x10);
+        copiedHeader = RedNew__Fi(headerSize);
+        if (copiedHeader != 0) {
+            memcpy(copiedHeader, musicHeader, headerSize);
+            _EntryExecCommand(_SetMusicData, (int)copiedHeader, 0, 0, 0, 0, 0, 0);
+            musicID = *(short*)(localHeader + 4);
+            (void)musicID;
+            return;
+        }
+    }
+    if (DAT_8032f408 != 0) {
+        OSReport("Music Header was broken.\n");
+        fflush(&DAT_8021d1a8);
+    }
 }
 
 /*
@@ -1475,12 +1504,38 @@ void CRedDriver::ClearWaveBank(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bfc60
+ * PAL Size: 276b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::SetWaveData(int, int, void*, int)
+void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
 {
-	// TODO
+    char* waveHeader;
+
+    while (DAT_8032f460 != 0) {
+        RedSleep(0);
+    }
+
+    DAT_8032dab8 = waveSize;
+    waveHeader = (char*)waveData;
+    if (waveSize == -1) {
+        if ((waveHeader[0] == 'W') && (waveHeader[1] == 'D')) {
+            DAT_8032dab8 = *(int*)(waveHeader + 4) +
+                           (((*(int*)(waveHeader + 8) * 4) + 0x3fU) & 0xffffffc0) +
+                           (*(int*)(waveHeader + 0xc) * 0x60) + 0x20;
+        }
+        else {
+            DAT_8032dab8 = 0;
+        }
+    }
+
+    DAT_8032daac = slot;
+    DAT_8032dab0 = waveID;
+    DAT_8032dab4 = waveData;
+    OSSignalSemaphore(&DAT_8032daa0);
 }
 
 /*

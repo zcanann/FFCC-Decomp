@@ -159,6 +159,41 @@ void CPtrArray<CMaterial*>::SetGrow(int growCapacity)
     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x14) = growCapacity;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x800343e0
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CPtrArray<CMapLightHolder*>::CPtrArray()
+{
+    m_size = 0;
+    m_numItems = 0;
+    m_defaultSize = 0x10;
+    m_items = 0;
+    m_stage = 0;
+    m_growCapacity = 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80034414
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CPtrArray<CMapLightHolder*>::~CPtrArray()
+{
+    RemoveAll();
+}
+
 template <>
 bool CPtrArray<CMapLightHolder*>::setSize(unsigned long newSize);
 
@@ -497,6 +532,146 @@ bool CPtrArray<CMapAnim*>::setSize(unsigned long newSize)
     }
 
     return true;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80034490
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CPtrArray<CMapAnimRun*>::CPtrArray()
+{
+    m_size = 0;
+    m_numItems = 0;
+    m_defaultSize = 0x10;
+    m_items = 0;
+    m_stage = 0;
+    m_growCapacity = 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800344c4
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CPtrArray<CMapAnimRun*>::~CPtrArray()
+{
+    RemoveAll();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80034540
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CPtrArray<CMapAnim*>::CPtrArray()
+{
+    m_size = 0;
+    m_numItems = 0;
+    m_defaultSize = 0x10;
+    m_items = 0;
+    m_stage = 0;
+    m_growCapacity = 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80034574
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CPtrArray<CMapAnim*>::~CPtrArray()
+{
+    RemoveAll();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800345f0
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CPtrArray<CMapAnimKeyDt*>::CPtrArray()
+{
+    m_size = 0;
+    m_numItems = 0;
+    m_defaultSize = 0x10;
+    m_items = 0;
+    m_stage = 0;
+    m_growCapacity = 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80034624
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CPtrArray<CMapAnimKeyDt*>::~CPtrArray()
+{
+    RemoveAll();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800346a0
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CPtrArray<CMapShadow*>::CPtrArray()
+{
+    m_size = 0;
+    m_numItems = 0;
+    m_defaultSize = 0x10;
+    m_items = 0;
+    m_stage = 0;
+    m_growCapacity = 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800346d4
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CPtrArray<CMapShadow*>::~CPtrArray()
+{
+    RemoveAll();
 }
 
 /*

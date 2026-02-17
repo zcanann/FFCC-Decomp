@@ -110,7 +110,7 @@ int CGamePcs::GetTable(unsigned long param)
  */
 void CGamePcs::create()
 {
-    Game.game.Create();
+    game.Create();
 }
 
 /*
@@ -124,7 +124,7 @@ void CGamePcs::create()
  */
 void CGamePcs::destroy()
 {
-    Game.game.Destroy();
+    game.Destroy();
 }
 
 /*
@@ -134,7 +134,7 @@ void CGamePcs::destroy()
  */
 void CGamePcs::calcInit()
 {
-	Game.game.CheckScriptChange();
+	game.CheckScriptChange();
 }
 
 /*
@@ -148,7 +148,7 @@ void CGamePcs::calcInit()
  */
 void CGamePcs::calc0()
 {
-    Game.game.Calc();
+    game.Calc();
 }
 
 /*
@@ -162,7 +162,7 @@ void CGamePcs::calc0()
  */
 void CGamePcs::calc1()
 {
-    Game.game.Calc2();
+    game.Calc2();
 }
 
 /*
@@ -176,7 +176,7 @@ void CGamePcs::calc1()
  */
 void CGamePcs::calc2()
 {
-    Game.game.Calc3();
+    game.Calc3();
 }
 
 /*
@@ -190,7 +190,7 @@ void CGamePcs::calc2()
  */
 void CGamePcs::draw0()
 {
-    Game.game.Draw();
+    game.Draw();
 }
 
 /*
@@ -204,7 +204,7 @@ void CGamePcs::draw0()
  */
 void CGamePcs::draw1()
 {
-    Game.game.Draw2();
+    game.Draw2();
 }
 
 /*
@@ -218,7 +218,7 @@ void CGamePcs::draw1()
  */
 void CGamePcs::draw2()
 {
-    Game.game.Draw3();
+    game.Draw3();
 }
 
 /*
@@ -232,7 +232,7 @@ void CGamePcs::draw2()
  */
 void CGamePcs::onScriptChanging(char* script)
 {
-	Game.game.ScriptChanging(script);
+	game.CGame::ScriptChanging(script);
 }
 
 /*
@@ -246,7 +246,7 @@ void CGamePcs::onScriptChanging(char* script)
  */
 void CGamePcs::onScriptChanged(char* script, int param)
 {
-	Game.game.ScriptChanged(script, param);
+	game.CGame::ScriptChanged(script, param);
 }
 
 /*
@@ -260,7 +260,7 @@ void CGamePcs::onScriptChanged(char* script, int param)
  */
 void CGamePcs::onMapChanging(int a, int b)
 {
-	Game.game.MapChanging(a, b);
+	game.CGame::MapChanging(a, b);
 }
 
 /*
@@ -274,5 +274,5 @@ void CGamePcs::onMapChanging(int a, int b)
  */
 void CGamePcs::onMapChanged(int a, int b, int c)
 {
-	Game.game.MapChanged(a, b, c);
+	game.CGame::MapChanged(a, b, c);
 }

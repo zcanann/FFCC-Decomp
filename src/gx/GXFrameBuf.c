@@ -136,21 +136,18 @@ void GXSetTexCopySrc(u16 left, u16 top, u16 wd, u16 ht) {
 
 void GXSetDispCopyDst(u16 wd, u16 ht) {
     GXData* gx;
-    u16 stride;
-    u32 reg;
+    u32* cpDispStride;
+    int stride;
 
     ASSERTMSGLINE(1293, (wd & 0xF) == 0, "GXSetDispCopyDst: Width must be a multiple of 16");
     CHECK_GXBEGIN(1294, "GXSetDispCopyDst");
     gx = __GXData;
 
-    stride = (wd & 0x7FFF) << 1;
     gx->cpDispStride = 0;
-    reg = gx->cpDispStride;
-    reg = (reg & 0xFFFFFC00) | ((u32)stride >> 5);
-    gx->cpDispStride = reg;
-    reg = gx->cpDispStride;
-    reg = (reg & 0x00FFFFFF) | 0x4D000000;
-    gx->cpDispStride = reg;
+    cpDispStride = &gx->cpDispStride;
+    stride = (int)((wd & 0x7FFF) << 1) >> 5;
+    *cpDispStride = (*cpDispStride & 0xFFFFFC00) | (u32)stride;
+    *cpDispStride = (*cpDispStride & 0x00FFFFFF) | 0x4D000000;
 }
 
 void GXSetTexCopyDst(u16 wd, u16 ht, GXTexFmt fmt, GXBool mipmap) {

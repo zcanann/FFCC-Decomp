@@ -3,6 +3,11 @@
 #include "ffcc/p_game.h"
 #include <string.h>
 
+extern "C" void __dl__FPv(void*);
+extern "C" void* __vt__8CMonWork[];
+extern "C" void* __vt__12CCaravanWork[];
+extern "C" void* __vt__9CGObjWork[];
+
 /*
  * --INFO--
  * Address:	TODO
@@ -21,6 +26,27 @@ CGObjWork::CGObjWork()
 CGObjWork::~CGObjWork()
 {
 	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800a2d8c
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" CGObjWork* dtor_800A2D8C(CGObjWork* gObjWork, short shouldDelete)
+{
+	if (gObjWork != 0) {
+		*(void**)gObjWork = __vt__9CGObjWork;
+		if (0 < shouldDelete) {
+			__dl__FPv(gObjWork);
+		}
+	}
+
+	return gObjWork;
 }
 
 /*
@@ -61,6 +87,30 @@ CCaravanWork::CCaravanWork()
 CCaravanWork::~CCaravanWork()
 {
 	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800a2b9c
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" CCaravanWork* dtor_800A2B9C(CCaravanWork* caravanWork, short shouldDelete)
+{
+	if (caravanWork != 0) {
+		*(void**)caravanWork = __vt__12CCaravanWork;
+		if (caravanWork != 0) {
+			*(void**)caravanWork = __vt__9CGObjWork;
+		}
+		if (0 < shouldDelete) {
+			__dl__FPv(caravanWork);
+		}
+	}
+
+	return caravanWork;
 }
 
 /*
@@ -820,6 +870,30 @@ CMonWork::CMonWork()
 	m_saveSlot = 0xff;
 	m_partyIndex = 0xff;
 	m_objType = 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8009e9b4
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" CMonWork* dtor_8009E9B4(CMonWork* monWork, short shouldDelete)
+{
+	if (monWork != 0) {
+		*(void**)monWork = __vt__8CMonWork;
+		if (monWork != 0) {
+			*(void**)monWork = __vt__9CGObjWork;
+		}
+		if (0 < shouldDelete) {
+			__dl__FPv(monWork);
+		}
+	}
+
+	return monWork;
 }
 
 /*

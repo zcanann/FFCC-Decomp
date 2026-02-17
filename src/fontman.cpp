@@ -89,132 +89,200 @@ void CFont::Create(void*, CMemory::CStage*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80092a9c
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFont::SetPosX(float)
+void CFont::SetPosX(float x)
 {
-	// TODO
+	posX = x;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80092a94
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFont::SetPosY(float)
+void CFont::SetPosY(float y)
 {
-	// TODO
+	posY = y;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80092a8c
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFont::SetPosZ(float)
+void CFont::SetPosZ(float z)
 {
-	// TODO
+	posZ = z;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80092a68
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFont::SetZMode(int, int)
+void CFont::SetZMode(int compareEnable, int updateEnable)
 {
-	// TODO
+	renderFlags = (static_cast<unsigned char>(compareEnable) << 6 & 0x40) | (renderFlags & 0xBF);
+	renderFlags = (static_cast<unsigned char>(updateEnable) << 5 & 0x20) | (renderFlags & 0xDF);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80092a60
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFont::SetMargin(float)
+void CFont::SetMargin(float value)
 {
-	// TODO
+	margin = value;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80092a54
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFont::SetScale(float)
+void CFont::SetScale(float value)
 {
-	// TODO
+	scaleY = value;
+	scaleX = value;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80092a4c
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFont::SetScaleX(float)
+void CFont::SetScaleX(float value)
 {
-	// TODO
+	scaleX = value;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80092a44
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFont::SetScaleY(float)
+void CFont::SetScaleY(float value)
 {
-	// TODO
+	scaleY = value;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80092a30
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFont::SetShadow(int)
+void CFont::SetShadow(int enabled)
 {
-	// TODO
+	renderFlags = (static_cast<unsigned char>(enabled) << 7) | (renderFlags & 0x7F);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800929e0
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFont::SetColor(_GXColor)
+void CFont::SetColor(_GXColor color)
 {
-	// TODO
+	m_color = color;
+	GXSetChanMatColor(GX_COLOR0A0, m_color);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80092998
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFont::SetTlut(int)
+void CFont::SetTlut(int index)
 {
-	// TODO
+	unsigned char* tlut = 0;
+	if (index >= 0) {
+		tlut = &m_tlutData[index * 0x40];
+	}
+	texturePtr->SetExternalTlut(tlut, 1);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80092938
+ * PAL Size: 96b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFont::SetTlutColor(int, int, _GXColor)
+void CFont::SetTlutColor(int tlutIndex, int colorIndex, _GXColor color)
 {
-	// TODO
+	int format = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texturePtr) + 0x60);
+	int colorCount = 0;
+
+	if (format == 9) {
+		colorCount = 0x100;
+	} else if (format == 8) {
+		colorCount = 0x10;
+	}
+
+	texturePtr->SetExternalTlutColor(&m_tlutData[tlutIndex * 0x40], colorCount, colorIndex, color);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009290c
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFont::FlushTlutColor()
 {
-	// TODO
+	texturePtr->FlushExternalTlut(m_tlutData);
 }
 
 /*

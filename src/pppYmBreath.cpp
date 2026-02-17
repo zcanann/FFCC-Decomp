@@ -1,8 +1,26 @@
 #include "ffcc/pppYmBreath.h"
+#include "ffcc/math.h"
 #include "dolphin/mtx.h"
 
+#include <string.h>
+
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
+extern "C" float RandF__5CMathFv(CMath* instance);
+extern "C" void pppGetRotMatrixXYZ__FR10pppFMATRIXP11pppIVECTOR4(void* outMatrix, void* angle);
 extern int DAT_8032ed70;
+extern CMath math;
+extern void pppNormalize__FR3Vec3Vec(float*, Vec*);
+
+struct pppIVECTOR4 {
+    short x;
+    short y;
+    short z;
+    short w;
+};
+
+struct pppFMATRIX {
+    Mtx value;
+};
 
 struct UnkC {
     unsigned char _pad[0xC];
@@ -24,12 +42,166 @@ void get_rand()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c118c
+ * PAL Size: 1580b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void BirthParticle(_pppPObject*, VYmBreath*, PYmBreath*, VColor*, PARTICLE_DATA*, PARTICLE_WMAT*, PARTICLE_COLOR*)
+void BirthParticle(_pppPObject*, VYmBreath* vYmBreath, PYmBreath* pYmBreath, VColor* vColor, PARTICLE_DATA* particleData,
+                   PARTICLE_WMAT* particleWmat, PARTICLE_COLOR* particleColor)
 {
-	// TODO
+    unsigned char* breath = (unsigned char*)pYmBreath;
+    unsigned char* particle = (unsigned char*)particleData;
+    pppIVECTOR4 angle;
+    pppFMATRIX rotMtx;
+    Vec baseDir;
+    Vec normDir;
+    float spread;
+    unsigned char flags;
+
+    memset(particle + 0x30, 0, 0x60);
+    if (particleWmat != NULL) {
+        memset(particleWmat, 0, 0x30);
+    }
+    if (particleColor != NULL) {
+        memset(particleColor, 0, 0x20);
+    }
+
+    spread = (float)(unsigned int)*(unsigned char*)(breath + 0x28);
+    baseDir.x = 0.0f;
+    baseDir.y = 0.0f;
+    baseDir.z = -1.0f;
+
+    angle.x = (short)((spread + spread) * RandF__5CMathFv(&math) - spread);
+    angle.y = (short)((spread + spread) * RandF__5CMathFv(&math) - spread);
+    angle.z = (short)((spread + spread) * RandF__5CMathFv(&math) - spread);
+    angle.w = 0;
+
+    pppGetRotMatrixXYZ__FR10pppFMATRIXP11pppIVECTOR4(&rotMtx, &angle);
+    PSMTXMultVecSR(rotMtx.value, &baseDir, (Vec*)(particle + 0x3C));
+
+    *(float*)(particle + 0x3C) *= *(float*)(breath + 0xB0);
+    *(float*)(particle + 0x40) *= *(float*)(breath + 0xB4);
+    *(float*)(particle + 0x44) *= *(float*)(breath + 0xB8);
+
+    normDir.x = *(float*)(particle + 0x3C);
+    normDir.y = *(float*)(particle + 0x40);
+    normDir.z = *(float*)(particle + 0x44);
+    pppNormalize__FR3Vec3Vec((float*)(particle + 0x3C), &normDir);
+
+    if (*(float*)(breath + 0xAC) != 0.0f) {
+        PSVECScale((Vec*)(particle + 0x3C), (Vec*)(particle + 0x30), *(float*)(breath + 0xAC));
+    }
+
+    if (*(char*)(breath + 0x26) != 0) {
+        *(float*)(particle + 0x7C) = (float)(unsigned int)*(unsigned char*)((unsigned char*)vColor + 0x0B);
+        *(char*)(particle + 0x54) = *(char*)(breath + 0x26);
+    }
+    if (*(char*)(breath + 0x27) != 0) {
+        *(char*)(particle + 0x55) = *(char*)(breath + 0x27);
+    }
+
+    *(float*)(particle + 0x58) = *(float*)(breath + 0x90);
+    *(float*)(particle + 0x5C) = *(float*)(breath + 0x94);
+
+    if (*(char*)(breath + 0xC2) != 0) {
+        *(float*)(particle + 0x60) = *(float*)(breath + 0x9C) * RandF__5CMathFv(&math);
+        flags = *(unsigned char*)(breath + 0xC2);
+
+        if (((flags & 1) != 0) && ((flags & 2) != 0)) {
+            if (RandF__5CMathFv(&math) > 0.5f) {
+                *(float*)(particle + 0x60) = -*(float*)(particle + 0x60);
+            }
+        } else if ((flags & 2) != 0) {
+            *(float*)(particle + 0x60) = -*(float*)(particle + 0x60);
+        }
+    }
+
+    if ((*(unsigned char*)(breath + 0xC2) & 4) != 0) {
+        *(float*)(particle + 0x58) += *(float*)(particle + 0x60);
+    }
+    if ((*(unsigned char*)(breath + 0xC2) & 8) != 0) {
+        *(float*)(particle + 0x5C) += *(float*)(particle + 0x60);
+    }
+
+    while (*(float*)(particle + 0x58) >= 6.2831855f) {
+        *(float*)(particle + 0x58) -= 6.2831855f;
+    }
+    while (*(float*)(particle + 0x58) < 0.0f) {
+        *(float*)(particle + 0x58) += 6.2831855f;
+    }
+
+    *(float*)(particle + 0x64) = *(float*)(breath + 0x50);
+    *(float*)(particle + 0x68) = *(float*)(breath + 0x54);
+    *(float*)(particle + 0x6C) = *(float*)(breath + 0x60);
+    *(float*)(particle + 0x70) = *(float*)(breath + 0x64);
+
+    if (*(unsigned char*)(breath + 0xC1) != 0) {
+        flags = *(unsigned char*)(breath + 0xC1);
+        if ((flags & 0x20) == 0) {
+            *(float*)(particle + 0x74) = *(float*)(breath + 0x80) * RandF__5CMathFv(&math);
+            *(float*)(particle + 0x78) = *(float*)(breath + 0x84) * RandF__5CMathFv(&math);
+
+            if (((flags & 1) != 0) && ((flags & 2) != 0)) {
+                if (RandF__5CMathFv(&math) > 0.5f) {
+                    *(float*)(particle + 0x74) = -*(float*)(particle + 0x74);
+                }
+                if (RandF__5CMathFv(&math) > 0.5f) {
+                    *(float*)(particle + 0x78) = -*(float*)(particle + 0x78);
+                }
+            } else if ((flags & 2) != 0) {
+                *(float*)(particle + 0x74) = -*(float*)(particle + 0x74);
+                *(float*)(particle + 0x78) = -*(float*)(particle + 0x78);
+            }
+        } else {
+            *(float*)(particle + 0x74) = *(float*)(breath + 0x80) * RandF__5CMathFv(&math);
+            *(float*)(particle + 0x78) = *(float*)(particle + 0x74);
+
+            if (((flags & 1) != 0) && ((flags & 2) != 0)) {
+                if (RandF__5CMathFv(&math) > 0.5f) {
+                    *(float*)(particle + 0x74) = -*(float*)(particle + 0x74);
+                    *(float*)(particle + 0x78) = -*(float*)(particle + 0x78);
+                }
+            } else if ((flags & 2) != 0) {
+                *(float*)(particle + 0x74) = -*(float*)(particle + 0x74);
+                *(float*)(particle + 0x78) = -*(float*)(particle + 0x78);
+            }
+        }
+    }
+
+    if ((*(unsigned char*)(breath + 0xC1) & 4) != 0) {
+        *(float*)(particle + 0x64) += *(float*)(particle + 0x74);
+        *(float*)(particle + 0x68) += *(float*)(particle + 0x78);
+    }
+    if ((*(unsigned char*)(breath + 0xC1) & 8) != 0) {
+        *(float*)(particle + 0x6C) += *(float*)(particle + 0x74);
+        *(float*)(particle + 0x70) += *(float*)(particle + 0x78);
+    }
+
+    *(float*)(particle + 0x80) = *(float*)(breath + 0x18);
+    if (*(float*)(breath + 0xA8) != 0.0f) {
+        spread = *(float*)(breath + 0xA8);
+        *(float*)(particle + 0x80) += (spread + spread) * RandF__5CMathFv(&math) - spread;
+    }
+
+    if (*(short*)(breath + 0x24) == 0) {
+        *(short*)(particle + 0x50) = -1;
+    } else {
+        *(short*)(particle + 0x50) = *(short*)(breath + 0x24);
+    }
+    *(unsigned char*)(particle + 0x84) = 0;
+
+    if (particleWmat != NULL) {
+        PSMTXCopy(*(Mtx*)vYmBreath, *(Mtx*)particleWmat);
+    }
+    if (particleColor != NULL) {
+        *(float*)((unsigned char*)particleColor + 0x10) = *(float*)(breath + 0x2C);
+        *(float*)((unsigned char*)particleColor + 0x14) = *(float*)(breath + 0x30);
+        *(float*)((unsigned char*)particleColor + 0x18) = *(float*)(breath + 0x34);
+        *(float*)((unsigned char*)particleColor + 0x1C) = *(float*)(breath + 0x38);
+    }
 }
 
 /*

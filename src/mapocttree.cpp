@@ -616,12 +616,131 @@ void CBound::operator= (const CBound&)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002d308
+ * PAL Size: 584b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void ClearFlag_r(COctNode*)
+void ClearFlag_r(COctNode* node)
 {
-	// TODO
+	COctNode* child1;
+	COctNode* child2;
+	COctNode* child3;
+	COctNode* child4;
+	COctNode* child5;
+	COctNode* child6;
+	COctNode* child7;
+	COctNode* child8;
+
+	if (*reinterpret_cast<unsigned short*>(Ptr(node, 0x3E)) != 0) {
+		*reinterpret_cast<unsigned long*>(Ptr(node, 0x40)) &= s_clearFlagMask;
+	}
+
+	for (int i = 0; i < 8; i++) {
+		child1 = *reinterpret_cast<COctNode**>(Ptr(node, 0x1C));
+		if (child1 == 0) {
+			return;
+		}
+		if (*reinterpret_cast<unsigned short*>(Ptr(child1, 0x3E)) != 0) {
+			*reinterpret_cast<unsigned long*>(Ptr(child1, 0x40)) &= s_clearFlagMask;
+		}
+
+		for (int j = 0; j < 8; j++) {
+			child2 = *reinterpret_cast<COctNode**>(Ptr(child1, 0x1C));
+			if (child2 == 0) {
+				break;
+			}
+			if (*reinterpret_cast<unsigned short*>(Ptr(child2, 0x3E)) != 0) {
+				*reinterpret_cast<unsigned long*>(Ptr(child2, 0x40)) &= s_clearFlagMask;
+			}
+
+			for (int k = 0; k < 8; k++) {
+				child3 = *reinterpret_cast<COctNode**>(Ptr(child2, 0x1C));
+				if (child3 == 0) {
+					break;
+				}
+				if (*reinterpret_cast<unsigned short*>(Ptr(child3, 0x3E)) != 0) {
+					*reinterpret_cast<unsigned long*>(Ptr(child3, 0x40)) &= s_clearFlagMask;
+				}
+
+				for (int m = 0; m < 8; m++) {
+					child4 = *reinterpret_cast<COctNode**>(Ptr(child3, 0x1C));
+					if (child4 == 0) {
+						break;
+					}
+					if (*reinterpret_cast<unsigned short*>(Ptr(child4, 0x3E)) != 0) {
+						*reinterpret_cast<unsigned long*>(Ptr(child4, 0x40)) &= s_clearFlagMask;
+					}
+
+					for (int n = 0; n < 8; n++) {
+						child5 = *reinterpret_cast<COctNode**>(Ptr(child4, 0x1C));
+						if (child5 == 0) {
+							break;
+						}
+						if (*reinterpret_cast<unsigned short*>(Ptr(child5, 0x3E)) != 0) {
+							*reinterpret_cast<unsigned long*>(Ptr(child5, 0x40)) &= s_clearFlagMask;
+						}
+
+						for (int o = 0; o < 8; o++) {
+							child6 = *reinterpret_cast<COctNode**>(Ptr(child5, 0x1C));
+							if (child6 == 0) {
+								break;
+							}
+							if (*reinterpret_cast<unsigned short*>(Ptr(child6, 0x3E)) != 0) {
+								*reinterpret_cast<unsigned long*>(Ptr(child6, 0x40)) &= s_clearFlagMask;
+							}
+
+							for (int p = 0; p < 8; p++) {
+								child7 = *reinterpret_cast<COctNode**>(Ptr(child6, 0x1C));
+								if (child7 == 0) {
+									break;
+								}
+								if (*reinterpret_cast<unsigned short*>(Ptr(child7, 0x3E)) != 0) {
+									*reinterpret_cast<unsigned long*>(Ptr(child7, 0x40)) &= s_clearFlagMask;
+								}
+
+								for (int q = 0; q < 8; q++) {
+									child8 = *reinterpret_cast<COctNode**>(Ptr(child7, 0x1C));
+									if (child8 == 0) {
+										break;
+									}
+									if (*reinterpret_cast<unsigned short*>(Ptr(child8, 0x3E)) != 0) {
+										*reinterpret_cast<unsigned long*>(Ptr(child8, 0x40)) &= s_clearFlagMask;
+									}
+
+									for (int r = 0; r < 8; r++) {
+										if (*reinterpret_cast<COctNode**>(Ptr(child8, 0x1C)) == 0) {
+											break;
+										}
+										ClearFlag_r(*reinterpret_cast<COctNode**>(Ptr(child8, 0x1C)));
+										child8 = reinterpret_cast<COctNode*>(Ptr(child8, 4));
+									}
+
+									child7 = reinterpret_cast<COctNode*>(Ptr(child7, 4));
+								}
+
+								child6 = reinterpret_cast<COctNode*>(Ptr(child6, 4));
+							}
+
+							child5 = reinterpret_cast<COctNode*>(Ptr(child5, 4));
+						}
+
+						child4 = reinterpret_cast<COctNode*>(Ptr(child4, 4));
+					}
+
+					child3 = reinterpret_cast<COctNode*>(Ptr(child3, 4));
+				}
+
+				child2 = reinterpret_cast<COctNode*>(Ptr(child2, 4));
+			}
+
+			child1 = reinterpret_cast<COctNode*>(Ptr(child1, 4));
+		}
+
+		node = reinterpret_cast<COctNode*>(Ptr(node, 4));
+	}
 }
 
 /*

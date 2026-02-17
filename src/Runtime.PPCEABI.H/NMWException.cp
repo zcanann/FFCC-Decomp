@@ -270,12 +270,12 @@ extern "C" void __construct_array(void* ptr, ConstructorDestructor ctor, Constru
  * @note Address: 801af8f8
  * @note Size: 120b
  */
-extern "C" void __destroy_arr(void* block, ConstructorDestructor* dtor, size_t size, size_t n) {
+extern "C" void __destroy_arr(void* block, ConstructorDestructor dtor, size_t size, size_t n) {
 	char* current = (char*)block + size * n;
 	
 	for (; n != 0; n--) {
 		current -= size;
-		DTORCALL_COMPLETE(*dtor, current);
+		DTORCALL_COMPLETE(dtor, current);
 	}
 }
 

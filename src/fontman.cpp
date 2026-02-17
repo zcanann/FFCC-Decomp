@@ -1,11 +1,15 @@
 #include "ffcc/fontman.h"
 #include "PowerPC_EABI_Support/Runtime/NMWException.h"
 #include <dolphin/mtx.h>
+#include <math.h>
 
 extern CFontMan FontMan;
+extern CTextureMan TextureMan;
 extern void* ARRAY_802ea170;
 extern "C" void __dt__8CFontManFv(void*);
 extern unsigned char CameraPcs[];
+extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
+extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 
 /*
  * --INFO--
@@ -287,12 +291,73 @@ void CFont::FlushTlutColor()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009260c
+ * PAL Size: 768b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFont::DrawInit()
 {
-	// TODO
+    Mtx identityMtx;
+    Mtx44 projMtx;
+    Mtx texMtx;
+    _GXColor white = { 0xFF, 0xFF, 0xFF, 0xFF };
+
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetChanCtrl(GX_ALPHA0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetChanMatColor(GX_COLOR0A0, m_color);
+    GXSetChanAmbColor(GX_COLOR0A0, white);
+
+    C_MTXOrtho(projMtx, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, 1.0f);
+    if ((renderFlags & 0x80) != 0 || (renderFlags & 0x40) != 0) {
+        projMtx[2][2] = 1.0f;
+        projMtx[2][3] = 0.0f;
+    }
+    GXSetProjection(projMtx, GX_ORTHOGRAPHIC);
+
+    PSMTXIdentity(identityMtx);
+    GXLoadPosMtxImm(identityMtx, 0);
+    GXSetZCompLoc(GX_FALSE);
+    GXSetCurrentMtx(0);
+
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+
+    int zFunction = 7;
+    if ((renderFlags & 0x40) != 0) {
+        zFunction = 3;
+    }
+    int zEnable = ((renderFlags & 0x80) != 0 || (renderFlags & 0x40) != 0) ? 1 : 0;
+    int zUpdate = ((renderFlags & 0x40) != 0) ? 1 : 0;
+    GXSetZMode(zEnable, (GXCompare)zFunction, zUpdate);
+
+    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
+    PSMTXIdentity(identityMtx);
+    GXLoadPosMtxImm(identityMtx, 0);
+    GXSetCullMode(GX_CULL_NONE);
+
+    TextureMan.SetTexture(GX_TEXMAP0, texturePtr);
+
+    float texWidth = static_cast<float>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(texturePtr) + 0x64));
+    float texHeight = static_cast<float>(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(texturePtr) + 0x68));
+    PSMTXScale(texMtx, 1.0f / texWidth, 1.0f / texHeight, 1.0f);
+    GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
+
+    GXSetNumTexGens(1);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_U16, 1);
+
+    TextureMan.SetTextureTev(texturePtr);
+
+    renderFlags &= static_cast<unsigned char>(~0x10);
+    renderFlags &= static_cast<unsigned char>(~0x08);
 }
 
 /*
@@ -331,12 +396,100 @@ void CFont::Draw(char* text)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009211c
+ * PAL Size: 1088b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFont::Draw(unsigned short)
+void CFont::Draw(unsigned short ch)
 {
-	// TODO
+    unsigned short* glyphBucket = m_glyphBuckets[ch & 0xFF];
+    unsigned short* glyph = glyphBucket + 1;
+    unsigned int count = static_cast<unsigned int>(glyphBucket[0]);
+
+    for (; count != 0; count--) {
+        if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) == ((ch >> 8) & 0xFF)) {
+            break;
+        }
+        glyph += 4;
+    }
+
+    if (count == 0) {
+        unsigned short* fallback = m_glyphBuckets[63] + 1;
+        unsigned int fallbackCount = static_cast<unsigned int>(m_glyphBuckets[63][0]);
+        for (; fallbackCount != 0; fallbackCount--) {
+            if (*reinterpret_cast<char*>(fallback + 1) == '\0') {
+                glyph = fallback;
+                break;
+            }
+            fallback += 4;
+        }
+        if (fallbackCount == 0) {
+            return;
+        }
+    }
+
+    unsigned char* glyphInfo = reinterpret_cast<unsigned char*>(glyph) + ((renderFlags & 0x80) ? 5 : 3);
+
+    unsigned int texX;
+    unsigned int texY;
+    unsigned int drawWidth;
+    unsigned int glyphIndex = static_cast<unsigned int>(*glyph);
+    unsigned int row = glyphIndex / m_glyphColumns;
+
+    if ((renderFlags & 0x10) != 0) {
+        drawWidth = m_glyphWidth;
+        texX = drawWidth * (glyphIndex - row * m_glyphColumns);
+        texY = m_glyphHeight * row;
+    } else {
+        drawWidth = glyphInfo[1];
+        texX = static_cast<unsigned int>(glyphInfo[0]) + m_glyphWidth * (glyphIndex - row * m_glyphColumns);
+        texY = m_glyphHeight * row;
+    }
+
+    float x0 = posX;
+    float y0 = posY;
+    if ((renderFlags & 0x08) != 0) {
+        x0 = floorf(x0);
+        y0 = floorf(y0);
+    }
+
+    float advance = scaleX * (static_cast<float>(drawWidth) + margin);
+    if ((renderFlags & 0x08) != 0) {
+        advance = floorf(advance);
+    }
+    posX += advance;
+
+    unsigned short u0 = static_cast<unsigned short>(texX * 2);
+    if (glyphInfo[0] == 0) {
+        u0 = static_cast<unsigned short>(u0 + 1);
+    }
+
+    unsigned short u1 = static_cast<unsigned short>((texX + drawWidth) * 2);
+    if (m_glyphWidth == static_cast<unsigned short>(glyphInfo[0] + glyphInfo[1])) {
+        u1 = static_cast<unsigned short>(u1 - 1);
+    }
+
+    unsigned short v0 = static_cast<unsigned short>(texY * 2 + 1);
+    unsigned short v1 = static_cast<unsigned short>((texY + m_glyphHeight) * 2 - 1);
+
+    float x1 = x0 + static_cast<float>(drawWidth) * scaleX;
+    float y1 = y0 + static_cast<float>(m_glyphHeight) * scaleY;
+
+    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+    GXPosition3f32(x0, y0, posZ);
+    GXTexCoord2u16(u0, v0);
+
+    GXPosition3f32(x1, y0, posZ);
+    GXTexCoord2u16(u1, v0);
+
+    GXPosition3f32(x1, y1, posZ);
+    GXTexCoord2u16(u1, v1);
+
+    GXPosition3f32(x0, y1, posZ);
+    GXTexCoord2u16(u0, v1);
 }
 
 /*

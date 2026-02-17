@@ -19,7 +19,7 @@ public:
     unsigned int CmdClose0();
     void GetCmdItem();
     void ChkCmdActive(int);
-    void ChkUnite(int, int (*)[2]);
+    int ChkUnite(int, int (*)[2]);
     void CmdUnite(int, int);
     void CmdDismantle(int);
     void DrawUniteList();

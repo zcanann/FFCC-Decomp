@@ -190,7 +190,7 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
             U16At(anim, 0xA) = chunkFile.Get2();
             U16At(anim, 0xC) = chunkFile.Get2();
             U16At(anim, 0x10) = U16At(anim, 0xC);
-            S32At(anim, 0x1C) = static_cast<int>(static_cast<float>(static_cast<short>(chunkFile.Get2())));
+            F32At(anim, 0x1C) = static_cast<float>(static_cast<short>(chunkFile.Get2()));
             U16At(anim, 0xE) = 0;
             F32At(anim, 0x18) = chunkFile.GetF4();
             U8At(anim, 0x14) = chunkFile.Get1();

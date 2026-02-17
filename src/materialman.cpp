@@ -12,6 +12,7 @@ extern "C" void __ct__4CRefFv(void*);
 extern "C" void __ct__10CTexScrollFv(void*);
 extern "C" void __dt__10CTexScrollFv(void*, int);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
+extern "C" int CheckName__8CTextureFPc(CTexture*, char*);
 extern "C" void* __vt__9CMaterial[];
 extern CMemory Memory;
 extern unsigned char MaterialMan[];
@@ -817,6 +818,73 @@ void CMaterialSet::CacheDumpTexture(int materialIndex, CAmemCacheSet* amemCacheS
             texture->CacheUnLoadTexture(amemCacheSet);
         }
         material += 4;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003c7a0
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMaterialSet::CacheLoadTexture(int materialIndex, CAmemCacheSet* amemCacheSet)
+{
+    int material = reinterpret_cast<int>(
+        (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8)))[static_cast<unsigned long>(materialIndex)]);
+    if (material == 0) {
+        return;
+    }
+
+    int numTexture = static_cast<int>(*reinterpret_cast<unsigned short*>(Ptr(reinterpret_cast<void*>(material), 0x18)));
+    for (int i = 0; i < numTexture; i++) {
+        CTexture* texture = *reinterpret_cast<CTexture**>(Ptr(reinterpret_cast<void*>(material), 0x3C));
+        if (texture != 0) {
+            texture->CacheLoadTexture(amemCacheSet);
+        }
+        material += 4;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003c824
+ * PAL Size: 172b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+unsigned short CMaterialSet::FindTexName(char* textureName, long* textureIndexOut)
+{
+    unsigned long materialIndex = 0;
+
+    while (true) {
+        if (UnkMaterialSetGetter(Ptr(this, 8)) <= materialIndex) {
+            return 0xFFFF;
+        }
+
+        int material = reinterpret_cast<int>(
+            (*reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8)))[materialIndex]);
+        if (material != 0) {
+            int numTexture = static_cast<int>(*reinterpret_cast<unsigned short*>(Ptr(reinterpret_cast<void*>(material), 0x18)));
+            int slot = 0;
+
+            while (slot < numTexture) {
+                if (CheckName__8CTextureFPc(*reinterpret_cast<CTexture**>(Ptr(reinterpret_cast<void*>(material), 0x3C)),
+                                            textureName)) {
+                    if (textureIndexOut != 0) {
+                        *textureIndexOut = slot;
+                    }
+                    return static_cast<unsigned short>(materialIndex);
+                }
+                slot++;
+                material += 4;
+            }
+        }
+        materialIndex++;
     }
 }
 

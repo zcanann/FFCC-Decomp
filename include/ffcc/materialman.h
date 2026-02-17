@@ -116,7 +116,7 @@ public:
     void Create(CChunkFile&, CTextureSet*, CMaterialMan::TEV_BIT, CLightPcs::CBumpLight*);
     void SetTextureSet(CTextureSet*);
     void Calc();
-    void FindTexName(char*, long*);
+    unsigned short FindTexName(char*, long*);
     void CacheLoadTexture(int, CAmemCacheSet*);
     void CacheUnLoadTexture(int, CAmemCacheSet*);
     void CacheRefCnt0UpTexture(int, CAmemCacheSet*);

@@ -345,10 +345,12 @@ void GXSetCopyClear(GXColor clear_clr, u32 clear_z) {
 
     regA = clear_clr.r;
     regA = (regA & ~0xFF00) | ((u32)clear_clr.a << 8);
+    regA &= 0xFFFF;
     GX_WRITE_RAS_REG(regA | 0x4F000000);
 
     regGB = clear_clr.b;
     regGB = (regGB & ~0xFF00) | ((u32)clear_clr.g << 8);
+    regGB &= 0xFFFF;
     GX_WRITE_RAS_REG(regGB | 0x50000000);
 
     GX_WRITE_RAS_REG((clear_z & 0xFFFFFF) | 0x51000000);

@@ -146,12 +146,27 @@ void CMapPcs::LoadMap(int, int, void*, unsigned long, unsigned char)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80035980
+ * PAL Size: 260b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapPcs::IsLoadMapCompleted()
+int CMapPcs::IsLoadMapCompleted()
 {
-	// TODO
+    int* busy = reinterpret_cast<int*>(reinterpret_cast<char*>(&MapMng) + 0x22A2C);
+
+    for (int i = 0; i < 3; i++) {
+        if (busy[0] != 0 || busy[1] != 0 || busy[2] != 0 || busy[3] != 0 ||
+            busy[4] != 0 || busy[5] != 0 || busy[6] != 0 || busy[7] != 0) {
+            return 0;
+        }
+
+        busy += 7;
+    }
+
+    return 1;
 }
 
 /*

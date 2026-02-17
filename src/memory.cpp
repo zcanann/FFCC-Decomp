@@ -1,6 +1,9 @@
 #include "ffcc/memory.h"
+#include "ffcc/sound.h"
+#include "ffcc/stopwatch.h"
 #include "ffcc/system.h"
 #include "dolphin/os/OSMemory.h"
+#include <string.h>
 
 static char s_memory_cpp[] = "memory.cpp";
 extern void* PTR_PTR_s_CMemory_801e8488;
@@ -9,6 +12,29 @@ extern char DAT_801d6648[];
 extern char DAT_801d6a7c[];
 extern char DAT_801d6c58[];
 extern "C" void Printf__7CSystemFPce(CSystem* system, char* format, ...);
+extern "C" int DMAEntry__9CRedSoundFiiiiiPFPv_vPv(
+    void*, int, int, int, int, int, void (*)(void*), void*);
+extern "C" int DMACheck__9CRedSoundFi(void*, int);
+
+static int calcCacheChecksum(const unsigned char* data, unsigned int size)
+{
+    int checksum = 0x12345678;
+    unsigned int blockCount = size >> 3;
+    while (blockCount != 0) {
+        checksum += data[0] + data[1] + data[2] + data[3] + data[4] + data[5] + data[6] + data[7];
+        data += 8;
+        blockCount--;
+    }
+
+    unsigned int remain = size & 7;
+    while (remain != 0) {
+        checksum += *data;
+        data++;
+        remain--;
+    }
+
+    return checksum;
+}
 
 static int stageGetAllocationMode(CMemory::CStage* stage)
 {
@@ -730,12 +756,79 @@ void CAmemCacheSet::GetData(short, char*, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001CED0
+ * PAL Size: 936b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CAmemCacheSet::SetData(void*, int, CAmemCache::TYPE, int)
+int CAmemCacheSet::SetData(void* src, int size, CAmemCache::TYPE type, int dmaCopy)
 {
-	// TODO
+    unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
+    short index = -1;
+    short i = 0;
+    int cacheCount = *reinterpret_cast<int*>(bytes + 0x3C);
+    int tableBase = *reinterpret_cast<int*>(bytes + 0x58);
+
+    while (i < cacheCount) {
+        unsigned char* entry = reinterpret_cast<unsigned char*>(tableBase + i * 0x1C);
+        if (entry[0x0E] == 0) {
+            index = i;
+            break;
+        }
+        i++;
+    }
+
+    if (index == -1) {
+        return -1;
+    }
+
+    unsigned char* entry = reinterpret_cast<unsigned char*>(tableBase + index * 0x1C);
+    unsigned int allocSize = static_cast<unsigned int>(size + 0x1F) & ~0x1F;
+    entry[0x0E] = 1;
+    entry[0x0F] = static_cast<unsigned char>(type);
+    entry[0x1A] = static_cast<char>(dmaCopy);
+    *reinterpret_cast<short*>(entry + 0x0C) = 0;
+
+    if (dmaCopy == 0) {
+        CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(bytes + 0x00);
+        int allocated = 0;
+        do {
+            allocated = reinterpret_cast<int>(stage->alloc(allocSize, s_memory_cpp, 0x807, 1));
+            *reinterpret_cast<int*>(entry + 0x04) = allocated;
+            if (allocated == 0) {
+                AmemFreeLowPrio(allocSize);
+            }
+        } while (allocated == 0);
+    } else {
+        *reinterpret_cast<int*>(bytes + 0x34) = *reinterpret_cast<int*>(bytes + 0x30);
+        *reinterpret_cast<int*>(bytes + 0x30) += allocSize;
+        *reinterpret_cast<int*>(entry + 0x04) = *reinterpret_cast<int*>(bytes + 0x34);
+    }
+
+    *reinterpret_cast<int*>(entry + 0x00) = 0;
+    *reinterpret_cast<unsigned int*>(entry + 0x08) = allocSize;
+    *reinterpret_cast<int*>(entry + 0x14) = calcCacheChecksum(reinterpret_cast<unsigned char*>(src), allocSize);
+
+    if (entry[0x1A] == 0) {
+        memcpy(reinterpret_cast<void*>(*reinterpret_cast<int*>(entry + 0x04)), src, *reinterpret_cast<int*>(entry + 0x08));
+        DCFlushRange(reinterpret_cast<void*>(*reinterpret_cast<int*>(entry + 0x04)), allocSize);
+    } else {
+        int dmaId = DMAEntry__9CRedSoundFiiiiiPFPv_vPv(
+            &Sound, 0, 0, reinterpret_cast<int>(src), *reinterpret_cast<int*>(entry + 0x04), *reinterpret_cast<int*>(entry + 0x08), 0,
+            0);
+
+        CStopWatch watch((char*)-1);
+        watch.Start();
+        while (DMACheck__9CRedSoundFi(&Sound, dmaId) != 0) {
+            watch.Stop();
+            watch.Get();
+            watch.Start();
+        }
+    }
+
+    return index;
 }
 
 /*

@@ -78,29 +78,22 @@ void GXAdjustForOverscan(const GXRenderModeObj* rmin, GXRenderModeObj* rmout, u1
     u16 hor2 = hor * 2;
     u16 ver2 = ver * 2;
     u32 verf;
-    u32 mode;
 
     if (rmin != rmout) {
         *rmout = *rmin;
     }
 
-    mode = rmin->viTVmode & 3;
     rmout->fbWidth = rmin->fbWidth - hor2;
     verf = (ver2 * rmin->efbHeight) / (u32)rmin->xfbHeight;
     rmout->efbHeight = rmin->efbHeight - verf;
-    if (rmin->xFBmode == VI_XFBMODE_SF && mode == 0) {
-        rmout->xfbHeight = rmin->xfbHeight - ver2 / 2;
+    if (rmin->xFBmode == VI_XFBMODE_SF && (rmin->viTVmode & 2) != 2) {
+        rmout->xfbHeight = rmin->xfbHeight - ver;
     } else {
         rmout->xfbHeight = rmin->xfbHeight - ver2;
     }
 
     rmout->viWidth = rmin->viWidth - hor2;
-
-    if (mode == 1) {
-        rmout->viHeight = rmin->viHeight - (ver2 * 2);
-    } else {
-        rmout->viHeight = rmin->viHeight - ver2;
-    }
+    rmout->viHeight = rmin->viHeight - ver2;
  
     rmout->viXOrigin = rmin->viXOrigin + hor;
     rmout->viYOrigin = rmin->viYOrigin + ver;

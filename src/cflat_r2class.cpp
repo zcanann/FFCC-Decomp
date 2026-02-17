@@ -80,6 +80,108 @@ void CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int co
 			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, static_cast<int>(engineObject->m_bgColMask));
 			outResult = 0;
 			break;
+		case -0x93: {
+			Vec moveTarget;
+			moveTarget.x = static_cast<float>(localBase[0]);
+			moveTarget.y = static_cast<float>(localBase[1]);
+			moveTarget.z = static_cast<float>(localBase[2]);
+			engineObject->Move(&moveTarget, static_cast<float>(localBase[3]), static_cast<int>(localBase[4]), 1, 0, 1, 0);
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		}
+		case -0x92:
+			engineObject->PutDropItem();
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x90:
+			engineObject->m_lookAtAccumYaw = static_cast<float>(localBase[0]);
+			engineObject->m_lookAtAccumPitch = static_cast<float>(localBase[1]);
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x8B:
+			engineObject->m_moveModePrevious = static_cast<unsigned char>(localBase[0]);
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x89: {
+			Vec moveTarget;
+			moveTarget.x = static_cast<float>(localBase[0]);
+			moveTarget.y = static_cast<float>(localBase[1]);
+			moveTarget.z = static_cast<float>(localBase[2]);
+			engineObject->Move(&moveTarget, static_cast<float>(localBase[3]), static_cast<int>(localBase[4]), 1, 1, 1, 1);
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		}
+		case -0x88: {
+			Vec nearPos;
+			engineObject->CalcSphereNearPos(static_cast<float>(localBase[0]), static_cast<float>(localBase[1]), nearPos);
+			*reinterpret_cast<unsigned int*>(localBase[2]) = *reinterpret_cast<unsigned int*>(&nearPos.x);
+			*reinterpret_cast<unsigned int*>(localBase[3]) = *reinterpret_cast<unsigned int*>(&nearPos.y);
+			*reinterpret_cast<unsigned int*>(localBase[4]) = *reinterpret_cast<unsigned int*>(&nearPos.z);
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		}
+		case -0x7D:
+			if (localBase[0] == 1) {
+				engineObject->m_bodyEllipsoidAspect = static_cast<float>(localBase[1]);
+			}
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x7A:
+			engineObject->PlayAnim(
+			    static_cast<int>(localBase[0]), 1, 0, static_cast<short>(localBase[1]), static_cast<short>(localBase[2]), 0);
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x78:
+			engineObject->PlayAnim(
+			    static_cast<int>(localBase[0]), 0, 0, static_cast<short>(localBase[1]), static_cast<short>(localBase[2]), 0);
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x72:
+			engineObject->SetDispItemName(static_cast<signed char>(localBase[0]));
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x71:
+			engineObject->m_jumpLandingDampening = static_cast<float>(localBase[0]);
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x70:
+			engineObject->m_stateFlags0 =
+			    static_cast<unsigned char>((static_cast<signed char>(localBase[0]) << 4) & 0x10) |
+			    (engineObject->m_stateFlags0 & 0xEF);
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x6F:
+			engineObject->m_moveOffset.x = static_cast<float>(localBase[0]);
+			engineObject->m_moveOffset.y = static_cast<float>(localBase[1]);
+			engineObject->m_moveOffset.z = static_cast<float>(localBase[0]);
+			engineObject->m_bounceFactor = static_cast<float>(localBase[2]);
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x6E:
+			*reinterpret_cast<unsigned int*>(engineObject->m_lastBgAttr) = localBase[0];
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
+		case -0x6D:
+		case -0x6C:
+		case -0x6A:
+		case -0x63:
+			push__12CFlatRuntimeFPQ212CFlatRuntime7CObjecti(this, object, 0);
+			outResult = 0;
+			break;
 		case -0x9A:
 			engineObject->PlayAnim(
 			    static_cast<int>(localBase[0]), 1, 1, static_cast<short>(localBase[1]), static_cast<short>(localBase[2]), 0);

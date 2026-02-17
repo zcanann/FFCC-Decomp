@@ -154,18 +154,18 @@ extern "C" void pppConstruct2YmLaser(void* pppYmLaser_, void* param_2_)
 	pppYmLaser* pppYmLaser = (struct pppYmLaser*)pppYmLaser_;
 	YmLaserParam* param_2 = (YmLaserParam*)param_2_;
 	f32 one = FLOAT_80330dc0;
-	s32 dataOffset = param_2->offsets->m_serializedDataOffsets[2];
+	f32* work = (f32*)((u8*)pppYmLaser + 0x80 + param_2->offsets->m_serializedDataOffsets[2]);
 
-	*(f32*)((u8*)&pppYmLaser->field_0x98 + dataOffset) = one;
-	*(f32*)((u8*)&pppYmLaser->field_0x94 + dataOffset) = one;
-	*(f32*)((u8*)&pppYmLaser->field_0x90 + dataOffset) = one;
-	*(f32*)((u8*)&pppYmLaser->field_0x8c + dataOffset) = one;
-	*(f32*)((u8*)&pppYmLaser->field_0x88 + dataOffset) = one;
-	*(f32*)((u8*)&pppYmLaser->field_0x84 + dataOffset) = one;
-	*(f32*)((u8*)&pppYmLaser->field_0xa8 + dataOffset) = one;
-	*(f32*)((u8*)&pppYmLaser->field_0xa4 + dataOffset) = one;
-	*(f32*)((u8*)&pppYmLaser->field_0xa0 + dataOffset) = one;
-	*((u8*)&pppYmLaser->field_0xac + dataOffset) = 0;
+	work[6] = one;
+	work[5] = one;
+	work[4] = one;
+	work[3] = one;
+	work[2] = one;
+	work[1] = one;
+	work[10] = one;
+	work[9] = one;
+	work[8] = one;
+	*((u8*)work + 0x2c) = 0;
 }
 
 /*
@@ -410,32 +410,32 @@ extern "C" void pppRenderYmLaser(void* pppYmLaser, void* param_2, void* param_3)
 	GXLoadPosMtxImm(mtxOut.value, 0);
 
 	GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-	GXPosition3f32(-halfWidth, 0.0f, 0.0f);
+	GXPosition3f32(-halfWidth, FLOAT_80330dc0, FLOAT_80330dc0);
 	GXColor1u32(color);
-	GXTexCoord2f32(0.0f, 0.0f);
-	GXPosition3f32(-halfWidth, 0.0f, length);
+	GXTexCoord2f32(FLOAT_80330dc0, FLOAT_80330dc0);
+	GXPosition3f32(-halfWidth, FLOAT_80330dc0, length);
 	GXColor1u32(color);
-	GXTexCoord2f32(0.0f, work[0]);
-	GXPosition3f32(halfWidth, 0.0f, 0.0f);
+	GXTexCoord2f32(FLOAT_80330dc0, work[0]);
+	GXPosition3f32(halfWidth, FLOAT_80330dc0, FLOAT_80330dc0);
 	GXColor1u32(color);
-	GXTexCoord2f32(1.0f, 0.0f);
-	GXPosition3f32(halfWidth, 0.0f, length);
+	GXTexCoord2f32(FLOAT_80330de0, FLOAT_80330dc0);
+	GXPosition3f32(halfWidth, FLOAT_80330dc0, length);
 	GXColor1u32(color);
-	GXTexCoord2f32(1.0f, work[0]);
+	GXTexCoord2f32(FLOAT_80330de0, work[0]);
 
 	GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-	GXPosition3f32(0.0f, -halfWidth, 0.0f);
+	GXPosition3f32(FLOAT_80330dc0, -halfWidth, FLOAT_80330dc0);
 	GXColor1u32(color);
-	GXTexCoord2f32(0.0f, 0.0f);
-	GXPosition3f32(0.0f, -halfWidth, length);
+	GXTexCoord2f32(FLOAT_80330dc0, FLOAT_80330dc0);
+	GXPosition3f32(FLOAT_80330dc0, -halfWidth, length);
 	GXColor1u32(color);
-	GXTexCoord2f32(0.0f, work[0]);
-	GXPosition3f32(0.0f, halfWidth, 0.0f);
+	GXTexCoord2f32(FLOAT_80330dc0, work[0]);
+	GXPosition3f32(FLOAT_80330dc0, halfWidth, FLOAT_80330dc0);
 	GXColor1u32(color);
-	GXTexCoord2f32(1.0f, 0.0f);
-	GXPosition3f32(0.0f, halfWidth, length);
+	GXTexCoord2f32(FLOAT_80330de0, FLOAT_80330dc0);
+	GXPosition3f32(FLOAT_80330dc0, halfWidth, length);
 	GXColor1u32(color);
-	GXTexCoord2f32(1.0f, work[0]);
+	GXTexCoord2f32(FLOAT_80330de0, work[0]);
 
 	if (step->m_stepValue != 0) {
 		long* shape = *(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + (u32)step->m_stepValue * 4);
@@ -457,7 +457,7 @@ extern "C" void pppRenderYmLaser(void* pppYmLaser, void* param_2, void* param_3)
 
 		count = (u32)step->m_payload[0x1e];
 		if (count > 1) {
-			uvStep = 1.0f / ((float)count - 1.0f);
+			uvStep = FLOAT_80330de0 / ((float)(double)count - (float)DOUBLE_80330dd8);
 			if (step->m_initWOrk == 0xFFFF) {
 				_GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
 				_GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
@@ -483,15 +483,15 @@ extern "C" void pppRenderYmLaser(void* pppYmLaser, void* param_2, void* param_3)
 
 				GXPosition3f32(work[8], work[9], work[10]);
 				GXColor1u32(color0);
-				GXTexCoord2f32(u0, 1.0f);
+				GXTexCoord2f32(u0, FLOAT_80330de0);
 
 				GXPosition3f32(points[i].x, points[i].y, points[i].z);
 				GXColor1u32(color0);
-				GXTexCoord2f32(u0, 0.0f);
+				GXTexCoord2f32(u0, FLOAT_80330dc0);
 
 				GXPosition3f32(points[i + 1].x, points[i + 1].y, points[i + 1].z);
 				GXColor1u32(color1);
-				GXTexCoord2f32(u1, 0.0f);
+				GXTexCoord2f32(u1, FLOAT_80330dc0);
 			}
 		}
 
@@ -545,7 +545,7 @@ extern "C" void pppRenderYmLaser(void* pppYmLaser, void* param_2, void* param_3)
 			PSMTXConcat(ppvCameraMatrix0, tempMtx, tempMtx);
 			shapePos.x = FLOAT_80330dc0;
 			shapePos.y = FLOAT_80330dc0;
-			shapePos.z = 1.0f;
+			shapePos.z = FLOAT_80330de0;
 			PSMTXMultVec(tempMtx, &shapePos, &shapePos);
 			tempMtx[0][3] = shapePos.x;
 			tempMtx[1][3] = shapePos.y;

@@ -180,19 +180,17 @@ extern "C" unsigned char* GetTmpFrameBuffer__8CGraphicFv(CGraphic* graphic)
  */
 int CMiniGamePcs::GetMiniGameParam(int id)
 {
-    if (id == 0x2002) {
+    switch (id) {
+    case 0x2000:
+        return *(signed char*)((char*)this + 0x6498);
+    case 0x2001:
+        return *(signed char*)((char*)this + 0x6499);
+    case 0x2002:
         return *(signed char*)((char*)this + 0x649A);
-    }
-    if (id < 0x2002) {
-        if (id == 0x2000) {
-            return *(signed char*)((char*)this + 0x6498);
-        }
-        if (id > 0x1FFF) {
-            return *(signed char*)((char*)this + 0x6499);
-        }
-    } else if (id < 0x2004) {
+    case 0x2003:
         return *(signed char*)((char*)this + 0x649B);
     }
+
     return 0;
 }
 

@@ -50,8 +50,10 @@ extern "C" {
  */
 void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* param_3, int meshIdx, int displayListIdx, float (*) [4])
 {
-	char flag = *(char*)((char*)param_3 + 0x14);
-	if (flag == 0) {
+	char* mesh = (char*)model + 0xac + meshIdx * 0x14;
+	void* displayList = (char*)(*(void**)(*(int*)(mesh + 8) + 0x50)) + displayListIdx * 0xc;
+
+	if (*(char*)((char*)param_3 + 0x14) == 0) {
 		*(int*)(MaterialMan + 0xd0) = (int)param_2 + 0x1c + 0x28;
 		*(int*)(MaterialMan + 0x44) = -1;
 		*(char*)(MaterialMan + 0x4c) = (char)0xff;
@@ -70,19 +72,12 @@ void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* pa
 		*(int*)(MaterialMan + 0x40) = 0xade0f;
 	}
 
-	char* meshes = (char*)model + 0xac;
-	void* meshData = *(void**)(meshes + meshIdx * 0x14 + 8);
-	void* displayLists = *(void**)((char*)meshData + 0x50);
-	void* displayList = (char*)displayLists + displayListIdx * 0xc;
-	void* modelData = *(void**)((char*)model + 0xa4);
-	void* materialSet = *(void**)((char*)modelData + 0x24);
-	unsigned short material = *(unsigned short*)((char*)displayList + 8);
+	void* materialSet = *(void**)(*(int*)((char*)model + 0xa4) + 0x24);
+	unsigned int material = *(unsigned short*)((char*)displayList + 8);
 	SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(MaterialMan, materialSet, material, 0, 0);
 
-	if (flag == 1 || flag == 0) {
-		void* data = *(void**)displayList;
-		unsigned int size = *(unsigned int*)((char*)displayList + 4);
-		GXCallDisplayList(data, size);
+	if ((*(char*)((char*)param_3 + 0x14) == 1) || (*(char*)((char*)param_3 + 0x14) == 0)) {
+		GXCallDisplayList(*(void**)displayList, *(unsigned int*)((char*)displayList + 4));
 	}
 }
 

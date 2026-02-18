@@ -1838,12 +1838,102 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 80054c58
+ * PAL Size: 304b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppCalcPartStd(_pppMngSt*)
+void pppCalcPartStd(_pppMngSt* pppMngSt)
 {
-	// TODO
+	struct pppSubProgEntryRaw
+	{
+		pppProg* m_prog;
+		u32 m_initWork;
+		u32 m_unk8;
+		u32 m_unkC;
+	};
+
+	struct pppProgramSetDefRaw
+	{
+		u8 m_pad0[0x20];
+		s32 m_objOffsets;
+		u8 m_pad1[0x26 - 0x24];
+		s16 m_numStages;
+		pppSubProgEntryRaw m_subProgEntries[1];
+	};
+
+	struct pppPDataValRaw
+	{
+		pppProgramSetDefRaw* m_programSetDef;
+		s32 m_nextSpawnTime;
+		_pppPObjLink* m_objHead;
+		s16 m_activeCount;
+		u8 m_index;
+		u8 m_pad;
+	};
+
+	struct pppMngStCalcRaw
+	{
+		u8 m_pad0[0xB8];
+		s32 m_numPrograms;
+		u8 m_pad1[0xC8 - 0xBC];
+		pppPDataValRaw* m_pppPDataVals;
+		u8 m_pad2[0xFA - 0xCC];
+		s16 m_prioTime;
+	};
+
+	pppMngStCalcRaw* mngRaw = (pppMngStCalcRaw*)pppMngSt;
+	s32 pDataValOffset = 0;
+
+	for (s32 i = 0; i < mngRaw->m_numPrograms; i++)
+	{
+		pppPDataValRaw* pDataVal = (pppPDataValRaw*)(((u8*)mngRaw->m_pppPDataVals) + pDataValOffset);
+		if (pDataVal != 0 && pDataVal->m_programSetDef != 0)
+		{
+			pppProgramSetDefRaw* programSet = pDataVal->m_programSetDef;
+			s16 activeCount = pDataVal->m_activeCount;
+			DAT_8032ed7c += (u16)activeCount;
+			if (activeCount != 0)
+			{
+				s32 stageWorkOffset = 0;
+				pppSubProgEntryRaw* subProg = programSet->m_subProgEntries;
+				for (s16 stage = 0; stage < programSet->m_numStages; stage++)
+				{
+					if (subProg->m_prog != 0)
+					{
+						void (*opFn)(_pppPObjLink*, u32, pppSubProgEntryRaw*) =
+							(void (*)(_pppPObjLink*, u32, pppSubProgEntryRaw*))subProg->m_prog->m_pppFunctionOperation;
+						if (opFn != 0)
+						{
+							u16 remaining = (u16)activeCount;
+							_pppPObjLink* obj = pDataVal->m_objHead;
+							while (remaining != 0)
+							{
+								_pppPObjLink* next = obj->m_next;
+								if (((u8*)obj)[0x7C] == 0)
+								{
+									opFn(obj, *(u32*)(((u8*)obj) + programSet->m_objOffsets + stageWorkOffset), subProg);
+								}
+								obj = next;
+								remaining--;
+							}
+						}
+					}
+
+					subProg++;
+					stageWorkOffset += 4;
+				}
+			}
+		}
+		pDataValOffset += 0x10;
+	}
+
+	if (mngRaw->m_prioTime != -1)
+	{
+		mngRaw->m_prioTime++;
+	}
 }
 
 /*

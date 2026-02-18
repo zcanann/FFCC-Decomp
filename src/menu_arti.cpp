@@ -58,6 +58,12 @@ struct ArtiFlatData
 	ArtiFlatTableEntry table[8];
 };
 
+static inline double IntToF64(unsigned int value)
+{
+	unsigned long long bits = ((unsigned long long)0x43300000 << 32) | (unsigned long long)(value ^ 0x80000000);
+	return (double)bits - DOUBLE_80332fe0;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80160c34
@@ -425,58 +431,51 @@ int CMenuPcs::ArtiCtrl()
 unsigned int CMenuPcs::ArtiClose()
 {
 	float fVar1;
-	double dVar2;
-	double dVar3;
+	float fVar2;
+	int iVar3;
 	int iVar4;
 	short* psVar5;
 	int iVar6;
 	int iVar7;
-	int iVar8;
 
-	iVar4 = 0;
+	iVar3 = 0;
 	*(short*)(*(int*)((char*)this + 0x82c) + 0x22) = *(short*)(*(int*)((char*)this + 0x82c) + 0x22) + 1;
-	iVar6 = (int)**(short**)((char*)this + 0x850);
+	iVar4 = (int)**(short**)((char*)this + 0x850);
 	psVar5 = *(short**)((char*)this + 0x850) + 4;
-	iVar7 = (int)*(short*)(*(int*)((char*)this + 0x82c) + 0x22);
-	if (0 < iVar6) {
-		for (iVar8 = iVar6; iVar8 != 0; iVar8 = iVar8 - 1) {
-			dVar3 = DOUBLE_80332fe0;
-			fVar1 = FLOAT_80332fa8;
-			if (*(int*)(psVar5 + 0x12) <= iVar7) {
-				if (iVar7 < *(int*)(psVar5 + 0x12) + *(int*)(psVar5 + 0x14)) {
-					*(int*)(psVar5 + 0x10) = *(int*)(psVar5 + 0x10) + 1;
-					dVar2 = DOUBLE_80332fb0;
-					*(float*)(psVar5 + 8) =
-					    (float)-((DOUBLE_80332fb0 /
-					              ((double)(((unsigned int)*(unsigned int*)(psVar5 + 0x14) ^ 0x80000000U) | 0x4330000000000000ULL) - dVar3)) *
-					             ((double)(((unsigned int)*(unsigned int*)(psVar5 + 0x10) ^ 0x80000000U) | 0x4330000000000000ULL) - dVar3) -
-					             DOUBLE_80332fb0);
-					if ((*(unsigned int*)(psVar5 + 0x16) & 2) == 0) {
-						fVar1 = (float)-((dVar2 /
-						                  ((double)(((unsigned int)*(unsigned int*)(psVar5 + 0x14) ^ 0x80000000U) | 0x4330000000000000ULL) - dVar3)) *
-						                 ((double)(((unsigned int)*(unsigned int*)(psVar5 + 0x10) ^ 0x80000000U) | 0x4330000000000000ULL) - dVar3) -
-						                 dVar2);
-						*(float*)(psVar5 + 0x18) =
-						    (*(float*)(psVar5 + 0x1c) -
-						     (float)((double)(((unsigned int)(int)*psVar5 ^ 0x80000000U) | 0x4330000000000000ULL) - dVar3)) *
-						    fVar1;
-						*(float*)(psVar5 + 0x1a) =
-						    (*(float*)(psVar5 + 0x1e) -
-						     (float)((double)(((unsigned int)(int)psVar5[1] ^ 0x80000000U) | 0x4330000000000000ULL) - dVar3)) *
-						    fVar1;
-					}
-				} else {
-					iVar4 = iVar4 + 1;
-					*(float*)(psVar5 + 8) = FLOAT_80332fa8;
-					*(float*)(psVar5 + 0x18) = fVar1;
-					*(float*)(psVar5 + 0x1a) = fVar1;
+	iVar6 = (int)*(short*)(*(int*)((char*)this + 0x82c) + 0x22);
+	for (iVar7 = 0; iVar7 < iVar4; iVar7 = iVar7 + 1) {
+		if (*(int*)(psVar5 + 0x12) <= iVar6) {
+			if (iVar6 < *(int*)(psVar5 + 0x12) + *(int*)(psVar5 + 0x14)) {
+				unsigned int uVar8 = (unsigned int)(*(int*)(psVar5 + 0x10) + 1);
+				unsigned int uVar9 = (unsigned int)*(int*)(psVar5 + 0x14);
+				double dVar10 = IntToF64(uVar8);
+				double dVar11 = IntToF64(uVar9);
+
+				*(int*)(psVar5 + 0x10) = (int)uVar8;
+				fVar1 = (float)(DOUBLE_80332fb0 - (DOUBLE_80332fb0 / dVar11) * dVar10);
+				*(float*)(psVar5 + 8) = fVar1;
+
+				if ((*(unsigned int*)(psVar5 + 0x16) & 2) == 0) {
+					fVar2 = (float)IntToF64((unsigned int)((int)*psVar5));
+					*(float*)(psVar5 + 0x18) = (*(float*)(psVar5 + 0x1c) - fVar2) * fVar1;
+					fVar2 = (float)IntToF64((unsigned int)((int)psVar5[1]));
+					*(float*)(psVar5 + 0x1a) = (*(float*)(psVar5 + 0x1e) - fVar2) * fVar1;
 				}
+			} else {
+				iVar3 = iVar3 + 1;
+				fVar1 = FLOAT_80332fa8;
+				*(float*)(psVar5 + 8) = fVar1;
+				*(float*)(psVar5 + 0x18) = fVar1;
+				*(float*)(psVar5 + 0x1a) = fVar1;
 			}
-			psVar5 = psVar5 + 0x20;
 		}
+		psVar5 = psVar5 + 0x20;
 	}
 
-	return (unsigned int)(iVar6 == iVar4);
+	if (iVar4 == iVar3) {
+		return 1;
+	}
+	return 0;
 }
 
 /*

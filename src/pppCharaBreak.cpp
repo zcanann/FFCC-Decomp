@@ -1,6 +1,7 @@
 #include "ffcc/pppCharaBreak.h"
 
 #include "ffcc/graphic.h"
+#include "ffcc/math.h"
 
 #include "dolphin/gx.h"
 #include "dolphin/mtx.h"
@@ -29,9 +30,13 @@ extern char s_pppCharaBreak_cpp_801dd690[];
 extern float FLOAT_80332048;
 extern float FLOAT_8033204c;
 extern float FLOAT_80332050;
+extern float FLOAT_80332058;
+extern float FLOAT_80332078;
+extern CMath Math;
 extern void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void* materialMan, void* materialSet,
                                                                         unsigned int materialIdx, int, int);
 extern "C" {
+int rand(void);
 void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
 int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
 void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
@@ -39,13 +44,31 @@ void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, cha
 void CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(void*, void*, void*, void*, unsigned long, unsigned long);
 void ReWriteDisplayList__5CUtilFPvUlUl(void*, void*, unsigned long, unsigned long);
 int GetNumPolygonFromDL__5CUtilFPvUl(void*, void*);
+int IsHasDrawFmtDL__5CUtilFUc(void*, unsigned char);
 void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, u8, u8, u8, u8, u8, u8, u8);
 void pppInitBlendMode__Fv(void);
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
+void ConvI2FVector__5CUtilFR3Vec6S16Vecl(void*, Vec*, S16Vec*, unsigned long);
+void ConvF2IVector__5CUtilFR6S16Vec3Vecl(void*, S16Vec*, Vec*, unsigned long);
+float RandF__5CMathFf(float, CMath*);
 }
+
+struct POLYGON_DATA {
+    u8 m_enabled;
+    u8 m_alpha;
+    u16 _pad2;
+    S16Vec m_normalA;
+    S16Vec m_normalB;
+    S16Vec m_pos0;
+    S16Vec m_pos1;
+    S16Vec m_pos2;
+    u16 m_posIndices[3];
+    u16 m_nrmIndices[3];
+    u16 m_texIndices[3];
+};
 
 /*
  * --INFO--
@@ -184,22 +207,178 @@ extern "C" u32 CharaBreak_BeforeCalcMatrixCallback__FPQ26CChara6CModelPvPv(u32 v
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80140CC8
+ * PAL Size: 592b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CreatePolygon(POLYGON_DATA*, void*, unsigned long, CChara::CModel*, CChara::CMesh*)
+void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, CChara::CModel* model, CChara::CMesh* mesh)
 {
-	// TODO
+    u8* stream = (u8*)displayList;
+    u8* meshData = *(u8**)((u8*)mesh + 8);
+    S16Vec* workPositions = *(S16Vec**)mesh;
+    u32 skinCount = *(u32*)(meshData + 0x54);
+    Mtx meshMtx;
+    bool isSkinned = skinCount != 0;
+
+    if (!isSkinned) {
+        u32 nodeIndex = *(u32*)(meshData + 0x58);
+        Mtx* nodeMtx = (Mtx*)((u8*)*(u8**)((u8*)model + 0xA8) + (nodeIndex * 0xC0) + 0xC);
+        PSMTXConcat(*(Mtx*)((u8*)model + 0x38), *nodeMtx, meshMtx);
+    }
+
+    for (;;) {
+        u8 drawCmd = *stream++;
+        u16 drawCount = *(u16*)stream;
+        stream += 2;
+        u8 primitive = drawCmd & 0xF8;
+
+        if (IsHasDrawFmtDL__5CUtilFUc((void*)DAT_8032ec70, drawCmd) == 0) {
+            break;
+        }
+
+        int triCount = drawCount - 2;
+        if (primitive == 0x90) {
+            triCount = drawCount / 3;
+        }
+
+        int outVertex = 0;
+        u8* stripRestart = 0;
+        while (triCount > 0) {
+            u16 posIndex = *(u16*)(stream + 0);
+            u16 nrmIndex = *(u16*)(stream + 2);
+            u16 texIndex = *(u16*)(stream + 6);
+            u8* prevStream = stream;
+            stream += ((drawCmd & 7) == 2) ? 10 : 8;
+
+            S16Vec* outPos = (S16Vec*)((u8*)polygonData + 0x10 + (outVertex * 6));
+            if (isSkinned) {
+                *outPos = workPositions[posIndex];
+            } else {
+                Vec worldPos;
+                S16Vec sourcePos;
+                sourcePos = workPositions[posIndex];
+                ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)DAT_8032ec70, &worldPos, &sourcePos,
+                                                    *(u32*)(*(u8**)((u8*)model + 0xA4) + 0x34));
+                PSMTXMultVec(meshMtx, &worldPos, &worldPos);
+                ConvF2IVector__5CUtilFR6S16Vec3Vecl((void*)DAT_8032ec70, outPos, &worldPos,
+                                                    *(u32*)(*(u8**)((u8*)model + 0xA4) + 0x34));
+            }
+
+            polygonData->m_posIndices[outVertex] = posIndex;
+            polygonData->m_nrmIndices[outVertex] = nrmIndex;
+            polygonData->m_texIndices[outVertex] = texIndex;
+
+            outVertex++;
+            if (primitive == 0x90) {
+                if (outVertex == 3) {
+                    outVertex = 0;
+                    triCount--;
+                    polygonData++;
+                }
+                continue;
+            }
+
+            if (primitive == 0x98) {
+                if (outVertex == 1) {
+                    stripRestart = prevStream;
+                    continue;
+                }
+                if (outVertex == 3) {
+                    outVertex = 0;
+                    triCount--;
+                    if ((triCount & 1) == 0 && stripRestart != NULL) {
+                        stream = stripRestart;
+                    }
+                    polygonData++;
+                }
+                continue;
+            }
+
+            break;
+        }
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8014099C
+ * PAL Size: 812b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void InitPolygonParameter(PCharaBreak*, VCharaBreak*, POLYGON_DATA*, unsigned long, CChara::CModel*, CChara::CMesh*)
+void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* polygonData, unsigned long polygonCount,
+                          CChara::CModel* model, CChara::CMesh* mesh)
 {
-	// TODO
+    u8* breakData = (u8*)charaBreak;
+    S16Vec* workNormals = *(S16Vec**)((u8*)mesh + 4);
+    u8* modelData = *(u8**)((u8*)model + 0xA4);
+    u32 normQuant = *(u32*)(modelData + 0x38);
+    Vec up;
+    up.x = FLOAT_80332048;
+    up.y = FLOAT_8033204c;
+    up.z = FLOAT_80332048;
+
+    for (u32 i = 0; i < polygonCount; i++) {
+        Vec normal;
+        Vec tangent;
+
+        int alpha = (int)breakData[0x34] + rand() % breakData[0x35];
+        if (alpha > 0xFF) {
+            alpha = 0xFF;
+        }
+
+        polygonData->m_alpha = (u8)alpha;
+        polygonData->m_enabled = 0;
+        polygonData->_pad2 = 0;
+
+        if (breakData[0x41] == 2) {
+            polygonData->m_enabled = 1;
+        }
+
+        if (*(u32*)(*(u8**)((u8*)mesh + 8) + 0x54) == 0) {
+            normal.x = RandF__5CMathFf(FLOAT_8033204c, &Math);
+            normal.y = RandF__5CMathFf(FLOAT_8033204c, &Math);
+            normal.z = RandF__5CMathFf(FLOAT_8033204c, &Math);
+            normal.x *= (rand() & 1) ? FLOAT_80332078 : FLOAT_8033204c;
+            normal.y *= (rand() & 1) ? FLOAT_80332078 : FLOAT_8033204c;
+            normal.z *= (rand() & 1) ? FLOAT_80332078 : FLOAT_8033204c;
+            PSVECNormalize(&normal, &normal);
+            ConvF2IVector__5CUtilFR6S16Vec3Vecl((void*)DAT_8032ec70, &polygonData->m_normalA, &normal, normQuant);
+        } else {
+            polygonData->m_normalA = workNormals[polygonData->m_nrmIndices[0]];
+            ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)DAT_8032ec70, &normal, &polygonData->m_normalA, normQuant);
+        }
+
+        PSVECCrossProduct(&up, &normal, &tangent);
+        float tangentMag = PSVECMag(&tangent);
+        if (tangentMag == FLOAT_80332048) {
+            tangent.x = FLOAT_80332048;
+            tangent.y = FLOAT_80332048;
+            tangent.z = FLOAT_80332048;
+        } else {
+            PSVECScale(&tangent, &tangent, FLOAT_8033204c / tangentMag);
+        }
+
+        if (tangent.x == FLOAT_80332048 && tangent.y == FLOAT_80332048 && tangent.z == FLOAT_80332048) {
+            tangent.x = FLOAT_8033204c;
+            tangent.y = FLOAT_80332048;
+            tangent.z = FLOAT_80332048;
+        }
+
+        if (breakData[0x40] == 1) {
+            polygonData->m_normalA.x = 0;
+            polygonData->m_normalA.y = (rand() & 1);
+            polygonData->m_normalA.z = 0;
+        }
+
+        ConvF2IVector__5CUtilFR6S16Vec3Vecl((void*)DAT_8032ec70, &polygonData->m_normalB, &tangent, normQuant);
+        polygonData++;
+    }
 }
 
 /*

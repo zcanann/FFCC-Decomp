@@ -6,7 +6,7 @@ class CMenuPcs
 public:
     void MLstInit();
     void MLstInit1();
-    void MLstOpen();
+    int MLstOpen();
     void MLstCtrl();
     void MLstClose();
     void MLstDraw();

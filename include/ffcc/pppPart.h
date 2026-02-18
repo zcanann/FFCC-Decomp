@@ -50,7 +50,7 @@ float pppVectorLength(Vec vec);
 void pppCreateHeap(_pppEnvSt* pppEnvSt, unsigned long param_2);
 void pppDestroyHeap(_pppEnvSt* pppEnvSt);
 void* pppMemAlloc(unsigned long, CMemory::CStage*, char*, int);
-void pppMemFree(void*);
+extern "C" void* pppMemFree__FPv(unsigned long, CMemory::CStage*, char*, int);
 void pppHeapUseRate(CMemory::CStage* stage);
 void pppHeapCheckLeak(CMemory::CStage* stage);
 unsigned long pppMngStHeapCheckLeak(CMemory::CStage* stage);

@@ -25,6 +25,13 @@ extern float FLOAT_8032faf0;
 extern float FLOAT_8032faf4;
 static const char s_materialStageName[] = "material";
 
+class CMapKeyFrame
+{
+public:
+    float Get();
+    void Calc();
+};
+
 namespace {
 template <class T>
 class CPtrArray
@@ -928,46 +935,46 @@ unsigned short CMaterialSet::FindTexName(char* textureName, long* textureIndexOu
 void CMaterialSet::Calc()
 {
     CPtrArray<CMaterial*>* materialArray = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
-    unsigned long materialCount = UnkMaterialSetGetter(materialArray);
+    unsigned long materialIndex = 0;
 
-    for (unsigned long materialIndex = 0; materialIndex < materialCount; materialIndex++) {
-        int material = reinterpret_cast<int>((*materialArray)[materialIndex]);
-        if (material == 0) {
-            continue;
+    while (materialIndex < static_cast<unsigned long>(materialArray->GetSize())) {
+        unsigned char* material = reinterpret_cast<unsigned char*>((*materialArray)[materialIndex]);
+        if (material != 0) {
+            unsigned char* texScroll = material + 0x4C;
+            for (int i = 0; i < 4; i++) {
+                if (texScroll[0] == 1) {
+                    float& offsetU = *reinterpret_cast<float*>(texScroll + 4);
+                    offsetU += *reinterpret_cast<float*>(texScroll + 0xC);
+                    if (offsetU > 1.0f) {
+                        offsetU -= 1.0f;
+                    } else if (offsetU < 0.0f) {
+                        offsetU += 1.0f;
+                    }
+                } else if (texScroll[0] == 2) {
+                    CMapKeyFrame* keyFrameU = *reinterpret_cast<CMapKeyFrame**>(texScroll + 0xC);
+                    *reinterpret_cast<float*>(texScroll + 4) = keyFrameU->Get();
+                    keyFrameU->Calc();
+                }
+
+                if (texScroll[1] == 1) {
+                    float& offsetV = *reinterpret_cast<float*>(texScroll + 8);
+                    offsetV += *reinterpret_cast<float*>(texScroll + 0x10);
+                    if (offsetV > 1.0f) {
+                        offsetV -= 1.0f;
+                    } else if (offsetV < 0.0f) {
+                        offsetV += 1.0f;
+                    }
+                } else if (texScroll[1] == 2) {
+                    CMapKeyFrame* keyFrameV = *reinterpret_cast<CMapKeyFrame**>(texScroll + 0x10);
+                    *reinterpret_cast<float*>(texScroll + 8) = keyFrameV->Get();
+                    keyFrameV->Calc();
+                }
+
+                texScroll += 0x14;
+            }
         }
 
-        unsigned char* texScroll = Ptr(reinterpret_cast<void*>(material), 0x4C);
-        for (int i = 0; i < 4; i++) {
-            if (*texScroll == 1) {
-                float& scrollValue = *reinterpret_cast<float*>(Ptr(texScroll, 4));
-                scrollValue += *reinterpret_cast<float*>(Ptr(texScroll, 0xC));
-                if (scrollValue > FLOAT_8032faf0) {
-                    scrollValue -= FLOAT_8032faf0;
-                } else if (scrollValue < FLOAT_8032faf4) {
-                    scrollValue += FLOAT_8032faf0;
-                }
-            } else if (*texScroll == 2) {
-                CMapKeyFrame* keyFrame = *reinterpret_cast<CMapKeyFrame**>(Ptr(texScroll, 0xC));
-                *reinterpret_cast<float*>(Ptr(texScroll, 4)) = Get__12CMapKeyFrameFv(keyFrame);
-                Calc__12CMapKeyFrameFv(keyFrame);
-            }
-
-            if (*Ptr(texScroll, 1) == 1) {
-                float& scrollValue = *reinterpret_cast<float*>(Ptr(texScroll, 8));
-                scrollValue += *reinterpret_cast<float*>(Ptr(texScroll, 0x10));
-                if (scrollValue > FLOAT_8032faf0) {
-                    scrollValue -= FLOAT_8032faf0;
-                } else if (scrollValue < FLOAT_8032faf4) {
-                    scrollValue += FLOAT_8032faf0;
-                }
-            } else if (*Ptr(texScroll, 1) == 2) {
-                CMapKeyFrame* keyFrame = *reinterpret_cast<CMapKeyFrame**>(Ptr(texScroll, 0x10));
-                *reinterpret_cast<float*>(Ptr(texScroll, 8)) = Get__12CMapKeyFrameFv(keyFrame);
-                Calc__12CMapKeyFrameFv(keyFrame);
-            }
-
-            texScroll += 0x14;
-        }
+        materialIndex++;
     }
 }
 

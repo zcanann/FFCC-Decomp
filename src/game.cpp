@@ -675,30 +675,41 @@ void CGame::CheckScriptChange()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80014e78
+ * PAL Size: 384b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGame::ChangeMap(int mapId, int mapVariant, int param4, int param5)
 {
-    bool hasParam = (param4 != 0);
+    u32 hasParamMask;
 
-    if (param5 == 0)
-    {
-        // LoadMap(&MapPcs, mapId, mapVariant, hasParam ? 0x800000 : 0, hasParam ? 0x580000 : 0, param4 & 0xFF);
-        // LoadFieldPdt(&PartPcs, mapId, mapVariant, hasParam ? 0xD80000 : 0, hasParam ? 0x80000 : 0, param4 & 0xFF);
-    }
-    else
-    {
-        // Graphic._WaitDrawDone(s_game_cpp_801d6190, 0x24e);
-        System.MapChanging(mapId, mapVariant);
+    if (param5 == 0) {
+        hasParamMask = (u32)((-param4 | param4) >> 31);
+        LoadMap__7CMapPcsFiiPvUlUc(
+            MapPcs, mapId, mapVariant, (void*)(hasParamMask & 0x800000), hasParamMask & 0x580000, param4 & 0xFF);
+
+        hasParamMask = (u32)((-param4 | param4) >> 31);
+        LoadFieldPdt__8CPartPcsFiiPvUlUc(
+            &PartPcs, mapId, mapVariant, (void*)(hasParamMask & 0xD80000), hasParamMask & 0x80000, (u8)param4);
+    } else {
+        _WaitDrawDone__8CGraphicFPci(&Graphic, s_game_cpp_801d6190, 0x24E);
+        MapChanging__7CSystemFii(&System, mapId, mapVariant);
 
         m_currentMapId = mapId;
+        hasParamMask = (u32)((-param4 | param4) >> 31);
         m_currentMapVariantId = mapVariant;
 
-        // LoadMap(&MapPcs, mapId, mapVariant, hasParam ? 0x800000 : 0, hasParam ? 0x580000 : 0, 0);
-        // LoadFieldPdt(&PartPcs, mapId, mapVariant, hasParam ? 0xD80000 : 0, hasParam ? 0x80000 : 0, 0);
+        LoadMap__7CMapPcsFiiPvUlUc(
+            MapPcs, mapId, mapVariant, (void*)(hasParamMask & 0x800000), hasParamMask & 0x580000, 0);
 
-        System.MapChanged(mapId, mapVariant, 1);
+        hasParamMask = (u32)((-param4 | param4) >> 31);
+        LoadFieldPdt__8CPartPcsFiiPvUlUc(
+            &PartPcs, mapId, mapVariant, (void*)(hasParamMask & 0xD80000), hasParamMask & 0x80000, 0);
+
+        MapChanged__7CSystemFiii(&System, mapId, mapVariant, 1);
     }
 }
 

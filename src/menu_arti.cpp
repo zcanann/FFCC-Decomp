@@ -210,76 +210,73 @@ void CMenuPcs::ArtiInit()
  */
 void CMenuPcs::ArtiInit1()
 {
-	int iVar2;
 	float fVar1;
+	int iVar2;
 	short* psVar3;
 	unsigned int uVar4;
 	unsigned int uVar5;
-	int* workPtr;
 
-	fVar1 = 0.0f;
-	workPtr = (int*)((char*)this + 0x850);
-
-	iVar2 = *workPtr;
+	iVar2 = *(int*)((char*)this + 0x850);
 	*(int*)(iVar2 + 0x24) = 0x2e;
 	*(int*)(iVar2 + 0x2c) = 2;
 	*(int*)(iVar2 + 0x30) = 5;
-	iVar2 = *workPtr;
+	iVar2 = *(int*)((char*)this + 0x850);
 	*(int*)(iVar2 + 100) = 0x44;
 	*(int*)(iVar2 + 0x6c) = 7;
 	*(int*)(iVar2 + 0x70) = 5;
-	iVar2 = *workPtr;
+	iVar2 = *(int*)((char*)this + 0x850);
 	*(int*)(iVar2 + 0xa4) = 0x44;
 	*(int*)(iVar2 + 0xac) = 7;
 	*(int*)(iVar2 + 0xb0) = 5;
-	iVar2 = *workPtr;
+	iVar2 = *(int*)((char*)this + 0x850);
 	*(int*)(iVar2 + 0xf4) = 2;
 	*(int*)(iVar2 + 0xe4) = 0x2e;
 	*(int*)(iVar2 + 0xec) = 7;
 	*(int*)(iVar2 + 0xf0) = 5;
-	iVar2 = *workPtr;
+	iVar2 = *(int*)((char*)this + 0x850);
 	*(int*)(iVar2 + 0x134) = 2;
 	*(int*)(iVar2 + 0x124) = 0x37;
 	*(int*)(iVar2 + 300) = 0;
 	*(int*)(iVar2 + 0x130) = 5;
-	iVar2 = *workPtr;
+	iVar2 = *(int*)((char*)this + 0x850);
 	*(int*)(iVar2 + 0x174) = 2;
 	*(int*)(iVar2 + 0x164) = 0x37;
 	*(int*)(iVar2 + 0x16c) = 0;
 	*(int*)(iVar2 + 0x170) = 5;
-	iVar2 = *workPtr;
+	iVar2 = *(int*)((char*)this + 0x850);
 	*(int*)(iVar2 + 0x1b4) = 2;
 	*(int*)(iVar2 + 0x1a4) = 0x37;
 	*(int*)(iVar2 + 0x1ac) = 0;
 	*(int*)(iVar2 + 0x1b0) = 5;
-	iVar2 = *workPtr;
+	iVar2 = *(int*)((char*)this + 0x850);
 	*(int*)(iVar2 + 500) = 2;
 	*(int*)(iVar2 + 0x1e4) = 0x37;
+	fVar1 = FLOAT_80332fac;
 	*(int*)(iVar2 + 0x1ec) = 0;
 	*(int*)(iVar2 + 0x1f0) = 5;
-	iVar2 = *workPtr;
+	iVar2 = *(int*)((char*)this + 0x850);
 	*(int*)(iVar2 + 0x234) = 2;
 	*(int*)(iVar2 + 0x224) = 0x37;
 	*(int*)(iVar2 + 0x22c) = 0;
 	*(int*)(iVar2 + 0x230) = 5;
-	iVar2 = *workPtr;
+	iVar2 = *(int*)((char*)this + 0x850);
 	*(int*)(iVar2 + 0x274) = 2;
 	*(int*)(iVar2 + 0x264) = 0x37;
 	*(int*)(iVar2 + 0x26c) = 0;
 	*(int*)(iVar2 + 0x270) = 5;
-	iVar2 = *workPtr;
+	iVar2 = *(int*)((char*)this + 0x850);
 	*(int*)(iVar2 + 0x2b4) = 2;
 	*(int*)(iVar2 + 0x2a4) = 0x37;
 	*(int*)(iVar2 + 0x2ac) = 0;
 	*(int*)(iVar2 + 0x2b0) = 5;
-	iVar2 = *workPtr;
+	iVar2 = *(int*)((char*)this + 0x850);
 	*(int*)(iVar2 + 0x2f4) = 2;
 	*(int*)(iVar2 + 0x2e4) = 0x37;
 	*(int*)(iVar2 + 0x2ec) = 0;
 	*(int*)(iVar2 + 0x2f0) = 5;
 
-	uVar4 = (unsigned int)**(short**)workPtr;
-	psVar3 = *(short**)workPtr + 4;
+	uVar4 = (unsigned int)**(short**)((char*)this + 0x850);
+	psVar3 = *(short**)((char*)this + 0x850) + 4;
 	if (0 < (int)uVar4) {
 		uVar5 = uVar4 >> 3;
 		if (uVar5 != 0) {
@@ -355,9 +352,8 @@ unsigned int CMenuPcs::ArtiOpen()
 	iVar6 = (int)**(short**)((char*)this + 0x850);
 	psVar4 = *(short**)((char*)this + 0x850) + 4;
 	iVar7 = (int)*(short*)(*(int*)((char*)this + 0x82c) + 0x22);
-	iVar8 = iVar6;
 	if (0 < iVar6) {
-		do {
+		for (iVar8 = iVar6; iVar8 != 0; iVar8 = iVar8 - 1) {
 			dVar3 = DOUBLE_80332fe0;
 			fVar1 = FLOAT_80332fa8;
 			if (*(int*)(psVar4 + 0x12) <= iVar7) {
@@ -389,8 +385,7 @@ unsigned int CMenuPcs::ArtiOpen()
 				}
 			}
 			psVar4 = psVar4 + 0x20;
-			iVar8 = iVar8 + -1;
-		} while (iVar8 != 0);
+		}
 	}
 
 	return (unsigned int)(iVar6 == iVar5);
@@ -443,9 +438,8 @@ unsigned int CMenuPcs::ArtiClose()
 	iVar6 = (int)**(short**)((char*)this + 0x850);
 	psVar5 = *(short**)((char*)this + 0x850) + 4;
 	iVar7 = (int)*(short*)(*(int*)((char*)this + 0x82c) + 0x22);
-	iVar8 = iVar6;
 	if (0 < iVar6) {
-		do {
+		for (iVar8 = iVar6; iVar8 != 0; iVar8 = iVar8 - 1) {
 			dVar3 = DOUBLE_80332fe0;
 			fVar1 = FLOAT_80332fa8;
 			if (*(int*)(psVar5 + 0x12) <= iVar7) {
@@ -479,8 +473,7 @@ unsigned int CMenuPcs::ArtiClose()
 				}
 			}
 			psVar5 = psVar5 + 0x20;
-			iVar8 = iVar8 + -1;
-		} while (iVar8 != 0);
+		}
 	}
 
 	return (unsigned int)(iVar6 == iVar4);

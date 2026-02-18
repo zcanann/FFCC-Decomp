@@ -139,6 +139,15 @@ void GXInitFogAdjTable(GXFogAdjTable *table, u16 width, const f32 projmtx[4][4])
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801a5bd8
+ * PAL Size: 256b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void GXSetFogRangeAdj(GXBool enable, u16 center, const GXFogAdjTable *table) {
     u32 range_adj;
 
@@ -147,33 +156,23 @@ void GXSetFogRangeAdj(GXBool enable, u16 center, const GXFogAdjTable *table) {
     if (enable) {
         ASSERTMSGLINE(334, table != NULL, "GXSetFogRangeAdj: table pointer is null");
 
-        range_adj = ((u32)table->r[1] << 12);
-        range_adj = (range_adj & 0x00fff000) | (table->r[0] & 0xfff);
-        range_adj |= 0xe9000000;
+        range_adj = (table->r[0] & 0xFFF) | ((u32)table->r[1] << 12) | 0xE9000000;
         GX_WRITE_RAS_REG(range_adj);
 
-        range_adj = ((u32)table->r[3] << 12);
-        range_adj = (range_adj & 0x00fff000) | (table->r[2] & 0xfff);
-        range_adj |= 0xea000000;
+        range_adj = (table->r[2] & 0xFFF) | ((u32)table->r[3] << 12) | 0xEA000000;
         GX_WRITE_RAS_REG(range_adj);
 
-        range_adj = ((u32)table->r[5] << 12);
-        range_adj = (range_adj & 0x00fff000) | (table->r[4] & 0xfff);
-        range_adj |= 0xeb000000;
+        range_adj = (table->r[4] & 0xFFF) | ((u32)table->r[5] << 12) | 0xEB000000;
         GX_WRITE_RAS_REG(range_adj);
 
-        range_adj = ((u32)table->r[7] << 12);
-        range_adj = (range_adj & 0x00fff000) | (table->r[6] & 0xfff);
-        range_adj |= 0xec000000;
+        range_adj = (table->r[6] & 0xFFF) | ((u32)table->r[7] << 12) | 0xEC000000;
         GX_WRITE_RAS_REG(range_adj);
 
-        range_adj = ((u32)table->r[9] << 12);
-        range_adj = (range_adj & 0x00fff000) | (table->r[8] & 0xfff);
-        range_adj |= 0xed000000;
+        range_adj = (table->r[8] & 0xFFF) | ((u32)table->r[9] << 12) | 0xED000000;
         GX_WRITE_RAS_REG(range_adj);
     }
 
-    range_adj = ((center + 342) & 0x3ff) | (enable << 10) | 0xe8000000;
+    range_adj = (center + 342) | ((u32)(u8)enable << 10) | 0xE8000000;
     GX_WRITE_RAS_REG(range_adj);
     __GXData->bpSentNot = 0;
 }

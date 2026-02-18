@@ -42,16 +42,6 @@ extern "C" void __sinit_math_cpp()
  * Address:	TODO
  * Size:	TODO
  */
-void VECMultAdd(Vec*, Vec*, Vec*, float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 CMath::CMath()
 {
 	// TODO

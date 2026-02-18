@@ -5,7 +5,7 @@
 
 #include <string.h>
 
-extern int DAT_8032ed70;
+extern int lbl_8032ED70;
 extern float FLOAT_80331928;
 extern float FLOAT_8033192c;
 extern float FLOAT_80331930;
@@ -60,11 +60,17 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
     PppMiasmaRenderStep* step;
     pppModelSt* model;
     s16* work;
+    u8 packedWork[4];
+    u32 packedColor;
     Vec managerPos;
     Vec cameraPos;
     float radius;
     float maxRadius;
     float radiusScale;
+    int texWidth;
+    int texHeight;
+    int i4TexSize;
+    int rgba8TexSize;
     int colorOffset;
     int textureIndex;
     u16 i;
@@ -84,6 +90,17 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
     if (step->m_payload[0x1e] == 0xFF) {
         step->m_payload[0x1e] = 0xFE;
     }
+
+    packedColor = *(u32*)((u8*)pppMiasma + 0x88 + colorOffset);
+    packedWork[0] = (u8)(work[0] >> 7);
+    packedWork[1] = (u8)(work[1] >> 7);
+    packedWork[2] = (u8)(work[2] >> 7);
+    packedWork[3] = (u8)(work[3] >> 7);
+
+    texWidth = (int)FLOAT_80331928;
+    texHeight = (int)FLOAT_8033192c;
+    i4TexSize = GXGetTexBufferSize(texWidth, texHeight, (GXTexFmt)6, GX_FALSE, 0);
+    rgba8TexSize = GXGetTexBufferSize(texWidth, texHeight, (GXTexFmt)0x28, GX_FALSE, 0);
 
     managerPos.x = pppMngStPtr->m_matrix.value[0][3];
     managerPos.y = pppMngStPtr->m_matrix.value[1][3];
@@ -118,6 +135,10 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
 
     (void)colorOffset;
     (void)work;
+    (void)packedWork;
+    (void)packedColor;
+    (void)i4TexSize;
+    (void)rgba8TexSize;
     (void)inFarZone;
     (void)step;
     (void)textureIndex;
@@ -188,7 +209,7 @@ void pppFrameMiasma(pppMiasma* pppMiasma, pppMiasmaFrameStep* param_2, pppMiasma
 {
     s16* work;
 
-    if (DAT_8032ed70 != 0) {
+    if (lbl_8032ED70 != 0) {
         return;
     }
 

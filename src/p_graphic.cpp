@@ -31,6 +31,7 @@ extern int DAT_802381a0;
 extern unsigned char MaterialMan[];
 extern CGraphicPcs GraphicsPcs;
 extern CMiniGamePcs MiniGamePcs;
+extern unsigned char MaterialMan[];
 extern char* PTR_DAT_801e9e64[];
 extern char DAT_8032fbf4[];
 extern char DAT_8032fbf8[];

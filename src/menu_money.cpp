@@ -92,9 +92,35 @@ bool CMenuPcs::MoneyOpen()
 		*(int *)(iVar8_2 + 0x30) = 10;
 		**(short**)((char*)this + 0x850) = 1;
 
-		UpdateDigits(static_cast<unsigned int>(reinterpret_cast<CCaravanWork*>(Game.game.m_scriptFoodBase[0])->m_gil), &s_place[0]);
+		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.game.m_scriptFoodBase[0]);
 		DAT_8032eee0 = 0;
-		UpdateDigits(0, &s_place[8]);
+		signed char* digits = s_place;
+		for (int group = 0; group < 2; ++group) {
+			int currentValue = (group == 0) ? caravanWork->m_gil : 0;
+			int div = 10000000;
+			bool started = false;
+
+			for (int i = 0; i < 8; ++i) {
+				if (!started && div <= currentValue) {
+					started = true;
+				}
+
+				if (started || div <= currentValue || i > 6) {
+					int digit = currentValue / div;
+					if (digit > 9) {
+						digit = 9;
+					}
+					digits[i] = static_cast<signed char>(digit);
+					currentValue -= (currentValue / div) * div;
+				} else {
+					digits[i] = -1;
+				}
+
+				div /= 10;
+			}
+
+			digits += 8;
+		}
 
 		*(short *)(*(int *)((char*)this + 0x82c) + 0x26) = 0;
 		*(char *)(*(int *)((char*)this + 0x82c) + 0xb) = 1;

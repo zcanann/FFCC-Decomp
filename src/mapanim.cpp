@@ -509,20 +509,32 @@ CMapAnim::~CMapAnim()
 {
     CPtrArray<CMapAnimNode*>* nodeArray = reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this);
     unsigned int i = 0;
-    unsigned int nodeCount = static_cast<unsigned int>(nodeArray->GetSize());
 
-    while (i < nodeCount) {
+    while (i < static_cast<unsigned int>(nodeArray->m_numItems)) {
         CMapAnimNode* node = __vc__26CPtrArray_P12CMapAnimNode_FUl(this, i);
         if (node != 0) {
             reinterpret_cast<int*>(node)[1] = 0;
             __dl__FPv(node);
         }
         i++;
-        nodeCount = static_cast<unsigned int>(nodeArray->GetSize());
     }
 
-    nodeArray->RemoveAll();
-    dtor_8004AE60(nodeArray, -1);
+    if (nodeArray->m_items != 0) {
+        __dla__FPv(nodeArray->m_items);
+        nodeArray->m_items = 0;
+    }
+    nodeArray->m_size = 0;
+    nodeArray->m_numItems = 0;
+
+    if (nodeArray != 0) {
+        nodeArray->m_vtable = lbl_801EA488;
+        if (nodeArray->m_items != 0) {
+            __dla__FPv(nodeArray->m_items);
+            nodeArray->m_items = 0;
+        }
+        nodeArray->m_size = 0;
+        nodeArray->m_numItems = 0;
+    }
 }
 
 /*

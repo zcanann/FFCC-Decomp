@@ -31,7 +31,11 @@ extern float FLOAT_80332048;
 extern float FLOAT_8033204c;
 extern float FLOAT_80332050;
 extern float FLOAT_80332058;
+extern float FLOAT_8033205c;
+extern float FLOAT_80332060;
+extern float FLOAT_80332064;
 extern float FLOAT_80332078;
+extern float ppvSinTbl[];
 extern CMath Math;
 extern void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void* materialMan, void* materialSet,
                                                                         unsigned int materialIdx, int, int);
@@ -383,12 +387,181 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801400F0
+ * PAL Size: 2220b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void UpdatePolygonData(PCharaBreak*, VCharaBreak*, CChara::CModel*)
+void UpdatePolygonData(PCharaBreak* charaBreak, VCharaBreak* work, CChara::CModel* model)
 {
-	// TODO
+    u8* breakData = (u8*)charaBreak;
+    u8* workData = (u8*)work;
+    u8* modelBytes = (u8*)model;
+    u8* modelData = *(u8**)(modelBytes + 0xA4);
+    u8* mesh = *(u8**)(modelBytes + 0xAC);
+    int* meshDataTable = (int*)*(u32*)(workData + 0x1C);
+    u32 meshCount = *(u32*)(modelData + 0xC);
+    u32 posQuant = *(u32*)(modelData + 0x34);
+    u32 normQuant = *(u32*)(modelData + 0x38);
+    s16 cutoff = (s16)(s32)(*(float*)(workData + 4) * (*(float*)(workData + 0x34) - *(float*)(workData + 0x24)) * (float)(1 << posQuant));
+
+    for (u32 meshIndex = 0; meshIndex < meshCount; meshIndex++) {
+        u8* meshRef = *(u8**)(mesh + 8);
+        S16Vec* workPositions = *(S16Vec**)mesh;
+        Mtx meshMtx;
+        bool transformPos = false;
+
+        if (*(u32*)(meshRef + 0x54) == 0 && breakData[0x42] == 1) {
+            u32 nodeIndex = *(u32*)(meshRef + 0x58);
+            Mtx* nodeMtx = (Mtx*)((u8*)*(u8**)(modelBytes + 0xA8) + (nodeIndex * 0xC0) + 0xC);
+            PSMTXConcat(*(Mtx*)(modelBytes + 0x38), *nodeMtx, meshMtx);
+            transformPos = true;
+        }
+
+        int* perMeshDisplayLists = (int*)meshDataTable[meshIndex];
+        for (int dlIndex = *(int*)(meshRef + 0x4C) - 1; dlIndex >= 0; dlIndex--) {
+            int dlPair = perMeshDisplayLists[dlIndex];
+            POLYGON_DATA* polygonData = (POLYGON_DATA*)*(u32*)(dlPair + 0xC);
+            u16 polygonCount = *(u16*)(dlPair + 8);
+
+            for (u16 i = 0; i < polygonCount; i++) {
+                if (polygonData->m_enabled == 0) {
+                    S16Vec transformed[3];
+                    int passMask[3] = {0, 0, 0};
+
+                    for (int v = 0; v < 3; v++) {
+                        S16Vec* output = (S16Vec*)((u8*)&polygonData->m_pos0 + (v * sizeof(S16Vec)));
+                        if (transformPos) {
+                            Vec worldPos;
+                            transformed[v] = workPositions[polygonData->m_posIndices[v]];
+                            ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)DAT_8032ec70, &worldPos, &transformed[v], posQuant);
+                            PSMTXMultVec(meshMtx, &worldPos, &worldPos);
+                            ConvF2IVector__5CUtilFR6S16Vec3Vecl((void*)DAT_8032ec70, &transformed[v], &worldPos, posQuant);
+                        } else {
+                            transformed[v] = workPositions[polygonData->m_posIndices[v]];
+                        }
+
+                        if (breakData[0x41] == 0) {
+                            if (breakData[0x42] == 1) {
+                                if (transformed[v].y < cutoff) {
+                                    passMask[v] = 1;
+                                }
+                            } else if (output->y < cutoff) {
+                                passMask[v] = 1;
+                            }
+                        } else if (breakData[0x41] == 1) {
+                            if (breakData[0x42] == 1) {
+                                if (cutoff < transformed[v].y) {
+                                    passMask[v] = 1;
+                                }
+                            } else if (cutoff < output->y) {
+                                passMask[v] = 1;
+                            }
+                        }
+                    }
+
+                    polygonData->m_enabled = (passMask[0] != 0 && passMask[1] != 0 && passMask[2] != 0) ? 1 : 0;
+
+                    if (breakData[0x42] == 1 && polygonData->m_enabled != 0) {
+                        polygonData->m_pos0 = transformed[0];
+                        polygonData->m_pos1 = transformed[1];
+                        polygonData->m_pos2 = transformed[2];
+                    }
+                }
+
+                if (polygonData->m_enabled == 0) {
+                    if (breakData[0x42] == 1) {
+                        S16Vec transformed[3];
+                        for (int v = 0; v < 3; v++) {
+                            transformed[v] = workPositions[polygonData->m_posIndices[v]];
+                        }
+                        polygonData->m_pos0 = transformed[0];
+                        polygonData->m_pos1 = transformed[1];
+                        polygonData->m_pos2 = transformed[2];
+                    }
+                } else {
+                    Vec points[3];
+                    Vec centroid;
+                    Vec axis;
+                    Vec velocity;
+                    Quaternion quat;
+                    Mtx rotMtx;
+
+                    centroid.x = FLOAT_80332048;
+                    centroid.y = FLOAT_80332048;
+                    centroid.z = FLOAT_80332048;
+
+                    for (int v = 0; v < 3; v++) {
+                        S16Vec* pos = (S16Vec*)((u8*)&polygonData->m_pos0 + (v * sizeof(S16Vec)));
+                        ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)DAT_8032ec70, &points[v], pos, posQuant);
+                        PSVECAdd(&centroid, &points[v], &centroid);
+                    }
+                    PSVECScale(&centroid, &centroid, FLOAT_80332058);
+
+                    ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)DAT_8032ec70, &axis, &polygonData->m_normalB, normQuant);
+                    ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)DAT_8032ec70, &velocity, &polygonData->m_normalA, normQuant);
+
+                    PSVECScale(&velocity,
+                               &velocity,
+                               *(float*)(breakData + 0x38) + RandF__5CMathFf(*(float*)(breakData + 0x3C), &Math));
+                    C_QUATRotAxisRad(&quat, &axis, FLOAT_8033205c * (float)polygonData->m_alpha);
+                    PSMTXQuat(rotMtx, &quat);
+
+                    float randomSin = FLOAT_80332048;
+                    float randomCos = FLOAT_80332048;
+                    if (breakData[0x40] == 1) {
+                        if (polygonData->m_normalA.y == 0) {
+                            polygonData->m_normalA.x = polygonData->m_normalA.x + (rand() % 10) + 10;
+                        } else {
+                            polygonData->m_normalA.x = polygonData->m_normalA.x - ((rand() % 10) + 10);
+                        }
+
+                        if (polygonData->m_normalA.x > 0x168) {
+                            polygonData->m_normalA.x = polygonData->m_normalA.x - 0x168;
+                        }
+                        if (polygonData->m_normalA.x < 0) {
+                            polygonData->m_normalA.x = polygonData->m_normalA.x + 0x168;
+                        }
+
+                        u32 sinIndex = (u32)((float)((s32)polygonData->m_normalA.x << 15) / FLOAT_80332060);
+                        randomSin = *(float*)((u8*)ppvSinTbl + (sinIndex & 0xFFFC));
+                        randomCos = *(float*)((u8*)ppvSinTbl + ((sinIndex + 0x4000) & 0xFFFC));
+                    }
+
+                    for (int v = 0; v < 3; v++) {
+                        S16Vec* pos = (S16Vec*)((u8*)&polygonData->m_pos0 + (v * sizeof(S16Vec)));
+                        PSVECSubtract(&points[v], &centroid, &points[v]);
+                        PSMTXMultVec(rotMtx, &points[v], &points[v]);
+                        PSVECAdd(&points[v], &centroid, &points[v]);
+
+                        if (breakData[0x40] == 0) {
+                            points[v].x += velocity.x;
+                            points[v].y += -(*(float*)(breakData + 0x10) * (float)polygonData->_pad2 - velocity.y);
+                            points[v].z += velocity.z;
+                        } else if (breakData[0x40] == 1) {
+                            points[v].x += randomCos * (FLOAT_8033204c + RandF__5CMathFf(FLOAT_80332064, &Math));
+                            points[v].y += -(*(float*)(breakData + 0x10) * (float)polygonData->_pad2 - velocity.y);
+                            points[v].z += randomSin * (FLOAT_8033204c + RandF__5CMathFf(FLOAT_80332064, &Math));
+                        }
+
+                        points[v].x += *(float*)(breakData + 0x18) * *(float*)(workData + 0x10);
+                        points[v].y += *(float*)(breakData + 0x1C) * *(float*)(workData + 0x10);
+                        points[v].z += *(float*)(breakData + 0x20) * *(float*)(workData + 0x10);
+
+                        ConvF2IVector__5CUtilFR6S16Vec3Vecl((void*)DAT_8032ec70, pos, &points[v], posQuant);
+                    }
+
+                    polygonData->_pad2++;
+                }
+
+                polygonData++;
+            }
+        }
+
+        mesh += 0x14;
+    }
 }
 
 /*

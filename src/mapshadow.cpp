@@ -27,7 +27,6 @@ void CMapShadowInsertOctTree(CMapShadow::TARGET target, COctTree& octTree)
 	CMapShadow* shadow;
 	int model;
 	u32 i;
-	u32 mapShadowCount;
 	Vec pos;
 	CBound* bound;
 

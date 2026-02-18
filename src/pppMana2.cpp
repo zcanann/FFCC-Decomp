@@ -4,22 +4,34 @@
 #include "ffcc/p_game.h"
 #include "ffcc/pppPart.h"
 
+#include <string.h>
+#include <dolphin/os/OSCache.h>
+
 extern char lbl_801DC4D0[];
 extern float FLOAT_803318fc;
 extern float FLOAT_80331898;
 extern float FLOAT_8033189c;
 extern float FLOAT_803318a0;
 extern float FLOAT_803318a4;
+extern float FLOAT_80331904;
 extern Mtx ppvCameraMatrix0;
 extern struct {
     float _224_4_;
     float _228_4_;
     float _232_4_;
 } CameraPcs;
+extern char MaterialMan[];
+extern char DAT_80331900[];
+extern char DAT_803318d4[];
+extern char DAT_803318dc[];
+extern char DAT_803318e4[];
+extern char DAT_803318ec[];
+extern char DAT_803318f4[];
 
 extern "C" {
 void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
 int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
+void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
 void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
@@ -38,12 +50,112 @@ void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80108db0
+ * PAL Size: 1060b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void Mana2_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*) [4])
+void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int partIndex, int dlIndex, float (*mtx)[4])
 {
-	// TODO
+    u8 type = *(u8*)((char*)step + 0x1C);
+    int shape = *(int*)(*(int*)((char*)model + 0xAC) + partIndex * 0x14 + 8);
+    u32* dlEntry = (u32*)(*(int*)(shape + 0x50) + dlIndex * 0xC);
+    bool draw = false;
+
+    if (type == 2) {
+        if (strcmp((char*)shape, DAT_80331900) == 0 || strcmp((char*)shape, DAT_803318dc) == 0) {
+            draw = true;
+        }
+    } else if (type < 2) {
+        if (type == 0) {
+            if (strcmp((char*)shape, DAT_80331900) == 0) {
+                draw = true;
+            }
+        } else if (strcmp((char*)shape, DAT_80331900) == 0 || strcmp((char*)shape, DAT_803318d4) == 0) {
+            draw = true;
+        }
+    } else if (type < 4 && (strcmp((char*)shape, DAT_80331900) == 0 || strcmp((char*)shape, DAT_803318e4) == 0)) {
+        draw = true;
+    }
+
+    int waterCmp = strcmp((char*)shape, DAT_803318ec);
+    if ((waterCmp == 0 && *(char*)((char*)step + 0x1C) == 1) ||
+        (strcmp((char*)shape, DAT_803318f4) == 0 && *(char*)((char*)step + 0x1C) == 2)) {
+        Mtx cameraMtx;
+        Mtx rotMtx;
+        Mtx posMtx;
+        Vec offset;
+        double x = (double)mtx[0][3];
+        double y = (double)mtx[1][3];
+        double z = (double)mtx[2][3];
+
+        PSMTXCopy(ppvCameraMatrix0, cameraMtx);
+        PSMTXRotRad(rotMtx, 'z', FLOAT_80331904);
+        mtx[0][3] = FLOAT_80331898;
+        mtx[1][3] = FLOAT_80331898;
+        mtx[2][3] = FLOAT_80331898;
+        PSMTXConcat(mtx, rotMtx, mtx);
+
+        offset.x = FLOAT_80331898;
+        offset.y = *(float*)((char*)step + 0x30);
+        offset.z = FLOAT_80331898;
+        PSMTXMultVec(mtx, &offset, &offset);
+
+        mtx[0][3] = (float)x;
+        mtx[1][3] = (float)(y - (double)offset.y);
+        mtx[2][3] = (float)z;
+
+        PSMTXConcat(cameraMtx, mtx, posMtx);
+        GXLoadPosMtxImm(posMtx, 0);
+        PSMTXCopy(mtx, (float(*)[4])((char*)work + 0x80));
+        GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
+        RenderWaterMesh((VMana2*)work);
+        GXSetCullMode((GXCullMode)1);
+    }
+
+    if (draw) {
+        if (strcmp((char*)shape, DAT_80331900) != 0) {
+            PSMTXCopy(mtx, (float(*)[4])((char*)work + 0xB0));
+            if (*(char*)((char*)work + 0xEC) != 0) {
+                *(u8*)((char*)work + 0x38) = **(u8**)(shape + 0x28);
+                *(u8*)((char*)work + 0x39) = *((u8*)(*(int*)(shape + 0x28)) + 1);
+                *(u8*)((char*)work + 0x3A) = *((u8*)(*(int*)(shape + 0x28)) + 2);
+                *(u8*)((char*)work + 0x3B) = 0x80;
+                DCFlushRange((u8*)work + 0x38, 4);
+                GXSetArray((GXAttr)0xB, *(void**)((char*)work + 0x68), 4);
+                GXSetArray((GXAttr)0xD, *(void**)((char*)work + 0x6C), 4);
+                *(u32*)(MaterialMan + 0x08) = *(u32*)((char*)work + 0x64);
+                *(u32*)(MaterialMan + 0x44) = 0xFFFFFFFF;
+                *(u8*)(MaterialMan + 0x4C) = 0xFF;
+                *(u32*)(MaterialMan + 0x11C) = 0;
+                *(u32*)(MaterialMan + 0x120) = 0x1E;
+                *(u32*)(MaterialMan + 0x124) = 0;
+                *(u8*)(MaterialMan + 0x205) = 0xFF;
+                *(u8*)(MaterialMan + 0x206) = 0xFF;
+                *(u32*)(MaterialMan + 0x58) = 0;
+                *(u32*)(MaterialMan + 0x5C) = 0;
+                *(u8*)(MaterialMan + 0x208) = 0;
+                *(u32*)(MaterialMan + 0x48) = 0x2ACE0F;
+                *(u32*)(MaterialMan + 0x128) = 0;
+                *(u32*)(MaterialMan + 0x12C) = 0x1E;
+                *(u32*)(MaterialMan + 0x130) = 0;
+                *(u32*)(MaterialMan + 0x40) = 0x2ACE0F;
+                *(u32*)(MaterialMan + 0xD0) = *(u32*)((char*)work + 0x20);
+                GXSetCullMode((GXCullMode)1);
+                GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
+                SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
+                    MaterialMan, *(void**)(*(int*)((char*)model + 0xA4) + 0x24), *(u16*)((char*)dlEntry + 8), 0, 0);
+                GXCallDisplayList(*(void**)(*(int*)((char*)work + 0x60) + dlIndex * 4), *dlEntry);
+            }
+        } else {
+            GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_ENABLE);
+            SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
+                MaterialMan, *(void**)(*(int*)((char*)model + 0xA4) + 0x24), *(u16*)((char*)dlEntry + 8), 0, 0);
+            GXCallDisplayList((void*)dlEntry[1], dlEntry[0]);
+        }
+    }
 }
 
 /*

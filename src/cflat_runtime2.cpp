@@ -30,6 +30,7 @@ extern unsigned char DbgMenuPcs[];
 extern CPartMng PartMng;
 extern "C" void* __vt__Q212CFlatRuntime7CObject[];
 extern "C" void* __vt__9CGBaseObj[];
+extern "C" void* __vt__9CGQuadObj[];
 extern "C" void* __vt__8CGObject[];
 extern "C" void* __vt__8CGPrgObj[];
 extern "C" void* __vt__9CGItemObj[];
@@ -419,6 +420,41 @@ extern "C" void __ct__8CGObjectFv(CGObject* obj)
 	self[0x38] &= 0xEF;
 	*reinterpret_cast<void***>(self + 0x48) = __vt__9CGBaseObj;
 	*reinterpret_cast<void***>(self + 0x48) = __vt__8CGObject;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8006EAA0
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __ct__9CGQuadObjFv(CGQuadObj* obj)
+{
+	u8* self = reinterpret_cast<u8*>(obj);
+	*reinterpret_cast<void***>(self + 0x48) = __vt__Q212CFlatRuntime7CObject;
+	self[0x38] &= 0xEF;
+	*reinterpret_cast<void***>(self + 0x48) = __vt__9CGBaseObj;
+	*reinterpret_cast<void***>(self + 0x48) = __vt__9CGQuadObj;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8006EAD8
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __ct__9CGBaseObjFv(CGBaseObj* obj)
+{
+	u8* self = reinterpret_cast<u8*>(obj);
+	*reinterpret_cast<void***>(self + 0x48) = __vt__Q212CFlatRuntime7CObject;
+	self[0x38] &= 0xEF;
+	*reinterpret_cast<void***>(self + 0x48) = __vt__9CGBaseObj;
 }
 
 /*

@@ -1,5 +1,8 @@
 #include "ffcc/graphic.h"
 
+#include <string.h>
+
+#include "ffcc/memory.h"
 #include "ffcc/pppfunctbl.h"
 #include "ffcc/system.h"
 #include "ffcc/util.h"
@@ -17,6 +20,18 @@ extern struct {
     float _232_4_;
     Mtx m_cameraMatrix;
 } CameraPcs;
+
+extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
+extern "C" void __dla__FPv(void*);
+extern "C" char lbl_801D6348[];
+
+static inline void*& PtrAt(CGraphic* self, u32 offset) {
+    return *reinterpret_cast<void**>(reinterpret_cast<u8*>(self) + offset);
+}
+
+static inline u16 U16At(void* p, u32 offset) {
+    return *reinterpret_cast<u16*>(reinterpret_cast<u8*>(p) + offset);
+}
 
 extern "C" {
 void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
@@ -251,9 +266,17 @@ void CGraphic::Thread()
  * Address:	TODO
  * Size:	TODO
  */
-void CGraphic::IsFifoOver()
+u8 CGraphic::IsFifoOver()
 {
-	// TODO
+	GXBool fifoWrap;
+	GXBool gpRead;
+	GXBool cpuWrite;
+	GXBool underflow;
+	GXBool overhi;
+	u32 fifoCount;
+
+	GXGetFifoStatus(GXGetCPUFifo(), &overhi, &underflow, &fifoCount, &cpuWrite, &gpRead, &fifoWrap);
+	return fifoWrap;
 }
 
 /*
@@ -798,7 +821,12 @@ void CGraphic::RenderBlur(int, unsigned char, unsigned char, unsigned char, unsi
  */
 void CGraphic::CreateTempBuffer()
 {
-	// TODO
+	u32 bufferSize = ((U16At(PtrAt(this, 0x71E0), 4) + 0xF) & 0xFFF0) * U16At(PtrAt(this, 0x71E0), 6) * 2 + 0x46000;
+	u8* tempBuffer = reinterpret_cast<u8*>(_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+	    &Memory, bufferSize, reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x8)), lbl_801D6348, 0xB53, 0));
+
+	PtrAt(this, 0x71E8) = tempBuffer;
+	memset(tempBuffer, 0, 0x46004);
 }
 
 /*
@@ -808,5 +836,8 @@ void CGraphic::CreateTempBuffer()
  */
 void CGraphic::DestroyTempBuffer()
 {
-	// TODO
+	if (PtrAt(this, 0x71E8) != nullptr) {
+		__dla__FPv(PtrAt(this, 0x71E8));
+		PtrAt(this, 0x71E8) = nullptr;
+	}
 }

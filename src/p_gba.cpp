@@ -5,8 +5,10 @@
 #include "ffcc/system.h"
 #include <dolphin/gba/GBA.h>
 
-unsigned char GbaPcs[0x15C];
-extern "C" void* lbl_8020F4A4;
+CGbaPcs GbaPcs;
+extern char __vt__8CManager[];
+extern char lbl_801E8668[];
+extern char lbl_8020F4A4[];
 extern "C" unsigned int lbl_8020F2F8[];
 extern "C" unsigned int lbl_8020F304[];
 extern "C" unsigned int lbl_8020F310[];

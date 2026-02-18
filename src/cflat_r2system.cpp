@@ -40,6 +40,7 @@ void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 int GetWait__4CMesFv(void*);
 unsigned char DAT_8032ecb8;
 }
+extern "C" double fmod(double, double);
 
 /*
  * --INFO--
@@ -1018,6 +1019,69 @@ void CVector::operator=(const CVector& other)
     float z = other.z;
     this->y = y;
     this->z = z;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9868
+ * PAL Size: 28b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CVector::CVector(const CVector& other)
+{
+    float y = other.y;
+    x = other.x;
+    float z = other.z;
+    this->y = y;
+    this->z = z;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9884
+ * PAL Size: 112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CVector CVector::operator-(const CVector& other) const
+{
+    CVector out;
+
+    PSVECSubtract((const Vec*)this, (const Vec*)&other, (Vec*)&out);
+    return out;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B98F4
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" float fmodf__3stdFff(float x, float y)
+{
+    return (float)fmod((double)x, (double)y);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9918
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void SetFov__10CCameraPcsFf(CCameraPcs* camera, float fov)
+{
+    *(float*)((char*)camera + 0xFC) = fov;
 }
 
 /*

@@ -5,6 +5,7 @@
 #include "ffcc/system.h"
 #include "ffcc/textureman.h"
 
+#include <math.h>
 #include <string.h>
 
 template <class T>
@@ -13,6 +14,12 @@ class CPtrArray
 public:
 	T operator[](unsigned long index);
 };
+
+extern "C" unsigned char Graphic[];
+extern "C" void Printf__8CGraphicFUlUlPce(void*, unsigned long, unsigned long, const char*, ...);
+extern "C" unsigned char Game[];
+extern "C" char lbl_801DB694[];
+extern "C" char lbl_801DB6B4[];
 
 /*
  * --INFO--
@@ -95,7 +102,165 @@ void CChara::TimeMogFur()
  */
 void CChara::CalcMogScore()
 {
-	// TODO
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	unsigned short* texels = reinterpret_cast<unsigned short*>(self + 4);
+	int bitCount = 0;
+	int lineCount = 0;
+	int circleCount = 0;
+
+	memset(self + 0x2018, 0, 0x40);
+
+	for (int y = 0; y < 0x40; y++) {
+		for (int x = 0; x < 0x40; x++) {
+			const int dx = x - 0x20;
+			const int dy = y - 0x20;
+			const int dist = static_cast<int>(sqrt(static_cast<double>(dx * dx + dy * dy)));
+
+			if (dist >= 0x40) {
+				continue;
+			}
+
+			const int tileIndex =
+			    ((((x >> 2) & 1) + (((y >> 2) & 1) * 4) + (x >> 3) * 0x10 + (y >> 3) * 0x100) * 2) +
+			    (((x & 3) + ((y & 3) * 4)) * 2);
+
+			const unsigned short packed = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(texels) + tileIndex);
+			const int a = (packed >> 12) & 7;
+			const int r = (packed >> 8) & 0xF;
+			const int g = (packed >> 4) & 0xF;
+			const int b = packed & 0xF;
+
+			*reinterpret_cast<int*>(self + 0x2054) += a;
+
+			int colorHit[3];
+			{
+				const int d0 = ((r - 0xF) < 0 ? -(r - 0xF) : (r - 0xF)) + (7 - a);
+				const int d1 = ((g - 4) < 0 ? -(g - 4) : (g - 4)) + (7 - a);
+				const int d2 = ((b - 4) < 0 ? -(b - 4) : (b - 4)) + (7 - a);
+				colorHit[0] = (d0 < 6 && d1 < 6 && d2 < 6) ? 1 : 0;
+			}
+			{
+				const int d0 = ((r - 4) < 0 ? -(r - 4) : (r - 4)) + (7 - a);
+				const int d1 = ((g - 0xF) < 0 ? -(g - 0xF) : (g - 0xF)) + (7 - a);
+				const int d2 = ((b - 4) < 0 ? -(b - 4) : (b - 4)) + (7 - a);
+				colorHit[1] = (d0 < 6 && d1 < 6 && d2 < 6) ? 1 : 0;
+			}
+			{
+				const int d0 = ((r - 4) < 0 ? -(r - 4) : (r - 4)) + (7 - a);
+				const int d1 = ((g - 8) < 0 ? -(g - 8) : (g - 8)) + (7 - a);
+				const int d2 = ((b - 0xF) < 0 ? -(b - 0xF) : (b - 0xF)) + (7 - a);
+				colorHit[2] = (d0 < 6 && d1 < 6 && d2 < 6) ? 1 : 0;
+			}
+
+			const int ring = dist % 12;
+			int angle = static_cast<int>(57.29577951308232 * atan2(static_cast<double>(dx), static_cast<double>(dy))) + 0x168;
+			angle %= 0x2D;
+			if (angle < 0) {
+				angle += 0x2D;
+			}
+
+			for (int i = 0; i < 3; i++) {
+				if (ring >= i * 4 && ring < (i + 1) * 4) {
+					circleCount++;
+					*reinterpret_cast<int*>(self + 0x203C + i * 4) += colorHit[i];
+				} else if (angle >= i * 0xF && angle < (i + 1) * 0xF) {
+					lineCount++;
+					*reinterpret_cast<int*>(self + 0x2030 + i * 4) += colorHit[i];
+				} else {
+					bitCount++;
+					*reinterpret_cast<int*>(self + 0x2024 + i * 4) += colorHit[i];
+				}
+			}
+		}
+	}
+
+	*reinterpret_cast<int*>(self + 0x2054) = (*reinterpret_cast<int*>(self + 0x2054) * 100) / 0x7000;
+
+	const int bitDiv = bitCount / 3;
+	const int lineDiv = lineCount / 3;
+	const int circleDiv = circleCount / 3;
+
+	*reinterpret_cast<int*>(self + 0x2024) = (*reinterpret_cast<int*>(self + 0x2024) * 100) / bitDiv;
+	*reinterpret_cast<int*>(self + 0x2028) = (*reinterpret_cast<int*>(self + 0x2028) * 100) / bitDiv;
+	*reinterpret_cast<int*>(self + 0x202C) = (*reinterpret_cast<int*>(self + 0x202C) * 100) / bitDiv;
+	*reinterpret_cast<int*>(self + 0x2030) = (*reinterpret_cast<int*>(self + 0x2030) * 100) / lineDiv;
+	*reinterpret_cast<int*>(self + 0x2034) = (*reinterpret_cast<int*>(self + 0x2034) * 100) / lineDiv;
+	*reinterpret_cast<int*>(self + 0x2038) = (*reinterpret_cast<int*>(self + 0x2038) * 100) / lineDiv;
+	*reinterpret_cast<int*>(self + 0x203C) = (*reinterpret_cast<int*>(self + 0x203C) * 100) / circleDiv;
+	*reinterpret_cast<int*>(self + 0x2040) = (*reinterpret_cast<int*>(self + 0x2040) * 100) / circleDiv;
+	*reinterpret_cast<int*>(self + 0x2044) = (*reinterpret_cast<int*>(self + 0x2044) * 100) / circleDiv;
+
+	for (int i = 0; i < 3; i++) {
+		const int bit = *reinterpret_cast<int*>(self + 0x2024 + i * 4);
+		const int line = *reinterpret_cast<int*>(self + 0x2030 + i * 4);
+		const int circle = *reinterpret_cast<int*>(self + 0x203C + i * 4);
+		int score = (line + circle * 2 - bit * 2) / 3;
+		int level;
+
+		if (score < 0) {
+			score = 0;
+		} else if (score > 100) {
+			score = 100;
+		}
+		*reinterpret_cast<int*>(self + 0x2018 + i * 4) = score;
+
+		level = (100 - score) / 5;
+		if (level < 5) {
+			level = 5;
+		} else if (level > 0xF) {
+			level = 0xF;
+		}
+		*reinterpret_cast<int*>(self + 0x2048 + i * 4) = level;
+	}
+
+	{
+		const unsigned int b0 = *reinterpret_cast<unsigned int*>(self + 0x2018);
+		const unsigned int b1 = *reinterpret_cast<unsigned int*>(self + 0x201C);
+		const unsigned int b2 = *reinterpret_cast<unsigned int*>(self + 0x2020);
+		unsigned char radarType = 0;
+
+		if (b0 > 2 && b0 > static_cast<unsigned int>(0.75f * static_cast<float>(b1 + b2))) {
+			radarType = 1;
+		} else if (b1 > 2 && b1 > static_cast<unsigned int>(0.75f * static_cast<float>(b0 + b2))) {
+			radarType = 2;
+		} else if (b2 > 2 && b2 > static_cast<unsigned int>(0.75f * static_cast<float>(b0 + b1))) {
+			radarType = 3;
+		}
+
+		Game[0x13E9] = radarType;
+	}
+
+	{
+		char** radarLabel = reinterpret_cast<char**>(lbl_801DB694);
+		Printf__8CGraphicFUlUlPce(
+		    Graphic,
+		    5,
+		    0xB,
+		    lbl_801DB6B4 + 0x18,
+		    *reinterpret_cast<int*>(self + 0x2048),
+		    *reinterpret_cast<int*>(self + 0x204C),
+		    *reinterpret_cast<int*>(self + 0x2050),
+		    *reinterpret_cast<int*>(self + 0x2054),
+		    *reinterpret_cast<int*>(self + 0x2018),
+		    *reinterpret_cast<int*>(self + 0x201C),
+		    *reinterpret_cast<int*>(self + 0x2020),
+		    *reinterpret_cast<int*>(self + 0x2024),
+		    *reinterpret_cast<int*>(self + 0x2028),
+		    *reinterpret_cast<int*>(self + 0x202C));
+
+		Printf__8CGraphicFUlUlPce(
+		    Graphic,
+		    5,
+		    0xC,
+		    lbl_801DB6B4 + 0x4C,
+		    *reinterpret_cast<int*>(self + 0x2030),
+		    *reinterpret_cast<int*>(self + 0x2034),
+		    *reinterpret_cast<int*>(self + 0x2038),
+		    *reinterpret_cast<int*>(self + 0x203C),
+		    *reinterpret_cast<int*>(self + 0x2040),
+		    *reinterpret_cast<int*>(self + 0x2044),
+		    radarLabel[Game[0x13E9]]);
+	}
 }
 
 /*
@@ -128,7 +293,6 @@ extern "C" unsigned char Chara[];
 extern "C" void CalcMogScore__6CCharaFv(CChara*);
 extern "C" int Find__11CTextureSetFPc(CTextureSet*, char*);
 extern "C" void _WaitDrawDone__8CGraphicFPci(void*, const char*, int);
-extern "C" unsigned char Graphic[];
 extern "C" char lbl_80331114;
 extern "C" char lbl_801DB72C[];
 

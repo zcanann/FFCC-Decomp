@@ -385,15 +385,16 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, UnkB* param_2, UnkC* param_3
         alphaScale = ((float)((double)((u64)0x4330000000000000ULL | (u32)((u8*)pppYmTracer2)[colorOffset + 0x8B]) -
                                DOUBLE_80331850)) /
                      FLOAT_80331848;
-        if (alphaScale < FLOAT_80331840) {
-            alphaScale = FLOAT_80331840;
-        }
-        if (alphaScale > FLOAT_80331844) {
-            alphaScale = FLOAT_80331844;
-        }
 
         GXBegin((GXPrimitive)0x98, GX_VTXFMT7, (u16)(visibleCount - 1) * 4);
         for (u16 i = 0; i < (u16)(visibleCount - 1); i++) {
+            if (alphaScale < FLOAT_80331840) {
+                alphaScale = FLOAT_80331840;
+            }
+            if (alphaScale > FLOAT_80331844) {
+                alphaScale = FLOAT_80331844;
+            }
+
             float u0 = (float)i * uvStep;
             float u1 = (float)(i + 1) * uvStep;
             TraceEntry* current = &entries[i];

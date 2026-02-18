@@ -994,14 +994,12 @@ extern "C" void __opP3Vec__7CVectorFv(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void __pl__7CVectorCFRC7CVector(CVector* outVec, CVector* vectorA, CVector* vectorB)
+CVector CVector::operator+(const CVector& other) const
 {
-    CVector result;
+    CVector out;
 
-    PSVECAdd(reinterpret_cast<Vec*>(vectorA), reinterpret_cast<Vec*>(vectorB), reinterpret_cast<Vec*>(&result));
-    outVec->x = result.x;
-    outVec->y = result.y;
-    outVec->z = result.z;
+    PSVECAdd((const Vec*)this, (const Vec*)&other, (Vec*)&out);
+    return out;
 }
 
 /*
@@ -1013,14 +1011,13 @@ extern "C" void __pl__7CVectorCFRC7CVector(CVector* outVec, CVector* vectorA, CV
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void __as__7CVectorFRC7CVector(CVector* vectorA, CVector* vectorB)
+void CVector::operator=(const CVector& other)
 {
-    float y = vectorB->y;
-    float x = vectorB->x;
-    vectorA->x = x;
-    vectorA->y = y;
-    float z = vectorB->z;
-    vectorA->z = z;
+    float y = other.y;
+    x = other.x;
+    float z = other.z;
+    this->y = y;
+    this->z = z;
 }
 
 /*

@@ -1016,9 +1016,10 @@ extern "C" void __pl__7CVectorCFRC7CVector(CVector* outVec, CVector* vectorA, CV
 extern "C" void __as__7CVectorFRC7CVector(CVector* vectorA, CVector* vectorB)
 {
     float y = vectorB->y;
-    vectorA->x = vectorB->x;
-    float z = vectorB->z;
+    float x = vectorB->x;
+    vectorA->x = x;
     vectorA->y = y;
+    float z = vectorB->z;
     vectorA->z = z;
 }
 

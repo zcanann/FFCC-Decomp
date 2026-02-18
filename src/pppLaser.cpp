@@ -162,7 +162,7 @@ void pppConstruct2Laser(struct pppLaser *pppLaser, struct UnkC *param_2)
 {
     f32 fVar1 = FLOAT_80333428;
     int iVar2 = param_2->offsets->m_serializedDataOffsets[2];
-    
+
     *(f32*)((u8*)&pppLaser->field_0x98 + iVar2) = fVar1;
     *(f32*)((u8*)&pppLaser->field_0x94 + iVar2) = fVar1;
     *(f32*)((u8*)&pppLaser->field_0x90 + iVar2) = fVar1;
@@ -186,11 +186,11 @@ void pppConstruct2Laser(struct pppLaser *pppLaser, struct UnkC *param_2)
  */
 void pppDestructLaser(struct pppLaser *pppLaser, struct UnkC *param_2)
 {
-    int iVar1 = param_2->offsets->m_serializedDataOffsets[2];
-    void *pfVar3 = *(void **)((u8*)&pppLaser->field_0x9c + iVar1);
-    if (pfVar3 != 0) {
-        pppHeapUseRate__FPQ27CMemory6CStage(pfVar3);
-        *(void **)((u8*)&pppLaser->field_0x9c + iVar1) = 0;
+    f32* work = (f32*)((u8*)pppLaser + 0x80 + param_2->offsets->m_serializedDataOffsets[2]);
+    void* alloc = *(void**)(work + 7);
+    if (alloc != 0) {
+        pppHeapUseRate__FPQ27CMemory6CStage(alloc);
+        *(void**)(work + 7) = 0;
     }
 }
 

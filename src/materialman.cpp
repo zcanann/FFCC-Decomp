@@ -20,6 +20,13 @@ extern CMemory Memory;
 extern unsigned char MaterialMan[];
 static const char s_materialStageName[] = "material";
 
+class CMapKeyFrame
+{
+public:
+    float Get();
+    void Calc();
+};
+
 namespace {
 template <class T>
 class CPtrArray
@@ -907,6 +914,61 @@ unsigned short CMaterialSet::FindTexName(char* textureName, long* textureIndexOu
                 material += 4;
             }
         }
+        materialIndex++;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003c8d0
+ * PAL Size: 352b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMaterialSet::Calc()
+{
+    CPtrArray<CMaterial*>* materialArray = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
+    unsigned long materialIndex = 0;
+
+    while (materialIndex < static_cast<unsigned long>(materialArray->GetSize())) {
+        unsigned char* material = reinterpret_cast<unsigned char*>((*materialArray)[materialIndex]);
+        if (material != 0) {
+            unsigned char* texScroll = material + 0x4C;
+            for (int i = 0; i < 4; i++) {
+                if (texScroll[0] == 1) {
+                    float& offsetU = *reinterpret_cast<float*>(texScroll + 4);
+                    offsetU += *reinterpret_cast<float*>(texScroll + 0xC);
+                    if (offsetU > 1.0f) {
+                        offsetU -= 1.0f;
+                    } else if (offsetU < 0.0f) {
+                        offsetU += 1.0f;
+                    }
+                } else if (texScroll[0] == 2) {
+                    CMapKeyFrame* keyFrameU = *reinterpret_cast<CMapKeyFrame**>(texScroll + 0xC);
+                    *reinterpret_cast<float*>(texScroll + 4) = keyFrameU->Get();
+                    keyFrameU->Calc();
+                }
+
+                if (texScroll[1] == 1) {
+                    float& offsetV = *reinterpret_cast<float*>(texScroll + 8);
+                    offsetV += *reinterpret_cast<float*>(texScroll + 0x10);
+                    if (offsetV > 1.0f) {
+                        offsetV -= 1.0f;
+                    } else if (offsetV < 0.0f) {
+                        offsetV += 1.0f;
+                    }
+                } else if (texScroll[1] == 2) {
+                    CMapKeyFrame* keyFrameV = *reinterpret_cast<CMapKeyFrame**>(texScroll + 0x10);
+                    *reinterpret_cast<float*>(texScroll + 8) = keyFrameV->Get();
+                    keyFrameV->Calc();
+                }
+
+                texScroll += 0x14;
+            }
+        }
+
         materialIndex++;
     }
 }

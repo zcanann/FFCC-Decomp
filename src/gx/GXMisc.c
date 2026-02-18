@@ -259,12 +259,20 @@ void GXPokeDither(GXBool dither) {
     GX_SET_PE_REG(1, reg);
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801A21C0
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void GXPokeZMode(GXBool compare_enable, GXCompare func, GXBool update_enable) {
     u32 reg = 0;
-
-    SET_REG_FIELD(767, reg, 1, 0, compare_enable);
-    SET_REG_FIELD(768, reg, 3, 1, func);
-    SET_REG_FIELD(769, reg, 1, 4, update_enable);
+    reg |= compare_enable;
+    reg |= func << 1;
+    reg |= update_enable << 4;
     GX_SET_PE_REG(0, reg);
 }
 

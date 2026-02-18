@@ -42,6 +42,7 @@ extern "C" unsigned char DAT_8032ed8a;
 extern "C" unsigned char DAT_8032ed8b;
 extern "C" int DAT_8032ed70;
 extern "C" int DAT_8032ed7c;
+extern "C" unsigned int DAT_8032ed80;
 extern "C" unsigned char CFlat[];
 extern "C" void* CAMemCacheSet;
 extern "C" void SetPart__9CLightPcsFQ29CLightPcs6TARGETPvUc(CLightPcs*, int, void*, unsigned char);
@@ -1838,12 +1839,75 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 80054c58
+ * PAL Size: 304b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppCalcPartStd(_pppMngSt*)
+void pppCalcPartStd(_pppMngSt* pppMngSt)
 {
-	// TODO
+	typedef void (*ConProgFn)(void*, void*, void*);
+
+	s32 pDataOffset = 0;
+	for (s32 i = 0; i < *(s32*)(((u8*)pppMngSt) + 0xB8); i++)
+	{
+		u8* pDataVals = (u8*)(*(void**)(((u8*)pppMngSt) + 0xC8));
+		s32* pDataVal = (s32*)(pDataVals + pDataOffset);
+
+		if (pDataVals != 0 && pDataVal[0] != 0)
+		{
+			s32 progSet = pDataVal[0];
+			u16 activeCount = *(u16*)(((u8*)pDataVal) + 0xC);
+			DAT_8032ed80 += activeCount;
+
+			if (activeCount != 0)
+			{
+				s32 workOffsetStep = 0;
+				u8* stageIter = (u8*)progSet;
+
+				for (s32 stage = 0; stage < *(s16*)(progSet + 0x26); stage++)
+				{
+					s32 prog = *(s32*)(stageIter + 0x28);
+					if (prog != 0)
+					{
+						ConProgFn fn = (ConProgFn)(*(void**)(prog + 8));
+						if (fn != 0)
+						{
+							u16 count = activeCount;
+							s32* obj = (s32*)(pDataVal[1]);
+
+							while (count != 0)
+							{
+								s32 next = obj[0];
+								if (*((u8*)obj + 0x7C) == 0)
+								{
+									fn(
+										obj,
+										*(void**)(((u8*)obj) + *(s32*)(progSet + 0x20) + workOffsetStep),
+										stageIter + 0x28);
+								}
+								count--;
+								obj = (s32*)next;
+							}
+						}
+					}
+
+					stageIter += 0x10;
+					workOffsetStep += 4;
+				}
+			}
+		}
+
+		pDataOffset += 0x10;
+	}
+
+	s16* prioTime = (s16*)(((u8*)pppMngSt) + 0xF9);
+	if (*prioTime != -1)
+	{
+		*prioTime = *prioTime + 1;
+	}
 }
 
 /*

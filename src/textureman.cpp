@@ -914,12 +914,27 @@ void CTexture::GetExternalTlutColor(void*, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003AE78
+ * PAL Size: 116b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CTexture::SetTlutColor(int, _GXColor)
+void CTexture::SetTlutColor(int index, _GXColor color)
 {
-	// TODO
+    int offset = 0;
+
+    if (U8At(this, 0x60) == 9) {
+        offset = 0x100;
+    } else if (U8At(this, 0x60) == 8) {
+        offset = 0x10;
+    }
+
+    U16At(PtrAt(this, 0x7C), (index + offset) * 2) =
+        static_cast<unsigned short>((static_cast<unsigned short>(color.a) << 8) | color.b);
+    U16At(PtrAt(this, 0x7C), index * 2) =
+        static_cast<unsigned short>((static_cast<unsigned short>(color.g) << 8) | color.r);
 }
 
 /*

@@ -190,12 +190,56 @@ int SeStopID(int seId)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801ca638
+ * PAL Size: 464b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void SeStopMG(int, int, int, int)
+int SeStopMG(int bank, int sep, int group, int kind)
 {
-	// TODO
+	int soundBase;
+	int* trackBasePtr;
+	int* track;
+
+	soundBase = (int)DAT_8032f3f0;
+	trackBasePtr = (int*)(soundBase + 0xdbc);
+	*(unsigned int*)(soundBase + 0x1244) = 0;
+	track = *(int**)(soundBase + 0xdbc);
+	do {
+		if ((*track != 0) && ((track[0x3d] & 0x80000000U) == 0)) {
+			int id = track[0x3d] / 1000 + (track[0x3d] >> 0x1f);
+			id = id - (id >> 0x1f);
+			if ((bank != id) && (sep != id) && (group != id) && (kind != id)) {
+				unsigned char trackNo;
+				unsigned int* seTrack;
+
+				KeyOnReserveClear((RedKeyOnDATA*)DAT_8032f3fc, (RedTrackDATA*)track);
+				track[0x3e] = 0;
+				track[0x41] = 0;
+				*track = 0;
+				track[0x16] = 0;
+
+				trackNo = *(unsigned char*)((char*)track + 0x14e);
+				((unsigned char*)DAT_8032f444)[trackNo * 0xc0 + 0x1a] &= (unsigned char)0xfa;
+				seTrack = (unsigned int*)((unsigned char*)DAT_8032f444 + trackNo * 0xc0);
+				seTrack[0x25] &= 0xfffffff7;
+				seTrack[0x24] &= 0xfffffffe;
+				seTrack[0x24] |= 2;
+				seTrack[0] = 0;
+				seTrack[0x23] = 0;
+
+				if (track[6] != 0) {
+					DAT_8032e154.WaveHistoryManager(0, *(short*)(track[6] + 2));
+				}
+				DAT_8032e154.SeSepHistoryManager(0, track[0x3d]);
+			}
+		}
+		track += 0x55;
+	} while (track < (int*)(*trackBasePtr + 0x2a80));
+
+	return 0;
 }
 
 /*

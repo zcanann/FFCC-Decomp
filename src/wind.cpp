@@ -375,31 +375,29 @@ found:
 int CWind::AddDiffuse(const Vec* pos, float radius, float dir, float speed)
 {
 	u8* freeObj;
-	int freeIdx = 0;
-	u8* scan = (u8*)this;
+	u8* scan;
+	int freeIdx;
+	int group;
 
-	for (int group = 4; group != 0; group--) {
+	scan = (u8*)this;
+	freeIdx = 0;
+	group = 4;
+	do {
 		freeObj = scan;
-		if ((int)((u32)scan[0] << 24) >= 0) goto found;
-		freeObj = scan + 100;
-		if ((int)((u32)freeObj[0] << 24) >= 0) goto found;
-		freeObj = scan + 200;
-		if ((int)((u32)freeObj[0] << 24) >= 0) goto found;
-		freeObj = scan + 300;
-		if ((int)((u32)freeObj[0] << 24) >= 0) goto found;
-		freeObj = scan + 400;
-		if ((int)((u32)freeObj[0] << 24) >= 0) goto found;
-		freeObj = scan + 500;
-		if ((int)((u32)freeObj[0] << 24) >= 0) goto found;
-		freeObj = scan + 600;
-		if ((int)((u32)freeObj[0] << 24) >= 0) goto found;
-		freeObj = scan + 700;
-		if ((int)((u32)scan[700] << 24) >= 0) goto found;
+		if (((((s8)scan[0] >= 0) || ((freeObj = scan + 100), (s8)freeObj[0] >= 0)) ||
+		     ((freeObj = scan + 200), (s8)freeObj[0] >= 0)) ||
+		    (((freeObj = scan + 300), (s8)freeObj[0] >= 0) ||
+		     ((freeObj = scan + 400), (s8)freeObj[0] >= 0)) ||
+		   (((freeObj = scan + 500), (s8)freeObj[0] >= 0) ||
+		    (((freeObj = scan + 600), (s8)freeObj[0] >= 0) ||
+		     ((freeObj = scan + 700), (s8)scan[700] >= 0)))) {
+			goto found;
+		}
 
-		freeIdx = freeIdx + 7;
-		scan = scan + 800;
-	}
-
+		freeIdx += 7;
+		scan += 800;
+		group--;
+	} while (group != 0);
 	freeObj = 0;
 
 found:

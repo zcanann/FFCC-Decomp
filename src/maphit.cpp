@@ -745,20 +745,21 @@ void CMapHit::DrawWire()
     while (faceIndex < static_cast<int>(m_faceCount)) {
         GXBegin(static_cast<GXPrimitive>(0xB0), GX_VTXFMT7, static_cast<u16>(4));
 
-        unsigned short* index = reinterpret_cast<unsigned short*>(face + 0x48);
+        unsigned char* index = face;
         int i = 0;
         while (i < static_cast<int>(face[0x46])) {
-            Vec* vertex = m_vertices + *index;
+            Vec* vertex = m_vertices + *reinterpret_cast<unsigned short*>(index + 0x48);
             GXPosition3f32(vertex->x, vertex->y, vertex->z);
             i++;
-            index++;
+            index += sizeof(unsigned short);
         }
 
-        Vec* firstVertex = m_vertices + *reinterpret_cast<unsigned short*>(face + 0x48);
-        GXPosition3f32(firstVertex->x, firstVertex->y, firstVertex->z);
-
+        const unsigned short firstIndex = *reinterpret_cast<unsigned short*>(face + 0x48);
         face += kFaceStride;
         faceIndex++;
+
+        Vec* firstVertex = m_vertices + firstIndex;
+        GXPosition3f32(firstVertex->x, firstVertex->y, firstVertex->z);
     }
 }
 

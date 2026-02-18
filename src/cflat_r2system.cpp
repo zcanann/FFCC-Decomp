@@ -1022,6 +1022,41 @@ void CVector::operator=(const CVector& other)
 
 /*
  * --INFO--
+ * PAL Address: 0x800B9868
+ * PAL Size: 28b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CVector::CVector(const CVector& other)
+{
+    float y = other.y;
+    x = other.x;
+    float z = other.z;
+    this->y = y;
+    this->z = z;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9884
+ * PAL Size: 112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CVector CVector::operator-(const CVector& other) const
+{
+    CVector out;
+
+    PSVECSubtract((const Vec*)this, (const Vec*)&other, (Vec*)&out);
+    return out;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800B9920
  * PAL Size: 8b
  * EN Address: TODO

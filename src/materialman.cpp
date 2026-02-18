@@ -8,10 +8,12 @@
 extern "C" unsigned long UnkMaterialSetGetter(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void __dla__FPv(void*);
+extern "C" void __dl__FPv(void*);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __ct__10CTexScrollFv(void*);
 extern "C" void __dt__10CTexScrollFv(void*, int);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
+extern "C" void __destroy_arr(void*, void*, unsigned long, unsigned long);
 extern "C" int CheckName__8CTextureFPc(CTexture*, char*);
 extern "C" void* __vt__9CMaterial[];
 extern CMemory Memory;
@@ -573,6 +575,27 @@ void CMaterialMan::ErrorTexMtxCur()
 void CMaterialMan::ErrorTexMapIdCur()
 {
 	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003c49c
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void* dtor_8003C49C(void* material, short shouldDelete)
+{
+    if (material != 0) {
+        __destroy_arr(Ptr(material, 0x10), (void*)__dt__10CTexScrollFv, 0x14, 4);
+        if (shouldDelete > 0) {
+            __dl__FPv(material);
+        }
+    }
+
+    return material;
 }
 
 /*

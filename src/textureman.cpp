@@ -57,6 +57,9 @@ extern "C" void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevS
                                                                                                        int, int);
 extern "C" unsigned short SetData__13CAmemCacheSetFPviQ210CAmemCache4TYPEi(CAmemCacheSet*, void*, int, CAmemCache::TYPE,
                                                                              int);
+extern "C" unsigned int IsEnable__13CAmemCacheSetFs(CAmemCacheSet*, short);
+extern "C" int GetData__13CAmemCacheSetFsPci(CAmemCacheSet*, short, char*, int);
+extern "C" void AddRef__13CAmemCacheSetFs(CAmemCacheSet*, short);
 
 static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
 static char s_ptrarray_grow_error[] = "CPtrArray grow error";
@@ -732,12 +735,57 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003B090
+ * PAL Size: 436b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CTexture::CacheLoadTexture(CAmemCacheSet*)
+void CTexture::CacheLoadTexture(CAmemCacheSet* amemCacheSet)
 {
-	// TODO
+    if (S16At(this, 0x72) != -1) {
+        if (IsEnable__13CAmemCacheSetFs(amemCacheSet, S16At(this, 0x72)) == 0) {
+            PtrAt(this, 0x78) = reinterpret_cast<void*>(
+                GetData__13CAmemCacheSetFsPci(amemCacheSet, S16At(this, 0x72), s_textureman_cpp, 0x1DD));
+
+            const int format = U8At(this, 0x60);
+            if ((format == 9) || (format == 8)) {
+                GXInitTexObjCI(reinterpret_cast<GXTexObj*>(Ptr(this, 0x28)), PtrAt(this, 0x78), U16At(this, 0x64), U16At(this, 0x68),
+                               static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(U8At(this, 0x6C)),
+                               static_cast<GXTexWrapMode>(U8At(this, 0x6C)), 0, 0);
+
+                unsigned int numEntries = 0x10;
+                if (U8At(this, 0x60) == 9) {
+                    numEntries = 0x100;
+                }
+                GXInitTlutObj(reinterpret_cast<GXTlutObj*>(Ptr(this, 0x48)), PtrAt(this, 0x7C), GX_TL_IA8,
+                              static_cast<u16>(numEntries));
+
+                numEntries = 0x10;
+                if (U8At(this, 0x60) == 9) {
+                    numEntries = 0x100;
+                }
+                int offset = 0x10;
+                if (U8At(this, 0x60) == 9) {
+                    offset = 0x100;
+                }
+                GXInitTlutObj(reinterpret_cast<GXTlutObj*>(Ptr(this, 0x54)), Ptr(PtrAt(this, 0x7C), offset * 2), GX_TL_IA8,
+                              static_cast<u16>(numEntries));
+            } else {
+                GXInitTexObj(reinterpret_cast<GXTexObj*>(Ptr(this, 0x28)), PtrAt(this, 0x78), U16At(this, 0x64), U16At(this, 0x68),
+                             static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(U8At(this, 0x6C)),
+                             static_cast<GXTexWrapMode>(U8At(this, 0x6C)), 1 - (U8At(this, 0x74) >> 31));
+            }
+
+            const unsigned char maxLod = U8At(this, 0x74);
+            if (maxLod >= 2) {
+                GXInitTexObjLOD(reinterpret_cast<GXTexObj*>(Ptr(this, 0x28)), GX_LINEAR, GX_LINEAR, 0.0f,
+                                static_cast<float>(maxLod - 1), 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+            }
+        }
+        AddRef__13CAmemCacheSetFs(amemCacheSet, S16At(this, 0x72));
+    }
 }
 
 /*
@@ -827,12 +875,31 @@ void CTexture::SetExternalTlut(void* tlutData, int loadToGX)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003AEEC
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CTexture::GetTlutColor(int)
+_GXColor CTexture::GetTlutColor(int index)
 {
-	// TODO
+    int offset = 0;
+
+    if (U8At(this, 0x60) == 9) {
+        offset = 0x100;
+    } else if (U8At(this, 0x60) == 8) {
+        offset = 0x10;
+    }
+
+    _GXColor color;
+    unsigned short color0 = U16At(PtrAt(this, 0x7C), index * 2);
+    unsigned short color1 = U16At(PtrAt(this, 0x7C), (index + offset) * 2);
+    color.r = static_cast<unsigned char>(color0);
+    color.g = static_cast<unsigned char>(color0 >> 8);
+    color.b = static_cast<unsigned char>(color1);
+    color.a = static_cast<unsigned char>(color1 >> 8);
+    return color;
 }
 
 /*
@@ -1082,12 +1149,22 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003A6F0
+ * PAL Size: 140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CTextureSet::Find(char*)
+int CTextureSet::Find(char* name)
 {
-	// TODO
+    for (unsigned long i = 0; i < static_cast<unsigned long>(Textures(this)->GetSize()); i++) {
+        CTexture* texture = (*Textures(this))[i];
+        if ((texture != 0) && (strcmp(reinterpret_cast<char*>(Ptr(texture, 8)), name) == 0)) {
+            return static_cast<int>(i);
+        }
+    }
+    return -1;
 }
 
 /*

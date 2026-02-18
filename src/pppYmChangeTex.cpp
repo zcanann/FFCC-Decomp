@@ -92,61 +92,55 @@ void ChangeTex_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* pa
  */
 void ChangeTex_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* param_3, int meshIdx, float (*) [4])
 {
-	if (*(char*)((char*)param_3 + 0x14) == 0) {
-		return;
-	}
+	if (*(char*)((char*)param_3 + 0x14) != 0) {
+		int textureInfo = *(int*)((char*)param_2 + 0x1c);
+		void* meshData = *(void**)((char*)model + 0xac + meshIdx * 0x14 + 8);
+		char* displayLists = (char*)*(void**)((char*)meshData + 0x50);
+		int colorArrayBase = *(int*)((char*)param_2 + 0xc);
+		if (colorArrayBase != 0) {
+			int vertexArray = *(int*)(colorArrayBase + meshIdx * 4);
+			if (vertexArray != 0) {
+				*(void**)(MaterialMan + 0x4) = *(void**)((char*)meshData + 0x20);
+				GXSetArray(0xb, (void*)vertexArray, 4);
 
-	int textureInfo = *(int*)((char*)param_2 + 0x1c);
-	char* meshes = (char*)model + 0xac;
-	void* meshData = *(void**)(meshes + meshIdx * 0x14 + 8);
-	void* displayLists = *(void**)((char*)meshData + 0x50);
-	int arrayBase = *(int*)((char*)param_2 + 0xc);
-	if (arrayBase == 0) {
-		return;
-	}
+				if ((*(char*)((char*)param_3 + 0x14) == 2) || (*(char*)((char*)param_3 + 0x14) == 3)) {
+					*(int*)(MaterialMan + 0x208) = 0;
+				} else {
+					*(int*)(MaterialMan + 0x208) = textureInfo + 0x28;
+				}
 
-	int vertexArray = *(int*)(arrayBase + meshIdx * 4);
-	if (vertexArray == 0) {
-		return;
-	}
+				int dlIdx = *(int*)((char*)meshData + 0x4c) - 1;
+				int dlOffset = dlIdx * 4;
+				for (; dlIdx >= 0; dlIdx--) {
+					int dlArrayBase = *(int*)(*(int*)((char*)param_2 + 0x10) + meshIdx * 4);
+					*(int*)(MaterialMan + 0x44) = -1;
+					*(char*)(MaterialMan + 0x4c) = (char)0xff;
+					*(int*)(MaterialMan + 0x11c) = 0;
+					*(int*)(MaterialMan + 0x120) = 0x1e;
+					*(int*)(MaterialMan + 0x124) = 0;
+					*(char*)(MaterialMan + 0x205) = (char)0xff;
+					*(char*)(MaterialMan + 0x206) = (char)0xff;
+					*(int*)(MaterialMan + 0x58) = 0;
+					*(int*)(MaterialMan + 0x5c) = 0;
+					*(char*)(MaterialMan + 0x208) = 0;
+					*(int*)(MaterialMan + 0x48) = 0xade0f;
+					*(int*)(MaterialMan + 0x128) = 0;
+					*(int*)(MaterialMan + 0x12c) = 0x1e;
+					*(int*)(MaterialMan + 0x130) = 0;
+					*(int*)(MaterialMan + 0x40) = 0xade0f;
 
-	*(void**)(MaterialMan + 0x4) = *(void**)((char*)meshData + 0x20);
-	GXSetArray(0xb, (void*)vertexArray, 4);
+					void* modelData = *(void**)((char*)model + 0xa4);
+					void* materialSet = *(void**)((char*)modelData + 0x24);
+					unsigned short material = *(unsigned short*)(displayLists + 8);
+					SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(MaterialMan, materialSet, material, 0, 0);
 
-	char flag = *(char*)((char*)param_3 + 0x14);
-	if (flag == 2 || flag == 3) {
-		*(int*)(MaterialMan + 0x208) = 0;
-	} else {
-		*(int*)(MaterialMan + 0x208) = textureInfo + 0x28;
-	}
-
-	int dlCount = *(int*)((char*)meshData + 0x4c);
-	int dlArrayBase = *(int*)(*(int*)((char*)param_2 + 0x10) + meshIdx * 4);
-	for (int i = dlCount - 1; i >= 0; --i) {
-		*(int*)(MaterialMan + 0x44) = -1;
-		*(char*)(MaterialMan + 0x4c) = (char)0xff;
-		*(int*)(MaterialMan + 0x11c) = 0;
-		*(int*)(MaterialMan + 0x120) = 0x1e;
-		*(int*)(MaterialMan + 0x124) = 0;
-		*(char*)(MaterialMan + 0x205) = (char)0xff;
-		*(char*)(MaterialMan + 0x206) = (char)0xff;
-		*(int*)(MaterialMan + 0x58) = 0;
-		*(int*)(MaterialMan + 0x5c) = 0;
-		*(char*)(MaterialMan + 0x208) = 0;
-		*(int*)(MaterialMan + 0x48) = 0xade0f;
-		*(int*)(MaterialMan + 0x128) = 0;
-		*(int*)(MaterialMan + 0x12c) = 0x1e;
-		*(int*)(MaterialMan + 0x130) = 0;
-		*(int*)(MaterialMan + 0x40) = 0xade0f;
-
-		void* displayList = (char*)displayLists + i * 0xc;
-		void* modelData = *(void**)((char*)model + 0xa4);
-		void* materialSet = *(void**)((char*)modelData + 0x24);
-		unsigned short material = *(unsigned short*)((char*)displayList + 8);
-		SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(MaterialMan, materialSet, material, 0, 0);
-
-		void** dl = (void**)(dlArrayBase + i * 4);
-		GXCallDisplayList(dl[0], *(unsigned int*)((char*)dl + 4));
+					void** dl = *(void***)(dlArrayBase + dlOffset);
+					GXCallDisplayList(dl[0], (unsigned int)dl[1]);
+					dlOffset -= 4;
+					displayLists += 0xc;
+				}
+			}
+		}
 	}
 }
 

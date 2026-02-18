@@ -1068,29 +1068,29 @@ unsigned int CMath::Hsb2Rgb(int hue, int saturation, int brightness)
 
         unsigned char lo = (unsigned char)m;
         unsigned char hi = (unsigned char)val;
-        unsigned char midUp = (unsigned char)(m + x);
-        unsigned char midDown = (unsigned char)(val - x);
+        unsigned char q = (unsigned char)(val - x);
+        unsigned char t = (unsigned char)(m + x);
 
         if (hue < 60) {
-            rgba = ((unsigned int)midUp << 24) | ((unsigned int)lo << 16) | ((unsigned int)lo << 8);
+            rgba = ((unsigned int)hi << 24) | ((unsigned int)t << 16) | ((unsigned int)lo << 8);
         }
         else if (hue < 120) {
-            rgba = ((unsigned int)hi << 24) | ((unsigned int)lo << 16) | ((unsigned int)midDown << 8);
+            rgba = ((unsigned int)q << 24) | ((unsigned int)hi << 16) | ((unsigned int)lo << 8);
         }
         else if (hue < 180) {
-            rgba = ((unsigned int)hi << 16) | ((unsigned int)midUp << 8) | (unsigned int)lo;
+            rgba = ((unsigned int)lo << 16) | ((unsigned int)hi << 8) | (unsigned int)t;
             rgba <<= 8;
         }
         else if (hue < 240) {
-            rgba = ((unsigned int)midDown << 16) | ((unsigned int)hi << 8) | (unsigned int)lo;
+            rgba = ((unsigned int)lo << 16) | ((unsigned int)q << 8) | (unsigned int)hi;
             rgba <<= 8;
         }
         else if (hue < 300) {
-            rgba = ((unsigned int)lo << 16) | ((unsigned int)hi << 8) | (unsigned int)midUp;
+            rgba = ((unsigned int)t << 16) | ((unsigned int)lo << 8) | (unsigned int)hi;
             rgba <<= 8;
         }
         else if (hue < 360) {
-            rgba = ((unsigned int)lo << 24) | ((unsigned int)midDown << 16) | ((unsigned int)hi << 8);
+            rgba = ((unsigned int)hi << 24) | ((unsigned int)lo << 16) | ((unsigned int)q << 8);
         }
         else {
             rgba = 0;

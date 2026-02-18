@@ -994,7 +994,7 @@ extern "C" void __opP3Vec__7CVectorFv(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void __pl__7CVectorCFRC7CVector(CVector* outVec, CVector* vectorA, CVector* vectorB)
+CVector CVector::operator+(const CVector& other) const
 {
     CVector localVec;
 

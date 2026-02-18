@@ -9,6 +9,8 @@ public:
 	CVector();
 	CVector(float, float, float);
 	CVector(const Vec&);
+	CVector operator+(const CVector&) const;
+	void operator=(const CVector&);
 
 	void Identity();
 	void Normalize();

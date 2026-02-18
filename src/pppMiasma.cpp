@@ -1,8 +1,30 @@
 #include "ffcc/pppMiasma.h"
+#include "ffcc/graphic.h"
+#include "ffcc/p_game.h"
+#include "ffcc/partMng.h"
 
 #include <string.h>
 
 extern int DAT_8032ed70;
+extern float FLOAT_80331928;
+extern float FLOAT_8033192c;
+extern float FLOAT_80331930;
+extern float FLOAT_80331934;
+extern float FLOAT_80331938;
+
+extern struct {
+    float _224_4_, _228_4_, _232_4_;
+} CameraPcs;
+
+extern "C" {
+void GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh*, CMaterialSet*, int&);
+}
+
+struct PppMiasmaRenderStep {
+    s32 m_graphId;
+    s32 m_dataValIndex;
+    u8 m_payload[0x20];
+};
 
 /*
  * --INFO--
@@ -33,9 +55,72 @@ void CreateScaleMatrix(_pppPObject*, float)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderMiasma(pppMiasma*, void*, pppMiasmaCtrl*)
+void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3)
 {
-	// TODO
+    PppMiasmaRenderStep* step;
+    pppModelSt* model;
+    s16* work;
+    Vec managerPos;
+    Vec cameraPos;
+    float radius;
+    float maxRadius;
+    float radiusScale;
+    int colorOffset;
+    int textureIndex;
+    u16 i;
+    bool inFarZone;
+
+    Graphic.SetDrawDoneDebugData(0x31);
+
+    step = (PppMiasmaRenderStep*)param_2;
+    work = (s16*)((u8*)pppMiasma + 0x80 + param_3->m_serializedDataOffsets[2]);
+    colorOffset = param_3->m_serializedDataOffsets[1];
+    radiusScale = *(float*)((u8*)pppMiasma + 0x80 + param_3->m_serializedDataOffsets[3]);
+
+    textureIndex = 0;
+    model = (pppModelSt*)(((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[step->m_dataValIndex]);
+    GetTexture__8CMapMeshFP12CMaterialSetRi((CMapMesh*)model, pppEnvStPtr->m_materialSetPtr, textureIndex);
+
+    if (step->m_payload[0x1e] == 0xFF) {
+        step->m_payload[0x1e] = 0xFE;
+    }
+
+    managerPos.x = pppMngStPtr->m_matrix.value[0][3];
+    managerPos.y = pppMngStPtr->m_matrix.value[1][3];
+    managerPos.z = pppMngStPtr->m_matrix.value[2][3];
+
+    if (Game.game.m_currentSceneId == 7) {
+        float* radiusArray;
+        u16 meshCount;
+
+        cameraPos.x = ppvCameraMatrix0[0][3];
+        cameraPos.y = ppvCameraMatrix0[1][3];
+        cameraPos.z = ppvCameraMatrix0[2][3];
+        maxRadius = FLOAT_80331930;
+
+        meshCount = *(u16*)((u8*)&model->m_mapMesh + 0x0);
+        radiusArray = *(float**)((u8*)&model->m_mapMesh + 0x2c);
+        for (i = 0; i < meshCount; i++) {
+            radius = radiusArray[i * 3];
+            if (maxRadius < radius) {
+                maxRadius = radius;
+            }
+        }
+    } else {
+        cameraPos.x = CameraPcs._224_4_;
+        cameraPos.y = CameraPcs._228_4_;
+        cameraPos.z = CameraPcs._232_4_;
+        maxRadius = FLOAT_80331934;
+    }
+
+    maxRadius = maxRadius * radiusScale;
+    inFarZone = (FLOAT_80331938 + maxRadius) <= PSVECDistance(&cameraPos, &managerPos);
+
+    (void)colorOffset;
+    (void)work;
+    (void)inFarZone;
+    (void)step;
+    (void)textureIndex;
 }
 
 /*

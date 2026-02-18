@@ -5,7 +5,7 @@
 
 #include <string.h>
 
-extern int DAT_8032ed70;
+extern int lbl_8032ED70;
 extern float FLOAT_80331928;
 extern float FLOAT_8033192c;
 extern float FLOAT_80331930;
@@ -188,7 +188,7 @@ void pppFrameMiasma(pppMiasma* pppMiasma, pppMiasmaFrameStep* param_2, pppMiasma
 {
     s16* work;
 
-    if (DAT_8032ed70 != 0) {
+    if (lbl_8032ED70 != 0) {
         return;
     }
 

@@ -14,6 +14,14 @@ extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 
 static const char s_fontman_cpp[] = "fontman.cpp";
+static const char s_CFontMan[] = "CFontMan";
+
+namespace {
+static inline unsigned char* Ptr(void* p, unsigned int offset)
+{
+    return reinterpret_cast<unsigned char*>(p) + offset;
+}
+}
 
 /*
  * --INFO--
@@ -37,22 +45,52 @@ CFontMan::~CFontMan()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80092f70
+ * PAL Size: 296b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFontMan::Init()
 {
-	// TODO
+    CFont* font;
+
+    *reinterpret_cast<CFont**>(Ptr(this, 8)) = 0;
+    *reinterpret_cast<CMemory::CStage**>(Ptr(this, 4)) =
+        Memory.CreateStage(0x8000, const_cast<char*>(s_CFontMan), 0);
+
+    font = new (*reinterpret_cast<CMemory::CStage**>(Ptr(this, 4)),
+                const_cast<char*>(s_fontman_cpp), 0x3D) CFont;
+    *reinterpret_cast<CFont**>(Ptr(this, 8)) = font;
+    font->Create(0, 0);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80092ef8
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFontMan::Quit()
 {
-	// TODO
+    int* ref;
+    int refCount;
+
+    ref = reinterpret_cast<int*>(*reinterpret_cast<CFont**>(Ptr(this, 8)));
+    if (ref != 0) {
+        refCount = ref[1] - 1;
+        ref[1] = refCount;
+        if ((refCount == 0) && (ref != 0)) {
+            (*reinterpret_cast<void (**)(int*, int)>(*ref + 8))(ref, 1);
+        }
+        *reinterpret_cast<CFont**>(Ptr(this, 8)) = 0;
+    }
+
+    Memory.DestroyStage(*reinterpret_cast<CMemory::CStage**>(Ptr(this, 4)));
 }
 
 /*

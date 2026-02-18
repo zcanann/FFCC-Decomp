@@ -14,6 +14,7 @@
 #include "ffcc/p_tina.h"
 #include "ffcc/sound.h"
 #include "ffcc/USBStreamData.h"
+#include "ffcc/vector.h"
 #include <string.h>
 
 static inline CUSBStreamData* UsbStream(CPartPcs* self)
@@ -982,6 +983,44 @@ void VECMultAdd(Vec* a, Vec* b, Vec* out, float scale)
  */
 extern "C" void __opP3Vec__7CVectorFv(void)
 {
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B97DC
+ * PAL Size: 112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __pl__7CVectorCFRC7CVector(CVector* outVec, CVector* vectorA, CVector* vectorB)
+{
+    CVector result;
+
+    PSVECAdd(reinterpret_cast<Vec*>(vectorA), reinterpret_cast<Vec*>(vectorB), reinterpret_cast<Vec*>(&result));
+    outVec->x = result.x;
+    outVec->y = result.y;
+    outVec->z = result.z;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B984C
+ * PAL Size: 28b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __as__7CVectorFRC7CVector(CVector* vectorA, CVector* vectorB)
+{
+    float x = vectorB->x;
+    float y = vectorB->y;
+    float z = vectorB->z;
+    vectorA->x = x;
+    vectorA->y = y;
+    vectorA->z = z;
 }
 
 /*

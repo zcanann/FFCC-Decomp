@@ -73,8 +73,8 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     colorEntry = **(int**)(*(int*)&pppEnvStPtr->m_particleColors[0] + *(int*)(ymData + 4) * 4);
     r1 = rand();
     life = (s16)r1 - (s16)(r1 / (int)*(s16*)(colorEntry + 6)) * *(s16*)(colorEntry + 6);
-    *(s16*)(particle + 0x5A) = life;
-    *(s16*)(particle + 0x58) = life;
+    *(s16*)(particle + 0x2A) = life;
+    *(s16*)(particle + 0x28) = life;
 
     angleIndex = (u32)(FLOAT_80330650 * FLOAT_80330654 * (float)((double)FLOAT_80330660 * randScale) -
                        FLOAT_80330664);
@@ -111,7 +111,7 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
                                               (u16)*(u8*)(ymData + 0x49));
     *(u16*)(particle + 0x20) = (u16)*(u8*)(ymData + 0x24);
     *(u16*)(particle + 0x22) = (u16)*(u8*)(ymData + 0x25);
-    *(u16*)(particle + 0x21) = (u16)*(u8*)(ymData + 0x26);
+    *(u16*)(particle + 0x24) = (u16)*(u8*)(ymData + 0x26);
     *(u16*)(particle + 0x26) = 0;
 
     *(s16*)(particle + 0x3C) = ((*(s16*)(ymData + 0x28) >> 7) - (u16)*(u8*)(ymData + 0x24)) / *(s16*)(ymData + 0x30);
@@ -119,7 +119,7 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     *(s16*)(particle + 0x40) = ((*(s16*)(ymData + 0x2C) >> 7) - (u16)*(u8*)(ymData + 0x26)) / *(s16*)(ymData + 0x30);
     *(s16*)(particle + 0x42) = ((*(s16*)(ymData + 0x2E) >> 7) - (u16)*(u8*)(ymData + 0x27)) / *(s16*)(ymData + 0x30);
 
-    *(float*)(particle + 0x48) = *(float*)(ymData + 0x34);
+    *(float*)(particle + 0x3C) = *(float*)(ymData + 0x34);
 
     scaledRadius = scaledRadius * (double)*(float*)(ymData + 0x14);
     parityScale = (float)scaledRadius;
@@ -127,10 +127,10 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     if (((parityBits & 1U) ^ (parityBits >> 31)) != (parityBits >> 31)) {
         parityScale = parityScale * FLOAT_80330668;
     }
-    *(float*)(particle + 0x4C) = *(float*)(ymData + 0x10) + parityScale;
-    *(u16*)(particle + 0x50) = *(u16*)(ymData + 0x50);
-    *(u16*)(particle + 0x52) = *(u16*)(ymData + 0x52);
-    *(u8*)(particle + 0x54) = 0;
+    *(float*)(particle + 0x40) = *(float*)(ymData + 0x10) + parityScale;
+    *(u16*)(particle + 0x44) = *(u16*)(ymData + 0x50);
+    *(u16*)(particle + 0x46) = *(u16*)(ymData + 0x52);
+    *(u8*)(particle + 0x48) = 0;
 }
 
 /*

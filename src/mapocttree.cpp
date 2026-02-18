@@ -594,12 +594,128 @@ void COctTree::DrawTypeMeshFrustumIn_r(COctNode* octNode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002e490
+ * PAL Size: 712b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void COctTree::DrawTypeMesh_r(COctNode*)
+void COctTree::DrawTypeMesh_r(COctNode* octNode)
 {
-	// TODO
+	float localX = *reinterpret_cast<float*>(Ptr(this, 0x3C));
+	float localY = *reinterpret_cast<float*>(Ptr(this, 0x40));
+	float localZ = *reinterpret_cast<float*>(Ptr(this, 0x44));
+	unsigned int orMask;
+
+	if (((*reinterpret_cast<float*>(Ptr(octNode, 0x0C)) < localX) || (*reinterpret_cast<float*>(Ptr(octNode, 0x10)) < localY) ||
+	     (*reinterpret_cast<float*>(Ptr(octNode, 0x14)) < localZ)) ||
+	    ((localX < *reinterpret_cast<float*>(Ptr(octNode, 0x00))) || (localY < *reinterpret_cast<float*>(Ptr(octNode, 0x04))) ||
+	     (localZ < *reinterpret_cast<float*>(Ptr(octNode, 0x08))))) {
+		Vec localCorner;
+		Vec viewPos;
+		float maxDepth = lbl_8032F96C;
+		float minDepth = lbl_8032F970;
+		unsigned int andMask = 0xF;
+		int farCount = 0;
+
+		orMask = 0;
+
+		for (int x = 0; x < 2; x++) {
+			localCorner.x = (x == 0) ? *reinterpret_cast<float*>(Ptr(octNode, 0x00)) : *reinterpret_cast<float*>(Ptr(octNode, 0x0C));
+			for (int y = 0; y < 2; y++) {
+				localCorner.y = (y == 0) ? *reinterpret_cast<float*>(Ptr(octNode, 0x04)) : *reinterpret_cast<float*>(Ptr(octNode, 0x10));
+				for (int z = 0; z < 2; z++) {
+					unsigned int clipFlags;
+					double depth;
+
+					localCorner.z = (z == 0) ? *reinterpret_cast<float*>(Ptr(octNode, 0x08)) : *reinterpret_cast<float*>(Ptr(octNode, 0x14));
+					PSMTXMultVec(reinterpret_cast<float(*)[4]>(Ptr(this, 0x0C)), &localCorner, &viewPos);
+
+					depth = static_cast<double>(viewPos.z);
+					if (maxDepth < viewPos.z) {
+						maxDepth = viewPos.z;
+					}
+
+					if (depth <= static_cast<double>(minDepth)) {
+						if (static_cast<double>(viewPos.x) <= -depth) {
+							if (depth <= static_cast<double>(viewPos.x)) {
+								clipFlags = 0;
+							} else {
+								clipFlags = 2;
+							}
+						} else {
+							clipFlags = 1;
+						}
+
+						if (static_cast<double>(viewPos.y) <= -depth) {
+							if (static_cast<double>(viewPos.y) < depth) {
+								clipFlags |= 8;
+							}
+						} else {
+							clipFlags |= 4;
+						}
+					} else {
+						farCount++;
+						if (static_cast<double>(viewPos.x) <= -depth) {
+							if (depth <= static_cast<double>(viewPos.x)) {
+								clipFlags = 0x10;
+							} else {
+								clipFlags = 0x12;
+							}
+						} else {
+							clipFlags = 0x11;
+						}
+
+						if (static_cast<double>(viewPos.y) <= -depth) {
+							if (static_cast<double>(viewPos.y) < depth) {
+								clipFlags |= 0x18;
+							}
+						} else {
+							clipFlags |= 0x14;
+						}
+					}
+
+					andMask &= clipFlags;
+					orMask |= clipFlags;
+				}
+			}
+		}
+
+		if (farCount > 7) {
+			return;
+		}
+		if (maxDepth < *reinterpret_cast<float*>(Ptr(&MapMng, 0x22A70))) {
+			return;
+		}
+		if (andMask != 0) {
+			return;
+		}
+	} else {
+		orMask = 0xF;
+	}
+
+	if (*reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3E)) != 0) {
+		*reinterpret_cast<unsigned long*>(Ptr(octNode, 0x40)) |= 1;
+	}
+
+	if (orMask == 0) {
+		for (int i = 0; i < 8; i++) {
+			if (*reinterpret_cast<COctNode**>(Ptr(octNode, 0x1C)) == 0) {
+				return;
+			}
+			DrawTypeMeshFrustumIn_r(*reinterpret_cast<COctNode**>(Ptr(octNode, 0x1C)));
+			octNode = reinterpret_cast<COctNode*>(Ptr(octNode, 4));
+		}
+	} else {
+		for (int i = 0; i < 8; i++) {
+			if (*reinterpret_cast<COctNode**>(Ptr(octNode, 0x1C)) == 0) {
+				return;
+			}
+			DrawTypeMesh_r(*reinterpret_cast<COctNode**>(Ptr(octNode, 0x1C)));
+			octNode = reinterpret_cast<COctNode*>(Ptr(octNode, 4));
+		}
+	}
 }
 
 /*

@@ -14,12 +14,22 @@ void DataAddCompute(int*, int, int*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C74C8
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void KeyOnReserveClear(RedKeyOnDATA*, RedTrackDATA*)
+void KeyOnReserveClear(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-	// TODO
+    int* slot = (int*)keyOnData;
+    do {
+        if (*slot == (int)track) {
+            *slot = 0;
+        }
+        slot += 2;
+    } while (slot < (int*)((int)keyOnData + 0x600));
 }
 
 /*

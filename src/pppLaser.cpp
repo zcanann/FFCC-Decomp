@@ -136,7 +136,6 @@ void pppConstructLaser(struct pppLaser *pppLaser, struct UnkC *param_2)
         local_14.x = *(f32*)(partyObj + 0x15c);
         local_14.y = *(f32*)(partyObj + 0x160);
         local_14.z = *(f32*)(partyObj + 0x164);
-
         if (local_24 == 0x200) {
             pfVar3[15] = PSVECDistance((Vec*)(pfVar3 + 0x10), &local_14);
         } else {
@@ -224,7 +223,7 @@ void pppFrameLaser(struct pppLaser *pppLaser, struct UnkB *param_2, struct UnkC 
         return;
     }
 
-    bool resetPoints = (work[7] == 0.0f);
+    bool resetPoints = (work[7] == FLOAT_80333428);
     if (resetPoints) {
         work[7] = (float)(u32)pppMemAlloc__FUlPQ27CMemory6CStagePci(
             (u32)step->m_payload[0x1e] * 0xc, pppEnvStPtr->m_stagePtr, s_pppLaser_cpp, 0x7d);
@@ -425,30 +424,30 @@ void pppRenderLaser(struct pppLaser *pppLaser, struct UnkB *param_2, struct UnkC
     GXLoadPosMtxImm(mtxOut.value, 0);
 
     GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-    GXPosition3f32(-halfWidth, 0.0f, 0.0f);
+    GXPosition3f32(-halfWidth, FLOAT_80333428, FLOAT_80333428);
     GXColor1u32(color);
-    GXTexCoord2f32(0.0f, 0.0f);
-    GXPosition3f32(-halfWidth, 0.0f, length);
+    GXTexCoord2f32(FLOAT_80333428, FLOAT_80333428);
+    GXPosition3f32(-halfWidth, FLOAT_80333428, length);
     GXColor1u32(color);
-    GXTexCoord2f32(0.0f, work[0]);
-    GXPosition3f32(halfWidth, 0.0f, 0.0f);
+    GXTexCoord2f32(FLOAT_80333428, work[0]);
+    GXPosition3f32(halfWidth, FLOAT_80333428, FLOAT_80333428);
     GXColor1u32(color);
-    GXTexCoord2f32(FLOAT_8033342c, 0.0f);
-    GXPosition3f32(halfWidth, 0.0f, length);
+    GXTexCoord2f32(FLOAT_8033342c, FLOAT_80333428);
+    GXPosition3f32(halfWidth, FLOAT_80333428, length);
     GXColor1u32(color);
     GXTexCoord2f32(FLOAT_8033342c, work[0]);
 
     GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-    GXPosition3f32(0.0f, -halfWidth, 0.0f);
+    GXPosition3f32(FLOAT_80333428, -halfWidth, FLOAT_80333428);
     GXColor1u32(color);
-    GXTexCoord2f32(0.0f, 0.0f);
-    GXPosition3f32(0.0f, -halfWidth, length);
+    GXTexCoord2f32(FLOAT_80333428, FLOAT_80333428);
+    GXPosition3f32(FLOAT_80333428, -halfWidth, length);
     GXColor1u32(color);
-    GXTexCoord2f32(0.0f, work[0]);
-    GXPosition3f32(0.0f, halfWidth, 0.0f);
+    GXTexCoord2f32(FLOAT_80333428, work[0]);
+    GXPosition3f32(FLOAT_80333428, halfWidth, FLOAT_80333428);
     GXColor1u32(color);
-    GXTexCoord2f32(FLOAT_8033342c, 0.0f);
-    GXPosition3f32(0.0f, halfWidth, length);
+    GXTexCoord2f32(FLOAT_8033342c, FLOAT_80333428);
+    GXPosition3f32(FLOAT_80333428, halfWidth, length);
     GXColor1u32(color);
     GXTexCoord2f32(FLOAT_8033342c, work[0]);
 

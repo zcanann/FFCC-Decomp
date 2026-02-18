@@ -32,6 +32,7 @@ extern "C" int CheckHitCylinder__8COctTreeFP12CMapCylinderP3VecUl(void*, CMapCyl
 extern "C" int CheckHitCylinderNear__8COctTreeFP12CMapCylinderP3VecUl(void*, CMapCylinder*, Vec*, unsigned long);
 extern "C" void SetDrawFlag__8COctTreeFv(void*);
 extern "C" void Calc__11CMapAnimRunFl(CMapAnimRun*, long);
+extern "C" void* lbl_801E89A8[];
 extern int DAT_8032ec78;
 extern float FLOAT_8032ec80;
 extern unsigned char DAT_8032ec88;
@@ -203,7 +204,47 @@ CPtrArray<CMapLightHolder*>::CPtrArray()
 template <>
 CPtrArray<CMapLightHolder*>::~CPtrArray()
 {
-    RemoveAll();
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    void*& items = *reinterpret_cast<void**>(self + 0x10);
+
+    if (items != 0) {
+        __dla__FPv(items);
+        items = 0;
+    }
+
+    *reinterpret_cast<int*>(self + 8) = 0;
+    *reinterpret_cast<int*>(self + 4) = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80034414
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" CPtrArray<CMapLightHolder*>* dtor_80034414(CPtrArray<CMapLightHolder*>* ptrArray, short param_2)
+{
+    if (ptrArray != 0) {
+        *reinterpret_cast<void***>(Ptr(ptrArray, 0)) = lbl_801E89A8;
+
+        void*& items = *reinterpret_cast<void**>(Ptr(ptrArray, 0x10));
+        if (items != 0) {
+            __dla__FPv(items);
+            items = 0;
+        }
+
+        *reinterpret_cast<int*>(Ptr(ptrArray, 8)) = 0;
+        *reinterpret_cast<int*>(Ptr(ptrArray, 4)) = 0;
+
+        if (0 < param_2) {
+            __dl__FPv(ptrArray);
+        }
+    }
+
+    return ptrArray;
 }
 
 template <>

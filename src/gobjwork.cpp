@@ -763,12 +763,62 @@ void CCaravanWork::CheckAndResetCurrentWeaponIdx(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009ED78
+ * PAL Size: 1024b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCaravanWork::SortBeforeReturnWorldMap()
 {
-	// TODO
+	memset(m_commandListExtra, 0, sizeof(m_commandListExtra));
+
+	for (int i = 0; i < 0x3F; i++) {
+		for (int j = i + 1; j < 0x40; j++) {
+			unsigned short lhs = m_inventoryItems[i];
+			unsigned short rhs = m_inventoryItems[j];
+
+			if (static_cast<short>(lhs) < 1) {
+				if (static_cast<short>(rhs) > 0) {
+					m_inventoryItems[i] = rhs;
+					m_inventoryItems[j] = 0xFFFF;
+
+					for (int slot = 2; slot < 8; slot++) {
+						if (static_cast<short>(m_commandListInventorySlotRef[slot]) == j) {
+							m_commandListInventorySlotRef[slot] = static_cast<unsigned short>(i);
+						}
+					}
+
+					for (int equip = 0; equip < 4; equip++) {
+						if (m_equipment[equip] == j) {
+							m_equipment[equip] = static_cast<short>(i);
+						}
+					}
+				}
+			} else if ((static_cast<short>(rhs) > 0) && (static_cast<short>(rhs) < static_cast<short>(lhs))) {
+				m_inventoryItems[i] = rhs;
+				m_inventoryItems[j] = lhs;
+
+				for (int slot = 2; slot < 8; slot++) {
+					short cur = static_cast<short>(m_commandListInventorySlotRef[slot]);
+					if (cur == i) {
+						m_commandListInventorySlotRef[slot] = static_cast<unsigned short>(j);
+					} else if (cur == j) {
+						m_commandListInventorySlotRef[slot] = static_cast<unsigned short>(i);
+					}
+				}
+
+				for (int equip = 0; equip < 4; equip++) {
+					if (m_equipment[equip] == i) {
+						m_equipment[equip] = static_cast<short>(j);
+					} else if (m_equipment[equip] == j) {
+						m_equipment[equip] = static_cast<short>(i);
+					}
+				}
+			}
+		}
+	}
 }
 
 /*

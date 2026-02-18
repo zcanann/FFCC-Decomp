@@ -1107,70 +1107,114 @@ void CUtil::CalcBoundaryBoxQuantized(Vec* minOut, Vec* maxOut, S16Vec* vecs, uns
  */
 int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
 {
-	u8* data = (u8*)dlData;
-	int polygonCount = 0;
-	bool running = true;
+    u8* data = (u8*)dlData;
+    bool running = true;
+    int polygonCount = 0;
 
-	while (running) {
-		u8 cmd = *data;
-		u16 count16 = *(u16*)(data + 1);
-		u32 count = count16;
-		u8 primitive = cmd & 0xF8;
-		bool isPrimitive = false;
+LOOP:
+    do {
+        u8 cmd;
+        u16 count16;
+        u32 count;
+        u32 qwords;
+        bool isPrimitive;
+        u8 primitive;
 
-		data += 3;
+        if (!running) {
+            return polygonCount;
+        }
 
-		switch (primitive) {
-			case 0x80:
-			case 0x90:
-			case 0x98:
-			case 0xA0:
-			case 0xA8:
-			case 0xB0:
-			case 0xB8:
-				isPrimitive = true;
-				break;
-		}
+        cmd = *data;
+        count16 = *(u16*)(data + 1);
+        count = (u32)count16;
+        data += 3;
+        primitive = cmd & 0xF8;
 
-		if (!isPrimitive) {
-			running = false;
-			continue;
-		}
+        if (primitive == 0xA0) {
+VALID:
+            isPrimitive = true;
+        } else {
+            if (primitive > 0x9F) {
+                if (primitive != 0xB0) {
+                    if (primitive < 0xB0) {
+                        if (primitive == 0xA8) {
+                            goto VALID;
+                        }
+                    } else if (primitive == 0xB8) {
+                        goto VALID;
+                    }
+                    goto INVALID;
+                }
+                goto VALID;
+            }
+            if (primitive == 0x90) {
+                goto VALID;
+            }
+            if (primitive < 0x90) {
+                if (primitive == 0x80) {
+                    goto VALID;
+                }
+            } else if (primitive == 0x98) {
+                goto VALID;
+            }
+INVALID:
+            isPrimitive = false;
+        }
 
-		if (primitive == 0x90) {
-			polygonCount += count / 3;
-		} else if (primitive == 0x98) {
-			polygonCount += (int)count - 2;
-		}
+        if (isPrimitive) {
+            if (primitive == 0x90) {
+                polygonCount += count / 3;
+            } else if (primitive == 0x98) {
+                polygonCount = count + polygonCount - 2;
+            }
 
-		if ((cmd & 7) == 2) {
-			if (count != 0) {
-				u32 qwords = count16 >> 3;
-				while (qwords != 0) {
-					data += 0x50;
-					qwords--;
-				}
-				count &= 7;
-				while (count != 0) {
-					data += 10;
-					count--;
-				}
-			}
-		} else if (count != 0) {
-			u32 qwords = count16 >> 3;
-			while (qwords != 0) {
-				data += 0x40;
-				qwords--;
-			}
-			count &= 7;
-			while (count != 0) {
-				data += 8;
-				count--;
-			}
-		}
-	}
+            if ((cmd & 7) != 2) {
+                if (count != 0) {
+                    qwords = (u32)(count16 >> 3);
+                    if ((count16 >> 3) != 0) {
+                        do {
+                            data += 0x40;
+                            qwords -= 1;
+                        } while (qwords != 0);
 
-	return polygonCount;
+                        count &= 7;
+                        if ((count16 & 7) == 0) {
+                            goto LOOP;
+                        }
+                    }
+
+                    do {
+                        data += 8;
+                        count -= 1;
+                    } while (count != 0);
+                }
+                goto LOOP;
+            }
+
+            if (count != 0) {
+                qwords = (u32)(count16 >> 3);
+                if ((count16 >> 3) != 0) {
+                    do {
+                        data += 0x50;
+                        qwords -= 1;
+                    } while (qwords != 0);
+
+                    count &= 7;
+                    if ((count16 & 7) == 0) {
+                        goto LOOP;
+                    }
+                }
+
+                do {
+                    data += 10;
+                    count -= 1;
+                } while (count != 0);
+            }
+            goto LOOP;
+        }
+
+        running = false;
+    } while (true);
 }
 
 /*

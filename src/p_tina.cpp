@@ -2,6 +2,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/stopwatch.h"
 
 extern CPartMng PartMng;
 
@@ -9,6 +10,20 @@ extern char DAT_801ead4c[];
 extern char s_prioTime__d_prio__d_pdtID__2d_fp_801d81a0[];
 extern char DAT_801d81d4[];
 extern char s_p_tina_cpp_801d8008[];
+extern char s_Tina___c__801d8014[];
+extern char s_clc___3f___max___3f___801d8020[];
+extern char s_drw___3f___max___3f___801d8038[];
+extern char s_hpm___3f___max___3f___801d8050[];
+extern int lbl_801EAE08[3];
+extern char* lbl_8032ED40;
+extern unsigned char lbl_8032ED44;
+extern int lbl_8032ED48;
+extern unsigned char lbl_8032ED4C;
+extern char lbl_8032FDB0[];
+extern float lbl_8032FDB8;
+extern double lbl_8032FDC0;
+extern CProfile g_par_calc_prof;
+extern CProfile g_par_draw_prof;
 
 static int GetMngStBaseTime(const _pppMngSt* pppMngSt)
 {
@@ -465,12 +480,56 @@ void CPartPcs::GetParColIdx(int, pppFVECTOR4&)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80052764
+ * PAL Size: 504b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartPcs::drawAfterViewer()
 {
-	// TODO
+	int frameSign;
+
+	Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x3f1);
+	OSStartStopwatch(&g_par_draw_prof);
+	OSStartStopwatch(&g_par_calc_prof);
+	Graphic.SetFog(1, 0);
+	pppInitDrawEnv(0);
+	PartMng.pppEditPartDrawAfter();
+	OSStopStopwatch(&g_par_calc_prof);
+	Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x3fb);
+	OSStopStopwatch(&g_par_draw_prof);
+	PartMng.pppGet2Dpos();
+	pppClearDrawEnv();
+
+	if (lbl_8032ED44 == 0) {
+		lbl_8032ED40 = lbl_8032FDB0;
+		lbl_8032ED44 = 1;
+	}
+	if (lbl_8032ED4C == 0) {
+		lbl_8032ED48 = 0;
+		lbl_8032ED4C = 1;
+	}
+
+	lbl_8032ED48++;
+	frameSign = lbl_8032ED48 >> 0x1f;
+	Graphic.Printf(
+		s_Tina___c__801d8014,
+		(int)(char)lbl_8032ED40[(frameSign * 4 |
+								 (unsigned int)((lbl_8032ED48 >> 4) * 0x40000000 + frameSign) >> 0x1e) -
+								frameSign]);
+
+	g_par_calc_prof.ProfEnd();
+	g_par_draw_prof.ProfEnd();
+	Graphic.Printf(
+		s_clc___3f___max___3f___801d8020, (double)g_par_calc_prof.m_lastTime, (double)g_par_calc_prof.m_maxTime);
+	Graphic.Printf(
+		s_drw___3f___max___3f___801d8038, (double)g_par_draw_prof.m_lastTime, (double)g_par_draw_prof.m_maxTime);
+	Graphic.Printf(
+		s_hpm___3f___max___3f___801d8050,
+		(double)((float)lbl_801EAE08[0] / lbl_8032FDB8),
+		(double)((float)lbl_801EAE08[1] / lbl_8032FDB8));
 }
 
 /*

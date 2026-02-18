@@ -53,92 +53,154 @@ void CMenuPcs::MLstInit1()
  * JP Address: TODO  
  * JP Size: TODO
  */
-void CMenuPcs::MLstOpen()
+int CMenuPcs::MLstOpen()
 {
-	// Initialize menu list data if not already initialized
+	int completedItems;
+	unsigned int itemCount;
+	short* itemPtr;
+
 	if (*(char*)((char*)this + 0x82c + 0xb) == 0) {
-		// Clear menu list data structure
+		int offset;
+		int i;
+		short yPos;
+		short initializedCount;
+
 		memset(*(void**)((char*)this + 0x850), 0, 0x1008);
-		
-		// Initialize 9 menu items with default properties
-		float defaultAlpha = 1.0f;
-		short yPos = 0x18;
-		int itemIndex = 0;
-		
-		for (int i = 0; i < 9; i++) {
-			short* itemPtr = (short*)(*(int*)((char*)this + 0x850) + i * 0x40 + 8);
-			
-			// Set item properties
-			*(int*)(itemPtr + 0x16) = 2;      // Some flag/type
-			*(int*)(itemPtr + 0xe) = 0x5b;    // Texture ID
-			itemPtr[2] = 0xe0;                // Width
-			itemPtr[3] = 0x28;                // Height
-			
-			// Calculate X position (centered)
-			*itemPtr = (short)(int)-(((double)(itemPtr[2] ^ 0x80000000) - 4503599627370496.0) * 0.5 - 320.0);
-			itemPtr[1] = yPos;                // Y position
-			yPos += 0x20;                     // Move down for next item
-			
-			*(float*)(itemPtr + 4) = 1.0f;    // Scale/alpha values
-			*(float*)(itemPtr + 6) = 1.0f;
-			*(int*)(itemPtr + 0x12) = itemIndex;    // Animation start frame
-			*(int*)(itemPtr + 0x14) = 4;            // Animation duration
-			
-			itemIndex++;
-		}
-		
-		// Set item count
-		**(short**)((char*)this + 0x850) = 9;
-		
-		// Mark as initialized
+
+		offset = *(int*)((char*)this + 0x850) + 8;
+		i = 8;
+		do {
+			*(float*)(offset + 0x14) = 1.0f;
+			*(float*)(offset + 0x54) = 1.0f;
+			*(float*)(offset + 0x94) = 1.0f;
+			*(float*)(offset + 0xd4) = 1.0f;
+			*(float*)(offset + 0x114) = 1.0f;
+			*(float*)(offset + 0x154) = 1.0f;
+			*(float*)(offset + 0x194) = 1.0f;
+			*(float*)(offset + 0x1d4) = 1.0f;
+			offset += 0x200;
+			i--;
+		} while (i != 0);
+
+		initializedCount = 0;
+		offset = 0;
+		i = 0;
+		yPos = 0x18;
+		do {
+			short* entry = (short*)(*(int*)((char*)this + 0x850) + offset + 8);
+
+			*(int*)(entry + 0x16) = 2;
+			initializedCount++;
+			*(int*)(entry + 0xe) = 0x5b;
+			offset += 0x40;
+			entry[2] = 0xe0;
+			entry[3] = 0x28;
+			*entry = (short)(int)(320.0 - ((double)entry[2] * 0.5));
+			entry[1] = yPos;
+			yPos += 0x20;
+			*(float*)(entry + 4) = 1.0f;
+			*(float*)(entry + 6) = 1.0f;
+			*(int*)(entry + 0x12) = i;
+			i++;
+			*(int*)(entry + 0x14) = 4;
+		} while (i < 9);
+
+		**(short**)((char*)this + 0x850) = initializedCount;
 		*(char*)((char*)this + 0x82c + 0xb) = 1;
 	}
-	
-	// Handle fade-in animation
-	int completedItems = 0;
-	*(short*)((char*)this + 0x82c + 0x22) += 1; // Increment animation frame
-	int currentFrame = *(short*)((char*)this + 0x82c + 0x22);
-	
-	int itemCount = **(short**)((char*)this + 0x850);
-	short* itemPtr = *(short**)((char*)this + 0x850) + 4;
-	
-	// Update each item's fade-in animation
-	for (int i = 0; i < itemCount; i++) {
-		int startFrame = *(int*)(itemPtr + 0x12);
-		int duration = *(int*)(itemPtr + 0x14);
-		
-		if (startFrame <= currentFrame) {
-			if (currentFrame < startFrame + duration) {
-				// Animate fade-in
-				*(int*)(itemPtr + 0x10) += 1;
-				float progress = (float)(*(int*)(itemPtr + 0x10)) / (float)duration;
-				*(float*)(itemPtr + 8) = progress;
-			} else {
-				// Animation complete
-				completedItems++;
-				*(float*)(itemPtr + 8) = 1.0f;
+
+	completedItems = 0;
+	*(short*)((char*)this + 0x82c + 0x22) = *(short*)((char*)this + 0x82c + 0x22) + 1;
+	itemCount = (unsigned int)**(short**)((char*)this + 0x850);
+	itemPtr = *(short**)((char*)this + 0x850) + 4;
+	if ((int)itemCount > 0) {
+		unsigned int i = itemCount;
+		int currentFrame = (int)*(short*)(*(int*)((char*)this + 0x82c) + 0x22);
+		do {
+			if (*(int*)(itemPtr + 0x12) <= currentFrame) {
+				if (currentFrame < *(int*)(itemPtr + 0x12) + *(int*)(itemPtr + 0x14)) {
+					*(int*)(itemPtr + 0x10) = *(int*)(itemPtr + 0x10) + 1;
+					*(float*)(itemPtr + 8) = (float)*(int*)(itemPtr + 0x10) / (float)*(int*)(itemPtr + 0x14);
+				} else {
+					completedItems++;
+					*(float*)(itemPtr + 8) = 1.0f;
+				}
 			}
-		}
-		
-		itemPtr += 0x20;
-	}
-	
-	// Check if all animations are complete
-	if (itemCount == completedItems) {
-		// Reset all animation states
-		itemPtr = *(short**)((char*)this + 0x850) + 4;
-		for (int i = 0; i < itemCount; i++) {
-			*(short*)(itemPtr + 0x12) = 0;  // Reset start frame
-			*(short*)(itemPtr + 0x13) = 0;
-			*(short*)(itemPtr + 0x14) = 0;  // Reset duration
-			*(short*)(itemPtr + 0x15) = 1;
-			*(float*)(itemPtr + 8) = 1.0f;  // Full alpha
 			itemPtr += 0x20;
-		}
-		// Animation complete - no return needed for void function
+			i--;
+		} while (i != 0);
 	}
-	
-	// Still animating - no return needed for void function
+
+	if (**(short**)((char*)this + 0x850) == completedItems) {
+		itemPtr = *(short**)((char*)this + 0x850) + 4;
+		if ((int)itemCount > 0) {
+			unsigned int blocks = itemCount >> 3;
+			if (blocks != 0) {
+				do {
+					itemPtr[0x12] = 0;
+					itemPtr[0x13] = 0;
+					itemPtr[0x14] = 0;
+					itemPtr[0x15] = 1;
+					*(float*)(itemPtr + 8) = 1.0f;
+					itemPtr[0x32] = 0;
+					itemPtr[0x33] = 0;
+					itemPtr[0x34] = 0;
+					itemPtr[0x35] = 1;
+					*(float*)(itemPtr + 0x28) = 1.0f;
+					itemPtr[0x52] = 0;
+					itemPtr[0x53] = 0;
+					itemPtr[0x54] = 0;
+					itemPtr[0x55] = 1;
+					*(float*)(itemPtr + 0x48) = 1.0f;
+					itemPtr[0x72] = 0;
+					itemPtr[0x73] = 0;
+					itemPtr[0x74] = 0;
+					itemPtr[0x75] = 1;
+					*(float*)(itemPtr + 0x68) = 1.0f;
+					itemPtr[0x92] = 0;
+					itemPtr[0x93] = 0;
+					itemPtr[0x94] = 0;
+					itemPtr[0x95] = 1;
+					*(float*)(itemPtr + 0x88) = 1.0f;
+					itemPtr[0xb2] = 0;
+					itemPtr[0xb3] = 0;
+					itemPtr[0xb4] = 0;
+					itemPtr[0xb5] = 1;
+					*(float*)(itemPtr + 0xa8) = 1.0f;
+					itemPtr[0xd2] = 0;
+					itemPtr[0xd3] = 0;
+					itemPtr[0xd4] = 0;
+					itemPtr[0xd5] = 1;
+					*(float*)(itemPtr + 0xc8) = 1.0f;
+					itemPtr[0xf2] = 0;
+					itemPtr[0xf3] = 0;
+					itemPtr[0xf4] = 0;
+					itemPtr[0xf5] = 1;
+					*(float*)(itemPtr + 0xe8) = 1.0f;
+					itemPtr += 0x100;
+					blocks--;
+				} while (blocks != 0);
+
+				itemCount &= 7;
+				if (itemCount == 0) {
+					return 1;
+				}
+			}
+
+			do {
+				itemPtr[0x12] = 0;
+				itemPtr[0x13] = 0;
+				itemPtr[0x14] = 0;
+				itemPtr[0x15] = 1;
+				*(float*)(itemPtr + 8) = 1.0f;
+				itemPtr += 0x20;
+				itemCount--;
+			} while (itemCount != 0);
+		}
+		return 1;
+	}
+
+	return 0;
 }
 
 /*

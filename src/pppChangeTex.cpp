@@ -21,7 +21,7 @@ extern void GXCallDisplayList(void*, unsigned int);
 extern _pppMngStChangeTex* pppMngStPtr;
 extern _pppEnvStChangeTex* lbl_8032ED54;
 extern _pppEnvStChangeTex* pppEnvStPtr;
-extern float FLOAT_80332040;
+extern float lbl_80332040;
 extern float FLOAT_80332020;
 extern float FLOAT_80332028;
 extern double DOUBLE_80332030;
@@ -167,7 +167,7 @@ extern "C" void ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2(C
  */
 void pppConstructChangeTex(pppChangeTex* changeTex, UnkC* data)
 {
-	float init = FLOAT_80332040;
+	float init = lbl_80332040;
 	float* state = (float*)((char*)changeTex + data->m_serializedDataOffsets[2] + 0x80);
 	int* stateInt = (int*)state;
 
@@ -193,7 +193,7 @@ void pppConstructChangeTex(pppChangeTex* changeTex, UnkC* data)
 void pppConstruct2ChangeTex(pppChangeTex* changeTex, UnkC* data)
 {
 	float* state = (float*)((char*)changeTex + data->m_serializedDataOffsets[2] + 0x80);
-	float init = FLOAT_80332040;
+	float init = lbl_80332040;
 
 	state[0] = init;
 	state[2] = init;

@@ -1647,17 +1647,17 @@ int COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
 	float maxValue;
 	float margin;
 	Mtx inverseMtx;
-	unsigned char* thisBytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* mapData = *reinterpret_cast<unsigned char**>(thisBytes + 8);
+	unsigned char* thisBytes = (unsigned char*)this;
+	unsigned char* mapData = *(unsigned char**)(thisBytes + 0x8);
 
-	if ((*thisBytes != 2) || (mapData == 0) || (*reinterpret_cast<CMapHit**>(mapData + 0xC) == 0)) {
+	if ((*thisBytes != 2) || (mapData == 0) || (*(CMapHit**)(mapData + 0xc) == 0)) {
 		return 0;
 	}
 
-	PSMTXInverse(reinterpret_cast<MtxPtr>(mapData + 0xB8), inverseMtx);
+	PSMTXInverse((MtxPtr)(mapData + 0xb8), inverseMtx);
 	PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &s_cyl.m_bottom);
 	PSMTXMultVec(inverseMtx, &cylinder->m_direction, &s_cyl.m_direction);
-	PSMTXMultVecSR(inverseMtx, reinterpret_cast<Vec*>(&cylinder->m_radius), reinterpret_cast<Vec*>(&s_cyl.m_radius));
+	PSMTXMultVecSR(inverseMtx, (Vec*)&cylinder->m_radius, (Vec*)&s_cyl.m_radius);
 	PSMTXMultVecSR(inverseMtx, move, &s_mvec);
 
 	s_cyl.m_top.y = cylinder->m_top.y;
@@ -1691,8 +1691,7 @@ int COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
 	s_cyl.m_direction2.y = minValue - margin;
 
 	s_checkHitCylinderMask = flag;
-	CheckHitCylinderNear_r(*reinterpret_cast<COctNode**>(thisBytes + 4));
-
+	CheckHitCylinderNear_r(*(COctNode**)(thisBytes + 0x4));
 	return 0;
 }
 

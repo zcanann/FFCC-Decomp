@@ -914,42 +914,84 @@ void CTexture::GetExternalTlutColor(void*, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003AE78
+ * PAL Size: 116b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CTexture::SetTlutColor(int, _GXColor)
+void CTexture::SetTlutColor(int index, _GXColor color)
 {
-	// TODO
+    int offset = 0;
+
+    if (U8At(this, 0x60) == 9) {
+        offset = 0x100;
+    } else if (U8At(this, 0x60) == 8) {
+        offset = 0x10;
+    }
+
+    unsigned short color0 = static_cast<unsigned short>(color.r | (color.g << 8));
+    unsigned short color1 = static_cast<unsigned short>(color.b | (color.a << 8));
+    U16At(PtrAt(this, 0x7C), index * 2) = color0;
+    U16At(PtrAt(this, 0x7C), (index + offset) * 2) = color1;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003AE30
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CTexture::SetExternalTlutColor(void*, int, int, _GXColor&)
+void CTexture::SetExternalTlutColor(void* tlutData, int tlutOffset, int index, _GXColor& color)
 {
-	// TODO
+    unsigned short color0 = static_cast<unsigned short>(color.r | (color.g << 8));
+    unsigned short color1 = static_cast<unsigned short>(color.b | (color.a << 8));
+    U16At(tlutData, index * 2) = color0;
+    U16At(tlutData, (index + tlutOffset) * 2) = color1;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003ADE0
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CTexture::FlushTlut()
 {
-	// TODO
+    int numEntries = 0;
+    if (U8At(this, 0x60) == 9) {
+        numEntries = 0x100;
+    } else if (U8At(this, 0x60) == 8) {
+        numEntries = 0x10;
+    }
+    DCFlushRange(PtrAt(this, 0x7C), static_cast<unsigned int>(numEntries << 2));
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003AD90
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CTexture::FlushExternalTlut(void*)
+void CTexture::FlushExternalTlut(void* tlutData)
 {
-	// TODO
+    int numEntries = 0;
+    if (U8At(this, 0x60) == 9) {
+        numEntries = 0x100;
+    } else if (U8At(this, 0x60) == 8) {
+        numEntries = 0x10;
+    }
+    DCFlushRange(tlutData, static_cast<unsigned int>(numEntries << 2));
 }
 
 /*

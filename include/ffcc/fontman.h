@@ -13,7 +13,7 @@ class CFontMan
 {
 public:
 	CFontMan();
-	~CFontMan();
+	virtual ~CFontMan();
 
 	void Init();
 	void Quit();

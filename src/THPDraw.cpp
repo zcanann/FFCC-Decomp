@@ -22,16 +22,16 @@ void THPGXYuv2RgbDraw(u32* yImage, u32* uImage, u32* vImage, s16 x, s16 y, s16 t
     
     GXBegin(GX_QUADS, GX_VTXFMT7, 4);
     
-    GXPosition2s16(x, y);
+    GXPosition3s16(x, y, 0);
     GXTexCoord2s16(0, 0);
     
-    GXPosition2s16(x + polyWidth, y);
+    GXPosition3s16(x + polyWidth, y, 0);
     GXTexCoord2s16(1, 0);
     
-    GXPosition2s16(x + polyWidth, y + polyHeight);
+    GXPosition3s16(x + polyWidth, y + polyHeight, 0);
     GXTexCoord2s16(1, 1);
     
-    GXPosition2s16(x, y + polyHeight);
+    GXPosition3s16(x, y + polyHeight, 0);
     GXTexCoord2s16(0, 1);
 }
 
@@ -82,7 +82,7 @@ void THPGXYuv2RgbSetup(GXRenderModeObj* rmode) {
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
-    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XY, GX_S16, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_S16, 0);
     GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_TEX0, GX_TEX_ST, GX_S16, 0);
 
     GXSetNumTevStages(4);

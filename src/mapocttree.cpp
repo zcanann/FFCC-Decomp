@@ -10,6 +10,7 @@
 
 extern float lbl_8032F96C;
 extern float lbl_8032F970;
+extern float lbl_8032F960;
 extern CMaterialMan MaterialMan;
 extern CLightPcs LightPcs;
 static unsigned long s_clearFlagMask;
@@ -1494,12 +1495,65 @@ int COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002c704
+ * PAL Size: 420b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int COctTree::CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned long)
+int COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned long flag)
 {
-	// TODO
+	float minValue;
+	float maxValue;
+	float margin;
+	Mtx inverseMtx;
+	unsigned char* thisBytes = (unsigned char*)this;
+	unsigned char* mapData = *(unsigned char**)(thisBytes + 0x8);
+
+	if ((*thisBytes != 2) || (mapData == 0) || (*(CMapHit**)(mapData + 0xc) == 0)) {
+		return 0;
+	}
+
+	PSMTXInverse((MtxPtr)(mapData + 0xb8), inverseMtx);
+	PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &s_cyl.m_bottom);
+	PSMTXMultVec(inverseMtx, &cylinder->m_direction, &s_cyl.m_direction);
+	PSMTXMultVecSR(inverseMtx, (Vec*)&cylinder->m_radius, (Vec*)&s_cyl.m_radius);
+	PSMTXMultVecSR(inverseMtx, move, &s_mvec);
+
+	s_cyl.m_top.y = cylinder->m_top.y;
+	margin = lbl_8032F960 + s_cyl.m_top.y;
+
+	minValue = s_cyl.m_direction.x;
+	maxValue = s_cyl.m_bottom.x;
+	if (maxValue < minValue) {
+		minValue = s_cyl.m_bottom.x;
+		maxValue = s_cyl.m_direction.x;
+	}
+	s_cyl.m_direction2.z = maxValue + margin;
+	s_cyl.m_top.z = minValue - margin;
+
+	minValue = s_cyl.m_direction.y;
+	maxValue = s_cyl.m_bottom.y;
+	if (maxValue < minValue) {
+		minValue = s_cyl.m_bottom.y;
+		maxValue = s_cyl.m_direction.y;
+	}
+	s_cyl.m_radius2 = maxValue + margin;
+	s_cyl.m_direction2.x = minValue - margin;
+
+	minValue = s_cyl.m_direction.z;
+	maxValue = s_cyl.m_bottom.z;
+	if (maxValue < minValue) {
+		minValue = s_cyl.m_bottom.z;
+		maxValue = s_cyl.m_direction.z;
+	}
+	s_cyl.m_height2 = maxValue + margin;
+	s_cyl.m_direction2.y = minValue - margin;
+
+	s_checkHitCylinderMask = flag;
+	CheckHitCylinderNear_r(*(COctNode**)(thisBytes + 0x4));
+	return 0;
 }
 
 /*

@@ -467,12 +467,54 @@ void CMenuPcs::EquipCtrl()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015cd08
+ * PAL Size: 428b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::EquipClose()
 {
-	// TODO
+	int menuState = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c);
+	s16* menuData = *reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850);
+	int doneCount = 0;
+
+	*reinterpret_cast<s16*>(menuState + 0x22) = *reinterpret_cast<s16*>(menuState + 0x22) + 1;
+	int timer = static_cast<int>(*reinterpret_cast<s16*>(menuState + 0x22));
+	int itemCount = static_cast<int>(*menuData);
+	s16* item = menuData + 4;
+
+	for (int i = 0; i < itemCount; i++) {
+		if (*reinterpret_cast<int*>(item + 0x12) <= timer) {
+			if (timer < (*reinterpret_cast<int*>(item + 0x12) + *reinterpret_cast<int*>(item + 0x14))) {
+				*reinterpret_cast<int*>(item + 0x10) = *reinterpret_cast<int*>(item + 0x10) + 1;
+				float ratio = FLOAT_80332ee0 -
+				              (static_cast<float>(*reinterpret_cast<int*>(item + 0x10)) /
+				               static_cast<float>(*reinterpret_cast<int*>(item + 0x14)));
+				*reinterpret_cast<float*>(item + 8) = ratio;
+				if (*reinterpret_cast<float*>(item + 8) < FLOAT_80332eb8) {
+					*reinterpret_cast<float*>(item + 8) = FLOAT_80332eb8;
+				}
+			} else {
+				doneCount++;
+				*reinterpret_cast<float*>(item + 8) = FLOAT_80332eb8;
+			}
+		}
+		item += 0x20;
+	}
+
+	if (itemCount == doneCount) {
+		item = menuData + 4;
+		for (int i = 0; i < itemCount; i++) {
+			*reinterpret_cast<int*>(item + 0x12) = 0;
+			*reinterpret_cast<int*>(item + 0x13) = 0;
+			*reinterpret_cast<int*>(item + 0x14) = 0;
+			*reinterpret_cast<int*>(item + 0x15) = 1;
+			*reinterpret_cast<float*>(item + 8) = FLOAT_80332eb8;
+			item += 0x20;
+		}
+	}
 }
 
 /*

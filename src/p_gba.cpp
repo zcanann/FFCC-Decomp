@@ -5,7 +5,7 @@
 #include "ffcc/system.h"
 #include <dolphin/gba/GBA.h>
 
-CGbaPcs GbaPcs;
+unsigned char GbaPcs[0x15C];
 extern "C" void* lbl_8020F4A4;
 extern "C" unsigned int lbl_8020F2F8[];
 extern "C" unsigned int lbl_8020F304[];
@@ -24,22 +24,21 @@ extern "C" unsigned int lbl_8020F328[];
  */
 extern "C" void __sinit_p_gba_cpp(void)
 {
-	volatile void** base = reinterpret_cast<volatile void**>(&GbaPcs);
-	*base = &lbl_8020F4A4;
+	unsigned int* table = reinterpret_cast<unsigned int*>(GbaPcs);
+	table[0] = reinterpret_cast<unsigned int>(&lbl_8020F4A4);
 
-	unsigned int* dst = lbl_8020F328;
-	dst[0x004 / 4] = lbl_8020F2F8[0];
-	dst[0x008 / 4] = lbl_8020F2F8[1];
-	dst[0x00C / 4] = lbl_8020F2F8[2];
-	dst[0x010 / 4] = lbl_8020F304[0];
-	dst[0x014 / 4] = lbl_8020F304[1];
-	dst[0x018 / 4] = lbl_8020F304[2];
-	dst[0x01C / 4] = lbl_8020F310[0];
-	dst[0x020 / 4] = lbl_8020F310[1];
-	dst[0x024 / 4] = lbl_8020F310[2];
-	dst[0x030 / 4] = lbl_8020F31C[0];
-	dst[0x034 / 4] = lbl_8020F31C[1];
-	dst[0x038 / 4] = lbl_8020F31C[2];
+	table[0x004 / 4] = lbl_8020F2F8[0];
+	table[0x008 / 4] = lbl_8020F2F8[1];
+	table[0x00C / 4] = lbl_8020F2F8[2];
+	table[0x010 / 4] = lbl_8020F304[0];
+	table[0x014 / 4] = lbl_8020F304[1];
+	table[0x018 / 4] = lbl_8020F304[2];
+	table[0x01C / 4] = lbl_8020F310[0];
+	table[0x020 / 4] = lbl_8020F310[1];
+	table[0x024 / 4] = lbl_8020F310[2];
+	table[0x030 / 4] = lbl_8020F31C[0];
+	table[0x034 / 4] = lbl_8020F31C[1];
+table[0x038 / 4] = lbl_8020F31C[2];
 }
 
 /*

@@ -8,7 +8,7 @@ class CGbaPcs : public CProcess
 {
 public:
     CGbaPcs();
-	
+
     void Init();
     void Quit();
     void* GetTable(unsigned long);
@@ -28,6 +28,6 @@ private:
     CMemory::CStage* m_stage;
 };
 
-extern CGbaPcs GbaPcs;
+extern unsigned char GbaPcs[];
 
 #endif // _FFCC_P_GBA_H_

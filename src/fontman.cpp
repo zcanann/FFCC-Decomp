@@ -539,22 +539,116 @@ void CFont::Draw(unsigned short ch)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80091f88
+ * PAL Size: 404b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFont::GetWidth(char*)
+float CFont::GetWidth(char* text)
 {
-	// TODO
+	float width = 0.0f;
+	unsigned char* cursor = reinterpret_cast<unsigned char*>(text);
+
+	while (*cursor != '\0') {
+		unsigned char ch = *cursor++;
+		unsigned short* glyphBucket = m_glyphBuckets[ch];
+		unsigned short* glyph = glyphBucket + 1;
+		unsigned int count = static_cast<unsigned int>(glyphBucket[0]);
+
+		for (; count != 0; count--) {
+			if (*reinterpret_cast<char*>(glyph + 1) == '\0') {
+				break;
+			}
+			glyph += 4;
+		}
+
+		if (count == 0) {
+			unsigned short* fallback = m_glyphBuckets[63] + 1;
+			unsigned int fallbackCount = static_cast<unsigned int>(m_glyphBuckets[63][0]);
+			for (; fallbackCount != 0; fallbackCount--) {
+				if (*reinterpret_cast<char*>(fallback + 1) == '\0') {
+					glyph = fallback;
+					break;
+				}
+				fallback += 4;
+			}
+			if (fallbackCount == 0) {
+				continue;
+			}
+		}
+
+		unsigned int drawWidth;
+		if ((renderFlags & 0x10) != 0) {
+			drawWidth = m_glyphWidth;
+		} else if ((renderFlags & 0x80) != 0) {
+			drawWidth = *(reinterpret_cast<unsigned char*>(glyph) + 6);
+		} else {
+			drawWidth = *(reinterpret_cast<unsigned char*>(glyph) + 4);
+		}
+
+		float charWidth = scaleX * (margin + static_cast<float>(drawWidth));
+		if ((renderFlags & 0x08) != 0) {
+			charWidth = floorf(charWidth);
+		}
+		width += charWidth;
+	}
+
+	return width;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80091e58
+ * PAL Size: 304b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFont::GetWidth(unsigned short)
+float CFont::GetWidth(unsigned short ch)
 {
-	// TODO
+	unsigned short* glyphBucket = m_glyphBuckets[ch & 0xFF];
+	unsigned short* glyph = glyphBucket + 1;
+	unsigned int count = static_cast<unsigned int>(glyphBucket[0]);
+
+	for (; count != 0; count--) {
+		if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) == ((ch >> 8) & 0xFF)) {
+			break;
+		}
+		glyph += 4;
+	}
+
+	if (count == 0) {
+		unsigned short* fallback = m_glyphBuckets[63] + 1;
+		unsigned int fallbackCount = static_cast<unsigned int>(m_glyphBuckets[63][0]);
+		for (; fallbackCount != 0; fallbackCount--) {
+			if (*reinterpret_cast<char*>(fallback + 1) == '\0') {
+				glyph = fallback;
+				break;
+			}
+			fallback += 4;
+		}
+		if (fallbackCount == 0) {
+			return 0.0f;
+		}
+	}
+
+	unsigned int drawWidth;
+	if ((renderFlags & 0x10) != 0) {
+		drawWidth = m_glyphWidth;
+	} else if ((renderFlags & 0x80) != 0) {
+		drawWidth = *(reinterpret_cast<unsigned char*>(glyph) + 6);
+	} else {
+		drawWidth = *(reinterpret_cast<unsigned char*>(glyph) + 4);
+	}
+
+	float width = scaleX * (margin + static_cast<float>(drawWidth));
+	if ((renderFlags & 0x08) != 0) {
+		width = floorf(width);
+	}
+	return width;
 }
 
 /*

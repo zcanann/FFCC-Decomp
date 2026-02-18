@@ -50,8 +50,8 @@ public:
 	void Draw(char*);
 	void Draw(unsigned short);
 
-	void GetWidth(char*);
-	void GetWidth(unsigned short);
+	float GetWidth(char*);
+	float GetWidth(unsigned short);
 
 	void searchChar(unsigned short);
 	void getNextChar(char**, unsigned short*);

@@ -9,12 +9,24 @@ extern CTextureMan TextureMan;
 extern void* ARRAY_802ea170;
 extern "C" unsigned char lbl_801FE080[];
 extern "C" void __dt__8CFontManFv(void*);
+extern "C" void __ct__4CRefFv(void*);
+extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
+extern "C" void* __vt__5CFont[];
 extern unsigned char CameraPcs[];
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 
 static const char s_fontman_cpp[] = "fontman.cpp";
 static const char s_CFontMan[] = "CFontMan";
+
+namespace {
+static inline unsigned char* Ptr(void* p, unsigned int offset)
+{
+	return reinterpret_cast<unsigned char*>(p) + offset;
+}
+
+typedef void (*VirtualDtorFn)(void*, int);
+}
 
 /*
  * --INFO--
@@ -55,10 +67,45 @@ CFontMan::~CFontMan()
  */
 void CFontMan::Init()
 {
-	m_font = 0;
-	m_stage = Memory.CreateStage(0x8000, const_cast<char*>(s_CFontMan), 0);
-	m_font = new (m_stage, const_cast<char*>(s_fontman_cpp), 0x3D) CFont;
-	m_font->Create(0, 0);
+	*reinterpret_cast<CFont**>(Ptr(this, 8)) = 0;
+
+	CMemory::CStage* stage = Memory.CreateStage(0x8000, const_cast<char*>(s_CFontMan), 0);
+	*reinterpret_cast<CMemory::CStage**>(Ptr(this, 4)) = stage;
+
+	CFont* font = reinterpret_cast<CFont*>(
+	    _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+	        &Memory,
+	        sizeof(CFont),
+	        *reinterpret_cast<CMemory::CStage**>(Ptr(&FontMan, 4)),
+	        const_cast<char*>(s_fontman_cpp),
+	        0x3D,
+	        0));
+
+	if (font != 0) {
+		__ct__4CRefFv(font);
+		*reinterpret_cast<void**>(font) = __vt__5CFont;
+		font->texturePtr = 0;
+		font->m_glyphData = 0;
+		font->posX = 0.0f;
+		font->posY = 0.0f;
+		font->posZ = 0.0f;
+		font->margin = 0.0f;
+		font->scaleX = 1.0f;
+		font->scaleY = 1.0f;
+		font->renderFlags &= static_cast<unsigned char>(~0x80);
+		font->renderFlags &= static_cast<unsigned char>(~0x08);
+		font->m_color.r = 0xFF;
+		font->m_color.g = 0xFF;
+		font->m_color.b = 0xFF;
+		font->m_color.a = 0xFF;
+		font->renderFlags &= static_cast<unsigned char>(~0x40);
+		font->renderFlags &= static_cast<unsigned char>(~0x20);
+		font->m_usesEmbeddedData = 0;
+		font->m_pad0f = 0;
+	}
+
+	*reinterpret_cast<CFont**>(Ptr(this, 8)) = font;
+	reinterpret_cast<CFont*>(*reinterpret_cast<void**>(Ptr(this, 8)))->Create(0, 0);
 }
 
 /*

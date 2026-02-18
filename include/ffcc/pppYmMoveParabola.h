@@ -11,14 +11,19 @@ struct pppYmMoveParabola {
 
 struct UnkB {
     u32 m_graphId;
+    u32 _pad0x04;
+    u32 _pad0x08;
     f32 m_stepValue;
-    u32 m_arg3;
-    u8* m_payload;
-    u32 m_dataValIndex;
-    u16 m_initWOrk;
+    s32 m_arg3;
+    void* m_payload;
+    s32 m_dataValIndex;
+    s32 m_initWOrk;
 };
 
 struct UnkC {
+    u32 _pad0x00;
+    u32 _pad0x04;
+    u32 _pad0x08;
     s32* m_serializedDataOffsets;
 };
 

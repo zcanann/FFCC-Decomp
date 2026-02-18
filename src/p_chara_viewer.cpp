@@ -1,4 +1,5 @@
 #include "ffcc/p_chara_viewer.h"
+#include "ffcc/pad.h"
 #include <dolphin/gx.h>
 #include "dolphin/mtx.h"
 
@@ -35,6 +36,15 @@ extern "C" void Read__5CFileFPQ25CFile7CHandle(void*, void*);
 extern "C" void SyncCompleted__5CFileFPQ25CFile7CHandle(void*, void*);
 extern "C" void Close__5CFileFPQ25CFile7CHandle(void*, void*);
 extern "C" void* createTextureSet__9CCharaPcsFPvi(void*, void*, int);
+extern "C" void Printf__7CSystemFPce(void*, const char*, ...);
+extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
+extern "C" void* __ct__Q26CChara6CModelFv(void*);
+extern "C" void Create__Q26CChara6CModelFPvPQ27CMemory6CStage(void*, void*, void*);
+extern "C" void CreateDynamics__Q26CChara6CModelFPvPQ27CMemory6CStage(void*, void*, void*);
+extern "C" void AttachTextureSet__Q26CChara6CModelFP11CTextureSet(void*, void*);
+extern "C" void AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(void*, void*, int, int, int);
+extern "C" void* __ct__Q26CChara5CAnimFv(void*);
+extern "C" void Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(void*, void*, void*);
 extern "C" void __ct__Q29CLightPcs10CBumpLightFv(void*);
 extern "C" int AddBump__9CLightPcsFPQ29CLightPcs6CLightQ29CLightPcs6TARGETPQ27CMemory6CStagei(
     void*, void*, int, void*, int);
@@ -42,8 +52,10 @@ extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, uns
 extern "C" void __ct__6CColorFv(void*);
 extern "C" void __ct__6CColorFR6CColor(void*, void*);
 extern "C" char lbl_801DA7E8[];
+extern "C" void* System;
 extern "C" float lbl_80330BE8;
 extern "C" float lbl_80330BF4;
+extern "C" float lbl_80330BF8;
 extern "C" float lbl_80330BFC;
 extern "C" float lbl_80330C00;
 extern "C" float lbl_80330C28;
@@ -60,6 +72,27 @@ extern "C" double lbl_80330C10;
 extern "C" void* memset(void*, int, unsigned long);
 extern "C" char* strcpy(char*, const char*);
 extern "C" int sprintf(char*, const char*, ...);
+
+static void releaseRef(unsigned char* p, int offset)
+{
+    int* ref = *(int**)(p + offset);
+    if (ref != 0) {
+        int count = ref[1];
+        ref[1] = count - 1;
+        if ((count - 1 == 0) && (ref != 0)) {
+            (*(void (**)(void*, int))(*(int*)ref + 8))(ref, 1);
+        }
+        *(void**)(p + offset) = 0;
+    }
+}
+
+static void addRef(unsigned char* p, int offset)
+{
+    int* ref = *(int**)(p + offset);
+    if (ref != 0) {
+        ref[1] = ref[1] + 1;
+    }
+}
 
 extern struct {
     float _212_4_;
@@ -154,6 +187,167 @@ extern "C" void drawViewer__9CCharaPcsFv(void* param_1)
                 }
             }
         }
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800BDED8
+ * PAL Size: 3960b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
+{
+    unsigned char* p = (unsigned char*)param_1;
+    char pathBuf[256];
+    void* fileHandle;
+
+    if (*(int*)(p + 0x6FC) != 0) {
+        releaseRef(p, 0x1A0);
+        *(void**)(p + 0x1A0) = *(void**)(p + 0x198);
+        addRef(p, 0x1A0);
+        *(int*)(p + 0x6FC) = 0;
+    }
+
+    if ((*(int*)(p + 0x2BC) != 0) || (*(int*)(p + 0x3C0) != 0) || (*(int*)(p + 0x4C4) != 0) || (*(int*)(p + 0x710) != 0)) {
+        if (*(int*)(p + 0x2BC) != 0) {
+            Printf__7CSystemFPce(System, lbl_801DA7E8 + 0x48, p + 0x2C0);
+            fileHandle = Open__5CFileFPcUlQ25CFile3PRI(File, (char*)(p + 0x2C0), 0, 0);
+            if (fileHandle != 0) {
+                releaseRef(p, 0x194);
+                releaseRef(p, 0x19C);
+                releaseRef(p, 0x2B4);
+
+                *(void**)(p + 0x194) = *(void**)(p + 0x190);
+                *(void**)(p + 0x19C) = *(void**)(p + 0x198);
+                *(void**)(p + 0x2B4) = *(void**)(p + 0x2B0);
+                *(void**)(p + 0x190) = 0;
+                *(void**)(p + 0x198) = 0;
+                *(void**)(p + 0x2B0) = 0;
+
+                Read__5CFileFPQ25CFile7CHandle(File, fileHandle);
+                SyncCompleted__5CFileFPQ25CFile7CHandle(File, fileHandle);
+                *(void**)(p + 0x190) = __nw__FUlPQ27CMemory6CStagePci(0x124, *(void**)(Chara + 0x2058), lbl_801DA7E8 + 0x10, 0xEA);
+                if (*(void**)(p + 0x190) != 0) {
+                    *(void**)(p + 0x190) = __ct__Q26CChara6CModelFv(*(void**)(p + 0x190));
+                }
+                Create__Q26CChara6CModelFPvPQ27CMemory6CStage(*(void**)(p + 0x190), *(void**)(File + 8), *(void**)(p + 0xCC));
+                *(unsigned char*)(*(unsigned char**)(p + 0x190) + 0x10C) = (*(unsigned char*)(*(unsigned char**)(p + 0x190) + 0x10C) & 0xBF) | 0x40;
+                Close__5CFileFPQ25CFile7CHandle(File, fileHandle);
+            }
+            *(int*)(p + 0x2BC) = 0;
+        }
+
+        if ((*(int*)(p + 0x5F0) != 0) && (*(void**)(p + 0x190) != 0)) {
+            Printf__7CSystemFPce(System, lbl_801DA7E8 + 0x48, p + 0x5F4);
+            fileHandle = Open__5CFileFPcUlQ25CFile3PRI(File, (char*)(p + 0x5F4), 0, 0);
+            if (fileHandle != 0) {
+                Read__5CFileFPQ25CFile7CHandle(File, fileHandle);
+                SyncCompleted__5CFileFPQ25CFile7CHandle(File, fileHandle);
+                CreateDynamics__Q26CChara6CModelFPvPQ27CMemory6CStage(*(void**)(p + 0x190), *(void**)(File + 8), *(void**)(p + 0xCC));
+                Close__5CFileFPQ25CFile7CHandle(File, fileHandle);
+            }
+            *(int*)(p + 0x5F0) = 0;
+        }
+
+        if ((*(int*)(p + 0x3C0) != 0) || (*(int*)(p + 0x710) != 0)) {
+            unsigned int i;
+            releaseRef(p, 0x198);
+            for (i = 0; i < 0x40; i++) {
+                releaseRef(p, 0x1B0 + i * 4);
+            }
+            *(int*)(p + 0x1AC) = 0;
+            *(int*)(p + 0x1A4) = 0;
+
+            if (*(int*)(p + 0x3C0) == 0) {
+                for (i = 0; i < *(unsigned int*)(p + 0x1A8); i++) {
+                    unsigned int idx = *(unsigned int*)(p + 0x1A4);
+                    sprintf(pathBuf, lbl_801DA7E8 + 0x64, p + 0x3C4, idx);
+                    Printf__7CSystemFPce(System, lbl_801DA7E8 + 0x48, pathBuf);
+                    fileHandle = Open__5CFileFPcUlQ25CFile3PRI(File, pathBuf, 0, 0);
+                    if (fileHandle != 0) {
+                        releaseRef(p, 0x1B0 + idx * 4);
+                        Read__5CFileFPQ25CFile7CHandle(File, fileHandle);
+                        SyncCompleted__5CFileFPQ25CFile7CHandle(File, fileHandle);
+                        *(void**)(p + 0x1B0 + idx * 4) = __nw__FUlPQ27CMemory6CStagePci(0x30, *(void**)(Chara + 0x2058), lbl_801DA7E8 + 0x10, 0x124);
+                        if (*(void**)(p + 0x1B0 + idx * 4) != 0) {
+                            *(void**)(p + 0x1B0 + idx * 4) = __ct__Q26CChara5CAnimFv(*(void**)(p + 0x1B0 + idx * 4));
+                        }
+                        Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(*(void**)(p + 0x1B0 + idx * 4), *(void**)(File + 8), *(void**)(p + 0xD4));
+                        Close__5CFileFPQ25CFile7CHandle(File, fileHandle);
+                        if (idx == 0) {
+                            *(void**)(p + 0x198) = *(void**)(p + 0x1B0);
+                            addRef(p, 0x198);
+                        }
+                        *(int*)(p + 0x1A4) = *(int*)(p + 0x1A4) + 1;
+                    }
+                }
+                *(int*)(p + 0x710) = 0;
+            } else {
+                Printf__7CSystemFPce(System, lbl_801DA7E8 + 0x48, p + 0x3C4);
+                fileHandle = Open__5CFileFPcUlQ25CFile3PRI(File, (char*)(p + 0x3C4), 0, 0);
+                if (fileHandle != 0) {
+                    Read__5CFileFPQ25CFile7CHandle(File, fileHandle);
+                    SyncCompleted__5CFileFPQ25CFile7CHandle(File, fileHandle);
+                    *(void**)(p + 0x198) = __nw__FUlPQ27CMemory6CStagePci(0x30, *(void**)(Chara + 0x2058), lbl_801DA7E8 + 0x10, 0x111);
+                    if (*(void**)(p + 0x198) != 0) {
+                        *(void**)(p + 0x198) = __ct__Q26CChara5CAnimFv(*(void**)(p + 0x198));
+                    }
+                    Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(*(void**)(p + 0x198), *(void**)(File + 8), *(void**)(p + 0xD4));
+                    Close__5CFileFPQ25CFile7CHandle(File, fileHandle);
+                }
+                *(int*)(p + 0x3C0) = 0;
+            }
+        }
+
+        if (*(int*)(p + 0x4C4) != 0) {
+            Printf__7CSystemFPce(System, lbl_801DA7E8 + 0x48, p + 0x4C8);
+            fileHandle = Open__5CFileFPcUlQ25CFile3PRI(File, (char*)(p + 0x4C8), 0, 0);
+            if (fileHandle != 0) {
+                releaseRef(p, 0x2B0);
+                Read__5CFileFPQ25CFile7CHandle(File, fileHandle);
+                SyncCompleted__5CFileFPQ25CFile7CHandle(File, fileHandle);
+                *(void**)(p + 0x2B0) = createTextureSet__9CCharaPcsFPvi(p, *(void**)(File + 8), 0);
+                Close__5CFileFPQ25CFile7CHandle(File, fileHandle);
+            }
+            *(int*)(p + 0x4C4) = 0;
+        }
+
+        if (*(void**)(p + 0x190) != 0) {
+            AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(*(void**)(p + 0x190), *(void**)(p + 0x198), -1, -1, -1);
+            AttachTextureSet__Q26CChara6CModelFP11CTextureSet(*(void**)(p + 0x190), *(void**)(p + 0x2B0));
+        }
+    }
+
+    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+    } else {
+        __cntlzw((unsigned int)Pad._448_4_);
+        if ((Pad._8_2_ & 0x800) != 0) {
+            *(unsigned int*)(p + 0x6F8) = (__cntlzw(*(unsigned int*)(p + 0x6F8)) >> 5) & 0xFF;
+        }
+        if ((Pad._8_2_ & 0x400) != 0) {
+            *(unsigned int*)(p + 0x6F4) = (__cntlzw(*(unsigned int*)(p + 0x6F4)) >> 5) & 0xFF;
+        }
+    }
+
+    if ((*(void**)(p + 0x190) != 0) && (*(int*)(p + 0x70C) != 0)) {
+        *(int*)(p + 0x704) = 0;
+        AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(*(void**)(p + 0x190), *(void**)(p + 0x198), -1, -1, 0);
+        *(int*)(p + 0x70C) = 0;
+    }
+
+    if (*(int*)(p + 0x6F4) == 0) {
+        float deltaY = lbl_80330BF8;
+        if ((Pad._4_2_ & 0x200) != 0) {
+            deltaY = lbl_80330C28;
+        }
+        if ((Pad._4_2_ & 0x100) != 0) {
+            deltaY = deltaY * lbl_80330C2C;
+        }
+        *(float*)(p + 0x700) = *(float*)(p + 0x700) + deltaY;
     }
 }
 

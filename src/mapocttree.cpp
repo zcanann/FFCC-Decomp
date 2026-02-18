@@ -10,6 +10,8 @@
 
 extern float lbl_8032F96C;
 extern float lbl_8032F970;
+extern float lbl_8032F960;
+extern float lbl_8032F964;
 extern CMaterialMan MaterialMan;
 extern CLightPcs LightPcs;
 static unsigned long s_clearFlagMask;
@@ -720,12 +722,58 @@ void COctTree::DrawTypeMesh_r(COctNode* octNode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002e338
+ * PAL Size: 344b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void COctTree::Draw(unsigned char)
+void COctTree::Draw(unsigned char drawType)
 {
-	// TODO
+	unsigned char* thisBytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* mapObj;
+	unsigned char* mapMng;
+	unsigned char* bumpLight;
+
+	if (*thisBytes != 0) {
+		return;
+	}
+
+	mapObj = *reinterpret_cast<unsigned char**>(thisBytes + 8);
+	if ((mapObj[0x15] != drawType) || ((mapObj[0x18] & 1) == 0)) {
+		return;
+	}
+
+	mapMng = reinterpret_cast<unsigned char*>(&MapMng);
+	bumpLight = *reinterpret_cast<unsigned char**>(mapObj + 0x10);
+	if ((mapMng[0x2298A] != 0) && (bumpLight != 0) && (bumpLight[0xB1] == 2)) {
+		MaterialMan.SetUnderWaterTex();
+		mapMng[0x2298A] = 0;
+	}
+
+	LightPcs.SetBumpTexMatirx(reinterpret_cast<float(*)[4]>(mapObj + 0xB8),
+	                          reinterpret_cast<CLightPcs::CBumpLight*>(*reinterpret_cast<void**>(mapObj + 0x10)),
+	                          reinterpret_cast<Vec*>(mapObj + 0x58), mapObj[0x1A]);
+
+	if (lbl_8032F964 != *reinterpret_cast<float*>(mapObj + 0x40)) {
+		CameraPcs.SetOffsetZBuff(*reinterpret_cast<float*>(mapObj + 0x40));
+	}
+
+	if (mapObj[0x27] != 0) {
+		GXSetZMode(1, GX_LEQUAL, 0);
+	}
+
+	reinterpret_cast<CMapMesh*>(*reinterpret_cast<void**>(mapObj + 0xC))->SetRenderArray();
+	DrawTypeMeshFlag_r(*reinterpret_cast<COctNode**>(thisBytes + 4));
+
+	if (mapObj[0x27] != 0) {
+		GXSetZMode(1, GX_LEQUAL, 1);
+	}
+
+	if (lbl_8032F964 != *reinterpret_cast<float*>(mapObj + 0x40)) {
+		CameraPcs.SetOffsetZBuff(*reinterpret_cast<float*>(mapObj + 0x40));
+	}
 }
 
 /*
@@ -760,12 +808,131 @@ void COctTree::GetLocalPosition(Vec&, Vec&)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002e028
+ * PAL Size: 408b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void ClearLight_r(COctNode*)
+void ClearLight_r(COctNode* node)
 {
-	// TODO
+	COctNode* child1;
+	COctNode* child2;
+	COctNode* child3;
+	COctNode* child4;
+	COctNode* child5;
+	COctNode* child6;
+	COctNode* child7;
+	COctNode* child8;
+
+	if (*reinterpret_cast<unsigned short*>(Ptr(node, 0x3E)) != 0) {
+		*reinterpret_cast<void**>(Ptr(node, 0x44)) = 0;
+	}
+
+	for (int i = 0; i < 8; i++) {
+		child1 = *reinterpret_cast<COctNode**>(Ptr(node, 0x1C));
+		if (child1 == 0) {
+			return;
+		}
+		if (*reinterpret_cast<unsigned short*>(Ptr(child1, 0x3E)) != 0) {
+			*reinterpret_cast<void**>(Ptr(child1, 0x44)) = 0;
+		}
+
+		for (int j = 0; j < 8; j++) {
+			child2 = *reinterpret_cast<COctNode**>(Ptr(child1, 0x1C));
+			if (child2 == 0) {
+				break;
+			}
+			if (*reinterpret_cast<unsigned short*>(Ptr(child2, 0x3E)) != 0) {
+				*reinterpret_cast<void**>(Ptr(child2, 0x44)) = 0;
+			}
+
+			for (int k = 0; k < 8; k++) {
+				child3 = *reinterpret_cast<COctNode**>(Ptr(child2, 0x1C));
+				if (child3 == 0) {
+					break;
+				}
+				if (*reinterpret_cast<unsigned short*>(Ptr(child3, 0x3E)) != 0) {
+					*reinterpret_cast<void**>(Ptr(child3, 0x44)) = 0;
+				}
+
+				for (int m = 0; m < 8; m++) {
+					child4 = *reinterpret_cast<COctNode**>(Ptr(child3, 0x1C));
+					if (child4 == 0) {
+						break;
+					}
+					if (*reinterpret_cast<unsigned short*>(Ptr(child4, 0x3E)) != 0) {
+						*reinterpret_cast<void**>(Ptr(child4, 0x44)) = 0;
+					}
+
+					for (int n = 0; n < 8; n++) {
+						child5 = *reinterpret_cast<COctNode**>(Ptr(child4, 0x1C));
+						if (child5 == 0) {
+							break;
+						}
+						if (*reinterpret_cast<unsigned short*>(Ptr(child5, 0x3E)) != 0) {
+							*reinterpret_cast<void**>(Ptr(child5, 0x44)) = 0;
+						}
+
+						for (int o = 0; o < 8; o++) {
+							child6 = *reinterpret_cast<COctNode**>(Ptr(child5, 0x1C));
+							if (child6 == 0) {
+								break;
+							}
+							if (*reinterpret_cast<unsigned short*>(Ptr(child6, 0x3E)) != 0) {
+								*reinterpret_cast<void**>(Ptr(child6, 0x44)) = 0;
+							}
+
+							for (int p = 0; p < 8; p++) {
+								child7 = *reinterpret_cast<COctNode**>(Ptr(child6, 0x1C));
+								if (child7 == 0) {
+									break;
+								}
+								if (*reinterpret_cast<unsigned short*>(Ptr(child7, 0x3E)) != 0) {
+									*reinterpret_cast<void**>(Ptr(child7, 0x44)) = 0;
+								}
+
+								for (int q = 0; q < 8; q++) {
+									child8 = *reinterpret_cast<COctNode**>(Ptr(child7, 0x1C));
+									if (child8 == 0) {
+										break;
+									}
+									if (*reinterpret_cast<unsigned short*>(Ptr(child8, 0x3E)) != 0) {
+										*reinterpret_cast<void**>(Ptr(child8, 0x44)) = 0;
+									}
+
+									for (int r = 0; r < 8; r++) {
+										if (*reinterpret_cast<COctNode**>(Ptr(child8, 0x1C)) == 0) {
+											break;
+										}
+										ClearLight_r(*reinterpret_cast<COctNode**>(Ptr(child8, 0x1C)));
+										child8 = reinterpret_cast<COctNode*>(Ptr(child8, 4));
+									}
+
+									child7 = reinterpret_cast<COctNode*>(Ptr(child7, 4));
+								}
+
+								child6 = reinterpret_cast<COctNode*>(Ptr(child6, 4));
+							}
+
+							child5 = reinterpret_cast<COctNode*>(Ptr(child5, 4));
+						}
+
+						child4 = reinterpret_cast<COctNode*>(Ptr(child4, 4));
+					}
+
+					child3 = reinterpret_cast<COctNode*>(Ptr(child3, 4));
+				}
+
+				child2 = reinterpret_cast<COctNode*>(Ptr(child2, 4));
+			}
+
+			child1 = reinterpret_cast<COctNode*>(Ptr(child1, 4));
+		}
+
+		node = reinterpret_cast<COctNode*>(Ptr(node, 4));
+	}
 }
 
 /*
@@ -1494,12 +1661,66 @@ int COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002c704
+ * PAL Size: 420b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int COctTree::CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned long)
+int COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned long flag)
 {
-	// TODO
+	float minValue;
+	float maxValue;
+	float margin;
+	Mtx inverseMtx;
+	unsigned char* thisBytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* mapData = *reinterpret_cast<unsigned char**>(thisBytes + 8);
+
+	if ((*thisBytes != 2) || (mapData == 0) || (*reinterpret_cast<CMapHit**>(mapData + 0xC) == 0)) {
+		return 0;
+	}
+
+	PSMTXInverse(reinterpret_cast<MtxPtr>(mapData + 0xB8), inverseMtx);
+	PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &s_cyl.m_bottom);
+	PSMTXMultVec(inverseMtx, &cylinder->m_direction, &s_cyl.m_direction);
+	PSMTXMultVecSR(inverseMtx, reinterpret_cast<Vec*>(&cylinder->m_radius), reinterpret_cast<Vec*>(&s_cyl.m_radius));
+	PSMTXMultVecSR(inverseMtx, move, &s_mvec);
+
+	s_cyl.m_top.y = cylinder->m_top.y;
+	margin = lbl_8032F960 + s_cyl.m_top.y;
+
+	minValue = s_cyl.m_direction.x;
+	maxValue = s_cyl.m_bottom.x;
+	if (maxValue < minValue) {
+		minValue = s_cyl.m_bottom.x;
+		maxValue = s_cyl.m_direction.x;
+	}
+	s_cyl.m_direction2.z = maxValue + margin;
+	s_cyl.m_top.z = minValue - margin;
+
+	minValue = s_cyl.m_direction.y;
+	maxValue = s_cyl.m_bottom.y;
+	if (maxValue < minValue) {
+		minValue = s_cyl.m_bottom.y;
+		maxValue = s_cyl.m_direction.y;
+	}
+	s_cyl.m_radius2 = maxValue + margin;
+	s_cyl.m_direction2.x = minValue - margin;
+
+	minValue = s_cyl.m_direction.z;
+	maxValue = s_cyl.m_bottom.z;
+	if (maxValue < minValue) {
+		minValue = s_cyl.m_bottom.z;
+		maxValue = s_cyl.m_direction.z;
+	}
+	s_cyl.m_height2 = maxValue + margin;
+	s_cyl.m_direction2.y = minValue - margin;
+
+	s_checkHitCylinderMask = flag;
+	CheckHitCylinderNear_r(*reinterpret_cast<COctNode**>(thisBytes + 4));
+
+	return 0;
 }
 
 /*

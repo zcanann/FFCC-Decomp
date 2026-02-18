@@ -725,12 +725,41 @@ void CMapHit::Draw()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80024e64
+ * PAL Size: 268b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapHit::DrawWire()
 {
-	// TODO
+    static const u32 kFaceStride = 0x50;
+
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+
+    unsigned char* face = reinterpret_cast<unsigned char*>(m_faces);
+    int faceIndex = 0;
+    while (faceIndex < static_cast<int>(m_faceCount)) {
+        GXBegin(static_cast<GXPrimitive>(0xB0), GX_VTXFMT7, static_cast<u16>(4));
+
+        unsigned short* index = reinterpret_cast<unsigned short*>(face + 0x48);
+        int i = 0;
+        while (i < static_cast<int>(face[0x46])) {
+            Vec* vertex = m_vertices + *index;
+            GXPosition3f32(vertex->x, vertex->y, vertex->z);
+            i++;
+            index++;
+        }
+
+        Vec* firstVertex = m_vertices + *reinterpret_cast<unsigned short*>(face + 0x48);
+        GXPosition3f32(firstVertex->x, firstVertex->y, firstVertex->z);
+
+        face += kFaceStride;
+        faceIndex++;
+    }
 }
 
 /*

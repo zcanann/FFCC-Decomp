@@ -232,65 +232,78 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
  */
 void CMapTexAnim::Calc(CMaterialSet* materialSet, CTextureSet* textureSet)
 {
-    if (U8At(this, 0x15) == 0) {
-        const float frameFloat = F32At(this, 0x1C);
-        const unsigned short frameIndex = static_cast<unsigned short>(frameFloat);
-        const unsigned short textureIndex = U16At(*reinterpret_cast<void**>(Ptr(this, 0x20)), frameIndex * 2);
-        void* material = MaterialAt(materialSet, static_cast<unsigned long>(U16At(this, 8)));
-        SetMaterialTextureSlot(material, static_cast<unsigned long>(U16At(this, 0xA)), TextureAt(textureSet, textureIndex));
+    if (U8At(this, 0x15) != 0) {
+        CMapKeyFrame* keyFrame = reinterpret_cast<CMapKeyFrame*>(Ptr(this, 0x24));
+        if (IsRun__12CMapKeyFrameFv(keyFrame) != 0) {
+            int keyFrameIndex = 0;
+            int keyFrameIndexNext = 0;
+            float blend = 0.0f;
+            int reachedFrame = Get__12CMapKeyFrameFRiRiRf(keyFrame, &keyFrameIndex, &keyFrameIndexNext, &blend);
 
-        F32At(this, 0x1C) = F32At(this, 0x1C) + F32At(this, 0x18);
-        const float endFrame = static_cast<float>(U16At(this, 0x10));
-        if (endFrame <= F32At(this, 0x1C)) {
-            if (U8At(this, 0x16) == 0) {
-                F32At(this, 0x1C) = endFrame;
+            if (reachedFrame == 0) {
+                const unsigned short textureIndex = U16At(*reinterpret_cast<void**>(Ptr(this, 0x20)), keyFrameIndex * 2);
+                void* texture = TextureAt(textureSet, textureIndex);
+                void* material = MaterialAt(materialSet, static_cast<unsigned long>(U16At(this, 8)));
+                SetMaterialTextureSlot(material, static_cast<unsigned long>(U16At(this, 0xA)), texture);
+
+                if (U8At(this, 0x14) != 0) {
+                    const unsigned short nextTextureIndex =
+                        U16At(*reinterpret_cast<void**>(Ptr(this, 0x20)), keyFrameIndexNext * 2);
+                    void* nextTexture = TextureAt(textureSet, nextTextureIndex);
+                    SetMaterialTextureSlot(material, static_cast<unsigned long>(U16At(this, 0xA) + 1), nextTexture);
+                    *reinterpret_cast<char*>(Ptr(material, 0xA4)) = 0;
+                    *reinterpret_cast<unsigned int*>(Ptr(material, 0x24)) |= 0x8000;
+                }
             } else {
-                F32At(this, 0x1C) = F32At(this, 0x1C) - static_cast<float>(U16At(this, 0x10) - U16At(this, 0xE));
-            }
-        }
+                const unsigned short textureIndex = U16At(*reinterpret_cast<void**>(Ptr(this, 0x20)), keyFrameIndex * 2);
+                void* texture = TextureAt(textureSet, textureIndex);
+                void* material = MaterialAt(materialSet, static_cast<unsigned long>(U16At(this, 8)));
+                SetMaterialTextureSlot(material, static_cast<unsigned long>(U16At(this, 0xA)), texture);
 
-        if (U8At(this, 0x14) != 0) {
-            int nextFrame = static_cast<int>(frameIndex) + 1;
-            if (nextFrame >= static_cast<int>(U16At(this, 0xC))) {
-                nextFrame = 0;
+                if (U8At(this, 0x14) != 0) {
+                    const unsigned short nextTextureIndex =
+                        U16At(*reinterpret_cast<void**>(Ptr(this, 0x20)), keyFrameIndexNext * 2);
+                    void* nextTexture = TextureAt(textureSet, nextTextureIndex);
+                    SetMaterialTextureSlot(material, static_cast<unsigned long>(U16At(this, 0xA) + 1), nextTexture);
+                    *reinterpret_cast<char*>(Ptr(material, 0xA4)) = static_cast<char>(FLOAT_8032fd38 * blend);
+                    *reinterpret_cast<unsigned int*>(Ptr(material, 0x24)) |= 0x8000;
+                }
             }
 
-            const unsigned short nextTextureIndex =
-                U16At(*reinterpret_cast<void**>(Ptr(this, 0x20)), static_cast<unsigned int>(nextFrame) * 2);
-            SetMaterialTextureSlot(material, static_cast<unsigned long>(U16At(this, 0xA) + 1), TextureAt(textureSet, nextTextureIndex));
-            *reinterpret_cast<char*>(Ptr(material, 0xA4)) =
-                static_cast<char>(FLOAT_8032fd38 * (frameFloat - static_cast<float>(frameIndex)));
-            *reinterpret_cast<unsigned int*>(Ptr(material, 0x24)) |= 0x8000;
+            Calc__12CMapKeyFrameFv(keyFrame);
         }
         return;
     }
 
-    CMapKeyFrame* keyFrame = reinterpret_cast<CMapKeyFrame*>(Ptr(this, 0x24));
-    if (IsRun__12CMapKeyFrameFv(keyFrame) == 0) {
-        return;
-    }
-
-    int keyFrameIndex = 0;
-    int keyFrameIndexNext = 0;
-    float blend = 0.0f;
-    const int reachedFrame = Get__12CMapKeyFrameFRiRiRf(keyFrame, &keyFrameIndex, &keyFrameIndexNext, &blend);
-
+    const float frameFloat = F32At(this, 0x1C);
+    const unsigned short frameIndex = static_cast<unsigned short>(frameFloat);
+    const unsigned short textureIndex = U16At(*reinterpret_cast<void**>(Ptr(this, 0x20)), frameIndex * 2);
     void* material = MaterialAt(materialSet, static_cast<unsigned long>(U16At(this, 8)));
-    const unsigned short textureIndex = U16At(*reinterpret_cast<void**>(Ptr(this, 0x20)), keyFrameIndex * 2);
     SetMaterialTextureSlot(material, static_cast<unsigned long>(U16At(this, 0xA)), TextureAt(textureSet, textureIndex));
 
-    if (U8At(this, 0x14) != 0) {
-        const unsigned short nextTextureIndex = U16At(*reinterpret_cast<void**>(Ptr(this, 0x20)), keyFrameIndexNext * 2);
-        SetMaterialTextureSlot(material, static_cast<unsigned long>(U16At(this, 0xA) + 1), TextureAt(textureSet, nextTextureIndex));
-        if (reachedFrame == 0) {
-            *reinterpret_cast<char*>(Ptr(material, 0xA4)) = 0;
+    F32At(this, 0x1C) = F32At(this, 0x1C) + F32At(this, 0x18);
+    const float endFrame = static_cast<float>(U16At(this, 0x10));
+    if (endFrame <= F32At(this, 0x1C)) {
+        if (U8At(this, 0x16) == 0) {
+            F32At(this, 0x1C) = endFrame;
         } else {
-            *reinterpret_cast<char*>(Ptr(material, 0xA4)) = static_cast<char>(FLOAT_8032fd38 * blend);
+            F32At(this, 0x1C) = F32At(this, 0x1C) - static_cast<float>(U16At(this, 0x10) - U16At(this, 0xE));
         }
-        *reinterpret_cast<unsigned int*>(Ptr(material, 0x24)) |= 0x8000;
     }
 
-    Calc__12CMapKeyFrameFv(keyFrame);
+    if (U8At(this, 0x14) != 0) {
+        int nextFrame = static_cast<int>(frameIndex) + 1;
+        if (nextFrame >= static_cast<int>(U16At(this, 0xC))) {
+            nextFrame = 0;
+        }
+
+        const unsigned short nextTextureIndex =
+            U16At(*reinterpret_cast<void**>(Ptr(this, 0x20)), static_cast<unsigned int>(nextFrame) * 2);
+        SetMaterialTextureSlot(material, static_cast<unsigned long>(U16At(this, 0xA) + 1), TextureAt(textureSet, nextTextureIndex));
+        *reinterpret_cast<char*>(Ptr(material, 0xA4)) =
+            static_cast<char>(FLOAT_8032fd38 * (frameFloat - static_cast<float>(frameIndex)));
+        *reinterpret_cast<unsigned int*>(Ptr(material, 0x24)) |= 0x8000;
+    }
 }
 
 /*

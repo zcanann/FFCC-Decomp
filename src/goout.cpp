@@ -6,6 +6,7 @@ extern CGoOutMenu g_GoOutMenu;
 extern CGoOutMenu* g_pGoOutMenu;
 extern "C" int GetYesNoXPos__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" int CalcGoOutSelChar__8CMenuPcsFUcUc(CMenuPcs*, unsigned char, unsigned char);
+extern "C" void Calc__10CGoOutMenuFv(CGoOutMenu*);
 
 struct CMenuPcsGoOutLayout
 {
@@ -1121,12 +1122,17 @@ void CGoOutMenu::Calc()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801683d4
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CalcGoOutMenu()
 {
-	// TODO
+    g_pGoOutMenu = &g_GoOutMenu;
+    Calc__10CGoOutMenuFv(&g_GoOutMenu);
 }
 
 /*

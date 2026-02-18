@@ -3,7 +3,10 @@
 #include "ffcc/math.h"
 #include "ffcc/memory.h"
 #include "ffcc/maphit.h"
+#include "ffcc/mapshadow.h"
 #include "ffcc/maptexanim.h"
+#include "ffcc/materialman.h"
+#include "ffcc/p_light.h"
 #include "ffcc/system.h"
 
 #include <string.h>
@@ -27,6 +30,8 @@ extern "C" float lbl_8032F998;
 extern "C" float lbl_8032F99C;
 extern "C" int CheckHitCylinder__8COctTreeFP12CMapCylinderP3VecUl(void*, CMapCylinder*, Vec*, unsigned long);
 extern "C" int CheckHitCylinderNear__8COctTreeFP12CMapCylinderP3VecUl(void*, CMapCylinder*, Vec*, unsigned long);
+extern "C" void SetDrawFlag__8COctTreeFv(void*);
+extern "C" void Calc__11CMapAnimRunFl(CMapAnimRun*, long);
 extern int DAT_8032ec78;
 extern float FLOAT_8032ec80;
 extern unsigned char DAT_8032ec88;
@@ -37,6 +42,7 @@ extern float FLOAT_8032f9ac;
 extern char DAT_801ead4c[];
 extern char DAT_801d7384[];
 extern char DAT_801d73c4[];
+extern CLightPcs LightPcs;
 extern CMath Math;
 
 static char s_map_cpp[] = "map.cpp";
@@ -1282,12 +1288,83 @@ void CMapMng::ReadMid(char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800311e8
+ * PAL Size: 552b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapMng::Calc()
 {
-	// TODO
+    *reinterpret_cast<int*>(Ptr(this, 4)) += 1;
+
+    const int mapObjCount = *reinterpret_cast<short*>(Ptr(this, 0xC));
+    if (mapObjCount == 0) {
+        return;
+    }
+
+    CPtrArray<CMapAnimRun*>* mapAnimRunArray = reinterpret_cast<CPtrArray<CMapAnimRun*>*>(Ptr(this, 0x213E0));
+    const int mapAnimRunCount = mapAnimRunArray->GetSize();
+    for (int i = 0; i < mapAnimRunCount; i++) {
+        CMapAnimRun* mapAnimRun = (*mapAnimRunArray)[i];
+        Calc__11CMapAnimRunFl(mapAnimRun, *reinterpret_cast<int*>(Ptr(this, 0x22A6C)));
+    }
+
+    Mtx identity;
+    PSMTXIdentity(identity);
+
+    CMapObj* mapObj = *reinterpret_cast<CMapObj**>(Ptr(this, 0x228E8));
+    if (mapObj != 0) {
+        mapObj->CalcMtx(identity, 0);
+    }
+
+    int& mapLightId = *reinterpret_cast<int*>(Ptr(this, 0x22A6C));
+    mapLightId += 1;
+    mapLightId += 1;
+    if (mapLightId != 0x1E) {
+        mapLightId = 0x1C;
+    }
+
+    SetLightSource();
+
+    CPtrArray<CMapShadow*>* mapShadowArray = reinterpret_cast<CPtrArray<CMapShadow*>*>(Ptr(this, 0x21434));
+    const int mapShadowCount = mapShadowArray->GetSize();
+    for (int i = 0; i < mapShadowCount; i++) {
+        CMapShadow* mapShadow = (*mapShadowArray)[i];
+        mapShadow->Calc();
+    }
+
+    for (int i = 0; i < mapObjCount; i++) {
+        reinterpret_cast<CMapObj*>(Ptr(this, 0x954 + (i * 0xF0)))->Calc();
+    }
+
+    CMapTexAnimSet* mapTexAnimSet = *reinterpret_cast<CMapTexAnimSet**>(Ptr(this, 0x213DC));
+    if (mapTexAnimSet != 0) {
+        mapTexAnimSet->Calc();
+    }
+
+    CMaterialSet* materialSet = *reinterpret_cast<CMaterialSet**>(Ptr(this, 0x213D4));
+    materialSet->Calc();
+
+    const int octTreeCount = *reinterpret_cast<short*>(Ptr(this, 8));
+    for (int i = 0; i < octTreeCount; i++) {
+        COctTree* octTree = reinterpret_cast<COctTree*>(Ptr(this, 0x14 + (i * 0x38)));
+        LightPcs.InsertOctTree(static_cast<CLightPcs::TARGET>(1), *octTree);
+    }
+
+    for (int i = 0; i < octTreeCount; i++) {
+        COctTree* octTree = reinterpret_cast<COctTree*>(Ptr(this, 0x14 + (i * 0x38)));
+        CMapShadowInsertOctTree(static_cast<CMapShadow::TARGET>(1), *octTree);
+    }
+
+    for (int i = 0; i < octTreeCount; i++) {
+        SetDrawFlag__8COctTreeFv(Ptr(this, 0x14 + (i * 0x38)));
+    }
+
+    for (int i = 0; i < mapObjCount; i++) {
+        reinterpret_cast<CMapObj*>(Ptr(this, 0x954 + (i * 0xF0)))->SetDrawFlag();
+    }
 }
 
 /*

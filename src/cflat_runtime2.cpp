@@ -32,6 +32,7 @@ extern "C" void* __vt__Q212CFlatRuntime7CObject[];
 extern "C" void* __vt__9CGBaseObj[];
 extern "C" void* __vt__8CGObject[];
 extern "C" void* __vt__8CGPrgObj[];
+extern "C" void* __vt__9CGItemObj[];
 extern "C" void* __vt__10CGCharaObj[];
 extern "C" void* __vt__8CGMonObj[];
 extern "C" void* __vt__10CGPartyObj[];
@@ -380,6 +381,44 @@ extern "C" void __ct__10CGPartyObjFv(CGPartyObj* obj)
 	*reinterpret_cast<void***>(self + 0x48) = __vt__8CGPrgObj;
 	*reinterpret_cast<void***>(self + 0x48) = __vt__10CGCharaObj;
 	*reinterpret_cast<void***>(self + 0x48) = __vt__10CGPartyObj;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8006EA18
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __ct__9CGItemObjFv(CGItemObj* obj)
+{
+	u8* self = reinterpret_cast<u8*>(obj);
+	*reinterpret_cast<void***>(self + 0x48) = __vt__Q212CFlatRuntime7CObject;
+	self[0x38] &= 0xEF;
+	*reinterpret_cast<void***>(self + 0x48) = __vt__9CGBaseObj;
+	*reinterpret_cast<void***>(self + 0x48) = __vt__8CGObject;
+	*reinterpret_cast<void***>(self + 0x48) = __vt__8CGPrgObj;
+	*reinterpret_cast<void***>(self + 0x48) = __vt__9CGItemObj;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8006EA68
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __ct__8CGObjectFv(CGObject* obj)
+{
+	u8* self = reinterpret_cast<u8*>(obj);
+	*reinterpret_cast<void***>(self + 0x48) = __vt__Q212CFlatRuntime7CObject;
+	self[0x38] &= 0xEF;
+	*reinterpret_cast<void***>(self + 0x48) = __vt__9CGBaseObj;
+	*reinterpret_cast<void***>(self + 0x48) = __vt__8CGObject;
 }
 
 /*

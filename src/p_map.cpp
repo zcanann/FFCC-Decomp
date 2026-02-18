@@ -239,20 +239,47 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
  * JP Address: TODO
  * JP Size: TODO
  */
-int CMapPcs::IsLoadMapCompleted()
+unsigned long long CMapPcs::IsLoadMapCompleted()
 {
     int* busy = reinterpret_cast<int*>(reinterpret_cast<char*>(&MapMng) + 0x22A2C);
+    unsigned int result = 0;
+    int remaining = 2;
 
-    for (int i = 0; i < 3; i++) {
-        if (busy[0] != 0 || busy[1] != 0 || busy[2] != 0 || busy[3] != 0 ||
-            busy[4] != 0 || busy[5] != 0 || busy[6] != 0 || busy[7] != 0) {
+    while (true) {
+        if (busy[0] != 0) {
             return 0;
+        }
+        if (busy[1] != 0) {
+            return 0;
+        }
+        if (busy[2] != 0) {
+            return 0;
+        }
+        if (busy[3] != 0) {
+            return 0;
+        }
+        if (busy[4] != 0) {
+            return 0;
+        }
+        if (busy[5] != 0) {
+            return 0;
+        }
+        if (busy[6] != 0) {
+            return 0;
+        }
+        if (busy[7] != 0) {
+            break;
         }
 
         busy += 7;
+        result += 7;
+        remaining--;
+        if (remaining == 0) {
+            return (static_cast<unsigned long long>(1) << 32) | result;
+        }
     }
 
-    return 1;
+    return result;
 }
 
 /*

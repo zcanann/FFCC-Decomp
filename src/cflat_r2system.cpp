@@ -2,6 +2,7 @@
 #include "ffcc/color.h"
 #include "ffcc/game.h"
 #include "ffcc/graphic.h"
+#include "ffcc/math.h"
 #include "ffcc/map.h"
 #include "ffcc/maphit.h"
 #include "ffcc/mes.h"
@@ -951,6 +952,36 @@ extern "C" void SetAmbient__9CCharaPcsFiP8_GXColor(CCharaPcs* chara, int index, 
     base[0xE9] = color->g;
     base[0xEA] = color->b;
     base[0xEB] = color->a;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9784
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void VECMultAdd(Vec* a, Vec* b, Vec* out, float scale)
+{
+    Vec scaled;
+
+    PSVECScale(b, &scaled, scale);
+    PSVECAdd(a, &scaled, out);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B97D8
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __opP3Vec__7CVectorFv(void)
+{
 }
 
 /*

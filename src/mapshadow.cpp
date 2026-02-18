@@ -22,7 +22,7 @@ extern CMapMng MapMng;
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapShadowInsertOctTree(CMapShadow::TARGET mapShadow, COctTree& octTree)
+void CMapShadowInsertOctTree(CMapShadow::TARGET target, COctTree& octTree)
 {
 	CMapShadow* shadow;
 	int model;
@@ -32,30 +32,30 @@ void CMapShadowInsertOctTree(CMapShadow::TARGET mapShadow, COctTree& octTree)
 	CBound* bound;
 
 	octTree.ClearShadow();
-	if (*(u32*)(*(u32*)((char*)&octTree + 0x8) + 0x3c) != 0) {
-		i = 0;
-		while (true) {
-			mapShadowCount = ((CPtrArray<CMapShadow>*)((char*)&MapMng + 0x21434))->GetSize();
-			if (mapShadowCount <= i) {
-				break;
-			}
+	if (*(u32*)(*(u32*)((char*)&octTree + 0x8) + 0x3c) == 0) {
+		return;
+	}
 
-			if (((*(u32*)(*(u32*)((char*)&octTree + 0x8) + 0x3c) & (1U << i)) != 0)
-			    && ((shadow = (*(CPtrArray<CMapShadow>*)((char*)&MapMng + 0x21434))[i]),
-			        (*((char*)shadow + (int)mapShadow + 0xf0) != 0))
-			    && (*(char*)((char*)shadow + 0x7) == 0)) {
+	i = 0;
+	do {
+		if ((*(u32*)(*(u32*)((char*)&octTree + 0x8) + 0x3c) & (1U << i)) != 0) {
+			shadow = (*(CPtrArray<CMapShadow>*)((char*)&MapMng + 0x21434))[i];
+			if ((*(s8*)((char*)shadow + (int)target + 0xf0) != 0) && (*(s8*)((char*)shadow + 0x7) == 0)) {
 				model = *(int*)((char*)shadow + 0xc);
 				pos.x = *(float*)(model + 0xc4);
 				pos.y = *(float*)(model + 0xd4);
 				pos.z = *(float*)(model + 0xe4);
 
-				bound = (CBound*)((char*)shadow + (int)mapShadow * 0x18 + 0xc0);
+				bound = (CBound*)((char*)shadow + (int)target * 0x18 + 0xc0);
 				octTree.InsertShadow(i, pos, *bound);
 			}
-			i++;
 		}
-	}
+
+		i++;
+		mapShadowCount = ((CPtrArray<CMapShadow>*)((char*)&MapMng + 0x21434))->GetSize();
+	} while (i < mapShadowCount);
 }
+
 
 /*
  * --INFO--

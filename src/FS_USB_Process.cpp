@@ -18,7 +18,7 @@ extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stag
 extern "C" void __dla__FPv(void* ptr);
 
 namespace {
-static char s_FS_USB_Process_cpp[] = "FS_USB_Process.cpp";
+static char s_FS_USB_Process_cpp[] = "FS_USB_Process.c";
 
 static inline u8* Ptr(CFunnyShapePcs* self, u32 offset) {
     return reinterpret_cast<u8*>(self) + offset;
@@ -63,9 +63,9 @@ void CFunnyShapePcs::SetUSBData()
     CUSBStreamData* usb = UsbStream(this);
     CFunnyShape* funny = FunnyShape(this);
     CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x4));
-    u8 index = *Ptr(this, 0x6124);
+    char index = *reinterpret_cast<char*>(Ptr(this, 0x6124));
 
-    switch (usb->m_packetCode) {
+    switch (*reinterpret_cast<u32*>(Ptr(this, 0x4C))) {
     case 4:
         U32At(this, 0x61B8) = 1;
         funny->ClearTextureData();

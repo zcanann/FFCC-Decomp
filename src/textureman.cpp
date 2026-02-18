@@ -931,10 +931,10 @@ void CTexture::SetTlutColor(int index, _GXColor color)
         offset = 0x10;
     }
 
-    U16At(PtrAt(this, 0x7C), (index + offset) * 2) =
-        static_cast<unsigned short>((static_cast<unsigned short>(color.a) << 8) | color.b);
-    U16At(PtrAt(this, 0x7C), index * 2) =
-        static_cast<unsigned short>((static_cast<unsigned short>(color.g) << 8) | color.r);
+    unsigned short rg = static_cast<unsigned short>((static_cast<unsigned short>(color.g) << 8) | color.r);
+    unsigned short ba = static_cast<unsigned short>((static_cast<unsigned short>(color.a) << 8) | color.b);
+    U16At(PtrAt(this, 0x7C), (index + offset) * 2) = ba;
+    U16At(PtrAt(this, 0x7C), index * 2) = rg;
 }
 
 /*

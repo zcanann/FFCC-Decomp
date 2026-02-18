@@ -14,6 +14,9 @@ extern "C" void Create__9CGBaseObjFv(CGBaseObj*);
 extern "C" void Destroy__9CGBaseObjFv(CGBaseObj*);
 extern "C" void Destroy__12CFlatRuntimeFv(CFlatRuntime*);
 extern "C" void Destroy__9CFlatDataFv(void*);
+extern "C" void AfterFrame__12CFlatRuntimeFi(CFlatRuntime*, int);
+extern "C" void __dt__9CFlatDataFv(void*, int);
+extern "C" void __dt__12CFlatRuntimeFv(CFlatRuntime*, int);
 extern "C" void Close__5CFileFPQ25CFile7CHandle(void*, void*);
 extern "C" void* __vt__13CFlatRuntime2[];
 extern "C" CFlatRuntime* __ct__12CFlatRuntimeFv(CFlatRuntime*);
@@ -329,7 +332,11 @@ CFlatRuntime2::CFlatRuntime2()
  */
 CFlatRuntime2::~CFlatRuntime2()
 {
-	// TODO
+	u8* runtime = reinterpret_cast<u8*>(this);
+	*reinterpret_cast<void***>(runtime) = __vt__13CFlatRuntime2;
+	AfterFrame__12CFlatRuntimeFi(reinterpret_cast<CFlatRuntime*>(this), 1);
+	__dt__9CFlatDataFv(runtime + 0xCF20, -1);
+	__dt__12CFlatRuntimeFv(reinterpret_cast<CFlatRuntime*>(this), 0);
 }
 
 /*

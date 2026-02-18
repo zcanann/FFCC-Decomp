@@ -42,6 +42,7 @@ extern "C" unsigned char DAT_8032ed8a;
 extern "C" unsigned char DAT_8032ed8b;
 extern "C" int DAT_8032ed70;
 extern "C" int DAT_8032ed7c;
+extern "C" unsigned int DAT_8032ed80;
 extern "C" unsigned char CFlat[];
 extern "C" void* CAMemCacheSet;
 extern "C" void SetPart__9CLightPcsFQ29CLightPcs6TARGETPvUc(CLightPcs*, int, void*, unsigned char);

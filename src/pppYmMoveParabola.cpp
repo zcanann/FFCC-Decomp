@@ -89,7 +89,8 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
         
         // Convert counter to double for frame calculations
         u16 counter = *(u16*)(pfVar + 3);
-        double frameCount = (double)(f32)((double)((u32)counter | 0x43300000) - DOUBLE_80330e30);
+        double frameBits = (double)(((u64)0x43300000 << 32) | (u64)counter);
+        double frameCount = (double)(f32)(frameBits - DOUBLE_80330e30);
         
         Vec direction;
         if (Game.game.m_currentSceneId == 7) {

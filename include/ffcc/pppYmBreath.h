@@ -21,8 +21,8 @@ void SetParticleMatrix(_pppPObject*, VYmBreath*, PARTICLE_DATA*, PARTICLE_WMAT*)
 extern "C" {
 #endif
 
-void pppFrameYmBreath(void);
-void pppRenderYmBreath(void);
+void pppFrameYmBreath(pppYmBreath*, PYmBreath*, UnkC*);
+void pppRenderYmBreath(pppYmBreath*, PYmBreath*, UnkC*);
 void pppConstructYmBreath(pppYmBreath*, UnkC*);
 void pppConstruct2YmBreath(void);
 void pppDestructYmBreath(pppYmBreath*, UnkC*);

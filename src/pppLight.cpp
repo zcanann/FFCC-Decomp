@@ -102,9 +102,9 @@ void pppLight(void* param1, void* param2, void* param3)
 	unsigned char* pppMng = (unsigned char*)param1;
 	unsigned char* lightParam = (unsigned char*)param2;
 	unsigned char* work = pppMng + *(int*)(*(unsigned char**)((unsigned char*)param3 + 0xc)) + 0x80;
-	unsigned char lightData[0xb0];
-	Vec sourcePos;
 	Vec targetPos;
+	Vec sourcePos;
+	unsigned char lightData[0xb0];
 
 	if (lbl_8032ED70 == 0) {
 		*(float*)(work + 0x1c) = *(float*)(work + 0x1c) + *(float*)(work + 0x20);
@@ -169,20 +169,16 @@ void pppLight(void* param1, void* param2, void* param3)
 		*(unsigned char**)(lightData + 0x6c) = lbl_8032ED50;
 		*(int*)(lightData + 0x70) = 0;
 
-		int c0 = *(short*)(work + 0x0) >> 7;
-		int c1 = *(short*)(work + 0x2) >> 7;
-		int c2 = *(short*)(work + 0x4) >> 7;
-		int c3 = *(short*)(work + 0x6) >> 7;
-		lightData[0x58] = (unsigned char)c0;
-		lightData[0x59] = (unsigned char)c1;
-		lightData[0x5a] = (unsigned char)c2;
-		lightData[0x5b] = (unsigned char)c3;
+		lightData[0x58] = (unsigned char)(*(short*)(work + 0x0) >> 7);
+		lightData[0x59] = (unsigned char)(*(short*)(work + 0x2) >> 7);
+		lightData[0x5a] = (unsigned char)(*(short*)(work + 0x4) >> 7);
+		lightData[0x5b] = (unsigned char)(*(short*)(work + 0x6) >> 7);
 
 		if (lightParam[0x5a] != 0) {
-			lightData[0x5c] = (unsigned char)c0;
-			lightData[0x5d] = (unsigned char)c1;
-			lightData[0x5e] = (unsigned char)c2;
-			lightData[0x5f] = (unsigned char)c3;
+			lightData[0x5c] = lightData[0x58];
+			lightData[0x5d] = lightData[0x59];
+			lightData[0x5e] = lightData[0x5a];
+			lightData[0x5f] = lightData[0x5b];
 		} else {
 			*(int*)(lightData + 0x5c) = 0;
 		}
@@ -215,8 +211,7 @@ void pppLight(void* param1, void* param2, void* param3)
 				if (*(int*)(lightParam + 0x44) == -1) {
 					obj = lbl_801EADC8;
 				} else {
-					int objId = *(int*)(lightParam + 0x44);
-					obj = *(unsigned char**)(*(unsigned char**)(lbl_8032ED50 + 0xd4) + (objId << 4) + 0x4);
+					obj = *(unsigned char**)(*(unsigned char**)(lbl_8032ED50 + 0xd4) + (*(int*)(lightParam + 0x44) << 4) + 0x4);
 				}
 
 				targetPos.x = *(float*)(obj + 0x1c);

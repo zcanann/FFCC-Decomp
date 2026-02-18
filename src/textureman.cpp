@@ -924,6 +924,7 @@ void CTexture::GetExternalTlutColor(void*, int, int)
 void CTexture::SetTlutColor(int index, _GXColor color)
 {
     int offset = 0;
+
     if (U8At(this, 0x60) == 9) {
         offset = 0x100;
     } else if (U8At(this, 0x60) == 8) {

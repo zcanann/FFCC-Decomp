@@ -51,17 +51,17 @@ void THPGXYuv2RgbSetup(GXRenderModeObj* rmode) {
     GXColor kColor0;
     GXColor kColor1;
     GXColor kColor2;
-    f32 width;
-    f32 height;
+    u16 fbWidth;
+    u16 efbHeight;
 
-    width = (f32)rmode->fbWidth;
-    height = (f32)rmode->efbHeight;
+    fbWidth = rmode->fbWidth;
+    efbHeight = rmode->efbHeight;
 
     GXSetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
-    C_MTXOrtho(projMtx, 0.0f, height, 0.0f, width, 0.0f, 1.0f);
+    C_MTXOrtho(projMtx, 0.0f, (f32)efbHeight, 0.0f, (f32)fbWidth, 0.0f, 1.0f);
     GXSetProjection(projMtx, GX_ORTHOGRAPHIC);
-    GXSetViewport(0.0f, 0.0f, width, height, 0.0f, 1.0f);
-    GXSetScissor(0, 0, rmode->fbWidth, rmode->efbHeight);
+    GXSetViewport(0.0f, 0.0f, (f32)fbWidth, (f32)efbHeight, 0.0f, 1.0f);
+    GXSetScissor(0, 0, fbWidth, efbHeight);
 
     PSMTXIdentity(modelMtx);
     GXLoadPosMtxImm(modelMtx, GX_PNMTX0);

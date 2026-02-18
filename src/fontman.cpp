@@ -30,22 +30,30 @@ typedef void (*VirtualDtorFn)(void*, int);
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80092f14
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CFontMan::CFontMan()
 {
-	// TODO
+	m_stage = 0;
+	m_font = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80093098
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CFontMan::~CFontMan()
 {
-	// TODO
 }
 
 /*
@@ -111,18 +119,17 @@ void CFontMan::Init()
  */
 void CFontMan::Quit()
 {
-	int* font = *reinterpret_cast<int**>(Ptr(this, 8));
+	int* font = reinterpret_cast<int*>(m_font);
 	if (font != 0) {
 		int refCount = font[1];
 		font[1] = refCount - 1;
 		if ((refCount - 1 == 0) && (font != 0)) {
-			void** vtable = *reinterpret_cast<void***>(font);
-			reinterpret_cast<VirtualDtorFn>(vtable[2])(font, 1);
+			(*(void (**)(int*, int))(*font + 8))(font, 1);
 		}
-		*reinterpret_cast<void**>(Ptr(this, 8)) = 0;
+		m_font = 0;
 	}
 
-	Memory.DestroyStage(*reinterpret_cast<CMemory::CStage**>(Ptr(this, 4)));
+	Memory.DestroyStage(m_stage);
 }
 
 /*
@@ -134,9 +141,9 @@ void CFontMan::Quit()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CFontMan::GetInternal22Size()
+unsigned long CFontMan::GetInternal22Size()
 {
-	// TODO
+	return 0x10D40;
 }
 
 /*
@@ -201,7 +208,7 @@ void CFont::Create(void* filePtr, CMemory::CStage* stage)
                         bucket += static_cast<unsigned int>(*bucket) * 4 + 1;
                     }
                 } else if (chunk.m_id == 0x54585452) {
-                    texturePtr = new (stage, const_cast<char*>(s_fontman_cpp), 0xDF) CTexture;
+                    texturePtr = new (FontMan.m_stage, const_cast<char*>(s_fontman_cpp), 0xDF) CTexture;
                     texturePtr->Create(chunkFile, stage, 0, 0, m_usesEmbeddedData != 0);
                 }
             }

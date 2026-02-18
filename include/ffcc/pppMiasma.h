@@ -7,15 +7,16 @@ struct Vec;
 struct _pppPObject;
 
 typedef struct {
+    u8 m_pad_0x0[0xc];
     s32 m_graphId;
-    u8 m_pad_0x4[0x7c];
+    u8 m_pad_0x10[0x70];
 } pppMiasma;
 
 typedef struct {
-    s32 m_unk0;
+    s32 m_graphId;
+    u8 m_pad_0x4[0x14];
     s16 m_addPosX;
     s16 m_addPosY;
-    s32 m_graphId;
     s16 m_addPosZ;
     s16 m_addPosW;
     s16 m_addVelX;

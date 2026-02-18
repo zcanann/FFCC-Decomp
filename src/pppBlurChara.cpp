@@ -244,12 +244,12 @@ void pppDestructBlurChara(pppBlurChara* blurChara, UnkC* data)
     *(int*)(model + 0xE4) = 0;
     *(int*)(model + 0xE8) = 0;
 
-    if (work->m_captureBuffer != 0) {
+    if ((CMemory::CStage*)work->m_captureBuffer != 0) {
         pppHeapUseRate__FPQ27CMemory6CStage((CMemory::CStage*)work->m_captureBuffer);
         work->m_captureBuffer = 0;
     }
 
-    if (work->m_smallTexObj != 0) {
+    if ((CMemory::CStage*)work->m_smallTexObj != 0) {
         pppHeapUseRate__FPQ27CMemory6CStage((CMemory::CStage*)work->m_smallTexObj);
         work->m_smallTexObj = 0;
     }

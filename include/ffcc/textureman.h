@@ -28,7 +28,7 @@ public:
     void CacheDumpTexture(CAmemCacheSet*);
     void CheckName(char*);
     void SetExternalTlut(void*, int);
-    void GetTlutColor(int);
+    _GXColor GetTlutColor(int);
     void GetExternalTlutColor(void*, int, int);
     void SetTlutColor(int, _GXColor);
     void SetExternalTlutColor(void*, int, int, _GXColor&);
@@ -48,7 +48,7 @@ public:
 
     void Create(void*, CMemory::CStage*, int, CAmemCacheSet*, int, int);
     void Create(CChunkFile&, CMemory::CStage*, int, CAmemCacheSet*, int, int);
-    void Find(char*);
+    int Find(char*);
     void ReleaseTextureIdx(int, CAmemCacheSet*);
 };
 

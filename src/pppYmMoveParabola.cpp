@@ -13,6 +13,7 @@ extern float FLOAT_80330e28;  // Gravity factor
 extern double DOUBLE_80330e30; // Double constant for counter conversion
 extern int ppvSinTbl;         // Sin table base
 extern int DAT_8032ed70;      // Global flag
+extern u8* lbl_8032ED50;
 
 /*
  * --INFO--
@@ -25,10 +26,8 @@ extern int DAT_8032ed70;      // Global flag
  */
 extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, struct UnkC* dataPtr)
 {
-    _pppMngSt* pppMngSt = pppMngStPtr;
-    Vec* savedPosition = (Vec*)((u8*)pppMngSt + 0x58);
-    Vec* paramVec0 = (Vec*)((u8*)pppMngSt + 0x68);
-    f32* pfVar = (f32*)((u8*)&basePtr->field0_0x0 + 8 + *dataPtr->m_serializedDataOffsets);
+    u8* pppMngSt = lbl_8032ED50;
+    f32* pfVar = (f32*)((u8*)basePtr + *dataPtr->m_serializedDataOffsets + 0x80);
 
     f32 fVar2 = FLOAT_80330e1c;
     pfVar[2] = FLOAT_80330e1c;
@@ -41,11 +40,11 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
         Vec basePos;
         Vec resultPos;
 
-        pppCopyVector(*(Vec*)(pfVar + 4), *savedPosition);
+        pppCopyVector(*(Vec*)(pfVar + 4), *(Vec*)(pppMngSt + 0x58));
 
-        matrixPos.x = pppMngStPtr->m_matrix.value[0][3];
-        matrixPos.y = pppMngStPtr->m_matrix.value[1][3];
-        matrixPos.z = pppMngStPtr->m_matrix.value[2][3];
+        matrixPos.x = *(f32*)(pppMngSt + 0x84);
+        matrixPos.y = *(f32*)(pppMngSt + 0x94);
+        matrixPos.z = *(f32*)(pppMngSt + 0xA4);
 
         basePos.x = pfVar[4];
         basePos.y = pfVar[5];
@@ -56,8 +55,8 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
         resultPos.x = pfVar[4];
         resultPos.y = pfVar[5];
         resultPos.z = pfVar[6];
-        pppCopyVector(*paramVec0, resultPos);
-        paramVec0->x = paramVec0->x + FLOAT_80330e18;
+        pppCopyVector(*(Vec*)(pppMngSt + 0x68), resultPos);
+        *(f32*)(pppMngSt + 0x68) += FLOAT_80330e18;
     }
 }
 
@@ -72,25 +71,28 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
  */
 extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct UnkB* stepData, struct UnkC* offsetData)
 {
-    _pppMngSt* pppMngSt = pppMngStPtr;
-    
     if (DAT_8032ed70 == 0) {
-        f32* pfVar = (f32*)((u8*)&basePtr->field0_0x0 + 8 + *offsetData->m_serializedDataOffsets);
+        u8* pppMngSt = lbl_8032ED50;
+        f32* pfVar = (f32*)((u8*)basePtr + *offsetData->m_serializedDataOffsets + 0x80);
         
         // Update velocity and position
         pfVar[1] = pfVar[1] + pfVar[2];
         *pfVar = *pfVar + pfVar[1];
         
-        if (stepData->m_graphId == basePtr->field0_0x0.m_graphId) {
+        if (stepData->m_graphId == basePtr->m_graphId) {
             *pfVar = *pfVar + stepData->m_stepValue;
-            pfVar[1] = pfVar[1] + (f32)stepData->m_arg3;
-            pfVar[2] = pfVar[2] + *(f32*)stepData->m_payload;
+            pfVar[1] = pfVar[1] + stepData->m_arg3;
+            pfVar[2] = pfVar[2] + stepData->m_payload;
         }
         
         // Convert counter to double for frame calculations
         u16 counter = *(u16*)(pfVar + 3);
-        double frameBits = (double)(((u64)0x43300000 << 32) | (u64)counter);
-        double frameCount = (double)(f32)(frameBits - DOUBLE_80330e30);
+        union {
+            u64 u;
+            double d;
+        } frameBits;
+        frameBits.u = ((u64)0x43300000 << 32) | (u64)counter;
+        double frameCount = (double)(f32)(frameBits.d - DOUBLE_80330e30);
         
         Vec direction;
         if (Game.game.m_currentSceneId == 7) {
@@ -106,14 +108,14 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
         pppNormalize(direction, tempDir);
         
         // Trigonometric parabolic motion calculations
-        u32 sinIndex = (u32)((FLOAT_80330e20 * (f32)stepData->m_dataValIndex) / FLOAT_80330e24);
+        s32 sinIndex = (s32)((FLOAT_80330e20 * stepData->m_dataValIndex) / FLOAT_80330e24);
         
         f32 baseValue = *pfVar;
         f32 horizontalScale = (f32)(frameCount * (double)(baseValue * *(f32*)((int)ppvSinTbl + ((sinIndex + 0x4000) & 0xfffc))));
         f32 horizontalX = direction.x * horizontalScale;
         f32 horizontalZ = direction.z * horizontalScale;
-        f32 verticalY = (f32)(frameCount * (double)(baseValue * *(f32*)((int)ppvSinTbl + (sinIndex & 0xfffc))) - 
-                             (double)(f32)(frameCount * (double)(f32)((double)(FLOAT_80330e28 * (f32)stepData->m_initWOrk) * frameCount)));
+        f32 verticalY = (f32)(frameCount * (double)(baseValue * *(f32*)((int)ppvSinTbl + (sinIndex & 0xfffc))) -
+                             (double)(f32)(frameCount * (double)(f32)((double)(FLOAT_80330e28 * stepData->m_initWOrk) * frameCount)));
         
         Vec newPosition;
         if (Game.game.m_currentSceneId == 7) {
@@ -142,11 +144,11 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
         pppCopyVector(*(Vec*)((u8*)pppMngSt + 0x8), newPosition);
         
         // Update matrix with new position
-        pppMngStPtr->m_matrix.value[0][3] = newPosition.x;
-        pppMngStPtr->m_matrix.value[1][3] = newPosition.y;
-        pppMngStPtr->m_matrix.value[2][3] = newPosition.z;
-        
-        pppSetFpMatrix(pppMngSt);
+        *(f32*)(pppMngSt + 0x84) = newPosition.x;
+        *(f32*)(pppMngSt + 0x94) = newPosition.y;
+        *(f32*)(pppMngSt + 0xA4) = newPosition.z;
+
+        pppSetFpMatrix((_pppMngSt*)pppMngSt);
         
         *(u16*)(pfVar + 3) = *(u16*)(pfVar + 3) + 1;
     }

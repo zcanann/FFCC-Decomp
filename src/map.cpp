@@ -203,7 +203,16 @@ CPtrArray<CMapLightHolder*>::CPtrArray()
 template <>
 CPtrArray<CMapLightHolder*>::~CPtrArray()
 {
-    RemoveAll();
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    void*& items = *reinterpret_cast<void**>(self + 0x10);
+
+    if (items != 0) {
+        __dla__FPv(items);
+        items = 0;
+    }
+
+    *reinterpret_cast<int*>(self + 8) = 0;
+    *reinterpret_cast<int*>(self + 4) = 0;
 }
 
 template <>

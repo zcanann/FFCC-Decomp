@@ -180,13 +180,14 @@ extern "C" void pppConstruct2YmLaser(void* pppYmLaser_, void* param_2_)
 extern "C" void pppDestructYmLaser(void* pppYmLaser_, void* param_2_)
 {
 	pppYmLaser* pppYmLaser = (struct pppYmLaser*)pppYmLaser_;
-	YmLaserOffsets* param_2 = (YmLaserOffsets*)param_2_;
-	s32 dataOffset = param_2->m_serializedDataOffsets[2];
-	void* stage = *(void**)((u8*)&pppYmLaser->field_0x9c + dataOffset);
+	YmLaserParam* param_2 = (YmLaserParam*)param_2_;
+	s32 dataOffset = param_2->offsets->m_serializedDataOffsets[2];
+	f32* work = (f32*)((u8*)pppYmLaser + 0x80 + dataOffset);
+	void* stage = *(void**)((u8*)work + 0x1c);
 
 	if (stage != 0) {
 		pppHeapUseRate__FPQ27CMemory6CStage(stage);
-		*(void**)((u8*)&pppYmLaser->field_0x9c + dataOffset) = 0;
+		*(void**)((u8*)work + 0x1c) = 0;
 	}
 }
 

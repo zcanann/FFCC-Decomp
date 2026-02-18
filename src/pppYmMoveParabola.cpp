@@ -10,7 +10,6 @@ extern float FLOAT_80330e18;  // Small offset constant
 extern float FLOAT_80330e20;  // Scale factor
 extern float FLOAT_80330e24;  // Divisor
 extern float FLOAT_80330e28;  // Gravity factor
-extern double DOUBLE_80330e30; // Double constant for counter conversion
 extern int ppvSinTbl;         // Sin table base
 extern int DAT_8032ed70;      // Global flag
 extern u8* lbl_8032ED50;
@@ -85,7 +84,6 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
             pfVar[2] = pfVar[2] + stepData->m_payload;
         }
         
-        // Convert counter to double for frame calculations
         u16 counter = *(u16*)(pfVar + 3);
         union {
             u64 u;

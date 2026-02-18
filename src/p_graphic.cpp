@@ -30,6 +30,7 @@ extern u32 lbl_801E9D08[];
 extern int DAT_802381a0;
 extern CGraphicPcs GraphicsPcs;
 extern CMiniGamePcs MiniGamePcs;
+extern unsigned char MaterialMan[];
 extern char* PTR_DAT_801e9e64[];
 extern char DAT_8032fbf4[];
 extern char DAT_8032fbf8[];
@@ -438,12 +439,29 @@ void CGraphicPcs::setViewport()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80046538
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphicPcs::preDrawEnvInit()
 {
-	// TODO
+    *reinterpret_cast<u32*>(MaterialMan + 0x48) = 0xACE0F;
+    *reinterpret_cast<u32*>(MaterialMan + 0x44) = 0xFFFFFFFF;
+    *reinterpret_cast<u8*>(MaterialMan + 0x4C) = 0xFF;
+    *reinterpret_cast<u32*>(MaterialMan + 0x128) = 0;
+    *reinterpret_cast<u32*>(MaterialMan + 0x11C) = 0;
+    *reinterpret_cast<u32*>(MaterialMan + 0x12C) = 0x1E;
+    *reinterpret_cast<u32*>(MaterialMan + 0x120) = 0x1E;
+    *reinterpret_cast<u32*>(MaterialMan + 0x130) = 0;
+    *reinterpret_cast<u32*>(MaterialMan + 0x124) = 0;
+    *reinterpret_cast<u8*>(MaterialMan + 0x205) = 0xFF;
+    *reinterpret_cast<u8*>(MaterialMan + 0x206) = 0xFF;
+    *reinterpret_cast<u32*>(MaterialMan + 0x58) = 0;
+    *reinterpret_cast<u32*>(MaterialMan + 0x5C) = 0;
+    *reinterpret_cast<u8*>(MaterialMan + 0x208) = 0;
 }
 
 /*

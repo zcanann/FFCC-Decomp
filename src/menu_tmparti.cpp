@@ -6,6 +6,7 @@
 #include <string.h>
 
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
+extern "C" int __cntlzw(unsigned int);
 
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
@@ -233,7 +234,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
  */
 void CMenuPcs::TmpArtiCtrl()
 {
-	int iVar1;
+	bool hasInput;
 	float fVar2;
 	unsigned short uVar3;
 	unsigned int uVar4;
@@ -243,42 +244,43 @@ void CMenuPcs::TmpArtiCtrl()
 	int iVar8;
 	unsigned int uVar9;
 
-	iVar1 = 0;
+	hasInput = false;
 	*(short *)(*(int *)((char *)this + 0x82c) + 0x32) = *(short *)(*(int *)((char *)this + 0x82c) + 0x30);
 	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
-		iVar1 = 1;
+		hasInput = true;
 	}
 
-	if (iVar1 != 0) {
+	if (hasInput) {
 		uVar3 = 0;
 	} else {
+		__cntlzw((unsigned int)Pad._448_4_);
 		uVar3 = Pad._8_2_;
 	}
 
 	if (uVar3 == 0) {
-		iVar1 = 0;
+		hasInput = false;
 	} else if ((uVar3 & 0x20) != 0) {
 		*(short *)(*(int *)((char *)this + 0x82c) + 0x1e) = 1;
 		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-		iVar1 = 1;
+		hasInput = true;
 	} else if ((uVar3 & 0x40) != 0) {
 		*(short *)(*(int *)((char *)this + 0x82c) + 0x1e) = -1;
 		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-		iVar1 = 1;
+		hasInput = true;
 	} else if ((uVar3 & 0x100) != 0) {
 		Sound.PlaySe(4, 0x40, 0x7f, 0);
-		iVar1 = 0;
+		hasInput = false;
 	} else if ((uVar3 & 0x200) != 0) {
 		*(unsigned char *)(*(int *)((char *)this + 0x82c) + 0xd) = 1;
 		Sound.PlaySe(3, 0x40, 0x7f, 0);
-		iVar1 = 1;
+		hasInput = true;
 	} else {
-		iVar1 = 0;
+		hasInput = false;
 	}
 
 	fVar2 = 1.0f;
 	uVar4 = Game.game.m_scriptFoodBase[0];
-	if (iVar1 != 0) {
+	if (hasInput) {
 		iVar6 = *(int *)((char *)this + 0x850) + 8;
 		for (iVar7 = 0; iVar7 < **(short **)((char *)this + 0x850); iVar7 = iVar7 + 1) {
 			*(float *)(iVar6 + 0x10) = fVar2;

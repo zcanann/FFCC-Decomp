@@ -9,11 +9,33 @@ extern CTextureMan TextureMan;
 extern void* ARRAY_802ea170;
 extern "C" unsigned char lbl_801FE080[];
 extern "C" void __dt__8CFontManFv(void*);
+extern "C" CMemory::CStage* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
+extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, CMemory::CStage*);
 extern unsigned char CameraPcs[];
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 
 static const char s_fontman_cpp[] = "fontman.cpp";
+static const char s_CFontMan[] = "CFontMan";
+
+namespace {
+typedef void (*VirtualDtorFn)(void*, int);
+
+static void ReleaseRef(void* object)
+{
+	if (object == 0) {
+		return;
+	}
+
+	int* refCount = reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(object) + 4);
+	int nextRefCount = *refCount - 1;
+	*refCount = nextRefCount;
+	if (nextRefCount == 0) {
+		void** vtable = *reinterpret_cast<void***>(object);
+		reinterpret_cast<VirtualDtorFn>(vtable[2])(object, 1);
+	}
+}
+}
 
 /*
  * --INFO--
@@ -22,7 +44,9 @@ static const char s_fontman_cpp[] = "fontman.cpp";
  */
 CFontMan::CFontMan()
 {
-	// TODO
+	m_unk0 = 0;
+	m_stage = 0;
+	m_font = 0;
 }
 
 /*
@@ -32,7 +56,7 @@ CFontMan::CFontMan()
  */
 CFontMan::~CFontMan()
 {
-	// TODO
+	Quit();
 }
 
 /*
@@ -42,7 +66,10 @@ CFontMan::~CFontMan()
  */
 void CFontMan::Init()
 {
-	// TODO
+	m_font = 0;
+	m_stage = CreateStage__7CMemoryFUlPci(&Memory, 0x8000, s_CFontMan, 0);
+	m_font = new (m_stage, const_cast<char*>(s_fontman_cpp), 0x3D) CFont;
+	m_font->Create(0, 0);
 }
 
 /*
@@ -52,7 +79,9 @@ void CFontMan::Init()
  */
 void CFontMan::Quit()
 {
-	// TODO
+	ReleaseRef(m_font);
+	m_font = 0;
+	DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_stage);
 }
 
 /*
@@ -60,9 +89,9 @@ void CFontMan::Quit()
  * Address:	TODO
  * Size:	TODO
  */
-void CFontMan::GetInternal22Size()
+unsigned int CFontMan::GetInternal22Size()
 {
-	// TODO
+	return 0x10D40;
 }
 
 /*

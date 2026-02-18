@@ -7,6 +7,8 @@
 
 #include <dolphin/gx.h>
 
+class CFont;
+
 class CFontMan
 {
 public:
@@ -15,7 +17,12 @@ public:
 
 	void Init();
 	void Quit();
-	void GetInternal22Size();
+	unsigned int GetInternal22Size();
+
+private:
+	unsigned int m_unk0;
+	CMemory::CStage* m_stage;
+	CFont* m_font;
 };
 
 class CFont : public CRef

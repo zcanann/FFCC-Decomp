@@ -1,9 +1,20 @@
 #include "ffcc/RedSound/RedExecute.h"
+#include "ffcc/RedSound/RedMemory.h"
 #include "types.h"
+#include "dolphin/ax.h"
+#include "dolphin/axfx.h"
 #include <string.h>
 
 extern u32* DAT_8032f444;
 extern unsigned int DAT_8032ec30;
+extern int DAT_8032f4ac;
+extern u32* DAT_8032f4b0;
+
+struct RedReverbDATA {
+    void (*callback)(void*, void*);
+    void* context;
+    int kind;
+};
 
 /*
  * --INFO--
@@ -79,32 +90,139 @@ void ReverbAreaFree(void* param_1)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c31d4
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void InitReverb()
 {
-	// TODO
+    DAT_8032f4ac = RedNew(0x18);
+    memset((void*)DAT_8032f4ac, 0, 0x18);
+    DAT_8032f4b0 = (u32*)RedNew(4);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c3218
+ * PAL Size: 1040b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _SetReverbData(RedReverbDATA*, int*)
+void _SetReverbData(RedReverbDATA* reverb, int* params)
 {
-	// TODO
+    int result = 0;
+    switch (reverb->kind) {
+    case 1: {
+        AXFX_REVERBSTD* std = (AXFX_REVERBSTD*)reverb->context;
+        std->tempDisableFX = 0;
+        std->preDelay = (float)params[0] / 100.0f;
+        std->time = (float)params[1] / 100.0f;
+        std->coloration = (float)params[2] / 10000.0f;
+        std->damping = (float)params[3] / 10000.0f;
+        std->mix = (float)params[4] / 10000.0f;
+        result = AXFXReverbStdSettings(std);
+        break;
+    }
+    case 2: {
+        AXFX_REVERBHI* hi = (AXFX_REVERBHI*)reverb->context;
+        hi->tempDisableFX = 0;
+        hi->preDelay = (float)params[0] / 100.0f;
+        hi->time = (float)params[1] / 100.0f;
+        hi->coloration = (float)params[2] / 10000.0f;
+        hi->damping = (float)params[3] / 10000.0f;
+        hi->mix = (float)params[4] / 10000.0f;
+        hi->crosstalk = (float)params[5] / 10000.0f;
+        result = AXFXReverbHiSettings(hi);
+        break;
+    }
+    case 3: {
+        AXFX_DELAY* delay = (AXFX_DELAY*)reverb->context;
+        delay->delay[0] = (u32)params[0];
+        delay->delay[1] = (u32)params[0];
+        delay->delay[2] = (u32)params[0];
+        delay->feedback[0] = (u32)params[1];
+        delay->feedback[1] = (u32)params[1];
+        delay->feedback[2] = (u32)params[1];
+        delay->output[0] = (u32)params[2];
+        delay->output[1] = (u32)params[2];
+        delay->output[2] = (u32)params[2];
+        result = AXFXDelaySettings(delay);
+        break;
+    }
+    case 4: {
+        AXFX_CHORUS* chorus = (AXFX_CHORUS*)reverb->context;
+        chorus->baseDelay = (u32)params[0];
+        chorus->variation = (u32)params[1];
+        chorus->period = (u32)params[2];
+        result = AXFXChorusSettings(chorus);
+        break;
+    }
+    case 5: {
+        AXFX_REVERBHI_DPL2* hiDpl2 = (AXFX_REVERBHI_DPL2*)reverb->context;
+        hiDpl2->tempDisableFX = 0;
+        hiDpl2->preDelay = (float)params[0] / 100.0f;
+        hiDpl2->time = (float)params[1] / 100.0f;
+        hiDpl2->coloration = (float)params[2] / 10000.0f;
+        hiDpl2->damping = (float)params[3] / 10000.0f;
+        hiDpl2->mix = (float)params[4] / 10000.0f;
+        result = AXFXReverbHiSettingsDpl2(hiDpl2);
+        break;
+    }
+    }
+
+    if (result != 1) {
+        DAT_8032f4b0[0] = 0;
+        DAT_8032f4b0[1] = 0;
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c3628
+ * PAL Size: 240b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _ClearReverb(int)
+void _ClearReverb(int bank)
 {
-	// TODO
+    RedReverbDATA* reverb = (RedReverbDATA*)(DAT_8032f4ac + (bank & 1) * 0xC);
+    if (reverb->callback == 0) {
+        return;
+    }
+
+    if (bank == 0) {
+        AXRegisterAuxACallback((void (*)(void*, void*))_ReverbNullCallback, 0);
+    } else {
+        AXRegisterAuxBCallback((void (*)(void*, void*))_ReverbNullCallback, 0);
+    }
+
+    switch (reverb->kind) {
+    case 1:
+        AXFXReverbStdShutdown((AXFX_REVERBSTD*)reverb->context);
+        break;
+    case 2:
+        AXFXReverbHiShutdown((AXFX_REVERBHI*)reverb->context);
+        break;
+    case 3:
+        AXFXDelayShutdown((AXFX_DELAY*)reverb->context);
+        break;
+    case 4:
+        AXFXChorusShutdown((AXFX_CHORUS*)reverb->context);
+        break;
+    case 5:
+        AXFXReverbHiShutdownDpl2((AXFX_REVERBHI_DPL2*)reverb->context);
+        break;
+    }
+
+    reverb->callback = 0;
+    RedDelete(reverb->context);
 }
 
 /*

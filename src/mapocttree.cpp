@@ -815,124 +815,97 @@ void COctTree::GetLocalPosition(Vec&, Vec&)
  * JP Address: TODO
  * JP Size: TODO
  */
-void ClearLight_r(COctNode* node)
+void ClearLight_r(COctNode* octNode)
 {
-	COctNode* child1;
-	COctNode* child2;
-	COctNode* child3;
-	COctNode* child4;
-	COctNode* child5;
-	COctNode* child6;
-	COctNode* child7;
-	COctNode* child8;
+	int iVar1;
+	int iVar2;
+	COctNode* pCVar3;
+	COctNode* pCVar4;
+	COctNode* pCVar5;
+	COctNode* pCVar6;
+	COctNode* pCVar7;
+	COctNode* pCVar8;
+	int iVar9;
+	int iVar10;
+	int iVar11;
+	int iVar12;
+	int iVar13;
 
-	if (*reinterpret_cast<unsigned short*>(Ptr(node, 0x3E)) != 0) {
-		*reinterpret_cast<void**>(Ptr(node, 0x44)) = 0;
+	if (*reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3E)) != 0) {
+		*reinterpret_cast<unsigned long*>(Ptr(octNode, 0x40)) = 0;
 	}
-
-	for (int i = 0; i < 8; i++) {
-		child1 = *reinterpret_cast<COctNode**>(Ptr(node, 0x1C));
-		if (child1 == 0) {
+	iVar1 = 0;
+	do {
+		pCVar8 = *reinterpret_cast<COctNode**>(Ptr(octNode, 0x1C));
+		if (pCVar8 == 0) {
 			return;
 		}
-		if (*reinterpret_cast<unsigned short*>(Ptr(child1, 0x3E)) != 0) {
-			*reinterpret_cast<void**>(Ptr(child1, 0x44)) = 0;
+		if (*reinterpret_cast<unsigned short*>(Ptr(pCVar8, 0x3E)) != 0) {
+			*reinterpret_cast<unsigned long*>(Ptr(pCVar8, 0x40)) = 0;
 		}
-
-		for (int j = 0; j < 8; j++) {
-			child2 = *reinterpret_cast<COctNode**>(Ptr(child1, 0x1C));
-			if (child2 == 0) {
-				break;
+		iVar2 = 0;
+		do {
+			pCVar7 = *reinterpret_cast<COctNode**>(Ptr(pCVar8, 0x1C));
+			if (pCVar7 == 0) break;
+			if (*reinterpret_cast<unsigned short*>(Ptr(pCVar7, 0x3E)) != 0) {
+				*reinterpret_cast<unsigned long*>(Ptr(pCVar7, 0x40)) = 0;
 			}
-			if (*reinterpret_cast<unsigned short*>(Ptr(child2, 0x3E)) != 0) {
-				*reinterpret_cast<void**>(Ptr(child2, 0x44)) = 0;
-			}
-
-			for (int k = 0; k < 8; k++) {
-				child3 = *reinterpret_cast<COctNode**>(Ptr(child2, 0x1C));
-				if (child3 == 0) {
-					break;
+			iVar13 = 0;
+			do {
+				pCVar6 = *reinterpret_cast<COctNode**>(Ptr(pCVar7, 0x1C));
+				if (pCVar6 == 0) break;
+				if (*reinterpret_cast<unsigned short*>(Ptr(pCVar6, 0x3E)) != 0) {
+					*reinterpret_cast<unsigned long*>(Ptr(pCVar6, 0x40)) = 0;
 				}
-				if (*reinterpret_cast<unsigned short*>(Ptr(child3, 0x3E)) != 0) {
-					*reinterpret_cast<void**>(Ptr(child3, 0x44)) = 0;
-				}
-
-				for (int m = 0; m < 8; m++) {
-					child4 = *reinterpret_cast<COctNode**>(Ptr(child3, 0x1C));
-					if (child4 == 0) {
-						break;
+				iVar12 = 0;
+				do {
+					pCVar5 = *reinterpret_cast<COctNode**>(Ptr(pCVar6, 0x1C));
+					if (pCVar5 == 0) break;
+					if (*reinterpret_cast<unsigned short*>(Ptr(pCVar5, 0x3E)) != 0) {
+						*reinterpret_cast<unsigned long*>(Ptr(pCVar5, 0x40)) = 0;
 					}
-					if (*reinterpret_cast<unsigned short*>(Ptr(child4, 0x3E)) != 0) {
-						*reinterpret_cast<void**>(Ptr(child4, 0x44)) = 0;
-					}
-
-					for (int n = 0; n < 8; n++) {
-						child5 = *reinterpret_cast<COctNode**>(Ptr(child4, 0x1C));
-						if (child5 == 0) {
-							break;
+					iVar11 = 0;
+					do {
+						pCVar4 = *reinterpret_cast<COctNode**>(Ptr(pCVar5, 0x1C));
+						if (pCVar4 == 0) break;
+						if (*reinterpret_cast<unsigned short*>(Ptr(pCVar4, 0x3E)) != 0) {
+							*reinterpret_cast<unsigned long*>(Ptr(pCVar4, 0x40)) = 0;
 						}
-						if (*reinterpret_cast<unsigned short*>(Ptr(child5, 0x3E)) != 0) {
-							*reinterpret_cast<void**>(Ptr(child5, 0x44)) = 0;
-						}
-
-						for (int o = 0; o < 8; o++) {
-							child6 = *reinterpret_cast<COctNode**>(Ptr(child5, 0x1C));
-							if (child6 == 0) {
-								break;
+						iVar10 = 0;
+						do {
+							pCVar3 = *reinterpret_cast<COctNode**>(Ptr(pCVar4, 0x1C));
+							if (pCVar3 == 0) break;
+							if (*reinterpret_cast<unsigned short*>(Ptr(pCVar3, 0x3E)) != 0) {
+								*reinterpret_cast<unsigned long*>(Ptr(pCVar3, 0x40)) = 0;
 							}
-							if (*reinterpret_cast<unsigned short*>(Ptr(child6, 0x3E)) != 0) {
-								*reinterpret_cast<void**>(Ptr(child6, 0x44)) = 0;
-							}
-
-							for (int p = 0; p < 8; p++) {
-								child7 = *reinterpret_cast<COctNode**>(Ptr(child6, 0x1C));
-								if (child7 == 0) {
-									break;
-								}
-								if (*reinterpret_cast<unsigned short*>(Ptr(child7, 0x3E)) != 0) {
-									*reinterpret_cast<void**>(Ptr(child7, 0x44)) = 0;
-								}
-
-								for (int q = 0; q < 8; q++) {
-									child8 = *reinterpret_cast<COctNode**>(Ptr(child7, 0x1C));
-									if (child8 == 0) {
-										break;
-									}
-									if (*reinterpret_cast<unsigned short*>(Ptr(child8, 0x3E)) != 0) {
-										*reinterpret_cast<void**>(Ptr(child8, 0x44)) = 0;
-									}
-
-									for (int r = 0; r < 8; r++) {
-										if (*reinterpret_cast<COctNode**>(Ptr(child8, 0x1C)) == 0) {
-											break;
-										}
-										ClearLight_r(*reinterpret_cast<COctNode**>(Ptr(child8, 0x1C)));
-										child8 = reinterpret_cast<COctNode*>(Ptr(child8, 4));
-									}
-
-									child7 = reinterpret_cast<COctNode*>(Ptr(child7, 4));
-								}
-
-								child6 = reinterpret_cast<COctNode*>(Ptr(child6, 4));
-							}
-
-							child5 = reinterpret_cast<COctNode*>(Ptr(child5, 4));
-						}
-
-						child4 = reinterpret_cast<COctNode*>(Ptr(child4, 4));
-					}
-
-					child3 = reinterpret_cast<COctNode*>(Ptr(child3, 4));
-				}
-
-				child2 = reinterpret_cast<COctNode*>(Ptr(child2, 4));
-			}
-
-			child1 = reinterpret_cast<COctNode*>(Ptr(child1, 4));
+							iVar9 = 0;
+							do {
+								if (*reinterpret_cast<COctNode**>(Ptr(pCVar3, 0x1C)) == 0) break;
+								ClearLight_r(*reinterpret_cast<COctNode**>(Ptr(pCVar3, 0x1C)));
+								iVar9 = iVar9 + 1;
+								pCVar3 = reinterpret_cast<COctNode*>(Ptr(pCVar3, 4));
+							} while (iVar9 < 8);
+							iVar10 = iVar10 + 1;
+							pCVar4 = reinterpret_cast<COctNode*>(Ptr(pCVar4, 4));
+						} while (iVar10 < 8);
+						iVar11 = iVar11 + 1;
+						pCVar5 = reinterpret_cast<COctNode*>(Ptr(pCVar5, 4));
+					} while (iVar11 < 8);
+					iVar12 = iVar12 + 1;
+					pCVar6 = reinterpret_cast<COctNode*>(Ptr(pCVar6, 4));
+				} while (iVar12 < 8);
+				iVar13 = iVar13 + 1;
+				pCVar7 = reinterpret_cast<COctNode*>(Ptr(pCVar7, 4));
+			} while (iVar13 < 8);
+			iVar2 = iVar2 + 1;
+			pCVar8 = reinterpret_cast<COctNode*>(Ptr(pCVar8, 4));
+		} while (iVar2 < 8);
+		iVar1 = iVar1 + 1;
+		octNode = reinterpret_cast<COctNode*>(Ptr(octNode, 4));
+		if (7 < iVar1) {
+			return;
 		}
-
-		node = reinterpret_cast<COctNode*>(Ptr(node, 4));
-	}
+	} while (true);
 }
 
 /*
@@ -1674,17 +1647,17 @@ int COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
 	float maxValue;
 	float margin;
 	Mtx inverseMtx;
-	unsigned char* thisBytes = reinterpret_cast<unsigned char*>(this);
-	unsigned char* mapData = *reinterpret_cast<unsigned char**>(thisBytes + 8);
+	unsigned char* thisBytes = (unsigned char*)this;
+	unsigned char* mapData = *(unsigned char**)(thisBytes + 0x8);
 
-	if ((*thisBytes != 2) || (mapData == 0) || (*reinterpret_cast<CMapHit**>(mapData + 0xC) == 0)) {
+	if ((*thisBytes != 2) || (mapData == 0) || (*(CMapHit**)(mapData + 0xc) == 0)) {
 		return 0;
 	}
 
-	PSMTXInverse(reinterpret_cast<MtxPtr>(mapData + 0xB8), inverseMtx);
+	PSMTXInverse((MtxPtr)(mapData + 0xb8), inverseMtx);
 	PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &s_cyl.m_bottom);
 	PSMTXMultVec(inverseMtx, &cylinder->m_direction, &s_cyl.m_direction);
-	PSMTXMultVecSR(inverseMtx, reinterpret_cast<Vec*>(&cylinder->m_radius), reinterpret_cast<Vec*>(&s_cyl.m_radius));
+	PSMTXMultVecSR(inverseMtx, (Vec*)&cylinder->m_radius, (Vec*)&s_cyl.m_radius);
 	PSMTXMultVecSR(inverseMtx, move, &s_mvec);
 
 	s_cyl.m_top.y = cylinder->m_top.y;
@@ -1718,8 +1691,7 @@ int COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
 	s_cyl.m_direction2.y = minValue - margin;
 
 	s_checkHitCylinderMask = flag;
-	CheckHitCylinderNear_r(*reinterpret_cast<COctNode**>(thisBytes + 4));
-
+	CheckHitCylinderNear_r(*(COctNode**)(thisBytes + 0x4));
 	return 0;
 }
 

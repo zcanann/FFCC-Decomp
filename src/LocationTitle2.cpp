@@ -255,14 +255,15 @@ void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, struct UnkB
 void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle, struct UnkB* unkB, struct UnkC* unkC)
 {
     int serializedOffset = *unkC->m_serializedDataOffsets;
+    u32 dataValIndex = *(u32*)((u8*)unkB + 4);
 
-    if (unkB->m_dataValIndex != 0xFFFF) {
+    if (dataValIndex != 0xFFFF) {
         u32 graphId = *(u32*)locationTitle;
         int graphFrame = GetGraphFrameFromId(graphId);
         LocationTitle2Work* work = (LocationTitle2Work*)((u8*)locationTitle + 8 + serializedOffset);
         LocationTitle2Particle* particle = (LocationTitle2Particle*)work->m_particles;
-        long* shapeTable = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + unkB->m_dataValIndex * 4);
-        u8 blendMode = *((u8*)&unkB->m_stepValue + 1);
+        long* shapeTable = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
+        u8 blendMode = *((u8*)unkB + 0xD);
 
         pppSetBlendMode(blendMode);
 
@@ -337,7 +338,7 @@ void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle, struct Unk
                 GXSetColorUpdate(GX_FALSE);
                 GXLoadPosMtxImm(model, 0);
 
-                if (((u8*)unkB->m_payload)[0xE] != 0) {
+                if (*((u8*)unkB + 0x22) != 0) {
                     GXSetColorUpdate(GX_TRUE);
                 }
 

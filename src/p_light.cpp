@@ -35,7 +35,9 @@ extern float FLOAT_8032fc3c;
 extern float FLOAT_8032fc40;
 extern float FLOAT_8032fc44;
 extern float FLOAT_8032fc60;
+extern float FLOAT_8032fc70;
 extern float FLOAT_8032fc74;
+extern float FLOAT_8032fc78;
 extern float FLOAT_8032fc84;
 extern float FLOAT_8032fc94;
 extern double DOUBLE_8032fc48;
@@ -51,6 +53,9 @@ public:
     float _224_4_;
     float _228_4_;
     float _232_4_;
+    float _236_4_;
+    float _240_4_;
+    float _244_4_;
 } CameraPcs;
 
 CLightPcs LightPcs;
@@ -507,12 +512,44 @@ void CLightPcs::EnableLight(int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800491f8
+ * PAL Size: 340b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CLightPcs::SetDiffuse(unsigned long, _GXColor, Vec*, int)
+void CLightPcs::SetDiffuse(unsigned long idx, _GXColor color, Vec* dir, int mode)
 {
-	// TODO
+    char* light = (char*)this + idx * 0xb0 + 0xbc;
+    Mtx cam;
+    Vec tmp;
+    Vec lightDir;
+
+    lightDir.x = CameraPcs._236_4_;
+    lightDir.y = CameraPcs._240_4_;
+    lightDir.z = CameraPcs._244_4_;
+
+    if (mode == 0) {
+        lightDir.x = dir->x;
+        lightDir.y = dir->y;
+        lightDir.z = dir->z;
+    }
+
+    GXInitLightColor((GXLightObj*)(light + 0x6c), color);
+    PSMTXCopy(CameraPcs.m_cameraMatrix, cam);
+
+    tmp.x = FLOAT_8032fc70 * -lightDir.x;
+    tmp.y = FLOAT_8032fc70 * -lightDir.y;
+    tmp.z = FLOAT_8032fc70 * -lightDir.z;
+    PSMTXMultVec(cam, &tmp, &tmp);
+    GXInitLightPos((GXLightObj*)(light + 0x6c), tmp.x, tmp.y, tmp.z);
+
+    PSMTXMultVecSR(cam, &lightDir, &lightDir);
+    GXInitLightDir((GXLightObj*)(light + 0x6c), lightDir.x, lightDir.y, lightDir.z);
+
+    GXInitLightSpot((GXLightObj*)(light + 0x6c), FLOAT_8032fc74, (GXSpotFn)4);
+    GXInitLightAttnK((GXLightObj*)(light + 0x6c), FLOAT_8032fc14, FLOAT_8032fc78, FLOAT_8032fc14);
 }
 
 /*

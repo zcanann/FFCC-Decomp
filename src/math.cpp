@@ -10,6 +10,9 @@ extern "C" int __cntlzw(unsigned int);
 CMath math;
 static Vec s_f_vpos;
 static Mtx s_f_lvmtx;
+static float s_hSpline[128];
+static float s_wSpline[128];
+static float s_dSpline[128];
 
 struct Vec4d {
     float x;
@@ -883,74 +886,49 @@ void CMath::MakeSpline1Dtable(int count, float* x, float* y, float* outSecondDer
     if (count <= 0) {
         return;
     }
+    int i;
+    for (i = 0; i < count; ++i) {
+        s_hSpline[i] = x[i + 1] - x[i];
+        s_wSpline[i] = (y[i + 1] - y[i]) / s_hSpline[i];
+    }
+    s_wSpline[count] = s_wSpline[0];
 
-    const int n = count;
-    float* h = new float[n];
-    float* slope = new float[n];
-    float* matrix = new float[n * n];
-    float* rhs = new float[n];
+    for (i = 1; i < count; ++i) {
+        s_dSpline[i] = 2.0f * (x[i + 1] - x[i - 1]);
+    }
+    s_dSpline[count] = 2.0f * (s_hSpline[count - 1] + s_hSpline[0]);
 
-    for (int i = 0; i < n; ++i) {
-        h[i] = x[i + 1] - x[i];
-        slope[i] = (y[i + 1] - y[i]) / h[i];
+    for (i = 1; i <= count; ++i) {
+        outSecondDerivatives[i] = s_wSpline[i] - s_wSpline[i - 1];
     }
 
-    memset(matrix, 0, sizeof(float) * n * n);
-    for (int i = 0; i < n; ++i) {
-        const int prev = (i + n - 1) % n;
-        const int next = (i + 1) % n;
-        matrix[i * n + prev] = h[prev];
-        matrix[i * n + i] = 2.0f * (h[prev] + h[i]);
-        matrix[i * n + next] = h[i];
-        rhs[i] = 6.0f * (slope[i] - slope[prev]);
+    s_wSpline[0] = s_hSpline[0];
+    s_wSpline[count] = s_dSpline[count];
+    for (i = 1; i < count; ++i) {
+        s_wSpline[i] = 0.0f;
     }
 
-    for (int col = 0; col < n; ++col) {
-        int pivotRow = col;
-        float pivotAbs = fabsf(matrix[col * n + col]);
-        for (int row = col + 1; row < n; ++row) {
-            const float candAbs = fabsf(matrix[row * n + col]);
-            if (pivotAbs < candAbs) {
-                pivotAbs = candAbs;
-                pivotRow = row;
-            }
-        }
-
-        if (pivotRow != col) {
-            for (int k = col; k < n; ++k) {
-                const float tmp = matrix[col * n + k];
-                matrix[col * n + k] = matrix[pivotRow * n + k];
-                matrix[pivotRow * n + k] = tmp;
-            }
-            const float tmpRhs = rhs[col];
-            rhs[col] = rhs[pivotRow];
-            rhs[pivotRow] = tmpRhs;
-        }
-
-        const float pivot = matrix[col * n + col];
-        for (int row = col + 1; row < n; ++row) {
-            const float scale = matrix[row * n + col] / pivot;
-            matrix[row * n + col] = 0.0f;
-            for (int k = col + 1; k < n; ++k) {
-                matrix[row * n + k] -= scale * matrix[col * n + k];
-            }
-            rhs[row] -= scale * rhs[col];
-        }
+    for (i = 1; i < count; ++i) {
+        float r = s_hSpline[i] / s_dSpline[i];
+        outSecondDerivatives[i + 1] = -(r * outSecondDerivatives[i] - outSecondDerivatives[i + 1]);
+        s_dSpline[i + 1] = -(r * s_hSpline[i] - s_dSpline[i + 1]);
+        s_wSpline[i + 1] = -(r * s_wSpline[i] - s_wSpline[i + 1]);
     }
 
-    for (int row = n - 1; row >= 0; --row) {
-        float value = rhs[row];
-        for (int col = row + 1; col < n; ++col) {
-            value -= matrix[row * n + col] * outSecondDerivatives[col];
-        }
-        outSecondDerivatives[row] = value / matrix[row * n + row];
+    s_wSpline[0] = s_wSpline[count];
+    outSecondDerivatives[0] = outSecondDerivatives[count];
+    for (i = count - 1; i >= 1; --i) {
+        float r = s_wSpline[i + 1] / s_dSpline[i + 1];
+        outSecondDerivatives[i] = -(r * outSecondDerivatives[i + 1] - outSecondDerivatives[i]);
+        s_dSpline[i] = -(r * s_dSpline[i + 1] - s_dSpline[i]);
     }
-    outSecondDerivatives[n] = outSecondDerivatives[0];
 
-    delete[] rhs;
-    delete[] matrix;
-    delete[] slope;
-    delete[] h;
+    outSecondDerivatives[0] /= s_wSpline[0];
+    outSecondDerivatives[count] = outSecondDerivatives[0];
+    for (i = 1; i < count; ++i) {
+        outSecondDerivatives[i] =
+            -(outSecondDerivatives[0] * s_wSpline[i] - outSecondDerivatives[i]) / s_dSpline[i];
+    }
 }
 
 /*

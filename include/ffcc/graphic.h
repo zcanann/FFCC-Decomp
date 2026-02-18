@@ -43,7 +43,7 @@ public:
     void SetDrawDoneDebugDataPartControl(int);
     void _WaitDrawDone(char*, int);
     void Thread();
-    void IsFifoOver();
+    u8 IsFifoOver();
     void IsFrameRateOver();
     void Flip();
 

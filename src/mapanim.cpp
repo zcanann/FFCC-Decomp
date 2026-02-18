@@ -502,39 +502,29 @@ CMapAnim::CMapAnim()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004a8b0
+ * PAL Size: 192b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CMapAnim::~CMapAnim()
 {
     CPtrArray<CMapAnimNode*>* nodeArray = reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this);
     unsigned int i = 0;
 
-    while (i < static_cast<unsigned int>(nodeArray->m_numItems)) {
+    while (i < static_cast<unsigned int>(nodeArray->GetSize())) {
         CMapAnimNode* node = __vc__26CPtrArray_P12CMapAnimNode_FUl(this, i);
-        if (node != 0) {
+        if (node != 0 && (node = __vc__26CPtrArray_P12CMapAnimNode_FUl(this, i), node != 0)) {
             reinterpret_cast<int*>(node)[1] = 0;
             __dl__FPv(node);
         }
         i++;
     }
 
-    if (nodeArray->m_items != 0) {
-        __dla__FPv(nodeArray->m_items);
-        nodeArray->m_items = 0;
-    }
-    nodeArray->m_size = 0;
-    nodeArray->m_numItems = 0;
-
-    if (nodeArray != 0) {
-        nodeArray->m_vtable = lbl_801EA488;
-        if (nodeArray->m_items != 0) {
-            __dla__FPv(nodeArray->m_items);
-            nodeArray->m_items = 0;
-        }
-        nodeArray->m_size = 0;
-        nodeArray->m_numItems = 0;
-    }
+    nodeArray->RemoveAll();
+    dtor_8004AE60(nodeArray, -1);
 }
 
 /*

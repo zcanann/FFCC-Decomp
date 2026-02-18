@@ -31,7 +31,16 @@ extern float FLOAT_80332048;
 extern float FLOAT_8033204c;
 extern float FLOAT_80332050;
 extern float FLOAT_80332058;
+extern float FLOAT_8033205c;
+extern float FLOAT_80332060;
+extern float FLOAT_80332064;
 extern float FLOAT_80332078;
+extern double DOUBLE_80332068;
+extern double DOUBLE_80332070;
+extern int DAT_801dd684;
+extern int DAT_801dd688;
+extern int DAT_801dd68c;
+extern int ppvSinTbl;
 extern CMath Math;
 extern void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void* materialMan, void* materialSet,
                                                                         unsigned int materialIdx, int, int);
@@ -383,12 +392,215 @@ void InitPolygonParameter(PCharaBreak* charaBreak, VCharaBreak*, POLYGON_DATA* p
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801400f0
+ * PAL Size: 2220b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void UpdatePolygonData(PCharaBreak*, VCharaBreak*, CChara::CModel*)
+void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* model)
 {
-	// TODO
+    u8* stepData = (u8*)step;
+    u8* workData = (u8*)work;
+    CChara::CMesh* mesh = (CChara::CMesh*)*(u8**)((u8*)model + 0xAC);
+    u32 meshCount = *(u32*)(*(u8**)((u8*)model + 0xA4) + 0xC);
+    u32 posQuant = *(u32*)(*(u8**)((u8*)model + 0xA4) + 0x34);
+    u32 normQuant = *(u32*)(*(u8**)((u8*)model + 0xA4) + 0x38);
+    u32 meshIndex;
+    short threshold;
+
+    threshold = (short)((*(float*)(workData + 4) * (*(float*)(workData + 0x34) - *(float*)(workData + 0x24))) *
+                        (float)((double)(1 << posQuant)));
+
+    for (meshIndex = 0; meshIndex < meshCount; meshIndex++) {
+        bool needsMtxUpdate = false;
+        Mtx meshToWorld;
+        u8* meshData = *(u8**)((u8*)mesh + 8);
+        S16Vec* workPositions = *(S16Vec**)mesh;
+
+        if (*(u32*)(meshData + 0x54) == 0 && stepData[0x42] == 1) {
+            needsMtxUpdate = true;
+            PSMTXConcat(*(Mtx*)((u8*)model + 0x38),
+                        *(Mtx*)((u8*)*(u8**)((u8*)model + 0xA8) + (*(u32*)(meshData + 0x58) * 0xC0) + 0xC),
+                        meshToWorld);
+        }
+
+        for (int dl = *(int*)(meshData + 0x4C) - 1; dl >= 0; dl--) {
+            int meshBuffers = *(int*)(*(int*)(workData + 0x1C) + (meshIndex * 4));
+            u8* polygon = *(u8**)(*(int*)(meshBuffers + (dl * 4)) + 0xC);
+            u16 polygonCount = *(u16*)(*(int*)(meshBuffers + (dl * 4)) + 8);
+
+            for (u32 polyIndex = 0; polyIndex < polygonCount; polyIndex++) {
+                S16Vec transformed[3];
+
+                if (polygon[0] == 0) {
+                    int flags[3];
+                    flags[0] = DAT_801dd684;
+                    flags[1] = DAT_801dd688;
+                    flags[2] = DAT_801dd68c;
+
+                    for (int i = 0; i < 3; i++) {
+                        S16Vec* dst = &transformed[i];
+                        S16Vec* srcPos = workPositions + *(u16*)(polygon + 0x22 + (i * 2));
+
+                        if (needsMtxUpdate) {
+                            S16Vec worldPos;
+                            Vec transformedPos;
+                            worldPos.x = srcPos->x;
+                            worldPos.y = srcPos->y;
+                            worldPos.z = srcPos->z;
+                            ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)DAT_8032ec70, &transformedPos, &worldPos,
+                                                                 posQuant);
+                            PSMTXMultVec(meshToWorld, &transformedPos, &transformedPos);
+                            ConvF2IVector__5CUtilFR6S16Vec3Vecl((void*)DAT_8032ec70, dst, &transformedPos,
+                                                                 posQuant);
+                        } else {
+                            *dst = *srcPos;
+                        }
+
+                        if (stepData[0x41] == 0) {
+                            if (stepData[0x42] == 1) {
+                                if (dst->y < threshold) {
+                                    flags[i] = 1;
+                                }
+                            } else if (*(short*)(polygon + 0x12 + (i * 6)) < threshold) {
+                                flags[i] = 1;
+                            }
+                        } else if (stepData[0x41] == 1) {
+                            if (stepData[0x42] == 1) {
+                                if (threshold < dst->y) {
+                                    flags[i] = 1;
+                                }
+                            } else if (threshold < *(short*)(polygon + 0x12 + (i * 6))) {
+                                flags[i] = 1;
+                            }
+                        }
+                    }
+
+                    polygon[0] = (flags[0] != 0 && flags[1] != 0 && flags[2] != 0) ? 1 : 0;
+
+                    if (stepData[0x42] == 1 && polygon[0] != 0) {
+                        *(S16Vec*)(polygon + 0x10) = transformed[0];
+                        *(S16Vec*)(polygon + 0x16) = transformed[1];
+                        *(S16Vec*)(polygon + 0x1C) = transformed[2];
+                    }
+                }
+
+                if (polygon[0] == 0) {
+                    if (stepData[0x42] == 1) {
+                        *(S16Vec*)(polygon + 0x10) = transformed[0];
+                        *(S16Vec*)(polygon + 0x16) = transformed[1];
+                        *(S16Vec*)(polygon + 0x1C) = transformed[2];
+                    }
+                } else {
+                    int sumX = (int)*(short*)(polygon + 0x10) + (int)*(short*)(polygon + 0x16) + (int)*(short*)(polygon + 0x1C);
+                    int sumY = (int)*(short*)(polygon + 0x12) + (int)*(short*)(polygon + 0x18) + (int)*(short*)(polygon + 0x1E);
+                    int sumZ = (int)*(short*)(polygon + 0x14) + (int)*(short*)(polygon + 0x1A) + (int)*(short*)(polygon + 0x20);
+                    short avgX = (short)(sumX / 3);
+                    short avgY = (short)(sumY / 3);
+                    short avgZ = (short)(sumZ / 3);
+
+                    if (avgX > -0x7531 && avgX < 0x7531 && avgY > -0x7531 && avgY < 0x7531 && avgZ > -0x7531 &&
+                        avgZ < 0x7531) {
+                        Vec center;
+                        Vec verts[3];
+                        S16Vec normalA;
+                        S16Vec normalB;
+                        Vec axis;
+                        Vec velocity;
+                        Quaternion rotQuat;
+                        Mtx rotMtx;
+                        float sinValue = FLOAT_80332048;
+                        float cosValue = FLOAT_80332048;
+
+                        center.x = FLOAT_80332048;
+                        center.y = FLOAT_80332048;
+                        center.z = FLOAT_80332048;
+
+                        for (int i = 0; i < 3; i++) {
+                            S16Vec pos;
+                            pos.x = *(short*)(polygon + 0x10 + (i * 6));
+                            pos.y = *(short*)(polygon + 0x12 + (i * 6));
+                            pos.z = *(short*)(polygon + 0x14 + (i * 6));
+                            ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)DAT_8032ec70, &verts[i], &pos, posQuant);
+                            PSVECAdd(&center, &verts[i], &center);
+                        }
+
+                        PSVECScale(&center, &center, FLOAT_80332058);
+
+                        normalB.x = *(short*)(polygon + 0xA);
+                        normalB.y = *(short*)(polygon + 0xC);
+                        normalB.z = *(short*)(polygon + 0xE);
+                        ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)DAT_8032ec70, &axis, &normalB, normQuant);
+
+                        normalA.x = *(short*)(polygon + 4);
+                        normalA.y = *(short*)(polygon + 6);
+                        normalA.z = *(short*)(polygon + 8);
+                        ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)DAT_8032ec70, &velocity, &normalA, normQuant);
+                        PSVECScale(&velocity, &velocity, *(float*)(stepData + 0x38) + RandF__5CMathFf(*(float*)(stepData + 0x3C), &Math));
+
+                        C_QUATRotAxisRad(&rotQuat, &axis, FLOAT_8033205c * (float)polygon[1]);
+                        PSMTXQuat(rotMtx, &rotQuat);
+
+                        if (stepData[0x40] == 1) {
+                            int rand10 = (rand() % 10) + 10;
+                            short* angleState = (short*)(polygon + 4);
+                            if (*(short*)(polygon + 6) == 0) {
+                                *angleState += (short)rand10;
+                            } else {
+                                *angleState -= (short)rand10;
+                            }
+
+                            if (*angleState > 0x168) {
+                                *angleState = (short)(*angleState - 0x168);
+                            }
+                            if (*angleState < 0) {
+                                *angleState = (short)(*angleState + 0x168);
+                            }
+
+                            u32 sinIndex = (u32)(((float)((int)(*angleState << 15))) / FLOAT_80332060);
+                            sinValue = *(float*)((int)ppvSinTbl + (sinIndex & 0xFFFC));
+                            cosValue = *(float*)((int)ppvSinTbl + ((sinIndex + 0x4000) & 0xFFFC));
+                        }
+
+                        for (int i = 0; i < 3; i++) {
+                            Vec translated;
+                            float wobbleScale;
+
+                            PSVECSubtract(&verts[i], &center, &translated);
+                            PSMTXMultVec(rotMtx, &translated, &translated);
+                            PSVECAdd(&translated, &center, &verts[i]);
+
+                            if (stepData[0x40] == 0) {
+                                verts[i].x += velocity.x;
+                                verts[i].y += -(*(float*)(stepData + 0x10) * (float)*(u16*)(polygon + 2) - velocity.y);
+                                verts[i].z += velocity.z;
+                            } else if (stepData[0x40] == 1) {
+                                wobbleScale = FLOAT_8033204c + RandF__5CMathFf(FLOAT_80332064, &Math);
+                                verts[i].x += cosValue * wobbleScale;
+                                verts[i].y += -(*(float*)(stepData + 0x10) * (float)*(u16*)(polygon + 2) - velocity.y);
+                                wobbleScale = FLOAT_8033204c + RandF__5CMathFf(FLOAT_80332064, &Math);
+                                verts[i].z += sinValue * wobbleScale;
+                            }
+
+                            verts[i].x += *(float*)(stepData + 0x18) * *(float*)(workData + 0x10);
+                            verts[i].y += *(float*)(stepData + 0x1C) * *(float*)(workData + 0x10);
+                            verts[i].z += *(float*)(stepData + 0x20) * *(float*)(workData + 0x10);
+
+                            ConvF2IVector__5CUtilFR6S16Vec3Vecl((void*)DAT_8032ec70, (S16Vec*)(polygon + 0x10 + (i * 6)), &verts[i],
+                                                                 posQuant);
+                        }
+                        *(short*)(polygon + 2) = *(short*)(polygon + 2) + 1;
+                    }
+                }
+
+                polygon += 0x34;
+            }
+        }
+
+        mesh = (CChara::CMesh*)((u8*)mesh + 0x14);
+    }
 }
 
 /*

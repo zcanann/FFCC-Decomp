@@ -74,27 +74,8 @@ void pppRandCV(void* param1, void* param2, void* param3)
 
     float scale = *randomValue;
 
-    {
-        u8 current = target[0];
-        s8 delta = params->delta[0];
-        target[0] = (u8)(current + (int)((float)delta * scale - (float)current));
-    }
-
-    {
-        u8 current = target[1];
-        s8 delta = params->delta[1];
-        target[1] = (u8)(current + (int)((float)delta * scale - (float)current));
-    }
-
-    {
-        u8 current = target[2];
-        s8 delta = params->delta[2];
-        target[2] = (u8)(current + (int)((float)delta * scale - (float)current));
-    }
-
-    {
-        u8 current = target[3];
-        s8 delta = params->delta[3];
-        target[3] = (u8)(current + (int)((float)delta * scale - (float)current));
-    }
+    target[0] = (u8)(target[0] + (int)((float)params->delta[0] * scale - (float)target[0]));
+    target[1] = (u8)(target[1] + (int)((float)params->delta[1] * scale - (float)target[1]));
+    target[2] = (u8)(target[2] + (int)((float)params->delta[2] * scale - (float)target[2]));
+    target[3] = (u8)(target[3] + (int)((float)params->delta[3] * scale - (float)target[3]));
 }

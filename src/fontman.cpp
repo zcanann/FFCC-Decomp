@@ -25,22 +25,30 @@ static inline unsigned char* Ptr(void* p, unsigned int offset)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80092f14
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CFontMan::CFontMan()
 {
-	// TODO
+	m_stage = 0;
+	m_font = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80093098
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CFontMan::~CFontMan()
 {
-	// TODO
 }
 
 /*
@@ -95,12 +103,16 @@ void CFontMan::Quit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80092eec
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFontMan::GetInternal22Size()
+unsigned long CFontMan::GetInternal22Size()
 {
-	// TODO
+	return 0x10D40;
 }
 
 /*
@@ -165,7 +177,7 @@ void CFont::Create(void* filePtr, CMemory::CStage* stage)
                         bucket += static_cast<unsigned int>(*bucket) * 4 + 1;
                     }
                 } else if (chunk.m_id == 0x54585452) {
-                    texturePtr = new (stage, const_cast<char*>(s_fontman_cpp), 0xDF) CTexture;
+                    texturePtr = new (FontMan.m_stage, const_cast<char*>(s_fontman_cpp), 0xDF) CTexture;
                     texturePtr->Create(chunkFile, stage, 0, 0, m_usesEmbeddedData != 0);
                 }
             }

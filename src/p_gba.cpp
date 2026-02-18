@@ -6,7 +6,9 @@
 #include <dolphin/gba/GBA.h>
 
 CGbaPcs GbaPcs;
-extern "C" void* lbl_8020F4A4;
+extern char __vt__8CManager[];
+extern char lbl_801E8668[];
+extern char lbl_8020F4A4[];
 extern "C" unsigned int lbl_8020F2F8[];
 extern "C" unsigned int lbl_8020F304[];
 extern "C" unsigned int lbl_8020F310[];
@@ -25,7 +27,9 @@ extern "C" unsigned int lbl_8020F328[];
 extern "C" void __sinit_p_gba_cpp(void)
 {
 	volatile void** base = reinterpret_cast<volatile void**>(&GbaPcs);
-	*base = &lbl_8020F4A4;
+	*base = __vt__8CManager;
+	*base = lbl_801E8668;
+	*base = lbl_8020F4A4;
 
 	unsigned int* dst = lbl_8020F328;
 	dst[0x004 / 4] = lbl_8020F2F8[0];

@@ -6,10 +6,10 @@ typedef struct pppConstrainCameraDir {
 } pppConstrainCameraDir;
 
 typedef struct UnkB {
+    int m_graphId;
     float m_dataValIndex;
     float m_initWOrk;
     float m_stepValue;
-    int m_graphId;
     char m_arg3;
     char pad[3];
 } UnkB;

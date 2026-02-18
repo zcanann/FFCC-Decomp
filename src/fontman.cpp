@@ -14,55 +14,89 @@ extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 
 static const char s_fontman_cpp[] = "fontman.cpp";
+static const char s_CFontMan[] = "CFontMan";
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80092f14
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CFontMan::CFontMan()
 {
-	// TODO
+	m_stage = 0;
+	m_font = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80093098
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CFontMan::~CFontMan()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80092f70
+ * PAL Size: 296b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFontMan::Init()
 {
-	// TODO
+	m_font = 0;
+	m_stage = Memory.CreateStage(0x8000, const_cast<char*>(s_CFontMan), 0);
+	m_font = new (m_stage, const_cast<char*>(s_fontman_cpp), 0x3D) CFont;
+	m_font->Create(0, 0);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80092ef8
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFontMan::Quit()
 {
-	// TODO
+	int* font = reinterpret_cast<int*>(m_font);
+	if (font != 0) {
+		int refCount = font[1];
+		font[1] = refCount - 1;
+		if ((refCount - 1 == 0) && (font != 0)) {
+			(*(void (**)(int*, int))(*font + 8))(font, 1);
+		}
+		m_font = 0;
+	}
+
+	Memory.DestroyStage(m_stage);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80092eec
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFontMan::GetInternal22Size()
+unsigned long CFontMan::GetInternal22Size()
 {
-	// TODO
+	return 0x10D40;
 }
 
 /*
@@ -127,7 +161,7 @@ void CFont::Create(void* filePtr, CMemory::CStage* stage)
                         bucket += static_cast<unsigned int>(*bucket) * 4 + 1;
                     }
                 } else if (chunk.m_id == 0x54585452) {
-                    texturePtr = new (stage, const_cast<char*>(s_fontman_cpp), 0xDF) CTexture;
+                    texturePtr = new (FontMan.m_stage, const_cast<char*>(s_fontman_cpp), 0xDF) CTexture;
                     texturePtr->Create(chunkFile, stage, 0, 0, m_usesEmbeddedData != 0);
                 }
             }

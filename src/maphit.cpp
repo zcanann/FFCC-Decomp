@@ -647,9 +647,8 @@ void CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, uns
 void CMapHit::Draw()
 {
     static const u32 kOverlayColor = 0x40FF40FF;
-    static const u32 kBaseColorA = 0xFFFFFFFF;
-    static const u32 kBaseColorB = 0x808080FF;
-    static const u32 kFaceStride = 0x98;
+    static const u32 kFaceStride = 0x50;
+    unsigned char* mapMngBytes = reinterpret_cast<unsigned char*>(&MapMng);
 
     GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_NRM, GX_NRM_XYZ, GX_F32, 0);
@@ -669,22 +668,28 @@ void CMapHit::Draw()
         const float nx = *reinterpret_cast<float*>(face + 0x00);
         const float ny = *reinterpret_cast<float*>(face + 0x04);
         const float nz = *reinterpret_cast<float*>(face + 0x08);
-        const unsigned short* indices = reinterpret_cast<unsigned short*>(face + 0x48);
+        const unsigned char groupIndex = face[0x47];
+        const u32 colorA = *reinterpret_cast<u32*>(mapMngBytes + 0x214E8 + groupIndex * 0x14 + 0x4);
+        const u32 colorB = *reinterpret_cast<u32*>(mapMngBytes + 0x214E8 + groupIndex * 0x14 + 0x8);
 
-        GXBegin(GX_TRIANGLES, GX_VTXFMT7, static_cast<u16>(vertexCount * 3));
+        GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
+        const unsigned short* index = reinterpret_cast<unsigned short*>(face + 0x48);
         for (int i = 0; i < vertexCount; ++i) {
-            Vec* vertex = m_vertices + indices[i];
+            Vec* vertex = m_vertices + *index;
             GXPosition3f32(vertex->x, vertex->y, vertex->z);
             GXNormal3f32(nx, ny, nz);
-            GXColor1u32(kBaseColorA);
+            GXColor1u32(colorA);
+            index++;
         }
 
-        GXBegin(GX_TRIANGLES, GX_VTXFMT7, static_cast<u16>(vertexCount * 3));
+        GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
+        const unsigned short* reverse = reinterpret_cast<unsigned short*>(face + 0x48 + (vertexCount - 1) * 2);
         for (int i = vertexCount - 1; i >= 0; --i) {
-            Vec* vertex = m_vertices + indices[i];
+            Vec* vertex = m_vertices + *reverse;
             GXPosition3f32(vertex->x, vertex->y, vertex->z);
             GXNormal3f32(nx, ny, nz);
-            GXColor1u32(kBaseColorB);
+            GXColor1u32(colorB);
+            reverse--;
         }
     }
 
@@ -705,20 +710,22 @@ void CMapHit::Draw()
         face[0x4B] = 0;
 
         const unsigned char vertexCount = face[0x46];
-        const unsigned short* indices = reinterpret_cast<unsigned short*>(face + 0x48);
-
-        GXBegin(GX_TRIANGLES, GX_VTXFMT7, static_cast<u16>(vertexCount * 3));
+        GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
+        const unsigned short* index = reinterpret_cast<unsigned short*>(face + 0x48);
         for (int i = 0; i < vertexCount; ++i) {
-            Vec* vertex = m_vertices + indices[i];
+            Vec* vertex = m_vertices + *index;
             GXPosition3f32(vertex->x, vertex->y, vertex->z);
             GXColor1u32(kOverlayColor);
+            index++;
         }
 
-        GXBegin(GX_TRIANGLES, GX_VTXFMT7, static_cast<u16>(vertexCount * 3));
+        GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
+        const unsigned short* reverse = reinterpret_cast<unsigned short*>(face + 0x48 + (vertexCount - 1) * 2);
         for (int i = vertexCount - 1; i >= 0; --i) {
-            Vec* vertex = m_vertices + indices[i];
+            Vec* vertex = m_vertices + *reverse;
             GXPosition3f32(vertex->x, vertex->y, vertex->z);
             GXColor1u32(kOverlayColor);
+            reverse--;
         }
     }
 }
@@ -745,20 +752,21 @@ void CMapHit::DrawWire()
     while (faceIndex < static_cast<int>(m_faceCount)) {
         GXBegin(static_cast<GXPrimitive>(0xB0), GX_VTXFMT7, static_cast<u16>(4));
 
-        unsigned short* index = reinterpret_cast<unsigned short*>(face + 0x48);
+        unsigned char* index = face;
         int i = 0;
         while (i < static_cast<int>(face[0x46])) {
-            Vec* vertex = m_vertices + *index;
+            Vec* vertex = m_vertices + *reinterpret_cast<unsigned short*>(index + 0x48);
             GXPosition3f32(vertex->x, vertex->y, vertex->z);
             i++;
-            index++;
+            index += sizeof(unsigned short);
         }
 
-        Vec* firstVertex = m_vertices + *reinterpret_cast<unsigned short*>(face + 0x48);
-        GXPosition3f32(firstVertex->x, firstVertex->y, firstVertex->z);
-
+        const unsigned short firstIndex = *reinterpret_cast<unsigned short*>(face + 0x48);
         face += kFaceStride;
         faceIndex++;
+
+        Vec* firstVertex = m_vertices + firstIndex;
+        GXPosition3f32(firstVertex->x, firstVertex->y, firstVertex->z);
     }
 }
 

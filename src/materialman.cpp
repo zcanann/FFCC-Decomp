@@ -15,9 +15,14 @@ extern "C" void __dt__10CTexScrollFv(void*, int);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
 extern "C" void __destroy_arr(void*, void*, unsigned long, unsigned long);
 extern "C" int CheckName__8CTextureFPc(CTexture*, char*);
+class CMapKeyFrame;
+extern "C" float Get__12CMapKeyFrameFv(CMapKeyFrame*);
+extern "C" void Calc__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" void* __vt__9CMaterial[];
 extern CMemory Memory;
 extern unsigned char MaterialMan[];
+extern float FLOAT_8032faf0;
+extern float FLOAT_8032faf4;
 static const char s_materialStageName[] = "material";
 
 class CMapKeyFrame

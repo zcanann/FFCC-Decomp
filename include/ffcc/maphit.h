@@ -53,7 +53,7 @@ public:
     int CheckHitCylinder(CMapCylinder*, Vec*, unsigned long);
     int CheckHitCylinder(CMapCylinder*, Vec*, unsigned short, unsigned short, unsigned long);
     int CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned long);
-    int CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned short, unsigned short, unsigned long);
+    void CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned short, unsigned short, unsigned long);
     void Draw();
     void DrawWire();
     void DrawNormal();

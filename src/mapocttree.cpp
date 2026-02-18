@@ -760,12 +760,104 @@ void COctTree::GetLocalPosition(Vec&, Vec&)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002e028
+ * PAL Size: 408b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void ClearLight_r(COctNode*)
+void ClearLight_r(COctNode* octNode)
 {
-	// TODO
+	int iVar1;
+	int iVar2;
+	COctNode* pCVar3;
+	COctNode* pCVar4;
+	COctNode* pCVar5;
+	COctNode* pCVar6;
+	COctNode* pCVar7;
+	COctNode* pCVar8;
+	int iVar9;
+	int iVar10;
+	int iVar11;
+	int iVar12;
+	int iVar13;
+
+	if (*reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3E)) != 0) {
+		*reinterpret_cast<unsigned long*>(Ptr(octNode, 0x40)) = 0;
+	}
+	iVar1 = 0;
+	do {
+		pCVar8 = *reinterpret_cast<COctNode**>(Ptr(octNode, 0x1C));
+		if (pCVar8 == 0) {
+			return;
+		}
+		if (*reinterpret_cast<unsigned short*>(Ptr(pCVar8, 0x3E)) != 0) {
+			*reinterpret_cast<unsigned long*>(Ptr(pCVar8, 0x40)) = 0;
+		}
+		iVar2 = 0;
+		do {
+			pCVar7 = *reinterpret_cast<COctNode**>(Ptr(pCVar8, 0x1C));
+			if (pCVar7 == 0) break;
+			if (*reinterpret_cast<unsigned short*>(Ptr(pCVar7, 0x3E)) != 0) {
+				*reinterpret_cast<unsigned long*>(Ptr(pCVar7, 0x40)) = 0;
+			}
+			iVar13 = 0;
+			do {
+				pCVar6 = *reinterpret_cast<COctNode**>(Ptr(pCVar7, 0x1C));
+				if (pCVar6 == 0) break;
+				if (*reinterpret_cast<unsigned short*>(Ptr(pCVar6, 0x3E)) != 0) {
+					*reinterpret_cast<unsigned long*>(Ptr(pCVar6, 0x40)) = 0;
+				}
+				iVar12 = 0;
+				do {
+					pCVar5 = *reinterpret_cast<COctNode**>(Ptr(pCVar6, 0x1C));
+					if (pCVar5 == 0) break;
+					if (*reinterpret_cast<unsigned short*>(Ptr(pCVar5, 0x3E)) != 0) {
+						*reinterpret_cast<unsigned long*>(Ptr(pCVar5, 0x40)) = 0;
+					}
+					iVar11 = 0;
+					do {
+						pCVar4 = *reinterpret_cast<COctNode**>(Ptr(pCVar5, 0x1C));
+						if (pCVar4 == 0) break;
+						if (*reinterpret_cast<unsigned short*>(Ptr(pCVar4, 0x3E)) != 0) {
+							*reinterpret_cast<unsigned long*>(Ptr(pCVar4, 0x40)) = 0;
+						}
+						iVar10 = 0;
+						do {
+							pCVar3 = *reinterpret_cast<COctNode**>(Ptr(pCVar4, 0x1C));
+							if (pCVar3 == 0) break;
+							if (*reinterpret_cast<unsigned short*>(Ptr(pCVar3, 0x3E)) != 0) {
+								*reinterpret_cast<unsigned long*>(Ptr(pCVar3, 0x40)) = 0;
+							}
+							iVar9 = 0;
+							do {
+								if (*reinterpret_cast<COctNode**>(Ptr(pCVar3, 0x1C)) == 0) break;
+								ClearLight_r(*reinterpret_cast<COctNode**>(Ptr(pCVar3, 0x1C)));
+								iVar9 = iVar9 + 1;
+								pCVar3 = reinterpret_cast<COctNode*>(Ptr(pCVar3, 4));
+							} while (iVar9 < 8);
+							iVar10 = iVar10 + 1;
+							pCVar4 = reinterpret_cast<COctNode*>(Ptr(pCVar4, 4));
+						} while (iVar10 < 8);
+						iVar11 = iVar11 + 1;
+						pCVar5 = reinterpret_cast<COctNode*>(Ptr(pCVar5, 4));
+					} while (iVar11 < 8);
+					iVar12 = iVar12 + 1;
+					pCVar6 = reinterpret_cast<COctNode*>(Ptr(pCVar6, 4));
+				} while (iVar12 < 8);
+				iVar13 = iVar13 + 1;
+				pCVar7 = reinterpret_cast<COctNode*>(Ptr(pCVar7, 4));
+			} while (iVar13 < 8);
+			iVar2 = iVar2 + 1;
+			pCVar8 = reinterpret_cast<COctNode*>(Ptr(pCVar8, 4));
+		} while (iVar2 < 8);
+		iVar1 = iVar1 + 1;
+		octNode = reinterpret_cast<COctNode*>(Ptr(octNode, 4));
+		if (7 < iVar1) {
+			return;
+		}
+	} while (true);
 }
 
 /*

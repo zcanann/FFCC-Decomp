@@ -16,6 +16,9 @@ extern "C" void Destroy__12CFlatRuntimeFv(CFlatRuntime*);
 extern "C" void Destroy__9CFlatDataFv(void*);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
 extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
+extern "C" void AfterFrame__12CFlatRuntimeFi(CFlatRuntime*, int);
+extern "C" void __dt__9CFlatDataFv(void*, int);
+extern "C" void __dt__12CFlatRuntimeFv(CFlatRuntime*, int);
 extern "C" void Close__5CFileFPQ25CFile7CHandle(void*, void*);
 extern "C" void* __vt__13CFlatRuntime2[];
 extern "C" CFlatRuntime2* __ct__13CFlatRuntime2Fv(CFlatRuntime2*);
@@ -343,7 +346,11 @@ CFlatRuntime2::CFlatRuntime2()
  */
 CFlatRuntime2::~CFlatRuntime2()
 {
-	// TODO
+	u8* runtime = reinterpret_cast<u8*>(this);
+	*reinterpret_cast<void***>(runtime) = __vt__13CFlatRuntime2;
+	AfterFrame__12CFlatRuntimeFi(reinterpret_cast<CFlatRuntime*>(this), 1);
+	__dt__9CFlatDataFv(runtime + 0xCF20, -1);
+	__dt__12CFlatRuntimeFv(reinterpret_cast<CFlatRuntime*>(this), 0);
 }
 
 /*

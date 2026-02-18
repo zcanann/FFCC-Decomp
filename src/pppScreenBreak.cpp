@@ -514,27 +514,30 @@ void SB_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
  */
 void pppConScreenBreak(PScreenBreak* pppScreenBreak, UnkC* param_2)
 {
-    float* value = (float*)((u8*)&pppScreenBreak->field0_0x0 + 8 + param_2->m_serializedDataOffsets[2]);
-    void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
+    s32 dataOffset = param_2->m_serializedDataOffsets[2];
+    float* value = (float*)((u8*)pppScreenBreak + dataOffset + 0x80);
+    void* gObject = *(void**)((u8*)pppMngStPtr + 0xD8);
+    void* handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
-    *(u32*)((u8*)*(void**)((u8*)pppMngStPtr + 0xD8) + 0x60) |= 0x40;
+    float f = FLOAT_80331cc4;
+    *(u32*)((u8*)gObject + 0x60) |= 0x40;
     *(void**)(model + 0xF0) = (void*)SB_BeforeDrawCallback;
     *(void**)(model + 0xFC) = (void*)SB_DrawMeshDLCallback;
     *(void**)(model + 0xF4) = (void*)SB_BeforeMeshLockEnvCallback;
     *(void**)(model + 0xEC) = (void*)SB_BeforeCalcMatrixCallback;
     value[3] = 0.0f;
     value[4] = 0.0f;
-    value[8] = FLOAT_80331cc4;
-    value[7] = FLOAT_80331cc4;
-    value[6] = FLOAT_80331cc4;
-    value[2] = FLOAT_80331cc4;
-    value[1] = FLOAT_80331cc4;
-    value[0] = FLOAT_80331cc4;
-    ((u8*)value)[0x24] = 0;
-    ((u8*)value)[0x28] = 0xFF;
-    ((u8*)value)[0x29] = 0xFF;
-    ((u8*)value)[0x2A] = 0xFF;
-    ((u8*)value)[0x2B] = 0xFF;
+    value[8] = f;
+    value[7] = f;
+    value[6] = f;
+    value[2] = f;
+    value[1] = f;
+    value[0] = f;
+    *(u8*)(value + 9) = 0;
+    *(u8*)(value + 10) = 0xFF;
+    *((u8*)value + 0x29) = 0xFF;
+    *((u8*)value + 0x2A) = 0xFF;
+    *((u8*)value + 0x2B) = 0xFF;
 }
 
 /*
@@ -548,7 +551,8 @@ void pppConScreenBreak(PScreenBreak* pppScreenBreak, UnkC* param_2)
  */
 void pppCon2ScreenBreak(PScreenBreak* pppScreenBreak, UnkC* param_2)
 {
-    float* value = (float*)((u8*)&pppScreenBreak->field0_0x0 + 8 + param_2->m_serializedDataOffsets[2]);
+    s32 dataOffset = param_2->m_serializedDataOffsets[2];
+    float* value = (float*)((u8*)pppScreenBreak + dataOffset + 0x80);
     value[2] = FLOAT_80331cc4;
     value[1] = FLOAT_80331cc4;
     value[0] = FLOAT_80331cc4;

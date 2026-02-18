@@ -6,8 +6,9 @@
  * PAL Address: 0x8006530c
  * PAL Size: 140b
  */
-void pppMatrixScl(void* mtx, void* data)
+void pppMatrixScl(void* mtx, void* data, void* param3)
 {
+    (void)param3;
     f32* matrix = (f32*)mtx;
     Mtx* mtxPtr = (Mtx*)((u8*)matrix + 16);
     

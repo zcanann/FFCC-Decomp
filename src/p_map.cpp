@@ -241,31 +241,32 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
  */
 unsigned long long CMapPcs::IsLoadMapCompleted()
 {
-    int* busy = reinterpret_cast<int*>(reinterpret_cast<char*>(&MapMng) + 0x22A2C);
+    int* busy = reinterpret_cast<int*>(&MapMng);
+    busy += 0x22A2C / sizeof(int);
     unsigned int result = 0;
-    int remaining = 2;
+    int i;
 
-    while (true) {
+    for (i = 0; i < 2; i++) {
         if (busy[0] != 0) {
-            return 0;
+            return result;
         }
         if (busy[1] != 0) {
-            return 0;
+            return result;
         }
         if (busy[2] != 0) {
-            return 0;
+            return result;
         }
         if (busy[3] != 0) {
-            return 0;
+            return result;
         }
         if (busy[4] != 0) {
-            return 0;
+            return result;
         }
         if (busy[5] != 0) {
-            return 0;
+            return result;
         }
         if (busy[6] != 0) {
-            return 0;
+            return result;
         }
         if (busy[7] != 0) {
             break;
@@ -273,8 +274,7 @@ unsigned long long CMapPcs::IsLoadMapCompleted()
 
         busy += 7;
         result += 7;
-        remaining--;
-        if (remaining == 0) {
+        if (i == 1) {
             return (static_cast<unsigned long long>(1) << 32) | result;
         }
     }

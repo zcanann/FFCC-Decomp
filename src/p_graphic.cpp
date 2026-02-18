@@ -28,8 +28,10 @@ extern u32 lbl_801E9CF0[];
 extern u32 lbl_801E9CFC[];
 extern u32 lbl_801E9D08[];
 extern int DAT_802381a0;
+extern unsigned char MaterialMan[];
 extern CGraphicPcs GraphicsPcs;
 extern CMiniGamePcs MiniGamePcs;
+extern unsigned char MaterialMan[];
 extern char* PTR_DAT_801e9e64[];
 extern char DAT_8032fbf4[];
 extern char DAT_8032fbf8[];
@@ -438,12 +440,29 @@ void CGraphicPcs::setViewport()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80046538
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphicPcs::preDrawEnvInit()
 {
-	// TODO
+    *(u32*)(MaterialMan + 0x48) = 0x000ACE0F;
+    *(u32*)(MaterialMan + 0x44) = 0xFFFFFFFF;
+    *(u8*)(MaterialMan + 0x4C) = 0xFF;
+    *(u32*)(MaterialMan + 0x128) = 0;
+    *(u32*)(MaterialMan + 0x11C) = 0;
+    *(u32*)(MaterialMan + 0x12C) = 0x1E;
+    *(u32*)(MaterialMan + 0x120) = 0x1E;
+    *(u32*)(MaterialMan + 0x130) = 0;
+    *(u32*)(MaterialMan + 0x124) = 0;
+    *(u8*)(MaterialMan + 0x205) = 0xFF;
+    *(u8*)(MaterialMan + 0x206) = 0xFF;
+    *(u32*)(MaterialMan + 0x58) = 0;
+    *(u32*)(MaterialMan + 0x5C) = 0;
+    *(u8*)(MaterialMan + 0x208) = 0;
 }
 
 /*

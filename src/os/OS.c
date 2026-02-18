@@ -192,17 +192,23 @@ u32 OSGetConsoleType(void) {
 #define NULL 0
 
 static void ClearArena(void) {
-    if (!(OSGetResetCode() & 0x80000000)) {
+    void* savedRegionStart;
+    void* savedRegionEnd;
+
+    if ((OSGetResetCode() + 0x80000000) != 0) {
         __OSSavedRegionStart = NULL;
         __OSSavedRegionEnd = NULL;
         memset(OSGetArenaLo(), 0, (u32)OSGetArenaHi() - (u32)OSGetArenaLo());
         return;
     }
 
-    __OSSavedRegionStart = (void*)BOOT_REGION_START;
-    __OSSavedRegionEnd = (void*)BOOT_REGION_END;
+    savedRegionStart = (void*)BOOT_REGION_START;
+    savedRegionEnd = (void*)BOOT_REGION_END;
 
-    if (__OSSavedRegionStart == NULL) {
+    __OSSavedRegionStart = savedRegionStart;
+    __OSSavedRegionEnd = savedRegionEnd;
+
+    if (savedRegionStart == NULL) {
         memset(OSGetArenaLo(), 0, (u32)OSGetArenaHi() - (u32)OSGetArenaLo());
         return;
     }

@@ -14,10 +14,23 @@ extern "C" void Create__9CGBaseObjFv(CGBaseObj*);
 extern "C" void Destroy__9CGBaseObjFv(CGBaseObj*);
 extern "C" void Destroy__12CFlatRuntimeFv(CFlatRuntime*);
 extern "C" void Destroy__9CFlatDataFv(void*);
+extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
+extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
+extern "C" void AfterFrame__12CFlatRuntimeFi(CFlatRuntime*, int);
+extern "C" void __dt__9CFlatDataFv(void*, int);
+extern "C" void __dt__12CFlatRuntimeFv(CFlatRuntime*, int);
 extern "C" void Close__5CFileFPQ25CFile7CHandle(void*, void*);
 extern "C" void* __vt__13CFlatRuntime2[];
+extern "C" CFlatRuntime2* __ct__13CFlatRuntime2Fv(CFlatRuntime2*);
+extern "C" void __dt__13CFlatRuntime2Fv(void*);
 extern "C" CFlatRuntime* __ct__12CFlatRuntimeFv(CFlatRuntime*);
 extern "C" void __ct__9CFlatDataFv(void*);
+extern "C" void __ct__8CGMonObjFv(CGMonObj*);
+extern "C" void __ct__10CGPartyObjFv(CGPartyObj*);
+extern "C" void __ct__9CGItemObjFv(CGItemObj*);
+extern "C" void __ct__8CGObjectFv(CGObject*);
+extern "C" void __ct__9CGQuadObjFv(CGQuadObj*);
+extern "C" void __ct__9CGBaseObjFv(CGBaseObj*);
 extern "C" void pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(CPartMng*, int, int, PPPCREATEPARAM*, int);
 extern "C" char* GetLangString__5CGameFv(void*);
 extern "C" void* Open__5CFileFPcUlQ25CFile3PRI(void*, char*, unsigned long, int);
@@ -27,6 +40,10 @@ extern unsigned char Pad[];
 extern unsigned char GraphicsPcs[];
 extern unsigned char CameraPcs[];
 extern unsigned char DbgMenuPcs[];
+extern unsigned char CFlat[];
+extern unsigned char m_objItem[];
+extern unsigned char m_objParty[];
+extern unsigned char m_objMon[];
 extern CPartMng PartMng;
 extern "C" void* __vt__Q212CFlatRuntime7CObject[];
 extern "C" void* __vt__9CGBaseObj[];
@@ -329,7 +346,11 @@ CFlatRuntime2::CFlatRuntime2()
  */
 CFlatRuntime2::~CFlatRuntime2()
 {
-	// TODO
+	u8* runtime = reinterpret_cast<u8*>(this);
+	*reinterpret_cast<void***>(runtime) = __vt__13CFlatRuntime2;
+	AfterFrame__12CFlatRuntimeFi(reinterpret_cast<CFlatRuntime*>(this), 1);
+	__dt__9CFlatDataFv(runtime + 0xCF20, -1);
+	__dt__12CFlatRuntimeFv(reinterpret_cast<CFlatRuntime*>(this), 0);
 }
 
 /*
@@ -340,6 +361,28 @@ CFlatRuntime2::~CFlatRuntime2()
 CFlatRuntime2::CParticleWork::CParticleWork()
 {
 	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8006E864
+ * PAL Size: 252b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_cflat_runtime2_cpp(void)
+{
+	__ct__13CFlatRuntime2Fv(reinterpret_cast<CFlatRuntime2*>(CFlat));
+	__register_global_object(CFlat, reinterpret_cast<void*>(__dt__13CFlatRuntime2Fv), CFlat - 0x20);
+
+	__construct_array(CFlat + 0x10440, reinterpret_cast<void (*)(void*)>(__ct__9CGBaseObjFv), 0, 0x50, 0x28);
+	__construct_array(CFlat + 0x110C0, reinterpret_cast<void (*)(void*)>(__ct__9CGQuadObjFv), 0, 0x18, 0xAC);
+	__construct_array(CFlat + 0x120E0, reinterpret_cast<void (*)(void*)>(__ct__8CGObjectFv), 0, 0x38, 0x518);
+	__construct_array(m_objItem, reinterpret_cast<void (*)(void*)>(__ct__9CGItemObjFv), 0, 0x20, 0x57C);
+	__construct_array(m_objParty, reinterpret_cast<void (*)(void*)>(__ct__10CGPartyObjFv), 0, 4, 0x6F8);
+	__construct_array(m_objMon, reinterpret_cast<void (*)(void*)>(__ct__8CGMonObjFv), 0, 0x40, 0x740);
 }
 
 /*

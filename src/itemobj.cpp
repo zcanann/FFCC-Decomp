@@ -1,5 +1,7 @@
 #include "ffcc/itemobj.h"
 #include "ffcc/prgobj.h"
+#include "ffcc/p_game.h"
+#include "ffcc/vector.h"
 
 #include <string.h>
 
@@ -8,8 +10,21 @@ extern "C" void onDestroy__8CGPrgObjFv(void*);
 extern "C" int GetFreeParticleSlot__13CFlatRuntime2Fv(void*);
 extern "C" void DeleteParticleSlot__13CFlatRuntime2Fii(void*, int);
 extern "C" void __dt__Q29CCharaPcs7CHandleFv(void*, int);
+extern "C" int __cntlzw(unsigned int);
+extern "C" void Attach__8CGObjectFP8CGObjectPcP3Vec(void*, void*, char*, Vec*);
+extern "C" void Detach__8CGObjectFv(void*);
+extern "C" void changeStat__8CGPrgObjFiii(void*, int, int, int);
+extern "C" float CalcSafePos__8CGObjectFiP8CGObjectP3Vec(void*, int, void*, Vec*);
+extern "C" void moveVectorHRot__8CGObjectFfffi(void*, float, float, float, int);
+extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+    void*, int, int, int, int, void*, void*);
 
 extern unsigned char CFlat[];
+extern float FLOAT_80331b20;
+extern float FLOAT_80331b8c;
+extern float FLOAT_80331b90;
+extern char DAT_80331b7c[];
+extern char DAT_80331b84[];
 
 /*
  * --INFO--
@@ -202,12 +217,142 @@ void CGItemObj::safeDetach(int, float)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80125650
+ * PAL Size: 916b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGItemObj::carry(CGPartyObj*, int, int)
+void CGItemObj::carry(CGPartyObj* partyObj, int carryState, int carryMode)
 {
-	// TODO
+	unsigned char* self = (unsigned char*)this;
+	int canSystemCall = 0;
+
+	if (carryState == 0) {
+		bool isStageCarry = false;
+		bool isMenuBossStage = false;
+
+		if (Game.game.m_gameWork.m_menuStageMode != 0 &&
+			Game.game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+			isMenuBossStage = true;
+		}
+		if (isMenuBossStage) {
+			typedef unsigned int (*PartyVFunc)(CGPartyObj*);
+			PartyVFunc getCid = reinterpret_cast<PartyVFunc>((*reinterpret_cast<void***>(partyObj))[3]);
+			unsigned int cid = getCid(partyObj);
+			unsigned int stageCarry = (unsigned int)__cntlzw(0x6D - (cid & 0x6D));
+			if (((stageCarry >> 5) & 0xFF) != 0) {
+				isStageCarry = true;
+			}
+		}
+		if (isStageCarry && *(int*)(*(unsigned char**)((unsigned char*)partyObj + 0x58) + 0x3B4) != 0) {
+			canSystemCall = 1;
+		}
+
+		*(CGPartyObj**)(self + 0x550) = partyObj;
+		*(int*)(self + 0x554) = carryMode;
+
+		if (carryMode == 0) {
+			CVector attachOffset(FLOAT_80331b20, FLOAT_80331b20, FLOAT_80331b20);
+			bool useBossAttachName = false;
+
+			if (Game.game.m_gameWork.m_menuStageMode != 0) {
+				bool condA = false;
+				bool condB = false;
+				bool condC = false;
+
+				if (Game.game.m_gameWork.m_menuStageMode != 0 &&
+					Game.game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+					condC = true;
+				}
+				if (condC) {
+					typedef unsigned int (*PartyVFunc)(CGPartyObj*);
+					PartyVFunc getCid = reinterpret_cast<PartyVFunc>((*reinterpret_cast<void***>(partyObj))[3]);
+					unsigned int cid = getCid(partyObj);
+					unsigned int stageCarry = (unsigned int)__cntlzw(0x6D - (cid & 0x6D));
+					if (((stageCarry >> 5) & 0xFF) != 0) {
+						condB = true;
+					}
+				}
+				if (condB && *(int*)(*(unsigned char**)((unsigned char*)partyObj + 0x58) + 0x3B4) != 0) {
+					condA = true;
+				}
+				if (condA) {
+					useBossAttachName = true;
+				}
+			}
+
+			char* attachName = DAT_80331b84;
+			if (useBossAttachName) {
+				attachName = DAT_80331b7c;
+			}
+			Attach__8CGObjectFP8CGObjectPcP3Vec(this, partyObj, attachName, reinterpret_cast<Vec*>(&attachOffset));
+			changeStat__8CGPrgObjFiii(this, 0, 0, 0);
+			*(float*)(self + 0x144) = FLOAT_80331b20;
+		} else {
+			changeStat__8CGPrgObjFiii(this, 0xB, 0, 0);
+		}
+	} else if (carryState == 1 || carryState == 2) {
+		bool isStageCarry = false;
+		bool isMenuBossStage = false;
+
+		if (Game.game.m_gameWork.m_menuStageMode != 0 &&
+			Game.game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+			isMenuBossStage = true;
+		}
+		if (isMenuBossStage) {
+			CGPartyObj* carryObj = *(CGPartyObj**)(self + 0x550);
+			typedef unsigned int (*PartyVFunc)(CGPartyObj*);
+			PartyVFunc getCid = reinterpret_cast<PartyVFunc>((*reinterpret_cast<void***>(carryObj))[3]);
+			unsigned int cid = getCid(carryObj);
+			unsigned int stageCarry = (unsigned int)__cntlzw(0x6D - (cid & 0x6D));
+			if (((stageCarry >> 5) & 0xFF) != 0) {
+				isStageCarry = true;
+			}
+		}
+		if (isStageCarry && *(int*)(*(unsigned char**)(*(unsigned char**)(self + 0x550) + 0x58) + 0x3B4) != 0) {
+			canSystemCall = 1;
+		}
+
+		*(int*)(self + 0x554) = carryMode;
+
+		if (carryMode == 0) {
+			CGPartyObj* carryObj = *(CGPartyObj**)(self + 0x550);
+			Vec safePos;
+			float safeDist = CalcSafePos__8CGObjectFiP8CGObjectP3Vec(this, 0x41, carryObj, &safePos);
+			if (FLOAT_80331b20 < safeDist) {
+				moveVectorHRot__8CGObjectFfffi(
+					carryObj,
+					FLOAT_80331b8c + *(float*)((unsigned char*)carryObj + 0x1A8),
+					FLOAT_80331b20,
+					safeDist / FLOAT_80331b90,
+					3);
+			}
+			Detach__8CGObjectFv(this);
+			*(Vec*)(self + 0x15C) = safePos;
+			*(int*)(self + 0x550) = 0;
+			changeStat__8CGPrgObjFiii(this, 0, 0, 0);
+			*(int*)(self + 0x56C) = 8;
+			*(float*)(self + 0x144) = FLOAT_80331b20;
+		} else {
+			changeStat__8CGPrgObjFiii(this, ((int)~(carryState - 1 | 1 - carryState) >> 0x1F) + 0xD, 0, 0);
+		}
+
+		self[0x94] = 0;
+		self[0x95] = 0;
+		self[0x96] = 0x11;
+		self[0x97] = 0x94;
+	}
+
+	if ((*(unsigned int*)(self + 0x5C) & 0x10) != 0 && canSystemCall != 0) {
+		CFlatRuntime::CStack stack[3];
+		stack[0].m_word = 3;
+		stack[1].m_word = static_cast<unsigned int>((-carryState | carryState) >> 0x1F);
+		stack[2].m_word = 0;
+		SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+			&CFlat, 0, 1, 9, 3, stack, 0);
+	}
 }
 
 /*

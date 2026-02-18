@@ -243,12 +243,41 @@ void operator delete[](void* ptr)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001FDCC
+ * PAL Size: 136b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CheckSum(void*, int)
+unsigned int CheckSum(void* data, int size)
 {
-	// TODO
+    unsigned int checksum = 0x12345678;
+    unsigned char* bytes = reinterpret_cast<unsigned char*>(data);
+
+    if (size != 0) {
+        unsigned int blockCount = static_cast<unsigned int>(size) >> 3;
+        if (blockCount != 0) {
+            do {
+                checksum += bytes[0] + bytes[1] + bytes[2] + bytes[3] + bytes[4] + bytes[5] + bytes[6] + bytes[7];
+                bytes += 8;
+                blockCount--;
+            } while (blockCount != 0);
+
+            size &= 7;
+            if (size == 0) {
+                return checksum;
+            }
+        }
+
+        do {
+            checksum += *bytes;
+            bytes++;
+            size--;
+        } while (size != 0);
+    }
+
+    return checksum;
 }
 
 /*

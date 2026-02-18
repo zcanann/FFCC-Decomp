@@ -8,7 +8,7 @@ class CAmemCache;
 class CAmemCacheSet;
 class CChara;
 
-void CheckSum(void*, int);
+unsigned int CheckSum(void*, int);
 
 class CMemory
 {

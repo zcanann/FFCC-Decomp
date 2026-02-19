@@ -831,6 +831,26 @@ void CMaterialSet::AddMaterial(CMaterial*, int)
 
 /*
  * --INFO--
+ * PAL Address: 0x8003d878
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void* CMaterialSet::operator new(unsigned long size, CMemory::CStage*, char* file, int line)
+{
+    return _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+        &Memory,
+        size,
+        *reinterpret_cast<CMemory::CStage**>(MaterialMan + 0x218),
+        file,
+        line,
+        0);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8003c71c
  * PAL Size: 132b
  * EN Address: TODO

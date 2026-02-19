@@ -1912,12 +1912,64 @@ void pppCalcPartStd(_pppMngSt* pppMngSt)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 80054b30
+ * PAL Size: 296b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppDrawPartStd(_pppMngSt*)
+void pppDrawPartStd(_pppMngSt* pppMngSt)
 {
-	// TODO
+	typedef void (*DrawProgFn)(void*, void*, void*);
+
+	s32 pDataOffset = 0;
+	for (s32 i = 0; i < *(s32*)(((u8*)pppMngSt) + 0xB8); i++)
+	{
+		u8* pDataVals = (u8*)(*(void**)(((u8*)pppMngSt) + 0xC8));
+		s32* pDataVal = (s32*)(pDataVals + pDataOffset);
+
+		if (pDataVals != 0 && pDataVal[0] != 0 && (s16)*(u16*)(((u8*)pDataVal) + 0xC) > 0)
+		{
+			s32 workOffsetStep = 0;
+			u8* stageIter = (u8*)pDataVal[0];
+
+			for (s32 stage = 0; stage < *(s16*)(pDataVal[0] + 0x26); stage++)
+			{
+				s32 prog = *(s32*)(stageIter + 0x28);
+				if (prog != 0)
+				{
+					DrawProgFn fn = (DrawProgFn)(*(void**)(prog + 0xC));
+					if (fn != 0)
+					{
+						u16 count = *(u16*)(((u8*)pDataVal) + 0xC);
+						s32* obj = (s32*)(pDataVal[1]);
+
+						while (count != 0)
+						{
+							s32 next = obj[0];
+							if (*((u8*)obj + 0x7C) == 0)
+							{
+								fn(
+									obj,
+									*(void**)(((u8*)obj) + *(s32*)(pDataVal[0] + 0x20) + workOffsetStep),
+									stageIter + 0x28);
+							}
+							count--;
+							obj = (s32*)next;
+						}
+
+						Graphic.SetDrawDoneDebugDataPartControl(0x7FFF);
+					}
+				}
+
+				stageIter += 0x10;
+				workOffsetStep += 4;
+			}
+		}
+
+		pDataOffset += 0x10;
+	}
 }
 
 /*

@@ -364,15 +364,16 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
     for (groupIndex = 0; groupIndex < (int)groupTableCount; groupIndex++) {
         int* group = groupTable + groupIndex * 0x17;
         if ((group[0] != 1) && (*(signed char*)group[1] != -1) && (*(signed char*)group[2] == 1)) {
-            float* position = (float*)(group + 3);
-            float* velocity = (float*)(group + 6);
+            Vec unitVelocity;
+            unitVelocity.x = lbl_80330F70;
+            unitVelocity.y = lbl_80330F70;
+            unitVelocity.z = 1.0f;
             group[9] = *(int*)((unsigned char*)pBreathModel + 0x14);
-            position[0] = lbl_80330F70;
-            position[1] = lbl_80330F70;
-            position[2] = lbl_80330F70;
-            velocity[0] = lbl_80330F70;
-            velocity[1] = lbl_80330F70;
-            velocity[2] = 1.0f;
+            *(float*)(group + 3) = lbl_80330F70;
+            *((float*)(group + 3) + 1) = lbl_80330F70;
+            *((float*)(group + 3) + 2) = lbl_80330F70;
+            *(Vec*)(group + 6) = unitVelocity;
+            PSMTXCopy(*(Mtx*)pppMngStPtr, *(Mtx*)(group + 0xB));
             group[0] = 1;
         }
     }
@@ -380,12 +381,9 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
     for (groupIndex = 0; groupIndex < (int)groupTableCount; groupIndex++) {
         int* group = groupTable + groupIndex * 0x17;
         if (group[0] != 0) {
-            float* position = (float*)(group + 3);
-            float* velocity = (float*)(group + 6);
-            float step = (float)group[9];
-            position[0] += velocity[0] * step;
-            position[1] += velocity[1] * step;
-            position[2] += velocity[2] * step;
+            Vec stepVelocity;
+            PSVECScale((Vec*)(group + 6), &stepVelocity, (float)group[9]);
+            PSVECAdd(&stepVelocity, (Vec*)(group + 3), (Vec*)(group + 3));
         }
     }
 }

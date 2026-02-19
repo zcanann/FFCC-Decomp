@@ -778,22 +778,76 @@ void COctTree::Draw(unsigned char drawType)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002e27c
+ * PAL Size: 188b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void COctTree::DrawCharaShadow(unsigned char)
+void COctTree::DrawCharaShadow(unsigned char drawType)
 {
-	// TODO
+	unsigned char* thisBytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* mapObj;
+
+	if (*thisBytes != 0) {
+		return;
+	}
+
+	mapObj = *reinterpret_cast<unsigned char**>(thisBytes + 8);
+	if (mapObj[0x15] != drawType) {
+		return;
+	}
+
+	LightPcs.SetBumpTexMatirx(reinterpret_cast<float(*)[4]>(mapObj + 0xB8), 0, reinterpret_cast<Vec*>(mapObj + 0x58), mapObj[0x1A]);
+
+	if (lbl_8032F964 != *reinterpret_cast<float*>(mapObj + 0x40)) {
+		CameraPcs.SetOffsetZBuff(*reinterpret_cast<float*>(mapObj + 0x40));
+	}
+
+	reinterpret_cast<CMapMesh*>(*reinterpret_cast<void**>(mapObj + 0xC))->SetRenderArray();
+	DrawCharaShadowTypeMeshFlag_r(*reinterpret_cast<COctNode**>(thisBytes + 4));
+
+	if (lbl_8032F964 != *reinterpret_cast<float*>(mapObj + 0x40)) {
+		CameraPcs.SetOffsetZBuff(*reinterpret_cast<float*>(mapObj + 0x40));
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002e1c0
+ * PAL Size: 188b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void COctTree::SetDrawFlag()
 {
-	// TODO
+	unsigned char* thisBytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* mapObj;
+	float localMtx[4][4];
+
+	if ((*reinterpret_cast<unsigned long*>(thisBytes + 0x48) & 1) != 0) {
+		return;
+	}
+
+	mapObj = *reinterpret_cast<unsigned char**>(thisBytes + 8);
+	if (mapObj[0x1D] != 1) {
+		return;
+	}
+
+	PSMTXConcat(reinterpret_cast<float(*)[4]>(Ptr(&MapMng, 0x22928)), reinterpret_cast<float(*)[4]>(mapObj + 0xB8),
+	            reinterpret_cast<float(*)[4]>(thisBytes + 0xC));
+	PSMTXConcat(reinterpret_cast<float(*)[4]>(Ptr(&MapMng, 0x228F8)), reinterpret_cast<float(*)[4]>(mapObj + 0xB8), localMtx);
+	PSMTXInverse(localMtx, localMtx);
+
+	*reinterpret_cast<float*>(thisBytes + 0x3C) = localMtx[0][3];
+	*reinterpret_cast<float*>(thisBytes + 0x40) = localMtx[1][3];
+	*reinterpret_cast<float*>(thisBytes + 0x44) = localMtx[2][3];
+
+	ClearFlag(1);
+	DrawTypeMesh_r(*reinterpret_cast<COctNode**>(thisBytes + 4));
 }
 
 /*

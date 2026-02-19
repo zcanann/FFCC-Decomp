@@ -41,6 +41,8 @@ extern "C" float FLOAT_8032fb78;
 extern "C" float FLOAT_8032fbfc;
 extern "C" float FLOAT_8032fc00;
 
+static char s_p_graphic_cpp_801d7c10[] = "p_graphic.cpp";
+
 /*
  * --INFO--
  * PAL Address: 0x80047788
@@ -254,32 +256,45 @@ void CGraphicPcs::calc()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80047588
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphicPcs::drawBegin()
 {
-	// TODO
+	Graphic.BeginFrame();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80047554
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphicPcs::drawWait()
 {
-	// TODO
+	Graphic._WaitDrawDone(s_p_graphic_cpp_801d7c10, 0xDA);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80047528
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphicPcs::drawFlip()
 {
-	// TODO
+	Graphic.Flip();
+	_InitGxFunc();
 }
 
 /*

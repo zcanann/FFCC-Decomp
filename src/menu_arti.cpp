@@ -341,8 +341,6 @@ void CMenuPcs::ArtiInit1()
 unsigned int CMenuPcs::ArtiOpen()
 {
 	float fVar1;
-	double dVar2;
-	double dVar3;
 	short* psVar4;
 	int iVar5;
 	int iVar6;
@@ -360,28 +358,22 @@ unsigned int CMenuPcs::ArtiOpen()
 	iVar7 = (int)*(short*)(*(int*)((char*)this + 0x82c) + 0x22);
 	if (0 < iVar6) {
 		for (iVar8 = iVar6; iVar8 != 0; iVar8 = iVar8 - 1) {
-			dVar3 = DOUBLE_80332fe0;
 			fVar1 = FLOAT_80332fa8;
 			if (*(int*)(psVar4 + 0x12) <= iVar7) {
 				if (iVar7 < *(int*)(psVar4 + 0x12) + *(int*)(psVar4 + 0x14)) {
-					*(int*)(psVar4 + 0x10) = *(int*)(psVar4 + 0x10) + 1;
-					dVar2 = DOUBLE_80332fb0;
-					*(float*)(psVar4 + 8) =
-					    (float)((DOUBLE_80332fb0 /
-					             ((double)(((unsigned int)*(unsigned int*)(psVar4 + 0x14) ^ 0x80000000U) | 0x4330000000000000ULL) - dVar3)) *
-					            ((double)(((unsigned int)*(unsigned int*)(psVar4 + 0x10) ^ 0x80000000U) | 0x4330000000000000ULL) - dVar3));
+					unsigned int uVar9 = (unsigned int)(*(int*)(psVar4 + 0x10) + 1);
+					unsigned int uVar10 = (unsigned int)*(int*)(psVar4 + 0x14);
+					double dVar11 = IntToF64(uVar9);
+					double dVar12 = IntToF64(uVar10);
+
+					*(int*)(psVar4 + 0x10) = (int)uVar9;
+					fVar1 = (float)((DOUBLE_80332fb0 / dVar12) * dVar11);
+					*(float*)(psVar4 + 8) = fVar1;
 					if ((*(unsigned int*)(psVar4 + 0x16) & 2) == 0) {
-						fVar1 = (float)((dVar2 /
-						                 ((double)(((unsigned int)*(unsigned int*)(psVar4 + 0x14) ^ 0x80000000U) | 0x4330000000000000ULL) - dVar3)) *
-						                ((double)(((unsigned int)*(unsigned int*)(psVar4 + 0x10) ^ 0x80000000U) | 0x4330000000000000ULL) - dVar3));
-						*(float*)(psVar4 + 0x18) =
-						    (*(float*)(psVar4 + 0x1c) -
-						     (float)((double)(((unsigned int)(int)*psVar4 ^ 0x80000000U) | 0x4330000000000000ULL) - dVar3)) *
-						    fVar1;
-						*(float*)(psVar4 + 0x1a) =
-						    (*(float*)(psVar4 + 0x1e) -
-						     (float)((double)(((unsigned int)(int)psVar4[1] ^ 0x80000000U) | 0x4330000000000000ULL) - dVar3)) *
-						    fVar1;
+						float fVar2 = (float)IntToF64((unsigned int)((int)*psVar4));
+						*(float*)(psVar4 + 0x18) = (*(float*)(psVar4 + 0x1c) - fVar2) * fVar1;
+						fVar2 = (float)IntToF64((unsigned int)((int)psVar4[1]));
+						*(float*)(psVar4 + 0x1a) = (*(float*)(psVar4 + 0x1e) - fVar2) * fVar1;
 					}
 				} else {
 					iVar5 = iVar5 + 1;

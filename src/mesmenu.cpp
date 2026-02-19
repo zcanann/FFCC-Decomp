@@ -1,4 +1,5 @@
 #include "ffcc/mesmenu.h"
+#include "ffcc/p_game.h"
 
 extern "C" {
 void Set__4CMesFPci(void* mes, char* script, int flags);
@@ -74,12 +75,89 @@ void CMesMenu::onDraw()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009bcec
+ * PAL Size: 496b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMesMenu::CalcHeart()
 {
-	// TODO
+    unsigned int scriptFood = Game.game.m_scriptFoodBase[*(int*)((char*)this + 0x18)];
+    if (scriptFood == 0) {
+        return;
+    }
+
+    unsigned int foodCount = (unsigned int)*(unsigned short*)(scriptFood + 0x1C);
+    int targetValue = (int)(foodCount * 6);
+    if (*(int*)((char*)this + 0x3DAC) < targetValue) {
+        *(int*)((char*)this + 0x3DAC) = targetValue;
+    } else if (targetValue < *(int*)((char*)this + 0x3DAC)) {
+        *(unsigned int*)((char*)this + 0x3DAC) = foodCount * 6;
+    }
+
+    int currentValue = *(int*)((char*)this + 0x3DA8);
+    if (currentValue < *(int*)((char*)this + 0x3DAC)) {
+        int index = currentValue / 0xC + (currentValue >> 0x1F);
+        int base = (int)this + (index - (index >> 0x1F)) * 4;
+        if (*(int*)(base + 0x3DB0) == 0) {
+            *(int*)(base + 0x3DB0) = 0x10;
+        }
+
+        int nextValue = currentValue + 2;
+        int maxValue = *(int*)((char*)this + 0x3DAC);
+        if (nextValue < maxValue) {
+            maxValue = nextValue;
+        }
+        *(int*)((char*)this + 0x3DA8) = maxValue;
+    } else if (*(int*)((char*)this + 0x3DAC) < currentValue) {
+        *(unsigned int*)((char*)this + 0x3DA8) = (currentValue - 2U) & ~((int)(currentValue - 2U) >> 0x1F);
+
+        int decValue = *(int*)((char*)this + 0x3DA8);
+        int index = decValue / 0xC + (decValue >> 0x1F);
+        int base = (int)this + (index - (index >> 0x1F)) * 4;
+        if (*(int*)(base + 0x3DD0) == 0) {
+            *(int*)(base + 0x3DD0) = 0x10;
+        }
+        if (*(int*)((char*)this + 0x3DF0) == 0) {
+            *(int*)((char*)this + 0x3DF0) = 0x10;
+        }
+    }
+
+    int i = 2;
+    int base = (int)this;
+    do {
+        unsigned int value = *(int*)(base + 0x3DB0) - 1;
+        *(unsigned int*)(base + 0x3DB0) = value & ~((int)value >> 0x1F);
+
+        value = *(int*)(base + 0x3DD0) - 1;
+        *(unsigned int*)(base + 0x3DD0) = value & ~((int)value >> 0x1F);
+
+        value = *(int*)(base + 0x3DB4) - 1;
+        *(unsigned int*)(base + 0x3DB4) = value & ~((int)value >> 0x1F);
+
+        value = *(int*)(base + 0x3DD4) - 1;
+        *(unsigned int*)(base + 0x3DD4) = value & ~((int)value >> 0x1F);
+
+        value = *(int*)(base + 0x3DB8) - 1;
+        *(unsigned int*)(base + 0x3DB8) = value & ~((int)value >> 0x1F);
+
+        value = *(int*)(base + 0x3DD8) - 1;
+        *(unsigned int*)(base + 0x3DD8) = value & ~((int)value >> 0x1F);
+
+        value = *(int*)(base + 0x3DBC) - 1;
+        *(unsigned int*)(base + 0x3DBC) = value & ~((int)value >> 0x1F);
+
+        value = *(int*)(base + 0x3DDC) - 1;
+        *(unsigned int*)(base + 0x3DDC) = value & ~((int)value >> 0x1F);
+
+        base += 0x10;
+        i--;
+    } while (i != 0);
+
+    unsigned int value = *(int*)((char*)this + 0x3DF0) - 1;
+    *(unsigned int*)((char*)this + 0x3DF0) = value & ~((int)value >> 0x1F);
 }
 
 /*

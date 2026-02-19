@@ -27,6 +27,11 @@ struct pppBlurCharaWork {
     float m_savedModelField;
 };
 
+struct pppMngStBlurCharaRaw {
+    char _padding0[0xD8];
+    void* m_charaObj;
+};
+
 extern int DAT_8032ed70;
 extern void* DAT_80238030;
 extern CUtil DAT_8032ec70;
@@ -277,13 +282,13 @@ void pppFrameBlurChara(pppBlurChara* blurChara, UnkB* param_2, UnkC* param_3)
     }
 
     work = GetBlurWork(blurChara, param_3);
-    handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)pppMngStPtr + 0xD8), 0);
+    handle = GetCharaHandlePtr__FP8CGObjectl(((pppMngStBlurCharaRaw*)pppMngStPtr)->m_charaObj, 0);
     model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
 
     *(pppBlurCharaWork**)(model + 0xE4) = work;
     *(UnkB**)(model + 0xE8) = param_2;
 
-    if (work->m_captureBuffer == 0) {
+    if ((unsigned int)work->m_captureBuffer == 0) {
         unsigned int texBufferSize = GXGetTexBufferSize(0x140, 0xE0, GX_TF_I8, GX_FALSE, GX_FALSE);
 
         work->m_captureBuffer = pppMemAlloc__FUlPQ27CMemory6CStagePci(texBufferSize, pppEnvStPtr->m_stagePtr,

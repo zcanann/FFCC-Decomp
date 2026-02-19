@@ -132,9 +132,7 @@ void pppFrameYmDrawMdlTexAnm(pppYmDrawMdlTexAnm* param1, pppYmDrawMdlTexAnmStep*
     CMapMeshUVLayout* uvLayout;
     s16* uvPairs;
     s32* payload;
-    u32 frameU;
-    u32 frameMod;
-    u32 i;
+    s32 i;
 
     work = (pppYmDrawMdlTexAnmWork*)((u8*)param1 + 0x80 + param3->m_serializedDataOffsets[2]);
     if (DAT_8032ed70 != 0) {
@@ -158,14 +156,12 @@ void pppFrameYmDrawMdlTexAnm(pppYmDrawMdlTexAnm* param1, pppYmDrawMdlTexAnmStep*
 
         uvLayout = (CMapMeshUVLayout*)mapMesh;
         uvPairs = uvLayout->m_uvPairs;
-        for (i = 0; i < (u32)uvLayout->m_uvCount; i++) {
-            const f32 u = (f32)uvPairs[0];
-            const f32 v = (f32)uvPairs[1];
-            if (work->m_perU < u) {
-                work->m_perU = u;
+        for (i = 0; i < (s32)(u32)uvLayout->m_uvCount; i++) {
+            if (work->m_perU < (f32)uvPairs[0]) {
+                work->m_perU = (f32)uvPairs[0];
             }
-            if (work->m_perV < v) {
-                work->m_perV = v;
+            if (work->m_perV < (f32)uvPairs[1]) {
+                work->m_perV = (f32)uvPairs[1];
             }
             uvPairs += 2;
         }
@@ -178,26 +174,21 @@ void pppFrameYmDrawMdlTexAnm(pppYmDrawMdlTexAnm* param1, pppYmDrawMdlTexAnmStep*
     work->m_frame += 1;
     work->m_wait = 0x200;
 
-    for (i = 0; i < (u32)uvLayout->m_uvCount; i++) {
+    for (i = 0; i < (s32)(u32)uvLayout->m_uvCount; i++) {
         uvPairs[0] = (s16)((f32)uvPairs[0] + work->m_perU);
-
-        frameMod = work->m_frame / work->m_tilesU;
-        if (work->m_frame == frameMod * work->m_tilesU) {
-            uvPairs[0] = (s16)(-((work->m_perU * (f32)work->m_tilesU) - (f32)uvPairs[0]));
+        if (work->m_frame == (work->m_frame / (u32)payload[1]) * (u32)payload[1]) {
+            uvPairs[0] = (s16)(-((work->m_perU * (f32)(u32)payload[1]) - (f32)uvPairs[0]));
             uvPairs[1] = (s16)((f32)uvPairs[1] + work->m_perV);
         }
-
-        if ((work->m_tilesU * work->m_tilesV) <= work->m_frame) {
-            frameU = work->m_tilesV;
-            uvPairs[1] = (s16)(-((work->m_perV * (f32)frameU) - (f32)uvPairs[1]));
+        if ((u32)(payload[1] * payload[2]) <= work->m_frame) {
+            uvPairs[1] = (s16)(-((work->m_perV * (f32)(u32)payload[2]) - (f32)uvPairs[1]));
         }
-
         uvPairs += 2;
     }
 
     DCFlushRange(uvLayout->m_uvPairs, (u32)uvLayout->m_uvCount << 2);
 
-    if ((work->m_tilesU * work->m_tilesV) <= work->m_frame) {
+    if ((u32)(payload[1] * payload[2]) <= work->m_frame) {
         work->m_frame = 0;
     }
 }

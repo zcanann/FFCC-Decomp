@@ -165,6 +165,21 @@ static bool BOOL_8032ec44;
 
 /*
  * --INFO--
+ * PAL Address: 0x800161f0
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <>
+CMapLightHolder* CPtrArray<CMapLightHolder*>::operator[](unsigned long index)
+{
+    return GetAt(index);
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

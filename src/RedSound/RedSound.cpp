@@ -230,15 +230,18 @@ void CRedSound::ReportPrint(int debugFlag)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 int CRedSound::ReportStandby(int id)
 {
+	int result = 0;
 	int i;
 
 	if (id == 0) {
 		i = 0;
 		do {
 			if (DAT_8032e17c[i] != 0) {
-				return 1;
+				result++;
+				break;
 			}
 			i++;
 		} while (i < 0x40);
@@ -246,13 +249,16 @@ int CRedSound::ReportStandby(int id)
 		i = 0;
 		do {
 			if (id == DAT_8032e17c[i]) {
-				return 1;
+				result++;
+				break;
 			}
 			i++;
 		} while (i < 0x40);
 	}
-	return 0;
+
+	return result;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

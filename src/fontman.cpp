@@ -148,22 +148,60 @@ unsigned long CFontMan::GetInternal22Size()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80092e3c
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CFont::CFont()
 {
-	// TODO
+	texturePtr = 0;
+	m_glyphData = 0;
+	margin = 0.0f;
+	posZ = 0.0f;
+	posY = 0.0f;
+	posX = 0.0f;
+	renderFlags &= static_cast<unsigned char>(~0x80);
+	scaleY = 1.0f;
+	scaleX = 1.0f;
+	renderFlags &= static_cast<unsigned char>(~0x08);
+	m_color.r = 0xFF;
+	m_color.g = 0xFF;
+	m_color.b = 0xFF;
+	m_color.a = 0xFF;
+	renderFlags &= static_cast<unsigned char>(~0x40);
+	renderFlags &= static_cast<unsigned char>(~0x20);
+	m_usesEmbeddedData = 0;
+	m_pad0f = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80092d74
+ * PAL Size: 200b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CFont::~CFont()
 {
-	// TODO
+	if (texturePtr != 0) {
+		int* texture = reinterpret_cast<int*>(texturePtr);
+		int refCount = texture[1];
+		texture[1] = refCount - 1;
+		if ((refCount - 1 == 0) && (texture != 0)) {
+			(*(void (**)(int*, int))(*texture + 8))(texture, 1);
+		}
+		texturePtr = 0;
+	}
+
+	if (m_usesEmbeddedData == 0 && m_glyphData != 0) {
+		::operator delete[](m_glyphData);
+		m_glyphData = 0;
+	}
 }
 
 /*

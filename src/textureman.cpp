@@ -803,9 +803,11 @@ void CTexture::CacheLoadTexture(CAmemCacheSet* amemCacheSet)
  * Address:	TODO
  * Size:	TODO
  */
-void CTexture::CacheUnLoadTexture(CAmemCacheSet*)
+void CTexture::CacheUnLoadTexture(CAmemCacheSet* amemCacheSet)
 {
-	// TODO
+    if (S16At(this, 0x72) != -1) {
+        amemCacheSet->Release(S16At(this, 0x72));
+    }
 }
 
 /*
@@ -1271,7 +1273,7 @@ void CTexture::GetNumTlut()
  */
 void* CTexture::operator new(unsigned long size, CMemory::CStage*, char* file, int line)
 {
-	return ::operator new(size, TextureMan.m_memoryStage, file, line);
+    return _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, size, TextureMan.m_memoryStage, file, line, 0);
 }
 
 /*
@@ -1285,5 +1287,5 @@ void* CTexture::operator new(unsigned long size, CMemory::CStage*, char* file, i
  */
 void* CTextureSet::operator new(unsigned long size, CMemory::CStage*, char* file, int line)
 {
-	return ::operator new(size, TextureMan.m_memoryStage, file, line);
+    return _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, size, TextureMan.m_memoryStage, file, line, 0);
 }

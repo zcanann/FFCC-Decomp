@@ -1,11 +1,15 @@
 #include "ffcc/pppYmMegaBirthShpTail2.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/pppGetRotMatrixXYZ.h"
 #include <dolphin/mtx.h>
 #include <string.h>
 
+class CMath;
+extern CMath Math;
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern "C" void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" float RandF__5CMathFv(CMath*);
 extern float lbl_80330560;
 extern pppFMATRIX g_matUnit2;
 extern s32 DAT_8032ed70;
@@ -108,12 +112,142 @@ void pppDestructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, UnkC* param2
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8008bb28
+ * PAL Size: 3704b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void birth(_pppPObject*, VYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*, VColor*, _PARTICLE_DATA*, _PARTICLE_WMAT*, _PARTICLE_COLOR*)
+void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail2* work, PYmMegaBirthShpTail2* param, VColor* vColor,
+           _PARTICLE_DATA* particleData, _PARTICLE_WMAT* particleWMat, _PARTICLE_COLOR* particleColor)
 {
-	// TODO
+    u8* paramBytes = (u8*)param;
+    u8* particleBytes = (u8*)particleData;
+    u8 mode = paramBytes[0x12];
+    float speedRandRange = *(float*)(paramBytes + 0x5c);
+    float speedRandHalf = 0.5f * speedRandRange;
+
+    memset(particleData, 0, 0x1b8);
+    if (particleWMat != 0) {
+        memset(particleWMat, 0, 0x30);
+    }
+    if (particleColor != 0) {
+        memset(particleColor, 0, 0x20);
+    }
+
+    if (mode < 8) {
+        Vec baseDir = *(Vec*)(paramBytes + 0x20);
+        pppIVECTOR4 angles;
+        pppFMATRIX rot;
+        Vec tempVec;
+        float spread = (float)paramBytes[0x19];
+        float spreadRange = spread * 2.0f;
+
+        angles.x = (s16)(spreadRange * RandF__5CMathFv(&Math) - spread);
+        angles.y = (s16)(spreadRange * RandF__5CMathFv(&Math) - spread);
+        angles.z = (s16)(spreadRange * RandF__5CMathFv(&Math) - spread);
+        angles.w = 0;
+        if ((mode == 2) || (mode == 3)) {
+            angles.x = 0;
+            angles.y = 0;
+            angles.z = 0;
+            angles.w = 0;
+        }
+
+        pppGetRotMatrixXYZ(rot, &angles);
+        PSMTXMultVecSR(rot.value, &baseDir, &particleData->m_velocity);
+        particleData->m_velocity.x *= *(float*)(paramBytes + 0x58);
+        particleData->m_velocity.y *= param->m_velocity.x;
+        particleData->m_velocity.z *= param->m_velocity.y;
+        tempVec = particleData->m_velocity;
+        pppNormalize(particleData->m_velocity, tempVec);
+    }
+
+    if ((mode < 6) && (speedRandRange != 0.0f)) {
+        u8 randType = paramBytes[0x6a];
+
+        if (randType <= 1) {
+            if (randType == 1) {
+                RandF__5CMathFv(&Math);
+            }
+            particleData->m_matrix[0][0] = speedRandRange * RandF__5CMathFv(&Math) - speedRandHalf;
+            particleData->m_matrix[0][1] = speedRandRange * RandF__5CMathFv(&Math) - speedRandHalf;
+            particleData->m_matrix[0][2] = speedRandRange * RandF__5CMathFv(&Math) - speedRandHalf;
+        } else if (randType == 3) {
+            particleData->m_matrix[0][0] = -(2.0f * (speedRandRange * RandF__5CMathFv(&Math) * RandF__5CMathFv(&Math)) - speedRandRange) - speedRandHalf;
+            particleData->m_matrix[0][1] = -(2.0f * (speedRandRange * RandF__5CMathFv(&Math) * RandF__5CMathFv(&Math)) - speedRandRange) - speedRandHalf;
+            particleData->m_matrix[0][2] = -(2.0f * (speedRandRange * RandF__5CMathFv(&Math) * RandF__5CMathFv(&Math)) - speedRandRange) - speedRandHalf;
+        } else if (randType == 5) {
+            particleData->m_matrix[0][0] =
+                -(0.5f * (RandF__5CMathFv(&Math) * (speedRandRange * RandF__5CMathFv(&Math) * RandF__5CMathFv(&Math))) - speedRandRange) - speedRandHalf;
+            particleData->m_matrix[0][1] =
+                -(0.5f * (RandF__5CMathFv(&Math) * (speedRandRange * RandF__5CMathFv(&Math) * RandF__5CMathFv(&Math))) - speedRandRange) - speedRandHalf;
+            particleData->m_matrix[0][2] =
+                -(0.5f * (RandF__5CMathFv(&Math) * (speedRandRange * RandF__5CMathFv(&Math) * RandF__5CMathFv(&Math))) - speedRandRange) - speedRandHalf;
+        } else {
+            particleData->m_matrix[0][0] = RandF__5CMathFv(&Math) * (speedRandRange * RandF__5CMathFv(&Math)) - speedRandHalf;
+            particleData->m_matrix[0][1] = RandF__5CMathFv(&Math) * (speedRandRange * RandF__5CMathFv(&Math)) - speedRandHalf;
+            particleData->m_matrix[0][2] = RandF__5CMathFv(&Math) * (speedRandRange * RandF__5CMathFv(&Math)) - speedRandHalf;
+        }
+
+        particleData->m_matrix[0][0] *= *(float*)(paramBytes + 0x58);
+        particleData->m_matrix[0][1] *= param->m_velocity.x;
+        particleData->m_matrix[0][2] *= param->m_velocity.y;
+    } else if ((mode >= 10) && (speedRandRange != 0.0f)) {
+        u8 randType = paramBytes[0x6a];
+        float scale = speedRandRange;
+
+        if (randType == 3) {
+            scale = -(2.0f * (speedRandRange * RandF__5CMathFv(&Math) * RandF__5CMathFv(&Math)) - speedRandRange);
+        } else if (randType == 1) {
+            RandF__5CMathFv(&Math);
+            scale = speedRandRange * RandF__5CMathFv(&Math);
+        } else if (randType == 2) {
+            scale = RandF__5CMathFv(&Math) * (speedRandRange * RandF__5CMathFv(&Math));
+        } else if (randType == 4) {
+            scale = RandF__5CMathFv(&Math) * (RandF__5CMathFv(&Math) * (speedRandRange * RandF__5CMathFv(&Math)));
+        } else if (randType == 5) {
+            scale = -(0.5f * (RandF__5CMathFv(&Math) * (speedRandRange * RandF__5CMathFv(&Math) * RandF__5CMathFv(&Math))) - speedRandRange);
+        }
+
+        Vec velocity = particleData->m_velocity;
+        pppScaleVectorXYZ(particleData->m_velocity, velocity, scale);
+    }
+
+    if (paramBytes[0x16] != 0) {
+        particleData->m_directionTail.x = (float)vColor->m_alpha;
+        *(((u8*)&particleData->m_directionTail.y) + 1) = paramBytes[0x16];
+    }
+    if (paramBytes[0x17] != 0) {
+        *(((u8*)&particleData->m_directionTail.y) + 2) = paramBytes[0x17];
+    }
+
+    particleData->m_matrix[2][2] = param->m_colorDeltaAdd[1];
+    particleData->m_matrix[2][3] = param->m_sizeStart;
+    if (param->m_colorDeltaAdd[3] != 0.0f) {
+        particleData->m_matrix[2][2] += (2.0f * param->m_colorDeltaAdd[3]) * RandF__5CMathFv(&Math) - param->m_colorDeltaAdd[3];
+    }
+
+    if (*(s16*)(paramBytes + 0x11) == 0) {
+        *(u16*)(particleBytes + 0x22) = 0xFFFF;
+    } else {
+        *(s16*)(particleBytes + 0x22) = *(s16*)(paramBytes + 0x11);
+    }
+    *((u8*)&particleData->m_directionTail.y) = 0;
+
+    if (particleWMat != 0) {
+        memcpy(particleWMat, &work->m_emitterMatrix, 0x30);
+    }
+
+    particleData->m_colorDeltaAdd[0] = 0.0f;
+    particleData->m_colorDeltaAdd[1] = 0.0f;
+    particleData->m_colorDeltaAdd[2] = 0.0f;
+    particleData->m_colorDeltaAdd[3] = 0.0f;
+    *(((u8*)&particleData->m_directionTail.z) + 2) = 0;
+    *((u8*)&particleData->m_directionTail.z) = 0;
+    *(((u8*)&particleData->m_directionTail.y) + 3) = 0x1f;
+    *((u8*)&particleData->m_directionTail.z) = *(((u8*)&particleData->m_directionTail.y) + 3) - 1;
 }
 
 /*

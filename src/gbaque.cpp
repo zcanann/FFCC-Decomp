@@ -28,12 +28,101 @@ GbaQueue::~GbaQueue()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800D1354
+ * PAL Size: 568b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void GbaQueue::Init()
 {
-	// TODO
+	GbaQueue* osSemaphore;
+	int i;
+	char* obj = reinterpret_cast<char*>(this);
+
+	memset(obj + 0x30, 0, 0x400);
+	memset(obj + 0x430, 0, 0x10);
+	memset(obj + 0x440, 0, 4);
+	memset(obj + 0x454, 0, 0x370);
+	memset(obj + 0x7C4, 0, 0x370);
+	memset(obj + 0xB34, 0, 0x500);
+	memset(obj + 0x1034, 0, 0x1400);
+	memset(obj + 0x2434, 0, 0x140);
+	memset(obj + 0x2574, 0, 0x500);
+	memset(obj + 0x2A74, 0, 0x80);
+	memset(obj + 0x2B00, 0, 0x188);
+	memset(obj + 0x2C8E, 0, 8);
+	memset(cmakeInfo, 0, 0x80);
+	memset(obj + 0x2D40, 0xFF, 0x10);
+
+	i = 0;
+	osSemaphore = this;
+	do {
+		OSInitSemaphore(osSemaphore->accessSemaphores, 1);
+		i = i + 1;
+		osSemaphore = reinterpret_cast<GbaQueue*>(osSemaphore->accessSemaphores + 1);
+	} while (i < 4);
+
+	*reinterpret_cast<unsigned int*>(obj + 0x448) = 0xFF;
+	*reinterpret_cast<unsigned int*>(obj + 0x444) = 0xFF;
+	*reinterpret_cast<unsigned int*>(obj + 0x44C) = 0;
+	*reinterpret_cast<unsigned short*>(obj + 0x44E) = 0;
+	*reinterpret_cast<unsigned short*>(obj + 0x450) = 0;
+
+	obj[0x2C94] = 0;
+	obj[0x2C88] = 0;
+	obj[0x2C89] = 0;
+	obj[0x2D38] = 0;
+	obj[0x2D39] = 0;
+	obj[0x2CCA] = 0;
+	obj[0x2CCB] = 0;
+	obj[0x2CCC] = 0;
+	obj[0x2CCD] = 0;
+	obj[0x2CDE] = 0;
+	obj[0x2CE8] = 0;
+	obj[0x2CE9] = 0;
+	obj[0x2CFA] = 0;
+	obj[0x2D04] = 0;
+	obj[0x2D14] = 0;
+	obj[0x2AF4] = 0;
+	obj[0x2D42] = 0;
+	obj[0x2D41] = 0xF;
+	obj[0x2D43] = 0;
+	obj[0x2D54] = 0;
+	obj[0x2D55] = 0;
+	obj[0x2D56] = 0;
+	obj[0x2D57] = 0;
+	obj[0x2D58] = 0;
+	obj[0x2D59] = 0;
+	obj[0x2D5A] = 0;
+	obj[0x2D5B] = 0;
+	obj[0x2D5C] = 0;
+	obj[0x2D5D] = 0xF;
+	obj[0x2D5E] = 0;
+	obj[0x2D5F] = 0;
+	obj[0x2D60] = 0xF;
+	obj[0x2D61] = 0;
+	obj[0x2C96] = static_cast<char>(0xFF);
+	*reinterpret_cast<unsigned int*>(obj + 0x2C9C) = 0;
+	obj[0x2CAC] = 0;
+	obj[0x2D30] = 0;
+	obj[0x2D32] = 1;
+	obj[0x2C97] = static_cast<char>(0xFF);
+	*reinterpret_cast<unsigned int*>(obj + 0x2CA0) = 0;
+	obj[0x2CAD] = 0;
+	obj[0x2C8B] = 0;
+	obj[0x2D33] = 1;
+	obj[0x2C98] = static_cast<char>(0xFF);
+	*reinterpret_cast<unsigned int*>(obj + 0x2CA4) = 0;
+	obj[0x2CAE] = 0;
+	obj[0x2C8C] = 0;
+	obj[0x2D34] = 1;
+	obj[0x2C99] = static_cast<char>(0xFF);
+	*reinterpret_cast<unsigned int*>(obj + 0x2CA8) = 0;
+	obj[0x2CAF] = 0;
+	obj[0x2C8D] = 0;
+	obj[0x2D35] = 1;
 }
 
 /*

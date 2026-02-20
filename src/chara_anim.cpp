@@ -192,19 +192,18 @@ CChara::CAnim::~CAnim()
  */
 void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 {
+	unsigned char* p = reinterpret_cast<unsigned char*>(this);
 	CChunkFile chunkFile(data);
 	CChunkFile::CChunk chunk;
 
-	*reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x2C)) = stage;
+	*reinterpret_cast<CMemory::CStage**>(p + 0x2C) = stage;
 
 	while (true) {
-		if (!chunkFile.GetNextChunk(chunk)) {
-			return;
-		}
-
-		if (chunk.m_id != FourCC('C', 'H', 'A', ' ')) {
-			continue;
-		}
+		do {
+			if (!chunkFile.GetNextChunk(chunk)) {
+				return;
+			}
+		} while (chunk.m_id != 0x43484120);
 
 		if (chunk.m_arg0 < 2) {
 			break;
@@ -212,89 +211,104 @@ void CChara::CAnim::Create(void* data, CMemory::CStage* stage)
 
 		chunkFile.PushChunk();
 		while (chunkFile.GetNextChunk(chunk)) {
-			if (chunk.m_id != FourCC('A', 'N', 'I', 'M')) {
-				continue;
-			}
+			if (chunk.m_id == 0x414E494D) {
+				*reinterpret_cast<unsigned short*>(p + 0xE) = static_cast<unsigned short>(chunk.m_arg0);
+				unsigned short nodeCount = *reinterpret_cast<unsigned short*>(p + 0xE);
 
-			U16At(this, 0xE) = static_cast<unsigned short>(chunk.m_arg0);
-			void* nodeArray = __nwa__FUlPQ27CMemory6CStagePci(
-			    static_cast<unsigned long>(U16At(this, 0xE) * 0x18 + 0x10), stage, s_chara_anim_cpp_801da980, 0x5F);
-			nodeArray = __construct_new_array(
-			    nodeArray, reinterpret_cast<ConstructorDestructor>(__ct__Q26CChara9CAnimNodeFv),
-			    reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara9CAnimNodeFv), 0x18, U16At(this, 0xE));
-			*reinterpret_cast<void**>(Ptr(this, 0x14)) = nodeArray;
+				void* nodeArray = __nwa__FUlPQ27CMemory6CStagePci(
+				    static_cast<unsigned long>(nodeCount) * 0x18 + 0x10, stage, s_chara_anim_cpp_801da980, 0x5F);
+				nodeArray = __construct_new_array(
+				    nodeArray, reinterpret_cast<ConstructorDestructor>(__ct__Q26CChara9CAnimNodeFv),
+				    reinterpret_cast<ConstructorDestructor>(__dt__Q26CChara9CAnimNodeFv), 0x18, nodeCount);
+				*reinterpret_cast<void**>(p + 0x14) = nodeArray;
 
-			int nodeOffset = 0;
-			chunkFile.PushChunk();
-			while (chunkFile.GetNextChunk(chunk)) {
-				if (chunk.m_id == FourCC('I', 'N', 'F', 'O')) {
-					U8At(this, 0xA) = static_cast<unsigned char>(chunkFile.Get4());
-					U8At(this, 0xB) = static_cast<unsigned char>(chunkFile.Get4());
-					U8At(this, 0xC) = static_cast<unsigned char>(chunkFile.Get4());
-				} else if (chunk.m_id == FourCC('F', 'R', 'A', 'M')) {
-					U16At(this, 0x10) = static_cast<unsigned short>(chunkFile.Get4());
-				} else if (chunk.m_id == FourCC('B', 'A', 'N', 'K')) {
-					const unsigned int bankSize = chunk.m_size;
-					U32At(this, 0x1C) = (bankSize + 0x1F) & ~0x1FU;
-					*reinterpret_cast<void**>(Ptr(this, 0x20)) =
-					    __nwa__FUlPQ27CMemory6CStagePci(bankSize, stage, s_chara_anim_cpp_801da980, 0x7C);
-					chunkFile.Get(*reinterpret_cast<void**>(Ptr(this, 0x20)), bankSize);
+				int nodeOffset = 0;
+				chunkFile.PushChunk();
+				while (chunkFile.GetNextChunk(chunk)) {
+					if (chunk.m_id == 0x494E464F) {
+						*reinterpret_cast<unsigned char*>(p + 0xA) = static_cast<unsigned char>(chunkFile.Get4());
+						*reinterpret_cast<unsigned char*>(p + 0xB) = static_cast<unsigned char>(chunkFile.Get4());
+						*reinterpret_cast<unsigned char*>(p + 0xC) = static_cast<unsigned char>(chunkFile.Get4());
+					} else if (chunk.m_id == 0x4652414D) {
+						*reinterpret_cast<unsigned short*>(p + 0x10) = static_cast<unsigned short>(chunkFile.Get4());
+					} else if (chunk.m_id == 0x42414E4B) {
+						*reinterpret_cast<unsigned int*>(p + 0x1C) = (chunk.m_size + 0x1F) & 0xFFFFFFE0;
+						*reinterpret_cast<void**>(p + 0x20) =
+						    __nwa__FUlPQ27CMemory6CStagePci(chunk.m_size, stage, s_chara_anim_cpp_801da980, 0x7C);
+						chunkFile.Get(*reinterpret_cast<void**>(p + 0x20), chunk.m_size);
 
-					const int amemBase = S32At(Chara, 8308);
-					const int amemOffset = S32At(reinterpret_cast<void*>(S32At(Chara, 8284)), 8);
-					Memory.CopyToAMemorySync(*reinterpret_cast<void**>(Ptr(this, 0x20)),
-					                         reinterpret_cast<void*>(amemBase + amemOffset), U32At(this, 0x1C));
+						Memory.CopyToAMemorySync(
+						    *reinterpret_cast<void**>(p + 0x20),
+						    reinterpret_cast<void*>(S32At(Chara, 8308) +
+						                            S32At(reinterpret_cast<void*>(S32At(Chara, 8284)), 8)),
+						    *reinterpret_cast<unsigned int*>(p + 0x1C));
 
-					S32At(this, 0x28) = amemBase;
-					S32At(Chara, 8308) = amemBase + S32At(this, 0x1C);
+						*reinterpret_cast<int*>(p + 0x28) = S32At(Chara, 8308);
+						S32At(Chara, 8308) = S32At(Chara, 8308) + *reinterpret_cast<int*>(p + 0x1C);
 
-					if (*reinterpret_cast<void**>(Ptr(this, 0x20)) != 0) {
-						__dl__FPv(*reinterpret_cast<void**>(Ptr(this, 0x20)));
-						*reinterpret_cast<void**>(Ptr(this, 0x20)) = 0;
-					}
-				} else if (chunk.m_id == FourCC('N', 'O', 'D', 'E')) {
-					unsigned char* const node = Ptr(*reinterpret_cast<void**>(Ptr(this, 0x14)), nodeOffset);
-					nodeOffset += 0x18;
+						if (*reinterpret_cast<void**>(p + 0x20) != 0) {
+							__dl__FPv(*reinterpret_cast<void**>(p + 0x20));
+							*reinterpret_cast<void**>(p + 0x20) = 0;
+						}
+					} else if (chunk.m_id == 0x4E4F4445) {
+						unsigned char* node = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(p + 0x14)) + nodeOffset;
+						CChunkFile::CChunk nodeChunk;
+						nodeOffset += 0x18;
 
-					CChunkFile::CChunk nodeChunk;
-					chunkFile.PushChunk();
-					while (chunkFile.GetNextChunk(nodeChunk)) {
-						if (nodeChunk.m_id == FourCC('N', 'A', 'M', 'E')) {
-							strcpy(reinterpret_cast<char*>(node), chunkFile.GetString());
-						} else if (nodeChunk.m_id == FourCC('D', 'A', 'T', 'A')) {
-							unsigned int shift = 0;
-							for (int i = 0; i < 9; i++, shift += 2) {
-								const int type = static_cast<int>(chunkFile.Get4());
-								const unsigned int dataOffset = chunkFile.Get4();
-								const unsigned int mode = (type == 0) ? 0U : ((type == 1) ? 1U : 2U);
+						chunkFile.PushChunk();
+						while (chunkFile.GetNextChunk(nodeChunk)) {
+							if (nodeChunk.m_id == 0x4E414D45) {
+								strcpy(reinterpret_cast<char*>(node), chunkFile.GetString());
+							} else if (nodeChunk.m_id == 0x44415441) {
+								int shift = 0;
+								int i = 0;
+								do {
+									int type = static_cast<int>(chunkFile.Get4());
+									unsigned int mode;
+									unsigned int dataOffset;
 
-								if (i == 0) {
-									U32At(node, 0x10) = dataOffset;
-								}
+									if (type == 0) {
+										mode = 0;
+									} else if (type == 1) {
+										mode = 1;
+									} else {
+										mode = 2;
+									}
 
-								const unsigned int flags = U32At(node, 0x14);
-								U32At(node, 0x14) =
-								    ((((flags >> 0xD) & 0x3FFFF) | ((mode << shift) & 0x3FFFFU)) << 0xD) |
-								    (flags & 0x80001FFFU);
+									dataOffset = chunkFile.Get4();
+									if (i == 0) {
+										*reinterpret_cast<unsigned int*>(node + 0x10) = dataOffset;
+									}
 
-								if (i > 5 && type != 0) {
-									U8At(node, 0x14) = static_cast<unsigned char>((U8At(node, 0x14) & 0x7F) | 0x80);
-								}
+									*reinterpret_cast<unsigned int*>(node + 0x14) =
+									    ((((*reinterpret_cast<unsigned int*>(node + 0x14) >> 0xD) & 0x3FFFF) |
+									      ((mode << shift) & 0x3FFFFU))
+									     << 0xD) |
+									    (*reinterpret_cast<unsigned int*>(node + 0x14) & 0x80001FFF);
+
+									if (i > 5 && type != 0) {
+										*reinterpret_cast<unsigned char*>(node + 0x14) =
+										    static_cast<unsigned char>((*reinterpret_cast<unsigned char*>(node + 0x14) & 0x7F) | 0x80);
+									}
+
+									i++;
+									shift += 2;
+								} while (i < 9);
 							}
 						}
+						chunkFile.PopChunk();
+					} else if (chunk.m_id == 0x494E5450) {
+						*reinterpret_cast<char*>(p + 9) = static_cast<char>(chunk.m_arg0);
+						*reinterpret_cast<unsigned int*>(p + 0x18) = chunkFile.Get4();
 					}
-					chunkFile.PopChunk();
-				} else if (chunk.m_id == FourCC('I', 'N', 'T', 'P')) {
-					*reinterpret_cast<char*>(Ptr(this, 9)) = static_cast<char>(chunk.m_arg0);
-					U32At(this, 0x18) = chunkFile.Get4();
 				}
+				chunkFile.PopChunk();
 			}
-			chunkFile.PopChunk();
 		}
 		chunkFile.PopChunk();
 	}
 
-	if (static_cast<unsigned int>(System.m_execParam) >= 2U) {
+	if (static_cast<unsigned int>(System.m_execParam) >= 2) {
 		System.Printf(DAT_801da990);
 	}
 }

@@ -1536,21 +1536,6 @@ const char* CGame::GetLangString()
 
 /*
  * --INFO--
- * PAL Address: 0x800b9928
- * PAL Size: 56b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CGame::SetNextScript(CGame::CNextScript* nextScript)
-{ 
-    memcpy(&m_nextScript, nextScript, sizeof(CNextScript));
-    m_newGameFlag = 1;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800b91a4
  * PAL Size: 72b
  * EN Address: TODO

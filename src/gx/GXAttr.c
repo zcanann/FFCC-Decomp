@@ -25,12 +25,34 @@
  * JP Size: TODO
  */
 static void __GXXfVtxSpecs(void) {
-    u32 nCols;
+    u32 nCol0;
+    u32 nCol1;
     s32 nNrm;
-    u32 nTex;
+    u32 nTex0;
+    u32 nTex1;
+    u32 nTex2;
+    u32 nTex3;
+    u32 nTex4;
+    u32 nTex5;
+    u32 nTex6;
+    u32 nTex7;
     u32 reg;
     u32 vcdHi;
     u32 vcdLo;
+
+    vcdLo = __GXData->vcdLo;
+
+    if (((vcdLo >> 13) & 3) != 0) {
+        nCol0 = 1;
+    } else {
+        nCol0 = 0;
+    }
+
+    if (((vcdLo >> 15) & 3) != 0) {
+        nCol1 = 1;
+    } else {
+        nCol1 = 0;
+    }
 
     if (__GXData->hasBiNrms != 0) {
         nNrm = 2;
@@ -41,43 +63,57 @@ static void __GXXfVtxSpecs(void) {
     }
 
     vcdHi = __GXData->vcdHi;
-    vcdLo = __GXData->vcdLo;
 
-    nTex = 0;
     if ((vcdHi & 3) != 0) {
-        nTex++;
+        nTex0 = 1;
+    } else {
+        nTex0 = 0;
     }
+
     if (((vcdHi >> 2) & 3) != 0) {
-        nTex++;
+        nTex1 = 1;
+    } else {
+        nTex1 = 0;
     }
+
     if (((vcdHi >> 4) & 3) != 0) {
-        nTex++;
+        nTex2 = 1;
+    } else {
+        nTex2 = 0;
     }
+
     if (((vcdHi >> 6) & 3) != 0) {
-        nTex++;
+        nTex3 = 1;
+    } else {
+        nTex3 = 0;
     }
+
     if (((vcdHi >> 8) & 3) != 0) {
-        nTex++;
+        nTex4 = 1;
+    } else {
+        nTex4 = 0;
     }
+
     if (((vcdHi >> 10) & 3) != 0) {
-        nTex++;
+        nTex5 = 1;
+    } else {
+        nTex5 = 0;
     }
+
     if (((vcdHi >> 12) & 3) != 0) {
-        nTex++;
+        nTex6 = 1;
+    } else {
+        nTex6 = 0;
     }
+
     if (((vcdHi >> 14) & 3) != 0) {
-        nTex++;
+        nTex7 = 1;
+    } else {
+        nTex7 = 0;
     }
 
-    nCols = 0;
-    if (((vcdLo >> 13) & 3) != 0) {
-        nCols++;
-    }
-    if (((vcdLo >> 15) & 3) != 0) {
-        nCols++;
-    }
-
-    reg = (nTex << 4) | nCols | (nNrm << 2);
+    reg = (nCol0 + nCol1) | (nNrm << 2);
+    reg |= (nTex0 + nTex1 + nTex2 + nTex3 + nTex4 + nTex5 + nTex6 + nTex7) << 4;
     GX_WRITE_XF_REG(8, reg);
     __GXData->bpSentNot = 1;
 }

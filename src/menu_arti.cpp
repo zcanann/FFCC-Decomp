@@ -6,6 +6,9 @@
 #include "ffcc/system.h"
 #include <string.h>
 
+typedef signed short s16;
+typedef unsigned char u8;
+
 extern double DOUBLE_80332fb0;
 extern double DOUBLE_80332fb8;
 extern double DOUBLE_80332fe0;
@@ -56,6 +59,23 @@ struct ArtiFlatData
 {
 	char pad0[0x6C];
 	ArtiFlatTableEntry table[8];
+};
+
+struct ArtiOpenAnim {
+	s16 x;
+	s16 y;
+	s16 w;
+	s16 h;
+	float alpha;
+	float scale;
+	int frame;
+	int duration;
+	unsigned int flags;
+	float progress;
+	float dx;
+	float dy;
+	float targetX;
+	float targetY;
 };
 
 static inline double IntToF64(unsigned int value)
@@ -340,53 +360,38 @@ void CMenuPcs::ArtiInit1()
  */
 unsigned int CMenuPcs::ArtiOpen()
 {
-	float fVar1;
-	short* psVar4;
-	int iVar5;
-	int iVar6;
-	int iVar7;
-	int iVar8;
+	s16* artiState = *(s16**)((u8*)this + 0x82C);
+	s16* artiList = *(s16**)((u8*)this + 0x850);
+	int finished = 0;
+	int count = artiList[0];
+	ArtiOpenAnim* anim = (ArtiOpenAnim*)((u8*)artiList + 8);
 
-	if (*(char*)(*(int*)((char*)this + 0x82c) + 0xb) == '\0') {
+	if (*(u8*)(artiState + 5) == 0) {
 		ArtiInit();
 	}
 
-	iVar5 = 0;
-	*(short*)(*(int*)((char*)this + 0x82c) + 0x22) = *(short*)(*(int*)((char*)this + 0x82c) + 0x22) + 1;
-	iVar6 = (int)**(short**)((char*)this + 0x850);
-	psVar4 = *(short**)((char*)this + 0x850) + 4;
-	iVar7 = (int)*(short*)(*(int*)((char*)this + 0x82c) + 0x22);
-	if (0 < iVar6) {
-		for (iVar8 = iVar6; iVar8 != 0; iVar8 = iVar8 - 1) {
-			fVar1 = FLOAT_80332fa8;
-			if (*(int*)(psVar4 + 0x12) <= iVar7) {
-				if (iVar7 < *(int*)(psVar4 + 0x12) + *(int*)(psVar4 + 0x14)) {
-					unsigned int uVar9 = (unsigned int)(*(int*)(psVar4 + 0x10) + 1);
-					unsigned int uVar10 = (unsigned int)*(int*)(psVar4 + 0x14);
-					double dVar11 = IntToF64(uVar9);
-					double dVar12 = IntToF64(uVar10);
+	artiState[0x11]++;
 
-					*(int*)(psVar4 + 0x10) = (int)uVar9;
-					fVar1 = (float)((DOUBLE_80332fb0 / dVar12) * dVar11);
-					*(float*)(psVar4 + 8) = fVar1;
-					if ((*(unsigned int*)(psVar4 + 0x16) & 2) == 0) {
-						float fVar2 = (float)IntToF64((unsigned int)((int)*psVar4));
-						*(float*)(psVar4 + 0x18) = (*(float*)(psVar4 + 0x1c) - fVar2) * fVar1;
-						fVar2 = (float)IntToF64((unsigned int)((int)psVar4[1]));
-						*(float*)(psVar4 + 0x1a) = (*(float*)(psVar4 + 0x1e) - fVar2) * fVar1;
-					}
-				} else {
-					iVar5 = iVar5 + 1;
-					*(float*)(psVar4 + 8) = FLOAT_80332fac;
-					*(float*)(psVar4 + 0x18) = fVar1;
-					*(float*)(psVar4 + 0x1a) = fVar1;
+	for (int i = 0; i < count; i++, anim++) {
+		if (anim->frame <= artiState[0x11]) {
+			if (artiState[0x11] < anim->frame + anim->duration) {
+				anim->frame++;
+				anim->progress = (float)anim->frame / (float)anim->duration;
+				if ((anim->flags & 2) == 0) {
+					float t = (float)anim->frame / (float)anim->duration;
+					anim->dx = (anim->targetX - (float)anim->x) * t;
+					anim->dy = (anim->targetY - (float)anim->y) * t;
 				}
+			} else {
+				finished++;
+				anim->progress = 1.0f;
+				anim->dx = 0.0f;
+				anim->dy = 0.0f;
 			}
-			psVar4 = psVar4 + 0x20;
 		}
 	}
 
-	return (unsigned int)(iVar6 == iVar5);
+	return (unsigned int)(count == finished);
 }
 
 /*
@@ -422,52 +427,34 @@ int CMenuPcs::ArtiCtrl()
  */
 unsigned int CMenuPcs::ArtiClose()
 {
-	float fVar1;
-	float fVar2;
-	int iVar3;
-	int iVar4;
-	short* psVar5;
-	int iVar6;
-	int iVar7;
+	s16* artiState = *(s16**)((u8*)this + 0x82C);
+	s16* artiList = *(s16**)((u8*)this + 0x850);
+	int finished = 0;
+	int count = artiList[0];
+	ArtiOpenAnim* anim = (ArtiOpenAnim*)((u8*)artiList + 8);
 
-	iVar3 = 0;
-	*(short*)(*(int*)((char*)this + 0x82c) + 0x22) = *(short*)(*(int*)((char*)this + 0x82c) + 0x22) + 1;
-	iVar4 = (int)**(short**)((char*)this + 0x850);
-	psVar5 = *(short**)((char*)this + 0x850) + 4;
-	iVar6 = (int)*(short*)(*(int*)((char*)this + 0x82c) + 0x22);
-	for (iVar7 = 0; iVar7 < iVar4; iVar7 = iVar7 + 1) {
-		if (*(int*)(psVar5 + 0x12) <= iVar6) {
-			if (iVar6 < *(int*)(psVar5 + 0x12) + *(int*)(psVar5 + 0x14)) {
-				unsigned int uVar8 = (unsigned int)(*(int*)(psVar5 + 0x10) + 1);
-				unsigned int uVar9 = (unsigned int)*(int*)(psVar5 + 0x14);
-				double dVar10 = IntToF64(uVar8);
-				double dVar11 = IntToF64(uVar9);
+	artiState[0x11]++;
 
-				*(int*)(psVar5 + 0x10) = (int)uVar8;
-				fVar1 = (float)(DOUBLE_80332fb0 - (DOUBLE_80332fb0 / dVar11) * dVar10);
-				*(float*)(psVar5 + 8) = fVar1;
-
-				if ((*(unsigned int*)(psVar5 + 0x16) & 2) == 0) {
-					fVar2 = (float)IntToF64((unsigned int)((int)*psVar5));
-					*(float*)(psVar5 + 0x18) = (*(float*)(psVar5 + 0x1c) - fVar2) * fVar1;
-					fVar2 = (float)IntToF64((unsigned int)((int)psVar5[1]));
-					*(float*)(psVar5 + 0x1a) = (*(float*)(psVar5 + 0x1e) - fVar2) * fVar1;
+	for (int i = 0; i < count; i++, anim++) {
+		if (anim->frame <= artiState[0x11]) {
+			if (artiState[0x11] < anim->frame + anim->duration) {
+				anim->frame++;
+				anim->progress = 1.0f - ((float)anim->frame / (float)anim->duration);
+				if ((anim->flags & 2) == 0) {
+					float t = 1.0f - ((float)anim->frame / (float)anim->duration);
+					anim->dx = (anim->targetX - (float)anim->x) * t;
+					anim->dy = (anim->targetY - (float)anim->y) * t;
 				}
 			} else {
-				iVar3 = iVar3 + 1;
-				fVar1 = FLOAT_80332fa8;
-				*(float*)(psVar5 + 8) = fVar1;
-				*(float*)(psVar5 + 0x18) = fVar1;
-				*(float*)(psVar5 + 0x1a) = fVar1;
+				finished++;
+				anim->progress = 0.0f;
+				anim->dx = 0.0f;
+				anim->dy = 0.0f;
 			}
 		}
-		psVar5 = psVar5 + 0x20;
 	}
 
-	if (iVar4 == iVar3) {
-		return 1;
-	}
-	return 0;
+	return (unsigned int)(count == finished);
 }
 
 /*

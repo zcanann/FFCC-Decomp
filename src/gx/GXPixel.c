@@ -172,7 +172,7 @@ void GXSetFogRangeAdj(GXBool enable, u16 center, const GXFogAdjTable *table) {
         GX_WRITE_RAS_REG(range_adj);
     }
 
-    range_adj = (center + 342) | ((u32)(u8)enable << 10) | 0xE8000000;
+    range_adj = ((center + 342) & 0x00FFFBFF) | ((u32)(u8)enable << 10) | 0xE8000000;
     GX_WRITE_RAS_REG(range_adj);
     __GXData->bpSentNot = 0;
 }

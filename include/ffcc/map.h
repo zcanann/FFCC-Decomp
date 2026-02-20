@@ -65,7 +65,7 @@ public:
     void MapFileRead(char*, unsigned long&);
     void MapCheckFileRead(char*);
     void LoadMapNoSyncCalc();
-    void SearchChildMapObj(CMapObj*, CMapObj*);
+    CMapObj* SearchChildMapObj(CMapObj*, CMapObj*);
     void SearchAtribMapObj(CMapObj*, CMapObjAtr::TYPE);
     void AttachMapHit(CMapHit*, char*);
     void GetDebugPlaySta(int, Vec*);

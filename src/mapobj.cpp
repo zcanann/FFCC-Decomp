@@ -59,6 +59,36 @@ static inline Mtx& MtxAt(CMapObj* self, unsigned int offset)
 {
     return *reinterpret_cast<Mtx*>(Ptr(self, offset));
 }
+
+static inline CMapObj* NextSlot(CMapObj* obj)
+{
+    return reinterpret_cast<CMapObj*>(Ptr(obj, 0xF0));
+}
+
+static inline CMapObj* MapObjArrayStart()
+{
+    return reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x954);
+}
+
+static void SetLinkRecursive(CMapObj* parent)
+{
+    CMapObj* childHead = 0;
+    CMapObj* searchStart = MapObjArrayStart();
+
+    while (true) {
+        CMapObj* child = MapMng.SearchChildMapObj(searchStart, parent);
+        if (child == 0) {
+            break;
+        }
+
+        ObjAt(child, 0x8) = childHead;
+        SetLinkRecursive(child);
+        childHead = child;
+        searchStart = NextSlot(child);
+    }
+
+    ObjAt(parent, 0x4) = childHead;
+}
 }
 
 extern "C" void __dl__FPv(void*);
@@ -431,12 +461,16 @@ void CMapObj::SetShow(int show)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80029D18
+ * PAL Size: 672b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapObj::SetLink()
 {
-	// TODO
+    SetLinkRecursive(this);
 }
 
 /*

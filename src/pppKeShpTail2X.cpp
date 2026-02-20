@@ -6,6 +6,7 @@
 
 extern int lbl_8032ED70;
 extern _pppMngSt* pppMngStPtr;
+extern _pppEnvSt* lbl_8032ED54;
 extern _pppEnvSt* pppEnvStPtr;
 
 extern "C" {
@@ -75,8 +76,10 @@ void pppKeShpTail2X(_pppPObject* obj, UnkB* param_2, UnkC* param_3)
             pos.z = out.value[2][3];
         }
 
-        for (u8 i = 0; i < work->m_count; i++) {
-            pppCopyVector__FR3Vec3Vec(&work->m_posHistory[i], &pos);
+        Vec* history = work->m_posHistory;
+        for (s32 i = 0; i < work->m_count; i++) {
+            pppCopyVector__FR3Vec3Vec(history, &pos);
+            history++;
         }
     }
 
@@ -105,17 +108,17 @@ void pppKeShpTail2X(_pppPObject* obj, UnkB* param_2, UnkC* param_3)
     pppCopyVector__FR3Vec3Vec(&work->m_posHistory[work->m_head], &pos);
 
     {
-        long* shape = *(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
+        long* shape = *(long**)(*(u32*)&lbl_8032ED54->m_particleColors[0] + step->m_dataValIndex * 4);
         u8* frameEntry;
         s16 frameDuration;
 
         work->m_shapePrevFrame = work->m_shapeFrame;
         frameEntry = (u8*)shape + ((u32)work->m_shapeFrame << 3) + 0x10;
 
-        work->m_frameAcc = (u16)(work->m_frameAcc + (u16)step->m_frameStep);
+        work->m_frameAcc += step->m_frameStep;
         frameDuration = *(s16*)(frameEntry + 2);
-        if (work->m_frameAcc >= (u16)frameDuration) {
-            work->m_frameAcc = (u16)(work->m_frameAcc - (u16)frameDuration);
+        if (work->m_frameAcc >= frameDuration) {
+            work->m_frameAcc -= frameDuration;
             work->m_shapeFrame++;
             if (work->m_shapeFrame >= (u16)*(s16*)((u8*)shape + 6)) {
                 if ((frameEntry[4] & 0x80) != 0) {

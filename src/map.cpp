@@ -33,6 +33,7 @@ extern "C" int CheckHitCylinderNear__8COctTreeFP12CMapCylinderP3VecUl(void*, CMa
 extern "C" void SetDrawFlag__8COctTreeFv(void*);
 extern "C" void Calc__11CMapAnimRunFl(CMapAnimRun*, long);
 extern "C" void* lbl_801E89A8[];
+extern "C" void* lbl_801E899C[];
 extern int DAT_8032ec78;
 extern float FLOAT_8032ec80;
 extern unsigned char DAT_8032ec88;
@@ -619,7 +620,43 @@ CPtrArray<CMapAnimRun*>::CPtrArray()
 template <>
 CPtrArray<CMapAnimRun*>::~CPtrArray()
 {
-    RemoveAll();
+    if (m_items != 0) {
+        __dla__FPv(m_items);
+        m_items = 0;
+    }
+    m_size = 0;
+    m_numItems = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800344c4
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" CPtrArray<CMapAnimRun*>* dtor_800344C4(CPtrArray<CMapAnimRun*>* ptrArray, short param_2)
+{
+    if (ptrArray != 0) {
+        *reinterpret_cast<void***>(Ptr(ptrArray, 0)) = lbl_801E899C;
+
+        void*& items = *reinterpret_cast<void**>(Ptr(ptrArray, 0x10));
+        if (items != 0) {
+            __dla__FPv(items);
+            items = 0;
+        }
+
+        *reinterpret_cast<int*>(Ptr(ptrArray, 8)) = 0;
+        *reinterpret_cast<int*>(Ptr(ptrArray, 4)) = 0;
+
+        if (0 < param_2) {
+            __dl__FPv(ptrArray);
+        }
+    }
+
+    return ptrArray;
 }
 
 /*

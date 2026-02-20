@@ -119,6 +119,16 @@ static void SetAtPtrArrayMaterial(void* ptrArray, unsigned long index, void* ite
         array->items[index] = item;
     }
 }
+
+static int HighestSetBit(unsigned int value)
+{
+    for (int bit = 31; bit >= 0; bit--) {
+        if ((value & (1u << bit)) != 0) {
+            return bit;
+        }
+    }
+    return -1;
+}
 }
 
 /*
@@ -647,6 +657,93 @@ CTexScroll::CTexScroll()
 void CMaterialMan::GetMemoryStage()
 {
 	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003ca30
+ * PAL Size: 908b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMaterialSet::SetTextureSet(CTextureSet* textureSet)
+{
+    CPtrArray<CMaterial*>* materialArray = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
+    unsigned long materialIndex = 0;
+
+    while (materialIndex < static_cast<unsigned long>(materialArray->GetSize())) {
+        CMaterial* material = (*materialArray)[materialIndex];
+        if (material != 0) {
+            unsigned short numTexture = *reinterpret_cast<unsigned short*>(Ptr(material, 0x18));
+            if (numTexture == 0) {
+                *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 1;
+            } else {
+                unsigned char* textureIndexPtr = Ptr(material, 0x1A);
+                unsigned char* texturePtr = Ptr(material, 0x3C);
+
+                for (int i = 0; i < numTexture; i++) {
+                    ReleaseRef(*reinterpret_cast<void**>(texturePtr));
+                    *reinterpret_cast<void**>(texturePtr) = 0;
+
+                    if (textureSet != 0) {
+                        CTexture* texture = 0;
+                        short textureIndex = *reinterpret_cast<short*>(textureIndexPtr);
+                        if (textureIndex >= 0) {
+                            CPtrArray<CTexture*>* textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(Ptr(textureSet, 8));
+                            unsigned long textureCount = static_cast<unsigned long>(textureArray->GetSize());
+                            if (static_cast<unsigned long>(textureIndex) < textureCount) {
+                                texture = (*textureArray)[static_cast<unsigned long>(textureIndex)];
+                            }
+                        }
+
+                        *reinterpret_cast<CTexture**>(texturePtr) = texture;
+                        if (texture != 0) {
+                            *reinterpret_cast<int*>(Ptr(texture, 4)) += 1;
+
+                            unsigned long& flags = *reinterpret_cast<unsigned long*>(Ptr(material, 0x24));
+                            int format = *reinterpret_cast<int*>(Ptr(texture, 0x60));
+                            if ((format == 9) || (format == 8)) {
+                                flags |= 0x200;
+                            } else if (format == 1) {
+                                flags |= 0x400;
+                            }
+
+                            if (*reinterpret_cast<char*>(Ptr(texture, 0x71)) != 0) {
+                                flags |= 0x800;
+                            }
+                        }
+                    }
+
+                    textureIndexPtr += 2;
+                    texturePtr += 4;
+                }
+
+                if ((*reinterpret_cast<char*>(Ptr(material, 0xA2)) != 0) &&
+                    (numTexture > 1) &&
+                    (*reinterpret_cast<void**>(Ptr(material, 0x3C)) != 0) &&
+                    (*reinterpret_cast<void**>(Ptr(material, 0x40)) != 0)) {
+                    void* texture0 = *reinterpret_cast<void**>(Ptr(material, 0x3C));
+                    void* texture1 = *reinterpret_cast<void**>(Ptr(material, 0x40));
+
+                    unsigned int scaleU =
+                        *reinterpret_cast<unsigned int*>(Ptr(texture0, 0x64)) /
+                        *reinterpret_cast<unsigned int*>(Ptr(texture1, 0x64));
+                    int uShift = HighestSetBit(scaleU);
+                    *reinterpret_cast<char*>(Ptr(material, 0x34)) = (uShift == -1) ? 0 : static_cast<char>(uShift);
+
+                    unsigned int scaleV =
+                        *reinterpret_cast<unsigned int*>(Ptr(texture0, 0x68)) /
+                        *reinterpret_cast<unsigned int*>(Ptr(texture1, 0x68));
+                    int vShift = HighestSetBit(scaleV);
+                    *reinterpret_cast<char*>(Ptr(material, 0x35)) = (vShift == -1) ? 0 : static_cast<char>(vShift);
+                }
+            }
+        }
+
+        materialIndex++;
+    }
 }
 
 /*

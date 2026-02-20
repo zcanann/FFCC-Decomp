@@ -1529,12 +1529,24 @@ void pppCacheLoadModel(short*, _pppDataHead*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 80055868
+ * PAL Size: 108b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppCacheLoadShape(short*, _pppDataHead*)
+void pppCacheLoadShape(short* shapeList, _pppDataHead* pppDataHead)
 {
-	// TODO
+	short shapeCount = shapeList[0];
+	short* shapeIndices = shapeList + 1;
+
+	for (short i = 0; i < shapeCount; i++) {
+		short shapeIndex = *shapeIndices;
+		shapeIndices++;
+		pppShapeSt* shape = *(pppShapeSt**)(pppDataHead->m_shapeNames + (shapeIndex * sizeof(pppShapeSt*)));
+		pppCacheLoadShapeTexture(shape, pppEnvStPtr->m_materialSetPtr);
+	}
 }
 
 /*

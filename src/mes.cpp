@@ -1,5 +1,11 @@
 #include "ffcc/mes.h"
+#include "ffcc/fontman.h"
 #include <string.h>
+
+extern "C" void SetPosX__5CFontFf(float, CFont*);
+extern "C" void SetPosY__5CFontFf(float, CFont*);
+extern "C" void Draw__5CFontFUs(CFont*, unsigned short);
+extern "C" float GetWidth__5CFontFUs(CFont*, unsigned short);
 
 /*
  * --INFO--
@@ -432,10 +438,49 @@ void CMes::MakeAgbString(char*, char*, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800981f0
+ * PAL Size: 380b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMes::drawTagString(CFont*, char*, int, int, int)
+unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int breakOnLineTag, int lineBaseY)
 {
-	// TODO
+	u8* p = (u8*)text;
+	u32 totalWidth = 0;
+	bool running = true;
+	float startX = font->posX;
+
+	while (running)
+	{
+		u8 ch = *p++;
+		if (ch == 0)
+		{
+			running = false;
+		}
+		else if (ch == 0xFF)
+		{
+			u8 tag = *p++;
+			if (tag == 0xA1)
+			{
+				running = false;
+			}
+			else if ((tag == 0xA0) && (breakOnLineTag != 0))
+			{
+				SetPosX__5CFontFf(startX, font);
+				SetPosY__5CFontFf((float)lineBaseY + font->posY + (float)font->m_glyphWidth * font->scaleY, font);
+			}
+		}
+		else
+		{
+			if (drawChars != 0)
+			{
+				Draw__5CFontFUs(font, ch);
+			}
+			totalWidth += (u32)GetWidth__5CFontFUs(font, ch);
+		}
+	}
+
+	return totalWidth;
 }

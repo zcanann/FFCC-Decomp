@@ -44,7 +44,7 @@ public:
     void _WaitDrawDone(char*, int);
     void Thread();
     u8 IsFifoOver();
-    void IsFrameRateOver();
+    u32 IsFrameRateOver();
     void Flip();
 
     void Printf(char*, ...);

@@ -27,8 +27,8 @@ void game(int argc, char** argv)
     char c;
     int cmp;
     int i;
-    bool copyScriptName;
-    bool parseLanguage;
+    int copyScriptName;
+    int parseLanguage;
     char** argument;
 
     Game.game.Init();
@@ -36,12 +36,12 @@ void game(int argc, char** argv)
 
     if (argc != 0) {
         argument = argv + 1;
-        copyScriptName = false;
-        parseLanguage = false;
+        copyScriptName = 0;
+        parseLanguage = 0;
         for (i = 1; i < argc; i++) {
             if (copyScriptName) {
                 strcpy(Game.game.m_currentScriptName, *argument);
-                copyScriptName = false;
+                copyScriptName = 0;
             } else if (parseLanguage) {
                 cmp = strcmp(*argument, lbl_801d6a48);
                 if (cmp == 0) {
@@ -74,15 +74,15 @@ void game(int argc, char** argv)
                         }
                     }
                 }
-                parseLanguage = false;
+                parseLanguage = 0;
             } else {
                 c = (*argument)[0];
                 if ((c == '-') || (c == '/')) {
                     c = (*argument)[1];
                     if (c == 'l') {
-                        parseLanguage = true;
-                    } else if (c == 'f') {
-                        copyScriptName = true;
+                        parseLanguage = 1;
+                    } else if ((c < 'l') && (c == 'f')) {
+                        copyScriptName = 1;
                     }
                 }
             }

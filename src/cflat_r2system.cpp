@@ -7,6 +7,7 @@
 #include "ffcc/maphit.h"
 #include "ffcc/mes.h"
 #include "ffcc/p_camera.h"
+#include "ffcc/p_dbgmenu.h"
 #include "ffcc/p_map.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/p_minigame.h"
@@ -1315,6 +1316,44 @@ extern "C" void SetFov__10CCameraPcsFf(CCameraPcs* camera, float fov)
 void CCameraPcs::SetZRotate(float zRotate)
 {
     *(float*)((char*)this + 0x108) = zRotate;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9928
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CGame::SetNextScript(CGame::CNextScript* nextScript)
+{
+    unsigned int* dst = (unsigned int*)&m_nextScript;
+    unsigned int* src = (unsigned int*)nextScript;
+    int count = 0x20;
+
+    do {
+        *dst++ = *src++;
+        *dst++ = *src++;
+        count--;
+    } while (count != 0);
+
+    m_newGameFlag = 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9BB0
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CDbgMenuPcs::GetDbgFlag()
+{
+    return *(int*)((char*)this + 0x4);
 }
 
 /*

@@ -630,7 +630,7 @@ void GXSetScissorBoxOffset(s32 x_off, s32 y_off) {
     ASSERTMSGLINE(1124, (u32)(y_off + 342) < 2048, "GXSetScissorBoxOffset: Invalid Y offset");
 
     reg = ((u32)(x_off + 0x156U) >> 1) | ((u32)(y_off + 0x156) << 9);
-    reg &= 0xFFFFFF;
+    reg = (reg << 8) >> 8;
     reg |= 0x59000000;
     GX_WRITE_RAS_REG(reg);
     __GXData->bpSentNot = 0;

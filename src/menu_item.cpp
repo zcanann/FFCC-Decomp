@@ -103,118 +103,128 @@ struct ItemFlatData {
  */
 void CMenuPcs::ItemInit()
 {
-    s16* itemState = *(s16**)((u8*)this + 0x82C);
-    s16* itemList = *(s16**)((u8*)this + 0x850);
-    u8* itemListBytes = (u8*)itemList;
-    const float zero = 0.0f;
-    const float one = 1.0f;
+    float fVar2;
+    float fVar3;
+    float fVar4;
+    int iVar5;
+    s16 sVar6;
+    s16 sVar7;
+    s16* psVar8;
+    int iVar9;
+    int iVar10;
+    int iVar11;
 
-    memset(itemList, 0, 0x1008);
-
-    int entryBase = (int)itemList + 8;
-    for (int i = 0; i < 8; i++) {
-        *(float*)(entryBase + 0x14) = one;
-        *(float*)(entryBase + 0x54) = one;
-        *(float*)(entryBase + 0x94) = one;
-        *(float*)(entryBase + 0xD4) = one;
-        *(float*)(entryBase + 0x114) = one;
-        *(float*)(entryBase + 0x154) = one;
-        *(float*)(entryBase + 0x194) = one;
-        *(float*)(entryBase + 0x1D4) = one;
-        entryBase += 0x200;
-    }
-
-    *(int*)(itemListBytes + 0x24) = 0x2E;
-    *(s16*)(itemListBytes + 8) = 0x68;
-    *(s16*)(itemListBytes + 0xA) = 0x28;
-    *(s16*)(itemListBytes + 0xC) = 0x78;
-    *(s16*)(itemListBytes + 0xE) = 0x108;
-    *(float*)(itemListBytes + 0x10) = zero;
-    *(float*)(itemListBytes + 0x14) = zero;
-    *(float*)(itemListBytes + 0x1C) = one;
-    *(int*)(itemListBytes + 0x2C) = 5;
-    *(int*)(itemListBytes + 0x30) = 5;
-
-    *(int*)(itemListBytes + 0x64) = 0x47;
-    *(s16*)(itemListBytes + 0x48) = 0x50;
-    *(s16*)(itemListBytes + 0x4A) = 0xE;
-    *(s16*)(itemListBytes + 0x4C) = 0x30;
-    *(s16*)(itemListBytes + 0x4E) = 0x30;
-    *(float*)(itemListBytes + 0x50) = zero;
-    *(float*)(itemListBytes + 0x54) = zero;
-    *(float*)(itemListBytes + 0x5C) = one;
-    *(int*)(itemListBytes + 0x6C) = 0;
-    *(int*)(itemListBytes + 0x70) = 5;
-
-    *(int*)(itemListBytes + 0xA4) = 0x47;
-    *(s16*)(itemListBytes + 0x88) = 0x55;
-    *(s16*)(itemListBytes + 0x8C) = 0x30;
-    *(s16*)(itemListBytes + 0x8E) = 0x30;
-    *(s16*)(itemListBytes + 0x8A) = 0x150 - *(s16*)(itemListBytes + 0x8E);
-    *(float*)(itemListBytes + 0x90) = zero;
-    *(float*)(itemListBytes + 0x94) = zero;
-    *(float*)(itemListBytes + 0x9C) = one;
-    *(int*)(itemListBytes + 0xAC) = 0;
-    *(int*)(itemListBytes + 0xB0) = 5;
-
-    *(int*)(itemListBytes + 0xF4) = 2;
-    *(int*)(itemListBytes + 0xE4) = 0x2E;
-    *(s16*)(itemListBytes + 0xC8) = 0x50;
-    *(s16*)(itemListBytes + 0xCA) = 8;
-    *(s16*)(itemListBytes + 0xCC) = 0x48;
-    *(s16*)(itemListBytes + 0xCE) = 0x140;
-    *(float*)(itemListBytes + 0xD0) = zero;
-    *(float*)(itemListBytes + 0xD4) = zero;
-    *(int*)(itemListBytes + 0xEC) = 0;
-    *(int*)(itemListBytes + 0xF0) = 5;
-
-    s16 yOffset = 0;
-    s16 count = 4;
-    int offset = 0x100;
-    for (int i = 0; i < 4; i++) {
-        s16* itemA = (s16*)(itemListBytes + offset + 8);
-        itemA[0x16] = 0;
-        itemA[0x17] = 2;
-        itemA[0xE] = 0;
-        itemA[0xF] = 0x37;
-        count += 2;
-
-        s16 nextYOffset = yOffset + 0x20;
-        itemA[0] = *(s16*)(itemListBytes + 8) + 0x24;
-        itemA[1] = *(s16*)(itemListBytes + 0xA) + yOffset;
-        itemA[2] = 200;
-        itemA[3] = 0x28;
-        *(float*)(itemA + 4) = zero;
-        *(float*)(itemA + 6) = zero;
-        itemA[0x12] = 0;
-        itemA[0x13] = 7;
-        itemA[0x14] = 0;
-        itemA[0x15] = 5;
-
-        int offsetB = offset + 0x48;
-        offset += 0x80;
-        s16* itemB = (s16*)(itemListBytes + offsetB);
-        itemB[0x16] = 0;
-        itemB[0x17] = 2;
-        itemB[0xE] = 0;
-        itemB[0xF] = 0x37;
-        itemB[0] = *(s16*)(itemListBytes + 8) + 0x24;
-        itemB[1] = *(s16*)(itemListBytes + 0xA) + nextYOffset;
-        itemB[2] = 200;
-        itemB[3] = 0x28;
-        *(float*)(itemB + 4) = zero;
-        *(float*)(itemB + 6) = zero;
-        itemB[0x12] = 0;
-        itemB[0x13] = 7;
-        itemB[0x14] = 0;
-        itemB[0x15] = 5;
-
-        yOffset += 0x40;
-    }
-
-    itemList[0] = count;
-    itemState[0x13] = 0;
-    *((u8*)itemState + 0xB) = 1;
+    memset(*(void**)((u8*)this + 0x850), 0, 0x1008);
+    fVar2 = FLOAT_80332e64;
+    iVar5 = *(int*)((u8*)this + 0x850) + 8;
+    iVar10 = 8;
+    do {
+        *(float*)(iVar5 + 0x14) = fVar2;
+        *(float*)(iVar5 + 0x54) = fVar2;
+        *(float*)(iVar5 + 0x94) = fVar2;
+        *(float*)(iVar5 + 0xD4) = fVar2;
+        *(float*)(iVar5 + 0x114) = fVar2;
+        *(float*)(iVar5 + 0x154) = fVar2;
+        *(float*)(iVar5 + 0x194) = fVar2;
+        *(float*)(iVar5 + 0x1D4) = fVar2;
+        iVar5 += 0x200;
+        iVar10 -= 1;
+    } while (iVar10 != 0);
+    iVar5 = *(int*)((u8*)this + 0x850);
+    *(int*)(iVar5 + 0x24) = 0x2E;
+    *(s16*)(iVar5 + 8) = 0x68;
+    *(s16*)(iVar5 + 0xA) = 0x28;
+    *(s16*)(iVar5 + 0xC) = 0x78;
+    fVar2 = FLOAT_80332e60;
+    *(s16*)(iVar5 + 0xE) = 0x108;
+    fVar4 = FLOAT_80332e60;
+    *(float*)(iVar5 + 0x10) = fVar2;
+    fVar3 = FLOAT_80332e64;
+    *(float*)(iVar5 + 0x14) = fVar4;
+    fVar2 = FLOAT_80332e60;
+    sVar6 = 0;
+    *(float*)(iVar5 + 0x1C) = fVar3;
+    fVar4 = FLOAT_80332e64;
+    sVar7 = 4;
+    *(int*)(iVar5 + 0x2C) = 5;
+    *(int*)(iVar5 + 0x30) = 5;
+    iVar5 = 0x100;
+    iVar10 = *(int*)((u8*)this + 0x850);
+    *(int*)(iVar10 + 0x64) = 0x47;
+    *(s16*)(iVar10 + 0x48) = 0x50;
+    *(s16*)(iVar10 + 0x4A) = 0xE;
+    *(s16*)(iVar10 + 0x4C) = 0x30;
+    *(s16*)(iVar10 + 0x4E) = 0x30;
+    *(float*)(iVar10 + 0x50) = fVar2;
+    *(float*)(iVar10 + 0x54) = fVar2;
+    *(float*)(iVar10 + 0x5C) = fVar3;
+    *(int*)(iVar10 + 0x6C) = 0;
+    *(int*)(iVar10 + 0x70) = 5;
+    iVar10 = *(int*)((u8*)this + 0x850);
+    *(int*)(iVar10 + 0xA4) = 0x47;
+    *(s16*)(iVar10 + 0x88) = 0x55;
+    *(s16*)(iVar10 + 0x8C) = 0x30;
+    *(s16*)(iVar10 + 0x8E) = 0x30;
+    *(s16*)(iVar10 + 0x8A) = (s16)(0x150 - *(s16*)(iVar10 + 0x8E));
+    *(float*)(iVar10 + 0x90) = fVar2;
+    *(float*)(iVar10 + 0x94) = fVar2;
+    *(float*)(iVar10 + 0x9C) = fVar4;
+    *(int*)(iVar10 + 0xAC) = 0;
+    *(int*)(iVar10 + 0xB0) = 5;
+    iVar10 = *(int*)((u8*)this + 0x850);
+    *(int*)(iVar10 + 0xF4) = 2;
+    *(int*)(iVar10 + 0xE4) = 0x2E;
+    *(s16*)(iVar10 + 0xC8) = 0x50;
+    *(s16*)(iVar10 + 0xCA) = 8;
+    *(s16*)(iVar10 + 0xCC) = 0x48;
+    *(s16*)(iVar10 + 0xCE) = 0x140;
+    *(float*)(iVar10 + 0xD0) = fVar2;
+    *(float*)(iVar10 + 0xD4) = fVar2;
+    *(int*)(iVar10 + 0xEC) = 0;
+    *(int*)(iVar10 + 0xF0) = 5;
+    iVar10 = *(int*)((u8*)this + 0x850);
+    iVar11 = 4;
+    do {
+        psVar8 = (s16*)(*(int*)((u8*)this + 0x850) + iVar5 + 8);
+        psVar8[0x16] = 0;
+        psVar8[0x17] = 2;
+        psVar8[0xE] = 0;
+        psVar8[0xF] = 0x37;
+        sVar7 = sVar7 + 2;
+        *psVar8 = *(s16*)(iVar10 + 8) + 0x24;
+        s16 sVar1 = sVar6 + 0x20;
+        psVar8[1] = *(s16*)(iVar10 + 0xA) + sVar6;
+        psVar8[2] = 200;
+        psVar8[3] = 0x28;
+        *(float*)(psVar8 + 4) = fVar2;
+        *(float*)(psVar8 + 6) = fVar2;
+        psVar8[0x12] = 0;
+        psVar8[0x13] = 7;
+        psVar8[0x14] = 0;
+        psVar8[0x15] = 5;
+        iVar9 = iVar5 + 0x48;
+        iVar5 += 0x80;
+        psVar8 = (s16*)(*(int*)((u8*)this + 0x850) + iVar9);
+        psVar8[0x16] = 0;
+        psVar8[0x17] = 2;
+        psVar8[0xE] = 0;
+        psVar8[0xF] = 0x37;
+        *psVar8 = *(s16*)(iVar10 + 8) + 0x24;
+        sVar6 = sVar6 + 0x40;
+        psVar8[1] = *(s16*)(iVar10 + 0xA) + sVar1;
+        psVar8[2] = 200;
+        psVar8[3] = 0x28;
+        *(float*)(psVar8 + 4) = fVar2;
+        *(float*)(psVar8 + 6) = fVar2;
+        psVar8[0x12] = 0;
+        psVar8[0x13] = 7;
+        psVar8[0x14] = 0;
+        psVar8[0x15] = 5;
+        iVar11 -= 1;
+    } while (iVar11 != 0);
+    **(s16**)((u8*)this + 0x850) = sVar7;
+    *(s16*)(*(int*)((u8*)this + 0x82C) + 0x26) = 0;
+    *(u8*)(*(int*)((u8*)this + 0x82C) + 0xB) = 1;
 }
 
 /*

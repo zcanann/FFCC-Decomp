@@ -368,6 +368,9 @@ void CMenuPcs::MLstClose()
 	unsigned int itemCount;
 	unsigned int remaining;
 	short* item;
+	double zero;
+	double one;
+	float alphaZero;
 
 	completedItems = 0;
 	*(short*)(*(int*)((char*)this + 0x82c) + 0x22) = *(short*)(*(int*)((char*)this + 0x82c) + 0x22) + 1;
@@ -375,14 +378,16 @@ void CMenuPcs::MLstClose()
 	item = *(short**)((char*)this + 0x850) + 4;
 	currentFrame = (int)*(short*)(*(int*)((char*)this + 0x82c) + 0x22);
 	remaining = itemCount;
+	zero = 0.0;
+	one = 1.0;
 
 	if (0 < (int)itemCount) {
 		do {
 			if (*(int*)(item + 0x12) <= currentFrame) {
 				if (currentFrame < *(int*)(item + 0x12) + *(int*)(item + 0x14)) {
 					*(int*)(item + 0x10) = *(int*)(item + 0x10) + 1;
-					*(float*)(item + 8) = 1.0f - (float)*(int*)(item + 0x10) / (float)*(int*)(item + 0x14);
-					if (*(float*)(item + 8) < 0.0f) {
+					*(float*)(item + 8) = (float)-((one / (double)*(int*)(item + 0x14)) * (double)*(int*)(item + 0x10) - one);
+					if ((double)*(float*)(item + 8) < zero) {
 						*(float*)(item + 8) = 0.0f;
 					}
 				} else {
@@ -396,6 +401,7 @@ void CMenuPcs::MLstClose()
 		} while (remaining != 0);
 	}
 
+	alphaZero = 0.0f;
 	if (**(short**)((char*)this + 0x850) == completedItems) {
 		item = *(short**)((char*)this + 0x850) + 4;
 		if (0 < (int)itemCount) {
@@ -406,42 +412,42 @@ void CMenuPcs::MLstClose()
 					item[0x13] = 0;
 					item[0x14] = 0;
 					item[0x15] = 1;
-					*(float*)(item + 8) = 0.0f;
+					*(float*)(item + 8) = alphaZero;
 					item[0x32] = 0;
 					item[0x33] = 0;
 					item[0x34] = 0;
 					item[0x35] = 1;
-					*(float*)(item + 0x28) = 0.0f;
+					*(float*)(item + 0x28) = alphaZero;
 					item[0x52] = 0;
 					item[0x53] = 0;
 					item[0x54] = 0;
 					item[0x55] = 1;
-					*(float*)(item + 0x48) = 0.0f;
+					*(float*)(item + 0x48) = alphaZero;
 					item[0x72] = 0;
 					item[0x73] = 0;
 					item[0x74] = 0;
 					item[0x75] = 1;
-					*(float*)(item + 0x68) = 0.0f;
+					*(float*)(item + 0x68) = alphaZero;
 					item[0x92] = 0;
 					item[0x93] = 0;
 					item[0x94] = 0;
 					item[0x95] = 1;
-					*(float*)(item + 0x88) = 0.0f;
+					*(float*)(item + 0x88) = alphaZero;
 					item[0xb2] = 0;
 					item[0xb3] = 0;
 					item[0xb4] = 0;
 					item[0xb5] = 1;
-					*(float*)(item + 0xa8) = 0.0f;
+					*(float*)(item + 0xa8) = alphaZero;
 					item[0xd2] = 0;
 					item[0xd3] = 0;
 					item[0xd4] = 0;
 					item[0xd5] = 1;
-					*(float*)(item + 200) = 0.0f;
+					*(float*)(item + 200) = alphaZero;
 					item[0xf2] = 0;
 					item[0xf3] = 0;
 					item[0xf4] = 0;
 					item[0xf5] = 1;
-					*(float*)(item + 0xe8) = 0.0f;
+					*(float*)(item + 0xe8) = alphaZero;
 					item = item + 0x100;
 					remaining = remaining - 1;
 				} while (remaining != 0);
@@ -457,7 +463,7 @@ void CMenuPcs::MLstClose()
 				item[0x13] = 0;
 				item[0x14] = 0;
 				item[0x15] = 1;
-				*(float*)(item + 8) = 0.0f;
+				*(float*)(item + 8) = alphaZero;
 				item = item + 0x20;
 				itemCount = itemCount - 1;
 			} while (itemCount != 0);

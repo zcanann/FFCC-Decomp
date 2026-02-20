@@ -12,16 +12,36 @@ extern "C" CProfile* __ct__8CProfileFPc(CProfile*, char*);
 extern "C" CPartPcs* __dt__8CPartPcsFv(CPartPcs*, short);
 extern "C" CProfile* __dt__8CProfileFv(CProfile*, short);
 extern "C" int sprintf(char*, const char*, ...);
+extern "C" void* memset(void*, int, unsigned long);
 extern "C" int pppLoadPtx__8CPartMngFPCciiPvi(CPartMng*, const char*, int, int, void*, int);
 extern "C" int pppLoadPdt__8CPartMngFPCciiPvi(CPartMng*, const char*, int, int, void*, int);
 extern "C" void pppReleasePdt__8CPartMngFi(CPartMng*, int);
+extern "C" void IsBigAlloc__7CUSBPcsFi(void*, int);
+extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
+extern "C" void Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFUl_UcUlPFUl_UcUlPFUl_UcUl(
+    void*,
+    char*,
+    void*,
+    void*,
+    int,
+    void*,
+    unsigned long,
+    void*,
+    unsigned long,
+    void*,
+    unsigned long);
 
 extern CPartMng PartMng;
 extern unsigned char PartPcs[];
+extern unsigned char USBPcs[];
+extern void* CAMemCacheSet;
 
 extern char DAT_801ead4c[];
 extern char s_prioTime__d_prio__d_pdtID__2d_fp_801d81a0[];
 extern char DAT_801d81d4[];
+extern char s_CPartPcs_801d7f54[];
+extern char s_CPartPcs_dat_801d810c[];
+extern char s_CPartPcs_amem_801d811c[];
 extern char s_p_tina_cpp_801d8008[];
 extern char s_Tina___c__801d8014[];
 extern char s_clc___3f___max___3f___801d8020[];
@@ -183,6 +203,24 @@ static unsigned char GetMngStPrioTime(const _pppMngSt* pppMngSt)
 {
 	return *(const unsigned char*)((const char*)pppMngSt + 0xf9);
 }
+
+struct CUSBStreamDataRaw {
+    unsigned char* m_data;
+    int m_headerReady;
+    int m_dataReady;
+    unsigned int m_sizeBytes;
+    unsigned int m_packetCode;
+    void* m_stageDefault;
+    void* m_stageLoad;
+    void* m_stageAmem;
+    void* m_stageExtra;
+    void* m_freePtr;
+    unsigned char m_fieldLoadReq;
+    unsigned char m_printFreeOnNext;
+    unsigned char m_blockOnFrame;
+    unsigned char m_miruraEventActive;
+    unsigned char m_disableShokiDraw;
+};
 
 /*
  * --INFO--
@@ -480,7 +518,45 @@ void CPartPcs::createLoad()
  */
 void CPartPcs::createViewer()
 {
-	// TODO
+    void* stage;
+    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 8);
+
+    IsBigAlloc__7CUSBPcsFi(USBPcs, 1);
+    usb->m_freePtr = 0;
+    usb->m_stageExtra = 0;
+    usb->m_blockOnFrame = 0;
+    usb->m_miruraEventActive = 0;
+    usb->m_disableShokiDraw = 0;
+
+    if (Game.game.m_currentSceneId == 7) {
+        stage = CreateStage__7CMemoryFUlPci(&Memory, 0x180000, s_CPartPcs_dat_801d810c, 0);
+        usb->m_stageLoad = stage;
+        usb->m_stageDefault = stage;
+        usb->m_stageAmem = 0;
+    } else {
+        stage = CreateStage__7CMemoryFUlPci(&Memory, 0x180000, s_CPartPcs_dat_801d810c, 0);
+        usb->m_stageLoad = stage;
+        usb->m_stageDefault = stage;
+        stage = CreateStage__7CMemoryFUlPci(&Memory, 0x400000, s_CPartPcs_amem_801d811c, 2);
+        usb->m_stageAmem = stage;
+    }
+
+    Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFUl_UcUlPFUl_UcUlPFUl_UcUl(
+        CAMemCacheSet,
+        s_CPartPcs_801d7f54,
+        usb->m_stageLoad,
+        usb->m_stageAmem,
+        0x400,
+        reinterpret_cast<void*>(pppNotAllocAmemCacheRmem),
+        0,
+        reinterpret_cast<void*>(pppAmemDeletePmng),
+        0,
+        reinterpret_cast<void*>(pppAmemRefCntError),
+        0);
+
+    memset(&PartMng, 0, 0x23FD8);
+    PartMng.Create();
+    reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 8)->CreateBuffer();
 }
 
 /*

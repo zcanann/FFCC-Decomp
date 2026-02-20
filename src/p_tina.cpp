@@ -1,6 +1,7 @@
 #include "ffcc/p_tina.h"
 #include "ffcc/graphic.h"
 #include "ffcc/partMng.h"
+#include "ffcc/p_game.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/stopwatch.h"
 #include "ffcc/USBStreamData.h"
@@ -10,6 +11,10 @@ extern "C" CUSBStreamData* __ct__14CUSBStreamDataFv(CUSBStreamData*);
 extern "C" CProfile* __ct__8CProfileFPc(CProfile*, char*);
 extern "C" CPartPcs* __dt__8CPartPcsFv(CPartPcs*, short);
 extern "C" CProfile* __dt__8CProfileFv(CProfile*, short);
+extern "C" int sprintf(char*, const char*, ...);
+extern "C" int pppLoadPtx__8CPartMngFPCciiPvi(CPartMng*, const char*, int, int, void*, int);
+extern "C" int pppLoadPdt__8CPartMngFPCciiPvi(CPartMng*, const char*, int, int, void*, int);
+extern "C" void pppReleasePdt__8CPartMngFi(CPartMng*, int);
 
 extern CPartMng PartMng;
 extern unsigned char PartPcs[];
@@ -33,6 +38,8 @@ extern double lbl_8032FDC0;
 extern CProfile g_par_calc_prof;
 extern CProfile g_par_draw_prof;
 extern char s_no_name_8032fdcc[];
+extern char s_dvd_tina_stage_03d_mirura_801d7f78[];
+extern char s_dvd_tina_stage_03d_title_801d7f94[];
 extern unsigned char ARRAY_80273928[];
 extern unsigned char ARRAY_80273968[];
 extern unsigned char ARRAY_802739e8[];
@@ -802,52 +809,94 @@ void CPartPcs::LoadMenuPdt(char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80052100
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartPcs::ReleasePdt(int)
+void CPartPcs::ReleasePdt(int pdtSlot)
 {
-	// TODO
+    pppReleasePdt__8CPartMngFi(&PartMng, pdtSlot);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005205c
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartPcs::StartLocationTitle()
 {
-	// TODO
+    int loaded;
+    char path[1028];
+    CUSBStreamData* usb = reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 8);
+
+    sprintf(path, s_dvd_tina_stage_03d_title_801d7f94, Game.game.m_currentMapId);
+    loaded = pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, path, 6, 0, 0, 0);
+    if ((loaded != 0) && ((loaded = pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, path, 6, 0, 0, 0), loaded != 0))) {
+        usb->m_blockOnFrame = 1;
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005201c
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartPcs::EndLocationTitle()
 {
-	// TODO
+    CUSBStreamData* usb = reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 8);
+
+    pppReleasePdt__8CPartMngFi(&PartMng, 6);
+    usb->m_blockOnFrame = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80051f78
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartPcs::StartMiruraEvent()
 {
-	// TODO
+    int loaded;
+    char path[1028];
+    CUSBStreamData* usb = reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 8);
+
+    sprintf(path, s_dvd_tina_stage_03d_mirura_801d7f78, Game.game.m_currentMapId);
+    loaded = pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, path, 7, 0, 0, 0);
+    if ((loaded != 0) && ((loaded = pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, path, 7, 0, 0, 0), loaded != 0))) {
+        usb->m_miruraEventActive = 1;
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80051f38
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartPcs::EndMiruraEvent()
 {
-	// TODO
+    CUSBStreamData* usb = reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 8);
+
+    pppReleasePdt__8CPartMngFi(&PartMng, 7);
+    usb->m_miruraEventActive = 0;
 }
 
 /*

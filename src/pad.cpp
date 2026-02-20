@@ -166,17 +166,24 @@ void CPad::Frame()
 	joyBusDataPtr = joyBusData;
 	for (int i = 0; i < 4; i++)
 	{
-		u16 ctrlMode = static_cast<u16>(Joybus.GetCtrlMode(i)) & 0x3FFF;
-		u16 flags = static_cast<u16>((__cntlzw(0x40000 - SIProbe(i)) << 10) & 0x8000);
-		u16 packedMode = static_cast<u16>(flags | ctrlMode);
-		if (((packedMode & 0x8000) != 0) && ((packedMode & 0x3FFF) == 0))
-		{
-			packedMode = static_cast<u16>(packedMode | 0x4000);
-		}
+		int probe = SIProbe(i);
+		int leading = __cntlzw(0x40000 - probe);
+		*reinterpret_cast<u8*>(joyBusDataPtr) =
+			static_cast<u8>(((leading << 2) & 0x80) | (*reinterpret_cast<u8*>(joyBusDataPtr) & 0x7F));
 
-		joyBusDataPtr[0] = packedMode;
+		u16 ctrlMode = static_cast<u16>(Joybus.GetCtrlMode(i));
+		joyBusDataPtr[0] = static_cast<u16>((ctrlMode & 0x3FFF) | (joyBusDataPtr[0] & 0xC000));
+
+		int setBit = 0;
+		if ((static_cast<s8>(*reinterpret_cast<u8*>(joyBusDataPtr)) < 0) && ((joyBusDataPtr[0] & 0x3FFF) == 0))
+		{
+			setBit = 1;
+		}
+		*reinterpret_cast<u8*>(joyBusDataPtr) =
+			static_cast<u8>((setBit << 6) | (*reinterpret_cast<u8*>(joyBusDataPtr) & 0xBF));
+
 		joyBusDataPtr[1] = 0;
-		if ((packedMode & 0x8000) != 0)
+		if (static_cast<s8>(*reinterpret_cast<u8*>(joyBusDataPtr)) < 0)
 		{
 			joyBusDataPtr[1] = static_cast<u16>(Joybus.GetPadData(i));
 		}

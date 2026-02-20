@@ -379,15 +379,16 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
     for (groupIndex = 0; groupIndex < (int)groupTableCount; groupIndex++) {
         int* group = groupTable + groupIndex * 0x17;
         if ((group[0] != 1) && (*(signed char*)group[1] != -1) && (*(signed char*)group[2] == 1)) {
-            float* position = (float*)(group + 3);
-            float* velocity = (float*)(group + 6);
+            Vec unitVelocity;
+            unitVelocity.x = 0.0f;
+            unitVelocity.y = 0.0f;
+            unitVelocity.z = 1.0f;
             group[9] = *(int*)((unsigned char*)pYmBreath + 0x14);
-            position[0] = 0.0f;
-            position[1] = 0.0f;
-            position[2] = 0.0f;
-            velocity[0] = 0.0f;
-            velocity[1] = 0.0f;
-            velocity[2] = 1.0f;
+            *(float*)(group + 3) = 0.0f;
+            *((float*)(group + 3) + 1) = 0.0f;
+            *((float*)(group + 3) + 2) = 0.0f;
+            *(Vec*)(group + 6) = unitVelocity;
+            PSMTXCopy(*(Mtx*)pppMngStPtr, *(Mtx*)(group + 0xB));
             group[0] = 1;
         }
     }

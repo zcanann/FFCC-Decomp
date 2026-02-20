@@ -6,6 +6,7 @@
 #include <string.h>
 
 extern CRedEntry DAT_8032e154;
+extern int DAT_8032e12c;
 extern void* DAT_8032f3f0;
 extern void* DAT_8032f3fc;
 extern unsigned int* DAT_8032f444;
@@ -257,19 +258,46 @@ int SeStopMG(int bank, int sep, int group, int kind)
  * Address:	TODO
  * Size:	TODO
  */
-void _SePlayStart(RedSeINFO*, int, int, int, int)
+int _SePlayStart(RedSeINFO*, int, int, int, int)
 {
 	// TODO
+	return 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cabb0
+ * PAL Size: 264b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void SeBlockPlay(int, int, int, int, int)
+int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 {
-	// TODO
+	int bankData;
+	int seOffset;
+	unsigned char* seInfo;
+
+	bank &= 3;
+	no &= 0x1ff;
+	bankData = (&DAT_8032e12c)[bank];
+	if (bankData != 0) {
+		if ((no < *(short*)(bankData + 10)) &&
+		    (*(int*)((bankData + 0x10) + no * 4) != -1)) {
+			seOffset = *(int*)((bankData + 0x10) + no * 4);
+			seInfo = (unsigned char*)((bankData + 0x10) + *(short*)(bankData + 10) * 4 +
+			                          (seOffset & 0x7fffffff));
+			if ((seOffset & 0x80000000) != 0) {
+				*seInfo |= 0x80;
+			}
+			if (_SePlayStart((RedSeINFO*)seInfo, seId, no + bank * 0x200 | 0x80000000, pan, volume) !=
+			    0) {
+				return no;
+			}
+		}
+	}
+	return -1;
 }
 
 /*

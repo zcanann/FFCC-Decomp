@@ -284,12 +284,35 @@ void SeSepPlay(int, int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cad78
+ * PAL Size: 168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void SetSeVolume(int, int, int, int)
+void SetSeVolume(int seId, int volume, int frameCount, int mode)
 {
-	// TODO
+	int* track;
+	int step;
+
+	if (frameCount < 1) {
+		frameCount = 1;
+	}
+
+	track = *(int**)((char*)DAT_8032f3f0 + 0xdbc);
+	step = (frameCount * 0x60) / 0x3c + ((frameCount * 0x60) >> 0x1f);
+	step = step - (step >> 0x1f);
+
+	do {
+		if ((*track != 0) && ((seId < 0) || (track[0x3e] == seId))) {
+			track[0x14] = ((volume << 0xc) | 0x800) - track[0x13];
+			track[0x14] /= step;
+			track[0x15] = step;
+			track[0x16] = mode;
+		}
+		track += 0x55;
+	} while (track < (int*)(*(int*)((char*)DAT_8032f3f0 + 0xdbc) + 0x2a80));
 }
 
 /*

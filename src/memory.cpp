@@ -908,12 +908,69 @@ void CAmemCacheSet::Release(short)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001C800
+ * PAL Size: 1012b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CAmemCacheSet::AmemFreeLowPrio(int)
+void CAmemCacheSet::AmemFreeLowPrio(int size)
 {
-	// TODO
+    unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
+    unsigned int bestPriority = 0x7ffffff1;
+    int currentSize = size;
+
+    while (true) {
+        int cacheCount = *reinterpret_cast<int*>(bytes + 0x3C);
+        unsigned char* bestEntry = 0;
+
+        for (int i = 0; i < cacheCount; i++) {
+            unsigned char* entry = reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x58) + i * 0x1C);
+            if (entry[0x0E] != 0 && *reinterpret_cast<short*>(entry + 0x0C) == 0 && entry[0x1A] != 0 &&
+                *reinterpret_cast<int*>(entry + 0x00) != 0 && currentSize <= *reinterpret_cast<int*>(entry + 0x08) &&
+                *reinterpret_cast<unsigned int*>(entry + 0x10) < bestPriority) {
+                bestEntry = entry;
+                bestPriority = *reinterpret_cast<unsigned int*>(entry + 0x10);
+            }
+        }
+
+        if (bestEntry != 0) {
+            int cachedData = *reinterpret_cast<int*>(bestEntry + 0x00);
+            if (cachedData != 0) {
+                operator delete(reinterpret_cast<void*>(cachedData));
+            }
+            *reinterpret_cast<int*>(bestEntry + 0x00) = 0;
+        }
+
+        CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(bytes + 0x00);
+        int allocated = reinterpret_cast<int>(stage->alloc(size, s_memory_cpp, 0x86D, 1));
+        if (allocated != 0) {
+            operator delete(reinterpret_cast<void*>(allocated));
+            return;
+        }
+
+        if (currentSize != 0) {
+            currentSize -= size / 2;
+            if (currentSize < 0) {
+                currentSize = 0;
+            }
+            continue;
+        }
+
+        if (bestPriority == 0xFFFFFFFF) {
+            unsigned char (*releaseCheck)(unsigned long) =
+                *reinterpret_cast<unsigned char (**)(unsigned long)>(bytes + 0x40);
+            if (releaseCheck != 0 && releaseCheck(*reinterpret_cast<unsigned long*>(bytes + 0x44)) != 0) {
+                continue;
+            }
+            unsigned char (*releaseAction)(unsigned long) =
+                *reinterpret_cast<unsigned char (**)(unsigned long)>(bytes + 0x48);
+            releaseAction(*reinterpret_cast<unsigned long*>(bytes + 0x4C));
+            bestPriority = 0xFFFFFFFF;
+            continue;
+        }
+    }
 }
 
 /*

@@ -20,6 +20,8 @@ extern CMiniGamePcs MiniGamePcs;
 #include <dolphin/os/OSRtc.h>
 #include <string.h>
 
+typedef void* ConstructorDestructor;
+
 extern "C" {
 unsigned int AddScenegraph__7CSystemFP8CProcessi(CSystem*, void*, int);
 void RemoveScenegraph__7CSystemFP8CProcessi(CSystem*, void*, int);
@@ -129,6 +131,16 @@ extern const char* lbl_801D60B0[];
 extern const char* lbl_801E8344[];
 int sprintf(char*, const char*, ...);
 int rand(void);
+void __construct_array(void*, ConstructorDestructor, ConstructorDestructor, unsigned long, unsigned long);
+void* __register_global_object(void*, void*, void*);
+void __ct__12CCaravanWorkFv(void*);
+void __dt__12CCaravanWorkFv(void*, int);
+void __ct__8CMonWorkFv(void*);
+void __dt__8CMonWorkFv(void*, int);
+void __ct__9CFlatDataFv(void*);
+void __dt__9CFlatDataFv(void*, int);
+void __dt__5CGameFv(void*, int);
+void* __vt__5CGame[];
 }
 
 static const float FLOAT_8032f688 = 1.0E+10;
@@ -162,6 +174,69 @@ struct CFlatDataView
 // Uninitialized
 static float FLOAT_8032ec40;
 static bool BOOL_8032ec44;
+
+/*
+ * --INFO--
+ * PAL Address: 0x80016220
+ * PAL Size: 312b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_game_cpp(void)
+{
+    *reinterpret_cast<void**>(&Game.game) = __vt__5CGame;
+
+    memset(reinterpret_cast<unsigned char*>(&Game.game) + 0xF, 0, 0x13E1);
+    memset(reinterpret_cast<unsigned char*>(&Game.game) + 0x20, 0xFF, 0x10);
+
+    Game.game.m_gameWork.m_scriptSysVal0 = 0;
+    Game.game.m_gameWork.m_scriptSysVal1 = 0;
+    Game.game.m_gameWork.m_scriptSysVal2 = 0;
+    Game.game.m_gameWork.m_scriptSysVal3 = 1;
+    Game.game.m_gameWork.m_chaliceElement = 1;
+
+    const char* townName = DAT_8032f6ac;
+    if (Game.game.m_gameWork.m_languageId == 3) {
+        townName = DAT_8032f6a4;
+    }
+    strcpy(Game.game.m_gameWork.m_townName, townName);
+
+    Game.game.m_gameWork.m_gameInitFlag = 1;
+
+    __construct_array(
+        Game.game.m_caravanWorkArr,
+        reinterpret_cast<ConstructorDestructor>(__ct__12CCaravanWorkFv),
+        reinterpret_cast<ConstructorDestructor>(__dt__12CCaravanWorkFv),
+        0xC30,
+        9
+    );
+    __construct_array(
+        Game.game.m_monWorkArr,
+        reinterpret_cast<ConstructorDestructor>(__ct__8CMonWorkFv),
+        reinterpret_cast<ConstructorDestructor>(__dt__8CMonWorkFv),
+        0x110,
+        0x40
+    );
+
+    Game.game.m_partyMinZ = FLOAT_8032f688;
+    Game.game.m_partyMinY = FLOAT_8032f688;
+    Game.game.m_partyMinX = FLOAT_8032f688;
+    Game.game.m_partyMaxZ = FLOAT_8032f68c;
+    Game.game.m_partyMaxY = FLOAT_8032f68c;
+    Game.game.m_partyMaxX = FLOAT_8032f68c;
+
+    __construct_array(
+        Game.game.m_cFlatDataArr,
+        reinterpret_cast<ConstructorDestructor>(__ct__9CFlatDataFv),
+        reinterpret_cast<ConstructorDestructor>(__dt__9CFlatDataFv),
+        0x14D4,
+        4
+    );
+
+    __register_global_object(&Game.game, reinterpret_cast<void*>(__dt__5CGameFv), &Game);
+}
 
 /*
  * --INFO--

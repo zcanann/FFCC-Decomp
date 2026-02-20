@@ -2,12 +2,22 @@
 #include "ffcc/RedSound/RedEntry.h"
 #include "ffcc/RedSound/RedMemory.h"
 #include "ffcc/RedSound/RedMidiCtrl.h"
+#include <dolphin/os.h>
 #include <string.h>
 
 extern CRedEntry DAT_8032e154;
 extern void* DAT_8032f3f0;
 extern void* DAT_8032f3fc;
 extern unsigned int* DAT_8032f444;
+extern int DAT_8032f408;
+extern int DAT_8021d1a8;
+extern char DAT_801e7e3e;
+extern char s__sPause___SE___ON__d_801e7e50[];
+extern char s__sPause___SE___OFF__d_801e7e6b[];
+
+extern "C" {
+int fflush(void*);
+}
 
 /*
  * --INFO--
@@ -304,12 +314,49 @@ void SetSePitch(int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801caf68
+ * PAL Size: 312b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void SePause(int, int)
+void SePause(int seId, int pause)
 {
-	// TODO
+	unsigned int* trackBasePtr;
+	unsigned int track;
+	unsigned int voice;
+
+	if (DAT_8032f408 != 0) {
+		if (pause == 1) {
+			OSReport(s__sPause___SE___ON__d_801e7e50, &DAT_801e7e3e, seId);
+		} else {
+			OSReport(s__sPause___SE___OFF__d_801e7e6b, &DAT_801e7e3e, seId);
+		}
+		fflush(&DAT_8021d1a8);
+	}
+
+	trackBasePtr = (unsigned int*)((char*)DAT_8032f3f0 + 0xdbc);
+	track = *trackBasePtr;
+	voice = (unsigned int)DAT_8032f444 + 0x1800;
+	do {
+		if ((*(int*)(track + 0xf8) != 0) && ((seId == -1) || (seId == *(int*)(track + 0xf8)))) {
+			if (pause == 1) {
+				if (*(int*)(voice + 0x14) != 0) {
+					*(unsigned int*)(voice + 0x9c) = 0;
+					*(unsigned int*)(voice + 0x90) |= 0x18;
+				}
+				*(unsigned int*)(track + 0xfc) |= 8;
+				*(unsigned int*)(voice + 0x94) |= 8;
+			} else {
+				*(unsigned int*)(voice + 0xb8) |= 3;
+				*(unsigned int*)(track + 0xfc) &= 0xfffffff7;
+				*(unsigned int*)(voice + 0x94) &= 0xfffffff7;
+			}
+		}
+		track += 0x154;
+		voice += 0xc0;
+	} while (track < *trackBasePtr + 0x2a80);
 }
 
 /*

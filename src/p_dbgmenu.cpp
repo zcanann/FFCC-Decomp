@@ -2,6 +2,7 @@
 #include "ffcc/gxfunc.h"
 #include "ffcc/graphic.h"
 #include "ffcc/pad.h"
+#include "ffcc/p_minigame.h"
 #include "ffcc/system.h"
 #include <dolphin/gx.h>
 #include <string.h>
@@ -15,8 +16,36 @@ extern unsigned char PartPcs[];
 extern unsigned char Sound[];
 extern char s_Debug_80331c90[];
 extern u32 PTR_DAT_80212524;
+extern u32 PTR_PTR_s_CDbgMenuPcs_802126c4;
+extern u32 DAT_80212398;
+extern u32 DAT_8021239c;
+extern u32 PTR_create__11CDbgMenuPcsFv_802123a0;
+extern u32 DAT_802123a4;
+extern u32 DAT_802123a8;
+extern u32 PTR_destroy__11CDbgMenuPcsFv_802123ac;
+extern u32 DAT_802123b0;
+extern u32 DAT_802123b4;
+extern u32 PTR_calc__11CDbgMenuPcsFv_802123b8;
+extern u32 DAT_802123bc;
+extern u32 DAT_802123c0;
+extern u32 PTR_draw__11CDbgMenuPcsFv_802123c4;
+extern u32 DAT_802123cc;
+extern u32 DAT_802123d0;
+extern u32 DAT_802123d4;
+extern u32 DAT_802123d8;
+extern u32 DAT_802123dc;
+extern u32 DAT_802123e0;
+extern u32 DAT_802123e4;
+extern u32 DAT_802123e8;
+extern u32 DAT_802123ec;
+extern u32 DAT_802123f8;
+extern u32 DAT_802123fc;
+extern u32 DAT_80212400;
+extern CMiniGamePcs MiniGamePcs;
 
 extern "C" int __cntlzw(unsigned int);
+extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
+extern "C" void __ct__Q211CDbgMenuPcs3CDMFv(void*);
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void*, int, int, int, int, void*, void*);
 extern "C" void CheckDriver__6CSoundFi(void*, int);
@@ -34,17 +63,23 @@ extern "C" void DumpLoad__9CCharaPcsFv(void*);
  */
 extern "C" void __sinit_p_dbgmenu_cpp()
 {
-	// Static initialization function for debug menu system
-	// Initialize MiniGamePcs structure
-	// memset calls for initialization
-	memset((void*)0x80306710, 0, 0x34);
-	memset((void*)0x80306744, 0, 0x20);
-	
-	// Initialize debug menu array with constructor calls
-	// __construct_array call for CDM objects
-	
-	// Set up vtable pointers and function pointers
-	// These appear to be vtable entries for CDbgMenuPcs
+	*(u32*)((u8*)&MiniGamePcs + 0x6480) = (u32)&PTR_PTR_s_CDbgMenuPcs_802126c4;
+	memset((u8*)&DbgMenuPcs, 0, 0x34);
+	memset((u8*)&DbgMenuPcs + 0x34, 0, 0x20);
+	__construct_array((u8*)&DbgMenuPcs + 0x54, __ct__Q211CDbgMenuPcs3CDMFv, 0, 0x54, 0x80);
+
+	DAT_802123cc = DAT_80212398;
+	DAT_802123d0 = DAT_8021239c;
+	DAT_802123d4 = PTR_create__11CDbgMenuPcsFv_802123a0;
+	DAT_802123d8 = DAT_802123a4;
+	DAT_802123dc = DAT_802123a8;
+	DAT_802123e0 = PTR_destroy__11CDbgMenuPcsFv_802123ac;
+	DAT_802123e4 = DAT_802123b0;
+	DAT_802123e8 = DAT_802123b4;
+	DAT_802123ec = PTR_calc__11CDbgMenuPcsFv_802123b8;
+	DAT_802123f8 = DAT_802123bc;
+	DAT_802123fc = DAT_802123c0;
+	DAT_80212400 = PTR_draw__11CDbgMenuPcsFv_802123c4;
 }
 
 /*

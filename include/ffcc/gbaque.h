@@ -145,16 +145,16 @@ public:
     void GetSPModeFlg(int);
     void ClrSPModeFlg(int);
     unsigned int GetSPMode(int);
-    void GetMemorysFlg(int);
+    unsigned int GetMemorysFlg(int);
     void ClrMemorysFlg(int);
     unsigned char GetMemorys(int);
-    void GetCmdNumFlg(int);
+    unsigned int GetCmdNumFlg(int);
     void ClrCmdNumFlg(int);
     unsigned char GetCmdNum(int);
-    void GetPlayModeFlg(int);
+    unsigned int GetPlayModeFlg(int);
     void ClrPlayModeFlg(int);
     void SetStartBonusFlg();
-    void GetStartBonusFlg(int);
+    unsigned int GetStartBonusFlg(int);
     void ClrStartBonusFlg(int);
 
 private:

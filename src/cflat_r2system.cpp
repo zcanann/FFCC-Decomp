@@ -41,6 +41,9 @@ int GetWait__4CMesFv(void*);
 unsigned char DAT_8032ecb8;
 }
 extern "C" double fmod(double, double);
+extern "C" double atan2(double, double);
+extern "C" double cos(double);
+extern "C" double sin(double);
 
 /*
  * --INFO--
@@ -1312,6 +1315,48 @@ extern "C" void SetFov__10CCameraPcsFf(CCameraPcs* camera, float fov)
 void CCameraPcs::SetZRotate(float zRotate)
 {
     *(float*)((char*)this + 0x108) = zRotate;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9B44
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" float atan2__3stdFff(float y, float x)
+{
+    return (float)atan2((double)y, (double)x);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9B68
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" float cosf__3stdFf(float x)
+{
+    return (float)cos((double)x);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9B8C
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" float sinf__3stdFf(float x)
+{
+    return (float)sin((double)x);
 }
 
 /*

@@ -740,16 +740,19 @@ float CFont::GetWidth(unsigned short ch)
 	}
 
 	if (count == 0) {
-		unsigned short* fallback = m_glyphBuckets[63] + 1;
-		unsigned int fallbackCount = static_cast<unsigned int>(m_glyphBuckets[63][0]);
-		for (; fallbackCount != 0; fallbackCount--) {
-			if (*reinterpret_cast<char*>(fallback + 1) == '\0') {
-				glyph = fallback;
+		glyph = 0;
+	}
+
+	if (glyph == 0) {
+		glyphBucket = m_glyphBuckets[63];
+		glyph = glyphBucket + 1;
+		for (count = static_cast<unsigned int>(glyphBucket[0]); count != 0; count--) {
+			if (*reinterpret_cast<char*>(glyph + 1) == '\0') {
 				break;
 			}
-			fallback += 4;
+			glyph += 4;
 		}
-		if (fallbackCount == 0) {
+		if (count == 0) {
 			return 0.0f;
 		}
 	}
@@ -757,10 +760,9 @@ float CFont::GetWidth(unsigned short ch)
 	unsigned int drawWidth;
 	if ((renderFlags & 0x10) != 0) {
 		drawWidth = m_glyphWidth;
-	} else if ((renderFlags & 0x80) != 0) {
-		drawWidth = *(reinterpret_cast<unsigned char*>(glyph) + 6);
 	} else {
-		drawWidth = *(reinterpret_cast<unsigned char*>(glyph) + 4);
+		drawWidth = *(reinterpret_cast<unsigned char*>(glyph) + 4 +
+		             ((static_cast<signed char>(renderFlags) >> 7) & 2));
 	}
 
 	float width = scaleX * (margin + static_cast<float>(drawWidth));

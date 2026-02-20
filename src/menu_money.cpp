@@ -381,8 +381,48 @@ int CMenuPcs::MoneyCtrlCur()
 			if (*selectedFlag == 0) {
 				caravanWork->FGPutGil(static_cast<int>(DAT_8032eee0));
 				DAT_8032eee0 = 0;
-				UpdateDigits(static_cast<unsigned int>(caravanWork->m_gil), &s_place[0]);
-				UpdateDigits(0, &s_place[8]);
+				{
+					bool started = false;
+					int value = caravanWork->m_gil;
+					int div = 10000000;
+					for (int i = 0; i < 8; ++i) {
+						if (!started && div <= value) {
+							started = true;
+						}
+						if (started || div <= value || i > 6) {
+							int digit = value / div;
+							if (digit > 9) {
+								digit = 9;
+							}
+							s_place[i] = static_cast<signed char>(digit);
+							value -= (value / div) * div;
+						} else {
+							s_place[i] = -1;
+						}
+						div /= 10;
+					}
+				}
+				{
+					bool started = false;
+					int value = 0;
+					int div = 10000000;
+					for (int i = 0; i < 8; ++i) {
+						if (!started && div <= value) {
+							started = true;
+						}
+						if (started || div <= value || i > 6) {
+							int digit = value / div;
+							if (digit > 9) {
+								digit = 9;
+							}
+							s_place[i + 8] = static_cast<signed char>(digit);
+							value -= (value / div) * div;
+						} else {
+							s_place[i + 8] = -1;
+						}
+						div /= 10;
+					}
+				}
 			}
 			*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 10) = 2;
 			*reinterpret_cast<short*>(menuState + 0x12) += 1;
@@ -404,7 +444,27 @@ int CMenuPcs::MoneyCtrlCur()
 			unsigned int maxValue = static_cast<unsigned int>(caravanWork->m_gil);
 			unsigned int nextValue = DAT_8032eee0 + placeValue;
 			DAT_8032eee0 = (nextValue < maxValue) ? nextValue : maxValue;
-			UpdateDigits(DAT_8032eee0, &s_place[8]);
+			{
+				bool started = false;
+				unsigned int value = DAT_8032eee0;
+				int div = 10000000;
+				for (int i = 0; i < 8; ++i) {
+					if (!started && div <= static_cast<int>(value)) {
+						started = true;
+					}
+					if (started || div <= static_cast<int>(value) || i > 6) {
+						int digit = static_cast<int>(value) / div;
+						if (digit > 9) {
+							digit = 9;
+						}
+						s_place[i + 8] = static_cast<signed char>(digit);
+						value -= static_cast<unsigned int>((static_cast<int>(value) / div) * div);
+					} else {
+						s_place[i + 8] = -1;
+					}
+					div /= 10;
+				}
+			}
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		}
 	} else if ((hold & 4) != 0) {
@@ -412,7 +472,27 @@ int CMenuPcs::MoneyCtrlCur()
 			Sound.PlaySe(4, 0x40, 0x7f, 0);
 		} else {
 			DAT_8032eee0 = (DAT_8032eee0 >= placeValue) ? (DAT_8032eee0 - placeValue) : 0;
-			UpdateDigits(DAT_8032eee0, &s_place[8]);
+			{
+				bool started = false;
+				unsigned int value = DAT_8032eee0;
+				int div = 10000000;
+				for (int i = 0; i < 8; ++i) {
+					if (!started && div <= static_cast<int>(value)) {
+						started = true;
+					}
+					if (started || div <= static_cast<int>(value) || i > 6) {
+						int digit = static_cast<int>(value) / div;
+						if (digit > 9) {
+							digit = 9;
+						}
+						s_place[i + 8] = static_cast<signed char>(digit);
+						value -= static_cast<unsigned int>((static_cast<int>(value) / div) * div);
+					} else {
+						s_place[i + 8] = -1;
+					}
+					div /= 10;
+				}
+			}
 			Sound.PlaySe(1, 0x40, 0x7f, 0);
 		}
 	}

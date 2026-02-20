@@ -306,20 +306,20 @@ void CMenuPcs::CompaCtrl()
 void CMenuPcs::CompaClose()
 {
 	int menuState = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c);
-	*reinterpret_cast<short*>(menuState + 0x22) = static_cast<short>(*reinterpret_cast<short*>(menuState + 0x22) + 1);
-	int time = static_cast<int>(*reinterpret_cast<short*>(menuState + 0x22));
+	short time = static_cast<short>(*reinterpret_cast<short*>(menuState + 0x22) + 1);
+	*reinterpret_cast<short*>(menuState + 0x22) = time;
 
-	int entryCount = static_cast<int>(**reinterpret_cast<short**>(reinterpret_cast<char*>(this) + 0x850));
-	short* entry = *reinterpret_cast<short**>(reinterpret_cast<char*>(this) + 0x850) + 4;
+	short* entry = *reinterpret_cast<short**>(reinterpret_cast<char*>(this) + 0x850);
+	int entryCount = static_cast<int>(*entry);
+	short currentTime = *reinterpret_cast<short*>(menuState + 0x22);
+	entry += 4;
 	for (int i = 0; i < entryCount; ++i) {
-		if (*reinterpret_cast<int*>(entry + 0x12) <= time) {
-			int duration = *reinterpret_cast<int*>(entry + 0x14);
-			if (time < *reinterpret_cast<int*>(entry + 0x12) + duration) {
+		if (*reinterpret_cast<int*>(entry + 0x12) <= currentTime) {
+			if (currentTime < *reinterpret_cast<int*>(entry + 0x12) + *reinterpret_cast<int*>(entry + 0x14)) {
 				*reinterpret_cast<int*>(entry + 0x10) = *reinterpret_cast<int*>(entry + 0x10) + 1;
-				float t = static_cast<float>(*reinterpret_cast<int*>(entry + 0x10)) / static_cast<float>(duration);
-				float fade = 1.0f - t;
+				float fade = 1.0f - static_cast<float>(*reinterpret_cast<int*>(entry + 0x10)) /
+					static_cast<float>(*reinterpret_cast<int*>(entry + 0x14));
 				*reinterpret_cast<float*>(entry + 8) = fade;
-
 				if ((*reinterpret_cast<unsigned int*>(entry + 0x16) & 2) == 0) {
 					*reinterpret_cast<float*>(entry + 0x18) =
 						(*reinterpret_cast<float*>(entry + 0x1c) - static_cast<float>(*entry)) * fade;
@@ -332,7 +332,6 @@ void CMenuPcs::CompaClose()
 				*reinterpret_cast<float*>(entry + 0x1a) = 0.0f;
 			}
 		}
-
 		entry += 0x20;
 	}
 }

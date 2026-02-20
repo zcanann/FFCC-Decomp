@@ -402,7 +402,7 @@ void pppFrameEmission(pppEmission* pppEmission_, UnkB* param_2, UnkC* param_3) {
         float* particle = (float*)state[0];
         for (int i = 0; i < particleCount; i++) {
             float randOffset = RandF__5CMathFf(*(float*)(payload + 4), &Math);
-            particle[0] = particle[0] + (float)state[3] + randOffset;
+            particle[0] = particle[0] + *(float*)(state + 3) + randOffset;
 
             if (*(s16*)(particle + 3) < 1) {
                 if (*(s16*)((u8*)particle + 10) < (s16)(u16)payload[0xC]) {

@@ -470,6 +470,222 @@ done_check:
 
 /*
  * --INFO--
+ * PAL Address: 0x800B9960
+ * PAL Size: 96b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" double GetRightStickY__4CPadFl(void* pad, long padIndex)
+{
+    bool isInvalidPad = false;
+
+    if (*(int*)((char*)pad + 0x1C4) == 0) {
+        if (padIndex != 0) {
+            goto done_check;
+        }
+        if (*(int*)((char*)pad + 0x1C0) == -1) {
+            goto done_check;
+        }
+    }
+    isInvalidPad = true;
+
+done_check:
+    if (isInvalidPad) {
+        return (double)0.0f;
+    }
+
+    return (double)*(float*)((char*)pad + (padIndex & ~((int)~(*(int*)((char*)pad + 0x1C0) - padIndex |
+                                                        padIndex - *(int*)((char*)pad + 0x1C0)) >>
+                                          31)) *
+                                               0x54 +
+                             0x30);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B99C0
+ * PAL Size: 96b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" double GetRightStickX__4CPadFl(void* pad, long padIndex)
+{
+    bool isInvalidPad = false;
+
+    if (*(int*)((char*)pad + 0x1C4) == 0) {
+        if (padIndex != 0) {
+            goto done_check;
+        }
+        if (*(int*)((char*)pad + 0x1C0) == -1) {
+            goto done_check;
+        }
+    }
+    isInvalidPad = true;
+
+done_check:
+    if (isInvalidPad) {
+        return (double)0.0f;
+    }
+
+    return (double)*(float*)((char*)pad + (padIndex & ~((int)~(*(int*)((char*)pad + 0x1C0) - padIndex |
+                                                        padIndex - *(int*)((char*)pad + 0x1C0)) >>
+                                          31)) *
+                                               0x54 +
+                             0x2C);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9A20
+ * PAL Size: 96b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" double GetLeftStickY__4CPadFl(void* pad, long padIndex)
+{
+    bool isInvalidPad = false;
+
+    if (*(int*)((char*)pad + 0x1C4) == 0) {
+        if (padIndex != 0) {
+            goto done_check;
+        }
+        if (*(int*)((char*)pad + 0x1C0) == -1) {
+            goto done_check;
+        }
+    }
+    isInvalidPad = true;
+
+done_check:
+    if (isInvalidPad) {
+        return (double)0.0f;
+    }
+
+    return (double)*(float*)((char*)pad + (padIndex & ~((int)~(*(int*)((char*)pad + 0x1C0) - padIndex |
+                                                        padIndex - *(int*)((char*)pad + 0x1C0)) >>
+                                          31)) *
+                                               0x54 +
+                             0x28);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9A80
+ * PAL Size: 96b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" double GetLeftStickX__4CPadFl(void* pad, long padIndex)
+{
+    bool isInvalidPad = false;
+
+    if (*(int*)((char*)pad + 0x1C4) == 0) {
+        if (padIndex != 0) {
+            goto done_check;
+        }
+        if (*(int*)((char*)pad + 0x1C0) == -1) {
+            goto done_check;
+        }
+    }
+    isInvalidPad = true;
+
+done_check:
+    if (isInvalidPad) {
+        return (double)0.0f;
+    }
+
+    return (double)*(float*)((char*)pad + (padIndex & ~((int)~(*(int*)((char*)pad + 0x1C0) - padIndex |
+                                                        padIndex - *(int*)((char*)pad + 0x1C0)) >>
+                                          31)) *
+                                               0x54 +
+                             0x24);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9AE0
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" unsigned short GetButtonRepeat__4CPadFl(void* pad, long padIndex)
+{
+    bool isInvalidPad = false;
+    unsigned int result;
+
+    if (*(int*)((char*)pad + 0x1C4) == 0) {
+        if (padIndex != 0) {
+            goto done_check;
+        }
+        if (*(int*)((char*)pad + 0x1C0) == -1) {
+            goto done_check;
+        }
+    }
+    isInvalidPad = true;
+
+done_check:
+    if (isInvalidPad) {
+        result = 0;
+    } else {
+        result = *(unsigned short*)((char*)pad + (padIndex & ~((int)~(*(int*)((char*)pad + 0x1C0) - padIndex |
+                                                               padIndex - *(int*)((char*)pad + 0x1C0)) >>
+                                                 31)) *
+                                                  0x54 +
+                                    0x14);
+    }
+
+    return (unsigned short)result;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9BB8
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" unsigned short GetButton__4CPadFl(void* pad, long padIndex)
+{
+    bool isInvalidPad = false;
+    unsigned int result;
+
+    if (*(int*)((char*)pad + 0x1C4) == 0) {
+        if (padIndex != 0) {
+            goto done_check;
+        }
+        if (*(int*)((char*)pad + 0x1C0) == -1) {
+            goto done_check;
+        }
+    }
+    isInvalidPad = true;
+
+done_check:
+    if (isInvalidPad) {
+        result = 0;
+    } else {
+        result = *(unsigned short*)((char*)pad + (padIndex & ~((int)~(*(int*)((char*)pad + 0x1C0) - padIndex |
+                                                               padIndex - *(int*)((char*)pad + 0x1C0)) >>
+                                                 31)) *
+                                                  0x54 +
+                                    4);
+    }
+
+    return (unsigned short)result;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800B9394
  * PAL Size: 44b
  * EN Address: TODO

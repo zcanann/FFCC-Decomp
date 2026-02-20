@@ -445,12 +445,16 @@ void CGraphicPcs::drawCopy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80046594
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphicPcs::setViewport()
 {
-	// TODO
+	Graphic.SetViewport();
 }
 
 /*
@@ -482,12 +486,19 @@ void CGraphicPcs::preDrawEnvInit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004650c
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphicPcs::stdDrawEnvInit()
 {
-	// TODO
+	*(u32*)(MaterialMan + 0x128) = *(u32*)(MaterialMan + 0x11C);
+	*(u32*)(MaterialMan + 0x12C) = *(u32*)(MaterialMan + 0x120);
+	*(u32*)(MaterialMan + 0x130) = *(u32*)(MaterialMan + 0x124);
+	*(u32*)(MaterialMan + 0x58) = *(u32*)(MaterialMan + 0x48);
 }
 
 /*

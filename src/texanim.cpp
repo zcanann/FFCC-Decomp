@@ -918,12 +918,26 @@ CTexAnim::CTexAnim()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80043ea4
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CTexAnim::~CTexAnim()
 {
-	// TODO
+    *reinterpret_cast<void**>(this) = &PTR_PTR_s_CTexAnim_801e9c54;
+    int* refData = reinterpret_cast<int*>(*reinterpret_cast<void**>(Ptr(this, 8)));
+    if (refData != 0) {
+        int refCount = refData[1];
+        refData[1] = refCount - 1;
+        if ((refCount - 1 == 0) && (refData != 0)) {
+            (*(void (**)(int*, int))(*refData + 8))(refData, 1);
+        }
+        *reinterpret_cast<void**>(Ptr(this, 8)) = 0;
+    }
+    __dt__4CRefFv(this, 0);
 }
 
 /*

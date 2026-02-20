@@ -756,17 +756,19 @@ float CFont::GetWidth(unsigned short ch)
 		}
 	}
 
+	unsigned char flags = renderFlags;
 	unsigned int drawWidth;
-	if ((renderFlags & 0x10) != 0) {
-		drawWidth = m_glyphWidth;
+	if (static_cast<int>((static_cast<unsigned int>(flags) << 27) | (static_cast<unsigned int>(flags) >> 5)) < 0) {
+		drawWidth = static_cast<unsigned int>(m_glyphWidth);
 	} else {
-		drawWidth = *(reinterpret_cast<unsigned char*>(glyph) + 4 +
-		             ((static_cast<signed char>(renderFlags) >> 7) & 2));
+		signed char sign = static_cast<signed char>(flags) >> 7;
+		unsigned int extra = static_cast<unsigned int>((-static_cast<int>(sign) | static_cast<int>(sign))) >> 30 & 2;
+		drawWidth = static_cast<unsigned int>(*(reinterpret_cast<unsigned char*>(glyph) + extra + 4));
 	}
 
 	float width = scaleX * (margin + static_cast<float>(drawWidth));
-	if ((renderFlags & 0x08) != 0) {
-		width = floorf(width);
+	if (static_cast<int>((static_cast<unsigned int>(renderFlags) << 28) | (static_cast<unsigned int>(renderFlags) >> 4)) < 0) {
+		width = static_cast<float>(floor(static_cast<double>(width)));
 	}
 	return width;
 }

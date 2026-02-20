@@ -701,10 +701,9 @@ float CFont::GetWidth(char* text)
 		unsigned int drawWidth;
 		if ((renderFlags & 0x10) != 0) {
 			drawWidth = m_glyphWidth;
-		} else if ((renderFlags & 0x80) != 0) {
-			drawWidth = *(reinterpret_cast<unsigned char*>(glyph) + 6);
 		} else {
-			drawWidth = *(reinterpret_cast<unsigned char*>(glyph) + 4);
+			drawWidth = *(reinterpret_cast<unsigned char*>(glyph) + 4 +
+			             ((static_cast<signed char>(renderFlags) >> 7) & 2));
 		}
 
 		float charWidth = scaleX * (margin + static_cast<float>(drawWidth));

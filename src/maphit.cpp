@@ -524,13 +524,10 @@ void CMapHit::CalcHitSlide(Vec* out, float y)
 void CMapHit::CalcHitPosition(Vec* position)
 {
     float len = PSVECMag(&g_hit_cyl_min.m_direction);
-    float push = (s_hit_edge_index == -1) ? s_push : s_epsilon;
-    if (len > s_epsilon) {
-        PSVECScale(&g_hit_cyl_min.m_direction, position, s_hit_t_min - (push / len));
+    if (s_hit_edge_index == -1) {
+        PSVECScale(&g_hit_cyl_min.m_direction, position, s_hit_t_min - (s_push / len));
     } else {
-        position->x = 0.0f;
-        position->y = 0.0f;
-        position->z = 0.0f;
+        PSVECScale(&g_hit_cyl_min.m_direction, position, s_hit_t_min - (s_epsilon / len));
     }
     PSVECAdd(&g_hit_cyl_min.m_bottom, position, position);
 }

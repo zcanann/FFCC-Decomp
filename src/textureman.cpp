@@ -712,13 +712,23 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
                        static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(U8At(this, 0x6C)),
                        static_cast<GXTexWrapMode>(U8At(this, 0x6C)), 0, 0);
 
+        int tlutBase = reinterpret_cast<int>(PtrAt(this, 0x7C));
         unsigned int numEntries = 0x10;
         if (U8At(this, 0x60) == 9) {
             numEntries = 0x100;
         }
+        GXInitTlutObj(reinterpret_cast<GXTlutObj*>(Ptr(this, 0x48)), reinterpret_cast<void*>(tlutBase), GX_TL_IA8,
+                      static_cast<u16>(numEntries));
 
-        GXInitTlutObj(reinterpret_cast<GXTlutObj*>(Ptr(this, 0x48)), PtrAt(this, 0x7C), GX_TL_IA8, static_cast<u16>(numEntries));
-        GXInitTlutObj(reinterpret_cast<GXTlutObj*>(Ptr(this, 0x54)), Ptr(PtrAt(this, 0x7C), numEntries * 2), GX_TL_IA8,
+        numEntries = 0x10;
+        if (U8At(this, 0x60) == 9) {
+            numEntries = 0x100;
+        }
+        int offset = 0x10;
+        if (U8At(this, 0x60) == 9) {
+            offset = 0x100;
+        }
+        GXInitTlutObj(reinterpret_cast<GXTlutObj*>(Ptr(this, 0x54)), reinterpret_cast<void*>(tlutBase + offset * 2), GX_TL_IA8,
                       static_cast<u16>(numEntries));
     } else {
         GXInitTexObj(reinterpret_cast<GXTexObj*>(Ptr(this, 0x28)), PtrAt(this, 0x78), U16At(this, 0x64), U16At(this, 0x68),

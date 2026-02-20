@@ -262,7 +262,7 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, UnkB* param_2, U
 
             pppSetDrawEnv((pppCVECTOR*)(particle + 1), (pppFMATRIX*)0, 0.0f, 0, 0, 0, 0, 0, 1, 0);
 
-            if (fadeDivisor > 0) {
+            if (fadeDivisor >= 0) {
                 u8* alpha = (u8*)&particle[1].x + 3;
                 *alpha = (u8)(*alpha - (*alpha / fadeDivisor));
             }
@@ -272,9 +272,9 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, UnkB* param_2, U
             GXSetChanMatColor(GX_COLOR0A0, color);
             GXLoadPosMtxImm(model, 0);
 
-            u8 blendMode = ((u8*)&param_2->m_stepValue)[1];
-            pppSetBlendMode(blendMode);
-            pppDrawShp(shapeTable, *(short*)&particle[2].x, pppEnvStPtr->m_materialSetPtr, blendMode);
+            pppSetBlendMode(((u8*)&param_2->m_stepValue)[1]);
+            pppDrawShp(shapeTable, *(short*)&particle[2].x, pppEnvStPtr->m_materialSetPtr,
+                       ((u8*)&param_2->m_stepValue)[1]);
 
             particle = (Vec*)&particle[2].y;
         }

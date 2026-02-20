@@ -1219,12 +1219,25 @@ void CMapMng::LoadMapNoSyncCalc()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800330CC
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapMng::SearchChildMapObj(CMapObj*, CMapObj*)
+CMapObj* CMapMng::SearchChildMapObj(CMapObj* searchStart, CMapObj* parentObj)
 {
-	// TODO
+    const int objCount = *reinterpret_cast<short*>(Ptr(this, 0xC));
+    CMapObj* mapObjEnd = reinterpret_cast<CMapObj*>(Ptr(this, 0x954 + (objCount * 0xF0)));
+
+    for (CMapObj* obj = searchStart; obj < mapObjEnd; obj = reinterpret_cast<CMapObj*>(Ptr(obj, 0xF0))) {
+        if (*reinterpret_cast<CMapObj**>(Ptr(obj, 0x0)) == parentObj) {
+            return obj;
+        }
+    }
+
+    return 0;
 }
 
 /*

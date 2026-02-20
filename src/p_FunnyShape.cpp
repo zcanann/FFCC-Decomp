@@ -109,16 +109,14 @@ static inline CFunnyShape* FunnyShape(CFunnyShapePcs* self)
  */
 extern "C" void __sinit_p_FunnyShape_cpp(void)
 {
-    CPtrArray<OSFS_TEXTURE_ST*>* texData =
-        reinterpret_cast<CPtrArray<OSFS_TEXTURE_ST*>*>(FunnyShapePcs + 0x61BC);
-    CPtrArray<_GXTexObj*>* gxTex = reinterpret_cast<CPtrArray<_GXTexObj*>*>(FunnyShapePcs + 0x61D8);
-
+    *reinterpret_cast<void**>(FunnyShapePcs) = &__vt__8CManager;
+    *reinterpret_cast<void**>(FunnyShapePcs) = &lbl_801E8668;
     *reinterpret_cast<void**>(FunnyShapePcs) = &lbl_801EA924;
 
-    __ct__14CUSBStreamDataFv(reinterpret_cast<CUSBStreamData*>(FunnyShapePcs + 0x8));
-    __ct__11CFunnyShapeFv(reinterpret_cast<CFunnyShape*>(FunnyShapePcs + 0x1C));
-    texData->CPtrArray<OSFS_TEXTURE_ST*>::CPtrArray();
-    gxTex->CPtrArray<_GXTexObj*>::CPtrArray();
+    __ct__14CUSBStreamDataFv(reinterpret_cast<CUSBStreamData*>(FunnyShapePcs + 0x3C));
+    __ct__11CFunnyShapeFv(reinterpret_cast<CFunnyShape*>(FunnyShapePcs + 0x50));
+    reinterpret_cast<CPtrArray<OSFS_TEXTURE_ST*>*>(FunnyShapePcs + 0x61BC)->CPtrArray<OSFS_TEXTURE_ST*>::CPtrArray();
+    reinterpret_cast<CPtrArray<_GXTexObj*>*>(FunnyShapePcs + 0x61D8)->CPtrArray<_GXTexObj*>::CPtrArray();
 
     __register_global_object(FunnyShapePcs, reinterpret_cast<void*>(__dt__14CFunnyShapePcsFv), ARRAY_8026D728);
 

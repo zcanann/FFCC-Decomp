@@ -10,6 +10,7 @@ extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned lo
 extern "C" void __dla__FPv(void*);
 extern "C" void __dl__FPv(void*);
 extern "C" void __ct__4CRefFv(void*);
+extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void __ct__10CTexScrollFv(void*);
 extern "C" void __dt__10CTexScrollFv(void*, int);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
@@ -19,6 +20,7 @@ class CMapKeyFrame;
 extern "C" float Get__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" void Calc__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" void* __vt__9CMaterial[];
+extern "C" void* PTR_PTR_s_CMaterialSet_801e9bbc;
 extern CMemory Memory;
 extern unsigned char MaterialMan[];
 extern float FLOAT_8032faf0;
@@ -37,8 +39,18 @@ template <class T>
 class CPtrArray
 {
 public:
+    unsigned long m_size;
+    unsigned long m_numItems;
+    unsigned long m_defaultSize;
+    T* m_items;
+    CMemory::CStage* m_stage;
+    int m_growCapacity;
+
     int GetSize();
     int Add(T item);
+    ~CPtrArray();
+    void RemoveAll();
+    void SetStage(CMemory::CStage* stage);
     void SetAt(unsigned long index, T item);
     T operator[](unsigned long index);
 };
@@ -944,6 +956,57 @@ void* CMaterialSet::operator new(unsigned long size, CMemory::CStage*, char* fil
         file,
         line,
         0);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003d8c0
+ * PAL Size: 216b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CMaterialSet::~CMaterialSet()
+{
+    CPtrArray<CMaterial*>* const materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
+    *reinterpret_cast<void**>(this) = &PTR_PTR_s_CMaterialSet_801e9bbc;
+
+    for (unsigned long i = 0; i < UnkMaterialSetGetter(materials); i++) {
+        CMaterial* const material = (*materials)[i];
+        if (material != 0) {
+            void** const vtable = *reinterpret_cast<void***>(material);
+            reinterpret_cast<VirtualDtorFn>(vtable[2])(material, 1);
+        }
+    }
+
+    materials->RemoveAll();
+    materials->~CPtrArray<CMaterial*>();
+    __dt__4CRefFv(this, 0);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003d998
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CMaterialSet::CMaterialSet()
+{
+    __ct__4CRefFv(this);
+    *reinterpret_cast<void**>(this) = &PTR_PTR_s_CMaterialSet_801e9bbc;
+
+    CPtrArray<CMaterial*>* const materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
+    materials->m_size = 0;
+    materials->m_numItems = 0;
+    materials->m_defaultSize = 0x10;
+    materials->m_items = 0;
+    materials->m_stage = 0;
+    materials->m_growCapacity = 1;
+    materials->SetStage(*reinterpret_cast<CMemory::CStage**>(MaterialMan + 0x218));
 }
 
 /*

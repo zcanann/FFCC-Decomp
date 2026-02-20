@@ -170,12 +170,28 @@ void CFlatRuntime::AfterFrame(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006879c
+ * PAL Size: 136b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime::deleteObject(CFlatRuntime::CObject*)
+void CFlatRuntime::deleteObject(CFlatRuntime::CObject* object)
 {
-	// TODO
+	object->m_previous->m_next = object->m_next;
+	object->m_next->m_previous = object->m_previous;
+
+	*(void**)((char*)*object->m_freeListNode + 4) = object->m_freeListNode[1];
+	*(void**)object->m_freeListNode[1] = *object->m_freeListNode;
+
+	object->m_freeListNode[1] = *(void***)((char*)this + 0x98C);
+	*(void***)((char*)this + 0x98C) = object->m_freeListNode;
+
+	object->m_flags &= 0xEF;
+
+	typedef void (*OnDeleteFn)(CFlatRuntime*);
+	reinterpret_cast<OnDeleteFn>((*reinterpret_cast<void***>(this))[7])(this);
 }
 
 /*

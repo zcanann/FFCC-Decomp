@@ -808,20 +808,28 @@ void CGPartyObj::onDrawDebug(CFont*, float, float&, float)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011a57c
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::onDraw()
 {
-	// TODO
+	CGObject::onDraw();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011a574
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CGPartyObj::GetCID()
 {
-	return 0;
+	return 0x6D;
 }

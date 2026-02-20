@@ -30,7 +30,7 @@ public:
     int useFlag(int, int);
     void addFlag(class CFlag&);
     void MakeAgbString(char*, char*, int, int);
-    void drawTagString(CFont*, char*, int, int, int);
+    unsigned long drawTagString(CFont*, char*, int, int, int);
 
 private:
     char* mText;

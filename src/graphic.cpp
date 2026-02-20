@@ -284,9 +284,9 @@ u8 CGraphic::IsFifoOver()
  * Address:	TODO
  * Size:	TODO
  */
-void CGraphic::IsFrameRateOver()
+u32 CGraphic::IsFrameRateOver()
 {
-	// TODO
+	return *reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x7350);
 }
 
 /*

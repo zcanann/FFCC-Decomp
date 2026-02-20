@@ -700,8 +700,12 @@ void* CCharaPcs::CHandle::operator new(unsigned long size, CMemory::CStage* stag
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 80077080
+ * PAL Size: 252b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CCharaPcs::CHandle::CHandle()
 {
@@ -733,7 +737,6 @@ CCharaPcs::CHandle::CHandle()
 
 	m_fogBlend = m_sortZ;
 	m_unk0x158 = 0;
-
 	m_drawListFlags &= 0x80;
 }
 
@@ -749,14 +752,19 @@ CCharaPcs::CHandle::~CHandle()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 80076cf4
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCharaPcs::CHandle::Add()
 {
     if (m_next == nullptr && m_previous == nullptr)
 	{
-		CCharaPcs::CHandle* head = (this); // *(CCharaPcsCHandle **)(CharaPcs._76_4_ + 0x15c); // gCharaPcsHandleHead;
+		CCharaPcs::CHandle* head = *reinterpret_cast<CCharaPcs::CHandle**>(
+			reinterpret_cast<char*>(&CharaPcs) + 0x4C);
 
 		m_previous = head;
 		m_next = head->m_next;

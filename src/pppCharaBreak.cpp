@@ -614,15 +614,16 @@ void UpdatePolygonData(PCharaBreak* step, VCharaBreak* work, CChara::CModel* mod
  */
 void pppConstructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
 {
+    float fVar1 = FLOAT_80332048;
     int dataOffset = data->m_serializedDataOffsets[2];
 
     *(u32*)((u8*)charaBreak + 0x9C + dataOffset) = 0;
-    *(float*)((u8*)charaBreak + 0x8C + dataOffset) = FLOAT_80332048;
-    *(float*)((u8*)charaBreak + 0x88 + dataOffset) = FLOAT_80332048;
-    *(float*)((u8*)charaBreak + 0x84 + dataOffset) = FLOAT_80332048;
-    *(float*)((u8*)charaBreak + 0x98 + dataOffset) = FLOAT_80332048;
-    *(float*)((u8*)charaBreak + 0x94 + dataOffset) = FLOAT_80332048;
-    *(float*)((u8*)charaBreak + 0x90 + dataOffset) = FLOAT_80332048;
+    *(float*)((u8*)charaBreak + 0x8C + dataOffset) = fVar1;
+    *(float*)((u8*)charaBreak + 0x88 + dataOffset) = fVar1;
+    *(float*)((u8*)charaBreak + 0x84 + dataOffset) = fVar1;
+    *(float*)((u8*)charaBreak + 0x98 + dataOffset) = fVar1;
+    *(float*)((u8*)charaBreak + 0x94 + dataOffset) = fVar1;
+    *(float*)((u8*)charaBreak + 0x90 + dataOffset) = fVar1;
     *(u32*)((u8*)charaBreak + 0xC4 + dataOffset) = 1;
 }
 
@@ -637,14 +638,15 @@ void pppConstructCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
  */
 void pppConstruct2CharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkC* data)
 {
+    float fVar1 = FLOAT_80332048;
     int dataOffset = data->m_serializedDataOffsets[2];
 
-    *(float*)((u8*)charaBreak + 0x8C + dataOffset) = FLOAT_80332048;
-    *(float*)((u8*)charaBreak + 0x88 + dataOffset) = FLOAT_80332048;
-    *(float*)((u8*)charaBreak + 0x84 + dataOffset) = FLOAT_80332048;
-    *(float*)((u8*)charaBreak + 0x98 + dataOffset) = FLOAT_80332048;
-    *(float*)((u8*)charaBreak + 0x94 + dataOffset) = FLOAT_80332048;
-    *(float*)((u8*)charaBreak + 0x90 + dataOffset) = FLOAT_80332048;
+    *(float*)((u8*)charaBreak + 0x8C + dataOffset) = fVar1;
+    *(float*)((u8*)charaBreak + 0x88 + dataOffset) = fVar1;
+    *(float*)((u8*)charaBreak + 0x84 + dataOffset) = fVar1;
+    *(float*)((u8*)charaBreak + 0x98 + dataOffset) = fVar1;
+    *(float*)((u8*)charaBreak + 0x94 + dataOffset) = fVar1;
+    *(float*)((u8*)charaBreak + 0x90 + dataOffset) = fVar1;
 }
 
 /*

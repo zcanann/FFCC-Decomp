@@ -12,12 +12,52 @@ CRingMenu::CRingMenu()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a5204
+ * PAL Size: 216b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CRingMenu::~CRingMenu()
 {
-	// TODO
+	reinterpret_cast<void (*)(CRingMenu*)>(reinterpret_cast<void**>(this)[4])(this);
+	CMenu::Create();
+
+	char* self = reinterpret_cast<char*>(this);
+	*reinterpret_cast<int*>(self + 0x504) = 0;
+	*reinterpret_cast<int*>(self + 0x500) = 0;
+	*reinterpret_cast<int*>(self + 0x0C) = -1;
+	*reinterpret_cast<int*>(self + 0x14) = 0x10;
+	*reinterpret_cast<int*>(self + 0x10) = 1;
+	*reinterpret_cast<int*>(self + 0x18) = 0;
+	*reinterpret_cast<int*>(self + 0x20) = -1;
+	*reinterpret_cast<int*>(self + 0x24) = -1;
+	*reinterpret_cast<int*>(self + 0x38) = 0;
+	*reinterpret_cast<int*>(self + 0x3C) = 0;
+	*reinterpret_cast<int*>(self + 0x40) = 0;
+	*reinterpret_cast<int*>(self + 0x1C) = 0;
+	*reinterpret_cast<int*>(self + 0x28) = -1;
+	*reinterpret_cast<int*>(self + 0x2C) = -1;
+	*reinterpret_cast<int*>(self + 0x44) = 0;
+	*reinterpret_cast<int*>(self + 0x48) = 0;
+	*reinterpret_cast<int*>(self + 0x4C) = 0;
+	*reinterpret_cast<int*>(self + 0x20) = 0;
+	*reinterpret_cast<int*>(self + 0x30) = -1;
+	*reinterpret_cast<int*>(self + 0x34) = -1;
+	*reinterpret_cast<int*>(self + 0x50) = 0;
+	*reinterpret_cast<int*>(self + 0x54) = 0;
+	*reinterpret_cast<int*>(self + 0x58) = 0;
+	*reinterpret_cast<int*>(self + 0x5C) = -1;
+	*reinterpret_cast<int*>(self + 0x60) = -1;
+	*reinterpret_cast<float*>(self + 0x64) = 0.0f;
+	*reinterpret_cast<int*>(self + 0x4EC) = 0;
+	*reinterpret_cast<int*>(self + 0x4F0) = 0;
+	*reinterpret_cast<int*>(self + 0x4F4) = 0;
+	*reinterpret_cast<int*>(self + 0x4F8) = 0;
+	*reinterpret_cast<int*>(self + 0x4FC) = 0;
+	*reinterpret_cast<int*>(self + 0x508) = 0;
+	*reinterpret_cast<float*>(self + 0x50C) = 0.0f;
 }
 
 /*

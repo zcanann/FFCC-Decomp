@@ -715,40 +715,52 @@ int CMenuPcs::EquipCtrlCur()
  */
 int CMenuPcs::EquipOpen0()
 {
-	*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x22) =
-	    *reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x22) + 1;
-	int timer = static_cast<int>(*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x22));
-	int selectedOffset = static_cast<int>(*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x26)) * 0x40 + 8;
+	float fVar1;
+	double dVar2;
+	int timer;
+	int selectedOffset;
+	s16* item;
+	int doneCount;
+	int itemCount;
+	int remaining;
+
+	*(s16*)(*(int*)((char*)this + 0x82c) + 0x22) = *(s16*)(*(int*)((char*)this + 0x82c) + 0x22) + 1;
+	timer = (int)*(s16*)(*(int*)((char*)this + 0x82c) + 0x22);
+	selectedOffset = *(s16*)(*(int*)((char*)this + 0x82c) + 0x26) * 0x40 + 8;
 
 	if (timer < 5) {
-		*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + selectedOffset) =
-		    *reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + selectedOffset) - 0x13;
+		*(s16*)(*(int*)((char*)this + 0x850) + selectedOffset) = *(s16*)(*(int*)((char*)this + 0x850) + selectedOffset) - 0x13;
 	}
 
-	s16* menuData = *reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850);
-	int doneCount = 0;
-	int itemCount = static_cast<int>(menuData[1]) - static_cast<int>(menuData[0]);
-	s16* item = menuData + menuData[0] * 0x20 + 4;
+	item = *(s16**)((char*)this + 0x850);
+	doneCount = 0;
+	itemCount = (int)item[1] - (int)*item;
+	item = item + *item * 0x20 + 4;
+	remaining = itemCount;
 
-	for (int i = 0; i < itemCount; i++) {
-		if (*reinterpret_cast<int*>(item + 0x12) <= timer) {
-			if (timer < (*reinterpret_cast<int*>(item + 0x12) + *reinterpret_cast<int*>(item + 0x14))) {
-				*reinterpret_cast<int*>(item + 0x10) = *reinterpret_cast<int*>(item + 0x10) + 1;
-				float ratio = static_cast<float>(*reinterpret_cast<int*>(item + 0x10)) /
-				              static_cast<float>(*reinterpret_cast<int*>(item + 0x14));
-				*reinterpret_cast<float*>(item + 8) = ratio;
-				if ((*reinterpret_cast<u32*>(item + 0x16) & 2) == 0) {
-					*reinterpret_cast<float*>(item + 0x18) = (*reinterpret_cast<float*>(item + 0x1c) - static_cast<float>(item[0])) * ratio;
-					*reinterpret_cast<float*>(item + 0x1a) = (*reinterpret_cast<float*>(item + 0x1e) - static_cast<float>(item[1])) * ratio;
+	if (0 < itemCount) {
+		do {
+			fVar1 = FLOAT_80332eb8;
+			if (*(int*)(item + 0x12) <= timer) {
+				if (timer < *(int*)(item + 0x12) + *(int*)(item + 0x14)) {
+					*(int*)(item + 0x10) = *(int*)(item + 0x10) + 1;
+					dVar2 = DOUBLE_80332ec0;
+					*(float*)(item + 8) = (float)((DOUBLE_80332ec0 / (double)*(int*)(item + 0x14)) * (double)*(int*)(item + 0x10));
+					if ((*(unsigned int*)(item + 0x16) & 2) == 0) {
+						fVar1 = (float)((dVar2 / (double)*(int*)(item + 0x14)) * (double)*(int*)(item + 0x10));
+						*(float*)(item + 0x18) = (*(float*)(item + 0x1c) - (float)(double)(int)*item) * fVar1;
+						*(float*)(item + 0x1a) = (*(float*)(item + 0x1e) - (float)(double)(int)item[1]) * fVar1;
+					}
+				} else {
+					doneCount = doneCount + 1;
+					*(float*)(item + 8) = FLOAT_80332ee0;
+					*(float*)(item + 0x18) = fVar1;
+					*(float*)(item + 0x1a) = fVar1;
 				}
-			} else {
-				doneCount++;
-				*reinterpret_cast<float*>(item + 8) = FLOAT_80332ee0;
-				*reinterpret_cast<float*>(item + 0x18) = FLOAT_80332eb8;
-				*reinterpret_cast<float*>(item + 0x1a) = FLOAT_80332eb8;
 			}
-		}
-		item += 0x20;
+			item = item + 0x20;
+			remaining = remaining - 1;
+		} while (remaining != 0);
 	}
 
 	return itemCount == doneCount;

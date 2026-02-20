@@ -1107,34 +1107,33 @@ void CUtil::CalcBoundaryBoxQuantized(Vec* minOut, Vec* maxOut, S16Vec* vecs, uns
  */
 int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
 {
-    u8* data = (u8*)dlData;
-    bool running = true;
-    int polygonCount = 0;
+    u8 cmd;
+    u16 vertexCount16;
+    bool isPrimitive;
+    bool running;
+    int polygonCount;
+    u8 primitive;
+    u32 vertexCount;
+    u32 blockCount;
+    u8* data = static_cast<u8*>(dlData);
 
+    running = true;
+    polygonCount = 0;
 LOOP:
     do {
-        u8 cmd;
-        u16 count16;
-        u32 count;
-        u32 qwords;
-        bool isPrimitive;
-        u8 primitive;
-
         if (!running) {
             return polygonCount;
         }
-
         cmd = *data;
-        count16 = *(u16*)(data + 1);
-        count = (u32)count16;
+        vertexCount16 = *(u16*)(data + 1);
+        vertexCount = (u32)vertexCount16;
         data += 3;
         primitive = cmd & 0xF8;
-
         if (primitive == 0xA0) {
 VALID:
             isPrimitive = true;
         } else {
-            if (primitive > 0x9F) {
+            if (0x9F < primitive) {
                 if (primitive != 0xB0) {
                     if (primitive < 0xB0) {
                         if (primitive == 0xA8) {
@@ -1160,59 +1159,51 @@ VALID:
 INVALID:
             isPrimitive = false;
         }
-
         if (isPrimitive) {
             if (primitive == 0x90) {
-                polygonCount += count / 3;
+                polygonCount += vertexCount / 3;
             } else if (primitive == 0x98) {
-                polygonCount = count + polygonCount - 2;
+                polygonCount = vertexCount + polygonCount - 2;
             }
-
             if ((cmd & 7) != 2) {
-                if (count != 0) {
-                    qwords = (u32)(count16 >> 3);
-                    if ((count16 >> 3) != 0) {
+                if (vertexCount != 0) {
+                    blockCount = (u32)(vertexCount16 >> 3);
+                    if ((vertexCount16 >> 3) != 0) {
                         do {
                             data += 0x40;
-                            qwords -= 1;
-                        } while (qwords != 0);
-
-                        count &= 7;
-                        if ((count16 & 7) == 0) {
+                            blockCount--;
+                        } while (blockCount != 0);
+                        vertexCount &= 7;
+                        if ((vertexCount16 & 7) == 0) {
                             goto LOOP;
                         }
                     }
-
                     do {
                         data += 8;
-                        count -= 1;
-                    } while (count != 0);
+                        vertexCount--;
+                    } while (vertexCount != 0);
                 }
                 goto LOOP;
             }
-
-            if (count != 0) {
-                qwords = (u32)(count16 >> 3);
-                if ((count16 >> 3) != 0) {
+            if (vertexCount != 0) {
+                blockCount = (u32)(vertexCount16 >> 3);
+                if ((vertexCount16 >> 3) != 0) {
                     do {
                         data += 0x50;
-                        qwords -= 1;
-                    } while (qwords != 0);
-
-                    count &= 7;
-                    if ((count16 & 7) == 0) {
+                        blockCount--;
+                    } while (blockCount != 0);
+                    vertexCount &= 7;
+                    if ((vertexCount16 & 7) == 0) {
                         goto LOOP;
                     }
                 }
-
                 do {
                     data += 10;
-                    count -= 1;
-                } while (count != 0);
+                    vertexCount--;
+                } while (vertexCount != 0);
             }
             goto LOOP;
         }
-
         running = false;
     } while (true);
 }

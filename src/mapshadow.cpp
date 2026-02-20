@@ -75,7 +75,7 @@ void CMapShadow::Init()
 	width = (float)materialWidth;
 	height = (float)materialHeight;
 	scale = *(float*)((char*)this + 0xa8);
-	if (*(s8*)((char*)this + 6) != 0) {
+	if (*(u8*)((char*)this + 6) != 0) {
 		C_MTXLightFrustum((MtxPtr)((char*)this + 0x48), -height, height, -width, width, *(float*)((char*)this + 0xac),
 		                  (float)(DOUBLE_8032fce8 * (double)scale), FLOAT_8032fcf0 * scale, FLOAT_8032fcf0,
 		                  FLOAT_8032fcf0);

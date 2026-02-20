@@ -368,8 +368,6 @@ void CMenuPcs::MLstClose()
 	unsigned int itemCount;
 	unsigned int remaining;
 	short* item;
-	double zero;
-	double one;
 	float alphaZero;
 
 	completedItems = 0;
@@ -378,16 +376,14 @@ void CMenuPcs::MLstClose()
 	item = *(short**)((char*)this + 0x850) + 4;
 	currentFrame = (int)*(short*)(*(int*)((char*)this + 0x82c) + 0x22);
 	remaining = itemCount;
-	zero = 0.0;
-	one = 1.0;
 
 	if (0 < (int)itemCount) {
 		do {
 			if (*(int*)(item + 0x12) <= currentFrame) {
 				if (currentFrame < *(int*)(item + 0x12) + *(int*)(item + 0x14)) {
 					*(int*)(item + 0x10) = *(int*)(item + 0x10) + 1;
-					*(float*)(item + 8) = (float)-((one / (double)*(int*)(item + 0x14)) * (double)*(int*)(item + 0x10) - one);
-					if ((double)*(float*)(item + 8) < zero) {
+					*(float*)(item + 8) = (float)-((1.0 / (double)*(int*)(item + 0x14)) * (double)*(int*)(item + 0x10) - 1.0);
+					if ((double)*(float*)(item + 8) < 0.0) {
 						*(float*)(item + 8) = 0.0f;
 					}
 				} else {

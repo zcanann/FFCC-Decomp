@@ -39,8 +39,6 @@ CSystem System;
  */
 CSystem::CSystem()
 {
-    volatile void** base = (volatile void**)this;
-    *base = __vt__7CSystem;
 }
 
 /*

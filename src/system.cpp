@@ -29,6 +29,7 @@ extern CFontMan FontMan;
 extern "C" int __cntlzw(unsigned int);
 extern CMiniGamePcs MiniGamePcs;
 extern unsigned char CFlat[];
+extern void* __vt__7CSystem[];
 CSystem System;
 
 /*
@@ -38,7 +39,8 @@ CSystem System;
  */
 CSystem::CSystem()
 {
-	// TODO
+    volatile void** base = (volatile void**)this;
+    *base = __vt__7CSystem;
 }
 
 /*

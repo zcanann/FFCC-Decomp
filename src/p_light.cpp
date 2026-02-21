@@ -159,12 +159,16 @@ void CLightPcs::Quit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004a27c
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CLightPcs::GetTable(unsigned long)
+int CLightPcs::GetTable(unsigned long index)
 {
-	// TODO
+    return (int)lbl_801EA2D4 + (index * 0x15c);
 }
 
 /*

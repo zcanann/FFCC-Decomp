@@ -27,7 +27,7 @@ public:
     virtual void MapChanged(int, int, int);
 };
 
-class CSystem
+class CSystem : public CManager
 {
 public:
     struct COrder

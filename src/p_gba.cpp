@@ -112,7 +112,7 @@ void CGbaPcs::create()
 	m_stage = Memory.CreateStage(0x56000, lbl_80330870, 0);
 	Joybus.CreateInit();
 	int result = Joybus.LoadBin();
-	if ((result != 0) && (1 < (unsigned int)System.m_execParam)) {
+	if ((result != 0) && (2 <= (unsigned int)System.m_execParam)) {
 		System.Printf(lbl_801D9DE0);
 	}
 	Joybus.ThreadInit();

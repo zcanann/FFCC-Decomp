@@ -1400,6 +1400,20 @@ extern "C" float sinf__3stdFf(float x)
 
 /*
  * --INFO--
+ * PAL Address: 0x800B9C1C
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void SetFromScript__10CCameraPcsFv(CCameraPcs* camera)
+{
+    *(int*)((char*)camera + 0x438) = 1;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800B9C28
  * PAL Size: 28b
  * EN Address: TODO
@@ -1428,6 +1442,25 @@ void CCameraPcs::SetRefPosition(Vec* position)
     *(float*)((char*)this + 0xD4) = *(float*)((char*)position + 0x0);
     *(float*)((char*)this + 0xD8) = *(float*)((char*)position + 0x4);
     *(float*)((char*)this + 0xDC) = *(float*)((char*)position + 0x8);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9C60
+ * PAL Size: 28b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __as__3VecFRC3Vec(Vec* self, const Vec* other)
+{
+    float x = other->x;
+    float y = other->y;
+    self->x = x;
+    float z = other->z;
+    self->y = y;
+    self->z = z;
 }
 
 /*

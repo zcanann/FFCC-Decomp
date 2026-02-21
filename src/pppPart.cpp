@@ -1669,19 +1669,25 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 
 	pppPDataValRaw* pDataVals = 0;
 	if (programCount > 0) {
-		pDataVals = (pppPDataValRaw*)new (pppEnvStPtr->m_stagePtr, (char*)"pppPart.cpp", 0x585) unsigned char[programCount * 0x10];
+		pDataVals = (pppPDataValRaw*)pppMemAlloc(programCount * 0x10, pppEnvStPtr->m_stagePtr, (char*)"pppPart.cpp", 0x585);
 	}
 	*(void**)(mngBytes + 0xC8) = pDataVals;
+	*(_pppPObjLink**)(mngBytes + 0xC4) = 0;
 
-	pppProgramSetDefRaw* programSet = (pppProgramSetDefRaw*)(pdt + 6);
-	for (int i = 0; i < programCount && programSet != 0 && pDataVals != 0; i++) {
-		pDataVals[i].m_programSetDef = programSet;
-		pDataVals[i].m_nextSpawnTime = programSet->m_startFrame;
-		pDataVals[i].m_objHead = 0;
-		pDataVals[i].m_activeCount = 0;
-		pDataVals[i].m_index = (unsigned char)i;
-		pDataVals[i].m_pad = 0;
-		programSet = programSet->m_next;
+	if (pDataVals != 0) {
+		pppProgramSetDefRaw* programSet = (pppProgramSetDefRaw*)(pdt + 6);
+		unsigned char index = 0;
+		while (programSet != 0) {
+			pDataVals->m_programSetDef = programSet;
+			pDataVals->m_nextSpawnTime = programSet->m_startFrame;
+			pDataVals->m_objHead = 0;
+			pDataVals->m_activeCount = 0;
+			pDataVals->m_index = index;
+			pDataVals->m_pad = 0;
+			programSet = programSet->m_next;
+			index++;
+			pDataVals++;
+		}
 	}
 
 	if (runControlPrograms != 0) {

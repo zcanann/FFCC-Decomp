@@ -4,6 +4,7 @@
 #include "ffcc/RedSound/RedEntry.h"
 #include "ffcc/RedSound/RedExecute.h"
 #include "ffcc/RedSound/RedMemory.h"
+#include <dolphin/os.h>
 #include <string.h>
 
 extern void* DAT_8032f438;
@@ -13,6 +14,9 @@ extern CRedEntry DAT_8032e154;
 extern CRedMemory DAT_8032f480;
 extern unsigned int* DAT_8032f444;
 extern void* DAT_8032f474;
+extern char DAT_801e7f44;
+extern char s__sPause___Stream___ON__d_801e7fb0[];
+extern char s__sPause___Stream___OFF__d_801e7fcb[];
 
 extern "C" {
 void RedDelete__FPv(void*);
@@ -451,14 +455,27 @@ void SetStreamVolume(int param_1, int param_2, int param_3)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cc600
+ * PAL Size: 392b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void StreamPause(int param_1, int param_2)
 {
 	unsigned int streamData;
 
 	streamData = (unsigned int)DAT_8032f438;
+	if (DAT_8032f408 != 0) {
+		if (param_2 == 1) {
+			OSReport(s__sPause___Stream___ON__d_801e7fb0, &DAT_801e7f44, param_1);
+		} else {
+			OSReport(s__sPause___Stream___OFF__d_801e7fcb, &DAT_801e7f44, param_1);
+		}
+		fflush(&DAT_8021d1a8);
+		streamData = (unsigned int)DAT_8032f438;
+	}
 	do {
 		if ((*(int*)(streamData + 0x10c) != 0) &&
 		    ((param_1 == -1) || (param_1 == *(int*)(streamData + 0x10c)))) {

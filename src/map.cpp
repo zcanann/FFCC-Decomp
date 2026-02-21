@@ -82,6 +82,36 @@ CMapKeyFrame::CMapKeyFrame()
 
 /*
  * --INFO--
+ * PAL Address: 0x8003492c
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CMapIdGrp::CMapIdGrp()
+{
+    *reinterpret_cast<int*>(Ptr(this, 0)) = -1;
+    *reinterpret_cast<unsigned char*>(Ptr(this, 4)) = 0x80;
+    *reinterpret_cast<unsigned char*>(Ptr(this, 6)) = 0;
+    *reinterpret_cast<unsigned char*>(Ptr(this, 5)) = 0;
+    *reinterpret_cast<unsigned char*>(Ptr(this, 7)) = 0x80;
+    *reinterpret_cast<unsigned char*>(Ptr(this, 8)) = 0;
+    *reinterpret_cast<unsigned char*>(Ptr(this, 9)) = 0;
+    *reinterpret_cast<unsigned char*>(Ptr(this, 10)) = 0x80;
+    *reinterpret_cast<unsigned char*>(Ptr(this, 11)) = 0x80;
+    *reinterpret_cast<unsigned char*>(Ptr(this, 12)) = 0xff;
+    *reinterpret_cast<unsigned char*>(Ptr(this, 13)) = 0x40;
+    *reinterpret_cast<unsigned char*>(Ptr(this, 14)) = 0x40;
+    *reinterpret_cast<unsigned char*>(Ptr(this, 15)) = 0x80;
+    *reinterpret_cast<unsigned char*>(Ptr(this, 16)) = 0x40;
+    *reinterpret_cast<unsigned char*>(Ptr(this, 17)) = 0x40;
+    *reinterpret_cast<unsigned char*>(Ptr(this, 18)) = 0;
+    *reinterpret_cast<unsigned char*>(Ptr(this, 19)) = 0x80;
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

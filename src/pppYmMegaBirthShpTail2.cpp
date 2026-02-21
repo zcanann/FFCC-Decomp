@@ -10,6 +10,12 @@ extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern "C" void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" float RandF__5CMathFv(CMath*);
+extern "C" int __cntlzw(unsigned int);
+extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+    void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char,
+    unsigned char);
+extern "C" void pppSetBlendMode__FUc(unsigned char);
+extern "C" void pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(void*, void*, unsigned char);
 extern float lbl_80330560;
 extern pppFMATRIX g_matUnit2;
 extern s32 DAT_8032ed70;
@@ -492,8 +498,179 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
  * --INFO--
  * PAL Address: 0x8008acc4
  * PAL Size: 1840b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2*, UnkB*, UnkC*)
+void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, UnkB* stepData, UnkC* offsets)
 {
-	// TODO: Implement rendering
+    u8* step = (u8*)stepData;
+    u8* payload = step + 0x14;
+    const u16 dataValIndex = *(u16*)step;
+    const s32 particleDataOffset = offsets->m_serializedDataOffsets[2];
+    _PARTICLE_DATA* particles = *(_PARTICLE_DATA**)((u8*)&object->field_0xbc + particleDataOffset);
+    _PARTICLE_WMAT* wmats = *(_PARTICLE_WMAT**)((u8*)&object->field_0xc0 + particleDataOffset);
+    _PARTICLE_COLOR* colors = *(_PARTICLE_COLOR**)((u8*)&object->field_0xc4 + particleDataOffset);
+    const u32 maxParticles = *(u32*)((u8*)&object->field_0xc8 + particleDataOffset);
+    bool hasRequiredMemory = false;
+
+    if (particles != 0 && wmats != 0) {
+        hasRequiredMemory = (payload[0x55] == 0) || (colors != 0);
+    }
+    if (!hasRequiredMemory || dataValIndex == 0xFFFF) {
+        return;
+    }
+
+    int shapeTable = **(int**)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
+    const u8 zEnable = (u8)(((u32)__cntlzw((u32)payload[0x57])) >> 5);
+    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+        (void*)(payload + 0x74), &object->field_0x40, *(float*)(payload + 0x74), payload[0x78], step[0x10],
+        payload[0x5A], 0, zEnable, 1, 0);
+    pppSetBlendMode__FUc(payload[0x5A]);
+
+    for (u32 i = 0; i < maxParticles; i++) {
+        u8* particle = (u8*)particles + i * 0x1B8;
+        if (*(s16*)(particle + 0x22) != 0) {
+            const u16 frameCountRaw = *(u16*)(payload + 0x70);
+            if (frameCountRaw != 0) {
+                pppFMATRIX drawMtx;
+                Vec drawPos;
+                Vec cameraPos;
+                Vec managerPos;
+                Vec zeroVec;
+                GXColor amb;
+                const s16 shapeOffset = *(s16*)(shapeTable + (u16)*(u16*)(particle + 0x20) * 8 + 0x10);
+                const u8 trailReadIndex = *(u8*)(particle + 0x38);
+                const u8 trailMaxIndex = (u8)(*(u8*)(particle + 0x37) - 1);
+                u8 trailNextIndex = (u8)(trailReadIndex + 1);
+                float drawScale = (float)payload[0x64];
+                const float drawScaleStep =
+                    (drawScale - (float)payload[0x68]) / ((frameCountRaw > 1) ? (float)(frameCountRaw - 1) : 1.0f);
+                float fadeR = (float)payload[0x64];
+                float fadeG = (float)payload[0x65];
+                float fadeB = (float)payload[0x66];
+                float fadeA = (float)payload[0x67];
+                const float fadeRStep =
+                    (fadeR - (float)payload[0x68]) / ((frameCountRaw > 1) ? (float)(frameCountRaw - 1) : 1.0f);
+                const float fadeGStep =
+                    (fadeG - (float)payload[0x69]) / ((frameCountRaw > 1) ? (float)(frameCountRaw - 1) : 1.0f);
+                const float fadeBStep =
+                    (fadeB - (float)payload[0x6A]) / ((frameCountRaw > 1) ? (float)(frameCountRaw - 1) : 1.0f);
+                const float fadeAStep =
+                    (fadeA - (float)payload[0x6B]) / ((frameCountRaw > 1) ? (float)(frameCountRaw - 1) : 1.0f);
+                const float spacing = *(float*)(payload + 0x6C);
+                Vec* history = (Vec*)(particle + 0x40);
+                Vec segVec;
+                float segLen;
+                float segProgress = 0.0f;
+                u16 frameCount = frameCountRaw;
+
+                if (trailReadIndex == trailMaxIndex) {
+                    trailNextIndex = 0;
+                }
+
+                drawPos = history[trailReadIndex];
+                cameraPos = history[trailNextIndex];
+                segVec.x = cameraPos.x - drawPos.x;
+                segVec.y = cameraPos.y - drawPos.y;
+                segVec.z = cameraPos.z - drawPos.z;
+                zeroVec.x = 0.0f;
+                zeroVec.y = 0.0f;
+                zeroVec.z = 0.0f;
+                segLen = PSVECDistance(&zeroVec, &segVec);
+
+                if (payload[0x72] == 0) {
+                    continue;
+                }
+
+                while (frameCount != 0) {
+                    Vec trailPos = drawPos;
+                    bool canDraw = (trailPos.x != 0.0f) || (trailPos.y != 0.0f) || (trailPos.z != 0.0f);
+                    if (canDraw) {
+                        pppUnitMatrix__FR10pppFMATRIX(&drawMtx);
+                        drawMtx.value[0][0] = drawScale * pppMngStPtr->m_scale.x;
+                        drawMtx.value[1][1] = drawScale * pppMngStPtr->m_scale.y;
+                        drawMtx.value[2][2] = drawScale * pppMngStPtr->m_scale.z;
+
+                        if (payload[0x79] == 0) {
+                            PSMTXMultVec(ppvWorldMatrix, &trailPos, &cameraPos);
+                        } else if (payload[0x79] == 1) {
+                            managerPos.x = pppMngStPtr->m_matrix.value[0][3];
+                            managerPos.y = pppMngStPtr->m_matrix.value[1][3];
+                            managerPos.z = pppMngStPtr->m_matrix.value[2][3];
+                            PSVECAdd(&trailPos, &managerPos, &trailPos);
+                            PSMTXMultVec(ppvCameraMatrix0, &trailPos, &cameraPos);
+                        } else {
+                            cameraPos = trailPos;
+                        }
+
+                        drawMtx.value[0][3] = cameraPos.x;
+                        drawMtx.value[1][3] = cameraPos.y;
+                        drawMtx.value[2][3] = cameraPos.z;
+                        GXLoadPosMtxImm(drawMtx.value, 0);
+
+                        amb.r = (u8)fadeR;
+                        amb.g = (u8)fadeG;
+                        amb.b = (u8)fadeB;
+                        amb.a = (u8)(fadeA * (1.0f - *(float*)(particle + 0x30)));
+                        GXSetChanAmbColor(GX_COLOR0A0, amb);
+                        pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(
+                            (void*)(shapeTable + shapeOffset), pppEnvStPtr->m_materialSetPtr, payload[0x5A]);
+                    }
+
+                    frameCount--;
+                    if (frameCount == 0 || spacing <= 0.0f) {
+                        break;
+                    }
+
+                    drawScale -= drawScaleStep;
+                    fadeR -= fadeRStep;
+                    fadeG -= fadeGStep;
+                    fadeB -= fadeBStep;
+                    fadeA -= fadeAStep;
+                    if (drawScale <= 0.0f) {
+                        break;
+                    }
+
+                    segProgress += spacing;
+                    while (segLen > 0.0f && segProgress > segLen) {
+                        const float overflow = segProgress - segLen;
+                        trailNextIndex++;
+                        if (trailNextIndex > trailMaxIndex) {
+                            trailNextIndex = 0;
+                        }
+                        if (trailNextIndex == trailReadIndex) {
+                            frameCount = 0;
+                            break;
+                        }
+
+                        drawPos = history[trailNextIndex];
+                        {
+                            u8 nextTrail = (u8)(trailNextIndex + 1);
+                            if (trailNextIndex == trailMaxIndex) {
+                                nextTrail = 0;
+                            }
+                            cameraPos = history[nextTrail];
+                        }
+                        segVec.x = cameraPos.x - drawPos.x;
+                        segVec.y = cameraPos.y - drawPos.y;
+                        segVec.z = cameraPos.z - drawPos.z;
+                        segLen = PSVECDistance(&zeroVec, &segVec);
+                        segProgress = overflow;
+                    }
+                    if (frameCount == 0 || segLen <= 0.0f) {
+                        break;
+                    }
+
+                    {
+                        const float t = segProgress / segLen;
+                        drawPos.x = history[trailNextIndex].x + segVec.x * t;
+                        drawPos.y = history[trailNextIndex].y + segVec.y * t;
+                        drawPos.z = history[trailNextIndex].z + segVec.z * t;
+                    }
+                }
+            }
+        }
+    }
 }

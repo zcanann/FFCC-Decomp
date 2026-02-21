@@ -265,7 +265,7 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
             if (*(s32*)(obj + 0x1C) == 2) {
                 if (d < (double)*(float*)(obj + 0x34)) {
                     yRand = (double)(FLOAT_80330ef8 - *(float*)(obj + 0x38) * *(float*)(obj + 0x38));
-                    d = sqrt(d);
+                    d = (double)sqrtf((float)d);
                     if (d <= DOUBLE_80330f10) {
                         d = DAT_8032ec20;
                     }
@@ -323,14 +323,13 @@ int CWind::AddAmbient(float dir, float speed)
 	group = 4;
 	do {
 		freeObj = scan;
-		if (((s8)scan[0] >= 0) ||
-		    ((freeObj = scan + 100), (s8)freeObj[0] >= 0) ||
-		    ((freeObj = scan + 200), (s8)freeObj[0] >= 0) ||
-		    ((freeObj = scan + 300), (s8)freeObj[0] >= 0) ||
-		    ((freeObj = scan + 400), (s8)freeObj[0] >= 0) ||
-		    ((freeObj = scan + 500), (s8)freeObj[0] >= 0) ||
-		    ((freeObj = scan + 600), (s8)freeObj[0] >= 0) ||
-		    ((freeObj = scan + 700), (s8)freeObj[0] >= 0)) {
+		if (((((s8)scan[0] >= 0) || ((freeObj = scan + 100), (s8)freeObj[0] >= 0)) ||
+		     ((freeObj = scan + 200), (s8)freeObj[0] >= 0)) ||
+		    (((freeObj = scan + 300), (s8)freeObj[0] >= 0) ||
+		     ((freeObj = scan + 400), (s8)freeObj[0] >= 0)) ||
+		   (((freeObj = scan + 500), (s8)freeObj[0] >= 0) ||
+		    (((freeObj = scan + 600), (s8)freeObj[0] >= 0) ||
+		     ((freeObj = scan + 700), (s8)scan[700] >= 0)))) {
 			goto found;
 		}
 

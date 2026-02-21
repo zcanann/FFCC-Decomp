@@ -135,32 +135,51 @@ void CGraphic::SetCopyClear(_GXColor, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001992c
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphic::SetStdDispCopySrc()
 {
-	// TODO
+    void* renderMode = PtrAt(this, 0x71E0);
+    GXSetDispCopySrc(0, 0, U16At(renderMode, 4), U16At(renderMode, 6));
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80019900
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphic::SetStdDispCopyDst()
 {
-	// TODO
+    void* renderMode = PtrAt(this, 0x71E0);
+    GXSetDispCopyDst(U16At(renderMode, 4), U16At(renderMode, 6));
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800198b8
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphic::SetStdPixelFmt()
 {
-	// TODO
+    void* renderMode = PtrAt(this, 0x71E0);
+    if (*reinterpret_cast<u8*>(reinterpret_cast<u8*>(renderMode) + 0x19) == 0) {
+        GXSetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
+    } else {
+        GXSetPixelFmt(GX_PF_RGBA6_Z24, GX_ZC_LINEAR);
+    }
 }
 
 /*

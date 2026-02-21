@@ -64,22 +64,26 @@ void pppKeShpTail2X(_pppPObject* obj, UnkB* param_2, UnkC* param_3)
             pos.y = obj->m_localMatrix.value[1][3];
             pos.z = obj->m_localMatrix.value[2][3];
         } else if (step->m_worldSpaceMode == 1) {
-            pppFMATRIX local;
-            pppFMATRIX world;
-            pppFMATRIX out;
+            pppFMATRIX ownerMatrix;
+            pppFMATRIX partMatrix;
+            pppFMATRIX outMatrix;
 
-            local = obj->m_localMatrix;
-            world = pppMngStPtr->m_matrix;
-            pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&out, &world, &local);
-            pos.x = out.value[0][3];
-            pos.y = out.value[1][3];
-            pos.z = out.value[2][3];
+            partMatrix = obj->m_localMatrix;
+            ownerMatrix = pppMngStPtr->m_matrix;
+            pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&outMatrix, &ownerMatrix, &partMatrix);
+            pos.x = outMatrix.value[0][3];
+            pos.y = outMatrix.value[1][3];
+            pos.z = outMatrix.value[2][3];
         }
 
+        u8 count = work->m_count;
         Vec* history = work->m_posHistory;
-        for (s32 i = 0; i < work->m_count; i++) {
-            pppCopyVector__FR3Vec3Vec(history, &pos);
-            history++;
+        if (count != 0) {
+            do {
+                pppCopyVector__FR3Vec3Vec(history, &pos);
+                history++;
+                count--;
+            } while (count != 0);
         }
     }
 
@@ -93,22 +97,22 @@ void pppKeShpTail2X(_pppPObject* obj, UnkB* param_2, UnkC* param_3)
         pos.y = obj->m_localMatrix.value[1][3];
         pos.z = obj->m_localMatrix.value[2][3];
     } else if (step->m_worldSpaceMode == 1) {
-        pppFMATRIX local;
-        pppFMATRIX world;
-        pppFMATRIX out;
+        pppFMATRIX ownerMatrix;
+        pppFMATRIX partMatrix;
+        pppFMATRIX outMatrix;
 
-        local = obj->m_localMatrix;
-        world = pppMngStPtr->m_matrix;
-        pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&out, &world, &local);
-        pos.x = out.value[0][3];
-        pos.y = out.value[1][3];
-        pos.z = out.value[2][3];
+        partMatrix = obj->m_localMatrix;
+        ownerMatrix = pppMngStPtr->m_matrix;
+        pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&outMatrix, &ownerMatrix, &partMatrix);
+        pos.x = outMatrix.value[0][3];
+        pos.y = outMatrix.value[1][3];
+        pos.z = outMatrix.value[2][3];
     }
 
-    pppCopyVector__FR3Vec3Vec(&work->m_posHistory[work->m_head], &pos);
+    pppCopyVector__FR3Vec3Vec((Vec*)((u8*)work + (u32)work->m_head * 0xc + 8), &pos);
 
     {
-        long* shape = *(long**)(*(u32*)&lbl_8032ED54->m_particleColors[0] + step->m_dataValIndex * 4);
+        long* shape = *(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
         u8* frameEntry;
         s16 frameDuration;
 

@@ -3,12 +3,14 @@
 #include "ffcc/mapmesh.h"
 #include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
+#include "ffcc/graphic.h"
 #include "ffcc/pppGetRotMatrixXYZ.h"
 #include "ffcc/pppGetRotMatrixXZY.h"
 #include "ffcc/pppGetRotMatrixYXZ.h"
 #include "ffcc/pppGetRotMatrixYZX.h"
 #include "ffcc/pppGetRotMatrixZXY.h"
 #include "ffcc/pppGetRotMatrixZYX.h"
+#include "ffcc/util.h"
 
 #include <math.h>
 
@@ -31,7 +33,10 @@ void _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevA
 void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(int stage, int op, int bias,
                                                                                            int scale, int clamp,
                                                                                            int reg);
+void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int type, int src, int dst, int op);
 }
+
+extern CUtil DAT_8032ec70;
 
 struct _pppEnvStYmEnv {
     void* m_stagePtr;
@@ -620,10 +625,153 @@ void genParaboloidMap(void* displayListBuffer, unsigned long* outDisplayListSize
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800e46dc
+ * PAL Size: 2268b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void drawParaboloidMap(_GXTexObj*, _GXTexObj*, void*, unsigned long, _GXTexObj*, unsigned char)
+void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displayList, unsigned long displayListSize,
+                       _GXTexObj* blendTexObj, unsigned char mode)
 {
-	// TODO
+    static const unsigned char s_texObjIndices[] = {0, 1, 2, 3, 4, 0, 1, 2, 3, 4};
+    static const unsigned char s_xAxisRotIndices[] = {0, 0, 0, 1, 1, 0, 0, 0, 1, 1};
+    static const unsigned char s_yAxisRotIndices[] = {0, 1, 0, 0, 1, 0, 1, 0, 0, 1};
+    static const float s_xAxisAngles[] = {0.0f, 90.0f, 180.0f, 270.0f};
+    static const unsigned char s_xAxisIds[] = {'x', 'x', 'x', 'x'};
+    static const float s_yAxisAngles[] = {0.0f, 1.0f};
+    static const Vec s_cameraPos = {0.0f, 0.0f, 0.0f};
+    static const Vec s_cameraUp = {0.0f, 1.0f, 0.0f};
+    static const Vec s_cameraLook = {0.0f, 0.0f, -1.0f};
+
+    const unsigned short texWidth = GXGetTexObjWidth(targetTexObj);
+    const unsigned short texHeight = GXGetTexObjHeight(targetTexObj);
+    const unsigned short modeOffset = (unsigned short)mode * 5;
+
+    _GXColor clearColor = {0, 0, 0, 0xFF};
+    _GXColor whiteColor = {0xFF, 0xFF, 0xFF, 0xFF};
+    _GXColor blackColor = {0, 0, 0, 0};
+
+    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+    DAT_8032ec70.RenderColorQuad(0.0f, 0.0f, texWidth, texHeight, clearColor);
+
+    const unsigned short rtWidth = GXGetTexObjWidth(targetTexObj);
+    const unsigned short rtHeight = GXGetTexObjHeight(targetTexObj);
+    const GXTexFmt targetFmt = GXGetTexObjFmt(targetTexObj);
+    void* targetData = GXGetTexObjData(targetTexObj);
+
+    Mtx44 orthoMtx;
+    C_MTXOrtho(orthoMtx, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f);
+    GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
+
+    Mtx cameraMtx;
+    C_MTXLookAt(cameraMtx, &s_cameraPos, &s_cameraUp, &s_cameraLook);
+    GXLoadPosMtxImm(cameraMtx, 0);
+
+    GXSetCullMode(GX_CULL_BACK);
+    GXSetViewport(0.0f, 0.0f, rtWidth, rtHeight, 0.0f, 1.0f);
+    GXSetScissor(0, 0, rtWidth, rtHeight);
+    GXSetTexCopySrc(0, 0, rtWidth, rtHeight);
+    GXSetTexCopyDst(rtWidth, rtHeight, targetFmt, GX_FALSE);
+
+    GXSetChanCtrl(GX_COLOR0A0, GX_ENABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT1, GX_DF_NONE, GX_AF_NONE);
+    GXSetChanMatColor(GX_COLOR0A0, whiteColor);
+    GXSetChanAmbColor(GX_COLOR0A0, blackColor);
+
+    GXLightObj lightObj;
+    GXInitLightColor(&lightObj, whiteColor);
+    GXInitLightAttnA(&lightObj, 0.0f, 1.0f, 0.0f);
+    GXInitLightAttnK(&lightObj, 0.0f, 0.0f, 0.0f);
+    GXInitLightPos(&lightObj, 0.0f, 0.0f, 1.0f);
+    GXInitLightDir(&lightObj, 0.0f, 0.0f, 1.0f);
+    GXLoadLightObjImm(&lightObj, GX_LIGHT1);
+
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_NRM, 0x1E, GX_FALSE, GX_PTIDENTITY);
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
+    _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(0, 0xF, 0xF, 0xF,
+                                                                                                          8);
+    _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
+    _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(0, 7, 4, 5, 7);
+    _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
+    GXSetNumTevStages(1);
+    GXSetNumTexGens(1);
+    GXSetNumChans(1);
+
+    Mtx lightFrustumMtx;
+    C_MTXLightFrustum(lightFrustumMtx, 1.0f, -1.0f, 1.0f, -1.0f, 0.0f, 0.5f, 0.5f, 0.5f, 0.5f);
+    GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 0xF);
+
+    if (blendTexObj != 0) {
+        _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(0, 0xF, 0xF,
+                                                                                                              0xF, 0xF);
+        _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
+        _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(0, 7, 4, 5,
+                                                                                                              7);
+        _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
+        _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(1, 0xF, 8, 1,
+                                                                                                              0xF);
+        _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(1, 0, 0, 0, 1, 0);
+        _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(1, 7, 7, 4,
+                                                                                                              0);
+        _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(1, 0, 0, 0, 1, 0);
+        GXSetTevDirect(GX_TEVSTAGE0);
+        GXSetTevDirect(GX_TEVSTAGE1);
+        GXSetNumTevStages(2);
+        GXSetNumTexGens(1);
+        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_NRM, 0x1E, GX_FALSE, GX_PTIDENTITY);
+        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
+        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(1, 0, 1, 4);
+        _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+        _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
+        GXSetChanMatColor(GX_COLOR0A0, whiteColor);
+        GXLoadTexObj(blendTexObj, GX_TEXMAP0);
+    }
+
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_NRM, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_NRM, GX_NRM_XYZ, GX_F32, 0);
+
+    const float kDegToRad = 0.017453292f;
+    for (int i = 0; i < 5; i++) {
+        const unsigned char texObjIdx = s_texObjIndices[modeOffset + i];
+        const unsigned char xRotIdx = s_xAxisRotIndices[modeOffset + i];
+        const unsigned char yRotIdx = s_yAxisRotIndices[modeOffset + i];
+
+        if (blendTexObj == 0) {
+            GXLoadTexObj(&texObjs[texObjIdx], GX_TEXMAP0);
+        } else {
+            GXLoadTexObj(&texObjs[texObjIdx], GX_TEXMAP1);
+        }
+
+        Mtx objectMtx;
+        Mtx tempMtx;
+        PSMTXIdentity(objectMtx);
+
+        if (s_yAxisAngles[yRotIdx] != 0.0f) {
+            PSMTXRotRad(tempMtx, 'y', kDegToRad * s_yAxisAngles[yRotIdx]);
+            PSMTXConcat(objectMtx, tempMtx, objectMtx);
+        }
+
+        PSMTXRotRad(tempMtx, s_xAxisIds[xRotIdx], kDegToRad * s_xAxisAngles[xRotIdx]);
+        PSMTXConcat(objectMtx, tempMtx, objectMtx);
+        PSMTXConcat(lightFrustumMtx, objectMtx, objectMtx);
+
+        GXLoadTexMtxImm(objectMtx, 0x1E, GX_MTX3x4);
+        GXLoadNrmMtxImm(objectMtx, 0);
+        GXCallDisplayList(displayList, displayListSize);
+    }
+
+    Graphic.GetBackBufferRect2(targetData, targetTexObj, 0, 0, texWidth, texHeight, 0, GX_LINEAR, GX_TF_RGBA8, 0);
+    GXSetScissor(0, 0, 0x280, 0x1C0);
+    Graphic.SetViewport();
+
+    if (mode != 0) {
+        DAT_8032ec70.RenderTextureQuad(0.0f, 0.0f, rtWidth, rtHeight, targetTexObj, 0, 0, 0, (GXBlendFactor)4,
+                                       (GXBlendFactor)5);
+        Graphic.GetBackBufferRect2(targetData, targetTexObj, 0, 0, texWidth, texHeight, 0, GX_LINEAR, GX_TF_RGBA8, 0);
+    }
 }

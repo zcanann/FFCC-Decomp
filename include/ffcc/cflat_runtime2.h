@@ -31,9 +31,9 @@ class CFlatRuntime2
 	void onNewObject(CFlatRuntime::CObject*);
 	void onDeleteObject(CFlatRuntime::CObject*);
 
-	void getNumFreeObject(int);
-	void getFreeObject(int);
-	void intToClass(int);
+	unsigned int getNumFreeObject(int);
+	CGObject* getFreeObject(int);
+	void* intToClass(int);
 
 	void Frame(int, int);
 	void Load(char*);

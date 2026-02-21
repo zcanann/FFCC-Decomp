@@ -580,12 +580,29 @@ void CLightPcs::SetDiffuseColor(unsigned long, _GXColor)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004934c
+ * PAL Size: 152b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CLightPcs::EnableLight(int, int)
+void CLightPcs::EnableLight(int param_1, int param_2)
 {
-	// TODO
+    unsigned int light_mask;
+
+    if (param_1 == 0) {
+        light_mask = 0;
+    } else {
+        light_mask = *(unsigned int*)((char*)this + 0xb4);
+    }
+
+    GXSetChanCtrl((GXChannelID)0, (u8)(((unsigned int)(-param_1 | param_1)) >> 0x1f), (GXColorSrc)0,
+                  (GXColorSrc)(__cntlzw((unsigned int)param_2) >> 5), light_mask, (GXDiffuseFn)2,
+                  (GXAttnFn)1);
+    GXSetChanCtrl((GXChannelID)2, (u8)(((unsigned int)(-param_1 | param_1)) >> 0x1f), (GXColorSrc)0,
+                  (GXColorSrc)(__cntlzw((unsigned int)param_2) >> 5), 0, (GXDiffuseFn)0,
+                  (GXAttnFn)2);
 }
 
 /*

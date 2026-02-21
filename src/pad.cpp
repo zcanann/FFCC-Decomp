@@ -98,8 +98,7 @@ void CPad::Init()
 				fclose(fp);
 				*reinterpret_cast<unsigned int*>(_1b0_4_ + 4) = 0;
 				frames = *reinterpret_cast<int*>(_1b0_4_ + 8);
-				frames = frames / 0x1E + (frames >> 0x1F);
-				System.Printf((char*)"replay frames=%d\n", frames - (frames >> 0x1F));
+				System.Printf((char*)"replay frames=%d\n", frames / 30);
 			}
 			else
 			{

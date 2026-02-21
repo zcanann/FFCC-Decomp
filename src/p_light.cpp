@@ -636,12 +636,37 @@ void setchanctrl(CLightPcs::TARGET, unsigned long)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80048ef8
+ * PAL Size: 232b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CLightPcs::SetBit32(CLightPcs::TARGET, unsigned long*)
+void CLightPcs::SetBit32(CLightPcs::TARGET target, unsigned long* mask)
 {
-	// TODO
+    char* lightPcs = (char*)this;
+    char* bumpSlot = lightPcs + 0x63c;
+
+    *(u32*)(lightPcs + 0xb0) = 0;
+    *(u32*)(lightPcs + 0xb4) = 0;
+
+    for (u32 i = 0; i < *(u32*)(lightPcs + 0xb8); i++) {
+        if ((*(char*)(bumpSlot + 0x60 + (int)target) != '\0') &&
+            (((1 << (i & 0x1f)) & *(u32*)((char*)mask + ((i >> 3) & 0x1ffffffc))) != 0)) {
+            _GXColor lightColor;
+            *(u32*)&lightColor = *(u32*)(bumpSlot + 0x50 + ((int)target * 4));
+            GXInitLightColor((GXLightObj*)(bumpSlot + 0x6c), lightColor);
+            GXLoadLightObjImm((GXLightObj*)(bumpSlot + 0x6c), (GXLightID)(1 << *(u32*)(lightPcs + 0xb0)));
+            *(u32*)(lightPcs + 0xb4) |= 1 << *(u32*)(lightPcs + 0xb0);
+            *(u32*)(lightPcs + 0xb0) += 1;
+            if (*(u32*)(lightPcs + 0xb0) > 7) {
+                return;
+            }
+        }
+
+        bumpSlot += 0xb0;
+    }
 }
 
 /*

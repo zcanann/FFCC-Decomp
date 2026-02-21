@@ -177,6 +177,20 @@ static bool BOOL_8032ec44;
 
 /*
  * --INFO--
+ * PAL Address: 0x8001439c
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CGBaseObj::GetCID()
+{
+    return 1;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x80016220
  * PAL Size: 312b
  * EN Address: TODO

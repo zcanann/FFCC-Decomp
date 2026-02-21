@@ -1,4 +1,5 @@
 #include "ffcc/itemobj.h"
+#include "ffcc/math.h"
 #include "ffcc/prgobj.h"
 #include "ffcc/p_game.h"
 #include "ffcc/vector.h"
@@ -18,9 +19,21 @@ extern "C" float CalcSafePos__8CGObjectFiP8CGObjectP3Vec(void*, int, void*, Vec*
 extern "C" void moveVectorHRot__8CGObjectFfffi(void*, float, float, float, int);
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void*, int, int, int, int, void*, void*);
+extern "C" void LoadModel__8CGObjectFiUlUli(void*, int, unsigned long, unsigned long, int);
+extern "C" void LoadAnim__8CGObjectFPciiiUl(void*, char*, int, int, int, unsigned long);
+extern "C" void SetAnimSlot__8CGObjectFii(void*, int, int);
+extern "C" void PlayAnim__8CGObjectFiiiiiPSc(void*, int, int, int, int, int, signed char*);
+extern "C" void DispCharaParts__8CGObjectFi(void*, int);
+extern "C" void putParticle__8CGPrgObjFiiP8CGObjectfi(void*, int, int, void*, float, int);
+extern "C" float RandF__5CMathFf(float, CMath*);
 
 extern unsigned char CFlat[];
+extern CMath Math;
 extern float FLOAT_80331b20;
+extern float FLOAT_80331b4c;
+extern float FLOAT_80331b50;
+extern float FLOAT_80331b54;
+extern float FLOAT_80331b58;
 extern float FLOAT_80331b8c;
 extern float FLOAT_80331b90;
 extern char DAT_80331b7c[];
@@ -397,12 +410,90 @@ void CGItemObj::onHitParticle(int, int, int, int, Vec*, PPPIFPARAM*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80124FE0
+ * PAL Size: 700b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGItemObj::loadModel()
 {
-	// TODO
+	unsigned char* self = (unsigned char*)this;
+	int modelNo = -1;
+	int modelVariant = 0;
+	int modelFlag = 0;
+	int useParticleTable = 1;
+	int worldParamA = *(int*)(self + 0x500);
+	int worldParamB = *(int*)(self + 0x504);
+
+	if (worldParamA < 0x18) {
+		if (worldParamA == 0xD) {
+			modelNo = 0x33;
+			useParticleTable = 0;
+		} else if (worldParamA < 0xD) {
+			if (worldParamA != 0xB) {
+				if (worldParamA > 9) {
+					modelNo = 8;
+					useParticleTable = 0;
+				}
+			} else {
+				modelNo = 0x27;
+				useParticleTable = 0;
+			}
+		} else if (worldParamA < 0x12 && worldParamA < 0xF) {
+			modelNo = 0x33;
+			modelVariant = 1;
+			useParticleTable = 0;
+		}
+	} else if (worldParamA >= 0x1F && worldParamA <= 0x21) {
+		unsigned short itemEntry = *(unsigned short*)(Game.game.unkCFlatData0[2] + worldParamB * 0x48 + 2);
+
+		self[0x53] = 1;
+		modelNo = itemEntry & 0xFFF;
+		modelVariant = itemEntry >> 0xC;
+		self[0x50] = (self[0x50] & 0xF7) | 8;
+		self[0x94] = 0;
+		self[0x95] = 0;
+		self[0x96] = 0x11;
+		self[0x97] = 0x94;
+		modelFlag = 1;
+	}
+
+	if (modelNo >= 0) {
+		LoadModel__8CGObjectFiUlUli(this, 3, modelNo, modelVariant, modelFlag);
+		LoadAnim__8CGObjectFPciiiUl(this, 0, 0, 0, 0, 0);
+		SetAnimSlot__8CGObjectFii(this, 0, 0);
+		PlayAnim__8CGObjectFiiiiiPSc(this, 0, 1, 0, -1, -1, 0);
+	}
+
+	if (worldParamA == 0x12) {
+		DispCharaParts__8CGObjectFi(this, 0);
+		self[0x50] = (self[0x50] & 0xEF) | 0x10;
+	}
+
+	if (useParticleTable != 0) {
+		for (int i = 0; i < 3; i++) {
+			if (i != 0 || *(short*)(self + 0x550) != 1) {
+				int entryBase = Game.game.unkCFlatData0[2] + worldParamB * 0x48;
+				unsigned short particleNo = *(unsigned short*)(entryBase + i * 2 + 0x14);
+
+				if (particleNo != 0xFFFF) {
+					float particleScale =
+					    FLOAT_80331b50 * (float)(unsigned short)*(unsigned short*)(entryBase + 0x10) + FLOAT_80331b4c;
+					putParticle__8CGPrgObjFiiP8CGObjectfi(
+					    this, particleNo | 0x100, *(int*)(self + 0x554), this, particleScale, 0);
+				}
+			}
+		}
+	}
+
+	if (worldParamA == 0xCB) {
+		*(int*)(self + 0x1D4) = (int)(FLOAT_80331b54 - RandF__5CMathFf(FLOAT_80331b58, &Math));
+		*(unsigned char*)(self + 0x9A) &= 0xFB;
+	}
+
+	self[0x54D] = (self[0x54D] & 0x7F) | 0x80;
 }
 
 /*

@@ -12,6 +12,7 @@
 extern "C" void __ct__Q29CLightPcs6CLightFv(void*);
 extern "C" void __ct__Q29CLightPcs10CBumpLightFv(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
+extern "C" void Free__7CMemoryFPv(CMemory*, void*);
 
 extern void* __vt__8CManager;
 extern void* lbl_801E8668;
@@ -149,12 +150,48 @@ CLightPcs::CLightPcs()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004a294
+ * PAL Size: 180b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CLightPcs::Init()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+
+    self[0x433c] = 0x3f;
+    self[0x433d] = 0x3f;
+    self[0x433e] = 0x3f;
+    self[0x433f] = 0xff;
+
+    self[0x4340] = 0x00;
+    self[0x4341] = 0x00;
+    self[0x4342] = 0x00;
+    self[0x4343] = 0xff;
+
+    *reinterpret_cast<float*>(self + 0x434c) = FLOAT_8032fc14;
+    *reinterpret_cast<float*>(self + 0x4350) = FLOAT_8032fc14;
+    *reinterpret_cast<float*>(self + 0x4354) = FLOAT_8032fc2c;
+
+    self[0x4344] = 0x3f;
+    self[0x4345] = 0x3f;
+    self[0x4346] = 0x3f;
+    self[0x4347] = 0xff;
+
+    *reinterpret_cast<float*>(self + 0x4358) = FLOAT_8032fc14;
+    *reinterpret_cast<float*>(self + 0x435c) = FLOAT_8032fc14;
+    *reinterpret_cast<float*>(self + 0x4360) = FLOAT_8032fc2c;
+
+    self[0x4348] = 0x00;
+    self[0x4349] = 0x00;
+    self[0x434a] = 0x00;
+    self[0x434b] = 0xff;
+
+    *reinterpret_cast<float*>(self + 0x4364) = FLOAT_8032fc14;
+    *reinterpret_cast<float*>(self + 0x4368) = FLOAT_8032fc14;
+    *reinterpret_cast<float*>(self + 0x436c) = FLOAT_8032fc2c;
 }
 
 /*
@@ -236,12 +273,38 @@ void CLightPcs::create()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004a11c
+ * PAL Size: 200b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CLightPcs::destroy()
 {
-	// TODO
+    unsigned char* light = reinterpret_cast<unsigned char*>(this);
+    for (unsigned int i = 0; i < 8; ++i) {
+        void** ptr = reinterpret_cast<void**>(light + 0x26b0);
+        if (*ptr != 0) {
+            Free__7CMemoryFPv(&Memory, *ptr);
+            *ptr = 0;
+            light[0x26ac] = 0;
+            light[0x26ad] = 0;
+        }
+        light += 0x138;
+    }
+
+    light = reinterpret_cast<unsigned char*>(this);
+    for (unsigned int i = 0; i < 8; ++i) {
+        void** ptr = reinterpret_cast<void**>(light + 0x1cf0);
+        if (*ptr != 0) {
+            Free__7CMemoryFPv(&Memory, *ptr);
+            *ptr = 0;
+            light[0x1cec] = 0;
+            light[0x1ced] = 0;
+        }
+        light += 0x138;
+    }
 }
 
 /*

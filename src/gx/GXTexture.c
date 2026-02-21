@@ -607,12 +607,12 @@ void GXLoadTexObjPreLoaded(GXTexObj* obj, GXTexRegion* region, GXTexMapID id) {
     CHECK_GXBEGIN(1259, "GXLoadTexObjPreLoaded");
     ASSERTMSGLINEV(1260, id < GX_MAX_TEXMAP, "%s: invalid texture map ID", "GXLoadTexObj");
 
-    SET_REG_FIELD(1271, t->mode0, 8, 24, GXTexMode0Ids[id]);
-    SET_REG_FIELD(1272, t->mode1, 8, 24, GXTexMode1Ids[id]);
-    SET_REG_FIELD(1273, t->image0, 8, 24, GXTexImage0Ids[id]);
-    SET_REG_FIELD(1274, r->image1, 8, 24, GXTexImage1Ids[id]);
-    SET_REG_FIELD(1275, r->image2, 8, 24, GXTexImage2Ids[id]);
-    SET_REG_FIELD(1276, t->image3, 8, 24, GXTexImage3Ids[id]);
+    t->mode0 = (t->mode0 & 0x00FFFFFF) | ((u32)GXTexMode0Ids[id] << 24);
+    t->mode1 = (t->mode1 & 0x00FFFFFF) | ((u32)GXTexMode1Ids[id] << 24);
+    t->image0 = (t->image0 & 0x00FFFFFF) | ((u32)GXTexImage0Ids[id] << 24);
+    r->image1 = (r->image1 & 0x00FFFFFF) | ((u32)GXTexImage1Ids[id] << 24);
+    r->image2 = (r->image2 & 0x00FFFFFF) | ((u32)GXTexImage2Ids[id] << 24);
+    t->image3 = (t->image3 & 0x00FFFFFF) | ((u32)GXTexImage3Ids[id] << 24);
 
     GX_WRITE_RAS_REG(t->mode0);
     GX_WRITE_RAS_REG(t->mode1);
@@ -626,7 +626,7 @@ void GXLoadTexObjPreLoaded(GXTexObj* obj, GXTexRegion* region, GXTexMapID id) {
         tlr = (__GXTlutRegionInt*)__GXData->tlutRegionCallback(t->tlutName);
         ASSERTMSGLINEV(1289, tlr, "%s: Tex/Tlut Region Callback returns NULL", "GXLoadTexObj/PreLoaded");
 
-        SET_REG_FIELD(1291, tlr->tlutObj.tlut, 8, 24, GXTexTlutIds[id]);
+        tlr->tlutObj.tlut = (tlr->tlutObj.tlut & 0x00FFFFFF) | ((u32)GXTexTlutIds[id] << 24);
         GX_WRITE_RAS_REG(tlr->tlutObj.tlut);
     }
 

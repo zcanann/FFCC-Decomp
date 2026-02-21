@@ -1414,6 +1414,20 @@ extern "C" void SetFromScript__10CCameraPcsFv(CCameraPcs* camera)
 
 /*
  * --INFO--
+ * PAL Address: 0x800B9C7C
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" int IsAbsolute__10CCameraPcsFv(CCameraPcs* camera)
+{
+    return *(int*)((char*)camera + 0x444);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800B9C28
  * PAL Size: 28b
  * EN Address: TODO

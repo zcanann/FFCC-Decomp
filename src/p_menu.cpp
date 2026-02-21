@@ -1,4 +1,9 @@
 #include "ffcc/p_menu.h"
+#include "ffcc/textureman.h"
+
+#include <dolphin/mtx.h>
+
+extern CTextureMan TextureMan;
 
 /*
  * --INFO--
@@ -212,12 +217,37 @@ void CMenuPcs::onMapChanged(int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80095bd0
+ * PAL Size: 212b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::SetTexture(CMenuPcs::TEX)
+void CMenuPcs::SetTexture(CMenuPcs::TEX tex)
 {
-	// TODO
+    CTexture* texture;
+    Mtx texMtx;
+
+    if ((int)tex == -1) {
+        texture = 0;
+    } else {
+        CTexture** textures = (CTexture**)((u8*)this + 0x18C);
+        u32 width;
+        u32 height;
+
+        texture = textures[(int)tex];
+        TextureMan.SetTexture(GX_TEXMAP0, texture);
+
+        width = *(u32*)((u8*)texture + 0x64);
+        height = *(u32*)((u8*)texture + 0x68);
+        PSMTXScale(texMtx, 1.0f / (f32)width, 1.0f / (f32)height, 1.0f);
+        GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
+        GXSetNumTexGens(1);
+        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+    }
+
+    TextureMan.SetTextureTev(texture);
 }
 
 /*

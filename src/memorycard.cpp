@@ -1717,39 +1717,49 @@ inline int rotrwi(int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800C1FF0
+ * PAL Size: 204b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMemoryCardMan::EncodeData()
 {
-    const u8  key = m_saveBuffer[0x11];
-    const u32 rotAmount = key & 0x1F;
-
+    const u32 rotAmount = m_saveBuffer[0x11] & 0x1F;
     u32* ptr = reinterpret_cast<u32*>(m_saveBuffer + 0x18);
+    int count = 0x5B6;
 
-    for (int i = 0; i < 0x5B6; i++)
+    do
     {
-        for (int w = 0; w < 7; w++)
-        {
-            u32 v = ptr[w];
-            v = (v << rotAmount) | (v >> (32 - rotAmount));
-            ptr[w] = v;
-        }
-
+        ptr[0] = (ptr[0] << rotAmount) | (ptr[0] >> (0x20 - rotAmount));
+        ptr[1] = (ptr[1] << rotAmount) | (ptr[1] >> (0x20 - rotAmount));
+        ptr[2] = (ptr[2] << rotAmount) | (ptr[2] >> (0x20 - rotAmount));
+        ptr[3] = (ptr[3] << rotAmount) | (ptr[3] >> (0x20 - rotAmount));
+        ptr[4] = (ptr[4] << rotAmount) | (ptr[4] >> (0x20 - rotAmount));
+        ptr[5] = (ptr[5] << rotAmount) | (ptr[5] >> (0x20 - rotAmount));
+        ptr[6] = (ptr[6] << rotAmount) | (ptr[6] >> (0x20 - rotAmount));
         ptr += 7;
+        count--;
     }
+    while (count != 0);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800C1F20
+ * PAL Size: 208b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMemoryCardMan::DecodeData()
 {
     u32 shift = 32 - (m_saveBuffer[0x11] & 0x1F);
     int count = 0x5B6;
     u32* ptr = reinterpret_cast<u32*>(m_saveBuffer + 0x18);
+    int count = 0x5B6;
 
     do {
         u32 v = ptr[0];

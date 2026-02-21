@@ -703,12 +703,11 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, UnkB* param_2, UnkC* para
 void pppRenderScreenBreak(PScreenBreak* pppScreenBreak, UnkB*, UnkC* param_3)
 {
     s32 dataOffset = param_3->m_serializedDataOffsets[2];
-    void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
-    CChara::CModel* model = (CChara::CModel*)GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
-    SearchNode__Q26CChara6CModelFPc(model, s_f999_root_801dd4c8);
-    if (*(u8*)((u8*)pppScreenBreak + 0xA4 + dataOffset) == 0) {
-        Graphic.GetBackBufferRect2(DAT_80238034, (_GXTexObj*)((u8*)pppScreenBreak + 0x90 + dataOffset), 0, 0, 0x280,
-                                   0x1C0, 0, GX_LINEAR, GX_TF_RGBA8, 0);
-        *(u8*)((u8*)pppScreenBreak + 0xA4 + dataOffset) = 1;
+    u8* value = (u8*)pppScreenBreak + dataOffset + 0x80;
+
+    if (value[0x24] == 0) {
+        Graphic.GetBackBufferRect2(*(void**)((u8*)&Graphic + 0x71EC), *(_GXTexObj**)(value + 0x10), 0, 0, 0x280, 0x1C0,
+                                   0, (_GXTexFilter)0, (_GXTexFmt)0, 0);
+        value[0x24] = 1;
     }
 }

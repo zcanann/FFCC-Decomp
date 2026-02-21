@@ -1,5 +1,7 @@
 #include "ffcc/p_light.h"
 
+#include "ffcc/graphic.h"
+
 #include <dolphin/mtx.h>
 #include <dolphin/gx/GXVert.h>
 #include <math.h>
@@ -29,6 +31,9 @@ extern float FLOAT_8032fc18;
 extern float FLOAT_8032fc1c;
 extern float FLOAT_8032fc20;
 extern float FLOAT_8032fc24;
+extern float FLOAT_8032fc28;
+extern float FLOAT_8032fc2c;
+extern float FLOAT_8032fc30;
 extern float FLOAT_8032fc34;
 extern float FLOAT_8032fc38;
 extern float FLOAT_8032fc3c;
@@ -38,6 +43,7 @@ extern float FLOAT_8032fc60;
 extern float FLOAT_8032fc70;
 extern float FLOAT_8032fc74;
 extern float FLOAT_8032fc78;
+extern float FLOAT_8032fc80;
 extern float FLOAT_8032fc84;
 extern float FLOAT_8032fc94;
 extern double DOUBLE_8032fc48;
@@ -45,7 +51,11 @@ extern double DOUBLE_8032fc50;
 extern double DOUBLE_8032fc58;
 extern double DOUBLE_8032fc68;
 extern double DAT_8032ec20;
+extern void* DAT_80238030;
 extern float DAT_801ea430;
+extern void* GraphicsPcs;
+
+extern "C" void setViewport__11CGraphicPcsFv(void*);
 
 extern class CCameraPcs {
 public:
@@ -626,22 +636,46 @@ void CLightPcs::SetPosition(CLightPcs::TARGET target, Vec* pos, unsigned long ma
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80048ef8
+ * PAL Size: 232b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void setchanctrl(CLightPcs::TARGET, unsigned long)
+void CLightPcs::SetBit32(CLightPcs::TARGET target, unsigned long* bits)
 {
-	// TODO
-}
+    char* lightPcs = (char*)this;
+    char* bumpSlot = lightPcs + 0x63c;
+    u32 i;
+    _GXColor lightColor;
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CLightPcs::SetBit32(CLightPcs::TARGET, unsigned long*)
-{
-	// TODO
+    *(u32*)(lightPcs + 0xb0) = 0;
+    *(u32*)(lightPcs + 0xb4) = 0;
+    i = 0;
+
+    do {
+        if (*(u32*)(lightPcs + 0xb8) <= i) {
+            return;
+        }
+
+        if ((*(char*)((int)target + (int)bumpSlot + 0x60) != '\0') &&
+            (((1 << (i & 0x1f)) & *(u32*)((char*)bits + ((i >> 3) & 0x1ffffffc))) != 0))
+        {
+            *(u32*)&lightColor = *(u32*)(bumpSlot + 0x50 + ((int)target * 4));
+            GXInitLightColor((GXLightObj*)(bumpSlot + 0x6c), lightColor);
+            GXLoadLightObjImm((GXLightObj*)(bumpSlot + 0x6c), (GXLightID)(1 << *(u32*)(lightPcs + 0xb0)));
+            *(u32*)(lightPcs + 0xb4) |= 1 << *(u32*)(lightPcs + 0xb0);
+            *(u32*)(lightPcs + 0xb0) += 1;
+
+            if (*(u32*)(lightPcs + 0xb0) > 7) {
+                return;
+            }
+        }
+
+        i += 1;
+        bumpSlot += 0xb0;
+    } while (true);
 }
 
 /*
@@ -976,7 +1010,55 @@ void CLightPcs::CBumpLight::MakeLightMap()
  */
 void CLightPcs::MakeLightMap()
 {
-	// TODO
+    Mtx44 projection;
+
+    GXSetCullMode(GX_CULL_BACK);
+    GXSetZCompLoc(GX_TRUE);
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+    GXSetBlendMode(GX_BM_NONE, GX_BL_ZERO, GX_BL_ZERO, GX_LO_SET);
+    GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
+    GXSetColorUpdate(GX_TRUE);
+    GXSetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
+    GXSetViewport(FLOAT_8032fc14, FLOAT_8032fc14, FLOAT_8032fc28, FLOAT_8032fc28, FLOAT_8032fc14, FLOAT_8032fc1c);
+    GXSetScissor(0, 0, 0x40, 0x40);
+    C_MTXOrtho(projection, FLOAT_8032fc2c, FLOAT_8032fc1c, FLOAT_8032fc2c, FLOAT_8032fc1c, FLOAT_8032fc1c,
+               FLOAT_8032fc30);
+    GXSetProjection(projection, GX_ORTHOGRAPHIC);
+    GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_CLAMP, GX_AF_NONE);
+    GXSetChanCtrl(GX_COLOR1A1, GX_TRUE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_NONE, GX_AF_SPEC);
+    GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+    GXSetTevDirect(GX_TEVSTAGE0);
+    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+    GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    GXSetNumIndStages(0);
+    GXSetNumTevStages(1);
+    GXSetNumTexGens(0);
+    GXSetNumChans(1);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_NRM, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_NRM, GX_NRM_XYZ, GX_F32, 0);
+    GXSetAlphaUpdate(GX_TRUE);
+
+    char* lightTarget = (char*)this;
+    for (u32 target = 0; target < 4; target++, lightTarget += 0x9c0) {
+        char* bump = lightTarget;
+        for (u32 i = 0; i < 8; i++, bump += 0x138) {
+            if (*(u8*)(bump + 0x1cec) != 0) {
+                ((CLightPcs::CBumpLight*)(bump + 0x1c3c))->MakeLightMap();
+            }
+        }
+    }
+
+    Graphic.SetStdPixelFmt();
+    setViewport__11CGraphicPcsFv(GraphicsPcs);
+    GXSetCullMode(GX_CULL_FRONT);
+    GXSetAlphaUpdate(GX_FALSE);
+    GXSetTexCopySrc(0, 0, 0x40, 0x40);
+    GXSetTexCopyDst((u16)0x40, (u16)0x40, GX_TF_I8, GX_FALSE);
+    GXCopyTex(DAT_80238030, GX_TRUE);
 }
 
 /*

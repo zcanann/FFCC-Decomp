@@ -23,7 +23,7 @@ public:
         void resDefaultParam();
         void setParam(void*, unsigned long);
         void free(void*);
-        void heapWalker(int, void*, unsigned long);
+        int heapWalker(int, void*, unsigned long);
         void drawHeapBar(int);
         void drawHeapTitle(int);
         void GetHeapUnuse();

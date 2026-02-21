@@ -66,12 +66,16 @@ struct ArtiOpenAnim {
 	s16 y;
 	s16 w;
 	s16 h;
+	float u;
+	float v;
 	float alpha;
 	float scale;
-	int frame;
+	int stepMax;
+	int tex;
+	int step;
+	int startFrame;
 	int duration;
 	unsigned int flags;
-	float progress;
 	float dx;
 	float dy;
 	float targetX;
@@ -365,26 +369,28 @@ unsigned int CMenuPcs::ArtiOpen()
 	int finished = 0;
 	int count = artiList[0];
 	ArtiOpenAnim* anim = (ArtiOpenAnim*)((u8*)artiList + 8);
+	int frame = artiState[0x11];
 
 	if (*(u8*)(artiState + 5) == 0) {
 		ArtiInit();
 	}
 
 	artiState[0x11]++;
+	frame = artiState[0x11];
 
 	for (int i = 0; i < count; i++, anim++) {
-		if (anim->frame <= artiState[0x11]) {
-			if (artiState[0x11] < anim->frame + anim->duration) {
-				anim->frame++;
-				anim->progress = (float)anim->frame / (float)anim->duration;
+		if (anim->startFrame <= frame) {
+			if (frame < anim->startFrame + anim->duration) {
+				anim->step++;
+				anim->alpha = (float)anim->step / (float)anim->duration;
 				if ((anim->flags & 2) == 0) {
-					float t = (float)anim->frame / (float)anim->duration;
+					float t = (float)anim->step / (float)anim->duration;
 					anim->dx = (anim->targetX - (float)anim->x) * t;
 					anim->dy = (anim->targetY - (float)anim->y) * t;
 				}
 			} else {
 				finished++;
-				anim->progress = 1.0f;
+				anim->alpha = 1.0f;
 				anim->dx = 0.0f;
 				anim->dy = 0.0f;
 			}
@@ -432,22 +438,24 @@ unsigned int CMenuPcs::ArtiClose()
 	int finished = 0;
 	int count = artiList[0];
 	ArtiOpenAnim* anim = (ArtiOpenAnim*)((u8*)artiList + 8);
+	int frame;
 
 	artiState[0x11]++;
+	frame = artiState[0x11];
 
 	for (int i = 0; i < count; i++, anim++) {
-		if (anim->frame <= artiState[0x11]) {
-			if (artiState[0x11] < anim->frame + anim->duration) {
-				anim->frame++;
-				anim->progress = 1.0f - ((float)anim->frame / (float)anim->duration);
+		if (anim->startFrame <= frame) {
+			if (frame < anim->startFrame + anim->duration) {
+				anim->step++;
+				anim->alpha = 1.0f - ((float)anim->step / (float)anim->duration);
 				if ((anim->flags & 2) == 0) {
-					float t = 1.0f - ((float)anim->frame / (float)anim->duration);
+					float t = 1.0f - ((float)anim->step / (float)anim->duration);
 					anim->dx = (anim->targetX - (float)anim->x) * t;
 					anim->dy = (anim->targetY - (float)anim->y) * t;
 				}
 			} else {
 				finished++;
-				anim->progress = 0.0f;
+				anim->alpha = 0.0f;
 				anim->dx = 0.0f;
 				anim->dy = 0.0f;
 			}

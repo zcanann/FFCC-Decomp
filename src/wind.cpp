@@ -265,7 +265,7 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
             if (*(s32*)(obj + 0x1C) == 2) {
                 if (d < (double)*(float*)(obj + 0x34)) {
                     yRand = (double)(FLOAT_80330ef8 - *(float*)(obj + 0x38) * *(float*)(obj + 0x38));
-                    d = sqrt(d);
+                    d = (double)sqrtf((float)d);
                     if (d <= DOUBLE_80330f10) {
                         d = DAT_8032ec20;
                     }

@@ -1,6 +1,7 @@
 #include "ffcc/gobjwork.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/p_game.h"
+#include "ffcc/system.h"
 #include <string.h>
 
 extern "C" void __dl__FPv(void*);
@@ -530,12 +531,93 @@ void CCaravanWork::CallShop(int, int, int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a0210
+ * PAL Size: 936b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCaravanWork::SafeDeleteTempItem()
 {
-	// TODO
+	int totalSlots = 0;
+	int artifactIndex = 0;
+
+	if ((unsigned int)System.m_execParam > 2U) {
+		System.Printf("");
+	}
+
+	for (int i = 0; i < 50; i++) {
+		if (artifactIndex < 96 && (short)m_artifacts[artifactIndex] > 0) {
+			unsigned short* artifactData =
+				(unsigned short*)(Game.game.unkCFlatData0[2] + (short)m_artifacts[artifactIndex] * 0x48);
+			if (artifactData[0] == 0xDB) {
+				totalSlots += artifactData[3];
+			}
+		}
+
+		if ((artifactIndex + 1) < 96 && (short)m_artifacts[artifactIndex + 1] > 0) {
+			unsigned short* artifactData = (unsigned short*)(Game.game.unkCFlatData0[2] +
+															 (short)m_artifacts[artifactIndex + 1] * 0x48);
+			if (artifactData[0] == 0xDB) {
+				totalSlots += artifactData[3];
+			}
+		}
+
+		artifactIndex += 2;
+	}
+
+	totalSlots += (short)m_baseCmdListSlots;
+	for (; totalSlots < 8; totalSlots++) {
+		if ((short)m_commandListInventorySlotRef[totalSlots] >= 0) {
+			m_commandListInventorySlotRef[totalSlots] = 0xFFFF;
+			if ((unsigned int)System.m_execParam > 2U) {
+				System.Printf("", totalSlots);
+			}
+		}
+	}
+
+	m_treasures[0] = 0xFFFF;
+	m_treasures[1] = 0xFFFF;
+	m_treasures[2] = 0xFFFF;
+	m_treasures[3] = 0xFFFF;
+
+	for (int i = 0; i < 64; i++) {
+		unsigned short item = m_inventoryItems[i];
+		if (((short)item > 0xFF) && ((short)item < 0x125) && item != 0xFFFF) {
+			m_inventoryItems[i] = 0xFFFF;
+			m_inventoryItemCount--;
+		}
+	}
+
+	if ((short)m_commandListInventorySlotRef[2] >= 0 &&
+		(short)m_inventoryItems[(short)m_commandListInventorySlotRef[2]] < 0) {
+		m_commandListInventorySlotRef[2] = 0xFFFF;
+	}
+	if ((short)m_commandListInventorySlotRef[3] >= 0 &&
+		(short)m_inventoryItems[(short)m_commandListInventorySlotRef[3]] < 0) {
+		m_commandListInventorySlotRef[3] = 0xFFFF;
+	}
+	if ((short)m_commandListInventorySlotRef[4] >= 0 &&
+		(short)m_inventoryItems[(short)m_commandListInventorySlotRef[4]] < 0) {
+		m_commandListInventorySlotRef[4] = 0xFFFF;
+	}
+	if ((short)m_commandListInventorySlotRef[5] >= 0 &&
+		(short)m_inventoryItems[(short)m_commandListInventorySlotRef[5]] < 0) {
+		m_commandListInventorySlotRef[5] = 0xFFFF;
+	}
+	if ((short)m_commandListInventorySlotRef[6] >= 0 &&
+		(short)m_inventoryItems[(short)m_commandListInventorySlotRef[6]] < 0) {
+		m_commandListInventorySlotRef[6] = 0xFFFF;
+	}
+	if ((short)m_commandListInventorySlotRef[7] >= 0 &&
+		(short)m_inventoryItems[(short)m_commandListInventorySlotRef[7]] < 0) {
+		m_commandListInventorySlotRef[7] = 0xFFFF;
+	}
+
+	m_currentCmdListIndex = 0;
+	m_weaponIdx = 0;
+	memset(m_commandListExtra, 0, sizeof(m_commandListExtra));
 }
 
 /*

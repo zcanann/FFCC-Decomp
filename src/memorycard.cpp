@@ -1747,21 +1747,28 @@ void CMemoryCardMan::EncodeData()
  */
 void CMemoryCardMan::DecodeData()
 {
-    u32 shift = (m_saveBuffer[0x11] & 0x1F);
-    u32 rshift = (32 - shift) & 31; 
+    u32 shift = 32 - (m_saveBuffer[0x11] & 0x1F);
+    int count = 0x5B6;
     u32* ptr = reinterpret_cast<u32*>(m_saveBuffer + 0x18);
 
-    for (int i = 0; i < 0x5B6; i++)
-    {
-        for (int w = 0; w < 7; w++)
-        {
-            u32 v = ptr[w];
-            v = (v >> shift) | (v << rshift);
-            ptr[w] = v;
-        }
-
+    do {
+        u32 v = ptr[0];
+        ptr[0] = (v << (shift & 0x1F)) | (v >> (32 - (shift & 0x1F)));
+        v = ptr[1];
+        ptr[1] = (v << (shift & 0x1F)) | (v >> (32 - (shift & 0x1F)));
+        v = ptr[2];
+        ptr[2] = (v << (shift & 0x1F)) | (v >> (32 - (shift & 0x1F)));
+        v = ptr[3];
+        ptr[3] = (v << (shift & 0x1F)) | (v >> (32 - (shift & 0x1F)));
+        v = ptr[4];
+        ptr[4] = (v << (shift & 0x1F)) | (v >> (32 - (shift & 0x1F)));
+        v = ptr[5];
+        ptr[5] = (v << (shift & 0x1F)) | (v >> (32 - (shift & 0x1F)));
+        v = ptr[6];
+        ptr[6] = (v << (shift & 0x1F)) | (v >> (32 - (shift & 0x1F)));
         ptr += 7;
-    }
+        count--;
+    } while (count != 0);
 }
 
 void CMemoryCardMan::CalcSaveDatHpMax(Mc::SaveDat* saveDat)

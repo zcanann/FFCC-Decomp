@@ -4,6 +4,18 @@
 #include "ffcc/system.h"
 #include <string.h>
 
+namespace {
+static inline unsigned short* GetItemDataPtr(int itemIdx)
+{
+	return (unsigned short*)(Game.game.unkCFlatData0[2] + (itemIdx * 0x48));
+}
+
+static inline float GetStatusMultiplier(int offset)
+{
+	return ((float)(*(unsigned short*)(Game.game.unk_flat3_field_8_0xc7dc + offset)) * 0.01f) + 1.0f;
+}
+}
+
 extern "C" void __dl__FPv(void*);
 extern "C" void* __vt__8CMonWork[];
 extern "C" void* __vt__12CCaravanWork[];
@@ -642,12 +654,229 @@ void CCaravanWork::CalcArtifactStatus(int, int, int&, int&, int&, int&, int&)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009fa44
+ * PAL Size: 1996b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCaravanWork::CalcStatus()
 {
-	// TODO
+	unsigned short* baseData = (unsigned short*)(Game.game.unkCFlatData0[0] + (m_baseDataIndex * 0x1D0));
+
+	memcpy(m_elementResistances, m_romWorkPtr + 0x6F, 0x16);
+
+	m_strength = baseData[4];
+	m_baseStrength = m_strength;
+	m_magic = baseData[5];
+	m_baseMagic = m_magic;
+	m_defense = baseData[6];
+	m_baseDefense = m_defense;
+	m_maxHp = baseData[3];
+
+	m_equipEffectFlags = 0;
+	m_numCmdListSlots = m_baseCmdListSlots;
+	memset(m_equipEffectParams, 0, 7);
+
+	if (m_tempStatBuffTimer != 0) {
+		if (m_tempStatBuffId >= 0x185) {
+			m_strength += *(short*)(Game.game.unk_flat3_field_8_0xc7dc + 0x6A);
+		} else if (m_tempStatBuffId >= 0x180) {
+			m_defense += *(short*)(Game.game.unk_flat3_field_8_0xc7dc + 0x6C);
+		} else if (m_tempStatBuffId > 0x17C) {
+			m_magic += *(short*)(Game.game.unk_flat3_field_8_0xc7dc + 0x6E);
+		}
+		m_tempStatBuffTimer--;
+	}
+
+	if (Game.game.m_gameWork.m_chaliceElement == 4) {
+		m_elementResistances[3]++;
+	} else if (Game.game.m_gameWork.m_chaliceElement < 4) {
+		if (Game.game.m_gameWork.m_chaliceElement == 2) {
+			m_elementResistances[2]++;
+		} else if ((Game.game.m_gameWork.m_chaliceElement < 2) && (Game.game.m_gameWork.m_chaliceElement > 0)) {
+			m_elementResistances[1]++;
+		}
+	} else if (Game.game.m_gameWork.m_chaliceElement == 8) {
+		m_statusTimers[0]++;
+		m_statusTimers[2]++;
+	}
+
+	short hpBonus = 0;
+	short cmdBonus = 0;
+	short strBonus = 0;
+	short magBonus = 0;
+	short defBonus = 0;
+	unsigned short* artifact = &m_artifacts[0];
+	for (int i = 0; i < 100; i++, artifact++) {
+		if (*(short*)artifact > 0) {
+			unsigned short* artifactData = GetItemDataPtr(*(short*)artifact);
+			unsigned short artifactEffect = artifactData[0];
+			short value = artifactData[3];
+
+			if (artifactEffect == 0xDB) {
+				cmdBonus += value;
+			} else if (artifactEffect < 0xDB) {
+				if (artifactEffect == 0xB6) {
+					magBonus += value;
+				} else if (artifactEffect < 0xB6) {
+					if (artifactEffect == 0x9F) {
+						strBonus += value;
+					}
+				} else if (artifactEffect == 0xCC) {
+					defBonus += value;
+				}
+			} else if (artifactEffect == 0xE4) {
+				hpBonus += value;
+			} else if ((artifactEffect < 0xE4) && (artifactEffect == 0xDF)) {
+				magBonus += value;
+			}
+		}
+	}
+
+	m_strength += strBonus;
+	m_baseStrength += strBonus;
+	m_magic += magBonus;
+	m_baseMagic += magBonus;
+	m_defense += defBonus;
+	m_baseDefense += defBonus;
+	m_numCmdListSlots += cmdBonus;
+	m_maxHp += hpBonus;
+
+	if ((short)m_numCmdListSlots > 8) {
+		m_numCmdListSlots = 8;
+	}
+	if (m_maxHp > 0x10) {
+		m_maxHp = 0x10;
+	}
+
+	for (int equipIdx = 0; equipIdx < 4; equipIdx++) {
+		if (m_equipment[equipIdx] >= 0) {
+			int itemIdx = (short)m_inventoryItems[m_equipment[equipIdx]];
+			unsigned short* itemData = GetItemDataPtr(itemIdx);
+			unsigned short itemType = itemData[0];
+
+			if (itemType == 1) {
+				int weaponItem = 0;
+				int weaponRef = 0;
+				GetCurrentWeaponItem(weaponItem, weaponRef);
+				if (weaponItem > 0) {
+					itemIdx = weaponItem;
+					itemData = GetItemDataPtr(itemIdx);
+				}
+			}
+
+			short itemValue = (short)itemData[3];
+			if (itemType == 0x45) {
+				m_defense += itemValue;
+				m_baseDefense += itemValue;
+			apply_effect:
+				switch (itemData[4]) {
+				case 1:
+					m_elementResistances[1]++;
+					break;
+				case 2:
+					m_elementResistances[2]++;
+					break;
+				case 3:
+					m_elementResistances[3]++;
+					break;
+				case 4:
+					m_elementResistances[4]++;
+					break;
+				case 5:
+					m_elementResistances[5]++;
+					break;
+				case 6:
+					m_statusTimers[0]++;
+					break;
+				case 7:
+					m_statusTimers[1]++;
+					break;
+				case 8:
+					m_statusTimers[2]++;
+					break;
+				case 9:
+					m_equipEffectParams[0] += (char)itemValue;
+					break;
+				case 10:
+					m_equipEffectParams[1] += (char)itemValue;
+					break;
+				case 0xB:
+					m_equipEffectParams[2] += (char)itemValue;
+					break;
+				case 0xC:
+					m_equipEffectParams[3] += (char)itemValue;
+					break;
+				case 0x10:
+					m_equipEffectParams[4] += (char)itemValue;
+					break;
+				case 0x11:
+					m_equipEffectParams[5] += (char)itemValue;
+					break;
+				case 0x12:
+					m_equipEffectParams[6] += (char)itemValue;
+					break;
+				case 0x13:
+					m_elementResistances[0]++;
+					break;
+				}
+				m_equipEffectFlags |= 1 << itemData[4];
+			} else if (itemType < 0x45) {
+				if (itemType == 1) {
+					m_strength += itemValue;
+					m_baseStrength += itemValue;
+				}
+			} else if (itemType == 0x7F) {
+				m_defense += itemValue;
+				m_baseDefense += itemValue;
+				goto apply_effect;
+			}
+		}
+	}
+
+	for (int i = 0; i < 11; i++) {
+		if (m_elementResistances[i] > 2) {
+			m_elementResistances[i] = 2;
+		}
+	}
+
+	if (m_maxHp < m_hp) {
+		m_hp = m_maxHp;
+	}
+
+	if (m_statusTimers[9] != 0) {
+		float mul = GetStatusMultiplier(0x38);
+		m_strength = (unsigned short)((float)m_strength * mul);
+		m_magic = (unsigned short)((float)m_magic * mul);
+		m_defense = (unsigned short)((float)m_defense * mul);
+	}
+	if (m_statusTimers[4] != 0) {
+		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x3E));
+	}
+	if (m_statusTimers[6] != 0) {
+		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x44));
+	}
+
+	if (m_strength > 99) {
+		m_strength = 99;
+	}
+	if (m_defense > 99) {
+		m_defense = 99;
+	}
+	if (m_magic > 99) {
+		m_magic = 99;
+	}
+	if (m_baseStrength > 99) {
+		m_baseStrength = 99;
+	}
+	if (m_baseDefense > 99) {
+		m_baseDefense = 99;
+	}
+	if (m_baseMagic > 99) {
+		m_baseMagic = 99;
+	}
 }
 
 /*

@@ -1,5 +1,6 @@
 #include "ffcc/materialman.h"
 #include "ffcc/pad.h"
+#include "ffcc/chunkfile.h"
 #include "ffcc/textureman.h"
 
 #include <dolphin/mtx.h>
@@ -20,6 +21,9 @@ extern "C" int CheckName__8CTextureFPc(CTexture*, char*);
 class CMapKeyFrame;
 extern "C" float Get__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" void Calc__12CMapKeyFrameFv(CMapKeyFrame*);
+extern "C" void ReadFrame__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*);
+extern "C" void ReadKey__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*, int);
+extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __vt__9CMaterial[];
 extern "C" void* PTR_PTR_s_CMaterialSet_801e9bbc;
 extern CMemory Memory;
@@ -157,6 +161,70 @@ static int HighestSetBit(unsigned int value)
         }
     }
     return -1;
+}
+
+static CMaterial* AllocMaterial()
+{
+    unsigned char* material = reinterpret_cast<unsigned char*>(
+        _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+            &Memory,
+            0xA8,
+            *reinterpret_cast<CMemory::CStage**>(MaterialMan + 0x218),
+            s_materialman_cpp,
+            0xCFF,
+            0));
+    if (material == 0) {
+        return 0;
+    }
+
+    __ct__4CRefFv(material);
+    *reinterpret_cast<void**>(material) = __vt__9CMaterial;
+    __construct_array(material + 0x4C, __ct__10CTexScrollFv, __dt__10CTexScrollFv, 0x14, 4);
+    memset(material + 8, 0, 0x10);
+    *reinterpret_cast<int*>(material + 0x9C) = -1;
+    material[0xA0] = 4;
+    material[0xA1] = 1;
+    material[0xA2] = 0;
+    material[0xA4] = 0;
+    *reinterpret_cast<void**>(material + 0x3C) = 0;
+    *reinterpret_cast<void**>(material + 0x40) = 0;
+    *reinterpret_cast<void**>(material + 0x44) = 0;
+    *reinterpret_cast<void**>(material + 0x48) = 0;
+    material[0x34] = 0;
+    material[0x35] = 0;
+    material[0x36] = 0;
+    material[0xA5] = 0;
+
+    return reinterpret_cast<CMaterial*>(material);
+}
+
+static void AddTextureIndex(CMaterial* material, unsigned short textureIndex)
+{
+    unsigned short numTexture = *reinterpret_cast<unsigned short*>(Ptr(material, 0x18));
+    *reinterpret_cast<unsigned short*>(Ptr(material, 0x18)) = static_cast<unsigned short>(numTexture + 1);
+    *reinterpret_cast<unsigned short*>(Ptr(material, 0x1A + (numTexture << 1))) = textureIndex;
+}
+
+static CMapKeyFrame* AllocMapKeyFrame(int line)
+{
+    CMapKeyFrame* keyFrame = reinterpret_cast<CMapKeyFrame*>(__nw__FUlPQ27CMemory6CStagePci(
+        0x28,
+        *reinterpret_cast<CMemory::CStage**>(MaterialMan + 0x218),
+        s_materialman_cpp,
+        line));
+    if (keyFrame != 0) {
+        memset(keyFrame, 0, 0x28);
+        *reinterpret_cast<unsigned char*>(Ptr(keyFrame, 0xC)) = 1;
+    }
+    return keyFrame;
+}
+
+static void SetMaterialColor(CMaterial* material, unsigned int rgba)
+{
+    *Ptr(material, 0x48) = static_cast<unsigned char>((rgba >> 24) & 0xFF);
+    *Ptr(material, 0x49) = static_cast<unsigned char>((rgba >> 16) & 0xFF);
+    *Ptr(material, 0x4A) = static_cast<unsigned char>((rgba >> 8) & 0xFF);
+    *Ptr(material, 0x4B) = static_cast<unsigned char>(rgba & 0xFF);
 }
 }
 
@@ -772,6 +840,309 @@ CMaterial::CMaterial()
 void CMaterialMan::GetMemoryStage()
 {
 	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003cdbc
+ * PAL Size: 2748b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void CMaterialSet::Create(CChunkFile& chunkFile, CTextureSet* textureSet, CMaterialMan::TEV_BIT tevBit,
+                          CLightPcs::CBumpLight* bumpLights)
+{
+    enum {
+        CHUNK_MATL = 0x4D41544C,
+        CHUNK_TIDX = 0x54494458,
+        CHUNK_NAME = 0x4E414D45,
+        CHUNK_ATTR = 0x41545242,
+        CHUNK_BUMP = 0x42554D50,
+        CHUNK_JIME = 0x4A494D45,
+        CHUNK_WATR = 0x57415452,
+        CHUNK_FUR  = 0x46555220,
+        CHUNK_TSCL = 0x5453434C,
+        CHUNK_TSDT = 0x54534454,
+        CHUNK_UFRM = 0x5546524D,
+        CHUNK_VFRM = 0x5646524D,
+        CHUNK_UKEY = 0x554B4559,
+        CHUNK_VKEY = 0x564B4559,
+    };
+
+    CMaterial* material = 0;
+    CChunkFile::CChunk chunk;
+    CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
+
+    chunkFile.PushChunk();
+    while (chunkFile.GetNextChunk(chunk) != 0) {
+        if (chunk.m_id != CHUNK_MATL) {
+            continue;
+        }
+
+        chunkFile.PushChunk();
+        while (chunkFile.GetNextChunk(chunk) != 0) {
+            if (chunk.m_id == CHUNK_TIDX) {
+                unsigned long materialIndex = 0;
+                while (materialIndex < static_cast<unsigned long>(materials->GetSize())) {
+                    if ((*materials)[materialIndex] == 0) {
+                        break;
+                    }
+                    materialIndex++;
+                }
+
+                material = AllocMaterial();
+                if (material == 0) {
+                    continue;
+                }
+
+                *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) = static_cast<unsigned long>(tevBit);
+                *reinterpret_cast<void**>(Ptr(material, 0x28)) = 0;
+                *reinterpret_cast<unsigned short*>(Ptr(material, 0x18)) = 0;
+                *reinterpret_cast<float*>(Ptr(material, 0x30)) = FLOAT_8032faf0;
+                *reinterpret_cast<float*>(Ptr(material, 0x2C)) = FLOAT_8032faf0;
+                *Ptr(material, 0xA7) = 0;
+                *reinterpret_cast<unsigned short*>(Ptr(material, 0x18)) = static_cast<unsigned short>(chunk.m_arg0);
+
+                if (*reinterpret_cast<unsigned short*>(Ptr(material, 0x18)) == 0) {
+                    *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 1;
+                } else {
+                    for (int i = 0; i < static_cast<int>(static_cast<unsigned short>(chunk.m_arg0)); i++) {
+                        *reinterpret_cast<unsigned short*>(Ptr(material, 0x1A + (i << 1))) =
+                            static_cast<unsigned short>(chunkFile.Get4());
+                    }
+                    if (*reinterpret_cast<unsigned short*>(Ptr(material, 0x18)) == 2) {
+                        *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 2;
+                    }
+                }
+
+                if (materialIndex < static_cast<unsigned long>(materials->GetSize())) {
+                    materials->SetAt(materialIndex, material);
+                } else {
+                    materials->Add(material);
+                }
+            } else if (chunk.m_id == CHUNK_NAME) {
+                if (material != 0) {
+                    strncpy(reinterpret_cast<char*>(Ptr(material, 8)), chunkFile.GetString(), 0x10);
+                } else {
+                    chunkFile.GetString();
+                }
+            } else if (chunk.m_id == CHUNK_ATTR) {
+                unsigned int flags = chunkFile.Get4();
+                if (material == 0) {
+                    chunkFile.Get1();
+                    chunkFile.Get1();
+                    chunkFile.Get1();
+                    chunkFile.Get1();
+                    chunkFile.Get2();
+                    chunkFile.Get2();
+                    chunkFile.GetF4();
+                    continue;
+                }
+
+                if ((flags & 1) != 0) {
+                    *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 0x80;
+                }
+                if ((flags & 2) != 0) {
+                    *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 0x10;
+                }
+                if ((flags & 4) != 0) {
+                    *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 4;
+                }
+                if ((flags & 8) != 0) {
+                    *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 0x100000;
+                }
+
+                *Ptr(material, 0xA0) = chunkFile.Get1();
+                *Ptr(material, 0xA1) = chunkFile.Get1();
+                chunkFile.Get1();
+                chunkFile.Get1();
+                *Ptr(material, 0xA6) = static_cast<unsigned char>(chunkFile.Get2());
+                chunkFile.Get2();
+                chunkFile.GetF4();
+            } else if (chunk.m_id == CHUNK_FUR) {
+                unsigned short textureIndex = chunkFile.Get2();
+                if (material != 0) {
+                    AddTextureIndex(material, textureIndex);
+                    *Ptr(material, 0xA7) = 1;
+                }
+            } else if (chunk.m_id == CHUNK_BUMP) {
+                unsigned char bumpLightDirect = 0;
+                if (chunk.m_version == 1) {
+                    bumpLightDirect = chunkFile.Get1();
+                    if (material != 0) {
+                        *Ptr(material, 0xA1) = chunkFile.Get1();
+                    } else {
+                        chunkFile.Get1();
+                    }
+                    chunkFile.Get2();
+                }
+
+                unsigned short texture0 = chunkFile.Get2();
+                unsigned short texture1 = chunkFile.Get2();
+                unsigned short bumpIndex = chunkFile.Get2();
+                unsigned short texture2 = chunkFile.Get2();
+                float scaleU = chunkFile.GetF4();
+                float scaleV = chunkFile.GetF4();
+                unsigned char a6 = static_cast<unsigned char>(chunkFile.Get4());
+                unsigned int rgba = chunkFile.Get4();
+
+                if (material != 0) {
+                    AddTextureIndex(material, texture0);
+                    AddTextureIndex(material, texture1);
+                    AddTextureIndex(material, texture2);
+
+                    *reinterpret_cast<float*>(Ptr(material, 0x30)) = FLOAT_8032faf0 / scaleU;
+                    *reinterpret_cast<float*>(Ptr(material, 0x2C)) = FLOAT_8032faf0 / scaleV;
+                    *Ptr(material, 0xA6) = a6;
+                    SetMaterialColor(material, rgba);
+                    *Ptr(material, 0xA2) = 1;
+
+                    CLightPcs::CBumpLight* bumpLight = bumpLights;
+                    if (bumpLight == 0) {
+                        bumpLight = reinterpret_cast<CLightPcs::CBumpLight*>(0x8026B584 + (bumpIndex * 0x138));
+                        *Ptr(material, 0xA3) = (bumpLightDirect == 0) ? 0 : 1;
+                    } else {
+                        *Ptr(material, 0xA3) = 1;
+                    }
+
+                    *reinterpret_cast<CLightPcs::CBumpLight**>(Ptr(material, 0x28)) = bumpLight;
+                    *Ptr(bumpLight, 0xB1) = *Ptr(material, 0xA2);
+                    *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 4;
+                }
+            } else if (chunk.m_id == CHUNK_JIME) {
+                unsigned short texture0 = chunkFile.Get2();
+                unsigned short texture1 = chunkFile.Get2();
+                unsigned short bumpIndex = chunkFile.Get2();
+                unsigned char a1 = chunkFile.Get1();
+                unsigned char useJimen = chunkFile.Get1();
+                float scaleU = chunkFile.GetF4();
+                float scaleV = chunkFile.GetF4();
+                chunkFile.Get4();
+                unsigned int rgba = chunkFile.Get4();
+
+                if (material != 0) {
+                    AddTextureIndex(material, texture0);
+                    AddTextureIndex(material, texture1);
+                    *Ptr(material, 0xA1) = a1;
+                    if (useJimen != 0) {
+                        *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 0x20000;
+                    }
+                    *reinterpret_cast<float*>(Ptr(material, 0x30)) = FLOAT_8032faf0 / scaleU;
+                    *reinterpret_cast<float*>(Ptr(material, 0x2C)) = FLOAT_8032faf0 / scaleV;
+                    *Ptr(material, 0xA2) = 3;
+
+                    CLightPcs::CBumpLight* bumpLight =
+                        reinterpret_cast<CLightPcs::CBumpLight*>(0x8026B584 + (bumpIndex * 0x138));
+                    *reinterpret_cast<CLightPcs::CBumpLight**>(Ptr(material, 0x28)) = bumpLight;
+                    *Ptr(bumpLight, 0xB1) = *Ptr(material, 0xA2);
+                    *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 0x4000;
+                    SetMaterialColor(material, rgba);
+                    *Ptr(material, 0xA3) = 1;
+                }
+            } else if (chunk.m_id == CHUNK_WATR) {
+                unsigned short texture0 = chunkFile.Get2();
+                unsigned short texture1 = chunkFile.Get2();
+                unsigned short bumpIndex = chunkFile.Get2();
+                unsigned char waterMode = chunkFile.Get1();
+                unsigned char a1 = chunkFile.Get1();
+                float scaleU = chunkFile.GetF4();
+                float scaleV = chunkFile.GetF4();
+                chunkFile.Get4();
+                unsigned int rgba = chunkFile.Get4();
+
+                if (material != 0) {
+                    AddTextureIndex(material, texture0);
+                    AddTextureIndex(material, texture1);
+                    *Ptr(material, 0xA1) = a1;
+                    *reinterpret_cast<float*>(Ptr(material, 0x30)) = FLOAT_8032faf0 / scaleU;
+                    *reinterpret_cast<float*>(Ptr(material, 0x2C)) = FLOAT_8032faf0 / scaleV;
+                    *Ptr(material, 0xA2) = 2;
+
+                    CLightPcs::CBumpLight* bumpLight =
+                        reinterpret_cast<CLightPcs::CBumpLight*>(0x8026B584 + (bumpIndex * 0x138));
+                    *reinterpret_cast<CLightPcs::CBumpLight**>(Ptr(material, 0x28)) = bumpLight;
+                    *Ptr(bumpLight, 0xB1) = *Ptr(material, 0xA2);
+                    *Ptr(material, 0xA0) = 4;
+                    SetMaterialColor(material, rgba);
+
+                    if ((waterMode == 0) && (*Ptr(material, 0xA1) == 0)) {
+                        *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 8;
+                    } else {
+                        *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) |= 0x80000;
+                    }
+                }
+            } else if (chunk.m_id == CHUNK_TSCL) {
+                if (material == 0) {
+                    continue;
+                }
+
+                if (chunk.m_version == 1) {
+                    CMapKeyFrame* keyFrameU = 0;
+                    CMapKeyFrame* keyFrameV = 0;
+
+                    chunkFile.PushChunk();
+                    while (chunkFile.GetNextChunk(chunk) != 0) {
+                        if (chunk.m_id == CHUNK_UFRM) {
+                            keyFrameU = AllocMapKeyFrame(0xDD3);
+                            ReadFrame__12CMapKeyFrameFR10CChunkFilei(keyFrameU, &chunkFile);
+                        } else if (chunk.m_id == CHUNK_VFRM) {
+                            keyFrameV = AllocMapKeyFrame(0xDDD);
+                            ReadFrame__12CMapKeyFrameFR10CChunkFilei(keyFrameV, &chunkFile);
+                        } else if (chunk.m_id == CHUNK_UKEY) {
+                            ReadKey__12CMapKeyFrameFR10CChunkFilei(
+                                keyFrameU, &chunkFile, static_cast<char>(chunk.m_arg0));
+                        } else if (chunk.m_id == CHUNK_VKEY) {
+                            ReadKey__12CMapKeyFrameFR10CChunkFilei(
+                                keyFrameV, &chunkFile, static_cast<char>(chunk.m_arg0));
+                        } else if (chunk.m_id == CHUNK_TSDT) {
+                            unsigned int slot = chunkFile.Get2() & 0xFFFF;
+                            chunkFile.Get2();
+
+                            if (keyFrameU == 0) {
+                                float valueU = chunkFile.GetF4();
+                                *reinterpret_cast<float*>(Ptr(material, 0x58 + (slot * 0x14))) = valueU;
+                                *Ptr(material, 0x4C + (slot * 0x14)) = (valueU == FLOAT_8032faf4) ? 0 : 1;
+                            } else {
+                                chunkFile.GetF4();
+                                *reinterpret_cast<CMapKeyFrame**>(Ptr(material, 0x58 + (slot * 0x14))) = keyFrameU;
+                                *Ptr(material, 0x4C + (slot * 0x14)) = 2;
+                            }
+
+                            if (keyFrameV == 0) {
+                                float valueV = chunkFile.GetF4();
+                                *reinterpret_cast<float*>(Ptr(material, 0x5C + (slot * 0x14))) = valueV;
+                                *Ptr(material, 0x4D + (slot * 0x14)) = (valueV == FLOAT_8032faf4) ? 0 : 1;
+                            } else {
+                                chunkFile.GetF4();
+                                *reinterpret_cast<CMapKeyFrame**>(Ptr(material, 0x5C + (slot * 0x14))) = keyFrameV;
+                                *Ptr(material, 0x4D + (slot * 0x14)) = 2;
+                            }
+                        }
+                    }
+                    chunkFile.PopChunk();
+                } else {
+                    unsigned int slot = chunkFile.Get2() & 0xFFFF;
+                    chunkFile.Get2();
+                    float valueU = chunkFile.GetF4();
+                    float valueV = chunkFile.GetF4();
+
+                    *reinterpret_cast<float*>(Ptr(material, 0x58 + (slot * 0x14))) = valueU;
+                    *reinterpret_cast<float*>(Ptr(material, 0x5C + (slot * 0x14))) = valueV;
+                    if (FLOAT_8032faf4 != valueU) {
+                        *Ptr(material, 0x4C + (slot * 0x14)) = 1;
+                    }
+                    if (FLOAT_8032faf4 != valueV) {
+                        *Ptr(material, 0x4D + (slot * 0x14)) = 1;
+                    }
+                }
+            }
+        }
+        chunkFile.PopChunk();
+    }
+    chunkFile.PopChunk();
+    SetTextureSet(textureSet);
 }
 
 /*

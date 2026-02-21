@@ -323,13 +323,14 @@ int CWind::AddAmbient(float dir, float speed)
 	group = 4;
 	do {
 		freeObj = scan;
-		if (((((s8)scan[0] >= 0) || ((freeObj = scan + 100), (s8)freeObj[0] >= 0)) ||
-		     ((freeObj = scan + 200), (s8)freeObj[0] >= 0)) ||
-		    (((freeObj = scan + 300), (s8)freeObj[0] >= 0) ||
-		     ((freeObj = scan + 400), (s8)freeObj[0] >= 0)) ||
-		   (((freeObj = scan + 500), (s8)freeObj[0] >= 0) ||
-		    (((freeObj = scan + 600), (s8)freeObj[0] >= 0) ||
-		     ((freeObj = scan + 700), (s8)scan[700] >= 0)))) {
+		if (((s8)scan[0] >= 0) ||
+		    ((freeObj = scan + 100), (s8)freeObj[0] >= 0) ||
+		    ((freeObj = scan + 200), (s8)freeObj[0] >= 0) ||
+		    ((freeObj = scan + 300), (s8)freeObj[0] >= 0) ||
+		    ((freeObj = scan + 400), (s8)freeObj[0] >= 0) ||
+		    ((freeObj = scan + 500), (s8)freeObj[0] >= 0) ||
+		    ((freeObj = scan + 600), (s8)freeObj[0] >= 0) ||
+		    ((freeObj = scan + 700), (s8)freeObj[0] >= 0)) {
 			goto found;
 		}
 

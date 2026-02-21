@@ -137,7 +137,7 @@ void RedDelete(int address)
 		while (blockPtr[1] != 0 && blockPtr < DAT_8032f4a0 + 0x800) {
 			if (blockPtr[0] == address) {
 				unsigned int moveCount = (int)DAT_8032f4a0 + (0x2000 - (int)(blockPtr + 2));
-				int entryCount = ((int)moveCount >> 3) + ((int)moveCount < 0 && (moveCount & 7) != 0);
+				int entryCount = (int)moveCount / 8;
 				if (entryCount > 0) {
 					memcpy(blockPtr, blockPtr + 2, entryCount * 8);
 					memset(DAT_8032f4a0 + 0x7FE, 0, 8);
@@ -279,7 +279,7 @@ void RedDeleteA(int address)
 		while (blockPtr[1] != 0 && blockPtr < DAT_8032f4a4 + 0x800) {
 			if (blockPtr[0] == address) {
 				unsigned int moveCount = (int)DAT_8032f4a4 + (0x2000 - (int)(blockPtr + 2));
-				int entryCount = ((int)moveCount >> 3) + ((int)moveCount < 0 && (moveCount & 7) != 0);
+				int entryCount = (int)moveCount / 8;
 				if (entryCount > 0) {
 					memcpy(blockPtr, blockPtr + 2, entryCount * 8);
 					memset(DAT_8032f4a4 + 0x7FE, 0, 8);

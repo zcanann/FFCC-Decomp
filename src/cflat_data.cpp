@@ -77,7 +77,7 @@ extern "C" CFlatData* dtor_800980B4(CFlatData* flatData, short shouldDelete)
 	if (flatData != nullptr)
 	{
 		pCVar1 = (FlatDataLayout*)flatData;
-		for (iVar2 = 0; iVar2 < pCVar1->m_dataCount; iVar2++)
+		for (iVar2 = 0; iVar2 < ((FlatDataLayout*)flatData)->m_dataCount; iVar2++)
 		{
 			if (pCVar1->m_data[0].m_data != nullptr)
 			{

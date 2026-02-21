@@ -39,6 +39,7 @@ struct VtMimeEnv
 
 extern int lbl_8032ED70;
 extern VtMimeEnv* lbl_8032ED54;
+extern const float lbl_803300F0;
 extern char Graphic[];
 static char lbl_801D8520[] = "pppVtMime.cpp";
 
@@ -147,10 +148,11 @@ void pppDrawVtMime(void* param1, void* param2, void* param3)
 void pppVtMimeCon(void* param1, void* param2, void* param3)
 {
     VtMimeState* state = (VtMimeState*)((char*)param1 + **(int**)((char*)param2 + 0xC) + 0x80);
+    float zero = lbl_803300F0;
 
-    state->accel = 0.0f;
-    state->velocity = 0.0f;
-    state->value = 0.0f;
+    state->accel = zero;
+    state->velocity = zero;
+    state->value = zero;
     state->vertexBuffer = 0;
 }
 
@@ -166,10 +168,11 @@ void pppVtMimeCon(void* param1, void* param2, void* param3)
 void pppVtMimeCon2(void* param1, void* param2, void* param3)
 {
     VtMimeState* state = (VtMimeState*)((char*)param1 + **(int**)((char*)param2 + 0xC) + 0x80);
+    float zero = lbl_803300F0;
 
-    state->accel = 0.0f;
-    state->velocity = 0.0f;
-    state->value = 0.0f;
+    state->accel = zero;
+    state->velocity = zero;
+    state->value = zero;
 }
 
 /*

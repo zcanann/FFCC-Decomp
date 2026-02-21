@@ -48,6 +48,7 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct UnkB* param_2, struct Unk
     KeShpTail3XStep* step;
     s16* work;
     Vec pos;
+    Vec temp;
 
     if (DAT_8032ed70 != 0) {
         return;
@@ -76,11 +77,15 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct UnkB* param_2, struct Unk
             pos.z = outMatrix.value[2][3];
         }
 
+        pppCopyVector__FR3Vec3Vec(&temp, &pos);
         Vec* history = (Vec*)(work + 0x18);
-        for (s32 i = 0; i < 0x1c; i++) {
+        s32 i = 0x1c;
+        do {
+            pppCopyVector__FR3Vec3Vec(&pos, &temp);
             pppCopyVector__FR3Vec3Vec(history, &pos);
             history++;
-        }
+            i--;
+        } while (i > 0);
     }
 
     if (((u8*)work)[0x1c2] == 0) {
@@ -105,7 +110,7 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct UnkB* param_2, struct Unk
         pos.z = outMatrix.value[2][3];
     }
 
-    pppCopyVector__FR3Vec3Vec((Vec*)(work + ((u32)((u8*)work)[0x1c2] * 6) + 0x18), &pos);
+    pppCopyVector__FR3Vec3Vec((Vec*)(work + ((u8*)work)[0x1c2] * 6 + 0x18), &pos);
 
     work[8] += work[0xc];
     work[0] += work[8];
@@ -151,7 +156,7 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct UnkB* param_2, struct Unk
         work[0x17] += *(s16*)(step->m_payload + 0x3a);
     }
 
-    *(u32*)(work + 0xdc) += (u32)step->m_initWOrk;
+    *(u32*)(work + 0xdc) += step->m_initWOrk;
 }
 
 /*

@@ -124,12 +124,16 @@ void CGraphicPcs::Quit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004776c
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGraphicPcs::GetTable(unsigned long)
+int CGraphicPcs::GetTable(unsigned long index)
 {
-	// TODO
+    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(lbl_801E9D08) + index * 0x15C);
 }
 
 /*

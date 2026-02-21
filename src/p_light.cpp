@@ -12,6 +12,8 @@
 extern "C" void __ct__Q29CLightPcs6CLightFv(void*);
 extern "C" void __ct__Q29CLightPcs10CBumpLightFv(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
+extern "C" void* Free__7CMemoryFPv(CMemory*, void*);
+extern "C" int __cntlzw(unsigned int);
 
 extern void* __vt__8CManager;
 extern void* lbl_801E8668;
@@ -149,12 +151,47 @@ CLightPcs::CLightPcs()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004a294
+ * PAL Size: 180b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CLightPcs::Init()
 {
-	// TODO
+    char* self = (char*)this;
+    float zero = FLOAT_8032fc14;
+    float one = FLOAT_8032fc2c;
+    u8 mask0 = (u8)(-(((u32)__cntlzw(0)) >> 5) & 0x3f);
+    u8 mask1 = (u8)(-(((u32)__cntlzw(1)) >> 5) & 0x3f);
+    u8 mask2 = (u8)(-(((u32)__cntlzw(2)) >> 5) & 0x3f);
+
+    *(u8*)(self + 0x433c) = 0x3f;
+    *(u8*)(self + 0x433d) = 0x3f;
+    *(u8*)(self + 0x433e) = 0x3f;
+    *(u8*)(self + 0x433f) = 0xff;
+    *(u8*)(self + 0x4340) = mask0;
+    *(u8*)(self + 0x4341) = mask0;
+    *(u8*)(self + 0x4342) = mask0;
+    *(u8*)(self + 0x4343) = 0xff;
+    *(u8*)(self + 0x4344) = mask1;
+    *(u8*)(self + 0x4345) = mask1;
+    *(u8*)(self + 0x4346) = mask1;
+    *(u8*)(self + 0x4347) = 0xff;
+    *(u8*)(self + 0x4348) = mask2;
+    *(u8*)(self + 0x4349) = mask2;
+    *(u8*)(self + 0x434a) = mask2;
+    *(u8*)(self + 0x434b) = 0xff;
+    *(float*)(self + 0x434c) = zero;
+    *(float*)(self + 0x4350) = zero;
+    *(float*)(self + 0x4354) = one;
+    *(float*)(self + 0x4358) = zero;
+    *(float*)(self + 0x435c) = zero;
+    *(float*)(self + 0x4360) = one;
+    *(float*)(self + 0x4364) = zero;
+    *(float*)(self + 0x4368) = zero;
+    *(float*)(self + 0x436c) = one;
 }
 
 /*
@@ -236,12 +273,36 @@ void CLightPcs::create()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004a11c
+ * PAL Size: 200b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CLightPcs::destroy()
 {
-	// TODO
+    char* bump = (char*)this + 0x63c;
+    for (u32 i = 0; i < 8; i++) {
+        if (*(u32*)(bump + 0xb4) != 0) {
+            Free__7CMemoryFPv(&Memory, *(void**)(bump + 0xb4));
+            *(u32*)(bump + 0xb4) = 0;
+            *(u8*)(bump + 0xb0) = 0;
+            *(u8*)(bump + 0xb1) = 0;
+        }
+        bump += 0x138;
+    }
+
+    char* light = (char*)this + 0xbc;
+    for (u32 i = 0; i < 8; i++) {
+        if (*(u32*)(light + 0xb4) != 0) {
+            Free__7CMemoryFPv(&Memory, *(void**)(light + 0xb4));
+            *(u32*)(light + 0xb4) = 0;
+            *(u8*)(light + 0xb0) = 0;
+            *(u8*)(light + 0xb1) = 0;
+        }
+        light += 0x138;
+    }
 }
 
 /*

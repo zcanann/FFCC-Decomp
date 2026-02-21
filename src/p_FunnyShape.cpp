@@ -24,7 +24,7 @@ public:
     int growCapacity;
 
     CPtrArray();
-    ~CPtrArray();
+    virtual ~CPtrArray();
 
     void RemoveAll();
     void DeleteAndRemoveAll();

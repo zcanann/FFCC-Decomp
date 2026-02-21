@@ -791,12 +791,40 @@ void CAmemCacheSet::Destroy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001D468
+ * PAL Size: 576b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CAmemCacheSet::DestroyCache(int)
+void CAmemCacheSet::DestroyCache(int index)
 {
-	// TODO
+    unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
+    unsigned char* entry =
+        reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x58) + index * 0x1C);
+    int cacheData = *reinterpret_cast<int*>(entry + 0x00);
+    int workData = *reinterpret_cast<int*>(entry + 0x04);
+
+    if (entry[0x1A] == 0) {
+        if (workData != 0) {
+            operator delete(reinterpret_cast<void*>(workData));
+        }
+        *reinterpret_cast<int*>(entry + 0x00) = 0;
+        *reinterpret_cast<int*>(entry + 0x04) = 0;
+    } else {
+        if (cacheData != 0) {
+            operator delete(reinterpret_cast<void*>(cacheData));
+            *reinterpret_cast<int*>(entry + 0x00) = 0;
+        }
+        if (workData != 0) {
+            *reinterpret_cast<int*>(entry + 0x04) = 0;
+        }
+    }
+
+    *reinterpret_cast<unsigned short*>(entry + 0x18) = 0;
+    *reinterpret_cast<unsigned short*>(entry + 0x0C) = 0;
+    entry[0x0E] = 0;
 }
 
 /*

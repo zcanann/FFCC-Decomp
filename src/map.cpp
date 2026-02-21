@@ -34,6 +34,9 @@ extern "C" void SetDrawFlag__8COctTreeFv(void*);
 extern "C" void Calc__11CMapAnimRunFl(CMapAnimRun*, long);
 extern "C" void* lbl_801E89A8[];
 extern "C" void* lbl_801E899C[];
+extern "C" void* lbl_801E8990[];
+extern "C" void* lbl_801E8984[];
+extern "C" void* lbl_801E8978[];
 extern int DAT_8032ec78;
 extern float FLOAT_8032ec80;
 extern unsigned char DAT_8032ec88;
@@ -691,7 +694,44 @@ CPtrArray<CMapAnim*>::CPtrArray()
 template <>
 CPtrArray<CMapAnim*>::~CPtrArray()
 {
-    RemoveAll();
+    if (m_items != 0) {
+        __dla__FPv(m_items);
+        m_items = 0;
+    }
+
+    m_size = 0;
+    m_numItems = 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80034574
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" CPtrArray<CMapAnim*>* dtor_80034574(CPtrArray<CMapAnim*>* ptrArray, short param_2)
+{
+    if (ptrArray != 0) {
+        *reinterpret_cast<void***>(Ptr(ptrArray, 0)) = lbl_801E8990;
+
+        void*& items = *reinterpret_cast<void**>(Ptr(ptrArray, 0x10));
+        if (items != 0) {
+            __dla__FPv(items);
+            items = 0;
+        }
+
+        *reinterpret_cast<int*>(Ptr(ptrArray, 8)) = 0;
+        *reinterpret_cast<int*>(Ptr(ptrArray, 4)) = 0;
+
+        if (0 < param_2) {
+            __dl__FPv(ptrArray);
+        }
+    }
+
+    return ptrArray;
 }
 
 /*
@@ -731,6 +771,37 @@ CPtrArray<CMapAnimKeyDt*>::~CPtrArray()
 
 /*
  * --INFO--
+ * PAL Address: 0x80034624
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" CPtrArray<CMapAnimKeyDt*>* dtor_80034624(CPtrArray<CMapAnimKeyDt*>* ptrArray, short param_2)
+{
+    if (ptrArray != 0) {
+        *reinterpret_cast<void***>(Ptr(ptrArray, 0)) = lbl_801E8984;
+
+        void*& items = *reinterpret_cast<void**>(Ptr(ptrArray, 0x10));
+        if (items != 0) {
+            __dla__FPv(items);
+            items = 0;
+        }
+
+        *reinterpret_cast<int*>(Ptr(ptrArray, 8)) = 0;
+        *reinterpret_cast<int*>(Ptr(ptrArray, 4)) = 0;
+
+        if (0 < param_2) {
+            __dl__FPv(ptrArray);
+        }
+    }
+
+    return ptrArray;
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800346a0
  * PAL Size: 52b
  * EN Address: TODO
@@ -762,6 +833,37 @@ template <>
 CPtrArray<CMapShadow*>::~CPtrArray()
 {
     RemoveAll();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800346d4
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" CPtrArray<CMapShadow*>* dtor_800346D4(CPtrArray<CMapShadow*>* ptrArray, short param_2)
+{
+    if (ptrArray != 0) {
+        *reinterpret_cast<void***>(Ptr(ptrArray, 0)) = lbl_801E8978;
+
+        void*& items = *reinterpret_cast<void**>(Ptr(ptrArray, 0x10));
+        if (items != 0) {
+            __dla__FPv(items);
+            items = 0;
+        }
+
+        *reinterpret_cast<int*>(Ptr(ptrArray, 8)) = 0;
+        *reinterpret_cast<int*>(Ptr(ptrArray, 4)) = 0;
+
+        if (0 < param_2) {
+            __dl__FPv(ptrArray);
+        }
+    }
+
+    return ptrArray;
 }
 
 /*

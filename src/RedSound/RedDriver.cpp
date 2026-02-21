@@ -60,6 +60,7 @@ extern int DAT_8032f478;
 extern int DAT_8032f424;
 extern int DAT_8032f440;
 extern int DAT_8032f43c;
+extern int DAT_8032f3bc;
 extern int DAT_8032f3b8;
 extern int DAT_8032e12c;
 extern int DAT_8032f458;
@@ -639,9 +640,13 @@ unsigned int DeltaTimeSumup(unsigned char** buffer)
  * Address:	TODO
  * Size:	TODO
  */
-void GetMyEntryID()
+unsigned int GetMyEntryID()
 {
-	// TODO
+    DAT_8032f3bc = (DAT_8032f3bc + 1) & 0x7fffffff;
+    if (DAT_8032f3bc == 0) {
+        DAT_8032f3bc = 1;
+    }
+    return DAT_8032f3bc;
 }
 
 /*
@@ -768,12 +773,78 @@ void _DmaCallback(unsigned long)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801be0d0
+ * PAL Size: 356b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int RedDmaEntry(int, int, int, int, int, void (*) (void*), void*)
+int RedDmaEntry(int param_1, int param_2, int param_3, int param_4, int param_5, void (*param_6)(void*), void* param_7)
 {
-	return 0;
+    unsigned int interrupt;
+    void* baseAddr;
+    void** queuePtr;
+    unsigned int entryID;
+    unsigned int size;
+    unsigned int chunkSize;
+    int* queueEntry;
+    int* nextEntry;
+
+    interrupt = OSDisableInterrupts();
+    if ((param_1 & 0xffff7fff) == 0) {
+        baseAddr = &DAT_8032c660;
+        queuePtr = &DAT_8032f3e4;
+    } else {
+        queuePtr = &DAT_8032f3e0;
+        baseAddr = &DAT_8032b860;
+    }
+    queueEntry = (int*)*queuePtr;
+    entryID = GetMyEntryID();
+    size = (unsigned int)(param_5 + 0x1f) & 0xffffffe0;
+    if ((DAT_8032f43c == 0) && ((param_1 & 0x8000) == 0)) {
+        queueEntry[0] = entryID;
+        queueEntry[1] = param_2;
+        queueEntry[2] = param_3;
+        queueEntry[3] = param_4;
+        queueEntry[4] = size;
+        queueEntry[5] = (int)param_6;
+        queueEntry[6] = (int)param_7;
+        nextEntry = queueEntry + 7;
+        if ((int*)baseAddr + 0x380 <= nextEntry) {
+            nextEntry = (int*)baseAddr;
+        }
+        *queuePtr = nextEntry;
+    } else {
+        do {
+            chunkSize = size;
+            if ((int)size > 0x40000) {
+                chunkSize = 0x40000;
+            }
+            queueEntry[0] = entryID;
+            size -= chunkSize;
+            queueEntry[1] = param_2;
+            queueEntry[2] = param_3;
+            param_3 += chunkSize;
+            queueEntry[3] = param_4;
+            param_4 += chunkSize;
+            queueEntry[4] = chunkSize;
+            queueEntry[6] = (int)param_7;
+            if ((int)size < 1) {
+                queueEntry[5] = (int)param_6;
+            } else {
+                queueEntry[5] = 0;
+            }
+            queueEntry += 7;
+            if ((int*)baseAddr + 0x380 <= queueEntry) {
+                queueEntry = (int*)baseAddr;
+            }
+        } while ((int)size > 0);
+        *queuePtr = queueEntry;
+    }
+    OSSignalSemaphore(&DAT_8032ddd8);
+    OSRestoreInterrupts(interrupt);
+    return entryID;
 }
 
 /*

@@ -16,6 +16,8 @@ extern int DAT_8032ed70;      // Global flag
 extern "C" {
 void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
 void pppAddVector__FR3Vec3Vec3Vec(Vec*, const Vec*, const Vec*);
+void pppNormalize__FR3Vec3Vec(float*, Vec*);
+void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
 }
 
 /*
@@ -114,7 +116,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
         
         // Normalize the direction vector
         Vec tempDir = direction;
-        pppNormalize(direction, tempDir);
+        pppNormalize__FR3Vec3Vec((float*)&direction, &tempDir);
         
         // Trigonometric parabolic motion calculations
         u32 sinIndex = (u32)((FLOAT_80330e20 * (f32)stepData->m_dataValIndex) / FLOAT_80330e24);
@@ -136,7 +138,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
             offset.x = horizontalX;
             offset.y = verticalY;
             offset.z = horizontalZ;
-            pppAddVector(newPosition, offset, basePos);
+            pppAddVector__FR3Vec3Vec3Vec(&newPosition, &offset, &basePos);
         } else {
             Vec basePos;
             basePos.x = *(f32*)((u8*)pppMngSt + 0x58);
@@ -146,18 +148,18 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
             offset.x = horizontalX;
             offset.y = verticalY;
             offset.z = horizontalZ;
-            pppAddVector(newPosition, offset, basePos);
+            pppAddVector__FR3Vec3Vec3Vec(&newPosition, &offset, &basePos);
         }
 
-        pppCopyVector(*(Vec*)((u8*)pppMngSt + 0x48), *(Vec*)((u8*)pppMngSt + 0x8));
-        pppCopyVector(*(Vec*)((u8*)pppMngSt + 0x8), newPosition);
+        pppCopyVector__FR3Vec3Vec((Vec*)((u8*)pppMngSt + 0x48), (Vec*)((u8*)pppMngSt + 0x8));
+        pppCopyVector__FR3Vec3Vec((Vec*)((u8*)pppMngSt + 0x8), &newPosition);
         
         // Update matrix with new position
         pppMngStPtr->m_matrix.value[0][3] = newPosition.x;
         pppMngStPtr->m_matrix.value[1][3] = newPosition.y;
         pppMngStPtr->m_matrix.value[2][3] = newPosition.z;
         
-        pppSetFpMatrix(pppMngSt);
+        pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
         
         *(u16*)(pfVar + 3) = *(u16*)(pfVar + 3) + 1;
     }

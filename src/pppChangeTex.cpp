@@ -269,8 +269,13 @@ void pppDestructChangeTex(pppChangeTex* changeTex, UnkC* data)
 				unsigned int dlCount = *(unsigned int*)(*(int*)(meshList + 8) + 0x4c);
 				void** dlEntries = (void**)*stageArray;
 				for (j = 0; j < dlCount; j++) {
-					if (*dlEntries != 0) {
-						pppHeapUseRate__FPQ27CMemory6CStage(*dlEntries);
+					int* dlPair = (int*)*dlEntries;
+					if (*(void**)dlPair != 0) {
+						pppHeapUseRate__FPQ27CMemory6CStage(*(void**)dlPair);
+						*(void**)dlPair = 0;
+					}
+					if ((void*)dlPair != 0) {
+						pppHeapUseRate__FPQ27CMemory6CStage((void*)dlPair);
 						*dlEntries = 0;
 					}
 					dlEntries++;

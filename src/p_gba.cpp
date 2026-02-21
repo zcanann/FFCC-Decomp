@@ -9,6 +9,8 @@ CGbaPcs GbaPcs;
 extern char __vt__8CManager[];
 extern char lbl_801E8668[];
 extern char lbl_8020F4A4[];
+extern char lbl_80330870[];
+extern char lbl_801D9DE0[];
 extern "C" unsigned int lbl_8020F2F8[];
 extern "C" unsigned int lbl_8020F304[];
 extern "C" unsigned int lbl_8020F310[];
@@ -107,11 +109,11 @@ void* CGbaPcs::GetTable(unsigned long tableIndex)
  */
 void CGbaPcs::create()
 {
-	m_stage = Memory.CreateStage(0x56000, "CGbaPcs", 0);
+	m_stage = Memory.CreateStage(0x56000, lbl_80330870, 0);
 	Joybus.CreateInit();
 	int result = Joybus.LoadBin();
-	if (result != 0 && (unsigned int)System.m_execParam >= 2u) {
-		System.Printf("JoyBus::LoadBin() error");
+	if ((result != 0) && (1 < (unsigned int)System.m_execParam)) {
+		System.Printf(lbl_801D9DE0);
 	}
 	Joybus.ThreadInit();
 }

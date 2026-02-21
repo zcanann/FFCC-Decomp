@@ -160,38 +160,39 @@ CLightPcs::CLightPcs()
  */
 void CLightPcs::Init()
 {
-    char* self = (char*)this;
-    float zero = FLOAT_8032fc14;
-    float one = FLOAT_8032fc2c;
-    u8 mask0 = (u8)(-(((u32)__cntlzw(0)) >> 5) & 0x3f);
-    u8 mask1 = (u8)(-(((u32)__cntlzw(1)) >> 5) & 0x3f);
-    u8 mask2 = (u8)(-(((u32)__cntlzw(2)) >> 5) & 0x3f);
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
-    *(u8*)(self + 0x433c) = 0x3f;
-    *(u8*)(self + 0x433d) = 0x3f;
-    *(u8*)(self + 0x433e) = 0x3f;
-    *(u8*)(self + 0x433f) = 0xff;
-    *(u8*)(self + 0x4340) = mask0;
-    *(u8*)(self + 0x4341) = mask0;
-    *(u8*)(self + 0x4342) = mask0;
-    *(u8*)(self + 0x4343) = 0xff;
-    *(u8*)(self + 0x4344) = mask1;
-    *(u8*)(self + 0x4345) = mask1;
-    *(u8*)(self + 0x4346) = mask1;
-    *(u8*)(self + 0x4347) = 0xff;
-    *(u8*)(self + 0x4348) = mask2;
-    *(u8*)(self + 0x4349) = mask2;
-    *(u8*)(self + 0x434a) = mask2;
-    *(u8*)(self + 0x434b) = 0xff;
-    *(float*)(self + 0x434c) = zero;
-    *(float*)(self + 0x4350) = zero;
-    *(float*)(self + 0x4354) = one;
-    *(float*)(self + 0x4358) = zero;
-    *(float*)(self + 0x435c) = zero;
-    *(float*)(self + 0x4360) = one;
-    *(float*)(self + 0x4364) = zero;
-    *(float*)(self + 0x4368) = zero;
-    *(float*)(self + 0x436c) = one;
+    self[0x433c] = 0x3f;
+    self[0x433d] = 0x3f;
+    self[0x433e] = 0x3f;
+    self[0x433f] = 0xff;
+
+    self[0x4340] = 0x00;
+    self[0x4341] = 0x00;
+    self[0x4342] = 0x00;
+    self[0x4343] = 0xff;
+
+    *reinterpret_cast<float*>(self + 0x434c) = FLOAT_8032fc14;
+    *reinterpret_cast<float*>(self + 0x4350) = FLOAT_8032fc14;
+    *reinterpret_cast<float*>(self + 0x4354) = FLOAT_8032fc2c;
+
+    self[0x4344] = 0x3f;
+    self[0x4345] = 0x3f;
+    self[0x4346] = 0x3f;
+    self[0x4347] = 0xff;
+
+    *reinterpret_cast<float*>(self + 0x4358) = FLOAT_8032fc14;
+    *reinterpret_cast<float*>(self + 0x435c) = FLOAT_8032fc14;
+    *reinterpret_cast<float*>(self + 0x4360) = FLOAT_8032fc2c;
+
+    self[0x4348] = 0x00;
+    self[0x4349] = 0x00;
+    self[0x434a] = 0x00;
+    self[0x434b] = 0xff;
+
+    *reinterpret_cast<float*>(self + 0x4364) = FLOAT_8032fc14;
+    *reinterpret_cast<float*>(self + 0x4368) = FLOAT_8032fc14;
+    *reinterpret_cast<float*>(self + 0x436c) = FLOAT_8032fc2c;
 }
 
 /*
@@ -282,24 +283,26 @@ void CLightPcs::create()
  */
 void CLightPcs::destroy()
 {
-    char* bump = (char*)this + 0x63c;
-    for (u32 i = 0; i < 8; i++) {
-        if (*(u32*)(bump + 0xb4) != 0) {
-            Free__7CMemoryFPv(&Memory, *(void**)(bump + 0xb4));
-            *(u32*)(bump + 0xb4) = 0;
-            *(u8*)(bump + 0xb0) = 0;
-            *(u8*)(bump + 0xb1) = 0;
+    unsigned char* light = reinterpret_cast<unsigned char*>(this);
+    for (unsigned int i = 0; i < 8; ++i) {
+        void** ptr = reinterpret_cast<void**>(light + 0x26b0);
+        if (*ptr != 0) {
+            Free__7CMemoryFPv(&Memory, *ptr);
+            *ptr = 0;
+            light[0x26ac] = 0;
+            light[0x26ad] = 0;
         }
-        bump += 0x138;
+        light += 0x138;
     }
 
-    char* light = (char*)this + 0xbc;
-    for (u32 i = 0; i < 8; i++) {
-        if (*(u32*)(light + 0xb4) != 0) {
-            Free__7CMemoryFPv(&Memory, *(void**)(light + 0xb4));
-            *(u32*)(light + 0xb4) = 0;
-            *(u8*)(light + 0xb0) = 0;
-            *(u8*)(light + 0xb1) = 0;
+    light = reinterpret_cast<unsigned char*>(this);
+    for (unsigned int i = 0; i < 8; ++i) {
+        void** ptr = reinterpret_cast<void**>(light + 0x1cf0);
+        if (*ptr != 0) {
+            Free__7CMemoryFPv(&Memory, *ptr);
+            *ptr = 0;
+            light[0x1cec] = 0;
+            light[0x1ced] = 0;
         }
         light += 0x138;
     }

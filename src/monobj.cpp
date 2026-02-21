@@ -5,6 +5,7 @@
 #include "ffcc/p_game.h"
 #include "ffcc/sound.h"
 #include "ffcc/vector.h"
+#include "PowerPC_EABI_Support/Runtime/ptmf.h"
 
 #include <math.h>
 #include <string.h>
@@ -280,12 +281,29 @@ void CGMonObj::enableAttackCol(int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80117B08
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::enableDamageCol(int)
+void CGMonObj::enableDamageCol(int enabled)
 {
-	// TODO
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+
+	unsigned int& damageCol1X =
+		*reinterpret_cast<unsigned int*>(&object->m_damageColliders[1].m_localPosition.x);
+	unsigned int& damageCol2X =
+		*reinterpret_cast<unsigned int*>(&object->m_damageColliders[2].m_localPosition.x);
+
+	if (enabled != 0) {
+		damageCol1X = 1;
+		damageCol2X = 1;
+	} else {
+		damageCol1X = 0;
+		damageCol2X = 0;
+	}
 }
 
 /*
@@ -330,12 +348,21 @@ void CGMonObj::onDrawDebug(CFont*, float, float&, float)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801173B4
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::onAttacked(CGPrgObj*)
 {
-	// TODO
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	mon[0x6C0] = 1;
+
+	if (__ptmf_test(reinterpret_cast<__ptmf*>(mon + 0x780)) != 0) {
+		__ptmf_scall(this, mon + 0x708);
+	}
 }
 
 /*

@@ -238,117 +238,116 @@ void CMenuPcs::ItemInit()
  */
 void CMenuPcs::ItemInit1()
 {
-    s16* itemList = *(s16**)((u8*)this + 0x850);
-    u8* itemListBytes = (u8*)itemList;
+    float fVar1;
+    int iVar2;
+    s16* psVar3;
+    unsigned int uVar4;
+    unsigned int uVar5;
 
-    *(int*)(itemListBytes + 0x24) = 0x2E;
-    *(int*)(itemListBytes + 0x2C) = 2;
-    *(int*)(itemListBytes + 0x30) = 5;
-
-    *(int*)(itemListBytes + 0x64) = 0x47;
-    *(int*)(itemListBytes + 0x6C) = 7;
-    *(int*)(itemListBytes + 0x70) = 5;
-
-    *(int*)(itemListBytes + 0xA4) = 0x47;
-    *(int*)(itemListBytes + 0xAC) = 7;
-    *(int*)(itemListBytes + 0xB0) = 5;
-
-    *(int*)(itemListBytes + 0xF4) = 2;
-    *(int*)(itemListBytes + 0xE4) = 0x2E;
-    *(int*)(itemListBytes + 0xEC) = 7;
-    *(int*)(itemListBytes + 0xF0) = 5;
-
-    *(int*)(itemListBytes + 0x134) = 2;
-    *(int*)(itemListBytes + 0x124) = 0x37;
-    *(int*)(itemListBytes + 0x12C) = 0;
-    *(int*)(itemListBytes + 0x130) = 5;
-
-    *(int*)(itemListBytes + 0x174) = 2;
-    *(int*)(itemListBytes + 0x164) = 0x37;
-    *(int*)(itemListBytes + 0x16C) = 0;
-    *(int*)(itemListBytes + 0x170) = 5;
-
-    *(int*)(itemListBytes + 0x1B4) = 2;
-    *(int*)(itemListBytes + 0x1A4) = 0x37;
-    *(int*)(itemListBytes + 0x1AC) = 0;
-    *(int*)(itemListBytes + 0x1B0) = 5;
-
-    *(int*)(itemListBytes + 0x1F4) = 2;
-    *(int*)(itemListBytes + 0x1E4) = 0x37;
-    *(int*)(itemListBytes + 0x1EC) = 0;
-    *(int*)(itemListBytes + 0x1F0) = 5;
-
-    *(int*)(itemListBytes + 0x234) = 2;
-    *(int*)(itemListBytes + 0x224) = 0x37;
-    *(int*)(itemListBytes + 0x22C) = 0;
-    *(int*)(itemListBytes + 0x230) = 5;
-
-    *(int*)(itemListBytes + 0x274) = 2;
-    *(int*)(itemListBytes + 0x264) = 0x37;
-    *(int*)(itemListBytes + 0x26C) = 0;
-    *(int*)(itemListBytes + 0x270) = 5;
-
-    *(int*)(itemListBytes + 0x2B4) = 2;
-    *(int*)(itemListBytes + 0x2A4) = 0x37;
-    *(int*)(itemListBytes + 0x2AC) = 0;
-    *(int*)(itemListBytes + 0x2B0) = 5;
-
-    *(int*)(itemListBytes + 0x2F4) = 2;
-    *(int*)(itemListBytes + 0x2E4) = 0x37;
-    *(int*)(itemListBytes + 0x2EC) = 0;
-    *(int*)(itemListBytes + 0x2F0) = 5;
-
-    unsigned int count = (unsigned int)itemList[0];
-    s16* entry = itemList + 4;
-    if ((int)count <= 0) {
-        return;
-    }
-
-    const float scale = 1.0f;
-    unsigned int blocks = count >> 3;
-    if (blocks != 0) {
-        do {
-            entry[0x10] = 0;
-            entry[0x11] = 0;
-            *(float*)(entry + 8) = scale;
-            entry[0x30] = 0;
-            entry[0x31] = 0;
-            *(float*)(entry + 0x28) = scale;
-            entry[0x50] = 0;
-            entry[0x51] = 0;
-            *(float*)(entry + 0x48) = scale;
-            entry[0x70] = 0;
-            entry[0x71] = 0;
-            *(float*)(entry + 0x68) = scale;
-            entry[0x90] = 0;
-            entry[0x91] = 0;
-            *(float*)(entry + 0x88) = scale;
-            entry[0xB0] = 0;
-            entry[0xB1] = 0;
-            *(float*)(entry + 0xA8) = scale;
-            entry[0xD0] = 0;
-            entry[0xD1] = 0;
-            *(float*)(entry + 0xC8) = scale;
-            entry[0xF0] = 0;
-            entry[0xF1] = 0;
-            *(float*)(entry + 0xE8) = scale;
-            entry += 0x100;
-            blocks--;
-        } while (blocks != 0);
-
-        count &= 7;
-        if (count == 0) {
-            return;
+    iVar2 = *(int*)((u8*)this + 0x850);
+    *(int*)(iVar2 + 0x24) = 0x2E;
+    *(int*)(iVar2 + 0x2C) = 2;
+    *(int*)(iVar2 + 0x30) = 5;
+    iVar2 = *(int*)((u8*)this + 0x850);
+    *(int*)(iVar2 + 0x64) = 0x47;
+    *(int*)(iVar2 + 0x6C) = 7;
+    *(int*)(iVar2 + 0x70) = 5;
+    iVar2 = *(int*)((u8*)this + 0x850);
+    *(int*)(iVar2 + 0xA4) = 0x47;
+    *(int*)(iVar2 + 0xAC) = 7;
+    *(int*)(iVar2 + 0xB0) = 5;
+    iVar2 = *(int*)((u8*)this + 0x850);
+    *(int*)(iVar2 + 0xF4) = 2;
+    *(int*)(iVar2 + 0xE4) = 0x2E;
+    *(int*)(iVar2 + 0xEC) = 7;
+    *(int*)(iVar2 + 0xF0) = 5;
+    iVar2 = *(int*)((u8*)this + 0x850);
+    *(int*)(iVar2 + 0x134) = 2;
+    *(int*)(iVar2 + 0x124) = 0x37;
+    *(int*)(iVar2 + 0x12C) = 0;
+    *(int*)(iVar2 + 0x130) = 5;
+    iVar2 = *(int*)((u8*)this + 0x850);
+    *(int*)(iVar2 + 0x174) = 2;
+    *(int*)(iVar2 + 0x164) = 0x37;
+    *(int*)(iVar2 + 0x16C) = 0;
+    *(int*)(iVar2 + 0x170) = 5;
+    iVar2 = *(int*)((u8*)this + 0x850);
+    *(int*)(iVar2 + 0x1B4) = 2;
+    *(int*)(iVar2 + 0x1A4) = 0x37;
+    *(int*)(iVar2 + 0x1AC) = 0;
+    *(int*)(iVar2 + 0x1B0) = 5;
+    iVar2 = *(int*)((u8*)this + 0x850);
+    *(int*)(iVar2 + 0x1F4) = 2;
+    *(int*)(iVar2 + 0x1E4) = 0x37;
+    fVar1 = FLOAT_80332e64;
+    *(int*)(iVar2 + 0x1EC) = 0;
+    *(int*)(iVar2 + 0x1F0) = 5;
+    iVar2 = *(int*)((u8*)this + 0x850);
+    *(int*)(iVar2 + 0x234) = 2;
+    *(int*)(iVar2 + 0x224) = 0x37;
+    *(int*)(iVar2 + 0x22C) = 0;
+    *(int*)(iVar2 + 0x230) = 5;
+    iVar2 = *(int*)((u8*)this + 0x850);
+    *(int*)(iVar2 + 0x274) = 2;
+    *(int*)(iVar2 + 0x264) = 0x37;
+    *(int*)(iVar2 + 0x26C) = 0;
+    *(int*)(iVar2 + 0x270) = 5;
+    iVar2 = *(int*)((u8*)this + 0x850);
+    *(int*)(iVar2 + 0x2B4) = 2;
+    *(int*)(iVar2 + 0x2A4) = 0x37;
+    *(int*)(iVar2 + 0x2AC) = 0;
+    *(int*)(iVar2 + 0x2B0) = 5;
+    iVar2 = *(int*)((u8*)this + 0x850);
+    *(int*)(iVar2 + 0x2F4) = 2;
+    *(int*)(iVar2 + 0x2E4) = 0x37;
+    *(int*)(iVar2 + 0x2EC) = 0;
+    *(int*)(iVar2 + 0x2F0) = 5;
+    uVar4 = (unsigned int)**(s16**)((u8*)this + 0x850);
+    psVar3 = *(s16**)((u8*)this + 0x850) + 4;
+    if (0 < (int)uVar4) {
+        uVar5 = uVar4 >> 3;
+        if (uVar5 != 0) {
+            do {
+                psVar3[0x10] = 0;
+                psVar3[0x11] = 0;
+                *(float*)(psVar3 + 8) = fVar1;
+                psVar3[0x30] = 0;
+                psVar3[0x31] = 0;
+                *(float*)(psVar3 + 0x28) = fVar1;
+                psVar3[0x50] = 0;
+                psVar3[0x51] = 0;
+                *(float*)(psVar3 + 0x48) = fVar1;
+                psVar3[0x70] = 0;
+                psVar3[0x71] = 0;
+                *(float*)(psVar3 + 0x68) = fVar1;
+                psVar3[0x90] = 0;
+                psVar3[0x91] = 0;
+                *(float*)(psVar3 + 0x88) = fVar1;
+                psVar3[0xB0] = 0;
+                psVar3[0xB1] = 0;
+                *(float*)(psVar3 + 0xA8) = fVar1;
+                psVar3[0xD0] = 0;
+                psVar3[0xD1] = 0;
+                *(float*)(psVar3 + 0xC8) = fVar1;
+                psVar3[0xF0] = 0;
+                psVar3[0xF1] = 0;
+                *(float*)(psVar3 + 0xE8) = fVar1;
+                psVar3 = psVar3 + 0x100;
+                uVar5 = uVar5 - 1;
+            } while (uVar5 != 0);
+            uVar4 = uVar4 & 7;
+            if (uVar4 == 0) {
+                return;
+            }
         }
+        do {
+            psVar3[0x10] = 0;
+            psVar3[0x11] = 0;
+            *(float*)(psVar3 + 8) = fVar1;
+            psVar3 = psVar3 + 0x20;
+            uVar4 = uVar4 - 1;
+        } while (uVar4 != 0);
     }
-
-    do {
-        entry[0x10] = 0;
-        entry[0x11] = 0;
-        *(float*)(entry + 8) = scale;
-        entry += 0x20;
-        count--;
-    } while (count != 0);
 }
 
 /*

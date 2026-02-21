@@ -1,6 +1,7 @@
 #include "ffcc/memorycard.h"
 #include "ffcc/file.h"
 #include "ffcc/math.h"
+#include "ffcc/memory.h"
 #include "ffcc/sound.h"
 #include "ffcc/system.h"
 
@@ -70,8 +71,12 @@ CMemoryCardMan::CMemoryCardMan()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c4d24
+ * PAL Size: 148b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMemoryCardMan::Init()
 {
@@ -82,17 +87,20 @@ void CMemoryCardMan::Init()
     m_currentSlot = -1;
     m_state = 0;
     m_saveBuffer = (char*)nullptr;
-
-    // m_stage = Memory.CreateStage(0x16000, s_CMemoryCardMan_801dae0c, 0);
-    // m_mountWorkArea = __nwa__(0xA000,  mStage, s_memorycard_cpp_801daea8, 0x88);
+    m_stage = reinterpret_cast<CStage*>(Memory.CreateStage(0x16000, (char*)"CMemoryCardMan", 0));
+    m_mountWorkArea = new (reinterpret_cast<CMemory::CStage*>(m_stage), (char*)"memorycard.cpp", 0x88) char[0xA000];
 
     m_currentSlot = -1;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c4ccc
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMemoryCardMan::Quit()
 { 
@@ -104,7 +112,7 @@ void CMemoryCardMan::Quit()
     m_mountWorkArea = (void*)nullptr;
   }
   
-  // DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory,mStage);
+  Memory.DestroyStage(reinterpret_cast<CMemory::CStage*>(m_stage));
 }
 
 /*

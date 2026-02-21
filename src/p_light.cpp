@@ -12,7 +12,8 @@
 extern "C" void __ct__Q29CLightPcs6CLightFv(void*);
 extern "C" void __ct__Q29CLightPcs10CBumpLightFv(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
-extern "C" void Free__7CMemoryFPv(CMemory*, void*);
+extern "C" void* Free__7CMemoryFPv(CMemory*, void*);
+extern "C" int __cntlzw(unsigned int);
 
 extern void* __vt__8CManager;
 extern void* lbl_801E8668;

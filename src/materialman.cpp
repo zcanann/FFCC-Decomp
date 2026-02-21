@@ -1,4 +1,5 @@
 #include "ffcc/materialman.h"
+#include "ffcc/pad.h"
 #include "ffcc/textureman.h"
 
 #include <dolphin/mtx.h>
@@ -35,11 +36,11 @@ public:
     void Calc();
 };
 
-namespace {
 template <class T>
 class CPtrArray
 {
 public:
+    void** m_vtable;
     unsigned long m_size;
     unsigned long m_numItems;
     unsigned long m_defaultSize;
@@ -47,6 +48,7 @@ public:
     CMemory::CStage* m_stage;
     int m_growCapacity;
 
+    CPtrArray();
     int GetSize();
     int Add(T item);
     ~CPtrArray();
@@ -56,6 +58,19 @@ public:
     T operator[](unsigned long index);
 };
 
+template <>
+CPtrArray<CMaterial*>::CPtrArray()
+{
+    m_vtable = reinterpret_cast<void**>(0x801E9BFC);
+    m_size = 0;
+    m_numItems = 0;
+    m_defaultSize = 0x10;
+    m_items = 0;
+    m_stage = 0;
+    m_growCapacity = 1;
+}
+
+namespace {
 static inline unsigned char* Ptr(void* p, unsigned int offset)
 {
     return reinterpret_cast<unsigned char*>(p) + offset;
@@ -85,6 +100,7 @@ struct RawPtrArray {
     void** vtable;
     unsigned long size;
     unsigned long numItems;
+    unsigned long defaultSize;
     void** items;
     CMemory::CStage* stage;
     int growCapacity;
@@ -96,7 +112,7 @@ static int AddPtrArrayMaterial(void* ptrArray, void* item)
 
     if (array->size < (array->numItems + 1)) {
         if (array->size == 0) {
-            array->size = 0x10;
+            array->size = array->defaultSize;
         } else {
             array->size = array->size << 1;
         }
@@ -142,6 +158,38 @@ static int HighestSetBit(unsigned int value)
     }
     return -1;
 }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80041f28
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+unsigned short CPad::GetButtonDown(long padIndex)
+{
+    bool shouldZero = false;
+
+    if (_1c4_4_ == 0) {
+        if ((padIndex == 0) && (_1c0_4_ == 0xFFFFFFFF)) {
+            goto read_slot;
+        }
+    }
+
+    shouldZero = true;
+read_slot:
+    if (shouldZero) {
+        return 0;
+    }
+
+    unsigned int padIndexU = static_cast<unsigned int>(padIndex);
+    unsigned int resolvedIndex =
+        padIndexU & ~((~(_1c0_4_ - padIndexU | padIndexU - _1c0_4_)) >> 31);
+    return *reinterpret_cast<unsigned short*>(
+        reinterpret_cast<unsigned char*>(this) + (resolvedIndex * 0x54) + 8);
 }
 
 /*

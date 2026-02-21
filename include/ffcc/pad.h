@@ -17,6 +17,7 @@ public:
     void Quit();
     void Frame();
     void SaveReplayData();
+    unsigned short GetButtonDown(long);
 
     void* _0_4_;
     short _4_2_;

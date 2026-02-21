@@ -514,7 +514,7 @@ CMapAnim::~CMapAnim()
     CPtrArray<CMapAnimNode*>* nodeArray = reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this);
     unsigned int i = 0;
 
-    while (i < static_cast<unsigned int>(nodeArray->GetSize())) {
+    while (i < static_cast<unsigned int>(nodeArray->m_numItems)) {
         CMapAnimNode* node = __vc__26CPtrArray_P12CMapAnimNode_FUl(this, i);
         if (node != 0 && (node = __vc__26CPtrArray_P12CMapAnimNode_FUl(this, i), node != 0)) {
             reinterpret_cast<int*>(node)[1] = 0;
@@ -524,7 +524,8 @@ CMapAnim::~CMapAnim()
     }
 
     nodeArray->RemoveAll();
-    dtor_8004AE60(nodeArray, -1);
+    nodeArray->m_vtable = lbl_801EA488;
+    nodeArray->RemoveAll();
 }
 
 /*
@@ -635,10 +636,11 @@ void CMapAnimRun::Calc(long frame)
     int* run = reinterpret_cast<int*>(this);
     CMapAnim* mapAnim;
 
+    if (run[0] < 0 && run[3] != frame) {
+        return;
+    }
+
     if (run[0] < 0) {
-        if (run[3] != frame) {
-            return;
-        }
         run[0] = run[1];
     }
 

@@ -1588,23 +1588,14 @@ char* CGame::MakeNumMonName(char* out, int monIndex, int count)
  */
 const char* CGame::GetLangString()
 {
-    static const char* const sLangDirs[] =
-    {
-        "jp/",
-        "uk/",
-        "gr/",
-        "it/",
-        "fr/",
-        "sp/"
-    };
     const char* localLangDirs[6];
 
-    localLangDirs[0] = sLangDirs[0];
-    localLangDirs[1] = sLangDirs[1];
-    localLangDirs[2] = sLangDirs[2];
-    localLangDirs[3] = sLangDirs[3];
-    localLangDirs[4] = sLangDirs[4];
-    localLangDirs[5] = sLangDirs[5];
+    localLangDirs[0] = lbl_801D60B0[0];
+    localLangDirs[1] = lbl_801D60B0[1];
+    localLangDirs[2] = lbl_801D60B0[2];
+    localLangDirs[3] = lbl_801D60B0[3];
+    localLangDirs[4] = lbl_801D60B0[4];
+    localLangDirs[5] = lbl_801D60B0[5];
 
     return localLangDirs[m_gameWork.m_languageId];
 }

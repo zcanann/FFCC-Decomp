@@ -9,6 +9,7 @@ extern float FLOAT_80330e4c;
 extern float FLOAT_80330e58;
 extern float FLOAT_80330e5c;
 extern float FLOAT_80330e68;
+extern char MaterialMan[];
 
 extern struct {
     float _224_4_;
@@ -32,6 +33,7 @@ void _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevA
                                                                                                             int, int);
 void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(int, int, int, int, int, int);
 void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
+void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
 }
 
 /*
@@ -178,12 +180,30 @@ void Mana_BeforeDrawShadowLockEnvCallback(CChara::CModel*, void*, void*, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800d7ef4
+ * PAL Size: 216b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void Chara_DrawShadowMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*) [4])
+void Chara_DrawShadowMeshDLCallback(CChara::CModel* model, void* work, void* vYmMana, int meshIndex, int dlIndex, float (*) [4])
 {
-	// TODO
+    s32 meshData = *(s32*)((u8*)model + 0xAC);
+    u8 alpha = *(u8*)((u8*)vYmMana + 0x3B);
+
+    *(u8*)((u8*)work + 0xFC) = 0xFF;
+    *(u8*)((u8*)work + 0xFD) = 0xFF;
+    *(u8*)((u8*)work + 0xFE) = 0xFF;
+    *(u8*)((u8*)work + 0xFF) = alpha == 0 ? 0xFF : alpha;
+
+    DCFlushRange((u8*)work + 0xFC, 4);
+    GXSetArray((GXAttr)0xB, (u8*)work + 0xFC, 4);
+
+    u32* dl = (u32*)(*(s32*)(*(s32*)(meshData + meshIndex * 0x14 + 8) + 0x50) + dlIndex * 0xC);
+    SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
+        MaterialMan, *(void**)(*(s32*)((u8*)model + 0xA4) + 0x24), *(u16*)((u8*)dl + 8), 0, 0);
+    GXCallDisplayList((void*)dl[1], dl[0]);
 }
 
 /*

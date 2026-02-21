@@ -136,8 +136,8 @@ CChara::CAnim::CAnim()
 	*(unsigned short*)(p + 0xE) = 0;
 	*(int*)(p + 0x14) = 0;
 	*(void**)(p + 0x20) = 0;
-	p[9] = (unsigned char)((p[9] & 0x7F) | 0x80);
-	p[9] = (unsigned char)(p[9] & 0xBF);
+	p[8] = (unsigned char)((p[8] & 0x7F) | 0x80);
+	p[8] = (unsigned char)(p[8] & 0xBF);
 	p[0xA] = 5;
 	p[0xB] = 0xB;
 	p[0xC] = 10;

@@ -94,6 +94,7 @@ public:
     void SetRefPosition(Vec*);
     void addWorldMap();
     void SetIsAbsolute(int);
+    int IsAbsolute();
     void SetWorldMapMatrix(float (*)[4]);
     void GetWorldMapInverseMatrix(float (*)[4]);
 

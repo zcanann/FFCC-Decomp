@@ -1465,6 +1465,20 @@ extern "C" void __as__3VecFRC3Vec(Vec* self, const Vec* other)
 
 /*
  * --INFO--
+ * PAL Address: 0x800B9C7C
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CCameraPcs::IsAbsolute()
+{
+    return *(int*)((char*)this + 0x444);
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

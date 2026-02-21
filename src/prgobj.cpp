@@ -63,6 +63,8 @@ void CGPrgObj::onDestroy()
  */
 void CGPrgObj::onFrame()
 {
+    onFrameAlways();
+
 	if ((m_weaponNodeFlags & 0x8000) != 0) {
 		m_animFlags &= 0x7f;
 		onFramePreCalc();
@@ -101,6 +103,8 @@ void CGPrgObj::onFrame()
 			m_animFlags &= 0x7f;
 		}
 	}
+
+    onFrameAlwaysAfter();
 }
 
 /*

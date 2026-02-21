@@ -59,11 +59,11 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct UnkB* param_2, struct Unk
     if ((obj->pppPObject.m_graphId == 0) && (obj->field_0x7d != 0)) {
         ((u8*)work)[0x1c3] = 1;
 
-        pos.x = obj->pppPObject.m_localMatrix.value[0][3];
-        pos.y = obj->pppPObject.m_localMatrix.value[1][3];
-        pos.z = obj->pppPObject.m_localMatrix.value[2][3];
-
-        if (step->m_payload[0x3f] == 1) {
+        if (step->m_payload[0x3f] == 0) {
+            pos.x = obj->pppPObject.m_localMatrix.value[0][3];
+            pos.y = obj->pppPObject.m_localMatrix.value[1][3];
+            pos.z = obj->pppPObject.m_localMatrix.value[2][3];
+        } else if (step->m_payload[0x3f] == 1) {
             pppFMATRIX ownerMatrix;
             pppFMATRIX partMatrix;
             pppFMATRIX outMatrix;
@@ -88,11 +88,11 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct UnkB* param_2, struct Unk
     }
     ((u8*)work)[0x1c2]--;
 
-    pos.x = obj->pppPObject.m_localMatrix.value[0][3];
-    pos.y = obj->pppPObject.m_localMatrix.value[1][3];
-    pos.z = obj->pppPObject.m_localMatrix.value[2][3];
-
-    if (step->m_payload[0x3f] == 1) {
+    if (step->m_payload[0x3f] == 0) {
+        pos.x = obj->pppPObject.m_localMatrix.value[0][3];
+        pos.y = obj->pppPObject.m_localMatrix.value[1][3];
+        pos.z = obj->pppPObject.m_localMatrix.value[2][3];
+    } else if (step->m_payload[0x3f] == 1) {
         pppFMATRIX ownerMatrix;
         pppFMATRIX partMatrix;
         pppFMATRIX outMatrix;

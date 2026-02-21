@@ -987,10 +987,51 @@ void COctTree::ClearLight()
  */
 void InsertLight_r(COctNode* node)
 {
+	float boundMinX = *reinterpret_cast<float*>(Ptr(node, 0x0));
+	bool xOverlap = false;
+	bool xyOverlap = false;
 	bool overlap = false;
 
-	if ((s_bound.CheckCross(*reinterpret_cast<CBound*>(node))) != 0) {
-		overlap = true;
+	if (*reinterpret_cast<float*>(Ptr(&s_bound, 0x0)) <= boundMinX) {
+		if (boundMinX <= *reinterpret_cast<float*>(Ptr(&s_bound, 0x0))) {
+			xOverlap = true;
+		} else {
+			xOverlap = boundMinX <= *reinterpret_cast<float*>(Ptr(&s_bound, 0xC));
+		}
+	} else {
+		xOverlap = *reinterpret_cast<float*>(Ptr(&s_bound, 0x0)) <= *reinterpret_cast<float*>(Ptr(node, 0xC));
+	}
+
+	if (xOverlap) {
+		float boundMinY = *reinterpret_cast<float*>(Ptr(node, 0x4));
+		if (*reinterpret_cast<float*>(Ptr(&s_bound, 0x4)) <= boundMinY) {
+			if (boundMinY <= *reinterpret_cast<float*>(Ptr(&s_bound, 0x4))) {
+				xOverlap = true;
+			} else {
+				xOverlap = boundMinY <= *reinterpret_cast<float*>(Ptr(&s_bound, 0x10));
+			}
+		} else {
+			xOverlap = *reinterpret_cast<float*>(Ptr(&s_bound, 0x4)) <= *reinterpret_cast<float*>(Ptr(node, 0x10));
+		}
+		if (xOverlap) {
+			xyOverlap = true;
+		}
+	}
+
+	if (xyOverlap) {
+		float boundMinZ = *reinterpret_cast<float*>(Ptr(node, 0x8));
+		if (*reinterpret_cast<float*>(Ptr(&s_bound, 0x8)) <= boundMinZ) {
+			if (boundMinZ <= *reinterpret_cast<float*>(Ptr(&s_bound, 0x8))) {
+				xyOverlap = true;
+			} else {
+				xyOverlap = boundMinZ <= *reinterpret_cast<float*>(Ptr(&s_bound, 0x14));
+			}
+		} else {
+			xyOverlap = *reinterpret_cast<float*>(Ptr(&s_bound, 0x8)) <= *reinterpret_cast<float*>(Ptr(node, 0x14));
+		}
+		if (xyOverlap) {
+			overlap = true;
+		}
 	}
 
 	if (!overlap) {
@@ -1003,51 +1044,89 @@ void InsertLight_r(COctNode* node)
 		*bits |= 1UL << (s_insertShadowBitIndex & 0x1f);
 	}
 
-	COctNode** children = reinterpret_cast<COctNode**>(Ptr(node, 0x1C));
 	for (int i = 0; i < 8; i++) {
-		COctNode* child = children[i];
+		COctNode* child = *reinterpret_cast<COctNode**>(Ptr(node, 0x1C));
 		if (child == 0) {
 			return;
 		}
 
+		float childBoundMinX = *reinterpret_cast<float*>(Ptr(child, 0x0));
+		bool childXOverlap = false;
+		bool childXYOverlap = false;
 		bool childOverlap = false;
-
-		if ((s_bound.CheckCross(*reinterpret_cast<CBound*>(child))) != 0) {
-			childOverlap = true;
+		if (*reinterpret_cast<float*>(Ptr(&s_bound, 0x0)) <= childBoundMinX) {
+			if (childBoundMinX <= *reinterpret_cast<float*>(Ptr(&s_bound, 0x0))) {
+				childXOverlap = true;
+			} else {
+				childXOverlap = childBoundMinX <= *reinterpret_cast<float*>(Ptr(&s_bound, 0xC));
+			}
+		} else {
+			childXOverlap = *reinterpret_cast<float*>(Ptr(&s_bound, 0x0)) <= *reinterpret_cast<float*>(Ptr(child, 0xC));
 		}
 
-		if (!childOverlap) {
-			continue;
+		if (childXOverlap) {
+			float childBoundMinY = *reinterpret_cast<float*>(Ptr(child, 0x4));
+			if (*reinterpret_cast<float*>(Ptr(&s_bound, 0x4)) <= childBoundMinY) {
+				if (childBoundMinY <= *reinterpret_cast<float*>(Ptr(&s_bound, 0x4))) {
+					childXOverlap = true;
+				} else {
+					childXOverlap = childBoundMinY <= *reinterpret_cast<float*>(Ptr(&s_bound, 0x10));
+				}
+			} else {
+				childXOverlap = *reinterpret_cast<float*>(Ptr(&s_bound, 0x4)) <= *reinterpret_cast<float*>(Ptr(child, 0x10));
+			}
+			if (childXOverlap) {
+				childXYOverlap = true;
+			}
 		}
 
-		if (*reinterpret_cast<unsigned short*>(Ptr(child, 0x3E)) != 0) {
-			unsigned long byteOffset = (s_insertShadowBitIndex >> 3) & 0x1ffffffc;
-			unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(child, 0x48 + byteOffset));
-			*bits |= 1UL << (s_insertShadowBitIndex & 0x1f);
+		if (childXYOverlap) {
+			float childBoundMinZ = *reinterpret_cast<float*>(Ptr(child, 0x8));
+			if (*reinterpret_cast<float*>(Ptr(&s_bound, 0x8)) <= childBoundMinZ) {
+				if (childBoundMinZ <= *reinterpret_cast<float*>(Ptr(&s_bound, 0x8))) {
+					childXYOverlap = true;
+				} else {
+					childXYOverlap = childBoundMinZ <= *reinterpret_cast<float*>(Ptr(&s_bound, 0x14));
+				}
+			} else {
+				childXYOverlap = *reinterpret_cast<float*>(Ptr(&s_bound, 0x8)) <= *reinterpret_cast<float*>(Ptr(child, 0x14));
+			}
+			if (childXYOverlap) {
+				childOverlap = true;
+			}
 		}
 
-		COctNode** grandChildren = reinterpret_cast<COctNode**>(Ptr(child, 0x1C));
-		for (int j = 0; j < 8; j++) {
-			COctNode* grandChild = grandChildren[j];
-			if (grandChild == 0) {
-				break;
+		if (childOverlap) {
+			if (*reinterpret_cast<unsigned short*>(Ptr(child, 0x3E)) != 0) {
+				unsigned long byteOffset = (s_insertShadowBitIndex >> 3) & 0x1ffffffc;
+				unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(child, 0x48 + byteOffset));
+				*bits |= 1UL << (s_insertShadowBitIndex & 0x1f);
 			}
 
-			if ((s_bound.CheckCross(*reinterpret_cast<CBound*>(grandChild))) != 0) {
-				if (*reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3E)) != 0) {
-					setbit32(reinterpret_cast<unsigned long*>(Ptr(grandChild, 0x48)), s_insertShadowBitIndex);
+			for (int j = 0; j < 8; j++) {
+				COctNode* grandChild = *reinterpret_cast<COctNode**>(Ptr(child, 0x1C));
+				if (grandChild == 0) {
+					break;
 				}
 
-				COctNode** greatGrandChildren = reinterpret_cast<COctNode**>(Ptr(grandChild, 0x1C));
-				for (int k = 0; k < 8; k++) {
-					COctNode* greatGrandChild = greatGrandChildren[k];
-					if (greatGrandChild == 0) {
-						break;
+				if ((s_bound.CheckCross(*reinterpret_cast<CBound*>(grandChild))) != 0) {
+					if (*reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3E)) != 0) {
+						setbit32(reinterpret_cast<unsigned long*>(Ptr(grandChild, 0x48)), s_insertShadowBitIndex);
 					}
-					InsertLight_r(greatGrandChild);
+
+					for (int k = 0; k < 8; k++) {
+						COctNode* greatGrandChild = *reinterpret_cast<COctNode**>(Ptr(grandChild, 0x1C));
+						if (greatGrandChild == 0) {
+							break;
+						}
+						InsertLight_r(greatGrandChild);
+						grandChild = reinterpret_cast<COctNode*>(Ptr(grandChild, 4));
+					}
 				}
+				child = reinterpret_cast<COctNode*>(Ptr(child, 4));
 			}
 		}
+		node = reinterpret_cast<COctNode*>(Ptr(node, 4));
 	}
 }
 

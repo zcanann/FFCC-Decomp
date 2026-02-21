@@ -502,6 +502,15 @@ static void* allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long siz
     return 0;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801b2640
+ * PAL Size: 216b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 static void* soft_allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned long size, unsigned long* available_size) {
     unsigned long aligned_size;
     Block* current_block;
@@ -514,24 +523,26 @@ static void* soft_allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned lon
     
     *available_size = 0;
     current_block = pool_obj->start_;
-    
-    if (current_block != 0) {
-        do {
-            if ((aligned_size <= current_block->max_size) &&
-                ((result = Block_subBlock(current_block, aligned_size)) != 0)) {
-                pool_obj->start_ = current_block;
-                return (char*)result + 8;
-            }
 
-            if ((8 < current_block->max_size) &&
-                (*available_size < current_block->max_size - 8)) {
-                *available_size = current_block->max_size - 8;
-            }
-
-            current_block = current_block->next;
-        } while (current_block != pool_obj->start_);
+    if (current_block == 0) {
+        return 0;
     }
-    
+
+    do {
+        if ((aligned_size <= current_block->max_size) &&
+            ((result = Block_subBlock(current_block, aligned_size)) != 0)) {
+            pool_obj->start_ = current_block;
+            return (char*)result + 8;
+        }
+
+        if ((8 < current_block->max_size) &&
+            (*available_size < current_block->max_size - 8)) {
+            *available_size = current_block->max_size - 8;
+        }
+
+        current_block = current_block->next;
+    } while (current_block != pool_obj->start_);
+
     return 0;
 }
 

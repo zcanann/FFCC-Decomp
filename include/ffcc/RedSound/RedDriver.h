@@ -35,7 +35,7 @@ void _StreamPause(int*);
 void _EntryExecCommand(void (*)(int*), int, int, int, int, int, int, int);
 void _ExecuteCommand();
 unsigned int DeltaTimeSumup(unsigned char**);
-void GetMyEntryID();
+unsigned int GetMyEntryID();
 void _MyAlarmHandler(OSAlarm*, OSContext*);
 void RedSleep(int);
 int _MainThread(void*);

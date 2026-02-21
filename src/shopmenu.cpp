@@ -6,6 +6,7 @@ void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
 void _WaitDrawDone__8CGraphicFPci(void*, char*, int);
 void SetMode__9CShopMenuFi(void*, int);
 int LoadMenuPdt__8CPartPcsFPc(void*, char*);
+int GetItemType__8CMenuPcsFii(void*, int, int);
 }
 
 extern char s_shopmenu_cpp_801ded8c[];
@@ -109,12 +110,103 @@ void bButtonNoRepeat(unsigned short)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801593f8
+ * PAL Size: 604b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CShopMenu::SetMode(int)
+void CShopMenu::SetMode(int mode)
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+
+    *reinterpret_cast<int*>(self + 0x0) = mode;
+    *reinterpret_cast<int*>(self + 0xC) = 0;
+
+    switch (*reinterpret_cast<int*>(self + 0x0)) {
+    case 0:
+        *reinterpret_cast<float*>(self + 0x1C) = 0.0f;
+        *reinterpret_cast<unsigned char*>(self + 0x48) = 0xFF;
+        break;
+    case 1:
+        *reinterpret_cast<unsigned char*>(self + 0x48) = 0;
+        break;
+    case 3:
+        *reinterpret_cast<int*>(self + 0x14) = 0;
+        *reinterpret_cast<int*>(self + 0x10) = 0;
+        *reinterpret_cast<int*>(self + 0x28) = -1;
+        *reinterpret_cast<int*>(self + 0x24) = 0;
+        *reinterpret_cast<int*>(self + 0x2C) = 8;
+        *reinterpret_cast<int*>(self + 0x34) = 0;
+        *reinterpret_cast<int*>(self + 0x30) = 0;
+        *reinterpret_cast<int*>(self + 0x40) = 0;
+        *reinterpret_cast<int*>(self + 0x44) = 1;
+        *reinterpret_cast<int*>(self + 0x38) = 0;
+        *reinterpret_cast<int*>(self + 0x3C) = 0;
+        break;
+    case 6:
+        *reinterpret_cast<int*>(self + 0x14) = 1;
+        *reinterpret_cast<int*>(self + 0x10) = 0;
+        *reinterpret_cast<int*>(self + 0x28) = -1;
+        *reinterpret_cast<int*>(self + 0x24) = 0;
+        *reinterpret_cast<int*>(self + 0x2C) = 8;
+        *reinterpret_cast<int*>(self + 0x34) = 0;
+        *reinterpret_cast<int*>(self + 0x30) = 0;
+        *reinterpret_cast<int*>(self + 0x40) = 0;
+        *reinterpret_cast<int*>(self + 0x44) = 1;
+        *reinterpret_cast<int*>(self + 0x38) = 0;
+        *reinterpret_cast<int*>(self + 0x3C) = 0;
+        break;
+    case 4:
+    case 7:
+        *reinterpret_cast<int*>(self + 0x28) = 0;
+        *reinterpret_cast<int*>(self + 0x24) = 0;
+        *reinterpret_cast<int*>(self + 0x38) = 0;
+        break;
+    case 9: {
+        *reinterpret_cast<float*>(self + 0x1C) = 0.0f;
+        *reinterpret_cast<unsigned char*>(self + 0x48) = 0xFF;
+        *reinterpret_cast<int*>(self + 0x14) = 2;
+        *reinterpret_cast<int*>(self + 0x10) = 0;
+        *reinterpret_cast<int*>(self + 0x28) = 0;
+        *reinterpret_cast<int*>(self + 0x24) = 0;
+        *reinterpret_cast<int*>(self + 0x2C) = 8;
+        *reinterpret_cast<int*>(self + 0x34) = 0;
+        *reinterpret_cast<int*>(self + 0x30) = 0;
+        *reinterpret_cast<int*>(self + 0x40) = 0;
+        *reinterpret_cast<int*>(self + 0x44) = 1;
+        *reinterpret_cast<int*>(self + 0x38) = 0;
+        *reinterpret_cast<int*>(self + 0x3C) = 0;
+        *reinterpret_cast<int*>(self + 0x154) = -1;
+        *reinterpret_cast<int*>(self + 0x4C) = 0;
+
+        for (int i = 0; i < 0x40; i++) {
+            if (GetItemType__8CMenuPcsFii(MenuPcs, i, 0) == 9) {
+                int count = *reinterpret_cast<int*>(self + 0x4C);
+                *reinterpret_cast<int*>(self + 0x4C) = count + 1;
+                *reinterpret_cast<int*>(self + 0x50 + count * 4) = i;
+            }
+        }
+
+        if (*reinterpret_cast<int*>(self + 0x4C) == 0) {
+            *reinterpret_cast<int*>(self + 0x4C) = 1;
+            *reinterpret_cast<int*>(self + 0x50) = -1;
+            for (int i = 0; i < 7; i++) {
+                int count = *reinterpret_cast<int*>(self + 0x4C);
+                *reinterpret_cast<int*>(self + 0x4C) = count + 1;
+                *reinterpret_cast<int*>(self + 0x50 + count * 4) = -1;
+            }
+        }
+        break;
+    }
+    case 10:
+        *reinterpret_cast<unsigned char*>(self + 0x48) = 0;
+        break;
+    case 12:
+        *reinterpret_cast<int*>(self + 0x3C) = 0;
+        break;
+    }
 }
 
 /*

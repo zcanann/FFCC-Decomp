@@ -25,8 +25,21 @@ extern "C" void __dt__6CSoundFv(void*);
 extern "C" unsigned int GetSoundMode__9CRedSoundFv(CRedSound*);
 extern "C" int StreamPlayState__9CRedSoundFi(CRedSound*, int);
 extern "C" int ReentryWaveData__9CRedSoundFi(CRedSound*, int);
+extern "C" int SePlayState__9CRedSoundFi(CRedSound*, int);
+extern "C" int ReportSeLoop__9CRedSoundFi(CRedSound*, int);
+extern "C" int GetSeVolume__9CRedSoundFii(CRedSound*, int, int);
+extern "C" void SeStop__9CRedSoundFi(CRedSound*, int);
+extern "C" void SePan__9CRedSoundFiii(CRedSound*, int, int, int);
+extern "C" void SeVolume__9CRedSoundFiii(CRedSound*, int, int, int);
+extern "C" int SePlay__9CRedSoundFiiiii(CRedSound*, int, int, int, int, int);
+extern "C" void MusicVolume__9CRedSoundFiii(CRedSound*, int, int, int);
+extern "C" void Printf__7CSystemFPce(CSystem*, char*, ...);
 extern "C" int sprintf(char*, const char*, ...);
 extern void* ARRAY_802f26c8;
+extern char DAT_801db29c[];
+extern char DAT_801db2b8[];
+extern char s_Sound___1_n_B_801db130[];
+extern unsigned char CFlat[];
 
 struct CLineSegment {
     Vec delta;
@@ -528,12 +541,97 @@ void CSound::CheckDriver(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c7594
+ * PAL Size: 776b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CSound::Frame()
 {
-	// TODO
+    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+    unsigned char* se = reinterpret_cast<unsigned char*>(this) + 0x2C;
+
+    loadWaveFrame();
+
+    for (u32 i = 0; i < 0x80; i++, se += 0x28) {
+        if (static_cast<signed char>(*se) < 0) {
+            int volumePan[3];
+            int pan;
+
+            calcVolumePan(reinterpret_cast<CSe3D*>(se), volumePan[0], pan);
+
+            if (((*se >> 6) & 1) == 0) {
+                int& seId = *reinterpret_cast<int*>(se + 8);
+                if (SePlayState__9CRedSoundFi(redSound, seId) == 0) {
+                    *se &= 0x7F;
+                } else {
+                    if (ReportSeLoop__9CRedSoundFi(redSound, seId) != 0 &&
+                        GetSeVolume__9CRedSoundFii(redSound, seId, 0) == 0 &&
+                        GetSeVolume__9CRedSoundFii(redSound, seId, 1) == 0) {
+                        if ((*reinterpret_cast<unsigned int*>(CFlat + 0x129C) & 0x400000) != 0) {
+                            Printf__7CSystemFPce(&System, DAT_801db2b8, *reinterpret_cast<int*>(se + 0xC));
+                        }
+                        SeStop__9CRedSoundFi(redSound, seId);
+                        *se = (*se & 0xBF) | 0x40;
+                        continue;
+                    }
+
+                    if (static_cast<signed char>(se[2]) != pan) {
+                        if (seId < 0) {
+                            Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
+                        } else {
+                            SePan__9CRedSoundFiii(redSound, seId, pan, 0x1E);
+                        }
+                        se[2] = static_cast<unsigned char>(pan);
+                    }
+
+                    if (static_cast<signed char>(se[1]) != volumePan[0]) {
+                        if (seId < 0) {
+                            Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
+                        } else {
+                            SeVolume__9CRedSoundFiii(redSound, seId, volumePan[0], 0x1E);
+                        }
+                        se[1] = static_cast<unsigned char>(volumePan[0]);
+                    }
+                }
+            } else if (volumePan[0] != 0) {
+                if ((*reinterpret_cast<unsigned int*>(CFlat + 0x129C) & 0x400000) != 0) {
+                    Printf__7CSystemFPce(&System, DAT_801db29c, *reinterpret_cast<int*>(se + 0xC));
+                }
+
+                int soundId = *reinterpret_cast<int*>(se + 0xC);
+                int newSeId;
+                if (soundId < 0) {
+                    Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
+                    newSeId = -1;
+                } else if (soundId < 4000) {
+                    int bank = soundId / 1000;
+                    newSeId = SePlay__9CRedSoundFiiiii(redSound, bank, soundId - bank * 1000, pan, 0, 0);
+                    SeVolume__9CRedSoundFiii(redSound, newSeId, volumePan[0], 0x1E);
+                } else {
+                    newSeId = SePlay__9CRedSoundFiiiii(redSound, -1, soundId, pan, 0, 0);
+                    SeVolume__9CRedSoundFiii(redSound, newSeId, volumePan[0], 0x1E);
+                }
+
+                *reinterpret_cast<int*>(se + 8) = newSeId;
+                *se &= 0xBF;
+            }
+        }
+    }
+
+    int& currentMusicVolume = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x22B8);
+    const int targetMusicVolume = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x22BC);
+    if (currentMusicVolume != targetMusicVolume) {
+        if (currentMusicVolume < targetMusicVolume) {
+            currentMusicVolume++;
+        } else {
+            currentMusicVolume--;
+        }
+    }
+
+    MusicVolume__9CRedSoundFiii(redSound, -1, currentMusicVolume, 0);
 }
 
 /*

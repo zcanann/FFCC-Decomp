@@ -665,12 +665,82 @@ extern "C" int CreateWaterMesh__FP3VecP3VecP5Vec2dPUsf2(
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80106c54
+ * PAL Size: 968b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void UpdateWaterMesh(VMana2*)
+void UpdateWaterMesh(VMana2* mana2)
 {
-	// TODO
+    u8* work;
+    float* waterHeightA;
+    float* waterHeightB;
+    Vec* positions;
+    Vec origin;
+
+    work = (u8*)mana2;
+    waterHeightA = *(float**)(work + 0x48);
+    positions = *(Vec**)(work + 0x3C);
+    waterHeightB = *(float**)(work + 0x4C);
+    if (waterHeightA == NULL) {
+        return;
+    }
+
+    for (int row = 1; row < 0x10; row++) {
+        int rowBase = row * 0x11;
+        for (int colBlock = 0; colBlock < 3; colBlock++) {
+            int col = colBlock * 5 + 1;
+            int idx = rowBase + col;
+
+            waterHeightB[idx + 0] =
+                FLOAT_80331898 * waterHeightA[idx + 0] +
+                FLOAT_803318a4 *
+                    (waterHeightA[idx + 1] + waterHeightA[idx - 1] + waterHeightA[idx - 0x11] + waterHeightA[idx + 0x11]) -
+                waterHeightB[idx + 0];
+
+            waterHeightB[idx + 1] =
+                FLOAT_80331898 * waterHeightA[idx + 1] +
+                FLOAT_803318a4 *
+                    (waterHeightA[idx + 2] + waterHeightA[idx + 0] + waterHeightA[idx - 0x10] + waterHeightA[idx + 0x12]) -
+                waterHeightB[idx + 1];
+
+            waterHeightB[idx + 2] =
+                FLOAT_80331898 * waterHeightA[idx + 2] +
+                FLOAT_803318a4 *
+                    (waterHeightA[idx + 3] + waterHeightA[idx + 1] + waterHeightA[idx - 0x0F] + waterHeightA[idx + 0x13]) -
+                waterHeightB[idx + 2];
+
+            waterHeightB[idx + 3] =
+                FLOAT_80331898 * waterHeightA[idx + 3] +
+                FLOAT_803318a4 *
+                    (waterHeightA[idx + 4] + waterHeightA[idx + 2] + waterHeightA[idx - 0x0E] + waterHeightA[idx + 0x14]) -
+                waterHeightB[idx + 3];
+
+            waterHeightB[idx + 4] =
+                FLOAT_80331898 * waterHeightA[idx + 4] +
+                FLOAT_803318a4 *
+                    (waterHeightA[idx + 5] + waterHeightA[idx + 3] + waterHeightA[idx - 0x0D] + waterHeightA[idx + 0x15]) -
+                waterHeightB[idx + 4];
+        }
+    }
+
+    for (int i = 0; i < 0x121; i++) {
+        float tmp = waterHeightA[i];
+        waterHeightA[i] = waterHeightB[i];
+        waterHeightB[i] = tmp;
+        positions[i].y = waterHeightA[i];
+    }
+
+    DCFlushRange(positions, 0xD8C);
+    CalculateNormal(mana2);
+
+    origin.x = *(float*)(work + 0x8C);
+    origin.y = *(float*)(work + 0x9C);
+    origin.z = *(float*)(work + 0xAC);
+    CalcWaterReflectionVector(*(Vec**)(work + 0x44), *(Vec**)(work + 0x3C), *(Vec**)(work + 0x40), 0x121, &origin,
+                              (float(*)[4])(work + 0x80), *(_GXColor**)(work + 0x5C), *(Vec2d**)(work + 0x58));
 }
 
 /*

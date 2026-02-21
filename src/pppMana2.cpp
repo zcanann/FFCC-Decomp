@@ -3,9 +3,16 @@
 #include "ffcc/gobject.h"
 #include "ffcc/p_game.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/util.h"
 
 #include <string.h>
+#include <math.h>
 #include <dolphin/os/OSCache.h>
+
+struct Vec2d {
+    float x;
+    float y;
+};
 
 extern char lbl_801DC4D0[];
 extern float FLOAT_803318fc;
@@ -13,6 +20,9 @@ extern float FLOAT_80331898;
 extern float FLOAT_8033189c;
 extern float FLOAT_803318a0;
 extern float FLOAT_803318a4;
+extern float FLOAT_803318b8;
+extern float FLOAT_803318bc;
+extern float FLOAT_803318c0;
 extern float FLOAT_80331904;
 extern Mtx ppvCameraMatrix0;
 extern struct {
@@ -20,6 +30,7 @@ extern struct {
     float _228_4_;
     float _232_4_;
 } CameraPcs;
+extern CUtil DAT_8032ec70;
 extern char MaterialMan[];
 extern char DAT_80331900[];
 extern char DAT_803318d4[];
@@ -286,12 +297,169 @@ void GXSetTexCoordGen(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801071b0
+ * PAL Size: 1428b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CalcReflectionVector2(Vec*, S16Vec*, S16Vec*, long, unsigned long, unsigned long, float (*) [4], void*, unsigned long, _GXColor*, S16Vec2d*, CChara::CNode*)
+void CalcReflectionVector2(
+    Vec* reflectionVec,
+    S16Vec* positions,
+    S16Vec* normals,
+    long count,
+    unsigned long posScale,
+    unsigned long normalScale,
+    float (*matrix)[4],
+    void* displayList,
+    unsigned long displayListSize,
+    _GXColor* color,
+    S16Vec2d* texCoord,
+    CChara::CNode* node)
 {
-	// TODO
+    Vec cameraPos;
+    Vec nodeOffset;
+    Vec worldPos;
+    Vec cameraVector;
+    Vec objSpacePos;
+    Vec objSpaceNormal;
+    Vec reflectOut;
+    Vec2d uv;
+    Mtx nodeMtx;
+    Mtx nodeRotMtx;
+    Mtx cameraMtx;
+    u8* dl = (u8*)displayList;
+    u8* dlEnd;
+    const double half = (double)FLOAT_803318a4;
+
+    cameraPos.x = CameraPcs._224_4_;
+    cameraPos.y = CameraPcs._228_4_;
+    cameraPos.z = CameraPcs._232_4_;
+
+    PSMTXCopy(matrix, nodeMtx);
+    nodeOffset.x = *(float*)((char*)node + 0x78);
+    nodeOffset.y = *(float*)((char*)node + 0x88);
+    nodeOffset.z = *(float*)((char*)node + 0x98);
+
+    worldPos.x = nodeMtx[0][3];
+    worldPos.y = nodeMtx[1][3];
+    worldPos.z = nodeMtx[2][3];
+    PSVECAdd(&nodeOffset, &worldPos, &worldPos);
+
+    PSMTXCopy((float(*)[4])((char*)node + 0x6C), matrix);
+    matrix[0][3] = worldPos.x;
+    matrix[1][3] = worldPos.y;
+    matrix[2][3] = worldPos.z;
+
+    PSMTXCopy(matrix, nodeRotMtx);
+    nodeRotMtx[0][3] = FLOAT_80331898;
+    nodeRotMtx[1][3] = FLOAT_80331898;
+    nodeRotMtx[2][3] = FLOAT_80331898;
+
+    PSMTXCopy(ppvCameraMatrix0, cameraMtx);
+    PSMTXConcat(cameraMtx, matrix, cameraMtx);
+
+    dlEnd = dl + displayListSize;
+    while (dl < dlEnd) {
+        u8 drawFmt = dl[0];
+        u16 itemCount = *(u16*)(dl + 1);
+        int i;
+
+        if (DAT_8032ec70.IsHasDrawFmtDL(drawFmt) == 0) {
+            break;
+        }
+
+        dl += 3;
+        for (i = 0; i < itemCount; i++) {
+            u16 posIndex = *(u16*)(dl + 0);
+            u16 normalIndex = *(u16*)(dl + 2);
+            u8* next = dl + 8;
+            int axis = 0;
+            float maxAxis;
+            float invAxis;
+            u8* clr;
+
+            if ((drawFmt & 7) == 2) {
+                next = dl + 10;
+            }
+
+            DAT_8032ec70.ConvI2FVector(objSpacePos, positions[posIndex], posScale);
+            DAT_8032ec70.ConvI2FVector(objSpaceNormal, normals[normalIndex], normalScale);
+            PSMTXMultVec(matrix, &objSpacePos, &objSpacePos);
+            PSMTXMultVec(nodeRotMtx, &objSpaceNormal, &objSpaceNormal);
+
+            PSVECSubtract(&objSpacePos, &cameraPos, &cameraVector);
+            PSVECNormalize(&cameraVector, &cameraVector);
+            C_VECReflect(&cameraVector, &objSpaceNormal, &reflectOut);
+
+            maxAxis = fabsf(reflectOut.x);
+            if (maxAxis < fabsf(reflectOut.y)) {
+                axis = 1;
+                maxAxis = fabsf(reflectOut.y);
+            }
+            if (maxAxis < fabsf(reflectOut.z)) {
+                axis = 2;
+            }
+
+            clr = (u8*)&color[posIndex];
+            clr[0] = 0x80;
+            clr[1] = 0x80;
+            clr[2] = 0x80;
+            clr[3] = 0xFF;
+
+            uv.x = (float)half;
+            uv.y = (float)half;
+
+            if (axis == 1) {
+                invAxis = FLOAT_803318b8 * reflectOut.y;
+                if (reflectOut.y < FLOAT_80331898) {
+                    clr[1] = (u8)(clr[1] - 0x7F);
+                    uv.x = (float)((half - (double)(reflectOut.x / invAxis)) * (double)FLOAT_803318bc +
+                                   (double)FLOAT_803318bc);
+                    uv.y = (float)((double)((float)(half + (double)(reflectOut.z / invAxis)) * FLOAT_803318bc) + half);
+                } else {
+                    clr[1] = (u8)(clr[1] + 0x7F);
+                    uv.y = (float)((half + (double)(reflectOut.z / invAxis)) * (double)FLOAT_803318bc);
+                    uv.x = (float)((double)((float)(half + (double)(reflectOut.x / invAxis)) * FLOAT_803318bc) + half);
+                }
+            } else if (axis == 0) {
+                invAxis = FLOAT_803318b8 * reflectOut.x;
+                if (reflectOut.x < FLOAT_80331898) {
+                    clr[0] = (u8)(clr[0] - 0x7F);
+                    uv.x = (float)((half - (double)(reflectOut.z / invAxis)) * (double)FLOAT_803318bc +
+                                   (double)FLOAT_803318c0);
+                    uv.y = (float)((half + (double)(reflectOut.y / invAxis)) * (double)FLOAT_803318bc +
+                                   (double)FLOAT_803318bc);
+                } else {
+                    clr[0] = (u8)(clr[0] + 0x7F);
+                    uv.x = (float)((half - (double)(reflectOut.z / invAxis)) * (double)FLOAT_803318bc +
+                                   (double)FLOAT_803318bc);
+                    uv.y = (float)((half - (double)(reflectOut.y / invAxis)) * (double)FLOAT_803318bc +
+                                   (double)FLOAT_803318bc);
+                }
+            } else {
+                invAxis = FLOAT_803318b8 * reflectOut.z;
+                if (reflectOut.z < FLOAT_80331898) {
+                    clr[2] = (u8)(clr[2] - 0x7F);
+                    uv.x = (float)((double)((float)(half + (double)(reflectOut.x / invAxis)) * FLOAT_803318bc) + half);
+                    uv.y = (float)((half + (double)(reflectOut.y / invAxis)) * (double)FLOAT_803318bc +
+                                   (double)FLOAT_803318bc);
+                } else {
+                    clr[2] = (u8)(clr[2] + 0x7F);
+                    uv.x = (float)((half + (double)(reflectOut.x / invAxis)) * (double)FLOAT_803318bc);
+                    uv.y = (float)((half - (double)(reflectOut.y / invAxis)) * (double)FLOAT_803318bc +
+                                   (double)FLOAT_803318bc);
+                }
+            }
+
+            DAT_8032ec70.ConvF2IVector2d(texCoord[normalIndex], uv, 12);
+            dl = next;
+        }
+    }
+
+    DCFlushRange(reflectionVec, count * sizeof(Vec));
+    DCFlushRange(texCoord, count << 3);
 }
 
 /*

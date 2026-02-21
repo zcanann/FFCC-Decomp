@@ -142,38 +142,49 @@ CMapTexAnimSet::~CMapTexAnimSet()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80050064
+ * PAL Size: 700b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CTextureSet* textureSet)
 {
-    CMapTexAnim* anim = 0;
+    CMapTexAnim* anim;
     CChunkFile::CChunk chunk;
-    CMemory::CStage* const stage = *reinterpret_cast<CMemory::CStage**>(&MapMng);
+    int i;
+    int index;
 
+    anim = 0;
     *reinterpret_cast<CMaterialSet**>(Ptr(this, 0x10C)) = materialSet;
     *reinterpret_cast<CTextureSet**>(Ptr(this, 0x110)) = textureSet;
 
     chunkFile.PushChunk();
-    while (chunkFile.GetNextChunk(chunk)) {
+    while (chunkFile.GetNextChunk(chunk) != 0) {
         if (chunk.m_id == 0x4B455920) {
             ReadKey__12CMapKeyFrameFR10CChunkFilei(
                 reinterpret_cast<CMapKeyFrame*>(Ptr(anim, 0x24)), &chunkFile, static_cast<char>(chunk.m_arg0));
             U8At(anim, 0x15) = 1;
-        } else if (chunk.m_id < 0x4B455920) {
+        } else if ((int)chunk.m_id < 0x4B455920) {
             if (chunk.m_id == 0x4A554E20) {
                 ReadJun__12CMapKeyFrameFR10CChunkFilei(
                     reinterpret_cast<CMapKeyFrame*>(Ptr(anim, 0x24)), &chunkFile, static_cast<char>(chunk.m_arg0));
-            } else if (chunk.m_id == 0x4652414D) {
+            } else if (((int)chunk.m_id < 0x4A554E20) && (chunk.m_id == 0x4652414D)) {
                 ReadFrame__12CMapKeyFrameFR10CChunkFilei(reinterpret_cast<CMapKeyFrame*>(Ptr(anim, 0x24)), &chunkFile);
             }
         } else if (chunk.m_id == 0x54414E4D) {
-            anim = static_cast<CMapTexAnim*>(__nw__FUlPQ27CMemory6CStagePci(0x4C, stage, s_maptexanim_cpp_801d7ec4, 0x24));
+            anim = static_cast<CMapTexAnim*>(__nw__FUlPQ27CMemory6CStagePci(
+                0x4C, *reinterpret_cast<CMemory::CStage**>(&MapMng), s_maptexanim_cpp_801d7ec4, 0x24));
             if (anim != 0) {
                 __ct__4CRefFv(anim);
                 *reinterpret_cast<void**>(anim) = &PTR_PTR_s_CMapTexAnim_801ea9a4;
                 F32At(anim, 0x18) = FLOAT_8032fd48;
                 F32At(anim, 0x1C) = FLOAT_8032fd4c;
+                *reinterpret_cast<void**>(Ptr(anim, 0x3C)) = 0;
+                *reinterpret_cast<void**>(Ptr(anim, 0x40)) = 0;
+                *reinterpret_cast<void**>(Ptr(anim, 0x44)) = 0;
+                *reinterpret_cast<void**>(Ptr(anim, 0x48)) = 0;
                 U8At(anim, 0x14) = 0;
                 U8At(anim, 0x15) = 0;
                 U16At(anim, 0x12) = 0xFFFF;
@@ -181,8 +192,6 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
                 S32At(anim, 0x2C) = 0;
                 S32At(anim, 0x30) = 0;
                 *reinterpret_cast<void**>(Ptr(anim, 0x20)) = 0;
-                *reinterpret_cast<void**>(Ptr(anim, 0x40)) = 0;
-                *reinterpret_cast<void**>(Ptr(anim, 0x44)) = 0;
             }
 
             U16At(anim, 0x8) = chunkFile.Get2();
@@ -208,9 +217,13 @@ void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CT
             chunkFile.Get4();
             chunkFile.Get4();
             *reinterpret_cast<void**>(Ptr(anim, 0x20)) = __nwa__FUlPQ27CMemory6CStagePci(
-                static_cast<unsigned long>(S16At(anim, 0xC) << 1), stage, s_maptexanim_cpp_801d7ec4, 0x3B);
-            for (int i = 0; i < S16At(anim, 0xC); i++) {
-                U16At(*reinterpret_cast<void**>(Ptr(anim, 0x20)), i * 2) = chunkFile.Get2();
+                static_cast<unsigned long>(S16At(anim, 0xC) << 1), *reinterpret_cast<CMemory::CStage**>(&MapMng),
+                s_maptexanim_cpp_801d7ec4, 0x3B);
+
+            index = 0;
+            for (i = 0; i < S16At(anim, 0xC); i++) {
+                U16At(*reinterpret_cast<void**>(Ptr(anim, 0x20)), static_cast<unsigned int>(index)) = chunkFile.Get2();
+                index += 2;
             }
 
             const short count = S16At(this, 8);

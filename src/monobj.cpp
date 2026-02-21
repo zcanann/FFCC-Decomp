@@ -1,6 +1,9 @@
 #include "ffcc/monobj.h"
 #include "ffcc/charaobj.h"
+#include "ffcc/gobjwork.h"
 #include "ffcc/math.h"
+#include "ffcc/p_game.h"
+#include "ffcc/sound.h"
 #include "ffcc/vector.h"
 
 #include <math.h>
@@ -597,12 +600,80 @@ void CGMonObj::setAI(int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801143D0
+ * PAL Size: 512b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::onFrameAlways()
 {
-	// TODO
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	void** scriptHandle = object->m_scriptHandle;
+
+	if (scriptHandle == nullptr) {
+		return;
+	}
+
+	if ((*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0xFE) & 4) != 0) {
+		unsigned char hasNearParty = 0;
+		if (mon[0x6B9] == 0) {
+			for (int i = 0; i < 4; i++) {
+				CGPartyObj* party = Game.game.m_partyObjArr[i];
+				if (party != nullptr && *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(party) + 0x668) != 0) {
+					float dist = PSVECDistance(
+						reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(party) + 0x66C),
+						&object->m_worldPosition
+					);
+					if (dist < 60.0f + object->m_bodyEllipsoidRadius) {
+						hasNearParty = 1;
+						break;
+					}
+				}
+			}
+		}
+
+		if (hasNearParty != mon[0x6C3]) {
+			reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x200000);
+			if (hasNearParty != 0) {
+				reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace(
+					0x146,
+					*reinterpret_cast<int*>(mon + 0x5B8),
+					object,
+					1.0f,
+					0
+				);
+			}
+			mon[0x6C3] = hasNearParty;
+		}
+	}
+
+	reinterpret_cast<CMonWork*>(object->m_scriptHandle)->CalcStatus();
+	__ptmf_scall(this, mon + 0x708);
+
+	unsigned short stepSeRaw = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1BE);
+	int stepSeId = 0;
+	if (stepSeRaw != 0xFFFF) {
+		stepSeId = (stepSeRaw & 0xFF) + ((stepSeRaw >> 8) * 1000);
+	}
+
+	if (stepSeId == 0) {
+		return;
+	}
+
+	int& stepSeHandle = *reinterpret_cast<int*>(mon + 0x704);
+	if (object->m_currentAnimSlot == static_cast<char>(object->m_animStartFrame)) {
+		if (stepSeHandle == 0) {
+			stepSeHandle = reinterpret_cast<CGPrgObj*>(this)->playSe3D(stepSeId, 0x32, 0x96, 0, (Vec*)0);
+		} else {
+			Sound.ChangeSe3DPos(stepSeHandle, &object->m_worldPosition);
+		}
+	} else if (stepSeHandle != 0) {
+		Sound.FadeOutSe3D(stepSeHandle, 0x32);
+		stepSeHandle = 0;
+	}
 }
 
 /*

@@ -38,6 +38,7 @@ public:
 extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
 extern "C" void __ct__4CRefFv(void*);
+extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void* lbl_801E9BA0[];
 extern "C" void* PTR_PTR_s_CTextureSet_801e9b34;
@@ -541,12 +542,36 @@ CTexture::CTexture()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003B8D8
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-CTexture::~CTexture()
+extern "C" CTexture* __dt__8CTextureFv(CTexture* texture, short shouldDelete)
 {
-	// TODO
+    if (texture != 0) {
+        *reinterpret_cast<void**>(texture) = &PTR_PTR_s_CTexture_801e9b78;
+        if (U8At(texture, 0x75) == 0) {
+            if (PtrAt(texture, 0x78) != 0) {
+                __dla__FPv(PtrAt(texture, 0x78));
+                PtrAt(texture, 0x78) = 0;
+            }
+            if (PtrAt(texture, 0x7C) != 0) {
+                __dla__FPv(PtrAt(texture, 0x7C));
+                PtrAt(texture, 0x7C) = 0;
+            }
+        } else {
+            PtrAt(texture, 0x78) = 0;
+            PtrAt(texture, 0x7C) = 0;
+        }
+        __dt__4CRefFv(texture, 0);
+        if (shouldDelete > 0) {
+            __dl__FPv(texture);
+        }
+    }
+    return texture;
 }
 
 /*

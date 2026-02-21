@@ -21,6 +21,19 @@ struct Vec2d {
     float y;
 };
 
+extern "C" {
+void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
+void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
+void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
+void _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(int, int, int,
+                                                                                                            int, int);
+void _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(int, int, int, int, int, int);
+void _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(int, int, int,
+                                                                                                            int, int);
+void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(int, int, int, int, int, int);
+void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800d7ff8
@@ -283,12 +296,124 @@ void UpdateWaterMesh(VYmMana*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800d55f4
+ * PAL Size: 1472b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void RenderWaterMesh(VYmMana*)
+void RenderWaterMesh(VYmMana* mana)
 {
-	// TODO
+    u8* work = (u8*)mana;
+    u16* indices = *(u16**)(work + 0x50);
+    void* texObj0 = *(void**)(work + 0x28);
+    void* texObj1 = *(void**)(work + 0x2C);
+    void* texObj2 = (u8*)*(void**)(work + 0x80) + 0x28;
+    _GXColor modulateColor;
+    _GXColor blendColor = {0x80, 0x80, 0x80, 0x80};
+
+    GXClearVtxDesc();
+    GXSetVtxDesc((GXAttr)9, GX_INDEX16);
+    GXSetVtxDesc((GXAttr)10, GX_INDEX16);
+    GXSetVtxDesc((GXAttr)0xB, GX_INDEX16);
+    GXSetVtxDesc((GXAttr)0xD, GX_INDEX16);
+    GXSetVtxDesc((GXAttr)0xE, GX_INDEX16);
+    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)9, (GXCompCnt)1, (GXCompType)4, 0);
+    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)10, (GXCompCnt)0, (GXCompType)4, 0);
+    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)0xB, (GXCompCnt)1, (GXCompType)5, 0);
+    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)0xD, (GXCompCnt)1, (GXCompType)4, 0);
+    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)0xE, (GXCompCnt)1, (GXCompType)4, 0);
+    GXSetNumTexGens(2);
+    GXSetCullMode((GXCullMode)0);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 0xF);
+    GXSetChanCtrl((GXChannelID)4, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPOT);
+    GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
+    GXSetNumChans(1);
+    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
+    GXSetArray((GXAttr)9, *(void**)(work + 0x3C), 0xC);
+    GXSetArray((GXAttr)10, *(void**)(work + 0x40), 0xC);
+    GXSetArray((GXAttr)0xB, *(void**)(work + 0x5C), 4);
+    GXSetArray((GXAttr)0xD, *(void**)(work + 0x54), 8);
+    GXSetArray((GXAttr)0xE, *(void**)(work + 0x58), 8);
+    GXSetTexCoordGen2((GXTexCoordID)0, (GXTexGenType)1, (GXTexGenSrc)4, 0x3C, GX_FALSE, 0x7D);
+    GXSetTexCoordGen2((GXTexCoordID)1, (GXTexGenType)1, (GXTexGenSrc)5, 0x3C, GX_FALSE, 0x7D);
+    modulateColor.r = *(u8*)(work + 0xE8);
+    modulateColor.g = modulateColor.r;
+    modulateColor.b = modulateColor.r;
+    modulateColor.a = modulateColor.r;
+
+    GXSetTevDirect((GXTevStageID)0);
+    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
+    GXLoadTexObj((GXTexObj*)texObj2, GX_TEXMAP0);
+    GXSetTevKColor((GXTevKColorID)1, modulateColor);
+    GXSetTevKColorSel((GXTevStageID)0, (GXTevKColorSel)0xD);
+    GXSetTevKAlphaSel((GXTevStageID)0, (GXTevKAlphaSel)0x1D);
+    _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(0, 0xF, 0xF,
+                                                                                                           0xF, 8);
+    _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
+    _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(0, 7, 6, 4, 7);
+    _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
+
+    GXSetTevDirect((GXTevStageID)1);
+    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(1, 1, 1, 4);
+    GXLoadTexObj((GXTexObj*)texObj0, GX_TEXMAP1);
+    GXSetTevKColor((GXTevKColorID)0, blendColor);
+    GXSetTevKColorSel((GXTevStageID)1, (GXTevKColorSel)0xC);
+    GXSetTevKAlphaSel((GXTevStageID)1, (GXTevKAlphaSel)0x1C);
+    _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(1, 0xB, 0xE, 8,
+                                                                                                           0xF);
+    _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(1, 8, 0, 0, 1, 0);
+    _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(1, 7, 7, 7, 0);
+    _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(1, 0, 0, 1, 1, 0);
+
+    GXSetTevDirect((GXTevStageID)2);
+    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(2, 0, 0);
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(2, 1, 2, 4);
+    GXLoadTexObj((GXTexObj*)texObj1, GX_TEXMAP2);
+    GXSetTevKColor((GXTevKColorID)0, blendColor);
+    GXSetTevKColorSel((GXTevStageID)2, (GXTevKColorSel)0xC);
+    GXSetTevKAlphaSel((GXTevStageID)2, (GXTevKAlphaSel)0x1C);
+    _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(2, 0xE, 0xB, 8,
+                                                                                                           0);
+    _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(2, 8, 0, 0, 1, 0);
+    _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(2, 7, 7, 7, 0);
+    _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(2, 0, 0, 0, 1, 0);
+
+    GXSetNumTevStages(3);
+    GXBegin((GXPrimitive)0x90, GX_VTXFMT7, 0x600);
+    for (int i = 0; i < 0x180; i++) {
+        GXPosition1x16(indices[0]);
+        GXNormal1x16(indices[0]);
+        GXColor1x16(indices[0]);
+        GXTexCoord1x16(indices[0]);
+        GXTexCoord1x16(indices[0]);
+        GXPosition1x16(indices[1]);
+        GXNormal1x16(indices[1]);
+        GXColor1x16(indices[1]);
+        GXTexCoord1x16(indices[1]);
+        GXTexCoord1x16(indices[1]);
+        GXPosition1x16(indices[2]);
+        GXNormal1x16(indices[2]);
+        GXColor1x16(indices[2]);
+        GXTexCoord1x16(indices[2]);
+        GXTexCoord1x16(indices[2]);
+        GXPosition1x16(indices[3]);
+        GXNormal1x16(indices[3]);
+        GXColor1x16(indices[3]);
+        GXTexCoord1x16(indices[3]);
+        GXTexCoord1x16(indices[3]);
+        indices += 4;
+    }
+
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0xFF, 4);
+    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 4, 5, 0xF);
+    GXSetNumTevStages(1);
+    GXLoadTexObj((GXTexObj*)texObj0, GX_TEXMAP0);
 }
 
 /*

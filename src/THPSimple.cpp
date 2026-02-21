@@ -776,15 +776,13 @@ void MixAudio(short* output, short* input, unsigned long samples)
     s16* audioPtr;
     u32 availableSamples;
     u32 i;
-    u32 playIndex;
 
     if (input == NULL) {
         if ((SimpleControl.isOpen == 0) || (SimpleControl.isBufferSet != 1) || (SimpleControl.hasAudio == 0)) {
             memset(output, 0, samples << 2);
         } else {
             do {
-                playIndex = static_cast<u32>(SimpleControl.audioPlayIndex);
-                availableSamples = SimpleControl.audioBuffer[playIndex].mValidSample;
+                availableSamples = SimpleControl.audioBuffer[SimpleControl.audioPlayIndex].mValidSample;
                 if (availableSamples == 0) {
                     memset(output, 0, samples << 2);
                     return;
@@ -793,7 +791,7 @@ void MixAudio(short* output, short* input, unsigned long samples)
                     availableSamples = static_cast<u32>(samples);
                 }
 
-                audioPtr = SimpleControl.audioBuffer[playIndex].mCurPtr;
+                audioPtr = SimpleControl.audioBuffer[SimpleControl.audioPlayIndex].mCurPtr;
                 for (i = availableSamples; i != 0; i--) {
                     volumeIndex = SimpleControl.unk_C8;
                     if (SimpleControl.unk_D0 != 0) {
@@ -826,9 +824,9 @@ void MixAudio(short* output, short* input, unsigned long samples)
                 }
 
                 samples -= availableSamples;
-                SimpleControl.audioBuffer[playIndex].mValidSample -= availableSamples;
-                SimpleControl.audioBuffer[playIndex].mCurPtr = audioPtr;
-                if (SimpleControl.audioBuffer[playIndex].mValidSample == 0) {
+                SimpleControl.audioBuffer[SimpleControl.audioPlayIndex].mValidSample -= availableSamples;
+                SimpleControl.audioBuffer[SimpleControl.audioPlayIndex].mCurPtr = audioPtr;
+                if (SimpleControl.audioBuffer[SimpleControl.audioPlayIndex].mValidSample == 0) {
                     SimpleControl.audioPlayIndex += 1;
                     if (SimpleControl.audioPlayIndex > 2) {
                         SimpleControl.audioPlayIndex = 0;
@@ -840,8 +838,7 @@ void MixAudio(short* output, short* input, unsigned long samples)
         memcpy(output, input, samples << 2);
     } else {
         do {
-            playIndex = static_cast<u32>(SimpleControl.audioPlayIndex);
-            availableSamples = SimpleControl.audioBuffer[playIndex].mValidSample;
+            availableSamples = SimpleControl.audioBuffer[SimpleControl.audioPlayIndex].mValidSample;
             if (availableSamples == 0) {
                 memcpy(output, input, samples << 2);
                 return;
@@ -850,7 +847,7 @@ void MixAudio(short* output, short* input, unsigned long samples)
                 availableSamples = static_cast<u32>(samples);
             }
 
-            audioPtr = SimpleControl.audioBuffer[playIndex].mCurPtr;
+            audioPtr = SimpleControl.audioBuffer[SimpleControl.audioPlayIndex].mCurPtr;
             for (i = availableSamples; i != 0; i--) {
                 volumeIndex = SimpleControl.unk_C8;
                 if (SimpleControl.unk_D0 != 0) {
@@ -886,9 +883,9 @@ void MixAudio(short* output, short* input, unsigned long samples)
             }
 
             samples -= availableSamples;
-            SimpleControl.audioBuffer[playIndex].mValidSample -= availableSamples;
-            SimpleControl.audioBuffer[playIndex].mCurPtr = audioPtr;
-            if (SimpleControl.audioBuffer[playIndex].mValidSample == 0) {
+            SimpleControl.audioBuffer[SimpleControl.audioPlayIndex].mValidSample -= availableSamples;
+            SimpleControl.audioBuffer[SimpleControl.audioPlayIndex].mCurPtr = audioPtr;
+            if (SimpleControl.audioBuffer[SimpleControl.audioPlayIndex].mValidSample == 0) {
                 SimpleControl.audioPlayIndex += 1;
                 if (SimpleControl.audioPlayIndex > 2) {
                     SimpleControl.audioPlayIndex = 0;

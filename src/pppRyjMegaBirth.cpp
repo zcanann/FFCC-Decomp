@@ -4,6 +4,10 @@
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern s32 DAT_8032ed70;
+extern float FLOAT_80330448;
+extern float FLOAT_80330458;
+extern float FLOAT_8033045c;
+extern float FLOAT_80330460;
 
 static Mtx g_matUnit;
 
@@ -51,12 +55,107 @@ void birth(_pppPObject*, VRyjMegaBirth*, PRyjMegaBirth*, VColor*, _PARTICLE_DATA
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80082cc8
+ * PAL Size: 936b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void calc(VRyjMegaBirth*, PRyjMegaBirth*, _PARTICLE_DATA*, VColor*, _PARTICLE_COLOR*)
+void calc(
+	VRyjMegaBirth* work, PRyjMegaBirth* param, _PARTICLE_DATA* particle, VColor* vColor,
+	_PARTICLE_COLOR* colorData)
 {
-	// TODO
+	s32 alpha;
+	u8* paramPayload;
+	u8* particlePayload;
+	u8 fadeOutFrames;
+	float particleAngle;
+
+	alpha = (u8)((u8*)vColor)[0xB];
+	paramPayload = (u8*)param;
+	particlePayload = (u8*)particle;
+
+	if (colorData != 0)
+	{
+		colorData->m_color[0] = colorData->m_color[0] + colorData->m_colorFrameDeltas[0];
+		colorData->m_color[1] = colorData->m_color[1] + colorData->m_colorFrameDeltas[1];
+		colorData->m_color[2] = colorData->m_color[2] + colorData->m_colorFrameDeltas[2];
+		colorData->m_color[3] = colorData->m_color[3] + colorData->m_colorFrameDeltas[3];
+		colorData->m_colorFrameDeltas[0] = colorData->m_colorFrameDeltas[0] + param->m_colorDeltaAdd[0];
+		colorData->m_colorFrameDeltas[1] = colorData->m_colorFrameDeltas[1] + param->m_colorDeltaAdd[1];
+		colorData->m_colorFrameDeltas[2] = colorData->m_colorFrameDeltas[2] + param->m_colorDeltaAdd[2];
+		colorData->m_colorFrameDeltas[3] = colorData->m_colorFrameDeltas[3] + param->m_colorDeltaAdd[3];
+			alpha = alpha + (s32)colorData->m_color[3];
+			if (0xFF < alpha)
+			{
+				alpha = 0xFF;
+			}
+	}
+
+	*(float*)(particlePayload + 0x28) = *(float*)(particlePayload + 0x28) + *(float*)(particlePayload + 0x2C);
+	if ((paramPayload[0x8B] & 0x10) == 0)
+	{
+		*(float*)(particlePayload + 0x2C) = *(float*)(particlePayload + 0x2C) + *(float*)(paramPayload + 0x98);
+	}
+	else
+	{
+		*(float*)(particlePayload + 0x2C) = *(float*)(particlePayload + 0x2C) +
+			*(float*)(paramPayload + 0x98) + *(float*)(particlePayload + 0x3C);
+	}
+
+	particleAngle = *(float*)(particlePayload + 0x28);
+	while (FLOAT_8033045c <= particleAngle)
+	{
+		particleAngle = particleAngle - FLOAT_80330458;
+	}
+	while (particleAngle < FLOAT_80330460)
+	{
+		particleAngle = particleAngle + FLOAT_80330458;
+	}
+	*(float*)(particlePayload + 0x28) = particleAngle;
+
+	*(float*)(particlePayload + 0x40) = *(float*)(particlePayload + 0x40) + *(float*)(particlePayload + 0x48);
+	*(float*)(particlePayload + 0x44) = *(float*)(particlePayload + 0x44) + *(float*)(particlePayload + 0x4C);
+
+	if ((paramPayload[0x8A] & 0x10) == 0)
+	{
+		*(float*)(particlePayload + 0x48) = *(float*)(particlePayload + 0x48) + *(float*)(paramPayload + 0x84);
+		*(float*)(particlePayload + 0x4C) = *(float*)(particlePayload + 0x4C) + *(float*)(paramPayload + 0x88);
+	}
+	else
+	{
+		*(float*)(particlePayload + 0x48) = *(float*)(particlePayload + 0x48) +
+			*(float*)(paramPayload + 0x84) + *(float*)(particlePayload + 0x50);
+		*(float*)(particlePayload + 0x4C) = *(float*)(particlePayload + 0x4C) +
+			*(float*)(paramPayload + 0x88) + *(float*)(particlePayload + 0x54);
+	}
+
+	*(float*)(particlePayload + 0x58) = *(float*)(particlePayload + 0x58) + *(float*)(paramPayload + 0xA8);
+	if ((s8)paramPayload[0x8E] == 0)
+	{
+		if ((*(float*)(paramPayload + 0xAC) <= FLOAT_80330448) || (FLOAT_80330448 <= *(float*)(paramPayload + 0xA8)))
+		{
+			if ((*(float*)(paramPayload + 0xAC) < FLOAT_80330448) &&
+				((FLOAT_80330448 < *(float*)(paramPayload + 0xA8)) &&
+				 (FLOAT_80330448 < *(float*)(particlePayload + 0x58))))
+			{
+				*(float*)(particlePayload + 0x58) = FLOAT_80330448;
+			}
+		}
+		else if (*(float*)(particlePayload + 0x58) < FLOAT_80330448)
+		{
+			*(float*)(particlePayload + 0x58) = FLOAT_80330448;
+		}
+	}
+
+	fadeOutFrames = *(u8*)(particlePayload + 0x59);
+	*(u8*)(particlePayload + 0x58) = *(u8*)(particlePayload + 0x58) + 1;
+	if ((fadeOutFrames != 0) && (*(u8*)(particlePayload + 0x58) <= fadeOutFrames))
+	{
+		*(float*)(particlePayload + 0x5C) =
+			*(float*)(particlePayload + 0x5C) - ((float)alpha / (float)fadeOutFrames);
+	}
 }
 
 /*

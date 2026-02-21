@@ -82,14 +82,16 @@ void SetTexGenMode(pppEmission*) {
 void Emission_DrawMeshDLCallback(CChara::CModel* model, void*, void*, int meshIndex, int displayListIndex, float (*)[4]) {
     Graphic.SetDrawDoneDebugData(0x64);
 
-    char* meshData = *(char**)((char*)model + 0xAC + (meshIndex * 0x14) + 8);
+    char* meshList = *(char**)((char*)model + 0xAC);
+    char* meshData = *(char**)(meshList + (meshIndex * 0x14) + 8);
     char* displayList = *(char**)(meshData + 0x50) + (displayListIndex * 0xC);
 
     if (strcmp(meshData, DAT_803311fc) == 0) {
-        *(u8*)(meshData + 0x18) = 0;
-        *(u8*)(meshData + 0x19) = 0;
-        *(u8*)(meshData + 0x1A) = 0;
-        *(u8*)(meshData + 0x1B) = 0;
+        u8* color = *(u8**)(meshData + 0x28);
+        color[0] = 0;
+        color[1] = 0;
+        color[2] = 0;
+        color[3] = 0;
     } else {
         void* modelData = *(void**)((char*)model + 0xA4);
         void* materialSet = *(void**)((char*)modelData + 0x24);

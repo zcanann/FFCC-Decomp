@@ -39,7 +39,7 @@ extern "C" {
 int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned long);
 void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 int GetWait__4CMesFv(void*);
-unsigned char DAT_8032ecb8;
+unsigned char lbl_8032ECB8;
 }
 extern "C" double fmod(double, double);
 extern "C" double atan2(double, double);
@@ -1048,7 +1048,7 @@ extern "C" void GetWorldMapMatrix__10CCameraPcsFPA4_f(void* camera, Mtx matrix)
  */
 extern "C" void IsHitDrawMode__7CMapPcsFc(CMapPcs*, unsigned char drawMode)
 {
-    DAT_8032ecb8 = drawMode;
+    lbl_8032ECB8 = drawMode;
 }
 
 /*

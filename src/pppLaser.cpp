@@ -7,7 +7,6 @@
 
 #include <string.h>
 
-extern void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern struct _pppMngSt* pppMngStPtr;
 extern CMath math;
 extern f32 FLOAT_80333428;
@@ -29,6 +28,7 @@ extern Mtx ppvCameraMatrix0;
 extern CGraphic Graphic;
 
 extern "C" {
+void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 f32 RandF__5CMathFf(f32, CMath*);
 int GetParticleSpecialInfo__5CGameFR10PPPIFPARAMRiRi(CGame*, PPPIFPARAM*, int*, int*);
 void GetTargetCursor__5CGameFiR3VecR3Vec(CGame*, int, Vec*, Vec*);

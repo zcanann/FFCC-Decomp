@@ -310,12 +310,35 @@ void CLightPcs::destroy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004a094
+ * PAL Size: 136b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CLightPcs::DestroyBumpLightAll(CLightPcs::TARGET)
+void CLightPcs::DestroyBumpLightAll(CLightPcs::TARGET target)
 {
-	// TODO
+    CMemory* memory = &Memory;
+    unsigned char* light = reinterpret_cast<unsigned char*>(this) + (static_cast<int>(target) * 0x9c0);
+    unsigned int i = 0;
+
+    do {
+        bool hasTexture = *reinterpret_cast<void**>(light + 0x1cf0) != 0;
+
+        if (hasTexture) {
+            if (hasTexture) {
+                Free__7CMemoryFPv(memory, *reinterpret_cast<void**>(light + 0x1cf0));
+                *reinterpret_cast<void**>(light + 0x1cf0) = 0;
+            }
+
+            light[0x1cec] = 0;
+            light[0x1ced] = 0;
+        }
+
+        i++;
+        light += 0x138;
+    } while (i < 8);
 }
 
 /*

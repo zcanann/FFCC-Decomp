@@ -102,6 +102,30 @@ static inline void*& PtrAt(void* p, unsigned int offset)
 {
     return *reinterpret_cast<void**>(Ptr(p, offset));
 }
+
+static inline CTexture* AllocTexture()
+{
+    CTexture* texture = static_cast<CTexture*>(_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+        &Memory,
+        0x80,
+        *reinterpret_cast<CMemory::CStage**>(Ptr(&TextureMan, 4)),
+        s_textureman_cpp,
+        0x2ED,
+        0));
+    if (texture != 0) {
+        __ct__4CRefFv(texture);
+        *reinterpret_cast<void**>(texture) = &PTR_PTR_s_CTexture_801e9b78;
+        U8At(texture, 0x74) = 0;
+        PtrAt(texture, 0x78) = 0;
+        PtrAt(texture, 0x7C) = 0;
+        U8At(texture, 0x70) = 0;
+        U8At(texture, 0x71) = 0;
+        U8At(texture, 0x08) = 0;
+        S16At(texture, 0x72) = -1;
+        U8At(texture, 0x75) = 0;
+    }
+    return texture;
+}
 }
 
 /*
@@ -1058,9 +1082,14 @@ CTextureSet::CTextureSet()
 {
     __ct__4CRefFv(this);
     *reinterpret_cast<void**>(this) = &PTR_PTR_s_CTextureSet_801e9b34;
-    Textures(this)->CPtrArray<CTexture*>::CPtrArray();
-    Textures(this)->SetDefaultSize(0x10);
-    Textures(this)->SetStage(TextureMan.m_memoryStage);
+    CPtrArray<CTexture*>* const textures = Textures(this);
+    textures->m_size = 0;
+    textures->m_numItems = 0;
+    textures->m_defaultSize = 0x10;
+    textures->m_items = 0;
+    textures->m_stage = 0;
+    textures->m_growCapacity = 1;
+    textures->SetStage(TextureMan.m_memoryStage);
 }
 
 /*
@@ -1105,7 +1134,7 @@ void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAme
                         chunkFile.PushChunk();
                         while (chunkFile.GetNextChunk(chunk)) {
                             if (chunk.m_id == 0x54585452) {
-                                CTexture* texture = new (TextureMan.m_memoryStage, s_textureman_cpp, 0x2ED) CTexture;
+                                CTexture* texture = AllocTexture();
                                 texture->Create(chunkFile, stage, amemCacheSet, cacheTag, useAddress);
 
                                 if (*reinterpret_cast<unsigned char*>(Ptr(texture, 8)) != 0) {
@@ -1182,7 +1211,7 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
     chunkFile.PushChunk();
     while (chunkFile.GetNextChunk(chunk)) {
         if (chunk.m_id == 0x54585452) {
-            CTexture* texture = new (TextureMan.m_memoryStage, s_textureman_cpp, 0x2ED) CTexture;
+            CTexture* texture = AllocTexture();
             texture->Create(chunkFile, stage, amemCacheSet, cacheTag, useAddress);
 
             if (*reinterpret_cast<unsigned char*>(Ptr(texture, 8)) != 0) {
@@ -1314,7 +1343,7 @@ void* CTexture::operator new(unsigned long size, CMemory::CStage*, char* file, i
  * JP Address: TODO
  * JP Size: TODO
  */
-void* CTextureSet::operator new(unsigned long size, CMemory::CStage*, char* file, int line)
+void* CTextureSet::operator new(unsigned long size, CMemory::CStage* stage, char* file, int line)
 {
-    return _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, size, TextureMan.m_memoryStage, file, line, 0);
+    return _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, size, stage, file, line, 0);
 }

@@ -1820,13 +1820,14 @@ COctNode::COctNode()
 {
 	float min = lbl_8032F96C;
 	float max = lbl_8032F970;
+	float* bounds = (float*)this;
 
-	*(float*)((unsigned char*)this + 0x0) = min;
-	*(float*)((unsigned char*)this + 0x4) = min;
-	*(float*)((unsigned char*)this + 0x8) = min;
-	*(float*)((unsigned char*)this + 0xC) = max;
-	*(float*)((unsigned char*)this + 0x10) = max;
-	*(float*)((unsigned char*)this + 0x14) = max;
+	bounds[2] = min;
+	bounds[1] = min;
+	bounds[0] = min;
+	bounds[5] = max;
+	bounds[4] = max;
+	bounds[3] = max;
 	*(void**)((unsigned char*)this + 0x44) = 0;
 	*(void**)((unsigned char*)this + 0x48) = 0;
 }

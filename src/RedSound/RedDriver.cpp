@@ -557,22 +557,54 @@ void _EntryExecCommand(void (*) (int*), int, int, int, int, int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bdbd0
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void _ExecuteCommand()
 {
-	// TODO
+	int* executePos = (int*)DAT_8032f3d8;
+	int* readPos = (int*)DAT_8032f3dc;
+
+	while (executePos != readPos) {
+		if (*readPos != 0) {
+			((void (*)(int*))(*readPos))(readPos + 1);
+		}
+		readPos += 8;
+		if (readPos == (int*)DAT_8032f3d4 + 0x800) {
+			readPos = (int*)DAT_8032f3d4;
+		}
+	}
+
+	DAT_8032f3dc = readPos;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bdc48
+ * PAL Size: 112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void DeltaTimeSumup(unsigned char **)
+unsigned int DeltaTimeSumup(unsigned char** buffer)
 {
-	// TODO
+	unsigned int deltaTime = 0;
+
+	if (buffer != 0) {
+		deltaTime = **buffer & 0x7f;
+		while ((**buffer & 0x80) != 0) {
+			*buffer += 1;
+			deltaTime = (deltaTime << 7) | (**buffer & 0x7f);
+		}
+		*buffer += 1;
+	}
+
+	return deltaTime;
 }
 
 /*

@@ -589,12 +589,114 @@ void CMemory::CStage::free(void*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001DF88
+ * PAL Size: 848b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMemory::CStage::heapWalker(int, void*, unsigned long)
+int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
 {
-	// TODO
+    int mode = stageGetAllocationMode(this);
+    int node = stageGetHeapHead(this);
+
+    if (mode != 2) {
+        node = *reinterpret_cast<int*>(node + 8);
+    }
+
+    if (flag == -1) {
+        Printf__7CSystemFPce(&System, "***** HEAP WALKER *****\n");
+        Printf__7CSystemFPce(&System, "Stage Name : %s\n", stageGetSourceName(this));
+        Printf__7CSystemFPce(&System,
+                             " No Flag Level  Size  Total  Address   Top      Tail     Source\n");
+        Printf__7CSystemFPce(&System,
+                             "-----------------------------------------------------------------\n");
+    }
+
+    int totalSize = 0;
+    int freeCount = 0;
+    int usedCount = 0;
+    int freeSize = 0;
+    int usedSize = 0;
+
+    if (mode == 2) {
+        int top = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 8);
+        int tail = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 12);
+        int count = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x120);
+
+        for (int i = 0; i <= count; i++) {
+            int blockTail = (i == count) ? tail : *reinterpret_cast<int*>(node + 4);
+            int size = blockTail - top;
+            if (size != 0) {
+                if ((flag & 1) != 0) {
+                    Printf__7CSystemFPce(&System,
+                                         "%3d %s %5d %7d %08x %08x %08x %-16.16s %04x\n",
+                                         freeCount, "FREE", 0, size, totalSize, 0, 0, "-------", 0);
+                }
+                usedSize += size;
+                totalSize += size;
+                freeCount++;
+            }
+
+            if (i < count) {
+                int used = *reinterpret_cast<int*>(node + 8) - *reinterpret_cast<int*>(node + 4);
+                if ((flag & 2) != 0) {
+                    Printf__7CSystemFPce(
+                        &System, "%3d %s %5d %7d %08x %08x %08x %-16.16s %04x\n", usedCount, "USED",
+                        *reinterpret_cast<unsigned char*>(node + 3), used, totalSize,
+                        *reinterpret_cast<int*>(node + 4), 0, reinterpret_cast<char*>(node + 0x1A),
+                        *reinterpret_cast<unsigned short*>(node + 0x18));
+                }
+                freeSize += used;
+                totalSize += used;
+                top = blockTail + used;
+                usedCount++;
+            }
+
+            node += 0x40;
+        }
+    } else {
+        while ((*reinterpret_cast<unsigned char*>(node + 2) & 2) == 0) {
+            unsigned char nodeFlags = *reinterpret_cast<unsigned char*>(node + 2);
+            int nodeGroup = *reinterpret_cast<int*>(node + 0x14);
+            if ((group == static_cast<unsigned long>(-1)) || (static_cast<unsigned long>(nodeGroup) == group)) {
+                bool isUsed = (nodeFlags & 4) != 0;
+                if ((isUsed && ((flag & 2) != 0)) || (!isUsed && ((flag & 1) != 0))) {
+                    const char* kind = isUsed ? "USED" : "FREE";
+                    unsigned char level = isUsed ? *reinterpret_cast<unsigned char*>(node + 3) : 0;
+                    const char* source = isUsed ? reinterpret_cast<char*>(node + 0x1A) : "-------";
+                    unsigned short line = isUsed ? *reinterpret_cast<unsigned short*>(node + 0x18) : 0;
+                    int index = isUsed ? usedCount : freeCount;
+                    Printf__7CSystemFPce(
+                        &System, "%3d %s %5d %7d %08x %08x %08x %-16.16s %04x\n", index, kind, level,
+                        *reinterpret_cast<int*>(node + 0x10), totalSize, node + 0x40,
+                        *reinterpret_cast<int*>(node + 4), source, line);
+                }
+            }
+
+            if ((group == static_cast<unsigned long>(-1)) || (static_cast<unsigned long>(nodeGroup) == group)) {
+                if ((nodeFlags & 4) == 0) {
+                    freeCount++;
+                    usedSize += *reinterpret_cast<int*>(node + 0x10);
+                } else {
+                    usedCount++;
+                    freeSize += *reinterpret_cast<int*>(node + 0x10);
+                }
+            }
+
+            totalSize += *reinterpret_cast<int*>(node + 8) - node;
+            node = *reinterpret_cast<int*>(node + 8);
+        }
+    }
+
+    if (flag == -1) {
+        Printf__7CSystemFPce(&System,
+                             "-----------------------------------------------------------------\n");
+        Printf__7CSystemFPce(&System, "USE  : %d  UNUSE : %d\n", freeSize, usedSize);
+    }
+
+    return freeSize;
 }
 
 /*

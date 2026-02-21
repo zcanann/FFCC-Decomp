@@ -1465,6 +1465,55 @@ extern "C" void __as__3VecFRC3Vec(Vec* self, const Vec* other)
 
 /*
  * --INFO--
+ * PAL Address: 0x800B9C7C
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" int IsAbsolute__10CCameraPcsFv(CCameraPcs* camera)
+{
+    return *(int*)((char*)camera + 0x444);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800B9C84
+ * PAL Size: 160b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+template <int count>
+class CLine;
+
+template <>
+class CLine<64>
+{
+public:
+    int IsInner(Vec* position, float margin);
+};
+
+int CLine<64>::IsInner(Vec* position, float margin)
+{
+    float* values = (float*)this;
+    if (values[6] == 0.0f) {
+        return 0;
+    }
+
+    if ((values[0] - margin) <= position->x && (values[1] - margin) <= position->y &&
+        (values[2] - margin) <= position->z && position->x <= (values[3] + margin) &&
+        position->y <= (values[4] + margin) && position->z <= (values[5] + margin)) {
+        return 1;
+    }
+
+    return 0;
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

@@ -1,9 +1,44 @@
 #include "ffcc/menu_money.h"
+#include "ffcc/fontman.h"
 #include "ffcc/p_game.h"
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
+#include "ffcc/system.h"
 
 #include <string.h>
+
+typedef unsigned char u8;
+
+extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
+extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
+extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
+extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float, float, float, float, float, float, float, float, float);
+extern "C" void DrawSingWin__8CMenuPcsFs(CMenuPcs*, short);
+extern "C" void DrawSingWinMess__8CMenuPcsFiii(CMenuPcs*, int, int, int);
+extern "C" int SingWinMessHeight__8CMenuPcsFv(CMenuPcs*);
+extern "C" void DrawCursor__8CMenuPcsFiif(CMenuPcs*, int, int, float);
+extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
+extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
+
+extern "C" void SetMargin__5CFontFf(float, CFont*);
+extern "C" void SetShadow__5CFontFi(CFont*, int);
+extern "C" void SetScale__5CFontFf(float, CFont*);
+extern "C" void DrawInit__5CFontFv(CFont*);
+extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
+extern "C" void SetPosX__5CFontFf(float, CFont*);
+extern "C" void SetPosY__5CFontFf(float, CFont*);
+extern "C" void Draw__5CFontFPc(CFont*, const char*);
+
+extern float FLOAT_80332f60;
+extern float FLOAT_80332f64;
+extern float FLOAT_80332f68;
+extern float FLOAT_80332f6c;
+extern float FLOAT_80332f70;
+extern float FLOAT_80332f74;
+extern float FLOAT_80332f78;
+extern float FLOAT_80332f7c;
+extern float FLOAT_80332f80;
+extern float FLOAT_80332f84;
 
 namespace {
 unsigned int DAT_8032eee0 = 0;
@@ -255,71 +290,109 @@ void CMenuPcs::MoneyClose()
  */
 void CMenuPcs::MoneyDraw()
 {
-	// Set blend mode for rendering
-	// _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
-	// SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(&MenuPcs, 0);
-	
-	short sVar1 = *(short *)(*(int *)((char*)this + 0x82c) + 0x10);
-	short sVar2 = *(short *)(*(int *)((char*)this + 0x82c) + 0x30);
-	short *psVar6 = (short *)(*(int *)((char*)this + 0x850) + 8);
-	
-	// Draw UI elements
-	for (int iVar7 = 0; iVar7 < **(short**)((char*)this + 0x850); iVar7++) {
-		if (-1 < *(int *)(psVar6 + 0xe)) {
-			// SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, *(int *)(psVar6 + 0xe));
-			
-			// Calculate positions and render rectangle
-			float dVar14 = (float)*psVar6;
-			float dVar13 = (float)psVar6[1];
-			float dVar15 = (float)psVar6[2];
-			float dVar16 = (float)psVar6[3];
-			float dVar11 = *(float *)(psVar6 + 4);
-			float dVar12 = *(float *)(psVar6 + 6);
-			
-			// Set material color
-			int local_cc = 0xffffffff;
-			// GXSetChanMatColor(4, &local_cc);
-			
-			// DrawRect__8CMenuPcsFUlfffffffff(
-			//	dVar14, dVar13, dVar15, dVar16, dVar11, dVar12, 
-			//	(float)*(float *)(psVar6 + 10), (float)*(float *)(psVar6 + 10), 
-			//	&MenuPcs, 0);
-		}
-		psVar6 = psVar6 + 0x20;
-	}
-	
-	// Draw money digits
-	// SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x5d);
-	
-	// Draw cursor if in selection mode
-	if ((sVar2 == 0) && (sVar1 == 1)) {
-		// SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(&MenuPcs, 0x48);
-		
-		// Draw cursor rectangle
-		short *psVar6_cursor = (short *)(*(int *)((char*)this + 0x850) + 8);
-		float cursorX = (float)*psVar6_cursor + (7 - *(short *)(*(int *)((char*)this + 0x82c) + 0x26)) * 18 + 36;
-		float cursorY = (float)*(short *)(*(int *)((char*)this + 0x850) + 10) + 92;
-		
-		// DrawRect__8CMenuPcsFUlfffffffff(
-		//	cursorX, cursorY, 24.0f, 18.0f, 0.0f, 0.0f, 1.0f, 1.0f, &MenuPcs, 0);
-	}
-	
-	// Draw text elements
-	void *font = *(void **)((char*)this + 0x108);
-	// SetMargin__5CFontFf(1.0f, font);
-	// SetShadow__5CFontFi(font, 0);
-	// SetScale__5CFontFf(1.0f, font);
-	// DrawInit__5CFontFv(font);
-	
-	int local_dc = 0xffffffff;
-	// SetColor__5CFontF8_GXColor(font, &local_dc);
-	
-	void *uVar3 = 0; // GetMenuStr__8CMenuPcsFi(this, 0x15);
-	// SetPosX__5CFontFf(100.0f, font);
-	// SetPosY__5CFontFf(50.0f, font);
-	// Draw__5CFontFPc(font, uVar3);
-	
-	// DrawInit__8CMenuPcsFv(this);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+
+    short* moneyState = reinterpret_cast<short*>(*(int*)((u8*)this + 0x82c));
+    short selectionState = *reinterpret_cast<short*>((u8*)moneyState + 0x10);
+    short mode = *reinterpret_cast<short*>((u8*)moneyState + 0x30);
+    short* panel = reinterpret_cast<short*>(*(int*)((u8*)this + 0x850));
+
+    short* entry = panel + 4;
+    int entryCount = panel[0];
+    for (int i = 0; i < entryCount; i++, entry += 0x20) {
+        int tex = *reinterpret_cast<int*>(entry + 0xE);
+        if (tex >= 0) {
+            SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
+            float alpha = *reinterpret_cast<float*>(entry + 8);
+            GXColor color = {0xFF, 0xFF, 0xFF, (u8)(FLOAT_80332f60 * alpha)};
+            GXSetChanMatColor(GX_COLOR0A0, color);
+            DrawRect__8CMenuPcsFUlfffffffff(
+                this, 0, (float)entry[0], (float)entry[1], (float)entry[2], (float)entry[3],
+                *reinterpret_cast<float*>(entry + 4), *reinterpret_cast<float*>(entry + 6),
+                *reinterpret_cast<float*>(entry + 10), *reinterpret_cast<float*>(entry + 10), 0.0f);
+        }
+    }
+
+    short* drawBase = panel + 4;
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x5D);
+    {
+        float alpha = *reinterpret_cast<float*>(panel + 0xC);
+        GXColor color = {0xFF, 0xFF, 0xFF, (u8)(FLOAT_80332f60 * alpha)};
+        GXSetChanMatColor(GX_COLOR0A0, color);
+    }
+
+    for (int row = 0; row < 2; row++) {
+        float rowY = (float)(drawBase[1] + 0x18) + FLOAT_80332f68 * (float)row;
+        float x = (float)(panel[4] + 0x20);
+        for (int i = 0; i < 8; i++) {
+            signed char digit = s_place[row * 8 + i];
+            if (digit >= 0) {
+                DrawRect__8CMenuPcsFUlfffffffff(
+                    this, 0, x, rowY, FLOAT_80332f6c, FLOAT_80332f68,
+                    FLOAT_80332f6c * (float)digit, FLOAT_80332f68 * (float)row,
+                    FLOAT_80332f70, FLOAT_80332f70, 0.0f);
+            }
+            x += FLOAT_80332f74;
+        }
+    }
+
+    short* firstEntry = panel + 4;
+    if (mode == 0 && selectionState == 1) {
+        SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x48);
+        {
+            float alpha = *reinterpret_cast<float*>(panel + 0xC);
+            GXColor color = {0xFF, 0xFF, 0xFF, (u8)(FLOAT_80332f60 * alpha)};
+            GXSetChanMatColor(GX_COLOR0A0, color);
+        }
+
+        float cursorX = (float)(firstEntry[0] + (7 - *reinterpret_cast<short*>((u8*)moneyState + 0x26)) * 0x12 + 0x24);
+        float cursorY = (float)(panel[5] + 0x5C);
+        DrawRect__8CMenuPcsFUlfffffffff(
+            this, 0, cursorX, cursorY, FLOAT_80332f78, FLOAT_80332f6c,
+            FLOAT_80332f64, FLOAT_80332f64, FLOAT_80332f70, FLOAT_80332f70, 0.0f);
+    }
+
+    CFont* font = *(CFont**)((u8*)this + 0x108);
+    SetMargin__5CFontFf(FLOAT_80332f70, font);
+    SetShadow__5CFontFi(font, 0);
+    SetScale__5CFontFf(FLOAT_80332f7c, font);
+    DrawInit__5CFontFv(font);
+
+    {
+        float alpha = *reinterpret_cast<float*>(firstEntry + 8);
+        GXColor color = {0xFF, 0xFF, 0xFF, (u8)(FLOAT_80332f60 * alpha)};
+        SetColor__5CFontF8_GXColor(font, &color);
+    }
+
+    const char* label = GetMenuStr__8CMenuPcsFi(this, 0x15);
+    for (int i = 0; i < 2; i++) {
+        float textX = (float)(firstEntry[0] + 0xB6);
+        float textY = (FLOAT_80332f68 + (FLOAT_80332f68 * (float)i + (float)(firstEntry[1] + 0x18))) - FLOAT_80332f80;
+        SetPosX__5CFontFf(textX, font);
+        SetPosY__5CFontFf(textY - FLOAT_80332f84, font);
+        Draw__5CFontFPc(font, label);
+    }
+
+    DrawInit__8CMenuPcsFv(this);
+    if (mode == 1) {
+        DrawSingWin__8CMenuPcsFs(this, -1);
+        if (*reinterpret_cast<short*>((u8*)moneyState + 0x12) == 1) {
+            DrawSingWinMess__8CMenuPcsFiii(this, 1, (int)*((char*)moneyState + 9), 0);
+        }
+    }
+
+    if (mode != 0 && *reinterpret_cast<short*>((u8*)moneyState + 0x12) == 1) {
+        short* singWindow = *reinterpret_cast<short**>((u8*)this + 0x848);
+        float cursorX = (float)singWindow[0];
+        float cursorY = (float)(singWindow[1] + 0x20);
+        cursorY += (float)(*reinterpret_cast<short*>((u8*)moneyState + 0x28) * SingWinMessHeight__8CMenuPcsFv(this));
+
+        int frame = (int)System.m_frameCounter;
+        int frameSign = frame >> 31;
+        int anim = ((frameSign * 8) | ((frame * 0x20000000 + frameSign) >> 29)) - frameSign;
+        DrawCursor__8CMenuPcsFiif(this, (int)(cursorX + (float)anim), (int)cursorY, FLOAT_80332f70);
+    }
 }
 
 /*

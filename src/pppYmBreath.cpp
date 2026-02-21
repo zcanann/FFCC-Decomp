@@ -1,19 +1,40 @@
 #include "ffcc/pppYmBreath.h"
+#include "ffcc/graphic.h"
 #include "ffcc/math.h"
 #include "dolphin/mtx.h"
 
 #include <string.h>
+
+struct pppFMATRIX;
 
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
 extern "C" float RandF__5CMathFv(CMath* instance);
 extern "C" void pppGetRotMatrixXYZ__FR10pppFMATRIXP11pppIVECTOR4(void* outMatrix, void* angle);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
 extern "C" void pppHitCylinderSendSystem__FP9_pppMngStP3VecP3Vecff(void*, Vec*, Vec*, float, float);
+extern "C" void pppSetBlendMode__FUc(unsigned char);
+extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+    void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
+extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
+extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
+extern "C" void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
+class CMaterialSet;
+extern "C" void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
 extern int DAT_8032ed70;
 extern unsigned char* pppEnvStPtr;
 extern unsigned char* pppMngStPtr;
+extern Mtx ppvCameraMatrix0;
+extern unsigned int CFlatFlags;
 extern CMath math;
+extern float FLOAT_80330c80;
+extern float FLOAT_80330c84;
+extern double DOUBLE_80330c88;
 extern void pppNormalize__FR3Vec3Vec(float*, Vec*);
+
+struct UnkC {
+    unsigned char _pad[0xC];
+    int* m_serializedDataOffsets;
+};
 
 struct pppIVECTOR4 {
     short x;
@@ -26,13 +47,17 @@ struct pppFMATRIX {
     Mtx value;
 };
 
-struct UnkC {
-    unsigned char _pad[0xC];
-    int* m_serializedDataOffsets;
-};
-
 struct pppYmBreath {
     unsigned char _pad[8];
+};
+
+struct YmBreathRenderStep {
+    int m_graphId;
+    int m_dataValIndex;
+    unsigned short m_initWork;
+    unsigned short m_stepValue;
+    int m_arg3;
+    unsigned char* m_payload;
 };
 
 static char s_pppYmBreath_cpp[] = "pppYmBreath.cpp";
@@ -579,8 +604,191 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, Un
  * Address:	800bffec
  * Size:	1292
  */
-extern "C" void pppRenderYmBreath(pppYmBreath*, PYmBreath*, UnkC*)
+extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, UnkC* offsets)
 {
+    YmBreathRenderStep* step;
+    int workOffset;
+    int colorOffset;
+    Vec* source;
+    Mtx* matrixList;
+    float* colorDelta;
+    int* groupData;
+    int groupCount;
+    long* shape;
+    unsigned char colorR;
+    unsigned char colorG;
+    unsigned char colorB;
+    unsigned char colorA;
+    int i;
+
+    step = (YmBreathRenderStep*)pYmBreath;
+    workOffset = offsets->m_serializedDataOffsets[0];
+    colorOffset = offsets->m_serializedDataOffsets[1];
+    source = *(Vec**)((unsigned char*)ymBreath + 8 + workOffset + 0x30);
+    matrixList = *(Mtx**)((unsigned char*)ymBreath + 8 + workOffset + 0x34);
+    colorDelta = *(float**)((unsigned char*)ymBreath + 8 + workOffset + 0x38);
+    groupData = *(int**)((unsigned char*)ymBreath + 8 + workOffset + 0x3C);
+    groupCount = *(int*)((unsigned char*)ymBreath + 8 + workOffset + 0x40);
+
+    if (step->m_stepValue == 0) {
+        return;
+    }
+
+    shape = *(long**)(*(unsigned int*)(pppEnvStPtr + 0xC) + step->m_stepValue * 4);
+    pppSetBlendMode__FUc(step->m_payload[8]);
+    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+        step->m_payload + 0xB0, 0, 0.0f, step->m_payload[0xB6], step->m_payload[0xB5], step->m_payload[8], 0, 1, 1, 0);
+
+    colorR = *((unsigned char*)ymBreath + 8 + colorOffset);
+    colorG = *((unsigned char*)ymBreath + 8 + colorOffset + 1);
+    colorB = *((unsigned char*)ymBreath + 8 + colorOffset + 2);
+    colorA = *((unsigned char*)ymBreath + 8 + colorOffset + 3);
+
+    for (i = 0; i < groupCount; i++) {
+        if (*(short*)&source[2].z > 0) {
+            _GXColor amb;
+            Mtx drawMtx;
+            Mtx rotMtx;
+            Vec pos;
+            pppFMATRIX viewMtx;
+            int r;
+            int g;
+            int b;
+            int a;
+
+            PSMTXIdentity(drawMtx);
+            drawMtx[0][0] = source[4].y * ((Vec*)(pppMngStPtr + 0x64))->x;
+            drawMtx[1][1] = source[4].z * ((Vec*)(pppMngStPtr + 0x64))->y;
+            drawMtx[2][2] = drawMtx[0][0];
+            if (FLOAT_80330c80 != source[3].y) {
+                PSMTXRotRad(rotMtx, 'z', FLOAT_80330c84 * source[3].y);
+                PSMTXConcat(drawMtx, rotMtx, drawMtx);
+            }
+
+            pppUnitMatrix__FR10pppFMATRIX(&viewMtx);
+            PSMTXConcat(*matrixList, *reinterpret_cast<Mtx*>(&ymBreath->_pad[4]), viewMtx.value);
+            PSMTXConcat(ppvCameraMatrix0, viewMtx.value, viewMtx.value);
+            PSMTXMultVec(viewMtx.value, source, &pos);
+            drawMtx[0][3] = pos.x;
+            drawMtx[1][3] = pos.y;
+            drawMtx[2][3] = pos.z;
+            GXLoadPosMtxImm(drawMtx, 0);
+
+            r = colorR;
+            g = colorG;
+            b = colorB;
+            a = (int)((double)(int)colorA - DOUBLE_80330c88 - source[6].y);
+            if (colorDelta != 0) {
+                r += (int)colorDelta[0];
+                g += (int)colorDelta[1];
+                b += (int)colorDelta[2];
+                a += (int)colorDelta[3];
+            }
+
+            if (r < 0) {
+                r = 0;
+            } else if (r > 0xFF) {
+                r = 0xFF;
+            }
+            if (g < 0) {
+                g = 0;
+            } else if (g > 0xFF) {
+                g = 0xFF;
+            }
+            if (b < 0) {
+                b = 0;
+            } else if (b > 0xFF) {
+                b = 0xFF;
+            }
+            if (a < 0) {
+                a = 0;
+            } else if (a > 0x7F) {
+                a = 0x7F;
+            }
+
+            amb.r = (unsigned char)r;
+            amb.g = (unsigned char)g;
+            amb.b = (unsigned char)b;
+            amb.a = (unsigned char)a;
+            GXSetChanAmbColor(GX_COLOR0A0, amb);
+            pppDrawShp__FPlsP12CMaterialSetUc(shape, *(short*)((unsigned char*)&source[7].y + 2),
+                                              *(CMaterialSet**)(pppEnvStPtr + 4),
+                                              step->m_payload[8]);
+        }
+
+        if (matrixList != 0) {
+            matrixList++;
+        }
+        if (colorDelta != 0) {
+            colorDelta += 8;
+        }
+        source += 8;
+    }
+
+    if ((CFlatFlags & 0x200000) != 0) {
+        for (i = 0; i < (int)*(unsigned short*)step->m_payload; i++) {
+            if (groupData[0] == 1) {
+                _GXColor debugColor;
+                int firstParticle;
+                int j;
+                float scale;
+                Mtx sphereMtx;
+                Mtx tempMtx;
+                Vec debugPos;
+
+                if ((i == 0) || (i == 2)) {
+                    debugColor.r = 0x80;
+                    debugColor.g = 0x00;
+                    debugColor.b = 0x00;
+                    debugColor.a = 0xFF;
+                } else if (i == 1) {
+                    debugColor.r = 0x80;
+                    debugColor.g = 0x80;
+                    debugColor.b = 0xFF;
+                    debugColor.a = 0xFF;
+                } else if (i == 3) {
+                    debugColor.r = 0x80;
+                    debugColor.g = 0x80;
+                    debugColor.b = 0x80;
+                    debugColor.a = 0xFF;
+                } else {
+                    debugColor.r = 0x00;
+                    debugColor.g = 0x60;
+                    debugColor.b = 0x80;
+                    debugColor.a = 0xFF;
+                }
+
+                firstParticle = -1;
+                for (j = 0; j < (int)*(unsigned short*)((unsigned char*)&step->m_arg3 + 2); j++) {
+                    if (*(signed char*)(groupData[2] + j) != -1) {
+                        firstParticle = (int)*(signed char*)(groupData[1] + j);
+                        break;
+                    }
+                }
+
+                scale = (float)groupData[10];
+                PSMTXIdentity(sphereMtx);
+                sphereMtx[0][0] = scale;
+                sphereMtx[1][1] = scale;
+                sphereMtx[2][2] = scale;
+
+                PSMTXConcat(*(Mtx*)(*(int*)((unsigned char*)ymBreath + 8 + workOffset + 0x34) + firstParticle * 0x30),
+                            *reinterpret_cast<Mtx*>(&ymBreath->_pad[4]), tempMtx);
+                PSMTXConcat(ppvCameraMatrix0, tempMtx, tempMtx);
+                PSMTXMultVec(tempMtx, (Vec*)(groupData + 3), &debugPos);
+                sphereMtx[0][3] = debugPos.x;
+                sphereMtx[1][3] = debugPos.y;
+                sphereMtx[2][3] = debugPos.z;
+                Graphic.DrawSphere(sphereMtx, debugColor);
+            }
+            groupData += 0x17;
+        }
+
+        pppSetBlendMode__FUc(1);
+        pppSetBlendMode__FUc(0);
+        _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 2);
+    }
 }
 
 /*

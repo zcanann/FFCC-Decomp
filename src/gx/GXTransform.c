@@ -79,33 +79,31 @@ void __GXSetProjection(void) {
 }
 
 void GXSetProjection(const Mtx44 mtx, GXProjectionType type) {
-    GXData* gx = __GXData;
-
     CHECK_GXBEGIN(295, "GXSetProjection");
 
-    gx->projType = type;
-    gx->projMtx[0] = mtx[0][0];
-    gx->projMtx[2] = mtx[1][1];
-    gx->projMtx[4] = mtx[2][2];
-    gx->projMtx[5] = mtx[2][3];
+    __GXData->projType = type;
+    __GXData->projMtx[0] = mtx[0][0];
+    __GXData->projMtx[2] = mtx[1][1];
+    __GXData->projMtx[4] = mtx[2][2];
+    __GXData->projMtx[5] = mtx[2][3];
     if (type == GX_ORTHOGRAPHIC) {
-        gx->projMtx[1] = mtx[0][3];
-        gx->projMtx[3] = mtx[1][3];
+        __GXData->projMtx[1] = mtx[0][3];
+        __GXData->projMtx[3] = mtx[1][3];
     } else {
-        gx->projMtx[1] = mtx[0][2];
-        gx->projMtx[3] = mtx[1][2];
+        __GXData->projMtx[1] = mtx[0][2];
+        __GXData->projMtx[3] = mtx[1][2];
     }
 
     GX_WRITE_U8(0x10);
     GX_WRITE_U32(0x00061020);
-    GX_WRITE_F32(gx->projMtx[0]);
-    GX_WRITE_F32(gx->projMtx[1]);
-    GX_WRITE_F32(gx->projMtx[2]);
-    GX_WRITE_F32(gx->projMtx[3]);
-    GX_WRITE_F32(gx->projMtx[4]);
-    GX_WRITE_F32(gx->projMtx[5]);
-    GX_WRITE_U32(gx->projType);
-    gx->bpSentNot = 1;
+    GX_WRITE_F32(__GXData->projMtx[0]);
+    GX_WRITE_F32(__GXData->projMtx[1]);
+    GX_WRITE_F32(__GXData->projMtx[2]);
+    GX_WRITE_F32(__GXData->projMtx[3]);
+    GX_WRITE_F32(__GXData->projMtx[4]);
+    GX_WRITE_F32(__GXData->projMtx[5]);
+    GX_WRITE_U32(__GXData->projType);
+    __GXData->bpSentNot = 1;
 }
 
 void GXSetProjectionv(const f32* ptr) {

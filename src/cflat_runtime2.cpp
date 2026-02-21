@@ -1021,12 +1021,65 @@ void CFlatRuntime2::drawLayer(int, char*, int, int, int, int, int, int, float, f
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006A53C
+ * PAL Size: 552b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::PutParticle(int, Vec&, float)
+void CFlatRuntime2::PutParticle(int workNo, Vec& pos, float scale)
 {
-	// TODO
+	u8* runtime = reinterpret_cast<u8*>(this);
+
+	ParticleWorkPosPtr(this) = 0;
+	ParticleWorkPosVecPtr(this) = 0;
+	ParticleWorkScalePtr(this) = 0;
+	ParticleWorkTargetPtr(this) = 0;
+	*reinterpret_cast<int*>(runtime + 0x16DC) = 0;
+	ParticleWorkBind(this) = 0;
+	ParticleWorkTrace(this) = 0;
+	ParticleWorkColor0(this) = 0;
+	ParticleWorkColor1(this) = 0;
+	ParticleWorkSpeed(this) = 1.0f;
+	ParticleWorkColorLerp(this) = 1.0f;
+	runtime[0x16F8] = 0;
+	memset(runtime + 0x16F9, 0, 3);
+
+	ParticleWorkSeNo(this) = -1;
+	runtime[0x1700] = 0;
+	ParticleWorkSeKind(this) = 1;
+	runtime[0x1702] = 0;
+	runtime[0x1703] = 0;
+	ParticleWorkSeParam(this) = 0;
+	*reinterpret_cast<int*>(runtime + 0x1708) = 0x1E;
+	*reinterpret_cast<int*>(runtime + 0x170C) = -1;
+	ParticleWorkParamNo(this) = 0;
+	ParticleWorkParamId(this) = 0;
+	runtime[0x1716] = 0;
+	runtime[0x1717] = 0;
+	memset(runtime + 0x1718, 0, 0x20);
+
+	runtime[0x16F8] = 1;
+	ParticleWorkNoHi(this) = workNo >> 8;
+	*reinterpret_cast<int*>(runtime + 0x16DC) = 0;
+	ParticleWorkNoLo(this) = static_cast<unsigned int>(workNo) & 0xFF;
+
+	ParticleWorkPosX(this) = pos.x;
+	ParticleWorkPosY(this) = pos.y;
+	ParticleWorkPosZ(this) = pos.z;
+	ParticleWorkPosAngle(this) = 0.0f;
+	ParticleWorkPosPtr(this) = &ParticleWorkPosX(this);
+	ParticleWorkPosVecPtr(this) = &ParticleWorkPosVecBase(this);
+
+	ParticleWorkScaleX(this) = scale;
+	ParticleWorkScaleY(this) = scale;
+	ParticleWorkScaleZ(this) = scale;
+	ParticleWorkScalePtr(this) = &ParticleWorkScaleX(this);
+
+	pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(
+		&PartMng, ParticleWorkNoHi(this), ParticleWorkNoLo(this),
+		reinterpret_cast<PPPCREATEPARAM*>(reinterpret_cast<u8*>(this) + 0x16CC), 1);
 }
 
 /*
@@ -1047,12 +1100,49 @@ void CFlatRuntime2::PutParticleWork()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006A350
+ * PAL Size: 432b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::ResetParticleWork(int, int)
+void CFlatRuntime2::ResetParticleWork(int workNo, int arg)
 {
-	// TODO
+	u8* runtime = reinterpret_cast<u8*>(this);
+
+	ParticleWorkPosPtr(this) = 0;
+	ParticleWorkPosVecPtr(this) = 0;
+	ParticleWorkScalePtr(this) = 0;
+	ParticleWorkTargetPtr(this) = 0;
+	*reinterpret_cast<int*>(runtime + 0x16DC) = 0;
+	ParticleWorkBind(this) = 0;
+	ParticleWorkTrace(this) = 0;
+	ParticleWorkColor0(this) = 0;
+	ParticleWorkColor1(this) = 0;
+	ParticleWorkSpeed(this) = 1.0f;
+	ParticleWorkColorLerp(this) = 1.0f;
+	runtime[0x16F8] = 0;
+	memset(runtime + 0x16F9, 0, 3);
+
+	ParticleWorkSeNo(this) = -1;
+	runtime[0x1700] = 0;
+	ParticleWorkSeKind(this) = 1;
+	runtime[0x1702] = 0;
+	runtime[0x1703] = 0;
+	ParticleWorkSeParam(this) = 0;
+	*reinterpret_cast<int*>(runtime + 0x1708) = 0x1E;
+	*reinterpret_cast<int*>(runtime + 0x170C) = -1;
+	ParticleWorkParamNo(this) = 0;
+	ParticleWorkParamId(this) = 0;
+	runtime[0x1716] = 0;
+	runtime[0x1717] = 0;
+	memset(runtime + 0x1718, 0, 0x20);
+
+	runtime[0x16F8] = 1;
+	ParticleWorkNoHi(this) = workNo >> 8;
+	*reinterpret_cast<int*>(runtime + 0x16DC) = arg;
+	ParticleWorkNoLo(this) = static_cast<unsigned int>(workNo) & 0xFF;
 }
 
 /*

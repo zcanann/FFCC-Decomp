@@ -1,13 +1,16 @@
 #include "ffcc/pppRyjMegaBirth.h"
+#include "ffcc/math.h"
 #include <string.h>
 
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
+extern "C" float RandF__5CMathFv(CMath*);
 extern s32 DAT_8032ed70;
 extern float FLOAT_80330448;
 extern float FLOAT_80330458;
 extern float FLOAT_8033045c;
 extern float FLOAT_80330460;
+extern CMath Math;
 
 static Mtx g_matUnit;
 
@@ -45,12 +48,94 @@ void alloc_check(VRyjMegaBirth*, PRyjMegaBirth*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80083070
+ * PAL Size: 4468b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void birth(_pppPObject*, VRyjMegaBirth*, PRyjMegaBirth*, VColor*, _PARTICLE_DATA*, _PARTICLE_WMAT*, _PARTICLE_COLOR*)
+void birth(
+    _pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* param, VColor* color, _PARTICLE_DATA* particle,
+    _PARTICLE_WMAT* worldMat, _PARTICLE_COLOR* colorData)
 {
-	// TODO
+    u8* payload;
+    u8* particlePayload;
+    float halfSpeed;
+    float directionSpeed;
+    float randomYaw;
+    float randomPitch;
+    float randomRoll;
+    s16 life;
+
+    payload = (u8*)param;
+    particlePayload = (u8*)particle;
+
+    memset(particle, 0, 0x60);
+    if (worldMat != NULL) {
+        memset(worldMat, 0, 0x30);
+    }
+    if (colorData != NULL) {
+        memset(colorData, 0, 0x20);
+    }
+
+    directionSpeed = *(float*)(payload + 0x94);
+    halfSpeed = directionSpeed * 0.5f;
+    randomYaw = RandF__5CMathFv(&Math) * directionSpeed - halfSpeed;
+    randomPitch = RandF__5CMathFv(&Math) * directionSpeed - halfSpeed;
+    randomRoll = RandF__5CMathFv(&Math) * directionSpeed - halfSpeed;
+
+    particle->m_velocity.x = randomYaw * *(float*)(payload + 0xA0);
+    particle->m_velocity.y = randomPitch * *(float*)(payload + 0xA4);
+    particle->m_velocity.z = randomRoll * *(float*)(payload + 0xA8);
+
+    particle->m_directionTail.x = *(float*)(payload + 0x90);
+    particle->m_directionTail.y = *(float*)(payload + 0x94);
+    particle->m_directionTail.z = *(float*)(payload + 0x98);
+    particle->m_colorDeltaAdd[0] = *(float*)(payload + 0x9C);
+    particle->m_colorDeltaAdd[1] = *(float*)(payload + 0xA0);
+
+    particle->m_matrix[2][2] = *(float*)(payload + 0x90);
+    particle->m_matrix[2][3] = *(float*)(payload + 0x94);
+    particle->m_sizeStart = *(float*)(payload + 0xAC);
+    particle->m_sizeVal = *(float*)(payload + 0xB0);
+    particle->m_sizeEnd = *(float*)(payload + 0xB4);
+
+    life = *(s16*)(payload + 0x96);
+    if (life == 0) {
+        *(s16*)(particlePayload + 0x22) = -1;
+    } else {
+        *(s16*)(particlePayload + 0x22) = life;
+    }
+    *(u16*)(particlePayload + 0x1C) = 0;
+    *(u16*)(particlePayload + 0x1E) = 0;
+    *(u16*)(particlePayload + 0x20) = 0;
+    *(u8*)(particlePayload + 0x58) = 0;
+
+    if (*(u8*)(payload + 0x8E) != 0) {
+        *(u8*)(particlePayload + 0x59) = *(u8*)(payload + 0x8E);
+        particle->m_sizeEnd = (float)color->m_alpha;
+    }
+
+    if (worldMat != NULL) {
+        switch (payload[0x8B]) {
+        case 1:
+            PSMTXCopy(work->m_worldMatrix, *(PARTICLE_WMAT*)worldMat);
+            break;
+        case 2:
+            PSMTXCopy(pObject->m_localMatrix.value, *(PARTICLE_WMAT*)worldMat);
+            break;
+        default:
+            break;
+        }
+    }
+
+    if (colorData != NULL) {
+        colorData->m_colorFrameDeltas[0] = *(float*)(payload + 0xC0);
+        colorData->m_colorFrameDeltas[1] = *(float*)(payload + 0xC4);
+        colorData->m_colorFrameDeltas[2] = *(float*)(payload + 0xC8);
+        colorData->m_colorFrameDeltas[3] = *(float*)(payload + 0xCC);
+    }
 }
 
 /*

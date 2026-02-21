@@ -269,6 +269,7 @@ int CRedSound::ReportStandby(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void CRedSound::DMAEntry(int type, int src, int dst, int length, int flags, void (*callback)(void*), void* userData)
 {
 	int localType = type;
@@ -281,6 +282,7 @@ void CRedSound::DMAEntry(int type, int src, int dst, int length, int flags, void
 
 	RedDmaEntry(localType, localSrc, localDst, localLength, localFlags, localCallback, localUserData);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

@@ -727,34 +727,31 @@ float CFont::GetWidth(char* text)
  */
 float CFont::GetWidth(unsigned short ch)
 {
-	unsigned short* glyphBucket = m_glyphBuckets[ch & 0xFF];
-	unsigned short* glyph = glyphBucket + 1;
-	unsigned int count = static_cast<unsigned int>(glyphBucket[0]);
+	unsigned short* glyph = m_glyphBuckets[ch & 0xFF] + 1;
+	unsigned int count = static_cast<unsigned int>(*m_glyphBuckets[ch & 0xFF]);
 
 	for (; count != 0; count--) {
 		if (static_cast<unsigned int>(*reinterpret_cast<unsigned char*>(glyph + 1)) == ((ch >> 8) & 0xFF)) {
-			break;
+			goto found_glyph;
 		}
 		glyph += 4;
 	}
+	glyph = 0;
 
-	if (count == 0) {
-		glyph = 0;
-	}
+found_glyph:
 
 	if (glyph == 0) {
-		glyphBucket = m_glyphBuckets[63];
-		glyph = glyphBucket + 1;
-		for (count = static_cast<unsigned int>(glyphBucket[0]); count != 0; count--) {
+		glyph = m_glyphBuckets[63] + 1;
+		for (count = static_cast<unsigned int>(*m_glyphBuckets[63]); count != 0; count--) {
 			if (*reinterpret_cast<char*>(glyph + 1) == '\0') {
-				break;
+				goto found_fallback;
 			}
 			glyph += 4;
 		}
-		if (count == 0) {
-			return 0.0f;
-		}
+		return 0.0f;
 	}
+
+found_fallback:
 
 	unsigned char flags = renderFlags;
 	unsigned int drawWidth;

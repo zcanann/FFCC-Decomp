@@ -556,32 +556,161 @@ void CFlatRuntime2::onDeleteObject(CFlatRuntime::CObject* object)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006DA68
+ * PAL Size: 1452b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::getNumFreeObject(int)
+unsigned int CFlatRuntime2::getNumFreeObject(int classType)
 {
-	// TODO
+	unsigned int count = 0;
+	unsigned char* objects;
+	int stride;
+	int objectCount;
+
+	if (classType == 3) {
+		objects = m_objParty;
+		stride = 0x6F8;
+		objectCount = 4;
+	} else if (classType < 3) {
+		if (classType == 1) {
+			objects = CFlat + 0x110C0;
+			stride = 0xAC;
+			objectCount = 0x18;
+		} else if (classType < 1) {
+			if (classType < 0) {
+				return 0;
+			}
+			objects = CFlat + 0x10440;
+			stride = 0x50;
+			objectCount = 0x28;
+		} else {
+			objects = CFlat + 0x120E0;
+			stride = 0x518;
+			objectCount = 0x38;
+		}
+	} else if (classType == 5) {
+		objects = m_objItem;
+		stride = 0x57C;
+		objectCount = 0x20;
+	} else if (classType < 5) {
+		objects = m_objMon;
+		stride = 0x740;
+		objectCount = 0x40;
+	} else {
+		return 0;
+	}
+
+	for (int i = 0; i < objectCount; i++) {
+		if (*reinterpret_cast<signed char*>(objects + 0x4C) >= 0) {
+			count++;
+		}
+		objects += stride;
+	}
+
+	return count;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006D868
+ * PAL Size: 512b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::getFreeObject(int)
+CGObject* CFlatRuntime2::getFreeObject(int classType)
 {
-	// TODO
+	unsigned char* objects;
+	int stride;
+	int objectCount;
+
+	if (classType == 3) {
+		objects = m_objParty;
+		stride = 0x6F8;
+		objectCount = 4;
+	} else if (classType < 3) {
+		if (classType == 1) {
+			objects = CFlat + 0x110C0;
+			stride = 0xAC;
+			objectCount = 0x18;
+		} else if (classType < 1) {
+			if (classType < 0) {
+				return 0;
+			}
+			objects = CFlat + 0x10440;
+			stride = 0x50;
+			objectCount = 0x28;
+		} else {
+			objects = CFlat + 0x120E0;
+			stride = 0x518;
+			objectCount = 0x38;
+		}
+	} else if (classType == 5) {
+		objects = m_objItem;
+		stride = 0x57C;
+		objectCount = 0x20;
+	} else if (classType < 5) {
+		objects = m_objMon;
+		stride = 0x740;
+		objectCount = 0x40;
+	} else {
+		return 0;
+	}
+
+	for (int i = 0; i < objectCount; i++) {
+		if (*reinterpret_cast<signed char*>(objects + 0x4C) >= 0) {
+			return reinterpret_cast<CGObject*>(objects);
+		}
+		objects += stride;
+	}
+
+	return 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006D79C
+ * PAL Size: 204b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::intToClass(int)
+void* CFlatRuntime2::intToClass(int classId)
 {
-	// TODO
+	const int classType = classId >> 8;
+	const unsigned int objectIndex = static_cast<unsigned int>(classId) & 0xFF;
+	const int slot = static_cast<int>(objectIndex) - 1;
+
+	if (classType == 3) {
+		return m_objParty + slot * 0x6F8;
+	}
+
+	if (classType > 2) {
+		if (classType == 5) {
+			return m_objItem + slot * 0x57C;
+		}
+		if (classType > 4) {
+			return this;
+		}
+		return m_objMon + slot * 0x740;
+	}
+
+	if (classType == 1) {
+		return CFlat + 0x110C0 + slot * 0xAC;
+	}
+	if (classType < 1) {
+		if (classType < 0) {
+			return this;
+		}
+		return CFlat + 0x10440 + slot * 0x50;
+	}
+
+	return CFlat + 0x120E0 + slot * 0x518;
 }
 
 /*

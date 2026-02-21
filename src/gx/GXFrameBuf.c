@@ -465,9 +465,10 @@ static void __GXVerifCopy(void* dest, u8 clear) {
  * JP Size: TODO
  */
 void GXCopyDisp(void* dest, GXBool clear) {
-    GXData* gx;
     u32 reg;
+    u32 tempPeCtrl;
     GXBool changePeCtrl;
+    GXData* gx;
 
     CHECK_GXBEGIN(1833, "GXCopyDisp");
 
@@ -477,53 +478,41 @@ void GXCopyDisp(void* dest, GXBool clear) {
 
     gx = __GXData;
     if (clear) {
-        GX_WRITE_U8(0x61);
-        GX_WRITE_U32((gx->zmode & 0xFFFFFFF0) | 0xF);
-        GX_WRITE_U8(0x61);
-        GX_WRITE_U32(gx->cmode0 & 0xFFFFFFFC);
+        reg = gx->zmode;
+        reg = (reg & 0xFFFFFFF0) | 0xF;
+        GX_WRITE_RAS_REG(reg);
+
+        reg = gx->cmode0;
+        reg &= 0xFFFFFFFC;
+        GX_WRITE_RAS_REG(reg);
     }
 
     changePeCtrl = FALSE;
-    if (!clear) {
-        if ((gx->peCtrl & 7) != 3) {
-            goto skipPeCtrlWrite;
-        }
-    }
-
-    if (((gx->peCtrl >> 6) & 1) == 1) {
+    tempPeCtrl = gx->peCtrl;
+    if ((clear || ((tempPeCtrl & 7) == 3)) && (((tempPeCtrl >> 6) & 1) == 1)) {
         changePeCtrl = TRUE;
-        GX_WRITE_U8(0x61);
-        GX_WRITE_U32(gx->peCtrl & 0xFFFFFFBF);
+        GX_WRITE_RAS_REG(tempPeCtrl & 0xFFFFFFBF);
     }
 
-skipPeCtrlWrite:
-    GX_WRITE_U8(0x61);
-    GX_WRITE_U32(gx->cpDispSrc);
-    GX_WRITE_U8(0x61);
-    GX_WRITE_U32(gx->cpDispSize);
-    GX_WRITE_U8(0x61);
-    GX_WRITE_U32(gx->cpDispStride);
+    GX_WRITE_RAS_REG(gx->cpDispSrc);
+    GX_WRITE_RAS_REG(gx->cpDispSize);
+    GX_WRITE_RAS_REG(gx->cpDispStride);
 
     reg = (((u32)dest >> 5) & 0xFFFFFF) | 0x4B000000;
-    GX_WRITE_U8(0x61);
-    GX_WRITE_U32(reg);
+    GX_WRITE_RAS_REG(reg);
 
     gx->cpDisp = (gx->cpDisp & 0xFFFFF7FF) | ((u32)clear << 11);
     gx->cpDisp = (gx->cpDisp & 0xFFFFBFFF) | 0x4000;
     gx->cpDisp = (gx->cpDisp & 0x00FFFFFF) | 0x52000000;
-    GX_WRITE_U8(0x61);
-    GX_WRITE_U32(gx->cpDisp);
+    GX_WRITE_RAS_REG(gx->cpDisp);
 
     if (clear) {
-        GX_WRITE_U8(0x61);
-        GX_WRITE_U32(gx->zmode);
-        GX_WRITE_U8(0x61);
-        GX_WRITE_U32(gx->cmode0);
+        GX_WRITE_RAS_REG(gx->zmode);
+        GX_WRITE_RAS_REG(gx->cmode0);
     }
 
     if (changePeCtrl) {
-        GX_WRITE_U8(0x61);
-        GX_WRITE_U32(gx->peCtrl);
+        GX_WRITE_RAS_REG(gx->peCtrl);
     }
 
     gx->bpSentNot = 0;

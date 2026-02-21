@@ -99,12 +99,36 @@ CFunnyShape::CFunnyShape()
     memset(Ptr(this, 0x60D8), 0, 0x10);
     memset(Ptr(this, 0x6014), 0, 0x40);
 
-    for (s32 i = 0; i < 0x10; i++) {
-        u32 offs = static_cast<u32>(i) * 4;
-        PtrAt(this, 0x6014 + offs) = 0;
-        PtrAt(this, 0x6054 + offs) = 0;
-        PtrAt(this, 0x6094 + offs) = 0;
-    }
+    CFunnyShape* p = this;
+    s32 i = 2;
+    do {
+        PtrAt(p, 0x6094) = 0;
+        PtrAt(p, 0x6014) = 0;
+        PtrAt(p, 0x6054) = 0;
+        PtrAt(p, 0x6098) = 0;
+        PtrAt(p, 0x6018) = 0;
+        PtrAt(p, 0x6058) = 0;
+        PtrAt(p, 0x609C) = 0;
+        PtrAt(p, 0x601C) = 0;
+        PtrAt(p, 0x605C) = 0;
+        PtrAt(p, 0x60A0) = 0;
+        PtrAt(p, 0x6020) = 0;
+        PtrAt(p, 0x6060) = 0;
+        PtrAt(p, 0x60A4) = 0;
+        PtrAt(p, 0x6024) = 0;
+        PtrAt(p, 0x6064) = 0;
+        PtrAt(p, 0x60A8) = 0;
+        PtrAt(p, 0x6028) = 0;
+        PtrAt(p, 0x6068) = 0;
+        PtrAt(p, 0x60AC) = 0;
+        PtrAt(p, 0x602C) = 0;
+        PtrAt(p, 0x606C) = 0;
+        PtrAt(p, 0x60B0) = 0;
+        PtrAt(p, 0x6030) = 0;
+        PtrAt(p, 0x6070) = 0;
+        p = reinterpret_cast<CFunnyShape*>(Ptr(p, 0x20));
+        i--;
+    } while (i != 0);
 
     U32At(this, 0x60D4) = 0;
 }

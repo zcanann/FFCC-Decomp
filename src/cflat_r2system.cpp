@@ -16,6 +16,7 @@
 #include "ffcc/sound.h"
 #include "ffcc/USBStreamData.h"
 #include "ffcc/vector.h"
+#include <math.h>
 #include <string.h>
 
 static inline CUSBStreamData* UsbStream(CPartPcs* self)
@@ -45,6 +46,11 @@ extern "C" double fmod(double, double);
 extern "C" double atan2(double, double);
 extern "C" double cos(double);
 extern "C" double sin(double);
+extern float FLOAT_80330cec;
+extern float FLOAT_80330cf0;
+extern float FLOAT_80330d10;
+extern float FLOAT_80330d30;
+extern float DAT_8032ec20;
 
 /*
  * --INFO--
@@ -1489,12 +1495,121 @@ extern "C" int IsAbsolute__10CCameraPcsFv(CCameraPcs* camera)
 template <int count>
 class CLine;
 
+struct CLineSegment64
+{
+    Vec delta;
+    Vec normal;
+    float length;
+    float startLength;
+};
+
 template <>
 class CLine<64>
 {
 public:
+    int Calc(Vec* nearestPosition, float* nearestDistance, unsigned long* nearestSegment,
+             float* nearestSegmentRatio, Vec* targetPosition, float maxDistance);
     int IsInner(Vec* position, float margin);
+
+    Vec m_min;
+    Vec m_max;
+    unsigned int m_numPoints;
+    unsigned int m_unused;
+    float m_0x20[4];
+    Vec m_points[64];
+    CLineSegment64 m_segments[63];
+    float m_totalLength;
 };
+
+int CLine<64>::Calc(Vec* nearestPosition, float* nearestDistance, unsigned long* nearestSegment,
+                    float* nearestSegmentRatio, Vec* targetPosition, float maxDistance)
+{
+    const bool infiniteRange = (maxDistance == FLOAT_80330cec);
+    float bestDistance = infiniteRange ? FLOAT_80330d10 : maxDistance;
+    const float maxDistanceSq = maxDistance * maxDistance;
+    int found = 0;
+    unsigned int bestIndex = 0;
+    float bestT = FLOAT_80330cec;
+    Vec bestPosition;
+
+    for (unsigned int i = 0; i + 1 < m_numPoints; i++) {
+        Vec candidate = m_points[i];
+        float distanceSq = PSVECSquareDistance(&candidate, targetPosition);
+        if (distanceSq < maxDistanceSq || infiniteRange) {
+            float distance = distanceSq;
+            if (distanceSq <= FLOAT_80330cec) {
+                distance = DAT_8032ec20;
+            } else {
+                distance = (float)sqrt(distanceSq);
+            }
+
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                bestPosition = candidate;
+                bestIndex = i;
+                bestT = FLOAT_80330cec;
+                found = 1;
+            }
+        }
+
+        if (i + 1 == m_numPoints - 1) {
+            candidate = m_points[i + 1];
+            distanceSq = PSVECSquareDistance(&candidate, targetPosition);
+            if (distanceSq < maxDistanceSq || infiniteRange) {
+                float distance = distanceSq;
+                if (distanceSq <= FLOAT_80330cec) {
+                    distance = DAT_8032ec20;
+                } else {
+                    distance = (float)sqrt(distanceSq);
+                }
+
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    bestPosition = candidate;
+                    bestIndex = i;
+                    bestT = FLOAT_80330cf0;
+                    found = 1;
+                }
+            }
+        }
+
+        CLineSegment64& segment = m_segments[i];
+        float dotTarget = PSVECDotProduct(targetPosition, &segment.delta);
+        float dotPoint = PSVECDotProduct(&m_points[i], &segment.delta);
+        float segmentT = (dotTarget - dotPoint) / (segment.length * segment.length);
+        if (((FLOAT_80330cec <= segmentT) && (segmentT <= FLOAT_80330cf0)) || infiniteRange) {
+            Vec scaled;
+            Vec projected;
+            PSVECScale(&segment.delta, &scaled, segmentT);
+            PSVECAdd(&m_points[i], &scaled, &projected);
+            float distance = PSVECDistance(targetPosition, &projected);
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                bestPosition = projected;
+                bestIndex = i;
+                bestT = segmentT;
+                found = 1;
+            }
+        }
+    }
+
+    if (found != 0) {
+        if (nearestPosition != nullptr) {
+            *nearestPosition = bestPosition;
+        }
+        if (nearestDistance != nullptr) {
+            *nearestDistance = bestDistance;
+        }
+        if (nearestSegment != nullptr) {
+            *nearestSegment = bestIndex;
+        }
+        if (nearestSegmentRatio != nullptr) {
+            *nearestSegmentRatio = bestT;
+        }
+    }
+
+    return found;
+}
 
 int CLine<64>::IsInner(Vec* position, float margin)
 {
@@ -1510,6 +1625,52 @@ int CLine<64>::IsInner(Vec* position, float margin)
     }
 
     return 0;
+}
+
+extern "C" void CalcBound__9CLine(CLine<64>* line)
+{
+    line->m_min.x = FLOAT_80330d10;
+    line->m_min.y = FLOAT_80330d10;
+    line->m_min.z = FLOAT_80330d10;
+    line->m_max.x = FLOAT_80330d30;
+    line->m_max.y = FLOAT_80330d30;
+    line->m_max.z = FLOAT_80330d30;
+    line->m_totalLength = FLOAT_80330cec;
+
+    for (unsigned int i = 0; i < line->m_numPoints; i++) {
+        const Vec& point = line->m_points[i];
+
+        if (point.x < line->m_min.x) {
+            line->m_min.x = point.x;
+        }
+        if (point.y < line->m_min.y) {
+            line->m_min.y = point.y;
+        }
+        if (point.z < line->m_min.z) {
+            line->m_min.z = point.z;
+        }
+
+        if (line->m_max.x < point.x) {
+            line->m_max.x = point.x;
+        }
+        if (line->m_max.y < point.y) {
+            line->m_max.y = point.y;
+        }
+        if (line->m_max.z < point.z) {
+            line->m_max.z = point.z;
+        }
+
+        if (i != 0) {
+            CLineSegment64& segment = line->m_segments[i - 1];
+            PSVECSubtract(&line->m_points[i], &line->m_points[i - 1], &segment.delta);
+            segment.length = PSVECMag(&segment.delta);
+            segment.startLength = line->m_totalLength;
+            line->m_totalLength += segment.length;
+            if (segment.length != FLOAT_80330cec) {
+                PSVECNormalize(&segment.delta, &segment.normal);
+            }
+        }
+    }
 }
 
 /*

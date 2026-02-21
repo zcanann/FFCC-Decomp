@@ -229,7 +229,7 @@ void CFlatData::Create(void* filePtr)
 							new (Game.game.m_mainStage, (char*)"cflat_data.cpp", 0x45) unsigned char[chunk.m_arg0];
 						chunkFile.Get(m_data[m_dataCount].m_data, chunk.m_arg0);
 
-						if (chunk.m_version == 0)
+						if (chunk.m_version < 1)
 						{
 							m_data[m_dataCount].m_numStrings = 0;
 							m_data[m_dataCount].m_stringBuf = (char*)nullptr;

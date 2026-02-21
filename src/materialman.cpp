@@ -664,6 +664,60 @@ CTexScroll::CTexScroll()
 
 /*
  * --INFO--
+ * PAL Address: 0x8003dc38
+ * PAL Size: 220b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CMaterial::~CMaterial()
+{
+    *reinterpret_cast<void**>(this) = __vt__9CMaterial;
+
+    int numTexture = static_cast<int>(*reinterpret_cast<unsigned short*>(Ptr(this, 0x18)));
+    for (int i = 0; i < numTexture; i++) {
+        unsigned char* textureRef = Ptr(this, 0x3C + (i << 2));
+        ReleaseRef(*reinterpret_cast<void**>(textureRef));
+        *reinterpret_cast<void**>(textureRef) = 0;
+    }
+
+    __destroy_arr(Ptr(this, 0x4C), (void*)__dt__10CTexScrollFv, 0x14, 4);
+    __dt__4CRefFv(this, 0);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003dd14
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CMaterial::CMaterial()
+{
+    __ct__4CRefFv(this);
+    *reinterpret_cast<void**>(this) = __vt__9CMaterial;
+    __construct_array(Ptr(this, 0x4C), __ct__10CTexScrollFv, __dt__10CTexScrollFv, 0x14, 4);
+    memset(Ptr(this, 0x8C), 0, 0x10);
+    *reinterpret_cast<int*>(Ptr(this, 0x9C)) = -1;
+    *Ptr(this, 0xA0) = 4;
+    *Ptr(this, 0xA1) = 1;
+    *Ptr(this, 0xA2) = 0;
+    *Ptr(this, 0xA4) = 0;
+    *reinterpret_cast<void**>(Ptr(this, 0x3C)) = 0;
+    *reinterpret_cast<void**>(Ptr(this, 0x40)) = 0;
+    *reinterpret_cast<void**>(Ptr(this, 0x44)) = 0;
+    *reinterpret_cast<void**>(Ptr(this, 0x48)) = 0;
+    *Ptr(this, 0x34) = 0;
+    *Ptr(this, 0x35) = 0;
+    *Ptr(this, 0x36) = 0;
+    *Ptr(this, 0xA5) = 0;
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

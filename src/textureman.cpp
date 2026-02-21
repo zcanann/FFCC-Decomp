@@ -832,12 +832,16 @@ void CTexture::CacheDumpTexture(CAmemCacheSet*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003B030
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CTexture::CheckName(char*)
+int CTexture::CheckName(char* name)
 {
-	// TODO
+    return strcmp(reinterpret_cast<char*>(Ptr(this, 8)), name) == 0;
 }
 
 /*

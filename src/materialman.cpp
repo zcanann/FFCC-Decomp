@@ -22,6 +22,7 @@ extern "C" void Calc__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" void* __vt__9CMaterial[];
 extern "C" void* PTR_PTR_s_CMaterialSet_801e9bbc;
 extern CMemory Memory;
+extern CTextureMan TextureMan;
 extern unsigned char MaterialMan[];
 extern float FLOAT_8032faf0;
 extern float FLOAT_8032faf4;
@@ -940,6 +941,26 @@ void CMaterialSet::AddMaterial(CMaterial*, int)
 
 /*
  * --INFO--
+ * PAL Address: 0x8003d9f0
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void* CMaterial::operator new(unsigned long size, CMemory::CStage*, char* file, int line)
+{
+    return _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+        &Memory,
+        size,
+        *reinterpret_cast<CMemory::CStage**>(MaterialMan + 0x218),
+        file,
+        line,
+        0);
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x8003d878
  * PAL Size: 72b
  * EN Address: TODO
@@ -1181,6 +1202,84 @@ unsigned long CMaterialSet::Find(char* name)
     } while (index < static_cast<unsigned long>(materialArray->GetSize()));
 
     return 0xFFFFFFFF;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003da38
+ * PAL Size: 472b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+int CMaterial::Set(_GXTexMapID texMapId)
+{
+    Mtx texMtx;
+    PSMTXIdentity(texMtx);
+
+    bool hasDualScroll = false;
+    if ((*reinterpret_cast<unsigned short*>(Ptr(this, 0x18)) == 2) &&
+        (FLOAT_8032faf4 == *reinterpret_cast<float*>(Ptr(this, 0x50))) &&
+        (FLOAT_8032faf4 == *reinterpret_cast<float*>(Ptr(this, 0x54))) &&
+        ((FLOAT_8032faf4 != *reinterpret_cast<float*>(Ptr(this, 0x64))) ||
+         (FLOAT_8032faf4 != *reinterpret_cast<float*>(Ptr(this, 0x68))))) {
+        hasDualScroll = true;
+    }
+
+    unsigned char* textureSlot = Ptr(this, 0x3C);
+    unsigned char* scrollData = Ptr(this, 0x4C);
+    int textureCount = static_cast<int>(*reinterpret_cast<unsigned short*>(Ptr(this, 0x18)));
+    for (int i = 0; i < textureCount; i++) {
+        CTexture* texture = *reinterpret_cast<CTexture**>(textureSlot);
+        if ((texture != 0) && ((*Ptr(this, 0xA7) == 0) || (i < 1))) {
+            TextureMan.SetTexture(texMapId, texture);
+            texMapId = static_cast<_GXTexMapID>(static_cast<int>(texMapId) + 1);
+
+            float scrollU = *reinterpret_cast<float*>(scrollData + 4);
+            float scrollV = *reinterpret_cast<float*>(scrollData + 8);
+            if ((FLOAT_8032faf4 != scrollU) || ((FLOAT_8032faf4 != scrollV) || hasDualScroll)) {
+                unsigned int& texMtxCur = *reinterpret_cast<unsigned int*>(MaterialMan + 0x120);
+                unsigned int& texCoordCur = *reinterpret_cast<unsigned int*>(MaterialMan + 0x124);
+                texMtx[0][3] = scrollU;
+                texMtx[1][3] = scrollV;
+
+                if (i == 0) {
+                    *reinterpret_cast<unsigned int*>(MaterialMan + 0x48) |= 0x20;
+                    *reinterpret_cast<unsigned int*>(MaterialMan + 0x144) = texMtxCur;
+                    *reinterpret_cast<unsigned int*>(MaterialMan + 0x148) = texCoordCur;
+                    GXLoadTexMtxImm(texMtx, texMtxCur, GX_MTX2x4);
+                    GXSetTexCoordGen2(
+                        static_cast<GXTexCoordID>(texCoordCur),
+                        GX_TG_MTX2x4,
+                        GX_TG_TEX0,
+                        texMtxCur,
+                        GX_FALSE,
+                        0x7D);
+                } else {
+                    *reinterpret_cast<unsigned int*>(MaterialMan + 0x48) |= 0x40;
+                    *reinterpret_cast<unsigned int*>(MaterialMan + 0x150) = texMtxCur;
+                    *reinterpret_cast<unsigned int*>(MaterialMan + 0x154) = texCoordCur;
+                    GXLoadTexMtxImm(texMtx, texMtxCur, GX_MTX2x4);
+                    GXSetTexCoordGen2(
+                        static_cast<GXTexCoordID>(texCoordCur),
+                        GX_TG_MTX2x4,
+                        GX_TG_TEX1,
+                        texMtxCur,
+                        GX_FALSE,
+                        0x7D);
+                }
+
+                texMtxCur += 3;
+                texCoordCur += 1;
+            }
+        }
+
+        textureSlot += 4;
+        scrollData += 0x14;
+    }
+
+    return static_cast<int>(texMapId);
 }
 
 /*

@@ -93,7 +93,7 @@ public:
     CMaterial();
     ~CMaterial();
     void Create(unsigned long, CMaterialMan::TEV_BIT);
-    void Set(_GXTexMapID);
+    int Set(_GXTexMapID);
     void CacheLoadTexture(CAmemCacheSet*);
     void CacheUnLoadTexture(CAmemCacheSet*);
     void CacheRefCnt0UpTexture(CAmemCacheSet*);

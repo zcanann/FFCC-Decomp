@@ -553,9 +553,10 @@ void pppCon2ScreenBreak(PScreenBreak* pppScreenBreak, UnkC* param_2)
 {
     s32 dataOffset = param_2->m_serializedDataOffsets[2];
     float* value = (float*)((u8*)pppScreenBreak + dataOffset + 0x80);
+    float f = FLOAT_80331cc4;
     value[2] = FLOAT_80331cc4;
-    value[1] = FLOAT_80331cc4;
-    value[0] = FLOAT_80331cc4;
+    value[1] = f;
+    *value = f;
 }
 
 /*

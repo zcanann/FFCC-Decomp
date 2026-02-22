@@ -7,6 +7,7 @@
 #include "ffcc/partyobj.h"
 #include "ffcc/p_game.h"
 #include "ffcc/stopwatch.h"
+#include "ffcc/textureman.h"
 #include <math.h>
 #include <string.h>
 
@@ -43,6 +44,8 @@ extern "C" void __ct__9CGBaseObjFv(CGBaseObj*);
 extern "C" void pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(CPartMng*, int, int, PPPCREATEPARAM*, int);
 extern "C" char* GetLangString__5CGameFv(void*);
 extern "C" void* Open__5CFileFPcUlQ25CFile3PRI(void*, char*, unsigned long, int);
+extern "C" void Read__5CFileFPQ25CFile7CHandle(void*, void*);
+extern "C" void SyncCompleted__5CFileFPQ25CFile7CHandle(void*, void*);
 extern "C" void ReadASync__5CFileFPQ25CFile7CHandle(void*, void*);
 extern "C" void ClrBattleItem__8CMenuPcsFv(void*);
 extern "C" void ChangeMogMode__6CCharaFi(void*, int);
@@ -1214,12 +1217,40 @@ void CFlatRuntime2::CcClass2D(int, int, Vec*, float, float, int, CGObject **)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006B068
+ * PAL Size: 372b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::loadLayer(int, char*)
+void CFlatRuntime2::loadLayer(int layerNo, char* fileName)
 {
-	// TODO
+	const int layerOffset = layerNo * 0xC;
+	u8* layer = reinterpret_cast<u8*>(this) + 0x1770 + layerOffset;
+
+	CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(layer + 4);
+	if (textureSet != 0) {
+		(*(void (**)(void*, int))(*reinterpret_cast<int*>(textureSet) + 8))(textureSet, 1);
+		*reinterpret_cast<CTextureSet**>(layer + 4) = 0;
+	}
+
+	char path[0x104];
+	sprintf(path, "dvd:/%s/%s.tex", GetLangString__5CGameFv(&Game.game), fileName);
+
+	void* fileHandle = Open__5CFileFPcUlQ25CFile3PRI(&File, path, 0, 0);
+	if (fileHandle != 0) {
+		Read__5CFileFPQ25CFile7CHandle(&File, fileHandle);
+		SyncCompleted__5CFileFPQ25CFile7CHandle(&File, fileHandle);
+
+		textureSet = new (Game.game.m_mainStage, "cflat_runtime2.cpp", 0x4F4) CTextureSet;
+		*reinterpret_cast<CTextureSet**>(layer + 4) = textureSet;
+		if (textureSet != 0) {
+			textureSet->Create(File.m_readBuffer, Game.game.m_mainStage, 0, 0, 0, 0);
+		}
+
+		Close__5CFileFPQ25CFile7CHandle(&File, fileHandle);
+	}
 }
 
 /*

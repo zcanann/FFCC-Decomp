@@ -1039,10 +1039,13 @@ unsigned int CMath::Hsb2Rgb(int hue, int saturation, int brightness)
         rgba = ((unsigned int)v << 24) | ((unsigned int)v << 16) | ((unsigned int)v << 8);
     }
     else {
-        int m = ((0xFF - sat) * val) / 0xFF;
-        int sector = hue / 60;
-        int fraction = (hue - (sector * 60)) * (val - m);
-        int x = fraction / 60;
+        int m = ((0xFF - sat) * val) / 0xFF + ((((0xFF - sat) * val) >> 31));
+        int sector = hue / 60 + (hue >> 31);
+        m -= m >> 31;
+        sector -= sector >> 31;
+        int fraction = (hue + (sector * -60)) * (val - m);
+        int x = fraction / 60 + (fraction >> 31);
+        x -= x >> 31;
 
         unsigned char lo = (unsigned char)m;
         unsigned char hi = (unsigned char)val;

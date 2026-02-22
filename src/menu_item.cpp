@@ -71,10 +71,13 @@ struct MenuItemOpenAnim {
     s16 h;
     float alpha;
     float scale;
+    float progress;
+    float uvScale;
+    int tex;
     int frame;
+    int unk24;
     int duration;
     unsigned int flags;
-    float progress;
     float dx;
     float dy;
     float targetX;

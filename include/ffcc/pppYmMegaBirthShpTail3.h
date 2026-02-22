@@ -17,16 +17,18 @@ struct pppYmMegaBirthShpTail3
 
 struct VYmMegaBirthShpTail3
 {
-    _PARTICLE_DATA m_baseData;  // 0x0 - 0x140
-    Vec m_tailScaleDirection;   // 0x140 - 0x14c
-}; // Size 0x14c+
+    pppFMATRIX m_emitterMatrix;   // 0x0
+    _PARTICLE_DATA* m_particles;  // 0x30
+    _PARTICLE_WMAT* m_wmats;      // 0x34
+    _PARTICLE_COLOR* m_colors;    // 0x38
+    unsigned int m_maxParticles;  // 0x3c
+    unsigned int m_lifeLimit;     // 0x40
+    Vec m_tailScaleDirection;     // 0x44
+};
 
-struct PYmMegaBirthShpTail3
+struct PYmMegaBirthShpTail3 : _PARTICLE_DATA
 {
-    pppFMATRIX m_matrix;        // 0x0 - 0x30
-    float m_colorDeltaAdd[4];   // 0x30 - 0x40
-    float m_sizeVal;            // 0x40 - 0x44
-}; // Size 0x44+
+};
 
 struct UnkB;
 struct UnkC

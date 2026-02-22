@@ -5,9 +5,15 @@
 
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern "C" void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
+extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern int rand();
 extern float FLOAT_803305a4;
 extern pppFMATRIX MatUnit3;
+extern _pppEnvSt* pppEnvStPtr;
+extern _pppMngSt* pppMngStPtr;
+extern s32 DAT_8032ed70;
+
+static char s_pppYmMegaBirthShpTail3_cpp[] = "pppYmMegaBirthShpTail3.cpp";
 
 /*
  * --INFO--
@@ -133,7 +139,7 @@ extern "C" void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirt
     // Basic randomization setup
     if (pYmMegaBirthShpTail3 != nullptr) {
         // Initialize matrix
-        PSMTXIdentity(pYmMegaBirthShpTail3->m_matrix.value);
+        PSMTXIdentity(pYmMegaBirthShpTail3->m_matrix);
     }
 }
 
@@ -223,10 +229,97 @@ void calc_particle(_pppPObject*, VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, V
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, UnkC*)
+void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShpTail3* param, UnkC* offsets)
 {
-    // Particle frame processing
-    // TODO: Implement frame update logic
+    bool hasRequiredMemory;
+    int spawnCount = 0;
+    int colorOffset;
+    u8* paramPayload;
+    u8* particleData;
+    u32 i;
+    _PARTICLE_WMAT* worldMat;
+    _PARTICLE_COLOR* particleColor;
+    VYmMegaBirthShpTail3* work;
+
+    colorOffset = offsets->m_serializedDataOffsets[1];
+    work = (VYmMegaBirthShpTail3*)((u8*)object + 8 + offsets->m_serializedDataOffsets[2]);
+    paramPayload = (u8*)&param->m_matrix;
+
+    if (work->m_particles == 0) {
+        work->m_maxParticles = *(u16*)(paramPayload + 0xe);
+        work->m_particles = (_PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+            work->m_maxParticles * 0x1f8, pppEnvStPtr->m_stagePtr, s_pppYmMegaBirthShpTail3_cpp, 0x2db);
+        if (work->m_particles != 0) {
+            memset(work->m_particles, 0, work->m_maxParticles * 0x1f8);
+        }
+
+        work->m_wmats = (_PARTICLE_WMAT*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
+            work->m_maxParticles * 0x30, pppEnvStPtr->m_stagePtr, s_pppYmMegaBirthShpTail3_cpp, 0x2e3);
+        if (work->m_wmats != 0) {
+            memset(work->m_wmats, 0, work->m_maxParticles * 0x30);
+        }
+
+        work->m_tailScaleDirection = param->m_directionTail;
+        PSVECNormalize(&work->m_tailScaleDirection, &work->m_tailScaleDirection);
+    }
+
+    hasRequiredMemory = (work->m_particles != 0) && (work->m_wmats != 0);
+    if (!hasRequiredMemory) {
+        return;
+    }
+
+    switch (*(paramPayload + 0x12)) {
+    default:
+        PSMTXCopy(pppMngStPtr->m_matrix.value, work->m_emitterMatrix.value);
+        break;
+    case 1:
+    case 3:
+    case 5:
+    case 7:
+    case 9:
+        PSMTXIdentity(work->m_emitterMatrix.value);
+        work->m_emitterMatrix.value[0][0] = pppMngStPtr->m_scale.x;
+        work->m_emitterMatrix.value[1][1] = pppMngStPtr->m_scale.y;
+        work->m_emitterMatrix.value[2][2] = pppMngStPtr->m_scale.z;
+        work->m_emitterMatrix.value[0][3] = pppMngStPtr->m_position.x;
+        work->m_emitterMatrix.value[1][3] = pppMngStPtr->m_position.y;
+        work->m_emitterMatrix.value[2][3] = pppMngStPtr->m_position.z;
+        break;
+    }
+
+    worldMat = work->m_wmats;
+    particleColor = work->m_colors;
+    particleData = (u8*)work->m_particles;
+
+    if ((DAT_8032ed70 != 0) || (*(float*)(paramPayload + 4) == 9.18341e-41f)) {
+        return;
+    }
+
+    work->m_lifeLimit = work->m_lifeLimit + 1;
+    for (i = 0; i < work->m_maxParticles; i++) {
+        if (*(s16*)(particleData + 0x22) == 0) {
+            if ((*(u16*)(paramPayload + 0x12) <= work->m_lifeLimit) && (spawnCount < *(u16*)(paramPayload + 0x10))) {
+                birth(&object->field0_0x0, work, param, (VColor*)((u8*)object + 8 + colorOffset),
+                      (_PARTICLE_DATA*)particleData, worldMat, particleColor);
+                spawnCount = spawnCount + 1;
+            }
+        } else {
+            calc(&object->field0_0x0, work, param, (_PARTICLE_DATA*)particleData,
+                 (VColor*)((u8*)object + 8 + colorOffset), particleColor);
+        }
+
+        if (worldMat != 0) {
+            worldMat = worldMat + 1;
+        }
+        if (particleColor != 0) {
+            particleColor = particleColor + 1;
+        }
+        particleData = particleData + 0x1f8;
+    }
+
+    if (spawnCount > 0) {
+        work->m_lifeLimit = 0;
+    }
 }
 
 /*

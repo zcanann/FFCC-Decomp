@@ -53,7 +53,10 @@ void pppRandHCV(void* p1, void* p2, void* p3) {
     u8* base = (u8*)p1;
     RandHCVParams* params = (RandHCVParams*)p2;
     RandHCVCtx* ctx = (RandHCVCtx*)p3;
-    float* randomValue;
+    int outputOffset;
+    int colorOffset;
+    float scale;
+    s16* target;
 
     if (lbl_8032ED70 != 0) {
         return;
@@ -67,22 +70,21 @@ void pppRandHCV(void* p1, void* p2, void* p3) {
             value *= lbl_8032FF98;
         }
 
-        randomValue = (float*)(base + *ctx->outputOffset + 0x80);
-        *randomValue = value;
+        outputOffset = *ctx->outputOffset + 0x80;
+        *(float*)(base + outputOffset) = value;
     } else if (params->index != *(int*)(base + 0xC)) {
         return;
     }
 
-    randomValue = (float*)(base + *ctx->outputOffset + 0x80);
-
-    s16* target;
-    if (params->colorOffset == -1) {
+    colorOffset = params->colorOffset;
+    outputOffset = *ctx->outputOffset + 0x80;
+    if (colorOffset == -1) {
         target = lbl_801EADC8;
     } else {
-        target = (s16*)(base + params->colorOffset + 0x80);
+        target = (s16*)(base + colorOffset + 0x80);
     }
 
-    float scale = *randomValue;
+    scale = *(float*)(base + outputOffset);
 
     {
         s16 current = target[0];

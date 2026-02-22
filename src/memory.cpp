@@ -1038,7 +1038,9 @@ void CMemory::CStage::drawHeapBar(int y)
  */
 void CMemory::CStage::drawHeapTitle(int y)
 {
-    int node = (stageGetAllocationMode(this) == 2) ? stageGetHeapHead(this) : *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
+    int node = (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x10C) == 2)
+                   ? *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x110)
+                   : *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x110) + 8);
     unsigned int totalUnuse = 0;
     unsigned int maxUnuse = 0;
     int prev = *reinterpret_cast<int*>(node + 4);
@@ -1047,20 +1049,18 @@ void CMemory::CStage::drawHeapTitle(int y)
         unsigned char flags = *reinterpret_cast<unsigned char*>(node + 2);
         if ((flags & 2) != 0) {
             char line[264];
-            int srcLen = strlen(stageGetSourceName(this));
-            int start = srcLen - 12;
-            if (start < 0) {
-                start = 0;
-            }
-            strcpy(line, stageGetSourceName(this) + start);
+            int srcLen = strlen(reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(this) + 0x10));
+            int start = (srcLen - 12U) & ~((srcLen - 12) >> 0x1F);
+            strcpy(line, reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(this) + 0x10) + start);
             Graphic.DrawDebugStringDirect(0x10, static_cast<unsigned short>(y), line, 8);
 
             int totalUnuseKB = (static_cast<int>(totalUnuse) >> 10) +
                 static_cast<int>((static_cast<int>(totalUnuse) < 0) && ((totalUnuse & 0x3FF) != 0));
             int maxUnuseKB = (static_cast<int>(maxUnuse) >> 10) +
                 static_cast<int>((static_cast<int>(maxUnuse) < 0) && ((maxUnuse & 0x3FF) != 0));
-            sprintf(line, s__4d__4d__4d_801d6800, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x124),
-                    totalUnuseKB, maxUnuseKB);
+            sprintf(line, s__4d__4d__4d_801d6800,
+                    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x124), totalUnuseKB,
+                    maxUnuseKB);
             Graphic.DrawDebugStringDirect(0x208, static_cast<unsigned short>(y), line, 8);
             return;
         }
@@ -1073,12 +1073,14 @@ void CMemory::CStage::drawHeapTitle(int y)
             }
         }
 
-        if ((*reinterpret_cast<int*>(node + 0x10) != *reinterpret_cast<int*>(node + 8) - (node + 0x40)) ||
-            (*reinterpret_cast<int*>(node + 4) != prev)) {
+        bool validPrev = *reinterpret_cast<int*>(node + 4) == prev;
+        int next = *reinterpret_cast<int*>(node + 8);
+        int current = node;
+        if ((*reinterpret_cast<int*>(node + 0x10) != next - (node + 0x40)) || !validPrev) {
             break;
         }
-        prev = node;
-        node = *reinterpret_cast<int*>(node + 8);
+        prev = current;
+        node = next;
     }
 
     if (System.m_execParam != 0) {

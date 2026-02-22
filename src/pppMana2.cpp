@@ -3,6 +3,7 @@
 #include "ffcc/gobject.h"
 #include "ffcc/p_game.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/pppYmEnv.h"
 #include "ffcc/util.h"
 
 #include <string.h>
@@ -23,12 +24,22 @@ extern float FLOAT_803318a4;
 extern float FLOAT_803318b8;
 extern float FLOAT_803318bc;
 extern float FLOAT_803318c0;
+extern float FLOAT_803318c4;
+extern float FLOAT_803318c8;
+extern float FLOAT_803318cc;
+extern float FLOAT_803318d0;
 extern float FLOAT_80331904;
 extern Mtx ppvCameraMatrix0;
+extern void* DAT_80238030;
 extern struct {
+    float _212_4_;
+    float _216_4_;
+    float _220_4_;
     float _224_4_;
     float _228_4_;
     float _232_4_;
+    Mtx m_cameraMatrix;
+    Mtx44 m_screenMatrix;
 } CameraPcs;
 extern CUtil DAT_8032ec70;
 extern char MaterialMan[];
@@ -61,6 +72,13 @@ void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
 void InitTexObj__8CTextureFv(void*);
 void genParaboloidMap__FPvPUlUs9_GXVtxFmt(void*, unsigned long*, unsigned short, GXVtxFmt);
+void BeginQuadEnv__5CUtilFv(void*);
+void EndQuadEnv__5CUtilFv(void*);
+void SetVtxFmt_POS_CLR_TEX__5CUtilFv(void*);
+void RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
+    CUtil* util, float x0, float y0, float x1, float y1, _GXTexObj* texObj, Vec2d* uv0, Vec2d* uv1, _GXColor* color,
+    _GXBlendFactor srcFactor, _GXBlendFactor dstFactor);
+void RenderQuad__5CUtilF3Vec3Vec8_GXColorP5Vec2dP5Vec2d(void*, Vec*, Vec*, GXColor, Vec2d*, Vec2d*);
 }
 
 /*
@@ -380,12 +398,191 @@ void pppRenderMana2(pppMana2*, UnkB*, UnkC*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80107744
+ * PAL Size: 1796b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void Mana2_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
+void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, float (*) [4], int)
 {
-	// TODO
+    u32* work;
+    s32 model;
+    void* handle;
+    CGObject* gObject;
+    Mtx identityMtx;
+    Mtx savedCameraMtx;
+    Mtx lookAtMtx;
+    Mtx44 projectionMtx;
+    Mtx44 savedScreenMtx;
+    _GXTexObj sceneTexObj;
+    _GXTexObj depthTexObj;
+    Vec centerPos;
+    Vec cameraPos;
+    Vec cameraUp;
+    Vec quadMin;
+    Vec quadMax;
+    GXColor quadColor;
+    u32 depthTexSize;
+    u32 baseParaboloidTexObjs;
+    u32 sourceTexObjs;
+    s32 i;
+
+    work = (u32*)param_2;
+    if (*(u8*)((char*)param_3 + 0x1C) == 0) {
+        return;
+    }
+
+    PSMTXIdentity(identityMtx);
+    PSMTXCopy(CameraPcs.m_cameraMatrix, savedCameraMtx);
+    PSMTX44Copy(CameraPcs.m_screenMatrix, savedScreenMtx);
+    Graphic.GetBackBufferRect2(DAT_80238030, &sceneTexObj, 0, 0, 0x80, 0x80, 0, GX_NEAR, GX_TF_RGBA8, 0);
+
+    gObject = (CGObject*)work[0];
+    if (gObject == NULL) {
+        return;
+    }
+
+    handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
+    model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    *(u32*)(model + 0xF0) = 0;
+    *(u32*)(model + 0xFC) = 0;
+
+    if (Game.game.m_currentSceneId == 7) {
+        centerPos.x = FLOAT_80331898;
+        centerPos.y = FLOAT_80331898;
+        centerPos.z = FLOAT_80331898;
+    } else {
+        centerPos.x = gObject->m_worldPosition.x;
+        centerPos.y = gObject->m_worldPosition.y;
+        centerPos.z = gObject->m_worldPosition.z;
+    }
+    centerPos.y += FLOAT_803318c4;
+
+    depthTexSize = GXGetTexBufferSize(0x80, 0x80, (_GXTexFmt)6, GX_FALSE, 0);
+    GXGetTexBufferSize(0x80, 0x80, (_GXTexFmt)4, GX_FALSE, 0);
+    sourceTexObjs = work[0x1D];
+
+    if (*(u8*)((char*)param_3 + 0x38) != 0) {
+        Graphic.GetBackBufferRect2(DAT_80238030, &depthTexObj, 0, 0, 0x80, 0x80, depthTexSize, GX_LINEAR,
+                                   (_GXTexFmt)0x16, 1);
+        GXSetViewport(FLOAT_80331898, FLOAT_80331898, FLOAT_803318c8, FLOAT_803318c8, FLOAT_80331898, FLOAT_803318a0);
+        C_MTXPerspective(projectionMtx, FLOAT_803318cc, FLOAT_803318a0, FLOAT_803318a0, FLOAT_803318d0);
+        GXSetProjection(projectionMtx, (_GXProjectionType)0);
+
+        baseParaboloidTexObjs = work[8];
+        for (i = 0; i < 6; i++) {
+            cameraPos.x = centerPos.x;
+            cameraPos.y = centerPos.y;
+            cameraPos.z = centerPos.z;
+            cameraUp.y = FLOAT_803318a0;
+            cameraUp.z = FLOAT_80331898;
+
+            if (i == 3) {
+                cameraPos.y = centerPos.y - FLOAT_803318a0;
+                cameraUp.y = FLOAT_80331898;
+                cameraUp.z = FLOAT_803318a0;
+            } else if (i < 3) {
+                if (i == 1) {
+                    cameraPos.x = centerPos.x - FLOAT_803318a0;
+                } else if (i < 1) {
+                    cameraPos.x = centerPos.x + FLOAT_803318a0;
+                } else {
+                    cameraPos.y = centerPos.y + FLOAT_803318a0;
+                    cameraUp.y = FLOAT_80331898;
+                    cameraUp.z = FLOAT_8033189c;
+                }
+            } else if (i == 5) {
+                cameraPos.z = centerPos.z - FLOAT_803318a0;
+            } else {
+                cameraPos.z = centerPos.z + FLOAT_803318a0;
+            }
+
+            cameraUp.x = FLOAT_80331898;
+            C_MTXLookAt(lookAtMtx, (Point3d*)&centerPos, &cameraUp, (Point3d*)&cameraPos);
+            Graphic.SetViewport();
+            GXSetScissor(0, 0, 0x280, 0x1C0);
+            RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
+                &DAT_8032ec70, FLOAT_80331898, FLOAT_80331898, FLOAT_803318c8, FLOAT_803318c8,
+                (GXTexObj*)baseParaboloidTexObjs, 0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
+            baseParaboloidTexObjs += 0x20;
+        }
+
+        PSMTXCopy(savedCameraMtx, CameraPcs.m_cameraMatrix);
+        Graphic.SetViewport();
+        GXSetScissor(0, 0, 0x280, 0x1C0);
+        GXSetZTexture((GXZTexOp)2, (_GXTexFmt)0x16, 0);
+        GXSetColorUpdate(GX_FALSE);
+        BeginQuadEnv__5CUtilFv(&DAT_8032ec70);
+        GXSetZMode(GX_TRUE, (_GXCompare)7, GX_TRUE);
+        GXSetZCompLoc(GX_FALSE);
+        SetVtxFmt_POS_CLR_TEX__5CUtilFv(&DAT_8032ec70);
+        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
+        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 0xFF);
+        _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
+            0, 0xF, 0xF, 0xF, 0xF);
+        _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
+        _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(0, 7, 7,
+                                                                                                                7, 6);
+        _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
+        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+        GXLoadTexObj(&depthTexObj, GX_TEXMAP0);
+
+        quadMin.x = FLOAT_80331898;
+        quadMin.y = FLOAT_80331898;
+        quadMin.z = FLOAT_80331898;
+        quadMax.x = FLOAT_803318c8;
+        quadMax.y = FLOAT_803318c8;
+        quadMax.z = FLOAT_80331898;
+        quadColor.r = 0xFF;
+        quadColor.g = 0xFF;
+        quadColor.b = 0xFF;
+        quadColor.a = 0;
+        RenderQuad__5CUtilF3Vec3Vec8_GXColorP5Vec2dP5Vec2d(&DAT_8032ec70, &quadMin, &quadMax, quadColor, 0, 0);
+        EndQuadEnv__5CUtilFv(&DAT_8032ec70);
+        GXSetZTexture((GXZTexOp)0, (_GXTexFmt)0x11, 0);
+        GXSetColorUpdate(GX_TRUE);
+        GXSetAlphaUpdate(GX_TRUE);
+        GXSetZCompLoc(GX_TRUE);
+        RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
+            &DAT_8032ec70, FLOAT_80331898, FLOAT_80331898, FLOAT_803318c8, FLOAT_803318c8, &sceneTexObj, 0, 0, 0,
+            (_GXBlendFactor)4, (_GXBlendFactor)5);
+        *((u8*)work + 0xEC) = 1;
+    }
+
+    baseParaboloidTexObjs = work[0x1E];
+    if (*(u8*)((char*)param_3 + 0x38) == 0) {
+        if (*((u8*)work + 0xEC) == 0) {
+            GXInitTexObj((GXTexObj*)work[10], (void*)work[12], 0x80, 0x80, (_GXTexFmt)4, (_GXTexWrapMode)1,
+                         (_GXTexWrapMode)1, GX_FALSE);
+            GXInitTexObj((GXTexObj*)work[11], (void*)work[13], 0x80, 0x80, (_GXTexFmt)4, (_GXTexWrapMode)1,
+                         (_GXTexWrapMode)1, GX_FALSE);
+            drawParaboloidMap((GXTexObj*)work[8], (GXTexObj*)work[11], (void*)work[9], work[0x39],
+                              (GXTexObj*)(baseParaboloidTexObjs + 0x28), 1);
+            drawParaboloidMap((GXTexObj*)work[8], (GXTexObj*)work[10], (void*)work[9], work[0x39],
+                              (GXTexObj*)(baseParaboloidTexObjs + 0x28), 0);
+            *((u8*)work + 0xEC) = 1;
+        }
+    } else {
+        GXInitTexObj((GXTexObj*)work[10], (void*)work[12], 0x80, 0x80, (_GXTexFmt)4, (_GXTexWrapMode)0,
+                     (_GXTexWrapMode)0, GX_FALSE);
+        GXInitTexObj((GXTexObj*)work[11], (void*)work[13], 0x80, 0x80, (_GXTexFmt)4, (_GXTexWrapMode)0,
+                     (_GXTexWrapMode)0, GX_FALSE);
+        drawParaboloidMap((GXTexObj*)sourceTexObjs, (GXTexObj*)work[11], (void*)work[9], work[0x39],
+                          (GXTexObj*)(baseParaboloidTexObjs + 0x28), 1);
+        drawParaboloidMap((GXTexObj*)sourceTexObjs, (GXTexObj*)work[10], (void*)work[9], work[0x39],
+                          (GXTexObj*)(baseParaboloidTexObjs + 0x28), 0);
+        Graphic.SetViewport();
+        GXSetProjection(savedScreenMtx, (_GXProjectionType)0);
+        PSMTXCopy(savedCameraMtx, CameraPcs.m_cameraMatrix);
+    }
+
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+    handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
+    model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    *(u32*)(model + 0xF0) = (u32)Mana2_BeforeDrawCallback;
+    *(u32*)(model + 0xFC) = (u32)Mana2_DrawMeshDLCallback;
 }
 
 /*

@@ -575,6 +575,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
  */
 void CGoOutMenu::CalcGoOut()
 {
+    McCtrl& mcCtrl = *reinterpret_cast<McCtrl*>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0x20);
     unsigned short input;
     unsigned char next;
 
@@ -702,6 +703,44 @@ void CGoOutMenu::CalcGoOut()
             Sound.PlaySe(2, 0x40, 0x7f, 0);
             SetGoOutMode(8);
         }
+        break;
+    case 8:
+        if (mcCtrl.ChkConnect(0) == -1) {
+            return;
+        }
+        field_0x30 = 0;
+        SetGoOutMode(9);
+        break;
+    case 9:
+        if (field_0x30 < 0x14) {
+            return;
+        }
+        if (mcCtrl.ChkConnect(0) == -3) {
+            SetMenuStr(0, 2, "No Memory Card found in", "Slot A.");
+            field_0x19 = -1;
+            SetGoOutMode(0);
+            return;
+        }
+        SetGoOutMode(0xC);
+        break;
+    case 10:
+        if (mcCtrl.ChkConnect(1) == -1) {
+            return;
+        }
+        field_0x30 = 0;
+        SetGoOutMode(0xB);
+        break;
+    case 0xB:
+        if (field_0x30 < 0x14) {
+            return;
+        }
+        if (mcCtrl.ChkConnect(1) == -3) {
+            SetMenuStr(0, 2, "No Memory Card found in", "Slot B.");
+            field_0x19 = -1;
+            SetGoOutMode(0);
+            return;
+        }
+        SetGoOutMode(0xE);
         break;
     default:
         break;

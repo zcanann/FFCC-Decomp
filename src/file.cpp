@@ -414,7 +414,7 @@ void CFile::SyncCompleted(CFile::CHandle* fileHandle)
  */
 void CFile::kick()
 {
-	while (CheckQueue() == 0)
+	do
 	{
 		CHandle* sentinel = &m_fileHandle;
 		CHandle* cur = sentinel->m_previous;
@@ -449,7 +449,7 @@ void CFile::kick()
 		{
 			return;
 		}
-	}
+	} while (CheckQueue() == 0);
 }
 
 /*

@@ -1348,12 +1348,33 @@ void CRedDriver::SetMusicPhraseStop(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bf0c4
+ * PAL Size: 168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::SetSeBlockData(int, void*)
+void CRedDriver::SetSeBlockData(int bank, void* blockData)
 {
-	// TODO
+    void* copiedHeader;
+    int headerSize;
+
+    if (blockData == 0) {
+        copiedHeader = 0;
+    } else {
+        headerSize = *(int*)((char*)blockData + 0xc);
+        if (headerSize < 1) {
+            copiedHeader = 0;
+        } else {
+            copiedHeader = RedNew__Fi(headerSize);
+            if (copiedHeader != 0) {
+                memcpy(copiedHeader, blockData, headerSize);
+            }
+        }
+    }
+
+    _EntryExecCommand(_SetSeBlockData, bank, (int)copiedHeader, 0, 0, 0, 0, 0);
 }
 
 /*

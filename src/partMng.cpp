@@ -7,6 +7,7 @@
 extern "C" void __dl__FPv(void* ptr);
 extern "C" void pppPartInit__8CPartMngFv2(CPartMng* partMng);
 extern "C" unsigned int CheckSum__FPvi(void*, int);
+extern "C" float ppvScreenMatrix[4][4];
 extern "C" void __ct__9_pppMngStFv(_pppMngSt* pppMngSt);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
 extern CPartMng PartMng;
@@ -218,12 +219,49 @@ void CPartMng::pppGetFreePppMngSt()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005e97c
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartMng::pppGetNumFreePppMngSt()
+int CPartMng::pppGetNumFreePppMngSt()
 {
-	// TODO
+    int freeCount = 0;
+    char* pppMngSt = reinterpret_cast<char*>(this);
+
+    int i = 0x30;
+    do {
+        if (*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 0)) == -0x1000) {
+            freeCount++;
+        }
+        if (*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 1)) == -0x1000) {
+            freeCount++;
+        }
+        if (*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 2)) == -0x1000) {
+            freeCount++;
+        }
+        if (*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 3)) == -0x1000) {
+            freeCount++;
+        }
+        if (*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 4)) == -0x1000) {
+            freeCount++;
+        }
+        if (*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 5)) == -0x1000) {
+            freeCount++;
+        }
+        if (*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 6)) == -0x1000) {
+            freeCount++;
+        }
+        if (*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 7)) == -0x1000) {
+            freeCount++;
+        }
+        pppMngSt += 0xAC0;
+        i--;
+    } while (i != 0);
+
+    return freeCount;
 }
 
 /*
@@ -548,12 +586,16 @@ void CPartMng::pppEditPartDrawAfter()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005a92c
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppSetProjection()
 {
-	// TODO
+    GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
 }
 
 /*

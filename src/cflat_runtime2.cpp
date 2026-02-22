@@ -1,17 +1,26 @@
 #include "ffcc/cflat_runtime2.h"
+#include "ffcc/astar.h"
 #include "ffcc/baseobj.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/monobj.h"
 #include "ffcc/partMng.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/p_game.h"
+#include "ffcc/stopwatch.h"
 #include <math.h>
 #include <string.h>
 
 extern "C" void reset__6CAStarFv(void*);
+extern "C" void drawAStar__6CAStarFv(void*);
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" int __cntlzw(unsigned int);
+extern "C" void StaticFrame__10CGCharaObjFv();
+extern "C" void CheckGameOver__10CGPartyObjFv();
 extern "C" void Create__9CGBaseObjFv(CGBaseObj*);
 extern "C" void Destroy__9CGBaseObjFv(CGBaseObj*);
+extern "C" void Frame__9CGBaseObjFv(CGBaseObj*);
+extern "C" void Draw__9CGBaseObjFv(CGBaseObj*);
+extern "C" void Frame__12CFlatRuntimeFii(CFlatRuntime*, int, int);
 extern "C" void Destroy__12CFlatRuntimeFv(CFlatRuntime*);
 extern "C" void Destroy__9CFlatDataFv(void*);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
@@ -60,6 +69,34 @@ extern "C" void* __vt__9CGItemObj[];
 extern "C" void* __vt__10CGCharaObj[];
 extern "C" void* __vt__8CGMonObj[];
 extern "C" void* __vt__10CGPartyObj[];
+extern "C" void move__8CGObjectFv(CGObject*);
+extern "C" void objectCollision__8CGObjectFv(CGObject*);
+extern "C" void bgCollision__8CGObjectFv(CGObject*);
+extern "C" void update__8CGObjectFv(CGObject*);
+extern "C" void hit__8CGObjectFv(CGObject*);
+extern "C" void copy__8CGObjectFv(CGObject*);
+
+static CGBaseObj* FindNextGBaseObjByCidMask(CFlatRuntime2* runtime, CFlatRuntime::CObject* object, unsigned int cidMask)
+{
+	typedef int (*GetCIDFn)(CFlatRuntime::CObject*);
+	CFlatRuntime::CObject* const root =
+		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(runtime) + 0x1204);
+
+	while (object != root) {
+		if (object->m_classIndex >= 0) {
+			const unsigned int flags = object->m_flags;
+			if ((int)(flags << 24) >= 0 && (int)((flags << 25) | (flags >> 7)) >= 0) {
+				GetCIDFn getCID = reinterpret_cast<GetCIDFn>((*reinterpret_cast<void***>(object))[3]);
+				if ((getCID(object) & cidMask) == cidMask) {
+					return reinterpret_cast<CGBaseObj*>(object);
+				}
+			}
+		}
+		object = object->m_next;
+	}
+
+	return 0;
+}
 
 template <int count>
 class CLine;
@@ -721,12 +758,102 @@ void* CFlatRuntime2::intToClass(int classId)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006CD40
+ * PAL Size: 2652b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::Frame(int, int)
+void CFlatRuntime2::Frame(int arg0, int mode)
 {
-	// TODO
+	CStopWatch watch((char*)-1);
+	System.DumpMapFile(&watch);
+
+	if (mode == 0) {
+		StaticFrame__10CGCharaObjFv();
+		CheckGameOver__10CGPartyObjFv();
+		Frame__12CFlatRuntimeFii(reinterpret_cast<CFlatRuntime*>(this), arg0, mode);
+
+		CFlatRuntime::CObject* const root =
+			reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x1204);
+		for (CGBaseObj* obj = FindNextGBaseObjByCidMask(this, root->m_next->m_next, 5); obj != 0;
+			 obj = FindNextGBaseObjByCidMask(this, reinterpret_cast<CFlatRuntime::CObject*>(obj)->m_next, 5)) {
+			Frame__9CGBaseObjFv(obj);
+		}
+		return;
+	}
+
+	if (mode == 1) {
+		watch.Reset();
+		watch.Start();
+		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
+			move__8CGObjectFv(object);
+		}
+		watch.Stop();
+		*reinterpret_cast<float*>(CFlat + 0x1338) += watch.Get();
+
+		watch.Reset();
+		watch.Start();
+		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
+			objectCollision__8CGObjectFv(object);
+		}
+		watch.Stop();
+		*reinterpret_cast<float*>(CFlat + 0x1340) += watch.Get();
+
+		watch.Reset();
+		watch.Start();
+		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
+			bgCollision__8CGObjectFv(object);
+		}
+		watch.Stop();
+		*reinterpret_cast<float*>(CFlat + 0x133C) += watch.Get();
+
+		watch.Reset();
+		watch.Start();
+		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
+			update__8CGObjectFv(object);
+		}
+		watch.Stop();
+		*reinterpret_cast<float*>(CFlat + 0x1344) += watch.Get();
+
+		watch.Reset();
+		watch.Start();
+		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
+			hit__8CGObjectFv(object);
+		}
+		watch.Stop();
+		*reinterpret_cast<float*>(CFlat + 0x1348) += watch.Get();
+
+		for (CGObject* object = FindGObjFirst(); object != 0; object = FindGObjNext(object)) {
+			copy__8CGObjectFv(object);
+		}
+		return;
+	}
+
+	_GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)5, (_GXLogicOp)1);
+	GXSetZCompLoc(GX_FALSE);
+	_GXSetAlphaCompare((_GXCompare)6, 1, (_GXAlphaOp)0, (_GXCompare)7, 0);
+	GXSetZMode(GX_TRUE, (_GXCompare)3, GX_TRUE);
+	GXSetCullMode(GX_CULL_BACK);
+	GXSetNumTevStages(1);
+	_GXSetTevOp((_GXTevStageID)0, (_GXTevMode)4);
+	_GXSetTevOrder((_GXTevStageID)0, (_GXTexCoordID)0xFF, (_GXTexMapID)0xFF, (_GXChannelID)4);
+	GXSetNumChans(1);
+	GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+	GXSetChanCtrl(
+		GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPEC);
+	GXClearVtxDesc();
+	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+	drawAStar__6CAStarFv(DbgMenuPcs + 0x2A5C);
+
+	CFlatRuntime::CObject* const root =
+		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x1204);
+	for (CGBaseObj* obj = FindNextGBaseObjByCidMask(this, root->m_next->m_next, 1); obj != 0;
+		 obj = FindNextGBaseObjByCidMask(this, reinterpret_cast<CFlatRuntime::CObject*>(obj)->m_next, 1)) {
+		Draw__9CGBaseObjFv(obj);
+	}
 }
 
 /*

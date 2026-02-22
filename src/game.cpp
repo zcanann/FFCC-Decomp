@@ -845,7 +845,6 @@ void CGame::ScriptChanged(char*, int)
 {
     int i;
     int j;
-    int k;
 
     for (i = 0; i < 4; i++) {
         m_partyObjArr[i] = 0;
@@ -855,10 +854,11 @@ void CGame::ScriptChanged(char*, int)
     unk_flat3_0xc7d0 = 0;
 
     for (i = 0; i < 4; i++) {
-        for (j = 0; j < 16; j++) {
-            for (k = 0; k < 2; k++) {
-                m_scriptWork[i][j][k] = 0;
-            }
+        for (j = 0; j < 8; j++) {
+            m_scriptWork[i][j][0] = 0;
+            m_scriptWork[i][j + 8][0] = 0;
+            m_scriptWork[i][j][1] = 0;
+            m_scriptWork[i][j + 8][1] = 0;
         }
     }
 

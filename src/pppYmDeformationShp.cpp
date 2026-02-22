@@ -202,34 +202,45 @@ void pppDestructYmDeformationShp(void)
  */
 void pppFrameYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, UnkB* param_2, UnkC* param_3)
 {
-	s16* angle;
+	struct FrameState {
+		s16 m_angle;
+		u8 m_direction;
+		u8 m_pad;
+		float m_values[6];
+	};
+
+	FrameState* state;
 
 	if (DAT_8032ed70 != 0) {
 		return;
 	}
 
-	angle = (s16*)((u8*)pppYmDeformationShp_ + 0x8c + param_3->m_serializedDataOffsets[2]);
+	state = (FrameState*)((u8*)pppYmDeformationShp_ + 0x8c + param_3->m_serializedDataOffsets[2]);
 
 	CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-		param_2->m_payload[0], pppYmDeformationShp_, param_2->m_graphId, (float*)(angle + 2), (float*)(angle + 4),
-		(float*)(angle + 6), &param_2->m_payload[1], &param_2->m_payload[2]);
+		param_2->m_payload[0], pppYmDeformationShp_, param_2->m_graphId, &state->m_values[0], &state->m_values[1],
+		&state->m_values[2], &param_2->m_payload[1], &param_2->m_payload[2]);
 	CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-		param_2->m_payload[3], pppYmDeformationShp_, param_2->m_graphId, (float*)(angle + 8), (float*)(angle + 10),
-		(float*)(angle + 12), &param_2->m_payload[4], &param_2->m_payload[5]);
+		param_2->m_payload[3], pppYmDeformationShp_, param_2->m_graphId, &state->m_values[3], &state->m_values[4],
+		&state->m_values[5], &param_2->m_payload[4], &param_2->m_payload[5]);
 
 	if (DAT_8032ed78 != 0) {
 		return;
 	}
 
-	if (*(u8*)(angle + 1) == 0) {
-		*angle = *angle - (s16)(int)*(float*)(angle + 8);
-		if ((int)*angle < -(int)param_2->m_payload3) {
-			*(u8*)(angle + 1) = 1;
+	if (state->m_direction != 0) {
+		s16 step = (s16)(int)state->m_values[3];
+
+		state->m_angle = state->m_angle + step;
+		if (param_2->m_payload3 < state->m_angle) {
+			state->m_direction = 0;
 		}
 	} else {
-		*angle = *angle + (s16)(int)*(float*)(angle + 8);
-		if (param_2->m_payload3 < *angle) {
-			*(u8*)(angle + 1) = 0;
+		s16 step = (s16)(int)state->m_values[3];
+
+		state->m_angle = state->m_angle - step;
+		if ((int)state->m_angle < -(int)param_2->m_payload3) {
+			state->m_direction = 1;
 		}
 	}
 }

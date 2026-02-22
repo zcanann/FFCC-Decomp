@@ -2,6 +2,7 @@
 #include "ffcc/pad.h"
 #include "ffcc/chunkfile.h"
 #include "ffcc/textureman.h"
+#include "ffcc/vector.h"
 
 #include <dolphin/mtx.h>
 
@@ -27,6 +28,9 @@ extern "C" void _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevS
                                                                                                         int, int, int);
 extern "C" void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(int, int, int,
                                                                                                         int, int, int);
+extern "C" int CheckFrustum__6CBoundFR3VecPA4_ff(CBound*, Vec*, float (*)[4], float);
+extern "C" void SetShadow__12CMaterialManFR10CMapShadowPA4_fiUl(
+    CMaterialMan*, CMapShadow*, float (*)[4], int, unsigned long);
 class CMapKeyFrame;
 extern "C" float Get__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" void Calc__12CMapKeyFrameFv(CMapKeyFrame*);
@@ -37,9 +41,13 @@ extern "C" void* __vt__9CMaterial[];
 extern "C" void* PTR_PTR_s_CMaterialSet_801e9bbc;
 extern CMemory Memory;
 extern CTextureMan TextureMan;
+class CMapMng;
+extern CMapMng MapMng;
 extern unsigned char MaterialMan[];
 extern float FLOAT_8032faf0;
 extern float FLOAT_8032faf4;
+extern float FLOAT_8032faf8;
+extern float FLOAT_8032fafc;
 static const char s_materialStageName[] = "material";
 
 class CMapKeyFrame
@@ -611,12 +619,39 @@ void CMaterialMan::GetCharaShadow(int, CMaterial **, float (**) [4], Vec*, float
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003e058
+ * PAL Size: 244b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMaterialMan::SetShadowBound(CMapShadow::TARGET, CBound*, float (*) [4])
+void CMaterialMan::SetShadowBound(CMapShadow::TARGET target, CBound* bound, float (*viewMtx) [4])
 {
-	// TODO
+    CPtrArray<CMapShadow*>* mapShadowArray = reinterpret_cast<CPtrArray<CMapShadow*>*>(Ptr(&MapMng, 0x21434));
+
+    for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
+        CMapShadow* shadow = (*mapShadowArray)[i];
+
+        if (*reinterpret_cast<unsigned char*>(Ptr(shadow, static_cast<int>(target) + 0xF0)) == 0) {
+            continue;
+        }
+
+        int model = *reinterpret_cast<int*>(Ptr(shadow, 0xC));
+        Vec position;
+        Mtx scaledShadowMtx;
+
+        position.x = *reinterpret_cast<float*>(model + 0xC4);
+        position.y = *reinterpret_cast<float*>(model + 0xD4);
+        position.z = *reinterpret_cast<float*>(model + 0xE4);
+        PSMTXScaleApply(reinterpret_cast<float(*)[4]>(Ptr(shadow, 0x78)), scaledShadowMtx, FLOAT_8032faf8,
+                        FLOAT_8032faf8, FLOAT_8032faf0);
+
+        if ((*reinterpret_cast<unsigned char*>(Ptr(shadow, 7)) == 1) ||
+            (CheckFrustum__6CBoundFR3VecPA4_ff(bound, &position, scaledShadowMtx, FLOAT_8032fafc) != 0)) {
+            SetShadow__12CMaterialManFR10CMapShadowPA4_fiUl(this, shadow, viewMtx, i, 0xFFFFFFFF);
+        }
+    }
 }
 
 /*

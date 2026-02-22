@@ -11,7 +11,7 @@ public:
     void CalcHelpLine(int, int&, int&);
     void GetLongHelpString(CFont*, int, int);
     void CalcCenteringPos2(char*, float, float);
-    void CalcCenteringPos(char*, CFont*);
+    float CalcCenteringPos(char*, CFont*);
     void DrawFont(int, int, _GXColor, int, char*, float, float);
     void GetFontWidth(char*, float, float);
     void DrawFont2(int, int, _GXColor, int, char*, float, float, float);

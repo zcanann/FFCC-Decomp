@@ -1,5 +1,10 @@
 #include "ffcc/MenuUtil.h"
 
+extern "C" float GetWidth__5CFontFPc(CFont*, const char*);
+
+extern float lbl_80333558;
+extern float lbl_8033358C;
+
 /*
  * --INFO--
  * Address:	TODO
@@ -35,9 +40,10 @@ void CMenuPcs::CalcCenteringPos2(char*, float, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::CalcCenteringPos(char*, CFont*)
+float CMenuPcs::CalcCenteringPos(char* text, CFont* font)
 {
-	// TODO
+    float width = GetWidth__5CFontFPc(font, text);
+    return -(width * lbl_80333558 - lbl_8033358C);
 }
 
 /*

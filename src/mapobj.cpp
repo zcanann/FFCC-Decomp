@@ -664,20 +664,18 @@ void CMapObj::Draw(unsigned char priority)
  */
 void CMapObj::SetDrawFlag()
 {
-    U8At(this, 0x18) &= 0xFB;
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    self[0x18] &= 0xFB;
 
-    if ((U8At(this, 0x1D) == 1) && (PtrAt(this, 0xC) != 0)) {
-        if ((U8At(this, 0x1F) == 0xFF) && ((U8At(this, 0x18) & 1) != 0)) {
-            unsigned char* mapMng = reinterpret_cast<unsigned char*>(&MapMng);
+    if ((static_cast<signed char>(self[0x1D]) == 1) && (*reinterpret_cast<void**>(self + 0xC) != 0)) {
+        if ((static_cast<signed char>(self[0x1F]) == -1) && ((self[0x18] & 1) != 0)) {
             Mtx concatMtx;
-            Mtx* viewMtx = reinterpret_cast<Mtx*>(mapMng + 0x22958);
-            CBound* bound = reinterpret_cast<CBound*>(reinterpret_cast<unsigned char*>(PtrAt(this, 0xC)) + 0xC);
+            unsigned char* mapMng = reinterpret_cast<unsigned char*>(&MapMng);
+            CBound* bound = reinterpret_cast<CBound*>(reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(self + 0xC)) + 0xC);
 
-            PSMTXConcat(*viewMtx, MtxAt(this, 0xB8), concatMtx);
-            if (bound->CheckFrustum(*reinterpret_cast<Vec*>(mapMng + 0x228EC),
-                                    *viewMtx,
-                                    *reinterpret_cast<float*>(mapMng + 0x22A74)) != 0) {
-                U8At(this, 0x18) |= 4;
+            PSMTXConcat(*reinterpret_cast<Mtx*>(mapMng + 0x22958), *reinterpret_cast<Mtx*>(self + 0xB8), concatMtx);
+            if (bound->CheckFrustum(*reinterpret_cast<Vec*>(mapMng + 0x228EC), concatMtx, *reinterpret_cast<float*>(mapMng + 0x22A74)) != 0) {
+                self[0x18] |= 4;
             }
         }
     }

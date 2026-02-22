@@ -15,9 +15,9 @@ extern float FLOAT_803331e4;
 extern float FLOAT_803331e8;
 extern int DAT_8032ec70;
 
-void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, pppConstrainCameraDir*, int, float*, float*, float*, float*, float*);
-void GetDirectVector__5CUtilFP3VecP3Vec3Vec(void*, Vec*, Vec*, Vec*);
-void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
+extern "C" void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, pppConstrainCameraDir*, int, float*, float*, float*, float*, float*);
+extern "C" void GetDirectVector__5CUtilFP3VecP3Vec3Vec(void*, Vec*, Vec*, Vec*);
+extern "C" void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
 
 /*
  * --INFO--

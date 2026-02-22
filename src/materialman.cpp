@@ -1,8 +1,10 @@
 #include "ffcc/materialman.h"
 #include "ffcc/pad.h"
 #include "ffcc/chunkfile.h"
+#include "ffcc/system.h"
 #include "ffcc/textureman.h"
 #include "ffcc/vector.h"
+#include "ffcc/graphic.h"
 
 #include <dolphin/mtx.h>
 
@@ -12,6 +14,7 @@ extern "C" unsigned long UnkMaterialSetGetter(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void __dla__FPv(void*);
 extern "C" void __dl__FPv(void*);
+extern "C" void __ct__6CColorFv(void*);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void __ct__10CTexScrollFv(void*);
@@ -29,6 +32,7 @@ extern "C" void _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevS
 extern "C" void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(int, int, int,
                                                                                                         int, int, int);
 extern "C" int CheckFrustum__6CBoundFR3VecPA4_ff(CBound*, Vec*, float (*)[4], float);
+extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int*, int*, int*, int*, int);
 extern "C" void SetShadow__12CMaterialManFR10CMapShadowPA4_fiUl(
     CMaterialMan*, CMapShadow*, float (*)[4], int, unsigned long);
 class CMapKeyFrame;
@@ -38,17 +42,39 @@ extern "C" void ReadFrame__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFi
 extern "C" void ReadKey__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*, int);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __vt__9CMaterial[];
+extern "C" void* PTR_PTR_s_CMaterialMan_801e9bec;
 extern "C" void* PTR_PTR_s_CMaterialSet_801e9bbc;
 extern CMemory Memory;
 extern CTextureMan TextureMan;
+extern CGraphic Graphic;
 class CMapMng;
 extern CMapMng MapMng;
+extern unsigned char CameraPcs[];
 extern unsigned char MaterialMan[];
 extern float FLOAT_8032faf0;
 extern float FLOAT_8032faf4;
 extern float FLOAT_8032faf8;
 extern float FLOAT_8032fafc;
+extern float FLOAT_8032fb08;
+extern float FLOAT_8032fb0c;
+extern float FLOAT_8032fb10;
+extern float FLOAT_8032fb14;
 static const char s_materialStageName[] = "material";
+
+/*
+ * --INFO--
+ * PAL Address: 0x80043ccc
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_materialman_cpp(void)
+{
+    *reinterpret_cast<void**>(MaterialMan) = &PTR_PTR_s_CMaterialMan_801e9bec;
+    __ct__6CColorFv(reinterpret_cast<void*>(0x80268E83));
+}
 
 class CMapKeyFrame
 {
@@ -117,6 +143,7 @@ static void ReleaseRef(void* object)
 
 static char s_materialman_cpp[] = "materialman.cpp";
 static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
+static char s_ptrarray_grow_error[] = "CPtrArray grow error";
 
 struct RawPtrArray {
     void** vtable;
@@ -210,6 +237,27 @@ CPtrArray<CMaterial*>::~CPtrArray()
     RemoveAll();
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x80043aac
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" CPtrArray<CMaterial*>* dtor_80043AAC(CPtrArray<CMaterial*>* ptrArray, short shouldDelete)
+{
+    if (ptrArray != 0) {
+        ptrArray->m_vtable = reinterpret_cast<void**>(0x801E9BFC);
+        ptrArray->RemoveAll();
+        if (shouldDelete > 0) {
+            __dl__FPv(ptrArray);
+        }
+    }
+    return ptrArray;
+}
+
 template <>
 void CPtrArray<CMaterial*>::RemoveAll()
 {
@@ -230,25 +278,31 @@ void CPtrArray<CMaterial*>::SetStage(CMemory::CStage* stage)
 template <>
 int CPtrArray<CMaterial*>::Add(CMaterial* item)
 {
-    int result = setSize(m_numItems + 1);
-    if (result != 0) {
-        m_items[m_numItems] = item;
-        m_numItems = m_numItems + 1;
+    if (setSize(m_numItems + 1) == 0) {
+        return 0;
     }
-    return result != 0;
+
+    m_items[m_numItems] = item;
+    m_numItems = m_numItems + 1;
+    return 1;
 }
 
 template <>
 int CPtrArray<CMaterial*>::setSize(unsigned long size)
 {
+    CMaterial** newItems;
+
     if (m_size < size) {
         if (m_size == 0) {
             m_size = m_defaultSize;
         } else {
+            if (m_growCapacity == 0) {
+                System.Printf(s_ptrarray_grow_error);
+            }
             m_size = m_size << 1;
         }
 
-        void** newItems = reinterpret_cast<void**>(
+        newItems = reinterpret_cast<CMaterial**>(
             _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
                 &Memory,
                 m_size << 2,
@@ -267,7 +321,7 @@ int CPtrArray<CMaterial*>::setSize(unsigned long size)
             __dla__FPv(m_items);
             m_items = 0;
         }
-        m_items = reinterpret_cast<CMaterial**>(newItems);
+        m_items = newItems;
     }
     return 1;
 }
@@ -485,12 +539,43 @@ void CMaterialMan::addtev_full_shadow(long)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80042010
+ * PAL Size: 368b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMaterialMan::SetUnderWaterTex()
 {
-	// TODO
+    int x = 0;
+    int y = 0;
+    int width = 0x280;
+    int height = 0x1C0;
+
+    *reinterpret_cast<int*>(Ptr(this, 0xC)) = GetBackBufferRect__8CGraphicFRiRiRiRii(&Graphic, &x, &y, &width, &height, 1);
+    if (*reinterpret_cast<int*>(Ptr(this, 0xC)) == 0) {
+        return;
+    }
+
+    Mtx matrixA;
+    Mtx matrixB;
+    Mtx44 screenMtx;
+    PSMTXIdentity(matrixA);
+    PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcs + 0x48), screenMtx);
+    PSMTXCopy(*reinterpret_cast<Mtx*>(CameraPcs + 0x4), matrixB);
+
+    matrixA[0][0] = screenMtx[0][0] * (FLOAT_8032fb08 / static_cast<float>(width));
+    matrixA[1][1] = screenMtx[1][1] * -(FLOAT_8032fb0c / static_cast<float>(height));
+    matrixA[1][0] = screenMtx[1][0];
+    matrixA[2][0] = screenMtx[2][0];
+    matrixA[0][1] = screenMtx[0][1];
+    matrixA[2][1] = screenMtx[2][1];
+    matrixA[0][2] = FLOAT_8032fb10;
+    matrixA[1][2] = FLOAT_8032fb10;
+    matrixA[2][2] = FLOAT_8032fb14;
+
+    PSMTXConcat(matrixA, matrixB, reinterpret_cast<MtxPtr>(Ptr(this, 0x10)));
 }
 
 /*
@@ -855,7 +940,69 @@ extern "C" void* dtor_8003C49C(void* material, short shouldDelete)
  */
 CTexScroll::~CTexScroll()
 {
-	// TODO
+    if (m_type0 == 2) {
+        void*& keyFrame0 = *reinterpret_cast<void**>(Ptr(this, 0xC));
+        if (keyFrame0 != 0) {
+            void*& table0 = *reinterpret_cast<void**>(Ptr(keyFrame0, 0x18));
+            if (table0 != 0) {
+                __dl__FPv(table0);
+                table0 = 0;
+            }
+
+            void*& table1 = *reinterpret_cast<void**>(Ptr(keyFrame0, 0x1C));
+            if (table1 != 0) {
+                __dl__FPv(table1);
+                table1 = 0;
+            }
+
+            void*& table2 = *reinterpret_cast<void**>(Ptr(keyFrame0, 0x20));
+            if (table2 != 0) {
+                __dl__FPv(table2);
+                table2 = 0;
+            }
+
+            void*& table3 = *reinterpret_cast<void**>(Ptr(keyFrame0, 0x24));
+            if (table3 != 0) {
+                __dl__FPv(table3);
+                table3 = 0;
+            }
+
+            __dl__FPv(keyFrame0);
+            keyFrame0 = 0;
+        }
+    }
+
+    if (m_type1 == 2) {
+        void*& keyFrame1 = *reinterpret_cast<void**>(Ptr(this, 0x10));
+        if (keyFrame1 != 0) {
+            void*& table0 = *reinterpret_cast<void**>(Ptr(keyFrame1, 0x18));
+            if (table0 != 0) {
+                __dl__FPv(table0);
+                table0 = 0;
+            }
+
+            void*& table1 = *reinterpret_cast<void**>(Ptr(keyFrame1, 0x1C));
+            if (table1 != 0) {
+                __dl__FPv(table1);
+                table1 = 0;
+            }
+
+            void*& table2 = *reinterpret_cast<void**>(Ptr(keyFrame1, 0x20));
+            if (table2 != 0) {
+                __dl__FPv(table2);
+                table2 = 0;
+            }
+
+            void*& table3 = *reinterpret_cast<void**>(Ptr(keyFrame1, 0x24));
+            if (table3 != 0) {
+                __dl__FPv(table3);
+                table3 = 0;
+            }
+
+            __dl__FPv(keyFrame1);
+            keyFrame1 = 0;
+        }
+    }
 }
 
 /*

@@ -939,12 +939,37 @@ void LoadFieldPdt0(int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800523f8
+ * PAL Size: 216b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartPcs::LoadFieldPdt(int, int, void*, unsigned long, unsigned char)
+void CPartPcs::LoadFieldPdt(int mapId, int floorId, void* amemBase, unsigned long loadCacheParam, unsigned char mode)
 {
-	// TODO
+    unsigned char* partMng = reinterpret_cast<unsigned char*>(&PartMng);
+
+    *reinterpret_cast<unsigned int*>(partMng + 0x236F4) = 0;
+    *reinterpret_cast<unsigned int*>(partMng + 0x23700) = 0;
+
+    if (loadCacheParam == 0) {
+        *reinterpret_cast<int*>(partMng + 0x236FC) = 0;
+    } else if (mode == 1) {
+        *reinterpret_cast<int*>(partMng + 0x236FC) = 2;
+    } else if (mode == 2) {
+        *reinterpret_cast<int*>(partMng + 0x236FC) = 3;
+        for (int i = 0; i < 0x10; i++) {
+            *reinterpret_cast<int*>(partMng + 0x2370C + (i * 4)) = 0;
+        }
+    } else {
+        *reinterpret_cast<int*>(partMng + 0x236FC) = 1;
+    }
+
+    *reinterpret_cast<void**>(partMng + 0x236E8) = amemBase;
+    *reinterpret_cast<void**>(partMng + 0x236EC) = amemBase;
+    *reinterpret_cast<unsigned long*>(partMng + 0x23704) = loadCacheParam;
+    LoadFieldPdt0(mapId, floorId);
 }
 
 /*

@@ -8,6 +8,10 @@
 
 #define NOP 0x60000000
 
+#ifndef __GEKKO__
+#define __GEKKO__
+#endif
+
 // external functions
 extern void EnableMetroTRKInterrupts(void);
 extern void __OSInitMemoryProtection(void);

@@ -19,7 +19,7 @@ void SetSePitch(int, int, int);
 void SePause(int, int);
 void _MusicPlayStart(RedMusicHEAD*, RedWaveHeadWD*, int, int, int);
 void MusicStop(int);
-void MusicPlay(int, int, int);
+int MusicPlay(int, int, int);
 void SetMusicVolume(int, int, int, int);
 
 #endif // _FFCC_REDSOUND_REDCOMMAND_H

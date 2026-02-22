@@ -20,11 +20,17 @@ extern char DAT_801d6bb0[];
 extern char DAT_801d6c58[];
 extern char DAT_801d6c88[];
 extern char DAT_801d6c98[];
+extern char s____Heap_Walker_801d6bfc[];
+extern char s_Use____5dKB__s_801d6c0c[];
+extern char s_Unuse___5dKB_801d6c20[];
+extern char s_Total___5dKB_Use___5dKB_Unuse____801d6c30[];
 extern char DAT_801d669c[];
 extern char DAT_801d67d8[];
 extern char DAT_801d6bdc[];
 extern char DAT_801d6bec[];
 extern char DAT_8032f7d4[];
+extern char DAT_8032f7e8[];
+extern char DAT_8032f808[];
 extern float FLOAT_8032f7d8;
 extern float FLOAT_8032f7dc;
 extern float FLOAT_8032f7fc;
@@ -500,12 +506,62 @@ void CMemory::Frame()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001EF90
+ * PAL Size: 392b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMemory::HeapWalker()
 {
-	// TODO
+    Printf__7CSystemFPce(&System, DAT_8032f7e8);
+    Printf__7CSystemFPce(&System, DAT_8032f808);
+    Printf__7CSystemFPce(&System, s____Heap_Walker_801d6bfc);
+    Printf__7CSystemFPce(&System, DAT_8032f808);
+
+    unsigned char* listHead = reinterpret_cast<unsigned char*>(this) + 4;
+    for (int mode = 0; mode < 3; mode++) {
+        if ((mode != 1) || (OSGetConsoleSimulatedMemSize() == 0x3000000)) {
+            CStage* head = reinterpret_cast<CStage*>(listHead);
+            CStage* stage = *reinterpret_cast<CStage**>(listHead + 4);
+            while (stage != head) {
+                stage->heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
+                stage = *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(stage) + 4);
+            }
+
+            Printf__7CSystemFPce(&System, DAT_8032f7e8);
+            stage = *reinterpret_cast<CStage**>(listHead + 4);
+
+            int useTotalKB = 0;
+            int unuseTotalKB = 0;
+            while (stage != head) {
+                unsigned int useKB = static_cast<unsigned int>(
+                    (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0xC) -
+                     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 8)) >>
+                    10);
+                Printf__7CSystemFPce(
+                    &System, s_Use____5dKB__s_801d6c0c, useKB,
+                    reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(stage) + 0x10));
+                useTotalKB += static_cast<int>(useKB);
+
+                unsigned int unuseKB = static_cast<unsigned int>(
+                    (*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 4) + 8) -
+                     *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0xC)) >>
+                    10);
+                Printf__7CSystemFPce(&System, s_Unuse___5dKB_801d6c20, unuseKB);
+                unuseTotalKB += static_cast<int>(unuseKB);
+
+                stage = *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(stage) + 4);
+            }
+
+            Printf__7CSystemFPce(
+                &System, s_Total___5dKB_Use___5dKB_Unuse____801d6c30, useTotalKB + unuseTotalKB,
+                useTotalKB, unuseTotalKB);
+        }
+
+        listHead += 0x27D8;
+    }
 }
 
 /*

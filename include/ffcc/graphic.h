@@ -17,7 +17,7 @@ class CFile;
 class CUtil;
 class CCameraPcs;
 
-void checkThread(void*);
+int checkThread(void*);
 void wakeup(OSAlarm*, OSContext*);
 void sleep();
 void std_sinf(float);
@@ -30,7 +30,7 @@ public:
 
     void Init();
     void Quit();
-    void GetProgressive();
+    int GetProgressive();
     void ChangeProgressive(int);
     void SetCopyClear(_GXColor, int);
     void SetStdDispCopySrc();

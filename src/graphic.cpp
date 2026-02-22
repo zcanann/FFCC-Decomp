@@ -6,8 +6,12 @@
 #include "ffcc/pppfunctbl.h"
 #include "ffcc/system.h"
 #include "ffcc/util.h"
+#include "dolphin/vi.h"
+#include "dolphin/vi/vifuncs.h"
 
 extern void* lbl_801E8408;
+extern GXRenderModeObj lbl_801E83C0;
+extern u8 DAT_801E83F2[7];
 extern char DAT_80238030[];
 extern CUtil DAT_8032ec70;
 
@@ -68,9 +72,10 @@ extern "C" void __sinit_graphic_cpp(void)
  * Address:	TODO
  * Size:	TODO
  */
-void checkThread(void*)
+int checkThread(void*)
 {
-	// TODO
+	Graphic.Thread();
+	return 0;
 }
 
 /*
@@ -108,9 +113,12 @@ void CGraphic::Quit()
  * Address:	TODO
  * Size:	TODO
  */
-void CGraphic::GetProgressive()
+int CGraphic::GetProgressive()
 {
-	// TODO
+    if (VIGetDTVStatus() == 0) {
+        return 0;
+    }
+    return OSGetProgressiveMode() == 0 ? 1 : 2;
 }
 
 /*
@@ -118,9 +126,19 @@ void CGraphic::GetProgressive()
  * Address:	TODO
  * Size:	TODO
  */
-void CGraphic::ChangeProgressive(int)
+void CGraphic::ChangeProgressive(int mode)
 {
-	// TODO
+    GXRenderModeObj** renderMode = reinterpret_cast<GXRenderModeObj**>(reinterpret_cast<u8*>(this) + 0x71E0);
+    if (*renderMode != &lbl_801E83C0) {
+        *renderMode = &lbl_801E83C0;
+        GXAdjustForOverscan(*renderMode, *renderMode, 0, 0x10);
+        VIConfigure(*renderMode);
+        GXSetCopyFilter((*renderMode)->aa, (*renderMode)->sample_pattern, GX_TRUE, DAT_801E83F2);
+        VIFlush();
+        VIWaitForRetrace();
+        VIWaitForRetrace();
+    }
+    OSSetProgressiveMode(mode);
 }
 
 /*
@@ -128,9 +146,11 @@ void CGraphic::ChangeProgressive(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGraphic::SetCopyClear(_GXColor, int)
+void CGraphic::SetCopyClear(_GXColor color, int)
 {
-	// TODO
+    _GXColor* clearColor = reinterpret_cast<_GXColor*>(reinterpret_cast<u8*>(this) + 0x735F);
+    *clearColor = color;
+    GXSetCopyClear(*clearColor, 0xFFFFFF);
 }
 
 /*

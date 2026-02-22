@@ -51,43 +51,46 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     u8* vData = (u8*)vYmMiasma;
     u8* ymData = (u8*)pYmMiasma;
     u8* particle = (u8*)particleData;
-    u32 r0;
+    u32 randomValue;
     u32 angleIndex;
     s16 life;
     int colorEntry;
-    int r1;
+    int randomLifeValue;
     Vec normalized;
     Vec managerPos;
     Vec particleOffset;
     double randScale;
     double scaledRadius;
+    double sinValue;
     float spread;
     float parityScale;
     u32 parityBits;
+    u32 paritySign;
 
     (void)pppPObject;
 
-    r0 = rand();
-    randScale = (double)(FLOAT_8033065c * (float)r0);
+    randomValue = rand();
+    randScale = (double)(FLOAT_8033065c * (float)randomValue);
 
     colorEntry = **(int**)(*(int*)&pppEnvStPtr->m_particleColors[0] + *(int*)(ymData + 4) * 4);
-    r1 = rand();
-    life = (s16)r1 - (s16)(r1 / (int)*(s16*)(colorEntry + 6)) * *(s16*)(colorEntry + 6);
+    randomLifeValue = rand();
+    life = (s16)randomLifeValue - (s16)(randomLifeValue / (int)*(s16*)(colorEntry + 6)) * *(s16*)(colorEntry + 6);
     *(s16*)(particle + 0x2A) = life;
     *(s16*)(particle + 0x28) = life;
 
     angleIndex = (u32)(FLOAT_80330650 * FLOAT_80330654 * (float)((double)FLOAT_80330660 * randScale) -
                        FLOAT_80330664);
-    *(s16*)(particle + 0x44) = (s16)(r0 % 0x168);
+    *(s16*)(particle + 0x44) = (s16)(randomValue % 0x168);
 
     scaledRadius = randScale * (double)*(float*)(ymData + 0x3C);
     spread = (float)((double)*(float*)(vData + 0x1C) + scaledRadius);
 
+    sinValue = (double)ppvSinTbl[(angleIndex & 0xFFFF) >> 2];
     *(float*)(particle + 0x00) = ppvSinTbl[((angleIndex + 0x4000) & 0xFFFF) >> 2] * spread;
     *(float*)(particle + 0x10) = *(float*)(particle + 0x00);
     *(float*)(particle + 0x04) = (float)RandF__5CMathFf((double)*(float*)(ymData + 0x40), &Math);
     *(float*)(particle + 0x14) = *(float*)(particle + 0x04);
-    *(float*)(particle + 0x08) = ppvSinTbl[(angleIndex & 0xFFFF) >> 2] * spread;
+    *(float*)(particle + 0x08) = (float)(sinValue * (double)spread);
     *(float*)(particle + 0x18) = *(float*)(particle + 0x08);
 
     normalized.x = *(float*)(particle + 0x10);
@@ -107,8 +110,8 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     }
 
     *(u16*)(particle + 0x22) = (u16)*(u8*)(ymData + 0x48) +
-                               ((s16)r0 - (s16)((int)r0 / (int)(u32)*(u8*)(ymData + 0x49)) *
-                                              (u16)*(u8*)(ymData + 0x49));
+                               ((s16)randomValue - (s16)((int)randomValue / (int)(u32)*(u8*)(ymData + 0x49)) *
+                                                        (u16)*(u8*)(ymData + 0x49));
     *(u16*)(particle + 0x20) = (u16)*(u8*)(ymData + 0x24);
     *(u16*)(particle + 0x22) = (u16)*(u8*)(ymData + 0x25);
     *(u16*)(particle + 0x24) = (u16)*(u8*)(ymData + 0x26);
@@ -124,7 +127,8 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     scaledRadius = scaledRadius * (double)*(float*)(ymData + 0x14);
     parityScale = (float)scaledRadius;
     parityBits = (u32)scaledRadius;
-    if (((parityBits & 1U) ^ (parityBits >> 31)) != (parityBits >> 31)) {
+    paritySign = parityBits >> 31;
+    if (((parityBits & 1U) ^ paritySign) != paritySign) {
         parityScale = parityScale * FLOAT_80330668;
     }
     *(float*)(particle + 0x40) = *(float*)(ymData + 0x10) + parityScale;

@@ -171,45 +171,38 @@ void pppRenderColum(pppColum *column, UnkB *param_2, UnkC *param_3)
 void pppFrameColum(pppColum *column, UnkB *param_2, UnkC *param_3)
 {
     int i;
-    int* serializedDataOffsets;
     unsigned char* work;
+    float* values;
+    unsigned char count;
 
-    if (lbl_8032ED70 != 0) {
-        return;
-    }
-
-    serializedDataOffsets = GetColumSerializedDataOffsets(param_3);
-    work = (unsigned char*)((char*)column + 0x80 + serializedDataOffsets[3]);
-
-    if (*(void**)(work + 8) == 0) {
-        unsigned char count = *((unsigned char*)&param_2->m_arg3 + 1);
-        float* values = (float*)pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(count * 0xc),
-                                                                       pppEnvStPtr->m_stagePtr,
-                                                                       (char*)"pppColum.cpp", 0x7d);
-
-        *(void**)(work + 8) = values;
-        for (i = 0; i < (int)count; i++) {
-            values[0] = RandF__5CMathFf(*(float*)(param_2->m_payload + 4), &Math);
-            values[0] += *(float*)param_2->m_payload;
-            values[1] = RandF__5CMathFf(*(float*)(param_2->m_payload + 0xc), &Math);
-            values[1] += *(float*)(param_2->m_payload + 8);
-            ((unsigned char*)values)[8] =
-                GetNoise__5CUtilFUc(&DAT_8032ec70, (unsigned char)param_2->m_payload[0x16]);
-            ((unsigned char*)values)[9] =
-                GetNoise__5CUtilFUc(&DAT_8032ec70, (unsigned char)param_2->m_payload[0x17]);
-            ((unsigned char*)values)[10] =
-                GetNoise__5CUtilFUc(&DAT_8032ec70, (unsigned char)param_2->m_payload[0x18]);
-            values += 3;
+    if (lbl_8032ED70 == 0) {
+        work = (unsigned char*)((char*)column + 0x80 + param_3->m_serializedDataOffsets[3]);
+        if (*(void**)(work + 8) == 0) {
+            count = *((unsigned char*)&param_2->m_arg3 + 1);
+            *(void**)(work + 8) = pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)count * 0xc,
+                                                                         pppEnvStPtr->m_stagePtr,
+                                                                         (char*)"pppColum.cpp", 0x7d);
+            values = *(float**)(work + 8);
+            for (i = 0; i < (int)count; i++) {
+                values[0] = RandF__5CMathFf(*(float*)(param_2->m_payload + 4), &Math);
+                values[0] = values[0] + *(float*)param_2->m_payload;
+                values[1] = RandF__5CMathFf(*(float*)(param_2->m_payload + 0xc), &Math);
+                values[1] = values[1] + *(float*)(param_2->m_payload + 8);
+                *(unsigned char*)(values + 2) =
+                    GetNoise__5CUtilFUc(&DAT_8032ec70, (unsigned char)param_2->m_payload[0x16]);
+                *(unsigned char*)((char*)values + 9) =
+                    GetNoise__5CUtilFUc(&DAT_8032ec70, (unsigned char)param_2->m_payload[0x17]);
+                *(unsigned char*)((char*)values + 10) =
+                    GetNoise__5CUtilFUc(&DAT_8032ec70, (unsigned char)param_2->m_payload[0x18]);
+                values = values + 3;
+            }
         }
-    }
 
-    if (param_2->m_dataValIndex != 0xffff) {
-        long* shapeTable = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
-        short& shapeA = *(short*)(work + 0);
-        short& shapeB = *(short*)(work + 2);
-        short& shapeC = *(short*)(work + 4);
-
-        pppCalcFrameShape__FPlRsRsRss(shapeTable, shapeA, shapeB, shapeC, (short)param_2->m_initWOrk);
+        if (param_2->m_dataValIndex != 0xffff) {
+            pppCalcFrameShape__FPlRsRsRss(
+                *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4),
+                *(short*)(work + 0), *(short*)(work + 2), *(short*)(work + 4), (short)param_2->m_initWOrk);
+        }
     }
 }
 

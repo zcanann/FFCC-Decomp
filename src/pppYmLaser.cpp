@@ -7,7 +7,7 @@
 
 #include <string.h>
 
-extern CMath Math;
+extern CMath math;
 extern "C" float RandF__5CMathFf(float param, CMath* math);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
 extern struct _pppMngSt* pppMngStPtr;
@@ -137,7 +137,7 @@ extern "C" void pppConstructYmLaser(void* pppYmLaser_, void* param_2_)
 	*((u16*)((u8*)work + 0x30)) = 0;
 	*((u16*)((u8*)work + 0x34)) = 0;
 	*((u16*)((u8*)work + 0x32)) = 0;
-	work[14] = RandF__5CMathFf(FLOAT_80330dc0, &Math);
+	work[14] = RandF__5CMathFf(FLOAT_80330dc0, &math);
 }
 
 /*
@@ -180,8 +180,8 @@ extern "C" void pppConstruct2YmLaser(void* pppYmLaser_, void* param_2_)
 extern "C" void pppDestructYmLaser(void* pppYmLaser_, void* param_2_)
 {
 	pppYmLaser* pppYmLaser = (struct pppYmLaser*)pppYmLaser_;
-	YmLaserOffsets* param_2 = (YmLaserOffsets*)param_2_;
-	f32* work = (f32*)((u8*)pppYmLaser + 0x80 + param_2->m_serializedDataOffsets[2]);
+	YmLaserParam* param_2 = (YmLaserParam*)param_2_;
+	f32* work = (f32*)((u8*)pppYmLaser + 0x80 + param_2->offsets->m_serializedDataOffsets[2]);
 	void* stage = *(void**)(work + 7);
 
 	if (stage != 0) {

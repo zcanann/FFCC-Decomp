@@ -410,7 +410,7 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
 int CMapHit::CheckHitFaceCylinder(unsigned long mask)
 {
     for (int faceIndex = 0; faceIndex < m_faceCount; faceIndex++) {
-        unsigned char* face = Ptr(m_faces, faceIndex * 0x98);
+        unsigned char* face = Ptr(m_faces, faceIndex * 0x50);
         unsigned char groupIndex = face[0x47];
         unsigned char* mapMngBytes = reinterpret_cast<unsigned char*>(&MapMng);
         unsigned long groupMask = *reinterpret_cast<unsigned long*>(mapMngBytes + 0x214E8 + groupIndex * 0x14);
@@ -556,8 +556,6 @@ int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned
  */
 int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned short startFace, unsigned short faceCount, unsigned long mask)
 {
-    (void)position;
-
     const unsigned int start = static_cast<unsigned int>(startFace);
     const unsigned int end = start + static_cast<unsigned int>(faceCount);
     if (start >= static_cast<unsigned int>(m_faceCount)) {
@@ -565,13 +563,14 @@ int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned
     }
 
     g_hit_cyl = *mapCylinder;
+    g_hit_mvec = *position;
     s_hit_t_min = s_large_pos;
     s_hit_face_min = 0;
     s_hit_edge_index = -1;
 
     CMapHitFace* savedFaces = m_faces;
     const unsigned short savedFaceCount = m_faceCount;
-    m_faces = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, start * 0x98));
+    m_faces = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, start * 0x50));
     if (end >= static_cast<unsigned int>(savedFaceCount)) {
         m_faceCount = static_cast<unsigned short>(savedFaceCount - start);
     } else {

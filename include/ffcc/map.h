@@ -68,7 +68,7 @@ public:
     CMapObj* SearchChildMapObj(CMapObj*, CMapObj*);
     void SearchAtribMapObj(CMapObj*, CMapObjAtr::TYPE);
     void AttachMapHit(CMapHit*, char*);
-    void GetDebugPlaySta(int, Vec*);
+    int GetDebugPlaySta(int, Vec*);
     void SetLightSource();
     void SetBumpLightSource();
     void InitMapShadow();

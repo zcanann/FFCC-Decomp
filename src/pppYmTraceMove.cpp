@@ -22,36 +22,23 @@ extern "C" {
  */
 void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, UnkC* param_2)
 {
-	union {
-		Vec vec;
-		u32 words[3];
-	} local_20;
-
-	Vec local_38;
 	Vec* dest;
+	Vec local_20;
 	f32 zero;
-	u32 local_24;
-	u32 local_28;
-	u32 local_2c;
-	u32 local_18;
-	u32 local_1c;
-
-	local_2c = *(u32*)((u8*)pppMngStPtr + 0x58);
-	local_28 = *(u32*)((u8*)pppMngStPtr + 0x5c);
+	Vec local_38;
+	Vec local_2c;
 	dest = (Vec*)((u8*)pppYmTraceMove + 0x80 + *param_2->m_serializedDataOffsets);
-	local_24 = *(u32*)((u8*)pppMngStPtr + 0x60);
-	local_20.words[0] = *(u32*)((u8*)pppMngStPtr + 0x68);
-	local_1c = *(u32*)((u8*)pppMngStPtr + 0x6c);
-	local_18 = *(u32*)((u8*)pppMngStPtr + 0x70);
-	local_20.words[1] = local_1c;
-	local_20.words[2] = local_18;
-	pppSubVector__FR3Vec3Vec3Vec((Vec*)&dest[1].y, &local_20.vec, (Vec*)&local_2c);
-
+	local_2c.x = *(f32*)((u8*)pppMngStPtr + 0x58);
+	local_2c.y = *(f32*)((u8*)pppMngStPtr + 0x5c);
+	local_2c.z = *(f32*)((u8*)pppMngStPtr + 0x60);
+	local_20.x = *(f32*)((u8*)pppMngStPtr + 0x68);
+	local_20.y = *(f32*)((u8*)pppMngStPtr + 0x6c);
+	local_20.z = *(f32*)((u8*)pppMngStPtr + 0x70);
+	pppSubVector__FR3Vec3Vec3Vec((Vec*)&dest[1].y, &local_20, &local_2c);
 	local_38.x = dest[1].y;
 	local_38.y = dest[1].z;
 	local_38.z = dest[2].x;
 	pppCopyVector__FR3Vec3Vec(dest, &local_38);
-
 	zero = 0.0f;
 	dest[3].x = 0.0f;
 	dest[2].z = zero;

@@ -13,12 +13,15 @@ extern float FLOAT_80330ce8;
 extern float FLOAT_80330cec;
 extern float FLOAT_80330cf0;
 extern float FLOAT_80330cf4;
+extern float FLOAT_80330d00;
 extern float FLOAT_80330d10;
 extern float FLOAT_80330d30;
+extern double DOUBLE_80330d08;
 extern double DOUBLE_80330d18;
 extern double DOUBLE_80330d20;
 extern double DOUBLE_80330d28;
 extern float DAT_8032ec20;
+extern unsigned int DAT_800000f8;
 extern "C" void* PTR_PTR_s_CSound_8021056c;
 extern "C" void __ct__9CRedSoundFv(void*);
 extern "C" void __dt__6CSoundFv(void*);
@@ -28,6 +31,13 @@ extern "C" int ReentryWaveData__9CRedSoundFi(CRedSound*, int);
 extern "C" int SePlayState__9CRedSoundFi(CRedSound*, int);
 extern "C" int ReportSeLoop__9CRedSoundFi(CRedSound*, int);
 extern "C" int GetSeVolume__9CRedSoundFii(CRedSound*, int, int);
+extern "C" unsigned int GetProgramTime__9CRedSoundFv(CRedSound*);
+extern "C" void SePause__9CRedSoundFii(CRedSound*, int, int);
+extern "C" void StreamPause__9CRedSoundFii(CRedSound*, int, int);
+extern "C" void ReportPrint__9CRedSoundFi(CRedSound*, int);
+extern "C" void TestProcess__9CRedSoundFi(CRedSound*, int);
+extern "C" void DisplayWaveInfo__9CRedSoundFv(CRedSound*);
+extern "C" void DisplaySePlayInfo__9CRedSoundFv(CRedSound*);
 extern "C" void SeStop__9CRedSoundFi(CRedSound*, int);
 extern "C" void SePan__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" void SeVolume__9CRedSoundFiii(CRedSound*, int, int, int);
@@ -514,9 +524,12 @@ void CSound::Realloc(int isMinMemoryMode)
  * Address:	TODO
  * Size:	TODO
  */
-void CSound::GetPerformance()
+float CSound::GetPerformance()
 {
-	// TODO
+    unsigned int programTime = GetProgramTime__9CRedSoundFv(reinterpret_cast<CRedSound*>(this));
+    float numer = (float)(programTime / 0xF);
+    float denom = (float)(((DAT_800000f8 / 500000) * 0x8235) >> 3);
+    return FLOAT_80330d00 * (numer / denom);
 }
 
 /*
@@ -524,9 +537,13 @@ void CSound::GetPerformance()
  * Address:	TODO
  * Size:	TODO
  */
-void CSound::PauseDiscError(int)
+void CSound::PauseDiscError(int pause)
 {
-	// TODO
+    if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x22D0) == 0) {
+        int paused = (-pause | pause) >> 0x1F;
+        SePause__9CRedSoundFii(reinterpret_cast<CRedSound*>(this), -1, paused);
+        StreamPause__9CRedSoundFii(reinterpret_cast<CRedSound*>(this), -1, paused);
+    }
 }
 
 /*
@@ -534,9 +551,16 @@ void CSound::PauseDiscError(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CSound::CheckDriver(int)
+void CSound::CheckDriver(int mode)
 {
-	// TODO
+    unsigned int oldPrint = *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x22D4);
+    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x22D4) = 1;
+    ReportPrint__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), 1);
+    TestProcess__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), mode);
+    DisplayWaveInfo__9CRedSoundFv(reinterpret_cast<CRedSound*>(this));
+    DisplaySePlayInfo__9CRedSoundFv(reinterpret_cast<CRedSound*>(this));
+    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x22D4) = oldPrint;
+    ReportPrint__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), (-oldPrint | oldPrint) >> 0x1F);
 }
 
 /*

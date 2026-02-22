@@ -21,9 +21,42 @@ extern "C" void CmdInit2__8CMenuPcsFv(CMenuPcs*);
 extern "C" int CanPlayerPutItem__12CCaravanWorkFv(void*);
 extern "C" void ChgEquipPos__12CCaravanWorkFii(void*, int, int);
 extern "C" void CalcStatus__12CCaravanWorkFv(void*);
+extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
+extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
+extern "C" void DrawRect__8CMenuPcsFUlfffffffff(double, double, double, double, double, double, double, double, CMenuPcs*,
+                                                 int);
+extern "C" void DrawRect__8CMenuPcsFUlffffffP8_GXColorfff(double, double, double, double, double, double, double, double,
+                                                           CMenuPcs*, int, void*);
+extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(double, CMenuPcs*, int, int, int, float);
+extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
+extern "C" s16* GetLetterBuffer__6JoyBusFi(void*, int);
+extern "C" int CalcListPos__8CMenuPcsFiii(CMenuPcs*, int, int, int);
+extern "C" void DrawListPosMark__8CMenuPcsFfff(double, double, double, CMenuPcs*);
+extern "C" void DrawCursor__8CMenuPcsFiif(double, CMenuPcs*, int, int);
+extern "C" void DrawEquipMark__8CMenuPcsFiif(double, CMenuPcs*, int, int);
+extern "C" void DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(CMenuPcs*, int);
+extern "C" int GetAttrStr__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
+extern "C" int GetWidth__5CFontFPc(void*, int);
+extern "C" void SetMargin__5CFontFf(float, void*);
+extern "C" void SetShadow__5CFontFi(void*, int);
+extern "C" void SetScale__5CFontFf(float, void*);
+extern "C" void DrawInit__5CFontFv(void*);
+extern "C" void SetColor__5CFontF8_GXColor(void*, void*);
+extern "C" void SetPosX__5CFontFf(float, void*);
+extern "C" void SetPosY__5CFontFf(float, void*);
+extern "C" void Draw__5CFontFPc(void*, int);
 
 extern float FLOAT_80332eb8;
 extern float FLOAT_80332ee0;
+extern float FLOAT_80332ee4;
+extern float FLOAT_80332ee8;
+extern float FLOAT_80332eec;
+extern float FLOAT_80332ef0;
+extern float FLOAT_80332ef4;
+extern float FLOAT_80332ef8;
+extern float FLOAT_80332efc;
+extern float FLOAT_80332f00;
 extern float FLOAT_80332f10;
 extern float FLOAT_80332f14;
 extern float FLOAT_80332f18;
@@ -523,12 +556,131 @@ void CMenuPcs::EquipClose()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015bc50
+ * PAL Size: 4280b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::EquipDraw()
 {
-	// TODO
+	int menuState = *(int*)((char*)this + 0x82c);
+	int mode = (int)*(s16*)(menuState + 0x30);
+	u32 caravanWork = Game.game.m_scriptFoodBase[0];
+	s16* menuData = *(s16**)((char*)this + 0x850);
+	s16* item = menuData + 4;
+	int helpItem = -1;
+
+	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+
+	for (int i = 0; i < menuData[0]; i++) {
+		if (*(int*)(item + 0xe) >= 0) {
+			double x = (double)(float)((double)item[0] - DOUBLE_80332ed8);
+			double y = (double)*(float*)(item + 4);
+			double w = (double)(float)((double)item[2] - DOUBLE_80332ed8);
+			double h = (double)(float)((double)item[3] - DOUBLE_80332ed8);
+			double sx = (double)*(float*)(item + 6);
+			int tex = *(int*)(item + 0xe);
+
+			if ((mode == 0) && (i == (int)*(s16*)(menuState + 0x26))) {
+				sx = sx + h;
+			}
+
+			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
+			DrawRect__8CMenuPcsFUlfffffffff(x, (double)(float)((double)item[1] - DOUBLE_80332ed8), w, h, y, sx,
+			                                (double)*(float*)(item + 10), (double)*(float*)(item + 10), this, 0);
+		}
+		item += 0x20;
+	}
+
+	item = menuData + 4;
+	for (int i = 0; i < 4; i++) {
+		if (*(s16*)(caravanWork + 0xac + i * 2) >= 0) {
+			int iconY = item[1] + 6;
+			int iconX = item[0] + item[2] - 0x10;
+			int itemIdx = *(s16*)(caravanWork + *(s16*)(caravanWork + 0xac + i * 2) * 2 + 0xb6);
+			DrawSingleIcon__8CMenuPcsFiiifif((double)*(float*)(item + 8), this, itemIdx, iconX, iconY, 0.0f);
+		}
+		item += 0x20;
+	}
+
+	void* font = *(void**)((char*)this + 0x108);
+	SetMargin__5CFontFf(FLOAT_80332ee0, font);
+	SetShadow__5CFontFi(font, 0);
+	SetScale__5CFontFf(FLOAT_80332ee8, font);
+	DrawInit__5CFontFv(font);
+
+	item = menuData + 4;
+	for (int i = 0; i < 4; i++) {
+		if (*(s16*)(caravanWork + 0xac + i * 2) >= 0) {
+			u8 alpha = (u8)(FLOAT_80332ee4 * *(float*)(item + 8));
+			u32 color = (u32)alpha | 0xFFFFFF00;
+			SetColor__5CFontF8_GXColor(font, &color);
+			int itemIdx = *(s16*)(caravanWork + *(s16*)(caravanWork + 0xac + i * 2) * 2 + 0xb6);
+			int str = GetAttrStr__8CMenuPcsFi(this, itemIdx);
+			if ((mode == 0) && (i == (int)*(s16*)(menuState + 0x26))) {
+				helpItem = itemIdx;
+			}
+			double textX = (double)item[0] + ((double)item[2] - (double)GetWidth__5CFontFPc(font, str)) * DOUBLE_80332ed0;
+			double textY = (double)item[1] + 11.0;
+			SetPosX__5CFontFf((float)textX, font);
+			SetPosY__5CFontFf((float)(textY - (double)FLOAT_80332eec), font);
+			Draw__5CFontFPc(font, str);
+		}
+		item += 0x20;
+	}
+	DrawInit__8CMenuPcsFv(this);
+
+	if ((mode == 1) && (*(s16*)(menuState + 0x12) == 1)) {
+		s16* listStart = menuData + menuData[0] * 0x20 + 4;
+		s16* letter = GetLetterBuffer__6JoyBusFi(&Joybus, 0);
+		double pos = (double)CalcListPos__8CMenuPcsFiii(this, (int)*(s16*)(menuState + 0x34), (int)letter[0], 0);
+		if (pos > (double)FLOAT_80332eb8) {
+			DrawListPosMark__8CMenuPcsFfff((double)listStart[0], (double)listStart[1], pos, this);
+		}
+	}
+
+	if (((mode == 0) && (*(s16*)(menuState + 0x10) == 1)) || ((mode != 0) && (*(s16*)(menuState + 0x12) == 1))) {
+		s16* cursorItem;
+		if (mode == 0) {
+			cursorItem = (s16*)((char*)menuData + *(s16*)(menuState + 0x26) * 0x40 + 8);
+		} else {
+			s16* listBase = menuData + menuData[0] * 0x20 + 4;
+			cursorItem = listBase + *(s16*)(menuState + 0x28) * 0x20;
+		}
+		int cursorX = (int)((double)cursorItem[1] + ((double)(cursorItem[3] - 0x20) * DOUBLE_80332ed0));
+		int frame = (int)System.m_frameCounter;
+		int cursorY = (cursorItem[0] - 0x14) + (frame & 7);
+		DrawCursor__8CMenuPcsFiif((double)FLOAT_80332ee0, this, cursorY, cursorX);
+	}
+
+	if ((mode == 1) && (*(s16*)(menuState + 0x12) == 1)) {
+		s16* letter = GetLetterBuffer__6JoyBusFi(&Joybus, 0);
+		int idx = *(s16*)(menuState + 0x28) + *(s16*)(menuState + 0x34);
+		if ((idx > 0) && (idx < letter[0]) && (letter[idx] >= 0)) {
+			if (EquipChk__8CMenuPcsFi(this, (int)letter[idx]) != 0) {
+				s16* listBase = menuData + menuData[0] * 0x20 + 4;
+				s16* markItem = listBase + *(s16*)(menuState + 0x28) * 0x20;
+				int markX = (int)((double)markItem[0] - (double)FLOAT_80332ef0);
+				int markY = (int)(((double)markItem[3] - (double)FLOAT_80332ef4) * DOUBLE_80332ed0 + (double)markItem[1]);
+				DrawEquipMark__8CMenuPcsFiif((double)*(float*)(markItem + 8), this, markX, markY);
+			}
+		}
+	}
+
+	int listIndex = (int)*(s16*)(menuState + mode * 2 + 0x26) + (int)*(s16*)(menuState + 0x34);
+	if ((mode == 1) && (listIndex < 1)) {
+		helpItem = -1;
+	}
+	if (((mode == 0) && (*(s16*)(menuState + 0x2c) == 0)) && (helpItem < 0)) {
+		helpItem = 0x267;
+	}
+	DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(this, helpItem);
+	if ((mode == 1) && (listIndex < 1)) {
+		DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(this, 0x265);
+	}
 }
 
 /*

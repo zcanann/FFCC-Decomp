@@ -1,6 +1,8 @@
 #include "ffcc/gbaque.h"
 #include "ffcc/cflat_runtime.h"
+#include "ffcc/cflat_runtime2.h"
 #include "ffcc/game.h"
+#include "ffcc/gobject.h"
 #include "ffcc/gobjwork.h"
 #include "ffcc/joybus.h"
 #include "ffcc/p_game.h"
@@ -11,6 +13,8 @@
 extern void* ARRAY_802f49b0;
 extern "C" void __dt__8GbaQueueFv(void*);
 extern __declspec(section ".data") CFlatRuntime CFlat;
+extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
+extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 
 /*
  * --INFO--
@@ -565,12 +569,71 @@ void GbaQueue::LoadEnemyStat()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800cebe4
+ * PAL Size: 436b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void GbaQueue::LoadMapItemStat()
 {
-	// TODO
+	unsigned char localMapItems[0x140];
+	char numMapItems;
+	CGObject* object;
+	GbaQueue* semaphoreIter;
+	int i;
+
+	memset(localMapItems, 0, sizeof(localMapItems));
+	numMapItems = 0;
+
+	if (reinterpret_cast<unsigned int*>(&CFlat)[0x1041] != 0) {
+		unsigned char* mapItemEntry = localMapItems;
+		object = FindGObjFirst__13CFlatRuntime2Fv(&CFlat);
+
+		while (object != 0) {
+			if ((object->m_objectFlags & 0x100) != 0) {
+				if ((object->m_dropItemCodes[0] & 0xC000) == 0x4000) {
+					mapItemEntry[1] = 4;
+				} else {
+					const int itemDataBase = Game.game.unkCFlatData0[2];
+					const int bossStageLimit = Game.game.m_gameWork.m_bossArtifactStageTable[Game.game.m_gameWork.m_bossArtifactStageIndex] + 2;
+					const int itemStage = *reinterpret_cast<unsigned short*>(itemDataBase + object->m_dropItemCodes[0] * 0x48 + 0xC);
+					mapItemEntry[1] = (itemStage < bossStageLimit) ? 4 : 5;
+				}
+
+				typedef int (*IsDispRadarFn)(CGObject*);
+				int isDispRader = reinterpret_cast<IsDispRadarFn>((*reinterpret_cast<void***>(object))[0xB])(object);
+				numMapItems++;
+				mapItemEntry[2] = static_cast<unsigned char>((-isDispRader | isDispRader) >> 31);
+				*reinterpret_cast<short*>(mapItemEntry + 8) = static_cast<short>(object->m_worldPosition.x / 100.0f);
+				*reinterpret_cast<short*>(mapItemEntry + 0xA) = static_cast<short>(object->m_worldPosition.z / 100.0f);
+				mapItemEntry += 0x14;
+			}
+
+			object = FindGObjNext__13CFlatRuntime2FP8CGObject(&CFlat, object);
+		}
+	}
+
+	reinterpret_cast<char*>(this)[0x2AF4] = numMapItems;
+
+	i = 0;
+	semaphoreIter = this;
+	do {
+		OSWaitSemaphore(semaphoreIter->accessSemaphores);
+		i++;
+		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+	} while (i < 4);
+
+	memcpy(reinterpret_cast<char*>(this) + 0x2434, localMapItems, sizeof(localMapItems));
+
+	i = 0;
+	semaphoreIter = this;
+	do {
+		OSSignalSemaphore(semaphoreIter->accessSemaphores);
+		i++;
+		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+	} while (i < 4);
 }
 
 /*

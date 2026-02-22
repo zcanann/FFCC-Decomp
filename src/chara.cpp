@@ -83,7 +83,11 @@ void CChara::FlipDBuffer()
  */
 void CChara::gqrInit(unsigned long, unsigned long, unsigned long)
 {
-	// TODO
+	asm {
+		mtspr GQR5, r4
+		mtspr GQR6, r5
+		mtspr GQR7, r6
+	}
 }
 
 /*

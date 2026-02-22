@@ -1,8 +1,10 @@
 #include "ffcc/memory.h"
+#include "ffcc/graphic.h"
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
 #include "ffcc/stopwatch.h"
 #include "ffcc/system.h"
+#include <dolphin/gx.h>
 #include "dolphin/os/OSMemory.h"
 #include <string.h>
 
@@ -14,7 +16,26 @@ extern char DAT_801d6a7c[];
 extern char DAT_801d6c58[];
 extern char DAT_801d6c88[];
 extern char DAT_801d6c98[];
+extern char DAT_801d67d8[];
+extern char s__4d__4d__4d_801d6800[];
+extern unsigned int DAT_801d64a8;
+extern unsigned int DAT_801d64ac;
+extern unsigned int DAT_801d64b0;
+extern unsigned int DAT_801d64b4;
+extern unsigned int DAT_801d64b8;
+extern unsigned int DAT_801d64bc;
+extern unsigned int DAT_801d64c0;
+extern unsigned int DAT_801d64c4;
+extern unsigned int DAT_801d64c8;
+extern unsigned int DAT_801d64cc;
+extern unsigned int DAT_801d64d0;
+extern unsigned int DAT_801d64d4;
+extern unsigned int DAT_801d64d8;
+extern unsigned int DAT_801d64dc;
+extern unsigned int DAT_801d64e0;
+extern unsigned int DAT_801d64e4;
 extern "C" void Printf__7CSystemFPce(CSystem* system, char* format, ...);
+extern "C" int sprintf(char*, const char*, ...);
 extern "C" int DMAEntry__9CRedSoundFiiiiiPFPv_vPv(
     void*, int, int, int, int, int, void (*)(void*), void*);
 extern "C" int DMACheck__9CRedSoundFi(void*, int);
@@ -810,32 +831,182 @@ int CMemory::CStage::heapWalker(int flag, void*, unsigned long group)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001DB48
+ * PAL Size: 1088b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMemory::CStage::drawHeapBar(int)
+void CMemory::CStage::drawHeapBar(int y)
 {
-	// TODO
+    unsigned int colors[16];
+    colors[0] = DAT_801d64a8;
+    colors[1] = DAT_801d64ac;
+    colors[2] = DAT_801d64b0;
+    colors[3] = DAT_801d64b4;
+    colors[4] = DAT_801d64b8;
+    colors[5] = DAT_801d64bc;
+    colors[6] = DAT_801d64c0;
+    colors[7] = DAT_801d64c4;
+    colors[8] = DAT_801d64c8;
+    colors[9] = DAT_801d64cc;
+    colors[10] = DAT_801d64d0;
+    colors[11] = DAT_801d64d4;
+    colors[12] = DAT_801d64d8;
+    colors[13] = DAT_801d64dc;
+    colors[14] = DAT_801d64e0;
+    colors[15] = DAT_801d64e4;
+
+    int mode = stageGetAllocationMode(this);
+    int node = (mode == 2) ? stageGetHeapHead(this) : *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
+    int prev = *reinterpret_cast<int*>(node + 4);
+    unsigned char heapBar[0x17d];
+    memset(heapBar, 0xFF, 0x17d);
+
+    int heapTop = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 8);
+    int heapSpan = (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0xC) - 0x40) - heapTop;
+
+    while (true) {
+        unsigned char flags = *reinterpret_cast<unsigned char*>(node + 2);
+        if ((flags & 2) != 0) {
+            unsigned char currentColor = heapBar[0];
+            int x0 = 0;
+
+            for (int x1 = 0; x1 < 0x17c; x1++) {
+                if ((currentColor != heapBar[x1]) || (x1 == 0x17b)) {
+                    unsigned int color;
+                    if (currentColor == 0xFF) {
+                        color = (mode == 0) ? 0x4080 : 0x400080;
+                    } else {
+                        color = colors[currentColor];
+                    }
+
+                    GXBegin(static_cast<GXPrimitive>(0x98), GX_VTXFMT0, 4);
+                    GXPosition3f32(static_cast<float>(x0 + 0x80), static_cast<float>(y), 0.0f);
+                    GXColor1u32(color);
+                    GXPosition3f32(static_cast<float>(x1 + 0x80), static_cast<float>(y), 0.0f);
+                    GXColor1u32(color);
+                    GXPosition3f32(static_cast<float>(x0 + 0x80), static_cast<float>(y + 8), 0.0f);
+                    GXColor1u32(color);
+                    GXPosition3f32(static_cast<float>(x1 + 0x80), static_cast<float>(y + 8), 0.0f);
+                    GXColor1u32(color);
+
+                    currentColor = heapBar[x1];
+                    x0 = x1;
+                }
+            }
+            return;
+        }
+
+        bool isAllocated = ((flags & 4) != 0) && ((flags & 3) == 0);
+        if (isAllocated) {
+            int fillEnd = ((*reinterpret_cast<int*>(node + 8) - heapTop) * 0x17c) / heapSpan;
+            int fillStart = (((node + 0x40) - heapTop) * 0x17c) / heapSpan;
+            if (fillStart <= fillEnd) {
+                unsigned char fillColor = static_cast<unsigned char>(flags >> 4);
+                unsigned int fillCount = static_cast<unsigned int>(fillEnd + 1 - fillStart);
+                unsigned char* dst = heapBar + fillStart;
+                for (unsigned int i = 0; i < fillCount; i++) {
+                    *dst++ = fillColor;
+                }
+            }
+        }
+
+        int next = *reinterpret_cast<int*>(node + 8);
+        if ((*reinterpret_cast<int*>(node + 0x10) != next - (node + 0x40)) ||
+            (*reinterpret_cast<int*>(node + 4) != prev)) {
+            if (System.m_execParam != 0) {
+                Printf__7CSystemFPce(&System, DAT_801d67d8);
+            }
+            return;
+        }
+        prev = node;
+        node = next;
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001D9BC
+ * PAL Size: 396b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMemory::CStage::drawHeapTitle(int)
+void CMemory::CStage::drawHeapTitle(int y)
 {
-	// TODO
+    int node = (stageGetAllocationMode(this) == 2) ? stageGetHeapHead(this) : *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
+    unsigned int totalUnuse = 0;
+    unsigned int maxUnuse = 0;
+    int prev = *reinterpret_cast<int*>(node + 4);
+
+    while (true) {
+        unsigned char flags = *reinterpret_cast<unsigned char*>(node + 2);
+        if ((flags & 2) != 0) {
+            char line[264];
+            int srcLen = strlen(stageGetSourceName(this));
+            int start = srcLen - 12;
+            if (start < 0) {
+                start = 0;
+            }
+            strcpy(line, stageGetSourceName(this) + start);
+            Graphic.DrawDebugStringDirect(0x10, static_cast<unsigned short>(y), line, 8);
+
+            int totalUnuseKB = (static_cast<int>(totalUnuse) >> 10) +
+                static_cast<int>((static_cast<int>(totalUnuse) < 0) && ((totalUnuse & 0x3FF) != 0));
+            int maxUnuseKB = (static_cast<int>(maxUnuse) >> 10) +
+                static_cast<int>((static_cast<int>(maxUnuse) < 0) && ((maxUnuse & 0x3FF) != 0));
+            sprintf(line, s__4d__4d__4d_801d6800, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x124),
+                    totalUnuseKB, maxUnuseKB);
+            Graphic.DrawDebugStringDirect(0x208, static_cast<unsigned short>(y), line, 8);
+            return;
+        }
+
+        if ((flags & 4) == 0) {
+            unsigned int blockSize = static_cast<unsigned int>(*reinterpret_cast<int*>(node + 8) - (node + 0x40));
+            totalUnuse += blockSize;
+            if (maxUnuse < blockSize) {
+                maxUnuse = blockSize;
+            }
+        }
+
+        if ((*reinterpret_cast<int*>(node + 0x10) != *reinterpret_cast<int*>(node + 8) - (node + 0x40)) ||
+            (*reinterpret_cast<int*>(node + 4) != prev)) {
+            break;
+        }
+        prev = node;
+        node = *reinterpret_cast<int*>(node + 8);
+    }
+
+    if (System.m_execParam != 0) {
+        Printf__7CSystemFPce(&System, DAT_801d67d8);
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001D964
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMemory::CStage::GetHeapUnuse()
+int CMemory::CStage::GetHeapUnuse()
 {
-	// TODO
+    int node = (stageGetAllocationMode(this) == 2) ? stageGetHeapHead(this) : *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
+    int total = 0;
+
+    while ((*reinterpret_cast<unsigned char*>(node + 2) & 2) == 0) {
+        if ((*reinterpret_cast<unsigned char*>(node + 2) & 4) == 0) {
+            total += *reinterpret_cast<int*>(node + 0x10);
+        }
+        node = *reinterpret_cast<int*>(node + 8);
+    }
+
+    return total;
 }
 
 /*

@@ -162,6 +162,13 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, UnkB* param_2, UnkC* param_3)
     u32 i;
     Vec* source;
     u8* work;
+    Vec local_a8;
+    Vec local_9c;
+    Vec local_90;
+    Vec local_84;
+    Mtx MStack_78;
+    u32 uStack_44;
+    u32 uStack_3c;
     YmTracer2Step* step = (YmTracer2Step*)param_2;
 
     if (DAT_8032ed70 != 0) {
@@ -216,9 +223,6 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, UnkB* param_2, UnkC* param_3)
         pfVar6 = (float*)((u8*)source + iVar8 * 0x28);
 
         for (; (s32)i <= iVar8; iVar8--) {
-            Vec local_a8;
-            Vec local_9c;
-
             *(u8*)(pfVar6 + 0x12) = *(u8*)(pfVar6 + 8);
             local_a8.x = *pfVar6;
             dest = (Vec*)((u8*)source + (iVar8 + 1) * 0x28);
@@ -259,16 +263,10 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, UnkB* param_2, UnkC* param_3)
         *((u8*)&pVVar10[2].y + 2) = ((u8*)pppYmTracer2)[iVar4 + 0x8A];
 
         if (i == 0) {
-            Mtx MStack_78;
-
             PSMTXConcat(pppMngStPtr->m_matrix.value, *(Mtx*)((u8*)pppYmTracer2 + 4), MStack_78);
             PSMTXMultVec(MStack_78, source, source);
             PSMTXMultVec(MStack_78, (Vec*)&source[1].y, (Vec*)&source[1].y);
         } else if (!useFallback) {
-            Mtx MStack_78;
-            u32 uStack_44;
-            u32 uStack_3c;
-
             uStack_3c = i ^ 0x80000000;
             uStack_44 = (step->m_payload[9] + 1) ^ 0x80000000;
             if (GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(
@@ -290,9 +288,6 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, UnkB* param_2, UnkC* param_3)
         Vec* pFallback = source;
 
         for (iVar4 = 0; iVar4 < (s32)(u32)*(u16*)(step->m_payload + 4); iVar4++) {
-            Vec local_84;
-            Vec local_90;
-
             local_84.x = source->x;
             local_84.y = source->y;
             local_84.z = source->z;

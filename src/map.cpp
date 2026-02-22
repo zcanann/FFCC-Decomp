@@ -1667,7 +1667,13 @@ void CMapMng::Calc()
  */
 void CMapMng::DrawMapShadow()
 {
-	// TODO
+    if (*reinterpret_cast<short*>(Ptr(this, 0xC)) != 0) {
+        CPtrArray<CMapShadow*>* mapShadowArray = reinterpret_cast<CPtrArray<CMapShadow*>*>(Ptr(this, 0x21434));
+        for (unsigned int i = 0; i < mapShadowArray->GetSize(); i++) {
+            CMapShadow* mapShadow = (*mapShadowArray)[i];
+            mapShadow->Draw();
+        }
+    }
 }
 
 /*

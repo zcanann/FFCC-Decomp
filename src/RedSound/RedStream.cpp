@@ -55,6 +55,7 @@ done:
  * Address:	TODO
  * Size:	TODO
  */
+#pragma dont_inline on
 void _StreamStop(RedStreamDATA* streamData)
 {
 	fflush(&DAT_8021d1a8);
@@ -81,6 +82,7 @@ void _StreamStop(RedStreamDATA* streamData)
 		}
 	}
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--

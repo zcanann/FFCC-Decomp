@@ -114,7 +114,7 @@ void pppConstructLaser(struct pppLaser *pppLaser, struct UnkC *param_2)
     pfVar3[3] = FLOAT_80333428;
     pfVar3[2] = FLOAT_80333428;
     pfVar3[1] = FLOAT_80333428;
-    *(u32*)((u8*)pfVar3 + 0x1c) = 0;
+    pfVar3[7] = FLOAT_80333428;
     pfVar3[10] = FLOAT_80333428;
     pfVar3[9] = FLOAT_80333428;
     pfVar3[8] = FLOAT_80333428;

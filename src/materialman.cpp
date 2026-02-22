@@ -3,6 +3,7 @@
 #include "ffcc/chunkfile.h"
 #include "ffcc/textureman.h"
 #include "ffcc/vector.h"
+#include "ffcc/graphic.h"
 
 #include <dolphin/mtx.h>
 
@@ -29,6 +30,7 @@ extern "C" void _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevS
 extern "C" void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(int, int, int,
                                                                                                         int, int, int);
 extern "C" int CheckFrustum__6CBoundFR3VecPA4_ff(CBound*, Vec*, float (*)[4], float);
+extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int*, int*, int*, int*, int);
 extern "C" void SetShadow__12CMaterialManFR10CMapShadowPA4_fiUl(
     CMaterialMan*, CMapShadow*, float (*)[4], int, unsigned long);
 class CMapKeyFrame;
@@ -41,13 +43,19 @@ extern "C" void* __vt__9CMaterial[];
 extern "C" void* PTR_PTR_s_CMaterialSet_801e9bbc;
 extern CMemory Memory;
 extern CTextureMan TextureMan;
+extern CGraphic Graphic;
 class CMapMng;
 extern CMapMng MapMng;
+extern unsigned char CameraPcs[];
 extern unsigned char MaterialMan[];
 extern float FLOAT_8032faf0;
 extern float FLOAT_8032faf4;
 extern float FLOAT_8032faf8;
 extern float FLOAT_8032fafc;
+extern float FLOAT_8032fb08;
+extern float FLOAT_8032fb0c;
+extern float FLOAT_8032fb10;
+extern float FLOAT_8032fb14;
 static const char s_materialStageName[] = "material";
 
 class CMapKeyFrame
@@ -485,12 +493,43 @@ void CMaterialMan::addtev_full_shadow(long)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80042010
+ * PAL Size: 368b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMaterialMan::SetUnderWaterTex()
 {
-	// TODO
+    int x = 0;
+    int y = 0;
+    int width = 0x280;
+    int height = 0x1C0;
+
+    *reinterpret_cast<int*>(Ptr(this, 0xC)) = GetBackBufferRect__8CGraphicFRiRiRiRii(&Graphic, &x, &y, &width, &height, 1);
+    if (*reinterpret_cast<int*>(Ptr(this, 0xC)) == 0) {
+        return;
+    }
+
+    Mtx matrixA;
+    Mtx matrixB;
+    Mtx44 screenMtx;
+    PSMTXIdentity(matrixA);
+    PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcs + 0x48), screenMtx);
+    PSMTXCopy(*reinterpret_cast<Mtx*>(CameraPcs + 0x4), matrixB);
+
+    matrixA[0][0] = screenMtx[0][0] * (FLOAT_8032fb08 / static_cast<float>(width));
+    matrixA[1][1] = screenMtx[1][1] * -(FLOAT_8032fb0c / static_cast<float>(height));
+    matrixA[1][0] = screenMtx[1][0];
+    matrixA[2][0] = screenMtx[2][0];
+    matrixA[0][1] = screenMtx[0][1];
+    matrixA[2][1] = screenMtx[2][1];
+    matrixA[0][2] = FLOAT_8032fb10;
+    matrixA[1][2] = FLOAT_8032fb10;
+    matrixA[2][2] = FLOAT_8032fb14;
+
+    PSMTXConcat(matrixA, matrixB, reinterpret_cast<MtxPtr>(Ptr(this, 0x10)));
 }
 
 /*

@@ -6,6 +6,7 @@
 #include "ffcc/mapshadow.h"
 #include "ffcc/maptexanim.h"
 #include "ffcc/materialman.h"
+#include "ffcc/p_game.h"
 #include "ffcc/p_light.h"
 #include "ffcc/system.h"
 
@@ -55,8 +56,10 @@ extern char DAT_801d7384[];
 extern char DAT_801d73c4[];
 extern CLightPcs LightPcs;
 extern CMath Math;
+extern unsigned char DAT_8032ecb9;
 
 static char s_map_cpp[] = "map.cpp";
+static char s_CMapMng_mapmng[] = "CMapMng.mapmng";
 static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
 static char s_ptrarray_grow_error[] = "CPtrArray grow error";
 
@@ -1275,12 +1278,47 @@ void CMapKeyFrame::ReadKey(CChunkFile& chunkFile, int count)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003368c
+ * PAL Size: 304b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapMng::Create()
 {
-	// TODO
+    *reinterpret_cast<unsigned int*>(Ptr(this, 4)) = 0;
+    *reinterpret_cast<unsigned short*>(Ptr(this, 0x10)) = 0;
+    *reinterpret_cast<unsigned short*>(Ptr(this, 0xE)) = 0;
+    *reinterpret_cast<unsigned short*>(Ptr(this, 0xC)) = 0;
+    *reinterpret_cast<unsigned short*>(Ptr(this, 8)) = 0;
+    *reinterpret_cast<unsigned char*>(Ptr(this, 0x2298C)) = 0xFF;
+    *reinterpret_cast<unsigned char*>(Ptr(this, 0x2298D)) = 0xFF;
+    *reinterpret_cast<unsigned char*>(Ptr(this, 0x2298E)) = 0xFF;
+    *reinterpret_cast<unsigned char*>(Ptr(this, 0x2298F)) = 0xFF;
+
+    if (Game.game.m_currentSceneId == 3) {
+        *reinterpret_cast<unsigned char*>(Ptr(this, 0x22988)) = 0;
+    } else {
+        *reinterpret_cast<unsigned char*>(Ptr(this, 0x22988)) = 1;
+    }
+
+    *reinterpret_cast<unsigned int*>(Ptr(this, 0x22A6C)) = 0;
+    *reinterpret_cast<unsigned int*>(Ptr(this, 0x228E8)) = 0;
+
+    CMemory::CStage* stage = Memory.CreateStage(0x540000, s_CMapMng_mapmng, 0);
+    *reinterpret_cast<CMemory::CStage**>(this) = stage;
+
+    reinterpret_cast<CPtrArray<CMapAnimRun*>*>(Ptr(this, 0x213E0))->SetStage(stage);
+    reinterpret_cast<CPtrArray<CMapAnim*>*>(Ptr(this, 0x213FC))->SetStage(stage);
+    reinterpret_cast<CPtrArray<CMapAnimKeyDt*>*>(Ptr(this, 0x21418))->SetStage(stage);
+    reinterpret_cast<CPtrArray<CMapShadow*>*>(Ptr(this, 0x21434))->SetStage(stage);
+
+    for (int i = 0; i < 2; i++) {
+        reinterpret_cast<CPtrArray<CMapLightHolder*>*>(Ptr(this, 0x21450 + (i * 0x1C)))->SetStage(stage);
+    }
+
+    DAT_8032ecb9 = 0;
 }
 
 /*

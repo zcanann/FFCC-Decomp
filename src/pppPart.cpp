@@ -20,6 +20,8 @@
 #include "ffcc/pppShape.h"
 #include "ffcc/gxfunc.h"
 
+#include <string.h>
+
 static const float kPppZero = 0.0; // FLOAT_8032fddc
 static const float kPppOne = 1.0; // FLOAT_8032fdfc
 static const double kScaleConstA = 4503601774854144.0; // DOUBLE_803304b0
@@ -44,8 +46,13 @@ extern "C" unsigned char lbl_8032ED78;
 extern "C" int DAT_8032ed70;
 extern "C" int DAT_8032ed7c;
 extern "C" unsigned int DAT_8032ed80;
+extern "C" unsigned char PartPcs[];
 extern "C" unsigned char CFlat[];
 extern "C" void* CAMemCacheSet;
+extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" void __dl__FPv(void*);
+extern "C" unsigned short SetData__13CAmemCacheSetFPviQ210CAmemCache4TYPEi(CAmemCacheSet*, void*, int, CAmemCache::TYPE,
+                                                                            int);
 extern "C" void SetPart__9CLightPcsFQ29CLightPcs6TARGETPvUc(CLightPcs*, int, void*, unsigned char);
 extern "C" void InitVtxFmt__12CMaterialManFi11_GXCompTypei11_GXCompTypei11_GXCompTypei(CMaterialMan*, int, _GXCompType, int, _GXCompType, int, _GXCompType, int);
 extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
@@ -1907,37 +1914,96 @@ void pppInitPdt(long* progOffsetReconstructionTable, pppProg* pppProg)
  */
 void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
 {
-	// Convert relative offsets to absolute addresses
-	pppDataHead->m_cacheChunks = (int)&pppDataHead->m_version + pppDataHead->m_cacheChunks;
-	pppDataHead->m_modelNames = (int)&pppDataHead->m_version + pppDataHead->m_modelNames;
-	pppDataHead->m_shapeNames = (int)&pppDataHead->m_version + pppDataHead->m_shapeNames;
-	pppDataHead->m_shapeGroups = (int)&pppDataHead->m_version + pppDataHead->m_shapeGroups;
-	
-	// Basic cache chunk processing
-	int* originalChunks = (int*)pppDataHead->m_cacheChunks;
-	for (int i = 0; i < (int)(unsigned int)pppDataHead->m_cacheChunkCount; i++) {
-		// Process cache chunks - simplified implementation
+	struct pppShapeGroupRaw
+	{
+		u16 m_groupId;
+		u16 m_shapeCount;
+		s16* m_shapeList;
+	};
+
+	u8* dataBase = reinterpret_cast<u8*>(&pppDataHead->m_version);
+
+	pppDataHead->m_cacheChunks = pppDataHead->m_cacheChunks + reinterpret_cast<u32>(dataBase);
+	pppDataHead->m_modelNames = pppDataHead->m_modelNames + reinterpret_cast<u32>(dataBase);
+	pppDataHead->m_shapeNames = pppDataHead->m_shapeNames + reinterpret_cast<u32>(dataBase);
+	pppDataHead->m_shapeGroups = pppDataHead->m_shapeGroups + reinterpret_cast<u32>(dataBase);
+
+	int* chunkOffsets = reinterpret_cast<int*>(pppDataHead->m_cacheChunks);
+	CMemory::CStage* stageLoad = *reinterpret_cast<CMemory::CStage**>(PartPcs + 0x1C);
+	s16* cacheChunks = reinterpret_cast<s16*>(__nwa__FUlPQ27CMemory6CStagePci(
+	                                          static_cast<u32>(pppDataHead->m_cacheChunkCount) << 3,
+	                                          stageLoad, const_cast<char*>(s_pppPart_cpp), 0x620));
+	pppDataHead->m_cacheChunks = reinterpret_cast<u32>(cacheChunks);
+
+	for (int i = 0; i < pppDataHead->m_cacheChunkCount; i++) {
+		int chunkOffset = chunkOffsets[0];
+		int chunkSize = chunkOffsets[1] - chunkOffset;
+		void* chunkData = __nwa__FUlPQ27CMemory6CStagePci(chunkSize, stageLoad, const_cast<char*>(s_pppPart_cpp), 0x626);
+
+		memcpy(chunkData, dataBase + chunkOffset, chunkSize);
+		cacheChunks[(i << 2)] = SetData__13CAmemCacheSetFPviQ210CAmemCache4TYPEi(
+		    reinterpret_cast<CAmemCacheSet*>(CAMemCacheSet), chunkData, chunkSize, static_cast<CAmemCache::TYPE>(2), param_3);
+		__dl__FPv(chunkData);
+		chunkOffsets++;
 	}
-	
-	// Basic model names processing  
-	unsigned int modelNamesOffset = pppDataHead->m_modelNames;
-	for (int i = 0; i < (int)(unsigned int)pppDataHead->m_modelCount; i++) {
-		// Process model names - simplified implementation
-		modelNamesOffset += 0x20;
+
+	char* modelName = reinterpret_cast<char*>(pppDataHead->m_modelNames);
+	pppModelSt** modelRefs = reinterpret_cast<pppModelSt**>(__nwa__FUlPQ27CMemory6CStagePci(
+	                                                        static_cast<u32>(pppDataHead->m_modelCount) << 2,
+	                                                        stageLoad, const_cast<char*>(s_pppPart_cpp), 0x636));
+	pppDataHead->m_modelNames = reinterpret_cast<u32>(modelRefs);
+
+	pppModelSt* modelArray = *reinterpret_cast<pppModelSt**>(reinterpret_cast<u8*>(&PartMng) + 0x7EC);
+	for (int i = 0; i < pppDataHead->m_modelCount; i++) {
+		pppModelSt* model = 0;
+		for (u32 j = 0; j < 0x100; j++) {
+			if (modelArray[j].m_isUsed != 0 && strcmp(modelArray[j].m_name, modelName) == 0) {
+				model = &modelArray[j];
+				break;
+			}
+		}
+
+		modelName += 0x20;
+		modelRefs[i] = model;
+		modelRefs[i]->m_refCount++;
 	}
-	
-	// Basic shape names processing
-	unsigned int shapeNamesOffset = pppDataHead->m_shapeNames;
-	for (int i = 0; i < (int)(unsigned int)pppDataHead->m_shapeCount; i++) {
-		// Process shape names - simplified implementation
-		shapeNamesOffset += 0x20;
+
+	char* shapeName = reinterpret_cast<char*>(pppDataHead->m_shapeNames);
+	pppShapeSt** shapeRefs = reinterpret_cast<pppShapeSt**>(__nwa__FUlPQ27CMemory6CStagePci(
+	                                                        static_cast<u32>(pppDataHead->m_shapeCount) << 2,
+	                                                        stageLoad, const_cast<char*>(s_pppPart_cpp), 0x643));
+	pppDataHead->m_shapeNames = reinterpret_cast<u32>(shapeRefs);
+
+	pppShapeSt* shapeArray = *reinterpret_cast<pppShapeSt**>(reinterpret_cast<u8*>(&PartMng) + 0x7F0);
+	for (int i = 0; i < pppDataHead->m_shapeCount; i++) {
+		pppShapeSt* shape = 0;
+		for (u32 j = 0; j < 0x100; j++) {
+			if (shapeArray[j].m_inUse != 0 && strcmp(shapeArray[j].m_name, shapeName) == 0) {
+				shape = &shapeArray[j];
+				break;
+			}
+		}
+
+		shapeName += 0x20;
+		shapeRefs[i] = shape;
+		shapeRefs[i]->m_refCount++;
 	}
-	
-	// Basic shape groups processing
-	unsigned short* originalGroups = (unsigned short*)pppDataHead->m_shapeGroups;
-	for (int i = 0; i < (int)(unsigned int)pppDataHead->m_shapeGroupCount; i++) {
-		// Process shape groups - simplified implementation
-		originalGroups += 4;
+
+	pppShapeGroupRaw* shapeGroups = reinterpret_cast<pppShapeGroupRaw*>(pppDataHead->m_shapeGroups);
+	pppShapeGroupRaw* shapeGroupRefs = reinterpret_cast<pppShapeGroupRaw*>(__nwa__FUlPQ27CMemory6CStagePci(
+	                                                                       static_cast<u32>(pppDataHead->m_shapeGroupCount)
+	                                                                           << 3,
+	                                                                       stageLoad, const_cast<char*>(s_pppPart_cpp), 0x651));
+	pppDataHead->m_shapeGroups = reinterpret_cast<u32>(shapeGroupRefs);
+
+	for (int i = 0; i < pppDataHead->m_shapeGroupCount; i++) {
+		shapeGroupRefs[i].m_groupId = shapeGroups[i].m_groupId;
+		shapeGroupRefs[i].m_shapeCount = shapeGroups[i].m_shapeCount;
+		shapeGroupRefs[i].m_shapeList = reinterpret_cast<s16*>(__nwa__FUlPQ27CMemory6CStagePci(
+		    static_cast<int>(shapeGroups[i].m_shapeCount) << 1, stageLoad, const_cast<char*>(s_pppPart_cpp), 0x656));
+
+		shapeGroups[i].m_shapeList = reinterpret_cast<s16*>(reinterpret_cast<u8*>(shapeGroups[i].m_shapeList) + reinterpret_cast<u32>(dataBase));
+		memcpy(shapeGroupRefs[i].m_shapeList, shapeGroups[i].m_shapeList, static_cast<int>(shapeGroups[i].m_shapeCount) << 1);
 	}
 }
 

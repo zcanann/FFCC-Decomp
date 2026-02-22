@@ -906,10 +906,40 @@ int MusicPlay(int musicId, int volume, int mode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cb870
+ * PAL Size: 204b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void SetMusicVolume(int, int, int, int)
+void SetMusicVolume(int seId, int volume, int duration, int mode)
 {
-	// TODO
+	int step;
+	unsigned int* music = (unsigned int*)DAT_8032f3f0;
+
+	if (volume != 0) {
+		volume = (((volume + 1) * 4) - 1) * 0x1000;
+	}
+
+	if (duration < 1) {
+		step = 1;
+	} else {
+		step = (duration * 200) / 0x3c + (duration * 200 >> 0x1f);
+		step = step - (step >> 0x1f);
+	}
+
+	do {
+		int* musicI = (int*)music;
+		if ((seId == -1) || (seId == (int)music[0x11c]) || ((int)music[0x11c] < 0)) {
+			if (mode == 1) {
+				musicI[0x116] = -musicI[0x115] / step;
+				musicI[0x117] = step;
+			} else {
+				musicI[8] = (((unsigned int)volume | 0x800U) - music[7]) / step;
+				musicI[9] = step;
+			}
+		}
+		music += 0x125;
+	} while (music < (unsigned int*)((char*)DAT_8032f3f0 + 0xdbc));
 }

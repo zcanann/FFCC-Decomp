@@ -33,7 +33,7 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
 {
     _pppMngSt* pppMngSt = pppMngStPtr;
     f32 fVar2 = FLOAT_80330e1c;
-    f32* pfVar = (f32*)((u8*)&basePtr->field0_0x0 + 8 + *dataPtr->m_serializedDataOffsets);
+    f32* pfVar = (f32*)((u8*)(&basePtr->field0_0x0 + 2) + *dataPtr->m_serializedDataOffsets);
     Vec local_48;
     Vec local_24;
     f32 local_3c;

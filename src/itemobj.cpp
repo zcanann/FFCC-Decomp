@@ -27,6 +27,7 @@ extern "C" void DispCharaParts__8CGObjectFi(void*, int);
 extern "C" void putParticle__8CGPrgObjFiiP8CGObjectfi(void*, int, int, void*, float, int);
 extern "C" float RandF__5CMathFf(float, CMath*);
 extern "C" unsigned int getNumFreeObject__13CFlatRuntime2Fi(void*, int);
+
 extern unsigned char CFlat[];
 extern CMath Math;
 extern float FLOAT_80331b20;
@@ -209,8 +210,9 @@ void CGItemObj::DeleteOld(int, int, CFlatRuntime::CObject*, CFlatRuntime::CObjec
  */
 unsigned int CGItemObj::CanCreateFromScript()
 {
-	unsigned int freeObjects = getNumFreeObject__13CFlatRuntime2Fi(CFlat, 5);
-	return (-freeObjects & ~freeObjects) >> 31;
+	unsigned int numFreeObjects = getNumFreeObject__13CFlatRuntime2Fi(CFlat, 5);
+
+	return (-numFreeObjects & ~numFreeObjects) >> 31;
 }
 
 /*

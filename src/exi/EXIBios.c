@@ -39,7 +39,8 @@ static int __EXIProbe(s32 chan);
 
 static void SetExiInterruptMask(s32 chan, EXIControl* exi) {
     EXIControl* exi2;
-    exi2 = &Ecb[2];
+    exi2 = Ecb;
+    exi2 += 2;
 
     switch (chan) {
     case 0:

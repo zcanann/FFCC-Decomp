@@ -21,6 +21,18 @@ static const float kPolyGroupAabbMin = -1.0e10f; // FLOAT_80332098
 static const float kInfiniteCost = 10000000.0f;  // FLOAT_8033209c
 static const float kDrawAStarSphereRadius = 5.0f;
 
+struct CMapCylinderRaw
+{
+	Vec m_bottom;
+	Vec m_direction;
+	float m_radius;
+	float m_height;
+	Vec m_top;
+	Vec m_direction2;
+	float m_radius2;
+	float m_height2;
+};
+
 extern Mtx gFlatPosMtx;
 extern int DAT_8032ed70;
 extern unsigned char lbl_8032EC90[];
@@ -892,17 +904,12 @@ CAStar::CAPos* CAStar::getEscapePos(Vec& from, Vec& base, int startGroup, int fo
 unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 {
 	unsigned long mask = m_hitAttributeMask;
-
-	CVector bottom(kPolyGroupBaseX, kPolyGroupBaseY, kPolyGroupBaseZ);
+	CVector base(kPolyGroupBaseX, kPolyGroupBaseY, kPolyGroupBaseZ);
 	CVector top(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z);
-	CMapCylinder cyl;
+	CMapCylinderRaw cyl;
 
-	cyl.m_bottom.x = top.x;
-	cyl.m_bottom.y = top.y;
-	cyl.m_bottom.z = top.z;
-	cyl.m_direction.x = bottom.x;
-	cyl.m_direction.y = bottom.y;
-	cyl.m_direction.z = bottom.z;
+	cyl.m_bottom = *reinterpret_cast<Vec*>(&top);
+	cyl.m_direction = *reinterpret_cast<Vec*>(&base);
 	cyl.m_radius = kPolyGroupBaseZ;
 	cyl.m_height = kPolyGroupAabbMax;
 	cyl.m_top.x = kPolyGroupAabbMax;
@@ -912,9 +919,13 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 	cyl.m_direction2.y = kPolyGroupAabbMin;
 	cyl.m_direction2.z = kPolyGroupAabbMin;
 
-	return (MapMng.CheckHitCylinderNear(&cyl, reinterpret_cast<Vec*>(&bottom), mask) != 0)
-	           ? lbl_8032EC90[0x47]
-	           : 0;
+	if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl),
+	                                reinterpret_cast<Vec*>(&base), mask) != 0)
+	{
+		return lbl_8032EC90[0x47];
+	}
+
+	return 0;
 }
 
 /*
@@ -930,16 +941,12 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 {
 	if ((DAT_8032ed70 & 1) == 0)
 	{
-		CVector bottom(kPolyGroupBaseX, kPolyGroupBaseY, kPolyGroupBaseZ);
+		CVector base(kPolyGroupBaseX, kPolyGroupBaseY, kPolyGroupBaseZ);
 		CVector top(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z);
-		CMapCylinder cyl;
+		CMapCylinderRaw cyl;
 
-		cyl.m_bottom.x = top.x;
-		cyl.m_bottom.y = top.y;
-		cyl.m_bottom.z = top.z;
-		cyl.m_direction.x = bottom.x;
-		cyl.m_direction.y = bottom.y;
-		cyl.m_direction.z = bottom.z;
+		cyl.m_bottom = *reinterpret_cast<Vec*>(&top);
+		cyl.m_direction = *reinterpret_cast<Vec*>(&base);
 		cyl.m_radius = kPolyGroupBaseZ;
 		cyl.m_height = kPolyGroupAabbMax;
 		cyl.m_top.x = kPolyGroupAabbMax;
@@ -949,23 +956,20 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 		cyl.m_direction2.y = kPolyGroupAabbMin;
 		cyl.m_direction2.z = kPolyGroupAabbMin;
 
-		if (MapMng.CheckHitCylinderNear(&cyl, reinterpret_cast<Vec*>(&bottom), hitAttributeMask) != 0)
+		if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl),
+		                                reinterpret_cast<Vec*>(&base), hitAttributeMask) != 0)
 		{
 			return lbl_8032EC90[0x47];
 		}
 	}
 	else
 	{
-		CVector bottom(kPolyGroupBaseX, kPolyGroupBaseY, kPolyGroupBaseZ);
+		CVector base(kPolyGroupBaseX, kPolyGroupBaseY, kPolyGroupBaseZ);
 		CVector top(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z);
-		CMapCylinder cyl;
+		CMapCylinderRaw cyl;
 
-		cyl.m_bottom.x = top.x;
-		cyl.m_bottom.y = top.y;
-		cyl.m_bottom.z = top.z;
-		cyl.m_direction.x = bottom.x;
-		cyl.m_direction.y = bottom.y;
-		cyl.m_direction.z = bottom.z;
+		cyl.m_bottom = *reinterpret_cast<Vec*>(&top);
+		cyl.m_direction = *reinterpret_cast<Vec*>(&base);
 		cyl.m_radius = kPolyGroupBaseZ;
 		cyl.m_height = kPolyGroupAabbMax;
 		cyl.m_top.x = kPolyGroupAabbMax;
@@ -975,7 +979,8 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 		cyl.m_direction2.y = kPolyGroupAabbMin;
 		cyl.m_direction2.z = kPolyGroupAabbMin;
 
-		if (MapMng.CheckHitCylinderNear(&cyl, reinterpret_cast<Vec*>(&bottom), m_hitAttributeMask) != 0)
+		if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl),
+		                                reinterpret_cast<Vec*>(&base), m_hitAttributeMask) != 0)
 		{
 			return lbl_8032EC90[0x47];
 		}

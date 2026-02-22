@@ -425,29 +425,26 @@ void CSystem::ExecScenegraph()
 unsigned int CSystem::AddScenegraph(CProcess* process, int arg)
 {
     typedef void* (*GetScenegraphBlockFn)(CProcess*, int);
-    GetScenegraphBlockFn getScenegraphBlock = *(GetScenegraphBlockFn*)((u8*)*(void**)process + 0x10);
-    int insertIndex = 0;
-    u32* description = (u32*)getScenegraphBlock(process, arg);
-    u32* entry = description + 7;
-	
-    if (__ptmf_test((__ptmf*)(description + 1)))
-	{
-        __ptmf_scall(process);
-	}
+    u32* description = (u32*)(*(GetScenegraphBlockFn*)((u8*)*(void**)process + 0x10))(process, arg);
 
-    while (true)
+    if (__ptmf_test((__ptmf*)(description + 1)) != 0)
     {
-        if (__ptmf_test((__ptmf*)entry) == 0)
-		{
-            return 1;
-		}
+        __ptmf_scall(process);
+    }
 
-        COrder* sentinel = &m_orderSentinel;
-        COrder* current = sentinel->m_next;
-
-        while (true)
+    u32* entry = description + 7;
+    int insertIndex = 0;
+    if (__ptmf_test((__ptmf*)entry) == 0)
+    {
+        return 1;
+    }
+    do
+    {
+        COrder* first = m_orderSentinel.m_next;
+        COrder* current = first;
+        do
         {
-            if (entry[3] < current->m_priority)
+            if ((u32)entry[3] < current->m_priority)
             {
                 COrder* order = m_freeOrderHead.m_next;
                 m_freeOrderHead.m_next = order->m_next;
@@ -456,26 +453,22 @@ unsigned int CSystem::AddScenegraph(CProcess* process, int arg)
                 current->m_previous->m_next = order;
                 current->m_previous = order;
                 order->m_entry = entry;
-                order->m_insertIndex = insertIndex++;
+                order->m_insertIndex = insertIndex;
+                insertIndex++;
                 order->m_descBlock = description;
                 order->m_owner = process;
                 order->m_priority = entry[3];
                 order->m_debugName = (void*)description[0];
                 m_orderCount++;
-				
                 break;
             }
-
             current = current->m_next;
-			
-            if (current == sentinel)
-			{
-                break;
-			}
-        }
+        } while (current != first);
 
         entry += 5;
-    }
+    } while (__ptmf_test((__ptmf*)entry) != 0);
+
+    return 1;
 }
 
 /*

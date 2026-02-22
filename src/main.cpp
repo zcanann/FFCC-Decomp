@@ -79,10 +79,13 @@ void game(int argc, char** argv)
                 c = (*argument)[0];
                 if ((c == '-') || (c == '/')) {
                     c = (*argument)[1];
-                    if (c == 'l') {
+                    switch (c) {
+                    case 'l':
                         parseLanguage = 1;
-                    } else if ((c < 'l') && (c == 'f')) {
+                        break;
+                    case 'f':
                         copyScriptName = 1;
+                        break;
                     }
                 }
             }

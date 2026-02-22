@@ -1436,12 +1436,23 @@ void CRedDriver::SeStopMG(int, int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bf540
+ * PAL Size: 196b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::SePlay(int, int, int, int, int, int)
+void CRedDriver::SePlay(int bank, int sep, int autoID, int unk, int volume, int pitch)
 {
-	// TODO
+	if (bank == -1) {
+		if (sep > -1) {
+			_EntryExecCommand(_SeSepPlaySequence, autoID, sep, unk, volume, pitch, 0, 0);
+		}
+	} else if ((bank > -1) && (bank < 4) && (sep > -1) && (sep < 0x200)) {
+		_EntryExecCommand(_SeBlockPlay, autoID, bank, sep, unk, volume, pitch, 0);
+	}
+
 }
 
 /*

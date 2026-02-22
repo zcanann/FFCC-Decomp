@@ -32,9 +32,19 @@ void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
 extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, struct UnkC* dataPtr)
 {
     _pppMngSt* pppMngSt = pppMngStPtr;
-    f32* pfVar;
-    pfVar = (f32*)((u8*)basePtr + 8 + *dataPtr->m_serializedDataOffsets);
     f32 fVar2 = FLOAT_80330e1c;
+    f32* pfVar = (f32*)((u8*)&basePtr->field0_0x0 + 8 + *dataPtr->m_serializedDataOffsets);
+    Vec local_48;
+    Vec local_24;
+    f32 local_3c;
+    f32 local_38;
+    f32 local_34;
+    f32 local_30;
+    f32 local_2c;
+    f32 local_28;
+    f32 local_18;
+    f32 local_14;
+    f32 local_10;
 
     pfVar[2] = FLOAT_80330e1c;
     pfVar[1] = fVar2;

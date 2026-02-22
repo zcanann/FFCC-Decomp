@@ -342,7 +342,8 @@ CChara::CAnimNode::CAnimNode()
 {
 	unsigned char* const p = (unsigned char*)this;
 	p[0x14] = (unsigned char)(p[0x14] & 0x7F);
-	*(unsigned int*)(p + 0x14) &= 0x80001FFF;
+	const unsigned int flags = *(unsigned int*)(p + 0x14);
+	*(unsigned int*)(p + 0x14) = (((flags >> 0xD) & 0x3FFFFU) | 0U) << 0xD | (flags & 0x80001FFFU);
 }
 
 /*

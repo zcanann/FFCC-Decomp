@@ -160,18 +160,18 @@ void pppConstructLaser(struct pppLaser *pppLaser, struct UnkC *param_2)
 void pppConstruct2Laser(struct pppLaser *pppLaser, struct UnkC *param_2)
 {
     f32 fVar1 = FLOAT_80333428;
-    int iVar2 = 0x80 + param_2->offsets->m_serializedDataOffsets[2];
+    u8* work = (u8*)pppLaser + param_2->offsets->m_serializedDataOffsets[2] + 0x80;
 
-    *(f32*)((u8*)pppLaser + iVar2 + 0x18) = fVar1;
-    *(f32*)((u8*)pppLaser + iVar2 + 0x14) = fVar1;
-    *(f32*)((u8*)pppLaser + iVar2 + 0x10) = fVar1;
-    *(f32*)((u8*)pppLaser + iVar2 + 0xc) = fVar1;
-    *(f32*)((u8*)pppLaser + iVar2 + 0x8) = fVar1;
-    *(f32*)((u8*)pppLaser + iVar2 + 0x4) = fVar1;
-    *(f32*)((u8*)pppLaser + iVar2 + 0x28) = fVar1;
-    *(f32*)((u8*)pppLaser + iVar2 + 0x24) = fVar1;
-    *(f32*)((u8*)pppLaser + iVar2 + 0x20) = fVar1;
-    *((u8*)pppLaser + iVar2 + 0x2c) = 0;
+    *(f32*)(work + 0x18) = FLOAT_80333428;
+    *(f32*)(work + 0x14) = fVar1;
+    *(f32*)(work + 0x10) = fVar1;
+    *(f32*)(work + 0x0C) = fVar1;
+    *(f32*)(work + 0x08) = fVar1;
+    *(f32*)(work + 0x04) = fVar1;
+    *(f32*)(work + 0x28) = fVar1;
+    *(f32*)(work + 0x24) = fVar1;
+    *(f32*)(work + 0x20) = fVar1;
+    *(work + 0x2C) = 0;
 }
 
 /*

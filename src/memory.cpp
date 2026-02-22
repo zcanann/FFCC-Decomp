@@ -1,4 +1,5 @@
 #include "ffcc/memory.h"
+#include "ffcc/pad.h"
 #include "ffcc/sound.h"
 #include "ffcc/stopwatch.h"
 #include "ffcc/system.h"
@@ -11,10 +12,13 @@ extern CMemory Memory;
 extern char DAT_801d6648[];
 extern char DAT_801d6a7c[];
 extern char DAT_801d6c58[];
+extern char DAT_801d6c88[];
+extern char DAT_801d6c98[];
 extern "C" void Printf__7CSystemFPce(CSystem* system, char* format, ...);
 extern "C" int DMAEntry__9CRedSoundFiiiiiPFPv_vPv(
     void*, int, int, int, int, int, void (*)(void*), void*);
 extern "C" int DMACheck__9CRedSoundFi(void*, int);
+extern "C" int __cntlzw(unsigned int);
 
 static int calcCacheChecksum(const unsigned char* data, unsigned int size)
 {
@@ -292,12 +296,94 @@ CMemory::CMemory()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001F8F0
+ * PAL Size: 524b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMemory::Init()
 {
-	// TODO
+    int arenaLo = reinterpret_cast<int>(OSGetArenaLo());
+    OSInitAlloc(OSGetArenaLo(), reinterpret_cast<void*>(arenaLo + 0x14000), 1);
+
+    unsigned char* modeBase = reinterpret_cast<unsigned char*>(this) + 4;
+    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x7794) = 0;
+    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x7798) = 0;
+    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x779C) = 0;
+
+    for (int pass = 0; pass < 3; pass++) {
+        if ((pass != 1) || (OSGetConsoleSimulatedMemSize() == 0x3000000)) {
+            if ((pass == 0) || (pass == 1)) {
+                unsigned int arenaHi = reinterpret_cast<unsigned int>(OSGetArenaHi());
+                if (pass == 0) {
+                    *reinterpret_cast<unsigned int*>(modeBase + 8) = 0x81780000;
+                    unsigned int lo = reinterpret_cast<unsigned int>(OSGetArenaLo());
+                    *reinterpret_cast<unsigned int*>(modeBase + 0xC) = (lo + 0x1403F) & ~0x3FU;
+                } else {
+                    *reinterpret_cast<unsigned int*>(modeBase + 8) = arenaHi & ~0x3FU;
+                    *reinterpret_cast<unsigned int*>(modeBase + 0xC) = 0x81800000;
+                }
+
+                int top = *reinterpret_cast<int*>(modeBase + 8);
+                int bottom = *reinterpret_cast<int*>(modeBase + 0xC);
+                if (0 < (top - bottom)) {
+                    memset(reinterpret_cast<void*>(bottom), 0xAB, top - bottom);
+                }
+            } else {
+                *reinterpret_cast<int*>(modeBase + 8) = 0x7FC000;
+                *reinterpret_cast<int*>(modeBase + 0xC) = 0x4000;
+            }
+
+            *reinterpret_cast<unsigned char**>(modeBase) = modeBase;
+            *reinterpret_cast<unsigned char**>(modeBase + 4) = modeBase;
+            *reinterpret_cast<unsigned char**>(modeBase + 0x130) = modeBase + 600;
+
+            unsigned char* stageBase = modeBase;
+            for (int index = 0; index < 32; index += 4) {
+                unsigned char* next;
+
+                if (index == 0x1F) {
+                    next = modeBase + 300;
+                } else {
+                    next = modeBase + (index + 1) * 300 + 600;
+                }
+                *reinterpret_cast<unsigned char**>(stageBase + 0x25C) = next;
+
+                if (index == 0x1E) {
+                    next = modeBase + 300;
+                } else {
+                    next = modeBase + (index + 2) * 300 + 600;
+                }
+                *reinterpret_cast<unsigned char**>(stageBase + 0x388) = next;
+
+                if (index == 0x1D) {
+                    next = modeBase + 300;
+                } else {
+                    next = modeBase + (index + 3) * 300 + 600;
+                }
+                *reinterpret_cast<unsigned char**>(stageBase + 0x4B4) = next;
+
+                if (index == 0x1C) {
+                    next = modeBase + 300;
+                } else {
+                    next = modeBase + (index + 4) * 300 + 600;
+                }
+                *reinterpret_cast<unsigned char**>(stageBase + 0x5E0) = next;
+
+                stageBase += 0x4B0;
+            }
+        }
+
+        modeBase += 0x27D8;
+    }
+
+    CStage* stage = CreateStage(0x2000, DAT_801d6c88, 0);
+    *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(this) + 0x778C) = stage;
+
+    stage = CreateStage(0x4000, DAT_801d6c98, 0);
+    *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(this) + 0x7790) = stage;
 }
 
 /*
@@ -341,12 +427,35 @@ void CMemory::Quit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001F118
+ * PAL Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMemory::Frame()
 {
-	// TODO
+    bool activeInput = false;
+    unsigned short trigger;
+
+    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        activeInput = true;
+    }
+
+    if (activeInput) {
+        trigger = 0;
+    } else {
+        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+        trigger = Pad._8_2_;
+    }
+
+    if ((trigger & 0x200) != 0) {
+        unsigned int showHeap = static_cast<unsigned int>(
+            __cntlzw(*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x7798)));
+        *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x7798) =
+            (showHeap >> 5) & 0xFF;
+    }
 }
 
 /*

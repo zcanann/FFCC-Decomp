@@ -1728,7 +1728,6 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 	unsigned char* mngBytes = (unsigned char*)pppMngSt;
 	*(int*)(mngBytes + 0x24) = (int)pdt[0];
 	*(unsigned char*)(mngBytes + 0xF4) = (unsigned char)pdt[1];
-	*(unsigned char*)(mngBytes + 0xE6) = 0;
 
 	short* modelList = (short*)((unsigned char*)pdt + pdt[4]);
 	short* shapeList = (short*)((unsigned char*)pdt + pdt[5]);
@@ -1738,6 +1737,7 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 		pppCacheLoadShape(shapeList, (_pppDataHead*)pdt);
 		*(unsigned char*)(mngBytes + 0xF5) = 1;
 	}
+	*(unsigned char*)(mngBytes + 0xE6) = 0;
 
 	int controlOffset = (int)pdt[2];
 	int programOffset = (int)pdt[3];
@@ -1775,15 +1775,17 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 	}
 
 	if (runControlPrograms != 0) {
-		void** controlTable = (void**)*(void**)(mngBytes + 0xCC);
+		int entryOffset = 0;
+		unsigned char* controlTable = *(unsigned char**)(mngBytes + 0xCC);
 		for (int i = 0; i < controlCount; i++) {
-			unsigned char* controlEntry = (unsigned char*)controlTable[i];
+			unsigned char* controlEntry = *(unsigned char**)(controlTable + entryOffset);
 			if (controlEntry != 0) {
 				void (*fn)(_pppMngSt*) = *(void (**)(_pppMngSt*))(controlEntry + 0x10);
 				if (fn != 0) {
 					fn(pppMngSt);
 				}
 			}
+			entryOffset += 4;
 		}
 	}
 }

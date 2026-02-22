@@ -51,8 +51,8 @@ extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCirc
     PSVECSubtract((Vec*)(pppMngSt + 0x68), (Vec*)(pppMngSt + 0x58), &temp1);
     PSVECNormalize(&temp1, &temp1);
 
-    f32 angle = acosf(PSVECDotProduct(&temp2, &temp1));
-    work->m_angle = lbl_80330D90 * angle;
+    f64 angle = acos((f64)PSVECDotProduct(&temp2, &temp1));
+    work->m_angle = lbl_80330D90 * (f32)angle;
 
     if ((temp1.x <= lbl_80330D7C && temp1.z >= lbl_80330D7C) ||
         (temp1.x >= lbl_80330D7C && temp1.z >= lbl_80330D7C)) {
@@ -97,17 +97,18 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
 
     work->m_radiusStep += work->m_radiusStepStep;
     work->m_radius += work->m_radiusStep;
+    work->m_angleStepStep += work->m_angleStepStepStep;
     work->m_angleStep += work->m_angleStepStep;
-    work->m_angle += work->m_angleStep;
 
     if (stepData->m_graphId == basePtr->m_graphId) {
         work->m_radius += stepData->m_radius;
         work->m_radiusStep += stepData->m_radiusStep;
         work->m_radiusStepStep += stepData->m_radiusStepStep;
-        work->m_angle += stepData->m_angle;
         work->m_angleStep += stepData->m_angleStep;
         work->m_angleStepStep += stepData->m_angleStepStep;
+        work->m_angleStepStepStep += stepData->m_angleStepStepStep;
     }
+    work->m_angle += work->m_angleStep;
 
     if (work->m_angle > lbl_80330D78) {
         work->m_angle -= lbl_80330D78;

@@ -8,9 +8,9 @@ struct pppYmMoveCircle {
 
 struct pppYmMoveCircleStep {
     int m_graphId;
-    float m_angle;
     float m_angleStep;
     float m_angleStepStep;
+    float m_angleStepStepStep;
     float m_radius;
     float m_radiusStep;
     float m_radiusStepStep;

@@ -1,8 +1,10 @@
 #include "ffcc/p_camera.h"
 
 #include "ffcc/materialman.h"
+#include "ffcc/memory.h"
 
 #include <dolphin/mtx.h>
+#include <dolphin/os/OSCache.h>
 
 extern Mtx ppvCameraMatrix0;
 extern float FLOAT_8032fa30;
@@ -11,10 +13,18 @@ extern float FLOAT_8032fa38;
 extern float FLOAT_8032fa5c;
 extern float FLOAT_8032fa58;
 extern float FLOAT_8032fa8c;
+extern float FLOAT_8032fa3c;
+extern float FLOAT_8032fac8;
+extern float FLOAT_8032faa4;
+extern float FLOAT_8032faa8;
 extern float FLOAT_8032fab0;
 extern float FLOAT_8032fab4;
 extern float FLOAT_8032fab8;
 extern CMaterialMan MaterialMan;
+extern char DAT_801d7928[];
+extern unsigned char MapMng[];
+extern "C" void Printf__7CSystemFPce(CSystem* system, char* format, ...);
+extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long size, CMemory::CStage* stage, char* file, int line);
 
 extern "C" {
 void pppEditGetViewPos__FP3Vec(Vec*);
@@ -144,12 +154,27 @@ void CCameraPcs::calc()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80039450
+ * PAL Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCameraPcs::SetStdProjectionMatrix()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    float fov = *reinterpret_cast<float*>(self + 0xFC);
+
+    if (fov < FLOAT_8032fac8 && System.m_execParam != 0) {
+        Printf__7CSystemFPce(&System, DAT_801d7928);
+        fov = FLOAT_8032fab4;
+    }
+
+    C_MTXPerspective(reinterpret_cast<Mtx44Ptr>(self + 0x94), fov, FLOAT_8032fa3c,
+                     *reinterpret_cast<float*>(self + 0x100),
+                     *reinterpret_cast<float*>(self + 0x104));
+    GXSetProjection(reinterpret_cast<Mtx44Ptr>(self + 0x94), GX_PERSPECTIVE);
 }
 
 /*
@@ -283,12 +308,66 @@ void CCameraPcs::createRampTex8()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80038358
+ * PAL Size: 624b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCameraPcs::createFullShadow()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    unsigned int rampTexSize;
+    unsigned int i;
+    unsigned char* rampTex;
+    CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(MapMng);
+
+    *reinterpret_cast<void**>(self + 0x31C) = 0;
+    rampTexSize = GXGetTexBufferSize(0x1E0, 0x1E0, GX_TF_I8, GX_FALSE, 0);
+    *reinterpret_cast<void**>(self + 0x31C) =
+        __nwa__FUlPQ27CMemory6CStagePci(rampTexSize, stage, const_cast<char*>("p_camera.cpp"), 0x3A5);
+
+    rampTexSize = GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0);
+    rampTex = static_cast<unsigned char*>(
+        __nwa__FUlPQ27CMemory6CStagePci(rampTexSize, stage, const_cast<char*>("p_camera.cpp"), 0x361));
+    *reinterpret_cast<unsigned char**>(self + 0x320) = rampTex;
+
+    for (i = 0; i < 0x100; i += 8) {
+        unsigned int i1 = i + 1;
+        unsigned int i2 = i + 2;
+        unsigned int i3 = i + 3;
+        unsigned int i4 = i + 4;
+        unsigned int i5 = i + 5;
+        unsigned int i6 = i + 6;
+        unsigned int i7 = i + 7;
+
+        rampTex[(i & 0xC) * 0x10 + ((i >> 2) & 0x20) + ((i >> 4) & 7)] = static_cast<unsigned char>(i);
+        rampTex[((i1 * 8) & 0x18) + ((i1 * 0x10) & 0xC0) + ((i1 >> 2) & 0x20) + ((i1 >> 4) & 7)] =
+            static_cast<unsigned char>(i1);
+        rampTex[((i2 * 8) & 0x18) + ((i2 * 0x10) & 0xC0) + ((i2 >> 2) & 0x20) + ((i2 >> 4) & 7)] =
+            static_cast<unsigned char>(i2);
+        rampTex[((i3 * 8) & 0x18) + ((i3 * 0x10) & 0xC0) + ((i3 >> 2) & 0x20) + ((i3 >> 4) & 7)] =
+            static_cast<unsigned char>(i3);
+        rampTex[((i4 * 0x10) & 0xC0) + ((i4 >> 2) & 0x20) + ((i4 >> 4) & 7)] = static_cast<unsigned char>(i4);
+        rampTex[((i5 * 8) & 0x18) + ((i5 * 0x10) & 0xC0) + ((i5 >> 2) & 0x20) + ((i5 >> 4) & 7)] =
+            static_cast<unsigned char>(i5);
+        rampTex[((i6 * 8) & 0x18) + ((i6 * 0x10) & 0xC0) + ((i6 >> 2) & 0x20) + ((i6 >> 4) & 7)] =
+            static_cast<unsigned char>(i6);
+        rampTex[((i7 * 8) & 0x18) + ((i7 * 0x10) & 0xC0) + ((i7 >> 2) & 0x20) + ((i7 >> 4) & 7)] =
+            static_cast<unsigned char>(i7);
+    }
+
+    GXInitTexObj(reinterpret_cast<GXTexObj*>(self + 0x344), rampTex, 0x10, 0x10, GX_TF_I8,
+                 GX_CLAMP, GX_REPEAT, GX_FALSE);
+    GXInitTexObjLOD(reinterpret_cast<GXTexObj*>(self + 0x344), GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f,
+                    GX_FALSE, GX_FALSE, GX_ANISO_1);
+    DCFlushRange(rampTex, rampTexSize);
+
+    self[0x404] = 1;
+    *reinterpret_cast<float*>(self + 0x364) = FLOAT_8032faa4;
+    *reinterpret_cast<float*>(self + 0x368) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0x370) = FLOAT_8032faa8;
 }
 
 /*
@@ -374,12 +453,87 @@ void CCameraPcs::SetFullScreenShadow(float (*matrix)[4], long flags)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80036a18
+ * PAL Size: 544b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCameraPcs::drawShadowEndAll()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+
+    if (self[0x404] == 0) {
+        return;
+    }
+
+    *reinterpret_cast<unsigned int*>(self + 0x4) = *reinterpret_cast<unsigned int*>(self + 0x10C);
+    *reinterpret_cast<unsigned int*>(self + 0x8) = *reinterpret_cast<unsigned int*>(self + 0x110);
+    *reinterpret_cast<unsigned int*>(self + 0xC) = *reinterpret_cast<unsigned int*>(self + 0x114);
+    *reinterpret_cast<unsigned int*>(self + 0x10) = *reinterpret_cast<unsigned int*>(self + 0x118);
+    *reinterpret_cast<unsigned int*>(self + 0x14) = *reinterpret_cast<unsigned int*>(self + 0x11C);
+    *reinterpret_cast<unsigned int*>(self + 0x18) = *reinterpret_cast<unsigned int*>(self + 0x120);
+    *reinterpret_cast<unsigned int*>(self + 0x1C) = *reinterpret_cast<unsigned int*>(self + 0x124);
+    *reinterpret_cast<unsigned int*>(self + 0x20) = *reinterpret_cast<unsigned int*>(self + 0x128);
+    *reinterpret_cast<unsigned int*>(self + 0x24) = *reinterpret_cast<unsigned int*>(self + 0x12C);
+    *reinterpret_cast<unsigned int*>(self + 0x28) = *reinterpret_cast<unsigned int*>(self + 0x130);
+    *reinterpret_cast<unsigned int*>(self + 0x2C) = *reinterpret_cast<unsigned int*>(self + 0x134);
+    *reinterpret_cast<unsigned int*>(self + 0x30) = *reinterpret_cast<unsigned int*>(self + 0x138);
+    *reinterpret_cast<unsigned int*>(self + 0x34) = *reinterpret_cast<unsigned int*>(self + 0x13C);
+    *reinterpret_cast<unsigned int*>(self + 0x38) = *reinterpret_cast<unsigned int*>(self + 0x140);
+    *reinterpret_cast<unsigned int*>(self + 0x3C) = *reinterpret_cast<unsigned int*>(self + 0x144);
+    *reinterpret_cast<unsigned int*>(self + 0x40) = *reinterpret_cast<unsigned int*>(self + 0x148);
+    *reinterpret_cast<unsigned int*>(self + 0x44) = *reinterpret_cast<unsigned int*>(self + 0x14C);
+    *reinterpret_cast<unsigned int*>(self + 0x48) = *reinterpret_cast<unsigned int*>(self + 0x150);
+    *reinterpret_cast<unsigned int*>(self + 0x4C) = *reinterpret_cast<unsigned int*>(self + 0x154);
+    *reinterpret_cast<unsigned int*>(self + 0x50) = *reinterpret_cast<unsigned int*>(self + 0x158);
+    *reinterpret_cast<unsigned int*>(self + 0x54) = *reinterpret_cast<unsigned int*>(self + 0x15C);
+    *reinterpret_cast<unsigned int*>(self + 0x58) = *reinterpret_cast<unsigned int*>(self + 0x160);
+    *reinterpret_cast<unsigned int*>(self + 0x5C) = *reinterpret_cast<unsigned int*>(self + 0x164);
+    *reinterpret_cast<unsigned int*>(self + 0x60) = *reinterpret_cast<unsigned int*>(self + 0x168);
+    *reinterpret_cast<unsigned int*>(self + 0x64) = *reinterpret_cast<unsigned int*>(self + 0x16C);
+    *reinterpret_cast<unsigned int*>(self + 0x68) = *reinterpret_cast<unsigned int*>(self + 0x170);
+    *reinterpret_cast<unsigned int*>(self + 0x6C) = *reinterpret_cast<unsigned int*>(self + 0x174);
+    *reinterpret_cast<unsigned int*>(self + 0x70) = *reinterpret_cast<unsigned int*>(self + 0x178);
+    *reinterpret_cast<unsigned int*>(self + 0x74) = *reinterpret_cast<unsigned int*>(self + 0x17C);
+    *reinterpret_cast<unsigned int*>(self + 0x78) = *reinterpret_cast<unsigned int*>(self + 0x180);
+    *reinterpret_cast<unsigned int*>(self + 0x7C) = *reinterpret_cast<unsigned int*>(self + 0x184);
+    *reinterpret_cast<unsigned int*>(self + 0x80) = *reinterpret_cast<unsigned int*>(self + 0x188);
+    *reinterpret_cast<unsigned int*>(self + 0x84) = *reinterpret_cast<unsigned int*>(self + 0x18C);
+    *reinterpret_cast<unsigned int*>(self + 0x88) = *reinterpret_cast<unsigned int*>(self + 0x190);
+    *reinterpret_cast<unsigned int*>(self + 0x8C) = *reinterpret_cast<unsigned int*>(self + 0x194);
+    *reinterpret_cast<unsigned int*>(self + 0x90) = *reinterpret_cast<unsigned int*>(self + 0x198);
+    *reinterpret_cast<unsigned int*>(self + 0x94) = *reinterpret_cast<unsigned int*>(self + 0x19C);
+    *reinterpret_cast<unsigned int*>(self + 0x98) = *reinterpret_cast<unsigned int*>(self + 0x1A0);
+    *reinterpret_cast<unsigned int*>(self + 0x9C) = *reinterpret_cast<unsigned int*>(self + 0x1A4);
+    *reinterpret_cast<unsigned int*>(self + 0xA0) = *reinterpret_cast<unsigned int*>(self + 0x1A8);
+    *reinterpret_cast<unsigned int*>(self + 0xA4) = *reinterpret_cast<unsigned int*>(self + 0x1AC);
+    *reinterpret_cast<unsigned int*>(self + 0xA8) = *reinterpret_cast<unsigned int*>(self + 0x1B0);
+    *reinterpret_cast<unsigned int*>(self + 0xAC) = *reinterpret_cast<unsigned int*>(self + 0x1B4);
+    *reinterpret_cast<unsigned int*>(self + 0xB0) = *reinterpret_cast<unsigned int*>(self + 0x1B8);
+    *reinterpret_cast<unsigned int*>(self + 0xB4) = *reinterpret_cast<unsigned int*>(self + 0x1BC);
+    *reinterpret_cast<unsigned int*>(self + 0xB8) = *reinterpret_cast<unsigned int*>(self + 0x1C0);
+    *reinterpret_cast<unsigned int*>(self + 0xBC) = *reinterpret_cast<unsigned int*>(self + 0x1C4);
+    *reinterpret_cast<unsigned int*>(self + 0xC0) = *reinterpret_cast<unsigned int*>(self + 0x1C8);
+    *reinterpret_cast<unsigned int*>(self + 0xC4) = *reinterpret_cast<unsigned int*>(self + 0x1CC);
+    *reinterpret_cast<unsigned int*>(self + 0xC8) = *reinterpret_cast<unsigned int*>(self + 0x1D0);
+    *reinterpret_cast<unsigned int*>(self + 0xCC) = *reinterpret_cast<unsigned int*>(self + 0x1D4);
+    *reinterpret_cast<unsigned int*>(self + 0xD0) = *reinterpret_cast<unsigned int*>(self + 0x1D8);
+    *reinterpret_cast<unsigned int*>(self + 0xD4) = *reinterpret_cast<unsigned int*>(self + 0x1DC);
+    *reinterpret_cast<unsigned int*>(self + 0xD8) = *reinterpret_cast<unsigned int*>(self + 0x1E0);
+    *reinterpret_cast<unsigned int*>(self + 0xDC) = *reinterpret_cast<unsigned int*>(self + 0x1E4);
+    *reinterpret_cast<unsigned int*>(self + 0xE0) = *reinterpret_cast<unsigned int*>(self + 0x1E8);
+    *reinterpret_cast<unsigned int*>(self + 0xE4) = *reinterpret_cast<unsigned int*>(self + 0x1EC);
+    *reinterpret_cast<unsigned int*>(self + 0xE8) = *reinterpret_cast<unsigned int*>(self + 0x1F0);
+    *reinterpret_cast<unsigned int*>(self + 0xEC) = *reinterpret_cast<unsigned int*>(self + 0x1F4);
+    *reinterpret_cast<unsigned int*>(self + 0xF0) = *reinterpret_cast<unsigned int*>(self + 0x1F8);
+    *reinterpret_cast<unsigned int*>(self + 0xF4) = *reinterpret_cast<unsigned int*>(self + 0x1FC);
+    *reinterpret_cast<unsigned int*>(self + 0xF8) = *reinterpret_cast<unsigned int*>(self + 0x200);
+    *reinterpret_cast<unsigned int*>(self + 0xFC) = *reinterpret_cast<unsigned int*>(self + 0x204);
+    *reinterpret_cast<unsigned int*>(self + 0x100) = *reinterpret_cast<unsigned int*>(self + 0x208);
+    *reinterpret_cast<unsigned int*>(self + 0x104) = *reinterpret_cast<unsigned int*>(self + 0x20C);
+    *reinterpret_cast<unsigned int*>(self + 0x108) = *reinterpret_cast<unsigned int*>(self + 0x210);
 }
 
 /*

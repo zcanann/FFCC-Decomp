@@ -372,15 +372,17 @@ void CalcGraphValue(_pppPObject* object, long graphId, float& value, float& velo
  */
 int GetTextureFromRSD(int mapMeshIndex, _pppEnvSt* env)
 {
+    _pppEnvStYmEnv* ymEnv = (_pppEnvStYmEnv*)env;
     int textureIndex;
+    CMapMesh** mapMeshArray;
 
     if (mapMeshIndex == 0xFFFF) {
         return 0;
     }
 
+    mapMeshArray = ymEnv->m_mapMeshPtr;
     textureIndex = 0;
-    return GetTexture__8CMapMeshFP12CMaterialSetRi(((_pppEnvStYmEnv*)env)->m_mapMeshPtr[mapMeshIndex],
-                                                   ((_pppEnvStYmEnv*)env)->m_materialSetPtr, textureIndex);
+    return GetTexture__8CMapMeshFP12CMaterialSetRi(mapMeshArray[mapMeshIndex], ymEnv->m_materialSetPtr, textureIndex);
 }
 
 /*

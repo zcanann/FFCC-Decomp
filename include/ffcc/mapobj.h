@@ -90,7 +90,7 @@ public:
     int CheckHitCylinder(CMapCylinder*, Vec*, unsigned long);
     int CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned long);
     void GetHitFaceNormal(Vec*);
-    void CalcHitSlide(Vec*, float);
+    int CalcHitSlide(Vec*, float);
     void CalcHitPosition(Vec*);
     void SetMime(int, int, int);
     void SetCalcMtx();

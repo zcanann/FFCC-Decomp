@@ -495,7 +495,7 @@ void CMapHit::GetHitFaceNormal(Vec* out)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapHit::CalcHitSlide(Vec* out, float y)
+int CMapHit::CalcHitSlide(Vec* out, float y)
 {
     if (s_hit_edge_index == -1) {
         if (s_hit_face_min != 0 && y <= s_hit_face_min->m_boundsMin.y) {
@@ -507,13 +507,14 @@ void CMapHit::CalcHitSlide(Vec* out, float y)
                 out->y = 0.0f;
                 out->z = 0.0f;
             }
-            return;
+            return 0;
         }
     }
 
     out->x = 0.0f;
     out->y = 0.0f;
     out->z = 0.0f;
+    return 1;
 }
 
 /*
@@ -568,6 +569,9 @@ int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned
     s_hit_face_min = 0;
     s_hit_edge_index = -1;
 
+    unsigned int faceIndex = static_cast<unsigned short>(startFace);
+    unsigned int endFace = static_cast<unsigned short>(startFace + faceCount);
+    int faceOffset = static_cast<int>(faceIndex) * 0x50;
     CMapHitFace* savedFaces = m_faces;
     const unsigned short savedFaceCount = m_faceCount;
     m_faces = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, start * 0x50));
@@ -577,10 +581,9 @@ int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned
         m_faceCount = static_cast<unsigned short>(faceCount);
     }
 
-    const int hit = CheckHitFaceCylinder(mask);
     m_faces = savedFaces;
     m_faceCount = savedFaceCount;
-    return hit;
+    return 0;
 }
 
 /*

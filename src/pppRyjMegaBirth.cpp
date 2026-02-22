@@ -492,19 +492,21 @@ void pppRyjDrawMegaBirth(void)
  */
 void pppRyjMegaBirthCon(_pppPObject* pObject, PRyjMegaBirthOffsets* offsets)
 {
-	u8* work = (u8*)pObject + 0x80 + offsets->m_serializedDataOffsets[2];
+	VRyjMegaBirth* work = (VRyjMegaBirth*)((u8*)pObject + 0x80 + offsets->m_serializedDataOffsets[2]);
+	Vec axis;
 
-	PSMTXIdentity(*(Mtx*)work);
-	*(f32*)(work + 0x30) = 0.0f;
-	*(f32*)(work + 0x34) = 0.0f;
-	*(f32*)(work + 0x38) = 0.0f;
-	*(void**)(work + 0x3C) = 0;
-	*(void**)(work + 0x40) = 0;
-	*(void**)(work + 0x44) = 0;
-	*(void**)(work + 0x48) = 0;
-	*(u16*)(work + 0x4C) = 0;
-	*(u16*)(work + 0x4E) = 0;
-	*(u16*)(work + 0x4C) = 10000;
+	PSMTXIdentity(work->m_worldMatrix);
+	axis.x = 0.0f;
+	axis.y = 0.0f;
+	axis.z = 0.0f;
+	work->m_accelerationAxis = axis;
+	work->m_particleBlock = 0;
+	work->m_worldMatrixBlock = 0;
+	work->m_colorBlock = 0;
+	work->m_meshData = 0;
+	work->m_numParticles = 0;
+	work->m_emitTimer = 0;
+	work->m_numParticles = 10000;
 
 	PSMTXIdentity(g_matUnit);
 }

@@ -29,7 +29,7 @@ void set_matrix(_pppPObject*, pppFMATRIX, pppFMATRIX, PRyjMegaBirthModel*, _PART
 extern "C" {
 #endif
 
-void pppRyjMegaBirthModel(void);
+void pppRyjMegaBirthModel(_pppPObject*, PRyjMegaBirthModel*, PRyjMegaBirthModelOffsets*);
 void pppRyjDrawMegaBirthModel(void);
 void pppRyjMegaBirthModelCon(_pppPObject*, PRyjMegaBirthModelOffsets*);
 void pppRyjMegaBirthModelDes(_pppPObject*, PRyjMegaBirthModelOffsets*);

@@ -58,6 +58,7 @@ public:
     ~CPtrArray();
     void RemoveAll();
     void SetStage(CMemory::CStage* stage);
+    int setSize(unsigned long size);
     void SetAt(unsigned long index, T item);
     T operator[](unsigned long index);
 };
@@ -109,49 +110,6 @@ struct RawPtrArray {
     CMemory::CStage* stage;
     int growCapacity;
 };
-
-static int AddPtrArrayMaterial(void* ptrArray, void* item)
-{
-    RawPtrArray* array = reinterpret_cast<RawPtrArray*>(ptrArray);
-
-    if (array->size < (array->numItems + 1)) {
-        if (array->size == 0) {
-            array->size = array->defaultSize;
-        } else {
-            array->size = array->size << 1;
-        }
-
-        void** newItems = reinterpret_cast<void**>(
-            _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-                &Memory,
-                array->size << 2,
-                array->stage,
-                s_collection_ptrarray_h,
-                0xFA,
-                0));
-        if (newItems == 0) {
-            return 0;
-        }
-
-        if (array->items != 0) {
-            memcpy(newItems, array->items, array->numItems << 2);
-            __dla__FPv(array->items);
-        }
-        array->items = newItems;
-    }
-
-    array->items[array->numItems] = item;
-    array->numItems++;
-    return 1;
-}
-
-static void SetAtPtrArrayMaterial(void* ptrArray, unsigned long index, void* item)
-{
-    RawPtrArray* array = reinterpret_cast<RawPtrArray*>(ptrArray);
-    if (array->items != 0) {
-        array->items[index] = item;
-    }
-}
 
 static int HighestSetBit(unsigned int value)
 {
@@ -226,6 +184,81 @@ static void SetMaterialColor(CMaterial* material, unsigned int rgba)
     *Ptr(material, 0x4A) = static_cast<unsigned char>((rgba >> 8) & 0xFF);
     *Ptr(material, 0x4B) = static_cast<unsigned char>(rgba & 0xFF);
 }
+}
+
+template <>
+CPtrArray<CMaterial*>::~CPtrArray()
+{
+    m_vtable = reinterpret_cast<void**>(0x801E9BFC);
+    RemoveAll();
+}
+
+template <>
+void CPtrArray<CMaterial*>::RemoveAll()
+{
+    if (m_items != 0) {
+        __dla__FPv(m_items);
+        m_items = 0;
+    }
+    m_size = 0;
+    m_numItems = 0;
+}
+
+template <>
+void CPtrArray<CMaterial*>::SetStage(CMemory::CStage* stage)
+{
+    m_stage = stage;
+}
+
+template <>
+int CPtrArray<CMaterial*>::Add(CMaterial* item)
+{
+    int result = setSize(m_numItems + 1);
+    if (result != 0) {
+        m_items[m_numItems] = item;
+        m_numItems = m_numItems + 1;
+    }
+    return result != 0;
+}
+
+template <>
+int CPtrArray<CMaterial*>::setSize(unsigned long size)
+{
+    if (m_size < size) {
+        if (m_size == 0) {
+            m_size = m_defaultSize;
+        } else {
+            m_size = m_size << 1;
+        }
+
+        void** newItems = reinterpret_cast<void**>(
+            _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+                &Memory,
+                m_size << 2,
+                m_stage,
+                s_collection_ptrarray_h,
+                0xFA,
+                0));
+        if (newItems == 0) {
+            return 0;
+        }
+
+        if (m_items != 0) {
+            memcpy(newItems, m_items, m_numItems << 2);
+        }
+        if (m_items != 0) {
+            __dla__FPv(m_items);
+            m_items = 0;
+        }
+        m_items = reinterpret_cast<CMaterial**>(newItems);
+    }
+    return 1;
+}
+
+template <>
+void CPtrArray<CMaterial*>::SetAt(unsigned long index, CMaterial* item)
+{
+    m_items[index] = item;
 }
 
 /*

@@ -26,7 +26,7 @@ public:
 	void onFrame();
 	void onFrameStat();
 	void DeleteOld(int, int, CFlatRuntime::CObject*, CFlatRuntime::CObject*);
-	void CanCreateFromScript();
+	unsigned int CanCreateFromScript();
 	void CreateFromScript(int, int, int, CGObject*, float, CGItemObj::CCFS*);
 	void safeDetach(int, float);
 	void carry(CGPartyObj*, int, int);

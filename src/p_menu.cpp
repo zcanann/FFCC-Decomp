@@ -4,6 +4,70 @@
 #include <dolphin/mtx.h>
 
 extern CTextureMan TextureMan;
+extern CMenuPcs MenuPcs;
+extern "C" void* __register_global_object(void* object, void* destructor, void* regmem);
+extern "C" void __dt__8CMenuPcsFv(void* self);
+extern void* __vt__8CManager;
+extern void* lbl_801E8668;
+extern void* lbl_8020F2D0;
+extern u32 lbl_8020EDF8[];
+extern u32 lbl_8020EE04[];
+extern u32 lbl_8020EE10[];
+extern u32 lbl_8020EE1C[];
+extern u32 lbl_8020EE28[];
+extern u32 lbl_8020EE34[];
+extern u32 lbl_8020EE40[];
+extern u8 lbl_802EA1A0[];
+
+/*
+ * --INFO--
+ * PAL Address: 0x80097618
+ * PAL Size: 328b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_p_menu_cpp(void)
+{
+    volatile void** base = reinterpret_cast<volatile void**>(&MenuPcs);
+    *base = &__vt__8CManager;
+    *base = &lbl_801E8668;
+    *base = &lbl_8020F2D0;
+
+    u32* mcCtrl = reinterpret_cast<u32*>(reinterpret_cast<u8*>(&MenuPcs) + 0x20);
+    mcCtrl[0] = 0;
+    mcCtrl[1] = 0;
+    mcCtrl[2] = 0;
+    mcCtrl[3] = 0;
+    mcCtrl[4] = 0;
+    mcCtrl[5] = 0;
+    mcCtrl[6] = 0;
+    mcCtrl[7] = 0;
+
+    __register_global_object(&MenuPcs, reinterpret_cast<void*>(__dt__8CMenuPcsFv), lbl_802EA1A0);
+
+    u32* dst = lbl_8020EE40;
+
+    dst[0x004 / 4] = lbl_8020EDF8[0];
+    dst[0x008 / 4] = lbl_8020EDF8[1];
+    dst[0x00C / 4] = lbl_8020EDF8[2];
+    dst[0x010 / 4] = lbl_8020EE04[0];
+    dst[0x014 / 4] = lbl_8020EE04[1];
+    dst[0x018 / 4] = lbl_8020EE04[2];
+    dst[0x01C / 4] = lbl_8020EE10[0];
+    dst[0x020 / 4] = lbl_8020EE10[1];
+    dst[0x024 / 4] = lbl_8020EE10[2];
+    dst[0x030 / 4] = lbl_8020EE1C[0];
+    dst[0x034 / 4] = lbl_8020EE1C[1];
+    dst[0x038 / 4] = lbl_8020EE1C[2];
+    dst[0x044 / 4] = lbl_8020EE28[0];
+    dst[0x048 / 4] = lbl_8020EE28[1];
+    dst[0x04C / 4] = lbl_8020EE28[2];
+    dst[0x058 / 4] = lbl_8020EE34[0];
+    dst[0x05C / 4] = lbl_8020EE34[1];
+    dst[0x060 / 4] = lbl_8020EE34[2];
+}
 
 /*
  * --INFO--

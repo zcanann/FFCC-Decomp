@@ -15,12 +15,14 @@ extern "C" unsigned long UnkMaterialSetGetter(void*);
 extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
 extern "C" void __destroy_arr(void*, void*, unsigned long, unsigned long);
+extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void __dt__8COctTreeFv(void*, int);
 extern "C" void __dt__7CMapHitFv(void*, int);
 extern "C" void __dt__7CMapObjFv(void*, int);
 extern "C" void __dt__8CMapMeshFv(void*, int);
+extern "C" void* PTR_PTR_s_CMapTexAnimSet_801e896c;
 extern "C" float Spline1D__5CMathFifPfPfPf(CMath*, int, float, float*, float*, float*);
 extern "C" float Line1D__5CMathFifPfPf(CMath*, int, float, float*, float*);
 extern "C" void MakeSpline1Dtable__5CMathFiPfPfPf(CMath*, int, float*, float*, float*);
@@ -78,6 +80,47 @@ CMapKeyFrame::CMapKeyFrame()
     *reinterpret_cast<int*>(Ptr(this, 0x1C)) = 0;
     *reinterpret_cast<int*>(Ptr(this, 0x20)) = 0;
     *reinterpret_cast<int*>(Ptr(this, 0x24)) = 0;
+}
+
+/*
+ * --INFO--
+ * Address:	TODO
+ * Size:	TODO
+ */
+CMapTexAnimSet::CMapTexAnimSet()
+{
+	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800335d0
+ * PAL Size: 188b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+CMapTexAnimSet::~CMapTexAnimSet()
+{
+    unsigned char* const p = reinterpret_cast<unsigned char*>(this);
+    const short count = *reinterpret_cast<short*>(p + 8);
+
+    *reinterpret_cast<void**>(p) = &PTR_PTR_s_CMapTexAnimSet_801e896c;
+
+    for (int i = 0; i < count; i++) {
+        int* entry = *reinterpret_cast<int**>(p + 0xC + (i * 4));
+        if (entry != 0) {
+            const int refCount = entry[1];
+            entry[1] = refCount - 1;
+            if ((refCount - 1) == 0 && entry != 0) {
+                (*reinterpret_cast<void (**)(int*, int)>(*entry + 8))(entry, 1);
+            }
+            *reinterpret_cast<int**>(p + 0xC + (i * 4)) = 0;
+        }
+    }
+
+    __dt__4CRefFv(this, 0);
 }
 
 /*

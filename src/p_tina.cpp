@@ -16,7 +16,9 @@ extern "C" void* memset(void*, int, unsigned long);
 extern "C" int pppLoadPtx__8CPartMngFPCciiPvi(CPartMng*, const char*, int, int, void*, int);
 extern "C" int pppLoadPdt__8CPartMngFPCciiPvi(CPartMng*, const char*, int, int, void*, int);
 extern "C" int pppGetFreeDataMng__8CPartMngFv(CPartMng*);
+extern "C" char* GetLangString__5CGameFv(void*);
 extern "C" void pppReleasePdt__8CPartMngFi(CPartMng*, int);
+extern "C" void SetRStage__13CAmemCacheSetFPQ27CMemory6CStage(void*, void*);
 extern "C" void IsBigAlloc__7CUSBPcsFi(void*, int);
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
 extern "C" void Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFUl_UcUlPFUl_UcUlPFUl_UcUl(
@@ -34,6 +36,7 @@ extern "C" void Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFU
 
 extern CPartMng PartMng;
 extern unsigned char PartPcs[];
+extern unsigned char MenuPcs[];
 extern unsigned char USBPcs[];
 extern void* CAMemCacheSet;
 
@@ -61,6 +64,7 @@ extern CProfile g_par_draw_prof;
 extern char s_no_name_8032fdcc[];
 extern char s_dvd_tina_stage_03d_mirura_801d7f78[];
 extern char s_dvd_tina_stage_03d_title_801d7f94[];
+extern char s_dvd__smenu__s_801d7fb0[];
 extern char lbl_801D7FC0[];
 extern char lbl_801D7FD4[];
 extern unsigned char ARRAY_80273928[];
@@ -496,12 +500,49 @@ void CPartPcs::create0()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005357c
+ * PAL Size: 328b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartPcs::create()
 {
-	// TODO
+    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 8);
+    void* stage;
+
+    usb->m_freePtr = 0;
+    usb->m_stageExtra = 0;
+    usb->m_blockOnFrame = 0;
+    usb->m_miruraEventActive = 0;
+    usb->m_disableShokiDraw = 0;
+
+    stage = CreateStage__7CMemoryFUlPci(&Memory, 0x180000, s_CPartPcs_dat_801d810c, 0);
+    usb->m_stageLoad = stage;
+    usb->m_stageDefault = stage;
+
+    if (Game.game.m_currentSceneId == 7) {
+        usb->m_stageAmem = 0;
+    } else {
+        usb->m_stageAmem = CreateStage__7CMemoryFUlPci(&Memory, 0x400000, s_CPartPcs_amem_801d811c, 2);
+    }
+
+    Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFUl_UcUlPFUl_UcUlPFUl_UcUl(
+        CAMemCacheSet,
+        s_CPartPcs_801d7f54,
+        reinterpret_cast<CUSBStreamDataRaw*>(PartPcs + 8)->m_stageLoad,
+        reinterpret_cast<CUSBStreamDataRaw*>(PartPcs + 8)->m_stageAmem,
+        0x400,
+        reinterpret_cast<void*>(pppNotAllocAmemCacheRmem),
+        0,
+        reinterpret_cast<void*>(pppAmemDeletePmng),
+        0,
+        reinterpret_cast<void*>(pppAmemRefCntError),
+        0);
+
+    memset(&PartMng, 0, 0x23FD8);
+    PartMng.Create();
 }
 
 /*
@@ -906,12 +947,62 @@ void CPartPcs::LoadMonsterPdt(int monsterId, int variant, void* pdtData, int pdt
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80052128
+ * PAL Size: 392b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartPcs::LoadMenuPdt(char*)
+int CPartPcs::LoadMenuPdt(char* fileName)
 {
-	// TODO
+    int pdtSlotIndex;
+    char* language;
+    int loaded;
+    void* stage;
+    char path[256];
+    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 8);
+    unsigned char* partMng = reinterpret_cast<unsigned char*>(&PartMng);
+
+    language = GetLangString__5CGameFv(&Game.game);
+    sprintf(path, s_dvd__smenu__s_801d7fb0, language, fileName);
+
+    stage = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0xEC);
+    if (Game.game.m_gameWork.m_menuStageMode != 0) {
+        stage = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0xF4);
+    }
+
+    usb->m_stageLoad = stage;
+    SetRStage__13CAmemCacheSetFPQ27CMemory6CStage(CAMemCacheSet, stage);
+
+    *reinterpret_cast<unsigned int*>(partMng + 0x236F4) = 0;
+    *reinterpret_cast<unsigned int*>(partMng + 0x236F8) = 0;
+    *reinterpret_cast<unsigned int*>(partMng + 0x236FC) = 0;
+    *reinterpret_cast<unsigned int*>(partMng + 0x23700) = 0;
+    *reinterpret_cast<unsigned int*>(partMng + 0x23704) = 0;
+    *reinterpret_cast<unsigned int*>(partMng + 0x23708) = 0;
+
+    pdtSlotIndex = pppGetFreeDataMng__8CPartMngFv(&PartMng);
+    if (pdtSlotIndex != -1) {
+        loaded = pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, path, pdtSlotIndex, 0, 0, 0);
+        if (loaded == 0) {
+            pppReleasePdt__8CPartMngFi(&PartMng, pdtSlotIndex);
+            pdtSlotIndex = -1;
+        } else {
+            loaded = pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, path, pdtSlotIndex, 0, 0, 0);
+            if (loaded == 0) {
+                pppReleasePdt__8CPartMngFi(&PartMng, pdtSlotIndex);
+                pdtSlotIndex = -1;
+            } else {
+                PartPcs[0x2d] = 1;
+            }
+        }
+    }
+
+    usb->m_stageLoad = usb->m_stageDefault;
+    SetRStage__13CAmemCacheSetFPQ27CMemory6CStage(CAMemCacheSet, usb->m_stageDefault);
+
+    return pdtSlotIndex;
 }
 
 /*

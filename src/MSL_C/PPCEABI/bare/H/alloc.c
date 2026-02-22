@@ -372,12 +372,21 @@ static void Block_construct(Block* block, unsigned long size) {
     Block_link(block, sb);
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801B28A8
+ * PAL Size: 484b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
     unsigned long current_size;
-    unsigned long max_size;
+    int start_offset;
     unsigned long* start;
     unsigned long* current;
-    int start_offset;
+    unsigned long max_size;
 
     start_offset = (block->size & 0xFFFFFFF8UL) - 4;
     start = *(unsigned long**)((char*)block + start_offset);
@@ -392,45 +401,46 @@ static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
     do {
         if (requested_size <= current_size) {
             if (0x4F < current_size - requested_size) {
-                unsigned long* remainder;
-                unsigned long old_header;
-                unsigned long block_link;
-                unsigned long is_alloc_clz;
-                unsigned long has_alloc_neighbor_clz;
+                unsigned long* split_block;
+                unsigned long old_size_flags;
+                unsigned long block_flags;
+                unsigned long prev_used_clz;
+                unsigned long prev_used_is_zero_clz;
 
-                remainder = (unsigned long*)((char*)current + requested_size);
-                old_header = *current;
-                block_link = current[1] & 0xFFFFFFFEUL | 1;
-                current[1] = block_link;
-                is_alloc_clz = __cntlzw(old_header & 2);
+                split_block = (unsigned long*)((char*)current + requested_size);
+                old_size_flags = *current;
+                block_flags = current[1] & 0xFFFFFFFEUL | 1;
+                current[1] = block_flags;
+                prev_used_clz = __cntlzw(old_size_flags & 2);
                 *current = requested_size;
-                has_alloc_neighbor_clz = __cntlzw(is_alloc_clz >> 5);
-                if (old_header & 4) {
+                prev_used_is_zero_clz = __cntlzw(prev_used_clz >> 5);
+                if ((old_size_flags & 4) != 0) {
                     *current |= 4;
                 }
-                if ((has_alloc_neighbor_clz >> 5) == 0) {
-                    remainder[-1] = requested_size;
+                if ((prev_used_is_zero_clz >> 5) == 0) {
+                    split_block[-1] = requested_size;
                 } else {
                     *current |= 2;
-                    *remainder |= 4;
+                    *split_block |= 4;
                 }
-                remainder[1] = block_link;
-                requested_size = (old_header & 0xFFFFFFF8UL) - requested_size;
-                *remainder = requested_size;
-                if ((has_alloc_neighbor_clz >> 5) == 0) {
-                    *(unsigned long*)((char*)remainder + (requested_size - 4)) = requested_size;
+                split_block[1] = block_flags;
+                requested_size = (old_size_flags & 0xFFFFFFF8UL) - requested_size;
+                *split_block = requested_size;
+                if ((prev_used_is_zero_clz >> 5) == 0) {
+                    *(unsigned long*)((char*)split_block + requested_size - 4) = requested_size;
                 } else {
-                    *remainder |= 4;
-                    *remainder |= 2;
-                    *(unsigned long*)((char*)remainder + requested_size) |= 4;
+                    *split_block |= 4;
+                    *split_block |= 2;
+                    *(unsigned long*)((char*)split_block + requested_size) |= 4;
                 }
-                if (is_alloc_clz >> 5) {
-                    remainder[3] = current[3];
-                    *(unsigned long*)(remainder[3] + 8) = (unsigned long)remainder;
-                    remainder[2] = (unsigned long)current;
-                    current[3] = (unsigned long)remainder;
+                if ((prev_used_clz >> 5) != 0) {
+                    split_block[3] = current[3];
+                    *(unsigned long*)(split_block[3] + 8) = (unsigned long)split_block;
+                    split_block[2] = (unsigned long)current;
+                    current[3] = (unsigned long)split_block;
                 }
             }
+
             *(unsigned long**)((char*)block + ((block->size & 0xFFFFFFF8UL) - 4)) = (unsigned long*)current[3];
             current_size = *current & 0xFFFFFFF8UL;
             *current |= 2;
@@ -448,6 +458,7 @@ static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
             }
             return (SubBlock*)current;
         }
+
         current = (unsigned long*)current[3];
         current_size = *current & 0xFFFFFFF8UL;
         if (max_size < current_size) {

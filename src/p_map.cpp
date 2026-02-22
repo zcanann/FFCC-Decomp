@@ -321,6 +321,7 @@ void CMapPcs::calcInit()
  */
 void CMapPcs::calc()
 {
+    Vec cameraPos;
     Mtx cameraMtx;
     Mtx44 screenMtx;
 
@@ -362,6 +363,10 @@ void CMapPcs::calc()
         if ((*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x17C) != 0) &&
             (strcmp(lbl_801E8EEC, reinterpret_cast<char*>(this) + 0x74) != 0)) {
             strcpy(lbl_801E8EEC, reinterpret_cast<char*>(this) + 0x74);
+            MapMng.GetDebugPlaySta(0, &cameraPos);
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0) = cameraPos.x;
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4) = cameraPos.y + lbl_8032FA10;
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8) = cameraPos.z;
         }
         *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x174) = 0;
         *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x178) = 1;

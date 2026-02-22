@@ -4,6 +4,7 @@
 #include <dolphin/mtx.h>
 
 extern CTextureMan TextureMan;
+extern unsigned char lbl_8020ee40[];
 
 /*
  * --INFO--
@@ -47,12 +48,18 @@ void CMenuPcs::Quit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80097490
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::GetTable(unsigned long)
+int CMenuPcs::GetTable(unsigned long index)
 {
-	// TODO
+    unsigned char* table = lbl_8020ee40;
+    unsigned long offset = index * 0x15c;
+    return (int)(table + offset);
 }
 
 /*

@@ -1547,12 +1547,48 @@ void CRedDriver::DisplaySePlayInfo()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bf8e8
+ * PAL Size: 240b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::StreamPlayState(int)
+int CRedDriver::StreamPlayState(int param_1)
 {
-	// TODO
+	unsigned int interrupts;
+	unsigned int streamData;
+	int result;
+	int* command;
+
+	interrupts = OSDisableInterrupts();
+	result = 0;
+	streamData = (unsigned int)DAT_8032f438;
+	do {
+		if ((*(int*)(streamData + 0x10C) != 0) &&
+		    ((param_1 == -1) || (*(int*)(streamData + 0x10C) == param_1))) {
+			result = 1;
+			break;
+		}
+		streamData += 0x130;
+	} while (streamData < (unsigned int)DAT_8032f438 + 0x4C0);
+
+	command = (int*)DAT_8032f3dc;
+	if (result == 0) {
+		while ((void*)command != DAT_8032f3d8) {
+			if ((*command != 0) && ((void (*)(int*))*command == _StreamPlay) &&
+			    ((param_1 == -1) || (param_1 == command[1]))) {
+				result = 1;
+				break;
+			}
+			command += 8;
+			if (command == (int*)DAT_8032f3d4 + 0x800) {
+				command = (int*)DAT_8032f3d4;
+			}
+		}
+	}
+	OSRestoreInterrupts(interrupts);
+	return result;
 }
 
 /*

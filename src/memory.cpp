@@ -16,7 +16,10 @@ extern char DAT_801d6a7c[];
 extern char DAT_801d6c58[];
 extern char DAT_801d6c88[];
 extern char DAT_801d6c98[];
+extern char DAT_801d669c[];
 extern char DAT_801d67d8[];
+extern char DAT_8032f7d4[];
+extern float FLOAT_8032f7d8;
 extern char s__4d__4d__4d_801d6800[];
 extern unsigned int DAT_801d64a8;
 extern unsigned int DAT_801d64ac;
@@ -1185,12 +1188,60 @@ void CAmemCacheSet::GetFree()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001D278
+ * PAL Size: 456b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CAmemCacheSet::GetData(short, char*, int)
+int CAmemCacheSet::GetData(short index, char* source, int line)
 {
-	// TODO
+    unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
+    while (true) {
+        int* cacheEntry = reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x58) + index * 0x1C);
+        int data = 0;
+
+        if (*cacheEntry == 0) {
+            if (*reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(cacheEntry) + 0x1A) == 0) {
+                *cacheEntry = cacheEntry[1];
+                data = *cacheEntry;
+            } else {
+                if (source == 0) {
+                    source = DAT_8032f7d4;
+                }
+
+                data = reinterpret_cast<int>(
+                    reinterpret_cast<CMemory::CStage*>(*reinterpret_cast<void**>(bytes))->alloc(
+                        static_cast<unsigned long>(cacheEntry[2]), source, static_cast<unsigned long>(line), 1));
+                *cacheEntry = data;
+                if (data != 0) {
+                    int dmaId = DMAEntry__9CRedSoundFiiiiiPFPv_vPv(&Sound, 0, 1, *cacheEntry, cacheEntry[1], cacheEntry[2], 0, 0);
+                    CStopWatch watch((char*)-1);
+                    watch.Start();
+                    while (DMACheck__9CRedSoundFi(&Sound, dmaId) != 0) {
+                        watch.Stop();
+                        if (watch.Get() < FLOAT_8032f7d8) {
+                            watch.Start();
+                        } else {
+                            if (System.m_execParam != 0) {
+                                Printf__7CSystemFPce(&System, DAT_801d669c);
+                            }
+                            Sound.CheckDriver(1);
+                            watch.Reset();
+                            watch.Start();
+                        }
+                    }
+                    data = *cacheEntry;
+                }
+            }
+        }
+
+        if (data != 0) {
+            return data;
+        }
+        AmemFreeLowPrio(*reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x58) + index * 0x1C + 8));
+    }
 }
 
 /*

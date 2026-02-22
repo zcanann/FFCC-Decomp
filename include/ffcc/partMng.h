@@ -408,7 +408,7 @@ public:
     void pppReleasePdt(int);
 
     void pppGetFreePppMngSt();
-    void pppGetNumFreePppMngSt();
+    int pppGetNumFreePppMngSt();
     void pppGetFreePppDataMngSt();
 
     void drawLine(int, int, int, int, _GXColor&);

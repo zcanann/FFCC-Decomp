@@ -87,27 +87,27 @@ void pppRandHCV(void* p1, void* p2, void* p3) {
     scale = *(float*)(base + outputOffset);
 
     {
+        s16 delta = params->delta[0];
         s16 current = target[0];
-        s16 base = params->delta[0];
-        target[0] = (s16)(current + (int)((float)base * scale - (float)current));
+        target[0] = (s16)(current + (int)((float)delta * scale - (float)delta));
     }
 
     {
+        s16 delta = params->delta[1];
         s16 current = target[1];
-        s16 base = params->delta[1];
-        target[1] = (s16)(current + (int)((float)base * scale - (float)current));
+        target[1] = (s16)(current + (int)((float)delta * scale - (float)delta));
     }
 
     {
+        s16 delta = params->delta[2];
         s16 current = target[2];
-        s16 base = params->delta[2];
-        target[2] = (s16)(current + (int)((float)base * scale - (float)current));
+        target[2] = (s16)(current + (int)((float)delta * scale - (float)delta));
     }
 
     {
+        s16 delta = params->delta[3];
         s16 current = target[3];
-        s16 base = params->delta[3];
-        target[3] = (s16)(current + (int)((float)base * scale - (float)current));
+        target[3] = (s16)(current + (int)((float)delta * scale - (float)delta));
     }
 }
 

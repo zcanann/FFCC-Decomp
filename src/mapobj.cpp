@@ -683,32 +683,53 @@ void CMapObj::SetDrawFlag()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80028F70
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapObj::DrawHit()
 {
-	// TODO
+    if ((U8At(this, 0x1D) == 2) && (PtrAt(this, 0xC) != 0)) {
+        MaterialMan.SetObjMatrix(reinterpret_cast<float(*)[4]>(0x8026805C), MtxAt(this, 0xB8));
+        reinterpret_cast<CMapHit*>(PtrAt(this, 0xC))->Draw();
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80028F08
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapObj::DrawHitWire()
 {
-	// TODO
+    if ((U8At(this, 0x1D) == 2) && (PtrAt(this, 0xC) != 0)) {
+        MaterialMan.SetObjMatrix(reinterpret_cast<float(*)[4]>(0x8026805C), MtxAt(this, 0xB8));
+        reinterpret_cast<CMapHit*>(PtrAt(this, 0xC))->DrawWire();
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80028EA0
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapObj::DrawHitNormal()
 {
-	// TODO
+    if ((U8At(this, 0x1D) == 2) && (PtrAt(this, 0xC) != 0)) {
+        MaterialMan.SetObjMatrix(reinterpret_cast<float(*)[4]>(0x8026805C), MtxAt(this, 0xB8));
+        reinterpret_cast<CMapHit*>(PtrAt(this, 0xC))->DrawNormal();
+    }
 }
 
 /*
@@ -835,32 +856,51 @@ int CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800288a8
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapObj::GetHitFaceNormal(Vec*)
+void CMapObj::GetHitFaceNormal(Vec* out)
 {
-	// TODO
+    CMapHit* mapHit = reinterpret_cast<CMapHit*>(PtrAt(this, 0xC));
+    mapHit->GetHitFaceNormal(out);
+    PSMTXMultVecSR(MtxAt(this, 0xB8), out, out);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002884c
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapObj::CalcHitSlide(Vec*, float)
+int CMapObj::CalcHitSlide(Vec* out, float y)
 {
-	// TODO
+    CMapHit* mapHit = reinterpret_cast<CMapHit*>(PtrAt(this, 0xC));
+    int hit = mapHit->CalcHitSlide(out, y);
+    PSMTXMultVecSR(MtxAt(this, 0xB8), out, out);
+    return hit;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80028800
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapObj::CalcHitPosition(Vec*)
+void CMapObj::CalcHitPosition(Vec* out)
 {
-	// TODO
+    CMapHit* mapHit = reinterpret_cast<CMapHit*>(PtrAt(this, 0xC));
+    mapHit->CalcHitPosition(out);
+    PSMTXMultVec(MtxAt(this, 0xB8), out, out);
 }
 
 /*

@@ -315,8 +315,10 @@ extern "C" void pppFrameYmLaser(void* pppYmLaser, void* param_2, void* param_3)
 				}
 
 				if (created != 0) {
-					*(Vec*)(created + *(int*)step->m_payload + 0x80) = points[i];
-					*(float*)(created + *(int*)step->m_payload + 0x84) += *(float*)(step->m_payload + 0x34);
+					Vec* createdPos = (Vec*)(created + *(int*)step->m_payload + 0x80);
+					createdPos->x = points[i].x;
+					createdPos->y = points[i].y + *(float*)(step->m_payload + 0x34);
+					createdPos->z = points[i].z;
 				}
 			}
 		}

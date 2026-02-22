@@ -27,7 +27,13 @@ extern double DOUBLE_80332a58;
 extern double DOUBLE_80332a60;
 extern double DOUBLE_80332a68;
 extern double DOUBLE_80332a78;
+extern double DOUBLE_80332a80;
+extern double DOUBLE_80332a90;
+extern double DOUBLE_80332a98;
+extern double DOUBLE_80332aa0;
+extern double DOUBLE_80332aa8;
 extern float FLOAT_80332a70;
+extern float FLOAT_80332ab0;
 extern float FLOAT_80332a88;
 extern const char* PTR_s_Flamestrike_80214d28[];
 extern const char* PTR_s_Feuer_Hieb_80214d3c[];
@@ -987,12 +993,80 @@ int CMenuPcs::UniteCloseAnim(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8014b244
+ * PAL Size: 904b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::CmdOpen1()
+unsigned int CMenuPcs::CmdOpen1()
 {
-	// TODO
+	u8* self = reinterpret_cast<u8*>(this);
+	const s32 caravanWork = Game.game.m_scriptFoodBase[0];
+	s16* const cmd = *reinterpret_cast<s16**>(self + 0x82c);
+	s16* const list = *reinterpret_cast<s16**>(self + 0x850);
+
+	cmd[0x11] = static_cast<s16>(cmd[0x11] + 1);
+
+	const s32 selected = static_cast<s32>(cmd[0x13]);
+	const f32 t = static_cast<f32>(-((DOUBLE_80332a90 * static_cast<f64>(cmd[0x11])) - DOUBLE_80332a58));
+	*reinterpret_cast<f32*>(list + selected * 0x20 + 0x0c) = t;
+
+	s32 chainCount = 1;
+	if (*reinterpret_cast<s16*>(caravanWork + (selected + 1) * 2 + 0x214) == -1) {
+		chainCount = 2;
+		*reinterpret_cast<f32*>(list + (selected + 1) * 0x20 + 0x0c) = t;
+		if (*reinterpret_cast<s16*>(caravanWork + (selected + 2) * 2 + 0x214) == -1) {
+			chainCount = 3;
+			*reinterpret_cast<f32*>(list + (selected + 2) * 0x20 + 0x0c) = t;
+		}
+	}
+
+	s32 slot = 3;
+	for (s32 i = 0; i < 3; i++) {
+		if (selected == static_cast<s32>(cmd[0x13 + i])) {
+			slot = i;
+			break;
+		}
+	}
+
+	s16* const baseEntry = list + (static_cast<s32>(list[1]) + slot) * 0x20 + 4;
+	s16* const animEntry = list + (static_cast<s32>(list[1]) + 3) * 0x20 + 4;
+
+	if (*reinterpret_cast<u8*>(cmd + 6) == 0) {
+		const s32 endX = static_cast<s32>(baseEntry[0] + baseEntry[2]) - static_cast<s32>(DOUBLE_80332a98);
+		animEntry[0] = static_cast<s16>(endX);
+
+		s32 uniteCount = 0;
+		if (chainCount == 2) {
+			int combo[5][2];
+			uniteCount = ChkUnite__8CMenuPcsFiPA2_i(this, static_cast<int>(cmd[0x13]), combo);
+		}
+
+		animEntry[0x0A] = 1.0f;
+		if (uniteCount != 0) {
+			animEntry[0x0A] = static_cast<f32>(DOUBLE_80332aa0);
+		}
+		animEntry[2] = 0xC0;
+		animEntry[3] = 0x40;
+		animEntry[1] = static_cast<s16>(((-((static_cast<f64>(animEntry[3]) * animEntry[0x0A]) -
+		                                    static_cast<f64>(baseEntry[3])) *
+		                                   DOUBLE_80332a60) +
+		                                  static_cast<f64>(baseEntry[1])) -
+		                                 DOUBLE_80332aa8);
+		animEntry[4] = FLOAT_80332ab0;
+		animEntry[6] = FLOAT_80332ab0;
+		*reinterpret_cast<s32*>(animEntry + 0x0e) = 0x39;
+		*reinterpret_cast<u8*>(cmd + 6) = 1;
+	}
+
+	animEntry[8] = static_cast<f32>(DOUBLE_80332a90 * static_cast<f64>(cmd[0x11]));
+	if (static_cast<f64>(cmd[0x11]) >= DOUBLE_80332a78) {
+		cmd[0x15] = 0;
+	}
+
+	return 0;
 }
 
 /*
@@ -1128,12 +1202,102 @@ void CMenuPcs::CmdOpen2()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8014a9dc
+ * PAL Size: 948b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::CmdClose2()
+unsigned int CMenuPcs::CmdClose2()
 {
-	// TODO
+	u8* self = reinterpret_cast<u8*>(this);
+	s16* const cmd = *reinterpret_cast<s16**>(self + 0x82c);
+	s16* const list = *reinterpret_cast<s16**>(self + 0x850);
+	const s32 caravanWork = Game.game.m_scriptFoodBase[0];
+
+	const s32 selected = static_cast<s32>(cmd[0x13]);
+	const s32 modeSel = static_cast<s32>(cmd[0x13 + cmd[0x18]]);
+
+	cmd[0x11] = static_cast<s16>(cmd[0x11] + 1);
+
+	switch (cmd[0x0A]) {
+	case 0:
+		cmd[0x11] = 0;
+		if (*reinterpret_cast<s8*>(cmd + 4) < 0) {
+			cmd[0x0A] = 3;
+		} else if (*reinterpret_cast<s16*>(caravanWork + selected * 2 + 0x214) == 0) {
+			cmd[0x0A] = 2;
+		} else {
+			cmd[0x0A] = 1;
+		}
+		return 0;
+	case 1: {
+		s32 uniteIdx = 0;
+		for (; uniteIdx < static_cast<s32>(list[0]); uniteIdx++) {
+			if (list[uniteIdx * 0x20 + 2] == selected) {
+				break;
+			}
+		}
+
+		if (UniteCloseAnim(uniteIdx) != 0) {
+			int combo[2][2];
+			ChkUnite__8CMenuPcsFiPA2_i(this, selected, combo);
+
+			s32 comboIdx = 0;
+			if (combo[0][1] < combo[1][1]) {
+				comboIdx = (combo[0][1] == modeSel) ? 0 : 1;
+			} else {
+				comboIdx = (combo[1][1] == modeSel) ? 1 : 0;
+			}
+
+			s32 ununiteCount = 1;
+			if (*reinterpret_cast<s16*>(caravanWork + (selected + 1) * 2 + 0x214) == -1) {
+				ununiteCount = 2;
+				if (*reinterpret_cast<s16*>(caravanWork + (selected + 2) * 2 + 0x214) == -1) {
+					ununiteCount = 3;
+				}
+			}
+
+			UnuniteComList__12CCaravanWorkFii(reinterpret_cast<void*>(caravanWork), selected, ununiteCount);
+			UniteComList__12CCaravanWorkFiii(reinterpret_cast<void*>(caravanWork), combo[comboIdx][1], 0, 0);
+			cmd[0x13] = static_cast<s16>(combo[comboIdx][1]);
+			cmd[0x0A] = 2;
+		}
+		return 0;
+	}
+	case 2:
+		if (*reinterpret_cast<s16*>(caravanWork + selected * 2 + 0x214) == 0) {
+			int combo[2][2];
+			ChkUnite__8CMenuPcsFiPA2_i(this, selected, combo);
+
+			s32 comboIdx = 0;
+			if (combo[0][1] < combo[1][1]) {
+				comboIdx = (combo[0][1] == modeSel) ? 0 : 1;
+			} else {
+				comboIdx = (combo[1][1] == modeSel) ? 1 : 0;
+			}
+
+			UniteComList__12CCaravanWorkFiii(reinterpret_cast<void*>(caravanWork), combo[comboIdx][1], 0, 0);
+			cmd[0x13] = static_cast<s16>(combo[comboIdx][1]);
+		} else if (UniteOpenAnim__8CMenuPcsFi(this, -1) != 0) {
+			cmd[0x0A] = 3;
+		}
+		return 0;
+	case 3:
+		for (s32 i = 0; i < static_cast<s32>(list[0]); i++) {
+			f32* const xAnim = reinterpret_cast<f32*>(list + i * 0x20 + 0x0c);
+			if (static_cast<f64>(*xAnim) < DOUBLE_80332a58) {
+				*xAnim = static_cast<f32>((DOUBLE_80332a68 * static_cast<f64>(cmd[0x11])) + DOUBLE_80332a60);
+				if (static_cast<f64>(*xAnim) > DOUBLE_80332a58) {
+					*xAnim = FLOAT_80332a70;
+				}
+			}
+		}
+		return static_cast<u32>(static_cast<f64>(cmd[0x11]) >= DOUBLE_80332a78);
+	default:
+		return 0;
+	}
 }
 
 /*

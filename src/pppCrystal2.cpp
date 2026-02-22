@@ -99,7 +99,7 @@ void MakeRefractionMap(HSD_ImageBuffer*)
 void pppConstructCrystal2(pppCrystal2* pppCrystal2, UnkC* param_2)
 {
     s32 iVar1 = param_2->m_serializedDataOffsets[2];
-    u32* data = (u32*)((char*)pppCrystal2 + iVar1 + 8);
+    u32* data = (u32*)((char*)pppCrystal2 + iVar1 + 0x80);
 
     data[0] = 0;
     data[1] = 0;
@@ -149,7 +149,7 @@ void pppDestructCrystal2(pppCrystal2* pppCrystal2, UnkC* param_2)
 void pppFrameCrystal2(pppCrystal2* pppCrystal2, UnkB* param_2, UnkC* param_3)
 {
     if ((DAT_8032ed70 == 0) && (param_2->m_payload[0] != 0)) {
-        int* refractionData = (int*)((char*)pppCrystal2 + param_3->m_serializedDataOffsets[2] + 8);
+        int* refractionData = (int*)((char*)pppCrystal2 + param_3->m_serializedDataOffsets[2] + 0x80);
         if (refractionData[0] == 0) {
             u32 y;
             u32 x;

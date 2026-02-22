@@ -144,12 +144,47 @@ int _EraseTime(int eraseTrack)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801ca3bc
+ * PAL Size: 252b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void SearchSeEmptyTrack(int, int, int)
+int* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
 {
-	// TODO
+	int* trackBasePtr;
+	int* scan;
+	int* track;
+	int remaining;
+
+	trackBasePtr = (int*)((char*)DAT_8032f3f0 + 0xdbc);
+	if (attrMask != 0) {
+		_EraseAttribute(eraseTrack, attrMask);
+	}
+
+	do {
+		track = (int*)(*trackBasePtr + 0x292c);
+		scan = track;
+		remaining = trackCount;
+		do {
+			while (((track = scan, remaining = remaining - 1, remaining != 0) && (*track == 0)) &&
+			       ((((unsigned char*)track)[0x26] & 2) == 0)) {
+				scan = track - 0x55;
+			}
+			if ((*track != 0) || ((((unsigned char*)track)[0x26] & 2) != 0)) {
+				remaining = 1;
+				scan = track;
+			}
+			scan = scan - 0x55;
+		} while ((remaining != 0) && ((int*)*trackBasePtr <= track));
+	} while ((track < (int*)*trackBasePtr) && (_EraseTime(eraseTrack) != 0));
+
+	if (track < (int*)*trackBasePtr) {
+		track = 0;
+	}
+
+	return track;
 }
 
 /*

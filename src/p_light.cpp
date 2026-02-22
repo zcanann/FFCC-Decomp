@@ -46,6 +46,7 @@ extern float FLOAT_8032fc60;
 extern float FLOAT_8032fc70;
 extern float FLOAT_8032fc74;
 extern float FLOAT_8032fc78;
+extern float FLOAT_8032fc7c;
 extern float FLOAT_8032fc80;
 extern float FLOAT_8032fc84;
 extern float FLOAT_8032fc94;
@@ -554,8 +555,12 @@ CLightPcs::CBumpLight* CLightPcs::AddBump(CLightPcs::CLight* srcLight, CLightPcs
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800494a4
+ * PAL Size: 696b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CLightPcs::SetMapColorAlpha(float (*) [4], _GXColor, _GXColor, unsigned char, float, float, float, unsigned char)
 {
@@ -564,42 +569,63 @@ void CLightPcs::SetMapColorAlpha(float (*) [4], _GXColor, _GXColor, unsigned cha
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80049474
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CLightPcs::SetAmbient(_GXColor)
+void CLightPcs::SetAmbient(_GXColor color)
 {
-	// TODO
+    GXSetChanAmbColor((GXChannelID)4, color);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80049428
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CLightPcs::SetAmbientAlpha(float)
+void CLightPcs::SetAmbientAlpha(float alpha)
 {
-	// TODO
+    _GXColor color;
+    color.r = 0;
+    color.g = 0;
+    color.b = 0;
+    color.a = (u8)(int)((double)FLOAT_8032fc7c * (double)alpha);
+    GXSetChanAmbColor((GXChannelID)2, color);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80049420
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CLightPcs::SetNumDiffuse(unsigned long)
+void CLightPcs::SetNumDiffuse(unsigned long count)
 {
-	// TODO
+    *(u32*)((char*)this + 0xac) = count;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800493e4
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CLightPcs::SetDiffuseColor(unsigned long, _GXColor)
+void CLightPcs::SetDiffuseColor(unsigned long idx, _GXColor color)
 {
-	// TODO
+    GXInitLightColor((GXLightObj*)((char*)this + (idx * 0xb0) + 0x128), color);
 }
 
 /*

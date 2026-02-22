@@ -34,7 +34,7 @@ extern "C" void SetMargin__5CFontFf(float, CFont*);
 extern "C" void SetShadow__5CFontFi(CFont*, int);
 extern "C" void SetScale__5CFontFf(float, CFont*);
 extern "C" void SetTlut__5CFontFi(CFont*, int);
-extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
+extern "C" float GetWidth__5CFontFPc(CFont*, const char*);
 
 /*
  * --INFO--
@@ -144,39 +144,34 @@ const char* CMenuPcs::GetWinMess(int index)
  */
 int CMenuPcs::GetYesNoXPos(int right)
 {
-    static const char sYes[] = "\0Yes";
-    static const char sSi[] = "\0Si";
-    static const char sJa[] = "\0Ja";
-    static const char sOui[] = "\0Oui";
-
     const unsigned int languageId = Game.game.m_gameWork.m_languageId;
-    const char* yesText = sSi;
-    if (languageId != 3) {
-        if (languageId < 3) {
-            if ((languageId != 1) && (languageId != 0)) {
-                yesText = sJa;
-                goto apply_font_yes;
-            }
+    const char* yesText;
+    if (languageId == 3) {
+        yesText = lbl_80215E00[13];
+    } else if (languageId < 3) {
+        if ((languageId == 1) || (languageId == 0)) {
+            yesText = lbl_80215C28[13];
         } else {
-            yesText = sSi;
-            if ((languageId == 5) || ((yesText = sOui), languageId < 5)) {
-                goto apply_font_yes;
-            }
+            yesText = lbl_80215D14[13];
         }
-        yesText = sYes;
+    } else if (languageId == 5) {
+        yesText = lbl_80215FD8[13];
+    } else if (languageId < 5) {
+        yesText = lbl_80215EEC[13];
+    } else {
+        yesText = lbl_80215C28[13];
     }
 
-apply_font_yes:
     CFont* font = *(CFont**)((char*)this + 0xf8);
     SetMargin__5CFontFf(1.0f, font);
     SetShadow__5CFontFi(font, 0);
     SetScale__5CFontFf(1.0f, font);
 
-    const int yesWidth = GetWidth__5CFontFPc(font, yesText + 1);
+    const int yesWidth = (int)GetWidth__5CFontFPc(font, yesText + 1);
     short* windowInfo = *(short**)((char*)this + 0x848);
     int x = (int)(((double)(windowInfo[2] - yesWidth) * 0.5) + (double)windowInfo[0]);
     if (right != 0) {
-        const int noWidth = GetWidth__5CFontFPc(font, lbl_8021672C[languageId - 1]);
+        const int noWidth = (int)GetWidth__5CFontFPc(font, lbl_8021672C[languageId - 1]);
         x += yesWidth - noWidth;
     }
     return x - 0x1e;
@@ -193,39 +188,35 @@ apply_font_yes:
  */
 int CMenuPcs::GetSlotABXPos(int right)
 {
-    static const char sSlotA[] = "\0Slot A";
-    static const char sSteckplatzA[] = "\0Steckplatz A";
-    static const char sRanuraA[] = "\0Ranura A";
-
     const unsigned int languageId = Game.game.m_gameWork.m_languageId;
-    const char* slotAText = sSlotA;
-    if (languageId != 3) {
-        if (languageId < 3) {
-            if ((languageId != 1) && (languageId != 0)) {
-                slotAText = sSteckplatzA;
-                goto apply_font_slot;
-            }
+    const char* slotAText;
+    if (languageId == 3) {
+        slotAText = lbl_80215E00[2];
+    } else if (languageId < 3) {
+        if ((languageId == 1) || (languageId == 0)) {
+            slotAText = lbl_80215C28[2];
         } else {
-            slotAText = sRanuraA;
-            if ((languageId == 5) || ((slotAText = sSlotA), languageId < 5)) {
-                goto apply_font_slot;
-            }
+            slotAText = lbl_80215D14[2];
         }
-        slotAText = sSlotA;
+    } else if (languageId == 5) {
+        slotAText = lbl_80215FD8[2];
+    } else if (languageId < 5) {
+        slotAText = lbl_80215EEC[2];
+    } else {
+        slotAText = lbl_80215C28[2];
     }
 
-apply_font_slot:
     CFont* font = *(CFont**)((char*)this + 0xf8);
     SetMargin__5CFontFf(1.0f, font);
     SetShadow__5CFontFi(font, 0);
     SetScale__5CFontFf(1.0f, font);
     SetTlut__5CFontFi(font, 0x23);
 
-    const int slotAWidth = GetWidth__5CFontFPc(font, slotAText + 1);
+    const int slotAWidth = (int)GetWidth__5CFontFPc(font, slotAText + 1);
     short* windowInfo = *(short**)((char*)this + 0x848);
     int x = (int)(((double)(windowInfo[2] - slotAWidth) * 0.5) + (double)windowInfo[0]);
     if (right != 0) {
-        const int slotBWidth = GetWidth__5CFontFPc(font, lbl_80216740[languageId - 1]);
+        const int slotBWidth = (int)GetWidth__5CFontFPc(font, lbl_80216740[languageId - 1]);
         x += slotAWidth - slotBWidth;
     }
     return x - 0x1e;

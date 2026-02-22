@@ -110,7 +110,8 @@ int CGamePcs::GetTable(unsigned long param)
  */
 void CGamePcs::create()
 {
-    game.Create();
+    CGame& game = Game.game;
+    game.CGame::Create();
 }
 
 /*
@@ -124,7 +125,8 @@ void CGamePcs::create()
  */
 void CGamePcs::destroy()
 {
-    game.Destroy();
+    CGame& game = Game.game;
+    game.CGame::Destroy();
 }
 
 /*
@@ -134,7 +136,8 @@ void CGamePcs::destroy()
  */
 void CGamePcs::calcInit()
 {
-	game.CheckScriptChange();
+    CGame& game = Game.game;
+    game.CGame::CheckScriptChange();
 }
 
 /*
@@ -148,7 +151,8 @@ void CGamePcs::calcInit()
  */
 void CGamePcs::calc0()
 {
-    game.Calc();
+    CGame& game = Game.game;
+    game.CGame::Calc();
 }
 
 /*
@@ -162,7 +166,8 @@ void CGamePcs::calc0()
  */
 void CGamePcs::calc1()
 {
-    game.Calc2();
+    CGame& game = Game.game;
+    game.CGame::Calc2();
 }
 
 /*
@@ -176,7 +181,8 @@ void CGamePcs::calc1()
  */
 void CGamePcs::calc2()
 {
-    game.Calc3();
+    CGame& game = Game.game;
+    game.CGame::Calc3();
 }
 
 /*
@@ -190,7 +196,8 @@ void CGamePcs::calc2()
  */
 void CGamePcs::draw0()
 {
-    game.Draw();
+    CGame& game = Game.game;
+    game.CGame::Draw();
 }
 
 /*
@@ -204,7 +211,8 @@ void CGamePcs::draw0()
  */
 void CGamePcs::draw1()
 {
-    game.Draw2();
+    CGame& game = Game.game;
+    game.CGame::Draw2();
 }
 
 /*
@@ -218,7 +226,8 @@ void CGamePcs::draw1()
  */
 void CGamePcs::draw2()
 {
-    game.Draw3();
+    CGame& game = Game.game;
+    game.CGame::Draw3();
 }
 
 /*

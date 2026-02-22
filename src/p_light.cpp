@@ -436,7 +436,7 @@ void CLightPcs::Add(CLightPcs::CLight* light)
     float intensity = *(float*)((char*)light + 0x28);
     unsigned int colorMask = 0x01010101;
 
-    if (maxDist >= FLOAT_8032fc14) {
+    if (maxDist >= FLOAT_8032fc10) {
         maxDist = radius;
     }
 
@@ -460,9 +460,53 @@ void CLightPcs::Add(CLightPcs::CLight* light)
 
     unsigned int* dst = (unsigned int*)((char*)this + 0x63c + index * 0xb0);
     unsigned int* src = (unsigned int*)light;
-    for (int i = 0; i < 0x2c; i++) {
-        dst[i] = src[i];
-    }
+    dst[0] = src[0];
+    dst[1] = src[1];
+    dst[2] = src[2];
+    dst[3] = src[3];
+    dst[4] = src[4];
+    dst[5] = src[5];
+    dst[6] = src[6];
+    dst[7] = src[7];
+    dst[8] = src[8];
+    dst[9] = src[9];
+    dst[10] = src[10];
+    dst[11] = src[11];
+    dst[12] = src[12];
+    dst[13] = src[13];
+    dst[14] = src[14];
+    dst[15] = src[15];
+    dst[16] = src[16];
+    dst[17] = src[17];
+    dst[18] = src[18];
+    *(u8*)(dst + 19) = *(u8*)(src + 19);
+    *(u8*)((char*)dst + 0x4d) = *(u8*)((char*)src + 0x4d);
+    *(u8*)((char*)dst + 0x4e) = *(u8*)((char*)src + 0x4e);
+    *(u8*)((char*)dst + 0x4f) = *(u8*)((char*)src + 0x4f);
+    dst[20] = src[20];
+    dst[21] = src[21];
+    dst[22] = src[22];
+    dst[23] = src[23];
+    dst[24] = src[24];
+    dst[25] = src[25];
+    dst[26] = src[26];
+    dst[27] = src[27];
+    dst[28] = src[28];
+    dst[29] = src[29];
+    dst[30] = src[30];
+    dst[31] = src[31];
+    dst[32] = src[32];
+    dst[33] = src[33];
+    dst[34] = src[34];
+    dst[35] = src[35];
+    dst[36] = src[36];
+    dst[37] = src[37];
+    dst[38] = src[38];
+    dst[39] = src[39];
+    dst[40] = src[40];
+    dst[41] = src[41];
+    dst[42] = src[42];
+    dst[43] = src[43];
 
     float atten = absRadius * FLOAT_8032fc18 * intensity;
     float radiusSq = radius * radius;

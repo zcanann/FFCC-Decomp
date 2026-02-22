@@ -33,6 +33,8 @@ extern "C" float lbl_8032F99C;
 extern "C" int CheckHitCylinder__8COctTreeFP12CMapCylinderP3VecUl(void*, CMapCylinder*, Vec*, unsigned long);
 extern "C" int CheckHitCylinderNear__8COctTreeFP12CMapCylinderP3VecUl(void*, CMapCylinder*, Vec*, unsigned long);
 extern "C" void SetDrawFlag__8COctTreeFv(void*);
+extern "C" void Draw__8COctTreeFUc(void*, unsigned char);
+extern "C" void Draw__7CMapObjFUc(void*, unsigned char);
 extern "C" void Calc__11CMapAnimRunFl(CMapAnimRun*, long);
 extern "C" void* lbl_801E89A8[];
 extern "C" void* lbl_801E899C[];
@@ -42,6 +44,7 @@ extern "C" void* lbl_801E8978[];
 extern int DAT_8032ec78;
 extern float FLOAT_8032ec80;
 extern unsigned char DAT_8032ec88;
+extern unsigned char DAT_8032ecb8;
 extern float FLOAT_8032f9a0;
 extern float FLOAT_8032f9a4;
 extern float FLOAT_8032f9a8;
@@ -1693,7 +1696,27 @@ void setDbgLight(int, Vec&, _GXColor&)
  */
 void CMapMng::DrawBefore()
 {
-	// TODO
+    if ((*reinterpret_cast<short*>(Ptr(this, 0xC)) != 0) && (*reinterpret_cast<unsigned char*>(Ptr(this, 0x2298B)) != 0)) {
+        GXSetColorUpdate(1);
+        GXSetAlphaUpdate(0);
+        GXSetCullMode(GX_CULL_BACK);
+        GXSetZMode(1, GX_LEQUAL, 1);
+        LightPcs.SetNumDiffuse(0);
+
+        if ((DAT_8032ecb8 & 8) == 0) {
+            unsigned char* mapObj = Ptr(&MapMng, 0x954);
+            for (int i = 0; i < *reinterpret_cast<short*>(Ptr(this, 0xC)); i++) {
+                Draw__7CMapObjFUc(mapObj, 0xFE);
+                mapObj += 0xF0;
+            }
+
+            unsigned char* octTree = Ptr(this, 0x14);
+            for (int i = 0; i < *reinterpret_cast<short*>(Ptr(this, 0x8)); i++) {
+                Draw__8COctTreeFUc(octTree, 0xFF);
+                octTree += 0x38;
+            }
+        }
+    }
 }
 
 /*

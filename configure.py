@@ -609,7 +609,7 @@ config.libs = [
         "os",
         [
             Object(NonMatching, "os/__start.c"),
-            Object(NonMatching, "os/__ppc_eabi_init.cpp"),
+            Object(NonMatching, "os/__ppc_eabi_init.c"),
             Object(NonMatching, "os/OS.c"),
             Object(NonMatching, "os/OSAddress.c"),
             Object(NonMatching, "os/OSAlarm.c"),

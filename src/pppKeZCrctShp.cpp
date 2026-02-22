@@ -23,6 +23,7 @@ void pppKeZCrctShpDraw(_pppPObject *pObject, int param2)
     Vec zeroVec;
     Vec transformedPos;
     pppFMATRIX transformMatrix;
+    pppFMATRIX modeMatrix;
     float scaledPosX;
     float scaledPosY;
     float scaledPosZ;
@@ -48,15 +49,17 @@ void pppKeZCrctShpDraw(_pppPObject *pObject, int param2)
 
     if (mode == 1) {
         Vec modePos;
+        modeMatrix = *(pppFMATRIX*)&ppvWorldMatrix;
         modePos.x = scaledPosX;
         modePos.y = scaledPosY;
         modePos.z = scaledPosZ;
-        pppApplyMatrix(zeroVec, *(pppFMATRIX*)&ppvWorldMatrix, modePos);
+        pppApplyMatrix(zeroVec, modeMatrix, modePos);
     } else if (mode == 0) {
         float offsetPosX;
         float offsetPosY;
         float offsetPosZ;
         Vec offsetPos;
+        modeMatrix = *(pppFMATRIX*)&ppvWorldMatrix;
 
         offsetPosX = scaledPosX + *(float*)(param2 + 8);
         offsetPosY = scaledPosY + *(float*)(param2 + 0xc);
@@ -68,24 +71,27 @@ void pppKeZCrctShpDraw(_pppPObject *pObject, int param2)
         offsetPos.x = offsetPosX;
         offsetPos.y = offsetPosY;
         offsetPos.z = offsetPosZ;
-        pppApplyMatrix(transformedPos, *(pppFMATRIX*)&ppvWorldMatrix, offsetPos);
+        pppApplyMatrix(transformedPos, modeMatrix, offsetPos);
     } else if (mode < 3) {
         Vec modePos;
         float cameraPosX;
         float cameraPosY;
         float cameraPosZ;
+        pppFMATRIX cameraMatrix;
 
+        modeMatrix = pppMngStPtr->m_matrix;
         modePos.x = scaledPosX;
         modePos.y = scaledPosY;
         modePos.z = scaledPosZ;
-        pppApplyMatrix(zeroVec, pppMngStPtr->m_matrix, modePos);
+        pppApplyMatrix(zeroVec, modeMatrix, modePos);
         cameraPosX = *(float*)(param2 + 8) * pppMngStPtr->m_scale.x + zeroVec.x;
         cameraPosY = *(float*)(param2 + 0xc) * pppMngStPtr->m_scale.y + zeroVec.y;
         cameraPosZ = *(float*)(param2 + 0x10) * pppMngStPtr->m_scale.z + zeroVec.z;
 
+        cameraMatrix = *(pppFMATRIX*)&ppvCameraMatrix0;
         zeroVec.x = cameraPosX;
         zeroVec.y = cameraPosY;
         zeroVec.z = cameraPosZ;
-        pppApplyMatrix(zeroVec, *(pppFMATRIX*)&ppvCameraMatrix0, zeroVec);
+        pppApplyMatrix(zeroVec, cameraMatrix, zeroVec);
     }
 }

@@ -15,10 +15,13 @@ extern "C" int sprintf(char*, const char*, ...);
 extern "C" void* memset(void*, int, unsigned long);
 extern "C" int pppLoadPtx__8CPartMngFPCciiPvi(CPartMng*, const char*, int, int, void*, int);
 extern "C" int pppLoadPdt__8CPartMngFPCciiPvi(CPartMng*, const char*, int, int, void*, int);
+extern "C" void pppLoadPmd__8CPartMngFPCc(CPartMng*, const char*);
+extern "C" void pppLoadPan__8CPartMngFPCc(CPartMng*, const char*);
 extern "C" int pppGetFreeDataMng__8CPartMngFv(CPartMng*);
 extern "C" char* GetLangString__5CGameFv(void*);
 extern "C" void pppReleasePdt__8CPartMngFi(CPartMng*, int);
 extern "C" void SetRStage__13CAmemCacheSetFPQ27CMemory6CStage(void*, void*);
+extern "C" void AmemSetLock__13CAmemCacheSetFv(void*);
 extern "C" void IsBigAlloc__7CUSBPcsFi(void*, int);
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
 extern "C" void Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFUl_UcUlPFUl_UcUlPFUl_UcUl(
@@ -46,6 +49,12 @@ extern char DAT_801d81d4[];
 extern char s_CPartPcs_801d7f54[];
 extern char s_CPartPcs_dat_801d810c[];
 extern char s_CPartPcs_amem_801d811c[];
+extern char s_dvd_tina_chobit_801d812c[];
+extern char s_dvd_tina_chobit_0_801d813c[];
+extern char s_dvd_tina_chobit_1_801d8150[];
+extern char s_dvd_tina_chobit_2_801d8164[];
+extern char s_dvd_tina_chobit_3_801d8178[];
+extern char s_dvd_tina_chobit_4_801d818c[];
 extern char s_p_tina_cpp_801d8008[];
 extern char s_Tina___c__801d8014[];
 extern char s_clc___3f___max___3f___801d8020[];
@@ -547,12 +556,34 @@ void CPartPcs::create()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80053444
+ * PAL Size: 312b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartPcs::createLoad()
 {
-	// TODO
+    unsigned char* partMng = reinterpret_cast<unsigned char*>(&PartMng);
+
+    *reinterpret_cast<unsigned int*>(partMng + 0x236F4) = 0;
+    *reinterpret_cast<unsigned int*>(partMng + 0x236F8) = 0;
+    *reinterpret_cast<unsigned int*>(partMng + 0x236FC) = 0;
+    *reinterpret_cast<unsigned int*>(partMng + 0x23700) = 0;
+    *reinterpret_cast<unsigned int*>(partMng + 0x23704) = 0;
+    *reinterpret_cast<unsigned int*>(partMng + 0x23708) = 0;
+    *reinterpret_cast<unsigned int*>(partMng + 0x2370C) = 0;
+
+    pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_801d812c, 1, 1, 0, 0);
+    pppLoadPmd__8CPartMngFPCc(&PartMng, s_dvd_tina_chobit_801d812c);
+    pppLoadPan__8CPartMngFPCc(&PartMng, s_dvd_tina_chobit_801d812c);
+    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_0_801d813c, 1, 1, 0, 0);
+    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_1_801d8150, 2, 1, 0, 0);
+    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_2_801d8164, 3, 1, 0, 0);
+    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_3_801d8178, 4, 1, 0, 0);
+    pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, s_dvd_tina_chobit_4_801d818c, 5, 1, 0, 0);
+    AmemSetLock__13CAmemCacheSetFv(CAMemCacheSet);
 }
 
 /*

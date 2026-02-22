@@ -14,6 +14,7 @@ static char s_memory_cpp[] = "memory.cpp";
 extern void* PTR_PTR_s_CMemory_801e8488;
 extern CMemory Memory;
 extern char DAT_801d6648[];
+extern char DAT_801d6a24[];
 extern char DAT_801d6a7c[];
 extern char DAT_801d6b7c[];
 extern char DAT_801d6bb0[];
@@ -47,6 +48,13 @@ extern unsigned int DAT_801d64d8;
 extern unsigned int DAT_801d64dc;
 extern unsigned int DAT_801d64e0;
 extern unsigned int DAT_801d64e4;
+extern int DAT_8032ec58;
+extern char DAT_8032f7e8[];
+extern char DAT_8032f808[];
+extern char s____Heap_Walker_801d6bfc[];
+extern char s_Use____5dKB__s_801d6c0c[];
+extern char s_Unuse___5dKB_801d6c20[];
+extern char s_Total___5dKB_Use___5dKB_Unuse____801d6c30[];
 extern "C" void Printf__7CSystemFPce(CSystem* system, char* format, ...);
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" int DMAEntry__9CRedSoundFiiiiiPFPv_vPv(
@@ -500,12 +508,57 @@ void CMemory::Frame()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001EF90
+ * PAL Size: 392b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMemory::HeapWalker()
 {
-	// TODO
+    Printf__7CSystemFPce(&System, DAT_8032f7e8);
+    Printf__7CSystemFPce(&System, DAT_8032f808);
+    Printf__7CSystemFPce(&System, s____Heap_Walker_801d6bfc);
+    Printf__7CSystemFPce(&System, DAT_8032f808);
+
+    CStage* listHead = reinterpret_cast<CStage*>(reinterpret_cast<unsigned char*>(this) + 4);
+    for (int mode = 0; mode < 3; mode++) {
+        if ((mode != 1) || (OSGetConsoleSimulatedMemSize() == 0x3000000)) {
+            CStage* stage = *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(listHead) + 4);
+            while (stage != listHead) {
+                stage->heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
+                stage = *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(stage) + 4);
+            }
+
+            Printf__7CSystemFPce(&System, DAT_8032f7e8);
+
+            stage = *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(listHead) + 4);
+            int useTotal = 0;
+            int unuseTotal = 0;
+            while (stage != listHead) {
+                unsigned int useKB = static_cast<unsigned int>(
+                    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0xC) -
+                    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 8))
+                    >> 10;
+                Printf__7CSystemFPce(&System, s_Use____5dKB__s_801d6c0c, useKB, stageGetSourceName(stage));
+                useTotal += useKB;
+
+                unsigned int unuseKB = static_cast<unsigned int>(
+                    *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 4) + 8) -
+                    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0xC))
+                    >> 10;
+                Printf__7CSystemFPce(&System, s_Unuse___5dKB_801d6c20, unuseKB);
+                stage = *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(stage) + 4);
+                unuseTotal += unuseKB;
+            }
+
+            Printf__7CSystemFPce(
+                &System, s_Total___5dKB_Use___5dKB_Unuse____801d6c30, useTotal + unuseTotal, useTotal, unuseTotal);
+        }
+
+        listHead = reinterpret_cast<CStage*>(reinterpret_cast<unsigned char*>(listHead) + 0x27D8);
+    }
 }
 
 /*
@@ -858,12 +911,89 @@ void CMemory::CStage::quitBlock()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001E2EC
+ * PAL Size: 524b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void* CMemory::CStage::alloc(unsigned long, char*, unsigned long, int)
+void* CMemory::CStage::alloc(unsigned long size, char* source, unsigned long line, int noError)
 {
-	return (void*)nullptr;
+    DAT_8032ec58 += 1;
+    if (size == 0) {
+        size = 0x40;
+    }
+
+    unsigned int allocSize = static_cast<unsigned int>(size + 0x3F) & ~0x3F;
+    int allocated = 0;
+
+    for (int pass = 0; pass < 2; pass++) {
+        if (pass != 0) {
+            for (int node = *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
+                 (*reinterpret_cast<unsigned char*>(node + 2) & 3) == 0;
+                 node = *reinterpret_cast<int*>(node + 8)) {
+                if (((*reinterpret_cast<unsigned char*>(node + 2) & 4) == 0) &&
+                    (allocSize <= static_cast<unsigned int>(*reinterpret_cast<int*>(node + 0x10)))) {
+                    if (allocSize < static_cast<unsigned int>(*reinterpret_cast<int*>(node + 0x10) - 0x40)) {
+                        int split = node + allocSize;
+                        *reinterpret_cast<unsigned char*>(split + 2) = 0;
+                        *reinterpret_cast<int*>(split + 0x10) =
+                            (*reinterpret_cast<int*>(node + 0x10) - static_cast<int>(allocSize)) - 0x40;
+                        *reinterpret_cast<int*>(node + 0x10) = allocSize;
+                        *reinterpret_cast<unsigned short*>(split + 0x00) = 0x4B41;
+                        *reinterpret_cast<unsigned short*>(split + 0x3E) = 0x4D49;
+                        *reinterpret_cast<int*>(split + 0x04) = node;
+                        *reinterpret_cast<int*>(split + 0x08) = *reinterpret_cast<int*>(node + 0x08);
+                        *reinterpret_cast<int*>(node + 0x08) = split + 0x40;
+                        *reinterpret_cast<int*>(*reinterpret_cast<int*>(split + 0x08) + 0x04) = split + 0x40;
+                    }
+
+                    *reinterpret_cast<unsigned short*>(node + 0x18) = static_cast<unsigned short>(line);
+                    *reinterpret_cast<unsigned char*>(node + 3) =
+                        static_cast<unsigned char>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Memory) +
+                                                                           0x7794));
+                    memset(reinterpret_cast<void*>(node + 0x1A), 0, 0x24);
+
+                    if (source == (char*)nullptr) {
+                        source = DAT_8032f7d4;
+                    }
+                    strncpy(reinterpret_cast<char*>(node + 0x1A), source, 0x23);
+
+                    allocated = node + 0x40;
+                    *reinterpret_cast<unsigned char*>(node + 2) = 4;
+                    *reinterpret_cast<unsigned char*>(node + 2) =
+                        (*reinterpret_cast<unsigned char*>(node + 2) & 0x0F) |
+                        static_cast<unsigned char>(
+                            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Memory) + 0x779C) << 4);
+                    *reinterpret_cast<unsigned long*>(node + 0x14) =
+                        *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned char*>(this) + 0x108);
+                    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x124) += 1;
+                    *reinterpret_cast<CStage**>(node + 0x0C) = this;
+                    break;
+                }
+
+                if ((*reinterpret_cast<int*>(node + 8) == 0) || (*reinterpret_cast<int*>(node + 4) == 0)) {
+                    heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
+                }
+            }
+
+            if (allocated != 0) {
+                break;
+            }
+        }
+    }
+
+    if ((noError == 0) && (allocated == 0)) {
+        if (source == (char*)nullptr) {
+            source = DAT_8032f7d4;
+        }
+        Printf__7CSystemFPce(
+            &System, DAT_801d6a24, stageGetSourceName(this), allocSize, source, line);
+        heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
+    }
+
+    return reinterpret_cast<void*>(allocated);
 }
 
 /*

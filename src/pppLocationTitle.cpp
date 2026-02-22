@@ -189,24 +189,25 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, UnkB* param_2, Un
         LocationTitleParticle* particles = (LocationTitleParticle*)work->m_particles;
         Vec subVec;
         Vec interp[50];
-        u16 count = work->m_count;
+        LocationTitleParticle* startParticle;
         u8 stepCount = *(u8*)&param_2->m_stepValue;
-        int startIndex = count - 2;
+        int startIndex = (int)work->m_count - 2;
         int inserted = 0;
-        float inv = 1.0f / (float)(stepCount + 1);
+        double stepScale = (double)(1.0f / (float)(stepCount + 1));
 
-        PSVECSubtract(&particles[count - 1].m_pos, &particles[startIndex].m_pos, &subVec);
+        startParticle = &particles[startIndex];
+        PSVECSubtract(&particles[work->m_count - 1].m_pos, &startParticle->m_pos, &subVec);
 
-        for (u8 i = 0; i < stepCount; i++) {
-            float t = (float)(i + 1) * inv;
+        for (int i = 0; i < stepCount; i++) {
             Vec scaled;
+            float t = (float)(stepScale * (double)(i + 1));
 
             PSVECScale(&subVec, &scaled, t);
-            PSVECAdd(&particles[startIndex].m_pos, &scaled, &interp[i]);
+            PSVECAdd(&startParticle->m_pos, &scaled, &interp[i]);
             inserted++;
             work->m_count++;
 
-            if (maxCount <= work->m_count + 1) {
+            if (maxCount <= (u16)(work->m_count + 1)) {
                 break;
             }
         }

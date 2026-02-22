@@ -556,32 +556,33 @@ int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned
  */
 int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned short startFace, unsigned short faceCount, unsigned long mask)
 {
-    (void)position;
-
-    const unsigned int start = static_cast<unsigned int>(startFace);
-    const unsigned int end = start + static_cast<unsigned int>(faceCount);
-    if (start >= static_cast<unsigned int>(m_faceCount)) {
-        return 0;
-    }
-
     g_hit_cyl = *mapCylinder;
-    s_hit_t_min = s_large_pos;
-    s_hit_face_min = 0;
-    s_hit_edge_index = -1;
+    g_hit_mvec = *position;
 
+    unsigned int faceIndex = static_cast<unsigned short>(startFace);
+    unsigned int endFace = static_cast<unsigned short>(startFace + faceCount);
+    int faceOffset = static_cast<int>(faceIndex) * 0x50;
     CMapHitFace* savedFaces = m_faces;
     const unsigned short savedFaceCount = m_faceCount;
-    m_faces = reinterpret_cast<CMapHitFace*>(Ptr(m_faces, start * 0x98));
-    if (end >= static_cast<unsigned int>(savedFaceCount)) {
-        m_faceCount = static_cast<unsigned short>(savedFaceCount - start);
-    } else {
-        m_faceCount = static_cast<unsigned short>(faceCount);
+
+    while (faceIndex < endFace) {
+        m_faces = reinterpret_cast<CMapHitFace*>(Ptr(savedFaces, faceOffset));
+        s_hit_t_min = s_large_pos;
+        m_faceCount = 1;
+
+        if (CheckHitFaceCylinder(mask) != 0) {
+            m_faces = savedFaces;
+            m_faceCount = savedFaceCount;
+            return 1;
+        }
+
+        faceOffset += 0x50;
+        faceIndex++;
     }
 
-    const int hit = CheckHitFaceCylinder(mask);
     m_faces = savedFaces;
     m_faceCount = savedFaceCount;
-    return hit;
+    return 0;
 }
 
 /*

@@ -135,8 +135,12 @@ double CRingMenu::GetDispCounter()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a4c3c
+ * PAL Size: 1392b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRingMenu::onCalc()
 {

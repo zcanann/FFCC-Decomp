@@ -1,9 +1,24 @@
 #include "ffcc/p_menu.h"
+#include "ffcc/color.h"
+#include "ffcc/math.h"
+#include "ffcc/menu.h"
+#include "ffcc/p_camera.h"
+#include "ffcc/ringmenu.h"
 #include "ffcc/textureman.h"
 
 #include <dolphin/mtx.h>
 
 extern CTextureMan TextureMan;
+extern CMath Math;
+
+struct Vec4d
+{
+    float x;
+    float y;
+    float z;
+    float w;
+};
+extern unsigned char lbl_8020ee40[];
 
 /*
  * --INFO--
@@ -47,12 +62,18 @@ void CMenuPcs::Quit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80097490
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::GetTable(unsigned long)
+int CMenuPcs::GetTable(unsigned long index)
 {
-	// TODO
+    unsigned char* table = lbl_8020ee40;
+    unsigned long offset = index * 0x15c;
+    return (int)(table + offset);
 }
 
 /*
@@ -423,12 +444,138 @@ void CMenuPcs::calcBattle()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80093ec4
+ * PAL Size: 1864b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::drawBattle()
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+
+    if (*reinterpret_cast<s32*>(self + 0x48) != 0) {
+        const float frame = static_cast<float>(*reinterpret_cast<s32*>(self + 0x58));
+        float fade = 1.0f - (frame * 0.05f);
+        if (fade < 0.0f) {
+            fade = 0.0f;
+        }
+
+        Mtx44 screenMtx;
+        Vec4d projected;
+        PSMTX44Copy(*reinterpret_cast<Mtx44*>(reinterpret_cast<u8*>(&CameraPcs) + 0x48), screenMtx);
+        Math.MTX44MultVec4(screenMtx, reinterpret_cast<Vec*>(self + 0x4C), &projected);
+
+        if (projected.w > 0.0f) {
+            const int totalWidth = static_cast<int>(static_cast<float>(*reinterpret_cast<s32*>(self + 0x60)) * fade);
+            const int halfWidth = totalWidth / 2;
+            float screenX = 320.0f + (320.0f * projected.x) / projected.w;
+            float screenY = 240.0f - (240.0f * projected.y) / projected.w;
+
+            if (screenX < static_cast<float>(halfWidth)) {
+                screenX = static_cast<float>(halfWidth);
+            } else {
+                const float right = 640.0f - static_cast<float>(halfWidth);
+                if (screenX > right) {
+                    screenX = right;
+                }
+            }
+
+            if (screenY < 32.0f) {
+                screenY = 32.0f;
+            } else if (screenY > 448.0f) {
+                screenY = 448.0f;
+            }
+
+            int fillWidth = 0;
+            if (*reinterpret_cast<s32*>(self + 0x64) != 0) {
+                fillWidth = ((totalWidth - 16) * *reinterpret_cast<s32*>(self + 0x6C)) /
+                            *reinterpret_cast<s32*>(self + 0x64);
+            }
+
+            const float left = screenX - static_cast<float>(halfWidth);
+            const float bodyLeft = left + 8.0f;
+            const float alphaF = 80.0f * fade;
+            const u8 alpha = static_cast<u8>(alphaF < 0.0f ? 0.0f : (alphaF > 255.0f ? 255.0f : alphaF));
+            const CColor frameColor(0xFF, 0xFF, 0xFF, alpha);
+            GXSetChanMatColor(GX_COLOR0A0, frameColor.color);
+
+            if (totalWidth > 0) {
+                CTexture* tex = *reinterpret_cast<CTexture**>(self + 0x500);
+                TextureMan.SetTexture(GX_TEXMAP0, tex);
+                if (tex != 0) {
+                    Mtx texMtx;
+                    const u32 width = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(tex) + 0x64);
+                    const u32 height = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(tex) + 0x68);
+                    PSMTXScale(texMtx, 1.0f / static_cast<float>(width), 1.0f / static_cast<float>(height), 1.0f);
+                    GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
+                    GXSetNumTexGens(1);
+                    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+                }
+                TextureMan.SetTextureTev(tex);
+                DrawRect(0, left, screenY, 8.0f, 8.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+
+                tex = *reinterpret_cast<CTexture**>(self + 0x504);
+                TextureMan.SetTexture(GX_TEXMAP0, tex);
+                if (tex != 0) {
+                    Mtx texMtx;
+                    const u32 width = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(tex) + 0x64);
+                    const u32 height = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(tex) + 0x68);
+                    PSMTXScale(texMtx, 1.0f / static_cast<float>(width), 1.0f / static_cast<float>(height), 1.0f);
+                    GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
+                    GXSetNumTexGens(1);
+                    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+                }
+                TextureMan.SetTextureTev(tex);
+                DrawRect(0, bodyLeft, screenY, static_cast<float>(totalWidth - 16), 8.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+
+                tex = *reinterpret_cast<CTexture**>(self + 0x508);
+                TextureMan.SetTexture(GX_TEXMAP0, tex);
+                if (tex != 0) {
+                    Mtx texMtx;
+                    const u32 width = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(tex) + 0x64);
+                    const u32 height = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(tex) + 0x68);
+                    PSMTXScale(texMtx, 1.0f / static_cast<float>(width), 1.0f / static_cast<float>(height), 1.0f);
+                    GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
+                    GXSetNumTexGens(1);
+                    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+                }
+                TextureMan.SetTextureTev(tex);
+                DrawRect(0, (left + static_cast<float>(totalWidth)) - 8.0f, screenY, 8.0f, 8.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+            }
+
+            const u8 gauge = static_cast<u8>((*reinterpret_cast<s32*>(self + 0x5C) * 0xFF) >> 4);
+            const CColor fillTop(0xFF, gauge, gauge, alpha);
+            GXSetChanMatColor(GX_COLOR0A0, fillTop.color);
+            TextureMan.SetTextureTev(0);
+            DrawRect(0, bodyLeft, screenY + 1.0f, static_cast<float>(fillWidth), 3.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+
+            const u8 gaugeTop = static_cast<u8>(((*reinterpret_cast<s32*>(self + 0x5C) * 0x7F) >> 4) + 0x80);
+            const CColor fillBottom(0xFF, gaugeTop, gauge, alpha);
+            GXSetChanMatColor(GX_COLOR0A0, fillBottom.color);
+            DrawRect(0, bodyLeft, screenY + 4.0f, static_cast<float>(fillWidth), 3.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+        }
+    }
+
+    for (int i = 0; i < 4; i++) {
+        CMenu* menu = *reinterpret_cast<CMenu**>(self + 0x13C + i * 4);
+        if (menu != 0) {
+            menu->Draw();
+        }
+    }
+    for (int i = 0; i < 12; i++) {
+        CMenu* menu = *reinterpret_cast<CMenu**>(self + 0x10C + i * 4);
+        if (menu != 0) {
+            menu->Draw();
+        }
+    }
+    for (int i = 0; i < 4; i++) {
+        CRingMenu* menu = *reinterpret_cast<CRingMenu**>(self + 0x13C + i * 4);
+        if (menu != 0) {
+            menu->DrawIcon();
+        }
+    }
 }
 
 /*

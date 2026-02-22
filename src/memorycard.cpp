@@ -13,6 +13,11 @@ extern unsigned char Game[];
 extern CMath Math;
 CMemoryCardMan MemoryCardMan;
 
+extern "C" void SaveScript__5CGameFPc(void* game, char* scriptData);
+class CChara;
+extern CChara Chara;
+extern "C" void SaveFurTexBuffer__6CCharaFPUs(CChara* chara, unsigned short* outTexels);
+
 // CRC32 lookup table
 static const unsigned int crcTable[256] = {
     0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f,
@@ -872,6 +877,9 @@ void CMemoryCardMan::MakeSaveData()
         *reinterpret_cast<int*>(dst + 0x1DA0) = *reinterpret_cast<int*>(cv + 0xC24);
         *reinterpret_cast<int*>(dst + 0x1DA4) = *reinterpret_cast<int*>(cv + 0x10);
     }
+
+    SaveScript__5CGameFPc(Game, reinterpret_cast<char*>(save + 0x62D0));
+    SaveFurTexBuffer__6CCharaFPUs(&Chara, reinterpret_cast<unsigned short*>(save + 0x6AD0));
 }
 
 /*
@@ -1026,6 +1034,7 @@ void CMemoryCardMan::SetLoadData()
             *reinterpret_cast<int*>(gameWork + 0x18 + i * 4) = -1;
         }
     }
+
 }
 
 /*

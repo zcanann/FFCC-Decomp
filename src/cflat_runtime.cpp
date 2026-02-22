@@ -579,12 +579,125 @@ void CFlatRuntime::CStack::operator= (const CFlatRuntime::CStack&)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80067c3c
+ * PAL Size: 1144b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime::request(CFlatRuntime::CObject*, int, int, int, CFlatRuntime::CStack*)
+void CFlatRuntime::request(CFlatRuntime::CObject* object, int systemKind, int systemIndex, int argCount,
+                           CFlatRuntime::CStack* args)
 {
-	// TODO
+	u8* const self = reinterpret_cast<u8*>(this);
+	u8* const targetObject = *reinterpret_cast<u8**>(reinterpret_cast<u8*>(object) + 0x18);
+	u8* func = 0;
+
+	if (static_cast<s8>(targetObject[0x38]) < 0) {
+		return;
+	}
+
+	if ((*reinterpret_cast<s16*>(targetObject + 0x16) < 0)
+	    || (((systemKind != 2) && (systemKind != 3)) || (systemIndex < 0))) {
+		u8* searchFunc = *reinterpret_cast<u8**>(self + 0x20);
+		int funcCount = *reinterpret_cast<int*>(self + 0x1C);
+
+		for (int i = 0; i < funcCount; i++, searchFunc += 0x50) {
+			if ((*reinterpret_cast<int*>(searchFunc + 0x40) == systemKind)
+			    && (*reinterpret_cast<int*>(searchFunc + 0x44) == systemIndex)) {
+				func = searchFunc;
+				break;
+			}
+		}
+	} else {
+		const s16 classIndex = *reinterpret_cast<s16*>(targetObject + 0x16);
+		u8* const classes = *reinterpret_cast<u8**>(self + 0x14);
+		const int funcIndex = *reinterpret_cast<int*>(classes + (classIndex * 0x22C) + 0x24 + (systemIndex * 4));
+		if (funcIndex >= 0) {
+			func = *reinterpret_cast<u8**>(self + 0x20) + (funcIndex * 0x50);
+		}
+	}
+
+	if (func == 0) {
+		return;
+	}
+
+	const int reqFlagIndex = *reinterpret_cast<int*>(func + 0x48);
+	if (reqFlagIndex >= 0) {
+		const u16 reqFlags = *reinterpret_cast<u16*>(targetObject + 0x34);
+		int highestBit = -1;
+		for (int bit = 31; bit >= 0; bit--) {
+			if ((reqFlags & (1U << bit)) != 0) {
+				highestBit = bit;
+				break;
+			}
+		}
+		if (reqFlagIndex <= highestBit) {
+			return;
+		}
+		*reinterpret_cast<u16*>(targetObject + 0x34) |= static_cast<u16>(1 << reqFlagIndex);
+	}
+
+	u32 copiedArgs = 0;
+	if (argCount > 0) {
+		u32* sp = *reinterpret_cast<u32**>(targetObject + 0x08);
+		while (copiedArgs < static_cast<u32>(argCount)) {
+			*sp++ = args[copiedArgs].m_word;
+			copiedArgs++;
+		}
+		*reinterpret_cast<u32**>(targetObject + 0x08) = sp;
+	}
+
+	const u32 prevCodePos = *reinterpret_cast<u32*>(targetObject + 0x1C);
+	const u8 prevFlags = targetObject[0x38];
+	const u32 prevLocalBase = *reinterpret_cast<u32*>(targetObject + 0x0C);
+	const int prevWaitCounter = *reinterpret_cast<int*>(targetObject + 0x28);
+	const int prevReqFlag0 = *reinterpret_cast<int*>(targetObject + 0x2C);
+	const s16 prevArgCount = *reinterpret_cast<s16*>(targetObject + 0x36);
+
+	if (*reinterpret_cast<int*>(func + 0x4C) == 0) {
+		*reinterpret_cast<u32*>(targetObject + 0x0C) =
+		    *reinterpret_cast<u32*>(targetObject + 0x08) - (static_cast<u32>(*reinterpret_cast<int*>(func + 0x24)) * 4);
+		*reinterpret_cast<u32*>(targetObject + 0x08) =
+		    *reinterpret_cast<u32*>(targetObject + 0x0C) + (static_cast<u32>(*reinterpret_cast<int*>(func + 0x28)) * 4);
+	} else {
+		*reinterpret_cast<u32*>(targetObject + 0x08) -= 4;
+		*reinterpret_cast<s16*>(targetObject + 0x36) = static_cast<s16>(**reinterpret_cast<u32**>(targetObject + 0x08));
+		*reinterpret_cast<u32*>(targetObject + 0x0C) =
+		    *reinterpret_cast<u32*>(targetObject + 0x08) - (static_cast<u32>(*reinterpret_cast<s16*>(targetObject + 0x36)) * 4);
+		*reinterpret_cast<u32*>(targetObject + 0x08) =
+		    *reinterpret_cast<u32*>(targetObject + 0x0C) + (static_cast<u32>(*reinterpret_cast<s16*>(targetObject + 0x36)) * 4);
+	}
+
+	*reinterpret_cast<u16*>(targetObject + 0x1C) =
+	    static_cast<u16>((*reinterpret_cast<u16*>(targetObject + 0x1C) & 0x000F)
+	                     | (static_cast<u16>(*reinterpret_cast<s16*>(func + 0x00)) << 4));
+	*reinterpret_cast<u32*>(targetObject + 0x1C) &= 0xFFF00000;
+
+	targetObject[0x38] = static_cast<u8>((targetObject[0x38] & 0xDF) | 0x20);
+	*reinterpret_cast<int*>(targetObject + 0x28) = 0;
+	*reinterpret_cast<int*>(targetObject + 0x2C) = 0;
+
+	**reinterpret_cast<u32**>(targetObject + 0x08) = prevLocalBase;
+	*reinterpret_cast<u32*>(targetObject + 0x08) += 4;
+	**reinterpret_cast<u32**>(targetObject + 0x08) = prevCodePos;
+	*reinterpret_cast<u32*>(targetObject + 0x08) += 4;
+	**reinterpret_cast<int**>(targetObject + 0x08) =
+	    static_cast<int>((static_cast<u32>(prevFlags) << 26) | (static_cast<u32>(prevFlags) >> 6)) >> 31;
+	*reinterpret_cast<u32*>(targetObject + 0x08) += 4;
+	**reinterpret_cast<u32**>(targetObject + 0x08) =
+	    static_cast<u32>(prevArgCount) | (static_cast<u32>(prevWaitCounter) << 16) | (static_cast<u32>(prevReqFlag0) << 15);
+	*reinterpret_cast<u32*>(targetObject + 0x08) += 4;
+
+	int clearCount = *reinterpret_cast<int*>(func + 0x28) - *reinterpret_cast<int*>(func + 0x24);
+	if (clearCount > 0) {
+		u32* clearPtr =
+		    reinterpret_cast<u32*>(*reinterpret_cast<u32*>(targetObject + 0x0C) + (*reinterpret_cast<int*>(func + 0x24) * 4));
+		while (clearCount > 0) {
+			*clearPtr++ = 0;
+			clearCount--;
+		}
+	}
 }
 
 /*

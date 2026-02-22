@@ -468,7 +468,7 @@ CFile::CHandle* CFile::CheckQueue()
         {
             int dvdStatus = DVDGetCommandBlockStatus(&handle->m_dvdFileInfo.cb);
 
-            if (dvdStatus == 0x0B || (dvdStatus >= 4 && dvdStatus <= 6) || dvdStatus == -1)
+            if (dvdStatus == 0x0B || ((u32)(dvdStatus - 4) <= 2U) || dvdStatus == -1)
             {
                 DrawError(handle->m_dvdFileInfo, dvdStatus);
             }

@@ -1877,17 +1877,53 @@ int CBound::CheckCross(CBound& other)
 {
 	float* a = (float*)this;
 	float* b = (float*)&other;
+	bool pass;
+	bool overlap;
 
-	if ((b[0] > a[3]) || (a[0] > b[3])) {
-		return 0;
+	if (b[0] <= a[0]) {
+		if (a[0] <= b[0]) {
+			overlap = true;
+		} else {
+			overlap = a[0] <= b[3];
+		}
+	} else {
+		overlap = b[0] <= a[3];
 	}
-	if ((b[1] > a[4]) || (a[1] > b[4])) {
-		return 0;
+
+	pass = false;
+	if (overlap) {
+		if (b[1] <= a[1]) {
+			if (a[1] <= b[1]) {
+				overlap = true;
+			} else {
+				overlap = a[1] <= b[4];
+			}
+		} else {
+			overlap = b[1] <= a[4];
+		}
+
+		if (overlap) {
+			pass = true;
+		}
 	}
-	if ((b[2] > a[5]) || (a[2] > b[5])) {
-		return 0;
+
+	if (pass) {
+		if (b[2] <= a[2]) {
+			if (a[2] <= b[2]) {
+				pass = true;
+			} else {
+				pass = a[2] <= b[5];
+			}
+		} else {
+			pass = b[2] <= a[5];
+		}
+
+		if (pass) {
+			return 1;
+		}
 	}
-	return 1;
+
+	return 0;
 }
 
 /*

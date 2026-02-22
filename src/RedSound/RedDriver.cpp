@@ -606,12 +606,41 @@ void _StreamPause(int* param_1)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bdb10
+ * PAL Size: 192b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _EntryExecCommand(void (*) (int*), int, int, int, int, int, int, int)
+void _EntryExecCommand(void (*command)(int*), int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6)
 {
-	// TODO
+    unsigned int interrupt;
+    int* entry;
+    int* nextEntry;
+    int* begin;
+
+    interrupt = OSDisableInterrupts();
+
+    entry = (int*)DAT_8032f3d8;
+    entry[0] = (int)command;
+    entry[1] = arg0;
+    entry[2] = arg1;
+    entry[3] = arg2;
+    entry[4] = arg3;
+    entry[5] = arg4;
+    entry[6] = arg5;
+    entry[7] = arg6;
+
+    begin = (int*)DAT_8032f3d4;
+    nextEntry = entry + 8;
+    if (nextEntry == begin + 0x800) {
+        nextEntry = begin;
+    }
+
+    DAT_8032f3d8 = nextEntry;
+
+    OSRestoreInterrupts(interrupt);
 }
 
 /*
@@ -1348,12 +1377,33 @@ void CRedDriver::SetMusicPhraseStop(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bf0c4
+ * PAL Size: 168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::SetSeBlockData(int, void*)
+void CRedDriver::SetSeBlockData(int bank, void* blockData)
 {
-	// TODO
+    void* copiedHeader;
+    int headerSize;
+
+    if (blockData == 0) {
+        copiedHeader = 0;
+    } else {
+        headerSize = *(int*)((char*)blockData + 0xc);
+        if (headerSize < 1) {
+            copiedHeader = 0;
+        } else {
+            copiedHeader = RedNew__Fi(headerSize);
+            if (copiedHeader != 0) {
+                memcpy(copiedHeader, blockData, headerSize);
+            }
+        }
+    }
+
+    _EntryExecCommand(_SetSeBlockData, bank, (int)copiedHeader, 0, 0, 0, 0, 0);
 }
 
 /*

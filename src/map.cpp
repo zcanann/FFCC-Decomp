@@ -33,15 +33,19 @@ extern "C" float lbl_8032F99C;
 extern "C" int CheckHitCylinder__8COctTreeFP12CMapCylinderP3VecUl(void*, CMapCylinder*, Vec*, unsigned long);
 extern "C" int CheckHitCylinderNear__8COctTreeFP12CMapCylinderP3VecUl(void*, CMapCylinder*, Vec*, unsigned long);
 extern "C" void SetDrawFlag__8COctTreeFv(void*);
+extern "C" void Draw__8COctTreeFUc(void*, unsigned char);
+extern "C" void Draw__7CMapObjFUc(void*, unsigned char);
 extern "C" void Calc__11CMapAnimRunFl(CMapAnimRun*, long);
 extern "C" void* lbl_801E89A8[];
 extern "C" void* lbl_801E899C[];
 extern "C" void* lbl_801E8990[];
 extern "C" void* lbl_801E8984[];
 extern "C" void* lbl_801E8978[];
+extern unsigned char CameraPcs[];
 extern int DAT_8032ec78;
 extern float FLOAT_8032ec80;
 extern unsigned char DAT_8032ec88;
+extern unsigned char DAT_8032ecb8;
 extern float FLOAT_8032f9a0;
 extern float FLOAT_8032f9a4;
 extern float FLOAT_8032f9a8;
@@ -1688,12 +1692,40 @@ void setDbgLight(int, Vec&, _GXColor&)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80031084
+ * PAL Size: 244b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapMng::DrawBefore()
 {
-	// TODO
+    const short mapObjCount = *reinterpret_cast<short*>(Ptr(this, 0xC));
+    if ((mapObjCount == 0) || (*reinterpret_cast<unsigned char*>(Ptr(this, 0x2298B)) == 0)) {
+        return;
+    }
+
+    GXSetColorUpdate(1);
+    GXSetAlphaUpdate(0);
+    GXSetCullMode(GX_CULL_BACK);
+    GXSetZMode(1, GX_LEQUAL, 1);
+    LightPcs.SetNumDiffuse(0);
+
+    if ((DAT_8032ecb8 & 8) == 0) {
+        CMapObj* mapObj = reinterpret_cast<CMapObj*>(Ptr(&MapMng, 0x954));
+        for (int i = 0; i < mapObjCount; i++) {
+            Draw__7CMapObjFUc(mapObj, 0xFE);
+            mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
+        }
+
+        const short octTreeCount = *reinterpret_cast<short*>(Ptr(this, 8));
+        void* octTree = Ptr(this, 0x14);
+        for (int i = 0; i < octTreeCount; i++) {
+            Draw__8COctTreeFUc(octTree, 0xFF);
+            octTree = Ptr(octTree, 0x38);
+        }
+    }
 }
 
 /*
@@ -1718,12 +1750,44 @@ void GXSetTexCoordGen(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80030280
+ * PAL Size: 276b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapMng::DrawAfter()
 {
-	// TODO
+    const short mapObjCount = *reinterpret_cast<short*>(Ptr(this, 0xC));
+    if ((mapObjCount == 0) || (*reinterpret_cast<unsigned char*>(Ptr(this, 0x2298B)) == 0)) {
+        return;
+    }
+
+    Mtx44 projection;
+    PSMTX44Copy(reinterpret_cast<float(*)[4]>(Ptr(CameraPcs, 0x94)), projection);
+    GXSetProjection(projection, GX_ORTHOGRAPHIC);
+
+    GXSetColorUpdate(1);
+    GXSetAlphaUpdate(0);
+    GXSetCullMode(GX_CULL_BACK);
+    GXSetZMode(1, GX_LEQUAL, 1);
+    LightPcs.SetNumDiffuse(0);
+
+    if (DAT_8032ecb8 == 0) {
+        void* octTree = Ptr(this, 0x14);
+        const short octTreeCount = *reinterpret_cast<short*>(Ptr(this, 8));
+        for (int i = 0; i < octTreeCount; i++) {
+            Draw__8COctTreeFUc(octTree, 2);
+            octTree = Ptr(octTree, 0x4C);
+        }
+
+        CMapObj* mapObj = reinterpret_cast<CMapObj*>(Ptr(&MapMng, 0x954));
+        for (int i = 0; i < mapObjCount; i++) {
+            Draw__7CMapObjFUc(mapObj, 2);
+            mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
+        }
+    }
 }
 
 /*

@@ -32,6 +32,9 @@ extern "C" int SePlayState__9CRedSoundFi(CRedSound*, int);
 extern "C" int ReportSeLoop__9CRedSoundFi(CRedSound*, int);
 extern "C" int GetSeVolume__9CRedSoundFii(CRedSound*, int, int);
 extern "C" unsigned int GetProgramTime__9CRedSoundFv(CRedSound*);
+extern "C" void GetStreamPlayPoint__9CRedSoundFiPiPi(CRedSound*, int, int*, int*);
+extern "C" unsigned int SetWaveData__9CRedSoundFiPvi(CRedSound*, int, void*, int);
+extern "C" int ReportStandby__9CRedSoundFi(CRedSound*, int);
 extern "C" void SePause__9CRedSoundFii(CRedSound*, int, int);
 extern "C" void StreamPause__9CRedSoundFii(CRedSound*, int, int);
 extern "C" void ReportPrint__9CRedSoundFi(CRedSound*, int);
@@ -670,12 +673,107 @@ void CSound::Draw()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c70e4
+ * PAL Size: 668b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CSound::loadWaveFrame()
 {
-	// TODO
+    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+    CFile::CHandle*& waveFile = *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 0x8);
+
+    int& waveRemain = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x14);
+    int& waveOffset = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x18);
+    int& waveID = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1C);
+    int& waveState = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x20);
+    int& waveSyncMode = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x24);
+
+    if (waveFile != 0) {
+        if (waveState == 0) {
+            unsigned int readSize = 0x100000;
+            if ((unsigned int)waveRemain < readSize) {
+                readSize = (unsigned int)waveRemain;
+            }
+
+            waveFile->m_chunkSize = readSize;
+            waveFile->m_currentOffset = (unsigned int)waveOffset;
+            File.ReadASync(waveFile);
+
+            if (waveSyncMode != 0) {
+                File.SyncCompleted(waveFile);
+            }
+
+            waveRemain -= (int)readSize;
+            waveOffset += (int)readSize;
+            waveState = 1;
+        } else if (waveState == 1 && File.IsCompleted(waveFile)) {
+            SetWaveData__9CRedSoundFiPvi(redSound, waveID, File.m_readBuffer, (int)waveFile->m_chunkSize);
+
+            while (ReportStandby__9CRedSoundFi(reinterpret_cast<CRedSound*>(&Sound), 0) != 0) {
+            }
+
+            waveState = 0;
+            if (waveRemain == 0) {
+                File.Close(waveFile);
+                waveFile = 0;
+            } else {
+                waveFile->Reset();
+            }
+        }
+    }
+
+    bool streamPlaying = false;
+    int& isStreamEnabled = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22A0);
+    int& streamID = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x2298);
+    if (isStreamEnabled != 0 && StreamPlayState__9CRedSoundFi(redSound, streamID) != 0) {
+        streamPlaying = true;
+    }
+
+    CFile::CHandle*& streamFile = *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 0x2290);
+    if (streamPlaying && streamFile != 0) {
+        int& streamState = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22A8);
+        int& streamRemain = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22A4);
+        int& streamOffset = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x2294);
+        unsigned int& streamHalf = *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x229C);
+        u8* streamBuffer = *reinterpret_cast<u8**>(reinterpret_cast<u8*>(this) + 0x228C);
+
+        if (streamState == 0) {
+            int playPoint[2];
+            GetStreamPlayPoint__9CRedSoundFiPiPi(redSound, streamID, &playPoint[0], &playPoint[1]);
+            unsigned int curHalf = (unsigned int)(playPoint[0] >> 16);
+
+            if (streamHalf != curHalf) {
+                int readSize = 0x10000;
+                if (streamRemain < readSize) {
+                    readSize = streamRemain;
+                }
+
+                if (readSize != 0) {
+                    streamFile->m_chunkSize = (unsigned int)readSize;
+                    streamFile->m_currentOffset = (unsigned int)streamOffset;
+                    File.ReadASync(streamFile);
+
+                    streamOffset += readSize;
+                    streamRemain -= readSize;
+                    streamHalf = curHalf;
+                    streamState = 1;
+                }
+            }
+        } else if (File.IsCompleted(streamFile)) {
+            memcpy(streamBuffer + (1 - streamHalf) * 0x10000, File.m_readBuffer, 0x10000);
+            streamState = 0;
+
+            if (streamRemain == 0) {
+                File.Close(streamFile);
+                streamFile = 0;
+            } else {
+                streamFile->Reset();
+            }
+        }
+    }
 }
 
 /*

@@ -1348,12 +1348,17 @@ void CMapMng::DestroyMap()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80033218
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapMng::Destroy()
 {
-	// TODO
+    DestroyMap();
+    Memory.DestroyStage(*reinterpret_cast<CMemory::CStage**>(this));
 }
 
 /*

@@ -15,7 +15,6 @@ extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dl__FPv(void*);
-extern "C" void* PTR_PTR_s_CMapTexAnimSet_801e896c;
 extern "C" void* PTR_PTR_s_CMapTexAnim_801ea9a4;
 extern "C" char s_maptexanim_cpp_801d7ec4[];
 extern "C" int IsRun__12CMapKeyFrameFv(CMapKeyFrame*);
@@ -97,47 +96,6 @@ static inline void SetMaterialTextureSlot(void* material, unsigned long slotInde
         numTexture = static_cast<unsigned short>(slotIndex + 1);
     }
 }
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-CMapTexAnimSet::CMapTexAnimSet()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * PAL Address: 0x800335d0
- * PAL Size: 188b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-CMapTexAnimSet::~CMapTexAnimSet()
-{
-    unsigned char* const p = reinterpret_cast<unsigned char*>(this);
-    const short count = *reinterpret_cast<short*>(p + 8);
-
-    *reinterpret_cast<void**>(p) = &PTR_PTR_s_CMapTexAnimSet_801e896c;
-
-    for (int i = 0; i < count; i++) {
-        int* entry = *reinterpret_cast<int**>(p + 0xC + (i * 4));
-        if (entry != 0) {
-            const int refCount = entry[1];
-            entry[1] = refCount - 1;
-            if ((refCount - 1) == 0 && entry != 0) {
-                (*reinterpret_cast<void (**)(int*, int)>(*entry + 8))(entry, 1);
-            }
-            *reinterpret_cast<int**>(p + 0xC + (i * 4)) = 0;
-        }
-    }
-
-    __dt__4CRefFv(this, 0);
 }
 
 /*

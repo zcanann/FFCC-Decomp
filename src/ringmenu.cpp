@@ -1,4 +1,20 @@
 #include "ffcc/ringmenu.h"
+#include "ffcc/joybus.h"
+#include "ffcc/pad.h"
+#include "ffcc/p_game.h"
+
+#include <math.h>
+
+extern unsigned char CFlat[];
+extern unsigned char Chara[];
+
+static inline void decClamp0(int* value)
+{
+	*value -= 1;
+	if (*value < 0) {
+		*value = 0;
+	}
+}
 
 /*
  * --INFO--
@@ -101,12 +117,106 @@ double CRingMenu::GetDispCounter()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a4c3c
+ * PAL Size: 1392b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRingMenu::onCalc()
 {
-	// TODO
+	char* self = reinterpret_cast<char*>(this);
+
+	if ((Game.game.m_gameWork.m_menuStageMode != 0) && (*reinterpret_cast<int*>(self + 0x0C) >= 1)) {
+		return;
+	}
+
+	int* const menuIndex = reinterpret_cast<int*>(self + 0x0C);
+	int* const animDirection = reinterpret_cast<int*>(self + 0x10);
+	int* const transitionTimer = reinterpret_cast<int*>(self + 0x14);
+	int* const displayCounter = reinterpret_cast<int*>(self + 0x500);
+	int* const gbaAnimCounter = reinterpret_cast<int*>(self + 0x504);
+	int* const gbaConnectedFlag = reinterpret_cast<int*>(self + 0x508);
+	float* const commandScrollOffset = reinterpret_cast<float*>(self + 0x50C);
+	int* const commonFrameCounter = reinterpret_cast<int*>(self + 0x4EC);
+	int* const buttonTimers = reinterpret_cast<int*>(self + 0x38);
+	int* const currentCommandIndex = reinterpret_cast<int*>(self + 0x5C);
+	float* const animFloat = reinterpret_cast<float*>(self + 0x64);
+
+	const int inputMask = *reinterpret_cast<int*>(CFlat + 0x12A0) & *reinterpret_cast<int*>(CFlat + 0x12A4);
+	const int nextDirection = (inputMask >> 2) & 1;
+	if (*animDirection != nextDirection) {
+		*animDirection = nextDirection;
+		*displayCounter = 0x10 - *displayCounter;
+	}
+
+	decClamp0(displayCounter);
+	decClamp0(transitionTimer);
+	*commonFrameCounter += 1;
+	decClamp0(reinterpret_cast<int*>(self + 0x4F8));
+	for (int i = 0; i < 8; i++) {
+		decClamp0(&buttonTimers[i]);
+	}
+	decClamp0(reinterpret_cast<int*>(self + 0x4FC));
+
+	for (int i = 0; i < 9; i++) {
+		for (int j = 0; j < 3; j++) {
+			float& v = animFloat[i * 3 + j];
+			v -= 0.1f;
+			if (v < 0.0f) {
+				v = 0.0f;
+			}
+		}
+	}
+
+	float& spinAccumulator = *reinterpret_cast<float*>(self + 0x4F4);
+	spinAccumulator = (float)fmod(spinAccumulator, 360.0f);
+
+	bool gbaConnected = Joybus.GetCtrlMode(*menuIndex) == 1;
+	if (!Joybus.GetGBAStart(*menuIndex)) {
+		gbaConnected = true;
+	}
+
+	const unsigned int padType = Joybus.GetPadType(*menuIndex);
+	if ((padType == 0x09000000) || (padType == 0x8B100000)) {
+		gbaConnected = false;
+	}
+
+	if (*gbaConnectedFlag != static_cast<int>(gbaConnected)) {
+		*gbaConnectedFlag = static_cast<int>(gbaConnected);
+		*gbaAnimCounter = 0x0C - *gbaAnimCounter;
+	}
+	decClamp0(gbaAnimCounter);
+
+	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.game.m_scriptFoodBase[*menuIndex]);
+	if (caravanWork == nullptr) {
+		return;
+	}
+
+	int commandIndex = static_cast<int>(caravanWork->m_currentCmdListIndex);
+	if (Game.game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
+		commandIndex = *reinterpret_cast<int*>(Chara + 0x2008);
+	}
+
+	float step = 0.0f;
+	if (*currentCommandIndex != commandIndex) {
+		for (int dist = 1; dist < 4; dist++) {
+			const int cw = (commandIndex + dist) % 5;
+			const int ccw = (commandIndex + 5 - dist) % 5;
+			if (*currentCommandIndex == ccw) {
+				step = static_cast<float>(dist);
+				break;
+			}
+			if (*currentCommandIndex == cw) {
+				step = -static_cast<float>(dist);
+				break;
+			}
+		}
+	}
+
+	*currentCommandIndex = commandIndex;
+	*commandScrollOffset = (*commandScrollOffset + step) * 0.95f;
 }
 
 /*

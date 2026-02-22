@@ -246,26 +246,32 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
         YmMeltVertex* vtx = work->m_vertexData;
         s16 phaseDiv = *(s16*)((u8*)&ctrl->m_arg3 + 2);
         int angleSeed = rand();
-        work->m_phaseOffset = (phaseDiv != 0) ? (s16)(angleSeed - (angleSeed / phaseDiv) * phaseDiv) : 0;
+        work->m_phaseOffset = (s16)angleSeed - (s16)(angleSeed / (int)phaseDiv) * phaseDiv;
 
-        float halfWidth = ctrl->m_stepValue * FLOAT_80330b08;
-        float step = ctrl->m_stepValue / ((float)((u16)((u8*)&ctrl->m_initWOrk)[2]) - (float)DOUBLE_80330af8);
-        float rot = FLOAT_80330b0c * ((float)(work->m_phaseOffset) - (float)DOUBLE_80330b00);
+        double halfWidth = (double)(ctrl->m_stepValue * FLOAT_80330b08);
+        double step =
+            (double)(ctrl->m_stepValue / (float)((double)((u16)((u8*)&ctrl->m_initWOrk)[2]) - DOUBLE_80330af8));
+        double rot = (double)(FLOAT_80330b0c * (float)((double)work->m_phaseOffset - DOUBLE_80330b00));
+        double z = -halfWidth;
+        double x;
 
-        for (float z = -halfWidth; z <= halfWidth; z += step) {
-            for (float x = -halfWidth; x <= halfWidth; x += step) {
-                vtx->m_position.x = x;
+        while (z <= halfWidth) {
+            x = -halfWidth;
+            while (x <= halfWidth) {
+                vtx->m_position.x = (float)x;
                 vtx->m_position.y = FLOAT_80330af0;
-                vtx->m_position.z = z;
+                vtx->m_position.z = (float)z;
 
-                if (work->m_phaseOffset != 0) {
+                if (phaseDiv != 0) {
                     Mtx rotMtx;
-                    PSMTXRotRad(rotMtx, 'y', rot);
+                    PSMTXRotRad(rotMtx, 'y', (float)rot);
                     PSMTXMultVec(rotMtx, &vtx->m_position, &vtx->m_position);
                 }
 
                 vtx++;
+                x = (double)(float)(x + step);
             }
+            z = (double)(float)(z + step);
         }
 
         CalcPolygonHeight(ymMelt, (VERTEX_DATA*)ctrl, (_GXColor*)work->m_vertexData, matrixY);

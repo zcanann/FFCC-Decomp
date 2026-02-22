@@ -35,8 +35,14 @@ extern "C" void pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(CPartMng*, int, int, P
 extern "C" char* GetLangString__5CGameFv(void*);
 extern "C" void* Open__5CFileFPcUlQ25CFile3PRI(void*, char*, unsigned long, int);
 extern "C" void ReadASync__5CFileFPQ25CFile7CHandle(void*, void*);
+extern "C" void ClrBattleItem__8CMenuPcsFv(void*);
+extern "C" void ChangeMogMode__6CCharaFi(void*, int);
+extern "C" void TimeMogFur__6CCharaFv(void*);
+extern "C" void LoadLogoWaitingData__5CGameFv(void*);
 
 extern unsigned char Pad[];
+extern unsigned char MenuPcs[];
+extern unsigned char Chara[];
 extern unsigned char GraphicsPcs[];
 extern unsigned char CameraPcs[];
 extern unsigned char DbgMenuPcs[];
@@ -1541,9 +1547,116 @@ void CFlatRuntime2::reqFinished(int reqNo, CFlatRuntime::CObject* object)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CFlatRuntime2::SysControl(int, int)
+void CFlatRuntime2::SysControl(int controlNo, int controlValue)
 {
-	// TODO
+	u8* runtime = reinterpret_cast<u8*>(this);
+	const u8 value8 = static_cast<u8>(controlValue);
+
+	switch (controlNo) {
+	case 0:
+		runtime[0x12E4] = static_cast<u8>((runtime[0x12E4] & 0x7F) | ((value8 & 1) << 7));
+		break;
+
+	case 2:
+		runtime[0x12E4] = static_cast<u8>((runtime[0x12E4] & 0xF7) | ((value8 & 1) << 3));
+		break;
+
+	case 3:
+		*reinterpret_cast<unsigned int*>(runtime + 0x12E8) = static_cast<unsigned int>(controlValue);
+		break;
+
+	case 4:
+		Game.game.m_gameWork.m_radarType = value8;
+		break;
+
+	case 5:
+		*reinterpret_cast<unsigned int*>(runtime + 0x12EC) = static_cast<unsigned int>(controlValue);
+		break;
+
+	case 6:
+	case 7:
+	case 8:
+	case 0xC:
+	case 0xD:
+	case 0xF:
+	case 0x10:
+	case 0x11:
+	case 0x15:
+	case 0x16: {
+		u8* mon = m_objMon;
+		for (int i = 0; i < 0x40; i++, mon += 0x740) {
+			if ((*reinterpret_cast<unsigned int*>(mon) != 0) &&
+			    ((controlValue == 0) || ((*reinterpret_cast<unsigned int*>(mon + 0x6EC) & static_cast<unsigned int>(controlValue)) != 0))) {
+				reinterpret_cast<CGMonObj*>(mon)->sysControl(controlNo);
+			}
+		}
+		break;
+	}
+
+	case 9:
+		ClrBattleItem__8CMenuPcsFv(MenuPcs);
+		break;
+
+	case 0xA:
+		runtime[0x12E4] = static_cast<u8>((runtime[0x12E4] & 0xEF) | ((value8 & 1) << 4));
+		break;
+
+	case 0xB:
+		runtime[0x12E4] = static_cast<u8>((runtime[0x12E4] & 0xDF) | ((value8 & 1) << 5));
+		break;
+
+	case 0xE:
+		runtime[0x12E4] = static_cast<u8>((runtime[0x12E4] & 0xFD) | ((value8 & 1) << 1));
+		ChangeMogMode__6CCharaFi(Chara, controlValue);
+		break;
+
+	case 0x12:
+		runtime[0x12E4] = static_cast<u8>((runtime[0x12E4] & 0xFE) | (value8 & 1));
+		break;
+
+	case 0x13: {
+		u8* party = m_objParty;
+		for (int i = 0; i < 4; i++, party += 0x6F8) {
+			if (*reinterpret_cast<unsigned int*>(party) != 0) {
+				reinterpret_cast<CGPartyObj*>(party)->sysControl(controlNo, controlValue);
+			}
+		}
+		break;
+	}
+
+	case 0x14:
+		TimeMogFur__6CCharaFv(Chara);
+		break;
+
+	case 0x17:
+		*reinterpret_cast<unsigned int*>(Pad + 0x1C8) = static_cast<unsigned int>(controlValue);
+		break;
+
+	case 0x18:
+		LoadLogoWaitingData__5CGameFv(&Game.game);
+		break;
+
+	case 0x19: {
+		u8* party = m_objParty;
+		for (int i = 0; i < 4; i++, party += 0x6F8) {
+			if (*reinterpret_cast<unsigned int*>(party) != 0) {
+				reinterpret_cast<CGCharaObj*>(party)->damageDelete();
+			}
+		}
+
+		u8* mon = m_objMon;
+		for (int i = 0; i < 0x40; i++, mon += 0x740) {
+			if (*reinterpret_cast<unsigned int*>(mon) != 0) {
+				reinterpret_cast<CGCharaObj*>(mon)->damageDelete();
+			}
+		}
+		break;
+	}
+
+	case 0x1A:
+		PartMng.pppDumpMngSt();
+		break;
+	}
 }
 
 /*

@@ -365,26 +365,47 @@ void GXSetCopyClear(GXColor clear_clr, u32 clear_z) {
  * JP Size: TODO
  */
 void GXSetCopyFilter(GXBool aa, const u8 sample_pattern[12][2], GXBool vf, const u8 vfilter[7]) {
-    const u8* sample;
-    u32 msLoc0;
-    u32 msLoc1;
-    u32 msLoc2;
-    u32 msLoc3;
-    u32 coeff0;
-    u32 coeff1;
+    u32 msLoc0 = 0;
+    u32 msLoc1 = 0;
+    u32 msLoc2 = 0;
+    u32 msLoc3 = 0;
+    u32 coeff0 = 0x53595000;
+    u32 coeff1 = 0x54000015;
 
     CHECK_GXBEGIN(1641, "GXSetCopyFilter");
 
     if (aa != 0) {
-        sample = &sample_pattern[0][0];
-        msLoc0 = (sample[0] & 0xF) | ((sample[1] & 0xF) << 4) | ((sample[2] & 0xF) << 8) | ((sample[3] & 0xF) << 12) |
-                 ((sample[4] & 0xF) << 16) | ((sample[5] & 0xF) << 20) | 0x01000000;
-        msLoc1 = (sample[6] & 0xF) | ((sample[7] & 0xF) << 4) | ((sample[8] & 0xF) << 8) | ((sample[9] & 0xF) << 12) |
-                 ((sample[10] & 0xF) << 16) | ((sample[11] & 0xF) << 20) | 0x02000000;
-        msLoc2 = (sample[12] & 0xF) | ((sample[13] & 0xF) << 4) | ((sample[14] & 0xF) << 8) | ((sample[15] & 0xF) << 12) |
-                 ((sample[16] & 0xF) << 16) | ((sample[17] & 0xF) << 20) | 0x03000000;
-        msLoc3 = (sample[18] & 0xF) | ((sample[19] & 0xF) << 4) | ((sample[20] & 0xF) << 8) | ((sample[21] & 0xF) << 12) |
-                 ((sample[22] & 0xF) << 16) | ((sample[23] & 0xF) << 20) | 0x04000000;
+        msLoc0 = sample_pattern[0][0] & 0xF;
+        msLoc0 = (msLoc0 & ~0xF0) | ((u32)sample_pattern[0][1] << 4);
+        msLoc0 = (msLoc0 & ~0xF00) | ((u32)sample_pattern[1][0] << 8);
+        msLoc0 = (msLoc0 & ~0xF000) | ((u32)sample_pattern[1][1] << 12);
+        msLoc0 = (msLoc0 & ~0xF0000) | ((u32)sample_pattern[2][0] << 16);
+        msLoc0 = (msLoc0 & ~0xF00000) | ((u32)sample_pattern[2][1] << 20);
+        msLoc0 = (msLoc0 & ~0xFF000000) | 0x01000000;
+
+        msLoc1 = sample_pattern[3][0] & 0xF;
+        msLoc1 = (msLoc1 & ~0xF0) | ((u32)sample_pattern[3][1] << 4);
+        msLoc1 = (msLoc1 & ~0xF00) | ((u32)sample_pattern[4][0] << 8);
+        msLoc1 = (msLoc1 & ~0xF000) | ((u32)sample_pattern[4][1] << 12);
+        msLoc1 = (msLoc1 & ~0xF0000) | ((u32)sample_pattern[5][0] << 16);
+        msLoc1 = (msLoc1 & ~0xF00000) | ((u32)sample_pattern[5][1] << 20);
+        msLoc1 = (msLoc1 & ~0xFF000000) | 0x02000000;
+
+        msLoc2 = sample_pattern[6][0] & 0xF;
+        msLoc2 = (msLoc2 & ~0xF0) | ((u32)sample_pattern[6][1] << 4);
+        msLoc2 = (msLoc2 & ~0xF00) | ((u32)sample_pattern[7][0] << 8);
+        msLoc2 = (msLoc2 & ~0xF000) | ((u32)sample_pattern[7][1] << 12);
+        msLoc2 = (msLoc2 & ~0xF0000) | ((u32)sample_pattern[8][0] << 16);
+        msLoc2 = (msLoc2 & ~0xF00000) | ((u32)sample_pattern[8][1] << 20);
+        msLoc2 = (msLoc2 & ~0xFF000000) | 0x03000000;
+
+        msLoc3 = sample_pattern[9][0] & 0xF;
+        msLoc3 = (msLoc3 & ~0xF0) | ((u32)sample_pattern[9][1] << 4);
+        msLoc3 = (msLoc3 & ~0xF00) | ((u32)sample_pattern[10][0] << 8);
+        msLoc3 = (msLoc3 & ~0xF000) | ((u32)sample_pattern[10][1] << 12);
+        msLoc3 = (msLoc3 & ~0xF0000) | ((u32)sample_pattern[11][0] << 16);
+        msLoc3 = (msLoc3 & ~0xF00000) | ((u32)sample_pattern[11][1] << 20);
+        msLoc3 = (msLoc3 & ~0xFF000000) | 0x04000000;
     } else {
         msLoc0 = 0x01666666;
         msLoc1 = 0x02666666;
@@ -398,12 +419,14 @@ void GXSetCopyFilter(GXBool aa, const u8 sample_pattern[12][2], GXBool vf, const
     GX_WRITE_RAS_REG(msLoc3);
 
     if (vf != 0) {
-        coeff0 = (vfilter[0] & 0x3F) | ((vfilter[1] & 0x3F) << 6) | ((vfilter[2] & 0x3F) << 12) | ((vfilter[3] & 0x3F) << 18) |
-                 0x53000000;
-        coeff1 = (vfilter[4] & 0x3F) | ((vfilter[5] & 0x3F) << 6) | ((vfilter[6] & 0x3F) << 12) | 0x54000000;
-    } else {
-        coeff0 = 0x53595000;
-        coeff1 = 0x54000015;
+        coeff0 = 0x53000000 | (vfilter[0] & 0x3F);
+        coeff0 = (coeff0 & ~0xFC0) | ((u32)vfilter[1] << 6);
+        coeff0 = (coeff0 & ~0x3F000) | ((u32)vfilter[2] << 12);
+        coeff0 = (coeff0 & ~0xFC0000) | ((u32)vfilter[3] << 18);
+
+        coeff1 = 0x54000000 | (vfilter[4] & 0x3F);
+        coeff1 = (coeff1 & ~0xFC0) | ((u32)vfilter[5] << 6);
+        coeff1 = (coeff1 & ~0x3F000) | ((u32)vfilter[6] << 12);
     }
 
     GX_WRITE_RAS_REG(coeff0);

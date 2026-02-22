@@ -1,4 +1,12 @@
 #include "ffcc/menu_letter.h"
+#include "ffcc/p_game.h"
+
+namespace {
+unsigned int DAT_8032eef0 = 0;
+unsigned char DAT_8032eeee = 0;
+unsigned char DAT_8032eeed = 0;
+int DAT_8032eef4 = 0;
+} // namespace
 
 /*
  * --INFO--
@@ -212,12 +220,20 @@ void CMenuPcs::LetterConfirmClose()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 80165b4c
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::LetterDraw()
 {
-	// TODO
+	if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x30) == 0) {
+		LetterListDraw();
+	} else {
+		LetterMessDraw();
+	}
 }
 
 /*
@@ -272,10 +288,19 @@ void CMenuPcs::LetterDrawPageMark(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 8016394c
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::LetterSetAttachItem(unsigned int, int)
+void CMenuPcs::LetterSetAttachItem(unsigned int itemIndex, int flag)
 {
-	// TODO
+	DAT_8032eef0 = itemIndex;
+	if (DAT_8032eeed == 0) {
+		DAT_8032eeee = static_cast<unsigned char>(itemIndex);
+		DAT_8032eef0 = static_cast<unsigned int>(*reinterpret_cast<short*>(Game.game.m_scriptFoodBase[0] + itemIndex * 2 + 0xB6));
+	}
+	DAT_8032eef4 = flag;
 }

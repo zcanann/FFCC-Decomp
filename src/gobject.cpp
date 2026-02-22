@@ -1,9 +1,34 @@
 #include "ffcc/gobject.h"
 
+#include "ffcc/math.h"
 #include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
+#include "ffcc/quadobj.h"
+
+#include <math.h>
 
 extern CPartMng PartMng;
+extern CMath Math;
+extern unsigned char CFlat[];
+extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
+extern "C" CGQuadObj* FindGQuadObjFirst__13CFlatRuntime2Fv(void*);
+extern "C" CGQuadObj* FindGQuadObjNext__13CFlatRuntime2FP9CGQuadObj(void*, CGQuadObj*);
+
+static inline void CallOnPush(CGBaseObj* self, CGBaseObj* other, int arg)
+{
+    typedef void (*Fn)(CGBaseObj*, CGBaseObj*, int);
+    void** vtable = *reinterpret_cast<void***>(self);
+    Fn fn = reinterpret_cast<Fn>(vtable[5]);
+    fn(self, other, arg);
+}
+
+static inline void CallOnTalk(CGBaseObj* self, CGBaseObj* other, int arg)
+{
+    typedef void (*Fn)(CGBaseObj*, CGBaseObj*, int);
+    void** vtable = *reinterpret_cast<void***>(self);
+    Fn fn = reinterpret_cast<Fn>(vtable[6]);
+    fn(self, other, arg);
+}
 
 static const float sBgDefaultGravityY = 0.0;
 static bool sBgCollisionActive;
@@ -95,12 +120,143 @@ void CGObject::move()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80080d04
+ * PAL Size: 1556b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGObject::objectCollision()
 {
-	// TODO
+    bool keepPushTimer = false;
+    Vec selfBasePos;
+    Vec selfCapsuleOffset;
+    Vec selfCapsulePos;
+
+    PSVECAdd(&m_worldPosition, &m_groundHitOffset, &selfBasePos);
+    selfCapsuleOffset.x = m_bodyEllipsoidOffset * -sinf(m_rotBaseY);
+    selfCapsuleOffset.y = sZeroFloat;
+    selfCapsuleOffset.z = m_bodyEllipsoidOffset * -cosf(m_rotBaseY);
+    PSVECAdd(&selfBasePos, &selfCapsuleOffset, &selfCapsulePos);
+
+    if ((m_bgColMask & 0x10000) != 0) {
+        for (CGQuadObj* quad = FindGQuadObjFirst__13CFlatRuntime2Fv(CFlat); quad != 0;
+            quad = FindGQuadObjNext__13CFlatRuntime2FP9CGQuadObj(CFlat, quad)) {
+            if (quad->isInner(&selfBasePos)) {
+                CallOnPush(quad, this, 0);
+            }
+        }
+    }
+
+    for (CGObject* other = FindGObjNext__13CFlatRuntime2FP8CGObject(CFlat, this); other != 0;
+         other = FindGObjNext__13CFlatRuntime2FP8CGObject(CFlat, other)) {
+        if (((m_bgColMask & 0xE) == 0) || ((other->m_bgColMask & 0xE) == 0)) {
+            continue;
+        }
+
+        Vec otherBasePos;
+        Vec otherCapsuleOffset;
+        Vec otherCapsulePos;
+        PSVECAdd(&other->m_worldPosition, &other->m_groundHitOffset, &otherBasePos);
+        otherCapsuleOffset.x = other->m_bodyEllipsoidOffset * -sinf(other->m_rotBaseY);
+        otherCapsuleOffset.y = sZeroFloat;
+        otherCapsuleOffset.z = other->m_bodyEllipsoidOffset * -cosf(other->m_rotBaseY);
+        PSVECAdd(&otherBasePos, &otherCapsuleOffset, &otherCapsulePos);
+
+        const double capsuleDistance = PSVECDistance(&selfCapsulePos, &otherCapsulePos);
+        if ((capsuleDistance == static_cast<double>(sZeroFloat))
+            || (capsuleDistance > static_cast<double>(m_nearColRadius + other->m_nearColRadius))) {
+            continue;
+        }
+
+        if (((m_bgColMask & 8) != 0) && ((other->m_bgColMask & 8) != 0)) {
+            const bool thisAttack = (m_objectFlags & 2) != 0;
+            const bool otherDamage = (other->m_objectFlags & 0xC) != 0;
+            const bool thisDamage = (m_objectFlags & 0xC) != 0;
+            const bool otherAttack = (other->m_objectFlags & 2) != 0;
+            const bool allowAttachA = ((m_weaponNodeFlags & 1) == 0) || (m_attachOwner != other);
+            const bool allowAttachB = ((other->m_weaponNodeFlags & 1) == 0) || (other->m_attachOwner != this);
+
+            if (((thisAttack && otherDamage) || (thisDamage && otherAttack))
+                && allowAttachA
+                && allowAttachB
+                && (capsuleDistance < static_cast<double>(m_attackColRadius + other->m_attackColRadius))) {
+                CGObject* frontObj = thisAttack ? this : other;
+                CGObject* hitObj = thisAttack ? other : this;
+                Vec dir;
+                PSVECSubtract(&hitObj->m_worldPosition, &frontObj->m_worldPosition, &dir);
+                const float hitRot = atan2f(dir.x, dir.z);
+                const float rotDelta = Math.DstRot(frontObj->m_rotBaseY, hitRot);
+
+                if (fabsf(rotDelta) < frontObj->m_frontHitAngle) {
+                    CallOnTalk(frontObj, hitObj, 1);
+                    CallOnTalk(hitObj, frontObj, 0);
+                }
+            }
+        }
+
+        if (((m_bgColMask & 4) != 0) && ((other->m_bgColMask & 4) != 0)
+            && (capsuleDistance < static_cast<double>(m_bodyColRadius + other->m_bodyColRadius))) {
+            CallOnPush(this, other, 1);
+            CallOnPush(other, this, 0);
+        }
+
+        if (((m_bgColMask & 2) != 0) && ((other->m_bgColMask & 2) != 0)
+            && (sZeroFloat < m_bodyEllipsoidRadius)
+            && (sZeroFloat < other->m_bodyEllipsoidRadius)) {
+            const bool allowAttachA = ((m_weaponNodeFlags & 1) == 0) || (m_attachOwner != other);
+            const bool allowAttachB = ((other->m_weaponNodeFlags & 1) == 0) || (other->m_attachOwner != this);
+
+            if (allowAttachA && allowAttachB) {
+                const bool usePushTimers = ((m_objectFlags & 0x40) != 0) && ((other->m_objectFlags & 0x40) != 0);
+                const double bodyDistanceLimit = static_cast<double>(m_bodyEllipsoidRadius + other->m_bodyEllipsoidRadius);
+
+                if (capsuleDistance < bodyDistanceLimit) {
+                    if (usePushTimers
+                        && ((m_groundHitOffset.x != sZeroFloat) || (m_groundHitOffset.z != sZeroFloat)
+                            || (other->m_groundHitOffset.x != sZeroFloat) || (other->m_groundHitOffset.z != sZeroFloat))) {
+                        keepPushTimer = true;
+                    }
+
+                    if (!usePushTimers || (m_collisionPushTimerMax != 0) || (other->m_collisionPushTimerMax == 0)) {
+                        const float thisPush = static_cast<float>(m_pushParamA + m_pushParamB);
+                        const float otherPush = static_cast<float>(other->m_pushParamA + other->m_pushParamB);
+                        float split = 0.5f + (thisPush - otherPush) / 510.0f;
+                        if (split < sZeroFloat) {
+                            split = sZeroFloat;
+                        }
+                        if (split > sAnimFrameOffset) {
+                            split = sAnimFrameOffset;
+                        }
+
+                        Vec delta;
+                        Vec scaledDelta;
+                        PSVECSubtract(&selfCapsulePos, &otherCapsulePos, &delta);
+                        PSVECScale(&delta, &delta, static_cast<float>((bodyDistanceLimit - capsuleDistance) / bodyDistanceLimit));
+                        PSVECScale(&delta, &scaledDelta, sAnimFrameOffset - split);
+                        PSVECAdd(&selfCapsulePos, &scaledDelta, &selfCapsulePos);
+                        PSVECScale(&delta, &scaledDelta, -split);
+                        PSVECAdd(&otherCapsulePos, &scaledDelta, &otherCapsulePos);
+                    }
+                }
+            }
+        }
+
+        PSVECSubtract(&otherCapsulePos, &other->m_worldPosition, &other->m_groundHitOffset);
+        PSVECSubtract(&other->m_groundHitOffset, &otherCapsuleOffset, &other->m_groundHitOffset);
+    }
+
+    if (keepPushTimer) {
+        if (m_collisionPushTimerMax > 0) {
+            --m_collisionPushTimerMax;
+        }
+    } else {
+        m_collisionPushTimerMax = 0x32;
+    }
+
+    PSVECSubtract(&selfCapsulePos, &m_worldPosition, &m_groundHitOffset);
+    PSVECSubtract(&m_groundHitOffset, &selfCapsuleOffset, &m_groundHitOffset);
 }
 
 /*

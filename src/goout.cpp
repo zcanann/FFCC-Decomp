@@ -49,6 +49,16 @@ static inline void WriteMenuU8(int offset, unsigned char value)
     *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(&MenuPcs) + offset) = value;
 }
 
+static inline int ReadMenuS32(int offset)
+{
+    return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&MenuPcs) + offset);
+}
+
+static inline void WriteMenuS32(int offset, int value)
+{
+    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&MenuPcs) + offset) = value;
+}
+
 static unsigned short GetGoOutInputMask()
 {
     if (Pad._452_4_ != 0 || Pad._448_4_ != -1) {
@@ -1152,35 +1162,83 @@ void CGoOutMenu::DrawDel()
  */
 void CGoOutMenu::Calc()
 {
-    char cVar10;
-
-    // Basic menu state management
+    CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
+    unsigned short input;
+    char mode;
+    
     field_0x47 = 0;
-    
-    // Check main mode and handle transitions
-    cVar10 = field_0x2c;
-    if (cVar10 == 2) {
-        CalcGoOut();
-    }
-    else if (cVar10 < 2) {
-        if (cVar10 == 0) {
-            if (field_0x45 != 0) {
-                SetMainMode(field_0x2d);
+
+    if (field_0x48 == 0) {
+        mode = field_0x2c;
+        if (mode == 2) {
+            CalcGoOut();
+        } else if (mode < 2) {
+            if (mode == 0) {
+                if (field_0x45 != 0) {
+                    input = GetGoOutInputMask();
+                    if ((input & 0x100) != 0) {
+                        Sound.PlaySe(2, 0x40, 0x7f, 0);
+                        SetMainMode(field_0x2d);
+                    }
+                }
+            } else if (field_0x45 != 0) {
+                input = GetGoOutInputMask();
+                if ((input & 0x200) != 0) {
+                    Sound.PlaySe(3, 0x40, 0x7f, 0);
+                    MenuPcs.InitSaveLoadMenu();
+                    MenuPcs.SetMenuCharaAnim(0, 0);
+                    WriteMenuShort(menuPcsLayout.field_2092, 0x20, -1);
+
+                    if (ReadMenuS32(2176) != 0) {
+                        WriteMenuS32(2176, 0);
+                    }
+                    if (ReadMenuS32(2180) != 0) {
+                        WriteMenuS32(2180, 0);
+                    }
+
+                    WriteMenuS32(2188, 0);
+                    WriteMenuU8(2184, 0);
+                    WriteMenuU8(2185, 0);
+                    WriteMenuU8(2186, 0);
+                    WriteMenuU8(2172, 1);
+                    MenuPcs.ChgAllModel();
+                    return;
+                }
+                field_0x47 = 1;
+                field74_0x4a = 200;
+                field75_0x4c = 0xB0;
+                field_0x49 = 1;
             }
+        } else if (mode < 4) {
+            CalcDel();
         }
-        else if (cVar10 == 1) {
-            // Handle menu operations
-            field_0x47 = 1;
+
+        field_0x30 = field_0x30 + 1;
+        if (10000 < field_0x30) {
+            field_0x30 = 10000;
         }
     }
-    else if (cVar10 == 3) {
-        CalcDel();
+
+    if (ReadMenuShort(menuPcsLayout.field_2120, 0xA) == 1) {
+        field_0x44 = 1;
+        field_0x45 = 1;
     }
-    
-    // Update frame counter
-    field_0x30 = field_0x30 + 1;
-    if (10000 < field_0x30) {
-        field_0x30 = 10000;
+
+    if (field_0x44 != 0 && ReadMenuShort(menuPcsLayout.field_2120, 0xA) == 3) {
+        short x;
+        short y;
+
+        field_0x36 = field_0x34;
+        if (field_0x34 == -1) {
+            field_0x44 = 1;
+        } else {
+            MenuPcs.GetWinSize(static_cast<unsigned short>(field_0x36), &x, &y, (field_0x36 >= 0x1E) ? 2 : 0);
+            MenuPcs.SetMcWinInfo(x, y);
+            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 0);
+            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+            field_0x40 = field_0x3c;
+            field_0x44 = 0;
+        }
     }
 }
 

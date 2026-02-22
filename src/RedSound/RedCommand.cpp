@@ -35,6 +35,8 @@ extern "C" {
 int fflush(void*);
 int SearchMusicBank__9CRedEntryFi(CRedEntry*, int);
 int SearchWaveBase__9CRedEntryFi(void*, int);
+int SearchSeSepBank__9CRedEntryFi(CRedEntry*, int);
+void SeSepHistoryManager__9CRedEntryFii(CRedEntry*, int, int);
 void WaveHistoryManager__9CRedEntryFii(void*, int, int);
 }
 int* SetReverb(int, int, int*);
@@ -499,12 +501,30 @@ int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cacb8
+ * PAL Size: 192b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void SeSepPlay(int, int, int, int)
+int SeSepPlay(int seId, int sepId, int pan, int volume)
 {
-	// TODO
+	int sepBank;
+	unsigned char* sepInfo;
+
+	sepBank = SearchSeSepBank__9CRedEntryFi(&DAT_8032e154, sepId);
+	if (sepBank != 0) {
+		sepInfo = (unsigned char*)(*(int*)(sepBank + 8) + 0x10);
+		if ((*(unsigned int*)(*(int*)(sepBank + 8) + 0xc) & 0x80000000) != 0) {
+			*sepInfo |= 0x80;
+		}
+		if (_SePlayStart((RedSeINFO*)sepInfo, seId, sepId, pan, volume) != 0) {
+			SeSepHistoryManager__9CRedEntryFii(&DAT_8032e154, 1, sepId);
+			return sepId;
+		}
+	}
+	return -1;
 }
 
 /*

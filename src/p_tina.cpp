@@ -900,12 +900,31 @@ void CPartPcs::drawAfterViewer()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80052660
+ * PAL Size: 260b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartPcs::IsLoadPartCompleted()
+unsigned int CPartPcs::IsLoadPartCompleted()
 {
-	// TODO
+    unsigned char* partMng = reinterpret_cast<unsigned char*>(&PartMng);
+    unsigned char* busy = partMng + 0x236F4;
+    int i = 2;
+
+    while (true) {
+        if (busy[0] != 0 || busy[1] != 0 || busy[2] != 0 || busy[3] != 0 || busy[4] != 0 ||
+            busy[5] != 0 || busy[6] != 0 || busy[7] != 0) {
+            return 0;
+        }
+
+        busy += 8;
+        i--;
+        if (i == 0) {
+            return 1;
+        }
+    }
 }
 
 /*

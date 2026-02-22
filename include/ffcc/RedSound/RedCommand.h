@@ -12,7 +12,7 @@ int SeStopID(int);
 int SeStopMG(int, int, int, int);
 int _SePlayStart(RedSeINFO*, int, int, int, int);
 int SeBlockPlay(int, int, int, int, int);
-void SeSepPlay(int, int, int, int);
+int SeSepPlay(int, int, int, int);
 void SetSeVolume(int, int, int, int);
 void SetSePan(int, int, int);
 void SetSePitch(int, int, int);

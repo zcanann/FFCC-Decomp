@@ -6,10 +6,8 @@
 
 // External references
 extern int DAT_8032ec70;
-extern float FLOAT_803331a8;
+extern float lbl_803331A8;
 extern void GetDirectVector__5CUtilFP3VecP3Vec3Vec(void*, Vec*, Vec*, Vec*);
-
-extern int DAT_8032ed70;
 
 // Function signatures from Ghidra decomp
 extern "C" int GetModelPtr__FP8CGObject(CGObject*);
@@ -73,8 +71,8 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
     PSVECAdd(&local_a4, &local_e0, &local_a4);
     PSVECAdd(&local_a4, &local_ec, &local_a4);
 
-    fVar1 = FLOAT_803331a8;
-    *(float*)((char*)model + 0x44) = FLOAT_803331a8;
+    fVar1 = lbl_803331A8;
+    *(float*)((char*)model + 0x44) = lbl_803331A8;
     *(float*)((char*)model + 0x54) = fVar1;
     *(float*)((char*)model + 0x64) = fVar1;
     if (Game.game.m_currentSceneId == 7) {
@@ -102,7 +100,7 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
 void pppConstructConstrainCameraForLoc(void)
 {
 	// pppMngStPtr points to a structure, access CGObject at offset 0xd8
-	CGObject* obj = *(CGObject**)((char*)pppMngStPtr + 0xd8);
+	CGObject* obj = *(CGObject**)(lbl_8032ED50 + 0xd8);
 	int modelPtr = GetModelPtr__FP8CGObject(obj);
 	*(int*)(modelPtr + 0xec) = 0;
 }
@@ -119,7 +117,7 @@ void pppConstructConstrainCameraForLoc(void)
 void pppConstruct2ConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraForLoc,
                                         pppConstrainCameraForLocData* data)
 {
-    float fVar1 = FLOAT_803331a8;
+    float fVar1 = lbl_803331A8;
     float* value = (float*)((char*)constrainCameraForLoc + 0x80 + data->m_serializedDataOffsets[2]);
     value[2] = fVar1;
     value[1] = fVar1;
@@ -142,9 +140,9 @@ void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraF
 	float* value;
 	int modelPtr;
 
-	if (DAT_8032ed70 == 0) {
+	if (lbl_8032ED70 == 0) {
 		value = (float*)((char*)constrainCameraForLoc + 0x80 + data->m_serializedDataOffsets[2]);
-		CGObject* obj = *(CGObject**)((char*)pppMngStPtr + 0xd8);
+		CGObject* obj = *(CGObject**)(lbl_8032ED50 + 0xd8);
 		modelPtr = GetModelPtr__FP8CGObject(obj);
 		*(float**)(modelPtr + 0xe4) = value;
 		*(pppConstrainCameraForLocParams**)(modelPtr + 0xe8) = params;
@@ -167,7 +165,7 @@ void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraF
  */
 void fn_80167EC4(pppConstrainCameraForLoc* constrainCameraForLoc, pppConstrainCameraForLocData* data)
 {
-    float fVar1 = FLOAT_803331a8;
+    float fVar1 = lbl_803331A8;
     float* value = (float*)((char*)constrainCameraForLoc + 0x80 + data->m_serializedDataOffsets[2]);
     value[2] = fVar1;
     value[1] = fVar1;

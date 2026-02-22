@@ -26,7 +26,7 @@ extern "C" void PlayAnim__8CGObjectFiiiiiPSc(void*, int, int, int, int, int, sig
 extern "C" void DispCharaParts__8CGObjectFi(void*, int);
 extern "C" void putParticle__8CGPrgObjFiiP8CGObjectfi(void*, int, int, void*, float, int);
 extern "C" float RandF__5CMathFf(float, CMath*);
-
+extern "C" unsigned int getNumFreeObject__13CFlatRuntime2Fi(void*, int);
 extern unsigned char CFlat[];
 extern CMath Math;
 extern float FLOAT_80331b20;
@@ -200,12 +200,17 @@ void CGItemObj::DeleteOld(int, int, CFlatRuntime::CObject*, CFlatRuntime::CObjec
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80125e74
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGItemObj::CanCreateFromScript()
+unsigned int CGItemObj::CanCreateFromScript()
 {
-	// TODO
+	unsigned int freeObjects = getNumFreeObject__13CFlatRuntime2Fi(CFlat, 5);
+	return (-freeObjects & ~freeObjects) >> 31;
 }
 
 /*

@@ -15,9 +15,9 @@ extern float FLOAT_803331e4;
 extern float FLOAT_803331e8;
 extern int DAT_8032ec70;
 
-void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, pppConstrainCameraDir*, int, float*, float*, float*, float*, float*);
-void GetDirectVector__5CUtilFP3VecP3Vec3Vec(void*, Vec*, Vec*, Vec*);
-void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
+extern "C" void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
+extern "C" void GetDirectVector__5CUtilFP3VecP3Vec3Vec(void*, Vec*, Vec*, Vec*);
+extern "C" void pppSetFpMatrix__FP9_pppMngSt(void*);
 
 /*
  * --INFO--
@@ -63,7 +63,7 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, UnkB* param_2, 
 		
 		CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
 			param_2->m_dataValIndex,
-			param_1,
+			(void*)param_1,
 			param_2->m_graphId,
 			value,
 			value + 1,
@@ -127,7 +127,7 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, UnkB* param_2, 
 			pppMngStPtr->m_matrix.value[1][3] = local_c0.y;
 			pppMngStPtr->m_matrix.value[2][3] = local_c0.z;
 			
-			pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
+			pppSetFpMatrix__FP9_pppMngSt((void*)pppMngSt);
 		}
 	}
 }

@@ -3,6 +3,7 @@
 #include "ffcc/chunkfile.h"
 #include "ffcc/textureman.h"
 #include "ffcc/vector.h"
+#include "ffcc/graphic.h"
 
 #include <dolphin/mtx.h>
 
@@ -13,6 +14,7 @@ extern "C" unsigned long UnkMaterialSetGetter(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void __dla__FPv(void*);
 extern "C" void __dl__FPv(void*);
+extern "C" void __ct__6CColorFv(void*);
 extern "C" void __ct__4CRefFv(void*);
 extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void __ct__10CTexScrollFv(void*);
@@ -31,6 +33,7 @@ extern "C" void _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevS
 extern "C" void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(int, int, int,
                                                                                                         int, int, int);
 extern "C" int CheckFrustum__6CBoundFR3VecPA4_ff(CBound*, Vec*, float (*)[4], float);
+extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int*, int*, int*, int*, int);
 extern "C" void SetShadow__12CMaterialManFR10CMapShadowPA4_fiUl(
     CMaterialMan*, CMapShadow*, float (*)[4], int, unsigned long);
 class CMapKeyFrame;
@@ -40,9 +43,11 @@ extern "C" void ReadFrame__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFi
 extern "C" void ReadKey__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*, int);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __vt__9CMaterial[];
+extern "C" void* PTR_PTR_s_CMaterialMan_801e9bec;
 extern "C" void* PTR_PTR_s_CMaterialSet_801e9bbc;
 extern CMemory Memory;
 extern CTextureMan TextureMan;
+extern CGraphic Graphic;
 class CMapMng;
 extern CMapMng MapMng;
 extern CGraphic Graphic;
@@ -51,12 +56,32 @@ public:
     Mtx m_cameraMatrix;
     Mtx44 m_screenMatrix;
 } CameraPcs;
+extern unsigned char CameraPcs[];
 extern unsigned char MaterialMan[];
 extern float FLOAT_8032faf0;
 extern float FLOAT_8032faf4;
 extern float FLOAT_8032faf8;
 extern float FLOAT_8032fafc;
+extern float FLOAT_8032fb08;
+extern float FLOAT_8032fb0c;
+extern float FLOAT_8032fb10;
+extern float FLOAT_8032fb14;
 static const char s_materialStageName[] = "material";
+
+/*
+ * --INFO--
+ * PAL Address: 0x80043ccc
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_materialman_cpp(void)
+{
+    *reinterpret_cast<void**>(MaterialMan) = &PTR_PTR_s_CMaterialMan_801e9bec;
+    __ct__6CColorFv(reinterpret_cast<void*>(0x80268E83));
+}
 
 class CMapKeyFrame
 {
@@ -216,6 +241,27 @@ CPtrArray<CMaterial*>::~CPtrArray()
 {
     m_vtable = reinterpret_cast<void**>(0x801E9BFC);
     RemoveAll();
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80043aac
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" CPtrArray<CMaterial*>* dtor_80043AAC(CPtrArray<CMaterial*>* ptrArray, short shouldDelete)
+{
+    if (ptrArray != 0) {
+        ptrArray->m_vtable = reinterpret_cast<void**>(0x801E9BFC);
+        ptrArray->RemoveAll();
+        if (shouldDelete > 0) {
+            __dl__FPv(ptrArray);
+        }
+    }
+    return ptrArray;
 }
 
 template <>
@@ -894,7 +940,69 @@ extern "C" void* dtor_8003C49C(void* material, short shouldDelete)
  */
 CTexScroll::~CTexScroll()
 {
-	// TODO
+    if (m_type0 == 2) {
+        void*& keyFrame0 = *reinterpret_cast<void**>(Ptr(this, 0xC));
+        if (keyFrame0 != 0) {
+            void*& table0 = *reinterpret_cast<void**>(Ptr(keyFrame0, 0x18));
+            if (table0 != 0) {
+                __dl__FPv(table0);
+                table0 = 0;
+            }
+
+            void*& table1 = *reinterpret_cast<void**>(Ptr(keyFrame0, 0x1C));
+            if (table1 != 0) {
+                __dl__FPv(table1);
+                table1 = 0;
+            }
+
+            void*& table2 = *reinterpret_cast<void**>(Ptr(keyFrame0, 0x20));
+            if (table2 != 0) {
+                __dl__FPv(table2);
+                table2 = 0;
+            }
+
+            void*& table3 = *reinterpret_cast<void**>(Ptr(keyFrame0, 0x24));
+            if (table3 != 0) {
+                __dl__FPv(table3);
+                table3 = 0;
+            }
+
+            __dl__FPv(keyFrame0);
+            keyFrame0 = 0;
+        }
+    }
+
+    if (m_type1 == 2) {
+        void*& keyFrame1 = *reinterpret_cast<void**>(Ptr(this, 0x10));
+        if (keyFrame1 != 0) {
+            void*& table0 = *reinterpret_cast<void**>(Ptr(keyFrame1, 0x18));
+            if (table0 != 0) {
+                __dl__FPv(table0);
+                table0 = 0;
+            }
+
+            void*& table1 = *reinterpret_cast<void**>(Ptr(keyFrame1, 0x1C));
+            if (table1 != 0) {
+                __dl__FPv(table1);
+                table1 = 0;
+            }
+
+            void*& table2 = *reinterpret_cast<void**>(Ptr(keyFrame1, 0x20));
+            if (table2 != 0) {
+                __dl__FPv(table2);
+                table2 = 0;
+            }
+
+            void*& table3 = *reinterpret_cast<void**>(Ptr(keyFrame1, 0x24));
+            if (table3 != 0) {
+                __dl__FPv(table3);
+                table3 = 0;
+            }
+
+            __dl__FPv(keyFrame1);
+            keyFrame1 = 0;
+        }
+    }
 }
 
 /*

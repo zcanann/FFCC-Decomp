@@ -18,7 +18,7 @@ extern u32 lbl_801E8690[];
 extern u32 lbl_801E869C[];
 extern u32 lbl_801E86A8[];
 extern u32 lbl_801E86B4[];
-extern char lbl_8032F810[];
+extern char lbl_8032F810;
 extern CUSBPcs USBPcs;
 
 
@@ -38,7 +38,7 @@ CUSBPcs::CUSBPcs()
  */
 void CUSBPcs::Init()
 { 
-	m_smallStage = Memory.CreateStage(0x2000, lbl_8032F810, 0);
+	m_smallStage = Memory.CreateStage(0x2000, &lbl_8032F810, 0);
 	m_bigStage = (CMemory::CStage*)nullptr;
 
 	strcpy(m_rootPath, "plot/kmitsuru/");
@@ -82,7 +82,7 @@ void* CUSBPcs::GetTable(unsigned long param)
 void CUSBPcs::IsBigAlloc(int param_2)
 {
     if ((param_2 != 0) && (m_bigStage == (CMemory::CStage*)nullptr)) {
-        m_bigStage = Memory.CreateStage(0x100000, lbl_8032F810, 0);
+        m_bigStage = Memory.CreateStage(0x100000, &lbl_8032F810, 0);
     } else if ((param_2 == 0) && (m_bigStage != (CMemory::CStage*)nullptr)) {
         Memory.DestroyStage(m_bigStage);
         m_bigStage = (CMemory::CStage*)nullptr;

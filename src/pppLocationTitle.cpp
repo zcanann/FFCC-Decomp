@@ -18,6 +18,7 @@ extern void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, voi
                                                                        unsigned char);
 extern void pppSetBlendMode__FUc(unsigned char);
 extern void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
+extern "C" void pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*, pppFMATRIX*);
 extern int DAT_8032ed70;
 extern "C" int rand(void);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
@@ -168,7 +169,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, UnkB* param_2, Un
 
         localMatrix = *(pppFMATRIX*)((u8*)pppLocationTitle + 4);
         managerMatrix = pppMngStPtr->m_matrix;
-        pppMulMatrix(resultMatrix, managerMatrix, localMatrix);
+        pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&resultMatrix, &managerMatrix, &localMatrix);
 
         particles[count].m_pos.x = resultMatrix.value[0][3];
         particles[count].m_pos.y = resultMatrix.value[1][3];

@@ -634,22 +634,18 @@ void CMapAnim::Calc(long frame)
 void CMapAnimRun::Calc(long frame)
 {
     int* run = reinterpret_cast<int*>(this);
-    CMapAnim* mapAnim;
-
-    if (run[0] < 0 && run[3] != frame) {
-        return;
-    }
-
     if (run[0] < 0) {
+        if (run[3] != frame) {
+            return;
+        }
         run[0] = run[1];
     }
 
-    mapAnim = __vc__21CPtrArray_P8CMapAnim_FUl(MapMng + 0x2140C, reinterpret_cast<unsigned short*>(this)[9]);
+    CMapAnim* mapAnim = __vc__21CPtrArray_P8CMapAnim_FUl(MapMng + 0x2140C, reinterpret_cast<unsigned short*>(this)[9]);
     mapAnim->Calc(run[0]);
-    int nextFrame = run[0] + 1;
-    run[0] = nextFrame;
+    run[0] = run[0] + 1;
 
-    if (nextFrame > run[2]) {
+    if (run[2] < run[0]) {
         if (reinterpret_cast<unsigned char*>(this)[0x10] != 0) {
             run[0] = 0;
         } else {

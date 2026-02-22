@@ -11,9 +11,9 @@ int DAT_8032ec68;
 
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
 
-extern void* __vt__8CManager;
-extern void* lbl_801E8668;
-extern void* lbl_801E8830;
+extern "C" char __vt__8CManager[];
+extern "C" char lbl_801E8668[];
+extern "C" char lbl_801E8830[];
 extern u32 lbl_801E8690[];
 extern u32 lbl_801E869C[];
 extern u32 lbl_801E86A8[];
@@ -147,9 +147,7 @@ void CUSBPcs::mccReadData()
 	if (4 < DAT_8032ec68)
 	{
 		DAT_8032ec68 = 0;
-		if (USB.IsConnected() == 0) {
-			return;
-		}
+		USB.IsConnected();
 	}
 }
 
@@ -247,23 +245,23 @@ int CUSBPcs::SendDataCode(int code, void* src, int elemSize, int elemCount)
  */
 extern "C" void __sinit_p_usb_cpp()
 {
-    volatile void** base = (volatile void**)&USBPcs;
-    *base = &__vt__8CManager;
-    *base = &lbl_801E8668;
-    *base = &lbl_801E8830;
+    void* vtbl = __vt__8CManager;
+    *reinterpret_cast<void**>(&USBPcs) = vtbl;
+    *reinterpret_cast<void**>(&USBPcs) = lbl_801E8668;
+    *reinterpret_cast<void**>(&USBPcs) = lbl_801E8830;
 
-    u32* dst = lbl_801E86B4 + 1;
+    u32* dst = lbl_801E86B4;
     u32* src0 = lbl_801E8690;
     u32* src1 = lbl_801E869C;
     u32* src2 = lbl_801E86A8;
 
-    dst[0] = src0[0];
-    dst[1] = src0[1];
-    dst[2] = src0[2];
-    dst[3] = src1[0];
-    dst[4] = src1[1];
-    dst[5] = src1[2];
-    dst[6] = src2[0];
-    dst[7] = src2[1];
-    dst[8] = src2[2];
+    dst[1] = src0[0];
+    dst[2] = src0[1];
+    dst[3] = src0[2];
+    dst[4] = src1[0];
+    dst[5] = src1[1];
+    dst[6] = src1[2];
+    dst[7] = src2[0];
+    dst[8] = src2[1];
+    dst[9] = src2[2];
 }

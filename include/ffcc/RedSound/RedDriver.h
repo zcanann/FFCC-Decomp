@@ -92,7 +92,7 @@ public:
 	void DisplaySePlayInfo();
 
 
-	void StreamPlayState(int);
+	int StreamPlayState(int);
 	void GetStreamPlayPoint(int, int*, int*);
 	void StreamStop(int);
 	void StreamPlay(int, void*, int, int, int);

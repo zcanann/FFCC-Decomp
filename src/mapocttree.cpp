@@ -1922,21 +1922,17 @@ COctNode::COctNode()
  */
 extern "C" void __sinit_mapocttree_cpp()
 {
-	float max = lbl_8032F970;
-	float min = lbl_8032F96C;
-	float* bounds = (float*)&s_bound;
+	((float*)&s_bound)[0] = lbl_8032F96C;
+	((float*)&s_bound)[1] = lbl_8032F96C;
+	((float*)&s_bound)[2] = lbl_8032F96C;
+	((float*)&s_bound)[3] = lbl_8032F970;
+	((float*)&s_bound)[4] = lbl_8032F970;
+	((float*)&s_bound)[5] = lbl_8032F970;
 
-	bounds[0] = min;
-	bounds[1] = min;
-	bounds[2] = min;
-	bounds[3] = max;
-	bounds[4] = max;
-	bounds[5] = max;
-
-	s_cyl.m_direction2.y = min;
-	s_cyl.m_direction2.x = min;
-	s_cyl.m_top.z = min;
-	s_cyl.m_height2 = max;
-	s_cyl.m_radius2 = max;
-	s_cyl.m_direction2.z = max;
+	s_cyl.m_direction2.y = lbl_8032F96C;
+	s_cyl.m_direction2.x = lbl_8032F96C;
+	s_cyl.m_top.z = lbl_8032F96C;
+	s_cyl.m_height2 = lbl_8032F970;
+	s_cyl.m_radius2 = lbl_8032F970;
+	s_cyl.m_direction2.z = lbl_8032F970;
 }

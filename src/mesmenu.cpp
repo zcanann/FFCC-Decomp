@@ -2,10 +2,12 @@
 #include "ffcc/p_game.h"
 
 #include <math.h>
+#include <string.h>
 
 extern "C" {
 void Set__4CMesFPci(void* mes, char* script, int flags);
 void SetPosition__4CMesFff(void* mes, float x, float y);
+void Create__5CMenuFv(void* menu);
 void PlaySe__6CSoundFiiii(void* sound, int id, int volume, int pan, int unk);
 void SetFade__9CRingMenuFi(void* ringMenu, int fade);
 int __cntlzw(unsigned int);
@@ -64,12 +66,56 @@ CMesMenu::~CMesMenu()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009dfd0
+ * PAL Size: 300b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMesMenu::Create()
 {
-	// TODO
+    typedef void (*InitFn)(CMesMenu*);
+    void** vtable = *reinterpret_cast<void***>(this);
+    reinterpret_cast<InitFn>(vtable[4])(this);
+
+    Create__5CMenuFv(this);
+
+    char* self = reinterpret_cast<char*>(this);
+    *reinterpret_cast<float*>(self + 0x3D78) = FLOAT_803308d8;
+    *reinterpret_cast<float*>(self + 0x3D74) = FLOAT_803308d8;
+    *reinterpret_cast<int*>(self + 0x08) = 0;
+    *reinterpret_cast<int*>(self + 0x0C) = 4;
+    *reinterpret_cast<int*>(self + 0x3DF4) = 0;
+    *reinterpret_cast<int*>(self + 0x3DF8) = 0;
+
+    if (*reinterpret_cast<int*>(self + 0x18) < 4) {
+        unsigned int x = 0x10;
+        if ((*reinterpret_cast<unsigned int*>(self + 0x18) & 1) != 0) {
+            x = 0x270;
+        }
+
+        unsigned int y = 0x18;
+        if ((*reinterpret_cast<unsigned int*>(self + 0x18) & 2) != 0) {
+            y = 0x1B0;
+        }
+
+        *reinterpret_cast<float*>(self + 0x3D6C) = (float)(int)x;
+        *reinterpret_cast<float*>(self + 0x3D70) = (float)(int)y;
+        *reinterpret_cast<float*>(self + 0x3D7C) = FLOAT_803308d8;
+        *reinterpret_cast<float*>(self + 0x3D80) = FLOAT_803308d8;
+        *reinterpret_cast<float*>(self + 0x3D84) = FLOAT_803308d8;
+        *reinterpret_cast<int*>(self + 0x3D88) = 0;
+        *reinterpret_cast<int*>(self + 0x3D8C) = 0;
+        *reinterpret_cast<int*>(self + 0x3DA8) = 0;
+        *reinterpret_cast<int*>(self + 0x3DAC) = 0;
+        memset(self + 0x3DB0, 0, 0x20);
+        memset(self + 0x3DD0, 0, 0x20);
+        *reinterpret_cast<int*>(self + 0x3DF0) = 0;
+    }
+
+    *reinterpret_cast<int*>(self + 0x3D98) = 0;
+    *reinterpret_cast<int*>(self + 0x3D94) = 0;
 }
 
 /*

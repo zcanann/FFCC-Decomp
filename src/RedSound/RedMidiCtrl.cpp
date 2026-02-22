@@ -1,6 +1,12 @@
 #include "ffcc/RedSound/RedMidiCtrl.h"
+#include "ffcc/RedSound/RedEntry.h"
+#include "ffcc/RedSound/RedMemory.h"
 
 extern unsigned int* DAT_8032f444;
+extern int DAT_8032f3f8;
+extern void* DAT_8032f3f0;
+extern int DAT_8032f424;
+extern CRedEntry DAT_8032e154;
 
 /*
  * --INFO--
@@ -34,12 +40,45 @@ void KeyOnReserveClear(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C7504
+ * PAL Size: 240b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void KeyOnReserve(RedKeyOnDATA*, RedTrackDATA*)
+void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-	// TODO
+    int* slot;
+    int* limit;
+
+    if ((((signed char*)track)[0x26] & 5) != 0) {
+        slot = (int*)((int)keyOnData + ((signed char*)track)[0x14e] * 8);
+        if ((*slot == 0) || (*slot == (int)track)) {
+            *slot = (int)track;
+            slot[1] = ((int*)track)[9];
+            DAT_8032f3f8++;
+        }
+        return;
+    }
+
+    if ((((unsigned char*)track)[0x26] & 8) != 0) {
+        slot = (int*)((int)keyOnData + 0x200);
+        limit = (int*)((int)keyOnData + 0x400);
+    } else {
+        slot = (int*)((int)keyOnData + 0x400);
+        limit = (int*)((int)keyOnData + 0x600);
+    }
+
+    do {
+        if (*slot == 0) {
+            *slot = (int)track;
+            slot[1] = ((int*)track)[9];
+            DAT_8032f3f8++;
+            break;
+        }
+        slot += 2;
+    } while (slot < limit);
 }
 
 /*
@@ -174,12 +213,61 @@ void __MidiCtrl_Pass(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C797C
+ * PAL Size: 456b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_Stop(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-	// TODO
+    unsigned int* seTrack;
+    unsigned int* controlData;
+
+    ((int*)track)[0x41] = 0;
+    KeyOffSet(control, keyOnData, track);
+
+    seTrack = DAT_8032f444;
+    do {
+        if ((RedTrackDATA*)*seTrack == track) {
+            ((unsigned char*)seTrack)[0x1a] &= (unsigned char)0xfa;
+        }
+        seTrack += 0x30;
+    } while (seTrack < DAT_8032f444 + 0xc00);
+
+    *((int*)track) = 0;
+    if ((int*)control < (int*)((int)DAT_8032f3f0 + 0xdbc)) {
+        *(short*)((int)control + 0x48e) = *(short*)((int)control + 0x48e) - 1;
+        if ((*(short*)((int)control + 0x48e) == 0) &&
+            ((DAT_8032f424 == 1) || ((((int*)control)[0x11b] & 1) == 0))) {
+            controlData = (unsigned int*)control;
+            seTrack = DAT_8032f444;
+            do {
+                if ((controlData[0] <= seTrack[0]) &&
+                    (seTrack[0] < controlData[0] + (unsigned int)((unsigned char*)control)[0x491] * 0x154)) {
+                    seTrack[0x25] &= 0xfffffff3;
+                    seTrack[0x24] &= 0xfffffffe;
+                    seTrack[0x24] |= 2;
+                    seTrack[0] = 0;
+                }
+                seTrack += 0x30;
+            } while (seTrack < DAT_8032f444 + 0xc00);
+
+            DAT_8032e154.MusicHistoryManager(0, controlData[0x11c]);
+            DAT_8032e154.WaveHistoryManager(0, controlData[0x11f]);
+            controlData[0x11c] = 0xffffffff;
+            controlData[0x122] = 0;
+            RedDelete((int)controlData[0]);
+            controlData[0] = 0;
+        }
+    } else {
+        if (((int*)track)[6] != 0) {
+            DAT_8032e154.WaveHistoryManager(0, *(short*)(((int*)track)[6] + 2));
+        }
+        DAT_8032e154.SeSepHistoryManager(0, ((int*)track)[0x3d]);
+        ((int*)track)[0x3e] = 0;
+    }
 }
 
 /*

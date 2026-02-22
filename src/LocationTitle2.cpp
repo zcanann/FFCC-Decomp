@@ -193,18 +193,20 @@ void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, struct UnkB
         animFrameCount = *(u16*)(modelAnim + 0x10);
 
         for (u16 frameIndex = 0; frameIndex < animFrameCount; frameIndex++) {
+            Mtx nodeMtx;
             LocationTitle2Particle* particle;
             u16 count;
 
             CalcBind__Q26CChara5CNodeFPQ26CChara6CModel(modelNodes + nodeIndex * 0xC0, model);
             SetFrame__Q26CChara6CModelFf((float)frameIndex, model);
             CalcMatrix__Q26CChara6CModelFv(model);
+            PSMTXCopy((float(*)[4])(modelNodes + nodeIndex * 0xC0 + 0xC), nodeMtx);
 
             count = work->m_count;
             particle = &particles[count];
-            particle->m_pos.x = *(float*)(modelNodes + nodeIndex * 0xC0 + 0x18);
-            particle->m_pos.y = *(float*)(modelNodes + nodeIndex * 0xC0 + 0x28);
-            particle->m_pos.z = *(float*)(modelNodes + nodeIndex * 0xC0 + 0x38) + FLOAT_80330f4c;
+            particle->m_pos.x = nodeMtx[0][3];
+            particle->m_pos.y = nodeMtx[1][3];
+            particle->m_pos.z = nodeMtx[2][3] + FLOAT_80330f4c;
             memcpy(&particle->m_color, (u8*)locationTitle + 0x88 + colorOffset, 4);
             particle->m_pad0 = 0;
             particle->m_shape = 0;
@@ -250,14 +252,15 @@ void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, struct UnkB
                     }
                 }
 
-                particles[startIndex + inserted + 1].m_pos = particles[startIndex + 1].m_pos;
+                pppCopyVector(particles[startIndex + inserted + 1].m_pos,
+                              particles[startIndex + 1].m_pos);
 
                 for (int i = 0; i < inserted; i++) {
                     LocationTitle2Particle* dst;
 
                     dst = &particles[startIndex + i + 1];
                     interp[i].z += FLOAT_80330f4c;
-                    dst->m_pos = interp[i];
+                    pppCopyVector(dst->m_pos, interp[i]);
                     memcpy(&dst->m_color, (u8*)locationTitle + 0x88 + colorOffset, 4);
                     dst->m_pad0 = 0;
                     dst->m_shape = 0;

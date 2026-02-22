@@ -23,15 +23,21 @@ extern "C" void* PTR_PTR_s_CSound_8021056c;
 extern "C" void __ct__9CRedSoundFv(void*);
 extern "C" void __dt__6CSoundFv(void*);
 extern "C" unsigned int GetSoundMode__9CRedSoundFv(CRedSound*);
+extern "C" void ReportPrint__9CRedSoundFi(CRedSound*, int);
+extern "C" void DisplayWaveInfo__9CRedSoundFv(CRedSound*);
+extern "C" void DisplaySePlayInfo__9CRedSoundFv(CRedSound*);
+extern "C" void TestProcess__9CRedSoundFi(CRedSound*, int);
 extern "C" int StreamPlayState__9CRedSoundFi(CRedSound*, int);
 extern "C" int ReentryWaveData__9CRedSoundFi(CRedSound*, int);
 extern "C" int SePlayState__9CRedSoundFi(CRedSound*, int);
 extern "C" int ReportSeLoop__9CRedSoundFi(CRedSound*, int);
 extern "C" int GetSeVolume__9CRedSoundFii(CRedSound*, int, int);
 extern "C" void SeStop__9CRedSoundFi(CRedSound*, int);
+extern "C" void SePause__9CRedSoundFii(CRedSound*, int, int);
 extern "C" void SePan__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" void SeVolume__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" int SePlay__9CRedSoundFiiiii(CRedSound*, int, int, int, int, int);
+extern "C" void StreamPause__9CRedSoundFii(CRedSound*, int, int);
 extern "C" void MusicVolume__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" void Printf__7CSystemFPce(CSystem*, char*, ...);
 extern "C" int sprintf(char*, const char*, ...);
@@ -521,22 +527,41 @@ void CSound::GetPerformance()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c7924
+ * PAL Size: 112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::PauseDiscError(int)
+void CSound::PauseDiscError(int param_2)
 {
-	// TODO
+    if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x22d0) == 0) {
+        int pause = (-param_2 | param_2) >> 0x1f;
+        SePause__9CRedSoundFii(reinterpret_cast<CRedSound*>(this), -1, pause);
+        StreamPause__9CRedSoundFii(reinterpret_cast<CRedSound*>(this), -1, pause);
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c789c
+ * PAL Size: 136b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::CheckDriver(int)
+void CSound::CheckDriver(int param_2)
 {
-	// TODO
+    unsigned int uVar1 = *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x22d4);
+    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x22d4) = 1;
+    ReportPrint__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), 1);
+    TestProcess__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), param_2);
+    DisplayWaveInfo__9CRedSoundFv(reinterpret_cast<CRedSound*>(this));
+    DisplaySePlayInfo__9CRedSoundFv(reinterpret_cast<CRedSound*>(this));
+    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x22d4) = uVar1;
+    ReportPrint__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), (-uVar1 | uVar1) >> 0x1f);
 }
 
 /*

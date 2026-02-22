@@ -1424,32 +1424,29 @@ CGPartyObj* CGame::GetPartyObj(int index)
  */
 char* CGame::MakeArtItemName(char* out, int itemIndex, int count)
 {
-    CFlatDataView* flatData = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1]);
-    char** itemTable = flatData->m_tabl[0].m_strings;
-
-    if (count < 2) {
-        bool hasSeparator = false;
-        char* prefix = itemTable[itemIndex * 5];
-        char* itemName = itemTable[itemIndex * 5 + 1];
-
-        if (strlen(prefix) != 0) {
-            unsigned char languageId = m_gameWork.m_languageId;
-            if ((languageId != 3) && (languageId != 4)) {
-                hasSeparator = true;
-            }
-        }
-
-        const char* separator = s_nameNoSep;
-        if (hasSeparator) {
-            separator = s_nameSep;
-        }
-
-        sprintf(out, s_nameJoinFmt, prefix, separator, itemName);
-    } else {
-        char* itemName = itemTable[itemIndex * 5 + 3];
-        sprintf(out, s_numNameFmt, count, itemName);
+    char** itemTable = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[0].m_strings;
+    if (count >= 2) {
+        sprintf(out, s_numNameFmt, count, itemTable[itemIndex * 5 + 3]);
+        return out;
     }
 
+    unsigned char hasSeparator = 0;
+    char* prefix = itemTable[itemIndex * 5];
+    char* itemName = itemTable[itemIndex * 5 + 1];
+
+    if (strlen(prefix) != 0) {
+        unsigned char languageId = m_gameWork.m_languageId;
+        if ((languageId != 3) && (languageId != 4)) {
+            hasSeparator = 1;
+        }
+    }
+
+    const char* separator = s_nameNoSep;
+    if (hasSeparator != 0) {
+        separator = s_nameSep;
+    }
+
+    sprintf(out, s_nameJoinFmt, prefix, separator, itemName);
     return out;
 }
 
@@ -1513,32 +1510,29 @@ char* CGame::MakeNumItemName(char* out, int itemIndex, int count)
  */
 char* CGame::MakeArtMonName(char* out, int monIndex, int count)
 {
-    CFlatDataView* flatData = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1]);
-    char** monTable = flatData->m_tabl[1].m_strings;
-
-    if (count < 2) {
-        bool hasSeparator = false;
-        char* prefix = monTable[monIndex * 5];
-        char* monName = monTable[monIndex * 5 + 1];
-
-        if (strlen(prefix) != 0) {
-            unsigned char languageId = m_gameWork.m_languageId;
-            if ((languageId != 3) && (languageId != 4)) {
-                hasSeparator = true;
-            }
-        }
-
-        const char* separator = s_nameNoSep;
-        if (hasSeparator) {
-            separator = s_nameSep;
-        }
-
-        sprintf(out, s_nameJoinFmt, prefix, separator, monName);
-    } else {
-        char* monName = monTable[monIndex * 5 + 3];
-        sprintf(out, s_numNameFmt, count, monName);
+    char** monTable = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[1].m_strings;
+    if (count >= 2) {
+        sprintf(out, s_numNameFmt, count, monTable[monIndex * 5 + 3]);
+        return out;
     }
 
+    unsigned char hasSeparator = 0;
+    char* prefix = monTable[monIndex * 5];
+    char* monName = monTable[monIndex * 5 + 1];
+
+    if (strlen(prefix) != 0) {
+        unsigned char languageId = m_gameWork.m_languageId;
+        if ((languageId != 3) && (languageId != 4)) {
+            hasSeparator = 1;
+        }
+    }
+
+    const char* separator = s_nameNoSep;
+    if (hasSeparator != 0) {
+        separator = s_nameSep;
+    }
+
+    sprintf(out, s_nameJoinFmt, prefix, separator, monName);
     return out;
 }
 

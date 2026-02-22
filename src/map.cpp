@@ -1479,12 +1479,34 @@ void CMapMng::AttachMapHit(CMapHit*, char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80032f1c
+ * PAL Size: 180b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapMng::GetDebugPlaySta(int, Vec*)
+int CMapMng::GetDebugPlaySta(int playStaNo, Vec* vec)
 {
-	// TODO
+    unsigned char* mapObj = Ptr(this, 0x954);
+    unsigned char* mapObjEnd = mapObj + (*reinterpret_cast<short*>(Ptr(this, 0xC)) * 0xF0);
+
+    while (mapObj < mapObjEnd) {
+        unsigned char* mapObjAtr = *reinterpret_cast<unsigned char**>(mapObj + 0xEC);
+        if (mapObjAtr != 0 && *reinterpret_cast<int*>(mapObjAtr + 4) == 4 &&
+            *(mapObjAtr + 8) == static_cast<unsigned char>(playStaNo)) {
+            vec->x = *reinterpret_cast<float*>(mapObj + 0xC4);
+            vec->y = *reinterpret_cast<float*>(mapObj + 0xD4);
+            vec->z = *reinterpret_cast<float*>(mapObj + 0xE4);
+            return 1;
+        }
+        mapObj += 0xF0;
+    }
+
+    vec->x = FLOAT_8032f9a0;
+    vec->y = FLOAT_8032f9a0;
+    vec->z = FLOAT_8032f9a0;
+    return 0;
 }
 
 /*

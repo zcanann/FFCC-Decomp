@@ -1922,12 +1922,14 @@ COctNode::COctNode()
  */
 extern "C" void __sinit_mapocttree_cpp()
 {
-	((float*)&s_bound)[0] = lbl_8032F96C;
-	((float*)&s_bound)[1] = lbl_8032F96C;
-	((float*)&s_bound)[2] = lbl_8032F96C;
-	((float*)&s_bound)[3] = lbl_8032F970;
-	((float*)&s_bound)[4] = lbl_8032F970;
-	((float*)&s_bound)[5] = lbl_8032F970;
+	float* bound = reinterpret_cast<float*>(Ptr(&s_bound, 0x0));
+
+	bound[2] = lbl_8032F96C;
+	bound[1] = lbl_8032F96C;
+	bound[0] = lbl_8032F96C;
+	bound[5] = lbl_8032F970;
+	bound[4] = lbl_8032F970;
+	bound[3] = lbl_8032F970;
 
 	s_cyl.m_direction2.y = lbl_8032F96C;
 	s_cyl.m_direction2.x = lbl_8032F96C;

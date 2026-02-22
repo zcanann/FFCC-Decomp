@@ -431,12 +431,13 @@ void CLightPcs::Clear()
  */
 void CLightPcs::Add(CLightPcs::CLight* light)
 {
-    float radius = *(float*)((char*)light + 0x1c);
-    float maxDist = *(float*)((char*)light + 0x20);
-    float intensity = *(float*)((char*)light + 0x28);
+    unsigned int* src = reinterpret_cast<unsigned int*>(light);
+    float radius = *reinterpret_cast<float*>(&src[7]);
+    float maxDist = *reinterpret_cast<float*>(&src[8]);
+    float intensity = *reinterpret_cast<float*>(&src[10]);
     unsigned int colorMask = 0x01010101;
 
-    if (maxDist >= FLOAT_8032fc10) {
+    if (FLOAT_8032fc10 <= maxDist) {
         maxDist = radius;
     }
 
@@ -444,22 +445,23 @@ void CLightPcs::Add(CLightPcs::CLight* light)
     if (radius < FLOAT_8032fc14) {
         absRadius = -radius;
     }
+    absRadius *= FLOAT_8032fc18;
 
-    if (*(int*)((char*)light + 0x50) == 0) {
-        reinterpret_cast<unsigned char*>(&colorMask)[0] = 0;
+    if (src[20] == 0) {
+        colorMask = 0x00010101;
     }
-    if (*(int*)((char*)light + 0x54) == 0) {
-        reinterpret_cast<unsigned char*>(&colorMask)[1] = 0;
+    if (src[21] == 0) {
+        colorMask = (colorMask & 0xFF0000FF) | ((colorMask >> 8) & 0x0000FF00);
     }
-    if (*(int*)((char*)light + 0x58) == 0) {
-        reinterpret_cast<unsigned char*>(&colorMask)[2] = 0;
+    if (src[22] == 0) {
+        colorMask = (colorMask & 0xFFFF00FF) | ((colorMask >> 16) & 0x000000FF);
     }
 
-    int index = *(int*)((char*)this + 0xb8);
-    *(int*)((char*)this + 0xb8) = index + 1;
+    int index = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0xb8);
+    *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0xb8) = index + 1;
 
-    unsigned int* dst = (unsigned int*)((char*)this + 0x63c + index * 0xb0);
-    unsigned int* src = (unsigned int*)light;
+    unsigned int* dst = reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(this) + (index * 0xb0) + 0x63c);
+
     dst[0] = src[0];
     dst[1] = src[1];
     dst[2] = src[2];
@@ -468,8 +470,8 @@ void CLightPcs::Add(CLightPcs::CLight* light)
     dst[5] = src[5];
     dst[6] = src[6];
     dst[7] = src[7];
-    dst[8] = src[8];
-    dst[9] = src[9];
+    dst[8] = *reinterpret_cast<unsigned int*>(&maxDist);
+    dst[9] = *reinterpret_cast<unsigned int*>(&(absRadius *= intensity));
     dst[10] = src[10];
     dst[11] = src[11];
     dst[12] = src[12];
@@ -479,15 +481,18 @@ void CLightPcs::Add(CLightPcs::CLight* light)
     dst[16] = src[16];
     dst[17] = src[17];
     dst[18] = src[18];
-    *(u8*)(dst + 19) = *(u8*)(src + 19);
-    *(u8*)((char*)dst + 0x4d) = *(u8*)((char*)src + 0x4d);
-    *(u8*)((char*)dst + 0x4e) = *(u8*)((char*)src + 0x4e);
-    *(u8*)((char*)dst + 0x4f) = *(u8*)((char*)src + 0x4f);
+    *reinterpret_cast<unsigned char*>(dst + 19) = *reinterpret_cast<unsigned char*>(src + 19);
+    *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(dst) + 0x4d) =
+        *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(src) + 0x4d);
+    *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(dst) + 0x4e) =
+        *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(src) + 0x4e);
+    *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(dst) + 0x4f) =
+        *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(src) + 0x4f);
     dst[20] = src[20];
     dst[21] = src[21];
     dst[22] = src[22];
     dst[23] = src[23];
-    dst[24] = src[24];
+    dst[24] = colorMask;
     dst[25] = src[25];
     dst[26] = src[26];
     dst[27] = src[27];
@@ -506,14 +511,7 @@ void CLightPcs::Add(CLightPcs::CLight* light)
     dst[40] = src[40];
     dst[41] = src[41];
     dst[42] = src[42];
-    dst[43] = src[43];
-
-    float atten = absRadius * FLOAT_8032fc18 * intensity;
-    float radiusSq = radius * radius;
-    dst[8] = *(unsigned int*)&maxDist;
-    dst[9] = *(unsigned int*)&atten;
-    dst[0x18] = colorMask;
-    dst[0x2b] = *(unsigned int*)&radiusSq;
+    dst[43] = *reinterpret_cast<unsigned int*>(&(radius *= radius));
 }
 
 /*

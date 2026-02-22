@@ -247,8 +247,8 @@ void CGPrgObj::reqAnim(int animId, int loop, int direct)
 {
 	m_animFlags = (m_animFlags & 0x7f) | 0x80;
 	m_reqAnimId = animId;
-	m_animFlags = ((loop << 6) & 0x40) | (m_animFlags & 0xbf);
-	m_animFlags = ((direct << 5) & 0x20) | (m_animFlags & 0xdf);
+	m_animFlags = ((u8)loop << 6) | (m_animFlags & 0xbf);
+	m_animFlags = ((u8)direct << 5) | (m_animFlags & 0xdf);
 }
 
 /*

@@ -191,6 +191,7 @@ void CSystem::Printf(char* fmt, ...)
     va_start(args, fmt);
     vsprintf(buffer, fmt, args);
     va_end(args);
+    OSReport(buffer);
     USB.Printf(buffer);
 }
 

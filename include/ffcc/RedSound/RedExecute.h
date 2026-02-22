@@ -20,7 +20,7 @@ void ReverbAreaFree(void*);
 void InitReverb();
 void _SetReverbData(RedReverbDATA*, int*);
 void _ClearReverb(int);
-void SetReverb(int, int, int*);
+int* SetReverb(int, int, int*);
 
 void EntryVoiceSearch(RedTrackDATA*);
 void _VoiceEnvelopeCheck();

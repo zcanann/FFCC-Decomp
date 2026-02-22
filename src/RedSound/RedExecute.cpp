@@ -227,12 +227,126 @@ void _ClearReverb(int bank)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c3718
+ * PAL Size: 1324b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void SetReverb(int, int, int*)
+int* SetReverb(int bank, int kind, int* params)
 {
-	// TODO
+    RedReverbDATA* reverb;
+    int result;
+
+    DAT_8032f4b0[0] = 0;
+    DAT_8032f4b0[1] = 0;
+
+    if (kind == 0) {
+        _ClearReverb(bank);
+        return (int*)DAT_8032f4b0;
+    }
+
+    if (kind > 5) {
+        return 0;
+    }
+
+    reverb = (RedReverbDATA*)(DAT_8032f4ac + (bank & 1) * 0xC);
+    if ((reverb->callback != nullptr) && (reverb->kind == kind)) {
+        _SetReverbData(reverb, params);
+        return (int*)DAT_8032f4b0;
+    }
+
+    _ClearReverb(bank);
+    if (kind == 5) {
+        _ClearReverb(1);
+    }
+
+    reverb->kind = kind;
+    result = 0;
+    switch (kind) {
+    case 1: {
+        AXFX_REVERBSTD* std = (AXFX_REVERBSTD*)RedNew(sizeof(AXFX_REVERBSTD));
+        reverb->context = std;
+        reverb->callback = (void (*)(void*, void*))AXFXReverbStdCallback;
+        std->tempDisableFX = 0;
+        std->preDelay = (float)params[0] / 100.0f;
+        std->time = (float)params[1] / 100.0f;
+        std->coloration = (float)params[2] / 10000.0f;
+        std->damping = (float)params[3] / 10000.0f;
+        std->mix = (float)params[4] / 10000.0f;
+        result = AXFXReverbStdInit(std);
+        break;
+    }
+    case 2: {
+        AXFX_REVERBHI* hi = (AXFX_REVERBHI*)RedNew(sizeof(AXFX_REVERBHI));
+        reverb->context = hi;
+        reverb->callback = (void (*)(void*, void*))AXFXReverbHiCallback;
+        hi->tempDisableFX = 0;
+        hi->preDelay = (float)params[0] / 100.0f;
+        hi->time = (float)params[1] / 100.0f;
+        hi->coloration = (float)params[2] / 10000.0f;
+        hi->damping = (float)params[3] / 10000.0f;
+        hi->mix = (float)params[4] / 10000.0f;
+        hi->crosstalk = (float)params[5] / 10000.0f;
+        result = AXFXReverbHiInit(hi);
+        break;
+    }
+    case 3: {
+        AXFX_DELAY* delay = (AXFX_DELAY*)RedNew(sizeof(AXFX_DELAY));
+        reverb->context = delay;
+        reverb->callback = (void (*)(void*, void*))AXFXDelayCallback;
+        delay->delay[0] = (u32)params[0];
+        delay->delay[1] = (u32)params[0];
+        delay->delay[2] = (u32)params[0];
+        delay->feedback[0] = (u32)params[1];
+        delay->feedback[1] = (u32)params[1];
+        delay->feedback[2] = (u32)params[1];
+        delay->output[0] = (u32)params[2];
+        delay->output[1] = (u32)params[2];
+        delay->output[2] = (u32)params[2];
+        result = AXFXDelayInit(delay);
+        break;
+    }
+    case 4: {
+        AXFX_CHORUS* chorus = (AXFX_CHORUS*)RedNew(sizeof(AXFX_CHORUS));
+        reverb->context = chorus;
+        reverb->callback = (void (*)(void*, void*))AXFXChorusCallback;
+        chorus->baseDelay = (u32)params[0];
+        chorus->variation = (u32)params[1];
+        chorus->period = (u32)params[2];
+        result = AXFXChorusInit(chorus);
+        break;
+    }
+    case 5: {
+        AXFX_REVERBHI_DPL2* hiDpl2 = (AXFX_REVERBHI_DPL2*)RedNew(sizeof(AXFX_REVERBHI_DPL2));
+        reverb->context = hiDpl2;
+        reverb->callback = (void (*)(void*, void*))AXFXReverbHiCallbackDpl2;
+        hiDpl2->tempDisableFX = 0;
+        hiDpl2->preDelay = (float)params[0] / 100.0f;
+        hiDpl2->time = (float)params[1] / 100.0f;
+        hiDpl2->coloration = (float)params[2] / 10000.0f;
+        hiDpl2->damping = (float)params[3] / 10000.0f;
+        hiDpl2->mix = (float)params[4] / 10000.0f;
+        result = AXFXReverbHiInitDpl2(hiDpl2);
+        break;
+    }
+    }
+
+    if (result == 1) {
+        if (bank == 0) {
+            AXRegisterAuxACallback(reverb->callback, reverb->context);
+        }
+        else {
+            AXRegisterAuxBCallback(reverb->callback, reverb->context);
+        }
+    }
+    else {
+        DAT_8032f4b0[0] = 0;
+        DAT_8032f4b0[1] = 0;
+    }
+
+    return (int*)DAT_8032f4b0;
 }
 
 /*

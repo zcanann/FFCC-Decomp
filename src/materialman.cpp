@@ -18,6 +18,15 @@ extern "C" void __dt__10CTexScrollFv(void*, int);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
 extern "C" void __destroy_arr(void*, void*, unsigned long, unsigned long);
 extern "C" int CheckName__8CTextureFPc(CTexture*, char*);
+extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
+extern "C" void _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
+    int, int, int, int, int);
+extern "C" void _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(
+    int, int, int, int, int);
+extern "C" void _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(int, int, int,
+                                                                                                        int, int, int);
+extern "C" void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(int, int, int,
+                                                                                                        int, int, int);
 class CMapKeyFrame;
 extern "C" float Get__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" void Calc__12CMapKeyFrameFv(CMapKeyFrame*);
@@ -396,12 +405,34 @@ void CMaterialMan::addtev_bump_spec_col_water(_GXTevScale)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80042b58
+ * PAL Size: 264b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMaterialMan::addtev_bump_jimen(_GXTevScale)
 {
-	// TODO
+    int tevStage = *reinterpret_cast<int*>(Ptr(this, 0x60));
+
+    GXSetIndTexMtx((GXIndTexMtxID)1, reinterpret_cast<const float(*)[3]>(0x8026901c), 0);
+    GXSetNumIndStages(1);
+    GXSetIndTexOrder((GXIndTexStageID)0,
+                     *reinterpret_cast<GXTexCoordID*>(Ptr(this, 0x1E8)),
+                     *reinterpret_cast<GXTexMapID*>(Ptr(this, 0x1C4)));
+    GXSetIndTexCoordScale((GXIndTexStageID)0, (GXIndTexScale)0, (GXIndTexScale)0);
+    GXSetTevIndBumpXYZ((GXTevStageID)tevStage, (GXIndTexStageID)0, (GXIndTexMtxID)1);
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(
+        tevStage, *reinterpret_cast<int*>(Ptr(this, 0x1F8)), *reinterpret_cast<int*>(Ptr(this, 0x1C8)), 0xFF);
+    _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
+        tevStage, 0xF, 4, 9, 0);
+    _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(
+        tevStage, 7, 7, 7, 0);
+    _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(tevStage, 0, 0, 0, 1, 0);
+    _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(tevStage, 0, 0, 0, 1, 0);
+    *reinterpret_cast<unsigned int*>(Ptr(this, 0x60)) =
+        (((*reinterpret_cast<unsigned int*>(Ptr(this, 0x60))) & 0xFF) + 1) & 0xFF;
 }
 
 /*

@@ -24,25 +24,29 @@ void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, UnkC* param_2)
 {
 	Vec* dest;
 	Vec local_20;
-	f32 zero;
 	Vec local_38;
 	Vec local_2c;
+	u32* mngWords;
+
+	mngWords = (u32*)pppMngStPtr;
 	dest = (Vec*)((u8*)pppYmTraceMove + 0x80 + *param_2->m_serializedDataOffsets);
-	local_2c.x = *(f32*)((u8*)pppMngStPtr + 0x58);
-	local_2c.y = *(f32*)((u8*)pppMngStPtr + 0x5c);
-	local_2c.z = *(f32*)((u8*)pppMngStPtr + 0x60);
-	local_20.x = *(f32*)((u8*)pppMngStPtr + 0x68);
-	local_20.y = *(f32*)((u8*)pppMngStPtr + 0x6c);
-	local_20.z = *(f32*)((u8*)pppMngStPtr + 0x70);
+
+	((u32*)&local_2c)[0] = mngWords[0x58 / 4];
+	((u32*)&local_2c)[1] = mngWords[0x5c / 4];
+	((u32*)&local_2c)[2] = mngWords[0x60 / 4];
+
+	((u32*)&local_20)[0] = mngWords[0x68 / 4];
+	((u32*)&local_20)[1] = mngWords[0x6c / 4];
+	((u32*)&local_20)[2] = mngWords[0x70 / 4];
+
 	pppSubVector__FR3Vec3Vec3Vec((Vec*)&dest[1].y, &local_20, &local_2c);
-	local_38.x = dest[1].y;
-	local_38.y = dest[1].z;
-	local_38.z = dest[2].x;
+	((u32*)&local_38)[0] = ((u32*)&dest[1].y)[0];
+	((u32*)&local_38)[1] = ((u32*)&dest[1].y)[1];
+	((u32*)&local_38)[2] = ((u32*)&dest[1].y)[2];
 	pppCopyVector__FR3Vec3Vec(dest, &local_38);
-	zero = 0.0f;
 	dest[3].x = 0.0f;
-	dest[2].z = zero;
-	dest[2].y = zero;
+	dest[2].z = 0.0f;
+	dest[2].y = 0.0f;
 }
 
 /*
@@ -56,6 +60,7 @@ void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, UnkC* param_2)
  */
 void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, UnkB* param_2, UnkC* param_3)
 {
+	_pppMngSt* pppMngSt;
 	u8* owner;
 	Vec* dest;
 	Vec local_128;
@@ -85,8 +90,9 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, UnkB* param_2, UnkC* pa
 		return;
 	}
 
+	pppMngSt = pppMngStPtr;
 	dest = (Vec*)((u8*)pppYmTraceMove + 0x80 + *param_3->m_serializedDataOffsets);
-	owner = *(u8**)((u8*)pppMngStPtr + 0xdc);
+	owner = *(u8**)((u8*)pppMngSt + 0xdc);
 
 	dest[2].z = dest[2].z + dest[3].x;
 	dest[2].y = dest[2].y + dest[2].z;
@@ -112,9 +118,9 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, UnkB* param_2, UnkC* pa
 		local_74.y = *(f32*)(owner + 0x160);
 		local_74.z = *(f32*)(owner + 0x164);
 
-		local_68.x = *(f32*)((u8*)pppMngStPtr + 0x8);
-		local_68.y = *(f32*)((u8*)pppMngStPtr + 0xc);
-		local_68.z = *(f32*)((u8*)pppMngStPtr + 0x10);
+		local_68.x = *(f32*)((u8*)pppMngSt + 0x8);
+		local_68.y = *(f32*)((u8*)pppMngSt + 0xc);
+		local_68.z = *(f32*)((u8*)pppMngSt + 0x10);
 		pppSubVector__FR3Vec3Vec3Vec(&local_20, &local_74, &local_68);
 
 		local_20.y = local_20.y + param_2->m_payload;
@@ -128,12 +134,12 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, UnkB* param_2, UnkC* pa
 		local_50.z = local_20.z;
 		pppCopyVector__FR3Vec3Vec(dest, &local_50);
 
-		local_44.x = *(f32*)((u8*)pppMngStPtr + 0x48);
-		local_44.y = *(f32*)((u8*)pppMngStPtr + 0x4c);
-		local_44.z = *(f32*)((u8*)pppMngStPtr + 0x50);
-		local_38.x = *(f32*)((u8*)pppMngStPtr + 0x8);
-		local_38.y = *(f32*)((u8*)pppMngStPtr + 0xc);
-		local_38.z = *(f32*)((u8*)pppMngStPtr + 0x10);
+		local_44.x = *(f32*)((u8*)pppMngSt + 0x48);
+		local_44.y = *(f32*)((u8*)pppMngSt + 0x4c);
+		local_44.z = *(f32*)((u8*)pppMngSt + 0x50);
+		local_38.x = *(f32*)((u8*)pppMngSt + 0x8);
+		local_38.y = *(f32*)((u8*)pppMngSt + 0xc);
+		local_38.z = *(f32*)((u8*)pppMngSt + 0x10);
 		pppSubVector__FR3Vec3Vec3Vec(&local_2c, &local_38, &local_44);
 
 		if ((local_2c.x == 0.0f) && (local_2c.y == 0.0f) && (local_2c.z == 0.0f)) {
@@ -163,27 +169,27 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, UnkB* param_2, UnkC* pa
 	local_8c.x = local_9c.x;
 	local_8c.y = local_9c.y;
 	local_8c.z = local_9c.z;
-	PSVECScale(&local_8c, &local_8c, dest[2].y * *(f32*)((u8*)pppMngStPtr + 0x24));
+	PSVECScale(&local_8c, &local_8c, dest[2].y * *(f32*)((u8*)pppMngSt + 0x24));
 
-	local_110.x = *(f32*)((u8*)pppMngStPtr + 0x8);
-	local_110.y = *(f32*)((u8*)pppMngStPtr + 0xc);
-	local_110.z = *(f32*)((u8*)pppMngStPtr + 0x10);
+	local_110.x = *(f32*)((u8*)pppMngSt + 0x8);
+	local_110.y = *(f32*)((u8*)pppMngSt + 0xc);
+	local_110.z = *(f32*)((u8*)pppMngSt + 0x10);
 	local_104.x = local_8c.x;
 	local_104.y = local_8c.y;
 	local_104.z = local_8c.z;
 	pppAddVector__FR3Vec3Vec3Vec(&local_ec, &local_104, &local_110);
 
-	local_11c.x = *(f32*)((u8*)pppMngStPtr + 0x8);
-	local_11c.y = *(f32*)((u8*)pppMngStPtr + 0xc);
-	local_11c.z = *(f32*)((u8*)pppMngStPtr + 0x10);
-	pppCopyVector__FR3Vec3Vec((Vec*)((u8*)pppMngStPtr + 0x48), &local_11c);
+	local_11c.x = *(f32*)((u8*)pppMngSt + 0x8);
+	local_11c.y = *(f32*)((u8*)pppMngSt + 0xc);
+	local_11c.z = *(f32*)((u8*)pppMngSt + 0x10);
+	pppCopyVector__FR3Vec3Vec((Vec*)((u8*)pppMngSt + 0x48), &local_11c);
 
 	local_128.x = local_ec.x;
 	local_128.y = local_ec.y;
 	local_128.z = local_ec.z;
-	pppCopyVector__FR3Vec3Vec((Vec*)((u8*)pppMngStPtr + 0x8), &local_128);
+	pppCopyVector__FR3Vec3Vec((Vec*)((u8*)pppMngSt + 0x8), &local_128);
 
-	pppMngStPtr->m_matrix.value[0][3] = local_ec.x;
-	pppMngStPtr->m_matrix.value[1][3] = local_ec.y;
-	pppMngStPtr->m_matrix.value[2][3] = local_ec.z;
+	pppMngSt->m_matrix.value[0][3] = local_ec.x;
+	pppMngSt->m_matrix.value[1][3] = local_ec.y;
+	pppMngSt->m_matrix.value[2][3] = local_ec.z;
 }

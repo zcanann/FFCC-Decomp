@@ -818,12 +818,66 @@ void GbaQueue::LoadMapObj()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CCE38
+ * PAL Size: 368b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int GbaQueue::GetMapObj(unsigned char*)
+int GbaQueue::GetMapObj(unsigned char* outData)
 {
-	return 0;
+	unsigned char mapObjWork[0x188];
+	unsigned char* workEntry;
+	unsigned char* writePtr;
+	GbaQueue* semaphoreIter;
+	int i;
+	int outSize;
+
+	i = 0;
+	semaphoreIter = this;
+	do {
+		OSWaitSemaphore(semaphoreIter->accessSemaphores);
+		i++;
+		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+	} while (i < 4);
+
+	memcpy(mapObjWork, reinterpret_cast<char*>(this) + 0x2B00, sizeof(mapObjWork));
+
+	i = 0;
+	semaphoreIter = this;
+	do {
+		OSSignalSemaphore(semaphoreIter->accessSemaphores);
+		i++;
+		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+	} while (i < 4);
+
+	workEntry = mapObjWork;
+	outData[0] = mapObjWork[0];
+	outData[1] = mapObjWork[4];
+	outData[2] = mapObjWork[5];
+	outData[3] = mapObjWork[6];
+	outData[4] = mapObjWork[7];
+
+	writePtr = outData + 5;
+	for (i = 0; i < mapObjWork[0]; i++) {
+		writePtr[0] = workEntry[8];
+		writePtr[1] = workEntry[0xC];
+		writePtr[2] = workEntry[0xD];
+		writePtr[3] = workEntry[0xE];
+		writePtr[4] = workEntry[0xF];
+		writePtr[5] = workEntry[0x10];
+		writePtr[6] = workEntry[0x11];
+		writePtr[7] = workEntry[0x12];
+		writePtr[8] = workEntry[0x13];
+
+		workEntry += 0xC;
+		writePtr += 9;
+	}
+
+	reinterpret_cast<char*>(this)[0x2C88] = 1;
+	outSize = static_cast<int>(writePtr - outData);
+	return outSize;
 }
 
 /*

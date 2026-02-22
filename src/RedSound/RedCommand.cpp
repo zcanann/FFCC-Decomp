@@ -15,12 +15,21 @@ extern int DAT_8032f408;
 extern int DAT_8032f440;
 extern int DAT_8021d1a8;
 extern void* DAT_8032f474;
+extern int DAT_8032f410;
+extern int DAT_8032f414;
+extern int DAT_8032f42c;
+extern OSSemaphore DAT_8032e120;
+extern int DAT_8021ec10[];
 extern char DAT_801e7e3e;
+extern char DAT_8021dcab;
 extern char DAT_80333d68;
+extern char DAT_80333d75;
 extern char DAT_80333d70;
 extern char s__sPause___SE___ON__d_801e7e50[];
 extern char s__sPause___SE___OFF__d_801e7e6b[];
 extern char s__s_sWave_is_not_Entry___wave_4_4_801e7e18[];
+extern char s__s_sMusic_Start___Couldn_t_Creat_801e7e86[];
+extern char s__s_s___music_3_3u_bgm___need_0x__801e7eb2[];
 
 extern "C" {
 int fflush(void*);
@@ -28,6 +37,7 @@ int SearchMusicBank__9CRedEntryFi(CRedEntry*, int);
 int SearchWaveBase__9CRedEntryFi(void*, int);
 void WaveHistoryManager__9CRedEntryFii(void*, int, int);
 }
+int* SetReverb(int, int, int*);
 
 /*
  * --INFO--
@@ -641,12 +651,164 @@ void SePause(int seId, int pause)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cb0a0
+ * PAL Size: 1360b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _MusicPlayStart(RedMusicHEAD*, RedWaveHeadWD*, int, int, int)
+void _MusicPlayStart(RedMusicHEAD* musicHead, RedWaveHeadWD* waveHead, int musicId, int volume, int mode)
 {
-	// TODO
+	int waveBase = SearchWaveBase__9CRedEntryFi(&DAT_8032e154, (int)*(short*)((char*)musicHead + 6));
+	if (waveBase == 0) {
+		return;
+	}
+
+	int* music = (int*)DAT_8032f3f0;
+	if (mode != 0) {
+		music += 0x24a;
+	}
+
+	DAT_8032f410 = mode;
+	music[0x11c] = musicId;
+	music[0x11b] &= 0xfffeffff;
+	music[0x122] = 0;
+
+	if (DAT_8032f42c == 0) {
+		music[0x115] = 0x1ff000;
+		music[0x117] = 0;
+	} else {
+		music[0x115] = 0;
+		music[0x116] = 0x1ff800;
+		music[0x116] = music[0x116] / DAT_8032f42c;
+		music[0x117] = DAT_8032f42c;
+		DAT_8032f42c = 0;
+	}
+
+	int trackBase = RedNew(*(char*)((char*)musicHead + 8) * 0x154);
+	if (trackBase == 0) {
+		if (DAT_8032f408 != 0) {
+			OSReport(s__s_sMusic_Start___Couldn_t_Creat_801e7e86, &DAT_801e7e3e, &DAT_80333d75,
+			         &DAT_80333d70);
+			fflush(&DAT_8021d1a8);
+			OSReport(s__s_s___music_3_3u_bgm___need_0x__801e7eb2, &DAT_801e7e3e, &DAT_80333d75,
+			         (int)*(short*)((char*)musicHead + 4), *(char*)((char*)musicHead + 8) * 0x154,
+			         &DAT_80333d70);
+			fflush(&DAT_8021d1a8);
+		}
+		DAT_8032e154.DisplayMMemoryInfo();
+		return;
+	}
+
+	*music = trackBase;
+
+	if (*(char*)((char*)musicHead + 9) != 0) {
+		unsigned int reverbKind = ((int)*(char*)((char*)musicHead + 9) - 1U) & 7;
+		SetReverb(0, *(int*)((char*)DAT_8021ec10 + reverbKind * 0x1c),
+		          (int*)((char*)DAT_8021ec10 + reverbKind * 0x1c + 4));
+	}
+
+	*(int*)DAT_8032f474 = (int)*(short*)((char*)musicHead + 10);
+	if (*(int*)DAT_8032f474 != 0) {
+		*(int*)DAT_8032f474 = (*(int*)DAT_8032f474 + 1) << 8;
+		*(int*)DAT_8032f474 = (*(int*)DAT_8032f474 - 1) << 0xc;
+	}
+	((int*)DAT_8032f474)[1] = 0;
+	((int*)DAT_8032f474)[2] = 0;
+	music[0x11f] = (int)*(short*)((char*)musicHead + 6);
+
+	unsigned char* current = (unsigned char*)musicHead + 0x20;
+	int* track = (int*)*music;
+	int count = *(char*)((char*)musicHead + 8);
+	char trackNo = 0;
+	while (count != 0) {
+		unsigned int blockSize = ((unsigned int)current[3] << 24) | ((unsigned int)current[2] << 16) |
+		                         ((unsigned int)current[1] << 8) | (unsigned int)current[0];
+		*(char*)((char*)track + 0x14e) = trackNo - 1;
+		track[6] = (int)waveHead;
+		*(unsigned char**)track = current + 4;
+		current = current + 4 + blockSize;
+		track[0x42] = DeltaTimeSumup((unsigned char**)track) + 1;
+		track[0x3d] = 0;
+		track[8] = (DAT_8032f414 == 0) ? 0 : (int)&DAT_8021dcab;
+		track[0x13] = 0x7f000;
+		track[0x15] = 0;
+		track[10] = 0x7fff000;
+		track[0xd] = 0x7f000;
+		track[0x10] = 0x40000;
+		track[0x1a] = *(int*)DAT_8032f474;
+		track[0x1c] = 0;
+		track[0x12] = 0;
+		track[0xf] = 0;
+		track[0xc] = 0;
+		track[0x45] = 0;
+		track[0x44] = 0;
+		track[0x46] = 0;
+		*(short*)(track + 0x4f) = 0;
+		*(short*)((char*)track + 0x142) = 0;
+		*(unsigned char*)((char*)track + 0x14b) = 2;
+		*(short*)((char*)track + 0x13e) = 0;
+		*(short*)(track + 0x50) = 0;
+		*(unsigned char*)(track + 0x52) = 0;
+		track[0x2d] = 0;
+		track[0x25] = 0;
+		track[0x1d] = 0;
+		track[0x33] = 0;
+		*(short*)(track + 0x2c) = 0;
+		*(short*)(track + 0x24) = 0;
+		*(short*)((char*)track + 0xb2) = 0;
+		*(short*)((char*)track + 0x92) = 0;
+		track[7] = 0;
+		track[0x41] = ((*(unsigned int*)((char*)musicHead + 0x14) & 0x40000) == 0) ? 0x200000 : 0;
+		*(short*)((char*)track + 0x13a) = 0;
+		*(short*)(track + 0x4e) = 0;
+		track[0x3c] = 0;
+		track[0x3b] = 0;
+		track[0x3a] = 0;
+		track[0x39] = 0;
+		track[0x38] = 0;
+		track[0x48] = 0xffffffff;
+		*(unsigned char*)((char*)track + 0x26) = 0;
+		track[0x3f] = 0xc02;
+		memset(track + 0x35, 0xff, 0xc);
+
+		count--;
+		trackNo++;
+		if (count != 0) {
+			track += 0x55;
+		}
+	}
+
+	music[0x11d] = 1;
+	*(unsigned char*)((char*)music + 0x490) = 0;
+	music[0x120] = 0;
+	music[2] = (int)&DAT_8021dcab;
+	*(unsigned char*)((char*)music + 0x491) = *(unsigned char*)((char*)musicHead + 8);
+	*(short*)((char*)music + 0x48e) = (short)*(char*)((char*)musicHead + 8);
+	*(unsigned char*)((char*)music + 0x492) = (unsigned char)(*(unsigned short*)((char*)musicHead + 0xc) & 0x7f);
+	*(short*)(music + 0x123) = 1;
+	music[0x112] = 0x1000;
+	music[5] = 10000;
+	music[4] = -1;
+	music[3] = 1;
+	music[0x11e] = 0;
+	if (volume != 0) {
+		volume = (((volume + 1) * 4) - 1) * 0x1000;
+	}
+	music[7] = volume;
+	music[9] = 0;
+	music[0x122] = 0;
+	music[0x11b] &= 0x10;
+	if ((*(unsigned int*)((char*)musicHead + 0x14) & 0x40000) != 0) {
+		music[0x11b] |= 0x40000;
+	}
+
+	DAT_8032e154.WaveHistoryManager(1, music[0x11f]);
+	DAT_8032e154.MusicHistoryManager(1, musicId);
+	if (DAT_8032f410 != 0) {
+		OSSignalSemaphore(&DAT_8032e120);
+	}
 }
 
 /*

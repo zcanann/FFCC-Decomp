@@ -1,6 +1,7 @@
 #include "ffcc/p_light.h"
 
 #include "ffcc/graphic.h"
+#include "ffcc/mapocttree.h"
 
 #include <dolphin/mtx.h>
 #include <dolphin/gx/GXVert.h>
@@ -865,12 +866,25 @@ void CLightPcs::SetPart(CLightPcs::TARGET target, void* part, unsigned char mode
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80048cbc
+ * PAL Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CLightPcs::InsertOctTree(CLightPcs::TARGET, COctTree&)
+void CLightPcs::InsertOctTree(CLightPcs::TARGET target, COctTree& octTree)
 {
-	// TODO
+    char* light = (char*)this + 0x63c;
+    u32 i;
+
+    octTree.ClearLight();
+    for (i = 0; i < *(u32*)((char*)this + 0xb8); i++) {
+        if (*(char*)(light + 0x60 + (int)target) != '\0') {
+            octTree.InsertLight(i, *(Vec*)(light + 4), *(float*)(light + 0x24), *(u32*)(light + 0x34));
+        }
+        light += 0xb0;
+    }
 }
 
 /*

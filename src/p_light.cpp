@@ -28,6 +28,7 @@ extern unsigned int lbl_801EA2D4[];
 
 extern unsigned int DAT_8032fc0c;
 extern unsigned int DAT_8032fc08;
+extern float FLOAT_8032fc10;
 extern float FLOAT_8032fc14;
 extern float FLOAT_8032fc18;
 extern float FLOAT_8032fc1c;
@@ -1328,32 +1329,89 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80047e84
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CLightPcs::CBumpLight::CBumpLight()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    float f2 = FLOAT_8032fc1c;
+    int r5 = 0;
+    float f1 = FLOAT_8032fc14;
+    int r4 = 4;
+
+    *reinterpret_cast<float*>(self + 0x28) = f2;
+    int r0 = -1;
+    float f0 = FLOAT_8032fc10;
+    *reinterpret_cast<float*>(self + 0x30) = f1;
+    *reinterpret_cast<float*>(self + 0x2C) = f1;
+    *reinterpret_cast<float*>(self + 0x20) = f0;
+    self[0x4E] = static_cast<unsigned char>(r5);
+    self[0x4C] = static_cast<unsigned char>(r5);
+    self[0x4D] = static_cast<unsigned char>(r4);
+    self[0x4F] = static_cast<unsigned char>(r5);
+    *reinterpret_cast<int*>(self + 0x34) = r0;
+    *reinterpret_cast<int*>(self + 0x64) = r5;
+    *reinterpret_cast<int*>(self + 0x50) = r5;
+    *reinterpret_cast<int*>(self + 0x54) = r5;
+    *reinterpret_cast<int*>(self + 0x58) = r5;
+    *reinterpret_cast<int*>(self + 0x5C) = r5;
+    *reinterpret_cast<float*>(self + 0x28) = f2;
+    self[0xB0] = static_cast<unsigned char>(r5);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80047e54
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CLightPcs::CBumpLight::SetTexture(_GXTexMapID, int)
+void CLightPcs::CBumpLight::SetTexture(_GXTexMapID texMapID, int textureIdx)
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    GXLoadTexObj(reinterpret_cast<GXTexObj*>(self + textureIdx * 0x20 + 0xB8), texMapID);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80047e00
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CLightPcs::CLight::CLight()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    float f0 = FLOAT_8032fc1c;
+    int r5 = 0;
+    float f1 = FLOAT_8032fc14;
+    int r4 = 4;
+
+    *reinterpret_cast<float*>(self + 0x28) = f0;
+    int r0 = -1;
+    f0 = FLOAT_8032fc10;
+    *reinterpret_cast<float*>(self + 0x30) = f1;
+    *reinterpret_cast<float*>(self + 0x2C) = f1;
+    *reinterpret_cast<float*>(self + 0x20) = f0;
+    self[0x4E] = static_cast<unsigned char>(r5);
+    self[0x4C] = static_cast<unsigned char>(r5);
+    self[0x4D] = static_cast<unsigned char>(r4);
+    self[0x4F] = static_cast<unsigned char>(r5);
+    *reinterpret_cast<int*>(self + 0x34) = r0;
+    *reinterpret_cast<int*>(self + 0x64) = r5;
+    *reinterpret_cast<int*>(self + 0x50) = r5;
+    *reinterpret_cast<int*>(self + 0x54) = r5;
+    *reinterpret_cast<int*>(self + 0x58) = r5;
+    *reinterpret_cast<int*>(self + 0x5C) = r5;
 }
 
 /*

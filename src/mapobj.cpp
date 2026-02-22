@@ -655,12 +655,32 @@ void CMapObj::Draw(unsigned char priority)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80028FD8
+ * PAL Size: 188b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapObj::SetDrawFlag()
 {
-	// TODO
+    U8At(this, 0x18) &= 0xFB;
+
+    if ((U8At(this, 0x1D) == 1) && (PtrAt(this, 0xC) != 0)) {
+        if ((U8At(this, 0x1F) == 0xFF) && ((U8At(this, 0x18) & 1) != 0)) {
+            unsigned char* mapMng = reinterpret_cast<unsigned char*>(&MapMng);
+            Mtx concatMtx;
+            Mtx* viewMtx = reinterpret_cast<Mtx*>(mapMng + 0x22958);
+            CBound* bound = reinterpret_cast<CBound*>(reinterpret_cast<unsigned char*>(PtrAt(this, 0xC)) + 0xC);
+
+            PSMTXConcat(*viewMtx, MtxAt(this, 0xB8), concatMtx);
+            if (bound->CheckFrustum(*reinterpret_cast<Vec*>(mapMng + 0x228EC),
+                                    *viewMtx,
+                                    *reinterpret_cast<float*>(mapMng + 0x22A74)) != 0) {
+                U8At(this, 0x18) |= 4;
+            }
+        }
+    }
 }
 
 /*

@@ -613,6 +613,7 @@ void _StreamPause(int* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 void _EntryExecCommand(void (*command)(int*), int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6)
 {
     unsigned int interrupt;
@@ -642,6 +643,7 @@ void _EntryExecCommand(void (*command)(int*), int arg0, int arg1, int arg2, int 
 
     OSRestoreInterrupts(interrupt);
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--

@@ -469,43 +469,41 @@ void pppRenderLaser(struct pppLaser *pppLaser, struct UnkB *param_2, struct UnkC
         pppDrawShp__FPlsP12CMaterialSetUc(shape, *(s16*)(work + 0xd), pppEnvStPtr->m_materialSetPtr, step->m_payload[0x1c]);
 
         count = (u32)step->m_payload[0x1e];
-        if (count > 1) {
-            uvStep = FLOAT_8033342c / ((float)(double)count - (float)DOUBLE_80333438);
-            if (step->m_initWOrk == 0xFFFF) {
-                _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
-                _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
-            } else {
-                tex = GetTextureFromRSD__FiP9_pppEnvSt(step->m_initWOrk, pppEnvStPtr);
-                _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 0);
-                GXLoadTexObj((GXTexObj*)(tex + 0x28), GX_TEXMAP0);
-            }
+        uvStep = FLOAT_8033342c / ((float)(double)count - (float)DOUBLE_80333438);
+        if (step->m_initWOrk == 0xFFFF) {
+            _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
+            _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+        } else {
+            tex = GetTextureFromRSD__FiP9_pppEnvSt(step->m_initWOrk, pppEnvStPtr);
+            _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 0);
+            GXLoadTexObj((GXTexObj*)(tex + 0x28), GX_TEXMAP0);
+        }
 
-            GXLoadPosMtxImm(ppvCameraMatrix0, GX_PNMTX0);
-            alphaMax = step->m_payload[0x2b];
-            alphaStep = (u8)((u32)alphaMax / count);
-            colorBase = *(u32*)(step->m_payload + 0x28) & 0xFFFFFF00;
-            points = (Vec*)(u32)work[7];
+        GXLoadPosMtxImm(ppvCameraMatrix0, GX_PNMTX0);
+        alphaMax = step->m_payload[0x2b];
+        alphaStep = (u8)((u32)alphaMax / count);
+        colorBase = *(u32*)(step->m_payload + 0x28) & 0xFFFFFF00;
+        points = (Vec*)(u32)work[7];
 
-            GXBegin(GX_TRIANGLES, GX_VTXFMT7, (u16)((count - 1) * 3));
-            for (i = 0; i < count - 1; i++) {
-                alpha0 = (u8)(alphaMax - (u8)(alphaStep * i));
-                color0 = colorBase | alpha0;
-                color1 = colorBase | (u8)(alphaMax - (u8)(alphaStep * (i + 1)));
-                u0 = (float)i * uvStep;
-                u1 = (float)(i + 1) * uvStep;
+        GXBegin(GX_TRIANGLES, GX_VTXFMT7, (u16)((count - 1) * 3));
+        for (i = 0; i < count - 1; i++) {
+            alpha0 = (u8)(alphaMax - (u8)(alphaStep * i));
+            color0 = colorBase | alpha0;
+            color1 = colorBase | (u8)(alphaMax - (u8)(alphaStep * (i + 1)));
+            u0 = (float)i * uvStep;
+            u1 = (float)(i + 1) * uvStep;
 
-                GXPosition3f32(work[8], work[9], work[10]);
-                GXColor1u32(color0);
-                GXTexCoord2f32(u0, FLOAT_8033342c);
+            GXPosition3f32(work[8], work[9], work[10]);
+            GXColor1u32(color0);
+            GXTexCoord2f32(u0, FLOAT_8033342c);
 
-                GXPosition3f32(points[i].x, points[i].y, points[i].z);
-                GXColor1u32(color0);
-                GXTexCoord2f32(u0, FLOAT_80333428);
+            GXPosition3f32(points[i].x, points[i].y, points[i].z);
+            GXColor1u32(color0);
+            GXTexCoord2f32(u0, FLOAT_80333428);
 
-                GXPosition3f32(points[i + 1].x, points[i + 1].y, points[i + 1].z);
-                GXColor1u32(color1);
-                GXTexCoord2f32(u1, FLOAT_80333428);
-            }
+            GXPosition3f32(points[i + 1].x, points[i + 1].y, points[i + 1].z);
+            GXColor1u32(color1);
+            GXTexCoord2f32(u1, FLOAT_80333428);
         }
 
         if ((CFlatFlags & 0x200000) != 0) {

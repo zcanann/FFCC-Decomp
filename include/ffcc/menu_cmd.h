@@ -26,7 +26,7 @@ public:
     void UniteOpenAnim(int);
     int UniteCloseAnim(int);
     void CmdOpen1();
-    void CmdClose1();
+    unsigned int CmdClose1();
     void CmdOpen2();
     void CmdClose2();
     const char* GetSkillStr(int);

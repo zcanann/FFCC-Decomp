@@ -11,6 +11,7 @@ extern "C" int EquipChk__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void CalcStatus__12CCaravanWorkFv(void*);
 extern "C" void ChgCmdLst__12CCaravanWorkFii(void*, int, int);
 extern "C" void UniteComList__12CCaravanWorkFiii(void*, int, int, int);
+extern "C" void UnuniteComList__12CCaravanWorkFii(void*, int, int);
 extern "C" unsigned int CmdCtrlCur__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int CmdOpen0__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int CmdClose0__8CMenuPcsFv(CMenuPcs*);
@@ -996,12 +997,123 @@ void CMenuPcs::CmdOpen1()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8014ad90
+ * PAL Size: 1204b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::CmdClose1()
+unsigned int CMenuPcs::CmdClose1()
 {
-	// TODO
+	u8* self = reinterpret_cast<u8*>(this);
+	s32 caravanWork = Game.game.m_scriptFoodBase[0];
+	s32 cmd = *reinterpret_cast<s32*>(self + 0x82c);
+	s16* list = *reinterpret_cast<s16**>(self + 0x850);
+
+	*reinterpret_cast<s16*>(cmd + 0x22) = static_cast<s16>(*reinterpret_cast<s16*>(cmd + 0x22) + 1);
+	const s16 timer = *reinterpret_cast<s16*>(cmd + 0x22);
+	const s16 selected = *reinterpret_cast<s16*>(cmd + 0x26);
+	s32 state = *reinterpret_cast<s16*>(cmd + 0x14);
+	u32 done = 0;
+
+	if (state == 0) {
+		const float t = static_cast<float>(timer) * 0.125f;
+		*reinterpret_cast<float*>(list + selected * 0x20 + 0x0c) = t;
+
+		if (*reinterpret_cast<s16*>(caravanWork + (selected + 1) * 2 + 0x214) < 0) {
+			*reinterpret_cast<float*>(list + (selected + 1) * 0x20 + 0x0c) = t;
+			if (*reinterpret_cast<s16*>(caravanWork + (selected + 2) * 2 + 0x214) < 0) {
+				*reinterpret_cast<float*>(list + (selected + 2) * 0x20 + 0x0c) = t;
+			}
+		}
+
+		float pos = 1.0f - t;
+		if (pos < 0.0f) {
+			pos = 0.0f;
+		}
+		*reinterpret_cast<float*>(list + (static_cast<s32>(list[1]) + 3) * 0x20 + 0x0c) = pos;
+
+		done = static_cast<u32>(static_cast<float>(timer) >= 8.0f);
+		if ((done != 0) && (*reinterpret_cast<u8*>(cmd + 8) != 0)) {
+			*reinterpret_cast<u8*>(cmd + 8) = 0;
+			if (*reinterpret_cast<s16*>(cmd + 0x2a) == 0) {
+				*reinterpret_cast<s16*>(cmd + 0x14) = 1;
+				done = 0;
+			} else if ((static_cast<double>(*reinterpret_cast<float*>(list + (static_cast<s32>(list[1]) + 3) * 0x20 + 0x0d)) ==
+			            DOUBLE_80332a58) &&
+			           (*reinterpret_cast<s16*>(cmd + 0x2a) == 1)) {
+				*reinterpret_cast<s16*>(cmd + 0x14) = 2;
+				done = 0;
+			}
+		}
+		if (done != 0) {
+			*reinterpret_cast<u8*>(cmd + 8) = 0;
+		}
+	} else if (state == 1) {
+		s32 uniteIdx = 0;
+		s32 topCount = static_cast<s32>(list[0]);
+		for (; uniteIdx < topCount; uniteIdx++) {
+			if (list[uniteIdx * 0x20 + 2] == selected) {
+				break;
+			}
+		}
+
+		done = static_cast<u32>(UniteCloseAnim(uniteIdx) != 0);
+		if (done != 0) {
+			s32 ununiteCount = 1;
+			if (*reinterpret_cast<s16*>(caravanWork + (selected + 1) * 2 + 0x214) < 0) {
+				ununiteCount = 2;
+				if (*reinterpret_cast<s16*>(caravanWork + (selected + 2) * 2 + 0x214) < 0) {
+					ununiteCount = 3;
+				}
+			}
+			UnuniteComList__12CCaravanWorkFii(reinterpret_cast<void*>(caravanWork), selected, ununiteCount);
+		}
+	} else if (state == 2) {
+		int combo[2][2];
+		const s32 count = ChkUnite__8CMenuPcsFiPA2_i(this, static_cast<int>(selected), combo);
+		if (count == 1) {
+			done = 0;
+			*reinterpret_cast<s16*>(cmd + 0x14) = 3;
+		} else {
+			done = 1;
+			*reinterpret_cast<u8*>(cmd + 8) = 1;
+		}
+	} else if (state == 3) {
+		s32 uniteIdx = 0;
+		s32 topCount = static_cast<s32>(list[0]);
+		for (; uniteIdx < topCount; uniteIdx++) {
+			if (list[uniteIdx * 0x20 + 2] == selected) {
+				break;
+			}
+		}
+
+		done = static_cast<u32>(UniteCloseAnim(uniteIdx) != 0);
+		if (done != 0) {
+			int combo[2][2];
+			ChkUnite__8CMenuPcsFiPA2_i(this, static_cast<int>(selected), combo);
+
+			s32 ununiteCount = 1;
+			if (*reinterpret_cast<s16*>(caravanWork + (selected + 1) * 2 + 0x214) < 0) {
+				ununiteCount = 2;
+				if (*reinterpret_cast<s16*>(caravanWork + (selected + 2) * 2 + 0x214) < 0) {
+					ununiteCount = 3;
+				}
+			}
+
+			UnuniteComList__12CCaravanWorkFii(reinterpret_cast<void*>(caravanWork), selected, ununiteCount);
+			UniteComList__12CCaravanWorkFiii(reinterpret_cast<void*>(caravanWork), combo[0][1], 0, 0);
+
+			done = 0;
+			*reinterpret_cast<s16*>(cmd + 0x26) = static_cast<s16>(combo[0][1]);
+			*reinterpret_cast<s16*>(cmd + 0x14) = 4;
+		}
+	} else if (state == 4) {
+		done = static_cast<u32>(UniteOpenAnim__8CMenuPcsFi(this, -1) != 0);
+	}
+
+	return done;
 }
 
 /*

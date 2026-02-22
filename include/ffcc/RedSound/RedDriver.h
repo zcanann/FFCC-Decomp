@@ -71,7 +71,7 @@ public:
 	void MusicVolume(int, int, int);
 	void SetMusicPhraseStop(int);
 
-	void SetSeBlockData(int, void*);
+	void* SetSeBlockData(int, void*);
 	void SetSeSepData(void*);
 	void ClearSeSepData(int);
 	void ClearSeSepDataMG(int, int, int, int);

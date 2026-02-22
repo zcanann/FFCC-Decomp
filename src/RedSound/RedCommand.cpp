@@ -18,6 +18,8 @@ extern char s__sPause___SE___OFF__d_801e7e6b[];
 
 extern "C" {
 int fflush(void*);
+RedMusicHEAD* SearchMusicBank__9CRedEntryFi(CRedEntry*, int);
+RedWaveHeadWD* SearchWaveBase__9CRedEntryFi(CRedEntry*, int);
 }
 
 /*
@@ -566,12 +568,29 @@ void MusicStop(int seId)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cb7d0
+ * PAL Size: 160b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void MusicPlay(int, int, int)
+int MusicPlay(int musicId, int pan, int volume)
 {
-	// TODO
+	RedMusicHEAD* musicHead = SearchMusicBank__9CRedEntryFi(&DAT_8032e154, musicId);
+
+	if (musicHead != NULL) {
+		RedWaveHeadWD* waveHead =
+		    SearchWaveBase__9CRedEntryFi(&DAT_8032e154, *(short*)((char*)musicHead + 6));
+
+		if (waveHead == NULL) {
+			return -1;
+		}
+
+		_MusicPlayStart(musicHead, waveHead, musicId, pan, volume);
+	}
+
+	return 0;
 }
 
 /*

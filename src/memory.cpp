@@ -1683,12 +1683,54 @@ void CAmemCache::IsEnable()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001CD48
+ * PAL Size: 360b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CAmemCacheSet::AddRef(short)
+void CAmemCacheSet::AddRef(short index)
 {
-	// TODO
+    unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
+    int tableBase = *reinterpret_cast<int*>(bytes + 0x58);
+    int entryOffset = static_cast<int>(index) * 0x1C;
+    int entry = tableBase + entryOffset;
+
+    *reinterpret_cast<short*>(entry + 0x0C) += 1;
+    if (*reinterpret_cast<short*>(entry + 0x0C) == -1) {
+        if (System.m_execParam > 2) {
+            Printf__7CSystemFPce(&System, "amemCacheSet AddRef over %d\n", static_cast<int>(index));
+        }
+
+        int count = *reinterpret_cast<int*>(bytes + 0x3C);
+        int offset = 0;
+        for (int i = 0; i < count; i++) {
+            unsigned char* current = reinterpret_cast<unsigned char*>(tableBase + offset);
+            int data = *reinterpret_cast<int*>(current + 0x00);
+            if ((current[0x0E] != 0) || (data != 0)) {
+                if (System.m_execParam > 2) {
+                    const char* useType = (current[0x0E] == 0) ? "FREE" : "USE";
+                    Printf__7CSystemFPce(
+                        &System, "%3d %s type:%d RefCnt:%d prio:%d data:%08x\n", i, useType,
+                        static_cast<int>(current[0x0F]), *reinterpret_cast<short*>(current + 0x0C),
+                        *reinterpret_cast<int*>(current + 0x10), data);
+                }
+            }
+            offset += 0x1C;
+        }
+
+        if (System.m_execParam > 2) {
+            Printf__7CSystemFPce(&System, "--------------------------------\n");
+        }
+
+        void (*overflowHook)(int) = *reinterpret_cast<void (**)(int)>(bytes + 0x50);
+        if (overflowHook != 0) {
+            overflowHook(static_cast<int>(index));
+        }
+    }
+
+    *reinterpret_cast<int*>(entry + 0x10) = 0x7FFFFFF0;
 }
 
 /*
@@ -1770,12 +1812,61 @@ void CAmemCacheSet::AmemFreeLowPrio(int size)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001C6A4
+ * PAL Size: 348b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CAmemCacheSet::CacheClear()
 {
-	// TODO
+    unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
+    int i = 0;
+    int offset = 0;
+
+    while (i < *reinterpret_cast<int*>(bytes + 0x3C)) {
+        int* entry = reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x58) + offset);
+        unsigned char* entryBytes = reinterpret_cast<unsigned char*>(entry);
+
+        if ((entryBytes[0x0E] != 0) && (*reinterpret_cast<short*>(entryBytes + 0x0C) == 0) &&
+            (entryBytes[0x1A] != 0)) {
+            int data = *entry;
+            if (data != 0) {
+                unsigned char* mem = reinterpret_cast<unsigned char*>(data);
+                if ((*reinterpret_cast<short*>(mem - 0x40) != 0x4B41) ||
+                    (*reinterpret_cast<short*>(mem - 2) != 0x4D49)) {
+                    Printf__7CSystemFPce(&System, DAT_801d6648, data, mem - 0x26, *reinterpret_cast<unsigned short*>(mem - 0x28));
+                }
+
+                mem[-0x3E] &= 0xFB;
+
+                int blockPrev = *reinterpret_cast<int*>(mem - 0x38);
+                if ((*(reinterpret_cast<unsigned char*>(blockPrev) + 2) & 4) == 0) {
+                    *reinterpret_cast<int*>(mem - 0x30) =
+                        *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockPrev) + 0x10) +
+                        *reinterpret_cast<int*>(mem - 0x30) + 0x40;
+                    *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockPrev) + 8) + 4) = data - 0x40;
+                    *reinterpret_cast<int*>(mem - 0x38) = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockPrev) + 8);
+                }
+
+                int blockNext = *reinterpret_cast<int*>(mem - 0x3C);
+                if ((*(reinterpret_cast<unsigned char*>(blockNext) + 2) & 4) == 0) {
+                    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockNext) + 0x10) =
+                        *reinterpret_cast<int*>(mem - 0x30) +
+                        *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockNext) + 0x10) + 0x40;
+                    *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x3C) + 8) = *reinterpret_cast<int*>(mem - 0x38);
+                    *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 4) = *reinterpret_cast<int*>(mem - 0x3C);
+                }
+
+                *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x34) + 0x124) -= 1;
+                *entry = 0;
+            }
+        }
+
+        offset += 0x1C;
+        i++;
+    }
 }
 
 /*

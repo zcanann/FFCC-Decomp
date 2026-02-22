@@ -260,12 +260,59 @@ void pppConstructMana2(pppMana2* pppMana2, UnkC* param_2)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801088a0
+ * PAL Size: 992b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppDestructMana2(pppMana2*, UnkC*)
+void pppDestructMana2(pppMana2* pppMana2, UnkC* param_2)
 {
-	// TODO
+    u32* work;
+    CGObject* gObject;
+    void* handle;
+    s32 model;
+
+    work = (u32*)((char*)pppMana2 + 0x80 + *(s32*)((char*)param_2 + 0xC));
+    gObject = *(CGObject**)((char*)pppMngStPtr + 0xDC);
+    if (gObject != NULL) {
+        handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
+        model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+        *(u32*)(model + 0xE4) = 0;
+        *(u32*)(model + 0xE8) = 0;
+        *(u32*)(model + 0xF0) = 0;
+        *(u32*)(model + 0xFC) = 0;
+    }
+
+    if (work[8] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[8]);
+        work[8] = 0;
+    }
+    if (work[9] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[9]);
+        work[9] = 0;
+    }
+    if (work[10] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[10]);
+        work[10] = 0;
+    }
+    if (work[11] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[11]);
+        work[11] = 0;
+    }
+    if (work[12] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[12]);
+        work[12] = 0;
+    }
+    if (work[13] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[13]);
+        work[13] = 0;
+    }
+    if (work[0x1D] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[0x1D]);
+        work[0x1D] = 0;
+    }
 }
 
 /*

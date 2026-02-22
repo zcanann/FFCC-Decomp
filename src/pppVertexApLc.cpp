@@ -112,7 +112,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
             points = src->points;
         }
 
-        u8 count = data->spawnCount;
+        s32 count = data->spawnCount;
 
         switch (data->mode) {
         case 0:
@@ -121,7 +121,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
                     state->index = 0;
                 }
 
-                u16 vertexIndex = entry->vertexIndices[state->index];
+                s32 vertexIndex = entry->vertexIndices[state->index];
                 state->index++;
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
@@ -149,7 +149,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
             break;
         case 1:
             do {
-                u16 vertexIndex = entry->vertexIndices[(s32)(RandF__5CMathFv(&math) * (f32)entry->maxValue)];
+                s32 vertexIndex = entry->vertexIndices[(s32)(RandF__5CMathFv(&math) * (f32)entry->maxValue)];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;

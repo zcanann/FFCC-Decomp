@@ -7,6 +7,7 @@
 extern "C" void __dl__FPv(void* ptr);
 extern "C" void pppPartInit__8CPartMngFv2(CPartMng* partMng);
 extern "C" unsigned int CheckSum__FPvi(void*, int);
+extern "C" void pppStopSe__FP9_pppMngStP7PPPSEST(_pppMngSt*, PPPSEST*);
 extern "C" float ppvScreenMatrix[4][4];
 extern "C" void __ct__9_pppMngStFv(_pppMngSt* pppMngSt);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
@@ -966,9 +967,19 @@ void CPartMng::pppShowSlot(int, unsigned char)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppDeletePart(int)
+void CPartMng::pppDeletePart(int index)
 {
-	// TODO
+    char* pppMngSt = reinterpret_cast<char*>(this);
+    pppMngSt += 0x158 * index;
+
+    int baseTime = *reinterpret_cast<int*>(pppMngSt + 0x14);
+    if (baseTime < 0) {
+        *reinterpret_cast<unsigned char*>(pppMngSt + 0xe5) = 1;
+        pppStopSe__FP9_pppMngStP7PPPSEST(reinterpret_cast<_pppMngSt*>(pppMngSt),
+                                         reinterpret_cast<PPPSEST*>(pppMngSt + 0x11c));
+    } else {
+        *reinterpret_cast<int*>(pppMngSt + 0x14) = -0x1000;
+    }
 }
 
 /*
@@ -976,9 +987,14 @@ void CPartMng::pppDeletePart(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppEndPart(int)
+void CPartMng::pppEndPart(int index)
 {
-	// TODO
+    char* pppMngSt = reinterpret_cast<char*>(this);
+    pppMngSt += 0x158 * index;
+
+    *reinterpret_cast<unsigned char*>(pppMngSt + 0xe4) = 1;
+    pppStopSe__FP9_pppMngStP7PPPSEST(reinterpret_cast<_pppMngSt*>(pppMngSt),
+                                     reinterpret_cast<PPPSEST*>(pppMngSt + 0x11c));
 }
 
 /*
@@ -1014,9 +1030,36 @@ void CPartMng::pppShowIdx(short index, unsigned char visible)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppFieldShowFpNo(short, unsigned char)
+void CPartMng::pppFieldShowFpNo(short fieldNo, unsigned char visible)
 {
-	// TODO
+    char* pppMngSt = reinterpret_cast<char*>(this);
+    int i = 0x60;
+
+    do {
+        if ((*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 0)) != -0x1000) &&
+            (*reinterpret_cast<short*>(pppMngSt + 0x74 + (0x158 * 0)) == 0) &&
+            (*reinterpret_cast<short*>(pppMngSt + 0x76 + (0x158 * 0)) == fieldNo)) {
+            *reinterpret_cast<unsigned char*>(pppMngSt + 0xe9 + (0x158 * 0)) = visible;
+        }
+        if ((*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 1)) != -0x1000) &&
+            (*reinterpret_cast<short*>(pppMngSt + 0x74 + (0x158 * 1)) == 0) &&
+            (*reinterpret_cast<short*>(pppMngSt + 0x76 + (0x158 * 1)) == fieldNo)) {
+            *reinterpret_cast<unsigned char*>(pppMngSt + 0xe9 + (0x158 * 1)) = visible;
+        }
+        if ((*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 2)) != -0x1000) &&
+            (*reinterpret_cast<short*>(pppMngSt + 0x74 + (0x158 * 2)) == 0) &&
+            (*reinterpret_cast<short*>(pppMngSt + 0x76 + (0x158 * 2)) == fieldNo)) {
+            *reinterpret_cast<unsigned char*>(pppMngSt + 0xe9 + (0x158 * 2)) = visible;
+        }
+        if ((*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 3)) != -0x1000) &&
+            (*reinterpret_cast<short*>(pppMngSt + 0x74 + (0x158 * 3)) == 0) &&
+            (*reinterpret_cast<short*>(pppMngSt + 0x76 + (0x158 * 3)) == fieldNo)) {
+            *reinterpret_cast<unsigned char*>(pppMngSt + 0xe9 + (0x158 * 3)) = visible;
+        }
+
+        pppMngSt += 0x560;
+        i--;
+    } while (i != 0);
 }
 
 /*
@@ -1024,9 +1067,24 @@ void CPartMng::pppFieldShowFpNo(short, unsigned char)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppFieldEndFpNo(short)
+void CPartMng::pppFieldEndFpNo(short fieldNo)
 {
-	// TODO
+    char* pppMngSt = reinterpret_cast<char*>(this);
+
+    for (int i = 0; i < 0x180; i++) {
+        int baseTime = *reinterpret_cast<int*>(pppMngSt + 0x14);
+        if ((baseTime != -0x1000) && (*reinterpret_cast<short*>(pppMngSt + 0x74) == 0) &&
+            (*reinterpret_cast<short*>(pppMngSt + 0x76) == fieldNo)) {
+            if (baseTime < 0) {
+                *reinterpret_cast<unsigned char*>(pppMngSt + 0xe4) = 1;
+                pppStopSe__FP9_pppMngStP7PPPSEST(reinterpret_cast<_pppMngSt*>(pppMngSt),
+                                                 reinterpret_cast<PPPSEST*>(pppMngSt + 0x11c));
+            } else {
+                *reinterpret_cast<int*>(pppMngSt + 0x14) = -0x1000;
+            }
+        }
+        pppMngSt += 0x158;
+    }
 }
 
 /*
@@ -1034,9 +1092,9 @@ void CPartMng::pppFieldEndFpNo(short)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppSetDeltaIdx(short, long)
+void CPartMng::pppSetDeltaIdx(short index, long color)
 {
-	// TODO
+    *reinterpret_cast<long*>(reinterpret_cast<char*>(this) + (index * 0x158) + 0x2ac0) = color;
 }
 
 /*
@@ -1044,9 +1102,58 @@ void CPartMng::pppSetDeltaIdx(short, long)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppSetDeltaSlot(int, long)
+void CPartMng::pppSetDeltaSlot(int slot, long color)
 {
-	// TODO
+    char* pppMngSt = reinterpret_cast<char*>(this);
+    int i = 0x40;
+
+    do {
+        if ((*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 0)) != -0x1000) &&
+            (*reinterpret_cast<int*>(pppMngSt + 0x100 + (0x158 * 0)) == slot)) {
+            *reinterpret_cast<unsigned char*>(pppMngSt + 0xa8 + (0x158 * 0)) = static_cast<unsigned char>((color >> 24) & 0xff);
+            *reinterpret_cast<unsigned char*>(pppMngSt + 0xa9 + (0x158 * 0)) = static_cast<unsigned char>((color >> 16) & 0xff);
+            *reinterpret_cast<unsigned char*>(pppMngSt + 0xaa + (0x158 * 0)) = static_cast<unsigned char>((color >> 8) & 0xff);
+            *reinterpret_cast<unsigned char*>(pppMngSt + 0xab + (0x158 * 0)) = static_cast<unsigned char>(color & 0xff);
+        }
+        if ((*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 1)) != -0x1000) &&
+            (*reinterpret_cast<int*>(pppMngSt + 0x100 + (0x158 * 1)) == slot)) {
+            *reinterpret_cast<unsigned char*>(pppMngSt + 0xa8 + (0x158 * 1)) = static_cast<unsigned char>((color >> 24) & 0xff);
+            *reinterpret_cast<unsigned char*>(pppMngSt + 0xa9 + (0x158 * 1)) = static_cast<unsigned char>((color >> 16) & 0xff);
+            *reinterpret_cast<unsigned char*>(pppMngSt + 0xaa + (0x158 * 1)) = static_cast<unsigned char>((color >> 8) & 0xff);
+            *reinterpret_cast<unsigned char*>(pppMngSt + 0xab + (0x158 * 1)) = static_cast<unsigned char>(color & 0xff);
+        }
+        if ((*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 2)) != -0x1000) &&
+            (*reinterpret_cast<int*>(pppMngSt + 0x100 + (0x158 * 2)) == slot)) {
+            *reinterpret_cast<unsigned char*>(pppMngSt + 0xa8 + (0x158 * 2)) = static_cast<unsigned char>((color >> 24) & 0xff);
+            *reinterpret_cast<unsigned char*>(pppMngSt + 0xa9 + (0x158 * 2)) = static_cast<unsigned char>((color >> 16) & 0xff);
+            *reinterpret_cast<unsigned char*>(pppMngSt + 0xaa + (0x158 * 2)) = static_cast<unsigned char>((color >> 8) & 0xff);
+            *reinterpret_cast<unsigned char*>(pppMngSt + 0xab + (0x158 * 2)) = static_cast<unsigned char>(color & 0xff);
+        }
+        if ((*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 3)) != -0x1000) &&
+            (*reinterpret_cast<int*>(pppMngSt + 0x100 + (0x158 * 3)) == slot)) {
+            *reinterpret_cast<unsigned char*>(pppMngSt + 0xa8 + (0x158 * 3)) = static_cast<unsigned char>((color >> 24) & 0xff);
+            *reinterpret_cast<unsigned char*>(pppMngSt + 0xa9 + (0x158 * 3)) = static_cast<unsigned char>((color >> 16) & 0xff);
+            *reinterpret_cast<unsigned char*>(pppMngSt + 0xaa + (0x158 * 3)) = static_cast<unsigned char>((color >> 8) & 0xff);
+            *reinterpret_cast<unsigned char*>(pppMngSt + 0xab + (0x158 * 3)) = static_cast<unsigned char>(color & 0xff);
+        }
+        if ((*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 4)) != -0x1000) &&
+            (*reinterpret_cast<int*>(pppMngSt + 0x100 + (0x158 * 4)) == slot)) {
+            *reinterpret_cast<unsigned char*>(pppMngSt + 0xa8 + (0x158 * 4)) = static_cast<unsigned char>((color >> 24) & 0xff);
+            *reinterpret_cast<unsigned char*>(pppMngSt + 0xa9 + (0x158 * 4)) = static_cast<unsigned char>((color >> 16) & 0xff);
+            *reinterpret_cast<unsigned char*>(pppMngSt + 0xaa + (0x158 * 4)) = static_cast<unsigned char>((color >> 8) & 0xff);
+            *reinterpret_cast<unsigned char*>(pppMngSt + 0xab + (0x158 * 4)) = static_cast<unsigned char>(color & 0xff);
+        }
+        if ((*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 5)) != -0x1000) &&
+            (*reinterpret_cast<int*>(pppMngSt + 0x100 + (0x158 * 5)) == slot)) {
+            *reinterpret_cast<unsigned char*>(pppMngSt + 0xa8 + (0x158 * 5)) = static_cast<unsigned char>((color >> 24) & 0xff);
+            *reinterpret_cast<unsigned char*>(pppMngSt + 0xa9 + (0x158 * 5)) = static_cast<unsigned char>((color >> 16) & 0xff);
+            *reinterpret_cast<unsigned char*>(pppMngSt + 0xaa + (0x158 * 5)) = static_cast<unsigned char>((color >> 8) & 0xff);
+            *reinterpret_cast<unsigned char*>(pppMngSt + 0xab + (0x158 * 5)) = static_cast<unsigned char>(color & 0xff);
+        }
+
+        pppMngSt += 0x810;
+        i--;
+    } while (i != 0);
 }
 
 /*
@@ -1054,9 +1161,40 @@ void CPartMng::pppSetDeltaSlot(int, long)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppSetLocSlot(int, Vec*)
+void CPartMng::pppSetLocSlot(int slot, Vec* position)
 {
-	// TODO
+    char* pppMngSt = reinterpret_cast<char*>(this);
+    int i = 0x60;
+
+    do {
+        if ((*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 0)) != -0x1000) &&
+            (*reinterpret_cast<int*>(pppMngSt + 0x100 + (0x158 * 0)) == slot)) {
+            *reinterpret_cast<float*>(pppMngSt + 0x8 + (0x158 * 0)) = position->x;
+            *reinterpret_cast<float*>(pppMngSt + 0xc + (0x158 * 0)) = position->y;
+            *reinterpret_cast<float*>(pppMngSt + 0x10 + (0x158 * 0)) = position->z;
+        }
+        if ((*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 1)) != -0x1000) &&
+            (*reinterpret_cast<int*>(pppMngSt + 0x100 + (0x158 * 1)) == slot)) {
+            *reinterpret_cast<float*>(pppMngSt + 0x8 + (0x158 * 1)) = position->x;
+            *reinterpret_cast<float*>(pppMngSt + 0xc + (0x158 * 1)) = position->y;
+            *reinterpret_cast<float*>(pppMngSt + 0x10 + (0x158 * 1)) = position->z;
+        }
+        if ((*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 2)) != -0x1000) &&
+            (*reinterpret_cast<int*>(pppMngSt + 0x100 + (0x158 * 2)) == slot)) {
+            *reinterpret_cast<float*>(pppMngSt + 0x8 + (0x158 * 2)) = position->x;
+            *reinterpret_cast<float*>(pppMngSt + 0xc + (0x158 * 2)) = position->y;
+            *reinterpret_cast<float*>(pppMngSt + 0x10 + (0x158 * 2)) = position->z;
+        }
+        if ((*reinterpret_cast<int*>(pppMngSt + 0x14 + (0x158 * 3)) != -0x1000) &&
+            (*reinterpret_cast<int*>(pppMngSt + 0x100 + (0x158 * 3)) == slot)) {
+            *reinterpret_cast<float*>(pppMngSt + 0x8 + (0x158 * 3)) = position->x;
+            *reinterpret_cast<float*>(pppMngSt + 0xc + (0x158 * 3)) = position->y;
+            *reinterpret_cast<float*>(pppMngSt + 0x10 + (0x158 * 3)) = position->z;
+        }
+
+        pppMngSt += 0x560;
+        i--;
+    } while (i != 0);
 }
 
 /*

@@ -96,60 +96,48 @@ extern "C" void ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2(CCh
  */
 extern "C" void ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2(CChara::CModel* model, void* param_2, void* param_3, int param_4, float (*param_5) [4])
 {
+	int iVar1;
+	int* puVar2;
+	int iVar3;
+	int iVar4;
+	void* meshData;
+	void* displayList;
+
 	if (*(char*)((char*)param_3 + 0x14) != 0) {
-		int texture_info = *(int*)((char*)param_2 + 0x1c);
-		
-		// Get mesh data
-		char* meshes = (char*)model + 0xac;
-		void* mesh_data = *(void**)(meshes + param_4 * 0x14 + 8);
-		void* display_lists = *(void**)((char*)mesh_data + 0x50);
-		
-		// Check if there are vertex arrays
+		iVar4 = *(int*)((char*)param_2 + 0x1c);
+		meshData = *(void**)((char*)model + param_4 * 0x14 + 0xb4);
+		displayList = *(void**)((char*)meshData + 0x50);
 		if (*(int*)((char*)param_2 + 0xc) != 0) {
-			int vertex_array = *(int*)(*(int*)((char*)param_2 + 0xc) + param_4 * 4);
-			if (vertex_array != 0) {
-				// Set up vertex array in MaterialMan
-				*(void**)(MaterialMan + 0x4) = *(void**)((char*)mesh_data + 0x20); // normals
-				extern void GXSetArray(unsigned int, void*, unsigned char);
-				GXSetArray(0xb, (void*)vertex_array, 4);
-				
-				*(int*)(MaterialMan + 0x208) = texture_info + 0x28;
-				
-				// Process display lists in reverse order
-				int display_list_count = *(int*)((char*)mesh_data + 0x4c);
-				for (int i = display_list_count - 1; i >= 0; i--) {
-					// Get display list data for current index
-					int display_list_array = *(int*)(*(int*)((char*)param_2 + 0x10) + param_4 * 4);
-					void* display_list = (void*)((char*)display_lists + i * 0xc);
-					
-					// Set MaterialMan fields
-					*(int*)(MaterialMan + 0x44) = 0xFFFFFFFF;
-					*(char*)(MaterialMan + 0x4c) = 0xFF;
+			iVar1 = *(int*)(*(int*)((char*)param_2 + 0xc) + param_4 * 4);
+			if (iVar1 != 0) {
+				*(void**)(MaterialMan + 4) = *(void**)((char*)meshData + 0x20);
+				GXSetArray((GXAttr)0xb, (void*)iVar1, 4);
+				*(int*)(MaterialMan + 0x208) = iVar4 + 0x28;
+				iVar1 = *(int*)((char*)meshData + 0x4c) - 1;
+				iVar4 = iVar1 * 4;
+				for (; -1 < iVar1; iVar1 = iVar1 - 1) {
+					iVar3 = *(int*)(param_4 * 4 + *(int*)((char*)param_2 + 0x10));
+					*(int*)(MaterialMan + 0x44) = 0xffffffff;
+					*(char*)(MaterialMan + 0x4c) = (char)0xff;
 					*(int*)(MaterialMan + 0x11c) = 0;
-					*(int*)(MaterialMan + 0x120) = 0x1E;
+					*(int*)(MaterialMan + 0x120) = 0x1e;
 					*(int*)(MaterialMan + 0x124) = 0;
-					*(char*)(MaterialMan + 0x205) = 0xFF;
-					*(char*)(MaterialMan + 0x206) = 0xFF;
+					*(char*)(MaterialMan + 0x205) = (char)0xff;
+					*(char*)(MaterialMan + 0x206) = (char)0xff;
 					*(int*)(MaterialMan + 0x58) = 0;
 					*(int*)(MaterialMan + 0x5c) = 0;
 					*(char*)(MaterialMan + 0x208) = 0;
-					*(int*)(MaterialMan + 0x48) = 0xADE0F;
+					*(int*)(MaterialMan + 0x48) = 0xade0f;
 					*(int*)(MaterialMan + 0x128) = 0;
-					*(int*)(MaterialMan + 0x12c) = 0x1E;
+					*(int*)(MaterialMan + 0x12c) = 0x1e;
 					*(int*)(MaterialMan + 0x130) = 0;
-					*(int*)(MaterialMan + 0x40) = 0xADE0F;
-					
-					// Call SetMaterial
-					void* model_data = *(void**)((char*)model + 0xa4);
-					void* material_set = *(void**)((char*)model_data + 0x24);
-					unsigned short material_id = *(unsigned short*)((char*)display_list + 8);
-					SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(MaterialMan, material_set, material_id, 0, 0);
-					
-					// Call display list
-					void** dl_array = (void**)(display_list_array + i * 4);
-					void* dl_data = *dl_array;
-					unsigned int dl_size = *((unsigned int*)dl_array + 1);
-					GXCallDisplayList(dl_data, dl_size);
+					*(int*)(MaterialMan + 0x40) = 0xade0f;
+					SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
+					    MaterialMan, *(void**)(*(int*)((char*)model + 0xa4) + 0x24), *(unsigned short*)((char*)displayList + 8), 0, 0);
+					puVar2 = *(int**)(iVar3 + iVar4);
+					GXCallDisplayList((void*)puVar2[0], (unsigned int)puVar2[1]);
+					iVar4 = iVar4 + -4;
+					displayList = (void*)((char*)displayList + 0xc);
 				}
 			}
 		}

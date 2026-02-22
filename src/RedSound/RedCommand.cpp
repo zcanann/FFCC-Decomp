@@ -24,6 +24,7 @@ extern char s__s_sWave_is_not_Entry___wave_4_4_801e7e18[];
 
 extern "C" {
 int fflush(void*);
+int SearchMusicBank__9CRedEntryFi(CRedEntry*, int);
 int SearchWaveBase__9CRedEntryFi(void*, int);
 void WaveHistoryManager__9CRedEntryFii(void*, int, int);
 }
@@ -717,12 +718,28 @@ void MusicStop(int seId)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cb7d0
+ * PAL Size: 160b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void MusicPlay(int, int, int)
+int MusicPlay(int musicId, int volume, int mode)
 {
-	// TODO
+	int musicBank = SearchMusicBank__9CRedEntryFi(&DAT_8032e154, musicId);
+
+	if (musicBank != 0) {
+		int musicHead = *(int*)(musicBank + 8);
+		int waveHead = SearchWaveBase__9CRedEntryFi(&DAT_8032e154, (int)*(short*)(musicHead + 6));
+		if (waveHead == 0) {
+			return -1;
+		}
+
+		_MusicPlayStart((RedMusicHEAD*)musicHead, (RedWaveHeadWD*)waveHead, musicId, volume, mode);
+	}
+
+	return 0;
 }
 
 /*

@@ -1,5 +1,6 @@
 #include "ffcc/RedSound/RedCommand.h"
 #include "ffcc/RedSound/RedEntry.h"
+#include "ffcc/RedSound/RedDriver.h"
 #include "ffcc/RedSound/RedMemory.h"
 #include "ffcc/RedSound/RedMidiCtrl.h"
 #include <dolphin/os.h>
@@ -11,13 +12,20 @@ extern void* DAT_8032f3f0;
 extern void* DAT_8032f3fc;
 extern unsigned int* DAT_8032f444;
 extern int DAT_8032f408;
+extern int DAT_8032f440;
 extern int DAT_8021d1a8;
+extern void* DAT_8032f474;
 extern char DAT_801e7e3e;
+extern char DAT_80333d68;
+extern char DAT_80333d70;
 extern char s__sPause___SE___ON__d_801e7e50[];
 extern char s__sPause___SE___OFF__d_801e7e6b[];
+extern char s__s_sWave_is_not_Entry___wave_4_4_801e7e18[];
 
 extern "C" {
 int fflush(void*);
+int SearchWaveBase__9CRedEntryFi(void*, int);
+void WaveHistoryManager__9CRedEntryFii(void*, int, int);
 }
 
 /*
@@ -290,13 +298,156 @@ int SeStopMG(int bank, int sep, int group, int kind)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801ca808
+ * PAL Size: 936b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int _SePlayStart(RedSeINFO*, int, int, int, int)
+int _SePlayStart(RedSeINFO* info, int seId, int sepId, int pan, int volume)
 {
-	// TODO
-	return 0;
+	unsigned char flag;
+	int waveBase;
+	int* track;
+	unsigned int state;
+	unsigned char attrMask;
+	unsigned char* seq;
+	int deltaTime;
+	unsigned int count;
+	unsigned char* current;
+	unsigned int remaining;
+	int* seTrack;
+
+	*(unsigned int*)((char*)DAT_8032f3f0 + 0x1244) = 0;
+	deltaTime = (unsigned int)((unsigned char*)info)[2] * 0x100 + (unsigned int)((unsigned char*)info)[1];
+	waveBase = SearchWaveBase__9CRedEntryFi(&DAT_8032e154, deltaTime);
+	if (waveBase == 0) {
+		if (DAT_8032f408 != 0) {
+			OSReport(s__s_sWave_is_not_Entry___wave_4_4_801e7e18, &DAT_801e7e3e, &DAT_80333d68,
+			         deltaTime, &DAT_80333d70);
+			fflush(&DAT_8021d1a8);
+		}
+	} else {
+		WaveHistoryManager__9CRedEntryFii(&DAT_8032e154, 1, *(short*)(waveBase + 2));
+	}
+
+	flag = ((unsigned char*)info)[0];
+	seq = (unsigned char*)info + 5;
+	attrMask = ((unsigned char*)info)[4];
+	count = ((unsigned char*)info)[0] & 0x7f;
+	current = seq + count * 2;
+	do {
+		remaining = count;
+		if (sepId != 1000000) {
+			remaining = 0;
+			do {
+				remaining = remaining + 1;
+				if ((seq[remaining * 2 + 1] & 0x80) == 0) {
+					break;
+				}
+			} while ((int)remaining < (int)count);
+		}
+
+		track = SearchSeEmptyTrack((int)remaining, ((unsigned char*)info)[3], attrMask);
+		attrMask = 0;
+		if (track == 0) {
+			SeStopID(seId);
+			return 0;
+		}
+
+		seTrack = (int*)((unsigned char*)DAT_8032f444 + *(char*)((char*)track + 0x14e) * 0xc0);
+		while (true) {
+			track[6] = waveBase;
+			*(unsigned char**)track = current;
+			current = current +
+			          (((unsigned int)seq[1] * 0x100 + (unsigned int)*seq) & 0x7fff);
+			deltaTime = (int)DeltaTimeSumup((unsigned char**)track);
+			track[0x42] = deltaTime + 1;
+			if (DAT_8032f440 != 0) {
+				track[0x42] = track[0x42] - DAT_8032f440;
+			}
+
+			track[0x3d] = sepId;
+			track[0x3e] = seId;
+			*(short*)(track + 0x51) = 0;
+			if (DAT_8032f440 == 0) {
+				state = 0xffffffff;
+			} else {
+				state = 0;
+			}
+			track[0x43] = state;
+
+			if (*(char*)*track != '\0') {
+				*(unsigned char*)((char*)track + 0x14f) = ((unsigned char*)info)[3];
+				*(unsigned char*)(track + 0x54) = ((unsigned char*)info)[4];
+				track[0x13] = volume << 0xc;
+				track[0x15] = 0;
+				track[0x16] = 0;
+				track[0x19] = 0;
+				track[0x17] = 0;
+				track[0x40] = (unsigned int)((flag & 0x80) != 0);
+				track[10] = 0x7fff000;
+				track[0xd] = 0x7f000;
+				track[0x10] = pan << 0xc;
+				track[0x1a] = *(int*)((char*)DAT_8032f474 + 0xc);
+				track[0x1c] = 0;
+				track[0x12] = 0;
+				track[0xf] = 0;
+				track[0xc] = 0;
+				track[0x45] = 0;
+				track[0x44] = 0;
+				track[0x46] = 0;
+				*(short*)(track + 0x4f) = 0;
+				*(short*)((char*)track + 0x142) = 0;
+				*(unsigned char*)((char*)track + 0x14b) = 2;
+				*(short*)((char*)track + 0x13e) = 0;
+				*(short*)(track + 0x50) = 0;
+				*(unsigned char*)(track + 0x52) = 0;
+				track[0x2d] = 0;
+				track[0x25] = 0;
+				track[0x1d] = 0;
+				track[0x33] = 0;
+				*(short*)(track + 0x2c) = 0;
+				*(short*)(track + 0x24) = 0;
+				*(short*)((char*)track + 0xb2) = 0;
+				*(short*)((char*)track + 0x92) = 0;
+				track[7] = 0;
+				track[0x41] = 0;
+				*(short*)((char*)track + 0x13a) = 0;
+				*(short*)(track + 0x4e) = 0;
+				track[0x3c] = 0;
+				track[0x3b] = 0;
+				track[0x3a] = 0;
+				track[0x39] = 0;
+				track[0x38] = 0;
+				track[0x48] = 0xffffffff;
+				track[0x3f] = 0xc00;
+				memset(track + 0x35, 0xff, 0xc);
+				*(unsigned char*)((char*)track + 0x26) = 5;
+				*(short*)((char*)track + 0x146) = 1;
+				*seTrack = (int)track;
+				*(unsigned char*)((char*)seTrack + 0x1a) = 5;
+				seTrack[0x24] = 2;
+				seTrack[0xc] = 0;
+				seTrack[8] = 0;
+				seTrack[0x2e] = 0;
+			}
+
+			remaining = remaining - 1;
+			seq = seq + 2;
+			count = count - 1;
+			if (remaining == 0) {
+				break;
+			}
+			track = track + 0x55;
+			seTrack = seTrack + 0x30;
+		}
+
+		if (count == 0) {
+			return seId;
+		}
+	} while (true);
 }
 
 /*

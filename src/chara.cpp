@@ -83,7 +83,11 @@ void CChara::FlipDBuffer()
  */
 void CChara::gqrInit(unsigned long, unsigned long, unsigned long)
 {
-	// TODO
+	asm {
+		mtspr GQR5, r4
+		mtspr GQR6, r5
+		mtspr GQR7, r6
+	}
 }
 
 /*
@@ -381,9 +385,10 @@ void CChara::CModel::CalcFurColor()
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CModel::GetDispIndex(CChara::CNode*)
+int CChara::CModel::GetDispIndex(CChara::CNode* node)
 {
-	// TODO
+	u8 displayIndex = *(u8*)(*(u8**)node + 0x8D);
+	return (s8)displayIndex;
 }
 
 /*

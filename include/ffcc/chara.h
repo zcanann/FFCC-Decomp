@@ -109,7 +109,7 @@ class CChara
 		void SetFrame(float);
 		void CalcFurColor();
 		void InitMogFurTex();
-		void GetDispIndex(CChara::CNode*);
+		int GetDispIndex(CChara::CNode*);
         void GetMatrix();
         void GetMatrix(float(*)[4]);
 

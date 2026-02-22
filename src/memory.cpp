@@ -5,6 +5,7 @@
 #include "ffcc/stopwatch.h"
 #include "ffcc/system.h"
 #include <dolphin/gx.h>
+#include <dolphin/mtx.h>
 #include "dolphin/os/OSMemory.h"
 #include <string.h>
 
@@ -20,8 +21,14 @@ extern char DAT_801d669c[];
 extern char DAT_801d6b7c[];
 extern char DAT_801d6bb0[];
 extern char DAT_801d67d8[];
+extern char DAT_801d6bdc[];
+extern char DAT_801d6bec[];
 extern char DAT_8032f7d4[];
 extern float FLOAT_8032f7d8;
+extern float FLOAT_8032f7dc;
+extern float FLOAT_8032f7fc;
+extern float FLOAT_8032f800;
+extern float FLOAT_8032f804;
 extern char s__4d__4d__4d_801d6800[];
 extern unsigned int DAT_801d64a8;
 extern unsigned int DAT_801d64ac;
@@ -46,6 +53,12 @@ extern "C" int DMAEntry__9CRedSoundFiiiiiPFPv_vPv(
 extern "C" int DMACheck__9CRedSoundFi(void*, int);
 extern "C" int __cntlzw(unsigned int);
 extern "C" void* __construct_new_array(void*, void*, void*, unsigned long, unsigned long);
+extern "C" unsigned char Chara[];
+extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
+extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
+extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
+extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
+extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 
 static int calcCacheChecksum(const unsigned char* data, unsigned int size)
 {
@@ -497,12 +510,97 @@ void CMemory::HeapWalker()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001EC94
+ * PAL Size: 764b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMemory::Draw()
 {
-	// TODO
+    if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x7798) == 0) {
+        return;
+    }
+
+    Mtx orthoMtx;
+    Mtx modelMtx;
+    char line[0x104];
+
+    C_MTXOrtho(orthoMtx, FLOAT_8032f7dc, FLOAT_8032f7fc, FLOAT_8032f7dc, FLOAT_8032f800, FLOAT_8032f7dc,
+               FLOAT_8032f804);
+    GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    GXSetZCompLoc(GX_FALSE);
+    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
+    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetNumTevStages(1);
+    GXSetTevDirect(GX_TEVSTAGE0);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetChanCtrl(GX_COLOR1A1, GX_DISABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    PSMTXIdentity(modelMtx);
+    GXLoadPosMtxImm(modelMtx, GX_PNMTX0);
+    GXLoadTexMtxImm(modelMtx, GX_IDENTITY, GX_MTX3x4);
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
+    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+
+    for (int pass = 0; pass < 2; pass++) {
+        if (pass == 1) {
+            Graphic.InitDebugString();
+        }
+
+        unsigned char* listHead = reinterpret_cast<unsigned char*>(this) + 4;
+        int y = 0x20;
+        int useTotalKB = 0;
+        int unuseTotalKB = 0;
+
+        for (int mode = 0; mode < 3; mode++) {
+            if (((mode != 1) || (OSGetConsoleSimulatedMemSize() == 0x3000000)) && (mode != 2)) {
+                CMemory::CStage* head = reinterpret_cast<CMemory::CStage*>(listHead);
+                CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(listHead + 4);
+                while (stage != head) {
+                    if (pass == 0) {
+                        stage->drawHeapBar(y);
+                    } else {
+                        stage->drawHeapTitle(y);
+                        if (mode == 0) {
+                            useTotalKB += (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0xC) -
+                                           *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 8)) >>
+                                          10;
+                            unuseTotalKB +=
+                                (*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) +
+                                                                                4) +
+                                                         8) -
+                                 *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0xC)) >>
+                                10;
+                        }
+                    }
+                    y += 0xC;
+                    stage = *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(stage) + 4);
+                }
+            }
+
+            listHead += 0x27D8;
+        }
+
+        if (pass == 1) {
+            sprintf(line, DAT_801d6bdc, useTotalKB, unuseTotalKB);
+            Graphic.DrawDebugStringDirect(0x10, static_cast<unsigned short>(y), line, 8);
+
+            int amemAnim = *reinterpret_cast<int*>(Chara + 0x2074);
+            int amemAnimKB = (amemAnim >> 10) + ((amemAnim < 0) && ((amemAnim & 0x3FF) != 0));
+            sprintf(line, DAT_801d6bec, amemAnimKB);
+            Graphic.DrawDebugStringDirect(0x10, static_cast<unsigned short>(y + 0xC), line, 8);
+        }
+    }
 }
 
 /*
@@ -1038,7 +1136,9 @@ void CMemory::CStage::drawHeapBar(int y)
  */
 void CMemory::CStage::drawHeapTitle(int y)
 {
-    int node = (stageGetAllocationMode(this) == 2) ? stageGetHeapHead(this) : *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
+    int node = (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x10C) == 2)
+                   ? *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x110)
+                   : *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x110) + 8);
     unsigned int totalUnuse = 0;
     unsigned int maxUnuse = 0;
     int prev = *reinterpret_cast<int*>(node + 4);
@@ -1047,20 +1147,18 @@ void CMemory::CStage::drawHeapTitle(int y)
         unsigned char flags = *reinterpret_cast<unsigned char*>(node + 2);
         if ((flags & 2) != 0) {
             char line[264];
-            int srcLen = strlen(stageGetSourceName(this));
-            int start = srcLen - 12;
-            if (start < 0) {
-                start = 0;
-            }
-            strcpy(line, stageGetSourceName(this) + start);
+            int srcLen = strlen(reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(this) + 0x10));
+            int start = (srcLen - 12U) & ~((srcLen - 12) >> 0x1F);
+            strcpy(line, reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(this) + 0x10) + start);
             Graphic.DrawDebugStringDirect(0x10, static_cast<unsigned short>(y), line, 8);
 
             int totalUnuseKB = (static_cast<int>(totalUnuse) >> 10) +
                 static_cast<int>((static_cast<int>(totalUnuse) < 0) && ((totalUnuse & 0x3FF) != 0));
             int maxUnuseKB = (static_cast<int>(maxUnuse) >> 10) +
                 static_cast<int>((static_cast<int>(maxUnuse) < 0) && ((maxUnuse & 0x3FF) != 0));
-            sprintf(line, s__4d__4d__4d_801d6800, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x124),
-                    totalUnuseKB, maxUnuseKB);
+            sprintf(line, s__4d__4d__4d_801d6800,
+                    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x124), totalUnuseKB,
+                    maxUnuseKB);
             Graphic.DrawDebugStringDirect(0x208, static_cast<unsigned short>(y), line, 8);
             return;
         }
@@ -1073,12 +1171,14 @@ void CMemory::CStage::drawHeapTitle(int y)
             }
         }
 
-        if ((*reinterpret_cast<int*>(node + 0x10) != *reinterpret_cast<int*>(node + 8) - (node + 0x40)) ||
-            (*reinterpret_cast<int*>(node + 4) != prev)) {
+        bool validPrev = *reinterpret_cast<int*>(node + 4) == prev;
+        int next = *reinterpret_cast<int*>(node + 8);
+        int current = node;
+        if ((*reinterpret_cast<int*>(node + 0x10) != next - (node + 0x40)) || !validPrev) {
             break;
         }
-        prev = node;
-        node = *reinterpret_cast<int*>(node + 8);
+        prev = current;
+        node = next;
     }
 
     if (System.m_execParam != 0) {

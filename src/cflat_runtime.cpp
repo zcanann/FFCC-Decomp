@@ -4,6 +4,7 @@
 extern "C" {
 void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
 void __dl__FPv(void*);
+void __dla__FPv(void*);
 char s_cflat_runtime_cpp_801d8ef8[];
 void* __vt__12CFlatRuntime[];
 void* __vt__Q212CFlatRuntime7CObject[];
@@ -100,22 +101,170 @@ void CFlatRuntime::Quit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800697CC
+ * PAL Size: 416b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFlatRuntime::Destroy()
 {
-	// TODO
+	typedef void (*OnDeleteFn)(CFlatRuntime*, CFlatRuntime::CObject*);
+
+	u8* const self = reinterpret_cast<u8*>(this);
+	CObject* const root = reinterpret_cast<CObject*>(self + 0x8CC);
+	CObject* object = *reinterpret_cast<CObject**>(self + 0x8F0);
+
+	while (object != root) {
+		CObject* const next = object->m_next;
+
+		object->m_previous->m_next = object->m_next;
+		object->m_next->m_previous = object->m_previous;
+
+		*reinterpret_cast<void**>(reinterpret_cast<u8*>(*object->m_freeListNode) + 4) = object->m_freeListNode[1];
+		*reinterpret_cast<void**>(object->m_freeListNode[1]) = *object->m_freeListNode;
+
+		object->m_freeListNode[1] = *reinterpret_cast<void***>(self + 0x98C);
+		*reinterpret_cast<void***>(self + 0x98C) = object->m_freeListNode;
+
+		object->m_flags &= 0xEF;
+
+		OnDeleteFn onDelete = reinterpret_cast<OnDeleteFn>((*reinterpret_cast<void***>(this))[7]);
+		onDelete(this, object);
+
+		object = next;
+	}
+
+	void* ptr = *reinterpret_cast<void**>(self + 0x08);
+	if (ptr != 0) {
+		__dla__FPv(ptr);
+	}
+
+	u8* funcs = *reinterpret_cast<u8**>(self + 0x20);
+	const int funcCount = *reinterpret_cast<int*>(self + 0x1C);
+	for (int i = 0, off = 0; i < funcCount; i++, off += 0x50) {
+		__dla__FPv(*reinterpret_cast<void**>(funcs + off + 0x34));
+		__dla__FPv(*reinterpret_cast<void**>(funcs + off + 0x3C));
+	}
+
+	ptr = *reinterpret_cast<void**>(self + 0x20);
+	if (ptr != 0) {
+		__dla__FPv(ptr);
+	}
+
+	ptr = *reinterpret_cast<void**>(self + 0x18);
+	if (ptr != 0) {
+		__dla__FPv(reinterpret_cast<u8*>(ptr) - 0x10);
+	}
+
+	ptr = *reinterpret_cast<void**>(self + 0x28);
+	if (ptr != 0) {
+		__dla__FPv(ptr);
+	}
+
+	ptr = *reinterpret_cast<void**>(self + 0x2C);
+	if (ptr != 0) {
+		__dla__FPv(ptr);
+	}
+
+	ptr = *reinterpret_cast<void**>(self + 0x34);
+	if (ptr != 0) {
+		__dla__FPv(ptr);
+	}
+
+	ptr = *reinterpret_cast<void**>(self + 0x38);
+	if (ptr != 0) {
+		__dla__FPv(ptr);
+	}
+
+	ptr = *reinterpret_cast<void**>(self + 0x40);
+	if (ptr != 0) {
+		__dla__FPv(ptr);
+	}
+
+	ptr = *reinterpret_cast<void**>(self + 0x44);
+	if (ptr != 0) {
+		__dla__FPv(ptr);
+	}
+
+	clear();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80069608
+ * PAL Size: 452b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFlatRuntime::clear()
 {
-	// TODO
+	u8* const self = reinterpret_cast<u8*>(this);
+	const short clearMaskBits = static_cast<short>(-1);
+
+	*reinterpret_cast<void**>(self + 0x08) = 0;
+	*reinterpret_cast<void**>(self + 0x20) = 0;
+	*reinterpret_cast<void**>(self + 0x1C) = 0;
+	*reinterpret_cast<void**>(self + 0x18) = 0;
+	*reinterpret_cast<void**>(self + 0x14) = 0;
+	*reinterpret_cast<void**>(self + 0x2C) = 0;
+	*reinterpret_cast<void**>(self + 0x28) = 0;
+	*reinterpret_cast<void**>(self + 0x24) = 0;
+	*reinterpret_cast<void**>(self + 0x38) = 0;
+	*reinterpret_cast<void**>(self + 0x34) = 0;
+	*reinterpret_cast<void**>(self + 0x30) = 0;
+	*reinterpret_cast<void**>(self + 0x44) = 0;
+	*reinterpret_cast<void**>(self + 0x40) = 0;
+	*reinterpret_cast<void**>(self + 0x3C) = 0;
+
+	*reinterpret_cast<short*>(self + 0x964) =
+	    static_cast<short>((*reinterpret_cast<short*>(self + 0x964) & 0x000F) | (clearMaskBits << 4));
+	*reinterpret_cast<short*>(self + 0x968) =
+	    static_cast<short>((*reinterpret_cast<short*>(self + 0x968) & 0x000F) | (clearMaskBits << 4));
+
+	*reinterpret_cast<void**>(self + 0x8EC) = self + 0x8CC;
+	*reinterpret_cast<void**>(self + 0x8F0) = self + 0x8CC;
+	*reinterpret_cast<short*>(self + 0x8FE) = 0x10;
+
+	*reinterpret_cast<void**>(self + 0x978) = self + 0x978;
+	*reinterpret_cast<void**>(self + 0x97C) = self + 0x978;
+	*reinterpret_cast<int*>(self + 0x980) = 0x5220;
+	*reinterpret_cast<void**>(self + 0x984) = 0;
+
+	*reinterpret_cast<void**>(self + 0x988) = self + 0x1288;
+	*reinterpret_cast<void**>(self + 0x98C) = self + 0x998;
+
+	u8* const freeNodes = self + 0x998;
+	for (int block = 0; block < 0x30; block++) {
+		const int baseIndex = block * 3;
+		u8* const node = freeNodes + block * 0x30;
+
+		*reinterpret_cast<void**>(node + 0x00) =
+		    (baseIndex == 0) ? static_cast<void*>(self + 0x988)
+		                     : static_cast<void*>(freeNodes + (baseIndex - 1) * 0x10);
+		*reinterpret_cast<void**>(node + 0x04) =
+		    (baseIndex == 0x8F) ? static_cast<void*>(self + 0x988)
+		                        : static_cast<void*>(freeNodes + (baseIndex + 1) * 0x10);
+
+		*reinterpret_cast<void**>(node + 0x10) =
+		    ((baseIndex + 1) == 0) ? static_cast<void*>(self + 0x988)
+		                           : static_cast<void*>(freeNodes + baseIndex * 0x10);
+		*reinterpret_cast<void**>(node + 0x14) =
+		    ((baseIndex + 1) == 0x8F) ? static_cast<void*>(self + 0x988)
+		                              : static_cast<void*>(freeNodes + (baseIndex + 2) * 0x10);
+
+		*reinterpret_cast<void**>(node + 0x20) =
+		    ((baseIndex + 2) == 0) ? static_cast<void*>(self + 0x988)
+		                           : static_cast<void*>(freeNodes + (baseIndex + 1) * 0x10);
+		*reinterpret_cast<void**>(node + 0x24) =
+		    ((baseIndex + 2) == 0x8F) ? static_cast<void*>(self + 0x988)
+		                              : static_cast<void*>(freeNodes + (baseIndex + 3) * 0x10);
+	}
+
+	memset(self + 0x48, 0, 0x804);
 }
 
 /*

@@ -1,5 +1,6 @@
 #include "ffcc/goout.h"
 #include "ffcc/wm_menu.h"
+#include <stdarg.h>
 #include <string.h>
 
 extern CGoOutMenu g_GoOutMenu;
@@ -7,6 +8,8 @@ extern CGoOutMenu* g_pGoOutMenu;
 extern "C" int GetYesNoXPos__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" int CalcGoOutSelChar__8CMenuPcsFUcUc(CMenuPcs*, unsigned char, unsigned char);
 extern "C" void Calc__10CGoOutMenuFv(CGoOutMenu*);
+extern "C" const char* GetWinMess__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" const char* const* GetMcWinMessBuff__8CMenuPcsFi(CMenuPcs*, int);
 
 struct CMenuPcsGoOutLayout
 {
@@ -287,9 +290,31 @@ void CGoOutMenu::SetMenu(short, long)
  * Address:	TODO
  * Size:	TODO
  */
-void CGoOutMenu::SetMenuStr(long, int, ...)
+void CGoOutMenu::SetMenuStr(long timer, int lineCount, ...)
 {
-	// TODO
+    CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
+    va_list args;
+
+    field_0x38 ^= 1;
+    *reinterpret_cast<int*>(const_cast<char*>(GetWinMess__8CMenuPcsFi(&MenuPcs, field_0x38 + 0x22))) = lineCount;
+
+    va_start(args, lineCount);
+    const unsigned int indexBase = (~-((static_cast<unsigned int>(__cntlzw(field_0x38)) >> 5) & 1) & 10);
+    const char* const* msgTable = GetMcWinMessBuff__8CMenuPcsFi(&MenuPcs, 2);
+    for (int i = 0; i < lineCount; i++) {
+        const_cast<const char**>(msgTable)[indexBase + i] = va_arg(args, const char*);
+    }
+    va_end(args);
+
+    if (field_0x36 >= 0) {
+        WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
+        WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+    }
+
+    field_0x45 = 0;
+    field_0x34 = field_0x38 + 0x22;
+    field_0x48 = 0;
+    field_0x3c = timer;
 }
 
 /*
@@ -575,6 +600,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
  */
 void CGoOutMenu::CalcGoOut()
 {
+    McCtrl& mcCtrl = *reinterpret_cast<McCtrl*>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0x20);
     unsigned short input;
     unsigned char next;
 
@@ -702,6 +728,44 @@ void CGoOutMenu::CalcGoOut()
             Sound.PlaySe(2, 0x40, 0x7f, 0);
             SetGoOutMode(8);
         }
+        break;
+    case 8:
+        if (mcCtrl.ChkConnect(0) == -1) {
+            return;
+        }
+        field_0x30 = 0;
+        SetGoOutMode(9);
+        break;
+    case 9:
+        if (field_0x30 < 0x14) {
+            return;
+        }
+        if (mcCtrl.ChkConnect(0) == -3) {
+            SetMenuStr(0, 2, "No Memory Card found in", "Slot A.");
+            field_0x19 = -1;
+            SetGoOutMode(0);
+            return;
+        }
+        SetGoOutMode(0xC);
+        break;
+    case 10:
+        if (mcCtrl.ChkConnect(1) == -1) {
+            return;
+        }
+        field_0x30 = 0;
+        SetGoOutMode(0xB);
+        break;
+    case 0xB:
+        if (field_0x30 < 0x14) {
+            return;
+        }
+        if (mcCtrl.ChkConnect(1) == -3) {
+            SetMenuStr(0, 2, "No Memory Card found in", "Slot B.");
+            field_0x19 = -1;
+            SetGoOutMode(0);
+            return;
+        }
+        SetGoOutMode(0xE);
         break;
     default:
         break;

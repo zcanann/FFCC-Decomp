@@ -805,12 +805,106 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80016968
+ * PAL Size: 1608b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGraphic::CreateSmallBackTexture(void*, _GXTexObj*, long, long, _GXTexFilter, _GXTexFmt, unsigned long)
+void CGraphic::CreateSmallBackTexture(void* src, _GXTexObj* texObj, long width, long height, _GXTexFilter filter, _GXTexFmt format,
+                                      unsigned long textureSize)
 {
-	// TODO
+    _GXTexObj tempTex;
+    Vec quadMin;
+    Vec quadMax;
+    _GXColor white;
+    Mtx cameraMtx;
+    float projection[7];
+    int halfWidth = static_cast<int>(width) / 2;
+    int halfHeight = static_cast<int>(height) / 2;
+
+    DAT_8032ec70.SetOrthoEnv();
+    DAT_8032ec70.SetVtxFmt_POS_CLR_TEX();
+    DAT_8032ec70.DisableIndMtx();
+
+    GXSetNumChans(1);
+    GXSetZCompLoc(0);
+    GXSetAlphaCompare(GX_ALWAYS, 1, GX_AOP_AND, GX_ALWAYS, 0);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 4, 5, 1);
+    GXSetAlphaCompare(GX_ALWAYS, 1, GX_AOP_OR, GX_ALWAYS, 0);
+    GXSetNumTevStages(1);
+    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
+    GXSetNumTexGens(1);
+    GXSetNumTevStages(1);
+    GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 4, 5, 1);
+    GXSetColorUpdate(GX_TRUE);
+    GXSetAlphaUpdate(GX_FALSE);
+
+    white.r = 0xFF;
+    white.g = 0xFF;
+    white.b = 0xFF;
+    white.a = 0xFF;
+
+    GetBackBufferRect2(PtrAt(this, 0x71E8), &tempTex, 0, 0, 0x140, 0xE0, 0x46000, filter, GX_TF_I8, 0);
+    GXLoadTexObj(&tempTex, GX_TEXMAP0);
+    quadMin.x = 0.0f;
+    quadMin.y = 0.0f;
+    quadMin.z = 0.0f;
+    quadMax.x = static_cast<float>(halfWidth);
+    quadMax.y = static_cast<float>(halfHeight);
+    quadMax.z = 0.0f;
+    DAT_8032ec70.RenderQuad(quadMin, quadMax, white, 0, 0);
+
+    GetBackBufferRect2(PtrAt(this, 0x71E8), texObj, 0x140, 0, 0x140, 0xE0, 0, filter, format, 0);
+    GXLoadTexObj(texObj, GX_TEXMAP0);
+    quadMin.x = static_cast<float>(halfWidth);
+    quadMin.y = 0.0f;
+    quadMin.z = 0.0f;
+    quadMax.x = static_cast<float>(width);
+    quadMax.y = static_cast<float>(halfHeight);
+    quadMax.z = 0.0f;
+    DAT_8032ec70.RenderQuad(quadMin, quadMax, white, 0, 0);
+
+    GetBackBufferRect2(PtrAt(this, 0x71E8), texObj, 0, 0xE0, 0x140, 0xE0, 0, filter, format, 0);
+    GXLoadTexObj(texObj, GX_TEXMAP0);
+    quadMin.x = 0.0f;
+    quadMin.y = static_cast<float>(halfHeight);
+    quadMin.z = 0.0f;
+    quadMax.x = static_cast<float>(halfWidth);
+    quadMax.y = static_cast<float>(height);
+    quadMax.z = 0.0f;
+    DAT_8032ec70.RenderQuad(quadMin, quadMax, white, 0, 0);
+
+    GetBackBufferRect2(PtrAt(this, 0x71E8), texObj, 0x140, 0xE0, 0x140, 0xE0, 0, filter, format, 0);
+    GXLoadTexObj(texObj, GX_TEXMAP0);
+    quadMin.x = static_cast<float>(halfWidth);
+    quadMin.y = static_cast<float>(halfHeight);
+    quadMin.z = 0.0f;
+    quadMax.x = static_cast<float>(width);
+    quadMax.y = static_cast<float>(height);
+    quadMax.z = 0.0f;
+    DAT_8032ec70.RenderQuad(quadMin, quadMax, white, 0, 0);
+
+    GetBackBufferRect2(src, texObj, 0, 0, static_cast<int>(width), static_cast<int>(height), textureSize, filter, format, 0);
+    GXLoadTexObj(&tempTex, GX_TEXMAP0);
+    quadMin.x = 0.0f;
+    quadMin.y = 0.0f;
+    quadMin.z = 0.0f;
+    quadMax.x = 1.0f;
+    quadMax.y = 1.0f;
+    quadMax.z = 0.0f;
+    DAT_8032ec70.RenderQuad(quadMin, quadMax, white, 0, 0);
+
+    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+    GXGetProjectionv(projection);
+    GXLoadPosMtxImm(cameraMtx, 0);
+    GXSetProjectionv(projection);
 }
 
 /*

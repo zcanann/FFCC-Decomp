@@ -5,15 +5,15 @@
 
 #include <dolphin/types.h>
 
-extern int DAT_8032ed70;
+extern int lbl_8032ED70;
 extern struct _pppMngSt* pppMngStPtr;
 extern struct CMapMng MapMng;
 
 // Float constants (addresses from Ghidra)
-extern float FLOAT_80330ed0;
-extern float FLOAT_80330ed4; 
-extern float FLOAT_80330ed8;
-extern float FLOAT_80330edc;
+extern float lbl_80330ED0;
+extern float lbl_80330ED4;
+extern float lbl_80330ED8;
+extern float lbl_80330EDC;
 
 struct CMapCylinderRaw
 {
@@ -58,33 +58,33 @@ void pppConstructYmCheckBGHeight(void)
  */
 struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(struct pppYmCheckBGHeight* pppYmCheckBGHeight, struct UnkC* param_2)
 {
-    if (DAT_8032ed70 == 0) {
+    if (lbl_8032ED70 == 0) {
         _pppMngSt* pppMngSt = pppMngStPtr;
         Vec direction;
         CMapCylinderRaw cyl;
         Vec hitPos;
         float currentY;
 
-        direction.x = FLOAT_80330ed0;
-        direction.y = FLOAT_80330ed4;
-        direction.z = FLOAT_80330ed0;
+        direction.x = lbl_80330ED0;
+        direction.y = lbl_80330ED4;
+        direction.z = lbl_80330ED0;
 
         currentY = ((float*)pppMngSt)[0x94 / sizeof(float)];
         cyl.m_bottom.x = ((float*)pppMngSt)[0x84 / sizeof(float)];
         cyl.m_bottom.z = ((float*)pppMngSt)[0xA4 / sizeof(float)];
         cyl.m_bottom.y = currentY + param_2->m_unk0x4;
 
-        cyl.m_direction2.x = FLOAT_80330ed8;
-        cyl.m_direction2.y = FLOAT_80330ed8;
-        cyl.m_direction2.z = FLOAT_80330ed8;
-        cyl.m_radius2 = FLOAT_80330edc;
-        cyl.m_height2 = FLOAT_80330edc;
-        cyl.m_radius = FLOAT_80330edc;
+        cyl.m_direction2.x = lbl_80330ED8;
+        cyl.m_direction2.y = lbl_80330ED8;
+        cyl.m_direction2.z = lbl_80330ED8;
+        cyl.m_radius2 = lbl_80330EDC;
+        cyl.m_height2 = lbl_80330EDC;
+        cyl.m_radius = lbl_80330EDC;
 
-        cyl.m_top.x = FLOAT_80330ed0;
-        cyl.m_top.y = FLOAT_80330ed4;
-        cyl.m_top.z = FLOAT_80330ed0;
-        cyl.m_height = FLOAT_80330ed0;
+        cyl.m_top.x = lbl_80330ED0;
+        cyl.m_top.y = lbl_80330ED4;
+        cyl.m_top.z = lbl_80330ED0;
+        cyl.m_height = lbl_80330ED0;
 
         if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, (CMapCylinder*)&cyl, &direction, 0xffffffff) != 0) {
             CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &hitPos);

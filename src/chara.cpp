@@ -68,7 +68,12 @@ void CChara::Destroy()
  */
 void CChara::FlipDBuffer()
 {
-	// TODO
+	s32* dbufferIndex = (s32*)((u8*)this + 0x2060);
+	*dbufferIndex = 1 - *dbufferIndex;
+
+	u8* bufferPtr = (u8*)this + (*dbufferIndex << 3);
+	u32 zero = 0;
+	*(u32*)(bufferPtr + 0x2064) = zero;
 }
 
 /*

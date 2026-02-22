@@ -5,8 +5,10 @@
 
 extern "C" {
 void Set__4CMesFPci(void* mes, char* script, int flags);
+void SetPosition__4CMesFff(void* mes, float x, float y);
 void PlaySe__6CSoundFiiii(void* sound, int id, int volume, int pan, int unk);
 void SetFade__9CRingMenuFi(void* ringMenu, int fade);
+int __cntlzw(unsigned int);
 void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void* flatRuntime, int object, int type, int id, int stackCount, void* stack, void* stack2);
 void* __ct__6CColorFUcUcUcUc(void* color, unsigned char r, unsigned char g, unsigned char b, unsigned char a);
@@ -22,6 +24,13 @@ extern unsigned char Sound[];
 extern int DAT_8020f998[4];
 extern float FLOAT_803308d8;
 extern float FLOAT_803308dc;
+extern float FLOAT_803308e0;
+extern float FLOAT_803308e4;
+extern float FLOAT_803308e8;
+extern float FLOAT_803308ec;
+extern float FLOAT_803308f0;
+extern float FLOAT_803308f4;
+extern float FLOAT_803308f8;
 extern float FLOAT_80330908;
 extern float FLOAT_8033090c;
 extern float FLOAT_80330910;
@@ -287,12 +296,86 @@ void CMesMenu::onScriptChanged(char*, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009b5fc
+ * PAL Size: 744b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMesMenu::Open(char*, int, int, int, int, int, int)
+void CMesMenu::Open(char* script, int x, int y, int flags, int unk1, int unk2, int unk3)
 {
-	// TODO
+    *(float*)((char*)this + 0x3D78) = FLOAT_803308d8;
+    *(float*)((char*)this + 0x3D74) = FLOAT_803308d8;
+    *(int*)((char*)this + 0x08) = 1;
+    *(int*)((char*)this + 0x3DA4) = 0;
+    *(unsigned int*)((char*)this + 0x3D8C) = (unsigned int)flags;
+
+    if (*(int*)((char*)this + 0x18) < 4) {
+        SetFade__9CRingMenuFi(*(void**)((char*)MenuPcs + 0x13C + *(int*)((char*)this + 0x18) * 4), 0);
+        *(float*)((char*)this + 0x3D9C) = FLOAT_803308e0;
+        *(float*)((char*)this + 0x3DA0) = FLOAT_803308e4;
+    } else {
+        *(float*)((char*)this + 0x3D6C) = (float)x;
+        *(float*)((char*)this + 0x3D70) = (float)y;
+        *(int*)((char*)this + 0x3D88) = 1;
+        *(float*)((char*)this + 0x3D9C) = FLOAT_803308dc;
+        *(float*)((char*)this + 0x3DA0) = FLOAT_803308dc;
+        *(unsigned int*)((char*)this + 0x3D50) = (unsigned int)(-(flags >> 1 & 1) & 0x1C);
+        *(unsigned int*)((char*)this + 0x3D54) = ((unsigned int)__cntlzw((unsigned int)(flags & 2))) >> 5;
+    }
+
+    *(int*)((char*)this + 0x3D90) = unk1;
+    *(int*)((char*)this + 0x3D94) = unk2;
+    *(int*)((char*)this + 0x3D98) = unk3;
+    Set__4CMesFPci((char*)this + 0x1C, script, flags & 0x20);
+
+    *(float*)((char*)this + 0x3D7C) = FLOAT_803308e8 * *(float*)((char*)this + 0x3D9C) + *(float*)((char*)this + 0x3CC0);
+    *(float*)((char*)this + 0x3D80) = FLOAT_803308e8 * *(float*)((char*)this + 0x3DA0) + *(float*)((char*)this + 0x3CC4);
+
+    if (*(int*)((char*)this + 0x18) < 4) {
+        if ((flags & 0x100) == 0 && *(float*)((char*)this + 0x3D7C) < FLOAT_803308f0) {
+            *(float*)((char*)this + 0x3D7C) = FLOAT_803308f0;
+        }
+    } else if ((flags & 8) == 0) {
+        if ((flags & 0x8000) != 0) {
+            *(float*)((char*)this + 0x3D6C) -= *(float*)((char*)this + 0x3D7C);
+        }
+    } else {
+        *(float*)((char*)this + 0x3D6C) = -(FLOAT_803308ec * *(float*)((char*)this + 0x3D7C) - *(float*)((char*)this + 0x3D6C));
+        *(float*)((char*)this + 0x3D70) = -(FLOAT_803308ec * *(float*)((char*)this + 0x3D80) - *(float*)((char*)this + 0x3D70));
+    }
+
+    float posY;
+    unsigned int index = (unsigned int)*(int*)((char*)this + 0x18);
+    if ((int)index < 4) {
+        if ((index & 2) == 0) {
+            posY = FLOAT_803308f8 + *(float*)((char*)this + 0x3DA0) + *(float*)((char*)this + 0x3D70) +
+                   *(float*)((char*)this + 0x3D78);
+        } else {
+            posY = (*(float*)((char*)this + 0x3DA0) + (*(float*)((char*)this + 0x3D70) - FLOAT_803308f4) +
+                    *(float*)((char*)this + 0x3D78)) -
+                   *(float*)((char*)this + 0x3D80);
+        }
+    } else {
+        posY = *(float*)((char*)this + 0x3DA0) + *(float*)((char*)this + 0x3D70) + *(float*)((char*)this + 0x3D78);
+    }
+
+    float posX;
+    if ((int)index < 4 && (index & 1) != 0) {
+        posX = (*(float*)((char*)this + 0x3D9C) + *(float*)((char*)this + 0x3D6C) + *(float*)((char*)this + 0x3D74)) -
+               *(float*)((char*)this + 0x3D7C);
+    } else {
+        posX = *(float*)((char*)this + 0x3D9C) + *(float*)((char*)this + 0x3D6C) + *(float*)((char*)this + 0x3D74);
+    }
+    SetPosition__4CMesFff((char*)this + 0x1C, posX, posY);
+
+    *(unsigned int*)((char*)this + 0x0C) = ((unsigned int)flags >> 4) & 1;
+    *(int*)((char*)this + 0x10) = 0;
+    *(int*)((char*)this + 0x14) = 8;
+    if ((flags & 0x11) == 0 && ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0)) {
+        PlaySe__6CSoundFiiii(Sound, 5, 0x40, 0x7F, 0);
+    }
 }
 
 /*

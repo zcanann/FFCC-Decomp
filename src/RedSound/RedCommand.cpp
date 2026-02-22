@@ -345,22 +345,64 @@ void SetSeVolume(int seId, int volume, int frameCount, int mode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cae20
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void SetSePan(int, int, int)
+void SetSePan(int seId, int pan, int frameCount)
 {
-	// TODO
+	int* track;
+	int step;
+
+	if (frameCount < 1) {
+		frameCount = 1;
+	}
+
+	track = *(int**)((char*)DAT_8032f3f0 + 0xdbc);
+	step = (frameCount * 0x60) / 0x3c + ((frameCount * 0x60) >> 0x1f);
+	step = step - (step >> 0x1f);
+
+	do {
+		if ((*track != 0) && ((seId < 0) || (track[0x3e] == seId))) {
+			track[0x11] = (((pan << 0xc) | 0x800) - track[0x10]) / step;
+			track[0x12] = step;
+		}
+		track += 0x55;
+	} while (track < (int*)(*(int*)((char*)DAT_8032f3f0 + 0xdbc) + 0x2a80));
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801caec4
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void SetSePitch(int, int, int)
+void SetSePitch(int seId, int pitch, int frameCount)
 {
-	// TODO
+	int* track;
+	int step;
+
+	if (frameCount < 1) {
+		frameCount = 1;
+	}
+
+	track = *(int**)((char*)DAT_8032f3f0 + 0xdbc);
+	step = (frameCount * 0x60) / 0x3c + ((frameCount * 0x60) >> 0x1f);
+	step = step - (step >> 0x1f);
+
+	do {
+		if ((*track != 0) && ((seId < 0) || (track[0x3e] == seId))) {
+			track[0x18] = (((pitch << 0xc) | 0x800) - track[0x17]) / step;
+			track[0x19] = step;
+		}
+		track += 0x55;
+	} while (track < (int*)(*(int*)((char*)DAT_8032f3f0 + 0xdbc) + 0x2a80));
 }
 
 /*

@@ -8,6 +8,7 @@
 
 #include <string.h>
 
+class CGraphic;
 extern "C" unsigned long UnkMaterialSetGetter(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void __dla__FPv(void*);
@@ -19,6 +20,7 @@ extern "C" void __dt__10CTexScrollFv(void*, int);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
 extern "C" void __destroy_arr(void*, void*, unsigned long, unsigned long);
 extern "C" int CheckName__8CTextureFPc(CTexture*, char*);
+extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int&, int&, int&, int&, int);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
     int, int, int, int, int);
@@ -43,6 +45,12 @@ extern CMemory Memory;
 extern CTextureMan TextureMan;
 class CMapMng;
 extern CMapMng MapMng;
+extern CGraphic Graphic;
+extern class CCameraPcs {
+public:
+    Mtx m_cameraMatrix;
+    Mtx44 m_screenMatrix;
+} CameraPcs;
 extern unsigned char MaterialMan[];
 extern float FLOAT_8032faf0;
 extern float FLOAT_8032faf4;
@@ -485,12 +493,43 @@ void CMaterialMan::addtev_full_shadow(long)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80042010
+ * PAL Size: 368b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMaterialMan::SetUnderWaterTex()
 {
-	// TODO
+    int left = 0;
+    int top = 0;
+    int width = 0x280;
+    int height = 0x1C0;
+    int backTexture = GetBackBufferRect__8CGraphicFRiRiRiRii(&Graphic, left, top, width, height, 1);
+    *reinterpret_cast<int*>(Ptr(this, 0xC)) = backTexture;
+
+    if (*reinterpret_cast<int*>(Ptr(this, 0xC)) != 0) {
+        Mtx textureMtx;
+        Mtx cameraMtx;
+        Mtx44 screenMtx;
+
+        PSMTXIdentity(textureMtx);
+        PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+        PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+
+        textureMtx[0][0] = screenMtx[0][0] * (2.0f / static_cast<float>(width));
+        textureMtx[1][1] = screenMtx[1][1] * -(2.0f / static_cast<float>(height));
+        textureMtx[1][0] = screenMtx[1][0];
+        textureMtx[2][0] = screenMtx[2][0];
+        textureMtx[0][1] = screenMtx[0][1];
+        textureMtx[2][1] = screenMtx[2][1];
+        textureMtx[0][2] = 0.0f;
+        textureMtx[1][2] = 0.0f;
+        textureMtx[2][2] = 1.0f;
+
+        PSMTXConcat(textureMtx, cameraMtx, reinterpret_cast<float(*)[4]>(Ptr(this, 0x10)));
+    }
 }
 
 /*

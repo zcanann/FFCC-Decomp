@@ -495,7 +495,7 @@ void CMapHit::GetHitFaceNormal(Vec* out)
  * Address:	TODO
  * Size:	TODO
  */
-void CMapHit::CalcHitSlide(Vec* out, float y)
+int CMapHit::CalcHitSlide(Vec* out, float y)
 {
     if (s_hit_edge_index == -1) {
         if (s_hit_face_min != 0 && y <= s_hit_face_min->m_boundsMin.y) {
@@ -507,13 +507,14 @@ void CMapHit::CalcHitSlide(Vec* out, float y)
                 out->y = 0.0f;
                 out->z = 0.0f;
             }
-            return;
+            return 0;
         }
     }
 
     out->x = 0.0f;
     out->y = 0.0f;
     out->z = 0.0f;
+    return 1;
 }
 
 /*

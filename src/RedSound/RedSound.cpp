@@ -17,7 +17,7 @@ extern CRedDriver CRedDriver_8032f4c0;
 extern CRedMemory DAT_8032f480;
 extern CRedEntry DAT_8032e154;
 extern int DAT_8032f408; // Debug flag
-extern unsigned int DAT_8032f4c4; // Auto ID counter
+extern volatile unsigned int DAT_8032f4c4; // Auto ID counter
 extern int DAT_8032e17c[0x40]; // Standby ID table
 extern void* DAT_8032e170; // Registration memory
 extern void* DAT_8032f4c8; // Internal sound state buffer
@@ -76,7 +76,8 @@ extern "C" CRedSound* dtor_801CCA38(CRedSound* redSound, short param_2)
 unsigned int CRedSound::GetAutoID()
 {
 	do {
-		DAT_8032f4c4 = (DAT_8032f4c4 + 1) & 0x7FFFFFFF;
+		DAT_8032f4c4 = DAT_8032f4c4 + 1;
+		DAT_8032f4c4 = DAT_8032f4c4 & 0x7FFFFFFF;
 	} while (DAT_8032f4c4 == 0);
 
 	return DAT_8032f4c4;

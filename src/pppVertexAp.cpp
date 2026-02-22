@@ -123,7 +123,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
 
         switch (data->mode) {
         case 0:
-            do {
+            while (count-- != 0) {
                 if (state->index >= (u16)entry->maxValue) {
                     state->index = 0;
                 }
@@ -163,10 +163,10 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                         *outPos = worldPos;
                     }
                 }
-            } while (count-- != 0);
+            }
             break;
         case 1:
-            do {
+            while (count-- != 0) {
                 u16 vertexIndex = entry->vertexIndices[(s32)(RandF__5CMathFv(&math) * (f32)entry->maxValue)];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
@@ -201,7 +201,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                         *outPos = worldPos;
                     }
                 }
-            } while (count-- != 0);
+            }
             break;
         }
 

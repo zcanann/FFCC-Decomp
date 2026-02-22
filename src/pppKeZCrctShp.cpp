@@ -23,16 +23,12 @@ void pppKeZCrctShpDraw(_pppPObject *pObject, int param2)
     Vec zeroVec;
     Vec transformedPos;
     pppFMATRIX transformMatrix;
-    pppFMATRIX cameraMatrix;
-    pppFMATRIX managerMatrix;
-    pppFMATRIX worldMatrixA;
-    pppFMATRIX worldMatrixB;
     float scaledPosX;
     float scaledPosY;
     float scaledPosZ;
     u8 mode;
 
-    pppGetRowVector(pObject->m_localMatrix, rowX, rowY, rowZ, rowPos);
+    pppGetRowVector(*(pppFMATRIX*)((char*)pObject + 0x10), rowX, rowY, rowZ, rowPos);
     pppScaleVector(scaledX, rowX, pppMngStPtr->m_scale.x);
     pppScaleVector(scaledY, rowY, pppMngStPtr->m_scale.y);
     pppScaleVector(scaledZ, rowZ, pppMngStPtr->m_scale.z);
@@ -51,13 +47,11 @@ void pppKeZCrctShpDraw(_pppPObject *pObject, int param2)
     transformedPos.z = scaledPosZ;
 
     if (mode == 1) {
-        worldMatrixA = *(pppFMATRIX*)&ppvWorldMatrix;
-
         Vec modePos;
         modePos.x = scaledPosX;
         modePos.y = scaledPosY;
         modePos.z = scaledPosZ;
-        pppApplyMatrix(zeroVec, worldMatrixA, modePos);
+        pppApplyMatrix(zeroVec, *(pppFMATRIX*)&ppvWorldMatrix, modePos);
     } else if (mode == 0) {
         float offsetPosX;
         float offsetPosY;
@@ -68,33 +62,30 @@ void pppKeZCrctShpDraw(_pppPObject *pObject, int param2)
         offsetPosY = scaledPosY + *(float*)(param2 + 0xc);
         offsetPosZ = scaledPosZ + *(float*)(param2 + 0x10);
 
-        worldMatrixB = *(pppFMATRIX*)&ppvWorldMatrix;
         transformedPos.x = offsetPosX;
         transformedPos.y = offsetPosY;
         transformedPos.z = offsetPosZ;
         offsetPos.x = offsetPosX;
         offsetPos.y = offsetPosY;
         offsetPos.z = offsetPosZ;
-        pppApplyMatrix(transformedPos, worldMatrixB, offsetPos);
+        pppApplyMatrix(transformedPos, *(pppFMATRIX*)&ppvWorldMatrix, offsetPos);
     } else if (mode < 3) {
         Vec modePos;
         float cameraPosX;
         float cameraPosY;
         float cameraPosZ;
 
-        managerMatrix = pppMngStPtr->m_matrix;
         modePos.x = scaledPosX;
         modePos.y = scaledPosY;
         modePos.z = scaledPosZ;
-        pppApplyMatrix(zeroVec, managerMatrix, modePos);
+        pppApplyMatrix(zeroVec, pppMngStPtr->m_matrix, modePos);
         cameraPosX = *(float*)(param2 + 8) * pppMngStPtr->m_scale.x + zeroVec.x;
         cameraPosY = *(float*)(param2 + 0xc) * pppMngStPtr->m_scale.y + zeroVec.y;
         cameraPosZ = *(float*)(param2 + 0x10) * pppMngStPtr->m_scale.z + zeroVec.z;
 
-        cameraMatrix = *(pppFMATRIX*)&ppvCameraMatrix0;
         zeroVec.x = cameraPosX;
         zeroVec.y = cameraPosY;
         zeroVec.z = cameraPosZ;
-        pppApplyMatrix(zeroVec, cameraMatrix, zeroVec);
+        pppApplyMatrix(zeroVec, *(pppFMATRIX*)&ppvCameraMatrix0, zeroVec);
     }
 }

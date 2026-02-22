@@ -5,6 +5,7 @@
 #include <string.h>
 
 extern "C" {
+void Create__5CMenuFv(void* menu);
 void Set__4CMesFPci(void* mes, char* script, int flags);
 void SetPosition__4CMesFff(void* mes, float x, float y);
 void Create__5CMenuFv(void* menu);

@@ -106,6 +106,7 @@ extern OSThread DAT_8032de08;
 extern OSThread DAT_8032d460;
 extern ARQRequest DAT_8032dde4;
 extern FILE DAT_8021d1a8;
+extern int DAT_800000f8;
 
 extern void ReverbAreaAlloc(unsigned long);
 extern void ReverbAreaFree(void*);
@@ -613,34 +614,29 @@ void _StreamPause(int* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-void _EntryExecCommand(void (*command)(int*), int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6)
+void _EntryExecCommand(void (*param_1)(int*), int param_2, int param_3, int param_4, int param_5,
+                       int param_6, int param_7, int param_8)
 {
-    unsigned int interrupt;
-    int* entry;
-    int* nextEntry;
-    int* begin;
+    unsigned int interruptLevel;
+    int* writePos;
+    int* nextPos;
 
-    interrupt = OSDisableInterrupts();
-
-    entry = (int*)DAT_8032f3d8;
-    entry[0] = (int)command;
-    entry[1] = arg0;
-    entry[2] = arg1;
-    entry[3] = arg2;
-    entry[4] = arg3;
-    entry[5] = arg4;
-    entry[6] = arg5;
-    entry[7] = arg6;
-
-    begin = (int*)DAT_8032f3d4;
-    nextEntry = entry + 8;
-    if (nextEntry == begin + 0x800) {
-        nextEntry = begin;
+    interruptLevel = OSDisableInterrupts();
+    writePos = (int*)DAT_8032f3d8;
+    writePos[0] = (int)param_1;
+    writePos[1] = param_2;
+    writePos[2] = param_3;
+    writePos[3] = param_4;
+    writePos[4] = param_5;
+    writePos[5] = param_6;
+    writePos[6] = param_7;
+    writePos[7] = param_8;
+    nextPos = writePos + 8;
+    if (nextPos == (int*)DAT_8032f3d4 + 0x800) {
+        nextPos = (int*)DAT_8032f3d4;
     }
-
-    DAT_8032f3d8 = nextEntry;
-
-    OSRestoreInterrupts(interrupt);
+    DAT_8032f3d8 = nextPos;
+    OSRestoreInterrupts(interruptLevel);
 }
 
 /*
@@ -711,22 +707,43 @@ unsigned int GetMyEntryID()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bdcf0
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _MyAlarmHandler(OSAlarm*, OSContext*)
+void _MyAlarmHandler(OSAlarm* param_1, OSContext*)
 {
-	// TODO
+    OSResumeThread((OSThread*)param_1->start);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bdd1c
+ * PAL Size: 160b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void RedSleep(int)
+void RedSleep(int param_1)
 {
-	// TODO
+    unsigned int interruptLevel;
+    OSThread* currentThread;
+    OSAlarm alarm;
+
+    if (param_1 < 0xfa) {
+        param_1 = 0xfa;
+    }
+    interruptLevel = OSDisableInterrupts();
+    currentThread = OSGetCurrentThread();
+    OSCreateAlarm(&alarm);
+    alarm.start = (OSTime)currentThread;
+    OSSetAlarm(&alarm, (param_1 * (DAT_800000f8 / 500000)) >> 3, _MyAlarmHandler);
+    OSSuspendThread(currentThread);
+    OSRestoreInterrupts(interruptLevel);
 }
 
 /*
@@ -1384,26 +1401,25 @@ void CRedDriver::SetMusicPhraseStop(int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::SetSeBlockData(int bank, void* blockData)
+void CRedDriver::SetSeBlockData(int param_1, void* param_2)
 {
-    void* copiedHeader;
-    int headerSize;
+    void* copiedBuffer;
+    int copySize;
 
-    if (blockData == 0) {
-        copiedHeader = 0;
+    if (param_2 == 0) {
+        copiedBuffer = 0;
     } else {
-        headerSize = *(int*)((char*)blockData + 0xc);
-        if (headerSize < 1) {
-            copiedHeader = 0;
+        copySize = *(int*)((char*)param_2 + 0xc);
+        if (copySize < 1) {
+            copiedBuffer = 0;
         } else {
-            copiedHeader = RedNew__Fi(headerSize);
-            if (copiedHeader != 0) {
-                memcpy(copiedHeader, blockData, headerSize);
+            copiedBuffer = RedNew__Fi(copySize);
+            if (copiedBuffer != 0) {
+                memcpy(copiedBuffer, param_2, copySize);
             }
         }
     }
-
-    _EntryExecCommand(_SetSeBlockData, bank, (int)copiedHeader, 0, 0, 0, 0, 0);
+    _EntryExecCommand(_SetSeBlockData, param_1, (int)copiedBuffer, 0, 0, 0, 0, 0);
 }
 
 /*

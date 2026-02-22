@@ -1,5 +1,7 @@
 #include "ffcc/p_camera.h"
 
+#include "ffcc/materialman.h"
+
 #include <dolphin/mtx.h>
 
 extern Mtx ppvCameraMatrix0;
@@ -7,10 +9,12 @@ extern float FLOAT_8032fa30;
 extern float FLOAT_8032fa34;
 extern float FLOAT_8032fa38;
 extern float FLOAT_8032fa5c;
+extern float FLOAT_8032fa58;
 extern float FLOAT_8032fa8c;
 extern float FLOAT_8032fab0;
 extern float FLOAT_8032fab4;
 extern float FLOAT_8032fab8;
+extern CMaterialMan MaterialMan;
 
 extern "C" {
 void pppEditGetViewPos__FP3Vec(Vec*);
@@ -329,22 +333,43 @@ void CCameraPcs::drawShadowEnd()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80036c7c
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCameraPcs::drawShadowChrBegin()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+
+    if (self[0x404] != 0) {
+        *reinterpret_cast<float*>(self + 0x3E0) *= FLOAT_8032fa58;
+        *reinterpret_cast<float*>(self + 0x3F0) *= FLOAT_8032fa58;
+        PSMTXConcat(reinterpret_cast<MtxPtr>(self + 0x3D4),
+                    reinterpret_cast<MtxPtr>(self + 0x214),
+                    reinterpret_cast<MtxPtr>(self + 0x3A4));
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80036c38
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCameraPcs::SetFullScreenShadow(float (*) [4], long)
+void CCameraPcs::SetFullScreenShadow(float (*matrix)[4], long flags)
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+
+    if (self[0x404] != 0) {
+        MaterialMan.SetFullScreenShadow(*reinterpret_cast<CFullScreenShadow*>(self + 0x31C),
+                                        matrix, flags);
+    }
 }
 
 /*

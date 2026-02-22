@@ -4,6 +4,7 @@
 #include "ffcc/sound.h"
 #include "ffcc/stopwatch.h"
 #include "ffcc/system.h"
+#include <PowerPC_EABI_Support/Runtime/MWCPlusLib.h>
 #include <dolphin/gx.h>
 #include "dolphin/os/OSMemory.h"
 #include <string.h>
@@ -13,6 +14,8 @@ extern void* PTR_PTR_s_CMemory_801e8488;
 extern CMemory Memory;
 extern char DAT_801d6648[];
 extern char DAT_801d6a7c[];
+extern char DAT_801d6b7c[];
+extern char DAT_801d6bb0[];
 extern char DAT_801d6c58[];
 extern char DAT_801d6c88[];
 extern char DAT_801d6c98[];
@@ -519,12 +522,107 @@ void CMemory::SetGroup(void* ptr, int group)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001EA28
+ * PAL Size: 600b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-CMemory::CStage* CMemory::CreateStage(unsigned long, char*, int)
+CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode)
 {
-	return (CMemory::CStage*)nullptr;
+    if ((mode != 1) || (OSGetConsoleSimulatedMemSize() == 0x3000000)) {
+        unsigned int alignedSize = (size + 0x3F) & ~0x3FU;
+        unsigned char* modeBase = reinterpret_cast<unsigned char*>(this) + 4 + mode * 0x27D8;
+        CStage* stage = *reinterpret_cast<CStage**>(modeBase + 0x130);
+        unsigned char* list = modeBase;
+
+        if (stage == reinterpret_cast<CStage*>(modeBase + 300)) {
+            Printf__7CSystemFPce(&System, DAT_801d6b7c);
+        } else {
+            do {
+                unsigned char* next = *reinterpret_cast<unsigned char**>(list + 4);
+                if (static_cast<unsigned int>(*reinterpret_cast<int*>(list + 0xC)) + alignedSize <=
+                    *reinterpret_cast<unsigned int*>(next + 8)) {
+                    unsigned char* stageBytes = reinterpret_cast<unsigned char*>(stage);
+
+                    *reinterpret_cast<CStage**>(modeBase + 0x130) =
+                        *reinterpret_cast<CStage**>(stageBytes + 4);
+                    *reinterpret_cast<unsigned char**>(stageBytes) = list;
+                    *reinterpret_cast<unsigned char**>(stageBytes + 4) =
+                        *reinterpret_cast<unsigned char**>(list + 4);
+                    *reinterpret_cast<CStage**>(*reinterpret_cast<unsigned char**>(list + 4)) = stage;
+                    *reinterpret_cast<CStage**>(list + 4) = stage;
+
+                    *reinterpret_cast<int*>(stageBytes + 8) = *reinterpret_cast<int*>(list + 0xC);
+                    *reinterpret_cast<unsigned int*>(stageBytes + 0xC) =
+                        *reinterpret_cast<unsigned int*>(stageBytes + 8) + alignedSize;
+
+                    if (source == (char*)nullptr) {
+                        source = DAT_8032f7d4;
+                    }
+                    strcpy(reinterpret_cast<char*>(stageBytes + 0x10), source);
+                    *reinterpret_cast<int*>(stageBytes + 0x10C) = mode;
+
+                    if (mode != 2) {
+                        unsigned char* fill = reinterpret_cast<unsigned char*>(
+                            *reinterpret_cast<int*>(stageBytes + 8));
+                        while (fill < reinterpret_cast<unsigned char*>(
+                                          *reinterpret_cast<int*>(stageBytes + 0xC))) {
+                            *fill = 0xCD;
+                            fill++;
+                        }
+
+                        *reinterpret_cast<int*>(stageBytes + 0x110) =
+                            *reinterpret_cast<int*>(stageBytes + 8);
+                        *reinterpret_cast<int*>(stageBytes + 0x114) =
+                            *reinterpret_cast<int*>(stageBytes + 0xC) - 0x40;
+
+                        *reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(stageBytes + 0x110) + 2) = 5;
+                        *reinterpret_cast<int*>(*reinterpret_cast<int*>(stageBytes + 0x110) + 4) = 0;
+                        *reinterpret_cast<int*>(*reinterpret_cast<int*>(stageBytes + 0x110) + 8) =
+                            *reinterpret_cast<int*>(stageBytes + 0x110) + 0x40;
+
+                        *reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(stageBytes + 0x110) + 0x40) =
+                            0x4B41;
+                        *reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(stageBytes + 0x110) + 0x7E) =
+                            0x4D49;
+                        *reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(stageBytes + 0x110) + 0x42) = 0;
+                        *reinterpret_cast<int*>(*reinterpret_cast<int*>(stageBytes + 0x110) + 0x50) =
+                            *reinterpret_cast<int*>(stageBytes + 0x114) -
+                            (*reinterpret_cast<int*>(stageBytes + 0x110) + 0x80);
+                        *reinterpret_cast<int*>(*reinterpret_cast<int*>(stageBytes + 0x110) + 0x44) =
+                            *reinterpret_cast<int*>(stageBytes + 0x110);
+                        *reinterpret_cast<int*>(*reinterpret_cast<int*>(stageBytes + 0x110) + 0x48) =
+                            *reinterpret_cast<int*>(stageBytes + 0x114);
+
+                        *reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(stageBytes + 0x114) + 2) = 6;
+                        *reinterpret_cast<int*>(*reinterpret_cast<int*>(stageBytes + 0x114) + 4) =
+                            *reinterpret_cast<int*>(stageBytes + 0x110) + 0x40;
+                        *reinterpret_cast<int*>(*reinterpret_cast<int*>(stageBytes + 0x114) + 8) = 0;
+                        *reinterpret_cast<int*>(stageBytes + 0x124) = 0;
+                    }
+
+                    if (mode == 2) {
+                        void* block = reinterpret_cast<CStage*>(
+                                          *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x778C))
+                                          ->alloc(0x810, s_memory_cpp, 0x228, 0);
+                        *reinterpret_cast<int*>(stageBytes + 0x110) =
+                            reinterpret_cast<int>(__construct_new_array(block, 0, 0, 0x40, 0x20));
+                        *reinterpret_cast<int*>(stageBytes + 0x120) = 0;
+                    }
+
+                    *reinterpret_cast<unsigned int*>(stageBytes + 0x108) = static_cast<unsigned int>(-1);
+                    return stage;
+                }
+                list = next;
+            } while (list != modeBase);
+
+            Printf__7CSystemFPce(&System, DAT_801d6bb0);
+            HeapWalker();
+        }
+    }
+    return (CMemory::CStage*)nullptr;
 }
 
 /*

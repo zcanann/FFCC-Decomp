@@ -55,132 +55,192 @@ void get_rand()
  * --INFO--
  * PAL Address: 0x800dc380
  * PAL Size: 1568b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void BirthParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBreathModel* pBreathModel, 
                    VColor* vColor, PARTICLE_DATA* particleData, PARTICLE_WMAT* particleWmat, 
                    PARTICLE_COLOR* particleColor)
 {
-	// Initialize particle data structure
-	memset(particleData, 0, 0x98);
-	
-	if (particleWmat != NULL) {
-		memset(particleWmat, 0, 0x30);
-	}
-	
-	if (particleColor != NULL) {
-		memset(particleColor, 0, 0x20);
-	}
+    unsigned char* breath = (unsigned char*)pBreathModel;
+    unsigned char* particle = (unsigned char*)particleData;
+    unsigned char flags;
+    float f0;
+    float f1;
+    float f2;
+    Mtx workMtx;
+    Vec jitter;
+    Vec pos;
+    Vec* dir;
 
-	// Generate random values for particle initialization
-	math.RandF();
-	math.RandF();
-	math.RandF();
+    memset(particleData, 0, 0x98);
+    if (particleWmat != NULL) {
+        memset(particleWmat, 0, 0x30);
+    }
+    if (particleColor != NULL) {
+        memset(particleColor, 0, 0x20);
+    }
 
-	// Alpha channel setup
-	if (*(char*)((int)pBreathModel + 0x22) != 0) {
-		*(float*)((int)particleData + 0x68) = *(float*)((char*)vColor + 0x3); // Assume alpha at offset 3
-		*(char*)((int)particleData + 0x39) = *(char*)((int)pBreathModel + 0x22);
-	}
+    math.RandF();
+    math.RandF();
+    math.RandF();
 
-	// Additional particle properties
-	if (*(char*)((int)pBreathModel + 0x23) != 0) {
-		*(char*)((int)particleData + 0x3D) = *(char*)((int)pBreathModel + 0x23);
-	}
+    if (*(char*)(breath + 0x22) != '\0') {
+        *(float*)(particle + 0x68) = (float)(unsigned int)*(unsigned char*)((unsigned char*)vColor + 0x0B);
+        *(unsigned char*)(particle + 0x39) = *(unsigned char*)(breath + 0x22);
+    }
+    if (*(char*)(breath + 0x23) != '\0') {
+        *(unsigned char*)(particle + 0x3D) = *(unsigned char*)(breath + 0x23);
+    }
 
-	// Base timing values
-	*(float*)((int)particleData + 0x68) = *(float*)((int)pBreathModel + 0x90);
-	*(float*)((int)particleData + 0x6C) = *(float*)((int)pBreathModel + 0x94);
+    *(float*)(particle + 0x68) = *(float*)(breath + 0x90);
+    *(float*)(particle + 0x6C) = *(float*)(breath + 0x94);
+    if (*(unsigned char*)(breath + 0xC1) != 0) {
+        *(float*)(particle + 0x60) = *(float*)(breath + 0x9C) * math.RandF();
+        flags = *(unsigned char*)(breath + 0xC1);
+        if ((flags & 1) && (flags & 2)) {
+            if (math.RandF() > 0.5f) {
+                *(float*)(particle + 0x60) *= FLOAT_80330F80;
+            }
+        } else if (flags & 2) {
+            *(float*)(particle + 0x60) *= FLOAT_80330F80;
+        }
+    }
 
-	// Random angle adjustment
-	if (*(char*)((int)pBreathModel + 0xc1) != 0) {
-		math.RandF();
-		// Basic randomization logic - simplified for compilation
-		*(float*)((int)particleData + 0x60) = *(float*)((int)pBreathModel + 0x9c) * 0.5f;
-		
-		unsigned char flags = *(unsigned char*)((int)pBreathModel + 0xc1);
-		if ((flags & 2) != 0) {
-			*(float*)((int)particleData + 0x60) *= -1.0f;
-		}
-	}
+    flags = *(unsigned char*)(breath + 0xC1);
+    if (flags & 4) {
+        *(float*)(particle + 0x68) += *(float*)(particle + 0x60);
+    }
+    if (flags & 8) {
+        *(float*)(particle + 0x6C) += *(float*)(particle + 0x60);
+    }
 
-	// Apply angle adjustments to timing
-	if ((*(unsigned char*)((int)pBreathModel + 0xc1) & 4) != 0) {
-		*(float*)((int)particleData + 0x68) += *(float*)((int)particleData + 0x60);
-	}
-	
-	if ((*(unsigned char*)((int)pBreathModel + 0xc1) & 8) != 0) {
-		*(float*)((int)particleData + 0x6C) += *(float*)((int)particleData + 0x60);
-	}
+    while (*(float*)(particle + 0x68) >= 6.2831855f) {
+        *(float*)(particle + 0x68) -= 6.2831855f;
+    }
+    while (*(float*)(particle + 0x68) < 0.0f) {
+        *(float*)(particle + 0x68) += 6.2831855f;
+    }
 
-	// Angle wrapping (normalize to 0-2π range)
-	while (*(float*)((int)particleData + 0x68) >= 6.28318f) {
-		*(float*)((int)particleData + 0x68) -= 6.28318f;
-	}
-	while (*(float*)((int)particleData + 0x68) < 0.0f) {
-		*(float*)((int)particleData + 0x68) += 6.28318f;
-	}
+    *(float*)(particle + 0x64) = *(float*)(breath + 0x50);
+    *(float*)(particle + 0x68) = *(float*)(breath + 0x54);
+    *(float*)(particle + 0x6C) = *(float*)(breath + 0x58);
+    *(float*)(particle + 0x70) = *(float*)(breath + 0x60);
+    *(float*)(particle + 0x74) = *(float*)(breath + 0x64);
+    *(float*)(particle + 0x78) = *(float*)(breath + 0x68);
 
-	// Set base velocity values
-	*(float*)((int)particleData + 0x64) = *(float*)((int)pBreathModel + 0x50);
-	*(float*)((int)particleData + 0x68) = *(float*)((int)pBreathModel + 0x54);
-	*(float*)((int)particleData + 0x6C) = *(float*)((int)pBreathModel + 0x58);
+    flags = *(unsigned char*)(breath + 0xC0);
+    if (flags != 0) {
+        if ((flags & 0x20) == 0) {
+            *(float*)(particle + 0x7C) = *(float*)(breath + 0x80) * math.RandF();
+            *(float*)(particle + 0x80) = *(float*)(breath + 0x84) * math.RandF();
+            *(float*)(particle + 0x84) = *(float*)(breath + 0x88) * math.RandF();
+            if ((flags & 1) && (flags & 2)) {
+                if (math.RandF() > 0.5f) {
+                    *(float*)(particle + 0x7C) *= FLOAT_80330F80;
+                }
+                if (math.RandF() > 0.5f) {
+                    *(float*)(particle + 0x80) *= FLOAT_80330F80;
+                }
+                if (math.RandF() > 0.5f) {
+                    *(float*)(particle + 0x84) *= FLOAT_80330F80;
+                }
+            } else if (flags & 2) {
+                *(float*)(particle + 0x7C) *= FLOAT_80330F80;
+                *(float*)(particle + 0x80) *= FLOAT_80330F80;
+                *(float*)(particle + 0x84) *= FLOAT_80330F80;
+            }
+        } else {
+            f0 = *(float*)(breath + 0x80) * math.RandF();
+            *(float*)(particle + 0x7C) = f0;
+            *(float*)(particle + 0x80) = f0;
+            *(float*)(particle + 0x84) = f0;
+            if ((flags & 1) && (flags & 2)) {
+                if (math.RandF() > 0.5f) {
+                    *(float*)(particle + 0x7C) *= FLOAT_80330F80;
+                    *(float*)(particle + 0x80) *= FLOAT_80330F80;
+                    *(float*)(particle + 0x84) *= FLOAT_80330F80;
+                }
+            } else if (flags & 2) {
+                *(float*)(particle + 0x7C) *= FLOAT_80330F80;
+                *(float*)(particle + 0x80) *= FLOAT_80330F80;
+                *(float*)(particle + 0x84) *= FLOAT_80330F80;
+            }
+        }
+    }
 
-	// Set acceleration values  
-	*(float*)((int)particleData + 0x70) = *(float*)((int)pBreathModel + 0x60);
-	*(float*)((int)particleData + 0x74) = *(float*)((int)pBreathModel + 0x64);
-	*(float*)((int)particleData + 0x78) = *(float*)((int)pBreathModel + 0x68);
+    if (flags & 4) {
+        *(float*)(particle + 0x64) += *(float*)(particle + 0x7C);
+        *(float*)(particle + 0x68) += *(float*)(particle + 0x80);
+        *(float*)(particle + 0x6C) += *(float*)(particle + 0x84);
+    }
+    if (flags & 8) {
+        *(float*)(particle + 0x70) += *(float*)(particle + 0x7C);
+        *(float*)(particle + 0x74) += *(float*)(particle + 0x80);
+        *(float*)(particle + 0x78) += *(float*)(particle + 0x84);
+    }
 
-	// Random velocity components - simplified for compilation
-	unsigned char velocityFlags = *(unsigned char*)((int)pBreathModel + 0xc0);
-	if (velocityFlags != 0) {
-		math.RandF();
-		math.RandF();
-		math.RandF();
-		
-		// Basic velocity setup
-		*(float*)((int)particleData + 0x7C) = *(float*)((int)pBreathModel + 0x80) * 0.5f;
-		*(float*)((int)particleData + 0x80) = *(float*)((int)pBreathModel + 0x84) * 0.5f;
-		*(float*)((int)particleData + 0x84) = *(float*)((int)pBreathModel + 0x88) * 0.5f;
+    *(float*)(particle + 0x8C) = *(float*)(breath + 0x14);
+    if (*(float*)(breath + 0xA8) != lbl_80330F70) {
+        *(float*)(particle + 0x8C) += (2.0f * *(float*)(breath + 0xA8)) * math.RandF() - *(float*)(breath + 0xA8);
+    }
 
-		if ((velocityFlags & 2) != 0) {
-			*(float*)((int)particleData + 0x7C) *= -1.0f;
-			*(float*)((int)particleData + 0x80) *= -1.0f;
-			*(float*)((int)particleData + 0x84) *= -1.0f;
-		}
-	}
+    if (*(short*)(breath + 0x20) == 0) {
+        *(short*)(particle + 0x30) = -1;
+    } else {
+        *(short*)(particle + 0x30) = *(short*)(breath + 0x20);
+    }
+    *(unsigned char*)(particle + 0x90) = 0;
 
-	// Set particle lifetime 
-	*(float*)((int)particleData + 0x8C) = *(float*)((int)pBreathModel + 0x14);
+    if (particleWmat != NULL) {
+        PSMTXCopy(*(Mtx*)vBreathModel, *(Mtx*)particleWmat);
+    }
+    if (particleColor != NULL) {
+        *(u32*)((unsigned char*)particleColor + 0x10) = *(u32*)(breath + 0x28);
+        *(u32*)((unsigned char*)particleColor + 0x14) = *(u32*)(breath + 0x2C);
+        *(u32*)((unsigned char*)particleColor + 0x18) = *(u32*)(breath + 0x30);
+        *(u32*)((unsigned char*)particleColor + 0x1C) = *(u32*)(breath + 0x34);
+    }
 
-	// Random lifetime variation - simplified
-	if (*(float*)((int)pBreathModel + 0xa8) != 0.0f) {
-		math.RandF();
-		// Apply basic lifetime variation
-		*(float*)((int)particleData + 0x8C) += *(float*)((int)pBreathModel + 0xa8) * 0.1f;
-	}
+    if (particleWmat == NULL) {
+        return;
+    }
 
-	// Set particle texture/type
-	if (*(short*)((int)pBreathModel + 0x20) == 0) {
-		*(short*)((int)particleData + 0x30) = -1;
-	} else {
-		*(short*)((int)particleData + 0x30) = *(short*)((int)pBreathModel + 0x20);
-	}
+    PSMTXCopy(*(Mtx*)particleWmat, workMtx);
+    workMtx[0][3] = lbl_80330F70;
+    workMtx[1][3] = lbl_80330F70;
+    workMtx[2][3] = lbl_80330F70;
 
-	// Initialize state flag
-	*(unsigned char*)((int)particleData + 0x90) = 0;
+    *(float*)(particle + 0x0C) = lbl_80330F70;
+    *(float*)(particle + 0x10) = lbl_80330F70;
+    *(float*)(particle + 0x14) = 1.0f;
+    dir = (Vec*)(particle + 0x0C);
+    PSMTXMultVec(workMtx, dir, dir);
+    PSVECNormalize(dir, dir);
 
-	// Copy world matrix
-	if (particleWmat != NULL) {
-		PSMTXCopy(*(Mtx*)vBreathModel, *(Mtx*)particleWmat);
-	}
+    f0 = *(float*)(breath + 0xB0);
+    f1 = *(float*)(breath + 0xB4);
+    f2 = *(float*)(breath + 0xB8);
+    jitter.x = -(f0 * 0.5f - math.RandF(f0));
+    jitter.y = -(f1 * 0.5f - math.RandF(f1));
+    jitter.z = -(f2 * 0.5f - math.RandF(f2));
 
-	// Copy color data
-	if (particleColor != NULL) {
-		*(unsigned int*)((int)particleColor + 0x10) = *(unsigned int*)((int)pBreathModel + 0x28);
-		*(unsigned int*)((int)particleColor + 0x14) = *(unsigned int*)((int)pBreathModel + 0x2c);
-		*(unsigned int*)((int)particleColor + 0x18) = *(unsigned int*)((int)pBreathModel + 0x30);
-		*(unsigned int*)((int)particleColor + 0x1c) = *(unsigned int*)((int)pBreathModel + 0x34);
-	}
+    pos.x = (*(Mtx*)particleWmat)[0][3];
+    pos.y = (*(Mtx*)particleWmat)[1][3];
+    pos.z = (*(Mtx*)particleWmat)[2][3];
+    PSVECAdd(&jitter, &pos, &pos);
+    (*(Mtx*)particleWmat)[0][3] = pos.x;
+    (*(Mtx*)particleWmat)[1][3] = pos.y;
+    (*(Mtx*)particleWmat)[2][3] = pos.z;
+
+    PSMTXConcat(*(Mtx*)particleWmat, *(Mtx*)((unsigned char*)pppObject + 4), *(Mtx*)particleData);
+    PSMTXConcat(ppvCameraMatrix0, *(Mtx*)particleData, workMtx);
+
+    *(float*)(particle + 0x0C) = lbl_80330F70;
+    *(float*)(particle + 0x10) = lbl_80330F70;
+    *(float*)(particle + 0x14) = 1.0f;
 }
 
 /*

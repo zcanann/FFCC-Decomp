@@ -1,5 +1,7 @@
 #include "ffcc/cflat_runtime.h"
 #include "ffcc/chunkfile.h"
+#include "ffcc/stopwatch.h"
+#include "ffcc/system.h"
 #include <string.h>
 
 extern "C" {
@@ -9,9 +11,26 @@ void __dla__FPv(void*);
 void __ct__Q212CFlatRuntime6CClassFv(void*);
 void* __construct_new_array(void*, void*, void*, unsigned long, unsigned long);
 char s_cflat_runtime_cpp_801d8ef8[];
+char DAT_80330118[];
 void* __vt__12CFlatRuntime[];
 void* __vt__Q212CFlatRuntime7CObject[];
+int __cntlzw(unsigned int);
+void Printf__7CSystemFPce(CSystem*, char*, ...);
+int sprintf(char*, const char*, ...);
+void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+    CFlatRuntime*, CFlatRuntime::CObject*, int, int, int, CFlatRuntime::CStack*, CFlatRuntime::CStack*);
 }
+static void appendString(char* dst, const char* src)
+{
+	while (*dst != '\0') {
+		dst++;
+	}
+	while ((*src) != '\0') {
+		*dst++ = *src++;
+	}
+	*dst = '\0';
+}
+
 
 /*
  * --INFO--
@@ -586,15 +605,15 @@ void CFlatRuntime::CStack::operator= (const CFlatRuntime::CStack&)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CFlatRuntime::request(CFlatRuntime::CObject* object, int systemKind, int systemIndex, int argCount,
-                           CFlatRuntime::CStack* args)
+int CFlatRuntime::request(CFlatRuntime::CObject* object, int systemKind, int systemIndex, int argCount,
+                          CFlatRuntime::CStack* args)
 {
 	u8* const self = reinterpret_cast<u8*>(this);
 	u8* const targetObject = *reinterpret_cast<u8**>(reinterpret_cast<u8*>(object) + 0x18);
 	u8* func = 0;
 
 	if (static_cast<s8>(targetObject[0x38]) < 0) {
-		return;
+		return 1;
 	}
 
 	if ((*reinterpret_cast<s16*>(targetObject + 0x16) < 0)
@@ -619,7 +638,7 @@ void CFlatRuntime::request(CFlatRuntime::CObject* object, int systemKind, int sy
 	}
 
 	if (func == 0) {
-		return;
+		return 0;
 	}
 
 	const int reqFlagIndex = *reinterpret_cast<int*>(func + 0x48);
@@ -633,7 +652,7 @@ void CFlatRuntime::request(CFlatRuntime::CObject* object, int systemKind, int sy
 			}
 		}
 		if (reqFlagIndex <= highestBit) {
-			return;
+			return 0;
 		}
 		*reinterpret_cast<u16*>(targetObject + 0x34) |= static_cast<u16>(1 << reqFlagIndex);
 	}
@@ -698,6 +717,8 @@ void CFlatRuntime::request(CFlatRuntime::CObject* object, int systemKind, int sy
 			clearCount--;
 		}
 	}
+
+	return 1;
 }
 
 /*
@@ -882,12 +903,256 @@ void CFlatRuntime::toCode(CFlatRuntime::CCodeIndex&)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80065d1c
+ * PAL Size: 1760b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime::systemFunc(CFlatRuntime::CObject*, int, int, int&)
+int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int systemIndex, int& result)
 {
-	// TODO
+	u8* const self = reinterpret_cast<u8*>(this);
+	int ret = 1;
+	result = 1;
+
+	if (systemKind == 1) {
+		if (systemIndex == -1) {
+			if (static_cast<int>(*object->m_localBase) <= object->m_waitCounter) {
+				*object->m_sp++ = 0;
+				result = 0;
+			}
+		} else if ((systemIndex < -1) && (-3 < systemIndex)) {
+			if (*reinterpret_cast<u8*>(self + 0x1298) != 0) {
+				const u16* const strOffs = *reinterpret_cast<u16**>(self + 0x34);
+				char* const strBlob = *reinterpret_cast<char**>(self + 0x38);
+				char* format = strBlob + strOffs[*object->m_localBase];
+
+				if (object->m_argCount == 1) {
+					Printf__7CSystemFPce(&System, format);
+					Printf__7CSystemFPce(&System, DAT_80330118);
+				} else {
+					char spec[256];
+					char rendered[256];
+					char line[264];
+					line[0] = '\0';
+
+					for (int i = 0; i < object->m_argCount - 1; i++) {
+						while (true) {
+							int specLen = 0;
+							while ((format[specLen] != '\0') && ((specLen == 0) || (format[specLen] != '%'))) {
+								spec[specLen] = format[specLen];
+								specLen++;
+							}
+							spec[specLen] = '\0';
+							format += specLen;
+
+							if (spec[0] == '%') {
+								break;
+							}
+							appendString(line, spec);
+						}
+
+						const int argIndex = i + 1;
+						char* scan = spec + 1;
+						if (spec[0] == '%') {
+							int fmtIndex = 1;
+							int width = 0;
+							u32 started = static_cast<u32>(__cntlzw(static_cast<u32>(0x30 - spec[1]))) >> 5 & 0xFF;
+							for (; (*scan >= '0') && (*scan <= '9'); scan++) {
+								fmtIndex++;
+								width = width * 10 + (*scan - '0');
+							}
+
+							if (spec[fmtIndex] == 'b') {
+								char* out = rendered;
+								u32 value = object->m_localBase[argIndex];
+								int outLen = 0;
+
+								for (int bit = 0; bit < width; bit++) {
+									const u32 cur = (value >> ((width - bit) - 1U)) & 1U;
+									if ((started == 0) && (cur != 0)) {
+										started = 1;
+									}
+									if (started != 0) {
+										*out++ = static_cast<char>(cur + '0');
+										outLen++;
+									}
+								}
+								rendered[outLen] = '\0';
+								appendString(rendered, spec + fmtIndex + 1);
+							} else {
+								while (*scan != '\0') {
+									switch (*scan) {
+									case 'd':
+									case 'x':
+										sprintf(rendered, spec, object->m_localBase[argIndex]);
+										scan = const_cast<char*>("");
+										break;
+									case 'f': {
+										union {
+											u32 u;
+											float f;
+										} value;
+										value.u = object->m_localBase[argIndex];
+										sprintf(rendered, spec, static_cast<double>(value.f));
+										scan = const_cast<char*>("");
+										break;
+									}
+									case 's':
+										sprintf(rendered, spec, strBlob + strOffs[object->m_localBase[argIndex]]);
+										scan = const_cast<char*>("");
+										break;
+									default:
+										scan++;
+										break;
+									}
+								}
+							}
+						}
+
+						appendString(line, rendered);
+					}
+
+					Printf__7CSystemFPce(&System, line);
+					Printf__7CSystemFPce(&System, DAT_80330118);
+				}
+			}
+
+			*object->m_sp++ = 0;
+			result = 0;
+		} else {
+			CStopWatch watch(reinterpret_cast<char*>(-1));
+			System.DumpMapFile(&watch);
+			watch.Reset();
+			watch.Start();
+			typedef int (*OnClassSystemFuncFn)(CFlatRuntime*, CFlatRuntime::CObject*, int, int, int*);
+			ret = reinterpret_cast<OnClassSystemFuncFn>((*reinterpret_cast<void***>(this))[8])(
+			    this, object, 1, systemIndex, &result);
+			watch.Stop();
+			*reinterpret_cast<float*>(self + ((-systemIndex) * 4) + 0x4C) += watch.Get();
+			*reinterpret_cast<int*>(self + ((-systemIndex) * 4) + 0x44C) += 1;
+		}
+	} else if (systemIndex == -2) {
+		CObject* const engineObject = reinterpret_cast<CObject*>(object->m_engineObject);
+		const u32 scriptGroup = *object->m_localBase;
+
+		engineObject->m_next->m_previous = engineObject->m_previous;
+		engineObject->m_previous->m_next = engineObject->m_next;
+
+		CObject* const root = reinterpret_cast<CObject*>(self + 0x8CC);
+		CObject* begin = root->m_next;
+		CObject* it = begin;
+		do {
+			if (static_cast<int>(scriptGroup) < it->m_0x32) {
+				break;
+			}
+			it = it->m_next;
+		} while (it != begin);
+
+		it = it->m_previous;
+		engineObject->m_next = it;
+		engineObject->m_previous = it->m_previous;
+		it->m_previous->m_next = engineObject;
+		it->m_previous = engineObject;
+		engineObject->m_0x32 = static_cast<s16>(scriptGroup);
+
+		*object->m_sp++ = 0;
+		result = 0;
+	} else {
+		if (systemIndex < -2) {
+			if (systemIndex == -4) {
+				SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+				    this, object, 2, *object->m_localBase, object->m_argCount - 1,
+				    reinterpret_cast<CStack*>(object->m_localBase + 1), 0);
+				*object->m_sp++ = 0;
+				result = 0;
+				return 1;
+			}
+
+			if (-5 < systemIndex) {
+				u8* const engineObject = reinterpret_cast<u8*>(object->m_engineObject);
+				if (engineObject != reinterpret_cast<u8*>(object)) {
+					*reinterpret_cast<void**>(*reinterpret_cast<u8**>(engineObject + 0x20) + 0x24) =
+					    *reinterpret_cast<void**>(engineObject + 0x24);
+					*reinterpret_cast<void**>(*reinterpret_cast<u8**>(engineObject + 0x24) + 0x20) =
+					    *reinterpret_cast<void**>(engineObject + 0x20);
+					*reinterpret_cast<void**>(*reinterpret_cast<u8**>(*reinterpret_cast<u8**>(engineObject + 0x04) + 0x00) + 0x04) =
+					    *reinterpret_cast<void**>(*reinterpret_cast<u8**>(engineObject + 0x04) + 0x04);
+					*reinterpret_cast<void**>(*reinterpret_cast<u8**>(*reinterpret_cast<u8**>(engineObject + 0x04) + 0x04) + 0x00) =
+					    *reinterpret_cast<void**>(*reinterpret_cast<u8**>(engineObject + 0x04) + 0x00);
+
+					*reinterpret_cast<void**>(*reinterpret_cast<u8**>(engineObject + 0x04) + 0x04) =
+					    *reinterpret_cast<void**>(self + 0x98C);
+					*reinterpret_cast<void**>(self + 0x98C) = *reinterpret_cast<void**>(engineObject + 0x04);
+					*reinterpret_cast<u8*>(engineObject + 0x38) &= 0xEF;
+
+					typedef void (*OnDeleteFn)(CFlatRuntime*, CFlatRuntime::CObject*);
+					reinterpret_cast<OnDeleteFn>((*reinterpret_cast<void***>(this))[7])(
+					    this, reinterpret_cast<CFlatRuntime::CObject*>(engineObject));
+				} else {
+					object->m_flags = static_cast<u8>((object->m_flags & 0x7F) | 0x80);
+				}
+
+				*object->m_sp++ = 0;
+				result = 0;
+				return 1;
+			}
+		} else if (systemIndex < 0) {
+			const u32 reqFlags = *reinterpret_cast<u32*>(&object->m_reqFlag0);
+			if (reqFlags != 0) {
+				*object->m_sp++ = 0;
+				result = 0;
+				return 1;
+			}
+
+			const u32 requestIndex = object->m_localBase[0];
+			const u32 noPush = object->m_localBase[1];
+			object->m_waitCounter = 1;
+			object->m_reqFlag0 = 0;
+			object->m_reqFlag1 = 0;
+			object->m_reqFlag2 = 0;
+			object->m_reqFlag3 = 1;
+
+			if (request(object, 2, requestIndex, object->m_argCount - 2,
+			            reinterpret_cast<CStack*>(object->m_localBase + 2)) != 0) {
+				if (object == reinterpret_cast<CObject*>(object->m_engineObject)) {
+					result = 2;
+					return 1;
+				}
+
+				*object->m_sp++ = 0;
+				result = 0;
+				return 1;
+			}
+
+			object->m_reqFlag0 = 0;
+			object->m_reqFlag1 = 0;
+			object->m_reqFlag2 = 0;
+			object->m_reqFlag3 = 0;
+
+			if (noPush != 0) {
+				return 1;
+			}
+
+			*object->m_sp++ = 0;
+			result = 0;
+			return 1;
+		}
+
+		CStopWatch watch(reinterpret_cast<char*>(-1));
+		System.DumpMapFile(&watch);
+		watch.Reset();
+		watch.Start();
+		typedef int (*OnSystemFuncFn)(CFlatRuntime*, CFlatRuntime::CObject*, int, int, int*);
+		ret = reinterpret_cast<OnSystemFuncFn>((*reinterpret_cast<void***>(this))[9])(
+		    this, object, systemKind, systemIndex, &result);
+		watch.Stop();
+		*reinterpret_cast<float*>(self + ((-systemIndex) * 4) + 0x24C) += watch.Get();
+		*reinterpret_cast<int*>(self + ((-systemIndex) * 4) + 0x64C) += 1;
+	}
+
+	return ret;
 }
 
 /*

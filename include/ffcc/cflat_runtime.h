@@ -92,7 +92,7 @@ public:
 
 	void SystemCall(CFlatRuntime::CObject*, int, int, int, CFlatRuntime::CStack*, CFlatRuntime::CStack*);
 
-	void request(CFlatRuntime::CObject*, int, int, int, CFlatRuntime::CStack*);
+	int request(CFlatRuntime::CObject*, int, int, int, CFlatRuntime::CStack*);
 	void callSetup(CFlatRuntime::CObject*, CFlatRuntime::CFunc*, int);
 	void callCleanup(CFlatRuntime::CObject*);
 
@@ -115,7 +115,7 @@ public:
 
 	void toFunc(CFlatRuntime::CCodeIndex&);
 	void toCode(CFlatRuntime::CCodeIndex&);
-	void systemFunc(CFlatRuntime::CObject*, int, int, int&);
+	int systemFunc(CFlatRuntime::CObject*, int, int, int&);
 
 	void ResetPerformance();
 	void PrintPerformance();

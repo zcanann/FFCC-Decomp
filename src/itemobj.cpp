@@ -201,7 +201,7 @@ void CGItemObj::DeleteOld(int, int, CFlatRuntime::CObject*, CFlatRuntime::CObjec
 
 /*
  * --INFO--
- * PAL Address: 0x80125E74
+ * PAL Address: 0x80125e74
  * PAL Size: 56b
  * EN Address: TODO
  * EN Size: TODO

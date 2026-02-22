@@ -73,6 +73,7 @@ extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(in
 extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
+extern "C" void __dt__10CAmemCacheFv(void*, int);
 
 static int calcCacheChecksum(const unsigned char* data, unsigned int size)
 {
@@ -1398,12 +1399,22 @@ void CAmemCacheSet::SetRStage(CMemory::CStage*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001D6A8
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CAmemCacheSet::Destroy()
 {
-	// TODO
+    unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
+    void* cacheArray = reinterpret_cast<void*>(*reinterpret_cast<int*>(bytes + 0x58));
+
+    if (cacheArray != nullptr) {
+        __destroy_new_array(cacheArray, (ConstructorDestructor)__dt__10CAmemCacheFv);
+        *reinterpret_cast<int*>(bytes + 0x58) = 0;
+    }
 }
 
 /*
@@ -1871,12 +1882,31 @@ void CAmemCacheSet::CacheClear()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001C640
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CAmemCacheSet::CalcPrio()
 {
-	// TODO
+    unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
+    int i = 0;
+    int offset = 0;
+
+    while (i < *reinterpret_cast<int*>(bytes + 0x3C)) {
+        int* entry = reinterpret_cast<int*>(*reinterpret_cast<int*>(bytes + 0x58) + offset);
+        unsigned char* entryBytes = reinterpret_cast<unsigned char*>(entry);
+
+        if ((entryBytes[0x0E] != 0) && (*reinterpret_cast<short*>(entryBytes + 0x0C) == 0) && (*entry != 0) &&
+            (entry[4] != 0)) {
+            entry[4]--;
+        }
+
+        offset += 0x1C;
+        i++;
+    }
 }
 
 /*
@@ -1946,12 +1976,25 @@ void CMemory::CStage::heapInfo(unsigned long&, unsigned long&, unsigned long&)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001D934
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CAmemCache::CAmemCache()
 {
-	// TODO
+    unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
+
+    *reinterpret_cast<int*>(bytes + 0x00) = 0;
+    *reinterpret_cast<int*>(bytes + 0x04) = 0;
+    *reinterpret_cast<short*>(bytes + 0x0C) = 0;
+    *reinterpret_cast<int*>(bytes + 0x08) = 0;
+    bytes[0x0E] = 0;
+    *reinterpret_cast<int*>(bytes + 0x10) = 0;
+    bytes[0x1A] = 1;
+    bytes[0x0F] = 0xFF;
 }
 
 /*

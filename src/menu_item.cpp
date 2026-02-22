@@ -75,7 +75,7 @@ struct MenuItemOpenAnim {
     float uvScale;
     int tex;
     int frame;
-    int unk24;
+    int startFrame;
     int duration;
     unsigned int flags;
     float dx;
@@ -364,36 +364,43 @@ void CMenuPcs::ItemInit1()
  */
 bool CMenuPcs::ItemOpen()
 {
-    s16* itemState = *reinterpret_cast<s16**>(reinterpret_cast<u8*>(this) + 0x82C);
-    s16* itemList = *reinterpret_cast<s16**>(reinterpret_cast<u8*>(this) + 0x850);
+    s16* itemState = *(s16**)((u8*)this + 0x82C);
+    s16* itemList = *(s16**)((u8*)this + 0x850);
     int finished = 0;
-    int count = itemList[0];
-    MenuItemOpenAnim* anim = reinterpret_cast<MenuItemOpenAnim*>(reinterpret_cast<u8*>(itemList) + 8);
+    int count = (int)*itemList;
+    MenuItemOpenAnim* anim = (MenuItemOpenAnim*)((u8*)itemList + 8);
 
-    if (*reinterpret_cast<u8*>(itemState + 5) == 0) {
+    if (*(u8*)(itemState + 5) == 0) {
         SingLifeInit(-1);
         ItemInit();
     }
 
-    itemState[0x11]++;
+    itemState[0x11] = itemState[0x11] + 1;
+    int step = (int)itemState[0x11];
 
-    for (int i = 0; i < count; i++, anim++) {
-        if (anim->frame <= itemState[0x11]) {
-            if (itemState[0x11] < anim->frame + anim->duration) {
-                anim->frame++;
-                anim->progress = (float)anim->frame / (float)anim->duration;
-                if ((anim->flags & 2) == 0) {
-                    float t = (float)anim->frame / (float)anim->duration;
-                    anim->dx = (anim->targetX - (float)anim->x) * t;
-                    anim->dy = (anim->targetY - (float)anim->y) * t;
+    if (0 < count) {
+        int i = count;
+        do {
+            float zero = FLOAT_80332e60;
+            if (anim->startFrame <= step) {
+                if (step < anim->startFrame + anim->duration) {
+                    anim->frame = anim->frame + 1;
+                    anim->progress = (FLOAT_80332e64 / (float)anim->duration) * (float)anim->frame;
+                    if ((anim->flags & 2) == 0) {
+                        float t = (float)((DOUBLE_80332e68 / (double)anim->duration) * (double)anim->frame);
+                        anim->dx = (anim->targetX - (float)anim->x) * t;
+                        anim->dy = (anim->targetY - (float)anim->y) * t;
+                    }
+                } else {
+                    finished = finished + 1;
+                    anim->progress = FLOAT_80332e64;
+                    anim->dx = zero;
+                    anim->dy = zero;
                 }
-            } else {
-                finished++;
-                anim->progress = 1.0f;
-                anim->dx = 0.0f;
-                anim->dy = 0.0f;
             }
-        }
+            anim++;
+            i = i - 1;
+        } while (i != 0);
     }
 
     return count == finished;
@@ -458,8 +465,8 @@ bool CMenuPcs::ItemClose()
     itemState[0x11]++;
 
     for (int i = 0; i < count; i++, anim++) {
-        if (anim->frame <= itemState[0x11]) {
-            if (itemState[0x11] < anim->frame + anim->duration) {
+        if (anim->startFrame <= itemState[0x11]) {
+            if (itemState[0x11] < anim->startFrame + anim->duration) {
                 anim->frame++;
                 anim->progress = 1.0f - ((float)anim->frame / (float)anim->duration);
                 if ((anim->flags & 2) == 0) {

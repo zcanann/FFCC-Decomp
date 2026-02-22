@@ -1,9 +1,18 @@
 #include "ffcc/p_menu.h"
+#include "ffcc/p_game.h"
 #include "ffcc/textureman.h"
 
 #include <dolphin/mtx.h>
 
 extern CTextureMan TextureMan;
+extern "C" void destroySingleMenu__8CMenuPcsFv(CMenuPcs*);
+extern "C" void Draw__5CMenuFv(void*);
+extern "C" void DrawIcon__9CRingMenuFv(void*);
+
+static inline u8* MenuPtr(CMenuPcs* self, u32 offset)
+{
+    return reinterpret_cast<u8*>(self) + offset;
+}
 
 /*
  * --INFO--
@@ -423,22 +432,54 @@ void CMenuPcs::calcBattle()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80093ec4
+ * PAL Size: 1864b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::drawBattle()
 {
-	// TODO
+    CMenuPcs* iter;
+
+    iter = this;
+    for (int i = 0; i < 4; i++) {
+        Draw__5CMenuFv(*reinterpret_cast<void**>(MenuPtr(iter, 0x13C)));
+        iter = reinterpret_cast<CMenuPcs*>(MenuPtr(iter, 4));
+    }
+
+    iter = this;
+    for (int i = 0; i < 12; i++) {
+        Draw__5CMenuFv(*reinterpret_cast<void**>(MenuPtr(iter, 0x10C)));
+        iter = reinterpret_cast<CMenuPcs*>(MenuPtr(iter, 4));
+    }
+
+    iter = this;
+    for (int i = 0; i < 4; i++) {
+        DrawIcon__9CRingMenuFv(*reinterpret_cast<void**>(MenuPtr(iter, 0x13C)));
+        iter = reinterpret_cast<CMenuPcs*>(MenuPtr(iter, 4));
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80093e78
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::ChgPlayModeFromScript(bool)
+void CMenuPcs::ChgPlayModeFromScript(bool mode)
 {
-	// TODO
+    int battleState = *reinterpret_cast<int*>(MenuPtr(this, 0x740));
+
+    if (battleState != 2 && battleState != 1) {
+        destroySingleMenu__8CMenuPcsFv(this);
+    }
+
+    Game.game.m_gameWork.m_menuStageMode = mode;
 }
 
 /*

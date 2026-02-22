@@ -1,4 +1,21 @@
 #include "ffcc/singmenu.h"
+#include <dolphin/gx.h>
+
+typedef signed short s16;
+typedef unsigned char u8;
+
+extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
+extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
+extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float, float, float, float, float, float, float, float, float);
+
+extern float FLOAT_8033292c;
+extern float FLOAT_80332934;
+extern float FLOAT_8033294c;
+extern float FLOAT_80332970;
+extern double DOUBLE_80332968;
+extern double DOUBLE_80332978;
+extern double DOUBLE_80332980;
+extern double DOUBLE_80332988;
 
 /*
  * --INFO--
@@ -262,12 +279,124 @@ void CMenuPcs::DrawEquipMark(int, int, float)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80146adc
+ * PAL Size: 1500b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::DrawSingWin(short)
+void CMenuPcs::DrawSingWin(short mode)
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+    s16* win = *reinterpret_cast<s16**>(self + 0x848);
+
+    if (mode >= 0 && win[5] != mode) {
+        win[5] = mode;
+    }
+
+    if (win[5] == 3) {
+        return;
+    }
+
+    float left = static_cast<float>(win[0]) + static_cast<float>(win[2]) * 0.5f;
+    float top = static_cast<float>(win[1]) + static_cast<float>(win[3]) * 0.5f;
+    float width;
+    float height;
+
+    if (win[5] == 1) {
+        left = static_cast<float>(win[0]);
+        top = static_cast<float>(win[1]);
+        width = static_cast<float>(win[2]);
+        height = static_cast<float>(win[3]);
+    } else {
+        float leftScale = (((left - static_cast<float>(win[0])) - FLOAT_8033292c) / FLOAT_80332970) * static_cast<float>(win[4]);
+        float topScale = (((top - static_cast<float>(win[1])) - FLOAT_8033292c) / FLOAT_80332970) * static_cast<float>(win[4]);
+        left = (left - FLOAT_8033292c) - leftScale;
+        width = static_cast<float>(DOUBLE_80332978 * static_cast<double>(FLOAT_8033292c + leftScale));
+        height = static_cast<float>(DOUBLE_80332978 * static_cast<double>(FLOAT_8033292c + topScale));
+        top = (top - FLOAT_8033292c) - topScale;
+    }
+
+    int leftPx = static_cast<int>(static_cast<double>(left) - DOUBLE_80332968);
+    int topPx = static_cast<int>(static_cast<double>(top) - DOUBLE_80332968);
+    int widthPx = static_cast<int>(static_cast<double>(width) - DOUBLE_80332980);
+    int heightPx = static_cast<int>(static_cast<double>(height) - DOUBLE_80332980);
+
+    float x0 = static_cast<float>(leftPx);
+    float y0 = static_cast<float>(topPx);
+    float w = static_cast<float>(widthPx);
+    float h = static_cast<float>(heightPx);
+    float x1 = x0 + w - FLOAT_8033292c;
+    float y1 = y0 + h - FLOAT_8033292c;
+
+    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+    _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
+    GXSetChanMatColor(GX_COLOR0A0, white);
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x3F);
+    for (unsigned long i = 0; i < 4; i++) {
+        unsigned long uvFlag = 0;
+        float x = x0;
+        float y = y0;
+        if ((i & 1) != 0) {
+            uvFlag = 8;
+            x = x1;
+        }
+        if ((i & 2) != 0) {
+            uvFlag |= 4;
+            y = y1;
+        }
+        DrawRect__8CMenuPcsFUlfffffffff(this, uvFlag, x, y, FLOAT_8033292c, FLOAT_8033292c, FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
+    }
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x41);
+    float innerW = w - static_cast<float>(DOUBLE_80332988);
+    float innerX = FLOAT_8033292c + x0;
+    for (int i = 0; i < 2; i++) {
+        unsigned long uvFlag = 0;
+        float y = y0;
+        if (i != 0) {
+            uvFlag = 4;
+            y = y1;
+        }
+        DrawRect__8CMenuPcsFUlfffffffff(this, uvFlag, innerX, y, innerW, FLOAT_8033292c, FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
+    }
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x40);
+    float innerH = h - static_cast<float>(DOUBLE_80332988);
+    float innerY = FLOAT_8033292c + y0;
+    for (int i = 0; i < 2; i++) {
+        unsigned long uvFlag = 0;
+        float x = x0;
+        if (i != 0) {
+            uvFlag = 8;
+            x = x1;
+        }
+        DrawRect__8CMenuPcsFUlfffffffff(this, uvFlag, x, innerY, FLOAT_8033292c, innerH, FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
+    }
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x42);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 0, innerX, innerY, innerW, innerH, FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
+
+    int winStatePtr = *reinterpret_cast<int*>(self + 0x848);
+    s16 state = *reinterpret_cast<s16*>(winStatePtr + 10);
+    if (state == 0) {
+        *reinterpret_cast<s16*>(winStatePtr + 8) = *reinterpret_cast<s16*>(winStatePtr + 8) + 1;
+        if (*reinterpret_cast<s16*>(winStatePtr + 8) > 5) {
+            *reinterpret_cast<s16*>(winStatePtr + 8) = 6;
+            *reinterpret_cast<s16*>(winStatePtr + 10) = 1;
+        }
+    } else if (state == 1) {
+        if (*reinterpret_cast<s16*>(winStatePtr + 8) != 6) {
+            *reinterpret_cast<s16*>(winStatePtr + 8) = 6;
+        }
+    } else if (state == 2) {
+        *reinterpret_cast<s16*>(winStatePtr + 8) = *reinterpret_cast<s16*>(winStatePtr + 8) - 1;
+        if (*reinterpret_cast<s16*>(winStatePtr + 8) < 1) {
+            *reinterpret_cast<s16*>(winStatePtr + 8) = 0;
+            *reinterpret_cast<s16*>(winStatePtr + 10) = 3;
+        }
+    }
 }
 
 /*

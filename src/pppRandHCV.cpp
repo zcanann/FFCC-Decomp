@@ -53,6 +53,7 @@ void pppRandHCV(void* p1, void* p2, void* p3) {
     u8* base = (u8*)p1;
     RandHCVParams* params = (RandHCVParams*)p2;
     RandHCVCtx* ctx = (RandHCVCtx*)p3;
+    int outputOffset;
     float* randomValue;
 
     if (lbl_8032ED70 != 0) {
@@ -67,13 +68,15 @@ void pppRandHCV(void* p1, void* p2, void* p3) {
             value *= lbl_8032FF98;
         }
 
-        randomValue = (float*)(base + *ctx->outputOffset + 0x80);
+        outputOffset = *ctx->outputOffset;
+        randomValue = (float*)(base + outputOffset + 0x80);
         *randomValue = value;
     } else if (params->index != *(int*)(base + 0xC)) {
         return;
     }
 
-    randomValue = (float*)(base + *ctx->outputOffset + 0x80);
+    outputOffset = *ctx->outputOffset;
+    randomValue = (float*)(base + outputOffset + 0x80);
 
     s16* target;
     if (params->colorOffset == -1) {
@@ -85,27 +88,27 @@ void pppRandHCV(void* p1, void* p2, void* p3) {
     float scale = *randomValue;
 
     {
+        s16 delta = params->delta[0];
         s16 current = target[0];
-        s16 base = params->delta[0];
-        target[0] = (s16)(current + (int)((float)base * scale - (float)current));
+        target[0] = (s16)(current + (int)((float)delta * scale - (float)delta));
     }
 
     {
+        s16 delta = params->delta[1];
         s16 current = target[1];
-        s16 base = params->delta[1];
-        target[1] = (s16)(current + (int)((float)base * scale - (float)current));
+        target[1] = (s16)(current + (int)((float)delta * scale - (float)delta));
     }
 
     {
+        s16 delta = params->delta[2];
         s16 current = target[2];
-        s16 base = params->delta[2];
-        target[2] = (s16)(current + (int)((float)base * scale - (float)current));
+        target[2] = (s16)(current + (int)((float)delta * scale - (float)delta));
     }
 
     {
+        s16 delta = params->delta[3];
         s16 current = target[3];
-        s16 base = params->delta[3];
-        target[3] = (s16)(current + (int)((float)base * scale - (float)current));
+        target[3] = (s16)(current + (int)((float)delta * scale - (float)delta));
     }
 }
 

@@ -39,7 +39,7 @@ unsigned int GetMyEntryID();
 void _MyAlarmHandler(OSAlarm*, OSContext*);
 void RedSleep(int);
 int _MainThread(void*);
-void _WaveSettingThread(void*);
+int _WaveSettingThread(void*);
 void _DMACheckProcess();
 void _DmaCallback(unsigned long);
 int RedDmaEntry(int, int, int, int, int, void (*)(void*), void*);
@@ -80,7 +80,7 @@ public:
 	int SePlayState(int);
 	void SeStop(int);
 	void SeStopMG(int, int, int, int);
-	void SePlay(int, int, int, int, int, int);
+	int SePlay(int, int, int, int, int, int);
 	void SeMasterVolume(int);
 	void SeFadeOut(int, int);
 	void SeVolume(int, int, int);

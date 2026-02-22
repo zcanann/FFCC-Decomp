@@ -166,7 +166,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
     drawColor.b = drawColor.r;
     drawColor.a = 0xFF;
 
-    for (slice = 0; slice < 4; slice++) {
+    for (slice = 0; slice < 2; slice++) {
         yOffset = (int)((float)slice * FLOAT_8033192c);
 
         Graphic.GetBackBufferRect2(DAT_80238030, &backI4Tex, 0, yOffset, texWidth, texHeight, 0, GX_LINEAR, GX_TF_I4, 0);
@@ -247,6 +247,12 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
             Graphic.GetBackBufferRect2(DAT_80238030, &backRgba8Tex2, 0, yOffset, texWidth, texHeight, i4TexSize + rgba8TexSize,
                                        GX_LINEAR, GX_TF_RGBA8, 0);
         }
+
+        Graphic.SetViewport();
+        DAT_8032ec70.RenderTextureQuad(FLOAT_8033193c, (float)yOffset, FLOAT_80331928, FLOAT_8033192c, &backI4Tex, 0, 0,
+                                       0, (GXBlendFactor)4, (GXBlendFactor)5);
+        DAT_8032ec70.BeginQuadEnv();
+        DAT_8032ec70.SetVtxFmt_POS_CLR_TEX0_TEX1();
     }
 
     Graphic.SetViewport();

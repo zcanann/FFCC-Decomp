@@ -4025,12 +4025,15 @@ int JoyBus::SendMapObjDrawFlg(ThreadParam* threadParam)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a9df0
+ * PAL Size: 700b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int JoyBus::SendFavorite(ThreadParam* threadParam)
 {
-    const int port = threadParam->m_portIndex;
     int result = 0;
 
     if (threadParam->m_subState != 0 && threadParam->m_subState != 1)
@@ -4040,6 +4043,7 @@ int JoyBus::SendFavorite(ThreadParam* threadParam)
 
     if (threadParam->m_subState == 1)
     {
+        unsigned int port = threadParam->m_portIndex;
         unsigned int* wordPtr = (unsigned int*)(m_joyDataPacketBuffer[port] + 2 + m_txWordIndex[port] * 4);
         unsigned int word = *wordPtr;
 
@@ -4069,6 +4073,7 @@ int JoyBus::SendFavorite(ThreadParam* threadParam)
     else
     {
         unsigned char payload[1 + 75];
+        unsigned int port = threadParam->m_portIndex;
 
         memset(payload, 0, 0x40);
         memset(m_joyDataPacketBuffer[port] + 2, 0, 0x400);
@@ -4079,21 +4084,9 @@ int JoyBus::SendFavorite(ThreadParam* threadParam)
 
         int dataLen = GbaQue.GetFavorite(port, (char*)favBuf);
 
-        if (dataLen < 0)
-        {
-            dataLen = 0;
-        }
-
-        if (dataLen > 75)
-        {
-            dataLen = 75;
-        }
-
-        const int byteLen = dataLen + 1;
-
         int wordCount = MakeJoyData(
             (char*)payload,
-            byteLen,
+            dataLen + 1,
             (unsigned int*)(m_joyDataPacketBuffer[port] + 2)
         );
 
@@ -4136,6 +4129,7 @@ int JoyBus::SendFavorite(ThreadParam* threadParam)
 
     if (result == 0)
     {
+        unsigned int port = threadParam->m_portIndex;
         m_txWordIndex[port]++;
 
         if (m_txWordCount[port] <= m_txWordIndex[port])

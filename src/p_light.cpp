@@ -50,9 +50,11 @@ extern float FLOAT_8032fc78;
 extern float FLOAT_8032fc7c;
 extern float FLOAT_8032fc80;
 extern float FLOAT_8032fc84;
+extern float FLOAT_8032fc90;
 extern float FLOAT_8032fc88;
 extern float FLOAT_8032fc8c;
 extern float FLOAT_8032fc94;
+extern float FLOAT_8032ed10;
 extern double DOUBLE_8032fc48;
 extern double DOUBLE_8032fc50;
 extern double DOUBLE_8032fc58;
@@ -355,7 +357,8 @@ void CLightPcs::DestroyBumpLightAll(CLightPcs::TARGET target)
  */
 void CLightPcs::calc()
 {
-	// TODO
+    *(u32*)((char*)this + 0xb8) = 0;
+    FLOAT_8032ed10 = FLOAT_8032ed10 + FLOAT_8032fc90;
 }
 
 /*

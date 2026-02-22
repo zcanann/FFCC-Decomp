@@ -1,16 +1,36 @@
 #include "ffcc/mesmenu.h"
 #include "ffcc/p_game.h"
 
+#include <math.h>
+
 extern "C" {
 void Set__4CMesFPci(void* mes, char* script, int flags);
 void PlaySe__6CSoundFiiii(void* sound, int id, int volume, int pan, int unk);
 void SetFade__9CRingMenuFi(void* ringMenu, int fade);
 void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void* flatRuntime, int object, int type, int id, int stackCount, void* stack, void* stack2);
+void* __ct__6CColorFUcUcUcUc(void* color, unsigned char r, unsigned char g, unsigned char b, unsigned char a);
+void SetColor__8CMenuPcsFR6CColor(void* menuPcs, void* color);
+void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(void* menuPcs, int tex);
+void DrawRect__8CMenuPcsFUlfffffffff(
+    void* menuPcs, unsigned long flags, float x, float y, float w, float h, float u, float v, float uvScaleX, float uvScaleY,
+    float rot);
 
 extern unsigned char CFlat[];
 extern unsigned char MenuPcs[];
 extern unsigned char Sound[];
+extern int DAT_8020f998[4];
+extern float FLOAT_803308d8;
+extern float FLOAT_803308dc;
+extern float FLOAT_80330908;
+extern float FLOAT_8033090c;
+extern float FLOAT_80330910;
+extern float FLOAT_80330914;
+extern float FLOAT_80330918;
+extern float FLOAT_8033091c;
+extern float FLOAT_80330920;
+extern float FLOAT_80330924;
+extern float FLOAT_80330928;
 }
 
 /*
@@ -162,12 +182,74 @@ void CMesMenu::CalcHeart()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009b958
+ * PAL Size: 916b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMesMenu::DrawHeart(float, float, float, float)
+void CMesMenu::DrawHeart(float x, float y, float z, float alpha)
 {
-	// TODO
+    (void)z;
+
+    unsigned int scriptFood = Game.game.m_scriptFoodBase[*(int*)((char*)this + 0x18)];
+    if (scriptFood == 0 || alpha <= FLOAT_803308d8) {
+        return;
+    }
+
+    unsigned char colorStorage[8];
+    int colorAlpha = (int)(FLOAT_80330908 * alpha);
+    __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (unsigned char)colorAlpha);
+    SetColor__8CMenuPcsFR6CColor(MenuPcs, colorStorage);
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcs, 0x17);
+
+    float baseX = x + (float)((*(unsigned int*)((char*)this + 0x18) & 1) != 0 ? 0x30 : 0x4C);
+    float baseY = y + FLOAT_8033090c;
+    int valueOffset = 0;
+    int timerOffset = 0;
+
+    int heartCount = (int)((unsigned short)*(unsigned short*)(scriptFood + 0x1A) >> 1);
+    for (int i = 0; i < heartCount; i++) {
+        unsigned int addTimer = *(unsigned int*)((char*)this + 0x3DB0 + timerOffset);
+        int heartValue = *(int*)((char*)this + 0x3DA8) - valueOffset;
+
+        float pulse = (FLOAT_8033091c *
+                       (float)sin(FLOAT_80330910 * -(((float)addTimer * FLOAT_80330918) - FLOAT_80330914)) +
+                       FLOAT_80330914) *
+                      FLOAT_80330920;
+
+        unsigned int subTimer = *(unsigned int*)((char*)this + 0x3DD0 + timerOffset);
+        int shakeX = 0;
+        int shakeY = 0;
+        if (subTimer != 0) {
+            shakeX = ((int)subTimer >> 2) * DAT_8020f998[(subTimer + 1) & 3];
+            shakeY = ((int)subTimer >> 2) * DAT_8020f998[subTimer & 3];
+        }
+
+        float drawX = baseX + (float)shakeX;
+        float drawY = baseY + (float)shakeY;
+
+        DrawRect__8CMenuPcsFUlfffffffff(
+            MenuPcs, 3, drawX, drawY, FLOAT_803308dc, FLOAT_803308dc, FLOAT_803308d8, FLOAT_803308d8, pulse, pulse,
+            FLOAT_803308d8);
+
+        if (heartValue > 0) {
+            int fillAmount = heartValue;
+            if (fillAmount > 0x0B) {
+                fillAmount = 0x0B;
+            }
+
+            float u = *(unsigned short*)(scriptFood + 0x42) != 0 ? 24.0f : 0.0f;
+            float v = (float)((0x0C - fillAmount) * 0x18);
+            DrawRect__8CMenuPcsFUlfffffffff(
+                MenuPcs, 3, drawX, drawY, FLOAT_803308dc, FLOAT_803308dc, u, v, pulse, pulse, FLOAT_803308d8);
+        }
+
+        baseX += ((*(unsigned int*)((char*)this + 0x18) & 1) != 0) ? FLOAT_80330924 : FLOAT_80330928;
+        valueOffset += 0x0C;
+        timerOffset += 4;
+    }
 }
 
 /*

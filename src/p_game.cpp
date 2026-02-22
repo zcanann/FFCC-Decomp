@@ -232,7 +232,8 @@ void CGamePcs::draw2()
  */
 void CGamePcs::onScriptChanging(char* script)
 {
-	game.CGame::ScriptChanging(script);
+    CGame& game = Game.game;
+    game.CGame::ScriptChanging(script);
 }
 
 /*
@@ -246,7 +247,8 @@ void CGamePcs::onScriptChanging(char* script)
  */
 void CGamePcs::onScriptChanged(char* script, int param)
 {
-	game.CGame::ScriptChanged(script, param);
+    CGame& game = Game.game;
+    game.CGame::ScriptChanged(script, param);
 }
 
 /*
@@ -260,7 +262,8 @@ void CGamePcs::onScriptChanged(char* script, int param)
  */
 void CGamePcs::onMapChanging(int a, int b)
 {
-	game.CGame::MapChanging(a, b);
+    CGame& game = Game.game;
+    game.CGame::MapChanging(a, b);
 }
 
 /*
@@ -274,5 +277,6 @@ void CGamePcs::onMapChanging(int a, int b)
  */
 void CGamePcs::onMapChanged(int a, int b, int c)
 {
-	game.CGame::MapChanged(a, b, c);
+    CGame& game = Game.game;
+    game.CGame::MapChanged(a, b, c);
 }

@@ -26,7 +26,7 @@ public:
         int heapWalker(int, void*, unsigned long);
         void drawHeapBar(int);
         void drawHeapTitle(int);
-        void GetHeapUnuse();
+        int GetHeapUnuse();
         void heapInfo(unsigned long&, unsigned long&, unsigned long&);
         void GetTail();
         void GetTop();

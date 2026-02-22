@@ -6,6 +6,7 @@
 #include "ffcc/p_camera.h"
 #include "ffcc/p_game.h"
 #include "ffcc/p_light.h"
+#include "ffcc/mapocttree.h"
 
 #include <dolphin/mtx.h>
 extern void* __vt__8CManager;
@@ -46,6 +47,7 @@ extern unsigned int lbl_8032ECD0;
 extern unsigned int lbl_8032ECC0;
 extern unsigned int lbl_8032ECC4;
 extern float DrawRangeDefault;
+extern float lbl_8032FA0C;
 extern float lbl_8032FA10;
 extern "C" char lbl_801E8EEC[];
 extern "C" const char lbl_801D7844[];
@@ -219,8 +221,19 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
         if ((*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x17C) != 0) &&
             (strcmp(lbl_801E8EEC, mapPath) != 0)) {
             strcpy(lbl_801E8EEC, mapPath);
-            MapMng.GetDebugPlaySta(0, &unusedVec);
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0) += lbl_8032FA10;
+            if (MapMng.GetDebugPlaySta(0, &unusedVec) == 0) {
+                COctNode* rootNode =
+                    *reinterpret_cast<COctNode**>(reinterpret_cast<char*>(&MapMng) + 0x18);
+                if (rootNode != 0) {
+                    float* bounds = reinterpret_cast<float*>(rootNode);
+                    unusedVec.x = (bounds[0] + bounds[3]) * lbl_8032FA0C;
+                    unusedVec.y = (bounds[1] + bounds[4]) * lbl_8032FA0C;
+                    unusedVec.z = (bounds[2] + bounds[5]) * lbl_8032FA0C;
+                }
+            }
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4) = unusedVec.y + lbl_8032FA10;
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0) = unusedVec.x;
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8) = unusedVec.z;
         }
     }
 
@@ -363,7 +376,16 @@ void CMapPcs::calc()
         if ((*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x17C) != 0) &&
             (strcmp(lbl_801E8EEC, reinterpret_cast<char*>(this) + 0x74) != 0)) {
             strcpy(lbl_801E8EEC, reinterpret_cast<char*>(this) + 0x74);
-            MapMng.GetDebugPlaySta(0, &cameraPos);
+            if (MapMng.GetDebugPlaySta(0, &cameraPos) == 0) {
+                COctNode* rootNode =
+                    *reinterpret_cast<COctNode**>(reinterpret_cast<char*>(&MapMng) + 0x18);
+                if (rootNode != 0) {
+                    float* bounds = reinterpret_cast<float*>(rootNode);
+                    cameraPos.x = (bounds[0] + bounds[3]) * lbl_8032FA0C;
+                    cameraPos.y = (bounds[1] + bounds[4]) * lbl_8032FA0C;
+                    cameraPos.z = (bounds[2] + bounds[5]) * lbl_8032FA0C;
+                }
+            }
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0) = cameraPos.x;
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4) = cameraPos.y + lbl_8032FA10;
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8) = cameraPos.z;

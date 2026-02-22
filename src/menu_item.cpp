@@ -366,28 +366,35 @@ bool CMenuPcs::ItemOpen()
 {
     s16* itemState = *(s16**)((u8*)this + 0x82C);
     s16* itemList = *(s16**)((u8*)this + 0x850);
-    int finished = 0;
-    int count = (int)*itemList;
-    MenuItemOpenAnim* anim = (MenuItemOpenAnim*)((u8*)itemList + 8);
+    int finished;
+    int count;
+    int step;
+    int remaining;
+    MenuItemOpenAnim* anim;
 
     if (*(u8*)(itemState + 5) == 0) {
         SingLifeInit(-1);
         ItemInit();
     }
 
+    finished = 0;
     itemState[0x11] = itemState[0x11] + 1;
-    int step = (int)itemState[0x11];
+    count = (int)*itemList;
+    anim = (MenuItemOpenAnim*)((u8*)itemList + 8);
+    step = (int)itemState[0x11];
+    remaining = count;
 
     if (0 < count) {
-        int i = count;
         do {
+            double dVar3 = DOUBLE_80332ea0;
             float zero = FLOAT_80332e60;
             if (anim->startFrame <= step) {
                 if (step < anim->startFrame + anim->duration) {
+                    double dVar2 = DOUBLE_80332e68;
                     anim->frame = anim->frame + 1;
-                    anim->progress = (FLOAT_80332e64 / (float)anim->duration) * (float)anim->frame;
+                    anim->progress = (float)((DOUBLE_80332e68 / (double)anim->duration) * (double)anim->frame);
                     if ((anim->flags & 2) == 0) {
-                        float t = (float)((DOUBLE_80332e68 / (double)anim->duration) * (double)anim->frame);
+                        float t = (float)((dVar2 / (double)anim->duration) * (double)anim->frame);
                         anim->dx = (anim->targetX - (float)anim->x) * t;
                         anim->dy = (anim->targetY - (float)anim->y) * t;
                     }
@@ -398,9 +405,9 @@ bool CMenuPcs::ItemOpen()
                     anim->dy = zero;
                 }
             }
-            anim++;
-            i = i - 1;
-        } while (i != 0);
+            anim = anim + 1;
+            remaining = remaining - 1;
+        } while (remaining != 0);
     }
 
     return count == finished;
@@ -458,29 +465,44 @@ bool CMenuPcs::ItemClose()
 {
     s16* itemState = *(s16**)((u8*)this + 0x82C);
     s16* itemList = *(s16**)((u8*)this + 0x850);
-    int finished = 0;
-    int count = itemList[0];
-    MenuItemOpenAnim* anim = (MenuItemOpenAnim*)((u8*)itemList + 8);
+    int count;
+    int finished;
+    int step;
+    int remaining;
+    MenuItemOpenAnim* anim;
 
-    itemState[0x11]++;
+    finished = 0;
+    itemState[0x11] = itemState[0x11] + 1;
+    count = (int)*itemList;
+    anim = (MenuItemOpenAnim*)((u8*)itemList + 8);
+    step = (int)itemState[0x11];
+    remaining = count;
 
-    for (int i = 0; i < count; i++, anim++) {
-        if (anim->startFrame <= itemState[0x11]) {
-            if (itemState[0x11] < anim->startFrame + anim->duration) {
-                anim->frame++;
-                anim->progress = 1.0f - ((float)anim->frame / (float)anim->duration);
-                if ((anim->flags & 2) == 0) {
-                    float t = 1.0f - ((float)anim->frame / (float)anim->duration);
-                    anim->dx = (anim->targetX - (float)anim->x) * t;
-                    anim->dy = (anim->targetY - (float)anim->y) * t;
+    if (0 < count) {
+        do {
+            double dVar3 = DOUBLE_80332ea0;
+            float zero = FLOAT_80332e60;
+            if (anim->startFrame <= step) {
+                if (step < anim->startFrame + anim->duration) {
+                    double dVar2 = DOUBLE_80332e68;
+                    anim->frame = anim->frame + 1;
+                    anim->progress =
+                        (float)-((DOUBLE_80332e68 / (double)anim->duration) * (double)anim->frame - DOUBLE_80332e68);
+                    if ((anim->flags & 2) == 0) {
+                        float t = (float)-((dVar2 / (double)anim->duration) * (double)anim->frame - dVar2);
+                        anim->dx = (anim->targetX - (float)anim->x) * t;
+                        anim->dy = (anim->targetY - (float)anim->y) * t;
+                    }
+                } else {
+                    finished = finished + 1;
+                    anim->progress = FLOAT_80332e60;
+                    anim->dx = zero;
+                    anim->dy = zero;
                 }
-            } else {
-                finished++;
-                anim->progress = 0.0f;
-                anim->dx = 0.0f;
-                anim->dy = 0.0f;
             }
-        }
+            anim = anim + 1;
+            remaining = remaining - 1;
+        } while (remaining != 0);
     }
 
     return count == finished;

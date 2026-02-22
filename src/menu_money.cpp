@@ -94,12 +94,23 @@ void CMenuPcs::MoneyInit()
  */
 bool CMenuPcs::MoneyOpen()
 {
+	float fVar1;
+	int iVar7;
+	int iVar8;
+	int iVar10;
+	int iVar12;
+	int iVar13;
+	int iVar15;
+	signed char* puVar9;
+	short* psVar11;
+	signed char* puVar14;
+
 	if (*(char *)(*(int *)((char*)this + 0x82c) + 0xb) == '\0') {
 		memset(*(void**)((char*)this + 0x850), 0, 0x1008);
 
-		float fVar1 = 1.0f;
-		int iVar8 = *(int *)((char*)this + 0x850) + 8;
-		int iVar15 = 8;
+		fVar1 = FLOAT_80332f70;
+		iVar8 = *(int *)((char*)this + 0x850) + 8;
+		iVar15 = 8;
 		do {
 			*(float *)(iVar8 + 0x14) = fVar1;
 			*(float *)(iVar8 + 0x54) = fVar1;
@@ -113,86 +124,90 @@ bool CMenuPcs::MoneyOpen()
 			iVar15 = iVar15 + -1;
 		} while (iVar15 != 0);
 
-		int iVar8_2 = *(int *)((char*)this + 0x850);
-		*(int *)(iVar8_2 + 0x24) = 0x3b;
-		*(short *)(iVar8_2 + 10) = 0x68;
-		*(short *)(iVar8_2 + 0xc) = 0xf8;
-		*(short *)(iVar8_2 + 0xe) = 0x88;
-
-		*(short *)(iVar8_2 + 8) = static_cast<short>(-(static_cast<int>(*(short *)(iVar8_2 + 0xc)) / 2));
-		*(float *)(iVar8_2 + 0x10) = 0.0f;
-		*(float *)(iVar8_2 + 0x14) = 0.0f;
-		*(float *)(iVar8_2 + 0x1c) = 1.0f;
-		*(int *)(iVar8_2 + 0x2c) = 0;
-		*(int *)(iVar8_2 + 0x30) = 10;
+		iVar8 = *(int *)((char*)this + 0x850);
+		*(int *)(iVar8 + 0x24) = 0x3b;
+		*(short *)(iVar8 + 10) = 0x68;
+		*(short *)(iVar8 + 0xc) = 0xf8;
+		*(short *)(iVar8 + 0xe) = 0x88;
+		*(short *)(iVar8 + 8) = static_cast<short>(-(static_cast<int>(*(short *)(iVar8 + 0xc)) / 2));
+		*(float *)(iVar8 + 0x10) = FLOAT_80332f64;
+		*(float *)(iVar8 + 0x14) = FLOAT_80332f64;
+		*(float *)(iVar8 + 0x1c) = FLOAT_80332f70;
+		*(int *)(iVar8 + 0x2c) = 0;
+		*(int *)(iVar8 + 0x30) = 10;
 		**(short**)((char*)this + 0x850) = 1;
 
-		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.game.m_scriptFoodBase[0]);
 		DAT_8032eee0 = 0;
-		signed char* digits = s_place;
-		for (int group = 0; group < 2; ++group) {
-			int currentValue = (group == 0) ? caravanWork->m_gil : 0;
-			int div = 10000000;
+		puVar9 = s_place;
+		iVar15 = 0;
+		do {
+			iVar8 = 10000000;
+			if (iVar15 == 0) {
+				iVar12 = *(int *)(Game.game.m_scriptFoodBase[0] + 0x200);
+			} else {
+				iVar12 = 0;
+			}
+			iVar13 = 0;
+			iVar7 = 8;
 			bool started = false;
-
-			for (int i = 0; i < 8; ++i) {
-				if (!started && div <= currentValue) {
+			puVar14 = puVar9;
+			do {
+				if ((!started) && (iVar8 <= iVar12)) {
 					started = true;
 				}
-
-				if (started || div <= currentValue || i > 6) {
-					int digit = currentValue / div;
-					if (digit > 9) {
-						digit = 9;
+				if (((started) || (iVar8 <= iVar12)) || (6 < iVar13)) {
+					iVar10 = iVar12 / iVar8;
+					if (9 < iVar10) {
+						iVar10 = 9;
 					}
-					digits[i] = static_cast<signed char>(digit);
-					currentValue -= (currentValue / div) * div;
+					*puVar14 = static_cast<signed char>(iVar10);
+					iVar12 = iVar12 - (iVar12 / iVar8) * iVar8;
 				} else {
-					digits[i] = -1;
+					*puVar14 = -1;
 				}
-
-				div /= 10;
-			}
-
-			digits += 8;
-		}
+				puVar14 = puVar14 + 1;
+				iVar13 = iVar13 + 1;
+				iVar8 /= 10;
+				iVar7 = iVar7 + -1;
+			} while (iVar7 != 0);
+			iVar15 = iVar15 + 1;
+			puVar9 = puVar9 + 8;
+		} while (iVar15 < 2);
 
 		*(short *)(*(int *)((char*)this + 0x82c) + 0x26) = 0;
 		*(char *)(*(int *)((char*)this + 0x82c) + 0xb) = 1;
 	}
 
-	int doneCount = 0;
-	int menuState = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c);
-
-	*reinterpret_cast<short*>(menuState + 0x22) = static_cast<short>(*reinterpret_cast<short*>(menuState + 0x22) + 1);
-	int entryCount = static_cast<int>(**reinterpret_cast<short**>(reinterpret_cast<char*>(this) + 0x850));
-	short* entry = *reinterpret_cast<short**>(reinterpret_cast<char*>(this) + 0x850) + 4;
-	int time = static_cast<int>(*reinterpret_cast<short*>(menuState + 0x22));
-
-	for (int i = 0; i < entryCount; ++i) {
-		if (*reinterpret_cast<int*>(entry + 0x12) <= time) {
-			int duration = *reinterpret_cast<int*>(entry + 0x14);
-			if (time < *reinterpret_cast<int*>(entry + 0x12) + duration) {
-				*reinterpret_cast<int*>(entry + 0x10) = *reinterpret_cast<int*>(entry + 0x10) + 1;
-				float t = static_cast<float>(*reinterpret_cast<int*>(entry + 0x10)) / static_cast<float>(duration);
-				*reinterpret_cast<float*>(entry + 8) = t;
-				if ((*reinterpret_cast<unsigned int*>(entry + 0x16) & 2) == 0) {
-					*reinterpret_cast<float*>(entry + 0x18) =
-						(*reinterpret_cast<float*>(entry + 0x1c) - static_cast<float>(*entry)) * t;
-					*reinterpret_cast<float*>(entry + 0x1a) =
-						(*reinterpret_cast<float*>(entry + 0x1e) - static_cast<float>(entry[1])) * t;
+	iVar15 = 0;
+	*(short *)(*(int *)((char*)this + 0x82c) + 0x22) = *(short *)(*(int *)((char*)this + 0x82c) + 0x22) + 1;
+	iVar12 = static_cast<int>(**(short**)((char*)this + 0x850));
+	psVar11 = *(short**)((char*)this + 0x850) + 4;
+	iVar7 = static_cast<int>(*(short *)(*(int *)((char*)this + 0x82c) + 0x22));
+	iVar8 = iVar12;
+	if (0 < iVar12) {
+		do {
+			if (*(int *)(psVar11 + 0x12) <= iVar7) {
+				if (iVar7 < *(int *)(psVar11 + 0x12) + *(int *)(psVar11 + 0x14)) {
+					*(int *)(psVar11 + 0x10) = *(int *)(psVar11 + 0x10) + 1;
+					fVar1 = static_cast<float>(*(int *)(psVar11 + 0x10)) / static_cast<float>(*(int *)(psVar11 + 0x14));
+					*(float *)(psVar11 + 8) = fVar1;
+					if ((*(unsigned int *)(psVar11 + 0x16) & 2) == 0) {
+						*(float *)(psVar11 + 0x18) = (*(float *)(psVar11 + 0x1c) - static_cast<float>(*psVar11)) * fVar1;
+						*(float *)(psVar11 + 0x1a) = (*(float *)(psVar11 + 0x1e) - static_cast<float>(psVar11[1])) * fVar1;
+					}
+				} else {
+					iVar15 = iVar15 + 1;
+					*(float *)(psVar11 + 8) = FLOAT_80332f70;
+					*(float *)(psVar11 + 0x18) = FLOAT_80332f64;
+					*(float *)(psVar11 + 0x1a) = FLOAT_80332f64;
 				}
-			} else {
-				doneCount += 1;
-				*reinterpret_cast<float*>(entry + 8) = 1.0f;
-				*reinterpret_cast<float*>(entry + 0x18) = 0.0f;
-				*reinterpret_cast<float*>(entry + 0x1a) = 0.0f;
 			}
-		}
-		entry += 0x20;
+			psVar11 = psVar11 + 0x20;
+			iVar8 = iVar8 + -1;
+		} while (iVar8 != 0);
 	}
 
-	return entryCount == doneCount;
+	return iVar12 == iVar15;
 }
 
 /*

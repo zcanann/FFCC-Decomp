@@ -3,9 +3,11 @@
 #include "ffcc/graphic.h"
 #include "ffcc/map.h"
 #include "ffcc/materialman.h"
+#include "ffcc/maplight.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_game.h"
 #include "ffcc/p_light.h"
+#include "ffcc/ptrarray.h"
 #include "ffcc/mapocttree.h"
 
 #include <dolphin/mtx.h>

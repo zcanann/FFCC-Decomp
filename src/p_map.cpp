@@ -3,9 +3,11 @@
 #include "ffcc/graphic.h"
 #include "ffcc/map.h"
 #include "ffcc/materialman.h"
+#include "ffcc/maplight.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_game.h"
 #include "ffcc/p_light.h"
+#include "ffcc/ptrarray.h"
 
 #include <dolphin/mtx.h>
 extern void* __vt__8CManager;
@@ -219,8 +221,20 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
         if ((*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x17C) != 0) &&
             (strcmp(lbl_801E8EEC, mapPath) != 0)) {
             strcpy(lbl_801E8EEC, mapPath);
+            unusedVec.x = *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0);
+            unusedVec.y = *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4);
+            unusedVec.z = *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
             MapMng.GetDebugPlaySta(0, &unusedVec);
-            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0) += lbl_8032FA10;
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE0) = unusedVec.x;
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4) = unusedVec.y + lbl_8032FA10;
+            *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8) = unusedVec.z;
+        }
+
+        CPtrArray<CMapLightHolder*>* mapLightHolderArr =
+            reinterpret_cast<CPtrArray<CMapLightHolder*>*>(reinterpret_cast<char*>(&MapMng) + 0x21450);
+        if (mapLightHolderArr[1].GetSize() != 0) {
+            mapLightHolderArr[1][0]->GetLightHolder(
+                reinterpret_cast<_GXColor*>(reinterpret_cast<char*>(&CameraPcs) + 0x1E0), static_cast<Vec*>(0));
         }
     }
 

@@ -16,7 +16,7 @@ void pppConstructConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir
     
     float uVar1 = DAT_803320c4;
     float* puVar2 = (float*)((char*)pppConstrainCameraDir + *param_2->m_serializedDataOffsets + 0x80);
-    puVar2[2] = DAT_803320c4;
+    puVar2[2] = uVar1;
     puVar2[1] = uVar1;
     puVar2[0] = uVar1;
 }
@@ -36,7 +36,7 @@ void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDi
     
     float uVar1 = DAT_803320c4;
     float* puVar2 = (float*)((char*)pppConstrainCameraDir + *param_2->m_serializedDataOffsets + 0x80);
-    puVar2[2] = DAT_803320c4;
+    puVar2[2] = uVar1;
     puVar2[1] = uVar1;
     puVar2[0] = uVar1;
 }

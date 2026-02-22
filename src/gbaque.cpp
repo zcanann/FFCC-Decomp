@@ -1,10 +1,16 @@
 #include "ffcc/gbaque.h"
+#include "ffcc/cflat_runtime.h"
+#include "ffcc/game.h"
+#include "ffcc/gobjwork.h"
+#include "ffcc/joybus.h"
+#include "ffcc/p_game.h"
 #include <string.h>
 #include <Dolphin/os.h>
 #include <Runtime.PPCEABI.H/NMWException.h>
 
 extern void* ARRAY_802f49b0;
 extern "C" void __dt__8GbaQueueFv(void*);
+extern __declspec(section ".data") CFlatRuntime CFlat;
 
 /*
  * --INFO--
@@ -130,9 +136,9 @@ void GbaQueue::Init()
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::BlockSem(int)
+void GbaQueue::BlockSem(int channel)
 {
-	// TODO
+	OSWaitSemaphore(accessSemaphores + channel);
 }
 
 /*
@@ -140,9 +146,9 @@ void GbaQueue::BlockSem(int)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::ReleaseSem(int)
+void GbaQueue::ReleaseSem(int channel)
 {
-	// TODO
+	OSSignalSemaphore(accessSemaphores + channel);
 }
 
 /*
@@ -152,7 +158,178 @@ void GbaQueue::ReleaseSem(int)
  */
 void GbaQueue::LoadAll()
 {
-	// TODO
+	int i;
+	GbaQueue* semaphoreIter;
+	char* obj;
+	unsigned char prevMenuStageMode;
+	unsigned char spModeBits;
+	unsigned char spModeChangeBits;
+	unsigned int cflatFlag;
+	int* scriptFoodBase;
+
+	semaphoreIter = this;
+	for (i = 0; i < 4; i++) {
+		OSWaitSemaphore(semaphoreIter->accessSemaphores);
+		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+	}
+
+	obj = reinterpret_cast<char*>(this);
+	prevMenuStageMode = static_cast<unsigned char>(obj[0x2D56]);
+	obj[0x2D56] = static_cast<unsigned char>(Game.game.m_gameWork.m_menuStageMode != 0);
+	if (prevMenuStageMode != static_cast<unsigned char>(obj[0x2D56])) {
+		obj[0x2C88] = 0xF;
+	}
+
+	spModeBits = static_cast<unsigned char>(Game.game.m_gameWork.m_spModeFlags[0] != 0);
+	if (Game.game.m_gameWork.m_spModeFlags[1] != 0) {
+		spModeBits |= 2;
+	}
+	if (Game.game.m_gameWork.m_spModeFlags[2] != 0) {
+		spModeBits |= 4;
+	}
+	if (Game.game.m_gameWork.m_spModeFlags[3] != 0) {
+		spModeBits |= 8;
+	}
+
+	spModeChangeBits = static_cast<unsigned char>(spModeBits ^ static_cast<unsigned char>(obj[0x2D5C]));
+	if ((spModeChangeBits & 1) != 0) {
+		obj[0x2D5D] = static_cast<char>(obj[0x2D5D] | 1);
+	}
+	if ((spModeChangeBits & 2) != 0) {
+		obj[0x2D5D] = static_cast<char>(obj[0x2D5D] | 2);
+	}
+	if ((spModeChangeBits & 4) != 0) {
+		obj[0x2D5D] = static_cast<char>(obj[0x2D5D] | 4);
+	}
+	if ((spModeChangeBits & 8) != 0) {
+		obj[0x2D5D] = static_cast<char>(obj[0x2D5D] | 8);
+	}
+	obj[0x2D5C] = static_cast<char>(spModeBits);
+
+	semaphoreIter = this;
+	for (i = 0; i < 4; i++) {
+		OSSignalSemaphore(semaphoreIter->accessSemaphores);
+		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+	}
+
+	LoadPlayerStat();
+	LoadEnemyStat();
+	LoadMapItemStat();
+
+	cflatFlag = reinterpret_cast<unsigned int*>(&CFlat)[0x1041];
+	if ((obj[0x2CE8] == 0) && (cflatFlag != 0)) {
+		SetRadarType();
+	}
+	if (cflatFlag == 0) {
+		memset(obj + 0x2CB8, 0xFF, 0x10);
+		obj[0x2CD8] = 0;
+	}
+
+	semaphoreIter = this;
+	for (i = 0; i < 4; i++) {
+		OSWaitSemaphore(semaphoreIter->accessSemaphores);
+		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+	}
+	obj[0x2CE8] = static_cast<char>(cflatFlag);
+	semaphoreIter = this;
+	for (i = 0; i < 4; i++) {
+		OSSignalSemaphore(semaphoreIter->accessSemaphores);
+		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+	}
+
+	LoadMapObj();
+
+	scriptFoodBase = reinterpret_cast<int*>(Game.game.m_scriptFoodBase);
+	for (i = 0; i < 4; i++) {
+		if (scriptFoodBase[i] == 0) {
+			obj[0x2C96 + i] = static_cast<char>(0xFF);
+		} else {
+			OSWaitSemaphore(accessSemaphores + i);
+			{
+				unsigned short maskValue = *reinterpret_cast<unsigned short*>(scriptFoodBase[i] + 0x89C);
+				if ((maskValue != *reinterpret_cast<unsigned short*>(obj + 0x2C8E)) && (Joybus.SendMask(i, maskValue) == 0)) {
+					*reinterpret_cast<unsigned short*>(obj + 0x2C8E) = maskValue;
+					obj[0x2C96 + i] = 6;
+				}
+			}
+			OSSignalSemaphore(accessSemaphores + i);
+		}
+	}
+
+	semaphoreIter = this;
+	for (i = 0; i < 4; i++) {
+		OSWaitSemaphore(semaphoreIter->accessSemaphores);
+		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+	}
+	{
+		unsigned char resetMask = static_cast<unsigned char>(obj[0x2D30]);
+		obj[0x2D30] = 0;
+		semaphoreIter = this;
+		for (i = 0; i < 4; i++) {
+			OSSignalSemaphore(semaphoreIter->accessSemaphores);
+			semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+		}
+
+		for (i = 0; i < 4; i++) {
+			if (scriptFoodBase[i] == 0) {
+				continue;
+			}
+
+			unsigned int bit = static_cast<unsigned int>(1U << i);
+			if ((resetMask & bit) != 0) {
+				CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(scriptFoodBase[i]);
+				if (caravanWork->m_shopBusyFlag == 1) {
+					OSWaitSemaphore(accessSemaphores + i);
+					obj[0x2D38] = static_cast<char>(obj[0x2D38] & ~static_cast<char>(bit));
+					obj[0x2D39] = static_cast<char>(obj[0x2D39] & ~static_cast<char>(bit));
+					OSSignalSemaphore(accessSemaphores + i);
+					for (int retry = 0; retry < 10; retry++) {
+						if (Joybus.SetMType(i, 0) == 0) {
+							break;
+						}
+					}
+					caravanWork->CallShop(0, 0, 0, 0, 0);
+				}
+				if (caravanWork->m_shopBusyFlag == 2) {
+					unsigned char shopMask = static_cast<unsigned char>(0x10 << i);
+					OSWaitSemaphore(accessSemaphores + i);
+					obj[0x2D38] = static_cast<char>(obj[0x2D38] & ~shopMask);
+					obj[0x2D39] = static_cast<char>(obj[0x2D39] & ~shopMask);
+					OSSignalSemaphore(accessSemaphores + i);
+					for (int retry = 0; retry < 10; retry++) {
+						if (Joybus.SetMType(i, 0) == 0) {
+							break;
+						}
+					}
+					caravanWork->CallShop(1, 0, 0, 0, 0);
+				}
+			}
+
+			if ((static_cast<unsigned char>(obj[0x2D39]) & bit) == 0) {
+				unsigned char shopMask = static_cast<unsigned char>(0x10 << i);
+				if ((static_cast<unsigned char>(obj[0x2D39]) & shopMask) != 0) {
+					OSWaitSemaphore(accessSemaphores + i);
+					obj[0x2D38] = static_cast<char>(obj[0x2D38] | shopMask);
+					OSSignalSemaphore(accessSemaphores + i);
+					if (Joybus.SetMType(i, 3) == 0) {
+						obj[0x2D39] = static_cast<char>(obj[0x2D39] & ~shopMask);
+					} else {
+						obj[0x2D39] = static_cast<char>(obj[0x2D39] | shopMask);
+					}
+				}
+			} else {
+				unsigned char playerMask = static_cast<unsigned char>(1 << i);
+				OSWaitSemaphore(accessSemaphores + i);
+				obj[0x2D38] = static_cast<char>(obj[0x2D38] | playerMask);
+				OSSignalSemaphore(accessSemaphores + i);
+				if (Joybus.SetMType(i, 2) == 0) {
+					obj[0x2D39] = static_cast<char>(obj[0x2D39] & ~playerMask);
+				} else {
+					obj[0x2D39] = static_cast<char>(obj[0x2D39] | playerMask);
+				}
+			}
+		}
+	}
 }
 
 /*

@@ -67,51 +67,50 @@ extern "C" CRedMemory* __dt__10CRedMemoryFv(CRedMemory* redMemory, int shouldDel
  */
 int RedNew(int param_1)
 {
-	int *piVar1;
-	unsigned int uVar2;
-	unsigned int uVar3;
-	unsigned int uVar4;
-	int iVar5;
-	int iVar6;
-	int *piVar7;
-	
-	if (((0 < param_1) && (DAT_8032f4a0 != (int *)0x0)) && (DAT_8032f490 != 0)) {
-		uVar4 = OSDisableInterrupts();
-		uVar2 = param_1 + 0x1fU & 0xffffffe0;
-		iVar5 = DAT_8032f490;
-		piVar7 = DAT_8032f4a0;
-		do {
-			if ((piVar7[1] == 0) || ((int)(iVar5 + uVar2) <= *piVar7)) {
-				if (DAT_8032f4a0[0x7ff] < 1) {
-					if (iVar5 + uVar2 <= (unsigned int)(DAT_8032f490 + DAT_8032f498)) {
-						if (0 < piVar7[1]) {
-							uVar3 = (int)DAT_8032f4a0 + (0x2000 - (int)(piVar7 + 2));
-							iVar6 = ((int)uVar3 >> 3) + (unsigned int)((int)uVar3 < 0 && (uVar3 & 7) != 0);
-							if (0 < iVar6) {
-								memmove(piVar7 + 2, piVar7, iVar6 * 8);
-							}
-						}
-						*piVar7 = iVar5;
-						piVar7[1] = uVar2;
-						OSRestoreInterrupts(uVar4);
-						return iVar5;
-					}
-				}
-				else {
-					if (DAT_8032f408 != 0) {
-						OSReport(s__s_sMemory_Bank_Full____s_801e7888, &DAT_801e78a3, &DAT_80333d20, &DAT_80333d28);
-						fflush(&DAT_8021d1a8);
-					}
-				}
-				break;
-			}
-			iVar5 = *piVar7;
-			piVar1 = piVar7 + 1;
-			piVar7 = piVar7 + 2;
-			iVar5 = iVar5 + *piVar1;
-		} while (piVar7 < DAT_8032f4a0 + 0x800);
-		OSRestoreInterrupts(uVar4);
+	int* entry;
+	unsigned int alignedSize;
+	unsigned int moveCount;
+	BOOL interrupts;
+	int address;
+	int entryCount;
+	int* slot;
+
+	if (((param_1 < 1) || (DAT_8032f4a0 == (int*)0)) || (DAT_8032f490 == 0)) {
+		return 0;
 	}
+
+	interrupts = OSDisableInterrupts();
+	alignedSize = param_1 + 0x1FU & 0xFFFFFFE0;
+	address = DAT_8032f490;
+	slot = DAT_8032f4a0;
+	do {
+		if ((slot[1] == 0) || (address + (int)alignedSize <= *slot)) {
+			if (DAT_8032f4a0[0x7FF] < 1) {
+				if (address + (int)alignedSize <= DAT_8032f490 + DAT_8032f498) {
+					if (0 < slot[1]) {
+						moveCount = (int)DAT_8032f4a0 + (0x2000 - (int)(slot + 2));
+						entryCount = ((int)moveCount >> 3) + (unsigned int)((int)moveCount < 0 && (moveCount & 7) != 0);
+						if (0 < entryCount) {
+							memmove(slot + 2, slot, entryCount * 8);
+						}
+					}
+					*slot = address;
+					slot[1] = alignedSize;
+					OSRestoreInterrupts(interrupts);
+					return address;
+				}
+			} else if (DAT_8032f408 != 0) {
+				OSReport(s__s_sMemory_Bank_Full____s_801e7888, &DAT_801e78a3, &DAT_80333d20, &DAT_80333d28);
+				fflush(&DAT_8021d1a8);
+			}
+			break;
+		}
+		address = *slot;
+		entry = slot + 1;
+		slot = slot + 2;
+		address = address + *entry;
+	} while (slot < DAT_8032f4a0 + 0x800);
+	OSRestoreInterrupts(interrupts);
 	return 0;
 }
 

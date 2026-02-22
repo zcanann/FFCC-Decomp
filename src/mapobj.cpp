@@ -856,32 +856,47 @@ int CMapObj::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned lo
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800288A8
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapObj::GetHitFaceNormal(Vec*)
+void CMapObj::GetHitFaceNormal(Vec* out)
 {
-	// TODO
+    reinterpret_cast<CMapHit*>(PtrAt(this, 0xC))->GetHitFaceNormal(out);
+    PSMTXMultVecSR(MtxAt(this, 0xB8), out, out);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002884C
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapObj::CalcHitSlide(Vec*, float)
+void CMapObj::CalcHitSlide(Vec* out, float y)
 {
-	// TODO
+    reinterpret_cast<CMapHit*>(PtrAt(this, 0xC))->CalcHitSlide(out, y);
+    PSMTXMultVecSR(MtxAt(this, 0xB8), out, out);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80028800
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapObj::CalcHitPosition(Vec*)
+void CMapObj::CalcHitPosition(Vec* position)
 {
-	// TODO
+    reinterpret_cast<CMapHit*>(PtrAt(this, 0xC))->CalcHitPosition(position);
+    PSMTXMultVec(MtxAt(this, 0xB8), position, position);
 }
 
 /*

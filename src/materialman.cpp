@@ -1,6 +1,7 @@
 #include "ffcc/materialman.h"
 #include "ffcc/pad.h"
 #include "ffcc/chunkfile.h"
+#include "ffcc/system.h"
 #include "ffcc/textureman.h"
 #include "ffcc/vector.h"
 #include "ffcc/graphic.h"
@@ -142,6 +143,7 @@ static void ReleaseRef(void* object)
 
 static char s_materialman_cpp[] = "materialman.cpp";
 static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
+static char s_ptrarray_grow_error[] = "CPtrArray grow error";
 
 struct RawPtrArray {
     void** vtable;
@@ -276,25 +278,31 @@ void CPtrArray<CMaterial*>::SetStage(CMemory::CStage* stage)
 template <>
 int CPtrArray<CMaterial*>::Add(CMaterial* item)
 {
-    int result = setSize(m_numItems + 1);
-    if (result != 0) {
-        m_items[m_numItems] = item;
-        m_numItems = m_numItems + 1;
+    if (setSize(m_numItems + 1) == 0) {
+        return 0;
     }
-    return result != 0;
+
+    m_items[m_numItems] = item;
+    m_numItems = m_numItems + 1;
+    return 1;
 }
 
 template <>
 int CPtrArray<CMaterial*>::setSize(unsigned long size)
 {
+    CMaterial** newItems;
+
     if (m_size < size) {
         if (m_size == 0) {
             m_size = m_defaultSize;
         } else {
+            if (m_growCapacity == 0) {
+                System.Printf(s_ptrarray_grow_error);
+            }
             m_size = m_size << 1;
         }
 
-        void** newItems = reinterpret_cast<void**>(
+        newItems = reinterpret_cast<CMaterial**>(
             _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
                 &Memory,
                 m_size << 2,
@@ -313,7 +321,7 @@ int CPtrArray<CMaterial*>::setSize(unsigned long size)
             __dla__FPv(m_items);
             m_items = 0;
         }
-        m_items = reinterpret_cast<CMaterial**>(newItems);
+        m_items = newItems;
     }
     return 1;
 }

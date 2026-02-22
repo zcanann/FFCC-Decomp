@@ -72,12 +72,17 @@ void pppConstructLocationTitle(pppLocationTitle* pppLocationTitle, UnkC* param_2
  */
 void pppDestructLocationTitle(pppLocationTitle* pppLocationTitle, UnkC* param_2)
 {
-    s32* serializedOffsets = *(s32**)((u8*)param_2 + 0xC);
-    s32 fieldOffset = *serializedOffsets + 0x80;
+    int serializedOffset;
+    CMemory::CStage** stagePtr;
+    s32* serializedOffsets;
 
-    if (*(CMemory::CStage**)((u8*)pppLocationTitle + fieldOffset) != NULL) {
-        pppHeapUseRate(*(CMemory::CStage**)((u8*)pppLocationTitle + fieldOffset));
-        *(u32*)((u8*)pppLocationTitle + fieldOffset) = 0;
+    serializedOffsets = *(s32**)((u8*)param_2 + 0xC);
+    serializedOffset = *serializedOffsets;
+    stagePtr = (CMemory::CStage**)((u8*)pppLocationTitle + serializedOffset + 0x80);
+
+    if (*stagePtr != NULL) {
+        pppHeapUseRate(*stagePtr);
+        *stagePtr = 0;
     }
 }
 

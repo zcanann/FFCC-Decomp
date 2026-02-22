@@ -1,10 +1,13 @@
 #include "ffcc/cflat_runtime.h"
+#include "ffcc/chunkfile.h"
 #include <string.h>
 
 extern "C" {
 void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
 void __dl__FPv(void*);
 void __dla__FPv(void*);
+void __ct__Q212CFlatRuntime6CClassFv(void*);
+void* __construct_new_array(void*, void*, void*, unsigned long, unsigned long);
 char s_cflat_runtime_cpp_801d8ef8[];
 void* __vt__12CFlatRuntime[];
 void* __vt__Q212CFlatRuntime7CObject[];
@@ -272,9 +275,190 @@ void CFlatRuntime::clear()
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime::Create(void*)
+void CFlatRuntime::Create(void* filePtr)
 {
-	// TODO
+	typedef void (*ResetFn)(CFlatRuntime*);
+	typedef void* (*GetStageFn)(CFlatRuntime*);
+
+	CChunkFile::CChunk chunk;
+	CChunkFile chunkFile(filePtr);
+	u8* const self = reinterpret_cast<u8*>(this);
+	GetStageFn getStage = reinterpret_cast<GetStageFn>((*reinterpret_cast<void***>(this))[0x11]);
+
+	reinterpret_cast<ResetFn>((*reinterpret_cast<void***>(this))[0x10])(this);
+
+	while (chunkFile.GetNextChunk(chunk)) {
+		if (chunk.m_id != 'CFLT') {
+			continue;
+		}
+
+		chunkFile.PushChunk();
+		while (chunkFile.GetNextChunk(chunk)) {
+			if (chunk.m_id == 'NAME') {
+				strcpy(reinterpret_cast<char*>(self + 0x00), chunkFile.GetString());
+				continue;
+			}
+
+			if (chunk.m_id == 'CLAS') {
+				const int classCount = chunk.m_arg0;
+				*reinterpret_cast<int*>(self + 0x14) = classCount;
+
+				void* classMem =
+				    __nwa__FUlPQ27CMemory6CStagePci(classCount * 0x22C + 0x10, getStage(this),
+				                                    s_cflat_runtime_cpp_801d8ef8, 0x9E);
+				*reinterpret_cast<void**>(self + 0x18) =
+				    __construct_new_array(classMem, reinterpret_cast<void*>(__ct__Q212CFlatRuntime6CClassFv),
+				                          0, 0x22C, classCount);
+
+				int classIndex = 0;
+				int classOffset = 0;
+				chunkFile.PushChunk();
+				while (chunkFile.GetNextChunk(chunk)) {
+					if (chunk.m_id != 'BLCK') {
+						continue;
+					}
+
+					int* classBase = reinterpret_cast<int*>(*reinterpret_cast<u8**>(self + 0x18) + classOffset);
+					classBase[0] = classIndex;
+					chunkFile.PushChunk();
+					while (chunkFile.GetNextChunk(chunk)) {
+						if (chunk.m_id == 'VAL ') {
+							classBase[0x89] = chunk.m_arg0;
+						} else if (chunk.m_id == 'NAME') {
+							strcpy(reinterpret_cast<char*>(classBase + 1), chunkFile.GetString());
+						} else if (chunk.m_id == 'INFO') {
+							classBase[0x8A] = chunkFile.Get4();
+						} else if (chunk.m_id == 'VTBL') {
+							for (int i = 0; i < 0x80; i++) {
+								classBase[9 + i] = chunkFile.Get4();
+							}
+						}
+					}
+					chunkFile.PopChunk();
+
+					classOffset += 0x22C;
+					classIndex++;
+				}
+				chunkFile.PopChunk();
+				continue;
+			}
+
+			if (chunk.m_id == 'FUNC') {
+				const int funcCount = chunk.m_arg0;
+				*reinterpret_cast<int*>(self + 0x1C) = funcCount;
+				*reinterpret_cast<void**>(self + 0x20) = __nwa__FUlPQ27CMemory6CStagePci(
+				    funcCount * 0x50, getStage(this), s_cflat_runtime_cpp_801d8ef8, 0xD9);
+
+				int funcIndex = 0;
+				int funcOffset = 0;
+				chunkFile.PushChunk();
+				while (chunkFile.GetNextChunk(chunk)) {
+					if (chunk.m_id != 'BLCK') {
+						continue;
+					}
+
+					int* funcBase = reinterpret_cast<int*>(*reinterpret_cast<u8**>(self + 0x20) + funcOffset);
+					funcBase[0] = funcIndex;
+					chunkFile.PushChunk();
+					while (chunkFile.GetNextChunk(chunk)) {
+						if (chunk.m_id == 'NAME') {
+							strcpy(reinterpret_cast<char*>(funcBase + 1), chunkFile.GetString());
+						} else if (chunk.m_id == 'INFO') {
+							funcBase[9] = chunkFile.Get4();
+							funcBase[0x10] = chunkFile.Get4();
+							funcBase[0x11] = chunkFile.Get4();
+							funcBase[0x12] = chunkFile.Get4();
+							funcBase[0x13] = chunkFile.Get4();
+						} else if (chunk.m_id == 'CODE') {
+							funcBase[0xC] = chunk.m_size;
+							funcBase[0xF] = 0;
+							funcBase[0xE] = 0;
+							if (funcBase[0xC] == 0) {
+								funcBase[0xD] = 0;
+							} else {
+								funcBase[0xD] = reinterpret_cast<int>(__nwa__FUlPQ27CMemory6CStagePci(
+								    chunk.m_size, getStage(this), s_cflat_runtime_cpp_801d8ef8, 0x109));
+								memcpy(reinterpret_cast<void*>(funcBase[0xD]), chunkFile.GetAddress(),
+								       chunk.m_size);
+							}
+						} else if (chunk.m_id == 'VAL ') {
+							funcBase[10] = chunk.m_arg0;
+						} else if (chunk.m_id == 'RET ') {
+							*reinterpret_cast<u8*>(funcBase + 0xB) = chunkFile.Get1();
+							*reinterpret_cast<u8*>(reinterpret_cast<u8*>(funcBase) + 0x2D) = chunkFile.Get1();
+							*reinterpret_cast<u16*>(reinterpret_cast<u8*>(funcBase) + 0x2E) = chunkFile.Get2();
+						}
+					}
+					chunkFile.PopChunk();
+
+					funcOffset += 0x50;
+					funcIndex++;
+				}
+				chunkFile.PopChunk();
+				continue;
+			}
+
+			if (chunk.m_id == 'VAL ') {
+				const int variableCount = chunk.m_arg0;
+				*reinterpret_cast<int*>(self + 0x24) = variableCount;
+				*reinterpret_cast<void**>(self + 0x28) = __nwa__FUlPQ27CMemory6CStagePci(
+				    variableCount << 2, getStage(this), s_cflat_runtime_cpp_801d8ef8, 0x96);
+
+				u8* variableDef = *reinterpret_cast<u8**>(self + 0x28);
+				for (int i = 0; i < variableCount; i++) {
+					variableDef[0] = chunkFile.Get1();
+					variableDef[1] = chunkFile.Get1();
+					*reinterpret_cast<u16*>(variableDef + 2) = chunkFile.Get2();
+					variableDef += 4;
+				}
+				continue;
+			}
+
+			if (chunk.m_id == 'STR ') {
+				const int strCount = chunk.m_arg0;
+				*reinterpret_cast<int*>(self + 0x30) = strCount;
+				*reinterpret_cast<void**>(self + 0x34) = __nwa__FUlPQ27CMemory6CStagePci(
+				    strCount << 1, getStage(this), s_cflat_runtime_cpp_801d8ef8, 0x121);
+				*reinterpret_cast<void**>(self + 0x38) = __nwa__FUlPQ27CMemory6CStagePci(
+				    chunk.m_size, getStage(this), s_cflat_runtime_cpp_801d8ef8, 0x122);
+
+				memcpy(*reinterpret_cast<void**>(self + 0x38), chunkFile.GetAddress(), chunk.m_size);
+				const short base = *reinterpret_cast<short*>(chunkFile.GetAddress());
+				int offset = 0;
+				for (int i = 0; i < strCount; i++) {
+					const short cur = *reinterpret_cast<short*>(chunkFile.GetAddress());
+					*reinterpret_cast<short*>(*reinterpret_cast<u8**>(self + 0x34) + offset) = cur - base;
+					chunkFile.GetString();
+					offset += 2;
+				}
+				continue;
+			}
+
+			if (chunk.m_id == 'FSTR') {
+				const int fstrCount = chunk.m_arg0;
+				*reinterpret_cast<int*>(self + 0x3C) = fstrCount;
+				*reinterpret_cast<void**>(self + 0x40) = __nwa__FUlPQ27CMemory6CStagePci(
+				    fstrCount << 1, getStage(this), s_cflat_runtime_cpp_801d8ef8, 0x12F);
+				*reinterpret_cast<void**>(self + 0x44) = __nwa__FUlPQ27CMemory6CStagePci(
+				    chunk.m_size, getStage(this), s_cflat_runtime_cpp_801d8ef8, 0x130);
+
+				memcpy(*reinterpret_cast<void**>(self + 0x44), chunkFile.GetAddress(), chunk.m_size);
+				const short base = *reinterpret_cast<short*>(chunkFile.GetAddress());
+				int offset = 0;
+				for (int i = 0; i < fstrCount; i++) {
+					const short cur = *reinterpret_cast<short*>(chunkFile.GetAddress());
+					*reinterpret_cast<short*>(*reinterpret_cast<u8**>(self + 0x40) + offset) = cur - base;
+					chunkFile.GetString();
+					offset += 2;
+				}
+			}
+		}
+		chunkFile.PopChunk();
+	}
+
+	createObject(-1);
+	self[0x1294] = 1;
+	*reinterpret_cast<u8*>(self + 0x974) = 1;
 }
 
 /*

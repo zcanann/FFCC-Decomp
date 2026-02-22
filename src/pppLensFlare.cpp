@@ -27,6 +27,11 @@ extern struct {
 extern "C" unsigned int __cvt_fp2unsigned(double);
 extern "C" void GXPeekZ(unsigned short, unsigned short, unsigned int*);
 
+static inline s32* GetSerializedDataOffsets(void* param)
+{
+	return *(s32**)((char*)param + 0x0c);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800dec14
@@ -75,7 +80,7 @@ void pppDestructLensFlare(void)
 void pppFrameLensFlare(void* obj, void* param2, void* param3)
 {
 	UnkB* unkB;
-	UnkC* unkC;
+	s32* serializedDataOffsets;
 	unsigned char* alphaPtr;
 	unsigned char argA;
 	int offset1;
@@ -104,9 +109,9 @@ void pppFrameLensFlare(void* obj, void* param2, void* param3)
 	}
 
 	unkB = (UnkB*)param2;
-	unkC = (UnkC*)param3;
-	offset2 = unkC->m_serializedDataOffsets[2];
-	offset1 = unkC->m_serializedDataOffsets[1];
+	serializedDataOffsets = GetSerializedDataOffsets(param3);
+	offset2 = serializedDataOffsets[2];
+	offset1 = serializedDataOffsets[1];
 	alphaPtr = (unsigned char*)((char*)obj + offset2 + 0xb2);
 
 	alphaScale = (double)((float)((double)(0x4330000000000000ULL | (u8)*((u8*)obj + offset1 + 0x88)) - DOUBLE_80331070) *
@@ -187,17 +192,17 @@ void pppRenderLensFlare(void* obj, void* param2, void* param3)
 {
 	pppColum* pppLensFlare;
 	UnkB* unkB;
-	UnkC* unkC;
+	s32* serializedDataOffsets;
 	int iVar1;
 	int iVar2;
 	long* shape;
 
 	pppLensFlare = (pppColum*)obj;
 	unkB = (UnkB*)param2;
-	unkC = (UnkC*)param3;
+	serializedDataOffsets = GetSerializedDataOffsets(param3);
 
-	iVar2 = unkC->m_serializedDataOffsets[2];
-	iVar1 = unkC->m_serializedDataOffsets[1];
+	iVar2 = serializedDataOffsets[2];
+	iVar1 = serializedDataOffsets[1];
 	if (unkB->m_dataValIndex != 0xffff) {
 		shape = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + unkB->m_dataValIndex * 4);
 		if (*((u8*)pppLensFlare + iVar2 + 0xb2) != 0) {

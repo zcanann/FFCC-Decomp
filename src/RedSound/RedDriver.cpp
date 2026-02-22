@@ -142,12 +142,43 @@ void _SetSoundMode(int*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bcf88
+ * PAL Size: 192b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _SetReverbDepth(int*)
+void _SetReverbDepth(int* param_1)
 {
-	// TODO
+    unsigned int reverbIndex;
+    unsigned int reverbDepth;
+    unsigned int fadeFrame;
+    int fadeStep;
+    int* seInfo;
+
+    reverbIndex = (unsigned int)param_1[0];
+    reverbDepth = (unsigned int)param_1[1] & 0x7f;
+    fadeFrame = (unsigned int)param_1[2];
+    if (reverbDepth != 0) {
+        reverbDepth = (((reverbDepth + 1) * 0x100) - 1) * 0x1000;
+    }
+    *(unsigned int*)((char*)DAT_8032f474 + (reverbIndex & 1) * 0xc) = reverbDepth;
+    if ((reverbIndex & 1) != 0) {
+        fadeStep = (int)(fadeFrame * 0x60) / 0x3c + ((int)(fadeFrame * 0x60) >> 0x1f);
+        fadeStep = fadeStep - (fadeStep >> 0x1f);
+        if (fadeStep == 0) {
+            fadeStep = 1;
+        }
+        seInfo = *(int**)((char*)DAT_8032f3f0 + 0xdbc);
+        do {
+            if (*seInfo != 0) {
+                seInfo[0x1b] = (int)((reverbDepth | 0x800) - (seInfo[0x1a] & 0xfffff000U)) / fadeStep;
+                seInfo[0x1c] = fadeStep;
+            }
+            seInfo += 0x55;
+        } while (seInfo < (int*)(*(int*)((char*)DAT_8032f3f0 + 0xdbc) + 0x2a80));
+    }
 }
 
 /*
@@ -718,12 +749,35 @@ int _MainThread(void*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bdee8
+ * PAL Size: 196b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _WaveSettingThread(void*)
+int _WaveSettingThread(void* param_1)
 {
-	// TODO
+    int threadResult;
+    int* waveSetting;
+
+    waveSetting = (int*)param_1;
+    DAT_8032f3c4 = DAT_8032f3c4 | 4;
+    DAT_8032f460 = 0;
+    while (DAT_8032f3c0 != 0) {
+        OSWaitSemaphore(&DAT_8032daa0);
+        if (DAT_8032f3c0 != 0) {
+            DAT_8032f460 = DAT_8032f460 + 1;
+            DAT_8032e154.SetWaveData(waveSetting[1], (void*)waveSetting[2], waveSetting[3]);
+            *(int*)waveSetting[0] = 0;
+            do {
+                threadResult = OSTryWaitSemaphore(&DAT_8032daa0);
+            } while (0 < threadResult);
+            DAT_8032f460 = 0;
+        }
+    }
+    DAT_8032f3c4 = DAT_8032f3c4 & ~4;
+    return 0;
 }
 
 /*
@@ -1443,7 +1497,7 @@ void CRedDriver::SeStopMG(int, int, int, int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::SePlay(int bank, int sep, int autoID, int unk, int volume, int pitch)
+int CRedDriver::SePlay(int bank, int sep, int autoID, int unk, int volume, int pitch)
 {
 	if (bank == -1) {
 		if (sep > -1) {
@@ -1452,7 +1506,7 @@ void CRedDriver::SePlay(int bank, int sep, int autoID, int unk, int volume, int 
 	} else if ((bank > -1) && (bank < 4) && (sep > -1) && (sep < 0x200)) {
 		_EntryExecCommand(_SeBlockPlay, autoID, bank, sep, unk, volume, pitch, 0);
 	}
-
+    return autoID;
 }
 
 /*

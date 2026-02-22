@@ -5,6 +5,7 @@
 #include "ffcc/stopwatch.h"
 #include "ffcc/system.h"
 #include <dolphin/gx.h>
+#include <dolphin/mtx.h>
 #include "dolphin/os/OSMemory.h"
 #include <string.h>
 
@@ -13,12 +14,16 @@ extern void* PTR_PTR_s_CMemory_801e8488;
 extern CMemory Memory;
 extern char DAT_801d6648[];
 extern char DAT_801d6a7c[];
+extern char DAT_801d6b7c[];
+extern char DAT_801d6bb0[];
 extern char DAT_801d6c58[];
 extern char DAT_801d6c88[];
 extern char DAT_801d6c98[];
 extern char DAT_801d669c[];
 extern char DAT_801d67d8[];
 extern char DAT_8032f7d4[];
+extern char s_USE__d_UNUSE__d_801d6bdc[];
+extern char s_AMEM_ANIM__d_801d6bec[];
 extern float FLOAT_8032f7d8;
 extern char s__4d__4d__4d_801d6800[];
 extern unsigned int DAT_801d64a8;
@@ -43,6 +48,16 @@ extern "C" int DMAEntry__9CRedSoundFiiiiiPFPv_vPv(
     void*, int, int, int, int, int, void (*)(void*), void*);
 extern "C" int DMACheck__9CRedSoundFi(void*, int);
 extern "C" int __cntlzw(unsigned int);
+extern "C" void* __construct_new_array(void*, void*, void*, unsigned long, unsigned long);
+extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
+extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
+extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
+extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
+extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
+extern struct {
+    unsigned char _pad[0x8308];
+    int _8308_4_;
+} Chara;
 
 static int calcCacheChecksum(const unsigned char* data, unsigned int size)
 {
@@ -494,12 +509,90 @@ void CMemory::HeapWalker()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001EC94
+ * PAL Size: 764b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMemory::Draw()
 {
-	// TODO
+    if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x7798) != 0) {
+        Mtx projMtx;
+        Mtx modelMtx;
+        char line[260];
+
+        C_MTXOrtho(projMtx, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, 1.0f);
+        GXSetProjection(projMtx, GX_ORTHOGRAPHIC);
+        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+        GXSetZCompLoc(GX_FALSE);
+        _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
+        GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
+        GXSetCullMode(GX_CULL_NONE);
+        GXSetNumTevStages(1);
+        GXSetTevDirect(GX_TEVSTAGE0);
+        GXSetNumChans(1);
+        GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+        GXSetChanCtrl(GX_ALPHA0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+        _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+        GXClearVtxDesc();
+        GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+        GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+        GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+        GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+        PSMTXIdentity(modelMtx);
+        GXLoadPosMtxImm(modelMtx, 0);
+        GXLoadTexMtxImm(modelMtx, GX_TEXMTX0, GX_MTX3x4);
+        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
+        _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+
+        for (int pass = 0; pass < 2; pass++) {
+            if (pass == 1) {
+                Graphic.InitDebugString();
+            }
+
+            CStage* modeList = reinterpret_cast<CStage*>(reinterpret_cast<unsigned char*>(this) + 4);
+            int y = 0x20;
+            int totalUse = 0;
+            int totalUnuse = 0;
+            for (int mode = 0; mode < 3; mode++) {
+                if (((mode != 1) || (OSGetConsoleSimulatedMemSize() == 0x3000000)) && (mode != 2)) {
+                    for (CStage* stage = *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(modeList) + 4);
+                         stage != modeList;
+                         stage = *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(stage) + 4)) {
+                        if (pass == 0) {
+                            stage->drawHeapBar(y);
+                        } else {
+                            stage->drawHeapTitle(y);
+                            if (mode == 0) {
+                                totalUse +=
+                                    static_cast<unsigned int>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0xC) -
+                                                              *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0x8)) >>
+                                    10;
+                                totalUnuse +=
+                                    static_cast<unsigned int>(
+                                        *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 4) + 8) -
+                                        *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0xC)) >>
+                                    10;
+                            }
+                        }
+                        y += 0xC;
+                    }
+                }
+                modeList = reinterpret_cast<CStage*>(reinterpret_cast<unsigned char*>(modeList) + 0x27D8);
+            }
+
+            if (pass == 1) {
+                sprintf(line, s_USE__d_UNUSE__d_801d6bdc, totalUse, totalUnuse);
+                Graphic.DrawDebugStringDirect(0x10, static_cast<unsigned short>(y), line, 8);
+
+                int amemAnim = (Chara._8308_4_ >> 10) + static_cast<int>((Chara._8308_4_ < 0) && ((Chara._8308_4_ & 0x3FF) != 0));
+                sprintf(line, s_AMEM_ANIM__d_801d6bec, amemAnim);
+                Graphic.DrawDebugStringDirect(0x10, static_cast<unsigned short>(y + 0xC), line, 8);
+            }
+        }
+    }
 }
 
 /*
@@ -519,12 +612,95 @@ void CMemory::SetGroup(void* ptr, int group)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001EA28
+ * PAL Size: 600b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-CMemory::CStage* CMemory::CreateStage(unsigned long, char*, int)
+CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int allocationMode)
 {
-	return (CMemory::CStage*)nullptr;
+    if ((allocationMode == 1) && (OSGetConsoleSimulatedMemSize() != 0x3000000)) {
+        return (CStage*)0;
+    }
+
+    unsigned int alignedSize = (static_cast<unsigned int>(size) + 0x3F) & ~0x3F;
+    unsigned char* modeBase = reinterpret_cast<unsigned char*>(this) + 4 + allocationMode * 0x27D8;
+    CStage* stage = *reinterpret_cast<CStage**>(modeBase + 0x130);
+
+    if (stage == reinterpret_cast<CStage*>(modeBase + 300)) {
+        Printf__7CSystemFPce(&System, DAT_801d6b7c);
+        return (CStage*)0;
+    }
+
+    unsigned char* list = modeBase;
+    while (true) {
+        unsigned char* next = *reinterpret_cast<unsigned char**>(list + 4);
+        if (static_cast<unsigned int>(*reinterpret_cast<int*>(list + 0xC)) + alignedSize <=
+            static_cast<unsigned int>(*reinterpret_cast<int*>(next + 8))) {
+            *reinterpret_cast<CStage**>(modeBase + 0x130) =
+                *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(stage) + 4);
+            *reinterpret_cast<unsigned char**>(reinterpret_cast<unsigned char*>(stage) + 0) = list;
+            *reinterpret_cast<unsigned char**>(reinterpret_cast<unsigned char*>(stage) + 4) = next;
+            *reinterpret_cast<unsigned char**>(next + 0) = reinterpret_cast<unsigned char*>(stage);
+            *reinterpret_cast<unsigned char**>(list + 4) = reinterpret_cast<unsigned char*>(stage);
+            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 8) = *reinterpret_cast<int*>(list + 0xC);
+            *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(stage) + 0xC) =
+                *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(stage) + 8) + alignedSize;
+
+            if (source == nullptr) {
+                source = DAT_8032f7d4;
+            }
+            strcpy(stageGetSourceName(stage), source);
+            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0x10C) = allocationMode;
+
+            if (allocationMode != 2) {
+                for (unsigned char* p = reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 8));
+                     p < reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0xC)); p++) {
+                    *p = 0xCD;
+                }
+
+                int heapHead = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 8);
+                stageSetHeapHead(stage, heapHead);
+                *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0x114) =
+                    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0xC) - 0x40;
+
+                *reinterpret_cast<unsigned char*>(heapHead + 2) = 5;
+                *reinterpret_cast<int*>(heapHead + 4) = 0;
+                *reinterpret_cast<int*>(heapHead + 8) = heapHead + 0x40;
+                *reinterpret_cast<unsigned short*>(heapHead + 0x40) = 0x4B41;
+                *reinterpret_cast<unsigned short*>(heapHead + 0x7E) = 0x4D49;
+                *reinterpret_cast<unsigned char*>(heapHead + 0x42) = 0;
+                *reinterpret_cast<int*>(heapHead + 0x50) =
+                    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0x114) - (heapHead + 0x80);
+                *reinterpret_cast<int*>(heapHead + 0x44) = heapHead;
+                *reinterpret_cast<int*>(heapHead + 0x48) = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0x114);
+
+                int heapTail = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0x114);
+                *reinterpret_cast<unsigned char*>(heapTail + 2) = 6;
+                *reinterpret_cast<int*>(heapTail + 4) = heapHead + 0x40;
+                *reinterpret_cast<int*>(heapTail + 8) = 0;
+                *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0x124) = 0;
+            } else {
+                CStage* amemStage = *reinterpret_cast<CStage**>(reinterpret_cast<unsigned char*>(this) + 0x7790);
+                void* heapBuffer = amemStage->alloc(0x810, s_memory_cpp, 0x228, 0);
+                stageSetHeapHead(stage, reinterpret_cast<int>(__construct_new_array(heapBuffer, 0, 0, 0x40, 0x20)));
+                *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0x120) = 0;
+            }
+
+            *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned char*>(stage) + 0x108) =
+                static_cast<unsigned long>(-1);
+            return stage;
+        }
+
+        list = next;
+        if (next == modeBase) {
+            Printf__7CSystemFPce(&System, DAT_801d6bb0);
+            HeapWalker();
+            return (CStage*)0;
+        }
+    }
 }
 
 /*

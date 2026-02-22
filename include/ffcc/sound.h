@@ -23,7 +23,7 @@ public:
     void create(int);
     void destroy();
     void Realloc(int);
-    void GetPerformance();
+    float GetPerformance();
     void PauseDiscError(int);
     void CheckDriver(int);
     void Frame();

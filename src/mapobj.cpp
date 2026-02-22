@@ -70,25 +70,6 @@ static inline CMapObj* MapObjArrayStart()
     return reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x954);
 }
 
-static void SetLinkRecursive(CMapObj* parent)
-{
-    CMapObj* childHead = 0;
-    CMapObj* searchStart = MapObjArrayStart();
-
-    while (true) {
-        CMapObj* child = MapMng.SearchChildMapObj(searchStart, parent);
-        if (child == 0) {
-            break;
-        }
-
-        ObjAt(child, 0x8) = childHead;
-        SetLinkRecursive(child);
-        childHead = child;
-        searchStart = NextSlot(child);
-    }
-
-    ObjAt(parent, 0x4) = childHead;
-}
 }
 
 extern "C" void __dl__FPv(void*);
@@ -470,7 +451,134 @@ void CMapObj::SetShow(int show)
  */
 void CMapObj::SetLink()
 {
-    SetLinkRecursive(this);
+    CMapObj* head0 = 0;
+    CMapObj* search0 = MapObjArrayStart();
+
+    while (true) {
+        CMapObj* child0 = MapMng.SearchChildMapObj(search0, this);
+        if (child0 == 0) {
+            break;
+        }
+
+        ObjAt(child0, 0x8) = head0;
+        CMapObj* head1 = 0;
+        CMapObj* search1 = MapObjArrayStart();
+        while (true) {
+            CMapObj* child1 = MapMng.SearchChildMapObj(search1, child0);
+            if (child1 == 0) {
+                break;
+            }
+
+            ObjAt(child1, 0x8) = head1;
+            CMapObj* head2 = 0;
+            CMapObj* search2 = MapObjArrayStart();
+            while (true) {
+                CMapObj* child2 = MapMng.SearchChildMapObj(search2, child1);
+                if (child2 == 0) {
+                    break;
+                }
+
+                ObjAt(child2, 0x8) = head2;
+                CMapObj* head3 = 0;
+                CMapObj* search3 = MapObjArrayStart();
+                while (true) {
+                    CMapObj* child3 = MapMng.SearchChildMapObj(search3, child2);
+                    if (child3 == 0) {
+                        break;
+                    }
+
+                    ObjAt(child3, 0x8) = head3;
+                    CMapObj* head4 = 0;
+                    CMapObj* search4 = MapObjArrayStart();
+                    while (true) {
+                        CMapObj* child4 = MapMng.SearchChildMapObj(search4, child3);
+                        if (child4 == 0) {
+                            break;
+                        }
+
+                        ObjAt(child4, 0x8) = head4;
+                        CMapObj* head5 = 0;
+                        CMapObj* search5 = MapObjArrayStart();
+                        while (true) {
+                            CMapObj* child5 = MapMng.SearchChildMapObj(search5, child4);
+                            if (child5 == 0) {
+                                break;
+                            }
+
+                            ObjAt(child5, 0x8) = head5;
+                            CMapObj* head6 = 0;
+                            CMapObj* search6 = MapObjArrayStart();
+                            while (true) {
+                                CMapObj* child6 = MapMng.SearchChildMapObj(search6, child5);
+                                if (child6 == 0) {
+                                    break;
+                                }
+
+                                ObjAt(child6, 0x8) = head6;
+                                CMapObj* head7 = 0;
+                                CMapObj* search7 = MapObjArrayStart();
+                                while (true) {
+                                    CMapObj* child7 = MapMng.SearchChildMapObj(search7, child6);
+                                    if (child7 == 0) {
+                                        break;
+                                    }
+
+                                    ObjAt(child7, 0x8) = head7;
+                                    CMapObj* head8 = 0;
+                                    CMapObj* search8 = MapObjArrayStart();
+                                    while (true) {
+                                        CMapObj* child8 = MapMng.SearchChildMapObj(search8, child7);
+                                        if (child8 == 0) {
+                                            break;
+                                        }
+
+                                        ObjAt(child8, 0x8) = head8;
+                                        child8->SetLink();
+                                        search8 = NextSlot(child8);
+                                        head8 = child8;
+                                    }
+
+                                    ObjAt(child7, 0x4) = head8;
+                                    search7 = NextSlot(child7);
+                                    head7 = child7;
+                                }
+
+                                ObjAt(child6, 0x4) = head7;
+                                search6 = NextSlot(child6);
+                                head6 = child6;
+                            }
+
+                            ObjAt(child5, 0x4) = head6;
+                            search5 = NextSlot(child5);
+                            head5 = child5;
+                        }
+
+                        ObjAt(child4, 0x4) = head5;
+                        search4 = NextSlot(child4);
+                        head4 = child4;
+                    }
+
+                    ObjAt(child3, 0x4) = head4;
+                    search3 = NextSlot(child3);
+                    head3 = child3;
+                }
+
+                ObjAt(child2, 0x4) = head3;
+                search2 = NextSlot(child2);
+                head2 = child2;
+            }
+
+            ObjAt(child1, 0x4) = head2;
+            search1 = NextSlot(child1);
+            head1 = child1;
+        }
+
+        ObjAt(child0, 0x4) = head1;
+        search0 = NextSlot(child0);
+        head0 = child0;
+    }
+
+    ObjAt(this, 0x4) = head0;
 }
 
 /*

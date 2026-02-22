@@ -18,6 +18,7 @@ void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
 void pppAddVector__FR3Vec3Vec3Vec(Vec*, const Vec*, const Vec*);
 void pppNormalize__FR3Vec3Vec(float*, Vec*);
 void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
+unsigned int __cvt_fp2unsigned(double);
 }
 
 /*
@@ -116,7 +117,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
         pppNormalize__FR3Vec3Vec((float*)&direction, &tempDir);
         
         // Trigonometric parabolic motion calculations
-        u32 sinIndex = (u32)((FLOAT_80330e20 * (f32)stepData->m_dataValIndex) / FLOAT_80330e24);
+        u32 sinIndex = __cvt_fp2unsigned((double)((FLOAT_80330e20 * (f32)stepData->m_dataValIndex) / FLOAT_80330e24));
         
         f32 baseValue = *pfVar;
         f32 horizontalScale = (f32)(frameCount * (double)(baseValue * *(f32*)((int)ppvSinTbl + ((sinIndex + 0x4000) & 0xfffc))));

@@ -65,7 +65,7 @@ public:
 
     void LoadFieldPdt(int, int, void*, unsigned long, unsigned char);
     void LoadMonsterPdt(int, int, void*, int, void*, int);
-    void LoadMenuPdt(char*);
+    int LoadMenuPdt(char*);
     void ReleasePdt(int);
 
     void StartLocationTitle();

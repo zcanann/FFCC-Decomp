@@ -31,43 +31,37 @@ void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
  */
 extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, struct UnkC* dataPtr)
 {
-    _pppMngSt* pppMngSt;
-    f32 fVar2;
+    _pppMngSt* pppMngSt = pppMngStPtr;
     f32* pfVar;
-    Vec local_48;
-    Vec local_24;
-    f32 local_3c;
-    f32 local_38;
-    f32 local_34;
-    f32 local_30;
-    f32 local_2c;
-    f32 local_28;
-    f32 local_18;
-    f32 local_14;
-    f32 local_10;
+    pfVar = (f32*)((u8*)basePtr + 8 + *dataPtr->m_serializedDataOffsets);
+    f32 fVar2 = FLOAT_80330e1c;
 
-    fVar2 = FLOAT_80330e1c;
-    pppMngSt = pppMngStPtr;
-    pfVar = (f32*)((u8*)&basePtr->field0_0x0 + 8 + *dataPtr->m_serializedDataOffsets);
     pfVar[2] = FLOAT_80330e1c;
     pfVar[1] = fVar2;
     *pfVar = fVar2;
     *(u16*)(pfVar + 3) = 1;
+
     if (Game.game.m_currentSceneId == 7) {
+        Vec local_24;
+        Vec matrixPos;
+        Vec basePos;
+        Vec local_48;
+
         local_24.x = *(f32*)((u8*)pppMngSt + 0x58);
         local_24.y = *(f32*)((u8*)pppMngSt + 0x5c);
         local_24.z = *(f32*)((u8*)pppMngSt + 0x60);
         pppCopyVector__FR3Vec3Vec((Vec*)(pfVar + 4), &local_24);
-        local_3c = pppMngStPtr->m_matrix.value[0][3];
-        local_38 = pppMngStPtr->m_matrix.value[1][3];
-        local_34 = pppMngStPtr->m_matrix.value[2][3];
-        local_30 = pfVar[4];
-        local_2c = pfVar[5];
-        local_28 = pfVar[6];
-        local_18 = local_3c;
-        local_14 = local_38;
-        local_10 = local_34;
-        pppAddVector__FR3Vec3Vec3Vec((Vec*)(pfVar + 4), (Vec*)&local_30, (Vec*)&local_3c);
+
+        matrixPos.x = pppMngStPtr->m_matrix.value[0][3];
+        matrixPos.y = pppMngStPtr->m_matrix.value[1][3];
+        matrixPos.z = pppMngStPtr->m_matrix.value[2][3];
+
+        basePos.x = pfVar[4];
+        basePos.y = pfVar[5];
+        basePos.z = pfVar[6];
+
+        pppAddVector__FR3Vec3Vec3Vec((Vec*)(pfVar + 4), &basePos, &matrixPos);
+
         local_48.x = pfVar[4];
         local_48.y = pfVar[5];
         local_48.z = pfVar[6];
@@ -90,7 +84,7 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
     _pppMngSt* pppMngSt = pppMngStPtr;
     
     if (DAT_8032ed70 == 0) {
-        f32* pfVar = (f32*)((u8*)&basePtr->field0_0x0 + 8 + *offsetData->m_serializedDataOffsets);
+        f32* pfVar = (f32*)((u8*)basePtr + 8 + *offsetData->m_serializedDataOffsets);
         
         // Update velocity and position
         pfVar[1] = pfVar[1] + pfVar[2];

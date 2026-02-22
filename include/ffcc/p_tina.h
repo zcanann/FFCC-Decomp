@@ -61,7 +61,7 @@ public:
     void SetParColIdx(int, pppFVECTOR4&);
     void GetParColIdx(int, pppFVECTOR4&);
 
-    void IsLoadPartCompleted();
+    unsigned int IsLoadPartCompleted();
 
     void LoadFieldPdt(int, int, void*, unsigned long, unsigned char);
     void LoadMonsterPdt(int, int, void*, int, void*, int);

@@ -4,6 +4,7 @@
 #include "ffcc/p_game.h"
 #include "ffcc/sound.h"
 #include "dolphin/types.h"
+#include <string.h>
 
 extern "C" int GetItemType__8CMenuPcsFii(CMenuPcs*, int, int);
 extern "C" int GetItemIcon__8CMenuPcsFi(CMenuPcs*, int);
@@ -35,6 +36,9 @@ extern double DOUBLE_80332aa8;
 extern float FLOAT_80332a70;
 extern float FLOAT_80332ab0;
 extern float FLOAT_80332a88;
+extern s16 DAT_801de910[];
+extern s16 DAT_801de914[];
+extern s16 DAT_801de91c[];
 extern const char* PTR_s_Flamestrike_80214d28[];
 extern const char* PTR_s_Feuer_Hieb_80214d3c[];
 extern const char* PTR_s_Colpo_Fire_80214d50[];
@@ -909,10 +913,199 @@ void CMenuPcs::ChkCmdActive(int)
  * Address:	TODO
  * Size:	TODO
  */
-int CMenuPcs::ChkUnite(int, int (*) [2])
+int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 {
-	// TODO
-	return 0;
+	u8* self = reinterpret_cast<u8*>(this);
+	const s32 caravanWork = Game.game.m_scriptFoodBase[0];
+	s16* const cmd = *reinterpret_cast<s16**>(self + 0x82c);
+
+	int candidates[10];
+	int itemKinds[11];
+	int matches[10];
+
+	memset(candidates, -1, sizeof(candidates));
+	memset(itemKinds, -1, sizeof(itemKinds));
+	memset(matches, -1, sizeof(matches));
+
+	if (comboOut != nullptr) {
+		for (int i = 0; i < 5; i++) {
+			comboOut[i][0] = -1;
+			comboOut[i][1] = -1;
+		}
+	}
+
+	const s16 selectedState = *reinterpret_cast<s16*>(caravanWork + selected * 2 + 0x214);
+	const u32 selectedNegMask = static_cast<u32>(-selectedState) & ~static_cast<u32>(selectedState);
+
+	if ((cmd[0x18] == 1) && (cmd[0x09] == 2)) {
+		if (selectedState < 0) {
+			selected--;
+		}
+		if (*reinterpret_cast<s16*>(caravanWork + selected * 2 + 0x214) < 0) {
+			selected--;
+		}
+	}
+
+	int write = 2;
+	for (int slot = 2; slot < 8;) {
+		int nextWrite = write;
+		int nextSlot = slot + 1;
+		int entryOffset = slot * 2;
+
+		if (slot == selected) {
+			if (*reinterpret_cast<s16*>(caravanWork + entryOffset + 0x214) == 0) {
+				candidates[write] = 0;
+			} else {
+				candidates[write] = 0;
+				candidates[write + 1] = 0;
+				nextWrite = write + 1;
+				nextSlot = slot + 2;
+				entryOffset += 2;
+				if (*reinterpret_cast<s16*>(caravanWork + entryOffset + 0x214) < 0) {
+					candidates[write + 2] = 0;
+					nextWrite = write + 2;
+					entryOffset += 2;
+					nextSlot = slot + 3;
+				}
+			}
+		} else {
+			const u32 v = static_cast<u32>(*reinterpret_cast<s16*>(caravanWork + entryOffset + 0x214));
+			candidates[write] = static_cast<s32>((-v | v) >> 31);
+		}
+
+		write = nextWrite + 1;
+		slot = nextSlot;
+	}
+
+	int index = 2;
+	for (int slot = 2; slot < 8; slot++, index++) {
+		if (*reinterpret_cast<s16*>(caravanWork + 0xbaa) <= slot) {
+			break;
+		}
+		const s16 itemRef = *reinterpret_cast<s16*>(caravanWork + slot * 2 + 0x204);
+		if (itemRef < 0) {
+			continue;
+		}
+
+		const int itemId = *reinterpret_cast<s16*>(caravanWork + itemRef * 2 + 0xb6);
+		const int icon = GetItemIcon__8CMenuPcsFi(this, itemId);
+
+		if ((itemId > 0xde) && (itemId < 0xe4)) {
+			if (itemId == 0xdf) {
+				itemKinds[index] = 0x100;
+			} else if (itemId == 0xe0) {
+				itemKinds[index] = 0x101;
+			} else if (itemId == 0xe1) {
+				itemKinds[index] = 0x102;
+			} else if (itemId == 0xe2) {
+				itemKinds[index] = 0x105;
+			} else {
+				itemKinds[index] = 0x107;
+			}
+		} else if ((icon == 0) || (icon == 1) || (icon == 2) || (icon == 3)) {
+			itemKinds[index] = 999;
+		} else if ((icon == 0x10) || (icon == 0x11)) {
+			itemKinds[index] = itemId;
+		}
+	}
+
+	int matchCount = 0;
+	if (itemKinds[selected] > 0) {
+		if ((itemKinds[selected] == 999) && (selected > 2)) {
+			int patIdx = 0;
+			for (s16* pat = DAT_801de910; pat[1] >= 0; pat += 6, patIdx++) {
+				if ((pat[0] == 0) || ((pat[2] == 2) && (static_cast<s32>(selectedNegMask) < 0))) {
+					continue;
+				}
+				int ok = 0;
+				for (int k = 0; k < pat[2]; k++) {
+					const int slot = selected - (pat[2] - 1 - k);
+					if (candidates[slot] != 0) {
+						break;
+					}
+					if (pat[3 + k] == itemKinds[slot]) {
+						ok++;
+					}
+				}
+				if (ok == pat[2] - 1) {
+					matches[matchCount * 2] = patIdx;
+					matches[matchCount * 2 + 1] = selected - (pat[2] - 1);
+					matchCount++;
+				}
+			}
+		} else if (static_cast<s32>(selectedNegMask) >= 0) {
+			const int baseLen = static_cast<int>(DAT_801de914[0]);
+			int start = selected - (baseLen - 1);
+			for (int i = 0; i < baseLen; i++, start++) {
+				int ok = 0;
+				for (int k = 0; k < baseLen; k++) {
+					const int slot = i + (selected - ((baseLen - 1) - k));
+					if (candidates[slot] != 0) {
+						break;
+					}
+					if (DAT_801de910[3 + k] == itemKinds[slot]) {
+						ok++;
+					}
+				}
+				if (ok == baseLen) {
+					matches[matchCount * 2] = 0;
+					matches[matchCount * 2 + 1] = start;
+					matchCount++;
+				}
+			}
+		}
+
+		int group = 1;
+		int* matchWrite = matches + matchCount * 2;
+		for (s16* pat = DAT_801de91c; pat[1] >= 0; pat += 6, group++) {
+			if (((pat[0] != 0) && (itemKinds[selected] == 999) && (selected >= 3)) ||
+			    ((pat[2] == 2) && (static_cast<s32>(selectedNegMask) < 0))) {
+				continue;
+			}
+
+			const int len = static_cast<int>(pat[2]);
+			for (int start = 0; start < len; start++) {
+				if ((start == 0) && (static_cast<s32>(selectedNegMask) < 0)) {
+					start = 1;
+				}
+
+				int ok = 0;
+				for (int k = 0; k < len; k++) {
+					const int slot = start + (selected - ((len - 1) - k));
+					if (candidates[slot] != 0) {
+						break;
+					}
+					if (pat[3 + k] == itemKinds[slot]) {
+						ok++;
+					}
+				}
+
+				if (ok == len) {
+					matchWrite[0] = group;
+					matchWrite[1] = start + (selected - (len - 1));
+					matchWrite += 2;
+					matchCount++;
+				}
+			}
+		}
+	}
+
+	if (comboOut != nullptr) {
+		for (int rank = 0; rank < 2; rank++) {
+			int (*dst)[2] = comboOut;
+			for (int i = 0; i < matchCount; i++) {
+				const int* m = &matches[i * 2];
+				if (rank + 2 == DAT_801de914[m[0] * 6]) {
+					dst[0][0] = m[0];
+					dst[0][1] = m[1];
+					dst++;
+				}
+			}
+			comboOut = dst;
+		}
+	}
+
+	return matchCount;
 }
 
 /*

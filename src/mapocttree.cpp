@@ -15,8 +15,24 @@ extern float lbl_8032F964;
 extern CMaterialMan MaterialMan;
 extern CLightPcs LightPcs;
 static unsigned long s_clearFlagMask;
-static CBound s_bound;
-static CMapCylinder s_cyl;
+struct CBoundRaw
+{
+    Vec m_min;
+    Vec m_max;
+};
+struct CMapCylinderRaw
+{
+    Vec m_bottom;
+    Vec m_direction;
+    float m_radius;
+    float m_height;
+    Vec m_top;
+    Vec m_direction2;
+    float m_radius2;
+    float m_height2;
+};
+static CBoundRaw s_bound;
+static CMapCylinderRaw s_cyl;
 static Vec s_mvec;
 static unsigned long s_checkHitCylinderMask;
 static unsigned long s_insertShadowBitIndex;
@@ -40,6 +56,7 @@ static inline COctNode* GetMapObjByIndex(unsigned short index)
 {
     return reinterpret_cast<COctNode*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x960 + (index * 0xF0));
 }
+
 }
 
 /*
@@ -1109,7 +1126,7 @@ void InsertLight_r(COctNode* node)
 					break;
 				}
 
-				if ((s_bound.CheckCross(*reinterpret_cast<CBound*>(grandChild))) != 0) {
+				if ((reinterpret_cast<CBound*>(&s_bound)->CheckCross(*reinterpret_cast<CBound*>(grandChild))) != 0) {
 					if (*reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3E)) != 0) {
 						setbit32(reinterpret_cast<unsigned long*>(Ptr(grandChild, 0x48)), s_insertShadowBitIndex);
 					}
@@ -1219,7 +1236,7 @@ void InsertShadow_r(COctNode* node)
 {
 	bool overlap = false;
 
-	if (s_bound.CheckCross(*(CBound*)node) != 0) {
+	if (reinterpret_cast<CBound*>(&s_bound)->CheckCross(*(CBound*)node) != 0) {
 		overlap = true;
 	}
 
@@ -1241,7 +1258,7 @@ void InsertShadow_r(COctNode* node)
 
 			overlap = false;
 
-			if (s_bound.CheckCross(*(CBound*)child) != 0) {
+			if (reinterpret_cast<CBound*>(&s_bound)->CheckCross(*(CBound*)child) != 0) {
 				overlap = true;
 			}
 
@@ -1261,7 +1278,7 @@ void InsertShadow_r(COctNode* node)
 
 					s_insertShadowDepth++;
 
-					if (s_bound.CheckCross(*(CBound*)child2) != 0) {
+					if (reinterpret_cast<CBound*>(&s_bound)->CheckCross(*(CBound*)child2) != 0) {
 						if ((s_insertShadowDepth > 2) &&
 							(*(unsigned short*)((unsigned char*)child2 + 0x3e) != 0)) {
 							setbit32((unsigned long*)((unsigned char*)child2 + 0x48), s_insertShadowBitIndex);
@@ -1520,7 +1537,7 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 	meshStart = *(unsigned short*)((unsigned char*)node + 0x3c);
 	meshEnd = *(unsigned short*)((unsigned char*)node + 0x3e);
 	if ((meshEnd != 0) &&
-		(mapHit->CheckHitCylinder(&s_cyl, &s_mvec, meshStart, meshEnd, s_checkHitCylinderMask) != 0)) {
+		(mapHit->CheckHitCylinder((CMapCylinder*)&s_cyl, &s_mvec, meshStart, meshEnd, s_checkHitCylinderMask) != 0)) {
 		return 1;
 	}
 
@@ -1666,7 +1683,7 @@ int COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 
 	if (*reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3E)) != 0) {
 		(*reinterpret_cast<CMapHit**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0xC)))
-		    ->CheckHitCylinderNear(&s_cyl, &s_mvec,
+		    ->CheckHitCylinderNear((CMapCylinder*)&s_cyl, &s_mvec,
 		                           *reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3C)),
 		                           *reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3E)),
 		                           s_checkHitCylinderMask);
@@ -1729,7 +1746,7 @@ int COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 
 		if (*reinterpret_cast<unsigned short*>(Ptr(child, 0x3E)) != 0) {
 			(*reinterpret_cast<CMapHit**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0xC)))
-			    ->CheckHitCylinderNear(&s_cyl, &s_mvec,
+			    ->CheckHitCylinderNear((CMapCylinder*)&s_cyl, &s_mvec,
 			                           *reinterpret_cast<unsigned short*>(Ptr(child, 0x3C)),
 			                           *reinterpret_cast<unsigned short*>(Ptr(child, 0x3E)),
 			                           s_checkHitCylinderMask);
@@ -1741,10 +1758,10 @@ int COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 				break;
 			}
 
-			if (reinterpret_cast<CBound*>(grandChild)->CheckCross(s_bound) != 0) {
+			if (reinterpret_cast<CBound*>(grandChild)->CheckCross(*reinterpret_cast<CBound*>(&s_bound)) != 0) {
 				if (*reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3E)) != 0) {
 					(*reinterpret_cast<CMapHit**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0xC)))
-					    ->CheckHitCylinderNear(&s_cyl, &s_mvec,
+					    ->CheckHitCylinderNear((CMapCylinder*)&s_cyl, &s_mvec,
 					                           *reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3C)),
 					                           *reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3E)),
 					                           s_checkHitCylinderMask);

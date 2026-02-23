@@ -1195,12 +1195,58 @@ void CGMonObj::sysControl(int controlType)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80112D5C
+ * PAL Size: 376b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::onChangePrg(int)
+void CGMonObj::onChangePrg(int value)
 {
-	// TODO
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+
+	if ((((char)object->m_weaponNodeFlags) >> 7) != value &&
+		(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) == 0xB)) {
+		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x1000);
+
+		unsigned short count = *reinterpret_cast<unsigned short*>(
+			reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + (value != 0 ? 0x1AC : 0x1AE)
+		);
+		int particleBase = (value != 0) ? 0x46 : 0x3C;
+
+		void* pdtLoadRef = nullptr;
+		if (object->m_charaModelHandle != nullptr) {
+			pdtLoadRef = object->m_charaModelHandle->m_pdtLoadRef;
+		}
+		int dataNo = (pdtLoadRef != nullptr) ? reinterpret_cast<int*>(pdtLoadRef)[5] : -1;
+		int modelSlot = *reinterpret_cast<int*>(mon + 0x594);
+
+		if (mon[0x6BA] != 0) {
+			if (count != 0) {
+				reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace(
+					(particleBase + 9) | (dataNo << 8),
+					modelSlot,
+					object,
+					0.0f,
+					0
+				);
+			}
+		} else {
+			for (int i = 0; i < (int)count; i++) {
+				reinterpret_cast<CGPrgObj*>(this)->putParticleBindTrace(
+					(particleBase + i) | (dataNo << 8),
+					modelSlot,
+					object,
+					0.0f,
+					0
+				);
+			}
+		}
+	}
+
+	reinterpret_cast<CGCharaObj*>(this)->onChangePrg(value);
 }
 
 /*

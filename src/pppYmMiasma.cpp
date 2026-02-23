@@ -16,7 +16,7 @@ extern float FLOAT_8033065c;
 extern float FLOAT_80330660;
 extern float FLOAT_80330664;
 extern float FLOAT_80330668;
-extern u32 DAT_80330658;
+extern float FLOAT_80330658;
 extern int DAT_8032ed70;
 extern double DOUBLE_80330648;
 extern double RandF__5CMathFf(double, void*);
@@ -278,23 +278,22 @@ void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA
  */
 void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, UnkC* param_2)
 {
-    u32 value;
+    u8* workBytes = (u8*)pppYmMiasma_ + 8 + param_2->m_serializedDataOffsets[2];
     float fVar1 = FLOAT_80330644;
-    u32* work = (u32*)((u8*)pppYmMiasma_ + 8 + param_2->m_serializedDataOffsets[2]);
+    float* work = (float*)workBytes;
 
-    value = DAT_80330658;
-    work[0] = 0;
-    ((float*)work)[7] = fVar1;
-    ((float*)work)[8] = fVar1;
-    ((float*)work)[9] = fVar1;
-    *((u8*)(work + 2)) = 0;
-    work[4] = value;
-    ((float*)work)[5] = fVar1;
-    ((float*)work)[6] = fVar1;
-    ((float*)work)[0xc] = fVar1;
-    ((float*)work)[0xb] = fVar1;
-    ((float*)work)[10] = fVar1;
-    *((u8*)(work + 0xd)) = 0;
+    *(u32*)workBytes = 0;
+    work[7] = fVar1;
+    work[8] = fVar1;
+    work[9] = fVar1;
+    workBytes[8] = 0;
+    work[4] = FLOAT_80330658;
+    work[5] = fVar1;
+    work[6] = fVar1;
+    work[0xc] = fVar1;
+    work[0xb] = fVar1;
+    work[10] = fVar1;
+    workBytes[0x34] = 0;
 }
 
 /*

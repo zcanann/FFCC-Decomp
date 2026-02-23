@@ -95,7 +95,7 @@ public:
     void DeleteItem(int, int);
     void AddTmpArtifact(int, int*);
     int CanAddGil(int);
-    void AddGil(int);
+    int AddGil(int);
     void GetFoodRank(int);
     void SearchRomLetterWork(CRomLetterWork**, int);
     void ShopRequest(int, int, int, int, int, int, int);

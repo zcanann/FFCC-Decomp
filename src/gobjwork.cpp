@@ -493,12 +493,29 @@ int CCaravanWork::CanAddGil(int gilAmount)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a1b5c
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::AddGil(int)
+int CCaravanWork::AddGil(int gilToAdd)
 {
-	// TODO
+	int totalGil;
+
+	m_gil = m_gil + gilToAdd;
+	totalGil = m_gil;
+	if (totalGil < 100000000) {
+		if (totalGil < 0) {
+			gilToAdd = gilToAdd - totalGil;
+			m_gil = 0;
+		}
+	} else {
+		m_gil = totalGil - (totalGil + -99999999);
+		gilToAdd = gilToAdd - (totalGil + -99999999);
+	}
+	return gilToAdd;
 }
 
 /*

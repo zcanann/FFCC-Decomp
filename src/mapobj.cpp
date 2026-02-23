@@ -429,10 +429,10 @@ void CMapObj::SetShow_r(int show)
  */
 void CMapObj::SetShow(int show)
 {
-    if (show == 0) {
-        U8At(this, 0x18) &= 0xFE;
-    } else {
+    if (show != 0) {
         U8At(this, 0x18) |= 1;
+    } else {
+        U8At(this, 0x18) &= 0xFE;
     }
 
     if (ObjAt(this, 0x4) != 0) {

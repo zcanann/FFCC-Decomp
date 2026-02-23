@@ -3,6 +3,7 @@
 #include "ffcc/materialman.h"
 #include "ffcc/memory.h"
 #include "ffcc/pad.h"
+#include "ffcc/gobject.h"
 
 #include <dolphin/mtx.h>
 #include <dolphin/os/OSCache.h>
@@ -22,6 +23,12 @@ extern float FLOAT_8032fa54;
 extern float FLOAT_8032fa5c;
 extern float FLOAT_8032fa58;
 extern float FLOAT_8032fa8c;
+extern float FLOAT_8032fa78;
+extern float FLOAT_8032fa7c;
+extern float FLOAT_8032fa94;
+extern float FLOAT_8032fa98;
+extern float FLOAT_8032fa9c;
+extern float FLOAT_8032faa0;
 extern float FLOAT_8032fa3c;
 extern float FLOAT_8032fac8;
 extern float FLOAT_8032faa4;
@@ -32,8 +39,14 @@ extern float FLOAT_8032fab8;
 extern CMaterialMan MaterialMan;
 extern char DAT_801d7928[];
 extern unsigned char MapMng[];
+extern unsigned char CFlat[];
 extern "C" void Printf__7CSystemFPce(CSystem* system, char* format, ...);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long size, CMemory::CStage* stage, char* file, int line);
+extern "C" void __dl__FPv(void*);
+extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
+extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
+extern "C" void SetFrustum__6CBoundFR3VecPA4_f(float* bound, Vec* point, Mtx matrix);
+extern "C" int CheckFrustum0__6CBoundFR6CBound(float* lhs, float* rhs);
 
 extern "C" {
 void pppEditGetViewPos__FP3Vec(Vec*);
@@ -385,22 +398,138 @@ void CCameraPcs::createFullShadow()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800382f8
+ * PAL Size: 96b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCameraPcs::destroyFullShadow()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+
+    if (*reinterpret_cast<void**>(self + 0x31C) != 0) {
+        __dl__FPv(*reinterpret_cast<void**>(self + 0x31C));
+        *reinterpret_cast<void**>(self + 0x31C) = 0;
+    }
+
+    if (*reinterpret_cast<void**>(self + 0x320) != 0) {
+        __dl__FPv(*reinterpret_cast<void**>(self + 0x320));
+        *reinterpret_cast<void**>(self + 0x320) = 0;
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80038050
+ * PAL Size: 680b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCameraPcs::GetShadowRect(CBound&)
+int CCameraPcs::GetShadowRect(CBound&)
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    int count = 0;
+    Mtx invView;
+    Mtx frustumMtx;
+    float cameraBound[6];
+    float* shadowRect = reinterpret_cast<float*>(self + 0x414);
+
+    PSMTXInverse(reinterpret_cast<MtxPtr>(self + 0x4), invView);
+    Vec eyePos;
+    eyePos.x = invView[0][3];
+    eyePos.y = invView[1][3];
+    eyePos.z = invView[2][3];
+
+    PSMTXScaleApply(reinterpret_cast<MtxPtr>(self + 0x4), frustumMtx,
+                    FLOAT_8032fa94 * *reinterpret_cast<float*>(self + 0x94),
+                    FLOAT_8032fa98 * *reinterpret_cast<float*>(self + 0xA8),
+                    FLOAT_8032fa1c);
+    SetFrustum__6CBoundFR3VecPA4_f(cameraBound, &eyePos, frustumMtx);
+
+    for (CGObject* gObject = FindGObjFirst__13CFlatRuntime2Fv(CFlat); gObject != 0;
+         gObject = FindGObjNext__13CFlatRuntime2FP8CGObject(CFlat, gObject))
+    {
+        bool include = false;
+        if (gObject->m_charaModelHandle != 0) {
+            unsigned int displayFlags = gObject->m_displayFlags;
+            if ((displayFlags & 1) != 0 && (displayFlags & 0x40) == 0) {
+                if (static_cast<signed char>(gObject->m_weaponNodeFlags >> 8) < 0) {
+                    if ((displayFlags & 0x80) != 0 || gObject->m_lookAtTimer == FLOAT_8032fa1c) {
+                        include = true;
+                    }
+                }
+            }
+        }
+
+        if (!include) {
+            continue;
+        }
+
+        float radius = gObject->m_nearColRadius;
+        if (FLOAT_8032fa9c < radius) {
+            radius = FLOAT_8032fa9c;
+        }
+
+        float minX = gObject->m_worldPosition.x - radius;
+        float minY = gObject->m_worldPosition.y;
+        float minZ = gObject->m_worldPosition.z - radius;
+        float maxX = gObject->m_worldPosition.x + radius;
+        float maxY = gObject->m_worldPosition.y + radius;
+        float maxZ = gObject->m_worldPosition.z + radius;
+
+        float clipBound[6];
+        clipBound[0] = FLOAT_8032fa78;
+        clipBound[1] = FLOAT_8032fa78;
+        clipBound[2] = FLOAT_8032fa78;
+        clipBound[3] = FLOAT_8032fa7c;
+        clipBound[4] = FLOAT_8032fa7c;
+        clipBound[5] = FLOAT_8032fa7c;
+
+        float worldBound[6];
+        worldBound[0] = minX;
+        worldBound[1] = minY;
+        worldBound[2] = minZ;
+        worldBound[3] = maxX;
+        worldBound[4] = maxY;
+        worldBound[5] = maxZ;
+
+        if (CheckFrustum0__6CBoundFR6CBound(worldBound, clipBound) == 0) {
+            continue;
+        }
+        if (FLOAT_8032faa0 >= clipBound[0]) {
+            continue;
+        }
+        if ((FLOAT_8032fa48 >= (clipBound[5] - clipBound[2]) / -clipBound[0]) &&
+            (FLOAT_8032fa48 >= (clipBound[4] - clipBound[1]) / -clipBound[0])) {
+            continue;
+        }
+
+        if (shadowRect[0] < minX) {
+            shadowRect[0] = minX;
+        }
+        if (shadowRect[1] < minY) {
+            shadowRect[1] = minY;
+        }
+        if (shadowRect[2] < minZ) {
+            shadowRect[2] = minZ;
+        }
+        if (maxX < shadowRect[3]) {
+            shadowRect[3] = maxX;
+        }
+        if (maxY < shadowRect[4]) {
+            shadowRect[4] = maxY;
+        }
+        if (maxZ < shadowRect[5]) {
+            shadowRect[5] = maxZ;
+        }
+        count += 1;
+    }
+
+    return count;
 }
 
 /*

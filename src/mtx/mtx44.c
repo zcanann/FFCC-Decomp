@@ -367,11 +367,14 @@ asm void PSMTX44Transpose(const register Mtx44 src, register Mtx44 xPose) {
 u32 C_MTX44Inverse(const Mtx44 src, Mtx44 inv) {
     Mtx44 gjm;
     s32 i;
+    s32 j;
     s32 k;
+    s32 rowOfs;
+    s32 colOfs;
     f32 w;
     f32 max;
     s32 swp;
-    f32 ftmp;
+    f32 absVal;
 
     ASSERTMSGLINE(734, src, "MTX44Inverse():  NULL Mtx44Ptr 'src' ");
     ASSERTMSGLINE(735, inv, "MTX44Inverse():  NULL Mtx44Ptr 'inv' ");
@@ -379,16 +382,23 @@ u32 C_MTX44Inverse(const Mtx44 src, Mtx44 inv) {
     MTX44Copy(src, gjm);
     MTX44Identity(inv);
 
+    rowOfs = 0;
+    colOfs = 0;
     for (i = 0; i < 4; i++) {
+        s32 rem = 4 - i;
+        s32 probe = rowOfs;
+
         max = 0.0f;
         swp = i;
-
-        for (k = i; k < 4; k++) {
-            ftmp = fabsf(gjm[k][i]);
-            if (ftmp > max) {
-                max = ftmp;
-                swp = k;
+        j = i;
+        while (rem-- > 0) {
+            absVal = fabsf(*(f32*)((u8*)gjm + probe + colOfs));
+            if (absVal > max) {
+                max = absVal;
+                swp = j;
             }
+            probe += 0x10;
+            j++;
         }
 
         if (max == 0.0f) {
@@ -402,7 +412,7 @@ u32 C_MTX44Inverse(const Mtx44 src, Mtx44 inv) {
             }
         }
 
-        w = 1.0f / gjm[i][i];
+        w = 1.0f / *(f32*)((u8*)gjm + rowOfs + colOfs);
         gjm[i][0] *= w;
         inv[i][0] *= w;
         gjm[i][1] *= w;
@@ -412,31 +422,34 @@ u32 C_MTX44Inverse(const Mtx44 src, Mtx44 inv) {
         gjm[i][3] *= w;
         inv[i][3] *= w;
 
-        for (k = 0; k < 4; k += 2) {
+        for (k = 0, j = 0; k < 4; k += 2, j += 0x20) {
             if (k != i) {
-                w = gjm[k][i];
-                gjm[k][0] -= gjm[i][0] * w;
-                inv[k][0] -= inv[i][0] * w;
-                gjm[k][1] -= gjm[i][1] * w;
-                inv[k][1] -= inv[i][1] * w;
-                gjm[k][2] -= gjm[i][2] * w;
-                inv[k][2] -= inv[i][2] * w;
-                gjm[k][3] -= gjm[i][3] * w;
-                inv[k][3] -= inv[i][3] * w;
+                w = *(f32*)((u8*)gjm + j + colOfs);
+                *(f32*)((u8*)gjm + j + 0x0) -= gjm[i][0] * w;
+                *(f32*)((u8*)inv + j + 0x0) -= inv[i][0] * w;
+                *(f32*)((u8*)gjm + j + 0x4) -= gjm[i][1] * w;
+                *(f32*)((u8*)inv + j + 0x4) -= inv[i][1] * w;
+                *(f32*)((u8*)gjm + j + 0x8) -= gjm[i][2] * w;
+                *(f32*)((u8*)inv + j + 0x8) -= inv[i][2] * w;
+                *(f32*)((u8*)gjm + j + 0xc) -= gjm[i][3] * w;
+                *(f32*)((u8*)inv + j + 0xc) -= inv[i][3] * w;
             }
 
             if (k + 1 != i) {
-                w = gjm[k + 1][i];
-                gjm[k + 1][0] -= gjm[i][0] * w;
-                inv[k + 1][0] -= inv[i][0] * w;
-                gjm[k + 1][1] -= gjm[i][1] * w;
-                inv[k + 1][1] -= inv[i][1] * w;
-                gjm[k + 1][2] -= gjm[i][2] * w;
-                inv[k + 1][2] -= inv[i][2] * w;
-                gjm[k + 1][3] -= gjm[i][3] * w;
-                inv[k + 1][3] -= inv[i][3] * w;
+                w = *(f32*)((u8*)gjm + j + 0x10 + colOfs);
+                *(f32*)((u8*)gjm + j + 0x10) -= gjm[i][0] * w;
+                *(f32*)((u8*)inv + j + 0x10) -= inv[i][0] * w;
+                *(f32*)((u8*)gjm + j + 0x14) -= gjm[i][1] * w;
+                *(f32*)((u8*)inv + j + 0x14) -= inv[i][1] * w;
+                *(f32*)((u8*)gjm + j + 0x18) -= gjm[i][2] * w;
+                *(f32*)((u8*)inv + j + 0x18) -= inv[i][2] * w;
+                *(f32*)((u8*)gjm + j + 0x1c) -= gjm[i][3] * w;
+                *(f32*)((u8*)inv + j + 0x1c) -= inv[i][3] * w;
             }
         }
+
+        rowOfs += 0x10;
+        colOfs += 0x4;
     }
 
     return 1;

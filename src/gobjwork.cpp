@@ -1286,12 +1286,52 @@ void CMonWork::Init(int, CRomWork*, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009e2fc
+ * PAL Size: 892b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMonWork::CalcStatus()
 {
-	// TODO
+	unsigned short* baseData = reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[1] + (m_baseDataIndex * 0x1D0));
+
+	memcpy(m_elementResistances, m_romWorkPtr + 0x6F, 0x16);
+
+	m_strength = baseData[4];
+	m_magic = baseData[5];
+	m_defense = baseData[6];
+
+	int stageRank = 0;
+	if (Game.game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+		stageRank = Game.game.m_gameWork.m_bossArtifactStageTable[Game.game.m_gameWork.m_bossArtifactStageIndex];
+		if (stageRank > 2) {
+			stageRank = 2;
+		}
+	}
+
+	if (stageRank > 0) {
+		const int stageOffset = stageRank * 2;
+		m_strength = (unsigned short)((float)m_strength * GetStatusMultiplier(stageOffset + 0x48));
+		m_magic = (unsigned short)((float)m_magic * GetStatusMultiplier(stageOffset + 0x4C));
+		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(stageOffset + 0x50));
+	}
+
+	if (m_statusTimers[9] != 0) {
+		const float mul = GetStatusMultiplier(0x38);
+		m_strength = (unsigned short)((float)m_strength * mul);
+		m_magic = (unsigned short)((float)m_magic * mul);
+		m_defense = (unsigned short)((float)m_defense * mul);
+	}
+
+	if (m_statusTimers[4] != 0) {
+		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x3E));
+	}
+
+	if (m_statusTimers[6] != 0) {
+		m_defense = (unsigned short)((float)m_defense * GetStatusMultiplier(0x44));
+	}
 }
 
 /*

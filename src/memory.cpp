@@ -2089,12 +2089,60 @@ void CAmemCacheSet::DumpCache()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001C2F0
+ * PAL Size: 280b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMemory::CStage::heapInfo(unsigned long&, unsigned long&, unsigned long&)
+void CMemory::CStage::heapInfo(unsigned long& heapTotal, unsigned long& heapUse, unsigned long& heapUnuse)
 {
-	// TODO
+    int mode = stageGetAllocationMode(this);
+    int node = stageGetHeapHead(this);
+    if (mode != 2) {
+        node = *reinterpret_cast<int*>(node + 8);
+    }
+
+    heapTotal = 0;
+    heapUse = 0;
+    heapUnuse = 0;
+
+    if (mode == 2) {
+        int top = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 8);
+        int tail = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 12);
+        int count = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x120);
+
+        for (int i = 0; i <= count; i++) {
+            int blockTail = (i == count) ? tail : *reinterpret_cast<int*>(node + 4);
+            int freeSize = blockTail - top;
+            if (freeSize != 0) {
+                heapUnuse += freeSize;
+                heapTotal += freeSize;
+            }
+
+            if (i < count) {
+                int usedSize = *reinterpret_cast<int*>(node + 8) - *reinterpret_cast<int*>(node + 4);
+                heapUse += usedSize;
+                top = blockTail + usedSize;
+                heapTotal += usedSize;
+            }
+
+            node += 0x40;
+        }
+        return;
+    }
+
+    while ((*reinterpret_cast<unsigned char*>(node + 2) & 2) == 0) {
+        if ((*reinterpret_cast<unsigned char*>(node + 2) & 4) == 0) {
+            heapUnuse += *reinterpret_cast<int*>(node + 0x10);
+        } else {
+            heapUse += *reinterpret_cast<int*>(node + 0x10);
+        }
+
+        heapTotal += *reinterpret_cast<int*>(node + 8) - node;
+        node = *reinterpret_cast<int*>(node + 8);
+    }
 }
 
 /*

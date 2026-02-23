@@ -413,8 +413,8 @@ extern "C" void SetEvtFlag__12CCaravanWorkFii(CCaravanWork* caravanWork, int evt
 extern "C" int GetEvtFlag__12CCaravanWorkFi(CCaravanWork* caravanWork, int evtFlagIndex)
 {
     unsigned char* evtFlags = reinterpret_cast<unsigned char*>(caravanWork->m_evtWorkArr);
-    int byteIndex = evtFlagIndex / 8;
-    int bitIndex = evtFlagIndex - byteIndex * 8;
+    int byteIndex = evtFlagIndex >> 3;
+    int bitIndex = evtFlagIndex & 7;
     unsigned char mask = (unsigned char)(1u << bitIndex);
 
     return (evtFlags[byteIndex] & mask) != 0;

@@ -23,6 +23,8 @@ extern "C" void Destroy__9CGBaseObjFv(CGBaseObj*);
 extern "C" void Frame__9CGBaseObjFv(CGBaseObj*);
 extern "C" void Draw__9CGBaseObjFv(CGBaseObj*);
 extern "C" void Frame__12CFlatRuntimeFii(CFlatRuntime*, int, int);
+extern "C" void Create__12CFlatRuntimeFPv(CFlatRuntime*, void*);
+extern "C" int CreateDebug__12CFlatRuntimeFPvi(CFlatRuntime*, void*, int);
 extern "C" void Destroy__12CFlatRuntimeFv(CFlatRuntime*);
 extern "C" void Destroy__9CFlatDataFv(void*);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
@@ -48,6 +50,7 @@ extern "C" void* Open__5CFileFPcUlQ25CFile3PRI(void*, char*, unsigned long, int)
 extern "C" void Read__5CFileFPQ25CFile7CHandle(void*, void*);
 extern "C" void SyncCompleted__5CFileFPQ25CFile7CHandle(void*, void*);
 extern "C" void ReadASync__5CFileFPQ25CFile7CHandle(void*, void*);
+extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
 extern "C" void ClrBattleItem__8CMenuPcsFv(void*);
 extern "C" void ChangeMogMode__6CCharaFi(void*, int);
 extern "C" void TimeMogFur__6CCharaFv(void*);
@@ -865,12 +868,61 @@ void CFlatRuntime2::Frame(int arg0, int mode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006CB84
+ * PAL Size: 444b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::Load(char*)
+int CFlatRuntime2::Load(char* fileName)
 {
-	// TODO
+	char path[0x100];
+	sprintf(path, "dvd:/%s.cft", fileName);
+
+	void* fileHandle = Open__5CFileFPcUlQ25CFile3PRI(&File, path, 0, 0);
+	if (fileHandle == 0) {
+		return 0;
+	}
+
+	Read__5CFileFPQ25CFile7CHandle(&File, fileHandle);
+	SyncCompleted__5CFileFPQ25CFile7CHandle(&File, fileHandle);
+	Create__12CFlatRuntimeFPv(reinterpret_cast<CFlatRuntime*>(this), File.m_readBuffer);
+	Close__5CFileFPQ25CFile7CHandle(&File, fileHandle);
+
+	typedef int (*NeedDebugDataFn)(CFlatRuntime2*);
+	NeedDebugDataFn needDebugData = reinterpret_cast<NeedDebugDataFn>((*reinterpret_cast<void***>(this))[0x12]);
+
+	if (needDebugData(this) != 0) {
+		int debugChunk = 0;
+		for (int debugIndex = 0;; debugIndex++) {
+			sprintf(path, "dvd:/%s.cft_dbg", fileName);
+			if (debugIndex != 0) {
+				sprintf(path, "%s%d", path, debugIndex);
+			}
+
+			fileHandle = Open__5CFileFPcUlQ25CFile3PRI(&File, path, 0, 0);
+			if (fileHandle == 0) {
+				return 0;
+			}
+
+			Read__5CFileFPQ25CFile7CHandle(&File, fileHandle);
+			SyncCompleted__5CFileFPQ25CFile7CHandle(&File, fileHandle);
+			debugChunk = CreateDebug__12CFlatRuntimeFPvi(
+				reinterpret_cast<CFlatRuntime*>(this), File.m_readBuffer, debugChunk);
+			Close__5CFileFPQ25CFile7CHandle(&File, fileHandle);
+
+			if (debugChunk == -1) {
+				break;
+			}
+		}
+	}
+
+	resetChangeScript();
+	if (System.m_execParam > 2) {
+		Printf__7CSystemFPce(&System, "CFlatRuntime2::Load\n");
+	}
+	return 1;
 }
 
 /*

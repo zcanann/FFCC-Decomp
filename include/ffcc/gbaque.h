@@ -75,7 +75,7 @@ public:
     int GetFavorite(int, char*);
     void GetMoneyFlg(int);
     void ClrMoneyFlg(int);
-    void GetMoney(int);
+    int GetMoney(int);
     void ClrScrInitEnd();
     void InitCmakeInfo(int, int);
     void ClrCmakeInfo(int);

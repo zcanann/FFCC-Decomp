@@ -1,6 +1,7 @@
 #include "ffcc/sound.h"
 
 #include "ffcc/RedSound/RedSound.h"
+#include "ffcc/graphic.h"
 #include "ffcc/system.h"
 #include "PowerPC_EABI_Support/Runtime/MWCPlusLib.h"
 #include <Runtime.PPCEABI.H/NMWException.h>
@@ -50,6 +51,11 @@ extern "C" int SePlay__9CRedSoundFiiiii(CRedSound*, int, int, int, int, int);
 extern "C" void MusicVolume__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" void Printf__7CSystemFPce(CSystem*, char*, ...);
 extern "C" int sprintf(char*, const char*, ...);
+extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
+extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
+extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
+extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
+extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
 extern void* ARRAY_802f26c8;
 extern char DAT_801db190[];
 extern char DAT_801db29c[];
@@ -668,12 +674,55 @@ void CSound::Frame()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c7380
+ * PAL Size: 532b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CSound::Draw()
 {
-	// TODO
+    Mtx cameraMatrix;
+    PSMTXCopy(*reinterpret_cast<Mtx*>(CameraPcs + 0x4), cameraMatrix);
+
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    GXSetZCompLoc((u8)0);
+    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
+    GXSetZMode((u8)1, (_GXCompare)3, (u8)1);
+    GXSetCullMode((_GXCullMode)1);
+    GXSetNumTevStages((u8)1);
+    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
+    GXSetNumChans((u8)1);
+    GXSetChanCtrl((GXChannelID)0, 0, (GXColorSrc)0, (GXColorSrc)0, 0, (GXDiffuseFn)2, (GXAttnFn)1);
+    GXSetChanCtrl((GXChannelID)2, 0, (GXColorSrc)0, (GXColorSrc)0, 0, (GXDiffuseFn)2, (GXAttnFn)2);
+    GXClearVtxDesc();
+    GXSetVtxDesc((GXAttr)9, (GXAttrType)1);
+    GXSetVtxAttrFmt((GXVtxFmt)0, (GXAttr)9, (GXCompCnt)1, (GXCompType)4, 0);
+
+    unsigned char* se = reinterpret_cast<unsigned char*>(this) + 0x2C;
+    for (u32 i = 0; i < 0x80; i++, se += 0x28) {
+        if (static_cast<signed char>(*se) < 0) {
+            u32 innerColor;
+            u32 outerColor;
+            Graphic.DrawSphere(cameraMatrix, reinterpret_cast<Vec*>(se + 0x18), *reinterpret_cast<float*>(se + 0x10),
+                               static_cast<_GXColor*>(__ct__6CColorFUcUcUcUc(&innerColor, 0xC0, 0xC0, 0xC0, 0x80)));
+            Graphic.DrawSphere(cameraMatrix, reinterpret_cast<Vec*>(se + 0x18), *reinterpret_cast<float*>(se + 0x14),
+                               static_cast<_GXColor*>(__ct__6CColorFUcUcUcUc(&outerColor, 0x80, 0x80, 0x80, 0x80)));
+        }
+    }
+
+    u32 lineColorRaw = 0xFF8000FF;
+    GXColor lineColor = *reinterpret_cast<GXColor*>(&lineColorRaw);
+    GXSetChanMatColor((GXChannelID)4, lineColor);
+    GXLoadPosMtxImm(cameraMatrix, 0);
+
+    CLine* line = reinterpret_cast<CLine*>(reinterpret_cast<unsigned char*>(this) + 0x142C);
+    for (u32 i = 0; i < 8; i++) {
+        Draw__9CLine(line);
+        line = reinterpret_cast<CLine*>(reinterpret_cast<unsigned char*>(line) + 0x1CC);
+    }
 }
 
 /*

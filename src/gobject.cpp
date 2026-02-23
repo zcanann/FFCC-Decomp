@@ -710,12 +710,35 @@ void CGObject::IsAnimFinished(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007c7b8
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGObject::CancelAnim(int)
+void CGObject::CancelAnim(int keepFacing)
 {
-	// TODO
+	m_currentAnimSlot = -1;
+
+	u8 flags = *((u8*)&m_shieldNodeFlags);
+	flags &= 0xbf;
+	*((u8*)&m_shieldNodeFlags) = flags;
+
+	m_turnSpeed = sZeroFloat;
+
+	if (keepFacing != 0)
+	{
+		m_rotTargetY = m_rotBaseY;
+	}
+
+	flags = *((u8*)&m_shieldNodeFlags);
+	flags &= 0xf7;
+	*((u8*)&m_shieldNodeFlags) = flags;
+
+	flags = *((u8*)&m_shieldNodeFlags);
+	flags &= 0x7f;
+	*((u8*)&m_shieldNodeFlags) = flags;
 }
 
 /*

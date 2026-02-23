@@ -7,6 +7,7 @@ extern unsigned int* DAT_8032f444;
 extern unsigned int DAT_8032f4b4;
 extern int DAT_8032f3f8;
 extern void* DAT_8032f3f0;
+extern int* DAT_8032f420;
 extern int DAT_8032f424;
 extern CRedEntry DAT_8032e154;
 
@@ -1155,32 +1156,75 @@ void __MidiCtrl_KeyTransposeRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDA
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C9A64
+ * PAL Size: 216b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _PitchBendCompute(RedTrackDATA*, int)
+void _PitchBendCompute(RedTrackDATA* track, int bend)
 {
-	// TODO
+    int* voiceData = (int*)DAT_8032f444;
+    int* trackData = (int*)track;
+
+    do {
+        if (voiceData[0] == (int)trackData) {
+            if (voiceData[1] != 0) {
+                int pitch;
+                if ((((unsigned char*)voiceData)[0x1a] & 3) == 0) {
+                    pitch = voiceData[0x28] + *DAT_8032f420;
+                } else {
+                    pitch = voiceData[0x28] + trackData[0x17];
+                }
+                voiceData[0x26] = PitchCompute(pitch, *(short*)((char*)trackData + 0x142) + bend, ((int*)voiceData[1])[5],
+                                               *(char*)((char*)trackData + 0x148));
+                voiceData[0x2e] |= 1;
+            }
+        }
+        voiceData += 0x30;
+    } while (voiceData < (int*)(DAT_8032f444 + 0xc00));
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C9B3C
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_PitchBend(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_PitchBend(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    unsigned char* command = (unsigned char*)((int*)track)[0];
+    int* trackData = (int*)track;
+    int bend = (unsigned int)command[0] + (unsigned int)command[1] * 0x80 - 0x2000;
+
+    *(short*)(trackData + 0x50) = bend;
+    *(short*)((char*)trackData + 0x13e) = (bend * *(char*)((char*)trackData + 0x14b)) >> 5;
+    trackData[0] += 2;
+    _PitchBendCompute(track, *(short*)((char*)trackData + 0x13e));
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C9BC0
+ * PAL Size: 112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_PitchBendRange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_PitchBendRange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    unsigned char* command = (unsigned char*)((int*)track)[0];
+    int* trackData = (int*)track;
+
+    trackData[0] = (int)(command + 1);
+    *(char*)((char*)trackData + 0x14b) = *(char*)command;
+    *(short*)((char*)trackData + 0x13e) = (*(short*)(trackData + 0x50) * *(char*)((char*)trackData + 0x14b)) >> 5;
+    _PitchBendCompute(track, *(short*)((char*)trackData + 0x13e));
 }
 
 /*

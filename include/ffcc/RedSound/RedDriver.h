@@ -57,7 +57,7 @@ public:
 
 	void Init();
 	void End();
-	void GetProgramTime();
+	int GetProgramTime();
 	void SetSoundMode(int);
 	void GetSoundMode();
 	void SetMusicData(void*);

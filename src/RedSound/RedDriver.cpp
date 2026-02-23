@@ -1239,12 +1239,25 @@ void CRedDriver::End()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bec04
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::GetProgramTime()
+int CRedDriver::GetProgramTime()
 {
-	// TODO
+	int total;
+	int* timePtr;
+
+	total = 0;
+	timePtr = (int*)DAT_8032f3cc;
+	do {
+		total += *timePtr;
+		timePtr++;
+	} while (timePtr < (int*)DAT_8032f3cc + 100);
+	return total;
 }
 
 /*

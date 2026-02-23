@@ -1,8 +1,10 @@
 #include "ffcc/RedSound/RedMidiCtrl.h"
 #include "ffcc/RedSound/RedEntry.h"
+#include "ffcc/RedSound/RedExecute.h"
 #include "ffcc/RedSound/RedMemory.h"
 
 extern unsigned int* DAT_8032f444;
+extern unsigned int DAT_8032f4b4;
 extern int DAT_8032f3f8;
 extern void* DAT_8032f3f0;
 extern int DAT_8032f424;
@@ -1174,12 +1176,37 @@ void __MidiCtrl_ReverbOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C9CD4
+ * PAL Size: 232b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_ReverbMix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_ReverbMix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    unsigned char* command = (unsigned char*)((int*)track)[0];
+    int* trackData = (int*)track;
+
+    trackData[0x3f] &= 0xFFFFC3FF;
+
+    if (command[0] == 1 || command[0] == 2) {
+        trackData[0x3f] |= 0x1000;
+    }
+    if (command[0] == 0 || command[0] >= 2) {
+        trackData[0x3f] |= 0x400;
+    }
+
+    if (command[1] == 1 || command[1] == 2) {
+        trackData[0x3f] |= 0x2000;
+    }
+    if (command[1] == 0 || command[1] >= 2) {
+        trackData[0x3f] |= 0x800;
+    }
+
+    trackData[0] += 2;
+    SetVoiceSwitch(track, trackData[0x3f]);
+    DAT_8032f4b4 |= 2;
 }
 
 /*
@@ -1204,12 +1231,41 @@ void __MidiCtrl_StepRelative2(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C9EBC
+ * PAL Size: 228b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_FuzzyOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_FuzzyOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    unsigned char* command = (unsigned char*)((int*)track)[0];
+    int* trackData = (int*)track;
+    int value;
+
+    trackData[0] = (int)(command + 2);
+    value = command[1] + 1;
+    if (command[1] == 0) {
+        value = 0x100;
+    }
+
+    if (command[0] == 1) {
+        trackData[0x39] = value;
+        trackData[0x3f] |= 0x8000;
+    } else if (command[0] == 2) {
+        trackData[0x3a] = value;
+        trackData[0x3f] |= 0x10000;
+    } else if (command[0] == 3) {
+        trackData[0x3b] = value;
+        trackData[0x3f] |= 0x20000;
+    } else if (command[0] == 4) {
+        trackData[0x3c] = value;
+        trackData[0x3f] |= 0x40000;
+    } else {
+        trackData[0x38] = value;
+        trackData[0x3f] |= 0x4000;
+    }
 }
 
 /*

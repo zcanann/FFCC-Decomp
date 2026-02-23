@@ -8,7 +8,7 @@ class CFlatRuntime;
 class CFlatRuntime2
 {
 	void onSystemFunc(CFlatRuntime::CObject*, int, int, int&);
-	void onSystemVal(CFlatRuntime::CObject*, int);
+	CFlatRuntime::CVal* onSystemVal(CFlatRuntime::CObject*, int);
 	void onSetSystemVal(int, CFlatRuntime::CStack*, int);
 };
 

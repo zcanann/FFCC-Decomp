@@ -1238,22 +1238,151 @@ void CSound::searchSe3D(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c5e2c
+ * PAL Size: 496b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::PlaySe3D(int, Vec*, float, float, int)
+int CSound::PlaySe3D(int soundId, Vec* pos, float nearDistance, float farDistance, int fadeFrames)
 {
-	// TODO
+    if (soundId < 0) {
+        Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
+    } else {
+        u8* se = reinterpret_cast<u8*>(this) + 0x2C;
+        for (int i = 0; i < 0x80; i++, se += 0x28) {
+            if (static_cast<s8>(*se) >= 0) {
+                int volume;
+                int pan;
+
+                *se = (*se & 0x7F) | 0x80;
+                *se &= 0xBF;
+                *reinterpret_cast<int*>(se + 0xC) = soundId;
+
+                int& seCount = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x28);
+                const int seIndex = seCount;
+                seCount = seIndex + 1;
+                *reinterpret_cast<int*>(se + 4) = seIndex;
+
+                *reinterpret_cast<float*>(se + 0x10) = nearDistance;
+                *reinterpret_cast<float*>(se + 0x14) = farDistance;
+                *reinterpret_cast<Vec*>(se + 0x18) = *pos;
+                se[3] = 0xFF;
+
+                calcVolumePan(reinterpret_cast<CSe3D*>(se), volume, pan);
+                se[1] = static_cast<u8>(volume);
+                se[2] = static_cast<u8>(pan);
+                se[0x24] = 0xFF;
+                se[0x25] = 0xFF;
+                se[0x26] = 0xFF;
+                se[0x27] = 0xFF;
+
+                int sePlayId;
+                if (soundId < 0) {
+                    Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
+                    sePlayId = -1;
+                } else if (soundId < 4000) {
+                    int bank = soundId / 1000 + (soundId >> 31);
+                    bank -= (bank >> 31);
+
+                    const u32 fade = static_cast<u32>(fadeFrames);
+                    const int firstVolume = volume & ~((int)((-fade) | fade) >> 0x1F);
+                    sePlayId = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(this), bank,
+                                                        soundId + bank * -1000, pan, firstVolume, 0);
+                    if (fade != 0) {
+                        SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), sePlayId, volume, fade);
+                    }
+                } else {
+                    const u32 fade = static_cast<u32>(fadeFrames);
+                    const int firstVolume = volume & ~((int)((-fade) | fade) >> 0x1F);
+                    sePlayId = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(this), -1, soundId, pan, firstVolume, 0);
+                    if (fade != 0) {
+                        SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), sePlayId, volume, fade);
+                    }
+                }
+
+                *reinterpret_cast<int*>(se + 8) = sePlayId;
+                return *reinterpret_cast<int*>(se + 4);
+            }
+        }
+    }
+
+    return -1;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c5c58
+ * PAL Size: 468b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::PlaySe3DLine(int, int, float, float, int)
+int CSound::PlaySe3DLine(int soundId, int lineIndex, float nearDistance, float farDistance, int fadeFrames)
 {
-	// TODO
+    if (soundId < 0) {
+        Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
+    } else {
+        u8* se = reinterpret_cast<u8*>(this) + 0x2C;
+        for (int i = 0; i < 0x80; i++, se += 0x28) {
+            if (static_cast<s8>(*se) >= 0) {
+                int volume;
+                int pan;
+
+                *se = (*se & 0x7F) | 0x80;
+                *se &= 0xBF;
+                *reinterpret_cast<int*>(se + 0xC) = soundId;
+
+                int& seCount = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x28);
+                const int seIndex = seCount;
+                seCount = seIndex + 1;
+                *reinterpret_cast<int*>(se + 4) = seIndex;
+
+                *reinterpret_cast<float*>(se + 0x10) = nearDistance;
+                *reinterpret_cast<float*>(se + 0x14) = farDistance;
+                se[3] = static_cast<u8>(lineIndex);
+
+                calcVolumePan(reinterpret_cast<CSe3D*>(se), volume, pan);
+                se[1] = static_cast<u8>(volume);
+                se[2] = static_cast<u8>(pan);
+                se[0x24] = 0xFF;
+                se[0x25] = 0xFF;
+                se[0x26] = 0xFF;
+                se[0x27] = 0xFF;
+
+                int sePlayId;
+                if (soundId < 0) {
+                    Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
+                    sePlayId = -1;
+                } else if (soundId < 4000) {
+                    int bank = soundId / 1000 + (soundId >> 31);
+                    bank -= (bank >> 31);
+
+                    const u32 fade = static_cast<u32>(fadeFrames);
+                    const int firstVolume = volume & ~((int)((-fade) | fade) >> 0x1F);
+                    sePlayId = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(this), bank,
+                                                        soundId + bank * -1000, pan, firstVolume, 0);
+                    if (fade != 0) {
+                        SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), sePlayId, volume, fade);
+                    }
+                } else {
+                    const u32 fade = static_cast<u32>(fadeFrames);
+                    const int firstVolume = volume & ~((int)((-fade) | fade) >> 0x1F);
+                    sePlayId = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(this), -1, soundId, pan, firstVolume, 0);
+                    if (fade != 0) {
+                        SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), sePlayId, volume, fade);
+                    }
+                }
+
+                *reinterpret_cast<int*>(se + 8) = sePlayId;
+                return *reinterpret_cast<int*>(se + 4);
+            }
+        }
+    }
+
+    return -1;
 }
 
 /*

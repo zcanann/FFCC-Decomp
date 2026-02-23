@@ -126,7 +126,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 			points = src->points;
 		}
 
-		u8 count = data->spawnCount;
+		s32 count = data->spawnCount;
 		if (data->mode == 0) {
 			do {
 				if (state->index >= (u16)entry->maxValue) {

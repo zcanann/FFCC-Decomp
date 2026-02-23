@@ -53,8 +53,8 @@ public:
     void ChangeSePan(int, int, int);
     void calcVolumePan(CSe3D*, int&, int&);
     void searchSe3D(int);
-    void PlaySe3D(int, Vec*, float, float, int);
-    void PlaySe3DLine(int, int, float, float, int);
+    int PlaySe3D(int, Vec*, float, float, int);
+    int PlaySe3DLine(int, int, float, float, int);
     void SetSe3DGroup(int, int);
     void StopSe3DGroup(int);
     void StopSe3D(int);

@@ -1,6 +1,8 @@
 #include "ffcc/sound.h"
 
 #include "ffcc/RedSound/RedSound.h"
+#include "ffcc/gxfunc.h"
+#include "ffcc/graphic.h"
 #include "ffcc/system.h"
 #include "PowerPC_EABI_Support/Runtime/MWCPlusLib.h"
 #include <Runtime.PPCEABI.H/NMWException.h>
@@ -668,12 +670,53 @@ void CSound::Frame()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c7380
+ * PAL Size: 532b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CSound::Draw()
 {
-	// TODO
+    Mtx viewMtx;
+    PSMTXCopy(*reinterpret_cast<Mtx*>(CameraPcs + 4), viewMtx);
+
+    _GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)5, (_GXLogicOp)1);
+    GXSetZCompLoc((GXBool)0);
+    _GXSetAlphaCompare((_GXCompare)6, 1, (_GXAlphaOp)0, (_GXCompare)7, 0);
+    GXSetZMode((GXBool)1, (GXCompare)3, (GXBool)1);
+    GXSetCullMode((GXCullMode)1);
+    GXSetNumTevStages(1);
+    _GXSetTevOp((_GXTevStageID)0, (_GXTevMode)4);
+    _GXSetTevOrder((_GXTevStageID)0, (_GXTexCoordID)0xFF, (_GXTexMapID)0xFF, (_GXChannelID)4);
+    GXSetNumChans(1);
+    GXSetChanCtrl((GXChannelID)0, (GXBool)0, (GXColorSrc)0, (GXColorSrc)0, (GXLightID)0, (GXDiffuseFn)2, (GXAttnFn)1);
+    GXSetChanCtrl((GXChannelID)2, (GXBool)0, (GXColorSrc)0, (GXColorSrc)0, (GXLightID)0, (GXDiffuseFn)2, (GXAttnFn)2);
+    GXClearVtxDesc();
+    GXSetVtxDesc((GXAttr)9, (GXAttrType)1);
+    GXSetVtxAttrFmt((GXVtxFmt)0, (GXAttr)9, (GXCompCnt)1, (GXCompType)4, 0);
+
+    u8* se = reinterpret_cast<u8*>(this) + 0x2C;
+    for (u32 i = 0; i < 0x80; i++, se += 0x28) {
+        if (static_cast<s8>(*se) < 0) {
+            _GXColor nearColor = {0xC0, 0xC0, 0xC0, 0x80};
+            Graphic.DrawSphere(viewMtx, reinterpret_cast<Vec*>(se + 0x18), *reinterpret_cast<float*>(se + 0x10), &nearColor);
+
+            _GXColor farColor = {0x80, 0x80, 0x80, 0x80};
+            Graphic.DrawSphere(viewMtx, reinterpret_cast<Vec*>(se + 0x18), *reinterpret_cast<float*>(se + 0x14), &farColor);
+        }
+    }
+
+    _GXColor lineColor = {0xFF, 0x80, 0x00, 0xFF};
+    GXSetChanMatColor((GXChannelID)4, lineColor);
+    GXLoadPosMtxImm(viewMtx, 0);
+
+    CLine* line = reinterpret_cast<CLine*>(reinterpret_cast<u8*>(this) + 0x142C);
+    for (u32 i = 0; i < 8; i++) {
+        Draw__9CLine(line);
+        line = reinterpret_cast<CLine*>(reinterpret_cast<u8*>(line) + 0x1CC);
+    }
 }
 
 /*

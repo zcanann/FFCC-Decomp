@@ -18,7 +18,10 @@ extern void* DAT_80238030;
 extern CUtil DAT_8032ec70;
 
 extern struct {
+    float _212_4_, _216_4_, _220_4_;
     float _224_4_, _228_4_, _232_4_;
+    Mtx m_cameraMatrix;
+    Mtx44 m_screenMatrix;
 } CameraPcs;
 
 extern "C" {
@@ -97,6 +100,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
     GXTexObj backRgba8Tex2;
     Mtx scaleMtx;
     Mtx localMtx;
+    Mtx44 screenMtx;
     GXColor drawColor;
     u8* meshColor;
 
@@ -175,7 +179,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
         DAT_8032ec70.RenderColorQuad(FLOAT_8033193c, (float)yOffset, FLOAT_80331928, FLOAT_8033192c, drawColor);
 
         pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-            &drawColor, (u8*)pppMiasma + 0x40, FLOAT_8033193c, 0, 1, 0, 1, 1, 1, 0);
+            &drawColor, (u8*)pppMiasma + 0x40, FLOAT_8033193c, 0, 0, 1, 0, 1, 1, 1);
 
         _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
         GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
@@ -199,8 +203,11 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
         GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)&colorRaw);
         GXSetChanCtrl(GX_COLOR0A0, GX_TRUE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
 
+        GXLoadPosMtxImm(*(Mtx*)((u8*)pppMiasma + 0x40), 0);
         GXSetNumTevStages(1);
         GXSetNumTexGens(0);
+        PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
+        GXSetProjection(screenMtx, GX_ORTHOGRAPHIC);
         PSMTXScale(scaleMtx, FLOAT_80331940, FLOAT_80331940, FLOAT_80331940);
         PSMTXConcat(scaleMtx, *(Mtx*)((u8*)pppMiasma + 4), localMtx);
         PSMTXConcat(ppvWorldMatrix, localMtx, *(Mtx*)((u8*)pppMiasma + 0x40));

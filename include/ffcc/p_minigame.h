@@ -27,7 +27,7 @@ class CMiniGamePcs : public CProcess
 public:
     CMiniGamePcs();
 
-    void GetTable(unsigned long);
+    int GetTable(unsigned long);
 
     void Init();
     void Quit();

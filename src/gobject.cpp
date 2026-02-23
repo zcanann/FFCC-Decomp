@@ -1,5 +1,6 @@
 #include "ffcc/gobject.h"
 
+#include "ffcc/cflat_runtime.h"
 #include "ffcc/math.h"
 #include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
@@ -10,6 +11,9 @@
 extern CPartMng PartMng;
 extern CMath Math;
 extern unsigned char CFlat[];
+extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+    void*, CGBaseObj*, int, int, int, CFlatRuntime::CStack*, CFlatRuntime::CStack*);
+extern "C" int SearchNode__Q26CChara6CModelFPc(CChara::CModel*, char*);
 extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" CGQuadObj* FindGQuadObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGQuadObj* FindGQuadObjNext__13CFlatRuntime2FP9CGQuadObj(void*, CGQuadObj*);
@@ -373,12 +377,21 @@ void CGObject::onDraw()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007def8
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGObject::CancelMove(int)
+void CGObject::CancelMove(int moveType)
 {
-	// TODO
+    *((u8*)&m_weaponNodeFlags + 1) &= 0xDF;
+
+    CFlatRuntime::CStack arg;
+    arg.m_word = static_cast<u32>(moveType);
+    SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+        CFlat, this, 2, 7, 1, &arg, 0);
 }
 
 /*
@@ -563,12 +576,24 @@ void CGObject::SetTexAnim(char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007cdb4
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGObject::LookAt(CGObject*, char*)
+void CGObject::LookAt(CGObject* target, char* nodeName)
 {
-	// TODO
+    short nodeIndex;
+
+    m_lookAtTarget = target;
+    if (nodeName == 0) {
+        nodeIndex = -1;
+    } else {
+        nodeIndex = SearchNode__Q26CChara6CModelFPc(m_charaModelHandle->m_model, nodeName);
+    }
+    m_lookAtTargetNodeIndex = nodeIndex;
 }
 
 /*
@@ -623,12 +648,16 @@ void CGObject::LoadAnim(char*, int, int, int, unsigned long)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007ca30
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGObject::FreeAnim(int)
+void CGObject::FreeAnim(int animSlot)
 {
-	// TODO
+    m_charaModelHandle->FreeAnim(animSlot);
 }
 
 /*
@@ -778,12 +807,17 @@ void CGObject::PlayAnim(int slot, int param2, int param3, int param4, int param5
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007c6e4
+ * PAL Size: 28b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGObject::SetDispItemName(int)
+void CGObject::SetDispItemName(int showName)
 {
-	// TODO
+    *((u8*)&m_shieldNodeFlags) = (((showName << 4) & 0x10) | (*((u8*)&m_shieldNodeFlags) & 0xEF));
+    m_dispItemTimer = 13;
 }
 
 /*
@@ -848,12 +882,16 @@ void CGObject::AddAnimPoint(int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007c1b8
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGObject::SetAnimSlot(int, int)
+void CGObject::SetAnimSlot(int slot, int anim)
 {
-	// TODO
+    m_animQueue[anim - 0x41] = static_cast<char>(slot);
 }
 
 /*

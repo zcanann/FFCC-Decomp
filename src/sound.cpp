@@ -1,8 +1,9 @@
 #include "ffcc/sound.h"
 
 #include "ffcc/RedSound/RedSound.h"
-#include "ffcc/gxfunc.h"
+#include "ffcc/color.h"
 #include "ffcc/graphic.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/system.h"
 #include "PowerPC_EABI_Support/Runtime/MWCPlusLib.h"
 #include <Runtime.PPCEABI.H/NMWException.h>
@@ -699,8 +700,8 @@ void CSound::Draw()
     GXSetChanCtrl((GXChannelID)0, 0, (GXColorSrc)0, (GXColorSrc)0, 0, (GXDiffuseFn)2, (GXAttnFn)1);
     GXSetChanCtrl((GXChannelID)2, 0, (GXColorSrc)0, (GXColorSrc)0, 0, (GXDiffuseFn)2, (GXAttnFn)2);
     GXClearVtxDesc();
-    GXSetVtxDesc((GXAttr)9, (GXAttrType)1);
-    GXSetVtxAttrFmt((GXVtxFmt)0, (GXAttr)9, (GXCompCnt)1, (GXCompType)4, 0);
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
 
     unsigned char* se = reinterpret_cast<unsigned char*>(this) + 0x2C;
     for (u32 i = 0; i < 0x80; i++, se += 0x28) {

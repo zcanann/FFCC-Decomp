@@ -1791,26 +1791,24 @@ void CAmemCacheSet::Release(short index)
 {
     unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
     int tableBase = *reinterpret_cast<int*>(bytes + 0x58);
-    int entryOffset = static_cast<int>(index) * 0x1C;
-    int entry = tableBase + entryOffset;
-
+    int entry = tableBase + static_cast<int>(index) * 0x1C;
     *reinterpret_cast<short*>(entry + 0x0C) -= 1;
-    if (*reinterpret_cast<short*>(entry + 0x0C) == -1) {
+
+    if (*reinterpret_cast<short*>(tableBase + static_cast<int>(index) * 0x1C + 0x0C) == -1) {
         if (System.m_execParam > 2) {
             Printf__7CSystemFPce(&System, "--------------------------------\n");
         }
 
-        int count = *reinterpret_cast<int*>(bytes + 0x3C);
         int offset = 0;
+        int count = *reinterpret_cast<int*>(bytes + 0x3C);
         for (int i = 0; i < count; i++) {
-            unsigned char* current = reinterpret_cast<unsigned char*>(tableBase + offset);
-            int data = *reinterpret_cast<int*>(current + 0x00);
-            if ((current[0x0E] != 0 || data != 0) && System.m_execParam > 2) {
-                const char* useType = (current[0x0E] == 0) ? "FREE" : "USE";
+            int* cache = reinterpret_cast<int*>(tableBase + offset);
+            if (((*reinterpret_cast<unsigned char*>(cache + 3) != 0) || (*cache != 0)) && (System.m_execParam > 2)) {
+                const char* useType = (*reinterpret_cast<unsigned char*>(cache + 3) != 0) ? "USE" : "FREE";
                 Printf__7CSystemFPce(
-                    &System, "%3d %s type:%d RefCnt:%d prio:%d data:%08x\n", i, useType,
-                    static_cast<int>(current[0x0F]), *reinterpret_cast<short*>(current + 0x0C),
-                    *reinterpret_cast<int*>(current + 0x10), data);
+                    &System, "%03d %s type:%d RefCnt:%d prio:%d data:%08x\n", i, useType,
+                    static_cast<int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(cache) + 0x0F)),
+                    *reinterpret_cast<short*>(cache + 3), cache[4], *cache);
             }
             offset += 0x1C;
         }
@@ -1819,9 +1817,9 @@ void CAmemCacheSet::Release(short index)
             Printf__7CSystemFPce(&System, "--------------------------------\n");
         }
 
-        void (*underflowHook)(int) = *reinterpret_cast<void (**)(int)>(bytes + 0x50);
-        if (underflowHook != 0) {
-            underflowHook(static_cast<int>(index));
+        void (*onUnderflow)(int) = *reinterpret_cast<void (**)(int)>(bytes + 0x50);
+        if (onUnderflow != 0) {
+            onUnderflow(static_cast<int>(index));
         }
     }
 }

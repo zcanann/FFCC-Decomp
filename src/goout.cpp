@@ -610,9 +610,36 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
  */
 void CGoOutMenu::CalcGoOut()
 {
+    CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
     McCtrl& mcCtrl = *reinterpret_cast<McCtrl*>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0x20);
     unsigned short input;
     unsigned char next;
+
+    if (field_0x1c != 0 && field_0x30 > 0x13 && (field_0x30 & 0xF) == 0) {
+        const int cardStatus = ((field_0x30 & 0x10) == 0) ? mcCtrl.ChkConnect(1) : mcCtrl.ChkConnect(0);
+        if (cardStatus != 1) {
+            field_0x1c = 0;
+            field_0x19 = -1;
+            field_0x18 = 0;
+            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 3);
+            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+            field_0x36 = -1;
+            field_0x40 = 0;
+            field_0x44 = 1;
+            SetMenuStr(0, 5,
+                       "A Memory Card has been removed.",
+                       "Cancelling character transfer.",
+                       "",
+                       "Please do not remove either Memory Card",
+                       "until the character transfer is complete.");
+            return;
+        }
+    }
+
+    if (field_0x1d != 0) {
+        const unsigned char selInit = static_cast<unsigned char>(__cntlzw(0xF - static_cast<int>(field_0x18)) >> 5 & 0xFF);
+        CalcGoOutSelChar__8CMenuPcsFUcUc(&MenuPcs, selInit, 1);
+    }
 
     switch (field_0x18) {
     case 0:

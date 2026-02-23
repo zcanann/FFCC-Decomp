@@ -2010,12 +2010,38 @@ void CAmemCacheSet::RefCnt0Clear()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001C52C
+ * PAL Size: 260b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CAmemCacheSet::RefCnt0Compare()
 {
-	// TODO
+    unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
+
+    if (System.m_execParam > 2) {
+        Printf__7CSystemFPce(&System, "---------- RefCnt0 Compare ----------\n");
+    }
+
+    int count = *reinterpret_cast<int*>(bytes + 0x3C);
+    int offset = 0;
+    for (int i = 0; i < count; i++) {
+        unsigned char* entry = reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x58) + offset);
+        if ((entry[0x0E] != 0 && *reinterpret_cast<short*>(entry + 0x0C) != 0) && System.m_execParam > 2) {
+            const char* useType = (entry[0x0E] == 0) ? "FREE" : "USE";
+            Printf__7CSystemFPce(
+                &System, "%3d %s type:%d RefCnt:%d prio:%d data:%08x\n", i, useType, static_cast<int>(entry[0x0F]),
+                *reinterpret_cast<short*>(entry + 0x0C), *reinterpret_cast<int*>(entry + 0x10),
+                *reinterpret_cast<int*>(entry + 0x00));
+        }
+        offset += 0x1C;
+    }
+
+    if (System.m_execParam > 2) {
+        Printf__7CSystemFPce(&System, "--------------------------------\n");
+    }
 }
 
 /*

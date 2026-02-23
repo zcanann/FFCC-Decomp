@@ -13,6 +13,8 @@ extern float FLOAT_80330ce8;
 extern float FLOAT_80330cec;
 extern float FLOAT_80330cf0;
 extern float FLOAT_80330cf4;
+extern float FLOAT_80330cf8;
+extern float FLOAT_80330cfc;
 extern float FLOAT_80330d00;
 extern float FLOAT_80330d10;
 extern float FLOAT_80330d30;
@@ -53,6 +55,8 @@ extern char DAT_801db29c[];
 extern char DAT_801db2b8[];
 extern char s_Sound___1_n_B_801db130[];
 extern unsigned char CFlat[];
+extern unsigned char CameraPcs[];
+extern unsigned char Game[];
 
 struct CLineSegment {
     Vec delta;
@@ -998,12 +1002,102 @@ void CSound::ChangeSePan(int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c601c
+ * PAL Size: 780b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::calcVolumePan(CSound::CSe3D*, int&, int&)
+void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
 {
-	// TODO
+    u8* se = reinterpret_cast<u8*>(se3D);
+    if (static_cast<s8>(se[3]) < 0) {
+        const float nearDistance = *reinterpret_cast<float*>(se + 0x10);
+        const float farDistance = *reinterpret_cast<float*>(se + 0x14);
+        if (FLOAT_80330cec == nearDistance && FLOAT_80330cec == farDistance) {
+            outVolume = 0x7F;
+            outPan = 0x40;
+        } else {
+            double attenuationScale = (double)FLOAT_80330cf0;
+            if (*reinterpret_cast<unsigned char*>(Game + 0x13E4) != '\0') {
+                const short stageIndex = *reinterpret_cast<short*>(Game + 0x13E0);
+                if (stageIndex == 0xE || stageIndex == 8) {
+                    attenuationScale = (double)FLOAT_80330cf4;
+                } else {
+                    attenuationScale = (double)FLOAT_80330cf8;
+                }
+            }
+
+            Vec cameraSpacePos;
+            PSMTXMultVec(*reinterpret_cast<Mtx*>(CameraPcs + 0x4),
+                         reinterpret_cast<Vec*>(se + 0x18), &cameraSpacePos);
+            const double distanceSq = (double)PSVECSquareDistance(
+                reinterpret_cast<Vec*>(CameraPcs + 0xD4), reinterpret_cast<Vec*>(se + 0x18));
+            const float scaledDistanceSq = (float)(attenuationScale * distanceSq);
+            const float farScaledSq = (float)(attenuationScale * (double)(farDistance * (float)((double)farDistance * attenuationScale)));
+            if (farScaledSq <= scaledDistanceSq) {
+                outVolume = 0;
+            } else {
+                const float nearScaledSq =
+                    (float)(attenuationScale * (double)(nearDistance * (float)((double)nearDistance * attenuationScale)));
+                if (nearScaledSq <= scaledDistanceSq) {
+                    outVolume = 0x7F - (int)(FLOAT_80330ce8 * ((scaledDistanceSq - nearScaledSq) / (farScaledSq - nearScaledSq)));
+                } else {
+                    outVolume = 0x7F;
+                }
+            }
+
+            int pan = 0;
+            if (*reinterpret_cast<unsigned int*>(Game + 0xC7F4) == 0x21) {
+                pan = (int)(cameraSpacePos.x / FLOAT_80330cfc);
+            } else {
+                pan = (int)cameraSpacePos.x;
+            }
+
+            if (pan < -0x38) {
+                pan = -0x38;
+            } else if (pan > 0x38) {
+                pan = 0x38;
+            }
+            outPan = pan + 0x40;
+        }
+    } else {
+        Vec nearestPoint;
+        float nearestDistance;
+        float nearestT;
+        const int found = Calc__9CLine(
+            (double)*reinterpret_cast<float*>(se + 0x14),
+            reinterpret_cast<CLine*>(reinterpret_cast<u8*>(this) + ((int)static_cast<s8>(se[3]) * 0x1CC) + 0x142C), &nearestPoint,
+            &nearestDistance, (u32*)0, &nearestT, reinterpret_cast<const Vec*>(CameraPcs + 0xE0));
+        if (found == 0) {
+            outVolume = 0;
+            outPan = 0x40;
+        } else {
+            PSMTXMultVec(*reinterpret_cast<Mtx*>(CameraPcs + 0x4), &nearestPoint, &nearestPoint);
+
+            const float nearDistance = *reinterpret_cast<float*>(se + 0x10);
+            if (nearDistance <= nearestDistance) {
+                outVolume = 0x7F -
+                            (int)(FLOAT_80330ce8 * ((nearestDistance - nearDistance) / (*reinterpret_cast<float*>(se + 0x14) - nearDistance)));
+            } else {
+                outVolume = 0x7F;
+            }
+
+            int pan = (int)nearestPoint.x;
+            if (pan < -0x38) {
+                pan = -0x38;
+            } else if (pan > 0x38) {
+                pan = 0x38;
+            }
+            outPan = pan + 0x40;
+        }
+    }
+
+    const int currentMusicVolume = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22B8);
+    if (currentMusicVolume < outVolume) {
+        outVolume = currentMusicVolume;
+    }
 }
 
 /*

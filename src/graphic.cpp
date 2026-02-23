@@ -3,6 +3,8 @@
 #include <string.h>
 
 #include "ffcc/memory.h"
+#include "ffcc/memorycard.h"
+#include "ffcc/file.h"
 #include "ffcc/pppfunctbl.h"
 #include "ffcc/system.h"
 #include "ffcc/util.h"
@@ -14,6 +16,15 @@ extern GXRenderModeObj lbl_801E83C0;
 extern u8 DAT_801E83F2[7];
 extern char DAT_80238030[];
 extern CUtil DAT_8032ec70;
+extern "C" u8 DAT_8032ec48;
+extern "C" u8 DAT_8032ec4c;
+extern "C" u8 DAT_8032ec50;
+extern "C" u8 DAT_8032ec54;
+extern "C" char DAT_801d637c[];
+extern "C" char DAT_801d63c0[];
+extern "C" char DAT_801d6400[];
+extern "C" char DAT_801d643c[];
+extern "C" char DAT_8032f714[];
 
 extern struct {
     float _212_4_;
@@ -35,6 +46,10 @@ static inline void*& PtrAt(CGraphic* self, u32 offset) {
 
 static inline u16 U16At(void* p, u32 offset) {
     return *reinterpret_cast<u16*>(reinterpret_cast<u8*>(p) + offset);
+}
+
+static inline int& S32At(CGraphic* self, u32 offset) {
+    return *reinterpret_cast<int*>(reinterpret_cast<u8*>(self) + offset);
 }
 
 extern "C" {
@@ -262,12 +277,17 @@ void CGraphic::SetDrawDoneDebugDataPartControl(int partControl)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80019694
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void wakeup(OSAlarm*, OSContext*)
+void wakeup(OSAlarm* alarm, OSContext*)
 {
-	// TODO
+    OSThread** waitingThread = reinterpret_cast<OSThread**>(reinterpret_cast<u8*>(alarm) + 0x28);
+    OSResumeThread(*waitingThread);
 }
 
 /*
@@ -282,22 +302,115 @@ void sleep()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80019640
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGraphic::_WaitDrawDone(char*, int)
+void CGraphic::_WaitDrawDone(char* file, int line)
 {
-	// TODO
+    PtrAt(this, 0x7368) = file;
+    S32At(this, 0x736C) = line;
+    S32At(this, 0x7364) = 1;
+    GXSetDrawDone();
+    GXWaitDrawDone();
+    S32At(this, 0x7364) = 0;
+    S32At(this, 0x7370) += 1;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800193c8
+ * PAL Size: 632b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphic::Thread()
 {
-	// TODO
+    struct SleepAlarm {
+        OSAlarm alarm;
+        OSThread* thread;
+    };
+
+    int lastCounter = -1;
+    int debugCountdown = 5;
+
+    while (true) {
+        if (S32At(this, 0x7364) == 0) {
+            debugCountdown = 5;
+        } else {
+            if (lastCounter != S32At(this, 0x7370)) {
+                debugCountdown = 100;
+                lastCounter = S32At(this, 0x7370);
+            }
+            debugCountdown--;
+
+            if (debugCountdown == 0) {
+                u16 drawSyncRaw = GXReadDrawSync();
+                u16 drawSyncPart = drawSyncRaw & 0x7FFF;
+                if ((drawSyncRaw & 0x8000) != 0) {
+                    if (drawSyncPart == 0x7FFF) {
+                        System.Printf(DAT_801d637c, PtrAt(this, 0x7368), S32At(this, 0x736C));
+                    } else if (drawSyncPart == 0x7FFE) {
+                        System.Printf(DAT_801d63c0, PtrAt(this, 0x7368), S32At(this, 0x736C));
+                    } else {
+                        System.Printf(DAT_801d6400, PtrAt(this, 0x7368), S32At(this, 0x736C), DAT_8032f714);
+                    }
+                }
+
+                CSystem::COrder* order = System.GetOrder(drawSyncPart >> 8);
+                void* orderName = DAT_8032f714;
+                int orderIndex = -1;
+                if (order != nullptr) {
+                    orderName = order->m_debugName;
+                    orderIndex = order->m_insertIndex;
+                }
+                System.Printf(DAT_801d643c, PtrAt(this, 0x7368), S32At(this, 0x736C), orderName, orderIndex,
+                              static_cast<int>(static_cast<char>(drawSyncPart)));
+            }
+        }
+
+        if (DAT_8032ec4c == 0) {
+            DAT_8032ec48 = 0;
+            DAT_8032ec4c = 1;
+        }
+        if (DAT_8032ec54 == 0) {
+            DAT_8032ec50 = 0;
+            DAT_8032ec54 = 1;
+        }
+
+        if (OSGetResetButtonState() == 0) {
+            if (DAT_8032ec48 != 0) {
+                DAT_8032ec50 = 1;
+            }
+        } else {
+            DAT_8032ec48 = 1;
+        }
+
+        if ((DAT_8032ec50 != 0) && (File.m_fatalDiskErrorFlag == 0) && (MemoryCardMan.m_currentSlot == 0xFF)) {
+            break;
+        }
+
+        SleepAlarm sleepAlarm;
+        sleepAlarm.thread = OSGetCurrentThread();
+        OSCreateAlarm(&sleepAlarm.alarm);
+        OSSetAlarmTag(&sleepAlarm.alarm, 1);
+        BOOL interrupts = OSDisableInterrupts();
+        OSSetAlarm(&sleepAlarm.alarm, (OS_BUS_CLOCK / 4000) * 0x32, wakeup);
+        OSSuspendThread(sleepAlarm.thread);
+        OSRestoreInterrupts(interrupts);
+    }
+
+    VISetBlack(TRUE);
+    VIFlush();
+    VIWaitForRetrace();
+    OSCancelAlarms(1);
+    OSResetSystem(FALSE, 0, FALSE);
+    while (true) {}
 }
 
 /*

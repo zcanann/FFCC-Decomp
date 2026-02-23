@@ -2,6 +2,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/partMng.h"
 #include "ffcc/p_game.h"
+#include "ffcc/p_camera.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/stopwatch.h"
 #include "ffcc/USBStreamData.h"
@@ -24,6 +25,7 @@ extern "C" void SetRStage__13CAmemCacheSetFPQ27CMemory6CStage(void*, void*);
 extern "C" void AmemSetLock__13CAmemCacheSetFv(void*);
 extern "C" void IsBigAlloc__7CUSBPcsFi(void*, int);
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
+extern "C" void DrawOt__10pppDrawMngFv(void*);
 extern "C" void Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFUl_UcUlPFUl_UcUlPFUl_UcUl(
     void*,
     char*,
@@ -41,6 +43,7 @@ extern CPartMng PartMng;
 extern unsigned char PartPcs[];
 extern unsigned char MenuPcs[];
 extern unsigned char USBPcs[];
+extern unsigned char ppvDrawMng[];
 extern void* CAMemCacheSet;
 
 extern char DAT_801ead4c[];
@@ -736,12 +739,34 @@ void CPartPcs::drawCharaBefore()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80052e3c
+ * PAL Size: 224b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartPcs::draw()
 {
-	// TODO
+    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 8);
+
+    Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
+    if (Game.game.m_gameWork.m_gamePaused == 0) {
+        if (usb->m_disableShokiDraw == 0) {
+            Graphic.SetFog(1, 0);
+            pppInitDrawEnv(0);
+            PartMng.pppSetRendMatrix();
+            PartMng.pppDraw();
+            pppClearDrawEnv();
+            Graphic.SetDrawDoneDebugData(0x7f);
+        } else {
+            DrawOt__10pppDrawMngFv(ppvDrawMng);
+            Graphic.SetDrawDoneDebugData(0x7f);
+        }
+    } else {
+        DrawOt__10pppDrawMngFv(ppvDrawMng);
+        Graphic.SetDrawDoneDebugData(0x7f);
+    }
 }
 
 /*
@@ -786,12 +811,29 @@ void CPartPcs::DrawMenu(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80052b10
+ * PAL Size: 196b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartPcs::DrawShoki()
 {
-	// TODO
+    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 8);
+
+    if (usb->m_disableShokiDraw == 0 && Game.game.m_currentSceneId == 4) {
+        Graphic.SetFog(1, 0);
+        if (Game.game.m_gameWork.m_gamePaused == 0 &&
+            *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&CameraPcs) + 0x1028) != 0) {
+            Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
+            pppInitDrawEnv(1);
+            PartMng.pppSetRendMatrix();
+            PartMng.pppDrawPrio(8);
+            pppClearDrawEnv();
+            Graphic.SetDrawDoneDebugData(0x7f);
+        }
+    }
 }
 
 /*

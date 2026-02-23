@@ -1780,12 +1780,48 @@ void CAmemCacheSet::AddRef(short index)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001CBF4
+ * PAL Size: 340b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CAmemCacheSet::Release(short)
+void CAmemCacheSet::Release(short index)
 {
-	// TODO
+    unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
+    int tableBase = *reinterpret_cast<int*>(bytes + 0x58);
+    int entry = tableBase + static_cast<int>(index) * 0x1C;
+    *reinterpret_cast<short*>(entry + 0x0C) -= 1;
+
+    if (*reinterpret_cast<short*>(tableBase + static_cast<int>(index) * 0x1C + 0x0C) == -1) {
+        if (System.m_execParam > 2) {
+            Printf__7CSystemFPce(&System, "--------------------------------\n");
+        }
+
+        int offset = 0;
+        int count = *reinterpret_cast<int*>(bytes + 0x3C);
+        for (int i = 0; i < count; i++) {
+            int* cache = reinterpret_cast<int*>(tableBase + offset);
+            if (((*reinterpret_cast<unsigned char*>(cache + 3) != 0) || (*cache != 0)) && (System.m_execParam > 2)) {
+                const char* useType = (*reinterpret_cast<unsigned char*>(cache + 3) != 0) ? "USE" : "FREE";
+                Printf__7CSystemFPce(
+                    &System, "%03d %s type:%d RefCnt:%d prio:%d data:%08x\n", i, useType,
+                    static_cast<int>(*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(cache) + 0x0F)),
+                    *reinterpret_cast<short*>(cache + 3), cache[4], *cache);
+            }
+            offset += 0x1C;
+        }
+
+        if (System.m_execParam > 2) {
+            Printf__7CSystemFPce(&System, "--------------------------------\n");
+        }
+
+        void (*onUnderflow)(int) = *reinterpret_cast<void (**)(int)>(bytes + 0x50);
+        if (onUnderflow != 0) {
+            onUnderflow(static_cast<int>(index));
+        }
+    }
 }
 
 /*

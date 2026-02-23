@@ -52,6 +52,10 @@ static inline int& S32At(CGraphic* self, u32 offset) {
     return *reinterpret_cast<int*>(reinterpret_cast<u8*>(self) + offset);
 }
 
+static inline u8& U8At(CGraphic* self, u32 offset) {
+    return *reinterpret_cast<u8*>(reinterpret_cast<u8*>(self) + offset);
+}
+
 extern "C" {
 void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);

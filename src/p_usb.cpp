@@ -147,7 +147,13 @@ void CUSBPcs::mccReadData()
 	if (4 < DAT_8032ec68)
 	{
 		DAT_8032ec68 = 0;
-		USB.IsConnected();
+		goto read_usb;
+	end:
+		return;
+	read_usb:
+		if ((int)USB.IsConnected() != 0) {
+			goto end;
+		}
 	}
 }
 

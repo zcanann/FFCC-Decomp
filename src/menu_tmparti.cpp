@@ -106,7 +106,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 			*(unsigned int *)(puVar9 + 0xe) = 0x37;
 			puVar9[2] = 200;
 			puVar9[3] = 0x28;
-			*puVar9 = (short)(int)-(((double)((unsigned int)(short)puVar9[2] ^ 0x80000000 | 0x4330000000000000) - dVar4) * dVar1 - dVar5);
+			*puVar9 = (short)(int)-(((double)(short)puVar9[2] - dVar4) * dVar1 - dVar5);
 			puVar9[1] = (short)iVar6 * (puVar9[3] + -8) + 0x60;
 			*(float *)(puVar9 + 4) = fVar2;
 			*(float *)(puVar9 + 6) = fVar2;
@@ -115,7 +115,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 			*(unsigned int *)(puVar9 + 0x2e) = 0x37;
 			puVar9[0x22] = 200;
 			puVar9[0x23] = 0x28;
-			puVar9[0x20] = (short)(int)-(((double)((unsigned int)(short)puVar9[0x22] ^ 0x80000000 | 0x4330000000000000) - dVar4) * dVar1 - dVar5);
+			puVar9[0x20] = (short)(int)-(((double)(short)puVar9[0x22] - dVar4) * dVar1 - dVar5);
 			puVar9[0x21] = (short)(iVar6 + 1) * (puVar9[0x23] + -8) + 0x60;
 			*(float *)(puVar9 + 0x24) = fVar2;
 			*(float *)(puVar9 + 0x26) = fVar2;
@@ -141,9 +141,9 @@ unsigned int CMenuPcs::TmpArtiOpen()
 			if (*(int *)(psVar7 + 0x12) <= iVar10) {
 				if (iVar10 < *(int *)(psVar7 + 0x12) + *(int *)(psVar7 + 0x14)) {
 					*(int *)(psVar7 + 0x10) = *(int *)(psVar7 + 0x10) + 1;
-					*(float *)(psVar7 + 8) = (float)((1.0 / 
-						((double)((unsigned int)*(unsigned int *)(psVar7 + 0x14) ^ 0x80000000 | 0x4330000000000000) - dVar1)) *
-						((double)((unsigned int)*(unsigned int *)(psVar7 + 0x10) ^ 0x80000000 | 0x4330000000000000) - dVar1));
+					*(float *)(psVar7 + 8) = (float)((1.0 /
+						((double)*(unsigned int *)(psVar7 + 0x14) - dVar1)) *
+						((double)*(unsigned int *)(psVar7 + 0x10) - dVar1));
 				} else {
 					iVar6 = iVar6 + 1;
 					*(float *)(psVar7 + 8) = 1.0f;

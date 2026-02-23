@@ -1,6 +1,7 @@
 #include "ffcc/p_menu.h"
 #include "ffcc/color.h"
 #include "ffcc/math.h"
+#include "ffcc/memory.h"
 #include "ffcc/menu.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/ringmenu.h"
@@ -61,6 +62,25 @@ extern u32 DAT_8020eea0;
 
 extern "C" void* __register_global_object(void* object, void* destructor, void* registration);
 extern "C" void __dt__8CMenuPcsFv(void*);
+extern "C" void Calc__5CMenuFv(CMenu*);
+extern "C" void CalcDiaryMenu__8CMenuPcsFv(CMenuPcs*);
+extern "C" void calcBonus__8CMenuPcsFv(CMenuPcs*);
+extern "C" void calcVillageMenu__8CMenuPcsFv(CMenuPcs*);
+extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
+
+static inline void ReleaseRefObject(void* object)
+{
+    if (object == nullptr) {
+        return;
+    }
+
+    u32* raw = reinterpret_cast<u32*>(object);
+    int refCount = static_cast<int>(raw[1]);
+    raw[1] = static_cast<u32>(refCount - 1);
+    if (refCount - 1 == 0) {
+        reinterpret_cast<void (*)(void*, int)>(*reinterpret_cast<u32*>(raw[0] + 8))(object, 1);
+    }
+}
 
 /*
  * --INFO--
@@ -164,12 +184,38 @@ void CMenuPcs::create()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800970e0
+ * PAL Size: 352b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::destroy()
 {
-	// TODO
+    changeMode(static_cast<CMenuPcs::MENUMODE>(-1));
+
+    u8* self = reinterpret_cast<u8*>(this);
+    for (int i = 0; i < 0x16; i++) {
+        u8* slot = self + 0x18c + i * 4;
+        ReleaseRefObject(*reinterpret_cast<void**>(slot));
+        *reinterpret_cast<void**>(slot) = nullptr;
+    }
+
+    for (int i = 0; i < 2; i++) {
+        u8* slot = self + 0x14c + i * 4;
+        ReleaseRefObject(*reinterpret_cast<void**>(slot));
+        *reinterpret_cast<void**>(slot) = nullptr;
+    }
+
+    ReleaseRefObject(*reinterpret_cast<void**>(self + 0xf8));
+    *reinterpret_cast<void**>(self + 0xf8) = nullptr;
+
+    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *reinterpret_cast<void**>(self + 0xec));
+    if (*(self + 0x859) != 0) {
+        *reinterpret_cast<void**>(self + 0xf0) = nullptr;
+        *(self + 0x859) = 0;
+    }
 }
 
 /*
@@ -214,12 +260,51 @@ void CMenuPcs::changeMode(CMenuPcs::MENUMODE)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800966e8
+ * PAL Size: 280b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::calc()
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+    int mode = *reinterpret_cast<int*>(self + 0x740);
+
+    if (mode == 1) {
+        CalcDiaryMenu__8CMenuPcsFv(this);
+    } else if (mode < 1) {
+        if (mode >= 0) {
+            for (int i = 0; i < 4; i++) {
+                Calc__5CMenuFv(*reinterpret_cast<CMenu**>(self + 0x13c + i * 4));
+            }
+
+            for (int i = 0; i < 0xc; i++) {
+                Calc__5CMenuFv(*reinterpret_cast<CMenu**>(self + 0x10c + i * 4));
+            }
+
+            int limit = *reinterpret_cast<int*>(self + 0x68);
+            int value = *reinterpret_cast<int*>(self + 0x6c) - 1;
+            if (value <= limit) {
+                int alt = *reinterpret_cast<int*>(self + 0x6c) + 1;
+                value = limit;
+                if (alt < limit) {
+                    value = alt;
+                }
+            }
+            *reinterpret_cast<int*>(self + 0x6c) = value;
+
+            u32 counter = *reinterpret_cast<u32*>(self + 0x58) - 1;
+            *reinterpret_cast<u32*>(self + 0x58) = counter & ~((int)counter >> 31);
+            counter = *reinterpret_cast<u32*>(self + 0x5c) - 1;
+            *reinterpret_cast<u32*>(self + 0x5c) = counter & ~((int)counter >> 31);
+
+            calcVillageMenu__8CMenuPcsFv(this);
+        }
+    } else if (mode < 3) {
+        calcBonus__8CMenuPcsFv(this);
+    }
 }
 
 /*

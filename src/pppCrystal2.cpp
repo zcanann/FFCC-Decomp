@@ -230,14 +230,26 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, UnkB* param_2, UnkC* param_3)
 {
     int workOffset = param_3->m_serializedDataOffsets[2];
     int colorOffset = param_3->m_serializedDataOffsets[1];
+    int textureIndex = 0;
+    int sourceTex = 0;
+    pppModelSt* model;
+    _GXTexObj backTexObj;
+    float slope;
+    float range;
+    float indMtx[2][3];
+    float texMtx[3][4];
+    Mtx lightMtx;
+    Mtx drawMtx;
+    Mtx cameraMtx;
+    Mtx tmpMtx;
+    Mtx normalMtx;
 
     if (param_2->m_dataValIndex == 0xFFFF) {
         return;
     }
 
-    int textureIndex = 0;
-    pppModelSt* model = (pppModelSt*)((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex];
-    int sourceTex = GetTexture__8CMapMeshFP12CMaterialSetRi((CMapMesh*)model, pppEnvStPtr->m_materialSetPtr, textureIndex);
+    model = (pppModelSt*)((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex];
+    GetTexture__8CMapMeshFP12CMaterialSetRi((CMapMesh*)model, pppEnvStPtr->m_materialSetPtr, textureIndex);
     if (param_2->m_payload[0] == 0) {
         if (param_2->m_initWOrk == 0xFFFF) {
             return;
@@ -246,15 +258,8 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, UnkB* param_2, UnkC* param_3)
             ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_initWOrk], pppEnvStPtr->m_materialSetPtr, textureIndex);
     }
 
-    _GXTexObj backTexObj;
-    Mtx drawMtx;
-    Mtx texMtx;
-    Mtx normalMtx;
-    Mtx cameraMtx;
-    Mtx tmpMtx;
-    float indMtx[2][3];
-    float slope = FLOAT_80331fd0 * param_2->m_stepValue;
-    float range = *(float*)(param_2->m_payload + 8);
+    slope = FLOAT_80331fd0 * param_2->m_stepValue;
+    range = *(float*)(param_2->m_payload + 8);
 
     pppSetBlendMode__FUc(0);
     Graphic.GetBackBufferRect2(DAT_80238030, &backTexObj, 0, 0, 0x280, 0x1C0, 0, GX_LINEAR, GX_TF_RGBA8, 0);
@@ -287,13 +292,13 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, UnkB* param_2, UnkC* param_3)
     PSMTXIdentity(drawMtx);
     PSMTXConcat(pppMngStPtr->m_matrix.value, ((_pppPObject*)pppCrystal2)->m_localMatrix.value, cameraMtx);
     if (Game.game.m_currentSceneId == 7) {
-        C_MTXLightPerspective(texMtx, FLOAT_80331fd4, FLOAT_80331fd8, range, -range, FLOAT_80331fdc, FLOAT_80331fdc);
+        C_MTXLightPerspective(lightMtx, FLOAT_80331fd4, FLOAT_80331fd8, range, -range, FLOAT_80331fdc, FLOAT_80331fdc);
         PSMTXConcat(ppvCameraMatrix0, cameraMtx, tmpMtx);
     } else {
-        C_MTXLightPerspective(texMtx, CameraPcs._252_4_, FLOAT_80331fd8, range, -range, FLOAT_80331fdc, FLOAT_80331fdc);
+        C_MTXLightPerspective(lightMtx, CameraPcs._252_4_, FLOAT_80331fd8, range, -range, FLOAT_80331fdc, FLOAT_80331fdc);
         PSMTXConcat(CameraPcs.m_cameraMatrix, cameraMtx, tmpMtx);
     }
-    PSMTXConcat(texMtx, tmpMtx, drawMtx);
+    PSMTXConcat(lightMtx, tmpMtx, drawMtx);
     PSMTXInverse(tmpMtx, normalMtx);
     PSMTXTranspose(normalMtx, normalMtx);
 

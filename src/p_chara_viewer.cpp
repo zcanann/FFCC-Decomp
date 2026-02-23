@@ -383,18 +383,13 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     p[0xE9] = 0x3F;
     p[0xEA] = 0x3F;
     p[0xEB] = 0xFF;
-    p[0xF0] = 0x3F;
-    p[0xF1] = 0x3F;
-    p[0xF2] = 0x3F;
-    p[0xF3] = 0xFF;
-    p[0xF4] = 0;
-    p[0xF5] = 0;
-    p[0xF6] = 0;
-    p[0xF7] = 0xFF;
-    p[0xF8] = 0;
-    p[0xF9] = 0;
-    p[0xFA] = 0;
-    p[0xFB] = 0xFF;
+    for (i = 0; i < 3; i++) {
+        unsigned char c = (unsigned char)(-((__cntlzw(i) >> 5) & 1) & 0x3F);
+        p[0xF0 + i * 4 + 0] = c;
+        p[0xF0 + i * 4 + 1] = c;
+        p[0xF0 + i * 4 + 2] = c;
+        p[0xF0 + i * 4 + 3] = 0xFF;
+    }
     *(float*)(p + 0x108) = lbl_80330BE8;
     *(float*)(p + 0x10C) = lbl_80330BE8;
     *(float*)(p + 0x110) = lbl_80330C28;
@@ -443,7 +438,9 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     *(int*)(p + 0x1A4) = 0;
     *(int*)(p + 0x1A8) = 0;
     *(int*)(p + 0x1AC) = 0;
-    memset(p + 0x1B0, 0, 0x100);
+    for (i = 0; i < 0x40; i++) {
+        *(int*)(p + 0x1B0 + i * 4) = 0;
+    }
 
     strcpy((char*)(p + 0x2C0), lbl_801DA7E8 + 0x11C);
     *(int*)(p + 0x2BC) = 1;

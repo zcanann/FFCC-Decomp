@@ -137,7 +137,6 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct UnkB* param_2, struct
 	u16 initWork;
 	u8* payload;
 	int textureIndex;
-	int textureBase;
 	int textureSize;
 	u32 y;
 	u32 x;
@@ -154,9 +153,8 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct UnkB* param_2, struct
 
 	payload = (u8*)param_2 + 0x14;
 	textureIndex = 0;
-	textureBase = GetTexture__8CMapMeshFP12CMaterialSetRi(
+	GetTexture__8CMapMeshFP12CMaterialSetRi(
 		&pppEnvStPtr->m_mapMeshPtr[dataValIndex], pppEnvStPtr->m_materialSetPtr, textureIndex);
-	(void)textureBase;
 
 	if (payload[0] == 0) {
 		initWork = *(u16*)((u8*)param_2 + 8);
@@ -173,10 +171,6 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct UnkB* param_2, struct
 
 	refractionData[0] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
 		0x18, pppEnvStPtr->m_stagePtr, s_pppCrystalCpp, 0xA7);
-	if (refractionData[0] == 0) {
-		return;
-	}
-
 	textureInfo = (int*)refractionData[0];
 	textureSize = (int)GXGetTexBufferSize(0x20, 0x20, GX_TF_IA8, GX_FALSE, 0);
 	textureInfo[0] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
@@ -187,13 +181,10 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct UnkB* param_2, struct
 	textureInfo[4] = 0x100;
 	textureInfo[5] = textureSize;
 
-	if (textureInfo[0] == 0) {
-		return;
-	}
-
 	{
 		const float start = -1.0f;
-		const float step = 2.0f / (float)(textureInfo[2] - 1);
+		const float stepX = 2.0f / (float)(textureInfo[2] - 1);
+		const float stepY = 2.0f / (float)(textureInfo[3] - 1);
 		float yy = start;
 
 		for (y = 0; y < (u32)textureInfo[3]; ++y) {
@@ -203,6 +194,9 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct UnkB* param_2, struct
 			for (x = 0; x < (u32)textureInfo[2]; ++x) {
 				float magnitude = xx * xx + y2;
 				float normal = 0.0f;
+				if (magnitude < 0.0f) {
+					magnitude = 0.0f;
+				}
 
 				if (magnitude > 1.0f) {
 					normal = 1.0f / sqrtf(magnitude);
@@ -227,19 +221,17 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct UnkB* param_2, struct
 					pixel[0] = nx;
 					pixel[1] = ny;
 				}
-				xx += step;
+				xx += stepX;
+				}
+				yy += stepY;
 			}
-			yy += step;
-		}
 	}
 
 	DCFlushRange((void*)textureInfo[0], textureInfo[5]);
 	refractionData[1] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
 		0x20, pppEnvStPtr->m_stagePtr, s_pppCrystalCpp, 0xB4);
-	if (refractionData[1] != 0) {
-		GXInitTexObj((GXTexObj*)refractionData[1], (void*)textureInfo[0], (u16)textureInfo[2],
-			(u16)textureInfo[3], GX_TF_IA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
-	}
+	GXInitTexObj((GXTexObj*)refractionData[1], (void*)textureInfo[0], (u16)textureInfo[2],
+		(u16)textureInfo[3], GX_TF_IA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
 }
 
 /*

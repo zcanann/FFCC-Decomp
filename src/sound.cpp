@@ -328,7 +328,7 @@ void CSound::Quit()
  */
 void CSound::SetStereo(int stereo)
 {
-    reinterpret_cast<CRedSound*>(this)->SetSoundMode((u32)__cntlzw(stereo) >> 5);
+    reinterpret_cast<CRedSound*>(reinterpret_cast<u8*>(this) + 8)->SetSoundMode((u32)__cntlzw(stereo) >> 5);
 }
 
 /*

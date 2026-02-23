@@ -102,7 +102,11 @@ void pppFrameLensFlare(void* obj, void* param2, void* param3)
 	Vec lookDir;
 	Vec objectPos;
 	Vec cameraToObject;
-	double alphaScale;
+	float alphaScale;
+	u8 sourceAlpha;
+	double objectPosX;
+	double objectPosY;
+	double objectPosZ;
 
 	if (DAT_8032ed70 != 0) {
 		return;
@@ -114,14 +118,16 @@ void pppFrameLensFlare(void* obj, void* param2, void* param3)
 	offset1 = serializedDataOffsets[1];
 	alphaPtr = (unsigned char*)((char*)obj + offset2 + 0xb2);
 
-	alphaScale = (double)((float)((double)(0x4330000000000000ULL | (u8)*((u8*)obj + offset1 + 0x88)) - DOUBLE_80331070) *
-						  FLOAT_80331064);
+	sourceAlpha = *((u8*)obj + offset1 + 0x88);
+	alphaScale = (float)sourceAlpha * FLOAT_80331064;
 
 	GXGetViewportv(viewport);
 	GXGetProjectionv(projection);
 	PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
-	GXProject((double)pppMngStPtr->m_matrix.value[0][3], (double)pppMngStPtr->m_matrix.value[1][3],
-			  (double)pppMngStPtr->m_matrix.value[2][3], cameraMtx, projection, viewport,
+	objectPosX = (double)pppMngStPtr->m_matrix.value[0][3];
+	objectPosY = (double)pppMngStPtr->m_matrix.value[1][3];
+	objectPosZ = (double)pppMngStPtr->m_matrix.value[2][3];
+	GXProject(objectPosX, objectPosY, objectPosZ, cameraMtx, projection, viewport,
 			  (float*)((char*)obj + offset2 + 0x90), (float*)((char*)obj + offset2 + 0x94),
 			  (float*)((char*)obj + offset2 + 0x98));
 
@@ -175,7 +181,7 @@ void pppFrameLensFlare(void* obj, void* param2, void* param3)
 		}
 	}
 
-	*alphaPtr = (u8)(int)((double)(float)((double)(0x4330000000000000ULL | (u8)*alphaPtr) - DOUBLE_80331070) * alphaScale);
+	*alphaPtr = (u8)(int)((float)(u8)*alphaPtr * alphaScale);
 	if (unkB->m_dataValIndex != 0xffff) {
 		long* shapeTable = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + unkB->m_dataValIndex * 4);
 		pppCalcFrameShape(shapeTable, *(short*)((char*)obj + offset2 + 0xac), *(short*)((char*)obj + offset2 + 0xae),

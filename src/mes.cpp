@@ -1,11 +1,34 @@
 #include "ffcc/mes.h"
 #include "ffcc/fontman.h"
+#include "ffcc/p_game.h"
+#include "ffcc/joybus.h"
 #include <string.h>
 
 extern "C" void SetPosX__5CFontFf(float, CFont*);
 extern "C" void SetPosY__5CFontFf(float, CFont*);
 extern "C" void Draw__5CFontFUs(CFont*, unsigned short);
 extern "C" float GetWidth__5CFontFUs(CFont*, unsigned short);
+extern "C" void SetShadow__5CFontFi(int, CFont*);
+extern "C" void SetMargin__5CFontFf(float, CFont*);
+extern "C" void SetScaleX__5CFontFf(float, CFont*);
+extern "C" void SetScaleY__5CFontFf(float, CFont*);
+extern "C" void SetColor__5CFontF8_GXColor(CFont*, _GXColor*);
+extern "C" void SetTlut__5CFontFi(CFont*, int);
+extern "C" void DrawInit__5CFontFv(CFont*);
+extern "C" void DrawQuit__5CFontFv(CFont*);
+extern "C" int GetPadType__6JoyBusFi(void*, int);
+extern "C" void DrawInit__8CMenuPcsFv(void*);
+extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
+extern "C" void SetColor__8CMenuPcsFR6CColor(void*, void*);
+extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(void*, int);
+extern "C" void DrawRect__8CMenuPcsFUlfffffffff(
+    void*, unsigned long, float, float, float, float, float, float, float, float, float);
+extern unsigned char MenuPcs[];
+extern float FLOAT_80330890;
+extern float FLOAT_80330894;
+extern float FLOAT_80330898;
+extern float FLOAT_8033089c;
+extern float FLOAT_803308a0;
 
 /*
  * --INFO--
@@ -345,7 +368,160 @@ doneAdvance:
  */
 void CMes::Draw()
 {
-	// TODO
+	int glyphCount = *(int*)((char*)this + 8);
+	if (glyphCount == 0)
+	{
+		return;
+	}
+
+	unsigned int globalAlpha = 0xFF;
+	if ((*(int*)((char*)this + 0x3CAC) != 0) && (*(int*)((char*)this + 0x3CB8) != 0))
+	{
+		globalAlpha = 0xFF - (unsigned int)(*(int*)((char*)this + 0x3CBC) * 0xFF) /
+		                        (unsigned int)*(int*)((char*)this + 0x3CB8);
+	}
+
+	float* glyph = (float*)((char*)this + 0x0C);
+	CFont* activeFont = 0;
+	unsigned int activeFontId = 0xFFFFFFFF;
+	unsigned int activeTlut = 0xFFFFFFFF;
+
+	for (int i = 0; i < glyphCount; i++)
+	{
+		if ((unsigned int)(unsigned short)*(short*)(glyph + 2) <= *(unsigned int*)((char*)this + 0x3C80))
+		{
+			unsigned char ch = *(unsigned char*)(glyph + 4);
+			if (ch < 0x20)
+			{
+				if (activeFont != 0)
+				{
+					DrawQuit__5CFontFv(activeFont);
+					activeFontId = 0xFFFFFFFF;
+				}
+
+				DrawInit__8CMenuPcsFv(MenuPcs);
+
+				unsigned int iconId = ch;
+				if ((ch == 7) || (ch == 8) || (ch == 0x0A) || (ch == 0x0B))
+				{
+					unsigned int mode = (unsigned int)Game.game.m_gameWork.m_menuStageMode;
+					if ((Game.game.m_currentMapId == 0x21) && (GetPadType__6JoyBusFi(&Joybus, 0) != 0x40))
+					{
+						int padType = GetPadType__6JoyBusFi(&Joybus, 0);
+						mode = (unsigned int)((0x40000U - (unsigned int)padType |
+						                       (unsigned int)padType - 0x40000U) >>
+						                      31);
+					}
+
+					if (ch == 7)
+					{
+						iconId = (mode != 0) ? 7 : 0x0B;
+					}
+					else if (ch == 8)
+					{
+						iconId = (mode != 0) ? 8 : 0x0C;
+					}
+					else if (ch == 0x0A)
+					{
+						iconId = (mode != 0) ? 9 : 0x0D;
+					}
+					else
+					{
+						iconId = (mode != 0) ? 0x0A : 0x0E;
+					}
+				}
+
+				unsigned char colorStorage[8];
+				__ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, 0xFF);
+				SetColor__8CMenuPcsFR6CColor(MenuPcs, colorStorage);
+				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcs, 0x15);
+
+				float x = *(float*)((char*)this + 0x3C9C) + *glyph;
+				float y = FLOAT_80330890 + *(float*)((char*)this + 0x3CA0) + (float)*(short*)(glyph + 2);
+				float u = (float)((iconId % 5) * 0x16);
+				float v = (float)((iconId / 5) * 0x16);
+
+				DrawRect__8CMenuPcsFUlfffffffff(
+				    MenuPcs, 0, x, y, FLOAT_80330894, FLOAT_80330894, u, v, FLOAT_80330898, FLOAT_80330898,
+				    0.0f);
+
+				if (activeFont != 0)
+				{
+					DrawInit__5CFontFv(activeFont);
+				}
+			}
+			else
+			{
+				unsigned int fontId = *(unsigned char*)((char*)glyph + 0x0E) & 0x0F;
+				if (activeFontId != fontId)
+				{
+					CFont* selectedFont = *(CFont**)(MenuPcs + 0x100);
+					if (fontId == 0)
+					{
+						selectedFont = *(CFont**)(MenuPcs + 0x0F8);
+					}
+					else if ((fontId == 1) || (fontId >= 4))
+					{
+						selectedFont = activeFont;
+					}
+
+					activeFont = selectedFont;
+					if (activeFont == 0)
+					{
+						glyph += 5;
+						continue;
+					}
+
+					SetShadow__5CFontFi(*(int*)((char*)this + 0x3D38), activeFont);
+					SetMargin__5CFontFf(FLOAT_8033089c, activeFont);
+					SetScaleX__5CFontFf(*(float*)((char*)this + 0x3D44), activeFont);
+					SetScaleY__5CFontFf(*(float*)((char*)this + 0x3D48), activeFont);
+					DrawInit__5CFontFv(activeFont);
+
+					activeFontId = fontId;
+				}
+
+				unsigned int fadeCur = *(unsigned char*)((char*)glyph + 0x0F) & 0x0F;
+				unsigned int fadeMax = (unsigned int)*(unsigned char*)((char*)glyph + 0x0F) >> 4;
+				unsigned char alpha = (unsigned char)globalAlpha;
+				if (fadeMax != 0)
+				{
+					float ratio = (float)fadeCur / (float)fadeMax;
+					if (ratio < FLOAT_80330898)
+					{
+						alpha = (unsigned char)((float)globalAlpha * ratio);
+					}
+				}
+
+				_GXColor color = {0xFF, 0xFF, 0xFF, alpha};
+				SetColor__5CFontF8_GXColor(activeFont, &color);
+
+				unsigned int tlut = (unsigned int)*(unsigned char*)((char*)glyph + 0x12);
+				if ((activeTlut != tlut) && (activeFontId < 2))
+				{
+					SetTlut__5CFontFi(activeFont, (int)tlut + *(int*)((char*)this + 0x3D34));
+					activeTlut = tlut;
+				}
+
+				SetPosX__5CFontFf(*(float*)((char*)this + 0x3C9C) + *glyph, activeFont);
+				SetPosY__5CFontFf(*(float*)((char*)this + 0x3CA0) + (float)*(short*)(glyph + 2), activeFont);
+
+				SetScaleX__5CFontFf(FLOAT_803308a0 * (float)*(unsigned char*)((char*)glyph + 0x0A), activeFont);
+				SetScaleY__5CFontFf(FLOAT_803308a0 * (float)*(unsigned char*)((char*)glyph + 0x11), activeFont);
+
+				activeFont->renderFlags = activeFont->renderFlags & 0xF7 | 8;
+				Draw__5CFontFUs(activeFont, ch);
+				activeFont->renderFlags &= 0xF7;
+			}
+		}
+
+		glyph += 5;
+	}
+
+	if (activeFont != 0)
+	{
+		DrawQuit__5CFontFv(activeFont);
+	}
 }
 
 /*

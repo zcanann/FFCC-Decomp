@@ -262,36 +262,45 @@ void CMenuPcs::MoneyCtrl()
  */
 void CMenuPcs::MoneyClose()
 {
-	int doneCount = 0;
-	int menuState = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c);
+	float fVar1;
+	int iVar4;
+	short* psVar5;
+	int iVar6;
+	int iVar7;
+	int iVar8;
 
-	*reinterpret_cast<short*>(menuState + 0x22) = static_cast<short>(*reinterpret_cast<short*>(menuState + 0x22) + 1);
-	int entryCount = static_cast<int>(**reinterpret_cast<short**>(reinterpret_cast<char*>(this) + 0x850));
-	short* entry = *reinterpret_cast<short**>(reinterpret_cast<char*>(this) + 0x850) + 4;
-	int time = static_cast<int>(*reinterpret_cast<short*>(menuState + 0x22));
-	for (int i = 0; i < entryCount; ++i) {
-		if (*reinterpret_cast<int*>(entry + 0x12) <= time) {
-			int duration = *reinterpret_cast<int*>(entry + 0x14);
-			if (time < *reinterpret_cast<int*>(entry + 0x12) + duration) {
-				*reinterpret_cast<int*>(entry + 0x10) = *reinterpret_cast<int*>(entry + 0x10) + 1;
-				float t = static_cast<float>(*reinterpret_cast<int*>(entry + 0x10)) / static_cast<float>(duration);
-				*reinterpret_cast<float*>(entry + 8) = 1.0f - t;
-				if ((*reinterpret_cast<unsigned int*>(entry + 0x16) & 2) == 0) {
-					float delta = 1.0f - t;
-					*reinterpret_cast<float*>(entry + 0x18) = (*reinterpret_cast<float*>(entry + 0x1c) - static_cast<float>(*entry)) * delta;
-					*reinterpret_cast<float*>(entry + 0x1a) = (*reinterpret_cast<float*>(entry + 0x1e) - static_cast<float>(entry[1])) * delta;
+	iVar4 = 0;
+	*(short *)(*(int *)((char*)this + 0x82c) + 0x22) = *(short *)(*(int *)((char*)this + 0x82c) + 0x22) + 1;
+	iVar6 = (int)**(short **)((char*)this + 0x850);
+	psVar5 = *(short **)((char*)this + 0x850) + 4;
+	iVar7 = (int)*(short *)(*(int *)((char*)this + 0x82c) + 0x22);
+	iVar8 = iVar6;
+	if (0 < iVar6) {
+		do {
+			fVar1 = FLOAT_80332f64;
+			if (*(int *)(psVar5 + 0x12) <= iVar7) {
+				if (iVar7 < *(int *)(psVar5 + 0x12) + *(int *)(psVar5 + 0x14)) {
+					*(int *)(psVar5 + 0x10) = *(int *)(psVar5 + 0x10) + 1;
+					*(float *)(psVar5 + 8) = FLOAT_80332f70 - (float)*(int *)(psVar5 + 0x10) / (float)*(int *)(psVar5 + 0x14);
+					if ((*(unsigned int *)(psVar5 + 0x16) & 2) == 0) {
+						fVar1 = FLOAT_80332f70 - (float)*(int *)(psVar5 + 0x10) / (float)*(int *)(psVar5 + 0x14);
+						*(float *)(psVar5 + 0x18) = (*(float *)(psVar5 + 0x1c) - (float)*psVar5) * fVar1;
+						*(float *)(psVar5 + 0x1a) = (*(float *)(psVar5 + 0x1e) - (float)psVar5[1]) * fVar1;
+					}
 				}
-			} else {
-				doneCount += 1;
-				*reinterpret_cast<float*>(entry + 8) = 0.0f;
-				*reinterpret_cast<float*>(entry + 0x18) = 0.0f;
-				*reinterpret_cast<float*>(entry + 0x1a) = 0.0f;
+				else {
+					iVar4 = iVar4 + 1;
+					*(float *)(psVar5 + 8) = FLOAT_80332f64;
+					*(float *)(psVar5 + 0x18) = fVar1;
+					*(float *)(psVar5 + 0x1a) = fVar1;
+				}
 			}
-		}
-		entry += 0x20;
+			psVar5 = psVar5 + 0x20;
+			iVar8 = iVar8 + -1;
+		} while (iVar8 != 0);
 	}
-
-	(void)doneCount;
+	(void)iVar6;
+	(void)iVar4;
 }
 
 /*

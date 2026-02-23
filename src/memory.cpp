@@ -1780,12 +1780,52 @@ void CAmemCacheSet::AddRef(short index)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001CBF4
+ * PAL Size: 340b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CAmemCacheSet::Release(short)
+void CAmemCacheSet::Release(short index)
 {
-	// TODO
+    unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
+    int tableBase = *reinterpret_cast<int*>(bytes + 0x58);
+    int entryOffset = static_cast<int>(index) * 0x1C;
+    int entry = tableBase + entryOffset;
+
+    *reinterpret_cast<short*>(entry + 0x0C) -= 1;
+    if (*reinterpret_cast<short*>(entry + 0x0C) == -1) {
+        if (System.m_execParam > 2) {
+            Printf__7CSystemFPce(&System, "amemCacheSet Release under %d\n", static_cast<int>(index));
+        }
+
+        int count = *reinterpret_cast<int*>(bytes + 0x3C);
+        int offset = 0;
+        for (int i = 0; i < count; i++) {
+            unsigned char* current = reinterpret_cast<unsigned char*>(tableBase + offset);
+            int data = *reinterpret_cast<int*>(current + 0x00);
+            if ((current[0x0E] != 0) || (data != 0)) {
+                if (System.m_execParam > 2) {
+                    const char* useType = (current[0x0E] == 0) ? "FREE" : "USE";
+                    Printf__7CSystemFPce(
+                        &System, "%3d %s type:%d RefCnt:%d prio:%d data:%08x\n", i, useType,
+                        static_cast<int>(current[0x0F]), *reinterpret_cast<short*>(current + 0x0C),
+                        *reinterpret_cast<int*>(current + 0x10), data);
+                }
+            }
+            offset += 0x1C;
+        }
+
+        if (System.m_execParam > 2) {
+            Printf__7CSystemFPce(&System, "--------------------------------\n");
+        }
+
+        void (*underflowHook)(int) = *reinterpret_cast<void (**)(int)>(bytes + 0x50);
+        if (underflowHook != 0) {
+            underflowHook(static_cast<int>(index));
+        }
+    }
 }
 
 /*

@@ -133,12 +133,31 @@ extern "C" void __sinit_RedDriver_cpp(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bcf0c
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _SetSoundMode(int*)
+void _SetSoundMode(int* param_1)
 {
-	// TODO
+    int soundMode;
+
+    soundMode = *param_1;
+    DAT_8032f3c8 = soundMode;
+    if (soundMode == 1) {
+        OSSetSoundMode(0);
+    } else {
+        OSSetSoundMode(1);
+    }
+    soundMode = DAT_8032f3c8;
+    DAT_8032f400 = soundMode;
+    if (soundMode == 2) {
+        AXSetMode(2);
+    } else {
+        AXSetMode(0);
+    }
 }
 
 /*

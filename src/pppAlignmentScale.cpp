@@ -53,8 +53,8 @@ struct pppAlignmentScale* pppFrameAlignmentScale(struct pppAlignmentScale* align
     Vec objPos;
     Mtx scaleMtx;
 
-    pppMngSt = pppMngStPtr;
     if (DAT_8032ed70 == 0) {
+        pppMngSt = pppMngStPtr;
         cameraPos.x = CameraPcs._224_4_;
         cameraPos.y = CameraPcs._228_4_;
         cameraPos.z = CameraPcs._232_4_;

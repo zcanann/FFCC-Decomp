@@ -51,6 +51,7 @@ extern "C" void MusicVolume__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" void Printf__7CSystemFPce(CSystem*, char*, ...);
 extern "C" int sprintf(char*, const char*, ...);
 extern void* ARRAY_802f26c8;
+extern char DAT_801db190[];
 extern char DAT_801db29c[];
 extern char DAT_801db2b8[];
 extern char s_Sound___1_n_B_801db130[];
@@ -872,22 +873,96 @@ void CSound::FadeOutBgm(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c6a20
+ * PAL Size: 624b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CSound::LoadBlock()
 {
-	// TODO
+    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+    CFile::CHandle*& waveFile = *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 0x8);
+
+    if (ReentryWaveData__9CRedSoundFi(redSound, 0) == -1) {
+        if (waveFile != 0) {
+            File.Close(waveFile);
+            waveFile = 0;
+            Printf__7CSystemFPce(&System, DAT_801db190);
+        }
+
+        redSound->SetWaveData(-1, 0, 0);
+
+        char wavePath[256];
+        sprintf(wavePath, "dvd/sound/wave/wave_%04d.wd", 0);
+        waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
+        if (waveFile != 0) {
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x14) = File.GetLength(waveFile);
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x18) = 0;
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x20) = 0;
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1C) = 0;
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x24) = 1;
+            while (waveFile != 0) {
+                loadWaveFrame();
+            }
+        }
+    }
+
+    if (ReentryWaveData__9CRedSoundFi(redSound, 500) == -1) {
+        if (waveFile != 0) {
+            File.Close(waveFile);
+            waveFile = 0;
+            Printf__7CSystemFPce(&System, DAT_801db190);
+        }
+
+        redSound->SetWaveData(-1, 0, 0);
+
+        char wavePath[256];
+        sprintf(wavePath, "dvd/sound/wave/wave_%04d.wd", 500);
+        waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
+        if (waveFile != 0) {
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x14) = File.GetLength(waveFile);
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x18) = 0;
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x20) = 0;
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1C) = 1;
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x24) = 1;
+            while (waveFile != 0) {
+                loadWaveFrame();
+            }
+        }
+    }
+
+    for (int i = 0; i < 4; i++) {
+        char sePath[260];
+        sprintf(sePath, "dvd/sound/se/block/se_%03d.seb", i);
+        CFile::CHandle* handle = File.Open(sePath, 0, CFile::PRI_LOW);
+        if (handle != 0) {
+            File.Read(handle);
+            File.SyncCompleted(handle);
+            redSound->SetSeBlockData(i, File.m_readBuffer);
+            File.Close(handle);
+        }
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c69b8
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CSound::FreeBlock()
 {
-	// TODO
+    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+    redSound->ClearWaveBank(500);
+    redSound->ClearWaveBank(0);
+    for (int i = 0; i < 4; i++) {
+        redSound->SetSeBlockData(i, 0);
+    }
 }
 
 /*

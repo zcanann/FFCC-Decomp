@@ -223,12 +223,21 @@ void CGraphic::SetStdPixelFmt()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80019830
+ * PAL Size: 136b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphic::SetViewport()
 {
-	// TODO
+    void* renderMode = PtrAt(this, 0x71E0);
+    u16 width = U16At(renderMode, 4);
+    u16 height = U16At(renderMode, 6);
+
+    GXSetViewport(0.0f, 0.0f, (f32)width, (f32)height, 0.0f, 1.0f);
+    GXSetScissor(0, 0, width, height);
 }
 
 /*
@@ -243,12 +252,16 @@ void CGraphic::BeginFrame()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80019718
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphic::EndFrame()
 {
-	// TODO
+    S32At(this, 0x14) = 0;
 }
 
 /*

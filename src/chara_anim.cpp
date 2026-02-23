@@ -145,8 +145,8 @@ CChara::CAnim::CAnim()
 	*(void**)(p + 0x18) = 0;
 	*(void**)(p + 0x28) = 0;
 	*(int*)(p + 0x1C) = 0;
-	*(int*)(p + 0x24) = 0;
 	*(void**)(p + 0x2C) = 0;
+	*(int*)(p + 0x24) = 0;
 }
 
 /*

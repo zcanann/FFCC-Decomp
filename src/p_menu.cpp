@@ -8,6 +8,7 @@
 #include "ffcc/textureman.h"
 
 #include <dolphin/mtx.h>
+#include <math.h>
 
 extern CTextureMan TextureMan;
 extern CMath Math;
@@ -66,7 +67,12 @@ extern "C" void Calc__5CMenuFv(CMenu*);
 extern "C" void CalcDiaryMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void calcBonus__8CMenuPcsFv(CMenuPcs*);
 extern "C" void calcVillageMenu__8CMenuPcsFv(CMenuPcs*);
+extern "C" void drawBonus__8CMenuPcsFv(CMenuPcs*);
+extern "C" void drawVillageMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
+extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
+extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, unsigned char, int, int, unsigned char);
+extern "C" unsigned char CFlat[];
 
 static inline void ReleaseRefObject(void* object)
 {
@@ -309,12 +315,87 @@ void CMenuPcs::calc()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009631c
+ * PAL Size: 972b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::draw()
 {
-	// TODO
+    Mtx modelMtx;
+    Mtx texMtx;
+    Mtx44 orthoMtx;
+    Mtx44 screenMtx;
+
+    PSMTXIdentity(modelMtx);
+    GXLoadPosMtxImm(modelMtx, 0);
+    C_MTXOrtho(orthoMtx, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, 1.0f);
+    GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+    GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+    {
+        CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+        GXSetChanAmbColor(GX_COLOR0A0, white.color);
+    }
+    GXSetZCompLoc(GX_FALSE);
+    GXSetCurrentMtx(0);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
+    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetNumTexGens(1);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+    GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+    GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+
+    {
+        int mode = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x740);
+
+        if (mode == 1) {
+            drawWorld();
+        } else if (mode < 1) {
+            if (mode >= 0) {
+                drawBattle();
+                drawVillageMenu__8CMenuPcsFv(this);
+            }
+        } else if (mode < 3) {
+            drawBonus__8CMenuPcsFv(this);
+        }
+    }
+
+    if (((*reinterpret_cast<unsigned int*>(CFlat + 0x12A0) & 0x10) != 0) && (System.m_scenegraphStepMode == 2)) {
+        CTexture* texture = *reinterpret_cast<CTexture**>(reinterpret_cast<u8*>(this) + 0x190);
+        TextureMan.SetTexture(GX_TEXMAP0, texture);
+
+        if (texture != nullptr) {
+            float width = static_cast<float>(*reinterpret_cast<u32*>(reinterpret_cast<u8*>(texture) + 0x64));
+            float height = static_cast<float>(*reinterpret_cast<u32*>(reinterpret_cast<u8*>(texture) + 0x68));
+            PSMTXScale(texMtx, 1.0f / width, 1.0f / height, 1.0f);
+            GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
+            GXSetNumTexGens(1);
+            GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+        }
+
+        TextureMan.SetTextureTev(texture);
+
+        {
+            int alpha = static_cast<int>(127.5f * (1.0f + sinf(System.m_frameCounter * 0.1f)));
+            CColor color(0xFF, 0xFF, 0xFF, static_cast<u8>(alpha));
+            GXSetChanMatColor(GX_COLOR0A0, color.color);
+            DrawRect(3, 0.0f, 0.0f, 640.0f, 480.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+        }
+    }
+
+    PSMTX44Copy(*reinterpret_cast<Mtx44*>(reinterpret_cast<u8*>(&CameraPcs) + 0x48), screenMtx);
+    GXSetProjection(screenMtx, GX_PERSPECTIVE);
 }
 
 /*

@@ -512,12 +512,38 @@ void CFlatRuntime::Frame(int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80068824
+ * PAL Size: 236b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime::AfterFrame(int)
+void CFlatRuntime::AfterFrame(int mode)
 {
-	// TODO
+	CObject* object = reinterpret_cast<CObject*>(reinterpret_cast<u8*>(this) + 0x8CC)->m_next;
+
+	while (object != reinterpret_cast<CObject*>(reinterpret_cast<u8*>(this) + 0x8CC)) {
+		CObject* const next = object->m_next;
+
+		if ((mode != 0) || (static_cast<s8>(object->m_flags) < 0)) {
+			object->m_previous->m_next = object->m_next;
+			object->m_next->m_previous = object->m_previous;
+
+			*reinterpret_cast<void**>(reinterpret_cast<u8*>(*object->m_freeListNode) + 4) = object->m_freeListNode[1];
+			*reinterpret_cast<void**>(object->m_freeListNode[1]) = *object->m_freeListNode;
+
+			object->m_freeListNode[1] = *reinterpret_cast<void***>(reinterpret_cast<u8*>(this) + 0x98C);
+			*reinterpret_cast<void***>(reinterpret_cast<u8*>(this) + 0x98C) = object->m_freeListNode;
+
+			object->m_flags &= 0xEF;
+
+			typedef void (*OnDeleteFn)(CFlatRuntime*);
+			reinterpret_cast<OnDeleteFn>((*reinterpret_cast<void***>(this))[7])(this);
+		}
+
+		object = next;
+	}
 }
 
 /*
@@ -548,12 +574,134 @@ void CFlatRuntime::deleteObject(CFlatRuntime::CObject* object)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800684c8
+ * PAL Size: 724b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime::createObject(int)
+CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 {
-	// TODO
+	u8* const self = reinterpret_cast<u8*>(this);
+	u8* classBase = 0;
+	if (classIndex != -1) {
+		classBase = *reinterpret_cast<u8**>(self + 0x18) + (classIndex * 0x22C);
+	}
+
+	int varCount = 0;
+	if (classBase != 0) {
+		varCount = *reinterpret_cast<int*>(classBase + 0x228);
+	}
+
+	typedef CObject* (*GetFreeObjectFn)(CFlatRuntime*, int);
+	CObject* object = reinterpret_cast<GetFreeObjectFn>((*reinterpret_cast<void***>(this))[0xE])(this, varCount);
+
+	object->m_previous = reinterpret_cast<CObject*>(self + 0x8CC)->m_previous;
+	object->m_next = reinterpret_cast<CObject*>(self + 0x8CC);
+	reinterpret_cast<CObject*>(self + 0x8CC)->m_previous->m_next = object;
+	reinterpret_cast<CObject*>(self + 0x8CC)->m_previous = object;
+
+	object->m_flags &= 0x7F;
+	object->m_flags &= 0xDF;
+	object->m_flags = static_cast<u8>((object->m_flags & 0xEF) | 0x10);
+	object->m_0x32 = 0;
+	object->m_particleId = 0xF;
+	object->m_waitCounter = 0;
+	object->m_reqFlag0 = 0;
+	object->m_reqFlag1 = 0;
+	object->m_reqFlag2 = 0;
+	object->m_reqFlag3 = 0;
+	object->m_classIndex = static_cast<s16>(classIndex);
+	object->m_classIndex = object->m_classIndex;
+	object->m_flags = static_cast<u8>((object->m_flags & 0xBF) | 0x40);
+
+	int classLocalCount = 0;
+	if (classIndex != -1) {
+		classLocalCount = *reinterpret_cast<int*>(classBase + 0x224);
+	}
+
+	u8* scanNode = *reinterpret_cast<u8**>(*reinterpret_cast<u8**>(self + 0x984) + 4);
+	const s32 scanDelta = static_cast<s32>((self + 0x978) - scanNode);
+	u32 noScan = static_cast<u32>(__cntlzw(static_cast<u32>(scanDelta))) >> 5 & 0xFF;
+	while (noScan == 0) {
+		u8* const prev = scanNode;
+		scanNode = *reinterpret_cast<u8**>(prev + 4);
+		if (*reinterpret_cast<int*>(*reinterpret_cast<u8**>(prev + 4) + 8)
+		    >= (classLocalCount + 0x60 + *reinterpret_cast<int*>(prev + 8) + *reinterpret_cast<int*>(prev + 0xC))) {
+			scanNode = prev;
+			break;
+		}
+	}
+
+	void** const freeNode = *reinterpret_cast<void***>(self + 0x98C);
+	*reinterpret_cast<void***>(self + 0x98C) = reinterpret_cast<void**>(freeNode[1]);
+	freeNode[0] = scanNode;
+	freeNode[1] = *reinterpret_cast<void**>(scanNode + 4);
+	*reinterpret_cast<void***>(freeNode[1]) = freeNode;
+	*reinterpret_cast<void**>(scanNode + 4) = freeNode;
+
+	int baseWords = 0;
+	if (noScan == 0) {
+		baseWords = *reinterpret_cast<int*>(scanNode + 8);
+	}
+	freeNode[2] = reinterpret_cast<void*>(static_cast<int>(*reinterpret_cast<int*>(scanNode + 0xC) + baseWords));
+	freeNode[3] = reinterpret_cast<void*>(classLocalCount + 0x60);
+
+	object->m_freeListNode = freeNode;
+	object->m_id = reinterpret_cast<u32>(*reinterpret_cast<u8**>(self + 0x0C) + (reinterpret_cast<s32>(freeNode[2]) * 4));
+
+	unsigned int* varBase = 0;
+	if (classIndex == -1) {
+		varBase = *reinterpret_cast<unsigned int**>(self + 0x2C);
+	} else {
+		varBase = reinterpret_cast<unsigned int*>(object->m_id);
+	}
+	object->m_thisBase = varBase;
+
+	if (classIndex == -1) {
+		varBase = reinterpret_cast<unsigned int*>(object->m_id);
+	} else {
+		varBase = object->m_thisBase + *reinterpret_cast<int*>(classBase + 0x224);
+	}
+	object->m_sp = varBase;
+	object->m_localBase = 0;
+	object->m_engineObject = object;
+	object->m_codePos = (object->m_codePos & 0x000F) | 0xFFF0;
+	object->m_argCount = 0;
+
+	u32 allowKeep = 1;
+	if (classIndex == -1) {
+		allowKeep = static_cast<u32>(__cntlzw(*reinterpret_cast<u32*>(self + 0x1294))) >> 5 & 0xFF;
+	}
+
+	u8* defs = 0;
+	int clearCount = 0;
+	if (classIndex == -1) {
+		defs = *reinterpret_cast<u8**>(self + 0x28);
+		clearCount = *reinterpret_cast<int*>(self + 0x24);
+	} else {
+		clearCount = *reinterpret_cast<int*>(classBase + 0x224);
+	}
+
+	unsigned int* write = object->m_thisBase;
+	while (clearCount > 0) {
+		if ((allowKeep != 0) || ((defs[1] & 0x20) == 0)) {
+			*write = 0;
+		}
+		defs += 4;
+		write++;
+		clearCount--;
+	}
+
+	if (classIndex == -1) {
+		request(object, 1, 0, 0, 0);
+	}
+
+	typedef void (*OnNewFn)(CFlatRuntime*);
+	reinterpret_cast<OnNewFn>((*reinterpret_cast<void***>(this))[6])(this);
+
+	return object;
 }
 
 /*

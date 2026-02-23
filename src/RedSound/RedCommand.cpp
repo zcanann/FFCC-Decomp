@@ -50,6 +50,7 @@ int* SetReverb(int, int, int*);
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 void _EraseAttribute(int eraseTrack, int attrMask)
 {
 	int* trackBasePtr = (int*)((char*)DAT_8032f3f0 + 0xdbc);
@@ -83,6 +84,7 @@ void _EraseAttribute(int eraseTrack, int attrMask)
 		track += 0x55;
 	} while (track < (int*)(*trackBasePtr + 0x2a80));
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--

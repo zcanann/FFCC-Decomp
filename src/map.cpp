@@ -4,10 +4,12 @@
 #include "ffcc/memory.h"
 #include "ffcc/maphit.h"
 #include "ffcc/mapshadow.h"
+#include "ffcc/mapanim.h"
 #include "ffcc/maptexanim.h"
 #include "ffcc/materialman.h"
 #include "ffcc/p_game.h"
 #include "ffcc/p_light.h"
+#include "ffcc/file.h"
 #include "ffcc/system.h"
 
 #include <string.h>
@@ -37,6 +39,7 @@ extern "C" void SetDrawFlag__8COctTreeFv(void*);
 extern "C" void Draw__8COctTreeFUc(void*, unsigned char);
 extern "C" void Draw__7CMapObjFUc(void*, unsigned char);
 extern "C" void Calc__11CMapAnimRunFl(CMapAnimRun*, long);
+extern "C" unsigned int CheckSum__FPvi(void*, int);
 extern "C" void* lbl_801E89A8[];
 extern "C" void* lbl_801E899C[];
 extern "C" void* lbl_801E8990[];
@@ -1448,12 +1451,33 @@ void CMapMng::Destroy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003311c
+ * PAL Size: 252b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapMng::MapFileRead(char*, unsigned long&)
 {
-	// TODO
+    for (int i = 0; i < 0x10; i++) {
+        CFile::CHandle** handleSlot = reinterpret_cast<CFile::CHandle**>(Ptr(this, 0x22A2C + (i * 4)));
+        CFile::CHandle* handle = *handleSlot;
+        if (handle != 0 && File.IsCompleted(handle)) {
+            int len = File.GetLength(handle);
+            void* readBuffer = File.m_readBuffer;
+            void* amemCursor = *reinterpret_cast<void**>(Ptr(this, 0x22998));
+
+            Memory.CopyToAMemorySync(readBuffer, amemCursor, (len + 0x1F) & ~0x1F);
+            *reinterpret_cast<int*>(Ptr(this, 0x229AC + (i * 4))) = len;
+            *reinterpret_cast<unsigned int*>(Ptr(this, 0x229EC + (i * 4))) = CheckSum__FPvi(readBuffer, len);
+            (*reinterpret_cast<int*>(Ptr(this, 0x229A0)))++;
+            *reinterpret_cast<unsigned char**>(Ptr(this, 0x22998)) += len;
+
+            File.Close(handle);
+            *handleSlot = 0;
+        }
+    }
 }
 
 /*
@@ -1511,12 +1535,45 @@ void CMapMng::SearchAtribMapObj(CMapObj*, CMapObjAtr::TYPE)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80032fd0
+ * PAL Size: 252b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapMng::AttachMapHit(CMapHit*, char*)
+void CMapMng::AttachMapHit(CMapHit* mapHit, char* mapHitName)
 {
-	// TODO
+    int mapObjCount = *reinterpret_cast<short*>(Ptr(this, 0xC));
+    unsigned char* mapObj = Ptr(this, 0x954);
+    unsigned char* mapObjEnd = mapObj + (mapObjCount * 0xF0);
+
+    while (true) {
+        while (mapObj < mapObjEnd) {
+            unsigned char* mapObjAtr = *reinterpret_cast<unsigned char**>(mapObj + 0xEC);
+            if (mapObjAtr != 0 && *reinterpret_cast<int*>(mapObjAtr + 4) == 3) {
+                break;
+            }
+            mapObj += 0xF0;
+        }
+
+        if (mapObj >= mapObjEnd) {
+            return;
+        }
+
+        unsigned char* mapObjAtr = *reinterpret_cast<unsigned char**>(mapObj + 0xEC);
+        if (strcmp(mapHitName, reinterpret_cast<char*>(mapObjAtr + 8)) == 0) {
+            *reinterpret_cast<CMapHit**>(mapObj + 0xC) = mapHit;
+
+            if (mapObjAtr != 0) {
+                void (**vtable)(void*, int) = reinterpret_cast<void (**)(void*, int)>(*reinterpret_cast<void**>(mapObjAtr));
+                vtable[2](mapObjAtr, 1);
+                *reinterpret_cast<unsigned char**>(mapObj + 0xEC) = 0;
+            }
+        }
+
+        mapObj += 0xF0;
+    }
 }
 
 /*
@@ -1997,12 +2054,53 @@ void CMapMng::SetIdGrpMask(int mapIdGrpIndex, unsigned long mask)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002fcb4
+ * PAL Size: 232b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapMng::SetIdGrpColor(int, int, _GXColor)
+void CMapMng::SetIdGrpColor(int mapIdGrpIndex, int channelIndex, _GXColor color)
 {
-	// TODO
+    unsigned char* mapIdGrp = Ptr(this, 0x214E8 + (mapIdGrpIndex * 0x14));
+    unsigned char* colorBytes = reinterpret_cast<unsigned char*>(&color);
+
+    if (channelIndex == 2) {
+        mapIdGrp[0xC] = colorBytes[0];
+        mapIdGrp[0xD] = colorBytes[1];
+        mapIdGrp[0xE] = colorBytes[2];
+        mapIdGrp[0xF] = colorBytes[3];
+        return;
+    }
+
+    if (channelIndex > 1) {
+        if (channelIndex > 3) {
+            return;
+        }
+        mapIdGrp[0x10] = colorBytes[0];
+        mapIdGrp[0x11] = colorBytes[1];
+        mapIdGrp[0x12] = colorBytes[2];
+        mapIdGrp[0x13] = colorBytes[3];
+        return;
+    }
+
+    if (channelIndex == 0) {
+        mapIdGrp[4] = colorBytes[0];
+        mapIdGrp[5] = colorBytes[1];
+        mapIdGrp[6] = colorBytes[2];
+        mapIdGrp[7] = colorBytes[3];
+        return;
+    }
+
+    if (channelIndex < 0) {
+        return;
+    }
+
+    mapIdGrp[8] = colorBytes[0];
+    mapIdGrp[9] = colorBytes[1];
+    mapIdGrp[10] = colorBytes[2];
+    mapIdGrp[11] = colorBytes[3];
 }
 
 /*
@@ -2138,12 +2236,28 @@ void CMapMng::SetMapObjAnim(int, int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002f710
+ * PAL Size: 148b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapMng::SetMapAnimID(int, int, int, int)
+void CMapMng::SetMapAnimID(int animId, int startFrame, int endFrame, int loop)
 {
-	// TODO
+    CPtrArray<CMapAnimRun*>* mapAnimRunArray = reinterpret_cast<CPtrArray<CMapAnimRun*>*>(Ptr(this, 0x213E0));
+    CMapAnimRun* mapAnimRun = 0;
+    int mapAnimRunCount = mapAnimRunArray->GetSize();
+
+    for (unsigned long i = 0; i < static_cast<unsigned long>(mapAnimRunCount); i++) {
+        CMapAnimRun* current = (*mapAnimRunArray)[i];
+        if (*reinterpret_cast<unsigned char*>(Ptr(current, 1)) == static_cast<unsigned char>(animId)) {
+            mapAnimRun = current;
+            break;
+        }
+    }
+
+    mapAnimRun->Start(startFrame, endFrame, loop);
 }
 
 /*

@@ -32,6 +32,13 @@ extern char DAT_801d6bec[];
 extern char DAT_8032f7d4[];
 extern char DAT_8032f7e8[];
 extern char DAT_8032f808[];
+extern char DAT_801d64f4[];
+extern char DAT_801d6580[];
+extern char DAT_801d65b4[];
+extern char DAT_801d65ec[];
+extern char DAT_8032f7c8[];
+extern char* PTR_s_USE_8032e410[];
+extern char* PTR_s_TEXTURE_801e8470[];
 extern float FLOAT_8032f7d8;
 extern float FLOAT_8032f7dc;
 extern float FLOAT_8032f7fc;
@@ -1780,12 +1787,50 @@ void CAmemCacheSet::AddRef(short index)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001CBF4
+ * PAL Size: 340b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CAmemCacheSet::Release(short)
+void CAmemCacheSet::Release(short index)
 {
-	// TODO
+    unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
+    int tableBase = *reinterpret_cast<int*>(bytes + 0x58);
+    int entryOffset = static_cast<int>(index) * 0x1C;
+    int entry = tableBase + entryOffset;
+
+    *reinterpret_cast<short*>(entry + 0x0C) -= 1;
+    if (*reinterpret_cast<short*>(entry + 0x0C) == -1) {
+        if (System.m_execParam > 2) {
+            Printf__7CSystemFPce(&System, DAT_801d64f4);
+        }
+
+        int count = *reinterpret_cast<int*>(bytes + 0x3C);
+        int offset = 0;
+        for (int i = 0; i < count; i++) {
+            int* current = reinterpret_cast<int*>(tableBase + offset);
+            unsigned char* currentBytes = reinterpret_cast<unsigned char*>(current);
+            if (((currentBytes[0x0E] != 0) || (*current != 0)) && (System.m_execParam > 2)) {
+                unsigned int kindIndex =
+                    static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(currentBytes[0x0E]))) >> 3;
+                Printf__7CSystemFPce(&System, DAT_801d6580, i, PTR_s_USE_8032e410[kindIndex],
+                                     PTR_s_TEXTURE_801e8470[currentBytes[0x0F]],
+                                     *reinterpret_cast<short*>(current + 3), current[4], *current);
+            }
+            offset += 0x1C;
+        }
+
+        if (System.m_execParam > 2) {
+            Printf__7CSystemFPce(&System, DAT_8032f7c8);
+        }
+
+        void (*underflowHook)(int) = *reinterpret_cast<void (**)(int)>(bytes + 0x50);
+        if (underflowHook != 0) {
+            underflowHook(static_cast<int>(index));
+        }
+    }
 }
 
 /*
@@ -1970,22 +2015,72 @@ void CAmemCacheSet::RefCnt0Clear()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001C52C
+ * PAL Size: 260b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CAmemCacheSet::RefCnt0Compare()
 {
-	// TODO
+    unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
+    if (System.m_execParam > 2) {
+        Printf__7CSystemFPce(&System, DAT_801d65b4);
+    }
+
+    int count = *reinterpret_cast<int*>(bytes + 0x3C);
+    int offset = 0;
+    for (int i = 0; i < count; i++) {
+        unsigned char* entry = reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x58) + offset);
+        if ((entry[0x0E] != 0) && (*reinterpret_cast<short*>(entry + 0x0C) != 0) && (System.m_execParam > 2)) {
+            unsigned int kindIndex = static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(entry[0x0E]))) >> 3;
+            Printf__7CSystemFPce(
+                &System, DAT_801d6580, i, PTR_s_USE_8032e410[kindIndex], PTR_s_TEXTURE_801e8470[entry[0x0F]],
+                *reinterpret_cast<short*>(entry + 0x0C), *reinterpret_cast<int*>(entry + 0x10),
+                *reinterpret_cast<int*>(entry + 0x00));
+        }
+        offset += 0x1C;
+    }
+
+    if (System.m_execParam > 2) {
+        Printf__7CSystemFPce(&System, DAT_801d65ec);
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001C40C
+ * PAL Size: 288b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CAmemCacheSet::AssertCache()
 {
-	// TODO
+    unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
+    if (System.m_execParam > 2) {
+        Printf__7CSystemFPce(&System, DAT_801d64f4);
+    }
+
+    int count = *reinterpret_cast<int*>(bytes + 0x3C);
+    int offset = 0;
+    for (int i = 0; i < count; i++) {
+        unsigned char* entry = reinterpret_cast<unsigned char*>(*reinterpret_cast<int*>(bytes + 0x58) + offset);
+        if (((entry[0x0E] != 0) || (*reinterpret_cast<int*>(entry + 0x00) != 0)) && (System.m_execParam > 2)) {
+            unsigned int kindIndex = static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(entry[0x0E]))) >> 3;
+            Printf__7CSystemFPce(
+                &System, DAT_801d6580, i, PTR_s_USE_8032e410[kindIndex], PTR_s_TEXTURE_801e8470[entry[0x0F]],
+                *reinterpret_cast<short*>(entry + 0x0C), *reinterpret_cast<int*>(entry + 0x10),
+                *reinterpret_cast<int*>(entry + 0x00));
+        }
+        offset += 0x1C;
+    }
+
+    if (System.m_execParam > 2) {
+        Printf__7CSystemFPce(&System, DAT_8032f7c8);
+    }
 }
 
 /*

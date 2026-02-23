@@ -1,8 +1,20 @@
 #include "ffcc/MenuUtil.h"
 
 extern "C" float GetWidth__5CFontFPc(CFont*, const char*);
+extern "C" void SetMargin__5CFontFf(float, CFont*);
+extern "C" void SetShadow__5CFontFi(CFont*, int);
+extern "C" void SetScaleX__5CFontFf(float, CFont*);
+extern "C" void SetScaleY__5CFontFf(float, CFont*);
+extern "C" void SetScale__5CFontFf(float, CFont*);
+extern "C" void DrawInit__5CFontFv(CFont*);
+extern "C" void SetTlut__5CFontFi(CFont*, int);
+extern "C" void SetColor__5CFontF8_GXColor(CFont*, _GXColor*);
+extern "C" void SetPosX__5CFontFf(float, CFont*);
+extern "C" void SetPosY__5CFontFf(float, CFont*);
+extern "C" void Draw__5CFontFPc(CFont*, const char*);
 
 extern float lbl_80333558;
+extern float lbl_8033356C;
 extern float lbl_8033358C;
 
 /*
@@ -30,9 +42,15 @@ void CMenuPcs::GetLongHelpString(CFont*, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::CalcCenteringPos2(char*, float, float)
+float CMenuPcs::CalcCenteringPos2(char* text, float margin, float scale)
 {
-	// TODO
+	CFont* font = *(CFont**)((unsigned char*)this + 0xF8);
+
+	SetShadow__5CFontFi(font, 1);
+	SetMargin__5CFontFf(margin, font);
+	SetScaleX__5CFontFf(scale, font);
+	SetScaleY__5CFontFf(lbl_8033356C, font);
+	return -(GetWidth__5CFontFPc(font, text) * lbl_80333558 - lbl_8033358C);
 }
 
 /*
@@ -51,9 +69,19 @@ float CMenuPcs::CalcCenteringPos(char* text, CFont* font)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawFont(int, int, _GXColor, int, char*, float, float)
+void CMenuPcs::DrawFont(int posX, int posY, _GXColor color, int tlut, char* text, float margin, float scale)
 {
-	// TODO
+	CFont* font = *(CFont**)((unsigned char*)this + 0xF8);
+
+	SetMargin__5CFontFf(margin, font);
+	SetShadow__5CFontFi(font, 1);
+	SetScale__5CFontFf(scale, font);
+	DrawInit__5CFontFv(font);
+	SetTlut__5CFontFi(font, tlut);
+	SetColor__5CFontF8_GXColor(font, &color);
+	SetPosX__5CFontFf((float)posX, font);
+	SetPosY__5CFontFf((float)posY, font);
+	Draw__5CFontFPc(font, text);
 }
 
 /*

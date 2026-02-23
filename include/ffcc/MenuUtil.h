@@ -10,7 +10,7 @@ class CMenuPcs
 public:
     void CalcHelpLine(int, int&, int&);
     void GetLongHelpString(CFont*, int, int);
-    void CalcCenteringPos2(char*, float, float);
+    float CalcCenteringPos2(char*, float, float);
     float CalcCenteringPos(char*, CFont*);
     void DrawFont(int, int, _GXColor, int, char*, float, float);
     void GetFontWidth(char*, float, float);

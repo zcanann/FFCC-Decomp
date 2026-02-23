@@ -1,4 +1,6 @@
 #include "ffcc/mes.h"
+#include "ffcc/goout.h"
+#include "ffcc/color.h"
 #include "ffcc/fontman.h"
 #include <string.h>
 
@@ -6,6 +8,14 @@ extern "C" void SetPosX__5CFontFf(float, CFont*);
 extern "C" void SetPosY__5CFontFf(float, CFont*);
 extern "C" void Draw__5CFontFUs(CFont*, unsigned short);
 extern "C" float GetWidth__5CFontFUs(CFont*, unsigned short);
+extern "C" void SetShadow__5CFontFi(CFont*, int);
+extern "C" void SetMargin__5CFontFf(float, CFont*);
+extern "C" void SetScaleX__5CFontFf(float, CFont*);
+extern "C" void SetScaleY__5CFontFf(float, CFont*);
+extern "C" void SetColor__5CFontF8_GXColor(CFont*, _GXColor*);
+extern "C" void SetTlut__5CFontFi(CFont*, int);
+extern "C" void DrawInit__5CFontFv(CFont*);
+extern "C" void DrawQuit__5CFontFv(CFont*);
 
 /*
  * --INFO--
@@ -340,12 +350,105 @@ doneAdvance:
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80098c90
+ * PAL Size: 1600b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMes::Draw()
 {
-	// TODO
+	int count = *(int*)((char*)this + 8);
+	if (count == 0)
+	{
+		return;
+	}
+
+	unsigned int alphaScale = 0xFF;
+	if ((*(int*)((char*)this + 0x3CAC) != 0) && (*(int*)((char*)this + 0x3CB8) != 0))
+	{
+		alphaScale = 0xFF - (*(int*)((char*)this + 0x3CBC) * 0xFF) / *(int*)((char*)this + 0x3CB8);
+	}
+
+	float* entry = (float*)((char*)this + 0xC);
+	CFont* activeFont = 0;
+	unsigned int lastStyle = 0xFFFFFFFF;
+	unsigned int lastTlut = 0xFFFFFFFF;
+
+	for (int i = 0; i < count; i++, entry += 5)
+	{
+		if ((int)(unsigned int)*(unsigned short*)(entry + 3) > *(int*)((char*)this + 0x3C80))
+		{
+			continue;
+		}
+
+		unsigned char ch = *(unsigned char*)(entry + 4);
+		if (ch < 0x20)
+		{
+			continue;
+		}
+
+		unsigned int style = *(unsigned char*)((char*)entry + 0xE) & 0xF;
+		if (style != lastStyle)
+		{
+			CFont* font = *(CFont**)((char*)&MenuPcs + 0x100);
+			if (style < 2)
+			{
+				font = *(CFont**)((char*)&MenuPcs + 0xF8);
+			}
+			if (font == 0)
+			{
+				continue;
+			}
+
+			SetShadow__5CFontFi(font, *(int*)((char*)this + 0x3D38));
+			SetMargin__5CFontFf(0.0f, font);
+			SetScaleX__5CFontFf(*(float*)((char*)this + 0x3D44), font);
+			SetScaleY__5CFontFf(*(float*)((char*)this + 0x3D48), font);
+			DrawInit__5CFontFv(font);
+
+			activeFont = font;
+			lastStyle = style;
+		}
+
+		if (activeFont == 0)
+		{
+			continue;
+		}
+
+		unsigned int fadeCur = *(unsigned char*)((char*)entry + 0xF) & 0xF;
+		unsigned int fadeMax = (*(unsigned char*)((char*)entry + 0xF) >> 4) & 0xF;
+		unsigned int drawAlpha = (fadeMax != 0) ? (fadeCur * alphaScale) / fadeMax : alphaScale;
+		if (drawAlpha > 0xFF)
+		{
+			drawAlpha = 0xFF;
+		}
+
+		_GXColor color = CColor(0xFF, 0xFF, 0xFF, (unsigned char)drawAlpha).color;
+		SetColor__5CFontF8_GXColor(activeFont, &color);
+
+		unsigned int tlut = *(unsigned char*)((char*)entry + 0x12);
+		if ((lastTlut != tlut) && (style < 2))
+		{
+			SetTlut__5CFontFi(activeFont, tlut + *(int*)((char*)this + 0x3D34));
+			lastTlut = tlut;
+		}
+
+		SetPosX__5CFontFf(*(float*)((char*)this + 0x3C9C) + entry[0], activeFont);
+		SetPosY__5CFontFf(*(float*)((char*)this + 0x3CA0) + (float)*(short*)(entry + 2), activeFont);
+		SetScaleX__5CFontFf(0.0625f * (float)*(unsigned char*)((char*)entry + 0xA), activeFont);
+		SetScaleY__5CFontFf(0.0625f * (float)*(unsigned char*)((char*)entry + 0x11), activeFont);
+
+		activeFont->renderFlags = (unsigned char)(activeFont->renderFlags | 8);
+		Draw__5CFontFUs(activeFont, ch);
+		activeFont->renderFlags = (unsigned char)(activeFont->renderFlags & ~8);
+	}
+
+	if (activeFont != 0)
+	{
+		DrawQuit__5CFontFv(activeFont);
+	}
 }
 
 /*

@@ -13,6 +13,7 @@
 
 extern "C" void reset__6CAStarFv(void*);
 extern "C" void drawAStar__6CAStarFv(void*);
+extern "C" int printf(const char*, ...);
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" int __cntlzw(unsigned int);
 extern "C" void StaticFrame__10CGCharaObjFv();
@@ -62,6 +63,9 @@ extern unsigned char CFlat[];
 extern unsigned char m_objItem[];
 extern unsigned char m_objParty[];
 extern unsigned char m_objMon[];
+extern int DAT_8032ed98;
+extern unsigned char DAT_8032ed9c;
+extern char DAT_801d8fc4[];
 extern CPartMng PartMng;
 extern "C" void* __vt__Q212CFlatRuntime7CObject[];
 extern "C" void* __vt__9CGBaseObj[];
@@ -1197,12 +1201,47 @@ void CFlatRuntime2::Draw()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006B688
+ * PAL Size: 304b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::AddDebugDrawCC(Vec*, Vec*, float, int, int)
+void CFlatRuntime2::AddDebugDrawCC(Vec* from, Vec* to, float radius, int bit7, int bit6)
 {
-	// TODO
+	u8* runtime = reinterpret_cast<u8*>(this);
+	int& count = *reinterpret_cast<int*>(runtime + 0xCD1C);
+
+	if (static_cast<unsigned int>(count) < 0x10U) {
+		const int slotOffset = count * 0x20;
+		u8* slot = runtime + 0xCD20 + slotOffset;
+
+		*reinterpret_cast<float*>(slot + 0x04) = from->x;
+		*reinterpret_cast<float*>(slot + 0x08) = from->y;
+		*reinterpret_cast<float*>(slot + 0x0C) = from->z;
+		*reinterpret_cast<float*>(slot + 0x10) = to->x;
+		*reinterpret_cast<float*>(slot + 0x14) = to->y;
+		*reinterpret_cast<float*>(slot + 0x18) = to->z;
+
+		slot[0] = static_cast<u8>((bit7 << 7) | (slot[0] & 0x7F));
+		slot[0] = static_cast<u8>(((bit6 << 6) & 0x40) | (slot[0] & 0xBF));
+
+		const int index = count;
+		count = index + 1;
+		*reinterpret_cast<float*>(runtime + 0xCD3C + index * 0x20) = radius;
+		return;
+	}
+
+	if (DAT_8032ed9c == 0) {
+		DAT_8032ed98 = 0;
+		DAT_8032ed9c = 1;
+	}
+
+	if (DAT_8032ed98 != static_cast<int>(System.m_frameCounter)) {
+		printf(&DAT_801d8fc4[0]);
+		DAT_8032ed98 = System.m_frameCounter;
+	}
 }
 
 /*

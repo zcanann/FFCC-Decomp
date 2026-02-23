@@ -1052,12 +1052,99 @@ void CGraphic::InitBlurParameter()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800164c4
+ * PAL Size: 1164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGraphic::RenderBlur(int, unsigned char, unsigned char, unsigned char, unsigned char, short)
+void CGraphic::RenderBlur(int, unsigned char mode, unsigned char, unsigned char blurInterval, unsigned char blurAlpha, short blurScale)
 {
-	// TODO
+    _GXTexObj blurTex;
+    _GXColor blurColor;
+    Mtx modelMtx;
+
+    u8* self = reinterpret_cast<u8*>(this);
+    u8& blurDelayCounter = *reinterpret_cast<u8*>(self + 0x735C);
+    u8& blurBufferIndex = *reinterpret_cast<u8*>(self + 0x735D);
+    u8& blurBufferCount = *reinterpret_cast<u8*>(self + 0x735E);
+
+    DAT_8032ec70.DisableIndMtx();
+    DAT_8032ec70.SetOrthoEnv();
+    DAT_8032ec70.SetVtxFmt_POS_CLR_TEX();
+
+    GXSetZCompLoc(GX_FALSE);
+    GXSetAlphaCompare(GX_ALWAYS, 1, GX_AOP_OR, GX_ALWAYS, 0);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetColorUpdate(GX_TRUE);
+    GXSetAlphaUpdate(GX_FALSE);
+    GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
+
+    blurColor.r = 0x80;
+    blurColor.g = 0x80;
+    blurColor.b = 0x80;
+    blurColor.a = blurAlpha;
+    GXSetChanAmbColor(GX_COLOR0A0, blurColor);
+    GXSetChanMatColor(GX_COLOR0A0, blurColor);
+
+    DAT_8032ec70.SetOrthoEnv();
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    GXSetTevDirect(GX_TEVSTAGE0);
+    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
+    _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(0, 0xF, 0xF,
+                                                                                                             0xF, 8);
+    _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
+    _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(0, 7, 7, 7, 5);
+    _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
+    GXSetNumTevStages(1);
+    GXSetNumTexGens(1);
+
+    int texOffset = 0;
+    for (int i = 0; i < blurBufferCount; i++) {
+        GXInitTexObj(&blurTex, reinterpret_cast<u8*>(PtrAt(this, 0x71EC)) + texOffset, 0x140, 0xE0, GX_TF_I8, GX_CLAMP,
+                     GX_CLAMP, GX_FALSE);
+        GXInitTexObjLOD(&blurTex, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+        GXLoadTexObj(&blurTex, GX_TEXMAP0);
+
+        if (mode == 1) {
+            Vec quadMin = {0.0f, 0.0f, 0.0f};
+            Vec quadMax = {640.0f, 448.0f, 0.0f};
+            DAT_8032ec70.RenderQuad(quadMin, quadMax, blurColor, 0, 0);
+        } else if (mode == 0) {
+            float minValue = -(float)blurScale;
+            Vec quadMin = {minValue, minValue, 0.0f};
+            Vec quadMax = {640.0f + blurScale, 448.0f + blurScale, 0.0f};
+            DAT_8032ec70.RenderQuad(quadMin, quadMax, blurColor, 0, 0);
+        }
+
+        texOffset += 0x46000;
+    }
+
+    GXSetZMode(GX_TRUE, GX_ALWAYS, GX_FALSE);
+    PSMTXIdentity(modelMtx);
+    GXLoadPosMtxImm(modelMtx, GX_PNMTX0);
+    GXSetCurrentMtx(GX_PNMTX0);
+    DAT_8032ec70.SetOrthoEnv();
+    GXSetAlphaUpdate(GX_TRUE);
+
+    if (blurDelayCounter < blurInterval) {
+        blurDelayCounter++;
+    } else if (System.m_scenegraphStepMode != 2) {
+        CreateSmallBackTexture(PtrAt(this, 0x71EC), &blurTex, 0x140, 0xE0, GX_LINEAR, GX_TF_I8, blurBufferIndex * 0x46000);
+        blurDelayCounter = 0;
+        blurBufferCount++;
+        if (blurBufferCount > 2) {
+            blurBufferCount = 2;
+        }
+
+        blurBufferIndex++;
+        if (blurBufferIndex > 1) {
+            blurBufferIndex = 0;
+        }
+    }
 }
 
 /*

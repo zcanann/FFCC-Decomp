@@ -3,12 +3,23 @@
 #include "ffcc/p_game.h"
 #include "ffcc/pppPart.h"
 
+#include <string.h>
+#include <dolphin/os/OSCache.h>
+
 extern Mtx ppvCameraMatrix0;
 
+extern float FLOAT_80330e48;
 extern float FLOAT_80330e4c;
 extern float FLOAT_80330e58;
 extern float FLOAT_80330e5c;
 extern float FLOAT_80330e68;
+extern float FLOAT_80330ec0;
+extern char DAT_80330e88[];
+extern char DAT_80330e90[];
+extern char DAT_80330e98[];
+extern char DAT_80330ea0[];
+extern char DAT_80330ea8[];
+extern char DAT_80330ebc[];
 extern char MaterialMan[];
 
 extern struct {
@@ -208,12 +219,137 @@ void Chara_DrawShadowMeshDLCallback(CChara::CModel* model, void* work, void* vYm
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800d79f4
+ * PAL Size: 1280b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void Mana_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*) [4])
+void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int partIndex, int dlIndex, float (*mtx)[4])
 {
-	// TODO
+    u8 type = *(u8*)((u8*)step + 0x1C);
+    int mesh = *(int*)(*(int*)((u8*)model + 0xAC) + partIndex * 0x14 + 8);
+    u32* dl = (u32*)(*(int*)(mesh + 0x50) + dlIndex * 0xC);
+    bool draw = false;
+
+    if (type == 2) {
+        if (strcmp((char*)mesh, DAT_80330ebc) == 0 || strcmp((char*)mesh, DAT_80330e90) == 0) {
+            draw = true;
+        }
+    } else if (type < 2) {
+        if (type == 0) {
+            if (strcmp((char*)mesh, DAT_80330ebc) == 0) {
+                draw = true;
+            }
+        } else if (strcmp((char*)mesh, DAT_80330ebc) == 0 || strcmp((char*)mesh, DAT_80330e88) == 0) {
+            draw = true;
+        }
+    } else if (type < 4 && (strcmp((char*)mesh, DAT_80330ebc) == 0 || strcmp((char*)mesh, DAT_80330e98) == 0)) {
+        draw = true;
+    }
+
+    int waterCmp = strcmp((char*)mesh, DAT_80330ea0);
+    if ((waterCmp == 0 && type == 1) || (strcmp((char*)mesh, DAT_80330ea8) == 0 && type == 2)) {
+        Mtx cameraMtx;
+        Mtx rotXMtx;
+        Mtx rotZMtx;
+        Mtx offsetMtx;
+        Mtx worldMtx;
+
+        PSMTXCopy(ppvCameraMatrix0, cameraMtx);
+        PSMTXCopy(mtx, (float (*)[4])((u8*)work + 0x88));
+        GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
+        GXSetCullMode(GX_CULL_NONE);
+        PSMTXRotRad(rotXMtx, 'x', FLOAT_80330e48);
+        PSMTXRotRad(rotZMtx, 'z', FLOAT_80330e48);
+        PSMTXIdentity(offsetMtx);
+        offsetMtx[1][3] = -*(float*)((u8*)step + 0x30);
+        PSMTXConcat(rotZMtx, offsetMtx, offsetMtx);
+        PSMTXConcat(rotXMtx, offsetMtx, offsetMtx);
+        PSMTXConcat(mtx, offsetMtx, offsetMtx);
+        PSMTXConcat(cameraMtx, offsetMtx, worldMtx);
+        GXLoadPosMtxImm(worldMtx, 0);
+        RenderWaterMesh((VYmMana*)work);
+    }
+
+    if (!draw) {
+        return;
+    }
+
+    if (strcmp((char*)mesh, DAT_80330ebc) != 0) {
+        PSMTXCopy(mtx, (float (*)[4])((u8*)work + 0xB8));
+        if (*(u8*)((u8*)work + 0xF4) != 0) {
+            *(u8*)((u8*)work + 0x38) = **(u8**)(mesh + 0x28);
+            *(u8*)((u8*)work + 0x39) = *((u8*)(*(int*)(mesh + 0x28)) + 1);
+            *(u8*)((u8*)work + 0x3A) = *((u8*)(*(int*)(mesh + 0x28)) + 2);
+            *(u8*)((u8*)work + 0x3B) = 0x80;
+            DCFlushRange((u8*)work + 0x38, 4);
+            GXSetArray((GXAttr)0xB, *(void**)((u8*)work + 0x68), 4);
+            GXSetArray((GXAttr)0xD, *(void**)((u8*)work + 0x6C), 4);
+            GXSetArray((GXAttr)0xE, *(void**)((u8*)work + 0x70), 4);
+            *(u32*)(MaterialMan + 0x08) = *(u32*)((u8*)work + 0x64);
+            *(u32*)(MaterialMan + 0x44) = 0xFFFFFFFF;
+            *(u8*)(MaterialMan + 0x4C) = 0xFF;
+            *(u32*)(MaterialMan + 0x11C) = 0;
+            *(u32*)(MaterialMan + 0x120) = 0x1E;
+            *(u32*)(MaterialMan + 0x124) = 0;
+            *(u8*)(MaterialMan + 0x205) = 0xFF;
+            *(u8*)(MaterialMan + 0x206) = 0xFF;
+            *(u32*)(MaterialMan + 0x58) = 0;
+            *(u32*)(MaterialMan + 0x5C) = 0;
+            *(u8*)(MaterialMan + 0x208) = 0;
+            *(u32*)(MaterialMan + 0x48) = 0xAEE0F;
+            *(u32*)(MaterialMan + 0x128) = 0;
+            *(u32*)(MaterialMan + 0x12C) = 0x1E;
+            *(u32*)(MaterialMan + 0x130) = 0;
+            *(u32*)(MaterialMan + 0x40) = 0xAEE0F;
+            *(u32*)(MaterialMan + 0xD0) = *(u32*)((u8*)work + 0x28);
+            *(u32*)(MaterialMan + 0xDC) = *(u32*)((u8*)work + 0x2C);
+            GXSetCullMode((GXCullMode)1);
+            GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_DISABLE);
+            SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
+                MaterialMan, *(void**)(*(int*)((u8*)model + 0xA4) + 0x24), *(u16*)((u8*)dl + 8), 0, 0);
+            SetEnvMap((PYmMana*)step, (VYmMana*)work);
+            GXCallDisplayList(*(void**)(*(int*)((u8*)work + 0x60) + dlIndex * 4), dl[0]);
+            for (int i = 0; i < 16; i++) {
+                GXSetTevKColorSel((GXTevStageID)i, (GXTevKColorSel)6);
+                GXSetTevKAlphaSel((GXTevStageID)i, (GXTevKAlphaSel)0);
+            }
+        }
+        return;
+    }
+
+    if (Game.game.m_currentMapId == 0x21) {
+        float alphaScale = FLOAT_80330ec0 * *(float*)(*(int*)work + 0x4B0);
+        int alpha = (int)alphaScale;
+        *(u8*)((u8*)work + 0x100) = 0xFF;
+        *(u8*)((u8*)work + 0x101) = 0xFF;
+        *(u8*)((u8*)work + 0x102) = 0xFF;
+        *(u8*)((u8*)work + 0x103) = (u8)alpha;
+    } else {
+        *(u8*)((u8*)work + 0x100) = *(u8*)((u8*)step + 0x3C);
+        *(u8*)((u8*)work + 0x101) = *(u8*)((u8*)step + 0x3D);
+        *(u8*)((u8*)work + 0x102) = *(u8*)((u8*)step + 0x3E);
+        *(u8*)((u8*)work + 0x103) = 0xFF;
+        if (*(u8*)((u8*)step + 0x3C) == 0) {
+            *(u8*)((u8*)work + 0x100) = 0xFF;
+        }
+        if (*(u8*)((u8*)step + 0x3D) == 0) {
+            *(u8*)((u8*)work + 0x101) = 0xFF;
+        }
+        if (*(u8*)((u8*)step + 0x3E) == 0) {
+            *(u8*)((u8*)work + 0x102) = 0xFF;
+        }
+    }
+
+    GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_ENABLE);
+    DCFlushRange((u8*)work + 0x100, 4);
+    GXSetArray((GXAttr)0xB, (u8*)work + 0x100, 4);
+    SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
+        MaterialMan, *(void**)(*(int*)((u8*)model + 0xA4) + 0x24), *(u16*)((u8*)dl + 8), 0, 0);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 4, 1, 0xF);
+    GXCallDisplayList((void*)dl[1], dl[0]);
 }
 
 /*

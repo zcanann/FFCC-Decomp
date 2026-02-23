@@ -10,7 +10,7 @@ extern unsigned char PartPcs[];
 extern unsigned int lbl_802121A8[];
 extern unsigned int lbl_802121B4[];
 extern unsigned int lbl_802121C0[];
-extern unsigned int lbl_802121CC[];
+extern unsigned char lbl_802121CC[];
 extern unsigned int lbl_80212348[];
 extern int DAT_800000f8;
 extern char DAT_80331bf0[];
@@ -29,7 +29,7 @@ extern "C" void __dl__FPv(void*);
  */
 extern "C" void __sinit_p_minigame_cpp(void)
 {
-    unsigned int* table = lbl_802121CC;
+    unsigned int* table = reinterpret_cast<unsigned int*>(lbl_802121CC);
     unsigned int* desc0 = lbl_802121A8;
     unsigned int* desc1 = lbl_802121B4;
     unsigned int* desc2 = lbl_802121C0;
@@ -185,32 +185,44 @@ CMiniGamePcs::CMiniGamePcs()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012b188
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMiniGamePcs::GetTable(unsigned long)
+int CMiniGamePcs::GetTable(unsigned long index)
 {
-	// TODO
+    return (int)(lbl_802121CC + (int)index * 0x15C);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012b184
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMiniGamePcs::Init()
 {
-	// TODO
+    return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012b180
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMiniGamePcs::Quit()
 {
-	// TODO
+    return;
 }
 
 /*
@@ -258,12 +270,16 @@ void CMiniGamePcs::create()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012b0d0
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMiniGamePcs::destroy()
 {
-	// TODO
+    return;
 }
 
 /*

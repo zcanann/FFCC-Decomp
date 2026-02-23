@@ -61,7 +61,7 @@ public:
     void createRampTex8();
     void createFullShadow();
     void destroyFullShadow();
-    void GetShadowRect(CBound&);
+    int GetShadowRect(CBound&);
     void drawShadowBegin();
     void drawShadowEnd();
     void drawShadowChrBegin();

@@ -202,7 +202,7 @@ void pppDestructChangeTex(pppChangeTex* changeTex, UnkC* data)
 	unsigned int i;
 	unsigned int j;
 	int model;
-	int dataOffset = data->m_serializedDataOffsets[2];
+	int dataOffset;
 	void* handle0;
 	void* handle1;
 	void* handle2;
@@ -210,6 +210,7 @@ void pppDestructChangeTex(pppChangeTex* changeTex, UnkC* data)
 	void* mesh;
 
 	_WaitDrawDone__8CGraphicFPci(&Graphic, s_pppChangeTex_cpp_801dd660, 0x9d);
+	dataOffset = data->m_serializedDataOffsets[2];
 
 	handle0 = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)changeTex + 0x98 + dataOffset), 0);
 	handle1 = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)changeTex + 0x98 + dataOffset), 1);
@@ -246,49 +247,46 @@ void pppDestructChangeTex(pppChangeTex* changeTex, UnkC* data)
 	}
 
 	stage = *(void**)((char*)changeTex + 0x90 + dataOffset);
-	if (stage != 0) {
-		mesh = *(void**)((char*)changeTex + 0x8c + dataOffset);
+	if ((stage != 0) && ((mesh = *(void**)((char*)changeTex + 0x8c + dataOffset)) != 0)) {
+		int meshList = *(int*)(model + 0xac);
+		void** stageArray = (void**)stage;
+		void** meshArray = (void**)mesh;
+
+		for (i = 0; i < *(unsigned int*)(*(int*)(model + 0xa4) + 0xc); i++) {
+			unsigned int dlCount = *(unsigned int*)(*(int*)(meshList + 8) + 0x4c);
+			void** dlEntries = (void**)*stageArray;
+			for (j = 0; j < dlCount; j++) {
+				int* dlPair = (int*)*dlEntries;
+				if (*(void**)dlPair != 0) {
+					pppHeapUseRate__FPQ27CMemory6CStage(*(void**)dlPair);
+					*(void**)dlPair = 0;
+				}
+				if ((void*)dlPair != 0) {
+					pppHeapUseRate__FPQ27CMemory6CStage((void*)dlPair);
+					*dlEntries = 0;
+				}
+				dlEntries++;
+			}
+
+			if (*stageArray != 0) {
+				pppHeapUseRate__FPQ27CMemory6CStage(*stageArray);
+				*stageArray = 0;
+			}
+			if (*meshArray != 0) {
+				pppHeapUseRate__FPQ27CMemory6CStage(*meshArray);
+				*meshArray = 0;
+			}
+
+			stageArray++;
+			meshArray++;
+			meshList += 0x14;
+		}
+
+		if (stage != 0) {
+			pppHeapUseRate__FPQ27CMemory6CStage(stage);
+		}
 		if (mesh != 0) {
-			int meshList = *(int*)(model + 0xac);
-			void** stageArray = (void**)stage;
-			void** meshArray = (void**)mesh;
-
-			for (i = 0; i < *(unsigned int*)(*(int*)(model + 0xa4) + 0xc); i++) {
-				unsigned int dlCount = *(unsigned int*)(*(int*)(meshList + 8) + 0x4c);
-				void** dlEntries = (void**)*stageArray;
-				for (j = 0; j < dlCount; j++) {
-					int* dlPair = (int*)*dlEntries;
-					if (*(void**)dlPair != 0) {
-						pppHeapUseRate__FPQ27CMemory6CStage(*(void**)dlPair);
-						*(void**)dlPair = 0;
-					}
-					if ((void*)dlPair != 0) {
-						pppHeapUseRate__FPQ27CMemory6CStage((void*)dlPair);
-						*dlEntries = 0;
-					}
-					dlEntries++;
-				}
-
-				if (*stageArray != 0) {
-					pppHeapUseRate__FPQ27CMemory6CStage(*stageArray);
-					*stageArray = 0;
-				}
-				if (*meshArray != 0) {
-					pppHeapUseRate__FPQ27CMemory6CStage(*meshArray);
-					*meshArray = 0;
-				}
-
-				stageArray++;
-				meshArray++;
-				meshList += 0x14;
-			}
-
-			if (stage != 0) {
-				pppHeapUseRate__FPQ27CMemory6CStage(stage);
-			}
-			if (mesh != 0) {
-				pppHeapUseRate__FPQ27CMemory6CStage(mesh);
-			}
+			pppHeapUseRate__FPQ27CMemory6CStage(mesh);
 		}
 	}
 }

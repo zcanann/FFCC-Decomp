@@ -16,10 +16,6 @@ extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned lo
 extern "C" void* Free__7CMemoryFPv(CMemory*, void*);
 extern "C" int __cntlzw(unsigned int);
 
-extern void* __vt__8CManager;
-extern void* lbl_801E8668;
-extern void* lbl_801EA460;
-
 extern unsigned int lbl_801EA298[];
 extern unsigned int lbl_801EA2A4[];
 extern unsigned int lbl_801EA2B0[];
@@ -95,67 +91,34 @@ static inline double U32ToDouble(unsigned int value)
 
 /*
  * --INFO--
- * PAL Address: 0x8004a348
- * PAL Size: 344b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void __sinit_p_light_cpp(void)
-{
-    char* lightBase = reinterpret_cast<char*>(&LightPcs);
-
-    *reinterpret_cast<void**>(lightBase) = &__vt__8CManager;
-    *reinterpret_cast<void**>(lightBase) = &lbl_801E8668;
-    *reinterpret_cast<void**>(lightBase) = &lbl_801EA460;
-
-    __construct_array(lightBase + 0xbc, (ConstructorDestructor)__ct__Q29CLightPcs6CLightFv, 0, 0xb0, 8);
-    __construct_array(lightBase + 0x63c, (ConstructorDestructor)__ct__Q29CLightPcs6CLightFv, 0, 0xb0, 0x20);
-    __construct_array(lightBase + 0x1c3c, (ConstructorDestructor)__ct__Q29CLightPcs10CBumpLightFv, 0, 0x138, 0x20);
-
-    unsigned int a0 = lbl_801EA298[0];
-    unsigned int a1 = lbl_801EA298[1];
-    unsigned int a2 = lbl_801EA298[2];
-    unsigned int b0 = lbl_801EA2A4[0];
-    unsigned int b1 = lbl_801EA2A4[1];
-    unsigned int b2 = lbl_801EA2A4[2];
-    unsigned int c0 = lbl_801EA2B0[0];
-    unsigned int c1 = lbl_801EA2B0[1];
-    unsigned int c2 = lbl_801EA2B0[2];
-    unsigned int d0 = lbl_801EA2BC[0];
-    unsigned int d1 = lbl_801EA2BC[1];
-    unsigned int d2 = lbl_801EA2BC[2];
-    unsigned int e0 = lbl_801EA2C8[0];
-    unsigned int e1 = lbl_801EA2C8[1];
-    unsigned int e2 = lbl_801EA2C8[2];
-
-    unsigned char* table = reinterpret_cast<unsigned char*>(lbl_801EA2D4);
-    *reinterpret_cast<unsigned int*>(table + 0x04) = a0;
-    *reinterpret_cast<unsigned int*>(table + 0x08) = a1;
-    *reinterpret_cast<unsigned int*>(table + 0x0c) = a2;
-    *reinterpret_cast<unsigned int*>(table + 0x10) = b0;
-    *reinterpret_cast<unsigned int*>(table + 0x14) = b1;
-    *reinterpret_cast<unsigned int*>(table + 0x18) = b2;
-    *reinterpret_cast<unsigned int*>(table + 0x1c) = c0;
-    *reinterpret_cast<unsigned int*>(table + 0x20) = c1;
-    *reinterpret_cast<unsigned int*>(table + 0x24) = c2;
-    *reinterpret_cast<unsigned int*>(table + 0x30) = d0;
-    *reinterpret_cast<unsigned int*>(table + 0x34) = d1;
-    *reinterpret_cast<unsigned int*>(table + 0x38) = d2;
-    *reinterpret_cast<unsigned int*>(table + 0x44) = e0;
-    *reinterpret_cast<unsigned int*>(table + 0x48) = e1;
-    *reinterpret_cast<unsigned int*>(table + 0x4c) = e2;
-}
-
-/*
- * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
 CLightPcs::CLightPcs()
 {
-	// TODO
+    char* self = reinterpret_cast<char*>(this);
+
+    __construct_array(self + 0xbc, (ConstructorDestructor)__ct__Q29CLightPcs6CLightFv, 0, 0xb0, 8);
+    __construct_array(self + 0x63c, (ConstructorDestructor)__ct__Q29CLightPcs6CLightFv, 0, 0xb0, 0x20);
+    __construct_array(self + 0x1c3c, (ConstructorDestructor)__ct__Q29CLightPcs10CBumpLightFv, 0, 0x138, 0x20);
+
+    unsigned int* table = lbl_801EA2D4;
+
+    table[0x004 / 4] = lbl_801EA298[0];
+    table[0x008 / 4] = lbl_801EA298[1];
+    table[0x00C / 4] = lbl_801EA298[2];
+    table[0x010 / 4] = lbl_801EA2A4[0];
+    table[0x014 / 4] = lbl_801EA2A4[1];
+    table[0x018 / 4] = lbl_801EA2A4[2];
+    table[0x01C / 4] = lbl_801EA2B0[0];
+    table[0x020 / 4] = lbl_801EA2B0[1];
+    table[0x024 / 4] = lbl_801EA2B0[2];
+    table[0x030 / 4] = lbl_801EA2BC[0];
+    table[0x034 / 4] = lbl_801EA2BC[1];
+    table[0x038 / 4] = lbl_801EA2BC[2];
+    table[0x044 / 4] = lbl_801EA2C8[0];
+    table[0x048 / 4] = lbl_801EA2C8[1];
+    table[0x04C / 4] = lbl_801EA2C8[2];
 }
 
 /*

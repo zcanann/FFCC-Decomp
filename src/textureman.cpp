@@ -1203,9 +1203,10 @@ void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAme
 void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int append, CAmemCacheSet* amemCacheSet, int cacheTag, int useAddress)
 {
     CChunkFile::CChunk chunk;
+    CPtrArray<CTexture*>* textures = Textures(this);
 
     if (append == 0) {
-        Textures(this)->ReleaseAndRemoveAll();
+        textures->ReleaseAndRemoveAll();
     }
 
     chunkFile.PushChunk();
@@ -1216,8 +1217,8 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
 
             if (*reinterpret_cast<unsigned char*>(Ptr(texture, 8)) != 0) {
                 int duplicateIdx = -1;
-                for (unsigned long i = 0; i < static_cast<unsigned long>(Textures(this)->GetSize()); i++) {
-                    CTexture* existing = (*Textures(this))[i];
+                for (unsigned long i = 0; i < static_cast<unsigned long>(textures->GetSize()); i++) {
+                    CTexture* existing = (*textures)[i];
                     if ((existing != 0)
                         && (strcmp(reinterpret_cast<char*>(Ptr(existing, 8)), reinterpret_cast<char*>(Ptr(texture, 8))) == 0)) {
                         duplicateIdx = static_cast<int>(i);
@@ -1238,21 +1239,21 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
                         (*reinterpret_cast<void (**)(int*, int)>(*refObj + 8))(refObj, 1);
                     }
 
-                    texture = (*Textures(this))[static_cast<unsigned long>(duplicateIdx)];
+                    texture = (*textures)[static_cast<unsigned long>(duplicateIdx)];
                     *reinterpret_cast<int*>(Ptr(texture, 4)) = *reinterpret_cast<int*>(Ptr(texture, 4)) + 1;
                 }
             }
 
             if (append != 0) {
-                for (unsigned long i = 0; i < static_cast<unsigned long>(Textures(this)->GetSize()); i++) {
-                    if ((*Textures(this))[i] == 0) {
-                        Textures(this)->SetAt(i, texture);
+                for (unsigned long i = 0; i < static_cast<unsigned long>(textures->GetSize()); i++) {
+                    if ((*textures)[i] == 0) {
+                        textures->SetAt(i, texture);
                         goto next_chunk;
                     }
                 }
             }
 
-            Textures(this)->Add(texture);
+            textures->Add(texture);
         next_chunk:;
         }
     }

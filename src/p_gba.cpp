@@ -30,15 +30,13 @@ extern "C" void __sinit_p_gba_cpp(void)
 {
 	*reinterpret_cast<void**>(&GbaPcs) = __vt__8CManager;
 	*reinterpret_cast<void**>(&GbaPcs) = lbl_801E8668;
-
-	unsigned int* table = lbl_8020F328;
-	table[4] = lbl_8020F304[0];
-
 	*reinterpret_cast<void**>(&GbaPcs) = lbl_8020F4A4;
 
+	unsigned int* table = lbl_8020F328;
 	table[1] = lbl_8020F2F8[0];
 	table[2] = lbl_8020F2F8[1];
 	table[3] = lbl_8020F2F8[2];
+	table[4] = lbl_8020F304[0];
 	table[5] = lbl_8020F304[1];
 	table[6] = lbl_8020F304[2];
 	table[7] = lbl_8020F310[0];

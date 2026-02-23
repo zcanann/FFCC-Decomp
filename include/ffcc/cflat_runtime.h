@@ -86,7 +86,7 @@ public:
 	void AfterFrame(int);
 
 	void deleteObject(CFlatRuntime::CObject*);
-	void createObject(int);
+	CFlatRuntime::CObject* createObject(int);
 	void getTopBit(unsigned int);
 	void searchFunc(int, int, int);
 

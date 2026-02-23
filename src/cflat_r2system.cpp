@@ -952,17 +952,15 @@ extern "C" char* GetNumSysMes__5CGameFv(void* game, int index)
 /*
  * --INFO--
  * PAL Address: 0x800B9538
- * PAL Size: 116b
+ * PAL Size: 16b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void __ct__14PPPCREATEPARAMFv2(PPPCREATEPARAM* pppCreateParam);
-
-extern "C" void __ct__14PPPCREATEPARAMFv(PPPCREATEPARAM* pppCreateParam)
+extern "C" char* __ct__14PPPCREATEPARAMFv(void* game, int index)
 {
-    __ct__14PPPCREATEPARAMFv2(pppCreateParam);
+    return ((char**)((char*)game + 0x10C))[index];
 }
 
 /*

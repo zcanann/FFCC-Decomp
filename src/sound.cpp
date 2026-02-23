@@ -1,6 +1,7 @@
 #include "ffcc/sound.h"
 
 #include "ffcc/RedSound/RedSound.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/graphic.h"
 #include "ffcc/system.h"
 #include "PowerPC_EABI_Support/Runtime/MWCPlusLib.h"

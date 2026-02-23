@@ -27,6 +27,10 @@ extern "C" void DispCharaParts__8CGObjectFi(void*, int);
 extern "C" void putParticle__8CGPrgObjFiiP8CGObjectfi(void*, int, int, void*, float, int);
 extern "C" float RandF__5CMathFf(float, CMath*);
 extern "C" unsigned int getNumFreeObject__13CFlatRuntime2Fi(void*, int);
+extern "C" void* FindGItemObjFirst__13CFlatRuntime2Fv(void*);
+extern "C" void* FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(void*, void*);
+extern "C" void deleteObject__12CFlatRuntimeFPQ212CFlatRuntime7CObject(void*, void*);
+extern "C" void Printf__7CSystemFPce(void*, char*, ...);
 
 extern unsigned char CFlat[];
 extern CMath Math;
@@ -39,6 +43,7 @@ extern float FLOAT_80331b8c;
 extern float FLOAT_80331b90;
 extern char DAT_80331b7c[];
 extern char DAT_80331b84[];
+extern char DAT_801dced4[];
 
 /*
  * --INFO--
@@ -191,12 +196,50 @@ void CGItemObj::onFrameStat()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80125eac
+ * PAL Size: 260b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGItemObj::DeleteOld(int, int, CFlatRuntime::CObject*, CFlatRuntime::CObject*)
+int CGItemObj::DeleteOld(int deleteMask, int maxDeleteCount, CFlatRuntime::CObject*, CFlatRuntime::CObject*)
 {
-	// TODO
+	unsigned char* bestItemObj;
+	int deletedCount = 0;
+
+	while (deletedCount < maxDeleteCount) {
+		void* bestScriptObject = (void*)0x00989680;
+		bestItemObj = 0;
+
+		for (unsigned char* itemObj = (unsigned char*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat);
+			 itemObj != 0;
+			 itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
+			unsigned char flags = itemObj[0x50];
+			unsigned char priorityMask = itemObj[0x53];
+			int isActive = (int)(((unsigned int)flags << 28) | ((unsigned int)flags >> 4)) < 0;
+			int scriptObjectPos = *(int*)(itemObj + 0x48);
+
+			if (*(int*)(itemObj + 0x44) == 0 && isActive != 0 && (priorityMask & deleteMask) != 0 &&
+				scriptObjectPos < (int)bestScriptObject) {
+				bestScriptObject = (void*)scriptObjectPos;
+				bestItemObj = itemObj;
+			}
+		}
+
+		if (bestItemObj == 0) {
+			break;
+		}
+
+		deleteObject__12CFlatRuntimeFPQ212CFlatRuntime7CObject(CFlat, bestItemObj);
+		deletedCount++;
+	}
+
+	if ((unsigned int)System.m_execParam > 2U && deletedCount < maxDeleteCount) {
+		Printf__7CSystemFPce(&System, DAT_801dced4);
+	}
+
+	return deletedCount;
 }
 
 /*

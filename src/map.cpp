@@ -23,6 +23,14 @@ extern "C" void __dt__8COctTreeFv(void*, int);
 extern "C" void __dt__7CMapHitFv(void*, int);
 extern "C" void __dt__7CMapObjFv(void*, int);
 extern "C" void __dt__8CMapMeshFv(void*, int);
+extern "C" void __dt__7CMapMngFv(void*, int);
+extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
+extern "C" void* __register_global_object(void*, void*, void*);
+extern "C" void __ct__8COctTreeFv(void*);
+extern "C" void __ct__7CMapHitFv(void*);
+extern "C" void __ct__7CMapObjFv(void*);
+extern "C" void __ct__8CMapMeshFv(void*);
+extern "C" void __ct__9CMapIdGrpFv(void*);
 extern "C" void* PTR_PTR_s_CMapTexAnimSet_801e896c;
 extern "C" float Spline1D__5CMathFifPfPfPf(CMath*, int, float, float*, float*, float*);
 extern "C" float Line1D__5CMathFifPfPf(CMath*, int, float, float*, float*);
@@ -57,6 +65,7 @@ extern char DAT_801d73c4[];
 extern CLightPcs LightPcs;
 extern CMath Math;
 extern unsigned char DAT_8032ecb9;
+extern "C" unsigned char Vec_80245758[];
 
 static char s_map_cpp[] = "map.cpp";
 static char s_CMapMng_mapmng[] = "CMapMng.mapmng";
@@ -68,6 +77,18 @@ static inline unsigned char* Ptr(void* p, unsigned int offset)
 {
     return reinterpret_cast<unsigned char*>(p) + offset;
 }
+
+static void InitPtrArrayRaw(void* ptrArray)
+{
+    unsigned char* raw = reinterpret_cast<unsigned char*>(ptrArray);
+    *reinterpret_cast<unsigned int*>(raw + 0x0) = 0;
+    *reinterpret_cast<unsigned int*>(raw + 0x4) = 0;
+    *reinterpret_cast<unsigned int*>(raw + 0x8) = 0x10;
+    *reinterpret_cast<void**>(raw + 0xC) = 0;
+    *reinterpret_cast<void**>(raw + 0x10) = 0;
+    *reinterpret_cast<int*>(raw + 0x14) = 1;
+}
+
 }
 
 /*
@@ -2399,6 +2420,34 @@ void CMapMng::SetDraw(unsigned char)
 void CMapMng::GetFogEnable()
 {
 	// TODO
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800342a0
+ * PAL Size: 320b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_map_cpp(void)
+{
+    __construct_array(Ptr(&MapMng, 0x14), __ct__8COctTreeFv, __dt__8COctTreeFv, 0x4C, 0x10);
+    __construct_array(Ptr(&MapMng, 0x4D4), __ct__7CMapHitFv, __dt__7CMapHitFv, 0x24, 0x20);
+    __construct_array(Ptr(&MapMng, 0x954), __ct__7CMapObjFv, __dt__7CMapObjFv, 0xF0, 0x200);
+    __construct_array(Ptr(&MapMng, 0x1E954), __ct__8CMapMeshFv, __dt__8CMapMeshFv, 0x44, 0xA0);
+
+    InitPtrArrayRaw(Ptr(&MapMng, 0x213E0));
+    InitPtrArrayRaw(Ptr(&MapMng, 0x213FC));
+    InitPtrArrayRaw(Ptr(&MapMng, 0x21418));
+    InitPtrArrayRaw(Ptr(&MapMng, 0x21434));
+
+    InitPtrArrayRaw(Ptr(&MapMng, 0x21450));
+    InitPtrArrayRaw(Ptr(&MapMng, 0x2146C));
+
+    __construct_array(Ptr(&MapMng, 0x214E4), __ct__9CMapIdGrpFv, 0, 0x14, 0x100);
+    __register_global_object(&MapMng, reinterpret_cast<void*>(__dt__7CMapMngFv), &Vec_80245758);
 }
 
 /*

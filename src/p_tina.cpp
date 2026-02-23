@@ -73,6 +73,7 @@ extern CProfile g_par_draw_prof;
 extern char s_no_name_8032fdcc[];
 extern char s_dvd_tina_stage_03d_mirura_801d7f78[];
 extern char s_dvd_tina_stage_03d_title_801d7f94[];
+extern char s_dvd_tina_stage_03d_fp_03d_801d7fec[];
 extern char s_dvd__smenu__s_801d7fb0[];
 extern char lbl_801D7FC0[];
 extern char lbl_801D7FD4[];
@@ -194,6 +195,8 @@ extern unsigned int DAT_801eac78;
 extern unsigned int DAT_801eac84;
 extern unsigned int DAT_801eac88;
 extern unsigned int DAT_801eac8c;
+extern int DAT_8032ed38;
+extern int DAT_8032ed3c;
 
 static int GetMngStBaseTime(const _pppMngSt* pppMngSt)
 {
@@ -929,12 +932,41 @@ unsigned int CPartPcs::IsLoadPartCompleted()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800524d0
+ * PAL Size: 400b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void LoadFieldPdt0(int, int)
+void LoadFieldPdt0(int mapId, int floorId)
 {
-	// TODO
+    unsigned char* partMng = reinterpret_cast<unsigned char*>(&PartMng);
+    int partLoadMode = *reinterpret_cast<int*>(partMng + 0x236FC);
+    int pdtSlot;
+    char path[1024];
+
+    DAT_8032ed3c = 0;
+    DAT_8032ed38 = 0;
+
+    if (partLoadMode != 3) {
+        pppReleasePdt__8CPartMngFi(&PartMng, 0);
+        pppReleasePdt__8CPartMngFi(&PartMng, 6);
+        pppReleasePdt__8CPartMngFi(&PartMng, 7);
+        reinterpret_cast<CAmemCacheSet*>(CAMemCacheSet)->AmemGetLock();
+        reinterpret_cast<CAmemCacheSet*>(CAMemCacheSet)->RefCnt0Compare();
+    }
+
+    reinterpret_cast<CUSBStreamDataRaw*>(PartPcs + 8)->m_fieldLoadReq = 1;
+
+    sprintf(path, s_dvd_tina_stage_03d_fp_03d_801d7fec, mapId, floorId);
+    pdtSlot = pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, path, 0, 1, 0, 0);
+    if (pdtSlot != 0) {
+        pdtSlot = pppLoadPdt__8CPartMngFPCciiPvi(&PartMng, path, 0, 1, 0, 0);
+        if ((pdtSlot != 0) && (partLoadMode != 2) && (partLoadMode != 3)) {
+            PartMng.pppGetDefaultCreateParam();
+        }
+    }
 }
 
 /*

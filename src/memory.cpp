@@ -868,22 +868,56 @@ void CMemory::CopyFromAMemory(void*, void*, unsigned long)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001E620
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMemory::CopyToAMemorySync(void*, void*, unsigned long)
+void CMemory::CopyToAMemorySync(void* source, void* dest, unsigned long size)
 {
-	// TODO
+    int dmaId = DMAEntry__9CRedSoundFiiiiiPFPv_vPv(&Sound, 0, 0, reinterpret_cast<int>(source),
+                                                   reinterpret_cast<int>(dest), static_cast<int>(size), 0, 0);
+    CStopWatch watch((char*)-1);
+    System.DumpMapFile(&watch);
+    watch.Start();
+    while (DMACheck__9CRedSoundFi(&Sound, dmaId) != 0) {
+        watch.Stop();
+        watch.Get();
+        watch.Start();
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001E4F8
+ * PAL Size: 296b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMemory::CopyFromAMemorySync(void*, void*, unsigned long)
+void CMemory::CopyFromAMemorySync(void* source, void* dest, unsigned long size)
 {
-	// TODO
+    int dmaId = DMAEntry__9CRedSoundFiiiiiPFPv_vPv(&Sound, 0, 1, reinterpret_cast<int>(source),
+                                                   reinterpret_cast<int>(dest), static_cast<int>(size), 0, 0);
+    CStopWatch watch((char*)-1);
+    System.DumpMapFile(&watch);
+    watch.Start();
+    while (DMACheck__9CRedSoundFi(&Sound, dmaId) != 0) {
+        watch.Stop();
+        if (watch.Get() < FLOAT_8032f7d8) {
+            watch.Start();
+        } else {
+            if (System.m_execParam != 0) {
+                Printf__7CSystemFPce(&System, DAT_801d669c);
+            }
+            Sound.CheckDriver(1);
+            watch.Reset();
+            watch.Start();
+        }
+    }
 }
 
 /*

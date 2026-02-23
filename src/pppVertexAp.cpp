@@ -135,10 +135,10 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                 f32 y = vertex->y;
                 f32 z = vertex->z;
 
-                s32 childId = data->childId;
-                if ((u16)childId != 0xFFFF) {
+                if ((data->childId + 0x10000) != 0xFFFF) {
                     _pppPObject* child;
-                    _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (childId << 4));
+                    _pppPDataVal* childData =
+                        (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (data->childId << 4));
                     Vec pos;
                     Vec worldPos;
                     Vec* outPos;
@@ -173,10 +173,10 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                 f32 y = vertex->y;
                 f32 z = vertex->z;
 
-                s32 childId = data->childId;
-                if ((u16)childId != 0xFFFF) {
+                if ((data->childId + 0x10000) != 0xFFFF) {
                     _pppPObject* child;
-                    _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (childId << 4));
+                    _pppPDataVal* childData =
+                        (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (data->childId << 4));
                     Vec pos;
                     Vec worldPos;
                     Vec* outPos;

@@ -1,10 +1,18 @@
 #include "ffcc/pppRyjMegaBirthModel.h"
+#include "ffcc/math.h"
 #include <string.h>
 
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
+extern "C" float RandF__5CMathFv(CMath*);
+extern "C" void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
 extern float FLOAT_80330498;
+extern float FLOAT_803304a4;
+extern float FLOAT_803304c0;
+extern float FLOAT_803304c4;
 extern float FLOAT_8033049c;
+extern double DOUBLE_803304b8;
+extern CMath Math;
 
 static char s_pppRyjMegaBirthModel_cpp_801d9c18[] = "pppRyjMegaBirthModel.cpp";
 
@@ -121,9 +129,53 @@ void calc_particle(_pppPObject*, VRyjMegaBirthModel*, PRyjMegaBirthModel*, VColo
  * Address:	TODO
  * Size:	TODO
  */
-void birth(_pppPObject*, VRyjMegaBirthModel*, PRyjMegaBirthModel*, VColor*, _PARTICLE_DATA*, _PARTICLE_WMAT*, _PARTICLE_COLOR*)
+void birth(
+    _pppPObject* pObject, VRyjMegaBirthModel* work, PRyjMegaBirthModel* params, VColor* color,
+    _PARTICLE_DATA* particleData, _PARTICLE_WMAT* particleWMat, _PARTICLE_COLOR* particleColor)
 {
-	// TODO
+    (void)pObject;
+    (void)work;
+    (void)color;
+
+    u8* payload = (u8*)params;
+    float spread = (float)payload[0x2B];
+    float halfSpread = spread;
+    float randomRange = FLOAT_803304c0 * spread;
+
+    memset(particleData, 0, 0xA0);
+    if (particleWMat != NULL) {
+        memset(particleWMat, 0, 0x30);
+    }
+    if (particleColor != NULL) {
+        memset(particleColor, 0, 0x20);
+    }
+
+    pppUnitMatrix__FR10pppFMATRIX((pppFMATRIX*)&particleData->m_matrix);
+
+    if (payload[0x2A] < 8) {
+        float baseDirectionX = *(float*)(payload + 0x48);
+        float baseDirectionY = *(float*)(payload + 0x4C);
+        float baseDirectionZ = *(float*)(payload + 0x50);
+        float randX = (FLOAT_803304a4 * (float)(randomRange * RandF__5CMathFv(&Math) - halfSpread)) / FLOAT_803304c4;
+        float randY = (FLOAT_803304a4 * (float)(randomRange * RandF__5CMathFv(&Math) - halfSpread)) / FLOAT_803304c4;
+        float randZ = (FLOAT_803304a4 * (float)(randomRange * RandF__5CMathFv(&Math) - halfSpread)) / FLOAT_803304c4;
+
+        if ((payload[0x2A] == 2) || (payload[0x2A] == 3)) {
+            randX = FLOAT_80330498;
+            randY = FLOAT_80330498;
+        }
+
+        particleData->m_directionTail.x = baseDirectionX;
+        particleData->m_directionTail.y = baseDirectionY;
+        particleData->m_directionTail.z = baseDirectionZ;
+        particleData->m_colorDeltaAdd[0] = randX;
+        particleData->m_colorDeltaAdd[1] = randY;
+        particleData->m_colorDeltaAdd[2] = randZ;
+    }
+
+    if (DOUBLE_803304b8 == 0.0) {
+        particleData->m_colorDeltaAdd[3] = FLOAT_80330498;
+    }
 }
 
 /*

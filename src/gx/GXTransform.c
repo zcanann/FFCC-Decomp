@@ -474,12 +474,15 @@ void GXSetViewport(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz) {
  * JP Size: TODO
  */
 void GXSetViewportJitter(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz, u32 field) {
+    f32 half;
+    f32 origin;
     f32 sx;
     f32 sy;
     f32 sz;
     f32 ox;
     f32 oy;
     f32 zmax;
+    f32 zScale;
 
     CHECK_GXBEGIN(903, "GXSetViewport");  // not the correct function name
 
@@ -487,21 +490,25 @@ void GXSetViewportJitter(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz,
         top -= 0.5f;
     }
 
-    sx = wd * 0.5f;
-    sy = -ht * 0.5f;
-    zmax = __GXData->zScale * farz;
+    half = 0.5f;
+    origin = 342.0f;
+    sx = wd * half;
+    zScale = __GXData->zScale;
+    zmax = zScale * farz;
+
     __GXData->vpLeft = left;
     __GXData->vpTop = top;
     __GXData->vpWd = wd;
+    sy = -ht * half;
     __GXData->vpHt = ht;
-    ox = 342.0f + (left + sx);
+    ox = origin + (left + sx);
     __GXData->vpNearz = nearz;
-    oy = 342.0f + (top + (ht * 0.5f));
-    sz = zmax - (__GXData->zScale * nearz);
+    oy = origin + (top + (ht * half));
+    sz = zmax - (zScale * nearz);
     __GXData->vpFarz = farz;
 
     if (__GXData->zOffset != 0.0f) {
-        __GXSetRange(nearz, __GXData->zScale);
+        __GXSetRange(nearz, zScale);
     }
 
     GX_WRITE_U8(0x10);

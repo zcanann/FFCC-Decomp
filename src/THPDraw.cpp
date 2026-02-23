@@ -47,10 +47,10 @@ void THPGXYuv2RgbDraw(u32* yImage, u32* uImage, u32* vImage, s16 x, s16 y, s16 t
 void THPGXYuv2RgbSetup(GXRenderModeObj* rmode) {
     Mtx modelMtx;
     Mtx44 projMtx;
-    GXColorS10 tevColor;
-    GXColor kColor0;
-    GXColor kColor1;
-    GXColor kColor2;
+    GXColorS10 tevColor = {-90, 0, -114, 135};
+    GXColor kColor0 = {0, 0, 226, 88};
+    GXColor kColor1 = {179, 0, 0, 182};
+    GXColor kColor2 = {0, 135, 0, 0};
     u16 fbWidth;
     u16 efbHeight;
 
@@ -120,28 +120,12 @@ void THPGXYuv2RgbSetup(GXRenderModeObj* rmode) {
     _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
     GXSetTevKColorSel(GX_TEVSTAGE3, GX_TEV_KCSEL_K2);
 
-    tevColor.r = -90;
-    tevColor.g = 0;
-    tevColor.b = -114;
-    tevColor.a = 135;
     GXSetTevColorS10(GX_TEVREG0, tevColor);
 
-    kColor0.r = 0;
-    kColor0.g = 0;
-    kColor0.b = 226;
-    kColor0.a = 88;
     GXSetTevKColor(GX_KCOLOR0, kColor0);
 
-    kColor1.r = 179;
-    kColor1.g = 0;
-    kColor1.b = 0;
-    kColor1.a = 182;
     GXSetTevKColor(GX_KCOLOR1, kColor1);
 
-    kColor2.r = 0;
-    kColor2.g = 135;
-    kColor2.b = 0;
-    kColor2.a = 0;
     GXSetTevKColor(GX_KCOLOR2, kColor2);
 
     _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);

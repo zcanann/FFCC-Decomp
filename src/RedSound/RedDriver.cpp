@@ -32,6 +32,9 @@ extern "C" {
     void ClearSeSepDataMG__9CRedEntryFiiii(void*, int, int, int, int);
     int SearchMusicSequence__9CRedEntryFi(void*, int);
     int SearchSeSepSequence__9CRedEntryFi(void*, int);
+    void ClearWaveData__9CRedEntryFi(void*, int);
+    void ClearWaveDataM__9CRedEntryFiiii(void*, int, int, int, int);
+    void ClearWaveBank__9CRedEntryFi(void*, int);
     void MusicStop__Fi(int);
     void MusicPlay__Fiii(int, int, int);
     void AXSetCompressor(int);
@@ -1833,32 +1836,44 @@ void CRedDriver::StreamPause(int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bfbb8
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::ClearWaveData(int)
+void CRedDriver::ClearWaveData(int param_1)
 {
-	// TODO
+    ClearWaveData__9CRedEntryFi(&DAT_8032e154, param_1);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bfbe8
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::ClearWaveDataM(int, int, int, int)
+void CRedDriver::ClearWaveDataM(int param_1, int param_2, int param_3, int param_4)
 {
-	// TODO
+    ClearWaveDataM__9CRedEntryFiiii(&DAT_8032e154, param_1, param_2, param_3, param_4);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bfc30
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::ClearWaveBank(int)
+void CRedDriver::ClearWaveBank(int param_1)
 {
-	// TODO
+    ClearWaveBank__9CRedEntryFi(&DAT_8032e154, param_1);
 }
 
 /*

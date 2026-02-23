@@ -1275,9 +1275,14 @@ void CRedDriver::SetSoundMode(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedDriver::GetSoundMode()
+int CRedDriver::GetSoundMode()
 {
-	// TODO
+    if (OSGetSoundMode() == 0) {
+        DAT_8032f400 = 1;
+    } else {
+        DAT_8032f400 = DAT_8032f3c8;
+    }
+    return DAT_8032f400;
 }
 
 /*

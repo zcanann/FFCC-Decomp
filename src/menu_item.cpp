@@ -368,9 +368,9 @@ bool CMenuPcs::ItemOpen()
     s16* itemList = *(s16**)((u8*)this + 0x850);
     int finished;
     int count;
+    s16* anim;
     int step;
     int remaining;
-    MenuItemOpenAnim* anim;
 
     if (*(u8*)(itemState + 5) == 0) {
         SingLifeInit(-1);
@@ -380,7 +380,7 @@ bool CMenuPcs::ItemOpen()
     finished = 0;
     itemState[0x11] = itemState[0x11] + 1;
     count = (int)*itemList;
-    anim = (MenuItemOpenAnim*)((u8*)itemList + 8);
+    anim = itemList + 4;
     step = (int)itemState[0x11];
     remaining = count;
 
@@ -388,24 +388,25 @@ bool CMenuPcs::ItemOpen()
         do {
             double dVar3 = DOUBLE_80332ea0;
             float zero = FLOAT_80332e60;
-            if (anim->startFrame <= step) {
-                if (step < anim->startFrame + anim->duration) {
+            if (*(int*)(anim + 0x12) <= step) {
+                if (step < *(int*)(anim + 0x12) + *(int*)(anim + 0x14)) {
                     double dVar2 = DOUBLE_80332e68;
-                    anim->frame = anim->frame + 1;
-                    anim->progress = (float)((DOUBLE_80332e68 / (double)anim->duration) * (double)anim->frame);
-                    if ((anim->flags & 2) == 0) {
-                        float t = (float)((dVar2 / (double)anim->duration) * (double)anim->frame);
-                        anim->dx = (anim->targetX - (float)anim->x) * t;
-                        anim->dy = (anim->targetY - (float)anim->y) * t;
+                    *(int*)(anim + 0x10) = *(int*)(anim + 0x10) + 1;
+                    *(float*)(anim + 8) =
+                        (float)((DOUBLE_80332e68 / (double)*(int*)(anim + 0x14)) * (double)*(int*)(anim + 0x10));
+                    if ((*(unsigned int*)(anim + 0x16) & 2) == 0) {
+                        float t = (float)((dVar2 / (double)*(int*)(anim + 0x14)) * (double)*(int*)(anim + 0x10));
+                        *(float*)(anim + 0x18) = (*(float*)(anim + 0x1C) - (float)anim[0]) * t;
+                        *(float*)(anim + 0x1A) = (*(float*)(anim + 0x1E) - (float)anim[1]) * t;
                     }
                 } else {
                     finished = finished + 1;
-                    anim->progress = FLOAT_80332e64;
-                    anim->dx = zero;
-                    anim->dy = zero;
+                    *(float*)(anim + 8) = FLOAT_80332e64;
+                    *(float*)(anim + 0x18) = zero;
+                    *(float*)(anim + 0x1A) = zero;
                 }
             }
-            anim = anim + 1;
+            anim = anim + 0x20;
             remaining = remaining - 1;
         } while (remaining != 0);
     }

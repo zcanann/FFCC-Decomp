@@ -59,7 +59,7 @@ public:
 	void End();
 	int GetProgramTime();
 	void SetSoundMode(int);
-	void GetSoundMode();
+	int GetSoundMode();
 	void SetMusicData(void*);
 	void ReentryMusicData(int);
 	void MusicStop(int);

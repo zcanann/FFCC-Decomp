@@ -126,6 +126,7 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, UnkC* param3)
     s32 shapeId;
     float mag;
     float scale;
+    u8 alpha;
 
     work = (CoronaWork*)((u8*)param1 + 0x80 + param3->m_serializedDataOffsets[3]);
     vecWork = (CoronaVecWork*)((u8*)param1 + 0x80 + param3->m_serializedDataOffsets[2]);
@@ -160,12 +161,14 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, UnkC* param3)
 
     GXLoadPosMtxImm(mtx.value, 0);
 
+    scale = work->m_scaleX * (f32)vecWork->m_alpha;
     color.rgba[0] = param2->m_colorR;
     color.rgba[1] = param2->m_colorG;
     color.rgba[2] = param2->m_colorB;
-    color.rgba[3] = (u8)(s32)(work->m_scaleX * (f32)vecWork->m_alpha);
+    alpha = (u8)(s32)scale;
+    color.rgba[3] = alpha;
 
-    pppSetDrawEnv(&color, (pppFMATRIX*)0, lbl_803310C8, param2->m_drawA, param2->m_drawB, param2->m_blendMode, 0, 1,
+    pppSetDrawEnv(&color, (pppFMATRIX*)0, 0.0f, param2->m_drawA, param2->m_drawB, param2->m_blendMode, 0, 1,
                   1, 0);
     pppSetBlendMode(param2->m_blendMode);
     pppDrawShp(*shape, work->m_shapeY, lbl_8032ED54->m_materialSetPtr, param2->m_blendMode);

@@ -892,16 +892,26 @@ void CTexAnimSet::SetTexGen()
 
     for (unsigned int i = 0; i < static_cast<unsigned int>(texAnims->GetSize()); i++) {
         CTexAnim* texAnim = (*texAnims)[i];
+        const float fVar2 = FLOAT_8032fb38;
         void* refData = *reinterpret_cast<void**>(Ptr(texAnim, 8));
         int* material = reinterpret_cast<int*>(*reinterpret_cast<void**>(Ptr(refData, 0x108)));
         if (material != 0) {
+            const unsigned int uVar1 = U32At(texAnim, 0x1C);
             int* texSrt = material + (S32At(refData, 0x10C) * 5);
             U32At(texSrt, 0x50) = U32At(texAnim, 0x18);
-            U32At(texSrt, 0x54) = U32At(texAnim, 0x1C);
-            F32At(texSrt, 0x58) = FLOAT_8032fb38;
-            F32At(texSrt, 0x5C) = FLOAT_8032fb38;
-            U8At(texSrt, 0x4C) = (F32At(texSrt, 0x58) != FLOAT_8032fb38);
-            U8At(texSrt, 0x4D) = (F32At(texSrt, 0x5C) != FLOAT_8032fb38);
+            U32At(texSrt, 0x54) = uVar1;
+            F32At(texSrt, 0x58) = fVar2;
+            F32At(texSrt, 0x5C) = fVar2;
+            if (fVar2 == F32At(texSrt, 0x58)) {
+                U8At(texSrt, 0x4C) = 0;
+            } else {
+                U8At(texSrt, 0x4C) = 1;
+            }
+            if (FLOAT_8032fb38 == F32At(texSrt, 0x5C)) {
+                U8At(texSrt, 0x4D) = 0;
+            } else {
+                U8At(texSrt, 0x4D) = 1;
+            }
         }
     }
 }

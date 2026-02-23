@@ -2,6 +2,7 @@
 
 #include "ffcc/materialman.h"
 #include "ffcc/memory.h"
+#include "ffcc/pad.h"
 
 #include <dolphin/mtx.h>
 #include <dolphin/os/OSCache.h>
@@ -10,6 +11,14 @@ extern Mtx ppvCameraMatrix0;
 extern float FLOAT_8032fa30;
 extern float FLOAT_8032fa34;
 extern float FLOAT_8032fa38;
+extern float FLOAT_8032fa1c;
+extern float FLOAT_8032fa20;
+extern float FLOAT_8032fa40;
+extern float FLOAT_8032fa44;
+extern float FLOAT_8032fa48;
+extern float FLOAT_8032fa4c;
+extern float FLOAT_8032fa50;
+extern float FLOAT_8032fa54;
 extern float FLOAT_8032fa5c;
 extern float FLOAT_8032fa58;
 extern float FLOAT_8032fa8c;
@@ -278,12 +287,16 @@ void CCameraPcs::createMap()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80038b18
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCameraPcs::destroyMap()
 {
-	// TODO
+    return;
 }
 
 /*
@@ -538,62 +551,252 @@ void CCameraPcs::drawShadowEndAll()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800369d4
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCameraPcs::createMaterialEditor()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+
+    *reinterpret_cast<int*>(self + 0x46C) = 0;
+    *reinterpret_cast<float*>(self + 0x450) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0x44C) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0x448) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0x45C) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0x458) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0x454) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0x468) = FLOAT_8032fa1c;
+    *reinterpret_cast<float*>(self + 0x464) = FLOAT_8032fa1c;
+    *reinterpret_cast<float*>(self + 0x460) = FLOAT_8032fa1c;
+    *reinterpret_cast<float*>(self + 0x44C) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0x450) = FLOAT_8032fa50;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800369d0
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCameraPcs::destroyMaterialEditor()
 {
-	// TODO
+    return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80036700
+ * PAL Size: 720b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCameraPcs::calcMaterialEditor()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    unsigned short padButtons;
+    Mtx mtxA;
+    Mtx mtxB;
+    Mtx mtxInv;
+    float stick;
+
+    C_MTXPerspective(reinterpret_cast<Mtx44Ptr>(self + 0x94), FLOAT_8032fa30, FLOAT_8032fa3c,
+                     FLOAT_8032fa40, FLOAT_8032fa54);
+    GXSetProjection(reinterpret_cast<Mtx44Ptr>(self + 0x94), GX_PERSPECTIVE);
+
+    if (Pad._452_4_ == 0) {
+        padButtons = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 4 +
+                                                        ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
+    } else {
+        padButtons = 0;
+    }
+
+    if ((padButtons & 8) != 0) {
+        *reinterpret_cast<float*>(self + 0x44C) += FLOAT_8032fa20;
+    }
+    if ((padButtons & 4) != 0) {
+        *reinterpret_cast<float*>(self + 0x44C) -= FLOAT_8032fa20;
+    }
+
+    stick = FLOAT_8032fa34;
+    if (Pad._452_4_ == 0) {
+        stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x24 +
+                                          ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
+    }
+    *reinterpret_cast<float*>(self + 0x458) =
+        FLOAT_8032fa48 * stick + *reinterpret_cast<float*>(self + 0x458);
+
+    stick = FLOAT_8032fa34;
+    if (Pad._452_4_ == 0) {
+        stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x28 +
+                                          ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
+    }
+    *reinterpret_cast<float*>(self + 0x454) =
+        -((FLOAT_8032fa48 * stick) - *reinterpret_cast<float*>(self + 0x454));
+
+    stick = FLOAT_8032fa34;
+    if (Pad._452_4_ == 0) {
+        stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x1C +
+                                          ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
+    }
+    *reinterpret_cast<float*>(self + 0x45C) =
+        -((FLOAT_8032fa4c * stick) - *reinterpret_cast<float*>(self + 0x45C));
+
+    stick = FLOAT_8032fa34;
+    if (Pad._452_4_ == 0) {
+        stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x20 +
+                                          ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
+    }
+    *reinterpret_cast<float*>(self + 0x45C) =
+        FLOAT_8032fa4c * stick + *reinterpret_cast<float*>(self + 0x45C);
+
+    PSMTXTrans(mtxA, *reinterpret_cast<float*>(self + 0x448), *reinterpret_cast<float*>(self + 0x44C),
+               *reinterpret_cast<float*>(self + 0x450));
+    PSMTXRotRad(mtxB, 'y', *reinterpret_cast<float*>(self + 0x458));
+    PSMTXConcat(mtxB, mtxA, mtxA);
+    PSMTXRotRad(mtxB, 'x', *reinterpret_cast<float*>(self + 0x454));
+    PSMTXConcat(mtxB, mtxA, mtxA);
+    PSMTXTrans(mtxB, FLOAT_8032fa34, FLOAT_8032fa34, -*reinterpret_cast<float*>(self + 0x45C));
+    PSMTXConcat(mtxB, mtxA, reinterpret_cast<MtxPtr>(self + 4));
+    PSMTXInverse(reinterpret_cast<MtxPtr>(self + 4), mtxInv);
+
+    *reinterpret_cast<float*>(self + 0xEC) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0xF0) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0xF4) = FLOAT_8032fa38;
+    PSMTXMultVecSR(mtxInv, reinterpret_cast<Vec*>(self + 0xEC), reinterpret_cast<Vec*>(self + 0xEC));
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800366bc
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCameraPcs::createFunnyShape()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+
+    *reinterpret_cast<int*>(self + 0x46C) = 0;
+    *reinterpret_cast<float*>(self + 0x450) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0x44C) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0x448) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0x45C) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0x458) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0x454) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0x468) = FLOAT_8032fa1c;
+    *reinterpret_cast<float*>(self + 0x464) = FLOAT_8032fa1c;
+    *reinterpret_cast<float*>(self + 0x460) = FLOAT_8032fa1c;
+    *reinterpret_cast<float*>(self + 0x44C) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0x450) = FLOAT_8032fa50;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800366b8
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCameraPcs::destroyFunnyShape()
 {
-	// TODO
+    return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800363e8
+ * PAL Size: 720b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCameraPcs::calcFunnyShape()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    unsigned short padButtons;
+    Mtx mtxA;
+    Mtx mtxB;
+    Mtx mtxInv;
+    float stick;
+
+    C_MTXPerspective(reinterpret_cast<Mtx44Ptr>(self + 0x94), FLOAT_8032fa30, FLOAT_8032fa3c,
+                     FLOAT_8032fa40, FLOAT_8032fa44);
+    GXSetProjection(reinterpret_cast<Mtx44Ptr>(self + 0x94), GX_PERSPECTIVE);
+
+    if (Pad._452_4_ == 0) {
+        padButtons = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 4 +
+                                                        ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
+    } else {
+        padButtons = 0;
+    }
+
+    if ((padButtons & 8) != 0) {
+        *reinterpret_cast<float*>(self + 0x44C) += FLOAT_8032fa20;
+    }
+    if ((padButtons & 4) != 0) {
+        *reinterpret_cast<float*>(self + 0x44C) -= FLOAT_8032fa20;
+    }
+
+    stick = FLOAT_8032fa34;
+    if (Pad._452_4_ == 0) {
+        stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x24 +
+                                          ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
+    }
+    *reinterpret_cast<float*>(self + 0x458) =
+        FLOAT_8032fa48 * stick + *reinterpret_cast<float*>(self + 0x458);
+
+    stick = FLOAT_8032fa34;
+    if (Pad._452_4_ == 0) {
+        stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x28 +
+                                          ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
+    }
+    *reinterpret_cast<float*>(self + 0x454) =
+        -((FLOAT_8032fa48 * stick) - *reinterpret_cast<float*>(self + 0x454));
+
+    stick = FLOAT_8032fa34;
+    if (Pad._452_4_ == 0) {
+        stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x1C +
+                                          ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
+    }
+    *reinterpret_cast<float*>(self + 0x45C) =
+        -((FLOAT_8032fa4c * stick) - *reinterpret_cast<float*>(self + 0x45C));
+
+    stick = FLOAT_8032fa34;
+    if (Pad._452_4_ == 0) {
+        stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x20 +
+                                          ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
+    }
+    *reinterpret_cast<float*>(self + 0x45C) =
+        FLOAT_8032fa4c * stick + *reinterpret_cast<float*>(self + 0x45C);
+
+    PSMTXTrans(mtxA, *reinterpret_cast<float*>(self + 0x448), *reinterpret_cast<float*>(self + 0x44C),
+               *reinterpret_cast<float*>(self + 0x450));
+    PSMTXRotRad(mtxB, 'y', *reinterpret_cast<float*>(self + 0x458));
+    PSMTXConcat(mtxB, mtxA, mtxA);
+    PSMTXRotRad(mtxB, 'x', *reinterpret_cast<float*>(self + 0x454));
+    PSMTXConcat(mtxB, mtxA, mtxA);
+    PSMTXTrans(mtxB, FLOAT_8032fa34, FLOAT_8032fa34, -*reinterpret_cast<float*>(self + 0x45C));
+    PSMTXConcat(mtxB, mtxA, reinterpret_cast<MtxPtr>(self + 4));
+    PSMTXInverse(reinterpret_cast<MtxPtr>(self + 4), mtxInv);
+
+    *reinterpret_cast<float*>(self + 0xEC) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0xF0) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0xF4) = FLOAT_8032fa38;
+    PSMTXMultVecSR(mtxInv, reinterpret_cast<Vec*>(self + 0xEC), reinterpret_cast<Vec*>(self + 0xEC));
 }
 
 /*

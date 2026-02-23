@@ -85,13 +85,42 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C75F4
+ * PAL Size: 220b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void KeyOffSet(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+#pragma dont_inline on
+void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-	// TODO
+    char key;
+    int* slot;
+
+    if (((void*)control == (void*)((int)DAT_8032f3f0 + 0x928)) || ((((unsigned int*)track)[0x41] & 0x80000) == 0)) {
+        ((int*)track)[0x44] = 0;
+        key = ((char*)track)[0x24];
+        slot = (int*)keyOnData;
+        do {
+            if ((*slot == (int)track) && (*(char*)(slot + 1) == key)) {
+                *slot = 0;
+            }
+            slot += 2;
+        } while (slot < (int*)((int)keyOnData + 0x600));
+
+        key = ((char*)track)[0x24];
+        slot = (int*)DAT_8032f444;
+        do {
+            if ((*slot == (int)track && (*(char*)(slot + 6) == key))) {
+                slot[0x24] &= 0xfffffffe;
+                slot[0x24] |= 2;
+            }
+            slot += 0x30;
+        } while (slot < (int*)(DAT_8032f444 + 0xc00));
+    }
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--

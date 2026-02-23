@@ -952,12 +952,22 @@ void GbaQueue::ClrMoneyFlg(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ccaf4
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::GetMoney(int)
+int GbaQueue::GetMoney(int channel)
 {
-	// TODO
+	char* compatibilityStr = reinterpret_cast<char*>(accessSemaphores) + 0x28;
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	int value = *reinterpret_cast<int*>(compatibilityStr + channel * 0xDC + 0x20);
+	OSSignalSemaphore(accessSemaphores + channel);
+
+	return value;
 }
 
 /*

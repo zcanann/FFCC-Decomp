@@ -787,12 +787,64 @@ void CGMonObj::InitFinished()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80114004
+ * PAL Size: 516b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::initFinishedFuncDefault()
 {
-	// TODO
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	unsigned char* scriptBase = reinterpret_cast<unsigned char*>(object->m_scriptHandle);
+
+	// Script value is authored in centi-units.
+	object->m_hitNormal.x = 0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1B0));
+
+	short animPoint = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A0);
+	if (animPoint != -1) {
+		object->AddAnimPoint(1, animPoint, 0xB);
+	}
+
+	animPoint = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1A2);
+	if (animPoint != -1) {
+		object->AddAnimPoint(1, animPoint, 0xA);
+	}
+
+	*reinterpret_cast<int*>(mon + 0x6E8) = -1;
+	for (int attackBase = 0, slotBase = 0; slotBase < 8; attackBase += 4, slotBase += 8) {
+		unsigned int attackId = *reinterpret_cast<unsigned short*>(scriptBase + slotBase + 0xD0);
+		if ((attackId != 0xFFFF) &&
+			(*reinterpret_cast<short*>(Game.game.unkCFlatData0[2] + attackId * 0x48 + 0xE) == 4)) {
+			*reinterpret_cast<int*>(mon + 0x6E8) = attackBase;
+			break;
+		}
+
+		attackId = *reinterpret_cast<unsigned short*>(scriptBase + slotBase + 0xD2);
+		if ((attackId != 0xFFFF) &&
+			(*reinterpret_cast<short*>(Game.game.unkCFlatData0[2] + attackId * 0x48 + 0xE) == 4)) {
+			*reinterpret_cast<int*>(mon + 0x6E8) = attackBase + 1;
+			break;
+		}
+
+		attackId = *reinterpret_cast<unsigned short*>(scriptBase + slotBase + 0xD4);
+		if ((attackId != 0xFFFF) &&
+			(*reinterpret_cast<short*>(Game.game.unkCFlatData0[2] + attackId * 0x48 + 0xE) == 4)) {
+			*reinterpret_cast<int*>(mon + 0x6E8) = attackBase + 2;
+			break;
+		}
+
+		attackId = *reinterpret_cast<unsigned short*>(scriptBase + slotBase + 0xD6);
+		if ((attackId != 0xFFFF) &&
+			(*reinterpret_cast<short*>(Game.game.unkCFlatData0[2] + attackId * 0x48 + 0xE) == 4)) {
+			*reinterpret_cast<int*>(mon + 0x6E8) = attackBase + 3;
+			break;
+		}
+	}
+
+	setRepop(1);
 }
 
 /*

@@ -8,6 +8,7 @@
 #include "ffcc/mes.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/p_dbgmenu.h"
+#include "ffcc/p_game.h"
 #include "ffcc/p_map.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/p_minigame.h"
@@ -1683,12 +1684,145 @@ void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject*, int, int, int&)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800B2F80
+ * PAL Size: 912b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int)
+CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int systemValue)
 {
-	// TODO
+    u8* game = reinterpret_cast<u8*>(&Game.game);
+    int result = 0;
+
+    if (systemValue < -0xFFF) {
+        int valueIndex = -0x1000 - systemValue;
+        int valueGroup = valueIndex / 0x600;
+        int rowIndex = 0x5FF - (valueIndex - valueGroup * 0x600);
+        u8* row = *reinterpret_cast<u8**>(game + 0xC5A8) + rowIndex * 0x48;
+
+        if ((unsigned int)valueGroup <= 0x23) {
+            result = reinterpret_cast<u16*>(row)[valueGroup];
+        }
+    } else if (systemValue < -499) {
+        unsigned int bitIndex = static_cast<unsigned int>(systemValue + 0x9F3);
+        int sign = static_cast<int>(bitIndex) >> 31;
+        u8* flagByte =
+            game +
+            ((static_cast<int>(bitIndex) >> 3) +
+                static_cast<int>((static_cast<int>(bitIndex) < 0) && ((bitIndex & 7) != 0)) +
+                0x10D4);
+        unsigned int bit =
+            1U << ((sign * 8 | static_cast<int>(bitIndex * 0x20000000U + (sign >> 29))) - sign);
+        result = ((*flagByte & bit) != 0);
+    } else if (systemValue < -199) {
+        result = *reinterpret_cast<s16*>(game + 0x111CC + (systemValue + 0x1C7) * 2);
+    } else {
+        u8* gameWork = game + 0x10000;
+        switch (systemValue) {
+        case -0x7A: {
+            int language = game[0xE];
+            result = 1;
+            if (language == 3) {
+                result = 6;
+            } else if (language < 3) {
+                if (language == 1) {
+                    result = 3;
+                } else if (language != 0) {
+                    result = 5;
+                }
+            } else if (language == 5) {
+                result = 7;
+            } else if (language < 5) {
+                result = 4;
+            }
+            break;
+        }
+        case -0x78:
+            result = *reinterpret_cast<u32*>(gameWork + 0x8);
+            break;
+        case -0x76:
+            result = gameWork[0x13D2];
+            break;
+        case -0x73:
+        case -0x72:
+        case -0x71:
+        case -0x70:
+        case -0x6F:
+        case -0x6E:
+        case -0x6D:
+        case -0x6C: {
+            int slotIndex = systemValue + 0x73;
+            u8* usbEdit = game + slotIndex * 0xC30;
+            if (*reinterpret_cast<s32*>(usbEdit + 0x1794) == 0) {
+                result = 0;
+            } else {
+                result = *reinterpret_cast<u16*>(usbEdit + 0x1404);
+            }
+            break;
+        }
+        case -0x6B:
+        case -0x6A:
+        case -0x69:
+        case -0x68:
+        case -0x67:
+            result = *reinterpret_cast<u32*>(gameWork + 0x18 + (systemValue + 0x47) * 4);
+            break;
+        case -0x66:
+            result = gameWork[0];
+            break;
+        case -0x65:
+        case -100:
+        case -99:
+        case -0x62:
+        case -0x61:
+        case -0x60:
+        case -0x5F:
+        case -0x5E:
+        case -0x5D:
+        case -0x5C:
+        case -0x5B:
+        case -0x5A:
+        case -0x59:
+        case -0x58:
+        case -0x57:
+            result = *reinterpret_cast<u32*>(gameWork + 0x28 + (systemValue + 0x56) * 4);
+            break;
+        case -0x56:
+        case -0x55:
+        case -0x54:
+        case -0x53:
+        case -0x52:
+        case -0x51:
+        case -0x50:
+        case -0x4F:
+        case -0x4E:
+        case -0x4D:
+        case -0x4C:
+        case -0x4B:
+        case -0x4A:
+        case -0x49:
+        case -0x48:
+            result = *reinterpret_cast<u32*>(gameWork + 0x64 + (systemValue + 0x65) * 4);
+            break;
+        case -0x47:
+        case -0x46:
+        case -0x45:
+        case -0x44:
+            result = *reinterpret_cast<u32*>(gameWork + 0xC8 + (systemValue + 0x65) * 4);
+            break;
+        case -0x43:
+            result = *reinterpret_cast<u32*>(gameWork + 0x10B4);
+            break;
+        case -0x42:
+            result = *reinterpret_cast<u32*>(gameWork + 0x10B8 + (systemValue + 0x6B) * 4);
+            break;
+        }
+    }
+
+    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x96C) = result;
+    return reinterpret_cast<CFlatRuntime::CVal*>(reinterpret_cast<u8*>(this) + 0x96C);
 }
 
 /*

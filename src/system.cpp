@@ -484,8 +484,7 @@ unsigned int CSystem::AddScenegraph(CProcess* process, int arg)
 void CSystem::RemoveScenegraph(CProcess* process, int arg)
 {
     typedef void* (*GetScenegraphBlockFn)(CProcess*, int);
-    GetScenegraphBlockFn getScenegraphBlock = *(GetScenegraphBlockFn*)((u8*)*(void**)process + 0x10);
-    void* descBlock = getScenegraphBlock(process, arg);
+    void* descBlock = (*(GetScenegraphBlockFn*)((u8*)*(void**)process + 0x10))(process, arg);
     COrder* order = m_orderSentinel.m_next;
     COrder* next;
 

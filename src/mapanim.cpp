@@ -638,7 +638,7 @@ void CMapAnimRun::Calc(long frame)
         run[0] = run[1];
     }
 
-    CMapAnim* mapAnim = __vc__21CPtrArray_P8CMapAnim_FUl(MapMng + 0x2140C, reinterpret_cast<unsigned short*>(this)[9]);
+    CMapAnim* mapAnim = __vc__21CPtrArray_P8CMapAnim_FUl(MapMng + 0x213FC, reinterpret_cast<unsigned short*>(this)[9]);
     mapAnim->Calc(run[0]);
     run[0] = run[0] + 1;
 

@@ -474,8 +474,12 @@ unsigned int CSystem::AddScenegraph(CProcess* process, int arg)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80021760
+ * PAL Size: 204b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CSystem::RemoveScenegraph(CProcess* process, int arg)
 {
@@ -483,24 +487,23 @@ void CSystem::RemoveScenegraph(CProcess* process, int arg)
     GetScenegraphBlockFn getScenegraphBlock = *(GetScenegraphBlockFn*)((u8*)*(void**)process + 0x10);
     void* descBlock = getScenegraphBlock(process, arg);
     COrder* order = m_orderSentinel.m_next;
-	
-    while (order != &m_orderSentinel)
-    {
-        COrder* next = order->m_next;
+    COrder* next;
 
+    do
+    {
+        next = order->m_next;
         if (order->m_descBlock == descBlock)
         {
-            order->m_previous->m_next = order->m_next;
-            order->m_next->m_previous = order->m_previous;
+            order->m_previous->m_next = next;
+            next->m_previous = order->m_previous;
             order->m_next = m_freeOrderHead.m_next;
             m_freeOrderHead.m_next = order;
 
             m_orderCount--;
         }
-
         order = next;
-    }
-	
+    } while (next != &m_orderSentinel);
+
     if (__ptmf_test((__ptmf*)((u8*)descBlock + 0x10)) != 0)
     {
         __ptmf_scall(process);

@@ -1,6 +1,8 @@
 #include "ffcc/p_MaterialEditor.h"
 #include "ffcc/p_usb.h"
 #include "ffcc/ME_USB_process.h"
+#include "ffcc/graphic.h"
+#include "ffcc/zlist.h"
 #include <Dolphin/mtx.h>
 #include <Dolphin/gx.h>
 #include <string.h>
@@ -12,6 +14,7 @@ extern "C" void* __ct__5ZLISTFv(void* self);
 extern "C" void __dt__18CMaterialEditorPcsFv(void* self);
 
 extern CUSBPcs USBPcs;
+extern CGraphic Graphic;
 extern unsigned char m_table__18CMaterialEditorPcs[];
 static char s_CMaterialEditorPcs[] = "CMaterialEditorPcs";
 extern void* __vt__8CManager;
@@ -25,6 +28,13 @@ extern unsigned int lbl_801EA4BC[];
 extern unsigned int lbl_801EA4C8[];
 extern float lbl_8032FCAC;
 extern float lbl_8032FCB0;
+extern unsigned char DAT_8032ed1c;
+extern char* DAT_8032ed18;
+extern char DAT_8032fcb4[];
+extern unsigned char DAT_8032ed24;
+extern int DAT_8032ed20;
+extern unsigned int DAT_8032fca8;
+static char s_MaterialEditor[] = "MaterialEditor=%c";
 extern class CCameraPcs {
 public:
     Mtx m_cameraMatrix;
@@ -33,6 +43,9 @@ extern CMemory Memory;
 
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
+extern "C" void Printf__8CGraphicFPce(void*, const char*, ...);
+extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
+extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, unsigned char, int, int, unsigned char);
 
 static void WriteU8(void* base, unsigned int offset, unsigned char value) {
     reinterpret_cast<unsigned char*>(base)[offset] = value;
@@ -470,7 +483,64 @@ void CMaterialEditorPcs::calcViewer()
  */
 void CMaterialEditorPcs::drawViewer()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+
+    if (DAT_8032ed1c == 0) {
+        DAT_8032ed18 = DAT_8032fcb4;
+        DAT_8032ed1c = 1;
+    }
+    if (DAT_8032ed24 == 0) {
+        DAT_8032ed20 = 0;
+        DAT_8032ed24 = 1;
+    }
+
+    DAT_8032ed20 = DAT_8032ed20 + 1;
+    int sign = DAT_8032ed20 >> 31;
+    int idx = (sign * 4 | (unsigned int)(((DAT_8032ed20 >> 4) * 0x40000000) + sign) >> 30) - sign;
+    Printf__8CGraphicFPce(&Graphic, s_MaterialEditor, (int)(char)DAT_8032ed18[idx]);
+
+    if (*reinterpret_cast<int*>(self + 0xE8) != 0) {
+        return;
+    }
+
+    ZLIST* zlist = reinterpret_cast<ZLIST*>(self + 0xC8);
+    _ZLISTITEM* it = zlist->m_root.m_previous;
+    while (it != 0) {
+        int* listData = reinterpret_cast<int*>(zlist->GetDataNext(&it));
+        int model = *listData;
+
+        GXSetArray(GX_VA_POS, *reinterpret_cast<void**>(model + 0x10), 0xC);
+        GXSetArray(GX_VA_NRM, *reinterpret_cast<void**>(model + 0x14), 0xC);
+        GXSetNumChans(1);
+        GXClearVtxDesc();
+        GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+        GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+        GXSetNumTevStages(1);
+        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
+        _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0);
+        GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+
+        GXColor matColor;
+        matColor.r = static_cast<unsigned char>((DAT_8032fca8 >> 24) & 0xFF);
+        matColor.g = static_cast<unsigned char>((DAT_8032fca8 >> 16) & 0xFF);
+        matColor.b = static_cast<unsigned char>((DAT_8032fca8 >> 8) & 0xFF);
+        matColor.a = static_cast<unsigned char>(DAT_8032fca8 & 0xFF);
+        GXSetChanAmbColor(GX_COLOR0A0, matColor);
+        GXSetChanMatColor(GX_COLOR0A0, matColor);
+
+        GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
+        GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
+        GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+        GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
+        GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+        GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_NRM, GX_NRM_XYZ, GX_F32, 0);
+        GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+        GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+        GXSetNumTexGens(1);
+        GXSetNumTevStages(1);
+        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
+    }
 }
 
 /*

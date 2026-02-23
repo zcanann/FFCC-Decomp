@@ -109,79 +109,89 @@ static inline void SetMaterialTextureSlot(void* material, unsigned long slotInde
  */
 void CMapTexAnimSet::Create(CChunkFile& chunkFile, CMaterialSet* materialSet, CTextureSet* textureSet)
 {
-    CMapTexAnim* anim = 0;
+    CMapTexAnim* ref = 0;
     CChunkFile::CChunk chunk;
-    *reinterpret_cast<CMaterialSet**>(Ptr(this, 0x10C)) = materialSet;
-    *reinterpret_cast<CTextureSet**>(Ptr(this, 0x110)) = textureSet;
+    *reinterpret_cast<CMaterialSet**>(reinterpret_cast<int>(this) + 0x10C) = materialSet;
+    *reinterpret_cast<CTextureSet**>(reinterpret_cast<int>(this) + 0x110) = textureSet;
 
     chunkFile.PushChunk();
     while (chunkFile.GetNextChunk(chunk) != 0) {
         if (chunk.m_id == 0x4B455920) {
             ReadKey__12CMapKeyFrameFR10CChunkFilei(
-                reinterpret_cast<CMapKeyFrame*>(Ptr(anim, 0x24)), &chunkFile, static_cast<char>(chunk.m_arg0));
-            U8At(anim, 0x15) = 1;
+                reinterpret_cast<CMapKeyFrame*>(reinterpret_cast<int>(ref) + 0x24), &chunkFile,
+                static_cast<char>(chunk.m_arg0));
+            *reinterpret_cast<unsigned char*>(reinterpret_cast<int>(ref) + 0x15) = 1;
         } else if ((int)chunk.m_id < 0x4B455920) {
             if (chunk.m_id == 0x4A554E20) {
                 ReadJun__12CMapKeyFrameFR10CChunkFilei(
-                    reinterpret_cast<CMapKeyFrame*>(Ptr(anim, 0x24)), &chunkFile, static_cast<char>(chunk.m_arg0));
+                    reinterpret_cast<CMapKeyFrame*>(reinterpret_cast<int>(ref) + 0x24), &chunkFile,
+                    static_cast<char>(chunk.m_arg0));
             } else if (((int)chunk.m_id < 0x4A554E20) && (chunk.m_id == 0x4652414D)) {
-                ReadFrame__12CMapKeyFrameFR10CChunkFilei(reinterpret_cast<CMapKeyFrame*>(Ptr(anim, 0x24)), &chunkFile);
+                ReadFrame__12CMapKeyFrameFR10CChunkFilei(
+                    reinterpret_cast<CMapKeyFrame*>(reinterpret_cast<int>(ref) + 0x24), &chunkFile);
             }
         } else if (chunk.m_id == 0x54414E4D) {
-            anim = static_cast<CMapTexAnim*>(__nw__FUlPQ27CMemory6CStagePci(
+            ref = static_cast<CMapTexAnim*>(__nw__FUlPQ27CMemory6CStagePci(
                 0x4C, *reinterpret_cast<CMemory::CStage**>(&MapMng), s_maptexanim_cpp_801d7ec4, 0x24));
-            if (anim != 0) {
-                __ct__4CRefFv(anim);
-                *reinterpret_cast<void**>(anim) = &PTR_PTR_s_CMapTexAnim_801ea9a4;
-                S32At(anim, 0x2C) = 0;
-                S32At(anim, 0x30) = 0;
-                *reinterpret_cast<void**>(Ptr(anim, 0x40)) = 0;
-                *reinterpret_cast<void**>(Ptr(anim, 0x44)) = 0;
-                *reinterpret_cast<void**>(Ptr(anim, 0x48)) = 0;
-                U8At(anim, 0x27) = 1;
-                U8At(anim, 0x28) = 0;
-                *reinterpret_cast<void**>(Ptr(anim, 0x20)) = 0;
-                F32At(anim, 0x18) = FLOAT_8032fd48;
-                F32At(anim, 0x1C) = FLOAT_8032fd4c;
-                U8At(anim, 0x14) = 0;
-                U8At(anim, 0x15) = 0;
-                U16At(anim, 0x12) = 0xFFFF;
-                U8At(anim, 0x16) = 1;
+            if (ref != 0) {
+                __ct__4CRefFv(ref);
+                *reinterpret_cast<void**>(ref) = &PTR_PTR_s_CMapTexAnim_801ea9a4;
+                *reinterpret_cast<int*>(reinterpret_cast<int>(ref) + 0x2C) = 0;
+                *reinterpret_cast<int*>(reinterpret_cast<int>(ref) + 0x30) = 0;
+                *reinterpret_cast<void**>(reinterpret_cast<int>(ref) + 0x40) = 0;
+                *reinterpret_cast<void**>(reinterpret_cast<int>(ref) + 0x44) = 0;
+                *reinterpret_cast<void**>(reinterpret_cast<int>(ref) + 0x48) = 0;
+                *reinterpret_cast<unsigned char*>(reinterpret_cast<int>(ref) + 0x27) = 1;
+                *reinterpret_cast<unsigned char*>(reinterpret_cast<int>(ref) + 0x28) = 0;
+                *reinterpret_cast<void**>(reinterpret_cast<int>(ref) + 0x20) = 0;
+                *reinterpret_cast<float*>(reinterpret_cast<int>(ref) + 0x18) = FLOAT_8032fd48;
+                *reinterpret_cast<float*>(reinterpret_cast<int>(ref) + 0x1C) = FLOAT_8032fd4c;
+                *reinterpret_cast<unsigned char*>(reinterpret_cast<int>(ref) + 0x14) = 0;
+                *reinterpret_cast<unsigned char*>(reinterpret_cast<int>(ref) + 0x15) = 0;
+                *reinterpret_cast<unsigned short*>(reinterpret_cast<int>(ref) + 0x12) = 0xFFFF;
+                *reinterpret_cast<unsigned char*>(reinterpret_cast<int>(ref) + 0x16) = 1;
             }
 
-            U16At(anim, 0x8) = chunkFile.Get2();
-            U16At(anim, 0xA) = chunkFile.Get2();
-            U16At(anim, 0xC) = chunkFile.Get2();
-            U16At(anim, 0x10) = U16At(anim, 0xC);
-            F32At(anim, 0x1C) = static_cast<float>(static_cast<short>(chunkFile.Get2()));
-            U16At(anim, 0xE) = 0;
-            F32At(anim, 0x18) = chunkFile.GetF4();
-            U8At(anim, 0x14) = chunkFile.Get1();
+            *reinterpret_cast<unsigned short*>(reinterpret_cast<int>(ref) + 8) = chunkFile.Get2();
+            *reinterpret_cast<unsigned short*>(reinterpret_cast<int>(ref) + 0xA) = chunkFile.Get2();
+            *reinterpret_cast<unsigned short*>(reinterpret_cast<int>(ref) + 0xC) = chunkFile.Get2();
+            *reinterpret_cast<unsigned short*>(reinterpret_cast<int>(ref) + 0x10) =
+                *reinterpret_cast<unsigned short*>(reinterpret_cast<int>(ref) + 0xC);
+            *reinterpret_cast<float*>(reinterpret_cast<int>(ref) + 0x1C) =
+                static_cast<float>(static_cast<short>(chunkFile.Get2()));
+            *reinterpret_cast<unsigned short*>(reinterpret_cast<int>(ref) + 0xE) = 0;
+            *reinterpret_cast<float*>(reinterpret_cast<int>(ref) + 0x18) = chunkFile.GetF4();
+            *reinterpret_cast<unsigned char*>(reinterpret_cast<int>(ref) + 0x14) = chunkFile.Get1();
             chunkFile.Get1();
             chunkFile.Get1();
             chunkFile.Get1();
 
             if (chunk.m_version == 0) {
                 chunkFile.Get4();
-                U16At(anim, 0x12) = 0xFFFF;
+                *reinterpret_cast<unsigned short*>(reinterpret_cast<int>(ref) + 0x12) = 0xFFFF;
             } else {
-                U16At(anim, 0x12) = chunkFile.Get2();
+                *reinterpret_cast<unsigned short*>(reinterpret_cast<int>(ref) + 0x12) = chunkFile.Get2();
                 chunkFile.Get2();
             }
 
             chunkFile.Get4();
             chunkFile.Get4();
-            *reinterpret_cast<void**>(Ptr(anim, 0x20)) = __nwa__FUlPQ27CMemory6CStagePci(
-                static_cast<unsigned long>(S16At(anim, 0xC) << 1), *reinterpret_cast<CMemory::CStage**>(&MapMng),
+            *reinterpret_cast<void**>(reinterpret_cast<int>(ref) + 0x20) = __nwa__FUlPQ27CMemory6CStagePci(
+                static_cast<unsigned long>(*reinterpret_cast<short*>(reinterpret_cast<int>(ref) + 0xC) << 1),
+                *reinterpret_cast<CMemory::CStage**>(&MapMng),
                 s_maptexanim_cpp_801d7ec4, 0x3B);
 
-            for (int i = 0; i < S16At(anim, 0xC); i++) {
-                reinterpret_cast<unsigned short*>(*reinterpret_cast<void**>(Ptr(anim, 0x20)))[i] = chunkFile.Get2();
+            int offset = 0;
+            for (int i = 0; i < *reinterpret_cast<short*>(reinterpret_cast<int>(ref) + 0xC); i++) {
+                *reinterpret_cast<unsigned short*>(
+                    reinterpret_cast<int>(*reinterpret_cast<void**>(reinterpret_cast<int>(ref) + 0x20)) + offset) =
+                    chunkFile.Get2();
+                offset += 2;
             }
 
-            short count = S16At(this, 8);
-            S16At(this, 8) = static_cast<short>(count + 1);
-            AnimAt(this, count) = anim;
+            short count = *reinterpret_cast<short*>(reinterpret_cast<int>(this) + 8);
+            *reinterpret_cast<short*>(reinterpret_cast<int>(this) + 8) = count + 1;
+            *reinterpret_cast<CMapTexAnim**>(reinterpret_cast<int>(this) + (count * 4) + 0xC) = ref;
         }
     }
     chunkFile.PopChunk();

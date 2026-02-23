@@ -53,6 +53,11 @@ extern "C" int SePlay__9CRedSoundFiiiii(CRedSound*, int, int, int, int, int);
 extern "C" void MusicVolume__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" void Printf__7CSystemFPce(CSystem*, char*, ...);
 extern "C" int sprintf(char*, const char*, ...);
+extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
+extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
+extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
+extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
+extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
 extern void* ARRAY_802f26c8;
 extern char DAT_801db190[];
 extern char DAT_801db29c[];
@@ -680,44 +685,45 @@ void CSound::Frame()
  */
 void CSound::Draw()
 {
-    Mtx cameraMtx;
-    PSMTXCopy(*reinterpret_cast<Mtx*>(CameraPcs + 0x4), cameraMtx);
+    Mtx cameraMatrix;
+    PSMTXCopy(*reinterpret_cast<Mtx*>(CameraPcs + 0x4), cameraMatrix);
 
-    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
-    GXSetZCompLoc(GX_FALSE);
-    _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
-    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-    GXSetCullMode(GX_CULL_BACK);
-    GXSetNumTevStages(1);
-    _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
-    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
-    GXSetNumChans(1);
-    GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPEC);
-    GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    GXSetZCompLoc((u8)0);
+    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
+    GXSetZMode((u8)1, (_GXCompare)3, (u8)1);
+    GXSetCullMode((_GXCullMode)1);
+    GXSetNumTevStages((u8)1);
+    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
+    GXSetNumChans((u8)1);
+    GXSetChanCtrl((GXChannelID)0, 0, (GXColorSrc)0, (GXColorSrc)0, 0, (GXDiffuseFn)2, (GXAttnFn)1);
+    GXSetChanCtrl((GXChannelID)2, 0, (GXColorSrc)0, (GXColorSrc)0, 0, (GXDiffuseFn)2, (GXAttnFn)2);
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
 
-    u8* se = reinterpret_cast<u8*>(this) + 0x2C;
+    unsigned char* se = reinterpret_cast<unsigned char*>(this) + 0x2C;
     for (u32 i = 0; i < 0x80; i++, se += 0x28) {
-        if (static_cast<s8>(se[0]) < 0) {
-            CColor nearColor(0xC0, 0xC0, 0xC0, 0x80);
-            Graphic.DrawSphere(cameraMtx, reinterpret_cast<Vec*>(se + 0x18), *reinterpret_cast<float*>(se + 0x10),
-                               reinterpret_cast<_GXColor*>(&nearColor.color));
-            CColor farColor(0x80, 0x80, 0x80, 0x80);
-            Graphic.DrawSphere(cameraMtx, reinterpret_cast<Vec*>(se + 0x18), *reinterpret_cast<float*>(se + 0x14),
-                               reinterpret_cast<_GXColor*>(&farColor.color));
+        if (static_cast<signed char>(*se) < 0) {
+            u32 innerColor;
+            u32 outerColor;
+            Graphic.DrawSphere(cameraMatrix, reinterpret_cast<Vec*>(se + 0x18), *reinterpret_cast<float*>(se + 0x10),
+                               static_cast<_GXColor*>(__ct__6CColorFUcUcUcUc(&innerColor, 0xC0, 0xC0, 0xC0, 0x80)));
+            Graphic.DrawSphere(cameraMatrix, reinterpret_cast<Vec*>(se + 0x18), *reinterpret_cast<float*>(se + 0x14),
+                               static_cast<_GXColor*>(__ct__6CColorFUcUcUcUc(&outerColor, 0x80, 0x80, 0x80, 0x80)));
         }
     }
 
-    CColor lineColor;
-    lineColor.raw = 0xFF8000FF;
-    GXSetChanMatColor(GX_COLOR0A0, lineColor.color);
-    GXLoadPosMtxImm(cameraMtx, 0);
+    u32 lineColorRaw = 0xFF8000FF;
+    GXColor lineColor = *reinterpret_cast<GXColor*>(&lineColorRaw);
+    GXSetChanMatColor((GXChannelID)4, lineColor);
+    GXLoadPosMtxImm(cameraMatrix, 0);
 
-    CLine* line = reinterpret_cast<CLine*>(reinterpret_cast<u8*>(this) + 0x142C);
-    for (u32 i = 0; i < 8; i++, line = reinterpret_cast<CLine*>(reinterpret_cast<u8*>(line) + 0x1CC)) {
+    CLine* line = reinterpret_cast<CLine*>(reinterpret_cast<unsigned char*>(this) + 0x142C);
+    for (u32 i = 0; i < 8; i++) {
         Draw__9CLine(line);
+        line = reinterpret_cast<CLine*>(reinterpret_cast<unsigned char*>(line) + 0x1CC);
     }
 }
 

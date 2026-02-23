@@ -1,9 +1,14 @@
 #include "ffcc/p_menu.h"
 #include "ffcc/color.h"
+#include "ffcc/file.h"
+#include "ffcc/game.h"
+#include "ffcc/map.h"
 #include "ffcc/math.h"
 #include "ffcc/memory.h"
 #include "ffcc/menu.h"
+#include "ffcc/mesmenu.h"
 #include "ffcc/p_camera.h"
+#include "ffcc/ptrarray.h"
 #include "ffcc/ringmenu.h"
 #include "ffcc/textureman.h"
 
@@ -12,6 +17,7 @@
 extern CTextureMan TextureMan;
 extern CMath Math;
 extern CMenuPcs MenuPcs;
+extern CGame Game;
 
 struct Vec4d
 {
@@ -59,13 +65,24 @@ extern u32 DAT_8020ee8c;
 extern u32 DAT_8020ee98;
 extern u32 DAT_8020ee9c;
 extern u32 DAT_8020eea0;
+extern char* PTR_s_shibuya_8020f23c[];
+extern int DAT_8020f260[];
+extern char s_dvd__smenu__s_tex_801d9d6c[];
+extern char s_dvd__smenu_gc23_fnt_801d9d8c[];
+extern char s_p_menu_cpp_801d9d80[];
 
 extern "C" void* __register_global_object(void* object, void* destructor, void* registration);
 extern "C" void __dt__8CMenuPcsFv(void*);
+extern "C" int sprintf(char*, const char*, ...);
 extern "C" void Calc__5CMenuFv(CMenu*);
 extern "C" void CalcDiaryMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void calcBonus__8CMenuPcsFv(CMenuPcs*);
 extern "C" void calcVillageMenu__8CMenuPcsFv(CMenuPcs*);
+extern "C" char* GetLangString__5CGameFv(void*);
+extern "C" void* Open__5CFileFPcUlQ25CFile3PRI(void*, char*, unsigned long, int);
+extern "C" void Read__5CFileFPQ25CFile7CHandle(void*, void*);
+extern "C" void SyncCompleted__5CFileFPQ25CFile7CHandle(void*, void*);
+extern "C" void Close__5CFileFPQ25CFile7CHandle(void*, void*);
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 
 static inline void ReleaseRefObject(void* object)
@@ -575,12 +592,93 @@ void CMenuPcs::drawPause()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009460c
+ * PAL Size: 880b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::createBattle()
 {
-	// TODO
+    char path[0x104];
+    char fontPath[0x80];
+    int* textureInfo = DAT_8020f260;
+    u8* self = reinterpret_cast<u8*>(this);
+
+    for (int i = 0; i < 2; i++) {
+        const char* language = Game.GetLangString();
+        sprintf(path, s_dvd__smenu__s_tex_801d9d6c, language, PTR_s_shibuya_8020f23c[i]);
+
+        void* fileHandle = Open__5CFileFPcUlQ25CFile3PRI(&File, path, 0, 0);
+        if (fileHandle != 0) {
+            Read__5CFileFPQ25CFile7CHandle(&File, fileHandle);
+            SyncCompleted__5CFileFPQ25CFile7CHandle(&File, fileHandle);
+
+            void* stage = *reinterpret_cast<int*>(self + 0x740) == 1 ? *reinterpret_cast<void**>(&MapMng)
+                                                                     : *reinterpret_cast<void**>(self + 0xEC);
+
+            CTextureSet* textureSet = new (Game.m_mainStage, s_p_menu_cpp_801d9d80, 0x182) CTextureSet;
+            *reinterpret_cast<CTextureSet**>(self + 0x14C + i * 4) = textureSet;
+            if (textureSet != 0) {
+                textureSet->Create(File.m_readBuffer, reinterpret_cast<CMemory::CStage*>(stage), 0, 0, 0, 0);
+            }
+
+            Close__5CFileFPQ25CFile7CHandle(&File, fileHandle);
+        }
+    }
+
+    for (int i = 0; i < 10; i++) {
+        CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(self + 0x14C + textureInfo[0] * 4);
+        const unsigned long textureIndex = static_cast<unsigned long>(textureSet->Find(reinterpret_cast<char*>(textureInfo[1])));
+        CTexture* texture = (*reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<u8*>(textureSet) + 8))[textureIndex];
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 4) =
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 4) + 1;
+        *reinterpret_cast<CTexture**>(self + 0x1E4 + i * 4) = texture;
+        textureInfo += 2;
+    }
+
+    for (int i = 0; i < 12; i++) {
+        CMesMenu* menu = new (Game.m_mainStage, s_p_menu_cpp_801d9d80, 0x48B) CMesMenu;
+        *reinterpret_cast<CMesMenu**>(self + 0x10C + i * 4) = menu;
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(menu) + 0x18) = i;
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(menu) + 0x1C) = i;
+        menu->Create();
+    }
+
+    for (int i = 0; i < 4; i++) {
+        CRingMenu* menu = new (Game.m_mainStage, s_p_menu_cpp_801d9d80, 0x492) CRingMenu;
+        *reinterpret_cast<CRingMenu**>(self + 0x13C + i * 4) = menu;
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(menu) + 8) = i;
+        menu->Create();
+    }
+
+    sprintf(fontPath, s_dvd__smenu_gc23_fnt_801d9d8c, Game.GetLangString());
+    loadFont(0, fontPath, 1, 1);
+
+    CTexture* fontTexture = *reinterpret_cast<CTexture**>(self + 0x1EC);
+    for (int i = 0; i < 0x100; i++) {
+        _GXColor color = fontTexture->GetTlutColor(i);
+        const int avg2 = (((int)color.r + (int)color.g + (int)color.b) / 3) * 2;
+        _GXColor outColor;
+        outColor.r = static_cast<u8>(((int)color.r + avg2) / 3);
+        outColor.g = static_cast<u8>(((int)color.g + avg2) / 3);
+        outColor.b = static_cast<u8>(((int)color.b + avg2) / 3);
+        outColor.a = color.a;
+
+        const int tlutFmt = *reinterpret_cast<int*>(reinterpret_cast<u8*>(fontTexture) + 0x60);
+        int tlutOffset = 0;
+        if (tlutFmt == 9) {
+            tlutOffset = 0x100;
+        } else if (tlutFmt == 8) {
+            tlutOffset = 0x10;
+        }
+
+        fontTexture->SetExternalTlutColor(self + 0x340, tlutOffset, i, outColor);
+    }
+
+    fontTexture->FlushExternalTlut(self + 0x340);
+    *reinterpret_cast<u16*>(self + 0x864) = 0;
 }
 
 /*

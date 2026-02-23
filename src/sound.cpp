@@ -1,6 +1,9 @@
 #include "ffcc/sound.h"
 
 #include "ffcc/RedSound/RedSound.h"
+#include "ffcc/color.h"
+#include "ffcc/graphic.h"
+#include "ffcc/gxfunc.h"
 #include "ffcc/system.h"
 #include "PowerPC_EABI_Support/Runtime/MWCPlusLib.h"
 #include <Runtime.PPCEABI.H/NMWException.h>
@@ -668,12 +671,54 @@ void CSound::Frame()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c7380
+ * PAL Size: 532b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CSound::Draw()
 {
-	// TODO
+    Mtx cameraMtx;
+    PSMTXCopy(*reinterpret_cast<Mtx*>(CameraPcs + 0x4), cameraMtx);
+
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+    GXSetZCompLoc(GX_FALSE);
+    _GXSetAlphaCompare(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+    GXSetCullMode(GX_CULL_BACK);
+    GXSetNumTevStages(1);
+    _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPEC);
+    GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+
+    u8* se = reinterpret_cast<u8*>(this) + 0x2C;
+    for (u32 i = 0; i < 0x80; i++, se += 0x28) {
+        if (static_cast<s8>(se[0]) < 0) {
+            CColor nearColor(0xC0, 0xC0, 0xC0, 0x80);
+            Graphic.DrawSphere(cameraMtx, reinterpret_cast<Vec*>(se + 0x18), *reinterpret_cast<float*>(se + 0x10),
+                               reinterpret_cast<_GXColor*>(&nearColor.color));
+            CColor farColor(0x80, 0x80, 0x80, 0x80);
+            Graphic.DrawSphere(cameraMtx, reinterpret_cast<Vec*>(se + 0x18), *reinterpret_cast<float*>(se + 0x14),
+                               reinterpret_cast<_GXColor*>(&farColor.color));
+        }
+    }
+
+    CColor lineColor;
+    lineColor.raw = 0xFF8000FF;
+    GXSetChanMatColor(GX_COLOR0A0, lineColor.color);
+    GXLoadPosMtxImm(cameraMtx, 0);
+
+    CLine* line = reinterpret_cast<CLine*>(reinterpret_cast<u8*>(this) + 0x142C);
+    for (u32 i = 0; i < 8; i++, line = reinterpret_cast<CLine*>(reinterpret_cast<u8*>(line) + 0x1CC)) {
+        Draw__9CLine(line);
+    }
 }
 
 /*

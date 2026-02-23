@@ -19,6 +19,7 @@ extern char MaterialMan[];
 extern void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
 extern void GXCallDisplayList(void*, unsigned int);
 extern _pppMngStChangeTex* pppMngStPtr;
+extern _pppMngStChangeTex* lbl_8032ED50;
 extern _pppEnvStChangeTex* lbl_8032ED54;
 extern _pppEnvStChangeTex* pppEnvStPtr;
 extern float lbl_80332040;
@@ -163,7 +164,7 @@ void pppConstructChangeTex(pppChangeTex* changeTex, UnkC* data)
 	state[2] = init;
 	state[1] = init;
 	stateInt[6] = 0;
-	stateInt[9] = (int)pppMngStPtr;
+	stateInt[9] = (int)lbl_8032ED50;
 	stateInt[7] = 0;
 	stateInt[3] = 0;
 	stateInt[4] = 0;

@@ -52,6 +52,10 @@ static inline int& S32At(CGraphic* self, u32 offset) {
     return *reinterpret_cast<int*>(reinterpret_cast<u8*>(self) + offset);
 }
 
+static inline u8& U8At(CGraphic* self, u32 offset) {
+    return *reinterpret_cast<u8*>(reinterpret_cast<u8*>(self) + offset);
+}
+
 extern "C" {
 void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
@@ -1055,9 +1059,98 @@ void CGraphic::InitBlurParameter()
  * Address:	TODO
  * Size:	TODO
  */
-void CGraphic::RenderBlur(int, unsigned char, unsigned char, unsigned char, unsigned char, short)
+void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2, unsigned char textureDelay,
+                          unsigned char alpha, short offset)
 {
-	// TODO
+    _GXTexObj texObj;
+    _GXColor blurColor;
+    Vec quadMin;
+    Vec quadMax;
+    Mtx identity;
+
+    (void)unused0;
+    (void)unused2;
+
+    DAT_8032ec70.DisableIndMtx();
+    DAT_8032ec70.SetOrthoEnv();
+    DAT_8032ec70.SetVtxFmt_POS_CLR_TEX();
+    GXSetZCompLoc(GX_FALSE);
+    GXSetAlphaCompare(GX_ALWAYS, 1, GX_AOP_OR, GX_ALWAYS, 0);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetColorUpdate(GX_TRUE);
+    GXSetAlphaUpdate(GX_FALSE);
+    GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
+
+    blurColor.r = 0x80;
+    blurColor.g = 0x80;
+    blurColor.b = 0x80;
+    blurColor.a = alpha;
+    GXSetChanAmbColor(GX_COLOR0A0, blurColor);
+    GXSetChanMatColor(GX_COLOR0A0, blurColor);
+
+    DAT_8032ec70.SetOrthoEnv();
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    GXSetTevDirect(GX_TEVSTAGE0);
+    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7D);
+    _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(0, 0xF, 0xF,
+                                                                                                           0xF, 8);
+    _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
+    _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(0, 7, 7, 7,
+                                                                                                           5);
+    _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
+    GXSetNumTevStages(1);
+    GXSetNumTexGens(1);
+
+    for (int i = 0; i < static_cast<int>(U8At(this, 0x735E)); i++) {
+        u8* textureBase = reinterpret_cast<u8*>(PtrAt(this, 0x71EC)) + i * 0x46000;
+        GXInitTexObj(&texObj, textureBase, 0x140, 0xE0, GX_TF_I8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+        GXInitTexObjLOD(&texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+        GXLoadTexObj(&texObj, GX_TEXMAP0);
+
+        if (mode == 1) {
+            quadMin.x = 0.0f;
+            quadMin.y = 0.0f;
+            quadMin.z = 0.0f;
+            quadMax.x = 640.0f;
+            quadMax.y = 448.0f;
+            quadMax.z = 0.0f;
+            DAT_8032ec70.RenderQuad(quadMin, quadMax, blurColor, 0, 0);
+        } else if (mode == 0) {
+            float blurOffset = static_cast<float>(offset);
+            quadMin.x = -blurOffset;
+            quadMin.y = -blurOffset;
+            quadMin.z = 0.0f;
+            quadMax.x = 640.0f + blurOffset;
+            quadMax.y = 448.0f + blurOffset;
+            quadMax.z = 0.0f;
+            DAT_8032ec70.RenderQuad(quadMin, quadMax, blurColor, 0, 0);
+        }
+    }
+
+    GXSetZMode(GX_TRUE, GX_ALWAYS, GX_FALSE);
+    PSMTXIdentity(identity);
+    GXLoadPosMtxImm(identity, 0);
+    GXSetCurrentMtx(0);
+    GXSetProjection(reinterpret_cast<f32(*)[4]>(reinterpret_cast<u8*>(this) + 0x73A4), GX_ORTHOGRAPHIC);
+    GXSetAlphaUpdate(GX_TRUE);
+
+    if (U8At(this, 0x735C) < textureDelay) {
+        U8At(this, 0x735C) += 1;
+    } else if (System.m_scenegraphStepMode != 2) {
+        CreateSmallBackTexture(PtrAt(this, 0x71EC), &texObj, 0x140, 0xE0, GX_NEAR, GX_TF_I8,
+                               static_cast<unsigned long>(U8At(this, 0x735D)) * 0x46000);
+        U8At(this, 0x735C) = 0;
+        U8At(this, 0x735E) += 1;
+        if (U8At(this, 0x735E) > 2) {
+            U8At(this, 0x735E) = 2;
+        }
+        U8At(this, 0x735D) += 1;
+        if (U8At(this, 0x735D) > 1) {
+            U8At(this, 0x735D) = 0;
+        }
+    }
 }
 
 /*

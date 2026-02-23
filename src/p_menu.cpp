@@ -10,6 +10,7 @@
 
 extern CTextureMan TextureMan;
 extern CMath Math;
+extern CMenuPcs MenuPcs;
 
 struct Vec4d
 {
@@ -19,6 +20,81 @@ struct Vec4d
     float w;
 };
 extern unsigned char lbl_8020ee40[];
+extern u8 ARRAY_802ea1a0[];
+extern u32 PTR_PTR_s_CMenuPcs_8020f2d0;
+extern u32 DAT_8020edf8;
+extern u32 DAT_8020edfc;
+extern u32 PTR_create__8CMenuPcsFv_8020ee00;
+extern u32 DAT_8020ee04;
+extern u32 DAT_8020ee08;
+extern u32 PTR_destroy__8CMenuPcsFv_8020ee0c;
+extern u32 DAT_8020ee10;
+extern u32 DAT_8020ee14;
+extern u32 PTR_calc__8CMenuPcsFv_8020ee18;
+extern u32 DAT_8020ee1c;
+extern u32 DAT_8020ee20;
+extern u32 PTR_draw__8CMenuPcsFv_8020ee24;
+extern u32 DAT_8020ee28;
+extern u32 DAT_8020ee2c;
+extern u32 PTR_loadTextureAsync__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii_8020ee30;
+extern u32 DAT_8020ee34;
+extern u32 DAT_8020ee38;
+extern u32 PTR_drawSingleMenu__8CMenuPcsFv_8020ee3c;
+extern u32 DAT_8020ee44;
+extern u32 DAT_8020ee48;
+extern u32 DAT_8020ee4c;
+extern u32 DAT_8020ee50;
+extern u32 DAT_8020ee54;
+extern u32 DAT_8020ee58;
+extern u32 DAT_8020ee5c;
+extern u32 DAT_8020ee60;
+extern u32 DAT_8020ee64;
+extern u32 DAT_8020ee70;
+extern u32 DAT_8020ee74;
+extern u32 DAT_8020ee78;
+extern u32 DAT_8020ee84;
+extern u32 DAT_8020ee88;
+extern u32 DAT_8020ee8c;
+extern u32 DAT_8020ee98;
+extern u32 DAT_8020ee9c;
+extern u32 DAT_8020eea0;
+
+extern "C" void* __register_global_object(void* object, void* destructor, void* registration);
+extern "C" void __dt__8CMenuPcsFv(void*);
+
+/*
+ * --INFO--
+ * PAL Address: 0x80097618
+ * PAL Size: 328b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_p_menu_cpp()
+{
+    *(u32*)((u8*)&MenuPcs) = (u32)&PTR_PTR_s_CMenuPcs_8020f2d0;
+    __register_global_object(&MenuPcs, reinterpret_cast<void*>(__dt__8CMenuPcsFv), ARRAY_802ea1a0);
+
+    DAT_8020ee44 = DAT_8020edf8;
+    DAT_8020ee48 = DAT_8020edfc;
+    DAT_8020ee4c = PTR_create__8CMenuPcsFv_8020ee00;
+    DAT_8020ee50 = DAT_8020ee04;
+    DAT_8020ee54 = DAT_8020ee08;
+    DAT_8020ee58 = PTR_destroy__8CMenuPcsFv_8020ee0c;
+    DAT_8020ee5c = DAT_8020ee10;
+    DAT_8020ee60 = DAT_8020ee14;
+    DAT_8020ee64 = PTR_calc__8CMenuPcsFv_8020ee18;
+    DAT_8020ee70 = DAT_8020ee1c;
+    DAT_8020ee74 = DAT_8020ee20;
+    DAT_8020ee78 = PTR_draw__8CMenuPcsFv_8020ee24;
+    DAT_8020ee84 = DAT_8020ee28;
+    DAT_8020ee88 = DAT_8020ee2c;
+    DAT_8020ee8c = PTR_loadTextureAsync__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii_8020ee30;
+    DAT_8020ee98 = DAT_8020ee34;
+    DAT_8020ee9c = DAT_8020ee38;
+    DAT_8020eea0 = PTR_drawSingleMenu__8CMenuPcsFv_8020ee3c;
+}
 
 /*
  * --INFO--

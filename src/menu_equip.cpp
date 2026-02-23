@@ -938,12 +938,13 @@ int CMenuPcs::EquipClose0()
 	int remaining;
 	s16* item;
 	int itemCount;
+	int selectedOffset;
 
 	*(s16*)(*(int*)((char*)this + 0x82c) + 0x22) = *(s16*)(*(int*)((char*)this + 0x82c) + 0x22) + 1;
 	timer = (int)*(s16*)(*(int*)((char*)this + 0x82c) + 0x22);
+	selectedOffset = *(s16*)(*(int*)((char*)this + 0x82c) + 0x26) * 0x40 + 8;
 	if (7 < timer) {
-		*(s16*)(*(int*)((char*)this + 0x850) + *(s16*)(*(int*)((char*)this + 0x82c) + 0x26) * 0x40 + 8) =
-		    *(s16*)(*(int*)((char*)this + 0x850) + *(s16*)(*(int*)((char*)this + 0x82c) + 0x26) * 0x40 + 8) + 0x13;
+		*(s16*)(*(int*)((char*)this + 0x850) + selectedOffset) = *(s16*)(*(int*)((char*)this + 0x850) + selectedOffset) + 0x13;
 	}
 
 	item = *(s16**)((char*)this + 0x850);
@@ -991,7 +992,7 @@ int CMenuPcs::EquipClose0()
 	}
 
 	if (itemCount == doneCount) {
-		selected = (s16*)(*(int*)((char*)this + 0x850) + *(s16*)(*(int*)((char*)this + 0x82c) + 0x26) * 0x40 + 8);
+		selected = (s16*)(*(int*)((char*)this + 0x850) + selectedOffset);
 		*selected = (s16)(int)-(((double)(((unsigned int)(short)selected[2] ^ 0x80000000U) | 0x4330000000000000ULL) - DOUBLE_80332ed8) *
 		                        DOUBLE_80332ed0 -
 		                        DOUBLE_80332ec8);

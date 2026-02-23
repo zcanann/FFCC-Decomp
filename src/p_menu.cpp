@@ -8,6 +8,7 @@
 #include "ffcc/textureman.h"
 
 #include <dolphin/mtx.h>
+#include <math.h>
 
 extern CTextureMan TextureMan;
 extern CMath Math;
@@ -22,6 +23,7 @@ struct Vec4d
 };
 extern unsigned char lbl_8020ee40[];
 extern u8 ARRAY_802ea1a0[];
+extern unsigned char CFlat[];
 extern u32 PTR_PTR_s_CMenuPcs_8020f2d0;
 extern u32 DAT_8020edf8;
 extern u32 DAT_8020edfc;
@@ -66,7 +68,11 @@ extern "C" void Calc__5CMenuFv(CMenu*);
 extern "C" void CalcDiaryMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void calcBonus__8CMenuPcsFv(CMenuPcs*);
 extern "C" void calcVillageMenu__8CMenuPcsFv(CMenuPcs*);
+extern "C" void drawVillageMenu__8CMenuPcsFv(CMenuPcs*);
+extern "C" void drawBonus__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
+extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
+extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 
 static inline void ReleaseRefObject(void* object)
 {
@@ -309,12 +315,86 @@ void CMenuPcs::calc()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009631c
+ * PAL Size: 972b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::draw()
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+    Mtx identity;
+    Mtx44 ortho;
+
+    PSMTXIdentity(identity);
+    GXLoadPosMtxImm(identity, GX_PNMTX0);
+    C_MTXOrtho(ortho, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, 1.0f);
+    GXSetProjection(ortho, GX_ORTHOGRAPHIC);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetChanCtrl(GX_COLOR1A1, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    const CColor white(0xFF, 0xFF, 0xFF, 0xFF);
+    GXSetChanAmbColor(GX_COLOR0A0, white.color);
+    GXSetZCompLoc(GX_FALSE);
+    GXSetCurrentMtx(GX_PNMTX0);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
+    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetNumTexGens(1);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+    GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetChanCtrl(GX_COLOR1A1, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+
+    int mode = *reinterpret_cast<int*>(self + 0x740);
+    if (mode == 1) {
+        drawWorld();
+    } else if (mode < 1) {
+        if (mode >= 0) {
+            drawBattle();
+            drawVillageMenu__8CMenuPcsFv(this);
+        }
+    } else if (mode < 3) {
+        drawBonus__8CMenuPcsFv(this);
+    }
+
+    if (((*reinterpret_cast<u32*>(CFlat + 0x129C) & 0x10) != 0) && (System.m_scenegraphStepMode == 2)) {
+        CTexture* texture = *reinterpret_cast<CTexture**>(self + 0x190);
+        TextureMan.SetTexture(GX_TEXMAP0, texture);
+
+        Mtx texMtx;
+        const u32 width = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(texture) + 0x64);
+        const u32 height = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(texture) + 0x68);
+        PSMTXScale(texMtx, 1.0f / static_cast<f32>(width), 1.0f / static_cast<f32>(height), 1.0f);
+        GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
+        GXSetNumTexGens(1);
+        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+        TextureMan.SetTextureTev(texture);
+
+        f32 frame = static_cast<f32>(System.m_frameCounter);
+        f32 alphaF = 0.2f * 127.0f * (1.0f + sinf(0.1f * frame));
+        int alpha = static_cast<int>(alphaF);
+        if (alpha < 0) {
+            alpha = 0;
+        } else if (alpha > 255) {
+            alpha = 255;
+        }
+
+        const CColor debugColor(0xFF, 0xFF, 0xFF, static_cast<u8>(alpha));
+        GXSetChanMatColor(GX_COLOR0A0, debugColor.color);
+        DrawRect(3, 0.0f, 0.0f, 640.0f, 480.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+    }
+
+    Mtx44 screenMtx;
+    PSMTX44Copy(*reinterpret_cast<Mtx44*>(reinterpret_cast<u8*>(&CameraPcs) + 0x48), screenMtx);
+    GXSetProjection(screenMtx, GX_PERSPECTIVE);
 }
 
 /*

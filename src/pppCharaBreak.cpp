@@ -225,88 +225,94 @@ extern "C" u32 CharaBreak_BeforeCalcMatrixCallback__FPQ26CChara6CModelPvPv(u32 v
  */
 void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, CChara::CModel* model, CChara::CMesh* mesh)
 {
-    u8* stream = (u8*)displayList;
-    u8* meshData = *(u8**)((u8*)mesh + 8);
+    u16* stream = (u16*)displayList;
     S16Vec* workPositions = *(S16Vec**)mesh;
-    u32 skinCount = *(u32*)(meshData + 0x54);
+    u8* meshData = *(u8**)((u8*)mesh + 8);
+    bool isSkinned = *(u32*)(meshData + 0x54) != 0;
     Mtx meshMtx;
-    bool isSkinned = skinCount != 0;
 
     if (!isSkinned) {
-        u32 nodeIndex = *(u32*)(meshData + 0x58);
-        Mtx* nodeMtx = (Mtx*)((u8*)*(u8**)((u8*)model + 0xA8) + (nodeIndex * 0xC0) + 0xC);
-        PSMTXConcat(*(Mtx*)((u8*)model + 0x38), *nodeMtx, meshMtx);
+        PSMTXConcat(*(Mtx*)((u8*)model + 0x38),
+                    *(Mtx*)((u8*)*(u8**)((u8*)model + 0xA8) + (*(u32*)(meshData + 0x58) * 0xC0) + 0xC), meshMtx);
     }
 
-    for (;;) {
-        u8 drawCmd = *stream++;
-        u16 drawCount = *(u16*)stream;
-        stream += 2;
+    bool hasCommand = true;
+    while (hasCommand) {
+        u8 drawCmd = *(u8*)stream;
+        u16 drawCount = *(u16*)((u8*)stream + 1);
+        stream = (u16*)((u8*)stream + 3);
+
         u8 primitive = drawCmd & 0xF8;
-
         if (IsHasDrawFmtDL__5CUtilFUc((void*)DAT_8032ec70, drawCmd) == 0) {
-            break;
-        }
+            hasCommand = false;
+        } else {
+            s16 triCount = drawCount - 2;
+            bool building = true;
+            int outVertex = 0;
+            u16* stripRestart = 0;
 
-        int triCount = drawCount - 2;
-        if (primitive == 0x90) {
-            triCount = drawCount / 3;
-        }
-
-        int outVertex = 0;
-        u8* stripRestart = 0;
-        while (triCount > 0) {
-            u16 posIndex = *(u16*)(stream + 0);
-            u16 nrmIndex = *(u16*)(stream + 2);
-            u16 texIndex = *(u16*)(stream + 6);
-            u8* prevStream = stream;
-            stream += ((drawCmd & 7) == 2) ? 10 : 8;
-
-            S16Vec* outPos = (S16Vec*)((u8*)polygonData + 0x10 + (outVertex * 6));
-            if (isSkinned) {
-                *outPos = workPositions[posIndex];
-            } else {
-                Vec worldPos;
-                S16Vec sourcePos;
-                sourcePos = workPositions[posIndex];
-                ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)DAT_8032ec70, &worldPos, &sourcePos,
-                                                    *(u32*)(*(u8**)((u8*)model + 0xA4) + 0x34));
-                PSMTXMultVec(meshMtx, &worldPos, &worldPos);
-                ConvF2IVector__5CUtilFR6S16Vec3Vecl((void*)DAT_8032ec70, outPos, &worldPos,
-                                                    *(u32*)(*(u8**)((u8*)model + 0xA4) + 0x34));
-            }
-
-            polygonData->m_posIndices[outVertex] = posIndex;
-            polygonData->m_nrmIndices[outVertex] = nrmIndex;
-            polygonData->m_texIndices[outVertex] = texIndex;
-
-            outVertex++;
             if (primitive == 0x90) {
-                if (outVertex == 3) {
-                    outVertex = 0;
-                    triCount--;
-                    polygonData++;
-                }
-                continue;
+                triCount = (s16)(((u64)((s64)(int)drawCount * 0x55555556LL)) >> 32);
             }
 
-            if (primitive == 0x98) {
-                if (outVertex == 1) {
-                    stripRestart = prevStream;
-                    continue;
+            while (building) {
+                u16* previousRestart = stripRestart;
+                u16 posIndex = stream[0];
+                u16 nrmIndex = stream[1];
+                u16 texIndex = stream[3];
+                u16* nextStream = stream + 4;
+
+                if ((drawCmd & 7) == 2) {
+                    nextStream = stream + 5;
                 }
-                if (outVertex == 3) {
-                    outVertex = 0;
-                    triCount--;
-                    if ((triCount & 1) == 0 && stripRestart != NULL) {
-                        stream = stripRestart;
+                stream = nextStream;
+
+                if (isSkinned) {
+                    *(S16Vec*)((u8*)polygonData + (outVertex * 6) + 0x10) = workPositions[posIndex];
+                } else {
+                    S16Vec sourcePos;
+                    Vec worldPos;
+
+                    sourcePos = workPositions[posIndex];
+                    ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)DAT_8032ec70, &worldPos, &sourcePos,
+                                                        *(u32*)(*(u8**)((u8*)model + 0xA4) + 0x34));
+                    PSMTXMultVec(meshMtx, &worldPos, &worldPos);
+                    ConvF2IVector__5CUtilFR6S16Vec3Vecl((void*)DAT_8032ec70,
+                                                        (S16Vec*)((u8*)polygonData + (outVertex * 6) + 0x10), &worldPos,
+                                                        *(u32*)(*(u8**)((u8*)model + 0xA4) + 0x34));
+                }
+
+                polygonData->m_posIndices[outVertex] = posIndex;
+                polygonData->m_texIndices[outVertex] = texIndex;
+                polygonData->m_nrmIndices[outVertex] = nrmIndex;
+                outVertex++;
+                stripRestart = previousRestart;
+
+                if (primitive == 0x90) {
+                    if (outVertex == 3) {
+                        triCount--;
+                        if (triCount < 1) {
+                            building = false;
+                        }
+                        outVertex = 0;
+                        polygonData++;
                     }
-                    polygonData++;
+                } else if (primitive == 0x98) {
+                    if (outVertex == 1) {
+                        stripRestart = stream;
+                    } else if (outVertex == 3) {
+                        triCount--;
+                        if (triCount < 1) {
+                            building = false;
+                        }
+                        if ((triCount & 1) == 0) {
+                            stream = previousRestart;
+                        }
+                        outVertex = 0;
+                        polygonData++;
+                    }
                 }
-                continue;
             }
-
-            break;
         }
     }
 }

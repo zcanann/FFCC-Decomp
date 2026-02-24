@@ -19,7 +19,7 @@ extern float FLOAT_80330668;
 extern float FLOAT_80330658;
 extern int DAT_8032ed70;
 extern double DOUBLE_80330648;
-extern double RandF__5CMathFf(double, void*);
+extern float RandF__5CMathFf(float, void*);
 extern void pppNormalize__FR3Vec3Vec(float*, Vec*);
 extern void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern float pppVectorLength__F3Vec(Vec*);
@@ -88,7 +88,7 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
     sinValue = (double)ppvSinTbl[(angleIndex & 0xFFFF) >> 2];
     *(float*)(particle + 0x00) = ppvSinTbl[((angleIndex + 0x4000) & 0xFFFF) >> 2] * spread;
     *(float*)(particle + 0x10) = *(float*)(particle + 0x00);
-    *(float*)(particle + 0x04) = (float)RandF__5CMathFf((double)*(float*)(ymData + 0x40), &Math);
+    *(float*)(particle + 0x04) = RandF__5CMathFf(*(float*)(ymData + 0x40), &Math);
     *(float*)(particle + 0x14) = *(float*)(particle + 0x04);
     *(float*)(particle + 0x08) = (float)(sinValue * (double)spread);
     *(float*)(particle + 0x18) = *(float*)(particle + 0x08);

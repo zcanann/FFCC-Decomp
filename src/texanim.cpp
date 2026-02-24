@@ -1052,13 +1052,26 @@ CTexAnim::CRefData::CRefData()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80043dec
+ * PAL Size: 184b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
+#pragma dont_inline on
 CTexAnim::CRefData::~CRefData()
 {
-	// TODO
+    *reinterpret_cast<void**>(this) = &PTR_PTR_s_CTexAnim_CRefData_801e9c3c;
+    ReleaseRef(reinterpret_cast<void**>(Ptr(this, 0x108)));
+
+    CPtrArray<CTexAnimSeq*>* const seqs = reinterpret_cast<CPtrArray<CTexAnimSeq*>*>(Ptr(this, 0x110));
+    seqs->ReleaseAndRemoveAll();
+    seqs->~CPtrArray<CTexAnimSeq*>();
+
+    __dt__4CRefFv(this, 0);
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--

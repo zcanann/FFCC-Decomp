@@ -15,6 +15,8 @@ extern unsigned int lbl_80212348[];
 extern int DAT_800000f8;
 extern char DAT_80331bf0[];
 
+extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
+
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dl__FPv(void*);
 
@@ -528,12 +530,58 @@ void CMiniGamePcs::calc()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801285a0
+ * PAL Size: 592b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMiniGamePcs::PadCodeProc(int, unsigned short)
+void CMiniGamePcs::PadCodeProc(int player, unsigned short padCode)
 {
-	// TODO
+    unsigned short codeType = padCode & 0x7F00;
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+
+    if (codeType == 0x1200)
+    {
+        if (System.m_execParam != 0)
+        {
+            Printf__7CSystemFPce(&System, "--------------------------------\n");
+            Printf__7CSystemFPce(&System, "GBA PADCODE MGR END\n");
+            Printf__7CSystemFPce(&System, "--------------------------------\n");
+        }
+        self[0x6495] = 1;
+    }
+    else if (codeType == 0x1100)
+    {
+        if (System.m_execParam != 0)
+        {
+            Printf__7CSystemFPce(&System, "--------------------------------\n");
+            Printf__7CSystemFPce(&System, "GBA PADCODE RACE END\n");
+            Printf__7CSystemFPce(&System, "--------------------------------\n");
+        }
+        self[0x6496] = 1;
+    }
+    else if (codeType == 0x1000)
+    {
+        if (System.m_execParam != 0)
+        {
+            Printf__7CSystemFPce(&System, "--------------------------------\n");
+            Printf__7CSystemFPce(&System, "GBA PADCODE RACE RESULT play=%d r=%d\n", player, padCode & 0xFF);
+            Printf__7CSystemFPce(&System, "--------------------------------\n");
+        }
+        self[0x6498 + player] = static_cast<unsigned char>(padCode);
+    }
+    else if (codeType == 0x1300)
+    {
+        if (System.m_execParam != 0)
+        {
+            Printf__7CSystemFPce(&System, "--------------------------------\n");
+            Printf__7CSystemFPce(&System, "GBA PADCODE MGR CONTINUE\n");
+            Printf__7CSystemFPce(&System, "--------------------------------\n");
+        }
+        self[0x6497] = 1;
+    }
 }
 
 /*

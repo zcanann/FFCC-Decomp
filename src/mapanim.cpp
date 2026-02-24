@@ -630,25 +630,43 @@ void CMapAnim::Calc(long frame)
  */
 void CMapAnimRun::Calc(long frame)
 {
-    int* run = reinterpret_cast<int*>(this);
-    if (run[0] < 0) {
-        if (run[3] != frame) {
-            return;
-        }
-        run[0] = run[1];
+    struct CMapAnimRunData
+    {
+        int currentFrame;
+        int startFrame;
+        int endFrame;
+        int triggerFrame;
+        unsigned char loop;
+        unsigned char _pad11;
+        unsigned short mapAnimIndex;
+    };
+
+    CMapAnimRunData* run = reinterpret_cast<CMapAnimRunData*>(this);
+
+    if (run->currentFrame < 0) {
+        goto checkStart;
     }
 
-    CMapAnim* mapAnim = __vc__21CPtrArray_P8CMapAnim_FUl(MapMng + 0x213FC, reinterpret_cast<unsigned short*>(this)[9]);
-    mapAnim->Calc(run[0]);
-    run[0] = run[0] + 1;
+runFrame:
+    CMapAnim* mapAnim = __vc__21CPtrArray_P8CMapAnim_FUl(MapMng + 0x213FC, run->mapAnimIndex);
+    mapAnim->Calc(run->currentFrame);
+    run->currentFrame = run->currentFrame + 1;
 
-    if (run[2] < run[0]) {
-        if (reinterpret_cast<unsigned char*>(this)[0x10] != 0) {
-            run[0] = 0;
+    if (run->endFrame < run->currentFrame) {
+        if (run->loop != 0) {
+            run->currentFrame = 0;
         } else {
-            run[0] = -1;
+            run->currentFrame = -1;
         }
     }
+    return;
+
+checkStart:
+    if (run->triggerFrame != frame) {
+        return;
+    }
+    run->currentFrame = run->startFrame;
+    goto runFrame;
 }
 
 /*

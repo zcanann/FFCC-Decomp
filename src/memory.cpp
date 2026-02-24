@@ -73,6 +73,7 @@ extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(in
 extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
+extern "C" void __ct__10CAmemCacheFv(void*, int);
 extern "C" void __dt__10CAmemCacheFv(void*, int);
 
 static int calcCacheChecksum(const unsigned char* data, unsigned int size)
@@ -1454,12 +1455,56 @@ void CAmemCache::SetData(void*, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001D838
+ * PAL Size: 252b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CAmemCacheSet::Init(char*, CMemory::CStage*, CMemory::CStage*, int, unsigned char (*) (unsigned long), unsigned long, unsigned char (*) (unsigned long), unsigned long, unsigned char (*) (unsigned long), unsigned long)
+void CAmemCacheSet::Init(char* sourceName, CMemory::CStage*, CMemory::CStage* stage, int cacheCount,
+                         unsigned char (*releaseCheck)(unsigned long), unsigned long releaseCheckArg,
+                         unsigned char (*releaseAction)(unsigned long), unsigned long releaseActionArg,
+                         unsigned char (*overflowHook)(unsigned long), unsigned long overflowHookArg)
 {
-	// TODO
+    unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
+
+    strcpy(reinterpret_cast<char*>(bytes + 8), sourceName);
+
+    *reinterpret_cast<unsigned long*>(bytes + 0x40) = releaseActionArg;
+    *reinterpret_cast<ConstructorDestructor*>(bytes + 0x44) =
+        reinterpret_cast<ConstructorDestructor>(overflowHook);
+    *reinterpret_cast<unsigned long*>(bytes + 0x48) = releaseCheckArg;
+    *reinterpret_cast<ConstructorDestructor*>(bytes + 0x4C) =
+        reinterpret_cast<ConstructorDestructor>(releaseAction);
+    *reinterpret_cast<unsigned long*>(bytes + 0x50) = overflowHookArg;
+    *reinterpret_cast<CMemory::CStage**>(bytes + 0x00) = stage;
+    *reinterpret_cast<int*>(bytes + 0x24) = cacheCount;
+
+    if (cacheCount == 0) {
+        *reinterpret_cast<ConstructorDestructor*>(bytes + 0x3C) = 0;
+        *reinterpret_cast<unsigned long*>(bytes + 0x30) = 0;
+        *reinterpret_cast<unsigned long*>(bytes + 0x28) = 0;
+        *reinterpret_cast<unsigned long*>(bytes + 0x2C) = 0;
+        *reinterpret_cast<unsigned long*>(bytes + 0x38) = 0;
+        *reinterpret_cast<ConstructorDestructor*>(bytes + 0x58) = 0;
+    } else {
+        *reinterpret_cast<ConstructorDestructor*>(bytes + 0x3C) =
+            reinterpret_cast<ConstructorDestructor>(releaseCheck);
+        unsigned long start = *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned char*>(cacheCount) + 8);
+        *reinterpret_cast<unsigned long*>(bytes + 0x28) = start;
+        *reinterpret_cast<unsigned long*>(bytes + 0x30) = start;
+        *reinterpret_cast<unsigned long*>(bytes + 0x2C) =
+            *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned char*>(cacheCount) + 0x0C);
+        *reinterpret_cast<unsigned long*>(bytes + 0x38) = 0;
+
+        int count = *reinterpret_cast<int*>(bytes + 0x3C);
+        void* block = stage->alloc(count * 0x1C + 0x10, s_memory_cpp, 0x787, 0);
+        void* table = __construct_new_array(
+            block, reinterpret_cast<ConstructorDestructor>(__ct__10CAmemCacheFv),
+            reinterpret_cast<ConstructorDestructor>(__dt__10CAmemCacheFv), 0x1C, count);
+        *reinterpret_cast<void**>(bytes + 0x58) = table;
+    }
 }
 
 /*

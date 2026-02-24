@@ -596,26 +596,25 @@ void CGame::Destroy()
  */
 void CGame::InitNewGame()
 {
-    const char* townName = DAT_8032f6ac;
-
     Printf__7CSystemFPce(&System, DAT_8032f6a0);
     Printf__7CSystemFPce(&System, DAT_801d6214);
     Printf__7CSystemFPce(&System, DAT_8032f6a0);
 
-    memset(&m_gameWork.m_gameDataStartMarker, 0, 0x13E1);
-    memset(m_gameWork.m_wmBackupParams, 0xFF, sizeof(m_gameWork.m_wmBackupParams));
+    memset(reinterpret_cast<u8*>(&Game.game) + 0xF, 0, 0x13E1);
+    memset(reinterpret_cast<u8*>(&Game.game) + 0x20, 0xFF, 0x10);
 
-    m_gameWork.m_scriptSysVal0 = 0;
-    m_gameWork.m_scriptSysVal1 = 0;
-    m_gameWork.m_scriptSysVal2 = 0;
-    m_gameWork.m_scriptSysVal3 = 1;
-    m_gameWork.m_chaliceElement = 1;
+    Game.game.m_gameWork.m_scriptSysVal0 = 0;
+    Game.game.m_gameWork.m_scriptSysVal1 = 0;
+    Game.game.m_gameWork.m_scriptSysVal2 = 0;
+    Game.game.m_gameWork.m_scriptSysVal3 = 1;
+    Game.game.m_gameWork.m_chaliceElement = 1;
 
-    if (m_gameWork.m_languageId == 3) {
-        townName = DAT_8032f6a4;
+    if (Game.game.m_gameWork.m_languageId == 3) {
+        strcpy(Game.game.m_gameWork.m_townName, DAT_8032f6a4);
+    } else {
+        strcpy(Game.game.m_gameWork.m_townName, DAT_8032f6ac);
     }
 
-    strcpy(m_gameWork.m_townName, townName);
     ResetNewGame__13CFlatRuntime2Fv(CFlat);
     InitFurTexBuffer__6CCharaFv(Chara);
 }
@@ -1261,17 +1260,19 @@ void CGame::SaveScript(char* scriptData)
     int scriptOffset = 0;
     int entryOffset = 0;
     int i = 0;
-    int count = *(int*)(CFlat + 4);
-    u8* table = *(u8**)(CFlat + 8);
-    u32* values = *(u32**)(CFlat + 12);
 
-    while (i < count) {
-        if ((table[entryOffset + 1] & 0x20) != 0) {
-            *(u32*)(scriptData + scriptOffset) = values[i];
+    while (true) {
+        if (*(int*)(CFlat + 4) <= i) {
+            break;
+        }
+
+        if ((*(u8*)(*(int*)(CFlat + 8) + entryOffset + 1) & 0x20) != 0) {
+            *(u32*)(scriptData + scriptOffset) = *(u32*)(*(int*)(CFlat + 12) + entryOffset);
             scriptOffset += 4;
         }
+
         entryOffset += 4;
-        ++i;
+        i++;
     }
 }
 

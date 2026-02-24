@@ -168,14 +168,16 @@ static BOOL DBGRead(u32 count, u32* buffer, s32 param3) {
  * JP Size: TODO
  */
 static BOOL DBGWrite(u32 count, u32* buffer, s32 param3) {
+    u32 regs;
     u32 result;
     u32 cmd;
     u32 word;
 
     cmd = ((count & 0x1fffc) << 8) | 0xa0000000;
-    __EXIRegs[10] = (__EXIRegs[10] & 0x405) | 0xc0;
+    regs = __EXIRegs[10];
+    __EXIRegs[10] = (regs & 0x405) | 0xc0;
 
-    result = (u32)__cntlzw(DBGEXIImm((u8*)&cmd, 4, TRUE));
+    result = ((u32)__cntlzw(DBGEXIImm((u8*)&cmd, 4, TRUE))) >> 5;
     while (__EXIRegs[13] & 1)
         ;
 
@@ -191,8 +193,9 @@ static BOOL DBGWrite(u32 count, u32* buffer, s32 param3) {
         }
     }
 
+    regs = __EXIRegs[10];
     result = (u32)__cntlzw(result);
-    __EXIRegs[10] &= 0x405;
+    __EXIRegs[10] = regs & 0x405;
     return result >> 5;
 }
 

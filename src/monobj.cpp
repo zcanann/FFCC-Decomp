@@ -653,12 +653,34 @@ void CGMonObj::aiAddDefault(int&)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801145D0
+ * PAL Size: 172b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::aiSeq(int, int, int, int, int, int)
+int CGMonObj::aiSeq(int seqId, int priority, int currentState, int nextState, int chance, int fallbackState)
 {
-	// TODO
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	int& aiState = *reinterpret_cast<int*>(mon + 0x6C8);
+	int& aiPriority = *reinterpret_cast<int*>(mon + 0x6CC);
+
+	if (aiPriority < priority && currentState == aiState) {
+		if (Math.Rand(100) <= static_cast<unsigned int>(chance)) {
+			if (aiPriority < priority) {
+				aiPriority = priority;
+				*reinterpret_cast<int*>(mon + 0x6D0) = seqId;
+			}
+			aiState = nextState;
+			return 1;
+		}
+		if (fallbackState >= 0) {
+			aiState = fallbackState;
+		}
+	}
+
+	return 0;
 }
 
 /*

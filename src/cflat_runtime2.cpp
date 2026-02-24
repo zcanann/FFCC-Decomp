@@ -1233,12 +1233,44 @@ void CFlatRuntime2::Destroy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006C004
+ * PAL Size: 1464b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFlatRuntime2::Calc()
 {
-	// TODO
+	u8* runtime = reinterpret_cast<u8*>(this);
+
+	for (int i = 0; i < 8; i++) {
+		u8* layer = runtime + 0x1770 + i * 0xC;
+		void* fileHandle = *reinterpret_cast<void**>(layer + 8);
+		if (fileHandle == 0) {
+			continue;
+		}
+
+		if (File.IsCompleted(reinterpret_cast<CFile::CHandle*>(fileHandle))) {
+			CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(layer + 4);
+			if (textureSet != 0) {
+				(*(void (**)(void*, int))(*reinterpret_cast<int*>(textureSet) + 8))(textureSet, 1);
+				*reinterpret_cast<CTextureSet**>(layer + 4) = 0;
+			}
+
+			textureSet = new (Game.game.m_mainStage, "cflat_runtime2.cpp", 0x335) CTextureSet;
+			*reinterpret_cast<CTextureSet**>(layer + 4) = textureSet;
+			if (textureSet != 0) {
+				textureSet->Create(File.m_readBuffer, Game.game.m_mainStage, 0, 0, 0, 0);
+			}
+
+			Close__5CFileFPQ25CFile7CHandle(&File, fileHandle);
+			*reinterpret_cast<void**>(layer + 8) = 0;
+		}
+	}
+
+	*reinterpret_cast<int*>(runtime + 0xCD1C) = 0;
+	memset(runtime + 0x1338, 0, 0x14);
 }
 
 /*

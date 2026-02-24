@@ -1,4 +1,10 @@
 #include "ffcc/charaobj.h"
+#include "ffcc/p_game.h"
+
+extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+	void*, int, int, int, int, void*, void*);
+
+extern unsigned char CFlat[];
 
 /*
  * --INFO--
@@ -508,12 +514,51 @@ void CGCharaObj::combi2()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8010b8b8
+ * PAL Size: 256b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGCharaObj::sendCombiToScript(CGCharaObj*, int, int)
+void CGCharaObj::sendCombiToScript(CGCharaObj* target, int scriptArg, int)
 {
-	// TODO
+	int entry = 0;
+	CGame* linkCursor = &Game.game;
+	int linkCount = *reinterpret_cast<int*>(&Game.game.m_gameWork.m_linkTable[3][0][0]);
+
+	while (entry < linkCount) {
+		int linkHead = *reinterpret_cast<int*>(&linkCursor->m_gameWork.m_linkTable[3][0][0]);
+		CGPrgObj* obj = *reinterpret_cast<CGPrgObj**>(linkHead + 4);
+		bool skip = (obj == 0);
+
+		if (!skip) {
+			if (Game.game.m_gameWork.m_menuStageMode != 0 && Game.game.m_gameWork.m_bossArtifactStageIndex < 0xF &&
+				(obj->GetCID() & 0x6D) == 0x6D &&
+				*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(obj->m_scriptHandle) + 0x3B4) != 0) {
+				skip = true;
+			}
+
+			if (obj->m_lastStateId == 6 || obj->m_lastStateId == 2) {
+				skip = true;
+			}
+		}
+
+		if (!skip) {
+			break;
+		}
+
+		linkCursor = reinterpret_cast<CGame*>(reinterpret_cast<unsigned char*>(linkCursor) + 4);
+		entry++;
+	}
+
+	if (entry == linkCount) {
+		int stackArgs[2];
+		stackArgs[0] = reinterpret_cast<int>(target);
+		stackArgs[1] = scriptArg;
+		SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+			CFlat, reinterpret_cast<int>(this), 2, 0x17, 2, stackArgs, 0);
+	}
 }
 
 /*

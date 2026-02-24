@@ -800,22 +800,63 @@ void CMemory::DestroyStage(CMemory::CStage* stage)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001E7F4
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMemory::_Alloc(unsigned long, CMemory::CStage*, char*, int, int)
+void CMemory::_Alloc(unsigned long size, CMemory::CStage* stage, char* source, int line, int noError)
 {
-	// TODO
+    if (source == (char*)nullptr) {
+        source = DAT_8032f7d4;
+    }
+    stage->alloc(size, source, line, noError);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001E6F0
+ * PAL Size: 260b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMemory::Free(void*)
+void CMemory::Free(void* ptr)
 {
-	// TODO
+    if (ptr != (void*)nullptr) {
+        unsigned char* mem = reinterpret_cast<unsigned char*>(ptr);
+        if ((*reinterpret_cast<short*>(mem - 0x40) != 0x4b41) ||
+            (*reinterpret_cast<short*>(mem - 2) != 0x4d49)) {
+            Printf__7CSystemFPce(&System, DAT_801d6648, ptr, mem - 0x26, *reinterpret_cast<unsigned short*>(mem - 0x28));
+        }
+
+        mem[-0x3e] &= 0xfb;
+
+        int blockPrev = *reinterpret_cast<int*>(mem - 0x38);
+        if ((*(reinterpret_cast<unsigned char*>(blockPrev) + 2) & 4) == 0) {
+            *reinterpret_cast<int*>(mem - 0x30) =
+                *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockPrev) + 0x10) +
+                *reinterpret_cast<int*>(mem - 0x30) + 0x40;
+            *reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockPrev) + 8) + 4) =
+                reinterpret_cast<int>(mem) - 0x40;
+            *reinterpret_cast<int*>(mem - 0x38) =
+                *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockPrev) + 8);
+        }
+
+        int blockNext = *reinterpret_cast<int*>(mem - 0x3c);
+        if ((*(reinterpret_cast<unsigned char*>(blockNext) + 2) & 4) == 0) {
+            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockNext) + 0x10) =
+                *reinterpret_cast<int*>(mem - 0x30) +
+                *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(blockNext) + 0x10) + 0x40;
+            *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x3c) + 8) = *reinterpret_cast<int*>(mem - 0x38);
+            *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x38) + 4) = *reinterpret_cast<int*>(mem - 0x3c);
+        }
+
+        *reinterpret_cast<int*>(*reinterpret_cast<int*>(mem - 0x34) + 0x124) -= 1;
+    }
 }
 
 /*

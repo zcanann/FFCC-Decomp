@@ -9,17 +9,17 @@
 
 extern struct _pppMngSt* pppMngStPtr;
 extern CMath math;
-extern f32 FLOAT_80333428;
-extern f32 FLOAT_80333448;
-extern f32 FLOAT_8033344c;
-extern f32 FLOAT_80333450;
-extern f32 FLOAT_80333454;
-extern f32 FLOAT_80333458;
-extern f32 FLOAT_8033345c;
-extern f32 FLOAT_8033342c;
-extern f32 FLOAT_80333430;
-extern f64 DOUBLE_80333440;
-extern f64 DOUBLE_80333438;
+extern const f32 FLOAT_80333428;
+extern const f32 FLOAT_80333448;
+extern const f32 FLOAT_8033344c;
+extern const f32 FLOAT_80333450;
+extern const f32 FLOAT_80333454;
+extern const f32 FLOAT_80333458;
+extern const f32 FLOAT_8033345c;
+extern const f32 FLOAT_8033342c;
+extern const f32 FLOAT_80333430;
+extern const f64 DOUBLE_80333440;
+extern const f64 DOUBLE_80333438;
 extern s32 DAT_8032ed70;
 extern void* DAT_8032ec70;
 extern u32 CFlatFlags;

@@ -304,12 +304,24 @@ void __MidiCtrl_Stop(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrack
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C7B44
+ * PAL Size: 136b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_Sleep(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_Sleep(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA*)
 {
-	// TODO
+    if ((DAT_8032f424 == 1) && ((void*)control == DAT_8032f3f0)) {
+        int* track = (int*)*(int*)control;
+        do {
+            if (*track != 0) {
+                __MidiCtrl_Stop(control, keyOnData, (RedTrackDATA*)track);
+            }
+            track += 0x55;
+        } while (track < (int*)(*(int*)control + (unsigned int)*(unsigned char*)((char*)control + 0x491) * 0x154));
+    }
 }
 
 /*
@@ -324,42 +336,99 @@ void __MidiCtrl_WholeLoopStart(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C7E40
+ * PAL Size: 148b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_WholeLoopEnd(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_WholeLoopEnd(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA*)
 {
-	// TODO
+    int* controlData = (int*)control;
+
+    controlData[0x11b] |= 2;
+    if ((DAT_8032f424 == 1) && ((void*)control == DAT_8032f3f0)) {
+        int* track = (int*)controlData[0];
+        do {
+            if (*track != 0) {
+                __MidiCtrl_Stop(control, keyOnData, (RedTrackDATA*)track);
+            }
+            track += 0x55;
+        } while (track < (int*)(controlData[0] + (unsigned int)*(unsigned char*)((char*)control + 0x491) * 0x154));
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C7ED4
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_LoopStart(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_LoopStart(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    int* trackData = (int*)track;
+
+    *(short*)(trackData + 0x4f) = *(short*)(trackData + 0x4f) + 1;
+    *(unsigned short*)(trackData + 0x4f) &= 3;
+
+    trackData[*(short*)(trackData + 0x4f) + 2] = trackData[0];
+    *(short*)((char*)trackData + *(short*)(trackData + 0x4f) * 2 + 0x130) = *(short*)(trackData + 0x51);
+    *(short*)((char*)trackData + *(short*)(trackData + 0x4f) * 2 + 0x128) = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C7F2C
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_LoopEnd(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_LoopEnd(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    unsigned char* command;
+    int* trackData = (int*)track;
+    unsigned int loopCount;
+    int loopIndexOffset;
+
+    command = (unsigned char*)trackData[0];
+    trackData[0] = (int)(command + 1);
+    loopCount = command[0];
+    if (loopCount == 0) {
+        loopCount = 0x100;
+    }
+
+    loopIndexOffset = *(short*)(trackData + 0x4f) * 2 + 0x128;
+    *(short*)((char*)trackData + loopIndexOffset) = *(short*)((char*)trackData + loopIndexOffset) + 1;
+    if (*(unsigned short*)((char*)trackData + *(short*)(trackData + 0x4f) * 2 + 0x128) == loopCount) {
+        *(short*)(trackData + 0x4f) = *(short*)(trackData + 0x4f) - 1;
+        *(unsigned short*)(trackData + 0x4f) &= 3;
+    } else {
+        trackData[0] = trackData[*(short*)(trackData + 0x4f) + 2];
+        *(short*)(trackData + 0x51) = *(short*)((char*)trackData + *(short*)(trackData + 0x4f) * 2 + 0x130);
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C7FD0
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_LoopRepeat(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_LoopRepeat(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    int* trackData = (int*)track;
+
+    trackData[0] = trackData[*(short*)(trackData + 0x4f) + 2];
+    *(short*)(trackData + 0x51) = *(short*)((char*)trackData + *(short*)(trackData + 0x4f) * 2 + 0x130);
 }
 
 /*

@@ -166,15 +166,25 @@ void pppConstructYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, Unk
  */
 void pppConstruct2YmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, UnkC* param_2)
 {
-	float fVar1 = FLOAT_803305f4;
-	u32* work = (u32*)((u8*)pppYmDeformationShp_ + 0x80 + param_2->m_serializedDataOffsets[2]);
+	struct WorkState {
+		u32 m_data0;
+		u32 m_data1;
+		u32 m_data2;
+		u16 m_angle;
+		u8 m_direction;
+		u8 m_pad;
+		float m_values[6];
+	};
 
-	((float*)work)[6] = fVar1;
-	((float*)work)[5] = fVar1;
-	((float*)work)[4] = fVar1;
-	((float*)work)[9] = fVar1;
-	((float*)work)[8] = fVar1;
-	((float*)work)[7] = fVar1;
+	float value = FLOAT_803305f4;
+	WorkState* state = (WorkState*)((u8*)pppYmDeformationShp_ + 0x80 + param_2->m_serializedDataOffsets[2]);
+
+	state->m_values[2] = FLOAT_803305f4;
+	state->m_values[1] = value;
+	state->m_values[0] = value;
+	state->m_values[5] = value;
+	state->m_values[4] = value;
+	state->m_values[3] = value;
 }
 
 /*

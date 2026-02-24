@@ -217,36 +217,39 @@ CFunnyShapePcs::~CFunnyShapePcs()
 void CFunnyShapePcs::Init()
 {
     unsigned char* self = Ptr(this, 0);
-    const unsigned int clz0 = static_cast<unsigned int>(__cntlzw(0));
-    const unsigned int clz1 = static_cast<unsigned int>(__cntlzw(1));
+    unsigned int clz0;
+    unsigned int clz1;
+    unsigned int clz2;
     unsigned char level;
-    const f32 value24 = lbl_8032FD24;
-    const f32 value14 = lbl_8032FD14;
+    f32 value24;
+    f32 value14;
 
     self[0x8] = 0x7F;
+    clz0 = static_cast<unsigned int>(__cntlzw(0));
     self[0x9] = 0x7F;
     self[0xA] = 0x7F;
+    clz1 = static_cast<unsigned int>(__cntlzw(1));
     level = static_cast<unsigned char>(-static_cast<int>((clz0 >> 5) & 1)) & 0x3F;
     self[0xB] = 0xFF;
+    value24 = lbl_8032FD24;
     self[0xC] = level;
-    const unsigned int clz2 = static_cast<unsigned int>(__cntlzw(2));
+    value14 = lbl_8032FD14;
+    clz2 = static_cast<unsigned int>(__cntlzw(2));
     self[0xD] = level;
     self[0xE] = level;
+    level = static_cast<unsigned char>(-static_cast<int>((clz1 >> 5) & 1)) & 0x3F;
     self[0xF] = 0xFF;
     *reinterpret_cast<f32*>(self + 0x18) = value24;
     *reinterpret_cast<f32*>(self + 0x1C) = value24;
     *reinterpret_cast<f32*>(self + 0x20) = value14;
-
-    level = static_cast<unsigned char>(-static_cast<int>((clz1 >> 5) & 1)) & 0x3F;
     self[0x10] = level;
     self[0x11] = level;
     self[0x12] = level;
+    level = static_cast<unsigned char>(-static_cast<int>((clz2 >> 5) & 1)) & 0x3F;
     self[0x13] = 0xFF;
     *reinterpret_cast<f32*>(self + 0x24) = value24;
     *reinterpret_cast<f32*>(self + 0x28) = value24;
     *reinterpret_cast<f32*>(self + 0x2C) = value14;
-
-    level = static_cast<unsigned char>(-static_cast<int>((clz2 >> 5) & 1)) & 0x3F;
     self[0x14] = level;
     self[0x15] = level;
     self[0x16] = level;

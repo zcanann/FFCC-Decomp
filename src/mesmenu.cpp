@@ -19,10 +19,18 @@ void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(void* menuPcs, int tex);
 void DrawRect__8CMenuPcsFUlfffffffff(
     void* menuPcs, unsigned long flags, float x, float y, float w, float h, float u, float v, float uvScaleX, float uvScaleY,
     float rot);
+unsigned int GetButtonDown__8CMenuPcsFi(void* menuPcs, int button);
+unsigned int GetButtonRepeat__8CMenuPcsFi(void* menuPcs, int button);
+void Calc__4CMesFv(void* mes);
+void Next__4CMesFv(void* mes);
+int GetWait__4CMesFv(void* mes);
+int useFlag__4CMesFii(void* mes, int flag, int value);
+void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 
 extern unsigned char CFlat[];
 extern unsigned char MenuPcs[];
 extern unsigned char Sound[];
+extern const char DAT_801d9e9c[];
 extern int DAT_8020f998[4];
 extern float FLOAT_803308d8;
 extern float FLOAT_803308dc;
@@ -42,6 +50,7 @@ extern float FLOAT_8033091c;
 extern float FLOAT_80330920;
 extern float FLOAT_80330924;
 extern float FLOAT_80330928;
+extern float FLOAT_80330980;
 }
 
 /*
@@ -128,12 +137,288 @@ void CMesMenu::Destroy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009d69c
+ * PAL Size: 2292b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMesMenu::onCalc()
 {
-	// TODO
+    int menuIndex = *(int*)((char*)this + 0x18);
+    if ((Game.game.m_gameWork.m_menuStageMode != 0) && (menuIndex > 0) && (menuIndex < 4)) {
+        return;
+    }
+
+    unsigned int stageBit = 0;
+    if (menuIndex < 4) {
+        stageBit = *(unsigned int*)(CFlat + 0x12A0) & *(unsigned int*)(CFlat + 0x12A4) & 1;
+    } else {
+        stageBit = *(unsigned int*)(CFlat + 0x12A0) & *(unsigned int*)(CFlat + 0x12A4) & 2;
+    }
+
+    unsigned int currentStageFlag = *(unsigned int*)((char*)this + 0x3DF8);
+    unsigned int desiredStageFlag = (unsigned int)(-(int)stageBit) >> 0x1F;
+    if (currentStageFlag != desiredStageFlag) {
+        Printf__7CSystemFPce(&System, DAT_801d9e9c);
+        *(unsigned int*)((char*)this + 0x3DF8) = ((unsigned int)__cntlzw(currentStageFlag) >> 5) & 0xFF;
+        *(int*)((char*)this + 0x3DF4) = 0x10 - *(int*)((char*)this + 0x3DF4);
+    }
+
+    unsigned int timer = *(int*)((char*)this + 0x3DF4) - 1;
+    *(unsigned int*)((char*)this + 0x3DF4) = timer & ~((int)timer >> 0x1F);
+
+    if ((menuIndex > 3) && (*(int*)((char*)this + 8) == 0)) {
+        return;
+    }
+
+    if (menuIndex < 4) {
+        unsigned int scriptFood = Game.game.m_scriptFoodBase[menuIndex];
+        if (scriptFood != 0) {
+            unsigned int foodCount = (unsigned int)*(unsigned short*)(scriptFood + 0x1C);
+            int targetValue = (int)(foodCount * 6);
+            if (*(int*)((char*)this + 0x3DAC) < targetValue) {
+                *(int*)((char*)this + 0x3DAC) = targetValue;
+            } else if (targetValue < *(int*)((char*)this + 0x3DAC)) {
+                *(unsigned int*)((char*)this + 0x3DAC) = foodCount * 6;
+            }
+
+            int currentValue = *(int*)((char*)this + 0x3DA8);
+            if (currentValue < *(int*)((char*)this + 0x3DAC)) {
+                int idx = currentValue / 0xC + (currentValue >> 0x1F);
+                int slotBase = (int)this + (idx - (idx >> 0x1F)) * 4;
+                if (*(int*)(slotBase + 0x3DB0) == 0) {
+                    *(int*)(slotBase + 0x3DB0) = 0x10;
+                }
+
+                int nextValue = currentValue + 2;
+                int maxValue = *(int*)((char*)this + 0x3DAC);
+                if (nextValue < maxValue) {
+                    maxValue = nextValue;
+                }
+                *(int*)((char*)this + 0x3DA8) = maxValue;
+            } else if (*(int*)((char*)this + 0x3DAC) < currentValue) {
+                *(unsigned int*)((char*)this + 0x3DA8) = (currentValue - 2U) & ~((int)(currentValue - 2U) >> 0x1F);
+
+                int decValue = *(int*)((char*)this + 0x3DA8);
+                int idx = decValue / 0xC + (decValue >> 0x1F);
+                int slotBase = (int)this + (idx - (idx >> 0x1F)) * 4;
+                if (*(int*)(slotBase + 0x3DD0) == 0) {
+                    *(int*)(slotBase + 0x3DD0) = 0x10;
+                }
+                if (*(int*)((char*)this + 0x3DF0) == 0) {
+                    *(int*)((char*)this + 0x3DF0) = 0x10;
+                }
+            }
+
+            int i = 2;
+            int base = (int)this;
+            unsigned int value;
+            do {
+                value = *(int*)(base + 0x3DB0) - 1;
+                *(unsigned int*)(base + 0x3DB0) = value & ~((int)value >> 0x1F);
+
+                value = *(int*)(base + 0x3DD0) - 1;
+                *(unsigned int*)(base + 0x3DD0) = value & ~((int)value >> 0x1F);
+
+                value = *(int*)(base + 0x3DB4) - 1;
+                *(unsigned int*)(base + 0x3DB4) = value & ~((int)value >> 0x1F);
+
+                value = *(int*)(base + 0x3DD4) - 1;
+                *(unsigned int*)(base + 0x3DD4) = value & ~((int)value >> 0x1F);
+
+                value = *(int*)(base + 0x3DB8) - 1;
+                *(unsigned int*)(base + 0x3DB8) = value & ~((int)value >> 0x1F);
+
+                value = *(int*)(base + 0x3DD8) - 1;
+                *(unsigned int*)(base + 0x3DD8) = value & ~((int)value >> 0x1F);
+
+                value = *(int*)(base + 0x3DBC) - 1;
+                *(unsigned int*)(base + 0x3DBC) = value & ~((int)value >> 0x1F);
+
+                value = *(int*)(base + 0x3DDC) - 1;
+                *(unsigned int*)(base + 0x3DDC) = value & ~((int)value >> 0x1F);
+
+                base += 0x10;
+                i--;
+            } while (i != 0);
+
+            value = *(int*)((char*)this + 0x3DF0) - 1;
+            *(unsigned int*)((char*)this + 0x3DF0) = value & ~((int)value >> 0x1F);
+        }
+    }
+
+    if (*(int*)((char*)this + 8) == 0) {
+        return;
+    }
+
+    int state = *(int*)((char*)this + 0xC);
+    if (state < 2) {
+        if (state == 0) {
+            (void)sin(FLOAT_80330980 +
+                      (FLOAT_80330910 * (float)*(int*)((char*)this + 0x10)) / (float)*(int*)((char*)this + 0x14));
+        } else {
+            *(float*)((char*)this + 0x3D84) = FLOAT_80330914;
+            Calc__4CMesFv((char*)this + 0x1C);
+
+            unsigned int downMask = 0;
+            unsigned int repeatMask = 0;
+            int maxButtons = *(int*)((char*)this + 0x10);
+            if (maxButtons > 0) {
+                for (int button = 0; button < 4; button++) {
+                    if ((*(unsigned int*)((char*)this + 0x3D90) & (1U << button)) != 0) {
+                        downMask |= GetButtonDown__8CMenuPcsFi(MenuPcs, button) & 0xFFFF;
+                        repeatMask |= GetButtonRepeat__8CMenuPcsFi(MenuPcs, button) & 0xFFFF;
+                    }
+                }
+            }
+
+            int wait = GetWait__4CMesFv((char*)this + 0x1C);
+            if (wait == 3) {
+                int cursor = *(int*)((char*)this + 0x3D34);
+                int altCursor = *(int*)((char*)this + 0x3D38);
+                if ((repeatMask & 8) != 0) {
+                    cursor--;
+                    if (cursor < 0) {
+                        cursor = *(int*)((char*)this + 0x3D30) - 1;
+                    }
+                    if ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0) {
+                        PlaySe__6CSoundFiiii(Sound, 1, 0x40, 0x7F, 0);
+                    }
+                } else if ((repeatMask & 4) != 0) {
+                    cursor++;
+                    if (*(int*)((char*)this + 0x3D30) <= cursor) {
+                        cursor = 0;
+                    }
+                    if ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0) {
+                        PlaySe__6CSoundFiiii(Sound, 1, 0x40, 0x7F, 0);
+                    }
+                } else if ((downMask & 0x200) != 0) {
+                    if (altCursor < 0) {
+                        if ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0) {
+                            PlaySe__6CSoundFiiii(Sound, 1, 0x40, 0x7F, 0);
+                        }
+                    } else {
+                        cursor = altCursor;
+                        if ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0) {
+                            PlaySe__6CSoundFiiii(Sound, 3, 0x40, 0x7F, 0);
+                        }
+                    }
+                }
+
+                *(int*)((char*)this + 0x3D34) = cursor;
+                if ((altCursor >= 0) && (cursor == altCursor)) {
+                    cursor = -1;
+                }
+                *(int*)((char*)this + 0x3CDC) = cursor;
+            } else {
+                int wait1 = GetWait__4CMesFv((char*)this + 0x1C);
+                if (((wait1 == 1) || (GetWait__4CMesFv((char*)this + 0x1C) == 5)) &&
+                    (*(int*)((char*)this + 0x3CC8) == 0)) {
+                    *(int*)((char*)this + 0x3CC8) = 1;
+                    *(int*)((char*)this + 0x3CD8) = 0;
+                }
+            }
+
+            bool advance = false;
+            if ((downMask & 0x100) == 0) {
+                advance = (*(int*)((char*)this + 0x3CC8) != 0) &&
+                          (*(int*)((char*)this + 0x3CD8) == *(int*)((char*)this + 0x3CD4));
+            } else {
+                int wait2 = GetWait__4CMesFv((char*)this + 0x1C);
+                if (wait2 == 0) {
+                    *(int*)((char*)this + 0x3C9C) = *(int*)((char*)this + 0x3C98) + 1000;
+                    useFlag__4CMesFii((char*)this + 0x1C, *(int*)((char*)this + 0x3C28), 1);
+                } else {
+                    int wait3 = GetWait__4CMesFv((char*)this + 0x1C);
+                    if ((wait3 == 3) && ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0)) {
+                        PlaySe__6CSoundFiiii(Sound, 2, 0x40, 0x7F, 0);
+                    }
+                    int wait4 = GetWait__4CMesFv((char*)this + 0x1C);
+                    if ((wait4 != 1) && (GetWait__4CMesFv((char*)this + 0x1C) != 5) &&
+                        (*(int*)((char*)this + 0x3C90) == 0) && ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0)) {
+                        PlaySe__6CSoundFiiii(Sound, 0xC, 0x40, 0x7F, 0);
+                    }
+                }
+
+                if (*(int*)((char*)this + 0x3CC8) == 0) {
+                    *(int*)((char*)this + 0x3CC8) = 1;
+                    *(int*)((char*)this + 0x3CD8) = 0;
+                }
+                advance = (*(int*)((char*)this + 0x3CC8) != 0) &&
+                          (*(int*)((char*)this + 0x3CD8) == *(int*)((char*)this + 0x3CD4));
+            }
+
+            if (advance) {
+                if (*(int*)((char*)this + 0x3C90) == 0) {
+                    Next__4CMesFv((char*)this + 0x1C);
+                } else {
+                    int wait5 = GetWait__4CMesFv((char*)this + 0x1C);
+                    *(int*)((char*)this + 0x3DA4) = 0;
+                    if ((wait5 != 4) && (*(int*)((char*)this + 0x0C) < 2)) {
+                        if ((*(unsigned int*)((char*)this + 0x3D8C) & 0x40) == 0) {
+                            *(int*)((char*)this + 0x0C) = 2;
+                            *(int*)((char*)this + 0x10) = 0;
+                            *(int*)((char*)this + 0x14) = 4;
+                            if (((*(unsigned int*)((char*)this + 0x3D8C) & 1) == 0) &&
+                                ((*(unsigned int*)((char*)this + 0x3D8C) & 0x4000) == 0)) {
+                                PlaySe__6CSoundFiiii(Sound, 6, 0x40, 0x7F, 0);
+                            }
+                        } else {
+                            int stack[2];
+                            Set__4CMesFPci((char*)this + 0x1C, 0, 0);
+                            stack[0] = *(int*)((char*)this + 0x18);
+                            stack[1] = *(int*)((char*)this + 0x3DA4);
+                            SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+                                CFlat, 0, 1, 3, 2, stack, 0);
+                            *(int*)((char*)this + 0x0C) = 4;
+                            *(int*)((char*)this + 0x08) = 0;
+                            if (*(int*)((char*)this + 0x18) < 4) {
+                                SetFade__9CRingMenuFi(*(void**)((char*)MenuPcs + 0x13C + *(int*)((char*)this + 0x18) * 4), 1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    } else if (state < 4) {
+        if (state == 2) {
+            float step = FLOAT_80330914 - (float)*(int*)((char*)this + 0x10) / (float)*(int*)((char*)this + 0x14);
+            *(float*)((char*)this + 0x3D84) = FLOAT_803308ec * (FLOAT_80330914 + (float)sin(FLOAT_80330910 * step + FLOAT_80330980));
+        }
+    }
+
+    *(int*)((char*)this + 0x10) = *(int*)((char*)this + 0x10) + 1;
+    if (*(int*)((char*)this + 0x14) < *(int*)((char*)this + 0x10)) {
+        int nextState = *(int*)((char*)this + 0x0C);
+        if (nextState == 2) {
+            *(int*)((char*)this + 0x0C) = 3;
+            *(int*)((char*)this + 0x10) = 0;
+            *(int*)((char*)this + 0x14) = 8;
+        } else if (nextState < 2) {
+            if (nextState == 0) {
+                *(int*)((char*)this + 0x0C) = 1;
+                *(int*)((char*)this + 0x10) = 0;
+                *(int*)((char*)this + 0x14) = 0;
+            }
+        } else if (nextState < 4) {
+            int stack[2];
+            *(int*)((char*)this + 0x0C) = 4;
+            *(int*)((char*)this + 0x10) = 0;
+            *(int*)((char*)this + 0x14) = 0;
+            Set__4CMesFPci((char*)this + 0x1C, 0, 0);
+            stack[0] = *(int*)((char*)this + 0x18);
+            stack[1] = *(int*)((char*)this + 0x3DA4);
+            SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+                CFlat, 0, 1, 3, 2, stack, 0);
+            *(int*)((char*)this + 0x0C) = 4;
+            *(int*)((char*)this + 0x08) = 0;
+            if (*(int*)((char*)this + 0x18) < 4) {
+                SetFade__9CRingMenuFi(*(void**)((char*)MenuPcs + 0x13C + *(int*)((char*)this + 0x18) * 4), 1);
+            }
+        }
+    }
 }
 
 /*

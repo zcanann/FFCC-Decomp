@@ -294,6 +294,38 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
     *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 6) += *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 0xe);
     *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 0xe) += *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 6);
 
+    if ((float)object->field0_0x0.m_graphId == *(float*)paramPayload) {
+        *(s16*)work[1].m_emitterMatrix.value[0] += *(s16*)(paramPayload + 0x88);
+        *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 2) += *(s16*)(paramPayload + 0x8a);
+        *(s16*)(work[1].m_emitterMatrix.value[0] + 1) += *(s16*)(paramPayload + 0x8c);
+        *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 6) += *(s16*)(paramPayload + 0x8e);
+
+        *(s16*)work[1].m_emitterMatrix.value[1] += *(s16*)(paramPayload + 0x88);
+        *(s16*)((u8*)work[1].m_emitterMatrix.value[1] + 2) += *(s16*)(paramPayload + 0x8a);
+        *(s16*)(work[1].m_emitterMatrix.value[1] + 1) += *(s16*)(paramPayload + 0x8c);
+        *(s16*)((u8*)work[1].m_emitterMatrix.value[1] + 6) += *(s16*)(paramPayload + 0x8e);
+
+        *(s16*)((u8*)work[1].m_emitterMatrix.value[1] + 2) += *(s16*)(paramPayload + 0x90);
+        *(s16*)((u8*)work[1].m_emitterMatrix.value[1] + 0xa) += *(s16*)(paramPayload + 0x92);
+        *(s16*)(work[1].m_emitterMatrix.value[1] + 3) += *(s16*)(paramPayload + 0x94);
+        *(s16*)((u8*)work[1].m_emitterMatrix.value[1] + 0xe) += *(s16*)(paramPayload + 0x96);
+
+        *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 2) += *(s16*)(paramPayload + 0x84);
+        *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 0xa) += *(s16*)(paramPayload + 0x86);
+        *(s16*)(work[1].m_emitterMatrix.value[0] + 3) += *(s16*)(paramPayload + 0x86);
+        *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 0xe) += *(s16*)(paramPayload + 0x88);
+
+        *(s16*)work[1].m_emitterMatrix.value[2] += *(s16*)(paramPayload + 0x98);
+        *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 2) += *(s16*)(paramPayload + 0x9a);
+        *(s16*)(work[1].m_emitterMatrix.value[2] + 1) += *(s16*)(paramPayload + 0x9c);
+        *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 6) += *(s16*)(paramPayload + 0x9e);
+
+        *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 2) += *(s16*)(paramPayload + 0xa0);
+        *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 0xa) += *(s16*)(paramPayload + 0xa2);
+        *(s16*)(work[1].m_emitterMatrix.value[2] + 3) += *(s16*)(paramPayload + 0xa4);
+        *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 0xe) += *(s16*)(paramPayload + 0xa6);
+    }
+
     switch (*(paramPayload + 0x12)) {
     default:
         PSMTXCopy(pppMngStPtr->m_matrix.value, work->m_emitterMatrix.value);

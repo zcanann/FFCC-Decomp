@@ -432,10 +432,25 @@ int CMenuPcs::MoneyCtrlCur()
 {
 	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.game.m_scriptFoodBase[0]);
 
-	unsigned short press = 0;
-	unsigned short hold = 0;
-	if (Pad._452_4_ == 0 && Pad._448_4_ == -1) {
+	bool blocked = false;
+	unsigned short press;
+	unsigned short hold;
+	if (Pad._452_4_ != 0 || Pad._448_4_ != -1) {
+		blocked = true;
+	}
+	if (blocked) {
+		press = 0;
+	} else {
 		press = Pad._8_2_;
+	}
+
+	blocked = false;
+	if (Pad._452_4_ != 0 || Pad._448_4_ != -1) {
+		blocked = true;
+	}
+	if (blocked) {
+		hold = 0;
+	} else {
 		hold = GetPadHoldMask();
 	}
 

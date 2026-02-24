@@ -1498,9 +1498,9 @@ void CAmemCacheSet::Init(char* sourceName, CMemory::CStage*, CMemory::CStage* st
  * Address:	TODO
  * Size:	TODO
  */
-void CAmemCacheSet::SetRStage(CMemory::CStage*)
+void CAmemCacheSet::SetRStage(CMemory::CStage* stage)
 {
-	// TODO
+    *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(this) + 0x04) = stage;
 }
 
 /*

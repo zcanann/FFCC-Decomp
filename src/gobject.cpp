@@ -7,6 +7,7 @@
 #include "ffcc/quadobj.h"
 
 #include <math.h>
+#include <string.h>
 
 extern CPartMng PartMng;
 extern CMath Math;
@@ -63,12 +64,163 @@ void CGBaseObj::onFrame()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80081ea4
+ * PAL Size: 980b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGObject::onCreate()
 {
-	// TODO
+    m_worldPosition.x = 0.0f;
+    m_worldPosition.y = 0.0f;
+    m_worldPosition.z = 0.0f;
+    m_groundHitOffset.x = 0.0f;
+    m_groundHitOffset.y = 0.0f;
+    m_groundHitOffset.z = 0.0f;
+
+    m_rotBaseX = 0.0f;
+    m_rotBaseY = 0.0f;
+    m_rotBaseZ = 0.0f;
+    m_rotTargetX = 0.0f;
+    m_rotTargetY = 0.0f;
+    m_rotTargetZ = 0.0f;
+
+    m_bodyOffset.x = 0.0f;
+    m_bodyOffset.y = 0.5f;
+    m_bodyOffset.z = 0.0f;
+    m_jumpOffset.x = 0.0f;
+    m_jumpOffset.y = 1.0f;
+    m_jumpOffset.z = 0.0f;
+    m_moveOffset.x = 0.0f;
+    m_moveOffset.y = 1.0f;
+    m_moveOffset.z = 0.0f;
+
+    m_charaModelHandle = 0;
+    m_weaponModelHandle = 0;
+    m_shieldModelHandle = 0;
+
+    m_animStateMisc = 0xFF;
+    *((u8*)&m_weaponNodeFlags + 1) &= 0x7F;
+    *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xBF) | 0x40;
+    *((u8*)&m_weaponNodeFlags + 1) &= 0xDF;
+
+    m_moveBaseSpeed = 10.0f;
+    m_currentAnimSlot = -1;
+    m_animSlotSel = -1;
+
+    m_bodyEllipsoidRadius = 2.0f;
+    m_bodyEllipsoidOffset = 0.0f;
+    m_bodyEllipsoidAspect = 1.0f;
+    m_capsuleHalfHeight = 2.0f;
+
+    m_attackColRadius = 3.0f;
+    m_bodyColRadius = 3.5f;
+    m_nearColRadius = 1.0f;
+    m_bgColMask = 0;
+
+    *((u8*)&m_weaponNodeFlags) = (*((u8*)&m_weaponNodeFlags) & 0xEF) | 0x10;
+    *((u8*)&m_weaponNodeFlags) &= 0xF7;
+    *((u8*)&m_weaponNodeFlags) = (*((u8*)&m_weaponNodeFlags) & 0xFB) | 4;
+    *((u8*)&m_weaponNodeFlags) &= 0xFE;
+    *((u8*)&m_weaponNodeFlags) = (*((u8*)&m_weaponNodeFlags) & 0xDF) | 0x20;
+    *((u8*)&m_weaponNodeFlags) &= 0xBF;
+    *((u8*)&m_weaponNodeFlags) &= 0x7F;
+
+    m_objectFlags = 1;
+    m_displayFlags = 3;
+    m_rotationX = 1.0f;
+    m_rotationY = 1.0f;
+    m_rotationZ = 1.0f;
+    m_attrFlags = 0;
+    m_ownerType = -1;
+    m_classWorkIndex = 0;
+    m_scriptHandle = 0;
+
+    unk_0x184 = 0.0f;
+    unk_0x188 = 0.0f;
+    m_moveVec.x = NAN;
+    m_turnSpeed = 0.0f;
+    m_pushParamA = 0;
+    m_pushParamB = 0;
+
+    *((u8*)&m_shieldNodeFlags) &= 0xBF;
+    *((u8*)&m_shieldNodeFlags) &= 0xDF;
+    *((u8*)&m_shieldNodeFlags) &= 0xEF;
+    *((u8*)&m_shieldNodeFlags) &= 0x7F;
+    *((u8*)&m_shieldNodeFlags) &= 0xF7;
+    *((u8*)&m_shieldNodeFlags) &= 0xFB;
+    *((u8*)&m_shieldNodeFlags) &= 0xFE;
+
+    m_frontHitAngle = 3.1415927f;
+    m_lookAtTarget = 0;
+    m_stepSlopeLimit = 1.0f;
+    m_lookAtTimer = 1.0f;
+    m_animBlend = 1.0f;
+    m_bgAttrValue = 1.0f;
+    m_bounceFactor = 1.0f;
+    m_gravityY = 0.0f;
+    m_jumpLandingDampening = 0.0f;
+
+    m_stateFlags0 &= 0xEF;
+    m_stateFlags0 &= 0xF7;
+    m_stateFlags0 &= 0x7F;
+
+    m_bgCollisionQtrn.x = 0.0f;
+    m_bgCollisionQtrn.y = 0.0f;
+    m_bgCollisionQtrn.z = 0.0f;
+    m_bgCollisionQtrn.w = 1.0f;
+
+    m_dispItemTimer = 0;
+    *reinterpret_cast<float*>(m_lastBgAttr) = 1.0f;
+    m_collisionPushTimerMax = 0x32;
+
+    m_radiusCtrl.x = 0.0f;
+    m_radiusCtrl.y = 0.0f;
+    m_radiusCtrl.z = 1.0f;
+    m_radiusCtrlVel.x = 0.0f;
+    m_radiusCtrlVel.y = m_radiusCtrl.y;
+    m_radiusCtrlVel.z = m_radiusCtrl.z;
+    m_groundFriction = m_radiusCtrlVel.x;
+
+    m_moveAnimState = 0;
+    m_moveAnimSubState = 0;
+    m_randSeedLo = 0;
+    m_randSeedHi = 0;
+    m_ownerSlot = 0;
+    m_moveMode = 0;
+    m_moveModePrevious = 4;
+
+    m_hitNormal.x = -1.0f;
+    m_hitNormal.y = 0.0f;
+    m_hitNormal.z = 0.0f;
+    m_bgDownDist = 9.0f;
+    m_groundSlide = 0.0f;
+    m_worldParam = 0.0f;
+    m_worldParamA = 0.0f;
+    *reinterpret_cast<float*>(m_worldMode) = 0.0f;
+
+    m_lookAtTargetNodeIndex = -1;
+    m_lookAtAccumYaw = 0.0f;
+    m_lookAtAccumPitch = 0.0f;
+    m_weaponAttachNode = -1;
+    m_shieldAttachNodeIndex = -1;
+    m_lastMapIdHit = 0;
+    m_lastMapIdExtra = 0;
+    m_extraMoveVec.x = 0.0f;
+    m_extraMoveVec.y = 0.0f;
+    m_extraMoveVec.z = 0.0f;
+
+    for (int i = 0; i < 4; i++) {
+        m_animQueue[i] = -1;
+    }
+    m_animQueueFlags = 0xFF;
+    m_animQueuePos = 0xFF;
+
+    memset(&m_attackColliders[0].m_localStart.y, 0, 0x180);
+    memset(&m_damageColliders[0].m_localPosition.y, 0, 0x140);
+    memset(m_dropItemCodes, 0, sizeof(m_dropItemCodes));
 }
 
 /*

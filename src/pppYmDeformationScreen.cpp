@@ -73,7 +73,8 @@ extern struct {
 } CameraPcs;
 
 extern "C" {
-void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
+void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
+    void*, int, float*, float*, float*, float, float*, float*);
 void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(void*, Mtx44, Vec4d*, Vec4d*);
 void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
 int GetTexture__8CMapMeshFP12CMaterialSetRi(CMapMesh*, CMaterialSet*, int&);
@@ -172,9 +173,9 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 		direction = (char*)work + 6;
 
 		CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-			step->m_initWOrk, param1, step->m_graphId, work + 2, work + 3, work + 4, &step->m_stepValue, &step->m_arg3);
+			param1, step->m_graphId, work + 2, work + 3, work + 4, step->m_initWOrk, &step->m_stepValue, &step->m_arg3);
 		CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-			step->m_payload0, param1, step->m_graphId, work + 5, work + 6, work + 7, &step->m_payload1, &step->m_payload2);
+			param1, step->m_graphId, work + 5, work + 6, work + 7, step->m_payload0, &step->m_payload1, &step->m_payload2);
 
 		if (DAT_8032ed78 == 0) {
 			if (*direction != 0) {

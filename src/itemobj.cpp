@@ -40,6 +40,9 @@ extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
 extern "C" void addSubStat__8CGPrgObjFv(void*);
 extern "C" void IgnoreParticle__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(void*, int, void*);
 extern "C" int intToClass__13CFlatRuntime2Fi(void*, int);
+extern "C" int IsLoadModelASyncCompleted__Q29CCharaPcs7CHandleFv(void*);
+extern "C" void SetDamageCol__8CGObjectFiPcffP3Vec(void*, int, char*, float, float, Vec*);
+extern "C" void onFrame__8CGPrgObjFv(void*);
 
 extern unsigned char CFlat[];
 extern CMath Math;
@@ -51,9 +54,12 @@ extern float FLOAT_80331b54;
 extern float FLOAT_80331b58;
 extern float FLOAT_80331b8c;
 extern float FLOAT_80331b90;
+extern float FLOAT_80331bb8;
 extern char DAT_80331b7c[];
 extern char DAT_80331b84[];
+extern char DAT_80331bc8[];
 extern char DAT_801dced4[];
+extern char DAT_801dd010[];
 
 /*
  * --INFO--
@@ -186,12 +192,40 @@ void CGItemObj::onCancelStat(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80126d08
+ * PAL Size: 428b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGItemObj::onFrame()
 {
-	// TODO
+	unsigned char* self = (unsigned char*)this;
+	void* pendingHandle = *(void**)(self + 0x564);
+
+	if (pendingHandle != 0 && IsLoadModelASyncCompleted__Q29CCharaPcs7CHandleFv(pendingHandle) != 0) {
+		if ((unsigned int)System.m_execParam > 2U) {
+			Printf__7CSystemFPce(&System, DAT_801dd010);
+		}
+
+		*(void**)(self + 0xF8) = pendingHandle;
+		*(void**)(self + 0x564) = 0;
+
+		if (*(int*)(self + 0x500) == 0xCB) {
+			CVector zero(FLOAT_80331b20, FLOAT_80331b20, FLOAT_80331b20);
+
+			LoadAnim__8CGObjectFPciiiUl(this, 0, 0, 0, 0, 0);
+			SetAnimSlot__8CGObjectFii(this, 0, 0);
+			PlayAnim__8CGObjectFiiiiiPSc(this, 0, 1, 0, -1, -1, 0);
+			SetDamageCol__8CGObjectFiPcffP3Vec(this, 0, DAT_80331bc8, FLOAT_80331bb8, FLOAT_80331bb8,
+			                                   reinterpret_cast<Vec*>(&zero));
+			*(int*)(self + 0x384) = 8;
+			addSubStat__8CGPrgObjFv(this);
+		}
+	}
+
+	onFrame__8CGPrgObjFv(this);
 }
 
 /*

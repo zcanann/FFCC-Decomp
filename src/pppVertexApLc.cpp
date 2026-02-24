@@ -112,25 +112,25 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
             points = src->points;
         }
 
-        s32 count = data->spawnCount;
+        u8 count = data->spawnCount;
 
         switch (data->mode) {
         case 0:
-            do {
-                if (state->index >= (u16)entry->maxValue) {
+            while (count-- != 0) {
+                if ((s16)state->index >= entry->maxValue) {
                     state->index = 0;
                 }
 
-                s32 vertexIndex = entry->vertexIndices[state->index];
+                u16 vertexIndex = entry->vertexIndices[state->index];
                 state->index++;
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;
                 f32 z = vertex->z;
 
-                s32 childId = data->childId;
-                if ((u16)childId != 0xFFFF) {
+                if ((data->childId + 0x10000) != 0xFFFF) {
                     _pppPObject* child;
+                    s32 childId = data->childId;
                     _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (childId << 4));
 
                     if (childData == 0) {
@@ -145,19 +145,19 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
                     dst->y = y;
                     dst->z = z;
                 }
-            } while (count-- != 0);
+            }
             break;
         case 1:
-            do {
-                s32 vertexIndex = entry->vertexIndices[(s32)(RandF__5CMathFv(&math) * (f32)entry->maxValue)];
+            while (count-- != 0) {
+                u16 vertexIndex = entry->vertexIndices[(s32)(RandF__5CMathFv(&math) * (f32)entry->maxValue)];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;
                 f32 z = vertex->z;
 
-                s32 childId = data->childId;
-                if ((u16)childId != 0xFFFF) {
+                if ((data->childId + 0x10000) != 0xFFFF) {
                     _pppPObject* child;
+                    s32 childId = data->childId;
                     _pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (childId << 4));
 
                     if (childData == 0) {
@@ -172,7 +172,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
                     dst->y = y;
                     dst->z = z;
                 }
-            } while (count-- != 0);
+            }
             break;
         }
 

@@ -665,16 +665,14 @@ void* __pool_alloc(__mem_pool* pool, unsigned long size) {
         return 0;
     }
 
-    if (size >= 0xFFFFFFD0UL) {
-        return 0;
+    if (size < 0xFFFFFFD0UL) {
+        pool_obj = (__mem_pool_obj*)pool;
+        if (size <= 68) {
+            return allocate_from_fixed_pools(pool_obj, size);
+        }
+        return allocate_from_var_pools(pool_obj, size);
     }
-
-    pool_obj = (__mem_pool_obj*)pool;
-    if (size <= 68) {
-        return allocate_from_fixed_pools(pool_obj, size);
-    }
-
-    return allocate_from_var_pools(pool_obj, size);
+    return 0;
 }
 
 /*

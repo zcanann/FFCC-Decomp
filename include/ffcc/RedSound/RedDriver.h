@@ -95,7 +95,7 @@ public:
 	int StreamPlayState(int);
 	int GetStreamPlayPoint(int, int*, int*);
 	void StreamStop(int);
-	void StreamPlay(int, void*, int, int, int);
+	int StreamPlay(int, void*, int, int, int);
 	void StreamVolume(int, int, int);
 	void StreamPause(int, int);
 

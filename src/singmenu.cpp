@@ -1,5 +1,8 @@
 #include "ffcc/singmenu.h"
 #include "ffcc/chara.h"
+#include "ffcc/graphic.h"
+#include "ffcc/memory.h"
+#include "ffcc/p_chara.h"
 #include "ffcc/pad.h"
 #include "ffcc/p_game.h"
 #include "ffcc/util.h"
@@ -22,6 +25,15 @@ extern "C" void AddFrame__Q26CChara6CModelFf(float, CChara::CModel*);
 extern "C" void SetMatrix__Q26CChara6CModelFPA4_f(CChara::CModel*, Mtx);
 extern "C" void CalcMatrix__Q26CChara6CModelFv(CChara::CModel*);
 extern "C" void CalcSkin__Q26CChara6CModelFv(CChara::CModel*);
+extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
+extern "C" void DestroyTempBuffer__8CGraphicFv(CGraphic*);
+extern "C" int GetModelNo__8CMenuPcsFiii(CMenuPcs*, int, int, int);
+extern "C" void* __nw__Q29CCharaPcs7CHandleFUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" CCharaPcs::CHandle* __ct__Q29CCharaPcs7CHandleFv(CCharaPcs::CHandle*);
+extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" char* s_stand_80332a24;
+extern "C" char* s_singmenu_cpp_801de8d4;
 
 extern "C" unsigned int CmdOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int CmdCtrl__8CMenuPcsFv(CMenuPcs*);
@@ -71,6 +83,7 @@ extern float FLOAT_80332934;
 extern float FLOAT_80332940;
 extern float FLOAT_80332948;
 extern float FLOAT_8033294c;
+extern float FLOAT_80332950;
 extern float FLOAT_80332970;
 extern float FLOAT_803329a4;
 extern float FLOAT_803329a8;
@@ -85,11 +98,33 @@ extern int DAT_8032eec4;
 extern float DAT_801dd708[];
 extern float DAT_801dd6f8[];
 extern float FLOAT_8032ea78;
+extern float FLOAT_803329d0;
+extern float FLOAT_803329d4;
+extern float FLOAT_803329d8;
+extern float FLOAT_803329dc;
+extern float FLOAT_803329e8;
+extern float FLOAT_803329ec;
+extern float FLOAT_803329f0;
+extern float FLOAT_803329f4;
+extern float FLOAT_803329f8;
+extern float FLOAT_803329fc;
+extern float FLOAT_80332a00;
+extern float FLOAT_80332a04;
+extern float FLOAT_80332a08;
+extern float FLOAT_80332a0c;
+extern float FLOAT_80332a10;
+extern float FLOAT_80332a18;
+extern float FLOAT_80332a1c;
+extern float FLOAT_80332a2c;
+extern float FLOAT_80332a48;
 extern double DOUBLE_80332938;
 extern double DOUBLE_80332968;
 extern double DOUBLE_80332978;
 extern double DOUBLE_80332980;
 extern double DOUBLE_80332988;
+extern double DOUBLE_80332a30;
+extern double DOUBLE_80332a38;
+extern double DOUBLE_80332a40;
 
 /*
  * --INFO--
@@ -113,12 +148,119 @@ void CMenuPcs::destroySingleMenu()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8014a214
+ * PAL Size: 1128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::SingMenuInit()
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+
+    _WaitDrawDone__8CGraphicFPci(&Graphic, s_singmenu_cpp_801de8d4, 0x5C2);
+    DestroyTempBuffer__8CGraphicFv(&Graphic);
+
+    *reinterpret_cast<void**>(self + 0xF4) = *reinterpret_cast<void**>(reinterpret_cast<u8*>(&Graphic) + 8);
+    memset(self + 0x85C, 0, 8);
+    *reinterpret_cast<void**>(self + 0x774) = 0;
+
+    CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
+    if (Game.game.m_gameWork.m_menuStageMode != 0) {
+        stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
+    }
+
+    CCharaPcs::CHandle* handle =
+        static_cast<CCharaPcs::CHandle*>(__nw__Q29CCharaPcs7CHandleFUlPQ27CMemory6CStagePci(
+            0x194, stage, s_singmenu_cpp_801de8d4, 0x5CD));
+    if (handle != 0) {
+        handle = __ct__Q29CCharaPcs7CHandleFv(handle);
+    }
+    *reinterpret_cast<CCharaPcs::CHandle**>(self + 0x774) = handle;
+
+    handle->Add();
+    int modelNo = GetModelNo__8CMenuPcsFiii(
+        this,
+        static_cast<int>(*reinterpret_cast<u16*>(Game.game.m_scriptFoodBase[0] + 0x3E0)),
+        static_cast<int>(*reinterpret_cast<u16*>(Game.game.m_scriptFoodBase[0] + 0x3E4)),
+        static_cast<int>(*reinterpret_cast<u16*>(Game.game.m_scriptFoodBase[0] + 0x3E2)));
+    handle->LoadModel(0, static_cast<unsigned long>(modelNo), 0, 0, -1, 0, 0);
+    handle->m_flags |= 0x300141;
+    handle->LoadAnim(s_stand_80332a24, 0, 1, 0, (handle->m_charaNo / 100) * 100, -1, 0);
+    handle->SetAnim(0, -1, -1, -1, 0);
+
+    stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
+    if (Game.game.m_gameWork.m_menuStageMode != 0) {
+        stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
+    }
+    *reinterpret_cast<void**>(self + 0x814) = __nwa__FUlPQ27CMemory6CStagePci(0x50, stage, s_singmenu_cpp_801de8d4, 0x5DD);
+
+    int state = *reinterpret_cast<int*>(self + 0x814);
+    *reinterpret_cast<float*>(state + 0x24) = FLOAT_8033294c;
+    *reinterpret_cast<float*>(state + 0x20) = FLOAT_8033294c;
+    *reinterpret_cast<float*>(state + 0x1C) = FLOAT_8033294c;
+    *reinterpret_cast<float*>(state + 0x30) = FLOAT_8033294c;
+    *reinterpret_cast<float*>(state + 0x2C) = FLOAT_8033294c;
+    *reinterpret_cast<float*>(state + 0x28) = FLOAT_8033294c;
+    *reinterpret_cast<float*>(state + 0x3C) = FLOAT_80332934;
+    *reinterpret_cast<float*>(state + 0x38) = FLOAT_80332934;
+    *reinterpret_cast<float*>(state + 0x34) = FLOAT_80332934;
+    *reinterpret_cast<int*>(state + 0) = 0;
+    *reinterpret_cast<int*>(state + 4) = 0;
+    *reinterpret_cast<s16*>(state + 8) = 0;
+    *reinterpret_cast<s16*>(state + 10) = 0;
+    *reinterpret_cast<s16*>(state + 12) = 0x280;
+    *reinterpret_cast<s16*>(state + 14) = 0x1C0;
+    *reinterpret_cast<float*>(state + 0x10) = FLOAT_8033294c;
+    *reinterpret_cast<float*>(state + 0x14) = FLOAT_8033294c;
+    *reinterpret_cast<float*>(state + 0x18) = FLOAT_80332a2c;
+    *reinterpret_cast<int*>(state + 0x40) = 0;
+    *reinterpret_cast<int*>(state + 0x44) = 0;
+    *reinterpret_cast<int*>(state + 0x48) = 0x280;
+    *reinterpret_cast<int*>(state + 0x4C) = 0x1C0;
+    *reinterpret_cast<s16*>(state + 8) = static_cast<s16>(static_cast<int>(
+        static_cast<double>(static_cast<float>(DOUBLE_80332a30 + static_cast<double>(FLOAT_803329f4) * DOUBLE_80332968
+                + static_cast<double>(FLOAT_803329d4 + FLOAT_803329ec)) - DOUBLE_80332a38) - DOUBLE_80332a30));
+    *reinterpret_cast<s16*>(state + 10) = static_cast<s16>(static_cast<int>(
+        static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_803329f0) * DOUBLE_80332968
+                + static_cast<double>(FLOAT_803329f0))) - DOUBLE_80332a40));
+    *reinterpret_cast<int*>(state + 0x40) = static_cast<int>(static_cast<double>(FLOAT_80332a48)
+                + static_cast<double>(FLOAT_803329d4 + FLOAT_803329ec));
+    *reinterpret_cast<int*>(state + 0x44) = static_cast<int>(FLOAT_80332950);
+    *reinterpret_cast<int*>(state + 0x48) = 0x48;
+    *reinterpret_cast<int*>(state + 0x4C) = 0x58;
+
+    stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
+    if (Game.game.m_gameWork.m_menuStageMode != 0) {
+        stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
+    }
+    *reinterpret_cast<void**>(self + 0x850) = __nw__FUlPQ27CMemory6CStagePci(0x1008, stage, s_singmenu_cpp_801de8d4, 0x605);
+    memset(*reinterpret_cast<void**>(self + 0x850), 0, 0x1008);
+
+    stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
+    if (Game.game.m_gameWork.m_menuStageMode != 0) {
+        stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
+    }
+    *reinterpret_cast<void**>(self + 0x82C) = __nw__FUlPQ27CMemory6CStagePci(0x48, stage, s_singmenu_cpp_801de8d4, 0x609);
+    memset(*reinterpret_cast<void**>(self + 0x82C), 0, 0x48);
+
+    stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
+    if (Game.game.m_gameWork.m_menuStageMode != 0) {
+        stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
+    }
+    *reinterpret_cast<void**>(self + 0x848) = __nw__FUlPQ27CMemory6CStagePci(0xC, stage, s_singmenu_cpp_801de8d4, 0x60D);
+    memset(*reinterpret_cast<void**>(self + 0x848), 0, 0xC);
+
+    *reinterpret_cast<s16*>(self + 0x866) = 0;
+    if (DAT_8032eec4 >= 0) {
+        *reinterpret_cast<s16*>(self + 0x864) = 8;
+        DAT_8032eec4 = -1;
+    }
+    FLOAT_8032ea78 = FLOAT_803329b8;
+    *reinterpret_cast<int*>(self + 0x874) = -1;
+    *(self + 0x872) = 1;
+    *(self + 0x85A) = 1;
 }
 
 /*

@@ -1276,12 +1276,77 @@ extern "C" CMonWork* dtor_8009E9B4(CMonWork* monWork, short shouldDelete)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009e678
+ * PAL Size: 828b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMonWork::Init(int, CRomWork*, int)
+void CMonWork::Init(int baseDataIndex, CRomWork* romWork, int)
 {
-	// TODO
+	unsigned short* romData = reinterpret_cast<unsigned short*>(romWork);
+	int stageRank;
+	unsigned int memberCount;
+
+	m_baseDataIndex = baseDataIndex;
+	m_id = romData[0];
+	m_param1 = romData[1];
+	m_param2 = romData[2];
+	m_maxHp = romData[3];
+	m_strength = romData[4];
+	m_magic = romData[5];
+	m_defense = romData[6];
+	m_romWorkPtr = romData + 8;
+
+	memcpy(m_elementResistances, m_romWorkPtr + 0x6F, 0x16);
+	memset(m_statusTimers + 3, 0, 0x4E);
+	memset(m_statusValues, 0xFF, sizeof(m_statusValues));
+	m_hp = m_maxHp;
+
+	memcpy(unk_0xac, romData + 0x56, 8);
+	memcpy(unk_0xb4, romData + 0x5A, 0x1C);
+	memset(unk_0xd0, 0, 0x20);
+	memset(unk_0xf0, 0, 0x20);
+
+	if (Game.game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+		stageRank = Game.game.m_gameWork.m_bossArtifactStageTable[Game.game.m_gameWork.m_bossArtifactStageIndex];
+		if (stageRank > 2) {
+			stageRank = 2;
+		}
+	} else {
+		stageRank = 0;
+	}
+
+	if (stageRank > 0) {
+		m_maxHp = (unsigned short)((float)m_maxHp * GetStatusMultiplier(stageRank * 2 + 0x44));
+	}
+
+	memberCount = (unsigned int)(Game.game.m_gameWork.m_wmBackupParams[0] >= 0);
+	if (Game.game.m_gameWork.m_wmBackupParams[1] >= 0) {
+		memberCount++;
+	}
+	if (Game.game.m_gameWork.m_wmBackupParams[2] >= 0) {
+		memberCount++;
+	}
+	if (Game.game.m_gameWork.m_wmBackupParams[3] >= 0) {
+		memberCount++;
+	}
+
+	if (Game.game.m_gameWork.m_menuStageMode != 0) {
+		memberCount = 1;
+	}
+
+	if (memberCount > 1) {
+		m_maxHp = (unsigned short)((float)m_maxHp * GetStatusMultiplier((int)(memberCount * 2 + 0x5E)));
+	}
+
+	if ((Game.game.m_gameWork.m_scriptSysVal0 == 1) && (Game.game.m_gameWork.m_bossArtifactStageIndex < 0xF)) {
+		m_maxHp = (unsigned short)((float)m_maxHp * ((((float)(*(unsigned short*)(Game.game.m_bossArtifactBase +
+			Game.game.m_gameWork.m_bossArtifactStageIndex * 0x168 + 0x60))) * 0.01f) + 1.0f));
+	}
+
+	m_hp = m_maxHp;
 }
 
 /*

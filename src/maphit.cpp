@@ -519,15 +519,20 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80025984
+ * PAL Size: 200b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapHit::CalcHitPosition(Vec* position)
 {
-    float len = PSVECMag(&g_hit_cyl_min.m_direction);
     if (s_hit_edge_index == -1) {
+        float len = PSVECMag(&g_hit_cyl_min.m_direction);
         PSVECScale(&g_hit_cyl_min.m_direction, position, s_hit_t_min - (s_push / len));
     } else {
+        float len = PSVECMag(&g_hit_cyl_min.m_direction);
         PSVECScale(&g_hit_cyl_min.m_direction, position, s_hit_t_min - (s_epsilon / len));
     }
     PSVECAdd(&g_hit_cyl_min.m_bottom, position, position);
@@ -535,8 +540,12 @@ void CMapHit::CalcHitPosition(Vec* position)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80025838
+ * PAL Size: 332b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned long mask)
 {

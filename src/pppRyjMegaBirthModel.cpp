@@ -6,6 +6,7 @@ extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::C
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern "C" float RandF__5CMathFv(CMath*);
 extern "C" void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
+extern s32 DAT_8032ed70;
 extern float FLOAT_80330498;
 extern float FLOAT_803304a4;
 extern float FLOAT_803304c0;
@@ -116,12 +117,64 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80087bac
+ * PAL Size: 316b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void calc_particle(_pppPObject*, VRyjMegaBirthModel*, PRyjMegaBirthModel*, VColor*)
+void calc_particle(_pppPObject* pObject, VRyjMegaBirthModel* work, PRyjMegaBirthModel* params, VColor* color)
 {
-	// TODO
+    s32 i;
+    s32 emitted;
+    s32 maxParticles;
+    u8* payload;
+    _PARTICLE_DATA* particleData;
+    _PARTICLE_WMAT* particleWMat;
+    _PARTICLE_COLOR* particleColor;
+    u16* emitTimer;
+
+    emitted = 0;
+    payload = (u8*)params;
+    particleData = *(_PARTICLE_DATA**)((u8*)work + 0xC);
+    particleWMat = *(_PARTICLE_WMAT**)((u8*)work + 0x10);
+    particleColor = *(_PARTICLE_COLOR**)((u8*)work + 0x14);
+    maxParticles = *(s32*)((u8*)work + 0x18);
+    emitTimer = (u16*)((u8*)work + 0x1C);
+
+    if (DAT_8032ed70 == 0) {
+        *(float*)((u8*)work + 0x20) = *(float*)((u8*)work + 0x2C);
+        *(float*)((u8*)work + 0x24) = *(float*)((u8*)work + 0x30);
+        *(float*)((u8*)work + 0x28) = *(float*)((u8*)work + 0x34);
+        *(float*)((u8*)work + 0x2C) = pObject->m_localMatrix.value[0][3];
+        *(float*)((u8*)work + 0x30) = pObject->m_localMatrix.value[1][3];
+        *(float*)((u8*)work + 0x34) = pObject->m_localMatrix.value[2][3];
+        *emitTimer = *emitTimer + 1;
+
+        for (i = 0; i < maxParticles; i = i + 1) {
+            if (*(s16*)&particleData->m_directionTail.x == 0) {
+                if ((*(u16*)(payload + 0x24) <= *emitTimer) && (emitted < (s32)(u32)*(u16*)(payload + 0x22))) {
+                    birth(pObject, work, params, color, particleData, particleWMat, particleColor);
+                    emitted = emitted + 1;
+                }
+            } else {
+                calc(pObject, work, params, particleData, color, particleColor);
+            }
+
+            if (particleWMat != NULL) {
+                particleWMat = (_PARTICLE_WMAT*)((u8*)particleWMat + 0x30);
+            }
+            if (particleColor != NULL) {
+                particleColor = particleColor + 1;
+            }
+            particleData = (_PARTICLE_DATA*)((u8*)particleData + 0xA0);
+        }
+
+        if (emitted > 0) {
+            *emitTimer = 0;
+        }
+    }
 }
 
 /*

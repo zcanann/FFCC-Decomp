@@ -636,6 +636,7 @@ void _StreamPause(int* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 void _EntryExecCommand(void (*param_1)(int*), int param_2, int param_3, int param_4, int param_5,
                        int param_6, int param_7, int param_8)
 {
@@ -660,6 +661,7 @@ void _EntryExecCommand(void (*param_1)(int*), int param_2, int param_3, int para
     DAT_8032f3d8 = nextPos;
     OSRestoreInterrupts(interruptLevel);
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -1800,7 +1802,8 @@ int CRedDriver::GetStreamPlayPoint(int param_1, int* param_2, int* param_3)
  */
 void CRedDriver::StreamStop(int param_1)
 {
-	_EntryExecCommand(_StreamStop, param_1, 0, 0, 0, 0, 0, 0);
+	int streamID = param_1;
+	_EntryExecCommand(_StreamStop, streamID, 0, 0, 0, 0, 0, 0);
 }
 
 /*
@@ -1812,9 +1815,16 @@ void CRedDriver::StreamStop(int param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5)
+int CRedDriver::StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_5)
 {
-	_EntryExecCommand(_StreamPlay, param_1, (int)param_2, param_3, param_4, param_5, 0, 0);
+	int streamID = param_1;
+	int data = (int)param_2;
+	int arg3 = param_3;
+	int arg4 = param_4;
+	int arg5 = param_5;
+
+	_EntryExecCommand(_StreamPlay, streamID, data, arg3, arg4, arg5, 0, 0);
+	return streamID;
 }
 
 /*

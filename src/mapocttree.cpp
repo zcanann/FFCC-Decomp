@@ -1234,75 +1234,154 @@ void COctTree::ClearShadow()
  */
 void InsertShadow_r(COctNode* node)
 {
+	float boundMinX = *reinterpret_cast<float*>(Ptr(node, 0x0));
+	bool xOverlap = false;
+	bool xyOverlap = false;
 	bool overlap = false;
 
-	if (reinterpret_cast<CBound*>(&s_bound)->CheckCross(*(CBound*)node) != 0) {
-		overlap = true;
+	if (*reinterpret_cast<float*>(Ptr(&s_bound, 0x0)) <= boundMinX) {
+		if (boundMinX <= *reinterpret_cast<float*>(Ptr(&s_bound, 0x0))) {
+			xOverlap = true;
+		} else {
+			xOverlap = boundMinX <= *reinterpret_cast<float*>(Ptr(&s_bound, 0xC));
+		}
+	} else {
+		xOverlap = *reinterpret_cast<float*>(Ptr(&s_bound, 0x0)) <= *reinterpret_cast<float*>(Ptr(node, 0xC));
 	}
 
-	if (overlap != false) {
-		if ((s_insertShadowDepth > 2) && (*(unsigned short*)((unsigned char*)node + 0x3e) != 0)) {
-			unsigned long byteOffset = (s_insertShadowBitIndex >> 3) & 0x1ffffffc;
-			unsigned long* bits = (unsigned long*)((unsigned char*)node + 0x48 + byteOffset);
-			*bits |= 1UL << (s_insertShadowBitIndex & 0x1f);
+	if (xOverlap) {
+		float boundMinY = *reinterpret_cast<float*>(Ptr(node, 0x4));
+		if (*reinterpret_cast<float*>(Ptr(&s_bound, 0x4)) <= boundMinY) {
+			if (boundMinY <= *reinterpret_cast<float*>(Ptr(&s_bound, 0x4))) {
+				xOverlap = true;
+			} else {
+				xOverlap = boundMinY <= *reinterpret_cast<float*>(Ptr(&s_bound, 0x10));
+			}
+		} else {
+			xOverlap = *reinterpret_cast<float*>(Ptr(&s_bound, 0x4)) <= *reinterpret_cast<float*>(Ptr(node, 0x10));
+		}
+		if (xOverlap) {
+			xyOverlap = true;
+		}
+	}
+
+	if (xyOverlap) {
+		float boundMinZ = *reinterpret_cast<float*>(Ptr(node, 0x8));
+		if (*reinterpret_cast<float*>(Ptr(&s_bound, 0x8)) <= boundMinZ) {
+			if (boundMinZ <= *reinterpret_cast<float*>(Ptr(&s_bound, 0x8))) {
+				xyOverlap = true;
+			} else {
+				xyOverlap = boundMinZ <= *reinterpret_cast<float*>(Ptr(&s_bound, 0x14));
+			}
+		} else {
+			xyOverlap = *reinterpret_cast<float*>(Ptr(&s_bound, 0x8)) <= *reinterpret_cast<float*>(Ptr(node, 0x14));
+		}
+		if (xyOverlap) {
+			overlap = true;
+		}
+	}
+
+	if (!overlap) {
+		return;
+	}
+
+	if ((s_insertShadowDepth > 2) && (*reinterpret_cast<unsigned short*>(Ptr(node, 0x3E)) != 0)) {
+		unsigned long byteOffset = (s_insertShadowBitIndex >> 3) & 0x1ffffffc;
+		unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(node, 0x48 + byteOffset));
+		*bits |= 1UL << (s_insertShadowBitIndex & 0x1f);
+	}
+
+	for (int i = 0; i < 8; i++) {
+		COctNode* child = *reinterpret_cast<COctNode**>(Ptr(node, 0x1C));
+		if (child == 0) {
+			return;
 		}
 
-		COctNode** children = (COctNode**)((unsigned char*)node + 0x1c);
-		for (int i = 0; i < 8; i++) {
-			COctNode* child = children[i];
-			if (child == 0) {
-				return;
+		s_insertShadowDepth++;
+
+		float childBoundMinX = *reinterpret_cast<float*>(Ptr(child, 0x0));
+		bool childXOverlap = false;
+		bool childXYOverlap = false;
+		bool childOverlap = false;
+		if (*reinterpret_cast<float*>(Ptr(&s_bound, 0x0)) <= childBoundMinX) {
+			if (childBoundMinX <= *reinterpret_cast<float*>(Ptr(&s_bound, 0x0))) {
+				childXOverlap = true;
+			} else {
+				childXOverlap = childBoundMinX <= *reinterpret_cast<float*>(Ptr(&s_bound, 0xC));
 			}
-
-			s_insertShadowDepth++;
-
-			overlap = false;
-
-			if (reinterpret_cast<CBound*>(&s_bound)->CheckCross(*(CBound*)child) != 0) {
-				overlap = true;
-			}
-
-			if (overlap != false) {
-				if ((s_insertShadowDepth > 2) && (*(unsigned short*)((unsigned char*)child + 0x3e) != 0)) {
-					unsigned long byteOffset = (s_insertShadowBitIndex >> 3) & 0x1ffffffc;
-					unsigned long* bits = (unsigned long*)((unsigned char*)child + 0x48 + byteOffset);
-					*bits |= 1UL << (s_insertShadowBitIndex & 0x1f);
-				}
-
-				COctNode** childChildren = (COctNode**)((unsigned char*)child + 0x1c);
-				for (int j = 0; j < 8; j++) {
-					COctNode* child2 = childChildren[j];
-					if (child2 == 0) {
-						break;
-					}
-
-					s_insertShadowDepth++;
-
-					if (reinterpret_cast<CBound*>(&s_bound)->CheckCross(*(CBound*)child2) != 0) {
-						if ((s_insertShadowDepth > 2) &&
-							(*(unsigned short*)((unsigned char*)child2 + 0x3e) != 0)) {
-							setbit32((unsigned long*)((unsigned char*)child2 + 0x48), s_insertShadowBitIndex);
-						}
-
-						COctNode** child2Children = (COctNode**)((unsigned char*)child2 + 0x1c);
-						for (int k = 0; k < 8; k++) {
-							COctNode* child3 = child2Children[k];
-							if (child3 == 0) {
-								break;
-							}
-
-							s_insertShadowDepth++;
-							InsertShadow_r(child3);
-							s_insertShadowDepth--;
-						}
-					}
-
-					s_insertShadowDepth--;
-				}
-			}
-
-			s_insertShadowDepth--;
+		} else {
+			childXOverlap = *reinterpret_cast<float*>(Ptr(&s_bound, 0x0)) <= *reinterpret_cast<float*>(Ptr(child, 0xC));
 		}
+
+		if (childXOverlap) {
+			float childBoundMinY = *reinterpret_cast<float*>(Ptr(child, 0x4));
+			if (*reinterpret_cast<float*>(Ptr(&s_bound, 0x4)) <= childBoundMinY) {
+				if (childBoundMinY <= *reinterpret_cast<float*>(Ptr(&s_bound, 0x4))) {
+					childXOverlap = true;
+				} else {
+					childXOverlap = childBoundMinY <= *reinterpret_cast<float*>(Ptr(&s_bound, 0x10));
+				}
+			} else {
+				childXOverlap = *reinterpret_cast<float*>(Ptr(&s_bound, 0x4)) <= *reinterpret_cast<float*>(Ptr(child, 0x10));
+			}
+			if (childXOverlap) {
+				childXYOverlap = true;
+			}
+		}
+
+		if (childXYOverlap) {
+			float childBoundMinZ = *reinterpret_cast<float*>(Ptr(child, 0x8));
+			if (*reinterpret_cast<float*>(Ptr(&s_bound, 0x8)) <= childBoundMinZ) {
+				if (childBoundMinZ <= *reinterpret_cast<float*>(Ptr(&s_bound, 0x8))) {
+					childXYOverlap = true;
+				} else {
+					childXYOverlap = childBoundMinZ <= *reinterpret_cast<float*>(Ptr(&s_bound, 0x14));
+				}
+			} else {
+				childXYOverlap = *reinterpret_cast<float*>(Ptr(&s_bound, 0x8)) <= *reinterpret_cast<float*>(Ptr(child, 0x14));
+			}
+			if (childXYOverlap) {
+				childOverlap = true;
+			}
+		}
+
+		if (childOverlap) {
+			if ((s_insertShadowDepth > 2) && (*reinterpret_cast<unsigned short*>(Ptr(child, 0x3E)) != 0)) {
+				unsigned long byteOffset = (s_insertShadowBitIndex >> 3) & 0x1ffffffc;
+				unsigned long* bits = reinterpret_cast<unsigned long*>(Ptr(child, 0x48 + byteOffset));
+				*bits |= 1UL << (s_insertShadowBitIndex & 0x1f);
+			}
+
+			for (int j = 0; j < 8; j++) {
+				COctNode* grandChild = *reinterpret_cast<COctNode**>(Ptr(child, 0x1C));
+				if (grandChild == 0) {
+					break;
+				}
+
+				s_insertShadowDepth++;
+
+				if ((reinterpret_cast<CBound*>(&s_bound)->CheckCross(*reinterpret_cast<CBound*>(grandChild))) != 0) {
+					if ((s_insertShadowDepth > 2) && (*reinterpret_cast<unsigned short*>(Ptr(grandChild, 0x3E)) != 0)) {
+						setbit32(reinterpret_cast<unsigned long*>(Ptr(grandChild, 0x48)), s_insertShadowBitIndex);
+					}
+
+					for (int k = 0; k < 8; k++) {
+						COctNode* greatGrandChild = *reinterpret_cast<COctNode**>(Ptr(grandChild, 0x1C));
+						if (greatGrandChild == 0) {
+							break;
+						}
+						s_insertShadowDepth++;
+						InsertShadow_r(greatGrandChild);
+						grandChild = reinterpret_cast<COctNode*>(Ptr(grandChild, 4));
+						s_insertShadowDepth--;
+					}
+				}
+				child = reinterpret_cast<COctNode*>(Ptr(child, 4));
+				s_insertShadowDepth--;
+			}
+		}
+		node = reinterpret_cast<COctNode*>(Ptr(node, 4));
+		s_insertShadowDepth--;
 	}
 }
 

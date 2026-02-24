@@ -22,20 +22,20 @@ void _SetReverbData(RedReverbDATA*, int*);
 void _ClearReverb(int);
 int* SetReverb(int, int, int*);
 
-void EntryVoiceSearch(RedTrackDATA*);
+RedVoiceDATA* EntryVoiceSearch(RedTrackDATA*);
 void _VoiceEnvelopeCheck();
 void SetVoiceVolumeMix(RedVoiceDATA*, int, int);
 void _VolumeExecute(RedVoiceDATA*, int);
 void _PitchExecute(RedVoiceDATA*);
 void _WaveSplitSelect(RedWaveDATA*, RedNoteDATA*);
 void _VoiceDataAsign(RedTrackDATA*, RedVoiceDATA*, RedNoteDATA*, int*);
-void _VoiceDataSelect(RedTrackDATA*, RedNoteDATA*, int*);
+RedVoiceDATA* _VoiceDataSelect(RedTrackDATA*, RedNoteDATA*, int*);
 void SetVoiceAccess(RedTrackDATA*, int);
 void SetVoiceSwitch(RedTrackDATA*, int);
 
 void _AdsrStart(RedVoiceDATA*);
 void _AdsrDataCompute(RedVoiceDATA*);
-void _AdsrDataExecute(RedVoiceDATA*);
+u32 _AdsrDataExecute(RedVoiceDATA*);
 void _VoiceDropedCallback(void*);
 void EnvelopeKeyExecute();
 void _KeyOnControl();

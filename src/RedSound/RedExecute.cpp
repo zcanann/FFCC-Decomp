@@ -11,6 +11,13 @@ extern int* DAT_8032f420;
 extern unsigned int DAT_8032ec30;
 extern int DAT_8032f4ac;
 extern u32* DAT_8032f4b0;
+extern void* DAT_8032f3f0;
+extern int DAT_8032f3f8;
+extern void* DAT_8032f3fc;
+extern int DAT_8032f430;
+extern int DAT_8032f434;
+extern int DAT_8032f478;
+extern void* DAT_8032f3f4;
 
 struct RedReverbDATA {
     void (*callback)(void*, void*);
@@ -356,9 +363,60 @@ int* SetReverb(int bank, int kind, int* params)
  * Address:	TODO
  * Size:	TODO
  */
-void EntryVoiceSearch(RedTrackDATA*)
+RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
 {
-	// TODO
+    int* bestVoice = 0;
+    int* voice;
+    int* voiceEnd;
+    int bestEnvelope;
+    int* selectedVoice;
+    int trackAddr = (int)track;
+
+    if ((((u8*)track)[0x26] & 5) == 0) {
+        voice = (int*)DAT_8032f444;
+        if ((((u8*)track)[0x26] & 8) == 0) {
+            voice = (int*)DAT_8032f444 + (s8)*((u8*)DAT_8032f3f4 + 0x490) * 0x30;
+        }
+
+        bestEnvelope = 0x8000;
+        voiceEnd = (int*)DAT_8032f444 + 0xC00;
+        do {
+            if ((((u8*)voice)[0x1A] & 3) == 0) {
+                if (voice[0x2C] < 1) {
+                    if (*voice != 0) {
+                        *voice = 0;
+                    }
+                    break;
+                }
+                if (voice[0x2C] < bestEnvelope) {
+                    bestEnvelope = voice[0x2C];
+                    bestVoice = voice;
+                }
+            }
+            voice += 0x30;
+        } while (voice < voiceEnd);
+
+        selectedVoice = voice;
+        if (voice == voiceEnd) {
+            *(u32*)((u8*)DAT_8032f3f4 + 0x488) |= 2;
+            selectedVoice = bestVoice;
+            if (bestEnvelope == 0x8000) {
+                selectedVoice = 0;
+            }
+        }
+    } else if (((((u8*)track)[0x26] & 1) == 0) &&
+               (((int*)DAT_8032f444)[(s8)((u8*)track)[0x14E] * 0x30] != 0) &&
+               (((int*)DAT_8032f444)[(s8)((u8*)track)[0x14E] * 0x30] != trackAddr)) {
+        selectedVoice = 0;
+    } else {
+        selectedVoice = (int*)DAT_8032f444 + (s8)((u8*)track)[0x14E] * 0x30;
+    }
+
+    if (selectedVoice != 0) {
+        selectedVoice[0x24] &= 0xFFFFFFFD;
+        selectedVoice[0x2C] = 0x8000;
+    }
+    return (RedVoiceDATA*)selectedVoice;
 }
 
 /*
@@ -609,9 +667,43 @@ void _VoiceDataAsign(RedTrackDATA* param_1, RedVoiceDATA* param_2, RedNoteDATA* 
  * Address:	TODO
  * Size:	TODO
  */
-void _VoiceDataSelect(RedTrackDATA*, RedNoteDATA*, int*)
+RedVoiceDATA* _VoiceDataSelect(RedTrackDATA* track, RedNoteDATA* note, int* voiceMask)
 {
-	// TODO
+    int* voiceData = (int*)DAT_8032f444;
+    int* trackData = (int*)track;
+
+    if ((trackData[0x41] & 0x80000U) == 0) {
+        voiceData = (int*)EntryVoiceSearch(track);
+    } else {
+        do {
+            if (*voiceData == (int)track) {
+                break;
+            }
+            voiceData += 0x30;
+        } while (voiceData < (int*)DAT_8032f444 + 0xC00);
+
+        if ((int*)DAT_8032f444 + 0xC00 <= voiceData) {
+            voiceData = (int*)EntryVoiceSearch(track);
+        }
+    }
+
+    if (voiceData != 0) {
+        int wave = (int)((RedWaveDATA*(*)(RedWaveDATA*, RedNoteDATA*))_WaveSplitSelect)((RedWaveDATA*)trackData[7], note);
+        voiceData[1] = wave;
+        _VoiceDataAsign(track, (RedVoiceDATA*)voiceData, note, voiceMask);
+
+        if (((*(u32*)voiceData[1] & 1) != 0) && ((((u8*)trackData)[0x26] & 5) == 0)) {
+            voiceData[0x25] |= 0x40;
+            voiceData = (int*)EntryVoiceSearch(track);
+            if (voiceData != 0) {
+                voiceData[0x25] |= 0x80;
+                voiceData[1] = wave + 0x60;
+                _VoiceDataAsign(track, (RedVoiceDATA*)voiceData, note, voiceMask);
+            }
+        }
+    }
+
+    return (RedVoiceDATA*)voiceData;
 }
 
 /*
@@ -659,9 +751,31 @@ void _AdsrDataCompute(RedVoiceDATA*)
  * Address:	TODO
  * Size:	TODO
  */
-void _AdsrDataExecute(RedVoiceDATA*)
+u32 _AdsrDataExecute(RedVoiceDATA* voice)
 {
-	// TODO
+    int* voiceData = (int*)voice;
+    u32 changed = 0;
+
+    if (voiceData[0x17] < 4) {
+        if (((voiceData[0x24] & 4U) != 0) || (voiceData[0x17] < 3)) {
+            changed = 1;
+            voiceData[0x18] -= 1;
+            voiceData[0x2B] += voiceData[0x19];
+            if ((voiceData[0x18] == 0) && (voiceData[0x17] < 3)) {
+                voiceData[0x17] += 1;
+                _AdsrDataCompute(voice);
+            }
+        }
+    } else {
+        voiceData[0x2B] = 0;
+    }
+
+    if ((voiceData[0x2B] >> 0xC) < 1) {
+        voiceData[0x17] = 4;
+        voiceData[0x2B] = 0;
+    }
+
+    return changed;
 }
 
 /*
@@ -696,7 +810,174 @@ void _VoiceDropedCallback(void* param_1)
  */
 void EnvelopeKeyExecute()
 {
-	// TODO
+    int* voiceData = (int*)DAT_8032f444;
+
+    while (true) {
+        if (voiceData[0x23] == 0) {
+            int voice = voiceData[5];
+            voiceData[0x2C] = 0;
+            voiceData[1] = 0;
+            if (voice != 0) {
+                if (*(s16*)(voice + 0x146) == 0) {
+                    if (*(int*)(voice + 0xC) != 0) {
+                        AXFreeVoice((AXVPB*)voice);
+                    }
+                    voiceData[5] = 0;
+                    *voiceData = 0;
+                } else {
+                    *(u16*)(voice + 0x146) = 0;
+                    *(u16*)(voice + 0x19C) = 0;
+                    *(u32*)(voice + 0x1C) |= 0x204;
+                }
+            }
+        } else {
+            int voice = voiceData[5];
+            u32 voiceFlags = 0;
+            u32 envChanged = 0;
+
+            if ((voiceData[0x24] & 1U) != 0) {
+                if ((voice != 0) && (*(int*)(voice + 0xC) != 0)) {
+                    AXFreeVoice((AXVPB*)voice);
+                    voiceData[5] = 0;
+                }
+
+                if ((((u8*)voiceData)[0x1A] & 3) == 0) {
+                    int prio = ((int)voiceData - (int)DAT_8032f444) / 0xC0 +
+                               (((int)voiceData - (int)DAT_8032f444) >> 0x1F);
+                    prio = (0x40 - (prio - (prio >> 0x1F)) >> 1) - 1;
+                    if (prio < 1) {
+                        prio = 1;
+                    }
+                    voiceData[5] = (int)AXAcquireVoice(prio, _VoiceDropedCallback, 0);
+                } else {
+                    voiceData[5] = (int)AXAcquireVoice(0x1F, _VoiceDropedCallback, 0);
+                }
+            }
+
+            voice = voiceData[5];
+            if (voice == 0) {
+                voiceData[0x24] = 0;
+                voiceData[0x23] = 0;
+                return;
+            }
+
+            if ((voiceData[0x24] & 0x10U) != 0) {
+                int pitch = voiceData[0x27];
+                voiceFlags = 0x80000;
+                *(u16*)(voice + 0x1DE) = (u16)(((u32)pitch >> 0x10) & 3);
+                *(s16*)(voice + 0x1E0) = (s16)pitch;
+            }
+
+            if ((voiceData[0x24] & 8U) != 0) {
+                if ((voiceData[0x25] & 8U) == 0) {
+                    memcpy((void*)(voice + 0x14A), voiceData + 0x1A, 0x24);
+                } else {
+                    memset((void*)(voice + 0x14A), 0, 0x24);
+                }
+
+                *(u16*)(voice + 0x144) = 3;
+                if ((voiceData[0x25] & 0x3000U) != 0) {
+                    if ((voiceData[0x25] & 2U) == 0) {
+                        *(u16*)(voice + 0x144) |= 0x600;
+                    } else {
+                        *(u16*)(voice + 0x144) |= 0x30;
+                    }
+                }
+                voiceFlags |= 0x12;
+            }
+
+            if (((voiceData[0x25] & 8U) == 0) && ((voiceData[0x24] & 0x20U) != 0)) {
+                _AdsrStart((RedVoiceDATA*)voiceData);
+                envChanged = 1;
+            }
+
+            if ((voiceData[0x24] & 1U) == 0) {
+                if ((voiceData[0x24] & 2U) == 0) {
+                    if ((voiceData[0x25] & 8U) == 0) {
+                        if ((voiceData[0x24] & 0x20U) == 0) {
+                            envChanged |= _AdsrDataExecute((RedVoiceDATA*)voiceData);
+                            voiceData[0x2C] = voiceData[0x2B] >> 0xC;
+                        }
+                        voiceData[0x24] &= 0xFFFFFFDF;
+                    }
+                } else {
+                    voiceData[0x24] |= 4;
+                    voiceData[0x17] = 3;
+                    voiceData[0x18] = (u16)((u8*)voiceData)[0x56];
+                    if (voiceData[0x18] == 0) {
+                        voiceData[0x2B] = 0;
+                    } else {
+                        voiceData[0x19] = -voiceData[0x2B];
+                        voiceData[0x19] = voiceData[0x19] / voiceData[0x18];
+                    }
+                    voiceData[0x2C] = voiceData[0x2B] >> 0xC;
+                }
+            } else {
+                int waveData = voiceData[1];
+                int trackData = voiceData[0];
+
+                voiceData[0x24] &= 0xFFFFFFFB;
+                if ((waveData == 0) || (trackData == 0)) {
+                    voiceData[0x23] = 0;
+                } else {
+                    int key = (*(int*)(trackData + 0x11C) + *(int*)(waveData + 4) + 1) * 2;
+                    int keyBase = key - 2;
+
+                    envChanged += 1;
+                    *(u16*)(voice + 0x148) = (u16)((voiceData[0x25] & 1U) != 0);
+                    *(u16*)(voice + 0x140) = 1;
+                    *(u16*)(voice + 0x146) = 1;
+
+                    memcpy((void*)(voice + 0x1B6), (void*)(waveData + 0x22), 0x28);
+                    memcpy((void*)(voice + 0x1EC), (void*)(waveData + 0x4A), 6);
+                    memset((void*)(voice + 0x1E4), 0, 8);
+                    *(u16*)(voice + 0x1A8) = 0;
+                    *(int*)(voice + 0x1B2) = key;
+
+                    if (*(int*)(waveData + 8) < 0) {
+                        *(u16*)(voice + 0x1A6) = 0;
+                        key = keyBase;
+                    } else {
+                        *(u16*)(voice + 0x1A6) = 1;
+                        key = keyBase + *(int*)(waveData + 8);
+                    }
+
+                    *(s16*)(voice + 0x1AA) = (s16)((u32)key >> 0x10);
+                    *(s16*)(voice + 0x1AC) = (s16)key;
+                    *(int*)(voice + 0x1AE) = keyBase + *(int*)(waveData + 0xC);
+
+                    voiceFlags |= 0x16100D;
+                    voiceData[0x24] |= 0x20;
+                    voiceData[0x2C] = 0x8000;
+                    voiceData[0x2B] = 0;
+                }
+            }
+
+            if (voiceData[0x2C] < 1) {
+                voiceData[0x24] &= 0xFFFFFFFB;
+                voiceData[0x23] = 0;
+                voiceFlags |= 0x204;
+                *voiceData = 0;
+                *(u16*)(voice + 0x146) = 0;
+                voiceData[0x2B] = 0;
+                voiceData[0x2C] = 0;
+                *(u16*)(voice + 0x19C) = 0;
+                *(u16*)(voice + 0x19E) = 0;
+            } else if ((envChanged != 0) && ((u32)*(u16*)(voice + 0x19C) != ((voiceData[0x2B] >> 0xC) & 0xFFFFU))) {
+                voiceFlags |= 0x200;
+                *(u16*)(voice + 0x19E) = 0;
+                *(s16*)(voice + 0x19C) = (s16)(voiceData[0x2B] >> 0xC);
+            }
+
+            *(u32*)(voice + 0x1C) |= voiceFlags;
+        }
+
+        voiceData[0x24] &= 0xFFFFFC24;
+        voiceData += 0x30;
+        if ((int*)DAT_8032f444 + 0xC00 <= voiceData) {
+            return;
+        }
+    }
 }
 
 /*
@@ -706,7 +987,141 @@ void EnvelopeKeyExecute()
  */
 void _KeyOnControl()
 {
-	// TODO
+    u32 local_24 = 0;
+    u32 local_28 = 0;
+    int* reserve = (int*)DAT_8032f3fc;
+    u32* voiceData = DAT_8032f444;
+    int (*waveFunc)(int);
+
+    _VoiceEnvelopeCheck();
+
+    if (DAT_8032f3f8 != 0) {
+        do {
+            if ((*reserve != 0) && (*(int*)(*reserve + 0x1C) != 0)) {
+                voiceData = (u32*)_VoiceDataSelect((RedTrackDATA*)*reserve, (RedNoteDATA*)(reserve + 1), (int*)&local_28);
+            }
+            reserve += 2;
+        } while ((voiceData != 0) && (reserve < (int*)DAT_8032f3fc + 0x180));
+    }
+
+    if ((*(s16*)((u8*)DAT_8032f3f0 + 0x48E) != 0) && ((((u32*)DAT_8032f3f0)[0x11B] & 0x10) == 0)) {
+        int* track = *(int**)DAT_8032f3f0;
+        do {
+            if ((*track != 0) && (track[0x2D] != 0)) {
+                waveFunc = (int (*)(int))track[0x2D];
+                track[0x33] = (((track[0x30] >> 0xC) + 1) * waveFunc((u32)track[0x32] >> 0xC)) >> 0x10;
+                track[0x32] += track[0x2E];
+            }
+            track += 0x55;
+        } while (track < (int*)(*(int*)DAT_8032f3f0 + (u32)*((u8*)DAT_8032f3f0 + 0x491) * 0x154));
+    }
+
+    if ((*(s16*)((u8*)DAT_8032f3f0 + 0x922) != 0) && ((((u32*)DAT_8032f3f0)[0x240] & 0x10) == 0)) {
+        int* track = (int*)((u32*)DAT_8032f3f0)[0x125];
+        u32* trackBase = (u32*)DAT_8032f3f0 + 0x125;
+        do {
+            if ((*track != 0) && (track[0x2D] != 0)) {
+                waveFunc = (int (*)(int))track[0x2D];
+                track[0x33] = (((track[0x30] >> 0xC) + 1) * waveFunc((u32)track[0x32] >> 0xC)) >> 0x10;
+                track[0x32] += track[0x2E];
+            }
+            track += 0x55;
+        } while (track < (int*)(*trackBase + (u32)*((u8*)DAT_8032f3f0 + 0x925) * 0x154));
+    }
+
+    {
+        u32* seTrackBase = (u32*)DAT_8032f3f0 + 0x36F;
+        int* track = (int*)((u32*)DAT_8032f3f0)[0x36F];
+        do {
+            if ((*track != 0) && (track[0x2D] != 0)) {
+                waveFunc = (int (*)(int))track[0x2D];
+                track[0x33] = (((track[0x30] >> 0xC) + 1) * waveFunc((u32)track[0x32] >> 0xC)) >> 0x10;
+                track[0x32] += track[0x2E];
+            }
+            track += 0x55;
+        } while (track < (int*)(*seTrackBase + 0x2A80));
+    }
+
+    {
+        u32* voice = DAT_8032f444;
+        do {
+            if ((voice[0x23] != 0) && (*voice != 0) && ((*(u32*)(*voice + 0xFC) & 9) == 0)) {
+                if (((voice[0x2E] & 2) != 0) || (*(int*)(*voice + 0x94) != 0) || (*(int*)(*voice + 0xB4) != 0)) {
+                    int volume;
+                    if ((*voice < *(u32*)DAT_8032f3f0) ||
+                        (*(u32*)DAT_8032f3f0 + (u32)*((u8*)DAT_8032f3f0 + 0x491) * 0x154 <= *voice)) {
+                        volume = DAT_8032f434;
+                        if ((((u32*)DAT_8032f3f0)[0x125] <= *voice) &&
+                            (*voice < ((u32*)DAT_8032f3f0)[0x125] + (u32)*((u8*)DAT_8032f3f0 + 0x925) * 0x154)) {
+                            u32 idx = (u32)*(s8*)(*voice + 0x14E);
+                            int idxSign = (int)*(s8*)(*voice + 0x14E) >> 0x1F;
+
+                            if ((1U << (((idxSign * 0x20 |
+                                          (u32)(*(s8*)(*voice + 0x14E) * 0x8000000 + idxSign) >> 0x1B) -
+                                         idxSign) &
+                                        (&DAT_8032f478)[((int)idx >> 5) + (u32)((int)idx < 0 && (idx & 0x1F) != 0)])) == 0) {
+                                volume = ((*(s8*)((u8*)DAT_8032f3f0 + 0x926) + 1) * (((int*)((u32*)DAT_8032f3f0)[300])[0] >> 0xC)) >> 7;
+                                if (((u32*)DAT_8032f3f0)[0x23C] != 0) {
+                                    volume = (volume * (((int*)((u32*)DAT_8032f3f0)[0x23A])[0] >> 0xC)) >> 9;
+                                }
+                                volume = (volume * DAT_8032f430) >> 9;
+                            } else {
+                                volume = 0;
+                            }
+                        }
+                    } else {
+                        u32 idx = (u32)*(s8*)(*voice + 0x14E);
+                        int idxSign = (int)*(s8*)(*voice + 0x14E) >> 0x1F;
+                        if ((1U << (((idxSign * 0x20 |
+                                      (u32)(*(s8*)(*voice + 0x14E) * 0x8000000 + idxSign) >> 0x1B) -
+                                     idxSign) &
+                                    (&DAT_8032f478)[((int)idx >> 5) + (u32)((int)idx < 0 && (idx & 0x1F) != 0)])) == 0) {
+                            volume = ((*(s8*)((u8*)DAT_8032f3f0 + 0x492) + 1) * (((int*)((u32*)DAT_8032f3f0)[7])[0] >> 0xC)) >> 7;
+                            if (((u32*)DAT_8032f3f0)[0x117] != 0) {
+                                volume = (volume * (((int*)((u32*)DAT_8032f3f0)[0x115])[0] >> 0xC)) >> 9;
+                            }
+                            volume = (volume * DAT_8032f430) >> 9;
+                        } else {
+                            volume = 0;
+                        }
+                    }
+                    _VolumeExecute((RedVoiceDATA*)voice, volume);
+                }
+
+                if (((voice[0x2E] & 1) != 0) || (*(int*)(*voice + 0x74) != 0)) {
+                    _PitchExecute((RedVoiceDATA*)voice);
+                }
+                voice[0x2E] = 0;
+            }
+            voice += 0x30;
+        } while (voice < DAT_8032f444 + 0xC00);
+    }
+
+    {
+        u32 bit = 1;
+        u32* voice = DAT_8032f444;
+        do {
+            if ((local_28 & bit) != 0) {
+                local_28 &= ~bit;
+                voice[0x24] |= 1;
+            }
+            bit <<= 1;
+            voice += 0x30;
+        } while (local_28 != 0);
+    }
+
+    {
+        u32 bit = 1;
+        u32* voice = DAT_8032f444 + 0x600;
+        do {
+            if ((local_24 & bit) != 0) {
+                local_24 &= ~bit;
+                voice[0x24] |= 1;
+            }
+            bit <<= 1;
+            voice += 0x30;
+        } while (local_24 != 0);
+    }
 }
 
 /*
@@ -724,9 +1139,155 @@ void _ExecuteExtraData()
  * Address:	TODO
  * Size:	TODO
  */
-void _MusicTrackDataExecute(RedTrackDATA*, int)
+void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
 {
-	// TODO
+    u32 flags = 0;
+    int* trackData = (int*)track;
+    int* voiceData;
+
+    trackData[0x43] += frames;
+
+    if (trackData[0x0C] != 0) {
+        int step = frames;
+        if (trackData[0x0C] <= frames) {
+            step = trackData[0x0C];
+        }
+        flags = 2;
+        trackData[0x0C] -= step;
+        trackData[0x0A] += trackData[0x0B] * step;
+    }
+
+    if (trackData[0x0F] != 0) {
+        int step = frames;
+        if (trackData[0x0F] <= frames) {
+            step = trackData[0x0F];
+        }
+        flags = 2;
+        trackData[0x0F] -= step;
+        trackData[0x0D] += trackData[0x0E] * step;
+    }
+
+    if (trackData[0x12] != 0) {
+        int step = frames;
+        if (trackData[0x12] <= frames) {
+            step = trackData[0x12];
+        }
+        flags = 2;
+        trackData[0x12] -= step;
+        trackData[0x10] += trackData[0x11] * step;
+    }
+
+    if (trackData[0x1C] != 0) {
+        int step = frames;
+        if (trackData[0x1C] <= frames) {
+            step = trackData[0x1C];
+        }
+        flags = 2;
+        trackData[0x1C] -= step;
+        trackData[0x1A] += trackData[0x1B] * step;
+    }
+
+    if (trackData[0x44] != 0) {
+        int step = frames;
+        int addPitch;
+
+        if (trackData[0x44] <= frames) {
+            step = trackData[0x44];
+        }
+        flags |= 1;
+        trackData[0x44] -= step;
+        addPitch = step * trackData[0x45];
+        trackData[0x48] += addPitch;
+
+        voiceData = (int*)DAT_8032f444;
+        do {
+            if ((*voiceData == (int)track) && ((voiceData[0x28] += addPitch), (voiceData[1] != 0))) {
+                voiceData[0x26] = PitchCompute(voiceData[0x28] + *DAT_8032f420,
+                                               (int)*(s16*)((u8*)track + 0x142) + (int)*(s16*)((u8*)track + 0x13E),
+                                               *(int*)((u8*)voiceData[1] + 0x14), (s8)((u8*)track)[0x148]);
+            }
+            voiceData += 0x30;
+        } while (voiceData < (int*)DAT_8032f444 + 0xC00);
+    }
+
+    if (trackData[0x1D] != 0) {
+        if (*(s16*)((u8*)track + 0x8C) != 0) {
+            int step = frames;
+            if (*(s16*)((u8*)track + 0x8C) <= frames) {
+                step = *(s16*)((u8*)track + 0x8C);
+            }
+            *(s16*)((u8*)track + 0x8C) -= (s16)step;
+            trackData[0x1E] += trackData[0x1F] * step;
+        }
+        if (*(s16*)((u8*)track + 0x8E) != 0) {
+            int step = frames;
+            if (*(s16*)((u8*)track + 0x8E) <= frames) {
+                step = *(s16*)((u8*)track + 0x8E);
+            }
+            *(s16*)((u8*)track + 0x8E) -= (s16)step;
+            trackData[0x20] += trackData[0x21] * step;
+        }
+    }
+
+    if (trackData[0x25] != 0) {
+        if (*(s16*)((u8*)track + 0xAC) != 0) {
+            int step = frames;
+            if (*(s16*)((u8*)track + 0xAC) <= frames) {
+                step = *(s16*)((u8*)track + 0xAC);
+            }
+            *(s16*)((u8*)track + 0xAC) -= (s16)step;
+            trackData[0x26] += trackData[0x27] * step;
+        }
+        if (*(s16*)((u8*)track + 0xAE) != 0) {
+            int step = frames;
+            if (*(s16*)((u8*)track + 0xAE) <= frames) {
+                step = *(s16*)((u8*)track + 0xAE);
+            }
+            *(s16*)((u8*)track + 0xAE) -= (s16)step;
+            trackData[0x28] += trackData[0x29] * step;
+        }
+    }
+
+    voiceData = (int*)DAT_8032f444;
+    if (trackData[0x2D] != 0) {
+        if (*(s16*)((u8*)track + 0xD0) != 0) {
+            int step = frames;
+            if (*(s16*)((u8*)track + 0xD0) <= frames) {
+                step = *(s16*)((u8*)track + 0xD0);
+            }
+            *(s16*)((u8*)track + 0xD0) -= (s16)step;
+            trackData[0x2E] += trackData[0x2F] * step;
+        }
+        if (*(s16*)((u8*)track + 0xD2) != 0) {
+            int step = frames;
+            if (*(s16*)((u8*)track + 0xD2) <= frames) {
+                step = *(s16*)((u8*)track + 0xD2);
+            }
+            *(s16*)((u8*)track + 0xD2) -= (s16)step;
+            trackData[0x30] += trackData[0x31] * step;
+        }
+    }
+
+    do {
+        if (*voiceData == (int)track) {
+            if (*(s16*)(voiceData + 0x0A) != 0) {
+                int step = frames;
+                if (*(s16*)(voiceData + 0x0A) <= frames) {
+                    step = *(s16*)(voiceData + 0x0A);
+                }
+                *(s16*)(voiceData + 0x0A) -= (s16)step;
+            }
+            if (*(s16*)(voiceData + 0x0E) != 0) {
+                int step = frames;
+                if (*(s16*)(voiceData + 0x0E) <= frames) {
+                    step = *(s16*)(voiceData + 0x0E);
+                }
+                *(s16*)(voiceData + 0x0E) -= (s16)step;
+            }
+            voiceData[0x2E] |= flags;
+        }
+        voiceData += 0x30;
+    } while (voiceData < (int*)DAT_8032f444 + 0xC00);
 }
 
 /*

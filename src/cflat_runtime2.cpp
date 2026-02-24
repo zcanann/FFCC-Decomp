@@ -1330,12 +1330,94 @@ void CFlatRuntime2::AddDebugDrawCC(Vec* from, Vec* to, float radius, int bit7, i
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006B1DC
+ * PAL Size: 1196b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::CcClass2D(int, int, Vec*, float, float, int, CGObject **)
+int CFlatRuntime2::CcClass2D(int flags, int classMask, Vec* center, float radius, float angle, int maxCount, CGObject** objects)
 {
-	// TODO
+	if (maxCount <= 0 || objects == 0) {
+		return 0;
+	}
+
+	const float radiusSq = radius * radius;
+	CFlatRuntime::CObject* root =
+		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x1204);
+	CGBaseObj* baseObj = FindNextGBaseObjByCidMask(this, root->m_next->m_next, 5);
+	int count = 0;
+
+	while (baseObj != 0) {
+		CGObject* object = reinterpret_cast<CGObject*>(baseObj);
+		const bool passesClassMask = (object->m_attrFlags & static_cast<unsigned int>(classMask)) != 0;
+		const bool passesScriptFilter =
+			((flags & 1) == 0) ||
+			((object->m_scriptHandle != 0) && (*reinterpret_cast<short*>(reinterpret_cast<u8*>(object->m_scriptHandle) + 0x1C) != 0));
+
+		if (passesClassMask && passesScriptFilter) {
+			if ((object->m_worldPosition.x != center->x) || (object->m_worldPosition.z != center->z)) {
+				if ((center->x - radius <= object->m_worldPosition.x) &&
+				    (center->z - radius <= object->m_worldPosition.z) &&
+				    (object->m_worldPosition.x <= center->x + radius) &&
+				    (object->m_worldPosition.z <= center->z + radius)) {
+					Vec offset;
+					PSVECSubtract(&object->m_worldPosition, center, &offset);
+					offset.y = 0.0f;
+
+					const float distanceSq = PSVECSquareMag(&offset);
+					if ((0.0f < distanceSq) && (distanceSq < radiusSq)) {
+						const float distance = sqrtf(distanceSq);
+						if (distance < radius) {
+							if ((flags & 2) != 0) {
+								Vec facing;
+								PSVECScale(&offset, &offset, 1.0f / distance);
+								facing.x = sin(angle);
+								facing.y = 0.0f;
+								facing.z = cos(angle);
+								if (PSVECDotProduct(&offset, &facing) <= 0.0f) {
+									baseObj = FindNextGBaseObjByCidMask(
+										this, reinterpret_cast<CFlatRuntime::CObject*>(object)->m_next, 5);
+									continue;
+								}
+							}
+
+							if ((flags & 4) != 0) {
+								objects[count] = object;
+								count++;
+								if (count == maxCount) {
+									return count;
+								}
+							} else {
+								int insertIndex = 0;
+								for (; insertIndex < count; insertIndex++) {
+									if (distance < *reinterpret_cast<float*>(&objects[insertIndex]->m_0x44)) {
+										break;
+									}
+								}
+
+								const int endIndex = (count < (maxCount - 1)) ? count : (maxCount - 1);
+								for (int i = endIndex; i > insertIndex; i--) {
+									objects[i] = objects[i - 1];
+								}
+
+								*reinterpret_cast<float*>(&object->m_0x44) = distance;
+								objects[insertIndex] = object;
+								if (count < maxCount) {
+									count++;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		baseObj = FindNextGBaseObjByCidMask(this, reinterpret_cast<CFlatRuntime::CObject*>(object)->m_next, 5);
+	}
+
+	return count;
 }
 
 /*

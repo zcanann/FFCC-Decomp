@@ -35,6 +35,8 @@ extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 extern "C" void _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
     int, int, int, int, int);
+extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
+extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 extern "C" int CheckFrustum__6CBoundFR3VecPA4_ff(CBound*, Vec*, float (*)[4], float);
 extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int*, int*, int*, int*, int);
 extern "C" void SetShadow__12CMaterialManFR10CMapShadowPA4_fiUl(
@@ -51,6 +53,7 @@ extern "C" void* PTR_PTR_s_CMaterialSet_801e9bbc;
 extern CMemory Memory;
 extern CTextureMan TextureMan;
 extern CGraphic Graphic;
+extern unsigned char Game[];
 class CMapMng;
 extern CMapMng MapMng;
 extern unsigned char CameraPcs[];
@@ -422,12 +425,97 @@ void CMaterialMan::Quit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800436ac
+ * PAL Size: 844b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMaterialMan::SetBlendMode(CMaterialSet*, int)
+void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
 {
-	// TODO
+    CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8));
+    CMaterial* material = (*materials)[materialIndex];
+
+    unsigned char fogEnable = *Ptr(material, 0xA1);
+    if ((*reinterpret_cast<unsigned int*>(Game + 0xC7F0) == 3) && (*Ptr(&MapMng, 0x141704) == 0)) {
+        fogEnable = 0;
+    }
+
+    unsigned char blendMode = *Ptr(material, 0xA0);
+    if (*reinterpret_cast<int*>(Ptr(this, 0x207)) != -1) {
+        if (blendMode == 0) {
+            blendMode = 5;
+        } else if (blendMode == 4) {
+            blendMode = 1;
+        }
+    }
+
+    if ((*Ptr(this, 0x205) == blendMode) && (*Ptr(this, 0x206) == fogEnable)) {
+        return;
+    }
+
+    *Ptr(this, 0x205) = blendMode;
+    *Ptr(this, 0x206) = fogEnable;
+
+    switch (*Ptr(this, 0x205)) {
+    case 3:
+        _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
+            0, 3, 3, 3, 3);
+        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(3, 4, 1, 5);
+        _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0xFF);
+        GXSetZCompLoc(1);
+        Graphic.SetFog(*Ptr(this, 0x206), 1);
+        return;
+
+    case 0:
+        _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
+            0, 0, 1, 2, 3);
+        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 1, 5, 5);
+        _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 0xC0, 0, 7, 0xFF);
+        GXSetZCompLoc(0);
+        Graphic.SetFog(*Ptr(this, 0x206), 0);
+        return;
+
+    case 1:
+        _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
+            0, 0, 1, 2, 3);
+        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 5);
+        _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0xFF);
+        GXSetZCompLoc(1);
+        Graphic.SetFog(*Ptr(this, 0x206), 0);
+        return;
+
+    case 2:
+        _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
+            0, 0, 1, 2, 3);
+        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 1, 5);
+        _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0xFF);
+        GXSetZCompLoc(1);
+        Graphic.SetFog(*Ptr(this, 0x206), 1);
+        return;
+
+    case 4:
+        _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
+            0, 0, 1, 2, 3);
+        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 1, 5, 5);
+        _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0xFF);
+        GXSetZCompLoc(1);
+        Graphic.SetFog(*Ptr(this, 0x206), 0);
+        return;
+
+    case 5:
+        _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
+            0, 0, 1, 2, 3);
+        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 5);
+        _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0xFF);
+        GXSetZCompLoc(0);
+        Graphic.SetFog(*Ptr(this, 0x206), 0);
+        return;
+
+    default:
+        return;
+    }
 }
 
 /*

@@ -166,15 +166,15 @@ void pppConstructYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, Unk
  */
 void pppConstruct2YmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, UnkC* param_2)
 {
-	int offset = param_2->m_serializedDataOffsets[2];
 	float fVar1 = FLOAT_803305f4;
+	u32* work = (u32*)((u8*)pppYmDeformationShp_ + 0x80 + param_2->m_serializedDataOffsets[2]);
 
-	*(float*)((u8*)pppYmDeformationShp_ + 0x98 + offset) = FLOAT_803305f4;
-	*(float*)((u8*)pppYmDeformationShp_ + 0x94 + offset) = fVar1;
-	*(float*)((u8*)pppYmDeformationShp_ + 0x90 + offset) = fVar1;
-	*(float*)((u8*)pppYmDeformationShp_ + 0xa4 + offset) = fVar1;
-	*(float*)((u8*)pppYmDeformationShp_ + 0xa0 + offset) = fVar1;
-	*(float*)((u8*)pppYmDeformationShp_ + 0x9c + offset) = fVar1;
+	((float*)work)[6] = fVar1;
+	((float*)work)[5] = fVar1;
+	((float*)work)[4] = fVar1;
+	((float*)work)[9] = fVar1;
+	((float*)work)[8] = fVar1;
+	((float*)work)[7] = fVar1;
 }
 
 /*

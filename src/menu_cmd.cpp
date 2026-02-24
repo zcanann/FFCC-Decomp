@@ -36,6 +36,7 @@ extern double DOUBLE_80332aa8;
 extern float FLOAT_80332a70;
 extern float FLOAT_80332ab0;
 extern float FLOAT_80332a88;
+extern float FLOAT_80332ad0;
 extern s16 DAT_801de910[];
 extern s16 DAT_801de914[];
 extern s16 DAT_801de91c[];
@@ -58,12 +59,72 @@ bool IsMagicArti(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8015023c
+ * PAL Size: 396b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CmdInit()
 {
-	// TODO
+	u8* self = reinterpret_cast<u8*>(this);
+	u32 caravanWork = Game.game.m_scriptFoodBase[0];
+	memset(*reinterpret_cast<void**>(self + 0x850), 0, 0x1008);
+
+	float fVar2 = FLOAT_80332a70;
+	s32 iVar5 = *reinterpret_cast<s32*>(self + 0x850) + 8;
+	s32 iVar8 = 8;
+	do {
+		*reinterpret_cast<float*>(iVar5 + 0x14) = fVar2;
+		*reinterpret_cast<float*>(iVar5 + 0x54) = fVar2;
+		*reinterpret_cast<float*>(iVar5 + 0x94) = fVar2;
+		*reinterpret_cast<float*>(iVar5 + 0xD4) = fVar2;
+		*reinterpret_cast<float*>(iVar5 + 0x114) = fVar2;
+		*reinterpret_cast<float*>(iVar5 + 0x154) = fVar2;
+		*reinterpret_cast<float*>(iVar5 + 0x194) = fVar2;
+		*reinterpret_cast<float*>(iVar5 + 0x1D4) = fVar2;
+		iVar5 += 0x200;
+		iVar8--;
+	} while (iVar8 != 0);
+
+	s16* puVar7 = reinterpret_cast<s16*>(*reinterpret_cast<s32*>(self + 0x850) + 8);
+	iVar5 = 0;
+	iVar8 = 8;
+	u32 uVar6 = caravanWork;
+	float fVar3 = FLOAT_80332ab0;
+	float fVar4 = FLOAT_80332ad0;
+	do {
+		if (iVar5 < *reinterpret_cast<s16*>(caravanWork + 0xBAA)) {
+			*reinterpret_cast<u32*>(puVar7 + 0xE) = 0x2D;
+		} else {
+			*reinterpret_cast<u32*>(puVar7 + 0xE) = 0xFFFFFFFF;
+		}
+
+		puVar7[2] = 200;
+		puVar7[3] = 0x20;
+		*puVar7 = 0x74;
+		puVar7[1] = static_cast<s16>(iVar5 * puVar7[3] + 0x28);
+		*reinterpret_cast<float*>(puVar7 + 4) = fVar3;
+		*reinterpret_cast<float*>(puVar7 + 6) = fVar4;
+
+		if ((1 < iVar5) && (*reinterpret_cast<s16*>(uVar6 + 0x204) < 0)) {
+			*reinterpret_cast<float*>(puVar7 + 6) += static_cast<float>(static_cast<double>(puVar7[3]));
+		}
+
+		*reinterpret_cast<s32*>(puVar7 + 0x12) = iVar5;
+		uVar6 += 2;
+		iVar5++;
+		*reinterpret_cast<u32*>(puVar7 + 0x14) = 3;
+		puVar7 += 0x20;
+		iVar8--;
+	} while (iVar8 != 0);
+
+	**reinterpret_cast<s16**>(self + 0x850) = 8;
+	CmdInit1__8CMenuPcsFv(this);
+	GetCmdItem();
+	*reinterpret_cast<s16*>(*reinterpret_cast<s32*>(self + 0x82C) + 0x26) = 2;
+	*reinterpret_cast<u8*>(*reinterpret_cast<s32*>(self + 0x82C) + 0x0B) = 1;
 }
 
 /*

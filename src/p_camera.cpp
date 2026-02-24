@@ -4,9 +4,11 @@
 #include "ffcc/memory.h"
 #include "ffcc/pad.h"
 #include "ffcc/gobject.h"
+#include "ffcc/p_game.h"
 
 #include <dolphin/mtx.h>
 #include <dolphin/os/OSCache.h>
+#include <math.h>
 
 extern Mtx ppvCameraMatrix0;
 extern float FLOAT_8032fa30;
@@ -36,10 +38,13 @@ extern float FLOAT_8032faa8;
 extern float FLOAT_8032fab0;
 extern float FLOAT_8032fab4;
 extern float FLOAT_8032fab8;
+extern float FLOAT_8032fabc;
 extern CMaterialMan MaterialMan;
 extern char DAT_801d7928[];
 extern unsigned char MapMng[];
 extern unsigned char CFlat[];
+extern float FLOAT_8032fa18;
+extern float FLOAT_8032fa70;
 extern "C" void Printf__7CSystemFPce(CSystem* system, char* format, ...);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long size, CMemory::CStage* stage, char* file, int line);
 extern "C" void __dl__FPv(void*);
@@ -166,12 +171,162 @@ void CCameraPcs::CalcQuake()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800394d0
+ * PAL Size: 1708b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCameraPcs::calc()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    bool useDebugPad = (Pad._452_4_ != 0) || (Pad._448_4_ != -1);
+    unsigned short padButtons;
+    unsigned int padOffset;
+    float stick;
+    float yaw;
+    float pitch;
+    float dolly;
+    float move;
+    double dYaw;
+    double dPitch;
+    Mtx rotMtx;
+    Mtx invMtx;
+    Mtx mapMtx;
+    Vec up;
+    unsigned int hiA;
+    unsigned int hiB;
+
+    if (useDebugPad) {
+        padButtons = 0;
+        padOffset = 0;
+    } else {
+        padOffset = ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54);
+        padButtons = *reinterpret_cast<unsigned short*>(
+            reinterpret_cast<unsigned char*>(&Pad) + 4 +
+            padOffset);
+    }
+
+    if ((padButtons & 0x20) != 0) {
+        *reinterpret_cast<unsigned int*>(self + 0x444) =
+            (__cntlzw(*reinterpret_cast<unsigned int*>(self + 0x444)) >> 5) & 0xFF;
+    }
+
+    if (*reinterpret_cast<int*>(self + 0x444) == 0) {
+        stick = FLOAT_8032fa34;
+        if (!useDebugPad) {
+            stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x2C + padOffset);
+        }
+        *reinterpret_cast<float*>(self + 0xF8) += FLOAT_8032fa70 * FLOAT_8032fa8c * stick;
+
+        stick = FLOAT_8032fa34;
+        if (!useDebugPad) {
+            stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x30 + padOffset);
+        }
+        *reinterpret_cast<float*>(self + 0x440) += FLOAT_8032fa70 * FLOAT_8032fabc * stick;
+
+        stick = FLOAT_8032fa34;
+        if (!useDebugPad) {
+            stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x1C + padOffset);
+        }
+        *reinterpret_cast<float*>(self + 0x43C) += FLOAT_8032fabc * stick;
+
+        yaw = FLOAT_8032fa34;
+        if (!useDebugPad) {
+            yaw = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x24 + padOffset);
+        }
+
+        pitch = FLOAT_8032fa34;
+        if (!useDebugPad) {
+            pitch = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x28 + padOffset);
+        }
+
+        dYaw = static_cast<double>(*reinterpret_cast<float*>(self + 0x440));
+        dPitch = static_cast<double>(*reinterpret_cast<float*>(self + 0xF8));
+        dolly = -(FLOAT_8032fabc * pitch - FLOAT_8032fabc * yaw);
+
+        move = FLOAT_8032fa34;
+        if (!useDebugPad) {
+            move = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x20 + padOffset);
+        }
+        move *= FLOAT_8032fa8c;
+
+        *reinterpret_cast<float*>(self + 0xD4) +=
+            static_cast<float>(sin(dPitch) * cos(dYaw) * static_cast<double>(move));
+        *reinterpret_cast<float*>(self + 0xD8) +=
+            static_cast<float>(sin(dYaw) * static_cast<double>(move) + static_cast<double>(dolly));
+        *reinterpret_cast<float*>(self + 0xDC) =
+            -((cos(dPitch) * cos(dYaw) * static_cast<double>(move)) - *reinterpret_cast<float*>(self + 0xDC));
+
+        *reinterpret_cast<float*>(self + 0xE0) =
+            *reinterpret_cast<float*>(self + 0x43C) *
+                static_cast<float>(sin(dPitch) * cos(dYaw)) +
+            *reinterpret_cast<float*>(self + 0xD4);
+        *reinterpret_cast<float*>(self + 0xE4) =
+            *reinterpret_cast<float*>(self + 0x43C) * static_cast<float>(sin(dYaw)) +
+            *reinterpret_cast<float*>(self + 0xD8);
+        *reinterpret_cast<float*>(self + 0xE8) =
+            -(*reinterpret_cast<float*>(self + 0x43C) * static_cast<float>(cos(dPitch) * cos(dYaw)) -
+              *reinterpret_cast<float*>(self + 0xDC));
+    } else {
+        *reinterpret_cast<float*>(self + 0xF8) = static_cast<float>(atan2(
+            static_cast<double>(*reinterpret_cast<float*>(self + 0xE0) - *reinterpret_cast<float*>(self + 0xD4)),
+            static_cast<double>(*reinterpret_cast<float*>(self + 0xDC) - *reinterpret_cast<float*>(self + 0xE8))));
+    }
+
+    CalcQuake();
+
+    SetStdProjectionMatrix();
+
+    up.x = FLOAT_8032fa34;
+    up.y = FLOAT_8032fa1c;
+    up.z = FLOAT_8032fa34;
+    PSVECDistance(reinterpret_cast<Vec*>(self + 0xE0), reinterpret_cast<Vec*>(self + 0xD4));
+    C_MTXLookAt(reinterpret_cast<MtxPtr>(self + 0x4),
+                reinterpret_cast<Vec*>(self + 0xE0),
+                &up,
+                reinterpret_cast<Vec*>(self + 0xD4));
+
+    if (Game.game.m_currentMapId == 0x21) {
+        PSMTXCopy(reinterpret_cast<MtxPtr>(self + 0x34), mapMtx);
+        if ((*reinterpret_cast<short*>(self + 0x47E) != 0) && (*reinterpret_cast<short*>(self + 0x480) != 0)) {
+            hiA = static_cast<unsigned int>(static_cast<int>(*reinterpret_cast<short*>(self + 0x480)) ^ 0x80000000);
+            hiB = static_cast<unsigned int>(static_cast<int>(*reinterpret_cast<short*>(self + 0x47E)) ^ 0x80000000);
+            yaw = FLOAT_8032fa1c -
+                  static_cast<float>((static_cast<double>(static_cast<float>(static_cast<int>(hiA ^ 0x80000000))) /
+                                     static_cast<double>(static_cast<float>(static_cast<int>(hiB ^ 0x80000000)))));
+            move = static_cast<float>(cos(FLOAT_8032fa18 * yaw));
+            move = FLOAT_8032fa20 * (FLOAT_8032fa1c + move);
+
+            PSMTXRotRad(rotMtx, 'x', *reinterpret_cast<float*>(self + 0x484) * move);
+            PSMTXConcat(rotMtx, mapMtx, mapMtx);
+
+            PSMTXRotRad(rotMtx, 'y', *reinterpret_cast<float*>(self + 0x488) * move);
+            PSMTXConcat(rotMtx, mapMtx, mapMtx);
+
+            yaw = -(*reinterpret_cast<float*>(self + 0x48C) * (FLOAT_8032fa1c - move) -
+                    (FLOAT_8032fa1c + *reinterpret_cast<float*>(self + 0x48C)));
+            PSMTXScale(rotMtx, yaw, yaw, yaw);
+            PSMTXConcat(rotMtx, mapMtx, mapMtx);
+
+            if (static_cast<signed char>(self[0x47C]) >= 0) {
+                *reinterpret_cast<short*>(self + 0x480) =
+                    static_cast<short>(*reinterpret_cast<short*>(self + 0x480) - 1);
+            }
+        }
+        PSMTXConcat(reinterpret_cast<MtxPtr>(self + 0x4), mapMtx, reinterpret_cast<MtxPtr>(self + 0x4));
+    }
+
+    PSMTXRotRad(rotMtx, 'z', *reinterpret_cast<float*>(self + 0x108));
+    PSMTXConcat(rotMtx, reinterpret_cast<MtxPtr>(self + 0x4), reinterpret_cast<MtxPtr>(self + 0x4));
+
+    PSMTXInverse(reinterpret_cast<MtxPtr>(self + 0x4), invMtx);
+    *reinterpret_cast<float*>(self + 0xEC) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0xF0) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0xF4) = FLOAT_8032fa38;
+    PSMTXMultVecSR(invMtx, reinterpret_cast<Vec*>(self + 0xEC), reinterpret_cast<Vec*>(self + 0xEC));
+    *reinterpret_cast<unsigned int*>(self + 0x438) = 0;
 }
 
 /*

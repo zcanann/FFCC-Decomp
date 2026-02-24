@@ -1760,30 +1760,33 @@ int CRedDriver::StreamPlayState(int param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::GetStreamPlayPoint(int param_1, int* param_2, int* param_3)
+int CRedDriver::GetStreamPlayPoint(int param_1, int* param_2, int* param_3)
 {
 	unsigned int streamData;
+	int found;
 
+	found = 0;
 	if (param_2 != 0) {
 		*param_2 = 0;
 	}
-	streamData = (unsigned int)DAT_8032f438;
 	if (param_3 != 0) {
 		*param_3 = 0;
-		streamData = (unsigned int)DAT_8032f438;
 	}
-	while ((*(int*)(streamData + 0x10C) == 0) || (*(int*)(streamData + 0x10C) != param_1)) {
-		streamData += 0x130;
-		if (streamData >= (unsigned int)DAT_8032f438 + 0x4C0) {
-			return;
+	streamData = (unsigned int)DAT_8032f438;
+	while (streamData < (unsigned int)DAT_8032f438 + 0x4C0) {
+		if ((*(int*)(streamData + 0x10C) != 0) && (*(int*)(streamData + 0x10C) == param_1)) {
+			if (param_2 != 0) {
+				*param_2 = *(int*)(streamData + 0x11C);
+			}
+			if (param_3 != 0) {
+				*param_3 = *(int*)(streamData + 0x120);
+			}
+			found = 1;
+			break;
 		}
+		streamData += 0x130;
 	}
-	if (param_2 != 0) {
-		*param_2 = *(int*)(streamData + 0x11C);
-	}
-	if (param_3 != 0) {
-		*param_3 = *(int*)(streamData + 0x120);
-	}
+	return found;
 }
 
 /*

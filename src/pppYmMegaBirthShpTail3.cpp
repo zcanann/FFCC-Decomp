@@ -171,9 +171,8 @@ extern "C" void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirth
         }
     }
     
-    // Update matrix values - placeholder implementation
-    particleData->m_matrix[2][2] = particleData->m_matrix[2][2] + 0.1f; // placeholder
-    particleData->m_matrix[2][3] = particleData->m_matrix[2][3] + 0.1f; // placeholder
+    particleData->m_matrix[2][2] = particleData->m_matrix[2][2] + pYmMegaBirthShpTail3->m_colorDeltaAdd[2];
+    particleData->m_matrix[2][3] = particleData->m_matrix[2][3] + pYmMegaBirthShpTail3->m_sizeVal;
     
     // Age particle and update lifetime
     *(char*)&(particleData->m_directionTail).y = *(char*)&(particleData->m_directionTail).y + 1;
@@ -191,10 +190,13 @@ extern "C" void calc(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirth
     // Second fade phase logic
     unsigned short fadeTime2 = (unsigned short)*(unsigned char*)((int)&(particleData->m_directionTail).y + 2);
     if (fadeTime2 != 0 && *(unsigned short*)((int)particleData->m_matrix[2] + 2) <= fadeTime2) {
-        particleData->m_directionTail.x = particleData->m_directionTail.x + 
-            (float)(uVar4) / (float)(fadeTime2);
-        if (particleData->m_directionTail.x > 1.0f) {
-            particleData->m_directionTail.x = 1.0f;
+        unsigned char fadeInFrames = *((unsigned char*)&pYmMegaBirthShpTail3->m_matrix[1] + 7);
+        if (fadeInFrames != 0) {
+            particleData->m_directionTail.x = particleData->m_directionTail.x + 
+                (float)(uVar4) / (float)(fadeInFrames);
+            if (particleData->m_directionTail.x > 1.0f) {
+                particleData->m_directionTail.x = 1.0f;
+            }
         }
     }
     

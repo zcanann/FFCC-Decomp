@@ -13,6 +13,8 @@
 extern CMath Math;
 extern unsigned char DbgMenuPcs[];
 extern unsigned char ARRAY_8030918c[];
+extern unsigned char CFlat[];
+extern "C" char DAT_803319ec[];
 
 extern "C" void __ptmf_scall(void*, void*);
 extern "C" int calcPolygonGroup__6CAStarFP3Veci(void*, Vec*, int);
@@ -889,12 +891,205 @@ void CGMonObj::IsDispRader()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80113960
+ * PAL Size: 1436b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::setRepop(int)
+void CGMonObj::setRepop(int mode)
 {
-	// TODO
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	void** scriptHandle = object->m_scriptHandle;
+	void* classId = scriptHandle[4];
+
+	bool allowRepop = (mode == 0);
+	if (!allowRepop) {
+		int option = static_cast<short>(Game.game.m_gameWork.m_optionValue);
+		if (8 < option) {
+			allowRepop = true;
+		} else {
+			int shift = reinterpret_cast<int>(scriptHandle[2]);
+			unsigned long long bit = (shift < 64) ? (1ULL << shift) : 0ULL;
+			unsigned int cflatHi = *reinterpret_cast<unsigned int*>(CFlat + 0x12F4 + option * 8);
+			unsigned int cflatLo = *reinterpret_cast<unsigned int*>(CFlat + 0x12F0 + option * 8);
+			if ((cflatHi & static_cast<unsigned int>(bit)) == 0 &&
+				(cflatLo & static_cast<unsigned int>(bit >> 32)) == 0) {
+				allowRepop = true;
+			}
+		}
+	}
+
+	if (!allowRepop) {
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle) + 0x1C) = 0;
+		object->m_bgColMask = 0;
+		object->m_displayFlags = 0;
+		object->m_weaponNodeFlags &= 0xFFEF;
+		prgObj->changeStat(0x28, 0, 0);
+		return;
+	}
+
+	if (mode == 0) {
+		*reinterpret_cast<float*>(mon + 0x6F8) = object->unk_0x168;
+		*reinterpret_cast<float*>(mon + 0x6FC) = object->unk_0x16C;
+		*reinterpret_cast<float*>(mon + 0x700) = object->unk_0x170;
+		object->m_worldPosition.x = *reinterpret_cast<float*>(mon + 0x6F8);
+		object->m_worldPosition.y = *reinterpret_cast<float*>(mon + 0x6FC);
+		object->m_worldPosition.z = *reinterpret_cast<float*>(mon + 0x700);
+		object->m_rotBaseY = static_cast<float>(object->m_bgFlags);
+		object->m_rotTargetY = object->m_rotBaseY;
+
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle) + 0x1C) =
+			*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle) + 0x1A);
+		*reinterpret_cast<unsigned int*>(mon + 0x6C4) = static_cast<unsigned int>(-1);
+		*reinterpret_cast<unsigned short*>(mon + 0x6E4) = 0;
+		*reinterpret_cast<unsigned short*>(mon + 0x6E6) = 0;
+		*reinterpret_cast<unsigned int*>(mon + 0x6C8) = 0;
+		*reinterpret_cast<unsigned int*>(mon + 0x6CC) = 0;
+		mon[0x6B4] = 0;
+		mon[0x6B8] = 0;
+		mon[0x6B9] = 0;
+		mon[0x6BA] = 0;
+		mon[0x6BC] = 0;
+		mon[0x6BD] = 0;
+		mon[0x6BE] = 0;
+		*reinterpret_cast<unsigned int*>(mon + 0x6F0) = 0;
+		*reinterpret_cast<unsigned int*>(mon + 0x6F4) = 0;
+		mon[0x6BF] = 0;
+		mon[0x6C0] = 0;
+		mon[0x6C2] = 0;
+		mon[0x6C3] = 0;
+		*reinterpret_cast<unsigned int*>(mon + 0x6D8) = 0;
+		*reinterpret_cast<unsigned int*>(mon + 0x6DC) = 0;
+		mon[0x6BB] = 0;
+		*reinterpret_cast<unsigned int*>(mon + 0x704) = 0;
+		memset(mon + 0x70C, 0, 0x34);
+	}
+
+	typedef void (*Virtual90)(CGMonObj*, int, int, int);
+	typedef void (*Virtual94)(CGMonObj*, int);
+	void** vtable = *reinterpret_cast<void***>(this);
+	reinterpret_cast<Virtual90>(vtable[0x90 / 4])(this, 0, 0, 0);
+	reinterpret_cast<Virtual94>(vtable[0x94 / 4])(this, 1);
+	prgObj->changeStat(0, 0, 0);
+
+	unsigned char* monsterScript = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+	unsigned short scriptFlags = *reinterpret_cast<unsigned short*>(monsterScript + 0xFE);
+
+	if ((scriptFlags & 0x80) == 0 && (scriptFlags & 0x20) == 0) {
+		if ((scriptFlags & 0x40) != 0 || classId == reinterpret_cast<void*>(0x39)) {
+			*reinterpret_cast<unsigned int*>(mon + 0x6D8) = 4;
+			*reinterpret_cast<unsigned int*>(mon + 0x6DC) = 0;
+			mon[0x6BB] = 1;
+			reinterpret_cast<Virtual94>(vtable[0x94 / 4])(this, 0);
+			if ((scriptFlags & 0x40) != 0) {
+				object->SetAnimSlot(10, 0);
+			}
+		}
+
+		if ((scriptFlags & 0x200) != 0) {
+			prgObj->changeStat(0x36, 0, 0);
+		}
+
+		if (mode == 0) {
+			prgObj->playSe3D(0x18, 0x32, 0x96, 0, (Vec*)0);
+			prgObj->putParticle(300, 0, &object->m_worldPosition, 0.0f, 0);
+			object->m_bgColMask |= 0x90002;
+			*reinterpret_cast<float*>(mon + 0x694) = 0.0f;
+		}
+	} else {
+		if (mode == 0) {
+			object->m_bgColMask |= 0x10002;
+		}
+		*reinterpret_cast<unsigned int*>(mon + 0x6D8) = 4;
+		*reinterpret_cast<unsigned int*>(mon + 0x6DC) = 0;
+		mon[0x6BB] = 1;
+		reinterpret_cast<Virtual94>(vtable[0x94 / 4])(this, 0);
+	}
+
+	if (classId == reinterpret_cast<void*>(0x55)) {
+		*reinterpret_cast<unsigned int*>(mon + 0x6D8) = 4;
+		*reinterpret_cast<unsigned int*>(mon + 0x6DC) = 0;
+		mon[0x6BB] = 1;
+	}
+
+	unsigned short countA = *reinterpret_cast<unsigned short*>(monsterScript + 0x1A8);
+	for (int i = 0; i < static_cast<int>(countA); i++) {
+		int particleBase = 0;
+		if (reinterpret_cast<int>(classId) < 0xA7) {
+			if (classId == reinterpret_cast<void*>(0x9C)) {
+				particleBase = 1;
+			}
+		} else if (classId == reinterpret_cast<void*>(0xA9)) {
+			particleBase = 0;
+		} else if (reinterpret_cast<int>(classId) < 0xA9) {
+			particleBase = 2;
+		}
+
+		void* pdtLoadRef = nullptr;
+		if (object->m_charaModelHandle != nullptr) {
+			pdtLoadRef = object->m_charaModelHandle->m_pdtLoadRef;
+		}
+		int dataNo = (pdtLoadRef != nullptr) ? reinterpret_cast<int*>(pdtLoadRef)[5] : -1;
+		prgObj->putParticleBindTrace((i + particleBase + 0x50) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x5A4), object, 0.0f, 0);
+	}
+
+	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x20000);
+
+	unsigned short countB = *reinterpret_cast<unsigned short*>(monsterScript + 0x1AA);
+	for (int i = 0; i < static_cast<int>(countB); i++) {
+		void* pdtLoadRef = nullptr;
+		if (object->m_charaModelHandle != nullptr) {
+			pdtLoadRef = object->m_charaModelHandle->m_pdtLoadRef;
+		}
+		int dataNo = (pdtLoadRef != nullptr) ? reinterpret_cast<int*>(pdtLoadRef)[5] : -1;
+		prgObj->putParticleBindTrace((i + 0x5A) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x5A8), object, 0.0f, 0);
+	}
+
+	if ((scriptFlags & 1) == 0) {
+		return;
+	}
+
+	*reinterpret_cast<float*>(mon + 0x694) = 1.0f;
+	scriptHandle = object->m_scriptHandle;
+	classId = scriptHandle[4];
+	int weaponMode = static_cast<int>((static_cast<unsigned int>(object->m_weaponNodeFlags) << 24) >> 31);
+	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0xFC) != 0xB) {
+		weaponMode = 1;
+	}
+
+	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x1000);
+
+	unsigned short countC = (weaponMode == 0) ?
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0x1AE) :
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0x1AC);
+	int particleBase = (weaponMode == 0) ? 0x3C : 0x46;
+
+	for (int i = 0; i < static_cast<int>(countC); i++) {
+		void* pdtLoadRef = nullptr;
+		if (object->m_charaModelHandle != nullptr) {
+			pdtLoadRef = object->m_charaModelHandle->m_pdtLoadRef;
+		}
+		int dataNo = (pdtLoadRef != nullptr) ? reinterpret_cast<int*>(pdtLoadRef)[5] : -1;
+		prgObj->putParticleBindTrace((particleBase + i) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x594), object, 0.0f, 0);
+	}
+
+	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(scriptHandle[9]) + 0xFC) == 0xB) {
+		object->SetTexAnim(DAT_803319ec);
+	}
+
+	if (static_cast<int>((static_cast<unsigned int>(object->m_weaponNodeFlags) << 24)) < 0) {
+		if (classId == reinterpret_cast<void*>(0x83)) {
+			prgObj->playSe3D(0x987A, 0x32, 0x96, 0, (Vec*)0);
+		} else if (classId == reinterpret_cast<void*>(0x7F)) {
+			prgObj->playSe3D(0x11585, 0x32, 0x96, 0, (Vec*)0);
+		}
+	}
+
+	mon[0x6BA] = 0;
 }
 
 /*

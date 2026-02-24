@@ -386,12 +386,12 @@ CMapTexAnim::~CMapTexAnim()
 {
     unsigned char* const p = reinterpret_cast<unsigned char*>(this);
 
-    *reinterpret_cast<void**>(p) = &PTR_PTR_s_CMapTexAnim_801ea9a4;
+    *reinterpret_cast<void**>(p) = PTR_PTR_s_CMapTexAnim_801ea9a4;
 
     __dl__FPv(*reinterpret_cast<void**>(p + 0x20));
     *reinterpret_cast<void**>(p + 0x20) = 0;
 
-    if (this != reinterpret_cast<CMapTexAnim*>(-0x24)) {
+    if ((reinterpret_cast<int>(this) + 0x24) != 0) {
         if (*reinterpret_cast<void**>(p + 0x3C) != 0) {
             __dl__FPv(*reinterpret_cast<void**>(p + 0x3C));
             *reinterpret_cast<void**>(p + 0x3C) = 0;

@@ -89,9 +89,16 @@ extern "C" void SyncCompleted__5CFileFPQ25CFile7CHandle(void*, void*);
 extern "C" void Close__5CFileFPQ25CFile7CHandle(void*, void*);
 extern "C" void drawBonus__8CMenuPcsFv(CMenuPcs*);
 extern "C" void drawVillageMenu__8CMenuPcsFv(CMenuPcs*);
+extern "C" void createBonus__8CMenuPcsFv(CMenuPcs*);
+extern "C" void destroyBonus__8CMenuPcsFv(CMenuPcs*);
+extern "C" void createSingleMenu__8CMenuPcsFv(CMenuPcs*);
+extern "C" void destroySingleMenu__8CMenuPcsFv(CMenuPcs*);
+extern "C" void destroyVillageMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
+extern "C" void _WaitDrawDone__8CGraphicFPci(void*, const char*, int);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, unsigned char, int, int, unsigned char);
+extern "C" unsigned char Graphic[];
 extern "C" unsigned char CFlat[];
 
 static inline void ReleaseRefObject(void* object)
@@ -318,12 +325,75 @@ void CMenuPcs::freeTexture(int, int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80096800
+ * PAL Size: 668b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::changeMode(CMenuPcs::MENUMODE)
+void CMenuPcs::changeMode(CMenuPcs::MENUMODE mode)
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+    int currentMode = *reinterpret_cast<int*>(self + 0x740);
+
+    if (currentMode == static_cast<int>(mode)) {
+        return;
+    }
+
+    _WaitDrawDone__8CGraphicFPci(Graphic, s_p_menu_cpp_801d9d80, 0x1B0);
+
+    if (currentMode == 1) {
+        destroyWorld();
+    } else if (currentMode < 1) {
+        if (currentMode != -1 && currentMode > -2) {
+            ReleaseRefObject(*reinterpret_cast<void**>(self + 0xFC));
+            *reinterpret_cast<void**>(self + 0xFC) = nullptr;
+
+            for (int i = 0; i < 10; i++) {
+                u8* slot = self + 0x1E4 + i * 4;
+                ReleaseRefObject(*reinterpret_cast<void**>(slot));
+                *reinterpret_cast<void**>(slot) = nullptr;
+            }
+
+            for (int i = 0; i < 2; i++) {
+                u8* slot = self + 0x154 + i * 4;
+                ReleaseRefObject(*reinterpret_cast<void**>(slot));
+                *reinterpret_cast<void**>(slot) = nullptr;
+            }
+
+            for (int i = 0; i < 4; i++) {
+                u8* slot = self + 0x13C + i * 4;
+                ReleaseRefObject(*reinterpret_cast<void**>(slot));
+                *reinterpret_cast<void**>(slot) = nullptr;
+            }
+
+            for (int i = 0; i < 12; i++) {
+                u8* slot = self + 0x10C + i * 4;
+                ReleaseRefObject(*reinterpret_cast<void**>(slot));
+                *reinterpret_cast<void**>(slot) = nullptr;
+            }
+
+            destroySingleMenu__8CMenuPcsFv(this);
+            destroyVillageMenu__8CMenuPcsFv(this);
+        }
+    } else if (currentMode < 3) {
+        destroyBonus__8CMenuPcsFv(this);
+    }
+
+    *reinterpret_cast<int*>(self + 0x740) = static_cast<int>(mode);
+    currentMode = *reinterpret_cast<int*>(self + 0x740);
+
+    if (currentMode == 1) {
+        createWorld();
+    } else if (currentMode < 1) {
+        if (currentMode != -1 && currentMode > -2) {
+            createBattle();
+            createSingleMenu__8CMenuPcsFv(this);
+        }
+    } else if (currentMode < 3) {
+        createBonus__8CMenuPcsFv(this);
+    }
 }
 
 /*

@@ -51,6 +51,14 @@ extern "C" void SePan__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" void SeVolume__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" int SePlay__9CRedSoundFiiiii(CRedSound*, int, int, int, int, int);
 extern "C" void MusicVolume__9CRedSoundFiii(CRedSound*, int, int, int);
+extern "C" int ReentryMusicData__9CRedSoundFi(CRedSound*, int);
+extern "C" void SetMusicData__9CRedSoundFPv(CRedSound*, void*);
+extern "C" void MusicStop__9CRedSoundFi(CRedSound*, int);
+extern "C" void MusicPlay__9CRedSoundFiii(CRedSound*, int, int, int);
+extern "C" void MusicCrossPlay__9CRedSoundFiii(CRedSound*, int, int, int);
+extern "C" void MusicNextPlay__9CRedSoundFiii(CRedSound*, int, int, int);
+extern "C" void MusicFadeOut__9CRedSoundFii(CRedSound*, int, int);
+extern "C" void SetMusicPhraseStop__9CRedSoundFi(CRedSound*, int);
 extern "C" void Printf__7CSystemFPce(CSystem*, char*, ...);
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
@@ -864,62 +872,123 @@ void CSound::IsLoadWaveASyncCompleted()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c6e4c
+ * PAL Size: 224b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::LoadBgm(int)
+void CSound::LoadBgm(int bgmId)
 {
-	// TODO
+    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+
+    if (bgmId < 0) {
+        Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
+    } else if (ReentryMusicData__9CRedSoundFi(redSound, bgmId) == -1) {
+        char musicPath[256];
+        sprintf(musicPath, "dvd/sound/music/music_%03d.bgm", bgmId);
+
+        CFile::CHandle* handle = File.Open(musicPath, 0, CFile::PRI_LOW);
+        if (handle != 0) {
+            File.Read(handle);
+            File.SyncCompleted(handle);
+            SetMusicData__9CRedSoundFPv(redSound, File.m_readBuffer);
+            File.Close(handle);
+        }
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c6dcc
+ * PAL Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::PlayBgm(int)
+void CSound::PlayBgm(int bgmId)
 {
-	// TODO
+    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+
+    if (bgmId < 0) {
+        Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
+    } else {
+        MusicStop__9CRedSoundFi(redSound, -1);
+        SetMusicPhraseStop__9CRedSoundFi(redSound, 0);
+        MusicPlay__9CRedSoundFiii(redSound, bgmId, 0x7F, 0);
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c6d4c
+ * PAL Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::CrossPlayBgm(int, int)
+void CSound::CrossPlayBgm(int bgmId, int crossFrames)
 {
-	// TODO
+    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+
+    if (bgmId < 0) {
+        Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
+    } else {
+        SetMusicPhraseStop__9CRedSoundFi(redSound, 0);
+        MusicCrossPlay__9CRedSoundFiii(redSound, bgmId, 0x7F, crossFrames);
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c6ce4
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::PlayNextBgm(int)
+void CSound::PlayNextBgm(int bgmId)
 {
-	// TODO
+    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+
+    if (bgmId < 0) {
+        Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
+    } else {
+        MusicNextPlay__9CRedSoundFiii(redSound, bgmId, 0x7F, 0);
+        SetMusicPhraseStop__9CRedSoundFi(redSound, 1);
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c6cbc
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CSound::StopBgm()
 {
-	// TODO
+    MusicStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), -1);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c6c90
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::FadeOutBgm(int)
+void CSound::FadeOutBgm(int fadeFrames)
 {
-	// TODO
+    MusicFadeOut__9CRedSoundFii(reinterpret_cast<CRedSound*>(this), -1, fadeFrames);
 }
 
 /*

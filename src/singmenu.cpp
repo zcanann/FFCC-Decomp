@@ -1,7 +1,10 @@
 #include "ffcc/singmenu.h"
+#include "ffcc/chara.h"
+#include "ffcc/pad.h"
 #include "ffcc/p_game.h"
 #include "ffcc/util.h"
 #include <dolphin/gx.h>
+#include <dolphin/mtx.h>
 
 typedef signed short s16;
 typedef unsigned char u8;
@@ -13,6 +16,43 @@ extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawFilter__8CMenuPcsFUcUcUcUc(CMenuPcs*, u8, u8, u8, u8);
 extern "C" void Draw__9CShopMenuFv(void*);
 extern "C" void SingleDrawCtrl__8CMenuPcsFv(CMenuPcs*);
+extern "C" void SetFrame__Q26CChara6CModelFf(float, CChara::CModel*);
+extern "C" void AddFrame__Q26CChara6CModelFf(float, CChara::CModel*);
+extern "C" void SetMatrix__Q26CChara6CModelFPA4_f(CChara::CModel*, Mtx);
+extern "C" void CalcMatrix__Q26CChara6CModelFv(CChara::CModel*);
+extern "C" void CalcSkin__Q26CChara6CModelFv(CChara::CModel*);
+
+extern "C" unsigned int CmdOpen__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int CmdCtrl__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int CmdClose__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int ItemOpen__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int ItemCtrl__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int ItemClose__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int EquipOpen__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int EquipCtrl__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int EquipClose__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int ArtiOpen__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int ArtiCtrl__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int ArtiClose__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int TmpArtiOpen__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int TmpArtiCtrl__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int TmpArtiClose__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int MoneyOpen__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int MoneyCtrl__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int MoneyClose__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int FavoOpen__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int FavoCtrl__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int FavoClose__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int CompaOpen__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int CompaCtrl__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int CompaClose__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int LetterOpen__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int LetterCtrl__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int LetterClose__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int MLstOpen__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int MLstCtrl__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned int MLstClose__8CMenuPcsFv(CMenuPcs*);
+extern "C" void CalcHeart__8CMesMenuFv(void*);
 
 extern float FLOAT_8033292c;
 extern float FLOAT_80332928;
@@ -27,7 +67,13 @@ extern float FLOAT_803329ac;
 extern float FLOAT_803329b0;
 extern float FLOAT_803329b4;
 extern float FLOAT_803329bc;
+extern float FLOAT_803329b8;
 extern CUtil DAT_8032ec70;
+extern int DAT_8032eebc;
+extern int DAT_8032eec4;
+extern float DAT_801dd708[];
+extern float DAT_801dd6f8[];
+extern float FLOAT_8032ea78;
 extern double DOUBLE_80332938;
 extern double DOUBLE_80332968;
 extern double DOUBLE_80332978;
@@ -282,12 +328,115 @@ void CMenuPcs::SingleDrawFadeOut()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80147d50
+ * PAL Size: 1232b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::SingleCalcCtrl()
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+
+    if (DAT_8032eebc == 0) {
+        return;
+    }
+
+    int statePtr = *reinterpret_cast<int*>(self + 0x82C);
+    if ((self[0x872] != 0) && (*reinterpret_cast<s16*>(statePtr + 0x10) != 0)) {
+        self[0x872] = 0;
+    }
+
+    unsigned short result = 0;
+    CChara::CModel* model = *reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
+    if (*reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x10) <=
+        *reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x08)) {
+        SetFrame__Q26CChara6CModelFf(FLOAT_8033294c, model);
+    } else {
+        AddFrame__Q26CChara6CModelFf(FLOAT_80332934, model);
+    }
+
+    unsigned short modelScaleIndex = *reinterpret_cast<unsigned short*>(Game.game.m_scriptFoodBase[0] + 0x3E0);
+    float modelScale = DAT_801dd708[modelScaleIndex];
+    Mtx scaleMtx;
+    PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
+    scaleMtx[1][3] = DAT_801dd6f8[modelScaleIndex];
+    scaleMtx[0][3] = FLOAT_8033294c;
+    scaleMtx[2][3] = FLOAT_8033294c;
+
+    int modelPtr = *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
+    *reinterpret_cast<u8*>(modelPtr + 0x10C) = (*reinterpret_cast<u8*>(modelPtr + 0x10C) & 0x7F) | 0x80;
+    SetMatrix__Q26CChara6CModelFPA4_f(model, scaleMtx);
+    CalcMatrix__Q26CChara6CModelFv(model);
+    CalcSkin__Q26CChara6CModelFv(model);
+
+    s16 mode = *reinterpret_cast<s16*>(self + 0x864);
+    s16 proc = *reinterpret_cast<s16*>(statePtr + 0x10);
+    switch (mode) {
+    case 0:
+        result = (proc == 0) ? CmdOpen__8CMenuPcsFv(this)
+                             : ((proc == 1) ? CmdCtrl__8CMenuPcsFv(this) : CmdClose__8CMenuPcsFv(this));
+        break;
+    case 1:
+        result = (proc == 0) ? ItemOpen__8CMenuPcsFv(this)
+                             : ((proc == 1) ? ItemCtrl__8CMenuPcsFv(this) : ItemClose__8CMenuPcsFv(this));
+        if (*reinterpret_cast<int*>(self + 0x874) >= 0) {
+            ++(*reinterpret_cast<int*>(self + 0x874));
+            if (*reinterpret_cast<int*>(self + 0x874) > 0x31) {
+                *reinterpret_cast<int*>(self + 0x874) = -1;
+            }
+        }
+        break;
+    case 2:
+        result = (proc == 0) ? EquipOpen__8CMenuPcsFv(this)
+                             : ((proc == 1) ? EquipCtrl__8CMenuPcsFv(this) : EquipClose__8CMenuPcsFv(this));
+        break;
+    case 3:
+        result = (proc == 0) ? ArtiOpen__8CMenuPcsFv(this)
+                             : ((proc == 1) ? ArtiCtrl__8CMenuPcsFv(this) : ArtiClose__8CMenuPcsFv(this));
+        break;
+    case 4:
+        result = (proc == 0) ? TmpArtiOpen__8CMenuPcsFv(this)
+                             : ((proc == 1) ? TmpArtiCtrl__8CMenuPcsFv(this) : TmpArtiClose__8CMenuPcsFv(this));
+        break;
+    case 5:
+        result = (proc == 0) ? MoneyOpen__8CMenuPcsFv(this)
+                             : ((proc == 1) ? MoneyCtrl__8CMenuPcsFv(this) : MoneyClose__8CMenuPcsFv(this));
+        break;
+    case 6:
+        result = (proc == 0) ? FavoOpen__8CMenuPcsFv(this)
+                             : ((proc == 1) ? FavoCtrl__8CMenuPcsFv(this) : FavoClose__8CMenuPcsFv(this));
+        break;
+    case 7:
+        result = (proc == 0) ? CompaOpen__8CMenuPcsFv(this)
+                             : ((proc == 1) ? CompaCtrl__8CMenuPcsFv(this) : CompaClose__8CMenuPcsFv(this));
+        break;
+    case 8:
+        result = (proc == 0) ? LetterOpen__8CMenuPcsFv(this)
+                             : ((proc == 1) ? LetterCtrl__8CMenuPcsFv(this) : LetterClose__8CMenuPcsFv(this));
+        break;
+    case 9:
+        result = (proc == 0) ? MLstOpen__8CMenuPcsFv(this)
+                             : ((proc == 1) ? MLstCtrl__8CMenuPcsFv(this) : MLstClose__8CMenuPcsFv(this));
+        break;
+    }
+
+    CalcHeart__8CMesMenuFv(*reinterpret_cast<void**>(self + 0x268));
+    *reinterpret_cast<unsigned short*>(statePtr + 0x2E) = result;
+
+    bool hasInput = (Pad._452_4_ != 0) || (Pad._448_4_ != -1);
+    unsigned short press;
+    if (hasInput) {
+        press = 0;
+    } else {
+        __cntlzw((unsigned int)Pad._448_4_);
+        press = Pad._8_2_;
+    }
+
+    if ((press & 0x800) != 0) {
+        *reinterpret_cast<unsigned short*>(*reinterpret_cast<int*>(self + 0x850) + 6) = 1;
+    }
 }
 
 /*

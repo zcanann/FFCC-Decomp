@@ -139,7 +139,6 @@ void oddToEven(float&)
  */
 void pppConstructYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, UnkC* param_2)
 {
-	float fVar1 = FLOAT_803305f4;
 	u32* work = (u32*)((u8*)pppYmDeformationShp_ + 0x80 + param_2->m_serializedDataOffsets[2]);
 
 	work[0] = 0;
@@ -147,12 +146,12 @@ void pppConstructYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, Unk
 	work[2] = 0;
 	*(u16*)(work + 3) = 0;
 	*(u8*)((u8*)(work + 3) + 2) = 1;
-	((float*)work)[6] = fVar1;
-	((float*)work)[5] = fVar1;
-	((float*)work)[4] = fVar1;
-	((float*)work)[9] = fVar1;
-	((float*)work)[8] = fVar1;
-	((float*)work)[7] = fVar1;
+	((float*)work)[6] = FLOAT_803305f4;
+	((float*)work)[5] = FLOAT_803305f4;
+	((float*)work)[4] = FLOAT_803305f4;
+	((float*)work)[9] = FLOAT_803305f4;
+	((float*)work)[8] = FLOAT_803305f4;
+	((float*)work)[7] = FLOAT_803305f4;
 }
 
 /*

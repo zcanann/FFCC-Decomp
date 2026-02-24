@@ -5,7 +5,12 @@
 #include <string.h>
 
 extern "C" {
+void __ct__5CMenuFv(void* menu);
+void __dt__5CMenuFv(void* menu, int shouldDelete);
+void __ct__4CMesFv(void* mes);
+void __dt__4CMesFv(void* mes, int shouldDelete);
 void Create__5CMenuFv(void* menu);
+void Destroy__5CMenuFv(void* menu);
 void Set__4CMesFPci(void* mes, char* script, int flags);
 void SetPosition__4CMesFff(void* mes, float x, float y);
 void PlaySe__6CSoundFiiii(void* sound, int id, int volume, int pan, int unk);
@@ -30,6 +35,7 @@ void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 extern unsigned char CFlat[];
 extern unsigned char MenuPcs[];
 extern unsigned char Sound[];
+extern void* __vt__8CMesMenu[];
 extern const char DAT_801d9e9c[];
 extern int DAT_8020f998[4];
 extern float FLOAT_803308d8;
@@ -55,22 +61,37 @@ extern float FLOAT_80330980;
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009e17c
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CMesMenu::CMesMenu()
 {
-	// TODO
+    __ct__5CMenuFv(this);
+    *(void***)this = __vt__8CMesMenu;
+    __ct__4CMesFv((char*)this + 0x1C);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009e0fc
+ * PAL Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CMesMenu::~CMesMenu()
 {
-	// TODO
+    typedef void (*VFunc)(void*);
+
+    *(void***)this = __vt__8CMesMenu;
+    ((VFunc)(*(unsigned int*)this + 0x10))(this);
+    __dt__4CMesFv((char*)this + 0x1C, -1);
+    __dt__5CMenuFv(this, 0);
 }
 
 /*
@@ -127,12 +148,17 @@ void CMesMenu::Create()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009df90
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMesMenu::Destroy()
 {
-	// TODO
+    Set__4CMesFPci((char*)this + 0x1C, 0, 0);
+    Destroy__5CMenuFv(this);
 }
 
 /*

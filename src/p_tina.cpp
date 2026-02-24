@@ -78,8 +78,10 @@ extern unsigned char lbl_8032ED4C;
 extern char lbl_8032FDB0[];
 extern float lbl_8032FDB8;
 extern double lbl_8032FDC0;
+extern float lbl_8032FDC8;
 extern CProfile g_par_calc_prof;
 extern CProfile g_par_draw_prof;
+extern char DAT_801d8068[];
 extern char s_no_name_8032fdcc[];
 extern char s_dvd_tina_stage_03d_mirura_801d7f78[];
 extern char s_dvd_tina_stage_03d_title_801d7f94[];
@@ -231,6 +233,36 @@ static unsigned char GetMngStPrio(const _pppMngSt* pppMngSt)
 static unsigned char GetMngStPrioTime(const _pppMngSt* pppMngSt)
 {
 	return *(const unsigned char*)((const char*)pppMngSt + 0xf9);
+}
+
+static float& GetMngStUserFloat0(_pppMngSt* pppMngSt)
+{
+	return *reinterpret_cast<float*>(reinterpret_cast<char*>(pppMngSt) + 0x38);
+}
+
+static float& GetMngStUserFloat1(_pppMngSt* pppMngSt)
+{
+	return *reinterpret_cast<float*>(reinterpret_cast<char*>(pppMngSt) + 0x3c);
+}
+
+static float& GetMngStScaleFactor(_pppMngSt* pppMngSt)
+{
+	return *reinterpret_cast<float*>(reinterpret_cast<char*>(pppMngSt) + 0x40);
+}
+
+static float& GetMngStOwnerScale(_pppMngSt* pppMngSt)
+{
+	return *reinterpret_cast<float*>(reinterpret_cast<char*>(pppMngSt) + 0x44);
+}
+
+static unsigned char& GetMngStOwnerScaleMode(_pppMngSt* pppMngSt)
+{
+	return *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0x48);
+}
+
+static unsigned char& GetMngStLockScaleFromOwner(_pppMngSt* pppMngSt)
+{
+	return *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(pppMngSt) + 0x4d);
 }
 
 struct CUSBStreamDataRaw {
@@ -703,22 +735,47 @@ void CPartPcs::ResetDataStage()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800531c8
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartPcs::calcInit()
 {
-	// TODO
+	PartMng.pppRefCnt0Up();
+	if (Game.game.m_currentSceneId == 7) {
+		g_par_calc_prof.ProfStart();
+		g_par_draw_prof.ProfStart();
+	}
+	PartMng.pppPartInit();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80053138
+ * PAL Size: 144b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartPcs::calc()
 {
-	// TODO
+	CUSBStreamData* usbStream = reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 8);
+
+	PartMng.pppPartCalc();
+	if (usbStream->m_printFreeOnNext != 0) {
+		unsigned int freeSize;
+
+		usbStream->m_printFreeOnNext = 0;
+		freeSize = reinterpret_cast<CAmemCacheSet*>(CAMemCacheSet)->AmemGetFreeSize();
+		System.Printf(
+			DAT_801d8068, ((int)freeSize >> 10) + (unsigned int)((int)freeSize < 0 && (freeSize & 0x3ff) != 0));
+	}
+	reinterpret_cast<CAmemCacheSet*>(CAMemCacheSet)->CalcPrio();
+	PartMng.pppDumpCacheIdx();
 }
 
 /*
@@ -1025,12 +1082,31 @@ void CPartPcs::GetParLocIdx(int, Vec&)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80052990
+ * PAL Size: 140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartPcs::SetParColIdx(int, pppFVECTOR4&)
+void CPartPcs::SetParColIdx(int index, pppFVECTOR4& color)
 {
-	// TODO
+	_pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(&PartMng) + index;
+	float* colorValues = reinterpret_cast<float*>(&color);
+	float one = lbl_8032FDC8;
+
+	GetMngStUserFloat0(pppMngSt) = colorValues[0];
+	GetMngStUserFloat1(pppMngSt) = colorValues[1];
+	GetMngStScaleFactor(pppMngSt) = colorValues[2];
+	GetMngStOwnerScale(pppMngSt) = colorValues[3];
+
+	if (one == colorValues[0] && one == colorValues[1] && one == colorValues[2] && one == colorValues[3]) {
+		GetMngStOwnerScaleMode(pppMngSt) = 0;
+		return;
+	}
+
+	GetMngStOwnerScaleMode(pppMngSt) = 1;
+	GetMngStLockScaleFromOwner(pppMngSt) = 1;
 }
 
 /*

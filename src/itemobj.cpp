@@ -31,10 +31,20 @@ extern "C" void* FindGItemObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" void* FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(void*, void*);
 extern "C" void deleteObject__12CFlatRuntimeFPQ212CFlatRuntime7CObject(void*, void*);
 extern "C" void Printf__7CSystemFPce(void*, char*, ...);
+extern "C" void EndParticleSlot__13CFlatRuntime2Fii(void*, int, int);
+extern "C" void ResetParticleWork__13CFlatRuntime2Fii(void*, int, int);
+extern "C" void SetParticleWorkPos__13CFlatRuntime2FR3Vecf(void*, Vec&, float);
+extern "C" void SetParticleWorkCol__13CFlatRuntime2Fiif(void*, int, int, float);
+extern "C" void SetParticleWorkParam__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(void*, int, void*);
+extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
+extern "C" void addSubStat__8CGPrgObjFv(void*);
+extern "C" void IgnoreParticle__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(void*, int, void*);
+extern "C" int intToClass__13CFlatRuntime2Fi(void*, int);
 
 extern unsigned char CFlat[];
 extern CMath Math;
 extern float FLOAT_80331b20;
+extern float FLOAT_80331b18;
 extern float FLOAT_80331b4c;
 extern float FLOAT_80331b50;
 extern float FLOAT_80331b54;
@@ -450,12 +460,73 @@ void CGItemObj::onFrameAlways()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012529C
+ * PAL Size: 556b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGItemObj::onHitParticle(int, int, int, int, Vec*, PPPIFPARAM*)
+void CGItemObj::onHitParticle(int effectIndex, int, int, int, Vec*, PPPIFPARAM* hitParam)
 {
-	// TODO
+	unsigned char* self = (unsigned char*)this;
+	int worldParamA = *(int*)(self + 0x500);
+	unsigned int particleAttr = (unsigned int)*(unsigned short*)(Game.game.unkCFlatData0[2] +
+	                                                             *(int*)((unsigned char*)hitParam + 0x0) * 0x48 + 8);
+
+	if (worldParamA == 0xD || worldParamA == 0xE) {
+		if (((particleAttr == 0 || particleAttr == 4) && worldParamA == 0xD) ||
+		    (particleAttr == 1 && worldParamA == 0xE)) {
+			int particleNo = 0;
+			int classControl = 0;
+
+			if (particleAttr == 1) {
+				particleNo = 0x20;
+				classControl = 0x491;
+			} else if (particleAttr == 0) {
+				particleNo = 0x1F;
+				classControl = 0x492;
+			} else if (particleAttr == 4) {
+				particleNo = 0x2F;
+				classControl = 0x493;
+			}
+
+			EndParticleSlot__13CFlatRuntime2Fii(CFlat, *(int*)(self + 0x55C), 0);
+			ResetParticleWork__13CFlatRuntime2Fii(CFlat, particleNo | 0x100, *(int*)(self + 0x55C));
+			SetParticleWorkPos__13CFlatRuntime2FR3Vecf(CFlat, *(Vec*)(self + 0x15C), FLOAT_80331b20);
+			SetParticleWorkCol__13CFlatRuntime2Fiif(CFlat, 9, 0, FLOAT_80331b18);
+			SetParticleWorkParam__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(CFlat, classControl, this);
+			PutParticleWork__13CFlatRuntime2Fv(CFlat);
+			*(unsigned int*)(self + 0x1C0) &= 0xFFF7FFFF;
+			addSubStat__8CGPrgObjFv(this);
+		}
+	} else {
+		if ((worldParamA != 0xCB || *(int*)(self + 0x520) == 0x24) && *(int*)(self + 0x520) != 0x25) {
+			if ((particleAttr >= 0x65 && particleAttr <= 0x67)) {
+				unsigned char* classObj = 0;
+
+				if (*(short*)((unsigned char*)hitParam + 4) != 0) {
+					classObj =
+					    (unsigned char*)intToClass__13CFlatRuntime2Fi(CFlat, (int)*(short*)((unsigned char*)hitParam + 4));
+				}
+
+				if (classObj != 0) {
+					void* objectBehavior = *(void**)(classObj + 0x48);
+					unsigned int cid =
+					    reinterpret_cast<unsigned int (*)(void*)>((*reinterpret_cast<void***>(objectBehavior))[3])(
+					        objectBehavior);
+
+					if ((cid & 0x6D) == 0x6D && *(void**)(self + 0x550) == classObj) {
+						changeStat__8CGPrgObjFiii(this, 0x26, 0, 0);
+					}
+				}
+			}
+		} else {
+			return;
+		}
+	}
+
+	IgnoreParticle__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(CFlat, (short)effectIndex, this);
 }
 
 /*

@@ -240,6 +240,21 @@ static float& GetMngStUserFloat0(_pppMngSt* pppMngSt)
 	return *reinterpret_cast<float*>(reinterpret_cast<char*>(pppMngSt) + 0x38);
 }
 
+static float& GetMngStPositionX(_pppMngSt* pppMngSt)
+{
+	return *reinterpret_cast<float*>(reinterpret_cast<char*>(pppMngSt) + 0x8);
+}
+
+static float& GetMngStPositionY(_pppMngSt* pppMngSt)
+{
+	return *reinterpret_cast<float*>(reinterpret_cast<char*>(pppMngSt) + 0xc);
+}
+
+static float& GetMngStPositionZ(_pppMngSt* pppMngSt)
+{
+	return *reinterpret_cast<float*>(reinterpret_cast<char*>(pppMngSt) + 0x10);
+}
+
 static float& GetMngStUserFloat1(_pppMngSt* pppMngSt)
 {
 	return *reinterpret_cast<float*>(reinterpret_cast<char*>(pppMngSt) + 0x3c);
@@ -1062,22 +1077,38 @@ void CPartPcs::DrawMenuIdx(int index)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80052a48
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartPcs::SetParLocIdx(int, Vec&)
+void CPartPcs::SetParLocIdx(int index, Vec& location)
 {
-	// TODO
+	_pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(&PartMng) + index;
+
+	GetMngStPositionX(pppMngSt) = location.x;
+	GetMngStPositionY(pppMngSt) = location.y;
+	GetMngStPositionZ(pppMngSt) = location.z;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80052a1c
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartPcs::GetParLocIdx(int, Vec&)
+void CPartPcs::GetParLocIdx(int index, Vec& location)
 {
-	// TODO
+	_pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(&PartMng) + index;
+
+	location.x = GetMngStPositionX(pppMngSt);
+	location.y = GetMngStPositionY(pppMngSt);
+	location.z = GetMngStPositionZ(pppMngSt);
 }
 
 /*
@@ -1111,12 +1142,22 @@ void CPartPcs::SetParColIdx(int index, pppFVECTOR4& color)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005295c
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartPcs::GetParColIdx(int, pppFVECTOR4&)
+void CPartPcs::GetParColIdx(int index, pppFVECTOR4& color)
 {
-	// TODO
+	_pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(&PartMng) + index;
+	float* colorValues = reinterpret_cast<float*>(&color);
+
+	colorValues[0] = GetMngStUserFloat0(pppMngSt);
+	colorValues[1] = GetMngStUserFloat1(pppMngSt);
+	colorValues[2] = GetMngStScaleFactor(pppMngSt);
+	colorValues[3] = GetMngStOwnerScale(pppMngSt);
 }
 
 /*

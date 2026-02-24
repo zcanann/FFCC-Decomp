@@ -102,7 +102,6 @@ void pppLight(void* param1, void* param2, void* param3)
 	unsigned char* pppMng = (unsigned char*)param1;
 	unsigned char* lightParam = (unsigned char*)param2;
 	unsigned char* work = pppMng + *(int*)(*(unsigned char**)((unsigned char*)param3 + 0xc)) + 0x80;
-	Vec targetPos;
 	Vec sourcePos;
 	unsigned char lightData[0xb0];
 
@@ -206,6 +205,7 @@ void pppLight(void* param1, void* param2, void* param3)
 				Add__9CLightPcsFPQ29CLightPcs6CLight(LightPcs, lightData);
 			} else {
 				unsigned char* obj;
+				Vec* direction;
 
 				*(int*)(lightData + 0x8) = 1;
 				if (*(int*)(lightParam + 0x44) == -1) {
@@ -214,13 +214,14 @@ void pppLight(void* param1, void* param2, void* param3)
 					obj = *(unsigned char**)(*(unsigned char**)(lbl_8032ED50 + 0xd4) + (*(int*)(lightParam + 0x44) << 4) + 0x4);
 				}
 
-				targetPos.x = *(float*)(obj + 0x1c);
-				targetPos.y = *(float*)(obj + 0x2c);
-				targetPos.z = *(float*)(obj + 0x3c);
-				PSMTXMultVec((MtxPtr)(lbl_8032ED50 + 0x78), &targetPos, &targetPos);
+				direction = (Vec*)(lightData + 0x40);
+				direction->x = *(float*)(obj + 0x1c);
+				direction->y = *(float*)(obj + 0x2c);
+				direction->z = *(float*)(obj + 0x3c);
+				PSMTXMultVec((MtxPtr)(lbl_8032ED50 + 0x78), direction, direction);
 
-				PSVECSubtract(&targetPos, &sourcePos, (Vec*)(lightData + 0x40));
-				PSVECNormalize((Vec*)(lightData + 0x40), (Vec*)(lightData + 0x40));
+				PSVECSubtract(direction, &sourcePos, direction);
+				PSVECNormalize(direction, direction);
 				*(float*)(lightData + 0x4c) = lbl_80330F6C * *(float*)(work + 0x30);
 
 				if (lightParam[0x58] == 2) {

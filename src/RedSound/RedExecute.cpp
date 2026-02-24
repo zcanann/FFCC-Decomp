@@ -18,6 +18,10 @@ extern int DAT_8032f430;
 extern int DAT_8032f434;
 extern int DAT_8032f478;
 extern void* DAT_8032f3f4;
+extern int DAT_8032f400;
+extern s16 DAT_8021ddce[];
+extern s16 DAT_8021dfce[];
+extern s16 DAT_8021de4e;
 
 struct RedReverbDATA {
     void (*callback)(void*, void*);
@@ -431,22 +435,214 @@ void _VoiceEnvelopeCheck()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c3df8
+ * PAL Size: 720b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void SetVoiceVolumeMix(RedVoiceDATA*, int, int)
+void SetVoiceVolumeMix(RedVoiceDATA* voice, int pan, int volume)
 {
-	// TODO
+    int iVar1;
+    int iVar2;
+    int waveData;
+    s16 leftPan;
+    s16 rightPan;
+    u16 uVar3;
+    int volFactor;
+    u16* mixData;
+    int* voiceData = (int*)voice;
+
+    waveData = voiceData[0];
+    if (waveData == 0) {
+        return;
+    }
+
+    mixData = (u16*)(voiceData + 0x1a);
+    memset(mixData, 0, 0x24);
+
+    if (DAT_8032f400 == 2) {
+        *mixData = (u16)((u32)(volume * DAT_8021ddce[pan]) >> 8);
+        *(s16*)(voiceData + 0x1e) = (s16)((u32)(volume * DAT_8021dfce[pan]) >> 8);
+        *(s16*)(voiceData + 0x1b) = (s16)((u32)(volume * DAT_8021ddce[pan ^ 0x7f]) >> 8);
+        *(s16*)(voiceData + 0x1f) = (s16)((u32)(volume * DAT_8021dfce[pan ^ 0x7f]) >> 8);
+
+        if ((voiceData[0x25] & 0x1000U) != 0) {
+            *(s16*)(voiceData + 0x1c) = (s16)((int)((u32)*mixData * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf);
+            *(s16*)(voiceData + 0x22) = (s16)((int)((u32)*(u16*)(voiceData + 0x1e) * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf);
+        }
+
+        if ((voiceData[0x25] & 0x2000U) != 0) {
+            *(s16*)(voiceData + 0x1d) = (s16)((int)((u32)*(u16*)(voiceData + 0x1b) * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf);
+            *(s16*)(voiceData + 0x20) = (s16)((int)((u32)*(u16*)(voiceData + 0x1f) * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf);
+        }
+    } else if ((DAT_8032f400 < 2) && (0 < DAT_8032f400)) {
+        volFactor = (int)DAT_8021de4e;
+
+        if ((voiceData[0x25] & 0xc00U) != 0) {
+            uVar3 = (u16)((u32)(volume * volFactor) >> 8);
+            *mixData = uVar3;
+            *(u16*)(voiceData + 0x1b) = uVar3;
+        }
+
+        if ((voiceData[0x25] & 0x3000U) != 0) {
+            u16 monoMix = (u16)(((volume * volFactor >> 8) * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf);
+            if ((voiceData[0x25] & 2U) == 0) {
+                *(u16*)(voiceData + 0x1e) = monoMix;
+                *(u16*)(voiceData + 0x1f) = monoMix;
+            } else {
+                *(u16*)(voiceData + 0x1c) = monoMix;
+                *(u16*)(voiceData + 0x1d) = monoMix;
+            }
+        }
+    } else {
+        if (0x80 < pan) {
+            pan = 0x100 - pan;
+        }
+
+        leftPan = DAT_8021ddce[pan];
+        rightPan = DAT_8021ddce[pan ^ 0x7f];
+
+        if ((voiceData[0x25] & 0x400U) != 0) {
+            *mixData = (u16)((u32)(volume * leftPan) >> 8);
+        }
+
+        if ((voiceData[0x25] & 0x800U) != 0) {
+            *(s16*)(voiceData + 0x1b) = (s16)((u32)(volume * rightPan) >> 8);
+        }
+
+        if ((voiceData[0x25] & 0x1000U) != 0) {
+            iVar1 = ((volume * leftPan >> 8) * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf;
+            if ((voiceData[0x25] & 2U) == 0) {
+                *(u16*)(voiceData + 0x1e) = (u16)iVar1;
+            } else {
+                *(u16*)(voiceData + 0x1c) = (u16)iVar1;
+            }
+        }
+
+        if ((voiceData[0x25] & 0x2000U) != 0) {
+            iVar2 = ((volume * rightPan >> 8) * ((*(int*)(waveData + 0x68) >> 0xc) + 1)) >> 0xf;
+            if ((voiceData[0x25] & 2U) == 0) {
+                *(u16*)(voiceData + 0x1f) = (u16)iVar2;
+            } else {
+                *(u16*)(voiceData + 0x1d) = (u16)iVar2;
+            }
+        }
+    }
+
+    voiceData[0x24] |= 8;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c40c8
+ * PAL Size: 664b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _VolumeExecute(RedVoiceDATA*, int)
+void _VolumeExecute(RedVoiceDATA* voice, int volume)
 {
-	// TODO
+    int modVolume;
+    int iVar1;
+    unsigned int pan;
+    int voiceMix;
+    int envelopeMul;
+    int* voiceData = (int*)voice;
+
+    if (volume != 0) {
+        volume = volume + 1;
+    }
+
+    voiceMix = volume * ((*(int*)voiceData[3] >> 0xc) + 1) >> 7;
+
+    if (*(s8*)((int)voiceData + 0x19) != 0) {
+        if (*(s8*)((int)voiceData + 0x19) == 0) {
+            envelopeMul = 0;
+        } else {
+            envelopeMul = *(s8*)((int)voiceData + 0x19) + 1;
+        }
+        voiceMix = voiceMix * envelopeMul >> 7;
+    }
+
+    envelopeMul = *(int*)(*voiceData + 0x4c) >> 0xc;
+    if (envelopeMul != 0) {
+        envelopeMul = envelopeMul + 1;
+    }
+
+    pan = *(u8*)(voiceData[1] + 0x1a) & 0x7f;
+    if ((*(u8*)(voiceData[1] + 0x1a) & 0x7f) != 0) {
+        pan = pan + 1;
+    }
+
+    voiceMix = (int)(((voiceMix * envelopeMul >> 7) * (*(int*)voiceData[2] >> 0xc) >> 9) * pan) >> 7;
+
+    if (*(int*)(*voiceData + 0x94) != 0) {
+        if (*(s16*)(voiceData + 0xe) == 0) {
+            envelopeMul = *(int*)(*voiceData + 0xa0) >> 0xc;
+            if (envelopeMul != 0) {
+                envelopeMul = envelopeMul + 1;
+            }
+
+            iVar1 = (**(int (**)(unsigned int))(*((int*)*voiceData + 0x25)))((unsigned int)voiceData[0xb] >> 0xc);
+            modVolume = (voiceMix * envelopeMul >> 8) * (iVar1 >> 4) >> 0xc;
+
+            if (voiceData[0xc] != 0) {
+                iVar1 = voiceData[0xd];
+                voiceData[0xd] = voiceData[0xd] + 1;
+                modVolume = (modVolume * iVar1) / voiceData[0xc];
+                if (voiceData[0xc] <= voiceData[0xd]) {
+                    voiceData[0xc] = 0;
+                }
+            }
+
+            voiceMix = voiceMix + modVolume;
+            voiceData[0xb] = voiceData[0xb] + *(int*)(*voiceData + 0x98);
+
+            if (voiceMix >= 0x8000) {
+                voiceMix = 0x7fff;
+            } else if (voiceMix < 0) {
+                voiceMix = 0;
+            }
+        }
+    }
+
+    if (DAT_8032f400 == 1) {
+        pan = 0x40;
+    } else if ((voiceData[0x25] & 0xc0U) == 0) {
+        if ((*(u8*)(voiceData[1] + 0x1b) & 0x80) == 0) {
+            pan = *(int*)voiceData[4] >> 0xc;
+        } else {
+            pan = *(u8*)(voiceData[1] + 0x1b) & 0x7f;
+            if ((*(u8*)(voiceData[1] + 0x1b) & 0x7f) == 0) {
+                pan = 0x40;
+            }
+        }
+
+        if (voiceData[0x11] != 0) {
+            pan = pan + ((int)(pan * voiceData[0x11]) >> 7);
+        }
+
+        pan = (pan + *(int*)(*voiceData + 0xcc)) & 0xff;
+    } else if ((voiceData[0x25] & 0x40U) == 0) {
+        pan = 0x7f;
+    } else {
+        pan = 0;
+    }
+
+    if (voiceData[0x10] != 0) {
+        voiceMix = voiceMix + (voiceMix * voiceData[0x10] >> 7);
+        if (voiceMix >= 0x8000) {
+            voiceMix = 0x7fff;
+        } else if (voiceMix < 0) {
+            voiceMix = 0;
+        }
+    }
+
+    SetVoiceVolumeMix(voice, pan, voiceMix);
+    voiceData[0x24] |= 8;
 }
 
 /*

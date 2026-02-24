@@ -32,6 +32,7 @@ extern "C" void __ct__9CRedSoundFv(void*);
 extern "C" void __dt__6CSoundFv(void*);
 extern "C" unsigned int GetSoundMode__9CRedSoundFv(CRedSound*);
 extern "C" int StreamPlayState__9CRedSoundFi(CRedSound*, int);
+extern "C" void StreamStop__9CRedSoundFi(CRedSound*, int);
 extern "C" int ReentryWaveData__9CRedSoundFi(CRedSound*, int);
 extern "C" int SePlayState__9CRedSoundFi(CRedSound*, int);
 extern "C" int ReportSeLoop__9CRedSoundFi(CRedSound*, int);
@@ -1477,12 +1478,58 @@ void CSound::SetReverb(int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c5318
+ * PAL Size: 404b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::LoadStream(int)
+void CSound::LoadStream(int streamID)
 {
-	// TODO
+    if (streamID < 0) {
+        Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
+    } else {
+        bool isPlaying = false;
+
+        if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22A0) != 0) {
+            if (StreamPlayState__9CRedSoundFi(reinterpret_cast<CRedSound*>(this),
+                                              *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x2298)) != 0) {
+                isPlaying = true;
+            }
+        }
+
+        if (isPlaying) {
+            StreamStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(this),
+                                     *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x2298));
+        }
+
+        CFile::CHandle*& streamFile = *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 0x2290);
+        if (streamFile != 0) {
+            File.Close(streamFile);
+            streamFile = 0;
+        }
+
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22A0) = 0;
+
+        char streamPath[268];
+        sprintf(streamPath, "dvd/sound/stream/str_%04d.str", streamID);
+        streamFile = File.Open(streamPath, 0, CFile::PRI_LOW);
+        if (streamFile != 0) {
+            streamFile->m_chunkSize = 0x20000;
+            streamFile->m_currentOffset = 0;
+            File.Read(streamFile);
+            File.SyncCompleted(streamFile);
+            memcpy(*reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0x228C), File.m_readBuffer, 0x20000);
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x2294) = 0x20000;
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x229C) = 0;
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22A4) = File.GetLength(streamFile) - 0x20000;
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22A8) = 0;
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22AC) = streamID;
+            File.Close(streamFile);
+            streamFile = 0;
+        }
+    }
 }
 
 /*

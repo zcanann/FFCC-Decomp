@@ -1,10 +1,12 @@
 #include "ffcc/mapobj.h"
 #include "ffcc/map.h"
+#include "ffcc/chunkfile.h"
 #include "ffcc/maphit.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/materialman.h"
 #include "ffcc/math.h"
 #include "ffcc/p_camera.h"
+#include "ffcc/p_game.h"
 #include "ffcc/p_light.h"
 #include <dolphin/mtx.h>
 
@@ -73,6 +75,7 @@ static inline CMapObj* MapObjArrayStart()
 }
 
 extern "C" void __dl__FPv(void*);
+extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 
 template class CPtrArray<CMapAnimRun*>;
 template class CPtrArray<CMapShadow*>;
@@ -219,12 +222,164 @@ void CMapObj::Init()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002A5B0
+ * PAL Size: 6240b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapObj::ReadOtmObj(CChunkFile&)
+void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
 {
-	// TODO
+    enum {
+        CHUNK_AMBI = 0x414D4249,
+        CHUNK_ANIM = 0x414E494D,
+        CHUNK_BOBJ = 0x424F424A,
+        CHUNK_EFID = 0x45464944,
+        CHUNK_GBID = 0x47424944,
+        CHUNK_GEOM = 0x47454F4D,
+        CHUNK_ID = 0x49442020,
+        CHUNK_LTST = 0x4C545354,
+        CHUNK_MSID = 0x4D534944,
+        CHUNK_PIDX = 0x50494458,
+        CHUNK_PRIO = 0x5052494F,
+        CHUNK_SDST = 0x53445354,
+        CHUNK_TFRM = 0x5446524D,
+        CHUNK_TRNS = 0x54524E53,
+    };
+
+    Init();
+
+    chunkFile.PushChunk();
+    CChunkFile::CChunk chunk;
+    while (chunkFile.GetNextChunk(chunk) != 0) {
+        if (chunk.m_id == CHUNK_BOBJ) {
+            U16At(this, 0x16) = chunkFile.Get2();
+        } else if (chunk.m_id == CHUNK_GBID) {
+            U16At(this, 0x32) = chunkFile.Get2();
+        } else if (chunk.m_id == CHUNK_EFID) {
+            U16At(this, 0x30) = chunkFile.Get2();
+        } else if (chunk.m_id == CHUNK_ID) {
+            U16At(this, 0x2E) = chunkFile.Get2();
+        } else if (chunk.m_id == CHUNK_MSID) {
+            U16At(this, 0x34) = static_cast<unsigned short>(chunkFile.Get4());
+        } else if (chunk.m_id == CHUNK_PRIO) {
+            unsigned char priority = chunkFile.Get1();
+            U8At(this, 0x15) = priority;
+            U8At(this, 0x14) = priority;
+        } else if (chunk.m_id == CHUNK_AMBI) {
+            U8At(this, 0xE8) = chunkFile.Get1();
+            U8At(this, 0xE9) = chunkFile.Get1();
+            U8At(this, 0xEA) = chunkFile.Get1();
+            U8At(this, 0xEB) = chunkFile.Get1();
+            U8At(this, 0x21) = 1;
+        } else if (chunk.m_id == CHUNK_GEOM) {
+            F32At(this, 0x40) = chunkFile.GetF4();
+            U8At(this, 0x1A) = chunkFile.Get1();
+            U8At(this, 0x27) = chunkFile.Get1();
+        } else if (chunk.m_id == CHUNK_LTST) {
+            if (chunk.m_version == 1) {
+                S32At(this, 0x38) = static_cast<int>(chunkFile.Get4());
+            } else if (chunkFile.Get1() == 0) {
+                S32At(this, 0x38) = 0;
+            }
+        } else if (chunk.m_id == CHUNK_SDST) {
+            if (chunk.m_version == 2) {
+                U8At(this, 0x22) = chunkFile.Get1();
+                chunkFile.Get1();
+                chunkFile.Get1();
+                chunkFile.Get1();
+                S32At(this, 0x3C) = static_cast<int>(chunkFile.Get4());
+            } else if (chunk.m_version == 1) {
+                U8At(this, 0x22) = chunkFile.Get1();
+                if (chunkFile.Get1() == 0) {
+                    S32At(this, 0x3C) = 0;
+                } else {
+                    S32At(this, 0x3C) = -1;
+                }
+            } else {
+                U8At(this, 0x22) = chunkFile.Get1();
+                S32At(this, 0x3C) = -1;
+            }
+        } else if (chunk.m_id == CHUNK_PIDX) {
+            short parentIdx = static_cast<short>(chunkFile.Get2());
+            short meshOrHitIdx = static_cast<short>(chunkFile.Get2());
+
+            U8At(this, 0x1E) = chunkFile.Get1();
+            U8At(this, 0x1D) = chunkFile.Get1();
+
+            if (parentIdx == -1) {
+                PtrAt(this, 0x0) = 0;
+            } else {
+                ObjAt(this, 0x0) = MapObjArrayStart() + parentIdx;
+            }
+
+            if (meshOrHitIdx == -1) {
+                PtrAt(this, 0xC) = 0;
+            } else if (U8At(this, 0x1D) == 1) {
+                PtrAt(this, 0xC) = reinterpret_cast<unsigned char*>(&MapMng) + 0x1E954 + (meshOrHitIdx * 0x44);
+                U8At(this, 0x14) = 0;
+                U8At(this, 0x15) = 0;
+            } else if ((U8At(this, 0x1D) == 2) || (U8At(this, 0x1D) == 3)) {
+                if (meshOrHitIdx == -2) {
+                    chunkFile.GetString();
+                    PtrAt(this, 0xC) = 0;
+                } else {
+                    PtrAt(this, 0xC) = reinterpret_cast<unsigned char*>(&MapMng) + 0x4D4 + (meshOrHitIdx * 0x24);
+                }
+            }
+
+            if (((Game.game.m_currentSceneId == 4) || (Game.game.m_currentSceneId == 7)) &&
+                (static_cast<signed char>(U8At(this, 0x1E)) > 7) && (static_cast<signed char>(U8At(this, 0x1E)) < 10)) {
+                F32At(this, 0x58) = lbl_8032F940;
+                F32At(this, 0x5C) = lbl_8032F944;
+                F32At(this, 0x60) = lbl_8032F940;
+            }
+        } else if (chunk.m_id == CHUNK_TRNS) {
+            F32At(this, 0x58) = chunkFile.GetF4();
+            F32At(this, 0x5C) = chunkFile.GetF4();
+            F32At(this, 0x60) = chunkFile.GetF4();
+        } else if (chunk.m_id == CHUNK_TFRM) {
+            F32At(this, 0x64) = chunkFile.GetF4();
+            F32At(this, 0x68) = chunkFile.GetF4();
+            F32At(this, 0x6C) = chunkFile.GetF4();
+            F32At(this, 0x70) = chunkFile.GetF4();
+            F32At(this, 0x74) = chunkFile.GetF4();
+            F32At(this, 0x78) = chunkFile.GetF4();
+            F32At(this, 0x7C) = chunkFile.GetF4();
+            F32At(this, 0x80) = chunkFile.GetF4();
+            F32At(this, 0x84) = chunkFile.GetF4();
+
+            if (((U8At(this, 0x1D) == 2) || (U8At(this, 0x1D) == 3)) &&
+                ((F32At(this, 0x7C) != lbl_8032F940) || (F32At(this, 0x80) != lbl_8032F940) || (F32At(this, 0x84) != lbl_8032F940))) {
+                F32At(this, 0x7C) = lbl_8032F940;
+                F32At(this, 0x80) = lbl_8032F940;
+                F32At(this, 0x84) = lbl_8032F940;
+            }
+
+            U8At(this, 0x1C) = 1;
+            U8At(this, 0x1B) = 1;
+        } else if (chunk.m_id == CHUNK_ANIM) {
+            unsigned char* animRun = reinterpret_cast<unsigned char*>(
+                __nw__FUlPQ27CMemory6CStagePci(0x14, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x21E));
+            if (animRun != 0) {
+                *reinterpret_cast<int*>(animRun) = -1;
+                *reinterpret_cast<unsigned short*>(animRun + 0x12) = static_cast<unsigned short>(chunkFile.Get4());
+                *reinterpret_cast<int*>(animRun + 0x4) = static_cast<int>(chunkFile.Get4());
+                *reinterpret_cast<int*>(animRun + 0x8) = static_cast<int>(chunkFile.Get4());
+                *reinterpret_cast<int*>(animRun + 0xC) = static_cast<int>(chunkFile.Get4());
+                *(animRun + 0x10) = chunkFile.Get1();
+                if (chunk.m_version == 1) {
+                    *(animRun + 0x11) = chunkFile.Get1();
+                } else {
+                    *(animRun + 0x11) = 0;
+                }
+                reinterpret_cast<CPtrArray<CMapAnimRun*>*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x213E0)
+                    ->Add(reinterpret_cast<CMapAnimRun*>(animRun));
+            }
+        }
+    }
+    chunkFile.PopChunk();
 }
 
 /*

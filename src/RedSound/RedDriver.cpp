@@ -1682,9 +1682,22 @@ void CRedDriver::SePause(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedDriver::GetSeVolume(int, int)
+void CRedDriver::GetSeVolume(int param_1, int param_2)
 {
-	// TODO
+	int* seInfo;
+
+	seInfo = *(int**)((int)DAT_8032f3f0 + 0xdbc);
+	while ((*seInfo == 0) || ((param_1 != -1) && (param_1 != seInfo[0x3e]))) {
+		seInfo += 0x55;
+		if (seInfo >= (int*)(*(int*)((int)DAT_8032f3f0 + 0xdbc) + 0x2a80)) {
+			return;
+		}
+	}
+	if (param_2 == 1) {
+		(void)seInfo[0x15];
+	} else {
+		(void)(seInfo[0x13] >> 0xc);
+	}
 }
 
 /*
@@ -1704,7 +1717,7 @@ void CRedDriver::ReportSeLoop(int)
  */
 void CRedDriver::DisplaySePlayInfo()
 {
-	// TODO
+	DAT_8032e154.DisplaySePlayInfo();
 }
 
 /*

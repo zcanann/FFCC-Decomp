@@ -1770,7 +1770,7 @@ int COctTree::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long 
 	unsigned char* thisBytes = (unsigned char*)this;
 	unsigned char* mapData = *(unsigned char**)(thisBytes + 0x8);
 
-	if ((*thisBytes != 2) || (mapData == 0) || (*(CMapHit**)(mapData + 0xc) == 0)) {
+	if ((*thisBytes != 2) || (*(CMapHit**)(mapData + 0xc) == 0)) {
 		return 0;
 	}
 
@@ -1781,7 +1781,7 @@ int COctTree::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long 
 	PSMTXMultVecSR(inverseMtx, move, &s_mvec);
 
 	s_cyl.m_top.y = cylinder->m_top.y;
-	margin = s_cyl.m_top.y;
+	margin = lbl_8032F960 + s_cyl.m_top.y;
 
 	minValue = s_cyl.m_direction.x;
 	maxValue = s_cyl.m_bottom.x;
@@ -1811,8 +1811,10 @@ int COctTree::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long 
 	s_cyl.m_direction2.y = minValue - margin;
 
 	s_checkHitCylinderMask = flag;
-
-	return CheckHitCylinder_r(*(COctNode**)(thisBytes + 0x4));
+	if (CheckHitCylinder_r(*(COctNode**)(thisBytes + 0x4)) != 0) {
+		return 1;
+	}
+	return 0;
 }
 
 /*
@@ -1997,7 +1999,7 @@ int COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
 	unsigned char* thisBytes = (unsigned char*)this;
 	unsigned char* mapData = *(unsigned char**)(thisBytes + 0x8);
 
-	if ((*thisBytes != 2) || (mapData == 0) || (*(CMapHit**)(mapData + 0xc) == 0)) {
+	if ((*thisBytes != 2) || (*(CMapHit**)(mapData + 0xc) == 0)) {
 		return 0;
 	}
 

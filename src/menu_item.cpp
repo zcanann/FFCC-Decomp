@@ -464,8 +464,6 @@ int CMenuPcs::ItemCtrl()
  */
 bool CMenuPcs::ItemClose()
 {
-    s16* itemState = *(s16**)((u8*)this + 0x82C);
-    s16* itemList = *(s16**)((u8*)this + 0x850);
     int count;
     int finished;
     int step;
@@ -473,10 +471,10 @@ bool CMenuPcs::ItemClose()
     MenuItemOpenAnim* anim;
 
     finished = 0;
-    itemState[0x11] = itemState[0x11] + 1;
-    count = (int)*itemList;
-    anim = (MenuItemOpenAnim*)((u8*)itemList + 8);
-    step = (int)itemState[0x11];
+    (*(s16**)((u8*)this + 0x82C))[0x11] = (*(s16**)((u8*)this + 0x82C))[0x11] + 1;
+    count = (int)**(s16**)((u8*)this + 0x850);
+    anim = (MenuItemOpenAnim*)(*(s16**)((u8*)this + 0x850) + 4);
+    step = (int)(*(s16**)((u8*)this + 0x82C))[0x11];
     remaining = count;
 
     if (0 < count) {

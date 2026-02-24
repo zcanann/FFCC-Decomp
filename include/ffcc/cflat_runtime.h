@@ -80,7 +80,7 @@ public:
 	void clear();
 
 	void Create(void*);
-	void CreateDebug(void*, int);
+	int CreateDebug(void*, int);
 	void createVal(CChunkFile&, int, CFlatRuntime::CVal*);
 	int Frame(int, int);
 	void AfterFrame(int);

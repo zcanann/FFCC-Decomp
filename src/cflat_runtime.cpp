@@ -482,12 +482,87 @@ void CFlatRuntime::Create(void* filePtr)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80068c04
+ * PAL Size: 500b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime::CreateDebug(void*, int)
+int CFlatRuntime::CreateDebug(void* filePtr, int debugChunkIndex)
 {
-	// TODO
+	CChunkFile chunkFile(filePtr);
+	CChunkFile::CChunk chunk;
+	u8* const self = reinterpret_cast<u8*>(this);
+	int debugOffset = debugChunkIndex * 0x50;
+	int hasChunk = 0;
+
+	while ((hasChunk = chunkFile.GetNextChunk(chunk), hasChunk != 0)) {
+		if (chunk.m_id == 'CFLT') {
+			chunkFile.PushChunk();
+			int funcOffset = debugOffset;
+
+			while ((hasChunk = chunkFile.GetNextChunk(chunk), hasChunk != 0)) {
+				if (((chunk.m_id != 'NAME') && (static_cast<int>(chunk.m_id) < static_cast<int>('NAME')))
+				    && (chunk.m_id == 'FUNC')) {
+					chunkFile.PushChunk();
+					int blockOffset = funcOffset;
+
+					while ((hasChunk = chunkFile.GetNextChunk(chunk), hasChunk != 0)) {
+						void* funcs = *reinterpret_cast<void**>(self + 0x20);
+						if (chunk.m_id == 'BLCK') {
+							chunkFile.PushChunk();
+
+							while ((hasChunk = chunkFile.GetNextChunk(chunk), hasChunk != 0)) {
+								if (((chunk.m_id != 'NAME')
+								     && (static_cast<int>(chunk.m_id) < static_cast<int>('NAME')))
+								    && (chunk.m_id == 'CODE')) {
+									if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(funcs) + blockOffset + 0x30)
+									    == 0) {
+										*reinterpret_cast<void**>(reinterpret_cast<u8*>(funcs) + blockOffset + 0x3C)
+										    = 0;
+										*reinterpret_cast<void**>(reinterpret_cast<u8*>(funcs) + blockOffset + 0x38)
+										    = 0;
+									} else {
+										typedef void* (*GetStageFn)(CFlatRuntime*);
+										GetStageFn getStage =
+											reinterpret_cast<GetStageFn>((*reinterpret_cast<void***>(this))[0x12]);
+										*reinterpret_cast<unsigned int*>(
+											reinterpret_cast<u8*>(funcs) + blockOffset + 0x38) = chunk.m_size >> 3;
+										*reinterpret_cast<void**>(reinterpret_cast<u8*>(funcs) + blockOffset + 0x3C)
+										    = __nwa__FUlPQ27CMemory6CStagePci(
+											    *reinterpret_cast<int*>(reinterpret_cast<u8*>(funcs) + blockOffset
+											                            + 0x38)
+											        << 3,
+											    getStage(this), s_cflat_runtime_cpp_801d8ef8, 0x181);
+										memcpy(
+											*reinterpret_cast<void**>(reinterpret_cast<u8*>(funcs) + blockOffset + 0x3C),
+											chunkFile.GetAddress(), chunk.m_size);
+									}
+								}
+							}
+
+							chunkFile.PopChunk();
+							blockOffset += 0x50;
+							funcOffset += 0x50;
+							debugOffset += 0x50;
+							debugChunkIndex++;
+						}
+					}
+
+					chunkFile.PopChunk();
+				}
+			}
+
+			chunkFile.PopChunk();
+		}
+	}
+
+	hasChunk = -1;
+	if (debugChunkIndex < *reinterpret_cast<int*>(self + 0x1C)) {
+		hasChunk = debugChunkIndex;
+	}
+	return hasChunk;
 }
 
 /*

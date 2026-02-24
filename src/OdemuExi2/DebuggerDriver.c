@@ -58,42 +58,12 @@ static BOOL DBGEXISync() {
  */
 static BOOL DBGEXIImm(u8* buffer, s32 bytecounter, s32 write) {
     s32 i;
-    s32 rem;
     u32 value;
-    u8* p;
-    u32 chunkCount;
 
     if (write != 0) {
-        i = 0;
         value = 0;
-        if (0 < bytecounter) {
-                if ((8 < bytecounter) &&
-                    (chunkCount = ((u32)bytecounter - 1) >> 3, p = buffer, 0 < bytecounter - 8)) {
-                do {
-                    value |= (u32)p[0] << ((3 - i) * 8);
-                    value |= (u32)p[1] << ((3 - (i + 1)) * 8);
-                    value |= (u32)p[2] << ((3 - (i + 2)) * 8);
-                    value |= (u32)p[3] << ((3 - (i + 3)) * 8);
-                    value |= (u32)p[4] << ((3 - (i + 4)) * 8);
-                    value |= (u32)p[5] << ((3 - (i + 5)) * 8);
-                    value |= (u32)p[6] << ((3 - (i + 6)) * 8);
-                    value |= (u32)p[7] << ((3 - (i + 7)) * 8);
-                    p += 8;
-                    i += 8;
-                    chunkCount--;
-                } while (chunkCount != 0);
-            }
-
-            p = buffer + i;
-            rem = bytecounter - i;
-            if (i < bytecounter) {
-                do {
-                    value |= (u32)(*p) << ((3 - i) * 8);
-                    p++;
-                    i++;
-                    rem--;
-                } while (rem != 0);
-            }
+        for (i = 0; i < bytecounter; i++) {
+            value |= (u32)buffer[i] << ((3 - i) * 8);
         }
         __EXIRegs[14] = value;
     }
@@ -104,34 +74,9 @@ static BOOL DBGEXIImm(u8* buffer, s32 bytecounter, s32 write) {
     } while (value & 1);
 
     if (write == 0) {
-        i = 0;
         value = __EXIRegs[14];
-        if (0 < bytecounter) {
-            if ((8 < bytecounter) && (chunkCount = ((u32)bytecounter - 1) >> 3, 0 < bytecounter - 8)) {
-                do {
-                    buffer[0] = (u8)(value >> ((3 - i) * 8));
-                    buffer[1] = (u8)(value >> ((3 - (i + 1)) * 8));
-                    buffer[2] = (u8)(value >> ((3 - (i + 2)) * 8));
-                    buffer[3] = (u8)(value >> ((3 - (i + 3)) * 8));
-                    buffer[4] = (u8)(value >> ((3 - (i + 4)) * 8));
-                    buffer[5] = (u8)(value >> ((3 - (i + 5)) * 8));
-                    buffer[6] = (u8)(value >> ((3 - (i + 6)) * 8));
-                    buffer[7] = (u8)(value >> ((3 - (i + 7)) * 8));
-                    buffer += 8;
-                    i += 8;
-                    chunkCount--;
-                } while (chunkCount != 0);
-            }
-
-            rem = bytecounter - i;
-            if (i < bytecounter) {
-                do {
-                    *buffer = (u8)(value >> ((3 - i) * 8));
-                    buffer++;
-                    i++;
-                    rem--;
-                } while (rem != 0);
-            }
+        for (i = 0; i < bytecounter; i++) {
+            buffer[i] = (u8)(value >> ((3 - i) * 8));
         }
     }
 
@@ -223,27 +168,22 @@ static BOOL DBGRead(u32 count, u32* buffer, s32 param3) {
  * JP Size: TODO
  */
 static BOOL DBGWrite(u32 count, u32* buffer, s32 param3) {
-    u32 busyFlag;
-    u32 regs;
     u32 result;
     u32 cmd;
     u32 word;
 
     cmd = ((count & 0x1fffc) << 8) | 0xa0000000;
-    regs = __EXIRegs[10];
-    __EXIRegs[10] = (regs & 0x405) | 0xc0;
+    __EXIRegs[10] = (__EXIRegs[10] & 0x405) | 0xc0;
 
     result = (u32)__cntlzw(DBGEXIImm((u8*)&cmd, 4, TRUE));
-    do {
-        busyFlag = __EXIRegs[13];
-    } while (busyFlag & 1);
+    while (__EXIRegs[13] & 1)
+        ;
 
     while (param3 != 0) {
         word = *buffer++;
         result |= (u32)__cntlzw(DBGEXIImm((u8*)&word, 4, TRUE)) >> 5;
-        do {
-            busyFlag = __EXIRegs[13];
-        } while (busyFlag & 1);
+        while (__EXIRegs[13] & 1)
+            ;
 
         param3 -= 4;
         if (param3 < 0) {
@@ -252,8 +192,7 @@ static BOOL DBGWrite(u32 count, u32* buffer, s32 param3) {
     }
 
     result = (u32)__cntlzw(result);
-    regs = __EXIRegs[10];
-    __EXIRegs[10] = regs & 0x405;
+    __EXIRegs[10] &= 0x405;
     return result >> 5;
 }
 

@@ -26,6 +26,7 @@ extern "C" void AmemSetLock__13CAmemCacheSetFv(void*);
 extern "C" void AssertCache__13CAmemCacheSetFv(void*);
 extern "C" void Destroy__13CAmemCacheSetFv(void*);
 extern "C" void IsBigAlloc__7CUSBPcsFi(void*, int);
+extern "C" void mccReadData__7CUSBPcsFv(void*);
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
 extern "C" void* Free__7CMemoryFPv(void*, void*);
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
@@ -721,12 +722,29 @@ void CPartPcs::calc()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005309c
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartPcs::calcViewer()
 {
-	// TODO
+    CUSBStreamData* usbStream = reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 8);
+
+    OSStartStopwatch(&g_par_calc_prof);
+    PartMng.pppEditBeforeCalc();
+    PartMng.pppEditPartCalc();
+    OSStopStopwatch(&g_par_calc_prof);
+
+    mccReadData__7CUSBPcsFv(USBPcs);
+    if (usbStream->IsUSBStreamDataDone()) {
+        if (usbStream->m_packetCode != 0) {
+            PartMng.pppDataRcv(usbStream->m_packetCode, reinterpret_cast<char*>(usbStream->m_data), usbStream->m_sizeBytes);
+        }
+        usbStream->SetUSBStreamDataDone();
+    }
 }
 
 /*
@@ -833,12 +851,27 @@ void CPartPcs::drawAfter()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80052bd4
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartPcs::DrawMenu(int)
+void CPartPcs::DrawMenu(int fpNo)
 {
-	// TODO
+    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 8);
+
+    if (usb->m_disableShokiDraw == 0) {
+        Graphic.SetFog(1, 0);
+        Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
+        pppInitDrawEnv(0);
+        PartMng.pppSetRendMatrix();
+        PartMng.pppDrawPrioPdtFpno(6, 0, static_cast<short>(fpNo));
+        PartMng.drawEnd();
+        pppClearDrawEnv();
+        Graphic.SetDrawDoneDebugData(0x7f);
+    }
 }
 
 /*
@@ -870,12 +903,27 @@ void CPartPcs::DrawShoki()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80052a74
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartPcs::DrawMenuIdx(int)
+void CPartPcs::DrawMenuIdx(int index)
 {
-	// TODO
+    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 8);
+
+    if (usb->m_disableShokiDraw == 0) {
+        Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
+        Graphic.SetFog(1, 0);
+        pppInitDrawEnv(0);
+        PartMng.pppSetRendMatrix();
+        PartMng.pppDrawIdx(index);
+        PartMng.drawEnd();
+        pppClearDrawEnv();
+        Graphic.SetDrawDoneDebugData(0x7f);
+    }
 }
 
 /*

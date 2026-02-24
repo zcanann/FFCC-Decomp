@@ -33,9 +33,12 @@ extern double DOUBLE_80332a90;
 extern double DOUBLE_80332a98;
 extern double DOUBLE_80332aa0;
 extern double DOUBLE_80332aa8;
+extern float FLOAT_80332ad0;
 extern float FLOAT_80332a70;
 extern float FLOAT_80332ab0;
 extern float FLOAT_80332a88;
+extern float FLOAT_80332b38;
+extern float FLOAT_80332b3c;
 extern s16 DAT_801de910[];
 extern s16 DAT_801de914[];
 extern s16 DAT_801de91c[];
@@ -78,12 +81,188 @@ void CMenuPcs::CmdInit0()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8014ff0c
+ * PAL Size: 816b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CmdInit1()
 {
-	// TODO
+	float fVar2;
+	float fVar3;
+	float fVar4;
+	u32 uVar5;
+	s16 sVar1;
+	s16 sVar6;
+	s16 sVar7;
+	s16* psVar8;
+	s16* psVar9;
+	int iVar10;
+	int iVar11;
+	int iVar12;
+	int iVar13;
+	u32 uVar14;
+
+	fVar4 = FLOAT_80332b38;
+	fVar3 = FLOAT_80332ad0;
+	fVar2 = FLOAT_80332a70;
+	iVar10 = (int)**(s16**)((u8*)this + 0x850);
+	psVar8 = *(s16**)((u8*)this + 0x850) + iVar10 * 0x20 + 4;
+	psVar8[0xe] = 0;
+	psVar8[0xf] = 0x2e;
+	*psVar8 = 0xb8;
+	psVar8[1] = 0x28;
+	psVar8[2] = 0x78;
+	psVar8[3] = 0x108;
+	*(float*)(psVar8 + 4) = fVar4;
+	*(float*)(psVar8 + 6) = fVar3;
+	*(float*)(psVar8 + 10) = fVar2;
+	psVar8[0x12] = 0;
+	psVar8[0x13] = 5;
+	psVar8[0x14] = 0;
+	psVar8[0x15] = 5;
+
+	iVar11 = 0x2f;
+	if (*(s16*)((u8*)this + 0x864) == 0) {
+		iVar11 = 0x46;
+	}
+
+	psVar8 = (s16*)(*(int*)((u8*)this + 0x850) + (iVar10 + 1) * 0x40 + 8);
+	*(int*)(psVar8 + 0xe) = iVar11;
+	*psVar8 = 0xa0;
+	fVar3 = FLOAT_80332ab0;
+	psVar8[1] = 0xe;
+	fVar2 = FLOAT_80332a70;
+	psVar8[2] = 0x30;
+	psVar8[3] = 0x30;
+	*(float*)(psVar8 + 4) = fVar3;
+	*(float*)(psVar8 + 6) = fVar3;
+	*(float*)(psVar8 + 10) = fVar2;
+	*(int*)(psVar8 + 0x12) = 0;
+	*(int*)(psVar8 + 0x14) = 5;
+
+	psVar8 = (s16*)(*(int*)((u8*)this + 0x850) + (iVar10 + 2) * 0x40 + 8);
+	*(int*)(psVar8 + 0xe) = iVar11;
+	psVar8[2] = 0x30;
+	fVar2 = FLOAT_80332ab0;
+	sVar7 = 0;
+	psVar8[3] = 0x30;
+	fVar3 = FLOAT_80332b3c;
+	*psVar8 = 0xa5;
+	iVar12 = iVar10 + 4;
+	psVar8[1] = (s16)(0x150 - psVar8[3]);
+	iVar13 = iVar12 * 0x40;
+	*(float*)(psVar8 + 4) = fVar2;
+	*(float*)(psVar8 + 6) = fVar2;
+	*(float*)(psVar8 + 10) = fVar3;
+	*(int*)(psVar8 + 0x12) = 0;
+	*(int*)(psVar8 + 0x14) = 5;
+
+	psVar8 = (s16*)(*(int*)((u8*)this + 0x850) + (iVar10 + 3) * 0x40 + 8);
+	*(int*)(psVar8 + 0x16) = 2;
+	*(int*)(psVar8 + 0xe) = 0x2e;
+	*psVar8 = 0xa0;
+	psVar8[1] = 8;
+	psVar8[2] = 0x48;
+	psVar8[3] = 0x140;
+	*(float*)(psVar8 + 4) = fVar2;
+	*(float*)(psVar8 + 6) = fVar2;
+	*(int*)(psVar8 + 0x12) = 0;
+	*(int*)(psVar8 + 0x14) = 5;
+
+	psVar9 = *(s16**)((u8*)this + 0x850) + **(s16**)((u8*)this + 0x850) * 0x20 + 4;
+	iVar10 = 4;
+	do {
+		psVar8 = (s16*)(*(int*)((u8*)this + 0x850) + iVar13 + 8);
+		psVar8[0x16] = 0;
+		psVar8[0x17] = 2;
+		psVar8[0xe] = 0;
+		psVar8[0xf] = 0x37;
+		iVar12 += 2;
+		*psVar8 = *psVar9 + 0x24;
+		sVar1 = sVar7 + 0x20;
+		psVar8[1] = psVar9[1] + sVar7;
+		psVar8[2] = 200;
+		psVar8[3] = 0x28;
+		*(float*)(psVar8 + 4) = fVar2;
+		*(float*)(psVar8 + 6) = fVar2;
+		psVar8[0x12] = 0;
+		psVar8[0x13] = 7;
+		psVar8[0x14] = 0;
+		psVar8[0x15] = 5;
+
+		iVar11 = iVar13 + 0x48;
+		iVar13 += 0x80;
+		psVar8 = (s16*)(*(int*)((u8*)this + 0x850) + iVar11);
+		psVar8[0x16] = 0;
+		psVar8[0x17] = 2;
+		psVar8[0xe] = 0;
+		psVar8[0xf] = 0x37;
+		*psVar8 = *psVar9 + 0x24;
+		sVar7 += 0x40;
+		psVar8[1] = psVar9[1] + sVar1;
+		psVar8[2] = 200;
+		psVar8[3] = 0x28;
+		*(float*)(psVar8 + 4) = fVar2;
+		*(float*)(psVar8 + 6) = fVar2;
+		psVar8[0x12] = 0;
+		psVar8[0x13] = 7;
+		psVar8[0x14] = 0;
+		fVar3 = FLOAT_80332ab0;
+		psVar8[0x15] = 5;
+		iVar10 -= 1;
+	} while (iVar10 != 0);
+	*(s16*)(*(int*)((u8*)this + 0x850) + 2) = (s16)iVar12;
+
+	psVar8 = *(s16**)((u8*)this + 0x850);
+	uVar5 = (u32)((int)psVar8[1] - (int)*psVar8);
+	psVar8 = psVar8 + *psVar8 * 0x20 + 4;
+	if ((int)uVar5 > 0) {
+		uVar14 = uVar5 >> 3;
+		if (uVar14 != 0) {
+			do {
+				psVar8[0x10] = 0;
+				psVar8[0x11] = 0;
+				*(float*)(psVar8 + 8) = fVar3;
+				psVar8[0x30] = 0;
+				psVar8[0x31] = 0;
+				*(float*)(psVar8 + 0x28) = fVar3;
+				psVar8[0x50] = 0;
+				psVar8[0x51] = 0;
+				*(float*)(psVar8 + 0x48) = fVar3;
+				psVar8[0x70] = 0;
+				psVar8[0x71] = 0;
+				*(float*)(psVar8 + 0x68) = fVar3;
+				psVar8[0x90] = 0;
+				psVar8[0x91] = 0;
+				*(float*)(psVar8 + 0x88) = fVar3;
+				psVar8[0xb0] = 0;
+				psVar8[0xb1] = 0;
+				*(float*)(psVar8 + 0xa8) = fVar3;
+				psVar8[0xd0] = 0;
+				psVar8[0xd1] = 0;
+				*(float*)(psVar8 + 200) = fVar3;
+				psVar8[0xf0] = 0;
+				psVar8[0xf1] = 0;
+				*(float*)(psVar8 + 0xe8) = fVar3;
+				psVar8 += 0x100;
+				uVar14 -= 1;
+			} while (uVar14 != 0);
+			uVar5 &= 7;
+			if (uVar5 == 0) {
+				return;
+			}
+		}
+		do {
+			psVar8[0x10] = 0;
+			psVar8[0x11] = 0;
+			*(float*)(psVar8 + 8) = fVar3;
+			psVar8 += 0x20;
+			uVar5 -= 1;
+		} while (uVar5 != 0);
+	}
 }
 
 /*

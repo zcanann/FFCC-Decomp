@@ -232,13 +232,11 @@ void CRingMenu::onCalc()
 	const int menuIndex = RingMenuInt(this, 0x0C);
 	if ((Game.game.m_gameWork.m_menuStageMode == 0) || (menuIndex < 1)) {
 		const int animDirection = RingMenuInt(this, 0x10);
-		const unsigned int flatFlag0 = *reinterpret_cast<unsigned int*>(CFlat + 0x12A0);
-		const unsigned int flatFlag1 = *reinterpret_cast<unsigned int*>(CFlat + 0x12A4);
-		const int targetAnimDirection = static_cast<int>((flatFlag0 & flatFlag1) >> 2 & 1);
-
-		if (animDirection != targetAnimDirection) {
+		const unsigned int targetAnimDirection =
+			((*reinterpret_cast<unsigned int*>(CFlat + 0x12A0) & *reinterpret_cast<unsigned int*>(CFlat + 0x12A4)) >> 2) & 1;
+		if (animDirection != static_cast<int>(targetAnimDirection)) {
 			System.Printf(DAT_801da01c, menuIndex);
-			RingMenuInt(this, 0x10) = targetAnimDirection;
+			RingMenuInt(this, 0x10) = (static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(animDirection))) >> 5) & 0xFF;
 			RingMenuInt(this, 0x500) = 0x10 - RingMenuInt(this, 0x500);
 		}
 
@@ -263,8 +261,10 @@ void CRingMenu::onCalc()
 		}
 
 		fmod(static_cast<double>(RingMenuFloat(this, 0x50C)), DOUBLE_80330a98);
-		for (volatile int i = 0x1B; i != 0; i--) {
-		}
+		volatile int i = 0x1B;
+		do {
+			i--;
+		} while (i != 0);
 
 		unsigned int gbaConnected =
 			(static_cast<unsigned int>(__cntlzw(1 - static_cast<int>(Joybus.GetCtrlMode(menuIndex)))) >> 5) & 0xFF;
@@ -273,8 +273,7 @@ void CRingMenu::onCalc()
 			gbaConnected = 1;
 		}
 
-		const unsigned int padType = Joybus.GetPadType(menuIndex);
-		if ((padType == 0x09000000) || (padType == 0x8B100000)) {
+		if ((Joybus.GetPadType(menuIndex) == 0x09000000) || (Joybus.GetPadType(menuIndex) == 0x8B100000)) {
 			gbaConnected = 0;
 		}
 

@@ -35,8 +35,8 @@ void CMapShadowInsertOctTree(CMapShadow::TARGET mapShadow, COctTree& octTree)
 		for (i = 0; i < ((CPtrArray<CMapShadow>*)((char*)&MapMng + 0x21434))->GetSize(); i++) {
 			if (((*(u32*)(*(u32*)((char*)&octTree + 0x8) + 0x3c) & (1U << i)) != 0)
 			    && ((shadow = (*(CPtrArray<CMapShadow>*)((char*)&MapMng + 0x21434))[i]),
-			        (*((char*)shadow + (int)mapShadow + 0xf0) != 0))
-			    && (*(char*)((char*)shadow + 0x7) == 0)) {
+			        (*(u8*)((char*)shadow + (int)mapShadow + 0xf0) != 0))
+			    && (*(u8*)((char*)shadow + 0x7) == 0)) {
 				model = *(int*)((char*)shadow + 0xc);
 				pos.x = *(float*)(model + 0xc4);
 				pos.y = *(float*)(model + 0xd4);

@@ -92,6 +92,7 @@ unsigned int CRedSound::GetAutoID()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 int* CRedSound::EntryStandbyID(int id)
 {
 	int* slot = DAT_8032e17c;
@@ -105,6 +106,7 @@ int* CRedSound::EntryStandbyID(int id)
 
 	return 0;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

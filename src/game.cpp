@@ -11,6 +11,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/file.h"
 #include "ffcc/partMng.h"
+#include "ffcc/maplight.h"
 
 #include <string.h>
 
@@ -672,6 +673,54 @@ void CGame::clearWork()
     ClearAll__5CWindFv(Wind);
 
     *((u8*)&Sound + 0x8892) = 0x7F;
+
+    CPtrArray<CMapLightHolder*>* mapLightHolderArr =
+        reinterpret_cast<CPtrArray<CMapLightHolder*>*>(reinterpret_cast<u8*>(&MapMng) + 0x21450);
+
+    if (mapLightHolderArr->GetSize() != 0) {
+        _GXColor holderColor;
+        Vec holderVec;
+
+        if (mapLightHolderArr->GetSize() != 0) {
+            (*mapLightHolderArr)[0]->GetLightHolder(&holderColor, 0);
+        }
+
+        u8* charaColorE8 = reinterpret_cast<u8*>(&CharaPcs) + 0xE8;
+        u8* charaColorF0Base = reinterpret_cast<u8*>(&CharaPcs) + 0xF0;
+        u8* charaVec108Base = reinterpret_cast<u8*>(&CharaPcs) + 0x108;
+
+        for (int i = 0; i < 2; i++) {
+            charaColorE8[0] = holderColor.r;
+            charaColorE8[1] = holderColor.g;
+            charaColorE8[2] = holderColor.b;
+            charaColorE8[3] = holderColor.a;
+
+            u8* charaColorF0 = charaColorF0Base;
+            u8* charaVec108 = charaVec108Base;
+
+            for (u32 j = 0; j < 3; j++) {
+                if ((j + 1) < static_cast<u32>(mapLightHolderArr->GetSize())) {
+                    (*mapLightHolderArr)[j + 1]->GetLightHolder(&holderColor, &holderVec);
+                }
+
+                charaColorF0[0] = holderColor.r;
+                charaColorF0[1] = holderColor.g;
+                charaColorF0[2] = holderColor.b;
+                charaColorF0[3] = holderColor.a;
+
+                if (i == 0) {
+                    *reinterpret_cast<Vec*>(charaVec108) = holderVec;
+                }
+
+                charaColorF0 += 4;
+                charaVec108 += 0xC;
+            }
+
+            charaColorE8 += 4;
+            charaColorF0Base += 0xC;
+            charaVec108Base += 0xC;
+        }
+    }
 }
 
 /*

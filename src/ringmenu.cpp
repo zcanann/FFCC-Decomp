@@ -1,4 +1,5 @@
 #include "ffcc/ringmenu.h"
+#include "ffcc/fontman.h"
 #include "ffcc/gobjwork.h"
 #include "ffcc/joybus.h"
 #include "ffcc/math.h"
@@ -12,11 +13,20 @@
 
 extern "C" int __cntlzw(unsigned int);
 extern "C" int _GetIdxCmdList__12CCaravanWorkFv(CCaravanWork*);
+extern "C" int _GetWeaponAttrib__12CCaravanWorkFi(CCaravanWork*, int);
 extern "C" int GetNextCmdListIdx__12CCaravanWorkFii(CCaravanWork*, int, int);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(void*, int);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(void*, unsigned long, float, float, float, float, float, float, float, float, float);
 extern "C" void SetColor__8CMenuPcsFR6CColor(void*, void*);
 extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
+extern "C" void SetTlut__5CFontFi(CFont*, int);
+extern "C" void SetScale__5CFontFf(float, CFont*);
+extern "C" int GetWidth__5CFontFPc(CFont*, int);
+extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
+extern "C" void SetPosX__5CFontFf(float, CFont*);
+extern "C" void SetPosY__5CFontFf(float, CFont*);
+extern "C" void SetPosZ__5CFontFf(float, CFont*);
+extern "C" void Draw__5CFontFPc(CFont*, int);
 extern "C" void SetExternalTlut__8CTextureFPvi(void*, void*, int);
 extern "C" void _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
     int, int, int, int, int);
@@ -53,9 +63,18 @@ extern float FLOAT_803309f0;
 extern float FLOAT_803309f4;
 extern float FLOAT_803309f8;
 extern float FLOAT_80330a54;
+extern float FLOAT_80330a28;
+extern float FLOAT_80330a34;
+extern float FLOAT_80330a40;
+extern float FLOAT_80330aa8;
+extern float FLOAT_80330ac4;
 extern float FLOAT_80330ae8;
 extern double DOUBLE_80330a00;
 extern double DOUBLE_80330a98;
+extern double DOUBLE_80330ac8;
+extern double DOUBLE_80330ad0;
+extern double DOUBLE_80330ad8;
+extern double DOUBLE_80330ae0;
 
 static inline int& RingMenuInt(CRingMenu* ringMenu, int offset)
 {
@@ -86,6 +105,19 @@ static inline unsigned int frameNibble(int value)
 	int sign = value >> 31;
 	return static_cast<unsigned int>((sign * 0x10 | (value * 0x10000000 + sign) >> 28) - sign);
 }
+
+struct RingMenuFlatTableEntry
+{
+	int count;
+	const char** strings;
+	char* stringBuf;
+};
+
+struct RingMenuFlatData
+{
+	char pad0[0x6C];
+	RingMenuFlatTableEntry table[8];
+};
 
 /*
  * --INFO--
@@ -322,12 +354,78 @@ void CRingMenu::onCalc()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a48f0
+ * PAL Size: 844b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void drawCommand(int, CFont*, float, float, CCaravanWork*, int, float, float)
+void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* caravanWork, int cmdIndex, float angle, float alphaScale)
 {
-	// TODO
+	const RingMenuFlatData* flatData = reinterpret_cast<const RingMenuFlatData*>(&Game.game.m_cFlatDataArr[1]);
+	const int* cmdNameTable = reinterpret_cast<const int*>(flatData->table[4].strings);
+
+	int commandLabel;
+	if (Game.game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
+		commandLabel = cmdNameTable[cmdIndex + 0x1E];
+	} else if (cmdIndex < 2) {
+		commandLabel = cmdNameTable[(cmdIndex == 0) ? 1 : 9];
+	} else {
+		commandLabel = _GetWeaponAttrib__12CCaravanWorkFi(caravanWork, cmdIndex);
+	}
+
+	int tlut = 7;
+	if (Game.game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
+		if (cmdIndex == 2) {
+			tlut = 4;
+		} else if (cmdIndex < 2) {
+			if (cmdIndex == 0) {
+				tlut = 2;
+			} else if (cmdIndex >= 0) {
+				tlut = 1;
+			}
+		} else if ((cmdIndex < 4) && (cmdIndex != 4)) {
+			tlut = 6;
+		}
+	} else if (cmdIndex != 0) {
+		tlut = 4;
+	}
+	SetTlut__5CFontFi(font, tlut);
+
+	const double angleSin = sin(static_cast<double>(angle));
+	const double waveX = static_cast<double>(FLOAT_80330ac4 * static_cast<float>(angleSin));
+
+	const bool reverseDir = (state == 0) || (state == 3);
+	double waveY = static_cast<double>((reverseDir ? -FLOAT_80330a40 : FLOAT_80330a40) * static_cast<float>(angleSin));
+	if (Game.game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
+		waveY += static_cast<double>(FLOAT_80330a28);
+	}
+
+	SetScale__5CFontFf(static_cast<float>(-(DOUBLE_80330ad0 * fabs(static_cast<double>(angle)) - DOUBLE_80330ac8)), font);
+
+	const int textWidth = GetWidth__5CFontFPc(font, commandLabel);
+	const float alphaRange = static_cast<float>(-(DOUBLE_80330ad8 * fabs(static_cast<double>(angle)) - DOUBLE_80330a98));
+	float clampedAlpha = FLOAT_803309c0;
+	if (alphaRange >= FLOAT_803309c0) {
+		clampedAlpha = alphaRange;
+		if (alphaRange > FLOAT_803309cc) {
+			clampedAlpha = FLOAT_803309cc;
+		}
+	}
+
+	const int alpha = static_cast<int>(FLOAT_80330a34 * alphaScale * clampedAlpha);
+	GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha)};
+	SetColor__5CFontF8_GXColor(font, &color);
+
+	const float textX = static_cast<float>(waveX + static_cast<double>(posX + FLOAT_80330aa8) - static_cast<double>(textWidth) * DOUBLE_80330ae0);
+	const double textHeight = static_cast<double>(font->m_glyphWidth) * font->scaleY;
+	const float textY = static_cast<float>(FLOAT_80330a40 + waveY + static_cast<double>(posY + FLOAT_803309ec) - textHeight * DOUBLE_80330ae0);
+
+	SetPosX__5CFontFf(textX, font);
+	SetPosY__5CFontFf(textY, font);
+	SetPosZ__5CFontFf(FLOAT_803309c0, font);
+	Draw__5CFontFPc(font, commandLabel);
 }
 
 /*

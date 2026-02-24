@@ -27,6 +27,7 @@ static char s_drawErrorFmt[] = "CFile::drawError %d";
 static char s_queueWarnAnyFmt[] = "BackAllFilesToQueue: %s";
 static char s_queueWarnTargetFmt[] = "BackAllFilesToQueue: %s (%s)";
 static char s_closeWarnFmt[] = "Close: %s";
+static char s_readWarnFmt[] = "Read: %s (%u)";
 
 static const char* s_diskErrorText[4][6][3] = {
     {
@@ -296,9 +297,9 @@ void CFile::Read(CFile::CHandle* fileHandle)
 	BackAllFilesToQueue(fileHandle);
 	fileHandle->m_completionStatus = 2;
 	u32 readSize = (fileHandle->m_chunkSize + 0x1FU) & ~0x1FU;
-	if (readSize > 0x100000U && System.m_execParam != 0)
+	if (readSize > 0x100000U && (unsigned int)System.m_execParam >= 1)
 	{
-		System.Printf("", fileHandle->m_name, readSize);
+		System.Printf(s_readWarnFmt, fileHandle->m_name, readSize);
 	}
 	DVDReadAsyncPrio(&fileHandle->m_dvdFileInfo, m_readBuffer, readSize, fileHandle->m_currentOffset, 0, 2);
 	fileHandle->m_nextOffset = fileHandle->m_currentOffset + readSize;

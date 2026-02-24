@@ -11,9 +11,11 @@ extern "C" void pppStopSe__FP9_pppMngStP7PPPSEST(_pppMngSt*, PPPSEST*);
 extern "C" float ppvScreenMatrix[4][4];
 extern "C" void __ct__9_pppMngStFv(_pppMngSt* pppMngSt);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
+extern int DAT_8032ed70;
 extern CPartMng PartMng;
 extern PPPCREATEPARAM g_dcp;
 static char s_partMng_cpp_801d8230[] = "partMng.cpp";
+static char s_CheckSum_ERROR_code_0x_x____801d82f0[] = "CheckSum ERROR code[0x%x]!!!";
 
 struct CPtrArrayBare {
     unsigned long m_size;
@@ -497,22 +499,64 @@ void CPartMng::pppEditAllReleaseResource()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005c1c4
+ * PAL Size: 108b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CheckSum(char*, unsigned long, unsigned long)
+void CheckSum(char* packet, unsigned long code, unsigned long packetSize)
 {
-	// TODO
+    if (packet == 0 || packetSize <= 0x20) {
+        return;
+    }
+
+    int checkSum = 0x12345678;
+    char* cursor = packet + 0x20;
+    unsigned long remaining = packetSize - 0x20;
+
+    while (remaining > 0) {
+        checkSum += *cursor++;
+        remaining--;
+    }
+
+    if (checkSum != *reinterpret_cast<int*>(packet)) {
+        Graphic.Printf(s_CheckSum_ERROR_code_0x_x____801d82f0, code);
+        Graphic.DrawDebugString();
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005c230
+ * PAL Size: 5168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartMng::pppDataRcv(unsigned long, char*, unsigned long)
+void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packetSize)
 {
-	// TODO
+    if (packet == 0 || packetSize <= 0x20) {
+        return;
+    }
+
+    CheckSum(packet, code, packetSize);
+
+    switch (code) {
+    case 0x14:
+        DAT_8032ed70 = 0;
+        return;
+    case 0x15:
+        DAT_8032ed70 = 1;
+        return;
+    case 0x1f:
+    case 0xfe:
+    case 0xff:
+    default:
+        return;
+    }
 }
 
 /*

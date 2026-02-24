@@ -5,6 +5,7 @@
 #include "ffcc/util.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include <string.h>
 
 typedef signed short s16;
 typedef unsigned char u8;
@@ -25,33 +26,43 @@ extern "C" void CalcSkin__Q26CChara6CModelFv(CChara::CModel*);
 extern "C" unsigned int CmdOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int CmdCtrl__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int CmdClose__8CMenuPcsFv(CMenuPcs*);
+extern "C" void CmdDraw__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int ItemOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int ItemCtrl__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int ItemClose__8CMenuPcsFv(CMenuPcs*);
+extern "C" void ItemDraw__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int EquipOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int EquipCtrl__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int EquipClose__8CMenuPcsFv(CMenuPcs*);
+extern "C" void EquipDraw__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int ArtiOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int ArtiCtrl__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int ArtiClose__8CMenuPcsFv(CMenuPcs*);
+extern "C" void ArtiDraw__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int TmpArtiOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int TmpArtiCtrl__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int TmpArtiClose__8CMenuPcsFv(CMenuPcs*);
+extern "C" void TmpArtiDraw__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int MoneyOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int MoneyCtrl__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int MoneyClose__8CMenuPcsFv(CMenuPcs*);
+extern "C" void MoneyDraw__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int FavoOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int FavoCtrl__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int FavoClose__8CMenuPcsFv(CMenuPcs*);
+extern "C" void FavoDraw__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int CompaOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int CompaCtrl__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int CompaClose__8CMenuPcsFv(CMenuPcs*);
+extern "C" void CompaDraw__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int LetterOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int LetterCtrl__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int LetterClose__8CMenuPcsFv(CMenuPcs*);
+extern "C" void LetterDraw__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int MLstOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int MLstCtrl__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int MLstClose__8CMenuPcsFv(CMenuPcs*);
+extern "C" void MLstDraw__8CMenuPcsFv(CMenuPcs*);
 extern "C" void CalcHeart__8CMesMenuFv(void*);
 
 extern float FLOAT_8033292c;
@@ -441,12 +452,139 @@ void CMenuPcs::SingleCalcCtrl()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801478cc
+ * PAL Size: 1156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::SingleDrawCtrl()
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+
+    DrawInit__8CMenuPcsFv(this);
+    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+    _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
+    GXSetChanMatColor(GX_COLOR0A0, white);
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x20);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 0, FLOAT_8033294c, FLOAT_8033294c, FLOAT_803329a4, FLOAT_80332928,
+                                     FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 4, FLOAT_8033294c, FLOAT_803329a8, FLOAT_803329a4, FLOAT_80332928,
+                                     FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x28);
+    unsigned int step = 0x20;
+    for (unsigned int y = 0x40; y < 0x180; y += step) {
+        if ((0x180 - y) < step) {
+            step = 0x180 - y;
+        }
+
+        DrawRect__8CMenuPcsFUlfffffffff(this, 0, FLOAT_8033294c, static_cast<float>(y), FLOAT_803329a4,
+                                         static_cast<float>(step), FLOAT_8033294c, FLOAT_8033294c,
+                                         FLOAT_80332934, FLOAT_80332934, 0.0f);
+    }
+
+    if (*reinterpret_cast<s16*>(self + 0x864) != 8) {
+        DrawInit__8CMenuPcsFv(this);
+        GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+        SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+        GXSetChanMatColor(GX_COLOR0A0, white);
+        SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x21);
+        DrawRect__8CMenuPcsFUlfffffffff(this, 0, FLOAT_8033292c, FLOAT_80332948, FLOAT_803329ac, FLOAT_803329b0,
+                                         FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
+        DrawRect__8CMenuPcsFUlfffffffff(this, 8, FLOAT_803329b4, FLOAT_80332948, FLOAT_803329ac, FLOAT_803329b0,
+                                         FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
+        DrawSingleStat(FLOAT_80332934);
+        DrawSingleHelpWim(FLOAT_80332934);
+    }
+
+    if (DAT_8032eebc == 0) {
+        return;
+    }
+
+    switch (*reinterpret_cast<s16*>(self + 0x864)) {
+    case 0:
+        CmdDraw__8CMenuPcsFv(this);
+        break;
+    case 1:
+        ItemDraw__8CMenuPcsFv(this);
+        break;
+    case 2:
+        EquipDraw__8CMenuPcsFv(this);
+        break;
+    case 3:
+        ArtiDraw__8CMenuPcsFv(this);
+        break;
+    case 4:
+        TmpArtiDraw__8CMenuPcsFv(this);
+        break;
+    case 5:
+        MoneyDraw__8CMenuPcsFv(this);
+        break;
+    case 6:
+        FavoDraw__8CMenuPcsFv(this);
+        break;
+    case 7:
+        CompaDraw__8CMenuPcsFv(this);
+        break;
+    case 8:
+        LetterDraw__8CMenuPcsFv(this);
+        break;
+    case 9:
+        MLstDraw__8CMenuPcsFv(this);
+        break;
+    }
+
+    int statePtr = *reinterpret_cast<int*>(self + 0x82C);
+    if (*reinterpret_cast<s16*>(statePtr + 0x2E) == 0) {
+        return;
+    }
+
+    if (*reinterpret_cast<s16*>(statePtr + 0x10) < 2) {
+        ++(*reinterpret_cast<s16*>(statePtr + 0x10));
+        *reinterpret_cast<s16*>(statePtr + 0x22) = 0;
+        *reinterpret_cast<u8*>(statePtr + 0xB) = 0;
+        *reinterpret_cast<s16*>(statePtr + 0x2E) = 0;
+        return;
+    }
+
+    s16 previousMode = 0;
+    if (*reinterpret_cast<u8*>(statePtr + 0xD) == 0) {
+        s16 mode = *reinterpret_cast<s16*>(self + 0x864);
+        if (mode == 9) {
+            *reinterpret_cast<s16*>(self + 0x864) = *reinterpret_cast<s16*>(statePtr + 0x26);
+        } else if ((mode == 8) && (DAT_8032eec4 >= 0)) {
+            *reinterpret_cast<s16*>(self + 0x864) = static_cast<s16>(DAT_8032eec4);
+        } else if ((mode == 8) || (DAT_8032eec4 < 0)) {
+            if (*reinterpret_cast<s16*>(statePtr + 0x1E) < 1) {
+                --(*reinterpret_cast<s16*>(self + 0x864));
+                if (*reinterpret_cast<s16*>(self + 0x864) < 0) {
+                    *reinterpret_cast<s16*>(self + 0x864) = 8;
+                }
+            } else {
+                ++(*reinterpret_cast<s16*>(self + 0x864));
+                if (*reinterpret_cast<s16*>(self + 0x864) > 8) {
+                    *reinterpret_cast<s16*>(self + 0x864) = 0;
+                }
+            }
+        } else {
+            *reinterpret_cast<s16*>(self + 0x864) = 8;
+        }
+    } else {
+        s16 mode = *reinterpret_cast<s16*>(self + 0x864);
+        if (mode == 9) {
+            *reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x850) + 6) = 1;
+        } else {
+            *reinterpret_cast<s16*>(self + 0x864) = 9;
+            previousMode = mode;
+        }
+    }
+
+    memset(reinterpret_cast<void*>(statePtr), 0, 0x48);
+    FLOAT_8032ea78 = FLOAT_803329b8;
+    *reinterpret_cast<s16*>(statePtr + 0x26) = previousMode;
 }
 
 /*

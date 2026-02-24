@@ -726,12 +726,107 @@ void CFlatRuntime::searchFunc(int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800680b4
+ * PAL Size: 1044b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime::SystemCall(CFlatRuntime::CObject*, int, int, int, CFlatRuntime::CStack*, CFlatRuntime::CStack*)
+void CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind, int systemIndex, int argCount,
+                              CFlatRuntime::CStack* args, CFlatRuntime::CStack* outArg)
 {
-	// TODO
+	typedef CObject* (*GetFreeObjectFn)(CFlatRuntime*, int);
+
+	if (objectParam == 0) {
+		objectParam = reinterpret_cast<GetFreeObjectFn>((*reinterpret_cast<void***>(this))[0xF])(this, 1);
+	}
+
+	CObject* const object = reinterpret_cast<CObject*>(objectParam->m_engineObject);
+	if ((static_cast<int>(object->m_flags) << 24) < 0) {
+		return;
+	}
+
+	u8* func = 0;
+	if ((*reinterpret_cast<s16*>(&object->m_classIndex) < 0)
+	    || (((systemKind != 2) && (systemKind != 3)) || (systemIndex < 0))) {
+		u8* searchFunc = *reinterpret_cast<u8**>(reinterpret_cast<u8*>(this) + 0x20);
+		int funcCount = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1C);
+
+		for (; funcCount > 0; funcCount--, searchFunc += 0x50) {
+			if ((*reinterpret_cast<int*>(searchFunc + 0x40) == systemKind)
+			    && (*reinterpret_cast<int*>(searchFunc + 0x44) == systemIndex)) {
+				func = searchFunc;
+				break;
+			}
+		}
+	} else {
+		const s16 classIndex = *reinterpret_cast<s16*>(&object->m_classIndex);
+		u8* const classes = *reinterpret_cast<u8**>(reinterpret_cast<u8*>(this) + 0x18);
+		const int funcPos = *reinterpret_cast<int*>(classes + (classIndex * 0x22C) + 0x24 + (systemIndex * 4));
+		if (funcPos >= 0) {
+			func = *reinterpret_cast<u8**>(reinterpret_cast<u8*>(this) + 0x20) + (funcPos * 0x50);
+		}
+	}
+
+	if ((func == 0) || (*reinterpret_cast<int*>(func + 0x30) == 0)) {
+		return;
+	}
+
+	if (argCount > 0) {
+		unsigned int* dst = object->m_sp;
+		for (int i = 0; i < argCount; i++) {
+			dst[i] = args[i].m_word;
+		}
+		object->m_sp = dst + argCount;
+	}
+
+	const unsigned int prevCodePos = object->m_codePos;
+	const u8 prevFlags = object->m_flags;
+	unsigned int* const prevLocalBase = object->m_localBase;
+	const int prevWaitCounter = object->m_waitCounter;
+	const int prevReqFlags = *reinterpret_cast<int*>(&object->m_reqFlag0);
+	const s16 prevArgCount = object->m_argCount;
+
+	if (*reinterpret_cast<int*>(func + 0x4C) == 0) {
+		object->m_localBase = object->m_sp - *reinterpret_cast<int*>(func + 0x24);
+		object->m_sp = object->m_localBase + *reinterpret_cast<int*>(func + 0x28);
+	} else {
+		object->m_sp--;
+		object->m_argCount = static_cast<s16>(*object->m_sp);
+		object->m_localBase = object->m_sp - object->m_argCount;
+		object->m_sp = object->m_localBase + object->m_argCount;
+	}
+
+	*reinterpret_cast<u16*>(&object->m_codePos) =
+	    static_cast<u16>((static_cast<s16>(*reinterpret_cast<int*>(func + 0x00)) << 4)
+	                     | (*reinterpret_cast<u16*>(&object->m_codePos) & 0x000F));
+	object->m_codePos &= 0xFFF00000;
+	object->m_flags = static_cast<u8>((object->m_flags & 0xDF) | 0x20);
+	object->m_waitCounter = 0;
+	object->m_reqFlag0 = 0;
+	object->m_reqFlag1 = 0;
+	object->m_reqFlag2 = 0;
+	object->m_reqFlag3 = 0;
+
+	*object->m_sp++ = reinterpret_cast<unsigned int>(prevLocalBase);
+	*object->m_sp++ = prevCodePos;
+	*object->m_sp++ =
+	    static_cast<int>((static_cast<unsigned int>(prevFlags) << 26) | (static_cast<unsigned int>(prevFlags) >> 6)) >> 31;
+	*object->m_sp++ = static_cast<unsigned int>(prevArgCount) | (static_cast<unsigned int>(prevWaitCounter) << 16)
+	                | (static_cast<unsigned int>(prevReqFlags) << 15);
+
+	int clearCount = *reinterpret_cast<int*>(func + 0x28) - *reinterpret_cast<int*>(func + 0x24);
+	for (unsigned int* clear = object->m_localBase + *reinterpret_cast<int*>(func + 0x24); clearCount > 0; clearCount--) {
+		*clear++ = 0;
+	}
+
+	objectFrame(object);
+	object->m_sp--;
+
+	if (outArg != 0) {
+		outArg->m_word = *object->m_sp;
+	}
 }
 
 /*

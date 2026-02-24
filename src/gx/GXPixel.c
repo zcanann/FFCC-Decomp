@@ -149,6 +149,8 @@ void GXInitFogAdjTable(GXFogAdjTable *table, u16 width, const f32 projmtx[4][4])
  * JP Size: TODO
  */
 void GXSetFogRangeAdj(GXBool enable, u16 center, const GXFogAdjTable *table) {
+    s32 i;
+    u32 addr;
     u32 range_adj;
     const u16 *r;
 
@@ -157,30 +159,18 @@ void GXSetFogRangeAdj(GXBool enable, u16 center, const GXFogAdjTable *table) {
     if (enable) {
         ASSERTMSGLINE(334, table != NULL, "GXSetFogRangeAdj: table pointer is null");
         r = table->r;
+        addr = 0xE9000000;
 
-        range_adj = (r[0] & 0xFFF) | ((u32)r[1] << 12);
-        range_adj = (range_adj & 0x00FFFFFF) | 0xE9000000;
-        GX_WRITE_RAS_REG(range_adj);
-
-        range_adj = (r[2] & 0xFFF) | ((u32)r[3] << 12);
-        range_adj = (range_adj & 0x00FFFFFF) | 0xEA000000;
-        GX_WRITE_RAS_REG(range_adj);
-
-        range_adj = (r[4] & 0xFFF) | ((u32)r[5] << 12);
-        range_adj = (range_adj & 0x00FFFFFF) | 0xEB000000;
-        GX_WRITE_RAS_REG(range_adj);
-
-        range_adj = (r[6] & 0xFFF) | ((u32)r[7] << 12);
-        range_adj = (range_adj & 0x00FFFFFF) | 0xEC000000;
-        GX_WRITE_RAS_REG(range_adj);
-
-        range_adj = (r[8] & 0xFFF) | ((u32)r[9] << 12);
-        range_adj = (range_adj & 0x00FFFFFF) | 0xED000000;
-        GX_WRITE_RAS_REG(range_adj);
+        for (i = 0; i < 10; i += 2) {
+            range_adj = (r[i] & 0xFFF) | ((r[i + 1] & 0xFFF) << 12);
+            range_adj = (range_adj & 0x00FFFFFF) | addr;
+            GX_WRITE_RAS_REG(range_adj);
+            addr += 0x01000000;
+        }
     }
 
-    range_adj = (center + 342) & 0x00FFFBFF;
-    range_adj |= (u32)(u8)enable << 10;
+    range_adj = (center & 0xFFFF) + 0x156;
+    range_adj = (range_adj & ~0x400) | ((u32)enable << 10);
     range_adj = (range_adj & 0x00FFFFFF) | 0xE8000000;
     GX_WRITE_RAS_REG(range_adj);
     __GXData->bpSentNot = 0;
@@ -267,28 +257,38 @@ void GXSetZCompLoc(GXBool before_tex) {
 }
 
 void GXSetPixelFmt(GXPixelFmt pix_fmt, GXZFmt16 z_fmt) {
+    GXData* gx;
+    u32 fmt;
     u32 oldPeCtrl;
+    u32 is_rgb565;
     static u32 p2f[8] = { 0, 1, 2, 3, 4, 4, 4, 5 };
 
     CHECK_GXBEGIN(511, "GXSetPixelFmt");
-    oldPeCtrl = __GXData->peCtrl;
+    gx = __GXData;
+    oldPeCtrl = gx->peCtrl;
     ASSERTMSGLINE(515, pix_fmt >= GX_PF_RGB8_Z24 && pix_fmt <= GX_PF_YUV420, "Invalid Pixel format");
-    __GXData->peCtrl = (__GXData->peCtrl & ~0x7) | p2f[pix_fmt];
-    __GXData->peCtrl = (__GXData->peCtrl & ~0x38) | ((u32)z_fmt << 3);
+    fmt = p2f[pix_fmt];
+    gx->peCtrl = (gx->peCtrl & ~0x7) | fmt;
+    gx->peCtrl = (gx->peCtrl & ~0x38) | ((u32)z_fmt << 3);
 
-    if (oldPeCtrl != __GXData->peCtrl) {
-        GX_WRITE_RAS_REG(__GXData->peCtrl);
-        __GXData->genMode = (__GXData->genMode & ~0x200) | ((u32)(pix_fmt == GX_PF_RGB565_Z16) << 9);
-        __GXData->dirtyState |= 4;
+    if (oldPeCtrl != gx->peCtrl) {
+        GX_WRITE_RAS_REG(gx->peCtrl);
+        if (pix_fmt == GX_PF_RGB565_Z16) {
+            is_rgb565 = 1;
+        } else {
+            is_rgb565 = 0;
+        }
+        gx->genMode = (gx->genMode & ~0x200) | (is_rgb565 << 9);
+        gx->dirtyState |= 4;
     }
 
-    if (p2f[pix_fmt] == 4) {
-        __GXData->cmode1 = (__GXData->cmode1 & ~0x600) | (((pix_fmt - 4) << 9) & 0x600);
-        __GXData->cmode1 = (__GXData->cmode1 & ~0xFF000000) | 0x42000000;
-        GX_WRITE_RAS_REG(__GXData->cmode1);
+    if (fmt == 4) {
+        gx->cmode1 = (gx->cmode1 & ~0x600) | (((pix_fmt - 4) << 9) & 0x600);
+        gx->cmode1 = (gx->cmode1 & ~0xFF000000) | 0x42000000;
+        GX_WRITE_RAS_REG(gx->cmode1);
     }
 
-    __GXData->bpSentNot = 0;
+    gx->bpSentNot = 0;
 }
 
 void GXSetDither(GXBool dither) {

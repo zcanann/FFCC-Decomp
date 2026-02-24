@@ -502,12 +502,73 @@ void CFlatRuntime::createVal(CChunkFile&, int, CFlatRuntime::CVal*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80068910
+ * PAL Size: 756b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime::Frame(int, int)
+int CFlatRuntime::Frame(int, int mode)
 {
-	// TODO
+	u8* const self = reinterpret_cast<u8*>(this);
+	CObject* const root = reinterpret_cast<CObject*>(self + 0x8CC);
+	CObject* object = root->m_next;
+	int hasParticle = 0;
+
+	while (object != root) {
+		CObject* const next = object->m_next;
+
+		if ((static_cast<s8>(object->m_flags) >= 0) && (mode != 0)) {
+			object->m_flags &= 0xBF;
+			objectFrame(object);
+
+			u16* const scriptPriority = reinterpret_cast<u16*>(reinterpret_cast<u8*>(object) + 0x34);
+			while (*scriptPriority != 0) {
+				object->m_sp--;
+
+				int scriptIndex = -1;
+				const u16 priority = *scriptPriority;
+				if (priority != 0) {
+					scriptIndex = 31 - __cntlzw(static_cast<unsigned int>(priority));
+				}
+
+				typedef void (*ReqFinishedFn)(CFlatRuntime*, int, CObject*);
+				reinterpret_cast<ReqFinishedFn>((*reinterpret_cast<void***>(this))[0x10])(this, scriptIndex, object);
+
+				if (scriptIndex < 0) {
+					break;
+				}
+
+				*scriptPriority = static_cast<u16>(*scriptPriority & ~(1U << scriptIndex));
+			}
+
+			object->m_flags = static_cast<u8>((object->m_flags & 0x7F) | 0x80);
+			if (object->m_particleId == 1) {
+				hasParticle = 1;
+			}
+		}
+
+		if (static_cast<s8>(object->m_flags) < 0) {
+			object->m_previous->m_next = object->m_next;
+			object->m_next->m_previous = object->m_previous;
+
+			*reinterpret_cast<void**>(reinterpret_cast<u8*>(*object->m_freeListNode) + 4) = object->m_freeListNode[1];
+			*reinterpret_cast<void**>(object->m_freeListNode[1]) = *object->m_freeListNode;
+
+			object->m_freeListNode[1] = *reinterpret_cast<void***>(self + 0x98C);
+			*reinterpret_cast<void***>(self + 0x98C) = object->m_freeListNode;
+
+			object->m_flags &= 0xEF;
+
+			typedef void (*OnDeleteFn)(CFlatRuntime*, CObject*);
+			reinterpret_cast<OnDeleteFn>((*reinterpret_cast<void***>(this))[7])(this, object);
+		}
+
+		object = next;
+	}
+
+	return hasParticle;
 }
 
 /*

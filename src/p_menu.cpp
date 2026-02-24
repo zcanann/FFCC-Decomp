@@ -7,10 +7,12 @@
 #include "ffcc/memory.h"
 #include "ffcc/menu.h"
 #include "ffcc/mesmenu.h"
+#include "ffcc/partMng.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/ptrarray.h"
 #include "ffcc/ringmenu.h"
 #include "ffcc/textureman.h"
+#include "ffcc/fontman.h"
 
 #include <dolphin/mtx.h>
 #include <math.h>
@@ -19,6 +21,7 @@ extern CTextureMan TextureMan;
 extern CMath Math;
 extern CMenuPcs MenuPcs;
 extern CGame Game;
+extern CFontMan FontMan;
 
 struct Vec4d
 {
@@ -243,12 +246,54 @@ void CMenuPcs::destroy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80096d98
+ * PAL Size: 840b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::loadFont(int, char*, int, int)
+void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
 {
-	// TODO
+    CMemory::CStage* stage = 0;
+    u8* self = reinterpret_cast<u8*>(this);
+
+    if (type == 1) {
+        stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF0);
+    } else if (type == 0) {
+        stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
+    } else if (type < 3) {
+        stage = pppEnvStPtr->m_stagePtr;
+    }
+
+    CFont** fontSlot = reinterpret_cast<CFont**>(self + 0xF8 + slot * 4);
+    if ((slot == 0) && (FontMan.m_font != 0)) {
+        *fontSlot = FontMan.m_font;
+        reinterpret_cast<u32*>(*fontSlot)[1] = reinterpret_cast<u32*>(*fontSlot)[1] + 1;
+    } else {
+        CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
+        File.Read(fileHandle);
+        File.SyncCompleted(fileHandle);
+
+        CFont* font = new (Game.m_mainStage, s_p_menu_cpp_801d9d80, 0xF8) CFont;
+        *fontSlot = font;
+        if (font != 0) {
+            font->Create(File.m_readBuffer, stage);
+        }
+
+        File.Close(fileHandle);
+    }
+
+    if (tlutMode < 2) {
+        const _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
+        for (int tlut = 0; tlut < 0x10; tlut++) {
+            for (int i = 0; i < 0x1C; i++) {
+                (*fontSlot)->SetTlutColor(tlut, i, white);
+                (*fontSlot)->SetTlutColor(tlut, i + 0x1C, white);
+            }
+        }
+        (*fontSlot)->FlushTlutColor();
+    }
 }
 
 /*

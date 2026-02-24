@@ -410,7 +410,7 @@ void CMapHit::ReadOtmHit(CChunkFile& chunkFile)
 int CMapHit::CheckHitFaceCylinder(unsigned long mask)
 {
     for (int faceIndex = 0; faceIndex < m_faceCount; faceIndex++) {
-        unsigned char* face = Ptr(m_faces, faceIndex * 0x98);
+        unsigned char* face = Ptr(m_faces, faceIndex * 0x50);
         unsigned char groupIndex = face[0x47];
         unsigned char* mapMngBytes = reinterpret_cast<unsigned char*>(&MapMng);
         unsigned long groupMask = *reinterpret_cast<unsigned long*>(mapMngBytes + 0x214E8 + groupIndex * 0x14);

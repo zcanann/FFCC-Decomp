@@ -11,6 +11,10 @@ struct VYmMana;
 struct CTexture;
 struct CGObject;
 struct Vec2d;
+struct UnkB;
+struct UnkC {
+    s32* m_serializedDataOffsets;
+};
 
 void SetEnvMap(PYmMana*, VYmMana*);
 void Mana_BeforeDrawShadowLockEnvCallback(CChara::CModel*, void*, void*, int);
@@ -30,9 +34,9 @@ void CalcReflectionVector2(Vec*, S16Vec*, S16Vec*, long, unsigned long, unsigned
 extern "C" {
 #endif
 
-void pppConstructYmMana(void);
-void pppDestructYmMana(void);
-void pppFrameYmMana(void);
+void pppConstructYmMana(PYmMana*, UnkC*);
+void pppDestructYmMana(PYmMana*, UnkC*);
+void pppFrameYmMana(PYmMana*, UnkB*, UnkC*);
 void pppRenderYmMana(void);
 
 #ifdef __cplusplus

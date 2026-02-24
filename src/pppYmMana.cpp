@@ -1,5 +1,6 @@
 #include "ffcc/pppYmMana.h"
 #include "ffcc/graphic.h"
+#include "ffcc/gobject.h"
 #include "ffcc/p_game.h"
 #include "ffcc/pppPart.h"
 
@@ -13,6 +14,7 @@ extern float FLOAT_80330e4c;
 extern float FLOAT_80330e58;
 extern float FLOAT_80330e5c;
 extern float FLOAT_80330e68;
+extern float FLOAT_80330eb8;
 extern float FLOAT_80330ec0;
 extern char DAT_80330e88[];
 extern char DAT_80330e90[];
@@ -45,6 +47,10 @@ void _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevA
 void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(int, int, int, int, int, int);
 void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
+void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
+int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
+void DispCharaParts__8CGObjectFi(CGObject*, int);
+void _WaitDrawDone__8CGraphicFPci(CGraphic*, char*, int);
 }
 
 /*
@@ -354,30 +360,258 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800d7864
+ * PAL Size: 400b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppConstructYmMana(void)
+void pppConstructYmMana(PYmMana* ymMana, UnkC* param_2)
 {
-	// TODO
+    CGObject* gObject = *(CGObject**)((u8*)pppMngStPtr + 0xDC);
+    u32* work = (u32*)((u8*)ymMana + 8 + param_2->m_serializedDataOffsets[2]);
+    void* handle;
+    u32 model;
+
+    if (Game.game.m_currentSceneId == 7) {
+        gObject->m_lookAtTimer = FLOAT_80330e58;
+    }
+
+    if (Game.game.m_currentMapId != 0x21) {
+        gObject->m_stepSlopeLimit = FLOAT_80330eb8;
+    }
+
+    handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
+    GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    model = *(u32*)((u8*)handle + 0x168);
+    *(u32*)(model + 0x98) = 0x3F;
+    work[1] = (u32)pppMngStPtr;
+
+    work[0] = 0;
+    work[1] = 0;
+    work[9] = 0;
+    work[8] = 0;
+    work[15] = 0;
+    work[16] = 0;
+    work[18] = 0;
+    work[19] = 0;
+    work[20] = 0;
+    work[21] = 0;
+    work[22] = 0;
+    work[24] = 0;
+    work[17] = 0;
+    work[23] = 0;
+    work[30] = 0;
+    work[29] = 0;
+    work[31] = 0;
+    work[32] = 0;
+    work[25] = 0;
+    work[26] = 0;
+    work[27] = 0;
+    work[28] = 0;
+    work[10] = 0;
+    work[11] = 0;
+    work[12] = 0;
+    work[13] = 0;
+    *(u8*)(work + 0x3A) = 0xFF;
+    PSMTXIdentity((float (*)[4])(work + 0x22));
+    PSMTXIdentity((float (*)[4])(work + 0x2E));
+    *(u8*)(work + 0xE) = 0xFF;
+    *((u8*)work + 0x39) = 0xFF;
+    *((u8*)work + 0x3A) = 0xFF;
+    *((u8*)work + 0x3B) = 0xFF;
+    *(u8*)(work + 0x3F) = 0xFF;
+    *((u8*)work + 0xFD) = 0xFF;
+    *((u8*)work + 0xFE) = 0xFF;
+    *((u8*)work + 0xFF) = 0xFF;
+    *(u8*)(work + 0x40) = 0xFF;
+    *((u8*)work + 0x101) = 0xFF;
+    *((u8*)work + 0x102) = 0xFF;
+    *((u8*)work + 0x103) = 0xFF;
+    work[2] = 0;
+    work[3] = 0;
+    work[4] = 0;
+    work[5] = 0;
+    work[6] = 0;
+    work[7] = 0;
+    work[0x3B] = 0;
+    work[0x3C] = 0;
+    *(u8*)(work + 0x3D) = 0;
+    work[0x3E] = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800d7440
+ * PAL Size: 1060b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppDestructYmMana(void)
+void pppDestructYmMana(PYmMana* ymMana, UnkC* param_2)
 {
-	// TODO
+    u32* work = (u32*)((u8*)ymMana + 8 + param_2->m_serializedDataOffsets[2]);
+    CGObject* gObject = (CGObject*)work[0];
+    void* handle;
+    s32 model;
+    s32 meshEntry;
+    s32 step;
+    u32 i;
+    u32 j;
+
+    DispCharaParts__8CGObjectFi(gObject, 1);
+    handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
+    model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    *(u32*)(model + 0xE4) = 0;
+    *(u32*)(model + 0xE8) = 0;
+    *(u32*)(model + 0xF0) = 0;
+    *(u32*)(model + 0xFC) = 0;
+    _WaitDrawDone__8CGraphicFPci(&Graphic, (char*)"pppYmMana.cpp", 0x2CE);
+    *(u32*)(MaterialMan + 0x208) = 0;
+    *(u32*)(MaterialMan + 0x220) = 0;
+
+    if (work[10] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[10]);
+        work[10] = 0;
+    }
+    if (work[11] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[11]);
+        work[11] = 0;
+    }
+    if (work[12] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[12]);
+        work[12] = 0;
+    }
+    if (work[13] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[13]);
+        work[13] = 0;
+    }
+    if (work[8] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[8]);
+        work[8] = 0;
+    }
+    if (work[15] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[15]);
+        work[15] = 0;
+    }
+    if (work[16] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[16]);
+        work[16] = 0;
+    }
+    if (work[18] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[18]);
+        work[18] = 0;
+    }
+    if (work[19] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[19]);
+        work[19] = 0;
+    }
+    if (work[20] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[20]);
+        work[20] = 0;
+    }
+    if (work[21] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[21]);
+        work[21] = 0;
+    }
+    if (work[22] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[22]);
+        work[22] = 0;
+    }
+    if (work[30] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[30]);
+        work[30] = 0;
+    }
+    if (work[9] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[9]);
+        work[9] = 0;
+    }
+    if (work[23] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[23]);
+        work[23] = 0;
+    }
+    if (work[17] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[17]);
+        work[17] = 0;
+    }
+    if (work[25] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[25]);
+        work[25] = 0;
+    }
+    if (work[26] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[26]);
+        work[26] = 0;
+    }
+    if (work[27] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[27]);
+        work[27] = 0;
+    }
+    if (work[28] != 0) {
+        pppHeapUseRate((CMemory::CStage*)work[28]);
+        work[28] = 0;
+    }
+
+    meshEntry = *(s32*)(model + 0xAC);
+    step = work[0x1D];
+    for (i = 0; i < *(u32*)(*(s32*)(model + 0xA4) + 0xC); i++) {
+        char stepType = *(char*)(step + 0x1C);
+        s32 shape = *(s32*)(meshEntry + 8);
+
+        if (stepType == 1) {
+            if (strcmp((char*)shape, DAT_80330e88) == 0) {
+                for (j = 0; j < *(u32*)(shape + 0x4C); j++) {
+                    if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + j * 4) != NULL) {
+                        pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + j * 4));
+                        *(u32*)(work[0x18] + j * 4) = 0;
+                    }
+                }
+                if (work[0x18] != 0) {
+                    pppHeapUseRate((CMemory::CStage*)work[0x18]);
+                    work[0x18] = 0;
+                }
+            }
+        } else if (stepType == 2) {
+            if (strcmp((char*)shape, DAT_80330e90) == 0) {
+                for (j = 0; j < *(u32*)(shape + 0x4C); j++) {
+                    if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + j * 4) != NULL) {
+                        pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + j * 4));
+                        *(u32*)(work[0x18] + j * 4) = 0;
+                    }
+                }
+                if (work[0x18] != 0) {
+                    pppHeapUseRate((CMemory::CStage*)work[0x18]);
+                    work[0x18] = 0;
+                }
+            }
+        } else if (stepType == 3 && strcmp((char*)shape, DAT_80330e98) == 0) {
+            for (j = 0; j < *(u32*)(shape + 0x4C); j++) {
+                if (work[0x18] != 0 && *(CMemory::CStage**)(work[0x18] + j * 4) != NULL) {
+                    pppHeapUseRate(*(CMemory::CStage**)(work[0x18] + j * 4));
+                    *(u32*)(work[0x18] + j * 4) = 0;
+                }
+            }
+            if (work[0x18] != 0) {
+                pppHeapUseRate((CMemory::CStage*)work[0x18]);
+                work[0x18] = 0;
+            }
+        }
+
+        meshEntry += 0x14;
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800d694c
+ * PAL Size: 2804b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppFrameYmMana(void)
+void pppFrameYmMana(PYmMana*, UnkB*, UnkC*)
 {
 	// TODO
 }

@@ -1,6 +1,8 @@
 #include "ffcc/p_graphic.h"
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
+#include "ffcc/joybus.h"
+#include "ffcc/math.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_minigame.h"
 #include "ffcc/pad.h"
@@ -11,6 +13,7 @@ extern "C" int sprintf(char*, const char*, ...);
 extern "C" double sin(double);
 extern "C" double cos(double);
 extern "C" void* memset(void*, int, unsigned long);
+extern "C" int GetPadType__6JoyBusFi(void*, int);
 
 extern void* __vt__8CManager;
 extern void* lbl_801E8668;
@@ -35,11 +38,13 @@ extern unsigned char MaterialMan[];
 extern char* PTR_DAT_801e9e64[];
 extern char DAT_8032fbf4[];
 extern char DAT_8032fbf8[];
+extern u32 DAT_8032fb74;
 extern char s__c_c_c_c_c_c_c_c_c_c_801d7bf8[];
 extern int DAT_802381a0;
 extern "C" float FLOAT_8032fb78;
 extern "C" float FLOAT_8032fbfc;
 extern "C" float FLOAT_8032fc00;
+extern CMath Math;
 
 static char s_p_graphic_cpp_801d7c10[] = "p_graphic.cpp";
 
@@ -382,12 +387,148 @@ void CGraphicPcs::drawEnd()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004674c
+ * PAL Size: 2812b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphicPcs::drawBar()
 {
-	// TODO
+    Mtx44 ortho;
+    Mtx identity;
+    C_MTXOrtho(ortho, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, 1.0f);
+    GXSetProjection(ortho, GX_ORTHOGRAPHIC);
+
+    _GXSetBlendMode((GXBlendMode)1, (GXBlendFactor)4, (GXBlendFactor)5, (GXLogicOp)1);
+    GXSetZCompLoc((GXBool)0);
+    _GXSetAlphaCompare((GXCompare)6, 1, (GXAlphaOp)0, (GXCompare)7, 0);
+    GXSetZMode((GXBool)0, GX_ALWAYS, (GXBool)0);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetNumTevStages(1);
+    GXSetTevDirect(GX_TEVSTAGE0);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0A0, (GXBool)0, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+    GXSetChanCtrl(GX_COLOR1A1, (GXBool)0, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPEC);
+    _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_U16, 1);
+    PSMTXIdentity(identity);
+    GXLoadPosMtxImm(identity, GX_PNMTX0);
+    GXLoadTexMtxImm(identity, GX_TEXMTX0, GX_MTX2x4);
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+
+    const bool useDebugPad = (Pad._452_4_ != 0) || (Pad._448_4_ != -1);
+    bool drawText = false;
+    if (!useDebugPad) {
+        const int padState = *reinterpret_cast<int*>(reinterpret_cast<u8*>(&Pad) + 0x60);
+        if ((padState != 0) && (GetPadType__6JoyBusFi(&Joybus, 0) != 0x40000)) {
+            drawText = true;
+        }
+    } else {
+        drawText = true;
+    }
+
+    const u32 backColor = DAT_8032fb74;
+    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+    GXPosition3f32(0.0f, 448.0f, 0.0f);
+    GXColor1u32(backColor);
+    GXTexCoord2u16(0, 0);
+    GXPosition3f32(640.0f, 448.0f, 0.0f);
+    GXColor1u32(backColor);
+    GXTexCoord2u16(2, 0);
+    GXPosition3f32(640.0f, 480.0f, 0.0f);
+    GXColor1u32(backColor);
+    GXTexCoord2u16(2, 2);
+    GXPosition3f32(0.0f, 480.0f, 0.0f);
+    GXColor1u32(backColor);
+    GXTexCoord2u16(0, 2);
+
+    const int orderCount = System.m_orderCount;
+    CSystem::COrder* order = System.GetFirstOrder();
+    float x = 0.0f;
+    int hue = 0;
+    for (int i = 0; i < orderCount && order != NULL; i++) {
+        const float width = (100.0f * order->m_lastTime) / 16.666666f;
+        const u32 rgb = Math.Hsb2Rgb(orderCount > 0 ? (hue / orderCount) : 0, 100, 100);
+
+        if (order->m_priority == 0x26) {
+            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+            GXPosition3f32(x, 456.0f, 0.0f);
+            GXColor1u32(rgb);
+            GXTexCoord2u16(0, 0);
+            GXPosition3f32(x + width, 456.0f, 0.0f);
+            GXColor1u32(rgb);
+            GXTexCoord2u16(2, 0);
+            GXPosition3f32(x + width, 464.0f, 0.0f);
+            GXColor1u32(rgb);
+            GXTexCoord2u16(2, 2);
+            GXPosition3f32(x, 464.0f, 0.0f);
+            GXColor1u32(rgb);
+            GXTexCoord2u16(0, 2);
+            x += width;
+        } else if (order->m_priority != 0x27) {
+            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+            GXPosition3f32(x, 464.0f, 0.0f);
+            GXColor1u32(rgb);
+            GXTexCoord2u16(0, 0);
+            GXPosition3f32(x + width, 464.0f, 0.0f);
+            GXColor1u32(rgb);
+            GXTexCoord2u16(2, 0);
+            GXPosition3f32(x + width, 456.0f, 0.0f);
+            GXColor1u32(rgb);
+            GXTexCoord2u16(2, 2);
+            GXPosition3f32(x, 456.0f, 0.0f);
+            GXColor1u32(rgb);
+            GXTexCoord2u16(0, 2);
+            x += width;
+        }
+
+        order = System.GetNextOrder(order);
+        hue += 0x168;
+    }
+
+    const u32 frameColor = (Graphic.IsFrameRateOver() == 0) ? 0x00FF00FF : 0xFF0000FF;
+    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+    GXPosition3f32(0.0f, 468.0f, 0.0f);
+    GXColor1u32(frameColor);
+    GXTexCoord2u16(0, 0);
+    GXPosition3f32(32.0f, 468.0f, 0.0f);
+    GXColor1u32(frameColor);
+    GXTexCoord2u16(2, 0);
+    GXPosition3f32(32.0f, 472.0f, 0.0f);
+    GXColor1u32(frameColor);
+    GXTexCoord2u16(2, 2);
+    GXPosition3f32(0.0f, 472.0f, 0.0f);
+    GXColor1u32(frameColor);
+    GXTexCoord2u16(0, 2);
+
+    const u32 fifoColor = (Graphic.IsFifoOver() == 0) ? 0x00FF00FF : 0xFF0000FF;
+    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+    GXPosition3f32(40.0f, 468.0f, 0.0f);
+    GXColor1u32(fifoColor);
+    GXTexCoord2u16(0, 0);
+    GXPosition3f32(48.0f, 468.0f, 0.0f);
+    GXColor1u32(fifoColor);
+    GXTexCoord2u16(2, 0);
+    GXPosition3f32(48.0f, 472.0f, 0.0f);
+    GXColor1u32(fifoColor);
+    GXTexCoord2u16(2, 2);
+    GXPosition3f32(40.0f, 472.0f, 0.0f);
+    GXColor1u32(fifoColor);
+    GXTexCoord2u16(0, 2);
+
+    if (drawText) {
+        Graphic.InitDebugString();
+    }
 }
 
 /*

@@ -2,42 +2,28 @@
 
 extern int lbl_8032ED70;
 
-typedef struct {
-    int unk0;
-    int unk4;
-    int unk8;
-    int* serializedDataOffsets;
-} pppAngAcceleObj;
-
-typedef struct {
-    int* graphIdPtr;
-    int unk4;
-    int x;
-    int y;
-    int z;
-} pppAngAcceleData;
-
 /*
  * --INFO--
  * PAL Address: 0x80064d3c
  * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppAngAccele(void* particleSystem, void* particleData)
+void pppAngAccele(pppAngAcceleObj* obj, pppAngAcceleUnkB* param_2, pppAngAcceleUnkC* param_3)
 {
-    pppAngAcceleObj* obj = (pppAngAcceleObj*)particleSystem;
-    pppAngAcceleData* data = (pppAngAcceleData*)particleData;
-    int* offsets = obj->serializedDataOffsets;
-    int* angularVelocity = (int*)((char*)obj + offsets[0] + 0x80);
-    int* angularAccel = (int*)((char*)obj + offsets[1] + 0x80);
+    int* angularVelocity = (int*)((char*)obj + *param_3->m_serializedDataOffsets + 0x80);
+    int* angularAccel = (int*)((char*)obj + param_3->m_serializedDataOffsets[1] + 0x80);
 
     if (lbl_8032ED70 != 0) {
         return;
     }
 
-    if (*(data->graphIdPtr) == offsets[0]) {
-        angularAccel[0] += data->x;
-        angularAccel[1] += data->y;
-        angularAccel[2] += data->z;
+    if (param_2->m_graphId == obj->m_graphId) {
+        angularAccel[0] += param_2->m_x;
+        angularAccel[1] += param_2->m_y;
+        angularAccel[2] += param_2->m_z;
     }
 
     angularVelocity[0] += angularAccel[0];
@@ -49,14 +35,16 @@ void pppAngAccele(void* particleSystem, void* particleData)
  * --INFO--
  * PAL Address: 0x80064d18
  * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppAngAcceleCon(void* particleSystem)
+void pppAngAcceleCon(pppAngAcceleObj* obj, pppAngAcceleUnkC* param)
 {
-    void** systemData = (void**)((void**)particleSystem)[3];
-    void* angularAccelerationPtr = systemData[1];
-    
-    char* ptr = (char*)particleSystem + (int)angularAccelerationPtr + 0x80;
-    *(int*)(ptr + 0x8) = 0;
-    *(int*)(ptr + 0x4) = 0;  
-    *(int*)(ptr + 0x0) = 0;
+    int* angularAccel = (int*)((char*)obj + param->m_serializedDataOffsets[1] + 0x80);
+
+    angularAccel[2] = 0;
+    angularAccel[1] = 0;
+    angularAccel[0] = 0;
 }

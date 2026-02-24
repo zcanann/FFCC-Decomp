@@ -623,28 +623,28 @@ void CMes::MakeAgbString(char*, char*, int, int)
  */
 unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int breakOnLineTag, int lineBaseY)
 {
-	u8* p = (u8*)text;
-	u32 totalWidth = 0;
-	bool running = true;
-	float startX = font->posX;
+	u32 width = 0;
+	u8* src = (u8*)text;
+	float lineStartX = font->posX;
 
-	while (running)
+	while (true)
 	{
-		u8 ch = *p++;
+		u8 ch = *src++;
 		if (ch == 0)
 		{
-			running = false;
+			break;
 		}
-		else if (ch == 0xFF)
+
+		if (ch == 0xFF)
 		{
-			u8 tag = *p++;
+			u8 tag = *src++;
 			if (tag == 0xA1)
 			{
-				running = false;
+				break;
 			}
-			else if ((tag == 0xA0) && (breakOnLineTag != 0))
+			if ((tag == 0xA0) && (breakOnLineTag != 0))
 			{
-				SetPosX__5CFontFf(startX, font);
+				SetPosX__5CFontFf(lineStartX, font);
 				SetPosY__5CFontFf((float)lineBaseY + font->posY + (float)font->m_glyphWidth * font->scaleY, font);
 			}
 		}
@@ -654,9 +654,9 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
 			{
 				Draw__5CFontFUs(font, ch);
 			}
-			totalWidth += (u32)GetWidth__5CFontFUs(font, ch);
+			width = (u32)((float)width + GetWidth__5CFontFUs(font, ch));
 		}
 	}
 
-	return totalWidth;
+	return width;
 }

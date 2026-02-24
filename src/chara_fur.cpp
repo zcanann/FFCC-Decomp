@@ -276,16 +276,17 @@ void CChara::ChangeMogMode(int mogMode)
 {
 	int* const mogSoundHandle = reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x200c);
 
-	if (mogMode == 0) {
-		if (*mogSoundHandle != 0) {
-			Sound.StopSe(*mogSoundHandle);
-			*mogSoundHandle = 0;
-		}
-	} else {
+	if (mogMode != 0) {
 		memset(reinterpret_cast<unsigned char*>(this) + 0x1FE8, 0, 0x2C);
 		*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x200c) = 0x140;
 		*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x2010) = 0xE0;
 		*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x2004) = 0;
+		return;
+	}
+
+	if (*mogSoundHandle != 0) {
+		Sound.StopSe(*mogSoundHandle);
+		*mogSoundHandle = 0;
 	}
 }
 

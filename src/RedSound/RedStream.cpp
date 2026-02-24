@@ -28,8 +28,12 @@ int fflush(void*);
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cb93c
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 unsigned int _SearchEmptyStreamData()
 {
@@ -417,23 +421,23 @@ void StreamPlay(int param_1, void* param_2, int param_3, int param_4, int param_
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cc534
+ * PAL Size: 204b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void SetStreamVolume(int param_1, int param_2, int param_3)
 {
 	int stepCount;
-	int scaled;
 	unsigned int volume;
 	unsigned int streamData;
-	int zero = 0;
 
 	if (param_3 < 1) {
 		stepCount = 1;
 	} else {
-		scaled = param_3 * 200;
-		stepCount = scaled / 0x3c;
-		stepCount += scaled >> 0x1f;
+		stepCount = (param_3 * 200) / 0x3c + (param_3 * 200 >> 0x1f);
 		stepCount -= stepCount >> 0x1f;
 	}
 
@@ -442,19 +446,20 @@ void SetStreamVolume(int param_1, int param_2, int param_3)
 		volume = ((volume + 1) * 0x100 - 1) * 0x1000 | 0x800;
 	}
 
-	for (streamData = (unsigned int)DAT_8032f438; streamData < (unsigned int)DAT_8032f438 + 0x4c0;
-	     streamData += 0x130) {
+	streamData = (unsigned int)DAT_8032f438;
+	do {
 		if ((*(int*)(streamData + 0x10c) != 0) &&
 		    ((param_1 == -1) || (param_1 == *(int*)(streamData + 0x10c)))) {
 			if (stepCount < 1) {
 				*(unsigned int*)(streamData + 0xf0) = volume;
-				*(int*)(streamData + 0xf8) = zero;
+				*(int*)(streamData + 0xf8) = 0;
 			} else {
-				*(int*)(streamData + 0xf4) = ((int)volume - *(int*)(streamData + 0xf0)) / stepCount;
+				*(int*)(streamData + 0xf4) = (int)(volume - *(int*)(streamData + 0xf0)) / stepCount;
 				*(int*)(streamData + 0xf8) = stepCount;
 			}
 		}
-	}
+		streamData += 0x130;
+	} while (streamData < (unsigned int)DAT_8032f438 + 0x4c0);
 }
 
 /*

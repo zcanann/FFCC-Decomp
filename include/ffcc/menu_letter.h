@@ -10,9 +10,9 @@ public:
     void LetterInit2();
     void LetterInit3();
     void LetterInit4();
-    void LetterOpen();
-    void LetterCtrl();
-    void LetterClose();
+    bool LetterOpen();
+    int LetterCtrl();
+    bool LetterClose();
     void LetterLstOpen();
     void LetterLstClose();
     void LetterMessOpen();

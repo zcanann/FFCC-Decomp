@@ -192,7 +192,7 @@ void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, struct UnkB
         modelNodes = *(u8**)(modelBytes + 0xA8);
         animFrameCount = *(u16*)(modelAnim + 0x10);
 
-        for (u16 frameIndex = 0; frameIndex < animFrameCount; frameIndex++) {
+        for (u32 frameIndex = 0; frameIndex < animFrameCount; frameIndex++) {
             Mtx nodeMtx;
             LocationTitle2Particle* particle;
             u16 count;

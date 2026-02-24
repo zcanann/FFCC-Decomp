@@ -4,6 +4,7 @@
 #include "ffcc/p_game.h"
 #include "ffcc/p_camera.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/pppDrawMng.h"
 #include "ffcc/stopwatch.h"
 #include "ffcc/USBStreamData.h"
 
@@ -749,42 +750,78 @@ void CPartPcs::calcViewer()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80053074
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartPcs::calcDead()
 {
-	// TODO
+    PartMng.pppPartDead();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005304c
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartPcs::ClearOt()
 {
-	// TODO
+    reinterpret_cast<pppDrawMng*>(ppvDrawMng)->ClearOt();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80052fb4
+ * PAL Size: 152b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartPcs::drawShadow()
 {
-	// TODO
+    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 8);
+
+    if (Game.game.m_gameWork.m_gamePaused == 0 && usb->m_disableShokiDraw == 0 &&
+        *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(&CameraPcs) + 0x1028) != 0) {
+        Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
+        pppInitDrawEnv(1);
+        PartMng.pppSetRendMatrix();
+        PartMng.pppDrawPrio(3);
+        pppClearDrawEnv();
+        Graphic.SetDrawDoneDebugData(0x7f);
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80052f1c
+ * PAL Size: 152b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartPcs::drawCharaBefore()
 {
-	// TODO
+    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 8);
+
+    if (Game.game.m_gameWork.m_gamePaused == 0 && usb->m_disableShokiDraw == 0) {
+        Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
+        Graphic.SetFog(1, 0);
+        pppInitDrawEnv(0);
+        PartMng.pppSetRendMatrix();
+        PartMng.pppDrawPrio(4);
+        pppClearDrawEnv();
+        Graphic.SetDrawDoneDebugData(0x7f);
+    }
 }
 
 /*
@@ -821,32 +858,72 @@ void CPartPcs::draw()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80052da4
+ * PAL Size: 152b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartPcs::drawShadowViewer()
 {
-	// TODO
+    Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x308);
+    OSStartStopwatch(&g_par_draw_prof);
+    OSStartStopwatch(&g_par_calc_prof);
+    pppSetProjection();
+    pppInitDrawEnv(0);
+    PartMng.pppEditDrawShadow();
+    OSStopStopwatch(&g_par_calc_prof);
+    Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x30f);
+    OSStopStopwatch(&g_par_draw_prof);
+    pppClearDrawEnv();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80052d0c
+ * PAL Size: 152b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartPcs::drawViewer()
 {
-	// TODO
+    Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x31a);
+    OSStartStopwatch(&g_par_draw_prof);
+    OSStartStopwatch(&g_par_calc_prof);
+    pppSetProjection();
+    pppInitDrawEnv(0);
+    PartMng.pppEditDraw();
+    OSStopStopwatch(&g_par_calc_prof);
+    Graphic._WaitDrawDone(s_p_tina_cpp_801d8008, 0x322);
+    OSStopStopwatch(&g_par_draw_prof);
+    pppClearDrawEnv();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80052c78
+ * PAL Size: 148b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartPcs::drawAfter()
 {
-	// TODO
+    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 8);
+
+    if (Game.game.m_gameWork.m_gamePaused == 0 && usb->m_disableShokiDraw == 0) {
+        Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
+        Graphic.SetFog(1, 0);
+        pppInitDrawEnv(0);
+        PartMng.pppSetRendMatrix();
+        PartMng.pppPartDrawAfter();
+        pppClearDrawEnv();
+        Graphic.SetDrawDoneDebugData(0x7f);
+    }
 }
 
 /*

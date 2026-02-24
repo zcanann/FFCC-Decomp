@@ -1132,12 +1132,26 @@ void CFlatRuntime::CCodeIndex::operator= (const CFlatRuntime::CCodeIndex&)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80067bf8
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFlatRuntime::ClearParmanent()
 {
-	// TODO
+	int varCount = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x24);
+	u8* varDefs = *reinterpret_cast<u8**>(reinterpret_cast<u8*>(this) + 0x28);
+	u32* varValues = *reinterpret_cast<u32**>(reinterpret_cast<u8*>(this) + 0x2C);
+
+	for (; varCount > 0; varCount--) {
+		if ((varDefs[1] & 0x20) != 0) {
+			*varValues = 0;
+		}
+		varDefs += 4;
+		varValues++;
+	}
 }
 
 /*
@@ -1152,12 +1166,17 @@ void CFlatRuntime::initVal(int, CFlatRuntime::CVal*, CFlatRuntime::CStack*, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80067be0
+ * PAL Size: 24b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime::push(CFlatRuntime::CObject*, int)
+void CFlatRuntime::push(CFlatRuntime::CObject* object, int value)
 {
-	// TODO
+	*object->m_sp = static_cast<u32>(value);
+	object->m_sp++;
 }
 
 /*

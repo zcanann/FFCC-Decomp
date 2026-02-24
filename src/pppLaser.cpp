@@ -101,23 +101,24 @@ struct CMapCylinderRaw {
  */
 void pppConstructLaser(struct pppLaser *pppLaser, struct UnkC *param_2)
 {
+    f32 fVar1 = FLOAT_80333428;
     f32* pfVar3 = (f32*)((u8*)pppLaser + 0x80 + param_2->offsets->m_serializedDataOffsets[2]);
-    int local_28;
     int local_24;
-    Vec local_14;
+    int local_28;
     Vec local_20;
+    Vec local_14;
 
     *pfVar3 = FLOAT_80333428;
-    pfVar3[6] = FLOAT_80333428;
-    pfVar3[5] = FLOAT_80333428;
-    pfVar3[4] = FLOAT_80333428;
-    pfVar3[3] = FLOAT_80333428;
-    pfVar3[2] = FLOAT_80333428;
-    pfVar3[1] = FLOAT_80333428;
-    pfVar3[7] = FLOAT_80333428;
-    pfVar3[10] = FLOAT_80333428;
-    pfVar3[9] = FLOAT_80333428;
-    pfVar3[8] = FLOAT_80333428;
+    pfVar3[6] = fVar1;
+    pfVar3[5] = fVar1;
+    pfVar3[4] = fVar1;
+    pfVar3[3] = fVar1;
+    pfVar3[2] = fVar1;
+    pfVar3[1] = fVar1;
+    pfVar3[7] = fVar1;
+    pfVar3[10] = fVar1;
+    pfVar3[9] = fVar1;
+    pfVar3[8] = fVar1;
 
     *((u8*)pfVar3 + 0x2c) = 0;
     *((u8*)pfVar3 + 0x2d) = 0;

@@ -163,12 +163,79 @@ void CGMonObj::rotTarget(int, float)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80119A64
+ * PAL Size: 1116b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::onStatAttack(int)
+void CGMonObj::onStatAttack(int state)
 {
-	// TODO
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	unsigned char* attackBase = reinterpret_cast<unsigned char*>(Game.game.unkCFlatData0[2]);
+	unsigned char* attackData = attackBase + *reinterpret_cast<int*>(mon + 0x560) * 0x48;
+	unsigned short attackFlags = *reinterpret_cast<unsigned short*>(attackData + 0x32);
+	int targetPartyIndex = *reinterpret_cast<int*>(mon + 0x6C4);
+
+	if (state == 0) {
+		if ((prgObj->m_stateFrame == 0) && (-1 < targetPartyIndex)) {
+			CGPartyObj* target = Game.game.m_partyObjArr[targetPartyIndex];
+			*reinterpret_cast<Vec*>(mon + 0x66C) = reinterpret_cast<CGObject*>(target)->m_worldPosition;
+
+			if ((attackFlags & 2) == 0) {
+				float rotLimit = 0.01f * static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x19C));
+				if (-1 < targetPartyIndex) {
+					float targetRot = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(target));
+					if (rotLimit <= 3.1415927f) {
+						float delta = Math.DstRot(targetRot, static_cast<float>(object->m_bgFlags));
+						if (delta < -rotLimit) {
+							delta = -rotLimit;
+						} else if (rotLimit < delta) {
+							delta = rotLimit;
+						}
+						object->m_rotTargetY = static_cast<float>(object->m_bgFlags) + delta;
+					} else {
+						object->m_rotTargetY = targetRot;
+					}
+				}
+			}
+
+			target = Game.game.m_partyObjArr[targetPartyIndex];
+			reinterpret_cast<CGPrgObj*>(target)->bonus(0x17, *reinterpret_cast<int*>(mon + 0x560), reinterpret_cast<CGPrgObj*>(target));
+		}
+		return;
+	}
+
+	if (*reinterpret_cast<short*>(attackData + 0xE) == 3) {
+		if (prgObj->m_subState == 1) {
+			if (prgObj->m_subFrame == 0) {
+				prgObj->reqAnim(*reinterpret_cast<int*>(mon + 0x554), 1, 0);
+			}
+			if (prgObj->m_subFrame == *reinterpret_cast<unsigned short*>(attackData + 0x2E)) {
+				prgObj->addSubStat();
+			}
+		} else if (prgObj->m_subState == 0) {
+			if (prgObj->isLoopAnim() != 0) {
+				prgObj->addSubStat();
+			}
+		} else if (prgObj->m_subState < 3) {
+			if (prgObj->m_subFrame == 0) {
+				prgObj->reqAnim(*reinterpret_cast<int*>(mon + 0x558), 0, 0);
+				reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(1);
+			}
+			if (prgObj->isLoopAnim() != 0) {
+				setAttackAfter(*reinterpret_cast<int*>(mon + 0x560));
+			}
+		}
+		return;
+	}
+
+	if ((prgObj->m_stateArg == 0) && (prgObj->isLoopAnim() != 0)) {
+		setAttackAfter(*reinterpret_cast<int*>(mon + 0x560));
+	}
 }
 
 /*

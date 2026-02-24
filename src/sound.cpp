@@ -69,6 +69,7 @@ extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_G
 extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
 extern void* ARRAY_802f26c8;
 extern char DAT_801db190[];
+extern char DAT_801db1d8[];
 extern char DAT_801db29c[];
 extern char DAT_801db2b8[];
 extern char s_Sound___1_n_B_801db130[];
@@ -1108,22 +1109,79 @@ void CSound::LoadSe(void*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c66bc
+ * PAL Size: 404b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::LoadWave(int)
+void CSound::LoadWave(int waveId)
 {
-	// TODO
+    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+    CFile::CHandle*& waveFile = *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 0x8);
+
+    if (waveId < 0) {
+        Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
+    } else {
+        if (ReentryWaveData__9CRedSoundFi(redSound, waveId) == -1) {
+            if (waveId < 0) {
+                Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
+            } else if (ReentryWaveData__9CRedSoundFi(redSound, waveId) == -1) {
+                if (waveFile != 0) {
+                    File.Close(waveFile);
+                    waveFile = 0;
+                    Printf__7CSystemFPce(&System, DAT_801db190);
+                }
+
+                SetWaveData__9CRedSoundFiPvi(redSound, -1, nullptr, 0);
+
+                char wavePath[260];
+                sprintf(wavePath, "dvd/sound/wave/wave_%04d.wd", waveId);
+                waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
+
+                if (waveFile != 0) {
+                    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x14) = File.GetLength(waveFile);
+                    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x18) = 0;
+                    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x20) = 0;
+                    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1C) = -1;
+                    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x24) = 1;
+                    while (waveFile != 0) {
+                        loadWaveFrame();
+                    }
+                }
+            }
+
+            if (System.m_execParam != 0) {
+                Printf__7CSystemFPce(&System, DAT_801db1d8, waveId);
+            }
+        }
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c6614
+ * PAL Size: 168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::LoadWave(void*)
+void CSound::LoadWave(void* waveData)
 {
-	// TODO
+    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+    CFile::CHandle*& waveFile = *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 0x8);
+
+    if (ReentryWaveData__9CRedSoundFi(redSound, reinterpret_cast<s16*>(waveData)[1]) == -1) {
+        if (waveFile != 0) {
+            File.Close(waveFile);
+            waveFile = 0;
+            Printf__7CSystemFPce(&System, DAT_801db190);
+        }
+        SetWaveData__9CRedSoundFiPvi(redSound, -1, nullptr, 0);
+        SetWaveData__9CRedSoundFiPvi(redSound, -1, waveData, -1);
+    }
 }
 
 /*

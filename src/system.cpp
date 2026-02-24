@@ -17,10 +17,13 @@
 #include "dolphin/gx/GXPerf.h"
 #include "dolphin/os.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/printf.h"
-#include "PowerPC_EABI_Support/Runtime/ptmf.h"
 #include "ffcc/p_game.h"
 #include "ffcc/p_minigame.h"
 #include <string.h>
+
+extern "C" {
+#include "PowerPC_EABI_Support/Runtime/ptmf.h"
+}
 
 extern CMath Math;
 extern CTextureMan TextureMan;
@@ -435,11 +438,7 @@ unsigned int CSystem::AddScenegraph(CProcess* process, int arg)
 
     u32* entry = description + 7;
     int insertIndex = 0;
-    if (__ptmf_test((__ptmf*)entry) == 0)
-    {
-        return 1;
-    }
-    do
+    while (__ptmf_test((__ptmf*)entry) != 0)
     {
         COrder* first = m_orderSentinel.m_next;
         COrder* current = first;
@@ -467,7 +466,7 @@ unsigned int CSystem::AddScenegraph(CProcess* process, int arg)
         } while (current != first);
 
         entry += 5;
-    } while (__ptmf_test((__ptmf*)entry) != 0);
+    }
 
     return 1;
 }

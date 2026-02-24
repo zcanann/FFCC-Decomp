@@ -23,8 +23,13 @@ extern "C" char* GetLangString__5CGameFv(void*);
 extern "C" void pppReleasePdt__8CPartMngFi(CPartMng*, int);
 extern "C" void SetRStage__13CAmemCacheSetFPQ27CMemory6CStage(void*, void*);
 extern "C" void AmemSetLock__13CAmemCacheSetFv(void*);
+extern "C" void AssertCache__13CAmemCacheSetFv(void*);
+extern "C" void Destroy__13CAmemCacheSetFv(void*);
 extern "C" void IsBigAlloc__7CUSBPcsFi(void*, int);
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
+extern "C" void* Free__7CMemoryFPv(void*, void*);
+extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
+extern "C" void Destroy__8CPartMngFv(CPartMng*);
 extern "C" void DrawOt__10pppDrawMngFv(void*);
 extern "C" void Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFUl_UcUlPFUl_UcUlPFUl_UcUl(
     void*,
@@ -642,12 +647,36 @@ void CPartPcs::createViewer()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005322C
+ * PAL Size: 180b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartPcs::destroy()
 {
-	// TODO
+    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 8);
+
+    IsBigAlloc__7CUSBPcsFi(USBPcs, 0);
+    Destroy__8CPartMngFv(&PartMng);
+
+    if (usb->m_stageAmem != 0) {
+        DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, usb->m_stageAmem);
+    }
+
+    AssertCache__13CAmemCacheSetFv(CAMemCacheSet);
+    Destroy__13CAmemCacheSetFv(CAMemCacheSet);
+
+    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, usb->m_stageDefault);
+
+    if (usb->m_freePtr != 0) {
+        Free__7CMemoryFPv(&Memory, usb->m_freePtr);
+    }
+
+    if (usb->m_stageExtra != 0) {
+        DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, usb->m_stageExtra);
+    }
 }
 
 /*

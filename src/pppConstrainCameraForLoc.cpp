@@ -18,13 +18,17 @@ extern "C" void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(pppConstrainCameraFo
  * --INFO--
  * PAL Address: 80167eec
  * PAL Size: 580b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
 {
     float* params = (float*)param_2;
     float fVar1 = params[0x10];
-    double dVar2;
-    double dVar3;
+    float fVar2;
+    float fVar3;
     float local_f8;
     float local_f4;
     float local_f0;
@@ -58,16 +62,16 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
     PSMTXConcat(local_98, *(Mtx*)((char*)model + 0x38), *(Mtx*)((char*)model + 0x38));
     PSVECAdd(&local_bc, &local_a4, &local_a4);
 
-    dVar3 = (double)*(float*)((int)fVar1 + 0x1c);
-    dVar2 = (double)*(float*)((int)fVar1 + 0x2c);
+    fVar3 = *(float*)((int)fVar1 + 0x1c);
+    fVar2 = *(float*)((int)fVar1 + 0x2c);
     GetDirectVector__5CUtilFP3VecP3Vec3Vec((void*)&DAT_8032ec70, (Vec*)&local_e0, (Vec*)&local_ec, (Vec*)&local_f8);
 
-    local_e0.x = (float)(dVar3 * (double)local_e0.x);
-    local_e0.y = (float)(dVar3 * (double)local_e0.y);
-    local_e0.z = (float)(dVar3 * (double)local_e0.z);
-    local_ec.x = (float)(dVar2 * (double)local_ec.x);
-    local_ec.y = (float)(dVar2 * (double)local_ec.y);
-    local_ec.z = (float)(dVar2 * (double)local_ec.z);
+    local_e0.x = fVar3 * local_e0.x;
+    local_e0.y = fVar3 * local_e0.y;
+    local_e0.z = fVar3 * local_e0.z;
+    local_ec.x = fVar2 * local_ec.x;
+    local_ec.y = fVar2 * local_ec.y;
+    local_ec.z = fVar2 * local_ec.z;
     PSVECAdd(&local_a4, &local_e0, &local_a4);
     PSVECAdd(&local_a4, &local_ec, &local_a4);
 

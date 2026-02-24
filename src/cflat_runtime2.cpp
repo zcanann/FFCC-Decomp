@@ -1333,9 +1333,84 @@ void CFlatRuntime2::AddDebugDrawCC(Vec* from, Vec* to, float radius, int bit7, i
  * Address:	TODO
  * Size:	TODO
  */
-void CFlatRuntime2::CcClass2D(int, int, Vec*, float, float, int, CGObject **)
+int CFlatRuntime2::CcClass2D(int flags, int cidMask, Vec* center, float range, float angle, int maxCount, CGObject** outList)
 {
-	// TODO
+	const float rangeSq = range * range;
+	CFlatRuntime::CObject* const root =
+		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x1204);
+
+	CFlatRuntime::CObject* object = root->m_next->m_next;
+	CGBaseObj* found = FindNextGBaseObjByCidMask(this, object, 5);
+	int count = 0;
+
+	while (found != 0) {
+		u8* obj = reinterpret_cast<u8*>(found);
+		if ((*reinterpret_cast<u32*>(obj + 0x180) & static_cast<u32>(cidMask)) != 0) {
+			if ((flags & 1) == 0 ||
+			    (*reinterpret_cast<void**>(obj + 0x58) != 0 &&
+			     *reinterpret_cast<s16*>(*reinterpret_cast<u8**>(obj + 0x58) + 0x1C) != 0)) {
+				const float x = *reinterpret_cast<float*>(obj + 0x15C);
+				const float z = *reinterpret_cast<float*>(obj + 0x164);
+
+				if ((x != center->x || z != center->z) &&
+				    center->x - range <= x && x <= center->x + range &&
+				    center->z - range <= z && z <= center->z + range) {
+					const float dx = x - center->x;
+					const float dz = z - center->z;
+					const float distSq = dx * dx + dz * dz;
+
+					if (distSq > 0.0f && distSq < rangeSq) {
+						const float dist = sqrtf(distSq);
+						bool passFacing = true;
+
+						if ((flags & 2) != 0) {
+							const float invDist = 1.0f / dist;
+							const float nx = dx * invDist;
+							const float nz = dz * invDist;
+							const float dirX = sinf(angle);
+							const float dirZ = cosf(angle);
+							passFacing = nx * dirX + nz * dirZ > 0.0f;
+						}
+
+						if (passFacing) {
+							if ((flags & 4) != 0) {
+								outList[count++] = reinterpret_cast<CGObject*>(found);
+								if (count == maxCount) {
+									return count;
+								}
+							} else {
+								int insert = 0;
+								while (insert < count &&
+								       dist >= *reinterpret_cast<float*>(reinterpret_cast<u8*>(outList[insert]) + 0x44)) {
+									insert++;
+								}
+
+								int tail = maxCount - 1;
+								if (count < tail) {
+									tail = count;
+								}
+
+								for (int i = tail; i > insert; i--) {
+									outList[i] = outList[i - 1];
+								}
+
+								*reinterpret_cast<float*>(obj + 0x44) = dist;
+								outList[insert] = reinterpret_cast<CGObject*>(found);
+								if (count < maxCount) {
+									count++;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		object = reinterpret_cast<CFlatRuntime::CObject*>(found)->m_next;
+		found = FindNextGBaseObjByCidMask(this, object, 5);
+	}
+
+	return count;
 }
 
 /*

@@ -48,9 +48,14 @@ extern "C" void TestProcess__9CRedSoundFi(CRedSound*, int);
 extern "C" void DisplayWaveInfo__9CRedSoundFv(CRedSound*);
 extern "C" void DisplaySePlayInfo__9CRedSoundFv(CRedSound*);
 extern "C" void SeStop__9CRedSoundFi(CRedSound*, int);
+extern "C" void SeStopMG__9CRedSoundFiiii(CRedSound*, int, int, int, int);
 extern "C" void SePan__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" void SeVolume__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" int SePlay__9CRedSoundFiiiii(CRedSound*, int, int, int, int, int);
+extern "C" void ClearSeSepData__9CRedSoundFi(CRedSound*, int);
+extern "C" void ClearSeSepDataMG__9CRedSoundFiiii(CRedSound*, int, int, int, int);
+extern "C" void ClearWaveData__9CRedSoundFi(CRedSound*, int);
+extern "C" void ClearWaveDataM__9CRedSoundFiiii(CRedSound*, int, int, int, int);
 extern "C" void MusicVolume__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" int ReentryMusicData__9CRedSoundFi(CRedSound*, int);
 extern "C" void SetMusicData__9CRedSoundFPv(CRedSound*, void*);
@@ -1196,12 +1201,33 @@ void CSound::FreeWave(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c64f0
+ * PAL Size: 220b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::StopAndFreeAllSe(int)
+void CSound::StopAndFreeAllSe(int clearMode)
 {
-	// TODO
+    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+    short* seGroup = reinterpret_cast<short*>(reinterpret_cast<u8*>(this) + 0x22C0);
+    short* waveGroup = reinterpret_cast<short*>(reinterpret_cast<u8*>(this) + 0x22C8);
+
+    if (clearMode == 0) {
+        SeStopMG__9CRedSoundFiiii(redSound, seGroup[0], seGroup[1], seGroup[2], seGroup[3]);
+        ClearSeSepDataMG__9CRedSoundFiiii(redSound, seGroup[0], seGroup[1], seGroup[2], seGroup[3]);
+        ClearWaveDataM__9CRedSoundFiiii(redSound, waveGroup[0], waveGroup[1], waveGroup[2], waveGroup[3]);
+    } else {
+        SeStop__9CRedSoundFi(redSound, -1);
+        ClearSeSepData__9CRedSoundFi(redSound, -1);
+        ClearWaveData__9CRedSoundFi(redSound, -3);
+    }
+
+    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x28) = 10000000;
+    memset(reinterpret_cast<u8*>(this) + 0x2C, 0, 0x1400);
+    memset(seGroup, 0xFF, 8);
+    memset(waveGroup, 0xFF, 8);
 }
 
 /*

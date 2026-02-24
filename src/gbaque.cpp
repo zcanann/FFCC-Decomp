@@ -6,6 +6,7 @@
 #include "ffcc/gobjwork.h"
 #include "ffcc/joybus.h"
 #include "ffcc/p_game.h"
+#include "ffcc/system.h"
 #include <string.h>
 #include <Dolphin/os.h>
 #include <Runtime.PPCEABI.H/NMWException.h>
@@ -15,6 +16,30 @@ extern "C" void __dt__8GbaQueueFv(void*);
 extern __declspec(section ".data") CFlatRuntime CFlat;
 extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
+extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" void __dla__FPv(void*);
+extern "C" void Printf__7CSystemFPce(CSystem*, char*, ...);
+
+struct GbaFlatDataTableEntryView
+{
+	int m_numEntries;
+	char** m_strings;
+	char* m_stringBuf;
+};
+
+struct GbaFlatDataView
+{
+	int m_dataCount;
+	unsigned char _pad[0x68 - 4];
+	int m_tableCount;
+	GbaFlatDataTableEntryView m_tabl[8];
+};
+
+static char s_gbaque_cpp[] = "gbaque.cpp";
+static char s_mem_alloc_error[] = "%s[%d] Error! memory allocation.\n";
+static char s_npc_max_over[] = "%s[%d] Error! NPC max over.\n";
+static char s_subject_max_over[] = "%s[%d] Error! Subject max over.\n";
+static char s_letter_data_error[] = "%s[%d] Error! Letter data error.\n";
 
 /*
  * --INFO--
@@ -731,9 +756,181 @@ int GbaQueue::GetPlayerHP(int, unsigned char*)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::MakeLetterList(int, char*)
+void GbaQueue::MakeLetterList(int channel, char* outData)
 {
-	// TODO
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	const unsigned int scriptFood = Game.game.m_scriptFoodBase[channel];
+	const unsigned char channelMask = static_cast<unsigned char>(1U << channel);
+
+	if (scriptFood == 0) {
+		self[0x2C8A] = static_cast<unsigned char>(self[0x2C8A] | channelMask);
+		Joybus.SetLetterSize(channel, 0);
+		self[0x2C89] = static_cast<unsigned char>(self[0x2C89] & ~channelMask);
+		return;
+	}
+
+	char* npcNameBuf = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
+		0x800, Game.game.m_mainStage, s_gbaque_cpp, 0x7A7));
+	if (npcNameBuf == 0) {
+		if (System.m_execParam != 0) {
+			Printf__7CSystemFPce(&System, s_mem_alloc_error, s_gbaque_cpp, 0x7A9);
+		}
+		return;
+	}
+	memset(npcNameBuf, 0, 0x800);
+
+	char* subjectNameBuf = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
+		0x1800, Game.game.m_mainStage, s_gbaque_cpp, 0x7B1));
+	if (subjectNameBuf == 0) {
+		if (System.m_execParam != 0) {
+			Printf__7CSystemFPce(&System, s_mem_alloc_error, s_gbaque_cpp, 0x7B3);
+		}
+		__dla__FPv(npcNameBuf);
+		return;
+	}
+	memset(subjectNameBuf, 0, 0x1800);
+
+	unsigned int* letterEntryBuf = static_cast<unsigned int*>(__nwa__FUlPQ27CMemory6CStagePci(
+		0x4000, Game.game.m_mainStage, s_gbaque_cpp, 0x7BB));
+	if (letterEntryBuf == 0) {
+		if (System.m_execParam != 0) {
+			Printf__7CSystemFPce(&System, s_mem_alloc_error, s_gbaque_cpp, 0x7BD);
+		}
+		__dla__FPv(subjectNameBuf);
+		__dla__FPv(npcNameBuf);
+		return;
+	}
+	memset(letterEntryBuf, 0, 0x800);
+
+	const CCaravanWork* caravanWork = reinterpret_cast<const CCaravanWork*>(scriptFood);
+	const unsigned int letterCount = static_cast<unsigned int>(caravanWork->m_letterCount);
+
+	unsigned int subjectCount = 0;
+	unsigned int npcCount = 0;
+
+	char* npcWrite = npcNameBuf;
+	char* subjectWrite = subjectNameBuf;
+	unsigned int* entryWrite = letterEntryBuf;
+
+	GbaFlatDataView* flatData = reinterpret_cast<GbaFlatDataView*>(&Game.game.m_cFlatDataArr[1]);
+	char** npcTable = flatData->m_tabl[2].m_strings;
+	char** subjectTable = flatData->m_tabl[5].m_strings;
+
+	for (int i = 0; i < static_cast<int>(letterCount); i++) {
+		int matchedSubject = -1;
+		int matchedNpc = -1;
+
+		const unsigned int* cur = reinterpret_cast<const unsigned int*>(scriptFood + 0x3EC + i * 0xC);
+		const unsigned int curWord = cur[0];
+
+		for (int j = 0; j < i; j++) {
+			const unsigned int* prev = reinterpret_cast<const unsigned int*>(scriptFood + 0x3EC + j * 0xC);
+			if (((curWord >> 9) & 0x1FF) == ((prev[0] >> 9) & 0x1FF)) {
+				matchedNpc = j;
+			}
+			if (((curWord >> 2) & 0x1FF) == ((prev[0] >> 2) & 0x1FF)) {
+				matchedSubject = j;
+			}
+			if (matchedSubject != -1 && matchedNpc != -1) {
+				break;
+			}
+		}
+
+		if (matchedNpc == -1) {
+			if (npcCount > 0x7F && System.m_execParam != 0) {
+				Printf__7CSystemFPce(&System, s_npc_max_over, s_gbaque_cpp, 0x7DC);
+			}
+
+			char tempName[0x20];
+			memset(tempName, 0, sizeof(tempName));
+			strcpy(tempName, npcTable[(curWord >> 9) & 0x1FF]);
+			memcpy(npcWrite, tempName, 0x10);
+			npcWrite += 0x10;
+			(reinterpret_cast<unsigned char*>(entryWrite))[5] = static_cast<unsigned char>(npcCount);
+			npcCount++;
+		} else {
+			(reinterpret_cast<unsigned char*>(entryWrite))[5] =
+				(reinterpret_cast<unsigned char*>(letterEntryBuf + matchedNpc * 2))[5];
+		}
+
+		if (matchedSubject == -1) {
+			if (subjectCount > 0xFF && System.m_execParam != 0) {
+				Printf__7CSystemFPce(&System, s_subject_max_over, s_gbaque_cpp, 0x7F0);
+			}
+
+			char tempSubject[0x20];
+			memset(tempSubject, 0, sizeof(tempSubject));
+			strcpy(tempSubject, subjectTable[(curWord >> 2) & 0x1FF]);
+			memcpy(subjectWrite, tempSubject, 0x18);
+			subjectWrite += 0x18;
+			(reinterpret_cast<unsigned char*>(entryWrite))[4] = static_cast<unsigned char>(subjectCount);
+			subjectCount++;
+		} else {
+			(reinterpret_cast<unsigned char*>(entryWrite))[4] =
+				(reinterpret_cast<unsigned char*>(letterEntryBuf + matchedSubject * 2))[4];
+		}
+
+		unsigned char flags = 0;
+		if ((curWord & 0x80000000U) != 0) {
+			flags |= 1;
+		}
+		if ((curWord & 0x40) != 0) {
+			flags |= 2;
+		}
+		if ((curWord & 0x20) != 0) {
+			flags |= 4;
+		}
+		if ((curWord & 0x10) != 0) {
+			flags |= 8;
+		}
+
+		const unsigned int value = cur[0] >> 16 & 0x1FF;
+		if ((curWord & 8) == 0) {
+			if (value != 0) {
+				if (value < 0x100 || value > 0x124) {
+					flags |= 0x10;
+					entryWrite[0] = (value << 24) | ((value >> 8) << 16);
+				} else if (System.m_execParam != 0) {
+					Printf__7CSystemFPce(&System, s_letter_data_error, s_gbaque_cpp, 0x810, channel, i);
+				}
+			}
+		} else if (value != 0) {
+			flags |= 0x20;
+			entryWrite[0] = value * 0x64000000 | ((value * 100 >> 8) << 16);
+		}
+
+		(reinterpret_cast<unsigned char*>(entryWrite))[6] = flags;
+		entryWrite += 2;
+	}
+
+	unsigned int header[4];
+	header[0] = (letterCount << 24) | ((letterCount >> 8) & 0xFF) << 16 |
+		((letterCount >> 16) & 0xFF) << 8 | (letterCount >> 24);
+	header[1] = (subjectCount << 24) | ((subjectCount >> 8) & 0xFF) << 16 |
+		((subjectCount >> 16) & 0xFF) << 8 | (subjectCount >> 24);
+	header[2] = (npcCount << 24) | ((npcCount >> 8) & 0xFF) << 16 |
+		((npcCount >> 16) & 0xFF) << 8 | (npcCount >> 24);
+	header[3] = reinterpret_cast<unsigned int*>(&CFlat)[0x1042];
+
+	memcpy(outData, header, 0x10);
+
+	const int entriesSize = static_cast<int>(letterCount * 8);
+	memcpy(outData + 0x10, letterEntryBuf, entriesSize);
+
+	char* dst = outData + 0x10 + entriesSize;
+	const int subjectSize = static_cast<int>(subjectCount * 0x18);
+	memcpy(dst, subjectNameBuf, subjectSize);
+	memcpy(dst + subjectSize, npcNameBuf, static_cast<int>(npcCount * 0x10));
+
+	const int totalSize = entriesSize + 0x10 + subjectSize + static_cast<int>(npcCount * 0x10);
+
+	__dla__FPv(letterEntryBuf);
+	__dla__FPv(subjectNameBuf);
+	__dla__FPv(npcNameBuf);
+
+	self[0x2C8A] = static_cast<unsigned char>(self[0x2C8A] | channelMask);
+	Joybus.SetLetterSize(channel, totalSize);
+	self[0x2C89] = static_cast<unsigned char>(self[0x2C89] & ~channelMask);
 }
 
 /*

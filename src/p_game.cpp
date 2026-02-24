@@ -110,7 +110,7 @@ int CGamePcs::GetTable(unsigned long param)
  */
 void CGamePcs::create()
 {
-    CGame& game = Game.game;
+    CGame& game = (CGame&)Game;
     game.CGame::Create();
 }
 
@@ -125,7 +125,7 @@ void CGamePcs::create()
  */
 void CGamePcs::destroy()
 {
-    CGame& game = Game.game;
+    CGame& game = (CGame&)Game;
     game.CGame::Destroy();
 }
 
@@ -136,7 +136,7 @@ void CGamePcs::destroy()
  */
 void CGamePcs::calcInit()
 {
-    CGame& game = Game.game;
+    CGame& game = (CGame&)Game;
     game.CGame::CheckScriptChange();
 }
 
@@ -151,7 +151,7 @@ void CGamePcs::calcInit()
  */
 void CGamePcs::calc0()
 {
-    CGame& game = Game.game;
+    CGame& game = (CGame&)Game;
     game.CGame::Calc();
 }
 
@@ -166,7 +166,7 @@ void CGamePcs::calc0()
  */
 void CGamePcs::calc1()
 {
-    CGame& game = Game.game;
+    CGame& game = (CGame&)Game;
     game.CGame::Calc2();
 }
 
@@ -181,7 +181,7 @@ void CGamePcs::calc1()
  */
 void CGamePcs::calc2()
 {
-    CGame& game = Game.game;
+    CGame& game = (CGame&)Game;
     game.CGame::Calc3();
 }
 
@@ -196,7 +196,7 @@ void CGamePcs::calc2()
  */
 void CGamePcs::draw0()
 {
-    CGame& game = Game.game;
+    CGame& game = (CGame&)Game;
     game.CGame::Draw();
 }
 
@@ -211,7 +211,7 @@ void CGamePcs::draw0()
  */
 void CGamePcs::draw1()
 {
-    CGame& game = Game.game;
+    CGame& game = (CGame&)Game;
     game.CGame::Draw2();
 }
 
@@ -226,7 +226,7 @@ void CGamePcs::draw1()
  */
 void CGamePcs::draw2()
 {
-    CGame& game = Game.game;
+    CGame& game = (CGame&)Game;
     game.CGame::Draw3();
 }
 
@@ -241,7 +241,7 @@ void CGamePcs::draw2()
  */
 void CGamePcs::onScriptChanging(char* script)
 {
-    CGame& game = Game.game;
+    CGame& game = (CGame&)Game;
     game.CGame::ScriptChanging(script);
 }
 
@@ -256,7 +256,7 @@ void CGamePcs::onScriptChanging(char* script)
  */
 void CGamePcs::onScriptChanged(char* script, int param)
 {
-    CGame& game = Game.game;
+    CGame& game = (CGame&)Game;
     game.CGame::ScriptChanged(script, param);
 }
 
@@ -271,7 +271,7 @@ void CGamePcs::onScriptChanged(char* script, int param)
  */
 void CGamePcs::onMapChanging(int a, int b)
 {
-    CGame& game = Game.game;
+    CGame& game = (CGame&)Game;
     game.CGame::MapChanging(a, b);
 }
 
@@ -286,6 +286,6 @@ void CGamePcs::onMapChanging(int a, int b)
  */
 void CGamePcs::onMapChanged(int a, int b, int c)
 {
-    CGame& game = Game.game;
+    CGame& game = (CGame&)Game;
     game.CGame::MapChanged(a, b, c);
 }

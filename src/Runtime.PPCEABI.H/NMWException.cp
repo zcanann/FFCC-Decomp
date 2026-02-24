@@ -284,21 +284,23 @@ extern "C" void __destroy_arr(void* block, ConstructorDestructor dtor, size_t si
  * @note Size: 124b
  */
 extern "C" void __destroy_new_array(void* block, ConstructorDestructor dtor) {
+	size_t i;
+	size_t elementSize;
+	size_t elementCount;
+	char* current;
+
 	if (block != nullptr) {
-		char* arrayStart = (char*)block;
-		
 		if (dtor != nullptr) {
-			size_t elementSize = *(size_t*)(arrayStart - 0x10);
-			size_t elementCount = *(size_t*)(arrayStart - 0xc);
-			char* current = arrayStart + elementSize * elementCount;
-			
-			for (size_t i = 0; i < elementCount; i++) {
+			elementSize = *(size_t*)((char*)block - 0x10);
+			i = 0;
+			elementCount = *(size_t*)((char*)block - 0xc);
+			current = (char*)block + elementSize * elementCount;
+			while (i < elementCount) {
 				current -= elementSize;
 				DTORCALL_COMPLETE(dtor, current);
+				i++;
 			}
 		}
-		
-		// Call delete operator on the allocation header
-		__dla__FPv((void*)(arrayStart - 0x10));
+		__dla__FPv((char*)block - 0x10);
 	}
 }

@@ -567,6 +567,7 @@ void CMenuPcs::EquipDraw()
 {
 	int menuState = *(int*)((char*)this + 0x82c);
 	int mode = (int)*(s16*)(menuState + 0x30);
+	int listState = (int)*(s16*)(menuState + 0x10);
 	u32 caravanWork = Game.game.m_scriptFoodBase[0];
 	s16* menuData = *(s16**)((char*)this + 0x850);
 	s16* item = menuData + 4;
@@ -584,11 +585,13 @@ void CMenuPcs::EquipDraw()
 			double sx = (double)*(float*)(item + 6);
 			int tex = *(int*)(item + 0xe);
 
-			if ((mode == 0) && (i == (int)*(s16*)(menuState + 0x26))) {
+			if ((listState == 1) && (i == (int)*(s16*)(menuState + 0x26))) {
 				sx = sx + h;
 			}
 
 			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
+			GXColor color = {0xff, 0xff, 0xff, (u8)(FLOAT_80332ee4 * *(float*)(item + 8))};
+			GXSetChanMatColor((GXChannelID)4, color);
 			DrawRect__8CMenuPcsFUlfffffffff(x, (double)(float)((double)item[1] - DOUBLE_80332ed8), w, h, y, sx,
 			                                (double)*(float*)(item + 10), (double)*(float*)(item + 10), this, 0);
 		}

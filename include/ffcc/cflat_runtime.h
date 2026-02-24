@@ -82,7 +82,7 @@ public:
 	void Create(void*);
 	void CreateDebug(void*, int);
 	void createVal(CChunkFile&, int, CFlatRuntime::CVal*);
-	void Frame(int, int);
+	int Frame(int, int);
 	void AfterFrame(int);
 
 	void deleteObject(CFlatRuntime::CObject*);

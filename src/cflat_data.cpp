@@ -71,47 +71,48 @@ extern "C" CFlatData* dtor_800980B4(CFlatData* flatData, short shouldDelete)
 		char* m_mesBuffer;
 	};
 
-	FlatDataLayout* pCVar1;
+	FlatDataLayout* dataIter;
+	FlatDataLayout* tableIter;
 	int iVar2;
 
 	if (flatData != nullptr)
 	{
-		pCVar1 = (FlatDataLayout*)flatData;
+		dataIter = (FlatDataLayout*)flatData;
 		for (iVar2 = 0; iVar2 < ((FlatDataLayout*)flatData)->m_dataCount; iVar2++)
 		{
-			if (pCVar1->m_data[0].m_data != nullptr)
+			if (dataIter->m_data[0].m_data != nullptr)
 			{
-				operator delete(pCVar1->m_data[0].m_data);
-				pCVar1->m_data[0].m_data = nullptr;
+				operator delete(dataIter->m_data[0].m_data);
+				dataIter->m_data[0].m_data = nullptr;
 			}
-			if (pCVar1->m_data[0].m_strings != nullptr)
+			if (dataIter->m_data[0].m_strings != nullptr)
 			{
-				operator delete(pCVar1->m_data[0].m_strings);
-				pCVar1->m_data[0].m_strings = (char**)nullptr;
+				operator delete(dataIter->m_data[0].m_strings);
+				dataIter->m_data[0].m_strings = (char**)nullptr;
 			}
-			if (pCVar1->m_data[0].m_stringBuf != nullptr)
+			if (dataIter->m_data[0].m_stringBuf != nullptr)
 			{
-				operator delete(pCVar1->m_data[0].m_stringBuf);
-				pCVar1->m_data[0].m_stringBuf = (char*)nullptr;
+				operator delete(dataIter->m_data[0].m_stringBuf);
+				dataIter->m_data[0].m_stringBuf = (char*)nullptr;
 			}
-			pCVar1 = (FlatDataLayout*)&pCVar1->m_data[0].m_stringBuf;
+			dataIter = (FlatDataLayout*)&dataIter->m_data[0].m_stringBuf;
 		}
 		((FlatDataLayout*)flatData)->m_dataCount = 0;
 
-		pCVar1 = (FlatDataLayout*)flatData;
+		tableIter = (FlatDataLayout*)flatData;
 		for (iVar2 = 0; iVar2 < ((FlatDataLayout*)flatData)->m_tableCount; iVar2++)
 		{
-			if (pCVar1->m_tabl[0].m_strings != nullptr)
+			if (tableIter->m_tabl[0].m_strings != nullptr)
 			{
-				operator delete(pCVar1->m_tabl[0].m_strings);
-				pCVar1->m_tabl[0].m_strings = (char**)nullptr;
+				operator delete(tableIter->m_tabl[0].m_strings);
+				tableIter->m_tabl[0].m_strings = (char**)nullptr;
 			}
-			if (pCVar1->m_tabl[0].m_stringBuf != nullptr)
+			if (tableIter->m_tabl[0].m_stringBuf != nullptr)
 			{
-				operator delete(pCVar1->m_tabl[0].m_stringBuf);
-				pCVar1->m_tabl[0].m_stringBuf = (char*)nullptr;
+				operator delete(tableIter->m_tabl[0].m_stringBuf);
+				tableIter->m_tabl[0].m_stringBuf = (char*)nullptr;
 			}
-			pCVar1 = (FlatDataLayout*)&pCVar1->m_data[0].m_numStrings;
+			tableIter = (FlatDataLayout*)&tableIter->m_data[0].m_numStrings;
 		}
 		((FlatDataLayout*)flatData)->m_tableCount = 0;
 

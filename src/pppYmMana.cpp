@@ -3,6 +3,7 @@
 #include "ffcc/gobject.h"
 #include "ffcc/p_game.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/pppYmEnv.h"
 
 #include <string.h>
 #include <dolphin/os/OSCache.h>
@@ -23,6 +24,7 @@ extern char DAT_80330ea0[];
 extern char DAT_80330ea8[];
 extern char DAT_80330ebc[];
 extern char MaterialMan[];
+extern int DAT_8032ed70;
 
 extern struct {
     float _224_4_;
@@ -49,6 +51,9 @@ void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, void*, unsigned int, int, int);
 void* GetCharaHandlePtr__FP8CGObjectl(void*, long);
 int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void*);
+int GetTextureFromRSD__FiP9_pppEnvSt(int, _pppEnvSt*);
+void InitTexObj__8CTextureFv(void*);
+void genParaboloidMap__FPvPUlUs9_GXVtxFmt(void*, unsigned long*, unsigned short, GXVtxFmt);
 void DispCharaParts__8CGObjectFi(CGObject*, int);
 void _WaitDrawDone__8CGraphicFPci(CGraphic*, char*, int);
 }
@@ -611,9 +616,109 @@ void pppDestructYmMana(PYmMana* ymMana, UnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmMana(PYmMana*, UnkB*, UnkC*)
+void pppFrameYmMana(PYmMana* pppYmMana, UnkB* param_2, UnkC* param_3)
 {
-	// TODO
+    u32 texBufferSize;
+    u32* work;
+    void* dstBuffer;
+    u32* texList;
+    void* handle;
+    s32 model;
+    CGObject* gObject;
+    s32 i;
+    s32 setupOffset;
+
+    if (DAT_8032ed70 != 0) {
+        return;
+    }
+
+    gObject = *(CGObject**)((u8*)pppMngStPtr + 0xDC);
+    setupOffset = param_3->m_serializedDataOffsets[1];
+    work = (u32*)((u8*)pppYmMana + 8 + param_3->m_serializedDataOffsets[2]);
+    if (gObject == NULL) {
+        return;
+    }
+
+    handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
+    model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    work[0x1D] = (u32)param_2;
+    if (Game.game.m_currentMapId == 0x21) {
+        *((u8*)param_2 + 0x24) = 0;
+    }
+
+    if ((*(u8*)&gObject->m_weaponNodeFlags & 1) != 0) {
+        work[0x3E] = (u32)gObject->m_attachOwner;
+    }
+
+    *(u32*)(model + 0xE4) = (u32)work;
+    *(u32*)(model + 0xE8) = (u32)param_2;
+    *(u32*)(model + 0xF0) = (u32)Mana_BeforeDrawCallback;
+    *(u32*)(model + 0xFC) = (u32)Mana_DrawMeshDLCallback;
+
+    MaterialMan[0x228] = (u8)((float)*((u8*)pppYmMana + 0x8B + setupOffset) * gObject->m_lookAtTimer);
+    *((u8*)work + 0xE8) = MaterialMan[0x228];
+
+    if (*(s32*)pppYmMana != 0) {
+        return;
+    }
+
+    work[0] = (u32)gObject;
+    *(u32*)(model + 0xE4) = (u32)work;
+    *(u32*)(model + 0xE8) = (u32)param_2;
+    *(u32*)(model + 0xF0) = (u32)Mana_BeforeDrawCallback;
+    *(u32*)(model + 0xFC) = (u32)Mana_DrawMeshDLCallback;
+    work[2] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((u8*)param_2 + 0x08), pppEnvStPtr);
+    work[3] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((u8*)param_2 + 0x0C), pppEnvStPtr);
+    work[4] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((u8*)param_2 + 0x10), pppEnvStPtr);
+    work[5] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((u8*)param_2 + 0x14), pppEnvStPtr);
+    work[6] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((u8*)param_2 + 0x20), pppEnvStPtr);
+    work[7] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((u8*)param_2 + 0x24), pppEnvStPtr);
+    work[0x1F] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((u8*)param_2 + 0x30), pppEnvStPtr);
+    work[0x20] = (u32)GetTextureFromRSD__FiP9_pppEnvSt(*(s32*)((u8*)param_2 + 0x34), pppEnvStPtr);
+
+    *(u32*)(work[0x1F] + 0x6C) = 0;
+    InitTexObj__8CTextureFv((void*)work[0x1F]);
+    *(u32*)(work[0x20] + 0x6C) = 0;
+    InitTexObj__8CTextureFv((void*)work[0x20]);
+
+    if (work[0x1E] == 0) {
+        work[0x1E] = (u32)pppMemAlloc(0xC0, pppEnvStPtr->m_stagePtr, (char*)"pppYmMana.cpp", 0x38F);
+    }
+    if (work[10] == 0) {
+        work[10] = (u32)pppMemAlloc(0x20, pppEnvStPtr->m_stagePtr, (char*)"pppYmMana.cpp", 0x395);
+    }
+    if (work[11] == 0) {
+        work[11] = (u32)pppMemAlloc(0x20, pppEnvStPtr->m_stagePtr, (char*)"pppYmMana.cpp", 0x399);
+    }
+
+    texBufferSize = GXGetTexBufferSize(0x80, 0x80, GX_TF_RGBA8, GX_FALSE, 0);
+    if (work[12] == 0) {
+        work[12] = (u32)pppMemAlloc(texBufferSize, pppEnvStPtr->m_stagePtr, (char*)"pppYmMana.cpp", 0x3A1);
+    }
+    if (work[13] == 0) {
+        work[13] = (u32)pppMemAlloc(texBufferSize, pppEnvStPtr->m_stagePtr, (char*)"pppYmMana.cpp", 0x3A3);
+    }
+
+    GXInitTexObj((GXTexObj*)work[10], (void*)work[12], 0x80, 0x80, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXInitTexObj((GXTexObj*)work[11], (void*)work[13], 0x80, 0x80, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+
+    if (work[8] == 0) {
+        work[8] = (u32)pppMemAlloc(0xC0, pppEnvStPtr->m_stagePtr, (char*)"pppYmMana.cpp", 0x3B0);
+    }
+    dstBuffer = (void*)work[8];
+    texList = &work[2];
+    for (i = 0; i < 6; i++) {
+        *(u32*)(texList[0] + 0x6C) = 0;
+        InitTexObj__8CTextureFv((void*)texList[0]);
+        memcpy(dstBuffer, (void*)(texList[0] + 0x28), 0x20);
+        dstBuffer = (void*)((u8*)dstBuffer + 0x20);
+        texList++;
+    }
+
+    if (work[9] == 0) {
+        work[9] = (u32)pppMemAlloc(0xA5E8, pppEnvStPtr->m_stagePtr, (char*)"pppYmMana.cpp", 0x3CB);
+        genParaboloidMap__FPvPUlUs9_GXVtxFmt((void*)work[9], &work[0x3B], 0x1E, GX_VTXFMT7);
+    }
 }
 
 /*

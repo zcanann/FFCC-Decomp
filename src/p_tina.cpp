@@ -23,8 +23,14 @@ extern "C" char* GetLangString__5CGameFv(void*);
 extern "C" void pppReleasePdt__8CPartMngFi(CPartMng*, int);
 extern "C" void SetRStage__13CAmemCacheSetFPQ27CMemory6CStage(void*, void*);
 extern "C" void AmemSetLock__13CAmemCacheSetFv(void*);
+extern "C" void AssertCache__13CAmemCacheSetFv(void*);
+extern "C" void Destroy__13CAmemCacheSetFv(void*);
 extern "C" void IsBigAlloc__7CUSBPcsFi(void*, int);
+extern "C" void mccReadData__7CUSBPcsFv(void*);
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
+extern "C" void* Free__7CMemoryFPv(void*, void*);
+extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
+extern "C" void Destroy__8CPartMngFv(CPartMng*);
 extern "C" void DrawOt__10pppDrawMngFv(void*);
 extern "C" void Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFUl_UcUlPFUl_UcUlPFUl_UcUl(
     void*,
@@ -642,12 +648,36 @@ void CPartPcs::createViewer()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005322C
+ * PAL Size: 180b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartPcs::destroy()
 {
-	// TODO
+    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 8);
+
+    IsBigAlloc__7CUSBPcsFi(USBPcs, 0);
+    Destroy__8CPartMngFv(&PartMng);
+
+    if (usb->m_stageAmem != 0) {
+        DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, usb->m_stageAmem);
+    }
+
+    AssertCache__13CAmemCacheSetFv(CAMemCacheSet);
+    Destroy__13CAmemCacheSetFv(CAMemCacheSet);
+
+    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, usb->m_stageDefault);
+
+    if (usb->m_freePtr != 0) {
+        Free__7CMemoryFPv(&Memory, usb->m_freePtr);
+    }
+
+    if (usb->m_stageExtra != 0) {
+        DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, usb->m_stageExtra);
+    }
 }
 
 /*
@@ -692,12 +722,29 @@ void CPartPcs::calc()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005309c
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartPcs::calcViewer()
 {
-	// TODO
+    CUSBStreamData* usbStream = reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 8);
+
+    OSStartStopwatch(&g_par_calc_prof);
+    PartMng.pppEditBeforeCalc();
+    PartMng.pppEditPartCalc();
+    OSStopStopwatch(&g_par_calc_prof);
+
+    mccReadData__7CUSBPcsFv(USBPcs);
+    if (usbStream->IsUSBStreamDataDone()) {
+        if (usbStream->m_packetCode != 0) {
+            PartMng.pppDataRcv(usbStream->m_packetCode, reinterpret_cast<char*>(usbStream->m_data), usbStream->m_sizeBytes);
+        }
+        usbStream->SetUSBStreamDataDone();
+    }
 }
 
 /*
@@ -804,12 +851,27 @@ void CPartPcs::drawAfter()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80052bd4
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartPcs::DrawMenu(int)
+void CPartPcs::DrawMenu(int fpNo)
 {
-	// TODO
+    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 8);
+
+    if (usb->m_disableShokiDraw == 0) {
+        Graphic.SetFog(1, 0);
+        Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
+        pppInitDrawEnv(0);
+        PartMng.pppSetRendMatrix();
+        PartMng.pppDrawPrioPdtFpno(6, 0, static_cast<short>(fpNo));
+        PartMng.drawEnd();
+        pppClearDrawEnv();
+        Graphic.SetDrawDoneDebugData(0x7f);
+    }
 }
 
 /*
@@ -841,12 +903,27 @@ void CPartPcs::DrawShoki()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80052a74
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartPcs::DrawMenuIdx(int)
+void CPartPcs::DrawMenuIdx(int index)
 {
-	// TODO
+    CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 8);
+
+    if (usb->m_disableShokiDraw == 0) {
+        Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
+        Graphic.SetFog(1, 0);
+        pppInitDrawEnv(0);
+        PartMng.pppSetRendMatrix();
+        PartMng.pppDrawIdx(index);
+        PartMng.drawEnd();
+        pppClearDrawEnv();
+        Graphic.SetDrawDoneDebugData(0x7f);
+    }
 }
 
 /*

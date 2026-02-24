@@ -1193,12 +1193,24 @@ void CMapObj::SetMime(int mode, int target, int type)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002BE34
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CMapObjAtr::~CMapObjAtr()
 {
-	// TODO
+}
+
+static inline void FreeAndClear(void* base, unsigned int offset)
+{
+    void*& ptr = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(base) + offset);
+    if (ptr != 0) {
+        __dl__FPv(ptr);
+        ptr = 0;
+    }
 }
 
 /*
@@ -1253,50 +1265,105 @@ CMapObjAtrMeshName::CMapObjAtrMeshName()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002C3E8
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CMapObjAtrMeshName::~CMapObjAtrMeshName()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002C2AC
+ * PAL Size: 316b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CMapObjAtrPointLight::~CMapObjAtrPointLight()
 {
-	// TODO
+    FreeAndClear(this, 0xE4);
+    FreeAndClear(this, 0xE8);
+    FreeAndClear(this, 0xEC);
+    FreeAndClear(this, 0xF0);
+    FreeAndClear(this, 0xBC);
+    FreeAndClear(this, 0xC0);
+    FreeAndClear(this, 0xC4);
+    FreeAndClear(this, 0xC8);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002C170
+ * PAL Size: 316b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CMapObjAtrSpotLight::~CMapObjAtrSpotLight()
 {
-	// TODO
+    FreeAndClear(this, 0x100);
+    FreeAndClear(this, 0x104);
+    FreeAndClear(this, 0x108);
+    FreeAndClear(this, 0x10C);
+    FreeAndClear(this, 0xD8);
+    FreeAndClear(this, 0xDC);
+    FreeAndClear(this, 0xE0);
+    FreeAndClear(this, 0xE4);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002C04C
+ * PAL Size: 292b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CMapObjAtrMime::~CMapObjAtrMime()
 {
-	// TODO
+    int* self = reinterpret_cast<int*>(this);
+    int i = 0;
+    int offset = 0;
+
+    while (i < static_cast<int>(*reinterpret_cast<unsigned char*>(self + 2))) {
+        void** entry = reinterpret_cast<void**>(self[3] + offset);
+        if (*entry != 0) {
+            __dl__FPv(*entry);
+            *entry = 0;
+        }
+
+        offset += 4;
+        i++;
+    }
+
+    if (self[3] != 0) {
+        __dl__FPv(reinterpret_cast<void*>(self[3]));
+        self[3] = 0;
+    }
+
+    FreeAndClear(this, 0x2C);
+    FreeAndClear(this, 0x30);
+    FreeAndClear(this, 0x34);
+    FreeAndClear(this, 0x38);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002BFF0
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CMapObjAtrPlaySta::~CMapObjAtrPlaySta()
 {
-	// TODO
 }

@@ -3,7 +3,10 @@
 #include "ffcc/materialman.h"
 #include "ffcc/memory.h"
 #include "ffcc/pad.h"
+#include "ffcc/p_game.h"
+#include "ffcc/p_graphic.h"
 #include "ffcc/gobject.h"
+#include "ffcc/gxfunc.h"
 
 #include <dolphin/mtx.h>
 #include <dolphin/os/OSCache.h>
@@ -21,10 +24,20 @@ extern float FLOAT_8032fa4c;
 extern float FLOAT_8032fa50;
 extern float FLOAT_8032fa54;
 extern float FLOAT_8032fa5c;
+extern float FLOAT_8032fa60;
+extern float FLOAT_8032fa64;
+extern float FLOAT_8032fa68;
+extern float FLOAT_8032fa6c;
+extern float FLOAT_8032fa70;
+extern float FLOAT_8032fa74;
 extern float FLOAT_8032fa58;
 extern float FLOAT_8032fa8c;
 extern float FLOAT_8032fa78;
 extern float FLOAT_8032fa7c;
+extern float FLOAT_8032fa80;
+extern float FLOAT_8032fa84;
+extern float FLOAT_8032fa88;
+extern float FLOAT_8032fa90;
 extern float FLOAT_8032fa94;
 extern float FLOAT_8032fa98;
 extern float FLOAT_8032fa9c;
@@ -40,6 +53,10 @@ extern CMaterialMan MaterialMan;
 extern char DAT_801d7928[];
 extern unsigned char MapMng[];
 extern unsigned char CFlat[];
+extern Vec g_shadow_pos;
+extern Vec g_shadow_refpos;
+extern CGraphicPcs GraphicsPcs;
+extern "C" void DrawMapShadow__7CMapMngFv(void*);
 extern "C" void Printf__7CSystemFPce(CSystem* system, char* format, ...);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long size, CMemory::CStage* stage, char* file, int line);
 extern "C" void __dl__FPv(void*);
@@ -539,7 +556,160 @@ int CCameraPcs::GetShadowRect(CBound&)
  */
 void CCameraPcs::drawShadowBegin()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    Mtx rotX;
+    Mtx rotY;
+    Mtx rot;
+    Mtx mapRot;
+    Vec up;
+    Vec offset;
+    int padOffset;
+    float stick;
+    double targetDist;
+
+    if (self[0x404] == 0) {
+        return;
+    }
+
+    GXInvalidateTexAll();
+
+    for (int i = 0; i < 0x108; i += 4) {
+        *reinterpret_cast<unsigned int*>(self + 0x10C + i) =
+            *reinterpret_cast<unsigned int*>(self + 0x4 + i);
+    }
+    for (int i = 0; i < 0x108; i += 4) {
+        *reinterpret_cast<unsigned int*>(self + 0x214 + i) =
+            *reinterpret_cast<unsigned int*>(self + 0x4 + i);
+    }
+
+    if (Game.game.m_currentSceneId == 3) {
+        padOffset = (((1 - Pad._448_4_) | (Pad._448_4_ - 1)) >> 31) * -0x54;
+        stick = FLOAT_8032fa34;
+        if (Pad._452_4_ == 0) {
+            stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x24 + padOffset);
+        }
+        *reinterpret_cast<float*>(self + 0x368) += FLOAT_8032fa70 * FLOAT_8032fa74 * stick;
+
+        stick = FLOAT_8032fa34;
+        if (Pad._452_4_ == 0) {
+            stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x28 + padOffset);
+        }
+        *reinterpret_cast<float*>(self + 0x364) += FLOAT_8032fa70 * FLOAT_8032fa4c * stick;
+    }
+
+    PSMTXRotRad(rotX, 'x', -*reinterpret_cast<float*>(self + 0x364));
+    PSMTXRotRad(rotY, 'y', *reinterpret_cast<float*>(self + 0x368));
+    PSMTXConcat(rotY, rotX, rot);
+
+    if (Game.game.m_currentSceneId == 4) {
+        *reinterpret_cast<float*>(self + 0x414) = FLOAT_8032fa78;
+        *reinterpret_cast<float*>(self + 0x418) = FLOAT_8032fa78;
+        *reinterpret_cast<float*>(self + 0x41C) = FLOAT_8032fa78;
+        *reinterpret_cast<float*>(self + 0x420) = FLOAT_8032fa7c;
+        *reinterpret_cast<float*>(self + 0x424) = FLOAT_8032fa7c;
+        *reinterpret_cast<float*>(self + 0x428) = FLOAT_8032fa7c;
+
+        if ((*reinterpret_cast<int*>(self + 0x434) == 1) &&
+            (GetShadowRect(*reinterpret_cast<CBound*>(self + 0x414)) != 0)) {
+            *reinterpret_cast<float*>(self + 0xD4) =
+                (*reinterpret_cast<float*>(self + 0x414) + *reinterpret_cast<float*>(self + 0x420)) *
+                FLOAT_8032fa20;
+            *reinterpret_cast<float*>(self + 0xD8) = *reinterpret_cast<float*>(self + 0x40C);
+            *reinterpret_cast<float*>(self + 0xDC) =
+                (*reinterpret_cast<float*>(self + 0x41C) + *reinterpret_cast<float*>(self + 0x428)) *
+                FLOAT_8032fa20;
+
+            double w = static_cast<double>(*reinterpret_cast<float*>(self + 0x420) -
+                                           *reinterpret_cast<float*>(self + 0x414));
+            double h = static_cast<double>(*reinterpret_cast<float*>(self + 0x428) -
+                                           *reinterpret_cast<float*>(self + 0x41C));
+            if (w < h) {
+                w = h;
+            }
+            *reinterpret_cast<float*>(self + 0x36C) = static_cast<float>(static_cast<double>(FLOAT_8032fa20) * w);
+            targetDist = w;
+        } else if (*reinterpret_cast<int*>(self + 0x434) == 2) {
+            *reinterpret_cast<float*>(self + 0xD4) = *reinterpret_cast<float*>(self + 0x408);
+            *reinterpret_cast<float*>(self + 0xD8) = *reinterpret_cast<float*>(self + 0x40C);
+            *reinterpret_cast<float*>(self + 0xDC) = *reinterpret_cast<float*>(self + 0x410);
+            PSVECSubtract(reinterpret_cast<Vec*>(self + 0xD4), reinterpret_cast<Vec*>(self + 0xE0), &offset);
+            *reinterpret_cast<float*>(self + 0x36C) = FLOAT_8032fa80 * *reinterpret_cast<float*>(self + 0x370);
+            targetDist = static_cast<double>(*reinterpret_cast<float*>(self + 0x430));
+        } else {
+            *reinterpret_cast<float*>(self + 0xD4) = *reinterpret_cast<float*>(self + 0x408);
+            *reinterpret_cast<float*>(self + 0xD8) = *reinterpret_cast<float*>(self + 0x40C);
+            *reinterpret_cast<float*>(self + 0xDC) = *reinterpret_cast<float*>(self + 0x410);
+            PSVECSubtract(reinterpret_cast<Vec*>(self + 0xD4), reinterpret_cast<Vec*>(self + 0xE0), &offset);
+            targetDist = static_cast<double>(PSVECMag(&offset));
+            *reinterpret_cast<float*>(self + 0x36C) =
+                static_cast<float>(targetDist * static_cast<double>(*reinterpret_cast<float*>(self + 0x370)));
+        }
+
+        if (static_cast<double>(FLOAT_8032fa34) <= static_cast<double>(*reinterpret_cast<float*>(self + 0x42C))) {
+            *reinterpret_cast<float*>(self + 0x42C) +=
+                (static_cast<float>(targetDist) - *reinterpret_cast<float*>(self + 0x42C)) * FLOAT_8032fa84;
+        } else {
+            *reinterpret_cast<float*>(self + 0x42C) = static_cast<float>(targetDist);
+        }
+    } else {
+        *reinterpret_cast<float*>(self + 0x36C) = FLOAT_8032fa88;
+        *reinterpret_cast<float*>(self + 0x42C) = FLOAT_8032fa8c;
+    }
+
+    up.x = FLOAT_8032fa34;
+    up.y = FLOAT_8032fa1c;
+    up.z = FLOAT_8032fa34;
+    PSMTXMultVecSR(rot, &up, &up);
+
+    *reinterpret_cast<float*>(self + 0x2F0) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0x2F4) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0x2F8) = *reinterpret_cast<float*>(self + 0x42C);
+    PSMTXMultVecSR(rot, reinterpret_cast<Vec*>(self + 0x2F0), reinterpret_cast<Vec*>(self + 0x2F0));
+    if (Game.game.m_currentMapId == 0x21) {
+        PSMTXCopy(reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x64), mapRot);
+        PSMTXMultVecSR(mapRot, reinterpret_cast<Vec*>(self + 0x2F0), reinterpret_cast<Vec*>(self + 0x2F0));
+    }
+    PSVECAdd(reinterpret_cast<Vec*>(self + 0x2F0), reinterpret_cast<Vec*>(self + 0xD4),
+             reinterpret_cast<Vec*>(self + 0x2F0));
+
+    *reinterpret_cast<unsigned int*>(self + 0x2E4) = *reinterpret_cast<unsigned int*>(self + 0xD4);
+    *reinterpret_cast<unsigned int*>(self + 0x2E8) = *reinterpret_cast<unsigned int*>(self + 0xD8);
+    *reinterpret_cast<unsigned int*>(self + 0x2EC) = *reinterpret_cast<unsigned int*>(self + 0xDC);
+    *reinterpret_cast<float*>(self + 0x310) = FLOAT_8032fa8c;
+    *reinterpret_cast<float*>(self + 0x314) = FLOAT_8032fa4c * *reinterpret_cast<float*>(self + 0x42C);
+
+    C_MTXLookAt(reinterpret_cast<MtxPtr>(self + 0x214),
+                reinterpret_cast<Point3d*>(self + 0x2F0), &up, reinterpret_cast<Point3d*>(self + 0x2E4));
+
+    stick = *reinterpret_cast<float*>(self + 0x36C);
+    C_MTXOrtho(reinterpret_cast<Mtx44Ptr>(self + 0x2A4),
+               stick, -stick, -stick, stick,
+               *reinterpret_cast<float*>(self + 0x310),
+               *reinterpret_cast<float*>(self + 0x314));
+
+    g_shadow_pos = *reinterpret_cast<Vec*>(self + 0x2F0);
+    g_shadow_refpos = *reinterpret_cast<Vec*>(self + 0x2E4);
+
+    for (int i = 0; i < 0x108; i += 4) {
+        *reinterpret_cast<unsigned int*>(self + 0x4 + i) =
+            *reinterpret_cast<unsigned int*>(self + 0x214 + i);
+    }
+
+    GXSetProjection(reinterpret_cast<Mtx44Ptr>(self + 0x94), GX_ORTHOGRAPHIC);
+    GXSetColorUpdate(GX_FALSE);
+    GXSetCullMode(GX_CULL_BACK);
+    GXSetViewport(FLOAT_8032fa4c, FLOAT_8032fa4c, FLOAT_8032fa90, FLOAT_8032fa90, FLOAT_8032fa34, FLOAT_8032fa1c);
+    GXSetScissor(2, 2, 0x1DC, 0x1DC);
+    _GXSetBlendMode(GX_BM_NONE, GX_BL_ZERO, GX_BL_ZERO, GX_LO_SET);
+    _GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0xFF);
+    GXSetZCompLoc(GX_TRUE);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetNumTevStages(1);
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+    GXSetNumTexGens(0);
+    DrawMapShadow__7CMapMngFv(MapMng);
 }
 
 /*
@@ -549,7 +719,113 @@ void CCameraPcs::drawShadowBegin()
  */
 void CCameraPcs::drawShadowEnd()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    Mtx44 ortho;
+    Mtx identity;
+    GXColor color;
+    float vA;
+    float vB;
+    float vC;
+    float vD;
+    float z;
+    float shadowSize;
+    float range;
+
+    if (self[0x404] == 0) {
+        return;
+    }
+
+    C_MTXOrtho(ortho, FLOAT_8032fa5c, -FLOAT_8032fa5c, FLOAT_8032fa5c, -FLOAT_8032fa5c,
+               *reinterpret_cast<float*>(self + 0x310), *reinterpret_cast<float*>(self + 0x314));
+    GXSetProjection(ortho, GX_ORTHOGRAPHIC);
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+    PSMTXIdentity(identity);
+    GXLoadPosMtxImm(identity, GX_PNMTX0);
+
+    _GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_OR);
+    _GXSetAlphaCompare(GX_ALWAYS, 1, GX_AOP_AND, GX_ALWAYS, 0);
+    GXSetZCompLoc(GX_FALSE);
+    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_TRUE);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetNumTevStages(1);
+    _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+    _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+    GXSetChanCtrl(GX_ALPHA0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXClearVtxDesc();
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetNumTexGens(0);
+    color.r = 0;
+    color.g = 0;
+    color.b = 0;
+    color.a = 0;
+    GXSetChanMatColor(GX_COLOR0A0, color);
+
+    vA = static_cast<float>(static_cast<int>(-FLOAT_8032fa5c - FLOAT_8032fa4c));
+    vB = static_cast<float>(static_cast<int>(FLOAT_8032fa64));
+    vC = static_cast<float>(static_cast<int>(FLOAT_8032fa60));
+    vD = static_cast<float>(static_cast<int>(FLOAT_8032fa68));
+    z = -(*reinterpret_cast<float*>(self + 0x314)) + *reinterpret_cast<float*>(self + 0x310);
+
+    GXBegin(GX_QUADS, GX_VTXFMT0, 0x10);
+    GXPosition3f32(vA, vB, z);
+    GXPosition3f32(vC, vB, z);
+    GXPosition3f32(vC, vA, z);
+    GXPosition3f32(vA, vA, z);
+    GXPosition3f32(vD, vB, z);
+    GXPosition3f32(vB, vB, z);
+    GXPosition3f32(vB, vA, z);
+    GXPosition3f32(vD, vA, z);
+    GXPosition3f32(vA, vB, z);
+    GXPosition3f32(vB, vB, z);
+    GXPosition3f32(vB, vD, z);
+    GXPosition3f32(vA, vD, z);
+    GXPosition3f32(vA, vC, z);
+    GXPosition3f32(vA, vD, z);
+    GXPosition3f32(vB, vC, z);
+    GXPosition3f32(vB, vA, z);
+
+    GXSetTexCopySrc(0, 0, 0x1E0, 0x1E0);
+    GXSetTexCopyDst(0x1E0, 0x1E0, GX_TF_Z24X8, GX_FALSE);
+    GXCopyTex(*reinterpret_cast<void**>(self + 0x31C), GX_TRUE);
+    GXSetCullMode(GX_CULL_FRONT);
+
+    shadowSize = *reinterpret_cast<float*>(self + 0x36C);
+    C_MTXLightOrtho(reinterpret_cast<MtxPtr>(self + 0x374),
+                    -shadowSize, shadowSize, -shadowSize, shadowSize,
+                    FLOAT_8032fa20, FLOAT_8032fa20, FLOAT_8032fa20, FLOAT_8032fa20);
+
+    PSMTXScale(reinterpret_cast<MtxPtr>(self + 0x3D4), FLOAT_8032fa34, FLOAT_8032fa34, FLOAT_8032fa34);
+    range = *reinterpret_cast<float*>(self + 0x314) - *reinterpret_cast<float*>(self + 0x310);
+    *reinterpret_cast<float*>(self + 0x3DC) = FLOAT_8032fa38 / range;
+    *reinterpret_cast<float*>(self + 0x3E0) = -(*reinterpret_cast<float*>(self + 0x310) / range);
+    *reinterpret_cast<float*>(self + 0x3EC) = *reinterpret_cast<float*>(self + 0x3DC) * FLOAT_8032fa6c;
+    *reinterpret_cast<float*>(self + 0x3F0) = *reinterpret_cast<float*>(self + 0x3E0) * FLOAT_8032fa6c;
+    *reinterpret_cast<float*>(self + 0x400) = FLOAT_8032fa1c;
+
+    PSMTXConcat(reinterpret_cast<MtxPtr>(self + 0x374), reinterpret_cast<MtxPtr>(self + 0x214),
+                reinterpret_cast<MtxPtr>(self + 0x374));
+    PSMTXConcat(reinterpret_cast<MtxPtr>(self + 0x3D4), reinterpret_cast<MtxPtr>(self + 0x214),
+                reinterpret_cast<MtxPtr>(self + 0x3A4));
+
+    GXSetColorUpdate(GX_TRUE);
+    GXSetZMode(GX_TRUE, GX_NEVER, GX_TRUE);
+    GXPixModeSync();
+    GXInitTexObj(reinterpret_cast<GXTexObj*>(self + 0x324), *reinterpret_cast<void**>(self + 0x31C),
+                 0x1E0, 0x1E0, GX_TF_Z24X8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXInitTexObjLOD(reinterpret_cast<GXTexObj*>(self + 0x324),
+                    GX_NEAR, GX_NEAR, FLOAT_8032fa34, FLOAT_8032fa34, FLOAT_8032fa34,
+                    GX_FALSE, GX_FALSE, GX_ANISO_1);
+
+    for (int i = 0; i < 0x108; i += 4) {
+        *reinterpret_cast<unsigned int*>(self + 0x4 + i) =
+            *reinterpret_cast<unsigned int*>(self + 0x10C + i);
+    }
+
+    GXSetProjection(reinterpret_cast<Mtx44Ptr>(self + 0x94), GX_PERSPECTIVE);
+    GraphicsPcs.setViewport();
 }
 
 /*

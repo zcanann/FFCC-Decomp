@@ -1495,12 +1495,16 @@ void CAmemCacheSet::Init(char* sourceName, CMemory::CStage*, CMemory::CStage* st
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8001D830
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CAmemCacheSet::SetRStage(CMemory::CStage*)
+void CAmemCacheSet::SetRStage(CMemory::CStage* stage)
 {
-	// TODO
+    *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(this) + 0x20) = stage;
 }
 
 /*

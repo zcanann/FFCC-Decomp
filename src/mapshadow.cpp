@@ -58,15 +58,16 @@ void CMapShadow::Init()
 {
 	float width;
 	float height;
-	float scale;
 	int material;
 	int materialArray;
 	u32 materialWidth;
 	u32 materialHeight;
 	u32 materialMode;
+	u32 materialIndex;
 
 	materialArray = *(int*)((char*)&MapMng + 0x213d4);
-	material = (int)(((CPtrArray<CMaterial>*)(materialArray + 8))->operator[](*(u16*)((char*)this + 4)));
+	materialIndex = *(u16*)((char*)this + 4);
+	material = (int)(((CPtrArray<CMaterial*>*)(materialArray + 8))->operator[](materialIndex));
 	material = *(int*)(material + 0x3c);
 	materialWidth = *(u32*)(material + 0x64);
 	materialHeight = *(u32*)(material + 0x68);
@@ -74,12 +75,13 @@ void CMapShadow::Init()
 	*((u8*)this + 7) = materialMode;
 	width = (float)materialWidth;
 	height = (float)materialHeight;
-	scale = *(float*)((char*)this + 0xa8);
 	if (*(u8*)((char*)this + 6) != 0) {
+		float scale = *(float*)((char*)this + 0xa8);
 		C_MTXLightFrustum((MtxPtr)((char*)this + 0x48), -height, height, -width, width, *(float*)((char*)this + 0xac),
 		                  (float)(DOUBLE_8032fce8 * (double)scale), FLOAT_8032fcf0 * scale, FLOAT_8032fcf0,
 		                  FLOAT_8032fcf0);
 	} else {
+		float scale = *(float*)((char*)this + 0xa8);
 		C_MTXLightOrtho((MtxPtr)((char*)this + 0x48), -height, height, -width, width,
 		                (float)(DOUBLE_8032fce8 * (double)scale), FLOAT_8032fcf0 * scale, FLOAT_8032fcf0,
 		                FLOAT_8032fcf0);

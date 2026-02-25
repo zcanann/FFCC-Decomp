@@ -25,7 +25,7 @@ public:
     void Quit();
 
     void onScriptChanging(char*);
-    void GetTable(unsigned long);
+    void* GetTable(unsigned long);
 
     void create0();
     void create();

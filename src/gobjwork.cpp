@@ -1,4 +1,5 @@
 #include "ffcc/gobjwork.h"
+#include "ffcc/gbaque.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/p_game.h"
 #include "ffcc/system.h"
@@ -285,12 +286,56 @@ void CCaravanWork::IsOutOfShouki()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a2514
+ * PAL Size: 392b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::AddLetter(int, int, int, int, int, int, int, int, int)
+void CCaravanWork::AddLetter(int param2, int param3, int param4, int param5, int param6, int param7,
+							 int param8, int param9, int param10)
 {
-	// TODO
+	unsigned char* shiftPtr = m_letterSlots + 0xAC;
+	int i;
+
+	for (i = 0; i < 0x21; i++) {
+		*(unsigned int*)(shiftPtr + 0x3EC) = *(unsigned int*)(shiftPtr + 0x3E0);
+		*(unsigned int*)(shiftPtr + 0x3F0) = *(unsigned int*)(shiftPtr + 0x3E4);
+		*(unsigned int*)(shiftPtr + 0x3F4) = *(unsigned int*)(shiftPtr + 0x3E8);
+		*(unsigned int*)(shiftPtr + 0x3E0) = *(unsigned int*)(shiftPtr + 0x3D4);
+		*(unsigned int*)(shiftPtr + 0x3E4) = *(unsigned int*)(shiftPtr + 0x3D8);
+		*(unsigned int*)(shiftPtr + 0x3E8) = *(unsigned int*)(shiftPtr + 0x3DC);
+		*(unsigned int*)(shiftPtr + 0x3D4) = *(unsigned int*)(shiftPtr + 0x3C8);
+		*(unsigned int*)(shiftPtr + 0x3D8) = *(unsigned int*)(shiftPtr + 0x3CC);
+		*(unsigned int*)(shiftPtr + 0x3DC) = *(unsigned int*)(shiftPtr + 0x3D0);
+		shiftPtr -= 0x24;
+	}
+
+	memset(m_letter0, 0, 0xC);
+	*(unsigned short*)m_letter0 = ((unsigned short)(param2 << 2) & 0x7FC) | (*(unsigned short*)m_letter0 & 0xF803);
+	*(unsigned int*)m_letter0 = ((unsigned int)(param3 & 0x1FF) << 9) | (*(unsigned int*)m_letter0 & 0xFFFC01FF);
+	m_letter0[0] = (unsigned char)((param5 << 3) & 8) | (m_letter0[0] & 0xF7);
+	if (((m_letter0[0] >> 3) & 1) != 0) {
+		int temp = (param4 / 100) + (param4 >> 31);
+		param4 = temp - (temp >> 31);
+	}
+	*(unsigned short*)(m_letter0 + 2) = ((unsigned short)param4 & 0x1FF) | (*(unsigned short*)(m_letter0 + 2) & 0xFE00);
+	m_letter0[0] &= 0x7F;
+	m_letter0[0] &= 0xBF;
+	m_letter0[0] &= 0xDF;
+	m_letter0[0] = (unsigned char)((param6 << 4) & 0x10) | (m_letter0[0] & 0xEF);
+	*(unsigned short*)(m_letter0 + 4) = (unsigned short)param7;
+	*(unsigned short*)(m_letter0 + 6) = (unsigned short)param8;
+	*(unsigned short*)(m_letter0 + 8) = (unsigned short)param9;
+	*(unsigned short*)(m_letter0 + 10) = (unsigned short)param10;
+
+	i = m_letterCount + 1;
+	if (100 < i) {
+		i = 100;
+	}
+	m_letterCount = i;
+	GbaQue.SetAddLetter(m_joybusCaravanId);
 }
 
 /*

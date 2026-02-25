@@ -1,4 +1,5 @@
 #include "ffcc/shopmenu.h"
+#include "ffcc/pad.h"
 #include "ffcc/p_game.h"
 #include "ffcc/pppPart.h"
 
@@ -6,19 +7,44 @@ extern "C" {
 void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
 void _WaitDrawDone__8CGraphicFPci(void*, char*, int);
 void SetMode__9CShopMenuFi(void*, int);
+void ReleasePdt__8CPartPcsFi(void*, int);
 int LoadMenuPdt__8CPartPcsFPc(void*, char*);
 int GetItemType__8CMenuPcsFii(void*, int, int);
 int GetData__13CAmemCacheSetFsPci(void*, short, char*, int);
+void PlaySe__6CSoundFiiii(void*, int, int, int, int);
+int __cntlzw(unsigned int);
+void __dl__FPv(void*);
 void pppCacheLoadShape__FPsP12_pppDataHead(short*, _pppDataHead*);
 }
 
 extern char s_shopmenu_cpp_801ded8c[];
 extern char DAT_80332e54[];
+extern unsigned short DAT_8032eed0;
 extern unsigned char MenuPcs[];
 extern unsigned char PartPcs[];
 extern unsigned char PartMng[];
+extern unsigned char Sound[];
 extern void* Graphic;
 extern void* ppvAmemCacheSet;
+
+static inline int& ShopMenuInt(CShopMenu* shopMenu, int offset)
+{
+    return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(shopMenu) + offset);
+}
+
+static inline float& ShopMenuFloat(CShopMenu* shopMenu, int offset)
+{
+    return *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(shopMenu) + offset);
+}
+
+static inline unsigned short GetPadButtons()
+{
+    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        return 0;
+    }
+    __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+    return static_cast<unsigned short>(Pad._8_2_);
+}
 
 /*
  * --INFO--
@@ -461,12 +487,156 @@ void CShopMenu::Destroy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801577ac
+ * PAL Size: 4352b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CShopMenu::Calc()
 {
-	// TODO
+    unsigned short buttons = GetPadButtons();
+    int mode = ShopMenuInt(this, 0x0);
+    int& timer = ShopMenuInt(this, 0xC);
+    int& subMode = ShopMenuInt(this, 0x10);
+    int& shopMode = ShopMenuInt(this, 0x14);
+    int& choice = ShopMenuInt(this, 0x48);
+
+    switch (mode) {
+    case 0:
+        if (timer == 1) {
+            PlaySe__6CSoundFiiii(Sound, 5, 0x40, 0x7F, 0);
+        }
+        ShopMenuFloat(this, 0x1C) = static_cast<float>(timer) * 0.125f;
+        if (timer == 8) {
+            this->SetMode(1);
+        }
+        break;
+    case 1:
+        if ((buttons & 4) != 0) {
+            ++choice;
+            if (choice > 2) {
+                choice = 0;
+            }
+            PlaySe__6CSoundFiiii(Sound, 1, 0x40, 0x7F, 0);
+        } else if ((buttons & 8) != 0) {
+            --choice;
+            if (choice > 2) {
+                choice = 2;
+            }
+            PlaySe__6CSoundFiiii(Sound, 1, 0x40, 0x7F, 0);
+        } else if ((buttons & 0x100) != 0) {
+            PlaySe__6CSoundFiiii(Sound, 2, 0x40, 0x7F, 0);
+            this->SetMode(2);
+        }
+
+        if ((buttons & 0x200) != 0) {
+            PlaySe__6CSoundFiiii(Sound, 3, 0x40, 0x7F, 0);
+            this->SetMode(2);
+            choice = 2;
+        }
+        break;
+    case 2:
+        ShopMenuFloat(this, 0x1C) = static_cast<float>(8 - timer) * 0.125f;
+        if (timer == 8) {
+            if (choice == 0) {
+                this->SetMode(3);
+            } else if (choice == 1) {
+                this->SetMode(6);
+            } else if (choice == 2) {
+                ReleasePdt__8CPartPcsFi(PartPcs, ShopMenuInt(this, 0x18));
+                reinterpret_cast<CCaravanWork*>(Game.game.m_scriptFoodBase[0])->CallShop(0, 0, 0, 0, 0);
+                *reinterpret_cast<unsigned short*>(MenuPcs + 0x850 + 6) = 1;
+                __dl__FPv(*reinterpret_cast<void**>(MenuPcs + 0x878));
+                *reinterpret_cast<void**>(MenuPcs + 0x878) = nullptr;
+                return;
+            }
+        }
+        break;
+    case 3:
+        if (timer == 0) {
+            PlaySe__6CSoundFiiii(Sound, 5, 0x40, 0x7F, 0);
+        }
+        ShopMenuFloat(this, 0x1C) = static_cast<float>(timer) * 0.125f;
+        if (timer == 8) {
+            this->SetMode(4);
+        }
+        break;
+    case 4:
+        if (subMode == 0) {
+            this->SelectItemIdx();
+            if ((buttons & 0x200) != 0) {
+                PlaySe__6CSoundFiiii(Sound, 3, 0x40, 0x7F, 0);
+                this->SetMode(5);
+            }
+        } else if (subMode == 1) {
+            this->SelectFigure();
+            if ((buttons & 0x200) != 0) {
+                PlaySe__6CSoundFiiii(Sound, 3, 0x40, 0x7F, 0);
+                subMode = 0;
+            }
+        } else if (subMode == 2) {
+            this->SelectYesNo();
+            if ((buttons & 0x200) != 0) {
+                PlaySe__6CSoundFiiii(Sound, 3, 0x40, 0x7F, 0);
+                subMode = 1;
+            }
+        }
+        break;
+    case 5:
+    case 8:
+        ShopMenuFloat(this, 0x1C) = static_cast<float>(8 - timer) * 0.125f;
+        if (timer == 8) {
+            this->SetMode(0);
+        }
+        break;
+    case 6:
+        if (timer == 0) {
+            PlaySe__6CSoundFiiii(Sound, 5, 0x40, 0x7F, 0);
+        }
+        ShopMenuFloat(this, 0x1C) = static_cast<float>(timer) * 0.125f;
+        if (timer == 8) {
+            this->SetMode(7);
+        }
+        break;
+    case 7:
+        if (subMode == 0) {
+            this->SelectItemIdx();
+            if ((buttons & 0x200) != 0) {
+                PlaySe__6CSoundFiiii(Sound, 3, 0x40, 0x7F, 0);
+                this->SetMode(8);
+            }
+        } else if (subMode == 2) {
+            this->SelectYesNo();
+            if ((buttons & 0x200) != 0) {
+                PlaySe__6CSoundFiiii(Sound, 3, 0x40, 0x7F, 0);
+                subMode = 1;
+            }
+        }
+        break;
+    case 9:
+        this->SelectSOUBI();
+        break;
+    case 10:
+        this->SelectMake();
+        break;
+    case 11:
+        this->SelectFigure();
+        break;
+    case 12:
+        this->SelectYesNo();
+        break;
+    }
+
+    ++timer;
+    if (timer > 8) {
+        timer = 8;
+    }
+
+    if ((shopMode == 0) || (shopMode == 1)) {
+        DAT_8032eed0 = 0;
+    }
 }
 
 /*

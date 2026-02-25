@@ -56,7 +56,7 @@ struct _pppEnvStYmDeformationScreen {
 };
 
 extern int DAT_8032ed70;
-extern char DAT_8032ed78;
+extern unsigned char DAT_8032ed78;
 extern char DAT_80238030[];
 extern CUtil DAT_8032ec70;
 extern float ppvScreenMatrix[4][4];
@@ -160,7 +160,7 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 	Mtx44 screenMtx;
 	float* work;
 	short* angle;
-	char* direction;
+	unsigned char* direction;
 	float cameraX;
 	float cameraY;
 	float cameraZ;
@@ -170,7 +170,7 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 		step = (YmDeformationScreenStep*)param2;
 		work = (float*)((char*)param1 + 0x80 + ((YmDeformationScreenData*)param3)->m_serializedDataOffsets[2]);
 		angle = (short*)(work + 1);
-		direction = (char*)work + 6;
+		direction = (unsigned char*)work + 6;
 
 		CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
 			param1, step->m_graphId, work + 2, work + 3, work + 4, step->m_initWOrk, &step->m_stepValue, &step->m_arg3);
@@ -180,12 +180,12 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 		if (DAT_8032ed78 == 0) {
 			if (*direction != 0) {
 				*angle = *angle + (short)(int)work[5];
-				if (step->m_payload3 < *angle) {
+				if (*angle > step->m_payload3) {
 					*direction = 0;
 				}
 			} else {
 				*angle = *angle - (short)(int)work[5];
-				if ((int)*angle < -(int)step->m_payload3) {
+				if (*angle < -step->m_payload3) {
 					*direction = 1;
 				}
 			}

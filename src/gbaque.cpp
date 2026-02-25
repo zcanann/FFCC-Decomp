@@ -6,6 +6,7 @@
 #include "ffcc/gobjwork.h"
 #include "ffcc/joybus.h"
 #include "ffcc/p_game.h"
+#include "ffcc/p_menu.h"
 #include "ffcc/system.h"
 #include <string.h>
 #include <Dolphin/os.h>
@@ -14,6 +15,7 @@
 extern void* ARRAY_802f49b0;
 extern "C" void __dt__8GbaQueueFv(void*);
 extern __declspec(section ".data") CFlatRuntime CFlat;
+extern CMenuPcs MenuPcs;
 extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
@@ -424,12 +426,243 @@ void GbaQueue::ResetQueue()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CFF38
+ * PAL Size: 2972b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void GbaQueue::ExecutQueue()
 {
-	// TODO
+	unsigned int localQueueData[4][64];
+	int localQueueCount[4];
+	char* obj;
+	int scriptFoodBase[4];
+	unsigned int channel;
+
+	for (channel = 0; channel < 4; channel++) {
+		OSWaitSemaphore(accessSemaphores + channel);
+	}
+
+	memcpy(localQueueData, reinterpret_cast<char*>(this) + 0x30, sizeof(localQueueData));
+	memcpy(localQueueCount, reinterpret_cast<char*>(this) + 0x430, sizeof(localQueueCount));
+	memset(reinterpret_cast<char*>(this) + 0x30, 0, sizeof(localQueueData));
+	memset(reinterpret_cast<char*>(this) + 0x430, 0, sizeof(localQueueCount));
+
+	for (channel = 0; channel < 4; channel++) {
+		OSSignalSemaphore(accessSemaphores + channel);
+	}
+
+	obj = reinterpret_cast<char*>(this);
+	memcpy(scriptFoodBase, Game.game.m_scriptFoodBase, sizeof(scriptFoodBase));
+
+	for (channel = 0; channel < 4; channel++) {
+		const unsigned int playerBit = (1U << channel);
+		const unsigned int shopBit = (0x10U << channel);
+		unsigned int* queueWords = localQueueData[channel];
+		int queueCount = localQueueCount[channel];
+		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(scriptFoodBase[channel]);
+		int i;
+
+		if (obj[0x430 + channel] != 0) {
+			continue;
+		}
+
+		for (i = 0; i < queueCount; i++) {
+			unsigned int cmdWord = queueWords[i];
+			unsigned char cmd = static_cast<unsigned char>(cmdWord & 0x3F);
+
+			if (cmd == 0x17) {
+				if (caravanWork != 0) {
+					const int action = static_cast<unsigned char>(cmdWord >> 16);
+					const int itemIdx = static_cast<unsigned char>(cmdWord >> 8);
+					if (action == 1) {
+						caravanWork->FGUseItem(itemIdx, 1);
+					} else if (action == 2) {
+						caravanWork->FGPutItem(itemIdx, 1);
+					} else if (action == 3) {
+						caravanWork->DeleteItemIdx(itemIdx, 1);
+					}
+				}
+			} else if (cmd == 0x1A) {
+				if (caravanWork != 0) {
+					const unsigned char p0 = static_cast<unsigned char>(cmdWord >> 24);
+					const unsigned char p1 = static_cast<unsigned char>(cmdWord >> 16);
+					const unsigned char p2 = static_cast<unsigned char>(cmdWord >> 8);
+					const unsigned char p3 = static_cast<unsigned char>(cmdWord);
+					unsigned int* pendingMoney = reinterpret_cast<unsigned int*>(obj + 0x2C9C + channel * 4);
+					unsigned char* moneyState = reinterpret_cast<unsigned char*>(obj + 0x2CAC + channel);
+
+					if ((static_cast<int>(p0) >> 6) == 0) {
+						*moneyState = static_cast<unsigned char>(p1 | 0x80);
+						*pendingMoney = (static_cast<unsigned int>(p2) << 24) | (static_cast<unsigned int>(p3) << 16);
+					} else if (*moneyState == 0) {
+						Joybus.SendResult(channel, 1, p0, p1);
+					} else {
+						*pendingMoney |= (static_cast<unsigned int>(p1) << 8) | p2;
+						Joybus.SendResult(channel, 0, p0, *moneyState & 7);
+						if ((*moneyState & 7) == 1) {
+							caravanWork->FGPutGil(*pendingMoney);
+						}
+						*pendingMoney = 0;
+						*moneyState = 0;
+					}
+				}
+			} else if (cmd == 0x1E) {
+				if (caravanWork != 0) {
+					const int equipType = static_cast<signed char>(cmdWord >> 16);
+					const int equipItem = static_cast<signed char>(cmdWord >> 8);
+					caravanWork->ChgEquipPos(equipType, equipItem);
+				}
+			} else if (cmd == 0x1F) {
+				if (caravanWork != 0) {
+					caravanWork->ChgCmdLst(static_cast<unsigned char>(cmdWord >> 16), static_cast<short>(cmdWord));
+				}
+			} else if (cmd == 0x0C) {
+				const unsigned char request = static_cast<unsigned char>(cmdWord >> 8);
+				if (caravanWork != 0) {
+					if ((request == 2) || (request == 3) || (request == 6) || (request == 7) || (request == 8) || (request == 9)) {
+						OSWaitSemaphore(accessSemaphores + channel);
+						obj[0x2CCA] = static_cast<char>(obj[0x2CCA] & ~static_cast<unsigned char>(playerBit));
+						OSSignalSemaphore(accessSemaphores + channel);
+						Joybus.SetLetterSize(channel, 0);
+
+						char* letterBuf = Joybus.GetLetterBuffer(channel);
+						if (request == 3) {
+							MakeLetterList(channel, letterBuf);
+						} else if (request == 2) {
+							caravanWork->FGLetterOpen(static_cast<unsigned char>(cmdWord));
+							MakeLetterData(channel, letterBuf, static_cast<unsigned char>(cmdWord));
+						} else if (request == 6) {
+							MakeSellData(channel, letterBuf);
+						} else if (request == 7) {
+							MakeBuyData(channel, letterBuf);
+						} else if (request == 8) {
+							MakeSmithData(channel, letterBuf);
+						} else if (request == 9) {
+							MakeArtiData(channel, letterBuf);
+						}
+					}
+				}
+			} else if (cmd == 0x14) {
+				const unsigned char request = static_cast<unsigned char>(cmdWord >> 8);
+				if (request == 0 || request == 1) {
+					if (caravanWork != 0) {
+						MoveLetterItem(channel, cmdWord);
+					}
+				} else if (request == 2) {
+					ChkCMakeCharaType(channel, cmdWord);
+				} else if (request == 3) {
+					ChkCMakeJob(channel, cmdWord);
+				} else if (request == 4 || request == 5) {
+					unsigned char status = static_cast<unsigned char>(cmdWord >> 16);
+					int retry;
+					for (retry = 0; retry < 10; retry++) {
+						if (Joybus.SetMType(channel, 4) == 0) {
+							break;
+						}
+					}
+					if (retry >= 10) {
+						status = 4;
+					}
+					if (status == 4) {
+						MenuPcs.ClrCMakeFlg(channel);
+					} else if (status == 5) {
+						MenuPcs.SetCMakeEnd(channel);
+					}
+				} else if (request == 6) {
+					OSWaitSemaphore(accessSemaphores + channel);
+					obj[0x2CCB] = static_cast<char>(cmdWord >> 8);
+					obj[0x2CCC] = static_cast<char>(cmdWord);
+					OSSignalSemaphore(accessSemaphores + channel);
+					Joybus.SendResult(channel, 0, static_cast<unsigned char>(cmdWord >> 16), 0);
+				} else if (request == 7) {
+					OSWaitSemaphore(accessSemaphores + channel);
+					obj[0x2D38] = static_cast<char>(obj[0x2D38] & ~static_cast<unsigned char>(playerBit));
+					obj[0x2D39] = static_cast<char>(obj[0x2D39] & ~static_cast<unsigned char>(playerBit));
+					OSSignalSemaphore(accessSemaphores + channel);
+					for (int retry = 0; retry < 10; retry++) {
+						if (Joybus.SetMType(channel, 0) == 0) {
+							break;
+						}
+					}
+					if (caravanWork != 0) {
+						caravanWork->CallShop(0, 0, 0, 0, 0);
+					}
+				} else if (request == 8) {
+					if (caravanWork != 0) {
+						const int itemIdx = static_cast<unsigned char>(cmdWord >> 8);
+						caravanWork->DeleteItemIdx(itemIdx, 1);
+						Joybus.SendResult(channel, 0, static_cast<unsigned char>(cmdWord >> 24), static_cast<unsigned char>(cmdWord >> 16));
+					}
+				} else if (request == 9) {
+					if (caravanWork != 0) {
+						const unsigned int quantity = static_cast<unsigned char>(cmdWord);
+						const int shopIndex = static_cast<unsigned char>(cmdWord >> 8);
+						int shopItem = caravanWork->m_shopList[shopIndex];
+						for (unsigned int n = 0; n < quantity; n++) {
+							caravanWork->AddItem(shopItem, 0);
+						}
+						Joybus.SendResult(channel, 0, static_cast<unsigned char>(cmdWord >> 24), static_cast<unsigned char>(cmdWord >> 16));
+					}
+				} else if (request == 10) {
+					if (caravanWork != 0) {
+						SetSmithData(channel, cmdWord);
+					}
+				} else if (request == 0x0B) {
+					OSWaitSemaphore(accessSemaphores + channel);
+					obj[0x2D38] = static_cast<char>(obj[0x2D38] & ~static_cast<unsigned char>(shopBit));
+					obj[0x2D39] = static_cast<char>(obj[0x2D39] & ~static_cast<unsigned char>(shopBit));
+					OSSignalSemaphore(accessSemaphores + channel);
+					for (int retry = 0; retry < 10; retry++) {
+						if (Joybus.SetMType(channel, 0) == 0) {
+							break;
+						}
+					}
+					if (caravanWork != 0) {
+						caravanWork->CallShop(1, 0, 0, 0, 0);
+					}
+				} else if (request == 0x15) {
+					for (int s = 0; s < 4; s++) {
+						OSWaitSemaphore(accessSemaphores + s);
+					}
+					obj[0x2D14] = static_cast<char>(obj[0x2D14] | static_cast<unsigned char>(playerBit));
+					for (int s = 0; s < 4; s++) {
+						OSSignalSemaphore(accessSemaphores + s);
+					}
+				}
+			} else if (cmd == 0x15) {
+				if (caravanWork != 0) {
+					ReplyLetter(channel);
+				}
+			} else if ((cmd == 6) && (static_cast<unsigned char>(cmdWord >> 8) == 0x18)) {
+				if (caravanWork != 0) {
+					caravanWork->m_evtState1 = 1;
+				}
+				obj[0x2C96 + channel] = static_cast<char>(0xFF);
+			} else if (cmd == 0x1C) {
+				ChkCMakeName(channel, cmdWord);
+			} else if (cmd == 0x1D) {
+				CMakeFavorite(channel, cmdWord);
+			}
+		}
+
+		if (obj[0x2C96 + channel] >= 0) {
+			if ((obj[0x2C96 + channel] == 0) && (Joybus.SendMask(channel, *reinterpret_cast<unsigned short*>(obj + 0x2C8E)) == 0)) {
+				obj[0x2C96 + channel] = 6;
+			}
+			obj[0x2C96 + channel] = static_cast<char>(obj[0x2C96 + channel] - 1);
+		}
+
+		if ((obj[0x2C89] & playerBit) != 0) {
+			if (!Joybus.IsLetterMenu(channel)) {
+				obj[0x2C89] = static_cast<char>(obj[0x2C89] & ~static_cast<unsigned char>(playerBit));
+			} else if (Joybus.SendAddLetter(channel) == 0) {
+				obj[0x2C89] = static_cast<char>(obj[0x2C89] & ~static_cast<unsigned char>(playerBit));
+			}
+		}
+	}
 }
 
 /*

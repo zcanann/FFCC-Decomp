@@ -16,6 +16,8 @@ extern "C" int _GetIdxCmdList__12CCaravanWorkFv(CCaravanWork*);
 extern "C" int _GetWeaponAttrib__12CCaravanWorkFi(CCaravanWork*, int);
 extern "C" int GetNextCmdListIdx__12CCaravanWorkFii(CCaravanWork*, int, int);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(void*, int);
+extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(void*, int);
+extern "C" void DrawInit__8CMenuPcsFv(void*);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(void*, unsigned long, float, float, float, float, float, float, float, float, float);
 extern "C" void SetColor__8CMenuPcsFR6CColor(void*, void*);
 extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
@@ -40,6 +42,8 @@ extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSe
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" asm void MTX44MultVec4__5CMathFPA4_fP3VecP5Vec4d(register void*, register float (*)[4], register Vec*,
                                                             register void*);
+extern "C" int GetGBAStart__6JoyBusFi(void*, int);
+extern "C" int IsInitSend__6JoyBusFi(void*, int);
 
 extern unsigned char CFlat[];
 extern unsigned char Chara[];
@@ -62,14 +66,28 @@ extern float FLOAT_803309ec;
 extern float FLOAT_803309f0;
 extern float FLOAT_803309f4;
 extern float FLOAT_803309f8;
+extern float FLOAT_80330a08;
+extern float FLOAT_80330a0c;
+extern float FLOAT_80330a10;
+extern float FLOAT_80330a14;
+extern float FLOAT_80330a18;
 extern float FLOAT_80330a54;
+extern float FLOAT_80330a2c;
+extern float FLOAT_80330a30;
 extern float FLOAT_80330a28;
 extern float FLOAT_80330a34;
+extern float FLOAT_80330a38;
+extern float FLOAT_80330a3c;
 extern float FLOAT_80330a40;
+extern float FLOAT_80330a44;
+extern float FLOAT_80330a48;
+extern float FLOAT_80330a4c;
+extern float FLOAT_80330a58;
 extern float FLOAT_80330aa8;
 extern float FLOAT_80330ac4;
 extern float FLOAT_80330ae8;
 extern double DOUBLE_80330a00;
+extern double DOUBLE_80330a20;
 extern double DOUBLE_80330a98;
 extern double DOUBLE_80330ac8;
 extern double DOUBLE_80330ad0;
@@ -439,12 +457,117 @@ void CRingMenu::onDraw()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a3404
+ * PAL Size: 1472b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRingMenu::drawGBA()
 {
-	// TODO
+	const int menuIndex = RingMenuInt(this, 0x0C);
+	if (!((Game.game.m_gameWork.m_menuStageMode == 0) || (menuIndex < 1))) {
+		return;
+	}
+
+	const unsigned int scriptFood = Game.game.m_scriptFoodBase[menuIndex];
+	if (scriptFood == 0) {
+		return;
+	}
+
+	double showScale = static_cast<double>(static_cast<float>(static_cast<float>(RingMenuInt(this, 0x500)) * FLOAT_80330a08));
+	if (RingMenuInt(this, 0x10) != 0) {
+		showScale = static_cast<double>(FLOAT_803309cc) - showScale;
+	}
+	if (showScale == static_cast<double>(FLOAT_803309c0)) {
+		return;
+	}
+
+	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcs, 0x16);
+
+	double gbaAnim = static_cast<double>(
+	    sin(static_cast<double>(FLOAT_80330a0c * static_cast<float>(RingMenuInt(this, 0x4F0))) / static_cast<double>(FLOAT_80330a10)));
+	if (RingMenuInt(this, 0x4F8) == 1) {
+		gbaAnim = static_cast<double>(FLOAT_803309cc) - gbaAnim;
+	}
+
+	float posX = 0x30;
+	if ((menuIndex & 1) != 0) {
+		posX = 0x250;
+	}
+
+	float posY = 0x30;
+	if ((menuIndex & 2) != 0) {
+		posY = 400.0f;
+	}
+
+	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcs, 0);
+
+	const double sizePulse = static_cast<double>(FLOAT_80330a14 * static_cast<float>(static_cast<double>(FLOAT_803309cc) - gbaAnim) +
+	                                             FLOAT_803309cc);
+	float cycle = static_cast<float>(
+	    fmod(static_cast<double>(FLOAT_80330a18 * static_cast<float>(RingMenuInt(this, 0x4F4))), DOUBLE_80330a20));
+	if (cycle > FLOAT_803309cc) {
+		cycle = FLOAT_80330a28 - cycle;
+	}
+
+	const double angle = static_cast<double>(FLOAT_80330a2c * cycle);
+	const double sinA = static_cast<double>(sin(angle));
+	const double sinB = static_cast<double>(sin(static_cast<double>(FLOAT_80330a30) + angle));
+
+	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcs, 0x1E);
+
+	const double alphaBase = static_cast<double>(FLOAT_80330a34) * gbaAnim;
+	const unsigned int alphaShadow =
+	    static_cast<unsigned int>(static_cast<int>(static_cast<double>(FLOAT_803309c4) * alphaBase * showScale));
+	unsigned int shadowColor[1];
+	__ct__6CColorFUcUcUcUc(shadowColor, 0, 0, 0, static_cast<unsigned char>(alphaShadow));
+	SetColor__8CMenuPcsFR6CColor(MenuPcs, shadowColor);
+
+	const double invSize = static_cast<double>(FLOAT_803309cc) - sizePulse;
+	const float drawX = static_cast<float>(static_cast<double>(posX) + static_cast<double>(FLOAT_80330a3c * static_cast<float>(sizePulse * sinB)));
+	const float drawY = static_cast<float>(static_cast<double>(posY) - static_cast<double>(FLOAT_80330a40 * static_cast<float>(sizePulse * sinA)));
+	const float menuV = static_cast<float>(menuIndex * 0x30);
+	DrawRect__8CMenuPcsFUlfffffffff(MenuPcs, 3, FLOAT_80330a38 + drawX, FLOAT_80330a38 + drawY, FLOAT_80330a44, FLOAT_80330a48,
+	                                 FLOAT_803309c0, menuV, FLOAT_80330a4c * static_cast<float>(static_cast<double>(FLOAT_803309cc) + invSize),
+	                                 FLOAT_80330a4c * static_cast<float>(sizePulse + invSize), 0.0f);
+
+	const double alphaLit = alphaBase * showScale;
+	const unsigned int alphaIcon = static_cast<unsigned int>(static_cast<int>(alphaLit));
+	unsigned int iconColor[1];
+	__ct__6CColorFUcUcUcUc(iconColor, 0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alphaIcon));
+	SetColor__8CMenuPcsFR6CColor(MenuPcs, iconColor);
+	DrawRect__8CMenuPcsFUlfffffffff(MenuPcs, 3, drawX, drawY, FLOAT_80330a44, FLOAT_80330a48, FLOAT_803309c0, menuV,
+	                                 FLOAT_80330a4c * static_cast<float>(sizePulse), FLOAT_80330a4c * static_cast<float>(sizePulse), 0.0f);
+
+	const unsigned int flatFlags = *reinterpret_cast<unsigned int*>(CFlat + 0x12A0) & *reinterpret_cast<unsigned int*>(CFlat + 0x12A4);
+	if (((flatFlags & 8) != 0) && (GetGBAStart__6JoyBusFi(&Joybus, menuIndex) == 0)) {
+		if (IsInitSend__6JoyBusFi(&Joybus, menuIndex) == 0) {
+			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcs, 0x1D);
+			const double blink = static_cast<double>(sin(static_cast<double>(FLOAT_80330a54 * static_cast<float>(RingMenuInt(this, 0x4F4)))));
+			const unsigned int sendAlpha = static_cast<unsigned int>(
+			    static_cast<int>(static_cast<double>(FLOAT_803309c4) * (alphaLit * static_cast<double>(FLOAT_803309cc + static_cast<float>(blink)))));
+			unsigned int sendColor[1];
+			__ct__6CColorFUcUcUcUc(sendColor, 0xFF, 0xFF, 0xFF, static_cast<unsigned char>(sendAlpha));
+			SetColor__8CMenuPcsFR6CColor(MenuPcs, sendColor);
+			DrawRect__8CMenuPcsFUlfffffffff(MenuPcs, 3, drawX, drawY, FLOAT_80330a48, FLOAT_80330a48, FLOAT_803309c0, FLOAT_80330a58,
+			                                 FLOAT_803309cc, FLOAT_803309cc, 0.0f);
+		} else {
+			int frameHalf = static_cast<int>(System.m_frameCounter) >> 1;
+			int frameSign = frameHalf >> 31;
+			unsigned int frameTex = static_cast<unsigned int>(
+			    (frameSign * 0x10 | (frameHalf * 0x10000000 + frameSign) >> 28) - frameSign);
+			if (frameTex > 3) {
+				frameTex &= 1;
+			}
+			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcs, 0x1D);
+			DrawRect__8CMenuPcsFUlfffffffff(MenuPcs, 3, drawX, drawY, FLOAT_80330a48, FLOAT_80330a48, FLOAT_803309c0,
+			                                 static_cast<float>(frameTex * 0x30), FLOAT_803309cc, FLOAT_803309cc, 0.0f);
+		}
+	}
+
+	DrawInit__8CMenuPcsFv(MenuPcs);
 }
 
 /*

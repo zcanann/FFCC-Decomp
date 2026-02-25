@@ -209,11 +209,13 @@ void GXPokeAlphaRead(GXAlphaReadMode mode) {
 }
 
 void GXPokeAlphaUpdate(GXBool update_enable) {
-    u32 reg;
+    volatile u16* pe_reg;
+    u16 reg;
 
-    reg = GX_GET_PE_REG(1);
-    SET_REG_FIELD(704, reg, 1, 4, update_enable);
-    GX_SET_PE_REG(1, reg);
+    pe_reg = (volatile u16*)__peReg;
+    reg = pe_reg[1];
+    reg = (reg & ~(1 << 4)) | ((u16)update_enable << 4);
+    pe_reg[1] = reg;
 }
 
 void GXPokeBlendMode(GXBlendMode type, GXBlendFactor src_factor, GXBlendFactor dst_factor, GXLogicOp op) {
@@ -231,11 +233,13 @@ void GXPokeBlendMode(GXBlendMode type, GXBlendFactor src_factor, GXBlendFactor d
 }
 
 void GXPokeColorUpdate(GXBool update_enable) {
-    u32 reg;
+    volatile u16* pe_reg;
+    u16 reg;
 
-    reg = GX_GET_PE_REG(1);
-    SET_REG_FIELD(738, reg, 1, 3, update_enable);
-    GX_SET_PE_REG(1, reg);
+    pe_reg = (volatile u16*)__peReg;
+    reg = pe_reg[1];
+    reg = (reg & ~(1 << 3)) | ((u16)update_enable << 3);
+    pe_reg[1] = reg;
 }
 
 /*
@@ -252,11 +256,13 @@ void GXPokeDstAlpha(GXBool enable, u8 alpha) {
 }
 
 void GXPokeDither(GXBool dither) {
-    u32 reg;
+    volatile u16* pe_reg;
+    u16 reg;
 
-    reg = GX_GET_PE_REG(1);
-    SET_REG_FIELD(758, reg, 1, 2, dither);
-    GX_SET_PE_REG(1, reg);
+    pe_reg = (volatile u16*)__peReg;
+    reg = pe_reg[1];
+    reg = (reg & ~(1 << 2)) | ((u16)dither << 2);
+    pe_reg[1] = reg;
 }
 
 /*

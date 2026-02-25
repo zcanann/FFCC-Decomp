@@ -246,40 +246,20 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, UnkB* param_2, UnkC* param_3)
         *(u16*)(work + 0xB) = *(u16*)(work + 0xB) + 1;
 
         if (*(u16*)(work + 0xB) > 3) {
-            Vec splineFrom[0xC];
-            Vec splineTo[0xC];
-            s16 splineCount;
-            f64 stepScale;
-
-            splineCount = 0;
-            stepScale = FLOAT_803306ec /
-                        (f32)((f64)(param_2->m_payload[9] + 1) - DOUBLE_803306f8);
+            f32 splineFromRaw[0x24];
+            f32 splineToRaw[0x24];
+            Vec* splineFrom = (Vec*)splineFromRaw;
+            Vec* splineTo = (Vec*)splineToRaw;
+            s16 splineCount = 0;
+            f64 stepScale = FLOAT_803306ec / (f32)((f64)(param_2->m_payload[9] + 1) - DOUBLE_803306f8);
 
             for (s32 i = 0; i < (s32)(u32)param_2->m_payload[9]; i++) {
-                f32 t;
-                Vec p0;
-                Vec p1;
-                Vec p2;
-                Vec p3;
-                Vec q0;
-                Vec q1;
-                Vec q2;
-                Vec q3;
+                f32 t = (f32)(stepScale * (f64)(i + 1));
 
-                t = (f32)(stepScale * (f64)(i + 1));
-
-                p0 = entries[0].from;
-                p1 = entries[1].to;
-                p2 = entries[2].to;
-                p3 = entries[3].to;
-                DAT_8032ec70.GetSplinePos(splineFrom[param_2->m_payload[9] - 1 - i], p3, p2, p1, p0, t,
-                                          FLOAT_803306ec);
-
-                q0 = entries[0].to;
-                q1 = entries[2].from;
-                q2 = entries[3].from;
-                q3 = entries[4].from;
-                DAT_8032ec70.GetSplinePos(splineTo[param_2->m_payload[9] - 1 - i], q3, q2, q1, q0, t, FLOAT_803306ec);
+                DAT_8032ec70.GetSplinePos(splineFrom[(param_2->m_payload[9] - 1) - i], entries[3].to, entries[2].to,
+                                          entries[1].to, entries[0].from, t, FLOAT_803306ec);
+                DAT_8032ec70.GetSplinePos(splineTo[(param_2->m_payload[9] - 1) - i], entries[4].from, entries[3].from,
+                                          entries[2].from, entries[0].to, t, FLOAT_803306ec);
 
                 splineCount++;
                 *(u16*)(work + 0xB) = *(u16*)(work + 0xB) + 1;
@@ -303,7 +283,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, UnkB* param_2, UnkC* param_3)
 
             for (s32 i = 0; i < splineCount; i++) {
                 s32 idx = i + 2;
-                entries[idx].alpha = (u8)(param_2->m_payload[8] - idx * entries[0].decay);
+                entries[idx].alpha = (u8)(param_2->m_payload[8] - (u8)(idx * entries[0].decay));
                 pppCopyVector(entries[idx].from, splineFrom[i]);
                 pppCopyVector(entries[idx].to, splineTo[i]);
             }
@@ -381,7 +361,7 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, UnkB* param_2, UnkC* param_3)
         SetUpPaletteEnv(texture);
     }
 
-    uvStep = FLOAT_803306ec / (f32)(count - 1);
+    uvStep = FLOAT_803306ec / (f32)((f64)(u32)count - DOUBLE_803306f8);
     GXSetCullMode(GX_CULL_NONE);
 
     for (u16 i = 0; i < (u16)(count - 1); i++) {

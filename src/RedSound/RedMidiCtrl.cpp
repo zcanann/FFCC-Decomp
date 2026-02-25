@@ -1,6 +1,7 @@
 #include "ffcc/RedSound/RedMidiCtrl.h"
 #include "ffcc/RedSound/RedEntry.h"
 #include "ffcc/RedSound/RedExecute.h"
+#include "ffcc/RedSound/RedDriver.h"
 #include "ffcc/RedSound/RedMemory.h"
 
 extern unsigned int* DAT_8032f444;
@@ -10,6 +11,11 @@ extern void* DAT_8032f3f0;
 extern int* DAT_8032f420;
 extern int DAT_8032f424;
 extern CRedEntry DAT_8032e154;
+extern int lbl_8021EA10[];
+
+extern "C" {
+void* memmove(void*, const void*, unsigned long);
+}
 
 /*
  * --INFO--
@@ -326,12 +332,76 @@ void __MidiCtrl_Sleep(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrac
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C7BCC
+ * PAL Size: 628b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_WholeLoopStart(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_WholeLoopStart(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-	// TODO
+    int* controlData = (int*)control;
+    int* trackData = (int*)track;
+    int loopBase = controlData[0x121];
+    int deltaAdjust = 1 - trackData[0x42];
+    int slot = 0;
+    int* scan;
+
+    controlData[0x11b] |= 1;
+    for (scan = (int*)controlData[0]; scan < trackData; scan += 0x55) {
+        controlData[slot + 10] = *scan;
+        controlData[slot + 0x4a] = scan[0x42] + deltaAdjust;
+        controlData[slot + 0x8a] = scan[0x41];
+        controlData[slot + 0xca] = scan[9];
+        slot++;
+    }
+
+    {
+        unsigned char* command = (unsigned char*)*scan;
+        int delta = DeltaTimeSumup(&command);
+        int* nextTrack = scan + 0x55;
+
+        controlData[slot + 10] = (int)command;
+        controlData[slot + 0x4a] = scan[0x42] + delta + deltaAdjust;
+        controlData[slot + 0x8a] = scan[0x41];
+        controlData[slot + 0xca] = scan[9];
+
+        if (nextTrack < (int*)(controlData[0] + (unsigned int)*(unsigned char*)((char*)control + 0x491) * 0x154)) {
+            for (; nextTrack < (int*)(controlData[0] + (unsigned int)*(unsigned char*)((char*)control + 0x491) * 0x154);
+                 nextTrack += 0x55) {
+                int currentDelta = deltaAdjust + (nextTrack[0x42] - loopBase);
+
+                while ((currentDelta < 1) && (*nextTrack != 0)) {
+                    unsigned char* cmd = (unsigned char*)*nextTrack;
+                    *nextTrack = (int)(cmd + 1);
+                    ((void (*)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*))lbl_8021EA10[*cmd])(
+                        control, keyOnData, (RedTrackDATA*)nextTrack);
+
+                    if (*nextTrack != 0) {
+                        int step = DeltaTimeSumup((unsigned char**)nextTrack);
+                        currentDelta += step;
+                        nextTrack[0x42] += step;
+                    }
+                }
+
+                controlData[slot + 0xb] = *nextTrack;
+                controlData[slot + 0x4b] = currentDelta;
+                controlData[slot + 0x8b] = nextTrack[0x41];
+                controlData[slot + 0xcb] = nextTrack[9];
+                slot++;
+            }
+        }
+    }
+
+    controlData[0x10d] = (int)*(short*)((char*)control + 0x48e);
+    memmove(controlData + 0x10e, controlData + 3, 0x10);
+    controlData[0x10f] = controlData[0x10f] - deltaAdjust;
+    if (controlData[0x10f] < 0) {
+        controlData[0x10f] += controlData[0x110];
+        controlData[0x10e] = controlData[0x10e] - 1;
+    }
+    memmove(controlData + 0x10a, controlData + 0x112, 0xc);
 }
 
 /*

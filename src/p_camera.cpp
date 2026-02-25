@@ -24,6 +24,12 @@ extern float FLOAT_8032fa50;
 extern float FLOAT_8032fa54;
 extern float FLOAT_8032fa5c;
 extern float FLOAT_8032fa58;
+extern float FLOAT_8032fa70;
+extern float FLOAT_8032fa74;
+extern float FLOAT_8032fa80;
+extern float FLOAT_8032fa84;
+extern float FLOAT_8032fa88;
+extern float FLOAT_8032fa90;
 extern float FLOAT_8032fa8c;
 extern float FLOAT_8032fa78;
 extern float FLOAT_8032fa7c;
@@ -45,6 +51,8 @@ extern unsigned char MapMng[];
 extern unsigned char CFlat[];
 extern float FLOAT_8032fa18;
 extern float FLOAT_8032fa70;
+extern Vec g_shadow_pos;
+extern Vec g_shadow_refpos;
 extern "C" void Printf__7CSystemFPce(CSystem* system, char* format, ...);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long size, CMemory::CStage* stage, char* file, int line);
 extern "C" void __dl__FPv(void*);
@@ -52,6 +60,11 @@ extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" void SetFrustum__6CBoundFR3VecPA4_f(float* bound, Vec* point, Mtx matrix);
 extern "C" int CheckFrustum0__6CBoundFR6CBound(float* lhs, float* rhs);
+extern "C" void DrawMapShadow__7CMapMngFv(void*);
+extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
+extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
+extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
+extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 
 extern "C" {
 void pppEditGetViewPos__FP3Vec(Vec*);
@@ -689,12 +702,154 @@ int CCameraPcs::GetShadowRect(CBound&)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80037554
+ * PAL Size: 2812b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCameraPcs::drawShadowBegin()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    Mtx rotX;
+    Mtx rotY;
+    Mtx rotXY;
+    Mtx tempMtx;
+    Vec up;
+    Vec delta;
+    double depth;
+
+    if (self[0x404] == 0) {
+        return;
+    }
+
+    GXInvalidateTexAll();
+
+    memcpy(self + 0x10C, self + 4, 0x108);
+    memcpy(self + 0x214, self + 4, 0x108);
+
+    if (Game.game.m_currentSceneId == 3) {
+        float stickX = FLOAT_8032fa34;
+        float stickY = FLOAT_8032fa34;
+
+        if (Pad._452_4_ == 0) {
+            stickX = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x24 +
+                                               (((1 - Pad._448_4_ | Pad._448_4_ - 1) >> 0x1f) * -0x54));
+            stickY = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x28 +
+                                               (((1 - Pad._448_4_ | Pad._448_4_ - 1) >> 0x1f) * -0x54));
+        }
+
+        *reinterpret_cast<float*>(self + 0x368) += FLOAT_8032fa70 * FLOAT_8032fa74 * stickX;
+        *reinterpret_cast<float*>(self + 0x364) += FLOAT_8032fa70 * FLOAT_8032fa4c * stickY;
+    }
+
+    PSMTXRotRad(rotX, 'x', -*reinterpret_cast<float*>(self + 0x364));
+    PSMTXRotRad(rotY, 'y', *reinterpret_cast<float*>(self + 0x368));
+    PSMTXConcat(rotY, rotX, rotXY);
+
+    if (Game.game.m_currentSceneId == 4) {
+        *reinterpret_cast<float*>(self + 0x414) = FLOAT_8032fa78;
+        *reinterpret_cast<float*>(self + 0x418) = FLOAT_8032fa78;
+        *reinterpret_cast<float*>(self + 0x41C) = FLOAT_8032fa78;
+        *reinterpret_cast<float*>(self + 0x420) = FLOAT_8032fa7c;
+        *reinterpret_cast<float*>(self + 0x424) = FLOAT_8032fa7c;
+        *reinterpret_cast<float*>(self + 0x428) = FLOAT_8032fa7c;
+
+        if (*reinterpret_cast<int*>(self + 0x434) == 1 && GetShadowRect(*reinterpret_cast<CBound*>(self + 0x414)) != 0) {
+            *reinterpret_cast<float*>(self + 0xD4) = (*reinterpret_cast<float*>(self + 0x414) +
+                                                      *reinterpret_cast<float*>(self + 0x420)) * FLOAT_8032fa20;
+            *reinterpret_cast<float*>(self + 0xD8) = *reinterpret_cast<float*>(self + 0x40C);
+            *reinterpret_cast<float*>(self + 0xDC) = (*reinterpret_cast<float*>(self + 0x41C) +
+                                                      *reinterpret_cast<float*>(self + 0x428)) * FLOAT_8032fa20;
+
+            double w = static_cast<double>(*reinterpret_cast<float*>(self + 0x420) - *reinterpret_cast<float*>(self + 0x414));
+            double h = static_cast<double>(*reinterpret_cast<float*>(self + 0x428) - *reinterpret_cast<float*>(self + 0x41C));
+            if (w < h) {
+                w = h;
+            }
+            *reinterpret_cast<float*>(self + 0x36C) = static_cast<float>(static_cast<double>(FLOAT_8032fa20) * w);
+            depth = w;
+        } else if (*reinterpret_cast<int*>(self + 0x434) == 2) {
+            *reinterpret_cast<float*>(self + 0xD4) = *reinterpret_cast<float*>(self + 0x408);
+            *reinterpret_cast<float*>(self + 0xD8) = *reinterpret_cast<float*>(self + 0x40C);
+            *reinterpret_cast<float*>(self + 0xDC) = *reinterpret_cast<float*>(self + 0x410);
+            PSVECSubtract(reinterpret_cast<Vec*>(self + 0xD4), reinterpret_cast<Vec*>(self + 0xE0), &delta);
+            depth = static_cast<double>(*reinterpret_cast<float*>(self + 0x430));
+            *reinterpret_cast<float*>(self + 0x36C) = FLOAT_8032fa80 * *reinterpret_cast<float*>(self + 0x370);
+        } else {
+            *reinterpret_cast<float*>(self + 0xD4) = *reinterpret_cast<float*>(self + 0x408);
+            *reinterpret_cast<float*>(self + 0xD8) = *reinterpret_cast<float*>(self + 0x40C);
+            *reinterpret_cast<float*>(self + 0xDC) = *reinterpret_cast<float*>(self + 0x410);
+            PSVECSubtract(reinterpret_cast<Vec*>(self + 0xD4), reinterpret_cast<Vec*>(self + 0xE0), &delta);
+            depth = static_cast<double>(PSVECMag(&delta));
+            *reinterpret_cast<float*>(self + 0x36C) = static_cast<float>(depth * static_cast<double>(*reinterpret_cast<float*>(self + 0x370)));
+        }
+
+        double currentDepth = static_cast<double>(*reinterpret_cast<float*>(self + 0x42C));
+        if (static_cast<double>(FLOAT_8032fa34) <= currentDepth) {
+            *reinterpret_cast<float*>(self + 0x42C) = static_cast<float>(currentDepth +
+                                                   static_cast<double>((static_cast<float>(depth - currentDepth)) * FLOAT_8032fa84));
+        } else {
+            *reinterpret_cast<float*>(self + 0x42C) = static_cast<float>(depth);
+        }
+    } else {
+        *reinterpret_cast<float*>(self + 0x36C) = FLOAT_8032fa88;
+        *reinterpret_cast<float*>(self + 0x42C) = FLOAT_8032fa8c;
+    }
+
+    up.x = FLOAT_8032fa34;
+    up.y = FLOAT_8032fa1c;
+    up.z = FLOAT_8032fa34;
+    PSMTXMultVecSR(rotXY, &up, &up);
+
+    *reinterpret_cast<float*>(self + 0x2F0) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0x2F4) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0x2F8) = *reinterpret_cast<float*>(self + 0x42C);
+    PSMTXMultVecSR(rotXY, reinterpret_cast<Vec*>(self + 0x2F0), reinterpret_cast<Vec*>(self + 0x2F0));
+
+    if (Game.game.m_currentMapId == 0x21) {
+        PSMTXCopy(reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x64), tempMtx);
+        PSMTXMultVecSR(tempMtx, reinterpret_cast<Vec*>(self + 0x2F0), reinterpret_cast<Vec*>(self + 0x2F0));
+    }
+
+    PSVECAdd(reinterpret_cast<Vec*>(self + 0x2F0), reinterpret_cast<Vec*>(self + 0xD4), reinterpret_cast<Vec*>(self + 0x2F0));
+    *reinterpret_cast<float*>(self + 0x2E4) = *reinterpret_cast<float*>(self + 0xD4);
+    *reinterpret_cast<float*>(self + 0x2E8) = *reinterpret_cast<float*>(self + 0xD8);
+    *reinterpret_cast<float*>(self + 0x2EC) = *reinterpret_cast<float*>(self + 0xDC);
+    *reinterpret_cast<float*>(self + 0x310) = FLOAT_8032fa8c;
+    *reinterpret_cast<float*>(self + 0x314) = FLOAT_8032fa4c * *reinterpret_cast<float*>(self + 0x42C);
+
+    C_MTXLookAt(reinterpret_cast<MtxPtr>(self + 0x214), reinterpret_cast<Vec*>(self + 0x2F0), &up,
+                reinterpret_cast<Vec*>(self + 0x2E4));
+    C_MTXOrtho(reinterpret_cast<Mtx44Ptr>(self + 0x2A4),
+               *reinterpret_cast<float*>(self + 0x36C), -*reinterpret_cast<float*>(self + 0x36C),
+               -*reinterpret_cast<float*>(self + 0x36C), *reinterpret_cast<float*>(self + 0x36C),
+               *reinterpret_cast<float*>(self + 0x310), *reinterpret_cast<float*>(self + 0x314));
+
+    g_shadow_pos.x = *reinterpret_cast<float*>(self + 0x2F0);
+    g_shadow_pos.y = *reinterpret_cast<float*>(self + 0x2F4);
+    g_shadow_pos.z = *reinterpret_cast<float*>(self + 0x2F8);
+    g_shadow_refpos.x = *reinterpret_cast<float*>(self + 0x2E4);
+    g_shadow_refpos.y = *reinterpret_cast<float*>(self + 0x2E8);
+    g_shadow_refpos.z = *reinterpret_cast<float*>(self + 0x2EC);
+
+    memcpy(self + 4, self + 0x214, 0x108);
+    GXSetProjection(reinterpret_cast<Mtx44Ptr>(self + 0x94), GX_ORTHOGRAPHIC);
+    GXSetColorUpdate(GX_FALSE);
+    GXSetCullMode(GX_CULL_BACK);
+    GXSetViewport(FLOAT_8032fa4c, FLOAT_8032fa4c, FLOAT_8032fa90, FLOAT_8032fa90, FLOAT_8032fa34, FLOAT_8032fa1c);
+    GXSetScissor(2, 2, 0x1DC, 0x1DC);
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 0, 0, 5);
+    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0xFF);
+    GXSetZCompLoc(GX_TRUE);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+    GXSetNumTevStages(1);
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
+    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+    GXSetNumTexGens(0);
+    DrawMapShadow__7CMapMngFv(&MapMng);
 }
 
 /*

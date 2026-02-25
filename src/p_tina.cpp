@@ -444,9 +444,10 @@ void CPartPcs::GetTable(unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void pppNotAllocAmemCacheRmem(unsigned long)
+unsigned int pppNotAllocAmemCacheRmem(unsigned long)
 {
-	// TODO
+	PartMng.pppDumpMngSt();
+	return 0;
 }
 
 /*
@@ -542,9 +543,9 @@ unsigned int pppFreeMngStPrioForData()
  * Address:	TODO
  * Size:	TODO
  */
-void pppAmemDeletePmng(unsigned long)
+unsigned int pppAmemDeletePmng(unsigned long)
 {
-	// TODO
+	return pppFreeMngStPrioForData();
 }
 
 /*
@@ -552,9 +553,9 @@ void pppAmemDeletePmng(unsigned long)
  * Address:	TODO
  * Size:	TODO
  */
-void pppAmemRefCntError(unsigned long)
+unsigned int pppAmemRefCntError(unsigned long)
 {
-	// TODO
+	return 1;
 }
 
 /*

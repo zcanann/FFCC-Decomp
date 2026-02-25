@@ -17,6 +17,7 @@ static inline float GetStatusMultiplier(int offset)
 }
 
 extern "C" void __dl__FPv(void*);
+extern "C" int __cntlzw(unsigned int);
 extern "C" void* __vt__8CMonWork[];
 extern "C" void* __vt__12CCaravanWork[];
 extern "C" void* __vt__9CGObjWork[];
@@ -922,12 +923,16 @@ void CCaravanWork::ValidCmdList(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009fa18
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::GetIdxCmdList()
+int CCaravanWork::GetIdxCmdList()
 {
-	// TODO
+	return *(short*)&m_currentCmdListIndex;
 }
 
 /*
@@ -942,22 +947,35 @@ void CCaravanWork::SetIdxCmdList(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009fa10
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::IsUseCmdList(int)
+void CCaravanWork::IsUseCmdList(int cmdListIdx)
 {
-	// TODO
+	m_currentCmdListIndex = (unsigned short)cmdListIdx;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009f9dc
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::IsSelectedCmdList(int)
+int CCaravanWork::IsSelectedCmdList(int cmdListIdx)
 {
-	// TODO
+	unsigned int isInvalid = 0;
+	if ((cmdListIdx > 1) &&
+		(*(short*)((char*)m_commandListInventorySlotRef + (cmdListIdx << 1)) == -1)) {
+		isInvalid = 1;
+	}
+	return ((unsigned int)__cntlzw((unsigned char)isInvalid)) >> 5;
 }
 
 /*

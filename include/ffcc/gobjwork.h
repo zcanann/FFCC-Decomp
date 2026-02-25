@@ -106,10 +106,10 @@ public:
     void CalcStatus();
     void CanPlayerUseItem();
     void ValidCmdList(int);
-    void GetIdxCmdList();
+    int GetIdxCmdList();
     void SetIdxCmdList(int);
     void IsUseCmdList(int);
-    void IsSelectedCmdList(int);
+    int IsSelectedCmdList(int);
     void GetMagicCharge(int, int&, int&);
     void GetCmdListItemName(int);
     void GetWeaponAttrib(int);

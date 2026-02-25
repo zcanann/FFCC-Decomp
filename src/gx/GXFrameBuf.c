@@ -100,20 +100,16 @@ void GXAdjustForOverscan(const GXRenderModeObj* rmin, GXRenderModeObj* rmout, u1
 }
 
 void GXSetDispCopySrc(u16 left, u16 top, u16 wd, u16 ht) {
-    GXData* gx;
-
     CHECK_GXBEGIN(1235, "GXSetDispCopySrc");
-    gx = __GXData;
+    __GXData->cpDispSrc = 0;
+    OLD_SET_REG_FIELD(1238, __GXData->cpDispSrc, 10, 0, left);
+    OLD_SET_REG_FIELD(1239, __GXData->cpDispSrc, 10, 10, top);
+    OLD_SET_REG_FIELD(1239, __GXData->cpDispSrc, 8, 24, 0x49);
 
-    gx->cpDispSrc = 0;
-    OLD_SET_REG_FIELD(1238, gx->cpDispSrc, 10, 0, left);
-    OLD_SET_REG_FIELD(1239, gx->cpDispSrc, 10, 10, top);
-    OLD_SET_REG_FIELD(1239, gx->cpDispSrc, 8, 24, 0x49);
-
-    gx->cpDispSize = 0;
-    OLD_SET_REG_FIELD(1243, gx->cpDispSize, 10, 0, wd - 1);
-    OLD_SET_REG_FIELD(1244, gx->cpDispSize, 10, 10, ht - 1);
-    OLD_SET_REG_FIELD(1244, gx->cpDispSize, 8, 24, 0x4A);
+    __GXData->cpDispSize = 0;
+    OLD_SET_REG_FIELD(1243, __GXData->cpDispSize, 10, 0, wd - 1);
+    OLD_SET_REG_FIELD(1244, __GXData->cpDispSize, 10, 10, ht - 1);
+    OLD_SET_REG_FIELD(1244, __GXData->cpDispSize, 8, 24, 0x4A);
 }
 
 

@@ -33,7 +33,11 @@ extern "C" void __dt__6CSoundFv(void*);
 extern "C" unsigned int GetSoundMode__9CRedSoundFv(CRedSound*);
 extern "C" int StreamPlayState__9CRedSoundFi(CRedSound*, int);
 extern "C" void StreamStop__9CRedSoundFi(CRedSound*, int);
+extern "C" int StreamPlay__9CRedSoundFPviii(CRedSound*, void*, int, int, int);
+extern "C" void StreamVolume__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" int ReentryWaveData__9CRedSoundFi(CRedSound*, int);
+extern "C" int ReentrySeSepData__9CRedSoundFi(CRedSound*, int);
+extern "C" void SetSeSepData__9CRedSoundFPv(CRedSound*, void*);
 extern "C" int SePlayState__9CRedSoundFi(CRedSound*, int);
 extern "C" int ReportSeLoop__9CRedSoundFi(CRedSound*, int);
 extern "C" int GetSeVolume__9CRedSoundFii(CRedSound*, int, int);
@@ -863,12 +867,22 @@ void CSound::LoadWaveASync(int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c6f3c
+ * PAL Size: 116b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CSound::CancelLoadWaveASync()
 {
-	// TODO
+    CFile::CHandle* handle = *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 8);
+    if (handle != 0) {
+        File.Close(handle);
+        *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 8) = 0;
+        Printf__7CSystemFPce(&System, DAT_801db190);
+    }
+    SetWaveData__9CRedSoundFiPvi(reinterpret_cast<CRedSound*>(this), -1, nullptr, 0);
 }
 
 /*
@@ -1098,22 +1112,50 @@ void CSound::FreeBlock()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c68a4
+ * PAL Size: 276b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::LoadSe(int)
+void CSound::LoadSe(int seId)
 {
-	// TODO
+    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+
+    if (seId < 0) {
+        Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
+    } else if (ReentrySeSepData__9CRedSoundFi(redSound, seId) == -1) {
+        char sePath[264];
+        sprintf(sePath, "dvd/sound/se_sep/se_%06d.sep", seId);
+        CFile::CHandle* handle = File.Open(sePath, 0, CFile::PRI_LOW);
+        if (handle != 0) {
+            File.Read(handle);
+            File.SyncCompleted(handle);
+            SetSeSepData__9CRedSoundFPv(redSound, File.m_readBuffer);
+            File.Close(handle);
+            if (System.m_execParam != 0) {
+                Printf__7CSystemFPce(&System, "CSound::LoadSe[%d]\n", seId);
+            }
+        }
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c6850
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::LoadSe(void*)
+void CSound::LoadSe(void* seData)
 {
-	// TODO
+    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+    if (ReentrySeSepData__9CRedSoundFi(redSound, *reinterpret_cast<s32*>((u8*)seData + 8)) == -1) {
+        SetSeSepData__9CRedSoundFPv(redSound, seData);
+    }
 }
 
 /*
@@ -1195,12 +1237,20 @@ void CSound::LoadWave(void* waveData)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c65cc
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::FreeWave(int)
+void CSound::FreeWave(int waveId)
 {
-	// TODO
+    if (waveId < 0) {
+        Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
+    } else {
+        ClearWaveData__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), waveId);
+    }
 }
 
 /*
@@ -1246,22 +1296,38 @@ void CSound::PlaySe(int, int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c6370
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::StopSe(int)
+void CSound::StopSe(int seId)
 {
-	// TODO
+    if (seId < 0) {
+        Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
+    } else {
+        SeStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), seId);
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c6328
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::FadeOutSe(int, int)
+void CSound::FadeOutSe(int seId, int fadeFrames)
 {
-	// TODO
+    if (seId < 0) {
+        Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
+    } else {
+        SeFadeOut__9CRedSoundFii(reinterpret_cast<CRedSound*>(this), seId, fadeFrames);
+    }
 }
 
 /*
@@ -1937,32 +2003,106 @@ void CSound::LoadStream(int streamID)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c51f8
+ * PAL Size: 288b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CSound::PlayStreamASync()
 {
-	// TODO
+    char streamPath[260];
+    sprintf(streamPath, "dvd/sound/stream/str_%04d.str",
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22ac));
+
+    CFile::CHandle* handle = File.Open(streamPath, 0, CFile::PRI_LOW);
+    *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 0x2290) = handle;
+    if (handle == 0) {
+        return;
+    }
+
+    int streamId = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22ac);
+    int volume;
+    if (streamId == 5) {
+        volume = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22b0);
+    } else if (streamId == 1) {
+        int bgmVol = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22b0);
+        int adjust = (bgmVol * 0x19) / 0x7f + ((bgmVol * 0x19) >> 0x1f);
+        volume = bgmVol - (adjust - (adjust >> 0x1f));
+    } else if (streamId > 0 && streamId < 7) {
+        volume = 0x7f;
+        if (streamId == 6) {
+            volume = 0x70;
+        }
+    } else {
+        volume = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22b4);
+    }
+
+    int clampedVolume;
+    if (volume < 0) {
+        clampedVolume = 0;
+    } else {
+        clampedVolume = 0x7f;
+        if (volume < 0x80) {
+            clampedVolume = volume;
+        }
+    }
+
+    int streamNo =
+        StreamPlay__9CRedSoundFPviii(reinterpret_cast<CRedSound*>(this),
+                                     *reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0x228c), 0x20000, 0x40,
+                                     clampedVolume);
+    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x2298) = streamNo;
+    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22a0) = 1;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c5164
+ * PAL Size: 148b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CSound::StopStream()
 {
-	// TODO
+    int shouldStop = 0;
+
+    if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22a0) != 0) {
+        int state = StreamPlayState__9CRedSoundFi(reinterpret_cast<CRedSound*>(this),
+                                                  *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x2298));
+        if (state != 0) {
+            shouldStop = 1;
+        }
+    }
+
+    if (shouldStop != 0) {
+        StreamStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(this),
+                                 *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x2298));
+    }
+
+    CFile::CHandle* handle = *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 0x2290);
+    if (handle != 0) {
+        File.Close(handle);
+        *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 0x2290) = 0;
+    }
+    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22a0) = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c5130
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::SetStreamVolume(int, int)
+void CSound::SetStreamVolume(int volume, int frames)
 {
-	// TODO
+    StreamVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), -1, volume, frames);
 }
 
 /*

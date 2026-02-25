@@ -4,9 +4,11 @@
 #include "ffcc/color.h"
 #include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
+#include "ffcc/memory.h"
 #include "ffcc/system.h"
 #include "PowerPC_EABI_Support/Runtime/MWCPlusLib.h"
 #include <Runtime.PPCEABI.H/NMWException.h>
+#include "dolphin/ar.h"
 #include "dolphin/gx.h"
 #include "dolphin/mtx.h"
 #include <math.h>
@@ -31,6 +33,9 @@ extern "C" void* PTR_PTR_s_CSound_8021056c;
 extern "C" void __ct__9CRedSoundFv(void*);
 extern "C" void __dt__6CSoundFv(void*);
 extern "C" unsigned int GetSoundMode__9CRedSoundFv(CRedSound*);
+extern "C" void SetSoundMode__9CRedSoundFi(CRedSound*, int);
+extern "C" void Init__9CRedSoundFPviii(CRedSound*, void*, int, int, int);
+extern "C" void End__9CRedSoundFv(CRedSound*);
 extern "C" int StreamPlayState__9CRedSoundFi(CRedSound*, int);
 extern "C" void StreamStop__9CRedSoundFi(CRedSound*, int);
 extern "C" int StreamPlay__9CRedSoundFPviii(CRedSound*, void*, int, int, int);
@@ -63,6 +68,8 @@ extern "C" void ClearSeSepDataMG__9CRedSoundFiiii(CRedSound*, int, int, int, int
 extern "C" void ClearWaveData__9CRedSoundFi(CRedSound*, int);
 extern "C" void ClearWaveDataM__9CRedSoundFiiii(CRedSound*, int, int, int, int);
 extern "C" void MusicVolume__9CRedSoundFiii(CRedSound*, int, int, int);
+extern "C" void MusicMasterVolume__9CRedSoundFi(CRedSound*, int);
+extern "C" void SeMasterVolume__9CRedSoundFi(CRedSound*, int);
 extern "C" int ReentryMusicData__9CRedSoundFi(CRedSound*, int);
 extern "C" void SetMusicData__9CRedSoundFPv(CRedSound*, void*);
 extern "C" void MusicStop__9CRedSoundFi(CRedSound*, int);
@@ -71,6 +78,14 @@ extern "C" void MusicCrossPlay__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" void MusicNextPlay__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" void MusicFadeOut__9CRedSoundFii(CRedSound*, int, int);
 extern "C" void SetMusicPhraseStop__9CRedSoundFi(CRedSound*, int);
+extern "C" void SetReverb__9CRedSoundFii(CRedSound*, int, int);
+extern "C" void SetReverbDepth__9CRedSoundFiii(CRedSound*, int, int, int);
+extern "C" void ClearWaveBank__9CRedSoundFi(CRedSound*, int);
+extern "C" void SetSeBlockData__9CRedSoundFiPv(CRedSound*, int, void*);
+extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
+extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
+extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
+extern "C" void __dla__FPv(void*);
 extern "C" void Printf__7CSystemFPce(CSystem*, char*, ...);
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
@@ -85,7 +100,9 @@ extern char s_CSound__C___B_801db14c[];
 extern char s_CSound__C_B_801db170[];
 extern char DAT_801db29c[];
 extern char DAT_801db2b8[];
+extern char s_CSound_80330ce0[];
 extern char s_Sound___1_n_B_801db130[];
+extern char s_sound_cpp_801db2d4[];
 extern unsigned char CFlat[];
 extern unsigned char CameraPcs[];
 extern unsigned char Game[];
@@ -330,22 +347,130 @@ CSound::~CSound()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c810c
+ * PAL Size: 372b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CSound::Init()
 {
-	// TODO
+    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+
+    void* stage = CreateStage__7CMemoryFUlPci(&Memory, 0xA4000, s_CSound_80330ce0, 0);
+    *reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0x4) = stage;
+
+    *reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0xC) =
+        __nwa__FUlPQ27CMemory6CStagePci(0x80000, stage, s_sound_cpp_801db2d4, 0x2E);
+    *reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0x228C) =
+        __nwa__FUlPQ27CMemory6CStagePci(0x20000, stage, s_sound_cpp_801db2d4, 0x2F);
+
+    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22B0) = 0x7F;
+    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22B4) = 0x7F;
+    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22BC) = 0x7F;
+    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22B8) = 0x7F;
+    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22D4) = 0;
+
+    ARInit(0, 0);
+    ARQInit();
+
+    Init__9CRedSoundFPviii(redSound, *reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0xC), 0x80000, 0x800000,
+                           0x800000);
+    {
+        u32 debugPrint = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x22D4);
+        ReportPrint__9CRedSoundFi(redSound, (-debugPrint | debugPrint) >> 31);
+    }
+
+    {
+        u32 soundMode = GetSoundMode__9CRedSoundFv(redSound);
+        SetSoundMode__9CRedSoundFi(redSound, (u32)__cntlzw((u32)__cntlzw(soundMode) >> 5) >> 5);
+    }
+
+    MusicMasterVolume__9CRedSoundFi(redSound, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22B0));
+    SeMasterVolume__9CRedSoundFi(redSound, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22B4));
+    SetReverb__9CRedSoundFii(redSound, 1, 4);
+    SetReverbDepth__9CRedSoundFiii(redSound, 1, 0x40, 0xF);
+
+    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10) = 0;
+    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x2290) = 0;
+    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22A0) = 0;
+    memset(reinterpret_cast<u8*>(this) + 0x22C0, 0xFF, 8);
+    memset(reinterpret_cast<u8*>(this) + 0x22C8, 0xFF, 8);
+    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22D0) = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c7f4c
+ * PAL Size: 448b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CSound::Quit()
 {
-	// TODO
+    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+
+    CFile::CHandle*& waveFile = *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 0x8);
+    if (waveFile != 0) {
+        File.Close(waveFile);
+        waveFile = 0;
+        Printf__7CSystemFPce(&System, DAT_801db190);
+    }
+
+    SetWaveData__9CRedSoundFiPvi(redSound, -1, nullptr, 0);
+
+    int shouldStopStream = 0;
+    if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22A0) != 0 &&
+        StreamPlayState__9CRedSoundFi(redSound, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x2298)) != 0) {
+        shouldStopStream = 1;
+    }
+
+    if (shouldStopStream != 0) {
+        StreamStop__9CRedSoundFi(redSound, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x2298));
+    }
+
+    CFile::CHandle*& streamFile = *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 0x2290);
+    if (streamFile != 0) {
+        File.Close(streamFile);
+        streamFile = 0;
+    }
+
+    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22A0) = 0;
+
+    SeStop__9CRedSoundFi(redSound, -1);
+    ClearSeSepData__9CRedSoundFi(redSound, -1);
+    ClearWaveData__9CRedSoundFi(redSound, -3);
+
+    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x28) = 10000000;
+    memset(reinterpret_cast<u8*>(this) + 0x2C, 0, 0x1400);
+    memset(reinterpret_cast<u8*>(this) + 0x22C0, 0xFF, 8);
+    memset(reinterpret_cast<u8*>(this) + 0x22C8, 0xFF, 8);
+
+    ClearWaveBank__9CRedSoundFi(redSound, 500);
+    ClearWaveBank__9CRedSoundFi(redSound, 0);
+
+    for (int i = 0; i < 4; i++) {
+        SetSeBlockData__9CRedSoundFiPv(redSound, i, nullptr);
+    }
+
+    End__9CRedSoundFv(redSound);
+
+    void*& streamBuffer = *reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0x228C);
+    if (streamBuffer != 0) {
+        __dla__FPv(streamBuffer);
+        streamBuffer = 0;
+    }
+
+    void*& aramBuffer = *reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0xC);
+    if (aramBuffer != 0) {
+        __dla__FPv(aramBuffer);
+        aramBuffer = 0;
+    }
+
+    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0x4));
 }
 
 /*

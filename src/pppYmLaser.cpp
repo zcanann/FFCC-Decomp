@@ -18,6 +18,7 @@ extern CMapMng MapMng;
 extern Mtx ppvCameraMatrix0;
 extern CGraphic Graphic;
 extern f32 FLOAT_80330dc0;
+extern f32 lbl_80330DC0;
 extern f32 FLOAT_80330de0;
 extern f32 FLOAT_80330de4;
 extern f32 FLOAT_80330de8;
@@ -153,7 +154,7 @@ extern "C" void pppConstruct2YmLaser(void* pppYmLaser_, void* param_2_)
 {
 	pppYmLaser* pppYmLaser = (struct pppYmLaser*)pppYmLaser_;
 	YmLaserParam* param_2 = (YmLaserParam*)param_2_;
-	f32 one = FLOAT_80330dc0;
+	f32 one = lbl_80330DC0;
 	f32* work = (f32*)((u8*)pppYmLaser + 0x80 + param_2->offsets->m_serializedDataOffsets[2]);
 
 	work[6] = one;

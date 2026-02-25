@@ -219,12 +219,48 @@ void CCaravanWork::LoadFinished()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a27b0
+ * PAL Size: 396b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::Init(int, CRomWork*, int)
+void CCaravanWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 {
-	// TODO
+	short* romData = reinterpret_cast<short*>(romWork);
+	int value = 0;
+
+	m_baseDataIndex = baseDataIndex;
+	m_id = romData[0] + idOffset;
+	m_param1 = romData[1];
+	m_param2 = romData[2];
+	m_maxHp = romData[3];
+	m_strength = romData[4];
+	m_magic = romData[5];
+	m_defense = romData[6];
+	m_romWorkPtr = reinterpret_cast<unsigned short*>(romData + 8);
+	memcpy(m_elementResistances, m_romWorkPtr + 0x6F, 0x16);
+	memset(m_statusTimers + 3, 0, 0x4E);
+	memset(m_statusValues, 0xFF, sizeof(m_statusValues));
+	m_hp = m_maxHp;
+	m_shopState = 1;
+
+	value = (int)m_id - 100;
+	value = (value / 200) + (value >> 31);
+	m_tribeId = (short)value - (short)(value >> 31);
+
+	value = (int)m_id - 100;
+	value = (value / 100) + (value >> 31);
+	m_genderFlag = ((short)value - (short)(value >> 31)) & 1;
+
+	clearCaravanWork();
+	m_bonusCondition = 0;
+	memset(m_artifactRelated, 0, sizeof(m_artifactRelated));
+	m_artifactRelated[3] = *(unsigned short*)(Game.game.m_bossArtifactBase +
+											  (Game.game.m_gameWork.m_bossArtifactStageIndex * 0x168) + 0x62);
+	m_artifactRelated[4] = *(unsigned short*)(Game.game.m_bossArtifactBase +
+											  (Game.game.m_gameWork.m_bossArtifactStageIndex * 0x168) + 100);
 }
 
 /*

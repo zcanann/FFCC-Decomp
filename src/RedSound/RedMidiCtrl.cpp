@@ -773,12 +773,39 @@ void __MidiCtrl_SlurOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C89F8
+ * PAL Size: 212b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_Sweep(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_Sweep(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    int* trackData = (int*)track;
+    int delta = DeltaTimeSumup((unsigned char**)trackData);
+    char* command;
+    int value = 0;
+    int* voiceData;
+
+    if (delta == 0) {
+        delta = 1;
+    }
+
+    command = (char*)trackData[0];
+    trackData[0] = (int)(command + 1);
+    DataAddCompute(&value, ((int)*command) << 8, &delta);
+    trackData[0x45] = value;
+    trackData[0x44] = delta;
+    trackData[0x48] &= 0xfffff000;
+
+    voiceData = (int*)DAT_8032f444;
+    do {
+        if ((int*)voiceData[0] == trackData) {
+            voiceData[0x28] &= 0xfffff000;
+        }
+        voiceData += 0x30;
+    } while (voiceData < (int*)(DAT_8032f444 + 0xc00));
 }
 
 /*

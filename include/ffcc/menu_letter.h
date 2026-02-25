@@ -19,7 +19,7 @@ public:
     void LetterMessClose();
     void LetterItemWinOpen();
     void LetterItemWinClose();
-    void LetterReplyWinOpen();
+    bool LetterReplyWinOpen();
     void LetterReplyWinClose();
     void LetterAttachWinOpen();
     void LetterAttachWinClose();

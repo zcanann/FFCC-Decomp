@@ -96,6 +96,8 @@ extern "C" void* Open__5CFileFPcUlQ25CFile3PRI(void*, char*, unsigned long, int)
 extern "C" void Read__5CFileFPQ25CFile7CHandle(void*, void*);
 extern "C" void SyncCompleted__5CFileFPQ25CFile7CHandle(void*, void*);
 extern "C" void Close__5CFileFPQ25CFile7CHandle(void*, void*);
+extern "C" void WmInit__8CMenuPcsFv(CMenuPcs*);
+extern "C" void BonusInit__8CMenuPcsFv(CMenuPcs*);
 extern "C" void drawBonus__8CMenuPcsFv(CMenuPcs*);
 extern "C" void drawVillageMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void createBonus__8CMenuPcsFv(CMenuPcs*);
@@ -109,6 +111,7 @@ extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, unsigned char, int, int, unsigned char);
 extern "C" unsigned char Graphic[];
 extern "C" unsigned char CFlat[];
+extern "C" f32 lbl_8033080C;
 
 static inline void ReleaseRefObject(void* object)
 {
@@ -180,12 +183,77 @@ CMenuPcs::~CMenuPcs()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800974a8
+ * PAL Size: 368b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::Init()
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+    const f32 one = lbl_8033080C;
+
+    *reinterpret_cast<void**>(self + 0xEC) = nullptr;
+    *reinterpret_cast<void**>(self + 0xF0) = nullptr;
+    *reinterpret_cast<void**>(self + 0xF4) = nullptr;
+    memset(self + 0xF8, 0, 0x14);
+    memset(self + 0x14C, 0, 0x40);
+    memset(self + 0x18C, 0, 0x1A4);
+    memset(self + 0x04, 0, 0x1C);
+
+    self[0x859] = 0;
+    *reinterpret_cast<u16*>(self + 0x86C) = 0;
+    *reinterpret_cast<u32*>(self + 0x830) = 0;
+    *reinterpret_cast<u32*>(self + 0x850) = 0;
+    *reinterpret_cast<u16*>(self + 0x864) = 0;
+
+    WmInit__8CMenuPcsFv(this);
+    BonusInit__8CMenuPcsFv(this);
+
+    self[0x8E] = 0;
+    self[0x8F] = 0;
+    self[0x90] = 0;
+    self[0x91] = 6;
+    self[0x92] = 6;
+    self[0x93] = 0;
+    self[0x94] = 0;
+    self[0x9C] = 0;
+    *reinterpret_cast<f32*>(self + 0x98) = one;
+    self[0x9D] = 0;
+    self[0xA4] = 0;
+    *reinterpret_cast<f32*>(self + 0xA0) = one;
+    *reinterpret_cast<f32*>(self + 0xA8) = one;
+    self[0xAC] = 0;
+    self[0xB5] = 0;
+    self[0xB6] = 0;
+    self[0xB7] = 0;
+    self[0xB8] = 0;
+    *reinterpret_cast<u32*>(self + 0xBC) = 0;
+    *reinterpret_cast<u32*>(self + 0xC0) = 0;
+    *reinterpret_cast<u32*>(self + 0xC4) = 0;
+    *reinterpret_cast<u32*>(self + 0xC8) = 0;
+    *reinterpret_cast<u32*>(self + 0xCC) = 0;
+    *reinterpret_cast<u32*>(self + 0xD0) = 0;
+    *reinterpret_cast<u32*>(self + 0xD4) = 0;
+    *reinterpret_cast<u32*>(self + 0xD8) = 0;
+    *reinterpret_cast<u32*>(self + 0xDC) = 0;
+    *reinterpret_cast<u32*>(self + 0xE0) = 0;
+    *reinterpret_cast<u32*>(self + 0xE4) = 0;
+
+    for (int i = 10; i < 11; i++) {
+        *reinterpret_cast<u32*>(self + 0xC0 + i * 4) = 0;
+    }
+
+    *reinterpret_cast<void**>(self + 0x878) = nullptr;
+    self[0x87C] = 1;
+    self[0x888] = 0;
+    self[0x889] = 0;
+    self[0x88A] = 0;
+    *reinterpret_cast<u32*>(self + 0x884) = 0;
+    *reinterpret_cast<u32*>(self + 0x880) = 0;
+    *reinterpret_cast<u32*>(self + 0x88C) = 0;
 }
 
 /*
@@ -370,12 +438,61 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80096b94
+ * PAL Size: 516b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::loadTexture(char **, int, int, CMenuPcs::CTmp*, int, int, int)
+void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCount, CMenuPcs::CTmp* tmp,
+                           int textureStart, int textureCount, int stageSelect)
 {
-	// TODO
+    char texPath[0x10C];
+    int* tmpInfo = reinterpret_cast<int*>(tmp);
+    u8* self = reinterpret_cast<u8*>(this);
+
+    for (int i = 0; i < textureSetCount; i++) {
+        sprintf(texPath, s_dvd__smenu__s_tex_801d9d6c, Game.GetLangString(), *paths);
+
+        CFile::CHandle* fileHandle = File.Open(texPath, 0, CFile::PRI_LOW);
+        if (fileHandle != 0) {
+            File.Read(fileHandle);
+            File.SyncCompleted(fileHandle);
+
+            CMemory::CStage* stage = reinterpret_cast<CMemory::CStage*>(&MapMng);
+            if ((*reinterpret_cast<int*>(self + 0x740) != 1) && (stageSelect != 3)) {
+                if ((Game.m_gameWork.m_menuStageMode == 0) || (stageSelect == 0)) {
+                    stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
+                } else if (stageSelect == 1) {
+                    stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF0);
+                } else {
+                    stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
+                }
+            }
+
+            CTextureSet* textureSet = new (Game.m_mainStage, s_p_menu_cpp_801d9d80, 0x182) CTextureSet;
+            *reinterpret_cast<CTextureSet**>(self + 0x14C + (textureSetStart + i) * 4) = textureSet;
+
+            if (textureSet != 0) {
+                textureSet->Create(File.m_readBuffer, stage, 0, 0, 0, 0);
+            }
+
+            File.Close(fileHandle);
+        }
+
+        paths++;
+    }
+
+    for (int i = 0; i < textureCount; i++) {
+        CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(self + 0x14C + tmpInfo[0] * 4);
+        const unsigned long textureIndex = static_cast<unsigned long>(textureSet->Find(reinterpret_cast<char*>(tmpInfo[1])));
+        CTexture* texture = (*reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<u8*>(textureSet) + 8))[textureIndex];
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 4) =
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 4) + 1;
+        *reinterpret_cast<CTexture**>(self + 0x18C + (textureStart + i) * 4) = texture;
+        tmpInfo += 2;
+    }
 }
 
 /*
@@ -1118,12 +1235,37 @@ void CMenuPcs::LoadExtraFont(int, char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009497c
+ * PAL Size: 368b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::SetExtraFontTlut(int, _GXColor)
+void CMenuPcs::SetExtraFontTlut(int fontNo, _GXColor color)
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+    CTexture* texture =
+        *reinterpret_cast<CTexture**>(*reinterpret_cast<u32*>(self + 0x100 + fontNo * 4) + 0x34);
+
+    for (int i = 0; i < 0x10; i++) {
+        _GXColor src = texture->GetTlutColor(i);
+        _GXColor out;
+        out.a = src.a;
+        if (i < 9) {
+            out.r = color.r;
+            out.g = color.g;
+            out.b = color.b;
+        } else {
+            float blend = 1.0f - static_cast<float>(i - 9) / 10.0f;
+            out.r = static_cast<u8>(245.0f - (245.0f - static_cast<float>(color.r)) * blend);
+            out.g = static_cast<u8>(245.0f - (245.0f - static_cast<float>(color.g)) * blend);
+            out.b = static_cast<u8>(245.0f - (245.0f - static_cast<float>(color.b)) * blend);
+        }
+        texture->SetTlutColor(i, out);
+    }
+
+    texture->FlushTlut();
 }
 
 /*

@@ -12,9 +12,12 @@
 #include <math.h>
 
 extern "C" int __cntlzw(unsigned int);
+extern "C" void* __vt__9CRingMenu[];
 extern "C" int _GetIdxCmdList__12CCaravanWorkFv(CCaravanWork*);
 extern "C" int _GetWeaponAttrib__12CCaravanWorkFi(CCaravanWork*, int);
 extern "C" int GetNextCmdListIdx__12CCaravanWorkFii(CCaravanWork*, int, int);
+extern "C" CMenu* dtor_8009B448(CMenu*, short);
+extern "C" void __dl__FPv(void*);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(void*, int);
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(void*, int);
 extern "C" void DrawInit__8CMenuPcsFv(void*);
@@ -199,12 +202,30 @@ CRingMenu::~CRingMenu()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a52dc
+ * PAL Size: 116b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRingMenu::Create()
 {
-	// TODO
+	register short shouldDelete;
+	asm {
+		mr shouldDelete, r4
+	}
+
+	if (this == 0) {
+		return;
+	}
+
+	*reinterpret_cast<void***>(this) = __vt__9CRingMenu;
+	reinterpret_cast<void (*)(CRingMenu*)>(reinterpret_cast<void**>(this)[4])(this);
+	dtor_8009B448(this, 0);
+	if (0 < shouldDelete) {
+		__dl__FPv(this);
+	}
 }
 
 /*

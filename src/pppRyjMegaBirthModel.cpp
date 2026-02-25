@@ -306,14 +306,16 @@ void set_matrix(_pppPObject*, pppFMATRIX, pppFMATRIX, PRyjMegaBirthModel*, _PART
 void pppRyjMegaBirthModelCon(_pppPObject* pObject, PRyjMegaBirthModelOffsets* offsets)
 {
     u8* work = (u8*)pObject + 0x80 + offsets->m_serializedDataOffsets[2];
-    float value0 = FLOAT_80330498;
-    float value1 = FLOAT_8033049c;
+    float value0;
+    float value1;
 
-    memset(work, 0, 0xC);
-    *(void**)(work + 0xC) = 0;
-    *(void**)(work + 0x10) = 0;
-    *(void**)(work + 0x14) = 0;
-    *(void**)(work + 0x18) = 0;
+    memset((void*)work, 0, 0xC);
+    *(u32*)(work + 0xC) = 0;
+    value0 = FLOAT_80330498;
+    *(u32*)(work + 0x10) = 0;
+    value1 = FLOAT_8033049c;
+    *(u32*)(work + 0x14) = 0;
+    *(u32*)(work + 0x18) = 0;
     *(u16*)(work + 0x1C) = 10000;
     *(u16*)(work + 0x1E) = 0;
     *(float*)(work + 0x20) = value0;

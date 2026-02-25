@@ -675,13 +675,7 @@ CTexAnimSet* CTexAnimSet::Duplicate(CMemory::CStage* stage)
     if (dup != 0) {
         __ct__4CRefFv(dup);
         *reinterpret_cast<void**>(dup) = &PTR_PTR_s_CTexAnimSet_801e9c6c;
-        CPtrArray<CTexAnim*>* const arr = reinterpret_cast<CPtrArray<CTexAnim*>*>(Ptr(dup, 8));
-        arr->m_size = 0;
-        arr->m_numItems = 0;
-        arr->m_defaultSize = 0x10;
-        arr->m_items = 0;
-        arr->m_stage = 0;
-        arr->m_growCapacity = 1;
+        new (Ptr(dup, 8)) CPtrArray<CTexAnim*>();
         F32At(dup, 0x24) = FLOAT_8032fb38;
     }
 

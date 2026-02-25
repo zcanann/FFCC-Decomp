@@ -153,12 +153,32 @@ void CGMonObj::undeadOn()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80119EC0
+ * PAL Size: 180b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::rotTarget(int, float)
+void CGMonObj::rotTarget(int targetPartyIndex, float rotLimit)
 {
-	// TODO
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+
+	if (-1 < targetPartyIndex) {
+		float targetRot = prgObj->getTargetRot(reinterpret_cast<CGPrgObj*>(Game.game.m_partyObjArr[targetPartyIndex]));
+		if (rotLimit <= 3.1415927f) {
+			float delta = Math.DstRot(targetRot, static_cast<float>(object->m_bgFlags));
+			if (delta < -rotLimit) {
+				delta = -rotLimit;
+			} else if (rotLimit < delta) {
+				delta = rotLimit;
+			}
+			object->m_rotTargetY = static_cast<float>(object->m_bgFlags) + delta;
+		} else {
+			object->m_rotTargetY = targetRot;
+		}
+	}
 }
 
 /*

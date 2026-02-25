@@ -52,6 +52,7 @@ extern int DAT_8032f404;
 extern int DAT_8032f410;
 extern int DAT_8032f40c;
 extern int DAT_8032f468;
+extern int DAT_8032f470;
 extern int DAT_8032f484;
 extern int DAT_8032f434;
 extern int DAT_8032f430;
@@ -1063,22 +1064,52 @@ void _DmaExecute()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801be4cc
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _DmaExecuteThread(void*)
+int _DmaExecuteThread(void*)
 {
-	// TODO
+    DAT_8032f3c4 |= 2;
+    DAT_8032f488 = 0;
+    while (DAT_8032f3c0 != 0) {
+        DAT_8032f484 = 0;
+        OSWaitSemaphore(&DAT_8032ddd8);
+        DAT_8032f484 = 1;
+        if (DAT_8032f3c0 != 0) {
+            _DmaExecute();
+        }
+    }
+    DAT_8032f3c4 &= ~2;
+    return 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801be550
+ * PAL Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _MusicSkipThread(void*)
+int _MusicSkipThread(void*)
 {
-	// TODO
+    DAT_8032f3c4 |= 8;
+    DAT_8032f470 = 0;
+    while (DAT_8032f3c0 != 0) {
+        OSWaitSemaphore(&DAT_8032e120);
+        if (DAT_8032f3c0 != 0) {
+            MusicSkipFunction();
+        }
+        while (OSTryWaitSemaphore(&DAT_8032e120) > 0) {
+        }
+    }
+    DAT_8032f3c4 &= ~8;
+    return 0;
 }
 
 /*
@@ -1253,12 +1284,26 @@ void CRedDriver::Init()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801beb78
+ * PAL Size: 140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedDriver::End()
 {
-	// TODO
+    AXRegisterCallback(0);
+    DAT_8032f3c0 = 0;
+    OSSignalSemaphore(&DAT_8032d778);
+    OSSignalSemaphore(&DAT_8032daa0);
+    OSSignalSemaphore(&DAT_8032ddd8);
+    OSSignalSemaphore(&DAT_8032e120);
+    while (DAT_8032f3c4 != 0) {
+        RedSleep(0);
+    }
+    AXRegisterAuxACallback(0, 0);
+    AXRegisterAuxBCallback(0, 0);
 }
 
 /*

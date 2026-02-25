@@ -433,7 +433,8 @@ void CPartPcs::Quit()
  */
 void CPartPcs::onScriptChanging(char*)
 {
-	// TODO
+	CUSBStreamData* usbStream = reinterpret_cast<CUSBStreamData*>(reinterpret_cast<unsigned char*>(this) + 0x8);
+	usbStream->m_fieldLoadReq = 0;
 }
 
 /*

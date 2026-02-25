@@ -1353,37 +1353,48 @@ void CMemory::CStage::drawHeapBar(int y)
  */
 void CMemory::CStage::drawHeapTitle(int y)
 {
-    int node = (stageGetAllocationMode(this) == 2) ? stageGetHeapHead(this) : *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
-    unsigned int totalUnuse = 0;
-    unsigned int maxUnuse = 0;
-    int prev = *reinterpret_cast<int*>(node + 4);
+    bool prevOk;
+    unsigned int blockSize;
+    int node;
+    int prev;
+    unsigned int maxUnuse;
+    unsigned int totalUnuse;
     char line[264];
-    char* sourceName = reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(this) + 0x10);
+
+    if (stageGetAllocationMode(this) == 2) {
+        node = stageGetHeapHead(this);
+    } else {
+        node = *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
+    }
+    totalUnuse = 0;
+    maxUnuse = 0;
+    prev = *reinterpret_cast<int*>(node + 4);
 
     do {
         if ((*reinterpret_cast<unsigned char*>(node + 2) & 2) != 0) {
-            int srcLen = strlen(sourceName);
-            strcpy(line, sourceName + ((srcLen - 12U) & ~((srcLen - 12U) >> 31)));
-            Graphic.DrawDebugStringDirect(0x10, static_cast<unsigned short>(y), line, 8);
-            sprintf(line, s__4d__4d__4d_801d6800, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x124),
+            int srcLen = strlen(reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(this) + 0x10));
+            strcpy(line, reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(this) + 0x10) +
+                             ((srcLen - 12U) & ~((srcLen - 12U) >> 31)));
+            Graphic.DrawDebugStringDirect(0x10, y, line, 8);
+            sprintf(line, s__4d__4d__4d_801d6800,
+                    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x124),
                     (static_cast<int>(totalUnuse) >> 10) +
                         static_cast<unsigned int>((static_cast<int>(totalUnuse) < 0) && ((totalUnuse & 0x3ff) != 0)),
                     (static_cast<int>(maxUnuse) >> 10) +
                         static_cast<unsigned int>((static_cast<int>(maxUnuse) < 0) && ((maxUnuse & 0x3ff) != 0)));
-            Graphic.DrawDebugStringDirect(0x208, static_cast<unsigned short>(y), line, 8);
+            Graphic.DrawDebugStringDirect(0x208, y, line, 8);
             return;
         }
 
         if ((*reinterpret_cast<unsigned char*>(node + 2) & 4) == 0) {
-            unsigned int blockSize = static_cast<unsigned int>(*reinterpret_cast<int*>(node + 8) - (node + 0x40));
+            blockSize = static_cast<unsigned int>(*reinterpret_cast<int*>(node + 8) - (node + 0x40));
             totalUnuse += blockSize;
             if (static_cast<int>(maxUnuse) < static_cast<int>(blockSize)) {
                 maxUnuse = blockSize;
             }
         }
     } while ((*reinterpret_cast<int*>(node + 0x10) == *reinterpret_cast<int*>(node + 8) - (node + 0x40)) &&
-             ((*reinterpret_cast<int*>(node + 4) == prev) &&
-              ((prev = node), (node = *reinterpret_cast<int*>(node + 8)), true)));
+             (prevOk = *reinterpret_cast<int*>(node + 4) == prev, prev = node, node = *reinterpret_cast<int*>(node + 8), prevOk));
 
     if (System.m_execParam != 0) {
         Printf__7CSystemFPce(&System, DAT_801d67d8);

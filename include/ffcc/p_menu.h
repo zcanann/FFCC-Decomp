@@ -79,8 +79,8 @@ public:
     void SetTexture(TEX);
     void SetColor(CColor&);
 
-    void GetButtonDown(int);
-    void GetButtonRepeat(int);
+    unsigned short GetButtonDown(int);
+    unsigned short GetButtonRepeat(int);
 
     void onScriptChanging(char*);
     void onMapChanging(int, int);

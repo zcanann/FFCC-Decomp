@@ -9,6 +9,7 @@
 #include "ffcc/mesmenu.h"
 #include "ffcc/partMng.h"
 #include "ffcc/p_camera.h"
+#include "ffcc/pad.h"
 #include "ffcc/ptrarray.h"
 #include "ffcc/ringmenu.h"
 #include "ffcc/textureman.h"
@@ -77,6 +78,7 @@ extern char s_p_menu_cpp_801d9d80[];
 
 extern "C" void* __register_global_object(void* object, void* destructor, void* registration);
 extern "C" void __dt__8CMenuPcsFv(void*);
+extern "C" int __cntlzw(unsigned int);
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" void Calc__5CMenuFv(CMenu*);
 extern "C" void CalcDiaryMenu__8CMenuPcsFv(CMenuPcs*);
@@ -624,22 +626,64 @@ void CMenuPcs::DrawQuit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80095EE4
+ * PAL Size: 116b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::GetButtonDown(int)
+u16 CMenuPcs::GetButtonDown(int port)
 {
-	// TODO
+    bool noInput = false;
+    if (Pad._452_4_ == 0) {
+        if (port != 0) {
+            goto input_check_done;
+        }
+        if (Pad._448_4_ == -1) {
+            goto input_check_done;
+        }
+    }
+    noInput = true;
+
+input_check_done:
+    if (noInput) {
+        return 0;
+    }
+
+    u32 clamped = (u32)port & ~((int)~(Pad._448_4_ - port | port - Pad._448_4_) >> 0x1f);
+    return *(u16*)((u8*)&Pad + 0x8 + clamped * 0x54);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80095E70
+ * PAL Size: 116b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::GetButtonRepeat(int)
+u16 CMenuPcs::GetButtonRepeat(int port)
 {
-	// TODO
+    bool noInput = false;
+    if (Pad._452_4_ == 0) {
+        if (port != 0) {
+            goto repeat_check_done;
+        }
+        if (Pad._448_4_ == -1) {
+            goto repeat_check_done;
+        }
+    }
+    noInput = true;
+
+repeat_check_done:
+    if (noInput) {
+        return 0;
+    }
+
+    u32 clamped = (u32)port & ~((int)~(Pad._448_4_ - port | port - Pad._448_4_) >> 0x1f);
+    return *(u16*)((u8*)&Pad + 0x14 + clamped * 0x54);
 }
 
 /*
@@ -654,22 +698,34 @@ void CMenuPcs::onScriptChanging(char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80095CE0
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::onMapChanging(int, int)
+void CMenuPcs::onMapChanging(int, int mapNo)
 {
-	// TODO
+    if (((mapNo == 0x21) && (Game.m_currentMapId != 0x21)) ||
+        ((mapNo != 0x21) && (Game.m_currentMapId == 0x21))) {
+        changeMode(static_cast<CMenuPcs::MENUMODE>(-1));
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80095CA4
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::onMapChanged(int, int, int)
 {
-	// TODO
+    changeMode(static_cast<CMenuPcs::MENUMODE>(
+        (u32)__cntlzw((u32)(0x21 - Game.m_currentMapId)) >> 5));
 }
 
 /*

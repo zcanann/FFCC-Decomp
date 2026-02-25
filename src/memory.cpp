@@ -1357,12 +1357,13 @@ void CMemory::CStage::drawHeapTitle(int y)
     unsigned int totalUnuse = 0;
     unsigned int maxUnuse = 0;
     int prev = *reinterpret_cast<int*>(node + 4);
+    char line[264];
+    char* sourceName = reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(this) + 0x10);
 
     do {
         if ((*reinterpret_cast<unsigned char*>(node + 2) & 2) != 0) {
-            char line[264];
-            int srcLen = strlen(stageGetSourceName(this));
-            strcpy(line, stageGetSourceName(this) + ((srcLen - 12U) & ~((srcLen - 12U) >> 31)));
+            int srcLen = strlen(sourceName);
+            strcpy(line, sourceName + ((srcLen - 12U) & ~((srcLen - 12U) >> 31)));
             Graphic.DrawDebugStringDirect(0x10, static_cast<unsigned short>(y), line, 8);
             sprintf(line, s__4d__4d__4d_801d6800, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x124),
                     (static_cast<int>(totalUnuse) >> 10) +

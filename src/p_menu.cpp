@@ -1118,12 +1118,37 @@ void CMenuPcs::LoadExtraFont(int, char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009497c
+ * PAL Size: 368b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::SetExtraFontTlut(int, _GXColor)
+void CMenuPcs::SetExtraFontTlut(int fontNo, _GXColor color)
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+    CTexture* texture =
+        *reinterpret_cast<CTexture**>(*reinterpret_cast<u32*>(self + 0x100 + fontNo * 4) + 0x34);
+
+    for (int i = 0; i < 0x10; i++) {
+        _GXColor src = texture->GetTlutColor(i);
+        _GXColor out;
+        out.a = src.a;
+        if (i < 9) {
+            out.r = color.r;
+            out.g = color.g;
+            out.b = color.b;
+        } else {
+            float blend = 1.0f - static_cast<float>(i - 9) / 10.0f;
+            out.r = static_cast<u8>(245.0f - (245.0f - static_cast<float>(color.r)) * blend);
+            out.g = static_cast<u8>(245.0f - (245.0f - static_cast<float>(color.g)) * blend);
+            out.b = static_cast<u8>(245.0f - (245.0f - static_cast<float>(color.b)) * blend);
+        }
+        texture->SetTlutColor(i, out);
+    }
+
+    texture->FlushTlut();
 }
 
 /*

@@ -265,11 +265,8 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* par
 	PARTICLE_WMAT* worldMats;
 	_PARTICLE_DATA* particle;
 	u8* paramPayload;
-	u16* particleLife;
-	u16* particleFrameTimer;
-	u16* particleFrameIndex;
-	u16* emitRate;
-	u16* emitPerFrame;
+	u16 emitRate;
+	u16 emitPerFrame;
 
 	emitCount = 0;
 	particle = (_PARTICLE_DATA*)work->m_particleBlock;
@@ -277,8 +274,8 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* par
 	colorData = work->m_colorBlock;
 	maxParticles = work->m_numParticles;
 	paramPayload = (u8*)param;
-	emitRate = (u16*)(paramPayload + 0xB4);
-	emitPerFrame = (u16*)(paramPayload + 0xB6);
+	emitRate = *(u16*)(paramPayload + 0xB4);
+	emitPerFrame = *(u16*)(paramPayload + 0xB6);
 
 	if ((DAT_8032ed70 == 0) && (paramPayload[0x16] != 0))
 	{
@@ -286,13 +283,9 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* par
 
 		for (i = 0; i < maxParticles; i = i + 1)
 		{
-			particleLife = (u16*)((u8*)particle + 0x22);
-			particleFrameTimer = (u16*)((u8*)particle + 0x1C);
-			particleFrameIndex = (u16*)((u8*)particle + 0x1E);
-
-			if (*(s16*)particleLife == 0)
+			if (*(s16*)((u8*)particle + 0x22) == 0)
 			{
-				if ((*emitRate <= work->m_emitTimer) && (emitCount < (s32)(*emitPerFrame)))
+				if ((emitRate <= work->m_emitTimer) && (emitCount < (s32)emitPerFrame))
 				{
 					birth(pObject, work, param, color, particle, (_PARTICLE_WMAT*)worldMats, colorData);
 					emitCount = emitCount + 1;
@@ -309,25 +302,25 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* par
 				frameData = colorSet + (u32)frame * 8 + 0x10;
 
 				*(s16*)((u8*)particle + 0x1C) = *(s16*)((u8*)particle + 0x1C) + *(s16*)(paramPayload + 0x08);
-				frame = *particleFrameTimer;
+				frame = *(u16*)((u8*)particle + 0x1C);
 				duration = *(s16*)(frameData + 2);
 
 				if ((s32)duration <= (s32)frame)
 				{
-					*particleFrameTimer = frame - duration;
-					*particleFrameIndex = *particleFrameIndex + 1;
+					*(u16*)((u8*)particle + 0x1C) = frame - duration;
+					*(u16*)((u8*)particle + 0x1E) = *(u16*)((u8*)particle + 0x1E) + 1;
 
-					if ((s32)*(s16*)(colorSet + 6) <= (s32)(*particleFrameIndex))
+					if ((s32)*(s16*)(colorSet + 6) <= (s32)(*(u16*)((u8*)particle + 0x1E)))
 					{
 						if ((*(u8*)(frameData + 4) & 0x80) == 0)
 						{
-							*particleFrameTimer = 0;
-							*particleFrameIndex = *particleFrameIndex - 1;
+							*(u16*)((u8*)particle + 0x1C) = 0;
+							*(u16*)((u8*)particle + 0x1E) = *(u16*)((u8*)particle + 0x1E) - 1;
 						}
 						else
 						{
-							*particleFrameIndex = 0;
-							*particleFrameTimer = 0;
+							*(u16*)((u8*)particle + 0x1E) = 0;
+							*(u16*)((u8*)particle + 0x1C) = 0;
 						}
 					}
 				}
@@ -493,13 +486,13 @@ void pppRyjDrawMegaBirth(void)
 void pppRyjMegaBirthCon(_pppPObject* pObject, PRyjMegaBirthOffsets* offsets)
 {
 	VRyjMegaBirth* work = (VRyjMegaBirth*)((u8*)pObject + 0x80 + offsets->m_serializedDataOffsets[2]);
-	Vec axis;
+	float zero;
 
 	PSMTXIdentity(work->m_worldMatrix);
-	axis.x = 0.0f;
-	axis.y = 0.0f;
-	axis.z = 0.0f;
-	work->m_accelerationAxis = axis;
+	zero = FLOAT_80330448;
+	work->m_accelerationAxis.z = FLOAT_80330448;
+	work->m_accelerationAxis.y = zero;
+	work->m_accelerationAxis.x = zero;
 	work->m_particleBlock = 0;
 	work->m_worldMatrixBlock = 0;
 	work->m_colorBlock = 0;

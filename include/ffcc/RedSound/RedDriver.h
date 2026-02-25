@@ -45,8 +45,8 @@ void _DmaCallback(unsigned long);
 int RedDmaEntry(int, int, int, int, int, void (*)(void*), void*);
 int RedDmaSearchID(int);
 void _DmaExecute();
-void _DmaExecuteThread(void*);
-void _MusicSkipThread(void*);
+int _DmaExecuteThread(void*);
+int _MusicSkipThread(void*);
 void _RedAXCallback();
 
 class CRedDriver

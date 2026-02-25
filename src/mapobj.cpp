@@ -1156,14 +1156,11 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
 
     Mtx inverseMtx;
     CMapCylinder localCylinder;
-    Vec localMove;
     CMapHit* mapHit = reinterpret_cast<CMapHit*>(PtrAt(this, 0xC));
 
     PSMTXInverse(MtxAt(this, 0xB8), inverseMtx);
     PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &localCylinder.m_bottom);
     PSMTXMultVec(inverseMtx, &cylinder->m_direction, &localCylinder.m_direction);
-    PSMTXMultVecSR(inverseMtx, reinterpret_cast<Vec*>(&cylinder->m_radius), reinterpret_cast<Vec*>(&localCylinder.m_radius));
-    PSMTXMultVecSR(inverseMtx, move, &localMove);
 
     localCylinder.m_top.y = cylinder->m_top.y;
     float margin = lbl_8032F940 + localCylinder.m_top.y;
@@ -1195,8 +1192,54 @@ int CMapObj::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long m
     localCylinder.m_height2 = maxValue + margin;
     localCylinder.m_direction2.y = minValue - margin;
 
-    if (mapHit->CheckHitCylinder(&localCylinder, &localMove, mask) != 0) {
-        return 1;
+    bool xOverlap;
+    if (localCylinder.m_top.z <= mapHit->m_positionMin.x) {
+        if (mapHit->m_positionMin.x <= localCylinder.m_top.z) {
+            xOverlap = true;
+        } else {
+            xOverlap = mapHit->m_positionMin.x <= localCylinder.m_direction2.z;
+        }
+    } else {
+        xOverlap = localCylinder.m_top.z <= mapHit->m_positionMax.x;
+    }
+
+    bool xyOverlap = false;
+    if (xOverlap) {
+        bool yOverlap;
+        if (localCylinder.m_direction2.x <= mapHit->m_positionMin.y) {
+            if (mapHit->m_positionMin.y <= localCylinder.m_direction2.x) {
+                yOverlap = true;
+            } else {
+                yOverlap = mapHit->m_positionMin.y <= localCylinder.m_radius2;
+            }
+        } else {
+            yOverlap = localCylinder.m_direction2.x <= mapHit->m_positionMax.y;
+        }
+        if (yOverlap) {
+            xyOverlap = true;
+        }
+    }
+
+    if (xyOverlap) {
+        bool zOverlap;
+        if (localCylinder.m_direction2.y <= mapHit->m_positionMin.z) {
+            if (mapHit->m_positionMin.z <= localCylinder.m_direction2.y) {
+                zOverlap = true;
+            } else {
+                zOverlap = mapHit->m_positionMin.z <= localCylinder.m_height2;
+            }
+        } else {
+            zOverlap = localCylinder.m_direction2.y <= mapHit->m_positionMax.z;
+        }
+
+        if (zOverlap) {
+            Vec localMove;
+            PSMTXMultVecSR(inverseMtx, reinterpret_cast<Vec*>(&cylinder->m_radius), reinterpret_cast<Vec*>(&localCylinder.m_radius));
+            PSMTXMultVecSR(inverseMtx, move, &localMove);
+            if (mapHit->CheckHitCylinder(&localCylinder, &localMove, mask) != 0) {
+                return 1;
+            }
+        }
     }
     return 0;
 }

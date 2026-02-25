@@ -837,6 +837,8 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
     delMode = mode;
     switch (delMode) {
     case 1:
+        *reinterpret_cast<short*>(ReadMenuS32(2092) + 0x1E) = -1;
+        *reinterpret_cast<short*>(ReadMenuS32(2092) + 0x18) = 10;
         break;
     case 2:
         field_0x45 = 0;

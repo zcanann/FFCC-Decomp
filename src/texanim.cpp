@@ -675,21 +675,18 @@ CTexAnimSet* CTexAnimSet::Duplicate(CMemory::CStage* stage)
     if (dup != 0) {
         __ct__4CRefFv(dup);
         *reinterpret_cast<void**>(dup) = &PTR_PTR_s_CTexAnimSet_801e9c6c;
-        CPtrArray<CTexAnim*>* const arr = reinterpret_cast<CPtrArray<CTexAnim*>*>(Ptr(dup, 8));
-        arr->m_size = 0;
-        arr->m_numItems = 0;
-        arr->m_defaultSize = 0x10;
-        arr->m_items = 0;
-        arr->m_stage = 0;
-        arr->m_growCapacity = 1;
+        new (Ptr(dup, 8)) CPtrArray<CTexAnim*>();
         F32At(dup, 0x24) = FLOAT_8032fb38;
     }
 
     CPtrArray<CTexAnim*>* const dstArray = reinterpret_cast<CPtrArray<CTexAnim*>*>(Ptr(dup, 8));
     CPtrArray<CTexAnim*>* const srcArray = reinterpret_cast<CPtrArray<CTexAnim*>*>(Ptr(this, 8));
+    int (CPtrArray<CTexAnim*>::*getSizeFn)() = &CPtrArray<CTexAnim*>::GetSize;
+    CTexAnim* (CPtrArray<CTexAnim*>::*indexFn)(unsigned long) = &CPtrArray<CTexAnim*>::operator[];
+    bool (CPtrArray<CTexAnim*>::*addFn)(CTexAnim*) = &CPtrArray<CTexAnim*>::Add;
     dstArray->SetStage(stage);
-    for (unsigned long i = 0; i < static_cast<unsigned long>(srcArray->GetSize()); i++) {
-        CTexAnim* const src = (*srcArray)[i];
+    for (unsigned long i = 0; i < static_cast<unsigned long>((srcArray->*getSizeFn)()); i++) {
+        CTexAnim* const src = (srcArray->*indexFn)(i);
         CTexAnim* const copy =
             static_cast<CTexAnim*>(__nw__FUlPQ27CMemory6CStagePci(0x24, stage, s_texanim_cpp_801d7adc, 0xF4));
         if (copy != 0) {
@@ -707,12 +704,12 @@ CTexAnimSet* CTexAnimSet::Duplicate(CMemory::CStage* stage)
         *reinterpret_cast<void**>(Ptr(copy, 8)) = *reinterpret_cast<void**>(Ptr(src, 8));
         S32At(*reinterpret_cast<void**>(Ptr(copy, 8)), 4) = S32At(*reinterpret_cast<void**>(Ptr(copy, 8)), 4) + 1;
         S32At(copy, 0x0C) = S32At(src, 0x0C);
-        U32At(copy, 0x10) = U32At(src, 0x10);
+        F32At(copy, 0x10) = F32At(src, 0x10);
         S32At(copy, 0x14) = S32At(src, 0x14);
-        U32At(copy, 0x18) = U32At(src, 0x18);
-        U32At(copy, 0x1C) = U32At(src, 0x1C);
-        U32At(copy, 0x20) = U32At(src, 0x20);
-        dstArray->Add(copy);
+        F32At(copy, 0x18) = F32At(src, 0x18);
+        F32At(copy, 0x1C) = F32At(src, 0x1C);
+        F32At(copy, 0x20) = F32At(src, 0x20);
+        (dstArray->*addFn)(copy);
     }
 
     F32At(dup, 0x24) = F32At(this, 0x24);
@@ -1063,11 +1060,17 @@ CTexAnim::CRefData::CRefData()
 CTexAnim::CRefData::~CRefData()
 {
     *reinterpret_cast<void**>(this) = &PTR_PTR_s_CTexAnim_CRefData_801e9c3c;
-    ReleaseRef(reinterpret_cast<void**>(Ptr(this, 0x108)));
-
-    CPtrArray<CTexAnimSeq*>* const seqs = reinterpret_cast<CPtrArray<CTexAnimSeq*>*>(Ptr(this, 0x110));
-    seqs->ReleaseAndRemoveAll();
-    seqs->~CPtrArray<CTexAnimSeq*>();
+    int* ref = *reinterpret_cast<int**>(Ptr(this, 0x108));
+    if (ref != 0) {
+        const int nextRefCount = ref[1] - 1;
+        ref[1] = nextRefCount;
+        if ((nextRefCount == 0) && (ref != 0)) {
+            (*(void (**)(int*, int))(*ref + 8))(ref, 1);
+        }
+        *reinterpret_cast<void**>(Ptr(this, 0x108)) = 0;
+    }
+    reinterpret_cast<CPtrArray<CTexAnimSeq*>*>(Ptr(this, 0x110))->ReleaseAndRemoveAll();
+    reinterpret_cast<CPtrArray<CTexAnimSeq*>*>(Ptr(this, 0x110))->~CPtrArray<CTexAnimSeq*>();
 
     __dt__4CRefFv(this, 0);
 }

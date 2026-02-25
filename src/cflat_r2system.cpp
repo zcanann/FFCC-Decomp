@@ -180,7 +180,7 @@ extern "C" int CheckHitCylinderNear__7CMapPcsFP3VecP3VecfUl(
  */
 extern "C" unsigned char* GetTmpFrameBuffer__8CGraphicFv(CGraphic* graphic)
 {
-    return *(unsigned char**)((char*)graphic + 0x7208);
+    return *(unsigned char**)((char*)graphic + 0x71E8);
 }
 
 /*

@@ -9,7 +9,7 @@ extern int DAT_8032ed70;
 extern u8 DAT_8032ed78;
 extern void* DAT_8032ec70;
 extern float FLOAT_803305f0;
-extern float FLOAT_803305f4;
+extern float lbl_803305F4;
 extern float FLOAT_803305f8;
 extern float FLOAT_80330610;
 extern float FLOAT_80330614;
@@ -139,20 +139,30 @@ void oddToEven(float&)
  */
 void pppConstructYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, UnkC* param_2)
 {
-	float fVar1 = FLOAT_803305f4;
-	u32* work = (u32*)((u8*)pppYmDeformationShp_ + 0x80 + param_2->m_serializedDataOffsets[2]);
+	struct WorkState {
+		u32 m_data0;
+		u32 m_data1;
+		u32 m_data2;
+		u16 m_angle;
+		u8 m_direction;
+		u8 m_pad;
+		float m_values[6];
+	};
 
-	work[0] = 0;
-	work[1] = 0;
-	work[2] = 0;
-	*(u16*)(work + 3) = 0;
-	*(u8*)((u8*)(work + 3) + 2) = 1;
-	((float*)work)[6] = fVar1;
-	((float*)work)[5] = fVar1;
-	((float*)work)[4] = fVar1;
-	((float*)work)[9] = fVar1;
-	((float*)work)[8] = fVar1;
-	((float*)work)[7] = fVar1;
+	float value = lbl_803305F4;
+	WorkState* state = (WorkState*)((u8*)pppYmDeformationShp_ + 0x80 + param_2->m_serializedDataOffsets[2]);
+
+	state->m_data0 = 0;
+	state->m_data1 = 0;
+	state->m_data2 = 0;
+	state->m_angle = 0;
+	state->m_direction = 1;
+	state->m_values[2] = value;
+	state->m_values[1] = value;
+	state->m_values[0] = value;
+	state->m_values[5] = value;
+	state->m_values[4] = value;
+	state->m_values[3] = value;
 }
 
 /*
@@ -176,10 +186,10 @@ void pppConstruct2YmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, Un
 		float m_values[6];
 	};
 
-	float value = FLOAT_803305f4;
+	float value = lbl_803305F4;
 	WorkState* state = (WorkState*)((u8*)pppYmDeformationShp_ + 0x80 + param_2->m_serializedDataOffsets[2]);
 
-	state->m_values[2] = FLOAT_803305f4;
+	state->m_values[2] = lbl_803305F4;
 	state->m_values[1] = value;
 	state->m_values[0] = value;
 	state->m_values[5] = value;
@@ -213,6 +223,9 @@ void pppDestructYmDeformationShp(void)
 void pppFrameYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, UnkB* param_2, UnkC* param_3)
 {
 	struct FrameState {
+		u32 m_data0;
+		u32 m_data1;
+		u32 m_data2;
 		s16 m_angle;
 		u8 m_direction;
 		u8 m_pad;
@@ -225,7 +238,7 @@ void pppFrameYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, UnkB* p
 		return;
 	}
 
-	state = (FrameState*)((u8*)pppYmDeformationShp_ + 0x8c + param_3->m_serializedDataOffsets[2]);
+	state = (FrameState*)((u8*)pppYmDeformationShp_ + 0x80 + param_3->m_serializedDataOffsets[2]);
 
 	CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
 		param_2->m_payload[0], pppYmDeformationShp_, param_2->m_graphId, &state->m_values[0], &state->m_values[1],
@@ -360,9 +373,9 @@ void RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* vert
 	texMtx[2][2] = FLOAT_8033062c;
 
 	PSMTXConcat(texMtx, objMtx, tempMtx);
-	origin.x = FLOAT_803305f4;
-	origin.y = FLOAT_803305f4;
-	origin.z = FLOAT_803305f4;
+	origin.x = lbl_803305F4;
+	origin.y = lbl_803305F4;
+	origin.z = lbl_803305F4;
 	PSMTXMultVec(tempMtx, &origin, &cameraPos);
 	cameraPos.x = cameraPos.x / cameraPos.z;
 	cameraPos.y = cameraPos.y / cameraPos.z;
@@ -515,18 +528,18 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, UnkB* 
 	indMtx[0][1] = rotMtx[0][1] * scale;
 	indMtx[1][0] = rotMtx[1][0] * scale;
 	indMtx[1][1] = rotMtx[1][1] * scale;
-	indMtx[0][2] = FLOAT_803305f4;
-	indMtx[1][2] = FLOAT_803305f4;
+	indMtx[0][2] = lbl_803305F4;
+	indMtx[1][2] = lbl_803305F4;
 	GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
 
 	if (params[0x26] == 0) {
 		float quadSize = (float)params[8];
 		if (params[0x28] == 0) {
 			local_e4 = -quadSize;
-			local_dc = FLOAT_803305f4;
-			local_d0 = FLOAT_803305f4;
-			local_c4 = FLOAT_803305f4;
-			local_b8 = FLOAT_803305f4;
+			local_dc = lbl_803305F4;
+			local_d0 = lbl_803305F4;
+			local_c4 = lbl_803305F4;
+			local_b8 = lbl_803305F4;
 			local_e0 = quadSize;
 			local_d8 = quadSize;
 			local_d4 = quadSize;
@@ -536,10 +549,10 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, UnkB* 
 			local_bc = -quadSize;
 		} else if (params[0x28] == 1) {
 			local_e4 = -quadSize;
-			local_e0 = FLOAT_803305f4;
-			local_d4 = FLOAT_803305f4;
-			local_c8 = FLOAT_803305f4;
-			local_bc = FLOAT_803305f4;
+			local_e0 = lbl_803305F4;
+			local_d4 = lbl_803305F4;
+			local_c8 = lbl_803305F4;
+			local_bc = lbl_803305F4;
 			local_dc = -quadSize;
 			local_d8 = quadSize;
 			local_d0 = -quadSize;
@@ -552,13 +565,13 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, UnkB* 
 			return;
 		}
 
-		local_134 = FLOAT_803305f4;
-		local_130 = FLOAT_803305f4;
+		local_134 = lbl_803305F4;
+		local_130 = lbl_803305F4;
 		local_12c = FLOAT_803305f8;
-		local_128 = FLOAT_803305f4;
+		local_128 = lbl_803305F4;
 		local_124 = FLOAT_803305f8;
 		local_120 = FLOAT_803305f8;
-		local_11c = FLOAT_803305f4;
+		local_11c = lbl_803305F4;
 		local_118 = FLOAT_803305f8;
 		RenderDeformationShape(
 			(_pppPObject*)pppYmDeformationShp_, (VYmDeformationShp*)work, (Vec*)&local_e4, (Vec2d*)&local_134);
@@ -577,10 +590,10 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, UnkB* 
 			local_c8 = split;
 			local_c0 = -size;
 			local_bc = split;
-			local_dc = FLOAT_803305f4;
-			local_d0 = FLOAT_803305f4;
-			local_c4 = FLOAT_803305f4;
-			local_b8 = FLOAT_803305f4;
+			local_dc = lbl_803305F4;
+			local_d0 = lbl_803305F4;
+			local_c4 = lbl_803305F4;
+			local_b8 = lbl_803305F4;
 		} else if (params[0x28] == 1) {
 			local_e4 = -size;
 			local_dc = -split;
@@ -590,22 +603,22 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, UnkB* 
 			local_c4 = split;
 			local_c0 = -size;
 			local_b8 = split;
-			local_e0 = FLOAT_803305f4;
-			local_d4 = FLOAT_803305f4;
-			local_c8 = FLOAT_803305f4;
-			local_bc = FLOAT_803305f4;
+			local_e0 = lbl_803305F4;
+			local_d4 = lbl_803305F4;
+			local_c8 = lbl_803305F4;
+			local_bc = lbl_803305F4;
 		} else {
 			DisableIndWarp__F13_GXTevStageID16_GXIndTexStageID(1, 0);
 			return;
 		}
 
-		local_134 = FLOAT_803305f4;
-		local_11c = FLOAT_803305f4;
+		local_134 = lbl_803305F4;
+		local_11c = lbl_803305F4;
 		local_12c = uvSplit;
 		local_128 = uvSplit;
 		local_124 = uvSplit;
 		local_118 = uvRemainder;
-		local_130 = FLOAT_803305f4;
+		local_130 = lbl_803305F4;
 		local_120 = uvRemainder;
 		RenderDeformationShape(
 			(_pppPObject*)pppYmDeformationShp_, (VYmDeformationShp*)work, (Vec*)&local_e4, (Vec2d*)&local_134);
@@ -619,10 +632,10 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, UnkB* 
 			local_c8 = split;
 			local_c0 = split;
 			local_bc = split;
-			local_dc = FLOAT_803305f4;
-			local_d0 = FLOAT_803305f4;
-			local_c4 = FLOAT_803305f4;
-			local_b8 = FLOAT_803305f4;
+			local_dc = lbl_803305F4;
+			local_d0 = lbl_803305F4;
+			local_c4 = lbl_803305F4;
+			local_b8 = lbl_803305F4;
 		} else {
 			local_e4 = split;
 			local_dc = -split;
@@ -632,10 +645,10 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, UnkB* 
 			local_c4 = split;
 			local_c0 = split;
 			local_b8 = split;
-			local_e0 = FLOAT_803305f4;
-			local_d4 = FLOAT_803305f4;
-			local_c8 = FLOAT_803305f4;
-			local_bc = FLOAT_803305f4;
+			local_e0 = lbl_803305F4;
+			local_d4 = lbl_803305F4;
+			local_c8 = lbl_803305F4;
+			local_bc = lbl_803305F4;
 		}
 
 		local_130 = uvSplit;
@@ -659,10 +672,10 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, UnkB* 
 				local_c8 = -split;
 				local_c0 = -size;
 				local_bc = -split;
-				local_dc = FLOAT_803305f4;
-				local_d0 = FLOAT_803305f4;
-				local_c4 = FLOAT_803305f4;
-				local_b8 = FLOAT_803305f4;
+				local_dc = lbl_803305F4;
+				local_d0 = lbl_803305F4;
+				local_c4 = lbl_803305F4;
+				local_b8 = lbl_803305F4;
 			} else if (params[0x28] == 1) {
 				local_e4 = -size;
 				local_dc = -size;
@@ -672,19 +685,19 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, UnkB* 
 				local_c4 = -split;
 				local_c0 = -size;
 				local_b8 = -split;
-				local_e0 = FLOAT_803305f4;
-				local_d4 = FLOAT_803305f4;
-				local_c8 = FLOAT_803305f4;
-				local_bc = FLOAT_803305f4;
+				local_e0 = lbl_803305F4;
+				local_d4 = lbl_803305F4;
+				local_c8 = lbl_803305F4;
+				local_bc = lbl_803305F4;
 			}
 
-			local_134 = FLOAT_803305f4;
-			local_130 = FLOAT_803305f4;
+			local_134 = lbl_803305F4;
+			local_130 = lbl_803305F4;
 			local_12c = FLOAT_803305f8;
-			local_128 = FLOAT_803305f4;
+			local_128 = lbl_803305F4;
 			local_124 = FLOAT_803305f8;
 			local_120 = uvSplit;
-			local_11c = FLOAT_803305f4;
+			local_11c = lbl_803305F4;
 			local_118 = uvSplit;
 			RenderDeformationShape(
 				(_pppPObject*)pppYmDeformationShp_, (VYmDeformationShp*)work, (Vec*)&local_e4, (Vec2d*)&local_134);
@@ -698,10 +711,10 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, UnkB* 
 				local_c8 = size;
 				local_c0 = split;
 				local_bc = size;
-				local_dc = FLOAT_803305f4;
-				local_d0 = FLOAT_803305f4;
-				local_c4 = FLOAT_803305f4;
-				local_b8 = FLOAT_803305f4;
+				local_dc = lbl_803305F4;
+				local_d0 = lbl_803305F4;
+				local_c4 = lbl_803305F4;
+				local_b8 = lbl_803305F4;
 			} else if (params[0x28] == 1) {
 				local_e4 = split;
 				local_dc = -size;
@@ -711,19 +724,19 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, UnkB* 
 				local_c4 = size;
 				local_c0 = split;
 				local_b8 = size;
-				local_e0 = FLOAT_803305f4;
-				local_d4 = FLOAT_803305f4;
-				local_c8 = FLOAT_803305f4;
-				local_bc = FLOAT_803305f4;
+				local_e0 = lbl_803305F4;
+				local_d4 = lbl_803305F4;
+				local_c8 = lbl_803305F4;
+				local_bc = lbl_803305F4;
 			}
 
-			local_134 = FLOAT_803305f4;
+			local_134 = lbl_803305F4;
 			local_130 = uvRemainder;
 			local_12c = FLOAT_803305f8;
 			local_128 = uvRemainder;
 			local_124 = FLOAT_803305f8;
 			local_120 = FLOAT_803305f8;
-			local_11c = FLOAT_803305f4;
+			local_11c = lbl_803305F4;
 			local_118 = FLOAT_803305f8;
 			RenderDeformationShape(
 				(_pppPObject*)pppYmDeformationShp_, (VYmDeformationShp*)work, (Vec*)&local_e4, (Vec2d*)&local_134);

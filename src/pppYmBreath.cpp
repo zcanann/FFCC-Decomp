@@ -12,6 +12,7 @@ extern "C" float RandF__5CMathFv(CMath* instance);
 extern "C" void pppGetRotMatrixXYZ__FR10pppFMATRIXP11pppIVECTOR4(void* outMatrix, void* angle);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
 extern "C" void pppHitCylinderSendSystem__FP9_pppMngStP3VecP3Vecff(void*, Vec*, Vec*, float, float);
+extern "C" void pppCalcFrameShape__FPlRsRsRss(long*, short&, short&, short&, short);
 extern "C" void pppSetBlendMode__FUc(unsigned char);
 extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
     void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
@@ -386,6 +387,10 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
             }
         } else {
             UpdateParticle(vYmBreath, pYmBreath, (PARTICLE_DATA*)particleData, vColor, (PARTICLE_COLOR*)particleColor);
+            pppCalcFrameShape__FPlRsRsRss(
+                *(long**)(*(unsigned int*)(pppEnvStPtr + 0xC) + *(int*)((unsigned char*)pYmBreath + 0xC) * 4),
+                *(short*)(particleData + 0x58), *(short*)(particleData + 0x5A), *(short*)(particleData + 0x56),
+                *(short*)((unsigned char*)pYmBreath + 0x10));
         }
 
         particleData += 0x98;

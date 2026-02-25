@@ -524,12 +524,32 @@ void __MidiCtrl_TempoChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C80B4
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_ReverbDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_ReverbDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    unsigned char* command = (unsigned char*)((int*)track)[0];
+    int* trackData = (int*)track;
+    int* reverbDepth = trackData + 0x1a;
+
+    trackData[0] = (int)(command + 1);
+    *reverbDepth = (int)*command;
+
+    if (*reverbDepth != 0) {
+        *reverbDepth += 1;
+        *reverbDepth <<= 8;
+        *reverbDepth -= 1;
+        *reverbDepth <<= 0xc;
+    }
+
+    trackData[0x1b] = 0;
+    trackData[0x1c] = 0;
+    SetVoiceAccess(track, 8);
 }
 
 /*
@@ -1444,22 +1464,39 @@ void __MidiCtrl_PitchBendRange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C9C30
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_ReverbOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_ReverbOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    int* trackData = (int*)track;
+
+    trackData[0x3f] |= 0x3c00;
+    SetVoiceSwitch(track, trackData[0x3f]);
+    DAT_8032f4b4 |= 2;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C9C7C
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_ReverbOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_ReverbOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    int* trackData = (int*)track;
+
+    trackData[0x3f] &= 0xffffcfff;
+    trackData[0x3f] |= 0xc00;
+    SetVoiceSwitch(track, trackData[0x3f]);
+    DAT_8032f4b4 |= 2;
 }
 
 /*

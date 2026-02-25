@@ -1203,6 +1203,7 @@ void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAme
 void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int append, CAmemCacheSet* amemCacheSet, int cacheTag, int useAddress)
 {
     CChunkFile::CChunk chunk;
+    CTexture* texture;
 
     if (append == 0) {
         Textures(this)->ReleaseAndRemoveAll();
@@ -1214,7 +1215,25 @@ void CTextureSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage, int appe
             continue;
         }
 
-        CTexture* texture = AllocTexture();
+        texture = static_cast<CTexture*>(_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+            &Memory,
+            0x80,
+            *reinterpret_cast<CMemory::CStage**>(Ptr(&TextureMan, 4)),
+            s_textureman_cpp,
+            0x2ED,
+            0));
+        if (texture != 0) {
+            __ct__4CRefFv(texture);
+            *reinterpret_cast<void**>(texture) = &PTR_PTR_s_CTexture_801e9b78;
+            U8At(texture, 0x74) = 0;
+            PtrAt(texture, 0x78) = 0;
+            PtrAt(texture, 0x7C) = 0;
+            U8At(texture, 0x70) = 0;
+            U8At(texture, 0x71) = 0;
+            U8At(texture, 0x08) = 0;
+            S16At(texture, 0x72) = -1;
+            U8At(texture, 0x75) = 0;
+        }
         texture->Create(chunkFile, stage, amemCacheSet, cacheTag, useAddress);
 
         if (*reinterpret_cast<unsigned char*>(Ptr(texture, 8)) != 0) {

@@ -1330,8 +1330,12 @@ void CFlatRuntime2::AddDebugDrawCC(Vec* from, Vec* to, float radius, int bit7, i
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006B1DC
+ * PAL Size: 1196b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CFlatRuntime2::CcClass2D(int flags, int cidMask, Vec* center, float range, float angle, int maxCount, CGObject** outList)
 {

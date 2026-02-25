@@ -10,10 +10,10 @@ struct pppFVECTOR4;
 
 void loadPdtPtx(char*, void*, int, void*, int, int);
 void LoadFieldPdt0(int, int);
-void pppNotAllocAmemCacheRmem(unsigned long);
+unsigned int pppNotAllocAmemCacheRmem(unsigned long);
 unsigned int pppFreeMngStPrioForData();
-void pppAmemDeletePmng(unsigned long);
-void pppAmemRefCntError(unsigned long);
+unsigned int pppAmemDeletePmng(unsigned long);
+unsigned int pppAmemRefCntError(unsigned long);
 
 class CPartPcs : public CProcess
 {

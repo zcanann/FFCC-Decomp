@@ -524,12 +524,32 @@ void __MidiCtrl_TempoChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C80B4
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_ReverbDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_ReverbDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    unsigned char* command = (unsigned char*)((int*)track)[0];
+    int* trackData = (int*)track;
+    int* reverbDepth = trackData + 0x1a;
+
+    trackData[0] = (int)(command + 1);
+    *reverbDepth = (int)*command;
+
+    if (*reverbDepth != 0) {
+        *reverbDepth += 1;
+        *reverbDepth <<= 8;
+        *reverbDepth -= 1;
+        *reverbDepth <<= 0xc;
+    }
+
+    trackData[0x1b] = 0;
+    trackData[0x1c] = 0;
+    SetVoiceAccess(track, 8);
 }
 
 /*

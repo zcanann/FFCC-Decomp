@@ -151,6 +151,7 @@ extern unsigned int DAT_801eaa88;
 extern unsigned int DAT_801eaa8c;
 extern unsigned int PTR_drawAfterViewer__8CPartPcsFv_801eaa90;
 extern unsigned int DAT_801eaa98;
+extern unsigned char lbl_801EAA94[];
 extern unsigned int DAT_801eaa9c;
 extern unsigned int DAT_801eaaa0;
 extern unsigned int DAT_801eaaa4;
@@ -401,12 +402,18 @@ CPartPcs::~CPartPcs()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80053950
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartPcs::Init()
 {
-	// TODO
+	CUSBStreamDataRaw* usbStream = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<unsigned char*>(this) + 0x8);
+	usbStream->m_fieldLoadReq = 0;
+	usbStream->m_printFreeOnNext = 0;
 }
 
 /*
@@ -431,12 +438,17 @@ void CPartPcs::onScriptChanging(char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005392c
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartPcs::GetTable(unsigned long)
+void* CPartPcs::GetTable(unsigned long index)
 {
-	// TODO
+	unsigned long offset = index * 0x15c;
+	return lbl_801EAA94 + offset;
 }
 
 /*

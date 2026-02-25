@@ -15,6 +15,7 @@ extern Mtx ppvCameraMatrix0;
 extern float FLOAT_8032fa30;
 extern float FLOAT_8032fa34;
 extern float FLOAT_8032fa38;
+extern float FLOAT_8032fa18;
 extern float FLOAT_8032fa1c;
 extern float FLOAT_8032fa20;
 extern float FLOAT_8032fa40;
@@ -40,6 +41,8 @@ extern float FLOAT_8032fa9c;
 extern float FLOAT_8032faa0;
 extern float FLOAT_8032fa3c;
 extern float FLOAT_8032fac8;
+extern float FLOAT_8032fac0;
+extern float FLOAT_8032fac4;
 extern float FLOAT_8032faa4;
 extern float FLOAT_8032faa8;
 extern float FLOAT_8032fab0;
@@ -127,7 +130,42 @@ void CCameraPcs::GetTable(unsigned long)
  */
 void CCameraPcs::create()
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+    float zero = FLOAT_8032fa34;
+
+    *reinterpret_cast<float*>(self + 0xDC) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0xD8) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0xD4) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0xF8) = FLOAT_8032fa18;
+    *reinterpret_cast<float*>(self + 0x43C) = FLOAT_8032fa5c;
+    *reinterpret_cast<float*>(self + 0x440) = FLOAT_8032fab0;
+    *reinterpret_cast<float*>(self + 0xFC) = FLOAT_8032fab4;
+    *reinterpret_cast<float*>(self + 0x100) = FLOAT_8032fa8c;
+    *reinterpret_cast<float*>(self + 0x104) = FLOAT_8032fab8;
+    *reinterpret_cast<s32*>(self + 0x444) = 0;
+
+    PSMTXIdentity(reinterpret_cast<MtxPtr>(self + 0x34));
+
+    *reinterpret_cast<float*>(self + 0x42C) = FLOAT_8032fa38;
+    *reinterpret_cast<float*>(self + 0x430) = FLOAT_8032fab8;
+    *reinterpret_cast<s32*>(self + 0x434) = 1;
+    *reinterpret_cast<s32*>(self + 0x438) = 0;
+    *reinterpret_cast<s32*>(self + 0x494) = 0;
+    *reinterpret_cast<s32*>(self + 0x498) = 0;
+    *reinterpret_cast<float*>(self + 0x4AC) = zero;
+    *reinterpret_cast<float*>(self + 0x4A8) = zero;
+    *reinterpret_cast<float*>(self + 0x4A4) = zero;
+    *reinterpret_cast<float*>(self + 0x4B8) = zero;
+    *reinterpret_cast<float*>(self + 0x4B4) = zero;
+    *reinterpret_cast<float*>(self + 0x4B0) = zero;
+    *reinterpret_cast<s16*>(self + 0x4BC) = 0;
+    *reinterpret_cast<s16*>(self + 0x4BE) = 0;
+    *reinterpret_cast<s16*>(self + 0x4C0) = 0;
+    *reinterpret_cast<s16*>(self + 0x4C2) = 0;
+    *reinterpret_cast<s16*>(self + 0x4A0) = 0;
+    *reinterpret_cast<s16*>(self + 0x49E) = 0;
+    *reinterpret_cast<s16*>(self + 0x49C) = 0;
+    self[0x490] = 0;
 }
 
 /*
@@ -240,9 +278,21 @@ void CCameraPcs::calcViewerCameraMatrix(float (*) [4], const SRT*)
  * Address:	TODO
  * Size:	TODO
  */
-void CCameraPcs::SetViewerSRT(const SRT*)
+void CCameraPcs::SetViewerSRT(const SRT* srt)
 {
-	// TODO
+    u32* dst = reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x448);
+    const u32* src = reinterpret_cast<const u32*>(srt);
+
+    dst[0] = src[0];
+    dst[1] = src[1];
+    dst[2] = src[2];
+    dst[3] = src[3];
+    dst[4] = src[4];
+    dst[5] = src[5];
+    dst[6] = src[6];
+    dst[7] = src[7];
+    dst[8] = src[8];
+    *reinterpret_cast<s32*>(reinterpret_cast<u8*>(this) + 0x46C) = 1;
 }
 
 /*
@@ -252,7 +302,25 @@ void CCameraPcs::SetViewerSRT(const SRT*)
  */
 void CCameraPcs::createChara()
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+    float zero = FLOAT_8032fa34;
+    float one = FLOAT_8032fa1c;
+
+    *reinterpret_cast<s32*>(self + 0x46C) = 0;
+    *reinterpret_cast<float*>(self + 0x450) = zero;
+    *reinterpret_cast<float*>(self + 0x44C) = zero;
+    *reinterpret_cast<float*>(self + 0x448) = zero;
+    *reinterpret_cast<float*>(self + 0x45C) = zero;
+    *reinterpret_cast<float*>(self + 0x458) = zero;
+    *reinterpret_cast<float*>(self + 0x454) = zero;
+    *reinterpret_cast<float*>(self + 0x468) = one;
+    *reinterpret_cast<float*>(self + 0x464) = one;
+    *reinterpret_cast<float*>(self + 0x460) = one;
+    *reinterpret_cast<float*>(self + 0x44C) = FLOAT_8032fac0;
+    *reinterpret_cast<float*>(self + 0x45C) = FLOAT_8032fac4;
+    *reinterpret_cast<float*>(self + 0xFC) = FLOAT_8032fab4;
+    *reinterpret_cast<float*>(self + 0x100) = FLOAT_8032fa8c;
+    *reinterpret_cast<float*>(self + 0x104) = FLOAT_8032fab8;
 }
 
 /*

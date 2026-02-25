@@ -49,7 +49,9 @@ extern "C" void DisplayWaveInfo__9CRedSoundFv(CRedSound*);
 extern "C" void DisplaySePlayInfo__9CRedSoundFv(CRedSound*);
 extern "C" void SeStop__9CRedSoundFi(CRedSound*, int);
 extern "C" void SeStopMG__9CRedSoundFiiii(CRedSound*, int, int, int, int);
+extern "C" void SeFadeOut__9CRedSoundFii(CRedSound*, int, int);
 extern "C" void SePan__9CRedSoundFiii(CRedSound*, int, int, int);
+extern "C" void SePitch__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" void SeVolume__9CRedSoundFiii(CRedSound*, int, int, int);
 extern "C" int SePlay__9CRedSoundFiiiii(CRedSound*, int, int, int, int, int);
 extern "C" void ClearSeSepData__9CRedSoundFi(CRedSound*, int);
@@ -75,6 +77,8 @@ extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, uns
 extern void* ARRAY_802f26c8;
 extern char DAT_801db190[];
 extern char DAT_801db1d8[];
+extern char s_CSound__C___B_801db14c[];
+extern char s_CSound__C_B_801db170[];
 extern char DAT_801db29c[];
 extern char DAT_801db2b8[];
 extern char s_Sound___1_n_B_801db130[];
@@ -1541,92 +1545,338 @@ int CSound::PlaySe3DLine(int soundId, int lineIndex, float nearDistance, float f
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c5b7c
+ * PAL Size: 220b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::SetSe3DGroup(int, int)
+void CSound::SetSe3DGroup(int se3dHandle, int group)
 {
-	// TODO
+    if (se3dHandle < 0) {
+        Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
+        return;
+    }
+
+    u8* se = reinterpret_cast<u8*>(this) + 0x2C;
+    u8* found = 0;
+    for (int i = 0; i < 0x20; i++, se += 0xA0) {
+        if (static_cast<s8>(se[0]) < 0 && *reinterpret_cast<int*>(se + 4) == se3dHandle) {
+            found = se;
+            break;
+        }
+        if (static_cast<s8>(se[0x28]) < 0 && *reinterpret_cast<int*>(se + 0x2C) == se3dHandle) {
+            found = se + 0x28;
+            break;
+        }
+        if (static_cast<s8>(se[0x50]) < 0 && *reinterpret_cast<int*>(se + 0x54) == se3dHandle) {
+            found = se + 0x50;
+            break;
+        }
+        if (static_cast<s8>(se[0x78]) < 0 && *reinterpret_cast<int*>(se + 0x7C) == se3dHandle) {
+            found = se + 0x78;
+            break;
+        }
+    }
+
+    if (found != 0) {
+        *reinterpret_cast<int*>(found + 0x24) = group;
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c5a08
+ * PAL Size: 372b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::StopSe3DGroup(int)
+void CSound::StopSe3DGroup(int group)
 {
-	// TODO
+    u8* se = reinterpret_cast<u8*>(this) + 0x2C;
+
+    for (u32 i = 0; i < 0x80; i++, se += 0x28) {
+        if (static_cast<s8>(*se) < 0 && *reinterpret_cast<int*>(se + 0x24) >= 0 &&
+            *reinterpret_cast<int*>(se + 0x24) == group) {
+            const int se3dHandle = *reinterpret_cast<int*>(se + 4);
+            if (se3dHandle < 0) {
+                Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
+            } else {
+                u8* search = reinterpret_cast<u8*>(this) + 0x2C;
+                u8* found = 0;
+                for (int j = 0; j < 0x20; j++, search += 0xA0) {
+                    if (static_cast<s8>(search[0]) < 0 && *reinterpret_cast<int*>(search + 4) == se3dHandle) {
+                        found = search;
+                        break;
+                    }
+                    if (static_cast<s8>(search[0x28]) < 0 && *reinterpret_cast<int*>(search + 0x2C) == se3dHandle) {
+                        found = search + 0x28;
+                        break;
+                    }
+                    if (static_cast<s8>(search[0x50]) < 0 && *reinterpret_cast<int*>(search + 0x54) == se3dHandle) {
+                        found = search + 0x50;
+                        break;
+                    }
+                    if (static_cast<s8>(search[0x78]) < 0 && *reinterpret_cast<int*>(search + 0x7C) == se3dHandle) {
+                        found = search + 0x78;
+                        break;
+                    }
+                }
+
+                if (found != 0) {
+                    const int playId = *reinterpret_cast<int*>(found + 8);
+                    if (playId < 0) {
+                        Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
+                    } else {
+                        SeStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), playId);
+                    }
+                    *found &= 0x7F;
+                }
+            }
+            *se &= 0x7F;
+        }
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c58e8
+ * PAL Size: 288b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::StopSe3D(int)
+void CSound::StopSe3D(int se3dHandle)
 {
-	// TODO
+    if (se3dHandle < 0) {
+        Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
+        return;
+    }
+
+    u8* se = reinterpret_cast<u8*>(this) + 0x2C;
+    u8* found = 0;
+    for (int i = 0; i < 0x20; i++, se += 0xA0) {
+        if (static_cast<s8>(se[0]) < 0 && *reinterpret_cast<int*>(se + 4) == se3dHandle) {
+            found = se;
+            break;
+        }
+        if (static_cast<s8>(se[0x28]) < 0 && *reinterpret_cast<int*>(se + 0x2C) == se3dHandle) {
+            found = se + 0x28;
+            break;
+        }
+        if (static_cast<s8>(se[0x50]) < 0 && *reinterpret_cast<int*>(se + 0x54) == se3dHandle) {
+            found = se + 0x50;
+            break;
+        }
+        if (static_cast<s8>(se[0x78]) < 0 && *reinterpret_cast<int*>(se + 0x7C) == se3dHandle) {
+            found = se + 0x78;
+            break;
+        }
+    }
+
+    if (found != 0) {
+        const int playId = *reinterpret_cast<int*>(found + 8);
+        if (playId < 0) {
+            Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
+        } else {
+            SeStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), playId);
+        }
+        *found &= 0x7F;
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c57c8
+ * PAL Size: 288b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-_pppMngSt* CSound::FadeOutSe3D(int, int)
+_pppMngSt* CSound::FadeOutSe3D(int se3dHandle, int fadeFrames)
 {
-	return (_pppMngSt*)nullptr;
+    if (se3dHandle < 0) {
+        Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
+        return 0;
+    }
+
+    u8* se = reinterpret_cast<u8*>(this) + 0x2C;
+    u8* found = 0;
+    for (int i = 0; i < 0x20; i++, se += 0xA0) {
+        if (static_cast<s8>(se[0]) < 0 && *reinterpret_cast<int*>(se + 4) == se3dHandle) {
+            found = se;
+            break;
+        }
+        if (static_cast<s8>(se[0x28]) < 0 && *reinterpret_cast<int*>(se + 0x2C) == se3dHandle) {
+            found = se + 0x28;
+            break;
+        }
+        if (static_cast<s8>(se[0x50]) < 0 && *reinterpret_cast<int*>(se + 0x54) == se3dHandle) {
+            found = se + 0x50;
+            break;
+        }
+        if (static_cast<s8>(se[0x78]) < 0 && *reinterpret_cast<int*>(se + 0x7C) == se3dHandle) {
+            found = se + 0x78;
+            break;
+        }
+    }
+
+    if (found != 0) {
+        const int playId = *reinterpret_cast<int*>(found + 8);
+        if (playId < 0) {
+            Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130, fadeFrames);
+        } else {
+            SeFadeOut__9CRedSoundFii(reinterpret_cast<CRedSound*>(this), playId, fadeFrames);
+        }
+        *found &= 0x7F;
+    }
+
+    return 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c56d8
+ * PAL Size: 240b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::ChangeSe3DPos(int, Vec*)
+void CSound::ChangeSe3DPos(int se3dHandle, Vec* position)
 {
-	// TODO
+    if (se3dHandle < 0) {
+        Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
+        return;
+    }
+
+    u8* se = reinterpret_cast<u8*>(this) + 0x2C;
+    u8* found = 0;
+    for (int i = 0; i < 0x20; i++, se += 0xA0) {
+        if (static_cast<s8>(se[0]) < 0 && *reinterpret_cast<int*>(se + 4) == se3dHandle) {
+            found = se;
+            break;
+        }
+        if (static_cast<s8>(se[0x28]) < 0 && *reinterpret_cast<int*>(se + 0x2C) == se3dHandle) {
+            found = se + 0x28;
+            break;
+        }
+        if (static_cast<s8>(se[0x50]) < 0 && *reinterpret_cast<int*>(se + 0x54) == se3dHandle) {
+            found = se + 0x50;
+            break;
+        }
+        if (static_cast<s8>(se[0x78]) < 0 && *reinterpret_cast<int*>(se + 0x7C) == se3dHandle) {
+            found = se + 0x78;
+            break;
+        }
+    }
+
+    if (found != 0) {
+        *reinterpret_cast<Vec*>(found + 0x18) = *position;
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c55f0
+ * PAL Size: 232b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::ChangeSe3DPitch(int, int, int)
+void CSound::ChangeSe3DPitch(int se3dHandle, int pitch, int frames)
 {
-	// TODO
+    if (se3dHandle < 0) {
+        Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
+        return;
+    }
+
+    u8* se = reinterpret_cast<u8*>(this) + 0x2C;
+    u8* found = 0;
+    for (int i = 0; i < 0x20; i++, se += 0xA0) {
+        if (static_cast<s8>(se[0]) < 0 && *reinterpret_cast<int*>(se + 4) == se3dHandle) {
+            found = se;
+            break;
+        }
+        if (static_cast<s8>(se[0x28]) < 0 && *reinterpret_cast<int*>(se + 0x2C) == se3dHandle) {
+            found = se + 0x28;
+            break;
+        }
+        if (static_cast<s8>(se[0x50]) < 0 && *reinterpret_cast<int*>(se + 0x54) == se3dHandle) {
+            found = se + 0x50;
+            break;
+        }
+        if (static_cast<s8>(se[0x78]) < 0 && *reinterpret_cast<int*>(se + 0x7C) == se3dHandle) {
+            found = se + 0x78;
+            break;
+        }
+    }
+
+    if (found != 0) {
+        SePitch__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), *reinterpret_cast<int*>(found + 8), pitch << 8, frames);
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c558c
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::Clear3DLine(int)
+void CSound::Clear3DLine(int lineIndex)
 {
-	// TODO
+    if (lineIndex > 7) {
+        Printf__7CSystemFPce(&System, s_CSound__C_B_801db170);
+    }
+    *reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x1444 + lineIndex * 0x1CC) = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c5508
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::Add3DLine(int, Vec*)
+void CSound::Add3DLine(int lineIndex, Vec* position)
 {
-	// TODO
+    const int lineOffset = lineIndex * 0x1CC;
+    const u32 pointCount = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x1444 + lineOffset);
+    if (pointCount < 10) {
+        *reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x1444 + lineOffset) = pointCount + 1;
+        const int pointOffset = static_cast<int>(pointCount) * 0xC + lineOffset;
+        *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x145C + pointOffset) = *position;
+        CalcBound__9CLine2(reinterpret_cast<CLine*>(reinterpret_cast<u8*>(this) + 0x142C + lineOffset));
+    } else {
+        Printf__7CSystemFPce(&System, s_CSound__C___B_801db14c);
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c54ac
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::SetReverb(int, int)
+void CSound::SetReverb(int reverb, int depth)
 {
-	// TODO
+    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+    redSound->SetReverb(1, reverb);
+    redSound->SetReverbDepth(1, depth, 0xF);
 }
 
 /*

@@ -1,5 +1,6 @@
 #include "ffcc/graphic.h"
 
+#include <math.h>
 #include <string.h>
 
 #include "ffcc/memory.h"
@@ -37,6 +38,7 @@ extern struct {
 } CameraPcs;
 
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
+extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dla__FPv(void*);
 extern "C" char lbl_801D6348[];
 
@@ -580,12 +582,118 @@ void CGraphic::DrawSphere(float (*) [4], _GXColor)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80018300
+ * PAL Size: 1124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphic::makeSphere()
 {
-	// TODO
+    float vertices[126];
+    int vertexCount = 1;
+
+    vertices[0] = 1.0f;
+    vertices[1] = 0.0f;
+    vertices[2] = 0.0f;
+
+    for (int ring = 0; ring < 5; ring++) {
+        float pitch = (3.1415927f * (float)(ring + 1)) / 6.0f;
+        float x = cosf(pitch);
+        float radius = sinf(pitch);
+
+        for (int seg = 0; seg < 8; seg++) {
+            float yaw = (6.2831855f * (float)seg) / 8.0f;
+            vertices[vertexCount * 3 + 0] = x;
+            vertices[vertexCount * 3 + 1] = radius * sinf(yaw);
+            vertices[vertexCount * 3 + 2] = radius * cosf(yaw);
+            vertexCount++;
+        }
+    }
+
+    vertices[vertexCount * 3 + 0] = -1.0f;
+    vertices[vertexCount * 3 + 1] = 0.0f;
+    vertices[vertexCount * 3 + 2] = 0.0f;
+
+    S32At(this, 0x71F8) = 0x880;
+    PtrAt(this, 0x71FC) = __nwa__FUlPQ27CMemory6CStagePci(S32At(this, 0x71F8),
+                                                           reinterpret_cast<CMemory::CStage*>(PtrAt(this, 4)),
+                                                           lbl_801D6348, 0x41A);
+
+    DCInvalidateRange(PtrAt(this, 0x71FC), S32At(this, 0x71F8));
+    GXBeginDisplayList(PtrAt(this, 0x71FC), S32At(this, 0x71F8));
+    GXBegin(GX_QUADS, GX_VTXFMT0, 0xB0);
+
+    int ringStart = 1;
+    for (int ring = 0; ring < 5; ring++) {
+        int base = ringStart * 3;
+        for (int pair = 0; pair < 4; pair++) {
+            int next0 = ringStart + ((pair * 2 + 1) & 7);
+            int next1 = ringStart + ((pair * 2 + 2) & 7);
+            int nextBase = base + 3;
+
+            GXWGFifo.f32 = vertices[base + 1];
+            GXWGFifo.f32 = vertices[base + 0];
+            GXWGFifo.f32 = vertices[base + 2];
+
+            GXWGFifo.f32 = vertices[next0 * 3 + 1];
+            GXWGFifo.f32 = vertices[next0 * 3 + 0];
+            GXWGFifo.f32 = vertices[next0 * 3 + 2];
+
+            GXWGFifo.f32 = vertices[nextBase + 1];
+            GXWGFifo.f32 = vertices[nextBase + 0];
+            GXWGFifo.f32 = vertices[nextBase + 2];
+
+            GXWGFifo.f32 = vertices[next1 * 3 + 1];
+            GXWGFifo.f32 = vertices[next1 * 3 + 0];
+            GXWGFifo.f32 = vertices[next1 * 3 + 2];
+
+            base += 6;
+        }
+        ringStart += 8;
+    }
+
+    for (int seg = 0; seg < 8; seg++) {
+        int ringOffset = 0;
+        int ringPairBase = 1;
+        for (int ringPair = 0; ringPair < 3; ringPair++) {
+            int idx0 = ringOffset == 0 ? 0 : (ringOffset - 1) * 8 + seg + 1;
+            int idx1 = ringOffset * 8 + seg + 1;
+
+            int idx2 = 0x29;
+            if (ringOffset != 5) {
+                idx2 = seg + ringPairBase;
+            }
+
+            int idx3 = 0x29;
+            if (ringOffset != 4) {
+                idx3 = seg + ringPairBase + 8;
+            }
+
+            GXWGFifo.f32 = vertices[idx0 * 3 + 1];
+            GXWGFifo.f32 = vertices[idx0 * 3 + 0];
+            GXWGFifo.f32 = vertices[idx0 * 3 + 2];
+
+            GXWGFifo.f32 = vertices[idx2 * 3 + 1];
+            GXWGFifo.f32 = vertices[idx2 * 3 + 0];
+            GXWGFifo.f32 = vertices[idx2 * 3 + 2];
+
+            GXWGFifo.f32 = vertices[idx1 * 3 + 1];
+            GXWGFifo.f32 = vertices[idx1 * 3 + 0];
+            GXWGFifo.f32 = vertices[idx1 * 3 + 2];
+
+            GXWGFifo.f32 = vertices[idx3 * 3 + 1];
+            GXWGFifo.f32 = vertices[idx3 * 3 + 0];
+            GXWGFifo.f32 = vertices[idx3 * 3 + 2];
+
+            ringPairBase += 0x10;
+            ringOffset += 2;
+        }
+    }
+
+    S32At(this, 0x71F8) = GXEndDisplayList();
+    DCFlushRange(PtrAt(this, 0x71FC), S32At(this, 0x71F8));
 }
 
 /*

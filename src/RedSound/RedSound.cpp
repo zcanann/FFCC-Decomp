@@ -574,7 +574,7 @@ void CRedSound::SeStopMG(int bank, int sep, int group, int kind)
  */
 int CRedSound::SePlay(int seID, int sepID, int unk, int volume, int pitch)
 {
-	int autoID = GetAutoID();
+	unsigned int autoID = GetAutoID();
 	CRedDriver_8032f4c0.SePlay(seID, sepID, autoID, unk, volume, pitch);
 	return autoID;
 }

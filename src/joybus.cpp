@@ -6577,7 +6577,7 @@ check_len:
  */
 int CFile::IsDiskError()
 {
-	return m_isDiskError;
+	return m_fatalDiskErrorFlag;
 }
 
 /*

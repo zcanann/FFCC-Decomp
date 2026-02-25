@@ -318,14 +318,14 @@ void CWind::getObj(int)
  */
 int CWind::AddAmbient(float dir, float speed)
 {
-	u8* freeObj;
-	u8* scan;
 	int freeIdx;
 	int group;
+	u8* scan;
+	u8* freeObj;
 
-	scan = (u8*)this;
 	freeIdx = 0;
 	group = 4;
+	scan = (u8*)this;
 	do {
 		freeObj = scan;
 		if (((((s8)scan[0] >= 0) || ((freeObj = scan + 100), (s8)freeObj[0] >= 0)) ||
@@ -379,14 +379,14 @@ found:
  */
 int CWind::AddDiffuse(const Vec* pos, float radius, float dir, float speed)
 {
-	u8* freeObj;
-	u8* scan;
 	int freeIdx;
 	int group;
+	u8* scan;
+	u8* freeObj;
 
-	scan = (u8*)this;
 	freeIdx = 0;
 	group = 4;
+	scan = (u8*)this;
 	do {
 		freeObj = scan;
 		if (((((s8)scan[0] >= 0) || ((freeObj = scan + 100), (s8)freeObj[0] >= 0)) ||

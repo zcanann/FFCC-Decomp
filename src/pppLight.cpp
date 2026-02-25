@@ -99,13 +99,15 @@ void pppLightCon(void* param1, void* param2)
  */
 void pppLight(void* param1, void* param2, void* param3)
 {
-	unsigned char* pppMng = (unsigned char*)param1;
 	unsigned char* lightParam = (unsigned char*)param2;
-	unsigned char* work = pppMng + *(int*)(*(unsigned char**)((unsigned char*)param3 + 0xc)) + 0x80;
-	Vec sourcePos;
-	unsigned char lightData[0xb0];
+	unsigned char* pppMng = (unsigned char*)param1;
+	unsigned char* owner = *(unsigned char**)((unsigned char*)param3 + 0xc);
 
 	if (lbl_8032ED70 == 0) {
+		unsigned char* work = pppMng + *(int*)owner + 0x80;
+		Vec sourcePos;
+		unsigned char lightData[0xb0];
+
 		*(float*)(work + 0x1c) = *(float*)(work + 0x1c) + *(float*)(work + 0x20);
 		*(float*)(work + 0x18) = *(float*)(work + 0x18) + *(float*)(work + 0x1c);
 		*(float*)(work + 0x28) = *(float*)(work + 0x28) + *(float*)(work + 0x2c);

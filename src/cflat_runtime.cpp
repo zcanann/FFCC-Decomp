@@ -1141,16 +1141,15 @@ void CFlatRuntime::CCodeIndex::operator= (const CFlatRuntime::CCodeIndex&)
  */
 void CFlatRuntime::ClearParmanent()
 {
-	int varCount = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x24);
-	u8* varDefs = *reinterpret_cast<u8**>(reinterpret_cast<u8*>(this) + 0x28);
-	u32* varValues = *reinterpret_cast<u32**>(reinterpret_cast<u8*>(this) + 0x2C);
+	int valueOffset = 0;
+	int varIndex = 0;
 
-	for (; varCount > 0; varCount--) {
-		if ((varDefs[1] & 0x20) != 0) {
-			*varValues = 0;
+	while (varIndex < *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x4)) {
+		if ((*(reinterpret_cast<u8*>(*reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x8)) + valueOffset + 1) & 0x20) != 0) {
+			*reinterpret_cast<u32*>(reinterpret_cast<u8*>(*reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0xC)) + valueOffset) = 0;
 		}
-		varDefs += 4;
-		varValues++;
+		valueOffset += 4;
+		varIndex += 1;
 	}
 }
 

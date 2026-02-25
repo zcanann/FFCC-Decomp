@@ -11,13 +11,11 @@ struct pppLocationTitle2 {
 struct UnkB {
     u32 m_dataValIndex;
     u16 m_initWOrk;
-    
-    // Extended fields from decompilation
-    char pad[2];
+    u16 m_pad;
+    u32 m_graphId;
+    float m_arg3;
+    u8* m_payload;
     float m_stepValue;
-    u8 m_arg3;
-    u8 m_payload[6]; // Array of payload bytes
-    char pad2[1];
 };
 
 struct UnkC {

@@ -146,7 +146,7 @@ void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, struct UnkB
     work->m_vel += work->m_acc;
     work->m_cur += work->m_vel;
 
-    if (*(u32*)((u8*)unkB + 8) == graphId) {
+    if (unkB->m_graphId == graphId) {
         work->m_cur += unkB->m_arg3;
         work->m_vel += *(float*)unkB->m_payload;
         work->m_acc += *(float*)((u8*)unkB->m_payload + 4);
@@ -165,7 +165,7 @@ void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, struct UnkB
         u16 animFrameCount;
 
         localMatrix = (pppFMATRIX*)((u8*)locationTitle + 4);
-        maxCount = *(u16*)((u8*)&unkB->m_initWOrk + 2);
+        maxCount = unkB->m_pad;
         work->m_particles = pppMemAlloc__FUlPQ27CMemory6CStagePci(
             maxCount * sizeof(LocationTitle2Particle), pppEnvStPtr->m_stagePtr, s_LocationTitle2_cpp,
             0x70);
@@ -289,7 +289,7 @@ void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, struct UnkB
 void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle, struct UnkB* unkB, struct UnkC* unkC)
 {
     int serializedOffset = *unkC->m_serializedDataOffsets;
-    u32 dataValIndex = *(u32*)((u8*)unkB + 4);
+    u32 dataValIndex = unkB->m_dataValIndex;
 
     if (dataValIndex != 0xFFFF) {
         u32 graphId = *(u32*)locationTitle;

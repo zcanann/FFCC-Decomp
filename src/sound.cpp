@@ -982,12 +982,46 @@ void CSound::loadWaveFrame()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c6fb0
+ * PAL Size: 308b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::LoadWaveASync(int, int, int)
+void CSound::LoadWaveASync(int waveNo, int waveId, int syncMode)
 {
-	// TODO
+    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+
+    if (waveNo < 0) {
+        Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
+    } else if (ReentryWaveData__9CRedSoundFi(redSound, waveNo) == -1) {
+        CFile::CHandle*& waveFile = *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 0x8);
+        if (waveFile != 0) {
+            File.Close(waveFile);
+            waveFile = 0;
+            Printf__7CSystemFPce(&System, DAT_801db190);
+        }
+
+        SetWaveData__9CRedSoundFiPvi(redSound, -1, nullptr, 0);
+
+        char wavePath[260];
+        sprintf(wavePath, "dvd/sound/wave/wave_%04d.wd", waveNo);
+        waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
+        if (waveFile != 0) {
+            *reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x14) = File.GetLength(waveFile);
+            *reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x18) = 0;
+            *reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x20) = 0;
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1C) = waveId;
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x24) = syncMode;
+
+            if (syncMode != 0) {
+                while (((u32)__cntlzw((u32)waveFile) >> 5) == 0) {
+                    loadWaveFrame();
+                }
+            }
+        }
+    }
 }
 
 /*
@@ -1012,12 +1046,17 @@ void CSound::CancelLoadWaveASync()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c6f2c
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::IsLoadWaveASyncCompleted()
+int CSound::IsLoadWaveASyncCompleted()
 {
-	// TODO
+    CFile::CHandle* waveFile = *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 0x8);
+    return (u32)__cntlzw((u32)waveFile) >> 5;
 }
 
 /*
@@ -1411,12 +1450,36 @@ void CSound::StopAndFreeAllSe(int clearMode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c63b8
+ * PAL Size: 312b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CSound::PlaySe(int, int, int, int)
+int CSound::PlaySe(int seNo, int pan, int volume, int fadeFrames)
 {
-	// TODO
+    int seId;
+    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+
+    if (seNo < 0) {
+        Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
+        seId = -1;
+    } else if (seNo < 4000) {
+        const int seBank = seNo / 1000;
+        seId = SePlay__9CRedSoundFiiiii(redSound, seBank, seNo - seBank * 1000, pan,
+                                        volume & ~((-fadeFrames | fadeFrames) >> 0x1F), 0);
+        if (fadeFrames != 0) {
+            SeVolume__9CRedSoundFiii(redSound, seId, volume, fadeFrames);
+        }
+    } else {
+        seId = SePlay__9CRedSoundFiiiii(redSound, -1, seNo, pan, volume & ~((-fadeFrames | fadeFrames) >> 0x1F), 0);
+        if (fadeFrames != 0) {
+            SeVolume__9CRedSoundFiii(redSound, seId, volume, fadeFrames);
+        }
+    }
+
+    return seId;
 }
 
 /*

@@ -178,30 +178,30 @@ void pppFrameColum(pppColum *column, UnkB *param_2, UnkC *param_3)
     if (lbl_8032ED70 == 0) {
         work = (unsigned char*)((char*)column + 0x80 + param_3->m_serializedDataOffsets[3]);
         if (*(void**)(work + 8) == 0) {
-            count = *((unsigned char*)&param_2->m_arg3 + 1);
+            count = *((unsigned char*)param_2 + 0x11);
             *(void**)(work + 8) = pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)count * 0xc,
                                                                          pppEnvStPtr->m_stagePtr,
                                                                          (char*)"pppColum.cpp", 0x7d);
             values = *(float**)(work + 8);
             for (i = 0; i < (int)count; i++) {
-                values[0] = RandF__5CMathFf(*(float*)(param_2->m_payload + 4), &Math);
-                values[0] = values[0] + *(float*)param_2->m_payload;
-                values[1] = RandF__5CMathFf(*(float*)(param_2->m_payload + 0xc), &Math);
-                values[1] = values[1] + *(float*)(param_2->m_payload + 8);
+                values[0] = RandF__5CMathFf(*(float*)(*(unsigned char**)((char*)param_2 + 0x14) + 4), &Math);
+                values[0] = values[0] + *(float*)(*(unsigned char**)((char*)param_2 + 0x14) + 0);
+                values[1] = RandF__5CMathFf(*(float*)(*(unsigned char**)((char*)param_2 + 0x14) + 0xc), &Math);
+                values[1] = values[1] + *(float*)(*(unsigned char**)((char*)param_2 + 0x14) + 8);
                 *(unsigned char*)(values + 2) =
-                    GetNoise__5CUtilFUc(&DAT_8032ec70, (unsigned char)param_2->m_payload[0x16]);
+                    GetNoise__5CUtilFUc(&DAT_8032ec70, *(unsigned char*)(*(unsigned char**)((char*)param_2 + 0x14) + 0x16));
                 *(unsigned char*)((char*)values + 9) =
-                    GetNoise__5CUtilFUc(&DAT_8032ec70, (unsigned char)param_2->m_payload[0x17]);
+                    GetNoise__5CUtilFUc(&DAT_8032ec70, *(unsigned char*)(*(unsigned char**)((char*)param_2 + 0x14) + 0x17));
                 *(unsigned char*)((char*)values + 10) =
-                    GetNoise__5CUtilFUc(&DAT_8032ec70, (unsigned char)param_2->m_payload[0x18]);
+                    GetNoise__5CUtilFUc(&DAT_8032ec70, *(unsigned char*)(*(unsigned char**)((char*)param_2 + 0x14) + 0x18));
                 values = values + 3;
             }
         }
 
-        if (param_2->m_dataValIndex != 0xffff) {
+        if (*(unsigned int*)param_2 != 0xffff) {
             pppCalcFrameShape__FPlRsRsRss(
-                *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4),
-                *(short*)(work + 0), *(short*)(work + 2), *(short*)(work + 4), (short)param_2->m_initWOrk);
+                *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + *(unsigned int*)param_2 * 4),
+                *(short*)(work + 0), *(short*)(work + 2), *(short*)(work + 4), *(short*)((char*)param_2 + 4));
         }
     }
 }

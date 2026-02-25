@@ -285,8 +285,8 @@ extern "C" void __destroy_arr(void* block, ConstructorDestructor dtor, size_t si
  */
 extern "C" void __destroy_new_array(void* block, ConstructorDestructor dtor) {
 	size_t i;
-	size_t elementSize;
 	size_t elementCount;
+	size_t elementSize;
 	char* current;
 
 	if (block != nullptr) {

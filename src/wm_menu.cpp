@@ -1,10 +1,30 @@
 #include "ffcc/wm_menu.h"
 
+#include "ffcc/goout.h"
+#include "ffcc/menu.h"
 #include "ffcc/p_game.h"
+
+#include <string.h>
 
 extern "C" void* __vt__Q212CFlatRuntime7CObject[];
 extern "C" void* __vt__8CGBaseObj[];
 extern "C" void* __vt__8CGObject[];
+extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
+extern "C" void DrawOptionMenu__8CMenuPcsFv(CMenuPcs*);
+extern "C" void DrawSingCMake__8CMenuPcsFv(CMenuPcs*);
+
+extern float FLOAT_8032ee18;
+extern float FLOAT_803313dc;
+extern float FLOAT_803313e8;
+extern unsigned char DAT_8032ee20;
+extern unsigned char uRam8032ee21;
+extern unsigned char DAT_8032ee24;
+extern unsigned char uRam8032ee25;
+extern int DAT_8032ee28;
+extern int DAT_8032ee2c;
+extern unsigned char DAT_8032ee30;
+extern char s_wm_menu_cpp_801dc418[];
+extern char s__s__d___Error_WM_menu_no_error___801dc424[];
 
 /*
  * --INFO--
@@ -28,12 +48,48 @@ CMenuPcs::EffectInfo::EffectInfo()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80102ed8
+ * PAL Size: 220b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::WmInit()
 {
-	// TODO
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+
+	FLOAT_8032ee18 = FLOAT_803313dc;
+	reinterpret_cast<unsigned int*>(bytes + 0x814)[0] = 0;
+	reinterpret_cast<unsigned int*>(bytes + 0x818)[0] = 0;
+	reinterpret_cast<unsigned int*>(bytes + 0x81C)[0] = 0;
+	reinterpret_cast<unsigned int*>(bytes + 0x820)[0] = 0;
+	reinterpret_cast<unsigned int*>(bytes + 0x824)[0] = 0;
+	reinterpret_cast<unsigned int*>(bytes + 0x828)[0] = 0;
+	reinterpret_cast<unsigned int*>(bytes + 0x82C)[0] = 0;
+	reinterpret_cast<unsigned int*>(bytes + 0x838)[0] = 0;
+	reinterpret_cast<unsigned int*>(bytes + 0x83C)[0] = 0;
+	reinterpret_cast<unsigned int*>(bytes + 0x840)[0] = 0;
+	reinterpret_cast<unsigned int*>(bytes + 0x854)[0] = 0;
+	bytes[0x858] = 0;
+	bytes[0x86E] = 0;
+	memset(bytes + 4, 0, 0x1C);
+	bytes[0xD] = 0;
+	bytes[0x10] = 0;
+	bytes[0x12] = 0;
+	bytes[0x13] = 0;
+	bytes[0xD] = 1;
+	bytes[0x16] = 0;
+	DAT_8032ee20 = 0xFF;
+	uRam8032ee21 = 0xFF;
+	DAT_8032ee24 = 0xFF;
+	uRam8032ee25 = 0xFF;
+	DAT_8032ee2c = -1;
+	DAT_8032ee28 = -1;
+	DAT_8032ee30 = Game.game.m_gameWork.m_scriptSysVal0;
+	if (Game.game.m_gameWork.m_scriptSysVal0 > 99) {
+		DAT_8032ee30 = 100;
+	}
 }
 
 /*
@@ -78,12 +134,40 @@ void CMenuPcs::InitFrameInfo()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80101658
+ * PAL Size: 212b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::InitFrame0Info()
 {
-	// TODO
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const frame = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x820)[0]);
+
+	reinterpret_cast<unsigned short*>(frame + 4)[0] = 0x10;
+	reinterpret_cast<unsigned short*>(frame + 6)[0] = 0x10;
+	reinterpret_cast<unsigned short*>(frame + 8)[0] = 0xE8;
+	reinterpret_cast<unsigned short*>(frame + 0xA)[0] = 0x168;
+	reinterpret_cast<float*>(frame + 0xC)[0] = FLOAT_803313dc;
+	reinterpret_cast<float*>(frame + 0x10)[0] = FLOAT_803313dc;
+	reinterpret_cast<float*>(frame + 0x14)[0] = FLOAT_803313e8;
+	reinterpret_cast<float*>(frame + 0x18)[0] = FLOAT_803313e8;
+	reinterpret_cast<unsigned int*>(frame + 0x1C)[0] = 0;
+
+	reinterpret_cast<unsigned short*>(frame + 0x20)[0] = reinterpret_cast<unsigned short*>(frame + 4)[0];
+	reinterpret_cast<unsigned short*>(frame + 0x22)[0] = reinterpret_cast<unsigned short*>(frame + 6)[0];
+	reinterpret_cast<unsigned short*>(frame + 0x24)[0] = reinterpret_cast<unsigned short*>(frame + 8)[0];
+	reinterpret_cast<unsigned short*>(frame + 0x26)[0] = reinterpret_cast<unsigned short*>(frame + 0xA)[0];
+	reinterpret_cast<unsigned int*>(frame + 0x28)[0] = reinterpret_cast<unsigned int*>(frame + 0xC)[0];
+	reinterpret_cast<unsigned int*>(frame + 0x2C)[0] = reinterpret_cast<unsigned int*>(frame + 0x10)[0];
+	reinterpret_cast<unsigned int*>(frame + 0x30)[0] = reinterpret_cast<unsigned int*>(frame + 0x14)[0];
+	reinterpret_cast<unsigned int*>(frame + 0x34)[0] = reinterpret_cast<unsigned int*>(frame + 0x18)[0];
+	reinterpret_cast<unsigned int*>(frame + 0x38)[0] = reinterpret_cast<unsigned int*>(frame + 0x1C)[0];
+
+	reinterpret_cast<short*>(frame + 0x20)[0] = 0x280 - (reinterpret_cast<short*>(frame + 8)[0] + reinterpret_cast<short*>(frame + 4)[0]);
+	reinterpret_cast<unsigned int*>(frame + 0x38)[0] = 8;
 }
 
 /*
@@ -310,12 +394,70 @@ unsigned int CMenuPcs::IsMenuCharaAnimIdle(int charaIndex)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800fc0b0
+ * PAL Size: 324b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::drawWorld()
 {
-	// TODO
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+
+	if (bytes[0xD] == 0) {
+		for (int i = 4; i < 6; i++) {
+			CMenu* const menu = *reinterpret_cast<CMenu**>(bytes + 0x10 + (i - 4) * 4 + 0x10C);
+			menu->Draw();
+		}
+	} else {
+		const short menuMode = *reinterpret_cast<short*>(*reinterpret_cast<unsigned int*>(bytes + 0x82C) + 0x1C);
+
+		switch (menuMode) {
+		case 0:
+			DrawMainMenu();
+			break;
+		case 1:
+			DrawDiaryMenu();
+			break;
+		case 2:
+			DrawMCardMenu();
+			break;
+		case 3:
+			if (*reinterpret_cast<short*>(bytes + 0x868) == 0) {
+				DrawCMakeMenu();
+			} else {
+				DrawSingCMake__8CMenuPcsFv(this);
+			}
+			break;
+		case 4:
+			DrawMoveMenu();
+			break;
+		case 5:
+			DrawLoadMenu();
+			break;
+		case 6:
+			DrawTitleMenu();
+			break;
+		case 7:
+			DrawOptionMenu__8CMenuPcsFv(this);
+			break;
+		case 8:
+			DrawGoOutMenu();
+			break;
+		default:
+			if (System.m_execParam != 0) {
+				Printf__7CSystemFPce(&System, s__s__d___Error_WM_menu_no_error___801dc424, s_wm_menu_cpp_801dc418, 0xC59);
+			}
+			break;
+		}
+
+		for (int i = 4; i < 6; i++) {
+			CMenu* const menu = *reinterpret_cast<CMenu**>(bytes + 0x10 + (i - 4) * 4 + 0x10C);
+			menu->Draw();
+		}
+		DrawInit();
+	}
 }
 
 /*

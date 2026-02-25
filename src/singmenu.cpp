@@ -1,10 +1,13 @@
 #include "ffcc/singmenu.h"
 #include "ffcc/chara.h"
+#include "ffcc/file.h"
 #include "ffcc/graphic.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_chara.h"
 #include "ffcc/pad.h"
 #include "ffcc/p_game.h"
+#include "ffcc/ptrarray.h"
+#include "ffcc/textureman.h"
 #include "ffcc/util.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -19,6 +22,7 @@ extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float,
 extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawFilter__8CMenuPcsFUcUcUcUc(CMenuPcs*, u8, u8, u8, u8);
 extern "C" void Draw__9CShopMenuFv(void*);
+extern "C" void Calc__9CShopMenuFv(void*);
 extern "C" void SingleDrawCtrl__8CMenuPcsFv(CMenuPcs*);
 extern "C" void SetFrame__Q26CChara6CModelFf(float, CChara::CModel*);
 extern "C" void AddFrame__Q26CChara6CModelFf(float, CChara::CModel*);
@@ -29,11 +33,27 @@ extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 extern "C" void DestroyTempBuffer__8CGraphicFv(CGraphic*);
 extern "C" int GetModelNo__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" void* __nw__Q29CCharaPcs7CHandleFUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" void* __nw__11CTextureSetFUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" CCharaPcs::CHandle* __ct__Q29CCharaPcs7CHandleFv(CCharaPcs::CHandle*);
+extern "C" CTextureSet* __ct__11CTextureSetFv(CTextureSet*);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" void Create__11CTextureSetFPvPQ27CMemory6CStageiP13CAmemCacheSetii(CTextureSet*, void*, CMemory::CStage*, int, void*, int, int);
+extern "C" int Find__11CTextureSetFPc(CTextureSet*, char*);
+extern "C" char* GetLangString__5CGameFv(void*);
+extern "C" void* Open__5CFileFPcUlQ25CFile3PRI(void*, char*, unsigned long, int);
+extern "C" void ReadASync__5CFileFPQ25CFile7CHandle(void*, void*);
+extern "C" int IsCompleted__5CFileFPQ25CFile7CHandle(void*, void*);
+extern "C" void Close__5CFileFPQ25CFile7CHandle(void*, void*);
+extern "C" int sprintf(char*, const char*, ...);
+extern "C" void createSingleMenu__8CMenuPcsFv(CMenuPcs*);
+extern "C" void SingMenuInit__8CMenuPcsFv(CMenuPcs*);
+extern "C" void CreateShopMenu__8CMenuPcsFv(CMenuPcs*);
+extern "C" void CreateSmithMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" char* s_stand_80332a24;
 extern "C" char* s_singmenu_cpp_801de8d4;
+extern "C" char* s_dvd__smenu__s_tex_801de8e4;
+extern "C" char* PTR_s_solo1_80214b18[];
 
 extern "C" unsigned int CmdOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int CmdCtrl__8CMenuPcsFv(CMenuPcs*);
@@ -93,8 +113,11 @@ extern float FLOAT_803329b4;
 extern float FLOAT_803329bc;
 extern float FLOAT_803329b8;
 extern CUtil DAT_8032ec70;
+extern int DAT_8032eeb8;
 extern int DAT_8032eebc;
+extern int DAT_8032eec0;
 extern int DAT_8032eec4;
+extern int DAT_80214b3c[];
 extern float DAT_801dd708[];
 extern float DAT_801dd6f8[];
 extern float FLOAT_8032ea78;
@@ -381,12 +404,136 @@ void CMenuPcs::drawSingleMenu()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80149e5c
+ * PAL Size: 952b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, int)
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+
+    DAT_8032eec0 = static_cast<int>(*reinterpret_cast<char*>(Game.game.m_scriptFoodBase[0] + 0xBE0) != 0);
+    if (Game.game.m_gameWork.m_menuStageMode == 0) {
+        if (self[0x859] == 0) {
+            return;
+        }
+
+        *reinterpret_cast<int*>(self + 0xF0) = 0;
+        self[0x859] = 0;
+        self[0x85A] = 0;
+        return;
+    }
+
+    if (self[0x859] == 0) {
+        createSingleMenu__8CMenuPcsFv(this);
+    }
+    if (Game.game.m_gameWork.m_singleShopOrSmithMenuActiveFlag == 0) {
+        return;
+    }
+    if (self[0x85A] == 0) {
+        SingMenuInit__8CMenuPcsFv(this);
+    }
+
+    if (*reinterpret_cast<char*>(Game.game.m_scriptFoodBase[0] + 0xBE0) == 0) {
+        int loadIndex = *reinterpret_cast<int*>(self + 0x85C);
+        if (loadIndex < 2) {
+            if (*reinterpret_cast<int*>(self + 0x860) == 0) {
+                char path[260];
+                char* language = GetLangString__5CGameFv(&Game.game);
+                sprintf(path, s_dvd__smenu__s_tex_801de8e4, language, PTR_s_solo1_80214b18[loadIndex]);
+                DAT_8032eeb8 = reinterpret_cast<int>(Open__5CFileFPcUlQ25CFile3PRI(&File, path, 0, 0));
+                ReadASync__5CFileFPQ25CFile7CHandle(&File, reinterpret_cast<void*>(DAT_8032eeb8));
+                *reinterpret_cast<int*>(self + 0x860) = *reinterpret_cast<int*>(self + 0x860) + 1;
+            } else if (*reinterpret_cast<int*>(self + 0x860) == 1) {
+                if (IsCompleted__5CFileFPQ25CFile7CHandle(&File, reinterpret_cast<void*>(DAT_8032eeb8)) == 0) {
+                    DAT_8032eebc = 0;
+                    goto post_texture_load;
+                }
+
+                CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
+                if (Game.game.m_gameWork.m_menuStageMode != 0) {
+                    stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
+                }
+
+                CTextureSet* textureSet = static_cast<CTextureSet*>(
+                    __nw__11CTextureSetFUlPQ27CMemory6CStagePci(0x24, stage, s_singmenu_cpp_801de8d4, 0x748));
+                if (textureSet != 0) {
+                    textureSet = __ct__11CTextureSetFv(textureSet);
+                }
+                *reinterpret_cast<CTextureSet**>(self + 0x160 + loadIndex * 4) = textureSet;
+
+                stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
+                if (Game.game.m_gameWork.m_menuStageMode != 0) {
+                    stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
+                }
+
+                Create__11CTextureSetFPvPQ27CMemory6CStageiP13CAmemCacheSetii(textureSet, File.m_readBuffer, stage, 0, 0, 0, 0);
+                Close__5CFileFPQ25CFile7CHandle(&File, reinterpret_cast<void*>(DAT_8032eeb8));
+                DAT_8032eeb8 = 0;
+                *reinterpret_cast<int*>(self + 0x860) = 0;
+                *reinterpret_cast<int*>(self + 0x85C) = *reinterpret_cast<int*>(self + 0x85C) + 1;
+            }
+
+            if (*reinterpret_cast<int*>(self + 0x85C) < 2) {
+                DAT_8032eebc = 0;
+            } else {
+                int* mapping = DAT_80214b3c;
+                for (int i = 0; i < 0x33; i++) {
+                    CTextureSet* set = *reinterpret_cast<CTextureSet**>(self + 0x14C + mapping[0] * 4);
+                    int texIdx = Find__11CTextureSetFPc(set, reinterpret_cast<char*>(mapping[1]));
+                    CTexture* tex = (*reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<u8*>(set) + 8))[static_cast<unsigned long>(texIdx)];
+                    *reinterpret_cast<CTexture**>(reinterpret_cast<u8*>(this) + 0x240 + i * 4) = tex;
+                    *reinterpret_cast<int*>(reinterpret_cast<u8*>(tex) + 4) = *reinterpret_cast<int*>(reinterpret_cast<u8*>(tex) + 4) + 1;
+                    mapping += 2;
+                }
+                DAT_8032eebc = 1;
+            }
+        } else {
+            DAT_8032eebc = 1;
+        }
+    }
+
+post_texture_load:
+    if (*reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x850) + 6) != 0) {
+        *reinterpret_cast<s16*>(self + 0x866) = *reinterpret_cast<s16*>(self + 0x866) + 1;
+        *reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x850) + 6) = 0;
+        *reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x850) + 4) = 0;
+        *(reinterpret_cast<u8*>(*reinterpret_cast<int*>(self + 0x82C)) + 0xB) = 0;
+        *(reinterpret_cast<u8*>(*reinterpret_cast<int*>(self + 0x82C)) + 0xD) = 0;
+        *reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x82C) + 0x10) = 0;
+        *reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x82C) + 0x22) = 0;
+    }
+
+    char menuKind = *reinterpret_cast<char*>(Game.game.m_scriptFoodBase[0] + 0xBE0);
+    if (menuKind == 1) {
+        if (*reinterpret_cast<void**>(self + 0x868) == 0) {
+            CreateShopMenu__8CMenuPcsFv(this);
+        } else {
+            Calc__9CShopMenuFv(*reinterpret_cast<void**>(self + 0x868));
+        }
+    } else if (menuKind == 2) {
+        if (*reinterpret_cast<void**>(self + 0x868) == 0) {
+            CreateSmithMenu__8CMenuPcsFv(this);
+        } else {
+            Calc__9CShopMenuFv(*reinterpret_cast<void**>(self + 0x868));
+        }
+    }
+
+    if (DAT_8032eec0 == 0) {
+        s16 state = *reinterpret_cast<s16*>(self + 0x866);
+        if (state == 1) {
+            SingleCalcCtrl();
+        } else if (state < 1) {
+            if (state >= 0) {
+                SingleCalcFadeIn();
+            }
+        } else if (state < 3) {
+            SingleCalcFadeOut();
+        }
+    }
 }
 
 /*

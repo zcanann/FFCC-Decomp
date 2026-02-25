@@ -1763,57 +1763,51 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
  */
 int COctTree::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long flag)
 {
-	float minValue;
-	float maxValue;
-	float margin;
+	float fVar1;
+	float fVar2;
+	int hit;
 	Mtx inverseMtx;
-	unsigned char* thisBytes = (unsigned char*)this;
-	unsigned char* mapData = *(unsigned char**)(thisBytes + 0x8);
 
-	if ((*thisBytes != 2) || (*(CMapHit**)(mapData + 0xc) == 0)) {
-		return 0;
+	if ((*reinterpret_cast<unsigned char*>(this) == 2) &&
+	    (*reinterpret_cast<CMapHit**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0xC)) != 0)) {
+		PSMTXInverse(reinterpret_cast<MtxPtr>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0xB8)), inverseMtx);
+		PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &s_cyl.m_bottom);
+		PSMTXMultVec(inverseMtx, &cylinder->m_direction, &s_cyl.m_direction);
+		PSMTXMultVecSR(inverseMtx, reinterpret_cast<Vec*>(&cylinder->m_radius), reinterpret_cast<Vec*>(&s_cyl.m_radius));
+		PSMTXMultVecSR(inverseMtx, move, &s_mvec);
+
+		s_cyl.m_top.y = cylinder->m_top.y;
+		fVar1 = s_cyl.m_direction.x;
+		fVar2 = s_cyl.m_bottom.x;
+		if (s_cyl.m_bottom.x < s_cyl.m_direction.x) {
+			fVar1 = s_cyl.m_bottom.x;
+			fVar2 = s_cyl.m_direction.x;
+		}
+		s_cyl.m_direction2.z = fVar2 + lbl_8032F960 + s_cyl.m_top.y;
+		s_cyl.m_top.z = fVar1 - (lbl_8032F960 + s_cyl.m_top.y);
+		fVar1 = s_cyl.m_direction.y;
+		fVar2 = s_cyl.m_bottom.y;
+		if (s_cyl.m_bottom.y < s_cyl.m_direction.y) {
+			fVar1 = s_cyl.m_bottom.y;
+			fVar2 = s_cyl.m_direction.y;
+		}
+		s_cyl.m_radius2 = fVar2 + lbl_8032F960 + s_cyl.m_top.y;
+		s_cyl.m_direction2.x = fVar1 - (lbl_8032F960 + s_cyl.m_top.y);
+		fVar1 = s_cyl.m_direction.z;
+		fVar2 = s_cyl.m_bottom.z;
+		if (s_cyl.m_bottom.z < s_cyl.m_direction.z) {
+			fVar1 = s_cyl.m_bottom.z;
+			fVar2 = s_cyl.m_direction.z;
+		}
+		s_cyl.m_height2 = fVar2 + lbl_8032F960 + s_cyl.m_top.y;
+		s_cyl.m_direction2.y = fVar1 - (lbl_8032F960 + s_cyl.m_top.y);
+		s_checkHitCylinderMask = flag;
+		hit = CheckHitCylinder_r(*reinterpret_cast<COctNode**>(Ptr(this, 4)));
+		if (hit != 0) {
+			return 1;
+		}
 	}
 
-	PSMTXInverse((MtxPtr)(mapData + 0xb8), inverseMtx);
-	PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &s_cyl.m_bottom);
-	PSMTXMultVec(inverseMtx, &cylinder->m_direction, &s_cyl.m_direction);
-	PSMTXMultVecSR(inverseMtx, (Vec*)&cylinder->m_radius, (Vec*)&s_cyl.m_radius);
-	PSMTXMultVecSR(inverseMtx, move, &s_mvec);
-
-	s_cyl.m_top.y = cylinder->m_top.y;
-	margin = lbl_8032F960 + s_cyl.m_top.y;
-
-	minValue = s_cyl.m_direction.x;
-	maxValue = s_cyl.m_bottom.x;
-	if (maxValue < minValue) {
-		minValue = s_cyl.m_bottom.x;
-		maxValue = s_cyl.m_direction.x;
-	}
-	s_cyl.m_direction2.z = maxValue + margin;
-	s_cyl.m_top.z = minValue - margin;
-
-	minValue = s_cyl.m_direction.y;
-	maxValue = s_cyl.m_bottom.y;
-	if (maxValue < minValue) {
-		minValue = s_cyl.m_bottom.y;
-		maxValue = s_cyl.m_direction.y;
-	}
-	s_cyl.m_radius2 = maxValue + margin;
-	s_cyl.m_direction2.x = minValue - margin;
-
-	minValue = s_cyl.m_direction.z;
-	maxValue = s_cyl.m_bottom.z;
-	if (maxValue < minValue) {
-		minValue = s_cyl.m_bottom.z;
-		maxValue = s_cyl.m_direction.z;
-	}
-	s_cyl.m_height2 = maxValue + margin;
-	s_cyl.m_direction2.y = minValue - margin;
-
-	s_checkHitCylinderMask = flag;
-	if (CheckHitCylinder_r(*(COctNode**)(thisBytes + 0x4)) != 0) {
-		return 1;
-	}
 	return 0;
 }
 
@@ -1992,55 +1986,47 @@ int COctTree::CheckHitCylinderNear_r(COctNode* octNode)
  */
 int COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned long flag)
 {
-	float minValue;
-	float maxValue;
-	float margin;
+	float fVar1;
+	float fVar2;
 	Mtx inverseMtx;
-	unsigned char* thisBytes = (unsigned char*)this;
-	unsigned char* mapData = *(unsigned char**)(thisBytes + 0x8);
 
-	if ((*thisBytes != 2) || (*(CMapHit**)(mapData + 0xc) == 0)) {
-		return 0;
+	if ((*reinterpret_cast<unsigned char*>(this) == 2) &&
+	    (*reinterpret_cast<CMapHit**>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0xC)) != 0)) {
+		PSMTXInverse(reinterpret_cast<MtxPtr>(Ptr(*reinterpret_cast<void**>(Ptr(this, 8)), 0xB8)), inverseMtx);
+		PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &s_cyl.m_bottom);
+		PSMTXMultVec(inverseMtx, &cylinder->m_direction, &s_cyl.m_direction);
+		PSMTXMultVecSR(inverseMtx, reinterpret_cast<Vec*>(&cylinder->m_radius), reinterpret_cast<Vec*>(&s_cyl.m_radius));
+		PSMTXMultVecSR(inverseMtx, move, &s_mvec);
+
+		s_cyl.m_top.y = cylinder->m_top.y;
+		fVar1 = s_cyl.m_direction.x;
+		fVar2 = s_cyl.m_bottom.x;
+		if (s_cyl.m_bottom.x < s_cyl.m_direction.x) {
+			fVar1 = s_cyl.m_bottom.x;
+			fVar2 = s_cyl.m_direction.x;
+		}
+		s_cyl.m_direction2.z = fVar2 + lbl_8032F960 + s_cyl.m_top.y;
+		s_cyl.m_top.z = fVar1 - (lbl_8032F960 + s_cyl.m_top.y);
+		fVar1 = s_cyl.m_direction.y;
+		fVar2 = s_cyl.m_bottom.y;
+		if (s_cyl.m_bottom.y < s_cyl.m_direction.y) {
+			fVar1 = s_cyl.m_bottom.y;
+			fVar2 = s_cyl.m_direction.y;
+		}
+		s_cyl.m_radius2 = fVar2 + lbl_8032F960 + s_cyl.m_top.y;
+		s_cyl.m_direction2.x = fVar1 - (lbl_8032F960 + s_cyl.m_top.y);
+		fVar1 = s_cyl.m_direction.z;
+		fVar2 = s_cyl.m_bottom.z;
+		if (s_cyl.m_bottom.z < s_cyl.m_direction.z) {
+			fVar1 = s_cyl.m_bottom.z;
+			fVar2 = s_cyl.m_direction.z;
+		}
+		s_cyl.m_height2 = fVar2 + lbl_8032F960 + s_cyl.m_top.y;
+		s_cyl.m_direction2.y = fVar1 - (lbl_8032F960 + s_cyl.m_top.y);
+		s_checkHitCylinderMask = flag;
+		CheckHitCylinderNear_r(*reinterpret_cast<COctNode**>(Ptr(this, 4)));
 	}
 
-	PSMTXInverse((MtxPtr)(mapData + 0xb8), inverseMtx);
-	PSMTXMultVec(inverseMtx, &cylinder->m_bottom, &s_cyl.m_bottom);
-	PSMTXMultVec(inverseMtx, &cylinder->m_direction, &s_cyl.m_direction);
-	PSMTXMultVecSR(inverseMtx, (Vec*)&cylinder->m_radius, (Vec*)&s_cyl.m_radius);
-	PSMTXMultVecSR(inverseMtx, move, &s_mvec);
-
-	s_cyl.m_top.y = cylinder->m_top.y;
-	margin = lbl_8032F960 + s_cyl.m_top.y;
-
-	minValue = s_cyl.m_direction.x;
-	maxValue = s_cyl.m_bottom.x;
-	if (maxValue < minValue) {
-		minValue = s_cyl.m_bottom.x;
-		maxValue = s_cyl.m_direction.x;
-	}
-	s_cyl.m_direction2.z = maxValue + margin;
-	s_cyl.m_top.z = minValue - margin;
-
-	minValue = s_cyl.m_direction.y;
-	maxValue = s_cyl.m_bottom.y;
-	if (maxValue < minValue) {
-		minValue = s_cyl.m_bottom.y;
-		maxValue = s_cyl.m_direction.y;
-	}
-	s_cyl.m_radius2 = maxValue + margin;
-	s_cyl.m_direction2.x = minValue - margin;
-
-	minValue = s_cyl.m_direction.z;
-	maxValue = s_cyl.m_bottom.z;
-	if (maxValue < minValue) {
-		minValue = s_cyl.m_bottom.z;
-		maxValue = s_cyl.m_direction.z;
-	}
-	s_cyl.m_height2 = maxValue + margin;
-	s_cyl.m_direction2.y = minValue - margin;
-
-	s_checkHitCylinderMask = flag;
-	CheckHitCylinderNear_r(*(COctNode**)(thisBytes + 0x4));
 	return 0;
 }
 

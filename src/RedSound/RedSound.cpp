@@ -569,15 +569,21 @@ void CRedSound::SeStopMG(int bank, int sep, int group, int kind)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801cd30c
+ * PAL Size: 108b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
+#pragma optimization_level 0
 int CRedSound::SePlay(int seID, int sepID, int unk, int volume, int pitch)
 {
-	int autoID = GetAutoID();
+	unsigned int autoID = GetAutoID();
 	CRedDriver_8032f4c0.SePlay(seID, sepID, autoID, unk, volume, pitch);
 	return autoID;
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

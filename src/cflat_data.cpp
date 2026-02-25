@@ -143,49 +143,51 @@ extern "C" CFlatData* dtor_800980B4(CFlatData* flatData, short shouldDelete)
  */
 void CFlatData::Create(void* filePtr)
 {
-	CFlatData* self;
-	int i;
-	int baseAddress;
-	int curAddress;
-	int offset;
+	CFlatData* flatData;
+	int iVar1;
+	int iVar6;
+	int iVar7;
+	int iVar8;
 	int stringCount;
+	int baseAddress;
+	int offset;
 
-	self = this;
-	for (i = 0; i < m_dataCount; i++)
+	flatData = this;
+	for (iVar8 = 0; iVar8 < m_dataCount; iVar8++)
 	{
-		if (self->m_data[0].m_data != nullptr)
+		if (flatData->m_data[0].m_data != nullptr)
 		{
-			operator delete(self->m_data[0].m_data);
-			self->m_data[0].m_data = nullptr;
+			operator delete(flatData->m_data[0].m_data);
+			flatData->m_data[0].m_data = nullptr;
 		}
-		if (self->m_data[0].m_strings != nullptr)
+		if (flatData->m_data[0].m_strings != nullptr)
 		{
-			operator delete(self->m_data[0].m_strings);
-			self->m_data[0].m_strings = (char**)nullptr;
+			operator delete(flatData->m_data[0].m_strings);
+			flatData->m_data[0].m_strings = (char**)nullptr;
 		}
-		if (self->m_data[0].m_stringBuf != nullptr)
+		if (flatData->m_data[0].m_stringBuf != nullptr)
 		{
-			operator delete(self->m_data[0].m_stringBuf);
-			self->m_data[0].m_stringBuf = (char*)nullptr;
+			operator delete(flatData->m_data[0].m_stringBuf);
+			flatData->m_data[0].m_stringBuf = (char*)nullptr;
 		}
-		self = (CFlatData*)&self->m_data[0].m_stringBuf;
+		flatData = (CFlatData*)&flatData->m_data[0].m_stringBuf;
 	}
 	m_dataCount = 0;
 
-	self = this;
-	for (i = 0; i < m_tableCount; i++)
+	flatData = this;
+	for (iVar8 = 0; iVar8 < m_tableCount; iVar8++)
 	{
-		if (self->m_tabl[0].m_strings != nullptr)
+		if (flatData->m_tabl[0].m_strings != nullptr)
 		{
-			operator delete(self->m_tabl[0].m_strings);
-			self->m_tabl[0].m_strings = (char**)nullptr;
+			operator delete(flatData->m_tabl[0].m_strings);
+			flatData->m_tabl[0].m_strings = (char**)nullptr;
 		}
-		if (self->m_tabl[0].m_stringBuf != nullptr)
+		if (flatData->m_tabl[0].m_stringBuf != nullptr)
 		{
-			operator delete(self->m_tabl[0].m_stringBuf);
-			self->m_tabl[0].m_stringBuf = (char*)nullptr;
+			operator delete(flatData->m_tabl[0].m_stringBuf);
+			flatData->m_tabl[0].m_stringBuf = (char*)nullptr;
 		}
-		self = (CFlatData*)&self->m_data[0].m_numStrings;
+		flatData = (CFlatData*)&flatData->m_data[0].m_numStrings;
 	}
 	m_tableCount = 0;
 
@@ -212,13 +214,13 @@ void CFlatData::Create(void* filePtr)
 					memcpy(m_mesBuffer, chunkFile.GetAddress(), chunk.m_size);
 
 					baseAddress = (int)chunkFile.GetAddress();
-					self = this;
-					for (i = 0; i < m_mesCount; i++)
+					flatData = this;
+					for (iVar7 = 0; iVar7 < m_mesCount; iVar7++)
 					{
-						curAddress = (int)chunkFile.GetAddress();
-						self->m_mesPtr[0] = m_mesBuffer + (curAddress - baseAddress);
+						iVar6 = (int)chunkFile.GetAddress();
+						flatData->m_mesPtr[0] = m_mesBuffer + (iVar6 - baseAddress);
 						chunkFile.GetString();
-						self = (CFlatData*)self->m_data;
+						flatData = (CFlatData*)flatData->m_data;
 					}
 				}
 				else if ((int)chunk.m_id < 0x4D455320)
@@ -249,11 +251,10 @@ void CFlatData::Create(void* filePtr)
 
 							baseAddress = (int)chunkFile.GetAddress();
 							offset = 0;
-							for (i = 0; i < m_data[m_dataCount].m_numStrings; i++)
+							for (iVar7 = 0; (iVar1 = m_dataCount, iVar7 < m_data[iVar1].m_numStrings); iVar7++)
 							{
-								curAddress = (int)chunkFile.GetAddress();
-								*(char**)((int)m_data[m_dataCount].m_strings + offset) =
-									m_data[m_dataCount].m_stringBuf + (curAddress - baseAddress);
+								iVar6 = (int)chunkFile.GetAddress();
+								*(char**)((int)m_data[iVar1].m_strings + offset) = m_data[iVar1].m_stringBuf + (iVar6 - baseAddress);
 								chunkFile.GetString();
 								offset += 4;
 							}
@@ -272,19 +273,24 @@ void CFlatData::Create(void* filePtr)
 					memcpy(m_tabl[m_tableCount].m_stringBuf, chunkFile.GetAddress(), chunk.m_size);
 
 					baseAddress = (int)chunkFile.GetAddress();
-					i = 0;
+					iVar7 = 0;
 					offset = 0;
-					while (m_tabl[m_tableCount].m_numEntries > i)
+					while (true)
 					{
-						curAddress = (int)chunkFile.GetAddress();
-						*(char**)((int)m_tabl[m_tableCount].m_strings + offset) =
-							m_tabl[m_tableCount].m_stringBuf + (curAddress - baseAddress);
+						iVar1 = m_tableCount;
+						if (m_tabl[iVar1].m_numEntries <= iVar7)
+						{
+							break;
+						}
+
+						iVar6 = (int)chunkFile.GetAddress();
+						*(char**)((int)m_tabl[iVar1].m_strings + offset) = m_tabl[iVar1].m_stringBuf + (iVar6 - baseAddress);
 						chunkFile.GetString();
 						offset += 4;
-						i++;
+						iVar7++;
 					}
 
-					m_tableCount++;
+					m_tableCount = iVar1 + 1;
 				}
 			}
 			chunkFile.PopChunk();

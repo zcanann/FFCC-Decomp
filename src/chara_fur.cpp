@@ -18,6 +18,7 @@ public:
 extern "C" unsigned char Graphic[];
 extern "C" void Printf__8CGraphicFUlUlPce(void*, unsigned long, unsigned long, const char*, ...);
 extern "C" unsigned char Game[];
+extern "C" unsigned char m_mogWork[];
 extern "C" char lbl_801DB694[];
 extern "C" char lbl_801DB6B4[];
 
@@ -274,16 +275,15 @@ void CChara::CalcMogScore()
  */
 void CChara::ChangeMogMode(int mogMode)
 {
-	int* const mogSoundHandle = reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x200c);
-
 	if (mogMode != 0) {
-		memset(reinterpret_cast<unsigned char*>(this) + 0x1FE8, 0, 0x2C);
+		memset(m_mogWork, 0, 0x2C);
 		*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x200c) = 0x140;
 		*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x2010) = 0xE0;
 		*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x2004) = 0;
 		return;
 	}
 
+	int* const mogSoundHandle = reinterpret_cast<int*>(m_mogWork + 0x24);
 	if (*mogSoundHandle != 0) {
 		Sound.StopSe(*mogSoundHandle);
 		*mogSoundHandle = 0;

@@ -72,9 +72,10 @@ const char* CMenuPcs::GetMcStr(int index)
  */
 const char* const* CMenuPcs::GetMcWinMessBuff(int group)
 {
+    const unsigned char languageId = Game.game.m_gameWork.m_languageId;
     switch (group) {
     case 0:
-        switch (Game.game.m_gameWork.m_languageId) {
+        switch (languageId) {
         case 2:
             return lbl_80215D14;
         case 3:
@@ -87,7 +88,7 @@ const char* const* CMenuPcs::GetMcWinMessBuff(int group)
             return lbl_80215C28;
         }
     case 1:
-        switch (Game.game.m_gameWork.m_languageId) {
+        switch (languageId) {
         case 2:
             return lbl_8021636C;
         case 3:
@@ -100,7 +101,7 @@ const char* const* CMenuPcs::GetMcWinMessBuff(int group)
             return lbl_80216330;
         }
     default:
-        switch (Game.game.m_gameWork.m_languageId) {
+        switch (languageId) {
         case 2:
             return lbl_80216140;
         case 3:
@@ -144,7 +145,7 @@ const char* CMenuPcs::GetWinMess(int index)
  */
 int CMenuPcs::GetYesNoXPos(int right)
 {
-    const unsigned int languageId = Game.game.m_gameWork.m_languageId;
+    const unsigned char languageId = Game.game.m_gameWork.m_languageId;
     const char* yesText;
     if (languageId == 3) {
         yesText = lbl_80215E00[13];
@@ -188,7 +189,7 @@ int CMenuPcs::GetYesNoXPos(int right)
  */
 int CMenuPcs::GetSlotABXPos(int right)
 {
-    const unsigned int languageId = Game.game.m_gameWork.m_languageId;
+    const unsigned char languageId = Game.game.m_gameWork.m_languageId;
     const char* slotAText;
     if (languageId == 3) {
         slotAText = lbl_80215E00[2];

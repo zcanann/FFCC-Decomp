@@ -27,7 +27,6 @@ extern unsigned short DAT_8032eed0;
 extern unsigned char MenuPcs[];
 extern unsigned char PartPcs[];
 extern unsigned char PartMng[];
-extern unsigned char Sound[];
 extern void* Graphic;
 extern void* ppvAmemCacheSet;
 
@@ -501,7 +500,7 @@ void CShopMenu::Calc()
     switch (mode) {
     case 0:
         if (timer == 1) {
-            PlaySe__6CSoundFiiii(Sound, 5, 0x40, 0x7F, 0);
+            PlaySe__6CSoundFiiii((void*)&Sound, 5, 0x40, 0x7F, 0);
         }
         ShopMenuFloat(this, 0x1C) = static_cast<float>(timer) * 0.125f;
         if (timer == 8) {
@@ -514,20 +513,20 @@ void CShopMenu::Calc()
             if (choice > 2) {
                 choice = 0;
             }
-            PlaySe__6CSoundFiiii(Sound, 1, 0x40, 0x7F, 0);
+            PlaySe__6CSoundFiiii((void*)&Sound, 1, 0x40, 0x7F, 0);
         } else if ((buttons & 8) != 0) {
             --choice;
             if (choice > 2) {
                 choice = 2;
             }
-            PlaySe__6CSoundFiiii(Sound, 1, 0x40, 0x7F, 0);
+            PlaySe__6CSoundFiiii((void*)&Sound, 1, 0x40, 0x7F, 0);
         } else if ((buttons & 0x100) != 0) {
-            PlaySe__6CSoundFiiii(Sound, 2, 0x40, 0x7F, 0);
+            PlaySe__6CSoundFiiii((void*)&Sound, 2, 0x40, 0x7F, 0);
             this->SetMode(2);
         }
 
         if ((buttons & 0x200) != 0) {
-            PlaySe__6CSoundFiiii(Sound, 3, 0x40, 0x7F, 0);
+            PlaySe__6CSoundFiiii((void*)&Sound, 3, 0x40, 0x7F, 0);
             this->SetMode(2);
             choice = 2;
         }
@@ -551,7 +550,7 @@ void CShopMenu::Calc()
         break;
     case 3:
         if (timer == 0) {
-            PlaySe__6CSoundFiiii(Sound, 5, 0x40, 0x7F, 0);
+            PlaySe__6CSoundFiiii((void*)&Sound, 5, 0x40, 0x7F, 0);
         }
         ShopMenuFloat(this, 0x1C) = static_cast<float>(timer) * 0.125f;
         if (timer == 8) {
@@ -562,19 +561,19 @@ void CShopMenu::Calc()
         if (subMode == 0) {
             this->SelectItemIdx();
             if ((buttons & 0x200) != 0) {
-                PlaySe__6CSoundFiiii(Sound, 3, 0x40, 0x7F, 0);
+                PlaySe__6CSoundFiiii((void*)&Sound, 3, 0x40, 0x7F, 0);
                 this->SetMode(5);
             }
         } else if (subMode == 1) {
             this->SelectFigure();
             if ((buttons & 0x200) != 0) {
-                PlaySe__6CSoundFiiii(Sound, 3, 0x40, 0x7F, 0);
+                PlaySe__6CSoundFiiii((void*)&Sound, 3, 0x40, 0x7F, 0);
                 subMode = 0;
             }
         } else if (subMode == 2) {
             this->SelectYesNo();
             if ((buttons & 0x200) != 0) {
-                PlaySe__6CSoundFiiii(Sound, 3, 0x40, 0x7F, 0);
+                PlaySe__6CSoundFiiii((void*)&Sound, 3, 0x40, 0x7F, 0);
                 subMode = 1;
             }
         }
@@ -588,7 +587,7 @@ void CShopMenu::Calc()
         break;
     case 6:
         if (timer == 0) {
-            PlaySe__6CSoundFiiii(Sound, 5, 0x40, 0x7F, 0);
+            PlaySe__6CSoundFiiii((void*)&Sound, 5, 0x40, 0x7F, 0);
         }
         ShopMenuFloat(this, 0x1C) = static_cast<float>(timer) * 0.125f;
         if (timer == 8) {
@@ -599,13 +598,13 @@ void CShopMenu::Calc()
         if (subMode == 0) {
             this->SelectItemIdx();
             if ((buttons & 0x200) != 0) {
-                PlaySe__6CSoundFiiii(Sound, 3, 0x40, 0x7F, 0);
+                PlaySe__6CSoundFiiii((void*)&Sound, 3, 0x40, 0x7F, 0);
                 this->SetMode(8);
             }
         } else if (subMode == 2) {
             this->SelectYesNo();
             if ((buttons & 0x200) != 0) {
-                PlaySe__6CSoundFiiii(Sound, 3, 0x40, 0x7F, 0);
+                PlaySe__6CSoundFiiii((void*)&Sound, 3, 0x40, 0x7F, 0);
                 subMode = 1;
             }
         }

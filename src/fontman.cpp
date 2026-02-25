@@ -799,7 +799,7 @@ void CFont::getNextChar(char **, unsigned short*)
  */
 void* CFont::operator new(unsigned long size, CMemory::CStage* stage, char* file, int line)
 {
-	return ::operator new(size, stage, file, line);
+	return _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, size, FontMan.m_stage, file, line, 0);
 }
 
 /*

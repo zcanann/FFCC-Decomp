@@ -25,12 +25,11 @@ struct pppCrystal2 {
 struct UnkB {
     s32 m_graphId;
     s32 m_dataValIndex;
-    u16 m_initWOrk;
-    u8 _pad0[2];
+    s32 m_initWOrk;
+    f32 _unk0C;
     f32 m_stepValue;
-    u8 m_arg3;
-    u8 m_payload[6];
-    u8 _pad1[1];
+    u8 m_payload[8];
+    f32 m_perspectiveScale;
 };
 
 struct UnkC {

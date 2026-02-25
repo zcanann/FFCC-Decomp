@@ -114,20 +114,17 @@ void GXSetDispCopySrc(u16 left, u16 top, u16 wd, u16 ht) {
 
 
 void GXSetTexCopySrc(u16 left, u16 top, u16 wd, u16 ht) {
-    GXData* gx;
-
     CHECK_GXBEGIN(1263, "GXSetTexCopySrc");
-    gx = __GXData;
 
-    gx->cpTexSrc = 0;
-    OLD_SET_REG_FIELD(1266, gx->cpTexSrc, 10, 0, left);
-    OLD_SET_REG_FIELD(1267, gx->cpTexSrc, 10, 10, top);
-    OLD_SET_REG_FIELD(1267, gx->cpTexSrc, 8, 24, 0x49);
+    __GXData->cpTexSrc = 0;
+    OLD_SET_REG_FIELD(1266, __GXData->cpTexSrc, 10, 0, left);
+    OLD_SET_REG_FIELD(1267, __GXData->cpTexSrc, 10, 10, top);
+    OLD_SET_REG_FIELD(1267, __GXData->cpTexSrc, 8, 24, 0x49);
 
-    gx->cpTexSize = 0;
-    OLD_SET_REG_FIELD(1271, gx->cpTexSize, 10, 0, wd - 1);
-    OLD_SET_REG_FIELD(1272, gx->cpTexSize, 10, 10, ht - 1);
-    OLD_SET_REG_FIELD(1272, gx->cpTexSize, 8, 24, 0x4A);
+    __GXData->cpTexSize = 0;
+    OLD_SET_REG_FIELD(1271, __GXData->cpTexSize, 10, 0, wd - 1);
+    OLD_SET_REG_FIELD(1272, __GXData->cpTexSize, 10, 10, ht - 1);
+    OLD_SET_REG_FIELD(1272, __GXData->cpTexSize, 8, 24, 0x4A);
 }
 
 /*

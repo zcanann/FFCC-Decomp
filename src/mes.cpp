@@ -625,38 +625,43 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
 {
 	u32 width = 0;
 	u8* src = (u8*)text;
+	bool continueDraw = true;
 	float lineStartX = font->posX;
 
-	while (true)
+	while (continueDraw)
 	{
-		u8 ch = *src++;
+		u8 ch = *src;
+		u8* next = src + 1;
+
 		if (ch == 0)
 		{
-			break;
+			continueDraw = false;
+			src = next;
 		}
-
-		if (ch == 0xFF)
+		else if (ch == 0xFF)
 		{
-			u8 tag = *src++;
+			u8 tag = *next;
+			src += 2;
 			if (tag == 0xA1)
 			{
-				break;
+				continueDraw = false;
 			}
-			if ((tag == 0xA0) && (breakOnLineTag != 0))
+			else if ((tag == 0xA0) && (breakOnLineTag != 0))
 			{
 				SetPosX__5CFontFf(lineStartX, font);
-				SetPosY__5CFontFf((float)lineBaseY + font->posY + (float)font->m_glyphWidth * font->scaleY, font);
+				SetPosY__5CFontFf((float)(double)lineBaseY + font->posY + (float)(double)font->m_glyphWidth * font->scaleY, font);
 			}
 		}
 		else
 		{
 			if (drawChars != 0)
 			{
-				Draw__5CFontFUs(font, ch);
+				Draw__5CFontFUs(font, (unsigned short)ch);
 			}
-			width = (u32)((float)width + GetWidth__5CFontFUs(font, ch));
+			width = (u32)((double)(float)(int)width + (double)GetWidth__5CFontFUs(font, (unsigned short)ch));
+			src = next;
 		}
 	}
 
-	return width;
+	return (unsigned long)width;
 }

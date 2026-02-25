@@ -946,9 +946,9 @@ void CMemory::CopyToAMemorySync(void* source, void* dest, unsigned long size)
  */
 void CMemory::CopyFromAMemorySync(void* source, void* dest, unsigned long size)
 {
+    CStopWatch watch(reinterpret_cast<char*>(-1));
     int dmaId = DMAEntry__9CRedSoundFiiiiiPFPv_vPv(&Sound, 0, 1, reinterpret_cast<int>(source),
                                                    reinterpret_cast<int>(dest), static_cast<int>(size), 0, 0);
-    CStopWatch watch((char*)-1);
     System.DumpMapFile(&watch);
     watch.Start();
     while (DMACheck__9CRedSoundFi(&Sound, dmaId) != 0) {
@@ -1354,8 +1354,8 @@ void CMemory::CStage::drawHeapBar(int y)
 void CMemory::CStage::drawHeapTitle(int y)
 {
     int node = (stageGetAllocationMode(this) == 2) ? stageGetHeapHead(this) : *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
-    unsigned int totalUnuse = 0;
-    unsigned int maxUnuse = 0;
+    int totalUnuse = 0;
+    int maxUnuse = 0;
     int prev = *reinterpret_cast<int*>(node + 4);
     char line[264];
     char* sourceName = reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(this) + 0x10);
@@ -1365,19 +1365,25 @@ void CMemory::CStage::drawHeapTitle(int y)
             int srcLen = strlen(sourceName);
             strcpy(line, sourceName + ((srcLen - 12U) & ~((srcLen - 12U) >> 31)));
             Graphic.DrawDebugStringDirect(0x10, static_cast<unsigned short>(y), line, 8);
+            int maxRound = 0;
+            if ((maxUnuse < 0) && ((maxUnuse & 0x3ff) != 0)) {
+                maxRound = 1;
+            }
+            int totalRound = 0;
+            if ((totalUnuse < 0) && ((totalUnuse & 0x3ff) != 0)) {
+                totalRound = 1;
+            }
+
             sprintf(line, s__4d__4d__4d_801d6800, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x124),
-                    (static_cast<int>(totalUnuse) >> 10) +
-                        static_cast<unsigned int>((static_cast<int>(totalUnuse) < 0) && ((totalUnuse & 0x3ff) != 0)),
-                    (static_cast<int>(maxUnuse) >> 10) +
-                        static_cast<unsigned int>((static_cast<int>(maxUnuse) < 0) && ((maxUnuse & 0x3ff) != 0)));
-            Graphic.DrawDebugStringDirect(0x208, static_cast<unsigned short>(y), line, 8);
+                    (totalUnuse >> 10) + totalRound, (maxUnuse >> 10) + maxRound);
+            Graphic.DrawDebugStringDirect(0x208, y, line, 8);
             return;
         }
 
         if ((*reinterpret_cast<unsigned char*>(node + 2) & 4) == 0) {
-            unsigned int blockSize = static_cast<unsigned int>(*reinterpret_cast<int*>(node + 8) - (node + 0x40));
+            int blockSize = *reinterpret_cast<int*>(node + 8) - (node + 0x40);
             totalUnuse += blockSize;
-            if (static_cast<int>(maxUnuse) < static_cast<int>(blockSize)) {
+            if (maxUnuse < blockSize) {
                 maxUnuse = blockSize;
             }
         }

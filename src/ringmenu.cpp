@@ -12,9 +12,12 @@
 #include <math.h>
 
 extern "C" int __cntlzw(unsigned int);
+extern "C" void* __vt__9CRingMenu[];
 extern "C" int _GetIdxCmdList__12CCaravanWorkFv(CCaravanWork*);
 extern "C" int _GetWeaponAttrib__12CCaravanWorkFi(CCaravanWork*, int);
 extern "C" int GetNextCmdListIdx__12CCaravanWorkFii(CCaravanWork*, int, int);
+extern "C" CMenu* dtor_8009B448(CMenu*, short);
+extern "C" void __dl__FPv(void*);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(void*, int);
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(void*, int);
 extern "C" void DrawInit__8CMenuPcsFv(void*);

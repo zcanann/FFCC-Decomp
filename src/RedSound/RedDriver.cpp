@@ -65,6 +65,7 @@ extern int DAT_8032f440;
 extern int DAT_8032f43c;
 extern int DAT_8032f3bc;
 extern int DAT_8032f3b8;
+extern int DAT_8032f470;
 extern int DAT_8032e12c;
 extern int DAT_8032f458;
 extern int DAT_8032daac;
@@ -1063,22 +1064,51 @@ void _DmaExecute()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801be4cc
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _DmaExecuteThread(void*)
+int _DmaExecuteThread(void*)
 {
-	// TODO
+    DAT_8032f3c4 |= 2;
+    DAT_8032f488 = 0;
+    while ((DAT_8032f484 = 0, DAT_8032f3c0 != 0)) {
+        OSWaitSemaphore(&DAT_8032ddd8);
+        DAT_8032f484 = 1;
+        if (DAT_8032f3c0 != 0) {
+            _DmaExecute();
+        }
+    }
+    DAT_8032f3c4 &= ~2;
+    return 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801be550
+ * PAL Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _MusicSkipThread(void*)
+int _MusicSkipThread(void*)
 {
-	// TODO
+    DAT_8032f3c4 |= 8;
+    DAT_8032f470 = 0;
+    while (DAT_8032f3c0 != 0) {
+        OSWaitSemaphore(&DAT_8032e120);
+        if (DAT_8032f3c0 != 0) {
+            MusicSkipFunction();
+        }
+        while (OSTryWaitSemaphore(&DAT_8032e120) > 0) {
+        }
+    }
+    DAT_8032f3c4 &= ~8;
+    return 0;
 }
 
 /*

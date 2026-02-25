@@ -541,7 +541,7 @@ static void EXIIntrruptHandler(__OSInterrupt interrupt, OSContext* context) {
     s16 exiInterrupt;
 
     exiInterrupt = interrupt;
-    chan = (exiInterrupt - 9) / 3;
+    chan = ((u32)exiInterrupt - 9) / 3;
 
     ASSERTLINE(1071, 0 <= chan && chan < MAX_CHAN);
     REG(chan, 0) = (REG(chan, 0) & 0x7F5) | 2;
@@ -590,7 +590,7 @@ static void EXTIntrruptHandler(__OSInterrupt interrupt, OSContext* context) {
     EXICallback callback;
     EXIControl* exi;
 
-    chan = (interrupt - 11) / 3;
+    chan = ((u32)interrupt - 11) / 3;
 
     ASSERTLINE(1147, 0 <= chan && chan < 2);
     __OSMaskInterrupts(0x500000U >> (chan * 3));
@@ -600,7 +600,6 @@ static void EXTIntrruptHandler(__OSInterrupt interrupt, OSContext* context) {
 
     if (callback) {
         OSContext exceptionContext;
-        
         OSClearContext(&exceptionContext);
         OSSetCurrentContext(&exceptionContext);
         exi->extCallback = NULL;

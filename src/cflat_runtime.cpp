@@ -1143,10 +1143,12 @@ void CFlatRuntime::ClearParmanent()
 {
 	int valueOffset = 0;
 	int varIndex = 0;
+	u32 clearValue = 0;
 
 	while (varIndex < *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x4)) {
-		if ((*(reinterpret_cast<u8*>(*reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x8)) + valueOffset + 1) & 0x20) != 0) {
-			*reinterpret_cast<u32*>(reinterpret_cast<u8*>(*reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0xC)) + valueOffset) = 0;
+		u8* variableDefs = reinterpret_cast<u8*>(*reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x8));
+		if ((variableDefs[valueOffset + 1] & 0x20) != 0) {
+			*reinterpret_cast<u32*>(reinterpret_cast<u8*>(*reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0xC)) + valueOffset) = clearValue;
 		}
 		valueOffset += 4;
 		varIndex += 1;

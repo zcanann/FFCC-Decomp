@@ -174,7 +174,6 @@ static asm void Config48MB(void) {
     rfi
 }
 
-#ifdef __GEKKO__
 static asm void RealMode(register u32 addr) {
     nofralloc
     clrlwi addr, addr, 2
@@ -184,7 +183,6 @@ static asm void RealMode(register u32 addr) {
     mtsrr1 addr
     rfi
 }
-#endif
 
 void __OSInitMemoryProtection(void) {
 #ifndef DEBUG

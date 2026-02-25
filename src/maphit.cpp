@@ -573,7 +573,7 @@ int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned
     unsigned int endFace = static_cast<unsigned short>(startFace + faceCount);
     int faceOffset = static_cast<int>(faceIndex) * 0x50;
     CMapHitFace* savedFaces = m_faces;
-    const unsigned short savedFaceCount = m_faceCount;
+    unsigned short savedFaceCount = m_faceCount;
 
     while (faceIndex < endFace) {
         m_faces = reinterpret_cast<CMapHitFace*>(Ptr(savedFaces, faceOffset));

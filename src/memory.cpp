@@ -946,9 +946,9 @@ void CMemory::CopyToAMemorySync(void* source, void* dest, unsigned long size)
  */
 void CMemory::CopyFromAMemorySync(void* source, void* dest, unsigned long size)
 {
+    CStopWatch watch(reinterpret_cast<char*>(-1));
     int dmaId = DMAEntry__9CRedSoundFiiiiiPFPv_vPv(&Sound, 0, 1, reinterpret_cast<int>(source),
                                                    reinterpret_cast<int>(dest), static_cast<int>(size), 0, 0);
-    CStopWatch watch((char*)-1);
     System.DumpMapFile(&watch);
     watch.Start();
     while (DMACheck__9CRedSoundFi(&Sound, dmaId) != 0) {

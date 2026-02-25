@@ -44,6 +44,8 @@ extern "C" asm void MTX44MultVec4__5CMathFPA4_fP3VecP5Vec4d(register void*, regi
                                                             register void*);
 extern "C" int GetGBAStart__6JoyBusFi(void*, int);
 extern "C" int IsInitSend__6JoyBusFi(void*, int);
+extern "C" void dtor_8009B448(CMenu*, int);
+extern void* vtable_CRingMenu;
 
 extern unsigned char CFlat[];
 extern unsigned char Chara[];
@@ -199,12 +201,24 @@ CRingMenu::~CRingMenu()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a52dc
+ * PAL Size: 116b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRingMenu::Create()
+extern "C" CRingMenu* Create__9CRingMenuFv(CRingMenu* ringMenu, short freeFlag)
 {
-	// TODO
+	if (ringMenu != 0) {
+		*reinterpret_cast<void**>(ringMenu) = &vtable_CRingMenu;
+		reinterpret_cast<void (*)(CRingMenu*)>(reinterpret_cast<void**>(ringMenu)[4])(ringMenu);
+		dtor_8009B448(ringMenu, 0);
+		if (freeFlag > 0) {
+			operator delete(ringMenu);
+		}
+	}
+	return ringMenu;
 }
 
 /*

@@ -1,4 +1,5 @@
 #include "ffcc/p_minigame.h"
+#include "ffcc/joybus.h"
 #include "ffcc/file.h"
 #include "ffcc/memory.h"
 
@@ -6,6 +7,7 @@
 #include <string.h>
 
 extern CMiniGamePcs MiniGamePcs;
+extern unsigned char CFlat[];
 extern unsigned char PartPcs[];
 extern unsigned int lbl_802121A8[];
 extern unsigned int lbl_802121B4[];
@@ -16,6 +18,9 @@ extern int DAT_800000f8;
 extern char DAT_80331bf0[];
 
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
+extern "C" int sprintf(char* buffer, const char* format, ...);
+extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+    void* flatRuntime, int object, int a, int b, int c, void* inStack, void* outStack);
 
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dl__FPv(void*);
@@ -520,12 +525,184 @@ void CMiniGamePcs::OpenCallback(MgGbaThreadParam*, void*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801287f0
+ * PAL Size: 1244b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMiniGamePcs::calc()
+void CMiniGamePcs::calc(void)
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+
+    if (self[0x1348] == 0)
+    {
+        return;
+    }
+
+    if (self[0x1348] == 1)
+    {
+        Joybus.ExitThread();
+        self[0x1348] = 2;
+    }
+
+    if (self[0x1348] == 2)
+    {
+        if (!Joybus.IsThreadRunning())
+        {
+            char managerFile[260];
+            char managerSpFile[256];
+
+            sprintf(managerFile, "%s/mgr%02d.bin", "dvd/minigame", self[0x1350]);
+            sprintf(managerSpFile, "%s/mgrsp%02d.bin", "dvd/minigame", self[0x1350]);
+
+            if ((unsigned int)System.m_execParam > 2)
+            {
+                Printf__7CSystemFPce(&System, "MINIGAME FILE=%s SPFILE=%s\n", managerFile, managerSpFile);
+            }
+
+            MiniGameGo(managerFile, managerSpFile);
+            self[0x1348] = 3;
+        }
+
+        return;
+    }
+
+    if (self[0x1348] != 3)
+    {
+        return;
+    }
+
+    if (self[0x6496] != 0)
+    {
+        int raceEndStack[3];
+
+        Printf__7CSystemFPce(&System, "--------------------------------\n");
+        for (int i = 0; i < 4; i++)
+        {
+            Printf__7CSystemFPce(&System, "P%d = %d\n", i + 1, static_cast<int>(self[0x6498 + i]));
+        }
+        Printf__7CSystemFPce(&System, "--------------------------------\n");
+
+        raceEndStack[0] = 0x3000;
+        raceEndStack[1] = 0;
+        raceEndStack[2] = 0;
+        SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+            &CFlat, 0, 1, 8, 3, raceEndStack, 0);
+        self[0x6496] = 0;
+    }
+
+    if (self[0x6497] != 0)
+    {
+        int continueStack[3];
+
+        self[0x6498] = 0xFF;
+        self[0x6499] = 0xFF;
+        self[0x649A] = 0xFF;
+        self[0x649B] = 0xFF;
+        if ((unsigned int)System.m_execParam > 2)
+        {
+            Printf__7CSystemFPce(&System, "MINI GAME CONTINUE\n");
+        }
+
+        continueStack[0] = 0x3002;
+        continueStack[1] = 0;
+        continueStack[2] = 0;
+        SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+            &CFlat, 0, 1, 8, 3, continueStack, 0);
+        self[0x6497] = 0;
+    }
+
+    if (self[0x6495] == 0)
+    {
+        return;
+    }
+
+    if (System.m_execParam != 0)
+    {
+        Printf__7CSystemFPce(&System, "CallMiniGameParam MGR_CALL_MGR_END:START\n");
+    }
+
+    {
+        int mgrEndStack[3];
+        mgrEndStack[0] = 0x3001;
+        mgrEndStack[1] = 0;
+        mgrEndStack[2] = 0;
+        SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+            &CFlat, 0, 1, 8, 3, mgrEndStack, 0);
+    }
+
+    if (System.m_execParam != 0)
+    {
+        Printf__7CSystemFPce(&System, "CallMiniGameParam MGR_CALL_MGR_END:END\n");
+        Printf__7CSystemFPce(&System, "MiniGameEnd 0000\n");
+    }
+
+    if (*reinterpret_cast<void**>(self + 0x1354) != 0)
+    {
+        self[0x649C] = 1;
+        while (self[0x649C] != 0)
+        {
+            OSAlarm alarm;
+
+            OSCreateAlarm(&alarm);
+            OSSetAlarmTag(&alarm, 1);
+            OSThread* currentThread = OSGetCurrentThread();
+            alarm.start = reinterpret_cast<OSTime>(currentThread);
+
+            BOOL interruptLevel = OSDisableInterrupts();
+            OSSetAlarm(&alarm, (DAT_800000f8 / 4000) * 100, GbaThreadAlarmHandler);
+            OSSuspendThread(currentThread);
+            OSRestoreInterrupts(interruptLevel);
+        }
+
+        while (OSIsThreadTerminated(reinterpret_cast<OSThread*>(self + 8)) == 0)
+        {
+            OSAlarm alarm;
+
+            OSCreateAlarm(&alarm);
+            OSSetAlarmTag(&alarm, 1);
+            OSThread* currentThread = OSGetCurrentThread();
+            alarm.start = reinterpret_cast<OSTime>(currentThread);
+
+            BOOL interruptLevel = OSDisableInterrupts();
+            OSSetAlarm(&alarm, (DAT_800000f8 / 4000) * 100, GbaThreadAlarmHandler);
+            OSSuspendThread(currentThread);
+            OSRestoreInterrupts(interruptLevel);
+        }
+
+        if (*reinterpret_cast<void**>(self + 0x1354) != 0)
+        {
+            __dl__FPv(*reinterpret_cast<void**>(self + 0x1354));
+            *reinterpret_cast<void**>(self + 0x1354) = 0;
+        }
+
+        if (*reinterpret_cast<void**>(self + 0x135C) != 0)
+        {
+            __dl__FPv(*reinterpret_cast<void**>(self + 0x135C));
+            *reinterpret_cast<void**>(self + 0x135C) = 0;
+        }
+    }
+
+    self[0x134B] = 0xF;
+    if (System.m_execParam != 0)
+    {
+        Printf__7CSystemFPce(&System, "MiniGameEnd 1111\n");
+    }
+
+    Joybus.RestartThread();
+
+    if (System.m_execParam != 0)
+    {
+        Printf__7CSystemFPce(&System, "MiniGameEnd 2222\n");
+        Printf__7CSystemFPce(&System, "--------------------------------\n");
+        Printf__7CSystemFPce(&System, "     MINI GAME END \n");
+        Printf__7CSystemFPce(&System, "--------------------------------\n");
+    }
+
+    self[0x6495] = 0;
+    self[0x1348] = 0;
 }
 
 /*

@@ -71,8 +71,12 @@ extern u32 DAT_8020ee98;
 extern u32 DAT_8020ee9c;
 extern u32 DAT_8020eea0;
 extern char* PTR_s_shibuya_8020f23c[];
+extern char* PTR_s_common_8032e7a0[];
+extern int DAT_8020ef9c[];
 extern int DAT_8020f260[];
+extern char s_CMenuPcs_801d9d3c[];
 extern char s_dvd__smenu__s_tex_801d9d6c[];
+extern char s_dvd__smenu_gc22_fnt_801d9db4[];
 extern char s_dvd__smenu_gc23_fnt_801d9d8c[];
 extern char s_p_menu_cpp_801d9d80[];
 
@@ -80,6 +84,9 @@ extern "C" void* __register_global_object(void* object, void* destructor, void* 
 extern "C" void __dt__8CMenuPcsFv(void*);
 extern "C" int __cntlzw(unsigned int);
 extern "C" int sprintf(char*, const char*, ...);
+extern "C" void* memset(void*, int, unsigned long);
+extern "C" unsigned long GetInternal22Size__8CFontManFv(void*);
+extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, char*, int);
 extern "C" void Calc__5CMenuFv(CMenu*);
 extern "C" void CalcDiaryMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void calcBonus__8CMenuPcsFv(CMenuPcs*);
@@ -209,12 +216,68 @@ int CMenuPcs::GetTable(unsigned long index)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80097240
+ * PAL Size: 592b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::create()
 {
-	// TODO
+    char fontPath[0x80];
+    char texPath[0x100];
+    int* textureInfo = DAT_8020ef9c;
+    u8* self = reinterpret_cast<u8*>(this);
+
+    unsigned long menuHeapSize = 0xC4000;
+    if (FontMan.m_font != 0) {
+        menuHeapSize -= GetInternal22Size__8CFontManFv(&FontMan);
+    }
+
+    *reinterpret_cast<CMemory::CStage**>(self + 0xEC) =
+        reinterpret_cast<CMemory::CStage*>(CreateStage__7CMemoryFUlPci(
+            &Memory, menuHeapSize, s_CMenuPcs_801d9d3c, 0));
+    *reinterpret_cast<int*>(self + 0x740) = -1;
+
+    memset(self + 0x14C, 0, 0x40);
+    memset(self + 0x18C, 0, 0x1A4);
+
+    sprintf(fontPath, s_dvd__smenu_gc22_fnt_801d9db4, Game.GetLangString());
+    loadFont(0, fontPath, 0, 0);
+
+    for (int i = 0; i < 2; i++) {
+        sprintf(texPath, s_dvd__smenu__s_tex_801d9d6c, Game.GetLangString(), PTR_s_common_8032e7a0[i]);
+
+        void* fileHandle = Open__5CFileFPcUlQ25CFile3PRI(&File, texPath, 0, 0);
+        if (fileHandle != 0) {
+            Read__5CFileFPQ25CFile7CHandle(&File, fileHandle);
+            SyncCompleted__5CFileFPQ25CFile7CHandle(&File, fileHandle);
+
+            void* stage = *reinterpret_cast<int*>(self + 0x740) == 1 ? *reinterpret_cast<void**>(&MapMng)
+                                                                     : *reinterpret_cast<void**>(self + 0xEC);
+
+            CTextureSet* textureSet = new (Game.m_mainStage, s_p_menu_cpp_801d9d80, 0x182) CTextureSet;
+            *reinterpret_cast<CTextureSet**>(self + 0x14C + i * 4) = textureSet;
+            if (textureSet != 0) {
+                textureSet->Create(File.m_readBuffer, reinterpret_cast<CMemory::CStage*>(stage), 0, 0, 0, 0);
+            }
+
+            Close__5CFileFPQ25CFile7CHandle(&File, fileHandle);
+        }
+    }
+
+    for (int i = 0; i < 0x16; i++) {
+        CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(self + 0x14C + textureInfo[0] * 4);
+        const unsigned long textureIndex = static_cast<unsigned long>(textureSet->Find(reinterpret_cast<char*>(textureInfo[1])));
+        CTexture* texture = (*reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<u8*>(textureSet) + 8))[textureIndex];
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 4) =
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 4) + 1;
+        *reinterpret_cast<CTexture**>(self + 0x18C + i * 4) = texture;
+        textureInfo += 2;
+    }
+
+    changeMode(static_cast<CMenuPcs::MENUMODE>(0));
 }
 
 /*

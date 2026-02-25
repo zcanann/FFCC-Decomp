@@ -31,7 +31,7 @@ public:
     void loadWaveFrame();
     void LoadWaveASync(int, int, int);
     void CancelLoadWaveASync();
-    void IsLoadWaveASyncCompleted();
+    int IsLoadWaveASyncCompleted();
     void LoadBgm(int);
     void PlayBgm(int);
     void CrossPlayBgm(int, int);
@@ -46,7 +46,7 @@ public:
     void LoadWave(void*);
     void FreeWave(int);
     void StopAndFreeAllSe(int);
-    void PlaySe(int, int, int, int);
+    int PlaySe(int, int, int, int);
     void StopSe(int);
     void FadeOutSe(int, int);
     void ChangeSeVolume(int, int, int);

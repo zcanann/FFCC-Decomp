@@ -370,12 +370,61 @@ void CMenuPcs::loadFont(int type, char* path, int slot, int tlutMode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80096b94
+ * PAL Size: 516b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::loadTexture(char **, int, int, CMenuPcs::CTmp*, int, int, int)
+void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCount, CMenuPcs::CTmp* tmp,
+                           int textureStart, int textureCount, int stageSelect)
 {
-	// TODO
+    char texPath[0x10C];
+    int* tmpInfo = reinterpret_cast<int*>(tmp);
+    u8* self = reinterpret_cast<u8*>(this);
+
+    for (int i = 0; i < textureSetCount; i++) {
+        sprintf(texPath, s_dvd__smenu__s_tex_801d9d6c, Game.GetLangString(), *paths);
+
+        CFile::CHandle* fileHandle = File.Open(texPath, 0, CFile::PRI_LOW);
+        if (fileHandle != 0) {
+            File.Read(fileHandle);
+            File.SyncCompleted(fileHandle);
+
+            CMemory::CStage* stage = reinterpret_cast<CMemory::CStage*>(&MapMng);
+            if ((*reinterpret_cast<int*>(self + 0x740) != 1) && (stageSelect != 3)) {
+                if ((Game.m_gameWork.m_menuStageMode == 0) || (stageSelect == 0)) {
+                    stage = *reinterpret_cast<CMemory::CStage**>(self + 0xEC);
+                } else if (stageSelect == 1) {
+                    stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF0);
+                } else {
+                    stage = *reinterpret_cast<CMemory::CStage**>(self + 0xF4);
+                }
+            }
+
+            CTextureSet* textureSet = new (Game.m_mainStage, s_p_menu_cpp_801d9d80, 0x182) CTextureSet;
+            *reinterpret_cast<CTextureSet**>(self + 0x14C + (textureSetStart + i) * 4) = textureSet;
+
+            if (textureSet != 0) {
+                textureSet->Create(File.m_readBuffer, stage, 0, 0, 0, 0);
+            }
+
+            File.Close(fileHandle);
+        }
+
+        paths++;
+    }
+
+    for (int i = 0; i < textureCount; i++) {
+        CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(self + 0x14C + tmpInfo[0] * 4);
+        const unsigned long textureIndex = static_cast<unsigned long>(textureSet->Find(reinterpret_cast<char*>(tmpInfo[1])));
+        CTexture* texture = (*reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<u8*>(textureSet) + 8))[textureIndex];
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 4) =
+            *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 4) + 1;
+        *reinterpret_cast<CTexture**>(self + 0x18C + (textureStart + i) * 4) = texture;
+        tmpInfo += 2;
+    }
 }
 
 /*

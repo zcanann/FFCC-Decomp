@@ -1370,7 +1370,7 @@ void CMemory::CStage::drawHeapTitle(int y)
                         static_cast<unsigned int>((static_cast<int>(totalUnuse) < 0) && ((totalUnuse & 0x3ff) != 0)),
                     (static_cast<int>(maxUnuse) >> 10) +
                         static_cast<unsigned int>((static_cast<int>(maxUnuse) < 0) && ((maxUnuse & 0x3ff) != 0)));
-            Graphic.DrawDebugStringDirect(0x208, static_cast<unsigned short>(y), line, 8);
+            Graphic.DrawDebugStringDirect(0x208, y, line, 8);
             return;
         }
 

@@ -15,6 +15,7 @@ extern int lbl_8021EA10[];
 
 extern "C" {
 void* memmove(void*, const void*, unsigned long);
+void* memset(void*, int, unsigned long);
 }
 
 /*
@@ -653,12 +654,31 @@ void __MidiCtrl_KeyOffVelocity(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C8564
+ * PAL Size: 184b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_Wave(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_Wave(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    unsigned char* command;
+    unsigned int waveNo;
+    int* trackData = (int*)track;
+
+    trackData[7] = 0;
+    trackData[0x47] = 0;
+    command = (unsigned char*)*trackData;
+    *trackData = (int)(command + 1);
+    waveNo = (unsigned int)*command;
+    if ((trackData[6] != 0) && ((int)waveNo < *(int*)(trackData[6] + 8))) {
+        trackData[7] = trackData[6] + *(int*)(trackData[6] + 0x20 + waveNo * 4);
+        trackData[0x47] = *(int*)(trackData[6] + 0x10);
+        memset(trackData + 0x35, 0xffffffff, 0xc);
+    }
+    *(unsigned char*)((int)trackData + 0x14d) = 0x10;
+    trackData[0x49] = waveNo;
 }
 
 /*

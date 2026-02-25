@@ -9,6 +9,14 @@ typedef unsigned char u8;
 extern "C" int SingGetLetterAttachflg__8CMenuPcsFv(CMenuPcs*);
 extern "C" void LetterInit1__8CMenuPcsFv(CMenuPcs*);
 extern "C" void SetSingWinScl__8CMenuPcsFf(CMenuPcs*, float);
+extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" void __dla__FPv(void*);
+extern "C" void MakeAgbString__4CMesFPcPcii(char*, char*, int, int);
+extern "C" int sprintf(char*, const char*, ...);
+extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" void SetSingDynamicWinMessInfo__8CMenuPcsFiPcPcPcPcPcPcPcPc(CMenuPcs*, int, char*, char*, char*, char*, char*, char*, char*, char*);
+extern "C" void GetSingWinSize__8CMenuPcsFiPsPsi(CMenuPcs*, int, s16*, s16*, int);
+extern "C" void SetMcWinInfo__8CMenuPcsFii(CMenuPcs*, int, int);
 
 extern float FLOAT_803330bc;
 extern float FLOAT_803330f8;
@@ -342,12 +350,99 @@ void CMenuPcs::LetterItemWinClose()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 80166194
+ * PAL Size: 764b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::LetterReplyWinOpen()
+bool CMenuPcs::LetterReplyWinOpen()
 {
-	// TODO
+	unsigned int caravanWork = Game.game.m_scriptFoodBase[0];
+	unsigned char languageId = Game.game.m_gameWork.m_languageId;
+	int state = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C);
+	if (*reinterpret_cast<char*>(state + 0xC) == '\0') {
+		char lines[8][0x80];
+		char unused0[0x80];
+		char unused1[0x80];
+		char unused2[0x80];
+		char unused3[0x80];
+		char unused4[0x80];
+		char unused5[0x80];
+		char unused6[0x88];
+		memset(lines, 0, 0x400);
+
+		CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(
+			reinterpret_cast<char*>(this) + (Game.game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
+		char* srcText = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
+			0x400, stage, const_cast<char*>("menu_letter.cpp"), 0x323));
+		stage = *reinterpret_cast<CMemory::CStage**>(
+			reinterpret_cast<char*>(this) + (Game.game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
+		char* workText = reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
+			0x400, stage, const_cast<char*>("menu_letter.cpp"), 0x325));
+
+		memset(srcText, 0, 0x400);
+		memset(workText, 0, 0x400);
+
+		unsigned short msgIndex = *reinterpret_cast<unsigned short*>(
+			caravanWork + DAT_8032eee8 * 0xC + 0x3EC);
+		char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<char*>(&Game.game.m_cFlatDataArr[1]) + 0x44);
+		strcpy(srcText, mesPtr[(msgIndex & 0x7FC) >> 1]);
+		MakeAgbString__4CMesFPcPcii(workText, srcText, *reinterpret_cast<unsigned short*>(caravanWork + 0x3E2), 0);
+
+		DAT_8032eeeb = 0;
+		char* curLine = workText;
+		for (int i = 0; i < 8; ++i) {
+			char* newline = strchr(curLine, '\n');
+			if (newline != 0) {
+				*newline = '\0';
+			}
+
+			const char* right = GetMenuStr__8CMenuPcsFi(this, 0x24);
+			const char* left = GetMenuStr__8CMenuPcsFi(this, 0x23);
+			if (languageId == 2) {
+				sprintf(lines[i], "%s%s%s", left, curLine, right);
+			} else {
+				sprintf(lines[i], "%s%s%s", left, curLine, right);
+			}
+
+			DAT_8032eeeb = static_cast<unsigned char>(DAT_8032eeeb + 1);
+			if (newline == 0) {
+				break;
+			}
+			curLine = newline + 1;
+		}
+
+		__dla__FPv(srcText);
+		__dla__FPv(workText);
+
+		const char* closeText = GetMenuStr__8CMenuPcsFi(this, 3);
+		int lineIndex = DAT_8032eeeb;
+		DAT_8032eeeb = static_cast<unsigned char>(DAT_8032eeeb + 1);
+		strcat(lines[lineIndex], closeText, 0x80);
+
+		SetSingDynamicWinMessInfo__8CMenuPcsFiPcPcPcPcPcPcPcPc(
+			this,
+			DAT_8032eeeb,
+			lines[0],
+			unused0,
+			unused1,
+			unused2,
+			unused3,
+			unused4,
+			unused5,
+			unused6);
+
+		s16 winW;
+		s16 winH;
+		GetSingWinSize__8CMenuPcsFiPsPsi(this, 0, &winW, &winH, 1);
+		SetMcWinInfo__8CMenuPcsFii(this, winW, winH);
+		*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) = 0;
+		*reinterpret_cast<unsigned char*>(state + 0x9) = 0xFF;
+		*reinterpret_cast<char*>(state + 0xC) = 1;
+	}
+	return *reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) == 1;
 }
 
 /*

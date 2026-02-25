@@ -164,19 +164,10 @@ void CShopMenu::SetMode(int mode)
         break;
     case 3:
         *reinterpret_cast<int*>(self + 0x14) = 0;
-        *reinterpret_cast<int*>(self + 0x10) = 0;
-        *reinterpret_cast<int*>(self + 0x28) = -1;
-        *reinterpret_cast<int*>(self + 0x24) = 0;
-        *reinterpret_cast<int*>(self + 0x2C) = 8;
-        *reinterpret_cast<int*>(self + 0x34) = 0;
-        *reinterpret_cast<int*>(self + 0x30) = 0;
-        *reinterpret_cast<int*>(self + 0x40) = 0;
-        *reinterpret_cast<int*>(self + 0x44) = 1;
-        *reinterpret_cast<int*>(self + 0x38) = 0;
-        *reinterpret_cast<int*>(self + 0x3C) = 0;
-        break;
+        goto mode_3_6_common;
     case 6:
         *reinterpret_cast<int*>(self + 0x14) = 1;
+mode_3_6_common:
         *reinterpret_cast<int*>(self + 0x10) = 0;
         *reinterpret_cast<int*>(self + 0x28) = -1;
         *reinterpret_cast<int*>(self + 0x24) = 0;

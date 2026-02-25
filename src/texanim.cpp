@@ -1060,11 +1060,17 @@ CTexAnim::CRefData::CRefData()
 CTexAnim::CRefData::~CRefData()
 {
     *reinterpret_cast<void**>(this) = &PTR_PTR_s_CTexAnim_CRefData_801e9c3c;
-    ReleaseRef(reinterpret_cast<void**>(Ptr(this, 0x108)));
-
-    CPtrArray<CTexAnimSeq*>* const seqs = reinterpret_cast<CPtrArray<CTexAnimSeq*>*>(Ptr(this, 0x110));
-    seqs->ReleaseAndRemoveAll();
-    seqs->~CPtrArray<CTexAnimSeq*>();
+    int* ref = *reinterpret_cast<int**>(Ptr(this, 0x108));
+    if (ref != 0) {
+        const int nextRefCount = ref[1] - 1;
+        ref[1] = nextRefCount;
+        if ((nextRefCount == 0) && (ref != 0)) {
+            (*(void (**)(int*, int))(*ref + 8))(ref, 1);
+        }
+        *reinterpret_cast<void**>(Ptr(this, 0x108)) = 0;
+    }
+    reinterpret_cast<CPtrArray<CTexAnimSeq*>*>(Ptr(this, 0x110))->ReleaseAndRemoveAll();
+    reinterpret_cast<CPtrArray<CTexAnimSeq*>*>(Ptr(this, 0x110))->~CPtrArray<CTexAnimSeq*>();
 
     __dt__4CRefFv(this, 0);
 }

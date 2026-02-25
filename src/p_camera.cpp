@@ -6,6 +6,7 @@
 #include "ffcc/gobject.h"
 #include "ffcc/p_game.h"
 
+#include <math.h>
 #include <string.h>
 
 #include <dolphin/mtx.h>
@@ -26,6 +27,11 @@ extern float FLOAT_8032fa50;
 extern float FLOAT_8032fa54;
 extern float FLOAT_8032fa5c;
 extern float FLOAT_8032fa58;
+extern float FLOAT_8032fabc;
+extern float FLOAT_8032fa60;
+extern float FLOAT_8032fa64;
+extern float FLOAT_8032fa68;
+extern float FLOAT_8032fa6c;
 extern float FLOAT_8032fa70;
 extern float FLOAT_8032fa74;
 extern float FLOAT_8032fa80;
@@ -48,12 +54,15 @@ extern float FLOAT_8032faa8;
 extern float FLOAT_8032fab0;
 extern float FLOAT_8032fab4;
 extern float FLOAT_8032fab8;
+extern double DOUBLE_8032fa28;
 extern CMaterialMan MaterialMan;
 extern char DAT_801d7928[];
+extern double DOUBLE_8032fa28;
 extern unsigned char MapMng[];
 extern unsigned char CFlat[];
 extern Vec g_shadow_pos;
 extern Vec g_shadow_refpos;
+extern void* GraphicsPcs;
 extern "C" void Printf__7CSystemFPce(CSystem* system, char* format, ...);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long size, CMemory::CStage* stage, char* file, int line);
 extern "C" void __dl__FPv(void*);
@@ -66,6 +75,8 @@ extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
+extern "C" int __cntlzw(unsigned int);
+extern "C" void setViewport__11CGraphicPcsFv(void*);
 
 extern "C" {
 void pppEditGetViewPos__FP3Vec(Vec*);
@@ -220,12 +231,146 @@ void CCameraPcs::CalcQuake()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800394d0
+ * PAL Size: 1708b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCameraPcs::calc()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    unsigned char* pad = reinterpret_cast<unsigned char*>(&Pad);
+    Mtx worldMapMtx;
+    Mtx tempMtx;
+    Mtx invMtx;
+    Mtx zRotMtx;
+    Vec up;
+
+    bool useDebugPad = (Pad._452_4_ != 0) || (Pad._448_4_ != -1);
+    unsigned short buttons = 0;
+    if (!useDebugPad) {
+        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+        buttons = *reinterpret_cast<unsigned short*>(pad + 0x54);
+    }
+
+    if ((buttons & 0x20) != 0) {
+        *reinterpret_cast<unsigned int*>(self + 0x444) =
+            (static_cast<unsigned int>(__cntlzw(*reinterpret_cast<unsigned int*>(self + 0x444))) >> 5) & 0xFF;
+    }
+
+    if (*reinterpret_cast<int*>(self + 0x444) == 0) {
+        float stickH = FLOAT_8032fa34;
+        float stickV = FLOAT_8032fa34;
+        float triggerL = FLOAT_8032fa34;
+        float triggerR = FLOAT_8032fa34;
+        float moveInOut = FLOAT_8032fa34;
+
+        if (!useDebugPad) {
+            __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+            stickH = *reinterpret_cast<float*>(pad + 0x44);
+            __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+            stickV = *reinterpret_cast<float*>(pad + 0x48);
+            __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+            triggerL = *reinterpret_cast<float*>(pad + 0x36);
+            __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+            triggerR = *reinterpret_cast<float*>(pad + 0x28);
+            __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+            moveInOut = *reinterpret_cast<float*>(pad + 0x40);
+        }
+
+        *reinterpret_cast<float*>(self + 0xF8) += FLOAT_8032fa70 * FLOAT_8032fa8c * stickH;
+        *reinterpret_cast<float*>(self + 0x440) += FLOAT_8032fa70 * FLOAT_8032fabc * stickV;
+        *reinterpret_cast<float*>(self + 0x43C) += FLOAT_8032fabc * triggerL;
+
+        const double rotY = static_cast<double>(*reinterpret_cast<float*>(self + 0x440));
+        const double rotX = static_cast<double>(*reinterpret_cast<float*>(self + 0xF8));
+        const double camMove = static_cast<double>(FLOAT_8032fa8c * moveInOut);
+        const double lateral = -static_cast<double>(FLOAT_8032fabc * triggerR - FLOAT_8032fabc * triggerL);
+        const double sinX = static_cast<double>(sin(rotX));
+        const double cosX = static_cast<double>(cos(rotX));
+        const double sinY = static_cast<double>(sin(rotY));
+        const double cosY = static_cast<double>(cos(rotY));
+        const double sinXCosY = static_cast<double>(static_cast<float>(sinX * cosY));
+        const double cosXCosY = static_cast<double>(static_cast<float>(cosX * cosY));
+
+        *reinterpret_cast<float*>(self + 0xD4) =
+            static_cast<float>(sinXCosY * camMove + static_cast<double>(*reinterpret_cast<float*>(self + 0xD4)));
+        *reinterpret_cast<float*>(self + 0xD8) = static_cast<float>(
+            static_cast<double>(*reinterpret_cast<float*>(self + 0xD8)) + (sinY * camMove + lateral));
+        *reinterpret_cast<float*>(self + 0xDC) =
+            -static_cast<float>(cosXCosY * camMove - static_cast<double>(*reinterpret_cast<float*>(self + 0xDC)));
+
+        const double distance = static_cast<double>(*reinterpret_cast<float*>(self + 0x43C));
+        *reinterpret_cast<float*>(self + 0xE0) =
+            static_cast<float>(distance * sinXCosY + static_cast<double>(*reinterpret_cast<float*>(self + 0xD4)));
+        *reinterpret_cast<float*>(self + 0xE4) =
+            static_cast<float>(distance * sinY + static_cast<double>(*reinterpret_cast<float*>(self + 0xD8)));
+        *reinterpret_cast<float*>(self + 0xE8) =
+            -static_cast<float>(distance * cosXCosY - static_cast<double>(*reinterpret_cast<float*>(self + 0xDC)));
+    } else {
+        *reinterpret_cast<float*>(self + 0xF8) = static_cast<float>(atan2(
+            static_cast<double>(*reinterpret_cast<float*>(self + 0xE0) - *reinterpret_cast<float*>(self + 0xD4)),
+            static_cast<double>(*reinterpret_cast<float*>(self + 0xDC) - *reinterpret_cast<float*>(self + 0xE8))));
+    }
+
+    CalcQuake();
+
+    float fov = *reinterpret_cast<float*>(self + 0xFC);
+    if (fov < FLOAT_8032fac8 && System.m_execParam != 0) {
+        Printf__7CSystemFPce(&System, DAT_801d7928);
+        fov = FLOAT_8032fab4;
+    }
+    C_MTXPerspective(reinterpret_cast<Mtx44Ptr>(self + 0x94), fov, FLOAT_8032fa3c,
+                     *reinterpret_cast<float*>(self + 0x100),
+                     *reinterpret_cast<float*>(self + 0x104));
+    GXSetProjection(reinterpret_cast<Mtx44Ptr>(self + 0x94), GX_PERSPECTIVE);
+
+    up.x = FLOAT_8032fa34;
+    up.y = FLOAT_8032fa1c;
+    up.z = FLOAT_8032fa34;
+    PSVECDistance(reinterpret_cast<Vec*>(self + 0xE0), reinterpret_cast<Vec*>(self + 0xD4));
+    C_MTXLookAt(reinterpret_cast<MtxPtr>(self + 4), reinterpret_cast<Vec*>(self + 0xE0), &up,
+                reinterpret_cast<Vec*>(self + 0xD4));
+
+    if (Game.game.m_currentMapId == 0x21) {
+        PSMTXCopy(reinterpret_cast<MtxPtr>(self + 0x34), worldMapMtx);
+        if (*reinterpret_cast<short*>(self + 0x47E) != 0 && *reinterpret_cast<short*>(self + 0x480) != 0) {
+            const double t = static_cast<double>(FLOAT_8032fa18 * (
+                FLOAT_8032fa1c - (static_cast<float>(static_cast<double>((0x4330000000000000ULL |
+                static_cast<unsigned short>(*reinterpret_cast<short*>(self + 0x480)))) - DOUBLE_8032fa28) /
+                static_cast<float>(static_cast<double>((0x4330000000000000ULL |
+                static_cast<unsigned short>(*reinterpret_cast<short*>(self + 0x47E)))) - DOUBLE_8032fa28))));
+            const double f = static_cast<double>(FLOAT_8032fa20 * (FLOAT_8032fa1c + static_cast<float>(cos(t))));
+
+            PSMTXRotRad(tempMtx, 'x', static_cast<float>(static_cast<double>(*reinterpret_cast<float*>(self + 0x484)) * f));
+            PSMTXConcat(tempMtx, worldMapMtx, worldMapMtx);
+            PSMTXRotRad(tempMtx, 'y', static_cast<float>(static_cast<double>(*reinterpret_cast<float*>(self + 0x488)) * f));
+            PSMTXConcat(tempMtx, worldMapMtx, worldMapMtx);
+
+            const float scale = -static_cast<float>(
+                static_cast<double>(*reinterpret_cast<float*>(self + 0x48C)) * (static_cast<double>(FLOAT_8032fa1c) - f) -
+                static_cast<double>(FLOAT_8032fa1c + *reinterpret_cast<float*>(self + 0x48C)));
+            PSMTXScale(tempMtx, scale, scale, scale);
+            PSMTXConcat(tempMtx, worldMapMtx, worldMapMtx);
+
+            if (static_cast<int>(static_cast<unsigned int>(self[0x47C]) << 0x18) >= 0) {
+                *reinterpret_cast<short*>(self + 0x480) -= 1;
+            }
+        }
+        PSMTXConcat(reinterpret_cast<MtxPtr>(self + 4), worldMapMtx, reinterpret_cast<MtxPtr>(self + 4));
+    }
+
+    PSMTXRotRad(zRotMtx, 'z', *reinterpret_cast<float*>(self + 0x108));
+    PSMTXConcat(zRotMtx, reinterpret_cast<MtxPtr>(self + 4), reinterpret_cast<MtxPtr>(self + 4));
+    PSMTXInverse(reinterpret_cast<MtxPtr>(self + 4), invMtx);
+
+    *reinterpret_cast<float*>(self + 0xEC) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0xF0) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0xF4) = FLOAT_8032fa38;
+    PSMTXMultVecSR(invMtx, reinterpret_cast<Vec*>(self + 0xEC), reinterpret_cast<Vec*>(self + 0xEC));
+    *reinterpret_cast<int*>(self + 0x438) = 0;
 }
 
 /*
@@ -775,7 +920,111 @@ void CCameraPcs::drawShadowBegin()
  */
 void CCameraPcs::drawShadowEnd()
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+    Mtx44 proj;
+    Mtx ident;
+    float z;
+    int x0;
+    int y0;
+    int x1;
+    int y1;
+    int x2;
+
+    if (self[0x404] == 0) {
+        return;
+    }
+
+    C_MTXOrtho(proj, FLOAT_8032fa5c, -FLOAT_8032fa5c, FLOAT_8032fa5c, -FLOAT_8032fa5c,
+               *reinterpret_cast<float*>(self + 0x310), *reinterpret_cast<float*>(self + 0x314));
+    GXSetProjection(proj, GX_ORTHOGRAPHIC);
+    GXSetZMode(GX_TRUE, GX_ALWAYS, GX_TRUE);
+    PSMTXIdentity(ident);
+    GXLoadPosMtxImm(ident, 0);
+
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 4, 5, 1);
+    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 1, 0, 7, 0);
+    GXSetZCompLoc(GX_FALSE);
+    GXSetZMode(GX_FALSE, GX_ALWAYS, GX_TRUE);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetNumTevStages(1);
+    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPEC);
+    GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPOT);
+    GXClearVtxDesc();
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetNumTexGens(0);
+
+    {
+        GXColor black = {0, 0, 0, 0};
+        GXSetChanMatColor(GX_COLOR0A0, black);
+    }
+
+    z = *reinterpret_cast<float*>(self + 0x310) - *reinterpret_cast<float*>(self + 0x314);
+    x0 = static_cast<int>(-FLOAT_8032fa5c - FLOAT_8032fa4c);
+    y0 = static_cast<int>(FLOAT_8032fa64);
+    x1 = static_cast<int>(FLOAT_8032fa60);
+    y1 = static_cast<int>(FLOAT_8032fa68);
+    x2 = static_cast<int>(FLOAT_8032fa64);
+
+    GXBegin(GX_QUADS, GX_VTXFMT0, 16);
+    GXPosition3f32(static_cast<float>(x0), static_cast<float>(y0), z);
+    GXPosition3f32(static_cast<float>(x1), static_cast<float>(y0), z);
+    GXPosition3f32(static_cast<float>(x1), static_cast<float>(x0), z);
+    GXPosition3f32(static_cast<float>(x0), static_cast<float>(x0), z);
+
+    GXPosition3f32(static_cast<float>(y1), static_cast<float>(y0), z);
+    GXPosition3f32(static_cast<float>(x2), static_cast<float>(y0), z);
+    GXPosition3f32(static_cast<float>(x2), static_cast<float>(x0), z);
+    GXPosition3f32(static_cast<float>(y1), static_cast<float>(x0), z);
+
+    GXPosition3f32(static_cast<float>(x0), static_cast<float>(y0), z);
+    GXPosition3f32(static_cast<float>(x2), static_cast<float>(y0), z);
+    GXPosition3f32(static_cast<float>(x2), static_cast<float>(y1), z);
+    GXPosition3f32(static_cast<float>(x0), static_cast<float>(y1), z);
+
+    GXPosition3f32(static_cast<float>(x0), static_cast<float>(x1), z);
+    GXPosition3f32(static_cast<float>(x2), static_cast<float>(x1), z);
+    GXPosition3f32(static_cast<float>(x2), static_cast<float>(x0), z);
+    GXPosition3f32(static_cast<float>(x0), static_cast<float>(x0), z);
+
+    GXSetTexCopySrc(0, 0, 0x1E0, 0x1E0);
+    GXSetTexCopyDst(0x1E0, 0x1E0, GX_TF_I8, GX_FALSE);
+    GXCopyTex(*reinterpret_cast<void**>(self + 0x31C), GX_TRUE);
+    GXSetCullMode(GX_CULL_BACK);
+
+    {
+        float span = *reinterpret_cast<float*>(self + 0x36C);
+        float depthSpan = *reinterpret_cast<float*>(self + 0x314) - *reinterpret_cast<float*>(self + 0x310);
+        C_MTXLightOrtho(reinterpret_cast<MtxPtr>(self + 0x374), -span, span, -span, span,
+                        FLOAT_8032fa20, FLOAT_8032fa20, FLOAT_8032fa20, FLOAT_8032fa20);
+        PSMTXScale(reinterpret_cast<MtxPtr>(self + 0x3D4), FLOAT_8032fa34, FLOAT_8032fa34, FLOAT_8032fa34);
+        *reinterpret_cast<float*>(self + 0x3DC) = FLOAT_8032fa38 / depthSpan;
+        *reinterpret_cast<float*>(self + 0x3E0) = -(*reinterpret_cast<float*>(self + 0x310) / depthSpan);
+        *reinterpret_cast<float*>(self + 0x3EC) = *reinterpret_cast<float*>(self + 0x3DC) * FLOAT_8032fa6c;
+        *reinterpret_cast<float*>(self + 0x3F0) = *reinterpret_cast<float*>(self + 0x3E0) * FLOAT_8032fa6c;
+        *reinterpret_cast<float*>(self + 0x400) = FLOAT_8032fa1c;
+        PSMTXConcat(reinterpret_cast<MtxPtr>(self + 0x374),
+                    reinterpret_cast<MtxPtr>(self + 0x214),
+                    reinterpret_cast<MtxPtr>(self + 0x374));
+        PSMTXConcat(reinterpret_cast<MtxPtr>(self + 0x3D4),
+                    reinterpret_cast<MtxPtr>(self + 0x214),
+                    reinterpret_cast<MtxPtr>(self + 0x3A4));
+    }
+
+    GXSetColorUpdate(GX_TRUE);
+    GXSetZMode(GX_TRUE, GX_LESS, GX_TRUE);
+    GXPixModeSync();
+    GXInitTexObj(reinterpret_cast<GXTexObj*>(self + 0x324), *reinterpret_cast<void**>(self + 0x31C),
+                 0x1E0, 0x1E0, GX_TF_I8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXInitTexObjLOD(reinterpret_cast<GXTexObj*>(self + 0x324), GX_NEAR, GX_NEAR, FLOAT_8032fa34,
+                    FLOAT_8032fa34, FLOAT_8032fa34, GX_FALSE, GX_FALSE, GX_ANISO_1);
+
+    memcpy(self + 0x4, self + 0x10C, 0x108);
+    GXSetProjection(reinterpret_cast<Mtx44Ptr>(self + 0x94), GX_PERSPECTIVE);
+    setViewport__11CGraphicPcsFv(GraphicsPcs);
 }
 
 /*

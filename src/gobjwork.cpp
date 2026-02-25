@@ -1,4 +1,5 @@
 #include "ffcc/gobjwork.h"
+#include "ffcc/gbaque.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/p_game.h"
 #include "ffcc/system.h"
@@ -285,12 +286,54 @@ void CCaravanWork::IsOutOfShouki()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a2514
+ * PAL Size: 392b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::AddLetter(int, int, int, int, int, int, int, int, int)
+void CCaravanWork::AddLetter(int letterType, int senderId, int placeId, int moneyValue, int hasMoneyFlag,
+							 int hasReplyFlag, int itemA, int itemB, int itemC)
 {
-	// TODO
+	struct LetterSlot
+	{
+		unsigned int words[3];
+	};
+
+	LetterSlot* slots = reinterpret_cast<LetterSlot*>(m_letter0);
+	for (int i = 98; i >= 0; i--) {
+		slots[i + 1] = slots[i];
+	}
+
+	memset(m_letter0, 0, sizeof(m_letter0));
+
+	unsigned short* letterWords16 = reinterpret_cast<unsigned short*>(m_letter0);
+	unsigned int* letterWords32 = reinterpret_cast<unsigned int*>(m_letter0);
+	letterWords16[0] = (unsigned short)((letterWords16[0] & 0xF803) | ((letterType << 2) & 0x7FC));
+	letterWords32[0] = (letterWords32[0] & 0xFFFC01FF) | ((senderId & 0x1FF) << 9);
+	m_letter0[0] = (unsigned char)((m_letter0[0] & 0xF7) | ((hasMoneyFlag << 3) & 8));
+	if (((m_letter0[0] >> 3) & 1) != 0) {
+		int divValue = (moneyValue / 100) + (moneyValue >> 31);
+		moneyValue = divValue - (divValue >> 31);
+	}
+	letterWords16[1] = (unsigned short)((letterWords16[1] & 0xFE00) | (moneyValue & 0x1FF));
+	m_letter0[0] = (unsigned char)(m_letter0[0] & 0x7F);
+	m_letter0[0] = (unsigned char)(m_letter0[0] & 0xBF);
+	m_letter0[0] = (unsigned char)(m_letter0[0] & 0xDF);
+	m_letter0[0] = (unsigned char)((m_letter0[0] & 0xEF) | ((hasReplyFlag << 4) & 0x10));
+	letterWords16[2] = (unsigned short)itemA;
+	letterWords16[3] = (unsigned short)itemB;
+	letterWords16[4] = (unsigned short)itemC;
+	letterWords16[5] = 0;
+
+	int nextCount = m_letterCount + 1;
+	if (nextCount > 100) {
+		nextCount = 100;
+	}
+	m_letterCount = nextCount;
+
+	GbaQue.SetAddLetter(m_joybusCaravanId);
 }
 
 /*

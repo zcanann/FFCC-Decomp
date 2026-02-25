@@ -66,6 +66,7 @@ extern int DAT_8032f440;
 extern int DAT_8032f43c;
 extern int DAT_8032f3bc;
 extern int DAT_8032f3b8;
+extern int DAT_8032f470;
 extern int DAT_8032e12c;
 extern int DAT_8032f458;
 extern int DAT_8032daac;

@@ -258,7 +258,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, UnkB* param_2, UnkC* param_3)
         pppSetBlendMode__FUc(0);
         Graphic.GetBackBufferRect2(DAT_80238030, &backTexObj, 0, 0, 0x280, 0x1C0, 0, GX_LINEAR, GX_TF_RGBA8, 0);
         pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-            (u8*)pppCrystal2 + 0x88 + colorOffset, (u8*)pppCrystal2 + 0x40, (float)param_2->m_arg3,
+            (u8*)pppCrystal2 + 0x88 + colorOffset, (u8*)pppCrystal2 + 0x40, (float)param_2->m_payload[0],
             param_2->m_payload[5], param_2->m_payload[4], param_2->m_payload[1], param_2->m_payload[2], 1, 1,
             param_2->m_payload[3]);
         GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
@@ -287,12 +287,12 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, UnkB* param_2, UnkC* param_3)
         PSMTXIdentity(drawMtx);
         PSMTXConcat(pppMngStPtr->m_matrix.value, ((_pppPObject*)pppCrystal2)->m_localMatrix.value, cameraMtx);
         if (Game.game.m_currentSceneId == 7) {
-            C_MTXLightPerspective(lightMtx, FLOAT_80331fd4, FLOAT_80331fd8, *(float*)(param_2->m_payload + 8),
-                                  -*(float*)(param_2->m_payload + 8), FLOAT_80331fdc, FLOAT_80331fdc);
+            C_MTXLightPerspective(lightMtx, FLOAT_80331fd4, FLOAT_80331fd8, param_2->m_perspectiveScale,
+                                  -param_2->m_perspectiveScale, FLOAT_80331fdc, FLOAT_80331fdc);
             PSMTXConcat(ppvCameraMatrix0, cameraMtx, tmpMtx);
         } else {
-            C_MTXLightPerspective(lightMtx, CameraPcs._252_4_, FLOAT_80331fd8, *(float*)(param_2->m_payload + 8),
-                                  -*(float*)(param_2->m_payload + 8), FLOAT_80331fdc, FLOAT_80331fdc);
+            C_MTXLightPerspective(lightMtx, CameraPcs._252_4_, FLOAT_80331fd8, param_2->m_perspectiveScale,
+                                  -param_2->m_perspectiveScale, FLOAT_80331fdc, FLOAT_80331fdc);
             PSMTXConcat(CameraPcs.m_cameraMatrix, cameraMtx, tmpMtx);
         }
         PSMTXConcat(lightMtx, tmpMtx, drawMtx);

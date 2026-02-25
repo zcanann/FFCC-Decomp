@@ -522,7 +522,14 @@ CMapAnim::~CMapAnim()
         }
     }
 
-    nodeArray->~CPtrArray<CMapAnimNode*>();
+    if (nodeArray != 0) {
+        if (nodeArray->m_items != 0) {
+            __dla__FPv(nodeArray->m_items);
+        }
+        nodeArray->m_items = 0;
+        nodeArray->m_size = 0;
+        nodeArray->m_numItems = 0;
+    }
 }
 
 /*

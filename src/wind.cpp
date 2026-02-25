@@ -318,25 +318,27 @@ void CWind::getObj(int)
  */
 int CWind::AddAmbient(float dir, float speed)
 {
-	u8* freeObj;
-	u8* scan;
+	int freeIdx;
 	int group;
+	u8* scan;
+	u8* freeObj;
 
-	scan = (u8*)this;
+	freeIdx = 0;
 	group = 4;
+	scan = (u8*)this;
 	do {
 		freeObj = scan;
-		if (((s8)scan[0] >= 0) ||
-		    ((freeObj = scan + 100), (s8)freeObj[0] >= 0) ||
-		    ((freeObj = scan + 200), (s8)freeObj[0] >= 0) ||
-		    ((freeObj = scan + 300), (s8)freeObj[0] >= 0) ||
-		    ((freeObj = scan + 400), (s8)freeObj[0] >= 0) ||
-		    ((freeObj = scan + 500), (s8)freeObj[0] >= 0) ||
-		    ((freeObj = scan + 600), (s8)freeObj[0] >= 0) ||
-		    ((freeObj = scan + 700), (s8)freeObj[0] >= 0)) {
+		if (((((s8)scan[0] >= 0) || ((freeObj = scan + 100), (s8)freeObj[0] >= 0)) ||
+		     ((freeObj = scan + 200), (s8)freeObj[0] >= 0)) ||
+		    (((freeObj = scan + 300), (s8)freeObj[0] >= 0) ||
+		     ((freeObj = scan + 400), (s8)freeObj[0] >= 0)) ||
+		   (((freeObj = scan + 500), (s8)freeObj[0] >= 0) ||
+		    (((freeObj = scan + 600), (s8)freeObj[0] >= 0) ||
+		     ((freeObj = scan + 700), (s8)scan[700] >= 0)))) {
 			goto found;
 		}
 
+		freeIdx += 7;
 		scan += 800;
 		group--;
 	} while (group != 0);
@@ -344,7 +346,7 @@ int CWind::AddAmbient(float dir, float speed)
 	freeObj = 0;
 found:
 	if (freeObj == 0) {
-		System.Printf(DAT_801db568);
+		System.Printf(DAT_801db568, freeIdx);
 		return -1;
 	}
 
@@ -377,14 +379,14 @@ found:
  */
 int CWind::AddDiffuse(const Vec* pos, float radius, float dir, float speed)
 {
-	u8* freeObj;
-	u8* scan;
 	int freeIdx;
 	int group;
+	u8* scan;
+	u8* freeObj;
 
-	scan = (u8*)this;
 	freeIdx = 0;
 	group = 4;
+	scan = (u8*)this;
 	do {
 		freeObj = scan;
 		if (((((s8)scan[0] >= 0) || ((freeObj = scan + 100), (s8)freeObj[0] >= 0)) ||

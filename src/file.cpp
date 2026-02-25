@@ -430,7 +430,7 @@ void CFile::kick()
 				cur->m_completionStatus = 2;
 				readSize = (cur->m_chunkSize + 0x1F) & ~0x1F;
 
-				if (readSize > 0x100000U && System.m_execParam != 0)
+				if (readSize > 0x100000U && (unsigned int)System.m_execParam >= 1)
 				{
 					System.Printf("", cur->m_name, readSize);
 				}

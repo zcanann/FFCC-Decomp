@@ -26,9 +26,9 @@ unsigned char DAT_8032eeea = 0;
 unsigned char DAT_8032eee8 = 0;
 unsigned char DAT_8032eeec = 0;
 unsigned char DAT_8032eeeb = 0;
-unsigned int DAT_8032eef0 = 0;
+int DAT_8032eef0 = 0;
 unsigned char DAT_8032eeee = 0;
-unsigned char DAT_8032eeed = 0;
+signed char DAT_8032eeed = 0;
 int DAT_8032eef4 = 0;
 s16 DAT_8032eef8 = 0;
 s16 DAT_8032eefc = 0;
@@ -577,7 +577,7 @@ void CMenuPcs::LetterSetAttachItem(unsigned int itemIndex, int flag)
 	DAT_8032eef0 = itemIndex;
 	if (DAT_8032eeed == 0) {
 		DAT_8032eeee = static_cast<unsigned char>(itemIndex);
-		DAT_8032eef0 = static_cast<unsigned int>(*reinterpret_cast<short*>(Game.game.m_scriptFoodBase[0] + itemIndex * 2 + 0xB6));
+		DAT_8032eef0 = *reinterpret_cast<short*>(Game.game.m_scriptFoodBase[0] + itemIndex * 2 + 0xB6);
 	}
 	DAT_8032eef4 = flag;
 }

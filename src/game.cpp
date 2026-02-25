@@ -1344,43 +1344,34 @@ void CGame::LoadFinished()
  */
 int CGame::GetBossArtifact(int ratioIndex, int amount)
 {
-    s16 stageBase;
-    s16 thresholdA;
-    s16 thresholdB;
-    s16 thresholdC;
-    int stageClass;
-    int baseOffset;
-    int stageIndex;
-    int bucketCount;
-    int randomValue;
-
-    stageClass = Game.game.m_gameWork.m_bossArtifactStageTable[Game.game.m_gameWork.m_bossArtifactStageIndex];
-    if (stageClass > 2) {
-        stageClass = 2;
+    int iVar5 =
+        Game.game.m_gameWork.m_bossArtifactStageTable[Game.game.m_gameWork.m_bossArtifactStageIndex];
+    if (2 < iVar5) {
+        iVar5 = 2;
     }
 
-    stageBase = s_bossArtifactStartTable[stageClass];
-    baseOffset = (int)((float)amount * s_ratio[ratioIndex]);
+    s16 stageBase = s_bossArtifactStartTable[iVar5];
+    iVar5 = (int)((float)(u32)amount * s_ratio[ratioIndex]);
 
-    stageIndex = (int)Game.game.m_gameWork.m_bossArtifactStageIndex;
-    randomValue = (int)Game.game.m_bossArtifactBase + stageIndex * 0x168;
-    thresholdA = *(s16*)(randomValue + 0x162);
-    thresholdB = *(s16*)(randomValue + 0x164);
-    thresholdC = *(s16*)(randomValue + 0x166);
+    s16 local_38[4];
+    memset(local_38, 0, 8);
 
-    bucketCount = 3;
-    if (baseOffset < thresholdC) {
-        bucketCount = 2;
-        if (baseOffset < thresholdB) {
-            bucketCount = 1;
-            if (baseOffset < thresholdA) {
-                bucketCount = 0;
-            }
-        }
+    u32 uVar2 = Game.game.m_bossArtifactBase;
+    int stageIndex = (int)Game.game.m_gameWork.m_bossArtifactStageIndex;
+    int iVar6 = 3;
+    int iVar4 = Game.game.m_bossArtifactBase + stageIndex * 0x168;
+
+    local_38[1] = *(s16*)(iVar4 + 0x162);
+    local_38[2] = *(s16*)(iVar4 + 0x164);
+    local_38[3] = *(s16*)(iVar4 + 0x166);
+
+    if (((iVar5 < local_38[3]) && (iVar6 = 2, iVar5 < local_38[2])) && (iVar6 = 1, iVar5 < local_38[1])) {
+        iVar6 = 0;
     }
 
-    baseOffset = rand();
-    return randomValue + 0x20 + (stageBase + (baseOffset - (baseOffset / (bucketCount + 1)) * (bucketCount + 1))) * 8;
+    iVar5 = rand();
+    return uVar2 + stageIndex * 0x168 + 0x20 +
+           ((int)stageBase + (iVar5 - (iVar5 / (iVar6 + 1)) * (iVar6 + 1))) * 8;
 }
 
 /*

@@ -1773,7 +1773,7 @@ void CMemoryCardMan::EncodeData()
  */
 void CMemoryCardMan::DecodeData()
 {
-    const u32 rotAmount = 0x20 - (m_saveBuffer[0x11] & 0x1F);
+    const int rotAmount = 0x20 - (static_cast<signed char>(m_saveBuffer[0x11]) % 0x20);
     u32* ptr = reinterpret_cast<u32*>(m_saveBuffer + 0x18);
     int count = 0x5B6;
 

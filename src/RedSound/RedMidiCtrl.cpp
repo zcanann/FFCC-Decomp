@@ -920,12 +920,41 @@ void __MidiCtrl_ADSR_RR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C8F1C
+ * PAL Size: 212b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_SustainPedal(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_SustainPedal(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    unsigned int* voice;
+    int* trackData;
+
+    trackData = (int*)track;
+    if (*(char*)trackData[0] == '\0') {
+        trackData[0x3f] &= 0xFFFFFFFB;
+        voice = DAT_8032f444;
+        do {
+            if ((int*)voice[0] == trackData) {
+                voice[0x25] &= 0xFFFFFFFB;
+            }
+            voice += 0x30;
+        } while (voice < DAT_8032f444 + 0xc00);
+    } else {
+        trackData[0x3f] |= 4;
+        voice = DAT_8032f444;
+        do {
+            if ((int*)voice[0] == trackData) {
+                voice[0x25] |= 4;
+            }
+            voice += 0x30;
+        } while (voice < DAT_8032f444 + 0xc00);
+    }
+
+    trackData[0] += 1;
+    SetVoiceSwitch(track, trackData[0x3f]);
 }
 
 /*

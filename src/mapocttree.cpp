@@ -2091,50 +2091,50 @@ void CMaterialMan::InitEnv()
  */
 int CBound::CheckCross(CBound& other)
 {
-	float* a = (float*)this;
-	float* b = (float*)&other;
-	bool pass;
-	bool overlap;
+	float* self = reinterpret_cast<float*>(this);
+	float* rhs = reinterpret_cast<float*>(&other);
+	bool bVar3;
+	bool bVar4;
 
-	if (b[0] <= a[0]) {
-		if (a[0] <= b[0]) {
-			overlap = true;
-		} else {
-			overlap = a[0] <= b[3];
-		}
+	bVar4 = false;
+	if (self[0] < rhs[0]) {
+		bVar3 = rhs[0] <= self[3];
 	} else {
-		overlap = b[0] <= a[3];
-	}
-
-	pass = false;
-	if (overlap) {
-		if (b[1] <= a[1]) {
-			if (a[1] <= b[1]) {
-				overlap = true;
-			} else {
-				overlap = a[1] <= b[4];
-			}
+		if (self[0] <= rhs[0]) {
+			bVar3 = true;
 		} else {
-			overlap = b[1] <= a[4];
-		}
-
-		if (overlap) {
-			pass = true;
+			bVar3 = self[0] <= rhs[3];
 		}
 	}
 
-	if (pass) {
-		if (b[2] <= a[2]) {
-			if (a[2] <= b[2]) {
-				pass = true;
-			} else {
-				pass = a[2] <= b[5];
-			}
+	if (bVar3) {
+		if (self[1] < rhs[1]) {
+			bVar3 = rhs[1] <= self[4];
 		} else {
-			pass = b[2] <= a[5];
+			if (self[1] <= rhs[1]) {
+				bVar3 = true;
+			} else {
+				bVar3 = self[1] <= rhs[4];
+			}
 		}
 
-		if (pass) {
+		if (bVar3) {
+			bVar4 = true;
+		}
+	}
+
+	if (bVar4) {
+		if (self[2] < rhs[2]) {
+			bVar4 = rhs[2] <= self[5];
+		} else {
+			if (self[2] <= rhs[2]) {
+				bVar4 = true;
+			} else {
+				bVar4 = self[2] <= rhs[5];
+			}
+		}
+
+		if (bVar4) {
 			return 1;
 		}
 	}

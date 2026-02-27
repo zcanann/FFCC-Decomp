@@ -29,6 +29,82 @@ extern float FLOAT_80330894;
 extern float FLOAT_80330898;
 extern float FLOAT_8033089c;
 extern float FLOAT_803308a0;
+extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
+extern "C" int m_tempVar__4CMes[];
+extern "C" int sprintf(char*, const char*, ...);
+extern "C" int toupper(int);
+extern "C" int tolower(int);
+
+static const char s_mesTagUnknown[] = "Not corresponding TAG is used. %02x\n";
+static const char s_mesTagMissing[] = "This TAG is not created. %02x\n";
+static const char s_mesNumFmt[] = "%d";
+static const char s_mesFallback[] = "---";
+static const char s_mesEmpty[] = "";
+
+struct CMesFlatTableView
+{
+	int m_numEntries;
+	char** m_strings;
+	char* m_stringBuf;
+};
+
+struct CMesFlatDataView
+{
+	int m_dataCount;
+	unsigned char _pad[0x68 - 4];
+	int m_tableCount;
+	CMesFlatTableView m_tabl[8];
+};
+
+static int GetMesNibbleValue(const char* data)
+{
+	unsigned char high = (unsigned char)data[0];
+	unsigned char low = (unsigned char)data[1];
+	return (int)((unsigned int)(high << 4) | ((unsigned int)low & 0x0F));
+}
+
+static void ApplyCaseMode(char* text, int& caseMode)
+{
+	if ((text[0] == '\0') || (caseMode == 0))
+	{
+		return;
+	}
+
+	if (caseMode == 1)
+	{
+		for (char* p = text; *p != '\0'; ++p)
+		{
+			*p = (char)toupper((unsigned char)*p);
+		}
+	}
+	else if (caseMode == 2)
+	{
+		text[0] = (char)toupper((unsigned char)text[0]);
+	}
+	else
+	{
+		for (char* p = text; *p != '\0'; ++p)
+		{
+			*p = (char)tolower((unsigned char)*p);
+		}
+	}
+
+	caseMode = 0;
+}
+
+static char* GetFlatName(int tableIdx, int entryIdx)
+{
+	CMesFlatDataView* flat = (CMesFlatDataView*)&Game.game.m_cFlatDataArr[1];
+	if ((unsigned int)tableIdx >= 8U)
+	{
+		return (char*)s_mesEmpty;
+	}
+	if ((unsigned int)entryIdx >= (unsigned int)flat->m_tabl[tableIdx].m_numEntries)
+	{
+		return (char*)s_mesEmpty;
+	}
+	return flat->m_tabl[tableIdx].m_strings[entryIdx];
+}
 
 /*
  * --INFO--
@@ -604,12 +680,307 @@ void CMes::CFlag::operator= (const CMes::CFlag&)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009836c
+ * PAL Size: 2136b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMes::MakeAgbString(char*, char*, int, int)
+void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOnLineBreak)
 {
-	// TODO
+	static char* sTag54Source = (char*)s_mesEmpty;
+	static int sTag54Init = 0;
+	if (sTag54Init == 0)
+	{
+		sTag54Source = (char*)s_mesEmpty;
+		sTag54Init = 1;
+	}
+
+	int caseMode = 0;
+	int branchMode = 0;
+	const unsigned char* in = (const unsigned char*)src;
+	char* dst = out;
+
+	while (true)
+	{
+		unsigned char c = in[0];
+		if (c == 0)
+		{
+			*dst = '\0';
+			return;
+		}
+
+		if (c != 0xFF)
+		{
+			if (branchMode != 2)
+			{
+				*dst = (char)c;
+				dst++;
+			}
+			in++;
+			continue;
+		}
+
+		unsigned int tag = ((unsigned int)in[1] - 0xA0U) & 0xFFU;
+		const unsigned char* next = in + 2;
+
+		switch (tag)
+		{
+		case 0:
+			if (keepHyphenOnLineBreak == 0)
+			{
+				*dst++ = '\n';
+			}
+			else if ((dst > out) && (dst[-1] == '-'))
+			{
+				dst[-1] = '\0';
+				dst--;
+			}
+			break;
+		case 4:
+			*dst++ = 0x1D;
+			break;
+		case 5:
+			*dst++ = 0x1C;
+			break;
+		case 6:
+			*dst++ = 0x1E;
+			break;
+		case 8:
+		{
+			int varIndex = GetMesNibbleValue((const char*)in + 4);
+			const char* text = GetFlatName(5, m_tempVar__4CMes[varIndex]);
+			strcpy(dst, text);
+			dst += strlen(dst);
+			next = in + 6;
+			break;
+		}
+		case 9:
+		case 0x1D:
+		case 0x37:
+		case 0x39:
+		case 0x3B:
+		case 0x3D:
+		case 0x3F:
+		{
+			int varIndex = GetMesNibbleValue((const char*)in + 4);
+			int value = m_tempVar__4CMes[varIndex];
+			if ((tag == 9) || (tag == 0x37))
+			{
+				strcpy(dst, GetFlatName(0, value * 5 + 1));
+			}
+			else if (tag == 0x1D)
+			{
+				strcpy(dst, GetFlatName(0, value * 5));
+			}
+			else if (tag == 0x39)
+			{
+				strcpy(dst, GetFlatName(0, value * 5 + 3));
+			}
+			else if (tag == 0x3B)
+			{
+				Game.game.MakeArtItemName(dst, value, 1);
+			}
+			else if (tag == 0x3D)
+			{
+				int countIdx = GetMesNibbleValue((const char*)in + 6);
+				int count = (unsigned int)m_tempVar__4CMes[countIdx] & 0xFFFF;
+				Game.game.MakeArtItemName(dst, value, count);
+			}
+			else
+			{
+				int countIdx = GetMesNibbleValue((const char*)in + 6);
+				int count = (unsigned int)m_tempVar__4CMes[countIdx] & 0xFFFF;
+				Game.game.MakeNumItemName(dst, value, count);
+			}
+			ApplyCaseMode(dst, caseMode);
+			dst += strlen(dst);
+			next = in + 6;
+			break;
+		}
+		case 0x1E:
+		case 0x2A:
+		case 0x38:
+		case 0x3A:
+		case 0x3C:
+		case 0x3E:
+		case 0x40:
+		{
+			int varIndex = GetMesNibbleValue((const char*)in + 4);
+			int value = m_tempVar__4CMes[varIndex];
+			if ((tag == 0x2A) || (tag == 0x38))
+			{
+				strcpy(dst, GetFlatName(1, value * 5 + 1));
+			}
+			else if (tag == 0x1E)
+			{
+				strcpy(dst, GetFlatName(1, value * 5));
+			}
+			else if (tag == 0x3A)
+			{
+				strcpy(dst, GetFlatName(1, value * 5 + 3));
+			}
+			else if (tag == 0x3C)
+			{
+				Game.game.MakeArtMonName(dst, value, 1);
+			}
+			else if (tag == 0x3E)
+			{
+				int countIdx = GetMesNibbleValue((const char*)in + 6);
+				int count = (unsigned int)m_tempVar__4CMes[countIdx] & 0xFFFF;
+				Game.game.MakeArtMonName(dst, value, count);
+			}
+			else
+			{
+				int countIdx = GetMesNibbleValue((const char*)in + 6);
+				int count = (unsigned int)m_tempVar__4CMes[countIdx] & 0xFFFF;
+				Game.game.MakeNumMonName(dst, value, count);
+			}
+			ApplyCaseMode(dst, caseMode);
+			dst += strlen(dst);
+			next = in + 6;
+			break;
+		}
+		case 0x2B:
+		{
+			int varIndex = GetMesNibbleValue((const char*)in + 4);
+			strcpy(dst, GetFlatName(2, m_tempVar__4CMes[varIndex]));
+			dst += strlen(dst);
+			next = in + 6;
+			break;
+		}
+		case 0x2C:
+		{
+			int varIndex = GetMesNibbleValue((const char*)in + 4);
+			strcpy(dst, GetFlatName(3, m_tempVar__4CMes[varIndex]));
+			dst += strlen(dst);
+			next = in + 6;
+			break;
+		}
+		case 0x2D:
+		{
+			int varIndex = GetMesNibbleValue((const char*)in + 4);
+			strcpy(dst, GetFlatName(3, m_tempVar__4CMes[varIndex] + 0x3C));
+			dst += strlen(dst);
+			next = in + 6;
+			break;
+		}
+		case 0x2E:
+		{
+			int varIndex = GetMesNibbleValue((const char*)in + 2);
+			strcpy(dst, GetFlatName(5, m_tempVar__4CMes[varIndex]));
+			dst += strlen(dst);
+			next = in + 4;
+			break;
+		}
+		case 0x2F:
+			strcpy(dst, s_mesFallback);
+			dst += strlen(dst);
+			break;
+		case 0x30:
+		{
+			int varIndex = GetMesNibbleValue((const char*)in + 2);
+			sprintf(dst, s_mesNumFmt, m_tempVar__4CMes[varIndex]);
+			dst += strlen(dst);
+			next = in + 4;
+			break;
+		}
+		case 0x41:
+		{
+			unsigned char mode = (unsigned char)GetMesNibbleValue((const char*)in + 2);
+			if (mode == 1)
+			{
+				caseMode = 1;
+			}
+			else if (mode == 0)
+			{
+				caseMode = 3;
+			}
+			else
+			{
+				caseMode = 2;
+			}
+			next = in + 4;
+			break;
+		}
+		case 0x42:
+		{
+			int varIndex = GetMesNibbleValue((const char*)in + 2);
+			branchMode = (m_tempVar__4CMes[varIndex] == 1) ? 1 : 2;
+			next = in + 4;
+			break;
+		}
+		case 0x44:
+			branchMode = (playerIndex == 0) ? 1 : 2;
+			break;
+		case 0x45:
+		{
+			int varIndex = GetMesNibbleValue((const char*)in + 2);
+			int caravanIdx = m_tempVar__4CMes[varIndex];
+			branchMode = (Game.game.m_caravanWorkArr[caravanIdx].m_genderFlag == 0) ? 1 : 2;
+			next = in + 4;
+			break;
+		}
+		case 0x46:
+			if (branchMode == 1)
+			{
+				branchMode = 2;
+			}
+			else if (branchMode == 2)
+			{
+				branchMode = 1;
+			}
+			break;
+		case 0x47:
+			branchMode = 0;
+			break;
+		case 0x54:
+			strcpy(dst, sTag54Source);
+			dst += strlen(dst);
+			break;
+		case 0x0C:
+		case 0x0E:
+		case 0x13:
+		case 0x14:
+			if ((unsigned int)System.m_execParam > 1U)
+			{
+				Printf__7CSystemFPce(&System, s_mesTagMissing, tag + 0xA0);
+			}
+			break;
+		case 2:
+		case 3:
+		case 7:
+		case 0x0A:
+		case 0x0B:
+		case 0x0D:
+		case 0x0F:
+		case 0x10:
+		case 0x11:
+		case 0x12:
+		case 0x15:
+		case 0x16:
+		case 0x17:
+		case 0x18:
+		case 0x23:
+		case 0x24:
+		case 0x25:
+		case 0x26:
+		case 0x27:
+		case 0x28:
+		case 0x29:
+		case 0x55:
+			if (System.m_execParam != 0)
+			{
+				Printf__7CSystemFPce(&System, s_mesTagUnknown, tag + 0xA0);
+			}
+			break;
+		default:
+			break;
+		}
+
+		in = next;
+	}
 }
 
 /*

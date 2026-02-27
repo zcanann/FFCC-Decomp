@@ -1999,37 +1999,38 @@ _pppMngSt* CSound::FadeOutSe3D(int se3dHandle, int fadeFrames)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CSound::ChangeSe3DPos(int se3dHandle, Vec* position)
+int CSound::ChangeSe3DPos(int se3dHandle, Vec* position)
 {
+    int ret;
+
     if (se3dHandle < 0) {
         Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
-        return;
+        ret = 0;
+    } else {
+        char* se = reinterpret_cast<char*>(this) + 0x2C;
+        char* found;
+        ret = 0;
+        int count = 0x20;
+        do {
+            if ((((*se < 0) && (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
+                 ((found = se + 0x28), found[0] < 0 && (*reinterpret_cast<int*>(se + 0x2C) == se3dHandle))) ||
+                ((found = se + 0x50), found[0] < 0 && (*reinterpret_cast<int*>(se + 0x54) == se3dHandle)) ||
+                (se[0x78] < 0 && (found = se + 0x78, *reinterpret_cast<int*>(se + 0x7C) == se3dHandle))) {
+                goto found_entry;
+            }
+            ret += 3;
+            se += 0xA0;
+            count--;
+        } while (count != 0);
+        found = 0;
+found_entry:
+        if (found != 0) {
+            *reinterpret_cast<float*>(found + 0x18) = position->x;
+            *reinterpret_cast<float*>(found + 0x1C) = position->y;
+            *reinterpret_cast<float*>(found + 0x20) = position->z;
+        }
     }
-
-    u8* se = reinterpret_cast<u8*>(this) + 0x2C;
-    u8* found = 0;
-    for (int i = 0; i < 0x20; i++, se += 0xA0) {
-        if (static_cast<s8>(se[0]) < 0 && *reinterpret_cast<int*>(se + 4) == se3dHandle) {
-            found = se;
-            break;
-        }
-        if (static_cast<s8>(se[0x28]) < 0 && *reinterpret_cast<int*>(se + 0x2C) == se3dHandle) {
-            found = se + 0x28;
-            break;
-        }
-        if (static_cast<s8>(se[0x50]) < 0 && *reinterpret_cast<int*>(se + 0x54) == se3dHandle) {
-            found = se + 0x50;
-            break;
-        }
-        if (static_cast<s8>(se[0x78]) < 0 && *reinterpret_cast<int*>(se + 0x7C) == se3dHandle) {
-            found = se + 0x78;
-            break;
-        }
-    }
-
-    if (found != 0) {
-        *reinterpret_cast<Vec*>(found + 0x18) = *position;
-    }
+    return ret;
 }
 
 /*

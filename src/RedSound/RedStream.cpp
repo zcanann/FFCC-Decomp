@@ -437,8 +437,7 @@ void SetStreamVolume(int param_1, int param_2, int param_3)
 	if (param_3 < 1) {
 		stepCount = 1;
 	} else {
-		stepCount = (param_3 * 200) / 0x3c + (param_3 * 200 >> 0x1f);
-		stepCount -= stepCount >> 0x1f;
+		stepCount = (param_3 * 200) / 60;
 	}
 
 	volume = (unsigned int)(param_2 & 0x7f);
@@ -450,12 +449,12 @@ void SetStreamVolume(int param_1, int param_2, int param_3)
 	do {
 		if ((*(int*)(streamData + 0x10c) != 0) &&
 		    ((param_1 == -1) || (param_1 == *(int*)(streamData + 0x10c)))) {
-			if (stepCount < 1) {
-				*(unsigned int*)(streamData + 0xf0) = volume;
-				*(int*)(streamData + 0xf8) = 0;
-			} else {
+			if (stepCount > 0) {
 				*(int*)(streamData + 0xf4) = (int)(volume - *(int*)(streamData + 0xf0)) / stepCount;
 				*(int*)(streamData + 0xf8) = stepCount;
+			} else {
+				*(unsigned int*)(streamData + 0xf0) = volume;
+				*(int*)(streamData + 0xf8) = 0;
 			}
 		}
 		streamData += 0x130;

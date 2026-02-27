@@ -1,5 +1,4 @@
 #include "ffcc/pppYmCheckBGHeight.h"
-#include "ffcc/map.h"
 #include "ffcc/maphit.h"
 #include "ffcc/pppPart.h"
 
@@ -7,7 +6,7 @@
 
 extern int lbl_8032ED70;
 extern struct _pppMngSt* pppMngStPtr;
-extern struct CMapMng MapMng;
+extern unsigned char MapMng[];
 
 // Float constants (addresses from Ghidra)
 extern float lbl_80330ED0;
@@ -28,7 +27,7 @@ struct CMapCylinderRaw
 };
 
 extern "C" {
-    int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(struct CMapMng*, CMapCylinder*, Vec*, unsigned int);
+    int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(void*, CMapCylinder*, Vec*, unsigned int);
     void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
     void* pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
 }
@@ -86,8 +85,8 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(struct pppYmCheckBGHeight* pp
         cyl.m_top.z = lbl_80330ED0;
         cyl.m_height = lbl_80330ED0;
 
-        if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, (CMapCylinder*)&cyl, &direction, 0xffffffff) != 0) {
-            CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A78), &hitPos);
+        if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(MapMng, (CMapCylinder*)&cyl, &direction, 0xffffffff) != 0) {
+            CalcHitPosition__7CMapObjFP3Vec(*(void**)(MapMng + 0x22A78), &hitPos);
             if (!(currentY - ((float*)param_2)[3] > hitPos.y)) {
                 currentY = hitPos.y + param_2->m_unk0x8;
             }

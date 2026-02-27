@@ -182,15 +182,11 @@ void CChara::CalcMogScore()
 	const int lineDiv = lineCount / 3;
 	const int circleDiv = circleCount / 3;
 
-	*reinterpret_cast<int*>(self + 0x2024) = (*reinterpret_cast<int*>(self + 0x2024) * 100) / bitDiv;
-	*reinterpret_cast<int*>(self + 0x2028) = (*reinterpret_cast<int*>(self + 0x2028) * 100) / bitDiv;
-	*reinterpret_cast<int*>(self + 0x202C) = (*reinterpret_cast<int*>(self + 0x202C) * 100) / bitDiv;
-	*reinterpret_cast<int*>(self + 0x2030) = (*reinterpret_cast<int*>(self + 0x2030) * 100) / lineDiv;
-	*reinterpret_cast<int*>(self + 0x2034) = (*reinterpret_cast<int*>(self + 0x2034) * 100) / lineDiv;
-	*reinterpret_cast<int*>(self + 0x2038) = (*reinterpret_cast<int*>(self + 0x2038) * 100) / lineDiv;
-	*reinterpret_cast<int*>(self + 0x203C) = (*reinterpret_cast<int*>(self + 0x203C) * 100) / circleDiv;
-	*reinterpret_cast<int*>(self + 0x2040) = (*reinterpret_cast<int*>(self + 0x2040) * 100) / circleDiv;
-	*reinterpret_cast<int*>(self + 0x2044) = (*reinterpret_cast<int*>(self + 0x2044) * 100) / circleDiv;
+	for (int i = 0; i < 3; i++) {
+		*reinterpret_cast<int*>(self + 0x2024 + i * 4) = (*reinterpret_cast<int*>(self + 0x2024 + i * 4) * 100) / bitDiv;
+		*reinterpret_cast<int*>(self + 0x203C + i * 4) = (*reinterpret_cast<int*>(self + 0x203C + i * 4) * 100) / circleDiv;
+		*reinterpret_cast<int*>(self + 0x2030 + i * 4) = (*reinterpret_cast<int*>(self + 0x2030 + i * 4) * 100) / lineDiv;
+	}
 
 	for (int i = 0; i < 3; i++) {
 		const int bit = *reinterpret_cast<int*>(self + 0x2024 + i * 4);

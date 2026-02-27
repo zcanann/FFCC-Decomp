@@ -682,9 +682,9 @@ void CRedSound::SePause(int seID, int pause)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedSound::GetSeVolume(int seID, int outVolume)
+int CRedSound::GetSeVolume(int seID, int outVolume)
 {
-	CRedDriver_8032f4c0.GetSeVolume(seID, outVolume);
+	return CRedDriver_8032f4c0.GetSeVolume(seID, outVolume);
 }
 
 /*

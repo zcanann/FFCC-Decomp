@@ -333,7 +333,7 @@ LAB_801adc44:
 	}
 }
 
-void TRK__read_aram(u32 param_1, u32 param_2, u32* param_3)
+void TRK__read_aram(register u32 param_1, register u32 param_2, u32* param_3)
 {
 	u32 uVar1;
 	u32 uVar2;
@@ -342,6 +342,7 @@ void TRK__read_aram(u32 param_1, u32 param_2, u32* param_3)
 	u32 iVar5;
 	u32 uVar6;
 	u32 uVar7;
+	u32 uVar8;
 
 	if (param_2 < 0x4000) {
 		return;
@@ -351,6 +352,7 @@ void TRK__read_aram(u32 param_1, u32 param_2, u32* param_3)
 	}
 
 	iVar5 = 0;
+	uVar8 = param_2 & 0xFFFFFFE0;
 	uVar1 = (*param_3 + (param_2 & 0x1F) + 0x1F) & 0xFFFFFFE0;
 	uVar2 = (uVar1 + 0x1F) >> 5;
 	if (uVar1 != 0) {
@@ -387,7 +389,7 @@ LAB_801ade28:
 	} while (uVar2 != 0);
 	sVar3 = __ARGetInterruptStatus();
 	__ARClearInterrupt();
-	ARStartDMA(1, param_1, param_2 & 0xFFFFFFE0, uVar1);
+	ARStartDMA(1, param_1, uVar8, uVar1);
 	do {
 		sVar4 = __ARGetInterruptStatus();
 	} while (sVar4 == 0);

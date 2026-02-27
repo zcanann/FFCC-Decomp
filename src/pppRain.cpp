@@ -251,9 +251,9 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     RainWork* work;
     RainDrop* drop;
     RainParam* rain;
-    double baseX;
-    double baseY;
-    double baseZ;
+    float baseX;
+    float baseY;
+    float baseZ;
     Vec segment;
 
     rain = (RainParam*)param_2;
@@ -284,15 +284,15 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
 
     work = (RainWork*)((u8*)pppRain + 0x80 + workOffset);
     drop = (RainDrop*)work->drops;
-    baseX = (double)pppMngStPtr->m_matrix.value[0][3];
-    baseY = (double)pppMngStPtr->m_matrix.value[1][3];
-    baseZ = (double)pppMngStPtr->m_matrix.value[2][3];
+    baseX = pppMngStPtr->m_matrix.value[0][3];
+    baseY = pppMngStPtr->m_matrix.value[1][3];
+    baseZ = pppMngStPtr->m_matrix.value[2][3];
 
     GXBegin((GXPrimitive)0xA8, GX_VTXFMT7, (u16)(count << 1));
     for (i = 0; i < count; i++) {
-        float x = (float)(baseX + (double)drop->posX);
-        float y = (float)(baseY + (double)drop->posY);
-        float z = (float)(baseZ + (double)drop->posZ);
+        float x = baseX + drop->posX;
+        float y = baseY + drop->posY;
+        float z = baseZ + drop->posZ;
 
         PSVECScale((Vec*)&drop->dirX, &segment, drop->length);
         GXPosition3f32(x, y, z);

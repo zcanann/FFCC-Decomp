@@ -100,10 +100,14 @@ extern "C" void CalcHeart__8CMesMenuFv(void*);
 extern float FLOAT_8033292c;
 extern float FLOAT_80332928;
 extern float FLOAT_80332934;
+extern float FLOAT_80332930;
 extern float FLOAT_80332940;
+extern float FLOAT_80332944;
 extern float FLOAT_80332948;
 extern float FLOAT_8033294c;
 extern float FLOAT_80332950;
+extern float FLOAT_80332954;
+extern float FLOAT_80332960;
 extern float FLOAT_80332970;
 extern float FLOAT_803329a4;
 extern float FLOAT_803329a8;
@@ -1200,12 +1204,58 @@ void CMenuPcs::GetRaceStr(int, char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801458ec
+ * PAL Size: 920b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::DrawSingBar(int, int, int, float)
+void CMenuPcs::DrawSingBar(int x, int y, int life, float alpha)
 {
-	// TODO
+    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+
+    u8 a = static_cast<u8>(FLOAT_80332940 * alpha);
+    _GXColor color = {0xFF, 0xFF, 0xFF, a};
+    GXSetChanMatColor(GX_COLOR0A0, color);
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x53);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 0, static_cast<float>(x), static_cast<float>(y), FLOAT_80332944, FLOAT_80332948,
+                                     FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 8, static_cast<float>(x + 0x60), static_cast<float>(y), FLOAT_80332944,
+                                     FLOAT_80332948, FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x54);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 0, static_cast<float>(x + 0x10), static_cast<float>(y), FLOAT_80332950,
+                                     FLOAT_80332948, FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
+
+    int tex;
+    if (life < 0x29) {
+        tex = 0x59;
+    } else if (life < 0x3D) {
+        tex = 0x57;
+    } else {
+        tex = 0x55;
+    }
+
+    int iVar1 = life / 10 + (life >> 0x1F);
+    int bars = iVar1 - (iVar1 >> 0x1F);
+    if (life != bars * 10) {
+        bars += 1;
+    }
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 0, static_cast<float>(x + 0x10), static_cast<float>(y + 8), FLOAT_80332954,
+                                     FLOAT_80332930, FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 8, static_cast<float>((bars * 8 + x + 0x10) - 4), static_cast<float>(y + 8),
+                                     FLOAT_80332954, FLOAT_80332930, FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934,
+                                     FLOAT_80332934, 0.0f);
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex + 1);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 0, static_cast<float>(x + 0x14), static_cast<float>(y + 8),
+                                     static_cast<float>(bars * 8 - 8), FLOAT_80332930, FLOAT_8033294c, FLOAT_8033294c,
+                                     FLOAT_80332934, FLOAT_80332934, 0.0f);
 }
 
 /*

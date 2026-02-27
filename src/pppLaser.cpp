@@ -8,7 +8,7 @@
 #include <string.h>
 
 extern struct _pppMngSt* pppMngStPtr;
-extern CMath math;
+extern CMath math[];
 extern const f32 FLOAT_80333428;
 extern const f32 FLOAT_80333448;
 extern const f32 FLOAT_8033344c;
@@ -128,7 +128,7 @@ void pppConstructLaser(struct pppLaser *pppLaser, struct UnkC *param_2)
     *((u16*)((u8*)pfVar3 + 0x34)) = 0;
     *((u16*)((u8*)pfVar3 + 0x32)) = 0;
 
-    pfVar3[14] = RandF__5CMathFf(FLOAT_8033345c, &math);
+    pfVar3[14] = RandF__5CMathFf(FLOAT_8033345c, math);
     *((u8*)pfVar3 + 0x4c) = 1;
 
     iVar2 = GetParticleSpecialInfo__5CGameFR10PPPIFPARAMRiRi(

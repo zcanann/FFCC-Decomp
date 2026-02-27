@@ -51,6 +51,7 @@ extern float FLOAT_8032fac0;
 extern float FLOAT_8032fac4;
 extern float FLOAT_8032faa4;
 extern float FLOAT_8032faa8;
+extern float FLOAT_8032faac;
 extern float FLOAT_8032fab0;
 extern float FLOAT_8032fab4;
 extern float FLOAT_8032fab8;
@@ -77,6 +78,8 @@ extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_G
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" int __cntlzw(unsigned int);
 extern "C" void setViewport__11CGraphicPcsFv(void*);
+extern "C" int CheckHitCylinder__7CMapMngFP12CMapCylinderP3VecUl(void*, void*, Vec*, unsigned long);
+extern "C" void CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
 
 extern "C" {
 void pppEditGetViewPos__FP3Vec(Vec*);
@@ -543,12 +546,156 @@ void CCameraPcs::destroyMap()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800385c8
+ * PAL Size: 1360b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCameraPcs::calcMap()
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+    bool useDebugPad = (Pad._452_4_ != 0) || (Pad._448_4_ != -1);
+    u16 buttons;
+    float stickH;
+    float stickV;
+    float triggerL;
+    Mtx rotXMtx;
+    Mtx rotYMtx;
+    Mtx rotMtx;
+    Mtx invViewMtx;
+    Vec dir;
+    Vec moveDelta;
+    Vec sideVec;
+    Vec upVec;
+    int i;
+
+    struct HitCylinder {
+        Vec center;
+        Vec delta;
+        float radiusXZ;
+        float radiusY;
+        float height;
+        float unk;
+    };
+    HitCylinder hitCylinder;
+
+    if (useDebugPad) {
+        buttons = 0;
+    } else {
+        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+        buttons = *reinterpret_cast<u16*>(reinterpret_cast<u8*>(&Pad) + 0x4);
+    }
+
+    stickH = FLOAT_8032fa34;
+    if (!useDebugPad) {
+        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+        stickH = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&Pad) + 0x44);
+    }
+    stickH = FLOAT_8032fa70 * (stickH / FLOAT_8032fa40);
+
+    stickV = FLOAT_8032fa34;
+    if (!useDebugPad) {
+        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+        stickV = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&Pad) + 0x48);
+    }
+    stickV = FLOAT_8032fa70 * (stickV / FLOAT_8032fa40);
+
+    triggerL = FLOAT_8032fa34;
+    if (!useDebugPad) {
+        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+        triggerL = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&Pad) + 0x36);
+    }
+
+    *reinterpret_cast<float*>(self + 0xFC) += triggerL;
+    *reinterpret_cast<float*>(self + 0x470) -= stickV;
+    *reinterpret_cast<float*>(self + 0x474) -= stickH;
+
+    PSMTXRotRad(rotXMtx, 'x', *reinterpret_cast<float*>(self + 0x470));
+    PSMTXRotRad(rotYMtx, 'y', *reinterpret_cast<float*>(self + 0x474));
+    PSMTXConcat(rotYMtx, rotXMtx, rotMtx);
+
+    *reinterpret_cast<float*>(self + 0xEC) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0xF0) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0xF4) = FLOAT_8032fa1c;
+    PSMTXMultVecSR(rotMtx, reinterpret_cast<Vec*>(self + 0xEC), reinterpret_cast<Vec*>(self + 0xEC));
+
+    moveDelta.x = FLOAT_8032fa34;
+    moveDelta.y = FLOAT_8032fa34;
+    moveDelta.z = FLOAT_8032fa34;
+
+    if ((buttons & 0x100) != 0) {
+        PSVECScale(&moveDelta, reinterpret_cast<Vec*>(self + 0xEC), FLOAT_8032fa74);
+    }
+
+    moveDelta.y = FLOAT_8032fa34;
+    if ((buttons & 0x800) != 0) {
+        PSVECScale(&moveDelta, reinterpret_cast<Vec*>(self + 0xEC), FLOAT_8032faac);
+        moveDelta.y = FLOAT_8032fa34;
+    }
+
+    if ((buttons & 0x8) != 0) {
+        moveDelta.y += FLOAT_8032fa74;
+    } else if ((buttons & 0x4) != 0) {
+        moveDelta.y -= FLOAT_8032fa74;
+    }
+
+    if ((buttons & 0x1) != 0) {
+        sideVec.x = FLOAT_8032fa74;
+        sideVec.y = FLOAT_8032fa34;
+        sideVec.z = FLOAT_8032fa34;
+        PSMTXMultVecSR(rotMtx, &sideVec, &sideVec);
+        sideVec.y = FLOAT_8032fa34;
+        PSVECAdd(&moveDelta, &moveDelta, &sideVec);
+    } else if ((buttons & 0x2) != 0) {
+        sideVec.x = FLOAT_8032faac;
+        sideVec.y = FLOAT_8032fa34;
+        sideVec.z = FLOAT_8032fa34;
+        PSMTXMultVecSR(rotMtx, &sideVec, &sideVec);
+        sideVec.y = FLOAT_8032fa34;
+        PSVECAdd(&moveDelta, &moveDelta, &sideVec);
+    }
+
+    if ((moveDelta.x != FLOAT_8032fa34) || (moveDelta.y != FLOAT_8032fa34) || (moveDelta.z != FLOAT_8032fa34)) {
+        for (i = 0; i < 4; i++) {
+            hitCylinder.radiusXZ = FLOAT_8032fa78;
+            hitCylinder.radiusY = FLOAT_8032fa78;
+            hitCylinder.height = FLOAT_8032fa78;
+            hitCylinder.unk = FLOAT_8032fa8c;
+            hitCylinder.center = *reinterpret_cast<Vec*>(self + 0xE0);
+            hitCylinder.delta = moveDelta;
+            if (CheckHitCylinder__7CMapMngFP12CMapCylinderP3VecUl(
+                    MapMng, &hitCylinder, &moveDelta, 0xFFFFFFFF) == 0) {
+                *reinterpret_cast<float*>(self + 0xE0) += moveDelta.x;
+                *reinterpret_cast<float*>(self + 0xE4) += moveDelta.y;
+                *reinterpret_cast<float*>(self + 0xE8) += moveDelta.z;
+                break;
+            }
+            CalcHitSlide__7CMapObjFP3Vecf(*reinterpret_cast<void**>(MapMng + 0x22A88), &moveDelta);
+        }
+    }
+
+    C_MTXPerspective(reinterpret_cast<Mtx44Ptr>(self + 0x94), *reinterpret_cast<float*>(self + 0xFC), FLOAT_8032fa3c,
+                     *reinterpret_cast<float*>(self + 0x100),
+                     *reinterpret_cast<float*>(self + 0x104));
+    GXSetProjection(reinterpret_cast<Mtx44Ptr>(self + 0x94), GX_PERSPECTIVE);
+
+    PSVECAdd(reinterpret_cast<Vec*>(self + 0xD4), reinterpret_cast<Vec*>(self + 0xE0), reinterpret_cast<Vec*>(self + 0xEC));
+
+    upVec.x = FLOAT_8032fa34;
+    upVec.y = FLOAT_8032fa1c;
+    upVec.z = FLOAT_8032fa34;
+    PSMTXMultVecSR(rotMtx, &upVec, &upVec);
+    C_MTXLookAt(reinterpret_cast<MtxPtr>(self + 0x4), reinterpret_cast<Vec*>(self + 0xE0), &upVec,
+                reinterpret_cast<Vec*>(self + 0xD4));
+    PSMTXInverse(reinterpret_cast<MtxPtr>(self + 0x4), invViewMtx);
+
+    dir.x = FLOAT_8032fa34;
+    dir.y = FLOAT_8032fa34;
+    dir.z = FLOAT_8032fa38;
+    *reinterpret_cast<Vec*>(self + 0xEC) = dir;
+    PSMTXMultVecSR(invViewMtx, reinterpret_cast<Vec*>(self + 0xEC), reinterpret_cast<Vec*>(self + 0xEC));
 }
 
 /*

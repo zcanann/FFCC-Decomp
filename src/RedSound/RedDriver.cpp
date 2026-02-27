@@ -974,12 +974,33 @@ int RedDmaEntry(int param_1, int param_2, int param_3, int param_4, int param_5,
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801be234
+ * PAL Size: 168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int RedDmaSearchID(int)
+int RedDmaSearchID(int id)
 {
-	return 0;
+    unsigned int interruptLevel;
+    int found;
+    int* queueEntry;
+
+    found = 0;
+    interruptLevel = OSDisableInterrupts();
+    if (id != 0) {
+        queueEntry = (int*)&DAT_8032b860;
+        do {
+            if ((*queueEntry != 0) && ((id == 0) || (*queueEntry == id))) {
+                found = 1;
+                break;
+            }
+            queueEntry += 7;
+        } while (queueEntry < (int*)&DAT_8032d460);
+    }
+    OSRestoreInterrupts(interruptLevel);
+    return found;
 }
 
 /*

@@ -819,10 +819,11 @@ void CMapObj::Calc()
             posCam.z = -posCam.z;
 
             U8At(this, 0x25) = static_cast<unsigned char>(F32At(this, 0x50) < posCam.z);
-            U8At(this, 0x26) = 1;
             if (F32At(this, 0x4C) <= posCam.z) {
+                U8At(this, 0x26) = 1;
                 U8At(this, 0x15) = U8At(this, 0x14);
             } else {
+                U8At(this, 0x26) = 1;
                 U8At(this, 0x15) = 2;
             }
         } else {

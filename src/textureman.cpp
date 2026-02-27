@@ -1134,23 +1134,41 @@ void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAme
                         chunkFile.PushChunk();
                         while (chunkFile.GetNextChunk(chunk)) {
                             if (chunk.m_id == 0x54585452) {
-                                CTexture* texture = AllocTexture();
+                                CTexture* texture = static_cast<CTexture*>(_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+                                    &Memory,
+                                    0x80,
+                                    *reinterpret_cast<CMemory::CStage**>(Ptr(&TextureMan, 4)),
+                                    s_textureman_cpp,
+                                    0x2ED,
+                                    0));
+                                if (texture != 0) {
+                                    __ct__4CRefFv(texture);
+                                    *reinterpret_cast<void**>(texture) = &PTR_PTR_s_CTexture_801e9b78;
+                                    U8At(texture, 0x74) = 0;
+                                    PtrAt(texture, 0x78) = 0;
+                                    PtrAt(texture, 0x7C) = 0;
+                                    U8At(texture, 0x70) = 0;
+                                    U8At(texture, 0x71) = 0;
+                                    U8At(texture, 0x08) = 0;
+                                    S16At(texture, 0x72) = -1;
+                                    U8At(texture, 0x75) = 0;
+                                }
                                 texture->Create(chunkFile, stage, amemCacheSet, cacheTag, useAddress);
 
                                 if (*reinterpret_cast<unsigned char*>(Ptr(texture, 8)) != 0) {
-                                    int duplicateIdx = -1;
-                                    for (unsigned long i = 0; i < static_cast<unsigned long>(Textures(this)->GetSize()); i++) {
-                                        CTexture* existing = (*Textures(this))[i];
+                                    unsigned int duplicateIdx;
+                                    for (duplicateIdx = 0; duplicateIdx < (unsigned int)Textures(this)->GetSize(); duplicateIdx++) {
+                                        CTexture* existing = (*Textures(this))[duplicateIdx];
                                         if ((existing != 0)
-                                            && (strcmp(reinterpret_cast<char*>(Ptr(existing, 8)),
-                                                       reinterpret_cast<char*>(Ptr(texture, 8)))
+                                            && (strcmp(reinterpret_cast<char*>(Ptr(existing, 8)), reinterpret_cast<char*>(Ptr(texture, 8)))
                                                 == 0)) {
-                                            duplicateIdx = static_cast<int>(i);
-                                            break;
+                                            goto found_duplicate;
                                         }
                                     }
+                                    duplicateIdx = 0xFFFFFFFF;
 
-                                    if (duplicateIdx >= 0) {
+                                found_duplicate:
+                                    if ((int)duplicateIdx >= 0) {
                                         if (amemCacheSet != 0) {
                                             amemCacheSet->DestroyCache(static_cast<int>(*reinterpret_cast<short*>(Ptr(texture, 0x72))));
                                             amemCacheSet->AmemPrev();
@@ -1163,7 +1181,7 @@ void CTextureSet::Create(void* filePtr, CMemory::CStage* stage, int append, CAme
                                             (*reinterpret_cast<void (**)(int*, int)>(*refObj + 8))(refObj, 1);
                                         }
 
-                                        texture = (*Textures(this))[static_cast<unsigned long>(duplicateIdx)];
+                                        texture = (*Textures(this))[duplicateIdx];
                                         *reinterpret_cast<int*>(Ptr(texture, 4)) = *reinterpret_cast<int*>(Ptr(texture, 4)) + 1;
                                     }
                                 }

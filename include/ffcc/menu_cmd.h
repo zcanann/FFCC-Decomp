@@ -23,7 +23,7 @@ public:
     void CmdUnite(int, int);
     void CmdDismantle(int);
     void DrawUniteList();
-    void UniteOpenAnim(int);
+    int UniteOpenAnim(int);
     int UniteCloseAnim(int);
     unsigned int CmdOpen1();
     unsigned int CmdClose1();

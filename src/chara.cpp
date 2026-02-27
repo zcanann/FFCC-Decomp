@@ -621,17 +621,20 @@ struct CharaGlobal {
 	} field0_0x0;
 } Chara;
 
-extern "C" void* __vt__8CManager;
-extern "C" void* lbl_801FCD24;
+extern "C" char __vt__8CManager[];
+extern "C" char lbl_801FCD24[];
 
 /*
  * --INFO--
- * PAL Address: 80073ad4
+ * PAL Address: 0x80073ad4
  * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 extern "C" void __sinit_chara_cpp(void)
 {
-	u32* charaBase = (u32*)&Chara;
-	*charaBase = (u32)&__vt__8CManager;
-	*charaBase = (u32)&lbl_801FCD24;
+	*(void**)&Chara = __vt__8CManager;
+	*(void**)&Chara = lbl_801FCD24;
 }

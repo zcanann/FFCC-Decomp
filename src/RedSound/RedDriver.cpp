@@ -753,6 +753,7 @@ void _MyAlarmHandler(OSAlarm* param_1, OSContext*)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 void RedSleep(int param_1)
 {
     unsigned int interruptLevel;
@@ -770,6 +771,7 @@ void RedSleep(int param_1)
     OSSuspendThread(currentThread);
     OSRestoreInterrupts(interruptLevel);
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -1304,12 +1306,26 @@ void CRedDriver::Init()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801beb78
+ * PAL Size: 140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedDriver::End()
 {
-	// TODO
+    AXRegisterCallback(0);
+    DAT_8032f3c0 = 0;
+    OSSignalSemaphore(&DAT_8032d778);
+    OSSignalSemaphore(&DAT_8032daa0);
+    OSSignalSemaphore(&DAT_8032ddd8);
+    OSSignalSemaphore(&DAT_8032e120);
+    while (DAT_8032f3c4 != 0) {
+        RedSleep(0);
+    }
+    AXRegisterAuxACallback(0, 0);
+    AXRegisterAuxBCallback(0, 0);
 }
 
 /*

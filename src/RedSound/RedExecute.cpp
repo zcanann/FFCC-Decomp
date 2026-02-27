@@ -1,6 +1,7 @@
 #include "ffcc/RedSound/RedExecute.h"
 #include "ffcc/RedSound/RedMemory.h"
 #include "ffcc/RedSound/RedCommand.h"
+#include "ffcc/RedSound/RedDriver.h"
 #include "ffcc/RedSound/RedMidiCtrl.h"
 #include "types.h"
 #include "dolphin/ax.h"
@@ -13,6 +14,9 @@ extern int* DAT_8032f420;
 extern unsigned int DAT_8032ec30;
 extern int DAT_8032f4ac;
 extern u32* DAT_8032f4b0;
+extern u32 DAT_8032f4b4;
+extern int* DAT_8032f4b8;
+extern int DAT_8032f470;
 extern void* DAT_8032f3f0;
 extern int DAT_8032f3f8;
 extern void* DAT_8032f3fc;
@@ -24,6 +28,7 @@ extern int DAT_8032f400;
 extern s16 DAT_8021ddce[];
 extern s16 DAT_8021dfce[];
 extern s16 DAT_8021de4e;
+extern int lbl_8021EA10[];
 
 struct RedReverbDATA {
     void (*callback)(void*, void*);
@@ -1568,12 +1573,78 @@ void _MusicTrackDataExecute(RedTrackDATA* track, int frames)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c619c
+ * PAL Size: 552b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _MidiTrackExecute(RedSoundCONTROL*, RedKeyOnDATA*, int)
+void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int frames)
 {
-	// TODO
+    int* track = *(int**)control;
+    do {
+        if (*track != 0) {
+            int step = frames;
+            DAT_8032f4b4 = 0;
+            if (track[0x42] < frames) {
+                step = track[0x42];
+            }
+            track[0x42] -= frames;
+            _MusicTrackDataExecute((RedTrackDATA*)track, step);
+            if (((track[0x41] & 0x200000) == 0) && (track[0x42] == 1)) {
+                KeyOffSet(control, keyOnData, (RedTrackDATA*)track);
+            }
+            while ((*track != 0) && (track[0x42] < 1)) {
+                unsigned char* cmd = (unsigned char*)*track;
+                int delta;
+                *track = (int)(cmd + 1);
+                ((void (*)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*))lbl_8021EA10[*cmd])(
+                    control, keyOnData, (RedTrackDATA*)track);
+                if (*track != 0) {
+                    if (track[0x42] < 1) {
+                        delta = DeltaTimeSumup((unsigned char**)track);
+                    } else {
+                        delta = track[0x42];
+                        track[0x42] = 0;
+                    }
+
+                    if (delta != 0) {
+                        delta += *(s16*)(track + 0x4E);
+                        if (delta < 1) {
+                            delta = 1;
+                        } else if ((track[0x3F] & 0x20000) != 0) {
+                            delta += ((delta * track[0x3B] >> 8) * (int)GetRandomData()) >> 7;
+                            if (delta < 1) {
+                                delta = 1;
+                            }
+                        }
+                    }
+
+                    if (track[0x42] < -1) {
+                        int execStep = delta;
+                        if (track[0x42] + delta > 0) {
+                            execStep = -track[0x42];
+                        }
+                        _MusicTrackDataExecute((RedTrackDATA*)track, execStep);
+                    }
+                    track[0x42] += delta;
+                }
+            }
+
+            if (DAT_8032f4b4 != 0) {
+                int* voice = (int*)DAT_8032f444;
+                do {
+                    if ((int*)*voice == track) {
+                        voice[0x2E] = DAT_8032f4b4;
+                    }
+                    voice += 0x30;
+                } while (voice < (int*)DAT_8032f444 + 0xC00);
+            }
+        }
+        track += 0x55;
+    } while ((*(s16*)((u8*)control + 0x48E) != 0) &&
+             (track < (int*)(*(int*)control + (u32)*(u8*)((u8*)control + 0x491) * 0x154)));
 }
 
 /*
@@ -1608,12 +1679,74 @@ void _MusicMidiNoteSkipExecute(RedSoundCONTROL*, RedKeyOnDATA*, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c6734
+ * PAL Size: 588b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void _SkipMusicEntry()
 {
-	// TODO
+    int* src;
+    int* dst;
+    u8 temp[0xC];
+
+    if (*(int*)((u8*)DAT_8032f3f0 + 0xD98) >= 0) {
+        src = DAT_8032f4b8;
+        dst = (int*)DAT_8032f3fc;
+        do {
+            if ((*src != 0) && (*dst == 0)) {
+                *dst = *src;
+                dst[1] = src[1];
+                DAT_8032f3f8++;
+            }
+            src += 2;
+            dst += 2;
+        } while (src < DAT_8032f4b8 + 0x80);
+
+        src = DAT_8032f4b8 + 0x80;
+        for (dst = (int*)DAT_8032f3fc + 0x80; (dst < (int*)DAT_8032f3fc + 0x100) && (*dst != 0); dst += 2) {
+        }
+        while ((dst < (int*)DAT_8032f3fc + 0x100) && (src < DAT_8032f4b8 + 0x100)) {
+            if (*src != 0) {
+                *dst = *src;
+                dst[1] = src[1];
+                dst += 2;
+                DAT_8032f3f8++;
+            }
+            src += 2;
+        }
+
+        src = DAT_8032f4b8 + 0x100;
+        for (dst = (int*)DAT_8032f3fc + 0x100; (dst < (int*)DAT_8032f3fc + 0x180) && (*dst != 0); dst += 2) {
+        }
+        while ((dst < (int*)DAT_8032f3fc + 0x180) && (src < DAT_8032f4b8 + 0x180)) {
+            if (*src != 0) {
+                *dst = *src;
+                dst[1] = src[1];
+                dst += 2;
+                DAT_8032f3f8++;
+            }
+            src += 2;
+        }
+
+        if (*(int*)((u8*)DAT_8032f3f0 + 0x470) != -1) {
+            if (*(int*)((u8*)DAT_8032f3f0 + 0x904) != -1) {
+                MusicStop(*(int*)((u8*)DAT_8032f3f0 + 0x904));
+            }
+            memcpy((u8*)DAT_8032f3f0 + 0x494, DAT_8032f3f0, 0x494);
+        }
+
+        memcpy(DAT_8032f3f0, (u8*)DAT_8032f3f0 + 0x928, 0x494);
+        memcpy(temp, (u8*)DAT_8032f3f0 + 0x944, 0xC);
+        memset((u8*)DAT_8032f3f0 + 0x928, 0, 0x494);
+        memcpy((u8*)DAT_8032f3f0 + 0x944, temp, 0xC);
+        *(int*)((u8*)DAT_8032f3f0 + 0xD98) = -1;
+    }
+
+    RedDelete(DAT_8032f4b8);
+    DAT_8032f470 = 0;
 }
 
 /*

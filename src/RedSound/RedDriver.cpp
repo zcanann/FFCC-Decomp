@@ -1463,22 +1463,32 @@ int CRedDriver::MusicPlay(int musicID, int volume, int mode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801beee8
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::MusicCrossPlay(int, int, int)
+int CRedDriver::MusicCrossPlay(int musicID, int volume, int mode)
 {
-	// TODO
+    _EntryExecCommand(_MusicCrossPlaySequence, musicID, volume, mode, 0, 0, 0, 0);
+    return musicID;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bef40
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::MusicNextPlay(int, int, int)
+int CRedDriver::MusicNextPlay(int musicID, int volume, int mode)
 {
-	// TODO
+    _EntryExecCommand(_MusicNextPlaySequence, musicID, volume, mode, 0, 0, 0, 0);
+    return musicID;
 }
 
 /*

@@ -64,8 +64,8 @@ public:
 	void ReentryMusicData(int);
 	void MusicStop(int);
 	int MusicPlay(int, int, int);
-	void MusicCrossPlay(int, int, int);
-	void MusicNextPlay(int, int, int);
+	int MusicCrossPlay(int, int, int);
+	int MusicNextPlay(int, int, int);
 	void MusicMasterVolume(int);
 	void MusicFadeOut(int, int);
 	void MusicVolume(int, int, int);

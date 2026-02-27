@@ -10,7 +10,7 @@ void SAFE_CAST_MON_WORK(CGObjWork*);
 class CFlatRuntime2
 {
 	void onClassSystemFunc(CFlatRuntime::CObject*, int, int, int&);
-	void onClassSystemVal(CFlatRuntime::CObject*, int);
+	CFlatRuntime::CVal* onClassSystemVal(CFlatRuntime::CObject*, int);
 	void onSetClassSystemVal(int, CFlatRuntime::CObject*, CFlatRuntime::CStack*, int);
 };
 

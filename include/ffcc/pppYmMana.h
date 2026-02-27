@@ -23,7 +23,7 @@ void Mana_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int, float (*)[
 void Mana_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*)[4], int);
 void GXSetViewportv(void);
 void MakeWave(Vec*, unsigned short*, float*, Vec&, float, float);
-void CreateWaterMesh(Vec*, Vec*, Vec2d*, unsigned short*, float);
+int CreateWaterMesh(Vec*, Vec*, Vec2d*, unsigned short*, float);
 void UpdateWaterMesh(VYmMana*);
 void RenderWaterMesh(VYmMana*);
 void CalculateNormal(VYmMana*);

@@ -25,6 +25,7 @@ extern "C" void SetAnimSlot__8CGObjectFii(void*, int, int);
 extern "C" void PlayAnim__8CGObjectFiiiiiPSc(void*, int, int, int, int, int, signed char*);
 extern "C" void DispCharaParts__8CGObjectFi(void*, int);
 extern "C" void putParticle__8CGPrgObjFiiP8CGObjectfi(void*, int, int, void*, float, int);
+extern "C" void putParticleTrace__8CGPrgObjFiiP8CGObjectfi(void*, int, int, void*, float, int);
 extern "C" float RandF__5CMathFf(float, CMath*);
 extern "C" unsigned int getNumFreeObject__13CFlatRuntime2Fi(void*, int);
 extern "C" void* FindGItemObjFirst__13CFlatRuntime2Fv(void*);
@@ -69,6 +70,7 @@ extern float FLOAT_80331b58;
 extern float FLOAT_80331b8c;
 extern float FLOAT_80331b90;
 extern float FLOAT_80331bb8;
+extern float FLOAT_80331b68;
 extern char DAT_80331b7c[];
 extern char DAT_80331b84[];
 extern char DAT_80331bc8[];
@@ -514,7 +516,34 @@ void CGItemObj::statPot()
  */
 void CGItemObj::onFrameAlways()
 {
-	// TODO
+	unsigned char* self = (unsigned char*)this;
+	unsigned int countdown = *(unsigned int*)(self + 0x568);
+
+	if (countdown != 0) {
+		unsigned int next = countdown - 1;
+		*(unsigned int*)(self + 0x568) = next & ~((int)next >> 0x1F);
+		*(float*)(self + 0x144) = *(float*)(self + 0x56C) * (float)(8 - *(int*)(self + 0x568)) * FLOAT_80331b68;
+	}
+
+	if (*(int*)(self + 0x500) == 0xA) {
+		unsigned char flatFlags = *(unsigned char*)(CFlat + 4836);
+		int* traceParticleSlot = (int*)(CFlat + 66604);
+		bool canUseTrace =
+		    Game.game.m_gameWork.m_gameInitFlag != 0 &&
+		    (int)(((unsigned int)flatFlags << 0x1C) | ((unsigned int)flatFlags >> 4)) < 0 &&
+		    (int)(((unsigned int)flatFlags << 0x1D) | ((unsigned int)flatFlags >> 3)) < 0 &&
+		    (int)((unsigned int)*(unsigned char*)(self + 0x9A) << 0x18) < 0 &&
+		    *(int*)(CFlat + 4780) == 0 &&
+		    *(int*)(self + 0x550) == 0;
+
+		if (canUseTrace && *traceParticleSlot == 0) {
+			*traceParticleSlot = GetFreeParticleSlot__13CFlatRuntime2Fv(CFlat);
+			putParticleTrace__8CGPrgObjFiiP8CGObjectfi(this, 0x141, *traceParticleSlot, this, FLOAT_80331b18, 0);
+		} else if (!canUseTrace && *traceParticleSlot != 0) {
+			EndParticleSlot__13CFlatRuntime2Fii(CFlat, *traceParticleSlot, 0);
+			*traceParticleSlot = 0;
+		}
+	}
 }
 
 /*

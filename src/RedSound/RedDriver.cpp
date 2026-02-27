@@ -102,6 +102,7 @@ extern void* DAT_8032f454;
 extern int DAT_8032f460;
 extern void* DAT_8032b860;
 extern void* DAT_8032c660;
+extern int DAT_8021ec10[];
 extern OSSemaphore DAT_8032ddd8;
 extern OSSemaphore DAT_8032daa0;
 extern OSSemaphore DAT_8032e120;
@@ -1447,12 +1448,17 @@ void CRedDriver::MusicStop(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801BEE90
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::MusicPlay(int, int, int)
+int CRedDriver::MusicPlay(int musicID, int volume, int mode)
 {
-	// TODO
+    _EntryExecCommand(_MusicPlaySequence, musicID, volume, mode, 0, 0, 0, 0);
+    return musicID;
 }
 
 /*
@@ -2052,12 +2058,16 @@ void CRedDriver::DisplayWaveInfo()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801BFDF8
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::SetReverb(int, int)
+void CRedDriver::SetReverb(int bank, int kind)
 {
-	// TODO
+    ::SetReverb(bank, *(int*)((char*)DAT_8021ec10 + kind * 0x1c), (int*)((char*)DAT_8021ec10 + kind * 0x1c + 4));
 }
 
 /*

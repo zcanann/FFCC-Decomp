@@ -678,21 +678,23 @@ void CGoOutMenu::CalcGoOut()
         field75_0x4c = 0xe7;
         field_0x49 = 0;
         next = 0;
-        input = GetGoOutInputMask();
 
-        if ((input & 3) == 0) {
-            if ((input & 0x100) != 0) {
-                if (field_0x46 == 0) {
-                    Sound.PlaySe(2, 0x40, 0x7f, 0);
-                } else if (field_0x46 == 1) {
-                    Sound.PlaySe(3, 0x40, 0x7f, 0);
+        if (ReadMenuShort(menuPcsLayout.field_2120, 0xA) == 1) {
+            input = GetGoOutInputMask();
+            if ((input & 3) == 0) {
+                if ((input & 0x100) != 0) {
+                    if (field_0x46 == 0) {
+                        Sound.PlaySe(2, 0x40, 0x7f, 0);
+                    } else if (field_0x46 == 1) {
+                        Sound.PlaySe(3, 0x40, 0x7f, 0);
+                    }
+
+                    next = static_cast<unsigned char>(field_0x46 + 1);
                 }
-
-                next = static_cast<unsigned char>(field_0x46 + 1);
+            } else {
+                field_0x46 ^= 1;
+                Sound.PlaySe(1, 0x40, 0x7f, 0);
             }
-        } else {
-            field_0x46 ^= 1;
-            Sound.PlaySe(1, 0x40, 0x7f, 0);
         }
 
         if (next == 2) {
@@ -711,21 +713,23 @@ void CGoOutMenu::CalcGoOut()
         field75_0x4c = 0xde;
         field_0x49 = 0;
         next = 0;
-        input = GetGoOutInputMask();
 
-        if ((input & 3) == 0) {
-            if ((input & 0x100) != 0) {
-                if (field_0x46 == 0) {
-                    Sound.PlaySe(2, 0x40, 0x7f, 0);
-                } else if (field_0x46 == 1) {
-                    Sound.PlaySe(3, 0x40, 0x7f, 0);
+        if (ReadMenuShort(menuPcsLayout.field_2120, 0xA) == 1) {
+            input = GetGoOutInputMask();
+            if ((input & 3) == 0) {
+                if ((input & 0x100) != 0) {
+                    if (field_0x46 == 0) {
+                        Sound.PlaySe(2, 0x40, 0x7f, 0);
+                    } else if (field_0x46 == 1) {
+                        Sound.PlaySe(3, 0x40, 0x7f, 0);
+                    }
+
+                    next = static_cast<unsigned char>(field_0x46 + 1);
                 }
-
-                next = static_cast<unsigned char>(field_0x46 + 1);
+            } else {
+                field_0x46 ^= 1;
+                Sound.PlaySe(1, 0x40, 0x7f, 0);
             }
-        } else {
-            field_0x46 ^= 1;
-            Sound.PlaySe(1, 0x40, 0x7f, 0);
         }
 
         if (next == 2) {

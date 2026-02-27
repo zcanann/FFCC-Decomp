@@ -1293,41 +1293,194 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 	}
 
 	u8* const self = reinterpret_cast<u8*>(this);
+	u8* funcs = *reinterpret_cast<u8**>(self + 0x20);
 	u8* code = *reinterpret_cast<u8**>(
-	    *reinterpret_cast<u8**>(
-	        *reinterpret_cast<u8**>(self + 0x20) + ((static_cast<int>(static_cast<s16>(object->m_codePos >> 16)) >> 4) * 0x50) + 0x34)
-	    + ((static_cast<int>(object->m_codePos << 12)) >> 12));
+	    funcs + ((static_cast<int>(static_cast<s16>(object->m_codePos >> 16)) >> 4) * 0x50) + 0x34)
+	    + (static_cast<int>(object->m_codePos << 12) >> 12);
 
-	*reinterpret_cast<u16*>(self + 0x968) = *reinterpret_cast<u16*>(self + 0x964);
-	*reinterpret_cast<u16*>(self + 0x96A) = *reinterpret_cast<u16*>(self + 0x966);
-	*reinterpret_cast<u16*>(self + 0x964) = static_cast<u16>(object->m_codePos);
-	*reinterpret_cast<u16*>(self + 0x966) = static_cast<u16>(object->m_codePos >> 16);
+	typedef unsigned int* (*GetValueFn)(CFlatRuntime*, CFlatRuntime::CObject*, int);
+	GetValueFn getSystemVal = reinterpret_cast<GetValueFn>((*reinterpret_cast<void***>(this))[10]);
+	GetValueFn getClassSystemVal = reinterpret_cast<GetValueFn>((*reinterpret_cast<void***>(this))[11]);
 
-	switch (code[0]) {
-	case 3:
-	case 4:
-	case 5:
-		*object->m_sp = *reinterpret_cast<u32*>(code + 1);
-		object->m_sp++;
-		break;
-	case 7: {
-		const u32 codePos = object->m_codePos;
-		const int current = static_cast<int>(codePos << 12) >> 12;
-		const int delta = static_cast<int>(*reinterpret_cast<u32*>(code + 1) & 0x00FFFFFF) - current;
-		code += delta;
-		object->m_codePos = (codePos & 0xFFF00000) | ((current + delta) & 0x000FFFFF);
-		break;
-	}
-	case 8:
-		object->m_sp--;
-		if (*object->m_sp == 0) {
+	while (true) {
+		*reinterpret_cast<u16*>(self + 0x968) = *reinterpret_cast<u16*>(self + 0x964);
+		*reinterpret_cast<u16*>(self + 0x96A) = *reinterpret_cast<u16*>(self + 0x966);
+		*reinterpret_cast<u16*>(self + 0x964) = static_cast<u16>(object->m_codePos);
+		*reinterpret_cast<u16*>(self + 0x966) = static_cast<u16>(object->m_codePos >> 16);
+
+		switch (code[0]) {
+		case 0: {
+			const u32 arg = *reinterpret_cast<u32*>(code + 1);
+			const int index = static_cast<int>(arg) >> 8;
+			unsigned int* value = 0;
+			if ((arg & 1) != 0) {
+				if (index < 0) {
+					value = (arg & 0x10) == 0 ? getSystemVal(this, object, index) : getClassSystemVal(this, object, index);
+				} else if ((arg & 8) == 0) {
+					value = object->m_localBase + index;
+				} else if ((arg & 0x10) == 0) {
+					value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x28) + (index * 4));
+				} else {
+					value = object->m_thisBase + index;
+				}
+				*object->m_sp++ = *value;
+			} else if ((arg & 2) != 0) {
+				--object->m_sp;
+				const int stackIndex = static_cast<int>(*object->m_sp);
+				if (index < 0) {
+					value = (arg & 0x10) == 0 ? getSystemVal(this, object, index + stackIndex)
+					                          : getClassSystemVal(this, object, index + stackIndex);
+				} else if ((arg & 8) == 0) {
+					value = object->m_localBase + index + stackIndex;
+				} else if ((arg & 0x10) == 0) {
+					value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x28) + ((index + stackIndex) * 4));
+				} else {
+					value = object->m_thisBase + index + stackIndex;
+				}
+				*object->m_sp++ = *value;
+			} else if ((arg & 4) != 0) {
+				if (index < 0) {
+					value = (arg & 0x10) == 0 ? getSystemVal(this, object, index) : getClassSystemVal(this, object, index);
+				} else if ((arg & 8) == 0) {
+					value = object->m_localBase + index;
+				} else if ((arg & 0x10) == 0) {
+					value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x28) + (index * 4));
+				} else {
+					value = object->m_thisBase + index;
+				}
+				--object->m_sp;
+				*object->m_sp = *reinterpret_cast<unsigned int*>(*value + (*object->m_sp * 4));
+				++object->m_sp;
+			}
+			break;
+		}
+		case 1: {
+			const u32 arg = *reinterpret_cast<u32*>(code + 1);
+			const int index = static_cast<int>(arg) >> 8;
+			unsigned int* value = 0;
+			if ((arg & 1) != 0) {
+				if (index < 0) {
+					value = (arg & 0x10) == 0 ? getSystemVal(this, object, index) : getClassSystemVal(this, object, index);
+				} else if ((arg & 8) == 0) {
+					value = object->m_localBase + index;
+				} else if ((arg & 0x10) == 0) {
+					value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x28) + (index * 4));
+				} else {
+					value = object->m_thisBase + index;
+				}
+				*object->m_sp++ = reinterpret_cast<u32>(value);
+			} else if ((arg & 2) != 0) {
+				--object->m_sp;
+				const int stackIndex = static_cast<int>(*object->m_sp);
+				if (index < 0) {
+					value = (arg & 0x10) == 0 ? getSystemVal(this, object, index + stackIndex)
+					                          : getClassSystemVal(this, object, index + stackIndex);
+				} else if ((arg & 8) == 0) {
+					value = object->m_localBase + index + stackIndex;
+				} else if ((arg & 0x10) == 0) {
+					value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x28) + ((index + stackIndex) * 4));
+				} else {
+					value = object->m_thisBase + index + stackIndex;
+				}
+				*object->m_sp++ = reinterpret_cast<u32>(value);
+			} else if ((arg & 4) != 0) {
+				if (index < 0) {
+					value = (arg & 0x10) == 0 ? getSystemVal(this, object, index) : getClassSystemVal(this, object, index);
+				} else if ((arg & 8) == 0) {
+					value = object->m_localBase + index;
+				} else if ((arg & 0x10) == 0) {
+					value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x28) + (index * 4));
+				} else {
+					value = object->m_thisBase + index;
+				}
+				--object->m_sp;
+				*object->m_sp = reinterpret_cast<u32>(value) + (*object->m_sp * 4);
+				++object->m_sp;
+			}
+			break;
+		}
+		case 2: {
+			const u32 arg = *reinterpret_cast<u32*>(code + 1);
+			const u32 classId = object->m_engineObject == 0 ? 1U : static_cast<u32>(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(object->m_engineObject) + 0x30));
+			if ((arg & 1) != 0) {
+				*object->m_sp++ = (static_cast<u32>(static_cast<int>(arg) >> 8) << 13) | (classId & 0xFFF) | (-(arg >> 4 & 1) & 0x1000);
+			} else if ((arg & 2) != 0) {
+				--object->m_sp;
+				*object->m_sp = (-(arg >> 4 & 1) & 0x1000) | (classId & 0xFFF) |
+				                ((static_cast<int>(arg) >> 8) + *object->m_sp) * 0x2000;
+				++object->m_sp;
+			}
+			break;
+		}
+		case 3:
+		case 4:
+		case 5:
+			*object->m_sp = *reinterpret_cast<unsigned int*>(code + 1);
+			object->m_sp++;
+			break;
+		case 6: {
+			const u32 arg = *reinterpret_cast<u32*>(code + 1);
+			if ((static_cast<int>(arg) >> 16) == 0) {
+				object->m_sp += 2;
+			} else {
+				unsigned int* frameBase = object->m_sp + (-3 - static_cast<int>(arg & 0xFFFF));
+				frameBase[1] = reinterpret_cast<u32>(object->m_thisBase);
+				u32 classIndex = 0xFFFF;
+				if (object->m_classIndex >= 0) {
+					classIndex = static_cast<u32>(object->m_classIndex);
+				}
+				frameBase[2] = (static_cast<u32>(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(object->m_engineObject) + 0x30)) << 16)
+				               | classIndex;
+				u8* classData = reinterpret_cast<u8*>(intToClass(static_cast<int>(*frameBase)));
+				object->m_thisBase = reinterpret_cast<unsigned int*>(*reinterpret_cast<unsigned int*>(classData));
+				object->m_classIndex = *reinterpret_cast<s16*>(classData + 0x14);
+				object->m_engineObject = classData;
+			}
+			break;
+		}
+		case 7: {
 			const u32 codePos = object->m_codePos;
 			const int current = static_cast<int>(codePos << 12) >> 12;
 			const int delta = static_cast<int>(*reinterpret_cast<u32*>(code + 1) & 0x00FFFFFF) - current;
+			code += delta;
 			object->m_codePos = (codePos & 0xFFF00000) | ((current + delta) & 0x000FFFFF);
+			continue;
 		}
-		break;
-	default:
+		case 8: {
+			--object->m_sp;
+			if (*object->m_sp == 0) {
+				const u32 jumpArg = *reinterpret_cast<u32*>(code + 1);
+				if ((static_cast<int>(jumpArg) >> 24) != 0) {
+					*object->m_sp++ = 0;
+				}
+				const u32 codePos = object->m_codePos;
+				const int current = static_cast<int>(codePos << 12) >> 12;
+				const int delta = static_cast<int>(jumpArg & 0x00FFFFFF) - current;
+				code += delta;
+				object->m_codePos = (codePos & 0xFFF00000) | ((current + delta) & 0x000FFFFF);
+				continue;
+			}
+			break;
+		}
+		case 9: {
+			--object->m_sp;
+			if (*object->m_sp != 0) {
+				const u32 jumpArg = *reinterpret_cast<u32*>(code + 1);
+				if ((static_cast<int>(jumpArg) >> 24) != 0) {
+					*object->m_sp++ = 1;
+				}
+				const u32 codePos = object->m_codePos;
+				const int current = static_cast<int>(codePos << 12) >> 12;
+				const int delta = static_cast<int>(jumpArg & 0x00FFFFFF) - current;
+				code += delta;
+				object->m_codePos = (codePos & 0xFFF00000) | ((current + delta) & 0x000FFFFF);
+				continue;
+			}
+			break;
+		}
+		default:
+			break;
+		}
 		break;
 	}
 

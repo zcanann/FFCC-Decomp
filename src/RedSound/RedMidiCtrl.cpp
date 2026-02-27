@@ -577,24 +577,25 @@ void __MidiCtrl_ReverbDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
  */
 void __MidiCtrl_ReverbDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    unsigned int delta[2];
+    unsigned int stepCount[2];
+    unsigned char* command = (unsigned char*)((int*)track)[0];
     int* trackData = (int*)track;
-    char* command = (char*)trackData[0];
-    char mode;
+    char targetDepth;
 
     if (*command == 0) {
-        delta[0] = 0x100;
+        stepCount[0] = 0x100;
     } else {
-        delta[0] = (unsigned char)*command;
+        stepCount[0] = *command;
     }
 
     trackData[0] = (int)(command + 1);
-    mode = *command;
-    if (mode != 0) {
-        mode = -1;
+    targetDepth = (char)*command;
+    if (targetDepth != 0) {
+        targetDepth = -1;
     }
-    trackData[0x1b] = DataAddCompute(trackData + 0x1a, mode, (int*)delta);
-    trackData[0x1c] = delta[0];
+
+    trackData[0x1b] = DataAddCompute(trackData + 0x1a, (int)targetDepth, (int*)stepCount);
+    trackData[0x1c] = stepCount[0];
     trackData[0] += 2;
 }
 

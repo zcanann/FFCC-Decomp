@@ -471,12 +471,41 @@ void CGMonObj::enableDamageCol(int enabled)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80117A18
+ * PAL Size: 240b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::getReplaceStat(int)
+int CGMonObj::getReplaceStat(int state)
 {
-	// TODO
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+
+	if (state == 0 || state == 3 || state == 0x1C) {
+		if (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId == state) {
+			state = -1;
+		}
+	} else if ((state < -4) && (state > -0xF)) {
+		unsigned short action = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle) + (state + 0xE) * 2 + 0xD0);
+		unsigned short actionType = *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + action * 0x48 + 0xE);
+		if (actionType == 3) {
+			return 0x12;
+		}
+		if (actionType < 2) {
+			return 1;
+		}
+		if (actionType == 2) {
+			return 2;
+		}
+		if (actionType == 4) {
+			return 8;
+		}
+	} else {
+		state = reinterpret_cast<CGCharaObj*>(this)->getReplaceStat(state);
+	}
+
+	return state;
 }
 
 /*

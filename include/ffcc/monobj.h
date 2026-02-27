@@ -40,7 +40,7 @@ public:
     void onAnimPoint(int, int);
     void enableAttackCol(int, int, int);
     void enableDamageCol(int);
-    void getReplaceStat(int);
+    int getReplaceStat(int);
     void onStatShield();
     void onStatDie();
     void onDrawDebug(CFont*, float, float&, float);

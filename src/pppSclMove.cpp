@@ -1,4 +1,7 @@
 #include "ffcc/pppSclMove.h"
+#include <dolphin/mtx.h>
+
+extern int DAT_8032ed70;
 
 /*
  * --INFO--
@@ -13,11 +16,10 @@ void pppSclMoveCon(void* param1, void* param2)
 {
     void* ptr = (void*)((int*)((char*)param2 + 0xC))[0];
     ptr = (void*)((int*)((char*)ptr + 0x4))[0];
-    float* data1 = (float*)((char*)param1 + (int)ptr + 0x80);
-    float zero = 0.0f;
-    data1[0] = zero;
-    data1[1] = zero;
-    data1[2] = zero;
+    Vec* data1 = (Vec*)((char*)param1 + (int)ptr + 0x80);
+    data1->x = 0.0f;
+    data1->y = 0.0f;
+    data1->z = 0.0f;
 }
 
 /*
@@ -31,29 +33,21 @@ void pppSclMoveCon(void* param1, void* param2)
  */
 void pppSclMove(void* param1, void* param2, void* param3)
 {
-    int* data2 = (int*)((char*)param3 + 0xC);
-    int* globalFlag = (int*)0x8032ED70; // Referenced in assembly
-    
-    float* src = (float*)((char*)param1 + data2[0] + 0x80);
-    float* dest = (float*)((char*)param1 + data2[1] + 0x80);
-    
-    if (*globalFlag != 0) {
+    int* data2 = *(int**)((char*)param3 + 0xC);
+    float* dataA = (float*)((char*)param1 + data2[1] + 0x80);
+    float* dataB = (float*)((char*)param1 + data2[0] + 0x80);
+
+    if (*(volatile int*)&DAT_8032ed70 != 0) {
         return;
     }
-    
-    int* param2Data = (int*)param2;
-    int param1Data = *(int*)((char*)param1 + 0xC);
-    
-    if (param2Data[0] == param1Data) {
-        // Vector addition for src
-        float* movement = (float*)((char*)param2 + 0x8);
-        src[0] += movement[0];
-        src[1] += movement[1];
-        src[2] += movement[2];
+
+    if (*(int*)param2 == *(int*)((char*)param1 + 0xC)) {
+        dataB[0] += *(float*)((char*)param2 + 0x8);
+        dataB[1] += *(float*)((char*)param2 + 0xC);
+        dataB[2] += *(float*)((char*)param2 + 0x10);
     }
-    
-    // Vector addition for dest
-    dest[0] += src[0];
-    dest[1] += src[1];
-    dest[2] += src[2];
+
+    dataA[0] += dataB[0];
+    dataA[1] += dataB[1];
+    dataA[2] += dataB[2];
 }

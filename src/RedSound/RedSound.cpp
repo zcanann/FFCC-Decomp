@@ -112,13 +112,17 @@ int* CRedSound::EntryStandbyID(int id)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801ccafc
+ * PAL Size: 528b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 {
 	memset(DAT_8032e17c, 0, 0x100);
-	
+
 	if (param_3 < 1 || param_5 < 1) {
 		if (DAT_8032f408 != 0) {
 			OSReport("[%s] Sound Driver Initialize ERROR! %s %s\n", "RedSound", "Invalid parameters", "");
@@ -155,7 +159,7 @@ void CRedSound::Init(void* param_2, int param_3, int param_4, int param_5)
 	AIReset();
 	AIInit(0);
 	AXInit();
-	// AXARTInit(); // Function might not exist yet
+	AXARTInit();
 	DAT_8032f480.Init((int)param_2, param_3, param_4, param_5);
 	DAT_8032e154.Init();
 	Start();

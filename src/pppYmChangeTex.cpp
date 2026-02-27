@@ -219,7 +219,7 @@ void pppDestructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* dat
 
 	void** stageArray = *(void***)((char*)ymChangeTex + 0x90 + dataOffset);
 	void** meshArray = *(void***)((char*)ymChangeTex + 0x8c + dataOffset);
-	if (stageArray == 0 || meshArray == 0 || model == 0) {
+	if (stageArray == 0 || meshArray == 0) {
 		return;
 	}
 

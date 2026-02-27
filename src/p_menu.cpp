@@ -194,7 +194,9 @@ CMenuPcs::~CMenuPcs()
 void CMenuPcs::Init()
 {
     u8* self = reinterpret_cast<u8*>(this);
-    const f32 one = lbl_8033080C;
+    f32 one;
+    int i;
+    int* cardChannel;
 
     *reinterpret_cast<void**>(self + 0xEC) = nullptr;
     *reinterpret_cast<void**>(self + 0xF0) = nullptr;
@@ -214,6 +216,9 @@ void CMenuPcs::Init()
     BonusInit__8CMenuPcsFv(this);
 
     self[0x8E] = 0;
+    one = lbl_8033080C;
+    i = 1;
+    cardChannel = reinterpret_cast<int*>(self + 0x838);
     self[0x8F] = 0;
     self[0x90] = 0;
     self[0x91] = 6;
@@ -243,9 +248,11 @@ void CMenuPcs::Init()
     *reinterpret_cast<u32*>(self + 0xE0) = 0;
     *reinterpret_cast<u32*>(self + 0xE4) = 0;
 
-    for (int i = 10; i < 11; i++) {
-        *reinterpret_cast<u32*>(self + 0xC0 + i * 4) = 0;
-    }
+    do {
+        cardChannel[0x30] = 0;
+        cardChannel = cardChannel + 1;
+        i = i + -1;
+    } while (i != 0);
 
     *reinterpret_cast<void**>(self + 0x878) = nullptr;
     self[0x87C] = 1;

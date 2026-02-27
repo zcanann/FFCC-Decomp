@@ -1,6 +1,7 @@
 #include "ffcc/p_camera.h"
 
 #include "ffcc/materialman.h"
+#include "ffcc/math.h"
 #include "ffcc/memory.h"
 #include "ffcc/pad.h"
 #include "ffcc/gobject.h"
@@ -57,8 +58,10 @@ extern float FLOAT_8032fab4;
 extern float FLOAT_8032fab8;
 extern double DOUBLE_8032fa28;
 extern CMaterialMan MaterialMan;
+extern CMath Math;
 extern char DAT_801d7928[];
 extern double DOUBLE_8032fa28;
+extern unsigned int lbl_801E915C[];
 extern unsigned char MapMng[];
 extern unsigned char CFlat[];
 extern Vec g_shadow_pos;
@@ -129,12 +132,16 @@ void CCameraPcs::Quit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003A234
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCameraPcs::GetTable(unsigned long)
+void* CCameraPcs::GetTable(unsigned long tableIndex)
 {
-	// TODO
+	return lbl_801E915C + tableIndex * 0x57;
 }
 
 /*
@@ -194,22 +201,49 @@ void CCameraPcs::destroy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003A148
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCameraPcs::onScriptChanging(char*)
 {
-	// TODO
+    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x444) = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003A0A0
+ * PAL Size: 168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCameraPcs::onScriptChanged(char*, int)
+void CCameraPcs::onScriptChanged(char*, int fromScript)
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    float zero = FLOAT_8032fa34;
+    MtxPtr mathMtx = reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&Math) + 4);
+
+    PSMTXCopy(mathMtx, reinterpret_cast<MtxPtr>(self + 0x34));
+    PSMTXInverse(mathMtx, reinterpret_cast<MtxPtr>(self + 0x64));
+
+    *reinterpret_cast<float*>(self + 0xDC) = zero;
+    *reinterpret_cast<float*>(self + 0xD8) = zero;
+    *reinterpret_cast<float*>(self + 0xD4) = zero;
+    *reinterpret_cast<float*>(self + 0xE0) = zero;
+    *reinterpret_cast<float*>(self + 0xE4) = FLOAT_8032fa88;
+    *reinterpret_cast<float*>(self + 0xE8) = FLOAT_8032fa88;
+
+    if (fromScript != 0) {
+        *reinterpret_cast<int*>(self + 0x444) = 1;
+    }
+
+    memset(self + 0x47C, 0, 0x14);
+    *reinterpret_cast<float*>(self + 0x48C) = FLOAT_8032fa1c;
 }
 
 /*

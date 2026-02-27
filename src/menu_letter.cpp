@@ -23,16 +23,16 @@ extern float FLOAT_803330f8;
 
 namespace {
 unsigned char DAT_8032eeea = 0;
-unsigned char DAT_8032eee8 = 0;
+short DAT_8032eee8 = 0;
 unsigned char DAT_8032eeec = 0;
 unsigned char DAT_8032eeeb = 0;
 int DAT_8032eef0 = 0;
 unsigned char DAT_8032eeee = 0;
 signed char DAT_8032eeed = 0;
 int DAT_8032eef4 = 0;
-s16 DAT_8032eef8 = 0;
-s16 DAT_8032eefc = 0;
-s16 DAT_8032ef00 = 0;
+int DAT_8032eef8 = 0;
+int DAT_8032eefc = 0;
+int DAT_8032ef00 = 0;
 } // namespace
 
 /*
@@ -110,17 +110,16 @@ bool CMenuPcs::LetterOpen()
 	if (*reinterpret_cast<char*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0xB) == '\0') {
 		memset(*reinterpret_cast<void**>(reinterpret_cast<char*>(this) + 0x850), 0, 0x1008);
 
-		float f = FLOAT_803330f8;
 		int base = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 8;
 		for (int i = 0; i < 8; ++i) {
-			*reinterpret_cast<float*>(base + 0x14) = f;
-			*reinterpret_cast<float*>(base + 0x54) = f;
-			*reinterpret_cast<float*>(base + 0x94) = f;
-			*reinterpret_cast<float*>(base + 0xD4) = f;
-			*reinterpret_cast<float*>(base + 0x114) = f;
-			*reinterpret_cast<float*>(base + 0x154) = f;
-			*reinterpret_cast<float*>(base + 0x194) = f;
-			*reinterpret_cast<float*>(base + 0x1D4) = f;
+			*reinterpret_cast<float*>(base + 0x14) = FLOAT_803330f8;
+			*reinterpret_cast<float*>(base + 0x54) = FLOAT_803330f8;
+			*reinterpret_cast<float*>(base + 0x94) = FLOAT_803330f8;
+			*reinterpret_cast<float*>(base + 0xD4) = FLOAT_803330f8;
+			*reinterpret_cast<float*>(base + 0x114) = FLOAT_803330f8;
+			*reinterpret_cast<float*>(base + 0x154) = FLOAT_803330f8;
+			*reinterpret_cast<float*>(base + 0x194) = FLOAT_803330f8;
+			*reinterpret_cast<float*>(base + 0x1D4) = FLOAT_803330f8;
 			base += 0x200;
 		}
 
@@ -151,14 +150,14 @@ bool CMenuPcs::LetterOpen()
 			memset(*reinterpret_cast<void**>(reinterpret_cast<char*>(this) + 0x850), 0, 0x1008);
 			base = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 8;
 			for (int i = 0; i < 8; ++i) {
-				*reinterpret_cast<float*>(base + 0x14) = f;
-				*reinterpret_cast<float*>(base + 0x54) = f;
-				*reinterpret_cast<float*>(base + 0x94) = f;
-				*reinterpret_cast<float*>(base + 0xD4) = f;
-				*reinterpret_cast<float*>(base + 0x114) = f;
-				*reinterpret_cast<float*>(base + 0x154) = f;
-				*reinterpret_cast<float*>(base + 0x194) = f;
-				*reinterpret_cast<float*>(base + 0x1D4) = f;
+				*reinterpret_cast<float*>(base + 0x14) = FLOAT_803330f8;
+				*reinterpret_cast<float*>(base + 0x54) = FLOAT_803330f8;
+				*reinterpret_cast<float*>(base + 0x94) = FLOAT_803330f8;
+				*reinterpret_cast<float*>(base + 0xD4) = FLOAT_803330f8;
+				*reinterpret_cast<float*>(base + 0x114) = FLOAT_803330f8;
+				*reinterpret_cast<float*>(base + 0x154) = FLOAT_803330f8;
+				*reinterpret_cast<float*>(base + 0x194) = FLOAT_803330f8;
+				*reinterpret_cast<float*>(base + 0x1D4) = FLOAT_803330f8;
 				base += 0x200;
 			}
 
@@ -169,10 +168,10 @@ bool CMenuPcs::LetterOpen()
 			**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) = 1;
 
 			*reinterpret_cast<s16*>(state + 0x22) = 0;
-			*reinterpret_cast<s16*>(state + 0x26) = DAT_8032eef8;
-			*reinterpret_cast<s16*>(state + 0x28) = DAT_8032eefc;
-			*reinterpret_cast<s16*>(state + 0x34) = DAT_8032ef00;
-			DAT_8032eee8 = static_cast<u8>(DAT_8032eef8 + DAT_8032ef00);
+			*reinterpret_cast<s16*>(state + 0x26) = static_cast<s16>(DAT_8032eef8);
+			*reinterpret_cast<s16*>(state + 0x28) = static_cast<s16>(DAT_8032eefc);
+			*reinterpret_cast<s16*>(state + 0x34) = static_cast<s16>(DAT_8032ef00);
+			DAT_8032eee8 = static_cast<s16>(DAT_8032eef8 + DAT_8032ef00);
 		}
 
 		DAT_8032eef8 = 0;

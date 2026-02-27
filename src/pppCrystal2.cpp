@@ -233,15 +233,31 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, UnkB* param_2, UnkC* param_3)
     int sourceTex = 0;
     pppModelSt* model;
     _GXTexObj backTexObj;
-    float slope;
-    float indMtx[2][3];
-    float texMtx[3][4];
+    int textureIndex = 0;
+    float indMtx00;
+    float indMtx01;
+    float indMtx02;
+    float indMtx10;
+    float indMtx11;
+    float indMtx12;
+    float texMtx00;
+    float texMtx01;
+    float texMtx02;
+    float texMtx03;
+    float texMtx10;
+    float texMtx11;
+    float texMtx12;
+    float texMtx13;
+    float texMtx20;
+    float texMtx21;
+    float texMtx22;
+    float texMtx23;
     Mtx lightMtx;
     Mtx drawMtx;
     Mtx tmpMtx;
     Mtx cameraMtx;
     Mtx normalMtx;
-    int textureIndex = 0;
+    const float perspectiveScale = param_2->m_perspectiveScale;
 
     if (param_2->m_dataValIndex != 0xFFFF) {
         model = (pppModelSt*)((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex];
@@ -263,36 +279,35 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, UnkB* param_2, UnkC* param_3)
             param_2->m_payload[3]);
         GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
 
-        slope = FLOAT_80331fd0 * param_2->m_stepValue;
-        indMtx[0][0] = slope;
-        indMtx[0][1] = DAT_801dd60c;
-        indMtx[0][2] = DAT_801dd610;
-        indMtx[1][0] = DAT_801dd614;
-        indMtx[1][1] = slope;
-        indMtx[1][2] = DAT_801dd61c;
+        indMtx00 = FLOAT_80331fd0 * param_2->m_stepValue;
+        indMtx01 = DAT_801dd60c;
+        indMtx02 = DAT_801dd610;
+        indMtx10 = DAT_801dd614;
+        indMtx11 = indMtx00;
+        indMtx12 = DAT_801dd61c;
 
-        texMtx[0][0] = DAT_801dd620;
-        texMtx[0][1] = DAT_801dd624;
-        texMtx[0][2] = DAT_801dd628;
-        texMtx[0][3] = DAT_801dd62c;
-        texMtx[1][0] = DAT_801dd630;
-        texMtx[1][1] = DAT_801dd634;
-        texMtx[1][2] = DAT_801dd638;
-        texMtx[1][3] = DAT_801dd63c;
-        texMtx[2][0] = DAT_801dd640;
-        texMtx[2][1] = DAT_801dd644;
-        texMtx[2][2] = DAT_801dd648;
-        texMtx[2][3] = DAT_801dd64c;
+        texMtx00 = DAT_801dd620;
+        texMtx01 = DAT_801dd624;
+        texMtx02 = DAT_801dd628;
+        texMtx03 = DAT_801dd62c;
+        texMtx10 = DAT_801dd630;
+        texMtx11 = DAT_801dd634;
+        texMtx12 = DAT_801dd638;
+        texMtx13 = DAT_801dd63c;
+        texMtx20 = DAT_801dd640;
+        texMtx21 = DAT_801dd644;
+        texMtx22 = DAT_801dd648;
+        texMtx23 = DAT_801dd64c;
 
         PSMTXIdentity(drawMtx);
         PSMTXConcat(pppMngStPtr->m_matrix.value, ((_pppPObject*)pppCrystal2)->m_localMatrix.value, cameraMtx);
         if (Game.game.m_currentSceneId == 7) {
-            C_MTXLightPerspective(lightMtx, FLOAT_80331fd4, FLOAT_80331fd8, param_2->m_perspectiveScale,
-                                  -param_2->m_perspectiveScale, FLOAT_80331fdc, FLOAT_80331fdc);
+            C_MTXLightPerspective(lightMtx, FLOAT_80331fd4, FLOAT_80331fd8, perspectiveScale, -perspectiveScale,
+                                  FLOAT_80331fdc, FLOAT_80331fdc);
             PSMTXConcat(ppvCameraMatrix0, cameraMtx, tmpMtx);
         } else {
-            C_MTXLightPerspective(lightMtx, CameraPcs._252_4_, FLOAT_80331fd8, param_2->m_perspectiveScale,
-                                  -param_2->m_perspectiveScale, FLOAT_80331fdc, FLOAT_80331fdc);
+            C_MTXLightPerspective(lightMtx, CameraPcs._252_4_, FLOAT_80331fd8, perspectiveScale, -perspectiveScale,
+                                  FLOAT_80331fdc, FLOAT_80331fdc);
             PSMTXConcat(CameraPcs.m_cameraMatrix, cameraMtx, tmpMtx);
         }
         PSMTXConcat(lightMtx, tmpMtx, drawMtx);
@@ -308,11 +323,11 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, UnkB* param_2, UnkC* param_3)
         GXSetNumIndStages(1);
         GXSetIndTexOrder((GXIndTexStageID)0, GX_TEXCOORD0, GX_TEXMAP1);
         GXSetIndTexCoordScale((GXIndTexStageID)0, GX_ITS_1, GX_ITS_1);
-        GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
+        GXSetIndTexMtx(GX_ITM_1, (const f32(*)[3])&indMtx00, 1);
         GXSetTevIndirect((GXTevStageID)0, (GXIndTexStageID)0, GX_ITF_8, GX_ITB_NONE, GX_ITM_1, GX_ITW_0, GX_ITW_0,
                          GX_FALSE, GX_FALSE, GX_ITBA_OFF);
 
-        GXLoadTexMtxImm(texMtx, 0x40, GX_MTX3x4);
+        GXLoadTexMtxImm((const f32(*)[4])&texMtx00, 0x40, GX_MTX3x4);
         GXLoadTexMtxImm(normalMtx, 0x21, GX_MTX3x4);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_NRM, 0x21, GX_TRUE, 0x40);
         GXLoadTexObj(&backTexObj, GX_TEXMAP0);

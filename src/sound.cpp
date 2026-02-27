@@ -1810,32 +1810,30 @@ int CSound::SetSe3DGroup(int se3dHandle, int group)
 {
     if (se3dHandle < 0) {
         Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
-        return 0;
-    }
-
-    char* se = reinterpret_cast<char*>(this) + 0x2C;
-    char* found;
-    int ret = 0;
-    int count = 0x20;
-    do {
-        if ((((*se < 0) && (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
-             ((found = se + 0x28, *found < 0 && (*reinterpret_cast<int*>(se + 0x2C) == se3dHandle))) ||
-             ((found = se + 0x50, *found < 0 && (*reinterpret_cast<int*>(se + 0x54) == se3dHandle))) ||
-             (se[0x78] < 0 && (found = se + 0x78, *reinterpret_cast<int*>(se + 0x7C) == se3dHandle)))) {
-            goto set_found;
+    } else {
+        char* se = reinterpret_cast<char*>(this) + 0x2C;
+        char* found;
+        int count = 0x20;
+        do {
+            if ((*se < 0 &&
+                  (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
+                 (se[0x28] < 0 &&
+                  (found = se + 0x28, *reinterpret_cast<int*>(se + 0x2C) == se3dHandle)) ||
+                 (se[0x50] < 0 &&
+                  (found = se + 0x50, *reinterpret_cast<int*>(se + 0x54) == se3dHandle)) ||
+                 (se[0x78] < 0 &&
+                  (found = se + 0x78, *reinterpret_cast<int*>(se + 0x7C) == se3dHandle))) {
+                goto found_se;
+            }
+            se += 0xA0;
+            count--;
+        } while (count != 0);
+        found = 0;
+found_se:
+        if (found != 0) {
+            *reinterpret_cast<int*>(found + 0x24) = group;
         }
-        ret += 3;
-        se += 0xA0;
-        count--;
-    } while (count != 0);
-    found = 0;
-
-set_found:
-    if (found != 0) {
-        *reinterpret_cast<int*>(found + 0x24) = group;
     }
-
-    return ret;
 }
 
 /*

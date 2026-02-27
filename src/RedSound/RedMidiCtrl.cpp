@@ -36,6 +36,7 @@ int DataAddCompute(int* current, int target, int* delta)
 
     return ((target << 0xc) + 0x800 - *current) / *delta;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -1487,7 +1488,7 @@ void __MidiCtrl_PitchBend(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     unsigned char* command = (unsigned char*)((int*)track)[0];
     int* trackData = (int*)track;
-    int bend = (unsigned int)command[0] + (unsigned int)command[1] * 0x80 - 0x2000;
+    int bend = (unsigned int)command[0] + (unsigned int)command[1] * 0x80 + -0x2000;
 
     *(short*)(trackData + 0x50) = bend;
     *(short*)((char*)trackData + 0x13e) = (bend * *(char*)((char*)trackData + 0x14b)) >> 5;

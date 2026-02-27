@@ -363,108 +363,106 @@ void CMenuPcs::MLstCtrl()
  */
 void CMenuPcs::MLstClose()
 {
-	int completedItems;
-	int currentFrame;
-	unsigned int itemCount;
-	unsigned int remaining;
-	short* item;
-	float alphaZero;
+	float fVar1;
+	double dVar2;
+	double dVar3;
+	short* psVar4;
+	int iVar5;
+	unsigned int uVar6;
+	int iVar7;
+	unsigned int uVar8;
 
-	completedItems = 0;
+	iVar5 = 0;
 	*(short*)(*(int*)((char*)this + 0x82c) + 0x22) = *(short*)(*(int*)((char*)this + 0x82c) + 0x22) + 1;
-	itemCount = (unsigned int)**(short**)((char*)this + 0x850);
-	item = *(short**)((char*)this + 0x850) + 4;
-	currentFrame = (int)*(short*)(*(int*)((char*)this + 0x82c) + 0x22);
-	remaining = itemCount;
-
-	if (0 < (int)itemCount) {
+	uVar6 = (unsigned int)**(short**)((char*)this + 0x850);
+	psVar4 = *(short**)((char*)this + 0x850) + 4;
+	iVar7 = (int)*(short*)(*(int*)((char*)this + 0x82c) + 0x22);
+	uVar8 = uVar6;
+	if (0 < (int)uVar6) {
 		do {
-			if (*(int*)(item + 0x12) <= currentFrame) {
-				if (currentFrame < *(int*)(item + 0x12) + *(int*)(item + 0x14)) {
-					*(int*)(item + 0x10) = *(int*)(item + 0x10) + 1;
-					*(float*)(item + 8) = (float)-((1.0 / (double)*(int*)(item + 0x14)) * (double)*(int*)(item + 0x10) - 1.0);
-					if ((double)*(float*)(item + 8) < 0.0) {
-						*(float*)(item + 8) = 0.0f;
+			dVar2 = 4503601774854144.0;
+			if (*(int*)(psVar4 + 0x12) <= iVar7) {
+				if (iVar7 < *(int*)(psVar4 + 0x12) + *(int*)(psVar4 + 0x14)) {
+					*(int*)(psVar4 + 0x10) = *(int*)(psVar4 + 0x10) + 1;
+					dVar3 = 0.0;
+					*(float*)(psVar4 + 8) = (float)-((1.0 / ((double)*(int*)(psVar4 + 0x14))) * (double)*(int*)(psVar4 + 0x10) - 1.0);
+					if ((double)*(float*)(psVar4 + 8) < dVar3) {
+						*(float*)(psVar4 + 8) = 0.0f;
 					}
 				} else {
-					completedItems = completedItems + 1;
-					*(float*)(item + 8) = 0.0f;
+					iVar5 = iVar5 + 1;
+					*(float*)(psVar4 + 8) = 0.0f;
 				}
 			}
-
-			item = item + 0x20;
-			remaining = remaining - 1;
-		} while (remaining != 0);
+			psVar4 = psVar4 + 0x20;
+			uVar8 = uVar8 - 1;
+		} while (uVar8 != 0);
 	}
-
-	alphaZero = 0.0f;
-	if (**(short**)((char*)this + 0x850) == completedItems) {
-		item = *(short**)((char*)this + 0x850) + 4;
-		if (0 < (int)itemCount) {
-			remaining = itemCount >> 3;
-			if (remaining != 0) {
+	fVar1 = 0.0f;
+	if (**(short**)((char*)this + 0x850) == iVar5) {
+		psVar4 = *(short**)((char*)this + 0x850) + 4;
+		if (0 < (int)uVar6) {
+			uVar8 = uVar6 >> 3;
+			if (uVar8 != 0) {
 				do {
-					item[0x12] = 0;
-					item[0x13] = 0;
-					item[0x14] = 0;
-					item[0x15] = 1;
-					*(float*)(item + 8) = alphaZero;
-					item[0x32] = 0;
-					item[0x33] = 0;
-					item[0x34] = 0;
-					item[0x35] = 1;
-					*(float*)(item + 0x28) = alphaZero;
-					item[0x52] = 0;
-					item[0x53] = 0;
-					item[0x54] = 0;
-					item[0x55] = 1;
-					*(float*)(item + 0x48) = alphaZero;
-					item[0x72] = 0;
-					item[0x73] = 0;
-					item[0x74] = 0;
-					item[0x75] = 1;
-					*(float*)(item + 0x68) = alphaZero;
-					item[0x92] = 0;
-					item[0x93] = 0;
-					item[0x94] = 0;
-					item[0x95] = 1;
-					*(float*)(item + 0x88) = alphaZero;
-					item[0xb2] = 0;
-					item[0xb3] = 0;
-					item[0xb4] = 0;
-					item[0xb5] = 1;
-					*(float*)(item + 0xa8) = alphaZero;
-					item[0xd2] = 0;
-					item[0xd3] = 0;
-					item[0xd4] = 0;
-					item[0xd5] = 1;
-					*(float*)(item + 200) = alphaZero;
-					item[0xf2] = 0;
-					item[0xf3] = 0;
-					item[0xf4] = 0;
-					item[0xf5] = 1;
-					*(float*)(item + 0xe8) = alphaZero;
-					item = item + 0x100;
-					remaining = remaining - 1;
-				} while (remaining != 0);
-
-				itemCount = itemCount & 7;
-				if (itemCount == 0) {
+					psVar4[0x12] = 0;
+					psVar4[0x13] = 0;
+					psVar4[0x14] = 0;
+					psVar4[0x15] = 1;
+					*(float*)(psVar4 + 8) = fVar1;
+					psVar4[0x32] = 0;
+					psVar4[0x33] = 0;
+					psVar4[0x34] = 0;
+					psVar4[0x35] = 1;
+					*(float*)(psVar4 + 0x28) = fVar1;
+					psVar4[0x52] = 0;
+					psVar4[0x53] = 0;
+					psVar4[0x54] = 0;
+					psVar4[0x55] = 1;
+					*(float*)(psVar4 + 0x48) = fVar1;
+					psVar4[0x72] = 0;
+					psVar4[0x73] = 0;
+					psVar4[0x74] = 0;
+					psVar4[0x75] = 1;
+					*(float*)(psVar4 + 0x68) = fVar1;
+					psVar4[0x92] = 0;
+					psVar4[0x93] = 0;
+					psVar4[0x94] = 0;
+					psVar4[0x95] = 1;
+					*(float*)(psVar4 + 0x88) = fVar1;
+					psVar4[0xb2] = 0;
+					psVar4[0xb3] = 0;
+					psVar4[0xb4] = 0;
+					psVar4[0xb5] = 1;
+					*(float*)(psVar4 + 0xa8) = fVar1;
+					psVar4[0xd2] = 0;
+					psVar4[0xd3] = 0;
+					psVar4[0xd4] = 0;
+					psVar4[0xd5] = 1;
+					*(float*)(psVar4 + 200) = fVar1;
+					psVar4[0xf2] = 0;
+					psVar4[0xf3] = 0;
+					psVar4[0xf4] = 0;
+					psVar4[0xf5] = 1;
+					*(float*)(psVar4 + 0xe8) = fVar1;
+					psVar4 = psVar4 + 0x100;
+					uVar8 = uVar8 - 1;
+				} while (uVar8 != 0);
+				uVar6 = uVar6 & 7;
+				if (uVar6 == 0) {
 					return;
 				}
 			}
-
 			do {
-				item[0x12] = 0;
-				item[0x13] = 0;
-				item[0x14] = 0;
-				item[0x15] = 1;
-				*(float*)(item + 8) = alphaZero;
-				item = item + 0x20;
-				itemCount = itemCount - 1;
-			} while (itemCount != 0);
+				psVar4[0x12] = 0;
+				psVar4[0x13] = 0;
+				psVar4[0x14] = 0;
+				psVar4[0x15] = 1;
+				*(float*)(psVar4 + 8) = fVar1;
+				psVar4 = psVar4 + 0x20;
+				uVar6 = uVar6 - 1;
+			} while (uVar6 != 0);
 		}
-
 		return;
 	}
 }

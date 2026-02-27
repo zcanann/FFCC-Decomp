@@ -6,6 +6,7 @@
 #include "ffcc/pad.h"
 #include "ffcc/gobject.h"
 #include "ffcc/p_game.h"
+#include "ffcc/math.h"
 
 #include <math.h>
 #include <string.h>
@@ -83,6 +84,8 @@ extern "C" int __cntlzw(unsigned int);
 extern "C" void setViewport__11CGraphicPcsFv(void*);
 extern "C" int CheckHitCylinder__7CMapMngFP12CMapCylinderP3VecUl(void*, void*, Vec*, unsigned long);
 extern "C" void CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
+extern "C" int rand(void);
+extern "C" float RandF__5CMathFf(float, CMath*);
 
 extern "C" {
 void pppEditGetViewPos__FP3Vec(Vec*);
@@ -258,12 +261,134 @@ void CCameraPcs::SetQuakeParameter(int, int, short, short, float, float, float, 
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80039b7c
+ * PAL Size: 1060b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCameraPcs::CalcQuake()
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+    Vec offset;
+    Vec jitter;
+    float zero = FLOAT_8032fa34;
+
+    if ((System.m_scenegraphStepMode == 2) || ((self[0x490] == 2) && (*reinterpret_cast<s32*>(self + 0x494) == 0))) {
+        return;
+    }
+
+    s32 randomValue = rand();
+    s16 randomSign = static_cast<s16>(randomValue >> 0x1F);
+    *reinterpret_cast<u16*>(self + 0x49C) = static_cast<u16>((randomValue & 1) ^ -randomSign) + randomSign;
+
+    *reinterpret_cast<s16*>(self + 0x49E) = 1 - *reinterpret_cast<s16*>(self + 0x49E);
+
+    randomValue = rand();
+    randomSign = static_cast<s16>(randomValue >> 0x1F);
+    *reinterpret_cast<u16*>(self + 0x4A0) = static_cast<u16>((randomValue & 1) ^ -randomSign) + randomSign;
+
+    if (*reinterpret_cast<s16*>(self + 0x49C) == 0) {
+        offset.x = -*reinterpret_cast<float*>(self + 0x4A4);
+    } else {
+        offset.x = *reinterpret_cast<float*>(self + 0x4A4);
+    }
+
+    if (*reinterpret_cast<s16*>(self + 0x49E) == 0) {
+        offset.y = -*reinterpret_cast<float*>(self + 0x4A8);
+    } else {
+        offset.y = *reinterpret_cast<float*>(self + 0x4A8);
+    }
+
+    if (*reinterpret_cast<s16*>(self + 0x4A0) == 0) {
+        offset.z = -*reinterpret_cast<float*>(self + 0x4AC);
+    } else {
+        offset.z = *reinterpret_cast<float*>(self + 0x4AC);
+    }
+
+    jitter.x = FLOAT_8032fa34;
+    jitter.y = FLOAT_8032fa34;
+    jitter.z = FLOAT_8032fa34;
+
+    u32 randX = static_cast<u32>(rand());
+    u16 signX = static_cast<u16>(randX >> 0x1F);
+    u32 randY = static_cast<u32>(rand());
+    u16 signY = static_cast<u16>(randY >> 0x1F);
+    u32 randZ = static_cast<u32>(rand());
+    u16 signZ = static_cast<u16>(randZ >> 0x1F);
+
+    if (((randX & 1) ^ signX) == signX) {
+        jitter.x = RandF__5CMathFf(*reinterpret_cast<float*>(self + 0x4B0), &Math);
+    } else {
+        jitter.x = -RandF__5CMathFf(*reinterpret_cast<float*>(self + 0x4B0), &Math);
+    }
+
+    if (((randY & 1) ^ signY) == signY) {
+        jitter.y = RandF__5CMathFf(*reinterpret_cast<float*>(self + 0x4B4), &Math);
+    } else {
+        jitter.y = -RandF__5CMathFf(*reinterpret_cast<float*>(self + 0x4B4), &Math);
+    }
+
+    if (((randZ & 1) ^ signZ) == signZ) {
+        jitter.z = RandF__5CMathFf(*reinterpret_cast<float*>(self + 0x4B8), &Math);
+    } else {
+        jitter.z = -RandF__5CMathFf(*reinterpret_cast<float*>(self + 0x4B8), &Math);
+    }
+
+    if (self[0x490] == 2) {
+        PSVECAdd(&offset, &jitter, &offset);
+        PSVECAdd(&offset, reinterpret_cast<Vec*>(self + 0xE0), reinterpret_cast<Vec*>(self + 0xE0));
+        offset.z = FLOAT_8032fa34;
+        PSVECAdd(&offset, reinterpret_cast<Vec*>(self + 0xD4), reinterpret_cast<Vec*>(self + 0xD4));
+        return;
+    }
+
+    if (self[0x490] != 1) {
+        return;
+    }
+
+    if (*reinterpret_cast<s16*>(self + 0x4BC) < 1) {
+        if (*reinterpret_cast<s32*>(self + 0x494) == 0) {
+            if (*reinterpret_cast<s16*>(self + 0x4C0) < 1) {
+                *reinterpret_cast<s32*>(self + 0x494) = 0;
+                *reinterpret_cast<s16*>(self + 0x4BC) = 0;
+                *reinterpret_cast<s16*>(self + 0x4BE) = 0;
+                *reinterpret_cast<s16*>(self + 0x4C0) = 0;
+                *reinterpret_cast<s16*>(self + 0x4C2) = 0;
+                *reinterpret_cast<float*>(self + 0x4AC) = zero;
+                *reinterpret_cast<float*>(self + 0x4A8) = zero;
+                *reinterpret_cast<float*>(self + 0x4A4) = zero;
+                *reinterpret_cast<float*>(self + 0x4B8) = zero;
+                *reinterpret_cast<float*>(self + 0x4B4) = zero;
+                *reinterpret_cast<float*>(self + 0x4B0) = zero;
+            } else {
+                float ratio = static_cast<float>(*reinterpret_cast<s16*>(self + 0x4C0)) /
+                              static_cast<float>(*reinterpret_cast<s16*>(self + 0x4C2));
+                PSVECScale(&offset, &offset, ratio);
+                PSVECSubtract(&offset, &jitter, &offset);
+                PSVECAdd(&offset, reinterpret_cast<Vec*>(self + 0xE0), reinterpret_cast<Vec*>(self + 0xE0));
+                PSVECAdd(&offset, reinterpret_cast<Vec*>(self + 0xD4), reinterpret_cast<Vec*>(self + 0xD4));
+                *reinterpret_cast<s16*>(self + 0x4C0) = *reinterpret_cast<s16*>(self + 0x4C0) - 1;
+            }
+        } else {
+            PSVECAdd(&offset, &jitter, &offset);
+            PSVECAdd(&offset, reinterpret_cast<Vec*>(self + 0xE0), reinterpret_cast<Vec*>(self + 0xE0));
+            PSVECAdd(&offset, reinterpret_cast<Vec*>(self + 0xD4), reinterpret_cast<Vec*>(self + 0xD4));
+        }
+    } else {
+        float ratio = static_cast<float>(*reinterpret_cast<s16*>(self + 0x4BC)) /
+                      static_cast<float>(*reinterpret_cast<s16*>(self + 0x4BE));
+        PSVECScale(&offset, &offset, ratio);
+        PSVECAdd(&offset, &jitter, &offset);
+        PSVECAdd(&offset, reinterpret_cast<Vec*>(self + 0xE0), reinterpret_cast<Vec*>(self + 0xE0));
+        PSVECAdd(&offset, reinterpret_cast<Vec*>(self + 0xD4), reinterpret_cast<Vec*>(self + 0xD4));
+        *reinterpret_cast<s16*>(self + 0x4BC) = *reinterpret_cast<s16*>(self + 0x4BC) - 1;
+
+        if ((*reinterpret_cast<s16*>(self + 0x4BC) == 0) && (*reinterpret_cast<s32*>(self + 0x498) == 0)) {
+            *reinterpret_cast<s32*>(self + 0x494) = 0;
+        }
+    }
 }
 
 /*

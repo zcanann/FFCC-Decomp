@@ -1067,10 +1067,57 @@ void CCaravanWork::GetMagicCharge(int, int&, int&)
 	// TODO
 }
 
+static int GetCmdListItemNameSub(CCaravanWork* caravanWork, int cmdListIdx, int* firstCmdIdx, int* itemCmdListIdx)
+{
+	int numGrouped = 1;
+	unsigned short* cmdListSlot = caravanWork->m_commandListInventorySlotRef + cmdListIdx;
+
+	if (Game.game.m_gameWork.m_menuStageMode != 0 && cmdListSlot[0] != 0) {
+		int searchIdx = cmdListIdx;
+		while (searchIdx >= 0 && cmdListSlot[0] == 0xFFFF) {
+			cmdListSlot--;
+			searchIdx--;
+		}
+		searchIdx++;
+		cmdListSlot++;
+
+		while (searchIdx < (short)caravanWork->m_numCmdListSlots && cmdListSlot[0] == 0xFFFF) {
+			numGrouped++;
+			cmdListSlot++;
+			searchIdx++;
+		}
+	}
+
+	if (numGrouped > 1) {
+		while (cmdListIdx >= 0 && caravanWork->m_commandListInventorySlotRef[cmdListIdx] == 0xFFFF) {
+			cmdListIdx--;
+		}
+		cmdListIdx++;
+
+		short cmdId = *(short*)(caravanWork->m_commandListExtra + cmdListIdx * 2);
+		if (cmdId == 0x207 || cmdId == 0x20B || cmdId == 0x20F) {
+			*firstCmdIdx = cmdListIdx;
+			for (int i = 0; i < numGrouped; i++) {
+				unsigned short invIdx = caravanWork->m_commandListInventorySlotRef[cmdListIdx + i];
+				if (*(short*)(Game.game.unkCFlatData0[2] + caravanWork->m_inventoryItems[invIdx] * 0x48) == 1) {
+					*itemCmdListIdx = cmdListIdx + i;
+					return 1;
+				}
+			}
+		}
+	}
+
+	return 0;
+}
+
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009f730
+ * PAL Size: 352b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCaravanWork::GetCmdListItemName(int)
 {
@@ -1089,22 +1136,96 @@ void CCaravanWork::GetWeaponAttrib(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009f618
+ * PAL Size: 148b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::GetCmdListItem(int)
+int CCaravanWork::GetCmdListItem(int cmdListIdx)
 {
-	// TODO
+	int cmdTopIdx;
+	int itemCmdListIdx;
+
+	if (GetCmdListItemNameSub(this, cmdListIdx, &cmdTopIdx, &itemCmdListIdx) != 0) {
+		short cmdId = *(short*)(m_commandListExtra + cmdTopIdx * 2);
+		if (cmdId == 0x207) {
+			return 0;
+		}
+		if (cmdId == 0x20B) {
+			return 1;
+		}
+		if (cmdId == 0x20F) {
+			return 2;
+		}
+	}
+	return -1;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009f458
+ * PAL Size: 448b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::DelCmdListAndItem(int, int)
+int CCaravanWork::DelCmdListAndItem(int cmdListIdx, int)
 {
-	// TODO
+	if (cmdListIdx == 0) {
+		if (m_equipment[0] < 0) {
+			return 0;
+		}
+		return (short)m_inventoryItems[m_equipment[0]];
+	}
+
+	if (cmdListIdx == 1) {
+		if (m_equipment[2] < 0) {
+			return 0;
+		}
+		return (short)m_inventoryItems[m_equipment[2]];
+	}
+
+	int numGrouped = 1;
+	unsigned short* cmdListSlot = m_commandListInventorySlotRef + cmdListIdx;
+	if (Game.game.m_gameWork.m_menuStageMode != 0 && cmdListSlot[0] != 0) {
+		int searchIdx = cmdListIdx;
+		while (searchIdx >= 0 && cmdListSlot[0] == 0xFFFF) {
+			cmdListSlot--;
+			searchIdx--;
+		}
+		searchIdx++;
+		cmdListSlot++;
+
+		while (searchIdx < (short)m_numCmdListSlots && cmdListSlot[0] == 0xFFFF) {
+			numGrouped++;
+			cmdListSlot++;
+			searchIdx++;
+		}
+	}
+
+	if (numGrouped < 2) {
+		short invIdx = m_commandListInventorySlotRef[cmdListIdx];
+		if (invIdx < 0) {
+			return 0;
+		}
+		return (short)m_inventoryItems[invIdx];
+	}
+
+	while (cmdListIdx >= 0 && m_commandListInventorySlotRef[cmdListIdx] == 0xFFFF) {
+		cmdListIdx--;
+	}
+	cmdListIdx++;
+
+	unsigned short result = *(short*)(m_commandListExtra + cmdListIdx * 2);
+	int cmdTopIdx;
+	int itemCmdListIdx;
+	if (GetCmdListItemNameSub(this, cmdListIdx, &cmdTopIdx, &itemCmdListIdx) != 0) {
+		result = m_inventoryItems[m_commandListInventorySlotRef[itemCmdListIdx]];
+	}
+	return (short)result;
 }
 
 /*

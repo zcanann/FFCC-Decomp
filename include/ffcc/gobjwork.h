@@ -113,8 +113,8 @@ public:
     void GetMagicCharge(int, int&, int&);
     void GetCmdListItemName(int);
     void GetWeaponAttrib(int);
-    void GetCmdListItem(int);
-    void DelCmdListAndItem(int, int);
+    int GetCmdListItem(int);
+    int DelCmdListAndItem(int, int);
     void SearchCombiTop(int);
     void GetNumCombi(int);
     void GetNextCmdListIdx(int, int);

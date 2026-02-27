@@ -1597,12 +1597,16 @@ void CRedDriver::SetSeSepData(void* param_1)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bf28c
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::ClearSeSepData(int)
+void CRedDriver::ClearSeSepData(int id)
 {
-	// TODO
+    _EntryExecCommand(_ClearSeSepData, id, 0, 0, 0, 0, 0, 0);
 }
 
 /*
@@ -1614,9 +1618,9 @@ void CRedDriver::ClearSeSepData(int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::ClearSeSepDataMG(int param_1, int param_2, int param_3, int param_4)
+void CRedDriver::ClearSeSepDataMG(int id1, int id2, int id3, int id4)
 {
-    _EntryExecCommand(_ClearSeSepDataMG, param_1, param_2, param_3, param_4, 0, 0, 0);
+    _EntryExecCommand(_ClearSeSepDataMG, id1, id2, id3, id4, 0, 0, 0);
 }
 
 /*
@@ -1685,12 +1689,16 @@ int CRedDriver::SePlayState(int param_1)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bf4a4
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::SeStop(int)
+void CRedDriver::SeStop(int id)
 {
-	// TODO
+    _EntryExecCommand(_SeStop, id, 0, 0, 0, 0, 0, 0);
 }
 
 /*
@@ -1702,9 +1710,9 @@ void CRedDriver::SeStop(int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CRedDriver::SeStopMG(int param_1, int param_2, int param_3, int param_4)
+void CRedDriver::SeStopMG(int id1, int id2, int id3, int id4)
 {
-    _EntryExecCommand(_SeStopMG, param_1, param_2, param_3, param_4, 0, 0, 0);
+    _EntryExecCommand(_SeStopMG, id1, id2, id3, id4, 0, 0, 0);
 }
 
 /*

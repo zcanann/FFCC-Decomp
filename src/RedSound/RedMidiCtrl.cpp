@@ -12,6 +12,7 @@ extern int* DAT_8032f420;
 extern int DAT_8032f424;
 extern CRedEntry DAT_8032e154;
 extern int lbl_8021EA10[];
+extern int PTR_SineSwing__Fi_8021e9d0[];
 
 extern "C" {
 void* memmove(void*, const void*, unsigned long);
@@ -1265,72 +1266,146 @@ void __MidiCtrl_TremoloOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C94F8
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_TremoloOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_TremoloOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+	((int*)track)[0x25] = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C9504
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_TremoloDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_TremoloDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+	int* trackData = (int*)track;
+	u8* command = (u8*)trackData[0];
+
+	trackData[0] = (int)(command + 1);
+	trackData[0x28] = (u32)*command << 0xc;
+	*(u16*)((u8*)trackData + 0xae) = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C9528
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_TremoloDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_TremoloDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+	int delta[5];
+	int* trackData = (int*)track;
+
+	delta[0] = DeltaTimeSumup((unsigned char**)trackData);
+	if (delta[0] == 0) {
+		delta[0] = 1;
+	}
+	trackData[0x29] = DataAddCompute(trackData + 0x28, *(u8*)trackData[0], delta);
+	*(short*)((int)trackData + 0xae) = (short)delta[0];
+	trackData[0] += 1;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C95A0
+ * PAL Size: 96b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_TremoloRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_TremoloRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+	u32 rate;
+	int* trackData = (int*)track;
+
+	if (*(char*)trackData[0] == '\0') {
+		rate = 0x100;
+	} else {
+		rate = *(u8*)trackData[0];
+	}
+	trackData[0x26] = 0x100000 / rate;
+	*(short*)(trackData + 0x2b) = 0;
+	trackData[0] += 1;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C9600
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_TremoloRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_TremoloRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+	int delta[3];
+	u32 rate;
+	int* trackData = (int*)track;
+
+	delta[0] = DeltaTimeSumup((unsigned char**)trackData);
+	if (delta[0] == 0) {
+		delta[0] = 1;
+	}
+	if (*(char*)trackData[0] == '\0') {
+		rate = 0x100;
+	} else {
+		rate = *(u8*)trackData[0];
+	}
+	trackData[0x27] = DataAddCompute(trackData + 0x26, 0x100 / rate, delta);
+	*(short*)(trackData + 0x2b) = (short)delta[0];
+	trackData[0] += 1;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C96B0
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_TremoloType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_TremoloType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+	u8* command = (u8*)((int*)track)[0];
+
+	((int*)track)[0] = (int)(command + 1);
+	((int*)track)[0x25] = PTR_SineSwing__Fi_8021e9d0[*command & 0xf];
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C96F0
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_TremoloDelay(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_TremoloDelay(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+	int* trackData = (int*)track;
+
+	*(u16*)(trackData + 0x2c) = (u16)*(u8*)trackData[0];
+	*(u16*)((u8*)trackData + 0xb2) = (u16)*(u8*)(trackData[0] + 1);
+	trackData[0] += 2;
 }
 
 /*
@@ -1507,8 +1582,8 @@ void __MidiCtrl_PitchBend(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_PitchBendRange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    unsigned char* command = (unsigned char*)((int*)track)[0];
     int* trackData = (int*)track;
+    unsigned char* command = (unsigned char*)((int*)track)[0];
 
     trackData[0] = (int)(command + 1);
     *(char*)((char*)trackData + 0x14b) = *(char*)command;

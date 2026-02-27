@@ -27,18 +27,14 @@ void* memset(void*, int, unsigned long);
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma dont_inline on
-int DataAddCompute(int* value, int target, int* delta)
+int DataAddCompute(int* current, int target, int* delta)
 {
-    int result = 0;
-
-    if (target == (*value >> 0xc)) {
+    if (target == (*current >> 0xc)) {
         *delta = 0;
-    } else {
-        result = ((target << 0xc | 0x800U) - *value) / *delta;
+        return 0;
     }
 
-    return result;
+    return ((target << 0xc) + 0x800 - *current) / *delta;
 }
 #pragma dont_inline reset
 
@@ -1177,22 +1173,23 @@ void __MidiCtrl_VibrateRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
  */
 void __MidiCtrl_VibrateRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
+    int trackDelta[3];
     int* trackData = (int*)track;
-    int delta = DeltaTimeSumup((unsigned char**)trackData);
-    int rate;
+    unsigned int rate;
 
-    if (delta == 0) {
-        delta = 1;
+    trackDelta[0] = DeltaTimeSumup((unsigned char**)trackData);
+    if (trackDelta[0] == 0) {
+        trackDelta[0] = 1;
     }
 
     if (*(char*)trackData[0] == '\0') {
         rate = 0x100;
     } else {
-        rate = *(unsigned char*)trackData[0];
+        rate = (unsigned int)*(unsigned char*)trackData[0];
     }
 
-    trackData[0x1f] = DataAddCompute(trackData + 0x1e, 0x100 / rate, &delta);
-    *(short*)(trackData + 0x23) = (short)delta;
+    trackData[0x1f] = DataAddCompute(trackData + 0x1e, 0x100 / rate, trackDelta);
+    *(short*)(trackData + 0x23) = (short)trackDelta[0];
     trackData[0] += 1;
 }
 

@@ -15,6 +15,7 @@ extern unsigned char DbgMenuPcs[];
 extern unsigned char ARRAY_8030918c[];
 extern unsigned char CFlat[];
 extern "C" char DAT_803319ec[];
+extern "C" char DAT_80331a4c[];
 
 extern "C" void __ptmf_scall(void*, void*);
 extern "C" int calcPolygonGroup__6CAStarFP3Veci(void*, Vec*, int);
@@ -133,22 +134,100 @@ void CGMonObj::flyUp()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011A0F4
+ * PAL Size: 296b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::undeadOff()
 {
-	// TODO
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+
+	*reinterpret_cast<float*>(mon + 0x694) = 0.0f;
+
+	int weaponMode = static_cast<int>((static_cast<unsigned int>(object->m_weaponNodeFlags) << 24) >> 31);
+	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) != 0xB) {
+		weaponMode = 1;
+	}
+
+	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x1000);
+
+	unsigned short count = (weaponMode == 0) ?
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AE) :
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AC);
+	int particleBase = (weaponMode == 0) ? 0x3C : 0x46;
+
+	if ((mon[0x6BA] != 0) && (count != 0)) {
+		void* pdtLoadRef = nullptr;
+		if (object->m_charaModelHandle != nullptr) {
+			pdtLoadRef = object->m_charaModelHandle->m_pdtLoadRef;
+		}
+		int dataNo = (pdtLoadRef != nullptr) ? reinterpret_cast<int*>(pdtLoadRef)[5] : -1;
+		prgObj->putParticleBindTrace((particleBase + 9) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x594), object, 0.0f, 0);
+	}
+
+	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) == 0xB) {
+		object->SetTexAnim(DAT_80331a4c);
+	}
+
+	mon[0x6BA] = 1;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80119F74
+ * PAL Size: 384b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::undeadOn()
 {
-	// TODO
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+
+	*reinterpret_cast<float*>(mon + 0x694) = 1.0f;
+	void* classId = object->m_scriptHandle[4];
+	int weaponMode = static_cast<int>((static_cast<unsigned int>(object->m_weaponNodeFlags) << 24) >> 31);
+	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) != 0xB) {
+		weaponMode = 1;
+	}
+
+	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x1000);
+
+	unsigned short count = (weaponMode == 0) ?
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AE) :
+		*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AC);
+	int particleBase = (weaponMode == 0) ? 0x3C : 0x46;
+
+	for (int i = 0; i < static_cast<int>(count); i++) {
+		void* pdtLoadRef = nullptr;
+		if (object->m_charaModelHandle != nullptr) {
+			pdtLoadRef = object->m_charaModelHandle->m_pdtLoadRef;
+		}
+		int dataNo = (pdtLoadRef != nullptr) ? reinterpret_cast<int*>(pdtLoadRef)[5] : -1;
+		prgObj->putParticleBindTrace((particleBase + i) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x594), object, 0.0f, 0);
+	}
+
+	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xFC) == 0xB) {
+		object->SetTexAnim(DAT_803319ec);
+	}
+
+	if (static_cast<int>((static_cast<unsigned int>(object->m_weaponNodeFlags) << 24)) < 0) {
+		if (classId == reinterpret_cast<void*>(0x83)) {
+			prgObj->playSe3D(0x987A, 0x32, 0x96, 0, (Vec*)0);
+		} else if (classId == reinterpret_cast<void*>(0x7F)) {
+			prgObj->playSe3D(0x11585, 0x32, 0x96, 0, (Vec*)0);
+		}
+	}
+
+	mon[0x6BA] = 0;
 }
 
 /*

@@ -1200,12 +1200,61 @@ void CMenuPcs::GetRaceStr(int, char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801458ec
+ * PAL Size: 920b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::DrawSingBar(int, int, int, float)
+void CMenuPcs::DrawSingBar(int x, int y, int value, float alpha)
 {
-	// TODO
+    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+
+    unsigned char alphaU8 = static_cast<unsigned char>(FLOAT_80332940 * alpha);
+    _GXColor color = {0xFF, 0xFF, 0xFF, alphaU8};
+    GXSetChanMatColor(GX_COLOR0A0, color);
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x53);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 0, static_cast<float>(x), static_cast<float>(y), 16.0f,
+                                    FLOAT_80332948, FLOAT_8033294c, FLOAT_8033294c,
+                                    FLOAT_80332934, FLOAT_80332934, 0.0f);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 8, static_cast<float>(x + 0x60), static_cast<float>(y), 16.0f,
+                                    FLOAT_80332948, FLOAT_8033294c, FLOAT_8033294c,
+                                    FLOAT_80332934, FLOAT_80332934, 0.0f);
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x54);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 0, static_cast<float>(x + 0x10), static_cast<float>(y),
+                                    FLOAT_80332950, FLOAT_80332948, FLOAT_8033294c, FLOAT_8033294c,
+                                    FLOAT_80332934, FLOAT_80332934, 0.0f);
+
+    int tex = 0x55;
+    if (value < 0x29) {
+        tex = 0x59;
+    } else if (value < 0x3D) {
+        tex = 0x57;
+    }
+
+    int bars = value / 10 + (value >> 31);
+    bars -= bars >> 31;
+    if (value != bars * 10) {
+        ++bars;
+    }
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
+    int barY = y + 8;
+    DrawRect__8CMenuPcsFUlfffffffff(this, 0, static_cast<float>(x + 0x10), static_cast<float>(barY),
+                                    4.0f, 8.0f, FLOAT_8033294c, FLOAT_8033294c,
+                                    FLOAT_80332934, FLOAT_80332934, 0.0f);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 8, static_cast<float>(x + 0x10 + bars * 8 - 4), static_cast<float>(barY),
+                                    4.0f, 8.0f, FLOAT_8033294c, FLOAT_8033294c,
+                                    FLOAT_80332934, FLOAT_80332934, 0.0f);
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex + 1);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 0, static_cast<float>(x + 0x14), static_cast<float>(barY),
+                                    static_cast<float>(bars * 8 - 8), 8.0f, FLOAT_8033294c, FLOAT_8033294c,
+                                    FLOAT_80332934, FLOAT_80332934, 0.0f);
 }
 
 /*

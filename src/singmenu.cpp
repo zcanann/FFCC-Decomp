@@ -54,6 +54,24 @@ extern "C" char* s_stand_80332a24;
 extern "C" char* s_singmenu_cpp_801de8d4;
 extern "C" char* s_dvd__smenu__s_tex_801de8e4;
 extern "C" char* PTR_s_solo1_80214b18[];
+extern "C" int GetItemType__8CMenuPcsFii(CMenuPcs*, int, int);
+extern "C" char* PTR_s_Tutti_802143ec;
+extern "C" char* PTR_s_Alle_Rassen_8021430c;
+extern "C" char* PTR_s_Todos_802145ac;
+extern "C" char* PTR_DAT_802144cc;
+extern "C" char* PTR_DAT_8021422c;
+extern "C" char* PTR_s_Clavat_80214110[];
+extern "C" char* PTR_s_Clavat_802140f0[];
+extern "C" char* PTR_s_Clavat_80214100[];
+extern "C" char* PTR_s_Clavate_80214130[];
+extern "C" char* PTR_s_Clavat_80214120[];
+extern "C" char* PTR_s_Maschio_802143e4[];
+extern "C" char* PTR_DAT_80214304[];
+extern "C" char* PTR_s_Hombre_802145a4[];
+extern "C" char* PTR_s_Masculin_802144c4[];
+extern "C" char* PTR_DAT_80214224[];
+extern "C" char DAT_80332958[];
+extern "C" char DAT_8033295c[];
 
 extern "C" unsigned int CmdOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int CmdCtrl__8CMenuPcsFv(CMenuPcs*);
@@ -1190,22 +1208,167 @@ void CMenuPcs::GetRecipeMaterial(int, CMenuPcs::MaterialInfo*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80145c84
+ * PAL Size: 748b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::GetRaceStr(int, char*)
+void CMenuPcs::GetRaceStr(int itemNo, char* outText)
 {
-	// TODO
+    unsigned short raceBits;
+    unsigned int raceType;
+    char* text;
+    char* suffix;
+    unsigned char languageId;
+
+    GetItemType__8CMenuPcsFii(this, itemNo, 1);
+    raceBits = *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemNo * 0x48 + 4);
+    outText[0] = '\0';
+
+    languageId = static_cast<unsigned char>(Game.game.m_gameWork.m_languageId);
+    if ((raceBits & 0xF) == 0xF) {
+        text = PTR_s_Tutti_802143ec;
+        if (languageId != 3) {
+            if (languageId < 3) {
+                if (languageId != 1 && languageId != 0) {
+                    text = PTR_s_Alle_Rassen_8021430c;
+                }
+            } else {
+                text = PTR_s_Todos_802145ac;
+                if (languageId != 5 && languageId >= 5) {
+                    text = PTR_DAT_8021422c;
+                } else if (languageId < 5) {
+                    text = PTR_DAT_802144cc;
+                }
+            }
+        }
+        strcpy(outText, text);
+        return;
+    }
+
+    raceType = 0;
+    if ((raceBits & 1) == 0) {
+        raceType = 1;
+        if ((raceBits & 2) == 0) {
+            raceType = 2;
+            if ((raceBits & 4) == 0) {
+                raceType = 3;
+                if ((raceBits & 8) == 0) {
+                    raceType = 4;
+                }
+            }
+        }
+    }
+
+    if (raceType < 4) {
+        if (languageId == 3) {
+            text = PTR_s_Clavat_80214110[raceType];
+        } else if (languageId < 3) {
+            if (languageId == 1 || languageId == 0) {
+                text = PTR_s_Clavat_802140f0[raceType];
+            } else {
+                text = PTR_s_Clavat_80214100[raceType];
+            }
+        } else if (languageId == 5) {
+            text = PTR_s_Clavate_80214130[raceType];
+        } else if (languageId < 5) {
+            text = PTR_s_Clavat_80214120[raceType];
+        } else {
+            text = PTR_s_Clavat_802140f0[raceType];
+        }
+
+        strcpy(outText, text);
+        if (languageId == 2) {
+            strcat(outText, DAT_80332958, 0x80);
+        }
+    }
+
+    if ((raceBits & 0xF) != 0 && (raceBits & 0x30) != 0) {
+        strcpy(outText, DAT_8033295c);
+    }
+    if ((raceBits & 0x30) == 0) {
+        return;
+    }
+
+    suffix = 0;
+    raceType = (raceBits & 0x30) >> 5;
+    if (languageId == 3) {
+        suffix = PTR_s_Maschio_802143e4[raceType];
+    } else if (languageId < 3) {
+        if (languageId != 1 && languageId != 0) {
+            suffix = PTR_DAT_80214304[raceType];
+        }
+    } else if (languageId == 5) {
+        suffix = PTR_s_Hombre_802145a4[raceType];
+    } else if (languageId < 5) {
+        suffix = PTR_s_Masculin_802144c4[raceType];
+    }
+
+    if (suffix == 0) {
+        suffix = PTR_DAT_80214224[raceType];
+    }
+    strcat(outText, suffix, 0x80);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801458ec
+ * PAL Size: 920b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::DrawSingBar(int, int, int, float)
+void CMenuPcs::DrawSingBar(int x, int y, int value, float alpha)
 {
-	// TODO
+    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+
+    unsigned char alphaU8 = static_cast<unsigned char>(FLOAT_80332940 * alpha);
+    _GXColor color = {0xFF, 0xFF, 0xFF, alphaU8};
+    GXSetChanMatColor(GX_COLOR0A0, color);
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x53);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 0, static_cast<float>(x), static_cast<float>(y), 16.0f,
+                                    FLOAT_80332948, FLOAT_8033294c, FLOAT_8033294c,
+                                    FLOAT_80332934, FLOAT_80332934, 0.0f);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 8, static_cast<float>(x + 0x60), static_cast<float>(y), 16.0f,
+                                    FLOAT_80332948, FLOAT_8033294c, FLOAT_8033294c,
+                                    FLOAT_80332934, FLOAT_80332934, 0.0f);
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x54);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 0, static_cast<float>(x + 0x10), static_cast<float>(y),
+                                    FLOAT_80332950, FLOAT_80332948, FLOAT_8033294c, FLOAT_8033294c,
+                                    FLOAT_80332934, FLOAT_80332934, 0.0f);
+
+    int tex = 0x55;
+    if (value < 0x29) {
+        tex = 0x59;
+    } else if (value < 0x3D) {
+        tex = 0x57;
+    }
+
+    int bars = value / 10 + (value >> 31);
+    bars -= bars >> 31;
+    if (value != bars * 10) {
+        ++bars;
+    }
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
+    int barY = y + 8;
+    DrawRect__8CMenuPcsFUlfffffffff(this, 0, static_cast<float>(x + 0x10), static_cast<float>(barY),
+                                    4.0f, 8.0f, FLOAT_8033294c, FLOAT_8033294c,
+                                    FLOAT_80332934, FLOAT_80332934, 0.0f);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 8, static_cast<float>(x + 0x10 + bars * 8 - 4), static_cast<float>(barY),
+                                    4.0f, 8.0f, FLOAT_8033294c, FLOAT_8033294c,
+                                    FLOAT_80332934, FLOAT_80332934, 0.0f);
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex + 1);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 0, static_cast<float>(x + 0x14), static_cast<float>(barY),
+                                    static_cast<float>(bars * 8 - 8), 8.0f, FLOAT_8033294c, FLOAT_8033294c,
+                                    FLOAT_80332934, FLOAT_80332934, 0.0f);
 }
 
 /*

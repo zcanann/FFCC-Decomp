@@ -472,11 +472,14 @@ void CMapMesh::DrawMesh(unsigned short startIdx, unsigned short count)
 {
     unsigned int remaining = count;
     MeshDrawEntry* entry = DrawEntries(this) + startIdx;
+    unsigned char* mapMng = MapMng;
 
     while (remaining != 0) {
         if (entry->size != 0) {
-            SetBlendMode__12CMaterialManFP12CMaterialSeti(MaterialMan, DefaultMaterialSet(), entry->materialIdx);
-            SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(MaterialMan, DefaultMaterialSet(),
+            SetBlendMode__12CMaterialManFP12CMaterialSeti(
+                MaterialMan, *reinterpret_cast<CMaterialSet**>(mapMng + 0x21434), entry->materialIdx);
+            SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(
+                MaterialMan, *reinterpret_cast<CMaterialSet**>(mapMng + 0x21434),
                                                                        entry->materialIdx, 0, 1);
             GXCallDisplayList(entry->displayList, entry->size);
         }

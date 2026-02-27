@@ -228,7 +228,7 @@ void CMenuPcs::CompaCtrl()
 {
 	bool activeInput = false;
 	unsigned short press;
-	unsigned short hold;
+	short hold;
 	bool doReset = false;
 
 	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
@@ -241,56 +241,61 @@ void CMenuPcs::CompaCtrl()
 		press = Pad._8_2_;
 	}
 
+	activeInput = false;
+	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+		activeInput = true;
+	}
+
 	if (activeInput) {
 		hold = 0;
 	} else {
-		hold = *reinterpret_cast<unsigned short*>(reinterpret_cast<char*>(&Pad) + 0x20);
+		hold = *reinterpret_cast<short*>(reinterpret_cast<char*>(&Pad) + 0x20);
 	}
 
-	if (hold != 0) {
-		if ((press & 0x20) != 0) {
-			*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x1e) = 1;
-			Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-			doReset = true;
-		} else if ((press & 0x40) != 0) {
-			*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x1e) = -1;
-			Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
-			doReset = true;
-		} else if ((press & 0x100) != 0) {
-			Sound.PlaySe(4, 0x40, 0x7f, 0);
-		} else if ((press & 0x200) != 0) {
-			*reinterpret_cast<char*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0xd) = 1;
-			Sound.PlaySe(3, 0x40, 0x7f, 0);
-			doReset = true;
+	if (hold == 0) {
+		doReset = false;
+	} else if ((press & 0x20) != 0) {
+		*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x1e) = 1;
+		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+		doReset = true;
+	} else if ((press & 0x40) != 0) {
+		*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x1e) = -1;
+		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
+		doReset = true;
+	} else if ((press & 0x100) != 0) {
+		Sound.PlaySe(4, 0x40, 0x7f, 0);
+		doReset = false;
+	} else if ((press & 0x200) != 0) {
+		*reinterpret_cast<char*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0xd) = 1;
+		Sound.PlaySe(3, 0x40, 0x7f, 0);
+		doReset = true;
+	} else {
+		doReset = false;
+	}
+
+	if (doReset) {
+		*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 0x2c) = 2;
+		*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 0x30) = 5;
+		*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 0x6c) = 2;
+		*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 0x70) = 5;
+		*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 0xac) = 2;
+		*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 0xb0) = 5;
+		*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 0xec) = 7;
+		*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 0xf0) = 5;
+		*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 300) = 7;
+		*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 0x130) = 5;
+		*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 0x174) = 2;
+		*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 0x16c) = 7;
+		*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 0x170) = 5;
+
+		int entryCount = static_cast<int>(**reinterpret_cast<short**>(reinterpret_cast<char*>(this) + 0x850));
+		short* entry = *reinterpret_cast<short**>(reinterpret_cast<char*>(this) + 0x850) + 4;
+		for (int i = 0; i < entryCount; ++i) {
+			*reinterpret_cast<int*>(entry + 0x10) = 0;
+			*reinterpret_cast<int*>(entry + 0x12) = 0;
+			*reinterpret_cast<float*>(entry + 8) = 1.0f;
+			entry += 0x20;
 		}
-	}
-
-	if (!doReset) {
-		return;
-	}
-
-	int menuData = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
-	*reinterpret_cast<int*>(menuData + 0x2c) = 2;
-	*reinterpret_cast<int*>(menuData + 0x30) = 5;
-	*reinterpret_cast<int*>(menuData + 0x6c) = 2;
-	*reinterpret_cast<int*>(menuData + 0x70) = 5;
-	*reinterpret_cast<int*>(menuData + 0xac) = 2;
-	*reinterpret_cast<int*>(menuData + 0xb0) = 5;
-	*reinterpret_cast<int*>(menuData + 0xec) = 7;
-	*reinterpret_cast<int*>(menuData + 0xf0) = 5;
-	*reinterpret_cast<int*>(menuData + 300) = 7;
-	*reinterpret_cast<int*>(menuData + 0x130) = 5;
-	*reinterpret_cast<int*>(menuData + 0x174) = 2;
-	*reinterpret_cast<int*>(menuData + 0x16c) = 7;
-	*reinterpret_cast<int*>(menuData + 0x170) = 5;
-
-	int entryCount = static_cast<int>(**reinterpret_cast<short**>(reinterpret_cast<char*>(this) + 0x850));
-	short* entry = *reinterpret_cast<short**>(reinterpret_cast<char*>(this) + 0x850) + 4;
-	for (int i = 0; i < entryCount; ++i) {
-		*reinterpret_cast<int*>(entry + 0x10) = 0;
-		*reinterpret_cast<int*>(entry + 0x12) = 0;
-		*reinterpret_cast<float*>(entry + 8) = 1.0f;
-		entry += 0x20;
 	}
 }
 

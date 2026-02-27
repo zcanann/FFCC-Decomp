@@ -52,7 +52,7 @@ public:
 	void SePan(int, int, int);
 	void SePitch(int, int, int);
 	void SePause(int, int);
-	void GetSeVolume(int, int);
+	int GetSeVolume(int, int);
 	void ReportSeLoop(int);
 	void DisplaySePlayInfo();
 

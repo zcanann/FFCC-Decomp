@@ -662,7 +662,7 @@ void* __pool_alloc(__mem_pool* pool, unsigned long size) {
         return 0;
     }
 
-    if (size >= 0xFFFFFFD0UL) {
+    if (size > 0xFFFFFFCFUL) {
         return 0;
     }
 

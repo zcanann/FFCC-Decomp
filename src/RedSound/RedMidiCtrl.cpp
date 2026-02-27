@@ -1460,12 +1460,31 @@ void __MidiCtrl_ShakeRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C98C4
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_ShakeRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_ShakeRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+	int delta[3];
+	u32 rate;
+	int* trackData = (int*)track;
+
+	delta[0] = DeltaTimeSumup((unsigned char**)trackData);
+	if (delta[0] == 0) {
+		delta[0] = 1;
+	}
+	if (*(char*)trackData[0] == '\0') {
+		rate = 0x100;
+	} else {
+		rate = *(u8*)trackData[0];
+	}
+	trackData[0x2f] = DataAddCompute(trackData + 0x2e, 0x100 / rate, delta);
+	*(short*)(trackData + 0x34) = (short)delta[0];
+	trackData[0] += 1;
 }
 
 /*

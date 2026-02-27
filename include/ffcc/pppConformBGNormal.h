@@ -12,11 +12,12 @@ struct pppConformBGNormal {
 };
 
 struct UnkB {
+    u32 _pad0;
+    float m_dataValIndex;
+    float m_initWOrk;
     u8 m_stepValue;
     u8 padding[3];
-    float m_initWOrk;
     float m_arg3;
-    float m_dataValIndex;
 };
 
 struct UnkC {

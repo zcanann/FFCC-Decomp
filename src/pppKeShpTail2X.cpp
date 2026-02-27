@@ -187,7 +187,7 @@ void pppKeShpTail2XDraw(_pppPObject* obj, UnkB* param_2, UnkC* param_3)
     KeShpTail2XWork* work;
     long* shapeTable;
     long* shapeEntry;
-    u8 count;
+    u16 count;
     float alphaMul;
     float colorR;
     float colorG;

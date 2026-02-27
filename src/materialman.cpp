@@ -2466,14 +2466,13 @@ CMaterialSet::CMaterialSet()
     __ct__4CRefFv(this);
     *reinterpret_cast<void**>(this) = &PTR_PTR_s_CMaterialSet_801e9bbc;
 
-    CPtrArray<CMaterial*>* const materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(this, 8));
-    materials->m_size = 0;
-    materials->m_numItems = 0;
-    materials->m_defaultSize = 0x10;
-    materials->m_items = 0;
-    materials->m_stage = 0;
-    materials->m_growCapacity = 1;
-    materials->SetStage(*reinterpret_cast<CMemory::CStage**>(MaterialMan + 0x218));
+    *reinterpret_cast<unsigned long*>(Ptr(this, 0x0C)) = 0;
+    *reinterpret_cast<unsigned long*>(Ptr(this, 0x10)) = 0;
+    *reinterpret_cast<unsigned long*>(Ptr(this, 0x14)) = 0x10;
+    *reinterpret_cast<void**>(Ptr(this, 0x18)) = 0;
+    *reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x1C)) =
+        *reinterpret_cast<CMemory::CStage**>(MaterialMan + 0x218);
+    *reinterpret_cast<int*>(Ptr(this, 0x20)) = 1;
 }
 
 /*

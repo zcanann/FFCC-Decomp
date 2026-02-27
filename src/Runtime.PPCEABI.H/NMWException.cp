@@ -57,96 +57,90 @@ extern "C" __partial_array_destructor* dtor_801AFA6C(__partial_array_destructor*
  */
 extern "C" char __throw_catch_compare(const char* throwtype, const char* catchtype, int* offset_result)
 {
-	char cVar1;
-	char cVar2;
-	int iVar3;
-	const char* pcVar4;
-	const char* pcVar5;
-
 	*offset_result = 0;
 	if (catchtype == nullptr) {
 		return 1;
 	}
 
 	if (*catchtype == 'P') {
-		pcVar4 = catchtype + 1;
-		if (*pcVar4 == 'C') {
-			pcVar4 = catchtype + 2;
+		const char* catchptr = catchtype + 1;
+		if (*catchptr == 'C') {
+			catchptr = catchtype + 2;
 		}
-		if (*pcVar4 == 'V') {
-			pcVar4 = pcVar4 + 1;
+		if (*catchptr == 'V') {
+			catchptr++;
 		}
-		if ((*pcVar4 == 'v') && ((*throwtype == 'P' || (*throwtype == '*')))) {
+		if ((*catchptr == 'v') && ((*throwtype == 'P') || (*throwtype == '*'))) {
 			return 1;
 		}
 	}
 
-	cVar1 = *throwtype;
-	if ((cVar1 == '*') || ((cVar1 < '*' && (cVar1 == '!')))) {
-		pcVar4 = throwtype + 1;
-		pcVar5 = catchtype + 1;
-		if (*throwtype != *catchtype) {
-			return 0;
-		}
-		while (true) {
-			while (true) {
-				cVar1 = *pcVar5;
-				pcVar5 = pcVar5 + 1;
-				cVar2 = *pcVar4;
-				if (cVar2 != cVar1) break;
-				pcVar4 = pcVar4 + 1;
-				if (cVar2 == '!') {
-					iVar3 = 0;
-					for (; *pcVar4 != '!'; pcVar4 = pcVar4 + 1) {
-						iVar3 = (int)*pcVar4 + iVar3 * 10 - 0x30;
-					}
-					*offset_result = iVar3;
-					return 1;
-				}
+	{
+		char ch = *throwtype;
+		if ((ch == '*') || ((ch < '*') && (ch == '!'))) {
+			const char* throwptr = throwtype + 1;
+			const char* catchptr = catchtype + 1;
+			if (*throwtype != *catchtype) {
+				return 0;
 			}
-			do {
-				cVar1 = *pcVar4;
-				pcVar4 = pcVar4 + 1;
-			} while (cVar1 != '!');
-			do {
-				cVar1 = *pcVar4;
-				pcVar4 = pcVar4 + 1;
-			} while (cVar1 != '!');
-			if (*pcVar4 == '\0') break;
-			pcVar5 = catchtype + 1;
+
+			while (true) {
+				while (true) {
+					char throwch = *throwptr;
+					char catchch = *catchptr;
+					catchptr++;
+					if (throwch != catchch) {
+						break;
+					}
+					throwptr++;
+					if (throwch == '!') {
+						int offset = 0;
+						while (*throwptr != '!') {
+							offset = ((offset * 10) + *throwptr) - '0';
+							throwptr++;
+						}
+						*offset_result = offset;
+						return 1;
+					}
+				}
+				while (*throwptr++ != '!') {}
+				while (*throwptr++ != '!') {}
+				if (*throwptr == '\0') {
+					return 0;
+				}
+				catchptr = catchtype + 1;
+			}
 		}
-		return 0;
 	}
 
 	while (true) {
-		cVar1 = *throwtype;
-		if (((cVar1 != 'P') && (cVar1 != 'R')) || (cVar1 != *catchtype)) {
-			while (true) {
-				if (*throwtype != *catchtype) {
-					return 0;
+		char ch = *throwtype;
+		if (((ch != 'P') && (ch != 'R')) || (ch != *catchtype)) {
+			while (*throwtype == *catchtype) {
+				if (*throwtype == '\0') {
+					return 1;
 				}
-				if (*throwtype == '\0') break;
-				throwtype = throwtype + 1;
-				catchtype = catchtype + 1;
+				throwtype++;
+				catchtype++;
 			}
-			return 1;
+			return 0;
 		}
-		pcVar4 = throwtype + 1;
-		pcVar5 = catchtype + 1;
+		const char* throwptr = throwtype + 1;
+		const char* catchptr = catchtype + 1;
 		if (catchtype[1] == 'C') {
-			if (*pcVar4 == 'C') {
-				pcVar4 = throwtype + 2;
+			if (*throwptr == 'C') {
+				throwptr = throwtype + 2;
 			}
-			pcVar5 = catchtype + 2;
+			catchptr = catchtype + 2;
 		}
-		catchtype = pcVar5;
-		throwtype = pcVar4;
+		catchtype = catchptr;
+		throwtype = throwptr;
 		if (*throwtype == 'C') break;
 		if (*catchtype == 'V') {
 			if (*throwtype == 'V') {
-				throwtype = throwtype + 1;
+				throwtype++;
 			}
-			catchtype = catchtype + 1;
+			catchtype++;
 		}
 		if (*throwtype == 'V') {
 			return 0;

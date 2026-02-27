@@ -21,6 +21,7 @@ extern "C" u8 DAT_8032ec48;
 extern "C" u8 DAT_8032ec4c;
 extern "C" u8 DAT_8032ec50;
 extern "C" u8 DAT_8032ec54;
+extern "C" _GXColor DAT_8032e3e8;
 extern "C" char DAT_801d637c[];
 extern "C" char DAT_801d63c0[];
 extern "C" char DAT_801d6400[];
@@ -542,12 +543,17 @@ void CGraphic::SaveFrameBuffer(char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80018a10
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphic::DrawSphere()
 {
-	// TODO
+    GXSetLineWidth(8, GX_TO_ZERO);
+    GXCallDisplayList(PtrAt(this, 0x71FC), S32At(this, 0x71F8));
 }
 
 /*
@@ -708,32 +714,56 @@ void CGraphic::DrawBound(CBound&, _GXColor)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80017f48
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGraphic::SetFogColor(_GXColor)
+void CGraphic::SetFogColor(_GXColor color)
 {
-	// TODO
+    U8At(this, 0x7200) = color.r;
+    U8At(this, 0x7201) = color.g;
+    U8At(this, 0x7202) = color.b;
+    U8At(this, 0x7203) = color.a;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80017f3c
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGraphic::SetFogParam(float, float)
+void CGraphic::SetFogParam(float startZ, float endZ)
 {
-	// TODO
+    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x7204) = startZ;
+    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x7208) = endZ;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80017ea8
+ * PAL Size: 148b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGraphic::SetFog(int, int)
+void CGraphic::SetFog(int useFog, int useGlobalColor)
 {
-	// TODO
+    float nearZ = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x100);
+    float farZ = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x104);
+    _GXColor color = useGlobalColor == 0 ? *reinterpret_cast<_GXColor*>(reinterpret_cast<u8*>(this) + 0x7200) : DAT_8032e3e8;
+    GXFogType fogType = useFog == 0 ? GX_FOG_NONE : GX_FOG_LIN;
+
+    GXSetFog(fogType,
+             *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x7204),
+             *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x7208),
+             nearZ, farZ, color);
 }
 
 /*

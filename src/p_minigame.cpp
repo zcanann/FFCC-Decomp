@@ -2,6 +2,7 @@
 #include "ffcc/joybus.h"
 #include "ffcc/file.h"
 #include "ffcc/memory.h"
+#include "ffcc/p_game.h"
 
 #include <dolphin/gba/GBA.h>
 #include <string.h>
@@ -466,12 +467,250 @@ void CMiniGamePcs::MiniGameGo(char* managerFilePath, char* managerSpFilePath)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012a5f4
+ * PAL Size: 1236b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMiniGamePcs::GbaThreadInitGbaContext(MgGbaThreadParam*, int)
+void CMiniGamePcs::GbaThreadInitGbaContext(MgGbaThreadParam* param, int initMode)
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    unsigned char* paramBytes = reinterpret_cast<unsigned char*>(param);
+    unsigned char* gbaContext = self + (paramBytes[0xBC] * 0x60) + 0x16AC;
+
+    memset(gbaContext, 0, 0x60);
+    if (initMode == 0)
+    {
+        gbaContext[0] = 1;
+    }
+
+    gbaContext[1] = paramBytes[0xBC];
+    gbaContext[3] = 1;
+    *reinterpret_cast<unsigned int*>(gbaContext + 4) = *reinterpret_cast<unsigned int*>(self + 0x1364);
+    gbaContext[0x10] = self[0x134A];
+    gbaContext[0x11] = self[0x134B];
+
+    gbaContext[0x14] = 0xFF;
+    gbaContext[0x15] = 0xFF;
+    gbaContext[0x16] = 0xFF;
+    gbaContext[0x17] = 0xFF;
+    gbaContext[0x18] = 0xFF;
+    gbaContext[0x19] = 0xFF;
+    gbaContext[0x1A] = 0xFF;
+    gbaContext[0x1B] = 0xFF;
+    gbaContext[0x1C] = 0xFF;
+    gbaContext[0x1D] = 0xFF;
+    gbaContext[0x1E] = 0xFF;
+    gbaContext[0x1F] = 0xFF;
+    gbaContext[0x20] = 0xFF;
+    gbaContext[0x21] = 0xFF;
+    gbaContext[0x22] = 0xFF;
+    gbaContext[0x23] = 0xFF;
+
+    if (Game.game.m_partyObjArr[0] == 0)
+    {
+        gbaContext[0x14] = 5;
+        gbaContext[0x15] = 0x11;
+        gbaContext[0x16] = 0x1E;
+        gbaContext[0x17] = 0x2A;
+        gbaContext[0x18] = 0x37;
+        gbaContext[0x19] = 0x43;
+        gbaContext[0x1A] = 0x50;
+        gbaContext[0x1B] = 0x5C;
+    }
+    else
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            int foodLevel = 0;
+            if (Game.game.m_gameWork.m_menuStageMode == 0)
+            {
+                foodLevel = Game.game.GetFoodLevel(0, i);
+            }
+            else
+            {
+                foodLevel = Game.game.GetFoodLevel(0, i);
+            }
+
+            if (foodLevel < 1)
+            {
+                foodLevel = 1;
+            }
+            else if (foodLevel > 100)
+            {
+                foodLevel = 100;
+            }
+
+            gbaContext[i + 0x14] = static_cast<unsigned char>(foodLevel);
+        }
+    }
+
+    gbaContext[0x24] = 0xFF;
+    gbaContext[0x25] = 0xFF;
+    gbaContext[0x26] = 0xFF;
+    gbaContext[0x27] = 0xFF;
+    gbaContext[0x28] = 0xFF;
+    gbaContext[0x29] = 0xFF;
+    gbaContext[0x2A] = 0xFF;
+    gbaContext[0x2B] = 0xFF;
+    gbaContext[0x2C] = 0xFF;
+    gbaContext[0x2D] = 0xFF;
+    gbaContext[0x2E] = 0xFF;
+    gbaContext[0x2F] = 0xFF;
+    gbaContext[0x30] = 0xFF;
+    gbaContext[0x31] = 0xFF;
+    gbaContext[0x32] = 0xFF;
+    gbaContext[0x33] = 0xFF;
+
+    if (Game.game.m_partyObjArr[1] == 0)
+    {
+        gbaContext[0x24] = 5;
+        gbaContext[0x25] = 0x11;
+        gbaContext[0x26] = 0x1E;
+        gbaContext[0x27] = 0x2A;
+        gbaContext[0x28] = 0x37;
+        gbaContext[0x29] = 0x43;
+        gbaContext[0x2A] = 0x50;
+        gbaContext[0x2B] = 0x5C;
+    }
+    else
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            int foodLevel = 0;
+            if (Game.game.m_gameWork.m_menuStageMode == 0)
+            {
+                foodLevel = Game.game.GetFoodLevel(1, i);
+            }
+            else
+            {
+                foodLevel = Game.game.GetFoodLevel(0, i);
+            }
+
+            if (foodLevel < 1)
+            {
+                foodLevel = 1;
+            }
+            else if (foodLevel > 100)
+            {
+                foodLevel = 100;
+            }
+
+            gbaContext[i + 0x24] = static_cast<unsigned char>(foodLevel);
+        }
+    }
+
+    gbaContext[0x34] = 0xFF;
+    gbaContext[0x35] = 0xFF;
+    gbaContext[0x36] = 0xFF;
+    gbaContext[0x37] = 0xFF;
+    gbaContext[0x38] = 0xFF;
+    gbaContext[0x39] = 0xFF;
+    gbaContext[0x3A] = 0xFF;
+    gbaContext[0x3B] = 0xFF;
+    gbaContext[0x3C] = 0xFF;
+    gbaContext[0x3D] = 0xFF;
+    gbaContext[0x3E] = 0xFF;
+    gbaContext[0x3F] = 0xFF;
+    gbaContext[0x40] = 0xFF;
+    gbaContext[0x41] = 0xFF;
+    gbaContext[0x42] = 0xFF;
+    gbaContext[0x43] = 0xFF;
+
+    if (Game.game.m_partyObjArr[2] == 0)
+    {
+        gbaContext[0x34] = 5;
+        gbaContext[0x35] = 0x11;
+        gbaContext[0x36] = 0x1E;
+        gbaContext[0x37] = 0x2A;
+        gbaContext[0x38] = 0x37;
+        gbaContext[0x39] = 0x43;
+        gbaContext[0x3A] = 0x50;
+        gbaContext[0x3B] = 0x5C;
+    }
+    else
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            int foodLevel = 0;
+            if (Game.game.m_gameWork.m_menuStageMode == 0)
+            {
+                foodLevel = Game.game.GetFoodLevel(2, i);
+            }
+            else
+            {
+                foodLevel = Game.game.GetFoodLevel(0, i);
+            }
+
+            if (foodLevel < 1)
+            {
+                foodLevel = 1;
+            }
+            else if (foodLevel > 100)
+            {
+                foodLevel = 100;
+            }
+
+            gbaContext[i + 0x34] = static_cast<unsigned char>(foodLevel);
+        }
+    }
+
+    gbaContext[0x44] = 0xFF;
+    gbaContext[0x45] = 0xFF;
+    gbaContext[0x46] = 0xFF;
+    gbaContext[0x47] = 0xFF;
+    gbaContext[0x48] = 0xFF;
+    gbaContext[0x49] = 0xFF;
+    gbaContext[0x4A] = 0xFF;
+    gbaContext[0x4B] = 0xFF;
+    gbaContext[0x4C] = 0xFF;
+    gbaContext[0x4D] = 0xFF;
+    gbaContext[0x4E] = 0xFF;
+    gbaContext[0x4F] = 0xFF;
+    gbaContext[0x50] = 0xFF;
+    gbaContext[0x51] = 0xFF;
+    gbaContext[0x52] = 0xFF;
+    gbaContext[0x53] = 0xFF;
+
+    if (Game.game.m_partyObjArr[3] == 0)
+    {
+        gbaContext[0x44] = 5;
+        gbaContext[0x45] = 0x11;
+        gbaContext[0x46] = 0x1E;
+        gbaContext[0x47] = 0x2A;
+        gbaContext[0x48] = 0x37;
+        gbaContext[0x49] = 0x43;
+        gbaContext[0x4A] = 0x50;
+        gbaContext[0x4B] = 0x5C;
+    }
+    else
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            int foodLevel = 0;
+            if (Game.game.m_gameWork.m_menuStageMode == 0)
+            {
+                foodLevel = Game.game.GetFoodLevel(3, i);
+            }
+            else
+            {
+                foodLevel = Game.game.GetFoodLevel(0, i);
+            }
+
+            if (foodLevel < 1)
+            {
+                foodLevel = 1;
+            }
+            else if (foodLevel > 100)
+            {
+                foodLevel = 100;
+            }
+
+            gbaContext[i + 0x44] = static_cast<unsigned char>(foodLevel);
+        }
+    }
 }
 
 /*

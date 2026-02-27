@@ -109,7 +109,6 @@ void CalcPolygonHeight(PYmMelt*, VERTEX_DATA* param_2, _GXColor* param_3, float 
     double rayY;
     double top;
     double expand;
-    Vec worldBase;
     CMapCylinderRaw cylinder;
     YmMeltVertex* vertex;
 
@@ -128,12 +127,11 @@ void CalcPolygonHeight(PYmMelt*, VERTEX_DATA* param_2, _GXColor* param_3, float 
         vertex->m_color[2] = param_3->b;
         vertex->m_color[3] = param_3->a;
 
-        worldBase.x = pppMngStPtr->m_matrix.value[0][3];
-        worldBase.y = pppMngStPtr->m_matrix.value[1][3] + param_2->m_collisionYOffset;
-        worldBase.z = pppMngStPtr->m_matrix.value[2][3];
-        pppAddVector(vertex->m_position, vertex->m_position, worldBase);
-
         cylinder.m_bottom = vertex->m_position;
+        cylinder.m_bottom.x += pppMngStPtr->m_matrix.value[0][3];
+        cylinder.m_bottom.y += pppMngStPtr->m_matrix.value[1][3] + param_2->m_collisionYOffset;
+        cylinder.m_bottom.z += pppMngStPtr->m_matrix.value[2][3];
+        vertex->m_position = cylinder.m_bottom;
         cylinder.m_direction.x = (float)zero;
         cylinder.m_direction.y = (float)rayY;
         cylinder.m_direction.z = (float)zero;
@@ -235,7 +233,7 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
     }
 
     YmMeltWork* work = (YmMeltWork*)((u8*)ymMelt + *offsets->m_serializedDataOffsets + 0x80);
-    int grid = (int)((u16)((u8*)&ctrl->m_initWOrk)[2]) + 1;
+    int grid = (int)(*(u16*)((u8*)&ctrl->m_initWOrk + 2)) + 1;
     float matrixY = pppMngStPtr->m_matrix.value[1][3];
 
     if (work->m_vertexData == nullptr) {
@@ -250,7 +248,7 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
 
         double halfWidth = (double)(ctrl->m_stepValue * FLOAT_80330b08);
         double step =
-            (double)(ctrl->m_stepValue / (float)((double)((u16)((u8*)&ctrl->m_initWOrk)[2]) - DOUBLE_80330af8));
+            (double)(ctrl->m_stepValue / (float)((double)(*(u16*)((u8*)&ctrl->m_initWOrk + 2)) - DOUBLE_80330af8));
         double rot = (double)(FLOAT_80330b0c * (float)((double)work->m_phaseOffset - DOUBLE_80330b00));
         double z = -halfWidth;
         double x;

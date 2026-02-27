@@ -843,12 +843,80 @@ void CMaterialMan::addtev_lightmap(long index)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800424d0
+ * PAL Size: 836b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMaterialMan::addtev_shadow(long)
+void CMaterialMan::addtev_shadow(long index)
 {
-	// TODO
+    unsigned int stage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    unsigned char indexByte = static_cast<unsigned char>(index);
+    int stageOffset = static_cast<int>(index) * 4;
+
+    if (((*Ptr(this, 0x208)) & (1 << indexByte)) == 0) {
+        GXSetTevDirect(static_cast<GXTevStageID>(stage));
+        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(
+            stage, *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x180)),
+            *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x158)), 0xFF);
+        _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(stage, 0,
+                                                                                                              8, 9,
+                                                                                                              0xF);
+        _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(stage, 0, 0, 0, 1, 0);
+        _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(stage, 7,
+                                                                                                              7, 7,
+                                                                                                              0);
+        _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(stage, 0, 0, 0, 1, 0);
+        _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(stage, 0, 0);
+        IncNumTevStage();
+        return;
+    }
+
+    GXColor kcolor;
+    *reinterpret_cast<unsigned int*>(&kcolor) = static_cast<unsigned int>(*Ptr(this, index + 0x209));
+    GXSetTevKColor(static_cast<GXTevKColorID>(index), kcolor);
+
+    GXSetTevDirect(static_cast<GXTevStageID>(stage));
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(
+        stage, *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x180)),
+        *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x158)), 0xFF);
+    _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(stage, 0, 8,
+                                                                                                          9, 0xF);
+    _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(stage, 0, 0, 0, 1, 2);
+    _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(stage, 7, 7,
+                                                                                                          7, 0);
+    _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(stage, 0, 0, 0, 1, 0);
+    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(stage, 0, 0);
+    IncNumTevStage();
+
+    stage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    GXSetTevDirect(static_cast<GXTevStageID>(stage));
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(
+        stage, *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x180)),
+        *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x158)) + 1, 0xFF);
+    _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(stage, 0, 8,
+                                                                                                          9, 0xF);
+    _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(stage, 0, 0, 0, 1, 0);
+    _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(stage, 7, 7,
+                                                                                                          7, 0);
+    _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(stage, 0, 0, 0, 1, 0);
+    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(stage, 0, 0);
+    IncNumTevStage();
+
+    stage = *reinterpret_cast<unsigned int*>(Ptr(this, 0x60));
+    GXSetTevDirect(static_cast<GXTevStageID>(stage));
+    GXSetTevKColorSel(static_cast<GXTevStageID>(stage), static_cast<GXTevKColorSel>(index + 0x1C));
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(stage, 0xFF, 0xFF, 0xFF);
+    _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(stage, 4, 0,
+                                                                                                          0xE, 0xF);
+    _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(stage, 0, 0, 0, 1, 0);
+    _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(stage, 7, 7,
+                                                                                                          7, 0);
+    _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(stage, 0, 0, 0, 1, 0);
+    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(stage, 0, 0);
+    IncNumTevStage();
 }
 
 /*

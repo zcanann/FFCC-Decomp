@@ -7,7 +7,7 @@
 
 #include <string.h>
 
-extern CMath math;
+extern CMath math[];
 extern "C" float RandF__5CMathFf(float param, CMath* math);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
 extern struct _pppMngSt* pppMngStPtr;
@@ -18,6 +18,7 @@ extern CMapMng MapMng;
 extern Mtx ppvCameraMatrix0;
 extern CGraphic Graphic;
 extern f32 FLOAT_80330dc0;
+extern f32 FLOAT_80330df0;
 extern f32 lbl_80330DC0;
 extern f32 FLOAT_80330de0;
 extern f32 FLOAT_80330de4;
@@ -138,7 +139,7 @@ extern "C" void pppConstructYmLaser(void* pppYmLaser_, void* param_2_)
 	*((u16*)((u8*)work + 0x30)) = 0;
 	*((u16*)((u8*)work + 0x34)) = 0;
 	*((u16*)((u8*)work + 0x32)) = 0;
-	work[14] = RandF__5CMathFf(FLOAT_80330dc0, &math);
+	work[14] = RandF__5CMathFf(FLOAT_80330df0, math);
 }
 
 /*

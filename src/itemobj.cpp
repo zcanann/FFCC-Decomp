@@ -692,30 +692,68 @@ void CGItemObj::ItemJump(int, float)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80124c2c
+ * PAL Size: 140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGItemObj::DeleteAllFieldItem()
 {
-	// TODO
+	unsigned char* itemObj = (unsigned char*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat);
+
+	while (itemObj != 0) {
+		unsigned char stateFlags = itemObj[0x50];
+		int isActive = (int)(((unsigned int)stateFlags << 0x1c) | ((unsigned int)stateFlags >> 4)) < 0;
+
+		if (*(int*)(itemObj + 0x550) == 0 && isActive != 0) {
+			itemObj[0x54d] = (itemObj[0x54d] & 0x7f) | 0x80;
+		}
+
+		itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj);
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80124b88
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGItemObj::DispAllFieldItem(int)
+void CGItemObj::DispAllFieldItem(int show)
 {
-	// TODO
+	unsigned char* itemObj = (unsigned char*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat);
+
+	while (itemObj != 0) {
+		unsigned char stateFlags = itemObj[0x50];
+		int isActive = (int)(((unsigned int)stateFlags << 0x1c) | ((unsigned int)stateFlags >> 4)) < 0;
+
+		if (*(int*)(itemObj + 0x550) == 0 && isActive != 0) {
+			if (show == 0) {
+				*(unsigned int*)(itemObj + 0x60) |= 0x400000;
+			} else {
+				*(unsigned int*)(itemObj + 0x60) &= 0xffbfffff;
+			}
+		}
+
+		itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj);
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80124b78
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CGItemObj::GetCID()
 {
-	return 0;
+	return 0x1d;
 }

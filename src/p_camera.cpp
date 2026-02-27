@@ -251,12 +251,74 @@ void CCameraPcs::onScriptChanged(char*, int fromScript)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80039FA0
+ * PAL Size: 256b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCameraPcs::SetQuakeParameter(int, int, short, short, float, float, float, float, float, float, int)
+void CCameraPcs::SetQuakeParameter(int quakeState, int keepMoving, short startTime, short endTime,
+                                   float posAmpX, float posAmpY, float posAmpZ,
+                                   float jitterAmpX, float jitterAmpY, float jitterAmpZ, int immediate)
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+
+    if (immediate != 0) {
+        *reinterpret_cast<s32*>(self + 0x494) = quakeState;
+        if (quakeState != 0) {
+            self[0x490] = 2;
+            *reinterpret_cast<float*>(self + 0x4A4) = posAmpX;
+            *reinterpret_cast<float*>(self + 0x4A8) = posAmpY;
+            *reinterpret_cast<float*>(self + 0x4AC) = posAmpZ;
+            *reinterpret_cast<float*>(self + 0x4B0) = jitterAmpX;
+            *reinterpret_cast<float*>(self + 0x4B4) = jitterAmpY;
+            *reinterpret_cast<float*>(self + 0x4B8) = jitterAmpZ;
+            return;
+        }
+
+        self[0x490] = 0;
+        *reinterpret_cast<float*>(self + 0x4AC) = FLOAT_8032fa34;
+        *reinterpret_cast<float*>(self + 0x4A8) = FLOAT_8032fa34;
+        *reinterpret_cast<float*>(self + 0x4A4) = FLOAT_8032fa34;
+        *reinterpret_cast<float*>(self + 0x4B8) = FLOAT_8032fa34;
+        *reinterpret_cast<float*>(self + 0x4B4) = FLOAT_8032fa34;
+        *reinterpret_cast<float*>(self + 0x4B0) = FLOAT_8032fa34;
+        return;
+    }
+
+    if ((*reinterpret_cast<s32*>(self + 0x494) == 0) && (quakeState != 0)) {
+        *reinterpret_cast<s32*>(self + 0x494) = 1;
+        self[0x490] = 1;
+        *reinterpret_cast<s32*>(self + 0x498) = keepMoving;
+        *reinterpret_cast<s16*>(self + 0x4BC) = startTime;
+        *reinterpret_cast<s16*>(self + 0x4BE) = startTime;
+        *reinterpret_cast<s16*>(self + 0x4C0) = endTime;
+        *reinterpret_cast<s16*>(self + 0x4C2) = endTime;
+        *reinterpret_cast<float*>(self + 0x4A4) = posAmpX;
+        *reinterpret_cast<float*>(self + 0x4A8) = posAmpY;
+        *reinterpret_cast<float*>(self + 0x4AC) = posAmpZ;
+        *reinterpret_cast<float*>(self + 0x4B0) = jitterAmpX;
+        *reinterpret_cast<float*>(self + 0x4B4) = jitterAmpY;
+        *reinterpret_cast<float*>(self + 0x4B8) = jitterAmpZ;
+        return;
+    }
+
+    if ((*reinterpret_cast<s32*>(self + 0x494) == 1) && (quakeState == 0)) {
+        *reinterpret_cast<s32*>(self + 0x494) = 0;
+        self[0x490] = 1;
+        *reinterpret_cast<s32*>(self + 0x498) = keepMoving;
+        *reinterpret_cast<s16*>(self + 0x4BC) = 0;
+        *reinterpret_cast<s16*>(self + 0x4BE) = 0;
+        *reinterpret_cast<s16*>(self + 0x4C0) = endTime;
+        *reinterpret_cast<s16*>(self + 0x4C2) = endTime;
+        *reinterpret_cast<float*>(self + 0x4A4) = posAmpX;
+        *reinterpret_cast<float*>(self + 0x4A8) = posAmpY;
+        *reinterpret_cast<float*>(self + 0x4AC) = posAmpZ;
+        *reinterpret_cast<float*>(self + 0x4B0) = jitterAmpX;
+        *reinterpret_cast<float*>(self + 0x4B4) = jitterAmpY;
+        *reinterpret_cast<float*>(self + 0x4B8) = jitterAmpZ;
+    }
 }
 
 /*

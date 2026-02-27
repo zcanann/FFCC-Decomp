@@ -276,7 +276,8 @@ void GXSetPixelFmt(GXPixelFmt pix_fmt, GXZFmt16 z_fmt) {
 
     if (oldPeCtrl != __GXData->peCtrl) {
         GX_WRITE_RAS_REG(__GXData->peCtrl);
-        __GXData->genMode = (__GXData->genMode & ~0x200) | ((u32)(pix_fmt == GX_PF_RGB565_Z16) << 9);
+        __GXData->genMode =
+            (__GXData->genMode & ~0x200) | ((pix_fmt == GX_PF_RGB565_Z16) ? 0x200 : 0);
         __GXData->dirtyState |= 4;
     }
 

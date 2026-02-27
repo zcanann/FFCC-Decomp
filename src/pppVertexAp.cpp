@@ -124,7 +124,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
         switch (data->mode) {
         case 0:
             while (count-- != 0) {
-                if (state->index >= (u16)entry->maxValue) {
+                if ((s16)state->index >= entry->maxValue) {
                     state->index = 0;
                 }
 
@@ -137,8 +137,9 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
 
                 if ((data->childId + 0x10000) != 0xFFFF) {
                     _pppPObject* child;
+                    s32 childId = data->childId;
                     _pppPDataVal* childData =
-                        (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (data->childId << 4));
+                        (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (childId << 4));
                     Vec pos;
                     Vec worldPos;
                     Vec* outPos;
@@ -175,8 +176,9 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
 
                 if ((data->childId + 0x10000) != 0xFFFF) {
                     _pppPObject* child;
+                    s32 childId = data->childId;
                     _pppPDataVal* childData =
-                        (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (data->childId << 4));
+                        (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (childId << 4));
                     Vec pos;
                     Vec worldPos;
                     Vec* outPos;

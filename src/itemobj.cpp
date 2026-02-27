@@ -43,11 +43,25 @@ extern "C" int intToClass__13CFlatRuntime2Fi(void*, int);
 extern "C" int IsLoadModelASyncCompleted__Q29CCharaPcs7CHandleFv(void*);
 extern "C" void SetDamageCol__8CGObjectFiPcffP3Vec(void*, int, char*, float, float, Vec*);
 extern "C" void onFrame__8CGPrgObjFv(void*);
+extern "C" void SetTlut__5CFontFi(CFont*, int);
+extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
+extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
+extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
+extern "C" void SetPosX__5CFontFf(float, CFont*);
+extern "C" void SetPosY__5CFontFf(float, CFont*);
+extern "C" void SetPosZ__5CFontFf(float, CFont*);
+extern "C" void Draw__5CFontFPc(CFont*, const char*);
 
 extern unsigned char CFlat[];
 extern CMath Math;
 extern float FLOAT_80331b20;
+extern float FLOAT_80331b1c;
 extern float FLOAT_80331b18;
+extern float FLOAT_80331b30;
+extern float FLOAT_80331b34;
+extern float FLOAT_80331b38;
+extern float FLOAT_80331b3c;
+extern float FLOAT_80331b40;
 extern float FLOAT_80331b4c;
 extern float FLOAT_80331b50;
 extern float FLOAT_80331b54;
@@ -60,6 +74,17 @@ extern char DAT_80331b84[];
 extern char DAT_80331bc8[];
 extern char DAT_801dced4[];
 extern char DAT_801dd010[];
+
+struct ItemObjFlatTableEntry {
+	int count;
+	const char** index;
+	char* buffer;
+};
+
+struct ItemObjFlatData {
+	char pad[0x6c];
+	ItemObjFlatTableEntry table[8];
+};
 
 /*
  * --INFO--
@@ -672,12 +697,53 @@ void CGItemObj::onNewFinished()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80124e04
+ * PAL Size: 424b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGItemObj::DrawOmoideName(CFont*)
+void CGItemObj::DrawOmoideName(CFont* font)
 {
-	// TODO
+	unsigned char* self = (unsigned char*)this;
+	unsigned char nodeFlags = *(unsigned char*)(self + 0x9A);
+	unsigned int rotatedFlags = ((unsigned int)nodeFlags << 26) | ((unsigned int)nodeFlags >> 6);
+
+	if ((int)rotatedFlags >= 0) {
+		return;
+	}
+
+	void* charaHandle = *(void**)(self + 0xF8);
+	bool hasModel = false;
+	if (charaHandle != 0 && *(void**)((unsigned char*)charaHandle + 0x168) != 0) {
+		hasModel = true;
+	}
+
+	if (!hasModel || *(int*)(self + 0x500) != 0xCB || *(float*)(self + 0x74) <= FLOAT_80331b20 ||
+	    *(float*)(self + 0x4B0) == FLOAT_80331b20) {
+		return;
+	}
+
+	SetTlut__5CFontFi(font, 7);
+
+	int alphaInt = (int)(FLOAT_80331b30 * *(float*)(self + 0x4B0));
+	GXColor textColor;
+	__ct__6CColorFUcUcUcUc(&textColor, 0xFF, 0xFF, 0xFF, (unsigned char)alphaInt);
+	SetColor__5CFontF8_GXColor(font, &textColor);
+
+	const ItemObjFlatData* flatData = reinterpret_cast<const ItemObjFlatData*>(&Game.game.m_cFlatDataArr[1]);
+	const char* name = flatData->table[2].index[*(int*)(self + 0x570)];
+	int width = GetWidth__5CFontFPc(font, name);
+	float depthScale = FLOAT_80331b18 / (*(float*)(self + 0x74) - FLOAT_80331b1c);
+	float posZ = *(float*)(self + 0x70) * depthScale;
+	float posY = -(FLOAT_80331b34 * *(float*)(self + 0x6C) * depthScale - FLOAT_80331b34);
+	float posX = -(FLOAT_80331b3c * (float)width - (FLOAT_80331b38 * *(float*)(self + 0x68) * depthScale + FLOAT_80331b38));
+
+	SetPosX__5CFontFf(posX, font);
+	SetPosY__5CFontFf(posY - FLOAT_80331b40, font);
+	SetPosZ__5CFontFf(posZ, font);
+	Draw__5CFontFPc(font, name);
 }
 
 /*

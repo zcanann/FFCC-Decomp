@@ -1337,12 +1337,16 @@ int CRedDriver::GetProgramTime()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bec48
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::SetSoundMode(int)
+void CRedDriver::SetSoundMode(int soundMode)
 {
-	// TODO
+    _EntryExecCommand(_SetSoundMode, soundMode, 0, 0, 0, 0, 0, 0);
 }
 
 /*
@@ -1397,12 +1401,20 @@ void CRedDriver::SetMusicData(void* param_1)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bedec
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::ReentryMusicData(int)
+void CRedDriver::ReentryMusicData(int musicID)
 {
-	// TODO
+    unsigned int interrupt;
+
+    interrupt = OSDisableInterrupts();
+    DAT_8032e154.ReentryMusicData(musicID);
+    OSRestoreInterrupts(interrupt);
 }
 
 /*

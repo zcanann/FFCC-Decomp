@@ -63,7 +63,7 @@ public:
 	void SetMusicData(void*);
 	void ReentryMusicData(int);
 	void MusicStop(int);
-	void MusicPlay(int, int, int);
+	int MusicPlay(int, int, int);
 	void MusicCrossPlay(int, int, int);
 	void MusicNextPlay(int, int, int);
 	void MusicMasterVolume(int);

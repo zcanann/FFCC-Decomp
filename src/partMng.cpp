@@ -1338,9 +1338,30 @@ void CPartMng::pppSetLocSlot(int slot, Vec* position)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppDeleteCHandle(CCharaPcs::CHandle*)
+void CPartMng::pppDeleteCHandle(CCharaPcs::CHandle* handle)
 {
-	// TODO
+    char* pppMngSt = reinterpret_cast<char*>(this);
+    for (int i = 0; i < 0x180; i++) {
+        int baseTime = *reinterpret_cast<int*>(pppMngSt + 0x14);
+        if (baseTime != -0x1000) {
+            unsigned char mode = *reinterpret_cast<unsigned char*>(pppMngSt + 0xe7);
+            if (mode == 3 || (mode >= 5 && mode <= 7) || mode == 8) {
+                void* owner = *reinterpret_cast<void**>(pppMngSt + 0xd8);
+                if (owner != 0 &&
+                    *reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<char*>(owner) + 0xf8) == handle) {
+                    if (baseTime < 0) {
+                        *reinterpret_cast<unsigned char*>(pppMngSt + 0xe5) = 1;
+                        pppStopSe__FP9_pppMngStP7PPPSEST(
+                            reinterpret_cast<_pppMngSt*>(pppMngSt),
+                            reinterpret_cast<PPPSEST*>(pppMngSt + 0x11c));
+                    } else {
+                        *reinterpret_cast<int*>(pppMngSt + 0x14) = -0x1000;
+                    }
+                }
+            }
+        }
+        pppMngSt += 0x158;
+    }
 }
 
 /*
@@ -1348,9 +1369,25 @@ void CPartMng::pppDeleteCHandle(CCharaPcs::CHandle*)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppEndCHandle(CCharaPcs::CHandle*)
+void CPartMng::pppEndCHandle(CCharaPcs::CHandle* handle)
 {
-	// TODO
+    char* pppMngSt = reinterpret_cast<char*>(this);
+    for (int i = 0; i < 0x180; i++) {
+        if (*reinterpret_cast<int*>(pppMngSt + 0x14) != -0x1000) {
+            unsigned char mode = *reinterpret_cast<unsigned char*>(pppMngSt + 0xe7);
+            if (mode == 3 || (mode >= 5 && mode <= 7) || mode == 8) {
+                void* owner = *reinterpret_cast<void**>(pppMngSt + 0xd8);
+                if (owner != 0 &&
+                    *reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<char*>(owner) + 0xf8) == handle) {
+                    *reinterpret_cast<unsigned char*>(pppMngSt + 0xe4) = 1;
+                    pppStopSe__FP9_pppMngStP7PPPSEST(
+                        reinterpret_cast<_pppMngSt*>(pppMngSt),
+                        reinterpret_cast<PPPSEST*>(pppMngSt + 0x11c));
+                }
+            }
+        }
+        pppMngSt += 0x158;
+    }
 }
 
 /*
@@ -1358,9 +1395,22 @@ void CPartMng::pppEndCHandle(CCharaPcs::CHandle*)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppIsDeadCHandle(CCharaPcs::CHandle*)
+void CPartMng::pppIsDeadCHandle(CCharaPcs::CHandle* handle)
 {
-	// TODO
+    char* pppMngSt = reinterpret_cast<char*>(this);
+    for (int i = 0; i < 0x180; i++) {
+        if (*reinterpret_cast<int*>(pppMngSt + 0x14) != -0x1000) {
+            unsigned char mode = *reinterpret_cast<unsigned char*>(pppMngSt + 0xe7);
+            if (mode == 3 || (mode >= 5 && mode <= 7) || mode == 8) {
+                void* owner = *reinterpret_cast<void**>(pppMngSt + 0xd8);
+                if (owner != 0 &&
+                    *reinterpret_cast<CCharaPcs::CHandle**>(reinterpret_cast<char*>(owner) + 0xf8) == handle) {
+                    return;
+                }
+            }
+        }
+        pppMngSt += 0x158;
+    }
 }
 
 /*
@@ -1370,7 +1420,21 @@ void CPartMng::pppIsDeadCHandle(CCharaPcs::CHandle*)
  */
 void CPartMng::pppDeleteAll()
 {
-	// TODO
+    char* pppMngSt = reinterpret_cast<char*>(this);
+    for (int i = 0; i < 0x180; i++) {
+        int baseTime = *reinterpret_cast<int*>(pppMngSt + 0x14);
+        if (baseTime != -0x1000) {
+            if (baseTime < 0) {
+                *reinterpret_cast<unsigned char*>(pppMngSt + 0xe5) = 1;
+                pppStopSe__FP9_pppMngStP7PPPSEST(
+                    reinterpret_cast<_pppMngSt*>(pppMngSt),
+                    reinterpret_cast<PPPSEST*>(pppMngSt + 0x11c));
+            } else {
+                *reinterpret_cast<int*>(pppMngSt + 0x14) = -0x1000;
+            }
+        }
+        pppMngSt += 0x158;
+    }
 }
 
 /*
@@ -1380,7 +1444,17 @@ void CPartMng::pppDeleteAll()
  */
 void CPartMng::pppDestroyAll()
 {
-	// TODO
+    Graphic._WaitDrawDone(s_partMng_cpp_801d8230, 0x116f);
+
+    char* pppMngSt = reinterpret_cast<char*>(this);
+    for (int i = 0; i < 0x180; i++) {
+        if (*reinterpret_cast<int*>(pppMngSt + 0x14) != -0x1000 && *reinterpret_cast<void**>(pppMngSt) != 0) {
+            _pppAllFreePObject(reinterpret_cast<_pppMngSt*>(pppMngSt));
+        }
+        pppMngSt += 0x158;
+    }
+
+    Graphic._WaitDrawDone(s_partMng_cpp_801d8230, 0x117b);
 }
 
 /*

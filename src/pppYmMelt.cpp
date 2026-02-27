@@ -322,14 +322,11 @@ void pppRenderYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offs
 
     colorOffset = offsets->m_serializedDataOffsets[1];
     work = (YmMeltWork*)((u8*)ymMelt + *offsets->m_serializedDataOffsets + 0x80);
-    if (ctrl->m_dataValIndex == 0xFFFF || work->m_vertexData == nullptr) {
+    if (ctrl->m_dataValIndex == 0xFFFF) {
         return;
     }
 
     shape = *(pppShapeSt**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + ctrl->m_dataValIndex * 4);
-    if (shape == nullptr) {
-        return;
-    }
 
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
         (u8*)ymMelt + 0x88 + colorOffset, &ppvCameraMatrix0, FLOAT_80330af0, ctrl->m_payload[0x19],

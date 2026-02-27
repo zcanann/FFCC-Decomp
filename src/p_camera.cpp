@@ -642,12 +642,105 @@ void CCameraPcs::destroyChara()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80038b68
+ * PAL Size: 916b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCameraPcs::calcChara()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    unsigned short padButtons;
+    Mtx mtxA;
+    Mtx mtxB;
+    Mtx mtxInv;
+    float stick;
+    Vec eyeDir;
+    Vec scaledDir;
+    Vec targetPos;
+
+    C_MTXPerspective(reinterpret_cast<Mtx44Ptr>(self + 0x94), *reinterpret_cast<float*>(self + 0xFC), FLOAT_8032fa3c,
+                     *reinterpret_cast<float*>(self + 0x100), *reinterpret_cast<float*>(self + 0x104));
+    GXSetProjection(reinterpret_cast<Mtx44Ptr>(self + 0x94), GX_PERSPECTIVE);
+
+    if (*reinterpret_cast<int*>(self + 0x46C) == 0) {
+        if (Pad._452_4_ == 0) {
+            padButtons = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 4 +
+                                                            ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
+        } else {
+            padButtons = 0;
+        }
+
+        if ((padButtons & 4) != 0) {
+            *reinterpret_cast<float*>(self + 0x44C) += FLOAT_8032fa20;
+        }
+        if ((padButtons & 8) != 0) {
+            *reinterpret_cast<float*>(self + 0x44C) -= FLOAT_8032fa20;
+        }
+
+        stick = FLOAT_8032fa34;
+        if (Pad._452_4_ == 0) {
+            stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x24 +
+                                              ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
+        }
+        *reinterpret_cast<float*>(self + 0x458) =
+            FLOAT_8032fa48 * stick + *reinterpret_cast<float*>(self + 0x458);
+
+        stick = FLOAT_8032fa34;
+        if (Pad._452_4_ == 0) {
+            stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x28 +
+                                              ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
+        }
+        *reinterpret_cast<float*>(self + 0x454) =
+            -((FLOAT_8032fa48 * stick) - *reinterpret_cast<float*>(self + 0x454));
+
+        stick = FLOAT_8032fa34;
+        if (Pad._452_4_ == 0) {
+            stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x1C +
+                                              ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
+        }
+        *reinterpret_cast<float*>(self + 0x45C) =
+            -((FLOAT_8032fabc * stick) - *reinterpret_cast<float*>(self + 0x45C));
+
+        stick = FLOAT_8032fa34;
+        if (Pad._452_4_ == 0) {
+            stick = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&Pad) + 0x20 +
+                                              ((~((int)~(Pad._448_4_ - 4 | 4 - Pad._448_4_) >> 0x1f) & 4U) * 0x54));
+        }
+        *reinterpret_cast<float*>(self + 0x45C) =
+            FLOAT_8032fabc * stick + *reinterpret_cast<float*>(self + 0x45C);
+    } else {
+        *reinterpret_cast<int*>(self + 0x46C) = 0;
+    }
+
+    PSMTXTrans(mtxA, *reinterpret_cast<float*>(self + 0x448), *reinterpret_cast<float*>(self + 0x44C),
+               *reinterpret_cast<float*>(self + 0x450));
+    PSMTXRotRad(mtxB, 'y', *reinterpret_cast<float*>(self + 0x458));
+    PSMTXConcat(mtxB, mtxA, mtxA);
+    PSMTXRotRad(mtxB, 'x', *reinterpret_cast<float*>(self + 0x454));
+    PSMTXConcat(mtxB, mtxA, mtxA);
+    PSMTXTrans(mtxB, FLOAT_8032fa34, FLOAT_8032fa34, -*reinterpret_cast<float*>(self + 0x45C));
+    PSMTXConcat(mtxB, mtxA, reinterpret_cast<MtxPtr>(self + 4));
+    PSMTXInverse(reinterpret_cast<MtxPtr>(self + 4), mtxInv);
+
+    *reinterpret_cast<float*>(self + 0xEC) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0xF0) = FLOAT_8032fa34;
+    *reinterpret_cast<float*>(self + 0xF4) = FLOAT_8032fa38;
+    PSMTXMultVecSR(mtxInv, reinterpret_cast<Vec*>(self + 0xEC), reinterpret_cast<Vec*>(self + 0xEC));
+
+    *reinterpret_cast<float*>(self + 0xD4) = *reinterpret_cast<float*>(self + 0x448);
+    *reinterpret_cast<float*>(self + 0xD8) = *reinterpret_cast<float*>(self + 0x44C);
+    *reinterpret_cast<float*>(self + 0xDC) = *reinterpret_cast<float*>(self + 0x450);
+
+    eyeDir = *reinterpret_cast<Vec*>(self + 0xEC);
+    PSVECScale(&eyeDir, &scaledDir, FLOAT_8032fa88);
+    PSVECAdd(reinterpret_cast<Vec*>(self + 0xD4), &scaledDir, &targetPos);
+
+    *reinterpret_cast<float*>(self + 0xE0) = targetPos.x;
+    *reinterpret_cast<float*>(self + 0xE4) = targetPos.y;
+    *reinterpret_cast<float*>(self + 0xE8) = targetPos.z;
 }
 
 /*

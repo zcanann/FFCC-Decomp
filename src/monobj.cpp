@@ -19,6 +19,8 @@ extern "C" char DAT_80331a4c[];
 
 extern "C" void __ptmf_scall(void*, void*);
 extern "C" int calcPolygonGroup__6CAStarFP3Veci(void*, Vec*, int);
+extern "C" int getNearParty__8CGMonObjFiiffi(CGMonObj*, int, int, float, float, int);
+extern "C" float DAT_8032ec24;
 
 /*
  * --INFO--
@@ -658,22 +660,36 @@ void CGMonObj::link(CGPartyObj*, CGMonObj*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80117090
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::aiTarget()
 {
-	// TODO
+	int partyIndex = getNearParty__8CGMonObjFiiffi(this, 0, 7, 0.0f, DAT_8032ec24, -1);
+	if (partyIndex >= 0) {
+		*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6C4) = partyIndex;
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80117044
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::aiTargetAttackRomMon(int)
+void CGMonObj::aiTargetAttackRomMon(int classId)
 {
-	// TODO
+	int partyIndex = getNearParty__8CGMonObjFiiffi(this, -1, 0x47, 0.0f, 0.0f, classId);
+	if (partyIndex >= 0) {
+		*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6C4) = partyIndex;
+	}
 }
 
 /*

@@ -1546,6 +1546,7 @@ void __MidiCtrl_KeyTransposeRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDA
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 void _PitchBendCompute(RedTrackDATA* track, int bend)
 {
     int* voiceData = (int*)DAT_8032f444;
@@ -1580,12 +1581,13 @@ void _PitchBendCompute(RedTrackDATA* track, int bend)
  */
 void __MidiCtrl_PitchBend(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    unsigned char* command = (unsigned char*)((int*)track)[0];
     int* trackData = (int*)track;
-    int bend = (unsigned int)command[0] + (unsigned int)command[1] * 0x80 + -0x2000;
+    int bend = (unsigned int)*(unsigned char*)trackData[0] + (unsigned int)*(unsigned char*)(trackData[0] + 1) * 0x80 + -0x2000;
 
     *(short*)(trackData + 0x50) = bend;
-    *(short*)((char*)trackData + 0x13e) = (bend * *(char*)((char*)trackData + 0x14b)) >> 5;
+    bend = (short)bend;
+    bend = (bend * *(char*)((char*)trackData + 0x14b)) >> 5;
+    *(short*)((char*)trackData + 0x13e) = bend;
     trackData[0] += 2;
     _PitchBendCompute(track, *(short*)((char*)trackData + 0x13e));
 }
@@ -1603,12 +1605,16 @@ void __MidiCtrl_PitchBendRange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* tr
 {
     int* trackData = (int*)track;
     unsigned char* command = (unsigned char*)((int*)track)[0];
+    signed char range;
 
     trackData[0] = (int)(command + 1);
-    *(char*)((char*)trackData + 0x14b) = *(char*)command;
-    *(short*)((char*)trackData + 0x13e) = (*(short*)(trackData + 0x50) * *(char*)((char*)trackData + 0x14b)) >> 5;
+    range = *(signed char*)command;
+    *(char*)((char*)trackData + 0x14b) = range;
+    range = *(char*)((char*)trackData + 0x14b);
+    *(short*)((char*)trackData + 0x13e) = (*(short*)(trackData + 0x50) * range) >> 5;
     _PitchBendCompute(track, *(short*)((char*)trackData + 0x13e));
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--

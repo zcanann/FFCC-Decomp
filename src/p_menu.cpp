@@ -1232,12 +1232,16 @@ void CMenuPcs::DrawWindow(float x, float y, float width, float height, CMenuPcs:
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009ba1c
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::SetColor(CColor&)
+void CMenuPcs::SetColor(CColor& color)
 {
-	// TODO
+    GXSetChanMatColor(GX_COLOR0A0, color.color);
 }
 
 /*
@@ -1555,12 +1559,23 @@ void CMenuPcs::drawBattle()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009ab8c
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::ChgPlayModeFromScript(bool)
+void CMenuPcs::ChgPlayModeFromScript(bool isScriptMode)
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+    const int mode = *reinterpret_cast<int*>(self + 0x740);
+
+    if ((mode != 2) && (mode != 1)) {
+        destroySingleMenu__8CMenuPcsFv(this);
+    }
+
+    Game.m_gameWork.m_menuStageMode = static_cast<u8>(isScriptMode);
 }
 
 /*

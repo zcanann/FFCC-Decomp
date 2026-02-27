@@ -1,4 +1,9 @@
 #include "ffcc/RedSound/RedEntry.h"
+#include <string.h>
+
+extern "C" {
+	void* RedNew__Fi(int);
+}
 
 /*
  * --INFO--
@@ -22,12 +27,51 @@ CRedEntry::~CRedEntry()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c0644
+ * PAL Size: 244b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedEntry::Init()
 {
-	// TODO
+	int iVar1;
+	int iVar2;
+	int* entry = (int*)this;
+
+	iVar2 = (int)RedNew__Fi(0x400);
+	entry[0] = iVar2;
+	iVar2 = (int)RedNew__Fi(0x1000);
+	entry[1] = iVar2;
+	iVar2 = (int)RedNew__Fi(0x40);
+	entry[2] = iVar2;
+
+	memset((void*)entry[0], 0, 0x400);
+	iVar2 = 0;
+	do {
+		iVar1 = iVar2 * 0x10;
+		iVar2 = iVar2 + 1;
+		*(int*)(entry[0] + iVar1) = -1;
+	} while (iVar2 < 0x40);
+
+	memset((void*)entry[1], 0, 0x1000);
+	iVar2 = 0;
+	do {
+		iVar1 = iVar2 * 0x10;
+		iVar2 = iVar2 + 1;
+		*(int*)(entry[1] + iVar1) = -1;
+	} while (iVar2 < 0x100);
+
+	memset((void*)entry[2], 0, 0x40);
+	iVar2 = 0;
+	do {
+		iVar1 = iVar2 * 0x10;
+		iVar2 = iVar2 + 1;
+		*(int*)(entry[2] + iVar1) = -1;
+	} while (iVar2 < 4);
+
+	entry[3] = -1;
 }
 
 /*

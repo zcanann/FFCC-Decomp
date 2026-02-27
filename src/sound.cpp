@@ -2050,20 +2050,22 @@ void CSound::ChangeSe3DPitch(int se3dHandle, int pitch, int frames)
         return;
     }
 
-    char* se = reinterpret_cast<char*>(this) + 0x2C;
-    char* found;
-    int count = 0x20;
+    u8* se = reinterpret_cast<u8*>(this) + 0x2C;
+    u8* found;
+    int remaining = 0x20;
     do {
-        if ((((*se < 0) && (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
-             ((found = se + 0x28, *found < 0 && (*reinterpret_cast<int*>(se + 0x2C) == se3dHandle))) ||
-             ((found = se + 0x50, *found < 0 && (*reinterpret_cast<int*>(se + 0x54) == se3dHandle))) ||
-             (se[0x78] < 0 && (found = se + 0x78, *reinterpret_cast<int*>(se + 0x7C) == se3dHandle)))) {
-            goto pitch_found;
+        if (((((static_cast<s8>(se[0]) < 0 && (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
+               ((found = se + 0x28), static_cast<s8>(*found) < 0 && (*reinterpret_cast<int*>(se + 0x2C) == se3dHandle))) ||
+              ((found = se + 0x50), static_cast<s8>(*found) < 0 && (*reinterpret_cast<int*>(se + 0x54) == se3dHandle))) ||
+             (static_cast<s8>(se[0x78]) < 0 && (found = se + 0x78, *reinterpret_cast<int*>(se + 0x7C) == se3dHandle)))) {
+            goto found_entry;
         }
         se += 0xA0;
-        count--;
-    } while (count != 0);
+        remaining--;
+    } while (remaining != 0);
     found = 0;
+
+found_entry:
 
 pitch_found:
     if (found != 0) {

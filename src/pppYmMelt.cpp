@@ -168,7 +168,8 @@ void CalcPolygonHeight(PYmMelt*, VERTEX_DATA* param_2, _GXColor* param_3, float 
             }
         }
 
-        vertex->m_position.y = (float)((double)(vertex->m_position.y + param_2->m_heightBias) - param_4);
+        vertex->m_position.y = vertex->m_position.y + param_2->m_heightBias;
+        vertex->m_position.y = (float)((double)vertex->m_position.y - param_4);
     }
 
     DCFlushRange(param_3, pointCount * 0x10);

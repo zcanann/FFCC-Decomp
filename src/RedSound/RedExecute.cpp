@@ -1,5 +1,6 @@
 #include "ffcc/RedSound/RedExecute.h"
 #include "ffcc/RedSound/RedMemory.h"
+#include "ffcc/RedSound/RedCommand.h"
 #include "ffcc/RedSound/RedMidiCtrl.h"
 #include "types.h"
 #include "dolphin/ax.h"
@@ -7,6 +8,7 @@
 #include <string.h>
 
 extern u32* DAT_8032f444;
+extern int* DAT_8032f41c;
 extern int* DAT_8032f420;
 extern unsigned int DAT_8032ec30;
 extern int DAT_8032f4ac;
@@ -1322,12 +1324,90 @@ void _KeyOnControl()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c5a3c
+ * PAL Size: 688b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void _ExecuteExtraData()
 {
-	// TODO
+    u32* sound = (u32*)DAT_8032f3f0;
+    u32* soundBase;
+    u32* voice;
+    int* track;
+    u32 musicBase;
+
+    do {
+        if ((sound[0x117] != 0) && (*sound != 0)) {
+            sound[0x117]--;
+            sound[0x115] += sound[0x116];
+            if ((sound[0x117] == 0) && ((int)sound[0x116] < 0)) {
+                MusicStop(sound[0x11C]);
+            }
+
+            if (*sound != 0) {
+                musicBase = *sound;
+                voice = DAT_8032f444;
+                do {
+                    if ((musicBase <= *voice) && (*voice < musicBase + (u32)*((u8*)sound + 0x491) * 0x154)) {
+                        voice[0x2E] |= 2;
+                    }
+                    voice += 0x30;
+                } while (voice < DAT_8032f444 + 0xC00);
+            }
+        }
+        soundBase = (u32*)DAT_8032f3f0;
+        sound += 0x125;
+    } while (sound < (u32*)DAT_8032f3f0 + 0x24A);
+
+    if (DAT_8032f41c[2] != 0) {
+        DAT_8032f41c[2]--;
+        DAT_8032f41c[0] += DAT_8032f41c[1];
+    }
+
+    if (DAT_8032f420[2] != 0) {
+        DAT_8032f420[2]--;
+        DAT_8032f420[0] += DAT_8032f420[1];
+        voice = DAT_8032f444;
+        do {
+            if ((((u8*)voice)[0x1A] & 3) == 0) {
+                voice[0x26] = PitchCompute(
+                    voice[0x28] + DAT_8032f420[0],
+                    (int)*(s16*)(*voice + 0x142) + (int)*(s16*)(*voice + 0x13E),
+                    *(int*)(voice[1] + 0x14),
+                    (s8)*(u8*)(*voice + 0x148));
+                voice[0x2E] |= 1;
+            }
+            voice += 0x30;
+        } while (voice < DAT_8032f444 + 0xC00);
+    }
+
+    do {
+        if ((*(s16*)((u8*)soundBase + 0x48E) != 0) && (soundBase[9] != 0)) {
+            soundBase[9]--;
+            soundBase[7] += soundBase[8];
+            if ((soundBase[0x11B] & 0x10000) == 0) {
+                track = (int*)*soundBase;
+                do {
+                    voice = DAT_8032f444;
+                    if (*track != 0) {
+                        do {
+                            if ((int*)*voice == track) {
+                                voice[0x2E] |= 2;
+                            }
+                            voice += 0x30;
+                        } while (voice < DAT_8032f444 + 0xC00);
+                    }
+                    track += 0x55;
+                } while (track < (int*)(*soundBase + (u32)*((u8*)soundBase + 0x491) * 0x154));
+            } else if ((soundBase[9] == 0) && (-1 < (int)soundBase[0x11C])) {
+                MusicStop(soundBase[0x11C]);
+            }
+        }
+        soundBase += 0x125;
+    } while (soundBase < (u32*)DAT_8032f3f0 + 0x36F);
 }
 
 /*

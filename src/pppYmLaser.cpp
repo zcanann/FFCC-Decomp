@@ -364,9 +364,6 @@ extern "C" void pppRenderYmLaser(void* pppYmLaser, void* param_2, void* param_3)
 	float u0;
 	float u1;
 	float uvStep;
-	pppFMATRIX localMtx;
-	pppFMATRIX worldMtx;
-	pppFMATRIX viewMtx;
 	pppFMATRIX modelView;
 	pppFMATRIX mtxOut;
 	pppFMATRIX shapeMtx;
@@ -405,11 +402,8 @@ extern "C" void pppRenderYmLaser(void* pppYmLaser, void* param_2, void* param_3)
 	halfWidth = work[4];
 	length = work[0];
 
-	localMtx = baseObj->m_localMatrix;
-	worldMtx = pppMngStPtr->m_matrix;
-	pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&modelView, &worldMtx, &localMtx);
-	viewMtx = *(pppFMATRIX*)&ppvCameraMatrix0;
-	pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&mtxOut, &viewMtx, &modelView);
+	pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&modelView, &pppMngStPtr->m_matrix, &baseObj->m_localMatrix);
+	pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&mtxOut, (pppFMATRIX*)&ppvCameraMatrix0, &modelView);
 	GXLoadPosMtxImm(mtxOut.value, 0);
 
 	GXBegin(GX_QUADS, GX_VTXFMT7, 4);

@@ -885,12 +885,51 @@ repeat_check_done:
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80095d44
+ * PAL Size: 300b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::onScriptChanging(char*)
+void CMenuPcs::onScriptChanging(char* script)
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+    int* refObject;
+    int refCount;
+
+    if (*reinterpret_cast<int*>(self + 0x740) == 0) {
+        for (int i = 0; i < 4; i++) {
+            CMenu* menu = *reinterpret_cast<CMenu**>(self + 0x13C + i * 4);
+            menu->ScriptChanging(script);
+        }
+
+        for (int i = 0; i < 12; i++) {
+            CMenu* menu = *reinterpret_cast<CMenu**>(self + 0x10C + i * 4);
+            menu->ScriptChanging(script);
+        }
+    }
+
+    memset(self + 0x48, 0, 0x28);
+    refObject = *reinterpret_cast<int**>(self + 0x100);
+    if (refObject != nullptr) {
+        refCount = refObject[1];
+        refObject[1] = refCount - 1;
+        if ((refCount - 1 == 0) && (refObject != nullptr)) {
+            reinterpret_cast<void (*)(void*, int)>(*reinterpret_cast<u32*>(refObject[0] + 8))(refObject, 1);
+        }
+        *reinterpret_cast<void**>(self + 0x100) = nullptr;
+    }
+
+    refObject = *reinterpret_cast<int**>(self + 0x104);
+    if (refObject != nullptr) {
+        refCount = refObject[1];
+        refObject[1] = refCount - 1;
+        if ((refCount - 1 == 0) && (refObject != nullptr)) {
+            reinterpret_cast<void (*)(void*, int)>(*reinterpret_cast<u32*>(refObject[0] + 8))(refObject, 1);
+        }
+        *reinterpret_cast<void**>(self + 0x104) = nullptr;
+    }
 }
 
 /*

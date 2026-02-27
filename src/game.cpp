@@ -1400,15 +1400,16 @@ int CGame::GetFoodLevel(int playerIndex, int foodIndex)
  */
 void CGame::GetTargetCursor(int playerIndex, Vec& posA, Vec& posB)
 {
-    f32* cursorPos = reinterpret_cast<f32*>(m_scriptFoodBase[playerIndex] + 0xBAC);
+    u32 base = m_scriptFoodBase[playerIndex];
 
-    posA.x = cursorPos[0];
-    posA.y = cursorPos[1];
-    posA.z = cursorPos[2];
+    posA.x = *(f32*)(base + 0xBAC);
+    posA.y = *(f32*)(base + 0xBB0);
+    posA.z = *(f32*)(base + 0xBB4);
 
-    posB.x = cursorPos[3];
-    posB.y = cursorPos[4];
-    posB.z = cursorPos[5];
+    base = m_scriptFoodBase[playerIndex];
+    posB.x = *(f32*)(base + 0xBB8);
+    posB.y = *(f32*)(base + 0xBBC);
+    posB.z = *(f32*)(base + 0xBC0);
 }
 
 /*

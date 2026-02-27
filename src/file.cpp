@@ -122,26 +122,27 @@ void CFile::Init()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80013b48
+ * PAL Size: 112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFile::Quit()
 {
-	if (m_readBuffer != 0)
-	{
-		delete[] m_readBuffer;
-		m_readBuffer = 0;
-	}
+    if (m_readBuffer != 0) {
+        delete[] m_readBuffer;
+        m_readBuffer = 0;
+    }
 
-	if (m_handlePoolHead.m_nextOffset != 0)
-	{
-		CHandle* pool = (CHandle*)m_handlePoolHead.m_nextOffset;
-		delete[] pool;
-		m_handlePoolHead.m_nextOffset = 0;
-		m_handlePoolHead.m_next = 0;
-	}
+    u32 nextOffset = m_handlePoolHead.m_nextOffset;
+    if (nextOffset != 0) {
+        delete[] (CHandle*)nextOffset;
+        m_handlePoolHead.m_nextOffset = 0;
+    }
 
-	// DestroyStage(&Memory, stage);
+    Memory.DestroyStage((CMemory::CStage*)m_stage);
 }
 
 /*

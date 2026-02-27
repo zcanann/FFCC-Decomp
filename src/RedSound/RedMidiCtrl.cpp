@@ -568,12 +568,34 @@ void __MidiCtrl_ReverbDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C8158
+ * PAL Size: 180b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_ReverbDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_ReverbDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    unsigned int delta[2];
+    int* trackData = (int*)track;
+    char* command = (char*)trackData[0];
+    char mode;
+
+    if (*command == 0) {
+        delta[0] = 0x100;
+    } else {
+        delta[0] = (unsigned char)*command;
+    }
+
+    trackData[0] = (int)(command + 1);
+    mode = *command;
+    if (mode != 0) {
+        mode = -1;
+    }
+    trackData[0x1b] = DataAddCompute(trackData + 0x1a, mode, (int*)delta);
+    trackData[0x1c] = delta[0];
+    trackData[0] += 2;
 }
 
 /*

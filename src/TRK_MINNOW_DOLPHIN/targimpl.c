@@ -417,13 +417,24 @@ DSError TRKTargetAccessDefault(u32 firstRegister, u32 lastRegister,
     return error;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801acc6c
+ * PAL Size: 1292b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 DSError TRKTargetAccessFP(u32 firstRegister, u32 lastRegister, TRKBuffer* b,
                           size_t* registersLengthPtr, BOOL read)
 {
+    typedef void (*asm_access_type)(void*, void*);
     u64 temp;
     DSError error;
     TRKExceptionStatus tempExceptionStatus;
     u32 current;
+    asm_access_type asm_access;
 
     if (lastRegister > 0x21) {
         return DS_InvalidRegister;
@@ -438,19 +449,70 @@ DSError TRKTargetAccessFP(u32 firstRegister, u32 lastRegister, TRKBuffer* b,
     error               = DS_NoError;
 
     for (current = firstRegister;
-         (current <= lastRegister) && (error == DS_NoError);
-         current++, *registersLengthPtr += sizeof(f64)) {
+         (current <= lastRegister) && (error == DS_NoError); current++) {
         if (read) {
-            error = TRKPPCAccessFPRegister(&temp, current, read);
-            if (error == DS_NoError) {
-                error = TRKAppendBuffer1_ui64(b, temp);
+            if (current < 0x20) {
+                u32 instructionData[] = {
+                    INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP,
+                    INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP
+                };
+                instructionData[0] = INSTR_STFD(current, 0, 3);
+                instructionData[9] = INSTR_BLR;
+                asm_access          = (asm_access_type)instructionData;
+                TRK_flush_cache(instructionData, sizeof(instructionData));
+                (*asm_access)(&temp, (void*)&TRKvalue128_temp);
+            } else if (current == 0x20) {
+                ReadFPSCR((f64*)&temp);
+                temp &= 0xffffffffULL;
+            } else if (current == 0x21) {
+                u32 instructionData[] = {
+                    INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP,
+                    INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP
+                };
+                instructionData[0] = INSTR_MFSPR(4, SPR_IBAT4U);
+                instructionData[1] = INSTR_STW(4, 0, 3);
+                instructionData[9] = INSTR_BLR;
+                asm_access          = (asm_access_type)instructionData;
+                TRK_flush_cache(instructionData, sizeof(instructionData));
+                (*asm_access)(&temp, (void*)&TRKvalue128_temp);
+                temp = (*(u32*)&temp) & 0xffffffffULL;
             }
+
+            error = TRKAppendBuffer1_ui64(b, temp);
         } else {
             error = TRKReadBuffer1_ui64(b, &temp);
             if (error == DS_NoError) {
-                error = TRKPPCAccessFPRegister(&temp, current, read);
+                if (current < 0x20) {
+                    u32 instructionData[] = {
+                        INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP,
+                        INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP
+                    };
+                    instructionData[0] = INSTR_LFD(current, 0, 3);
+                    instructionData[9] = INSTR_BLR;
+                    asm_access          = (asm_access_type)instructionData;
+                    TRK_flush_cache(instructionData, sizeof(instructionData));
+                    (*asm_access)(&temp, (void*)&TRKvalue128_temp);
+                } else if (current == 0x20) {
+                    WriteFPSCR((f64*)&temp);
+                    temp &= 0xffffffffULL;
+                } else if (current == 0x21) {
+                    u32 instructionData[] = {
+                        INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP,
+                        INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP
+                    };
+                    *(u32*)&temp         = *((u32*)&temp + 1);
+                    instructionData[0]   = INSTR_LWZ(4, 0, 3);
+                    instructionData[1]   = INSTR_MTSPR(SPR_IBAT4U, 4);
+                    instructionData[9]   = INSTR_BLR;
+                    asm_access           = (asm_access_type)instructionData;
+                    TRK_flush_cache(instructionData, sizeof(instructionData));
+                    (*asm_access)(&temp, (void*)&TRKvalue128_temp);
+                    temp = 0;
+                }
             }
         }
+
+        *registersLengthPtr += sizeof(f64);
     }
 
     if (gTRKExceptionStatus.exceptionDetected) {

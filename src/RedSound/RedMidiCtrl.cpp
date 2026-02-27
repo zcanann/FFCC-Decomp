@@ -20,13 +20,24 @@ void* memset(void*, int, unsigned long);
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C7478
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int DataAddCompute(int*, int, int*)
+int DataAddCompute(int* current, int target, int* stepCount)
 {
-	// TODO
-    return 0;
+    int delta = 0;
+
+    if (target == (*current >> 0xc)) {
+        *stepCount = 0;
+    } else {
+        delta = (((target << 0xc) | 0x800U) - *current) / *stepCount;
+    }
+
+    return delta;
 }
 
 /*

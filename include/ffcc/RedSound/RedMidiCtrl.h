@@ -5,7 +5,7 @@ struct RedKeyOnDATA;
 struct RedTrackDATA;
 struct RedSoundCONTROL;
 
-void DataAddCompute(int*, int, int*);
+int DataAddCompute(int*, int, int*);
 void KeyOnReserveClear(RedKeyOnDATA*, RedTrackDATA*);
 void KeyOnReserve(RedKeyOnDATA*, RedTrackDATA*);
 void KeyOffSet(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*);

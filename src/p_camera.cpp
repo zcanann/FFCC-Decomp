@@ -2,6 +2,7 @@
 
 #include "ffcc/materialman.h"
 #include "ffcc/memory.h"
+#include "ffcc/math.h"
 #include "ffcc/pad.h"
 #include "ffcc/gobject.h"
 #include "ffcc/p_game.h"
@@ -64,6 +65,7 @@ extern unsigned char CFlat[];
 extern Vec g_shadow_pos;
 extern Vec g_shadow_refpos;
 extern void* GraphicsPcs;
+extern CMath Math;
 extern "C" void Printf__7CSystemFPce(CSystem* system, char* format, ...);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long size, CMemory::CStage* stage, char* file, int line);
 extern "C" void __dl__FPv(void*);
@@ -77,6 +79,8 @@ extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(in
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" int __cntlzw(unsigned int);
+extern "C" int rand(void);
+extern "C" float RandF__5CMathFf(float, CMath*);
 extern "C" void setViewport__11CGraphicPcsFv(void*);
 extern "C" int CheckHitCylinder__7CMapMngFP12CMapCylinderP3VecUl(void*, void*, Vec*, unsigned long);
 extern "C" void CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
@@ -224,12 +228,99 @@ void CCameraPcs::SetQuakeParameter(int, int, short, short, float, float, float, 
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80039b7c
+ * PAL Size: 1060b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCameraPcs::CalcQuake()
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+    Vec move;
+    Vec randMove;
+
+    if (System.m_scenegraphStepMode == 2) {
+        return;
+    }
+
+    if (self[0x490] == 2 && *reinterpret_cast<s32*>(self + 0x494) == 0) {
+        return;
+    }
+
+    *reinterpret_cast<s16*>(self + 0x49C) = rand() & 1;
+    *reinterpret_cast<s16*>(self + 0x49E) = 1 - *reinterpret_cast<s16*>(self + 0x49E);
+    *reinterpret_cast<s16*>(self + 0x4A0) = rand() & 1;
+
+    move.x = (*reinterpret_cast<s16*>(self + 0x49C) == 0) ? -*reinterpret_cast<float*>(self + 0x4A4)
+                                                           : *reinterpret_cast<float*>(self + 0x4A4);
+    move.y = (*reinterpret_cast<s16*>(self + 0x49E) == 0) ? -*reinterpret_cast<float*>(self + 0x4A8)
+                                                           : *reinterpret_cast<float*>(self + 0x4A8);
+    move.z = (*reinterpret_cast<s16*>(self + 0x4A0) == 0) ? -*reinterpret_cast<float*>(self + 0x4AC)
+                                                           : *reinterpret_cast<float*>(self + 0x4AC);
+
+    randMove.x = (rand() & 1) ? RandF__5CMathFf(*reinterpret_cast<float*>(self + 0x4B0), &Math)
+                              : -RandF__5CMathFf(*reinterpret_cast<float*>(self + 0x4B0), &Math);
+    randMove.y = (rand() & 1) ? RandF__5CMathFf(*reinterpret_cast<float*>(self + 0x4B4), &Math)
+                              : -RandF__5CMathFf(*reinterpret_cast<float*>(self + 0x4B4), &Math);
+    randMove.z = (rand() & 1) ? RandF__5CMathFf(*reinterpret_cast<float*>(self + 0x4B8), &Math)
+                              : -RandF__5CMathFf(*reinterpret_cast<float*>(self + 0x4B8), &Math);
+
+    if (self[0x490] == 2) {
+        PSVECAdd(&move, &randMove, &move);
+        PSVECAdd(&move, reinterpret_cast<Vec*>(self + 0xE0), reinterpret_cast<Vec*>(self + 0xE0));
+        move.z = FLOAT_8032fa34;
+        PSVECAdd(&move, reinterpret_cast<Vec*>(self + 0xD4), reinterpret_cast<Vec*>(self + 0xD4));
+        return;
+    }
+
+    if (self[0x490] != 1) {
+        return;
+    }
+
+    if (*reinterpret_cast<s16*>(self + 0x4BC) < 1) {
+        if (*reinterpret_cast<s32*>(self + 0x494) != 0) {
+            PSVECAdd(&move, &randMove, &move);
+            PSVECAdd(&move, reinterpret_cast<Vec*>(self + 0xE0), reinterpret_cast<Vec*>(self + 0xE0));
+            PSVECAdd(&move, reinterpret_cast<Vec*>(self + 0xD4), reinterpret_cast<Vec*>(self + 0xD4));
+            return;
+        }
+
+        if (*reinterpret_cast<s16*>(self + 0x4C0) < 1) {
+            *reinterpret_cast<s32*>(self + 0x494) = 0;
+            *reinterpret_cast<s16*>(self + 0x4BC) = 0;
+            *reinterpret_cast<s16*>(self + 0x4BE) = 0;
+            *reinterpret_cast<s16*>(self + 0x4C0) = 0;
+            *reinterpret_cast<s16*>(self + 0x4C2) = 0;
+            *reinterpret_cast<float*>(self + 0x4AC) = FLOAT_8032fa34;
+            *reinterpret_cast<float*>(self + 0x4A8) = FLOAT_8032fa34;
+            *reinterpret_cast<float*>(self + 0x4A4) = FLOAT_8032fa34;
+            *reinterpret_cast<float*>(self + 0x4B8) = FLOAT_8032fa34;
+            *reinterpret_cast<float*>(self + 0x4B4) = FLOAT_8032fa34;
+            *reinterpret_cast<float*>(self + 0x4B0) = FLOAT_8032fa34;
+            return;
+        }
+
+        PSVECScale(&move, &move, static_cast<float>(*reinterpret_cast<s16*>(self + 0x4C0)) /
+                                    static_cast<float>(*reinterpret_cast<s16*>(self + 0x4C2)));
+        PSVECSubtract(&move, &randMove, &move);
+        PSVECAdd(&move, reinterpret_cast<Vec*>(self + 0xE0), reinterpret_cast<Vec*>(self + 0xE0));
+        PSVECAdd(&move, reinterpret_cast<Vec*>(self + 0xD4), reinterpret_cast<Vec*>(self + 0xD4));
+        *reinterpret_cast<s16*>(self + 0x4C0) -= 1;
+        return;
+    }
+
+    PSVECScale(&move, &move, static_cast<float>(*reinterpret_cast<s16*>(self + 0x4BC)) /
+                                static_cast<float>(*reinterpret_cast<s16*>(self + 0x4BE)));
+    PSVECAdd(&move, &randMove, &move);
+    PSVECAdd(&move, reinterpret_cast<Vec*>(self + 0xE0), reinterpret_cast<Vec*>(self + 0xE0));
+    PSVECAdd(&move, reinterpret_cast<Vec*>(self + 0xD4), reinterpret_cast<Vec*>(self + 0xD4));
+    *reinterpret_cast<s16*>(self + 0x4BC) -= 1;
+
+    if (*reinterpret_cast<s16*>(self + 0x4BC) == 0 && *reinterpret_cast<s32*>(self + 0x498) == 0) {
+        *reinterpret_cast<s32*>(self + 0x494) = 0;
+    }
 }
 
 /*

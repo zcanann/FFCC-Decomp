@@ -41,7 +41,12 @@ extern struct {
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dla__FPv(void*);
+extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
 extern "C" char lbl_801D6348[];
+extern "C" char lbl_801D6330[];
+extern "C" char lbl_801D6498[];
+extern "C" OSThread m_thread;
+extern "C" u8 m_threadStack[];
 
 static inline void*& PtrAt(CGraphic* self, u32 offset) {
     return *reinterpret_cast<void**>(reinterpret_cast<u8*>(self) + offset);
@@ -112,12 +117,110 @@ CGraphic::CGraphic()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80019b54
+ * PAL Size: 1000b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphic::Init()
 {
-	// TODO
+    PtrAt(this, 0x4) = CreateStage__7CMemoryFUlPci(&Memory, 0x19C000, lbl_801D6330, 0);
+    PtrAt(this, 0x8) = CreateStage__7CMemoryFUlPci(&Memory, 0xD6000, lbl_801D6498, 0);
+
+    S32At(this, 0x14) = 0;
+    U8At(this, 0x7200) = 0;
+    U8At(this, 0x7201) = 0;
+    U8At(this, 0x7202) = 0;
+    U8At(this, 0x7203) = 0;
+
+    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x7204) = 0.0f;
+    *reinterpret_cast<float*>(reinterpret_cast<u8*>(this) + 0x7208) = 0.0f;
+
+    U8At(this, 0x735F) = U8At(this, 0x7200);
+    U8At(this, 0x7360) = U8At(this, 0x7201);
+    U8At(this, 0x7361) = U8At(this, 0x7202);
+    U8At(this, 0x7362) = U8At(this, 0x7203);
+    memset(reinterpret_cast<u8*>(this) + 0x7364, 0, 0x10);
+
+    OSCreateThread(&m_thread, reinterpret_cast<void* (*)(void*)>(checkThread), nullptr, m_threadStack, 0x4000, 1, 1);
+    OSResumeThread(&m_thread);
+
+    VIInit();
+    PtrAt(this, 0x71E0) = &lbl_801E83C0;
+    S32At(this, 0x71F0) = 1;
+
+    void* renderMode = PtrAt(this, 0x71E0);
+    u32 alignedWidth = (U16At(renderMode, 4) + 0xF) & 0xFFF0;
+    u16 efbHeight = U16At(renderMode, 6);
+    u16 xfbHeight = U16At(renderMode, 8);
+
+    PtrAt(this, 0x71E4) = __nwa__FUlPQ27CMemory6CStagePci(alignedWidth * xfbHeight * 2,
+                                                           reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)),
+                                                           lbl_801D6348, 0x86);
+    memset(PtrAt(this, 0x71E4), 0, 4);
+
+    PtrAt(this, 0x71EC) = __nwa__FUlPQ27CMemory6CStagePci(alignedWidth * efbHeight * 2,
+                                                           reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)),
+                                                           lbl_801D6348, 0x88);
+    memset(PtrAt(this, 0x71EC), 0, 4);
+
+    PtrAt(this, 0x71E8) = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, alignedWidth * efbHeight * 2 + 0x46000,
+                                                                     reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x8)),
+                                                                     lbl_801D6348, 0xB53, 0);
+    memset(PtrAt(this, 0x71E8), 0, 0x46004);
+
+    PtrAt(this, 0x10) =
+        __nwa__FUlPQ27CMemory6CStagePci(0x60000, reinterpret_cast<CMemory::CStage*>(PtrAt(this, 0x4)), lbl_801D6348, 0x8B);
+
+    VIConfigure(reinterpret_cast<GXRenderModeObj*>(PtrAt(this, 0x71E0)));
+    GXInit(PtrAt(this, 0x10), 0x60000);
+
+    GXSetViewport(0.0f, 0.0f, static_cast<f32>(U16At(renderMode, 4)), static_cast<f32>(U16At(renderMode, 6)), 0.0f, 1.0f);
+    GXSetScissor(0, 0, U16At(renderMode, 4), U16At(renderMode, 6));
+    GXSetDispCopyYScale(GXGetYScaleFactor(U16At(renderMode, 6), U16At(renderMode, 8)));
+    GXSetDispCopySrc(0, 0, U16At(renderMode, 4), U16At(renderMode, 6));
+    GXSetDispCopyDst(U16At(renderMode, 4), U16At(renderMode, 6));
+    GXSetCopyFilter(reinterpret_cast<GXRenderModeObj*>(renderMode)->aa,
+                    reinterpret_cast<GXRenderModeObj*>(renderMode)->sample_pattern, GX_TRUE, DAT_801E83F2);
+
+    if (reinterpret_cast<GXRenderModeObj*>(renderMode)->aa == 0) {
+        GXSetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
+    } else {
+        GXSetPixelFmt(GX_PF_RGBA6_Z24, GX_ZC_LINEAR);
+    }
+
+    GXSetDispCopySrc(0, 0, U16At(renderMode, 4), U16At(renderMode, 6));
+    GXSetDispCopyDst(U16At(renderMode, 4), U16At(renderMode, 6));
+    GXCopyDisp(PtrAt(this, 0x71E4), GX_TRUE);
+    GXSetDispCopyGamma(GX_GM_1_0);
+    VISetNextFrameBuffer(PtrAt(this, 0x71E4));
+    VIFlush();
+    VIWaitForRetrace();
+    if ((*reinterpret_cast<u32*>(renderMode) & 1) != 0) {
+        VIWaitForRetrace();
+    }
+
+    S32At(this, 0x71F4) = VIGetRetraceCount();
+    S32At(this, 0xC) = 0;
+    S32At(this, 0x734C) = 0;
+    S32At(this, 0x7350) = 0;
+    S32At(this, 0x7354) = 0;
+    makeSphere();
+    S32At(this, 0x7358) = 0;
+    U8At(this, 0x735C) = 0;
+    U8At(this, 0x735D) = 0;
+    U8At(this, 0x735E) = 0;
+    GXCopyDisp(PtrAt(this, 0x71E4), GX_TRUE);
+    PtrAt(this, 0x7368) = lbl_801D6348;
+    S32At(this, 0x736C) = 0xBE;
+    S32At(this, 0x7364) = 1;
+    GXSetDrawDone();
+    GXWaitDrawDone();
+    S32At(this, 0x7364) = 0;
+    S32At(this, 0x7370) += 1;
+    VIFlush();
 }
 
 /*

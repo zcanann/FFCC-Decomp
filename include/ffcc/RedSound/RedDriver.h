@@ -75,7 +75,7 @@ public:
 	void SetSeSepData(void*);
 	void ClearSeSepData(int);
 	void ClearSeSepDataMG(int, int, int, int);
-	void ReentrySeSepData(int);
+	int ReentrySeSepData(int);
 
 	int SePlayState(int);
 	void SeStop(int);
@@ -103,7 +103,7 @@ public:
 	void ClearWaveDataM(int, int, int, int);
 	void ClearWaveBank(int);
 	void SetWaveData(int, int, void*, int);
-	void ReentryWaveData(int);
+	int ReentryWaveData(int);
 	void DisplayWaveInfo();
 
 	void SetReverb(int, int);

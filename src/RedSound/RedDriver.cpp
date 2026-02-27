@@ -30,8 +30,10 @@ extern "C" {
     int SetSeSepData__9CRedEntryFP12RedSeSepHEAD(void*, void*);
     void ClearSeSepData__9CRedEntryFi(void*, int);
     void ClearSeSepDataMG__9CRedEntryFiiii(void*, int, int, int, int);
+    int ReentrySeSepData__9CRedEntryFi(void*, int);
     int SearchMusicSequence__9CRedEntryFi(void*, int);
     int SearchSeSepSequence__9CRedEntryFi(void*, int);
+    int ReentryWaveData__9CRedEntryFi(void*, int);
     void ClearWaveData__9CRedEntryFi(void*, int);
     void ClearWaveDataM__9CRedEntryFiiii(void*, int, int, int, int);
     void ClearWaveBank__9CRedEntryFi(void*, int);
@@ -1602,9 +1604,15 @@ void CRedDriver::ClearSeSepDataMG(int, int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedDriver::ReentrySeSepData(int)
+int CRedDriver::ReentrySeSepData(int id)
 {
-	// TODO
+    unsigned int interrupts;
+    int result;
+
+    interrupts = OSDisableInterrupts();
+    result = ReentrySeSepData__9CRedEntryFi(&DAT_8032e154, id);
+    OSRestoreInterrupts(interrupts);
+    return result;
 }
 
 /*
@@ -2021,9 +2029,15 @@ void CRedDriver::SetWaveData(int slot, int waveID, void* waveData, int waveSize)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedDriver::ReentryWaveData(int)
+int CRedDriver::ReentryWaveData(int id)
 {
-	// TODO
+    unsigned int interrupts;
+    int result;
+
+    interrupts = OSDisableInterrupts();
+    result = ReentryWaveData__9CRedEntryFi(&DAT_8032e154, id);
+    OSRestoreInterrupts(interrupts);
+    return result;
 }
 
 /*

@@ -103,8 +103,8 @@ void pppConstructLaser(struct pppLaser *pppLaser, struct UnkC *param_2)
 {
     f32 fVar1 = FLOAT_80333428;
     f32* pfVar3 = (f32*)((u8*)pppLaser + 0x80 + param_2->offsets->m_serializedDataOffsets[2]);
-    int local_28;
     int local_24;
+    int local_28;
     int iVar2;
     Vec local_20;
     Vec local_14;

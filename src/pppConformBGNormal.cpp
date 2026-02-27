@@ -59,15 +59,13 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
 {
     u8 mode;
     f32 matrixX;
+    f32 matrixY;
     f32 matrixZ;
     f32 ownerY;
     _pppMngSt* pppMngSt;
     s32 hitFound;
     f32* serializedState;
     Vec* owner;
-    f64 matrixXd;
-    f64 matrixYd;
-    f64 matrixZd;
     f64 trigValue;
     f32 local_1b8;
     f32 local_1b4;
@@ -117,10 +115,8 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
         owner = *(Vec**)((u8*)pppMngStPtr + 0xd8);
         hitFound = 0;
         matrixX = pppMngStPtr->m_matrix.value[0][3];
-        matrixXd = (f64)matrixX;
-        matrixYd = (f64)pppMngStPtr->m_matrix.value[1][3];
+        matrixY = pppMngStPtr->m_matrix.value[1][3];
         matrixZ = pppMngStPtr->m_matrix.value[2][3];
-        matrixZd = (f64)matrixZ;
         serializedState = (f32*)((u8*)pppConformBGNormal + 0x80 + *param3->m_serializedDataOffsets);
 
         if ((Game.game.m_currentSceneId != 7) || (param2->m_stepValue == 2)) {
@@ -143,7 +139,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                 local_17c = lbl_80331908;
                 local_178 = lbl_80331910;
                 local_174 = lbl_80331908;
-                local_f0 = (f32)(matrixYd + (f64)param2->m_arg3);
+                local_f0 = matrixY + param2->m_arg3;
                 local_c4 = lbl_80331914;
                 local_c8 = lbl_80331914;
                 local_cc = lbl_80331914;
@@ -163,14 +159,14 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                     local_164.x = lbl_80331908;
                     local_164.y = lbl_8033190C;
                     local_164.z = lbl_80331908;
-                    local_170.x = (f32)matrixXd;
-                    local_170.y = (f32)matrixYd;
-                    local_170.z = (f32)matrixZd;
+                    local_170.x = matrixX;
+                    local_170.y = matrixY;
+                    local_170.z = matrixZ;
                 } else {
                     CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A88), &local_170);
                     GetHitFaceNormal__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A88), &local_164);
-                    if (local_170.y < (f32)(matrixYd - (f64)lbl_8033191C)) {
-                        local_170.y = (f32)matrixYd;
+                    if (local_170.y < matrixY - lbl_8033191C) {
+                        local_170.y = matrixY;
                     }
                 }
             }
@@ -263,7 +259,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                         &MapMng, &local_134, &local_1b8, 0xffffffff);
                     if (hitFound == 0) {
                         pppMngStPtr->m_matrix.value[0][3] = *(f32*)((u8*)owner + 0x15c);
-                        pppMngStPtr->m_matrix.value[1][3] = (f32)matrixYd;
+                        pppMngStPtr->m_matrix.value[1][3] = matrixY;
                         pppMngStPtr->m_matrix.value[2][3] = *(f32*)((u8*)owner + 0x164);
                     } else {
                         CalcHitPosition__7CMapObjFP3Vec(*(void**)((u8*)&MapMng + 0x22A88), &local_170);
@@ -279,9 +275,9 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
                 }
             } else if (mode == 1) {
                 if (hitFound == 0) {
-                    pppMngStPtr->m_matrix.value[0][3] = (f32)matrixXd;
-                    pppMngStPtr->m_matrix.value[1][3] = (f32)matrixYd;
-                    pppMngStPtr->m_matrix.value[2][3] = (f32)matrixZd;
+                    pppMngStPtr->m_matrix.value[0][3] = matrixX;
+                    pppMngStPtr->m_matrix.value[1][3] = matrixY;
+                    pppMngStPtr->m_matrix.value[2][3] = matrixZ;
                 } else {
                     pppMngStPtr->m_matrix.value[0][3] = local_170.x;
                     pppMngStPtr->m_matrix.value[1][3] = local_170.y;

@@ -86,6 +86,10 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
     u8* pppMngSt;
     Vec nextPos;
     s32 tableIndex;
+    f32 sinAngle;
+    f32 cosAngle;
+    f32 radiusX;
+    f32 radiusZ;
 
     if (DAT_8032ed70 != 0) {
         return;
@@ -108,7 +112,10 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
         work->m_angleStepStep += stepData->m_angleStepStep;
         work->m_angleStepStepStep += stepData->m_angleStepStepStep;
     }
-    work->m_angle += work->m_angleStep;
+    {
+        f32 nextAngle = work->m_angle + work->m_angleStep;
+        work->m_angle = nextAngle;
+    }
 
     if (work->m_angle > lbl_80330D78) {
         work->m_angle -= lbl_80330D78;
@@ -118,15 +125,19 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
     }
 
     tableIndex = (s32)((lbl_80330D80 * (lbl_80330D84 * work->m_angle)) / lbl_80330D88);
-    nextPos.x = (work->m_radius * *(f32*)((u8*)lbl_801EC9F0 + ((tableIndex + 0x4000) & 0xFFFC))) + work->m_center.x;
+    sinAngle = *(f32*)((u8*)lbl_801EC9F0 + ((tableIndex + 0x4000) & 0xFFFC));
+    cosAngle = -(*(f32*)((u8*)lbl_801EC9F0 + (tableIndex & 0xFFFC)));
+    radiusX = work->m_radius * sinAngle;
+    radiusZ = work->m_radius * cosAngle;
+    nextPos.x = radiusX + work->m_center.x;
     nextPos.y = *(f32*)(pppMngSt + 0xC);
-    nextPos.z = (work->m_radius * -(*(f32*)((u8*)lbl_801EC9F0 + (tableIndex & 0xFFFC)))) + work->m_center.z;
+    nextPos.z = radiusZ + work->m_center.z;
 
     pppCopyVector(*(Vec*)(pppMngSt + 0x48), *(Vec*)(pppMngSt + 0x8));
     pppCopyVector(*(Vec*)(pppMngSt + 0x8), nextPos);
 
-    *(f32*)(pppMngSt + 0x84) = nextPos.x;
-    *(f32*)(pppMngSt + 0x94) = nextPos.y;
-    *(f32*)(pppMngSt + 0xA4) = nextPos.z;
+    *(f32*)(lbl_8032ED50 + 0x84) = nextPos.x;
+    *(f32*)(lbl_8032ED50 + 0x94) = nextPos.y;
+    *(f32*)(lbl_8032ED50 + 0xA4) = nextPos.z;
     pppSetFpMatrix((_pppMngSt*)pppMngSt);
 }

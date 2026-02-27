@@ -1310,6 +1310,30 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 		*object->m_sp = *reinterpret_cast<u32*>(code + 1);
 		object->m_sp++;
 		break;
+	case 6: {
+		const u32 op = *reinterpret_cast<u32*>(code + 1);
+		if ((static_cast<int>(op) >> 16) == 0) {
+			object->m_sp += 2;
+		} else {
+			unsigned int* const callFrame = object->m_sp + (-3 - (op & 0xFFFF));
+			typedef unsigned int* (*ResolveCallFn)(CFlatRuntime*, unsigned int);
+			unsigned int* const newObject =
+			    reinterpret_cast<ResolveCallFn>((*reinterpret_cast<void***>(this))[0xF])(this, *callFrame);
+
+			callFrame[1] = reinterpret_cast<unsigned int>(object->m_thisBase);
+			u32 classIndex = 0xFFFF;
+			if (object->m_classIndex >= 0) {
+				classIndex = static_cast<u32>(object->m_classIndex);
+			}
+			callFrame[2] = (static_cast<u32>(*reinterpret_cast<u16*>(reinterpret_cast<u8*>(object->m_engineObject) + 0x30))
+			                << 16) | classIndex;
+
+			object->m_thisBase = reinterpret_cast<unsigned int*>(newObject[0]);
+			object->m_classIndex = *reinterpret_cast<s16*>(newObject + 5);
+			object->m_engineObject = newObject;
+		}
+		break;
+	}
 	case 7: {
 		const u32 codePos = object->m_codePos;
 		const int current = static_cast<int>(codePos << 12) >> 12;
@@ -1324,6 +1348,21 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 			const u32 codePos = object->m_codePos;
 			const int current = static_cast<int>(codePos << 12) >> 12;
 			const int delta = static_cast<int>(*reinterpret_cast<u32*>(code + 1) & 0x00FFFFFF) - current;
+			object->m_codePos = (codePos & 0xFFF00000) | ((current + delta) & 0x000FFFFF);
+		}
+		break;
+	case 9:
+		object->m_sp--;
+		if (*object->m_sp != 0) {
+			const u32 op = *reinterpret_cast<u32*>(code + 1);
+			if ((static_cast<int>(op) >> 24) != 0) {
+				*object->m_sp = 1;
+				object->m_sp++;
+			}
+			const u32 codePos = object->m_codePos;
+			const int current = static_cast<int>(codePos << 12) >> 12;
+			const int delta = static_cast<int>(op & 0x00FFFFFF) - current;
+			code += delta;
 			object->m_codePos = (codePos & 0xFFF00000) | ((current + delta) & 0x000FFFFF);
 		}
 		break;

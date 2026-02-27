@@ -1,4 +1,6 @@
 #include "ffcc/itemobj.h"
+#include "ffcc/color.h"
+#include "ffcc/fontman.h"
 #include "ffcc/math.h"
 #include "ffcc/prgobj.h"
 #include "ffcc/p_game.h"
@@ -48,6 +50,12 @@ extern unsigned char CFlat[];
 extern CMath Math;
 extern float FLOAT_80331b20;
 extern float FLOAT_80331b18;
+extern float FLOAT_80331b1c;
+extern float FLOAT_80331b30;
+extern float FLOAT_80331b34;
+extern float FLOAT_80331b38;
+extern float FLOAT_80331b3c;
+extern float FLOAT_80331b40;
 extern float FLOAT_80331b4c;
 extern float FLOAT_80331b50;
 extern float FLOAT_80331b54;
@@ -60,6 +68,21 @@ extern char DAT_80331b84[];
 extern char DAT_80331bc8[];
 extern char DAT_801dced4[];
 extern char DAT_801dd010[];
+
+struct CFlatDataTableEntryView
+{
+	int m_numEntries;
+	char** m_strings;
+	char* m_stringBuf;
+};
+
+struct CFlatDataView
+{
+	int m_dataCount;
+	unsigned char _pad[0x68 - 4];
+	int m_tableCount;
+	CFlatDataTableEntryView m_tabl[8];
+};
 
 /*
  * --INFO--
@@ -672,12 +695,48 @@ void CGItemObj::onNewFinished()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80124e04
+ * PAL Size: 424b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGItemObj::DrawOmoideName(CFont*)
+void CGItemObj::DrawOmoideName(CFont* font)
 {
-	// TODO
+	unsigned char* self = (unsigned char*)this;
+	unsigned char weaponNodeFlagsByte0 = self[0x9A];
+
+	if ((int)(((unsigned int)weaponNodeFlagsByte0 << 0x1A) | ((unsigned int)weaponNodeFlagsByte0 >> 6)) < 0) {
+		int charaModelHandle = *(int*)(self + 0x564);
+
+		if ((charaModelHandle != 0) && (*(int*)(charaModelHandle + 0x168) != 0) && (*(int*)(self + 0x550) == 0xCB)) {
+			float screenDepth = *(float*)(self + 0x74);
+			float lookAtTimer = *(float*)(self + 0x4B0);
+
+			if ((FLOAT_80331b20 < screenDepth) && (lookAtTimer != FLOAT_80331b20)) {
+				font->SetTlut(7);
+
+				int alpha = (int)(FLOAT_80331b30 * lookAtTimer);
+				font->SetColor(CColor(0xFF, 0xFF, 0xFF, (unsigned char)alpha).color);
+
+				int omoideNameId = *(int*)(self + 0x570);
+				char* itemName = reinterpret_cast<CFlatDataView*>(&Game.game.m_cFlatDataArr[1])->m_tabl[2].m_strings[omoideNameId];
+				double textWidth = (double)font->GetWidth(itemName);
+
+				float projScale = FLOAT_80331b18 / (screenDepth - FLOAT_80331b1c);
+				float projY = *(float*)(self + 0x68);
+				float projZ = *(float*)(self + 0x6C);
+				float projW = *(float*)(self + 0x70);
+
+				font->SetPosX(-(float)((double)FLOAT_80331b3c * textWidth -
+				                       (double)(FLOAT_80331b38 * projY * projScale + FLOAT_80331b38)));
+				font->SetPosY(-(FLOAT_80331b34 * projZ * projScale - FLOAT_80331b34) - FLOAT_80331b40);
+				font->SetPosZ(projW * projScale);
+				font->Draw(itemName);
+			}
+		}
+	}
 }
 
 /*

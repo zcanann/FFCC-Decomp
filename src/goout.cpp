@@ -8,6 +8,7 @@ extern CGoOutMenu* g_pGoOutMenu;
 extern "C" int GetYesNoXPos__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" int CalcGoOutSelChar__8CMenuPcsFUcUc(CMenuPcs*, unsigned char, unsigned char);
 extern "C" void Calc__10CGoOutMenuFv(CGoOutMenu*);
+extern "C" void __dl__FPv(void*);
 extern "C" const char* GetWinMess__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" const char* const* GetMcWinMessBuff__8CMenuPcsFi(CMenuPcs*, int);
 
@@ -47,6 +48,11 @@ static inline signed char ReadGoOutS8(CGoOutMenu& menu, int offset)
 static inline void WriteMenuU8(int offset, unsigned char value)
 {
     *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(&MenuPcs) + offset) = value;
+}
+
+static inline unsigned char ReadMenuU8(int offset)
+{
+    return *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(&MenuPcs) + offset);
 }
 
 static inline int ReadMenuS32(int offset)
@@ -1198,8 +1204,18 @@ void CGoOutMenu::Calc()
     CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
     unsigned short input;
     char mode;
-    
+
     field_0x47 = 0;
+
+    if (ReadMenuU8(2172) != 0) {
+        WriteMenuU8(2172, 0);
+        WriteMenuShort(menuPcsLayout.field_2120, 0xA, 3);
+        field_0x36 = -1;
+        field_0x34 = -1;
+        field_0x38 = 0;
+        SetMainMode(1);
+        field_0x44 = 1;
+    }
 
     if (field_0x48 == 0) {
         mode = field_0x2c;
@@ -1223,9 +1239,11 @@ void CGoOutMenu::Calc()
                     WriteMenuShort(menuPcsLayout.field_2092, 0x20, -1);
 
                     if (ReadMenuS32(2176) != 0) {
+                        __dl__FPv(reinterpret_cast<void*>(ReadMenuS32(2176)));
                         WriteMenuS32(2176, 0);
                     }
                     if (ReadMenuS32(2180) != 0) {
+                        __dl__FPv(reinterpret_cast<void*>(ReadMenuS32(2180)));
                         WriteMenuS32(2180, 0);
                     }
 

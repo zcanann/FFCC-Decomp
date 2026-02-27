@@ -194,9 +194,8 @@ static BOOL DBGWrite(u32 count, u32* buffer, s32 param3) {
     }
 
     regs = __EXIRegs[10];
-    result = (u32)__cntlzw(result);
     __EXIRegs[10] = regs & 0x405;
-    return result >> 5;
+    return ((u32)__cntlzw(result)) >> 5;
 }
 
 inline static BOOL _DBGReadStatus(u32* p1) {

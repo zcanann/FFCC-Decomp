@@ -1272,12 +1272,67 @@ void CFlatRuntime::setSystemVal(CFlatRuntime::CObject*, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800663fc
+ * PAL Size: 5600b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime::objectFrame(CFlatRuntime::CObject*)
+int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 {
-	// TODO
+	CStopWatch watch(reinterpret_cast<char*>(-1));
+	System.DumpMapFile(&watch);
+	watch.Reset();
+	watch.Start();
+
+	if (object->m_waitCounter != 0) {
+		object->m_waitCounter--;
+		watch.Stop();
+		return 1;
+	}
+
+	u8* const self = reinterpret_cast<u8*>(this);
+	u8* code = *reinterpret_cast<u8**>(
+	    *reinterpret_cast<u8**>(
+	        *reinterpret_cast<u8**>(self + 0x20) + ((static_cast<int>(static_cast<s16>(object->m_codePos >> 16)) >> 4) * 0x50) + 0x34)
+	    + ((static_cast<int>(object->m_codePos << 12)) >> 12));
+
+	*reinterpret_cast<u16*>(self + 0x968) = *reinterpret_cast<u16*>(self + 0x964);
+	*reinterpret_cast<u16*>(self + 0x96A) = *reinterpret_cast<u16*>(self + 0x966);
+	*reinterpret_cast<u16*>(self + 0x964) = static_cast<u16>(object->m_codePos);
+	*reinterpret_cast<u16*>(self + 0x966) = static_cast<u16>(object->m_codePos >> 16);
+
+	switch (code[0]) {
+	case 3:
+	case 4:
+	case 5:
+		*object->m_sp = *reinterpret_cast<u32*>(code + 1);
+		object->m_sp++;
+		break;
+	case 7: {
+		const u32 codePos = object->m_codePos;
+		const int current = static_cast<int>(codePos << 12) >> 12;
+		const int delta = static_cast<int>(*reinterpret_cast<u32*>(code + 1) & 0x00FFFFFF) - current;
+		code += delta;
+		object->m_codePos = (codePos & 0xFFF00000) | ((current + delta) & 0x000FFFFF);
+		break;
+	}
+	case 8:
+		object->m_sp--;
+		if (*object->m_sp == 0) {
+			const u32 codePos = object->m_codePos;
+			const int current = static_cast<int>(codePos << 12) >> 12;
+			const int delta = static_cast<int>(*reinterpret_cast<u32*>(code + 1) & 0x00FFFFFF) - current;
+			object->m_codePos = (codePos & 0xFFF00000) | ((current + delta) & 0x000FFFFF);
+		}
+		break;
+	default:
+		break;
+	}
+
+	watch.Stop();
+	return 1;
 }
 
 /*

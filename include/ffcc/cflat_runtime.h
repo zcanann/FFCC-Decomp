@@ -111,7 +111,7 @@ public:
 	void calc(CFlatRuntime::CObject*, int);
 	void systemVal(CFlatRuntime::CObject*, int, int);
 	void setSystemVal(CFlatRuntime::CObject*, int);
-	void objectFrame(CFlatRuntime::CObject*);
+	int objectFrame(CFlatRuntime::CObject*);
 
 	void toFunc(CFlatRuntime::CCodeIndex&);
 	void toCode(CFlatRuntime::CCodeIndex&);

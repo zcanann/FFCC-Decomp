@@ -144,13 +144,14 @@ extern "C" CFlatData* dtor_800980B4(CFlatData* flatData, short shouldDelete)
 void CFlatData::Create(void* filePtr)
 {
 	CFlatData* flatData;
+	char** strings;
+	char** tableStrings;
 	int iVar1;
 	int iVar6;
 	int iVar7;
 	int iVar8;
 	int stringCount;
 	int baseAddress;
-	int offset;
 
 	flatData = this;
 	for (iVar8 = 0; iVar8 < m_dataCount; iVar8++)
@@ -214,13 +215,11 @@ void CFlatData::Create(void* filePtr)
 					memcpy(m_mesBuffer, chunkFile.GetAddress(), chunk.m_size);
 
 					baseAddress = (int)chunkFile.GetAddress();
-					flatData = this;
 					for (iVar7 = 0; iVar7 < m_mesCount; iVar7++)
 					{
 						iVar6 = (int)chunkFile.GetAddress();
-						flatData->m_mesPtr[0] = m_mesBuffer + (iVar6 - baseAddress);
+						m_mesPtr[iVar7] = m_mesBuffer + (iVar6 - baseAddress);
 						chunkFile.GetString();
-						flatData = (CFlatData*)flatData->m_data;
 					}
 				}
 				else if ((int)chunk.m_id < 0x4D455320)
@@ -250,13 +249,12 @@ void CFlatData::Create(void* filePtr)
 							memcpy(m_data[m_dataCount].m_stringBuf, chunkFile.GetAddress(), stringCount);
 
 							baseAddress = (int)chunkFile.GetAddress();
-							offset = 0;
 							for (iVar7 = 0; (iVar1 = m_dataCount, iVar7 < m_data[iVar1].m_numStrings); iVar7++)
 							{
 								iVar6 = (int)chunkFile.GetAddress();
-								*(char**)((int)m_data[iVar1].m_strings + offset) = m_data[iVar1].m_stringBuf + (iVar6 - baseAddress);
+								strings = m_data[iVar1].m_strings;
+								strings[iVar7] = m_data[iVar1].m_stringBuf + (iVar6 - baseAddress);
 								chunkFile.GetString();
-								offset += 4;
 							}
 						}
 
@@ -273,24 +271,15 @@ void CFlatData::Create(void* filePtr)
 					memcpy(m_tabl[m_tableCount].m_stringBuf, chunkFile.GetAddress(), chunk.m_size);
 
 					baseAddress = (int)chunkFile.GetAddress();
-					iVar7 = 0;
-					offset = 0;
-					while (true)
+					tableStrings = m_tabl[m_tableCount].m_strings;
+					for (iVar7 = 0; iVar7 < m_tabl[m_tableCount].m_numEntries; iVar7++)
 					{
-						iVar1 = m_tableCount;
-						if (m_tabl[iVar1].m_numEntries <= iVar7)
-						{
-							break;
-						}
-
 						iVar6 = (int)chunkFile.GetAddress();
-						*(char**)((int)m_tabl[iVar1].m_strings + offset) = m_tabl[iVar1].m_stringBuf + (iVar6 - baseAddress);
+						tableStrings[iVar7] = m_tabl[m_tableCount].m_stringBuf + (iVar6 - baseAddress);
 						chunkFile.GetString();
-						offset += 4;
-						iVar7++;
 					}
 
-					m_tableCount = iVar1 + 1;
+					m_tableCount++;
 				}
 			}
 			chunkFile.PopChunk();

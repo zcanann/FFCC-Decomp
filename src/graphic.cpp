@@ -1197,12 +1197,18 @@ void CGraphic::CreateSmallBackTexture(void* src, _GXTexObj* texObj, long width, 
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80016950
+ * PAL Size: 24b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphic::InitBlurParameter()
 {
-	// TODO
+    U8At(this, 0x735D) = 0;
+    U8At(this, 0x735E) = 0;
+    U8At(this, 0x735C) = 0xE8;
 }
 
 /*

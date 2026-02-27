@@ -90,6 +90,8 @@ struct CFlatDataView
 	unsigned char _pad[0x68 - 4];
 	int m_tableCount;
 	CFlatDataTableEntryView m_tabl[8];
+};
+
 struct ItemObjFlatTableEntry {
 	int count;
 	const char** index;

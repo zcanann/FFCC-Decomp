@@ -885,12 +885,40 @@ repeat_check_done:
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80095d44
+ * PAL Size: 300b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::onScriptChanging(char*)
+void CMenuPcs::onScriptChanging(char* script)
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+
+    if (*reinterpret_cast<int*>(self + 0x740) == 0) {
+        CMenu** menuSlot = reinterpret_cast<CMenu**>(self + 0x13C);
+        for (int i = 0; i < 4; i++) {
+            (*menuSlot)->ScriptChanging(script);
+            menuSlot++;
+        }
+
+        menuSlot = reinterpret_cast<CMenu**>(self + 0x10C);
+        for (int i = 0; i < 0xC; i++) {
+            (*menuSlot)->ScriptChanging(script);
+            menuSlot++;
+        }
+    }
+
+    memset(self + 0x48, 0, 0x28);
+
+    void** slot = reinterpret_cast<void**>(self + 0x100);
+    ReleaseRefObject(*slot);
+    *slot = nullptr;
+
+    slot = reinterpret_cast<void**>(self + 0x104);
+    ReleaseRefObject(*slot);
+    *slot = nullptr;
 }
 
 /*

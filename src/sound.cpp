@@ -2052,25 +2052,21 @@ void CSound::ChangeSe3DPitch(int se3dHandle, int pitch, int frames)
     }
 
     u8* se = reinterpret_cast<u8*>(this) + 0x2C;
-    u8* found = 0;
-    for (int i = 0; i < 0x20; i++, se += 0xA0) {
-        if (static_cast<s8>(se[0]) < 0 && *reinterpret_cast<int*>(se + 4) == se3dHandle) {
-            found = se;
-            break;
+    u8* found;
+    int remaining = 0x20;
+    do {
+        if (((((static_cast<s8>(se[0]) < 0 && (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
+               ((found = se + 0x28), static_cast<s8>(*found) < 0 && (*reinterpret_cast<int*>(se + 0x2C) == se3dHandle))) ||
+              ((found = se + 0x50), static_cast<s8>(*found) < 0 && (*reinterpret_cast<int*>(se + 0x54) == se3dHandle))) ||
+             (static_cast<s8>(se[0x78]) < 0 && (found = se + 0x78, *reinterpret_cast<int*>(se + 0x7C) == se3dHandle)))) {
+            goto found_entry;
         }
-        if (static_cast<s8>(se[0x28]) < 0 && *reinterpret_cast<int*>(se + 0x2C) == se3dHandle) {
-            found = se + 0x28;
-            break;
-        }
-        if (static_cast<s8>(se[0x50]) < 0 && *reinterpret_cast<int*>(se + 0x54) == se3dHandle) {
-            found = se + 0x50;
-            break;
-        }
-        if (static_cast<s8>(se[0x78]) < 0 && *reinterpret_cast<int*>(se + 0x7C) == se3dHandle) {
-            found = se + 0x78;
-            break;
-        }
-    }
+        se += 0xA0;
+        remaining--;
+    } while (remaining != 0);
+    found = 0;
+
+found_entry:
 
     if (found != 0) {
         SePitch__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), *reinterpret_cast<int*>(found + 8), pitch << 8, frames);

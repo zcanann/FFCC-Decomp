@@ -20,13 +20,27 @@ void* memset(void*, int, unsigned long);
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C7478
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void DataAddCompute(int*, int, int*)
+#pragma dont_inline on
+int DataAddCompute(int* value, int target, int* delta)
 {
-	// TODO
+    int result = 0;
+
+    if (target == (*value >> 0xc)) {
+        *delta = 0;
+    } else {
+        result = ((target << 0xc | 0x800U) - *value) / *delta;
+    }
+
+    return result;
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -1131,12 +1145,32 @@ void __MidiCtrl_VibrateRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C92C0
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_VibrateRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_VibrateRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    int* trackData = (int*)track;
+    int delta = DeltaTimeSumup((unsigned char**)trackData);
+    int rate;
+
+    if (delta == 0) {
+        delta = 1;
+    }
+
+    if (*(char*)trackData[0] == '\0') {
+        rate = 0x100;
+    } else {
+        rate = *(unsigned char*)trackData[0];
+    }
+
+    trackData[0x1f] = DataAddCompute(trackData + 0x1e, 0x100 / rate, &delta);
+    *(short*)(trackData + 0x23) = (short)delta;
+    trackData[0] += 1;
 }
 
 /*
@@ -1434,7 +1468,7 @@ void __MidiCtrl_PitchBend(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
     unsigned char* command = (unsigned char*)((int*)track)[0];
     int* trackData = (int*)track;
-    int bend = (unsigned int)command[0] + (unsigned int)command[1] * 0x80 - 0x2000;
+    int bend = (unsigned int)command[0] + (unsigned int)command[1] * 0x80 + -0x2000;
 
     *(short*)(trackData + 0x50) = bend;
     *(short*)((char*)trackData + 0x13e) = (bend * *(char*)((char*)trackData + 0x14b)) >> 5;

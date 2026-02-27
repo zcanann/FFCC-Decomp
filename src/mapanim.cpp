@@ -40,6 +40,7 @@ extern "C" void* lbl_801EA488[];
 extern "C" CPtrArray<CMapAnimNode*>* __ct__26CPtrArray_P12CMapAnimNode_Fv(CPtrArray<CMapAnimNode*>*);
 extern "C" CMapAnim* __vc__21CPtrArray_P8CMapAnim_FUl(void*, unsigned long);
 extern "C" CMapAnimNode* __vc__26CPtrArray_P12CMapAnimNode_FUl(void*, unsigned long);
+extern "C" int GetSize__26CPtrArray_P12CMapAnimNode_Fv(void*);
 extern "C" int Add__26CPtrArray_P12CMapAnimNode_FP12CMapAnimNode(CPtrArray<CMapAnimNode*>*, CMapAnimNode*);
 extern "C" int Add__27CPtrArray_P13CMapAnimKeyDt_FP13CMapAnimKeyDt(CPtrArray<CMapAnimKeyDt*>*, CMapAnimKeyDt*);
 extern unsigned char MapMng[];
@@ -617,12 +618,13 @@ void CMapAnim::ReadOtmAnim(CChunkFile& chunkFile)
  */
 void CMapAnim::Calc(long frame)
 {
-    CPtrArray<CMapAnimNode*>* nodeArray = reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this);
-    int nodeCount = nodeArray->GetSize();
+    int nodeCount;
+    int i;
 
-    for (int i = 0; i < nodeCount; i++) {
-        CMapAnimNode* node = __vc__26CPtrArray_P12CMapAnimNode_FUl(this, static_cast<unsigned long>(i));
-        node->Interp(static_cast<int>(frame));
+    nodeCount = GetSize__26CPtrArray_P12CMapAnimNode_Fv(this);
+    for (i = 0; i < nodeCount; i = i + 1) {
+        CMapAnimNode* node = __vc__26CPtrArray_P12CMapAnimNode_FUl(this, i);
+        node->Interp(frame);
     }
 }
 

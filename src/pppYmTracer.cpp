@@ -319,94 +319,85 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, UnkB* param_2, UnkC* param_3)
  */
 void pppRenderYmTracer(pppYmTracer* pppYmTracer, UnkB* param_2, UnkC* param_3)
 {
-    f32* work;
-    TRACE_POLYGON* polygons;
+    f32* poly;
     CMapMesh* mapMesh;
     CTexture* texture;
+    f32* work;
+    u32 i;
     u16 count;
+    s32 serializedOffset0;
+    s32 serializedOffset1;
+    u32 colorTop;
+    u32 colorBottom;
+    f32 uTop;
+    f32 uBottom;
     f32 uvStep;
     int textureIndex;
 
-    if (param_2->m_dataValIndex == 0xFFFF) {
-        return;
-    }
+    serializedOffset0 = *param_3->m_serializedDataOffsets;
+    serializedOffset1 = param_3->m_serializedDataOffsets[1];
 
-    work = (f32*)((u8*)pppYmTracer + 0x10 + *param_3->m_serializedDataOffsets);
-    polygons = (TRACE_POLYGON*)(u32)work[10];
+    work = (f32*)((u8*)pppYmTracer + 0x10 + serializedOffset0);
     count = *(u16*)(work + 0xB);
     mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[param_2->m_dataValIndex];
-    pppSetBlendMode__FUc(param_2->m_payload[10]);
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        (void*)((char*)pppYmTracer + 0x88 + param_3->m_serializedDataOffsets[1]), (void*)&ppvCameraMatrix0,
-        FLOAT_803306e8, param_2->m_payload[0xC], param_2->m_payload[0xB], param_2->m_payload[10], 0, 1, 1, 0);
-    SetVtxFmt_POS_CLR_TEX__5CUtilFv(&DAT_8032ec70);
+    if (param_2->m_dataValIndex != 0xFFFF) {
+        pppSetBlendMode__FUc(param_2->m_payload[10]);
+        pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+            (void*)((char*)pppYmTracer + 0x88 + serializedOffset1), (void*)&ppvCameraMatrix0, FLOAT_803306e8,
+            param_2->m_payload[0xC], param_2->m_payload[0xB], param_2->m_payload[10], 0, 1, 1, 0);
+        SetVtxFmt_POS_CLR_TEX__5CUtilFv(&DAT_8032ec70);
 
-    textureIndex = 0;
-    texture = (CTexture*)GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, pppEnvStPtr->m_materialSetPtr, textureIndex);
-    if (texture == nullptr) {
-        return;
-    }
+        textureIndex = 0;
+        texture = (CTexture*)GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, pppEnvStPtr->m_materialSetPtr, textureIndex);
+        if (texture != nullptr) {
+            GXLoadTexObj((GXTexObj*)((u8*)texture + 0x28), GX_TEXMAP0);
+            GXSetNumChans(1);
+            GXSetNumTexGens(1);
+            GXSetNumTevStages(1);
+            GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+            _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
+            _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 0);
+            _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
+            _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
 
-    GXLoadTexObj((GXTexObj*)((u8*)texture + 0x28), GX_TEXMAP0);
-    GXSetNumChans(1);
-    GXSetNumTexGens(1);
-    GXSetNumTevStages(1);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
-    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
-    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 0);
-    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-    _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
+            if ((*(u8*)((u8*)texture + 0x60) == 8) || (*(u8*)((u8*)texture + 0x60) == 9)) {
+                SetUpPaletteEnv(texture);
+            }
 
-    if ((*(u8*)((u8*)texture + 0x60) == 8) || (*(u8*)((u8*)texture + 0x60) == 9)) {
-        SetUpPaletteEnv(texture);
-    }
+            uvStep = FLOAT_803306ec / (f32)((f64)count - DOUBLE_803306f8);
+            GXSetCullMode(GX_CULL_NONE);
+            poly = (f32*)(u32)work[10];
 
-    uvStep = FLOAT_803306ec / (f32)((f64)(u32)count - DOUBLE_803306f8);
-    GXSetCullMode(GX_CULL_NONE);
+            for (i = 0; (s32)i < (s32)(count - 1); i++) {
+                if ((((*(s16*)(poly + 8) > 0) && (FLOAT_803306e8 != poly[4]) && (FLOAT_803306e8 != poly[5]) &&
+                      (FLOAT_803306e8 != poly[6]) && (FLOAT_803306e8 != poly[0]) && (FLOAT_803306e8 != poly[1]) &&
+                      (FLOAT_803306e8 != poly[2]) && (FLOAT_803306e8 != poly[14]) && (FLOAT_803306e8 != poly[15]) &&
+                      (FLOAT_803306e8 != poly[16]) && (FLOAT_803306e8 != poly[10]) && (FLOAT_803306e8 != poly[11]) &&
+                      (FLOAT_803306e8 != poly[12])))) {
+                    uTop = (f32)i * uvStep;
+                    uBottom = (f32)(i + 1) * uvStep;
+                    colorTop = (DAT_803306e0 & 0xFFFFFF00) | *(u8*)((u8*)poly + 0x1F);
+                    colorBottom = (DAT_803306e4 & 0xFFFFFF00) | *(u8*)((u8*)poly + 0x47);
 
-    for (u16 i = 0; i < (u16)(count - 1); i++) {
-        f32* poly = (f32*)(polygons + i);
-        f32 u0;
-        f32 u1;
-        u32 color0;
-        u32 color1;
+                    GXBegin((GXPrimitive)0x98, GX_VTXFMT7, 4);
+                    GXPosition3f32(poly[4], poly[5], poly[6]);
+                    GXColor1u32(colorTop);
+                    GXTexCoord2f32(uTop, FLOAT_803306ec);
 
-        if (*(s16*)(poly + 8) <= 0) {
-            continue;
+                    GXPosition3f32(poly[0], poly[1], poly[2]);
+                    GXColor1u32(colorTop);
+                    GXTexCoord2f32(uTop, FLOAT_803306e8);
+
+                    GXPosition3f32(poly[14], poly[15], poly[16]);
+                    GXColor1u32(colorBottom);
+                    GXTexCoord2f32(uBottom, FLOAT_803306ec);
+
+                    GXPosition3f32(poly[10], poly[11], poly[12]);
+                    GXColor1u32(colorBottom);
+                    GXTexCoord2f32(uBottom, FLOAT_803306e8);
+                }
+                poly += 10;
+            }
         }
-        if (poly[4] == FLOAT_803306e8 || poly[5] == FLOAT_803306e8 || poly[6] == FLOAT_803306e8) {
-            continue;
-        }
-        if (poly[0] == FLOAT_803306e8 || poly[1] == FLOAT_803306e8 || poly[2] == FLOAT_803306e8) {
-            continue;
-        }
-        if (poly[14] == FLOAT_803306e8 || poly[15] == FLOAT_803306e8 || poly[16] == FLOAT_803306e8) {
-            continue;
-        }
-        if (poly[10] == FLOAT_803306e8 || poly[11] == FLOAT_803306e8 || poly[12] == FLOAT_803306e8) {
-            continue;
-        }
-
-        u0 = (f32)i * uvStep;
-        u1 = (f32)(i + 1) * uvStep;
-        color0 = (DAT_803306e0 & 0xFFFFFF00) | *(u8*)((u8*)poly + 0x1F);
-        color1 = (DAT_803306e4 & 0xFFFFFF00) | *(u8*)((u8*)poly + 0x47);
-
-        GXBegin((GXPrimitive)0x98, GX_VTXFMT7, 4);
-        GXPosition3f32(poly[4], poly[5], poly[6]);
-        GXColor1u32(color0);
-        GXTexCoord2f32(u0, FLOAT_803306ec);
-
-        GXPosition3f32(poly[0], poly[1], poly[2]);
-        GXColor1u32(color0);
-        GXTexCoord2f32(u0, FLOAT_803306e8);
-
-        GXPosition3f32(poly[14], poly[15], poly[16]);
-        GXColor1u32(color1);
-        GXTexCoord2f32(u1, FLOAT_803306ec);
-
-        GXPosition3f32(poly[10], poly[11], poly[12]);
-        GXColor1u32(color1);
-        GXTexCoord2f32(u1, FLOAT_803306e8);
     }
 }

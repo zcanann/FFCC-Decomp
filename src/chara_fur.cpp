@@ -21,6 +21,7 @@ extern "C" unsigned char Game[];
 extern "C" unsigned char m_mogWork[];
 extern "C" char lbl_801DB694[];
 extern "C" char lbl_801DB6B4[];
+extern "C" void* lbl_8032EDF0;
 
 /*
  * --INFO--
@@ -406,6 +407,23 @@ void CChara::CModel::InitMogFurTex()
 		unsigned char flags = *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this) + 0xA0);
 		*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this) + 0xA0) = flags | 0x40;
 	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800e32c8
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void freeFurTex__6CCharaFv()
+{
+    if (lbl_8032EDF0 != 0) {
+        Memory.Free(lbl_8032EDF0);
+        lbl_8032EDF0 = 0;
+    }
 }
 
 /*

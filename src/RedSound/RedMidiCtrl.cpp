@@ -20,12 +20,24 @@ void* memset(void*, int, unsigned long);
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C7478
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void DataAddCompute(int*, int, int*)
+int DataAddCompute(int* current, int target, int* stepCount)
 {
-	// TODO
+    int delta = 0;
+
+    if (target == (*current >> 0xc)) {
+        *stepCount = 0;
+    } else {
+        delta = (((target << 0xc) | 0x800U) - *current) / *stepCount;
+    }
+
+    return delta;
 }
 
 /*
@@ -554,12 +566,35 @@ void __MidiCtrl_ReverbDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C8158
+ * PAL Size: 180b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_ReverbDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_ReverbDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    unsigned int stepCount[2];
+    unsigned char* command = (unsigned char*)((int*)track)[0];
+    int* trackData = (int*)track;
+    char targetDepth;
+
+    if (*command == 0) {
+        stepCount[0] = 0x100;
+    } else {
+        stepCount[0] = *command;
+    }
+
+    trackData[0] = (int)(command + 1);
+    targetDepth = (char)*command;
+    if (targetDepth != 0) {
+        targetDepth = -1;
+    }
+
+    trackData[0x1b] = DataAddCompute(trackData + 0x1a, (int)targetDepth, (int*)stepCount);
+    trackData[0x1c] = stepCount[0];
+    trackData[0] += 2;
 }
 
 /*

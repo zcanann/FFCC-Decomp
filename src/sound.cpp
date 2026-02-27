@@ -1806,37 +1806,36 @@ int CSound::PlaySe3DLine(int soundId, int lineIndex, float nearDistance, float f
  * JP Address: TODO
  * JP Size: TODO
  */
-void CSound::SetSe3DGroup(int se3dHandle, int group)
+int CSound::SetSe3DGroup(int se3dHandle, int group)
 {
     if (se3dHandle < 0) {
         Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
-        return;
+        return 0;
     }
 
-    u8* se = reinterpret_cast<u8*>(this) + 0x2C;
-    u8* found = 0;
-    for (int i = 0; i < 0x20; i++, se += 0xA0) {
-        if (static_cast<s8>(se[0]) < 0 && *reinterpret_cast<int*>(se + 4) == se3dHandle) {
-            found = se;
-            break;
+    char* se = reinterpret_cast<char*>(this) + 0x2C;
+    char* found;
+    int ret = 0;
+    int count = 0x20;
+    do {
+        if ((((*se < 0) && (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
+             ((found = se + 0x28, *found < 0 && (*reinterpret_cast<int*>(se + 0x2C) == se3dHandle))) ||
+             ((found = se + 0x50, *found < 0 && (*reinterpret_cast<int*>(se + 0x54) == se3dHandle))) ||
+             (se[0x78] < 0 && (found = se + 0x78, *reinterpret_cast<int*>(se + 0x7C) == se3dHandle)))) {
+            goto set_found;
         }
-        if (static_cast<s8>(se[0x28]) < 0 && *reinterpret_cast<int*>(se + 0x2C) == se3dHandle) {
-            found = se + 0x28;
-            break;
-        }
-        if (static_cast<s8>(se[0x50]) < 0 && *reinterpret_cast<int*>(se + 0x54) == se3dHandle) {
-            found = se + 0x50;
-            break;
-        }
-        if (static_cast<s8>(se[0x78]) < 0 && *reinterpret_cast<int*>(se + 0x7C) == se3dHandle) {
-            found = se + 0x78;
-            break;
-        }
-    }
+        ret += 3;
+        se += 0xA0;
+        count--;
+    } while (count != 0);
+    found = 0;
 
+set_found:
     if (found != 0) {
         *reinterpret_cast<int*>(found + 0x24) = group;
     }
+
+    return ret;
 }
 
 /*
@@ -2068,6 +2067,7 @@ void CSound::ChangeSe3DPitch(int se3dHandle, int pitch, int frames)
 
 found_entry:
 
+pitch_found:
     if (found != 0) {
         SePitch__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), *reinterpret_cast<int*>(found + 8), pitch << 8, frames);
     }

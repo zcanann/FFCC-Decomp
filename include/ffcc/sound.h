@@ -55,7 +55,7 @@ public:
     void searchSe3D(int);
     int PlaySe3D(int, Vec*, float, float, int);
     int PlaySe3DLine(int, int, float, float, int);
-    void SetSe3DGroup(int, int);
+    int SetSe3DGroup(int, int);
     void StopSe3DGroup(int);
     void StopSe3D(int);
     _pppMngSt* FadeOutSe3D(int, int);

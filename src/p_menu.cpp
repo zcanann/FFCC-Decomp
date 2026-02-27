@@ -76,6 +76,7 @@ extern int DAT_8020ef9c[];
 extern int DAT_8020f260[];
 extern char s_CMenuPcs_801d9d3c[];
 extern char s_dvd__smenu__s_tex_801d9d6c[];
+extern char s_dvd__smenu__s_fnt_801d9da0[];
 extern char s_dvd__smenu_gc22_fnt_801d9db4[];
 extern char s_dvd__smenu_gc23_fnt_801d9d8c[];
 extern char s_p_menu_cpp_801d9d80[];
@@ -497,12 +498,28 @@ void CMenuPcs::loadTexture(char** paths, int textureSetStart, int textureSetCoun
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80096a9c
+ * PAL Size: 248b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::freeTexture(int, int, int, int)
+void CMenuPcs::freeTexture(int textureSetStart, int textureSetCount, int textureStart, int textureCount)
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+
+    for (int i = 0; i < textureCount; i++) {
+        void** slot = reinterpret_cast<void**>(self + 0x18C + (textureStart + i) * 4);
+        ReleaseRefObject(*slot);
+        *slot = nullptr;
+    }
+
+    for (int i = 0; i < textureSetCount; i++) {
+        void** slot = reinterpret_cast<void**>(self + 0x14C + (textureSetStart + i) * 4);
+        ReleaseRefObject(*slot);
+        *slot = nullptr;
+    }
 }
 
 /*
@@ -1225,12 +1242,23 @@ void CMenuPcs::SetColor(CColor&)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80094aec
+ * PAL Size: 208b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::LoadExtraFont(int, char*)
+void CMenuPcs::LoadExtraFont(int fontNo, char* fileName)
 {
-	// TODO
+    char path[0x108];
+    u8* self = reinterpret_cast<u8*>(this);
+    CFont** fontSlot = reinterpret_cast<CFont**>(self + 0x100 + fontNo * 4);
+    ReleaseRefObject(*fontSlot);
+    *fontSlot = 0;
+
+    sprintf(path, s_dvd__smenu__s_fnt_801d9da0, Game.GetLangString(), fileName);
+    loadFont(2, path, fontNo + 2, -1);
 }
 
 /*

@@ -33,7 +33,10 @@ extern double DOUBLE_80332a90;
 extern double DOUBLE_80332a98;
 extern double DOUBLE_80332aa0;
 extern double DOUBLE_80332aa8;
+extern double DOUBLE_80332ab8;
+extern double DOUBLE_80332ac0;
 extern float FLOAT_80332ad0;
+extern float FLOAT_80332ac8;
 extern float FLOAT_80332a70;
 extern float FLOAT_80332ab0;
 extern float FLOAT_80332a88;
@@ -48,6 +51,8 @@ extern const char* PTR_s_Feuer_Hieb_80214d3c[];
 extern const char* PTR_s_Colpo_Fire_80214d50[];
 extern const char* PTR_s_Pyro_Frappe_80214d64[];
 extern const char* PTR_s_Efecto_Fuego_80214d78[];
+s32 DAT_8032eec8;
+s32 s_UniteTop[3];
 
 /*
  * --INFO--
@@ -1536,23 +1541,134 @@ void CMenuPcs::DrawUniteList()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8014b7ec
+ * PAL Size: 564b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::UniteOpenAnim(int)
+int CMenuPcs::UniteOpenAnim(int topIdx)
 {
-	// TODO
+	s16* const list = *reinterpret_cast<s16**>((u8*)this + 0x850);
+	const s32 caravanWork = Game.game.m_scriptFoodBase[0];
+	const float baseX = static_cast<float>(static_cast<double>(list[4]) - DOUBLE_80332a80);
+
+	if (DAT_8032eec8 == 0) {
+		return 1;
+	}
+
+	if (topIdx < 0) {
+		s32 finished = 0;
+		const float targetX = FLOAT_80332ac8 + baseX;
+		for (s32 i = 0; i < DAT_8032eec8; i++) {
+			for (s32 j = 0; j < 3; j++) {
+				const s32 idx = j + s_UniteTop[i];
+				const s32 entry = idx * 0x20 + 4;
+				if ((j != 0) && (*reinterpret_cast<s16*>(caravanWork + idx * 2 + 0x214) != -1)) {
+					break;
+				}
+
+				float value = static_cast<float>(static_cast<double>(list[entry]) - DOUBLE_80332a80);
+				value += static_cast<float>(DOUBLE_80332ab8);
+				list[entry] = static_cast<s16>(value);
+
+				const float delta = static_cast<float>(static_cast<double>(list[entry]) - DOUBLE_80332a80) - baseX;
+				if ((delta > static_cast<float>(DOUBLE_80332ac0)) || (delta < -static_cast<float>(DOUBLE_80332ac0))) {
+					list[entry] = static_cast<s16>(targetX);
+					if (j == 0) {
+						finished++;
+					}
+				}
+			}
+		}
+		return static_cast<int>(finished == DAT_8032eec8);
+	}
+
+	for (s32 i = 0; i < 3; i++) {
+		const s32 idx = i + s_UniteTop[topIdx];
+		const s32 entry = idx * 0x20 + 4;
+		if ((i != 0) && (*reinterpret_cast<s16*>(caravanWork + idx * 2 + 0x214) != -1)) {
+			break;
+		}
+
+		float value = static_cast<float>(static_cast<double>(list[entry]) - DOUBLE_80332a80);
+		value += static_cast<float>(DOUBLE_80332ab8);
+		list[entry] = static_cast<s16>(value);
+
+		const float delta = static_cast<float>(static_cast<double>(list[entry]) - DOUBLE_80332a80) - baseX;
+		if ((delta > static_cast<float>(DOUBLE_80332ac0)) || (delta < -static_cast<float>(DOUBLE_80332ac0))) {
+			list[entry] = static_cast<s16>(FLOAT_80332ac8 + baseX);
+			return 1;
+		}
+	}
+
+	return 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8014b5cc
+ * PAL Size: 544b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int CMenuPcs::UniteCloseAnim(int)
+int CMenuPcs::UniteCloseAnim(int topIdx)
 {
-	// TODO
-	return 0;
+	s16* const list = *reinterpret_cast<s16**>((u8*)this + 0x850);
+	const s32 caravanWork = Game.game.m_scriptFoodBase[0];
+	const float baseX = static_cast<float>(static_cast<double>(list[4]) - DOUBLE_80332a80);
+
+	if (DAT_8032eec8 == 0) {
+		return 1;
+	}
+
+	if (topIdx < 0) {
+		s32 finished = 0;
+		for (s32 i = 0; i < DAT_8032eec8; i++) {
+			for (s32 j = 0; j < 3; j++) {
+				const s32 idx = j + s_UniteTop[i];
+				const s32 entry = idx * 0x20 + 4;
+				if ((j != 0) && (*reinterpret_cast<s16*>(caravanWork + idx * 2 + 0x214) != -1)) {
+					break;
+				}
+
+				float value = static_cast<float>(static_cast<double>(list[entry]) - DOUBLE_80332a80);
+				value -= static_cast<float>(DOUBLE_80332ab8);
+				list[entry] = static_cast<s16>(value);
+
+				if (static_cast<float>(static_cast<double>(list[entry]) - DOUBLE_80332a80) <= baseX) {
+					list[entry] = static_cast<s16>(baseX);
+					if (j == 0) {
+						finished++;
+					}
+				}
+			}
+		}
+		return static_cast<int>(finished == DAT_8032eec8);
+	}
+
+	bool finished = false;
+	for (s32 i = 0; i < 3; i++) {
+		const s32 idx = i + s_UniteTop[topIdx];
+		const s32 entry = idx * 0x20 + 4;
+		if ((i != 0) && (*reinterpret_cast<s16*>(caravanWork + idx * 2 + 0x214) != -1)) {
+			break;
+		}
+
+		float value = static_cast<float>(static_cast<double>(list[entry]) - DOUBLE_80332a80);
+		value -= static_cast<float>(DOUBLE_80332ab8);
+		list[entry] = static_cast<s16>(value);
+
+		if (static_cast<float>(static_cast<double>(list[entry]) - DOUBLE_80332a80) <= baseX) {
+			finished = true;
+			list[entry] = static_cast<s16>(baseX);
+		}
+	}
+
+	return static_cast<int>(finished);
 }
 
 /*

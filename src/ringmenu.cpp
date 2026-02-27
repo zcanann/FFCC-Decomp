@@ -26,12 +26,17 @@ extern "C" void SetColor__8CMenuPcsFR6CColor(void*, void*);
 extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
 extern "C" void SetTlut__5CFontFi(CFont*, int);
 extern "C" void SetScale__5CFontFf(float, CFont*);
+extern "C" void SetScaleX__5CFontFf(float, CFont*);
+extern "C" void SetScaleY__5CFontFf(float, CFont*);
+extern "C" void SetMargin__5CFontFf(float, CFont*);
+extern "C" void SetShadow__5CFontFi(CFont*, int);
 extern "C" int GetWidth__5CFontFPc(CFont*, int);
 extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
 extern "C" void SetPosX__5CFontFf(float, CFont*);
 extern "C" void SetPosY__5CFontFf(float, CFont*);
 extern "C" void SetPosZ__5CFontFf(float, CFont*);
 extern "C" void Draw__5CFontFPc(CFont*, int);
+extern "C" void DrawInit__5CFontFv(CFont*);
 extern "C" void SetExternalTlut__8CTextureFPvi(void*, void*, int);
 extern "C" void _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
     int, int, int, int, int);
@@ -75,6 +80,19 @@ extern float FLOAT_80330a10;
 extern float FLOAT_80330a14;
 extern float FLOAT_80330a18;
 extern float FLOAT_80330a54;
+extern float FLOAT_80330a5c;
+extern float FLOAT_80330a60;
+extern float FLOAT_80330a64;
+extern float FLOAT_80330a68;
+extern float FLOAT_80330a6c;
+extern float FLOAT_80330a70;
+extern float FLOAT_80330a74;
+extern float FLOAT_80330a78;
+extern float FLOAT_80330a7c;
+extern float FLOAT_80330a80;
+extern float FLOAT_80330a84;
+extern float FLOAT_80330a88;
+extern float FLOAT_80330a8c;
 extern float FLOAT_80330a2c;
 extern float FLOAT_80330a30;
 extern float FLOAT_80330a28;
@@ -86,12 +104,20 @@ extern float FLOAT_80330a44;
 extern float FLOAT_80330a48;
 extern float FLOAT_80330a4c;
 extern float FLOAT_80330a58;
+extern float FLOAT_80330aac;
+extern float FLOAT_80330ab0;
+extern float FLOAT_80330ab4;
+extern float FLOAT_80330ab8;
+extern float FLOAT_80330abc;
+extern float FLOAT_80330ac0;
 extern float FLOAT_80330aa8;
 extern float FLOAT_80330ac4;
 extern float FLOAT_80330ae8;
 extern double DOUBLE_80330a00;
 extern double DOUBLE_80330a20;
+extern double DOUBLE_80330a90;
 extern double DOUBLE_80330a98;
+extern double DOUBLE_80330aa0;
 extern double DOUBLE_80330ac8;
 extern double DOUBLE_80330ad0;
 extern double DOUBLE_80330ad8;
@@ -468,12 +494,322 @@ void drawCommand(int state, CFont* font, float posX, float posY, CCaravanWork* c
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a39c4
+ * PAL Size: 3884b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRingMenu::onDraw()
 {
-	// TODO
+	const int menuIndex = RingMenuInt(this, 0x0C);
+	const RingMenuFlatData* flatData = reinterpret_cast<const RingMenuFlatData*>(&Game.game.m_cFlatDataArr[1]);
+	if (!((Game.game.m_gameWork.m_menuStageMode == 0) || (menuIndex < 1))) {
+		return;
+	}
+
+	unsigned int scriptFood = Game.game.m_scriptFoodBase[menuIndex];
+	if (scriptFood == 0) {
+		return;
+	}
+
+	double showScale = static_cast<double>(static_cast<float>(RingMenuInt(this, 0x500)) * FLOAT_80330a08);
+	if (RingMenuInt(this, 0x10) != 0) {
+		showScale = static_cast<double>(FLOAT_803309cc) - showScale;
+	}
+	if (showScale == static_cast<double>(FLOAT_803309c0)) {
+		return;
+	}
+
+	double transitionScale = static_cast<double>(static_cast<float>(RingMenuInt(this, 0x4EC)) * FLOAT_80330a08);
+	if (RingMenuInt(this, 0x10) != 0) {
+		transitionScale = -static_cast<double>(static_cast<float>(
+			static_cast<double>(static_cast<float>(RingMenuInt(this, 0x4EC)) * FLOAT_80330a08) - FLOAT_803309cc));
+	}
+
+	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcs, 0x16);
+	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcs, 0);
+
+	float cycle = static_cast<float>(
+		fmod(static_cast<double>(FLOAT_80330a18 * static_cast<float>(RingMenuInt(this, 0x4F4))), DOUBLE_80330a20));
+	if (cycle > FLOAT_803309cc) {
+		cycle = FLOAT_80330a28 - cycle;
+	}
+
+	const double pulse = sin(static_cast<double>(FLOAT_80330a0c) * showScale);
+
+	const float alphaScaleBase = FLOAT_80330a34 * static_cast<float>(showScale * transitionScale);
+	const float glowOffset = FLOAT_80330a5c * (FLOAT_803309cc - static_cast<float>(pulse));
+	const float iconAlphaScale = static_cast<float>(showScale * transitionScale);
+
+	const float posAltX = FLOAT_80330a60 + glowOffset;
+	const float posAltY = FLOAT_80330a64 + glowOffset;
+	const float posLeft = -glowOffset;
+	const float posMainX = posAltX - FLOAT_80330a68;
+	const float posMainY = FLOAT_80330a6c + glowOffset;
+
+	for (int group = 2; group >= 0; group--) {
+		float posX;
+		float posY;
+
+		if (group == 2) {
+			float sideX = posLeft;
+			if ((menuIndex & 1) != 0) {
+				sideX = posAltX;
+			}
+			posX = FLOAT_80330a70 + sideX;
+
+			float sideY = posLeft;
+			if ((menuIndex & 2) != 0) {
+				sideY = posAltY;
+			}
+			posY = FLOAT_80330a44 + sideY;
+		} else {
+			float sideX = posLeft;
+			if ((menuIndex & 1) != 0) {
+				sideX = posMainX;
+			}
+			posX = FLOAT_80330a68 + sideX;
+
+			float sideY = posLeft;
+			if ((menuIndex & 2) != 0) {
+				sideY = posMainY;
+			}
+			posY = FLOAT_80330a74 + sideY;
+		}
+
+		double buttonAlpha = static_cast<double>(static_cast<float>(RingMenuInt(this, 0x40 + group * 0x0C)) * FLOAT_80330a78);
+		if (RingMenuInt(this, 0x20 + group * 0x08) >= 0) {
+			buttonAlpha = static_cast<double>(FLOAT_803309cc) - buttonAlpha;
+		}
+
+		if (group == 2) {
+			CGPartyObj* partyObj = Game.game.m_partyObjArr[menuIndex];
+			if (partyObj != 0) {
+				buttonAlpha = static_cast<double>((-static_cast<int>(*reinterpret_cast<unsigned short*>(
+					reinterpret_cast<unsigned char*>(partyObj) + 0x6F4)) & 9) >> 31);
+			}
+		}
+
+		if (buttonAlpha == static_cast<double>(FLOAT_803309c0)) {
+			continue;
+		}
+
+		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcs, 0x1F);
+		unsigned int buttonColor[1];
+		__ct__6CColorFUcUcUcUc(buttonColor, 0xFF, 0xFF, 0xFF, static_cast<unsigned char>(static_cast<int>(buttonAlpha * alphaScaleBase)));
+		SetColor__8CMenuPcsFR6CColor(MenuPcs, buttonColor);
+
+		float drawX = posX;
+		float drawY = posY;
+		if (group == 1 || group == 0) {
+			const float wobble = static_cast<float>(sin(static_cast<double>(FLOAT_80330a0c) * buttonAlpha));
+			drawX = -(FLOAT_80330a70 * wobble - ((group == 0) ? (FLOAT_80330a10 + posX) : posX));
+			drawY = posY + ((group == 1) ? FLOAT_80330a80 : FLOAT_803309c0);
+		}
+
+		if (group == 2) {
+			DrawRect__8CMenuPcsFUlfffffffff(MenuPcs, 0, posX, posY, FLOAT_80330a84, FLOAT_80330a5c, FLOAT_803309c0, FLOAT_80330a88,
+			                                 FLOAT_803309cc, FLOAT_803309cc, 0.0f);
+		} else if (group == 1) {
+			DrawRect__8CMenuPcsFUlfffffffff(MenuPcs, 0, drawX, drawY, FLOAT_80330a7c, FLOAT_80330a80, FLOAT_803309c0, FLOAT_80330a5c,
+			                                 FLOAT_803309cc, FLOAT_803309cc, 0.0f);
+			DrawRect__8CMenuPcsFUlfffffffff(MenuPcs, 0, drawX, drawY, FLOAT_80330a80, FLOAT_80330a80, FLOAT_80330a68, FLOAT_803309f0,
+			                                 FLOAT_803309cc, FLOAT_803309cc, 0.0f);
+		} else {
+			DrawRect__8CMenuPcsFUlfffffffff(MenuPcs, 0, drawX, drawY, FLOAT_80330a7c, FLOAT_80330a5c, FLOAT_803309c0, FLOAT_803309c0,
+			                                 FLOAT_803309cc, FLOAT_803309cc, 0.0f);
+			DrawRect__8CMenuPcsFUlfffffffff(MenuPcs, 0, drawX, drawY, FLOAT_80330a68, FLOAT_80330a5c, FLOAT_803309c0, FLOAT_803309f0,
+			                                 FLOAT_803309cc, FLOAT_803309cc, 0.0f);
+		}
+
+		if (group == 2) {
+			CGPartyObj* partyObj = Game.game.m_partyObjArr[menuIndex];
+			if (partyObj != 0) {
+				CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(
+					reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(partyObj) + 0x5C)[0]);
+				int cmdIndex = (Game.game.m_gameWork.m_bossArtifactStageIndex == 0x19)
+				                   ? *reinterpret_cast<int*>(Chara + 0x2004)
+				                   : _GetIdxCmdList__12CCaravanWorkFv(caravanWork);
+
+				CFont* font = reinterpret_cast<CFont*>(*reinterpret_cast<int*>(MenuPcs + 0xFC));
+				DrawInit__5CFontFv(font);
+				SetMargin__5CFontFf(FLOAT_80330a8c, font);
+				SetShadow__5CFontFi(font, 1);
+				SetTlut__5CFontFi(font, 4);
+
+				double scroll = static_cast<double>(RingMenuFloat(this, 0x50C));
+				while (scroll >= static_cast<double>(FLOAT_803309cc)) {
+					if (Game.game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
+						cmdIndex = (cmdIndex + 1) % 5;
+					} else {
+						cmdIndex = GetNextCmdListIdx__12CCaravanWorkFii(caravanWork, cmdIndex, -1);
+					}
+					scroll -= static_cast<double>(FLOAT_803309cc);
+				}
+				while (scroll < static_cast<double>(FLOAT_803309d0)) {
+					if (Game.game.m_gameWork.m_bossArtifactStageIndex == 0x19) {
+						cmdIndex = (cmdIndex + 4) % 5;
+					} else {
+						cmdIndex = GetNextCmdListIdx__12CCaravanWorkFii(caravanWork, cmdIndex, 1);
+					}
+					scroll += static_cast<double>(FLOAT_803309cc);
+				}
+
+				double labelAlphaScale = DOUBLE_80330a98;
+				if (fabs(static_cast<double>(RingMenuFloat(this, 0x50C))) < DOUBLE_80330aa0) {
+					labelAlphaScale = DOUBLE_80330a90 * fabs(static_cast<double>(RingMenuFloat(this, 0x50C)));
+				}
+				labelAlphaScale = static_cast<double>(static_cast<float>(labelAlphaScale * static_cast<double>(iconAlphaScale)));
+
+				int prev1 = (Game.game.m_gameWork.m_bossArtifactStageIndex == 0x19)
+				                ? (cmdIndex + 4) % 5
+				                : GetNextCmdListIdx__12CCaravanWorkFii(caravanWork, cmdIndex, -1);
+				int prev2 = (Game.game.m_gameWork.m_bossArtifactStageIndex == 0x19)
+				                ? (prev1 + 4) % 5
+				                : GetNextCmdListIdx__12CCaravanWorkFii(caravanWork, prev1, -1);
+				int next1 = (Game.game.m_gameWork.m_bossArtifactStageIndex == 0x19)
+				                ? (cmdIndex + 1) % 5
+				                : GetNextCmdListIdx__12CCaravanWorkFii(caravanWork, cmdIndex, 1);
+				int next2 = (Game.game.m_gameWork.m_bossArtifactStageIndex == 0x19)
+				                ? (next1 + 1) % 5
+				                : GetNextCmdListIdx__12CCaravanWorkFii(caravanWork, next1, 1);
+
+				drawCommand(menuIndex, font, posX, posY, caravanWork, prev2, static_cast<float>(scroll - FLOAT_80330a28),
+				            static_cast<float>(labelAlphaScale));
+				drawCommand(menuIndex, font, posX, posY, caravanWork, prev1, static_cast<float>(scroll - FLOAT_803309cc),
+				            static_cast<float>(labelAlphaScale));
+				drawCommand(menuIndex, font, posX, posY, caravanWork, next2, static_cast<float>(scroll + FLOAT_80330a28),
+				            static_cast<float>(labelAlphaScale));
+				drawCommand(menuIndex, font, posX, posY, caravanWork, next1, static_cast<float>(scroll + FLOAT_803309cc),
+				            static_cast<float>(labelAlphaScale));
+				drawCommand(menuIndex, font, posX, posY, caravanWork, cmdIndex, static_cast<float>(scroll), iconAlphaScale);
+				DrawInit__8CMenuPcsFv(MenuPcs);
+			}
+		}
+
+		CFont* font = reinterpret_cast<CFont*>(*reinterpret_cast<int*>(MenuPcs + 0xFC));
+		for (int button = 1; button >= 0; button--) {
+			const int buttonValue = RingMenuInt(this, 0x18 + group * 0x0C + button * 4);
+			if (buttonValue < 0) {
+				continue;
+			}
+
+			int labelId;
+			if ((buttonValue & 0x8000) == 0) {
+				labelId = reinterpret_cast<const int*>(flatData->table[4].strings)[buttonValue];
+			} else {
+				labelId = reinterpret_cast<const int*>(flatData->table[0].strings)[(buttonValue & 0x7FFF) * 5 + 4];
+			}
+
+			double fade = static_cast<double>(static_cast<float>(RingMenuInt(this, 0x3C + group * 0x0C + button * 4) * FLOAT_80330a78));
+			if (button == 0) {
+				fade = static_cast<double>(FLOAT_803309cc) - fade;
+			}
+
+			DrawInit__5CFontFv(font);
+			SetMargin__5CFontFf(FLOAT_80330a8c, font);
+			SetShadow__5CFontFi(font, 1);
+
+			float textScale;
+			if (group == 1) {
+				SetTlut__5CFontFi(font, 0xE);
+				textScale = FLOAT_80330a4c;
+			} else if (group == 0) {
+				SetTlut__5CFontFi(font, 0xD);
+				textScale = FLOAT_80330ab8;
+			} else {
+				SetTlut__5CFontFi(font, (buttonValue == 1) ? 7 : 4);
+				const double wobble = sin(static_cast<double>(FLOAT_80330a0c) * static_cast<double>(FLOAT_803309cc - fade));
+				textScale = FLOAT_80330a4c * (FLOAT_80330abc * static_cast<float>(wobble) + FLOAT_803309cc);
+			}
+
+			SetScaleX__5CFontFf(textScale, font);
+			SetScaleY__5CFontFf(textScale, font);
+
+			const float width = static_cast<float>(GetWidth__5CFontFPc(font, labelId));
+			int alpha = static_cast<int>(showScale * static_cast<double>(static_cast<float>(FLOAT_80330a34 * fade) * static_cast<float>(transitionScale)));
+			if ((group == 2) && (RingMenuInt(this, 0x30) >= 0)) {
+				alpha = static_cast<int>(FLOAT_80330ac0 * static_cast<float>(alpha));
+			}
+
+			GXColor textColor = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(alpha)};
+			SetColor__5CFontF8_GXColor(font, &textColor);
+
+			float textX;
+			float textY;
+			if (group == 1) {
+				textX = -(FLOAT_803309c4 * width - (FLOAT_803309f0 + posX + FLOAT_80330aac));
+				textY = (FLOAT_80330ab0 + drawY) - FLOAT_803309ec;
+			} else if (group == 0) {
+				textX = -(FLOAT_803309c4 * width - (FLOAT_80330aa8 + posX + FLOAT_80330aac));
+				textY = (FLOAT_80330a3c + drawY) - FLOAT_803309ec;
+			} else {
+				textX = -(FLOAT_803309c4 * width - (FLOAT_80330aa8 + posX));
+				textY = FLOAT_80330ab4 + drawY;
+			}
+
+			SetPosX__5CFontFf(textX, font);
+			SetPosY__5CFontFf(textY, font);
+			SetPosZ__5CFontFf(FLOAT_803309c0, font);
+			if (group != 2) {
+				Draw__5CFontFPc(font, labelId);
+			}
+			DrawInit__8CMenuPcsFv(MenuPcs);
+
+			if (group == 2) {
+				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcs, 0x1F);
+				CGPartyObj* partyObj = Game.game.m_partyObjArr[menuIndex];
+				if (partyObj != 0) {
+					CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(
+						reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(partyObj) + 0x5C)[0]);
+					if ((caravanWork != 0) && ((*reinterpret_cast<unsigned char*>(CFlat + 0x12E4) & 2) == 0)) {
+						const float barY = FLOAT_80330aac + textY;
+						const float fullAlpha =
+							static_cast<float>(showScale * static_cast<double>(static_cast<float>(FLOAT_80330a34 * fade) * static_cast<float>(transitionScale)));
+						const float dimAlpha =
+							static_cast<float>(showScale * static_cast<double>(static_cast<float>(FLOAT_80330a84 * fade) * static_cast<float>(transitionScale)));
+						const float centerBase =
+							(FLOAT_80330aa8 + posX) -
+							static_cast<float>(static_cast<double>((((caravanWork->m_numCmdListSlots >> 28) & 1) +
+							                                       (caravanWork->m_numCmdListSlots * 8)) >>
+							                                      1));
+
+						for (int i = 0; i < caravanWork->m_numCmdListSlots; i++) {
+							int maxCharge;
+							int curCharge;
+							caravanWork->GetMagicCharge(i, maxCharge, curCharge);
+
+							float blink = FLOAT_803309c0;
+							if (maxCharge == 0) {
+								if (!caravanWork->IsSelectedCmdList(i)) {
+									unsigned int color[1];
+									__ct__6CColorFUcUcUcUc(color, 0x80, 0x80, 0x80, static_cast<unsigned char>(static_cast<int>(dimAlpha)));
+									SetColor__8CMenuPcsFR6CColor(MenuPcs, color);
+								} else {
+									unsigned int color[1];
+									__ct__6CColorFUcUcUcUc(color, 0x20, 0xFF, 0x20, static_cast<unsigned char>(static_cast<int>(fullAlpha)));
+									SetColor__8CMenuPcsFR6CColor(MenuPcs, color);
+								}
+							} else {
+								unsigned int color[1];
+								__ct__6CColorFUcUcUcUc(color, 0x00, 0xFF, 0x00, static_cast<unsigned char>(static_cast<int>(fullAlpha)));
+								SetColor__8CMenuPcsFR6CColor(MenuPcs, color);
+								blink = static_cast<float>((System.m_frameCounter >> 2) & 1);
+							}
+
+							DrawRect__8CMenuPcsFUlfffffffff(
+								MenuPcs, 3, FLOAT_803309ec + centerBase + static_cast<float>(i * 8), barY, FLOAT_80330a38, FLOAT_80330a38,
+								FLOAT_80330a38 * (FLOAT_80330a38 + blink), FLOAT_803309f0, FLOAT_803309cc, FLOAT_803309cc, 0.0f);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	DrawInit__8CMenuPcsFv(MenuPcs);
 }
 
 /*

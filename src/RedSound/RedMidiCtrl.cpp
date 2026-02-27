@@ -20,13 +20,21 @@ void* memset(void*, int, unsigned long);
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C7478
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int DataAddCompute(int*, int, int*)
+int DataAddCompute(int* current, int target, int* delta)
 {
-	// TODO
-    return 0;
+    if (target == (*current >> 0xc)) {
+        *delta = 0;
+        return 0;
+    }
+
+    return ((target << 0xc) + 0x800 - *current) / *delta;
 }
 
 /*
@@ -1154,12 +1162,33 @@ void __MidiCtrl_VibrateRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C92C0
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_VibrateRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_VibrateRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    int trackDelta[3];
+    int* trackData = (int*)track;
+    unsigned int rate;
+
+    trackDelta[0] = DeltaTimeSumup((unsigned char**)trackData);
+    if (trackDelta[0] == 0) {
+        trackDelta[0] = 1;
+    }
+
+    if (*(char*)trackData[0] == '\0') {
+        rate = 0x100;
+    } else {
+        rate = (unsigned int)*(unsigned char*)trackData[0];
+    }
+
+    trackData[0x1f] = DataAddCompute(trackData + 0x1e, 0x100 / rate, trackDelta);
+    *(short*)(trackData + 0x23) = (short)trackDelta[0];
+    trackData[0] += 1;
 }
 
 /*

@@ -261,7 +261,7 @@ void CFlatRuntime2::onClassSystemFunc(CFlatRuntime::CObject* object, int, int co
  * JP Address: TODO
  * JP Size: TODO
  */
-void CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* object, int systemVal)
+CFlatRuntime::CVal* CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* object, int systemVal)
 {
 	u8* const engineObject = reinterpret_cast<u8*>(object->m_engineObject);
 	unsigned int value = 0;
@@ -440,6 +440,8 @@ void CFlatRuntime2::onClassSystemVal(CFlatRuntime::CObject* object, int systemVa
 	} else {
 		LastResult(this) = 0;
 	}
+
+	return reinterpret_cast<CFlatRuntime::CVal*>(&LastResult(this));
 }
 
 /*

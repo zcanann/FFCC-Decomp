@@ -196,31 +196,24 @@ CFile::CHandle* CFile::Open(char* path, unsigned long userParam, CFile::PRI pri)
     if (entry != -1)
 	{
         DVDFastOpen(entry, &fi);
-
         handle = m_freeList;
-
-        if (handle != 0)
-		{
-            CHandle* next = it->m_next;
-
-            m_freeList = handle->m_previous;
-            handle->m_previous = it;
-            handle->m_next = next;
-            next->m_previous = handle;
-            it->m_next = handle;
-            handle->m_priority = pri;
-            handle->m_userParam = userParam;
-            handle->m_length = fi.length;
-            handle->m_completionStatus = 0;
-            handle->m_closedFlag = 0;
-            handle->m_flags = 0;
-            strcpy(handle->m_name, path);
-            handle->m_chunkSize = fi.length;
-            handle->m_currentOffset = 0;
-            handle->m_nextOffset = 0;
-            handle->m_dvdFileInfo = fi;
-            handle->m_dvdFileInfo.cb.userData = handle;
-        }
+        m_freeList = handle->m_previous;
+        handle->m_previous = it;
+        handle->m_next = it->m_next;
+        it->m_next->m_previous = handle;
+        it->m_next = handle;
+        handle->m_priority = pri;
+        handle->m_userParam = userParam;
+        handle->m_length = fi.length;
+        handle->m_completionStatus = 0;
+        handle->m_closedFlag = 0;
+        handle->m_flags = 0;
+        strcpy(handle->m_name, path);
+        handle->m_chunkSize = fi.length;
+        handle->m_currentOffset = 0;
+        handle->m_nextOffset = 0;
+        handle->m_dvdFileInfo = fi;
+        handle->m_dvdFileInfo.cb.userData = handle;
 	}
 
     if (handle == 0 && System.m_execParam != 0)

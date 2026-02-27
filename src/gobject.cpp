@@ -2,6 +2,8 @@
 
 #include "ffcc/cflat_runtime.h"
 #include "ffcc/math.h"
+#include "ffcc/map.h"
+#include "ffcc/maphit.h"
 #include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
 #include "ffcc/quadobj.h"
@@ -18,6 +20,8 @@ extern "C" int SearchNode__Q26CChara6CModelFPc(CChara::CModel*, char*);
 extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" CGQuadObj* FindGQuadObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGQuadObj* FindGQuadObjNext__13CFlatRuntime2FP9CGQuadObj(void*, CGQuadObj*);
+extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, u32);
+extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 
 static inline void CallOnPush(CGBaseObj* self, CGBaseObj* other, int arg)
 {
@@ -984,22 +988,98 @@ void CGObject::DrawDebug(CFont*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007c3bc
+ * PAL Size: 672b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGObject::SetPosBG(Vec*, int)
+void CGObject::SetPosBG(Vec* position, int useCapsuleOffset)
 {
-	// TODO
+    m_worldPosition = *position;
+
+    if (((m_weaponNodeFlags & 0x10) != 0) && (Game.game.m_currentMapId != 0x21)) {
+        CMapCylinder bodyCylinder;
+        bodyCylinder.m_bottom = m_worldPosition;
+        bodyCylinder.m_bottom.y += useCapsuleOffset != 0 ? m_capsuleHalfHeight : 0.5f;
+        bodyCylinder.m_direction.x = sZeroFloat;
+        bodyCylinder.m_direction.y = -1.0f;
+        bodyCylinder.m_direction.z = sZeroFloat;
+        bodyCylinder.m_radius = 0.3f;
+        bodyCylinder.m_height = 0.3f;
+        bodyCylinder.m_top = bodyCylinder.m_direction;
+        bodyCylinder.m_direction2.x = 0.3f;
+        bodyCylinder.m_direction2.y = 0.6f;
+        bodyCylinder.m_direction2.z = 0.6f;
+        bodyCylinder.m_radius2 = 0.6f;
+        bodyCylinder.m_height2 = 0.0f;
+
+        u32 hitMask = *reinterpret_cast<u32*>(&m_moveVec.x);
+        if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &bodyCylinder, &bodyCylinder.m_direction, hitMask) != 0) {
+            CalcHitPosition__7CMapObjFP3Vec(*reinterpret_cast<void**>(reinterpret_cast<u8*>(&MapMng) + 0x22A88), &m_worldPosition);
+        }
+
+        if ((m_charaModelHandle != 0) && (m_charaModelHandle->m_model != 0)) {
+            CMapCylinder attrCylinder;
+            attrCylinder.m_bottom.x = m_worldPosition.x;
+            attrCylinder.m_bottom.y = m_worldPosition.y + 1.0f;
+            attrCylinder.m_bottom.z = m_worldPosition.z;
+            attrCylinder.m_direction.x = sZeroFloat;
+            attrCylinder.m_direction.y = -0.5f;
+            attrCylinder.m_direction.z = sZeroFloat;
+            attrCylinder.m_radius = 0.3f;
+            attrCylinder.m_height = 0.3f;
+            attrCylinder.m_top = attrCylinder.m_direction;
+            attrCylinder.m_direction2.x = 0.3f;
+            attrCylinder.m_direction2.y = 0.6f;
+            attrCylinder.m_direction2.z = 0.6f;
+            attrCylinder.m_radius2 = 0.0f;
+            attrCylinder.m_height2 = 0.0f;
+
+            if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &attrCylinder, &attrCylinder.m_direction, 0x78000000) == 0) {
+                m_bgAttrValue = sAnimFrameOffset;
+            } else {
+                u8* hitObj = *reinterpret_cast<u8**>(reinterpret_cast<u8*>(&MapMng) + 0x22A88);
+                if (hitObj != 0) {
+                    switch (hitObj[0x47]) {
+                    case 0x28:
+                        m_bgAttrValue = 0.5f;
+                        break;
+                    case 0x29:
+                        m_bgAttrValue = 0.75f;
+                        break;
+                    case 0x2A:
+                        m_bgAttrValue = 0.25f;
+                        break;
+                    case 0x2B:
+                        m_bgAttrValue = sZeroFloat;
+                        break;
+                    default:
+                        break;
+                    }
+                }
+            }
+        }
+        m_animBlend = m_bgAttrValue;
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007c37c
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGObject::ResetDynamics()
 {
-	// TODO
+    if ((m_charaModelHandle != 0) && (m_charaModelHandle->m_model != 0)) {
+        u8* modelBytes = reinterpret_cast<u8*>(m_charaModelHandle->m_model);
+        modelBytes[0x10C] = (modelBytes[0x10C] & 0x7F) | 0x80;
+    }
 }
 
 /*

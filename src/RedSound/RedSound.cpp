@@ -360,7 +360,16 @@ void CRedSound::SetReverb(int bank, int kind)
  */
 void CRedSound::SetReverbDepth(int bank, int sep, int depth)
 {
-	CRedDriver_8032f4c0.SetReverbDepth(bank, sep, depth);
+	CRedDriver* driver;
+	int localBank;
+	int localSep;
+	int localDepth;
+
+	driver = &CRedDriver_8032f4c0;
+	localBank = bank;
+	localSep = sep;
+	localDepth = depth;
+	driver->SetReverbDepth(localBank, localSep, localDepth);
 }
 
 /*

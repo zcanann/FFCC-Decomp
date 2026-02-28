@@ -385,44 +385,37 @@ void CGoOutMenu::CalcLoadMenu()
 void CGoOutMenu::SetMainMode(unsigned char mode)
 {
     CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
+    char prevMainMode;
+    int i;
 
     WriteMenuU8(2185, 0);
     WriteMenuU8(2186, 0);
-    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&MenuPcs) + 2188) = 0;
-
-    if (field_0x2c == 2) {
+    WriteMenuS32(2188, 0);
+    if (field_0x2c == '\x02') {
         MemoryCardMan.McEnd();
     }
-
-    const signed char previousMode = field_0x2c;
+    prevMainMode = field_0x2c;
     field_0x2c = mode;
     field_0x30 = 0;
-
-    if (mode == 2) {
+    if (mode == '\x02') {
         if (Game.game.m_gameWork.m_mcHasSerial != 1) {
-            SetMenuStr(0, 4,
-                       "This game has not been saved.",
-                       "",
-                       "You must save your game before",
+            SetMenuStr(0, 4, "This game has not been saved.", "", "You must save your game before",
                        "you can import a character.");
-            field_0x19 = -1;
+            field_0x19 = (char)0xff;
             field_0x18 = 0;
         }
-
-        for (int i = 0; i < 8; i++) {
+        i = 0;
+        do {
             if (Game.game.m_caravanWorkArr[i].m_objType != 0 &&
                 Game.game.m_caravanWorkArr[i].m_caravanLocalFlags != 1) {
-                SetMenuStr(0, 5,
-                           "This game contains character data",
-                           "that has not yet been saved.",
-                           "",
+                SetMenuStr(0, 5, "This game contains character data", "that has not yet been saved.", "",
                            "You must save your game before",
                            "you can import a character.");
-                field_0x19 = -1;
+                field_0x19 = (char)0xff;
                 field_0x18 = 0;
             }
-        }
-
+            i++;
+        } while (i < 8);
         field_0x1 = 0;
         reinterpret_cast<unsigned char*>(this)[0] = 0;
         field_0x2 = 0;
@@ -430,31 +423,28 @@ void CGoOutMenu::SetMainMode(unsigned char mode)
         field_0x4 = -1;
         field_0x8 = 0;
         SetGoOutMode(7);
-    } else if (mode < 2) {
-        if (mode != 0) {
+    } else if (mode < '\x02') {
+        if (mode != '\0') {
             field_0x46 = 1;
-            if (previousMode != 3) {
+            if (prevMainMode != '\x03') {
                 field_0x46 = 0;
             }
-
             MenuPcs.ChgAllModel();
-
             if (field_0x36 >= 0) {
-                WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
-                WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+                *reinterpret_cast<short*>(menuPcsLayout.field_2120 + 10) = 2;
+                *reinterpret_cast<short*>(menuPcsLayout.field_2092 + 0x22) = 0;
             }
-
             field_0x45 = 0;
             field_0x34 = 0x1e;
             field_0x48 = 0;
             field_0x3c = 0;
             field_0x14 = 0;
         }
-    } else if (mode < 4) {
+    } else if (mode < '\x04') {
         MenuPcs.ChgAllModel();
         WriteMenuU8(2184, 2);
         field_0x14 = 0;
-        reinterpret_cast<signed char&>(field_0x24[2]) = 0;
+        field_0x24[2] = 0;
         SetDelMode(2);
     }
 }
@@ -601,6 +591,145 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         field_0x48 = 0;
         field_0x3c = 0;
         field_0x46 = 1;
+        break;
+    case 7:
+        WriteMenuU8(2184, 1);
+        field_0x14 = 0;
+        field_0x18 = 7;
+        field_0x1c = 0;
+        field_0x1d = 0;
+        SetMenuStr(0, 7,
+                   "Please insert a Memory Card with",
+                   "current game's data into Slot A.",
+                   "Insert into Slot B a Memory Card",
+                   "with the character data to be transferred.",
+                   "",
+                   "Please do not remove either Memory Card",
+                   "until the transfer is complete.");
+        break;
+    case 0xC:
+        if (field_0x36 >= 0) {
+            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
+            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+        }
+        field_0x45 = 0;
+        field_0x34 = 0x21;
+        field_0x48 = 0;
+        field_0x3c = 0;
+        MenuPcs.GetMcAccessPos(&field_0xc, &field_0x10);
+        field_0xc = 0;
+        mcCtrl.m_cardChannel = field_0xc;
+        field_0x2 = static_cast<char>(mcCtrl.m_cardChannel);
+        field_0x3 = static_cast<char>(field_0x10);
+        field_0x4 = mcCtrl.ChkConnect(static_cast<unsigned char>(field_0x2));
+        if (field_0x4 == 1) {
+            mcCtrl.m_saveIndex = static_cast<unsigned char>(field_0x3);
+            mcCtrl.m_cardChannel = static_cast<unsigned char>(field_0x2);
+            mcCtrl.m_previousState = 0;
+            mcCtrl.m_state = 0;
+            mcCtrl.m_lastResult = 0;
+            mcCtrl.m_iteration = 0;
+            mcCtrl.m_userBuffer = 0;
+            mcCtrl.m_createFlag = 0;
+            field_0x1 = 1;
+        }
+        break;
+    case 0xE:
+        MenuPcs.InitSaveLoadMenu();
+        MenuPcs.SetMenuCharaAnim(0, 0);
+        MenuPcs.CopyNowCaravanDat(*reinterpret_cast<Mc::SaveDat**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 2176));
+        WriteMenuU8(2185, 2);
+        WriteMenuU8(2186, 1);
+        WriteMenuS32(2188, ReadMenuS32(2180));
+        if (field_0x36 >= 0) {
+            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
+            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+        }
+        field_0x45 = 0;
+        field_0x34 = -1;
+        field_0x48 = 0;
+        field_0x3c = 0;
+        break;
+    case 0xF:
+        MenuPcs.ChgAllModel2();
+        if (field_0x1d == 0) {
+            MenuPcs.InitSaveLoadMenu();
+        }
+        MenuPcs.SetMenuCharaAnim(0, 0);
+        field_0x1d = 1;
+        if (field_0x36 >= 0) {
+            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
+            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+        }
+        field_0x45 = 0;
+        field_0x34 = -1;
+        field_0x48 = 0;
+        field_0x3c = 0;
+        WriteMenuU8(2185, 2);
+        WriteMenuU8(2186, 1);
+        WriteMenuS32(2188, ReadMenuS32(2180));
+        break;
+    case 0x10:
+        if (field_0x1e == 0) {
+            SetMenuStr(0, 5,
+                       "Are you sure you wish to import",
+                       "the selected character into the",
+                       "current game? The character will",
+                       "be unavailable until returned.",
+                       "  Yes   No");
+        } else {
+            SetMenuStr(0, 5,
+                       "Are you sure you wish to return",
+                       "the selected character to the",
+                       "current game? The character's",
+                       "guest data will be deleted.",
+                       "  Yes   No");
+        }
+        field_0x46 = 1;
+        break;
+    case 0x11:
+        if (field_0x36 >= 0) {
+            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
+            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+        }
+        field_0x45 = 0;
+        field_0x34 = 0x1F;
+        field_0x48 = 0;
+        field_0x3c = 0;
+        field_0x46 = 1;
+        break;
+    case 0x13:
+        mcCtrl.m_cardChannel = static_cast<unsigned char>(field_0x1a);
+        field_0x2 = field_0x1a;
+        field_0x3 = field_0x1b;
+        field_0x8 = ReadMenuS32(2180);
+        field_0x4 = mcCtrl.ChkConnect(static_cast<unsigned char>(field_0x2));
+        if (field_0x4 == 1) {
+            mcCtrl.m_saveIndex = static_cast<unsigned char>(field_0x3);
+            mcCtrl.m_cardChannel = static_cast<unsigned char>(field_0x2);
+            mcCtrl.m_previousState = 0;
+            mcCtrl.m_state = 0;
+            mcCtrl.m_lastResult = 0;
+            mcCtrl.m_iteration = 0;
+            mcCtrl.m_userBuffer = 0;
+            mcCtrl.m_createFlag = 0;
+            field_0x1 = 2;
+        }
+        SetMenuStr(0, 4,
+                   "Saving data to the Memory",
+                   "Card in Slot B. Please do",
+                   "not touch the Memory Card",
+                   "or the POWER Button.");
+        break;
+    case 0x14:
+        if (field_0x36 >= 0) {
+            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
+            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+        }
+        field_0x45 = 0;
+        field_0x34 = 0x20;
+        field_0x48 = 0;
+        field_0x3c = 0;
         break;
 	}
 }

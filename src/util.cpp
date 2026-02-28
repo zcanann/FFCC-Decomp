@@ -10,13 +10,9 @@ extern float lbl_8032f8a8;
 extern CMath Math;
 
 extern struct {
-    float _212_4_;
-    float _216_4_;
-    float _220_4_;
-    float _224_4_;
-    float _228_4_;
-    float _232_4_;
+    u8 _0x0[0x4];
     Mtx m_cameraMatrix;
+    u8 _0x34[0x60];
     Mtx44 m_screenMatrix;
 } CameraPcs;
 

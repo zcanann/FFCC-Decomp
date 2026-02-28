@@ -17,6 +17,7 @@ extern "C" void SetParticleWorkSe__13CFlatRuntime2Fiii(void*, int, int, int);
 extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
 extern CMath Math;
 extern unsigned char CFlat[];
+extern unsigned char PartPcs[];
 
 /*
  * --INFO--
@@ -66,6 +67,10 @@ void CGPrgObj::onFrame()
     onFrameAlways();
 
 	if ((m_weaponNodeFlags & 0x8000) != 0) {
+		if ((GetCID() & 0x2d) == 0x2d && PartPcs[0x2d] != 0) {
+			return;
+		}
+
 		m_animFlags &= 0x7f;
 		onFramePreCalc();
 
@@ -262,7 +267,11 @@ void CGPrgObj::reqAnim(int animId, int loop, int direct)
  */
 int CGPrgObj::isLoopAnim()
 {
-	if ((m_animFlags & 0x80) != 0 || (m_animFlags & 0x40) != 0 || !IsLoopAnim(2)) {
+	unsigned char flags = m_animFlags;
+	if (((int)(((unsigned int)flags << 25) | (unsigned int)(flags >> 7)) < 0) ||
+	    ((int)((unsigned int)flags << 24) < 0) ||
+	    !IsLoopAnim(2))
+	{
 		return 0;
 	}
 

@@ -439,25 +439,35 @@ unsigned int CMenuPcs::ArtiClose()
 	int count = artiList[0];
 	ArtiOpenAnim* anim = (ArtiOpenAnim*)((u8*)artiList + 8);
 	int frame;
+	float zeroF;
+	double biasD;
+	double oneD;
 
 	artiState[0x11]++;
 	frame = artiState[0x11];
 
 	for (int i = 0; i < count; i++, anim++) {
+		biasD = DOUBLE_80332fe0;
+		zeroF = FLOAT_80332fa8;
 		if (anim->startFrame <= frame) {
 			if (frame < anim->startFrame + anim->duration) {
 				anim->step++;
-				anim->alpha = 1.0f - ((float)anim->step / (float)anim->duration);
+				oneD = DOUBLE_80332fb0;
+				anim->alpha = (float)-(((DOUBLE_80332fb0 / ((double)(unsigned int)anim->duration - biasD)) *
+				                        ((double)(unsigned int)anim->step - biasD)) -
+				                       DOUBLE_80332fb0);
 				if ((anim->flags & 2) == 0) {
-					float t = 1.0f - ((float)anim->step / (float)anim->duration);
-					anim->dx = (anim->targetX - (float)anim->x) * t;
-					anim->dy = (anim->targetY - (float)anim->y) * t;
+					float ratio = (float)-(((oneD / ((double)(unsigned int)anim->duration - biasD)) *
+					                        ((double)(unsigned int)anim->step - biasD)) -
+					                       oneD);
+					anim->dx = (anim->targetX - (float)anim->x) * ratio;
+					anim->dy = (anim->targetY - (float)anim->y) * ratio;
 				}
 			} else {
 				finished++;
-				anim->alpha = 0.0f;
-				anim->dx = 0.0f;
-				anim->dy = 0.0f;
+				anim->alpha = FLOAT_80332fa8;
+				anim->dx = zeroF;
+				anim->dy = zeroF;
 			}
 		}
 	}

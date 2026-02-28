@@ -1084,32 +1084,84 @@ void CGObject::ResetDynamics()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007c278
+ * PAL Size: 260b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGObject::CalcSphereNearPos(float, float, Vec&)
+void CGObject::CalcSphereNearPos(float scale, float angleOffset, Vec& outPos)
 {
-	// TODO
+    Vec up;
+    Vec normal;
+    Vec tangent;
+    Vec bitangent;
+    Vec offset;
+    Mtx rotationMtx;
+
+    up.x = 0.0f;
+    up.y = 1.0f;
+    up.z = 0.0f;
+
+    PSVECNormalize(&m_worldPosition, &normal);
+    PSVECCrossProduct(&normal, &up, &bitangent);
+    PSVECNormalize(&bitangent, &bitangent);
+    PSVECCrossProduct(&normal, &bitangent, &tangent);
+    PSVECNormalize(&tangent, &tangent);
+    PSMTXRotAxisRad(rotationMtx, &normal, m_rotBaseY + angleOffset);
+    PSMTXMultVec(rotationMtx, &tangent, &tangent);
+    PSVECScale(&tangent, &offset, scale);
+    PSVECAdd(&m_worldPosition, &offset, &outPos);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007c230
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGObject::ResetAnimPoint(int)
+void CGObject::ResetAnimPoint(int slot)
 {
-	// TODO
+    if ((m_charaModelHandle == 0) || (m_charaModelHandle->m_model == 0)) {
+        return;
+    }
+
+    if (m_charaModelHandle->m_animSlot[slot] == 0) {
+        return;
+    }
+
+    *reinterpret_cast<u16*>(reinterpret_cast<u8*>(m_charaModelHandle->m_animSlot[slot]) + 0x2C) = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007c1c4
+ * PAL Size: 108b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGObject::AddAnimPoint(int, int, int)
+void CGObject::AddAnimPoint(int slot, int pointType, int pointFrame)
 {
-	// TODO
+    if ((m_charaModelHandle == 0) || (m_charaModelHandle->m_model == 0)) {
+        return;
+    }
+
+    CRef* animRef = m_charaModelHandle->m_animSlot[slot];
+    if (animRef == 0) {
+        return;
+    }
+
+    u8* animRefBytes = reinterpret_cast<u8*>(animRef);
+    u16 count = *reinterpret_cast<u16*>(animRefBytes + 0x2C);
+    *reinterpret_cast<u16*>(animRefBytes + 0x2E + count * 4) = static_cast<u16>(pointFrame);
+    *reinterpret_cast<u16*>(animRefBytes + 0x30 + count) = static_cast<u16>(pointType);
+    *reinterpret_cast<u16*>(animRefBytes + 0x2C) = static_cast<u16>(count + 1);
 }
 
 /*

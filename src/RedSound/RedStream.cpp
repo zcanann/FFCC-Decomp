@@ -282,12 +282,9 @@ void StreamStop(int param_1)
 
 	streamData = (unsigned int)DAT_8032f438;
 	do {
-		int currentStream = *(int*)(streamData + 0x10c);
-		if (currentStream != 0) {
-			currentStream = *(int*)(streamData + 0x10c);
-			if ((param_1 == -1) || (param_1 == currentStream)) {
-				_StreamStop((RedStreamDATA*)streamData);
-			}
+		if ((*(int*)(streamData + 0x10c) != 0) &&
+		    ((param_1 == -1) || (param_1 == *(int*)(streamData + 0x10c)))) {
+			_StreamStop((RedStreamDATA*)streamData);
 		}
 		streamData += 0x130;
 	} while (streamData < (unsigned int)DAT_8032f438 + 0x4c0);

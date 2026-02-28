@@ -88,7 +88,11 @@ extern float FLOAT_80331b90;
 extern float FLOAT_80331b94;
 extern float FLOAT_80331b98;
 extern float FLOAT_80331bb8;
+extern float FLOAT_80331bb0;
+extern float FLOAT_80331b9c;
+extern float FLOAT_80331bbc;
 extern float FLOAT_80331b68;
+extern double DOUBLE_80331ba0;
 extern unsigned char DAT_8032ec90[];
 extern int DAT_8032ee90;
 extern char SoundBuffer[];
@@ -99,6 +103,7 @@ extern char DAT_801dcec0[];
 extern char DAT_801dced4[];
 extern char DAT_801dcef8[];
 extern char DAT_801dcf10[];
+extern char DAT_801dcf80[];
 extern char DAT_801dcf34[];
 extern char DAT_801dcf58[];
 extern char DAT_801dcf64[];
@@ -284,12 +289,89 @@ void CGItemObj::onFrame()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80125fb0
+ * PAL Size: 3416b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGItemObj::onFrameStat()
 {
-	// TODO
+	unsigned char* self = (unsigned char*)this;
+	CGPrgObj* prgObj = (CGPrgObj*)this;
+	int stateId = *(int*)(self + 0x520);
+	float zero = FLOAT_80331b20;
+
+	switch (stateId) {
+	case 0: {
+		int hasOwner = *(int*)(self + 0x550) != 0;
+		unsigned char stateFlags = self[0x50];
+		int isActive = (int)(((unsigned int)stateFlags << 0x1c) | ((unsigned int)stateFlags >> 4)) < 0;
+
+		if (!hasOwner && isActive) {
+			double distance = (double)FLOAT_80331b20;
+
+			if (Game.game.unk_flat3_0xc7d0 == 0) {
+				if (*(int*)(CFlat + 0x4780) == 1) {
+					Vec partyCenter;
+
+					partyCenter.x = (Game.game.m_partyMinX + Game.game.m_partyMaxX) * FLOAT_80331b3c;
+					partyCenter.y = (Game.game.m_partyMinY + Game.game.m_partyMaxY) * FLOAT_80331b3c;
+					partyCenter.z = (Game.game.m_partyMinZ + Game.game.m_partyMaxZ) * FLOAT_80331b3c;
+					distance = (double)PSVECDistance((Vec*)(self + 0x15c), &partyCenter);
+				}
+			} else {
+				distance = (double)PSVECDistance((Vec*)(self + 0x15c), (Vec*)(Game.game.unk_flat3_0xc7d0 + 0x15c));
+			}
+
+			if (*(int*)(self + 0x94) < 1 || DOUBLE_80331ba0 < distance) {
+				Printf__7CSystemFPce(&System, DAT_801dcf80);
+				*(float*)(self + 0x4b8) = FLOAT_80331b54;
+				*(float*)(self + 0x4b4) = zero;
+				*(unsigned int*)(self + 0x1c0) = 1;
+				EndParticle__13CFlatRuntime2FPQ29CCharaPcs7CHandle(CFlat, *(void**)(self + 0xf8));
+				changeStat__8CGPrgObjFiii(this, 9, 0, 0);
+			}
+		}
+		break;
+	}
+	case 9:
+		if (*(int*)(self + 0x528) == 8) {
+			self[0x54d] = (self[0x54d] & 0x7f) | 0x80;
+		}
+		break;
+	case 0x1b:
+		if (*(int*)(self + 0x528) < 9) {
+			float wobble = (float)sin((double)(FLOAT_80331b9c * (float)(*(int*)(self + 0x528)) * FLOAT_80331b68));
+
+			*(float*)(self + 0x17c) = wobble;
+			*(float*)(self + 0x178) = wobble;
+			*(float*)(self + 0x174) = wobble;
+
+			if (*(int*)(self + 0x528) == 8) {
+				changeStat__8CGPrgObjFiii(this, 0, 0, 0);
+			}
+		}
+		break;
+	case 0x23:
+		if (*(int*)(self + 0x52c) == 1 && *(int*)(self + 0x530) < 9) {
+			float wobble = (float)sin((double)(FLOAT_80331b9c * (float)(*(int*)(self + 0x530)) * FLOAT_80331b68));
+
+			prgObj->m_rotationZ = wobble;
+			prgObj->m_rotationY = wobble;
+			prgObj->m_rotationX = wobble;
+		}
+		break;
+	case 0x24:
+		prgObj->m_moveOffset.x = FLOAT_80331bb0;
+		prgObj->m_moveOffset.y = zero;
+		prgObj->m_moveOffset.z = FLOAT_80331bb0;
+		prgObj->m_rotTargetY = prgObj->m_rotTargetY + FLOAT_80331b50;
+		break;
+	default:
+		break;
+	}
 }
 
 /*

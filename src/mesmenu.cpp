@@ -18,6 +18,12 @@ void SetFade__9CRingMenuFi(void* ringMenu, int fade);
 int __cntlzw(unsigned int);
 void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void* flatRuntime, int object, int type, int id, int stackCount, void* stack, void* stack2);
+void SetMargin__5CFontFf(float margin, void* font);
+void SetShadow__5CFontFi(void* font, int enable);
+void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(void* menuPcs, int fmt);
+void DrawWindow__8CMenuPcsFffffQ28CMenuPcs3TEXf(void* menuPcs, float x, float y, float w, float h, int tex, float rot);
+void DrawInit__8CMenuPcsFv(void* menuPcs);
+void Draw__4CMesFv(void* mes);
 void* __ct__6CColorFUcUcUcUc(void* color, unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 void SetColor__8CMenuPcsFR6CColor(void* menuPcs, void* color);
 void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(void* menuPcs, int tex);
@@ -56,7 +62,10 @@ extern float FLOAT_8033091c;
 extern float FLOAT_80330920;
 extern float FLOAT_80330924;
 extern float FLOAT_80330928;
+extern float FLOAT_8033092c;
+extern float FLOAT_80330930;
 extern float FLOAT_80330980;
+extern float FLOAT_80330994;
 }
 
 /*
@@ -454,7 +463,117 @@ void CMesMenu::onCalc()
  */
 void CMesMenu::onDraw()
 {
-	// TODO
+    int menuIndex = *(int*)((char*)this + 0x18);
+    if (!((menuIndex < 4) || (*(int*)((char*)this + 8) != 0))) {
+        return;
+    }
+    if ((Game.game.m_gameWork.m_menuStageMode != 0) && (menuIndex > 0) && (menuIndex < 4)) {
+        return;
+    }
+
+    void* font = *(void**)(MenuPcs + 0xF8);
+    SetMargin__5CFontFf(FLOAT_803308d8, font);
+    SetShadow__5CFontFi(font, 1);
+    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcs, 0);
+
+    float stageBlend = (float)*(int*)((char*)this + 0x3DF4) * FLOAT_80330918;
+    if (*(int*)((char*)this + 0x3DF8) != 0) {
+        stageBlend = FLOAT_80330914 - stageBlend;
+    }
+
+    float stateBlend = FLOAT_803308d8;
+    int state = *(int*)((char*)this + 0x0C);
+    if ((state == 0) || (state == 1) || (state == 3)) {
+        if (state == 0) {
+            stateBlend = (float)*(int*)((char*)this + 0x10) / (float)*(int*)((char*)this + 0x14);
+        } else if (state == 3) {
+            stateBlend = FLOAT_80330914 - (float)*(int*)((char*)this + 0x10) / (float)*(int*)((char*)this + 0x14);
+        } else {
+            stateBlend = FLOAT_80330914;
+        }
+    }
+
+    if (menuIndex < 4) {
+        unsigned int scriptFood = Game.game.m_scriptFoodBase[menuIndex];
+        if (scriptFood == 0) {
+            return;
+        }
+
+        float pulse = FLOAT_8033092c * (FLOAT_80330914 - sinf(FLOAT_80330930 * stageBlend));
+        float baseX = *(float*)((char*)this + 0x3D6C) + *(float*)((char*)this + 0x3D74);
+        float baseY = *(float*)((char*)this + 0x3D70) + *(float*)((char*)this + 0x3D78);
+        float dirX = ((menuIndex & 1) != 0) ? FLOAT_80330914 : -FLOAT_80330914;
+        float dirY = ((menuIndex & 2) != 0) ? FLOAT_80330914 : -FLOAT_80330914;
+        baseX += dirX * pulse;
+        baseY += dirY * pulse;
+
+        float alphaF = FLOAT_80330908 * stateBlend * stageBlend;
+        if (alphaF < FLOAT_803308d8) {
+            alphaF = FLOAT_803308d8;
+        } else if (alphaF > 255.0f) {
+            alphaF = 255.0f;
+        }
+        unsigned char alpha = (unsigned char)(int)alphaF;
+        unsigned char colorStorage[8];
+        __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, alpha);
+        SetColor__8CMenuPcsFR6CColor(MenuPcs, colorStorage);
+        DrawWindow__8CMenuPcsFffffQ28CMenuPcs3TEXf(
+            MenuPcs, baseX, baseY, *(float*)((char*)this + 0x3D7C) * stateBlend, *(float*)((char*)this + 0x3D80) * stateBlend, 2,
+            FLOAT_8033092c);
+
+        if ((*(int*)((char*)this + 0x0C) == 1) && (stageBlend == FLOAT_80330914)) {
+            Draw__4CMesFv((char*)this + 0x1C);
+            DrawInit__8CMenuPcsFv(MenuPcs);
+        }
+
+        DrawHeart(baseX, baseY, FLOAT_803308d8, alphaF);
+    } else {
+        float sizeX = *(float*)((char*)this + 0x3D7C) * stateBlend;
+        float sizeY = *(float*)((char*)this + 0x3D80) * stateBlend;
+        float baseX = *(float*)((char*)this + 0x3D6C) + *(float*)((char*)this + 0x3D74);
+        float baseY = *(float*)((char*)this + 0x3D70) + *(float*)((char*)this + 0x3D78);
+        float drawX = -(FLOAT_803308ec * sizeX - (FLOAT_803308ec * *(float*)((char*)this + 0x3D7C) + baseX));
+        float drawY = -(FLOAT_803308ec * sizeY - (FLOAT_803308ec * *(float*)((char*)this + 0x3D80) + baseY));
+
+        if ((*(unsigned int*)((char*)this + 0x3D8C) & 1) == 0) {
+            float alphaF = FLOAT_80330908 * stateBlend * stageBlend;
+            if (alphaF < FLOAT_803308d8) {
+                alphaF = FLOAT_803308d8;
+            } else if (alphaF > 255.0f) {
+                alphaF = 255.0f;
+            }
+            unsigned char colorStorage[8];
+            __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
+            SetColor__8CMenuPcsFR6CColor(MenuPcs, colorStorage);
+
+            int tex = ((*(unsigned int*)((char*)this + 0x3D8C) & 0x200) != 0) ? 2 : 0xB;
+            DrawWindow__8CMenuPcsFffffQ28CMenuPcs3TEXf(MenuPcs, drawX, drawY, sizeX, sizeY, tex, FLOAT_8033092c);
+        }
+
+        if (*(int*)((char*)this + 0x0C) == 1) {
+            Draw__4CMesFv((char*)this + 0x1C);
+            DrawInit__8CMenuPcsFv(MenuPcs);
+        }
+    }
+
+    if ((*(int*)((char*)this + 0x0C) == 1) && (GetWait__4CMesFv((char*)this + 0x1C) == 3)) {
+        SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcs, 0);
+        float alphaF = FLOAT_80330908 * stageBlend;
+        if (alphaF < FLOAT_803308d8) {
+            alphaF = FLOAT_803308d8;
+        } else if (alphaF > 255.0f) {
+            alphaF = 255.0f;
+        }
+        unsigned char colorStorage[8];
+        __ct__6CColorFUcUcUcUc(colorStorage, 0xFF, 0xFF, 0xFF, (unsigned char)(int)alphaF);
+        SetColor__8CMenuPcsFR6CColor(MenuPcs, colorStorage);
+
+        DrawRect__8CMenuPcsFUlfffffffff(
+            MenuPcs, 0, FLOAT_80330994 + *(float*)((char*)this + 0x3CB8),
+            (float)*(int*)((char*)this + 0x3D34) * *(float*)((char*)this + 0x3D40) + FLOAT_803308e8 +
+                *(float*)((char*)this + 0x3CBC) + *(float*)((char*)this + 0x3D3C),
+            FLOAT_8033092c, FLOAT_8033092c, FLOAT_803308d8, FLOAT_803308d8, FLOAT_80330914, FLOAT_80330914, FLOAT_803308d8);
+    }
 }
 
 /*

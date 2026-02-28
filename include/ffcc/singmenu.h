@@ -63,12 +63,12 @@ public:
     void DrawSingLife();
     void SingLifeInit(int);
     void SingLifeResetWait();
-    void GetTribeStr(int);
-    void GetJobStr(int);
-    void GetHairStr(int);
-    void GetMenuStr(int);
-    void GetAttrStr(int);
-    void GetItemIcon(int);
+    char* GetTribeStr(int);
+    char* GetJobStr(int);
+    char* GetHairStr(int);
+    char* GetMenuStr(int);
+    char* GetAttrStr(int);
+    unsigned char GetItemIcon(int);
 };
 
 #endif // _FFCC_PPP_SINGMENU_H_

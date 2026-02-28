@@ -1897,12 +1897,13 @@ CTexScroll::~CTexScroll()
  */
 CTexScroll::CTexScroll()
 {
-    m_type0 = 0;
+    float zero = FLOAT_8032faf4;
+    m_v0 = zero;
+    m_u0 = zero;
+    m_v1 = zero;
+    m_u1 = zero;
     m_type1 = 0;
-    m_u0 = 0.0f;
-    m_v0 = 0.0f;
-    m_u1 = 0.0f;
-    m_v1 = 0.0f;
+    m_type0 = 0;
 }
 
 /*

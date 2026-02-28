@@ -770,20 +770,20 @@ void CGraphicPcs::drawScreenFade()
     Mtx44 orthoMtx;
     Mtx cameraMtx;
     Mtx44 screenMtx;
-    Mtx44 cameraScreenMtx;
+    Mtx44 worldScreenMtx;
     Mtx identityMtx;
 
     C_MTXOrtho(orthoMtx, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, 1.0f);
     GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
 
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
-    PSMTXCopy(cameraMtx, (float(*)[4])screenMtx);
+    PSMTXCopy(cameraMtx, screenMtx);
     screenMtx[3][0] = 0.0f;
     screenMtx[3][1] = 0.0f;
     screenMtx[3][2] = 0.0f;
     screenMtx[3][3] = 1.0f;
-    PSMTX44Copy(CameraPcs.m_screenMatrix, cameraScreenMtx);
-    PSMTX44Concat(cameraScreenMtx, screenMtx, cameraScreenMtx);
+    PSMTX44Copy(CameraPcs.m_screenMatrix, worldScreenMtx);
+    PSMTX44Concat(worldScreenMtx, screenMtx, worldScreenMtx);
 
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
@@ -921,7 +921,7 @@ void CGraphicPcs::drawScreenFade()
                     pos.x = obj->x;
                     pos.y = obj->y + *(float*)(slotBase + 0x20);
                     pos.z = obj->z;
-                    PSMTX44MultVec(cameraScreenMtx, &pos, &pos);
+                    PSMTX44MultVec(worldScreenMtx, &pos, &pos);
 
                     float sx = pos.x * 320.0f + 320.0f;
                     float sy = -(pos.y * 240.0f - 240.0f);

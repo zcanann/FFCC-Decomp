@@ -1753,10 +1753,9 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
         int valueIndex = -0x1000 - systemValue;
         int valueGroup = valueIndex / 0x600;
         int rowIndex = 0x5FF - (valueIndex - valueGroup * 0x600);
-        u8* row = *reinterpret_cast<u8**>(game + 0xC5A8) + rowIndex * 0x48;
-
+        u16* row = reinterpret_cast<u16*>(*reinterpret_cast<u8**>(game + 0xC5A8) + rowIndex * 0x48);
         if ((unsigned int)valueGroup <= 0x23) {
-            result = reinterpret_cast<u16*>(row)[valueGroup];
+            result = row[valueGroup];
         }
     } else if (systemValue < -499) {
         unsigned int bitIndex = static_cast<unsigned int>(systemValue + 0x9F3);
@@ -1870,6 +1869,9 @@ CFlatRuntime::CVal* CFlatRuntime2::onSystemVal(CFlatRuntime::CObject*, int syste
             break;
         case -0x42:
             result = *reinterpret_cast<u32*>(gameWork + 0x10B8 + (systemValue + 0x6B) * 4);
+            break;
+        case -0x41:
+            result = *reinterpret_cast<u32*>(gameWork + 0x10BC);
             break;
         }
     }

@@ -9,6 +9,7 @@
 #include "ffcc/p_game.h"
 #include "ffcc/p_light.h"
 #include <dolphin/mtx.h>
+#include <string.h>
 
 extern float lbl_8032F938;
 extern float lbl_8032F93C;
@@ -245,12 +246,14 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         CHUNK_ANIM = 0x414E494D,
         CHUNK_BOBJ = 0x424F424A,
         CHUNK_EFID = 0x45464944,
+        CHUNK_FSDW = 0x46534457,
         CHUNK_GBID = 0x47424944,
         CHUNK_GEOM = 0x47454F4D,
         CHUNK_ID = 0x49442020,
         CHUNK_LTST = 0x4C545354,
         CHUNK_MSID = 0x4D534944,
         CHUNK_PIDX = 0x50494458,
+        CHUNK_PSTA = 0x50535441,
         CHUNK_PRIO = 0x5052494F,
         CHUNK_SDST = 0x53445354,
         CHUNK_TFRM = 0x5446524D,
@@ -268,6 +271,8 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             U16At(this, 0x32) = chunkFile.Get2();
         } else if (chunk.m_id == CHUNK_EFID) {
             U16At(this, 0x30) = chunkFile.Get2();
+        } else if (chunk.m_id == CHUNK_FSDW) {
+            *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x404) = chunkFile.Get1();
         } else if (chunk.m_id == CHUNK_ID) {
             U16At(this, 0x2E) = chunkFile.Get2();
         } else if (chunk.m_id == CHUNK_MSID) {
@@ -331,7 +336,16 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 U8At(this, 0x15) = 0;
             } else if ((U8At(this, 0x1D) == 2) || (U8At(this, 0x1D) == 3)) {
                 if (meshOrHitIdx == -2) {
-                    chunkFile.GetString();
+                    CMapObjAtrMeshName* meshName = reinterpret_cast<CMapObjAtrMeshName*>(
+                        __nw__FUlPQ27CMemory6CStagePci(0x28, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x84));
+                    if (meshName != 0) {
+                        meshName->CMapObjAtrMeshName::CMapObjAtrMeshName();
+                    }
+                    PtrAt(this, 0xEC) = meshName;
+                    char* name = chunkFile.GetString();
+                    if (meshName != 0) {
+                        strncpy(reinterpret_cast<char*>(meshName) + 8, name, 0x20);
+                    }
                     PtrAt(this, 0xC) = 0;
                 } else {
                     PtrAt(this, 0xC) = reinterpret_cast<unsigned char*>(&MapMng) + 0x4D4 + (meshOrHitIdx * 0x24);
@@ -386,6 +400,14 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 reinterpret_cast<CPtrArray<CMapAnimRun*>*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x213E0)
                     ->Add(reinterpret_cast<CMapAnimRun*>(animRun));
             }
+        } else if (chunk.m_id == CHUNK_PSTA) {
+            CMapObjAtrPlaySta* playSta = reinterpret_cast<CMapObjAtrPlaySta*>(
+                __nw__FUlPQ27CMemory6CStagePci(0xC, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x39B));
+            if (playSta != 0) {
+                playSta->CMapObjAtrPlaySta::CMapObjAtrPlaySta();
+                *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(playSta) + 8) = chunkFile.Get1();
+            }
+            PtrAt(this, 0xEC) = playSta;
         }
     }
     chunkFile.PopChunk();
@@ -615,14 +637,9 @@ void CMapObj::SetShow(int show)
  */
 void CMapObj::SetLink()
 {
+    CMapObj* mapStart = MapObjArrayStart();
     CMapObj* head0 = 0;
-    CMapObj* search0 = MapObjArrayStart();
-    CMapObj* mapStart1 = MapObjArrayStart();
-    CMapObj* mapStart2 = MapObjArrayStart();
-    CMapObj* mapStart3 = MapObjArrayStart();
-    CMapObj* mapStart4 = MapObjArrayStart();
-    CMapObj* mapStart5 = MapObjArrayStart();
-    CMapObj* mapStart6 = MapObjArrayStart();
+    CMapObj* search0 = mapStart;
 
     while (true) {
         CMapObj* child0 = MapMng.SearchChildMapObj(search0, this);
@@ -631,7 +648,7 @@ void CMapObj::SetLink()
         }
 
         ObjAt(child0, 0x8) = head0;
-        CMapObj* search1 = mapStart6;
+        CMapObj* search1 = mapStart;
         CMapObj* head1 = 0;
         while (true) {
             CMapObj* child1 = MapMng.SearchChildMapObj(search1, child0);
@@ -641,7 +658,7 @@ void CMapObj::SetLink()
 
             ObjAt(child1, 0x8) = head1;
             CMapObj* head2 = 0;
-            CMapObj* search2 = mapStart1;
+            CMapObj* search2 = mapStart;
             while (true) {
                 CMapObj* child2 = MapMng.SearchChildMapObj(search2, child1);
                 if (child2 == 0) {
@@ -650,7 +667,7 @@ void CMapObj::SetLink()
 
                 ObjAt(child2, 0x8) = head2;
                 CMapObj* head3 = 0;
-                CMapObj* search3 = mapStart2;
+                CMapObj* search3 = mapStart;
                 while (true) {
                     CMapObj* child3 = MapMng.SearchChildMapObj(search3, child2);
                     if (child3 == 0) {
@@ -659,7 +676,7 @@ void CMapObj::SetLink()
 
                     ObjAt(child3, 0x8) = head3;
                     CMapObj* head4 = 0;
-                    CMapObj* search4 = mapStart3;
+                    CMapObj* search4 = mapStart;
                     while (true) {
                         CMapObj* child4 = MapMng.SearchChildMapObj(search4, child3);
                         if (child4 == 0) {
@@ -668,7 +685,7 @@ void CMapObj::SetLink()
 
                         ObjAt(child4, 0x8) = head4;
                         CMapObj* head5 = 0;
-                        CMapObj* search5 = mapStart4;
+                        CMapObj* search5 = mapStart;
                         while (true) {
                             CMapObj* child5 = MapMng.SearchChildMapObj(search5, child4);
                             if (child5 == 0) {
@@ -677,7 +694,7 @@ void CMapObj::SetLink()
 
                             ObjAt(child5, 0x8) = head5;
                             CMapObj* head6 = 0;
-                            CMapObj* search6 = mapStart5;
+                            CMapObj* search6 = mapStart;
                             while (true) {
                                 CMapObj* child6 = MapMng.SearchChildMapObj(search6, child5);
                                 if (child6 == 0) {
@@ -686,7 +703,7 @@ void CMapObj::SetLink()
 
                                 ObjAt(child6, 0x8) = head6;
                                 CMapObj* head7 = 0;
-                                CMapObj* search7 = mapStart6;
+                                CMapObj* search7 = mapStart;
                                 while (true) {
                                     CMapObj* child7 = MapMng.SearchChildMapObj(search7, child6);
                                     if (child7 == 0) {
@@ -695,7 +712,7 @@ void CMapObj::SetLink()
 
                                     ObjAt(child7, 0x8) = head7;
                                     CMapObj* head8 = 0;
-                                    CMapObj* search8 = mapStart6;
+                                    CMapObj* search8 = mapStart;
                                     while (true) {
                                         CMapObj* child8 = MapMng.SearchChildMapObj(search8, child7);
                                         if (child8 == 0) {

@@ -1517,19 +1517,23 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 800558d4
+ * PAL Size: 684b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppSetFpMatrix(_pppMngSt* pppMngSt)
 {
-	Vec pos;
-	Vec up;
-	Vec upTmp;
-	Vec right;
-	Vec rightTmp;
-	Vec forward;
 	Vec forwardTmp;
-	Mtx localMtx = {};
+	Vec rightTmp;
+	Vec upTmp;
+	Vec forward;
+	Vec up;
+	Vec right;
+	Vec pos;
+	Mtx localMtx;
 
 	PSMTXCopy(pppMngStPtr->m_matrix.value, localMtx);
 
@@ -1558,9 +1562,10 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 
 	up.x = ppvWorldMatrix[0][1];
 	up.y = ppvWorldMatrix[1][1];
+	upTmp.x = ppvWorldMatrix[0][1];
 	up.z = ppvWorldMatrix[2][1];
-
-	upTmp = up;
+	upTmp.y = ppvWorldMatrix[1][1];
+	upTmp.z = ppvWorldMatrix[2][1];
 
 	ppvWorldMatrix[0][3] = pos.x;
 	ppvWorldMatrix[1][3] = pos.y;
@@ -1571,16 +1576,17 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 		PSVECNormalize(&upTmp, &up);
 	}
 
-	right.x	= up.y;
-	rightTmp.x = up.y;
+	right.x = up.y;
 	rightTmp.y = -up.x;
-	right.y	= rightTmp.y;
-	right.z	= kPppZero;
-	rightTmp.z = kPppZero;
+	right.z = kPppZero;
+	rightTmp.x = up.y;
 
 	ppvWorldMatrixWood[0][1] = up.x;
 	ppvWorldMatrixWood[1][1] = up.y;
 	ppvWorldMatrixWood[2][1] = up.z;
+
+	rightTmp.z = kPppZero;
+	right.y = rightTmp.y;
 
 	if (up.y != kPppZero || rightTmp.y != kPppZero)
 	{
@@ -1592,7 +1598,9 @@ void pppSetFpMatrix(_pppMngSt* pppMngSt)
 	ppvWorldMatrixWood[2][0] = right.z;
 
 	PSVECCrossProduct(&right, &up, &forward);
-	forwardTmp = forward;
+	forwardTmp.x = forward.x;
+	forwardTmp.y = forward.y;
+	forwardTmp.z = forward.z;
 
 	if (forward.x != kPppZero || forward.y != kPppZero || forward.z != kPppZero)
 	{

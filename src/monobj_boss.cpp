@@ -1,6 +1,13 @@
 #include "ffcc/monobj_boss.h"
 #include "ffcc/prgobj.h"
 #include "ffcc/charaobj.h"
+#include "ffcc/math.h"
+
+#include <math.h>
+
+extern CMath Math;
+extern "C" int Rand__5CMathFUl(CMath*, unsigned long);
+extern "C" void setAttackAfter__8CGMonObjFi(CGMonObj*, int);
 
 /*
  * --INFO--
@@ -807,12 +814,118 @@ void CGMonObj::logicFuncLastBoss()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012e9bc
+ * PAL Size: 1360b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::teleport(int, int, int, int, int, int, int, int, int, Vec*, int&, Vec&)
+void CGMonObj::teleport(
+	int mode, int animId, int startFrame, int blendEndFrame, int seStart, int seEnd, int particleStart, int particleBlend, int particleEnd,
+	Vec* teleportPoints, int& teleportIndex, Vec& startPos
+)
 {
-	// TODO
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	int pdtNo = -1;
+
+	if (object->m_charaModelHandle != 0 && object->m_charaModelHandle->m_pdtLoadRef != 0) {
+		pdtNo = reinterpret_cast<int*>(object->m_charaModelHandle->m_pdtLoadRef)[2];
+	}
+
+	if (prgObj->m_stateFrame == 0) {
+		object->m_bgColMask &= 0xFFF3FFFC;
+		*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags) &= 0xEF;
+		object->m_groundHitOffset.x = 0.0f;
+		object->m_groundHitOffset.y = 0.0f;
+		object->m_groundHitOffset.z = 0.0f;
+
+		prgObj->reqAnim(animId, 0, 0);
+		prgObj->playSe3D(seStart, 0x32, 0x1C2, 0, 0);
+		prgObj->putParticle(particleStart | (pdtNo << 8), *reinterpret_cast<int*>(mon + 0x58C), object, 1.0f, 0);
+
+		if (mode == 0) {
+			prgObj->putParticle(particleBlend | (pdtNo << 8), *reinterpret_cast<int*>(mon + 0x58C), &object->m_worldPosition, 1.0f, 0);
+		} else {
+			prgObj->putParticle(particleBlend | (pdtNo << 8), *reinterpret_cast<int*>(mon + 0x58C), object, 1.0f, 0);
+		}
+	}
+
+	const int stateFrame = prgObj->m_stateFrame;
+	const int blendStartFrame = startFrame + 8;
+
+	if (blendStartFrame < stateFrame) {
+		if (stateFrame < blendEndFrame) {
+			if (stateFrame <= blendEndFrame + 8) {
+				if (stateFrame == blendEndFrame + 1) {
+					if (mode == 0) {
+						prgObj->putParticle(particleEnd | (pdtNo << 8), *reinterpret_cast<int*>(mon + 0x58C), &object->m_worldPosition, 1.0f, 0);
+						prgObj->playSe3D(seEnd, 0x32, 0x1C2, 0, 0);
+					}
+
+					object->m_bgColMask |= 3;
+					*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags) =
+						(*reinterpret_cast<unsigned char*>(&object->m_weaponNodeFlags) & 0xEF) | 0x10;
+					object->m_groundHitOffset.x = 0.0f;
+					object->m_groundHitOffset.y = 0.0f;
+					object->m_groundHitOffset.z = 0.0f;
+
+					if (mode == 1) {
+						object->m_displayFlags |= 1;
+					}
+				}
+
+				const float angle = 3.1415927f * (1.0f - static_cast<float>(stateFrame - blendEndFrame) * 0.125f);
+				const float wave = static_cast<float>(cos(angle));
+				object->m_rotationX = wave;
+				object->m_rotationZ = wave;
+				object->m_rotationY = 1.0f + static_cast<float>(sin(angle));
+
+				if (stateFrame == blendEndFrame + 8) {
+					object->m_bgColMask |= 0xC0000;
+					setAttackAfter__8CGMonObjFi(this, *reinterpret_cast<int*>(mon + 0x560));
+				}
+			}
+		} else {
+			if (stateFrame == startFrame + 9) {
+				int nextIndex;
+				do {
+					nextIndex = Rand__5CMathFUl(&Math, 4);
+				} while (nextIndex == teleportIndex);
+
+				teleportIndex = nextIndex;
+				startPos = object->m_worldPosition;
+
+				if (mode == 1) {
+					object->m_displayFlags &= 0xFFFFFFFE;
+				}
+			}
+
+			const float ratio = static_cast<float>(stateFrame - blendStartFrame) / static_cast<float>(blendEndFrame - blendStartFrame);
+			const float blend = 0.5f * (1.0f + static_cast<float>(cos(3.1415927f * ratio)));
+			Vec fromPoint;
+			Vec fromCurrent;
+			Vec blended;
+
+			PSVECScale(&teleportPoints[teleportIndex], &fromPoint, 1.0f - blend);
+			PSVECScale(&object->m_worldPosition, &fromCurrent, blend);
+			PSVECAdd(&fromCurrent, &fromPoint, &blended);
+			object->m_worldPosition = blended;
+
+			if (mode == 1 && stateFrame == blendEndFrame - 0x2A) {
+				prgObj->putParticle(particleEnd | (pdtNo << 8), *reinterpret_cast<int*>(mon + 0x58C), &teleportPoints[teleportIndex], 1.0f, 0);
+				prgObj->playSe3D(seEnd, 0x32, 0x1C2, 0, 0);
+			}
+		}
+	} else if (startFrame <= stateFrame) {
+		const float angle = 3.1415927f * static_cast<float>(stateFrame - startFrame) * 0.125f;
+		const float wave = static_cast<float>(cos(angle));
+		object->m_rotationX = wave;
+		object->m_rotationZ = wave;
+		object->m_rotationY = 1.0f + static_cast<float>(sin(angle));
+	}
 }
 
 /*

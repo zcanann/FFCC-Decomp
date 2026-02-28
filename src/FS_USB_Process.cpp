@@ -63,7 +63,6 @@ void CFunnyShapePcs::SetUSBData()
     CUSBStreamData* usb = UsbStream(this);
     CFunnyShape* funny = FunnyShape(this);
     CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x4));
-    char index = *reinterpret_cast<char*>(Ptr(this, 0x6124));
 
     switch (*reinterpret_cast<u32*>(Ptr(this, 0x4C))) {
     case 4:
@@ -73,7 +72,7 @@ void CFunnyShapePcs::SetUSBData()
     case 5: {
         u16* tmp = static_cast<u16*>(__nwa__FUlPQ27CMemory6CStagePci(usb->m_sizeBytes, stage, s_FS_USB_Process_cpp, 0x55));
         void* hdr = __nw__FUlPQ27CMemory6CStagePci(0x30, stage, s_FS_USB_Process_cpp, 0x57);
-        *reinterpret_cast<void**>(Ptr(this, 0x60A4) + index * 4) = hdr;
+        *reinterpret_cast<void**>(Ptr(this, 0x60A4) + static_cast<char>(*Ptr(this, 0x6124)) * 4) = hdr;
 
         memcpy(tmp, usb->m_data, usb->m_sizeBytes);
         for (int i = 0; i < 8; i++) {
@@ -86,15 +85,15 @@ void CFunnyShapePcs::SetUSBData()
         memcpy(hdr, tmp, 0x30);
 
         void* texData = __nwa__FUlPQ27CMemory6CStagePci(usb->m_sizeBytes - 0x30, stage, s_FS_USB_Process_cpp, 0x6C);
-        *reinterpret_cast<void**>(Ptr(this, 0x60E4) + index * 4) = texData;
+        *reinterpret_cast<void**>(Ptr(this, 0x60E4) + static_cast<char>(*Ptr(this, 0x6124)) * 4) = texData;
         memcpy(texData, tmp + 0x18, usb->m_sizeBytes - 0x30);
         DCFlushRange(texData, usb->m_sizeBytes - 0x30);
 
         GXTexObj* texObj = static_cast<GXTexObj*>(__nw__FUlPQ27CMemory6CStagePci(0x20, stage, s_FS_USB_Process_cpp, 0x73));
-        *reinterpret_cast<void**>(Ptr(this, 0x6064) + index * 4) = texObj;
+        *reinterpret_cast<void**>(Ptr(this, 0x6064) + static_cast<char>(*Ptr(this, 0x6124)) * 4) = texObj;
         GXInitTexObj(texObj, texData, tmp[2], tmp[3], GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
 
-        *Ptr(this, 0x6124) = index + 1;
+        *Ptr(this, 0x6124) = *Ptr(this, 0x6124) + 1;
         if (tmp != 0) {
             __dla__FPv(tmp);
         }

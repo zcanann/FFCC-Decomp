@@ -35,6 +35,9 @@ extern "C" void __ct__7CMapHitFv(void*);
 extern "C" void __ct__7CMapObjFv(void*);
 extern "C" void __ct__8CMapMeshFv(void*);
 extern "C" void __ct__9CMapIdGrpFv(void*);
+extern "C" void* __nw__11CTextureSetFUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" CTextureSet* __ct__11CTextureSetFv(CTextureSet*);
+extern "C" void Create__11CTextureSetFPvPQ27CMemory6CStageiP13CAmemCacheSetii(CTextureSet*, void*, CMemory::CStage*, int, void*, int, int);
 extern "C" void* PTR_PTR_s_CMapTexAnimSet_801e896c;
 extern "C" float Spline1D__5CMathFifPfPfPf(CMath*, int, float, float*, float*, float*);
 extern "C" float Line1D__5CMathFifPfPf(CMath*, int, float, float*, float*);
@@ -1674,12 +1677,125 @@ void CMapMng::InitMapShadow()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80032784
+ * PAL Size: 1132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapMng::ReadMtx(char*)
+void CMapMng::ReadMtx(char* mapName)
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    char path[256];
+    int loadIndex = 0;
+    int append = 0;
+
+    *reinterpret_cast<unsigned char*>(self + 0x2298B) = 1;
+
+    if (*reinterpret_cast<int*>(self + 0x229A8) != 2 && *reinterpret_cast<int*>(self + 0x229A8) != 3) {
+        CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(self + 0x0);
+        CTextureSet* textureSet =
+            static_cast<CTextureSet*>(__nw__11CTextureSetFUlPQ27CMemory6CStagePci(0x24, stage, s_map_cpp, 0x3A9));
+        if (textureSet != 0) {
+            textureSet = __ct__11CTextureSetFv(textureSet);
+        }
+        *reinterpret_cast<CTextureSet**>(self + 0x213D8) = textureSet;
+    }
+
+    while (true) {
+        sprintf(path, "%s_%d.mtx", mapName, loadIndex);
+
+        bool exists = false;
+        if (*reinterpret_cast<int*>(self + 0x229A8) == 1) {
+            exists = true;
+        } else {
+            CFile::CHandle* openProbe = File.Open(path, 0, CFile::PRI_LOW);
+            if (openProbe != 0) {
+                File.Close(openProbe);
+                exists = true;
+            }
+        }
+        if (!exists) {
+            break;
+        }
+
+        void* filePtr = File.m_readBuffer;
+        if (*reinterpret_cast<int*>(self + 0x229A8) == 1) {
+            int& readIndex = *reinterpret_cast<int*>(self + 0x229A0);
+            int size = *reinterpret_cast<int*>(self + 0x229AC + (readIndex * 4));
+            void* amemCursor = *reinterpret_cast<void**>(self + 0x22998);
+            Memory.CopyFromAMemorySync(File.m_readBuffer, amemCursor, static_cast<unsigned long>((size + 0x1F) & ~0x1F));
+            *reinterpret_cast<unsigned char**>(self + 0x22998) += size;
+            CheckSum__FPvi(filePtr, size);
+            readIndex += 1;
+        } else {
+            CFile::CHandle* handle = File.Open(path, 0, CFile::PRI_LOW);
+            if (handle == 0) {
+                filePtr = 0;
+            } else {
+                int size = File.GetLength(handle);
+                if (*reinterpret_cast<int*>(self + 0x229A8) == 3) {
+                    File.ReadASync(handle);
+                    filePtr = reinterpret_cast<void*>(1);
+                    int& openIndex = *reinterpret_cast<int*>(self + 0x229A4);
+                    *reinterpret_cast<CFile::CHandle**>(self + 0x22A2C + (openIndex * 4)) = handle;
+                    openIndex += 1;
+                } else {
+                    File.Read(handle);
+                    File.SyncCompleted(handle);
+                    filePtr = File.m_readBuffer;
+                    File.Close(handle);
+                    if (*reinterpret_cast<int*>(self + 0x229A8) == 2) {
+                        int& readIndex = *reinterpret_cast<int*>(self + 0x229A0);
+                        void* amemCursor = *reinterpret_cast<void**>(self + 0x22998);
+                        Memory.CopyToAMemorySync(filePtr, amemCursor, static_cast<unsigned long>(size));
+                        *reinterpret_cast<int*>(self + 0x229AC + (readIndex * 4)) = size;
+                        *reinterpret_cast<unsigned int*>(self + 0x229EC + (readIndex * 4)) = CheckSum__FPvi(filePtr, size);
+                        readIndex += 1;
+                        *reinterpret_cast<unsigned char**>(self + 0x22998) += size;
+                    }
+                }
+            }
+        }
+
+        if (filePtr == 0) {
+            return;
+        }
+
+        if (*reinterpret_cast<int*>(self + 0x229A8) != 3) {
+            CChunkFile chunkFile;
+            chunkFile.SetBuf(filePtr);
+            CChunkFile::CChunk chunk;
+
+            if (*reinterpret_cast<int*>(self + 0x229A8) == 2) {
+                while (chunkFile.GetNextChunk(chunk)) {
+                    if (chunk.m_id == 0x54534554 && chunk.m_arg0 == 1) {
+                        return;
+                    }
+                }
+            } else {
+                while (chunkFile.GetNextChunk(chunk)) {
+                    if (chunk.m_id == 0x54534554) {
+                        Create__11CTextureSetFPvPQ27CMemory6CStageiP13CAmemCacheSetii(
+                            *reinterpret_cast<CTextureSet**>(self + 0x213D8),
+                            &chunkFile,
+                            *reinterpret_cast<CMemory::CStage**>(self + 0x0),
+                            append,
+                            0,
+                            0,
+                            0);
+                        append = 1;
+                        if (chunk.m_arg0 == 1) {
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
+        loadIndex += 1;
+    }
 }
 
 /*

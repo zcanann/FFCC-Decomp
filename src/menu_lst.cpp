@@ -364,8 +364,6 @@ void CMenuPcs::MLstCtrl()
 void CMenuPcs::MLstClose()
 {
 	float fVar1;
-	double dVar2;
-	double dVar3;
 	short* psVar4;
 	int iVar5;
 	unsigned int uVar6;
@@ -380,13 +378,11 @@ void CMenuPcs::MLstClose()
 	uVar8 = uVar6;
 	if (0 < (int)uVar6) {
 		do {
-			dVar2 = 4503601774854144.0;
 			if (*(int*)(psVar4 + 0x12) <= iVar7) {
 				if (iVar7 < *(int*)(psVar4 + 0x12) + *(int*)(psVar4 + 0x14)) {
 					*(int*)(psVar4 + 0x10) = *(int*)(psVar4 + 0x10) + 1;
-					dVar3 = 0.0;
-					*(float*)(psVar4 + 8) = (float)-((1.0 / ((double)*(int*)(psVar4 + 0x14))) * (double)*(int*)(psVar4 + 0x10) - 1.0);
-					if ((double)*(float*)(psVar4 + 8) < dVar3) {
+					*(float*)(psVar4 + 8) = (float)(1.0 - ((1.0 / (double)*(int*)(psVar4 + 0x14)) * (double)*(int*)(psVar4 + 0x10)));
+					if (*(float*)(psVar4 + 8) < 0.0f) {
 						*(float*)(psVar4 + 8) = 0.0f;
 					}
 				} else {

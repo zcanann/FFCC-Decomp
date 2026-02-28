@@ -10,7 +10,6 @@
 extern int lbl_8032ED70;
 extern float lbl_80330500;
 extern float lbl_80330504;
-extern _pppMngSt* pppMngStPtr;
 extern _pppEnvSt* lbl_8032ED54;
 extern _pppEnvSt* pppEnvStPtr;
 extern Mtx ppvWorldMatrix;
@@ -70,6 +69,16 @@ struct KeShpTail2XWork {
     Vec m_posHistory[31];
 };
 
+struct KeShpTail2XObj {
+    u8 _pad0[0xc];
+    _pppPObject m_baseObj;
+};
+
+struct KeShpTail2XMng {
+    u8 _pad0[0x78];
+    pppFMATRIX m_matrix;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x80088e4c
@@ -83,6 +92,8 @@ void pppKeShpTail2X(_pppPObject* obj, UnkB* param_2, UnkC* param_3)
 {
     KeShpTail2XStep* step;
     KeShpTail2XWork* work;
+    KeShpTail2XObj* tailObj;
+    KeShpTail2XMng* tailMng;
     Vec pos;
 
     if (lbl_8032ED70 != 0) {
@@ -90,34 +101,41 @@ void pppKeShpTail2X(_pppPObject* obj, UnkB* param_2, UnkC* param_3)
     }
 
     step = (KeShpTail2XStep*)param_2;
+    tailObj = (KeShpTail2XObj*)obj;
+    tailMng = (KeShpTail2XMng*)lbl_8032ED50;
     work = (KeShpTail2XWork*)((u8*)obj + 0x80 + ((KeShpTail2XOffsets*)param_3)->m_serializedDataOffsets[0]);
 
-    if (obj->m_graphId == 0) {
+    if (tailObj->m_baseObj.m_graphId == 0) {
         if (step->m_worldSpaceMode == 0) {
-            pos.x = obj->m_localMatrix.value[0][3];
-            pos.y = obj->m_localMatrix.value[1][3];
-            pos.z = obj->m_localMatrix.value[2][3];
+            pos.x = tailObj->m_baseObj.m_localMatrix.value[0][3];
+            pos.y = tailObj->m_baseObj.m_localMatrix.value[1][3];
+            pos.z = tailObj->m_baseObj.m_localMatrix.value[2][3];
         } else if (step->m_worldSpaceMode == 1) {
             pppFMATRIX ownerMatrix;
             pppFMATRIX partMatrix;
             pppFMATRIX outMatrix;
 
-            partMatrix = obj->m_localMatrix;
-            ownerMatrix = pppMngStPtr->m_matrix;
+            partMatrix = tailObj->m_baseObj.m_localMatrix;
+            ownerMatrix = tailMng->m_matrix;
             pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&outMatrix, &ownerMatrix, &partMatrix);
             pos.x = outMatrix.value[0][3];
             pos.y = outMatrix.value[1][3];
             pos.z = outMatrix.value[2][3];
         }
 
-        u8 count = work->m_count;
-        Vec* history = work->m_posHistory;
+        Vec temp;
+        u8 count;
+        Vec* history;
+
+        pppCopyVector__FR3Vec3Vec(&temp, &pos);
+        count = work->m_count;
+        history = work->m_posHistory;
         if (count != 0) {
             do {
-                pppCopyVector__FR3Vec3Vec(history, &pos);
+                pppCopyVector__FR3Vec3Vec(history, &temp);
                 history++;
                 count--;
-            } while (count != 0);
+            } while (count > 0);
         }
     }
 
@@ -127,16 +145,16 @@ void pppKeShpTail2X(_pppPObject* obj, UnkB* param_2, UnkC* param_3)
     work->m_head--;
 
     if (step->m_worldSpaceMode == 0) {
-        pos.x = obj->m_localMatrix.value[0][3];
-        pos.y = obj->m_localMatrix.value[1][3];
-        pos.z = obj->m_localMatrix.value[2][3];
+        pos.x = tailObj->m_baseObj.m_localMatrix.value[0][3];
+        pos.y = tailObj->m_baseObj.m_localMatrix.value[1][3];
+        pos.z = tailObj->m_baseObj.m_localMatrix.value[2][3];
     } else if (step->m_worldSpaceMode == 1) {
         pppFMATRIX ownerMatrix;
         pppFMATRIX partMatrix;
         pppFMATRIX outMatrix;
 
-        partMatrix = obj->m_localMatrix;
-        ownerMatrix = pppMngStPtr->m_matrix;
+        partMatrix = tailObj->m_baseObj.m_localMatrix;
+        ownerMatrix = tailMng->m_matrix;
         pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&outMatrix, &ownerMatrix, &partMatrix);
         pos.x = outMatrix.value[0][3];
         pos.y = outMatrix.value[1][3];
@@ -185,6 +203,7 @@ void pppKeShpTail2XDraw(_pppPObject* obj, UnkB* param_2, UnkC* param_3)
     KeShpTail2XStep* step = (KeShpTail2XStep*)param_2;
     KeShpTail2XOffsets* offsets = (KeShpTail2XOffsets*)param_3;
     KeShpTail2XWork* work;
+    KeShpTail2XObj* tailObj;
     long* shapeTable;
     long* shapeEntry;
     u16 count;
@@ -247,6 +266,7 @@ void pppKeShpTail2XDraw(_pppPObject* obj, UnkB* param_2, UnkC* param_3)
     }
 
     work = (KeShpTail2XWork*)((u8*)obj + 0x80 + offsets->m_serializedDataOffsets[0]);
+    tailObj = (KeShpTail2XObj*)obj;
     mng = (_pppMngSt*)lbl_8032ED50;
     shapeTable = *(long**)(*(u32*)&lbl_8032ED54->m_particleColors[0] + step->m_dataValIndex * 4);
     shapeEntry = (long*)((u8*)shapeTable + *(s16*)((u8*)shapeTable + ((u16)work->m_shapePrevFrame << 3) + 0x10));
@@ -256,7 +276,7 @@ void pppKeShpTail2XDraw(_pppPObject* obj, UnkB* param_2, UnkC* param_3)
     colorB = (float)step->m_colorStartB;
     colorA = (float)step->m_colorStartA * alphaMul;
 
-    pppCopyMatrix__FR10pppFMATRIX10pppFMATRIX(&localBase, &obj->m_localMatrix);
+    pppCopyMatrix__FR10pppFMATRIX10pppFMATRIX(&localBase, &tailObj->m_baseObj.m_localMatrix);
     pppUnitMatrix__FR10pppFMATRIX(&drawMtx);
 
     drawScale = step->m_scaleStart;

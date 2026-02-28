@@ -4,9 +4,9 @@ static GBASecParam SecParams[4];
 GBAControl __GBA[4];
 BOOL __GBAReset = FALSE;
 
-static BOOL OnReset(BOOL final);
+static BOOL OnReset4(BOOL final);
 
-static OSResetFunctionInfo ResetFunctionInfo = {OnReset, 127};
+static OSResetFunctionInfo ResetFunctionInfo = {OnReset4, 127};
 
 static void ShortCommandProc(s32 chan) {
     GBAControl* gba;
@@ -24,6 +24,15 @@ static void ShortCommandProc(s32 chan) {
     gba->status[0] = gba->input[2] & GBA_JSTAT_MASK;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801A7460
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void GBAInit() {
     GBAControl* gba;
     s32 chan;
@@ -36,6 +45,7 @@ void GBAInit() {
     }
 
     OSInitAlarm();
+    DSPInit();
 
     __GBAReset = FALSE;
     OSRegisterResetFunction(&ResetFunctionInfo);
@@ -86,7 +96,16 @@ s32 GBAReset(s32 chan, u8* status) {
     return __GBASync(chan);
 }
 
-BOOL OnReset(BOOL final) {
+/*
+ * --INFO--
+ * PAL Address: 0x801A76EC
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+BOOL OnReset4(BOOL final) {
     __GBAReset = TRUE;
     return TRUE;
 }

@@ -303,13 +303,13 @@ void CMapTexAnim::SetMapTexAnim(int, int, int)
  */
 void CMapTexAnimSet::Calc()
 {
-    CMapTexAnim** anim = reinterpret_cast<CMapTexAnim**>(Ptr(this, 0xC));
+    int setPtr = reinterpret_cast<int>(this);
     for (int i = 0; i < S16At(this, 8); i++) {
         Calc__11CMapTexAnimFP12CMaterialSetP11CTextureSet(
-            *anim,
+            *reinterpret_cast<CMapTexAnim**>(setPtr + 0xC),
             *reinterpret_cast<CMaterialSet**>(Ptr(this, 0x10C)),
             *reinterpret_cast<CTextureSet**>(Ptr(this, 0x110)));
-        anim++;
+        setPtr += 4;
     }
 }
 

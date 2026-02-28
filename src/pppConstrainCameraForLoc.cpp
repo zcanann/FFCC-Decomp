@@ -34,6 +34,8 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
     float local_f0;
     Vec local_ec;
     Vec local_e0;
+    Vec local_d4;
+    Vec local_c8;
     Vec local_bc;
     Vec local_a4;
     Mtx local_98;
@@ -64,14 +66,14 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
 
     fVar3 = *(float*)((int)fVar1 + 0x1c);
     fVar2 = *(float*)((int)fVar1 + 0x2c);
-    GetDirectVector__5CUtilFP3VecP3Vec3Vec((void*)&DAT_8032ec70, (Vec*)&local_e0, (Vec*)&local_ec, (Vec*)&local_f8);
+    GetDirectVector__5CUtilFP3VecP3Vec3Vec((void*)&DAT_8032ec70, &local_c8, &local_d4, (Vec*)&local_f8);
 
-    local_e0.x = fVar3 * local_e0.x;
-    local_e0.y = fVar3 * local_e0.y;
-    local_e0.z = fVar3 * local_e0.z;
-    local_ec.x = fVar2 * local_ec.x;
-    local_ec.y = fVar2 * local_ec.y;
-    local_ec.z = fVar2 * local_ec.z;
+    local_e0.x = fVar3 * local_c8.x;
+    local_e0.y = fVar3 * local_c8.y;
+    local_e0.z = fVar3 * local_c8.z;
+    local_ec.x = fVar2 * local_d4.x;
+    local_ec.y = fVar2 * local_d4.y;
+    local_ec.z = fVar2 * local_d4.z;
     PSVECAdd(&local_a4, &local_e0, &local_a4);
     PSVECAdd(&local_a4, &local_ec, &local_a4);
 

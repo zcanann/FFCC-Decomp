@@ -96,9 +96,9 @@ public:
     void AddTmpArtifact(int, int*);
     int CanAddGil(int);
     int AddGil(int);
-    void GetFoodRank(int);
+    int GetFoodRank(int);
     void SearchRomLetterWork(CRomLetterWork**, int);
-    void ShopRequest(int, int, int, int, int, int, int);
+    int ShopRequest(int, int, int, int, int, int, int);
     void CallShop(int, int, int, int, int);
     void SafeDeleteTempItem();
     void ClampStatus(short&, unsigned short&);

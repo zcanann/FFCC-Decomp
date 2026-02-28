@@ -86,79 +86,70 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
 extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct UnkB* stepData, struct UnkC* offsetData)
 {
     _pppMngSt* pppMngSt = (_pppMngSt*)lbl_8032ED50;
-    
     if (lbl_8032ED70 == 0) {
         f32* pfVar = (f32*)((u8*)&basePtr->field0_0x0 + 8 + *offsetData->m_serializedDataOffsets);
-        
-        // Update velocity and position
+        double frameCount;
+        Vec direction;
+        Vec tempDirection;
+        Vec offset;
+        Vec basePos;
+        Vec currentPos;
+        Vec newPos;
+        u32 sinIndex;
+        f32 posX;
+        f32 posY;
+        f32 posZ;
+
         pfVar[1] = pfVar[1] + pfVar[2];
         *pfVar = *pfVar + pfVar[1];
-        
         if (stepData->m_graphId == basePtr->field0_0x0.m_graphId) {
             *pfVar = *pfVar + stepData->m_stepValue;
             pfVar[1] = pfVar[1] + (f32)stepData->m_arg3;
             pfVar[2] = pfVar[2] + *(f32*)stepData->m_payload;
         }
-        
-        u16 counter = *(u16*)(pfVar + 3);
-        double frameCount = (double)(f32)counter;
-        
-        Vec direction;
+        frameCount = (double)(f32)*(u16*)(pfVar + 3);
         if (Game.game.m_currentSceneId == 7) {
-            direction.y = lbl_80330E1C;
             direction.x = lbl_80330E18;
+            direction.y = lbl_80330E1C;
             direction.z = lbl_80330E1C;
         } else {
             PSVECSubtract((Vec*)((u8*)pppMngSt + 0x68), (Vec*)((u8*)pppMngSt + 0x58), &direction);
         }
-        
-        // Normalize the direction vector
-        Vec tempDir = direction;
-        pppNormalize__FR3Vec3Vec(&direction, &tempDir);
-        
-        // Trigonometric parabolic motion calculations
-        u32 sinIndex = (u32)((lbl_80330E20 * (f32)stepData->m_dataValIndex) / lbl_80330E24);
-        
-        f32 baseValue = *pfVar;
-        f32 horizontalScale = (f32)(frameCount * (double)(baseValue * lbl_801EC9F0[((sinIndex + 0x4000) & 0xfffc) / 4]));
-        f32 horizontalX = direction.x * horizontalScale;
-        f32 horizontalZ = direction.z * horizontalScale;
-        f32 verticalY = (f32)(frameCount * (double)(baseValue * lbl_801EC9F0[(sinIndex & 0xfffc) / 4]) - 
-                             (double)(f32)(frameCount * (double)(f32)((double)(lbl_80330E28 * (f32)stepData->m_initWOrk) * frameCount)));
-        
-        Vec newPosition;
+        tempDirection.x = direction.x;
+        tempDirection.y = direction.y;
+        tempDirection.z = direction.z;
+        pppNormalize__FR3Vec3Vec(&direction, &tempDirection);
+        sinIndex = (u32)((lbl_80330E20 * (f32)stepData->m_dataValIndex) / lbl_80330E24);
+        posX = (f32)(frameCount * (double)(*pfVar * lbl_801EC9F0[((sinIndex + 0x4000) & 0xfffc) / 4]));
+        posY = direction.x * posX;
+        posX = direction.z * posX;
+        posZ = (f32)(frameCount * (double)(*pfVar * lbl_801EC9F0[(sinIndex & 0xfffc) / 4]) -
+                     (double)(f32)(frameCount * (double)(f32)((double)(lbl_80330E28 * (f32)stepData->m_initWOrk) * frameCount)));
         if (Game.game.m_currentSceneId == 7) {
-            Vec basePos;
             basePos.x = pfVar[4];
             basePos.y = pfVar[5];
             basePos.z = pfVar[6];
-            Vec offset;
-            offset.x = horizontalX;
-            offset.y = verticalY;
-            offset.z = horizontalZ;
-            pppAddVector__FR3Vec3Vec3Vec(&newPosition, &offset, &basePos);
         } else {
-            Vec basePos;
             basePos.x = *(f32*)((u8*)pppMngSt + 0x58);
             basePos.y = *(f32*)((u8*)pppMngSt + 0x5c);
             basePos.z = *(f32*)((u8*)pppMngSt + 0x60);
-            Vec offset;
-            offset.x = horizontalX;
-            offset.y = verticalY;
-            offset.z = horizontalZ;
-            pppAddVector__FR3Vec3Vec3Vec(&newPosition, &offset, &basePos);
         }
-
-        pppCopyVector__FR3Vec3Vec((Vec*)((u8*)pppMngSt + 0x48), (Vec*)((u8*)pppMngSt + 0x8));
-        pppCopyVector__FR3Vec3Vec((Vec*)((u8*)pppMngSt + 0x8), &newPosition);
-        
-        // Update matrix with new position
-        ((_pppMngSt*)lbl_8032ED50)->m_matrix.value[0][3] = newPosition.x;
-        ((_pppMngSt*)lbl_8032ED50)->m_matrix.value[1][3] = newPosition.y;
-        ((_pppMngSt*)lbl_8032ED50)->m_matrix.value[2][3] = newPosition.z;
-        
+        offset.x = posY;
+        offset.y = posZ;
+        offset.z = posX;
+        pppAddVector__FR3Vec3Vec3Vec((Vec*)&posY, &offset, &basePos);
+        currentPos.x = *(f32*)((u8*)pppMngSt + 0x8);
+        currentPos.y = *(f32*)((u8*)pppMngSt + 0xc);
+        currentPos.z = *(f32*)((u8*)pppMngSt + 0x10);
+        pppCopyVector__FR3Vec3Vec((Vec*)((u8*)pppMngSt + 0x48), &currentPos);
+        newPos.x = posY;
+        newPos.y = posZ;
+        newPos.z = posX;
+        pppCopyVector__FR3Vec3Vec((Vec*)((u8*)pppMngSt + 0x8), &newPos);
+        ((_pppMngSt*)lbl_8032ED50)->m_matrix.value[0][3] = posY;
+        ((_pppMngSt*)lbl_8032ED50)->m_matrix.value[1][3] = posZ;
+        ((_pppMngSt*)lbl_8032ED50)->m_matrix.value[2][3] = posX;
         pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
-        
         *(u16*)(pfVar + 3) = *(u16*)(pfVar + 3) + 1;
     }
 }

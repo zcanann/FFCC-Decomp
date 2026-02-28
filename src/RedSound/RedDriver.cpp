@@ -1438,7 +1438,7 @@ void CRedDriver::ReentryMusicData(int musicID)
 
 /*
  * --INFO--
- * PAL Address: 0x801BEE48
+ * PAL Address: 0x801bee48
  * PAL Size: 72b
  * EN Address: TODO
  * EN Size: TODO
@@ -1497,7 +1497,7 @@ int CRedDriver::MusicNextPlay(int musicID, int volume, int mode)
 
 /*
  * --INFO--
- * PAL Address: 0x801BEF98
+ * PAL Address: 0x801bef98
  * PAL Size: 72b
  * EN Address: TODO
  * EN Size: TODO

@@ -8,6 +8,7 @@ extern "C" {
 void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
 void _WaitDrawDone__8CGraphicFPci(void*, char*, int);
 void SetMode__9CShopMenuFi(void*, int);
+void DrawSingleBase__8CMenuPcsFf(void*, float);
 void ReleasePdt__8CPartPcsFi(void*, int);
 int LoadMenuPdt__8CPartPcsFPc(void*, char*);
 int GetItemType__8CMenuPcsFii(void*, int, int);
@@ -1578,12 +1579,54 @@ void CShopMenu::DrawShopBase()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801527EC
+ * PAL Size: 832b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CShopMenu::DrawMakeBase()
 {
-	// TODO
+    DrawSingleBase__8CMenuPcsFf(reinterpret_cast<CMenuPcs*>(MenuPcs), 1.0f);
+    pppInitDrawEnv(0);
+
+    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)9, (GXCompCnt)1, (GXCompType)4, 0);
+    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)11, (GXCompCnt)1, (GXCompType)5, 0);
+    GXSetVtxAttrFmt((GXVtxFmt)7, (GXAttr)13, (GXCompCnt)1, (GXCompType)4, 0);
+    GXSetNumChans(1);
+    GXSetChanCtrl((GXChannelID)0, GX_ENABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+    GXSetChanCtrl((GXChannelID)2, GX_ENABLE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+    GXSetColorUpdate(GX_TRUE);
+
+    _GXColor colorA = {0xFF, 0xFF, 0xFF, 0x00};
+    _GXColor colorB = {0xFF, 0xFF, 0xFF, 0xFF};
+    _GXColor colorC = {0xFF, 0xFF, 0xFF, 0x00};
+    _GXColor colorD = {0xFF, 0xFF, 0xFF, 0xFF};
+    drawShapeSeqGrouad(9, 0, 0x1C, 0xB8, 0.5f, 0.7f, colorA, colorB, colorC, colorD);
+
+    _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
+    int x = 0x3C;
+    while (x < 0x25C) {
+        drawShapeSeqGrouad(9, 0, x, 0xB8, 0.5f, 0.7f, white, white, white, white);
+        x += 0x20;
+    }
+
+    _GXColor endA = {0xFF, 0xFF, 0xFF, 0xFF};
+    _GXColor endB = {0xFF, 0xFF, 0xFF, 0x00};
+    _GXColor endC = {0xFF, 0xFF, 0xFF, 0xFF};
+    _GXColor endD = {0xFF, 0xFF, 0xFF, 0x00};
+    drawShapeSeqGrouad(9, 0, x, 0xB8, 0.5f, 0.7f, endA, endB, endC, endD);
+
+    drawShapeSeq(3, 0, 0xB4, 0x8C, 0xFF, 0, 0, 0.0f, 0);
+    x = 0xB4;
+    while (x < 0x1CC) {
+        drawShapeSeq(4, 0, x, 0x8C, 0xFF, 0, 0, 0.0f, 0);
+        x += 0x20;
+    }
+    drawShapeSeq(3, 0, x, 0x8C, 0xFF, 1, 0, 0.0f, 0);
 }
 
 /*

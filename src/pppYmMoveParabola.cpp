@@ -85,9 +85,8 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
  */
 extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct UnkB* stepData, struct UnkC* offsetData)
 {
-    _pppMngSt* pppMngSt = (_pppMngSt*)lbl_8032ED50;
-    
     if (lbl_8032ED70 == 0) {
+        _pppMngSt* pppMngSt = (_pppMngSt*)lbl_8032ED50;
         f32* pfVar = (f32*)((u8*)&basePtr->field0_0x0 + 8 + *offsetData->m_serializedDataOffsets);
         
         // Update velocity and position

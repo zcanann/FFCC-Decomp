@@ -2760,9 +2760,31 @@ void CMapMng::GetMapObjWMtx(int mapObjIndex, float (*destination)[4])
  * Address:	TODO
  * Size:	TODO
  */
-void CMapMng::SetMapObjAnim(int, int, int, int)
+void CMapMng::SetMapObjAnim(int mapObjIndex, int startFrame, int endFrame, int loop)
 {
-	// TODO
+    CPtrArray<CMapAnimRun*>* mapAnimRunArray = reinterpret_cast<CPtrArray<CMapAnimRun*>*>(Ptr(this, 0x213E0));
+    CPtrArray<CMapAnim*>* mapAnimArray = reinterpret_cast<CPtrArray<CMapAnim*>*>(Ptr(this, 0x213FC));
+    CMapAnimRun* foundMapAnimRun = 0;
+    CMapObj* mapObj = reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(this) + (mapObjIndex * 0xF0) + 0x954);
+    int mapAnimRunCount = mapAnimRunArray->GetSize();
+
+    for (unsigned int mapAnimRunIndex = 0; mapAnimRunIndex < static_cast<unsigned int>(mapAnimRunCount); mapAnimRunIndex++) {
+        CMapAnimRun* mapAnimRun = (*mapAnimRunArray)[mapAnimRunIndex];
+        unsigned short mapAnimIndex = *reinterpret_cast<unsigned short*>(Ptr(mapAnimRun, 0x12));
+        CPtrArray<CMapAnimNode*>* mapAnimNodeArray = reinterpret_cast<CPtrArray<CMapAnimNode*>*>((*mapAnimArray)[mapAnimIndex]);
+        int mapAnimNodeCount = mapAnimNodeArray->GetSize();
+
+        for (int mapAnimNodeIndex = 0; mapAnimNodeIndex < mapAnimNodeCount; mapAnimNodeIndex++) {
+            CMapAnimNode* mapAnimNode = (*mapAnimNodeArray)[mapAnimNodeIndex];
+            if (reinterpret_cast<CMapObj*>(*reinterpret_cast<int*>(mapAnimNode)) == mapObj) {
+                foundMapAnimRun = mapAnimRun;
+                goto startMapObjAnim;
+            }
+        }
+    }
+
+startMapObjAnim:
+    foundMapAnimRun->Start(startFrame, endFrame, loop);
 }
 
 /*

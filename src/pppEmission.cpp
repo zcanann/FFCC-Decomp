@@ -348,7 +348,7 @@ void pppFrameEmission(pppEmission* pppEmission_, UnkB* param_2, UnkC* param_3) {
     *((u8*)state + 10) = *((u8*)pppEmission_ + 0x8A + dataSet);
     *((u8*)state + 11) = baseAlpha;
 
-    double alphaScale = (double)((float)baseAlpha / FLOAT_803311e0);
+    double alphaScale = (double)baseAlpha / FLOAT_803311e0;
 
     CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
         param_2->m_stepValue, pppEmission_, param_2->m_graphId,
@@ -418,7 +418,7 @@ void pppFrameEmission(pppEmission* pppEmission_, UnkB* param_2, UnkC* param_3) {
             }
 
             *(s16*)((u8*)particle + 10) = *(s16*)((u8*)particle + 10) - 1;
-            int alpha = (int)((double)(float)*(s16*)(particle + 1) * alphaScale);
+            int alpha = (int)((double)*(s16*)(particle + 1) * alphaScale);
 
             if (*(s16*)((u8*)particle + 10) < 1) {
                 s16 jitter = 0;

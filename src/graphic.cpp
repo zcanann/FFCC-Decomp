@@ -871,12 +871,112 @@ void CGraphic::makeSphere()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80017f6c
+ * PAL Size: 916b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGraphic::DrawBound(CBound&, _GXColor)
+void CGraphic::DrawBound(CBound& bound, _GXColor color)
 {
-	// TODO
+    float* box = reinterpret_cast<float*>(&bound);
+    _GXColor materialColor = color;
+    _GXColor ambientColor = color;
+    Mtx cameraMtx;
+
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(GX_BM_NONE, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+    GXSetZCompLoc(GX_FALSE);
+    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(GX_GEQUAL, 1, GX_AOP_AND, GX_ALWAYS, 0);
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetNumTevStages(1);
+    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(GX_TEVSTAGE0, GX_PASSCLR);
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+
+    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+    GXLoadPosMtxImm(cameraMtx, GX_PNMTX0);
+    GXSetChanMatColor(GX_COLOR0A0, materialColor);
+    GXSetChanAmbColor(GX_COLOR0A0, ambientColor);
+
+    GXBegin(GX_LINES, GX_VTXFMT7, 0x18);
+    GXWGFifo.f32 = box[0];
+    GXWGFifo.f32 = box[1];
+    GXWGFifo.f32 = box[2];
+    GXWGFifo.f32 = box[3];
+    GXWGFifo.f32 = box[1];
+    GXWGFifo.f32 = box[2];
+    GXWGFifo.f32 = box[0];
+    GXWGFifo.f32 = box[4];
+    GXWGFifo.f32 = box[2];
+    GXWGFifo.f32 = box[3];
+    GXWGFifo.f32 = box[4];
+    GXWGFifo.f32 = box[2];
+    GXWGFifo.f32 = box[0];
+    GXWGFifo.f32 = box[1];
+    GXWGFifo.f32 = box[5];
+    GXWGFifo.f32 = box[3];
+    GXWGFifo.f32 = box[1];
+    GXWGFifo.f32 = box[5];
+    GXWGFifo.f32 = box[0];
+    GXWGFifo.f32 = box[4];
+    GXWGFifo.f32 = box[5];
+    GXWGFifo.f32 = box[3];
+    GXWGFifo.f32 = box[4];
+    GXWGFifo.f32 = box[5];
+    GXWGFifo.f32 = box[0];
+    GXWGFifo.f32 = box[1];
+    GXWGFifo.f32 = box[2];
+    GXWGFifo.f32 = box[0];
+    GXWGFifo.f32 = box[4];
+    GXWGFifo.f32 = box[2];
+    GXWGFifo.f32 = box[3];
+    GXWGFifo.f32 = box[1];
+    GXWGFifo.f32 = box[2];
+    GXWGFifo.f32 = box[3];
+    GXWGFifo.f32 = box[4];
+    GXWGFifo.f32 = box[2];
+    GXWGFifo.f32 = box[0];
+    GXWGFifo.f32 = box[1];
+    GXWGFifo.f32 = box[5];
+    GXWGFifo.f32 = box[0];
+    GXWGFifo.f32 = box[4];
+    GXWGFifo.f32 = box[5];
+    GXWGFifo.f32 = box[3];
+    GXWGFifo.f32 = box[1];
+    GXWGFifo.f32 = box[5];
+    GXWGFifo.f32 = box[3];
+    GXWGFifo.f32 = box[4];
+    GXWGFifo.f32 = box[5];
+    GXWGFifo.f32 = box[0];
+    GXWGFifo.f32 = box[1];
+    GXWGFifo.f32 = box[2];
+    GXWGFifo.f32 = box[0];
+    GXWGFifo.f32 = box[1];
+    GXWGFifo.f32 = box[5];
+    GXWGFifo.f32 = box[3];
+    GXWGFifo.f32 = box[1];
+    GXWGFifo.f32 = box[2];
+    GXWGFifo.f32 = box[3];
+    GXWGFifo.f32 = box[1];
+    GXWGFifo.f32 = box[5];
+    GXWGFifo.f32 = box[0];
+    GXWGFifo.f32 = box[4];
+    GXWGFifo.f32 = box[2];
+    GXWGFifo.f32 = box[0];
+    GXWGFifo.f32 = box[4];
+    GXWGFifo.f32 = box[5];
+    GXWGFifo.f32 = box[3];
+    GXWGFifo.f32 = box[4];
+    GXWGFifo.f32 = box[2];
+    GXWGFifo.f32 = box[3];
+    GXWGFifo.f32 = box[4];
+    GXWGFifo.f32 = box[5];
 }
 
 /*

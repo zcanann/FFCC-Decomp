@@ -1513,12 +1513,16 @@ void CRedDriver::MusicFadeOut(int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bf02c
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::MusicVolume(int, int, int)
+void CRedDriver::MusicVolume(int param_1, int param_2, int param_3)
 {
-	// TODO
+    _EntryExecCommand(_MusicVolume, param_1, param_2, param_3, 0, 0, 0, 0);
 }
 
 /*
@@ -1758,12 +1762,16 @@ void CRedDriver::SeFadeOut(int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bf698
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::SeVolume(int, int, int)
+void CRedDriver::SeVolume(int param_1, int param_2, int param_3)
 {
-	// TODO
+    _EntryExecCommand(_SeVolume, param_1, param_2, param_3, 0, 0, 0, 0);
 }
 
 /*
@@ -1820,12 +1828,28 @@ int CRedDriver::GetSeVolume(int param_1, int param_2)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bf854
+ * PAL Size: 108b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::ReportSeLoop(int)
+int CRedDriver::ReportSeLoop(int param_1)
 {
-	// TODO
+    int* seInfo;
+    int* end;
+
+    seInfo = *(int**)((int)DAT_8032f3f0 + 0xdbc);
+    end = (int*)(*(int*)((int)DAT_8032f3f0 + 0xdbc) + 0x2a80);
+    while (seInfo < end) {
+        if ((*seInfo != 0) &&
+            ((param_1 == -1 || (param_1 == seInfo[0x3e])) && ((seInfo[0x40] & 1) != 0))) {
+            return 1;
+        }
+        seInfo += 0x55;
+    }
+    return 0;
 }
 
 /*

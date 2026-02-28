@@ -34,13 +34,17 @@ struct CMapCylinderRaw
 };
 
 extern Mtx gFlatPosMtx;
-extern int DAT_8032ed70;
 extern unsigned char lbl_8032EC90[];
 extern char lbl_801DD6A8[];
 extern char lbl_801DD6B4[];
 extern char lbl_803320A0[];
 extern CMath Math;
 extern "C" int __cntlzw(unsigned int);
+
+static inline int GetDbgFlags()
+{
+	return *reinterpret_cast<int*>(reinterpret_cast<char*>(&DbgMenuPcs) + 0x2A5C);
+}
 
 CAStar AStar;
 
@@ -523,7 +527,7 @@ void CAStar::calcAStar()
  */
 void CAStar::drawAStar()
 {
-	if ((DAT_8032ed70 & 0x400) != 0)
+	if ((GetDbgFlags() & 0x400) != 0)
 	{
 		int frameGroup = System.m_frameCounter / 0x1e + (System.m_frameCounter >> 31);
 
@@ -942,7 +946,7 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
  */
 unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 {
-	if ((DAT_8032ed70 & 1) == 0)
+	if ((GetDbgFlags() & 1) == 0)
 	{
 		CVector base(kPolyGroupBaseX, kPolyGroupBaseY, kPolyGroupBaseZ);
 		CVector top(pos->x, pos->y + kPolyGroupTopOffsetY, pos->z);

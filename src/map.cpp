@@ -3,6 +3,7 @@
 #include "ffcc/math.h"
 #include "ffcc/memory.h"
 #include "ffcc/maphit.h"
+#include "ffcc/mapmesh.h"
 #include "ffcc/mapshadow.h"
 #include "ffcc/mapanim.h"
 #include "ffcc/maptexanim.h"
@@ -77,6 +78,10 @@ extern CMath Math;
 extern unsigned char DAT_8032ecb9;
 extern CPartPcs PartPcs;
 extern "C" unsigned char Vec_80245758[];
+extern "C" void __ct__Q29CLightPcs6CLightFv(void*);
+extern "C" void SetLink__7CMapObjFv();
+extern "C" void ReadOtmOctTree__8COctTreeFR10CChunkFile(void*, CChunkFile&);
+extern "C" int sprintf(char*, const char*, ...);
 
 static char s_map_cpp[] = "map.cpp";
 static char s_CMapMng_mapmng[] = "CMapMng.mapmng";
@@ -1689,12 +1694,294 @@ void CMapMng::ReadMpl(char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800319ec
+ * PAL Size: 2264b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapMng::ReadOtm(char*)
+void CMapMng::ReadOtm(char* mapName)
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    char path[64];
+    CFile::CHandle* fileHandle = 0;
+    void* filePtr = File.m_readBuffer;
+
+    *reinterpret_cast<unsigned char*>(self + 0x2298B) = 1;
+    sprintf(path, "%s", mapName);
+    *reinterpret_cast<int*>(self + 0x22A6C) = 0;
+
+    const int readMode = *reinterpret_cast<int*>(self + 0x229A8);
+    if (readMode == 1) {
+        int& readIndex = *reinterpret_cast<int*>(self + 0x229A0);
+        const int size = *reinterpret_cast<int*>(self + 0x229AC + (readIndex * 4));
+        void* amemCursor = *reinterpret_cast<void**>(self + 0x22998);
+
+        Memory.CopyFromAMemorySync(File.m_readBuffer, amemCursor, (size + 0x1F) & ~0x1F);
+        *reinterpret_cast<unsigned char**>(self + 0x22998) += size;
+        CheckSum__FPvi(File.m_readBuffer, size);
+        readIndex += 1;
+    } else {
+        fileHandle = File.Open(path, 0, CFile::PRI_LOW);
+        if (fileHandle != 0) {
+            const int size = File.GetLength(fileHandle);
+            if (readMode == 3) {
+                File.ReadASync(fileHandle);
+                filePtr = reinterpret_cast<void*>(1);
+                int& openIndex = *reinterpret_cast<int*>(self + 0x229A4);
+                *reinterpret_cast<CFile::CHandle**>(self + 0x22A2C + (openIndex * 4)) = fileHandle;
+                openIndex += 1;
+            } else {
+                File.Read(fileHandle);
+                File.SyncCompleted(fileHandle);
+                filePtr = File.m_readBuffer;
+                File.Close(fileHandle);
+
+                if (readMode == 2) {
+                    int& readIndex = *reinterpret_cast<int*>(self + 0x229A0);
+                    void* amemCursor = *reinterpret_cast<void**>(self + 0x22998);
+                    Memory.CopyToAMemorySync(filePtr, amemCursor, static_cast<unsigned long>(size));
+                    *reinterpret_cast<int*>(self + 0x229AC + (readIndex * 4)) = size;
+                    *reinterpret_cast<unsigned int*>(self + 0x229EC + (readIndex * 4)) = CheckSum__FPvi(filePtr, size);
+                    readIndex += 1;
+                    *reinterpret_cast<unsigned char**>(self + 0x22998) += size;
+                }
+            }
+        } else {
+            filePtr = 0;
+        }
+    }
+
+    if (filePtr == 0) {
+        return;
+    }
+
+    if (readMode == 2 || readMode == 3) {
+        return;
+    }
+
+    CChunkFile chunkFile;
+    chunkFile.SetBuf(filePtr);
+
+    CChunkFile::CChunk chunk;
+    while (chunkFile.GetNextChunk(chunk)) {
+        if (chunk.m_id != 0x4F544D20) {
+            continue;
+        }
+
+        chunkFile.PushChunk();
+        while (chunkFile.GetNextChunk(chunk)) {
+            if (chunk.m_id == 0x4F43544D) {
+                short& octTreeCount = *reinterpret_cast<short*>(self + 0x8);
+                if (octTreeCount > 0xF) {
+                    return;
+                }
+
+                void* octTree = self + 0x14 + (octTreeCount * 0x4C);
+                ReadOtmOctTree__8COctTreeFR10CChunkFile(octTree, chunkFile);
+                octTreeCount += 1;
+                continue;
+            }
+
+            if (chunk.m_id == 0x4C495448) {
+                CMapLightHolder* light = reinterpret_cast<CMapLightHolder*>(
+                    _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+                        &Memory, 0x10, *reinterpret_cast<CMemory::CStage**>(self), s_map_cpp, 0x4D3, 0));
+                if (light != 0) {
+                    unsigned char* lightRaw = reinterpret_cast<unsigned char*>(light);
+                    lightRaw[0] = chunkFile.Get1();
+                    lightRaw[1] = chunkFile.Get1();
+                    lightRaw[2] = chunkFile.Get1();
+                    lightRaw[3] = chunkFile.Get1();
+                    *reinterpret_cast<float*>(lightRaw + 4) = chunkFile.GetF4();
+                    *reinterpret_cast<float*>(lightRaw + 8) = chunkFile.GetF4();
+                    *reinterpret_cast<float*>(lightRaw + 0xC) = chunkFile.GetF4();
+
+                    CPtrArray<CMapLightHolder*>* holderArray =
+                        reinterpret_cast<CPtrArray<CMapLightHolder*>*>(self + 0x21450 + (chunk.m_arg0 * 0x1C));
+                    holderArray->Add(light);
+                }
+                continue;
+            }
+
+            if (chunk.m_id != 0x5343454E) {
+                continue;
+            }
+
+            chunkFile.PushChunk();
+            while (chunkFile.GetNextChunk(chunk)) {
+                if (chunk.m_id == 0x4D455348) {
+                    short& meshCount = *reinterpret_cast<short*>(self + 0xE);
+                    if (meshCount > 0x9F) {
+                        return;
+                    }
+                    CMapMesh* mesh = reinterpret_cast<CMapMesh*>(self + 0x16AC + (meshCount * 0x44));
+                    mesh->ReadOtmMesh(chunkFile, *reinterpret_cast<CMemory::CStage**>(self), 0, 1);
+                    meshCount += 1;
+                    continue;
+                }
+
+                if (chunk.m_id == 0x41534554) {
+                    CMapTexAnimSet* texAnimSet =
+                        new (*reinterpret_cast<CMemory::CStage**>(self), s_map_cpp, 0x49A) CMapTexAnimSet();
+                    *reinterpret_cast<CMapTexAnimSet**>(self + 0x213DC) = texAnimSet;
+                    if (texAnimSet != 0) {
+                        texAnimSet->Create(
+                            chunkFile,
+                            *reinterpret_cast<CMaterialSet**>(self + 0x213D4),
+                            *reinterpret_cast<CTextureSet**>(self + 0x213D8));
+                    }
+                    continue;
+                }
+
+                if (chunk.m_id == 0x414E494D) {
+                    CMapAnim* mapAnim = new (*reinterpret_cast<CMemory::CStage**>(self), s_map_cpp, 0x4BF) CMapAnim();
+                    if (mapAnim != 0) {
+                        mapAnim->ReadOtmAnim(chunkFile);
+                        reinterpret_cast<CPtrArray<CMapAnim*>*>(self + 0x213FC)->Add(mapAnim);
+                    }
+                    continue;
+                }
+
+                if (chunk.m_id == 0x48495420) {
+                    short& hitCount = *reinterpret_cast<short*>(self + 0xA);
+                    if (hitCount > 0x1F) {
+                        return;
+                    }
+                    CMapHit* hit = reinterpret_cast<CMapHit*>(self + 0x4D4 + (hitCount * 0x24));
+                    hit->ReadOtmHit(chunkFile);
+                    hitCount += 1;
+                    continue;
+                }
+
+                if (chunk.m_id == 0x4E4F4445) {
+                    short& mapObjCount = *reinterpret_cast<short*>(self + 0xC);
+                    if (mapObjCount > 0x1FF) {
+                        return;
+                    }
+                    CMapObj* mapObj = reinterpret_cast<CMapObj*>(self + 0x954 + (mapObjCount * 0xF0));
+                    mapObj->ReadOtmObj(chunkFile);
+                    mapObjCount += 1;
+                    continue;
+                }
+
+                if (chunk.m_id == 0x4D534554) {
+                    CMaterialSet* materialSet =
+                        new (*reinterpret_cast<CMemory::CStage**>(self), s_map_cpp, 0x482) CMaterialSet();
+                    *reinterpret_cast<CMaterialSet**>(self + 0x213D4) = materialSet;
+                    if (materialSet != 0) {
+                        reinterpret_cast<CPtrArray<CMaterial*>*>(reinterpret_cast<unsigned char*>(materialSet) + 8)
+                            ->SetDefaultSize(0x180);
+                        reinterpret_cast<CPtrArray<CMaterial*>*>(reinterpret_cast<unsigned char*>(materialSet) + 8)
+                            ->SetGrow(0);
+                        materialSet->Create(
+                            chunkFile,
+                            *reinterpret_cast<CTextureSet**>(self + 0x213D8),
+                            static_cast<CMaterialMan::TEV_BIT>(0xFFF53060),
+                            0);
+                    }
+                }
+            }
+            chunkFile.PopChunk();
+        }
+        chunkFile.PopChunk();
+    }
+
+    const short octTreeCount = *reinterpret_cast<short*>(self + 8);
+    for (int i = 0; i < octTreeCount; i++) {
+        unsigned char* octTreeRaw = self + 0x14 + (i * 0x4C);
+        if (*reinterpret_cast<void**>(octTreeRaw + 8) != 0) {
+            *reinterpret_cast<char*>(octTreeRaw + 0x1F) = static_cast<char>(i);
+        }
+    }
+
+    CPtrArray<CMapShadow*>* mapShadowArray = reinterpret_cast<CPtrArray<CMapShadow*>*>(self + 0x21434);
+    for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
+        CMapShadow* mapShadow = (*mapShadowArray)[i];
+        mapShadow->Init();
+    }
+
+    CMapObj* mapObj = reinterpret_cast<CMapObj*>(self + 0x954);
+    CMapObj* mapObjEnd = reinterpret_cast<CMapObj*>(self + 0x954 + (*reinterpret_cast<short*>(self + 0xC) * 0xF0));
+    CMapObj* root = 0;
+    while (mapObj < mapObjEnd) {
+        if (*reinterpret_cast<CMapObj**>(mapObj) != 0) {
+            root = mapObj;
+            break;
+        }
+        mapObj = reinterpret_cast<CMapObj*>(reinterpret_cast<unsigned char*>(mapObj) + 0xF0);
+    }
+
+    *reinterpret_cast<CMapObj**>(self + 0x228E8) = root;
+    if (root == 0) {
+        return;
+    }
+
+    SetLink__7CMapObjFv();
+
+    Mtx identity;
+    PSMTXIdentity(identity);
+    root->CalcMtx(identity, 1);
+
+    const int mapObjCount = *reinterpret_cast<short*>(self + 0xC);
+    for (int i = 0; i < mapObjCount; i++) {
+        unsigned char* obj = self + 0x954 + (i * 0xF0);
+        unsigned char* atr = *reinterpret_cast<unsigned char**>(obj + 0xEC);
+        if (atr == 0) {
+            continue;
+        }
+        if (*reinterpret_cast<int*>(atr + 4) != 1 || *reinterpret_cast<int*>(atr + 0x34) == 0) {
+            continue;
+        }
+
+        unsigned char lightRaw[0xB0];
+        __ct__Q29CLightPcs6CLightFv(lightRaw);
+        *reinterpret_cast<int*>(lightRaw + 0x8) = 1;
+        *reinterpret_cast<float*>(lightRaw + 0xC) = *reinterpret_cast<float*>(obj + 0xC4);
+        *reinterpret_cast<float*>(lightRaw + 0x10) = *reinterpret_cast<float*>(obj + 0xD4);
+        *reinterpret_cast<float*>(lightRaw + 0x14) = *reinterpret_cast<float*>(obj + 0xE4);
+
+        unsigned char* targetObj = reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(atr + 0x10));
+        Vec source;
+        source.x = *reinterpret_cast<float*>(targetObj + 0xC4);
+        source.y = *reinterpret_cast<float*>(targetObj + 0xD4);
+        source.z = *reinterpret_cast<float*>(targetObj + 0xE4);
+        Vec target;
+        target.x = *reinterpret_cast<float*>(obj + 0xC4);
+        target.y = *reinterpret_cast<float*>(obj + 0xD4);
+        target.z = *reinterpret_cast<float*>(obj + 0xE4);
+        Vec dir;
+        PSVECSubtract(&source, &target, &dir);
+        PSVECNormalize(&dir, &dir);
+
+        *reinterpret_cast<float*>(lightRaw + 0x40) = dir.x;
+        *reinterpret_cast<float*>(lightRaw + 0x44) = dir.y;
+        *reinterpret_cast<float*>(lightRaw + 0x48) = dir.z;
+        *reinterpret_cast<unsigned int*>(lightRaw + 0x4C) = *reinterpret_cast<unsigned int*>(atr + 0x34);
+        *reinterpret_cast<unsigned int*>(lightRaw + 0x20) = *reinterpret_cast<unsigned int*>(atr + 0x20);
+        *reinterpret_cast<unsigned int*>(lightRaw + 0x24) = *reinterpret_cast<unsigned int*>(atr + 0x24);
+        *reinterpret_cast<unsigned int*>(lightRaw + 0x28) = *reinterpret_cast<unsigned int*>(atr + 0x28);
+        lightRaw[0x58] = atr[8];
+        lightRaw[0x59] = atr[9];
+        lightRaw[0x5A] = atr[10];
+        lightRaw[0x5B] = atr[11];
+
+        CLightPcs::CBumpLight* bump = LightPcs.AddBump(
+            reinterpret_cast<CLightPcs::CLight*>(lightRaw),
+            static_cast<CLightPcs::TARGET>(1),
+            *reinterpret_cast<CMemory::CStage**>(self),
+            1);
+        *reinterpret_cast<CLightPcs::CBumpLight**>(atr + 0x38) = bump;
+
+        for (int j = 0; j < mapObjCount; j++) {
+            unsigned char* scan = self + 0x954 + (j * 0xF0);
+            if (*reinterpret_cast<short*>(scan + 0x16) == i) {
+                *reinterpret_cast<CLightPcs::CBumpLight**>(scan + 0x10) = bump;
+            }
+        }
+
+    }
 }
 
 /*

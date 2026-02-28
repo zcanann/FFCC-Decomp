@@ -1144,7 +1144,9 @@ int _MusicSkipThread(void*)
  */
 void _RedAXCallback()
 {
-	// TODO
+    DAT_8032f3b8 = DAT_8032f3b8 + 1;
+    EnvelopeKeyExecute();
+    OSSignalSemaphore(&DAT_8032d778);
 }
 
 /*

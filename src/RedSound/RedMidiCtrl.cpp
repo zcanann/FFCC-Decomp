@@ -627,12 +627,22 @@ void __MidiCtrl_ReverbDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C820C
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_TimeSignature(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_TimeSignature(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    unsigned char* command = (unsigned char*)*(int*)track;
+
+    *(unsigned short*)((int)control + 0x18) = command[0];
+    *(unsigned short*)((int)control + 0x1a) = command[1];
+    *(int*)((int)control + 0x14) =
+        (0xc0 / (int)*(short*)((int)control + 0x1a)) * (int)*(short*)((int)control + 0x18);
+    *(int*)track += 2;
 }
 
 /*
@@ -647,12 +657,16 @@ void __MidiCtrl_KeySignature(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C82D8
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_PhraseSignature(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_PhraseSignature(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    *(int*)track += 1;
 }
 
 /*
@@ -862,32 +876,74 @@ void __MidiCtrl_VolumeChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C87B4
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_ExpressionDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_ExpressionDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    unsigned char* command = (unsigned char*)*(int*)track;
+    int* trackData = (int*)track;
+
+    *trackData = (int)(command + 1);
+    trackData[0xd] = ((int)(char)*command) << 0xc;
+    trackData[0xe] = 0;
+    trackData[0xf] = 0;
+    DAT_8032f4b4 |= 2;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C8800
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_ExpressionChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_ExpressionChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    int delta[4];
+    unsigned char* command;
+    int* trackData = (int*)track;
+
+    delta[0] = DeltaTimeSumup((unsigned char**)trackData);
+    if (delta[0] == 0) {
+        delta[0] = 1;
+    }
+
+    command = (unsigned char*)*trackData;
+    *trackData = (int)(command + 1);
+    trackData[0xe] = DataAddCompute(trackData + 0xd, (int)(char)*command, delta);
+    trackData[0xf] = delta[0];
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C8884
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_PanDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_PanDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    u8* command;
+    int* trackData = (int*)track;
+
+    command = (u8*)trackData[0];
+    trackData[0] = (int)(command + 1);
+    trackData[0x10] = ((u32)*command) << 0xc;
+    trackData[0x11] = 0;
+    trackData[0x12] = 0;
+    if (trackData[0x2d] == 0) {
+        trackData[0x33] = 0;
+    }
+    DAT_8032f4b4 |= 2;
 }
 
 /*
@@ -1841,22 +1897,66 @@ void __MidiCtrl_ReverbMix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C9DBC
+ * PAL Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_StepRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_StepRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    char step;
+    short value;
+    char* command = (char*)*(int*)track;
+    int* trackData = (int*)track;
+
+    *trackData = (int)(command + 1);
+    step = *command;
+    if (step == 0) {
+        value = 0;
+    } else {
+        value = *(short*)(trackData + 0x4e) + step;
+    }
+    *(short*)(trackData + 0x4e) = value;
+    *(short*)((int)trackData + 0x13a) = 0;
+    if (*(short*)(trackData + 0x4e) < -9999) {
+        *(unsigned short*)(trackData + 0x4e) = 0xD8F1;
+    } else if (*(short*)(trackData + 0x4e) > 9999) {
+        *(short*)(trackData + 0x4e) = 9999;
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C9E3C
+ * PAL Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_StepRelative2(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_StepRelative2(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    u8 step;
+    short value;
+    u8* command = (u8*)*(int*)track;
+    int* trackData = (int*)track;
+
+    *trackData = (int)(command + 1);
+    step = *command;
+    *(short*)(trackData + 0x4e) = 0;
+    if (step == 0) {
+        value = 0;
+    } else {
+        value = *(short*)((int)trackData + 0x13a) + step;
+    }
+    *(short*)((int)trackData + 0x13a) = value;
+    if (*(short*)((int)trackData + 0x13a) < -9999) {
+        *(unsigned short*)((int)trackData + 0x13a) = 0xD8F1;
+    } else if (*(short*)((int)trackData + 0x13a) > 9999) {
+        *(short*)((int)trackData + 0x13a) = 9999;
+    }
 }
 
 /*

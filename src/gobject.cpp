@@ -7,6 +7,7 @@
 #include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
 #include "ffcc/quadobj.h"
+#include "ffcc/sound.h"
 
 #include <math.h>
 #include <string.h>
@@ -21,7 +22,19 @@ extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" CGQuadObj* FindGQuadObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGQuadObj* FindGQuadObjNext__13CFlatRuntime2FP9CGQuadObj(void*, CGQuadObj*);
 extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, u32);
+extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
 extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
+extern "C" void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
+extern "C" int PlaySe3D__6CSoundFiP3Vecffi(CSound*, int, Vec*, float, float, int);
+extern unsigned char DAT_8032ec90[];
+extern float FLOAT_8033033c;
+extern float FLOAT_80330340;
+extern float FLOAT_80330360;
+extern double DOUBLE_80330400;
+extern float FLOAT_80330410;
+extern float FLOAT_8033041c;
+extern float FLOAT_80330420;
+extern float FLOAT_80330424;
 
 static inline void CallOnPush(CGBaseObj* self, CGBaseObj* other, int arg)
 {
@@ -453,12 +466,170 @@ void CGObject::bgCollision()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800806d4
+ * PAL Size: 1428b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGObject::bgNormalCollision()
 {
-	// TODO
+    if (fabs(static_cast<double>(m_groundHitOffset.x)) < DOUBLE_80330400) {
+        m_groundHitOffset.x = sZeroFloat;
+    }
+    if (fabs(static_cast<double>(m_groundHitOffset.y)) < DOUBLE_80330400) {
+        m_groundHitOffset.y = sZeroFloat;
+    }
+    if (fabs(static_cast<double>(m_groundHitOffset.z)) < DOUBLE_80330400) {
+        m_groundHitOffset.z = sZeroFloat;
+    }
+
+    if ((m_groundHitOffset.x == sZeroFloat) && (m_groundHitOffset.y == sZeroFloat) && (m_groundHitOffset.z == sZeroFloat)) {
+        return;
+    }
+
+    Vec move = m_groundHitOffset;
+    move.y = sZeroFloat;
+    Vec pos = m_worldPosition;
+    pos.y += FLOAT_80330360 + m_capsuleHalfHeight;
+    const u32 hitMask = *reinterpret_cast<u32*>(&m_moveVec.x);
+
+    int retry = 4;
+    while (retry != 0) {
+        CMapCylinder bodyCylinder;
+        bodyCylinder.m_bottom = pos;
+        bodyCylinder.m_direction = move;
+        bodyCylinder.m_radius = FLOAT_8033033c;
+        bodyCylinder.m_height = FLOAT_8033033c;
+        bodyCylinder.m_top = move;
+        bodyCylinder.m_direction2.x = FLOAT_80330340;
+        bodyCylinder.m_direction2.y = FLOAT_80330340;
+        bodyCylinder.m_direction2.z = FLOAT_80330340;
+        bodyCylinder.m_radius2 = m_capsuleHalfHeight;
+        bodyCylinder.m_height2 = 0.0f;
+
+        if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &bodyCylinder, &move, hitMask) == 0) {
+            break;
+        }
+
+        m_stateFlags0 = (m_stateFlags0 & 0xBF) | 0x40;
+        CalcHitSlide__7CMapObjFP3Vecf(*reinterpret_cast<void**>(reinterpret_cast<u8*>(&MapMng) + 0x22A88), &move);
+
+        if (fabs(static_cast<double>(move.x)) < DOUBLE_80330400) {
+            move.x = sZeroFloat;
+        }
+        if (fabs(static_cast<double>(move.y)) < DOUBLE_80330400) {
+            move.y = sZeroFloat;
+        }
+        if (fabs(static_cast<double>(move.z)) < DOUBLE_80330400) {
+            move.z = sZeroFloat;
+        }
+
+        --retry;
+    }
+
+    if (retry == 0) {
+        m_groundHitOffset.x = sZeroFloat;
+        m_groundHitOffset.y = sZeroFloat;
+        m_groundHitOffset.z = sZeroFloat;
+        return;
+    }
+
+    PSVECAdd(&pos, &move, &pos);
+    move.x = sZeroFloat;
+    move.y = m_groundHitOffset.y - FLOAT_80330360;
+    move.z = sZeroFloat;
+
+    CMapCylinder stepCylinder;
+    stepCylinder.m_bottom = pos;
+    stepCylinder.m_direction.x = sZeroFloat;
+    stepCylinder.m_direction.y = move.y;
+    stepCylinder.m_direction.z = sZeroFloat;
+    stepCylinder.m_radius = FLOAT_8033033c;
+    stepCylinder.m_height = FLOAT_8033033c;
+    stepCylinder.m_top = stepCylinder.m_direction;
+    stepCylinder.m_direction2.x = FLOAT_80330340;
+    stepCylinder.m_direction2.y = FLOAT_80330340;
+    stepCylinder.m_direction2.z = FLOAT_80330340;
+    stepCylinder.m_radius2 = m_capsuleHalfHeight;
+    stepCylinder.m_height2 = 0.0f;
+
+    if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &stepCylinder, &move, hitMask) == 0) {
+        pos.y -= m_capsuleHalfHeight;
+        PSVECAdd(&pos, &move, &pos);
+        PSVECSubtract(&pos, &m_worldPosition, &m_groundHitOffset);
+        return;
+    }
+
+    const unsigned char mapGroup = DAT_8032ec90[0x47];
+    u8* mapGroupData = reinterpret_cast<u8*>(&MapMng) + 0x214E8 + (mapGroup * 0x14);
+    if ((*reinterpret_cast<u32*>(mapGroupData) & 0x20) == 0) {
+        m_stateFlags0 = (m_stateFlags0 & 0x7F) | 0x80;
+        m_radiusCtrl.x = *reinterpret_cast<float*>(mapGroupData);
+        if (mapGroup != 0) {
+            m_lastBgGroup = static_cast<short>(mapGroup);
+        }
+        GetHitFaceNormal__7CMapObjFP3Vec(
+            *reinterpret_cast<void**>(reinterpret_cast<u8*>(&MapMng) + 0x22A88),
+            reinterpret_cast<Vec*>(&m_hitNormal.y));
+    }
+
+    if (CalcHitSlide__7CMapObjFP3Vecf(*reinterpret_cast<void**>(reinterpret_cast<u8*>(&MapMng) + 0x22A88), &move) != 0) {
+        CMapCylinder hitCylinder;
+        hitCylinder.m_bottom = pos;
+        hitCylinder.m_direction = move;
+        hitCylinder.m_radius = FLOAT_8033033c;
+        hitCylinder.m_height = FLOAT_8033033c;
+        hitCylinder.m_top = move;
+        hitCylinder.m_direction2.x = FLOAT_80330340;
+        hitCylinder.m_direction2.y = FLOAT_80330340;
+        hitCylinder.m_direction2.z = FLOAT_80330340;
+        hitCylinder.m_radius2 = m_capsuleHalfHeight;
+        hitCylinder.m_height2 = 0.0f;
+
+        if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &hitCylinder, &move, hitMask) != 0) {
+            Vec hitPos;
+            CalcHitPosition__7CMapObjFP3Vec(*reinterpret_cast<void**>(reinterpret_cast<u8*>(&MapMng) + 0x22A88), &hitPos);
+            PSVECSubtract(&hitPos, &pos, &move);
+        }
+    }
+
+    pos.y -= m_capsuleHalfHeight;
+    PSVECAdd(&pos, &move, &pos);
+
+    if ((m_jumpLandingDampening <= sZeroFloat) || (FLOAT_8033041c <= m_groundHitOffset.y)) {
+        m_groundHitOffset.x = pos.x - m_worldPosition.x;
+        m_groundHitOffset.y = pos.y - m_worldPosition.y;
+        m_groundHitOffset.z = pos.z - m_worldPosition.z;
+        return;
+    }
+
+    float oldY = m_groundHitOffset.y;
+    if (oldY < FLOAT_80330420) {
+        oldY = FLOAT_80330420;
+    }
+
+    float clampedY = m_groundHitOffset.y;
+    if (clampedY < FLOAT_80330420) {
+        clampedY = FLOAT_80330420;
+    }
+
+    m_worldPosition.y = pos.y;
+    m_groundHitOffset.x = pos.x - m_worldPosition.x;
+    m_groundHitOffset.y = sZeroFloat;
+    m_groundHitOffset.z = pos.z - m_worldPosition.z;
+    m_gravityY = m_jumpLandingDampening * -((clampedY - (oldY - move.y)) + (oldY - move.y));
+
+    if (((m_displayFlags & 1) != 0) && ((m_weaponNodeFlags & 1) == 0)) {
+        PlaySe3D__6CSoundFiP3Vecffi(
+            &Sound,
+            0x26,
+            &m_worldPosition,
+            FLOAT_80330424 + (FLOAT_80330424 * m_gravityY) / FLOAT_80330360,
+            FLOAT_80330410 + (FLOAT_80330410 * m_gravityY) / FLOAT_80330360,
+            0);
+    }
 }
 
 /*

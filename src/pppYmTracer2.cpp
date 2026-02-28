@@ -149,7 +149,7 @@ void pppDestructYmTracer2(pppYmTracer2* pppYmTracer2, UnkC* param_2)
  */
 void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, UnkB* param_2, UnkC* param_3)
 {
-    bool useFallback;
+    s32 useFallback;
     float fVar2;
     s16 alpha;
     s32 iVar4;
@@ -175,7 +175,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, UnkB* param_2, UnkC* param_3)
         return;
     }
 
-    useFallback = false;
+    useFallback = 0;
     iVar4 = param_3->m_serializedDataOffsets[1];
     work = (u8*)pppYmTracer2 + 0x80 + *param_3->m_serializedDataOffsets;
 
@@ -194,7 +194,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, UnkB* param_2, UnkC* param_3)
     *(void**)(work + 0x24) = pWorkPtr;
 
     if (*(u32*)(work + 0x28) == 0) {
-        useFallback = true;
+        useFallback = 1;
         *(u16*)(work + 0x30) = (u16)step->m_payload[8] / *(u16*)(step->m_payload + 6);
         *(void**)(work + 0x28) = pppMemAlloc__FUlPQ27CMemory6CStagePci(
             (u32)*(u16*)(step->m_payload + 4) * 0x28, pppEnvStPtr->m_stagePtr, s_pppYmTracer2_cpp_801dc4b8, 0xAD);
@@ -266,14 +266,14 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, UnkB* param_2, UnkC* param_3)
             PSMTXConcat(pppMngStPtr->m_matrix.value, *(Mtx*)((u8*)pppYmTracer2 + 4), MStack_78);
             PSMTXMultVec(MStack_78, source, source);
             PSMTXMultVec(MStack_78, (Vec*)&source[1].y, (Vec*)&source[1].y);
-        } else if (!useFallback) {
+        } else if (useFallback == 0) {
             uStack_3c = i ^ 0x80000000;
             uStack_44 = (step->m_payload[9] + 1) ^ 0x80000000;
             if (GetCharaNodeFrameMatrix__FP9_pppMngStfPA4_f(
                     (FLOAT_80331860 / (float)((double)((u64)0x43300000 << 32 | uStack_44) - DOUBLE_80331858)) *
                         (float)((double)((u64)0x43300000 << 32 | uStack_3c) - DOUBLE_80331858),
                     pppMngStPtr, MStack_78) == 0) {
-                useFallback = true;
+                useFallback = 1;
             } else {
                 PSMTXConcat(MStack_78, *(Mtx*)((u8*)pppYmTracer2 + 4), MStack_78);
                 PSMTXMultVec(MStack_78, pVVar10, pVVar10);
@@ -284,7 +284,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, UnkB* param_2, UnkC* param_3)
         pVVar10 = (Vec*)&pVVar10[3].y;
     }
 
-    if (useFallback) {
+    if (useFallback != 0) {
         Vec* pFallback = source;
 
         for (iVar4 = 0; iVar4 < (s32)(u32)*(u16*)(step->m_payload + 4); iVar4++) {
@@ -303,9 +303,9 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, UnkB* param_2, UnkC* param_3)
     visibleCount = 0;
     for (iVar4 = 0; iVar4 < (s32)(u32)*(u16*)(step->m_payload + 4); iVar4++) {
         alpha = (u16)step->m_payload[8] - (s16)iVar4 * *(s16*)(work + 0x30);
-        if ((alpha < 0) || ((useFallback = *(char*)&source[2].z == '\0'), useFallback)) {
+        if ((alpha < 0) || ((useFallback = *(char*)&source[2].z == '\0'), useFallback != 0)) {
             *(u8*)((u8*)&source[2].y + 3) = 0;
-        } else if (!useFallback) {
+        } else if (useFallback == 0) {
             *(u8*)((u8*)&source[2].y + 3) = (u8)alpha;
             visibleCount++;
         }

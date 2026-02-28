@@ -38,6 +38,8 @@ extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void* lbl_801EA488[];
 extern "C" CPtrArray<CMapAnimNode*>* __ct__26CPtrArray_P12CMapAnimNode_Fv(CPtrArray<CMapAnimNode*>*);
+extern "C" void SetStage__26CPtrArray_P12CMapAnimNode_FPQ27CMemory6CStage(
+    CPtrArray<CMapAnimNode*>*, CMemory::CStage*);
 extern "C" CMapAnim* __vc__21CPtrArray_P8CMapAnim_FUl(void*, unsigned long);
 extern "C" CMapAnimNode* __vc__26CPtrArray_P12CMapAnimNode_FUl(void*, unsigned long);
 extern "C" int GetSize__26CPtrArray_P12CMapAnimNode_Fv(void*);
@@ -497,8 +499,10 @@ void CMapAnimNode::interp(Vec*, CMapAnimKey*, int, int)
  */
 CMapAnim::CMapAnim()
 {
-    __ct__26CPtrArray_P12CMapAnimNode_Fv(reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this));
-    reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this)->SetStage(*reinterpret_cast<CMemory::CStage**>(MapMng));
+    CPtrArray<CMapAnimNode*>* nodeArray = reinterpret_cast<CPtrArray<CMapAnimNode*>*>(this);
+
+    __ct__26CPtrArray_P12CMapAnimNode_Fv(nodeArray);
+    SetStage__26CPtrArray_P12CMapAnimNode_FPQ27CMemory6CStage(nodeArray, *reinterpret_cast<CMemory::CStage**>(MapMng));
 }
 
 /*

@@ -20,6 +20,7 @@ extern void pppSetBlendMode__FUc(unsigned char);
 extern void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
 extern "C" void pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*, pppFMATRIX*);
 extern int DAT_8032ed70;
+extern float FLOAT_80330ee0;
 extern "C" int rand(void);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 
@@ -53,7 +54,7 @@ void pppConstructLocationTitle(pppLocationTitle* pppLocationTitle, UnkC* param_2
 {
     s32* serializedOffsets = *(s32**)((u8*)param_2 + 0xC);
     u8* base = (u8*)pppLocationTitle + *serializedOffsets + 0x80;
-    float value = 0.0f;
+    float value = FLOAT_80330ee0;
 
     *(u32*)(base + 0x0) = 0;
     *(u16*)(base + 0x4) = 0;
@@ -237,53 +238,50 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, UnkB* param_2, U
 {
     int serializedOffset = *param_3->m_serializedDataOffsets;
 
-    if (param_2->m_dataValIndex != 0xFFFF) {
-        u32 graphId = *(u32*)pppLocationTitle;
-        int fadeDivisor = -1;
-        int graphFrame = GetGraphFrameFromId(graphId);
-        Vec* particle = *(Vec**)((u8*)pppLocationTitle + 8 + serializedOffset);
-        long* shapeTable = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
+    if (param_2->m_dataValIndex == 0xFFFF) {
+        return;
+    }
 
-        u16* payload = (u16*)param_2->m_payload;
-        if ((int)payload[5] <= graphFrame) {
-            fadeDivisor = payload[6] + (graphFrame - (int)payload[5]);
+    u32 graphId = *(u32*)pppLocationTitle;
+    int fadeDivisor = -1;
+    int graphFrame = GetGraphFrameFromId(graphId);
+    Vec* source = *(Vec**)((u8*)pppLocationTitle + 8 + serializedOffset);
+    long* shapeTable = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + param_2->m_dataValIndex * 4);
+
+    if ((int)(u16)*(u16*)((u8*)param_2->m_payload + 10) <= graphFrame) {
+        fadeDivisor = (int)(u16)*(u16*)((u8*)param_2->m_payload + 12)
+                      + (graphFrame - (int)(u16)*(u16*)((u8*)param_2->m_payload + 10));
+    }
+
+    for (int i = 0; i < (int)(u16)*(u16*)((u8*)pppLocationTitle + 12 + serializedOffset); i++) {
+        Mtx model;
+        Vec worldPos;
+
+        PSMTXIdentity(model);
+        model[2][2] = source[1].y;
+        model[0][0] = pppMngStPtr->m_scale.x * model[2][2];
+        model[1][1] = pppMngStPtr->m_scale.y * model[2][2];
+        model[2][2] = pppMngStPtr->m_scale.z * model[2][2];
+
+        PSMTXMultVec(ppvCameraMatrix0, source, &worldPos);
+        model[0][3] = worldPos.x;
+        model[1][3] = worldPos.y;
+        model[2][3] = worldPos.z;
+
+        pppSetDrawEnv((pppCVECTOR*)(source + 1), (pppFMATRIX*)0, 0.0f, 0, 0, 0, 0, 0, 1, 0);
+
+        if (fadeDivisor >= 0) {
+            u8 alpha = *(((u8*)&source[1].x) + 3);
+            *(((u8*)&source[1].x) + 3) = (u8)(alpha - (u8)(alpha / fadeDivisor));
         }
 
-        u16 count = *(u16*)((u8*)pppLocationTitle + 12 + serializedOffset);
-        for (int i = 0; i < (int)count; i++) {
-            Mtx model;
-            Vec worldPos;
-            u32 colorWord;
-            GXColor color;
+        GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)&source[1].x);
+        GXLoadPosMtxImm(model, 0);
 
-            PSMTXIdentity(model);
-            model[2][2] = particle[1].y;
-            model[0][0] = pppMngStPtr->m_scale.x * model[2][2];
-            model[1][1] = pppMngStPtr->m_scale.y * model[2][2];
-            model[2][2] = pppMngStPtr->m_scale.z * model[2][2];
+        pppSetBlendMode(*(((u8*)&param_2->m_stepValue) + 1));
+        pppDrawShp(shapeTable, *(s16*)&source[2].x, pppEnvStPtr->m_materialSetPtr,
+                   *(((u8*)&param_2->m_stepValue) + 1));
 
-            PSMTXMultVec(ppvCameraMatrix0, particle, &worldPos);
-            model[0][3] = worldPos.x;
-            model[1][3] = worldPos.y;
-            model[2][3] = worldPos.z;
-
-            pppSetDrawEnv((pppCVECTOR*)(particle + 1), (pppFMATRIX*)0, 0.0f, 0, 0, 0, 0, 0, 1, 0);
-
-            if (fadeDivisor >= 0) {
-                u8* alpha = (u8*)&particle[1].x + 3;
-                *alpha = (u8)(*alpha - (*alpha / fadeDivisor));
-            }
-
-            colorWord = *(u32*)&particle[1].x;
-            *(u32*)&color = colorWord;
-            GXSetChanMatColor(GX_COLOR0A0, color);
-            GXLoadPosMtxImm(model, 0);
-
-            pppSetBlendMode(((u8*)&param_2->m_stepValue)[1]);
-            pppDrawShp(shapeTable, *(short*)&particle[2].x, pppEnvStPtr->m_materialSetPtr,
-                       ((u8*)&param_2->m_stepValue)[1]);
-
-            particle = (Vec*)&particle[2].y;
-        }
+        source = (Vec*)&source[2].y;
     }
 }

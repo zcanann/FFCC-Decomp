@@ -20,8 +20,8 @@ public:
 	void SearchWaveSequence(int);
 	void SearchUseWave(int);
 	void WaveDelete(RedHistoryBANK*);
-	void WaveOldClear(int, int);
-	void WaveHeadAdd(int, RedWaveHeadWD*, int);
+	int WaveOldClear(int, int);
+	int WaveHeadAdd(int, RedWaveHeadWD*, int);
 	void SetWaveData(int, void*, int);
 	void ClearWaveData(int);
 	void ClearWaveDataM(int, int, int, int);

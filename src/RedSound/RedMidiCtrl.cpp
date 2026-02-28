@@ -15,6 +15,7 @@ extern int lbl_8021EA10[];
 extern int PTR_SineSwing__Fi_8021e9d0[];
 
 extern "C" {
+void* memcpy(void*, const void*, unsigned long);
 void* memmove(void*, const void*, unsigned long);
 void* memset(void*, int, unsigned long);
 int GetWaveBank__9CRedEntryFi(CRedEntry*, int);
@@ -950,12 +951,30 @@ void __MidiCtrl_TenutoOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C8AEC
+ * PAL Size: 160b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_ADSR_Default(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_ADSR_Default(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    int* voice;
+    int* trackData = (int*)track;
+
+    trackData[0x35] = -1;
+    trackData[0x36] = -1;
+    memset(trackData + 0x35, 0xffffffff, 0xc);
+
+    voice = (int*)DAT_8032f444;
+    do {
+        if ((voice[0] == (int)trackData) && (voice[1] != 0)) {
+            memcpy(voice + 0x14, (void*)(voice[1] + 0x50), 0xc);
+            voice[0x24] |= 0x3c0;
+        }
+        voice += 0x30;
+    } while (voice < (int*)(DAT_8032f444 + 0xc00));
 }
 
 /*

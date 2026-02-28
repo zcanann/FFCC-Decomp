@@ -7,6 +7,7 @@
 #include "ffcc/joybus.h"
 #include "ffcc/p_game.h"
 #include "ffcc/p_menu.h"
+#include "ffcc/partyobj.h"
 #include "ffcc/system.h"
 #include <string.h>
 #include <Dolphin/os.h>
@@ -21,6 +22,10 @@ extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dla__FPv(void*);
 extern "C" void Printf__7CSystemFPce(CSystem*, char*, ...);
+extern "C" int memcmp(const void*, const void*, unsigned long);
+extern "C" int IsOutOfShouki__12CCaravanWorkFv(void*);
+extern "C" int CanPlayerUseItem__12CCaravanWorkFv(void*);
+extern "C" int CanPlayerPutItem__12CCaravanWorkFv(void*);
 
 struct GbaFlatDataTableEntryView
 {
@@ -807,12 +812,214 @@ void GbaQueue::LoadAllStat()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CEF70
+ * PAL Size: 1916b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void GbaQueue::LoadPlayerStat()
 {
-	// TODO
+	unsigned char localNames[0x80];
+	unsigned char localPlayerStat[0x370];
+	GbaQueue* semaphoreIter;
+	unsigned int outOfShoukiMask;
+	int i;
+	char* obj;
+
+	memset(localPlayerStat, 0, sizeof(localPlayerStat));
+	memset(localNames, 0, sizeof(localNames));
+
+	for (i = 0; i < 8; i++) {
+		memcpy(localNames + (i * 0x10), Game.game.m_caravanWorkArr[i].unk_0x3ca_0x3dd, 0x10);
+	}
+
+	outOfShoukiMask = 0;
+	if (reinterpret_cast<unsigned int*>(&CFlat)[0x1041] != 0) {
+		unsigned char* entry = localPlayerStat;
+		for (i = 0; i < 4; i++) {
+			unsigned char menuStageMode = static_cast<unsigned char>(reinterpret_cast<char*>(this)[0x2D56]);
+			CGPartyObj* partyObj;
+			CCaravanWork* caravanWork;
+
+			if ((menuStageMode == 0) || (i != 1)) {
+				partyObj = Game.game.m_partyObjArr[i];
+				caravanWork = reinterpret_cast<CCaravanWork*>(Game.game.m_scriptFoodBase[i]);
+			} else {
+				partyObj = Game.game.m_partyObjArr[0];
+				caravanWork = reinterpret_cast<CCaravanWork*>(Game.game.m_scriptFoodBase[0]);
+			}
+
+			if (caravanWork != 0) {
+				if ((menuStageMode == 0) || ((menuStageMode != 0) && (i == 0))) {
+					entry[3] = 1;
+				} else if ((menuStageMode != 0) && (i == 1) && (Game.game.m_scriptFoodBase[0] != 0)) {
+					entry[3] = 1;
+				}
+
+				entry[0x16] = static_cast<unsigned char>(caravanWork->m_maxHp);
+				entry[0x17] = static_cast<unsigned char>(caravanWork->m_hp);
+				entry[2] = static_cast<unsigned char>((caravanWork->m_tribeId & 3) |
+				                                      ((caravanWork->m_appearanceVariant & 3) << 2));
+				if (caravanWork->m_genderFlag != 0) {
+					entry[2] |= 0x80;
+				}
+
+				*reinterpret_cast<int*>(entry + 0x24) = caravanWork->m_gil;
+				if (caravanWork->m_progressValue < 0x100) {
+					*reinterpret_cast<unsigned short*>(entry + 0x14) = caravanWork->m_progressValue;
+				} else {
+					*reinterpret_cast<unsigned short*>(entry + 0x14) = 0xFF;
+				}
+
+				entry[0x18] = static_cast<unsigned char>(caravanWork->m_letterMeta[0]);
+				entry[0x19] = static_cast<unsigned char>(caravanWork->m_letterMeta[1]);
+				entry[0x1A] = static_cast<unsigned char>(caravanWork->m_letterMeta[2]);
+				entry[0x1B] = static_cast<unsigned char>(caravanWork->m_letterMeta[3]);
+				entry[0x1C] = static_cast<unsigned char>(caravanWork->m_letterMeta[4]);
+				entry[0x1D] = static_cast<unsigned char>(caravanWork->m_letterMeta[5]);
+				entry[0x1E] = static_cast<unsigned char>(caravanWork->m_letterMeta[6]);
+				entry[0x1F] = static_cast<unsigned char>(caravanWork->m_letterMeta[7]);
+
+				entry[0] = static_cast<unsigned char>(caravanWork->m_saveSlot);
+				entry[4] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x12]);
+				entry[5] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x13]);
+				entry[6] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x14]);
+				entry[7] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x15]);
+				entry[8] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x16]);
+				entry[9] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x17]);
+				entry[0xA] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x18]);
+				entry[0xB] = static_cast<unsigned char>(caravanWork->m_evtWordArr[0x19]);
+				memcpy(entry + 0xC, &Game.game.m_gameWork.m_linkTable[caravanWork->m_saveSlot][0][0][0], 8);
+
+				entry[0x20] = static_cast<unsigned char>(caravanWork->m_strength >= 100 ? 99 : caravanWork->m_strength);
+				entry[0x21] = static_cast<unsigned char>(caravanWork->m_defense >= 100 ? 99 : caravanWork->m_defense);
+				entry[0x22] = static_cast<unsigned char>(caravanWork->m_magic >= 100 ? 99 : caravanWork->m_magic);
+				entry[0xD2] = caravanWork->m_bonusCondition;
+				entry[0xD5] = static_cast<unsigned char>(caravanWork->unk_0x3ac);
+
+				memcpy(entry + 0x3A, caravanWork->m_inventoryItems, 0x80);
+				for (int artifactIndex = 0; artifactIndex < 96; artifactIndex++) {
+					if (static_cast<short>(caravanWork->m_artifacts[artifactIndex]) > 0) {
+						reinterpret_cast<unsigned int*>(entry + 0x28)[artifactIndex >> 5] |=
+						    static_cast<unsigned int>(1U << (artifactIndex & 0x1F));
+					}
+				}
+
+				*reinterpret_cast<unsigned short*>(entry + 0xBA) = caravanWork->m_treasures[0];
+				*reinterpret_cast<unsigned short*>(entry + 0xBC) = caravanWork->m_treasures[1];
+				*reinterpret_cast<unsigned short*>(entry + 0xBE) = caravanWork->m_treasures[2];
+				*reinterpret_cast<unsigned short*>(entry + 0xC0) = caravanWork->m_treasures[3];
+
+				entry[0xD3] = static_cast<unsigned char>(caravanWork->m_numCmdListSlots);
+				*reinterpret_cast<unsigned short*>(entry + 0xC2) = caravanWork->m_commandListInventorySlotRef[0];
+				*reinterpret_cast<unsigned short*>(entry + 0xC4) = caravanWork->m_commandListInventorySlotRef[1];
+				*reinterpret_cast<unsigned short*>(entry + 0xC6) = caravanWork->m_commandListInventorySlotRef[2];
+				*reinterpret_cast<unsigned short*>(entry + 0xC8) = caravanWork->m_commandListInventorySlotRef[3];
+				*reinterpret_cast<unsigned short*>(entry + 0xCA) = caravanWork->m_commandListInventorySlotRef[4];
+				*reinterpret_cast<unsigned short*>(entry + 0xCC) = caravanWork->m_commandListInventorySlotRef[5];
+				*reinterpret_cast<unsigned short*>(entry + 0xCE) = caravanWork->m_commandListInventorySlotRef[6];
+				*reinterpret_cast<unsigned short*>(entry + 0xD0) = caravanWork->m_commandListInventorySlotRef[7];
+
+				entry[0xD7] = static_cast<unsigned char>(caravanWork->m_equipment[0]);
+				entry[0xD8] = static_cast<unsigned char>(caravanWork->m_equipment[1]);
+				entry[0xD9] = static_cast<unsigned char>(caravanWork->m_equipment[2]);
+				entry[0xDA] = static_cast<unsigned char>(caravanWork->m_equipment[3]);
+
+				entry[0x23] = 1;
+				entry[0xD4] = 0;
+				if (partyObj != 0) {
+					entry[0xD4] = static_cast<unsigned char>((reinterpret_cast<int (*)(CGPartyObj*)>(
+					                                             (*reinterpret_cast<void***>(partyObj))[0xB])(partyObj) != 0));
+				}
+
+				if ((IsOutOfShouki__12CCaravanWorkFv(reinterpret_cast<void*>(caravanWork)) != 0) && (entry[0x17] != 0)) {
+					outOfShoukiMask |= (1U << i);
+				}
+
+				if (CanPlayerUseItem__12CCaravanWorkFv(reinterpret_cast<void*>(caravanWork)) != 0) {
+					entry[0xD6] |= 1;
+				}
+				if (CanPlayerPutItem__12CCaravanWorkFv(reinterpret_cast<void*>(caravanWork)) != 0) {
+					entry[0xD6] |= 2;
+				}
+			}
+
+			if (partyObj != 0) {
+				entry[1] = 1;
+				*reinterpret_cast<short*>(entry + 0x36) = static_cast<short>(partyObj->m_worldPosition.x / 100.0f);
+				*reinterpret_cast<short*>(entry + 0x38) = static_cast<short>(partyObj->m_worldPosition.z / 100.0f);
+			}
+
+			entry += 0xDC;
+		}
+	}
+
+	i = 0;
+	semaphoreIter = this;
+	do {
+		OSWaitSemaphore(semaphoreIter->accessSemaphores);
+		i++;
+		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+	} while (i < 4);
+
+	obj = reinterpret_cast<char*>(this);
+	memcpy(obj + 0x7C4, obj + 0x454, 0x370);
+	memcpy(obj + 0x454, localPlayerStat, 0x370);
+	memcpy(obj + 0x2A74, localNames, 0x80);
+
+	obj[0x2D59] = obj[0x2D5A];
+	obj[0x2D5A] = static_cast<char>(outOfShoukiMask);
+
+	for (i = 0; i < 4; i++) {
+		const int oldBase = 0x7C4 + (i * 0xDC);
+		const int newBase = 0x454 + (i * 0xDC);
+		int j;
+
+		if (memcmp(obj + oldBase + 0x18, obj + newBase + 0x18, 8) != 0) {
+			obj[0x2C8A] = static_cast<char>(obj[0x2C8A] | (1 << i));
+		}
+		if (*reinterpret_cast<int*>(obj + oldBase + 0x24) != *reinterpret_cast<int*>(obj + newBase + 0x24)) {
+			obj[0x2C8B] = static_cast<char>(obj[0x2C8B] | (1 << i));
+		}
+
+		for (j = 0; j < 8; j++) {
+			if (memcmp(obj + oldBase + 4, obj + newBase + 4, 8) != 0) {
+				obj[0x2C96 + i] = static_cast<char>(obj[0x2C96 + i] | (1 << j));
+			}
+		}
+
+		if (obj[oldBase + 0x23] != obj[newBase + 0x23]) {
+			obj[0x2CAC] = static_cast<char>(obj[0x2CAC] | (1 << i));
+		}
+		if (memcmp(obj + oldBase + 0x20, obj + newBase + 0x20, 3) != 0) {
+			obj[0x2CAD] = static_cast<char>(obj[0x2CAD] | (1 << i));
+		}
+		if (memcmp(obj + oldBase + 0x28, obj + newBase + 0x28, 0xC) != 0) {
+			obj[0x2CAE] = static_cast<char>(obj[0x2CAE] | (1 << i));
+		}
+		if (*reinterpret_cast<unsigned short*>(obj + oldBase + 0x14) !=
+		    *reinterpret_cast<unsigned short*>(obj + newBase + 0x14)) {
+			obj[0x2C8C] = static_cast<char>(obj[0x2C8C] | (1 << i));
+		}
+
+		if (obj[oldBase + 0xD3] != obj[newBase + 0xD3]) {
+			const int shift = i << 1;
+			obj[0x2D41] = static_cast<char>(obj[0x2D41] | (1 << shift));
+			if ((static_cast<int>(obj[newBase + 0xD3]) - static_cast<int>(obj[oldBase + 0xD3])) != 1) {
+				obj[0x2D41] = static_cast<char>(obj[0x2D41] | (2 << shift));
+			}
+		}
+	}
+
+	i = 0;
+	semaphoreIter = this;
+	do {
+		OSSignalSemaphore(semaphoreIter->accessSemaphores);
+		i++;
+		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+	} while (i < 4);
 }
 
 /*

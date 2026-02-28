@@ -474,12 +474,127 @@ void CMenuPcs::CmdInit2()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8014fa78
+ * PAL Size: 472b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CmdOpen()
 {
-	// TODO
+	u8* self = reinterpret_cast<u8*>(this);
+	s16* cmd = *reinterpret_cast<s16**>(self + 0x82c);
+	s16* list = *reinterpret_cast<s16**>(self + 0x850);
+
+	if (*reinterpret_cast<u8*>(reinterpret_cast<u8*>(cmd) + 0x0b) == 0) {
+		CmdInit();
+	}
+
+	s32 finishedCount = 0;
+	cmd[0x11] = static_cast<s16>(cmd[0x11] + 1);
+
+	u32 count = static_cast<u32>(list[0]);
+	s16* entry = list + 4;
+	const s32 timer = static_cast<s32>(cmd[0x11]);
+	u32 remaining = count;
+
+	if (static_cast<s32>(remaining) > 0) {
+		do {
+			if (*reinterpret_cast<s32*>(entry + 0x12) <= timer) {
+				const s32 start = *reinterpret_cast<s32*>(entry + 0x12);
+				const s32 length = *reinterpret_cast<s32*>(entry + 0x14);
+				if (timer < (start + length)) {
+					s32 value = *reinterpret_cast<s32*>(entry + 0x10);
+					value += 1;
+					*reinterpret_cast<s32*>(entry + 0x10) = value;
+					*reinterpret_cast<float*>(entry + 8) = static_cast<float>(
+					    (DOUBLE_80332a58 / static_cast<double>(length)) * static_cast<double>(value));
+				} else {
+					finishedCount += 1;
+					*reinterpret_cast<float*>(entry + 8) = FLOAT_80332a70;
+				}
+			}
+			entry += 0x20;
+			remaining -= 1;
+		} while (remaining != 0);
+	}
+
+	bool done = false;
+	if (list[0] == finishedCount) {
+		float anim = FLOAT_80332a70;
+		entry = list + 4;
+		if (static_cast<s32>(count) > 0) {
+			u32 batch = count >> 3;
+			if (batch != 0) {
+				do {
+					entry[0x12] = 0;
+					entry[0x13] = 0;
+					entry[0x14] = 0;
+					entry[0x15] = 1;
+					*reinterpret_cast<float*>(entry + 8) = anim;
+					entry[0x32] = 0;
+					entry[0x33] = 0;
+					entry[0x34] = 0;
+					entry[0x35] = 1;
+					*reinterpret_cast<float*>(entry + 0x28) = anim;
+					entry[0x52] = 0;
+					entry[0x53] = 0;
+					entry[0x54] = 0;
+					entry[0x55] = 1;
+					*reinterpret_cast<float*>(entry + 0x48) = anim;
+					entry[0x72] = 0;
+					entry[0x73] = 0;
+					entry[0x74] = 0;
+					entry[0x75] = 1;
+					*reinterpret_cast<float*>(entry + 0x68) = anim;
+					entry[0x92] = 0;
+					entry[0x93] = 0;
+					entry[0x94] = 0;
+					entry[0x95] = 1;
+					*reinterpret_cast<float*>(entry + 0x88) = anim;
+					entry[0xb2] = 0;
+					entry[0xb3] = 0;
+					entry[0xb4] = 0;
+					entry[0xb5] = 1;
+					*reinterpret_cast<float*>(entry + 0xa8) = anim;
+					entry[0xd2] = 0;
+					entry[0xd3] = 0;
+					entry[0xd4] = 0;
+					entry[0xd5] = 1;
+					*reinterpret_cast<float*>(entry + 200) = anim;
+					entry[0xf2] = 0;
+					entry[0xf3] = 0;
+					entry[0xf4] = 0;
+					entry[0xf5] = 1;
+					*reinterpret_cast<float*>(entry + 0xe8) = anim;
+					entry += 0x100;
+					batch -= 1;
+				} while (batch != 0);
+				count &= 7;
+				if (count == 0) {
+					done = true;
+				}
+			}
+
+			if (done == false) {
+				do {
+					entry[0x12] = 0;
+					entry[0x13] = 0;
+					entry[0x14] = 0;
+					entry[0x15] = 1;
+					*reinterpret_cast<float*>(entry + 8) = anim;
+					entry += 0x20;
+					count -= 1;
+				} while (count != 0);
+			}
+		}
+		done = true;
+	}
+
+	if (done) {
+		UniteOpenAnim__8CMenuPcsFi(this, -1);
+	}
 }
 
 /*

@@ -371,7 +371,7 @@ unsigned int CMenuPcs::ArtiOpen()
 	ArtiOpenAnim* anim = (ArtiOpenAnim*)((u8*)artiList + 8);
 	int frame = artiState[0x11];
 
-	if (*(u8*)(artiState + 5) == 0) {
+	if (*((char*)artiState + 0x0B) == '\0') {
 		ArtiInit();
 	}
 

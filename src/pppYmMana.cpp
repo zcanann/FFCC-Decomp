@@ -1051,9 +1051,48 @@ void RenderWaterMesh(VYmMana* mana)
  * Address:	TODO
  * Size:	TODO
  */
-void CalculateNormal(VYmMana*)
+void CalculateNormal(VYmMana* mana)
 {
-	// TODO
+    Vec* positions = *(Vec**)((u8*)mana + 0x3C);
+    Vec* normals = *(Vec**)((u8*)mana + 0x40);
+    u16* indices = *(u16**)((u8*)mana + 0x50);
+    Vec edgeA;
+    Vec edgeB;
+    Vec faceNormal;
+
+    for (int i = 0; i < 0x121; i++) {
+        normals[i].x = FLOAT_80330e4c;
+        normals[i].y = FLOAT_80330e4c;
+        normals[i].z = FLOAT_80330e4c;
+    }
+
+    for (int tri = 0; tri < 0x200; tri++) {
+        u16 idx0 = indices[0];
+        u16 idx1 = indices[1];
+        u16 idx2 = indices[2];
+
+        edgeA.x = positions[idx1].x - positions[idx0].x;
+        edgeA.y = positions[idx1].y - positions[idx0].y;
+        edgeA.z = positions[idx1].z - positions[idx0].z;
+
+        edgeB.x = positions[idx2].x - positions[idx0].x;
+        edgeB.y = positions[idx2].y - positions[idx0].y;
+        edgeB.z = positions[idx2].z - positions[idx0].z;
+
+        PSVECCrossProduct(&edgeA, &edgeB, &faceNormal);
+        PSVECNormalize(&faceNormal, &faceNormal);
+        PSVECAdd(&normals[idx0], &faceNormal, &normals[idx0]);
+        PSVECAdd(&normals[idx1], &faceNormal, &normals[idx1]);
+        PSVECAdd(&normals[idx2], &faceNormal, &normals[idx2]);
+
+        indices += 3;
+    }
+
+    for (int i = 0; i < 0x121; i++) {
+        PSVECNormalize(&normals[i], &normals[i]);
+    }
+
+    DCFlushRange(normals, 0xD8C);
 }
 
 /*

@@ -196,22 +196,49 @@ void CRedEntry::ClearWaveBank(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c14d0
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedEntry::GetWaveBank(int)
+int CRedEntry::GetWaveBank(int waveNo)
 {
-	// TODO
+	int* entry = (int*)this;
+
+	if ((-1 < waveNo) && (waveNo < 0x10))
+	{
+		return *entry + (waveNo * 0x10);
+	}
+
+	return 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c14f8
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedEntry::SearchWaveBase(int)
+int CRedEntry::SearchWaveBase(int waveNo)
 {
-	// TODO
+	int* entry = (int*)this;
+	int* waveBank = (int*)*entry;
+
+	do
+	{
+		if (*waveBank == waveNo)
+		{
+			return waveBank[2];
+		}
+		waveBank += 4;
+	} while (waveBank < (int*)(*entry + 0x400));
+
+	return 0;
 }
 
 /*

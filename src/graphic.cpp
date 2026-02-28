@@ -552,11 +552,11 @@ void CGraphic::Thread()
  */
 u8 CGraphic::IsFifoOver()
 {
-	GXBool fifoWrap;
-	GXBool gpRead;
-	GXBool cpuWrite;
-	GXBool underflow;
 	GXBool overhi;
+	GXBool underflow;
+	GXBool cpuWrite;
+	GXBool gpRead;
+	GXBool fifoWrap;
 	u32 fifoCount;
 
 	GXGetFifoStatus(GXGetCPUFifo(), &overhi, &underflow, &fifoCount, &cpuWrite, &gpRead, &fifoWrap);

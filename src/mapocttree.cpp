@@ -230,18 +230,20 @@ void COctTree::ReadOtmOctTree(CChunkFile& chunkFile)
 
                 if (chunk.m_id == 'CHLD') {
                     int childCount = 0;
+                    COctNode** childNode = reinterpret_cast<COctNode**>(Ptr(node, 0x1C));
 
                     for (int i = 0; i < 8; i++) {
                         unsigned short childIndex = chunkFile.Get2();
                         if (childIndex != 0xFFFF) {
-                            COctNode* child = reinterpret_cast<COctNode*>(Ptr(*reinterpret_cast<void**>(Ptr(this, 4)), childIndex * 0x4C));
-                            *reinterpret_cast<COctNode**>(Ptr(node, 0x1C + (childCount * 4))) = child;
+                            *childNode = reinterpret_cast<COctNode*>(Ptr(*reinterpret_cast<void**>(Ptr(this, 4)), childIndex * 0x4C));
+                            childNode++;
                             childCount++;
                         }
                     }
 
                     for (int i = childCount; i < 8; i++) {
-                        *reinterpret_cast<COctNode**>(Ptr(node, 0x1C + (i * 4))) = 0;
+                        *childNode = 0;
+                        childNode++;
                     }
                 }
             }

@@ -9,6 +9,7 @@
 #include "ffcc/materialman.h"
 #include "ffcc/p_game.h"
 #include "ffcc/p_light.h"
+#include "ffcc/p_tina.h"
 #include "ffcc/file.h"
 #include "ffcc/system.h"
 
@@ -53,6 +54,11 @@ extern "C" void* lbl_801E899C[];
 extern "C" void* lbl_801E8990[];
 extern "C" void* lbl_801E8984[];
 extern "C" void* lbl_801E8978[];
+extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
+extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
+extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
+extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
+extern "C" void SetOffsetZBuff__10CCameraPcsFf(double, void*);
 extern unsigned char CameraPcs[];
 extern int DAT_8032ec78;
 extern float FLOAT_8032ec80;
@@ -62,12 +68,14 @@ extern float FLOAT_8032f9a0;
 extern float FLOAT_8032f9a4;
 extern float FLOAT_8032f9a8;
 extern float FLOAT_8032f9ac;
+extern float FLOAT_8032f9bc;
 extern char DAT_801ead4c[];
 extern char DAT_801d7384[];
 extern char DAT_801d73c4[];
 extern CLightPcs LightPcs;
 extern CMath Math;
 extern unsigned char DAT_8032ecb9;
+extern CPartPcs PartPcs;
 extern "C" unsigned char Vec_80245758[];
 
 static char s_map_cpp[] = "map.cpp";
@@ -1846,12 +1854,111 @@ void CMapMng::DrawBefore()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80030394
+ * PAL Size: 3312b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapMng::Draw()
 {
-	// TODO
+    const short mapObjCount = *reinterpret_cast<short*>(Ptr(this, 0xC));
+    if ((mapObjCount == 0) || (*reinterpret_cast<unsigned char*>(Ptr(this, 0x2298B)) == 0)) {
+        return;
+    }
+
+    GXSetColorUpdate(1);
+    GXSetAlphaUpdate(0);
+    GXSetCullMode(GX_CULL_BACK);
+    GXSetZMode(1, GX_LEQUAL, 1);
+    LightPcs.SetNumDiffuse(0);
+
+    Mtx44 projection;
+    PSMTX44Copy(reinterpret_cast<float(*)[4]>(Ptr(CameraPcs, 0x94)), projection);
+    GXSetProjection(projection, GX_ORTHOGRAPHIC);
+    *reinterpret_cast<unsigned char*>(Ptr(this, 0x2298A)) = 1;
+
+    if ((DAT_8032ecb8 & 8) == 0) {
+        const short octTreeCount = *reinterpret_cast<short*>(Ptr(this, 8));
+
+        void* octTree = Ptr(this, 0x14);
+        for (int i = 0; i < octTreeCount; i++) {
+            Draw__8COctTreeFUc(octTree, 0);
+            octTree = Ptr(octTree, 0x38);
+        }
+
+        CMapObj* mapObj = reinterpret_cast<CMapObj*>(Ptr(&MapMng, 0x954));
+        for (int i = 0; i < mapObjCount; i++) {
+            Draw__7CMapObjFUc(mapObj, 0x40);
+            mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
+        }
+
+        PartPcs.DrawShoki();
+
+        GXSetColorUpdate(1);
+        GXSetAlphaUpdate(0);
+        GXSetCullMode(GX_CULL_BACK);
+        GXSetZMode(1, GX_LEQUAL, 1);
+        LightPcs.SetNumDiffuse(0);
+
+        mapObj = reinterpret_cast<CMapObj*>(Ptr(&MapMng, 0x954));
+        for (int i = 0; i < mapObjCount; i++) {
+            Draw__7CMapObjFUc(mapObj, 0);
+            mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
+        }
+
+        octTree = Ptr(this, 0x14);
+        for (int i = 0; i < octTreeCount; i++) {
+            Draw__8COctTreeFUc(octTree, 1);
+            octTree = Ptr(octTree, 0x38);
+        }
+    }
+
+    if ((DAT_8032ecb8 & 8) != 0) {
+        _GXColor clearColor;
+        clearColor.r = 0xFF;
+        clearColor.g = 0xFF;
+        clearColor.b = 0xFF;
+        clearColor.a = 0xFF;
+        GXSetCopyClear(clearColor, 0x00FFFFFF);
+    }
+
+    if ((DAT_8032ecb8 & 4) != 0) {
+        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+        _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
+        GXSetZCompLoc(0);
+        GXSetZMode(1, GX_LEQUAL, 1);
+        GXSetCullMode(GX_CULL_BACK);
+        GXSetNumTevStages(1);
+        _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
+        GXSetNumChans(1);
+        GXSetChanCtrl(GX_COLOR0A0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+        GXSetChanCtrl(GX_ALPHA0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+        _GXColor wireColor;
+        wireColor.r = 0x80;
+        wireColor.g = 0x80;
+        wireColor.b = 0x80;
+        wireColor.a = 0x80;
+        GXSetChanMatColor(GX_COLOR0A0, wireColor);
+
+        SetOffsetZBuff__10CCameraPcsFf(static_cast<double>(FLOAT_8032f9bc), &CameraPcs);
+
+        CMapObj* mapObj = reinterpret_cast<CMapObj*>(Ptr(&MapMng, 0x954));
+        for (int i = 0; i < mapObjCount; i++) {
+            mapObj->DrawHitWire();
+            mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
+        }
+
+        mapObj = reinterpret_cast<CMapObj*>(Ptr(&MapMng, 0x954));
+        for (int i = 0; i < mapObjCount; i++) {
+            mapObj->DrawHitNormal();
+            mapObj = reinterpret_cast<CMapObj*>(Ptr(mapObj, 0xF0));
+        }
+
+        SetOffsetZBuff__10CCameraPcsFf(static_cast<double>(FLOAT_8032f9a0), &CameraPcs);
+    }
 }
 
 /*

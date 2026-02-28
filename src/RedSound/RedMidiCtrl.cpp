@@ -629,12 +629,22 @@ void __MidiCtrl_ReverbDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C820C
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_TimeSignature(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_TimeSignature(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    unsigned char* command = (unsigned char*)*(int*)track;
+
+    *(unsigned short*)((int)control + 0x18) = command[0];
+    *(unsigned short*)((int)control + 0x1a) = command[1];
+    *(int*)((int)control + 0x14) =
+        (0xc0 / (int)*(short*)((int)control + 0x1a)) * (int)*(short*)((int)control + 0x18);
+    *(int*)track += 2;
 }
 
 /*
@@ -669,12 +679,16 @@ void __MidiCtrl_KeySignature(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDA
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C82D8
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_PhraseSignature(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_PhraseSignature(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    *(int*)track += 1;
 }
 
 /*
@@ -884,12 +898,23 @@ void __MidiCtrl_VolumeChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C87B4
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_ExpressionDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_ExpressionDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    unsigned char* command = (unsigned char*)*(int*)track;
+    int* trackData = (int*)track;
+
+    *trackData = (int)(command + 1);
+    trackData[0xd] = ((int)(char)*command) << 0xc;
+    trackData[0xe] = 0;
+    trackData[0xf] = 0;
+    DAT_8032f4b4 |= 2;
 }
 
 /*
@@ -920,12 +945,27 @@ void __MidiCtrl_ExpressionChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C8884
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_PanDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_PanDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    u8* command;
+    int* trackData = (int*)track;
+
+    command = (u8*)trackData[0];
+    trackData[0] = (int)(command + 1);
+    trackData[0x10] = ((u32)*command) << 0xc;
+    trackData[0x11] = 0;
+    trackData[0x12] = 0;
+    if (trackData[0x2d] == 0) {
+        trackData[0x33] = 0;
+    }
+    DAT_8032f4b4 |= 2;
 }
 
 /*

@@ -1807,74 +1807,64 @@ void CMapMng::ReadMtx(char* mapName)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMapMng::ReadMpl(char* mapName)
+int CMapMng::ReadMpl(char* mapName)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
     int loadIndex = 0;
-
     *reinterpret_cast<unsigned char*>(self + 0x2298B) = 1;
 
     while (true) {
-        char path[256];
+        char path[64];
         sprintf(path, "%s_%d.mpl", mapName, loadIndex);
 
-        bool canRead = false;
-        const int readMode = *reinterpret_cast<int*>(self + 0x229A8);
-        if (readMode == 1) {
-            canRead = true;
+        bool exists = false;
+        if (*reinterpret_cast<int*>(self + 0x229A8) == 1) {
+            exists = true;
         } else {
-            CFile::CHandle* existsHandle = File.Open(path, 0, CFile::PRI_LOW);
-            if (existsHandle != 0) {
-                File.Close(existsHandle);
-                canRead = true;
+            CFile::CHandle* probe = File.Open(path, 0, CFile::PRI_LOW);
+            if (probe != 0) {
+                File.Close(probe);
+                exists = true;
             }
         }
 
-        if (!canRead) {
-            if (readMode == 3) {
-                return;
+        if (!exists) {
+            if (*reinterpret_cast<int*>(self + 0x229A8) == 3) {
+                return 1;
             }
             if (loadIndex == 0) {
-                if (System.m_execParam != 0) {
-                    System.Printf("CAN NOT READ OPEN %s", path);
-                }
-                return;
+                return 0;
             }
-            return;
-        }
-
-        if (static_cast<unsigned int>(System.m_execParam) > 2) {
-            System.Printf("ReadMpl fn %s", path);
+            return 1;
         }
 
         void* filePtr = File.m_readBuffer;
-        if (readMode == 1) {
+        if (*reinterpret_cast<int*>(self + 0x229A8) == 1) {
             int& readIndex = *reinterpret_cast<int*>(self + 0x229A0);
             const int size = *reinterpret_cast<int*>(self + 0x229AC + (readIndex * 4));
             void* amemCursor = *reinterpret_cast<void**>(self + 0x22998);
-
-            Memory.CopyFromAMemorySync(File.m_readBuffer, amemCursor, (size + 0x1F) & ~0x1F);
+            Memory.CopyFromAMemorySync(File.m_readBuffer, amemCursor, static_cast<unsigned long>((size + 0x1F) & ~0x1F));
             *reinterpret_cast<unsigned char**>(self + 0x22998) += size;
             CheckSum__FPvi(filePtr, size);
             readIndex += 1;
         } else {
-            CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
-            if (fileHandle == 0) {
+            CFile::CHandle* handle = File.Open(path, 0, CFile::PRI_LOW);
+            if (handle == 0) {
                 filePtr = 0;
             } else {
-                const int size = File.GetLength(fileHandle);
-                if (readMode == 3) {
-                    File.ReadASync(fileHandle);
+                const int size = File.GetLength(handle);
+                if (*reinterpret_cast<int*>(self + 0x229A8) == 3) {
+                    File.ReadASync(handle);
                     filePtr = reinterpret_cast<void*>(1);
                     int& openIndex = *reinterpret_cast<int*>(self + 0x229A4);
-                    *reinterpret_cast<CFile::CHandle**>(self + 0x22A2C + (openIndex * 4)) = fileHandle;
+                    *reinterpret_cast<CFile::CHandle**>(self + 0x22A2C + (openIndex * 4)) = handle;
                     openIndex += 1;
                 } else {
-                    File.Read(fileHandle);
-                    File.SyncCompleted(fileHandle);
+                    File.Read(handle);
+                    File.SyncCompleted(handle);
                     filePtr = File.m_readBuffer;
-                    File.Close(fileHandle);
-                    if (readMode == 2) {
+                    File.Close(handle);
+                    if (*reinterpret_cast<int*>(self + 0x229A8) == 2) {
                         int& readIndex = *reinterpret_cast<int*>(self + 0x229A0);
                         void* amemCursor = *reinterpret_cast<void**>(self + 0x22998);
                         Memory.CopyToAMemorySync(filePtr, amemCursor, static_cast<unsigned long>(size));
@@ -1888,50 +1878,44 @@ void CMapMng::ReadMpl(char* mapName)
         }
 
         if (filePtr == 0) {
-            if (System.m_execParam != 0) {
-                System.Printf("CAN NOT READ %s", path);
-            }
-            return;
+            return 0;
         }
 
-        if (readMode != 3) {
+        if (*reinterpret_cast<int*>(self + 0x229A8) != 3) {
             CChunkFile chunkFile;
             chunkFile.SetBuf(filePtr);
             CChunkFile::CChunk chunk;
 
-            if (readMode == 2) {
+            if (*reinterpret_cast<int*>(self + 0x229A8) == 2) {
                 while (chunkFile.GetNextChunk(chunk)) {
                     if (chunk.m_id == 0x4D455348 && chunk.m_arg0 == 1) {
-                        return;
+                        return 1;
                     }
                 }
             } else {
                 while (chunkFile.GetNextChunk(chunk)) {
-                    if (chunk.m_id != 0x4D455348) {
-                        continue;
-                    }
-
-                    chunkFile.PushChunk();
-                    CChunkFile::CChunk meshChunk;
-                    while (chunkFile.GetNextChunk(meshChunk)) {
-                        if (meshChunk.m_id == 0x56534554) {
-                            short& meshCount = *reinterpret_cast<short*>(self + 0xE);
-                            if (meshCount > 0x9F) {
-                                return;
+                    if (chunk.m_id == 0x4D455348) {
+                        const int meshChunkArg0 = chunk.m_arg0;
+                        chunkFile.PushChunk();
+                        while (chunkFile.GetNextChunk(chunk)) {
+                            if (chunk.m_id == 0x56534554) {
+                                short& meshCount = *reinterpret_cast<short*>(self + 0xE);
+                                if (meshCount > 0x9F) {
+                                    return 0;
+                                }
+                                CMapMesh* mesh = reinterpret_cast<CMapMesh*>(self + 0x16AC + (meshCount * 0x44));
+                                mesh->ReadOtmMesh(chunkFile, *reinterpret_cast<CMemory::CStage**>(self + 0x0), 1, 1);
+                            } else if (chunk.m_id == 0x44534554) {
+                                short& meshCount = *reinterpret_cast<short*>(self + 0xE);
+                                CMapMesh* mesh = reinterpret_cast<CMapMesh*>(self + 0x16AC + (meshCount * 0x44));
+                                mesh->ReadOtmMesh(chunkFile, *reinterpret_cast<CMemory::CStage**>(self + 0x0), 1, 1);
+                                meshCount += 1;
                             }
-                            CMapMesh* mesh = reinterpret_cast<CMapMesh*>(self + 0x16AC + (meshCount * 0x44));
-                            mesh->ReadOtmMesh(chunkFile, *reinterpret_cast<CMemory::CStage**>(self), 1, 1);
-                        } else if (meshChunk.m_id == 0x44534554) {
-                            short& meshCount = *reinterpret_cast<short*>(self + 0xE);
-                            CMapMesh* mesh = reinterpret_cast<CMapMesh*>(self + 0x16AC + (meshCount * 0x44));
-                            mesh->ReadOtmMesh(chunkFile, *reinterpret_cast<CMemory::CStage**>(self), 1, 1);
-                            meshCount += 1;
                         }
-                    }
-                    chunkFile.PopChunk();
-
-                    if (chunk.m_arg0 == 1) {
-                        return;
+                        chunkFile.PopChunk();
+                        if (meshChunkArg0 == 1) {
+                            return 1;
+                        }
                     }
                 }
             }

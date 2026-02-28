@@ -649,8 +649,8 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
 {
     CChunkFile::CChunk chunk;
 
-    U8At(this, 0x6C) = 1;
-    U8At(this, 0x60) = 6;
+    U32At(this, 0x6C) = 1;
+    U32At(this, 0x60) = 6;
     U8At(this, 0x71) = 0;
     U8At(this, 0x75) = static_cast<unsigned char>(useAddress);
 
@@ -661,42 +661,42 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
         } else if (chunk.m_id == 0x464D5420) {
             switch (chunkFile.Get1()) {
             case 0:
-                U8At(this, 0x60) = 6;
+                U32At(this, 0x60) = 6;
                 break;
             case 1:
-                U8At(this, 0x60) = 4;
+                U32At(this, 0x60) = 4;
                 break;
             case 2:
-                U8At(this, 0x60) = 9;
+                U32At(this, 0x60) = 9;
                 break;
             case 3:
-                U8At(this, 0x60) = 8;
+                U32At(this, 0x60) = 8;
                 break;
             case 5:
-                U8At(this, 0x60) = 0;
+                U32At(this, 0x60) = 0;
                 break;
             case 6:
-                U8At(this, 0x60) = 0xE;
+                U32At(this, 0x60) = 0xE;
                 break;
             case 7:
-                U8At(this, 0x60) = 3;
+                U32At(this, 0x60) = 3;
                 U8At(this, 0x70) = 1;
                 break;
             case 8:
-                U8At(this, 0x60) = 3;
+                U32At(this, 0x60) = 3;
                 break;
             case 9:
-                U8At(this, 0x60) = 1;
+                U32At(this, 0x60) = 1;
                 break;
             case 10:
-                U8At(this, 0x60) = 0xE;
+                U32At(this, 0x60) = 0xE;
                 U8At(this, 0x71) = 1;
                 break;
             }
 
             U8At(this, 0x74) = chunkFile.Get1();
             if (chunk.m_arg0 > 3) {
-                U8At(this, 0x6C) = chunkFile.Get1();
+                U32At(this, 0x6C) = chunkFile.Get1();
             }
         } else if (chunk.m_id == 0x53495A45) {
             U32At(this, 0x64) = chunkFile.Get4();
@@ -748,41 +748,41 @@ void CTexture::Create(CChunkFile& chunkFile, CMemory::CStage* stage, CAmemCacheS
         height >>= 1;
     }
     if ((width != 1) || (height != 1)) {
-        U8At(this, 0x6C) = 0;
+        U32At(this, 0x6C) = 0;
     }
 
     if (S16At(this, 0x72) != -1) {
         return;
     }
 
-    const int format = U8At(this, 0x60);
+    const int format = U32At(this, 0x60);
     if ((format == 9) || (format == 8)) {
         GXInitTexObjCI(reinterpret_cast<GXTexObj*>(Ptr(this, 0x28)), PtrAt(this, 0x78), U16At(this, 0x64), U16At(this, 0x68),
-                       static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(U8At(this, 0x6C)),
-                       static_cast<GXTexWrapMode>(U8At(this, 0x6C)), 0, 0);
+                       static_cast<GXCITexFmt>(format), static_cast<GXTexWrapMode>(U32At(this, 0x6C)),
+                       static_cast<GXTexWrapMode>(U32At(this, 0x6C)), 0, 0);
 
         int tlutBase = reinterpret_cast<int>(PtrAt(this, 0x7C));
         unsigned int numEntries = 0x10;
-        if (U8At(this, 0x60) == 9) {
+        if (U32At(this, 0x60) == 9) {
             numEntries = 0x100;
         }
         GXInitTlutObj(reinterpret_cast<GXTlutObj*>(Ptr(this, 0x48)), reinterpret_cast<void*>(tlutBase), GX_TL_IA8,
                       static_cast<u16>(numEntries));
 
         numEntries = 0x10;
-        if (U8At(this, 0x60) == 9) {
+        if (U32At(this, 0x60) == 9) {
             numEntries = 0x100;
         }
         int offset = 0x10;
-        if (U8At(this, 0x60) == 9) {
+        if (U32At(this, 0x60) == 9) {
             offset = 0x100;
         }
         GXInitTlutObj(reinterpret_cast<GXTlutObj*>(Ptr(this, 0x54)), reinterpret_cast<void*>(tlutBase + offset * 2), GX_TL_IA8,
                       static_cast<u16>(numEntries));
     } else {
         GXInitTexObj(reinterpret_cast<GXTexObj*>(Ptr(this, 0x28)), PtrAt(this, 0x78), U16At(this, 0x64), U16At(this, 0x68),
-                     static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(U8At(this, 0x6C)),
-                     static_cast<GXTexWrapMode>(U8At(this, 0x6C)), 1 - (U8At(this, 0x74) >> 31));
+                     static_cast<GXTexFmt>(format), static_cast<GXTexWrapMode>(U32At(this, 0x6C)),
+                     static_cast<GXTexWrapMode>(U32At(this, 0x6C)), 1 - (U8At(this, 0x74) >> 31));
     }
 
     const unsigned char maxLod = U8At(this, 0x74);

@@ -470,8 +470,8 @@ public:
     void pppGetFreeDataMng();
     void pppGetDefaultCreateParam();
 
-    void pppCreate0(int, int, PPPCREATEPARAM*, int);
-    void pppCreate(int, int, PPPCREATEPARAM*, int);
+    int pppCreate0(int, int, PPPCREATEPARAM*, int);
+    int pppCreate(int, int, PPPCREATEPARAM*, int);
 
     void pppGetFreeSlot();
     void pppDeleteSlot(int, int);

@@ -1078,62 +1078,133 @@ void CPartMng::pppGetDefaultCreateParam()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80058148
+ * PAL Size: 1632b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartMng::pppCreate0(int, int, PPPCREATEPARAM*, int)
+int CPartMng::pppCreate0(int, int, PPPCREATEPARAM*, int)
 {
-	// TODO
+    // TODO
+    return -1;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005810c
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartMng::pppCreate(int, int, PPPCREATEPARAM*, int)
+int CPartMng::pppCreate(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam, int allowFpOverride)
 {
-	// TODO
+    if (DAT_8032ed68 == 0) {
+        return pppCreate0(pdtSlotIndex, fpNo, createParam, allowFpOverride);
+    }
+    return -1;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800580e0
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartMng::pppGetFreeSlot()
 {
-	// TODO
+    char* self = reinterpret_cast<char*>(this);
+    unsigned long slot = *reinterpret_cast<unsigned long*>(self + 0x34);
+    slot++;
+    *reinterpret_cast<unsigned long*>(self + 0x34) = slot;
+
+    if ((long)slot >= 0x7fffffff) {
+        *reinterpret_cast<unsigned long*>(self + 0x34) = 0x10;
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80058030
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartMng::pppDeleteSlot(int, int)
+void CPartMng::pppDeleteSlot(int slot, int checkHitFlags)
 {
-	// TODO
+    char* pppMngSt = reinterpret_cast<char*>(this);
+
+    for (int i = 0; i < 0x180; i++) {
+        int baseTime = *reinterpret_cast<int*>(pppMngSt + 0x14);
+        if (baseTime != -0x1000 && *reinterpret_cast<int*>(pppMngSt + 0x100) == slot) {
+            if (checkHitFlags == 0 || (*reinterpret_cast<unsigned char*>(pppMngSt + 0x137) & 1) == 0) {
+                if (baseTime < 0) {
+                    *reinterpret_cast<unsigned char*>(pppMngSt + 0xe5) = 1;
+                    pppStopSe__FP9_pppMngStP7PPPSEST(reinterpret_cast<_pppMngSt*>(pppMngSt),
+                                                     reinterpret_cast<PPPSEST*>(pppMngSt + 0x11c));
+                } else {
+                    *reinterpret_cast<int*>(pppMngSt + 0x14) = -0x1000;
+                }
+            }
+        }
+        pppMngSt += 0x158;
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80057fac
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartMng::pppEndSlot(int, int)
+void CPartMng::pppEndSlot(int slot, int checkHitFlags)
 {
-	// TODO
+    char* pppMngSt = reinterpret_cast<char*>(this);
+
+    for (int i = 0; i < 0x180; i++) {
+        if (*reinterpret_cast<int*>(pppMngSt + 0x14) != -0x1000
+            && *reinterpret_cast<int*>(pppMngSt + 0x100) == slot) {
+            if (checkHitFlags == 0 || (*reinterpret_cast<unsigned char*>(pppMngSt + 0x137) & 1) == 0) {
+                *reinterpret_cast<unsigned char*>(pppMngSt + 0xe4) = 1;
+                pppStopSe__FP9_pppMngStP7PPPSEST(reinterpret_cast<_pppMngSt*>(pppMngSt),
+                                                 reinterpret_cast<PPPSEST*>(pppMngSt + 0x11c));
+            }
+        }
+        pppMngSt += 0x158;
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80057ee8
+ * PAL Size: 196b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartMng::pppShowSlot(int, unsigned char)
+void CPartMng::pppShowSlot(int slot, unsigned char isVisible)
 {
-	// TODO
+    char* pppMngSt = reinterpret_cast<char*>(this);
+
+    for (int i = 0; i < 0x180; i++) {
+        if (*reinterpret_cast<int*>(pppMngSt + 0x14) != -0x1000
+            && *reinterpret_cast<int*>(pppMngSt + 0x100) == slot) {
+            *reinterpret_cast<unsigned char*>(pppMngSt + 0xe9) = isVisible;
+        }
+        pppMngSt += 0x158;
+    }
 }
 
 /*

@@ -26,6 +26,8 @@ extern u32 CFlatFlags;
 extern CMapMng MapMng;
 extern Mtx ppvCameraMatrix0;
 extern CGraphic Graphic;
+extern u8 PartMng[];
+extern u8* lbl_8032ED50;
 
 extern "C" {
 void pppHeapUseRate__FPQ27CMemory6CStage(void*);
@@ -299,9 +301,10 @@ void pppFrameLaser(struct pppLaser *pppLaser, struct UnkB *param_2, struct UnkC 
             work[0] = PSVECDistance(&points[i], (Vec*)(work + 8));
         } else if (i == 0 && *((u8*)work + 0x4c) != 0) {
             if (work[0xf] - FLOAT_80333458 < work[0]) {
+                s32 partIndex = ((s32)(lbl_8032ED50 - (PartMng + 0x2A18))) / 0x158;
                 work[0] = work[0xf] - FLOAT_80333458;
                 ParticleFrameCallback__5CGameFiiiiiP3Vec(
-                    &Game.game, 0, (int)pppMngStPtr->m_kind, (int)pppMngStPtr->m_nodeIndex, 3,
+                    &Game.game, partIndex, (int)pppMngStPtr->m_kind, (int)pppMngStPtr->m_nodeIndex, 3,
                     (int)((u32)baseObj->m_graphId >> 12));
                 *((u8*)work + 0x4c) = 0;
             }

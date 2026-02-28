@@ -43,6 +43,7 @@ extern "C" void Create__Q26CChara6CModelFPvPQ27CMemory6CStage(void*, void*, void
 extern "C" void CreateDynamics__Q26CChara6CModelFPvPQ27CMemory6CStage(void*, void*, void*);
 extern "C" void AttachTextureSet__Q26CChara6CModelFP11CTextureSet(void*, void*);
 extern "C" void AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(void*, void*, int, int, int);
+extern "C" void SetFrame__Q26CChara6CModelFf(float, void*);
 extern "C" void* __ct__Q26CChara5CAnimFv(void*);
 extern "C" void Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(void*, void*, void*);
 extern "C" void __ct__Q29CLightPcs10CBumpLightFv(void*);
@@ -72,6 +73,7 @@ extern "C" double lbl_80330C10;
 extern "C" void* memset(void*, int, unsigned long);
 extern "C" char* strcpy(char*, const char*);
 extern "C" int sprintf(char*, const char*, ...);
+extern "C" double fmod(double, double);
 
 static void releaseRef(unsigned char* p, int offset)
 {
@@ -322,32 +324,55 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
         }
     }
 
-    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
-    } else {
+    unsigned short heldButtons = 0;
+    unsigned short triggerButtons = 0;
+    if ((Pad._452_4_ == 0) && (Pad._448_4_ == -1)) {
         __cntlzw((unsigned int)Pad._448_4_);
-        if ((Pad._8_2_ & 0x800) != 0) {
+        heldButtons = Pad._4_2_;
+        triggerButtons = Pad._8_2_;
+        if ((triggerButtons & 0x800) != 0) {
             *(unsigned int*)(p + 0x6F8) = (__cntlzw(*(unsigned int*)(p + 0x6F8)) >> 5) & 0xFF;
         }
-        if ((Pad._8_2_ & 0x400) != 0) {
+        if ((triggerButtons & 0x400) != 0) {
             *(unsigned int*)(p + 0x6F4) = (__cntlzw(*(unsigned int*)(p + 0x6F4)) >> 5) & 0xFF;
         }
     }
 
     if ((*(void**)(p + 0x190) != 0) && (*(int*)(p + 0x70C) != 0)) {
         *(int*)(p + 0x704) = 0;
-        AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(*(void**)(p + 0x190), *(void**)(p + 0x198), -1, -1, 0);
+        if (*(int*)(p + 0x708) == 0) {
+            AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(*(void**)(p + 0x190), *(void**)(p + 0x198), -1, -1, 0);
+        } else {
+            float frame = *(float*)(*(unsigned char**)(p + 0x190) + 0xB4);
+            float animFrames = (float)*(unsigned short*)(*(unsigned char**)(p + 0x198) + 0x10);
+            *(float*)(p + 0x700) = (float)fmod((double)frame, (double)animFrames);
+            AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(*(void**)(p + 0x190), *(void**)(p + 0x198), -1, -1, 0);
+        }
         *(int*)(p + 0x70C) = 0;
+    }
+
+    if (((triggerButtons & 0x1000) != 0) && (*(void**)(p + 0x1A0) == 0) && (*(void**)(p + 0x190) != 0)) {
+        AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(*(void**)(p + 0x190), *(void**)(p + 0x198), -1, -1, -1);
     }
 
     if (*(int*)(p + 0x6F4) == 0) {
         float deltaY = lbl_80330BF8;
-        if ((Pad._4_2_ & 0x200) != 0) {
+        if ((heldButtons & 0x200) != 0) {
             deltaY = lbl_80330C28;
         }
-        if ((Pad._4_2_ & 0x100) != 0) {
+        if ((heldButtons & 0x100) != 0) {
             deltaY = deltaY * lbl_80330C2C;
         }
         *(float*)(p + 0x700) = *(float*)(p + 0x700) + deltaY;
+    } else {
+        float baseFrame = lbl_80330BE8;
+        if ((triggerButtons & 0x100) != 0) {
+            baseFrame = lbl_80330BF8;
+        }
+        if ((triggerButtons & 0x200) != 0) {
+            baseFrame = baseFrame + lbl_80330C28;
+        }
+        *(float*)(p + 0x700) = baseFrame;
     }
 }
 

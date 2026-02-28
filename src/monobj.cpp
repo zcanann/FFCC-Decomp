@@ -6,6 +6,7 @@
 #include "ffcc/astar.h"
 #include "ffcc/p_game.h"
 #include "ffcc/sound.h"
+#include "ffcc/gbaque.h"
 #include "ffcc/vector.h"
 #include "PowerPC_EABI_Support/Runtime/ptmf.h"
 
@@ -22,8 +23,11 @@ extern "C" char DAT_80331a4c[];
 extern "C" void __ptmf_scall(void*, void*);
 extern "C" void aiAddDuct__8CGMonObjFRi(CGMonObj*, int&);
 extern "C" int calcPolygonGroup__6CAStarFP3Veci(void*, Vec*, int);
+extern "C" CGMonObj* FindGMonObjFirst__13CFlatRuntime2Fv(void*);
+extern "C" CGMonObj* FindGMonObjNext__13CFlatRuntime2FP8CGMonObj(void*, CGMonObj*);
 extern "C" int getNearParty__8CGMonObjFiiffi(CGMonObj*, int, int, float, float, int);
 extern "C" int sprintf(char*, const char*, ...);
+extern "C" void SetHitEnemy__8GbaQueueFii(void*, int, int);
 extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
 extern "C" void SetPosX__5CFontFf(float, CFont*);
 extern "C" void SetPosY__5CFontFf(float, CFont*);
@@ -775,12 +779,118 @@ void CGMonObj::onAttacked(CGPrgObj*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801170E0
+ * PAL Size: 724b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::onDamaged(CGPrgObj*)
+void CGMonObj::onDamaged(CGPrgObj* prgObj)
 {
-	// TODO
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	void** prgScript = *reinterpret_cast<void***>(reinterpret_cast<unsigned char*>(prgObj) + 0x58);
+	typedef unsigned int (*GetFlagsFn)(CGPrgObj*);
+	GetFlagsFn getFlags = *reinterpret_cast<GetFlagsFn*>(
+		reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(prgObj) + 0x48)) + 0xC
+	);
+
+	mon[0x6BF] = 1;
+
+	unsigned int prgFlags = getFlags(prgObj);
+	if ((prgFlags & 0x6D) == 0x6D) {
+		unsigned char* aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+		if (*reinterpret_cast<short*>(mon + 0x6E4) != 0) {
+			aiData = reinterpret_cast<unsigned char*>(Game.game.unkCFlatData0[1]) +
+				(*reinterpret_cast<short*>(mon + 0x6E4) +
+					*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x100)) * 0x1D0 + 0x10;
+		}
+
+		int attackerIndex = reinterpret_cast<int>(prgScript[0xED]);
+		if ((*reinterpret_cast<short*>(aiData + 0x106) == 1) || (*reinterpret_cast<int*>(mon + 0x6C4) < 0)) {
+			if ((Game.game.m_gameWork.m_menuStageMode != '\0') && (Game.game.m_gameWork.m_bossArtifactStageIndex < 0xF)) {
+				prgFlags = getFlags(prgObj);
+				if ((prgFlags & 0x6D) == 0x6D) {
+					if (prgScript[0xED] != nullptr) {
+						goto skip_target_update;
+					}
+				}
+			}
+			*reinterpret_cast<int*>(mon + 0x6C4) = attackerIndex;
+		}
+
+skip_target_update:
+		int teamNo = reinterpret_cast<int>(object->m_scriptHandle[2]);
+		*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(prgObj) + 0x5BC) = static_cast<float>(teamNo);
+		SetHitEnemy__8GbaQueueFii(&GbaQue, attackerIndex, teamNo);
+
+		unsigned short groupTag = *reinterpret_cast<unsigned short*>(mon + 0x6D4);
+		if ((groupTag & 0x7FFF) != 0) {
+			for (CGMonObj* other = FindGMonObjFirst__13CFlatRuntime2Fv(CFlat); other != nullptr;
+				other = FindGMonObjNext__13CFlatRuntime2FP8CGMonObj(CFlat, other)) {
+				if (other == this) {
+					continue;
+				}
+
+				unsigned char* otherMon = reinterpret_cast<unsigned char*>(other);
+				if ((*reinterpret_cast<unsigned short*>(otherMon + 0x6D4) & 0x7FFF) == 0) {
+					continue;
+				}
+				if ((groupTag & 0x7FFF) != (*reinterpret_cast<unsigned short*>(otherMon + 0x6D4) & 0x7FFF)) {
+					continue;
+				}
+
+				void** otherScript = reinterpret_cast<CGObject*>(other)->m_scriptHandle;
+				if (*reinterpret_cast<short*>(otherScript + 7) == 0) {
+					continue;
+				}
+				if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(otherScript) + 0x3E) != 0) {
+					continue;
+				}
+				if (*reinterpret_cast<short*>(otherScript + 0x14) != 0) {
+					continue;
+				}
+				if (*reinterpret_cast<short*>(otherScript + 0x11) != 0) {
+					continue;
+				}
+
+				*reinterpret_cast<int*>(otherMon + 0x6C4) = attackerIndex;
+				otherMon[0x6BD] = 1;
+
+				if (*reinterpret_cast<int*>(otherMon + 0x6D8) == 4) {
+					if ((static_cast<int>(static_cast<unsigned int>(otherMon[0x63C]) << 24) >= 0) &&
+						(reinterpret_cast<CGObject*>(other)->m_scriptHandle[4] == reinterpret_cast<void*>(0x55))) {
+						reinterpret_cast<CGPrgObj*>(other)->changeStat(0x18, 0, 0);
+						*reinterpret_cast<int*>(otherMon + 0x6D8) = 2;
+						*reinterpret_cast<int*>(otherMon + 0x6DC) = 0;
+						otherMon[0x6BB] = 1;
+					}
+				} else {
+					*reinterpret_cast<int*>(otherMon + 0x6D8) = 2;
+					*reinterpret_cast<int*>(otherMon + 0x6DC) = 0;
+					otherMon[0x6BB] = 1;
+				}
+			}
+		}
+	}
+
+	if (*reinterpret_cast<int*>(mon + 0x520) == 0x11) {
+		prgObj->changeStat(0, 0, 0);
+	}
+
+	if ((static_cast<int>(static_cast<unsigned int>(mon[0x63C]) << 24) >= 0) &&
+		(object->m_scriptHandle[4] == reinterpret_cast<void*>(0x55))) {
+		prgObj->changeStat(0x18, 0, 0);
+	}
+
+	*reinterpret_cast<int*>(mon + 0x6D8) = 2;
+	*reinterpret_cast<int*>(mon + 0x6DC) = 0;
+	mon[0x6BB] = 1;
+
+	if (__ptmf_test(reinterpret_cast<__ptmf*>(mon + 0x774)) != 0) {
+		__ptmf_scall(this, mon + 0x708);
+	}
 }
 
 /*

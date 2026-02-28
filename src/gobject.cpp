@@ -1436,5 +1436,5 @@ void CGObject::onDrawDebug(CFont*, float, float&, float)
  */
 int CGObject::GetCID()
 {
-	return 0;
+	return 5;
 }

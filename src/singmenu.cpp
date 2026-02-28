@@ -722,12 +722,89 @@ void CMenuPcs::SingleDrawFadeIn()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80148220
+ * PAL Size: 708b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::SingleCalcFadeOut()
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+    int fadeState = *reinterpret_cast<int*>(self + 0x850);
+
+    if (*reinterpret_cast<s16*>(fadeState + 4) == 0) {
+        Sound.PlaySe(0xF, 0x40, 0x7F, 0);
+        memset(reinterpret_cast<void*>(fadeState), 0, 0x1008);
+
+        *reinterpret_cast<int*>(fadeState + 0x2C) =
+            (*reinterpret_cast<s16*>(self + 0x864) == 8) ? 10 : 0;
+        *reinterpret_cast<int*>(fadeState + 0x30) = 10;
+
+        *reinterpret_cast<int*>(fadeState + 0x6C) = 0;
+        *reinterpret_cast<int*>(fadeState + 0x70) = 10;
+        *reinterpret_cast<int*>(fadeState + 0xAC) = 0;
+        *reinterpret_cast<int*>(fadeState + 0xB0) = 10;
+        *reinterpret_cast<int*>(fadeState + 0xEC) = 0;
+        *reinterpret_cast<int*>(fadeState + 0xF0) = 10;
+
+        *reinterpret_cast<s16*>(fadeState + 0) = 4;
+        *reinterpret_cast<s16*>(fadeState + 6) = 0;
+        *reinterpret_cast<s16*>(fadeState + 4) = 1;
+    }
+
+    int completed = 0;
+    int ctrlState = *reinterpret_cast<int*>(self + 0x82C);
+    ++(*reinterpret_cast<s16*>(ctrlState + 0x22));
+
+    int totalEntries = static_cast<int>(*reinterpret_cast<s16*>(fadeState + 0));
+    s16* entry = reinterpret_cast<s16*>(fadeState + 8);
+    int frame = static_cast<int>(*reinterpret_cast<s16*>(ctrlState + 0x22));
+    for (int i = 0; i < totalEntries; i++) {
+        int start = *reinterpret_cast<int*>(entry + 0x12);
+        if (frame < start) {
+            *reinterpret_cast<float*>(entry + 8) = FLOAT_80332934;
+        } else {
+            int duration = *reinterpret_cast<int*>(entry + 0x14);
+            if (frame < start + duration) {
+                int elapsed = ++(*reinterpret_cast<int*>(entry + 0x10));
+                *reinterpret_cast<float*>(entry + 8) =
+                    static_cast<float>(-((DOUBLE_80332980 / static_cast<double>(duration)) *
+                                          static_cast<double>(elapsed) - DOUBLE_80332980));
+            } else {
+                completed++;
+                *reinterpret_cast<float*>(entry + 8) = FLOAT_8033294c;
+            }
+        }
+        entry += 0x20;
+    }
+
+    CChara::CModel* model = *reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
+    if (*reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x10) <=
+        *reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x08)) {
+        SetFrame__Q26CChara6CModelFf(FLOAT_8033294c, model);
+    } else {
+        AddFrame__Q26CChara6CModelFf(FLOAT_80332934, model);
+    }
+
+    unsigned short modelScaleIndex = *reinterpret_cast<unsigned short*>(Game.game.m_scriptFoodBase[0] + 0x3E0);
+    float modelScale = DAT_801dd708[modelScaleIndex];
+    Mtx scaleMtx;
+    PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
+    scaleMtx[1][3] = DAT_801dd6f8[modelScaleIndex];
+    scaleMtx[0][3] = FLOAT_8033294c;
+    scaleMtx[2][3] = FLOAT_8033294c;
+
+    int modelPtr = *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
+    *reinterpret_cast<u8*>(modelPtr + 0x10C) = (*reinterpret_cast<u8*>(modelPtr + 0x10C) & 0x7F) | 0x80;
+    SetMatrix__Q26CChara6CModelFPA4_f(model, scaleMtx);
+    CalcMatrix__Q26CChara6CModelFv(model);
+    CalcSkin__Q26CChara6CModelFv(model);
+
+    if (totalEntries == completed) {
+        *reinterpret_cast<s16*>(fadeState + 6) = 1;
+    }
 }
 
 /*

@@ -64,6 +64,23 @@ static int GetMesNibbleValue(const char* data)
 	return (int)((unsigned int)(high << 4) | ((unsigned int)low & 0x0F));
 }
 
+static int ReadTagU8(char** text)
+{
+	int value = GetMesNibbleValue(*text);
+	*text += 2;
+	return value;
+}
+
+static int ReadTagS16(char** text)
+{
+	int a = (unsigned char)(*text)[0] & 0x0F;
+	int b = (unsigned char)(*text)[1] & 0x0F;
+	int c = (unsigned char)(*text)[2] & 0x0F;
+	int d = (unsigned char)(*text)[3] & 0x0F;
+	*text += 4;
+	return (int)(short)((a << 12) | (b << 8) | (c << 4) | d);
+}
+
 static void ApplyCaseMode(char* text, int& caseMode)
 {
 	if ((text[0] == '\0') || (caseMode == 0))
@@ -310,6 +327,8 @@ void CMes::addString(char** text, int branchMode)
 {
 	CFont* font = *(CFont**)(MenuPcs + 0x100);
 	int fontSel = *(int*)((char*)this + 0x3D40);
+	int caseMode = 0;
+	int flowMode = branchMode;
 	if (fontSel == 0)
 	{
 		font = *(CFont**)(MenuPcs + 0x0F8);
@@ -382,16 +401,160 @@ void CMes::addString(char** text, int branchMode)
 			case 6:
 				*(int*)((char*)this + 0x3D2C) = 1;
 				break;
+			case 0x0C:
+			case 0x0D:
+			case 0x0E:
+			case 0x0F:
+			case 0x10:
+			case 0x11:
+			case 0x12:
+			case 0x13:
+			case 0x14:
+			case 0x15:
+			case 0x16:
+			case 0x17:
+			case 0x18:
+				*(int*)((char*)this + 0x3D28) = (int)tag - 0x0C;
+				break;
+			case 0x1A:
+				*(float*)((char*)this + 0x3D44) = FLOAT_803308a0 * (float)ReadTagS16(text);
+				SetScaleX__5CFontFf(*(float*)((char*)this + 0x3D44), font);
+				SetScaleY__5CFontFf(*(float*)((char*)this + 0x3D48), font);
+				break;
+			case 0x1B:
+			{
+				int idx = ReadTagU8(text);
+				flowMode = ((m_tempVar__4CMes[idx] & 1) == 0) ? 1 : 2;
+				break;
+			}
+			case 0x1C:
+			{
+				int idx = ReadTagU8(text);
+				flowMode = ((m_tempVar__4CMes[idx] & 1) != 0) ? 1 : 2;
+				break;
+			}
+			case 0x25:
+			{
+				int value = ReadTagU8(text);
+				if (*(int*)((char*)this + 0x3D4C) == 0)
+				{
+					if (value == 0x7F)
+					{
+						*(int*)((char*)this + 0x3D4C) = 0;
+					}
+					else
+					{
+						*(int*)((char*)this + 0x3CB0) = value;
+					}
+				}
+				break;
+			}
+			case 0x26:
+				*(int*)((char*)this + 0x3CB4) = ReadTagU8(text);
+				break;
+			case 0x27:
+				*(int*)((char*)this + 0x3CB8) = ReadTagU8(text);
+				break;
+			case 0x31:
+				*(int*)((char*)this + 0x3C84) = ReadTagS16(text);
+				*(int*)((char*)this + 0x3C88) = ReadTagS16(text);
+				break;
+			case 0x33:
+				*(int*)((char*)this + 0x3D3C) = ReadTagU8(text);
+				break;
+			case 0x34:
+			{
+				*(int*)((char*)this + 0x3D40) = ReadTagU8(text);
+				int nextFontSel = *(int*)((char*)this + 0x3D40);
+				if (nextFontSel == 0)
+				{
+					font = *(CFont**)(MenuPcs + 0x0F8);
+				}
+				else
+				{
+					font = *(CFont**)(MenuPcs + 0x100);
+				}
+				SetShadow__5CFontFi(*(int*)((char*)this + 0x3D38), font);
+				SetMargin__5CFontFf(FLOAT_8033089c, font);
+				SetScaleX__5CFontFf(*(float*)((char*)this + 0x3D44), font);
+				SetScaleY__5CFontFf(*(float*)((char*)this + 0x3D48), font);
+				break;
+			}
+			case 0x35:
+			{
+				float scale = FLOAT_803308a0 * (float)ReadTagS16(text);
+				*(float*)((char*)this + 0x3D44) = scale;
+				*(float*)((char*)this + 0x3D48) = scale;
+				SetScaleX__5CFontFf(*(float*)((char*)this + 0x3D44), font);
+				SetScaleY__5CFontFf(*(float*)((char*)this + 0x3D48), font);
+				break;
+			}
+			case 0x41:
+			{
+				int mode = ReadTagU8(text);
+				if (mode == 1)
+				{
+					caseMode = 1;
+				}
+				else if (mode == 0)
+				{
+					caseMode = 3;
+				}
+				else
+				{
+					caseMode = 2;
+				}
+				break;
+			}
+			case 0x42:
+			{
+				int idx = ReadTagU8(text);
+				flowMode = (m_tempVar__4CMes[idx] == 1) ? 1 : 2;
+				break;
+			}
+			case 0x46:
+				if (flowMode == 1)
+				{
+					flowMode = 2;
+				}
+				else if (flowMode == 2)
+				{
+					flowMode = 1;
+				}
+				break;
+			case 0x47:
+				flowMode = 0;
+				break;
+			case 0x48:
+			case 0x49:
+			case 0x4A:
+			case 0x4B:
+			case 0x4C:
+			case 0x4D:
+			case 0x4E:
+			case 0x4F:
+			case 0x50:
+			case 0x52:
+			case 0x53:
+				ch = (unsigned char)(tag - 0x48U);
+				goto render_char;
 			default:
 				break;
 			}
 			continue;
 		}
 
-		if (branchMode == 2)
+render_char:
+		if (flowMode == 2)
 		{
 			continue;
 		}
+
+		char tmpCharBuf[2];
+		tmpCharBuf[0] = (char)ch;
+		tmpCharBuf[1] = '\0';
+		ApplyCaseMode(tmpCharBuf, caseMode);
+		ch = (unsigned char)tmpCharBuf[0];
 
 		float* glyph = (float*)((char*)this + *(int*)((char*)this + 8) * 0x14 + 0x0C);
 		*(unsigned char*)((char*)glyph + 0x12) = (unsigned char)*(int*)((char*)this + 0x3D28);
@@ -427,6 +590,18 @@ void CMes::addString(char** text, int branchMode)
 		if (*(int*)((char*)this + 0x3D4C) == 0)
 		{
 			*(int*)((char*)this + 0x3C7C) = *(int*)((char*)this + 0x3C7C) + *(int*)((char*)this + 0x3CB0);
+		}
+		else
+		{
+			int step = *(int*)((char*)this + 0x3CB0);
+			if ((*(int*)((char*)this + 8) & 1) == 0)
+			{
+				*(int*)((char*)this + 0x3C7C) = *(int*)((char*)this + 0x3C7C) + (step / 2);
+			}
+			else
+			{
+				*(int*)((char*)this + 0x3C7C) = *(int*)((char*)this + 0x3C7C) + (step - (step / 2));
+			}
 		}
 		*(int*)((char*)this + 8) = *(int*)((char*)this + 8) + 1;
 	}

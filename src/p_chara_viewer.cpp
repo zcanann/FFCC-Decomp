@@ -330,12 +330,6 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
         __cntlzw((unsigned int)Pad._448_4_);
         heldButtons = Pad._4_2_;
         triggerButtons = Pad._8_2_;
-        if ((triggerButtons & 0x800) != 0) {
-            *(unsigned int*)(p + 0x6F8) = (__cntlzw(*(unsigned int*)(p + 0x6F8)) >> 5) & 0xFF;
-        }
-        if ((triggerButtons & 0x400) != 0) {
-            *(unsigned int*)(p + 0x6F4) = (__cntlzw(*(unsigned int*)(p + 0x6F4)) >> 5) & 0xFF;
-        }
     }
 
     if ((*(void**)(p + 0x190) != 0) && (*(int*)(p + 0x70C) != 0)) {
@@ -355,24 +349,79 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
         AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(*(void**)(p + 0x190), *(void**)(p + 0x198), -1, -1, -1);
     }
 
+    if ((triggerButtons & 0x800) != 0) {
+        *(unsigned int*)(p + 0x6F8) = (__cntlzw(*(unsigned int*)(p + 0x6F8)) >> 5) & 0xFF;
+    }
+    if ((triggerButtons & 0x400) != 0) {
+        *(unsigned int*)(p + 0x6F4) = (__cntlzw(*(unsigned int*)(p + 0x6F4)) >> 5) & 0xFF;
+    }
+
+    float frameAdvance;
     if (*(int*)(p + 0x6F4) == 0) {
         float deltaY = lbl_80330BF8;
         if ((heldButtons & 0x200) != 0) {
             deltaY = lbl_80330C28;
         }
+        float speedScale = lbl_80330BF8;
         if ((heldButtons & 0x100) != 0) {
-            deltaY = deltaY * lbl_80330C2C;
+            speedScale = lbl_80330C2C;
         }
-        *(float*)(p + 0x700) = *(float*)(p + 0x700) + deltaY;
+        frameAdvance = deltaY * speedScale;
     } else {
-        float baseFrame = lbl_80330BE8;
+        float offsetA = lbl_80330BE8;
         if ((triggerButtons & 0x100) != 0) {
-            baseFrame = lbl_80330BF8;
+            offsetA = lbl_80330BF8;
         }
+        float offsetB = lbl_80330BE8;
         if ((triggerButtons & 0x200) != 0) {
-            baseFrame = baseFrame + lbl_80330C28;
+            offsetB = lbl_80330C28;
         }
-        *(float*)(p + 0x700) = baseFrame;
+        frameAdvance = lbl_80330BE8 + offsetA + offsetB;
+        *(float*)(p + 0x700) = frameAdvance;
+    }
+
+    for (unsigned int i = 0; i < 2; i++) {
+        unsigned char* model = *(unsigned char**)(p + 0x190 + i * 4);
+        if (model == 0) {
+            continue;
+        }
+
+        unsigned char* anim = *(unsigned char**)(p + 0x198 + i * 4);
+        if (anim == 0) {
+            continue;
+        }
+
+        if ((i == 0) && (*(int*)(p + 0x1A4) != 0)) {
+            SetFrame__Q26CChara6CModelFf(*(float*)(model + 0xB4) + frameAdvance, model);
+            float animFrames = (float)*(unsigned short*)(anim + 0x10);
+            if (animFrames <= *(float*)(*(unsigned char**)(p + 0x190) + 0xB4)) {
+                int nextIndex = *(int*)(p + 0x1AC) + 1;
+                int animCount = *(int*)(p + 0x1A4);
+                *(int*)(p + 0x1AC) = nextIndex - (nextIndex / animCount) * animCount;
+                AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(*(void**)(p + 0x190),
+                                                                  *(void**)(p + 0x1B0 + *(int*)(p + 0x1AC) * 4),
+                                                                  -1, -1, 0);
+                releaseRef(p, 0x198);
+                *(void**)(p + 0x198) = *(void**)(p + 0x1B0 + *(int*)(p + 0x1AC) * 4);
+                addRef(p, 0x198);
+            }
+        } else if ((i == 0) && (*(int*)(p + 0x708) != 0)) {
+            float animFrames = (float)*(unsigned short*)(*(unsigned char**)(p + 0x198) + 0x10);
+            if (*(int*)(p + 0x704) == 0) {
+                if (*(float*)(p + 0x700) + animFrames <= *(float*)(model + 0xB4)) {
+                    *(int*)(p + 0x704) = 1;
+                    AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(model, *(void**)(p + 0x1A0), -1, -1, -1);
+                }
+            } else {
+                if (animFrames <= *(float*)(model + 0xB4)) {
+                    *(int*)(p + 0x704) = 0;
+                    AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(model, *(void**)(p + 0x198), -1, -1, 0);
+                }
+            }
+            SetFrame__Q26CChara6CModelFf(*(float*)(model + 0xB4) + frameAdvance, model);
+        } else {
+            SetFrame__Q26CChara6CModelFf(*(float*)(model + 0xB4) + frameAdvance, model);
+        }
     }
 }
 

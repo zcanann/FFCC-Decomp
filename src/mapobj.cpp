@@ -637,14 +637,9 @@ void CMapObj::SetShow(int show)
  */
 void CMapObj::SetLink()
 {
+    CMapObj* mapStart = MapObjArrayStart();
     CMapObj* head0 = 0;
-    CMapObj* search0 = MapObjArrayStart();
-    CMapObj* mapStart1 = MapObjArrayStart();
-    CMapObj* mapStart2 = MapObjArrayStart();
-    CMapObj* mapStart3 = MapObjArrayStart();
-    CMapObj* mapStart4 = MapObjArrayStart();
-    CMapObj* mapStart5 = MapObjArrayStart();
-    CMapObj* mapStart6 = MapObjArrayStart();
+    CMapObj* search0 = mapStart;
 
     while (true) {
         CMapObj* child0 = MapMng.SearchChildMapObj(search0, this);
@@ -653,7 +648,7 @@ void CMapObj::SetLink()
         }
 
         ObjAt(child0, 0x8) = head0;
-        CMapObj* search1 = mapStart6;
+        CMapObj* search1 = mapStart;
         CMapObj* head1 = 0;
         while (true) {
             CMapObj* child1 = MapMng.SearchChildMapObj(search1, child0);
@@ -663,7 +658,7 @@ void CMapObj::SetLink()
 
             ObjAt(child1, 0x8) = head1;
             CMapObj* head2 = 0;
-            CMapObj* search2 = mapStart1;
+            CMapObj* search2 = mapStart;
             while (true) {
                 CMapObj* child2 = MapMng.SearchChildMapObj(search2, child1);
                 if (child2 == 0) {
@@ -672,7 +667,7 @@ void CMapObj::SetLink()
 
                 ObjAt(child2, 0x8) = head2;
                 CMapObj* head3 = 0;
-                CMapObj* search3 = mapStart2;
+                CMapObj* search3 = mapStart;
                 while (true) {
                     CMapObj* child3 = MapMng.SearchChildMapObj(search3, child2);
                     if (child3 == 0) {
@@ -681,7 +676,7 @@ void CMapObj::SetLink()
 
                     ObjAt(child3, 0x8) = head3;
                     CMapObj* head4 = 0;
-                    CMapObj* search4 = mapStart3;
+                    CMapObj* search4 = mapStart;
                     while (true) {
                         CMapObj* child4 = MapMng.SearchChildMapObj(search4, child3);
                         if (child4 == 0) {
@@ -690,7 +685,7 @@ void CMapObj::SetLink()
 
                         ObjAt(child4, 0x8) = head4;
                         CMapObj* head5 = 0;
-                        CMapObj* search5 = mapStart4;
+                        CMapObj* search5 = mapStart;
                         while (true) {
                             CMapObj* child5 = MapMng.SearchChildMapObj(search5, child4);
                             if (child5 == 0) {
@@ -699,7 +694,7 @@ void CMapObj::SetLink()
 
                             ObjAt(child5, 0x8) = head5;
                             CMapObj* head6 = 0;
-                            CMapObj* search6 = mapStart5;
+                            CMapObj* search6 = mapStart;
                             while (true) {
                                 CMapObj* child6 = MapMng.SearchChildMapObj(search6, child5);
                                 if (child6 == 0) {
@@ -708,7 +703,7 @@ void CMapObj::SetLink()
 
                                 ObjAt(child6, 0x8) = head6;
                                 CMapObj* head7 = 0;
-                                CMapObj* search7 = mapStart6;
+                                CMapObj* search7 = mapStart;
                                 while (true) {
                                     CMapObj* child7 = MapMng.SearchChildMapObj(search7, child6);
                                     if (child7 == 0) {
@@ -717,7 +712,7 @@ void CMapObj::SetLink()
 
                                     ObjAt(child7, 0x8) = head7;
                                     CMapObj* head8 = 0;
-                                    CMapObj* search8 = mapStart6;
+                                    CMapObj* search8 = mapStart;
                                     while (true) {
                                         CMapObj* child8 = MapMng.SearchChildMapObj(search8, child7);
                                         if (child8 == 0) {

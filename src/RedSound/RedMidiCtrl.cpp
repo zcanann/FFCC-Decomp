@@ -17,6 +17,7 @@ extern int PTR_SineSwing__Fi_8021e9d0[];
 extern "C" {
 void* memmove(void*, const void*, unsigned long);
 void* memset(void*, int, unsigned long);
+int GetWaveBank__9CRedEntryFi(CRedEntry*, int);
 }
 
 /*
@@ -737,12 +738,38 @@ void __MidiCtrl_Wave(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C861C
+ * PAL Size: 168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_WaveWithBank(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_WaveWithBank(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+	u8* command;
+	u8 bankNo;
+	u32 waveNo;
+	int waveBank;
+	int* trackData = (int*)track;
+
+	command = (u8*)trackData[0];
+	trackData[0] = (int)(command + 1);
+	bankNo = *command;
+	command = (u8*)trackData[0];
+	trackData[0] = (int)(command + 1);
+	waveNo = *command;
+	trackData[7] = 0;
+	trackData[0x47] = 0;
+	waveBank = GetWaveBank__9CRedEntryFi(&DAT_8032e154, bankNo);
+	if (waveBank != 0) {
+		waveBank = *(int*)(waveBank + 8);
+		trackData[7] = waveBank + *(int*)(waveBank + 0x20 + waveNo * 4);
+		trackData[0x47] = *(int*)(waveBank + 0x10);
+		memset(trackData + 0x35, 0xffffffff, 0xc);
+	}
+	*(u8*)((int)trackData + 0x14d) = bankNo;
+	trackData[0x49] = waveNo;
 }
 
 /*
@@ -797,12 +824,31 @@ void __MidiCtrl_PanDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C88E0
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_PanChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_PanChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+	int delta[4];
+	u8* command;
+	int* trackData = (int*)track;
+
+	delta[0] = DeltaTimeSumup((unsigned char**)trackData);
+	if (delta[0] == 0) {
+		delta[0] = 1;
+	}
+	if (trackData[0x2d] == 0) {
+		trackData[0x10] += trackData[0x33] * 0x1000;
+		trackData[0x33] = 0;
+	}
+	command = (u8*)trackData[0];
+	trackData[0] = (int)(command + 1);
+	trackData[0x11] = DataAddCompute(trackData + 0x10, *command, delta);
+	trackData[0x12] = delta[0];
 }
 
 /*
@@ -1410,12 +1456,31 @@ void __MidiCtrl_TremoloDelay(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C9718
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_ShakeOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_ShakeOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+	u32 rate;
+	int* trackData = (int*)track;
+
+	trackData[0x30] = *(u8*)trackData[0] << 0xc;
+	if (*(char*)(trackData[0] + 1) == '\0') {
+		rate = 0x100;
+	} else {
+		rate = *(u8*)(trackData[0] + 1);
+	}
+	trackData[0x2e] = 0x100000 / rate;
+	trackData[0x2d] = PTR_SineSwing__Fi_8021e9d0[*(u8*)(trackData[0] + 2) & 0xf];
+	*(u16*)((u8*)trackData + 0xd2) = 0;
+	*(u16*)(trackData + 0x34) = 0;
+	trackData[0x32] = 0;
+	trackData[0x33] = 0;
+	trackData[0] += 3;
 }
 
 /*

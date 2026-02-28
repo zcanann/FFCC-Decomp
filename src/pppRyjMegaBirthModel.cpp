@@ -58,6 +58,9 @@ void alloc_check(VRyjMegaBirthModel*, PRyjMegaBirthModel*)
  */
 void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyjMegaBirthModelOffsets* offsets)
 {
+    float posX;
+    float posY;
+    float posZ;
     bool hasRequiredMemory;
     s32 colorOffset = offsets->m_serializedDataOffsets[1];
     u8* work = (u8*)pObject + 0x80 + offsets->m_serializedDataOffsets[2];
@@ -92,22 +95,29 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
         *(float*)(work + 0x8) = *(float*)(payload + 0x100);
         PSVECNormalize((Vec*)(work + 0x0), (Vec*)(work + 0x0));
 
-        *(float*)(work + 0x20) = pObject->m_localMatrix.value[0][3];
-        *(float*)(work + 0x24) = pObject->m_localMatrix.value[1][3];
-        *(float*)(work + 0x28) = pObject->m_localMatrix.value[2][3];
-        *(float*)(work + 0x2C) = pObject->m_localMatrix.value[0][3];
-        *(float*)(work + 0x30) = pObject->m_localMatrix.value[1][3];
-        *(float*)(work + 0x34) = pObject->m_localMatrix.value[2][3];
+        posX = pObject->m_localMatrix.value[0][3];
+        posY = pObject->m_localMatrix.value[1][3];
+        posZ = pObject->m_localMatrix.value[2][3];
+        *(float*)(work + 0x20) = posX;
+        *(float*)(work + 0x24) = posY;
+        *(float*)(work + 0x28) = posZ;
+        *(float*)(work + 0x2C) = posX;
+        *(float*)(work + 0x30) = posY;
+        *(float*)(work + 0x34) = posZ;
     }
 
     if (*(void**)(work + 0xC) == 0) {
         hasRequiredMemory = false;
-    } else if ((*(u8*)(payload + 0x136) != 0) && (*(void**)(work + 0x10) == 0)) {
-        hasRequiredMemory = false;
-    } else if ((*(u8*)(payload + 0x131) == 0) || (*(void**)(work + 0x14) != 0)) {
-        hasRequiredMemory = true;
     } else {
-        hasRequiredMemory = false;
+        if ((*(u8*)(payload + 0x136) == 0) || (*(void**)(work + 0x10) != 0)) {
+            if ((*(u8*)(payload + 0x131) == 0) || (*(void**)(work + 0x14) != 0)) {
+                hasRequiredMemory = true;
+            } else {
+                hasRequiredMemory = false;
+            }
+        } else {
+            hasRequiredMemory = false;
+        }
     }
 
     if (hasRequiredMemory) {

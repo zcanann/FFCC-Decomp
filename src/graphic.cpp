@@ -1086,22 +1086,154 @@ void CGraphic::CopySaveFrameBuffer()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80017b30
+ * PAL Size: 716b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGraphic::GetBackBufferRect(int&, int&, int&, int&, int)
+void CGraphic::GetBackBufferRect(int& x, int& y, int& width, int& height, int doClear)
 {
-	// TODO
+    if (((x & 1) ^ (x >> 31)) != (x >> 31)) {
+        x -= 1;
+    }
+    if (((y & 1) ^ (y >> 31)) != (y >> 31)) {
+        y -= 1;
+    }
+
+    int xEnd = x + width;
+    int yEnd = y + height;
+
+    if (((xEnd & 1) ^ (xEnd >> 31)) != (xEnd >> 31)) {
+        xEnd += 1;
+        width += 1;
+    }
+    if (((yEnd & 1) ^ (yEnd >> 31)) != (yEnd >> 31)) {
+        yEnd += 1;
+        height += 1;
+    }
+
+    if ((xEnd < 0) || (yEnd < 0)) {
+        return;
+    }
+
+    void* renderMode = PtrAt(this, 0x71E0);
+    int efbWidth = static_cast<int>(U16At(renderMode, 4));
+    int efbHeight = static_cast<int>(U16At(renderMode, 6));
+
+    if ((x > efbWidth) || (y > efbHeight) || (width <= 0) || (height <= 0)) {
+        return;
+    }
+
+    if (xEnd > efbWidth) {
+        width -= (xEnd - efbWidth);
+        xEnd = efbWidth;
+    }
+
+    if (x < 0) {
+        width += x;
+        x = 0;
+    }
+
+    if (y < 0) {
+        height += y;
+        y = 0;
+    }
+
+    if (yEnd > efbHeight) {
+        height -= (yEnd - efbHeight);
+        yEnd = efbHeight;
+    }
+
+    if ((xEnd == x) || (yEnd == y)) {
+        return;
+    }
+
+    int texFormat = 6;
+    int textureSize = width * height * 4;
+    int maxTextureSize = (((efbWidth + 0xF) & 0xFFF0) * efbHeight * 2) + 0x46000;
+    if (maxTextureSize < textureSize) {
+        texFormat = 4;
+        textureSize /= 2;
+    }
+
+    GXSetTexCopySrc(x & 0xFFFF, y & 0xFFFF, width & 0xFFFF, height & 0xFFFF);
+    GXSetTexCopyDst(width & 0xFFFF, height & 0xFFFF, static_cast<_GXTexFmt>(texFormat), GX_FALSE);
+    DCInvalidateRange(PtrAt(this, 0x71E8), textureSize);
+    GXCopyTex(PtrAt(this, 0x71E8), doClear);
+    GXPixModeSync();
+    GXInvalidateTexAll();
+    GXInitTexObj(reinterpret_cast<_GXTexObj*>(reinterpret_cast<u8*>(this) + 0x720C), PtrAt(this, 0x71E8), width & 0xFFFF,
+                 height & 0xFFFF, static_cast<_GXTexFmt>(texFormat), GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXInitTexObjLOD(reinterpret_cast<_GXTexObj*>(reinterpret_cast<u8*>(this) + 0x720C), GX_LINEAR, GX_LINEAR, FLOAT_8032f6c0,
+                    FLOAT_8032f6c0, FLOAT_8032f6c0, GX_FALSE, GX_FALSE, GX_ANISO_1);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80017980
+ * PAL Size: 432b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGraphic::GetBackBufferRect2(void*, _GXTexObj*, int, int, int, int, int, _GXTexFilter, _GXTexFmt, int)
+void CGraphic::GetBackBufferRect2(void* dstBuffer, _GXTexObj* texObj, int x, int y, int width, int height, int dstOffset,
+                                  _GXTexFilter filter, _GXTexFmt format, int doClear)
 {
-	// TODO
+    int xEnd = x + width;
+    int yEnd = y + height;
+    if ((xEnd < 0) || (yEnd < 0)) {
+        return;
+    }
+
+    void* renderMode = PtrAt(this, 0x71E0);
+    int efbWidth = static_cast<int>(U16At(renderMode, 4));
+    int efbHeight = static_cast<int>(U16At(renderMode, 6));
+
+    if ((x > efbWidth) || (y > efbHeight) || (width <= 0) || (height <= 0) || (xEnd == x) || (yEnd == y)) {
+        return;
+    }
+
+    int textureSize = GXGetTexBufferSize(width & 0xFFFF, height & 0xFFFF, format, GX_FALSE, GX_FALSE);
+    void* textureBase = reinterpret_cast<void*>((reinterpret_cast<u32>(dstBuffer) + ((dstOffset + 0x1F) & 0xFFFFFFE0) + 0x1F) &
+                                                0xFFFFFFE0);
+
+    GXSetTexCopySrc(x & 0xFFFF, y & 0xFFFF, width & 0xFFFF, height & 0xFFFF);
+    GXSetTexCopyDst(width & 0xFFFF, height & 0xFFFF, format, GX_FALSE);
+    DCInvalidateRange(textureBase, textureSize);
+    GXCopyTex(textureBase, doClear);
+    GXPixModeSync();
+    GXInvalidateTexAll();
+
+    int initFormat = format;
+    switch (format) {
+    case GX_CTF_R4:
+    case GX_CTF_RA4:
+        initFormat = 0;
+        break;
+    case GX_CTF_RA8:
+    case GX_CTF_A8:
+    case GX_CTF_R8:
+    case GX_CTF_G8:
+    case GX_CTF_B8:
+        initFormat = 1;
+        break;
+    case GX_CTF_RG8:
+    case GX_CTF_GB8:
+        initFormat = 3;
+        break;
+    default:
+        break;
+    }
+
+    if (texObj != nullptr) {
+        GXInitTexObj(texObj, textureBase, width & 0xFFFF, height & 0xFFFF, static_cast<_GXTexFmt>(initFormat), GX_CLAMP,
+                     GX_CLAMP, GX_FALSE);
+        GXInitTexObjLOD(texObj, filter, filter, FLOAT_8032f6c0, FLOAT_8032f6c0, FLOAT_8032f6c0, GX_FALSE, GX_FALSE,
+                        GX_ANISO_1);
+    }
 }
 
 /*

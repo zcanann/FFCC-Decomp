@@ -1,7 +1,9 @@
 #include "ffcc/menu_letter.h"
+#include "ffcc/fontman.h"
 #include "ffcc/pad.h"
 #include "ffcc/p_game.h"
 #include "ffcc/sound.h"
+#include "ffcc/system.h"
 
 #include <string.h>
 
@@ -27,11 +29,49 @@ extern "C" void AddGil__12CCaravanWorkFi(void*, int);
 extern "C" int CanAddGil__12CCaravanWorkFi(void*, int);
 extern "C" void FGLetterReply__12CCaravanWorkFiiii(void*, int, int, int, int);
 extern "C" void DeleteItemIdx__12CCaravanWorkFii(void*, int, int);
+extern "C" void DrawSingleCrescent__8CMenuPcsFff(CMenuPcs*, float, float);
+extern "C" void DrawSingleStat__8CMenuPcsFf(CMenuPcs*, float);
+extern "C" void DrawSingleHelpWim__8CMenuPcsFf(CMenuPcs*, float);
+extern "C" void SetMargin__5CFontFf(float, CFont*);
+extern "C" void SetShadow__5CFontFi(CFont*, int);
+extern "C" void SetScale__5CFontFf(float, CFont*);
+extern "C" void DrawInit__5CFontFv(CFont*);
+extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
+extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
+extern "C" void DrawShadowFont__8CMenuPcsFP5CFontPcffii(CMenuPcs*, CFont*, const char*, float, float, int, int);
+extern "C" void SetTlut__5CFontFi(CFont*, int);
+extern "C" void SetPosX__5CFontFf(float, CFont*);
+extern "C" void SetPosY__5CFontFf(float, CFont*);
+extern "C" void Draw__5CFontFPc(CFont*, const char*);
+extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
+extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
+extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
+extern "C" void DrawRect__8CMenuPcsFUlfffffffff(double, double, double, double, double, double, double, double, CMenuPcs*, int);
+extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(double, CMenuPcs*, int, int, int, float);
+extern "C" void DrawCursor__8CMenuPcsFiif(double, CMenuPcs*, int, int);
 extern "C" int m_tempVar__4CMes[];
 extern u8 CFlat[];
 
+extern float FLOAT_80333088;
+extern float FLOAT_8033308c;
+extern float FLOAT_803330a0;
 extern float FLOAT_803330bc;
+extern float FLOAT_803330b8;
+extern float FLOAT_803330c0;
+extern float FLOAT_803330f4;
 extern float FLOAT_803330f8;
+extern float FLOAT_80333148;
+extern float FLOAT_80333158;
+extern float FLOAT_8033315c;
+extern float FLOAT_80333160;
+extern float FLOAT_80333164;
+extern float FLOAT_80333168;
+extern double DOUBLE_80333090;
+extern double DOUBLE_80333098;
+extern double DOUBLE_803330a8;
+extern double DOUBLE_803330b0;
+extern double DOUBLE_803330c8;
+extern double DOUBLE_803330e8;
 
 namespace {
 unsigned char DAT_8032eeea = 0;
@@ -1032,12 +1072,149 @@ void CMenuPcs::LetterDraw()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 80165554
+ * PAL Size: 1528b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::LetterListDraw()
 {
-	// TODO
+	int menuDataBase = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
+
+	if ((DAT_8032eeea != 0) && (*reinterpret_cast<char*>(reinterpret_cast<char*>(this) + 0x872) == '\0')) {
+		float anim = static_cast<float>(DOUBLE_803330e8 - static_cast<double>(*reinterpret_cast<float*>(menuDataBase + 0x18)));
+		DrawSingleCrescent__8CMenuPcsFff(this, FLOAT_803330f8, anim);
+		DrawSingleStat__8CMenuPcsFf(this, anim);
+		DrawSingleHelpWim__8CMenuPcsFf(this, anim);
+	}
+
+	if (**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) == 1) {
+		return;
+	}
+
+	LetterLstBaseDraw(*reinterpret_cast<float*>(menuDataBase + 0x58));
+
+	CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<char*>(this) + 0xF8);
+	SetMargin__5CFontFf(FLOAT_803330f8, font);
+	SetShadow__5CFontFi(font, 1);
+	SetScale__5CFontFf(FLOAT_803330f8, font);
+	DrawInit__5CFontFv(font);
+
+	GXColor titleColor = {0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_803330a0 * *reinterpret_cast<float*>(menuDataBase + 0x58))};
+	SetColor__5CFontF8_GXColor(font, &titleColor);
+
+	const char* menuTitle = GetMenuStr__8CMenuPcsFi(this, 0x1D);
+	float titleX = static_cast<float>((static_cast<double>(FLOAT_80333158) - static_cast<double>(GetWidth__5CFontFPc(font, menuTitle))) *
+	                                  DOUBLE_803330a8);
+	DrawShadowFont__8CMenuPcsFP5CFontPcffii(this, font, menuTitle, titleX, FLOAT_8033315c, 0x18, 0x12);
+
+	if (DOUBLE_803330e8 > static_cast<double>(*reinterpret_cast<float*>(menuDataBase + 0x58))) {
+		return;
+	}
+
+	GXColor textColor = {0xFF, 0xFF, 0xFF, 0xFF};
+	SetColor__5CFontF8_GXColor(font, &textColor);
+
+	const unsigned int caravanWork = Game.game.m_scriptFoodBase[0];
+	const int topRow = static_cast<int>(*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x34));
+	FlatDataView* flatData = reinterpret_cast<FlatDataView*>(&Game.game.m_cFlatDataArr[1]);
+
+	int y = 0x60;
+	for (int row = 0; row < 9; ++row) {
+		const int letterIndex = topRow + row;
+		if (letterIndex >= *reinterpret_cast<int*>(caravanWork + 1000)) {
+			break;
+		}
+
+		const int letterOffset = caravanWork + letterIndex * 0xC + 0x3EC;
+		const unsigned int letterWord = *reinterpret_cast<unsigned int*>(letterOffset);
+
+		int tlut = 9;
+		if (static_cast<signed char>(*reinterpret_cast<unsigned char*>(letterOffset)) < 0) {
+			tlut = ((*reinterpret_cast<unsigned char*>(letterOffset) >> 5) & 1) ? 8 : 0;
+		}
+
+		SetTlut__5CFontFi(font, tlut);
+
+		const char* from = flatData->m_tabl[5].m_strings[(letterWord & 0x7FC) >> 2];
+		SetPosX__5CFontFf(FLOAT_80333160, font);
+		SetPosY__5CFontFf(static_cast<float>(static_cast<double>(y) - static_cast<double>(FLOAT_80333148)), font);
+		Draw__5CFontFPc(font, from);
+
+		const char* subject = flatData->m_tabl[2].m_strings[(letterWord >> 7) & 0x1FF];
+		SetPosX__5CFontFf(FLOAT_80333164, font);
+		SetPosY__5CFontFf(static_cast<float>(static_cast<double>(y) - static_cast<double>(FLOAT_80333148)), font);
+		Draw__5CFontFPc(font, subject);
+
+		y += 0x20;
+	}
+
+	DrawInit__8CMenuPcsFv(this);
+
+	unsigned char pageMark = (*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x34) != 0) ? 1 : 0;
+	if (topRow + 9 < *reinterpret_cast<int*>(caravanWork + 1000)) {
+		pageMark = static_cast<unsigned char>(pageMark | 2);
+	}
+
+	if (pageMark != 0) {
+		const int frame = static_cast<int>(System.m_frameCounter);
+		const int cycle = ((frame / 0x14) + (frame >> 31));
+		const int phase = (frame + (cycle - (cycle >> 31)) * -0x14) - 10;
+		const unsigned int absPhase = static_cast<unsigned int>(phase < 0 ? -phase : phase);
+		const double markScale = static_cast<double>(static_cast<float>(DOUBLE_80333098 * static_cast<double>(absPhase) + DOUBLE_80333090));
+
+		SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+
+		const int alpha = static_cast<int>(FLOAT_803330a0 *
+		                                   static_cast<float>(DOUBLE_803330b0 * static_cast<double>(absPhase) + DOUBLE_803330a8));
+		GXColor markColor = {0xFF, 0xFF, 0xFF, static_cast<u8>(alpha)};
+		GXSetChanMatColor(GX_COLOR0A0, markColor);
+		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x43);
+
+		const double iconSize = static_cast<double>(FLOAT_803330b8);
+		const double iconOffset = -static_cast<double>(static_cast<float>((iconSize * markScale - iconSize) * DOUBLE_803330a8));
+		const double markX = static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_80333088) + iconOffset));
+		const double markY = static_cast<double>(static_cast<float>(static_cast<double>(FLOAT_8033308c) + iconOffset));
+
+		if ((pageMark & 1) != 0) {
+			DrawRect__8CMenuPcsFUlfffffffff(
+			    markX, markY, iconSize, iconSize,
+			    static_cast<double>(FLOAT_803330bc), static_cast<double>(FLOAT_803330bc),
+			    markScale, markScale, this, 4);
+		}
+		if ((pageMark & 2) != 0) {
+			DrawRect__8CMenuPcsFUlfffffffff(
+			    markX, static_cast<double>(static_cast<float>(markY + static_cast<double>(FLOAT_803330c0))),
+			    iconSize, iconSize,
+			    static_cast<double>(FLOAT_803330bc), static_cast<double>(FLOAT_803330bc),
+			    markScale, markScale, this, 0);
+		}
+	}
+
+	unsigned int iconY = 0x5B;
+	const int iconX = static_cast<int>(FLOAT_80333168);
+	for (int row = 0; row < 9; ++row) {
+		const int letterIndex = topRow + row;
+		if (letterIndex >= *reinterpret_cast<int*>(caravanWork + 1000)) {
+			break;
+		}
+
+		const int entry = caravanWork + letterIndex * 0xC;
+		if ((*reinterpret_cast<u16*>(entry + 0x3EE) & 0x1FF) != 0) {
+			const int icon = 0x26 + ((*reinterpret_cast<unsigned char*>(entry + 0x3EC) >> 6) & 1);
+			DrawSingleIcon__8CMenuPcsFiiifif(
+			    FLOAT_803330f8, this, icon, iconX,
+			    static_cast<int>(iconY), FLOAT_803330f8);
+		}
+		iconY += 0x20;
+	}
+
+	const int cursorState = *reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x26);
+	const int cursorX = static_cast<int>(FLOAT_803330f4 + static_cast<float>(System.m_frameCounter & 7));
+	const int cursorY = cursorState * 0x20 + 0x60;
+	DrawCursor__8CMenuPcsFiif(FLOAT_803330f8, this, cursorX, cursorY);
 }
 
 /*

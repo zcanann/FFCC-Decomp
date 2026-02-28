@@ -272,11 +272,26 @@ void CGItemObj::onFrame()
 		*(void**)(self + 0x564) = 0;
 
 		if (*(int*)(self + 0x500) == 0xCB) {
-			CVector zero(FLOAT_80331b20, FLOAT_80331b20, FLOAT_80331b20);
-
 			LoadAnim__8CGObjectFPciiiUl(this, 0, 0, 0, 0, 0);
 			SetAnimSlot__8CGObjectFii(this, 0, 0);
 			PlayAnim__8CGObjectFiiiiiPSc(this, 0, 1, 0, -1, -1, 0);
+
+			int soundEntry = *(int*)(*(int*)(SoundBuffer + 0x1260 + 0xF8) + 0x178);
+			if (soundEntry == 0) {
+				soundEntry = -1;
+			} else {
+				soundEntry = *(int*)(soundEntry + 0x14);
+			}
+
+			int ownerAttr = *(int*)(*(int*)(*(int*)(self + 0x550) + 0x58) + 0x3B4);
+			int itemDataEntry = Game.game.unkCFlatData0[2] + *(int*)(self + 0x504) * 0x48;
+			float particleScale =
+			    FLOAT_80331b50 * (float)(unsigned short)*(unsigned short*)(itemDataEntry + 0x10) + FLOAT_80331b4c;
+
+			putParticle__8CGPrgObjFiiP8CGObjectfi(this, (soundEntry << 8) | ownerAttr, *(int*)(self + 0x558), this,
+			                                      particleScale, 0x12909);
+
+			CVector zero(FLOAT_80331b20, FLOAT_80331b20, FLOAT_80331b20);
 			SetDamageCol__8CGObjectFiPcffP3Vec(this, 0, DAT_80331bc8, FLOAT_80331bb8, FLOAT_80331bb8,
 			                                   reinterpret_cast<Vec*>(&zero));
 			*(int*)(self + 0x384) = 8;

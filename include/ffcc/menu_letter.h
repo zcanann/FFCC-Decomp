@@ -28,7 +28,7 @@ public:
     void LetterDraw();
     void LetterListDraw();
     void LetterMessDraw();
-    void LetterCtrlCur();
+    int LetterCtrlCur();
     void LetterLstBaseDraw(float);
     void LetterDrawPageMark(int);
     void LetterSetAttachItem(unsigned int, int);

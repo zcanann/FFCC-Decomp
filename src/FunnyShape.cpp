@@ -298,60 +298,58 @@ void CFunnyShape::Update()
     }
 
     const u32 noSpread = (((U32At(this, 0) >> 7) & 1) ^ 1);
-    const s16 count = *reinterpret_cast<s16*>(Ptr(this, 0x28));
-    u8* entry = Ptr(this, 0x30);
-
-    for (s16 i = 0; i < count; i++) {
-        *reinterpret_cast<s16*>(entry + 0x16) = static_cast<s16>(*reinterpret_cast<s16*>(entry + 0x16) - 0x200);
-        if (*reinterpret_cast<s16*>(entry + 0x16) < 1) {
-            *reinterpret_cast<s16*>(entry + 0x14) = static_cast<s16>(*reinterpret_cast<s16*>(entry + 0x14) + 1);
+    CFunnyShape* cur = this;
+    for (s32 i = 0; i < *reinterpret_cast<s16*>(Ptr(this, 0x28)); i++) {
+        *reinterpret_cast<s16*>(Ptr(cur, 0x46)) = static_cast<s16>(*reinterpret_cast<s16*>(Ptr(cur, 0x46)) - 0x200);
+        if (*reinterpret_cast<s16*>(Ptr(cur, 0x46)) < 1) {
+            *reinterpret_cast<s16*>(Ptr(cur, 0x44)) = static_cast<s16>(*reinterpret_cast<s16*>(Ptr(cur, 0x44)) + 1);
             if (*reinterpret_cast<s16*>(reinterpret_cast<u8*>(PtrAt(this, 0xC)) + 6) <=
-                *reinterpret_cast<s16*>(entry + 0x14)) {
-                *reinterpret_cast<s16*>(entry + 0x14) = 0;
+                *reinterpret_cast<s16*>(Ptr(cur, 0x44))) {
+                *reinterpret_cast<s16*>(Ptr(cur, 0x44)) = 0;
 
                 s32 r = rand();
                 const s16 range = *reinterpret_cast<s16*>(Ptr(this, 0x2A));
-                *reinterpret_cast<float*>(entry + 8) = static_cast<float>(r - (r / range) * range);
+                *reinterpret_cast<float*>(Ptr(cur, 0x38)) = static_cast<float>(r - (r / range) * range);
 
                 r = rand();
-                *reinterpret_cast<float*>(entry + 0xC) = static_cast<float>(r - (r / range) * range);
-                *reinterpret_cast<float*>(entry + 0x10) = FLOAT_8032fd6c;
-                *reinterpret_cast<s16*>(entry + 0x16) = 2;
-                *reinterpret_cast<float*>(entry + 0x20) = FLOAT_8032fd6c;
-                *reinterpret_cast<float*>(entry + 0x24) = FLOAT_8032fd6c;
+                *reinterpret_cast<float*>(Ptr(cur, 0x3C)) = static_cast<float>(r - (r / range) * range);
+                *reinterpret_cast<float*>(Ptr(cur, 0x40)) = FLOAT_8032fd6c;
+                *reinterpret_cast<s16*>(Ptr(cur, 0x46)) = 2;
+                *reinterpret_cast<float*>(Ptr(cur, 0x50)) = FLOAT_8032fd6c;
+                *reinterpret_cast<float*>(Ptr(cur, 0x54)) = FLOAT_8032fd6c;
 
                 r = rand();
                 s32 q = r / 0x168 + (r >> 0x1F);
                 q = r + (q - (q >> 0x1F)) * -0x168;
-                *reinterpret_cast<float*>(entry + 0x28) =
+                *reinterpret_cast<float*>(Ptr(cur, 0x58)) =
                     (FLOAT_8032fda4 * static_cast<float>(q)) / FLOAT_8032fda8;
 
                 u32 u = static_cast<u32>(rand());
                 if (((u & 1) ^ (u >> 0x1F)) != (u >> 0x1F)) {
-                    *reinterpret_cast<float*>(entry + 8) *= FLOAT_8032fd80;
+                    *reinterpret_cast<float*>(Ptr(cur, 0x38)) *= FLOAT_8032fd80;
                 }
 
                 u = static_cast<u32>(rand());
                 if (((u & 1) ^ (u >> 0x1F)) != (u >> 0x1F)) {
-                    *reinterpret_cast<float*>(entry + 0xC) *= FLOAT_8032fd80;
+                    *reinterpret_cast<float*>(Ptr(cur, 0x3C)) *= FLOAT_8032fd80;
                 }
 
                 if (noSpread != 0) {
-                    *reinterpret_cast<s16*>(entry + 0x14) = 0;
-                    *reinterpret_cast<float*>(entry + 8) = FLOAT_8032fd6c;
-                    *reinterpret_cast<float*>(entry + 0xC) = FLOAT_8032fd6c;
+                    *reinterpret_cast<s16*>(Ptr(cur, 0x44)) = 0;
+                    *reinterpret_cast<float*>(Ptr(cur, 0x38)) = FLOAT_8032fd6c;
+                    *reinterpret_cast<float*>(Ptr(cur, 0x3C)) = FLOAT_8032fd6c;
                 }
             }
 
-            *reinterpret_cast<s16*>(entry + 0x16) = *reinterpret_cast<s16*>(
-                reinterpret_cast<u8*>(PtrAt(this, 0xC)) + *reinterpret_cast<s16*>(entry + 0x14) * 8 + 0x12);
+            *reinterpret_cast<s16*>(Ptr(cur, 0x46)) = *reinterpret_cast<s16*>(
+                reinterpret_cast<u8*>(PtrAt(this, 0xC)) + *reinterpret_cast<s16*>(Ptr(cur, 0x44)) * 8 + 0x12);
         }
 
         if (noSpread != 0) {
             return;
         }
 
-        entry += 0x30;
+        cur = reinterpret_cast<CFunnyShape*>(Ptr(cur, 0x30));
     }
 }
 

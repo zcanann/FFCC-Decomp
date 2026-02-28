@@ -1962,6 +1962,23 @@ void CFlatRuntime2::PutParticleWork()
 void CFlatRuntime2::ResetParticleWork(int workNo, int arg)
 {
 	u8* runtime = reinterpret_cast<u8*>(this);
+	float one = 1.0f;
+	u8 clear3[3] = { 0, 0, 0 };
+	int seNo = -1;
+	int sePacked = 0x00000100;
+	int seParam = 0;
+	int seDelay = 0x1E;
+	int seFrame = -1;
+	int paramNo = 0;
+	int paramId = 0;
+	int ex0 = 0;
+	int ex1 = 0;
+	int ex2 = 0;
+	int ex3 = 0;
+	int ex4 = 0;
+	int ex5 = 0;
+	int ex6 = 0;
+	int ex7 = 0;
 
 	ParticleWorkPosPtr(this) = 0;
 	ParticleWorkPosVecPtr(this) = 0;
@@ -1972,24 +1989,26 @@ void CFlatRuntime2::ResetParticleWork(int workNo, int arg)
 	ParticleWorkTrace(this) = 0;
 	ParticleWorkColor0(this) = 0;
 	ParticleWorkColor1(this) = 0;
-	ParticleWorkSpeed(this) = 1.0f;
-	ParticleWorkColorLerp(this) = 1.0f;
+	ParticleWorkSpeed(this) = one;
+	ParticleWorkColorLerp(this) = one;
 	runtime[0x16F8] = 0;
-	memset(runtime + 0x16F9, 0, 3);
+	memcpy(runtime + 0x16F9, clear3, sizeof(clear3));
 
-	ParticleWorkSeNo(this) = -1;
-	runtime[0x1700] = 0;
-	ParticleWorkSeKind(this) = 1;
-	runtime[0x1702] = 0;
-	runtime[0x1703] = 0;
-	ParticleWorkSeParam(this) = 0;
-	*reinterpret_cast<int*>(runtime + 0x1708) = 0x1E;
-	*reinterpret_cast<int*>(runtime + 0x170C) = -1;
-	ParticleWorkParamNo(this) = 0;
-	ParticleWorkParamId(this) = 0;
-	runtime[0x1716] = 0;
-	runtime[0x1717] = 0;
-	memset(runtime + 0x1718, 0, 0x20);
+	*reinterpret_cast<int*>(runtime + 0x16FC) = seNo;
+	*reinterpret_cast<int*>(runtime + 0x1700) = sePacked;
+	*reinterpret_cast<int*>(runtime + 0x1704) = seParam;
+	*reinterpret_cast<int*>(runtime + 0x1708) = seDelay;
+	*reinterpret_cast<int*>(runtime + 0x170C) = seFrame;
+	*reinterpret_cast<int*>(runtime + 0x1710) = paramNo;
+	*reinterpret_cast<int*>(runtime + 0x1714) = paramId;
+	*reinterpret_cast<int*>(runtime + 0x1718) = ex0;
+	*reinterpret_cast<int*>(runtime + 0x171C) = ex1;
+	*reinterpret_cast<int*>(runtime + 0x1720) = ex2;
+	*reinterpret_cast<int*>(runtime + 0x1724) = ex3;
+	*reinterpret_cast<int*>(runtime + 0x1728) = ex4;
+	*reinterpret_cast<int*>(runtime + 0x172C) = ex5;
+	*reinterpret_cast<int*>(runtime + 0x1730) = ex6;
+	*reinterpret_cast<int*>(runtime + 0x1734) = ex7;
 
 	runtime[0x16F8] = 1;
 	ParticleWorkNoHi(this) = workNo >> 8;

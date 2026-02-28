@@ -335,8 +335,8 @@ void GXSetTevSwapMode(GXTevStageID stage, GXTevSwapSel ras_sel, GXTevSwapSel tex
     ASSERTMSGLINE(943, stage < GX_MAX_TEVSTAGE, "GXSetTevSwapMode: Invalid Tev Stage Index");
 
     pTevReg = &__GXData->teva[stage];
-    SET_REG_FIELD(946, *pTevReg, 2, 0, ras_sel);
-    SET_REG_FIELD(947, *pTevReg, 2, 2, tex_sel);
+    *pTevReg = (*pTevReg & 0xFFFFFFFC) | ras_sel;
+    *pTevReg = (*pTevReg & 0xFFFFFFF3) | ((u32)tex_sel << 2);
 
     GX_WRITE_RAS_REG(*pTevReg);
     __GXData->bpSentNot = 0;

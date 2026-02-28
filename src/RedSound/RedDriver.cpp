@@ -1776,22 +1776,30 @@ void CRedDriver::SeVolume(int param_1, int param_2, int param_3)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bf6e8
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::SePan(int, int, int)
+void CRedDriver::SePan(int param_1, int param_2, int param_3)
 {
-	// TODO
+    _EntryExecCommand(_SePan, param_1, param_2, param_3, 0, 0, 0, 0);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bf738
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::SePitch(int, int, int)
+void CRedDriver::SePitch(int param_1, int param_2, int param_3)
 {
-	// TODO
+    _EntryExecCommand(_SePitch, param_1, param_2, param_3, 0, 0, 0, 0);
 }
 
 /*
@@ -1984,12 +1992,16 @@ int CRedDriver::StreamPlay(int param_1, void* param_2, int param_3, int param_4,
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bfb1c
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::StreamVolume(int, int, int)
+void CRedDriver::StreamVolume(int param_1, int param_2, int param_3)
 {
-	// TODO
+    _EntryExecCommand(_StreamVolume, param_1, param_2, param_3, 0, 0, 0, 0);
 }
 
 /*

@@ -29,6 +29,7 @@ extern float FLOAT_80330894;
 extern float FLOAT_80330898;
 extern float FLOAT_8033089c;
 extern float FLOAT_803308a0;
+extern float FLOAT_803308a4;
 extern float FLOAT_803308ac;
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 extern "C" int m_tempVar__4CMes[];
@@ -159,52 +160,62 @@ void CMes::Set(char* text, int param)
 {
 	*(int*)((char*)this + 4) = (int)text;
 	*(int*)((char*)this + 0x3c74) = 0;
-	*(float*)((char*)this + 0x3ca8) = 0.0f;
-	*(float*)((char*)this + 0x3ca4) = 0.0f;
+	*(float*)((char*)this + 0x3ca8) = FLOAT_8033089c;
+	*(float*)((char*)this + 0x3ca4) = FLOAT_8033089c;
 	*(int*)((char*)this + 8) = 0;
 	*(int*)((char*)this + 0x3c10) = 0;
 	*(int*)((char*)this + 0x3c0c) = 0;
 	*(int*)((char*)this + 0x3d10) = 0;
 	*(int*)((char*)this + 0x3d30) = param;
-	*(float*)((char*)this + 0x3d3c) = 0.0f;
+	*(float*)((char*)this + 0x3d3c) = FLOAT_8033089c;
 	*(int*)((char*)this + 0x3d40) = 0;
-	*(float*)((char*)this + 0x3d44) = 1.0f;
-	*(float*)((char*)this + 0x3d48) = 1.0f;
+	*(float*)((char*)this + 0x3d44) = FLOAT_80330898;
+	*(float*)((char*)this + 0x3d48) = FLOAT_80330898;
 	*(int*)((char*)this + 0x3d4c) = 1;
-	
-	if (text != 0)
-	{
-		// Copy data and process text
-		memcpy((char*)this + 0x3cc0, (char*)this + 0x3cc0, 0x50);
-		
-		while (*(int*)((char*)this + 0x3c74) == 0)
-		{
+
+	if (text != 0) {
+		unsigned char flagBackup[0x50];
+		memcpy(flagBackup, (char*)this + 0x3cc0, sizeof(flagBackup));
+
+		while (*(int*)((char*)this + 0x3c74) == 0) {
 			*(int*)((char*)this + 8) = 0;
 			*(int*)((char*)this + 0x3c10) = 0;
 			*(int*)((char*)this + 0x3c0c) = 0;
-			*(float*)((char*)this + 0x3c88) = 0.0f;
-			*(float*)((char*)this + 0x3c84) = 0.0f;
-			*(float*)((char*)this + 0x3c90) = 0.0f;
-			*(float*)((char*)this + 0x3c8c) = 0.0f;
-			
-			// Call addString - simplified
-			break; // Avoid infinite loop for now
+			*(float*)((char*)this + 0x3c88) = FLOAT_8033089c;
+			*(float*)((char*)this + 0x3c84) = FLOAT_8033089c;
+			*(float*)((char*)this + 0x3c90) = FLOAT_8033089c;
+			*(float*)((char*)this + 0x3c8c) = FLOAT_8033089c;
+
+			addString((char**)((char*)this + 4), 1);
+
+			float width = *(float*)((char*)this + 0x3c8c);
+			if (width > *(float*)((char*)this + 0x3ca4)) {
+				*(float*)((char*)this + 0x3ca4) = width;
+			}
+			float height = *(float*)((char*)this + 0x3c90);
+			if (height > *(float*)((char*)this + 0x3ca8)) {
+				*(float*)((char*)this + 0x3ca8) = height;
+			}
 		}
-		
-		// Final setup
+
+		memcpy((char*)this + 0x3cc0, flagBackup, sizeof(flagBackup));
+		*(float*)((char*)this + 0x3ca4) = *(float*)((char*)this + 0x3ca4) - *(float*)((char*)this + 0x3d3c);
+		*(float*)((char*)this + 0x3ca8) = *(float*)((char*)this + 0x3ca8) - FLOAT_803308a4;
+
 		*(int*)((char*)this + 4) = (int)text;
 		*(int*)((char*)this + 0x3c74) = 0;
-		*(int*)((char*)this + 0x3cb0) = 0;
+		*(int*)((char*)this + 0x3cb0) = (param == 0);
 		*(int*)((char*)this + 0x3cb4) = 3;
 		*(int*)((char*)this + 0x3cb8) = 0;
 		*(int*)((char*)this + 0x3d10) = 0;
 		*(int*)((char*)this + 0x3d2c) = 0;
 		*(int*)((char*)this + 0x3d28) = 7;
-		*(float*)((char*)this + 0x3d3c) = 0.0f;
+		*(float*)((char*)this + 0x3d3c) = FLOAT_8033089c;
 		*(int*)((char*)this + 0x3d40) = 0;
-		*(float*)((char*)this + 0x3d44) = 1.0f;
-		*(float*)((char*)this + 0x3d48) = 1.0f;
+		*(float*)((char*)this + 0x3d44) = FLOAT_80330898;
+		*(float*)((char*)this + 0x3d48) = FLOAT_80330898;
 		*(int*)((char*)this + 0x3d4c) = 1;
+		Next();
 	}
 }
 
@@ -1295,15 +1306,16 @@ void CMes::MakeAgbString(char* out, char* src, int playerIndex, int keepHyphenOn
  */
 unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int breakOnLineTag, int lineBaseY)
 {
-	u32 width = 0;
-	u8* src = (u8*)text;
+	unsigned int width = 0;
+	unsigned char* src = (unsigned char*)text;
 	bool continueDraw = true;
 	float lineStartX = font->posX;
+	int lineStartXInt = (int)lineStartX;
 
 	while (continueDraw)
 	{
-		u8 ch = *src;
-		u8* next = src + 1;
+		unsigned char ch = *src;
+		unsigned char* next = src + 1;
 
 		if (ch == 0)
 		{
@@ -1312,7 +1324,7 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
 		}
 		else if (ch == 0xFF)
 		{
-			u8 tag = *next;
+			unsigned char tag = *next;
 			src += 2;
 			if (tag == 0xA1)
 			{
@@ -1320,20 +1332,20 @@ unsigned long CMes::drawTagString(CFont* font, char* text, int drawChars, int br
 			}
 			else if ((tag == 0xA0) && (breakOnLineTag != 0))
 			{
-				SetPosX__5CFontFf(lineStartX, font);
-				SetPosY__5CFontFf((float)(double)lineBaseY + font->posY + (float)(double)font->m_glyphWidth * font->scaleY, font);
+				SetPosX__5CFontFf((float)lineStartXInt, font);
+				SetPosY__5CFontFf((float)lineBaseY + font->posY + (float)font->m_glyphWidth * font->scaleY, font);
 			}
 		}
 		else
 		{
 			if (drawChars != 0)
 			{
-				Draw__5CFontFUs(font, (unsigned short)ch);
+				Draw__5CFontFUs(font, ch);
 			}
-			width = (u32)((double)(float)(int)width + (double)GetWidth__5CFontFUs(font, (unsigned short)ch));
+			width = (unsigned int)((double)(float)width + (double)GetWidth__5CFontFUs(font, ch));
 			src = next;
 		}
 	}
 
-	return (unsigned long)width;
+	return width;
 }

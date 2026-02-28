@@ -3,6 +3,7 @@
 
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
 	void*, int, int, int, int, void*, void*);
+extern "C" void DeleteParticleSlot__13CFlatRuntime2Fii(void*, int);
 
 extern unsigned char CFlat[];
 
@@ -93,22 +94,33 @@ void CGCharaObj::onCreate()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80112C20
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGCharaObj::onDestroy()
 {
-	// TODO
+	CGPrgObj::onDestroy();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80112BC4
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGCharaObj::ClearAllSta()
 {
-	// TODO
+	for (int i = 0; i < 0x27; i++) {
+		setSta(i, 0);
+	}
+	m_displayFlags |= 2;
 }
 
 /*
@@ -173,12 +185,21 @@ void CGCharaObj::endPSlotBit(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80111FF0
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGCharaObj::deletePSlotBit(int)
+void CGCharaObj::deletePSlotBit(int slotMask)
 {
-	// TODO
+	int* slots = (int*)((char*)this + 0x564);
+	for (int i = 0; i < 0x16; i++) {
+		if (((unsigned int)slotMask & (1U << i)) != 0) {
+			DeleteParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i]);
+		}
+	}
 }
 
 /*

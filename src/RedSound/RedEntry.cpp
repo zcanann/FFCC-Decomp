@@ -5,6 +5,7 @@
 
 extern CRedMemory DAT_8032f480;
 extern int DAT_8032f408;
+extern int DAT_8032e12c;
 extern int DAT_8021d1a8;
 extern char DAT_801e7905;
 extern char DAT_80333d30;
@@ -22,6 +23,14 @@ extern char s__s______________0x_8_8X___0x_8_8_801e7aca[];
 extern char s__s_Entry_Wave____d_801e7b01[];
 extern char s__s_Total_Size___0x_8_8X_801e7b18[];
 extern char s__s_Max_Free_Size___0x_8_8X_801e7b34[];
+extern char s__s_____MMemory_Information______801e7cce[];
+extern char s__s_Name___Start___Size___Free_801e7cef[];
+extern char s__s_MUSIC_3_3d___0x_8_8X___0x_8_8_801e7d24[];
+extern char s__s_SE_BLOCK___0x_8_8X___0x_8_8X___801e7d51[];
+extern char s__s_WAVE_4_4d___0x_8_8X___0x_8_8X_801e7d7c[];
+extern char s__s_SE_6_6d___0x_8_8X___0x_8_8X___801e7da8[];
+extern char s__s____________0x_8_8X___0x_8_8X___801e7dd2[];
+extern char s__s_Entry_Items____d_801e7dfd[];
 
 extern "C" {
 	void* RedNew__Fi(int);
@@ -765,10 +774,145 @@ void CRedEntry::SetMusicData(RedMusicHEAD*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c2b70
+ * PAL Size: 1108b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedEntry::DisplayMMemoryInfo()
 {
-	// TODO
+	int i;
+	int entryCount;
+	int totalSize;
+	int maxFreeSize;
+	int bufferTop;
+	int nextAddress;
+	int freeSize;
+	int* memoryBank;
+	int* bankEntry;
+	unsigned int history;
+	int* seBlockBase;
+	int* entry = (int*)this;
+
+	if (DAT_8032f408 == 0) {
+		return;
+	}
+
+	OSReport(&DAT_80333d4d);
+	fflush(&DAT_8021d1a8);
+	OSReport(s__s_____MMemory_Information______801e7cce, &DAT_801e7905);
+	fflush(&DAT_8021d1a8);
+	OSReport(s__s_Name___Start___Size___Free_801e7cef, &DAT_801e7905);
+	fflush(&DAT_8021d1a8);
+
+	maxFreeSize = 0;
+	totalSize = 0;
+	entryCount = 0;
+	nextAddress = DAT_8032f480.GetMainBufferAddress();
+	memoryBank = DAT_8032f480.GetMainBankAddress();
+	bufferTop = nextAddress + DAT_8032f480.GetMainBufferSize();
+	bankEntry = memoryBank;
+	seBlockBase = &DAT_8032e12c;
+
+	do {
+		if (bankEntry[1] != 0) {
+			int matched = 0;
+
+			if (bankEntry[3] < 1) {
+				freeSize = bufferTop - (bankEntry[0] + bankEntry[1]);
+			} else {
+				freeSize = bankEntry[2] - (bankEntry[0] + bankEntry[1]);
+			}
+
+			history = (unsigned int)entry[2];
+			do {
+				if ((*(int*)(history + 0xC) != 0) && (*(int*)(history + 8) == bankEntry[0])) {
+					OSReport(s__s_MUSIC_3_3d___0x_8_8X___0x_8_8_801e7d24, &DAT_801e7905,
+					         (int)*(short*)(bankEntry[0] + 4), bankEntry[0], bankEntry[1], freeSize);
+					fflush(&DAT_8021d1a8);
+					matched = 1;
+					break;
+				}
+				history += 0x10;
+			} while (history < (unsigned int)entry[2] + 0x40);
+
+			if (matched == 0) {
+				i = 0;
+				do {
+					if ((seBlockBase[i] != 0) && (bankEntry[0] == seBlockBase[i])) {
+						OSReport(s__s_SE_BLOCK___0x_8_8X___0x_8_8X___801e7d51, &DAT_801e7905, bankEntry[0],
+						         bankEntry[1], freeSize);
+						fflush(&DAT_8021d1a8);
+						matched = 1;
+						break;
+					}
+					i++;
+				} while (i < 4);
+			}
+
+			if (matched == 0) {
+				history = (unsigned int)entry[0];
+				do {
+					if ((*(int*)(history + 0xC) != 0) && (*(int*)(history + 8) == bankEntry[0])) {
+						OSReport(s__s_WAVE_4_4d___0x_8_8X___0x_8_8X_801e7d7c, &DAT_801e7905,
+						         (int)*(short*)(bankEntry[0] + 2), bankEntry[0], bankEntry[1], freeSize);
+						fflush(&DAT_8021d1a8);
+						matched = 1;
+						break;
+					}
+					history += 0x10;
+				} while (history < (unsigned int)entry[0] + 0x400);
+			}
+
+			if (matched == 0) {
+				history = (unsigned int)entry[1];
+				do {
+					if ((*(int*)(history + 0xC) != 0) && (*(int*)(history + 8) == bankEntry[0])) {
+						OSReport(s__s_SE_6_6d___0x_8_8X___0x_8_8X___801e7da8, &DAT_801e7905,
+						         *(int*)(bankEntry[0] + 8), bankEntry[0], bankEntry[1], freeSize);
+						fflush(&DAT_8021d1a8);
+						matched = 1;
+						break;
+					}
+					history += 0x10;
+				} while (history < (unsigned int)entry[1] + 0x1000);
+			}
+
+			if (matched == 0) {
+				OSReport(s__s____________0x_8_8X___0x_8_8X___801e7dd2, &DAT_801e7905, bankEntry[0], bankEntry[1],
+				         freeSize);
+				fflush(&DAT_8021d1a8);
+			}
+
+			if (maxFreeSize < (bankEntry[0] - nextAddress)) {
+				maxFreeSize = bankEntry[0] - nextAddress;
+			}
+
+			entryCount++;
+			totalSize += bankEntry[1];
+			nextAddress = bankEntry[0] + bankEntry[1];
+		}
+
+		bankEntry += 2;
+	} while (bankEntry < memoryBank + 0x800);
+
+	freeSize = (DAT_8032f480.GetMainBufferAddress() + DAT_8032f480.GetMainBufferSize()) - nextAddress;
+	if (maxFreeSize < freeSize) {
+		maxFreeSize = freeSize;
+	}
+
+	OSReport(&DAT_80333d4f, &DAT_801e7905);
+	fflush(&DAT_8021d1a8);
+	OSReport(s__s_Entry_Items____d_801e7dfd, &DAT_801e7905, entryCount);
+	fflush(&DAT_8021d1a8);
+	OSReport(s__s_Total_Size___0x_8_8X_801e7b18, &DAT_801e7905, totalSize);
+	fflush(&DAT_8021d1a8);
+	OSReport(s__s_Max_Free_Size___0x_8_8X_801e7b34, &DAT_801e7905, maxFreeSize);
+	fflush(&DAT_8021d1a8);
+	OSReport(&DAT_80333d4f, &DAT_801e7905);
+	fflush(&DAT_8021d1a8);
+	OSReport(&DAT_80333d4d);
+	fflush(&DAT_8021d1a8);
 }

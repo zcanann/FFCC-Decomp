@@ -65,6 +65,32 @@ extern char DAT_801d7928[];
 extern double DOUBLE_8032fa28;
 extern unsigned char DAT_8032ecd8;
 extern unsigned int lbl_801E915C[];
+extern unsigned int lbl_801E9030[];
+extern unsigned int lbl_801E903C[];
+extern unsigned int lbl_801E9048[];
+extern unsigned int lbl_801E9054[];
+extern unsigned int lbl_801E9060[];
+extern unsigned int lbl_801E906C[];
+extern unsigned int lbl_801E9078[];
+extern unsigned int lbl_801E9084[];
+extern unsigned int lbl_801E9090[];
+extern unsigned int lbl_801E909C[];
+extern unsigned int lbl_801E90A8[];
+extern unsigned int lbl_801E90B4[];
+extern unsigned int lbl_801E90C0[];
+extern unsigned int lbl_801E90CC[];
+extern unsigned int lbl_801E90D8[];
+extern unsigned int lbl_801E90E4[];
+extern unsigned int lbl_801E90F0[];
+extern unsigned int lbl_801E90FC[];
+extern unsigned int lbl_801E9108[];
+extern unsigned int lbl_801E9114[];
+extern unsigned int lbl_801E9120[];
+extern unsigned int lbl_801E912C[];
+extern unsigned int lbl_801E9138[];
+extern unsigned int lbl_801E9144[];
+extern unsigned int lbl_801E9150[];
+extern unsigned int lbl_801E9B00[];
 extern unsigned char MapMng[];
 extern unsigned char CFlat[];
 extern Vec g_shadow_pos;
@@ -94,6 +120,104 @@ extern "C" {
 void pppEditGetViewPos__FP3Vec(Vec*);
 void pppEditGetViewMatrix__FPA4_f(float (*)[4]);
 void pppEditGetProjectionMatrix__FPA4_f(float (*)[4]);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8003A250
+ * PAL Size: 940b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void __sinit_p_camera_cpp(void)
+{
+    unsigned int* dst = lbl_801E915C;
+
+    *reinterpret_cast<unsigned int*>(&CameraPcs) = reinterpret_cast<unsigned int>(lbl_801E9B00);
+    *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x414) = FLOAT_8032fa78;
+    *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x418) = FLOAT_8032fa78;
+    *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x41C) = FLOAT_8032fa78;
+    *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x420) = FLOAT_8032fa7c;
+    *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x424) = FLOAT_8032fa7c;
+    *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x428) = FLOAT_8032fa7c;
+
+    dst[0x004 / 4] = lbl_801E9030[0];
+    dst[0x008 / 4] = lbl_801E9030[1];
+    dst[0x00C / 4] = lbl_801E9030[2];
+    dst[0x010 / 4] = lbl_801E903C[0];
+    dst[0x014 / 4] = lbl_801E903C[1];
+    dst[0x018 / 4] = lbl_801E903C[2];
+    dst[0x01C / 4] = lbl_801E9048[0];
+    dst[0x020 / 4] = lbl_801E9048[1];
+    dst[0x024 / 4] = lbl_801E9048[2];
+    dst[0x030 / 4] = lbl_801E9054[0];
+    dst[0x034 / 4] = lbl_801E9054[1];
+    dst[0x038 / 4] = lbl_801E9054[2];
+    dst[0x160 / 4] = lbl_801E9060[0];
+    dst[0x164 / 4] = lbl_801E9060[1];
+    dst[0x168 / 4] = lbl_801E9060[2];
+    dst[0x16C / 4] = lbl_801E906C[0];
+    dst[0x170 / 4] = lbl_801E906C[1];
+    dst[0x174 / 4] = lbl_801E906C[2];
+    dst[0x178 / 4] = lbl_801E9078[0];
+    dst[0x17C / 4] = lbl_801E9078[1];
+    dst[0x180 / 4] = lbl_801E9078[2];
+    dst[0x2BC / 4] = lbl_801E9084[0];
+    dst[0x2C0 / 4] = lbl_801E9084[1];
+    dst[0x2C4 / 4] = lbl_801E9084[2];
+    dst[0x2C8 / 4] = lbl_801E9090[0];
+    dst[0x2CC / 4] = lbl_801E9090[1];
+    dst[0x2D0 / 4] = lbl_801E9090[2];
+    dst[0x2D4 / 4] = lbl_801E909C[0];
+    dst[0x2D8 / 4] = lbl_801E909C[1];
+    dst[0x2DC / 4] = lbl_801E909C[2];
+    dst[0x418 / 4] = lbl_801E90A8[0];
+    dst[0x41C / 4] = lbl_801E90A8[1];
+    dst[0x420 / 4] = lbl_801E90A8[2];
+    dst[0x424 / 4] = lbl_801E90B4[0];
+    dst[0x428 / 4] = lbl_801E90B4[1];
+    dst[0x42C / 4] = lbl_801E90B4[2];
+    dst[0x430 / 4] = lbl_801E90C0[0];
+    dst[0x434 / 4] = lbl_801E90C0[1];
+    dst[0x438 / 4] = lbl_801E90C0[2];
+    dst[0x574 / 4] = lbl_801E90CC[0];
+    dst[0x578 / 4] = lbl_801E90CC[1];
+    dst[0x57C / 4] = lbl_801E90CC[2];
+    dst[0x580 / 4] = lbl_801E90D8[0];
+    dst[0x584 / 4] = lbl_801E90D8[1];
+    dst[0x588 / 4] = lbl_801E90D8[2];
+    dst[0x58C / 4] = lbl_801E90E4[0];
+    dst[0x590 / 4] = lbl_801E90E4[1];
+    dst[0x594 / 4] = lbl_801E90E4[2];
+    dst[0x6D0 / 4] = lbl_801E90F0[0];
+    dst[0x6D4 / 4] = lbl_801E90F0[1];
+    dst[0x6D8 / 4] = lbl_801E90F0[2];
+    dst[0x6DC / 4] = lbl_801E90FC[0];
+    dst[0x6E0 / 4] = lbl_801E90FC[1];
+    dst[0x6E4 / 4] = lbl_801E90FC[2];
+    dst[0x6E8 / 4] = lbl_801E9108[0];
+    dst[0x6EC / 4] = lbl_801E9108[1];
+    dst[0x6F0 / 4] = lbl_801E9108[2];
+    dst[0x82C / 4] = lbl_801E9114[0];
+    dst[0x830 / 4] = lbl_801E9114[1];
+    dst[0x834 / 4] = lbl_801E9114[2];
+    dst[0x838 / 4] = lbl_801E9120[0];
+    dst[0x83C / 4] = lbl_801E9120[1];
+    dst[0x840 / 4] = lbl_801E9120[2];
+    dst[0x844 / 4] = lbl_801E912C[0];
+    dst[0x848 / 4] = lbl_801E912C[1];
+    dst[0x84C / 4] = lbl_801E912C[2];
+    dst[0x858 / 4] = lbl_801E9138[0];
+    dst[0x85C / 4] = lbl_801E9138[1];
+    dst[0x860 / 4] = lbl_801E9138[2];
+    dst[0x86C / 4] = lbl_801E9144[0];
+    dst[0x870 / 4] = lbl_801E9144[1];
+    dst[0x874 / 4] = lbl_801E9144[2];
+    dst[0x880 / 4] = lbl_801E9150[0];
+    dst[0x884 / 4] = lbl_801E9150[1];
+    dst[0x888 / 4] = lbl_801E9150[2];
 }
 
 /*

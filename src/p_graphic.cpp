@@ -806,10 +806,6 @@ void CGraphicPcs::drawScreenFade()
         if ((invert == 0) && (timer == 0)) {
             continue;
         }
-        if (duration == 0) {
-            continue;
-        }
-
         _GXSetBlendMode((GXBlendMode)1, (GXBlendFactor)4, (GXBlendFactor)5, (GXLogicOp)1);
         GXSetZCompLoc(0);
         _GXSetAlphaCompare((GXCompare)6, 1, (GXAlphaOp)0, (GXCompare)7, 0);
@@ -835,7 +831,8 @@ void CGraphicPcs::drawScreenFade()
         baseColor.a = fadeAlpha;
         baseColor2.a = fadeAlpha;
 
-        GXSetChanAmbColor(GX_COLOR0A0, *(GXColor*)&baseColor);
+        const _GXColor whiteColor = {0xFF, 0xFF, 0xFF, 0xFF};
+        GXSetChanAmbColor(GX_COLOR0A0, *(GXColor*)&whiteColor);
         _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
         _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 

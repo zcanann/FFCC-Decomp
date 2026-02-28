@@ -282,9 +282,12 @@ void StreamStop(int param_1)
 
 	streamData = (unsigned int)DAT_8032f438;
 	do {
-		if ((*(int*)(streamData + 0x10c) != 0) &&
-		    ((param_1 == -1) || (param_1 == *(int*)(streamData + 0x10c)))) {
-			_StreamStop((RedStreamDATA*)streamData);
+		int currentStream = *(int*)(streamData + 0x10c);
+		if (currentStream != 0) {
+			currentStream = *(int*)(streamData + 0x10c);
+			if ((param_1 == -1) || (param_1 == currentStream)) {
+				_StreamStop((RedStreamDATA*)streamData);
+			}
 		}
 		streamData += 0x130;
 	} while (streamData < (unsigned int)DAT_8032f438 + 0x4c0);
@@ -487,9 +490,9 @@ void StreamPause(int param_1, int param_2)
 	do {
 		if ((*(int*)(streamData + 0x10c) != 0) &&
 		    ((param_1 == -1) || (param_1 == *(int*)(streamData + 0x10c)))) {
-			int voiceData = *(int*)(streamData + 4);
+			unsigned int voiceData = *(unsigned int*)(streamData + 4);
 			if (param_2 == 1) {
-				if (*(int*)(voiceData + 0x14) != 0) {
+				if (*(void**)(voiceData + 0x14) != 0) {
 					*(int*)(voiceData + 0x9c) = 0;
 					*(unsigned int*)(voiceData + 0x90) |= 0x10;
 					if (*(short*)(streamData + 0x2a) == 2) {
@@ -497,8 +500,8 @@ void StreamPause(int param_1, int param_2)
 						*(unsigned int*)(voiceData + 0x150) |= 0x10;
 					}
 				}
-			} else if (*(int*)(voiceData + 0x14) != 0) {
-				int pitch = PitchCompute__Fiiii(0x3c00000, 0, *(int*)(streamData + 0x24), 0);
+			} else if (*(void**)(voiceData + 0x14) != 0) {
+				unsigned int pitch = PitchCompute__Fiiii(0x3c00000, 0, *(int*)(streamData + 0x24), 0);
 				if (*(short*)(streamData + 0x2a) == 2) {
 					*(int*)(voiceData + 0x9c) = pitch;
 					*(unsigned int*)(voiceData + 0x90) |= 0x10;

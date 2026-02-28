@@ -815,32 +815,80 @@ void CGraphic::DrawSphere()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80018954
+ * PAL Size: 188b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGraphic::DrawSphere(float (*) [4], Vec*, float, _GXColor*)
+void CGraphic::DrawSphere(float (*mtx)[4], Vec* pos, float scale, _GXColor* color)
 {
-	// TODO
+    Mtx sphereMtx;
+
+    PSMTXScale(sphereMtx, scale, scale, scale);
+    sphereMtx[0][3] = pos->x;
+    sphereMtx[1][3] = pos->y;
+    sphereMtx[2][3] = pos->z;
+    PSMTXConcat(mtx, sphereMtx, sphereMtx);
+    GXLoadPosMtxImm(sphereMtx, 0);
+    GXSetChanMatColor((GXChannelID)4, *color);
+    GXSetLineWidth(8, GX_TO_ZERO);
+    GXCallDisplayList(PtrAt(this, 0x71FC), S32At(this, 0x71F8));
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80018894
+ * PAL Size: 192b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGraphic::DrawSphere(float (*) [4], Vec*, Vec*, _GXColor*)
+void CGraphic::DrawSphere(float (*mtx)[4], Vec* pos, Vec* scale, _GXColor* color)
 {
-	// TODO
+    Mtx sphereMtx;
+
+    PSMTXScale(sphereMtx, scale->x, scale->y, scale->z);
+    sphereMtx[0][3] = pos->x;
+    sphereMtx[1][3] = pos->y;
+    sphereMtx[2][3] = pos->z;
+    PSMTXConcat(mtx, sphereMtx, sphereMtx);
+    GXLoadPosMtxImm(sphereMtx, 0);
+    GXSetChanMatColor((GXChannelID)4, *color);
+    GXSetLineWidth(8, GX_TO_ZERO);
+    GXCallDisplayList(PtrAt(this, 0x71FC), S32At(this, 0x71F8));
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80018764
+ * PAL Size: 304b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGraphic::DrawSphere(float (*) [4], _GXColor)
+void CGraphic::DrawSphere(float (*mtx)[4], _GXColor color)
 {
-	// TODO
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 4, 5, 1);
+    GXSetZCompLoc(GX_FALSE);
+    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetNumTevStages(1);
+    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
+    GXSetNumChans(1);
+    GXClearVtxDesc();
+    GXSetVtxDesc((GXAttr)9, (GXAttrType)1);
+    GXSetVtxAttrFmt(GX_VTXFMT0, (GXAttr)9, (GXCompCnt)1, GX_F32, 0);
+    GXLoadPosMtxImm(mtx, 0);
+    GXSetChanMatColor((GXChannelID)4, color);
+    GXSetChanAmbColor((GXChannelID)4, color);
+    GXSetLineWidth(8, GX_TO_ZERO);
+    GXCallDisplayList(PtrAt(this, 0x71FC), S32At(this, 0x71F8));
 }
 
 /*

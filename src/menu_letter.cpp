@@ -10,6 +10,7 @@ typedef unsigned char u8;
 typedef unsigned short u16;
 
 extern "C" int SingGetLetterAttachflg__8CMenuPcsFv(CMenuPcs*);
+extern "C" void SingSetLetterAttachflg__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void LetterInit1__8CMenuPcsFv(CMenuPcs*);
 extern "C" void SetSingWinScl__8CMenuPcsFf(CMenuPcs*, float);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
@@ -259,12 +260,418 @@ bool CMenuPcs::LetterOpen()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 80166678
+ * PAL Size: 4556b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CMenuPcs::LetterCtrl()
 {
-	return 0;
+	int done = 0;
+	int ret = 0;
+	int state = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C);
+	*reinterpret_cast<s16*>(state + 0x32) = *reinterpret_cast<s16*>(state + 0x30);
+	DAT_8032eeea = 0;
+
+	s16 phase = *reinterpret_cast<s16*>(state + 0x12);
+	if (phase == 0) {
+		s16 mode = *reinterpret_cast<s16*>(state + 0x30);
+		if (mode == 0) {
+			*reinterpret_cast<s16*>(state + 0x22) = *reinterpret_cast<s16*>(state + 0x22) + 1;
+			int panelCount = static_cast<int>(**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850));
+			s16* panel = *reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) + 4;
+			int frame = static_cast<int>(*reinterpret_cast<s16*>(state + 0x22));
+			for (int i = 0; i < panelCount; ++i, panel += 0x20) {
+				float f = FLOAT_803330bc;
+				if (*reinterpret_cast<int*>(panel + 0x12) <= frame) {
+					if (frame < *reinterpret_cast<int*>(panel + 0x12) + *reinterpret_cast<int*>(panel + 0x14)) {
+						*reinterpret_cast<int*>(panel + 0x10) = *reinterpret_cast<int*>(panel + 0x10) + 1;
+						*reinterpret_cast<float*>(panel + 8) =
+							static_cast<float>(*reinterpret_cast<int*>(panel + 0x10)) / static_cast<float>(*reinterpret_cast<int*>(panel + 0x14));
+						if ((*reinterpret_cast<unsigned int*>(panel + 0x16) & 2) == 0) {
+							f = static_cast<float>(*reinterpret_cast<int*>(panel + 0x10)) / static_cast<float>(*reinterpret_cast<int*>(panel + 0x14));
+							*reinterpret_cast<float*>(panel + 0x18) =
+								(*reinterpret_cast<float*>(panel + 0x1C) - static_cast<float>(panel[0])) * f;
+							*reinterpret_cast<float*>(panel + 0x1A) =
+								(*reinterpret_cast<float*>(panel + 0x1E) - static_cast<float>(panel[1])) * f;
+						}
+					} else {
+						++done;
+						*reinterpret_cast<float*>(panel + 8) = FLOAT_803330f8;
+						*reinterpret_cast<float*>(panel + 0x18) = f;
+						*reinterpret_cast<float*>(panel + 0x1A) = f;
+					}
+				}
+			}
+			if (panelCount == done) {
+				*reinterpret_cast<s16*>(state + 0x34) = DAT_8032eee8 - *reinterpret_cast<s16*>(state + 0x26);
+				*reinterpret_cast<s16*>(state + 0x12) = 1;
+			}
+		} else if (mode == 1) {
+			int letterOffs = DAT_8032eee8 * 0xC + 0x3EC;
+			signed char letterFlags = *reinterpret_cast<signed char*>(Game.game.m_scriptFoodBase[0] + letterOffs);
+			if (letterFlags >= 0) {
+				*reinterpret_cast<unsigned char*>(Game.game.m_scriptFoodBase[0] + letterOffs) =
+					(static_cast<unsigned char>(letterFlags) & 0x7F) | 0x80;
+			}
+
+			*reinterpret_cast<s16*>(state + 0x22) = *reinterpret_cast<s16*>(state + 0x22) + 1;
+			int panelCount = static_cast<int>(**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850));
+			s16* panel = *reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) + 4;
+			int frame = static_cast<int>(*reinterpret_cast<s16*>(state + 0x22));
+			done = 0;
+			for (int i = 0; i < panelCount; ++i, panel += 0x20) {
+				float f = FLOAT_803330bc;
+				if (*reinterpret_cast<int*>(panel + 0x12) <= frame) {
+					if (frame < *reinterpret_cast<int*>(panel + 0x12) + *reinterpret_cast<int*>(panel + 0x14)) {
+						*reinterpret_cast<int*>(panel + 0x10) = *reinterpret_cast<int*>(panel + 0x10) + 1;
+						*reinterpret_cast<float*>(panel + 8) =
+							static_cast<float>(*reinterpret_cast<int*>(panel + 0x10)) / static_cast<float>(*reinterpret_cast<int*>(panel + 0x14));
+						if ((*reinterpret_cast<unsigned int*>(panel + 0x16) & 2) == 0) {
+							f = static_cast<float>(*reinterpret_cast<int*>(panel + 0x10)) / static_cast<float>(*reinterpret_cast<int*>(panel + 0x14));
+							*reinterpret_cast<float*>(panel + 0x18) =
+								(*reinterpret_cast<float*>(panel + 0x1C) - static_cast<float>(panel[0])) * f;
+							*reinterpret_cast<float*>(panel + 0x1A) =
+								(*reinterpret_cast<float*>(panel + 0x1E) - static_cast<float>(panel[1])) * f;
+						}
+					} else {
+						++done;
+						*reinterpret_cast<float*>(panel + 8) = FLOAT_803330f8;
+						*reinterpret_cast<float*>(panel + 0x18) = f;
+						*reinterpret_cast<float*>(panel + 0x1A) = f;
+					}
+				}
+			}
+			if (panelCount == done) {
+				if (SingGetLetterAttachflg__8CMenuPcsFv(this) < 0) {
+					*reinterpret_cast<s16*>(state + 0x12) = 1;
+				} else {
+					if (DAT_8032eef4 < 1) {
+						DAT_8032eeed = 2;
+						*reinterpret_cast<s16*>(state + 0x30) = 3;
+						*reinterpret_cast<s16*>(state + 0x28) = static_cast<s16>(DAT_8032eeec);
+					} else {
+						*reinterpret_cast<s16*>(state + 0x30) = 5;
+					}
+					*reinterpret_cast<s16*>(state + 0x12) = 0;
+					*reinterpret_cast<char*>(state + 0xC) = 0;
+					SingSetLetterAttachflg__8CMenuPcsFi(this, -1);
+				}
+			}
+		} else if (mode == 2) {
+			if (*reinterpret_cast<char*>(state + 0xC) == '\0') {
+				char info[0x80];
+				char left[0x10];
+				char right[0x10];
+				s16 winW;
+				s16 winH;
+
+				int letter = Game.game.m_scriptFoodBase[0] + DAT_8032eee8 * 0xC;
+				if (((*reinterpret_cast<unsigned char*>(letter + 0x3EC) >> 3) & 1) == 0) {
+					FlatDataView* flatData = reinterpret_cast<FlatDataView*>(&Game.game.m_cFlatDataArr[1]);
+					int itemId = (*reinterpret_cast<u16*>(letter + 0x3EE) & 0x1FF) * 5 + 4;
+					int value = reinterpret_cast<int*>(flatData->m_tabl[0].m_strings)[itemId];
+					if (Game.game.m_gameWork.m_languageId == 2) {
+						sprintf(info, "%s%d%s%s",
+							GetMenuStr__8CMenuPcsFi(this, 0x23),
+							value,
+							GetMenuStr__8CMenuPcsFi(this, 0x24),
+							GetMenuStr__8CMenuPcsFi(this, 0x22));
+					} else {
+						sprintf(info, "%s%d",
+							GetMenuStr__8CMenuPcsFi(this, 0x22),
+							value);
+					}
+				} else {
+					int gil = static_cast<int>(*reinterpret_cast<u16*>(letter + 0x3EE) & 0x1FF) * 100;
+					if (Game.game.m_gameWork.m_languageId == 2) {
+						sprintf(info, "%d%s%s",
+							gil,
+							GetMenuStr__8CMenuPcsFi(this, 4),
+							GetMenuStr__8CMenuPcsFi(this, 0x22));
+					} else {
+						sprintf(info, "%s%d%s",
+							GetMenuStr__8CMenuPcsFi(this, 0x22),
+							gil,
+							GetMenuStr__8CMenuPcsFi(this, 4));
+					}
+				}
+
+				strcpy(left, "");
+				strcat(left, GetMenuStr__8CMenuPcsFi(this, 1), 0x10);
+				strcpy(right, "");
+				strcat(right, GetMenuStr__8CMenuPcsFi(this, 2), 0x10);
+				SetSingDynamicWinMessInfo__8CMenuPcsFiPcPcPcPcPcPcPcPc(this, 3, info, left, right, 0, 0, 0, 0, 0);
+				GetSingWinSize__8CMenuPcsFiPsPsi(this, 0, &winW, &winH, 1);
+				SetMcWinInfo__8CMenuPcsFii(this, static_cast<int>(winW), static_cast<int>(winH));
+				*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) = 0;
+				*reinterpret_cast<s16*>(state + 0x28) = 0;
+				*reinterpret_cast<char*>(state + 0xC) = 1;
+			}
+			if (*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) == 1) {
+				*reinterpret_cast<s16*>(state + 0x12) = 1;
+			}
+		} else if (mode == 3) {
+			if (LetterReplyWinOpen()) {
+				*reinterpret_cast<s16*>(state + 0x12) = 1;
+			}
+		} else if (mode == 4) {
+			if (*reinterpret_cast<char*>(state + 0xC) == '\0') {
+				s16 winW;
+				s16 winH;
+				GetSingWinSize__8CMenuPcsFiPsPsi(this, 2, &winW, &winH, 0);
+				SetMcWinInfo__8CMenuPcsFii(this, static_cast<int>(winW), static_cast<int>(winH));
+				*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) = 0;
+				*reinterpret_cast<s16*>(state + 0x28) = 0;
+				*reinterpret_cast<unsigned char*>(state + 9) = 0xFF;
+				*reinterpret_cast<char*>(state + 0xC) = 1;
+			}
+			if (*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) == 1) {
+				*reinterpret_cast<s16*>(state + 0x12) = 1;
+			}
+		} else if (mode == 5) {
+			if (LetterConfirmOpen()) {
+				*reinterpret_cast<s16*>(state + 0x12) = 1;
+			}
+		}
+	} else if (phase == 1) {
+		ret = LetterCtrlCur();
+	} else if (phase == 2) {
+		s16 mode = *reinterpret_cast<s16*>(state + 0x30);
+		if (mode == 0) {
+			*reinterpret_cast<s16*>(state + 0x22) = *reinterpret_cast<s16*>(state + 0x22) + 1;
+			int panelCount = static_cast<int>(**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850));
+			s16* panel = *reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) + 4;
+			int frame = static_cast<int>(*reinterpret_cast<s16*>(state + 0x22));
+			done = 0;
+			for (int i = 0; i < panelCount; ++i, panel += 0x20) {
+				float f = FLOAT_803330bc;
+				if (*reinterpret_cast<int*>(panel + 0x12) <= frame) {
+					if (frame < *reinterpret_cast<int*>(panel + 0x12) + *reinterpret_cast<int*>(panel + 0x14)) {
+						*reinterpret_cast<int*>(panel + 0x10) = *reinterpret_cast<int*>(panel + 0x10) + 1;
+						*reinterpret_cast<float*>(panel + 8) = 1.0f -
+							static_cast<float>(*reinterpret_cast<int*>(panel + 0x10)) / static_cast<float>(*reinterpret_cast<int*>(panel + 0x14));
+						if ((*reinterpret_cast<unsigned int*>(panel + 0x16) & 2) == 0) {
+							f = 1.0f - static_cast<float>(*reinterpret_cast<int*>(panel + 0x10)) / static_cast<float>(*reinterpret_cast<int*>(panel + 0x14));
+							*reinterpret_cast<float*>(panel + 0x18) =
+								(*reinterpret_cast<float*>(panel + 0x1C) - static_cast<float>(panel[0])) * f;
+							*reinterpret_cast<float*>(panel + 0x1A) =
+								(*reinterpret_cast<float*>(panel + 0x1E) - static_cast<float>(panel[1])) * f;
+						}
+					} else {
+						++done;
+						*reinterpret_cast<float*>(panel + 8) = FLOAT_803330bc;
+						*reinterpret_cast<float*>(panel + 0x18) = f;
+						*reinterpret_cast<float*>(panel + 0x1A) = f;
+					}
+				}
+			}
+			if (panelCount == done) {
+				LetterInit1__8CMenuPcsFv(this);
+				*reinterpret_cast<s16*>(state + 0x30) = 1;
+				*reinterpret_cast<s16*>(state + 0x12) = 0;
+			}
+		} else if (mode == 1) {
+			signed char action = *reinterpret_cast<signed char*>(state + 8);
+			if (action < 1) {
+				*reinterpret_cast<s16*>(state + 0x22) = *reinterpret_cast<s16*>(state + 0x22) + 1;
+				int panelCount = static_cast<int>(**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850));
+				s16* panel = *reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) + 4;
+				int frame = static_cast<int>(*reinterpret_cast<s16*>(state + 0x22));
+				done = 0;
+				for (int i = 0; i < panelCount; ++i, panel += 0x20) {
+					float f = FLOAT_803330bc;
+					if (*reinterpret_cast<int*>(panel + 0x12) <= frame) {
+						if (frame < *reinterpret_cast<int*>(panel + 0x12) + *reinterpret_cast<int*>(panel + 0x14)) {
+							*reinterpret_cast<int*>(panel + 0x10) = *reinterpret_cast<int*>(panel + 0x10) + 1;
+							*reinterpret_cast<float*>(panel + 8) = 1.0f -
+								static_cast<float>(*reinterpret_cast<int*>(panel + 0x10)) / static_cast<float>(*reinterpret_cast<int*>(panel + 0x14));
+							if ((*reinterpret_cast<unsigned int*>(panel + 0x16) & 2) == 0) {
+								f = 1.0f - static_cast<float>(*reinterpret_cast<int*>(panel + 0x10)) / static_cast<float>(*reinterpret_cast<int*>(panel + 0x14));
+								*reinterpret_cast<float*>(panel + 0x18) =
+									(*reinterpret_cast<float*>(panel + 0x1C) - static_cast<float>(panel[0])) * f;
+								*reinterpret_cast<float*>(panel + 0x1A) =
+									(*reinterpret_cast<float*>(panel + 0x1E) - static_cast<float>(panel[1])) * f;
+							}
+						} else {
+							++done;
+							*reinterpret_cast<float*>(panel + 8) = FLOAT_803330bc;
+							*reinterpret_cast<float*>(panel + 0x18) = f;
+							*reinterpret_cast<float*>(panel + 0x1A) = f;
+						}
+					}
+				}
+				if (panelCount == done) {
+					if (DAT_8032eeed == 2) {
+						memset(*reinterpret_cast<void**>(reinterpret_cast<char*>(this) + 0x850), 0, 0x1008);
+						int p = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 8;
+						for (int i = 0; i < 8; ++i) {
+							*reinterpret_cast<float*>(p + 0x14) = FLOAT_803330f8;
+							*reinterpret_cast<float*>(p + 0x54) = FLOAT_803330f8;
+							*reinterpret_cast<float*>(p + 0x94) = FLOAT_803330f8;
+							*reinterpret_cast<float*>(p + 0xD4) = FLOAT_803330f8;
+							*reinterpret_cast<float*>(p + 0x114) = FLOAT_803330f8;
+							*reinterpret_cast<float*>(p + 0x154) = FLOAT_803330f8;
+							*reinterpret_cast<float*>(p + 0x194) = FLOAT_803330f8;
+							*reinterpret_cast<float*>(p + 0x1D4) = FLOAT_803330f8;
+							p += 0x200;
+						}
+						int anim = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
+						*reinterpret_cast<int*>(anim + 0x24) = 0;
+						*reinterpret_cast<int*>(anim + 0x2C) = 0;
+						*reinterpret_cast<int*>(anim + 0x30) = 10;
+						*reinterpret_cast<int*>(anim + 0x64) = 0;
+						*reinterpret_cast<int*>(anim + 0x6C) =
+							~(((-static_cast<int>(static_cast<char>(*reinterpret_cast<char*>(reinterpret_cast<char*>(this) + 0x872))) |
+								static_cast<int>(static_cast<char>(*reinterpret_cast<char*>(reinterpret_cast<char*>(this) + 0x872)))) >>
+							   31)) &
+							10;
+						*reinterpret_cast<int*>(anim + 0x70) = 10;
+						**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) = 2;
+						*reinterpret_cast<s16*>(state + 0x22) = 0;
+						*reinterpret_cast<char*>(state + 0xB) = 1;
+					} else {
+						ret = 1;
+					}
+					*reinterpret_cast<s16*>(state + 0x12) = 0;
+					*reinterpret_cast<s16*>(state + 0x30) = 0;
+				}
+			} else {
+				if (action == 1) {
+					*reinterpret_cast<s16*>(state + 0x30) = 2;
+				} else if (action == 2) {
+					*reinterpret_cast<s16*>(state + 0x28) = 0;
+					*reinterpret_cast<s16*>(state + 0x30) = 3;
+				}
+				*reinterpret_cast<s16*>(state + 0x12) = 0;
+				*reinterpret_cast<unsigned char*>(state + 8) = 0;
+				*reinterpret_cast<unsigned char*>(state + 0xC) = 0;
+			}
+			*reinterpret_cast<unsigned char*>(state + 8) = 0;
+		} else if (mode == 2) {
+			if (*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) == 3) {
+				*reinterpret_cast<char*>(state + 0xC) = 0;
+				if (*reinterpret_cast<signed char*>(state + 8) < 1) {
+					*reinterpret_cast<s16*>(state + 0x30) = 1;
+				} else {
+					*reinterpret_cast<s16*>(state + 0x30) = 3;
+				}
+				*reinterpret_cast<unsigned char*>(state + 8) = 0;
+				*reinterpret_cast<s16*>(state + 0x12) = 0;
+				*reinterpret_cast<unsigned char*>(state + 0xC) = 0;
+				*reinterpret_cast<s16*>(state + 0x28) = 0;
+			}
+		} else if (mode == 3) {
+			if (*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) == 3) {
+				*reinterpret_cast<char*>(state + 0xC) = 0;
+				if (*reinterpret_cast<signed char*>(state + 8) < 1) {
+					*reinterpret_cast<s16*>(state + 0x30) = 1;
+					*reinterpret_cast<s16*>(state + 0x12) = 1;
+				} else {
+					*reinterpret_cast<s16*>(state + 0x30) = 4;
+					*reinterpret_cast<s16*>(state + 0x12) = 0;
+				}
+				*reinterpret_cast<char*>(state + 0xC) = 0;
+			}
+		} else if (mode == 4) {
+			if (*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) == 3) {
+				*reinterpret_cast<char*>(state + 0xC) = 0;
+				if (*reinterpret_cast<signed char*>(state + 8) < 1) {
+					*reinterpret_cast<s16*>(state + 0x30) = 3;
+					*reinterpret_cast<s16*>(state + 0x12) = 0;
+					*reinterpret_cast<char*>(state + 0xC) = 0;
+					*reinterpret_cast<s16*>(state + 0x28) = static_cast<s16>(DAT_8032eeec);
+				} else {
+					if (DAT_8032eeed == 2) {
+						*reinterpret_cast<s16*>(state + 0x30) = 5;
+						*reinterpret_cast<s16*>(state + 0x12) = 0;
+					} else {
+						if (DAT_8032eeed == 0) {
+							SingSetLetterAttachflg__8CMenuPcsFi(this, 1);
+						} else {
+							SingSetLetterAttachflg__8CMenuPcsFi(this, 5);
+						}
+						*reinterpret_cast<s16*>(state + 0x30) = 1;
+						*reinterpret_cast<s16*>(state + 0x12) = 2;
+						*reinterpret_cast<unsigned char*>(state + 8) = 0xFF;
+						int anim = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
+						*reinterpret_cast<int*>(anim + 0x2C) = 0;
+						*reinterpret_cast<int*>(anim + 0x30) = 10;
+						*reinterpret_cast<int*>(anim + 0x6C) = 0;
+						*reinterpret_cast<int*>(anim + 0x70) = 10;
+						int panelCount = static_cast<int>(**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850));
+						s16* panel = *reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) + 4;
+						for (int i = 0; i < panelCount; ++i, panel += 0x20) {
+							panel[0x10] = 0;
+							panel[0x11] = 0;
+							*reinterpret_cast<float*>(panel + 8) = FLOAT_803330f8;
+						}
+						*reinterpret_cast<s16*>(state + 0x22) = 0;
+					}
+					*reinterpret_cast<char*>(state + 0xC) = 0;
+				}
+			}
+		} else if (mode == 5) {
+			if (*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) == 3) {
+				*reinterpret_cast<char*>(state + 0xC) = 0;
+				if (*reinterpret_cast<signed char*>(state + 8) < 1) {
+					*reinterpret_cast<s16*>(state + 0x30) = 3;
+					*reinterpret_cast<s16*>(state + 0x12) = 0;
+					*reinterpret_cast<char*>(state + 0xC) = 0;
+					*reinterpret_cast<s16*>(state + 0x28) = static_cast<s16>(DAT_8032eeec);
+				} else {
+					DAT_8032eeed = 2;
+					*reinterpret_cast<s16*>(state + 0x30) = 1;
+					*reinterpret_cast<s16*>(state + 0x12) = 2;
+					*reinterpret_cast<unsigned char*>(state + 8) = 0xFF;
+					int anim = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
+					*reinterpret_cast<int*>(anim + 0x2C) = 0;
+					*reinterpret_cast<int*>(anim + 0x30) = 10;
+					*reinterpret_cast<int*>(anim + 0x6C) = 0;
+					*reinterpret_cast<int*>(anim + 0x70) = 10;
+					int panelCount = static_cast<int>(**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850));
+					s16* panel = *reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) + 4;
+					for (int i = 0; i < panelCount; ++i, panel += 0x20) {
+						panel[0x10] = 0;
+						panel[0x11] = 0;
+						*reinterpret_cast<float*>(panel + 8) = FLOAT_803330f8;
+					}
+					*reinterpret_cast<s16*>(state + 0x22) = 0;
+					*reinterpret_cast<char*>(state + 0xC) = 0;
+				}
+			}
+		}
+	}
+
+	if (ret == 0) {
+		return 0;
+	}
+
+	int anim = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
+	*reinterpret_cast<int*>(anim + 0x24) = 0;
+	if (DAT_8032eeed == 2) {
+		*reinterpret_cast<int*>(anim + 0x2C) = 10;
+		*reinterpret_cast<int*>(anim + 0x30) = 10;
+		*reinterpret_cast<int*>(anim + 0x64) = 0;
+		*reinterpret_cast<int*>(anim + 0x6C) = 0;
+		*reinterpret_cast<int*>(anim + 0x70) = 10;
+	} else {
+		*reinterpret_cast<int*>(anim + 0x2C) = 0;
+		*reinterpret_cast<int*>(anim + 0x30) = 10;
+		**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) = 1;
+	}
+
+	int panelCount = static_cast<int>(**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850));
+	s16* panel = *reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) + 4;
+	for (int i = 0; i < panelCount; ++i, panel += 0x20) {
+		panel[0x10] = 0;
+		panel[0x11] = 0;
+		*reinterpret_cast<float*>(panel + 8) = FLOAT_803330f8;
+	}
+	*reinterpret_cast<s16*>(state + 0x22) = 0;
+	return ret;
 }
 
 /*

@@ -600,12 +600,40 @@ int CCaravanWork::AddGil(int gilToAdd)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a1ab0
+ * PAL Size: 172b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::GetFoodRank(int)
+int CCaravanWork::GetFoodRank(int playerIdx)
 {
-	// TODO
+	int rank = 0;
+	int baseIdx = 0;
+	int loops = 2;
+	CCaravanWork* cur = this;
+
+	do {
+		if ((playerIdx != baseIdx) && (m_letterMeta[playerIdx] < cur->m_letterMeta[0])) {
+			rank++;
+		}
+		if ((playerIdx != (baseIdx + 1)) && (m_letterMeta[playerIdx] < cur->m_letterMeta[1])) {
+			rank++;
+		}
+		if ((playerIdx != (baseIdx + 2)) && (m_letterMeta[playerIdx] < cur->m_letterMeta[2])) {
+			rank++;
+		}
+		if ((playerIdx != (baseIdx + 3)) && (m_letterMeta[playerIdx] < cur->m_letterMeta[3])) {
+			rank++;
+		}
+
+		cur = (CCaravanWork*)&cur->m_saveSlot;
+		baseIdx += 4;
+		loops--;
+	} while (loops != 0);
+
+	return rank;
 }
 
 /*
@@ -620,12 +648,67 @@ void CCaravanWork::SearchRomLetterWork(CRomLetterWork **, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a0628
+ * PAL Size: 340b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::ShopRequest(int, int, int, int, int, int, int)
+int CCaravanWork::ShopRequest(int requestType, int param3, int param4, int param5, int param6, int, int flags)
 {
-	// TODO
+	if (requestType == 3) {
+		m_shopParam = (short)param3;
+	} else if (requestType < 3) {
+		if (requestType == 1) {
+			short idx = m_shopListCount;
+			m_shopListCount = idx + 1;
+			m_shopList[idx] = (short)param3;
+		} else if (requestType < 1) {
+			if (requestType >= 0) {
+				m_shopListCount = 0;
+				m_shopRequestState = 0;
+				m_shopList[0] = 0;
+				m_shopList[1] = 0;
+				m_shopList[2] = 0;
+				m_shopList[3] = 0;
+				m_shopList[4] = 0;
+				m_shopList[5] = 0;
+				m_shopList[6] = 0;
+				m_shopList[7] = 0;
+				m_shopList[8] = 0;
+				m_shopList[9] = 0;
+				m_shopList[10] = 0;
+				m_shopList[11] = 0;
+				m_shopList[12] = 0;
+				m_shopList[13] = 0;
+				m_shopList[14] = 0;
+				m_shopList[15] = 0;
+			}
+		} else {
+			m_shopArg0 = param3;
+			m_shopArg1 = param4;
+			m_shopArg2 = param5;
+			m_shopArg3 = param6;
+			m_shopRequestFlags = (unsigned char)(flags & 1);
+		}
+	} else if (requestType == 5) {
+		m_shopRequestState = 2;
+		if (Game.game.m_gameWork.m_menuStageMode == 0) {
+			GbaQue.SetSmithFlg(m_joybusCaravanId);
+		} else {
+			Game.game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 1;
+		}
+	} else if (requestType < 5) {
+		m_shopRequestState = 1;
+		if (Game.game.m_gameWork.m_menuStageMode == 0) {
+			GbaQue.SetShopFlg(m_joybusCaravanId);
+		} else {
+			Game.game.m_gameWork.m_singleShopOrSmithMenuActiveFlag = 1;
+		}
+	}
+
+	return 0;
 }
 
 /*

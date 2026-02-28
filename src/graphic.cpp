@@ -871,12 +871,114 @@ void CGraphic::makeSphere()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80017f6c
+ * PAL Size: 916b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGraphic::DrawBound(CBound&, _GXColor)
+void CGraphic::DrawBound(CBound& bound, _GXColor color)
 {
-	// TODO
+    _GXColor matColor;
+    _GXColor ambColor;
+    Mtx cameraMtx;
+    float* p = reinterpret_cast<float*>(&bound);
+
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 4, 5, 1);
+    GXSetZCompLoc((GXBool)0);
+    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
+    GXSetZMode((u8)1, (_GXCompare)3, (u8)1);
+    GXSetCullMode((GXCullMode)0);
+    GXSetNumTevStages((u8)1);
+    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
+    GXSetNumChans((u8)1);
+    GXSetChanCtrl((GXChannelID)4, (GXBool)0, (GXColorSrc)0, (GXColorSrc)0, 0, (GXDiffuseFn)2, (GXAttnFn)2);
+    GXClearVtxDesc();
+    GXSetVtxDesc((GXAttr)9, (GXAttrType)1);
+    GXSetVtxAttrFmt((GXVtxFmt)0, (GXAttr)9, (GXCompCnt)1, (GXCompType)4, 0);
+    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+    GXLoadPosMtxImm(cameraMtx, 0);
+
+    matColor = color;
+    GXSetChanMatColor((GXChannelID)4, matColor);
+    ambColor = color;
+    GXSetChanAmbColor((GXChannelID)4, ambColor);
+
+    GXBegin((GXPrimitive)0xA8, (GXVtxFmt)7, 0x18);
+    GXWGFifo.f32 = p[0];
+    GXWGFifo.f32 = p[1];
+    GXWGFifo.f32 = p[2];
+    GXWGFifo.f32 = p[3];
+    GXWGFifo.f32 = p[1];
+    GXWGFifo.f32 = p[2];
+    GXWGFifo.f32 = p[0];
+    GXWGFifo.f32 = p[4];
+    GXWGFifo.f32 = p[2];
+    GXWGFifo.f32 = p[3];
+    GXWGFifo.f32 = p[4];
+    GXWGFifo.f32 = p[2];
+    GXWGFifo.f32 = p[0];
+    GXWGFifo.f32 = p[1];
+    GXWGFifo.f32 = p[5];
+    GXWGFifo.f32 = p[3];
+    GXWGFifo.f32 = p[1];
+    GXWGFifo.f32 = p[5];
+    GXWGFifo.f32 = p[0];
+    GXWGFifo.f32 = p[4];
+    GXWGFifo.f32 = p[5];
+    GXWGFifo.f32 = p[3];
+    GXWGFifo.f32 = p[4];
+    GXWGFifo.f32 = p[5];
+    GXWGFifo.f32 = p[0];
+    GXWGFifo.f32 = p[1];
+    GXWGFifo.f32 = p[2];
+    GXWGFifo.f32 = p[0];
+    GXWGFifo.f32 = p[4];
+    GXWGFifo.f32 = p[2];
+    GXWGFifo.f32 = p[3];
+    GXWGFifo.f32 = p[1];
+    GXWGFifo.f32 = p[2];
+    GXWGFifo.f32 = p[3];
+    GXWGFifo.f32 = p[4];
+    GXWGFifo.f32 = p[2];
+    GXWGFifo.f32 = p[0];
+    GXWGFifo.f32 = p[1];
+    GXWGFifo.f32 = p[5];
+    GXWGFifo.f32 = p[0];
+    GXWGFifo.f32 = p[4];
+    GXWGFifo.f32 = p[5];
+    GXWGFifo.f32 = p[3];
+    GXWGFifo.f32 = p[1];
+    GXWGFifo.f32 = p[5];
+    GXWGFifo.f32 = p[3];
+    GXWGFifo.f32 = p[4];
+    GXWGFifo.f32 = p[5];
+    GXWGFifo.f32 = p[0];
+    GXWGFifo.f32 = p[1];
+    GXWGFifo.f32 = p[2];
+    GXWGFifo.f32 = p[0];
+    GXWGFifo.f32 = p[1];
+    GXWGFifo.f32 = p[5];
+    GXWGFifo.f32 = p[3];
+    GXWGFifo.f32 = p[1];
+    GXWGFifo.f32 = p[2];
+    GXWGFifo.f32 = p[3];
+    GXWGFifo.f32 = p[1];
+    GXWGFifo.f32 = p[5];
+    GXWGFifo.f32 = p[0];
+    GXWGFifo.f32 = p[4];
+    GXWGFifo.f32 = p[2];
+    GXWGFifo.f32 = p[0];
+    GXWGFifo.f32 = p[4];
+    GXWGFifo.f32 = p[5];
+    GXWGFifo.f32 = p[3];
+    GXWGFifo.f32 = p[4];
+    GXWGFifo.f32 = p[2];
+    GXWGFifo.f32 = p[3];
+    GXWGFifo.f32 = p[4];
+    GXWGFifo.f32 = p[5];
 }
 
 /*

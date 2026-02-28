@@ -206,18 +206,18 @@ extern "C" void pppFrameYmLaser(void* pppYmLaser, void* param_2, void* param_3)
 	YmLaserStep* step = (YmLaserStep*)param_2;
 	YmLaserParam* data = (YmLaserParam*)param_3;
 	_pppPObject* baseObj = (_pppPObject*)pppYmLaser;
-	float* work = (float*)((unsigned char*)pppYmLaser + 0x88 + data->offsets->m_serializedDataOffsets[2]);
+	float* work;
 	Vec localA;
 	Vec localB;
 	Vec localPos;
 	CMapCylinderRaw cyl;
 	Mtx charaMtx;
 	Mtx tempMtx;
-	bool emptyHistory = (work[7] == 0.0f);
+	bool emptyHistory;
 
-	if ((DAT_8032ed70 != 0) || (step->m_stepValue == 1)) {
-		return;
-	}
+	if ((DAT_8032ed70 == 0) && (step->m_stepValue != 1)) {
+		work = (float*)((u8*)pppYmLaser + 0x88 + data->offsets->m_serializedDataOffsets[2]);
+		emptyHistory = (work[7] == 0.0f);
 
 	if (emptyHistory) {
 		work[7] = (float)(u32)pppMemAlloc__FUlPQ27CMemory6CStagePci(
@@ -310,13 +310,10 @@ extern "C" void pppFrameYmLaser(void* pppYmLaser, void* param_2, void* param_3)
 
 			if (canCreate && hit && step->m_arg3 != -1) {
 				u8* dataVals = *(u8**)((u8*)pppMngStPtr + 0xc8);
-				int created = 0;
+				int created;
 				if (dataVals != 0) {
 					created = pppCreatePObject__FP9_pppMngStP12_pppPDataVal(pppMngStPtr, dataVals + step->m_arg3 * 0x10);
 					*(void**)(created + 4) = pppYmLaser;
-				}
-
-				if (created != 0) {
 					Vec* createdPos = (Vec*)(created + *(int*)step->m_payload + 0x80);
 					createdPos->x = points[i].x;
 					createdPos->y = points[i].y + *(float*)(step->m_payload + 0x34);
@@ -326,10 +323,11 @@ extern "C" void pppFrameYmLaser(void* pppYmLaser, void* param_2, void* param_3)
 		}
 	}
 
-	if (emptyHistory) {
-		Vec* points = (Vec*)(u32)work[7];
-		for (int i = 0; i < (int)(u32)step->m_payload[0x1e]; i++) {
-			points[i] = points[0];
+		if (emptyHistory) {
+			Vec* points = (Vec*)(u32)work[7];
+			for (int i = 0; i < (int)(u32)step->m_payload[0x1e]; i++) {
+				points[i] = points[0];
+			}
 		}
 	}
 }

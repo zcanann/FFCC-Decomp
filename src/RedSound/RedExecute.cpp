@@ -654,12 +654,66 @@ void _VolumeExecute(RedVoiceDATA* voice, int volume)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c4360
+ * PAL Size: 428b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _PitchExecute(RedVoiceDATA*)
+void _PitchExecute(RedVoiceDATA* param_1)
 {
-	// TODO
+    int pitchDelta = 0;
+    int* voiceData = (int*)param_1;
+    int* trackData = (int*)voiceData[0];
+
+    if ((trackData[0x1D] != 0) && (((s16*)voiceData)[10] == 0)) {
+        u32 pitchLfo = (u32)trackData[0x20] >> 0xC;
+        if ((int)pitchLfo < 0x80) {
+            pitchDelta = ((int)pitchLfo + 1) * 2;
+        } else {
+            pitchDelta = ((int)(pitchLfo & 0x7F) + 1) * 0x18;
+        }
+
+        if ((((u8*)voiceData)[0x1A] & 3) == 0) {
+            pitchDelta = PitchCompute(
+                voiceData[0x28] + *DAT_8032f420,
+                ((s16*)trackData)[0xA1] + ((s16*)trackData)[0x9F] + pitchDelta,
+                ((int*)voiceData[1])[5],
+                ((s8*)trackData)[0x148]);
+        } else {
+            pitchDelta = PitchCompute(
+                voiceData[0x28] + trackData[0x17],
+                ((s16*)trackData)[0xA1] + ((s16*)trackData)[0x9F] + pitchDelta,
+                ((int*)voiceData[1])[5],
+                ((s8*)trackData)[0x148]);
+        }
+
+        {
+            int currentPitch = voiceData[0x26];
+            int (*pitchWaveFunc)(u32) = *(int (**)(u32))((u8*)trackData + 0x74);
+            int pitchWave = pitchWaveFunc((u32)voiceData[7] >> 0xC);
+            pitchDelta = ((pitchDelta - currentPitch) * (pitchWave >> 4)) >> 0xC;
+        }
+
+        if (voiceData[8] != 0) {
+            int frame = voiceData[9];
+            voiceData[9] = frame + 1;
+            pitchDelta = (pitchDelta * frame) / voiceData[8];
+            if (voiceData[8] <= voiceData[9]) {
+                voiceData[8] = 0;
+            }
+        }
+
+        if (pitchDelta < 0) {
+            pitchDelta >>= 1;
+        }
+
+        voiceData[7] += trackData[0x1E];
+    }
+
+    voiceData[0x27] = pitchDelta + voiceData[0x26] + voiceData[0xF];
+    voiceData[0x24] |= 0x10;
 }
 
 /*

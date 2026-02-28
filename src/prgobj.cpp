@@ -267,7 +267,11 @@ void CGPrgObj::reqAnim(int animId, int loop, int direct)
  */
 int CGPrgObj::isLoopAnim()
 {
-	if ((m_animFlags & 0x80) != 0 || (m_animFlags & 0x40) != 0 || !IsLoopAnim(2)) {
+	unsigned char flags = m_animFlags;
+	if (((int)(((unsigned int)flags << 25) | (unsigned int)(flags >> 7)) < 0) ||
+	    ((int)((unsigned int)flags << 24) < 0) ||
+	    !IsLoopAnim(2))
+	{
 		return 0;
 	}
 

@@ -26,8 +26,8 @@ public:
 	void ClearWaveData(int);
 	void ClearWaveDataM(int, int, int, int);
 	void ClearWaveBank(int);
-	void GetWaveBank(int);
-	void SearchWaveBase(int);
+	int GetWaveBank(int);
+	int SearchWaveBase(int);
 	void ReentryWaveData(int);
 	void WaveHistoryManager(int, int);
 	void DisplayWaveInfo();

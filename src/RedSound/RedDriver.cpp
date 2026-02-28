@@ -1503,12 +1503,16 @@ void CRedDriver::MusicMasterVolume(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801befe0
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::MusicFadeOut(int, int)
+void CRedDriver::MusicFadeOut(int musicID, int fadeTime)
 {
-	// TODO
+    _EntryExecCommand(_MusicVolume, musicID, 0, fadeTime, 1, 0, 0, 0);
 }
 
 /*
@@ -1752,12 +1756,16 @@ void CRedDriver::SeMasterVolume(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bf64c
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::SeFadeOut(int, int)
+void CRedDriver::SeFadeOut(int seID, int fadeTime)
 {
-	// TODO
+    _EntryExecCommand(_SeVolume, seID, 0, fadeTime, 1, 0, 0, 0);
 }
 
 /*
@@ -2134,12 +2142,16 @@ void CRedDriver::SetReverb(int bank, int kind)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bfe54
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::SetReverbDepth(int, int, int)
+void CRedDriver::SetReverbDepth(int bank, int mode, int depth)
 {
-	// TODO
+    _EntryExecCommand(_SetReverbDepth, bank, mode, depth, 0, 0, 0, 0);
 }
 
 /*

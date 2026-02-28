@@ -139,7 +139,17 @@ static inline void ReleaseRefObject(void* object)
  */
 extern "C" void __sinit_p_menu_cpp()
 {
+    u32* mcCtrl = reinterpret_cast<u32*>(reinterpret_cast<u8*>(&MenuPcs) + 0x20);
+
     *(u32*)((u8*)&MenuPcs) = (u32)&PTR_PTR_s_CMenuPcs_8020f2d0;
+    mcCtrl[0] = 0;
+    mcCtrl[1] = 0;
+    mcCtrl[2] = 0;
+    mcCtrl[3] = 0;
+    mcCtrl[4] = 0;
+    mcCtrl[5] = 0;
+    mcCtrl[6] = 0;
+    mcCtrl[7] = 0;
     __register_global_object(&MenuPcs, reinterpret_cast<void*>(__dt__8CMenuPcsFv), ARRAY_802ea1a0);
 
     DAT_8020ee44 = DAT_8020edf8;
@@ -179,7 +189,20 @@ CMenuPcs::CMenuPcs()
  */
 CMenuPcs::~CMenuPcs()
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+
+    *reinterpret_cast<u32*>(self) = reinterpret_cast<u32>(&PTR_PTR_s_CMenuPcs_8020f2d0);
+
+    if (self + 0x20 != nullptr) {
+        *reinterpret_cast<u32*>(self + 0x20) = 0;
+        *reinterpret_cast<u32*>(self + 0x24) = 0;
+        *reinterpret_cast<u32*>(self + 0x2C) = 0;
+        *reinterpret_cast<u32*>(self + 0x34) = 0;
+        *reinterpret_cast<u32*>(self + 0x3C) = 0;
+        *reinterpret_cast<u32*>(self + 0x38) = 0;
+        *reinterpret_cast<u32*>(self + 0x28) = 0;
+        *reinterpret_cast<u32*>(self + 0x30) = 0;
+    }
 }
 
 /*

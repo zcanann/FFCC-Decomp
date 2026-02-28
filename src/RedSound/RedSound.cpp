@@ -850,10 +850,12 @@ void CRedSound::ClearWaveData(int id)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void CRedSound::ClearWaveDataM(int bank, int sep, int group, int kind)
 {
 	CRedDriver_8032f4c0.ClearWaveDataM(bank, sep, group, kind);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

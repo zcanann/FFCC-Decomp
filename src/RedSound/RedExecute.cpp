@@ -1942,12 +1942,74 @@ void _SeTrackDataExecute(RedTrackDATA* track, int frames)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c703c
+ * PAL Size: 572b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _SeMidiNoteExecute(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*, int, int)
+void _SeMidiNoteExecute(
+    RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* trackData, int frames, int tickStep)
 {
-	// TODO
+    int* track = (int*)trackData;
+    do {
+        if ((*track != 0) && ((track[0x3F] & 8) == 0)) {
+            *(s16*)((u8*)track + 0x146) += (s16)(tickStep * -0x78);
+            while (*(s16*)((u8*)track + 0x146) < 1) {
+                int step = frames;
+                *(s16*)((u8*)track + 0x146) += 0xFA;
+                if (track[0x42] < frames) {
+                    step = track[0x42];
+                }
+                track[0x42] -= frames;
+                _SeTrackDataExecute((RedTrackDATA*)track, step);
+                if (((track[0x41] & 0x200000) == 0) && (track[0x42] == 1)) {
+                    KeyOffSet(control, keyOnData, (RedTrackDATA*)track);
+                }
+
+                DAT_8032f4b4 = 0;
+                while ((*track != 0) && (track[0x42] < 1)) {
+                    int delta;
+                    unsigned char* cmd;
+                    *(s16*)(track + 0x51) += 1;
+                    cmd = (unsigned char*)*track;
+                    *track = (int)(cmd + 1);
+                    ((void (*)(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*))lbl_8021EA10[*cmd])(
+                        control, keyOnData, (RedTrackDATA*)track);
+                    if (*track != 0) {
+                        delta = DeltaTimeSumup((unsigned char**)track);
+                        if (delta != 0) {
+                            delta += *(s16*)(track + 0x4E);
+                            if (delta < 1) {
+                                delta = 1;
+                            } else if ((track[0x3F] & 0x20000) != 0) {
+                                delta += ((delta * track[0x3B] >> 8) * (int)GetRandomData()) >> 7;
+                                if (delta < 1) {
+                                    delta = 1;
+                                }
+                            }
+                        }
+
+                        if (track[0x42] < -1) {
+                            int execStep = delta;
+                            if (track[0x42] + delta > 0) {
+                                execStep = -track[0x42];
+                            }
+                            _SeTrackDataExecute((RedTrackDATA*)track, execStep);
+                        }
+                        track[0x42] += delta;
+                    }
+                }
+
+                if (DAT_8032f4b4 != 0) {
+                    ((int*)((u8*)DAT_8032f444 + (s8)((u8*)track)[0x14E] * 0xC0))[0x2E] = DAT_8032f4b4;
+                }
+            }
+        }
+        track += 0x55;
+    } while (track < (int*)(*(int*)control + 0x2A80));
+    ((int*)control)[0x11D] = 1;
 }
 
 /*

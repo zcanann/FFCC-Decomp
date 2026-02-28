@@ -804,18 +804,12 @@ config.libs = [
             Object(NonMatching, "gx/GXVert.c"),
         ],
     ),
-    #DolphinLib(
-        #"gba",
-        #[
-            # Object(NonMatching, "gba/GBA.c"),
-            #Object(NonMatching, "gba/GBAGetProcessStatus.c"),
-            #Object(NonMatching, "gba/GBAJoyBoot.c"),
-            #Object(NonMatching, "gba/GBAKey.c"),
-            #Object(NonMatching, "gba/GBARead.c"),
-            #Object(NonMatching, "gba/GBAWrite.c"),
-            #Object(NonMatching, "gba/GBAXfer.c"),
-        #],
-    #),
+    DolphinLib(
+        "gba",
+        [
+            Object(NonMatching, "gba/GBAGetProcessStatus.c"),
+        ],
+    ),
     {
         "lib": "Runtime.PPCEABI.H",
         "mw_version": config.linker_version,

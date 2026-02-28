@@ -6,11 +6,13 @@
 
 extern unsigned int* DAT_8032f444;
 extern unsigned int DAT_8032f4b4;
+extern int DAT_8032f414;
 extern int DAT_8032f3f8;
 extern void* DAT_8032f3f0;
 extern int* DAT_8032f420;
 extern int DAT_8032f424;
 extern CRedEntry DAT_8032e154;
+extern int DAT_8021dc20[];
 extern int lbl_8021EA10[];
 extern int PTR_SineSwing__Fi_8021e9d0[];
 
@@ -637,12 +639,34 @@ void __MidiCtrl_TimeSignature(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C824C
+ * PAL Size: 140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_KeySignature(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_KeySignature(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    int* controlData = (int*)control;
+    int* trackData = (int*)track;
+    u8* command;
+    unsigned int key;
+
+    command = (u8*)trackData[0];
+    trackData[0] = (int)(command + 1);
+    key = *command & 0x1f;
+    controlData[0x120] = key;
+    controlData[2] = DAT_8021dc20[key] + 0x8021dca0;
+
+    if (DAT_8032f414 != 0) {
+        u32 scan = controlData[0];
+        u32 limit = controlData[0] + (u32)*((u8*)control + 0x491) * 0x154;
+        do {
+            *(u32*)(scan + 0x20) = controlData[2];
+            scan += 0x154;
+        } while (scan < limit);
+    }
 }
 
 /*
@@ -872,12 +896,28 @@ void __MidiCtrl_ExpressionDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C8800
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_ExpressionChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_ExpressionChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    int delta[4];
+    u8* command;
+    int* trackData = (int*)track;
+
+    delta[0] = DeltaTimeSumup((unsigned char**)trackData);
+    if (delta[0] == 0) {
+        delta[0] = 1;
+    }
+
+    command = (u8*)trackData[0];
+    trackData[0] = (int)(command + 1);
+    trackData[0xe] = DataAddCompute(trackData + 0xd, *command, delta);
+    trackData[0xf] = delta[0];
 }
 
 /*
@@ -1841,12 +1881,34 @@ void __MidiCtrl_ReverbMix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C9DBC
+ * PAL Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_StepRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_StepRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    s16 step;
+    s8 value;
+    int* trackData = (int*)track;
+
+    value = *(s8*)trackData[0];
+    trackData[0]++;
+    if (value == 0) {
+        step = 0;
+    } else {
+        step = *(s16*)(trackData + 0x4e) + value;
+    }
+
+    *(s16*)(trackData + 0x4e) = step;
+    *(s16*)((u8*)trackData + 0x13a) = 0;
+    if (*(s16*)(trackData + 0x4e) < -9999) {
+        *(s16*)(trackData + 0x4e) = -9999;
+    } else if (*(s16*)(trackData + 0x4e) > 9999) {
+        *(s16*)(trackData + 0x4e) = 9999;
+    }
 }
 
 /*

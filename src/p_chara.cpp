@@ -809,7 +809,7 @@ bool CCharaPcs::CHandle::IsModelLoaded(int checkModelField)
 	if ((m_asyncState == 0 || m_asyncState == 7)
 		&& m_model != nullptr
 		// TODO: Pending CModel decomp
-		&& (checkModelField == 0 || *reinterpret_cast<int*>(reinterpret_cast<char*>(m_model) + 0xB0) != 0))
+		&& (checkModelField == 0 || *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(m_model) + 0xB0) != 0))
 	{
 			return true;
 	}

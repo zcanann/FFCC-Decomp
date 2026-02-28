@@ -12,6 +12,7 @@ extern "C" void pppStopSe__FP9_pppMngStP7PPPSEST(_pppMngSt*, PPPSEST*);
 extern "C" float ppvScreenMatrix[4][4];
 extern "C" float ppvScreenMatrix0[4][4];
 extern "C" float FLOAT_8032ed60;
+extern "C" float FLOAT_8032fe18;
 extern "C" unsigned char DAT_8032ed68;
 extern "C" void __ct__9_pppMngStFv(_pppMngSt* pppMngSt);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
@@ -1045,12 +1046,34 @@ void CPartMng::pppGetFreeDataMng()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800587a8
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartMng::pppGetDefaultCreateParam()
 {
-	// TODO
+    g_dcp.m_positionOffsetPtr = 0;
+    g_dcp.m_rotationPtr = 0;
+    g_dcp.m_scalePtr = 0;
+    g_dcp.m_extraPositionPtr = 0;
+    g_dcp.m_paramA = 0;
+    g_dcp.m_paramB = 0;
+    g_dcp.m_lookTargetPtr = 0;
+    g_dcp.m_objectHitMask = 0;
+    g_dcp.m_cylinderAttribute = 0;
+    g_dcp.m_paramC = FLOAT_8032fe18;
+    g_dcp.m_paramD = FLOAT_8032fe18;
+    g_dcp.m_owner = 0;
+    g_dcp.m_soundEffectParams.m_soundEffectHandle = -1;
+    g_dcp.m_soundEffectParams.m_soundEffectSlot = -1;
+    g_dcp.m_soundEffectParams.m_soundEffectStopFlag = 0;
+    g_dcp.m_soundEffectParams.m_soundEffectKind = 1;
+    g_dcp.m_soundEffectParams.m_soundEffectStartFrame = 0;
+    g_dcp.m_soundEffectParams.m_soundEffectStartedOnce = 0;
+    g_dcp.m_soundEffectParams.m_soundEffectFadeFrames = 0x1e;
 }
 
 /*

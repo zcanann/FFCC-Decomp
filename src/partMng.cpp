@@ -10,6 +10,7 @@ extern "C" void pppPartInit__8CPartMngFv2(CPartMng* partMng);
 extern "C" unsigned int CheckSum__FPvi(void*, int);
 extern "C" void pppStopSe__FP9_pppMngStP7PPPSEST(_pppMngSt*, PPPSEST*);
 extern "C" float ppvScreenMatrix[4][4];
+extern "C" float ppvScreenMatrix0[4][4];
 extern "C" float FLOAT_8032ed60;
 extern "C" unsigned char DAT_8032ed68;
 extern "C" void __ct__9_pppMngStFv(_pppMngSt* pppMngSt);
@@ -464,32 +465,46 @@ void CPartMng::pppReadShp(CChunkFile&, pppShapeSt*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005d92c
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppEditGetViewPos(Vec*)
+void pppEditGetViewPos(Vec* viewPos)
 {
-	// TODO
+	viewPos->x = ppvCameraMatrix0[0][3];
+	viewPos->y = ppvCameraMatrix0[1][3];
+	viewPos->z = ppvCameraMatrix0[2][3];
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005d900
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppEditGetViewMatrix(float (*) [4])
+void pppEditGetViewMatrix(float (*viewMatrix)[4])
 {
-	// TODO
+	PSMTXCopy(ppvCameraMatrix0, viewMatrix);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005d8d4
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void pppEditGetProjectionMatrix(float (*) [4])
+void pppEditGetProjectionMatrix(float (*projectionMatrix)[4])
 {
-	// TODO
+	PSMTX44Copy(ppvScreenMatrix0, projectionMatrix);
 }
 
 /*

@@ -1957,30 +1957,27 @@ _pppMngSt* CSound::FadeOutSe3D(int se3dHandle, int fadeFrames)
     }
 
     u8* se = reinterpret_cast<u8*>(this) + 0x2C;
-    u8* found = 0;
-    for (int i = 0; i < 0x20; i++, se += 0xA0) {
-        if (static_cast<s8>(se[0]) < 0 && *reinterpret_cast<int*>(se + 4) == se3dHandle) {
-            found = se;
-            break;
+    u8* found;
+    int ret = 0;
+    int count = 0x20;
+    do {
+        if (((((static_cast<s8>(*se) < 0) && (found = se, *reinterpret_cast<int*>(se + 4) == se3dHandle)) ||
+              ((found = se + 0x28), static_cast<s8>(*found) < 0 && *reinterpret_cast<int*>(se + 0x2C) == se3dHandle)) ||
+             ((found = se + 0x50), static_cast<s8>(*found) < 0 && *reinterpret_cast<int*>(se + 0x54) == se3dHandle)) ||
+            (static_cast<s8>(se[0x78]) < 0 && (found = se + 0x78, *reinterpret_cast<int*>(se + 0x7C) == se3dHandle))) {
+            goto found_entry;
         }
-        if (static_cast<s8>(se[0x28]) < 0 && *reinterpret_cast<int*>(se + 0x2C) == se3dHandle) {
-            found = se + 0x28;
-            break;
-        }
-        if (static_cast<s8>(se[0x50]) < 0 && *reinterpret_cast<int*>(se + 0x54) == se3dHandle) {
-            found = se + 0x50;
-            break;
-        }
-        if (static_cast<s8>(se[0x78]) < 0 && *reinterpret_cast<int*>(se + 0x7C) == se3dHandle) {
-            found = se + 0x78;
-            break;
-        }
-    }
+        ret += 3;
+        se += 0xA0;
+        count--;
+    } while (count != 0);
+    found = 0;
 
+found_entry:
     if (found != 0) {
         const int playId = *reinterpret_cast<int*>(found + 8);
         if (playId < 0) {
-            Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130, fadeFrames);
+            Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130, fadeFrames, ret);
         } else {
             SeFadeOut__9CRedSoundFii(reinterpret_cast<CRedSound*>(this), playId, fadeFrames);
         }

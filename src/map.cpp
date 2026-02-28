@@ -28,6 +28,8 @@ extern "C" void __dt__7CMapHitFv(void*, int);
 extern "C" void __dt__7CMapObjFv(void*, int);
 extern "C" void __dt__8CMapMeshFv(void*, int);
 extern "C" void __dt__7CMapMngFv(void*, int);
+extern "C" void __dt__8CMapAnimFv(void*, int);
+extern "C" void __dt__13CMapAnimKeyDtFv(void*, int);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
 extern "C" void* __register_global_object(void*, void*, void*);
 extern "C" void __ct__8COctTreeFv(void*);
@@ -82,6 +84,7 @@ extern unsigned char DAT_8032ecb9;
 extern CPartPcs PartPcs;
 extern "C" unsigned char Vec_80245758[];
 extern "C" void __ct__Q29CLightPcs6CLightFv(void*);
+extern "C" void DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(void*, int);
 extern "C" void SetLink__7CMapObjFv();
 extern "C" void ReadOtmOctTree__8COctTreeFR10CChunkFile(void*, CChunkFile&);
 extern "C" int sprintf(char*, const char*, ...);
@@ -1463,12 +1466,110 @@ void CMapMng::DestroyMapLightHolder()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80033254
+ * PAL Size: 892b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMapMng::DestroyMap()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+
+    short octTreeCount = *reinterpret_cast<short*>(self + 8);
+    for (int i = 0; i < octTreeCount; i++) {
+        __dt__8COctTreeFv(self + 0x14 + (i * 0x4C), 0xFFFF);
+    }
+    *reinterpret_cast<short*>(self + 8) = 0;
+
+    short mapHitCount = *reinterpret_cast<short*>(self + 0xA);
+    for (int i = 0; i < mapHitCount; i++) {
+        __dt__7CMapHitFv(self + 0x4D4 + (i * 0x24), 0xFFFF);
+    }
+    *reinterpret_cast<short*>(self + 0xA) = 0;
+
+    short mapObjCount = *reinterpret_cast<short*>(self + 0xC);
+    for (int i = 0; i < mapObjCount; i++) {
+        __dt__7CMapObjFv(self + 0x954 + (i * 0xF0), -1);
+    }
+    *reinterpret_cast<short*>(self + 0xC) = 0;
+
+    short mapMeshCount = *reinterpret_cast<short*>(self + 0xE);
+    for (int i = 0; i < mapMeshCount; i++) {
+        __dt__8CMapMeshFv(self + 0x1E954 + (i * 0x44), 0xFFFF);
+    }
+    *reinterpret_cast<short*>(self + 0xE) = 0;
+
+    int* materialSet = *reinterpret_cast<int**>(self + 0x213D4);
+    if (materialSet != 0) {
+        (*reinterpret_cast<void (**)(int*, int)>(*materialSet + 8))(materialSet, 1);
+        *reinterpret_cast<int**>(self + 0x213D4) = 0;
+    }
+
+    int* textureSet = *reinterpret_cast<int**>(self + 0x213D8);
+    if (textureSet != 0) {
+        (*reinterpret_cast<void (**)(int*, int)>(*textureSet + 8))(textureSet, 1);
+        *reinterpret_cast<int**>(self + 0x213D8) = 0;
+    }
+
+    int* mapTexAnimSet = *reinterpret_cast<int**>(self + 0x213DC);
+    if (mapTexAnimSet != 0) {
+        (*reinterpret_cast<void (**)(int*, int)>(*mapTexAnimSet + 8))(mapTexAnimSet, 1);
+        *reinterpret_cast<int**>(self + 0x213DC) = 0;
+    }
+
+    CPtrArray<CMapAnim*>* mapAnimArray = reinterpret_cast<CPtrArray<CMapAnim*>*>(self + 0x213FC);
+    for (unsigned int i = 0; i < static_cast<unsigned int>(mapAnimArray->GetSize()); i++) {
+        CMapAnim* mapAnim = (*mapAnimArray)[i];
+        if (mapAnim != 0) {
+            __dt__8CMapAnimFv(mapAnim, 1);
+        }
+    }
+    mapAnimArray->RemoveAll();
+
+    CPtrArray<CMapAnimKeyDt*>* mapAnimKeyDtArray = reinterpret_cast<CPtrArray<CMapAnimKeyDt*>*>(self + 0x21418);
+    for (unsigned int i = 0; i < static_cast<unsigned int>(mapAnimKeyDtArray->GetSize()); i++) {
+        CMapAnimKeyDt* mapAnimKeyDt = (*mapAnimKeyDtArray)[i];
+        if (mapAnimKeyDt != 0) {
+            __dt__13CMapAnimKeyDtFv(mapAnimKeyDt, 1);
+        }
+    }
+    mapAnimKeyDtArray->RemoveAll();
+
+    CPtrArray<CMapAnimRun*>* mapAnimRunArray = reinterpret_cast<CPtrArray<CMapAnimRun*>*>(self + 0x213E0);
+    for (unsigned int i = 0; i < static_cast<unsigned int>(mapAnimRunArray->GetSize()); i++) {
+        CMapAnimRun* mapAnimRun = (*mapAnimRunArray)[i];
+        if (mapAnimRun != 0) {
+            __dl__FPv(mapAnimRun);
+        }
+    }
+    mapAnimRunArray->RemoveAll();
+
+    CPtrArray<CMapShadow*>* mapShadowArray = reinterpret_cast<CPtrArray<CMapShadow*>*>(self + 0x21434);
+    for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
+        CMapShadow* mapShadow = (*mapShadowArray)[i];
+        if (mapShadow != 0) {
+            __dl__FPv(mapShadow);
+        }
+    }
+    mapShadowArray->RemoveAll();
+
+    for (int i = 0; i < 2; i++) {
+        CPtrArray<CMapLightHolder*>* mapLightHolderArray =
+            reinterpret_cast<CPtrArray<CMapLightHolder*>*>(self + 0x21450 + (i * 0x1C));
+
+        for (unsigned int j = 0; j < static_cast<unsigned int>(mapLightHolderArray->GetSize()); j++) {
+            CMapLightHolder* holder = (*mapLightHolderArray)[j];
+            if (holder != 0) {
+                __dl__FPv(holder);
+            }
+        }
+        mapLightHolderArray->RemoveAll();
+    }
+
+    DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(&LightPcs, 1);
+    *reinterpret_cast<void**>(self + 0x228E8) = 0;
 }
 
 /*

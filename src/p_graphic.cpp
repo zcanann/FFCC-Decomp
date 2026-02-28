@@ -744,10 +744,285 @@ unsigned int CGraphicPcs::GetScreenFadeExecutingBit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80045178
+ * PAL Size: 4256b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphicPcs::drawScreenFade()
 {
-	// TODO
+    struct CameraForFade {
+        float _padding0[58];
+        Mtx m_cameraMatrix;
+        Mtx44 m_screenMatrix;
+    };
+    struct ScreenFadeObjPos {
+        char _padding0[0x15C];
+        float x;
+        float y;
+        float z;
+    };
+
+    extern CameraForFade CameraPcs;
+
+    Mtx44 orthoMtx;
+    Mtx cameraMtx;
+    Mtx44 screenMtx;
+    Mtx identityMtx;
+
+    C_MTXOrtho(orthoMtx, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, 1.0f);
+    GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
+
+    PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
+    for (int r = 0; r < 3; r++) {
+        for (int c = 0; c < 4; c++) {
+            screenMtx[r][c] = cameraMtx[r][c];
+        }
+    }
+    screenMtx[3][0] = 0.0f;
+    screenMtx[3][1] = 0.0f;
+    screenMtx[3][2] = 0.0f;
+    screenMtx[3][3] = 1.0f;
+    PSMTX44Concat(CameraPcs.m_screenMatrix, screenMtx, screenMtx);
+
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_U16, 1);
+
+    PSMTXIdentity(identityMtx);
+    GXLoadPosMtxImm(identityMtx, 0);
+    GXLoadTexMtxImm(identityMtx, GX_TEXMTX0, GX_MTX3x4);
+
+    for (int slot = 0; slot < 4; slot++) {
+        u8* slotBase = (u8*)this + slot * 0x2C;
+        const int timer = *(int*)(slotBase + 4);
+        const int duration = *(int*)(slotBase + 8);
+        const int invert = *(int*)(slotBase + 0x14);
+
+        if ((invert == 0) && (timer == 0)) {
+            continue;
+        }
+        if (duration == 0) {
+            continue;
+        }
+
+        _GXSetBlendMode((GXBlendMode)1, (GXBlendFactor)4, (GXBlendFactor)5, (GXLogicOp)1);
+        GXSetZCompLoc(0);
+        _GXSetAlphaCompare((GXCompare)6, 1, (GXAlphaOp)0, (GXCompare)7, 0);
+        GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
+        GXSetCullMode(GX_CULL_NONE);
+        GXSetNumTevStages(1);
+        GXSetNumIndStages(0);
+        GXSetTevDirect(GX_TEVSTAGE0);
+        GXSetNumChans(1);
+        GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+        GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+        _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+
+        _GXColor baseColor = *(_GXColor*)(slotBase + 0x0C);
+        _GXColor baseColor2 = *(_GXColor*)(slotBase + 0x10);
+
+        float t = (float)timer / (float)duration;
+        if (invert != 0) {
+            t = 1.0f - t;
+        }
+        const float fadeWave = (float)sin((double)(3.1415927f * t));
+        const u8 fadeAlpha = (u8)(255.0f * fadeWave);
+        baseColor.a = fadeAlpha;
+        baseColor2.a = fadeAlpha;
+
+        GXSetChanAmbColor(GX_COLOR0A0, *(GXColor*)&baseColor);
+        _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+        _GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+
+        if (slot == 3) {
+            const int barHeight = (int)(448.0f * fadeWave);
+            const int barEdge = (int)(32.0f * fadeWave);
+
+            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+            GXPosition3f32(0.0f, 0.0f, 0.0f);
+            GXColor1u32(*(u32*)&baseColor);
+            GXTexCoord2u16(0, 0);
+            GXPosition3f32(640.0f, 0.0f, 0.0f);
+            GXColor1u32(*(u32*)&baseColor);
+            GXTexCoord2u16(2, 0);
+            GXPosition3f32(640.0f, 480.0f, 0.0f);
+            GXColor1u32(*(u32*)&baseColor);
+            GXTexCoord2u16(2, 2);
+            GXPosition3f32(0.0f, 480.0f, 0.0f);
+            GXColor1u32(*(u32*)&baseColor);
+            GXTexCoord2u16(0, 2);
+
+            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+            GXPosition3f32(0.0f, 0.0f, 0.0f);
+            GXColor1u32(*(u32*)&baseColor);
+            GXTexCoord2u16(0, 0);
+            GXPosition3f32(640.0f, 0.0f, 0.0f);
+            GXColor1u32(*(u32*)&baseColor);
+            GXTexCoord2u16(2, 0);
+            GXPosition3f32(640.0f, (float)barHeight, 0.0f);
+            GXColor1u32(*(u32*)&baseColor);
+            GXTexCoord2u16(2, 2);
+            GXPosition3f32(0.0f, (float)barHeight, 0.0f);
+            GXColor1u32(*(u32*)&baseColor);
+            GXTexCoord2u16(0, 2);
+
+            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+            GXPosition3f32(0.0f, 480.0f - (float)barHeight, 0.0f);
+            GXColor1u32(*(u32*)&baseColor);
+            GXTexCoord2u16(0, 0);
+            GXPosition3f32(640.0f, 480.0f - (float)barHeight, 0.0f);
+            GXColor1u32(*(u32*)&baseColor);
+            GXTexCoord2u16(2, 0);
+            GXPosition3f32(640.0f, 480.0f, 0.0f);
+            GXColor1u32(*(u32*)&baseColor);
+            GXTexCoord2u16(2, 2);
+            GXPosition3f32(0.0f, 480.0f, 0.0f);
+            GXColor1u32(*(u32*)&baseColor);
+            GXTexCoord2u16(0, 2);
+
+            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+            GXPosition3f32(0.0f, (float)barHeight, 0.0f);
+            GXColor1u32(*(u32*)&baseColor);
+            GXTexCoord2u16(0, 0);
+            GXPosition3f32(640.0f, (float)barHeight, 0.0f);
+            GXColor1u32(*(u32*)&baseColor);
+            GXTexCoord2u16(2, 0);
+            GXPosition3f32(640.0f, (float)(barHeight + barEdge), 0.0f);
+            GXColor1u32(*(u32*)&baseColor2);
+            GXTexCoord2u16(2, 2);
+            GXPosition3f32(0.0f, (float)(barHeight + barEdge), 0.0f);
+            GXColor1u32(*(u32*)&baseColor2);
+            GXTexCoord2u16(0, 2);
+
+            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+            GXPosition3f32(0.0f, 480.0f - (float)barHeight, 0.0f);
+            GXColor1u32(*(u32*)&baseColor);
+            GXTexCoord2u16(0, 0);
+            GXPosition3f32(640.0f, 480.0f - (float)barHeight, 0.0f);
+            GXColor1u32(*(u32*)&baseColor);
+            GXTexCoord2u16(2, 0);
+            GXPosition3f32(640.0f, 480.0f - (float)(barHeight + barEdge), 0.0f);
+            GXColor1u32(*(u32*)&baseColor2);
+            GXTexCoord2u16(2, 2);
+            GXPosition3f32(0.0f, 480.0f - (float)(barHeight + barEdge), 0.0f);
+            GXColor1u32(*(u32*)&baseColor2);
+            GXTexCoord2u16(0, 2);
+            continue;
+        }
+
+        if (slot == 2) {
+            const int mode = *(int*)(slotBase + 0x18);
+            if (mode == 1) {
+                ScreenFadeObjPos* obj = *(ScreenFadeObjPos**)(slotBase + 0x1C);
+                if (obj != NULL) {
+                    Vec pos;
+                    pos.x = obj->x;
+                    pos.y = obj->y + *(float*)(slotBase + 0x20);
+                    pos.z = obj->z;
+                    PSMTX44MultVec(screenMtx, &pos, &pos);
+
+                    float sx = pos.x * 320.0f + 320.0f;
+                    float sy = -(pos.y * 240.0f - 240.0f);
+                    if (sx < 0.0f) {
+                        sx = 0.0f;
+                    } else if (sx > 640.0f) {
+                        sx = 640.0f;
+                    }
+                    if (sy < 0.0f) {
+                        sy = 0.0f;
+                    } else if (sy > 480.0f) {
+                        sy = 480.0f;
+                    }
+
+                    const int radius = (int)(640.0f * (1.0f - t));
+                    drawSFCircle(0x500, (int)sx, radius, (int)sy, baseColor, baseColor);
+                    drawSFCircle(radius, (int)sx, radius - 8, (int)sy, baseColor, baseColor2);
+                    continue;
+                }
+            }
+
+            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+            GXPosition3f32(0.0f, 0.0f, 0.0f);
+            GXColor1u32(*(u32*)&baseColor);
+            GXTexCoord2u16(0, 0);
+            GXPosition3f32(640.0f, 0.0f, 0.0f);
+            GXColor1u32(*(u32*)&baseColor);
+            GXTexCoord2u16(2, 0);
+            GXPosition3f32(640.0f, 480.0f, 0.0f);
+            GXColor1u32(*(u32*)&baseColor);
+            GXTexCoord2u16(2, 2);
+            GXPosition3f32(0.0f, 480.0f, 0.0f);
+            GXColor1u32(*(u32*)&baseColor);
+            GXTexCoord2u16(0, 2);
+            continue;
+        }
+
+        if (slot == 0) {
+            if (timer < (duration - 1)) {
+                GXSetNumTexGens(1);
+                GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+                _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+                _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+
+                const float phase = *(float*)((u8*)this + 0x24);
+                const float stretch = *(float*)((u8*)this + 0x28);
+                const float amp = *(float*)((u8*)this + 0x2C) * (1.0f - t);
+                const float size = amp + 1.0f;
+                const float offX = stretch * (320.0f * amp) * (float)sin((double)phase);
+                const float offY = stretch * (240.0f * amp) * (float)cos((double)phase);
+                const float cx = 320.0f + offX;
+                const float cy = 240.0f + offY;
+                const float w = 320.0f * size;
+                const float h = 240.0f * size;
+
+                GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+                GXPosition3f32(cx - w, cy - h, 0.0f);
+                GXColor1u32(*(u32*)&baseColor);
+                GXTexCoord2u16(0, 0);
+                GXPosition3f32(cx + w, cy - h, 0.0f);
+                GXColor1u32(*(u32*)&baseColor);
+                GXTexCoord2u16(2, 0);
+                GXPosition3f32(cx + w, cy + h, 0.0f);
+                GXColor1u32(*(u32*)&baseColor);
+                GXTexCoord2u16(2, 2);
+                GXPosition3f32(cx - w, cy + h, 0.0f);
+                GXColor1u32(*(u32*)&baseColor);
+                GXTexCoord2u16(0, 2);
+                continue;
+            }
+        }
+
+        if (slot == 1) {
+            const int mode = *(int*)(slotBase + 0x18);
+            if (mode == 2) {
+                _GXSetBlendMode((GXBlendMode)1, (GXBlendFactor)4, (GXBlendFactor)1, (GXLogicOp)5);
+            } else if (mode == 3) {
+                _GXSetBlendMode((GXBlendMode)3, (GXBlendFactor)4, (GXBlendFactor)1, (GXLogicOp)5);
+            }
+        }
+
+        GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+        GXPosition3f32(0.0f, 0.0f, 0.0f);
+        GXColor1u32(*(u32*)&baseColor);
+        GXTexCoord2u16(0, 0);
+        GXPosition3f32(640.0f, 0.0f, 0.0f);
+        GXColor1u32(*(u32*)&baseColor);
+        GXTexCoord2u16(2, 0);
+        GXPosition3f32(640.0f, 480.0f, 0.0f);
+        GXColor1u32(*(u32*)&baseColor2);
+        GXTexCoord2u16(2, 2);
+        GXPosition3f32(0.0f, 480.0f, 0.0f);
+        GXColor1u32(*(u32*)&baseColor2);
+        GXTexCoord2u16(0, 2);
+    }
+
+    PSMTX44Copy(CameraPcs.m_screenMatrix, orthoMtx);
+    GXSetProjection(orthoMtx, GX_PERSPECTIVE);
 }

@@ -115,7 +115,7 @@ void CSystem::Init()
         if (fileHandle != (CFile::CHandle*)0)
         {
             m_mapSize = File.GetLength(fileHandle);
-            m_mapBuffer = new unsigned char[m_mapSize];
+            m_mapBuffer = new ((CMemory::CStage*)m_mapStage, (char*)"system.cpp", 0x123) unsigned char[m_mapSize];
             if (m_mapBuffer != (void*)0)
             {
                 unsigned int offset = 0;

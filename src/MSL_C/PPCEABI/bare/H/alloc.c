@@ -382,16 +382,16 @@ static void Block_construct(Block* block, unsigned long size) {
  * JP Size: TODO
  */
 static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
-    char* block_end;
+    unsigned long block_size;
     unsigned long current_size;
-    int start_offset;
     unsigned long* start;
     unsigned long* current;
     unsigned long max_size;
+    unsigned long** start_ptr;
 
-    start_offset = block->size & 0xFFFFFFF8UL;
-    block_end = (char*)block + start_offset;
-    start = *(unsigned long**)(block_end - 4);
+    block_size = block->size & 0xFFFFFFF8UL;
+    start_ptr = (unsigned long**)((char*)block + block_size - 4);
+    start = *start_ptr;
     if (start == 0) {
         block->max_size = 0;
         return 0;
@@ -401,8 +401,14 @@ static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
     current = start;
     max_size = current_size;
     do {
-        if (requested_size <= current_size) {
-            if (current_size - requested_size >= 0x50) {
+        if (requested_size > current_size) {
+            current = (unsigned long*)current[3];
+            current_size = *current & 0xFFFFFFF8UL;
+            if (max_size < current_size) {
+                max_size = current_size;
+            }
+        } else {
+            if (0x4F < current_size - requested_size) {
                 unsigned long* split_block;
                 unsigned long old_size_flags;
                 unsigned long block_flags;
@@ -443,28 +449,21 @@ static SubBlock* Block_subBlock(Block* block, unsigned long requested_size) {
                 }
             }
 
-            block_end = (char*)block + (block->size & 0xFFFFFFF8UL);
-            *(unsigned long**)(block_end - 4) = (unsigned long*)current[3];
+            *start_ptr = (unsigned long*)current[3];
             current_size = *current & 0xFFFFFFF8UL;
             *current |= 2;
             *(unsigned long*)((char*)current + current_size) |= 4;
-            if (*(unsigned long**)(block_end - 4) == current) {
-                *(unsigned long**)(block_end - 4) = (unsigned long*)current[3];
+            if (*start_ptr == current) {
+                *start_ptr = (unsigned long*)current[3];
             }
-            if (*(unsigned long**)(block_end - 4) == current) {
-                *(unsigned long**)(block_end - 4) = 0;
+            if (*start_ptr == current) {
+                *start_ptr = 0;
                 block->max_size = 0;
             } else {
                 *(unsigned long*)(current[3] + 8) = current[2];
                 *(unsigned long*)(current[2] + 12) = current[3];
             }
             return (SubBlock*)current;
-        }
-
-        current = (unsigned long*)current[3];
-        current_size = *current & 0xFFFFFFF8UL;
-        if (max_size < current_size) {
-            max_size = current_size;
         }
     } while (current != start);
 

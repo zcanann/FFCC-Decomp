@@ -158,8 +158,8 @@ void pppFrameLensFlare(void* obj, void* param2, void* param3)
 
 		*alphaPtr = (u8)(int)((double)(float)(u8)*alphaPtr * alphaScale);
 		if (unkB->m_dataValIndex != 0xffff) {
-			long* shapeTable = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + unkB->m_dataValIndex * 4);
-			pppCalcFrameShape(shapeTable, *(short*)((u8*)obj + shapeOffset + 0xac),
+			long** shapeTable = *(long***)(*(int*)&pppEnvStPtr->m_particleColors[0] + unkB->m_dataValIndex * 4);
+			pppCalcFrameShape(*shapeTable, *(short*)((u8*)obj + shapeOffset + 0xac),
 							  *(short*)((u8*)obj + shapeOffset + 0xae), *(short*)((u8*)obj + shapeOffset + 0xb0),
 							  (short)unkB->m_initWOrk);
 		}

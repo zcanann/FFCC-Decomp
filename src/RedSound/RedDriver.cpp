@@ -1441,9 +1441,9 @@ void CRedDriver::ReentryMusicData(int musicID)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedDriver::MusicStop(int)
+void CRedDriver::MusicStop(int musicID)
 {
-	// TODO
+    _EntryExecCommand(_MusicStop, musicID, 0, 0, 0, 0, 0, 0);
 }
 
 /*
@@ -1496,9 +1496,9 @@ int CRedDriver::MusicNextPlay(int musicID, int volume, int mode)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedDriver::MusicMasterVolume(int)
+void CRedDriver::MusicMasterVolume(int volume)
 {
-	// TODO
+    _EntryExecCommand(_MusicMasterVolume, volume, 0, 0, 0, 0, 0, 0);
 }
 
 /*
@@ -1534,9 +1534,9 @@ void CRedDriver::MusicVolume(int param_1, int param_2, int param_3)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedDriver::SetMusicPhraseStop(int)
+void CRedDriver::SetMusicPhraseStop(int stop)
 {
-	// TODO
+    _EntryExecCommand(_SetMusicPhraseStop, stop, 0, 0, 0, 0, 0, 0);
 }
 
 /*

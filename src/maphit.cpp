@@ -492,28 +492,101 @@ void CMapHit::GetHitFaceNormal(Vec* out)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80025a4c
+ * PAL Size: 904b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CMapHit::CalcHitSlide(Vec* out, float y)
 {
-    if (s_hit_edge_index == -1) {
-        if (s_hit_face_min != 0 && y <= s_hit_face_min->m_boundsMin.y) {
-            float len = PSVECMag(&g_hit_cyl_min.m_direction);
-            if (len > s_epsilon) {
-                PSVECScale(&g_hit_cyl_min.m_direction, out, s_hit_t_min - (s_push / len));
-            } else {
-                out->x = 0.0f;
-                out->y = 0.0f;
-                out->z = 0.0f;
-            }
-            return 0;
-        }
+    if (s_hit_face_min == 0) {
+        out->x = 0.0f;
+        out->y = 0.0f;
+        out->z = 0.0f;
+        return 1;
     }
 
-    out->x = 0.0f;
-    out->y = 0.0f;
-    out->z = 0.0f;
+    if (s_hit_edge_index == -1) {
+        if (y <= s_hit_face_min->m_boundsMin.y) {
+            float len = PSVECMag(&g_hit_cyl_min.m_direction);
+            PSVECScale(&g_hit_cyl_min.m_direction, out, s_hit_t_min - (s_push / len));
+            return 0;
+        }
+
+        if (s_epsilon < s_hit_t_min) {
+            Vec* normal = reinterpret_cast<Vec*>(s_hit_face_min);
+            float planeD = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(s_hit_face_min) + 0x0C);
+            float planeDot = PSVECDotProduct(&g_hit_cyl_min.m_direction, normal);
+
+            Vec push;
+            PSVECScale(normal, &push, s_push - (planeDot - (planeD + g_hit_cyl_min.m_top.y)));
+            PSVECAdd(&g_hit_cyl_min.m_direction, &push, &push);
+            PSVECSubtract(&push, &g_hit_cyl_min.m_bottom, out);
+            return 1;
+        }
+
+        out->x = 0.0f;
+        out->y = 0.0f;
+        out->z = 0.0f;
+        return 1;
+    }
+
+    if (y <= s_hit_face_min->m_boundsMin.y) {
+        float len = PSVECMag(&g_hit_cyl_min.m_direction);
+        PSVECScale(&g_hit_cyl_min.m_direction, out, s_hit_t_min - (s_push / len));
+        return 0;
+    }
+
+    unsigned char* face = reinterpret_cast<unsigned char*>(s_hit_face_min);
+    const unsigned char vertexCount = face[0x46];
+    unsigned short* faceIndices = reinterpret_cast<unsigned short*>(face + 0x48);
+
+    Vec edgeStart;
+    Vec edgeEnd;
+    if (s_hit_edge_index == 0) {
+        edgeStart = m_vertices[faceIndices[vertexCount - 1]];
+        edgeEnd = m_vertices[faceIndices[0]];
+    } else {
+        edgeStart = m_vertices[faceIndices[s_hit_edge_index - 1]];
+        edgeEnd = m_vertices[faceIndices[s_hit_edge_index]];
+    }
+
+    Vec edge;
+    Vec edgeToCenter;
+    PSVECSubtract(&edgeEnd, &edgeStart, &edge);
+    PSVECSubtract(&edgeEnd, &g_hit_cyl_min.m_direction, &edgeToCenter);
+
+    float edgeDot = PSVECDotProduct(&edge, &edgeToCenter);
+    float edgeLenSq = PSVECDotProduct(&edge, &edge);
+
+    Vec edgeProjection;
+    Vec nearestPoint;
+    PSVECScale(&edge, &edgeProjection, edgeDot / edgeLenSq);
+    PSVECSubtract(&edgeEnd, &edgeProjection, &nearestPoint);
+
+    Vec slideDir;
+    PSVECSubtract(&g_hit_cyl_min.m_direction, &nearestPoint, &slideDir);
+
+    float side = PSVECDotProduct(reinterpret_cast<Vec*>(&g_hit_cyl_min.m_radius), &slideDir);
+    float slideLen = PSVECMag(&slideDir);
+    if (slideLen <= s_epsilon) {
+        out->x = 0.0f;
+        out->y = 0.0f;
+        out->z = 0.0f;
+    } else {
+        PSVECScale(&slideDir, &slideDir, s_push / slideLen);
+        if (0.0f < side) {
+            PSVECScale(&slideDir, &slideDir, -g_hit_cyl_min.m_top.y);
+        } else {
+            PSVECScale(&slideDir, &slideDir, g_hit_cyl_min.m_top.y);
+        }
+
+        PSVECAdd(&nearestPoint, &slideDir, &nearestPoint);
+        PSVECSubtract(&nearestPoint, &g_hit_cyl_min.m_bottom, out);
+    }
+
     return 1;
 }
 
@@ -663,7 +736,6 @@ void CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, uns
 void CMapHit::Draw()
 {
     static const u32 kOverlayColor = 0x40FF40FF;
-    static const u32 kFaceStride = 0x50;
     unsigned char* mapMngBytes = reinterpret_cast<unsigned char*>(&MapMng);
 
     GXSetVtxAttrFmt(GX_VTXFMT7, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
@@ -674,9 +746,11 @@ void CMapHit::Draw()
     GXSetVtxDesc(GX_VA_NRM, GX_DIRECT);
     GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
 
-    for (int faceIndex = 0; faceIndex < m_faceCount; ++faceIndex) {
-        unsigned char* face = Ptr(m_faces, faceIndex * kFaceStride);
+    CMapHitFace* faceIt = m_faces;
+    for (int faceIndex = 0; faceIndex < m_faceCount; faceIndex++) {
+        unsigned char* face = reinterpret_cast<unsigned char*>(faceIt);
         if ((face[0x4B] & 1) != 0) {
+            faceIt++;
             continue;
         }
 
@@ -700,13 +774,16 @@ void CMapHit::Draw()
 
         GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
         const unsigned short* reverse = reinterpret_cast<unsigned short*>(face + 0x48 + (vertexCount - 1) * 2);
-        for (int i = vertexCount - 1; i >= 0; --i) {
+        int i = vertexCount - 1;
+        while (i >= 0) {
             Vec* vertex = m_vertices + *reverse;
             GXPosition3f32(vertex->x, vertex->y, vertex->z);
             GXNormal3f32(nx, ny, nz);
             GXColor1u32(colorB);
             reverse--;
+            i--;
         }
+        faceIt++;
     }
 
     GXClearVtxDesc();
@@ -715,10 +792,12 @@ void CMapHit::Draw()
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
     GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
 
-    for (int faceIndex = 0; faceIndex < m_faceCount; ++faceIndex) {
-        unsigned char* face = Ptr(m_faces, faceIndex * kFaceStride);
+    faceIt = m_faces;
+    for (int faceIndex = 0; faceIndex < m_faceCount; faceIndex++) {
+        unsigned char* face = reinterpret_cast<unsigned char*>(faceIt);
         if ((face[0x4B] & 1) == 0) {
             face[0x4B] = 0;
+            faceIt++;
             continue;
         }
 
@@ -737,12 +816,15 @@ void CMapHit::Draw()
 
         GXBegin(GX_TRIANGLES, GX_VTXFMT7, 3);
         const unsigned short* reverse = reinterpret_cast<unsigned short*>(face + 0x48 + (vertexCount - 1) * 2);
-        for (int i = vertexCount - 1; i >= 0; --i) {
+        int i = vertexCount - 1;
+        while (i >= 0) {
             Vec* vertex = m_vertices + *reverse;
             GXPosition3f32(vertex->x, vertex->y, vertex->z);
             GXColor1u32(kOverlayColor);
             reverse--;
+            i--;
         }
+        faceIt++;
     }
 }
 

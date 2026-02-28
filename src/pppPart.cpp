@@ -1758,32 +1758,44 @@ void _pppStartPart(_pppMngSt* pppMngSt, long* pdt, int runControlPrograms)
 	int programOffset = (int)pdt[3];
 	int controlCount = *(int*)((unsigned char*)pdt + controlOffset);
 	int programCount = *(int*)((unsigned char*)pdt + programOffset);
+	pppProgramSetDefRaw* programSet = (pppProgramSetDefRaw*)(pdt + 6);
 
 	*(int*)(mngBytes + 0xB4) = controlCount;
 	*(int*)(mngBytes + 0xB8) = programCount;
 	*(void**)(mngBytes + 0xCC) = (void*)((int*)((unsigned char*)pdt + controlOffset) + 1);
 	*(void**)(mngBytes + 0xD0) = (void*)((int*)((unsigned char*)pdt + programOffset) + 1);
-	*(int*)(mngBytes + 0x34) = 0;
-	*(int*)(mngBytes + 0xAC) = 0;
 
 	pppPDataValRaw* pDataVals = 0;
 	if (programCount > 0) {
 		pDataVals = (pppPDataValRaw*)pppMemAlloc(programCount * 0x10, pppEnvStPtr->m_stagePtr, (char*)"pppPart.cpp", 0x585);
 	}
 	*(void**)(mngBytes + 0xC8) = pDataVals;
+
+	if (programSet->m_next != 0) {
+		*(void**)(mngBytes + 0xD4) = 0;
+	}
+
+	*(int*)(mngBytes + 0x34) = 0;
+	if (programCount == 0) {
+		*(void**)(mngBytes + 0xD4) = 0;
+	} else {
+		*(void**)(mngBytes + 0xD4) = programSet;
+	}
+
 	*(_pppPObjLink**)(mngBytes + 0xC4) = 0;
+	*(int*)(mngBytes + 0xAC) = 0;
 
 	if (pDataVals != 0) {
-		pppProgramSetDefRaw* programSet = (pppProgramSetDefRaw*)(pdt + 6);
 		unsigned char index = 0;
-		while (programSet != 0) {
-			pDataVals->m_programSetDef = programSet;
-			pDataVals->m_nextSpawnTime = programSet->m_startFrame;
+		pppProgramSetDefRaw* programSetIt = programSet;
+		while (programSetIt != 0) {
+			pDataVals->m_programSetDef = programSetIt;
+			pDataVals->m_nextSpawnTime = programSetIt->m_startFrame;
 			pDataVals->m_objHead = 0;
 			pDataVals->m_activeCount = 0;
 			pDataVals->m_index = index;
 			pDataVals->m_pad = 0;
-			programSet = programSet->m_next;
+			programSetIt = programSetIt->m_next;
 			index++;
 			pDataVals++;
 		}

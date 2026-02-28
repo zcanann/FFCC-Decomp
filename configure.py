@@ -808,6 +808,7 @@ config.libs = [
         "gba",
         [
             Object(NonMatching, "gba/GBAGetProcessStatus.c"),
+            Object(NonMatching, "gba/GBARead.c"),
         ],
     ),
     {

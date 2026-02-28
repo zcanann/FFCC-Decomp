@@ -1,5 +1,14 @@
 #include "dolphin/gba/GBAPriv.h"
 
+/*
+ * --INFO--
+ * PAL Address: 0x801A76FC
+ * PAL Size: 372b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 s32 GBAGetProcessStatus(s32 chan, u8* percentp) {
     GBAControl* gba = &__GBA[chan];
     GBABootInfo* bootInfo = &gba->bootInfo;
@@ -26,10 +35,10 @@ s32 GBAGetProcessStatus(s32 chan, u8* percentp) {
             *percentp = percent;
         }
     } else {
-        if (gba->callback == NULL) {
-            ret = GBA_READY;
-        } else {
+        if (gba->callback != NULL) {
             ret = GBA_BUSY;
+        } else {
+            ret = GBA_READY;
         }
     }
 

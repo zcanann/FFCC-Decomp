@@ -467,6 +467,7 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, UnkB* param_2, UnkC* param_3)
             pos.x = particle[0];
             pos.y = particle[1];
             pos.z = particle[2];
+            pppCopyVector__FR3Vec3Vec(&pos, &pos);
             if (Game.game.m_currentSceneId == 7) {
                 PSMTXMultVec(ppvWorldMatrix, &pos, &pos);
             } else {

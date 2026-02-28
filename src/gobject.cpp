@@ -26,10 +26,14 @@ extern "C" int CalcHitSlide__7CMapObjFP3Vecf(void*, Vec*);
 extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 extern "C" void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
 extern "C" int PlaySe3D__6CSoundFiP3Vecffi(CSound*, int, Vec*, float, float, int);
+extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
+    int, int, int, CGObject*, float, void*);
 extern unsigned char DAT_8032ec90[];
 extern float FLOAT_8033033c;
 extern float FLOAT_80330340;
+extern float FLOAT_80330344;
 extern float FLOAT_80330360;
+extern double DOUBLE_80330348;
 extern double DOUBLE_80330400;
 extern float FLOAT_80330410;
 extern float FLOAT_8033041c;
@@ -1351,22 +1355,109 @@ void CGObject::SetAnimSlot(int slot, int anim)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007bf34
+ * PAL Size: 644b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGObject::CalcSafePos(int, CGObject*, Vec*)
+float CGObject::CalcSafePos(int hitMask, CGObject* other, Vec* outSafePos)
 {
-	// TODO
+    Vec centerPos;
+    Vec hitMove;
+    CMapCylinder hitCylinder;
+    float safeDistance = sZeroFloat;
+    void* hitObject = *reinterpret_cast<void**>(reinterpret_cast<u8*>(&MapMng) + 0x22A88);
+
+    centerPos.x = other->m_worldPosition.x;
+    centerPos.y = m_worldPosition.y;
+    if (centerPos.y < other->m_worldPosition.y) {
+        centerPos.y = other->m_worldPosition.y;
+    }
+    centerPos.y += m_capsuleHalfHeight;
+    centerPos.z = other->m_worldPosition.z;
+
+    PSVECSubtract(&m_worldPosition, &centerPos, &hitMove);
+    hitMove.y = sZeroFloat;
+
+    hitCylinder.m_bottom = centerPos;
+    hitCylinder.m_direction = hitMove;
+    hitCylinder.m_radius = FLOAT_8033033c;
+    hitCylinder.m_height = FLOAT_8033033c;
+    hitCylinder.m_top = hitMove;
+    hitCylinder.m_direction2.x = FLOAT_80330340;
+    hitCylinder.m_direction2.y = FLOAT_80330340;
+    hitCylinder.m_direction2.z = FLOAT_80330340;
+    hitCylinder.m_radius2 = m_capsuleHalfHeight;
+    hitCylinder.m_height2 = sZeroFloat;
+
+    if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &hitCylinder, &hitMove, hitMask) == 0) {
+        *outSafePos = m_worldPosition;
+        hitMove.y = sZeroFloat;
+        hitMove.x = (m_capsuleHalfHeight + other->m_capsuleHalfHeight) * (float)sin((double)other->m_rotBaseY);
+        hitMove.z = (m_capsuleHalfHeight + other->m_capsuleHalfHeight) * (float)cos((double)other->m_rotBaseY);
+
+        hitCylinder.m_bottom = centerPos;
+        hitCylinder.m_direction = hitMove;
+        hitCylinder.m_radius = FLOAT_8033033c;
+        hitCylinder.m_height = FLOAT_8033033c;
+        hitCylinder.m_top = hitMove;
+        hitCylinder.m_direction2.x = FLOAT_80330340;
+        hitCylinder.m_direction2.y = FLOAT_80330340;
+        hitCylinder.m_direction2.z = FLOAT_80330340;
+        hitCylinder.m_radius2 = m_capsuleHalfHeight;
+        hitCylinder.m_height2 = sZeroFloat;
+
+        if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &hitCylinder, &hitMove, hitMask) != 0) {
+            CalcHitPosition__7CMapObjFP3Vec(hitObject, &centerPos);
+            safeDistance = (m_capsuleHalfHeight + other->m_capsuleHalfHeight) -
+                           PSVECDistance(&m_worldPosition, &centerPos);
+        }
+    } else {
+        CalcHitPosition__7CMapObjFP3Vec(hitObject, &centerPos);
+        centerPos.y -= m_capsuleHalfHeight;
+        *outSafePos = centerPos;
+        safeDistance = PSVECDistance(&m_worldPosition, &centerPos);
+    }
+
+    return safeDistance;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007be74
+ * PAL Size: 192b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGObject::PutDropItem()
 {
-	// TODO
+    u32 dropCount = 0;
+
+    for (int i = 0; i < 4; i++) {
+        u32 dropCode = static_cast<u16>(m_dropItemCodes[i]);
+        if ((short)m_dropItemCodes[i] > 0) {
+            int createMode;
+            if ((dropCode & 0xC000) == 0x4000) {
+                dropCode &= 0x3FFF;
+                createMode = 2;
+            } else {
+                createMode = 0;
+            }
+
+            CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
+                createMode,
+                4,
+                dropCode,
+                this,
+                FLOAT_80330344 * (float)dropCount,
+                0);
+            dropCount++;
+        }
+    }
 }
 
 /*

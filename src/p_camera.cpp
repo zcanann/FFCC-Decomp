@@ -5,6 +5,7 @@
 #include "ffcc/memory.h"
 #include "ffcc/pad.h"
 #include "ffcc/gobject.h"
+#include "ffcc/graphic.h"
 #include "ffcc/p_game.h"
 #include "ffcc/math.h"
 
@@ -62,6 +63,7 @@ extern CMaterialMan MaterialMan;
 extern CMath Math;
 extern char DAT_801d7928[];
 extern double DOUBLE_8032fa28;
+extern unsigned char DAT_8032ecd8;
 extern unsigned int lbl_801E915C[];
 extern unsigned char MapMng[];
 extern unsigned char CFlat[];
@@ -80,6 +82,7 @@ extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
 extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
+extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
 extern "C" int __cntlzw(unsigned int);
 extern "C" void setViewport__11CGraphicPcsFv(void*);
 extern "C" int CheckHitCylinder__7CMapMngFP12CMapCylinderP3VecUl(void*, void*, Vec*, unsigned long);
@@ -624,12 +627,93 @@ void CCameraPcs::SetStdProjectionMatrix()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80038FB4
+ * PAL Size: 1180b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCameraPcs::draw()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    Mtx shadowMtx;
+    Mtx cameraMtx;
+    _GXColor drawColor;
+    unsigned int redColor;
+    unsigned int magentaColor;
+
+    if ((*reinterpret_cast<int*>(self + 0x444) == 0) || ((*reinterpret_cast<unsigned int*>(CFlat + 0x129c) & 0x1000000) != 0)) {
+        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+        GXSetZCompLoc(0);
+        _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
+        GXSetZMode(1, GX_LEQUAL, 1);
+        GXSetCullMode(GX_CULL_BACK);
+        GXSetNumTevStages(1);
+        _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
+        GXSetNumChans(1);
+        GXSetChanCtrl(GX_COLOR0A0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+        GXSetChanCtrl(GX_ALPHA0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+        GXClearVtxDesc();
+        GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+        GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+        __ct__6CColorFUcUcUcUc(&drawColor, 0xFF, 0xFF, 0xFF, 0xFF);
+        Graphic.DrawSphere(reinterpret_cast<MtxPtr>(self + 4), reinterpret_cast<Vec*>(self + 0xD4), FLOAT_8032fabc,
+                           &drawColor);
+    }
+
+    if (DAT_8032ecd8 != 0) {
+        PSMTXCopy(reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 4), cameraMtx);
+        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+        GXSetZCompLoc(0);
+        _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
+        GXSetZMode(1, GX_LEQUAL, 1);
+        GXSetCullMode(GX_CULL_BACK);
+        GXSetNumTevStages(1);
+        _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
+        GXSetNumChans(1);
+        GXSetChanCtrl(GX_COLOR0A0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+        GXSetChanCtrl(GX_ALPHA0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+        GXClearVtxDesc();
+        GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+        GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+        PSMTXScale(shadowMtx, FLOAT_8032fa4c, FLOAT_8032fa4c, FLOAT_8032fa4c);
+        shadowMtx[0][3] = g_shadow_pos.x;
+        shadowMtx[1][3] = g_shadow_pos.y;
+        shadowMtx[2][3] = g_shadow_pos.z;
+        PSMTXConcat(cameraMtx, shadowMtx, shadowMtx);
+        GXLoadPosMtxImm(shadowMtx, 0);
+        redColor = 0xFF0000FF;
+        GXSetChanMatColor(GX_COLOR0A0, *reinterpret_cast<_GXColor*>(&redColor));
+        Graphic.DrawSphere();
+
+        PSMTXCopy(reinterpret_cast<MtxPtr>(reinterpret_cast<unsigned char*>(&CameraPcs) + 4), cameraMtx);
+        _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+        GXSetZCompLoc(0);
+        _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0);
+        GXSetZMode(1, GX_LEQUAL, 1);
+        GXSetCullMode(GX_CULL_BACK);
+        GXSetNumTevStages(1);
+        _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
+        _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
+        GXSetNumChans(1);
+        GXSetChanCtrl(GX_COLOR0A0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+        GXSetChanCtrl(GX_ALPHA0, 0, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+        GXClearVtxDesc();
+        GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+        GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+        PSMTXScale(shadowMtx, FLOAT_8032fa4c, FLOAT_8032fa4c, FLOAT_8032fa4c);
+        shadowMtx[0][3] = g_shadow_refpos.x;
+        shadowMtx[1][3] = g_shadow_refpos.y;
+        shadowMtx[2][3] = g_shadow_refpos.z;
+        PSMTXConcat(cameraMtx, shadowMtx, shadowMtx);
+        GXLoadPosMtxImm(shadowMtx, 0);
+        magentaColor = 0x00FF00FF;
+        GXSetChanMatColor(GX_COLOR0A0, *reinterpret_cast<_GXColor*>(&magentaColor));
+        Graphic.DrawSphere();
+    }
 }
 
 /*

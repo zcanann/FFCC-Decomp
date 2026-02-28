@@ -1034,49 +1034,55 @@ unsigned int CMath::Hsb2Rgb(int hue, int saturation, int brightness)
     sat -= sat >> 31;
     val -= val >> 31;
 
-    unsigned char v = (unsigned char)val;
-    unsigned int rgba;
+    unsigned char rgba[4];
     if ((float)sat == 0.0f) {
-        rgba = ((unsigned int)v << 24) | ((unsigned int)v << 16) | ((unsigned int)v << 8);
-    }
-    else {
-        int m = ((0xFF - sat) * val) / 0xFF;
-        int sector = hue / 60;
-        int fraction = (hue - (sector * 60)) * (val - m);
-        int x = fraction / 60;
+        rgba[0] = (unsigned char)val;
+        rgba[1] = (unsigned char)val;
+        rgba[2] = (unsigned char)val;
+    } else {
+        int tmp = (0xFF - sat) * val;
+        int lo = tmp / 0xFF + (tmp >> 31);
+        lo -= lo >> 31;
+        tmp = hue / 60 + (hue >> 31);
+        tmp = (hue + (tmp - (tmp >> 31)) * -60) * (val - lo);
+        tmp = tmp / 60 + (tmp >> 31);
 
-        unsigned char lo = (unsigned char)m;
-        unsigned char hi = (unsigned char)val;
-        unsigned char q = (unsigned char)(val - x);
-        unsigned char t = (unsigned char)(m + x);
-
+        unsigned char x = (unsigned char)(tmp - (tmp >> 31));
+        unsigned char cLo = (unsigned char)lo;
+        unsigned char cHi = (unsigned char)val;
         if (hue < 60) {
-            rgba = ((unsigned int)hi << 24) | ((unsigned int)t << 16) | ((unsigned int)lo << 8);
-        }
-        else if (hue < 120) {
-            rgba = ((unsigned int)q << 24) | ((unsigned int)hi << 16) | ((unsigned int)lo << 8);
-        }
-        else if (hue < 180) {
-            rgba = ((unsigned int)lo << 16) | ((unsigned int)hi << 8) | (unsigned int)t;
-            rgba <<= 8;
-        }
-        else if (hue < 240) {
-            rgba = ((unsigned int)lo << 16) | ((unsigned int)q << 8) | (unsigned int)hi;
-            rgba <<= 8;
-        }
-        else if (hue < 300) {
-            rgba = ((unsigned int)t << 16) | ((unsigned int)lo << 8) | (unsigned int)hi;
-            rgba <<= 8;
-        }
-        else if (hue < 360) {
-            rgba = ((unsigned int)hi << 24) | ((unsigned int)lo << 16) | ((unsigned int)q << 8);
-        }
-        else {
-            rgba = 0;
+            rgba[0] = cHi;
+            rgba[1] = cLo + x;
+            rgba[2] = cLo;
+        } else if (hue < 120) {
+            rgba[0] = cHi - x;
+            rgba[1] = cHi;
+            rgba[2] = cLo;
+        } else if (hue < 180) {
+            rgba[0] = cLo;
+            rgba[1] = cHi;
+            rgba[2] = cLo + x;
+        } else if (hue < 240) {
+            rgba[0] = cLo;
+            rgba[1] = cHi - x;
+            rgba[2] = cHi;
+        } else if (hue < 300) {
+            rgba[0] = cLo + x;
+            rgba[1] = cLo;
+            rgba[2] = cHi;
+        } else if (hue < 360) {
+            rgba[0] = cHi;
+            rgba[1] = cLo;
+            rgba[2] = cHi - x;
+        } else {
+            rgba[0] = 0;
+            rgba[1] = 0;
+            rgba[2] = 0;
         }
     }
 
-    return rgba | 0xFF;
+    rgba[3] = 0xFF;
+    return *(unsigned int*)rgba;
 }
 
 /*

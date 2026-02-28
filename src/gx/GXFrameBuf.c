@@ -482,9 +482,8 @@ static void __GXVerifCopy(void* dest, u8 clear) {
  */
 void GXCopyDisp(void* dest, GXBool clear) {
     u32 reg;
-    u32 tempPeCtrl;
-    GXBool changePeCtrl;
-    GXData* gx;
+    u32 oldPeCtrl;
+    GXBool disablePeCtrl;
 
     CHECK_GXBEGIN(1833, "GXCopyDisp");
 
@@ -492,46 +491,45 @@ void GXCopyDisp(void* dest, GXBool clear) {
     __GXVerifCopy(dest, clear);
 #endif
 
-    gx = __GXData;
     if (clear) {
-        reg = gx->zmode;
+        reg = __GXData->zmode;
         reg = (reg & 0xFFFFFFF0) | 0xF;
         GX_WRITE_RAS_REG(reg);
 
-        reg = gx->cmode0;
+        reg = __GXData->cmode0;
         reg &= 0xFFFFFFFC;
         GX_WRITE_RAS_REG(reg);
     }
 
-    changePeCtrl = FALSE;
-    tempPeCtrl = gx->peCtrl;
-    if ((clear || ((tempPeCtrl & 7) == 3)) && (((tempPeCtrl >> 6) & 1) == 1)) {
-        changePeCtrl = TRUE;
-        GX_WRITE_RAS_REG(tempPeCtrl & 0xFFFFFFBF);
+    disablePeCtrl = FALSE;
+    oldPeCtrl = __GXData->peCtrl;
+    if ((clear || ((oldPeCtrl & 7) == 3)) && (((oldPeCtrl >> 6) & 1) == 1)) {
+        disablePeCtrl = TRUE;
+        GX_WRITE_RAS_REG(oldPeCtrl & 0xFFFFFFBF);
     }
 
-    GX_WRITE_RAS_REG(gx->cpDispSrc);
-    GX_WRITE_RAS_REG(gx->cpDispSize);
-    GX_WRITE_RAS_REG(gx->cpDispStride);
+    GX_WRITE_RAS_REG(__GXData->cpDispSrc);
+    GX_WRITE_RAS_REG(__GXData->cpDispSize);
+    GX_WRITE_RAS_REG(__GXData->cpDispStride);
 
     reg = (((u32)dest >> 5) & 0xFFFFFF) | 0x4B000000;
     GX_WRITE_RAS_REG(reg);
 
-    gx->cpDisp = (gx->cpDisp & 0xFFFFF7FF) | ((u32)clear << 11);
-    gx->cpDisp = (gx->cpDisp & 0xFFFFBFFF) | 0x4000;
-    gx->cpDisp = (gx->cpDisp & 0x00FFFFFF) | 0x52000000;
-    GX_WRITE_RAS_REG(gx->cpDisp);
+    __GXData->cpDisp = (__GXData->cpDisp & 0xFFFFF7FF) | ((u32)clear << 11);
+    __GXData->cpDisp = (__GXData->cpDisp & 0xFFFFBFFF) | 0x4000;
+    __GXData->cpDisp = (__GXData->cpDisp & 0x00FFFFFF) | 0x52000000;
+    GX_WRITE_RAS_REG(__GXData->cpDisp);
 
     if (clear) {
-        GX_WRITE_RAS_REG(gx->zmode);
-        GX_WRITE_RAS_REG(gx->cmode0);
+        GX_WRITE_RAS_REG(__GXData->zmode);
+        GX_WRITE_RAS_REG(__GXData->cmode0);
     }
 
-    if (changePeCtrl) {
-        GX_WRITE_RAS_REG(gx->peCtrl);
+    if (disablePeCtrl) {
+        GX_WRITE_RAS_REG(__GXData->peCtrl);
     }
 
-    gx->bpSentNot = 0;
+    __GXData->bpSentNot = 0;
 }
 
 void GXCopyTex(void* dest, GXBool clear) {

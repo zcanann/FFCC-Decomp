@@ -11,6 +11,8 @@
 #include <math.h>
 #include <string.h>
 
+class CFont;
+
 extern "C" void reset__6CAStarFv(void*);
 extern "C" void drawAStar__6CAStarFv(void*);
 extern "C" int printf(const char*, ...);
@@ -18,6 +20,8 @@ extern "C" int sprintf(char*, const char*, ...);
 extern "C" int __cntlzw(unsigned int);
 extern "C" void StaticFrame__10CGCharaObjFv();
 extern "C" void CheckGameOver__10CGPartyObjFv();
+extern "C" void DrawDebug__8CGObjectFP5CFont(CGObject*, CFont*);
+extern "C" void DrawOmoideName__9CGItemObjFP5CFont(CGItemObj*, CFont*);
 extern "C" void Create__9CGBaseObjFv(CGBaseObj*);
 extern "C" void Destroy__9CGBaseObjFv(CGBaseObj*);
 extern "C" void Frame__9CGBaseObjFv(CGBaseObj*);
@@ -55,6 +59,14 @@ extern "C" void ClrBattleItem__8CMenuPcsFv(void*);
 extern "C" void ChangeMogMode__6CCharaFi(void*, int);
 extern "C" void TimeMogFur__6CCharaFv(void*);
 extern "C" void LoadLogoWaitingData__5CGameFv(void*);
+extern "C" void SetScale__5CFontFf(float, CFont*);
+extern "C" void SetShadow__5CFontFi(CFont*, int);
+extern "C" void SetMargin__5CFontFf(float, CFont*);
+extern "C" void SetZMode__5CFontFii(CFont*, int, int);
+extern "C" void DrawInit__5CFontFv(CFont*);
+extern "C" void SetTlut__5CFontFi(CFont*, int);
+extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
+extern "C" void SetPosZ__5CFontFf(float, CFont*);
 
 extern unsigned char Pad[];
 extern unsigned char MenuPcs[];
@@ -62,6 +74,7 @@ extern unsigned char Chara[];
 extern unsigned char GraphicsPcs[];
 extern unsigned char CameraPcs[];
 extern unsigned char DbgMenuPcs[];
+extern unsigned char MiniGamePcs[];
 extern unsigned char CFlat[];
 extern unsigned char m_objItem[];
 extern unsigned char m_objParty[];
@@ -390,6 +403,48 @@ CFlatRuntime2::CFlatRuntime2()
 
 	resetChangeScript();
 	memset(runtime + 0x12F0, 0, 0x48);
+
+	u8* baseObj = runtime + 0x10440;
+	for (int i = 0; i < 0x28; i++) {
+		baseObj[0x4C] &= 0x7F;
+		*reinterpret_cast<u16*>(baseObj + 0x30) = static_cast<u16>(i + 1);
+		baseObj += 0x50;
+	}
+
+	u8* quadObj = runtime + 0x110C0;
+	for (int i = 0; i < 0x18; i++) {
+		quadObj[0x4C] &= 0x7F;
+		*reinterpret_cast<u16*>(quadObj + 0x30) = static_cast<u16>((i + 1) | 0x100);
+		quadObj += 0xAC;
+	}
+
+	u8* gObj = runtime + 0x120E0;
+	for (int i = 0; i < 0x38; i++) {
+		gObj[0x4C] &= 0x7F;
+		*reinterpret_cast<u16*>(gObj + 0x30) = static_cast<u16>((i + 1) | 0x200);
+		gObj += 0x518;
+	}
+
+	u8* partyObj = reinterpret_cast<u8*>(m_objParty);
+	for (int i = 0; i < 4; i++) {
+		partyObj[0x4C] &= 0x7F;
+		*reinterpret_cast<u16*>(partyObj + 0x30) = static_cast<u16>((i + 1) | 0x300);
+		partyObj += 0x6F8;
+	}
+
+	u8* monObj = reinterpret_cast<u8*>(m_objMon);
+	for (int i = 0; i < 0x40; i++) {
+		monObj[0x4C] &= 0x7F;
+		*reinterpret_cast<u16*>(monObj + 0x30) = static_cast<u16>((i + 1) | 0x400);
+		monObj += 0x740;
+	}
+
+	u8* itemObj = reinterpret_cast<u8*>(m_objItem);
+	for (int i = 0; i < 0x20; i++) {
+		itemObj[0x4C] &= 0x7F;
+		*reinterpret_cast<u16*>(itemObj + 0x30) = static_cast<u16>((i + 1) | 0x500);
+		itemObj += 0x57C;
+	}
 }
 
 /*
@@ -874,32 +929,34 @@ CGObject* CFlatRuntime2::getFreeObject(int classType)
 void* CFlatRuntime2::intToClass(int classId)
 {
 	int classType = classId >> 8;
-	int slot = (classId & 0xFF) - 1;
+	unsigned int slot = static_cast<unsigned int>(classId) & 0xFF;
 
 	if (classType == 3) {
-		return m_objParty + slot * 0x6F8;
+		return m_objParty + (slot - 1) * 0x6F8;
 	}
 
-	if (classType <= 2) {
-		if (classType == 1) {
-			return CFlat + 0x110C0 + slot * 0xAC;
+	if (classType > 2) {
+		if (classType == 5) {
+			return m_objItem + (slot - 1) * 0x57C;
 		}
+		if (classType > 4) {
+			return this;
+		}
+		return m_objMon + (slot - 1) * 0x740;
+	}
+
+	if (classType == 1) {
+		return CFlat + 0x110C0 + (slot - 1) * 0xAC;
+	}
+
+	if (classType < 1) {
 		if (classType < 0) {
 			return this;
 		}
-		if (classType == 0) {
-			return CFlat + 0x10440 + slot * 0x50;
-		}
-		return CFlat + 0x120E0 + slot * 0x518;
+		return CFlat + 0x10440 + (slot - 1) * 0x50;
 	}
 
-	if (classType == 5) {
-		return m_objItem + slot * 0x57C;
-	}
-	if (classType > 4) {
-		return this;
-	}
-	return m_objMon + slot * 0x740;
+	return CFlat + 0x120E0 + (slot - 1) * 0x518;
 }
 
 /*
@@ -1411,12 +1468,173 @@ void CFlatRuntime2::Calc()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006B7B8
+ * PAL Size: 2124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CFlatRuntime2::Draw()
 {
-	// TODO
+	CFont* font = *reinterpret_cast<CFont**>(MenuPcs + 0x248);
+	SetScale__5CFontFf(1.0f, font);
+	SetShadow__5CFontFi(font, 1);
+	SetMargin__5CFontFf(0.0f, font);
+	SetZMode__5CFontFii(font, 0, 0);
+	DrawInit__5CFontFv(font);
+	SetTlut__5CFontFi(font, 7);
+	GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
+	SetColor__5CFontF8_GXColor(font, &color);
+
+	CFlatRuntime::CObject* const root =
+		reinterpret_cast<CFlatRuntime::CObject*>(reinterpret_cast<u8*>(this) + 0x1204);
+	for (CGObject* object = reinterpret_cast<CGObject*>(
+			 FindNextGBaseObjByCidMask(this, root->m_next->m_next, 5));
+		 object != 0;
+		 object = reinterpret_cast<CGObject*>(FindNextGBaseObjByCidMask(
+			 this, reinterpret_cast<CFlatRuntime::CObject*>(object)->m_next, 5))) {
+		DrawDebug__8CGObjectFP5CFont(object, font);
+	}
+
+	SetZMode__5CFontFii(font, 0, 0);
+	SetPosZ__5CFontFf(1.0f, font);
+	Mtx44 projection;
+	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcs + 0x40), projection);
+	GXSetProjection(projection, GX_PERSPECTIVE);
+
+	SetScale__5CFontFf(0.875f, font);
+	SetShadow__5CFontFi(font, 1);
+	SetMargin__5CFontFf(0.0f, font);
+	SetZMode__5CFontFii(font, 1, 1);
+	DrawInit__5CFontFv(font);
+
+	for (CGItemObj* item = reinterpret_cast<CGItemObj*>(
+			 FindNextGBaseObjByCidMask(this, root->m_next->m_next, 0x1D));
+		 item != 0;
+		 item = reinterpret_cast<CGItemObj*>(FindNextGBaseObjByCidMask(
+			 this, reinterpret_cast<CFlatRuntime::CObject*>(item)->m_next, 0x1D))) {
+		DrawOmoideName__9CGItemObjFP5CFont(item, font);
+	}
+
+	SetZMode__5CFontFii(font, 0, 0);
+	SetPosZ__5CFontFf(1.0f, font);
+	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcs + 0x40), projection);
+	GXSetProjection(projection, GX_PERSPECTIVE);
+
+	Mtx cameraMtx;
+	PSMTXCopy(*reinterpret_cast<Mtx*>(CameraPcs + 0x10), cameraMtx);
+
+	_GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)5, (_GXLogicOp)1);
+	GXSetZCompLoc(GX_FALSE);
+	_GXSetAlphaCompare((_GXCompare)6, 1, (_GXAlphaOp)0, (_GXCompare)7, 0);
+	GXSetZMode(GX_TRUE, (_GXCompare)3, GX_TRUE);
+	GXSetCullMode(GX_CULL_BACK);
+	GXSetNumTevStages(1);
+	_GXSetTevOp((_GXTevStageID)0, (_GXTevMode)4);
+	_GXSetTevOrder((_GXTevStageID)0, (_GXTexCoordID)0xFF, (_GXTexMapID)0xFF, (_GXChannelID)4);
+	GXSetNumChans(1);
+	GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+	GXSetChanCtrl(
+		GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPEC);
+	GXClearVtxDesc();
+	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+
+	u8* runtime = reinterpret_cast<u8*>(this);
+	if ((*reinterpret_cast<u32*>(runtime + 0x129C) & 0x20000) != 0) {
+		GXColor lineColor = {0xFF, 0x80, 0x80, 0xFF};
+		GXSetChanMatColor(GX_COLOR0A0, lineColor);
+		GXLoadPosMtxImm(cameraMtx, GX_PNMTX0);
+
+		CLine<64>* line = reinterpret_cast<CLine<64>*>(runtime + 0x1BDC);
+		for (int i = 0; i < 0x10; i++) {
+			line->Draw();
+			line = reinterpret_cast<CLine<64>*>(reinterpret_cast<u8*>(line) + 0x17C);
+		}
+	}
+
+	const bool showDebugCC =
+		((*reinterpret_cast<u32*>(runtime + 0x129C) & 0x200000) != 0) || ((MiniGamePcs[0x25732] & 0x80) != 0);
+	const int debugCount = *reinterpret_cast<int*>(runtime + 0xCD1C);
+	if (showDebugCC && debugCount != 0) {
+		GXColor greenColor = {0x80, 0xFF, 0x80, 0xFF};
+		GXColor blueColor = {0x80, 0x80, 0xFF, 0xFF};
+		GXColor redColor = {0xFF, 0x00, 0x00, 0xFF};
+		Vec worldUp = {0.0f, 1.0f, 0.0f};
+		float ringVerts[8][3];
+
+		u8* entry = runtime + 0xCD20;
+		for (int i = 0; i < debugCount; i++) {
+			const u8 flags = entry[0];
+			GXColor* drawColor = &greenColor;
+			if ((flags & 0x80) != 0) {
+				drawColor = &redColor;
+			} else if ((flags & 0x40) != 0) {
+				drawColor = &blueColor;
+			}
+			GXSetChanMatColor(GX_COLOR0A0, *drawColor);
+
+			Vec* start = reinterpret_cast<Vec*>(entry + 0x04);
+			Vec* end = reinterpret_cast<Vec*>(entry + 0x10);
+			float length = PSVECMag(end);
+
+			Mtx orientMtx;
+			PSMTXIdentity(orientMtx);
+			Vec dir = *end;
+			PSVECNormalize(&dir, &dir);
+
+			const float dot = PSVECDotProduct(&worldUp, &dir);
+			if (dot < 0.9999f) {
+				if (dot >= -0.9999f) {
+					Vec axis;
+					PSVECCrossProduct(&dir, &worldUp, &axis);
+					PSMTXRotAxisRad(orientMtx, &axis, -acosf(dot));
+				} else {
+					length = -length;
+				}
+			}
+
+			orientMtx[0][3] = start->x;
+			orientMtx[1][3] = start->y;
+			orientMtx[2][3] = start->z;
+			PSMTXConcat(cameraMtx, orientMtx, orientMtx);
+			GXLoadPosMtxImm(orientMtx, GX_PNMTX0);
+
+			const float radius = *reinterpret_cast<float*>(entry + 0x1C);
+			GXBegin((GXPrimitive)0xA8, GX_VTXFMT0, 0x20);
+			for (int j = 0; j < 8; j++) {
+				const float angle = static_cast<float>(j) * 0.7853982f;
+				ringVerts[j][0] = radius * sinf(angle);
+				ringVerts[j][1] = radius * cosf(angle);
+				ringVerts[j][2] = length;
+				if ((flags & 0x40) != 0) {
+					GXWGFifo.f32 = ringVerts[j][0];
+					GXWGFifo.f32 = ringVerts[j][1];
+					GXWGFifo.f32 = 1.0f;
+				} else {
+					GXWGFifo.f32 = 1.0f;
+					GXWGFifo.f32 = 1.0f;
+					GXWGFifo.f32 = 1.0f;
+				}
+				GXWGFifo.f32 = ringVerts[j][0];
+				GXWGFifo.f32 = ringVerts[j][1];
+				GXWGFifo.f32 = ringVerts[j][2];
+			}
+
+			for (int j = 0; j < 8; j++) {
+				const int next = (j + 1) & 7;
+				GXWGFifo.f32 = ringVerts[j][0];
+				GXWGFifo.f32 = ringVerts[j][1];
+				GXWGFifo.f32 = ringVerts[j][2];
+				GXWGFifo.f32 = ringVerts[next][0];
+				GXWGFifo.f32 = ringVerts[next][1];
+				GXWGFifo.f32 = ringVerts[next][2];
+			}
+
+			entry += 0x20;
+		}
+	}
 }
 
 /*

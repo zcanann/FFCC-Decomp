@@ -3,6 +3,7 @@
 #include "ffcc/gobjwork.h"
 #include "ffcc/fontman.h"
 #include "ffcc/math.h"
+#include "ffcc/astar.h"
 #include "ffcc/p_game.h"
 #include "ffcc/sound.h"
 #include "ffcc/vector.h"
@@ -19,6 +20,7 @@ extern "C" char DAT_803319ec[];
 extern "C" char DAT_80331a4c[];
 
 extern "C" void __ptmf_scall(void*, void*);
+extern "C" void aiAddDuct__8CGMonObjFRi(CGMonObj*, int&);
 extern "C" int calcPolygonGroup__6CAStarFP3Veci(void*, Vec*, int);
 extern "C" int getNearParty__8CGMonObjFiiffi(CGMonObj*, int, int, float, float, int);
 extern "C" int sprintf(char*, const char*, ...);
@@ -120,12 +122,70 @@ void CGMonObj::resetWork()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011A290
+ * PAL Size: 540b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::onFramePreCalc()
 {
-	// TODO
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	unsigned char* scriptBase = reinterpret_cast<unsigned char*>(object->m_scriptHandle);
+	unsigned char* script9 = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+
+	reinterpret_cast<CGCharaObj*>(this)->onFramePreCalc();
+	*reinterpret_cast<unsigned int*>(mon + 0x6F4) += 1;
+
+	if (*reinterpret_cast<short*>(script9 + 0x10C) == 1) {
+		unsigned char* aiData = script9;
+		short& aiState = *reinterpret_cast<short*>(mon + 0x6E4);
+		short& aiStatePrev = *reinterpret_cast<short*>(mon + 0x6E6);
+
+		if (aiState != 0) {
+			aiData = reinterpret_cast<unsigned char*>(Game.game.unkCFlatData0[1]) +
+				(aiState + *reinterpret_cast<unsigned short*>(script9 + 0x100)) * 0x1D0 + 0x10;
+		}
+
+		__ptmf_scall(this, *reinterpret_cast<unsigned short*>(aiData + 0x102) & 3, mon + 0x708);
+
+		if (aiState != aiStatePrev) {
+			aiStatePrev = aiState;
+			*reinterpret_cast<unsigned int*>(mon + 0x6CC) = 0;
+		}
+	}
+
+	if ((*reinterpret_cast<short*>(scriptBase + 0x3E) == 0) &&
+		(*reinterpret_cast<short*>(scriptBase + 0x50) == 0) &&
+		(*reinterpret_cast<short*>(scriptBase + 0x44) == 0) &&
+		(*reinterpret_cast<short*>(scriptBase + 0x46) == 0) &&
+		(static_cast<int>(static_cast<unsigned int>(mon[0x63C]) << 24) < 0) &&
+		(mon[0x6B9] == 0) &&
+		(mon[0x6C1] == 0)) {
+		*reinterpret_cast<int*>(mon + 0x6D8) = (*reinterpret_cast<short*>(script9 + 0x10C) == 1) ? -1 : 0;
+		*reinterpret_cast<int*>(mon + 0x6DC) = *reinterpret_cast<int*>(mon + 0x6C4);
+		*reinterpret_cast<int*>(mon + 0x6D0) = -1;
+
+		if ((reinterpret_cast<unsigned int>(object->m_scriptHandle[4]) < 0x9A) &&
+			(0x8D < reinterpret_cast<unsigned int>(object->m_scriptHandle[4]))) {
+			int aiLocal = 0;
+			aiAddDuct__8CGMonObjFRi(this, aiLocal);
+		} else {
+			__ptmf_scall(this, mon + 0x708);
+		}
+
+		int nextState = *reinterpret_cast<int*>(mon + 0x6D8);
+		if (*reinterpret_cast<short*>(script9 + 0x10C) == 1) {
+			if ((nextState != -1) && (nextState != prgObj->m_lastStateId)) {
+				prgObj->changeStat(nextState, 0, 0);
+			}
+		} else if (nextState != prgObj->m_lastStateId) {
+			prgObj->changeStat(nextState, 0, 0);
+		}
+	}
 }
 
 /*
@@ -1507,12 +1567,82 @@ void CGMonObj::statMove()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011367C
+ * PAL Size: 740b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::moveAStar(int, int, Vec&)
+void CGMonObj::moveAStar(int startGroup, int forbiddenGroup, Vec& targetPos)
 {
-	// TODO
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+
+	unsigned int moveFlags = *reinterpret_cast<unsigned int*>(mon + 0x70C);
+	short& routeFrom = *reinterpret_cast<short*>(mon + 0x73C);
+	short& routePrev = *reinterpret_cast<short*>(mon + 0x73E);
+
+	if (((moveFlags & 0x30000) == 0) || (*reinterpret_cast<unsigned int*>(ARRAY_8030918c) == 0)) {
+		return;
+	}
+
+	if (routeFrom == 0) {
+		routeFrom = static_cast<short>(startGroup);
+	}
+
+	if (((moveFlags & 0x10000) == 0) || ((moveFlags & 0x40) != 0)) {
+		if ((routeFrom == 0) || (forbiddenGroup == 0)) {
+			return;
+		}
+
+		CAStar::CAPos* escapePos = AStar.getEscapePos(object->m_worldPosition, targetPos, routeFrom, routePrev);
+		if (escapePos == nullptr) {
+			return;
+		}
+
+		unsigned int nextGroup = escapePos->m_groupA;
+		if (static_cast<short>(nextGroup) == routeFrom) {
+			nextGroup = escapePos->m_groupB;
+		}
+
+		unsigned char* routeStep = AStar.m_routeTable[routeFrom - 1][nextGroup + 0x36];
+		float portalDist = PSVECDistance(&object->m_worldPosition, &escapePos->m_position);
+		if ((portalDist < object->m_capsuleHalfHeight) || (startGroup == routeStep[0])) {
+			routePrev = routeFrom;
+			routeFrom = routeStep[0];
+			escapePos = reinterpret_cast<CAStar::CAPos*>(ARRAY_8030918c) +
+				AStar.m_routeTable[routeStep[0] - 1][forbiddenGroup + 0x36][1];
+		}
+
+		float targetDist = PSVECDistance(&targetPos, &object->m_worldPosition);
+		Vec dirRaw;
+		PSVECSubtract(&object->m_worldPosition, &escapePos->m_position, &dirRaw);
+		CVector dir(dirRaw);
+		dir.Normalize();
+		targetPos.x = object->m_worldPosition.x + dir.x * targetDist;
+		targetPos.y = object->m_worldPosition.y + dir.y * targetDist;
+		targetPos.z = object->m_worldPosition.z + dir.z * targetDist;
+		return;
+	}
+
+	short currentRoute = routeFrom;
+	if ((currentRoute == 0) || (forbiddenGroup == 0) || (currentRoute == forbiddenGroup)) {
+		return;
+	}
+
+	unsigned char* routeStep = AStar.m_routeTable[currentRoute - 1][forbiddenGroup + 0x36];
+	CAStar::CAPos* portalPos = reinterpret_cast<CAStar::CAPos*>(ARRAY_8030918c) + routeStep[1];
+	float portalDist = PSVECDistance(&object->m_worldPosition, &portalPos->m_position);
+	if ((portalDist < object->m_capsuleHalfHeight) || (startGroup == routeStep[0])) {
+		routeFrom = routeStep[0];
+		portalPos = reinterpret_cast<CAStar::CAPos*>(ARRAY_8030918c) +
+			AStar.m_routeTable[routeStep[0] - 1][forbiddenGroup + 0x36][1];
+	}
+
+	targetPos.x = portalPos->m_position.x;
+	targetPos.y = portalPos->m_position.y;
+	targetPos.z = portalPos->m_position.z;
 }
 
 /*

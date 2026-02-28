@@ -21,25 +21,6 @@ struct Vec4d {
     float w;
 };
 
-extern void* __vt__8CManager[];
-extern void* __vt__5CMath[];
-
-/*
- * --INFO--
- * PAL Address: 0x8001c2d0
- * PAL Size: 32b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-extern "C" void __sinit_math_cpp()
-{
-    volatile void** base = (volatile void**)&math;
-    *base = __vt__8CManager;
-    *base = __vt__5CMath;
-}
-
 /*
  * --INFO--
  * Address:	TODO

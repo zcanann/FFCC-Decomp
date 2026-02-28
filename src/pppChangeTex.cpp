@@ -63,7 +63,7 @@ extern "C" void ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2(CCh
 	void* displayList = (void*)(*(int*)((char*)meshData + 0x50) + param_5 * 0xc);
 
 	if (*(char*)((char*)param_3 + 0x14) == 0) {
-		*(int*)(MaterialMan + 0x208) = *(int*)((char*)param_2 + 0x1c) + 0x28;
+		*(int*)(MaterialMan + 0xd0) = *(int*)((char*)param_2 + 0x1c) + 0x28;
 		*(int*)(MaterialMan + 0x44) = 0xFFFFFFFF;
 		*(char*)(MaterialMan + 0x4c) = 0xFF;
 		*(int*)(MaterialMan + 0x11c) = 0;

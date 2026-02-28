@@ -73,6 +73,27 @@ extern "C" char* PTR_s_Masculin_802144c4[];
 extern "C" char* PTR_DAT_80214224[];
 extern "C" char DAT_80332958[];
 extern "C" char DAT_8033295c[];
+extern "C" u8 lbl_801DE6AC[];
+extern "C" char* lbl_80214140[];
+extern "C" char* lbl_80214160[];
+extern "C" char* lbl_80214180[];
+extern "C" char* lbl_802141A0[];
+extern "C" char* lbl_802141C0[];
+extern "C" char* lbl_802141E0[];
+extern "C" char* lbl_802142C0[];
+extern "C" char* lbl_802143A0[];
+extern "C" char* lbl_80214480[];
+extern "C" char* lbl_80214560[];
+extern "C" char* lbl_80214640[];
+extern "C" char* lbl_802146C0[];
+extern "C" char* lbl_80214740[];
+extern "C" char* lbl_802147C0[];
+extern "C" char* lbl_80214840[];
+extern "C" char* lbl_802148C0[];
+extern "C" char* lbl_80214910[];
+extern "C" char* lbl_80214960[];
+extern "C" char* lbl_802149B0[];
+extern "C" char* lbl_80214A00[];
 
 extern "C" unsigned int CmdOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int CmdCtrl__8CMenuPcsFv(CMenuPcs*);
@@ -701,12 +722,89 @@ void CMenuPcs::SingleDrawFadeIn()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80148220
+ * PAL Size: 708b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::SingleCalcFadeOut()
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+    int fadeState = *reinterpret_cast<int*>(self + 0x850);
+
+    if (*reinterpret_cast<s16*>(fadeState + 4) == 0) {
+        Sound.PlaySe(0xF, 0x40, 0x7F, 0);
+        memset(reinterpret_cast<void*>(fadeState), 0, 0x1008);
+
+        *reinterpret_cast<int*>(fadeState + 0x2C) =
+            (*reinterpret_cast<s16*>(self + 0x864) == 8) ? 10 : 0;
+        *reinterpret_cast<int*>(fadeState + 0x30) = 10;
+
+        *reinterpret_cast<int*>(fadeState + 0x6C) = 0;
+        *reinterpret_cast<int*>(fadeState + 0x70) = 10;
+        *reinterpret_cast<int*>(fadeState + 0xAC) = 0;
+        *reinterpret_cast<int*>(fadeState + 0xB0) = 10;
+        *reinterpret_cast<int*>(fadeState + 0xEC) = 0;
+        *reinterpret_cast<int*>(fadeState + 0xF0) = 10;
+
+        *reinterpret_cast<s16*>(fadeState + 0) = 4;
+        *reinterpret_cast<s16*>(fadeState + 6) = 0;
+        *reinterpret_cast<s16*>(fadeState + 4) = 1;
+    }
+
+    int completed = 0;
+    int ctrlState = *reinterpret_cast<int*>(self + 0x82C);
+    ++(*reinterpret_cast<s16*>(ctrlState + 0x22));
+
+    int totalEntries = static_cast<int>(*reinterpret_cast<s16*>(fadeState + 0));
+    s16* entry = reinterpret_cast<s16*>(fadeState + 8);
+    int frame = static_cast<int>(*reinterpret_cast<s16*>(ctrlState + 0x22));
+    for (int i = 0; i < totalEntries; i++) {
+        int start = *reinterpret_cast<int*>(entry + 0x12);
+        if (frame < start) {
+            *reinterpret_cast<float*>(entry + 8) = FLOAT_80332934;
+        } else {
+            int duration = *reinterpret_cast<int*>(entry + 0x14);
+            if (frame < start + duration) {
+                int elapsed = ++(*reinterpret_cast<int*>(entry + 0x10));
+                *reinterpret_cast<float*>(entry + 8) =
+                    static_cast<float>(-((DOUBLE_80332980 / static_cast<double>(duration)) *
+                                          static_cast<double>(elapsed) - DOUBLE_80332980));
+            } else {
+                completed++;
+                *reinterpret_cast<float*>(entry + 8) = FLOAT_8033294c;
+            }
+        }
+        entry += 0x20;
+    }
+
+    CChara::CModel* model = *reinterpret_cast<CChara::CModel**>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
+    if (*reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x10) <=
+        *reinterpret_cast<float*>(reinterpret_cast<u8*>(model) + 0x08)) {
+        SetFrame__Q26CChara6CModelFf(FLOAT_8033294c, model);
+    } else {
+        AddFrame__Q26CChara6CModelFf(FLOAT_80332934, model);
+    }
+
+    unsigned short modelScaleIndex = *reinterpret_cast<unsigned short*>(Game.game.m_scriptFoodBase[0] + 0x3E0);
+    float modelScale = DAT_801dd708[modelScaleIndex];
+    Mtx scaleMtx;
+    PSMTXScale(scaleMtx, modelScale, modelScale, modelScale);
+    scaleMtx[1][3] = DAT_801dd6f8[modelScaleIndex];
+    scaleMtx[0][3] = FLOAT_8033294c;
+    scaleMtx[2][3] = FLOAT_8033294c;
+
+    int modelPtr = *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x774) + 0x168);
+    *reinterpret_cast<u8*>(modelPtr + 0x10C) = (*reinterpret_cast<u8*>(modelPtr + 0x10C) & 0x7F) | 0x80;
+    SetMatrix__Q26CChara6CModelFPA4_f(model, scaleMtx);
+    CalcMatrix__Q26CChara6CModelFv(model);
+    CalcSkin__Q26CChara6CModelFv(model);
+
+    if (totalEntries == completed) {
+        *reinterpret_cast<s16*>(fadeState + 6) = 1;
+    }
 }
 
 /*
@@ -1506,62 +1604,109 @@ void CMenuPcs::SingLifeResetWait()
 	// TODO
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenuPcs::GetTribeStr(int)
+static inline char* GetLanguageTableString(int index, char** englishTable, char** germanTable, char** italianTable,
+                                           char** frenchTable, char** spanishTable)
 {
-	// TODO
+    u8 languageId = Game.game.m_gameWork.m_languageId;
+    if (languageId == 3) {
+        return italianTable[index];
+    }
+    if (languageId < 3) {
+        if ((languageId != 1) && (languageId != 0)) {
+            return germanTable[index];
+        }
+    } else {
+        if (languageId == 5) {
+            return spanishTable[index];
+        }
+        if (languageId < 5) {
+            return frenchTable[index];
+        }
+    }
+    return englishTable[index];
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80145674
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::GetJobStr(int)
+char* CMenuPcs::GetTribeStr(int index)
 {
-	// TODO
+    return GetLanguageTableString(index, PTR_s_Clavat_802140f0, PTR_s_Clavat_80214100, PTR_s_Clavat_80214110,
+                                  PTR_s_Clavat_80214120, PTR_s_Clavate_80214130);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801455d8
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::GetHairStr(int)
+char* CMenuPcs::GetJobStr(int index)
 {
-	// TODO
+    return GetLanguageTableString(index, lbl_80214140, lbl_80214160, lbl_80214180, lbl_802141A0, lbl_802141C0);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8014553c
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::GetMenuStr(int)
+char* CMenuPcs::GetHairStr(int index)
 {
-	// TODO
+    return GetLanguageTableString(index, lbl_80214640, lbl_802146C0, lbl_80214740, lbl_802147C0, lbl_80214840);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801454a0
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::GetAttrStr(int)
+char* CMenuPcs::GetMenuStr(int index)
 {
-	// TODO
+    return GetLanguageTableString(index, lbl_802141E0, lbl_802142C0, lbl_802143A0, lbl_80214480, lbl_80214560);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80145404
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::GetItemIcon(int)
+char* CMenuPcs::GetAttrStr(int index)
 {
-	// TODO
+    return GetLanguageTableString(index, lbl_802148C0, lbl_80214910, lbl_80214960, lbl_802149B0, lbl_80214A00);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801453f4
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+u8 CMenuPcs::GetItemIcon(int index)
+{
+    return lbl_801DE6AC[index];
 }

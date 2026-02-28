@@ -1542,9 +1542,9 @@ void CRedDriver::MusicVolume(int param_1, int param_2, int param_3)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedDriver::SetMusicPhraseStop(int)
+void CRedDriver::SetMusicPhraseStop(int stop)
 {
-	// TODO
+    _EntryExecCommand(_SetMusicPhraseStop, stop, 0, 0, 0, 0, 0, 0);
 }
 
 /*

@@ -797,12 +797,32 @@ void __MidiCtrl_PanDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C88E0
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_PanChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_PanChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+	int delta[4];
+	int* trackData = (int*)track;
+	u8* command;
+
+	delta[0] = DeltaTimeSumup((unsigned char**)trackData);
+	if (delta[0] == 0) {
+		delta[0] = 1;
+	}
+	if (trackData[0x2d] == 0) {
+		trackData[0x10] += trackData[0x33] * 0x1000;
+		trackData[0x33] = 0;
+	}
+
+	command = (u8*)trackData[0];
+	trackData[0] = (int)(command + 1);
+	trackData[0x11] = DataAddCompute(trackData + 0x10, *command, delta);
+	trackData[0x12] = delta[0];
 }
 
 /*
@@ -1410,12 +1430,32 @@ void __MidiCtrl_TremoloDelay(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C9718
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_ShakeOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_ShakeOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+	int* trackData = (int*)track;
+	u32 rate;
+	u8* command = (u8*)trackData[0];
+
+	trackData[0x30] = (u32)command[0] << 0xc;
+	if ((char)command[1] == '\0') {
+		rate = 0x100;
+	} else {
+		rate = (u32)command[1];
+	}
+	trackData[0x2e] = 0x100000 / rate;
+	trackData[0x2d] = PTR_SineSwing__Fi_8021e9d0[command[2] & 0xf];
+	*(u16*)((u8*)trackData + 0xd2) = 0;
+	*(u16*)(trackData + 0x34) = 0;
+	trackData[0x32] = 0;
+	trackData[0x33] = 0;
+	trackData[0] += 3;
 }
 
 /*

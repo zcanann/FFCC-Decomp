@@ -688,6 +688,7 @@ void CGoOutMenu::CalcGoOut()
         if (ReadMenuShort(menuPcsLayout.field_2120, 0xA) == 1) {
             input = GetGoOutInputMask();
             if ((input & 3) == 0) {
+                input = GetGoOutInputMask();
                 if ((input & 0x100) != 0) {
                     if (field_0x46 == 0) {
                         Sound.PlaySe(2, 0x40, 0x7f, 0);
@@ -723,6 +724,7 @@ void CGoOutMenu::CalcGoOut()
         if (ReadMenuShort(menuPcsLayout.field_2120, 0xA) == 1) {
             input = GetGoOutInputMask();
             if ((input & 3) == 0) {
+                input = GetGoOutInputMask();
                 if ((input & 0x100) != 0) {
                     if (field_0x46 == 0) {
                         Sound.PlaySe(2, 0x40, 0x7f, 0);

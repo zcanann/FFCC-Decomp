@@ -84,7 +84,7 @@ extern "C" void pppConstructLocationTitle2(struct pppLocationTitle2* locationTit
     LocationTitle2Work* work;
 
     value = 0.0f;
-    work = (LocationTitle2Work*)((char*)locationTitle + 8 + *unkC->m_serializedDataOffsets);
+    work = (LocationTitle2Work*)((char*)locationTitle + 0x80 + *unkC->m_serializedDataOffsets);
     work->data = 0;
     work->count = 0;
     work->scaleZ = value;
@@ -107,7 +107,7 @@ extern "C" void pppDestructLocationTitle2(struct pppLocationTitle2* locationTitl
     CMemory::CStage** stagePtr;
 
     serializedOffset = *unkC->m_serializedDataOffsets;
-    stagePtr = (CMemory::CStage**)((char*)locationTitle + 8 + serializedOffset);
+    stagePtr = (CMemory::CStage**)((char*)locationTitle + 0x80 + serializedOffset);
 
     if (*stagePtr != 0) {
         pppHeapUseRate(*stagePtr);
@@ -136,7 +136,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
 
     colorOffset = unkC->m_serializedDataOffsets[1];
     graphId = *(u32*)locationTitle;
-    work = (LocationTitle2Work*)((u8*)locationTitle + 8 + *unkC->m_serializedDataOffsets);
+    work = (LocationTitle2Work*)((u8*)locationTitle + 0x80 + *unkC->m_serializedDataOffsets);
     rand();
 
     if (unkB->m_dataValIndex == 0xFFFF) {
@@ -290,7 +290,7 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
     if (dataValIndex != 0xFFFF) {
         u32 graphId = *(u32*)locationTitle;
         int graphFrame = GetGraphFrameFromId(graphId);
-        LocationTitle2Work* work = (LocationTitle2Work*)((u8*)locationTitle + 8 + serializedOffset);
+        LocationTitle2Work* work = (LocationTitle2Work*)((u8*)locationTitle + 0x80 + serializedOffset);
         LocationTitle2Particle* particle = (LocationTitle2Particle*)work->m_particles;
         long* shapeTable = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
         u8 blendMode = *((u8*)unkB + 0xD);

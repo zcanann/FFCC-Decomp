@@ -71,6 +71,13 @@ static int ReadTagU8(char** text)
 	return value;
 }
 
+static int ReadTagS8(char** text)
+{
+	int value = GetMesNibbleValue(*text);
+	*text += 2;
+	return (int)(signed char)value;
+}
+
 static int ReadTagS16(char** text)
 {
 	int a = (unsigned char)(*text)[0] & 0x0F;
@@ -389,8 +396,7 @@ void CMes::addString(char** text, int branchMode)
 				*(int*)((char*)this + 0x3C74) = 1;
 				return;
 			case 3:
-				*(int*)((char*)this + 0x3C7C) = *(int*)((char*)this + 0x3C7C) + GetMesNibbleValue(*text);
-				*text = *text + 2;
+				*(int*)((char*)this + 0x3C7C) = *(int*)((char*)this + 0x3C7C) + ReadTagS8(text);
 				break;
 			case 4:
 				*(int*)((char*)this + 0x3D2C) = 0;
@@ -435,7 +441,7 @@ void CMes::addString(char** text, int branchMode)
 			}
 			case 0x25:
 			{
-				int value = ReadTagU8(text);
+				int value = ReadTagS8(text);
 				if (*(int*)((char*)this + 0x3D4C) == 0)
 				{
 					if (value == 0x7F)
@@ -450,21 +456,21 @@ void CMes::addString(char** text, int branchMode)
 				break;
 			}
 			case 0x26:
-				*(int*)((char*)this + 0x3CB4) = ReadTagU8(text);
+				*(int*)((char*)this + 0x3CB4) = ReadTagS8(text);
 				break;
 			case 0x27:
-				*(int*)((char*)this + 0x3CB8) = ReadTagU8(text);
+				*(int*)((char*)this + 0x3CB8) = ReadTagS8(text);
 				break;
 			case 0x31:
 				*(int*)((char*)this + 0x3C84) = ReadTagS16(text);
 				*(int*)((char*)this + 0x3C88) = ReadTagS16(text);
 				break;
 			case 0x33:
-				*(int*)((char*)this + 0x3D3C) = ReadTagU8(text);
+				*(int*)((char*)this + 0x3D3C) = ReadTagS8(text);
 				break;
 			case 0x34:
 			{
-				*(int*)((char*)this + 0x3D40) = ReadTagU8(text);
+				*(int*)((char*)this + 0x3D40) = ReadTagS8(text);
 				int nextFontSel = *(int*)((char*)this + 0x3D40);
 				if (nextFontSel == 0)
 				{

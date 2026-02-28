@@ -283,15 +283,7 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* par
 
 		for (i = 0; i < maxParticles; i = i + 1)
 		{
-			if (*(s16*)((u8*)particle + 0x22) == 0)
-			{
-				if ((emitRate <= work->m_emitTimer) && (emitCount < (s32)emitPerFrame))
-				{
-					birth(pObject, work, param, color, particle, (_PARTICLE_WMAT*)worldMats, colorData);
-					emitCount = emitCount + 1;
-				}
-			}
-			else
+			if (*(s16*)((u8*)particle + 0x22) != 0)
 			{
 				calc(work, param, particle, color, colorData);
 
@@ -324,6 +316,11 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* par
 						}
 					}
 				}
+			}
+			else if ((emitRate <= work->m_emitTimer) && (emitCount < (s32)emitPerFrame))
+			{
+				birth(pObject, work, param, color, particle, (_PARTICLE_WMAT*)worldMats, colorData);
+				emitCount = emitCount + 1;
 			}
 
 			if (worldMats != 0)

@@ -141,7 +141,6 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                     _pppPDataVal* childData =
                         (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (childId << 4));
                     Vec pos;
-                    Vec worldPos;
                     Vec* outPos;
 
                     if (childData == 0) {
@@ -160,8 +159,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                     if (data->useWorldMtx == 0) {
                         *outPos = pos;
                     } else {
-                        PSMTXMultVec(*(Mtx*)((u8*)lbl_8032ED50 + 0x78), &pos, &worldPos);
-                        *outPos = worldPos;
+                        PSMTXMultVec(*(Mtx*)((u8*)lbl_8032ED50 + 0x78), &pos, outPos);
                     }
                 }
             }
@@ -180,7 +178,6 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                     _pppPDataVal* childData =
                         (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (childId << 4));
                     Vec pos;
-                    Vec worldPos;
                     Vec* outPos;
 
                     if (childData == 0) {
@@ -199,8 +196,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                     if (data->useWorldMtx == 0) {
                         *outPos = pos;
                     } else {
-                        PSMTXMultVec(*(Mtx*)((u8*)lbl_8032ED50 + 0x78), &pos, &worldPos);
-                        *outPos = worldPos;
+                        PSMTXMultVec(*(Mtx*)((u8*)lbl_8032ED50 + 0x78), &pos, outPos);
                     }
                 }
             }

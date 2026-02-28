@@ -70,6 +70,11 @@ struct KeShpTail2XWork {
     Vec m_posHistory[31];
 };
 
+struct KeShpTail2XObject {
+    u8 _pad0[0xc];
+    _pppPObject m_obj;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x80088e4c
@@ -83,6 +88,7 @@ void pppKeShpTail2X(_pppPObject* obj, UnkB* param_2, UnkC* param_3)
 {
     KeShpTail2XStep* step;
     KeShpTail2XWork* work;
+    KeShpTail2XObject* tailObj;
     Vec pos;
 
     if (lbl_8032ED70 != 0) {
@@ -90,19 +96,20 @@ void pppKeShpTail2X(_pppPObject* obj, UnkB* param_2, UnkC* param_3)
     }
 
     step = (KeShpTail2XStep*)param_2;
+    tailObj = (KeShpTail2XObject*)obj;
     work = (KeShpTail2XWork*)((u8*)obj + 0x80 + ((KeShpTail2XOffsets*)param_3)->m_serializedDataOffsets[0]);
 
-    if (obj->m_graphId == 0) {
+    if (tailObj->m_obj.m_graphId == 0) {
         if (step->m_worldSpaceMode == 0) {
-            pos.x = obj->m_localMatrix.value[0][3];
-            pos.y = obj->m_localMatrix.value[1][3];
-            pos.z = obj->m_localMatrix.value[2][3];
+            pos.x = tailObj->m_obj.m_localMatrix.value[0][3];
+            pos.y = tailObj->m_obj.m_localMatrix.value[1][3];
+            pos.z = tailObj->m_obj.m_localMatrix.value[2][3];
         } else if (step->m_worldSpaceMode == 1) {
             pppFMATRIX ownerMatrix;
             pppFMATRIX partMatrix;
             pppFMATRIX outMatrix;
 
-            partMatrix = obj->m_localMatrix;
+            partMatrix = tailObj->m_obj.m_localMatrix;
             ownerMatrix = pppMngStPtr->m_matrix;
             pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&outMatrix, &ownerMatrix, &partMatrix);
             pos.x = outMatrix.value[0][3];
@@ -127,15 +134,15 @@ void pppKeShpTail2X(_pppPObject* obj, UnkB* param_2, UnkC* param_3)
     work->m_head--;
 
     if (step->m_worldSpaceMode == 0) {
-        pos.x = obj->m_localMatrix.value[0][3];
-        pos.y = obj->m_localMatrix.value[1][3];
-        pos.z = obj->m_localMatrix.value[2][3];
+        pos.x = tailObj->m_obj.m_localMatrix.value[0][3];
+        pos.y = tailObj->m_obj.m_localMatrix.value[1][3];
+        pos.z = tailObj->m_obj.m_localMatrix.value[2][3];
     } else if (step->m_worldSpaceMode == 1) {
         pppFMATRIX ownerMatrix;
         pppFMATRIX partMatrix;
         pppFMATRIX outMatrix;
 
-        partMatrix = obj->m_localMatrix;
+        partMatrix = tailObj->m_obj.m_localMatrix;
         ownerMatrix = pppMngStPtr->m_matrix;
         pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&outMatrix, &ownerMatrix, &partMatrix);
         pos.x = outMatrix.value[0][3];
@@ -184,6 +191,7 @@ void pppKeShpTail2XDraw(_pppPObject* obj, UnkB* param_2, UnkC* param_3)
 {
     KeShpTail2XStep* step = (KeShpTail2XStep*)param_2;
     KeShpTail2XOffsets* offsets = (KeShpTail2XOffsets*)param_3;
+    KeShpTail2XObject* tailObj = (KeShpTail2XObject*)obj;
     KeShpTail2XWork* work;
     long* shapeTable;
     long* shapeEntry;
@@ -256,7 +264,7 @@ void pppKeShpTail2XDraw(_pppPObject* obj, UnkB* param_2, UnkC* param_3)
     colorB = (float)step->m_colorStartB;
     colorA = (float)step->m_colorStartA * alphaMul;
 
-    pppCopyMatrix__FR10pppFMATRIX10pppFMATRIX(&localBase, &obj->m_localMatrix);
+    pppCopyMatrix__FR10pppFMATRIX10pppFMATRIX(&localBase, &tailObj->m_obj.m_localMatrix);
     pppUnitMatrix__FR10pppFMATRIX(&drawMtx);
 
     drawScale = step->m_scaleStart;
@@ -301,10 +309,11 @@ draw_loop:
     pos.z = segBaseZ;
 
     if (step->m_worldSpaceMode == 0) {
-        PSMTXScaleApply(localBase.value, *(Mtx*)((u8*)obj + 0x40), drawScale * mng->m_scale.x, drawScale * mng->m_scale.y,
+        PSMTXScaleApply(localBase.value, *(Mtx*)((u8*)&tailObj->m_obj + 0x40), drawScale * mng->m_scale.x,
+                        drawScale * mng->m_scale.y,
                         drawScale * mng->m_scale.z);
         PSMTXMultVec(ppvWorldMatrix, &pos, &pos);
-        PSMTXCopy(*(Mtx*)((u8*)obj + 0x40), drawMtx.value);
+        PSMTXCopy(*(Mtx*)((u8*)&tailObj->m_obj + 0x40), drawMtx.value);
     } else if (step->m_worldSpaceMode == 1) {
         pppUnitMatrix__FR10pppFMATRIX(&drawMtx);
         drawMtx.value[0][0] = drawScale * (localBase.value[0][0] * mng->m_scale.x);

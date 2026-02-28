@@ -288,9 +288,9 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
     }
 
     if (ctrl->m_dataValIndex != 0xFFFF) {
-        long* shape = *(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + ctrl->m_dataValIndex * 4);
-        pppCalcFrameShape__FPlRsRsRss(shape, work->m_shapeFrame, work->m_shapeAge, work->m_shapeNext,
-                                      (s16)ctrl->m_initWOrk);
+        long** shapeTable = (long**)*(u32*)&pppEnvStPtr->m_particleColors[0];
+        pppCalcFrameShape__FPlRsRsRss(shapeTable[ctrl->m_dataValIndex], work->m_shapeFrame, work->m_shapeAge,
+                                      work->m_shapeNext, *(s16*)&ctrl->m_initWOrk);
     }
 }
 

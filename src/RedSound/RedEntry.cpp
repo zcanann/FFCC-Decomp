@@ -10,8 +10,18 @@ extern char DAT_801e7905;
 extern char DAT_80333d30;
 extern char DAT_80333d38;
 extern char DAT_80333d3d;
+extern char DAT_80333d4d;
+extern char DAT_80333d4f;
 extern char s__s_sNOT_HAVE_A_MEMORY_FREE_AREA___801e7991[];
 extern char s__s_sWave_Header_was_broken__s_801e7972[];
+extern char s__s_____AMemory_Information______801e79ed[];
+extern char s__s_Bank___Name___Start___Size___F_801e7a0e[];
+extern char s__s__2d___WAVE_4_4d___0x_8_8X___0_801e7a53[];
+extern char s__s______WAVE_4_4d___0x_8_8X___0x_801e7a8f[];
+extern char s__s______________0x_8_8X___0x_8_8_801e7aca[];
+extern char s__s_Entry_Wave____d_801e7b01[];
+extern char s__s_Total_Size___0x_8_8X_801e7b18[];
+extern char s__s_Max_Free_Size___0x_8_8X_801e7b34[];
 
 extern "C" {
 	void* RedNew__Fi(int);
@@ -398,12 +408,99 @@ void CRedEntry::WaveHistoryManager(int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c172c
+ * PAL Size: 864b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedEntry::DisplayWaveInfo()
 {
-	// TODO
+	int* entry = (int*)this;
+
+	if (DAT_8032f408 != 0) {
+		OSReport(&DAT_80333d4d);
+		fflush(&DAT_8021d1a8);
+		OSReport(s__s_____AMemory_Information______801e79ed, &DAT_801e7905);
+		fflush(&DAT_8021d1a8);
+		OSReport(s__s_Bank___Name___Start___Size___F_801e7a0e, &DAT_801e7905);
+		fflush(&DAT_8021d1a8);
+
+		int maxFreeSize = 0;
+		int totalSize = 0;
+		int entryWave = 0;
+		int aBufferAddress = DAT_8032f480.GetABufferAddress();
+		int* aBankAddress = (int*)DAT_8032f480.GetABankAddress();
+		int aBufferEnd = aBufferAddress + DAT_8032f480.GetABufferSize();
+
+		int* bank = aBankAddress;
+		do {
+			if (bank[1] != 0) {
+				int freeSize;
+				if (bank[3] < 1) {
+					freeSize = aBufferEnd - (bank[0] + bank[1]);
+				} else {
+					freeSize = bank[2] - (bank[0] + bank[1]);
+				}
+
+				unsigned int history = (unsigned int)entry[0];
+				do {
+					if ((*(int*)(history + 0xC) != 0) && (*(int*)(*(int*)(history + 8) + 0x10) == bank[0])) {
+						break;
+					}
+					history += 0x10;
+				} while (history < (unsigned int)entry[0] + 0x400);
+
+				if (history < (unsigned int)entry[0] + 0x400) {
+					if (history < (unsigned int)entry[0] + 0x100) {
+						unsigned int index = history - (unsigned int)entry[0];
+						OSReport(s__s__2d___WAVE_4_4d___0x_8_8X___0_801e7a53, &DAT_801e7905, (int)(index >> 4),
+						         (int)*(short*)(*(int*)(history + 8) + 2), *(int*)(*(int*)(history + 8) + 0x10), bank[1],
+						         freeSize, *(int*)(history + 4));
+						fflush(&DAT_8021d1a8);
+					} else {
+						OSReport(s__s______WAVE_4_4d___0x_8_8X___0x_801e7a8f, &DAT_801e7905,
+						         (int)*(short*)(*(int*)(history + 8) + 2), *(int*)(*(int*)(history + 8) + 0x10), bank[1],
+						         freeSize, *(int*)(history + 4));
+						fflush(&DAT_8021d1a8);
+					}
+					entryWave += 1;
+				} else {
+					unsigned int bankIndex = (unsigned int)((int)bank - (int)aBankAddress);
+					OSReport(s__s______________0x_8_8X___0x_8_8_801e7aca, &DAT_801e7905, bank[0], bank[1], freeSize,
+					         (int)(bankIndex >> 3));
+					fflush(&DAT_8021d1a8);
+				}
+
+				if (maxFreeSize < bank[0] - aBufferAddress) {
+					maxFreeSize = bank[0] - aBufferAddress;
+				}
+				totalSize += bank[1];
+				aBufferAddress = bank[0] + bank[1];
+			}
+			bank += 2;
+		} while (bank < aBankAddress + 0x800);
+
+		int aBase = DAT_8032f480.GetABufferAddress();
+		int aSize = DAT_8032f480.GetABufferSize();
+		if (maxFreeSize < (aBase + aSize) - aBufferAddress) {
+			maxFreeSize = (aBase + DAT_8032f480.GetABufferSize()) - aBufferAddress;
+		}
+
+		OSReport(&DAT_80333d4f, &DAT_801e7905);
+		fflush(&DAT_8021d1a8);
+		OSReport(s__s_Entry_Wave____d_801e7b01, &DAT_801e7905, entryWave);
+		fflush(&DAT_8021d1a8);
+		OSReport(s__s_Total_Size___0x_8_8X_801e7b18, &DAT_801e7905, totalSize);
+		fflush(&DAT_8021d1a8);
+		OSReport(s__s_Max_Free_Size___0x_8_8X_801e7b34, &DAT_801e7905, maxFreeSize);
+		fflush(&DAT_8021d1a8);
+		OSReport(&DAT_80333d4f, &DAT_801e7905);
+		fflush(&DAT_8021d1a8);
+		OSReport(&DAT_80333d4d);
+		fflush(&DAT_8021d1a8);
+	}
 }
 
 /*

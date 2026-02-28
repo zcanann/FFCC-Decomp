@@ -390,6 +390,48 @@ CFlatRuntime2::CFlatRuntime2()
 
 	resetChangeScript();
 	memset(runtime + 0x12F0, 0, 0x48);
+
+	u8* baseObj = runtime + 0x10440;
+	for (int i = 0; i < 0x28; i++) {
+		baseObj[0x4C] &= 0x7F;
+		*reinterpret_cast<u16*>(baseObj + 0x30) = static_cast<u16>(i + 1);
+		baseObj += 0x50;
+	}
+
+	u8* quadObj = runtime + 0x110C0;
+	for (int i = 0; i < 0x18; i++) {
+		quadObj[0x4C] &= 0x7F;
+		*reinterpret_cast<u16*>(quadObj + 0x30) = static_cast<u16>((i + 1) | 0x100);
+		quadObj += 0xAC;
+	}
+
+	u8* gObj = runtime + 0x120E0;
+	for (int i = 0; i < 0x38; i++) {
+		gObj[0x4C] &= 0x7F;
+		*reinterpret_cast<u16*>(gObj + 0x30) = static_cast<u16>((i + 1) | 0x200);
+		gObj += 0x518;
+	}
+
+	u8* partyObj = reinterpret_cast<u8*>(m_objParty);
+	for (int i = 0; i < 4; i++) {
+		partyObj[0x4C] &= 0x7F;
+		*reinterpret_cast<u16*>(partyObj + 0x30) = static_cast<u16>((i + 1) | 0x300);
+		partyObj += 0x6F8;
+	}
+
+	u8* monObj = reinterpret_cast<u8*>(m_objMon);
+	for (int i = 0; i < 0x40; i++) {
+		monObj[0x4C] &= 0x7F;
+		*reinterpret_cast<u16*>(monObj + 0x30) = static_cast<u16>((i + 1) | 0x400);
+		monObj += 0x740;
+	}
+
+	u8* itemObj = reinterpret_cast<u8*>(m_objItem);
+	for (int i = 0; i < 0x20; i++) {
+		itemObj[0x4C] &= 0x7F;
+		*reinterpret_cast<u16*>(itemObj + 0x30) = static_cast<u16>((i + 1) | 0x500);
+		itemObj += 0x57C;
+	}
 }
 
 /*
@@ -874,32 +916,34 @@ CGObject* CFlatRuntime2::getFreeObject(int classType)
 void* CFlatRuntime2::intToClass(int classId)
 {
 	int classType = classId >> 8;
-	int slot = (classId & 0xFF) - 1;
+	unsigned int slot = static_cast<unsigned int>(classId) & 0xFF;
 
 	if (classType == 3) {
-		return m_objParty + slot * 0x6F8;
+		return m_objParty + (slot - 1) * 0x6F8;
 	}
 
-	if (classType <= 2) {
-		if (classType == 1) {
-			return CFlat + 0x110C0 + slot * 0xAC;
+	if (classType > 2) {
+		if (classType == 5) {
+			return m_objItem + (slot - 1) * 0x57C;
 		}
+		if (classType > 4) {
+			return this;
+		}
+		return m_objMon + (slot - 1) * 0x740;
+	}
+
+	if (classType == 1) {
+		return CFlat + 0x110C0 + (slot - 1) * 0xAC;
+	}
+
+	if (classType < 1) {
 		if (classType < 0) {
 			return this;
 		}
-		if (classType == 0) {
-			return CFlat + 0x10440 + slot * 0x50;
-		}
-		return CFlat + 0x120E0 + slot * 0x518;
+		return CFlat + 0x10440 + (slot - 1) * 0x50;
 	}
 
-	if (classType == 5) {
-		return m_objItem + slot * 0x57C;
-	}
-	if (classType > 4) {
-		return this;
-	}
-	return m_objMon + slot * 0x740;
+	return CFlat + 0x120E0 + (slot - 1) * 0x518;
 }
 
 /*

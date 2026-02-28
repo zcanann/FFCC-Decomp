@@ -1952,10 +1952,64 @@ void _SeMidiNoteExecute(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*, int, int
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c7278
+ * PAL Size: 512b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void MainControl(int)
+void MainControl(int frames)
 {
-	// TODO
+    u32 mul;
+    int step;
+
+    _KeyOnControl();
+    DAT_8032f3f8 = 0;
+    memset(DAT_8032f3fc, 0, 0x600);
+
+    DAT_8032f3f4 = (void*)((u8*)DAT_8032f3f0 + 0xDBC);
+    _SeMidiNoteExecute((RedSoundCONTROL*)DAT_8032f3f4, (RedKeyOnDATA*)DAT_8032f3fc,
+                       *(RedTrackDATA**)DAT_8032f3f4, *(int*)((u8*)DAT_8032f3f0 + 0x1230), frames);
+    DAT_8032f3f4 = DAT_8032f3f0;
+
+    if (*(s16*)((u8*)DAT_8032f3f0 + 0x48E) != 0) {
+        if ((((u32*)DAT_8032f3f0)[0x11B] & 0x10) == 0) {
+            mul = ((u32)*DAT_8032f41c >> 0xC) & 0xFFFF;
+            step = *(int*)((u8*)DAT_8032f3f0 + 0x448) >> 0xC;
+            if (mul != 0) {
+                if (*DAT_8032f41c < 0) {
+                    step = (step * (int)mul) >> 0x10;
+                } else {
+                    step = ((step * ((int)mul + 1)) >> 0xF) + (*(int*)((u8*)DAT_8032f3f0 + 0x448) >> 0xC);
+                }
+            }
+            *(s16*)((u8*)DAT_8032f3f0 + 0x48C) -= (s16)step * (s16)frames;
+            while (*(s16*)((u8*)DAT_8032f3f4 + 0x48C) < 1) {
+                *(s16*)((u8*)DAT_8032f3f4 + 0x48C) += 0xFA;
+                _MusicNoteExecute();
+            }
+        }
+    }
+
+    if (*(s16*)((u8*)DAT_8032f3f0 + 0x922) != 0) {
+        DAT_8032f3f4 = (void*)((u8*)DAT_8032f3f0 + 0x494);
+        *(s16*)((u8*)DAT_8032f3f0 + 0x920) -= (s16)(*(int*)((u8*)DAT_8032f3f0 + 0x8DC) >> 0xC) * (s16)frames;
+        while (*(s16*)((u8*)DAT_8032f3f4 + 0x48C) < 1) {
+            *(s16*)((u8*)DAT_8032f3f4 + 0x48C) += 0xFA;
+            _MusicNoteExecute();
+        }
+        if (*(s16*)((u8*)DAT_8032f3f0 + 0x48E) == 0) {
+            memcpy(DAT_8032f3f0, (u8*)DAT_8032f3f0 + 0x494, 0x494);
+            *(s16*)((u8*)DAT_8032f3f4 + 0x48E) = 0;
+            *(u8*)((u8*)DAT_8032f3f4 + 0x491) = 0;
+            *(int*)((u8*)DAT_8032f3f4 + 0x470) = -1;
+        }
+        DAT_8032f3f4 = DAT_8032f3f0;
+    }
+
+    _ExecuteExtraData();
+    if (DAT_8032f470 != 0) {
+        _SkipMusicEntry();
+    }
 }

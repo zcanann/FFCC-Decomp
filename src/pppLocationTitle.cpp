@@ -143,7 +143,9 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, UnkB* param_2, Un
             memcpy(&particle->m_color, (u8*)pppLocationTitle + 0x88 + colorOffset, 4);
             particle->m_frame = work->m_cur;
 
-            s16 shape = (s16)(rand() % *(s16*)((u8*)shapeTable + 6));
+            int random = rand();
+            s16 divisor = *(s16*)((u8*)shapeTable + 6);
+            s16 shape = (s16)random - (s16)(random / (int)divisor) * divisor;
             particle->m_shapeA = shape;
             particle->m_shapeB = shape;
 
@@ -214,11 +216,19 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, UnkB* param_2, Un
             }
         }
 
-        pppCopyVector(particles[startIndex + inserted + 1].m_pos, particles[startIndex + 1].m_pos);
+        Vec copied;
+        copied.x = particles[startIndex + 1].m_pos.x;
+        copied.y = particles[startIndex + 1].m_pos.y;
+        copied.z = particles[startIndex + 1].m_pos.z;
+        pppCopyVector(particles[startIndex + inserted + 1].m_pos, copied);
 
         for (int i = 0; i < inserted; i++) {
             LocationTitleParticle* dst = &particles[startIndex + i + 1];
-            pppCopyVector(dst->m_pos, interp[i]);
+            Vec copiedInterp;
+            copiedInterp.x = interp[i].x;
+            copiedInterp.y = interp[i].y;
+            copiedInterp.z = interp[i].z;
+            pppCopyVector(dst->m_pos, copiedInterp);
             memcpy(&dst->m_color, (u8*)pppLocationTitle + 0x88 + colorOffset, 4);
             dst->m_frame = work->m_cur;
         }

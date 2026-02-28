@@ -61,36 +61,47 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(struct pppYmCheckBGHeight* pp
         _pppMngSt* pppMngSt = pppMngStPtr;
         Vec direction;
         CMapCylinderRaw cyl;
+        float* cylF = (float*)&cyl;
         Vec hitPos;
         float currentY;
+        float resolvedY;
+        float baseX;
+        float baseZ;
+        float bottomY;
 
         direction.x = lbl_80330ED0;
         direction.y = lbl_80330ED4;
         direction.z = lbl_80330ED0;
 
         currentY = ((float*)pppMngSt)[0x94 / sizeof(float)];
-        cyl.m_bottom.x = ((float*)pppMngSt)[0x84 / sizeof(float)];
-        cyl.m_bottom.z = ((float*)pppMngSt)[0xA4 / sizeof(float)];
-        cyl.m_bottom.y = currentY + param_2->m_unk0x4;
+        resolvedY = currentY;
+        baseX = ((float*)pppMngSt)[0x84 / sizeof(float)];
+        baseZ = ((float*)pppMngSt)[0xA4 / sizeof(float)];
+        bottomY = currentY + param_2->m_unk0x4;
 
-        cyl.m_direction2.x = lbl_80330ED8;
-        cyl.m_direction2.y = lbl_80330ED8;
-        cyl.m_direction2.z = lbl_80330ED8;
-        cyl.m_radius2 = lbl_80330EDC;
-        cyl.m_height2 = lbl_80330EDC;
-        cyl.m_radius = lbl_80330EDC;
-
-        cyl.m_top.x = lbl_80330ED0;
-        cyl.m_top.y = lbl_80330ED4;
-        cyl.m_top.z = lbl_80330ED0;
-        cyl.m_height = lbl_80330ED0;
+        cylF[12] = lbl_80330ED8;
+        cylF[11] = lbl_80330ED8;
+        cylF[10] = lbl_80330ED8;
+        cylF[15] = lbl_80330EDC;
+        cylF[14] = lbl_80330EDC;
+        cylF[13] = lbl_80330EDC;
+        cylF[6] = lbl_80330ED0;
+        cylF[7] = lbl_80330ED4;
+        cylF[8] = lbl_80330ED0;
+        cylF[9] = lbl_80330ED0;
+        cyl.m_bottom.x = baseX;
+        cyl.m_bottom.y = bottomY;
+        cyl.m_bottom.z = baseZ;
 
         if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(MapMng, (CMapCylinder*)&cyl, &direction, 0xffffffff) != 0) {
             CalcHitPosition__7CMapObjFP3Vec(*(void**)(MapMng + 0x22A78), &hitPos);
-            if (!(currentY - ((float*)param_2)[3] > hitPos.y)) {
-                currentY = hitPos.y + param_2->m_unk0x8;
+            if (currentY - ((float*)param_2)[3] > hitPos.y) {
+                resolvedY = currentY;
+            } else {
+                resolvedY = hitPos.y + param_2->m_unk0x8;
             }
         }
+        currentY = resolvedY;
 
         ((float*)pppMngSt)[0x0C / sizeof(float)] = currentY;
         ((float*)pppMngSt)[0x5C / sizeof(float)] = currentY;

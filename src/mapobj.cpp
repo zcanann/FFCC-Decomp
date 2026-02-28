@@ -159,9 +159,11 @@ CMapObj::~CMapObj()
 extern "C" CMapObj* dtor_8002BE7C(CMapObj* mapObj, short param_2)
 {
     if (mapObj != 0) {
-        void* attr = PtrAt(mapObj, 0xEC);
-        if (attr != 0) {
-            (*(void (**)(void*, int))(*reinterpret_cast<unsigned int*>(attr) + 8))(attr, 1);
+        int* piVar1 = reinterpret_cast<int*>(PtrAt(mapObj, 0xEC));
+        if (piVar1 != 0) {
+            if (piVar1 != 0) {
+                (*(void (**)(int*, int))(*piVar1 + 8))(piVar1, 1);
+            }
             PtrAt(mapObj, 0xEC) = 0;
         }
 

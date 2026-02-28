@@ -2,22 +2,34 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/cflat_runtime.h"
 #include "ffcc/file.h"
+#include "ffcc/gobject.h"
 #include "ffcc/graphic.h"
 #include "ffcc/math.h"
 
 extern "C" void __dl__FPv(void* ptr);
+extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppPartInit__8CPartMngFv2(CPartMng* partMng);
 extern "C" unsigned int CheckSum__FPvi(void*, int);
 extern "C" void pppStopSe__FP9_pppMngStP7PPPSEST(_pppMngSt*, PPPSEST*);
 extern "C" float ppvScreenMatrix[4][4];
 extern "C" float ppvScreenMatrix0[4][4];
+extern "C" float ppvCameraMatrix02[3][4];
 extern "C" float FLOAT_8032fe5c;
 extern "C" float FLOAT_8032fe60;
 extern "C" float FLOAT_8032fe64;
 extern "C" float FLOAT_8032fe68;
+extern "C" float FLOAT_8032fe4c;
+extern "C" float FLOAT_8032fe50;
+extern "C" float FLOAT_8032fe54;
+extern "C" float FLOAT_8032fe58;
+extern "C" float FLOAT_8032ed58;
+extern "C" float FLOAT_8032ed5c;
 extern "C" float FLOAT_8032ed60;
 extern "C" float FLOAT_8032fe18;
 extern "C" unsigned char DAT_8032ed68;
+extern "C" int DAT_8032ed6c;
+extern "C" unsigned char DAT_8032ed90;
+extern "C" unsigned char DAT_8032ed91;
 extern "C" void __ct__9_pppMngStFv(_pppMngSt* pppMngSt);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
 extern "C" void pppSetBlendMode__FUc(unsigned char);
@@ -27,7 +39,11 @@ extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_G
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
 extern "C" void _pppDrawPart__FP9_pppMngSt(_pppMngSt*);
+extern "C" void Create__9CGBaseObjFv(CGBaseObj*);
+extern "C" void LoadMap__7CMapPcsFiiPvUlUc(void*, int, int, void*, unsigned long, unsigned char);
 extern int DAT_8032ed70;
+extern unsigned char PartPcs[];
+extern unsigned char MapPcs[];
 extern CPartMng PartMng;
 extern PPPCREATEPARAM g_dcp;
 static char s_partMng_cpp_801d8230[] = "partMng.cpp";
@@ -694,12 +710,156 @@ void pppSetFog(unsigned char, unsigned char, unsigned char, unsigned char, float
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005bbc0
+ * PAL Size: 1648b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartMng::pppEditBeforeCalc()
 {
-	// TODO
+    char* self = reinterpret_cast<char*>(this);
+    int* lastEnvCmd = reinterpret_cast<int*>(self + 0x23560);
+    CGObject** editorObj = reinterpret_cast<CGObject**>(self + 0x80c);
+
+    switch (*lastEnvCmd) {
+    case 1:
+    case 2: {
+        // Camera matrix handed over from editor uses opposite handedness on these axes.
+        *reinterpret_cast<float*>(self + 0x60) = -*reinterpret_cast<float*>(self + 0x60);
+        *reinterpret_cast<float*>(self + 0x68) = -*reinterpret_cast<float*>(self + 0x68);
+        *reinterpret_cast<float*>(self + 0x44) = -*reinterpret_cast<float*>(self + 0x44);
+        *reinterpret_cast<float*>(self + 0x54) = -*reinterpret_cast<float*>(self + 0x54);
+        *reinterpret_cast<float*>(self + 0x6c) = -*reinterpret_cast<float*>(self + 0x6c);
+        *reinterpret_cast<float*>(self + 0x6c) *= *reinterpret_cast<float*>(self + 0x70);
+
+        PSMTXCopy(reinterpret_cast<float(*)[4]>(self + 0x40), ppvCameraMatrix02);
+        C_MTXPerspective(ppvScreenMatrix, FLOAT_8032fe4c, FLOAT_8032fe50, FLOAT_8032fe54, FLOAT_8032fe58);
+        FLOAT_8032ed58 = ppvScreenMatrix[2][0];
+        FLOAT_8032ed5c = ppvScreenMatrix[2][1];
+        FLOAT_8032ed60 = ppvScreenMatrix[2][3];
+        PSMTXCopy(ppvCameraMatrix02, ppvCameraMatrix0);
+        PSMTX44Copy(ppvScreenMatrix, ppvScreenMatrix0);
+
+        _GXColor clearColor;
+        clearColor.r = *reinterpret_cast<unsigned char*>(self + 0x158);
+        clearColor.g = *reinterpret_cast<unsigned char*>(self + 0x159);
+        clearColor.b = *reinterpret_cast<unsigned char*>(self + 0x15a);
+        clearColor.a = 0xFF;
+        GXSetCopyClear(clearColor, 0x00FFFFFF);
+
+        unsigned char useFog = *reinterpret_cast<unsigned char*>(self + 0x15c);
+        _GXColor fogColor;
+        fogColor.r = *reinterpret_cast<unsigned char*>(self + 0x15d);
+        fogColor.g = *reinterpret_cast<unsigned char*>(self + 0x15e);
+        fogColor.b = *reinterpret_cast<unsigned char*>(self + 0x15f);
+        fogColor.a = 0;
+
+        if (useFog != 0) {
+            Graphic.SetFogColor(fogColor);
+            if (*lastEnvCmd == 1) {
+                Graphic.SetFogParam(*reinterpret_cast<float*>(self + 0x160), *reinterpret_cast<float*>(self + 0x164));
+            } else {
+                Graphic.SetFogParam(*reinterpret_cast<float*>(self + 0x164), *reinterpret_cast<float*>(self + 0x160));
+            }
+        } else {
+            fogColor.r = 0;
+            fogColor.g = 0;
+            fogColor.b = 0;
+            fogColor.a = 0;
+            Graphic.SetFogColor(fogColor);
+            Graphic.SetFogParam(FLOAT_8032fe5c, FLOAT_8032fe5c);
+        }
+
+        DAT_8032ed6c = 1;
+        break;
+    }
+    case 0x18:
+        Graphic._WaitDrawDone(s_partMng_cpp_801d8230, 0x7a4);
+        LoadMap__7CMapPcsFiiPvUlUc(
+            MapPcs,
+            *reinterpret_cast<int*>(self + 0x188),
+            *reinterpret_cast<int*>(self + 0x18c),
+            0,
+            0,
+            0
+        );
+        *reinterpret_cast<unsigned int*>(MapPcs + 0x180) = 1;
+        break;
+    case 0x19: {
+        Graphic._WaitDrawDone(s_partMng_cpp_801d8230, 0x7ad);
+
+        if (*editorObj != 0) {
+            if ((*editorObj)->m_charaModelHandle != 0) {
+                delete (*editorObj)->m_charaModelHandle;
+                (*editorObj)->m_charaModelHandle = 0;
+            }
+            __dl__FPv(*editorObj);
+            *editorObj = 0;
+        }
+
+        CMemory::CStage* stageLoad = *reinterpret_cast<CMemory::CStage**>(PartPcs + 0x1c);
+        *editorObj = static_cast<CGObject*>(__nw__FUlPQ27CMemory6CStagePci(0x518, stageLoad, s_partMng_cpp_801d8230, 0x7b5));
+        if (*editorObj != 0) {
+            Create__9CGBaseObjFv(*editorObj);
+
+            CCharaPcs::CHandle* handle = new (stageLoad, s_partMng_cpp_801d8230, 0x7b7) CCharaPcs::CHandle;
+            (*editorObj)->m_charaModelHandle = handle;
+            if (handle != 0) {
+                handle->Add();
+                handle->m_charaNo = 3;
+                handle->LoadModel(
+                    *reinterpret_cast<int*>(self + 0x190),
+                    *reinterpret_cast<unsigned long*>(self + 0x194),
+                    *reinterpret_cast<unsigned long*>(self + 0x198),
+                    0,
+                    -1,
+                    0,
+                    0
+                );
+
+                if (handle == (*editorObj)->m_charaModelHandle && !handle->IsModelLoaded(1)) {
+                    delete handle;
+                    (*editorObj)->m_charaModelHandle = 0;
+                }
+            }
+        }
+        break;
+    }
+    case 0x1a:
+        if (*editorObj != 0) {
+            Graphic._WaitDrawDone(s_partMng_cpp_801d8230, 0x7ce);
+            if (DAT_8032ed91 == 0) {
+                DAT_8032ed90 = 0;
+                DAT_8032ed91 = 1;
+            }
+
+            CCharaPcs::CHandle* handle = (*editorObj)->m_charaModelHandle;
+            if (handle != 0) {
+                handle->LoadAnim(reinterpret_cast<char*>(self + 0x19c), DAT_8032ed90, 0, -1, -1, -1, 0);
+                handle->SetAnim(DAT_8032ed90, -1, -1, -1, 0);
+                DAT_8032ed90++;
+            }
+        }
+        break;
+    case 0x1b:
+        *reinterpret_cast<unsigned int*>(MapPcs + 0x180) = *reinterpret_cast<unsigned int*>(self + 0x1bc);
+        break;
+    case 0x1c:
+        if (*editorObj != 0 && (*editorObj)->m_charaModelHandle != 0) {
+            if (*reinterpret_cast<int*>(self + 0x1c0) != 0) {
+                (*editorObj)->m_charaModelHandle->m_flags |= 1;
+            } else {
+                (*editorObj)->m_charaModelHandle->m_flags &= ~1;
+            }
+        }
+        break;
+    default:
+        break;
+    }
+
+    *lastEnvCmd = 0;
 }
 
 /*

@@ -23,7 +23,7 @@ public:
     void LetterReplyWinClose();
     void LetterAttachWinOpen();
     void LetterAttachWinClose();
-    void LetterConfirmOpen();
+    bool LetterConfirmOpen();
     void LetterConfirmClose();
     void LetterDraw();
     void LetterListDraw();

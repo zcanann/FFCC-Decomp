@@ -27,6 +27,13 @@ extern "C" char DAT_801d63c0[];
 extern "C" char DAT_801d6400[];
 extern "C" char DAT_801d643c[];
 extern "C" char DAT_8032f714[];
+extern "C" u8 DAT_801fd480[];
+extern "C" float FLOAT_8032f6c0;
+extern "C" float FLOAT_8032f6c4;
+extern "C" double DOUBLE_8032f6d8;
+extern "C" float FLOAT_8032f708;
+extern "C" float FLOAT_8032f70c;
+extern "C" float FLOAT_8032f710;
 
 extern struct {
     float _212_4_;
@@ -78,6 +85,8 @@ void _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevA
                                                                                                              int);
 void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(int, int, int, int, int,
                                                                                            int);
+void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, int, int, int, int);
+void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 }
 
 /*
@@ -601,7 +610,62 @@ void CGraphic::Printf(unsigned long, unsigned long, char*, ...)
  */
 void CGraphic::DrawDebugString()
 {
-	// TODO
+    Mtx44 proj;
+    Mtx model;
+    Mtx texMtx;
+    GXTexObj texObj;
+
+    void* renderMode = PtrAt(this, 0x71E0);
+    C_MTXOrtho(proj,
+               FLOAT_8032f6c0,
+               static_cast<float>(U16At(renderMode, 6)),
+               FLOAT_8032f6c0,
+               static_cast<float>(U16At(renderMode, 4)),
+               FLOAT_8032f6c0,
+               FLOAT_8032f708);
+    GXSetProjection(proj, GX_ORTHOGRAPHIC);
+
+    PSMTXIdentity(model);
+    GXLoadPosMtxImm(model, 0);
+    GXSetCurrentMtx(0);
+
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 1, 0, 0);
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 0, 0, 7, 0);
+    GXSetNumChans(0);
+    GXSetNumTevStages(1);
+    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 3);
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 0xFF);
+
+    PSMTXIdentity(model);
+    GXLoadPosMtxImm(model, 0);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetCurrentMtx(0);
+
+    GXInitTexObj(&texObj, DAT_801fd480, 0x40, 0x60, GX_TF_I8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXInitTexObjLOD(&texObj, GX_NEAR, GX_NEAR, FLOAT_8032f6c0, FLOAT_8032f6c0, FLOAT_8032f6c0, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXLoadTexObj(&texObj, GX_TEXMAP0);
+
+    PSMTXScale(texMtx, FLOAT_8032f70c, FLOAT_8032f710, FLOAT_8032f6c4);
+    GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX2x4);
+    GXSetNumTexGens(1);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x1E, GX_FALSE, 0x7D);
+
+    s16 y = 0x10;
+    u8* base = reinterpret_cast<u8*>(this);
+    for (u32 i = 0; i < *reinterpret_cast<u32*>(base + 0x14); ++i) {
+        s16 xCell = *reinterpret_cast<s16*>(base + 0x18 + i * 4);
+        s16 yCell = *reinterpret_cast<s16*>(base + 0x1A + i * 4);
+        char* text = reinterpret_cast<char*>(base + 0x1E0 + i * 0x70);
+
+        if (xCell == -1) {
+            DrawDebugStringDirect(0x10, static_cast<u32>(y), text, 0xC);
+        } else {
+            DrawDebugStringDirect(static_cast<u32>(xCell * 0xC + 0x10), static_cast<u32>(yCell * 0xC + 0x10), text, 0xC);
+        }
+
+        y += 0xC;
+    }
 }
 
 /*

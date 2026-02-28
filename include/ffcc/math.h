@@ -1,6 +1,8 @@
 #ifndef _FFCC_CMATH_H_
 #define _FFCC_CMATH_H_
 
+#include "ffcc/manager.h"
+
 struct Vec;
 struct Vec4d;
 struct SRT;
@@ -24,7 +26,7 @@ public:
     void Identity();
 };
 
-class CMath
+class CMath : public CManager
 {
 public:
     CMath();

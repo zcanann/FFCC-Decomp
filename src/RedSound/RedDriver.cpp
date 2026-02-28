@@ -1754,12 +1754,16 @@ int CRedDriver::SePlay(int bank, int sep, int autoID, int unk, int volume, int p
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bf604
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::SeMasterVolume(int)
+void CRedDriver::SeMasterVolume(int volume)
 {
-	// TODO
+    _EntryExecCommand(_SeMasterVolume, volume, 0, 0, 0, 0, 0, 0);
 }
 
 /*

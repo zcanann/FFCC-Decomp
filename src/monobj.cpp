@@ -684,12 +684,26 @@ int CGMonObj::getReplaceStat(int state)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801179BC
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::onStatShield()
 {
-	// TODO
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+
+	if (*reinterpret_cast<int*>(mon + 0x52C) == 1) {
+		unsigned int subFrame = *reinterpret_cast<unsigned int*>(mon + 0x530);
+		int action = *reinterpret_cast<int*>(mon + 0x560);
+		unsigned int waitFrame = *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + action * 0x48 + 0x2E);
+
+		if (subFrame == waitFrame) {
+			reinterpret_cast<CGPrgObj*>(this)->changeSubStat(3);
+		}
+	}
 }
 
 /*

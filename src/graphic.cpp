@@ -670,12 +670,55 @@ void CGraphic::DrawDebugString()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80018bf0
+ * PAL Size: 452b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphic::InitDebugString()
 {
-	// TODO
+    Mtx44 proj;
+    Mtx model;
+    Mtx texMtx;
+    GXTexObj texObj;
+
+    void* renderMode = PtrAt(this, 0x71E0);
+    C_MTXOrtho(proj,
+               FLOAT_8032f6c0,
+               static_cast<float>(U16At(renderMode, 6)),
+               FLOAT_8032f6c0,
+               static_cast<float>(U16At(renderMode, 4)),
+               FLOAT_8032f6c0,
+               FLOAT_8032f708);
+    GXSetProjection(proj, GX_ORTHOGRAPHIC);
+
+    PSMTXIdentity(model);
+    GXLoadPosMtxImm(model, 0);
+    GXSetCurrentMtx(0);
+
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 1, 0, 0);
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+    _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 0, 0, 7, 0);
+    GXSetNumChans(0);
+    GXSetNumTevStages(1);
+    _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 3);
+    _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 0xFF);
+
+    PSMTXIdentity(model);
+    GXLoadPosMtxImm(model, 0);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetCurrentMtx(0);
+
+    GXInitTexObj(&texObj, DAT_801fd480, 0x40, 0x60, GX_TF_I8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXInitTexObjLOD(&texObj, GX_NEAR, GX_NEAR, FLOAT_8032f6c0, FLOAT_8032f6c0, FLOAT_8032f6c0, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXLoadTexObj(&texObj, GX_TEXMAP0);
+
+    PSMTXScale(texMtx, FLOAT_8032f70c, FLOAT_8032f710, FLOAT_8032f6c4);
+    GXLoadTexMtxImm(texMtx, 0x1E, GX_MTX2x4);
+    GXSetNumTexGens(1);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x1E, GX_FALSE, 0x7D);
 }
 
 /*

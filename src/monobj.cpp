@@ -1,6 +1,7 @@
 #include "ffcc/monobj.h"
 #include "ffcc/charaobj.h"
 #include "ffcc/gobjwork.h"
+#include "ffcc/fontman.h"
 #include "ffcc/math.h"
 #include "ffcc/p_game.h"
 #include "ffcc/sound.h"
@@ -20,6 +21,12 @@ extern "C" char DAT_80331a4c[];
 extern "C" void __ptmf_scall(void*, void*);
 extern "C" int calcPolygonGroup__6CAStarFP3Veci(void*, Vec*, int);
 extern "C" int getNearParty__8CGMonObjFiiffi(CGMonObj*, int, int, float, float, int);
+extern "C" int sprintf(char*, const char*, ...);
+extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
+extern "C" void SetPosX__5CFontFf(float, CFont*);
+extern "C" void SetPosY__5CFontFf(float, CFont*);
+extern "C" void SetPosZ__5CFontFf(float, CFont*);
+extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" float DAT_8032ec24;
 
 /*
@@ -611,12 +618,58 @@ void CGMonObj::onStatDie()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011740C
+ * PAL Size: 644b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::onDrawDebug(CFont*, float, float&, float)
+void CGMonObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 {
-	// TODO
+	CGCharaObj* charaObj = reinterpret_cast<CGCharaObj*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+
+	charaObj->onDrawDebug(font, posX, posY, posZ);
+
+	if ((((int)((unsigned int)object->m_weaponNodeFlags << 0x18) < 0) &&
+			(*reinterpret_cast<unsigned int*>(CFlat + 0x12AC) == 0)) &&
+		((*reinterpret_cast<unsigned int*>(DbgMenuPcs + 0x6484) & 0x80) != 0)) {
+		char text[0x100];
+		unsigned short aiState = *reinterpret_cast<unsigned short*>(mon + 0x6E4);
+		int targetIndex = *reinterpret_cast<int*>(mon + 0x6C4);
+		int targetChar = '-';
+		int aiChar = '-';
+
+		if (targetIndex >= 0) {
+			targetChar = targetIndex + '0';
+		}
+		if ((aiState & 0x7FFF) != 0) {
+			aiChar = (aiState & 0x7FFF) + 0x40;
+		}
+
+		sprintf(text, "%d:%c %d:%c", (int)object->m_scriptHandle[2], aiChar, *reinterpret_cast<int*>(mon + 0x6D0), targetChar);
+		SetPosX__5CFontFf(posX - static_cast<float>(GetWidth__5CFontFPc(font, text)) * 0.5f, font);
+		SetPosY__5CFontFf(posY, font);
+		SetPosZ__5CFontFf(posZ, font);
+		Draw__5CFontFPc(font, text);
+		posY -= static_cast<float>(font->m_glyphWidth) * font->scaleY;
+
+		int targetDist = 0;
+		if (targetIndex >= 0) {
+			targetDist = static_cast<int>(*reinterpret_cast<float*>(mon + targetIndex * 4 + 0x5D0));
+		}
+
+		int chaseRange = static_cast<int>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0xCC));
+		int spawnDist = static_cast<int>(PSVECDistance(reinterpret_cast<Vec*>(mon + 0x6F8), &object->m_worldPosition));
+		sprintf(text, "%d %d %d", targetDist, spawnDist, chaseRange);
+		SetPosX__5CFontFf(posX - static_cast<float>(GetWidth__5CFontFPc(font, text)) * 0.5f, font);
+		SetPosY__5CFontFf(posY, font);
+		SetPosZ__5CFontFf(posZ, font);
+		Draw__5CFontFPc(font, text);
+		posY -= static_cast<float>(font->m_glyphWidth) * font->scaleY;
+	}
 }
 
 /*

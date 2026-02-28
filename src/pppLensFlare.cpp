@@ -170,6 +170,10 @@ void pppFrameLensFlare(void* obj, void* param2, void* param3)
  * --INFO--
  * PAL Address: 0x800de718
  * PAL Size: 428b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppRenderLensFlare(void* obj, void* param2, void* param3)
 {
@@ -179,6 +183,11 @@ void pppRenderLensFlare(void* obj, void* param2, void* param3)
 	int iVar1;
 	int iVar2;
 	long* shape;
+	u8* lensBytes;
+	u8* shapeBytes;
+	u8* colorBytes;
+	u8* arg3Bytes;
+	float stepValue;
 
 	pppLensFlare = (pppColum*)obj;
 	unkB = (UnkB*)param2;
@@ -186,50 +195,53 @@ void pppRenderLensFlare(void* obj, void* param2, void* param3)
 
 	iVar2 = serializedDataOffsets[2];
 	iVar1 = serializedDataOffsets[1];
-	if (unkB->m_dataValIndex != 0xffff) {
-		shape = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + unkB->m_dataValIndex * 4);
-		if (*((u8*)pppLensFlare + iVar2 + 0xb2) != 0) {
-			pppCVECTOR local_70;
-			Vec local_6c;
-			Vec local_60;
-			Mtx local_54;
+	lensBytes = (u8*)pppLensFlare;
+	shapeBytes = lensBytes + iVar2;
+	colorBytes = lensBytes + iVar1;
+	arg3Bytes = (u8*)&unkB->m_arg3;
+	stepValue = *(float*)&unkB->m_stepValue;
+	if ((unkB->m_dataValIndex != 0xffff) &&
+		(shape = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + unkB->m_dataValIndex * 4),
+		 shapeBytes[0xb2] != 0)) {
+		pppCVECTOR local_70;
+		Vec local_6c;
+		Vec local_60;
+		Mtx local_54;
 
-			PSMTXIdentity(local_54);
-			local_54[2][2] = *(float*)&unkB->m_stepValue;
-			local_54[0][0] = local_54[2][2] * pppMngStPtr->m_scale.x * *(float*)((u8*)pppLensFlare + 0x40);
-			local_54[1][1] = local_54[2][2] * pppMngStPtr->m_scale.y * *(float*)((u8*)pppLensFlare + 0x54);
-			local_54[2][2] = local_54[2][2] * pppMngStPtr->m_scale.z * *(float*)((u8*)pppLensFlare + 0x68);
+		PSMTXIdentity(local_54);
+		local_54[2][2] = stepValue;
+		local_54[0][0] = local_54[2][2] * pppMngStPtr->m_scale.x * *(float*)(lensBytes + 0x40);
+		local_54[1][1] = local_54[2][2] * pppMngStPtr->m_scale.y * *(float*)(lensBytes + 0x54);
+		local_54[2][2] = local_54[2][2] * pppMngStPtr->m_scale.z * *(float*)(lensBytes + 0x68);
 
-			local_60.x = pppMngStPtr->m_matrix.value[0][3];
-			local_60.y = pppMngStPtr->m_matrix.value[1][3];
-			local_60.z = pppMngStPtr->m_matrix.value[2][3];
+		local_60.x = pppMngStPtr->m_matrix.value[0][3];
+		local_60.y = pppMngStPtr->m_matrix.value[1][3];
+		local_60.z = pppMngStPtr->m_matrix.value[2][3];
 
-			PSMTXMultVec(ppvCameraMatrix0, &local_60, &local_60);
+		PSMTXMultVec(ppvCameraMatrix0, &local_60, &local_60);
 
-			local_54[0][3] = local_60.x;
-			local_54[1][3] = local_60.y;
-			local_54[2][3] = local_60.z;
+		local_54[0][3] = local_60.x;
+		local_54[1][3] = local_60.y;
+		local_54[2][3] = local_60.z;
 
-			local_6c.x = local_60.x;
-			local_6c.y = local_60.y;
-			local_6c.z = local_60.z;
+		local_6c.x = local_60.x;
+		local_6c.y = local_60.y;
+		local_6c.z = local_60.z;
 
-			pppCopyVector(*(Vec*)((u8*)pppLensFlare + iVar2 + 0xa0), local_6c);
+		pppCopyVector(*(Vec*)(shapeBytes + 0xa0), local_6c);
 
-			GXLoadPosMtxImm(local_54, 0);
+		GXLoadPosMtxImm(local_54, 0);
 
-			local_70.rgba[0] = *((u8*)pppLensFlare + iVar1 + 0x88);
-			local_70.rgba[1] = *((u8*)pppLensFlare + iVar1 + 0x89);
-			local_70.rgba[2] = *((u8*)pppLensFlare + iVar1 + 0x8a);
-			local_70.rgba[3] = *((u8*)pppLensFlare + iVar2 + 0xb2);
+		local_70.rgba[0] = colorBytes[0x88];
+		local_70.rgba[1] = colorBytes[0x89];
+		local_70.rgba[2] = colorBytes[0x8a];
+		local_70.rgba[3] = shapeBytes[0xb2];
 
-			pppSetDrawEnv(&local_70, (pppFMATRIX*)0, FLOAT_80331060, (u8)unkB->m_payload[0],
-						  *((u8*)&unkB->m_arg3 + 3), *((u8*)&unkB->m_arg3 + 2), (u8)0, (u8)1, (u8)1, (u8)0);
+		pppSetDrawEnv(&local_70, (pppFMATRIX*)0, FLOAT_80331060, (u8)unkB->m_payload[0], arg3Bytes[3],
+					  arg3Bytes[2], (u8)0, (u8)1, (u8)1, (u8)0);
 
-			pppSetBlendMode(*((u8*)&unkB->m_arg3 + 2));
-			pppDrawShp(shape, *(s16*)((u8*)pppLensFlare + iVar2 + 0xae), pppEnvStPtr->m_materialSetPtr,
-					   *((u8*)&unkB->m_arg3 + 2));
-			pppSetBlendMode(3);
-		}
+		pppSetBlendMode(arg3Bytes[2]);
+		pppDrawShp(shape, *(s16*)(shapeBytes + 0xae), pppEnvStPtr->m_materialSetPtr, arg3Bytes[2]);
+		pppSetBlendMode(3);
 	}
 }

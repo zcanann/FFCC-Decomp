@@ -1152,37 +1152,61 @@ void CCaravanWork::GetMagicCharge(int, int&, int&)
 
 static int GetCmdListItemNameSub(CCaravanWork* caravanWork, int cmdListIdx, int* firstCmdIdx, int* itemCmdListIdx)
 {
-	int numGrouped = 1;
-	unsigned short* cmdListSlot = caravanWork->m_commandListInventorySlotRef + cmdListIdx;
+	int groupedCount = 1;
 
-	if (Game.game.m_gameWork.m_menuStageMode != 0 && cmdListSlot[0] != 0) {
-		int searchIdx = cmdListIdx;
-		while (searchIdx >= 0 && cmdListSlot[0] == 0xFFFF) {
-			cmdListSlot--;
-			searchIdx--;
-		}
-		searchIdx++;
-		cmdListSlot++;
+	if (Game.game.m_gameWork.m_menuStageMode != 0) {
+		unsigned short* slotRef = caravanWork->m_commandListInventorySlotRef + cmdListIdx;
+		if (slotRef[0] != 0) {
+			int scanCount = cmdListIdx + 1;
+			int topIdx = cmdListIdx;
+			if (cmdListIdx >= 0) {
+				do {
+					if (slotRef[0] != 0xFFFF) {
+						break;
+					}
+					slotRef--;
+					topIdx--;
+					scanCount--;
+				} while (scanCount != 0);
+			}
 
-		while (searchIdx < (short)caravanWork->m_numCmdListSlots && cmdListSlot[0] == 0xFFFF) {
-			numGrouped++;
-			cmdListSlot++;
-			searchIdx++;
+			groupedCount = 1;
+			scanCount = (short)caravanWork->m_numCmdListSlots - (topIdx + 1);
+			slotRef = caravanWork->m_commandListInventorySlotRef + topIdx + 1;
+			if ((topIdx + 1) < (short)caravanWork->m_numCmdListSlots) {
+				do {
+					if (slotRef[0] != 0xFFFF) {
+						break;
+					}
+					groupedCount++;
+					slotRef++;
+					scanCount--;
+				} while (scanCount != 0);
+			}
 		}
 	}
 
-	if (numGrouped > 1) {
-		while (cmdListIdx >= 0 && caravanWork->m_commandListInventorySlotRef[cmdListIdx] == 0xFFFF) {
-			cmdListIdx--;
+	if (groupedCount > 1) {
+		int scanCount = cmdListIdx + 1;
+		unsigned short* slotRef = caravanWork->m_commandListInventorySlotRef + cmdListIdx;
+		if (cmdListIdx >= 0) {
+			do {
+				if (slotRef[0] != 0xFFFF) {
+					break;
+				}
+				slotRef--;
+				cmdListIdx--;
+				scanCount--;
+			} while (scanCount != 0);
 		}
-		cmdListIdx++;
 
 		short cmdId = *(short*)(caravanWork->m_commandListExtra + cmdListIdx * 2);
 		if (cmdId == 0x207 || cmdId == 0x20B || cmdId == 0x20F) {
 			*firstCmdIdx = cmdListIdx;
-			for (int i = 0; i < numGrouped; i++) {
-				unsigned short invIdx = caravanWork->m_commandListInventorySlotRef[cmdListIdx + i];
-				if (*(short*)(Game.game.unkCFlatData0[2] + caravanWork->m_inventoryItems[invIdx] * 0x48) == 1) {
+			for (int i = 0; i < groupedCount; i++) {
+				short invSlot = (short)caravanWork->m_commandListInventorySlotRef[cmdListIdx + i];
+				short itemId = (short)caravanWork->m_inventoryItems[invSlot];
+				if (*(short*)(Game.game.unkCFlatData0[2] + itemId * 0x48) == 1) {
 					*itemCmdListIdx = cmdListIdx + i;
 					return 1;
 				}

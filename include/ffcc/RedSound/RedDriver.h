@@ -88,7 +88,7 @@ public:
 	void SePitch(int, int, int);
 	void SePause(int, int);
 	int GetSeVolume(int, int);
-	void ReportSeLoop(int);
+	int ReportSeLoop(int);
 	void DisplaySePlayInfo();
 
 

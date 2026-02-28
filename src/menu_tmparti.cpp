@@ -3,6 +3,7 @@
 #include "ffcc/sound.h"
 #include "ffcc/pad.h"
 #include "ffcc/p_game.h"
+#include "ffcc/color.h"
 #include <string.h>
 
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
@@ -481,12 +482,8 @@ void CMenuPcs::TmpArtiDraw()
 
 			SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
 
-			GXColor color;
-			color.r = 0xFF;
-			color.g = 0xFF;
-			color.b = 0xFF;
-			color.a = (unsigned char)(int)(255.0f * alpha);
-			GXSetChanMatColor(GX_COLOR0A0, color);
+			CColor color(0xFF, 0xFF, 0xFF, (unsigned char)(int)(255.0f * alpha));
+			GXSetChanMatColor(GX_COLOR0A0, color.color);
 
 			DrawRect__8CMenuPcsFUlfffffffff(this, 0, left, top, width, height, s, t, z, z, 0.0f);
 		}
@@ -520,8 +517,8 @@ void CMenuPcs::TmpArtiDraw()
 		short itemId = *(short*)(foodPtr + 0x1F6);
 		if (-1 < itemId) {
 			float alpha = *(float*)(entry + 8);
-			GXColor textColor = { 0xFF, 0xFF, 0xFF, (unsigned char)(int)(255.0f * alpha) };
-			SetColor__5CFontF8_GXColor(font, &textColor);
+			CColor textColor(0xFF, 0xFF, 0xFF, (unsigned char)(int)(255.0f * alpha));
+			SetColor__5CFontF8_GXColor(font, &textColor.color);
 
 			const char* text = flatData->table[0].strings[itemId * 5 + 4];
 			int width = GetWidth__5CFontFPc(font, text);

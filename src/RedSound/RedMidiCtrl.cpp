@@ -517,22 +517,49 @@ void __MidiCtrl_LoopRepeat(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C7FFC
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_TempoDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_TempoDirect(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    unsigned char* command;
+    int* controlData = (int*)control;
+    int* trackData = (int*)track;
+
+    command = (unsigned char*)trackData[0];
+    trackData[0] = (int)(command + 1);
+    controlData[0x112] = ((unsigned int)*command) << 0xc;
+    controlData[0x113] = 0;
+    controlData[0x114] = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C8028
+ * PAL Size: 140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_TempoChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_TempoChange(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    unsigned int delta[3];
+    int* controlData = (int*)control;
+
+    if (*(char*)*(int*)track == '\0') {
+        delta[0] = 0x100;
+    } else {
+        delta[0] = *(unsigned char*)*(int*)track;
+    }
+
+    controlData[0x113] = DataAddCompute(controlData + 0x112, *(unsigned char*)(*(int*)track + 1), (int*)delta);
+    controlData[0x114] = delta[0];
+    *(int*)track += 2;
 }
 
 /*
@@ -775,22 +802,62 @@ void __MidiCtrl_WaveWithBank(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C86C4
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_VolumeDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_VolumeDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    unsigned int volume;
+    unsigned char* command;
+    int* trackData = (int*)track;
+
+    command = (unsigned char*)trackData[0];
+    trackData[0] = (int)(command + 1);
+    volume = *command;
+    if (volume != 0) {
+        volume = (((volume + 1) * 0x100) - 1) << 0xc;
+    }
+
+    trackData[10] = volume;
+    trackData[0xb] = 0;
+    trackData[0xc] = 0;
+    DAT_8032f4b4 |= 2;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C8720
+ * PAL Size: 148b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_VolumeChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_VolumeChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    int delta[4];
+    unsigned char* command;
+    unsigned int volume;
+    int* trackData = (int*)track;
+
+    delta[0] = DeltaTimeSumup((unsigned char**)trackData);
+    if (delta[0] == 0) {
+        delta[0] = 1;
+    }
+
+    command = (unsigned char*)trackData[0];
+    trackData[0] = (int)(command + 1);
+    volume = *command;
+    if (volume != 0) {
+        volume = ((volume + 1) * 0x100) - 1;
+    }
+
+    trackData[0xb] = DataAddCompute(trackData + 10, volume, delta);
+    trackData[0xc] = delta[0];
 }
 
 /*

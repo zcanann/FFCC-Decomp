@@ -28,6 +28,28 @@ extern "C" void SetPosY__5CFontFf(float, CFont*);
 extern "C" void SetPosZ__5CFontFf(float, CFont*);
 extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" float DAT_8032ec24;
+extern "C" void* DAT_80212a1c[];
+extern "C" void* DAT_80212b30[];
+extern "C" void* DAT_80212c38[];
+extern "C" void* DAT_80212d4c[];
+extern "C" void* DAT_80212e54[];
+extern "C" void* DAT_80212f5c[];
+extern "C" void* DAT_80213064[];
+extern "C" void* DAT_8021316c[];
+extern "C" void* DAT_80213274[];
+extern "C" void* DAT_80213394[];
+extern "C" void* DAT_802134a8[];
+extern "C" void* DAT_802135bc[];
+extern "C" void* DAT_802136dc[];
+extern "C" void* DAT_802137f0[];
+extern "C" void* DAT_802138f8[];
+extern "C" void* DAT_80213a00[];
+extern "C" void* DAT_80213b08[];
+extern "C" void* DAT_80213c10[];
+extern "C" void* DAT_80213d24[];
+extern "C" void* DAT_80213e2c[];
+extern "C" void* DAT_80213f40[];
+extern "C" void* DAT_80214054[];
 
 /*
  * --INFO--
@@ -1065,12 +1087,107 @@ void CGMonObj::onFrameAlways()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80114208
+ * PAL Size: 456b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::InitFinished()
 {
-	// TODO
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	void* classId = object->m_scriptHandle[4];
+
+	*reinterpret_cast<float*>(mon + 0x6F8) = object->unk_0x168;
+	*reinterpret_cast<float*>(mon + 0x6FC) = object->unk_0x16C;
+	*reinterpret_cast<float*>(mon + 0x700) = object->unk_0x170;
+
+	switch (reinterpret_cast<unsigned int>(classId)) {
+	case 0x5B:
+		*reinterpret_cast<void**>(mon + 0x708) = DAT_80212b30;
+		break;
+	case 0x5F:
+		*reinterpret_cast<void**>(mon + 0x708) = DAT_80213064;
+		break;
+	case 0x63:
+		*reinterpret_cast<void**>(mon + 0x708) = DAT_80212c38;
+		break;
+	case 0x67:
+		*reinterpret_cast<void**>(mon + 0x708) = DAT_80212f5c;
+		break;
+	case 0x6B:
+		*reinterpret_cast<void**>(mon + 0x708) = DAT_80212e54;
+		break;
+	case 0x6F:
+		*reinterpret_cast<void**>(mon + 0x708) = DAT_80213394;
+		break;
+	case 0x70:
+		*reinterpret_cast<void**>(mon + 0x708) = DAT_802134a8;
+		break;
+	case 0x71:
+		*reinterpret_cast<void**>(mon + 0x708) = DAT_80212d4c;
+		break;
+	case 0x73:
+		*reinterpret_cast<void**>(mon + 0x708) = DAT_8021316c;
+		break;
+	case 0x74:
+	case 0x75:
+		*reinterpret_cast<void**>(mon + 0x708) = DAT_80214054;
+		break;
+	case 0x77:
+		*reinterpret_cast<void**>(mon + 0x708) = DAT_80213274;
+		break;
+	case 0x79:
+		*reinterpret_cast<void**>(mon + 0x708) = DAT_80213b08;
+		break;
+	case 0x7B:
+		*reinterpret_cast<void**>(mon + 0x708) = DAT_80213a00;
+		break;
+	case 0x7F:
+		*reinterpret_cast<void**>(mon + 0x708) = DAT_80213c10;
+		break;
+	case 0x83:
+		*reinterpret_cast<void**>(mon + 0x708) = DAT_802138f8;
+		break;
+	case 0x85:
+	case 0x86:
+	case 0x87:
+		*reinterpret_cast<void**>(mon + 0x708) = DAT_802135bc;
+		break;
+	case 0x88:
+		*reinterpret_cast<void**>(mon + 0x708) = DAT_802136dc;
+		break;
+	case 0x8E:
+	case 0x8F:
+	case 0x90:
+	case 0x91:
+	case 0x92:
+	case 0x93:
+	case 0x94:
+	case 0x95:
+	case 0x96:
+	case 0x97:
+	case 0x98:
+	case 0x99:
+		*reinterpret_cast<void**>(mon + 0x708) = DAT_802137f0;
+		break;
+	case 0x9A:
+		*reinterpret_cast<void**>(mon + 0x708) = DAT_80213f40;
+		break;
+	case 0x9B:
+		*reinterpret_cast<void**>(mon + 0x708) = DAT_80213e2c;
+		break;
+	case 0x9E:
+		*reinterpret_cast<void**>(mon + 0x708) = DAT_80213d24;
+		break;
+	default:
+		*reinterpret_cast<void**>(mon + 0x708) = DAT_80212a1c;
+		break;
+	}
+
+	__ptmf_scall(this, mon + 0x708);
 }
 
 /*

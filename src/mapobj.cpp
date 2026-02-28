@@ -811,7 +811,8 @@ void CMapObj::Calc()
         }
     }
 
-    if ((U8At(this, 0x1D) == 1) && (PtrAt(this, 0xC) != 0) && (U8At(this, 0x1F) == 0xFF) &&
+    if ((static_cast<signed char>(U8At(this, 0x1D)) == 1) && (PtrAt(this, 0xC) != 0) &&
+        (static_cast<signed char>(U8At(this, 0x1F)) == -1) &&
         ((U8At(this, 0x18) & 1) != 0)) {
         if ((lbl_8032F944 <= F32At(this, 0x50)) || (F32At(this, 0x4C) < lbl_8032F948)) {
             Vec pos;
@@ -840,71 +841,63 @@ void CMapObj::Calc()
     }
 
     int attr = S32At(this, 0xEC);
-    if (attr == 0) {
-        return;
-    }
+    if (attr != 0) {
+        int attrType = *reinterpret_cast<int*>(attr + 4);
+        if (attrType == 1) {
+            _GXColor& colorCurrent = *reinterpret_cast<_GXColor*>(attr + 8);
+            _GXColor* colorTable = reinterpret_cast<_GXColor*>(attr + 0x40);
 
-    int attrType = *reinterpret_cast<int*>(attr + 4);
-    if (attrType == 1) {
-        _GXColor& colorCurrent = *reinterpret_cast<_GXColor*>(attr + 8);
-        _GXColor* colorTable = reinterpret_cast<_GXColor*>(attr + 0x40);
+            calcColorKeyFrame(reinterpret_cast<CMapKeyFrame*>(attr + 0xC0), colorCurrent, colorTable);
+            if (*reinterpret_cast<unsigned char*>(attr + 0x2F) != 0) {
+                *reinterpret_cast<_GXColor*>(attr + 0xC) = colorCurrent;
+            }
 
-        calcColorKeyFrame(reinterpret_cast<CMapKeyFrame*>(attr + 0xC0), colorCurrent, colorTable);
-        if (*reinterpret_cast<unsigned char*>(attr + 0x2F) != 0) {
-            *reinterpret_cast<_GXColor*>(attr + 0xC) = colorCurrent;
-        }
+            calcColorKeyFrame(reinterpret_cast<CMapKeyFrame*>(attr + 0xE8), colorCurrent, colorTable);
+        } else if (attrType < 1) {
+            if (attrType >= 0) {
+                _GXColor& colorCurrent = *reinterpret_cast<_GXColor*>(attr + 8);
+                _GXColor* colorTable = reinterpret_cast<_GXColor*>(attr + 0x24);
 
-        calcColorKeyFrame(reinterpret_cast<CMapKeyFrame*>(attr + 0xE8), colorCurrent, colorTable);
-        return;
-    }
+                calcColorKeyFrame(reinterpret_cast<CMapKeyFrame*>(attr + 0xA4), colorCurrent, colorTable);
+                if (*reinterpret_cast<unsigned char*>(attr + 0x1F) != 0) {
+                    *reinterpret_cast<_GXColor*>(attr + 0xC) = colorCurrent;
+                }
 
-    if (attrType == 0) {
-        _GXColor& colorCurrent = *reinterpret_cast<_GXColor*>(attr + 8);
-        _GXColor* colorTable = reinterpret_cast<_GXColor*>(attr + 0x24);
+                calcColorKeyFrame(reinterpret_cast<CMapKeyFrame*>(attr + 0xCC), colorCurrent, colorTable);
+            }
+        } else if ((attrType < 3) && (IsRun__12CMapKeyFrameFv(reinterpret_cast<CMapKeyFrame*>(attr + 0x14)) != 0)) {
+            int key0 = 0;
+            int key1 = 0;
+            float blend = 0.0f;
+            int vertexCount = *reinterpret_cast<int*>(attr + 0x10);
+            int frameList = *reinterpret_cast<int*>(attr + 0xC);
+            Vec* outVerts = *reinterpret_cast<Vec**>(S32At(this, 0xC) + 0x2C);
 
-        calcColorKeyFrame(reinterpret_cast<CMapKeyFrame*>(attr + 0xA4), colorCurrent, colorTable);
-        if (*reinterpret_cast<unsigned char*>(attr + 0x1F) != 0) {
-            *reinterpret_cast<_GXColor*>(attr + 0xC) = colorCurrent;
-        }
+            if (Get__12CMapKeyFrameFRiRiRf(reinterpret_cast<CMapKeyFrame*>(attr + 0x14), &key0, &key1, &blend) == 0) {
+                float* src = *reinterpret_cast<float**>(frameList + key0 * 4);
+                for (int i = 0; i < vertexCount; i++) {
+                    outVerts[i].x = src[0];
+                    outVerts[i].y = src[1];
+                    outVerts[i].z = src[2];
+                    src += 3;
+                }
+            } else {
+                Vec* src0 = *reinterpret_cast<Vec**>(frameList + key0 * 4);
+                Vec* src1 = *reinterpret_cast<Vec**>(frameList + key1 * 4);
+                for (int i = 0; i < vertexCount; i++) {
+                    Vec delta;
+                    PSVECSubtract(src1, src0, &delta);
+                    PSVECScale(&delta, &delta, blend);
+                    PSVECAdd(src0, &delta, &outVerts[i]);
+                    src0++;
+                    src1++;
+                }
+            }
 
-        calcColorKeyFrame(reinterpret_cast<CMapKeyFrame*>(attr + 0xCC), colorCurrent, colorTable);
-        return;
-    }
-
-    if (attrType != 2 || IsRun__12CMapKeyFrameFv(reinterpret_cast<CMapKeyFrame*>(attr + 0x14)) == 0) {
-        return;
-    }
-
-    int key0 = 0;
-    int key1 = 0;
-    float blend = 0.0f;
-    int vertexCount = *reinterpret_cast<int*>(attr + 0x10);
-    int frameList = *reinterpret_cast<int*>(attr + 0xC);
-    Vec* outVerts = *reinterpret_cast<Vec**>(S32At(this, 0xC) + 0x2C);
-
-    if (Get__12CMapKeyFrameFRiRiRf(reinterpret_cast<CMapKeyFrame*>(attr + 0x14), &key0, &key1, &blend) == 0) {
-        float* src = *reinterpret_cast<float**>(frameList + key0 * 4);
-        for (int i = 0; i < vertexCount; i++) {
-            outVerts[i].x = src[0];
-            outVerts[i].y = src[1];
-            outVerts[i].z = src[2];
-            src += 3;
-        }
-    } else {
-        Vec* src0 = *reinterpret_cast<Vec**>(frameList + key0 * 4);
-        Vec* src1 = *reinterpret_cast<Vec**>(frameList + key1 * 4);
-        for (int i = 0; i < vertexCount; i++) {
-            Vec delta;
-            PSVECSubtract(src1, src0, &delta);
-            PSVECScale(&delta, &delta, blend);
-            PSVECAdd(src0, &delta, &outVerts[i]);
-            src0++;
-            src1++;
+            DCFlushRange(outVerts, static_cast<unsigned long>(vertexCount * 0xC));
+            Calc__12CMapKeyFrameFv(reinterpret_cast<CMapKeyFrame*>(attr + 0x14));
         }
     }
-
-    DCFlushRange(outVerts, static_cast<unsigned long>(vertexCount * 0xC));
-    Calc__12CMapKeyFrameFv(reinterpret_cast<CMapKeyFrame*>(attr + 0x14));
 }
 
 /*

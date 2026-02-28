@@ -575,12 +575,61 @@ u32 CGraphic::IsFrameRateOver()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800191d8
+ * PAL Size: 424b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphic::Flip()
 {
-	// TODO
+    if (S32At(this, 0xC) != 0) {
+        if (S32At(this, 0x71F0) != 0) {
+            VISetBlack(FALSE);
+            S32At(this, 0x71F0) = 0;
+        }
+
+        if (System.m_scenegraphStepMode != 1) {
+            int retraceCount = VIGetRetraceCount();
+            if ((u32)(retraceCount - S32At(this, 0x71F4)) < 2) {
+                S32At(this, 0x7350) = 0;
+                do {
+                    VIWaitForRetrace();
+                    retraceCount = VIGetRetraceCount();
+                } while ((u32)(retraceCount - S32At(this, 0x71F4)) < 2);
+            } else {
+                S32At(this, 0x7350) = 1;
+            }
+        }
+
+        GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+        GXCopyDisp(PtrAt(this, 0x71E4), GX_TRUE);
+        PtrAt(this, 0x7368) = lbl_801D6348;
+        S32At(this, 0x736C) = 0x26D;
+        S32At(this, 0x7364) = 1;
+        GXSetDrawDone();
+        GXWaitDrawDone();
+        S32At(this, 0x7364) = 0;
+        S32At(this, 0x7370) += 1;
+        VIFlush();
+
+        S32At(this, 0x734C) = 1 - S32At(this, 0x734C);
+
+        GXFifoObj* fifo = reinterpret_cast<GXFifoObj*>(reinterpret_cast<u8*>(this) + 0x724C + S32At(this, 0x734C) * 0x80);
+        GXInitFifoBase(fifo, PtrAt(this, 0x10), 0x60000);
+        GXInitFifoLimits(fifo, 0x5C000, 0x50000);
+        GXSetCPUFifo(fifo);
+        GXSetGPFifo(fifo);
+    }
+
+    S32At(this, 0x71F4) = VIGetRetraceCount();
+
+    if (System.m_scenegraphStepMode == 1) {
+        S32At(this, 0xC) = ((u32)__cntlzw(System.m_frameCounter & 3) >> 5) & 0xFF;
+    } else {
+        S32At(this, 0xC) = 1;
+    }
 }
 
 /*

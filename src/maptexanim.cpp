@@ -324,15 +324,23 @@ void CMapTexAnimSet::Calc()
  */
 void CMapTexAnimSet::SetMapTexAnim(int materialId, int frameStart, int frameEnd, int wrapMode)
 {
-    int found = 0;
-    int i = 0;
+    bool found = false;
     int setPtr = reinterpret_cast<int>(this);
 
-    while (i < S16At(this, 8)) {
+    for (int i = 0; i < S16At(this, 8); i++) {
         int anim = *reinterpret_cast<int*>(setPtr + 0xC);
         void* animPtr = reinterpret_cast<void*>(anim);
         if (S16At(animPtr, 0x12) == static_cast<short>(materialId)) {
-            if (U8At(animPtr, 0x15) != 0) {
+            if (U8At(animPtr, 0x15) == 0) {
+                int end = frameEnd;
+                S16At(animPtr, 0xE) = static_cast<short>(frameStart);
+                F32At(animPtr, 0x1C) = static_cast<float>(static_cast<short>(frameStart));
+                if (frameEnd > S16At(animPtr, 0xC)) {
+                    end = S16At(animPtr, 0xC);
+                }
+                S16At(animPtr, 0x10) = static_cast<short>(end);
+                U8At(animPtr, 0x16) = static_cast<unsigned char>(wrapMode);
+            } else {
                 int end = frameEnd;
                 S32At(animPtr, 0x30) = frameStart;
                 S32At(animPtr, 0x2C) = frameStart;
@@ -342,23 +350,13 @@ void CMapTexAnimSet::SetMapTexAnim(int materialId, int frameStart, int frameEnd,
                 S32At(animPtr, 0x34) = end;
                 U8At(animPtr, 0x27) = static_cast<unsigned char>(wrapMode);
                 U8At(animPtr, 0x28) = 1;
-            } else {
-                int end = frameEnd;
-                S16At(animPtr, 0xE) = static_cast<short>(frameStart);
-                F32At(animPtr, 0x1C) = static_cast<float>(static_cast<short>(frameStart));
-                if (frameEnd > S16At(animPtr, 0xC)) {
-                    end = S16At(animPtr, 0xC);
-                }
-                S16At(animPtr, 0x10) = static_cast<short>(end);
-                U8At(animPtr, 0x16) = static_cast<unsigned char>(wrapMode);
             }
-            found = 1;
+            found = true;
         }
         setPtr += 4;
-        i++;
     }
 
-    if ((found == 0) && (static_cast<unsigned int>(System.m_execParam) >= 1)) {
+    if ((!found) && (System.m_execParam != 0)) {
         System.Printf("SetMapTexAnim: material id (%d) not found\n", materialId);
     }
 }

@@ -145,16 +145,16 @@ void CFlatData::Create(void* filePtr)
 {
 	CFlatData* flatData;
 	char** strings;
-	char** tableStrings;
 	int iVar1;
 	int iVar6;
 	int iVar7;
 	int iVar8;
 	int stringCount;
 	int baseAddress;
+	int idxOffset;
 
 	flatData = this;
-	for (iVar8 = 0; iVar8 < m_dataCount; iVar8++)
+	for (stringCount = 0; stringCount < m_dataCount; stringCount++)
 	{
 		if (flatData->m_data[0].m_data != nullptr)
 		{
@@ -176,7 +176,7 @@ void CFlatData::Create(void* filePtr)
 	m_dataCount = 0;
 
 	flatData = this;
-	for (iVar8 = 0; iVar8 < m_tableCount; iVar8++)
+	for (stringCount = 0; stringCount < m_tableCount; stringCount++)
 	{
 		if (flatData->m_tabl[0].m_strings != nullptr)
 		{
@@ -217,8 +217,8 @@ void CFlatData::Create(void* filePtr)
 					baseAddress = (int)chunkFile.GetAddress();
 					for (iVar7 = 0; iVar7 < m_mesCount; iVar7++)
 					{
-						iVar6 = (int)chunkFile.GetAddress();
-						m_mesPtr[iVar7] = m_mesBuffer + (iVar6 - baseAddress);
+						iVar8 = (int)chunkFile.GetAddress();
+						m_mesPtr[iVar7] = m_mesBuffer + (iVar8 - baseAddress);
 						chunkFile.GetString();
 					}
 				}
@@ -230,8 +230,7 @@ void CFlatData::Create(void* filePtr)
 						m_data[m_dataCount].m_data =
 							new (Game.game.m_mainStage, (char*)"cflat_data.cpp", 0x45) unsigned char[chunk.m_arg0];
 						chunkFile.Get(m_data[m_dataCount].m_data, chunk.m_arg0);
-
-						if (chunk.m_version < 1)
+						if (chunk.m_version == 0)
 						{
 							m_data[m_dataCount].m_numStrings = 0;
 							m_data[m_dataCount].m_stringBuf = (char*)nullptr;
@@ -239,25 +238,25 @@ void CFlatData::Create(void* filePtr)
 						}
 						else
 						{
-							stringCount = chunkFile.Get4();
-							m_data[m_dataCount].m_numStrings = stringCount;
+							iVar8 = chunkFile.Get4();
+							m_data[m_dataCount].m_numStrings = iVar8;
 							m_data[m_dataCount].m_strings =
-								(char**)new (Game.game.m_mainStage, (char*)"cflat_data.cpp", 0x4C)
-									unsigned char[stringCount << 2];
+								(char**)new (Game.game.m_mainStage, (char*)"cflat_data.cpp", 0x4C) unsigned char[iVar8 << 2];
 							m_data[m_dataCount].m_stringBuf =
-								new (Game.game.m_mainStage, (char*)"cflat_data.cpp", 0x4D) char[stringCount];
-							memcpy(m_data[m_dataCount].m_stringBuf, chunkFile.GetAddress(), stringCount);
+								new (Game.game.m_mainStage, (char*)"cflat_data.cpp", 0x4D) char[iVar8];
+							memcpy(m_data[m_dataCount].m_stringBuf, chunkFile.GetAddress(), iVar8);
 
 							baseAddress = (int)chunkFile.GetAddress();
+							idxOffset = 0;
 							for (iVar7 = 0; (iVar1 = m_dataCount, iVar7 < m_data[iVar1].m_numStrings); iVar7++)
 							{
 								iVar6 = (int)chunkFile.GetAddress();
 								strings = m_data[iVar1].m_strings;
-								strings[iVar7] = m_data[iVar1].m_stringBuf + (iVar6 - baseAddress);
+								*(char**)((int)strings + idxOffset) = m_data[iVar1].m_stringBuf + (iVar6 - baseAddress);
 								chunkFile.GetString();
+								idxOffset += 4;
 							}
 						}
-
 						m_dataCount++;
 					}
 				}
@@ -271,14 +270,17 @@ void CFlatData::Create(void* filePtr)
 					memcpy(m_tabl[m_tableCount].m_stringBuf, chunkFile.GetAddress(), chunk.m_size);
 
 					baseAddress = (int)chunkFile.GetAddress();
-					tableStrings = m_tabl[m_tableCount].m_strings;
-					for (iVar7 = 0; iVar7 < m_tabl[m_tableCount].m_numEntries; iVar7++)
+					iVar7 = 0;
+					idxOffset = 0;
+					while (m_tabl[m_tableCount].m_numEntries > iVar7)
 					{
 						iVar6 = (int)chunkFile.GetAddress();
-						tableStrings[iVar7] = m_tabl[m_tableCount].m_stringBuf + (iVar6 - baseAddress);
+						*(char**)((int)m_tabl[m_tableCount].m_strings + idxOffset) =
+							m_tabl[m_tableCount].m_stringBuf + (iVar6 - baseAddress);
 						chunkFile.GetString();
+						idxOffset += 4;
+						iVar7++;
 					}
-
 					m_tableCount++;
 				}
 			}

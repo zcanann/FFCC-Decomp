@@ -799,8 +799,31 @@ CMemory::CStage* CMemory::CreateStage(unsigned long size, char* source, int mode
  */
 void CMemory::DestroyStage(CMemory::CStage* stage)
 {
-    stageDestroyInternal(stage);
-    stageMoveToPoolList(this, stage);
+    int mode = stageGetAllocationMode(stage);
+    int modeListOffset = mode * 0x27D8;
+
+    if (mode != 2) {
+        if (stageHasUnfreedBlocks(stage)) {
+            Printf__7CSystemFPce(&System, DAT_801d6a7c, stageGetSourceName(stage));
+            stage->heapWalker(-1, nullptr, static_cast<unsigned long>(-1));
+        }
+    } else {
+        int heapHead = stageGetHeapHead(stage);
+        if (heapHead != 0) {
+            if (heapHead != 0x10) {
+                operator delete[](reinterpret_cast<void*>(heapHead - 0x10));
+            }
+            stageSetHeapHead(stage, 0);
+        }
+    }
+
+    unsigned char* stageBytes = reinterpret_cast<unsigned char*>(stage);
+    int modeListNode = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x134 + modeListOffset);
+
+    *reinterpret_cast<int*>(*reinterpret_cast<int*>(stageBytes) + 4) = *reinterpret_cast<int*>(stageBytes + 4);
+    **reinterpret_cast<int**>(stageBytes + 4) = *reinterpret_cast<int*>(stageBytes);
+    *reinterpret_cast<int*>(stageBytes + 4) = modeListNode;
+    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x134 + modeListOffset) = reinterpret_cast<int>(stage);
 }
 
 /*

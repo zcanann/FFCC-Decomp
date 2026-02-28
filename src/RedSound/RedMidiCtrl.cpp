@@ -17,6 +17,7 @@ extern int PTR_SineSwing__Fi_8021e9d0[];
 extern "C" {
 void* memmove(void*, const void*, unsigned long);
 void* memset(void*, int, unsigned long);
+int GetWaveBank__9CRedEntryFi(CRedEntry*, int);
 }
 
 /*
@@ -737,12 +738,38 @@ void __MidiCtrl_Wave(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C861C
+ * PAL Size: 168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_WaveWithBank(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_WaveWithBank(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+	u8* command;
+	u8 bankNo;
+	u32 waveNo;
+	int waveBank;
+	int* trackData = (int*)track;
+
+	command = (u8*)trackData[0];
+	trackData[0] = (int)(command + 1);
+	bankNo = *command;
+	command = (u8*)trackData[0];
+	trackData[0] = (int)(command + 1);
+	waveNo = *command;
+	trackData[7] = 0;
+	trackData[0x47] = 0;
+	waveBank = GetWaveBank__9CRedEntryFi(&DAT_8032e154, bankNo);
+	if (waveBank != 0) {
+		waveBank = *(int*)(waveBank + 8);
+		trackData[7] = waveBank + *(int*)(waveBank + 0x20 + waveNo * 4);
+		trackData[0x47] = *(int*)(waveBank + 0x10);
+		memset(trackData + 0x35, 0xffffffff, 0xc);
+	}
+	*(u8*)((int)trackData + 0x14d) = bankNo;
+	trackData[0x49] = waveNo;
 }
 
 /*

@@ -1,4 +1,5 @@
 #include "ffcc/partyobj.h"
+#include "ffcc/gobjwork.h"
 
 /*
  * --INFO--
@@ -142,12 +143,16 @@ void CGPartyObj::onFrameStat()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80120B74
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGPartyObj::onAnimPoint(int, int)
+void CGPartyObj::onAnimPoint(int no, int dataNo)
 {
-	// TODO
+	CGCharaObj::onAnimPoint(no, dataNo);
 }
 
 /*
@@ -172,12 +177,23 @@ void CGPartyObj::enableDamageCol(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012098C
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CGPartyObj::getReplaceStat(int state)
 {
-	// TODO
+	if (state != 7) {
+		if (state == -20) {
+			state = -1;
+		} else {
+			state = CGCharaObj::getReplaceStat(state);
+		}
+	}
+
 	return state;
 }
 
@@ -233,12 +249,16 @@ void CGPartyObj::onStatShield()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011F9A8
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::putComboParticle()
 {
-	// TODO
+	putParticle(0x153, 0, reinterpret_cast<CGObject*>(this), 0.0f, 0);
 }
 
 /*
@@ -398,12 +418,16 @@ void CGPartyObj::onTalk(CGBaseObj*, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011E0D8
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::commandFinished()
 {
-	// TODO
+	*(reinterpret_cast<unsigned char*>(this) + 0x6B8) &= 0x7F;
 }
 
 /*
@@ -788,12 +812,18 @@ void CGPartyObj::gpmMove()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011A918
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGPartyObj::sysControl(int, int)
+void CGPartyObj::sysControl(int controlType, int controlValue)
 {
-	// TODO
+	if (controlType == 0x13) {
+		reinterpret_cast<CCaravanWork*>(m_scriptHandle)->BackupTutorialItem(controlValue);
+	}
 }
 
 /*

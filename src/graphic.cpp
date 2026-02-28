@@ -6,6 +6,7 @@
 #include "ffcc/memory.h"
 #include "ffcc/memorycard.h"
 #include "ffcc/file.h"
+#include "ffcc/pad.h"
 #include "ffcc/pppfunctbl.h"
 #include "ffcc/system.h"
 #include "ffcc/util.h"
@@ -34,6 +35,7 @@ extern "C" double DOUBLE_8032f6d8;
 extern "C" float FLOAT_8032f708;
 extern "C" float FLOAT_8032f70c;
 extern "C" float FLOAT_8032f710;
+extern "C" int __cntlzw(unsigned int);
 
 extern struct {
     float _212_4_;
@@ -357,12 +359,34 @@ void CGraphic::SetViewport()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80019724
+ * PAL Size: 268b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphic::BeginFrame()
 {
-	// TODO
+    GXSetZMode((GXBool)1, GX_LEQUAL, (GXBool)1);
+    GXSetColorUpdate((GXBool)1);
+    void* renderMode = PtrAt(this, 0x71E0);
+    u16 width = U16At(renderMode, 4);
+    u16 height = U16At(renderMode, 6);
+    GXSetViewport(0.0f, 0.0f, (f32)width, (f32)height, 0.0f, 1.0f);
+    GXInvalidateVtxCache();
+    GXInvalidateTexAll();
+
+    const bool useDebugPad = (Pad._452_4_ != 0) || (Pad._448_4_ != -1);
+    u16 buttons = 0;
+    if (!useDebugPad) {
+        __cntlzw(static_cast<unsigned int>(Pad._448_4_));
+        buttons = Pad._4_2_;
+    }
+
+    if ((buttons & 2) != 0) {
+        S32At(this, 0x7354) = (static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(S32At(this, 0x7354)))) >> 5) & 0xFF;
+    }
 }
 
 /*

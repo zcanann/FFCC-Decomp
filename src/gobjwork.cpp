@@ -1150,7 +1150,7 @@ void CCaravanWork::GetMagicCharge(int, int&, int&)
 	// TODO
 }
 
-static int GetCmdListItemNameSub(CCaravanWork* caravanWork, int cmdListIdx, int* firstCmdIdx, int* itemCmdListIdx)
+extern "C" int GetCmdListItemName__12CCaravanWorkFi(CCaravanWork* caravanWork, int cmdListIdx, int* firstCmdIdx, int* itemCmdListIdx)
 {
 	int groupedCount = 1;
 
@@ -1219,20 +1219,6 @@ static int GetCmdListItemNameSub(CCaravanWork* caravanWork, int cmdListIdx, int*
 
 /*
  * --INFO--
- * PAL Address: 0x8009f730
- * PAL Size: 352b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void CCaravanWork::GetCmdListItemName(int)
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
@@ -1255,7 +1241,7 @@ int CCaravanWork::GetCmdListItem(int cmdListIdx)
 	int cmdTopIdx;
 	int itemCmdListIdx;
 
-	if (GetCmdListItemNameSub(this, cmdListIdx, &cmdTopIdx, &itemCmdListIdx) != 0) {
+	if (GetCmdListItemName__12CCaravanWorkFi(this, cmdListIdx, &cmdTopIdx, &itemCmdListIdx) != 0) {
 		short cmdId = *(short*)(m_commandListExtra + cmdTopIdx * 2);
 		if (cmdId == 0x207) {
 			return 0;
@@ -1329,7 +1315,7 @@ int CCaravanWork::DelCmdListAndItem(int cmdListIdx, int)
 	unsigned short result = *(short*)(m_commandListExtra + cmdListIdx * 2);
 	int cmdTopIdx;
 	int itemCmdListIdx;
-	if (GetCmdListItemNameSub(this, cmdListIdx, &cmdTopIdx, &itemCmdListIdx) != 0) {
+	if (GetCmdListItemName__12CCaravanWorkFi(this, cmdListIdx, &cmdTopIdx, &itemCmdListIdx) != 0) {
 		result = m_inventoryItems[m_commandListInventorySlotRef[itemCmdListIdx]];
 	}
 	return (short)result;

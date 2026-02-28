@@ -1,8 +1,12 @@
 #include "ffcc/pppYmMegaBirthShpTail3.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/pppGetRotMatrixXYZ.h"
 #include "dolphin/mtx.h"
 #include <string.h>
 
+class CMath;
+extern CMath Math;
+extern "C" float RandF__5CMathFv(CMath*);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern "C" void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
@@ -121,26 +125,154 @@ extern "C" void birth(_pppPObject* pppPObject, VYmMegaBirthShpTail3* vYmMegaBirt
                       _PARTICLE_DATA* particleData, _PARTICLE_WMAT* particleWMat, 
                       _PARTICLE_COLOR* particleColor)
 {
-    // Complex particle initialization based on Ghidra decomp
-    // Initialize matrix data
-    if (particleData != nullptr) {
-        // Basic matrix initialization
-        PSMTXIdentity(particleData->m_matrix);
+    u8* paramBytes = (u8*)pYmMegaBirthShpTail3;
+    u8* particleBytes = (u8*)particleData;
+    u8 mode = paramBytes[0x12];
+    float speedRandRange = *(float*)(paramBytes + 0x5c);
+    float speedRandHalf = 0.5f * speedRandRange;
+
+    memset(particleData, 0, 0x1f8);
+    if (particleWMat != 0) {
+        memset(particleWMat, 0, 0x30);
     }
-    
-    // Initialize color data if provided
-    if (particleColor != nullptr) {
-        particleColor->m_color[0] = 0.0f;
-        particleColor->m_color[1] = 0.0f;
-        particleColor->m_color[2] = 0.0f;
-        particleColor->m_color[3] = 0.0f;
+    if (particleColor != 0) {
+        memset(particleColor, 0, 0x20);
     }
-    
-    // Basic randomization setup
-    if (pYmMegaBirthShpTail3 != nullptr) {
-        // Initialize matrix
-        PSMTXIdentity(pYmMegaBirthShpTail3->m_matrix);
+
+    if (mode < 8) {
+        Vec baseDir = *(Vec*)(paramBytes + 0x20);
+        pppIVECTOR4 angles;
+        pppFMATRIX rot;
+        Vec tempVec;
+        float spread = (float)paramBytes[0x19];
+        float spreadRange = spread * 2.0f;
+
+        angles.x = (s16)(spreadRange * RandF__5CMathFv(&Math) - spread);
+        angles.y = (s16)(spreadRange * RandF__5CMathFv(&Math) - spread);
+        angles.z = (s16)(spreadRange * RandF__5CMathFv(&Math) - spread);
+        angles.w = 0;
+        if ((mode == 2) || (mode == 3)) {
+            angles.x = 0;
+            angles.y = 0;
+            angles.z = 0;
+            angles.w = 0;
+        }
+
+        pppGetRotMatrixXYZ(rot, &angles);
+        PSMTXMultVecSR(rot.value, &baseDir, &particleData->m_velocity);
+        particleData->m_velocity.x *= *(float*)(paramBytes + 0x58);
+        particleData->m_velocity.y *= pYmMegaBirthShpTail3->m_velocity.x;
+        particleData->m_velocity.z *= pYmMegaBirthShpTail3->m_velocity.y;
+        tempVec = particleData->m_velocity;
+        pppNormalize(particleData->m_velocity, tempVec);
     }
+
+    if ((mode < 6) && (speedRandRange != 0.0f)) {
+        u8 randType = paramBytes[0x6a];
+
+        if (randType <= 1) {
+            if (randType == 1) {
+                RandF__5CMathFv(&Math);
+            }
+            particleData->m_matrix[0][0] = speedRandRange * RandF__5CMathFv(&Math) - speedRandHalf;
+            particleData->m_matrix[0][1] = speedRandRange * RandF__5CMathFv(&Math) - speedRandHalf;
+            particleData->m_matrix[0][2] = speedRandRange * RandF__5CMathFv(&Math) - speedRandHalf;
+        } else if (randType == 3) {
+            particleData->m_matrix[0][0] =
+                -(2.0f * (speedRandRange * RandF__5CMathFv(&Math) * RandF__5CMathFv(&Math)) - speedRandRange) -
+                speedRandHalf;
+            particleData->m_matrix[0][1] =
+                -(2.0f * (speedRandRange * RandF__5CMathFv(&Math) * RandF__5CMathFv(&Math)) - speedRandRange) -
+                speedRandHalf;
+            particleData->m_matrix[0][2] =
+                -(2.0f * (speedRandRange * RandF__5CMathFv(&Math) * RandF__5CMathFv(&Math)) - speedRandRange) -
+                speedRandHalf;
+        } else if (randType == 5) {
+            particleData->m_matrix[0][0] = -(0.5f * (RandF__5CMathFv(&Math) *
+                                                     (speedRandRange * RandF__5CMathFv(&Math) *
+                                                      RandF__5CMathFv(&Math))) -
+                                             speedRandRange) -
+                                            speedRandHalf;
+            particleData->m_matrix[0][1] = -(0.5f * (RandF__5CMathFv(&Math) *
+                                                     (speedRandRange * RandF__5CMathFv(&Math) *
+                                                      RandF__5CMathFv(&Math))) -
+                                             speedRandRange) -
+                                            speedRandHalf;
+            particleData->m_matrix[0][2] = -(0.5f * (RandF__5CMathFv(&Math) *
+                                                     (speedRandRange * RandF__5CMathFv(&Math) *
+                                                      RandF__5CMathFv(&Math))) -
+                                             speedRandRange) -
+                                            speedRandHalf;
+        } else {
+            particleData->m_matrix[0][0] =
+                RandF__5CMathFv(&Math) * (speedRandRange * RandF__5CMathFv(&Math)) - speedRandHalf;
+            particleData->m_matrix[0][1] =
+                RandF__5CMathFv(&Math) * (speedRandRange * RandF__5CMathFv(&Math)) - speedRandHalf;
+            particleData->m_matrix[0][2] =
+                RandF__5CMathFv(&Math) * (speedRandRange * RandF__5CMathFv(&Math)) - speedRandHalf;
+        }
+
+        particleData->m_matrix[0][0] *= *(float*)(paramBytes + 0x58);
+        particleData->m_matrix[0][1] *= pYmMegaBirthShpTail3->m_velocity.x;
+        particleData->m_matrix[0][2] *= pYmMegaBirthShpTail3->m_velocity.y;
+    } else if ((mode >= 10) && (speedRandRange != 0.0f)) {
+        u8 randType = paramBytes[0x6a];
+        float scale = speedRandRange;
+
+        if (randType == 3) {
+            scale = -(2.0f * (speedRandRange * RandF__5CMathFv(&Math) * RandF__5CMathFv(&Math)) - speedRandRange);
+        } else if (randType == 1) {
+            RandF__5CMathFv(&Math);
+            scale = speedRandRange * RandF__5CMathFv(&Math);
+        } else if (randType == 2) {
+            scale = RandF__5CMathFv(&Math) * (speedRandRange * RandF__5CMathFv(&Math));
+        } else if (randType == 4) {
+            scale = RandF__5CMathFv(&Math) * (RandF__5CMathFv(&Math) * (speedRandRange * RandF__5CMathFv(&Math)));
+        } else if (randType == 5) {
+            scale = -(0.5f * (RandF__5CMathFv(&Math) *
+                              (speedRandRange * RandF__5CMathFv(&Math) * RandF__5CMathFv(&Math))) -
+                      speedRandRange);
+        }
+
+        Vec velocity = particleData->m_velocity;
+        pppScaleVectorXYZ(particleData->m_velocity, velocity, scale);
+    }
+
+    if (paramBytes[0x16] != 0) {
+        particleData->m_directionTail.x = (float)vColor->m_alpha;
+        *(((u8*)&particleData->m_directionTail.y) + 1) = paramBytes[0x16];
+    }
+    if (paramBytes[0x17] != 0) {
+        *(((u8*)&particleData->m_directionTail.y) + 2) = paramBytes[0x17];
+    }
+
+    particleData->m_matrix[2][2] = pYmMegaBirthShpTail3->m_colorDeltaAdd[1];
+    particleData->m_matrix[2][3] = pYmMegaBirthShpTail3->m_sizeStart;
+    if (pYmMegaBirthShpTail3->m_colorDeltaAdd[3] != 0.0f) {
+        particleData->m_matrix[2][2] +=
+            (2.0f * pYmMegaBirthShpTail3->m_colorDeltaAdd[3]) * RandF__5CMathFv(&Math) -
+            pYmMegaBirthShpTail3->m_colorDeltaAdd[3];
+    }
+
+    if (*(s16*)(paramBytes + 0x11) == 0) {
+        *(u16*)(particleBytes + 0x22) = 0xFFFF;
+    } else {
+        *(s16*)(particleBytes + 0x22) = *(s16*)(paramBytes + 0x11);
+    }
+    *((u8*)&particleData->m_directionTail.y) = 0;
+
+    if (particleWMat != 0) {
+        memcpy(particleWMat, &vYmMegaBirthShpTail3->m_emitterMatrix, 0x30);
+    }
+
+    particleData->m_colorDeltaAdd[0] = 0.0f;
+    particleData->m_colorDeltaAdd[1] = 0.0f;
+    particleData->m_colorDeltaAdd[2] = 0.0f;
+    particleData->m_colorDeltaAdd[3] = 0.0f;
+    *(((u8*)&particleData->m_directionTail.z) + 2) = 0;
+    *((u8*)&particleData->m_directionTail.z) = 0;
+    *(((u8*)&particleData->m_directionTail.y) + 3) = 0x1f;
+    *((u8*)&particleData->m_directionTail.z) = *(((u8*)&particleData->m_directionTail.y) + 3) - 1;
 }
 
 /*
@@ -312,8 +444,8 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
 
         *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 2) += *(s16*)(paramPayload + 0x84);
         *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 0xa) += *(s16*)(paramPayload + 0x86);
-        *(s16*)(work[1].m_emitterMatrix.value[0] + 3) += *(s16*)(paramPayload + 0x86);
-        *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 0xe) += *(s16*)(paramPayload + 0x88);
+        *(s16*)(work[1].m_emitterMatrix.value[0] + 3) += *(s16*)(paramPayload + 0x88);
+        *(s16*)((u8*)work[1].m_emitterMatrix.value[0] + 0xe) += *(s16*)(paramPayload + 0x8a);
 
         *(s16*)work[1].m_emitterMatrix.value[2] += *(s16*)(paramPayload + 0x98);
         *(s16*)((u8*)work[1].m_emitterMatrix.value[2] + 2) += *(s16*)(paramPayload + 0x9a);
@@ -337,8 +469,8 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
     case 9:
         PSMTXIdentity(work->m_emitterMatrix.value);
         work->m_emitterMatrix.value[0][0] = pppMngStPtr->m_scale.x;
-        work->m_emitterMatrix.value[1][1] = pppMngStPtr->m_scale.y;
-        work->m_emitterMatrix.value[2][2] = pppMngStPtr->m_scale.z;
+        work->m_emitterMatrix.value[1][1] = pppMngStPtr->m_scale.x;
+        work->m_emitterMatrix.value[2][2] = pppMngStPtr->m_scale.x;
         work->m_emitterMatrix.value[0][3] = pppMngStPtr->m_position.x;
         work->m_emitterMatrix.value[1][3] = pppMngStPtr->m_position.y;
         work->m_emitterMatrix.value[2][3] = pppMngStPtr->m_position.z;

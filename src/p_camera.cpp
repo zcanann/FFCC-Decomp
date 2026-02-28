@@ -1833,20 +1833,22 @@ void CCameraPcs::drawShadowEndAll()
  */
 void CCameraPcs::createMaterialEditor()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-
+    u8* self = reinterpret_cast<u8*>(this);
+    float fVar2 = FLOAT_8032fa34;
     *reinterpret_cast<int*>(self + 0x46C) = 0;
-    *reinterpret_cast<float*>(self + 0x450) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0x44C) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0x448) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0x45C) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0x458) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0x454) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0x468) = FLOAT_8032fa1c;
-    *reinterpret_cast<float*>(self + 0x464) = FLOAT_8032fa1c;
-    *reinterpret_cast<float*>(self + 0x460) = FLOAT_8032fa1c;
-    *reinterpret_cast<float*>(self + 0x44C) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0x450) = FLOAT_8032fa50;
+    float fVar1 = FLOAT_8032fa1c;
+    *reinterpret_cast<float*>(self + 0x450) = fVar2;
+    float fVar3 = FLOAT_8032fa50;
+    *reinterpret_cast<float*>(self + 0x44C) = fVar2;
+    *reinterpret_cast<float*>(self + 0x448) = fVar2;
+    *reinterpret_cast<float*>(self + 0x45C) = fVar2;
+    *reinterpret_cast<float*>(self + 0x458) = fVar2;
+    *reinterpret_cast<float*>(self + 0x454) = fVar2;
+    *reinterpret_cast<float*>(self + 0x468) = fVar1;
+    *reinterpret_cast<float*>(self + 0x464) = fVar1;
+    *reinterpret_cast<float*>(self + 0x460) = fVar1;
+    *reinterpret_cast<float*>(self + 0x44C) = fVar2;
+    *reinterpret_cast<float*>(self + 0x450) = fVar3;
 }
 
 /*
@@ -1958,20 +1960,22 @@ void CCameraPcs::calcMaterialEditor()
  */
 void CCameraPcs::createFunnyShape()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-
+    u8* self = reinterpret_cast<u8*>(this);
+    float fVar2 = FLOAT_8032fa34;
     *reinterpret_cast<int*>(self + 0x46C) = 0;
-    *reinterpret_cast<float*>(self + 0x450) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0x44C) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0x448) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0x45C) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0x458) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0x454) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0x468) = FLOAT_8032fa1c;
-    *reinterpret_cast<float*>(self + 0x464) = FLOAT_8032fa1c;
-    *reinterpret_cast<float*>(self + 0x460) = FLOAT_8032fa1c;
-    *reinterpret_cast<float*>(self + 0x44C) = FLOAT_8032fa34;
-    *reinterpret_cast<float*>(self + 0x450) = FLOAT_8032fa50;
+    float fVar1 = FLOAT_8032fa1c;
+    *reinterpret_cast<float*>(self + 0x450) = fVar2;
+    float fVar3 = FLOAT_8032fa50;
+    *reinterpret_cast<float*>(self + 0x44C) = fVar2;
+    *reinterpret_cast<float*>(self + 0x448) = fVar2;
+    *reinterpret_cast<float*>(self + 0x45C) = fVar2;
+    *reinterpret_cast<float*>(self + 0x458) = fVar2;
+    *reinterpret_cast<float*>(self + 0x454) = fVar2;
+    *reinterpret_cast<float*>(self + 0x468) = fVar1;
+    *reinterpret_cast<float*>(self + 0x464) = fVar1;
+    *reinterpret_cast<float*>(self + 0x460) = fVar1;
+    *reinterpret_cast<float*>(self + 0x44C) = fVar2;
+    *reinterpret_cast<float*>(self + 0x450) = fVar3;
 }
 
 /*

@@ -23,12 +23,22 @@ void CGPartyObj::onCreate()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80124840
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::onDestroy()
 {
-	// TODO
+	unsigned char* partyFlags = reinterpret_cast<unsigned char*>(this) + 0x6B8;
+	if ((*partyFlags & 0x04) != 0) {
+		addHp(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1A), static_cast<CGPrgObj*>(0));
+		*partyFlags &= ~0x04;
+	}
+
+	CGCharaObj::onDestroy();
 }
 
 /*

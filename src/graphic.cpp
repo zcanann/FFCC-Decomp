@@ -50,6 +50,7 @@ extern struct {
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dla__FPv(void*);
+extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
 extern "C" char lbl_801D6348[];
 extern "C" char lbl_801D6330[];
@@ -236,12 +237,38 @@ void CGraphic::Init()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80019a94
+ * PAL Size: 192b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphic::Quit()
 {
-	// TODO
+    if (PtrAt(this, 0x71EC) != nullptr) {
+        __dla__FPv(PtrAt(this, 0x71EC));
+        PtrAt(this, 0x71EC) = nullptr;
+    }
+    if (PtrAt(this, 0x71E4) != nullptr) {
+        __dla__FPv(PtrAt(this, 0x71E4));
+        PtrAt(this, 0x71E4) = nullptr;
+    }
+    if (PtrAt(this, 0x71E8) != nullptr) {
+        __dla__FPv(PtrAt(this, 0x71E8));
+        PtrAt(this, 0x71E8) = nullptr;
+    }
+    if (PtrAt(this, 0x71FC) != nullptr) {
+        __dla__FPv(PtrAt(this, 0x71FC));
+        PtrAt(this, 0x71FC) = nullptr;
+    }
+    if (PtrAt(this, 0x10) != nullptr) {
+        __dla__FPv(PtrAt(this, 0x10));
+        PtrAt(this, 0x10) = nullptr;
+    }
+
+    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, PtrAt(this, 0x8));
+    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, PtrAt(this, 0x4));
 }
 
 /*
@@ -804,12 +831,84 @@ void GXSetTexCoordGen(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80018a50
+ * PAL Size: 416b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGraphic::DrawDebugStringDirect(unsigned long, unsigned long, char*, unsigned long)
+void CGraphic::DrawDebugStringDirect(unsigned long x, unsigned long y, char* text, unsigned long charSize)
 {
-	// TODO
+    if (text == nullptr) {
+        return;
+    }
+
+    GXClearVtxDesc();
+    GXSetVtxDesc((GXAttr)9, (GXAttrType)1);
+    GXSetVtxDesc((GXAttr)0xD, (GXAttrType)1);
+    GXSetVtxAttrFmt((GXVtxFmt)0, (GXAttr)9, (GXCompCnt)1, (GXCompType)3, 0);
+    GXSetVtxAttrFmt((GXVtxFmt)0, (GXAttr)0xD, (GXCompCnt)1, (GXCompType)3, 1);
+
+    u32 count = 0;
+    char* lineStart = text;
+    while (true) {
+        char ch;
+        while (true) {
+            ch = *text++;
+            if (ch < ' ' || ch > 0x7F) {
+                break;
+            }
+            count += 1;
+        }
+
+        if (count > 0) {
+            GXBegin((GXPrimitive)0x80, (GXVtxFmt)0, (u16)((count & 0x3FFF) << 2));
+            s16 i = 0;
+            while (count > 0) {
+                s16 px = (s16)(x + i * charSize);
+                u32 glyph = (u32)(*lineStart - 0x20);
+                s16 tx = (s16)((glyph & 7) * 16);
+                s16 ty = (s16)((glyph >> 3) * 16);
+
+                i++;
+                lineStart++;
+
+                GXWGFifo.s16 = px;
+                GXWGFifo.s16 = (s16)y;
+                GXWGFifo.s16 = 0;
+                GXWGFifo.s16 = tx;
+                GXWGFifo.s16 = ty;
+
+                GXWGFifo.s16 = (s16)(px + charSize);
+                GXWGFifo.s16 = (s16)y;
+                GXWGFifo.s16 = 0;
+                GXWGFifo.s16 = (s16)(tx + 0x10);
+                GXWGFifo.s16 = ty;
+
+                GXWGFifo.s16 = (s16)(px + charSize);
+                GXWGFifo.s16 = (s16)(y + charSize);
+                GXWGFifo.s16 = 0;
+                GXWGFifo.s16 = (s16)(tx + 0x10);
+                GXWGFifo.s16 = (s16)(ty + 0x10);
+
+                GXWGFifo.s16 = px;
+                GXWGFifo.s16 = (s16)(y + charSize);
+                GXWGFifo.s16 = 0;
+                GXWGFifo.s16 = tx;
+                GXWGFifo.s16 = (s16)(ty + 0x10);
+
+                count -= 1;
+            }
+            count = 0;
+        }
+
+        if (ch != '\n') {
+            break;
+        }
+        y += charSize;
+        lineStart = text;
+    }
 }
 
 /*
@@ -1197,12 +1296,24 @@ void CGraphic::SetFog(int useFog, int useGlobalColor)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80017dfc
+ * PAL Size: 172b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGraphic::CopySaveFrameBuffer()
 {
-	// TODO
+    GXSetTexCopySrc(0, 0, 0x280, 0x1C0);
+    GXSetTexCopyDst(0x280, 0x1C0, GX_TF_I8, GX_FALSE);
+    GXCopyTex(PtrAt(this, 0x71EC), GX_FALSE);
+    GXPixModeSync();
+    GXInitTexObj(reinterpret_cast<GXTexObj*>(reinterpret_cast<u8*>(this) + 0x722C),
+                 PtrAt(this, 0x71EC), 0x280, 0x1C0, GX_TF_I8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXInitTexObjLOD(reinterpret_cast<GXTexObj*>(reinterpret_cast<u8*>(this) + 0x722C),
+                    GX_NEAR, GX_NEAR, FLOAT_8032f6c0, FLOAT_8032f6c0, FLOAT_8032f6c0,
+                    GX_FALSE, GX_FALSE, GX_ANISO_1);
 }
 
 /*

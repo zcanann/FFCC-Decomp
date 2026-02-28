@@ -617,6 +617,12 @@ void CMapObj::SetLink()
 {
     CMapObj* head0 = 0;
     CMapObj* search0 = MapObjArrayStart();
+    CMapObj* mapStart1 = MapObjArrayStart();
+    CMapObj* mapStart2 = MapObjArrayStart();
+    CMapObj* mapStart3 = MapObjArrayStart();
+    CMapObj* mapStart4 = MapObjArrayStart();
+    CMapObj* mapStart5 = MapObjArrayStart();
+    CMapObj* mapStart6 = MapObjArrayStart();
 
     while (true) {
         CMapObj* child0 = MapMng.SearchChildMapObj(search0, this);
@@ -625,8 +631,8 @@ void CMapObj::SetLink()
         }
 
         ObjAt(child0, 0x8) = head0;
+        CMapObj* search1 = mapStart6;
         CMapObj* head1 = 0;
-        CMapObj* search1 = MapObjArrayStart();
         while (true) {
             CMapObj* child1 = MapMng.SearchChildMapObj(search1, child0);
             if (child1 == 0) {
@@ -635,7 +641,7 @@ void CMapObj::SetLink()
 
             ObjAt(child1, 0x8) = head1;
             CMapObj* head2 = 0;
-            CMapObj* search2 = MapObjArrayStart();
+            CMapObj* search2 = mapStart1;
             while (true) {
                 CMapObj* child2 = MapMng.SearchChildMapObj(search2, child1);
                 if (child2 == 0) {
@@ -644,7 +650,7 @@ void CMapObj::SetLink()
 
                 ObjAt(child2, 0x8) = head2;
                 CMapObj* head3 = 0;
-                CMapObj* search3 = MapObjArrayStart();
+                CMapObj* search3 = mapStart2;
                 while (true) {
                     CMapObj* child3 = MapMng.SearchChildMapObj(search3, child2);
                     if (child3 == 0) {
@@ -653,7 +659,7 @@ void CMapObj::SetLink()
 
                     ObjAt(child3, 0x8) = head3;
                     CMapObj* head4 = 0;
-                    CMapObj* search4 = MapObjArrayStart();
+                    CMapObj* search4 = mapStart3;
                     while (true) {
                         CMapObj* child4 = MapMng.SearchChildMapObj(search4, child3);
                         if (child4 == 0) {
@@ -662,7 +668,7 @@ void CMapObj::SetLink()
 
                         ObjAt(child4, 0x8) = head4;
                         CMapObj* head5 = 0;
-                        CMapObj* search5 = MapObjArrayStart();
+                        CMapObj* search5 = mapStart4;
                         while (true) {
                             CMapObj* child5 = MapMng.SearchChildMapObj(search5, child4);
                             if (child5 == 0) {
@@ -671,7 +677,7 @@ void CMapObj::SetLink()
 
                             ObjAt(child5, 0x8) = head5;
                             CMapObj* head6 = 0;
-                            CMapObj* search6 = MapObjArrayStart();
+                            CMapObj* search6 = mapStart5;
                             while (true) {
                                 CMapObj* child6 = MapMng.SearchChildMapObj(search6, child5);
                                 if (child6 == 0) {
@@ -680,7 +686,7 @@ void CMapObj::SetLink()
 
                                 ObjAt(child6, 0x8) = head6;
                                 CMapObj* head7 = 0;
-                                CMapObj* search7 = MapObjArrayStart();
+                                CMapObj* search7 = mapStart6;
                                 while (true) {
                                     CMapObj* child7 = MapMng.SearchChildMapObj(search7, child6);
                                     if (child7 == 0) {
@@ -689,7 +695,7 @@ void CMapObj::SetLink()
 
                                     ObjAt(child7, 0x8) = head7;
                                     CMapObj* head8 = 0;
-                                    CMapObj* search8 = MapObjArrayStart();
+                                    CMapObj* search8 = mapStart6;
                                     while (true) {
                                         CMapObj* child8 = MapMng.SearchChildMapObj(search8, child7);
                                         if (child8 == 0) {
@@ -698,47 +704,47 @@ void CMapObj::SetLink()
 
                                         ObjAt(child8, 0x8) = head8;
                                         child8->SetLink();
-                                        search8 = NextSlot(child8);
+                                        search8 = reinterpret_cast<CMapObj*>(Ptr(child8, 0xF0));
                                         head8 = child8;
                                     }
 
                                     ObjAt(child7, 0x4) = head8;
-                                    search7 = NextSlot(child7);
+                                    search7 = reinterpret_cast<CMapObj*>(Ptr(child7, 0xF0));
                                     head7 = child7;
                                 }
 
                                 ObjAt(child6, 0x4) = head7;
-                                search6 = NextSlot(child6);
+                                search6 = reinterpret_cast<CMapObj*>(Ptr(child6, 0xF0));
                                 head6 = child6;
                             }
 
                             ObjAt(child5, 0x4) = head6;
-                            search5 = NextSlot(child5);
+                            search5 = reinterpret_cast<CMapObj*>(Ptr(child5, 0xF0));
                             head5 = child5;
                         }
 
                         ObjAt(child4, 0x4) = head5;
-                        search4 = NextSlot(child4);
+                        search4 = reinterpret_cast<CMapObj*>(Ptr(child4, 0xF0));
                         head4 = child4;
                     }
 
                     ObjAt(child3, 0x4) = head4;
-                    search3 = NextSlot(child3);
+                    search3 = reinterpret_cast<CMapObj*>(Ptr(child3, 0xF0));
                     head3 = child3;
                 }
 
                 ObjAt(child2, 0x4) = head3;
-                search2 = NextSlot(child2);
+                search2 = reinterpret_cast<CMapObj*>(Ptr(child2, 0xF0));
                 head2 = child2;
             }
 
             ObjAt(child1, 0x4) = head2;
-            search1 = NextSlot(child1);
+            search1 = reinterpret_cast<CMapObj*>(Ptr(child1, 0xF0));
             head1 = child1;
         }
 
         ObjAt(child0, 0x4) = head1;
-        search0 = NextSlot(child0);
+        search0 = reinterpret_cast<CMapObj*>(Ptr(child0, 0xF0));
         head0 = child0;
     }
 

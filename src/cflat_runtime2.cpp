@@ -390,6 +390,48 @@ CFlatRuntime2::CFlatRuntime2()
 
 	resetChangeScript();
 	memset(runtime + 0x12F0, 0, 0x48);
+
+	u8* baseObj = runtime + 0x10440;
+	for (int i = 0; i < 0x28; i++) {
+		baseObj[0x4C] &= 0x7F;
+		*reinterpret_cast<u16*>(baseObj + 0x30) = static_cast<u16>(i + 1);
+		baseObj += 0x50;
+	}
+
+	u8* quadObj = runtime + 0x110C0;
+	for (int i = 0; i < 0x18; i++) {
+		quadObj[0x4C] &= 0x7F;
+		*reinterpret_cast<u16*>(quadObj + 0x30) = static_cast<u16>((i + 1) | 0x100);
+		quadObj += 0xAC;
+	}
+
+	u8* gObj = runtime + 0x120E0;
+	for (int i = 0; i < 0x38; i++) {
+		gObj[0x4C] &= 0x7F;
+		*reinterpret_cast<u16*>(gObj + 0x30) = static_cast<u16>((i + 1) | 0x200);
+		gObj += 0x518;
+	}
+
+	u8* partyObj = reinterpret_cast<u8*>(m_objParty);
+	for (int i = 0; i < 4; i++) {
+		partyObj[0x4C] &= 0x7F;
+		*reinterpret_cast<u16*>(partyObj + 0x30) = static_cast<u16>((i + 1) | 0x300);
+		partyObj += 0x6F8;
+	}
+
+	u8* monObj = reinterpret_cast<u8*>(m_objMon);
+	for (int i = 0; i < 0x40; i++) {
+		monObj[0x4C] &= 0x7F;
+		*reinterpret_cast<u16*>(monObj + 0x30) = static_cast<u16>((i + 1) | 0x400);
+		monObj += 0x740;
+	}
+
+	u8* itemObj = reinterpret_cast<u8*>(m_objItem);
+	for (int i = 0; i < 0x20; i++) {
+		itemObj[0x4C] &= 0x7F;
+		*reinterpret_cast<u16*>(itemObj + 0x30) = static_cast<u16>((i + 1) | 0x500);
+		itemObj += 0x57C;
+	}
 }
 
 /*

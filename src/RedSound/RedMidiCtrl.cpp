@@ -1134,12 +1134,31 @@ void __MidiCtrl_ADSR_AL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C8BF4
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_ADSR_AR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_ADSR_AR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    int trackData;
+    int* voice;
+    int delta;
+
+    trackData = (int)track;
+    delta = DeltaTimeSumup((unsigned char**)trackData);
+    *(unsigned short*)(trackData + 0xD4) = delta;
+
+    voice = (int*)DAT_8032f444;
+    do {
+        if (*voice == trackData) {
+            *(unsigned short*)(voice + 0x14) = delta;
+            voice[0x24] |= 0x3C0;
+        }
+        voice += 0x30;
+    } while (voice < (int*)(DAT_8032f444 + 0xC00));
 }
 
 /*
@@ -1154,12 +1173,31 @@ void __MidiCtrl_ADSR_DL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C8CD8
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_ADSR_DR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_ADSR_DR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    int trackData;
+    int* voice;
+    int delta;
+
+    trackData = (int)track;
+    delta = DeltaTimeSumup((unsigned char**)trackData);
+    *(unsigned short*)(trackData + 0xD6) = delta;
+
+    voice = (int*)DAT_8032f444;
+    do {
+        if (*voice == trackData) {
+            *(unsigned short*)((int)voice + 0x52) = delta;
+            voice[0x24] |= 0x3C0;
+        }
+        voice += 0x30;
+    } while (voice < (int*)(DAT_8032f444 + 0xC00));
 }
 
 /*
@@ -1174,12 +1212,31 @@ void __MidiCtrl_ADSR_SL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C8DBC
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_ADSR_SR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_ADSR_SR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    int trackData;
+    int* voice;
+    int delta;
+
+    trackData = (int)track;
+    delta = DeltaTimeSumup((unsigned char**)trackData);
+    *(unsigned short*)(trackData + 0xD8) = delta;
+
+    voice = (int*)DAT_8032f444;
+    do {
+        if (*voice == trackData) {
+            *(unsigned short*)(voice + 0x15) = delta;
+            voice[0x24] |= 0x3C0;
+        }
+        voice += 0x30;
+    } while (voice < (int*)(DAT_8032f444 + 0xC00));
 }
 
 /*

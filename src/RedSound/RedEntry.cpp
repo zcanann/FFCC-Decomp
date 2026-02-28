@@ -1,4 +1,5 @@
 #include "ffcc/RedSound/RedEntry.h"
+#include "ffcc/RedSound/RedDriver.h"
 #include "ffcc/RedSound/RedMemory.h"
 #include <dolphin/os.h>
 #include <string.h>
@@ -11,6 +12,7 @@ extern char DAT_801e7905;
 extern char DAT_80333d30;
 extern char DAT_80333d38;
 extern char DAT_80333d3d;
+extern char DAT_80333d45;
 extern char DAT_80333d4d;
 extern char DAT_80333d4f;
 extern char s__s_sNOT_HAVE_A_MEMORY_FREE_AREA___801e7991[];
@@ -23,6 +25,7 @@ extern char s__s______________0x_8_8X___0x_8_8_801e7aca[];
 extern char s__s_Entry_Wave____d_801e7b01[];
 extern char s__s_Total_Size___0x_8_8X_801e7b18[];
 extern char s__s_Max_Free_Size___0x_8_8X_801e7b34[];
+extern char s__s_sWave_Entry___wave_4_4u__s_801e79ce[];
 extern char s__s_____MMemory_Information______801e7cce[];
 extern char s__s_Name___Start___Size___Free_801e7cef[];
 extern char s__s_MUSIC_3_3d___0x_8_8X___0x_8_8_801e7d24[];
@@ -141,9 +144,21 @@ void CRedEntry::WaveHistoryChoice(RedHistoryBANK*)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedEntry::SearchWaveSequence(int)
+int CRedEntry::SearchWaveSequence(int waveNo)
 {
-	// TODO
+	int* entry = (int*)this;
+	int* waveBank = (int*)entry[0];
+
+	while (waveBank < (int*)(entry[0] + 0x400)) {
+		if ((waveBank[3] != 0) && (waveBank[0] == waveNo)) {
+			unsigned int offset = (unsigned int)((int)waveBank - entry[0]);
+			return ((int)offset >> 4) + (unsigned int)(((int)offset < 0) && ((offset & 0xF) != 0));
+		}
+
+		waveBank += 4;
+	}
+
+	return -1;
 }
 
 /*
@@ -313,9 +328,91 @@ int CRedEntry::WaveHeadAdd(int waveBankNo, RedWaveHeadWD* waveHead, int waveNo)
  * Address:	TODO
  * Size:	TODO
  */
-void CRedEntry::SetWaveData(int, void*, int)
+int CRedEntry::SetWaveData(int waveBankNo, void* waveData, int waveDataSize)
 {
-	// TODO
+	int* entry = (int*)this;
+	int waveNo;
+	int waveAddress;
+
+	if (waveDataSize == 0) {
+		if ((-1 < entry[3]) && ((waveNo = SearchWaveSequence(entry[3])) > -1)) {
+			WaveDelete((RedHistoryBANK*)(entry[0] + waveNo * 0x10));
+		}
+
+		entry[3] = -1;
+		return -1;
+	}
+
+	waveAddress = 0;
+	if (entry[3] < 0) {
+		RedWaveHeadWD* waveHead = (RedWaveHeadWD*)waveData;
+		waveNo = *(short*)((unsigned char*)waveHead + 2);
+
+		if ((waveBankNo > -1) && (waveNo != *(int*)(entry[0] + waveBankNo * 0x10))) {
+			WaveDelete((RedHistoryBANK*)(entry[0] + waveBankNo * 0x10));
+		}
+
+		int historyNo = SearchWaveSequence(waveNo);
+		if (historyNo < 0) {
+			entry[3] = waveNo;
+			waveAddress = WaveHeadAdd(waveBankNo, waveHead, waveNo);
+			if (waveAddress < 0) {
+				entry[4] = 0;
+				entry[3] = -1;
+				return -1;
+			}
+
+			int waveHeadSize =
+			    ((((*(int*)((unsigned char*)waveHead + 8) * 4) + 0x1F) & 0xFFFFFFE0) +
+			     *(int*)((unsigned char*)waveHead + 0xC) * 0x60) +
+			    0x20;
+			entry[4] = *(int*)((unsigned char*)waveHead + 4);
+			entry[5] = waveAddress;
+			waveDataSize -= waveHeadSize;
+			waveData = (void*)((unsigned char*)waveData + waveHeadSize);
+		} else {
+			if ((waveBankNo > -1) && (historyNo != waveBankNo)) {
+				int src = entry[0] + historyNo * 0x10;
+				int dst = entry[0] + waveBankNo * 0x10;
+				*(int*)(dst + 0x0) = *(int*)(src + 0x0);
+				*(int*)(dst + 0x4) = *(int*)(src + 0x4);
+				*(int*)(dst + 0x8) = *(int*)(src + 0x8);
+				*(int*)(dst + 0xC) = *(int*)(src + 0xC);
+				historyNo = waveBankNo;
+			}
+
+			WaveHistoryChoice((RedHistoryBANK*)(entry[0] + historyNo * 0x10));
+		}
+	} else {
+		waveAddress = entry[5];
+	}
+
+	if ((waveAddress != 0) && (waveDataSize > 0)) {
+		int transferSize = entry[4];
+		if (waveDataSize < transferSize) {
+			transferSize = waveDataSize;
+		}
+
+		int dmaID = RedDmaEntry(0x8000, 0, (int)waveData, waveAddress, transferSize, 0, 0);
+		entry[4] -= transferSize;
+		entry[5] += transferSize;
+
+		while (RedDmaSearchID(dmaID) > 0) {
+			RedSleep(1000);
+		}
+
+		if (entry[4] < 1) {
+			if (DAT_8032f408 != 0) {
+				OSReport(s__s_sWave_Entry___wave_4_4u__s_801e79ce, &DAT_801e7905, &DAT_80333d45, entry[3], &DAT_80333d38);
+				fflush(&DAT_8021d1a8);
+			}
+
+			entry[3] = -1;
+			return 0;
+		}
+	}
+
+	return entry[3];
 }
 
 /*

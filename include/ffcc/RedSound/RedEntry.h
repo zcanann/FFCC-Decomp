@@ -17,12 +17,12 @@ public:
 	void WaveHistoryAdd(int);
 	void WaveHistoryDelete(int);
 	void WaveHistoryChoice(RedHistoryBANK*);
-	void SearchWaveSequence(int);
+	int SearchWaveSequence(int);
 	void SearchUseWave(int);
 	void WaveDelete(RedHistoryBANK*);
 	int WaveOldClear(int, int);
 	int WaveHeadAdd(int, RedWaveHeadWD*, int);
-	void SetWaveData(int, void*, int);
+	int SetWaveData(int, void*, int);
 	void ClearWaveData(int);
 	void ClearWaveDataM(int, int, int, int);
 	void ClearWaveBank(int);

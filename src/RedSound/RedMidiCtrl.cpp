@@ -11,6 +11,7 @@ extern int DAT_8032f3f8;
 extern void* DAT_8032f3f0;
 extern int* DAT_8032f420;
 extern int DAT_8032f424;
+extern int DAT_8032f414;
 extern CRedEntry DAT_8032e154;
 extern int DAT_8021dc20[];
 extern int lbl_8021EA10[];
@@ -1913,12 +1914,37 @@ void __MidiCtrl_StepRelative(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* trac
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C9E3C
+ * PAL Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_StepRelative2(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_StepRelative2(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    unsigned char value;
+    short step;
+    unsigned char* command;
+    int* trackData = (int*)track;
+
+    command = (unsigned char*)trackData[0];
+    trackData[0] = (int)(command + 1);
+    value = *command;
+    *(short*)(trackData + 0x4e) = 0;
+
+    if (value == 0) {
+        step = 0;
+    } else {
+        step = *(short*)((char*)trackData + 0x13a) + (unsigned short)value;
+    }
+    *(short*)((char*)trackData + 0x13a) = step;
+
+    if (*(short*)((char*)trackData + 0x13a) < -9999) {
+        *(short*)((char*)trackData + 0x13a) = -9999;
+    } else if (*(short*)((char*)trackData + 0x13a) > 9999) {
+        *(short*)((char*)trackData + 0x13a) = 9999;
+    }
 }
 
 /*

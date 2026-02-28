@@ -9,6 +9,7 @@
 #include "ffcc/p_game.h"
 #include "ffcc/p_light.h"
 #include <dolphin/mtx.h>
+#include <string.h>
 
 extern float lbl_8032F938;
 extern float lbl_8032F93C;
@@ -245,12 +246,14 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         CHUNK_ANIM = 0x414E494D,
         CHUNK_BOBJ = 0x424F424A,
         CHUNK_EFID = 0x45464944,
+        CHUNK_FSDW = 0x46534457,
         CHUNK_GBID = 0x47424944,
         CHUNK_GEOM = 0x47454F4D,
         CHUNK_ID = 0x49442020,
         CHUNK_LTST = 0x4C545354,
         CHUNK_MSID = 0x4D534944,
         CHUNK_PIDX = 0x50494458,
+        CHUNK_PSTA = 0x50535441,
         CHUNK_PRIO = 0x5052494F,
         CHUNK_SDST = 0x53445354,
         CHUNK_TFRM = 0x5446524D,
@@ -268,6 +271,8 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
             U16At(this, 0x32) = chunkFile.Get2();
         } else if (chunk.m_id == CHUNK_EFID) {
             U16At(this, 0x30) = chunkFile.Get2();
+        } else if (chunk.m_id == CHUNK_FSDW) {
+            *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(&CameraPcs) + 0x404) = chunkFile.Get1();
         } else if (chunk.m_id == CHUNK_ID) {
             U16At(this, 0x2E) = chunkFile.Get2();
         } else if (chunk.m_id == CHUNK_MSID) {
@@ -331,7 +336,16 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 U8At(this, 0x15) = 0;
             } else if ((U8At(this, 0x1D) == 2) || (U8At(this, 0x1D) == 3)) {
                 if (meshOrHitIdx == -2) {
-                    chunkFile.GetString();
+                    CMapObjAtrMeshName* meshName = reinterpret_cast<CMapObjAtrMeshName*>(
+                        __nw__FUlPQ27CMemory6CStagePci(0x28, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x84));
+                    if (meshName != 0) {
+                        meshName->CMapObjAtrMeshName::CMapObjAtrMeshName();
+                    }
+                    PtrAt(this, 0xEC) = meshName;
+                    char* name = chunkFile.GetString();
+                    if (meshName != 0) {
+                        strncpy(reinterpret_cast<char*>(meshName) + 8, name, 0x20);
+                    }
                     PtrAt(this, 0xC) = 0;
                 } else {
                     PtrAt(this, 0xC) = reinterpret_cast<unsigned char*>(&MapMng) + 0x4D4 + (meshOrHitIdx * 0x24);
@@ -386,6 +400,14 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 reinterpret_cast<CPtrArray<CMapAnimRun*>*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x213E0)
                     ->Add(reinterpret_cast<CMapAnimRun*>(animRun));
             }
+        } else if (chunk.m_id == CHUNK_PSTA) {
+            CMapObjAtrPlaySta* playSta = reinterpret_cast<CMapObjAtrPlaySta*>(
+                __nw__FUlPQ27CMemory6CStagePci(0xC, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x39B));
+            if (playSta != 0) {
+                playSta->CMapObjAtrPlaySta::CMapObjAtrPlaySta();
+                *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(playSta) + 8) = chunkFile.Get1();
+            }
+            PtrAt(this, 0xEC) = playSta;
         }
     }
     chunkFile.PopChunk();

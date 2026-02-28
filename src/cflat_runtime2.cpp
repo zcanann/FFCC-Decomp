@@ -874,32 +874,34 @@ CGObject* CFlatRuntime2::getFreeObject(int classType)
 void* CFlatRuntime2::intToClass(int classId)
 {
 	int classType = classId >> 8;
-	int slot = (classId & 0xFF) - 1;
+	unsigned int slot = static_cast<unsigned int>(classId) & 0xFF;
 
 	if (classType == 3) {
-		return m_objParty + slot * 0x6F8;
+		return m_objParty + (slot - 1) * 0x6F8;
 	}
 
-	if (classType <= 2) {
-		if (classType == 1) {
-			return CFlat + 0x110C0 + slot * 0xAC;
+	if (classType > 2) {
+		if (classType == 5) {
+			return m_objItem + (slot - 1) * 0x57C;
 		}
+		if (classType > 4) {
+			return this;
+		}
+		return m_objMon + (slot - 1) * 0x740;
+	}
+
+	if (classType == 1) {
+		return CFlat + 0x110C0 + (slot - 1) * 0xAC;
+	}
+
+	if (classType < 1) {
 		if (classType < 0) {
 			return this;
 		}
-		if (classType == 0) {
-			return CFlat + 0x10440 + slot * 0x50;
-		}
-		return CFlat + 0x120E0 + slot * 0x518;
+		return CFlat + 0x10440 + (slot - 1) * 0x50;
 	}
 
-	if (classType == 5) {
-		return m_objItem + slot * 0x57C;
-	}
-	if (classType > 4) {
-		return this;
-	}
-	return m_objMon + slot * 0x740;
+	return CFlat + 0x120E0 + (slot - 1) * 0x518;
 }
 
 /*

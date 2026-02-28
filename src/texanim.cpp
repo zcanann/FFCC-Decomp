@@ -539,7 +539,7 @@ CTexAnim* CPtrArray<CTexAnim*>::GetAt(unsigned long index)
 CTexAnimSet::CTexAnimSet()
 {
     __ct__4CRefFv(this);
-    *reinterpret_cast<void**>(this) = &PTR_PTR_s_CTexAnimSet_801e9c6c;
+    *reinterpret_cast<void**>(this) = PTR_PTR_s_CTexAnimSet_801e9c6c;
     CPtrArray<CTexAnim*>* const arr = reinterpret_cast<CPtrArray<CTexAnim*>*>(Ptr(this, 8));
     arr->m_size = 0;
     arr->m_numItems = 0;

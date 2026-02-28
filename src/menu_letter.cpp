@@ -106,122 +106,153 @@ void CMenuPcs::LetterInit4()
  */
 bool CMenuPcs::LetterOpen()
 {
+	double dVar2;
+	double dVar3;
+	float fVar1;
+	int iVar4;
+	int iVar5;
+	int iVar6;
+	s16* psVar7;
+	int iVar8;
+
 	DAT_8032eeea = 1;
 	if (*reinterpret_cast<char*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0xB) == '\0') {
 		memset(*reinterpret_cast<void**>(reinterpret_cast<char*>(this) + 0x850), 0, 0x1008);
-
-		int base = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 8;
-		for (int i = 0; i < 8; ++i) {
-			*reinterpret_cast<float*>(base + 0x14) = FLOAT_803330f8;
-			*reinterpret_cast<float*>(base + 0x54) = FLOAT_803330f8;
-			*reinterpret_cast<float*>(base + 0x94) = FLOAT_803330f8;
-			*reinterpret_cast<float*>(base + 0xD4) = FLOAT_803330f8;
-			*reinterpret_cast<float*>(base + 0x114) = FLOAT_803330f8;
-			*reinterpret_cast<float*>(base + 0x154) = FLOAT_803330f8;
-			*reinterpret_cast<float*>(base + 0x194) = FLOAT_803330f8;
-			*reinterpret_cast<float*>(base + 0x1D4) = FLOAT_803330f8;
-			base += 0x200;
-		}
-
-		int panel = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
-		*reinterpret_cast<int*>(panel + 0x24) = 0;
-		*reinterpret_cast<int*>(panel + 0x2C) = 0;
-		*reinterpret_cast<int*>(panel + 0x30) = 10;
-		*reinterpret_cast<int*>(panel + 0x64) = 0;
-		*reinterpret_cast<unsigned int*>(panel + 0x6C) =
-			(static_cast<unsigned int>(-static_cast<int>(static_cast<char>(*reinterpret_cast<char*>(reinterpret_cast<char*>(this) + 0x872)) != 0)) >> 31) & 10;
-		*reinterpret_cast<int*>(panel + 0x70) = 10;
+		fVar1 = FLOAT_803330f8;
+		iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 8;
+		iVar8 = 8;
+		do {
+			*reinterpret_cast<float*>(iVar4 + 0x14) = fVar1;
+			*reinterpret_cast<float*>(iVar4 + 0x54) = fVar1;
+			*reinterpret_cast<float*>(iVar4 + 0x94) = fVar1;
+			*reinterpret_cast<float*>(iVar4 + 0xD4) = fVar1;
+			*reinterpret_cast<float*>(iVar4 + 0x114) = fVar1;
+			*reinterpret_cast<float*>(iVar4 + 0x154) = fVar1;
+			*reinterpret_cast<float*>(iVar4 + 0x194) = fVar1;
+			*reinterpret_cast<float*>(iVar4 + 0x1D4) = fVar1;
+			iVar4 = iVar4 + 0x200;
+			iVar8 = iVar8 + -1;
+		} while (iVar8 != 0);
+		iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
+		*reinterpret_cast<int*>(iVar4 + 0x24) = 0;
+		*reinterpret_cast<int*>(iVar4 + 0x2C) = 0;
+		*reinterpret_cast<int*>(iVar4 + 0x30) = 10;
+		iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
+		*reinterpret_cast<int*>(iVar4 + 0x64) = 0;
+		*reinterpret_cast<unsigned int*>(iVar4 + 0x6C) =
+		    ~((-(int)(char)*reinterpret_cast<char*>(reinterpret_cast<char*>(this) + 0x872) |
+		       (int)(char)*reinterpret_cast<char*>(reinterpret_cast<char*>(this) + 0x872)) >>
+		      0x1f) &
+		    10;
+		*reinterpret_cast<int*>(iVar4 + 0x70) = 10;
 		**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) = 2;
-
-		int state = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C);
-		*reinterpret_cast<s16*>(state + 0x22) = 0;
-		*reinterpret_cast<char*>(state + 0xB) = 1;
-
-		int attachFlag = SingGetLetterAttachflg__8CMenuPcsFv(this);
-		if (attachFlag < 0) {
-			*reinterpret_cast<s16*>(state + 0x26) = 0;
-			*reinterpret_cast<s16*>(state + 0x28) = 0;
-			*reinterpret_cast<s16*>(state + 0x34) = 0;
+		*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x22) = 0;
+		*reinterpret_cast<char*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0xB) = 1;
+		iVar4 = SingGetLetterAttachflg__8CMenuPcsFv(this);
+		if (iVar4 < 0) {
+			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x26) = 0;
+			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x28) = 0;
+			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x34) = 0;
 			DAT_8032eef0 = 0;
 			DAT_8032eef4 = 0;
 			DAT_8032eeed = 2;
 			DAT_8032eee8 = 0;
 		} else {
 			memset(*reinterpret_cast<void**>(reinterpret_cast<char*>(this) + 0x850), 0, 0x1008);
-			base = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 8;
-			for (int i = 0; i < 8; ++i) {
-				*reinterpret_cast<float*>(base + 0x14) = FLOAT_803330f8;
-				*reinterpret_cast<float*>(base + 0x54) = FLOAT_803330f8;
-				*reinterpret_cast<float*>(base + 0x94) = FLOAT_803330f8;
-				*reinterpret_cast<float*>(base + 0xD4) = FLOAT_803330f8;
-				*reinterpret_cast<float*>(base + 0x114) = FLOAT_803330f8;
-				*reinterpret_cast<float*>(base + 0x154) = FLOAT_803330f8;
-				*reinterpret_cast<float*>(base + 0x194) = FLOAT_803330f8;
-				*reinterpret_cast<float*>(base + 0x1D4) = FLOAT_803330f8;
-				base += 0x200;
-			}
-
-			panel = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
-			*reinterpret_cast<int*>(panel + 0x24) = 0;
-			*reinterpret_cast<int*>(panel + 0x2C) = 0;
-			*reinterpret_cast<int*>(panel + 0x30) = 10;
+			fVar1 = FLOAT_803330f8;
+			iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 8;
+			iVar8 = 8;
+			do {
+				*reinterpret_cast<float*>(iVar4 + 0x14) = fVar1;
+				*reinterpret_cast<float*>(iVar4 + 0x54) = fVar1;
+				*reinterpret_cast<float*>(iVar4 + 0x94) = fVar1;
+				*reinterpret_cast<float*>(iVar4 + 0xD4) = fVar1;
+				*reinterpret_cast<float*>(iVar4 + 0x114) = fVar1;
+				*reinterpret_cast<float*>(iVar4 + 0x154) = fVar1;
+				*reinterpret_cast<float*>(iVar4 + 0x194) = fVar1;
+				*reinterpret_cast<float*>(iVar4 + 0x1D4) = fVar1;
+				iVar4 = iVar4 + 0x200;
+				iVar8 = iVar8 + -1;
+			} while (iVar8 != 0);
+			iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
+			*reinterpret_cast<int*>(iVar4 + 0x24) = 0;
+			*reinterpret_cast<int*>(iVar4 + 0x2C) = 0;
+			*reinterpret_cast<int*>(iVar4 + 0x30) = 10;
 			**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) = 1;
-
-			*reinterpret_cast<s16*>(state + 0x22) = 0;
-			*reinterpret_cast<s16*>(state + 0x26) = static_cast<s16>(DAT_8032eef8);
-			*reinterpret_cast<s16*>(state + 0x28) = static_cast<s16>(DAT_8032eefc);
-			*reinterpret_cast<s16*>(state + 0x34) = static_cast<s16>(DAT_8032ef00);
+			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x22) = 0;
+			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x26) = static_cast<s16>(DAT_8032eef8);
+			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x28) = static_cast<s16>(DAT_8032eefc);
+			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x34) = static_cast<s16>(DAT_8032ef00);
 			DAT_8032eee8 = static_cast<s16>(DAT_8032eef8 + DAT_8032ef00);
 		}
-
 		DAT_8032eef8 = 0;
 		DAT_8032eefc = 0;
 		DAT_8032ef00 = 0;
 		SetSingWinScl__8CMenuPcsFf(this, FLOAT_803330f8);
 	}
-
-	int finished = 0;
-	int state = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C);
-	*reinterpret_cast<s16*>(state + 0x22) = *reinterpret_cast<s16*>(state + 0x22) + 1;
-
-	int panelCount = static_cast<int>(**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850));
-	s16* entry = *reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) + 4;
-	int frame = static_cast<int>(*reinterpret_cast<s16*>(state + 0x22));
-
-	for (int i = 0; i < panelCount; ++i, entry += 0x20) {
-		float f = FLOAT_803330bc;
-		if (*reinterpret_cast<int*>(entry + 0x12) <= frame) {
-			if (frame < *reinterpret_cast<int*>(entry + 0x12) + *reinterpret_cast<int*>(entry + 0x14)) {
-				*reinterpret_cast<int*>(entry + 0x10) = *reinterpret_cast<int*>(entry + 0x10) + 1;
-				*reinterpret_cast<float*>(entry + 8) =
-					static_cast<float>(*reinterpret_cast<int*>(entry + 0x10)) / static_cast<float>(*reinterpret_cast<int*>(entry + 0x14));
-				if ((*reinterpret_cast<unsigned int*>(entry + 0x16) & 2) == 0) {
-					f = static_cast<float>(*reinterpret_cast<int*>(entry + 0x10)) / static_cast<float>(*reinterpret_cast<int*>(entry + 0x14));
-					*reinterpret_cast<float*>(entry + 0x18) =
-						(*reinterpret_cast<float*>(entry + 0x1C) - static_cast<float>(entry[0])) * f;
-					*reinterpret_cast<float*>(entry + 0x1A) =
-						(*reinterpret_cast<float*>(entry + 0x1E) - static_cast<float>(entry[1])) * f;
+	iVar6 = 0;
+	*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x22) =
+	    *reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x22) + 1;
+	iVar5 = (int)**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850);
+	psVar7 = *reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) + 4;
+	iVar8 = (int)*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x22);
+	iVar4 = iVar5;
+	if (0 < iVar5) {
+		do {
+			dVar2 = 4503601774854144.0;
+			fVar1 = FLOAT_803330bc;
+			if (*reinterpret_cast<int*>(psVar7 + 0x12) <= iVar8) {
+				if (iVar8 < *reinterpret_cast<int*>(psVar7 + 0x12) + *reinterpret_cast<int*>(psVar7 + 0x14)) {
+					*reinterpret_cast<int*>(psVar7 + 0x10) = *reinterpret_cast<int*>(psVar7 + 0x10) + 1;
+					dVar3 = 1.0;
+					*reinterpret_cast<float*>(psVar7 + 8) =
+					    (float)((1.0 /
+					             ((double)(((unsigned int)*reinterpret_cast<unsigned int*>(psVar7 + 0x14) ^ 0x80000000U) |
+					                       0x4330000000000000ULL) -
+					              dVar2)) *
+					            ((double)(((unsigned int)*reinterpret_cast<unsigned int*>(psVar7 + 0x10) ^ 0x80000000U) |
+					                      0x4330000000000000ULL) -
+					             dVar2));
+					if ((*reinterpret_cast<unsigned int*>(psVar7 + 0x16) & 2) == 0) {
+						fVar1 =
+						    (float)((dVar3 /
+						             ((double)(((unsigned int)*reinterpret_cast<unsigned int*>(psVar7 + 0x14) ^ 0x80000000U) |
+						                       0x4330000000000000ULL) -
+						              dVar2)) *
+						            ((double)(((unsigned int)*reinterpret_cast<unsigned int*>(psVar7 + 0x10) ^ 0x80000000U) |
+						                      0x4330000000000000ULL) -
+						             dVar2));
+						*reinterpret_cast<float*>(psVar7 + 0x18) =
+						    (*reinterpret_cast<float*>(psVar7 + 0x1C) -
+						     (float)((double)(((unsigned int)(int)*psVar7 ^ 0x80000000U) | 0x4330000000000000ULL) - dVar2)) *
+						    fVar1;
+						*reinterpret_cast<float*>(psVar7 + 0x1A) =
+						    (*reinterpret_cast<float*>(psVar7 + 0x1E) -
+						     (float)((double)(((unsigned int)(int)psVar7[1] ^ 0x80000000U) | 0x4330000000000000ULL) - dVar2)) *
+						    fVar1;
+					}
+				} else {
+					iVar6 = iVar6 + 1;
+					*reinterpret_cast<float*>(psVar7 + 8) = FLOAT_803330f8;
+					*reinterpret_cast<float*>(psVar7 + 0x18) = fVar1;
+					*reinterpret_cast<float*>(psVar7 + 0x1A) = fVar1;
 				}
-			} else {
-				++finished;
-				*reinterpret_cast<float*>(entry + 8) = FLOAT_803330f8;
-				*reinterpret_cast<float*>(entry + 0x18) = f;
-				*reinterpret_cast<float*>(entry + 0x1A) = f;
 			}
-		}
+			psVar7 = psVar7 + 0x20;
+			iVar4 = iVar4 + -1;
+		} while (iVar4 != 0);
 	}
-
-	if (panelCount == finished) {
-		if (SingGetLetterAttachflg__8CMenuPcsFv(this) < 0) {
-			*reinterpret_cast<s16*>(state + 0x12) = 1;
+	if (iVar5 == iVar6) {
+		iVar4 = SingGetLetterAttachflg__8CMenuPcsFv(this);
+		if (iVar4 < 0) {
+			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x12) = 1;
 		} else {
-			*reinterpret_cast<s16*>(state + 0x12) = 0;
-			*reinterpret_cast<s16*>(state + 0x30) = 1;
+			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x12) = 0;
+			*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x30) = 1;
 			LetterInit1__8CMenuPcsFv(this);
 		}
 	}
-
-	return panelCount == finished;
+	return iVar5 == iVar6;
 }
 
 /*

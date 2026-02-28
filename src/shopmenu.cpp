@@ -12,6 +12,7 @@ void DrawSingleBase__8CMenuPcsFf(void*, float);
 void ReleasePdt__8CPartPcsFi(void*, int);
 int LoadMenuPdt__8CPartPcsFPc(void*, char*);
 int GetItemType__8CMenuPcsFii(void*, int, int);
+const char* GetJobStr__8CMenuPcsFi(CMenuPcs*, int);
 int GetData__13CAmemCacheSetFsPci(void*, short, char*, int);
 int ChkEquipPossible__8CMenuPcsFi(void*, int);
 void GetRecipeMaterial__8CMenuPcsFiPQ28CMenuPcs12MaterialInfo(void*, int, short*);
@@ -22,6 +23,7 @@ int GetSmithItem__8CMenuPcsFi(void*, int);
 int __cntlzw(unsigned int);
 void __dl__FPv(void*);
 void pppCacheLoadShape__FPsP12_pppDataHead(short*, _pppDataHead*);
+void SetScale__5CFontFf(float, CFont*);
 void SetScaleX__5CFontFf(float, CFont*);
 void SetScaleY__5CFontFf(float, CFont*);
 void SetMargin__5CFontFf(float, CFont*);
@@ -47,6 +49,8 @@ extern float FLOAT_80332d2c;
 extern float FLOAT_80332d5c;
 extern float FLOAT_80332d60;
 extern float FLOAT_80332d64;
+extern float FLOAT_80332e48;
+extern float FLOAT_80332e4c;
 extern float FLOAT_80332d7c;
 extern float FLOAT_80332d80;
 extern float FLOAT_80332d88;
@@ -56,6 +60,7 @@ extern float FLOAT_80332d94;
 extern float FLOAT_80332d98;
 extern char DAT_80332d84[];
 extern char DAT_80332d14[];
+extern char* PTR_s_Blacksmith_80214da0[];
 extern char* PTR_s_Price_80214dc4[];
 extern char* PTR_s_Money_80214db0[];
 extern char* PTR_DAT_80214da8[];
@@ -1546,12 +1551,44 @@ void CShopMenu::DrawSell()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80154E98
+ * PAL Size: 448b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CShopMenu::DrawSmith0()
 {
-	// TODO
+    DrawShopBase();
+    drawShapeSeqScale(0x11, 0, 0, 0x154, FLOAT_80332e48, FLOAT_80332d28, 0xFF);
+    DrawItemList();
+    DrawItemHelp(ShopMenuInt(this, 0x28), 0x140, 0x172);
+
+    CFont* font = *reinterpret_cast<CFont**>(MenuPcs + 0x248);
+    SetMargin__5CFontFf(FLOAT_80332d28, font);
+    SetShadow__5CFontFi(font, 1);
+    SetScale__5CFontFf(FLOAT_80332d8c, font);
+
+    _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
+    SetColor__5CFontF8_GXColor(font, &white);
+    DrawInit__5CFontFv(font);
+
+    int languageId = static_cast<int>(Game.game.m_gameWork.m_languageId) - 1;
+    int caravan = ShopMenuInt(this, 0x20);
+    const char* title = PTR_s_Blacksmith_80214da0[languageId];
+    if (*reinterpret_cast<char*>(caravan + 0xBE1) != '\0') {
+        title = GetJobStr__8CMenuPcsFi(reinterpret_cast<CMenuPcs*>(MenuPcs), 1);
+    }
+
+    float textWidth = GetWidth__5CFontFPc(font, title);
+    float textX = 264.0f - textWidth;
+
+    DrawInit__5CFontFv(font);
+    DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
+        MenuPcs, font, const_cast<char*>(title), textX, FLOAT_80332e4c, 9, 0x12);
+    DrawInit__8CMenuPcsFv(MenuPcs);
+    DrawInit__8CMenuPcsFv(MenuPcs);
 }
 
 /*

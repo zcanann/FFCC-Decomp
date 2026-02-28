@@ -73,6 +73,27 @@ extern "C" char* PTR_s_Masculin_802144c4[];
 extern "C" char* PTR_DAT_80214224[];
 extern "C" char DAT_80332958[];
 extern "C" char DAT_8033295c[];
+extern "C" u8 lbl_801DE6AC[];
+extern "C" char* lbl_80214140[];
+extern "C" char* lbl_80214160[];
+extern "C" char* lbl_80214180[];
+extern "C" char* lbl_802141A0[];
+extern "C" char* lbl_802141C0[];
+extern "C" char* lbl_802141E0[];
+extern "C" char* lbl_802142C0[];
+extern "C" char* lbl_802143A0[];
+extern "C" char* lbl_80214480[];
+extern "C" char* lbl_80214560[];
+extern "C" char* lbl_80214640[];
+extern "C" char* lbl_802146C0[];
+extern "C" char* lbl_80214740[];
+extern "C" char* lbl_802147C0[];
+extern "C" char* lbl_80214840[];
+extern "C" char* lbl_802148C0[];
+extern "C" char* lbl_80214910[];
+extern "C" char* lbl_80214960[];
+extern "C" char* lbl_802149B0[];
+extern "C" char* lbl_80214A00[];
 
 extern "C" unsigned int CmdOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int CmdCtrl__8CMenuPcsFv(CMenuPcs*);
@@ -1506,62 +1527,109 @@ void CMenuPcs::SingLifeResetWait()
 	// TODO
 }
 
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void CMenuPcs::GetTribeStr(int)
+static inline char* GetLanguageTableString(int index, char** englishTable, char** germanTable, char** italianTable,
+                                           char** frenchTable, char** spanishTable)
 {
-	// TODO
+    u8 languageId = Game.game.m_gameWork.m_languageId;
+    if (languageId == 3) {
+        return italianTable[index];
+    }
+    if (languageId < 3) {
+        if ((languageId != 1) && (languageId != 0)) {
+            return germanTable[index];
+        }
+    } else {
+        if (languageId == 5) {
+            return spanishTable[index];
+        }
+        if (languageId < 5) {
+            return frenchTable[index];
+        }
+    }
+    return englishTable[index];
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80145674
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::GetJobStr(int)
+char* CMenuPcs::GetTribeStr(int index)
 {
-	// TODO
+    return GetLanguageTableString(index, PTR_s_Clavat_802140f0, PTR_s_Clavat_80214100, PTR_s_Clavat_80214110,
+                                  PTR_s_Clavat_80214120, PTR_s_Clavate_80214130);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801455d8
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::GetHairStr(int)
+char* CMenuPcs::GetJobStr(int index)
 {
-	// TODO
+    return GetLanguageTableString(index, lbl_80214140, lbl_80214160, lbl_80214180, lbl_802141A0, lbl_802141C0);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8014553c
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::GetMenuStr(int)
+char* CMenuPcs::GetHairStr(int index)
 {
-	// TODO
+    return GetLanguageTableString(index, lbl_80214640, lbl_802146C0, lbl_80214740, lbl_802147C0, lbl_80214840);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801454a0
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::GetAttrStr(int)
+char* CMenuPcs::GetMenuStr(int index)
 {
-	// TODO
+    return GetLanguageTableString(index, lbl_802141E0, lbl_802142C0, lbl_802143A0, lbl_80214480, lbl_80214560);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80145404
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::GetItemIcon(int)
+char* CMenuPcs::GetAttrStr(int index)
 {
-	// TODO
+    return GetLanguageTableString(index, lbl_802148C0, lbl_80214910, lbl_80214960, lbl_802149B0, lbl_80214A00);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801453f4
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+u8 CMenuPcs::GetItemIcon(int index)
+{
+    return lbl_801DE6AC[index];
 }

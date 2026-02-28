@@ -2226,10 +2226,10 @@ void CMapMng::ReadOtm(char* mapName)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CMapMng::ReadMid(char*)
+void CMapMng::ReadMid(char* mapName)
 {
-	// TODO
-    return 0;
+    (void)mapName;
+    // TODO
 }
 
 /*

@@ -6,6 +6,8 @@
 
 #include <string.h>
 
+class CMapMng;
+
 extern "C" void onCreate__8CGPrgObjFv(void*);
 extern "C" void onDestroy__8CGPrgObjFv(void*);
 extern "C" int GetFreeParticleSlot__13CFlatRuntime2Fv(void*);
@@ -52,11 +54,16 @@ extern "C" void SetPosX__5CFontFf(float, CFont*);
 extern "C" void SetPosY__5CFontFf(float, CFont*);
 extern "C" void SetPosZ__5CFontFf(float, CFont*);
 extern "C" void Draw__5CFontFPc(CFont*, const char*);
+extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, void*, void*, unsigned int);
 
 extern unsigned char CFlat[];
+extern CMapMng MapMng;
 extern CMath Math;
 extern float FLOAT_80331b20;
 extern float FLOAT_80331b1c;
+extern float FLOAT_80331b24;
+extern float FLOAT_80331b28;
+extern float FLOAT_80331b2c;
 extern float FLOAT_80331b18;
 extern float FLOAT_80331b30;
 extern float FLOAT_80331b34;
@@ -71,6 +78,7 @@ extern float FLOAT_80331b8c;
 extern float FLOAT_80331b90;
 extern float FLOAT_80331bb8;
 extern float FLOAT_80331b68;
+extern unsigned char DAT_8032ec90[];
 extern char DAT_80331b7c[];
 extern char DAT_80331b84[];
 extern char DAT_80331bc8[];
@@ -780,9 +788,40 @@ void CGItemObj::DrawOmoideName(CFont* font)
  * Address:	TODO
  * Size:	TODO
  */
-void CGItemObj::ItemJump(int, float)
+void CGItemObj::ItemJump(int state, float jump)
 {
-	// TODO
+	unsigned char* itemObj = (unsigned char*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat);
+
+	while (itemObj != 0) {
+		if ((*(unsigned int*)(itemObj + 0x60) & 0x10) == 0) {
+			float local_78 = FLOAT_80331b20;
+			float local_74 = FLOAT_80331b24;
+			float local_70 = FLOAT_80331b20;
+			float local_6c = *(float*)(itemObj + 0x68);
+			float local_68 = *(float*)(itemObj + 0x6c) + FLOAT_80331b1c;
+			float local_64 = *(float*)(itemObj + 0x70);
+			float local_60 = local_6c;
+			float local_5c = local_68;
+			float local_58 = local_64;
+			float local_48 = FLOAT_80331b20;
+			float local_44 = FLOAT_80331b24;
+			float local_40 = FLOAT_80331b20;
+			float local_3c = FLOAT_80331b20;
+			float local_38 = FLOAT_80331b28;
+			float local_34 = FLOAT_80331b28;
+			float local_30 = FLOAT_80331b28;
+			float local_2c = FLOAT_80331b2c;
+			float local_28 = FLOAT_80331b2c;
+			float local_24 = FLOAT_80331b2c;
+
+			if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &local_60, &local_78, *(unsigned int*)(itemObj + 0x1c4)) != 0 &&
+			    DAT_8032ec90[0x47] == (unsigned char)state) {
+				*(float*)(itemObj + 0x108) = *(float*)(itemObj + 0x108) + jump;
+			}
+		}
+
+		itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj);
+	}
 }
 
 /*

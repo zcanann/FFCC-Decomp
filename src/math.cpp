@@ -226,7 +226,8 @@ int CMath::RandPM(unsigned long max)
     }
 
     value = (unsigned int)rand() * 0xFFFE - 0x7FFF;
-    return (int)(value - (value / max) * max);
+    unsigned int quotient = value / max;
+    return (int)(value - quotient * max);
 }
 
 /*

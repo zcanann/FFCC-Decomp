@@ -549,14 +549,22 @@ void CMapHit::CalcHitPosition(Vec* position)
  */
 int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned long mask)
 {
-    (void)position;
-
     g_hit_cyl = *mapCylinder;
-    s_hit_t_min = s_large_pos;
-    s_hit_face_min = 0;
-    s_hit_edge_index = -1;
+    g_hit_mvec = *position;
 
-    return CheckHitFaceCylinder(mask);
+    CMapHitFace* face = m_faces;
+    int i = 0;
+    while (i < m_faceCount) {
+        s_hit_face_min = face;
+        s_hit_t_min = s_large_pos;
+        if (CheckHitFaceCylinder(mask) != 0) {
+            return 1;
+        }
+        face = reinterpret_cast<CMapHitFace*>(Ptr(face, 0x50));
+        i++;
+    }
+
+    return 0;
 }
 
 /*

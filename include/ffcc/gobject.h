@@ -72,7 +72,7 @@ public:
     void ResetAnimPoint(int);
     void AddAnimPoint(int, int, int);
     void SetAnimSlot(int, int);
-    void CalcSafePos(int, CGObject*, Vec*);
+    float CalcSafePos(int, CGObject*, Vec*);
     void PutDropItem();
     bool IsDispRader();
     void onHit(int, CGObject*, int, Vec*);

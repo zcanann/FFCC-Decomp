@@ -1833,10 +1833,39 @@ void __MidiCtrl_FuzzyOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C9FA0
+ * PAL Size: 152b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_FuzzyOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_FuzzyOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+	unsigned char* data = *(unsigned char**)track;
+	unsigned int* trackWords = (unsigned int*)track;
+	*(unsigned char**)track = data + 1;
+	unsigned char mode = *data;
+
+	if (mode == 3) {
+		trackWords[0x3F] &= 0xFFFDFFFF;
+		return;
+	}
+
+	if (mode < 3) {
+		if (mode == 1) {
+			trackWords[0x3F] &= 0xFFFF7FFF;
+			return;
+		}
+
+		if (mode != 0) {
+			trackWords[0x3F] &= 0xFFFEFFFF;
+			return;
+		}
+	} else if (mode < 5) {
+		trackWords[0x3F] &= 0xFFFBFFFF;
+		return;
+	}
+
+	trackWords[0x3F] &= 0xFFFFBFFF;
 }

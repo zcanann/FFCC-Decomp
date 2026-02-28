@@ -4,6 +4,7 @@
 #include "ffcc/p_game.h"
 #include "ffcc/vector.h"
 
+#include <math.h>
 #include <string.h>
 
 class CMapMng;
@@ -43,6 +44,14 @@ extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
 extern "C" void addSubStat__8CGPrgObjFv(void*);
 extern "C" void IgnoreParticle__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(void*, int, void*);
 extern "C" int intToClass__13CFlatRuntime2Fi(void*, int);
+extern "C" float RandFPM__5CMathFf(float, CMath*);
+extern "C" void SetPosBG__8CGObjectFP3Veci(void*, Vec*, int);
+extern "C" void MoveVector__8CGObjectFP3Vecfiiii(void*, Vec*, float, int, int, int, int);
+extern "C" void EndParticle__13CFlatRuntime2FPQ29CCharaPcs7CHandle(void*, void*);
+extern "C" void* __nw__Q29CCharaPcs7CHandleFUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
+extern "C" void* __ct__Q29CCharaPcs7CHandleFv(void*);
+extern "C" void Add__Q29CCharaPcs7CHandleFv(void*);
+extern "C" void LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(void*, int, unsigned long, unsigned long);
 extern "C" int IsLoadModelASyncCompleted__Q29CCharaPcs7CHandleFv(void*);
 extern "C" void SetDamageCol__8CGObjectFiPcffP3Vec(void*, int, char*, float, float, Vec*);
 extern "C" void onFrame__8CGPrgObjFv(void*);
@@ -76,13 +85,23 @@ extern float FLOAT_80331b54;
 extern float FLOAT_80331b58;
 extern float FLOAT_80331b8c;
 extern float FLOAT_80331b90;
+extern float FLOAT_80331b94;
+extern float FLOAT_80331b98;
 extern float FLOAT_80331bb8;
 extern float FLOAT_80331b68;
 extern unsigned char DAT_8032ec90[];
+extern int DAT_8032ee90;
+extern char SoundBuffer[];
 extern char DAT_80331b7c[];
 extern char DAT_80331b84[];
 extern char DAT_80331bc8[];
+extern char DAT_801dcec0[];
 extern char DAT_801dced4[];
+extern char DAT_801dcef8[];
+extern char DAT_801dcf10[];
+extern char DAT_801dcf34[];
+extern char DAT_801dcf58[];
+extern char DAT_801dcf64[];
 extern char DAT_801dd010[];
 
 struct ItemObjFlatTableEntry {
@@ -339,12 +358,148 @@ unsigned int CGItemObj::CanCreateFromScript()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801259e4
+ * PAL Size: 1168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGItemObj::CreateFromScript(int, int, int, CGObject*, float, CGItemObj::CCFS*)
+CGPrgObj* CGItemObj::CreateFromScript(
+    int createMode, int createFlags, int scriptArg, CGObject* owner, float launchAngle, CGItemObj::CCFS* ccfs)
 {
-	// TODO
+	int freeItemCount = getNumFreeObject__13CFlatRuntime2Fi(CFlat, 5);
+	Printf__7CSystemFPce(&System, DAT_801dcec0, freeItemCount);
+
+	if (freeItemCount == 0) {
+		int deletedCount = 0;
+		unsigned char* bestItemObj = 0;
+		void* bestScriptPos = reinterpret_cast<void*>(0x00989680);
+
+		for (unsigned char* itemObj = (unsigned char*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat);
+		     itemObj != 0;
+		     itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
+			unsigned char flags = itemObj[0x50];
+			int isActive = (int)(((unsigned int)flags << 28) | ((unsigned int)flags >> 4)) < 0;
+			int canDelete = (itemObj[0x53] & 1) != 0;
+			int scriptPos = *(int*)(itemObj + 0x48);
+
+			if (*(int*)(itemObj + 0x44) == 0 && isActive != 0 && canDelete != 0 &&
+			    scriptPos < (int)bestScriptPos) {
+				bestScriptPos = (void*)scriptPos;
+				bestItemObj = itemObj;
+			}
+		}
+
+		if (bestItemObj == 0) {
+			if ((unsigned int)System.m_execParam > 2U) {
+				Printf__7CSystemFPce(&System, DAT_801dced4);
+			}
+		} else {
+			deleteObject__12CFlatRuntimeFPQ212CFlatRuntime7CObject(CFlat, bestItemObj);
+			deletedCount = 1;
+		}
+
+		Printf__7CSystemFPce(&System, DAT_801dcef8, deletedCount);
+		if (deletedCount == 0) {
+			if ((unsigned int)System.m_execParam > 2U) {
+				Printf__7CSystemFPce(&System, DAT_801dcf10);
+			}
+			return 0;
+		}
+	}
+
+	int ownerParticleId = 0;
+	if (owner != 0) {
+		ownerParticleId = *(short*)((unsigned char*)owner + 0x30);
+	}
+
+	DAT_8032ee90 = createFlags;
+	CFlatRuntime::CStack inStack[3];
+	CFlatRuntime::CStack outStack;
+	inStack[0].m_word = createMode;
+	inStack[1].m_word = createFlags;
+	inStack[2].m_word = scriptArg;
+	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+	    &CFlat, 0, 1, 7, 5, inStack, &outStack);
+
+	if (createMode == 1) {
+		return 0;
+	}
+
+	CGPrgObj* newItem = (CGPrgObj*)intToClass__13CFlatRuntime2Fi(CFlat, (int)outStack.m_word);
+	unsigned char* itemSelf = (unsigned char*)newItem;
+
+	if (createMode == 2) {
+		*(int*)(itemSelf + 0x558) = scriptArg;
+		newItem->m_radiusCtrl.y = FLOAT_80331b18;
+	}
+
+	changeStat__8CGPrgObjFiii(newItem, 0x1B, 0, 0);
+
+	if ((createFlags & 1) != 0 && owner != 0) {
+		float safePosDist;
+		Vec safePos;
+		float yRot = owner->m_rotBaseY + RandFPM__5CMathFf(FLOAT_80331b54, &Math);
+
+		newItem->m_worldPosition.x = FLOAT_80331b1c * (float)sin((double)yRot) + owner->m_worldPosition.x;
+		newItem->m_worldPosition.y = FLOAT_80331b1c + owner->m_worldPosition.y;
+		newItem->m_worldPosition.z = FLOAT_80331b1c * (float)cos((double)yRot) + owner->m_worldPosition.z;
+
+		safePosDist = CalcSafePos__8CGObjectFiP8CGObjectP3Vec(newItem, 0x41, owner, &safePos);
+		if (FLOAT_80331b20 < safePosDist) {
+			moveVectorHRot__8CGObjectFfffi(
+			    owner, FLOAT_80331b8c + owner->m_rotBaseY, FLOAT_80331b20, safePosDist / FLOAT_80331b90, 3);
+		}
+
+		newItem->m_worldPosition = safePos;
+		SetPosBG__8CGObjectFP3Veci(newItem, &safePos, 1);
+	}
+
+	if ((createFlags & 4) != 0 && owner != 0) {
+		newItem->m_worldPosition = owner->m_worldPosition;
+		SetPosBG__8CGObjectFP3Veci(newItem, &newItem->m_worldPosition, 1);
+
+		CVector moveVec((float)sin((double)launchAngle), FLOAT_80331b1c, (float)cos((double)launchAngle));
+		MoveVector__8CGObjectFP3Vecfiiii(newItem, (Vec*)&moveVec, FLOAT_80331b94, 1, 0, 1, 0);
+	}
+
+	if ((createFlags & 2) != 0 && owner != 0) {
+		changeStat__8CGPrgObjFiii(newItem, 0x23, 0, 0);
+		newItem->m_worldPosition.x = owner->m_worldPosition.x;
+		newItem->m_worldPosition.y = owner->m_worldPosition.y + FLOAT_80331b98;
+		newItem->m_worldPosition.z = owner->m_worldPosition.z;
+		*(CGObject**)(itemSelf + 0x550) = owner;
+
+		void* ownerScriptSlot = owner->m_scriptHandle[0xED];
+		if ((unsigned int)System.m_execParam > 2U) {
+			Printf__7CSystemFPce(&System, DAT_801dcf34, ownerScriptSlot);
+		}
+		*(CGPrgObj**)(SoundBuffer + (int)ownerScriptSlot * 4 + 0x4F4) = newItem;
+
+		void* handle = __nw__Q29CCharaPcs7CHandleFUlPQ27CMemory6CStagePci(
+		    0x194, Game.game.m_mainStage, DAT_801dcf58, 0x28E);
+		if (handle != 0) {
+			handle = __ct__Q29CCharaPcs7CHandleFv(handle);
+		}
+		*(void**)(itemSelf + 0x564) = handle;
+		Add__Q29CCharaPcs7CHandleFv(*(void**)(itemSelf + 0x564));
+
+		if (ccfs != 0) {
+			unsigned int* ccfsData = (unsigned int*)ccfs;
+			LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(*(void**)(itemSelf + 0x564), 2, ccfsData[1], ccfsData[2]);
+			*(int*)(itemSelf + 0x56C) = (int)ccfsData[3];
+			*(int*)(itemSelf + 0x570) = (int)ccfsData[4];
+			*(int*)(itemSelf + 0x574) = (int)ccfsData[0];
+		}
+
+		if ((unsigned int)System.m_execParam > 2U) {
+			Printf__7CSystemFPce(&System, DAT_801dcf64);
+		}
+	}
+
+	(void)ownerParticleId;
+	return newItem;
 }
 
 /*

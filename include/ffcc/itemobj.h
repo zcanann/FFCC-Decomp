@@ -5,6 +5,7 @@
 
 class CGObject;
 class CGPartyObj;
+class CGPrgObj;
 class CFlatRuntime;
 class CFont;
 struct Vec;
@@ -27,7 +28,7 @@ public:
 	void onFrameStat();
 	int DeleteOld(int, int, CFlatRuntime::CObject*, CFlatRuntime::CObject*);
 	unsigned int CanCreateFromScript();
-	void CreateFromScript(int, int, int, CGObject*, float, CGItemObj::CCFS*);
+	CGPrgObj* CreateFromScript(int, int, int, CGObject*, float, CGItemObj::CCFS*);
 	void safeDetach(int, float);
 	void carry(CGPartyObj*, int, int);
 	void onChangePrg(int);

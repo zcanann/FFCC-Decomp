@@ -29,6 +29,7 @@ extern float FLOAT_80330894;
 extern float FLOAT_80330898;
 extern float FLOAT_8033089c;
 extern float FLOAT_803308a0;
+extern float FLOAT_803308ac;
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 extern "C" int m_tempVar__4CMes[];
 extern "C" int sprintf(char*, const char*, ...);
@@ -298,12 +299,137 @@ void CMes::getFont(int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80099460
+ * PAL Size: 6900b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMes::addString(char **, int)
+void CMes::addString(char** text, int branchMode)
 {
-	// TODO
+	CFont* font = *(CFont**)(MenuPcs + 0x100);
+	int fontSel = *(int*)((char*)this + 0x3D40);
+	if (fontSel == 0)
+	{
+		font = *(CFont**)(MenuPcs + 0x0F8);
+	}
+	else if ((fontSel == 1) || (fontSel >= 4))
+	{
+		// Keep current font pointer selection for unsupported modes.
+	}
+	else
+	{
+		font = *(CFont**)(MenuPcs + 0x100);
+	}
+
+	if (font == 0)
+	{
+		return;
+	}
+
+	SetShadow__5CFontFi(*(int*)((char*)this + 0x3D38), font);
+	SetMargin__5CFontFf(FLOAT_8033089c, font);
+	SetScaleX__5CFontFf(*(float*)((char*)this + 0x3D44), font);
+	SetScaleY__5CFontFf(*(float*)((char*)this + 0x3D48), font);
+
+	for (;;)
+	{
+		unsigned char ch = (unsigned char)**text;
+		*text = *text + 1;
+
+		if (ch == 0)
+		{
+			return;
+		}
+
+		if (ch == 0xFF)
+		{
+			unsigned int tag = ((unsigned int)(unsigned char)**text - 0xA0U) & 0xFFU;
+			*text = *text + 1;
+
+			switch (tag)
+			{
+			case 0:
+				*(int*)((char*)this + 0x3C84) = 0;
+				*(int*)((char*)this + 0x3C88) = *(int*)((char*)this + 0x3C88) + *(int*)((char*)this + 0x3CB0);
+				break;
+			case 1:
+			{
+				int wait = 2;
+				if (*(int*)((char*)this + 0x3D10) != 0)
+				{
+					wait = 3;
+				}
+				*(int*)((char*)this + 0x3C78) = wait;
+				*(int*)((char*)this + 0x3C74) = 1;
+				return;
+			}
+			case 2:
+				*(int*)((char*)this + 0x3C78) = 4;
+				*(int*)((char*)this + 0x3C74) = 1;
+				return;
+			case 3:
+				*(int*)((char*)this + 0x3C7C) = *(int*)((char*)this + 0x3C7C) + GetMesNibbleValue(*text);
+				*text = *text + 2;
+				break;
+			case 4:
+				*(int*)((char*)this + 0x3D2C) = 0;
+				break;
+			case 5:
+				*(int*)((char*)this + 0x3D2C) = 2;
+				break;
+			case 6:
+				*(int*)((char*)this + 0x3D2C) = 1;
+				break;
+			default:
+				break;
+			}
+			continue;
+		}
+
+		if (branchMode == 2)
+		{
+			continue;
+		}
+
+		float* glyph = (float*)((char*)this + *(int*)((char*)this + 8) * 0x14 + 0x0C);
+		*(unsigned char*)((char*)glyph + 0x12) = (unsigned char)*(int*)((char*)this + 0x3D28);
+		*(unsigned char*)((char*)glyph + 0x10) = ch;
+		glyph[0] = *(float*)((char*)this + 0x3C84);
+		glyph[2] = *(float*)((char*)this + 0x3C88);
+
+		font->renderFlags = (font->renderFlags & 0xF7) | 8;
+		if (ch < 0x20)
+		{
+			glyph[1] = FLOAT_80330894;
+		}
+		else
+		{
+			glyph[1] = GetWidth__5CFontFUs(font, ch);
+		}
+		font->renderFlags &= 0xF7;
+
+		*(unsigned short*)((char*)glyph + 0x0C) = (unsigned short)*(int*)((char*)this + 0x3C7C);
+		*(unsigned char*)((char*)glyph + 0x0F) =
+		    (unsigned char)(*(int*)((char*)this + 0x3CB4) << 4) | (*(unsigned char*)((char*)glyph + 0x0F) & 0x0F);
+		*(unsigned char*)((char*)glyph + 0x0F) = *(unsigned char*)((char*)glyph + 0x0F) & 0xF0;
+		*(unsigned char*)((char*)glyph + 0x13) = (unsigned char)*(int*)((char*)this + 0x3C0C);
+		*(unsigned char*)((char*)glyph + 0x0E) =
+		    (unsigned char)(*(int*)((char*)this + 0x3D2C) << 4) | (*(unsigned char*)((char*)glyph + 0x0E) & 0x0F);
+		*(unsigned char*)((char*)glyph + 0x0E) =
+		    (unsigned char)((*(int*)((char*)this + 0x3D40) & 0x0F) | (*(unsigned char*)((char*)glyph + 0x0E) & 0xF0));
+		*(unsigned char*)((char*)glyph + 0x0A) = (unsigned char)(FLOAT_803308ac * *(float*)((char*)this + 0x3D44));
+		*(unsigned char*)((char*)glyph + 0x11) = (unsigned char)(FLOAT_803308ac * *(float*)((char*)this + 0x3D48));
+
+		*(float*)((char*)this + 0x3C84) =
+		    *(float*)((char*)this + 0x3C84) + glyph[1] + *(float*)((char*)this + 0x3D3C);
+		if (*(int*)((char*)this + 0x3D4C) == 0)
+		{
+			*(int*)((char*)this + 0x3C7C) = *(int*)((char*)this + 0x3C7C) + *(int*)((char*)this + 0x3CB0);
+		}
+		*(int*)((char*)this + 8) = *(int*)((char*)this + 8) + 1;
+	}
 }
 
 /*

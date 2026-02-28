@@ -298,8 +298,8 @@ int CBound::CheckFrustum0(CBound& outBound)
     param_2[5] = fVar2;
     param_2[4] = fVar2;
     param_2[3] = fVar2;
-    if ((((param_1[3] < s_f_vpos.x) || (param_1[4] < s_f_vpos.y)) || (param_1[5] < s_f_vpos.z)) ||
-        ((s_f_vpos.x < *param_1 || (s_f_vpos.y < param_1[1])) || (s_f_vpos.z < param_1[2]))) {
+    if (!((s_f_vpos.x <= param_1[3] && s_f_vpos.y <= param_1[4] && s_f_vpos.z <= param_1[5]) &&
+          (*param_1 <= s_f_vpos.x && param_1[1] <= s_f_vpos.y && param_1[2] <= s_f_vpos.z))) {
         dVar10 = (double)0.0f;
         uVar5 = 0xF;
         uVar7 = 0;

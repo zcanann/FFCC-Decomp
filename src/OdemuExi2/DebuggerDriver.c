@@ -59,11 +59,15 @@ static BOOL DBGEXISync() {
 static BOOL DBGEXIImm(u8* buffer, s32 bytecounter, s32 write) {
     s32 i;
     u32 value;
+    u8* ptr;
 
     if (write != 0) {
-        value = 0;
-        for (i = 0; i < bytecounter; i++) {
-            value |= (u32)buffer[i] << ((3 - i) * 8);
+        i = 0;
+        value = 0U;
+        ptr = buffer;
+        while (i < bytecounter) {
+            value |= (u32)*ptr++ << ((3 - i) * 8);
+            i++;
         }
         __EXIRegs[14] = value;
     }
@@ -74,9 +78,12 @@ static BOOL DBGEXIImm(u8* buffer, s32 bytecounter, s32 write) {
     } while (value & 1);
 
     if (write == 0) {
+        i = 0;
+        ptr = buffer;
         value = __EXIRegs[14];
-        for (i = 0; i < bytecounter; i++) {
-            buffer[i] = (u8)(value >> ((3 - i) * 8));
+        while (i < bytecounter) {
+            *ptr++ = (u8)(value >> ((3 - i) * 8));
+            i++;
         }
     }
 

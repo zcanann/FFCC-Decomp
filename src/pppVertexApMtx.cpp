@@ -106,7 +106,9 @@ void apea(_pppPObject*, PVertexApMtx*, Vec*)
 void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 {
 	VertexApMtxData* data = (VertexApMtxData*)dataRaw;
-	VertexApMtxState* state = (VertexApMtxState*)((u8*)parent + **(s32**)((u8*)ctrlRaw + 0xC) + 0x80);
+	VertexApMtxCtrl* ctrl = (VertexApMtxCtrl*)ctrlRaw;
+	s32 stateOffset = *ctrl->stateOffset;
+	VertexApMtxState* state = (VertexApMtxState*)((u8*)parent + stateOffset + 0x80);
 
 	if (lbl_8032ED70 != 0) {
 		return;
@@ -126,10 +128,11 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 			points = src->points;
 		}
 
-		s32 count = data->spawnCount;
-		if (data->mode == 0) {
-			do {
-				if (state->index >= (u16)entry->maxValue) {
+		u8 count = data->spawnCount;
+		switch (data->mode) {
+		case 0:
+			while (count-- != 0) {
+				if ((s16)state->index >= entry->maxValue) {
 					state->index = 0;
 				}
 
@@ -142,7 +145,9 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 
 				if ((data->childId + 0x10000) != 0xFFFF) {
 					_pppPObject* child;
-					_pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (data->childId << 4));
+					s32 childId = data->childId;
+					_pppPDataVal* childData =
+						(_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (childId << 4));
 					Mtx* outMtx;
 					Vec pos;
 					Vec worldPos;
@@ -151,7 +156,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 						child = 0;
 					} else {
 						child = pppCreatePObject((_pppMngSt*)lbl_8032ED50, childData);
-						*(void**)((u8*)child + 4) = parent;
+						*(void**)((u8*)child + 0x4) = parent;
 					}
 
 					pos.x = x;
@@ -172,9 +177,10 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 						(*outMtx)[2][3] = worldPos.z;
 					}
 				}
-			} while (count-- != 0);
-		} else if (data->mode == 1) {
-			do {
+			}
+			break;
+		case 1:
+			while (count-- != 0) {
 				u16 vertexIndex = entry->vertexIndices[(s32)(RandF__5CMathFv(&math) * (f32)entry->maxValue)];
 				Vec* vertex = &points[vertexIndex];
 				f32 x = vertex->x;
@@ -183,7 +189,9 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 
 				if ((data->childId + 0x10000) != 0xFFFF) {
 					_pppPObject* child;
-					_pppPDataVal* childData = (_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (data->childId << 4));
+					s32 childId = data->childId;
+					_pppPDataVal* childData =
+						(_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (childId << 4));
 					Mtx* outMtx;
 					Vec pos;
 					Vec worldPos;
@@ -192,7 +200,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 						child = 0;
 					} else {
 						child = pppCreatePObject((_pppMngSt*)lbl_8032ED50, childData);
-						*(void**)((u8*)child + 4) = parent;
+						*(void**)((u8*)child + 0x4) = parent;
 					}
 
 					pos.x = x;
@@ -213,7 +221,8 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 						(*outMtx)[2][3] = worldPos.z;
 					}
 				}
-			} while (count-- != 0);
+			}
+			break;
 		}
 		state->countdown = data->spawnDelay;
 	}

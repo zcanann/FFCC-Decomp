@@ -1462,32 +1462,94 @@ void CCaravanWork::SortBeforeReturnWorldMap()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009ec2c
+ * PAL Size: 332b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::BackupTutorialItem(int)
+void CCaravanWork::BackupTutorialItem(int mode)
 {
-	// TODO
+	if (mode == 0) {
+		memcpy(m_inventoryItems, m_backupInventoryBlock, 0x148);
+		m_inventoryItemCount = m_backupInventoryItemCount;
+		memcpy(m_commandListInventorySlotRef, m_backupCommandListInventorySlotRef, 0x10);
+		memcpy(m_commandListExtra, m_backupCmdlistExtra, 0x10);
+		memcpy(m_equipment, m_backupEquipment, 8);
+		m_gil = m_backupGil;
+		m_currentCmdListIndex = m_backupCurrentCmdListIndex;
+		m_weaponIdx = m_backupWeaponIdx;
+	} else {
+		memcpy(m_backupInventoryBlock, m_inventoryItems, 0x148);
+		memset(m_inventoryItems, 0xFF, 0x148);
+		m_backupInventoryItemCount = m_inventoryItemCount;
+		m_inventoryItemCount = 0;
+		memcpy(m_backupCommandListInventorySlotRef, m_commandListInventorySlotRef, 0x10);
+		memset(m_commandListInventorySlotRef, 0xFF, 0x10);
+		memcpy(m_backupCmdlistExtra, m_commandListExtra, 0x10);
+		memset(m_commandListExtra, 0, 0x10);
+		memcpy(m_backupEquipment, m_equipment, 8);
+		memset(m_equipment, 0xFF, 8);
+		m_backupGil = m_gil;
+		m_gil = 0;
+		m_backupCurrentCmdListIndex = m_currentCmdListIndex;
+		m_currentCmdListIndex = 0;
+		m_backupWeaponIdx = m_weaponIdx;
+		m_weaponIdx = 0;
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009eb94
+ * PAL Size: 152b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::UniteComList(int, int, int)
+void CCaravanWork::UniteComList(int startIdx, int count, int cmdId)
 {
-	// TODO
+	for (int i = 0; i < count; i++) {
+		short value = -1;
+		if (i == 0) {
+			value = (short)cmdId;
+		}
+		*(short*)(m_commandListExtra + (startIdx + i) * 2) = value;
+	}
+
+	if ((startIdx <= m_weaponIdx) && (m_weaponIdx < (startIdx + count))) {
+		int cmdTopIdx;
+		int itemCmdListIdx;
+		if (GetCmdListItemName__12CCaravanWorkFi(this, startIdx, &cmdTopIdx, &itemCmdListIdx) != 0) {
+			m_weaponIdx = (short)itemCmdListIdx;
+		}
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009ea48
+ * PAL Size: 332b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::UnuniteComList(int, int)
+void CCaravanWork::UnuniteComList(int startIdx, int count)
 {
-	// TODO
+	if (m_weaponIdx == startIdx) {
+		int cmdTopIdx;
+		int itemCmdListIdx;
+		if (GetCmdListItemName__12CCaravanWorkFi(this, startIdx, &cmdTopIdx, &itemCmdListIdx) != 0) {
+			m_weaponIdx = (short)itemCmdListIdx;
+		}
+	}
+
+	for (int i = 0; i < count; i++) {
+		*(short*)(m_commandListExtra + (startIdx + i) * 2) = 0;
+	}
 }
 
 /*

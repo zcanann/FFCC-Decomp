@@ -6,6 +6,7 @@
 #include "ffcc/partMng.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/p_game.h"
+#include "ffcc/ptrarray.h"
 #include "ffcc/stopwatch.h"
 #include "ffcc/textureman.h"
 #include <math.h>
@@ -83,6 +84,7 @@ extern int DAT_8032ed98;
 extern unsigned char DAT_8032ed9c;
 extern char DAT_801d8fc4[];
 extern CPartMng PartMng;
+extern CTextureMan TextureMan;
 extern "C" void* __vt__Q212CFlatRuntime7CObject[];
 extern "C" void* __vt__9CGBaseObj[];
 extern "C" void* __vt__9CGQuadObj[];
@@ -1863,12 +1865,118 @@ void CFlatRuntime2::loadLayerASync(int layerNo, char* fileName)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006A764
+ * PAL Size: 2040b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::drawLayer(int, char*, int, int, int, int, int, int, float, float, _GXColor*, int)
+void CFlatRuntime2::drawLayer(
+	int layerNo, char* textureName, int x, int y, int width, int height, int texS, int texT, float scaleX,
+	float scaleY, _GXColor* color, int flags)
 {
-	// TODO
+	u8* runtime = reinterpret_cast<u8*>(this);
+	CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(runtime + 0x1774 + layerNo * 0xC);
+	if (textureSet == 0) {
+		return;
+	}
+
+	int textureIdx = textureSet->Find(textureName);
+	if (textureIdx < 0) {
+		return;
+	}
+
+	CPtrArray<CTexture*>* textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<u8*>(textureSet) + 8);
+	CTexture* texture = (*textureArray)[static_cast<unsigned long>(textureIdx)];
+	if (texture == 0) {
+		return;
+	}
+
+	GXSetNumChans(1);
+	GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+	GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPEC);
+	GXSetChanMatColor(GX_COLOR0A0, *color);
+
+	Mtx44 orthoMtx;
+	C_MTXOrtho(orthoMtx, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, 1.0f);
+	GXSetProjection(orthoMtx, GX_ORTHOGRAPHIC);
+
+	Mtx modelMtx;
+	PSMTXIdentity(modelMtx);
+	GXLoadPosMtxImm(modelMtx, GX_PNMTX0);
+	GXSetCurrentMtx(GX_PNMTX0);
+
+	int blendMode = (flags >> 1) & 3;
+	if (blendMode == 1) {
+		_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_NOOP);
+	} else if (blendMode == 2) {
+		_GXSetBlendMode(GX_BM_SUBTRACT, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_NOOP);
+	} else {
+		_GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+	}
+	GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
+	GXSetCullMode(GX_CULL_NONE);
+
+	TextureMan.SetTexture(GX_TEXMAP0, texture);
+
+	const int textureWidth = *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 0x64);
+	const int textureHeight = *reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 0x68);
+	Mtx texMtx;
+	PSMTXScale(texMtx, 1.0f / static_cast<float>(textureWidth), 1.0f / static_cast<float>(textureHeight), 1.0f);
+	GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
+
+	GXSetNumTexGens(1);
+	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+	GXClearVtxDesc();
+	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+	GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, 0);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 0);
+	TextureMan.SetTextureTev(texture);
+
+	float drawW = static_cast<float>(width) * scaleX;
+	float drawH = static_cast<float>(height) * scaleY;
+	float left = static_cast<float>(x);
+	float top = static_cast<float>(y);
+	if ((flags & 1) != 0) {
+		left -= drawW * 0.5f;
+		top -= drawH * 0.5f;
+	}
+
+	s16 x0 = static_cast<s16>(left);
+	s16 y0 = static_cast<s16>(top);
+	s16 x1 = static_cast<s16>(left + drawW);
+	s16 y1 = static_cast<s16>(top + drawH);
+	s16 s0 = static_cast<s16>(texS);
+	s16 t0 = static_cast<s16>(texT);
+	s16 s1 = static_cast<s16>(texS + width);
+	s16 t1 = static_cast<s16>(texT + height);
+
+	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+	GXWGFifo.s16 = x0;
+	GXWGFifo.s16 = y0;
+	GXWGFifo.s16 = 0;
+	GXWGFifo.s16 = s0;
+	GXWGFifo.s16 = t0;
+
+	GXWGFifo.s16 = x1;
+	GXWGFifo.s16 = y0;
+	GXWGFifo.s16 = 0;
+	GXWGFifo.s16 = s1;
+	GXWGFifo.s16 = t0;
+
+	GXWGFifo.s16 = x1;
+	GXWGFifo.s16 = y1;
+	GXWGFifo.s16 = 0;
+	GXWGFifo.s16 = s1;
+	GXWGFifo.s16 = t1;
+
+	GXWGFifo.s16 = x0;
+	GXWGFifo.s16 = y1;
+	GXWGFifo.s16 = 0;
+	GXWGFifo.s16 = s0;
+	GXWGFifo.s16 = t1;
 }
 
 /*

@@ -1251,12 +1251,31 @@ void __MidiCtrl_ADSR_RL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C8EA0
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_ADSR_RR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_ADSR_RR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+	int trackData;
+	int* voice;
+	int delta;
+
+	trackData = (int)track;
+	delta = DeltaTimeSumup((unsigned char**)trackData);
+	*(unsigned short*)(trackData + 0xDA) = delta;
+
+	voice = (int*)DAT_8032f444;
+	do {
+		if (*voice == trackData) {
+			*(unsigned short*)((int)voice + 0x56) = delta;
+			voice[0x24] |= 0x3C0;
+		}
+		voice += 0x30;
+	} while (voice < (int*)(DAT_8032f444 + 0xC00));
 }
 
 /*
@@ -1412,12 +1431,25 @@ void __MidiCtrl_VibrateDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C91E8
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_VibrateDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_VibrateDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+	int delta[5];
+	int* trackData = (int*)track;
+
+	delta[0] = DeltaTimeSumup((unsigned char**)trackData);
+	if (delta[0] == 0) {
+		delta[0] = 1;
+	}
+	trackData[0x21] = DataAddCompute(trackData + 0x20, *(u8*)trackData[0], delta);
+	*(short*)((int)trackData + 0x8e) = (short)delta[0];
+	trackData[0] += 1;
 }
 
 /*
@@ -1726,12 +1758,25 @@ void __MidiCtrl_ShakeDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C97EC
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_ShakeDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_ShakeDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+	int delta[5];
+	int* trackData = (int*)track;
+
+	delta[0] = DeltaTimeSumup((unsigned char**)trackData);
+	if (delta[0] == 0) {
+		delta[0] = 1;
+	}
+	trackData[0x31] = DataAddCompute(trackData + 0x30, *(u8*)trackData[0], delta);
+	*(short*)((int)trackData + 0xd2) = (short)delta[0];
+	trackData[0] += 1;
 }
 
 /*

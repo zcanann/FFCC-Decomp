@@ -438,12 +438,22 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c3db4
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void _VoiceEnvelopeCheck()
 {
-	// TODO
+    u32* voiceData = DAT_8032f444;
+    do {
+        if ((((u8*)voiceData)[0x1A] & 7) != 0) {
+            voiceData[0x2C] = 0x8000;
+        }
+        voiceData += 0x30;
+    } while (voiceData < DAT_8032f444 + 0xC00);
 }
 
 /*
@@ -1021,36 +1031,35 @@ void SetVoiceSwitch(RedTrackDATA* track, int voiceSwitch)
 void _AdsrStart(RedVoiceDATA* voice)
 {
     int* voiceData = (int*)voice;
-    u8* voiceBytes = (u8*)voice;
-    int* stage = &voiceData[0x17];
-    u32 curValue = (u8)voiceBytes[0x58];
-    u32 prevValue;
-    u32 stepCount;
+    u32 prevLevel;
+    u32 nextLevel;
+    u32 stepFrames;
 
-    *stage = 0;
+    voiceData[0x17] = 0;
+    nextLevel = *(u8*)((u8*)voiceData + 0x58);
     do {
-        prevValue = curValue;
-        stepCount = (u16)*(u16*)(voiceBytes + 0x50 + *stage * 2);
-        curValue = (u8)*(u8*)(voiceBytes + 0x50 + *stage + 9);
-        if (stepCount != 0) {
+        prevLevel = nextLevel;
+        stepFrames = *(u16*)((u8*)voiceData + 0x50 + voiceData[0x17] * 2);
+        nextLevel = *(u8*)((u8*)voiceData + 0x50 + voiceData[0x17] + 9);
+        if (stepFrames != 0) {
             break;
         }
-        *stage += 1;
-    } while (*stage < 3);
+        voiceData[0x17] += 1;
+    } while (voiceData[0x17] < 3);
 
-    voiceData[0x18] = stepCount;
-    if (curValue != 0) {
-        curValue = (((curValue + 1) * 0x100) - 1) * 0x1000;
+    voiceData[0x18] = stepFrames;
+    if (nextLevel != 0) {
+        nextLevel = (((nextLevel + 1) * 0x100) - 1) * 0x1000;
     }
 
-    if (stepCount == 0) {
-        voiceData[0x2B] = curValue;
+    if (stepFrames == 0) {
+        voiceData[0x2B] = nextLevel;
     } else {
-        if (prevValue != 0) {
-            prevValue = (((prevValue + 1) * 0x100) - 1) * 0x1000;
+        if (prevLevel != 0) {
+            prevLevel = (((prevLevel + 1) * 0x100) - 1) * 0x1000;
         }
-        voiceData[0x2B] = prevValue;
-        voiceData[0x19] = ((curValue | 0x800) - prevValue) / (int)stepCount;
+        voiceData[0x2B] = prevLevel;
+        voiceData[0x19] = (int)((nextLevel | 0x800) - prevLevel) / (int)stepFrames;
     }
 }
 

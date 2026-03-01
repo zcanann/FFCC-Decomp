@@ -12,6 +12,7 @@
 #include "ffcc/p_map.h"
 #include "ffcc/p_menu.h"
 #include "ffcc/p_minigame.h"
+#include "ffcc/pad.h"
 #include "ffcc/partMng.h"
 #include "ffcc/p_tina.h"
 #include "ffcc/sound.h"
@@ -41,6 +42,8 @@ extern "C" {
 int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned long);
 void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 int GetWait__4CMesFv(void*);
+int GetSysControl__13CFlatRuntime2Fi(CFlatRuntime2*, int);
+void resetSpawnBit__13CFlatRuntime2Fi(CFlatRuntime2*, int);
 void Printf__7CSystemFPce(CSystem*, const char*, ...);
 unsigned char lbl_8032ECB8;
 }
@@ -54,6 +57,7 @@ extern float FLOAT_80330d10;
 extern float FLOAT_80330d30;
 extern float DAT_8032ec20;
 extern CMenuPcs MenuPcs;
+extern CPartPcs PartPcs;
 
 static inline void StoreSetU32(CFlatRuntime::CStack* stack, int setMode, unsigned int* value)
 {
@@ -1736,12 +1740,77 @@ extern "C" void CalcBound__9CLine(CLine<64>* line)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800B3310
+ * PAL Size: 23664b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject*, int, int, int&)
+void CFlatRuntime2::onSystemFunc(CFlatRuntime::CObject* object, int, int systemFunc, int& outResult)
 {
-	// TODO
+    CFlatRuntime* runtime = reinterpret_cast<CFlatRuntime*>(this);
+
+    switch (systemFunc) {
+    case -0xFD: {
+        const double stickX = GetLeftStickX__4CPadFl(&Pad, *object->m_localBase);
+        const double stickY = GetLeftStickY__4CPadFl(&Pad, *object->m_localBase);
+        *reinterpret_cast<float*>(object->m_localBase[1]) = static_cast<float>(stickX);
+        *reinterpret_cast<float*>(object->m_localBase[2]) = static_cast<float>(stickY);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    }
+    case -0xFC:
+        *reinterpret_cast<int*>(reinterpret_cast<char*>(&DbgMenuPcs) + 0x10844) = *object->m_localBase;
+        *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&DbgMenuPcs) + 0x10848) =
+            object->m_localBase[1];
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xFB:
+        Game.game.SetNextScriptNewGame();
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xF9:
+        CameraPcs.SetFullScreenShadowCamLen(static_cast<float>(*object->m_localBase));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xF6:
+        Game.game.m_caravanWorkArr[*object->m_localBase].m_gil = object->m_localBase[1];
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xF5:
+        Sound.SeMaxVolume(*object->m_localBase);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xF4:
+        PartPcs.pppSetDebugHide(static_cast<unsigned char>(*object->m_localBase));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xF3:
+        runtime->push(object, GetSysControl__13CFlatRuntime2Fi(this, *object->m_localBase));
+        outResult = 0;
+        return;
+    case -0xF2:
+        MapMng.SetMapAnimID(static_cast<char>(object->m_localBase[0]), object->m_localBase[1],
+            object->m_localBase[2], static_cast<char>(object->m_localBase[3]));
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    case -0xF1:
+        resetSpawnBit__13CFlatRuntime2Fi(this, *object->m_localBase);
+        runtime->push(object, 0);
+        outResult = 0;
+        return;
+    default:
+        return;
+    }
 }
 
 /*

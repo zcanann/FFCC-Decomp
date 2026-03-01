@@ -91,9 +91,12 @@ void _ReverbNullCallback(AXFX_BUFFERUPDATE* param_1, void*)
  * Address:	TODO
  * Size:	TODO
  */
-void ReverbAreaAlloc(unsigned long)
+void ReverbAreaAlloc(unsigned long size)
 {
-	// TODO
+    DAT_8032f4b0[0] += (u32)size;
+    size = ((u32)size + 0x1F) & ~0x1F;
+    DAT_8032f4b0[1] += (u32)size;
+    RedNew((int)size);
 }
 
 /*

@@ -554,43 +554,38 @@ void CMaterialEditorPcs::drawViewer()
  */
 void CMaterialEditorPcs::CreateBoundaryBox(Vec& minPos, Vec& maxPos, long count, const Vec* points)
 {
-    float* minVals = reinterpret_cast<float*>(&minPos);
-    float* maxVals = reinterpret_cast<float*>(&maxPos);
-    const float* src = reinterpret_cast<const float*>(points);
+    minPos.x = lbl_8032FCAC;
+    minPos.y = lbl_8032FCAC;
+    minPos.z = lbl_8032FCAC;
+    maxPos.x = lbl_8032FCB0;
+    maxPos.y = lbl_8032FCB0;
+    maxPos.z = lbl_8032FCB0;
 
-    minVals[0] = lbl_8032FCAC;
-    minVals[1] = lbl_8032FCAC;
-    minVals[2] = lbl_8032FCAC;
-
-    maxVals[0] = lbl_8032FCB0;
-    maxVals[1] = lbl_8032FCB0;
-    maxVals[2] = lbl_8032FCB0;
-
-    if (count < 1) {
+    if (count <= 0) {
         return;
     }
 
     do {
-        if (src[0] < minVals[0]) {
-            minVals[0] = src[0];
+        if (minPos.x > points->x) {
+            minPos.x = points->x;
         }
-        if (src[1] < minVals[1]) {
-            minVals[1] = src[1];
+        if (minPos.y > points->y) {
+            minPos.y = points->y;
         }
-        if (src[2] < minVals[2]) {
-            minVals[2] = src[2];
+        if (minPos.z > points->z) {
+            minPos.z = points->z;
         }
-        if (maxVals[0] < src[0]) {
-            maxVals[0] = src[0];
+        if (maxPos.x < points->x) {
+            maxPos.x = points->x;
         }
-        if (maxVals[1] < src[1]) {
-            maxVals[1] = src[1];
+        if (maxPos.y < points->y) {
+            maxPos.y = points->y;
         }
-        if (maxVals[2] < src[2]) {
-            maxVals[2] = src[2];
+        if (maxPos.z < points->z) {
+            maxPos.z = points->z;
         }
 
-        src += 3;
+        points += 1;
         count -= 1;
     } while (count != 0);
 }

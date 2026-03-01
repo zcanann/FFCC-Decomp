@@ -15,6 +15,7 @@
 
 extern void* ARRAY_802f49b0;
 extern "C" void __dt__8GbaQueueFv(void*);
+extern "C" int rand(void);
 extern __declspec(section ".data") CFlatRuntime CFlat;
 extern CMenuPcs MenuPcs;
 extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
@@ -856,12 +857,113 @@ void GbaQueue::ClrStageFlg(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CF764
+ * PAL Size: 684b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void GbaQueue::SetRadarType()
 {
-	// TODO
+	char* obj = reinterpret_cast<char*>(this);
+	unsigned int validMemberCount;
+	unsigned int activeMask;
+	int assignedCount;
+	int prevAssignedType;
+	int i;
+
+	if ((obj[0x2D30] != 0) || (Game.game.m_gameWork.m_bossArtifactStageIndex == 0x19)) {
+		return;
+	}
+
+	validMemberCount = static_cast<unsigned int>(Game.game.m_gameWork.m_wmBackupParams[0] >= 0);
+	if (Game.game.m_gameWork.m_wmBackupParams[1] >= 0) {
+		validMemberCount++;
+	}
+	if (Game.game.m_gameWork.m_wmBackupParams[2] >= 0) {
+		validMemberCount++;
+	}
+	if (Game.game.m_gameWork.m_wmBackupParams[3] >= 0) {
+		validMemberCount++;
+	}
+
+	obj[0x2D32] = 1;
+	activeMask = 0;
+	if ((Game.game.m_scriptFoodBase[0] != 0) &&
+	    (reinterpret_cast<CCaravanWork*>(Game.game.m_scriptFoodBase[0])->m_shopState != 0)) {
+		activeMask = 1;
+	}
+
+	obj[0x2D33] = 1;
+	if ((Game.game.m_scriptFoodBase[1] != 0) &&
+	    (reinterpret_cast<CCaravanWork*>(Game.game.m_scriptFoodBase[1])->m_shopState != 0)) {
+		activeMask |= 2;
+	}
+
+	obj[0x2D34] = 1;
+	if ((Game.game.m_scriptFoodBase[2] != 0) &&
+	    (reinterpret_cast<CCaravanWork*>(Game.game.m_scriptFoodBase[2])->m_shopState != 0)) {
+		activeMask |= 4;
+	}
+
+	obj[0x2D35] = 1;
+	if ((Game.game.m_scriptFoodBase[3] != 0) &&
+	    (reinterpret_cast<CCaravanWork*>(Game.game.m_scriptFoodBase[3])->m_shopState != 0)) {
+		activeMask |= 8;
+	}
+
+	assignedCount = 0;
+	prevAssignedType = 0;
+	while (assignedCount < static_cast<int>(validMemberCount)) {
+		const int slot = rand() & 3;
+		if ((activeMask & (1 << slot)) != 0) {
+			int assignedType = assignedCount;
+			if (assignedCount > 1) {
+				if (assignedCount == 2) {
+					assignedType = (rand() & 1) + 2;
+				} else {
+					assignedType = (prevAssignedType == 2) ? 3 : 2;
+				}
+			}
+
+			OSWaitSemaphore(accessSemaphores + slot);
+			obj[0x2D32 + slot] = static_cast<char>(assignedType);
+			OSSignalSemaphore(accessSemaphores + slot);
+
+			activeMask &= static_cast<unsigned int>(~(1 << slot));
+			assignedCount++;
+			prevAssignedType = assignedType;
+		}
+	}
+
+	if (obj[0x2D56] != 0) {
+		const unsigned char radarType = Game.game.m_gameWork.m_mogScoreRadarType;
+		obj[0x2D32] = static_cast<char>(radarType);
+		obj[0x2D33] = static_cast<char>(radarType);
+		obj[0x2D34] = static_cast<char>(radarType);
+		obj[0x2D35] = static_cast<char>(radarType);
+	}
+
+	obj[0x2D30] = 1;
+	if (Game.game.m_gameWork.m_bossArtifactStageIndex > 0xE) {
+		obj[0x2D32] = 0;
+		obj[0x2D33] = 0;
+		obj[0x2D34] = 0;
+		obj[0x2D35] = 0;
+	}
+
+	for (i = 0; i < 4; i++) {
+		const unsigned char mask = static_cast<unsigned char>(1 << i);
+		const unsigned char oldMode = static_cast<unsigned char>(obj[0x2D41]);
+
+		OSWaitSemaphore(accessSemaphores + i);
+		obj[0x2D41] = static_cast<char>((oldMode & ~mask) | mask);
+		if (oldMode != static_cast<unsigned char>(obj[0x2D41])) {
+			obj[0x2D42] = static_cast<char>(static_cast<unsigned char>(obj[0x2D42]) | mask);
+		}
+		OSSignalSemaphore(accessSemaphores + i);
+	}
 }
 
 /*

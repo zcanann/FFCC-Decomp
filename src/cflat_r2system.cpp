@@ -44,6 +44,7 @@ void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 int GetWait__4CMesFv(void*);
 int GetSysControl__13CFlatRuntime2Fi(CFlatRuntime2*, int);
 void resetSpawnBit__13CFlatRuntime2Fi(CFlatRuntime2*, int);
+void Printf__7CSystemFPce(CSystem*, const char*, ...);
 unsigned char lbl_8032ECB8;
 }
 extern "C" double fmod(double, double);

@@ -74,10 +74,10 @@ void pppConstructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTa
     work[1].value[0][2] = FLOAT_803305a4;
     work[1].value[0][1] = initVal;
     work[1].value[0][0] = initVal;
-    work[1].value[0][3] = 0.0f;
-    work[1].value[1][0] = 0.0f;
-    work[1].value[1][1] = 0.0f;
-    work[1].value[1][2] = 0.0f;
+    *reinterpret_cast<u32*>(&work[1].value[0][3]) = 0;
+    *reinterpret_cast<u32*>(&work[1].value[1][0]) = 0;
+    *reinterpret_cast<u32*>(&work[1].value[1][1]) = 0;
+    *reinterpret_cast<u32*>(&work[1].value[1][2]) = 0;
     *(u16*)(work[1].value[1] + 3) = 0;
     *(u16*)((u8*)work[1].value[1] + 0xe) = 0;
     *(u16*)(work[1].value[1] + 3) = 10000;

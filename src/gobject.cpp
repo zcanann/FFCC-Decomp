@@ -727,12 +727,29 @@ void CGObject::CancelMove(int moveType)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007de74
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGObject::Move(Vec*, float, int, int, int, int, int)
+void CGObject::Move(Vec* moveVec, float moveTimer, int turnFrames, int moveMode, int useFacing, int flagA, int flagB)
 {
-	// TODO
+    *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xDF) | 0x20;
+    *((u8*)&m_weaponNodeFlags + 1) &= 0xEF;
+    m_turnFrames = static_cast<u32>(turnFrames);
+    m_moveVec.y = moveVec->x;
+    m_moveVec.z = moveVec->y;
+    m_moveSpeed = moveVec->z;
+    m_moveTimer = static_cast<s32>(moveTimer);
+    *((u8*)&m_weaponNodeFlags) = (static_cast<u8>(moveMode << 1) & 2) | (*((u8*)&m_weaponNodeFlags) & 0xFD);
+    *((u8*)&m_weaponNodeFlags + 1) =
+        (static_cast<u8>(useFacing << 3) & 8) | (*((u8*)&m_weaponNodeFlags + 1) & 0xF7);
+    *((u8*)&m_weaponNodeFlags + 1) =
+        (static_cast<u8>(flagA << 1) & 2) | (*((u8*)&m_weaponNodeFlags + 1) & 0xFD);
+    *((u8*)&m_weaponNodeFlags + 1) =
+        (static_cast<u8>(flagB << 2) & 4) | (*((u8*)&m_weaponNodeFlags + 1) & 0xFB);
 }
 
 /*
@@ -740,49 +757,133 @@ void CGObject::Move(Vec*, float, int, int, int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::MoveVector(Vec*, float, int, int, int, int)
+void CGObject::MoveVector(Vec* moveVec, float moveTimer, int turnFrames, int useFacing, int flagA, int flagB)
 {
 	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007dd14
+ * PAL Size: 240b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGObject::moveVector(Vec*, float, int)
+void CGObject::moveVector(Vec* moveVec, float moveTimer, int turnFrames)
 {
-	// TODO
+    Vec unitVec;
+    const double mag = static_cast<double>(PSVECMag(moveVec));
+    if (static_cast<double>(sZeroFloat) == mag) {
+        unitVec.x = sZeroFloat;
+        unitVec.y = sZeroFloat;
+        unitVec.z = sZeroFloat;
+    } else {
+        PSVECScale(moveVec, &unitVec, static_cast<float>(static_cast<double>(sAnimFrameOffset) / mag));
+    }
+
+    *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xDF) | 0x20;
+    *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xEF) | 0x10;
+    m_turnFrames = static_cast<u32>(turnFrames);
+    m_moveVec.y = unitVec.x;
+    m_moveVec.z = unitVec.y;
+    m_moveSpeed = unitVec.z;
+    m_moveTimer = static_cast<s32>(moveTimer);
+    *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xF7) | 8;
+    *((u8*)&m_weaponNodeFlags + 1) &= 0xFD;
+    *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xFB) | 4;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007dc24
+ * PAL Size: 240b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGObject::moveVectorH(Vec*, float, int)
+void CGObject::moveVectorH(Vec* moveVec, float moveTimer, int turnFrames)
 {
-	// TODO
+    Vec unitVec;
+    const double mag = static_cast<double>(PSVECMag(moveVec));
+    if (static_cast<double>(sZeroFloat) == mag) {
+        unitVec.x = sZeroFloat;
+        unitVec.y = sZeroFloat;
+        unitVec.z = sZeroFloat;
+    } else {
+        PSVECScale(moveVec, &unitVec, static_cast<float>(static_cast<double>(sAnimFrameOffset) / mag));
+    }
+
+    *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xDF) | 0x20;
+    *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xEF) | 0x10;
+    m_turnFrames = static_cast<u32>(turnFrames);
+    m_moveVec.y = unitVec.x;
+    m_moveVec.z = unitVec.y;
+    m_moveSpeed = unitVec.z;
+    m_moveTimer = static_cast<s32>(moveTimer);
+    *((u8*)&m_weaponNodeFlags + 1) &= 0xF7;
+    *((u8*)&m_weaponNodeFlags + 1) &= 0xFD;
+    *((u8*)&m_weaponNodeFlags + 1) &= 0xFB;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007dae8
+ * PAL Size: 316b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGObject::moveVectorRot(float, float, float, int)
+void CGObject::moveVectorRot(float rotX, float rotY, float moveTimer, int turnFrames)
 {
-	// TODO
+    const double cosY0 = static_cast<double>(static_cast<float>(cos(rotY)));
+    const double sinX = static_cast<double>(static_cast<float>(sin(rotX)));
+    const double sinY = static_cast<double>(static_cast<float>(sin(rotY)));
+    const double cosY1 = static_cast<double>(static_cast<float>(cos(rotY)));
+    const double cosX = static_cast<double>(static_cast<float>(cos(rotX)));
+
+    *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xDF) | 0x20;
+    *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xEF) | 0x10;
+    m_turnFrames = static_cast<u32>(turnFrames);
+    m_moveVec.y = static_cast<float>(sinX * cosY0);
+    m_moveVec.z = static_cast<float>(sinY);
+    m_moveSpeed = static_cast<float>(cosX * cosY1);
+    m_moveTimer = static_cast<s32>(moveTimer);
+    *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xF7) | 8;
+    *((u8*)&m_weaponNodeFlags + 1) &= 0xFD;
+    *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xFB) | 4;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007d9ac
+ * PAL Size: 316b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGObject::moveVectorHRot(float, float, float, int)
+void CGObject::moveVectorHRot(float rotX, float rotY, float moveTimer, int turnFrames)
 {
-	// TODO
+    const double cosY0 = static_cast<double>(static_cast<float>(cos(rotY)));
+    const double sinX = static_cast<double>(static_cast<float>(sin(rotX)));
+    const double sinY = static_cast<double>(static_cast<float>(sin(rotY)));
+    const double cosY1 = static_cast<double>(static_cast<float>(cos(rotY)));
+    const double cosX = static_cast<double>(static_cast<float>(cos(rotX)));
+
+    *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xDF) | 0x20;
+    *((u8*)&m_weaponNodeFlags + 1) = (*((u8*)&m_weaponNodeFlags + 1) & 0xEF) | 0x10;
+    m_turnFrames = static_cast<u32>(turnFrames);
+    m_moveVec.y = static_cast<float>(sinX * cosY0);
+    m_moveVec.z = static_cast<float>(sinY);
+    m_moveSpeed = static_cast<float>(cosX * cosY1);
+    m_moveTimer = static_cast<s32>(moveTimer);
+    *((u8*)&m_weaponNodeFlags + 1) &= 0xF7;
+    *((u8*)&m_weaponNodeFlags + 1) &= 0xFD;
+    *((u8*)&m_weaponNodeFlags + 1) &= 0xFB;
 }
 
 /*

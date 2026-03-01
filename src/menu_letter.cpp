@@ -15,6 +15,7 @@ extern "C" int SingGetLetterAttachflg__8CMenuPcsFv(CMenuPcs*);
 extern "C" void SingSetLetterAttachflg__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void LetterInit1__8CMenuPcsFv(CMenuPcs*);
 extern "C" void SetSingWinScl__8CMenuPcsFf(CMenuPcs*, float);
+extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dla__FPv(void*);
 extern "C" void MakeAgbString__4CMesFPcPcii(char*, char*, int, int);
@@ -46,6 +47,9 @@ extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
+extern "C" void DrawSingWin__8CMenuPcsFs(CMenuPcs*, short);
+extern "C" void DrawSingWinMess__8CMenuPcsFiii(CMenuPcs*, int, int, int);
+extern "C" int SingWinMessHeight__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(double, double, double, double, double, double, double, double, CMenuPcs*, int);
 extern "C" void DrawSingleIcon__8CMenuPcsFiiifif(double, CMenuPcs*, int, int, int, float);
 extern "C" void DrawCursor__8CMenuPcsFiif(double, CMenuPcs*, int, int);
@@ -58,9 +62,27 @@ extern float FLOAT_803330a0;
 extern float FLOAT_803330bc;
 extern float FLOAT_803330b8;
 extern float FLOAT_803330c0;
+extern float FLOAT_803330d0;
+extern float FLOAT_803330d4;
+extern float FLOAT_803330e0;
+extern float FLOAT_803330f0;
 extern float FLOAT_803330f4;
 extern float FLOAT_803330f8;
+extern float FLOAT_80333108;
+extern float FLOAT_8033310c;
+extern float FLOAT_80333110;
+extern float FLOAT_80333128;
+extern float FLOAT_8033312c;
+extern float FLOAT_80333130;
+extern float FLOAT_80333134;
+extern float FLOAT_80333138;
+extern float FLOAT_8033313c;
+extern float FLOAT_80333140;
+extern float FLOAT_80333144;
+extern float FLOAT_8033314c;
 extern float FLOAT_80333148;
+extern float FLOAT_80333150;
+extern float FLOAT_80333154;
 extern float FLOAT_80333158;
 extern float FLOAT_8033315c;
 extern float FLOAT_80333160;
@@ -71,7 +93,11 @@ extern double DOUBLE_80333098;
 extern double DOUBLE_803330a8;
 extern double DOUBLE_803330b0;
 extern double DOUBLE_803330c8;
+extern double DOUBLE_803330d8;
 extern double DOUBLE_803330e8;
+extern double DOUBLE_80333100;
+extern double DOUBLE_80333118;
+extern double DOUBLE_80333120;
 
 namespace {
 unsigned char DAT_8032eeea = 0;
@@ -1269,12 +1295,151 @@ void CMenuPcs::LetterListDraw()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 80164ee0
+ * PAL Size: 1652b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::LetterMessDraw()
 {
-	// TODO
+	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+
+	int caravanWork = Game.game.m_scriptFoodBase[0];
+	int state = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C);
+	s16 mode = *reinterpret_cast<s16*>(state + 0x32);
+	s16* animBase = *reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850);
+
+	s16* panel = animBase + 4;
+	for (int i = 0; i < animBase[0]; ++i, panel += 0x20) {
+		int tex = *reinterpret_cast<int*>(panel + 0xE);
+		if (tex < 0) {
+			continue;
+		}
+
+		u8 alpha = static_cast<u8>(FLOAT_803330a0 * *reinterpret_cast<float*>(panel + 8));
+		GXColor color = {0xFF, 0xFF, 0xFF, alpha};
+		GXSetChanMatColor(GX_COLOR0A0, color);
+		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
+		DrawRect__8CMenuPcsFUlfffffffff(
+		    static_cast<double>(panel[0]), static_cast<double>(panel[1]),
+		    static_cast<double>(panel[2]), static_cast<double>(panel[3]),
+		    static_cast<double>(*reinterpret_cast<float*>(panel + 4)),
+		    static_cast<double>(*reinterpret_cast<float*>(panel + 6)),
+		    static_cast<double>(*reinterpret_cast<float*>(panel + 10)),
+		    static_cast<double>(*reinterpret_cast<float*>(panel + 10)),
+		    this, 0);
+	}
+
+	CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<char*>(this) + 0x108);
+	SetShadow__5CFontFi(font, 0);
+	SetMargin__5CFontFf(FLOAT_8033313c, font);
+	SetScale__5CFontFf(FLOAT_80333140, font);
+	DrawInit__5CFontFv(font);
+	SetTlut__5CFontFi(font, 0x1C);
+
+	{
+		u8 alpha = static_cast<u8>(FLOAT_803330a0 * *reinterpret_cast<float*>(animBase + 0xC));
+		GXColor color = {0xFF, 0xFF, 0xFF, alpha};
+		SetColor__5CFontF8_GXColor(font, &color);
+	}
+
+	CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(
+	    reinterpret_cast<char*>(this) + (Game.game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
+	char* srcText =
+	    reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(0x400, stage, const_cast<char*>("menu_letter.cpp"), 0x535));
+	stage = *reinterpret_cast<CMemory::CStage**>(
+	    reinterpret_cast<char*>(this) + (Game.game.m_gameWork.m_menuStageMode == '\0' ? 0xEC : 0xF4));
+	char* workText =
+	    reinterpret_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(0x400, stage, const_cast<char*>("menu_letter.cpp"), 0x537));
+
+	memset(srcText, 0, 0x400);
+	memset(workText, 0, 0x400);
+
+	u16 msgIndex = *reinterpret_cast<u16*>(caravanWork + DAT_8032eee8 * 0xC + 0x3EC);
+	char** mesPtr = reinterpret_cast<char**>(reinterpret_cast<char*>(&Game.game.m_cFlatDataArr[1]) + 0x44);
+	strcpy(srcText, mesPtr[(msgIndex & 0x7FC) >> 1]);
+	MakeAgbString__4CMesFPcPcii(workText, srcText, *reinterpret_cast<u16*>(caravanWork + 0x3E2), 0);
+
+	char* curLine = workText;
+	int y = 0x58;
+	for (int i = 0; i < 7; ++i) {
+		char* newline = strchr(curLine, '\n');
+		if (newline != 0) {
+			*newline = '\0';
+		}
+
+		if (strlen(curLine) != 0) {
+			SetPosX__5CFontFf(FLOAT_80333144, font);
+			SetPosY__5CFontFf(static_cast<float>(static_cast<double>(y) - static_cast<double>(FLOAT_80333148)), font);
+			Draw__5CFontFPc(font, curLine);
+		}
+
+		if (newline == 0) {
+			break;
+		}
+
+		curLine = newline + 1;
+		y += 0x20;
+	}
+
+	__dla__FPv(srcText);
+	__dla__FPv(workText);
+
+	DrawInit__8CMenuPcsFv(this);
+
+	int letterEntry = caravanWork + DAT_8032eee8 * 0xC;
+	if ((*reinterpret_cast<u16*>(letterEntry + 0x3EE) & 0x1FF) != 0) {
+		int icon = 0x26 + ((*reinterpret_cast<u8*>(letterEntry + 0x3EC) >> 6) & 1);
+		DrawSingleIcon__8CMenuPcsFiiifif(
+		    static_cast<double>(*reinterpret_cast<float*>(animBase + 0xC)), this, icon,
+		    static_cast<int>(FLOAT_8033314c), static_cast<int>(FLOAT_80333150), FLOAT_80333154);
+	}
+
+	if (mode <= 1) {
+		return;
+	}
+
+	DrawSingWin__8CMenuPcsFs(this, -1);
+	if ((*reinterpret_cast<s16*>(state + 0x12) == 1) &&
+	    (*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 0xA) == 1)) {
+		int msgType = static_cast<int>(*reinterpret_cast<signed char*>(state + 9));
+		if (mode == 4) {
+			DrawSingWinMess__8CMenuPcsFiii(this, 2, msgType, 0);
+		} else {
+			DrawSingWinMess__8CMenuPcsFiii(this, 0, msgType, 1);
+		}
+
+		float cursorX;
+		float cursorY;
+		short* singWin = *reinterpret_cast<short**>(reinterpret_cast<char*>(this) + 0x848);
+		int itemSel = *reinterpret_cast<s16*>(state + 0x28);
+		if ((mode == 2) || (mode == 5)) {
+			if (mode == 2) {
+				itemSel += 1;
+			} else {
+				itemSel += ((DAT_8032eeed == 2) ? 1 : 0) + 4;
+			}
+			cursorX = static_cast<float>(singWin[0] + 0x14);
+			cursorY = static_cast<float>(singWin[1] + itemSel * SingWinMessHeight__8CMenuPcsFv(this) + 0x20);
+		} else {
+			cursorX = static_cast<float>(singWin[0] - 8);
+			if (mode == 4) {
+				cursorX += FLOAT_80333110;
+			}
+			cursorY = static_cast<float>(singWin[1] + *reinterpret_cast<s16*>(state + 0x28) * SingWinMessHeight__8CMenuPcsFv(this) + 0x20);
+		}
+
+		int frame = static_cast<int>(System.m_frameCounter);
+		int frameSign = frame >> 31;
+		int frameAnim = ((frameSign * 8) | ((frame * 0x20000000 + frameSign) >> 29)) - frameSign;
+		DrawCursor__8CMenuPcsFiif(
+		    static_cast<double>(FLOAT_803330f8), this,
+		    static_cast<int>(cursorX + static_cast<float>(frameAnim)),
+		    static_cast<int>(cursorY));
+	}
 }
 
 /*
@@ -1699,12 +1864,144 @@ int CMenuPcs::LetterCtrlCur()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 8016398c
+ * PAL Size: 1616b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::LetterLstBaseDraw(float)
+void CMenuPcs::LetterLstBaseDraw(float param_1)
 {
-	// TODO
+	double param = static_cast<double>(param_1);
+	if (param <= static_cast<double>(FLOAT_803330bc)) {
+		return;
+	}
+
+	double x0 = static_cast<double>(static_cast<int>(static_cast<double>(FLOAT_803330d4 - static_cast<float>(static_cast<double>(FLOAT_803330d0) * param * DOUBLE_803330a8)) - DOUBLE_803330a8));
+	double y0 = static_cast<double>(static_cast<int>(static_cast<double>(static_cast<float>(DOUBLE_803330d8 + static_cast<double>(FLOAT_803330d0) * param)) - DOUBLE_803330e8));
+	double w = static_cast<double>(static_cast<int>(static_cast<double>(FLOAT_803330e0) - DOUBLE_803330a8));
+	double h = static_cast<double>(static_cast<int>(static_cast<double>(FLOAT_803330f0) - DOUBLE_803330e8));
+
+	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+	GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
+	GXSetChanMatColor(GX_COLOR0A0, white);
+
+	double x1 = static_cast<double>(static_cast<float>(x0 + w - static_cast<double>(FLOAT_803330f4)));
+	double y1 = static_cast<double>(static_cast<float>(y0 + h - static_cast<double>(FLOAT_803330f4)));
+
+	for (unsigned int i = 0; i < 4; ++i) {
+		int tex;
+		int flip = 0;
+		if (i < 2) {
+			tex = 0x3C;
+		} else if (i == 2) {
+			tex = 0x4B;
+		} else {
+			tex = 0x4D;
+		}
+
+		double x = x0;
+		double y = y0;
+		if ((i & 1) != 0) {
+			x = x1;
+			if (i == 1) {
+				flip = 8;
+			}
+		}
+		if ((i & 2) != 0) {
+			y = y1;
+		}
+
+		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
+		DrawRect__8CMenuPcsFUlfffffffff(
+		    x, y, static_cast<double>(FLOAT_803330f4), static_cast<double>(FLOAT_803330f4),
+		    static_cast<double>(FLOAT_803330bc), static_cast<double>(FLOAT_803330bc),
+		    static_cast<double>(FLOAT_803330f8), static_cast<double>(FLOAT_803330f8), this, flip);
+	}
+
+	double innerW = static_cast<double>(static_cast<float>(w - DOUBLE_803330d8));
+	double innerH = static_cast<double>(static_cast<float>(h - DOUBLE_803330d8));
+	double innerX = static_cast<double>(static_cast<float>(x0 + static_cast<double>(FLOAT_803330f4)));
+	double innerY = static_cast<double>(static_cast<float>(y0 + static_cast<double>(FLOAT_803330f4)));
+
+	for (int i = 0; i < 2; ++i) {
+		int tex = (i == 0) ? 0x49 : 0x4C;
+		double y = (i == 0) ? y0 : y1;
+		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, tex);
+		DrawRect__8CMenuPcsFUlfffffffff(
+		    innerX, y, innerW, static_cast<double>(FLOAT_803330f4),
+		    static_cast<double>(FLOAT_803330bc), static_cast<double>(FLOAT_803330bc),
+		    static_cast<double>(FLOAT_803330f8), static_cast<double>(FLOAT_803330f8), this, 0);
+	}
+
+	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x4A);
+	for (int i = 0; i < 2; ++i) {
+		int flip = (i == 0) ? 0 : 8;
+		double x = (i == 0) ? x0 : x1;
+		DrawRect__8CMenuPcsFUlfffffffff(
+		    x, innerY, static_cast<double>(FLOAT_803330f4), innerH,
+		    static_cast<double>(FLOAT_803330bc), static_cast<double>(FLOAT_803330bc),
+		    static_cast<double>(FLOAT_803330f8), static_cast<double>(FLOAT_803330f8), this, flip);
+	}
+
+	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x4E);
+	DrawRect__8CMenuPcsFUlfffffffff(
+	    innerX, innerY, innerW, innerH,
+	    static_cast<double>(FLOAT_803330bc), static_cast<double>(FLOAT_803330bc),
+	    static_cast<double>(FLOAT_803330f8), static_cast<double>(FLOAT_803330f8), this, 0);
+
+	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x4F);
+	double decoX0 = static_cast<double>(static_cast<float>(x0 + w - static_cast<double>(FLOAT_80333108)));
+	double decoY0 = y0 - DOUBLE_80333100;
+	double decoX1 = static_cast<double>(static_cast<float>(decoX0 + DOUBLE_80333100));
+	double decoY1 = DOUBLE_80333100 + static_cast<double>(static_cast<float>(y0 + h - static_cast<double>(FLOAT_8033310c)));
+	for (unsigned int i = 0; i < 4; ++i) {
+		double x = ((i & 1) == 0) ? static_cast<double>(static_cast<float>(x0 - static_cast<double>(FLOAT_80333110))) : decoX1;
+		double y = ((i & 2) == 0) ? decoY0 : decoY1;
+		int flip = ((i & 2) == 0) ? 0 : 4;
+		DrawRect__8CMenuPcsFUlfffffffff(
+		    x, y, static_cast<double>(FLOAT_80333108), static_cast<double>(FLOAT_8033310c),
+		    static_cast<double>(FLOAT_803330bc), static_cast<double>(FLOAT_803330bc),
+		    static_cast<double>(FLOAT_803330f8), static_cast<double>(FLOAT_803330f8), this, flip);
+	}
+
+	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x50);
+	double barX0 = static_cast<double>(static_cast<float>(x0 - static_cast<double>(FLOAT_80333110)));
+	double barX1 = static_cast<double>(static_cast<float>(decoX0 + static_cast<double>(FLOAT_80333110)));
+	double barY0 = static_cast<double>(static_cast<float>((DOUBLE_80333118 + y0) - DOUBLE_80333100));
+	double barY1 = static_cast<double>(static_cast<float>(barY0 + static_cast<double>(h - DOUBLE_80333120)));
+	for (int side = 0; side < 2; ++side) {
+		double x = (side == 0) ? barX0 : barX1;
+		double y = barY0;
+		while (y < barY1) {
+			double seg = static_cast<double>(static_cast<float>(barY1 - y));
+			if (DOUBLE_80333118 <= seg) {
+				seg = static_cast<double>(FLOAT_8033310c);
+			}
+			DrawRect__8CMenuPcsFUlfffffffff(
+			    x, y, static_cast<double>(FLOAT_80333108), seg,
+			    static_cast<double>(FLOAT_803330bc), static_cast<double>(FLOAT_803330bc),
+			    static_cast<double>(FLOAT_803330f8), static_cast<double>(FLOAT_803330f8), this, 0);
+			y = static_cast<double>(static_cast<float>(y + seg));
+		}
+	}
+
+	if (param >= DOUBLE_803330e8) {
+		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x3D);
+		DrawRect__8CMenuPcsFUlfffffffff(
+		    static_cast<double>(static_cast<float>(x0 - static_cast<double>(FLOAT_803330f4))),
+		    static_cast<double>(static_cast<float>(y0 - static_cast<double>(FLOAT_80333108))),
+		    static_cast<double>(FLOAT_80333128), static_cast<double>(FLOAT_8033312c),
+		    static_cast<double>(FLOAT_80333130), static_cast<double>(FLOAT_803330bc),
+		    static_cast<double>(FLOAT_803330f8), static_cast<double>(FLOAT_803330f8), this, 0);
+		DrawRect__8CMenuPcsFUlfffffffff(
+		    static_cast<double>(static_cast<float>(x0 + w - static_cast<double>(FLOAT_80333134))),
+		    static_cast<double>(static_cast<float>(y0 + h - static_cast<double>(FLOAT_803330c0))),
+		    static_cast<double>(FLOAT_80333130), static_cast<double>(FLOAT_80333138),
+		    static_cast<double>(FLOAT_803330bc), static_cast<double>(FLOAT_803330bc),
+		    static_cast<double>(FLOAT_803330f8), static_cast<double>(FLOAT_803330f8), this, 0);
+	}
 }
 
 /*

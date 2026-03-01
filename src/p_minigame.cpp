@@ -1122,14 +1122,334 @@ void CMiniGamePcs::EndThread()
 	// TODO
 }
 
+static unsigned int MiniGameCrc8(unsigned int value)
+{
+    unsigned int crc = 0;
+
+    for (unsigned int mask = 0x80; mask != 0; mask >>= 1)
+    {
+        crc <<= 1;
+        if (((value >> 16) & 0xFF & mask) == 0)
+        {
+            if ((crc & 0x100) != 0)
+            {
+                crc ^= 0xCD;
+            }
+        }
+        else if ((crc & 0x100) == 0)
+        {
+            crc += 1;
+        }
+        else
+        {
+            crc ^= 0xCC;
+        }
+    }
+
+    for (unsigned int mask = 0x80; mask != 0; mask >>= 1)
+    {
+        crc <<= 1;
+        if (((value >> 8) & 0xFF & mask) == 0)
+        {
+            if ((crc & 0x100) != 0)
+            {
+                crc ^= 0xCD;
+            }
+        }
+        else if ((crc & 0x100) == 0)
+        {
+            crc += 1;
+        }
+        else
+        {
+            crc ^= 0xCC;
+        }
+    }
+
+    for (int i = 0; i < 8; i++)
+    {
+        crc <<= 1;
+        if ((crc & 0x100) != 0)
+        {
+            crc ^= 0xCD;
+        }
+    }
+
+    return crc & 0xFF;
+}
+
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80127b74
+ * PAL Size: 2560b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMiniGamePcs::MngThreadMain(void*)
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    int managerStackOffset = 0x1000;
+
+    for (int i = 0; i < 4; i++)
+    {
+        unsigned char* threadParam = self + 0x138C + i * 200;
+        unsigned char* threadState = self + 0x1830 + i * 0x318;
+
+        unsigned int imageSize = *reinterpret_cast<unsigned int*>(self + 0x1358);
+        void* imageBase = *reinterpret_cast<void**>(self + 0x1354);
+        if (self[0x1344 + i] != 0)
+        {
+            imageSize = *reinterpret_cast<unsigned int*>(self + 0x1360);
+            imageBase = *reinterpret_cast<void**>(self + 0x135C);
+        }
+
+        memset(threadParam, 0, 200);
+        threadParam[0xBC] = static_cast<unsigned char>(i);
+        *reinterpret_cast<void (**)(MgGbaThreadParam*, void*)>(threadParam + 0x24) = _OpenCallback;
+        *reinterpret_cast<void**>(threadParam + 0x8C) = imageBase;
+        *reinterpret_cast<unsigned int*>(threadParam + 0x90) = imageSize;
+
+        memset(threadState, 0, 0x318);
+        OSInitMessageQueue(reinterpret_cast<OSMessageQueue*>(threadParam),
+                           reinterpret_cast<OSMessage*>(threadParam + 0x20), 1);
+        OSCreateThread(reinterpret_cast<OSThread*>(threadState),
+                       reinterpret_cast<void* (*)(void*)>(_GbaThreadMain),
+                       reinterpret_cast<void*>(threadParam),
+                       reinterpret_cast<void*>(self + 0x2490 + managerStackOffset),
+                       0x1000, 7, 1);
+        OSResumeThread(reinterpret_cast<OSThread*>(threadState));
+
+        managerStackOffset += 0x1000;
+    }
+
+    OSTime startTime = OSGetTime();
+    unsigned int loopCounter = 0;
+
+    while (true)
+    {
+        OSAlarm alarm;
+        OSCreateAlarm(&alarm);
+        OSSetAlarmTag(&alarm, 1);
+        OSThread* currentThread = OSGetCurrentThread();
+        alarm.start = reinterpret_cast<OSTime>(currentThread);
+
+        BOOL interruptLevel = OSDisableInterrupts();
+        OSSetAlarm(&alarm, DAT_800000f8 / 4000, GbaThreadAlarmHandler);
+        OSSuspendThread(currentThread);
+        OSRestoreInterrupts(interruptLevel);
+
+        if (self[0x649C] != 0)
+        {
+            self[0x649D] = 0;
+
+            for (int i = 0; i < 4; i++)
+            {
+                OSAlarm sleepAlarm;
+                OSCreateAlarm(&sleepAlarm);
+                OSSetAlarmTag(&sleepAlarm, 1);
+                currentThread = OSGetCurrentThread();
+                sleepAlarm.start = reinterpret_cast<OSTime>(currentThread);
+                interruptLevel = OSDisableInterrupts();
+                OSSetAlarm(&sleepAlarm, (DAT_800000f8 / 4000) * 100, GbaThreadAlarmHandler);
+                OSSuspendThread(currentThread);
+                OSRestoreInterrupts(interruptLevel);
+
+                unsigned char* threadParam = self + 0x138C + i * 200;
+                OSSendMessage(reinterpret_cast<OSMessageQueue*>(threadParam), reinterpret_cast<OSMessage>(1), 1);
+            }
+
+            OSAlarm settleAlarm;
+            OSCreateAlarm(&settleAlarm);
+            OSSetAlarmTag(&settleAlarm, 1);
+            currentThread = OSGetCurrentThread();
+            settleAlarm.start = reinterpret_cast<OSTime>(currentThread);
+            interruptLevel = OSDisableInterrupts();
+            OSSetAlarm(&settleAlarm, (DAT_800000f8 / 4000) * 200, GbaThreadAlarmHandler);
+            OSSuspendThread(currentThread);
+            OSRestoreInterrupts(interruptLevel);
+
+            while (self[0x649D] != 0x0F)
+            {
+                OSAlarm waitAlarm;
+                OSCreateAlarm(&waitAlarm);
+                OSSetAlarmTag(&waitAlarm, 1);
+                currentThread = OSGetCurrentThread();
+                waitAlarm.start = reinterpret_cast<OSTime>(currentThread);
+                interruptLevel = OSDisableInterrupts();
+                OSSetAlarm(&waitAlarm, (DAT_800000f8 / 4000) * 100, GbaThreadAlarmHandler);
+                OSSuspendThread(currentThread);
+                OSRestoreInterrupts(interruptLevel);
+            }
+
+            while (true)
+            {
+                bool allTerminated = true;
+                for (int i = 0; i < 4; i++)
+                {
+                    unsigned char* threadState = self + 0x1830 + i * 0x318;
+                    if (OSIsThreadTerminated(reinterpret_cast<OSThread*>(threadState)) == 0)
+                    {
+                        allTerminated = false;
+                        break;
+                    }
+                }
+
+                if (allTerminated)
+                {
+                    OSAlarm endAlarm;
+                    OSCreateAlarm(&endAlarm);
+                    OSSetAlarmTag(&endAlarm, 1);
+                    currentThread = OSGetCurrentThread();
+                    endAlarm.start = reinterpret_cast<OSTime>(currentThread);
+                    interruptLevel = OSDisableInterrupts();
+                    OSSetAlarm(&endAlarm, (DAT_800000f8 / 4000) * 100, GbaThreadAlarmHandler);
+                    OSSuspendThread(currentThread);
+                    OSRestoreInterrupts(interruptLevel);
+
+                    self[0x649C] = 0;
+                    OSExitThread(0);
+                    return;
+                }
+            }
+        }
+
+        if (self[0x134B] != 0)
+        {
+            unsigned int successMask = 0;
+
+            for (int i = 0; i < 4; i++)
+            {
+                unsigned int bit = 1U << i;
+                unsigned char* threadParam = self + 0x138C + i * 200;
+                unsigned int* channelWord = reinterpret_cast<unsigned int*>(self + 0x1368 + i * 4);
+
+                if ((self[0x134B] & bit) == 0 || threadParam[0xBD] != 0)
+                {
+                    continue;
+                }
+
+                if (*reinterpret_cast<unsigned int*>(threadParam + 0x94) == 0x40000)
+                {
+                    unsigned char state = threadParam[0xBF];
+                    if (state == 3)
+                    {
+                        *reinterpret_cast<unsigned int*>(threadParam + 0x94) = 0;
+                    }
+                    else if (state == 0)
+                    {
+                        if (threadParam[0xC4] == 0)
+                        {
+                            if (threadParam[0xC6] != 0)
+                            {
+                                goto disconnect_player;
+                            }
+
+                            *reinterpret_cast<unsigned short*>(self + 0x134E) = 0;
+                            OSSendMessage(reinterpret_cast<OSMessageQueue*>(threadParam), reinterpret_cast<OSMessage>(7), 1);
+                        }
+                        else if (threadParam[0xC5] == 0)
+                        {
+                            if (threadParam[0xC2] != 0)
+                            {
+                                unsigned int packet = *reinterpret_cast<unsigned int*>(threadParam + 0xA0);
+                                unsigned int crc = MiniGameCrc8(packet);
+                                if ((packet & 0xFF) == crc)
+                                {
+                                    self[0x6490 + i] = threadParam[0xC2];
+                                    successMask |= bit;
+                                    *channelWord = packet & 0xFFFF00;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            threadParam[0xC6] = 1;
+                            self[0x6490 + i] = 1;
+                            successMask |= bit;
+                            *channelWord = 0;
+                        }
+                    }
+                    else
+                    {
+                        *reinterpret_cast<unsigned int*>(threadParam + 0x94) = 0;
+                    }
+                }
+                else if (*reinterpret_cast<unsigned int*>(threadParam + 0x94) == 0 || (loopCounter & 0x1F) == 0)
+                {
+                    OSTime now = OSGetTime();
+                    if ((DAT_800000f8 / 4000) * 5000 < static_cast<unsigned long long>(now - startTime) ||
+                        threadParam[0xC6] != 0)
+                    {
+disconnect_player:
+                        if ((self[0x134B] & bit) != 0)
+                        {
+                            self[0x134B] = static_cast<unsigned char>(self[0x134B] & ~bit);
+                            if (self[0x134B] == 0)
+                            {
+                                self[0x6495] = 1;
+                                continue;
+                            }
+
+                            self[0x6490 + i] = 1;
+                            *channelWord = 0x40012000;
+                            *channelWord |= MiniGameCrc8(*channelWord);
+                        }
+                    }
+
+                    OSSendMessage(reinterpret_cast<OSMessageQueue*>(threadParam), reinterpret_cast<OSMessage>(6), 1);
+                }
+            }
+
+            if (successMask == (self[0x134B] & 0xF))
+            {
+                self[0x6494] = 1;
+
+                for (int i = 0; i < 4; i++)
+                {
+                    unsigned int* channelWord = reinterpret_cast<unsigned int*>(self + 0x1368 + i * 4);
+                    unsigned int word = *channelWord;
+
+                    if ((word & 0x8000) != 0)
+                    {
+                        unsigned short padCode = static_cast<unsigned short>((word & 0xFF00) | ((word & 0xFFFF00) >> 16));
+                        PadCodeProc(i, padCode);
+                    }
+
+                    unsigned int* txWord = reinterpret_cast<unsigned int*>(self + 0x1378 + i * 4);
+                    *txWord = static_cast<unsigned int>((i + 0x40) << 24) | (word & 0xFFFF00);
+                    *txWord |= MiniGameCrc8(*txWord);
+                }
+
+                unsigned int* seqWord = reinterpret_cast<unsigned int*>(self + 5000);
+                unsigned short seq = *reinterpret_cast<unsigned short*>(self + 0x134E);
+                unsigned short swappedSeq = static_cast<unsigned short>((seq << 8) | (seq >> 8));
+                *seqWord = 0x44000000 | (static_cast<unsigned int>(swappedSeq) << 8);
+                *seqWord |= MiniGameCrc8(*seqWord);
+
+                for (int i = 0; i < 4; i++)
+                {
+                    if ((successMask & (1U << i)) != 0)
+                    {
+                        unsigned char* threadParam = self + 0x138C + i * 200;
+                        threadParam[0xC5] = 0;
+                        memcpy(threadParam + 0xA8, self + 0x1378, 0x14);
+                        OSSendMessage(reinterpret_cast<OSMessageQueue*>(threadParam), reinterpret_cast<OSMessage>(10), 1);
+                    }
+                }
+
+                unsigned short& frameCounter = *reinterpret_cast<unsigned short*>(self + 0x134E);
+                frameCounter += 1;
+                if (frameCounter > 0x0FFE)
+                {
+                    frameCounter = 0x0FFF;
+                }
+            }
+        }
+
+        loopCounter += 1;
+    }
 }
 
 /*

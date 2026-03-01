@@ -356,6 +356,88 @@ void CGItemObj::onFrameStat()
 			self[0x54d] = (self[0x54d] & 0x7f) | 0x80;
 		}
 		break;
+	case 0xB:
+		if (*(int*)(self + 0x528) == *(int*)(self + 0x554)) {
+			CVector attachOffset(FLOAT_80331b20, FLOAT_80331b20, FLOAT_80331b20);
+			bool useBossAttachName = false;
+
+			if (Game.game.m_gameWork.m_menuStageMode != 0) {
+				bool condA = false;
+				bool condB = false;
+				bool condC = false;
+
+				if (Game.game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+					condC = true;
+				}
+				if (condC) {
+					CGPartyObj* carryObj = *(CGPartyObj**)(self + 0x550);
+					typedef unsigned int (*PartyVFunc)(CGPartyObj*);
+					PartyVFunc getCid = reinterpret_cast<PartyVFunc>((*reinterpret_cast<void***>(carryObj))[3]);
+					unsigned int cid = getCid(carryObj);
+					unsigned int stageCarry = (unsigned int)__cntlzw(0x6D - (cid & 0x6D));
+					if (((stageCarry >> 5) & 0xFF) != 0) {
+						condB = true;
+					}
+				}
+				if (condB && *(int*)(*(unsigned char**)(*(unsigned char**)(self + 0x550) + 0x58) + 0x3B4) != 0) {
+					condA = true;
+				}
+				if (condA) {
+					useBossAttachName = true;
+				}
+			}
+
+			char* attachName = DAT_80331b84;
+			if (useBossAttachName) {
+				attachName = DAT_80331b7c;
+			}
+			Attach__8CGObjectFP8CGObjectPcP3Vec(this, *(void**)(self + 0x550), attachName,
+			                                    reinterpret_cast<Vec*>(&attachOffset));
+			changeStat__8CGPrgObjFiii(this, 0, 0, 0);
+			*(float*)(self + 0x144) = FLOAT_80331b20;
+		}
+		break;
+	case 0xC:
+	case 0xD:
+		if (*(int*)(self + 0x528) == *(int*)(self + 0x554)) {
+			CGPartyObj* carryObj = *(CGPartyObj**)(self + 0x550);
+			Vec safePos;
+			float safeDist = CalcSafePos__8CGObjectFiP8CGObjectP3Vec(this, 0x41, carryObj, &safePos);
+
+			if (FLOAT_80331b20 < safeDist) {
+				moveVectorHRot__8CGObjectFfffi(
+				    carryObj, FLOAT_80331b8c + *(float*)((unsigned char*)carryObj + 0x1A8), FLOAT_80331b20,
+				    safeDist / FLOAT_80331b90, 3);
+			}
+
+			Detach__8CGObjectFv(this);
+			*(Vec*)(self + 0x15C) = safePos;
+
+			float launchSpeed = FLOAT_80331b90;
+			if (*(int*)(self + 0x520) != 0xC) {
+				launchSpeed = FLOAT_80331b40;
+			}
+
+			float ownerRotY = *(float*)((unsigned char*)carryObj + 0x1B4);
+			CVector moveVec((float)sin((double)ownerRotY), FLOAT_80331b54, (float)cos((double)ownerRotY));
+			MoveVector__8CGObjectFP3Vecfiiii(this, reinterpret_cast<Vec*>(&moveVec), launchSpeed, 1, 0, 1, 0);
+
+			*(int*)(self + 0x550) = 0;
+			*(int*)(self + 0x56C) = 8;
+			*(float*)(self + 0x144) = FLOAT_80331b20;
+		}
+
+		if (*(int*)(self + 0x554) <= *(int*)(self + 0x528)) {
+			int worldParamA = *(int*)(self + 0x500);
+			bool isActive = (int)((unsigned int)self[0x50] << 0x18) < 0;
+
+			if ((worldParamA == 1 || worldParamA == 2) && isActive) {
+				changeStat__8CGPrgObjFiii(this, 0x1F, 0, 0);
+			} else if (isActive) {
+				changeStat__8CGPrgObjFiii(this, 0, 0, 0);
+			}
+		}
+		break;
 	case 0x1b:
 		if (*(int*)(self + 0x528) < 9) {
 			float wobble = (float)sin((double)(FLOAT_80331b9c * (float)(*(int*)(self + 0x528)) * FLOAT_80331b68));
@@ -1037,42 +1119,64 @@ void CGItemObj::DrawOmoideName(CFont* font)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80124cb8
+ * PAL Size: 332b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGItemObj::ItemJump(int state, float jump)
 {
-	unsigned char* itemObj = (unsigned char*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat);
-
-	while (itemObj != 0) {
-		if ((*(unsigned int*)(itemObj + 0x60) & 0x10) == 0) {
-			float local_78 = FLOAT_80331b20;
-			float local_74 = FLOAT_80331b24;
-			float local_70 = FLOAT_80331b20;
-			float local_6c = *(float*)(itemObj + 0x68);
-			float local_68 = *(float*)(itemObj + 0x6c) + FLOAT_80331b1c;
-			float local_64 = *(float*)(itemObj + 0x70);
-			float local_60 = local_6c;
-			float local_5c = local_68;
-			float local_58 = local_64;
-			float local_48 = FLOAT_80331b20;
-			float local_44 = FLOAT_80331b24;
-			float local_40 = FLOAT_80331b20;
-			float local_3c = FLOAT_80331b20;
-			float local_38 = FLOAT_80331b28;
-			float local_34 = FLOAT_80331b28;
-			float local_30 = FLOAT_80331b28;
-			float local_2c = FLOAT_80331b2c;
-			float local_28 = FLOAT_80331b2c;
-			float local_24 = FLOAT_80331b2c;
-
-			if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &local_60, &local_78, *(unsigned int*)(itemObj + 0x1c4)) != 0 &&
-			    DAT_8032ec90[0x47] == (unsigned char)state) {
-				*(float*)(itemObj + 0x108) = *(float*)(itemObj + 0x108) + jump;
-			}
+	for (unsigned char* itemObj = (unsigned char*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat); itemObj != 0;
+	     itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
+		if ((*(unsigned int*)(itemObj + 0x60) & 0x10) != 0) {
+			continue;
 		}
 
-		itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj);
+		float local_78;
+		float local_74;
+		float local_70;
+		float local_6c;
+		float local_68;
+		float local_64;
+		float local_60;
+		float local_5c;
+		float local_58;
+		float local_48;
+		float local_44;
+		float local_40;
+		float local_3c;
+		float local_38;
+		float local_34;
+		float local_30;
+		float local_2c;
+		float local_28;
+		float local_24;
+
+		local_6c = *(float*)(itemObj + 0x68);
+		local_64 = *(float*)(itemObj + 0x70);
+		local_68 = *(float*)(itemObj + 0x6c) + FLOAT_80331b1c;
+		local_78 = FLOAT_80331b20;
+		local_70 = FLOAT_80331b20;
+		local_74 = FLOAT_80331b24;
+		local_30 = FLOAT_80331b28;
+		local_34 = FLOAT_80331b28;
+		local_38 = FLOAT_80331b28;
+		local_24 = FLOAT_80331b2c;
+		local_28 = FLOAT_80331b2c;
+		local_2c = FLOAT_80331b2c;
+		local_48 = FLOAT_80331b20;
+		local_44 = FLOAT_80331b24;
+		local_40 = FLOAT_80331b20;
+		local_3c = FLOAT_80331b20;
+		local_60 = local_6c;
+		local_5c = local_68;
+		local_58 = local_64;
+		if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &local_60, &local_78, *(unsigned int*)(itemObj + 0x1c4)) != 0 &&
+		    DAT_8032ec90[0x47] == state) {
+			*(float*)(itemObj + 0x108) = *(float*)(itemObj + 0x108) + jump;
+		}
 	}
 }
 

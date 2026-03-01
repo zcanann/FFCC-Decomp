@@ -443,7 +443,13 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
  */
 void _VoiceEnvelopeCheck()
 {
-	// TODO
+    int* voiceData = (int*)DAT_8032f444;
+    do {
+        if ((((u8*)voiceData)[0x1A] & 7) != 0) {
+            voiceData[0x2C] = 0x8000;
+        }
+        voiceData += 0x30;
+    } while (voiceData < (int*)DAT_8032f444 + 0xC00);
 }
 
 /*
@@ -1014,9 +1020,40 @@ void SetVoiceSwitch(RedTrackDATA* track, int voiceSwitch)
  * Address:	TODO
  * Size:	TODO
  */
-void _AdsrStart(RedVoiceDATA*)
+void _AdsrStart(RedVoiceDATA* voice)
 {
-	// TODO
+    int* voiceData = (int*)voice;
+    u8* voiceBytes = (u8*)voiceData;
+    u32 currentLevel;
+    u32 targetLevel;
+    u32 stepCount;
+
+    voiceData[0x17] = 0;
+    currentLevel = voiceBytes[0x58];
+    do {
+        targetLevel = currentLevel;
+        stepCount = *(u16*)(voiceBytes + 0x50 + voiceData[0x17] * 2);
+        currentLevel = voiceBytes[0x59 + voiceData[0x17]];
+        if (stepCount != 0) {
+            break;
+        }
+        voiceData[0x17] += 1;
+    } while (voiceData[0x17] < 3);
+
+    voiceData[0x18] = stepCount;
+    if (currentLevel != 0) {
+        currentLevel = ((currentLevel + 1) * 0x100 - 1) * 0x1000;
+    }
+
+    if (stepCount == 0) {
+        voiceData[0x2B] = currentLevel;
+    } else {
+        if (targetLevel != 0) {
+            targetLevel = ((targetLevel + 1) * 0x100 - 1) * 0x1000;
+        }
+        voiceData[0x2B] = targetLevel;
+        voiceData[0x19] = (s32)((currentLevel | 0x800) - targetLevel) / (s32)stepCount;
+    }
 }
 
 /*
@@ -1024,9 +1061,36 @@ void _AdsrStart(RedVoiceDATA*)
  * Address:	TODO
  * Size:	TODO
  */
-void _AdsrDataCompute(RedVoiceDATA*)
+void _AdsrDataCompute(RedVoiceDATA* voice)
 {
-	// TODO
+    int* voiceData = (int*)voice;
+    u8* voiceBytes = (u8*)voiceData;
+    u32 stepCount = 0;
+    u32 startLevel = voiceData[0x2B];
+    u32 prevLevel = startLevel;
+    u32 targetLevel = startLevel;
+
+    while (voiceData[0x17] < 3) {
+        targetLevel = voiceBytes[0x59 + voiceData[0x17]];
+        stepCount = *(u16*)(voiceBytes + 0x50 + voiceData[0x17] * 2);
+        if (targetLevel != 0) {
+            targetLevel = ((targetLevel + 1) * 0x100 - 1) * 0x1000;
+        }
+        prevLevel = startLevel;
+        if (stepCount != 0) {
+            break;
+        }
+        voiceData[0x17] += 1;
+        startLevel = targetLevel;
+    }
+
+    voiceData[0x18] = stepCount;
+    if (stepCount == 0) {
+        voiceData[0x2B] = targetLevel;
+    } else {
+        voiceData[0x2B] = prevLevel;
+        voiceData[0x19] = (s32)((targetLevel | 0x800) - prevLevel) / (s32)stepCount;
+    }
 }
 
 /*

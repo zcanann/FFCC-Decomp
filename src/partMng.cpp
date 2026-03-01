@@ -1,5 +1,6 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/chunkfile.h"
 #include "ffcc/cflat_runtime.h"
 #include "ffcc/file.h"
 #include "ffcc/gobject.h"
@@ -10,9 +11,12 @@
 
 #include <string.h>
 
+extern "C" int sprintf(char*, const char*, ...);
 extern "C" void __dl__FPv(void* ptr);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppPartInit__8CPartMngFv2(CPartMng* partMng);
+extern "C" void* pppPartInit__8CPartMngFv(CPartMng* partMng, const char* filePath, unsigned long* fileSize, void* readBuffer, unsigned long readBufferSize);
 extern "C" void pppCreateHeap__FP9_pppEnvStUl(_pppEnvSt*, unsigned long);
 extern "C" unsigned int CheckSum__FPvi(void*, int);
 extern "C" void pppStopSe__FP9_pppMngStP7PPPSEST(_pppMngSt*, PPPSEST*);
@@ -65,8 +69,14 @@ extern "C" int SearchNodeSk__Q26CChara6CModelFPc(CChara::CModel*, char*);
 extern int DAT_8032ed70;
 extern unsigned char PartPcs[];
 extern unsigned char MapPcs[];
+extern void* CAMemCacheSet;
 extern CPartMng PartMng;
 extern PPPCREATEPARAM g_dcp;
+struct _pppSysProgTbl
+{
+    pppProg* m_progs;
+};
+extern _pppSysProgTbl pppSysProgTbl;
 static char s_partMng_cpp_801d8230[] = "partMng.cpp";
 static char s_pppGetFreePppDataMngSt_CAN_NOT_ALLOC[] = "pppGetFreePppDataMngSt CAN NOT ALLOC!!\n";
 static char s_CheckSum_ERROR_code_0x_x____801d82f0[] = "CheckSum ERROR code[0x%x]!!!";
@@ -1454,12 +1464,96 @@ void CPartMng::pppLoadPan(const char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800588e0
+ * PAL Size: 1400b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartMng::pppLoadPdt(const char*, int, int, void*, int)
+void CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePriority, void* readBuffer, int readBufferSize)
 {
-	// TODO
+    struct PppPdtSlotRaw {
+        _pppDataHead* m_pppDataHead;
+        unsigned int m_envFields[5];
+        char m_name[0x20];
+    };
+
+    CMemory::CStage* stageLoad = *reinterpret_cast<CMemory::CStage**>(PartPcs + 0x1c);
+    PppPdtSlotRaw* pdtSlots = reinterpret_cast<PppPdtSlotRaw*>(reinterpret_cast<char*>(this) + 0x22e18);
+    PppPdtSlotRaw* pdtSlot = &pdtSlots[pdtSlotIndex];
+
+    reinterpret_cast<CAmemCacheSet*>(CAMemCacheSet)->CacheClear();
+    stageLoad->setDefaultParam(pdtSlotIndex);
+
+    char pdtPath[256];
+    sprintf(pdtPath, "%s.pdt", baseName);
+    strncpy(pdtSlot->m_name, baseName, sizeof(pdtSlot->m_name));
+    pdtSlot->m_name[sizeof(pdtSlot->m_name) - 1] = '\0';
+
+    if (System.m_execParam > 2) {
+        System.Printf("ReadPdt fn=[%s]\n", pdtPath);
+    }
+
+    unsigned long pdtSize = 0;
+    void* pdtData = pppPartInit__8CPartMngFv(this, pdtPath, &pdtSize, readBuffer, readBufferSize);
+    if (pdtData == 0) {
+        pdtSlot->m_pppDataHead = 0;
+        if (System.m_execParam != 0) {
+            System.Printf("CAN NOT READ[%s]!!\n", pdtPath);
+        }
+        stageLoad->resDefaultParam();
+        return;
+    }
+
+    // Async file mode can return sentinel 1 before data is available.
+    if (pdtData == reinterpret_cast<void*>(1)) {
+        stageLoad->resDefaultParam();
+        return;
+    }
+
+    CChunkFile pdtFile;
+    pdtFile.SetBuf(pdtData);
+
+    CChunkFile::CChunk parentChunk;
+    while (pdtFile.GetNextChunk(parentChunk)) {
+        pdtFile.PushChunk();
+        if (parentChunk.m_id == 0x50445420) { // "PDT "
+            CChunkFile::CChunk childChunk;
+            while (pdtFile.GetNextChunk(childChunk)) {
+                pdtFile.PushChunk();
+                if (childChunk.m_id == 0x50445453) { // "PDTS"
+                    _pppDataHead* sourceHead = reinterpret_cast<_pppDataHead*>(pdtFile.GetAddress());
+                    pppInitData(sourceHead, pppSysProgTbl.m_progs, cachePriority);
+
+                    unsigned long copySize = sourceHead->m_partCount * 0x60 + 0x20;
+                    _pppDataHead* copiedHead = static_cast<_pppDataHead*>(
+                        __nwa__FUlPQ27CMemory6CStagePci(copySize, stageLoad, s_partMng_cpp_801d8230, 0xd56));
+                    pdtSlot->m_pppDataHead = copiedHead;
+
+                    if (copiedHead != 0) {
+                        memcpy(copiedHead, sourceHead, copySize);
+                    }
+
+                    pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(pdtSlot->m_envFields);
+                    pdtSlot->m_envFields[0] = reinterpret_cast<unsigned int>(stageLoad);
+                    pdtSlot->m_envFields[1] = pppEnvStPtr != 0
+                                                  ? reinterpret_cast<unsigned int>(pppEnvStPtr->m_materialSetPtr)
+                                                  : 0;
+
+                    if (copiedHead != 0) {
+                        pdtSlot->m_envFields[2] = copiedHead->m_modelNames;
+                        pdtSlot->m_envFields[3] = copiedHead->m_shapeNames;
+                        pdtSlot->m_envFields[4] = copiedHead->m_shapeGroups;
+                    }
+                }
+                pdtFile.PopChunk();
+            }
+        }
+        pdtFile.PopChunk();
+    }
+
+    stageLoad->resDefaultParam();
 }
 
 /*

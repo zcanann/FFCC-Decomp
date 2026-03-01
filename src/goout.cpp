@@ -5,6 +5,7 @@
 
 extern CGoOutMenu g_GoOutMenu;
 extern CGoOutMenu* g_pGoOutMenu;
+extern "C" int __cntlzw(unsigned int);
 extern "C" int GetYesNoXPos__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" int CalcGoOutSelChar__8CMenuPcsFUcUc(CMenuPcs*, unsigned char, unsigned char);
 extern "C" void Calc__10CGoOutMenuFv(CGoOutMenu*);
@@ -67,10 +68,15 @@ static inline void WriteMenuS32(int offset, int value)
 
 static unsigned short GetGoOutInputMask()
 {
-    if (Pad._452_4_ != 0 || Pad._448_4_ != -1) {
+    bool hasPendingInput = false;
+    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        hasPendingInput = true;
+    }
+    if (hasPendingInput) {
         return 0;
     }
 
+    __cntlzw(Pad._448_4_);
     return static_cast<unsigned short>(Pad._8_2_);
 }
 

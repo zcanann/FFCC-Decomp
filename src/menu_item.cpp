@@ -424,32 +424,36 @@ bool CMenuPcs::ItemOpen()
  */
 int CMenuPcs::ItemCtrl()
 {
-    s16* itemState = *(s16**)((u8*)this + 0x82C);
-    s16* selectState = *(s16**)((u8*)this + 0x848);
-    int result = 0;
+    s16 sVar1;
+    int iVar2;
+    int iVar3;
 
-    itemState[0x19] = itemState[0x18];
+    iVar3 = 0;
+    *(s16*)(*(int*)((u8*)this + 0x82C) + 0x32) = *(s16*)(*(int*)((u8*)this + 0x82C) + 0x30);
+    iVar2 = *(int*)((u8*)this + 0x82C);
+    sVar1 = *(s16*)(iVar2 + 0x30);
 
-    if ((itemState[0x18] == 0) || ((itemState[0x18] != 0) && (itemState[0x9] == 1))) {
-        result = ItemCtrlCur();
-    } else if ((itemState[0x18] == 1) && (itemState[0x9] == 0)) {
-        if (selectState[5] == 1) {
-            result = 0;
-            itemState[0x9] = 1;
+    if ((!sVar1) || ((sVar1) && (*(s16*)(iVar2 + 0x12) == 1))) {
+        iVar3 = ItemCtrlCur();
+    } else if ((sVar1 == 1) && (*(s16*)(iVar2 + 0x12) == 0)) {
+        if ((!*(s16*)(iVar2 + 0x12)) && (*(s16*)(*(int*)((u8*)this + 0x848) + 10) == 1)) {
+            iVar3 = 0;
+            *(s16*)(iVar2 + 0x12) = *(s16*)(iVar2 + 0x12) + 1;
         }
-    } else if ((itemState[0x18] == 1) && (itemState[0x9] == 2) && (selectState[5] == 3)) {
-        result = 0;
-        itemState[0x9] = 0;
-        itemState[0x18] = 0;
-        itemState[0x11] = 0;
+    } else if (((sVar1 == 1) && (*(s16*)(iVar2 + 0x12) == 2)) &&
+               (*(s16*)(*(int*)((u8*)this + 0x848) + 10) == 3)) {
+        iVar3 = 0;
+        *(s16*)(iVar2 + 0x12) = 0;
+        *(s16*)(*(int*)((u8*)this + 0x82C) + 0x30) = 0;
+        *(s16*)(*(int*)((u8*)this + 0x82C) + 0x22) = 0;
     }
 
-    if (result != 0) {
+    if (iVar3 != 0) {
         SingLifeInit(-1);
         ItemInit1();
     }
 
-    return result;
+    return iVar3;
 }
 
 /*

@@ -4,7 +4,10 @@
 #include "ffcc/math.h"
 #include "ffcc/map.h"
 #include "ffcc/maphit.h"
+#include "ffcc/p_camera.h"
 #include "ffcc/p_game.h"
+#include "ffcc/p_minigame.h"
+#include "ffcc/pad.h"
 #include "ffcc/partMng.h"
 #include "ffcc/quadobj.h"
 #include "ffcc/sound.h"
@@ -14,7 +17,9 @@
 
 extern CPartMng PartMng;
 extern CMath Math;
+extern CMiniGamePcs MiniGamePcs;
 extern unsigned char CFlat[];
+extern "C" int __cntlzw(unsigned int);
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void*, CGBaseObj*, int, int, int, CFlatRuntime::CStack*, CFlatRuntime::CStack*);
 extern "C" int SearchNode__Q26CChara6CModelFPc(CChara::CModel*, char*);
@@ -32,13 +37,25 @@ extern unsigned char DAT_8032ec90[];
 extern float FLOAT_8033033c;
 extern float FLOAT_80330340;
 extern float FLOAT_80330344;
+extern float FLOAT_80330368;
 extern float FLOAT_80330360;
 extern double DOUBLE_80330348;
+extern double DOUBLE_803303e8;
 extern double DOUBLE_80330400;
 extern float FLOAT_80330410;
+extern float FLOAT_80330418;
 extern float FLOAT_8033041c;
 extern float FLOAT_80330420;
 extern float FLOAT_80330424;
+extern float FLOAT_80330428;
+extern float FLOAT_8033042c;
+extern float FLOAT_80330430;
+extern float DAT_801d9b70;
+extern float DAT_801d9b74;
+extern float DAT_801d9b78;
+extern float DAT_801d9b7c;
+extern float DAT_801d9b80;
+extern float DAT_801d9b84;
 
 static inline void CallOnPush(CGBaseObj* self, CGBaseObj* other, int arg)
 {
@@ -287,12 +304,314 @@ void CGObject::onDestroy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80081318
+ * PAL Size: 2752b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGObject::move()
 {
-	// TODO
+    if ((m_charaModelHandle == 0) || (m_charaModelHandle->m_model == 0)) {
+        return;
+    }
+
+    u8 weaponFlags = *reinterpret_cast<u8*>(&m_weaponNodeFlags);
+    if (Game.game.m_currentMapId == 0x21) {
+        if (static_cast<int>((static_cast<u32>(weaponFlags) << 0x1D) | (weaponFlags >> 3)) < 0) {
+            m_groundHitOffset.y = sZeroFloat;
+        }
+    } else {
+        if ((static_cast<int>((static_cast<u32>(weaponFlags) << 0x1B) | (weaponFlags >> 5)) < 0)
+            && (static_cast<int>((static_cast<u32>(weaponFlags) << 0x1C) | (weaponFlags >> 4)) >= 0)) {
+            PSVECAdd(&m_groundHitOffset, &m_bodyOffset, &m_groundHitOffset);
+            if (m_groundHitOffset.y < FLOAT_80330428) {
+                m_groundHitOffset.y = FLOAT_80330428;
+            }
+        } else if (static_cast<int>((static_cast<u32>(weaponFlags) << 0x1D) | (weaponFlags >> 3)) < 0) {
+            m_groundHitOffset.y = sZeroFloat;
+        }
+    }
+
+    bool movingWithScript = false;
+    bool hasStickInput = false;
+    Vec moveVec;
+    moveVec.x = sZeroFloat;
+    moveVec.y = sZeroFloat;
+    moveVec.z = sZeroFloat;
+    m_groundHitOffset.y += m_gravityY;
+
+    u8 weaponFlagsHi = *(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1);
+    if (static_cast<int>((static_cast<u32>(weaponFlagsHi) << 0x1A) | (weaponFlagsHi >> 6)) < 0) {
+        int scriptMoveEnd = 0;
+        if (static_cast<int>((static_cast<u32>(weaponFlagsHi) << 0x1B) | (weaponFlagsHi >> 5)) < 0) {
+            moveVec.x = m_moveVec.y;
+            moveVec.y = m_moveVec.z;
+            moveVec.z = m_moveSpeed;
+        } else {
+            PSVECSubtract(reinterpret_cast<Vec*>(&m_moveVec.y), &m_worldPosition, &moveVec);
+        }
+
+        if ((Game.game.m_currentMapId != 0x21)
+            && (static_cast<int>((static_cast<u32>(weaponFlagsHi) << 0x1E) | (weaponFlagsHi >> 2)) >= 0)) {
+            moveVec.y = sZeroFloat;
+        }
+
+        const double moveMag = static_cast<double>(PSVECMag(&moveVec));
+        if (moveMag == static_cast<double>(sZeroFloat)) {
+            scriptMoveEnd = 1;
+        } else if ((static_cast<int>((static_cast<u32>(weaponFlagsHi) << 0x1B) | (weaponFlagsHi >> 5)) < 0)
+                   || (static_cast<double>(m_moveTimer) <= moveMag)) {
+            PSVECNormalize(&moveVec, &moveVec);
+            PSVECScale(&moveVec, &moveVec, static_cast<float>(m_moveTimer));
+        } else {
+            scriptMoveEnd = 1;
+        }
+
+        m_turnFrames -= 1;
+        if (static_cast<int>(m_turnFrames) < 1) {
+            scriptMoveEnd = 2;
+        }
+
+        weaponFlagsHi = *(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1);
+        const u32 scriptMoveFlag = (static_cast<u32>(weaponFlagsHi) << 0x1B) | (weaponFlagsHi >> 5);
+        if (((static_cast<int>(scriptMoveFlag) >= 0) && (scriptMoveEnd != 0))
+            || ((static_cast<int>(scriptMoveFlag) < 0) && (scriptMoveEnd == 2))) {
+            *(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1) &= 0xDF;
+            u32 stackWord = static_cast<u32>(__cntlzw(static_cast<u32>(2 - scriptMoveEnd))) >> 5;
+            SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+                CFlat,
+                this,
+                2,
+                7,
+                1,
+                reinterpret_cast<CFlatRuntime::CStack*>(&stackWord),
+                0);
+        }
+
+        movingWithScript = true;
+    } else {
+        const u8 player = m_animStateMisc;
+        const bool canReadPad = (static_cast<char>(player) >= 0)
+            && (static_cast<char>(player) <= 3)
+            && (static_cast<int>((static_cast<u32>(weaponFlagsHi) << 0x18) | (weaponFlagsHi >> 8)) < 0)
+            && (static_cast<int>((static_cast<u32>(weaponFlagsHi) << 0x19) | (weaponFlagsHi >> 7)) < 0)
+            && ((Game.game.m_gameWork.m_menuStageMode == 0) || (player == 0));
+
+        if (canReadPad) {
+            const bool useDebugPad = (Pad._452_4_ != 0) || ((player == 0) && (Pad._448_4_ != -1));
+            const u32 playerIndex = static_cast<u32>(player)
+                & ~((static_cast<int>(~(Pad._448_4_ - static_cast<int>(player)
+                                        | static_cast<int>(player) - Pad._448_4_))
+                     >> 31));
+            const u8* padBytes = reinterpret_cast<u8*>(&Pad);
+
+            u16 buttons = 0;
+            u16 buttonsDown = 0;
+            u16 buttonsRepeat = 0;
+            if (!useDebugPad) {
+                buttons = *reinterpret_cast<const u16*>(padBytes + 0x4 + (playerIndex * 0x54));
+                buttonsDown = *reinterpret_cast<const u16*>(padBytes + 0x8 + (playerIndex * 0x54));
+                buttonsRepeat = *reinterpret_cast<const u16*>(padBytes + 0x12 + (playerIndex * 0x54));
+            }
+
+            if ((buttons != 0) && (buttonsRepeat != 0)) {
+                buttons |= buttonsRepeat;
+            }
+
+            u32 miniGameFlags = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(&MiniGamePcs) + 0x6484);
+            if ((miniGameFlags & 0x100) != 0) {
+                float stickX = sZeroFloat;
+                float stickY = sZeroFloat;
+                if (!useDebugPad) {
+                    stickX = *reinterpret_cast<const float*>(padBytes + 0x24 + (playerIndex * 0x54));
+                    stickY = *reinterpret_cast<const float*>(padBytes + 0x28 + (playerIndex * 0x54));
+                }
+                moveVec.x = sZeroFloat - stickX;
+                moveVec.z = sZeroFloat + stickY;
+                if ((moveVec.x != sZeroFloat) || (moveVec.z != sZeroFloat)) {
+                    hasStickInput = true;
+                }
+            }
+
+            if (!hasStickInput) {
+                if ((buttons & 1) != 0) {
+                    moveVec.x += sAnimFrameOffset;
+                }
+                if ((buttons & 2) != 0) {
+                    moveVec.x -= sAnimFrameOffset;
+                }
+                if ((buttons & 8) != 0) {
+                    moveVec.z += sAnimFrameOffset;
+                }
+                if ((buttons & 4) != 0) {
+                    moveVec.z -= sAnimFrameOffset;
+                }
+            }
+
+            if (((miniGameFlags & 0x40) == 0) && ((buttonsDown & 0x1000) != 0)) {
+                if (static_cast<int>((static_cast<u32>(*reinterpret_cast<u8*>(&m_weaponNodeFlags)) << 0x1B)
+                                         | (*reinterpret_cast<u8*>(&m_weaponNodeFlags) >> 5))
+                    < 0) {
+                    PSVECAdd(&m_groundHitOffset, &m_jumpOffset, &m_groundHitOffset);
+                } else {
+                    m_worldPosition.y += FLOAT_80330418;
+                }
+            }
+
+            if (Game.game.m_currentMapId == 0x21) {
+                Mtx cameraWorldMtx;
+                PSMTXCopy(reinterpret_cast<MtxPtr>(reinterpret_cast<u8*>(&CameraPcs) + 0x64), cameraWorldMtx);
+                moveVec.x = -moveVec.x;
+                moveVec.z = -moveVec.z;
+                moveVec.y = sZeroFloat;
+                PSMTXMultVec(cameraWorldMtx, &moveVec, &moveVec);
+            }
+        }
+    }
+
+    if ((moveVec.x != sZeroFloat) || (moveVec.y != sZeroFloat) || (moveVec.z != sZeroFloat)) {
+        float cameraYaw = *reinterpret_cast<float*>(reinterpret_cast<u8*>(&CameraPcs) + 0x248);
+        if (movingWithScript) {
+            cameraYaw = sZeroFloat;
+        }
+
+        const double inputYaw = atan2(static_cast<double>(moveVec.x), static_cast<double>(moveVec.z));
+        const float inputYawF = static_cast<float>(inputYaw);
+
+        const double sinYaw = sin(static_cast<double>(cameraYaw));
+        const double cosYaw = cos(static_cast<double>(cameraYaw));
+        if (Game.game.m_currentMapId != 0x21) {
+            const double mz = static_cast<double>(moveVec.z);
+            const float oldX = moveVec.x;
+            moveVec.z = static_cast<float>(static_cast<double>(oldX) * static_cast<float>(sinYaw)
+                                           + static_cast<float>(mz * static_cast<float>(cosYaw)));
+            moveVec.x = static_cast<float>(static_cast<double>(oldX) * static_cast<float>(cosYaw)
+                                           - static_cast<float>(mz * static_cast<float>(sinYaw)));
+        }
+
+        if (!movingWithScript) {
+            double speed = static_cast<double>(m_moveBaseSpeed);
+            if (hasStickInput && ((*reinterpret_cast<u32*>(reinterpret_cast<u8*>(&MiniGamePcs) + 0x6484) & 0x200) != 0)) {
+                const double mag = static_cast<double>(PSVECMag(&moveVec));
+                speed *= static_cast<double>(FLOAT_8033042c) * mag;
+            }
+
+            PSVECNormalize(&moveVec, &moveVec);
+
+            weaponFlagsHi = *(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1);
+            if ((static_cast<int>(static_cast<u32>(weaponFlagsHi) << 0x18) < 0)
+                && (static_cast<int>((static_cast<u32>(weaponFlagsHi) << 0x19) | (weaponFlagsHi >> 7)) < 0)
+                && (m_ownerType == 0)) {
+                if ((*reinterpret_cast<u32*>(reinterpret_cast<u8*>(&MiniGamePcs) + 0x6484) & 2) != 0) {
+                    speed *= static_cast<double>(FLOAT_8033042c);
+                }
+
+                const u32 cflatCenterState = *reinterpret_cast<u32*>(CFlat + 0x12AC);
+                if (cflatCenterState == 1) {
+                    Vec partyCenter;
+                    partyCenter.x = (Game.game.m_partyMinX + Game.game.m_partyMaxX) * FLOAT_80330368;
+                    partyCenter.y = (Game.game.m_partyMinY + Game.game.m_partyMaxY) * FLOAT_80330368;
+                    partyCenter.z = (Game.game.m_partyMinZ + Game.game.m_partyMaxZ) * FLOAT_80330368;
+
+                    Vec centerDelta;
+                    PSVECSubtract(&m_worldPosition, &partyCenter, &centerDelta);
+                    double centerDist = static_cast<double>(PSVECMag(&centerDelta));
+                    PSVECNormalize(&centerDelta, &centerDelta);
+
+                    const double dirDot = static_cast<double>(PSVECDotProduct(&moveVec, &centerDelta));
+                    if (static_cast<double>(sZeroFloat) < dirDot) {
+                        centerDist /= static_cast<double>(*reinterpret_cast<float*>(CFlat + 0x12B0));
+                        double clampDist = centerDist;
+                        if (static_cast<double>(sZeroFloat) <= clampDist) {
+                            if (static_cast<double>(sAnimFrameOffset) < clampDist) {
+                                clampDist = static_cast<double>(sAnimFrameOffset);
+                            }
+                            speed *= -((clampDist * clampDist) - static_cast<double>(sAnimFrameOffset));
+                        }
+                    }
+                }
+            }
+
+            if ((*reinterpret_cast<u32*>(&m_radiusCtrl.x) & 0x400000) != 0) {
+                speed *= static_cast<double>(FLOAT_80330344);
+            }
+
+            PSVECScale(&moveVec, &moveVec, static_cast<float>(speed));
+        }
+
+        PSVECAdd(&m_groundHitOffset, &moveVec, &m_groundHitOffset);
+
+        if (!movingWithScript
+            || (static_cast<int>((static_cast<u32>(*(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1)) << 0x1C)
+                                     | (*(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1) >> 4))
+                < 0)) {
+            if (Game.game.m_currentMapId == 0x21) {
+                const double slideSq = static_cast<double>(PSVECSquareMag(&m_groundHitOffset));
+                if (static_cast<double>(FLOAT_80330430) < slideSq) {
+                    Mtx yawMtx;
+                    Mtx pitchMtx;
+                    Vec worldUp;
+                    Vec tangent;
+                    Vec worldPosNorm;
+                    Vec moveNorm;
+                    Vec cross;
+
+                    PSMTXRotRad(yawMtx, 'y', static_cast<float>(atan2(static_cast<double>(m_worldPosition.x),
+                                                                      static_cast<double>(m_worldPosition.z))));
+                    worldUp.x = DAT_801d9b70;
+                    worldUp.y = DAT_801d9b74;
+                    worldUp.z = DAT_801d9b78;
+                    tangent.x = DAT_801d9b7c;
+                    tangent.y = DAT_801d9b80;
+                    tangent.z = DAT_801d9b84;
+                    PSVECNormalize(&m_worldPosition, &worldPosNorm);
+                    float upDot = PSVECDotProduct(&worldUp, &worldPosNorm);
+                    if (upDot > 1.0f) {
+                        upDot = 1.0f;
+                    } else if (upDot < -1.0f) {
+                        upDot = -1.0f;
+                    }
+                    PSMTXRotRad(pitchMtx, 'x', acosf(upDot));
+                    PSMTXConcat(yawMtx, pitchMtx, yawMtx);
+
+                    PSVECNormalize(&m_groundHitOffset, &moveNorm);
+                    PSMTXMultVec(yawMtx, &tangent, &tangent);
+                    float tanDot = PSVECDotProduct(&tangent, &moveNorm);
+                    if (tanDot > 1.0f) {
+                        tanDot = 1.0f;
+                    } else if (tanDot < -1.0f) {
+                        tanDot = -1.0f;
+                    }
+                    float targetRot = acosf(tanDot);
+
+                    PSVECCrossProduct(&tangent, &moveNorm, &cross);
+                    if (PSVECDotProduct(&worldPosNorm, &cross) < sZeroFloat) {
+                        targetRot = -targetRot;
+                    }
+                    m_rotTargetY = targetRot;
+                }
+            } else {
+                m_rotTargetY = inputYawF - cameraYaw;
+            }
+        }
+
+        if (movingWithScript
+            && (static_cast<int>((static_cast<u32>(*(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1)) << 0x1D)
+                                     | (*(reinterpret_cast<u8*>(&m_weaponNodeFlags) + 1) >> 3))
+                >= 0)) {
+            m_animSlotSel = *(reinterpret_cast<s8*>(&m_shieldNodeFlags) + 1);
+        } else {
+            m_animSlotSel = *reinterpret_cast<s8*>(&m_animStartFrame);
+        }
+        return;
+    }
+
+    const double rotDelta = static_cast<double>(Math.DstRot(m_rotTargetY, m_rotBaseY));
+    m_animSlotSel = (DOUBLE_803303e8 < fabs(rotDelta))
+        ? *reinterpret_cast<s8*>(&m_animStartFrame)
+        : *(reinterpret_cast<s8*>(&m_shieldNodeFlags) + 1);
 }
 
 /*

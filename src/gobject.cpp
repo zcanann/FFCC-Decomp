@@ -1,6 +1,8 @@
 #include "ffcc/gobject.h"
 
 #include "ffcc/cflat_runtime.h"
+#include "ffcc/color.h"
+#include "ffcc/graphic.h"
 #include "ffcc/math.h"
 #include "ffcc/map.h"
 #include "ffcc/maphit.h"
@@ -12,6 +14,7 @@
 #include "ffcc/quadobj.h"
 #include "ffcc/sound.h"
 
+#include <dolphin/gx.h>
 #include <math.h>
 #include <string.h>
 
@@ -19,6 +22,8 @@ extern CPartMng PartMng;
 extern CMath Math;
 extern CMiniGamePcs MiniGamePcs;
 extern unsigned char CFlat[];
+extern u32 CFlatFlags;
+extern Mtx gFlatPosMtx;
 extern "C" int __cntlzw(unsigned int);
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void*, CGBaseObj*, int, int, int, CFlatRuntime::CStack*, CFlatRuntime::CStack*);
@@ -1017,12 +1022,126 @@ void CGObject::copy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007df50
+ * PAL Size: 1180b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGObject::onDraw()
 {
-	// TODO
+    if ((m_weaponNodeFlags & 0x20) == 0) {
+        return;
+    }
+
+    const bool hasModel =
+        (m_charaModelHandle != (CCharaPcs::CHandle*)0) &&
+        (m_charaModelHandle->m_model != (CChara::CModel*)0);
+    if (!hasModel) {
+        return;
+    }
+
+    if (((CFlatFlags & 0x1) != 0) && ((m_bgColMask & 0x1) != 0)) {
+        CColor color(0xFF, 0x00, 0x00, 0xFF);
+        Vec pos;
+        pos.x = m_worldPosition.x;
+        pos.y = m_worldPosition.y + m_capsuleHalfHeight;
+        pos.z = m_worldPosition.z;
+        Graphic.DrawSphere(gFlatPosMtx, &pos, m_capsuleHalfHeight, &color.color);
+    }
+
+    if (((CFlatFlags & 0x2) != 0) && ((m_bgColMask & 0x2) != 0)) {
+        Vec capsuleOffset;
+        capsuleOffset.x = sZeroFloat;
+        capsuleOffset.y = sZeroFloat;
+        capsuleOffset.z = sZeroFloat;
+        if (m_bodyEllipsoidOffset == sZeroFloat) {
+        } else {
+            capsuleOffset.y = sZeroFloat;
+            capsuleOffset.x = m_bodyEllipsoidOffset * -sinf(m_rotBaseY);
+            capsuleOffset.z = m_bodyEllipsoidOffset * -cosf(m_rotBaseY);
+        }
+
+        Mtx scaleMtx;
+        Mtx rotMtx;
+        const float r = m_bodyEllipsoidRadius;
+        PSMTXScale(scaleMtx, r * m_bodyEllipsoidAspect, r, r);
+        PSMTXRotRad(rotMtx, 'y', m_rotBaseY);
+        PSMTXConcat(rotMtx, scaleMtx, scaleMtx);
+
+        Vec spherePos;
+        spherePos.x = m_worldPosition.x;
+        spherePos.y = m_worldPosition.y + m_bodyEllipsoidRadius;
+        spherePos.z = m_worldPosition.z;
+        PSVECAdd(&spherePos, &capsuleOffset, &spherePos);
+
+        scaleMtx[0][3] = spherePos.x;
+        scaleMtx[1][3] = spherePos.y;
+        scaleMtx[2][3] = spherePos.z;
+        PSMTXConcat(gFlatPosMtx, scaleMtx, scaleMtx);
+        GXLoadPosMtxImm(scaleMtx, GX_PNMTX0);
+
+        CColor color(0x00, 0xFF, 0x00, 0xFF);
+        GXSetChanMatColor(GX_COLOR0A0, color.color);
+        Graphic.DrawSphere();
+    }
+
+    if (((CFlatFlags & 0x4) != 0) && ((m_bgColMask & 0x4) != 0)) {
+        CColor color(0x00, 0x00, 0xFF, 0xFF);
+        Vec pos;
+        pos.x = m_worldPosition.x;
+        pos.y = m_worldPosition.y + m_bodyColRadius;
+        pos.z = m_worldPosition.z;
+        Graphic.DrawSphere(gFlatPosMtx, &pos, m_bodyColRadius, &color.color);
+    }
+
+    if (((CFlatFlags & 0x8) != 0) && ((m_bgColMask & 0x8) != 0)) {
+        CColor color(0xFF, 0xFF, 0x00, 0xFF);
+        Vec pos;
+        pos.x = m_worldPosition.x;
+        pos.y = m_worldPosition.y + m_attackColRadius;
+        pos.z = m_worldPosition.z;
+        Graphic.DrawSphere(gFlatPosMtx, &pos, m_attackColRadius, &color.color);
+    }
+
+    if (((CFlatFlags & 0x10) != 0) && ((m_bgColMask & 0x10) != 0)) {
+        CColor color(0x40, 0xFF, 0x40, 0xFF);
+        Graphic.DrawSphere(gFlatPosMtx, &m_worldPosition, m_nearColRadius, &color.color);
+    }
+
+    if (((CFlatFlags & 0x40000) != 0) && ((m_bgColMask & 0x40000) != 0)) {
+        for (int i = 0; i < 8; i++) {
+            AttackCol* collider = &m_attackColliders[i];
+            if (collider->m_localStart.x == sZeroFloat) {
+                continue;
+            }
+
+            CColor color(0xFF, 0x80, 0x80, 0xFF);
+            Graphic.DrawSphere(gFlatPosMtx, &collider->m_worldPosition, collider->m_radius, &color.color);
+
+            GXLoadPosMtxImm(gFlatPosMtx, GX_PNMTX0);
+            GXBegin(GX_LINES, GX_VTXFMT0, 2);
+            GXPosition3f32(collider->m_localEnd.y, collider->m_localEnd.z, collider->m_worldPosition.x);
+            GXPosition3f32(collider->m_worldPosition.y, collider->m_worldPosition.z, collider->m_radius);
+        }
+    }
+
+    if (((CFlatFlags & 0x80000) != 0) && ((m_bgColMask & 0x80000) != 0)) {
+        for (int i = 0; i < 8; i++) {
+            DamageCol* collider = &m_damageColliders[i];
+            if (collider->m_localPosition.x == sZeroFloat) {
+                continue;
+            }
+
+            CColor color(0x80, 0x80, 0xFF, 0xFF);
+            Vec scale;
+            scale.x = collider->m_innerRadius;
+            scale.y = collider->m_outerRadius;
+            scale.z = collider->m_innerRadius;
+            Graphic.DrawSphere(gFlatPosMtx, &collider->m_worldPosition, &scale, &color.color);
+        }
+    }
 }
 
 /*

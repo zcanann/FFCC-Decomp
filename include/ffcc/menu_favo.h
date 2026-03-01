@@ -12,7 +12,7 @@ public:
     void FavoInit();
     void FavoInit0();
     bool FavoOpen();
-    void FavoCtrl();
+    unsigned int FavoCtrl();
     bool FavoClose();
     void FavoDraw();
     void FavoCtrlCur();

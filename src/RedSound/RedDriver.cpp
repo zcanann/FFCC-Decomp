@@ -1879,18 +1879,18 @@ int CRedDriver::GetSeVolume(int param_1, int param_2)
 int CRedDriver::ReportSeLoop(int param_1)
 {
     int* seInfo;
-    int* end;
 
     seInfo = *(int**)((int)DAT_8032f3f0 + 0xdbc);
-    end = (int*)(*(int*)((int)DAT_8032f3f0 + 0xdbc) + 0x2a80);
-    while (seInfo < end) {
+    while (1) {
         if ((*seInfo != 0) &&
-            ((param_1 == -1 || (param_1 == seInfo[0x3e])) && ((seInfo[0x40] & 1) != 0))) {
+            (((param_1 == -1) || (param_1 == seInfo[0x3e])) && ((seInfo[0x40] & 1) != 0))) {
             return 1;
         }
         seInfo += 0x55;
+        if ((int*)(*(int*)((int)DAT_8032f3f0 + 0xdbc) + 0x2a80) <= seInfo) {
+            return 0;
+        }
     }
-    return 0;
 }
 
 /*

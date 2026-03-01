@@ -355,9 +355,9 @@ void CMenuPcs::CompaDraw()
 	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
 	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
 
-	unsigned int scriptFood = Game.game.m_scriptFoodBase[0];
+	int scriptFood = Game.game.m_scriptFoodBase[0];
 	short* entry = (short*)(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 8);
-	int count = static_cast<int>(**reinterpret_cast<short**>(reinterpret_cast<char*>(this) + 0x850));
+	int count = **reinterpret_cast<short**>(reinterpret_cast<char*>(this) + 0x850);
 	for (int i = 0; i < count; i++) {
 		int tex = *reinterpret_cast<int*>(entry + 0xE);
 		if (tex >= 0) {
@@ -536,7 +536,7 @@ void CMenuPcs::CompaDraw()
 		SetPosY__5CFontFf(y, font);
 		Draw__5CFontFPc(font, name);
 
-		int food = *reinterpret_cast<short*>(scriptFood + 0x9CA + drawIndex * 2);
+		short food = *reinterpret_cast<short*>(scriptFood + 0x9CA + drawIndex * 2);
 		if (food >= 0) {
 			const char* value = flatData->table[2].strings[food];
 			SetPosX__5CFontFf(static_cast<float>(*reinterpret_cast<short*>(menuData + 8) + 0x90), font);

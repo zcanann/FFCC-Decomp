@@ -77,7 +77,7 @@ extern int DAT_8032dab8;
 extern void* DAT_8032f3f0;
 extern void* DAT_8032f418;
 extern int DAT_8032f42c;
-extern void* DAT_8032f3cc;
+extern int* DAT_8032f3cc;
 extern void* DAT_8032f3d0;
 extern void* DAT_8032f41c;
 extern void* DAT_8032f420;
@@ -1199,7 +1199,7 @@ void CRedDriver::Init()
     } else {
         AXSetMode(0);
     }
-    DAT_8032f3cc = RedNew__Fi(400);
+    DAT_8032f3cc = (int*)RedNew__Fi(400);
     memset(DAT_8032f3cc, 0, 400);
     AXSetCompressor(0);
     DAT_8032f414 = 0;
@@ -1346,16 +1346,18 @@ void CRedDriver::End()
  */
 int CRedDriver::GetProgramTime()
 {
-	int total;
-	int* timePtr;
+    int iVar1;
+    int iVar2;
+    int* piVar3;
 
-	total = 0;
-	timePtr = (int*)DAT_8032f3cc;
-	do {
-		total += *timePtr;
-		timePtr++;
-	} while (timePtr < (int*)DAT_8032f3cc + 100);
-	return total;
+    iVar2 = 0;
+    piVar3 = DAT_8032f3cc;
+    do {
+        iVar1 = *piVar3;
+        piVar3 = piVar3 + 1;
+        iVar2 = iVar2 + iVar1;
+    } while (piVar3 < DAT_8032f3cc + 100);
+    return iVar2;
 }
 
 /*
@@ -1847,19 +1849,22 @@ void CRedDriver::SePause(int param_1, int param_2)
  */
 int CRedDriver::GetSeVolume(int param_1, int param_2)
 {
-	int* seInfo;
+    int* seInfo;
 
-	seInfo = *(int**)((int)DAT_8032f3f0 + 0xdbc);
-	while ((*seInfo == 0) || ((param_1 != -1) && (param_1 != seInfo[0x3e]))) {
-		seInfo += 0x55;
-		if (seInfo >= (int*)(*(int*)((int)DAT_8032f3f0 + 0xdbc) + 0x2a80)) {
-			return 0;
-		}
-	}
-	if (param_2 == 1) {
-		return seInfo[0x15];
-	}
-	return seInfo[0x13] >> 0xc;
+    seInfo = *(int**)((int)DAT_8032f3f0 + 0xdbc);
+    while (1) {
+        if ((*seInfo != 0) && ((param_1 == -1) || (param_1 == seInfo[0x3e]))) {
+            break;
+        }
+        seInfo += 0x55;
+        if ((int*)(*(int*)((int)DAT_8032f3f0 + 0xdbc) + 0x2a80) <= seInfo) {
+            return 0;
+        }
+    }
+    if (param_2 == 1) {
+        return seInfo[0x15];
+    }
+    return seInfo[0x13] >> 0xc;
 }
 
 /*

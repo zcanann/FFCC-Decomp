@@ -44,6 +44,7 @@ extern "C" void SetShadow__5CFontFi(CFont*, int);
 extern "C" void SetScale__5CFontFf(float, CFont*);
 extern "C" void DrawInit__5CFontFv(CFont*);
 extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
+extern "C" void SetTlut__5CFontFi(CFont*, int);
 extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
 extern "C" void SetPosX__5CFontFf(float, CFont*);
 extern "C" void SetPosY__5CFontFf(float, CFont*);
@@ -1893,27 +1894,143 @@ void CMenuPcs::CmdDismantle(int)
  */
 void CMenuPcs::DrawUniteList()
 {
-	// Basic implementation structure for unite list drawing
-	int i;
-	int j;
-	bool isActive = false;
-	int itemCount = 0;
-	
-	// Initialize graphics state
-	// GXSetBlendMode operations would go here
-	
-	// Main processing loop for unite items
-	for (i = 0; i < 16; i++) {
-		if (itemCount > 0) {
-			isActive = true;
+	const s32 caravanWork = Game.game.m_scriptFoodBase[0];
+	s16* const list = *reinterpret_cast<s16**>((u8*)this + 0x850);
+	const s16* const cmd = *reinterpret_cast<s16**>((u8*)this + 0x82C);
+	const s16 selected = cmd[0x26 / 2];
+	const s16 foodCount = *reinterpret_cast<const s16*>(caravanWork + 0xBAA);
+
+	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+
+	DAT_8032eec8 = 0;
+	for (s32 i = 0; i < 8; i++) {
+		if (i >= foodCount) {
+			break;
 		}
-		
-		// Draw unite list item
-		for (j = 0; j < 8; j++) {
-			// Item rendering logic
+
+		const s32 slotType = *reinterpret_cast<const s16*>(caravanWork + i * 2 + 0x214);
+		if (slotType == 0) {
+			continue;
 		}
-		
-		itemCount++;
+
+		s16* const entry = list + i * 0x20 + 4;
+		GXColor color;
+		color.r = 0xFF;
+		color.g = 0xFF;
+		color.b = 0xFF;
+		color.a = static_cast<u8>(FLOAT_80332acc * entry[8]);
+		GXSetChanMatColor((_GXChannelID)4, color);
+
+		s32 groupSize = 1;
+		if (slotType > 0) {
+			if ((i + 2 < 8) && (*reinterpret_cast<const s16*>(caravanWork + i * 2 + 0x218) == -1)) {
+				groupSize = 3;
+			} else {
+				groupSize = 2;
+			}
+		}
+
+		bool active = (i == selected);
+		if ((!active) && (slotType > 0) && (i <= selected) && (selected < i + groupSize)) {
+			active = true;
+		}
+
+		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, (groupSize == 2) ? 0x36 : 0x35);
+		DrawRect__8CMenuPcsFUlfffffffff(this, 0,
+			static_cast<float>(entry[0]),
+			static_cast<float>(entry[1]) - FLOAT_80332ad0,
+			static_cast<float>(entry[2]) - 8.0f,
+			static_cast<float>(entry[3]),
+			static_cast<float>(entry[4]),
+			active ? FLOAT_80332ac8 : FLOAT_80332ab0,
+			FLOAT_80332a70,
+			FLOAT_80332a70,
+			FLOAT_80332a70);
+	}
+
+	CFont* const font = *reinterpret_cast<CFont**>((u8*)this + 0xF8);
+	SetMargin__5CFontFf(FLOAT_80332a70, font);
+	SetShadow__5CFontFi(font, 1);
+	SetScale__5CFontFf(FLOAT_80332ad8, font);
+	DrawInit__5CFontFv(font);
+	SetTlut__5CFontFi(font, 7);
+
+	const s16 topX = list[4];
+	for (s32 i = 0; i < foodCount; i++) {
+		const s16 slotType = *reinterpret_cast<const s16*>(caravanWork + i * 2 + 0x214);
+		if ((i <= 7) && (slotType == 0)) {
+			continue;
+		}
+
+		s16* const entry = list + i * 0x20 + 4;
+		const float alpha = (cmd[0x30 / 2] == 3) ? FLOAT_80332a70 : entry[8];
+
+		GXColor color;
+		color.r = 0xFF;
+		color.g = 0xFF;
+		color.b = 0xFF;
+		color.a = static_cast<u8>(FLOAT_80332acc * alpha);
+		SetColor__5CFontF8_GXColor(font, &color);
+
+		const char* text = 0;
+		if (i < 2) {
+			text = GetMenuStr__8CMenuPcsFi(this, i + 9);
+		} else {
+			const s16 itemIdx = *reinterpret_cast<const s16*>(caravanWork + i * 2 + 0x204);
+			if (itemIdx < 0) {
+				continue;
+			}
+			const s16 skillId = *reinterpret_cast<const s16*>(caravanWork + itemIdx * 2 + 0xB6);
+			const char** flatText = *reinterpret_cast<const char***>(
+				reinterpret_cast<u8*>(&Game.game.m_cFlatDataArr[1]) + 0x70);
+			text = flatText[skillId * 5 + 4];
+		}
+
+		const float width = static_cast<float>(GetWidth__5CFontFPc(font, text));
+		float x = (static_cast<float>(entry[2]) - width) * static_cast<float>(DOUBLE_80332a60) + static_cast<float>(entry[0]);
+		if (topX != entry[0]) {
+			float diff = static_cast<float>(topX - entry[0]);
+			if (diff < FLOAT_80332a70) {
+				diff = -diff;
+			}
+			const float t = diff * 0.125f;
+			const float target = static_cast<float>(entry[0] + entry[2] - 0x18) - width;
+			x = (target - x) * t + x;
+		}
+
+		SetPosX__5CFontFf(x, font);
+		SetPosY__5CFontFf(static_cast<float>(entry[1] + 3) - FLOAT_80332ae8, font);
+		Draw__5CFontFPc(font, text);
+	}
+
+	DrawInit__8CMenuPcsFv(this);
+	for (s32 i = 0; i < 8; i++) {
+		if (i >= foodCount) {
+			break;
+		}
+
+		const s16 slotType = *reinterpret_cast<const s16*>(caravanWork + i * 2 + 0x214);
+		if (slotType <= 0) {
+			continue;
+		}
+
+		s32 groupSize = 2;
+		if ((i + 2 < 8) && (*reinterpret_cast<const s16*>(caravanWork + i * 2 + 0x218) == -1)) {
+			groupSize = 3;
+		}
+
+		if (i > 0) {
+			const s16 prevType = *reinterpret_cast<const s16*>(caravanWork + (i - 1) * 2 + 0x214);
+			if ((prevType > 0) && (groupSize != 3)) {
+				continue;
+			}
+		}
+
+		if (DAT_8032eec8 < 3) {
+			s_UniteTop[DAT_8032eec8] = i;
+			DAT_8032eec8++;
+		}
 	}
 }
 

@@ -3,6 +3,8 @@
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
 
+class CPartMng;
+
 extern "C" float GetWidth__5CFontFPc(CFont*, const char*);
 extern "C" void SetMargin__5CFontFf(float, CFont*);
 extern "C" void SetShadow__5CFontFi(CFont*, int);
@@ -25,6 +27,9 @@ extern double lbl_80333640;
 extern float lbl_80333648;
 extern float lbl_8033364C;
 extern float lbl_80333650;
+extern CPartMng PartMng;
+extern "C" void pppDeletePart__8CPartMngFi(CPartMng*, int);
+extern "C" void BindEffect__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 
 extern "C" int __cntlzw(unsigned int);
 
@@ -470,10 +475,63 @@ void CMenuPcs::DrawOptionMenu()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8017683c
+ * PAL Size: 336b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::BindMcObj(int)
+void CMenuPcs::BindMcObj(int index)
 {
-	// TODO
+	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const effectObjBase = *reinterpret_cast<unsigned char**>(self + 0x840);
+
+	for (int i = 0; i < 4; i++) {
+		if (index == i) {
+			int* const effectObj = reinterpret_cast<int*>(effectObjBase + (i + 0x11) * 0x524);
+
+			if (effectObj[1] >= 0) {
+				pppDeletePart__8CPartMngFi(&PartMng, effectObj[1]);
+				effectObj[1] = -1;
+				effectObj[2] = -1;
+				effectObj[0] = -1;
+			}
+
+			if (effectObj[0x525] >= 0) {
+				pppDeletePart__8CPartMngFi(&PartMng, effectObj[0x525]);
+				effectObj[0x525] = -1;
+				effectObj[0x526] = -1;
+				effectObj[0x524] = -1;
+			}
+		}
+	}
+
+	unsigned char* const effectInfoBase = *reinterpret_cast<unsigned char**>(self + 0x838);
+	int effectType = 0;
+	int effectOffset = 0;
+
+	for (int i = 0; i < 4; i++, effectOffset += 0x48) {
+		if (index == i) {
+			const int dataId = *reinterpret_cast<int*>(effectInfoBase + effectOffset + 0xC);
+			if (dataId != 0) {
+				BindEffect__8CMenuPcsFiii(this, i + 0x11, dataId + 0x16, -1);
+			}
+
+			const unsigned int flags = *reinterpret_cast<unsigned int*>(effectInfoBase + effectOffset + 0x28);
+			if ((flags & 1) != 0) {
+				effectType = 0;
+			} else if ((flags & 2) != 0) {
+				effectType = 1;
+			} else if ((flags & 4) != 0) {
+				effectType = 2;
+			} else if ((flags & 8) != 0) {
+				effectType = 3;
+			} else if ((flags & 0x10) != 0) {
+				effectType = 4;
+			}
+
+			BindEffect__8CMenuPcsFiii(this, i + 0x11, effectType + 0x1A, -1);
+		}
+	}
 }

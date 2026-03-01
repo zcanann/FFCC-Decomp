@@ -356,6 +356,88 @@ void CGItemObj::onFrameStat()
 			self[0x54d] = (self[0x54d] & 0x7f) | 0x80;
 		}
 		break;
+	case 0xB:
+		if (*(int*)(self + 0x528) == *(int*)(self + 0x554)) {
+			CVector attachOffset(FLOAT_80331b20, FLOAT_80331b20, FLOAT_80331b20);
+			bool useBossAttachName = false;
+
+			if (Game.game.m_gameWork.m_menuStageMode != 0) {
+				bool condA = false;
+				bool condB = false;
+				bool condC = false;
+
+				if (Game.game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+					condC = true;
+				}
+				if (condC) {
+					CGPartyObj* carryObj = *(CGPartyObj**)(self + 0x550);
+					typedef unsigned int (*PartyVFunc)(CGPartyObj*);
+					PartyVFunc getCid = reinterpret_cast<PartyVFunc>((*reinterpret_cast<void***>(carryObj))[3]);
+					unsigned int cid = getCid(carryObj);
+					unsigned int stageCarry = (unsigned int)__cntlzw(0x6D - (cid & 0x6D));
+					if (((stageCarry >> 5) & 0xFF) != 0) {
+						condB = true;
+					}
+				}
+				if (condB && *(int*)(*(unsigned char**)(*(unsigned char**)(self + 0x550) + 0x58) + 0x3B4) != 0) {
+					condA = true;
+				}
+				if (condA) {
+					useBossAttachName = true;
+				}
+			}
+
+			char* attachName = DAT_80331b84;
+			if (useBossAttachName) {
+				attachName = DAT_80331b7c;
+			}
+			Attach__8CGObjectFP8CGObjectPcP3Vec(this, *(void**)(self + 0x550), attachName,
+			                                    reinterpret_cast<Vec*>(&attachOffset));
+			changeStat__8CGPrgObjFiii(this, 0, 0, 0);
+			*(float*)(self + 0x144) = FLOAT_80331b20;
+		}
+		break;
+	case 0xC:
+	case 0xD:
+		if (*(int*)(self + 0x528) == *(int*)(self + 0x554)) {
+			CGPartyObj* carryObj = *(CGPartyObj**)(self + 0x550);
+			Vec safePos;
+			float safeDist = CalcSafePos__8CGObjectFiP8CGObjectP3Vec(this, 0x41, carryObj, &safePos);
+
+			if (FLOAT_80331b20 < safeDist) {
+				moveVectorHRot__8CGObjectFfffi(
+				    carryObj, FLOAT_80331b8c + *(float*)((unsigned char*)carryObj + 0x1A8), FLOAT_80331b20,
+				    safeDist / FLOAT_80331b90, 3);
+			}
+
+			Detach__8CGObjectFv(this);
+			*(Vec*)(self + 0x15C) = safePos;
+
+			float launchSpeed = FLOAT_80331b90;
+			if (*(int*)(self + 0x520) != 0xC) {
+				launchSpeed = FLOAT_80331b40;
+			}
+
+			float ownerRotY = *(float*)((unsigned char*)carryObj + 0x1B4);
+			CVector moveVec((float)sin((double)ownerRotY), FLOAT_80331b54, (float)cos((double)ownerRotY));
+			MoveVector__8CGObjectFP3Vecfiiii(this, reinterpret_cast<Vec*>(&moveVec), launchSpeed, 1, 0, 1, 0);
+
+			*(int*)(self + 0x550) = 0;
+			*(int*)(self + 0x56C) = 8;
+			*(float*)(self + 0x144) = FLOAT_80331b20;
+		}
+
+		if (*(int*)(self + 0x554) <= *(int*)(self + 0x528)) {
+			int worldParamA = *(int*)(self + 0x500);
+			bool isActive = (int)((unsigned int)self[0x50] << 0x18) < 0;
+
+			if ((worldParamA == 1 || worldParamA == 2) && isActive) {
+				changeStat__8CGPrgObjFiii(this, 0x1F, 0, 0);
+			} else if (isActive) {
+				changeStat__8CGPrgObjFiii(this, 0, 0, 0);
+			}
+		}
+		break;
 	case 0x1b:
 		if (*(int*)(self + 0x528) < 9) {
 			float wobble = (float)sin((double)(FLOAT_80331b9c * (float)(*(int*)(self + 0x528)) * FLOAT_80331b68));

@@ -1242,12 +1242,32 @@ void __MidiCtrl_ADSR_DR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C8D54
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_ADSR_SL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_ADSR_SL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    u8* sequencePos;
+    u8 value;
+    int* voice;
+
+    sequencePos = *(u8**)track;
+    *(u8**)track = sequencePos + 1;
+    value = *sequencePos;
+    *((u8*)track + 0xDE) = value;
+
+    voice = (int*)DAT_8032f444;
+    do {
+        if ((RedTrackDATA*)*voice == track) {
+            *((u8*)voice + 0x5A) = value;
+            voice[0x24] |= 0x3C0;
+        }
+        voice += 0x30;
+    } while (voice < (int*)(DAT_8032f444 + 0xC00));
 }
 
 /*
@@ -1281,12 +1301,32 @@ void __MidiCtrl_ADSR_SR(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C8E38
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_ADSR_RL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_ADSR_RL(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    u8* sequencePos;
+    u8 value;
+    int* voice;
+
+    sequencePos = *(u8**)track;
+    *(u8**)track = sequencePos + 1;
+    value = *sequencePos;
+    *((u8*)track + 0xDF) = value;
+
+    voice = (int*)DAT_8032f444;
+    do {
+        if ((RedTrackDATA*)*voice == track) {
+            *((u8*)voice + 0x5B) = value;
+            voice[0x24] |= 0x3C0;
+        }
+        voice += 0x30;
+    } while (voice < (int*)(DAT_8032f444 + 0xC00));
 }
 
 /*

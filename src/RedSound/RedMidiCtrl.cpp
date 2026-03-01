@@ -743,13 +743,20 @@ void __MidiCtrl_PhraseSignature(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* t
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C82F8
+ * PAL Size: 48b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_KeyOnSame(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+#pragma optimization_level 0
+#pragma dont_inline on
+void __MidiCtrl_KeyOnSame(RedSoundCONTROL*, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-	// TODO
+	KeyOnReserve(keyOnData, track);
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -760,7 +767,6 @@ void __MidiCtrl_KeyOnSame(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
  * JP Address: TODO
  * JP Size: TODO
  */
-#pragma optimization_level 0
 #pragma dont_inline on
 void __MidiCtrl_KeyOnNoteVelocity(RedSoundCONTROL*, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
@@ -1653,12 +1659,21 @@ void __MidiCtrl_VibrateOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C91C4
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_VibrateDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_VibrateDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+	int* trackData = (int*)track;
+	u8* command = (u8*)trackData[0];
+
+	trackData[0] = (int)(command + 1);
+	trackData[0x20] = (u32)*command << 0xc;
+	*(u16*)((u8*)trackData + 0x8e) = 0;
 }
 
 /*
@@ -1758,12 +1773,20 @@ void __MidiCtrl_VibrateType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C93B0
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_VibrateDelay(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_VibrateDelay(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+	int* trackData = (int*)track;
+
+	*(u16*)(trackData + 0x24) = (u16)*(u8*)trackData[0];
+	*(u16*)((u8*)trackData + 0x92) = (u16)*(u8*)(trackData[0] + 1);
+	trackData[0] += 2;
 }
 
 /*

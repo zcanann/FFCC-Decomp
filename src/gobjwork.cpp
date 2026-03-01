@@ -1068,9 +1068,9 @@ void CCaravanWork::CalcStatus()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CCaravanWork::CanPlayerUseItem()
+int CCaravanWork::CanPlayerUseItem()
 {
-	((CGPartyObj*)m_ownerObj)->canPlayerUseItem();
+	return ((CGPartyObj*)m_ownerObj)->canPlayerUseItem();
 }
 
 /*
@@ -1360,9 +1360,9 @@ void CCaravanWork::GetNextCmdListIdx(int, int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CCaravanWork::CanPlayerPutItem()
+int CCaravanWork::CanPlayerPutItem()
 {
-	((CGPartyObj*)m_ownerObj)->canPlayerPutItem();
+	return ((CGPartyObj*)m_ownerObj)->canPlayerPutItem();
 }
 
 /*

@@ -112,12 +112,17 @@ void CMenuPcs::WmInit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80102ed4
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::createWorld()
 {
-	// TODO
+	// Ghidra body is a no-op.
+	return;
 }
 
 /*
@@ -127,17 +132,21 @@ void CMenuPcs::createWorld()
  */
 void CMenuPcs::ChkNumItemAll()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8010172c
+ * PAL Size: 6000b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::loadData()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -147,7 +156,7 @@ void CMenuPcs::loadData()
  */
 void CMenuPcs::InitFrameInfo()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -195,17 +204,21 @@ void CMenuPcs::InitFrame0Info()
  */
 void CMenuPcs::Sprt::operator= (const CMenuPcs::Sprt&)
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80101444
+ * PAL Size: 532b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::InitCharaInfo()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -215,7 +228,7 @@ void CMenuPcs::InitCharaInfo()
  */
 void CMenuPcs::InitCharaSelectInfo()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -225,17 +238,21 @@ void CMenuPcs::InitCharaSelectInfo()
  */
 void CMenuPcs::InitCSelCurPos()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80101150
+ * PAL Size: 756b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::destroyWorld()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -388,27 +405,35 @@ void CMenuPcs::calcWorld()
  */
 void CMenuPcs::CalcMainMenu()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80100b00
+ * PAL Size: 1616b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CalcDiaryMenu()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800fec40
+ * PAL Size: 6552b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CalcMCardMenu()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -418,7 +443,7 @@ void CMenuPcs::CalcMCardMenu()
  */
 void CMenuPcs::CalcCMakeMenu()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -428,57 +453,77 @@ void CMenuPcs::CalcCMakeMenu()
  */
 void CMenuPcs::CalcMoveMenu()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800feba0
+ * PAL Size: 160b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::InitSaveLoadMenu()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800fcfb4
+ * PAL Size: 7148b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CalcLoadMenu()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800fca2c
+ * PAL Size: 1416b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CalcTitleMenu()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800fc4bc
+ * PAL Size: 1392b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CalcGoOutCharaSelect(unsigned char)
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800fc234
+ * PAL Size: 648b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CalcGoOutSelChar(unsigned char, unsigned char)
 {
-	// TODO
+	return;
 }
 
 /*
@@ -488,7 +533,7 @@ void CMenuPcs::CalcGoOutSelChar(unsigned char, unsigned char)
  */
 void CMenuPcs::CalcGoOutSelCharInit()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -613,102 +658,142 @@ void CMenuPcs::drawWorld()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800fb910
+ * PAL Size: 1952b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawMainMenu()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800fb440
+ * PAL Size: 1232b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawDiaryMenu()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800fa1cc
+ * PAL Size: 4724b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawMCardMenu()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800f98bc
+ * PAL Size: 2320b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawCMakeMenu()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800f9248
+ * PAL Size: 1652b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawMoveMenu()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800f7efc
+ * PAL Size: 4940b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawLoadMenu()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800f7044
+ * PAL Size: 3768b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawTitleMenu()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800f6d70
+ * PAL Size: 724b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::SetWorldParam(int, int)
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800f6afc
+ * PAL Size: 628b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::GetWorldParam(int)
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800f6ab0
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CallWorldParam(int, int, int)
 {
-	// TODO
+	return;
 }
 
 /*
@@ -718,37 +803,49 @@ void CMenuPcs::CallWorldParam(int, int, int)
  */
 void CMenuPcs::CalcSpl(CMenuPcs::SPL*, CMenuPcs::SPL*, float)
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800f69a8
+ * PAL Size: 264b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::GetFcvValue(CMenuPcs::FCV, float)
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800f67e0
+ * PAL Size: 456b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::SetProjection(int)
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800f673c
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::RestoreProjection()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -758,37 +855,49 @@ void CMenuPcs::RestoreProjection()
  */
 void CMenuPcs::DrawObj(int)
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800f653c
+ * PAL Size: 512b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CalcPitcher()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800f554c
+ * PAL Size: 4080b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CalcFukidashi()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800f4b24
+ * PAL Size: 2600b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawFukidashi()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -798,7 +907,7 @@ void CMenuPcs::DrawFukidashi()
  */
 void CMenuPcs::ChkPlaceLength(char*)
 {
-	// TODO
+	return;
 }
 
 /*
@@ -808,7 +917,7 @@ void CMenuPcs::ChkPlaceLength(char*)
  */
 void CMenuPcs::SplitPlace(const char*, char*, char*)
 {
-	// TODO
+	return;
 }
 
 /*
@@ -818,47 +927,63 @@ void CMenuPcs::SplitPlace(const char*, char*, char*)
  */
 void CMenuPcs::SplitPlace2(const char*, char*, char*, CFont*, int)
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800f3f60
+ * PAL Size: 3012b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CalcWMFrame()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800f36ac
+ * PAL Size: 2228b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawWMFrame()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800f3500
+ * PAL Size: 428b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CalcWMFrame0(int)
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800f3384
+ * PAL Size: 380b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawWMFrame0(int, float)
 {
-	// TODO
+	return;
 }
 
 /*
@@ -868,7 +993,7 @@ void CMenuPcs::DrawWMFrame0(int, float)
  */
 void CMenuPcs::DrawMainMenuBase(float)
 {
-	// TODO
+	return;
 }
 
 /*
@@ -878,37 +1003,49 @@ void CMenuPcs::DrawMainMenuBase(float)
  */
 void CMenuPcs::CalcCharaBase()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800f31b8
+ * PAL Size: 460b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawCharaBase()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800f2b00
+ * PAL Size: 1720b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CalcChara()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800f26f4
+ * PAL Size: 1036b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::PCAnimCtrl()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -918,57 +1055,77 @@ void CMenuPcs::PCAnimCtrl()
  */
 void CMenuPcs::GetAnimNo(int, int)
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800f2034
+ * PAL Size: 1728b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawChara()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800f2018
+ * PAL Size: 28b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::GetModelNo(int, int, int)
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800f0a70
+ * PAL Size: 5544b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CalcCharaSelect()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800f0274
+ * PAL Size: 2044b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawCharaName()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800efc38
+ * PAL Size: 1596b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawCMLife()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -978,17 +1135,21 @@ void CMenuPcs::DrawCMLife()
  */
 void CMenuPcs::WMSubMenuInit()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800eeea0
+ * PAL Size: 3480b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::WMChgMenu()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -998,47 +1159,63 @@ void CMenuPcs::WMChgMenu()
  */
 void CMenuPcs::SetParty()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800eee34
+ * PAL Size: 108b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::SetCMakeEnd(int)
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800eed84
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::ClrCMakeFlg(int)
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800eec84
+ * PAL Size: 256b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::ChgAllModel()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800eeb9c
+ * PAL Size: 232b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::ChgAllModel2()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -1048,47 +1225,63 @@ void CMenuPcs::ChgAllModel2()
  */
 void CMenuPcs::SetMakeChara(int)
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800eeb1c
+ * PAL Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::ChgModel(int, int, int, int)
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ee928
+ * PAL Size: 500b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::SetAnim(int)
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ee828
+ * PAL Size: 256b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawCursor(int, int, float)
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ed94c
+ * PAL Size: 3804b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CalcMainMenuSub()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -1098,37 +1291,51 @@ void CMenuPcs::CalcMainMenuSub()
  */
 void CMenuPcs::ChkSelectParty()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ecff0
+ * PAL Size: 2396b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawMainMenuSub()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ecfd0
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::GetMcAccessPos(int*, int*)
+void CMenuPcs::GetMcAccessPos(int* x, int* y)
 {
-	// TODO
+	*x = DAT_8032ee20;
+	*y = uRam8032ee21;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ecfb0
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::GetMcOdekakePos(int*, int*)
+void CMenuPcs::GetMcOdekakePos(int* x, int* y)
 {
-	// TODO
+	*x = DAT_8032ee24;
+	*y = uRam8032ee25;
 }
 
 /*
@@ -1138,17 +1345,21 @@ void CMenuPcs::GetMcOdekakePos(int*, int*)
  */
 void CMenuPcs::ChkMcDataCnt()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800eb6f8
+ * PAL Size: 6328b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawMCList()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -1158,17 +1369,21 @@ void CMenuPcs::DrawMCList()
  */
 void CMenuPcs::DrawHelpBase(int, float)
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800eb1d8
+ * PAL Size: 1312b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CalcMcObj()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -1178,7 +1393,7 @@ void CMenuPcs::CalcMcObj()
  */
 void CMenuPcs::DrawMcObj()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -1188,7 +1403,7 @@ void CMenuPcs::DrawMcObj()
  */
 void CMenuPcs::SetMcList(int, McListInfo*)
 {
-	// TODO
+	return;
 }
 
 /*
@@ -1198,7 +1413,7 @@ void CMenuPcs::SetMcList(int, McListInfo*)
  */
 void McListInfo::operator= (const McListInfo&)
 {
-	// TODO
+	return;
 }
 
 /*
@@ -1208,27 +1423,35 @@ void McListInfo::operator= (const McListInfo&)
  */
 void CMenuPcs::ClrMcList()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800eb088
+ * PAL Size: 336b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::BindEffect(int, int, int)
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800eafa0
+ * PAL Size: 232b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::SetLight(int)
 {
-	// TODO
+	return;
 }
 
 /*
@@ -1238,67 +1461,91 @@ void CMenuPcs::SetLight(int)
  */
 void CMenuPcs::DrawPageMark()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ead94
+ * PAL Size: 524b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawRect2(unsigned long, float, float, float, float, float, float, float, float, float (*) [4])
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800eab98
+ * PAL Size: 508b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawRect3d(unsigned long, float, float, float, float, float, float, float, float, float)
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800eaaec
+ * PAL Size: 172b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::SetMcWinInfo(int, int)
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ea4f4
+ * PAL Size: 1528b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawMcWin(short, short)
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ea150
+ * PAL Size: 932b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawMcWinMess(int, int)
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ea014
+ * PAL Size: 316b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::GetWinSize(int, short*, short*, int)
 {
-	// TODO
+	return;
 }
 
 /*
@@ -1308,7 +1555,7 @@ void CMenuPcs::GetWinSize(int, short*, short*, int)
  */
 void CMenuPcs::SetTextureLoc(int)
 {
-	// TODO
+	return;
 }
 
 /*
@@ -1318,77 +1565,105 @@ void CMenuPcs::SetTextureLoc(int)
  */
 void GXSetTexCoordGen(void)
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ea00c
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::GetMaxAnimWait()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800e9c8c
+ * PAL Size: 896b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::BindMcObj()
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800e9ba0
+ * PAL Size: 236b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawFilter(unsigned char, unsigned char, unsigned char, unsigned char)
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800e9b2c
+ * PAL Size: 116b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CopyNowCaravanDat(Mc::SaveDat*)
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800e9aac
+ * PAL Size: 128b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::SetCaravanWork(Mc::SaveDat*)
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800e9904
+ * PAL Size: 424b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::GetSameCharaData(Mc::SaveDat*, Mc::SaveDat*, int, int)
 {
-	// TODO
+	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800e98c4
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CheckSameMcFormatID(Mc::SaveDat*, Mc::SaveDat*)
 {
-	// TODO
+	return;
 }
 
 /*
@@ -1398,7 +1673,7 @@ void CMenuPcs::CheckSameMcFormatID(Mc::SaveDat*, Mc::SaveDat*)
  */
 void CMenuPcs::IsAsyncCharaLoadFinish()
 {
-	// TODO
+	return;
 }
 /*
  * --INFO--
@@ -1407,7 +1682,7 @@ void CMenuPcs::IsAsyncCharaLoadFinish()
  */
 McCtrl::McCtrl()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -1417,7 +1692,7 @@ McCtrl::McCtrl()
  */
 McCtrl::~McCtrl()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -1427,7 +1702,7 @@ McCtrl::~McCtrl()
  */
 void McCtrl::Init()
 {
-	// TODO
+	return;
 }
 
 
@@ -1438,7 +1713,7 @@ void McCtrl::Init()
  */
 void McCtrl::LoadMcList()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -1448,7 +1723,7 @@ void McCtrl::LoadMcList()
  */
 void McCtrl::SetListDat(int, int)
 {
-	// TODO
+	return;
 }
 
 /*
@@ -1458,7 +1733,7 @@ void McCtrl::SetListDat(int, int)
  */
 void McCtrl::SetBrokenFile(int)
 {
-	// TODO
+	return;
 }
 
 /*
@@ -1468,7 +1743,7 @@ void McCtrl::SetBrokenFile(int)
  */
 void McCtrl::SaveDat()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -1478,7 +1753,7 @@ void McCtrl::SaveDat()
  */
 void McCtrl::LoadDat()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -1488,7 +1763,7 @@ void McCtrl::LoadDat()
  */
 void McCtrl::Format(int)
 {
-	// TODO
+	return;
 }
 
 /*
@@ -1886,7 +2161,7 @@ int McCtrl::ChkNowData()
  */
 void McCtrl::SaveDataBuffer(char*)
 {
-	// TODO
+	return;
 }
 
 /*
@@ -1896,7 +2171,7 @@ void McCtrl::SaveDataBuffer(char*)
  */
 void McCtrl::ChkParty(char*)
 {
-	// TODO
+	return;
 }
 
 /*
@@ -1906,7 +2181,7 @@ void McCtrl::ChkParty(char*)
  */
 void McCtrl::EraseDat()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -1916,7 +2191,7 @@ void McCtrl::EraseDat()
  */
 void McCtrl::GetDno()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -1926,7 +2201,7 @@ void McCtrl::GetDno()
  */
 void McCtrl::GetSerial()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -1936,7 +2211,7 @@ void McCtrl::GetSerial()
  */
 void McCtrl::SetDataBuff(char*)
 {
-	// TODO
+	return;
 }
 
 /*
@@ -1946,7 +2221,7 @@ void McCtrl::SetDataBuff(char*)
  */
 void McCtrl::GetSlot()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -1956,7 +2231,7 @@ void McCtrl::GetSlot()
  */
 void McCtrl::SetDno(int)
 {
-	// TODO
+	return;
 }
 
 /*
@@ -1966,7 +2241,7 @@ void McCtrl::SetDno(int)
  */
 void McCtrl::SetSlot(int)
 {
-	// TODO
+	return;
 }
 
 /*
@@ -1976,7 +2251,7 @@ void McCtrl::SetSlot(int)
  */
 void CMenuPcs::AlphaNormal()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -1986,7 +2261,7 @@ void CMenuPcs::AlphaNormal()
  */
 void CMenuPcs::AlphaAdd()
 {
-	// TODO
+	return;
 }
 
 /*
@@ -1996,5 +2271,6 @@ void CMenuPcs::AlphaAdd()
  */
 void CMenuPcs::GetFontWorld()
 {
-	// TODO
+	return;
 }
+

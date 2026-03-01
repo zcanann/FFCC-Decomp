@@ -759,12 +759,37 @@ void CRedEntry::SeSepHistoryChoice(RedHistoryBANK*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c1b84
+ * PAL Size: 156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedEntry::SearchSeSepSequence(int)
+int CRedEntry::SearchSeSepSequence(int seNo)
 {
-	// TODO
+	int* const base = reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 4));
+	int* seSepBank = base;
+
+	if (seNo == -1) {
+		do {
+			if (seSepBank[3] != 0) {
+				int offset = reinterpret_cast<int>(seSepBank) - reinterpret_cast<int>(base);
+				return (offset >> 4) + ((offset < 0) && ((offset & 0xF) != 0));
+			}
+			seSepBank += 4;
+		} while ((unsigned int)seSepBank < (unsigned int)base + 0x1000);
+	} else {
+		do {
+			if ((seSepBank[3] != 0) && (seSepBank[0] == seNo)) {
+				int offset = reinterpret_cast<int>(seSepBank) - reinterpret_cast<int>(base);
+				return (offset >> 4) + ((offset < 0) && ((offset & 0xF) != 0));
+			}
+			seSepBank += 4;
+		} while ((unsigned int)seSepBank < (unsigned int)base + 0x1000);
+	}
+
+	return -1;
 }
 
 /*
@@ -955,12 +980,27 @@ void CRedEntry::MusicHistoryChoice(RedHistoryBANK*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c2610
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedEntry::SearchMusicSequence(int)
+int CRedEntry::SearchMusicSequence(int musicNo)
 {
-	// TODO
+	int* const base = reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8));
+	int* musicBank = base;
+
+	while ((musicBank[3] == 0) || (musicBank[0] != musicNo)) {
+		musicBank += 4;
+		if (musicBank >= reinterpret_cast<int*>(reinterpret_cast<int>(base) + 0x40)) {
+			return -1;
+		}
+	}
+
+	int offset = reinterpret_cast<int>(musicBank) - reinterpret_cast<int>(base);
+	return (offset >> 4) + ((offset < 0) && ((offset & 0xF) != 0));
 }
 
 /*
@@ -995,12 +1035,24 @@ void CRedEntry::MusicOldChoice()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c27d8
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedEntry::SearchMusicBank(int)
+int* CRedEntry::SearchMusicBank(int musicNo)
 {
-	// TODO
+	int* musicBank = reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8));
+	do {
+		if (musicBank[0] == musicNo) {
+			return musicBank;
+		}
+		musicBank += 4;
+	} while (musicBank < reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8) + 0x40));
+
+	return 0;
 }
 
 /*
@@ -1015,12 +1067,44 @@ void CRedEntry::ReentryMusicData(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c2874
+ * PAL Size: 324b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedEntry::MusicHistoryManager(int, int)
+void CRedEntry::MusicHistoryManager(int mode, int musicNo)
 {
-	// TODO
+	if (mode == 0) {
+		bool inUse = false;
+		if ((*reinterpret_cast<short*>((int)DAT_8032f3f0 + 0x48E) != 0)
+		    && (*reinterpret_cast<int*>((int)DAT_8032f3f0 + 0x470) == musicNo)) {
+			inUse = true;
+		}
+		if ((*reinterpret_cast<short*>((int)DAT_8032f3f0 + 0x922) != 0)
+		    && (*reinterpret_cast<int*>((int)DAT_8032f3f0 + 0x904) == musicNo)) {
+			inUse = true;
+		}
+
+		int musicSeq = SearchMusicSequence(musicNo);
+		if ((!inUse) && (musicSeq >= 0)) {
+			int* const musicBank = reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8));
+			if (musicBank[musicSeq * 4 + 1] == 0) {
+				MusicHistoryAdd();
+				musicBank[musicSeq * 4 + 1] = 1;
+			}
+		}
+	} else {
+		int musicSeq = SearchMusicSequence(musicNo);
+		if (musicSeq >= 0) {
+			int* const musicBank = reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<int>(this) + 8));
+			if (musicBank[musicSeq * 4 + 1] != 0) {
+				MusicHistoryDelete(musicBank[musicSeq * 4 + 1]);
+				musicBank[musicSeq * 4 + 1] = 0;
+			}
+		}
+	}
 }
 
 /*

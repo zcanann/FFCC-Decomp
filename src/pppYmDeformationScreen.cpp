@@ -62,6 +62,7 @@ extern CUtil DAT_8032ec70;
 extern float ppvScreenMatrix[4][4];
 
 extern struct {
+	char pad[0xd4];
 	float _212_4_;
 	float _216_4_;
 	float _220_4_;

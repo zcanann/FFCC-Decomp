@@ -438,12 +438,22 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c3db4
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void _VoiceEnvelopeCheck()
 {
-	// TODO
+    u32* voiceData = DAT_8032f444;
+    do {
+        if ((((u8*)voiceData)[0x1A] & 7) != 0) {
+            voiceData[0x2C] = 0x8000;
+        }
+        voiceData += 0x30;
+    } while (voiceData < DAT_8032f444 + 0xC00);
 }
 
 /*
@@ -1794,6 +1804,8 @@ void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int fr
              (track < (int*)(*(int*)control + (u32)*(u8*)((u8*)control + 0x491) * 0x154)));
 }
 
+#pragma dont_inline on
+
 /*
  * --INFO--
  * PAL Address: 0x801c63c4
@@ -1878,6 +1890,8 @@ void _MusicNoteExecute()
         DAT_8032f424 = 0;
     }
 }
+
+#pragma dont_inline reset
 
 /*
  * --INFO--

@@ -1523,22 +1523,50 @@ void __MidiCtrl_ChannelAlloc(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C9008
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_ChannelPriority(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_ChannelPriority(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+	int* trackData;
+	u8* command;
+
+	trackData = (int*)track;
+	command = (u8*)trackData[0];
+	trackData[0] = (int)(command + 1);
+	if (*command == 0) {
+		*(u8*)((char*)trackData + 0x26) &= 0xf7;
+	} else {
+		*(u8*)((char*)trackData + 0x26) |= 8;
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C9050
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_ChannelFix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_ChannelFix(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+	int* trackData;
+	u8* command;
+
+	trackData = (int*)track;
+	command = (u8*)trackData[0];
+	trackData[0] = (int)(command + 1);
+	if (*command == 0) {
+		*(u8*)((char*)trackData + 0x26) &= 0xfb;
+	} else {
+		*(u8*)((char*)trackData + 0x26) |= 4;
+	}
 }
 
 /*
@@ -1703,12 +1731,19 @@ void __MidiCtrl_VibrateRateChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C9370
+ * PAL Size: 64b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_VibrateType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_VibrateType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+	u8* command = (u8*)((int*)track)[0];
+
+	((int*)track)[0] = (int)(command + 1);
+	((int*)track)[0x1d] = PTR_SineSwing__Fi_8021e9d0[*command & 0xf];
 }
 
 /*

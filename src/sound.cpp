@@ -1429,23 +1429,31 @@ void CSound::FreeWave(int waveId)
 void CSound::StopAndFreeAllSe(int clearMode)
 {
     CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
-    short* seGroup = reinterpret_cast<short*>(reinterpret_cast<u8*>(this) + 0x22C0);
-    short* waveGroup = reinterpret_cast<short*>(reinterpret_cast<u8*>(this) + 0x22C8);
+    u8* soundData = reinterpret_cast<u8*>(this);
 
     if (clearMode == 0) {
-        SeStopMG__9CRedSoundFiiii(redSound, seGroup[0], seGroup[1], seGroup[2], seGroup[3]);
-        ClearSeSepDataMG__9CRedSoundFiiii(redSound, seGroup[0], seGroup[1], seGroup[2], seGroup[3]);
-        ClearWaveDataM__9CRedSoundFiiii(redSound, waveGroup[0], waveGroup[1], waveGroup[2], waveGroup[3]);
+        SeStopMG__9CRedSoundFiiii(redSound, *reinterpret_cast<s16*>(soundData + 0x22C0),
+                                  *reinterpret_cast<s16*>(soundData + 0x22C2),
+                                  *reinterpret_cast<s16*>(soundData + 0x22C4),
+                                  *reinterpret_cast<s16*>(soundData + 0x22C6));
+        ClearSeSepDataMG__9CRedSoundFiiii(redSound, *reinterpret_cast<s16*>(soundData + 0x22C0),
+                                          *reinterpret_cast<s16*>(soundData + 0x22C2),
+                                          *reinterpret_cast<s16*>(soundData + 0x22C4),
+                                          *reinterpret_cast<s16*>(soundData + 0x22C6));
+        ClearWaveDataM__9CRedSoundFiiii(redSound, *reinterpret_cast<s16*>(soundData + 0x22C8),
+                                        *reinterpret_cast<s16*>(soundData + 0x22CA),
+                                        *reinterpret_cast<s16*>(soundData + 0x22CC),
+                                        *reinterpret_cast<s16*>(soundData + 0x22CE));
     } else {
         SeStop__9CRedSoundFi(redSound, -1);
         ClearSeSepData__9CRedSoundFi(redSound, -1);
         ClearWaveData__9CRedSoundFi(redSound, -3);
     }
 
-    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x28) = 10000000;
-    memset(reinterpret_cast<u8*>(this) + 0x2C, 0, 0x1400);
-    memset(seGroup, 0xFF, 8);
-    memset(waveGroup, 0xFF, 8);
+    *reinterpret_cast<int*>(soundData + 0x28) = 10000000;
+    memset(soundData + 0x2C, 0, 0x1400);
+    memset(soundData + 0x22C0, 0xFF, 8);
+    memset(soundData + 0x22C8, 0xFF, 8);
 }
 
 /*

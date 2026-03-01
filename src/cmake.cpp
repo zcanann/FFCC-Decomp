@@ -1,10 +1,12 @@
 #include "ffcc/cmake.h"
 #include "ffcc/p_game.h"
+#include <string.h>
 
 extern "C" void __dl__FPv(void*);
 extern "C" void freeTexture__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
 extern "C" void CmakeVillageDraw__8CMenuPcsFv(CMenuPcs*);
 extern "C" void CallWorldParam__8CMenuPcsFiii(CMenuPcs*, int, int, int);
+extern "C" void ChgModel__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
 
 static inline short& MenuS16(CMenuPcs* menu, int offset)
 {
@@ -67,12 +69,103 @@ void GetCharaCnt(char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80173ba4
+ * PAL Size: 2984b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CalcSingCMake()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    int state = MenuS32(this, 0x82C);
+
+    if (*reinterpret_cast<unsigned char*>(state + 0x0B) == 0) {
+        memset(self + 0x85C, 0, 0x16);
+        *reinterpret_cast<unsigned char*>(state + 0x0B) = 1;
+        *reinterpret_cast<unsigned char*>(state + 0x0C) = 0;
+        *reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) = 3;
+    }
+
+    short& frame = *reinterpret_cast<short*>(state + 0x22);
+    short& openMode = *reinterpret_cast<short*>(state + 0x10);
+    short& step = *reinterpret_cast<short*>(state + 0x16);
+
+    switch (step) {
+    case 0:
+        if (openMode == 0 || openMode == 2) {
+            if (frame < 10) {
+                frame = frame + 1;
+            } else {
+                *reinterpret_cast<short*>(state + 0x26) = 0;
+                *reinterpret_cast<short*>(state + 0x28) = 0;
+                *reinterpret_cast<short*>(state + 0x2A) = 0;
+                *reinterpret_cast<short*>(state + 0x2C) = 0;
+            }
+        }
+        break;
+    case 1:
+        if (openMode == 0 || openMode == 2) {
+            if (frame < 10) {
+                frame = frame + 1;
+            } else if (openMode == 2 && *reinterpret_cast<short*>(state + 0x1E) < 0) {
+                ChgModel__8CMenuPcsFiiii(this, static_cast<int>(MenuS16(this, 0x86A)), -1, -1, -1);
+            }
+        } else {
+            CmakeNameCtrl();
+        }
+        break;
+    case 2:
+        if (openMode == 0) {
+            if (*reinterpret_cast<unsigned char*>(state + 0x0C) == 0) {
+                *reinterpret_cast<short*>(state + 0x26) = 0;
+                *reinterpret_cast<unsigned char*>(state + 0x0C) = 1;
+            }
+            if (frame < 10) {
+                frame = frame + 1;
+            }
+        } else if (openMode == 1) {
+            CmakeSexCtrl();
+        } else if (frame < 10) {
+            frame = frame + 1;
+        }
+        break;
+    case 3:
+        if (openMode == 0) {
+            if (*reinterpret_cast<unsigned char*>(state + 0x0C) == 0) {
+                *reinterpret_cast<short*>(state + 0x26) = 0;
+                *reinterpret_cast<short*>(state + 0x28) = 0;
+                *reinterpret_cast<short*>(state + 0x30) = 0;
+                *reinterpret_cast<unsigned char*>(state + 0x0C) = 1;
+            }
+            if (frame < 10) {
+                frame = frame + 1;
+            }
+        } else if (openMode == 1) {
+            CmakeTribeCtrl();
+        } else if (frame < 10) {
+            frame = frame + 1;
+        }
+        break;
+    case 4:
+        if (openMode == 0) {
+            if (*reinterpret_cast<unsigned char*>(state + 0x0C) == 0) {
+                *reinterpret_cast<short*>(state + 0x26) = 0;
+                *reinterpret_cast<unsigned char*>(state + 0x0C) = 1;
+            }
+            if (frame < 10) {
+                frame = frame + 1;
+            }
+        } else if (openMode == 1) {
+            CmakeJobCtrl();
+        } else if (frame < 10) {
+            frame = frame + 1;
+        }
+        break;
+    default:
+        break;
+    }
 }
 
 /*

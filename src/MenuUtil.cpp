@@ -124,12 +124,27 @@ void CMenuPcs::GetFontWidth(char*, float, float)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8017ac40
+ * PAL Size: 272b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::DrawFont2(int, int, _GXColor, int, char*, float, float, float)
+void CMenuPcs::DrawFont2(int posX, int posY, _GXColor color, int tlut, char* text, float margin, float scaleX, float scaleY)
 {
-	// TODO
+	CFont* font = *(CFont**)((unsigned char*)this + 0xF8);
+
+	SetMargin__5CFontFf(margin, font);
+	SetShadow__5CFontFi(font, 1);
+	SetScaleX__5CFontFf(scaleX, font);
+	SetScaleY__5CFontFf(scaleY, font);
+	DrawInit__5CFontFv(font);
+	SetTlut__5CFontFi(font, tlut);
+	SetColor__5CFontF8_GXColor(font, &color);
+	SetPosX__5CFontFf((float)posX, font);
+	SetPosY__5CFontFf((float)posY, font);
+	Draw__5CFontFPc(font, text);
 }
 
 /*

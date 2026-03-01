@@ -402,13 +402,53 @@ void CLightPcs::Clear()
  */
 void CLightPcs::Add(CLightPcs::CLight* light)
 {
-    unsigned int* src = reinterpret_cast<unsigned int*>(light);
-    float radius = *reinterpret_cast<float*>(&src[7]);
-    float maxDist = *reinterpret_cast<float*>(&src[8]);
-    float intensity = *reinterpret_cast<float*>(&src[10]);
-    unsigned int colorMask = 0x01010101;
+    u32* src = reinterpret_cast<u32*>(light);
+    u32 w0 = src[0];
+    u32 w1 = src[1];
+    u32 w2 = src[2];
+    u32 w3 = src[3];
+    u32 w4 = src[4];
+    u32 w5 = src[5];
+    u32 w6 = src[6];
+    float radius = reinterpret_cast<float*>(src)[7];
+    u32 w11 = src[11];
+    u32 w12 = src[12];
+    u32 w13 = src[13];
+    u32 w14 = src[14];
+    u32 w15 = src[15];
+    u32 w16 = src[16];
+    u32 w17 = src[17];
+    u32 w18 = src[18];
+    float intensity = reinterpret_cast<float*>(src)[10];
+    u8 c4d = *(reinterpret_cast<u8*>(src) + 0x4d);
+    u8 c4e = *(reinterpret_cast<u8*>(src) + 0x4e);
+    u8 c4c = *(reinterpret_cast<u8*>(src) + 0x4c);
+    u8 c4f = *(reinterpret_cast<u8*>(src) + 0x4f);
+    int colorR = src[20];
+    int colorG = src[21];
+    int colorB = src[22];
+    u32 w23 = src[23];
+    u32 w25 = src[25];
+    u32 w26 = src[26];
+    u32 w27 = src[27];
+    u32 w28 = src[28];
+    u32 w29 = src[29];
+    u32 w30 = src[30];
+    u32 w31 = src[31];
+    u32 w32 = src[32];
+    u32 w33 = src[33];
+    u32 w34 = src[34];
+    u32 w35 = src[35];
+    u32 w36 = src[36];
+    u32 w37 = src[37];
+    u32 w38 = src[38];
+    u32 w39 = src[39];
+    u32 w40 = src[40];
+    u32 w41 = src[41];
+    u32 w42 = src[42];
+    float maxDist = reinterpret_cast<float*>(src)[8];
 
-    if (FLOAT_8032fc10 <= maxDist) {
+    if (FLOAT_8032fc10 <= reinterpret_cast<float*>(src)[8]) {
         maxDist = radius;
     }
 
@@ -416,73 +456,70 @@ void CLightPcs::Add(CLightPcs::CLight* light)
     if (radius < FLOAT_8032fc14) {
         absRadius = -radius;
     }
-    absRadius *= FLOAT_8032fc18;
+    absRadius = absRadius * FLOAT_8032fc18;
 
-    if (src[20] == 0) {
+    u32 colorMask = 0x01010101;
+    if (colorR == 0) {
         colorMask = 0x00010101;
     }
-    if (src[21] == 0) {
+    if (colorG == 0) {
         colorMask = (colorMask & 0xFF0000FF) | ((colorMask >> 8) & 0x0000FF00);
     }
-    if (src[22] == 0) {
+    if (colorB == 0) {
         colorMask = (colorMask & 0xFFFF00FF) | ((colorMask >> 16) & 0x000000FF);
     }
 
     int index = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0xb8);
     *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0xb8) = index + 1;
 
-    unsigned int* dst = reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(this) + (index * 0xb0) + 0x63c);
-
-    dst[0] = src[0];
-    dst[1] = src[1];
-    dst[2] = src[2];
-    dst[3] = src[3];
-    dst[4] = src[4];
-    dst[5] = src[5];
-    dst[6] = src[6];
-    dst[7] = src[7];
-    dst[8] = *reinterpret_cast<unsigned int*>(&maxDist);
-    dst[9] = *reinterpret_cast<unsigned int*>(&(absRadius *= intensity));
-    dst[10] = src[10];
-    dst[11] = src[11];
-    dst[12] = src[12];
-    dst[13] = src[13];
-    dst[14] = src[14];
-    dst[15] = src[15];
-    dst[16] = src[16];
-    dst[17] = src[17];
-    dst[18] = src[18];
-    *reinterpret_cast<unsigned char*>(dst + 19) = *reinterpret_cast<unsigned char*>(src + 19);
-    *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(dst) + 0x4d) =
-        *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(src) + 0x4d);
-    *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(dst) + 0x4e) =
-        *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(src) + 0x4e);
-    *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(dst) + 0x4f) =
-        *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(src) + 0x4f);
-    dst[20] = src[20];
-    dst[21] = src[21];
-    dst[22] = src[22];
-    dst[23] = src[23];
+    u32* dst = reinterpret_cast<u32*>(reinterpret_cast<char*>(this) + (index * 0xb0) + 0x63c);
+    dst[0] = w0;
+    dst[1] = w1;
+    dst[2] = w2;
+    dst[3] = w3;
+    dst[4] = w4;
+    dst[5] = w5;
+    dst[6] = w6;
+    reinterpret_cast<float*>(dst)[7] = radius;
+    reinterpret_cast<float*>(dst)[8] = maxDist;
+    reinterpret_cast<float*>(dst)[9] = absRadius * intensity;
+    reinterpret_cast<float*>(dst)[10] = intensity;
+    dst[11] = w11;
+    dst[12] = w12;
+    dst[13] = w13;
+    dst[14] = w14;
+    dst[15] = w15;
+    dst[16] = w16;
+    dst[17] = w17;
+    dst[18] = w18;
+    *(reinterpret_cast<u8*>(dst) + 0x4c) = c4c;
+    *(reinterpret_cast<u8*>(dst) + 0x4d) = c4d;
+    *(reinterpret_cast<u8*>(dst) + 0x4e) = c4e;
+    *(reinterpret_cast<u8*>(dst) + 0x4f) = c4f;
+    dst[20] = colorR;
+    dst[21] = colorG;
+    dst[22] = colorB;
+    dst[23] = w23;
     dst[24] = colorMask;
-    dst[25] = src[25];
-    dst[26] = src[26];
-    dst[27] = src[27];
-    dst[28] = src[28];
-    dst[29] = src[29];
-    dst[30] = src[30];
-    dst[31] = src[31];
-    dst[32] = src[32];
-    dst[33] = src[33];
-    dst[34] = src[34];
-    dst[35] = src[35];
-    dst[36] = src[36];
-    dst[37] = src[37];
-    dst[38] = src[38];
-    dst[39] = src[39];
-    dst[40] = src[40];
-    dst[41] = src[41];
-    dst[42] = src[42];
-    dst[43] = *reinterpret_cast<unsigned int*>(&(radius *= radius));
+    dst[25] = w25;
+    dst[26] = w26;
+    dst[27] = w27;
+    dst[28] = w28;
+    dst[29] = w29;
+    dst[30] = w30;
+    dst[31] = w31;
+    dst[32] = w32;
+    dst[33] = w33;
+    dst[34] = w34;
+    dst[35] = w35;
+    dst[36] = w36;
+    dst[37] = w37;
+    dst[38] = w38;
+    dst[39] = w39;
+    dst[40] = w40;
+    dst[41] = w41;
+    dst[42] = w42;
+    reinterpret_cast<float*>(dst)[43] = radius * radius;
 }
 
 /*
@@ -507,16 +544,22 @@ void CLightPcs::GetFreeBumpLight(CLightPcs::TARGET)
 CLightPcs::CBumpLight* CLightPcs::AddBump(CLightPcs::CLight* srcLight, CLightPcs::TARGET target,
                                           CMemory::CStage* stage, int count)
 {
-    char* base = (char*)this + (int)target * 0x9c0;
-    char* slot = 0;
+    float threshold = FLOAT_8032fc10;
+    int base = (int)this + (int)target * 0x9c0;
+    int i = 0;
+    int remaining = 8;
+    int entry = base;
+    u32* slot = 0;
 
-    for (int i = 0; i < 8; i++) {
-        char* entry = base + i * 0x138 + 0x1c3c;
-        if (*(u8*)(entry + 0xb0) == 0) {
-            slot = entry;
+    do {
+        if (*(char*)(entry + 0x1cec) == '\0') {
+            slot = (u32*)(base + i * 0x138 + 0x1c3c);
             break;
         }
-    }
+        entry += 0x138;
+        i += 1;
+        remaining -= 1;
+    } while (remaining != 0);
 
     if (slot == 0) {
         if (System.m_execParam != 0) {
@@ -525,50 +568,97 @@ CLightPcs::CBumpLight* CLightPcs::AddBump(CLightPcs::CLight* srcLight, CLightPcs
         return 0;
     }
 
-    memcpy(slot, srcLight, 0xb0);
+    u32* src = (u32*)srcLight;
+    slot[0] = src[0];
+    slot[1] = src[1];
+    slot[2] = src[2];
+    slot[3] = src[3];
+    slot[4] = src[4];
+    slot[5] = src[5];
+    slot[6] = src[6];
+    slot[7] = src[7];
+    slot[8] = src[8];
+    slot[9] = src[9];
+    slot[10] = src[10];
+    slot[11] = src[11];
+    slot[12] = src[12];
+    slot[13] = src[13];
+    slot[14] = src[14];
+    slot[15] = src[15];
+    slot[16] = src[16];
+    slot[17] = src[17];
+    slot[18] = src[18];
+    *(u8*)(slot + 19) = *(u8*)(src + 19);
+    *(u8*)((char*)slot + 0x4d) = *(u8*)((char*)src + 0x4d);
+    *(u8*)((char*)slot + 0x4e) = *(u8*)((char*)src + 0x4e);
+    *(u8*)((char*)slot + 0x4f) = *(u8*)((char*)src + 0x4f);
+    slot[20] = src[20];
+    slot[21] = src[21];
+    slot[22] = src[22];
+    slot[23] = src[23];
+    slot[24] = src[24];
+    slot[25] = src[25];
+    slot[26] = src[26];
+    slot[27] = src[27];
+    slot[28] = src[28];
+    slot[29] = src[29];
+    slot[30] = src[30];
+    slot[31] = src[31];
+    slot[32] = src[32];
+    slot[33] = src[33];
+    slot[34] = src[34];
+    slot[35] = src[35];
+    slot[36] = src[36];
+    slot[37] = src[37];
+    slot[38] = src[38];
+    slot[39] = src[39];
+    slot[40] = src[40];
+    slot[41] = src[41];
+    slot[42] = src[42];
+    slot[43] = src[43];
 
-    float* fslot = (float*)slot;
-    if (fslot[8] >= fslot[7]) {
-        fslot[8] = fslot[7];
+    if (threshold <= reinterpret_cast<float*>(slot)[8]) {
+        slot[8] = slot[7];
     }
 
-    fslot[0x2b] = fslot[7] * fslot[7];
-    fslot[9] = fslot[7];
-    if (fslot[9] < FLOAT_8032fc14) {
-        fslot[9] = -fslot[9];
+    threshold = FLOAT_8032fc14;
+    reinterpret_cast<float*>(slot)[43] = reinterpret_cast<float*>(slot)[7] * reinterpret_cast<float*>(slot)[7];
+    slot[9] = slot[7];
+    if (reinterpret_cast<float*>(slot)[9] < threshold) {
+        reinterpret_cast<float*>(slot)[9] = -reinterpret_cast<float*>(slot)[9];
     }
-    fslot[9] = fslot[9] * FLOAT_8032fc18 * fslot[10];
+    reinterpret_cast<float*>(slot)[9] =
+        reinterpret_cast<float*>(slot)[9] * FLOAT_8032fc18 * reinterpret_cast<float*>(slot)[10];
 
-    slot[0x63] = 1;
-    slot[0x62] = 1;
-    slot[0x61] = 1;
-    slot[0x60] = 1;
+    *(u8*)((char*)slot + 99) = 1;
+    *(u8*)((char*)slot + 0x62) = 1;
+    *(u8*)((char*)slot + 0x61) = 1;
+    *(u8*)(slot + 24) = 1;
 
-    if (*(u32*)(slot + 0x50) == 0) {
-        slot[0x60] = 0;
+    if (slot[20] == 0) {
+        *(u8*)(slot + 24) = 0;
     }
-    if (*(u32*)(slot + 0x54) == 0) {
-        slot[0x61] = 0;
+    if (slot[21] == 0) {
+        *(u8*)((char*)slot + 0x61) = 0;
     }
-    if (*(u32*)(slot + 0x58) == 0) {
-        slot[0x62] = 0;
+    if (slot[22] == 0) {
+        *(u8*)((char*)slot + 0x62) = 0;
     }
 
-    slot[0xb2] = (char)target;
-    *(u32*)(slot + 0xb0) = 1;
-    slot[0xb3] = (char)count;
+    *(char*)((char*)slot + 0xb2) = (char)target;
+    *(u8*)(slot + 44) = 1;
+    *(char*)((char*)slot + 0xb3) = (char)count;
 
     int texSize = GXGetTexBufferSize(0x40, 0x40, 3, 0, 0);
-    *(u32*)(slot + 0xb4) = (u32)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-        &Memory, texSize * count, stage, s_p_light_cpp, 0x13b, 0);
+    slot[45] = (u32)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, texSize * count, stage, s_p_light_cpp, 0x13b, 0);
 
-    char* texObj = slot + 0xb8;
     int texOffset = 0;
-    for (int i = 0; i < count; i++) {
-        GXInitTexObj((GXTexObj*)texObj, (void*)(*(u32*)(slot + 0xb4) + texOffset), (u16)0x40, (u16)0x40, (GXTexFmt)3,
+    u32* texObj = slot;
+    for (i = 0; i < count; i++) {
+        GXInitTexObj((GXTexObj*)(texObj + 46), (void*)(slot[45] + texOffset), (u16)0x40, (u16)0x40, (GXTexFmt)3,
                      (GXTexWrapMode)0, (GXTexWrapMode)0, (u8)0);
         texOffset += texSize;
-        texObj += 0x20;
+        texObj += 8;
     }
 
     return (CLightPcs::CBumpLight*)slot;

@@ -1031,36 +1031,35 @@ void SetVoiceSwitch(RedTrackDATA* track, int voiceSwitch)
 void _AdsrStart(RedVoiceDATA* voice)
 {
     int* voiceData = (int*)voice;
-    int envState = 0;
-    u16 envFrames = 0;
-    u8 envTarget = ((u8*)voiceData)[0x58];
-    u8 startLevel = envTarget;
+    u32 prevLevel;
+    u32 nextLevel;
+    u32 stepFrames;
 
+    voiceData[0x17] = 0;
+    nextLevel = *(u8*)((u8*)voiceData + 0x58);
     do {
-        startLevel = envTarget;
-        envFrames = *(u16*)((u8*)voiceData + 0x50 + envState * 2);
-        envTarget = *(((u8*)voiceData + 0x59) + envState);
-        if (envFrames != 0) {
+        prevLevel = nextLevel;
+        stepFrames = *(u16*)((u8*)voiceData + 0x50 + voiceData[0x17] * 2);
+        nextLevel = *(u8*)((u8*)voiceData + 0x50 + voiceData[0x17] + 9);
+        if (stepFrames != 0) {
             break;
         }
-        envState += 1;
-    } while (envState < 3);
+        voiceData[0x17] += 1;
+    } while (voiceData[0x17] < 3);
 
-    voiceData[0x17] = envState;
-    voiceData[0x18] = envFrames;
-
-    if (envTarget != 0) {
-        envTarget = ((envTarget + 1) * 0x100 - 1) * 0x1000;
+    voiceData[0x18] = stepFrames;
+    if (nextLevel != 0) {
+        nextLevel = (((nextLevel + 1) * 0x100) - 1) * 0x1000;
     }
 
-    if (envFrames == 0) {
-        voiceData[0x2B] = envTarget;
+    if (stepFrames == 0) {
+        voiceData[0x2B] = nextLevel;
     } else {
-        if (startLevel != 0) {
-            startLevel = ((startLevel + 1) * 0x100 - 1) * 0x1000;
+        if (prevLevel != 0) {
+            prevLevel = (((prevLevel + 1) * 0x100) - 1) * 0x1000;
         }
-        voiceData[0x2B] = startLevel;
-        voiceData[0x19] = ((int)(envTarget | 0x800) - (int)startLevel) / (int)envFrames;
+        voiceData[0x2B] = prevLevel;
+        voiceData[0x19] = (int)((nextLevel | 0x800) - prevLevel) / (int)stepFrames;
     }
 }
 

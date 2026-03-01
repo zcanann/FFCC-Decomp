@@ -242,8 +242,8 @@ void CUtil::GetSplinePos(Vec& out, Vec p0, Vec p1, Vec p2, Vec p3, float t, floa
  */
 void CUtil::ConvI2FVector(Vec& out, S16Vec in, long shift)
 {
-    unsigned int scale = 1u << shift;
-    float fScale = (float)scale;
+    unsigned int scale = 1U << shift;
+    float fScale = (float)(double)scale;
 
     out.x = (float)in.x / fScale;
     out.y = (float)in.y / fScale;

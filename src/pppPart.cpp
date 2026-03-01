@@ -33,6 +33,7 @@ extern "C" float ppvScreenMatrix[4][4];
 extern "C" float FLOAT_8032ed60;
 extern "C" float FLOAT_8032ed8c;
 extern "C" double DOUBLE_8032fdf0;
+extern "C" double DOUBLE_8032fe00;
 extern "C" float FLOAT_8032fdf8;
 extern "C" unsigned int DAT_8032fdd8;
 extern "C" unsigned char DAT_8032ed84;
@@ -60,6 +61,7 @@ extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 extern "C" int PlaySe3D__6CSoundFiP3Vecffi(CSound*, int, Vec*, float, float, int);
+extern "C" void CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(void*, float (*)[4], void*);
 extern CPartMng PartMng;
 extern CLightPcs LightPcs;
 extern CMath Math;
@@ -1219,7 +1221,7 @@ static void InitOwnerFlagsAndScale(_pppMngSt* pppMngSt)
 
 		if (kScaleConstA == (double)pppMngSt->m_ownerScale) {
 			pppMngSt->m_useOwnerScaleSign = 1;
-		} else if (kScaleConstA == (double)pppMngSt->m_ownerScale) {
+		} else if (DOUBLE_8032fe00 == (double)pppMngSt->m_ownerScale) {
 			pppMngSt->m_useOwnerScaleSign = 0;
 		} else {
 			pppMngSt->m_useOwnerScaleSign = 1;
@@ -1231,8 +1233,12 @@ static void InitOwnerFlagsAndScale(_pppMngSt* pppMngSt)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 80055b80
+ * PAL Size: 2172b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppSetMatrix(_pppMngSt* pppMngSt)
 {
@@ -1262,7 +1268,7 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 
 	u8 mode = pppMngSt->m_matrixMode;
 
-	Mtx nodeMtx = {};
+	Mtx nodeMtx;
 	Vec tmpPos;
 	bool attached = false;
 
@@ -1276,16 +1282,8 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 		InitOwnerFlagsAndScale(pppMngSt);
 
 		u8* ownerBytes = (u8*)pppMngSt->m_owner;
-		int ownerData = *(int*)(ownerBytes + 0xF8);
-		CChara::CModel* model = 0;
-
-		if (ownerData != 0)
-		{
-			model = *(CChara::CModel**)(ownerData + 0x168);
-		}
-
-		// CalcSafeNodeWorldMatrix(model, nodeMtx, pppMngSt->m_bindNode);
-		// (call commented if symbol not wired up)
+		CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(
+			*(void**)(*(int*)(ownerBytes + 0xF8) + 0x168), nodeMtx, pppMngSt->m_bindNode);
 
 		nodeMtx[0][3] += pppMngStPtr->m_position.x;
 		nodeMtx[1][3] += pppMngStPtr->m_position.y;
@@ -1306,15 +1304,8 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 			InitOwnerFlagsAndScale(pppMngSt);
 
 			u8* ownerBytes = (u8*)pppMngSt->m_owner;
-			int ownerData = *(int*)(ownerBytes + 0xF8);
-			CChara::CModel* model = 0;
-
-			if (ownerData != 0)
-			{
-				model = *(CChara::CModel**)(ownerData + 0x168);
-			}
-
-			// CalcSafeNodeWorldMatrix(model, nodeMtx, pppMngSt->m_bindNode);
+			CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(
+				*(void**)(*(int*)(ownerBytes + 0xF8) + 0x168), nodeMtx, pppMngSt->m_bindNode);
 
 			nodeMtx[0][3] += pppMngStPtr->m_position.x;
 			nodeMtx[1][3] += pppMngStPtr->m_position.y;
@@ -1370,15 +1361,8 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 			InitOwnerFlagsAndScale(pppMngSt);
 
 			u8* ownerBytes = (u8*)pppMngSt->m_owner;
-			int ownerData = *(int*)(ownerBytes + 0xF8);
-			CChara::CModel* model = 0;
-
-			if (ownerData != 0)
-			{
-				model = *(CChara::CModel**)(ownerData + 0x168);
-			}
-
-			// CalcSafeNodeWorldMatrix(model, nodeMtx, pppMngSt->m_bindNode);
+			CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(
+				*(void**)(*(int*)(ownerBytes + 0xF8) + 0x168), nodeMtx, pppMngSt->m_bindNode);
 
 			PSMTXMultVecSR(nodeMtx, &pppMngStPtr->m_position, &tmpPos);
 
@@ -1398,15 +1382,8 @@ void pppSetMatrix(_pppMngSt* pppMngSt)
 			InitOwnerFlagsAndScale(pppMngSt);
 
 			u8* ownerBytes = (u8*)pppMngSt->m_owner;
-			int ownerData = *(int*)(ownerBytes + 0xF8);
-			CChara::CModel* model = 0;
-
-			if (ownerData != 0)
-			{
-				model = *(CChara::CModel**)(ownerData + 0x168);
-			}
-
-			// CalcSafeNodeWorldMatrix(model, nodeMtx, pppMngSt->m_bindNode);
+			CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(
+				*(void**)(*(int*)(ownerBytes + 0xF8) + 0x168), nodeMtx, pppMngSt->m_bindNode);
 
 			Vec col0;
 			Vec col1;

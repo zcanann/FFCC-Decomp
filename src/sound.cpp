@@ -738,88 +738,87 @@ void CSound::CheckDriver(int mode)
  */
 void CSound::Frame()
 {
-    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
-    unsigned char* se = reinterpret_cast<unsigned char*>(this) + 0x2C;
-
     loadWaveFrame();
-
-    for (u32 i = 0; i < 0x80; i++, se += 0x28) {
+    unsigned char* se = reinterpret_cast<unsigned char*>(this) + 0x2C;
+    u32 i = 0;
+    do {
         if (static_cast<signed char>(*se) < 0) {
-            int volumePan[3];
             int pan;
+            int volume[3];
 
-            calcVolumePan(reinterpret_cast<CSe3D*>(se), volumePan[0], pan);
+            calcVolumePan(reinterpret_cast<CSe3D*>(se), volume[0], pan);
 
             if (((*se >> 6) & 1) == 0) {
-                int& seId = *reinterpret_cast<int*>(se + 8);
-                if (SePlayState__9CRedSoundFi(redSound, seId) == 0) {
+                if (SePlayState__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), *reinterpret_cast<int*>(se + 8)) == 0) {
                     *se &= 0x7F;
                 } else {
-                    if (ReportSeLoop__9CRedSoundFi(redSound, seId) != 0 &&
-                        GetSeVolume__9CRedSoundFii(redSound, seId, 0) == 0 &&
-                        GetSeVolume__9CRedSoundFii(redSound, seId, 1) == 0) {
+                    int playing = ReportSeLoop__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), *reinterpret_cast<int*>(se + 8));
+                    if ((playing != 0) &&
+                        (GetSeVolume__9CRedSoundFii(reinterpret_cast<CRedSound*>(this), *reinterpret_cast<int*>(se + 8), 0) == 0) &&
+                        (GetSeVolume__9CRedSoundFii(reinterpret_cast<CRedSound*>(this), *reinterpret_cast<int*>(se + 8), 1) == 0)) {
                         if ((*reinterpret_cast<unsigned int*>(CFlat + 0x129C) & 0x400000) != 0) {
                             Printf__7CSystemFPce(&System, DAT_801db2b8, *reinterpret_cast<int*>(se + 0xC));
                         }
-                        SeStop__9CRedSoundFi(redSound, seId);
+                        SeStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), *reinterpret_cast<int*>(se + 8));
                         *se = (*se & 0xBF) | 0x40;
-                        continue;
+                        goto next;
                     }
 
                     if (static_cast<signed char>(se[2]) != pan) {
-                        if (seId < 0) {
+                        if (*reinterpret_cast<int*>(se + 8) < 0) {
                             Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
                         } else {
-                            SePan__9CRedSoundFiii(redSound, seId, pan, 0x1E);
+                            SePan__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), *reinterpret_cast<int*>(se + 8), pan, 0x1E);
                         }
                         se[2] = static_cast<unsigned char>(pan);
                     }
 
-                    if (static_cast<signed char>(se[1]) != volumePan[0]) {
-                        if (seId < 0) {
+                    if (static_cast<signed char>(se[1]) != volume[0]) {
+                        if (*reinterpret_cast<int*>(se + 8) < 0) {
                             Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
                         } else {
-                            SeVolume__9CRedSoundFiii(redSound, seId, volumePan[0], 0x1E);
+                            SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), *reinterpret_cast<int*>(se + 8), volume[0], 0x1E);
                         }
-                        se[1] = static_cast<unsigned char>(volumePan[0]);
+                        se[1] = static_cast<unsigned char>(volume[0]);
                     }
                 }
-            } else if (volumePan[0] != 0) {
+            } else if (volume[0] != 0) {
                 if ((*reinterpret_cast<unsigned int*>(CFlat + 0x129C) & 0x400000) != 0) {
                     Printf__7CSystemFPce(&System, DAT_801db29c, *reinterpret_cast<int*>(se + 0xC));
                 }
 
-                int soundId = *reinterpret_cast<int*>(se + 0xC);
-                int newSeId;
-                if (soundId < 0) {
+                int vol = volume[0];
+                int seNo = *reinterpret_cast<int*>(se + 0xC);
+                if (seNo < 0) {
                     Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
-                    newSeId = -1;
-                } else if (soundId < 4000) {
-                    int bank = soundId / 1000;
-                    newSeId = SePlay__9CRedSoundFiiiii(redSound, bank, soundId - bank * 1000, pan, 0, 0);
-                    SeVolume__9CRedSoundFiii(redSound, newSeId, volumePan[0], 0x1E);
+                    seNo = -1;
+                } else if (seNo < 4000) {
+                    int bank = seNo / 1000;
+                    seNo = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(this), bank, seNo - (bank * 1000), pan, 0, 0);
+                    SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), seNo, vol, 0x1E);
                 } else {
-                    newSeId = SePlay__9CRedSoundFiiiii(redSound, -1, soundId, pan, 0, 0);
-                    SeVolume__9CRedSoundFiii(redSound, newSeId, volumePan[0], 0x1E);
+                    seNo = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(this), -1, seNo, pan, 0, 0);
+                    SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), seNo, vol, 0x1E);
                 }
-
-                *reinterpret_cast<int*>(se + 8) = newSeId;
+                *reinterpret_cast<int*>(se + 8) = seNo;
                 *se &= 0xBF;
             }
         }
-    }
+next:
+        i++;
+        se += 0x28;
+    } while (i < 0x80);
 
-    int& currentMusicVolume = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x22B8);
-    const int targetMusicVolume = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x22BC);
-    if (currentMusicVolume != targetMusicVolume) {
-        if (currentMusicVolume < targetMusicVolume) {
-            currentMusicVolume++;
+    int currentMusicVolume = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x22B8);
+    if (currentMusicVolume != *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x22BC)) {
+        if (currentMusicVolume < *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x22BC)) {
+            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x22B8) = currentMusicVolume + 1;
         } else {
-            currentMusicVolume--;
+            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x22B8) = currentMusicVolume - 1;
         }
     }
 
-    MusicVolume__9CRedSoundFiii(redSound, -1, currentMusicVolume, 0);
+    MusicVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), -1, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x22B8), 0);
 }
 
 /*

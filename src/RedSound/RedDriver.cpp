@@ -895,12 +895,16 @@ void _DMACheckProcess()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801be0c4
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void _DmaCallback(unsigned long)
 {
-	// TODO
+    DAT_8032f468 = 0;
 }
 
 /*

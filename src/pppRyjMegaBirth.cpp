@@ -157,7 +157,9 @@ void calc(
 	u8* paramPayload;
 	u8* particlePayload;
 	u8 fadeOutFrames;
+	u8 fadeInFrames;
 	float particleAngle;
+	Vec velocityStep;
 
 	alpha = (u8)((u8*)vColor)[0xB];
 	paramPayload = (u8*)param;
@@ -236,12 +238,34 @@ void calc(
 		}
 	}
 
+	*(float*)(particlePayload + 0x5C) = *(float*)(particlePayload + 0x5C) + *(float*)(paramPayload + 0xB0);
+	PSVECScale((Vec*)(particlePayload + 0x10), &velocityStep, *(float*)(particlePayload + 0x58));
+	PSVECAdd(&velocityStep, (Vec*)particlePayload, (Vec*)particlePayload);
+	PSVECScale(&work->m_accelerationAxis, &velocityStep, *(float*)(particlePayload + 0x5C));
+	PSVECAdd((Vec*)particlePayload, &velocityStep, (Vec*)particlePayload);
+
+	if (*(s16*)(paramPayload + 0x8E) != 0)
+	{
+		*(s16*)(particlePayload + 0x22) = *(s16*)(particlePayload + 0x22) - 1;
+	}
+
 	fadeOutFrames = *(u8*)(particlePayload + 0x59);
 	*(u8*)(particlePayload + 0x58) = *(u8*)(particlePayload + 0x58) + 1;
 	if ((fadeOutFrames != 0) && (*(u8*)(particlePayload + 0x58) <= fadeOutFrames))
 	{
 		*(float*)(particlePayload + 0x5C) =
 			*(float*)(particlePayload + 0x5C) - ((float)alpha / (float)fadeOutFrames);
+	}
+
+	fadeInFrames = *(u8*)(particlePayload + 0x5A);
+	if ((fadeInFrames != 0) && (*(u16*)(particlePayload + 0x22) <= (u16)fadeInFrames))
+	{
+		u8 blendWindow = paramPayload[0x95];
+		if (blendWindow != 0)
+		{
+			*(float*)(particlePayload + 0x5C) =
+				*(float*)(particlePayload + 0x5C) + ((float)alpha / (float)blendWindow);
+		}
 	}
 }
 

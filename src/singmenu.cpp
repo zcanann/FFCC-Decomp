@@ -224,7 +224,6 @@ extern double DOUBLE_80332a30;
 extern double DOUBLE_80332a38;
 extern double DOUBLE_80332a40;
 extern "C" char s_DynamicMessStr[];
-extern "C" char DAT_80214a50[];
 
 static inline char* GetLanguageTableString(int index, char** englishTable, char** germanTable, char** italianTable,
                                            char** frenchTable, char** spanishTable);

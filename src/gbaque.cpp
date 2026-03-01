@@ -23,6 +23,7 @@ extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*
 extern "C" void __dla__FPv(void*);
 extern "C" void Printf__7CSystemFPce(CSystem*, char*, ...);
 extern "C" int memcmp(const void*, const void*, unsigned long);
+extern "C" void MakeAgbString__4CMesFPcPcii(char*, char*, int, int);
 extern "C" int IsOutOfShouki__12CCaravanWorkFv(void*);
 extern "C" int CanPlayerUseItem__12CCaravanWorkFv(void*);
 extern "C" int CanPlayerPutItem__12CCaravanWorkFv(void*);
@@ -1860,12 +1861,111 @@ void GbaQueue::MakeBuyData(int, char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800cb0d0
+ * PAL Size: 972b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::MakeSellData(int, char*)
+void GbaQueue::MakeSellData(int channel, char* outData)
 {
-	// TODO
+	char* itemNameScratch = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
+		0x400, Game.game.m_mainStage, s_gbaque_cpp, 0xDD5));
+	if (itemNameScratch == 0) {
+		if (System.m_execParam != 0) {
+			Printf__7CSystemFPce(&System, s_mem_alloc_error, s_gbaque_cpp, 0xDD7);
+		}
+		return;
+	}
+	memset(itemNameScratch, 0, 0x400);
+
+	char* agbStringScratch = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(
+		0x400, Game.game.m_mainStage, s_gbaque_cpp, 0xDDE));
+	if (agbStringScratch == 0) {
+		if (System.m_execParam != 0) {
+			Printf__7CSystemFPce(&System, s_mem_alloc_error, s_gbaque_cpp, 0xDE0);
+		}
+		__dla__FPv(itemNameScratch);
+		return;
+	}
+	memset(agbStringScratch, 0, 0x400);
+
+	const unsigned int scriptFood = Game.game.m_scriptFoodBase[channel];
+	const unsigned int flatBase = Game.game.unkCFlatData0[2];
+	int totalSize = 0;
+
+	for (int i = 0; i < 0x40; i++) {
+		const int itemId = *reinterpret_cast<short*>(scriptFood + i * 2 + 0xB6);
+		unsigned int sellInfo[2];
+		if ((itemId < 1) || (itemId > 0x9E)) {
+			sellInfo[0] = 0;
+			sellInfo[1] = 0;
+		} else {
+			const int itemBase = flatBase + itemId * 0x48;
+			sellInfo[0] = static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(itemBase + 4));
+			sellInfo[1] = static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(itemBase + 6)) |
+				(static_cast<unsigned int>(static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(itemBase + 8))) << 16);
+		}
+		memcpy(outData, sellInfo, 8);
+		outData += 8;
+		totalSize += 8;
+	}
+
+	const double userRate = static_cast<double>(static_cast<float>(
+		static_cast<float>(*reinterpret_cast<short*>(scriptFood + 0xBE2)) / 100.0f * 0.3f));
+	for (int i = 0; i < 0x40; i++) {
+		const int itemId = *reinterpret_cast<short*>(scriptFood + i * 2 + 0xB6);
+		unsigned int packedPrice = 0;
+		if (itemId > 0) {
+			unsigned int itemPrice = static_cast<unsigned short>(
+				*reinterpret_cast<unsigned short*>(flatBase + itemId * 0x48 + 0x20));
+			itemPrice = static_cast<unsigned int>(static_cast<double>(static_cast<float>(itemPrice)) * userRate);
+			if (static_cast<int>(itemPrice) < 1) {
+				itemPrice = 1;
+			}
+			packedPrice =
+				(itemPrice << 24) |
+				((itemPrice >> 8) & 0xFF) << 16 |
+				((itemPrice >> 16) & 0xFF) << 8 |
+				(itemPrice >> 24);
+		}
+
+		memcpy(outData, &packedPrice, 4);
+		outData += 4;
+		totalSize += 4;
+	}
+
+	GbaFlatDataView* flatData = reinterpret_cast<GbaFlatDataView*>(&Game.game.m_cFlatDataArr[1]);
+	for (int i = 0; i < 0x40; i++) {
+		memset(itemNameScratch, 0, 0x400);
+		memset(agbStringScratch, 0, 0x400);
+
+		const int itemId = *reinterpret_cast<short*>(scriptFood + i * 2 + 0xB6);
+		if (itemId < 1) {
+			outData[0] = 0;
+			outData += 1;
+			totalSize += 1;
+			continue;
+		}
+
+		strcpy(itemNameScratch, flatData->m_tabl[6].m_strings[itemId]);
+		MakeAgbString__4CMesFPcPcii(agbStringScratch, itemNameScratch, 0, 0);
+		const int strSize = static_cast<int>(strlen(agbStringScratch) + 1);
+		memcpy(outData, agbStringScratch, strSize);
+		outData += strSize;
+		totalSize += strSize;
+	}
+
+	__dla__FPv(agbStringScratch);
+	__dla__FPv(itemNameScratch);
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	reinterpret_cast<unsigned char*>(this)[0x2C98] =
+		static_cast<unsigned char>(reinterpret_cast<unsigned char*>(this)[0x2C98] | (1 << channel));
+	OSSignalSemaphore(accessSemaphores + channel);
+
+	Joybus.SetLetterSize(channel, totalSize);
 }
 
 /*
@@ -1880,62 +1980,113 @@ void GbaQueue::MakeSmithData(int, char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800cabb8
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::GetSellFlg(int)
+unsigned int GbaQueue::GetSellFlg(int channel)
 {
-	// TODO
+	unsigned int flag;
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	flag = static_cast<unsigned int>(static_cast<unsigned char>(reinterpret_cast<char*>(this)[0x2D57])) & (1U << channel);
+	OSSignalSemaphore(accessSemaphores + channel);
+	return static_cast<unsigned int>((-static_cast<int>(flag) | static_cast<int>(flag)) >> 31);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800cab3c
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::ClrSellFlg(int)
+void GbaQueue::ClrSellFlg(int channel)
 {
-	// TODO
+	OSWaitSemaphore(accessSemaphores + channel);
+	reinterpret_cast<char*>(this)[0x2D57] =
+		static_cast<char>(static_cast<unsigned char>(reinterpret_cast<char*>(this)[0x2D57]) & ~(1 << channel));
+	OSSignalSemaphore(accessSemaphores + channel);
+	Joybus.SetLetterSize(channel, 0);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800caac4
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::GetBuyFlg(int)
+unsigned int GbaQueue::GetBuyFlg(int channel)
 {
-	// TODO
+	unsigned int flag;
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	flag = static_cast<unsigned int>(static_cast<unsigned char>(reinterpret_cast<char*>(this)[0x2D55])) & (1U << channel);
+	OSSignalSemaphore(accessSemaphores + channel);
+	return static_cast<unsigned int>((-static_cast<int>(flag) | static_cast<int>(flag)) >> 31);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800caa48
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::ClrBuyFlg(int)
+void GbaQueue::ClrBuyFlg(int channel)
 {
-	// TODO
+	OSWaitSemaphore(accessSemaphores + channel);
+	reinterpret_cast<char*>(this)[0x2D55] =
+		static_cast<char>(static_cast<unsigned char>(reinterpret_cast<char*>(this)[0x2D55]) & ~(1 << channel));
+	OSSignalSemaphore(accessSemaphores + channel);
+	Joybus.SetLetterSize(channel, 0);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ca9d0
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::GetMkSmithFlg(int)
+unsigned int GbaQueue::GetMkSmithFlg(int channel)
 {
-	// TODO
+	unsigned int flag;
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	flag = static_cast<unsigned int>(static_cast<unsigned char>(reinterpret_cast<char*>(this)[0x2D56])) & (1U << channel);
+	OSSignalSemaphore(accessSemaphores + channel);
+	return static_cast<unsigned int>((-static_cast<int>(flag) | static_cast<int>(flag)) >> 31);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ca954
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::ClrMkSmithFlg(int)
+void GbaQueue::ClrMkSmithFlg(int channel)
 {
-	// TODO
+	OSWaitSemaphore(accessSemaphores + channel);
+	reinterpret_cast<char*>(this)[0x2D56] =
+		static_cast<char>(static_cast<unsigned char>(reinterpret_cast<char*>(this)[0x2D56]) & ~(1 << channel));
+	OSSignalSemaphore(accessSemaphores + channel);
+	Joybus.SetLetterSize(channel, 0);
 }
 
 /*

@@ -4,6 +4,7 @@
 #include "ffcc/fontman.h"
 #include "ffcc/graphic.h"
 #include "ffcc/memory.h"
+#include "ffcc/astar.h"
 #include "ffcc/p_chara.h"
 #include "ffcc/pad.h"
 #include "ffcc/p_game.h"
@@ -112,6 +113,8 @@ extern "C" char* lbl_80214910[];
 extern "C" char* lbl_80214960[];
 extern "C" char* lbl_802149B0[];
 extern "C" char* lbl_80214A00[];
+extern "C" unsigned char DAT_80214a50[];
+extern "C" char s_DynamicMessStr[];
 
 extern "C" unsigned int CmdOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int CmdCtrl__8CMenuPcsFv(CMenuPcs*);
@@ -167,6 +170,8 @@ extern float FLOAT_80332940;
 extern float FLOAT_80332948;
 extern float FLOAT_8033294c;
 extern float FLOAT_80332950;
+extern float FLOAT_80332954;
+extern float FLOAT_80332960;
 extern float FLOAT_80332970;
 extern float FLOAT_803329a4;
 extern float FLOAT_803329a8;
@@ -217,6 +222,31 @@ extern double DOUBLE_80332988;
 extern double DOUBLE_80332a30;
 extern double DOUBLE_80332a38;
 extern double DOUBLE_80332a40;
+
+static inline const char* GetSingWinMessage(int staticText, const char* dynamicText, int useDynamic)
+{
+    if (useDynamic != 0) {
+        return dynamicText;
+    }
+
+    u8 languageId = Game.game.m_gameWork.m_languageId;
+    if (languageId == 3) {
+        return lbl_802143A0[staticText];
+    }
+    if (languageId < 3) {
+        if ((languageId == 0) || (languageId == 1)) {
+            return lbl_802141E0[staticText];
+        }
+        return lbl_802142C0[staticText];
+    }
+    if (languageId == 5) {
+        return lbl_80214560[staticText];
+    }
+    if (languageId < 5) {
+        return lbl_80214480[staticText];
+    }
+    return lbl_802141E0[staticText];
+}
 
 /*
  * --INFO--
@@ -1515,22 +1545,131 @@ void CMenuPcs::DrawSingWin(short mode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801466ec
+ * PAL Size: 1008b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::DrawSingWinMess(int, int, int)
+void CMenuPcs::DrawSingWinMess(int messageNo, int activeMask, int useDynamic)
 {
-	// TODO
+    CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<u8*>(this) + 0xF8);
+    SetMargin__5CFontFf(FLOAT_80332934, font);
+    SetShadow__5CFontFi(font, 1);
+    SetScale__5CFontFf(FLOAT_8032ea78, font);
+    DrawInit__5CFontFv(font);
+
+    _GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
+    SetColor__5CFontF8_GXColor(font, &color);
+
+    int lineCount = AStar.m_bestPath.m_pathLength;
+    if (useDynamic == 0) {
+        lineCount = *reinterpret_cast<int*>(DAT_80214a50 + messageNo * 0x14);
+    }
+
+    int maxWidth = 0;
+    char* dynamicText = s_DynamicMessStr;
+    unsigned char* staticInfo = DAT_80214a50 + messageNo * 0x14;
+    for (int i = 0; i < lineCount; i++) {
+        short textId = *reinterpret_cast<short*>(staticInfo + 4);
+        int textWidth = GetWidth__5CFontFPc(font, GetSingWinMessage(textId, dynamicText, useDynamic));
+        if (maxWidth < textWidth) {
+            maxWidth = textWidth;
+        }
+        staticInfo += 2;
+        dynamicText += 0x80;
+    }
+
+    s16* win = *reinterpret_cast<s16**>(reinterpret_cast<u8*>(this) + 0x848);
+    int lineHeight = static_cast<int>(FLOAT_80332960 * FLOAT_8032ea78);
+    if (FLOAT_8033294c < FLOAT_80332960 * FLOAT_8032ea78 - static_cast<float>(lineHeight)) {
+        lineHeight++;
+    }
+
+    float x = static_cast<float>(win[0]) + static_cast<float>(win[2] - maxWidth) * static_cast<float>(DOUBLE_80332968);
+    float y = static_cast<float>(win[1] + 0x20);
+    int lineStep = lineHeight + 3;
+
+    dynamicText = s_DynamicMessStr;
+    staticInfo = DAT_80214a50 + messageNo * 0x14;
+    for (int i = 0; i < lineCount; i++) {
+        SetTlut__5CFontFi(font, ((activeMask & (1 << i)) != 0) + 8);
+
+        short textId = *reinterpret_cast<short*>(staticInfo + 4);
+        const char* text = GetSingWinMessage(textId, dynamicText, useDynamic);
+        if (strlen(text) != 0) {
+            char lineBuffer[128];
+            strcpy(lineBuffer, text);
+            SetPosX__5CFontFf(x, font);
+            SetPosY__5CFontFf(y - FLOAT_80332954, font);
+            Draw__5CFontFPc(font, lineBuffer);
+        }
+
+        staticInfo += 2;
+        dynamicText += 0x80;
+        y += static_cast<float>(lineStep);
+    }
+
+    DrawInit__8CMenuPcsFv(this);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801464cc
+ * PAL Size: 544b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::GetSingWinSize(int, short*, short*, int)
+void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, int useDynamic)
 {
-	// TODO
+    CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<u8*>(this) + 0xF8);
+    SetMargin__5CFontFf(FLOAT_80332934, font);
+    SetShadow__5CFontFi(font, 1);
+    SetScale__5CFontFf(FLOAT_8032ea78, font);
+
+    int lineCount = AStar.m_bestPath.m_pathLength;
+    if (useDynamic == 0) {
+        lineCount = *reinterpret_cast<int*>(DAT_80214a50 + messageNo * 0x14);
+    }
+
+    int maxWidth = 0;
+    char* dynamicText = s_DynamicMessStr;
+    unsigned char* staticInfo = DAT_80214a50 + messageNo * 0x14;
+    for (int i = 0; i < lineCount; i++) {
+        short textId = *reinterpret_cast<short*>(staticInfo + 4);
+        int textWidth = GetWidth__5CFontFPc(font, GetSingWinMessage(textId, dynamicText, useDynamic));
+        if (maxWidth < textWidth) {
+            maxWidth = textWidth;
+        }
+        staticInfo += 2;
+        dynamicText += 0x80;
+    }
+
+    if (useDynamic == 0) {
+        maxWidth -= 0x18;
+    } else {
+        maxWidth += 0x16;
+    }
+
+    int lineHeight = static_cast<int>(FLOAT_80332960 * FLOAT_8032ea78);
+    if (FLOAT_8033294c < FLOAT_80332960 * FLOAT_8032ea78 - static_cast<float>(lineHeight)) {
+        lineHeight++;
+    }
+
+    int widthLines = maxWidth / lineHeight;
+    if (maxWidth != widthLines * lineHeight) {
+        widthLines++;
+    }
+
+    if (useDynamic == 0) {
+        widthLines += 3;
+    }
+
+    *outWidth = static_cast<short>(widthLines * lineHeight + 0x40);
+    *outHeight = static_cast<short>(lineCount * (lineHeight + 2) + 0x40);
 }
 
 /*

@@ -1880,62 +1880,113 @@ void GbaQueue::MakeSmithData(int, char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800cabb8
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::GetSellFlg(int)
+unsigned int GbaQueue::GetSellFlg(int channel)
 {
-	// TODO
+	unsigned int flag;
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	flag = static_cast<unsigned int>(static_cast<unsigned char>(reinterpret_cast<char*>(this)[0x2D57])) & (1U << channel);
+	OSSignalSemaphore(accessSemaphores + channel);
+	return static_cast<unsigned int>((-static_cast<int>(flag) | static_cast<int>(flag)) >> 31);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800cab3c
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::ClrSellFlg(int)
+void GbaQueue::ClrSellFlg(int channel)
 {
-	// TODO
+	OSWaitSemaphore(accessSemaphores + channel);
+	reinterpret_cast<char*>(this)[0x2D57] =
+		static_cast<char>(static_cast<unsigned char>(reinterpret_cast<char*>(this)[0x2D57]) & ~(1 << channel));
+	OSSignalSemaphore(accessSemaphores + channel);
+	Joybus.SetLetterSize(channel, 0);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800caac4
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::GetBuyFlg(int)
+unsigned int GbaQueue::GetBuyFlg(int channel)
 {
-	// TODO
+	unsigned int flag;
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	flag = static_cast<unsigned int>(static_cast<unsigned char>(reinterpret_cast<char*>(this)[0x2D55])) & (1U << channel);
+	OSSignalSemaphore(accessSemaphores + channel);
+	return static_cast<unsigned int>((-static_cast<int>(flag) | static_cast<int>(flag)) >> 31);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800caa48
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::ClrBuyFlg(int)
+void GbaQueue::ClrBuyFlg(int channel)
 {
-	// TODO
+	OSWaitSemaphore(accessSemaphores + channel);
+	reinterpret_cast<char*>(this)[0x2D55] =
+		static_cast<char>(static_cast<unsigned char>(reinterpret_cast<char*>(this)[0x2D55]) & ~(1 << channel));
+	OSSignalSemaphore(accessSemaphores + channel);
+	Joybus.SetLetterSize(channel, 0);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ca9d0
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::GetMkSmithFlg(int)
+unsigned int GbaQueue::GetMkSmithFlg(int channel)
 {
-	// TODO
+	unsigned int flag;
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	flag = static_cast<unsigned int>(static_cast<unsigned char>(reinterpret_cast<char*>(this)[0x2D56])) & (1U << channel);
+	OSSignalSemaphore(accessSemaphores + channel);
+	return static_cast<unsigned int>((-static_cast<int>(flag) | static_cast<int>(flag)) >> 31);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ca954
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::ClrMkSmithFlg(int)
+void GbaQueue::ClrMkSmithFlg(int channel)
 {
-	// TODO
+	OSWaitSemaphore(accessSemaphores + channel);
+	reinterpret_cast<char*>(this)[0x2D56] =
+		static_cast<char>(static_cast<unsigned char>(reinterpret_cast<char*>(this)[0x2D56]) & ~(1 << channel));
+	OSSignalSemaphore(accessSemaphores + channel);
+	Joybus.SetLetterSize(channel, 0);
 }
 
 /*

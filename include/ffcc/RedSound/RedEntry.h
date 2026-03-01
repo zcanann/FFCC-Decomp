@@ -18,7 +18,7 @@ public:
 	void WaveHistoryDelete(int);
 	void WaveHistoryChoice(RedHistoryBANK*);
 	int SearchWaveSequence(int);
-	void SearchUseWave(int);
+	int SearchUseWave(int);
 	void WaveDelete(RedHistoryBANK*);
 	int WaveOldClear(int, int);
 	int WaveHeadAdd(int, RedWaveHeadWD*, int);

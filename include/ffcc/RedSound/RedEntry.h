@@ -42,7 +42,7 @@ public:
 	void SetSeSepData(RedSeSepHEAD*);
 	void ClearSeSepData(int);
 	void ClearSeSepDataMG(int, int, int, int);
-	void SearchSeSepBank(int);
+	int* SearchSeSepBank(int);
 	void ReentrySeSepData(int);
 	void SeSepHistoryManager(int, int);
 	void DisplaySePlayInfo();

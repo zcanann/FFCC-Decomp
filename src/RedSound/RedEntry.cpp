@@ -19,6 +19,11 @@ extern char DAT_80333d4d;
 extern char DAT_80333d4f;
 extern char s__s_sNOT_HAVE_A_MEMORY_FREE_AREA___801e7991[];
 extern char s__s_sWave_Header_was_broken__s_801e7972[];
+extern char s__s_____SE_Play_Information______801e7b71[];
+extern char s__s_Track___Name___Wave_801e7b92[];
+extern char s__s__2d____3_3u__3_3u___WAVE_4_4u_801e7bb2[];
+extern char s__s__2d___se_6_6u_sep___WAVE_4_4u_801e7bdc[];
+extern char s__s__2d_____801e7c01[];
 extern char s__s_____AMemory_Information______801e79ed[];
 extern char s__s_Bank___Name___Start___Size___F_801e7a0e[];
 extern char s__s__2d___WAVE_4_4d___0x_8_8X___0_801e7a53[];
@@ -824,12 +829,24 @@ void CRedEntry::ClearSeSepDataMG(int, int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c20d8
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedEntry::SearchSeSepBank(int)
+int* CRedEntry::SearchSeSepBank(int seNo)
 {
-	// TODO
+	int* seSepBank = (int*)*(int*)((int)this + 4);
+	do {
+		if (seSepBank[0] == seNo) {
+			return seSepBank;
+		}
+		seSepBank += 4;
+	} while ((unsigned int)seSepBank < (unsigned int)*(int*)((int)this + 4) + 0x1000);
+
+	return 0;
 }
 
 /*
@@ -854,12 +871,56 @@ void CRedEntry::SeSepHistoryManager(int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c22b4
+ * PAL Size: 612b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedEntry::DisplaySePlayInfo()
 {
-	// TODO
+	if (DAT_8032f408 != 0) {
+		OSReport(&DAT_80333d4d);
+		fflush(&DAT_8021d1a8);
+		OSReport(s__s_____SE_Play_Information______801e7b71, &DAT_801e7905);
+		fflush(&DAT_8021d1a8);
+		OSReport(s__s_Track___Name___Wave_801e7b92, &DAT_801e7905);
+		fflush(&DAT_8021d1a8);
+
+		int* trackHead = (int*)((int)DAT_8032f3f0 + 0xdbc);
+		int* track = (int*)*trackHead;
+		do {
+			int trackIndex = ((int)track - *trackHead) / 0x154 + (((int)track - *trackHead) >> 0x1F);
+			if (track[0] == 0) {
+				OSReport(s__s__2d_____801e7c01, &DAT_801e7905, (trackIndex - (trackIndex >> 0x1F)) + 0x20);
+				fflush(&DAT_8021d1a8);
+			} else if ((track[0x3D] & 0x80000000) == 0) {
+				int* seSepBank = SearchSeSepBank(track[0x3D]);
+				OSReport(s__s__2d___se_6_6u_sep___WAVE_4_4u_801e7bdc, &DAT_801e7905,
+				         (trackIndex - (trackIndex >> 0x1F)) + 0x20, track[0x3D],
+				         ((int)*(unsigned char*)(seSepBank[2] + 0x12) << 8) | *(unsigned char*)(seSepBank[2] + 0x11));
+				fflush(&DAT_8021d1a8);
+			} else {
+				unsigned int seDataNo = (unsigned int)track[0x3D];
+				int songNo = (int)(seDataNo & 0x7FFFFFFF) >> 9;
+				int seqBase = ((int*)&DAT_8032e12c)[songNo] + 0x10;
+				seqBase += *(short*)(((int*)&DAT_8032e12c)[songNo] + 10) * 4;
+				seqBase += (*(unsigned int*)(seqBase + (seDataNo & 0x1FF) * 4) & 0x7FFFFFFF);
+
+				OSReport(s__s__2d____3_3u__3_3u___WAVE_4_4u_801e7bb2, &DAT_801e7905,
+				         (trackIndex - (trackIndex >> 0x1F)) + 0x20, songNo, seDataNo & 0x1FF,
+				         ((int)*(unsigned char*)(seqBase + 2) << 8) | *(unsigned char*)(seqBase + 1));
+				fflush(&DAT_8021d1a8);
+			}
+			track += 0x55;
+		} while (track < (int*)(*trackHead + 0x2A80));
+
+		OSReport(&DAT_80333d4f, &DAT_801e7905);
+		fflush(&DAT_8021d1a8);
+		OSReport(&DAT_80333d4d);
+		fflush(&DAT_8021d1a8);
+	}
 }
 
 /*

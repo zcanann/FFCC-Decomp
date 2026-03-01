@@ -30,6 +30,7 @@ extern float FLOAT_80332f30;
 extern double DOUBLE_80332f20;
 extern double DOUBLE_80332f40;
 extern double DOUBLE_80332f48;
+extern double DOUBLE_80332f50;
 extern double DOUBLE_80332f58;
 
 struct TmpArtiTableEntry {
@@ -363,6 +364,7 @@ unsigned int CMenuPcs::TmpArtiClose()
 {
 	float fVar1;
 	double dVar2;
+	double dVar3;
 	short *psVar4;
 	int iVar5;
 	unsigned int uVar6;
@@ -382,11 +384,13 @@ unsigned int CMenuPcs::TmpArtiClose()
 			if (*(int *)(psVar4 + 0x12) <= iVar7) {
 				if (iVar7 < *(int *)(psVar4 + 0x12) + *(int *)(psVar4 + 0x14)) {
 					*(int *)(psVar4 + 0x10) = *(int *)(psVar4 + 0x10) + 1;
+					dVar3 = DOUBLE_80332f50;
 					*(float *)(psVar4 + 8) =
-					    (float)-(DOUBLE_80332f48 / ((double)(unsigned int)*(unsigned int *)(psVar4 + 0x14) - dVar2) *
-					            ((double)(unsigned int)*(unsigned int *)(psVar4 + 0x10) - dVar2) -
-					            DOUBLE_80332f48);
-					if (*(float *)(psVar4 + 8) < FLOAT_80332f2c) {
+					    (float)-((DOUBLE_80332f48 /
+					              ((double)(int)*(unsigned int *)(psVar4 + 0x14) - dVar2)) *
+					             ((double)(int)*(unsigned int *)(psVar4 + 0x10) - dVar2) -
+					             DOUBLE_80332f48);
+					if ((double)*(float *)(psVar4 + 8) < dVar3) {
 						*(float *)(psVar4 + 8) = FLOAT_80332f2c;
 					}
 				}

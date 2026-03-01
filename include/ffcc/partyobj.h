@@ -79,11 +79,11 @@ public:
     void statPickup();
 
     void bonus(int, int, CGPrgObj*);
-    void canPlayerUseItem();
+    int canPlayerUseItem();
     void canPlayerGoMenu();
     void useItem(int);
 
-    void canPlayerPutItem();
+    int canPlayerPutItem();
     void putItem(int);
     void putGil(int);
 

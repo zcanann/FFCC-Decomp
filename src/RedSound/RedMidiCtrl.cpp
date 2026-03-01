@@ -1653,12 +1653,21 @@ void __MidiCtrl_VibrateOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C91C4
+ * PAL Size: 36b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_VibrateDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_VibrateDepthDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+	int* trackData = (int*)track;
+	u8* command = (u8*)trackData[0];
+
+	trackData[0] = (int)(command + 1);
+	trackData[0x20] = (unsigned int)(*command) << 0xc;
+	*(short*)((int)trackData + 0x8e) = 0;
 }
 
 /*
@@ -1758,12 +1767,20 @@ void __MidiCtrl_VibrateType(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C93B0
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_VibrateDelay(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_VibrateDelay(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+	int* trackData = (int*)track;
+
+	*(unsigned short*)(trackData + 0x24) = (unsigned short)*(u8*)trackData[0];
+	*(unsigned short*)((int)trackData + 0x92) = (unsigned short)*(u8*)(trackData[0] + 1);
+	trackData[0] += 2;
 }
 
 /*

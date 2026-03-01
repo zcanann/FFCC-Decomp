@@ -1,6 +1,7 @@
 #include "ffcc/cflat_runtime2.h"
 #include "ffcc/astar.h"
 #include "ffcc/baseobj.h"
+#include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/monobj.h"
 #include "ffcc/partMng.h"
@@ -81,6 +82,7 @@ extern "C" void DrawInit__5CFontFv(CFont*);
 extern "C" void SetTlut__5CFontFi(CFont*, int);
 extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
 extern "C" void SetPosZ__5CFontFf(float, CFont*);
+extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int&, int&, int&, int&, int);
 
 extern unsigned char Pad[];
 extern unsigned char MenuPcs[];
@@ -96,6 +98,7 @@ extern unsigned char m_objMon[];
 extern int DAT_8032ed98;
 extern unsigned char DAT_8032ed9c;
 extern char DAT_801d8fc4[];
+extern CTextureMan TextureMan;
 extern CPartMng PartMng;
 extern CTextureMan TextureMan;
 extern "C" void* __vt__Q212CFlatRuntime7CObject[];
@@ -1942,7 +1945,9 @@ void CFlatRuntime2::drawLayer(
 	GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX3x4);
 
 	GXSetNumTexGens(1);
-	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+	GXSetTexCoordGen2(
+		GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+
 	GXClearVtxDesc();
 	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
 	GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);

@@ -13,6 +13,7 @@
 #include "ffcc/util.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include <math.h>
 #include <string.h>
 
 typedef signed short s16;
@@ -63,6 +64,7 @@ extern "C" void SetTlut__5CFontFi(CFont*, int);
 extern "C" void SetPosX__5CFontFf(float, CFont*);
 extern "C" void SetPosY__5CFontFf(float, CFont*);
 extern "C" void Draw__5CFontFPc(CFont*, const char*);
+extern "C" void DrawHeart__8CMesMenuFffff(void*, float, float, float, float);
 extern "C" void createSingleMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void SingMenuInit__8CMenuPcsFv(CMenuPcs*);
 extern "C" void CreateShopMenu__8CMenuPcsFv(CMenuPcs*);
@@ -154,7 +156,12 @@ extern "C" void MLstDraw__8CMenuPcsFv(CMenuPcs*);
 extern "C" void CalcHeart__8CMesMenuFv(void*);
 
 extern float FLOAT_8033292c;
+extern float FLOAT_80332930;
 extern float FLOAT_80332928;
+extern float FLOAT_80332924;
+extern float FLOAT_80332920;
+extern float FLOAT_8033291c;
+extern float FLOAT_80332918;
 extern float FLOAT_80332934;
 extern float FLOAT_80332940;
 extern float FLOAT_80332948;
@@ -1812,22 +1819,63 @@ void CMenuPcs::CalcSingLife()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80145738
+ * PAL Size: 420b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawSingLife()
 {
-	// TODO
+    unsigned int scriptFood = Game.game.m_scriptFoodBase[0];
+    int lifeTimer = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x874);
+    if (lifeTimer < 0) {
+        return;
+    }
+
+    float y = FLOAT_8033291c;
+    if (lifeTimer < 10) {
+        int phase = lifeTimer;
+        if (phase < 0) {
+            phase = 0;
+        } else if (phase > 10) {
+            phase = 10;
+        }
+        y = FLOAT_80332928 * static_cast<float>(sin(FLOAT_80332920 * FLOAT_80332924 * static_cast<float>(phase))) + FLOAT_8033291c;
+    } else if (lifeTimer > 0x27) {
+        int phase = 10 - (lifeTimer - 0x28);
+        if (phase < 0) {
+            phase = 0;
+        } else if (phase > 10) {
+            phase = 10;
+        }
+        y = FLOAT_80332928 * static_cast<float>(sin(FLOAT_80332920 * FLOAT_80332924 * static_cast<float>(phase))) + FLOAT_8033291c;
+    }
+
+    int halfHearts = static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(scriptFood + 0x1A) >> 1);
+    float x = FLOAT_80332918 + static_cast<float>(((8 - halfHearts) * 0x18) / 2);
+    DrawHeart__8CMesMenuFffff(*reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0x268), x, y - FLOAT_80332930, FLOAT_80332934,
+                              FLOAT_80332934);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80145710
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::SingLifeInit(int)
+void CMenuPcs::SingLifeInit(int timer)
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+    if ((*reinterpret_cast<int*>(self + 0x874) > 0) && (timer == 0)) {
+        *reinterpret_cast<int*>(self + 0x874) = 10;
+        return;
+    }
+    *reinterpret_cast<int*>(self + 0x874) = timer;
 }
 
 /*

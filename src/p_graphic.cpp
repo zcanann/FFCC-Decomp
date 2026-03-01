@@ -39,6 +39,7 @@ extern char* PTR_DAT_801e9e64[];
 extern char DAT_8032fbf4[];
 extern char DAT_8032fbf8[];
 extern u32 DAT_8032fb74;
+extern void* DAT_80238030;
 extern char s__c_c_c_c_c_c_c_c_c_c_801d7bf8[];
 extern int DAT_802381a0;
 extern "C" float FLOAT_8032fb78;
@@ -996,7 +997,53 @@ void CGraphicPcs::drawScreenFade()
 
         if (slot == 1) {
             const int mode = *(int*)(slotBase + 0x18);
-            if (mode == 2) {
+            if (mode == 4) {
+                GXSetNumTexGens(1);
+                GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+                _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+                _GXSetTevColorIn(GX_TEVSTAGE0, (_GXTevColorArg)0xF, (_GXTevColorArg)8, (_GXTevColorArg)10, (_GXTevColorArg)0xF);
+                _GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_DIVIDE_2, GX_TRUE, GX_TEVPREV);
+                _GXSetTevAlphaIn(GX_TEVSTAGE0, (_GXTevAlphaArg)7, (_GXTevAlphaArg)4, (_GXTevAlphaArg)5, (_GXTevAlphaArg)7);
+                _GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+
+                for (u32 tile = 0; tile < 4; tile++) {
+                    _GXTexObj backTexObj;
+                    const int x = (tile & 1) ? 0x140 : 0;
+                    const int y = (tile & 2) ? 0xE0 : 0;
+                    const float t0 = ((tile & 2) ? 1.0f : 0.0f) * 0.5f;
+                    const float t1 = t0 + 0.5f;
+
+                    Graphic.GetBackBufferRect2(DAT_80238030, &backTexObj, x, y, 0x140, 0xE0, 0, GX_LINEAR, GX_TF_RGBA8, 0);
+                    GXLoadTexObj(&backTexObj, GX_TEXMAP0);
+
+                    _GXColor topColor;
+                    topColor.r = (u8)(t0 * ((float)baseColor2.r - (float)baseColor.r) + (float)baseColor.r);
+                    topColor.g = (u8)(t0 * ((float)baseColor2.g - (float)baseColor.g) + (float)baseColor.g);
+                    topColor.b = (u8)(t0 * ((float)baseColor2.b - (float)baseColor.b) + (float)baseColor.b);
+                    topColor.a = 0xFF;
+
+                    _GXColor bottomColor;
+                    bottomColor.r = (u8)(t1 * ((float)baseColor2.r - (float)baseColor.r) + (float)baseColor.r);
+                    bottomColor.g = (u8)(t1 * ((float)baseColor2.g - (float)baseColor.g) + (float)baseColor.g);
+                    bottomColor.b = (u8)(t1 * ((float)baseColor2.b - (float)baseColor.b) + (float)baseColor.b);
+                    bottomColor.a = 0xFF;
+
+                    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+                    GXPosition3f32((float)x, (float)y, 0.0f);
+                    GXColor1u32(*(u32*)&topColor);
+                    GXTexCoord2u16(0, 0);
+                    GXPosition3f32((float)(x + 0x140), (float)y, 0.0f);
+                    GXColor1u32(*(u32*)&topColor);
+                    GXTexCoord2u16(2, 0);
+                    GXPosition3f32((float)(x + 0x140), (float)(y + 0xE0), 0.0f);
+                    GXColor1u32(*(u32*)&bottomColor);
+                    GXTexCoord2u16(2, 2);
+                    GXPosition3f32((float)x, (float)(y + 0xE0), 0.0f);
+                    GXColor1u32(*(u32*)&bottomColor);
+                    GXTexCoord2u16(0, 2);
+                }
+                continue;
+            } else if (mode == 2) {
                 _GXSetBlendMode((GXBlendMode)1, (GXBlendFactor)4, (GXBlendFactor)1, (GXLogicOp)5);
             } else if (mode == 3) {
                 _GXSetBlendMode((GXBlendMode)3, (GXBlendFactor)4, (GXBlendFactor)1, (GXLogicOp)5);

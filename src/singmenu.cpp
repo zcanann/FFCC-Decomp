@@ -1,6 +1,7 @@
 #include "ffcc/singmenu.h"
 #include "ffcc/chara.h"
 #include "ffcc/file.h"
+#include "ffcc/fontman.h"
 #include "ffcc/graphic.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_chara.h"
@@ -22,6 +23,9 @@ extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float, float, float, float, float, float, float, float, float);
 extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawFilter__8CMenuPcsFUcUcUcUc(CMenuPcs*, u8, u8, u8, u8);
+extern "C" void SetProjection__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" void SetLight__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" void RestoreProjection__8CMenuPcsFv(CMenuPcs*);
 extern "C" void Draw__9CShopMenuFv(void*);
 extern "C" void Calc__9CShopMenuFv(void*);
 extern "C" void SingleDrawCtrl__8CMenuPcsFv(CMenuPcs*);
@@ -47,6 +51,18 @@ extern "C" void ReadASync__5CFileFPQ25CFile7CHandle(void*, void*);
 extern "C" int IsCompleted__5CFileFPQ25CFile7CHandle(void*, void*);
 extern "C" void Close__5CFileFPQ25CFile7CHandle(void*, void*);
 extern "C" int sprintf(char*, const char*, ...);
+extern "C" void SetMargin__5CFontFf(float, CFont*);
+extern "C" void SetShadow__5CFontFi(CFont*, int);
+extern "C" void SetScale__5CFontFf(float, CFont*);
+extern "C" void SetScaleX__5CFontFf(float, CFont*);
+extern "C" void SetScaleY__5CFontFf(float, CFont*);
+extern "C" void DrawInit__5CFontFv(CFont*);
+extern "C" void SetColor__5CFontF8_GXColor(CFont*, _GXColor*);
+extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
+extern "C" void SetTlut__5CFontFi(CFont*, int);
+extern "C" void SetPosX__5CFontFf(float, CFont*);
+extern "C" void SetPosY__5CFontFf(float, CFont*);
+extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" void createSingleMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void SingMenuInit__8CMenuPcsFv(CMenuPcs*);
 extern "C" void CreateShopMenu__8CMenuPcsFv(CMenuPcs*);
@@ -174,6 +190,7 @@ extern float FLOAT_803329ec;
 extern float FLOAT_803329f0;
 extern float FLOAT_803329f4;
 extern float FLOAT_803329f8;
+extern float FLOAT_80332994;
 extern float FLOAT_803329fc;
 extern float FLOAT_80332a00;
 extern float FLOAT_80332a04;
@@ -602,12 +619,163 @@ void CMenuPcs::DrawSingleBase(float)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80148b98
+ * PAL Size: 1988b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::DrawSingleStat(float)
+void CMenuPcs::DrawSingleStat(float alpha)
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+    u8 languageId = Game.game.m_gameWork.m_languageId;
+
+    DrawInit__8CMenuPcsFv(this);
+    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+
+    _GXColor color = {0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_80332940 * alpha)};
+    GXSetChanMatColor(GX_COLOR0A0, color);
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x26);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 0, FLOAT_803329d4, 0.0f, FLOAT_803329d8, FLOAT_803329d0,
+                                     0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 4, FLOAT_803329d4, FLOAT_803329dc, FLOAT_803329d8, FLOAT_803329d0,
+                                     0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x29);
+    for (float y = FLOAT_803329d0; y < FLOAT_803329dc; ) {
+        float sliceHeight = 32.0f;
+        if ((FLOAT_803329dc - y) < sliceHeight) {
+            sliceHeight = FLOAT_803329dc - y;
+        }
+        DrawRect__8CMenuPcsFUlfffffffff(this, 0, FLOAT_803329d4, y, FLOAT_803329a4, sliceHeight,
+                                         0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+        y += sliceHeight;
+    }
+
+    color.a = static_cast<u8>(FLOAT_80332940 * static_cast<float>(DOUBLE_80332968) * alpha);
+    GXSetChanMatColor(GX_COLOR0A0, color);
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x22);
+
+    unsigned short charaNo = *reinterpret_cast<unsigned short*>(Game.game.m_scriptFoodBase[0] + 0x3E0);
+    float iconStep = FLOAT_803329e8;
+    float texU = static_cast<float>(charaNo & 1) * iconStep;
+    float texV = static_cast<float>(charaNo >> 1) * iconStep;
+    DrawRect__8CMenuPcsFUlfffffffff(this, 0, FLOAT_803329d4 - FLOAT_8033292c, FLOAT_803329ac, iconStep, iconStep,
+                                     texU, texV, 1.0f, 1.0f, 0.0f);
+
+    color.a = static_cast<u8>(FLOAT_80332940 * alpha);
+    GXSetChanMatColor(GX_COLOR0A0, color);
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x2A);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 0, FLOAT_803329d4 + FLOAT_803329ec, FLOAT_803329f0, FLOAT_803329f4, FLOAT_803329f0,
+                                     0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+
+    DrawInit__8CMenuPcsFv(this);
+    SetProjection__8CMenuPcsFi(this, 0);
+    SetLight__8CMenuPcsFi(this, 1);
+    *reinterpret_cast<float*>(*reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x774) + 0x168) + 0x9C) = alpha;
+    (*reinterpret_cast<CCharaPcs::CHandle**>(self + 0x774))->Draw(5);
+    RestoreProjection__8CMenuPcsFv(this);
+
+    DrawInit__8CMenuPcsFv(this);
+    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+    color.a = static_cast<u8>(FLOAT_80332940 * alpha);
+    GXSetChanMatColor(GX_COLOR0A0, color);
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x2A);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 0, FLOAT_803329d4 + FLOAT_803329ec, FLOAT_80332994, FLOAT_803329f4, FLOAT_803329f8,
+                                     0.0f, FLOAT_803329f0, 1.0f, 1.0f, 0.0f);
+
+    DrawInit__8CMenuPcsFv(this);
+    CFont* font = *reinterpret_cast<CFont**>(self + 0xF8);
+    SetMargin__5CFontFf(0.0f, font);
+    SetShadow__5CFontFi(font, 1);
+    SetScale__5CFontFf(FLOAT_803329b8, font);
+
+    _GXColor fontColor = {0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_80332940 * alpha)};
+    SetColor__5CFontF8_GXColor(font, &fontColor);
+    DrawInit__5CFontFv(font);
+
+    char* charaName = reinterpret_cast<char*>(Game.game.m_scriptFoodBase[0] + 0x3CA);
+    float titleWidth = static_cast<float>(GetWidth__5CFontFPc(font, charaName));
+    float titleX = FLOAT_803329d4 + (FLOAT_803329d8 - titleWidth) * static_cast<float>(DOUBLE_80332968);
+    SetTlut__5CFontFi(font, 0x12);
+    SetPosX__5CFontFf(titleX, font);
+    SetPosY__5CFontFf(FLOAT_803329fc, font);
+    Draw__5CFontFPc(font, charaName);
+
+    SetTlut__5CFontFi(font, 0x17);
+    SetPosX__5CFontFf(titleX, font);
+    SetPosY__5CFontFf(FLOAT_80332a00, font);
+    Draw__5CFontFPc(font, charaName);
+
+    SetTlut__5CFontFi(font, 0x15);
+    float y = FLOAT_80332a04;
+    for (int i = 0; i < 4; i++) {
+        SetPosX__5CFontFf(FLOAT_803329d4, font);
+        SetPosY__5CFontFf(y - 5.0f, font);
+
+        char* label;
+        if (languageId == 3) {
+            label = lbl_802143A0[i + 5];
+        } else if (languageId < 3) {
+            if ((languageId == 0) || (languageId == 1)) {
+                label = lbl_802141E0[i + 5];
+            } else {
+                label = lbl_802142C0[i + 5];
+            }
+        } else if (languageId == 5) {
+            label = lbl_80214560[i + 5];
+        } else if (languageId > 4) {
+            label = lbl_802141E0[i + 5];
+        } else {
+            label = lbl_80214480[i + 5];
+        }
+
+        if ((languageId == 2) && (i == 3)) {
+            SetScaleX__5CFontFf(FLOAT_80332a08, font);
+            SetScaleY__5CFontFf(FLOAT_803329b8, font);
+        } else {
+            SetScaleX__5CFontFf(FLOAT_803329b8, font);
+        }
+        Draw__5CFontFPc(font, label);
+
+        font->renderFlags = (font->renderFlags & 0xEF) | 0x10;
+        if (languageId == 2) {
+            SetMargin__5CFontFf(FLOAT_80332a0c, font);
+            SetScaleX__5CFontFf(FLOAT_80332a08, font);
+            SetScaleY__5CFontFf(FLOAT_803329b8, font);
+        } else {
+            SetMargin__5CFontFf(FLOAT_80332a10, font);
+            SetScale__5CFontFf(FLOAT_803329b8, font);
+        }
+
+        unsigned short stat;
+        if (i == 0) {
+            stat = *reinterpret_cast<unsigned short*>(Game.game.m_scriptFoodBase[0] + 0x1E);
+        } else if (i == 1) {
+            stat = *reinterpret_cast<unsigned short*>(Game.game.m_scriptFoodBase[0] + 0x22);
+        } else if (i == 2) {
+            stat = *reinterpret_cast<unsigned short*>(Game.game.m_scriptFoodBase[0] + 0x20);
+        } else {
+            stat = *reinterpret_cast<unsigned short*>(Game.game.m_scriptFoodBase[0] + 0x3DE);
+        }
+
+        char valueText[36];
+        sprintf(valueText, "%d", stat);
+        float valueW = static_cast<float>(GetWidth__5CFontFPc(font, valueText));
+        SetPosX__5CFontFf(FLOAT_80332a18 - valueW, font);
+        Draw__5CFontFPc(font, valueText);
+
+        font->renderFlags &= 0xEF;
+        SetMargin__5CFontFf(FLOAT_80332934, font);
+        y += FLOAT_80332a1c;
+    }
+
+    font->renderFlags &= 0xEF;
+    SetMargin__5CFontFf(FLOAT_80332934, font);
+    DrawInit__8CMenuPcsFv(this);
 }
 
 /*

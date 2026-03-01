@@ -9,6 +9,26 @@
 extern CMath Math;
 extern "C" int Rand__5CMathFUl(CMath*, unsigned long);
 extern "C" void setAttackAfter__8CGMonObjFi(CGMonObj*, int);
+extern "C" void reqAnim__8CGPrgObjFiii(void*, int, int, int);
+extern "C" void putParticle__8CGPrgObjFiiP8CGObjectfi(void*, int, int, void*, float, int);
+extern "C" void playSe3D__8CGPrgObjFiiiiP3Vec(void*, int, int, int, int, Vec*);
+extern "C" int isLoopAnim__8CGPrgObjFv(void*);
+extern "C" void changeStat__8CGPrgObjFiii(void*, int, int, int);
+extern "C" void Move__8CGObjectFP3Vecfiiiii(void*, Vec*, float, int, int, int, int, int);
+extern "C" void moveVectorHRot__8CGObjectFfffi(void*, float, float, float, int);
+extern float FLOAT_80331dd0;
+extern float FLOAT_80331cf8;
+extern float FLOAT_80331dcc;
+extern float FLOAT_80331dc8;
+extern float FLOAT_80331d18;
+extern float FLOAT_80331dd4;
+extern float FLOAT_80331d24;
+extern float FLOAT_80331d2c;
+extern float FLOAT_80331dd8;
+extern float FLOAT_80331d60;
+extern float FLOAT_80331db8;
+extern double DOUBLE_80331dc0;
+extern char SoundBuffer[];
 
 /*
  * --INFO--
@@ -51,46 +71,120 @@ void CGMonObj::calcBranchFuncGiantCrab(int)
  */
 void CGMonObj::frameStatFuncGiantCrab()
 {
-	// Minimal implementation - framework for Giant Crab boss frame state logic
-	// Based on Ghidra decomp addresses: PAL 0x801329e8, size 1168b
-	
-	// Read state from memory layout (matching original offsets)
-	int currentState = *(int *)((char *)this + 0x520);
-	int frameCount = *(int *)((char *)this + 0x528);
-	
-	// Main state: 100 (attack/movement state)
-	if (currentState == 100) {
-		if (frameCount == 0) {
-			// State initialization - would set up animation and particles
-		}
-		
-		if (frameCount > 0x20) {
-			// Active attack phase with sound effects
-			if (frameCount == 0x21) {
-				// Sound effect 0x4e30 would play here
+	u8* self = (u8*)this;
+	int state = *(int*)(self + 0x520);
+
+	if (state == 100) {
+		if (*(int*)(self + 0x528) == 0) {
+			int soundStep = *(int*)(SoundBuffer + 0x4f0);
+			if (soundStep == 2) {
+				*(float*)(SoundBuffer + 0x4f4) = FLOAT_80331dd0;
+				*(float*)(SoundBuffer + 0x4f8) = FLOAT_80331cf8;
+				*(float*)(SoundBuffer + 0x4fc) = FLOAT_80331dcc;
+			} else if (soundStep < 2) {
+				if (soundStep == 0) {
+					*(float*)(SoundBuffer + 0x4f4) = FLOAT_80331dc8;
+					*(float*)(SoundBuffer + 0x4f8) = FLOAT_80331cf8;
+					*(float*)(SoundBuffer + 0x4fc) = FLOAT_80331dcc;
+				} else if (soundStep > -1) {
+					*(float*)(SoundBuffer + 0x4f4) = FLOAT_80331dc8;
+					*(float*)(SoundBuffer + 0x4f8) = FLOAT_80331cf8;
+					*(float*)(SoundBuffer + 0x4fc) = FLOAT_80331dc8;
+				}
+			} else if (soundStep < 4) {
+				*(float*)(SoundBuffer + 0x4f4) = FLOAT_80331dd0;
+				*(float*)(SoundBuffer + 0x4f8) = FLOAT_80331cf8;
+				*(float*)(SoundBuffer + 0x4fc) = FLOAT_80331dc8;
 			}
-			else if (frameCount == 0x32) {
-				// Sound effect 0x4e35 would play here  
+
+			*(int*)(SoundBuffer + 0x4f0) = (soundStep + 1) & 3;
+			reqAnim__8CGPrgObjFiii(self, 0xc, 0, 0);
+
+			int pdtIndex = -1;
+			u8* charaModelHandle = *(u8**)(self + 0xf8);
+			if (charaModelHandle != 0) {
+				u8* pdtLoadRef = *(u8**)(charaModelHandle + 0x178);
+				if (pdtLoadRef != 0) {
+					pdtIndex = *(int*)(pdtLoadRef + 0x14);
+				}
+			}
+			putParticle__8CGPrgObjFiiP8CGObjectfi(self, (pdtIndex << 8) | 6, 0, self, FLOAT_80331d18, 0);
+			putParticle__8CGPrgObjFiiP8CGObjectfi(self, (pdtIndex << 8) | 7, 0, self, FLOAT_80331d18, 0);
+		}
+
+		int frame = *(int*)(self + 0x528);
+		if (frame > 0x20) {
+			if (frame == 0x21) {
+				playSe3D__8CGPrgObjFiiiiP3Vec(self, 0x4e30, 0x32, 0x1c2, 0, 0);
+			} else if (frame == 0x32) {
+				playSe3D__8CGPrgObjFiiiiP3Vec(self, 0x4e35, 0x32, 0x1c2, 0, 0);
+			}
+
+			*(u32*)(self + 0x1c0) &= 0xfff7fffd;
+			float moveScale = PSVECDistance((Vec*)(SoundBuffer + 0x4f4), (Vec*)(self + 0x15c)) * FLOAT_80331dd4;
+			Vec moveDir = { 0.0f, 0.0f, 0.0f };
+			Move__8CGObjectFP3Vecfiiiii(self, &moveDir, moveScale, 0x10, 1, 0, 0, 0);
+
+			int targetIdx = *(int*)(self + 0x6c4);
+			if (targetIdx > -1) {
+				u8* target = (u8*)Game.game.m_partyObjArr[targetIdx];
+				if (target != 0) {
+					*(float*)(self + 0x1b4) = (float)atan2(
+					    (double)(*(float*)(target + 0x15c) - *(float*)(self + 0x15c)),
+					    (double)(*(float*)(target + 0x164) - *(float*)(self + 0x164)));
+				}
 			}
 		}
-		
-		// Check for animation loop completion (would call isLoopAnim)
-		// If complete, would call changeStat(0, 0, 0) to return to idle
-	}
-	// Attack preparation states: 101-104
-	else if ((99 < currentState) && (currentState < 0x69)) {
-		if (frameCount == 0) {
-			// Initialize attack animation based on current state
-			// Different animations for different attack types
+
+		if (isLoopAnim__8CGPrgObjFv(self) != 0) {
+			changeStat__8CGPrgObjFiii(self, 0, 0, 0);
+			*(u32*)(self + 0x1c0) |= 0x80002;
 		}
-		
-		if (frameCount == 0x19) {
-			// Attack completion - would call changeStat(0, 0, 0)
+	} else if (state > 99 && state < 0x69) {
+		if (*(int*)(self + 0x528) == 0) {
+			float turnOffset = FLOAT_80331d2c;
+			int animId = 1;
+			if (state == 0x67) {
+				turnOffset = FLOAT_80331d24;
+				animId = 0x12;
+			} else if (state >= 0x68) {
+				turnOffset = FLOAT_80331dd8;
+				animId = 0x13;
+			}
+
+			reqAnim__8CGPrgObjFiii(self, animId, 0, 0);
+			u16 scriptScale = *(u16*)(*(u8**)(self + 0x7c) + 0xd4);
+			float moveMagnitude =
+			    *(float*)(self + 0x690) *
+			    (FLOAT_80331d60 * (float)((double)scriptScale - DOUBLE_80331dc0) + FLOAT_80331db8);
+			moveVectorHRot__8CGObjectFfffi(self, *(float*)(self + 0x1b4) + turnOffset, FLOAT_80331cf8, moveMagnitude, 0x1e);
+
+			int targetIdx = *(int*)(self + 0x6c4);
+			if (targetIdx > -1) {
+				u8* target = (u8*)Game.game.m_partyObjArr[targetIdx];
+				if (target != 0) {
+					*(float*)(self + 0x1b4) = (float)atan2(
+					    (double)(*(float*)(target + 0x15c) - *(float*)(self + 0x15c)),
+					    (double)(*(float*)(target + 0x164) - *(float*)(self + 0x164)));
+				}
+			}
+
+			u32 action = (u32) * (void**)(self + 0x68);
+			if (action == 0x63) {
+				playSe3D__8CGPrgObjFiiiiP3Vec(self, 0x8cab, 0x32, 0x1c2, 0, 0);
+			} else if (action < 99) {
+				if (action == 0x5b) {
+					playSe3D__8CGPrgObjFiiiiP3Vec(self, 0x4e2a, 0x32, 0x1c2, 0, 0);
+				}
+			} else if (action == 0x6b) {
+				playSe3D__8CGPrgObjFiiiiP3Vec(self, 0xfdf3, 0x32, 0x1c2, 0, 0);
+			}
+		}
+
+		if (*(int*)(self + 0x528) == 0x19) {
+			changeStat__8CGPrgObjFiii(self, 0, 0, 0);
 		}
 	}
-	
-	// This is a foundational implementation that provides the correct structure
-	// and state handling logic based on the original Ghidra decompilation
 }
 
 /*

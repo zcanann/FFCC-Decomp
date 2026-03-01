@@ -557,23 +557,23 @@ static void* soft_allocate_from_var_pools(__mem_pool_obj* pool_obj, unsigned lon
 
 static void* allocate_from_fixed_pools(__mem_pool_obj* pool_obj, unsigned long size) {
     const unsigned long* pool_size_ptr;
-    unsigned long available[4];
-    unsigned long i;
-    unsigned long pool_index;
-    unsigned long client_size;
-    unsigned long entry_size;
-    unsigned long max_count;
-    unsigned long count;
-    unsigned long available_size;
     FixStart* fix_start;
     FixBlock* block;
     FixBlock* head_block;
     FixSubBlock* sub;
     FixSubBlock* result_sub;
+    unsigned long pool_index;
+    unsigned long entry_size;
+    unsigned long client_size;
+    unsigned long max_count;
+    unsigned long count;
+    unsigned long available_size;
+    unsigned long available[4];
+    unsigned long i;
     void* mem;
 
     pool_index = 0;
-    for (pool_size_ptr = fix_pool_sizes; *pool_size_ptr < size; ++pool_size_ptr) {
+    for (pool_size_ptr = fix_pool_sizes; size > *pool_size_ptr; ++pool_size_ptr) {
         ++pool_index;
     }
 

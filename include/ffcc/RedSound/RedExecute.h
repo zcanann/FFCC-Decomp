@@ -45,7 +45,7 @@ void _MusicTrackDataExecute(RedTrackDATA*, int);
 void _MidiTrackExecute(RedSoundCONTROL*, RedKeyOnDATA*, int);
 void _MusicMidiNoteExecute(RedSoundCONTROL*, RedKeyOnDATA*, int);
 void _MusicNoteExecute();
-void _MusicMidiNoteSkipExecute(RedSoundCONTROL*, RedKeyOnDATA*, int);
+int _MusicMidiNoteSkipExecute(RedSoundCONTROL*, RedKeyOnDATA*, int);
 void _SkipMusicEntry();
 void MusicSkipFunction();
 

@@ -381,11 +381,11 @@ void CGraphic::SetStdPixelFmt()
  */
 void CGraphic::SetViewport()
 {
-    void* renderMode = PtrAt(this, 0x71E0);
-    u16 width = U16At(renderMode, 4);
-    u16 height = U16At(renderMode, 6);
+    register void* renderMode = PtrAt(this, 0x71E0);
+    register u16 width = U16At(renderMode, 4);
+    register u16 height = U16At(renderMode, 6);
 
-    GXSetViewport(0.0f, 0.0f, (f32)width, (f32)height, 0.0f, 1.0f);
+    GXSetViewport(FLOAT_8032f6c0, FLOAT_8032f6c0, (f32)width, (f32)height, FLOAT_8032f6c0, FLOAT_8032f6c4);
     GXSetScissor(0, 0, width, height);
 }
 

@@ -3,6 +3,7 @@
 #include "ffcc/file.h"
 #include "ffcc/fontman.h"
 #include "ffcc/graphic.h"
+#include "ffcc/astar.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_chara.h"
 #include "ffcc/pad.h"
@@ -160,6 +161,8 @@ extern float FLOAT_80332940;
 extern float FLOAT_80332948;
 extern float FLOAT_8033294c;
 extern float FLOAT_80332950;
+extern float FLOAT_80332954;
+extern float FLOAT_80332960;
 extern float FLOAT_80332970;
 extern float FLOAT_803329a4;
 extern float FLOAT_803329a8;
@@ -209,6 +212,11 @@ extern double DOUBLE_80332988;
 extern double DOUBLE_80332a30;
 extern double DOUBLE_80332a38;
 extern double DOUBLE_80332a40;
+extern "C" char s_DynamicMessStr[];
+extern "C" char DAT_80214a50[];
+
+static inline char* GetLanguageTableString(int index, char** englishTable, char** germanTable, char** italianTable,
+                                           char** frenchTable, char** spanishTable);
 
 /*
  * --INFO--
@@ -1507,12 +1515,84 @@ void CMenuPcs::DrawSingWin(short mode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801466ec
+ * PAL Size: 1008b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::DrawSingWinMess(int, int, int)
+void CMenuPcs::DrawSingWinMess(int messageSet, int activeMask, int dynamicMode)
 {
-	// TODO
+    CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<u8*>(this) + 0xF8);
+    SetMargin__5CFontFf(FLOAT_80332934, font);
+    SetShadow__5CFontFi(font, 1);
+    SetScale__5CFontFf(FLOAT_8032ea78, font);
+    DrawInit__5CFontFv(font);
+
+    _GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
+    SetColor__5CFontF8_GXColor(font, &color);
+
+    int messageCount = AStar.m_bestPath.m_pathLength;
+    if (dynamicMode == 0) {
+        messageCount = *reinterpret_cast<int*>(DAT_80214a50 + messageSet * 0x14);
+    }
+
+    int maxWidth = 0;
+    char* dynamicText = s_DynamicMessStr;
+    u8* messageInfo = reinterpret_cast<u8*>(DAT_80214a50) + messageSet * 0x14;
+    for (int i = 0; i < messageCount; i++) {
+        char* text = dynamicText;
+        if (dynamicMode == 0) {
+            s16 index = *reinterpret_cast<s16*>(messageInfo + 4);
+            text = GetLanguageTableString(index, lbl_802141E0, lbl_802142C0, lbl_802143A0, lbl_80214480, lbl_80214560);
+        }
+
+        int width = GetWidth__5CFontFPc(font, text);
+        if (maxWidth < width) {
+            maxWidth = width;
+        }
+
+        messageInfo += 2;
+        dynamicText += 0x80;
+    }
+
+    s16* win = *reinterpret_cast<s16**>(reinterpret_cast<u8*>(this) + 0x848);
+    float lineHeightF = FLOAT_80332960 * FLOAT_8032ea78;
+    int lineHeight = static_cast<int>(lineHeightF);
+    if (FLOAT_8033294c < lineHeightF - static_cast<float>(lineHeight)) {
+        lineHeight++;
+    }
+    lineHeight += 3;
+
+    float x = static_cast<float>(win[0]) + (static_cast<float>(win[2] - maxWidth) * static_cast<float>(DOUBLE_80332968));
+    float y = static_cast<float>(win[1] + 0x20);
+
+    dynamicText = s_DynamicMessStr;
+    messageInfo = reinterpret_cast<u8*>(DAT_80214a50) + messageSet * 0x14;
+    for (int i = 0; i < messageCount; i++) {
+        SetTlut__5CFontFi(font, ((activeMask & (1 << i)) != 0) + 8);
+
+        char* text = dynamicText;
+        if (dynamicMode == 0) {
+            s16 index = *reinterpret_cast<s16*>(messageInfo + 4);
+            text = GetLanguageTableString(index, lbl_802141E0, lbl_802142C0, lbl_802143A0, lbl_80214480, lbl_80214560);
+        }
+
+        if (strlen(text) != 0) {
+            char drawText[128];
+            strcpy(drawText, text);
+            SetPosX__5CFontFf(x, font);
+            SetPosY__5CFontFf(y - FLOAT_80332954, font);
+            Draw__5CFontFPc(font, drawText);
+        }
+
+        messageInfo += 2;
+        dynamicText += 0x80;
+        y += static_cast<float>(lineHeight);
+    }
+
+    DrawInit__8CMenuPcsFv(this);
 }
 
 /*

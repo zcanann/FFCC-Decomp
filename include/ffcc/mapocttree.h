@@ -50,8 +50,8 @@ public:
 	void ClearFlag(unsigned long);
 	int CheckHitCylinder_r(COctNode*);
 	int CheckHitCylinder(CMapCylinder*, Vec*, unsigned long);
-	int CheckHitCylinderNear_r(COctNode*);
-	int CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned long);
+	void CheckHitCylinderNear_r(COctNode*);
+	void CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned long);
 	void SetOctTreeMapObj(int);
 };
 

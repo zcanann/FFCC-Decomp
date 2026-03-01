@@ -31,6 +31,8 @@ extern int DAT_8032f400;
 extern s16 DAT_8021ddce[];
 extern s16 DAT_8021dfce[];
 extern s16 DAT_8021de4e;
+extern u32 DAT_8021d7f0[];
+extern int DAT_8021d820[];
 extern int lbl_8021EA10[];
 
 struct RedReverbDATA {
@@ -60,13 +62,38 @@ u8 GetRandomData()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C2FFC
+ * PAL Size: 256b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-int PitchCompute(int, int, int, int)
+int PitchCompute(int param_1, int param_2, int param_3, int param_4)
 {
-	// TODO
-	return 0;
+    u32 value;
+    u32 param4;
+    int result;
+    u32 pitch;
+
+    result = 0;
+    for (pitch = (param_1 >> 12) + param_2 + (param_3 >> 16); (int)pitch < 0; pitch += 0xC00) {
+        result--;
+    }
+
+    value = (pitch >> 8) & 0x7F;
+    result = (int)((DAT_8021d7f0[value % 12] >> (10 - (result + (int)(value / 12)))) * DAT_8021d820[pitch & 0xFF]) >> 12;
+
+    param4 = (u32)param_4;
+    if (param4 != 0) {
+        if ((int)param4 < 1) {
+            result = (int)(result * (param4 & 0xFF)) >> 8;
+        } else {
+            result = result + ((int)(result * (param4 + 1)) >> 7);
+        }
+    }
+
+    return result;
 }
 
 /*

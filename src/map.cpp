@@ -74,10 +74,15 @@ extern float FLOAT_8032f9a0;
 extern float FLOAT_8032f9a4;
 extern float FLOAT_8032f9a8;
 extern float FLOAT_8032f9ac;
+extern float FLOAT_8032f988;
+extern float FLOAT_8032f98c;
 extern float FLOAT_8032f9bc;
 extern char DAT_801ead4c[];
+extern char DAT_801d7318[];
+extern char DAT_801d7350[];
 extern char DAT_801d7384[];
 extern char DAT_801d73c4[];
+extern char DAT_8032f984[];
 extern CLightPcs LightPcs;
 extern CMath Math;
 extern unsigned char DAT_8032ecb9;
@@ -2875,22 +2880,98 @@ void CMapMng::SetIdGrpColor(int mapIdGrpIndex, int channelIndex, _GXColor color)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002fb4c
+ * PAL Size: 360b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapMng::SetMeshCameraSemiTransRange(unsigned short, float, float, float, float, float)
+void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, float farRange, float minAlpha,
+                                          float maxAlpha, float fadeRange)
 {
-	// TODO
+    int mapObjCount = *reinterpret_cast<short*>(Ptr(this, 0xC));
+    bool found = false;
+    unsigned char* mapObj = reinterpret_cast<unsigned char*>(this);
+
+    for (int i = 0; i < mapObjCount; i++) {
+        if (*reinterpret_cast<unsigned short*>(mapObj + 0x982) == id) {
+            *reinterpret_cast<float*>(mapObj + 0x998) = nearRange;
+            *reinterpret_cast<float*>(mapObj + 0x99C) = farRange;
+            *reinterpret_cast<float*>(mapObj + 0x9A8) = fadeRange;
+            *reinterpret_cast<float*>(mapObj + 0x9A0) = minAlpha;
+            *reinterpret_cast<float*>(mapObj + 0x9A4) = maxAlpha;
+            if (*reinterpret_cast<void**>(mapObj + 0x960) != 0 && *reinterpret_cast<signed char*>(mapObj + 0x973) != -1) {
+                *reinterpret_cast<float*>(mapObj + 0x9A0) = FLOAT_8032f988;
+                *reinterpret_cast<float*>(mapObj + 0x9A4) = FLOAT_8032f98c;
+                *reinterpret_cast<unsigned char*>(mapObj + 0x969) = 2;
+                *reinterpret_cast<unsigned char*>(mapObj + 0x97A) = 1;
+            }
+            *reinterpret_cast<short*>(mapObj + 0x97E) = 0x4000;
+            found = true;
+            *reinterpret_cast<short*>(mapObj + 0x97C) = 0x4000;
+            *reinterpret_cast<short*>(mapObj + 0x980) = 0;
+        }
+        mapObj += 0xF0;
+    }
+
+    if (!found) {
+        if (System.m_execParam != 0) {
+            System.Printf(DAT_801ead4c);
+        }
+        if (System.m_execParam != 0) {
+            System.Printf(DAT_801d7350, id);
+        }
+        if (System.m_execParam != 0) {
+            System.Printf(DAT_801ead4c);
+        }
+        if (System.m_execParam != 0) {
+            System.Printf(DAT_8032f984);
+        }
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002fa2c
+ * PAL Size: 288b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMapMng::SetMeshCameraSemiTransAlpha(unsigned short, int, int)
+void CMapMng::SetMeshCameraSemiTransAlpha(unsigned short id, int alpha, int frameCount)
 {
-	// TODO
+    int mapObjCount = *reinterpret_cast<short*>(Ptr(this, 0xC));
+    bool found = false;
+    unsigned char* mapObj = reinterpret_cast<unsigned char*>(this);
+
+    for (int i = 0; i < mapObjCount; i++) {
+        if (*reinterpret_cast<unsigned short*>(mapObj + 0x982) == id) {
+            *reinterpret_cast<short*>(mapObj + 0x97E) = static_cast<short>(alpha << 7);
+            found = true;
+            *reinterpret_cast<short*>(mapObj + 0x980) = static_cast<short>(
+                (static_cast<int>(*reinterpret_cast<short*>(mapObj + 0x97E)) -
+                 static_cast<int>(*reinterpret_cast<short*>(mapObj + 0x97C))) /
+                frameCount);
+        }
+        mapObj += 0xF0;
+    }
+
+    if (!found) {
+        if (System.m_execParam != 0) {
+            System.Printf(DAT_801ead4c);
+        }
+        if (System.m_execParam != 0) {
+            System.Printf(DAT_801d7318, id);
+        }
+        if (System.m_execParam != 0) {
+            System.Printf(DAT_801ead4c);
+        }
+        if (System.m_execParam != 0) {
+            System.Printf(DAT_8032f984);
+        }
+    }
 }
 
 /*

@@ -5,6 +5,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/astar.h"
 #include "ffcc/memory.h"
+#include "ffcc/astar.h"
 #include "ffcc/p_chara.h"
 #include "ffcc/pad.h"
 #include "ffcc/p_game.h"
@@ -14,6 +15,7 @@
 #include "ffcc/util.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include <math.h>
 #include <string.h>
 
 typedef signed short s16;
@@ -64,6 +66,7 @@ extern "C" void SetTlut__5CFontFi(CFont*, int);
 extern "C" void SetPosX__5CFontFf(float, CFont*);
 extern "C" void SetPosY__5CFontFf(float, CFont*);
 extern "C" void Draw__5CFontFPc(CFont*, const char*);
+extern "C" void DrawHeart__8CMesMenuFffff(void*, float, float, float, float);
 extern "C" void createSingleMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void SingMenuInit__8CMenuPcsFv(CMenuPcs*);
 extern "C" void CreateShopMenu__8CMenuPcsFv(CMenuPcs*);
@@ -111,6 +114,8 @@ extern "C" char* lbl_80214910[];
 extern "C" char* lbl_80214960[];
 extern "C" char* lbl_802149B0[];
 extern "C" char* lbl_80214A00[];
+extern "C" unsigned char DAT_80214a50[];
+extern "C" char s_DynamicMessStr[];
 
 extern "C" unsigned int CmdOpen__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int CmdCtrl__8CMenuPcsFv(CMenuPcs*);
@@ -155,7 +160,12 @@ extern "C" void MLstDraw__8CMenuPcsFv(CMenuPcs*);
 extern "C" void CalcHeart__8CMesMenuFv(void*);
 
 extern float FLOAT_8033292c;
+extern float FLOAT_80332930;
 extern float FLOAT_80332928;
+extern float FLOAT_80332924;
+extern float FLOAT_80332920;
+extern float FLOAT_8033291c;
+extern float FLOAT_80332918;
 extern float FLOAT_80332934;
 extern float FLOAT_80332940;
 extern float FLOAT_80332948;
@@ -195,6 +205,7 @@ extern float FLOAT_803329f4;
 extern float FLOAT_803329f8;
 extern float FLOAT_80332994;
 extern float FLOAT_803329fc;
+extern float FLOAT_80332960;
 extern float FLOAT_80332a00;
 extern float FLOAT_80332a04;
 extern float FLOAT_80332a08;
@@ -217,6 +228,31 @@ extern "C" char DAT_80214a50[];
 
 static inline char* GetLanguageTableString(int index, char** englishTable, char** germanTable, char** italianTable,
                                            char** frenchTable, char** spanishTable);
+
+static inline const char* GetSingWinMessage(int staticText, const char* dynamicText, int useDynamic)
+{
+    if (useDynamic != 0) {
+        return dynamicText;
+    }
+
+    u8 languageId = Game.game.m_gameWork.m_languageId;
+    if (languageId == 3) {
+        return lbl_802143A0[staticText];
+    }
+    if (languageId < 3) {
+        if ((languageId == 0) || (languageId == 1)) {
+            return lbl_802141E0[staticText];
+        }
+        return lbl_802142C0[staticText];
+    }
+    if (languageId == 5) {
+        return lbl_80214560[staticText];
+    }
+    if (languageId < 5) {
+        return lbl_80214480[staticText];
+    }
+    return lbl_802141E0[staticText];
+}
 
 /*
  * --INFO--
@@ -1597,22 +1633,80 @@ void CMenuPcs::DrawSingWinMess(int messageSet, int activeMask, int dynamicMode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801464cc
+ * PAL Size: 544b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::GetSingWinSize(int, short*, short*, int)
+void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, int useDynamic)
 {
-	// TODO
+    CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<u8*>(this) + 0xF8);
+    SetMargin__5CFontFf(FLOAT_80332934, font);
+    SetShadow__5CFontFi(font, 1);
+    SetScale__5CFontFf(FLOAT_8032ea78, font);
+
+    int lineCount = AStar.m_bestPath.m_pathLength;
+    if (useDynamic == 0) {
+        lineCount = *reinterpret_cast<int*>(DAT_80214a50 + messageNo * 0x14);
+    }
+
+    int maxWidth = 0;
+    char* dynamicText = s_DynamicMessStr;
+    unsigned char* staticInfo = DAT_80214a50 + messageNo * 0x14;
+    for (int i = 0; i < lineCount; i++) {
+        short textId = *reinterpret_cast<short*>(staticInfo + 4);
+        int textWidth = GetWidth__5CFontFPc(font, GetSingWinMessage(textId, dynamicText, useDynamic));
+        if (maxWidth < textWidth) {
+            maxWidth = textWidth;
+        }
+        staticInfo += 2;
+        dynamicText += 0x80;
+    }
+
+    if (useDynamic == 0) {
+        maxWidth -= 0x18;
+    } else {
+        maxWidth += 0x16;
+    }
+
+    int lineHeight = static_cast<int>(FLOAT_80332960 * FLOAT_8032ea78);
+    if (FLOAT_8033294c < FLOAT_80332960 * FLOAT_8032ea78 - static_cast<float>(lineHeight)) {
+        lineHeight++;
+    }
+
+    int widthLines = maxWidth / lineHeight;
+    if (maxWidth != widthLines * lineHeight) {
+        widthLines++;
+    }
+
+    if (useDynamic == 0) {
+        widthLines += 3;
+    }
+
+    *outWidth = static_cast<short>(widthLines * lineHeight + 0x40);
+    *outHeight = static_cast<short>(lineCount * (lineHeight + 2) + 0x40);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80146490
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::SetSingWinInfo(int, int, int, int)
+void CMenuPcs::SetSingWinInfo(int x, int y, int w, int h)
 {
-	// TODO
+    s16* winInfo = *reinterpret_cast<s16**>(reinterpret_cast<u8*>(this) + 0x848);
+    winInfo[0] = static_cast<s16>(x);
+    winInfo[1] = static_cast<s16>(y);
+    winInfo[2] = static_cast<s16>(w);
+    winInfo[3] = static_cast<s16>(h);
+    winInfo[4] = 0;
+    winInfo[5] = 3;
 }
 
 /*
@@ -1627,52 +1721,112 @@ void CMenuPcs::SetSingDynamicWinMessInfo(int, char*, char*, char*, char*, char*,
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80146364
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::SetSingWinScl(float)
+void CMenuPcs::SetSingWinScl(float scale)
 {
-	// TODO
+    FLOAT_8032ea78 = scale;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::GetSingWinScl()
+float CMenuPcs::GetSingWinScl()
 {
-	// TODO
+    return FLOAT_8032ea78;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8014630c
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::SingWinMessHeight()
+int CMenuPcs::SingWinMessHeight()
 {
-	// TODO
+    unsigned int lineHeight = static_cast<unsigned int>(FLOAT_80332960 * FLOAT_8032ea78);
+    float scaledHeight = FLOAT_80332960 * FLOAT_8032ea78;
+    double intHeight = static_cast<double>(lineHeight);
+
+    if (FLOAT_8033294c < (scaledHeight - static_cast<float>(intHeight))) {
+        lineHeight += 1;
+    }
+    return static_cast<int>(lineHeight + 3);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8014624c
+ * PAL Size: 192b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::ChkEquipPossible(int)
+int CMenuPcs::ChkEquipPossible(int itemNo)
 {
-	// TODO
+    u16 flags = *reinterpret_cast<u16*>(Game.game.unkCFlatData0[2] + itemNo * 0x48 + 4);
+    unsigned int raceMask = 1 << (*reinterpret_cast<u16*>(Game.game.m_scriptFoodBase[0] + 0x3E0) & 3);
+    unsigned int genderMask = 0x10;
+
+    if (*reinterpret_cast<s16*>(Game.game.m_scriptFoodBase[0] + 0x3E2) != 0) {
+        genderMask = 0x20;
+    }
+
+    bool result;
+    if ((flags & 0xF) != 0) {
+        if ((flags & 0x30) != 0) {
+            result = (((flags & 0xF) & raceMask) != 0) && (((flags & 0x30) & genderMask) != 0);
+            return result ? 1 : 0;
+        }
+        result = ((flags & 0xF) & raceMask) != 0;
+    } else {
+        result = ((flags & 0x30) & genderMask) != 0;
+    }
+
+    return result ? 1 : 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80146190
+ * PAL Size: 188b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::GetEquipType(int)
+int CMenuPcs::GetEquipType(int itemNo)
 {
-	// TODO
+    u16 flags = *reinterpret_cast<u16*>(Game.game.unkCFlatData0[2] + itemNo * 0x48 + 4);
+
+    if ((flags & 0x100) != 0) {
+        return 0;
+    }
+    if ((flags & 0x400) != 0) {
+        return 1;
+    }
+    if ((flags & 0xA00) != 0) {
+        return 2;
+    }
+    if ((flags & 0x3000) != 0) {
+        return 3;
+    }
+    return 0;
 }
 
 /*
@@ -1892,22 +2046,63 @@ void CMenuPcs::CalcSingLife()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80145738
+ * PAL Size: 420b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawSingLife()
 {
-	// TODO
+    unsigned int scriptFood = Game.game.m_scriptFoodBase[0];
+    int lifeTimer = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x874);
+    if (lifeTimer < 0) {
+        return;
+    }
+
+    float y = FLOAT_8033291c;
+    if (lifeTimer < 10) {
+        int phase = lifeTimer;
+        if (phase < 0) {
+            phase = 0;
+        } else if (phase > 10) {
+            phase = 10;
+        }
+        y = FLOAT_80332928 * static_cast<float>(sin(FLOAT_80332920 * FLOAT_80332924 * static_cast<float>(phase))) + FLOAT_8033291c;
+    } else if (lifeTimer > 0x27) {
+        int phase = 10 - (lifeTimer - 0x28);
+        if (phase < 0) {
+            phase = 0;
+        } else if (phase > 10) {
+            phase = 10;
+        }
+        y = FLOAT_80332928 * static_cast<float>(sin(FLOAT_80332920 * FLOAT_80332924 * static_cast<float>(phase))) + FLOAT_8033291c;
+    }
+
+    int halfHearts = static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(scriptFood + 0x1A) >> 1);
+    float x = FLOAT_80332918 + static_cast<float>(((8 - halfHearts) * 0x18) / 2);
+    DrawHeart__8CMesMenuFffff(*reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0x268), x, y - FLOAT_80332930, FLOAT_80332934,
+                              FLOAT_80332934);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80145710
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::SingLifeInit(int)
+void CMenuPcs::SingLifeInit(int timer)
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+    if ((*reinterpret_cast<int*>(self + 0x874) > 0) && (timer == 0)) {
+        *reinterpret_cast<int*>(self + 0x874) = 10;
+        return;
+    }
+    *reinterpret_cast<int*>(self + 0x874) = timer;
 }
 
 /*

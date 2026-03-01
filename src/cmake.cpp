@@ -1,12 +1,33 @@
 #include "ffcc/cmake.h"
+#include "ffcc/chara.h"
 #include "ffcc/p_game.h"
+#include <dolphin/mtx.h>
 #include <string.h>
 
 extern "C" void __dl__FPv(void*);
 extern "C" void freeTexture__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
 extern "C" void CmakeVillageDraw__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned short CmakeVillageCtrl__8CMenuPcsFv(CMenuPcs*);
 extern "C" void CallWorldParam__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" void ChgModel__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
+extern "C" void SetAnim__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" void PCAnimCtrl__8CMenuPcsFv(CMenuPcs*);
+extern "C" void SetMatrix__Q26CChara6CModelFPA4_f(CChara::CModel*, Mtx);
+extern "C" void CalcMatrix__Q26CChara6CModelFv(CChara::CModel*);
+extern "C" void CalcSkin__Q26CChara6CModelFv(CChara::CModel*);
+extern "C" float FLOAT_80333254;
+extern "C" float FLOAT_8033325c;
+extern "C" float FLOAT_80333260;
+extern "C" float FLOAT_80333264;
+extern "C" char* GetLangString__5CGameFv(void*);
+extern "C" int sprintf(char*, const char*, ...);
+extern "C" void loadFont__8CMenuPcsFiPcii(CMenuPcs*, int, char*, int, int);
+extern "C" void loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(CMenuPcs*, char**, int, int, void*, int, int, int);
+extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
+extern "C" char s_dvd__smenu_subfont_fnt_801e3020[];
+extern "C" char* PTR_s_world2_802159a4[];
+extern "C" int DAT_802159c8;
+extern "C" char s_cmake_cpp_801e3038[];
 
 static inline short& MenuS16(CMenuPcs* menu, int offset)
 {
@@ -680,12 +701,77 @@ void CMenuPcs::destroyVillageMenu()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8016cf58
+ * PAL Size: 580b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::calcVillageMenu()
 {
-	// TODO
+    if (MenuU8(this, 0x16) != 0 && MenuS16(this, 0x86C) == 0) {
+        if (Game.game.m_gameWork.m_menuStageMode == 0) {
+            char path[128];
+            char* language = GetLangString__5CGameFv(&Game.game);
+            sprintf(path, s_dvd__smenu_subfont_fnt_801e3020, language);
+            loadFont__8CMenuPcsFiPcii(this, 2, path, 4, -1);
+        }
+
+        loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(
+            this, PTR_s_world2_802159a4, 8, 1, &DAT_802159c8, 0x60, 9, 3);
+
+        void* stage = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0xEC);
+        int& villageWork = MenuS32(this, 0x830);
+        villageWork = reinterpret_cast<int>(__nw__FUlPQ27CMemory6CStagePci(0x48, stage, s_cmake_cpp_801e3038, 0xCB3));
+        memset(reinterpret_cast<void*>(villageWork), 0, 0x48);
+        MenuS16(this, 0x86C) = 1;
+    }
+
+    short active = MenuS16(this, 0x86C);
+    if (active == 0) {
+        return;
+    }
+
+    if (MenuU8(this, 0x16) == 0) {
+        if (Game.game.m_gameWork.m_menuStageMode == 0) {
+            void*& font = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x108);
+            ReleaseRefObject(font);
+            font = nullptr;
+        }
+
+        freeTexture__8CMenuPcsFiiii(this, 8, 1, 0x60, 9);
+        int& villageWork = MenuS32(this, 0x830);
+        if (villageWork != 0) {
+            __dl__FPv(reinterpret_cast<void*>(villageWork));
+            villageWork = 0;
+        }
+        MenuS16(this, 0x86C) = 0;
+        return;
+    }
+
+    int villageWork = MenuS32(this, 0x830);
+    unsigned short result = 0;
+    short& mode = *reinterpret_cast<short*>(villageWork + 0x10);
+    short& frame = *reinterpret_cast<short*>(villageWork + 0x22);
+
+    if (mode == 0) {
+        if (frame < 10) {
+            frame = frame + 1;
+            result = 0;
+        } else {
+            result = 1;
+        }
+    } else if (mode == 1) {
+        result = CmakeVillageCtrl__8CMenuPcsFv(this);
+    } else if (frame < 10) {
+        frame = frame + 1;
+        result = 0;
+    } else {
+        result = 1;
+    }
+
+    *reinterpret_cast<unsigned short*>(villageWork + 0x2E) = result;
 }
 
 /*
@@ -717,12 +803,61 @@ void CMenuPcs::drawVillageMenu()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8016cd3c
+ * PAL Size: 400b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CalcSingleCMakeChara()
 {
-	// TODO
+    int slot = static_cast<int>(MenuS16(this, 0x86A));
+    int handle = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x7F4 + slot * 4);
+    CChara::CModel* model = *reinterpret_cast<CChara::CModel**>(reinterpret_cast<unsigned char*>(handle) + 0x168);
+    unsigned char* modelWork = reinterpret_cast<unsigned char*>(MenuS32(this, 0x814) + slot * 0x50 + 0xA00);
+
+    if (model == nullptr || *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(model) + 0xB0) == 0) {
+        *reinterpret_cast<int*>(modelWork + 0x00) = 0;
+        return;
+    }
+
+    unsigned char* animWork = reinterpret_cast<unsigned char*>(MenuS32(this, 0x824) + slot * 0x34);
+    if (animWork[0x0C] == 1) {
+        *reinterpret_cast<float*>(modelWork + 0x2C) = FLOAT_8033325c;
+        SetAnim__8CMenuPcsFi(this, slot);
+        animWork[0x0C] = 0;
+    }
+
+    *reinterpret_cast<int*>(modelWork + 0x00) = 1;
+    if (**reinterpret_cast<int**>(reinterpret_cast<unsigned char*>(this) + 0x7F4 + slot * 4) != 3) {
+        Mtx scaleMtx;
+        Mtx rotXMtx;
+        Mtx rotYMtx;
+
+        *reinterpret_cast<float*>(modelWork + 0x1C) = FLOAT_80333254;
+        *reinterpret_cast<float*>(modelWork + 0x20) = FLOAT_80333260;
+        *reinterpret_cast<float*>(modelWork + 0x24) = FLOAT_80333254;
+        *reinterpret_cast<float*>(modelWork + 0x34) = FLOAT_80333264;
+        *reinterpret_cast<float*>(modelWork + 0x38) = FLOAT_80333264;
+        *reinterpret_cast<float*>(modelWork + 0x3C) = FLOAT_80333264;
+
+        PSMTXScale(scaleMtx,
+            *reinterpret_cast<float*>(modelWork + 0x34),
+            *reinterpret_cast<float*>(modelWork + 0x38),
+            *reinterpret_cast<float*>(modelWork + 0x3C));
+        PSMTXRotRad(rotXMtx, 'x', *reinterpret_cast<float*>(modelWork + 0x28));
+        PSMTXRotRad(rotYMtx, 'y', *reinterpret_cast<float*>(modelWork + 0x2C));
+        PSMTXConcat(rotXMtx, rotYMtx, rotXMtx);
+        rotXMtx[0][3] = *reinterpret_cast<float*>(modelWork + 0x1C);
+        rotXMtx[1][3] = *reinterpret_cast<float*>(modelWork + 0x20);
+        rotXMtx[2][3] = *reinterpret_cast<float*>(modelWork + 0x24);
+        PSMTXConcat(rotXMtx, scaleMtx, scaleMtx);
+        SetMatrix__Q26CChara6CModelFPA4_f(model, scaleMtx);
+        CalcMatrix__Q26CChara6CModelFv(model);
+        CalcSkin__Q26CChara6CModelFv(model);
+        PCAnimCtrl__8CMenuPcsFv(this);
+    }
 }
 
 /*

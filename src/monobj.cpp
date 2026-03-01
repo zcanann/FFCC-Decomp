@@ -33,6 +33,9 @@ extern "C" void SetPosX__5CFontFf(float, CFont*);
 extern "C" void SetPosY__5CFontFf(float, CFont*);
 extern "C" void SetPosZ__5CFontFf(float, CFont*);
 extern "C" void Draw__5CFontFPc(CFont*, const char*);
+extern "C" char SoundBuffer_1248_[];
+extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
+	int, int, int, CGObject*, float, void*);
 extern "C" float DAT_8032ec24;
 extern "C" void* DAT_80212a1c[];
 extern "C" void* DAT_80212b30[];
@@ -588,12 +591,56 @@ void CGMonObj::onFrameStat()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80117D5C
+ * PAL Size: 756b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::onStatMagic()
 {
-	// TODO
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	unsigned char* attackData = reinterpret_cast<unsigned char*>(Game.game.unkCFlatData0[2]) +
+		*reinterpret_cast<int*>(mon + 0x560) * 0x48;
+
+	if (prgObj->m_subState == 1) {
+		if (*reinterpret_cast<int*>(mon + 0x68C) < prgObj->m_subFrame) {
+			prgObj->changeSubStat(2);
+		}
+		return;
+	}
+
+	if (prgObj->m_subState == 0) {
+		if (prgObj->m_subFrame == 0) {
+			int targetPartyIndex = *reinterpret_cast<int*>(mon + 0x6C4);
+			if (targetPartyIndex >= 0) {
+				CGPartyObj* target = Game.game.m_partyObjArr[targetPartyIndex];
+				*reinterpret_cast<Vec*>(mon + 0x66C) = reinterpret_cast<CGObject*>(target)->m_worldPosition;
+
+				if ((*reinterpret_cast<unsigned short*>(attackData + 0x32) & 2) == 0) {
+					float rotLimit = 0.01f *
+						static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x19C));
+					rotTarget(targetPartyIndex, rotLimit);
+				}
+
+				CGPrgObj* targetPrg = reinterpret_cast<CGPrgObj*>(target);
+				targetPrg->bonus(0x17, *reinterpret_cast<int*>(mon + 0x560), targetPrg);
+			}
+
+			reinterpret_cast<CGCharaObj*>(this)->putParticleFromItem(
+				*reinterpret_cast<int*>(mon + 0x560), 0, *reinterpret_cast<int*>(mon + 0x570), (Vec*)0);
+			reinterpret_cast<CGCharaObj*>(this)->putParticleFromItem(
+				*reinterpret_cast<int*>(mon + 0x560), 1, *reinterpret_cast<int*>(mon + 0x570), (Vec*)0);
+		}
+		return;
+	}
+
+	if ((prgObj->m_subState < 3) && (prgObj->isLoopAnim() != 0)) {
+		setAttackAfter(*reinterpret_cast<int*>(mon + 0x560));
+	}
 }
 
 /*
@@ -708,12 +755,107 @@ void CGMonObj::onStatShield()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80117690
+ * PAL Size: 812b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::onStatDie()
 {
-	// TODO
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	int subState = *reinterpret_cast<int*>(mon + 0x52C);
+
+	if (subState == 1) {
+		unsigned char* aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+		int subFrame = *reinterpret_cast<int*>(mon + 0x530);
+
+		if ((*reinterpret_cast<unsigned short*>(aiData + 0xFE) & 2) == 0) {
+			if (subFrame != 0) {
+				return;
+			}
+		} else {
+			if (subFrame == 0) {
+				int particleId = *reinterpret_cast<int*>(mon + 0x560);
+				void* classId = object->m_scriptHandle[4];
+				if (classId == reinterpret_cast<void*>(5)) {
+					particleId = 599;
+				} else if (classId == reinterpret_cast<void*>(4)) {
+					particleId = 0x253;
+				} else if (classId == reinterpret_cast<void*>(6)) {
+					particleId = 0x25B;
+				}
+
+				*reinterpret_cast<int*>(mon + 0x560) = particleId;
+				reinterpret_cast<CGCharaObj*>(this)->putParticleFromItem(particleId, 0, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+				reinterpret_cast<CGCharaObj*>(this)->putParticleFromItem(particleId, 1, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+				reinterpret_cast<CGCharaObj*>(this)->putParticleFromItem(particleId, 2, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+				reinterpret_cast<CGCharaObj*>(this)->putParticleFromItem(particleId, 3, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+				return;
+			}
+			if (subFrame != 0x19) {
+				return;
+			}
+		}
+
+		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x231000);
+		*reinterpret_cast<float*>(mon + 0x694) = 0.0f;
+		typedef void (*Virtual90)(CGMonObj*, int, int, int);
+		void** vtable = *reinterpret_cast<void***>(this);
+		reinterpret_cast<Virtual90>(vtable[0x90 / 4])(this, 0, 0, 0);
+		object->m_bgColMask &= 0xFFF6FFFD;
+		reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x17, 0x32, 0x96, 0, (Vec*)0);
+		reinterpret_cast<CGPrgObj*>(this)->putParticle(0x116, 0, object, 20.0f * object->m_attackColRadius, 0);
+		CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(1, 0, 0, object, 0.0f, 0);
+		object->PutDropItem();
+		reinterpret_cast<CGPrgObj*>(this)->changeSubStat(2);
+		return;
+	}
+
+	if (subState == 2) {
+		unsigned short repopDelay = *reinterpret_cast<unsigned short*>(mon + 0x6D6);
+		if ((repopDelay != 0) && (*reinterpret_cast<int*>(mon + 0x530) == static_cast<int>(repopDelay) * 0x1E)) {
+			setRepop(0);
+		}
+		return;
+	}
+
+	if (subState == 0) {
+		if (*reinterpret_cast<int*>(mon + 0x530) == 0) {
+			unsigned char* aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+			reinterpret_cast<CGPrgObj*>(this)->playSe3D(
+				*reinterpret_cast<unsigned short*>(aiData + 0x190) * 1000 + *reinterpret_cast<unsigned short*>(aiData + 0x192) + 9,
+				0x32,
+				0x96,
+				0,
+				(Vec*)0
+			);
+
+			unsigned short pId = *reinterpret_cast<unsigned short*>(aiData + 0x19E);
+			if (pId != 0xFFFF) {
+				int dataNo = -1;
+				if (object->m_charaModelHandle != nullptr && object->m_charaModelHandle->m_pdtLoadRef != nullptr) {
+					dataNo = reinterpret_cast<int*>(object->m_charaModelHandle->m_pdtLoadRef)[5];
+				}
+				reinterpret_cast<CGPrgObj*>(this)->putParticle(pId | (dataNo << 8), 0, object, 20.0f * object->m_attackColRadius, 0);
+			}
+
+			int option = static_cast<short>(Game.game.m_gameWork.m_optionValue);
+			if (option <= 8 && *reinterpret_cast<short*>(mon + 0x6D6) == 0) {
+				int shift = reinterpret_cast<int>(object->m_scriptHandle[2]);
+				unsigned long long bit = (shift < 64) ? (1ULL << shift) : 0ULL;
+				*reinterpret_cast<unsigned int*>(CFlat + 0x12F4 + option * 8) |= static_cast<unsigned int>(bit);
+				*reinterpret_cast<unsigned int*>(CFlat + 0x12F0 + option * 8) |= static_cast<unsigned int>(bit >> 32);
+			}
+			return;
+		}
+
+		if (reinterpret_cast<CGPrgObj*>(this)->isLoopAnimDirect() != 0) {
+			reinterpret_cast<CGPrgObj*>(this)->changeSubStat(1);
+		}
+	}
 }
 
 /*
@@ -1438,12 +1580,29 @@ void CGMonObj::initFinishedFuncDefault()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80113F58
+ * PAL Size: 172b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::setIceJEffect(int)
+void CGMonObj::setIceJEffect(int enabled)
 {
-	// TODO
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+
+	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x20000);
+
+	if (enabled != 0) {
+		unsigned short count = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AA);
+		for (int i = 0; i < static_cast<int>(count); i++) {
+			void* pdtLoadRef = object->m_charaModelHandle->m_pdtLoadRef;
+			int dataNo = (pdtLoadRef != nullptr) ? reinterpret_cast<int*>(pdtLoadRef)[5] : -1;
+			prgObj->putParticleBindTrace((i + 0x5A) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x5A8), object, 0.0f, 0);
+		}
+	}
 }
 
 /*
@@ -1949,6 +2108,31 @@ void CGMonObj::moveFrame()
  * JP Size: TODO
  */
 #pragma dont_inline on
+/*
+ * --INFO--
+ * PAL Address: 0x801162B4
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void fn_801162B4(CGMonObj* monObj)
+{
+	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
+	*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0;
+	memset(mon + 0x70C, 0, 0x34);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8011467C
+ * PAL Size: 1272b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 extern "C" void MonObjRelated(CGMonObj* monObj, int* targetIndex)
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);

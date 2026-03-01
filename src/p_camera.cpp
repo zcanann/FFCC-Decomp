@@ -879,25 +879,38 @@ void CCameraPcs::SetViewerSRT(const SRT* srt)
  */
 void CCameraPcs::createChara()
 {
-    u8* self = reinterpret_cast<u8*>(this);
-    float zero = FLOAT_8032fa34;
-    float one = FLOAT_8032fa1c;
+    u8* self;
+    float fVar1;
+    float fVar2;
+    float fVar3;
+    float fVar4;
+    float fVar5;
+    float fVar6;
+    float fVar7;
 
+    self = reinterpret_cast<u8*>(this);
+    fVar2 = FLOAT_8032fa34;
     *reinterpret_cast<s32*>(self + 0x46C) = 0;
-    *reinterpret_cast<float*>(self + 0x450) = zero;
-    *reinterpret_cast<float*>(self + 0x44C) = zero;
-    *reinterpret_cast<float*>(self + 0x448) = zero;
-    *reinterpret_cast<float*>(self + 0x45C) = zero;
-    *reinterpret_cast<float*>(self + 0x458) = zero;
-    *reinterpret_cast<float*>(self + 0x454) = zero;
-    *reinterpret_cast<float*>(self + 0x468) = one;
-    *reinterpret_cast<float*>(self + 0x464) = one;
-    *reinterpret_cast<float*>(self + 0x460) = one;
-    *reinterpret_cast<float*>(self + 0x44C) = FLOAT_8032fac0;
-    *reinterpret_cast<float*>(self + 0x45C) = FLOAT_8032fac4;
-    *reinterpret_cast<float*>(self + 0xFC) = FLOAT_8032fab4;
-    *reinterpret_cast<float*>(self + 0x100) = FLOAT_8032fa8c;
-    *reinterpret_cast<float*>(self + 0x104) = FLOAT_8032fab8;
+    fVar1 = FLOAT_8032fa1c;
+    *reinterpret_cast<float*>(self + 0x450) = fVar2;
+    fVar6 = FLOAT_8032fac0;
+    *reinterpret_cast<float*>(self + 0x44C) = fVar2;
+    fVar7 = FLOAT_8032fac4;
+    *reinterpret_cast<float*>(self + 0x448) = fVar2;
+    fVar4 = FLOAT_8032fab4;
+    *reinterpret_cast<float*>(self + 0x45C) = fVar2;
+    fVar3 = FLOAT_8032fa8c;
+    *reinterpret_cast<float*>(self + 0x458) = fVar2;
+    fVar5 = FLOAT_8032fab8;
+    *reinterpret_cast<float*>(self + 0x454) = fVar2;
+    *reinterpret_cast<float*>(self + 0x468) = fVar1;
+    *reinterpret_cast<float*>(self + 0x464) = fVar1;
+    *reinterpret_cast<float*>(self + 0x460) = fVar1;
+    *reinterpret_cast<float*>(self + 0x44C) = fVar6;
+    *reinterpret_cast<float*>(self + 0x45C) = fVar7;
+    *reinterpret_cast<float*>(self + 0xFC) = fVar4;
+    *reinterpret_cast<float*>(self + 0x100) = fVar3;
+    *reinterpret_cast<float*>(self + 0x104) = fVar5;
 }
 
 /*

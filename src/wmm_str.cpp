@@ -72,7 +72,7 @@ const char* CMenuPcs::GetMcStr(int index)
  */
 const char* const* CMenuPcs::GetMcWinMessBuff(int group)
 {
-    const unsigned char languageId = Game.game.m_gameWork.m_languageId;
+    int languageId = Game.game.m_gameWork.m_languageId;
     switch (group) {
     case 0:
         switch (languageId) {

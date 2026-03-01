@@ -2062,44 +2062,44 @@ unsigned int CMenuPcs::CmdOpen1()
 {
 	u8* self = reinterpret_cast<u8*>(this);
 	const s32 caravanWork = Game.game.m_scriptFoodBase[0];
-	s16* const cmd = *reinterpret_cast<s16**>(self + 0x82c);
-	s16* const list = *reinterpret_cast<s16**>(self + 0x850);
+	const s32 cmd = *reinterpret_cast<s32*>(self + 0x82c);
+	const s32 list = *reinterpret_cast<s32*>(self + 0x850);
 
-	cmd[0x11] = static_cast<s16>(cmd[0x11] + 1);
+	*reinterpret_cast<s16*>(cmd + 0x22) = static_cast<s16>(*reinterpret_cast<s16*>(cmd + 0x22) + 1);
 
-	const s32 selected = static_cast<s32>(cmd[0x13]);
-	const f32 t = static_cast<f32>(-((DOUBLE_80332a90 * static_cast<f64>(cmd[0x11])) - DOUBLE_80332a58));
-	*reinterpret_cast<f32*>(list + selected * 0x20 + 0x0c) = t;
+	const s32 selected = static_cast<s32>(*reinterpret_cast<s16*>(cmd + 0x26));
+	const f32 t = static_cast<f32>(
+		-((DOUBLE_80332a90 * static_cast<f64>(*reinterpret_cast<s16*>(cmd + 0x22))) - DOUBLE_80332a58)
+	);
+	*reinterpret_cast<f32*>(list + selected * 0x40 + 0x18) = t;
 
 	s32 chainCount = 1;
 	if (*reinterpret_cast<s16*>(caravanWork + (selected + 1) * 2 + 0x214) == -1) {
 		chainCount = 2;
-		*reinterpret_cast<f32*>(list + (selected + 1) * 0x20 + 0x0c) = t;
+		*reinterpret_cast<f32*>(list + (selected + 1) * 0x40 + 0x18) = t;
 		if (*reinterpret_cast<s16*>(caravanWork + (selected + 2) * 2 + 0x214) == -1) {
 			chainCount = 3;
-			*reinterpret_cast<f32*>(list + (selected + 2) * 0x20 + 0x0c) = t;
+			*reinterpret_cast<f32*>(list + (selected + 2) * 0x40 + 0x18) = t;
 		}
 	}
 
-	s32 slot = 3;
-	for (s32 i = 0; i < 3; i++) {
-		if (selected == static_cast<s32>(cmd[0x13 + i])) {
-			slot = i;
-			break;
-		}
+	s32 slot = 0;
+	if ((selected != s_UniteTop[0]) && ((slot = 1), selected != s_UniteTop[1]) &&
+	    ((slot = 2), selected != s_UniteTop[2])) {
+		slot = 3;
 	}
 
-	s16* const baseEntry = list + (static_cast<s32>(list[1]) + slot) * 0x20 + 4;
-	s16* const animEntry = list + (static_cast<s32>(list[1]) + 3) * 0x20 + 4;
+	s16* const animEntry = reinterpret_cast<s16*>(list + (*reinterpret_cast<s16*>(list + 2) + 3) * 0x40 + 8);
+	s16* const baseEntry = reinterpret_cast<s16*>(list + (*reinterpret_cast<s16*>(list + 2) + slot) * 0x40 + 8);
 
-	if (*reinterpret_cast<u8*>(cmd + 6) == 0) {
-		const s32 endX = static_cast<s32>(baseEntry[0] + baseEntry[2]) - static_cast<s32>(DOUBLE_80332a98);
+	if (*reinterpret_cast<s8*>(cmd + 0xc) == 0) {
+		const s32 endX = static_cast<s32>(static_cast<f64>(baseEntry[0] + baseEntry[2]) - DOUBLE_80332a98);
 		animEntry[0] = static_cast<s16>(endX);
 
 		s32 uniteCount = 0;
 		if (chainCount == 2) {
 			int combo[5][2];
-			uniteCount = ChkUnite__8CMenuPcsFiPA2_i(this, static_cast<int>(cmd[0x13]), combo);
+			uniteCount = ChkUnite__8CMenuPcsFiPA2_i(this, static_cast<int>(*reinterpret_cast<s16*>(cmd + 0x26)), combo);
 		}
 
 		animEntry[0x0A] = 1.0f;
@@ -2116,12 +2116,12 @@ unsigned int CMenuPcs::CmdOpen1()
 		animEntry[4] = FLOAT_80332ab0;
 		animEntry[6] = FLOAT_80332ab0;
 		*reinterpret_cast<s32*>(animEntry + 0x0e) = 0x39;
-		*reinterpret_cast<u8*>(cmd + 6) = 1;
+		*reinterpret_cast<u8*>(cmd + 0xc) = 1;
 	}
 
-	animEntry[8] = static_cast<f32>(DOUBLE_80332a90 * static_cast<f64>(cmd[0x11]));
-	if (static_cast<f64>(cmd[0x11]) >= DOUBLE_80332a78) {
-		cmd[0x15] = 0;
+	animEntry[8] = static_cast<f32>(DOUBLE_80332a90 * static_cast<f64>(*reinterpret_cast<s16*>(cmd + 0x22)));
+	if (static_cast<f64>(*reinterpret_cast<s16*>(cmd + 0x22)) >= DOUBLE_80332a78) {
+		*reinterpret_cast<s16*>(cmd + 0x2a) = 0;
 	}
 
 	return 0;

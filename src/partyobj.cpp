@@ -2,12 +2,14 @@
 #include "ffcc/gobjwork.h"
 #include "ffcc/map.h"
 #include "ffcc/maphit.h"
+#include "ffcc/p_game.h"
 
 #include <math.h>
 
 extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned int);
 extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 extern "C" void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
+extern "C" int CanCreateFromScript__9CGItemObjFv();
 
 extern float FLOAT_80331a78;
 extern float FLOAT_80331a9c;
@@ -559,9 +561,20 @@ void CGPartyObj::bonus(int, int, CGPrgObj*)
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::canPlayerUseItem()
+int CGPartyObj::canPlayerUseItem()
 {
-	// TODO
+	unsigned char* weaponFlags = reinterpret_cast<unsigned char*>(&m_weaponNodeFlags);
+
+	if ((int)((unsigned int)weaponFlags[0] << 0x18) < 0) {
+		unsigned char* self = reinterpret_cast<unsigned char*>(this);
+		if (((int)((unsigned int)weaponFlags[1] << 0x18) < 0) &&
+		    ((int)((unsigned int)self[0x63C] << 0x18) < 0) &&
+		    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0)) {
+			return 1;
+		}
+	}
+
+	return 0;
 }
 
 /*
@@ -589,9 +602,23 @@ void CGPartyObj::useItem(int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::canPlayerPutItem()
+int CGPartyObj::canPlayerPutItem()
 {
-	// TODO
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	unsigned char* weaponFlags = reinterpret_cast<unsigned char*>(&m_weaponNodeFlags);
+
+	if ((int)((unsigned int)weaponFlags[0] << 0x18) < 0 &&
+	    (int)((unsigned int)weaponFlags[1] << 0x18) < 0 &&
+	    (int)((unsigned int)self[0x63C] << 0x18) < 0 &&
+	    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) &&
+	    (*reinterpret_cast<int*>(self + 0x6F0) == 0)) {
+		if (Game.game.m_gameWork.m_menuStageMode != 0 && CanCreateFromScript__9CGItemObjFv() == 0) {
+			return 0;
+		}
+		return 1;
+	}
+
+	return 0;
 }
 
 /*

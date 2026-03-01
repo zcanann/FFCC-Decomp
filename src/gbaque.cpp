@@ -48,6 +48,7 @@ static char s_mem_alloc_error[] = "%s[%d] Error! memory allocation.\n";
 static char s_npc_max_over[] = "%s[%d] Error! NPC max over.\n";
 static char s_subject_max_over[] = "%s[%d] Error! Subject max over.\n";
 static char s_letter_data_error[] = "%s[%d] Error! Letter data error.\n";
+static char s_cmake_name_crc_error[] = "%s[%d] Error! ChkCMakeName() crc.\n";
 
 /*
  * --INFO--
@@ -1671,12 +1672,121 @@ void GbaQueue::ClrCmakeInfo(int param_2)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800cc5c4
+ * PAL Size: 1048b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::ChkCMakeName(int, unsigned int)
+void GbaQueue::ChkCMakeName(int channel, unsigned int value)
 {
-	// TODO
+	char* obj = reinterpret_cast<char*>(this);
+	const unsigned char byte0 = static_cast<unsigned char>(value);
+	const unsigned char byte1 = static_cast<unsigned char>(value >> 8);
+	const unsigned char byte2 = static_cast<unsigned char>(value >> 16);
+	const unsigned char cmdType = static_cast<unsigned char>(value >> 24);
+	const int cmakeOffset = channel * 0x20;
+	OSSemaphore* semaphore = accessSemaphores + channel;
+
+	if ((static_cast<int>(value >> 24) >> 6) == 0) {
+		OSWaitSemaphore(semaphore);
+		obj[0x2CB3 + cmakeOffset] = static_cast<char>(cmdType);
+		*reinterpret_cast<unsigned short*>(obj + 0x2CB4 + cmakeOffset) = 1;
+		*reinterpret_cast<short*>(obj + 0x2CB6 + cmakeOffset) = static_cast<short>(value >> 8);
+		memset(obj + 0x2CB9 + cmakeOffset, 0, 0x11);
+		obj[0x2CB9 + cmakeOffset] = static_cast<char>(byte0);
+		OSSignalSemaphore(semaphore);
+		return;
+	}
+
+	unsigned char resultCode;
+	unsigned char compareSlot;
+	short expectedCrc;
+	unsigned char nameBuffer[0x11];
+	bool hasFullName = false;
+
+	OSWaitSemaphore(semaphore);
+	{
+		const int writeOffset = static_cast<int>(*reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset)) * 3;
+		*reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset) =
+			static_cast<short>(*reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset) + 1);
+		obj[0x2CB7 + cmakeOffset + writeOffset] = static_cast<char>(byte2);
+		obj[0x2CB8 + cmakeOffset + writeOffset] = static_cast<char>(byte1);
+		obj[0x2CB9 + cmakeOffset + writeOffset] = static_cast<char>(byte0);
+
+		hasFullName = (*reinterpret_cast<short*>(obj + 0x2CB4 + cmakeOffset) > 5);
+		resultCode = static_cast<unsigned char>(obj[0x2CB3 + cmakeOffset]);
+		expectedCrc = *reinterpret_cast<short*>(obj + 0x2CB6 + cmakeOffset);
+		compareSlot = static_cast<unsigned char>(obj[0x2CB8 + cmakeOffset]);
+		memcpy(nameBuffer, obj + 0x2CB9 + cmakeOffset, sizeof(nameBuffer));
+	}
+	OSSignalSemaphore(semaphore);
+
+	if (!hasFullName) {
+		return;
+	}
+
+	if (strlen(reinterpret_cast<char*>(obj + 0x2CB9 + cmakeOffset)) == 0) {
+		obj[0x2CCA + cmakeOffset] = static_cast<char>(0xFF);
+		obj[0x2CD1 + cmakeOffset] = static_cast<char>(0xFF);
+		return;
+	}
+
+	unsigned short crc = 0xFFFF;
+	if (Joybus.Crc16(0x10, nameBuffer, &crc) == expectedCrc) {
+		for (int i = 0; i < 4; i++) {
+			OSWaitSemaphore(accessSemaphores + i);
+		}
+
+		for (int i = 0; i < 4; i++) {
+			const int otherOffset = i * 0x20;
+			if ((channel != i) && (cmakeInfo[i][0] != '\0') &&
+			    (strcmp(obj + 0x2CB9 + otherOffset, reinterpret_cast<char*>(nameBuffer)) == 0)) {
+				memset(obj + 0x2CB9 + cmakeOffset, 0, 0x11);
+				for (int j = 0; j < 4; j++) {
+					OSSignalSemaphore(accessSemaphores + j);
+				}
+				Joybus.SendResult(channel, 1, resultCode, 0);
+				return;
+			}
+		}
+
+		for (int i = 0; i < 4; i++) {
+			OSSignalSemaphore(accessSemaphores + i);
+		}
+
+		GbaFlatDataView* flatData = reinterpret_cast<GbaFlatDataView*>(&Game.game.m_cFlatDataArr[1]);
+		for (int i = 0; i < 0x100; i++) {
+			if (strcmp(flatData->m_tabl[2].m_strings[i], reinterpret_cast<char*>(nameBuffer)) == 0) {
+				Joybus.SendResult(channel, 1, resultCode, 0);
+				return;
+			}
+		}
+
+		for (int i = 0; i < 8; i++) {
+			CCaravanWork* caravanWork = &Game.game.m_caravanWorkArr[i];
+			char* caravanObj = reinterpret_cast<char*>(caravanWork);
+			if ((i != compareSlot) && (*reinterpret_cast<int*>(caravanObj + 0x3A4) != 0) &&
+			    (caravanObj[0xBA6] == '\0') &&
+			    (strcmp(caravanObj + 0x3CA, reinterpret_cast<char*>(nameBuffer)) == 0)) {
+				Joybus.SendResult(channel, 1, resultCode, 0);
+				return;
+			}
+		}
+
+		Joybus.SendResult(channel, 0, resultCode, 0);
+		OSWaitSemaphore(semaphore);
+		obj[0x2CB3 + cmakeOffset] = 0;
+		*reinterpret_cast<unsigned short*>(obj + 0x2CB4 + cmakeOffset) = 0;
+		*reinterpret_cast<unsigned short*>(obj + 0x2CB6 + cmakeOffset) = 0;
+		OSSignalSemaphore(semaphore);
+	} else {
+		if (System.m_execParam != 0) {
+			Printf__7CSystemFPce(&System, s_cmake_name_crc_error, s_gbaque_cpp, 0xAD3);
+		}
+		Joybus.SendResult(channel, 1, resultCode, 0);
+	}
 }
 
 /*

@@ -109,6 +109,8 @@ static inline CFunnyShape* FunnyShape(CFunnyShapePcs* self)
  */
 extern "C" void __sinit_p_FunnyShape_cpp(void)
 {
+    *reinterpret_cast<void**>(FunnyShapePcs) = &__vt__8CManager;
+    *reinterpret_cast<void**>(FunnyShapePcs) = &lbl_801E8668;
     *reinterpret_cast<void**>(FunnyShapePcs) = &lbl_801EA924;
 
     __ct__14CUSBStreamDataFv(reinterpret_cast<CUSBStreamData*>(FunnyShapePcs + 0x3C));

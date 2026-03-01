@@ -35,7 +35,7 @@ public:
 	void SeSepHistoryAdd();
 	void SeSepHistoryDelete(int);
 	void SeSepHistoryChoice(RedHistoryBANK*);
-	void SearchSeSepSequence(int);
+	int SearchSeSepSequence(int);
 	void SeSepMemoryFree(RedHistoryBANK*);
 	void SeSepOldDelete();
 	void SeSepHeadAdd(RedSeSepHEAD*);
@@ -50,11 +50,11 @@ public:
 	void MusicHistoryAdd();
 	void MusicHistoryDelete(int);
 	void MusicHistoryChoice(RedHistoryBANK*);
-	void SearchMusicSequence(int);
+	int SearchMusicSequence(int);
 	void MusicMemoryFree(RedHistoryBANK*);
 	void MusicOldClear();
 	void MusicOldChoice();
-	void SearchMusicBank(int);
+	int* SearchMusicBank(int);
 	void ReentryMusicData(int);
 	void MusicHistoryManager(int, int);
 	void MusicHeadAdd(RedMusicHEAD*);

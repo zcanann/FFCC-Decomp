@@ -173,16 +173,16 @@ void pppFrameColum(pppColum *column, UnkB *param_2, UnkC *param_3)
     if (lbl_8032ED70 == 0) {
         unsigned char* work = (unsigned char*)((char*)column + 0x80 + param_3->m_serializedDataOffsets[3]);
         if (*(void**)(work + 8) == 0) {
-            unsigned char count = *((unsigned char*)&param_2->m_arg3 + 1);
             char* payload = param_2->m_payload;
             float* values;
             int i;
 
             *(void**)(work + 8) = pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                (unsigned long)count * 0xc, pppEnvStPtr->m_stagePtr, (char*)"pppColum.cpp", 0x7d);
+                (unsigned long)*((unsigned char*)&param_2->m_arg3 + 1) * 0xc, pppEnvStPtr->m_stagePtr,
+                (char*)"pppColum.cpp", 0x7d);
 
             values = *(float**)(work + 8);
-            for (i = 0; i < (int)count; i++) {
+            for (i = 0; i < (int)(unsigned int)*((unsigned char*)&param_2->m_arg3 + 1); i++) {
                 values[0] = RandF__5CMathFf(*(float*)(payload + 4), &Math);
                 values[0] = values[0] + *(float*)(payload + 0);
                 values[1] = RandF__5CMathFf(*(float*)(payload + 0xc), &Math);

@@ -20,7 +20,7 @@ extern unsigned char CFlat[];
 extern "C" char DAT_803319ec[];
 extern "C" char DAT_80331a4c[];
 
-extern "C" void __ptmf_scall(void*, void*);
+extern "C" void __ptmf_scall(...);
 extern "C" void aiAddDuct__8CGMonObjFRi(CGMonObj*, int&);
 extern "C" int calcPolygonGroup__6CAStarFP3Veci(void*, Vec*, int);
 extern "C" CGMonObj* FindGMonObjFirst__13CFlatRuntime2Fv(void*);

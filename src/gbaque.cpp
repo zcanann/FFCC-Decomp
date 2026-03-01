@@ -1970,12 +1970,143 @@ void GbaQueue::MakeSellData(int channel, char* outData)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800cac30
+ * PAL Size: 1184b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::MakeSmithData(int, char*)
+void GbaQueue::MakeSmithData(int channel, char* outData)
 {
-	// TODO
+	unsigned char* smithIndices = static_cast<unsigned char*>(
+		__nwa__FUlPQ27CMemory6CStagePci(0x40, Game.game.m_mainStage, s_gbaque_cpp, 0xE41));
+	if (smithIndices == 0) {
+		if (System.m_execParam != 0) {
+			Printf__7CSystemFPce(&System, s_mem_alloc_error, s_gbaque_cpp, 0xE43);
+		}
+		return;
+	}
+	memset(smithIndices, 0xFF, 0x40);
+
+	const unsigned int scriptFood = Game.game.m_scriptFoodBase[channel];
+	const unsigned int flatBase = Game.game.unkCFlatData0[2];
+
+	unsigned char smithCount = 0;
+	unsigned char baseIndex = 0;
+	for (int i = 0; i < 0x10; i++) {
+		if (*reinterpret_cast<short*>(scriptFood + i * 8 + 0xB6) > 400) {
+			smithIndices[smithCount++] = baseIndex;
+		}
+		if (*reinterpret_cast<short*>(scriptFood + i * 8 + 0xB8) > 400) {
+			smithIndices[smithCount++] = baseIndex + 1;
+		}
+		if (*reinterpret_cast<short*>(scriptFood + i * 8 + 0xBA) > 400) {
+			smithIndices[smithCount++] = baseIndex + 2;
+		}
+		if (*reinterpret_cast<short*>(scriptFood + i * 8 + 0xBC) > 400) {
+			smithIndices[smithCount++] = baseIndex + 3;
+		}
+		baseIndex += 4;
+	}
+
+	*outData = static_cast<char>(smithCount);
+	memcpy(outData + 1, smithIndices, smithCount);
+
+	int totalSize = static_cast<int>(smithCount) + 1;
+	if ((totalSize & 3) != 0) {
+		totalSize = ((totalSize >> 2) + 1) * 4;
+	}
+	char* writePtr = outData + totalSize;
+
+	const double userRate =
+		static_cast<double>(static_cast<float>(static_cast<float>(*reinterpret_cast<short*>(scriptFood + 0xBE2)) / 100.0f));
+
+	for (int i = 0; i < 0x40; i++) {
+		const int itemId = *reinterpret_cast<short*>(scriptFood + i * 2 + 0xB6);
+		if (itemId > 400) {
+			unsigned int itemBuf[0xE];
+			memset(itemBuf, 0, sizeof(itemBuf));
+
+			const int itemBase = flatBase + itemId * 0x48;
+			unsigned int price = static_cast<unsigned int>(static_cast<float>(static_cast<unsigned short>(
+				*reinterpret_cast<unsigned short*>(itemBase + 0x24))) * userRate);
+
+			itemBuf[0] =
+				(price << 24) |
+				(((price >> 8) & 0xFF) << 16) |
+				(((price >> 16) & 0xFF) << 8) |
+				(price >> 24);
+
+			reinterpret_cast<unsigned short*>(itemBuf)[2] = static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(itemBase + 0x26));
+			reinterpret_cast<unsigned short*>(itemBuf)[3] = static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(itemBase + 0x28));
+			reinterpret_cast<unsigned short*>(itemBuf)[4] = static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(itemBase + 0x2A));
+			reinterpret_cast<unsigned short*>(itemBuf)[5] = static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(itemBase + 0x2C));
+			reinterpret_cast<unsigned short*>(itemBuf)[6] = static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(itemBase + 0x2E));
+			reinterpret_cast<unsigned short*>(itemBuf)[7] = static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(itemBase + 0x30));
+
+			for (int j = 0; j < 2; j++) {
+				const int recipeBase = itemBase + j * 4;
+
+				const unsigned short materialA = static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(recipeBase + 0x38));
+				reinterpret_cast<unsigned short*>(itemBuf)[8 + j] = materialA;
+				if (materialA == 0) {
+					reinterpret_cast<unsigned short*>(itemBuf)[12 + j * 2] = 0;
+					reinterpret_cast<unsigned short*>(itemBuf)[13 + j * 2] = 0;
+					reinterpret_cast<unsigned short*>(itemBuf)[14 + j * 2] = 0;
+				} else {
+					const int materialBase = flatBase + materialA * 0x48;
+					reinterpret_cast<unsigned short*>(itemBuf)[12 + j * 2] =
+						static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(materialBase + 4));
+					reinterpret_cast<unsigned short*>(itemBuf)[13 + j * 2] =
+						static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(materialBase + 6));
+					reinterpret_cast<unsigned short*>(itemBuf)[14 + j * 2] =
+						static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(materialBase + 8));
+				}
+
+				const unsigned short materialB = static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(recipeBase + 0x3A));
+				reinterpret_cast<unsigned short*>(itemBuf)[17 + j] = materialB;
+				if (materialB == 0) {
+					reinterpret_cast<unsigned short*>(itemBuf)[16 + j * 2] = 0;
+					reinterpret_cast<unsigned short*>(itemBuf)[17 + j * 2 + 2] = 0;
+					reinterpret_cast<unsigned short*>(itemBuf)[18 + j * 2 + 2] = 0;
+				} else {
+					const int materialBase = flatBase + materialB * 0x48;
+					reinterpret_cast<unsigned short*>(itemBuf)[16 + j * 2] =
+						static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(materialBase + 4));
+					reinterpret_cast<unsigned short*>(itemBuf)[17 + j * 2 + 2] =
+						static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(materialBase + 6));
+					reinterpret_cast<unsigned short*>(itemBuf)[18 + j * 2 + 2] =
+						static_cast<unsigned short>(*reinterpret_cast<unsigned short*>(materialBase + 8));
+				}
+			}
+
+			memcpy(writePtr, itemBuf, 0x38);
+			writePtr += 0x38;
+			totalSize += 0x38;
+		}
+	}
+
+	for (int i = 0; i < 4; i++) {
+		const unsigned char* src = reinterpret_cast<unsigned char*>(scriptFood + i * 4 + 0xC08);
+		unsigned int value =
+			(static_cast<unsigned int>(src[3]) << 24) |
+			(static_cast<unsigned int>(src[2]) << 16) |
+			(static_cast<unsigned int>(src[1]) << 8) |
+			static_cast<unsigned int>(src[0]);
+		memcpy(writePtr, &value, 4);
+		writePtr += 4;
+		totalSize += 4;
+	}
+
+	__dla__FPv(smithIndices);
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	reinterpret_cast<unsigned char*>(this)[0x2D56] =
+		static_cast<unsigned char>(reinterpret_cast<unsigned char*>(this)[0x2D56] | (1 << channel));
+	OSSignalSemaphore(accessSemaphores + channel);
+
+	Joybus.SetLetterSize(channel, totalSize);
 }
 
 /*

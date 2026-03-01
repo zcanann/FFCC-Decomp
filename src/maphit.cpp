@@ -420,13 +420,46 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
 
         float* boundsMin = reinterpret_cast<float*>(face + 0x10);
         float* boundsMax = reinterpret_cast<float*>(face + 0x1C);
-        if (g_hit_cyl.m_direction2.z < boundsMin[0] || boundsMax[0] < g_hit_cyl.m_top.z) {
+
+        bool overlap = false;
+        if (g_hit_cyl.m_top.z <= boundsMin[0]) {
+            if (boundsMin[0] <= g_hit_cyl.m_top.z) {
+                overlap = true;
+            } else {
+                overlap = boundsMin[0] <= g_hit_cyl.m_direction2.z;
+            }
+        } else {
+            overlap = g_hit_cyl.m_top.z <= boundsMax[0];
+        }
+        if (!overlap) {
             continue;
         }
-        if (g_hit_cyl.m_radius2 < boundsMin[1] || boundsMax[1] < g_hit_cyl.m_direction2.x) {
+
+        overlap = false;
+        if (g_hit_cyl.m_direction2.x <= boundsMin[1]) {
+            if (boundsMin[1] <= g_hit_cyl.m_direction2.x) {
+                overlap = true;
+            } else {
+                overlap = boundsMin[1] <= g_hit_cyl.m_radius2;
+            }
+        } else {
+            overlap = g_hit_cyl.m_direction2.x <= boundsMax[1];
+        }
+        if (!overlap) {
             continue;
         }
-        if (g_hit_cyl.m_height2 < boundsMin[2] || boundsMax[2] < g_hit_cyl.m_direction2.y) {
+
+        overlap = false;
+        if (g_hit_cyl.m_direction2.y <= boundsMin[2]) {
+            if (boundsMin[2] <= g_hit_cyl.m_direction2.y) {
+                overlap = true;
+            } else {
+                overlap = boundsMin[2] <= g_hit_cyl.m_height2;
+            }
+        } else {
+            overlap = g_hit_cyl.m_direction2.y <= boundsMax[2];
+        }
+        if (!overlap) {
             continue;
         }
 
@@ -442,7 +475,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         float topY = g_hit_cyl.m_top.y;
         float hitDot = PSVECDotProduct(&g_hit_cyl.m_bottom, normal);
         hitT = -((hitDot - (planeD + topY)) / dot);
-        if (hitT < 0.0f || s_hit_t_min <= hitT) {
+        if (hitT <= 0.0f || s_hit_t_min <= hitT) {
             continue;
         }
 

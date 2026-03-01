@@ -46,6 +46,7 @@ extern "C" char s_texanim_cpp_801d7adc[];
 extern "C" char DAT_8032fb48[];
 extern "C" float FLOAT_8032fb38;
 extern "C" int Rand__5CMathFUl(CMath*, unsigned long);
+extern "C" int __cntlzw(unsigned int);
 
 extern CMemory Memory;
 extern CSystem System;
@@ -571,102 +572,92 @@ CTexAnimSet::~CTexAnimSet()
  */
 void CTexAnimSet::Create(CChunkFile& chunkFile, CMemory::CStage* stage)
 {
-    CPtrArray<CTexAnim*>* texAnims = reinterpret_cast<CPtrArray<CTexAnim*>*>(reinterpret_cast<int>(this) + 8);
     CChunkFile::CChunk chunk;
+    CPtrArray<CTexAnim*>* texAnims = reinterpret_cast<CPtrArray<CTexAnim*>*>((int)this + 8);
 
     texAnims->SetStage(stage);
     chunkFile.PushChunk();
-    while (chunkFile.GetNextChunk(chunk) != 0) {
+    while (chunkFile.GetNextChunk(chunk)) {
         if (chunk.m_id == 0x54414E4D) {
             CTexAnim* texAnim =
                 static_cast<CTexAnim*>(__nw__FUlPQ27CMemory6CStagePci(0x24, stage, s_texanim_cpp_801d7adc, 0x3F));
             if (texAnim != 0) {
                 __ct__4CRefFv(texAnim);
                 *reinterpret_cast<void**>(texAnim) = &PTR_PTR_s_CTexAnim_801e9c54;
-                *reinterpret_cast<void**>(reinterpret_cast<int>(texAnim) + 8) = 0;
-                *reinterpret_cast<int*>(reinterpret_cast<int>(texAnim) + 0xC) = 0;
-                *reinterpret_cast<float*>(reinterpret_cast<int>(texAnim) + 0x10) = FLOAT_8032fb38;
-                *reinterpret_cast<int*>(reinterpret_cast<int>(texAnim) + 0x14) = -2;
-                *reinterpret_cast<float*>(reinterpret_cast<int>(texAnim) + 0x18) = FLOAT_8032fb38;
-                *reinterpret_cast<float*>(reinterpret_cast<int>(texAnim) + 0x1C) = FLOAT_8032fb38;
-                *reinterpret_cast<float*>(reinterpret_cast<int>(texAnim) + 0x20) = FLOAT_8032fb38;
+                *reinterpret_cast<void**>((int)texAnim + 8) = 0;
+                *reinterpret_cast<int*>((int)texAnim + 0xC) = 0;
+                *reinterpret_cast<float*>((int)texAnim + 0x10) = FLOAT_8032fb38;
+                *reinterpret_cast<int*>((int)texAnim + 0x14) = -2;
+                *reinterpret_cast<float*>((int)texAnim + 0x18) = FLOAT_8032fb38;
+                *reinterpret_cast<float*>((int)texAnim + 0x1C) = FLOAT_8032fb38;
+                *reinterpret_cast<float*>((int)texAnim + 0x20) = FLOAT_8032fb38;
             }
-
-            int* ref = *reinterpret_cast<int**>(reinterpret_cast<int>(texAnim) + 8);
+            int* ref = *reinterpret_cast<int**>((int)texAnim + 8);
             if (ref != 0) {
-                const int refCount = ref[1];
+                int refCount = ref[1];
                 ref[1] = refCount - 1;
                 if ((refCount - 1 == 0) && (ref != 0)) {
                     (*reinterpret_cast<void (**)(int*, int)>(*ref + 8))(ref, 1);
                 }
-                *reinterpret_cast<void**>(reinterpret_cast<int>(texAnim) + 8) = 0;
+                *reinterpret_cast<void**>((int)texAnim + 8) = 0;
             }
-
             void* refData = __nw__FUlPQ27CMemory6CStagePci(300, stage, s_texanim_cpp_801d7adc, 0xD3);
             if (refData != 0) {
                 __ct__4CRefFv(refData);
                 *reinterpret_cast<void**>(refData) = &PTR_PTR_s_CTexAnim_CRefData_801e9c3c;
-                new (reinterpret_cast<void*>(reinterpret_cast<int>(refData) + 0x110)) CPtrArray<CTexAnimSeq*>();
-                *reinterpret_cast<void**>(reinterpret_cast<int>(refData) + 0x108) = 0;
-                *reinterpret_cast<int*>(reinterpret_cast<int>(refData) + 0x10C) = 0;
+                new ((void*)((int)refData + 0x110)) CPtrArray<CTexAnimSeq*>();
+                *reinterpret_cast<void**>((int)refData + 0x108) = 0;
+                *reinterpret_cast<int*>((int)refData + 0x10C) = 0;
             }
-
-            *reinterpret_cast<void**>(reinterpret_cast<int>(texAnim) + 8) = refData;
-            reinterpret_cast<CPtrArray<CTexAnimSeq*>*>(reinterpret_cast<int>(*reinterpret_cast<void**>(reinterpret_cast<int>(texAnim) + 8)) + 0x110)
+            *reinterpret_cast<void**>((int)texAnim + 8) = refData;
+            reinterpret_cast<CPtrArray<CTexAnimSeq*>*>((int)(*reinterpret_cast<void**>((int)texAnim + 8)) + 0x110)
                 ->SetStage(stage);
 
             chunkFile.PushChunk();
-            while (chunkFile.GetNextChunk(chunk) != 0) {
+            while (chunkFile.GetNextChunk(chunk)) {
                 if (chunk.m_id == 0x53455120) {
                     CTexAnimSeq* seq = static_cast<CTexAnimSeq*>(
                         __nw__FUlPQ27CMemory6CStagePci(0x118, stage, s_texanim_cpp_801d7adc, 0xE2));
                     if (seq != 0) {
                         __ct__4CRefFv(seq);
                         *reinterpret_cast<void**>(seq) = &PTR_PTR_s_CTexAnimSeq_801e9c24;
-                        *reinterpret_cast<int*>(reinterpret_cast<int>(seq) + 0x10C) = 0;
-                        *reinterpret_cast<int*>(reinterpret_cast<int>(seq) + 0x114) = 0;
+                        *reinterpret_cast<int*>((int)seq + 0x10C) = 0;
+                        *reinterpret_cast<int*>((int)seq + 0x114) = 0;
                     }
-
                     chunkFile.PushChunk();
-                    while (chunkFile.GetNextChunk(chunk) != 0) {
+                    while (chunkFile.GetNextChunk(chunk)) {
                         if (chunk.m_id == 0x4B455920) {
-                            *reinterpret_cast<unsigned int*>(reinterpret_cast<int>(seq) + 0x10C) = chunk.m_size / 0x30;
-                            int keys = reinterpret_cast<int>(_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
-                                &Memory, chunk.m_size, stage, s_texanim_cpp_801d7adc, 0x1D4, 0));
-                            *reinterpret_cast<int*>(reinterpret_cast<int>(seq) + 0x114) = keys;
-                            memcpy(reinterpret_cast<void*>(*reinterpret_cast<int*>(reinterpret_cast<int>(seq) + 0x114)),
-                                   chunkFile.GetAddress(), chunk.m_size);
+                            *reinterpret_cast<unsigned int*>((int)seq + 0x10C) = chunk.m_size / 0x30;
+                            int keys = (int)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
+                                &Memory, chunk.m_size, stage, s_texanim_cpp_801d7adc, 0x1D4, 0);
+                            *reinterpret_cast<int*>((int)seq + 0x114) = keys;
+                            memcpy((void*)*reinterpret_cast<int*>((int)seq + 0x114), chunkFile.GetAddress(), chunk.m_size);
                         } else if ((int)chunk.m_id < 0x4B455920) {
                             if (chunk.m_id == 0x494E464F) {
-                                *reinterpret_cast<void**>(reinterpret_cast<int>(seq) + 0x108) =
-                                    reinterpret_cast<void*>(chunkFile.Get4());
+                                *reinterpret_cast<void**>((int)seq + 0x108) = (void*)chunkFile.Get4();
                                 chunkFile.Get4();
-                                unsigned char flag =
-                                    *reinterpret_cast<unsigned char*>(reinterpret_cast<int>(seq) + 0x110);
-
-                                flag = (flag & 0x7F) | static_cast<unsigned char>(chunkFile.Get4() << 7);
-                                flag = (flag & 0xBF) | (static_cast<unsigned char>(chunkFile.Get4() << 6) & 0x40);
-
-                                const unsigned int nameEq =
-                                    static_cast<unsigned int>(strcmp(reinterpret_cast<char*>(reinterpret_cast<int>(seq) + 8),
-                                                                     DAT_8032fb48));
-                                const unsigned int bit5 = (nameEq == 0) ? 0x20 : 0;
-                                flag = (flag & 0xDF) | static_cast<unsigned char>(bit5 & 0x20);
-
-                                *reinterpret_cast<unsigned char*>(reinterpret_cast<int>(seq) + 0x110) = flag;
+                                unsigned char flag = *reinterpret_cast<unsigned char*>((int)seq + 0x110);
+                                char bit7 = (char)chunkFile.Get4();
+                                flag = (unsigned char)(((int)bit7 << 7) | (flag & 0x7F));
+                                char bit6 = (char)chunkFile.Get4();
+                                flag = (unsigned char)(((int)bit6 << 6) & 0x40) | (unsigned char)(flag & 0xBF);
+                                unsigned int isEq =
+                                    (unsigned int)__cntlzw((unsigned int)strcmp((char*)((int)seq + 8), DAT_8032fb48));
+                                flag =
+                                    (unsigned char)((unsigned char)((int)(char)(isEq >> 5) << 5) & 0x20) | (flag & 0xDF);
+                                *reinterpret_cast<unsigned char*>((int)seq + 0x110) = flag;
                             }
                         } else if (chunk.m_id == 0x4E414D45) {
-                            strcpy(reinterpret_cast<char*>(reinterpret_cast<int>(seq) + 8), chunkFile.GetString());
+                            strcpy((char*)((int)seq + 8), chunkFile.GetString());
                         }
                     }
                     chunkFile.PopChunk();
-                    reinterpret_cast<CPtrArray<CTexAnimSeq*>*>(reinterpret_cast<int>(*reinterpret_cast<void**>(reinterpret_cast<int>(texAnim) + 8)) + 0x110)
+                    reinterpret_cast<CPtrArray<CTexAnimSeq*>*>((int)*reinterpret_cast<void**>((int)texAnim + 8) + 0x110)
                         ->Add(seq);
                 } else if (((int)chunk.m_id < 0x53455120) && (chunk.m_id == 0x4E414D45)) {
-                    *reinterpret_cast<unsigned char**>(reinterpret_cast<int>(*reinterpret_cast<void**>(reinterpret_cast<int>(texAnim) + 8)) + 0x10C) =
-                        reinterpret_cast<unsigned char*>(chunk.m_arg0);
-                    strcpy(reinterpret_cast<char*>(reinterpret_cast<int>(*reinterpret_cast<void**>(reinterpret_cast<int>(texAnim) + 8)) + 8),
-                           chunkFile.GetString());
+                    *reinterpret_cast<unsigned char**>((int)*reinterpret_cast<void**>((int)texAnim + 8) + 0x10C) =
+                        (unsigned char*)chunk.m_arg0;
+                    strcpy((char*)((int)*reinterpret_cast<void**>((int)texAnim + 8) + 8), chunkFile.GetString());
                 }
             }
             chunkFile.PopChunk();

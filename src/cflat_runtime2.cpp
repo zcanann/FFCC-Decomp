@@ -7,6 +7,7 @@
 #include "ffcc/partyobj.h"
 #include "ffcc/p_game.h"
 #include "ffcc/graphic.h"
+#include "ffcc/ptrarray.h"
 #include "ffcc/stopwatch.h"
 #include "ffcc/textureman.h"
 #include <math.h>

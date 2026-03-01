@@ -375,6 +375,8 @@ u32 C_MTX44Inverse(const Mtx44 src, Mtx44 inv) {
     f32 max;
     s32 swp;
     f32 absVal;
+    s32 rem;
+    s32 probe;
 
     ASSERTMSGLINE(734, src, "MTX44Inverse():  NULL Mtx44Ptr 'src' ");
     ASSERTMSGLINE(735, inv, "MTX44Inverse():  NULL Mtx44Ptr 'inv' ");
@@ -382,12 +384,12 @@ u32 C_MTX44Inverse(const Mtx44 src, Mtx44 inv) {
     MTX44Copy(src, gjm);
     MTX44Identity(inv);
 
+    i = 0;
     rowOfs = 0;
     colOfs = 0;
-    for (i = 0; i < 4; i++) {
-        s32 rem = 4 - i;
-        s32 probe = rowOfs;
-
+    while (i < 4) {
+        rem = 4 - i;
+        probe = rowOfs;
         max = 0.0f;
         swp = i;
         j = i;
@@ -406,9 +408,11 @@ u32 C_MTX44Inverse(const Mtx44 src, Mtx44 inv) {
         }
 
         if (swp != i) {
-            for (k = 0; k < 4; k++) {
+            k = 0;
+            while (k < 4) {
                 SWAP(gjm[i][k], gjm[swp][k]);
                 SWAP(inv[i][k], inv[swp][k]);
+                k++;
             }
         }
 
@@ -448,6 +452,7 @@ u32 C_MTX44Inverse(const Mtx44 src, Mtx44 inv) {
             }
         }
 
+        i++;
         rowOfs += 0x10;
         colOfs += 0x4;
     }

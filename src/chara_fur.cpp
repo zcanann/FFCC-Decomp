@@ -131,26 +131,70 @@ void CChara::CalcMogScore()
 			const int r = (packed >> 8) & 0xF;
 			const int g = (packed >> 4) & 0xF;
 			const int b = packed & 0xF;
+			CColor srcColor(static_cast<unsigned char>(r), static_cast<unsigned char>(g), static_cast<unsigned char>(b),
+			                static_cast<unsigned char>(a));
 
 			*reinterpret_cast<int*>(self + 0x2054) += a;
 
 			int colorHit[3];
 			{
-				const int d0 = ((r - 0xF) < 0 ? -(r - 0xF) : (r - 0xF)) + (7 - a);
-				const int d1 = ((g - 4) < 0 ? -(g - 4) : (g - 4)) + (7 - a);
-				const int d2 = ((b - 4) < 0 ? -(b - 4) : (b - 4)) + (7 - a);
+				CColor refColor(0xF, 4, 4, 2);
+				CColor tmp(srcColor);
+				const int d0 =
+				    ((static_cast<int>(tmp.color.r) - static_cast<int>(refColor.color.r)) < 0
+				         ? -(static_cast<int>(tmp.color.r) - static_cast<int>(refColor.color.r))
+				         : (static_cast<int>(tmp.color.r) - static_cast<int>(refColor.color.r))) +
+				    (7 - static_cast<int>(tmp.color.a));
+				const int d1 =
+				    ((static_cast<int>(tmp.color.g) - static_cast<int>(refColor.color.g)) < 0
+				         ? -(static_cast<int>(tmp.color.g) - static_cast<int>(refColor.color.g))
+				         : (static_cast<int>(tmp.color.g) - static_cast<int>(refColor.color.g))) +
+				    (7 - static_cast<int>(tmp.color.a));
+				const int d2 =
+				    ((static_cast<int>(tmp.color.b) - static_cast<int>(refColor.color.b)) < 0
+				         ? -(static_cast<int>(tmp.color.b) - static_cast<int>(refColor.color.b))
+				         : (static_cast<int>(tmp.color.b) - static_cast<int>(refColor.color.b))) +
+				    (7 - static_cast<int>(tmp.color.a));
 				colorHit[0] = (d0 < 6 && d1 < 6 && d2 < 6) ? 1 : 0;
 			}
 			{
-				const int d0 = ((r - 4) < 0 ? -(r - 4) : (r - 4)) + (7 - a);
-				const int d1 = ((g - 0xF) < 0 ? -(g - 0xF) : (g - 0xF)) + (7 - a);
-				const int d2 = ((b - 4) < 0 ? -(b - 4) : (b - 4)) + (7 - a);
+				CColor refColor(4, 0xF, 4, 2);
+				CColor tmp(srcColor);
+				const int d0 =
+				    ((static_cast<int>(tmp.color.r) - static_cast<int>(refColor.color.r)) < 0
+				         ? -(static_cast<int>(tmp.color.r) - static_cast<int>(refColor.color.r))
+				         : (static_cast<int>(tmp.color.r) - static_cast<int>(refColor.color.r))) +
+				    (7 - static_cast<int>(tmp.color.a));
+				const int d1 =
+				    ((static_cast<int>(tmp.color.g) - static_cast<int>(refColor.color.g)) < 0
+				         ? -(static_cast<int>(tmp.color.g) - static_cast<int>(refColor.color.g))
+				         : (static_cast<int>(tmp.color.g) - static_cast<int>(refColor.color.g))) +
+				    (7 - static_cast<int>(tmp.color.a));
+				const int d2 =
+				    ((static_cast<int>(tmp.color.b) - static_cast<int>(refColor.color.b)) < 0
+				         ? -(static_cast<int>(tmp.color.b) - static_cast<int>(refColor.color.b))
+				         : (static_cast<int>(tmp.color.b) - static_cast<int>(refColor.color.b))) +
+				    (7 - static_cast<int>(tmp.color.a));
 				colorHit[1] = (d0 < 6 && d1 < 6 && d2 < 6) ? 1 : 0;
 			}
 			{
-				const int d0 = ((r - 4) < 0 ? -(r - 4) : (r - 4)) + (7 - a);
-				const int d1 = ((g - 8) < 0 ? -(g - 8) : (g - 8)) + (7 - a);
-				const int d2 = ((b - 0xF) < 0 ? -(b - 0xF) : (b - 0xF)) + (7 - a);
+				CColor refColor(4, 8, 0xF, 2);
+				CColor tmp(srcColor);
+				const int d0 =
+				    ((static_cast<int>(tmp.color.r) - static_cast<int>(refColor.color.r)) < 0
+				         ? -(static_cast<int>(tmp.color.r) - static_cast<int>(refColor.color.r))
+				         : (static_cast<int>(tmp.color.r) - static_cast<int>(refColor.color.r))) +
+				    (7 - static_cast<int>(tmp.color.a));
+				const int d1 =
+				    ((static_cast<int>(tmp.color.g) - static_cast<int>(refColor.color.g)) < 0
+				         ? -(static_cast<int>(tmp.color.g) - static_cast<int>(refColor.color.g))
+				         : (static_cast<int>(tmp.color.g) - static_cast<int>(refColor.color.g))) +
+				    (7 - static_cast<int>(tmp.color.a));
+				const int d2 =
+				    ((static_cast<int>(tmp.color.b) - static_cast<int>(refColor.color.b)) < 0
+				         ? -(static_cast<int>(tmp.color.b) - static_cast<int>(refColor.color.b))
+				         : (static_cast<int>(tmp.color.b) - static_cast<int>(refColor.color.b))) +
+				    (7 - static_cast<int>(tmp.color.a));
 				colorHit[2] = (d0 < 6 && d1 < 6 && d2 < 6) ? 1 : 0;
 			}
 
@@ -182,11 +226,15 @@ void CChara::CalcMogScore()
 	const int lineDiv = lineCount / 3;
 	const int circleDiv = circleCount / 3;
 
-	for (int i = 0; i < 3; i++) {
-		*reinterpret_cast<int*>(self + 0x2024 + i * 4) = (*reinterpret_cast<int*>(self + 0x2024 + i * 4) * 100) / bitDiv;
-		*reinterpret_cast<int*>(self + 0x203C + i * 4) = (*reinterpret_cast<int*>(self + 0x203C + i * 4) * 100) / circleDiv;
-		*reinterpret_cast<int*>(self + 0x2030 + i * 4) = (*reinterpret_cast<int*>(self + 0x2030 + i * 4) * 100) / lineDiv;
-	}
+	*reinterpret_cast<int*>(self + 0x2024) = (*reinterpret_cast<int*>(self + 0x2024) * 100) / bitDiv;
+	*reinterpret_cast<int*>(self + 0x203C) = (*reinterpret_cast<int*>(self + 0x203C) * 100) / circleDiv;
+	*reinterpret_cast<int*>(self + 0x2030) = (*reinterpret_cast<int*>(self + 0x2030) * 100) / lineDiv;
+	*reinterpret_cast<int*>(self + 0x2028) = (*reinterpret_cast<int*>(self + 0x2028) * 100) / bitDiv;
+	*reinterpret_cast<int*>(self + 0x2040) = (*reinterpret_cast<int*>(self + 0x2040) * 100) / circleDiv;
+	*reinterpret_cast<int*>(self + 0x2034) = (*reinterpret_cast<int*>(self + 0x2034) * 100) / lineDiv;
+	*reinterpret_cast<int*>(self + 0x202C) = (*reinterpret_cast<int*>(self + 0x202C) * 100) / bitDiv;
+	*reinterpret_cast<int*>(self + 0x2044) = (*reinterpret_cast<int*>(self + 0x2044) * 100) / circleDiv;
+	*reinterpret_cast<int*>(self + 0x2038) = (*reinterpret_cast<int*>(self + 0x2038) * 100) / lineDiv;
 
 	for (int i = 0; i < 3; i++) {
 		const int bit = *reinterpret_cast<int*>(self + 0x2024 + i * 4);

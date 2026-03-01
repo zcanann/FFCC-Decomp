@@ -2,10 +2,14 @@
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801434a8
+ * PAL Size: 8012b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __sinit_monobj_table_cpp(void)
+extern "C" void __sinit_monobj_table_cpp(void)
 {
 	// TODO
 }

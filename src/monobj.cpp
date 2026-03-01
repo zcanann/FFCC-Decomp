@@ -33,6 +33,8 @@ extern "C" void SetPosX__5CFontFf(float, CFont*);
 extern "C" void SetPosY__5CFontFf(float, CFont*);
 extern "C" void SetPosZ__5CFontFf(float, CFont*);
 extern "C" void Draw__5CFontFPc(CFont*, const char*);
+extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
+	int, int, int, CGObject*, float, void*);
 extern "C" float DAT_8032ec24;
 extern "C" void* DAT_80212a1c[];
 extern "C" void* DAT_80212b30[];
@@ -588,12 +590,56 @@ void CGMonObj::onFrameStat()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80117D5C
+ * PAL Size: 756b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::onStatMagic()
 {
-	// TODO
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	unsigned char* attackData = reinterpret_cast<unsigned char*>(Game.game.unkCFlatData0[2]) +
+		*reinterpret_cast<int*>(mon + 0x560) * 0x48;
+
+	if (prgObj->m_subState == 1) {
+		if (*reinterpret_cast<int*>(mon + 0x68C) < prgObj->m_subFrame) {
+			prgObj->changeSubStat(2);
+		}
+		return;
+	}
+
+	if (prgObj->m_subState == 0) {
+		if (prgObj->m_subFrame == 0) {
+			int targetPartyIndex = *reinterpret_cast<int*>(mon + 0x6C4);
+			if (targetPartyIndex >= 0) {
+				CGPartyObj* target = Game.game.m_partyObjArr[targetPartyIndex];
+				*reinterpret_cast<Vec*>(mon + 0x66C) = reinterpret_cast<CGObject*>(target)->m_worldPosition;
+
+				if ((*reinterpret_cast<unsigned short*>(attackData + 0x32) & 2) == 0) {
+					float rotLimit = 0.01f *
+						static_cast<float>(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x19C));
+					rotTarget(targetPartyIndex, rotLimit);
+				}
+
+				CGPrgObj* targetPrg = reinterpret_cast<CGPrgObj*>(target);
+				targetPrg->bonus(0x17, *reinterpret_cast<int*>(mon + 0x560), targetPrg);
+			}
+
+			reinterpret_cast<CGCharaObj*>(this)->putParticleFromItem(
+				*reinterpret_cast<int*>(mon + 0x560), 0, *reinterpret_cast<int*>(mon + 0x570), (Vec*)0);
+			reinterpret_cast<CGCharaObj*>(this)->putParticleFromItem(
+				*reinterpret_cast<int*>(mon + 0x560), 1, *reinterpret_cast<int*>(mon + 0x570), (Vec*)0);
+		}
+		return;
+	}
+
+	if ((prgObj->m_subState < 3) && (prgObj->isLoopAnim() != 0)) {
+		setAttackAfter(*reinterpret_cast<int*>(mon + 0x560));
+	}
 }
 
 /*
@@ -708,12 +754,119 @@ void CGMonObj::onStatShield()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80117690
+ * PAL Size: 812b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::onStatDie()
 {
-	// TODO
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	unsigned char* script9 = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+
+	if (prgObj->m_subState == 1) {
+		unsigned short scriptFlags = *reinterpret_cast<unsigned short*>(script9 + 0xFE);
+		if ((scriptFlags & 2) == 0) {
+			if (prgObj->m_subFrame != 0) {
+				return;
+			}
+		} else {
+			if (prgObj->m_subFrame == 0) {
+				int particleNo = 0;
+				void* classId = object->m_scriptHandle[4];
+				if (classId == reinterpret_cast<void*>(5)) {
+					particleNo = 0x257;
+				} else if (classId == reinterpret_cast<void*>(4)) {
+					particleNo = 0x253;
+				} else if ((classId == reinterpret_cast<void*>(6))) {
+					particleNo = 0x25B;
+				}
+
+				*reinterpret_cast<int*>(mon + 0x560) = particleNo;
+				reinterpret_cast<CGCharaObj*>(this)->putParticleFromItem(particleNo, 0, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+				reinterpret_cast<CGCharaObj*>(this)->putParticleFromItem(particleNo, 1, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+				reinterpret_cast<CGCharaObj*>(this)->putParticleFromItem(particleNo, 2, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+				reinterpret_cast<CGCharaObj*>(this)->putParticleFromItem(particleNo, 3, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+				return;
+			}
+
+			if (prgObj->m_subFrame != 0x19) {
+				return;
+			}
+		}
+
+		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x231000);
+		*reinterpret_cast<float*>(mon + 0x694) = 0.0f;
+
+		typedef void (*Virtual90)(CGMonObj*, int, int, int);
+		void** vtable = *reinterpret_cast<void***>(this);
+		reinterpret_cast<Virtual90>(vtable[0x90 / 4])(this, 0, 0, 0);
+
+		object->m_bgColMask &= 0xFFF6FFFD;
+		prgObj->playSe3D(0x17, 0x32, 0x96, 0, (Vec*)0);
+		prgObj->putParticle(0x116, 0, object, object->m_attackColRadius * 0.01f, 0);
+		CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(1, 0, 0, object, 0.0f, 0);
+		object->PutDropItem();
+		prgObj->changeSubStat(2);
+		return;
+	}
+
+	if (prgObj->m_subState > 1) {
+		if (prgObj->m_subState > 2) {
+			return;
+		}
+		if (*reinterpret_cast<unsigned short*>(mon + 0x6D6) == 0) {
+			return;
+		}
+		if (prgObj->m_subFrame != static_cast<int>(*reinterpret_cast<unsigned short*>(mon + 0x6D6)) * 0x1E) {
+			return;
+		}
+		setRepop(0);
+		return;
+	}
+
+	if (prgObj->m_subState < 0) {
+		return;
+	}
+
+	if (prgObj->m_subFrame == 0) {
+		prgObj->playSe3D(
+			static_cast<int>(*reinterpret_cast<unsigned short*>(script9 + 0x192)) +
+			static_cast<int>(*reinterpret_cast<unsigned short*>(script9 + 0x190)) * 1000 + 9,
+			0x32, 0x96, 0, (Vec*)0);
+
+		unsigned int particleNo = *reinterpret_cast<unsigned short*>(script9 + 0x19E);
+		if (particleNo != 0xFFFF) {
+			void* pdtLoadRef = 0;
+			if (object->m_charaModelHandle != 0) {
+				pdtLoadRef = object->m_charaModelHandle->m_pdtLoadRef;
+			}
+			int dataNo = (pdtLoadRef != 0) ? reinterpret_cast<int*>(pdtLoadRef)[5] : -1;
+			prgObj->putParticle((dataNo << 8) | particleNo, 0, object, object->m_attackColRadius * 0.01f, 0);
+		}
+
+		int option = static_cast<short>(Game.game.m_gameWork.m_optionValue);
+		if (option > 8) {
+			return;
+		}
+		if (*reinterpret_cast<short*>(mon + 0x6D6) != 0) {
+			return;
+		}
+
+		int shift = reinterpret_cast<int>(object->m_scriptHandle[2]);
+		unsigned long long bit = (shift < 64) ? (1ULL << shift) : 0ULL;
+		*reinterpret_cast<unsigned int*>(CFlat + 0x12F4 + option * 8) |= static_cast<unsigned int>(bit);
+		*reinterpret_cast<unsigned int*>(CFlat + 0x12F0 + option * 8) |= static_cast<unsigned int>(bit >> 32);
+		return;
+	}
+
+	if (prgObj->isLoopAnimDirect() != 0) {
+		prgObj->changeSubStat(1);
+	}
 }
 
 /*

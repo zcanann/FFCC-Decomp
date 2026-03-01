@@ -335,44 +335,6 @@ struct CMapAnimNodeTracks
     CMapAnimNodeTrack scale;
 };
 
-static void interpTrack(Vec* out, CMapAnimNodeTrack* track, unsigned int frame, unsigned int loopFrameCount)
-{
-    if (track->count == 1) {
-        *out = track->keys[0].value;
-        return;
-    }
-
-    CMapAnimNodeTrackKey* current = track->keys;
-    for (unsigned int i = 0; i < track->count; i++, current++) {
-        unsigned int nextIndex = i + 1;
-        if (nextIndex >= track->count) {
-            nextIndex = 0;
-        }
-
-        CMapAnimNodeTrackKey* next = track->keys + nextIndex;
-        unsigned int endFrame = next->frame;
-        if (nextIndex == 0) {
-            endFrame += loopFrameCount;
-        }
-
-        if ((current->frame <= frame) && (frame < endFrame)) {
-            int frameRange = static_cast<int>(endFrame - current->frame);
-            float t = 0.0f;
-            if (frameRange != 0) {
-                t = static_cast<float>(frame - current->frame) / static_cast<float>(frameRange);
-            }
-
-            Vec currentScaled;
-            Vec nextScaled;
-            PSVECScale(&current->value, &currentScaled, t);
-            PSVECScale(&next->value, &nextScaled, 1.0f - t);
-            PSVECAdd(&currentScaled, &nextScaled, out);
-            break;
-        }
-    }
-}
-
-
 /*
  * --INFO--
  * Address:	TODO
@@ -465,16 +427,122 @@ void CMapAnimNode::Interp(int frame)
     unsigned char* target = *reinterpret_cast<unsigned char**>(node + 0x00);
     unsigned char* run = *reinterpret_cast<unsigned char**>(node + 0x04);
     CMapAnimNodeTracks* tracks = *reinterpret_cast<CMapAnimNodeTracks**>(node + 0x08);
-
     int startFrame = *reinterpret_cast<int*>(run + 0x1C);
     unsigned int loopFrameCount = static_cast<unsigned int>((*(reinterpret_cast<int*>(run + 0x20)) - startFrame) + 1);
-    unsigned int frameInLoop =
-        static_cast<unsigned int>(startFrame) +
-        (static_cast<unsigned int>(frame) - ((static_cast<unsigned int>(frame) / loopFrameCount) * loopFrameCount));
+    unsigned int frameInLoop = static_cast<unsigned int>(startFrame) +
+                               (static_cast<unsigned int>(frame) -
+                                ((static_cast<unsigned int>(frame) / loopFrameCount) * loopFrameCount));
+    CMapAnimNodeTrack* track;
+    CMapAnimNodeTrackKey* keys;
 
-    interpTrack(reinterpret_cast<Vec*>(target + 0x64), &tracks->position, frameInLoop, loopFrameCount);
-    interpTrack(reinterpret_cast<Vec*>(target + 0x70), &tracks->rotation, frameInLoop, loopFrameCount);
-    interpTrack(reinterpret_cast<Vec*>(target + 0x7C), &tracks->scale, frameInLoop, loopFrameCount);
+    track = &tracks->position;
+    keys = track->keys;
+    if (track->count == 1) {
+        *reinterpret_cast<Vec*>(target + 0x64) = keys[0].value;
+    } else {
+        CMapAnimNodeTrackKey* current = keys;
+        for (unsigned int i = 0; i < track->count; i++, current++) {
+            unsigned int nextIndex = i + 1;
+            if (nextIndex >= track->count) {
+                nextIndex = 0;
+            }
+
+            CMapAnimNodeTrackKey* next = keys + nextIndex;
+            unsigned int endFrame = next->frame;
+            if (nextIndex == 0) {
+                endFrame += loopFrameCount;
+            }
+
+            if ((current->frame <= frameInLoop) && (frameInLoop < endFrame)) {
+                int frameRange = static_cast<int>(endFrame - current->frame);
+                float t = 0.0f;
+                Vec currentScaled;
+                Vec nextScaled;
+
+                if (frameRange != 0) {
+                    t = static_cast<float>(frameInLoop - current->frame) / static_cast<float>(frameRange);
+                }
+
+                PSVECScale(&current->value, &currentScaled, t);
+                PSVECScale(&next->value, &nextScaled, 1.0f - t);
+                PSVECAdd(&currentScaled, &nextScaled, reinterpret_cast<Vec*>(target + 0x64));
+                break;
+            }
+        }
+    }
+
+    track = &tracks->rotation;
+    keys = track->keys;
+    if (track->count == 1) {
+        *reinterpret_cast<Vec*>(target + 0x70) = keys[0].value;
+    } else {
+        CMapAnimNodeTrackKey* current = keys;
+        for (unsigned int i = 0; i < track->count; i++, current++) {
+            unsigned int nextIndex = i + 1;
+            if (nextIndex >= track->count) {
+                nextIndex = 0;
+            }
+
+            CMapAnimNodeTrackKey* next = keys + nextIndex;
+            unsigned int endFrame = next->frame;
+            if (nextIndex == 0) {
+                endFrame += loopFrameCount;
+            }
+
+            if ((current->frame <= frameInLoop) && (frameInLoop < endFrame)) {
+                int frameRange = static_cast<int>(endFrame - current->frame);
+                float t = 0.0f;
+                Vec currentScaled;
+                Vec nextScaled;
+
+                if (frameRange != 0) {
+                    t = static_cast<float>(frameInLoop - current->frame) / static_cast<float>(frameRange);
+                }
+
+                PSVECScale(&current->value, &currentScaled, t);
+                PSVECScale(&next->value, &nextScaled, 1.0f - t);
+                PSVECAdd(&currentScaled, &nextScaled, reinterpret_cast<Vec*>(target + 0x70));
+                break;
+            }
+        }
+    }
+
+    track = &tracks->scale;
+    keys = track->keys;
+    if (track->count == 1) {
+        *reinterpret_cast<Vec*>(target + 0x7C) = keys[0].value;
+    } else {
+        CMapAnimNodeTrackKey* current = keys;
+        for (unsigned int i = 0; i < track->count; i++, current++) {
+            unsigned int nextIndex = i + 1;
+            if (nextIndex >= track->count) {
+                nextIndex = 0;
+            }
+
+            CMapAnimNodeTrackKey* next = keys + nextIndex;
+            unsigned int endFrame = next->frame;
+            if (nextIndex == 0) {
+                endFrame += loopFrameCount;
+            }
+
+            if ((current->frame <= frameInLoop) && (frameInLoop < endFrame)) {
+                int frameRange = static_cast<int>(endFrame - current->frame);
+                float t = 0.0f;
+                Vec currentScaled;
+                Vec nextScaled;
+
+                if (frameRange != 0) {
+                    t = static_cast<float>(frameInLoop - current->frame) / static_cast<float>(frameRange);
+                }
+
+                PSVECScale(&current->value, &currentScaled, t);
+                PSVECScale(&next->value, &nextScaled, 1.0f - t);
+                PSVECAdd(&currentScaled, &nextScaled, reinterpret_cast<Vec*>(target + 0x7C));
+                break;
+            }
+        }
+    }
+
     target[0x1B] = 1;
 }
 

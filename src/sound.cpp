@@ -1428,24 +1428,32 @@ void CSound::FreeWave(int waveId)
  */
 void CSound::StopAndFreeAllSe(int clearMode)
 {
-    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
-    short* seGroup = reinterpret_cast<short*>(reinterpret_cast<u8*>(this) + 0x22C0);
-    short* waveGroup = reinterpret_cast<short*>(reinterpret_cast<u8*>(this) + 0x22C8);
-
-    if (clearMode == 0) {
-        SeStopMG__9CRedSoundFiiii(redSound, seGroup[0], seGroup[1], seGroup[2], seGroup[3]);
-        ClearSeSepDataMG__9CRedSoundFiiii(redSound, seGroup[0], seGroup[1], seGroup[2], seGroup[3]);
-        ClearWaveDataM__9CRedSoundFiiii(redSound, waveGroup[0], waveGroup[1], waveGroup[2], waveGroup[3]);
+    if (clearMode != 0) {
+        SeStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), -1);
+        ClearSeSepData__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), -1);
+        ClearWaveData__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), -3);
     } else {
-        SeStop__9CRedSoundFi(redSound, -1);
-        ClearSeSepData__9CRedSoundFi(redSound, -1);
-        ClearWaveData__9CRedSoundFi(redSound, -3);
+        SeStopMG__9CRedSoundFiiii(reinterpret_cast<CRedSound*>(this),
+                                  *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C0),
+                                  *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C2),
+                                  *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C4),
+                                  *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C6));
+        ClearSeSepDataMG__9CRedSoundFiiii(reinterpret_cast<CRedSound*>(this),
+                                          *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C0),
+                                          *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C2),
+                                          *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C4),
+                                          *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C6));
+        ClearWaveDataM__9CRedSoundFiiii(reinterpret_cast<CRedSound*>(this),
+                                        *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C8),
+                                        *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22CA),
+                                        *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22CC),
+                                        *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22CE));
     }
 
     *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x28) = 10000000;
     memset(reinterpret_cast<u8*>(this) + 0x2C, 0, 0x1400);
-    memset(seGroup, 0xFF, 8);
-    memset(waveGroup, 0xFF, 8);
+    memset(reinterpret_cast<u8*>(this) + 0x22C0, 0xFF, 8);
+    memset(reinterpret_cast<u8*>(this) + 0x22C8, 0xFF, 8);
 }
 
 /*

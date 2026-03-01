@@ -1204,16 +1204,20 @@ int CCaravanWork::IsSelectedCmdList(int cmdListIdx)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CCaravanWork::GetMagicCharge(int cmdListIdx, int& maxCharge, int& curCharge)
+void CCaravanWork::GetMagicCharge(int cmdListIdx, int& groupedCount, int& isSelected)
 {
-	maxCharge = 0;
-	curCharge = 0;
-
+	unsigned int isInvalid = 0;
 	if ((cmdListIdx > 1) && (m_commandListInventorySlotRef[cmdListIdx] == 0xFFFF)) {
+		isInvalid = 1;
+	}
+
+	if ((((unsigned int)__cntlzw((unsigned char)isInvalid)) >> 5) == 0) {
+		groupedCount = 0;
+		isSelected = 0;
 		return;
 	}
 
-	maxCharge = 1;
+	groupedCount = 1;
 	if (Game.game.m_gameWork.m_menuStageMode != 0) {
 		unsigned short* slotRef = m_commandListInventorySlotRef + cmdListIdx;
 		if (slotRef[0] != 0) {
@@ -1230,7 +1234,7 @@ void CCaravanWork::GetMagicCharge(int cmdListIdx, int& maxCharge, int& curCharge
 				} while (scanCount != 0);
 			}
 
-			maxCharge = 1;
+			groupedCount = 1;
 			scanCount = (short)m_numCmdListSlots - (topIdx + 1);
 			slotRef = m_commandListInventorySlotRef + topIdx + 1;
 			if ((topIdx + 1) < (short)m_numCmdListSlots) {
@@ -1238,7 +1242,7 @@ void CCaravanWork::GetMagicCharge(int cmdListIdx, int& maxCharge, int& curCharge
 					if (slotRef[0] != 0xFFFF) {
 						break;
 					}
-					maxCharge++;
+					groupedCount++;
 					slotRef++;
 					scanCount--;
 				} while (scanCount != 0);
@@ -1246,8 +1250,8 @@ void CCaravanWork::GetMagicCharge(int cmdListIdx, int& maxCharge, int& curCharge
 		}
 	}
 
-	if (maxCharge == 1) {
-		curCharge = (cmdListIdx == (short)m_currentCmdListIndex);
+	if (groupedCount == 1) {
+		isSelected = (((unsigned int)__cntlzw(cmdListIdx - (short)m_currentCmdListIndex)) >> 5) & 0xFF;
 		return;
 	}
 
@@ -1264,11 +1268,12 @@ void CCaravanWork::GetMagicCharge(int cmdListIdx, int& maxCharge, int& curCharge
 		} while (scanCount != 0);
 	}
 
-	curCharge = 0;
+	unsigned int selected = 0;
 	if ((cmdListIdx <= (short)m_currentCmdListIndex) &&
-		((short)m_currentCmdListIndex <= cmdListIdx + maxCharge - 1)) {
-		curCharge = 1;
+		((short)m_currentCmdListIndex <= (cmdListIdx + groupedCount - 1))) {
+		selected = 1;
 	}
+	isSelected = selected;
 }
 
 extern "C" int GetCmdListItemName__12CCaravanWorkFi(CCaravanWork* caravanWork, int cmdListIdx, int* firstCmdIdx, int* itemCmdListIdx)

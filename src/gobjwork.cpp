@@ -573,12 +573,52 @@ void CCaravanWork::CanAddTmpArtifact(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a1d70
+ * PAL Size: 284b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::FindItem(int)
+int CCaravanWork::FindItem(int itemId)
 {
-	// TODO
+	int baseIdx = 0;
+	int rowCount = 8;
+	CCaravanWork* cur = this;
+
+	while (true) {
+		if ((short)cur->m_inventoryItems[0] != -1 && (short)cur->m_inventoryItems[0] == itemId) {
+			return baseIdx;
+		}
+		if ((short)cur->m_inventoryItems[1] != -1 && (short)cur->m_inventoryItems[1] == itemId) {
+			return baseIdx + 1;
+		}
+		if ((short)cur->m_inventoryItems[2] != -1 && (short)cur->m_inventoryItems[2] == itemId) {
+			return baseIdx + 2;
+		}
+		if ((short)cur->m_inventoryItems[3] != -1 && (short)cur->m_inventoryItems[3] == itemId) {
+			return baseIdx + 3;
+		}
+		if ((short)cur->m_inventoryItems[4] != -1 && (short)cur->m_inventoryItems[4] == itemId) {
+			return baseIdx + 4;
+		}
+		if ((short)cur->m_inventoryItems[5] != -1 && (short)cur->m_inventoryItems[5] == itemId) {
+			return baseIdx + 5;
+		}
+		if ((short)cur->m_inventoryItems[6] != -1 && (short)cur->m_inventoryItems[6] == itemId) {
+			return baseIdx + 6;
+		}
+		if ((short)cur->m_inventoryItems[7] != -1 && (short)cur->m_inventoryItems[7] == itemId) {
+			return baseIdx + 7;
+		}
+
+		cur = (CCaravanWork*)&cur->m_baseDataIndex;
+		baseIdx += 8;
+		rowCount--;
+		if (rowCount == 0) {
+			return -1;
+		}
+	}
 }
 
 /*

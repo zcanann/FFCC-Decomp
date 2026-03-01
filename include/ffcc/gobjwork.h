@@ -90,7 +90,7 @@ public:
     void FGAddItemIdx(int, int);
     void ChkNumItem(char*, int);
     void CanAddTmpArtifact(int);
-    void FindItem(int);
+    int FindItem(int);
     void DeleteItemIdx(int, int);
     void DeleteItem(int, int);
     void AddTmpArtifact(int, int*);

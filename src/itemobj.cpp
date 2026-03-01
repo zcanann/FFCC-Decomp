@@ -1191,19 +1191,12 @@ void CGItemObj::ItemJump(int state, float jump)
  */
 void CGItemObj::DeleteAllFieldItem()
 {
-	unsigned char* itemObj = (unsigned char*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat);
-
-	while (itemObj != 0) {
-		unsigned char stateFlags = itemObj[0x50];
-		unsigned int rotated = (unsigned int)stateFlags >> 4;
-		rotated |= (unsigned int)stateFlags << 0x1c;
-		int isActive = (int)(rotated >> 0x1f);
-
-		if (*(int*)(itemObj + 0x550) == 0 && isActive != 0) {
+	for (unsigned char* itemObj = (unsigned char*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat); itemObj != 0;
+	     itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
+		if (*(int*)(itemObj + 0x550) == 0 &&
+		    (int)(((unsigned int)itemObj[0x50] << 0x1c) | ((unsigned int)itemObj[0x50] >> 4)) < 0) {
 			itemObj[0x38] = (itemObj[0x38] & 0x7f) | 0x80;
 		}
-
-		itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj);
 	}
 }
 
@@ -1218,21 +1211,16 @@ void CGItemObj::DeleteAllFieldItem()
  */
 void CGItemObj::DispAllFieldItem(int show)
 {
-	unsigned char* itemObj = (unsigned char*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat);
-
-	while (itemObj != 0) {
-		unsigned char stateFlags = itemObj[0x50];
-		int isActive = (int)(((unsigned int)stateFlags << 0x1c) | ((unsigned int)stateFlags >> 4)) < 0;
-
-		if (*(int*)(itemObj + 0x550) == 0 && isActive != 0) {
+	for (unsigned char* itemObj = (unsigned char*)FindGItemObjFirst__13CFlatRuntime2Fv(CFlat); itemObj != 0;
+	     itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj)) {
+		if (*(int*)(itemObj + 0x550) == 0 &&
+		    (int)(((unsigned int)itemObj[0x50] << 0x1c) | ((unsigned int)itemObj[0x50] >> 4)) < 0) {
 			if (show == 0) {
 				*(unsigned int*)(itemObj + 0x60) |= 0x400000;
 			} else {
 				*(unsigned int*)(itemObj + 0x60) &= 0xffbfffff;
 			}
 		}
-
-		itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj);
 	}
 }
 

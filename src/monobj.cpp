@@ -2157,6 +2157,171 @@ void CGMonObj::moveFrame()
 #pragma dont_inline on
 /*
  * --INFO--
+ * PAL Address: 0x8011548C
+ * PAL Size: 1908b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" int fn_8011548C(CGMonObj* monObj, int partyIndex)
+{
+	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
+	__ptmf* checkFn = reinterpret_cast<__ptmf*>(mon + 0x78C);
+	if (__ptmf_test(checkFn) != 0) {
+		typedef int (*PtmfScallRet)(CGMonObj*, int, void*);
+		int result = reinterpret_cast<PtmfScallRet>(__ptmf_scall)(monObj, partyIndex, mon + 0x708);
+		if (result == -2) {
+			return -1;
+		}
+		if (result != -1) {
+			return result;
+		}
+	}
+
+	return -1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80115C00
+ * PAL Size: 1716b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void fn_80115C00(CGMonObj* monObj)
+{
+	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
+	CGObject* object = reinterpret_cast<CGObject*>(monObj);
+	int& targetPartyIndex = *reinterpret_cast<int*>(mon + 0x6C4);
+	int& actionState = *reinterpret_cast<int*>(SoundBuffer_1248_ + 4);
+	unsigned char* script = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+
+	if (targetPartyIndex >= 0) {
+		float homeRange = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xCC));
+		float homeDist = PSVECDistance(reinterpret_cast<Vec*>(mon + 0x6F8), &object->m_worldPosition);
+		if (homeDist < homeRange) {
+			if (mon[0x6BD] != 0) {
+				float reacquireRange = static_cast<float>(*reinterpret_cast<unsigned short*>(script + 0xC8));
+				int nearTarget = getNearParty__8CGMonObjFiiffi(monObj, 6, 0, object->m_rotBaseY, reacquireRange, -1);
+				if (nearTarget >= 0) {
+					targetPartyIndex = nearTarget;
+					mon[0x6BD] = 0;
+				}
+			}
+
+			int nextAction = fn_8011548C(monObj, targetPartyIndex);
+			if (nextAction == -2) {
+				actionState = 0;
+				memset(mon + 0x70C, 0, 0x34);
+				*reinterpret_cast<int*>(mon + 0x6D8) = 0;
+				*reinterpret_cast<int*>(mon + 0x6DC) = 0;
+				mon[0x6BB] = 1;
+				return;
+			}
+			if (nextAction == -1) {
+				if (*reinterpret_cast<short*>(script + 0x10C) != 1) {
+					if (static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BA)) <=
+						*reinterpret_cast<int*>(mon + 0x6DC)) {
+						*reinterpret_cast<int*>(mon + 0x6D8) = 3;
+						*reinterpret_cast<int*>(mon + 0x6DC) = 0;
+						mon[0x6BB] = 1;
+						return;
+					}
+					actionState = 3;
+					return;
+				}
+
+				if (((*reinterpret_cast<unsigned short*>(script + 0xFE) & 8) == 0) &&
+					((*reinterpret_cast<unsigned short*>(script + 0x102) & 0x100) == 0)) {
+					actionState = 0x21;
+					if (*reinterpret_cast<int*>(mon + 0x734) != 1) {
+						memset(mon + 0x70C, 0, 0x34);
+						*reinterpret_cast<unsigned int*>(mon + 0x70C) = 0x205;
+						if ((*reinterpret_cast<unsigned short*>(script + 0x102) & 0x40) != 0) {
+							*reinterpret_cast<unsigned int*>(mon + 0x70C) |= 0x10000;
+						}
+						*reinterpret_cast<int*>(mon + 0x734) = 1;
+					}
+					*reinterpret_cast<void**>(mon + 0x714) = Game.game.m_partyObjArr[targetPartyIndex];
+					if (((*reinterpret_cast<unsigned int*>(mon + 0x710) & 1) != 0) ||
+						(static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BA)) <=
+						 *reinterpret_cast<int*>(mon + 0x730))) {
+						actionState = 0;
+						memset(mon + 0x70C, 0, 0x34);
+						*reinterpret_cast<int*>(mon + 0x6D8) = 3;
+						*reinterpret_cast<int*>(mon + 0x6DC) = 0;
+						mon[0x6BB] = 1;
+					}
+					return;
+				}
+
+				actionState = 0;
+				memset(mon + 0x70C, 0, 0x34);
+				*reinterpret_cast<int*>(mon + 0x6D8) = 2;
+				*reinterpret_cast<int*>(mon + 0x6DC) = 0;
+				mon[0x6BB] = 1;
+				return;
+			}
+
+			if (*reinterpret_cast<short*>(script + 0x10C) == 1) {
+				actionState = (nextAction < 100) ? 0x21 : nextAction;
+			} else {
+				actionState = nextAction - 0xE;
+			}
+			*reinterpret_cast<int*>(mon + 0x6D8) = 1;
+			*reinterpret_cast<int*>(mon + 0x6DC) = 0;
+			mon[0x6BB] = 1;
+			return;
+		}
+	}
+
+	targetPartyIndex = -1;
+	actionState = 0;
+	memset(mon + 0x70C, 0, 0x34);
+	*reinterpret_cast<int*>(mon + 0x6D8) = 3;
+	*reinterpret_cast<int*>(mon + 0x6DC) = 0;
+	mon[0x6BB] = 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80114B74
+ * PAL Size: 2328b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void fn_80114B74(CGMonObj* monObj)
+{
+	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
+
+	if (*reinterpret_cast<int*>(mon + 0x520) == 0x21) {
+		unsigned char* script = reinterpret_cast<unsigned char*>(
+			reinterpret_cast<CGObject*>(monObj)->m_scriptHandle[9]);
+		if ((*reinterpret_cast<short*>(script + 0x10C) == 1) &&
+			(((*reinterpret_cast<unsigned int*>(mon + 0x710) & 1) != 0) ||
+			 (static_cast<int>(*reinterpret_cast<unsigned short*>(script + 0x1BC)) <=
+			  *reinterpret_cast<int*>(mon + 0x730)))) {
+			*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0;
+			memset(mon + 0x70C, 0, 0x34);
+			*reinterpret_cast<int*>(mon + 0x6D8) = 3;
+			*reinterpret_cast<int*>(mon + 0x6DC) = 0;
+			mon[0x6BB] = 1;
+		}
+		return;
+	}
+
+	if (*reinterpret_cast<int*>(mon + 0x520) == 0) {
+		fn_80115C00(monObj);
+	}
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x801162B4
  * PAL Size: 60b
  * EN Address: TODO

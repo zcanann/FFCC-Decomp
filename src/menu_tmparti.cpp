@@ -25,6 +25,13 @@ extern "C" void SetPosX__5CFontFf(float, CFont*);
 extern "C" void SetPosY__5CFontFf(float, CFont*);
 extern "C" void Draw__5CFontFPc(CFont*, const char*);
 
+extern float FLOAT_80332f2c;
+extern float FLOAT_80332f30;
+extern double DOUBLE_80332f20;
+extern double DOUBLE_80332f40;
+extern double DOUBLE_80332f48;
+extern double DOUBLE_80332f58;
+
 struct TmpArtiTableEntry {
     int count;
     const char** strings;
@@ -81,7 +88,7 @@ unsigned int CMenuPcs::TmpArtiOpen()
 
 	if (*(char *)(*(int *)((char *)this + 0x82c) + 0xb) == '\0') {
 		memset(*(void **)((char *)this + 0x850), 0, 0x1008);
-		fVar3 = 1.0f;
+		fVar3 = FLOAT_80332f30;
 		iVar6 = *(int *)((char *)this + 0x850) + 8;
 		iVar10 = 8;
 		do {
@@ -93,10 +100,10 @@ unsigned int CMenuPcs::TmpArtiOpen()
 			*(float *)(iVar6 + 0x154) = fVar3;
 			*(float *)(iVar6 + 0x194) = fVar3;
 			*(float *)(iVar6 + 0x1d4) = fVar3;
-			dVar5 = 2.0;
-			dVar4 = 4607182418800017408.0;
-			fVar2 = 0.0f;
-			dVar1 = 4602678819172646912.0;
+			dVar5 = DOUBLE_80332f58;
+			dVar4 = DOUBLE_80332f40;
+			fVar2 = FLOAT_80332f2c;
+			dVar1 = DOUBLE_80332f20;
 			iVar6 = iVar6 + 0x200;
 			iVar10 = iVar10 - 1;
 		} while (iVar10 != 0);
@@ -138,23 +145,23 @@ unsigned int CMenuPcs::TmpArtiOpen()
 	uVar11 = uVar8;
 	if (0 < (int)uVar8) {
 		do {
-			dVar1 = 4607182418800017408.0;
+			dVar1 = DOUBLE_80332f40;
 			if (*(int *)(psVar7 + 0x12) <= iVar10) {
 				if (iVar10 < *(int *)(psVar7 + 0x12) + *(int *)(psVar7 + 0x14)) {
 					*(int *)(psVar7 + 0x10) = *(int *)(psVar7 + 0x10) + 1;
-					*(float *)(psVar7 + 8) = (float)((1.0 /
+					*(float *)(psVar7 + 8) = (float)((DOUBLE_80332f48 /
 						((double)*(unsigned int *)(psVar7 + 0x14) - dVar1)) *
 						((double)*(unsigned int *)(psVar7 + 0x10) - dVar1));
 				} else {
 					iVar6 = iVar6 + 1;
-					*(float *)(psVar7 + 8) = 1.0f;
+					*(float *)(psVar7 + 8) = FLOAT_80332f30;
 				}
 			}
 			psVar7 = psVar7 + 0x20;
 			uVar11 = uVar11 - 1;
 		} while (uVar11 != 0);
 	}
-	fVar3 = 1.0f;
+	fVar3 = FLOAT_80332f30;
 	if (**(short **)((char *)this + 0x850) == iVar6) {
 		psVar7 = *(short **)((char *)this + 0x850) + 4;
 		if (0 < (int)uVar8) {
@@ -279,7 +286,7 @@ void CMenuPcs::TmpArtiCtrl()
 		hasInput = false;
 	}
 
-	fVar2 = 1.0f;
+	fVar2 = FLOAT_80332f30;
 	uVar4 = Game.game.m_scriptFoodBase[0];
 	if (hasInput) {
 		iVar6 = *(int *)((char *)this + 0x850) + 8;
@@ -371,21 +378,21 @@ unsigned int CMenuPcs::TmpArtiClose()
 	
 	if (0 < (int)uVar6) {
 		do {
-			dVar2 = 1.0;
+			dVar2 = DOUBLE_80332f40;
 			if (*(int *)(psVar4 + 0x12) <= iVar7) {
 				if (iVar7 < *(int *)(psVar4 + 0x12) + *(int *)(psVar4 + 0x14)) {
 					*(int *)(psVar4 + 0x10) = *(int *)(psVar4 + 0x10) + 1;
 					*(float *)(psVar4 + 8) =
-					    (float)-(1.0 / ((double)(unsigned int)*(unsigned int *)(psVar4 + 0x14) - dVar2) *
+					    (float)-(DOUBLE_80332f48 / ((double)(unsigned int)*(unsigned int *)(psVar4 + 0x14) - dVar2) *
 					            ((double)(unsigned int)*(unsigned int *)(psVar4 + 0x10) - dVar2) -
-					            1.0);
-					if (*(float *)(psVar4 + 8) < 0.0f) {
-						*(float *)(psVar4 + 8) = 0.0f;
+					            DOUBLE_80332f48);
+					if (*(float *)(psVar4 + 8) < FLOAT_80332f2c) {
+						*(float *)(psVar4 + 8) = FLOAT_80332f2c;
 					}
 				}
 				else {
 					iVar5 = iVar5 + 1;
-					*(float *)(psVar4 + 8) = 0.0f;
+					*(float *)(psVar4 + 8) = FLOAT_80332f2c;
 				}
 			}
 			psVar4 = psVar4 + 0x20;
@@ -393,7 +400,7 @@ unsigned int CMenuPcs::TmpArtiClose()
 		} while (uVar8 != 0);
 	}
 	
-	fVar1 = 0.0f;
+	fVar1 = FLOAT_80332f2c;
 	if (**(short **)((char *)this + 0x850) == iVar5) {
 		psVar4 = *(short **)((char *)this + 0x850) + 4;
 		if (0 < (int)uVar6) {

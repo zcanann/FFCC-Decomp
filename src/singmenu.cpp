@@ -248,6 +248,12 @@ static inline const char* GetSingWinMessage(int staticText, const char* dynamicT
     return lbl_802141E0[staticText];
 }
 
+static inline double SingWinUIntToDouble(unsigned int value)
+{
+    unsigned long long bits = 0x4330000000000000ULL | static_cast<unsigned long long>(value ^ 0x80000000U);
+    return static_cast<double>(bits) - DOUBLE_80332938;
+}
+
 /*
  * --INFO--
  * Address:	TODO
@@ -1742,10 +1748,9 @@ float CMenuPcs::GetSingWinScl()
 int CMenuPcs::SingWinMessHeight()
 {
     unsigned int lineHeight = static_cast<unsigned int>(FLOAT_80332960 * FLOAT_8032ea78);
-    float scaledHeight = FLOAT_80332960 * FLOAT_8032ea78;
-    double intHeight = static_cast<double>(lineHeight);
-
-    if (FLOAT_8033294c < (scaledHeight - static_cast<float>(intHeight))) {
+    if (FLOAT_8033294c <
+        (FLOAT_80332960 * FLOAT_8032ea78) -
+            static_cast<float>(SingWinUIntToDouble(lineHeight))) {
         lineHeight += 1;
     }
     return static_cast<int>(lineHeight + 3);

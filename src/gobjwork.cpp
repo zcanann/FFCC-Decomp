@@ -1142,12 +1142,83 @@ int CCaravanWork::IsSelectedCmdList(int cmdListIdx)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009f890
+ * PAL Size: 332b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::GetMagicCharge(int, int&, int&)
+void CCaravanWork::GetMagicCharge(int cmdListIdx, int& groupedCount, int& isSelected)
 {
-	// TODO
+	unsigned int isInvalid = 0;
+	if ((cmdListIdx > 1) && (m_commandListInventorySlotRef[cmdListIdx] == 0xFFFF)) {
+		isInvalid = 1;
+	}
+
+	if ((((unsigned int)__cntlzw((unsigned char)isInvalid)) >> 5) == 0) {
+		groupedCount = 0;
+		isSelected = 0;
+		return;
+	}
+
+	groupedCount = 1;
+	if (Game.game.m_gameWork.m_menuStageMode != 0) {
+		unsigned short* slotRef = m_commandListInventorySlotRef + cmdListIdx;
+		if (slotRef[0] != 0) {
+			int scanCount = cmdListIdx + 1;
+			int topIdx = cmdListIdx;
+			if (cmdListIdx >= 0) {
+				do {
+					if (slotRef[0] != 0xFFFF) {
+						break;
+					}
+					slotRef--;
+					topIdx--;
+					scanCount--;
+				} while (scanCount != 0);
+			}
+
+			groupedCount = 1;
+			scanCount = (short)m_numCmdListSlots - (topIdx + 1);
+			slotRef = m_commandListInventorySlotRef + topIdx + 1;
+			if ((topIdx + 1) < (short)m_numCmdListSlots) {
+				do {
+					if (slotRef[0] != 0xFFFF) {
+						break;
+					}
+					groupedCount++;
+					slotRef++;
+					scanCount--;
+				} while (scanCount != 0);
+			}
+		}
+	}
+
+	if (groupedCount == 1) {
+		isSelected = (((unsigned int)__cntlzw(cmdListIdx - (short)m_currentCmdListIndex)) >> 5) & 0xFF;
+		return;
+	}
+
+	int scanCount = cmdListIdx + 1;
+	unsigned short* slotRef = m_commandListInventorySlotRef + cmdListIdx;
+	if (cmdListIdx >= 0) {
+		do {
+			if (slotRef[0] != 0xFFFF) {
+				break;
+			}
+			slotRef--;
+			cmdListIdx--;
+			scanCount--;
+		} while (scanCount != 0);
+	}
+
+	unsigned int selected = 0;
+	if ((cmdListIdx <= (short)m_currentCmdListIndex) &&
+		((short)m_currentCmdListIndex <= (cmdListIdx + groupedCount - 1))) {
+		selected = 1;
+	}
+	isSelected = selected;
 }
 
 extern "C" int GetCmdListItemName__12CCaravanWorkFi(CCaravanWork* caravanWork, int cmdListIdx, int* firstCmdIdx, int* itemCmdListIdx)

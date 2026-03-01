@@ -81,8 +81,7 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct UnkB* param_2, struct Unk
         Vec* history = (Vec*)(work + 0x18);
         s32 i = 0x1c;
         do {
-            pppCopyVector__FR3Vec3Vec(&pos, &temp);
-            pppCopyVector__FR3Vec3Vec(history, &pos);
+            pppCopyVector__FR3Vec3Vec(history, &temp);
             history++;
             i--;
         } while (i > 0);

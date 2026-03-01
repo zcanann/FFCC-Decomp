@@ -14,9 +14,12 @@ extern CMath Math;
 CMemoryCardMan MemoryCardMan;
 
 extern "C" void SaveScript__5CGameFPc(void* game, char* scriptData);
+extern "C" void LoadScript__5CGameFPc(void* game, char* scriptData);
 class CChara;
 extern CChara Chara;
 extern "C" void SaveFurTexBuffer__6CCharaFPUs(CChara* chara, unsigned short* outTexels);
+extern "C" void LoadFurTexBuffer__6CCharaFPUs(CChara* chara, unsigned short* inTexels);
+extern "C" unsigned short GetArtifactIncludeHpMax__12CCaravanWorkFv(void*);
 
 // CRC32 lookup table
 static const unsigned int crcTable[256] = {
@@ -1014,9 +1017,10 @@ void CMemoryCardMan::SetLoadData()
         cv[0xC1E] = src[0x1D92];
         *reinterpret_cast<int*>(cv + 0xC20) = *reinterpret_cast<int*>(src + 0x1D94);
         *reinterpret_cast<int*>(cv + 0xC24) = *reinterpret_cast<int*>(src + 0x1DA0);
-        *reinterpret_cast<int*>(cv + 0xC28) = *reinterpret_cast<int*>(src + 0x1D98);
         *reinterpret_cast<int*>(cv + 0xC2C) = *reinterpret_cast<int*>(src + 0x1D9C);
+        *reinterpret_cast<int*>(cv + 0xC28) = *reinterpret_cast<int*>(src + 0x1D98);
         *reinterpret_cast<int*>(cv + 0x10) = *reinterpret_cast<int*>(src + 0x1DA4);
+        *reinterpret_cast<u16*>(cv + 0x1A) = GetArtifactIncludeHpMax__12CCaravanWorkFv(cv);
 
     }
 
@@ -1034,6 +1038,9 @@ void CMemoryCardMan::SetLoadData()
             *reinterpret_cast<int*>(gameWork + 0x18 + i * 4) = -1;
         }
     }
+
+    LoadScript__5CGameFPc(Game, reinterpret_cast<char*>(save + 0x62D0));
+    LoadFurTexBuffer__6CCharaFPUs(&Chara, reinterpret_cast<unsigned short*>(save + 0x6AD0));
 
 }
 

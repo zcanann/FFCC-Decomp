@@ -43,7 +43,7 @@ void _ExecuteExtraData();
 
 void _MusicTrackDataExecute(RedTrackDATA*, int);
 void _MidiTrackExecute(RedSoundCONTROL*, RedKeyOnDATA*, int);
-void _MusicMidiNoteExecute(RedSoundCONTROL*, RedKeyOnDATA*, int);
+int _MusicMidiNoteExecute(RedSoundCONTROL*, RedKeyOnDATA*, int);
 void _MusicNoteExecute();
 int _MusicMidiNoteSkipExecute(RedSoundCONTROL*, RedKeyOnDATA*, int);
 void _SkipMusicEntry();

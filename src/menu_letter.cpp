@@ -123,12 +123,62 @@ void CMenuPcs::LetterInit0()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 80167c3c
+ * PAL Size: 408b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::LetterInit1()
 {
-	// TODO
+	int iVar4;
+	int iVar5;
+	float fVar1;
+
+	memset(*reinterpret_cast<void**>(reinterpret_cast<char*>(this) + 0x850), 0, 0x1008);
+	fVar1 = FLOAT_803330f8;
+	iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 8;
+	iVar5 = 8;
+	do {
+		*reinterpret_cast<float*>(iVar4 + 0x14) = fVar1;
+		*reinterpret_cast<float*>(iVar4 + 0x54) = fVar1;
+		*reinterpret_cast<float*>(iVar4 + 0x94) = fVar1;
+		*reinterpret_cast<float*>(iVar4 + 0xD4) = fVar1;
+		*reinterpret_cast<float*>(iVar4 + 0x114) = fVar1;
+		*reinterpret_cast<float*>(iVar4 + 0x154) = fVar1;
+		*reinterpret_cast<float*>(iVar4 + 0x194) = fVar1;
+		*reinterpret_cast<float*>(iVar4 + 0x1D4) = fVar1;
+		iVar4 += 0x200;
+		--iVar5;
+	} while (iVar5 != 0);
+
+	iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
+	*reinterpret_cast<int*>(iVar4 + 0x24) = 0x5F;
+	*reinterpret_cast<s16*>(iVar4 + 0xC) = 0x238;
+	*reinterpret_cast<s16*>(iVar4 + 0xE) = 0x178;
+	*reinterpret_cast<s16*>(iVar4 + 8) = static_cast<s16>((0x280 - *reinterpret_cast<s16*>(iVar4 + 0xC)) * DOUBLE_803330a8);
+	*reinterpret_cast<s16*>(iVar4 + 0xA) = static_cast<s16>((0x1C0 - *reinterpret_cast<s16*>(iVar4 + 0xE)) * DOUBLE_803330a8);
+	fVar1 = FLOAT_803330bc;
+	*reinterpret_cast<float*>(iVar4 + 0x10) = fVar1;
+	*reinterpret_cast<float*>(iVar4 + 0x14) = fVar1;
+	*reinterpret_cast<int*>(iVar4 + 0x2C) = 0;
+	*reinterpret_cast<int*>(iVar4 + 0x30) = 10;
+
+	iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
+	*reinterpret_cast<int*>(iVar4 + 0x64) = 0x3E;
+	*reinterpret_cast<s16*>(iVar4 + 0x4C) = 0xA8;
+	*reinterpret_cast<s16*>(iVar4 + 0x4E) = 0x60;
+	*reinterpret_cast<s16*>(iVar4 + 0x48) = 0x20;
+	*reinterpret_cast<s16*>(iVar4 + 0x4A) = static_cast<s16>(0x1A0 - *reinterpret_cast<s16*>(iVar4 + 0x4E));
+	*reinterpret_cast<float*>(iVar4 + 0x50) = fVar1;
+	*reinterpret_cast<float*>(iVar4 + 0x54) = fVar1;
+	*reinterpret_cast<int*>(iVar4 + 0x6C) = 0;
+	*reinterpret_cast<int*>(iVar4 + 0x70) = 10;
+
+	**reinterpret_cast<s16**>(reinterpret_cast<char*>(this) + 0x850) = 2;
+	*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0x22) = 0;
+	*reinterpret_cast<char*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82C) + 0xB) = 1;
 }
 
 /*

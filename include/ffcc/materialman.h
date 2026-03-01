@@ -68,7 +68,7 @@ public:
     void SetShadow(CMapShadow&, float(*)[4], int, unsigned long);
     void SetShadowBit32(CMapShadow::TARGET, unsigned long*, float(*)[4]);
     void SetPosition(CMapShadow::TARGET, Vec*, float, float, float(*)[4], int);
-    void GetCharaShadow(int, CMaterial**, float(**)[4], Vec*, float, float, int);
+    int GetCharaShadow(int, CMaterial**, float(**)[4], Vec*, float, float, int);
     void SetShadowBound(CMapShadow::TARGET, CBound*, float(*)[4]);
     void InitVtxFmt(int, _GXCompType, int, _GXCompType, int, _GXCompType, int);
     void IncNumTevStage();

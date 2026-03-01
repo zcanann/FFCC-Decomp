@@ -1810,12 +1810,110 @@ void CMaterialMan::SetPosition(
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003e14c
+ * PAL Size: 584b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMaterialMan::GetCharaShadow(int, CMaterial **, float (**) [4], Vec*, float, float, int)
+int CMaterialMan::GetCharaShadow(
+    int maxShadows,
+    CMaterial** materialsOut,
+    float (**shadowMtxOut)[4],
+    Vec* position,
+    float rangeXZ,
+    float rangeY,
+    int ignoreFrustumCheck)
 {
-	// TODO
+    float minX = position->x - rangeXZ;
+    float minY = position->y;
+    float minZ = position->z - rangeXZ;
+    float maxX = position->x + rangeXZ;
+    float maxY = minY + rangeY;
+    float maxZ = position->z + rangeXZ;
+
+    CMaterialSet* materialSet = *reinterpret_cast<CMaterialSet**>(Ptr(&MapMng, 0x213D4));
+    CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8));
+    CPtrArray<CMapShadow*>* mapShadowArray = reinterpret_cast<CPtrArray<CMapShadow*>*>(Ptr(&MapMng, 0x21434));
+
+    int shadowCandidates[384];
+    int* candidateWrite = shadowCandidates;
+    int candidateCount = 0;
+    int outputCount = 0;
+
+    for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
+        CMapShadow* shadow = (*mapShadowArray)[i];
+        unsigned char* shadowBytes = reinterpret_cast<unsigned char*>(shadow);
+        if (*(shadowBytes + 0xF0) == 0) {
+            continue;
+        }
+
+        int model = *reinterpret_cast<int*>(shadowBytes + 0xC);
+        Vec shadowPos;
+        shadowPos.x = *reinterpret_cast<float*>(model + 0xC4);
+        shadowPos.y = *reinterpret_cast<float*>(model + 0xD4);
+        shadowPos.z = *reinterpret_cast<float*>(model + 0xE4);
+
+        Mtx scaledShadowMtx;
+        PSMTXScaleApply(
+            reinterpret_cast<float(*)[4]>(shadowBytes + 0x78),
+            scaledShadowMtx,
+            FLOAT_8032faf8,
+            FLOAT_8032faf8,
+            FLOAT_8032faf0);
+
+        if (*(shadowBytes + 7) == 1) {
+            if (outputCount < maxShadows) {
+                unsigned short materialIndex = *reinterpret_cast<unsigned short*>(shadowBytes + 4);
+                materialsOut[outputCount] = (*materials)[materialIndex];
+                shadowMtxOut[outputCount] = reinterpret_cast<float(*)[4]>(shadowBytes + 0x78);
+                outputCount++;
+            }
+            continue;
+        }
+
+        bool yFilterPass =
+            ((*(shadowBytes + 9) != 1) || (shadowPos.y <= position->y)) &&
+            ((*(shadowBytes + 9) != 2) || (position->y <= shadowPos.y));
+        if ((ignoreFrustumCheck != 0) ||
+            (yFilterPass &&
+             (CheckFrustum__6CBoundFR3VecPA4_ff(
+                  reinterpret_cast<CBound*>(&minX),
+                  &shadowPos,
+                  scaledShadowMtx,
+                  FLOAT_8032fafc) != 0))) {
+            Vec delta;
+            PSVECSubtract(&shadowPos, position, &delta);
+            candidateWrite[0] = reinterpret_cast<int>(shadow);
+            candidateWrite[1] = static_cast<int>(PSVECSquareMag(&delta));
+            candidateWrite[2] = i;
+            candidateWrite += 3;
+            candidateCount++;
+        }
+    }
+
+    int* nearest = 0;
+    float nearestDist = FLOAT_8032fb00;
+    int* candidateRead = shadowCandidates;
+    for (int i = 0; i < candidateCount; i++) {
+        if (static_cast<float>(candidateRead[1]) < nearestDist) {
+            nearest = candidateRead;
+            nearestDist = static_cast<float>(candidateRead[1]);
+        }
+        candidateRead += 3;
+    }
+
+    if ((nearest != 0) && (outputCount < maxShadows)) {
+        nearest[1] = static_cast<int>(FLOAT_8032fb04);
+        unsigned char* nearestShadowBytes = reinterpret_cast<unsigned char*>(nearest[0]);
+        unsigned short materialIndex = *reinterpret_cast<unsigned short*>(nearestShadowBytes + 4);
+        materialsOut[outputCount] = (*materials)[materialIndex];
+        shadowMtxOut[outputCount] = reinterpret_cast<float(*)[4]>(nearestShadowBytes + 0x78);
+        outputCount++;
+    }
+
+    return outputCount;
 }
 
 /*

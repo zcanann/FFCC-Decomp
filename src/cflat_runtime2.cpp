@@ -6,6 +6,7 @@
 #include "ffcc/partMng.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/p_game.h"
+#include "ffcc/graphic.h"
 #include "ffcc/stopwatch.h"
 #include "ffcc/textureman.h"
 #include <math.h>
@@ -55,6 +56,18 @@ extern "C" void Read__5CFileFPQ25CFile7CHandle(void*, void*);
 extern "C" void SyncCompleted__5CFileFPQ25CFile7CHandle(void*, void*);
 extern "C" void ReadASync__5CFileFPQ25CFile7CHandle(void*, void*);
 extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
+extern "C" int Find__11CTextureSetFPc(CTextureSet*, char*);
+extern "C" void _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(int, int, int, int);
+extern "C" void _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
+	int, int, int, int, int);
+extern "C" void _GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(int, int, int, int,
+																																				int, int);
+extern "C" void _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(
+	int, int, int, int, int);
+extern "C" void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(int, int, int, int,
+																																				int, int);
+extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
+extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int*, int*, int*, int*, int);
 extern "C" void ClrBattleItem__8CMenuPcsFv(void*);
 extern "C" void ChangeMogMode__6CCharaFi(void*, int);
 extern "C" void TimeMogFur__6CCharaFv(void*);
@@ -83,6 +96,7 @@ extern int DAT_8032ed98;
 extern unsigned char DAT_8032ed9c;
 extern char DAT_801d8fc4[];
 extern CPartMng PartMng;
+extern CTextureMan TextureMan;
 extern "C" void* __vt__Q212CFlatRuntime7CObject[];
 extern "C" void* __vt__9CGBaseObj[];
 extern "C" void* __vt__9CGQuadObj[];
@@ -1863,12 +1877,196 @@ void CFlatRuntime2::loadLayerASync(int layerNo, char* fileName)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006A764
+ * PAL Size: 2040b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::drawLayer(int, char*, int, int, int, int, int, int, float, float, _GXColor*, int)
+void CFlatRuntime2::drawLayer(
+	int layerNo, char* textureName, int x, int y, int width, int height, int texS, int texT, float scaleX, float scaleY,
+	_GXColor* color, int mode)
 {
-	// TODO
+	CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(reinterpret_cast<u8*>(this) + 0x1774 + layerNo * 0xC);
+	if (textureSet == 0) {
+		return;
+	}
+
+	int textureIndex = Find__11CTextureSetFPc(textureSet, textureName);
+	if (textureIndex < 0) {
+		return;
+	}
+
+	CPtrArray<CTexture*>* textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<u8*>(textureSet) + 8);
+	CTexture* texture = (*textureArray)[static_cast<unsigned long>(textureIndex)];
+	if (texture == 0) {
+		return;
+	}
+
+	GXSetNumChans(1);
+	GXSetChanCtrl(GX_COLOR0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+	GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
+	GXSetChanMatColor(GX_COLOR0A0, *reinterpret_cast<GXColor*>(color));
+
+	Mtx44 orthoProjection;
+	C_MTXOrtho(orthoProjection, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, 1.0f);
+	GXSetProjection(orthoProjection, GX_ORTHOGRAPHIC);
+
+	Mtx identityMtx;
+	PSMTXIdentity(identityMtx);
+	GXLoadPosMtxImm(identityMtx, GX_PNMTX0);
+	GXSetCurrentMtx(GX_PNMTX0);
+
+	unsigned int blendMode = static_cast<unsigned int>(mode >> 1) & 3;
+	if (blendMode == 1) {
+		_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 1, 5);
+	} else if (blendMode == 2) {
+		_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(3, 4, 1, 5);
+	} else {
+		_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+	}
+
+	GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
+	PSMTXIdentity(identityMtx);
+	GXLoadPosMtxImm(identityMtx, GX_PNMTX0);
+	GXSetCullMode(GX_CULL_NONE);
+
+	TextureMan.SetTexture(GX_TEXMAP0, texture);
+
+	float texWidth = static_cast<float>(*reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 0x64));
+	float texHeight = static_cast<float>(*reinterpret_cast<int*>(reinterpret_cast<u8*>(texture) + 0x68));
+	Mtx texMtx;
+	PSMTXScale(texMtx, 1.0f / texWidth, 1.0f / texHeight, 1.0f);
+	GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX3x4);
+
+	GXSetNumTexGens(1);
+	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+	GXClearVtxDesc();
+	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+	GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 0);
+
+	int tevStageCount = TextureMan.SetTextureTev(texture);
+
+	float scaledWidth = static_cast<float>(width) * scaleX;
+	float scaledHeight = static_cast<float>(height) * scaleY;
+	float centerOffsetX = ((mode & 1) != 0) ? (scaledWidth * 0.5f) : 0.0f;
+	float centerOffsetY = ((mode & 1) != 0) ? (scaledHeight * 0.5f) : 0.0f;
+
+	float left = static_cast<float>(x) - centerOffsetX;
+	float top = static_cast<float>(y) - centerOffsetY;
+	float right = left + scaledWidth;
+	float bottom = top + scaledHeight;
+
+	s16 texRight = static_cast<s16>(texS + width);
+	s16 texBottom = static_cast<s16>(texT + height);
+
+	if (blendMode == 3) {
+		GXSetNumTexGens(2);
+		GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_NRM, GX_TEXMTX1, GX_FALSE, GX_PTIDENTITY);
+		GXClearVtxDesc();
+		GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+		GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+		GXSetVtxDesc(GX_VA_TEX1, GX_DIRECT);
+		GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+		GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 0);
+		GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX1, GX_TEX_ST, GX_U8, 0);
+
+		GXSetNumTevStages(static_cast<u8>((tevStageCount + 1) & 0xFF));
+		_GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(tevStageCount, 1, 1, 0xFF);
+		_GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
+			tevStageCount, 0xF, 8, 0, 0xF);
+		_GXSetTevColorOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(tevStageCount, 0, 0, 2, 1, 0);
+		_GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(
+			tevStageCount, 7, 4, 0, 7);
+		_GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(tevStageCount, 0, 0, 0, 1, 0);
+
+		int quadWidth = static_cast<int>(scaledWidth * 0.5f);
+		int quadHeight = static_cast<int>(scaledHeight * 0.5f);
+		for (int quadrant = 0; quadrant < 4; quadrant++) {
+			int backX = static_cast<int>(left) + ((quadrant & 1) != 0 ? quadWidth : 0);
+			int backY = static_cast<int>(top) + ((quadrant & 2) != 0 ? quadHeight : 0);
+			int backWidth = quadWidth;
+			int backHeight = quadHeight;
+
+			s16 localTexS = static_cast<s16>(texS + ((quadrant & 1) != 0 ? quadWidth : 0));
+			s16 localTexT = static_cast<s16>(texT + ((quadrant & 2) != 0 ? quadHeight : 0));
+			s16 localTexRight = static_cast<s16>(localTexS + backWidth);
+			s16 localTexBottom = static_cast<s16>(localTexT + backHeight);
+
+			int capturedTex = GetBackBufferRect__8CGraphicFRiRiRiRii(&Graphic, &backX, &backY, &backWidth, &backHeight, 0);
+			GXLoadTexObj(reinterpret_cast<GXTexObj*>(capturedTex), GX_TEXMAP1);
+
+			float quadLeft = static_cast<float>(backX);
+			float quadTop = static_cast<float>(backY);
+			float quadRight = static_cast<float>(backX + backWidth);
+			float quadBottom = static_cast<float>(backY + backHeight);
+
+			GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+			GXWGFifo.f32 = quadLeft;
+			GXWGFifo.f32 = quadTop;
+			GXWGFifo.f32 = 0.0f;
+			GXWGFifo.u16 = static_cast<u16>(localTexS);
+			GXWGFifo.u16 = static_cast<u16>(localTexT);
+			GXWGFifo.u8 = 0;
+			GXWGFifo.u8 = 0;
+
+			GXWGFifo.f32 = quadRight;
+			GXWGFifo.f32 = quadTop;
+			GXWGFifo.f32 = 0.0f;
+			GXWGFifo.u16 = static_cast<u16>(localTexRight);
+			GXWGFifo.u16 = static_cast<u16>(localTexT);
+			GXWGFifo.u8 = 2;
+			GXWGFifo.u8 = 0;
+
+			GXWGFifo.f32 = quadRight;
+			GXWGFifo.f32 = quadBottom;
+			GXWGFifo.f32 = 0.0f;
+			GXWGFifo.u16 = static_cast<u16>(localTexRight);
+			GXWGFifo.u16 = static_cast<u16>(localTexBottom);
+			GXWGFifo.u8 = 2;
+			GXWGFifo.u8 = 2;
+
+			GXWGFifo.f32 = quadLeft;
+			GXWGFifo.f32 = quadBottom;
+			GXWGFifo.f32 = 0.0f;
+			GXWGFifo.u16 = static_cast<u16>(localTexS);
+			GXWGFifo.u16 = static_cast<u16>(localTexBottom);
+			GXWGFifo.u8 = 0;
+			GXWGFifo.u8 = 2;
+		}
+	} else {
+		GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+		GXWGFifo.f32 = left;
+		GXWGFifo.f32 = top;
+		GXWGFifo.f32 = 0.0f;
+		GXWGFifo.u16 = static_cast<u16>(texS);
+		GXWGFifo.u16 = static_cast<u16>(texT);
+
+		GXWGFifo.f32 = right;
+		GXWGFifo.f32 = top;
+		GXWGFifo.f32 = 0.0f;
+		GXWGFifo.u16 = static_cast<u16>(texRight);
+		GXWGFifo.u16 = static_cast<u16>(texT);
+
+		GXWGFifo.f32 = right;
+		GXWGFifo.f32 = bottom;
+		GXWGFifo.f32 = 0.0f;
+		GXWGFifo.u16 = static_cast<u16>(texRight);
+		GXWGFifo.u16 = static_cast<u16>(texBottom);
+
+		GXWGFifo.f32 = left;
+		GXWGFifo.f32 = bottom;
+		GXWGFifo.f32 = 0.0f;
+		GXWGFifo.u16 = static_cast<u16>(texS);
+		GXWGFifo.u16 = static_cast<u16>(texBottom);
+	}
+
+	Mtx44 cameraProjection;
+	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcs + 0x40), cameraProjection);
+	GXSetProjection(cameraProjection, GX_PERSPECTIVE);
 }
 
 /*

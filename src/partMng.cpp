@@ -1467,21 +1467,29 @@ void CPartMng::pppLoadPdt(const char*, int, int, void*, int)
  */
 int CPartMng::pppGetFreeDataMng()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    int index = 8;
-    _pppDataHead** pdtPtr = reinterpret_cast<_pppDataHead**>(self + 0x22E18 + (index * 0x38));
+    char* self = reinterpret_cast<char*>(this);
+    char* pdtSlot = self + 0x22FD8;
+    char* freeSlot = 0;
 
-    for (int i = 0; i < 0x18; i++, index++, pdtPtr = reinterpret_cast<_pppDataHead**>(reinterpret_cast<char*>(pdtPtr) + 0x38)) {
-        if (*pdtPtr == 0) {
-            return index;
+    for (int i = 0; i < 0x18; i++) {
+        if (*reinterpret_cast<_pppDataHead**>(pdtSlot) == 0) {
+            freeSlot = pdtSlot;
+            break;
         }
+        pdtSlot += 0x38;
     }
 
-    if (System.m_execParam != 0) {
-        System.Printf(s_pppGetFreePppDataMngSt_CAN_NOT_ALLOC);
+    if (freeSlot == 0) {
+        if (System.m_execParam != 0) {
+            System.Printf(s_pppGetFreePppDataMngSt_CAN_NOT_ALLOC);
+        }
+        OSPanic(s_partMng_cpp_801d8230, 0xD74, "");
+        return -1;
     }
-    OSPanic(s_partMng_cpp_801d8230, 0xD74, "");
-    return -1;
+
+    int index = freeSlot - (self + 0x22E18);
+    index = index / 0x38 + (index >> 0x1f);
+    return index - (index >> 0x1f);
 }
 
 /*

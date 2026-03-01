@@ -1142,12 +1142,78 @@ int CCaravanWork::IsSelectedCmdList(int cmdListIdx)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009f890
+ * PAL Size: 332b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::GetMagicCharge(int, int&, int&)
+void CCaravanWork::GetMagicCharge(int cmdListIdx, int& maxCharge, int& curCharge)
 {
-	// TODO
+	maxCharge = 0;
+	curCharge = 0;
+
+	if ((cmdListIdx > 1) && (m_commandListInventorySlotRef[cmdListIdx] == 0xFFFF)) {
+		return;
+	}
+
+	maxCharge = 1;
+	if (Game.game.m_gameWork.m_menuStageMode != 0) {
+		unsigned short* slotRef = m_commandListInventorySlotRef + cmdListIdx;
+		if (slotRef[0] != 0) {
+			int scanCount = cmdListIdx + 1;
+			int topIdx = cmdListIdx;
+			if (cmdListIdx >= 0) {
+				do {
+					if (slotRef[0] != 0xFFFF) {
+						break;
+					}
+					slotRef--;
+					topIdx--;
+					scanCount--;
+				} while (scanCount != 0);
+			}
+
+			maxCharge = 1;
+			scanCount = (short)m_numCmdListSlots - (topIdx + 1);
+			slotRef = m_commandListInventorySlotRef + topIdx + 1;
+			if ((topIdx + 1) < (short)m_numCmdListSlots) {
+				do {
+					if (slotRef[0] != 0xFFFF) {
+						break;
+					}
+					maxCharge++;
+					slotRef++;
+					scanCount--;
+				} while (scanCount != 0);
+			}
+		}
+	}
+
+	if (maxCharge == 1) {
+		curCharge = (cmdListIdx == (short)m_currentCmdListIndex);
+		return;
+	}
+
+	int scanCount = cmdListIdx + 1;
+	unsigned short* slotRef = m_commandListInventorySlotRef + cmdListIdx;
+	if (cmdListIdx >= 0) {
+		do {
+			if (slotRef[0] != 0xFFFF) {
+				break;
+			}
+			slotRef--;
+			cmdListIdx--;
+			scanCount--;
+		} while (scanCount != 0);
+	}
+
+	curCharge = 0;
+	if ((cmdListIdx <= (short)m_currentCmdListIndex) &&
+		((short)m_currentCmdListIndex <= cmdListIdx + maxCharge - 1)) {
+		curCharge = 1;
+	}
 }
 
 extern "C" int GetCmdListItemName__12CCaravanWorkFi(CCaravanWork* caravanWork, int cmdListIdx, int* firstCmdIdx, int* itemCmdListIdx)

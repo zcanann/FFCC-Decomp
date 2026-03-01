@@ -3,6 +3,8 @@
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
 
+extern "C" void pppDeletePart__8CPartMngFi(void*, int);
+
 extern "C" float GetWidth__5CFontFPc(CFont*, const char*);
 extern "C" void SetMargin__5CFontFf(float, CFont*);
 extern "C" void SetShadow__5CFontFi(CFont*, int);
@@ -27,6 +29,8 @@ extern float lbl_8033364C;
 extern float lbl_80333650;
 
 extern "C" int __cntlzw(unsigned int);
+
+extern unsigned char PartMng[];
 
 static unsigned short GetMenuPress()
 {
@@ -470,10 +474,73 @@ void CMenuPcs::DrawOptionMenu()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8017683c
+ * PAL Size: 336b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::BindMcObj(int)
+void CMenuPcs::BindMcObj(int saveIndex)
 {
-	// TODO
+	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
+	int slot = 0;
+
+	do {
+		if (saveIndex == slot) {
+			int* const effect = reinterpret_cast<int*>(reinterpret_cast<unsigned int*>(self + 0x840)[0] + (slot + 0x11) * 0x524);
+
+			if (-1 < effect[1]) {
+				pppDeletePart__8CPartMngFi(PartMng, effect[1]);
+				effect[1] = -1;
+				effect[2] = -1;
+				effect[0] = -1;
+			}
+			if (-1 < effect[0x525]) {
+				pppDeletePart__8CPartMngFi(PartMng, effect[0x525]);
+				effect[0x525] = -1;
+				effect[0x526] = -1;
+				effect[0x524] = -1;
+			}
+		}
+		slot++;
+	} while (slot < 4);
+
+	slot = 0;
+	int offset = 0;
+
+	do {
+		if (saveIndex == slot) {
+			unsigned int* const saveData = reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned int*>(self + 0x838)[0]);
+			int boundEffect = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(saveData) + offset + 0xC);
+			if (boundEffect != 0) {
+				BindEffect(slot + 0x11, boundEffect + 0x16, -1);
+			}
+
+			unsigned int flags = *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(saveData) + offset + 0x28);
+			int mode;
+			if ((flags & 1) == 0) {
+				if ((flags & 2) == 0) {
+					if ((flags & 4) == 0) {
+						if ((flags & 8) == 0) {
+							if ((flags & 0x10) != 0) {
+								mode = 4;
+							}
+						} else {
+							mode = 3;
+						}
+					} else {
+						mode = 2;
+					}
+				} else {
+					mode = 1;
+				}
+			} else {
+				mode = 0;
+			}
+			BindEffect(slot + 0x11, mode + 0x1A, -1);
+		}
+		slot++;
+		offset += 0x48;
+	} while (slot < 4);
 }

@@ -12,8 +12,8 @@ public:
     void EquipClose();
     void EquipDraw();
     int EquipCtrlCur();
-    int EquipOpen0();
-    int EquipClose0();
+    bool EquipOpen0();
+    bool EquipClose0();
     void GetEquipItem();
     int ChkEquipActive(int);
 };

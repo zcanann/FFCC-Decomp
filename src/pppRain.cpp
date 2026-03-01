@@ -246,29 +246,31 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
 {
     int i;
     u16 count;
+    u16 drawCount;
     s32 colorOffset;
     s32 workOffset;
     RainWork* work;
     RainDrop* drop;
-    RainParam* rain;
+    u8* payload;
     float baseX;
     float baseY;
     float baseZ;
     Vec segment;
 
-    rain = (RainParam*)param_2;
-    count = *(u16*)&param_2->payload[0];
+    payload = param_2->payload;
+    count = *(u16*)&payload[4];
+    drawCount = count & 0x7fff;
     colorOffset = param_3->m_serializedDataOffsets[1];
     workOffset = param_3->m_serializedDataOffsets[2];
 
-    pppSetBlendMode__FUc(rain->blendMode);
+    pppSetBlendMode__FUc(payload[0x5c]);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
         (u8*)pppRain + 0x88 + colorOffset,
         &ppvCameraMatrix0,
         lbl_80331018,
-        rain->drawA,
-        rain->drawB,
-        rain->blendMode,
+        payload[0x5e],
+        payload[0x5d],
+        payload[0x5c],
         0,
         1,
         1,
@@ -279,7 +281,7 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     GXSetTevDirect(GX_TEVSTAGE0);
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP_NULL, GX_COLOR0A0);
     GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
-    GXSetLineWidth(rain->lineWidth, GX_TO_ZERO);
+    GXSetLineWidth(payload[0x50], GX_TO_ZERO);
     SetVtxFmt_POS_CLR_TEX__5CUtilFv(&DAT_8032ec70);
 
     work = (RainWork*)((u8*)pppRain + 0x80 + workOffset);
@@ -288,7 +290,7 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     baseY = pppMngStPtr->m_matrix.value[1][3];
     baseZ = pppMngStPtr->m_matrix.value[2][3];
 
-    GXBegin((GXPrimitive)0xA8, GX_VTXFMT7, (u16)(count << 1));
+    GXBegin((GXPrimitive)0xA8, GX_VTXFMT7, (u16)(drawCount << 1));
     for (i = 0; i < count; i++) {
         float x = baseX + drop->posX;
         float y = baseY + drop->posY;

@@ -11,8 +11,8 @@ typedef unsigned short u16;
 
 extern "C" int GetItemType__8CMenuPcsFii(CMenuPcs*, int, int);
 extern "C" int EquipCtrlCur__8CMenuPcsFv(CMenuPcs*);
-extern "C" int EquipOpen0__8CMenuPcsFv(CMenuPcs*);
-extern "C" int EquipClose0__8CMenuPcsFv(CMenuPcs*);
+extern "C" bool EquipOpen0__8CMenuPcsFv(CMenuPcs*);
+extern "C" bool EquipClose0__8CMenuPcsFv(CMenuPcs*);
 extern "C" int ChkEquipPossible__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" int GetEquipType__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" int EquipChk__8CMenuPcsFi(CMenuPcs*, int);
@@ -280,6 +280,9 @@ int CMenuPcs::EquipOpen()
 {
 	u8* self = reinterpret_cast<u8*>(this);
 	u8* equipState = *reinterpret_cast<u8**>(self + 0x82c);
+	double dVar2;
+	double dVar3;
+	float fVar5;
 
 	if (equipState[0xb] == 0) {
 		memset(*reinterpret_cast<void**>(self + 0x850), 0, 0x1008);
@@ -298,26 +301,29 @@ int CMenuPcs::EquipOpen()
 			scalePtr += 0x200;
 		}
 
+		dVar3 = DOUBLE_80332ed0;
+		dVar2 = DOUBLE_80332ec8;
+		fVar5 = FLOAT_80332eb8;
 		int menuIndex = 0;
 		s16* entry = reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x850) + 8);
 		for (int i = 0; i < 2; i++) {
 			*reinterpret_cast<int*>(entry + 0xe) = 0x34;
 			entry[2] = 200;
 			entry[3] = 0x28;
-			*entry = static_cast<s16>(-((static_cast<double>(entry[2]) * 0.5) - 320.0));
+			*entry = static_cast<s16>(-((static_cast<double>(entry[2]) * dVar3) - dVar2));
 			entry[1] = static_cast<s16>(menuIndex * (entry[3] - 8) + 0x60);
-			*reinterpret_cast<float*>(entry + 4) = FLOAT_80332eb8;
-			*reinterpret_cast<float*>(entry + 6) = FLOAT_80332eb8;
+			*reinterpret_cast<float*>(entry + 4) = fVar5;
+			*reinterpret_cast<float*>(entry + 6) = fVar5;
 			*reinterpret_cast<int*>(entry + 0x12) = menuIndex;
 			*reinterpret_cast<int*>(entry + 0x14) = 3;
 
 			*reinterpret_cast<int*>(entry + 0x2e) = 0x34;
 			entry[0x22] = 200;
 			entry[0x23] = 0x28;
-			entry[0x20] = static_cast<s16>(-((static_cast<double>(entry[0x22]) * 0.5) - 320.0));
+			entry[0x20] = static_cast<s16>(-((static_cast<double>(entry[0x22]) * dVar3) - dVar2));
 			entry[0x21] = static_cast<s16>((menuIndex + 1) * (entry[0x23] - 8) + 0x60);
-			*reinterpret_cast<float*>(entry + 0x24) = FLOAT_80332eb8;
-			*reinterpret_cast<float*>(entry + 0x26) = FLOAT_80332eb8;
+			*reinterpret_cast<float*>(entry + 0x24) = fVar5;
+			*reinterpret_cast<float*>(entry + 0x26) = fVar5;
 			*reinterpret_cast<int*>(entry + 0x32) = menuIndex + 1;
 			*reinterpret_cast<int*>(entry + 0x34) = 3;
 
@@ -356,7 +362,7 @@ int CMenuPcs::EquipOpen()
 			if (timer < (*reinterpret_cast<int*>(entry + 0x12) + *reinterpret_cast<int*>(entry + 0x14))) {
 				*reinterpret_cast<int*>(entry + 0x10) = *reinterpret_cast<int*>(entry + 0x10) + 1;
 				*reinterpret_cast<float*>(entry + 8) = static_cast<float>(
-					(1.0 / static_cast<double>(*reinterpret_cast<int*>(entry + 0x14))) *
+					(DOUBLE_80332ec0 / static_cast<double>(*reinterpret_cast<int*>(entry + 0x14))) *
 					static_cast<double>(*reinterpret_cast<int*>(entry + 0x10)));
 			} else {
 				doneCount++;
@@ -868,7 +874,7 @@ int CMenuPcs::EquipCtrlCur()
  * JP Address: TODO
  * JP Size: TODO
  */
-int CMenuPcs::EquipOpen0()
+bool CMenuPcs::EquipOpen0()
 {
 	float fVar1;
 	double dVar2;
@@ -930,7 +936,7 @@ int CMenuPcs::EquipOpen0()
  * JP Address: TODO
  * JP Size: TODO
  */
-int CMenuPcs::EquipClose0()
+bool CMenuPcs::EquipClose0()
 {
 	float fVar1;
 	double dVar2;
@@ -1025,27 +1031,29 @@ void CMenuPcs::GetEquipItem()
  */
 int CMenuPcs::ChkEquipActive(int index)
 {
-	unsigned int caravanWork = Game.game.m_scriptFoodBase[0];
-	s16* entries = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-	int equipIndex = static_cast<int>(*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x26));
+	u32 caravanWork;
+	s16* entries;
+	u32 active;
+	int equipIndex;
+	int item;
 
+	caravanWork = Game.game.m_scriptFoodBase[0];
+	entries = GetLetterBuffer__6JoyBusFi(&Joybus, 0);
+	equipIndex = static_cast<int>(*reinterpret_cast<s16*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x26));
 	if ((index < 0) || (entries[0] <= index)) {
-		return 0;
-	}
-
-	if (index == 0) {
-		if (equipIndex < 3) {
-			return 0;
-		}
-		return (unsigned int)(int)*reinterpret_cast<s16*>(caravanWork + equipIndex * 2 + 0xac) >> 0x1f ^ 1;
-	}
-
-	int item = static_cast<int>(*reinterpret_cast<s16*>(caravanWork + entries[index] * 2 + 0xb6));
-	int active = ChkEquipPossible__8CMenuPcsFi(this, item);
-
-	if ((active != 0) && (GetEquipType__8CMenuPcsFi(this, item) != equipIndex)) {
 		active = 0;
+	} else if (index == 0) {
+		if (equipIndex < 3) {
+			active = 0;
+		} else {
+			active = (u32)(int)*reinterpret_cast<s16*>(caravanWork + equipIndex * 2 + 0xac) >> 0x1f ^ 1;
+		}
+	} else {
+		item = static_cast<int>(*reinterpret_cast<s16*>(caravanWork + entries[index] * 2 + 0xb6));
+		active = ChkEquipPossible__8CMenuPcsFi(this, item);
+		if ((active & 0xff) && (GetEquipType__8CMenuPcsFi(this, item) != equipIndex)) {
+			active = 0;
+		}
 	}
-
 	return active;
 }

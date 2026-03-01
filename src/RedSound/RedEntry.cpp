@@ -113,32 +113,72 @@ void CRedEntry::Init()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c0738
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedEntry::WaveHistoryAdd(int)
+void CRedEntry::WaveHistoryAdd(int historyNo)
 {
-	// TODO
+	int* const entry = reinterpret_cast<int*>(this);
+	unsigned int history = static_cast<unsigned int>(entry[0] + 0x100);
+
+	do {
+		if (historyNo <= *reinterpret_cast<int*>(history + 4)) {
+			*reinterpret_cast<int*>(history + 4) = *reinterpret_cast<int*>(history + 4) + 1;
+		}
+		history += 0x10;
+	} while (history < static_cast<unsigned int>(entry[0] + 0x400));
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c0780
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedEntry::WaveHistoryDelete(int)
+void CRedEntry::WaveHistoryDelete(int historyNo)
 {
-	// TODO
+	if (historyNo != 0) {
+		unsigned int history = static_cast<unsigned int>(*reinterpret_cast<int*>(this));
+		do {
+			int* const priority = reinterpret_cast<int*>(history + 4);
+			if ((*priority != 0) && (historyNo < *priority)) {
+				*priority = *priority - 1;
+			}
+			history += 0x10;
+		} while (history < static_cast<unsigned int>(*reinterpret_cast<int*>(this)) + 0x400);
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c07d8
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedEntry::WaveHistoryChoice(RedHistoryBANK*)
+void CRedEntry::WaveHistoryChoice(RedHistoryBANK* bank)
 {
-	// TODO
+	if (reinterpret_cast<int*>(bank)[1] != 0) {
+		unsigned int history = static_cast<unsigned int>(*reinterpret_cast<int*>(this));
+		do {
+			int* const priority = reinterpret_cast<int*>(history + 4);
+			if ((*priority != 0) && (*priority < reinterpret_cast<int*>(bank)[1])) {
+				*priority = *priority + 1;
+			}
+			history += 0x10;
+		} while (history < static_cast<unsigned int>(*reinterpret_cast<int*>(this)) + 0x400);
+
+		reinterpret_cast<int*>(bank)[1] = 1;
+	}
 }
 
 /*

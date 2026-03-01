@@ -796,25 +796,36 @@ void __MidiCtrl_KeyOffSame(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void __MidiCtrl_KeyOffNoteVelocity(RedSoundCONTROL* control, RedKeyOnDATA* keyOn, RedTrackDATA* track)
+void __MidiCtrl_KeyOffNoteVelocity(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-    int* trackData = (int*)track;
-    unsigned char* command = (unsigned char*)trackData[0];
+    int* trackData = reinterpret_cast<int*>(track);
+    unsigned char* command = reinterpret_cast<unsigned char*>(trackData[0]);
 
-    trackData[0] = (int)(command + 1);
-    *(unsigned char*)(trackData + 9) = *command;
+    trackData[0] = reinterpret_cast<int>(command + 1);
+    *reinterpret_cast<unsigned char*>(trackData + 9) = *command;
     trackData[0] += 1;
-    KeyOffSet(control, keyOn, track);
+
+    KeyOffSet(control, keyOnData, track);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C84C8
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_KeyOffNote(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_KeyOffNote(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-	// TODO
+    int* trackData = reinterpret_cast<int*>(track);
+    unsigned char* command = reinterpret_cast<unsigned char*>(trackData[0]);
+
+    trackData[0] = reinterpret_cast<int>(command + 1);
+    *reinterpret_cast<unsigned char*>(trackData + 9) = *command;
+
+    KeyOffSet(control, keyOnData, track);
 }
 
 /*
@@ -1931,12 +1942,27 @@ void __MidiCtrl_ShakeDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* 
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C9864
+ * PAL Size: 96b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_ShakeRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_ShakeRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    int* trackData = reinterpret_cast<int*>(track);
+    u32 rate;
+
+    if (*reinterpret_cast<char*>(trackData[0]) == '\0') {
+        rate = 0x100;
+    } else {
+        rate = *reinterpret_cast<unsigned char*>(trackData[0]);
+    }
+
+    trackData[0x2e] = 0x100000 / rate;
+    *reinterpret_cast<short*>(trackData + 0x34) = 0;
+    trackData[0] += 1;
 }
 
 /*

@@ -80,6 +80,42 @@ static unsigned short GetGoOutInputMask()
     return static_cast<unsigned short>(Pad._8_2_);
 }
 
+static const char* const sSlotAErrorLine1[5] = {
+    "The Memory Card in Slot A contains",
+    "The Memory Card in Slot A contains",
+    "The Memory Card in Slot A contains",
+    "The Memory Card in Slot A contains",
+    "The Memory Card in Slot A contains",
+};
+static const char* const sSlotAErrorLine2[5] = {
+    "no save data for your current game",
+    "no save data for your current game",
+    "no save data for your current game",
+    "no save data for your current game",
+    "no save data for your current game",
+};
+static const char* const sSlotAErrorLine3[5] = {
+    "or contains corrupt data. Please",
+    "or contains corrupt data. Please",
+    "or contains corrupt data. Please",
+    "or contains corrupt data. Please",
+    "or contains corrupt data. Please",
+};
+static const char* const sSlotAErrorLine4[5] = {
+    "insert a Memory Card containing",
+    "insert a Memory Card containing",
+    "insert a Memory Card containing",
+    "insert a Memory Card containing",
+    "insert a Memory Card containing",
+};
+static const char* const sSlotAErrorLine5[5] = {
+    "valid save data into Slot A.",
+    "valid save data into Slot A.",
+    "valid save data into Slot A.",
+    "valid save data into Slot A.",
+    "valid save data into Slot A.",
+};
+
 /*
  * --INFO--
  * PAL Address: 0x80168130
@@ -221,75 +257,129 @@ void CGoOutMenu::CalcMemCardProc()
  */
 int CGoOutMenu::SetMemCardError()
 {
+    CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
     int result = 1;
-    const int memCardResult = field_0x4;
 
-    if (memCardResult == -5) {
+    if (field_0x4 == -5) {
+        WriteMenuShort(menuPcsLayout.field_2120, 0xA, 3);
+        WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
         field_0x36 = -1;
         field_0x40 = 0;
         field_0x44 = 1;
+        if (field_0x36 >= 0) {
+            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
+            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+        }
         field_0x45 = 0;
         field_0x34 = 3;
         field_0x48 = 0;
         field_0x3c = 0;
-    } else if (memCardResult < -5) {
-        if (memCardResult == -13 || memCardResult == -6) {
+    } else if (field_0x4 < -5) {
+        if (field_0x4 == -13 || field_0x4 == -6) {
             SetGoOutMode(3);
             return 1;
         }
 
-        if ((memCardResult == -999 || memCardResult == -1000) && field_0x1 == 1) {
+        if ((field_0x4 == -999 || field_0x4 == -1000) && field_0x1 == 1) {
+            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 3);
+            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
             field_0x36 = -1;
             field_0x40 = 0;
             field_0x44 = 1;
+            int languageId = static_cast<int>(Game.game.m_gameWork.m_languageId) - 1;
+            SetMenuStr(0, 5,
+                       sSlotAErrorLine1[languageId],
+                       sSlotAErrorLine2[languageId],
+                       sSlotAErrorLine3[languageId],
+                       sSlotAErrorLine4[languageId],
+                       sSlotAErrorLine5[languageId]);
         } else if (field_0x1 == 3) {
+            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 3);
+            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
             field_0x36 = -1;
             field_0x40 = 0;
             field_0x44 = 1;
+            if (field_0x36 >= 0) {
+                WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
+                WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+            }
             field_0x45 = 0;
             field_0x34 = 0xd;
             field_0x48 = 0;
             field_0x3c = 0;
         } else if (field_0x1 == 2) {
+            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 3);
+            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
             field_0x36 = -1;
             field_0x40 = 0;
             field_0x44 = 1;
+            if (field_0x36 >= 0) {
+                WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
+                WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+            }
             field_0x45 = 0;
             field_0x34 = 0xf;
             field_0x48 = 0;
             field_0x3c = 0;
         }
-    } else if (memCardResult == -1 || memCardResult == -3) {
+    } else if (field_0x4 == -1 || field_0x4 == -3) {
+        WriteMenuShort(menuPcsLayout.field_2120, 0xA, 3);
+        WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
         field_0x36 = -1;
         field_0x40 = 0;
         field_0x44 = 1;
+        if (field_0x36 >= 0) {
+            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
+            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+        }
         field_0x45 = 0;
         field_0x34 = 1;
         field_0x48 = 0;
         field_0x3c = 0;
-    } else if (memCardResult == -2) {
+    } else if (field_0x4 == -2) {
+        WriteMenuShort(menuPcsLayout.field_2120, 0xA, 3);
+        WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
         field_0x36 = -1;
         field_0x40 = 0;
         field_0x44 = 1;
+        if (field_0x36 >= 0) {
+            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
+            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+        }
         field_0x45 = 0;
         field_0x34 = 2;
         field_0x48 = 0;
         field_0x3c = 0;
-    } else if (memCardResult == -4) {
+    } else if (field_0x4 == -4) {
         if (field_0x1 != 1) {
+            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 3);
+            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
             field_0x36 = -1;
             field_0x40 = 0;
             field_0x44 = 1;
+            if (field_0x36 >= 0) {
+                WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
+                WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+            }
             field_0x45 = 0;
             field_0x34 = 0x13;
             field_0x48 = 0;
             field_0x3c = 0;
         } else {
+            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 3);
+            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
             field_0x36 = -1;
             field_0x40 = 0;
             field_0x44 = 1;
+            int languageId = static_cast<int>(Game.game.m_gameWork.m_languageId) - 1;
+            SetMenuStr(0, 5,
+                       sSlotAErrorLine1[languageId],
+                       sSlotAErrorLine2[languageId],
+                       sSlotAErrorLine3[languageId],
+                       sSlotAErrorLine4[languageId],
+                       sSlotAErrorLine5[languageId]);
         }
-    } else if (memCardResult == 1) {
+    } else if (field_0x4 == 1) {
         result = 0;
     }
 

@@ -1732,12 +1732,55 @@ void CMaterialMan::SetShadowBound(CMapShadow::TARGET target, CBound* bound, floa
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003ddc4
+ * PAL Size: 660b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMaterialMan::InitVtxFmt(int, _GXCompType, int, _GXCompType, int, _GXCompType, int)
+void CMaterialMan::InitVtxFmt(
+    int formatFlags, _GXCompType positionType, int positionFrac, _GXCompType colorType, int colorFrac,
+    _GXCompType texCoordType, int texCoordFrac)
 {
-	// TODO
+    if ((formatFlags & 1) != 0) {
+        GXSetVtxAttrFmt((_GXVtxFmt)0, (_GXAttr)9, (_GXCompCnt)1, positionType, positionFrac);
+        GXSetVtxAttrFmt((_GXVtxFmt)0, (_GXAttr)10, (_GXCompCnt)0, colorType, colorFrac);
+        GXSetVtxAttrFmt((_GXVtxFmt)0, (_GXAttr)11, (_GXCompCnt)1, (_GXCompType)5, 0);
+        GXSetVtxAttrFmt((_GXVtxFmt)0, (_GXAttr)13, (_GXCompCnt)1, texCoordType, texCoordFrac);
+    }
+    if ((formatFlags & 2) != 0) {
+        GXSetVtxAttrFmt((_GXVtxFmt)1, (_GXAttr)9, (_GXCompCnt)1, positionType, positionFrac);
+        GXSetVtxAttrFmt((_GXVtxFmt)1, (_GXAttr)0x19, (_GXCompCnt)1, colorType, colorFrac);
+        GXSetVtxAttrFmt((_GXVtxFmt)1, (_GXAttr)11, (_GXCompCnt)1, (_GXCompType)5, 0);
+        GXSetVtxAttrFmt((_GXVtxFmt)1, (_GXAttr)13, (_GXCompCnt)1, texCoordType, texCoordFrac);
+    }
+    if ((formatFlags & 4) != 0) {
+        GXSetVtxAttrFmt((_GXVtxFmt)2, (_GXAttr)9, (_GXCompCnt)1, positionType, positionFrac);
+        GXSetVtxAttrFmt((_GXVtxFmt)2, (_GXAttr)10, (_GXCompCnt)0, colorType, colorFrac);
+        GXSetVtxAttrFmt((_GXVtxFmt)2, (_GXAttr)11, (_GXCompCnt)1, (_GXCompType)5, 0);
+        GXSetVtxAttrFmt((_GXVtxFmt)2, (_GXAttr)13, (_GXCompCnt)1, texCoordType, texCoordFrac);
+        GXSetVtxAttrFmt((_GXVtxFmt)2, (_GXAttr)14, (_GXCompCnt)1, texCoordType, texCoordFrac);
+    }
+    if ((formatFlags & 8) != 0) {
+        GXSetVtxAttrFmt((_GXVtxFmt)3, (_GXAttr)9, (_GXCompCnt)1, positionType, positionFrac);
+        GXSetVtxAttrFmt((_GXVtxFmt)3, (_GXAttr)10, (_GXCompCnt)0, colorType, colorFrac);
+        GXSetVtxAttrFmt((_GXVtxFmt)3, (_GXAttr)11, (_GXCompCnt)1, (_GXCompType)5, 0);
+    }
+    if ((formatFlags & 0x10) != 0) {
+        GXSetVtxAttrFmt((_GXVtxFmt)4, (_GXAttr)9, (_GXCompCnt)1, positionType, positionFrac);
+        GXSetVtxAttrFmt((_GXVtxFmt)4, (_GXAttr)11, (_GXCompCnt)1, (_GXCompType)5, 0);
+        GXSetVtxAttrFmt((_GXVtxFmt)4, (_GXAttr)13, (_GXCompCnt)1, texCoordType, texCoordFrac);
+    }
+    if ((formatFlags & 0x20) != 0) {
+        GXSetVtxAttrFmt((_GXVtxFmt)5, (_GXAttr)9, (_GXCompCnt)1, positionType, positionFrac);
+    }
+    if ((formatFlags & 0x40) != 0) {
+        GXSetVtxAttrFmt((_GXVtxFmt)6, (_GXAttr)9, (_GXCompCnt)1, positionType, positionFrac);
+        GXSetVtxAttrFmt((_GXVtxFmt)6, (_GXAttr)11, (_GXCompCnt)1, (_GXCompType)5, 0);
+    }
+
+    *reinterpret_cast<unsigned int*>(Ptr(this, 0x44)) = 0xFFFFFFFF;
 }
 
 /*

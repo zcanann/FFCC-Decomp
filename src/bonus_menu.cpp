@@ -1,4 +1,6 @@
 #include "ffcc/bonus_menu.h"
+#include "ffcc/gobjwork.h"
+#include "ffcc/p_game.h"
 
 /*
  * --INFO--
@@ -237,10 +239,20 @@ void CMenuPcs::GetAllPadOn()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80133108
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::ClrBattleItem()
 {
-	// TODO
+	for (int i = 0; i < 4; i++) {
+		CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.game.m_scriptFoodBase[i]);
+		if (caravanWork != 0) {
+			caravanWork->SafeDeleteTempItem();
+			caravanWork->SortBeforeReturnWorldMap();
+		}
+	}
 }

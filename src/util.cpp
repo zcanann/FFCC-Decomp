@@ -1101,105 +1101,66 @@ void CUtil::CalcBoundaryBoxQuantized(Vec* minOut, Vec* maxOut, S16Vec* vecs, uns
  */
 int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
 {
-    int cmd;
-    u16 vertexCount16;
-    bool isPrimitive;
-    bool running;
-    int polygonCount;
-    int primitive;
-    u32 vertexCount;
-    u32 blockCount;
+    int polygonCount = 0;
     u8* data = static_cast<u8*>(dlData);
 
-    running = true;
-    polygonCount = 0;
-LOOP:
-    do {
-        if (!running) {
+    while (true) {
+        u8 cmd = *data;
+        u16 vertexCount16 = *(u16*)(data + 1);
+        int vertexCount = vertexCount16;
+        u8 primitive = cmd & 0xF8;
+        bool isPrimitive;
+
+        data += 3;
+
+        if (primitive == 0xA0) {
+            isPrimitive = true;
+        } else if (primitive > 0x9F) {
+            if (primitive == 0xB0) {
+                isPrimitive = true;
+            } else if (primitive < 0xB0) {
+                isPrimitive = (primitive == 0xA8);
+            } else {
+                isPrimitive = (primitive == 0xB8);
+            }
+        } else if (primitive == 0x90) {
+            isPrimitive = true;
+        } else if (primitive < 0x90) {
+            isPrimitive = (primitive == 0x80);
+        } else {
+            isPrimitive = (primitive == 0x98);
+        }
+
+        if (!isPrimitive) {
             return polygonCount;
         }
-        cmd = *data;
-        vertexCount16 = *(u16*)(data + 1);
-        vertexCount = (u32)vertexCount16;
-        data += 3;
-        primitive = cmd & 0xF8;
-        if (primitive == 0xA0) {
-VALID:
-            isPrimitive = true;
+
+        if (primitive == 0x90) {
+            polygonCount += vertexCount / 3;
+        } else if (primitive == 0x98) {
+            polygonCount += vertexCount - 2;
+        }
+
+        if (vertexCount <= 0) {
+            continue;
+        }
+
+        if ((cmd & 7) == 2) {
+            for (int i = vertexCount >> 3; i > 0; i--) {
+                data += 0x50;
+            }
+            for (int i = vertexCount & 7; i > 0; i--) {
+                data += 10;
+            }
         } else {
-            if (0x9F < primitive) {
-                if (primitive != 0xB0) {
-                    if (primitive < 0xB0) {
-                        if (primitive == 0xA8) {
-                            goto VALID;
-                        }
-                    } else if (primitive == 0xB8) {
-                        goto VALID;
-                    }
-                    goto INVALID;
-                }
-                goto VALID;
+            for (int i = vertexCount >> 3; i > 0; i--) {
+                data += 0x40;
             }
-            if (primitive == 0x90) {
-                goto VALID;
+            for (int i = vertexCount & 7; i > 0; i--) {
+                data += 8;
             }
-            if (primitive < 0x90) {
-                if (primitive == 0x80) {
-                    goto VALID;
-                }
-            } else if (primitive == 0x98) {
-                goto VALID;
-            }
-INVALID:
-            isPrimitive = false;
         }
-        if (isPrimitive) {
-            if (primitive == 0x90) {
-                polygonCount += vertexCount / 3;
-            } else if (primitive == 0x98) {
-                polygonCount = vertexCount + polygonCount - 2;
-            }
-            if ((cmd & 7) != 2) {
-                if (vertexCount != 0) {
-                    blockCount = (u32)(vertexCount16 >> 3);
-                    if ((vertexCount16 >> 3) != 0) {
-                        do {
-                            data += 0x40;
-                            blockCount--;
-                        } while (blockCount != 0);
-                        vertexCount &= 7;
-                        if ((vertexCount16 & 7) == 0) {
-                            goto LOOP;
-                        }
-                    }
-                    do {
-                        data += 8;
-                        vertexCount--;
-                    } while (vertexCount != 0);
-                }
-                goto LOOP;
-            }
-            if (vertexCount != 0) {
-                blockCount = (u32)(vertexCount16 >> 3);
-                if ((vertexCount16 >> 3) != 0) {
-                    do {
-                        data += 0x50;
-                        blockCount--;
-                    } while (blockCount != 0);
-                    vertexCount &= 7;
-                    if ((vertexCount16 & 7) == 0) {
-                        goto LOOP;
-                    }
-                }
-                do {
-                    data += 10;
-                    vertexCount--;
-                } while (vertexCount != 0);
-            }
-            goto LOOP;
-        }
-        running = false;
-    } while (true);
+    }
 }
 
 /*

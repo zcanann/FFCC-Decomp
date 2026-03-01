@@ -277,18 +277,26 @@ int CMiniGamePcs::GetMiniGameParam(int id)
 void CMiniGamePcs::SetMiniGameParam(int id, int value)
 {
     if ((unsigned int)System.m_execParam > 2U) {
-        System.Printf("SetMiniGameParam no 0x%04x data[%d]\n", id, value);
+        Printf__7CSystemFPce(&System, "SetMiniGameParam no 0x%04x data[%d]\n", id, value);
     }
 
     if (id == 0x1202) {
         *(unsigned char*)((char*)this + 0x134B) |= (unsigned char)(1 << value);
-    } else if (id < 0x1202) {
+        return;
+    }
+
+    if (id < 0x1202) {
         if (id == 0x1102) {
             *(unsigned char*)((char*)this + 0x1348) = 1;
-        } else if (id > 0x1100 && id < 0x1102) {
-            *(signed char*)((char*)this + 0x1350) = (signed char)value;
+            return;
         }
-    } else if (id < 0x1204) {
+        if (id < 0x1102 && 0x1100 < id) {
+            *(char*)((char*)this + 0x1350) = (char)value;
+        }
+        return;
+    }
+
+    if (id < 0x1204) {
         *(unsigned char*)((char*)this + 0x134B) &= (unsigned char)~(1 << value);
     }
 }

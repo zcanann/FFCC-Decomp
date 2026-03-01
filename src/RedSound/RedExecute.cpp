@@ -1011,22 +1011,89 @@ void SetVoiceSwitch(RedTrackDATA* track, int voiceSwitch)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c4da0
+ * PAL Size: 188b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _AdsrStart(RedVoiceDATA*)
+void _AdsrStart(RedVoiceDATA* voice)
 {
-	// TODO
+    int* voiceData = (int*)voice;
+    int* stage = (int*)((u8*)voice + 0x5C);
+    u32 nextLevel;
+    u32 currentLevel;
+    u32 stageFrames;
+    u32 originalLevel;
+
+    *stage = 0;
+    nextLevel = *(u8*)((u8*)voice + 0x58);
+    do {
+        originalLevel = nextLevel;
+        stageFrames = *(u16*)((u8*)voice + (*stage * 2) + 0x50);
+        currentLevel = *(u8*)((u8*)voice + *stage + 0x59);
+        if (stageFrames != 0) {
+            break;
+        }
+        *stage += 1;
+    } while (*stage < 3);
+
+    voiceData[0x18] = stageFrames;
+    if (currentLevel != 0) {
+        currentLevel = (((currentLevel + 1) * 0x100) - 1) * 0x1000;
+    }
+
+    if (stageFrames == 0) {
+        voiceData[0x2B] = currentLevel;
+    } else {
+        if (originalLevel != 0) {
+            originalLevel = (((originalLevel + 1) * 0x100) - 1) * 0x1000;
+        }
+        voiceData[0x2B] = originalLevel;
+        voiceData[0x19] = ((currentLevel | 0x800) - originalLevel) / stageFrames;
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c4e5c
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _AdsrDataCompute(RedVoiceDATA*)
+void _AdsrDataCompute(RedVoiceDATA* voice)
 {
-	// TODO
+    int* stage = (int*)((u8*)voice + 0x5C);
+    int* voiceData = (int*)voice;
+    u32 stageFrames = 0;
+    u32 targetLevel;
+    u32 level = voiceData[0x2B];
+    u32 previousLevel = level;
+
+    while (*stage < 3) {
+        targetLevel = *(u8*)((u8*)voice + *stage + 0x59);
+        stageFrames = *(u16*)((u8*)voice + (*stage * 2) + 0x50);
+        if (targetLevel != 0) {
+            targetLevel = (((targetLevel + 1) * 0x100) - 1) * 0x1000;
+        }
+        previousLevel = level;
+        if (stageFrames != 0) {
+            break;
+        }
+        *stage += 1;
+        level = targetLevel;
+    }
+
+    voiceData[0x18] = stageFrames;
+    if (stageFrames == 0) {
+        voiceData[0x2B] = targetLevel;
+    } else {
+        voiceData[0x2B] = previousLevel;
+        voiceData[0x19] = ((targetLevel | 0x800) - previousLevel) / stageFrames;
+    }
 }
 
 /*

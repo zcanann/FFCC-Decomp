@@ -3,7 +3,6 @@
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
 
-class CPartMng;
 extern "C" void pppDeletePart__8CPartMngFi(void*, int);
 
 extern "C" float GetWidth__5CFontFPc(CFont*, const char*);

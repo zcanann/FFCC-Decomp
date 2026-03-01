@@ -13,7 +13,7 @@
 #include "dolphin/vi.h"
 #include "dolphin/vi/vifuncs.h"
 
-extern void* lbl_801E8408;
+extern "C" char lbl_801E8408[];
 extern GXRenderModeObj lbl_801E83C0;
 extern u8 DAT_801E83F2[7];
 extern char DAT_80238030[];
@@ -22,6 +22,7 @@ extern "C" u8 DAT_8032ec48;
 extern "C" u8 DAT_8032ec4c;
 extern "C" u8 DAT_8032ec50;
 extern "C" u8 DAT_8032ec54;
+extern "C" char __vt__8CManager[];
 extern "C" _GXColor DAT_8032e3e8;
 extern "C" char DAT_801d637c[];
 extern "C" char DAT_801d63c0[];
@@ -103,7 +104,9 @@ void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
  */
 extern "C" void __sinit_graphic_cpp(void)
 {
-	*(void**)&Graphic = &lbl_801E8408;
+    void* vtbl = __vt__8CManager;
+    *reinterpret_cast<void**>(&Graphic) = vtbl;
+    *reinterpret_cast<void**>(&Graphic) = lbl_801E8408;
 }
 
 /*

@@ -2890,12 +2890,11 @@ void CMapMng::SetIdGrpColor(int mapIdGrpIndex, int channelIndex, _GXColor color)
 void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, float farRange, float minAlpha,
                                           float maxAlpha, float fadeRange)
 {
-    int mapObjCount = *reinterpret_cast<short*>(Ptr(this, 0xC));
     bool found = false;
     unsigned char* mapObj = reinterpret_cast<unsigned char*>(this);
 
-    for (int i = 0; i < mapObjCount; i++) {
-        if (*reinterpret_cast<unsigned short*>(mapObj + 0x982) == id) {
+    for (int i = 0; i < *reinterpret_cast<short*>(Ptr(this, 0xC)); i++) {
+        if (*reinterpret_cast<unsigned short*>(mapObj + 0x988) == id) {
             *reinterpret_cast<float*>(mapObj + 0x998) = nearRange;
             *reinterpret_cast<float*>(mapObj + 0x99C) = farRange;
             *reinterpret_cast<float*>(mapObj + 0x9A8) = fadeRange;
@@ -2916,16 +2915,16 @@ void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, fl
     }
 
     if (!found) {
-        if (System.m_execParam != 0) {
+        if (System.m_execParam >= 1) {
             System.Printf(DAT_801ead4c);
         }
-        if (System.m_execParam != 0) {
+        if (System.m_execParam >= 1) {
             System.Printf(DAT_801d7350, id);
         }
-        if (System.m_execParam != 0) {
+        if (System.m_execParam >= 1) {
             System.Printf(DAT_801ead4c);
         }
-        if (System.m_execParam != 0) {
+        if (System.m_execParam >= 1) {
             System.Printf(DAT_8032f984);
         }
     }
@@ -2942,12 +2941,11 @@ void CMapMng::SetMeshCameraSemiTransRange(unsigned short id, float nearRange, fl
  */
 void CMapMng::SetMeshCameraSemiTransAlpha(unsigned short id, int alpha, int frameCount)
 {
-    int mapObjCount = *reinterpret_cast<short*>(Ptr(this, 0xC));
     bool found = false;
     unsigned char* mapObj = reinterpret_cast<unsigned char*>(this);
 
-    for (int i = 0; i < mapObjCount; i++) {
-        if (*reinterpret_cast<unsigned short*>(mapObj + 0x982) == id) {
+    for (int i = 0; i < *reinterpret_cast<short*>(Ptr(this, 0xC)); i++) {
+        if (*reinterpret_cast<unsigned short*>(mapObj + 0x988) == id) {
             *reinterpret_cast<short*>(mapObj + 0x97E) = static_cast<short>(alpha << 7);
             found = true;
             *reinterpret_cast<short*>(mapObj + 0x980) = static_cast<short>(
@@ -2959,16 +2957,16 @@ void CMapMng::SetMeshCameraSemiTransAlpha(unsigned short id, int alpha, int fram
     }
 
     if (!found) {
-        if (System.m_execParam != 0) {
+        if (System.m_execParam >= 1) {
             System.Printf(DAT_801ead4c);
         }
-        if (System.m_execParam != 0) {
+        if (System.m_execParam >= 1) {
             System.Printf(DAT_801d7318, id);
         }
-        if (System.m_execParam != 0) {
+        if (System.m_execParam >= 1) {
             System.Printf(DAT_801ead4c);
         }
-        if (System.m_execParam != 0) {
+        if (System.m_execParam >= 1) {
             System.Printf(DAT_8032f984);
         }
     }

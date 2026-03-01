@@ -1011,12 +1011,47 @@ void SetVoiceSwitch(RedTrackDATA* track, int voiceSwitch)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c4da0
+ * PAL Size: 188b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _AdsrStart(RedVoiceDATA*)
+void _AdsrStart(RedVoiceDATA* voice)
 {
-	// TODO
+    int* voiceData = (int*)voice;
+    int stage = 0;
+    int prevLevel;
+    int targetLevel;
+    int duration;
+
+    voiceData[0x17] = 0;
+    prevLevel = (u8)voiceData[0x16];
+
+    do {
+        targetLevel = (u16)*((u16*)((u8*)voiceData + 0x50) + stage);
+        duration = (u8)*((u8*)voiceData + stage + 0x59);
+        if (targetLevel != 0) {
+            break;
+        }
+        stage++;
+    } while (stage < 3);
+
+    voiceData[0x18] = targetLevel;
+    if (duration != 0) {
+        duration = (((duration + 1) * 0x100) - 1) * 0x1000;
+    }
+
+    if (targetLevel == 0) {
+        voiceData[0x2B] = duration;
+    } else {
+        if (prevLevel != 0) {
+            prevLevel = (((prevLevel + 1) * 0x100) - 1) * 0x1000;
+        }
+        voiceData[0x2B] = prevLevel;
+        voiceData[0x19] = ((duration | 0x800) - prevLevel) / targetLevel;
+    }
 }
 
 /*

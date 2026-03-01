@@ -438,9 +438,10 @@ void CPtrArray<_GXTexObj*>::DeleteAndRemoveAll()
 {
     int offset = 0;
     for (unsigned int i = 0; i < static_cast<unsigned int>(numItems); i++) {
-        if (*(int*)((int)items + offset) != 0) {
-            __dl__FPv(*(void**)((int)items + offset));
-            *(int*)((int)items + offset) = 0;
+        void* item = *(void**)((int)items + offset);
+        if (item != 0) {
+            __dl__FPv(item);
+            *(void**)((int)items + offset) = 0;
         }
         offset += 4;
     }
@@ -457,9 +458,10 @@ void CPtrArray<OSFS_TEXTURE_ST*>::DeleteAndRemoveAll()
 {
     int offset = 0;
     for (unsigned int i = 0; i < static_cast<unsigned int>(numItems); i++) {
-        if (*(int*)((int)items + offset) != 0) {
-            __dl__FPv(*(void**)((int)items + offset));
-            *(int*)((int)items + offset) = 0;
+        void* item = *(void**)((int)items + offset);
+        if (item != 0) {
+            __dl__FPv(item);
+            *(void**)((int)items + offset) = 0;
         }
         offset += 4;
     }

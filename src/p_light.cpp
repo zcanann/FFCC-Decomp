@@ -133,38 +133,46 @@ CLightPcs::CLightPcs()
 void CLightPcs::Init()
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    float f1 = FLOAT_8032fc14;
+    float f2 = FLOAT_8032fc2c;
+    unsigned int z0 = __cntlzw(0);
+    unsigned int z1 = __cntlzw(1);
+    unsigned char v = static_cast<unsigned char>(-(((z0 >> 5) & 1))) & 0x3F;
 
     self[0x433c] = 0x3f;
     self[0x433d] = 0x3f;
     self[0x433e] = 0x3f;
     self[0x433f] = 0xff;
 
-    self[0x4340] = 0x00;
-    self[0x4341] = 0x00;
-    self[0x4342] = 0x00;
+    self[0x4340] = v;
+    self[0x4341] = v;
+    self[0x4342] = v;
+    v = static_cast<unsigned char>(-(((z1 >> 5) & 1))) & 0x3F;
+    unsigned int z2 = __cntlzw(2);
     self[0x4343] = 0xff;
 
-    *reinterpret_cast<float*>(self + 0x434c) = FLOAT_8032fc14;
-    *reinterpret_cast<float*>(self + 0x4350) = FLOAT_8032fc14;
-    *reinterpret_cast<float*>(self + 0x4354) = FLOAT_8032fc2c;
+    *reinterpret_cast<float*>(self + 0x434c) = f1;
+    *reinterpret_cast<float*>(self + 0x4350) = f1;
+    *reinterpret_cast<float*>(self + 0x4354) = f2;
 
-    self[0x4344] = 0x3f;
-    self[0x4345] = 0x3f;
-    self[0x4346] = 0x3f;
+    self[0x4344] = v;
+    self[0x4345] = v;
+    self[0x4346] = v;
+    v = static_cast<unsigned char>(-(((z2 >> 5) & 1))) & 0x3F;
     self[0x4347] = 0xff;
 
-    *reinterpret_cast<float*>(self + 0x4358) = FLOAT_8032fc14;
-    *reinterpret_cast<float*>(self + 0x435c) = FLOAT_8032fc14;
-    *reinterpret_cast<float*>(self + 0x4360) = FLOAT_8032fc2c;
+    *reinterpret_cast<float*>(self + 0x4358) = f1;
+    *reinterpret_cast<float*>(self + 0x435c) = f1;
+    *reinterpret_cast<float*>(self + 0x4360) = f2;
 
-    self[0x4348] = 0x00;
-    self[0x4349] = 0x00;
-    self[0x434a] = 0x00;
+    self[0x4348] = v;
+    self[0x4349] = v;
+    self[0x434a] = v;
     self[0x434b] = 0xff;
 
-    *reinterpret_cast<float*>(self + 0x4364) = FLOAT_8032fc14;
-    *reinterpret_cast<float*>(self + 0x4368) = FLOAT_8032fc14;
-    *reinterpret_cast<float*>(self + 0x436c) = FLOAT_8032fc2c;
+    *reinterpret_cast<float*>(self + 0x4364) = f1;
+    *reinterpret_cast<float*>(self + 0x4368) = f1;
+    *reinterpret_cast<float*>(self + 0x436c) = f2;
 }
 
 /*

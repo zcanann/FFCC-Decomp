@@ -727,38 +727,66 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
         _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP1);
     }
 
-    float u1 = lbl_8032f888;
-    float v1 = lbl_8032f888;
-    float u2 = lbl_8032f88c;
-    float v2 = lbl_8032f88c;
-    if (uv1 != 0 && uv2 != 0) {
-        u1 = uv1->x;
-        v1 = uv1->y;
-        u2 = uv2->x;
-        v2 = uv2->y;
+    if (color == 0) {
+        float u1 = lbl_8032f888;
+        float v1 = lbl_8032f888;
+        float u2 = lbl_8032f88c;
+        float v2 = lbl_8032f88c;
+
+        if (uv1 != 0 && uv2 != 0) {
+            u1 = uv1->x;
+            v1 = uv1->y;
+            u2 = uv2->x;
+            v2 = uv2->y;
+        }
+
+        GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
+        GXPosition3f32(x, y, lbl_8032f888);
+        GXColor1u32(0xFFFFFFFF);
+        GXTexCoord2f32(u1, v1);
+
+        GXPosition3f32(x2, y, lbl_8032f888);
+        GXColor1u32(0xFFFFFFFF);
+        GXTexCoord2f32(u2, v1);
+
+        GXPosition3f32(x2, y2, lbl_8032f888);
+        GXColor1u32(0xFFFFFFFF);
+        GXTexCoord2f32(u2, v2);
+
+        GXPosition3f32(x, y2, lbl_8032f888);
+        GXColor1u32(0xFFFFFFFF);
+        GXTexCoord2f32(u1, v2);
+    } else {
+        float u1 = lbl_8032f888;
+        float v1 = lbl_8032f888;
+        float u2 = lbl_8032f88c;
+        float v2 = lbl_8032f88c;
+        u32 colorValue = *reinterpret_cast<u32*>(color);
+
+        if (uv1 != 0 && uv2 != 0) {
+            u1 = uv1->x;
+            v1 = uv1->y;
+            u2 = uv2->x;
+            v2 = uv2->y;
+        }
+
+        GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
+        GXPosition3f32(x, y, lbl_8032f888);
+        GXColor1u32(colorValue);
+        GXTexCoord2f32(u1, v1);
+
+        GXPosition3f32(x2, y, lbl_8032f888);
+        GXColor1u32(colorValue);
+        GXTexCoord2f32(u2, v1);
+
+        GXPosition3f32(x2, y2, lbl_8032f888);
+        GXColor1u32(colorValue);
+        GXTexCoord2f32(u2, v2);
+
+        GXPosition3f32(x, y2, lbl_8032f888);
+        GXColor1u32(colorValue);
+        GXTexCoord2f32(u1, v2);
     }
-
-    u32 colorValue = 0xFFFFFFFF;
-    if (color != 0) {
-        colorValue = *reinterpret_cast<u32*>(color);
-    }
-
-    GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
-    GXPosition3f32(x, y, lbl_8032f888);
-    GXColor1u32(colorValue);
-    GXTexCoord2f32(u1, v1);
-
-    GXPosition3f32(x2, y, lbl_8032f888);
-    GXColor1u32(colorValue);
-    GXTexCoord2f32(u2, v1);
-
-    GXPosition3f32(x2, y2, lbl_8032f888);
-    GXColor1u32(colorValue);
-    GXTexCoord2f32(u2, v2);
-
-    GXPosition3f32(x, y2, lbl_8032f888);
-    GXColor1u32(colorValue);
-    GXTexCoord2f32(u1, v2);
 
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
     PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);

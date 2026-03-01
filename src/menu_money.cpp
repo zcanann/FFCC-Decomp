@@ -222,10 +222,12 @@ bool CMenuPcs::MoneyOpen()
 void CMenuPcs::MoneyCtrl()
 {
 	int iVar2 = 0;
-	int iVar3 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c);
+	int iVar3;
 	short sVar1;
 
-	*reinterpret_cast<short*>(iVar3 + 0x32) = *reinterpret_cast<short*>(iVar3 + 0x30);
+	*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x32) =
+		*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x30);
+	iVar3 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c);
 	sVar1 = *reinterpret_cast<short*>(iVar3 + 0x30);
 	if ((sVar1 == 0) || ((sVar1 != 0 && (*reinterpret_cast<short*>(iVar3 + 0x12) == 1)))) {
 		iVar2 = MoneyCtrlCur();
@@ -244,7 +246,7 @@ void CMenuPcs::MoneyCtrl()
 
 	if (iVar2 != 0) {
 		iVar2 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
-		*reinterpret_cast<float*>(iVar2 + 0x18) = 1.0f;
+		*reinterpret_cast<float*>(iVar2 + 0x18) = FLOAT_80332f70;
 		*reinterpret_cast<int*>(iVar2 + 0x2c) = 0;
 		*reinterpret_cast<int*>(iVar2 + 0x30) = 10;
 		*reinterpret_cast<int*>(iVar2 + 0x28) = 0;

@@ -361,13 +361,12 @@ void CCaravanWork::CLetterWork::operator= (const CCaravanWork::CLetterWork&)
  */
 void CCaravanWork::FGLetterOpen(int letterIdx)
 {
-	int stack[2];
-	unsigned char* letter = m_letter0 + (letterIdx * 0xC);
+	unsigned int stack[2];
+	unsigned char* letter = m_letter0 + letterIdx * 0xC;
 	unsigned short* words16 = reinterpret_cast<unsigned short*>(letter);
-	unsigned int* words32 = reinterpret_cast<unsigned int*>(letter);
 
 	stack[0] = (words16[0] >> 2) & 0x1FF;
-	stack[1] = (words32[0] >> 9) & 0x1FF;
+	stack[1] = (*(unsigned int*)letter >> 9) & 0x1FF;
 	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
 		CFlat, Game.game.m_partyObjArr[m_joybusCaravanId], 2, 0xF, 2, stack, 0);
 
@@ -375,14 +374,18 @@ void CCaravanWork::FGLetterOpen(int letterIdx)
 	m_tempVar__4CMes[1] = words16[3];
 	m_tempVar__4CMes[2] = words16[4];
 	m_tempVar__4CMes[3] = words16[5];
-	m_tempVar__4CMes[4] = stack[0];
-	m_tempVar__4CMes[5] = stack[1];
+	m_tempVar__4CMes[4] = (words16[0] >> 2) & 0x1FF;
+	m_tempVar__4CMes[5] = (*(unsigned int*)letter >> 9) & 0x1FF;
 
 	if (((letter[0] >> 3) & 1) == 0) {
 		m_tempVar__4CMes[6] = words16[1] & 0x1FF;
-		m_tempVar__4CMes[7] = 0;
 	} else {
 		m_tempVar__4CMes[6] = 0;
+	}
+
+	if (((letter[0] >> 3) & 1) == 0) {
+		m_tempVar__4CMes[7] = 0;
+	} else {
 		m_tempVar__4CMes[7] = (words16[1] & 0x1FF) * 100;
 	}
 
@@ -1123,9 +1126,9 @@ void CCaravanWork::CalcStatus()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CCaravanWork::CanPlayerUseItem()
+int CCaravanWork::CanPlayerUseItem()
 {
-	((CGPartyObj*)m_ownerObj)->canPlayerUseItem();
+	return ((CGPartyObj*)m_ownerObj)->canPlayerUseItem();
 }
 
 /*
@@ -1197,12 +1200,83 @@ int CCaravanWork::IsSelectedCmdList(int cmdListIdx)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009f890
+ * PAL Size: 332b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::GetMagicCharge(int, int&, int&)
+void CCaravanWork::GetMagicCharge(int cmdListIdx, int& groupedCount, int& isSelected)
 {
-	// TODO
+	unsigned int isInvalid = 0;
+	if ((cmdListIdx > 1) && (m_commandListInventorySlotRef[cmdListIdx] == 0xFFFF)) {
+		isInvalid = 1;
+	}
+
+	if ((((unsigned int)__cntlzw((unsigned char)isInvalid)) >> 5) == 0) {
+		groupedCount = 0;
+		isSelected = 0;
+		return;
+	}
+
+	groupedCount = 1;
+	if (Game.game.m_gameWork.m_menuStageMode != 0) {
+		unsigned short* slotRef = m_commandListInventorySlotRef + cmdListIdx;
+		if (slotRef[0] != 0) {
+			int scanCount = cmdListIdx + 1;
+			int topIdx = cmdListIdx;
+			if (cmdListIdx >= 0) {
+				do {
+					if (slotRef[0] != 0xFFFF) {
+						break;
+					}
+					slotRef--;
+					topIdx--;
+					scanCount--;
+				} while (scanCount != 0);
+			}
+
+			groupedCount = 1;
+			scanCount = (short)m_numCmdListSlots - (topIdx + 1);
+			slotRef = m_commandListInventorySlotRef + topIdx + 1;
+			if ((topIdx + 1) < (short)m_numCmdListSlots) {
+				do {
+					if (slotRef[0] != 0xFFFF) {
+						break;
+					}
+					groupedCount++;
+					slotRef++;
+					scanCount--;
+				} while (scanCount != 0);
+			}
+		}
+	}
+
+	if (groupedCount == 1) {
+		isSelected = (((unsigned int)__cntlzw(cmdListIdx - (short)m_currentCmdListIndex)) >> 5) & 0xFF;
+		return;
+	}
+
+	int scanCount = cmdListIdx + 1;
+	unsigned short* slotRef = m_commandListInventorySlotRef + cmdListIdx;
+	if (cmdListIdx >= 0) {
+		do {
+			if (slotRef[0] != 0xFFFF) {
+				break;
+			}
+			slotRef--;
+			cmdListIdx--;
+			scanCount--;
+		} while (scanCount != 0);
+	}
+
+	unsigned int selected = 0;
+	if ((cmdListIdx <= (short)m_currentCmdListIndex) &&
+		((short)m_currentCmdListIndex <= (cmdListIdx + groupedCount - 1))) {
+		selected = 1;
+	}
+	isSelected = selected;
 }
 
 extern "C" int GetCmdListItemName__12CCaravanWorkFi(CCaravanWork* caravanWork, int cmdListIdx, int* firstCmdIdx, int* itemCmdListIdx)
@@ -1415,9 +1489,9 @@ void CCaravanWork::GetNextCmdListIdx(int, int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CCaravanWork::CanPlayerPutItem()
+int CCaravanWork::CanPlayerPutItem()
 {
-	((CGPartyObj*)m_ownerObj)->canPlayerPutItem();
+	return ((CGPartyObj*)m_ownerObj)->canPlayerPutItem();
 }
 
 /*

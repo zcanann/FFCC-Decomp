@@ -729,32 +729,70 @@ void CRedEntry::DisplayWaveInfo()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c1a8c
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CRedEntry::SeSepHistoryAdd()
 {
-	// TODO
+	int* const entry = (int*)this;
+	unsigned int history = (unsigned int)entry[1];
+	do {
+		if (*(int*)(history + 4) != 0) {
+			*(int*)(history + 4) = *(int*)(history + 4) + 1;
+		}
+		history += 0x10;
+	} while (history < (unsigned int)(entry[1] + 0x1000));
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c1ad0
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedEntry::SeSepHistoryDelete(int)
+void CRedEntry::SeSepHistoryDelete(int historyNo)
 {
-	// TODO
+	if (historyNo != 0) {
+		int* const entry = (int*)this;
+		unsigned int history = (unsigned int)entry[1];
+		do {
+			if (historyNo < *(int*)(history + 4)) {
+				*(int*)(history + 4) = *(int*)(history + 4) - 1;
+			}
+			history += 0x10;
+		} while (history < (unsigned int)(entry[1] + 0x1000));
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c1b1c
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedEntry::SeSepHistoryChoice(RedHistoryBANK*)
+void CRedEntry::SeSepHistoryChoice(RedHistoryBANK* bank)
 {
-	// TODO
+	if (((int*)bank)[1] != 0) {
+		int* const entry = (int*)this;
+		unsigned int history = (unsigned int)entry[1];
+		do {
+			if ((*(int*)(history + 4) != 0) && (*(int*)(history + 4) < ((int*)bank)[1])) {
+				*(int*)(history + 4) = *(int*)(history + 4) + 1;
+			}
+			history += 0x10;
+		} while (history < (unsigned int)(entry[1] + 0x1000));
+		((int*)bank)[1] = 1;
+	}
 }
 
 /*

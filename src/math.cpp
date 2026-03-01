@@ -1082,21 +1082,23 @@ float CMath::DstRot(float from, float to)
     const float s1 = (float)sin((double)to);
     const float c1 = (float)cos((double)to);
     const float dot = s0 * s1 + c0 * c1;
-    float angle = 0.0f;
 
-    if (dot != 0.0f) {
-        if (dot < -1.0f) {
-            angle = -1.0f;
-        } else if (1.0f < dot) {
-            angle = 1.0f;
-        } else {
-            angle = dot;
-        }
+    if (dot == 0.0f) {
+        return 0.0f;
+    }
 
-        angle = (float)acos((double)angle);
-        if (s0 * c1 - s1 * c0 < 0.0f) {
-            angle = -angle;
-        }
+    float clamped;
+    if (dot < -1.0f) {
+        clamped = -1.0f;
+    } else if (dot > 1.0f) {
+        clamped = 1.0f;
+    } else {
+        clamped = dot;
+    }
+
+    float angle = (float)acos((double)clamped);
+    if (s0 * c1 - s1 * c0 < 0.0f) {
+        angle = -angle;
     }
 
     return angle;

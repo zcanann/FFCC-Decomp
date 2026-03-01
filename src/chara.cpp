@@ -1,6 +1,8 @@
 #include "ffcc/chara.h"
 #include "ffcc/cflat_runtime.h"
 
+extern "C" void CalcBind__Q26CChara5CNodeFPQ26CChara6CModel(void*, void*);
+
 /*
  * --INFO--
  * Address:	TODO
@@ -187,7 +189,16 @@ void CChara::CModel::Duplicate(CMemory::CStage*)
  */
 void CChara::CModel::calcBindMatrix()
 {
-	// TODO
+	CNode* node = *(CNode**)((u8*)this + 0xA8);
+	u32 i = 0;
+
+	while (i < *(u32*)((u8*)*(void**)((u8*)this + 0xA4) + 8)) {
+		if (*(s16*)((u8*)*(void**)node + 0x68) < 0) {
+			CalcBind__Q26CChara5CNodeFPQ26CChara6CModel(node, this);
+		}
+		i++;
+		node = (CNode*)((u8*)node + 0xC0);
+	}
 }
 
 /*

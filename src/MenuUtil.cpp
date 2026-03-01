@@ -19,6 +19,7 @@ extern "C" void SetPosY__5CFontFf(float, CFont*);
 extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" void pppDeletePart__8CPartMngFi(void*, int);
 extern "C" void BindEffect__8CMenuPcsFiii(CMenuPcs*, int, int, int);
+extern "C" unsigned int GetSoundMode__9CRedSoundFv(void*);
 extern unsigned char PartMng[];
 
 extern float lbl_80333558;
@@ -199,12 +200,45 @@ void CMenuPcs::SetManaWaterEffect()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80179d28
+ * PAL Size: 256b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::GetOptionData()
 {
-	// TODO
+	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
+	signed char& gameInitMode = *reinterpret_cast<signed char*>(self + 0x8F);
+	signed char& stereoMode = *reinterpret_cast<signed char*>(self + 0x90);
+	signed char& bgmVolume = *reinterpret_cast<signed char*>(self + 0x91);
+	signed char& seVolume = *reinterpret_cast<signed char*>(self + 0x92);
+	signed char* const specialModeFlags = reinterpret_cast<signed char*>(self + 0xB5);
+
+	gameInitMode =
+	    static_cast<signed char>(static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(Game.game.m_gameWork.m_gameInitFlag))) >> 5);
+
+	unsigned int soundMode = GetSoundMode__9CRedSoundFv(reinterpret_cast<unsigned char*>(&Sound) + 8);
+	unsigned int soundModeClz = static_cast<unsigned int>(__cntlzw(soundMode));
+	stereoMode = static_cast<signed char>(static_cast<unsigned int>(__cntlzw(soundModeClz >> 5)) >> 5);
+
+	int value = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Sound) + 0x22B0);
+	value = value / 10 + (value >> 31);
+	bgmVolume = static_cast<signed char>(value - (value >> 31));
+
+	value = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Sound) + 0x22B4);
+	value = value / 10 + (value >> 31);
+	seVolume = static_cast<signed char>(value - (value >> 31));
+
+	unsigned int flag = Game.game.m_gameWork.m_spModeFlags[0];
+	specialModeFlags[0] = static_cast<signed char>((-flag | flag) >> 31);
+	flag = Game.game.m_gameWork.m_spModeFlags[1];
+	specialModeFlags[1] = static_cast<signed char>((-flag | flag) >> 31);
+	flag = Game.game.m_gameWork.m_spModeFlags[2];
+	specialModeFlags[2] = static_cast<signed char>((-flag | flag) >> 31);
+	flag = Game.game.m_gameWork.m_spModeFlags[3];
+	specialModeFlags[3] = static_cast<signed char>((-flag | flag) >> 31);
 }
 
 /*

@@ -2,6 +2,7 @@
 #include "ffcc/cflat_runtime.h"
 
 extern "C" void CalcBind__Q26CChara5CNodeFPQ26CChara6CModel(void*, void*);
+extern "C" void freeFurTex__6CCharaFv();
 
 /*
  * --INFO--
@@ -60,7 +61,7 @@ void CChara::Create()
  */
 void CChara::Destroy()
 {
-	// TODO
+	freeFurTex__6CCharaFv();
 }
 
 /*
@@ -558,7 +559,11 @@ CChara::CMesh::CRefData::~CRefData()
  */
 CChara::CMesh::CDisplayList::CDisplayList()
 {
-	// TODO
+	u8* const bytes = reinterpret_cast<u8*>(this);
+
+	*reinterpret_cast<void**>(bytes + 0) = 0;
+	*reinterpret_cast<s32*>(bytes + 4) = 0;
+	*reinterpret_cast<s16*>(bytes + 8) = -1;
 }
 
 /*

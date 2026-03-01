@@ -4,6 +4,7 @@
 #include "ffcc/menu.h"
 #include "ffcc/p_game.h"
 
+#include <dolphin/mtx.h>
 #include <string.h>
 
 extern "C" void* __vt__Q212CFlatRuntime7CObject[];
@@ -12,10 +13,26 @@ extern "C" void* __vt__8CGObject[];
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 extern "C" void DrawOptionMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawSingCMake__8CMenuPcsFv(CMenuPcs*);
+extern "C" void PlaySe__6CSoundFiiii(void*, int, int, int, int);
+extern "C" void SetAnim__Q29CCharaPcs7CHandleFiiiii(void*, int, int, int, int, int);
+extern "C" void SetFrame__Q26CChara6CModelFf(float, void*);
+extern "C" void AddFrame__Q26CChara6CModelFf(float, void*);
+extern "C" void SetMatrix__Q26CChara6CModelFPA4_f(void*, Mtx);
+extern "C" void CalcMatrix__Q26CChara6CModelFv(void*);
+extern "C" void CalcSkin__Q26CChara6CModelFv(void*);
+extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+    void*, void*, int, int, int, void*, void*);
 
 extern float FLOAT_8032ee18;
 extern float FLOAT_803313dc;
 extern float FLOAT_803313e8;
+extern float FLOAT_803314bc;
+extern float FLOAT_80331598;
+extern float FLOAT_803315d4;
+extern float FLOAT_80331698;
+extern float FLOAT_803317e0;
+extern float FLOAT_803317e4;
+extern float FLOAT_803317e8;
 extern unsigned char DAT_8032ee20;
 extern unsigned char uRam8032ee21;
 extern unsigned char DAT_8032ee24;
@@ -23,6 +40,7 @@ extern unsigned char uRam8032ee25;
 extern int DAT_8032ee28;
 extern int DAT_8032ee2c;
 extern unsigned char DAT_8032ee30;
+extern unsigned char CFlat[];
 extern char s_wm_menu_cpp_801dc418[];
 extern char s__s__d___Error_WM_menu_no_error___801dc424[];
 
@@ -222,12 +240,145 @@ void CMenuPcs::destroyWorld()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801005d8
+ * PAL Size: 1320b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::calcWorld()
 {
-	// TODO
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	unsigned char* const worldParams = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x83C)[0]);
+
+	reinterpret_cast<unsigned int*>(worldParams + 4)[0] = reinterpret_cast<unsigned int*>(worldParams + 8)[0];
+
+	if (worldState[8] == 0) {
+		PlaySe__6CSoundFiiii(&Sound, 0x138B, 0x40, 0x7F, 0);
+		SetAnim__Q29CCharaPcs7CHandleFiiiii(reinterpret_cast<void*>(reinterpret_cast<unsigned int*>(bytes + 0x778)[0]), 0, -1, -1, -1, 0);
+		reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 0;
+		worldState[8] = 1;
+		reinterpret_cast<short*>(worldState + 0x10)[0] = 1;
+	}
+
+	void* const handle = reinterpret_cast<void*>(reinterpret_cast<unsigned int*>(bytes + 0x778)[0]);
+	void* const model = reinterpret_cast<void*>(reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(handle) + 0x168)[0]);
+	const float animEnd = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0x10)[0];
+	const float animTime = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 8)[0];
+	const short animState = reinterpret_cast<short*>(worldState + 0x10)[0];
+
+	if (animState == 1) {
+		if (animEnd <= animTime) {
+			if (reinterpret_cast<short*>(worldState + 0x22)[0] > 9) {
+				int stackData[3];
+				stackData[0] = 2;
+				stackData[1] = 0;
+				stackData[2] = 0;
+
+				SetAnim__Q29CCharaPcs7CHandleFiiiii(handle, 1, -1, -1, -1, 0);
+				reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 1;
+				SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+				    CFlat, 0, 1, 4, 3, stackData, 0);
+				reinterpret_cast<short*>(worldState + 0x10)[0] = 2;
+				reinterpret_cast<short*>(worldState + 0x22)[0] = 0;
+			}
+		} else {
+			AddFrame__Q26CChara6CModelFf(FLOAT_80331698, model);
+			reinterpret_cast<short*>(worldState + 0x22)[0] = 0;
+		}
+	} else if (animState == 2) {
+		int nextAnim = static_cast<signed char>(bytes[0xE]);
+
+		if (nextAnim == 0) {
+			if (animEnd <= animTime) {
+				SetAnim__Q29CCharaPcs7CHandleFiiiii(handle, 1, -1, -1, -1, 0);
+				reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 1;
+			} else {
+				AddFrame__Q26CChara6CModelFf(FLOAT_80331698, model);
+			}
+		} else {
+			if (nextAnim >= 1 && nextAnim <= 4) {
+				PlaySe__6CSoundFiiii(&Sound, 0x138C, 0x40, 0x7F, 0);
+				nextAnim++;
+			} else if (nextAnim == 5) {
+				PlaySe__6CSoundFiiii(&Sound, 0x138D, 0x40, 0x7F, 0);
+				nextAnim = 6;
+				reinterpret_cast<short*>(worldState + 0x10)[0] = 3;
+				reinterpret_cast<short*>(worldState + 0x22)[0] = 0;
+			}
+
+			if (nextAnim != reinterpret_cast<int*>(worldParams + 8)[0]) {
+				SetAnim__Q29CCharaPcs7CHandleFiiiii(handle, nextAnim, -1, -1, -1, 0);
+				reinterpret_cast<int*>(worldParams + 8)[0] = nextAnim;
+
+				if (nextAnim == 0) {
+					SetFrame__Q26CChara6CModelFf(animEnd, model);
+				}
+			}
+			bytes[0xE] = 0;
+		}
+	} else if (animState == 3 && reinterpret_cast<short*>(worldState + 0x22)[0] > 9) {
+		if (animEnd <= animTime) {
+			SetAnim__Q29CCharaPcs7CHandleFiiiii(handle, 0, -1, -1, -1, 0);
+			reinterpret_cast<unsigned int*>(worldParams + 8)[0] = 0;
+			reinterpret_cast<short*>(worldState + 0x18)[0] = 10;
+			reinterpret_cast<short*>(worldState + 0x1E)[0] = -1;
+			reinterpret_cast<short*>(worldState + 0x10)[0] = 4;
+			PlaySe__6CSoundFiiii(&Sound, 0x32, 0x40, 0x7F, 0);
+		} else {
+			AddFrame__Q26CChara6CModelFf(FLOAT_80331698, model);
+		}
+	} else if (animState == 4) {
+		if (reinterpret_cast<short*>(worldState + 0x18)[0] == 0) {
+			reinterpret_cast<short*>(worldState + 0x20)[0] = reinterpret_cast<short*>(worldState + 0x1E)[0];
+			reinterpret_cast<short*>(worldState + 0x1E)[0] = 0;
+		} else {
+			reinterpret_cast<short*>(worldState + 0x18)[0]--;
+		}
+	}
+
+	unsigned char* const worldObj = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]);
+	worldObj[0x50] = 1;
+	reinterpret_cast<short*>(worldObj + 0x58)[0] = 0;
+	reinterpret_cast<short*>(worldObj + 0x5A)[0] = 0;
+	reinterpret_cast<short*>(worldObj + 0x5C)[0] = 0x280;
+	reinterpret_cast<short*>(worldObj + 0x5E)[0] = 0x1C0;
+	reinterpret_cast<float*>(worldObj + 0x60)[0] = FLOAT_803313dc;
+	reinterpret_cast<float*>(worldObj + 0x64)[0] = FLOAT_803313dc;
+	reinterpret_cast<float*>(worldObj + 0x68)[0] = FLOAT_80331598;
+	reinterpret_cast<float*>(worldObj + 0x6C)[0] = FLOAT_803313dc;
+	reinterpret_cast<float*>(worldObj + 0x70)[0] = FLOAT_803317e0;
+	reinterpret_cast<float*>(worldObj + 0x74)[0] = FLOAT_803317e4;
+	reinterpret_cast<float*>(worldObj + 0x78)[0] = FLOAT_803317e8;
+	reinterpret_cast<float*>(worldObj + 0x7C)[0] = FLOAT_803313dc;
+	reinterpret_cast<float*>(worldObj + 0x80)[0] = FLOAT_803313dc;
+	reinterpret_cast<float*>(worldObj + 0x84)[0] = FLOAT_803315d4;
+	reinterpret_cast<float*>(worldObj + 0x88)[0] = FLOAT_803315d4;
+	reinterpret_cast<float*>(worldObj + 0x8C)[0] = FLOAT_803315d4;
+
+	Mtx matrix;
+	PSMTXRotRad(matrix, 'x', FLOAT_803314bc * reinterpret_cast<float*>(worldObj + 0x78)[0]);
+	matrix[0][3] = reinterpret_cast<float*>(worldObj + 0x6C)[0];
+	matrix[1][3] = reinterpret_cast<float*>(worldObj + 0x70)[0];
+	matrix[2][3] = reinterpret_cast<float*>(worldObj + 0x74)[0];
+	PSMTXScaleApply(matrix, matrix, reinterpret_cast<float*>(worldObj + 0x84)[0], reinterpret_cast<float*>(worldObj + 0x88)[0],
+	                reinterpret_cast<float*>(worldObj + 0x8C)[0]);
+
+	SetMatrix__Q26CChara6CModelFPA4_f(model, matrix);
+	CalcMatrix__Q26CChara6CModelFv(model);
+	CalcSkin__Q26CChara6CModelFv(model);
+
+	const short updatedAnimState = reinterpret_cast<short*>(worldState + 0x10)[0];
+
+	if (updatedAnimState == 1 && animTime >= animEnd) {
+		if (reinterpret_cast<short*>(worldState + 0x22)[0] < 10) {
+			reinterpret_cast<short*>(worldState + 0x22)[0]++;
+		}
+	} else if (updatedAnimState == 3 && reinterpret_cast<short*>(worldState + 0x22)[0] < 10) {
+		reinterpret_cast<short*>(worldState + 0x22)[0]++;
+	}
 }
 
 /*

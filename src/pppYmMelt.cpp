@@ -236,29 +236,24 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
     }
 
     YmMeltWork* work = (YmMeltWork*)((u8*)ymMelt + *offsets->m_serializedDataOffsets + 0x80);
-    int grid = (int)((u16)((u8*)&ctrl->m_initWOrk)[2]) + 1;
+    u16 gridSize = *(u16*)((u8*)&ctrl->m_initWOrk + 2);
+    int grid = (int)gridSize + 1;
     float matrixY = pppMngStPtr->m_matrix.value[1][3];
 
     if (work->m_vertexData == nullptr) {
-        int pointCount = grid * grid;
         work->m_vertexData = (YmMeltVertex*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-            (unsigned long)pointCount * sizeof(YmMeltVertex), pppEnvStPtr->m_stagePtr, s_pppYmMelt_cpp, 0xA9);
+            (unsigned long)(grid * grid) * sizeof(YmMeltVertex), pppEnvStPtr->m_stagePtr, s_pppYmMelt_cpp, 0xA9);
 
         YmMeltVertex* vtx = work->m_vertexData;
-        s16 phaseDiv = *(s16*)((u8*)&ctrl->m_arg3 + 2);
         int angleSeed = rand();
+        s16 phaseDiv = *(s16*)((u8*)&ctrl->m_arg3 + 2);
         work->m_phaseOffset = (s16)angleSeed - (s16)(angleSeed / (int)phaseDiv) * phaseDiv;
 
         double halfWidth = (double)(ctrl->m_stepValue * FLOAT_80330b08);
-        double step =
-            (double)(ctrl->m_stepValue / (float)((double)((u16)((u8*)&ctrl->m_initWOrk)[2]) - DOUBLE_80330af8));
+        double step = (double)(ctrl->m_stepValue / (float)((double)gridSize - DOUBLE_80330af8));
         double rot = (double)(FLOAT_80330b0c * (float)((double)work->m_phaseOffset - DOUBLE_80330b00));
-        double z = -halfWidth;
-        double x;
-
-        while (z <= halfWidth) {
-            x = -halfWidth;
-            while (x <= halfWidth) {
+        for (double z = -halfWidth; z <= halfWidth; z = (double)(float)(z + step)) {
+            for (double x = -halfWidth; x <= halfWidth; x = (double)(float)(x + step)) {
                 vtx->m_position.x = (float)x;
                 vtx->m_position.y = FLOAT_80330af0;
                 vtx->m_position.z = (float)z;
@@ -270,9 +265,7 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
                 }
 
                 vtx++;
-                x = (double)(float)(x + step);
             }
-            z = (double)(float)(z + step);
         }
 
         CalcPolygonHeight(ymMelt, (VERTEX_DATA*)ctrl, (_GXColor*)work->m_vertexData, matrixY);

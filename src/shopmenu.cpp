@@ -17,6 +17,9 @@ int GetData__13CAmemCacheSetFsPci(void*, short, char*, int);
 int ChkEquipPossible__8CMenuPcsFi(void*, int);
 void GetRecipeMaterial__8CMenuPcsFiPQ28CMenuPcs12MaterialInfo(void*, int, short*);
 int CanAddGil__12CCaravanWorkFi(void*, int);
+void AddItem__12CCaravanWorkFiPi(void*, int, int*);
+void AddGil__12CCaravanWorkFi(void*, int);
+void DeleteItemIdx__12CCaravanWorkFii(void*, int, int);
 void PlaySe__6CSoundFiiii(void*, int, int, int, int);
 char EquipChk__8CMenuPcsFi(void*, int);
 int GetSmithItem__8CMenuPcsFi(void*, int);
@@ -1305,12 +1308,245 @@ void CShopMenu::SelectFigure()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80155934
+ * PAL Size: 2108b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CShopMenu::SelectYesNo()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    unsigned short buttons;
+    int listType;
+    int itemIndex;
+    int itemId;
+    int gilValue;
+    int i;
+    int count;
+    int itemBits;
+    bool canExecute = false;
+    int caravan = *reinterpret_cast<int*>(self + 0x20);
+
+    buttons = GetPadButtons();
+    if ((buttons & 0xC) != 0) {
+        *reinterpret_cast<unsigned int*>(self + 0x3C) ^= 1;
+        PlaySe__6CSoundFiiii(&Sound, 1, 0x40, 0x7F, 0);
+        return;
+    }
+
+    buttons = GetPadButtons();
+    if ((buttons & 0x100) == 0) {
+        return;
+    }
+
+    if (*reinterpret_cast<int*>(self + 0x3C) == 1) {
+        PlaySe__6CSoundFiiii(&Sound, 3, 0x40, 0x7F, 0);
+        if (*reinterpret_cast<int*>(self + 0x14) == 0) {
+            *reinterpret_cast<int*>(self + 0x10) = 1;
+        } else {
+            *reinterpret_cast<int*>(self + 0x10) = 0;
+        }
+        return;
+    }
+
+    *reinterpret_cast<int*>(self + 0x10) = 0;
+    listType = *reinterpret_cast<int*>(self + 0x14);
+
+    if (listType == 0) {
+        PlaySe__6CSoundFiiii(&Sound, 0x50, 0x40, 0x7F, 0);
+        itemIndex = *reinterpret_cast<int*>(self + 0x28);
+        if (listType == 0) {
+            itemId = *reinterpret_cast<short*>(caravan + itemIndex * 2 + 0xBE6);
+        } else if (listType == 1) {
+            itemId = *reinterpret_cast<short*>(caravan + itemIndex * 2 + 0xB6);
+        } else if (listType == 2) {
+            itemIndex = *reinterpret_cast<int*>(self + 0x50 + itemIndex * 4);
+            if (itemIndex == -1) {
+                itemId = -1;
+            } else {
+                itemId = *reinterpret_cast<short*>(caravan + itemIndex * 2 + 0xB6);
+            }
+        } else {
+            itemId = -1;
+        }
+
+        i = 0;
+        itemBits = itemId * 0x48;
+        while ((i < *reinterpret_cast<int*>(self + 0x44)) &&
+               ((unsigned short)(*reinterpret_cast<unsigned short*>(caravan + 0x94) + 1) < 0x41)) {
+            if (*reinterpret_cast<int*>(self + 0x14) == 0) {
+                if (itemId < 1) {
+                    gilValue = 0;
+                } else {
+                    gilValue = *reinterpret_cast<short*>(caravan + 0xBE2) *
+                               *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemBits + 0x20);
+                    gilValue = gilValue / 100 + (gilValue >> 0x1F);
+                    gilValue = gilValue - (gilValue >> 0x1F);
+                }
+            } else if (*reinterpret_cast<int*>(self + 0x14) == 1) {
+                if (itemId < 1) {
+                    gilValue = 0;
+                } else {
+                    gilValue = *reinterpret_cast<short*>(caravan + 0xBE2) *
+                               *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemBits + 0x20);
+                    gilValue = gilValue / 100 + (gilValue >> 0x1F);
+                    gilValue = gilValue - (gilValue >> 0x1F);
+                    gilValue = (gilValue * 3) / 4;
+                }
+            } else {
+                gilValue = -1;
+            }
+
+            if (CanAddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), -gilValue) == 0) {
+                return;
+            }
+
+            AddItem__12CCaravanWorkFiPi(reinterpret_cast<void*>(caravan), static_cast<short>(itemId), 0);
+
+            if (*reinterpret_cast<int*>(self + 0x14) == 0) {
+                if (itemId < 1) {
+                    gilValue = 0;
+                } else {
+                    gilValue = *reinterpret_cast<short*>(caravan + 0xBE2) *
+                               *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemBits + 0x20);
+                    gilValue = gilValue / 100 + (gilValue >> 0x1F);
+                    gilValue = gilValue - (gilValue >> 0x1F);
+                }
+            } else if (*reinterpret_cast<int*>(self + 0x14) == 1) {
+                if (itemId < 1) {
+                    gilValue = 0;
+                } else {
+                    gilValue = *reinterpret_cast<short*>(caravan + 0xBE2) *
+                               *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemBits + 0x20);
+                    gilValue = gilValue / 100 + (gilValue >> 0x1F);
+                    gilValue = gilValue - (gilValue >> 0x1F);
+                    gilValue = (gilValue * 3) / 4;
+                }
+            } else {
+                gilValue = -1;
+            }
+
+            AddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), -gilValue);
+            i = i + 1;
+        }
+        return;
+    }
+
+    itemIndex = *reinterpret_cast<int*>(self + 0x28);
+    if (itemIndex != -1) {
+        if (listType == 0) {
+            itemId = *reinterpret_cast<short*>(caravan + itemIndex * 2 + 0xBE6);
+        } else if (listType == 1) {
+            itemId = *reinterpret_cast<short*>(caravan + itemIndex * 2 + 0xB6);
+        } else if (listType == 2) {
+            count = *reinterpret_cast<int*>(self + 0x50 + itemIndex * 4);
+            if (count == -1) {
+                itemId = -1;
+            } else {
+                itemId = *reinterpret_cast<short*>(caravan + count * 2 + 0xB6);
+            }
+        } else {
+            itemId = -1;
+        }
+
+        if (itemId < 1) {
+            canExecute = false;
+        } else if (listType == 0) {
+            canExecute = true;
+        } else if (listType == 2) {
+            canExecute = true;
+            count = (itemId - 0x191U) & 0x1F;
+            itemBits = (itemId - 0x191U) >> 5;
+            if (((*reinterpret_cast<unsigned int*>(caravan + itemBits * 4 + 0xC08) & (1U << count))) == 0) {
+                canExecute = false;
+            }
+        } else {
+            if (EquipChk__8CMenuPcsFi(&MenuPcs, itemIndex) == 0) {
+                canExecute = (itemId >= 0x9F);
+            } else {
+                canExecute = false;
+            }
+        }
+    }
+
+    if (!canExecute) {
+        PlaySe__6CSoundFiiii(&Sound, 4, 0x40, 0x7F, 0);
+        return;
+    }
+
+    PlaySe__6CSoundFiiii(&Sound, 0x50, 0x40, 0x7F, 0);
+    listType = *reinterpret_cast<int*>(self + 0x14);
+    itemIndex = *reinterpret_cast<int*>(self + 0x28);
+    if (listType == 0) {
+        itemId = *reinterpret_cast<short*>(caravan + itemIndex * 2 + 0xBE6);
+    } else if (listType == 1) {
+        itemId = *reinterpret_cast<short*>(caravan + itemIndex * 2 + 0xB6);
+    } else if (listType == 2) {
+        count = *reinterpret_cast<int*>(self + 0x50 + itemIndex * 4);
+        if (count == -1) {
+            itemId = -1;
+        } else {
+            itemId = *reinterpret_cast<short*>(caravan + count * 2 + 0xB6);
+        }
+    } else {
+        itemId = -1;
+    }
+
+    if (listType == 0) {
+        if (itemId < 1) {
+            gilValue = 0;
+        } else {
+            gilValue = *reinterpret_cast<short*>(caravan + 0xBE2) *
+                       *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
+            gilValue = gilValue / 100 + (gilValue >> 0x1F);
+            gilValue = gilValue - (gilValue >> 0x1F);
+        }
+    } else if (listType == 1) {
+        if (itemId < 1) {
+            gilValue = 0;
+        } else {
+            gilValue = *reinterpret_cast<short*>(caravan + 0xBE2) *
+                       *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
+            gilValue = gilValue / 100 + (gilValue >> 0x1F);
+            gilValue = gilValue - (gilValue >> 0x1F);
+            gilValue = (gilValue * 3) / 4;
+        }
+    } else {
+        gilValue = -1;
+    }
+
+    if (CanAddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), gilValue) == 0) {
+        return;
+    }
+
+    DeleteItemIdx__12CCaravanWorkFii(reinterpret_cast<void*>(caravan), *reinterpret_cast<int*>(self + 0x28), 0);
+
+    if (*reinterpret_cast<int*>(self + 0x14) == 0) {
+        if (itemId < 1) {
+            itemId = 0;
+        } else {
+            itemId = *reinterpret_cast<short*>(caravan + 0xBE2) *
+                     *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
+            itemId = itemId / 100 + (itemId >> 0x1F);
+            itemId = itemId - (itemId >> 0x1F);
+        }
+    } else if (*reinterpret_cast<int*>(self + 0x14) == 1) {
+        if (itemId < 1) {
+            itemId = 0;
+        } else {
+            itemId = *reinterpret_cast<short*>(caravan + 0xBE2) *
+                     *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
+            itemId = itemId / 100 + (itemId >> 0x1F);
+            itemId = itemId - (itemId >> 0x1F);
+            itemId = (itemId * 3) / 4;
+        }
+    } else {
+        itemId = -1;
+    }
+
+    AddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravan), itemId);
 }
 
 /*

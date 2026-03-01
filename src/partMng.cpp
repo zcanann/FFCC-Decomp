@@ -4,6 +4,7 @@
 #include "ffcc/file.h"
 #include "ffcc/gobject.h"
 #include "ffcc/graphic.h"
+#include "ffcc/map.h"
 #include "ffcc/math.h"
 #include "ffcc/p_game.h"
 
@@ -60,6 +61,7 @@ extern "C" void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
 extern "C" void _pppDrawPart__FP9_pppMngSt(_pppMngSt*);
 extern "C" void Create__9CGBaseObjFv(CGBaseObj*);
 extern "C" void LoadMap__7CMapPcsFiiPvUlUc(void*, int, int, void*, unsigned long, unsigned char);
+extern "C" int SearchNodeSk__Q26CChara6CModelFPc(CChara::CModel*, char*);
 extern int DAT_8032ed70;
 extern unsigned char PartPcs[];
 extern unsigned char MapPcs[];
@@ -1533,10 +1535,261 @@ void CPartMng::pppGetDefaultCreateParam()
  * JP Address: TODO
  * JP Size: TODO
  */
-int CPartMng::pppCreate0(int, int, PPPCREATEPARAM*, int)
+int CPartMng::pppCreate0(int pdtSlotIndex, int fpNo, PPPCREATEPARAM* createParam, int allowFpOverride)
 {
-    // TODO
-    return -1;
+    struct PppMngStCreateRaw {
+        void* m_pppResSet;           // 0x00
+        int m_partIndex;             // 0x04
+        Vec m_position;              // 0x08
+        int m_baseTime;              // 0x14
+        pppIVECTOR4 m_rotation;      // 0x18
+        int m_rotationSpeed;         // 0x20
+        int m_lifeEnd;               // 0x24
+        Vec m_scale;                 // 0x28
+        int m_currentFrame;          // 0x34
+        int m_previousFrame;         // 0x38
+        int m_numControlPrograms;    // 0x3C
+        float m_scaleFactor;         // 0x40
+        float m_ownerScale;          // 0x44
+        float m_userFloat0;          // 0x48
+        float m_userFloat1;          // 0x4C
+        Vec m_savedPosition;         // 0x50
+        Vec m_previousPosition;      // 0x5C
+        Vec m_paramVec0;             // 0x68
+        short m_kind;                // 0x74
+        short m_nodeIndex;           // 0x76
+        pppFMATRIX m_matrix;         // 0x78
+        unsigned char m_envColorR;   // 0xA8
+        unsigned char m_envColorG;   // 0xA9
+        unsigned char m_envColorB;   // 0xAA
+        unsigned char m_envColorA;   // 0xAB
+        int m_prioTime;              // 0xAC
+        int m_previousFrame2;        // 0xB0
+        int m_numPrograms;           // 0xB4
+        int m_reservedB8;            // 0xB8
+        unsigned int m_objHitMask;   // 0xBC
+        unsigned int m_cylinderAttribute; // 0xC0
+        _pppPObjLink m_pppPObjLinkHead;   // 0xC4
+        void* m_pppPDataVals;        // 0xCC
+        unsigned char m_padD0[0xE4 - 0xD0];
+        unsigned char m_endRequested;     // 0xE4
+        unsigned char m_stopRequested;    // 0xE5
+        unsigned char m_isFinished;       // 0xE6
+        unsigned char m_matrixMode;       // 0xE7
+        unsigned char m_hitBgFlag;        // 0xE8
+        unsigned char m_slotVisible;      // 0xE9
+        unsigned char m_ownerFacing;      // 0xEA
+        unsigned char m_drawVariant;      // 0xEB
+        unsigned char m_rotationOrder;    // 0xEC
+        unsigned char m_drawPass;         // 0xED
+        signed char m_drawSubType;        // 0xEE
+        unsigned char m_useOwnerScaleSign; // 0xEF
+        unsigned char m_ownerFlagsInitialized; // 0xF0
+        unsigned char m_nodeScaleInitialized;   // 0xF1
+        unsigned char m_fieldF2;          // 0xF2
+        unsigned char m_padF3[0xF5 - 0xF3];
+        unsigned char m_mapTexLoaded;     // 0xF5
+        unsigned char m_hasMapRef;        // 0xF6
+        unsigned char m_fpBillboard;      // 0xF7
+        unsigned char m_prio;             // 0xF8
+        short m_frameCounter;             // 0xF9
+        unsigned char m_padFB[0x100 - 0xFB];
+        unsigned int m_paramA;            // 0x100
+        unsigned int m_paramB;            // 0x104
+        float m_cullRadiusSq;             // 0x108
+        float m_cullRadius;               // 0x10C
+        float m_cullYOffset;              // 0x110
+        float m_sortDepth;                // 0x114
+        unsigned short m_field118;        // 0x118
+        short m_mapObjIndex;              // 0x11A
+        PPPSEST m_soundEffectData;        // 0x11C
+        PPPIFPARAM m_hitParams;           // 0x130
+        short m_hitObjectIds[0x10];       // 0x138
+    };
+
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    unsigned char* slot = self + 0x22E18 + pdtSlotIndex * 0x38;
+    _pppDataHead* pdt = *reinterpret_cast<_pppDataHead**>(slot + 0x0);
+    if (pdt == 0) {
+        return -1;
+    }
+
+    int freeIdx = -1;
+    for (int i = 0; i < 0x180; i++) {
+        unsigned char* mngBytes = self + 0x1D4 + i * 0x158;
+        if (*reinterpret_cast<int*>(mngBytes + 0x14) == -0x1000) {
+            freeIdx = i;
+            break;
+        }
+    }
+    if (freeIdx < 0) {
+        return -1;
+    }
+
+    PppMngStCreateRaw* mng = reinterpret_cast<PppMngStCreateRaw*>(self + 0x1D4 + freeIdx * 0x158);
+    unsigned char* fpData = reinterpret_cast<unsigned char*>(pdt) + 0x20 + fpNo * 0x60;
+    unsigned char* fpData1 = fpData + 0x20;
+    unsigned char* fpData2 = fpData + 0x40;
+
+    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(mng) + 0x104) = -1;
+    mng->m_prioTime = 0;
+    mng->m_kind = static_cast<short>(pdtSlotIndex);
+    mng->m_nodeIndex = static_cast<short>(fpNo);
+
+    mng->m_hitParams.m_particleIndex = createParam->m_hitParamA;
+    mng->m_hitParams.m_classId = createParam->m_hitParamB;
+    mng->m_hitParams.m_hitObjectCount = createParam->m_hitObjectCount;
+    mng->m_hitParams.m_hitFlags = createParam->m_hitFlags;
+    memcpy(mng->m_hitObjectIds, createParam->m_hitObjectIds, sizeof(mng->m_hitObjectIds));
+
+    mng->m_mapTexLoaded = 0;
+    mng->m_hasMapRef = 0;
+    mng->m_envColorR = 0;
+    mng->m_envColorG = 0;
+    mng->m_envColorB = 0x13;
+    mng->m_envColorA = 0x33;
+    if (PartPcs[0x5b145] != 0 && pdtSlotIndex == 7 && fpNo == 0) {
+        mng->m_envColorR = 0;
+        mng->m_envColorG = 0;
+        mng->m_envColorB = 0x10;
+        mng->m_envColorA = 0;
+    }
+
+    mng->m_soundEffectData = createParam->m_soundEffectParams;
+    mng->m_soundEffectData.m_soundEffectStartFrame <<= 0xC;
+
+    mng->m_isFinished = 0;
+    mng->m_endRequested = 0;
+    mng->m_stopRequested = 0;
+    mng->m_slotVisible = 1;
+    mng->m_ownerFacing = 1;
+
+    const int initialTime = *reinterpret_cast<int*>(fpData1 + 0x0C);
+    if (initialTime == -0x1000) {
+        mng->m_baseTime = 0;
+    } else {
+        int scaled = initialTime * 0x19;
+        scaled = scaled / 0x1E + (scaled >> 0x1F);
+        mng->m_baseTime = scaled - (scaled >> 0x1F);
+    }
+
+    mng->m_pppResSet = slot;
+    mng->m_partIndex = *reinterpret_cast<int*>(fpData1 + 0x10);
+    mng->m_cullRadiusSq = *reinterpret_cast<float*>(fpData1 + 0x14);
+    if (mng->m_cullRadiusSq > 0.0f) {
+        mng->m_cullRadiusSq *= mng->m_cullRadiusSq;
+    }
+    mng->m_cullRadius = *reinterpret_cast<float*>(fpData1 + 0x18);
+    mng->m_cullYOffset = *reinterpret_cast<float*>(fpData1 + 0x1C);
+    mng->m_pppPObjLinkHead.m_next = 0;
+    mng->m_pppPObjLinkHead.m_owner = 0;
+    mng->m_pppPDataVals = 0;
+
+    *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(mng) + 0xFC) =
+        *reinterpret_cast<unsigned short*>(fpData2 + 0x0);
+    mng->m_field118 = *reinterpret_cast<unsigned short*>(fpData2 + 0x2);
+    mng->m_matrixMode = *reinterpret_cast<unsigned char*>(fpData2 + 0x5);
+    mng->m_drawVariant = *reinterpret_cast<unsigned char*>(fpData2 + 0x6);
+    mng->m_rotationOrder = *reinterpret_cast<unsigned char*>(fpData2 + 0x7);
+    mng->m_slotVisible = *reinterpret_cast<unsigned char*>(fpData2 + 0x4);
+    mng->m_drawSubType = *reinterpret_cast<signed char*>(fpData2 + 0x0C);
+    mng->m_ownerFlagsInitialized = *reinterpret_cast<unsigned char*>(fpData2 + 0x0D);
+    mng->m_nodeScaleInitialized = *reinterpret_cast<unsigned char*>(fpData2 + 0x0E);
+    mng->m_fieldF2 = 1;
+    if (allowFpOverride != 0) {
+        const unsigned char mode = *reinterpret_cast<unsigned char*>(fpData2 + 0x05);
+        if (mode == 4 || mode < 3 || mode > 8) {
+            mng->m_fieldF2 = *reinterpret_cast<unsigned char*>(fpData2 + 0x0F);
+        }
+    }
+
+    mng->m_fpBillboard = *reinterpret_cast<unsigned char*>(fpData2 + 0x0A);
+    mng->m_prio = *reinterpret_cast<unsigned char*>(fpData2 + 0x0B);
+    mng->m_mapObjIndex = *reinterpret_cast<short*>(fpData2 + 0x08);
+
+    mng->m_objHitMask = createParam->m_objectHitMask;
+    mng->m_cylinderAttribute = createParam->m_cylinderAttribute;
+    mng->m_paramA = createParam->m_paramA;
+    mng->m_paramB = createParam->m_paramB;
+
+    const float baseX = *reinterpret_cast<float*>(fpData + 0x00);
+    const float baseY = *reinterpret_cast<float*>(fpData + 0x04);
+    const float baseZ = *reinterpret_cast<float*>(fpData + 0x08);
+    if (createParam->m_positionOffsetPtr == 0) {
+        mng->m_position.x = baseX;
+        mng->m_position.y = baseY;
+        mng->m_position.z = baseZ;
+    } else {
+        mng->m_position.x = createParam->m_positionOffsetPtr->x + baseX;
+        mng->m_position.y = createParam->m_positionOffsetPtr->y + baseY;
+        mng->m_position.z = createParam->m_positionOffsetPtr->z + baseZ;
+    }
+    mng->m_savedPosition = mng->m_position;
+    mng->m_previousPosition = mng->m_position;
+
+    if (createParam->m_extraPositionPtr != 0) {
+        mng->m_paramVec0.x = createParam->m_extraPositionPtr->x + baseX;
+        mng->m_paramVec0.y = createParam->m_extraPositionPtr->y + baseY;
+        mng->m_paramVec0.z = createParam->m_extraPositionPtr->z + baseZ;
+    }
+
+    if (createParam->m_rotationPtr == 0) {
+        mng->m_rotation.x = *reinterpret_cast<short*>(fpData + 0x10);
+        mng->m_rotation.y = *reinterpret_cast<short*>(fpData + 0x12);
+        mng->m_rotation.z = *reinterpret_cast<short*>(fpData + 0x14);
+        mng->m_rotation.w = *reinterpret_cast<short*>(fpData + 0x16);
+        mng->m_rotationSpeed = *reinterpret_cast<int*>(fpData + 0x18);
+    } else {
+        const float rotScale = 65536.0f / 360.0f;
+        int rotX = static_cast<int>(createParam->m_rotationPtr->x * rotScale);
+        int rotY = static_cast<int>(createParam->m_rotationPtr->y * rotScale);
+        mng->m_rotation.x = static_cast<short>(rotX >> 16);
+        mng->m_rotation.y = static_cast<short>(rotX);
+        mng->m_rotation.z = static_cast<short>(rotY >> 16);
+        mng->m_rotation.w = static_cast<short>(rotY);
+        mng->m_rotationSpeed = static_cast<int>(createParam->m_rotationPtr->z * rotScale);
+    }
+
+    const float scaleX = *reinterpret_cast<float*>(fpData1 + 0x00);
+    const float scaleY = *reinterpret_cast<float*>(fpData1 + 0x04);
+    const float scaleZ = *reinterpret_cast<float*>(fpData1 + 0x08);
+    if (createParam->m_scalePtr == 0) {
+        mng->m_scale.x = scaleX;
+        mng->m_scale.y = scaleY;
+        mng->m_scale.z = scaleZ;
+    } else {
+        mng->m_scale.x = createParam->m_scalePtr->x * scaleX;
+        mng->m_scale.y = createParam->m_scalePtr->y * scaleY;
+        mng->m_scale.z = createParam->m_scalePtr->z * scaleZ;
+    }
+
+    mng->m_ownerScale = FLOAT_8032fe18;
+    mng->m_scaleFactor = FLOAT_8032fe18;
+    mng->m_userFloat0 = FLOAT_8032fe18;
+    mng->m_userFloat1 = FLOAT_8032fe18;
+    mng->m_useOwnerScaleSign = 0;
+    *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(mng) + 0xD8) = 0;
+    *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(mng) + 0xDC) = createParam->m_lookTargetPtr;
+    *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(mng) + 0xE0) = 0;
+
+    const unsigned char mode = *reinterpret_cast<unsigned char*>(fpData2 + 0x05);
+    if (mode == 2 || mode == 4) {
+        mng->m_mapObjIndex = static_cast<short>(MapMng.GetMapObjEffectIdx(*reinterpret_cast<unsigned short*>(fpData2 + 0x08)));
+    } else if (mode >= 3 && mode <= 8) {
+        mng->m_ownerFacing = 0;
+        CGObject* owner = reinterpret_cast<CGObject*>(createParam->m_paramB);
+        *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(mng) + 0xD8) = owner;
+        *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(mng) + 0xDC) = createParam->m_lookTargetPtr;
+        if (owner != 0 && owner->m_charaModelHandle != 0 && owner->m_charaModelHandle->m_model != 0) {
+            int node = SearchNodeSk__Q26CChara6CModelFPc(owner->m_charaModelHandle->m_model,
+                                                         reinterpret_cast<char*>(fpData2 + 0x10));
+            if (node >= 0) {
+                *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(mng) + 0xE0) = 0;
+            }
+        }
+    }
+
+    return freeIdx;
 }
 
 /*

@@ -100,11 +100,11 @@ public:
     void MakeBuyData(int, char*);
     int MakeSellData(int, char*);
     void MakeSmithData(int, char*);
-    void GetSellFlg(int);
+    unsigned int GetSellFlg(int);
     void ClrSellFlg(int);
-    void GetBuyFlg(int);
+    unsigned int GetBuyFlg(int);
     void ClrBuyFlg(int);
-    void GetMkSmithFlg(int);
+    unsigned int GetMkSmithFlg(int);
     void ClrMkSmithFlg(int);
     void SetResetFlg(int);
     void GetBonus(int);

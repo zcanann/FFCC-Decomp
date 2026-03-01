@@ -288,11 +288,9 @@ void CMenuPcs::FavoInit0()
 	int iVar2;
 	float fVar1;
 	short *psVar3;
-	unsigned int uVar4;
-	unsigned int uVar5;
-	
-	fVar1 = 0.0f;
-	
+	int iVar4;
+	int iVar5;
+
 	iVar2 = *(int *)&field_0x850;
 	*(int *)(iVar2 + 0x2c) = 2;
 	*(int *)(iVar2 + 0x30) = 5;
@@ -326,6 +324,7 @@ void CMenuPcs::FavoInit0()
 	*(int *)(iVar2 + 0x230) = 5;
 	iVar2 = *(int *)&field_0x850;
 	*(int *)(iVar2 + 0x274) = 2;
+	fVar1 = 0.0f;
 	*(int *)(iVar2 + 0x26c) = 0;
 	*(int *)(iVar2 + 0x270) = 5;
 	iVar2 = *(int *)&field_0x850;
@@ -345,11 +344,11 @@ void CMenuPcs::FavoInit0()
 	*(int *)(iVar2 + 0x36c) = 0;
 	*(int *)(iVar2 + 0x370) = 5;
 	
-	uVar4 = (unsigned int)**(short **)&field_0x850;
+	iVar4 = (int)**(short **)&field_0x850;
 	psVar3 = *(short **)&field_0x850 + 4;
-	if (0 < (int)uVar4) {
-		uVar5 = uVar4 >> 3;
-		if (uVar5 != 0) {
+	if (iVar4 > 0) {
+		iVar5 = iVar4 >> 3;
+		if (iVar5 != 0) {
 			do {
 				psVar3[0x10] = 0;
 				psVar3[0x11] = 0;
@@ -376,10 +375,10 @@ void CMenuPcs::FavoInit0()
 				psVar3[0xf1] = 0;
 				*(float *)(psVar3 + 0xe8) = fVar1;
 				psVar3 = psVar3 + 0x100;
-				uVar5 = uVar5 - 1;
-			} while (uVar5 != 0);
-			uVar4 = uVar4 & 7;
-			if (uVar4 == 0) {
+				iVar5 = iVar5 - 1;
+			} while (iVar5 != 0);
+			iVar4 = iVar4 & 7;
+			if (iVar4 == 0) {
 				return;
 			}
 		}
@@ -388,8 +387,8 @@ void CMenuPcs::FavoInit0()
 			psVar3[0x11] = 0;
 			*(float *)(psVar3 + 8) = fVar1;
 			psVar3 = psVar3 + 0x20;
-			uVar4 = uVar4 - 1;
-		} while (uVar4 != 0);
+			iVar4 = iVar4 - 1;
+		} while (iVar4 != 0);
 	}
 }
 

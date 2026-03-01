@@ -8,6 +8,7 @@
 
 extern "C" int rand(void);
 extern int DAT_8032ed70;
+extern float lbl_80330520;
 
 struct KeShpTail3XStep {
     s32 m_graphId;
@@ -28,6 +29,7 @@ void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
 void pppCopyMatrix__FR10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*);
 void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
 void pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(pppFMATRIX*, pppFMATRIX*, pppFMATRIX*);
+void memset__FPviUl(void*, int, unsigned long);
 int __cntlzw(unsigned int);
 }
 extern Mtx ppvWorldMatrix;
@@ -432,20 +434,20 @@ void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, struct UnkC* param_2)
     int i;
     float one;
 
-    work = (unsigned char*)((u8*)&obj->pppPObject + 8 + ((KeShpTail3XOffsets*)param_2)->m_serializedDataOffsets[0]);
+    work = (unsigned char*)((u8*)obj + 0x80 + ((KeShpTail3XOffsets*)param_2)->m_serializedDataOffsets[0]);
     work[0x1c3] = 0;
     work[0x1c2] = 0;
     *(u16*)(work + 0x1bc) = 0;
     *(u32*)(work + 0x1b8) = 0;
     *(u16*)(work + 0x1c0) = (u16)rand();
-    memset(work, 0, 8);
-    memset(work + 8, 0, 8);
-    memset(work + 0x10, 0, 8);
-    memset(work + 0x18, 0, 8);
-    memset(work + 0x20, 0, 8);
-    memset(work + 0x28, 0, 8);
+    memset__FPviUl(work, 0, 8);
+    memset__FPviUl(work + 8, 0, 8);
+    memset__FPviUl(work + 0x10, 0, 8);
+    memset__FPviUl(work + 0x18, 0, 8);
+    memset__FPviUl(work + 0x20, 0, 8);
+    memset__FPviUl(work + 0x28, 0, 8);
 
-    one = 1.0f;
+    one = lbl_80330520;
     i = 0;
     anglePtr = work;
     do {

@@ -1296,72 +1296,122 @@ void CMemory::CStage::drawHeapBar(int y)
     colors[14] = DAT_801d64e0;
     colors[15] = DAT_801d64e4;
 
-    int mode = stageGetAllocationMode(this);
-    int node = (mode == 2) ? stageGetHeapHead(this) : *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
-    int prev = *reinterpret_cast<int*>(node + 4);
-    unsigned char heapBar[0x17d];
-    memset(heapBar, 0xFF, 0x17d);
+    int node;
+    if (stageGetAllocationMode(this) == 2) {
+        node = stageGetHeapHead(this);
+    } else {
+        node = *reinterpret_cast<int*>(stageGetHeapHead(this) + 8);
+    }
+
+    int prevNode = *reinterpret_cast<int*>(node + 4);
+    unsigned char heapBar[0x17D];
+    memset(heapBar, 0xFF, 0x17D);
 
     int heapTop = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 8);
     int heapSpan = (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0xC) - 0x40) - heapTop;
 
-    while (true) {
-        unsigned char flags = *reinterpret_cast<unsigned char*>(node + 2);
+    do {
+        int curNode = node;
+        unsigned char flags = *reinterpret_cast<unsigned char*>(curNode + 2);
         if ((flags & 2) != 0) {
-            unsigned char currentColor = heapBar[0];
-            int x0 = 0;
+            unsigned int drawColor = static_cast<unsigned int>(heapBar[0]);
+            unsigned char* colorPtr = heapBar;
+            int segmentStart = 0;
+            int x = 0;
 
-            for (int x1 = 0; x1 < 0x17c; x1++) {
-                if ((currentColor != heapBar[x1]) || (x1 == 0x17b)) {
+            do {
+                if ((drawColor != *colorPtr) || (x == 0x17B)) {
                     unsigned int color;
-                    if (currentColor == 0xFF) {
-                        color = (mode == 0) ? 0x4080 : 0x400080;
+                    if (drawColor == 0xFF) {
+                        if (stageGetAllocationMode(this) == 0) {
+                            color = 0x4080;
+                        } else {
+                            color = 0x400080;
+                        }
                     } else {
-                        color = colors[currentColor];
+                        color = colors[drawColor];
                     }
 
                     GXBegin(static_cast<GXPrimitive>(0x98), GX_VTXFMT0, 4);
-                    GXPosition3f32(static_cast<float>(x0 + 0x80), static_cast<float>(y), 0.0f);
+                    GXPosition3f32(static_cast<float>(segmentStart + 0x80), static_cast<float>(y), 0.0f);
                     GXColor1u32(color);
-                    GXPosition3f32(static_cast<float>(x1 + 0x80), static_cast<float>(y), 0.0f);
+                    GXPosition3f32(static_cast<float>(x + 0x80), static_cast<float>(y), 0.0f);
                     GXColor1u32(color);
-                    GXPosition3f32(static_cast<float>(x0 + 0x80), static_cast<float>(y + 8), 0.0f);
+                    GXPosition3f32(static_cast<float>(segmentStart + 0x80), static_cast<float>(y + 8), 0.0f);
                     GXColor1u32(color);
-                    GXPosition3f32(static_cast<float>(x1 + 0x80), static_cast<float>(y + 8), 0.0f);
+                    GXPosition3f32(static_cast<float>(x + 0x80), static_cast<float>(y + 8), 0.0f);
                     GXColor1u32(color);
 
-                    currentColor = heapBar[x1];
-                    x0 = x1;
+                    drawColor = static_cast<unsigned int>(*colorPtr);
+                    segmentStart = x;
                 }
-            }
+
+                x++;
+                colorPtr++;
+            } while (x < 0x17C);
             return;
         }
 
-        bool isAllocated = ((flags & 4) != 0) && ((flags & 3) == 0);
-        if (isAllocated) {
-            int fillEnd = ((*reinterpret_cast<int*>(node + 8) - heapTop) * 0x17c) / heapSpan;
-            int fillStart = (((node + 0x40) - heapTop) * 0x17c) / heapSpan;
+        bool isUsed = false;
+        if (((flags & 4) != 0) && ((flags & 3) == 0)) {
+            isUsed = true;
+        }
+
+        if (isUsed) {
+            int fillEnd = ((*reinterpret_cast<int*>(curNode + 8) - heapTop) * 0x17C) / heapSpan;
+            int fillStart = (((curNode + 0x40) - heapTop) * 0x17C) / heapSpan;
+            unsigned char* dst = heapBar + fillStart;
+            unsigned int fillCount = static_cast<unsigned int>(fillEnd + 1) - static_cast<unsigned int>(fillStart);
+
             if (fillStart <= fillEnd) {
-                unsigned char fillColor = static_cast<unsigned char>(flags >> 4);
-                unsigned int fillCount = static_cast<unsigned int>(fillEnd + 1 - fillStart);
-                unsigned char* dst = heapBar + fillStart;
-                for (unsigned int i = 0; i < fillCount; i++) {
-                    *dst++ = fillColor;
+                unsigned int loop = fillCount >> 3;
+                if (loop != 0) {
+                    do {
+                        unsigned char color = static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(curNode + 2) >> 4);
+                        dst[0] = color;
+                        dst[1] = color;
+                        dst[2] = color;
+                        dst[3] = color;
+                        dst[4] = color;
+                        dst[5] = color;
+                        dst[6] = color;
+                        dst[7] = color;
+                        dst += 8;
+                        loop--;
+                    } while (loop != 0);
+
+                    fillCount &= 7;
+                    if (fillCount == 0) {
+                        goto checkHeapNode;
+                    }
                 }
+
+                do {
+                    *dst = static_cast<unsigned char>(*reinterpret_cast<unsigned char*>(curNode + 2) >> 4);
+                    dst++;
+                    fillCount--;
+                } while (fillCount != 0);
             }
         }
 
-        int next = *reinterpret_cast<int*>(node + 8);
-        if ((*reinterpret_cast<int*>(node + 0x10) != next - (node + 0x40)) ||
-            (*reinterpret_cast<int*>(node + 4) != prev)) {
+checkHeapNode:
+        if (*reinterpret_cast<int*>(curNode + 0x10) != *reinterpret_cast<int*>(curNode + 8) - (curNode + 0x40)) {
             if (System.m_execParam != 0) {
                 Printf__7CSystemFPce(&System, DAT_801d67d8);
             }
             return;
         }
-        prev = node;
-        node = next;
-    }
+
+        bool linkMismatch = *reinterpret_cast<int*>(curNode + 4) != prevNode;
+        node = *reinterpret_cast<int*>(curNode + 8);
+        prevNode = curNode;
+        if (linkMismatch) {
+            if (System.m_execParam != 0) {
+                Printf__7CSystemFPce(&System, DAT_801d67d8);
+            }
+            return;
+        }
+    } while (true);
 }
 
 /*

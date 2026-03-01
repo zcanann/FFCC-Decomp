@@ -93,9 +93,9 @@ void _ReverbNullCallback(AXFX_BUFFERUPDATE* param_1, void*)
  */
 void ReverbAreaAlloc(unsigned long size)
 {
+    unsigned long alignedSize = ((u32)size + 0x1F) & ~0x1F;
     DAT_8032f4b0[0] += (u32)size;
-    size = ((u32)size + 0x1F) & ~0x1F;
-    DAT_8032f4b0[1] += (u32)size;
+    DAT_8032f4b0[1] += (u32)alignedSize;
     RedNew((int)size);
 }
 

@@ -26,7 +26,7 @@ void pppKeZCrctShpDraw(_pppPObject *pObject, int param2)
     float scaledPosX;
     float scaledPosY;
     float scaledPosZ;
-    u8 mode;
+    int mode;
 
     pppGetRowVector(*(pppFMATRIX*)((char*)pObject + 0x10), rowX, rowY, rowZ, rowPos);
     pppScaleVector(scaledX, rowX, pppMngStPtr->m_scale.x);

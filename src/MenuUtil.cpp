@@ -4,6 +4,7 @@
 #include "ffcc/sound.h"
 
 class CPartMng;
+extern "C" void pppDeletePart__8CPartMngFi(void*, int);
 
 extern "C" float GetWidth__5CFontFPc(CFont*, const char*);
 extern "C" void SetMargin__5CFontFf(float, CFont*);
@@ -32,6 +33,8 @@ extern "C" void pppDeletePart__8CPartMngFi(CPartMng*, int);
 extern "C" void BindEffect__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 
 extern "C" int __cntlzw(unsigned int);
+
+extern unsigned char PartMng[];
 
 static unsigned short GetMenuPress()
 {

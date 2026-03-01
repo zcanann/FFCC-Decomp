@@ -135,7 +135,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                 f32 y = vertex->y;
                 f32 z = vertex->z;
 
-                if ((data->childId + 0x10000) != 0xFFFF) {
+                if (data->childId != 0xFFFF) {
                     _pppPObject* child;
                     s32 childId = data->childId;
                     _pppPDataVal* childData =
@@ -172,7 +172,7 @@ void pppVertexAp(_pppPObject* parent, PVertexAp* dataRaw, void* ctrlRaw)
                 f32 y = vertex->y;
                 f32 z = vertex->z;
 
-                if ((data->childId + 0x10000) != 0xFFFF) {
+                if (data->childId != 0xFFFF) {
                     _pppPObject* child;
                     s32 childId = data->childId;
                     _pppPDataVal* childData =

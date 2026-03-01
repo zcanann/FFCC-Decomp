@@ -438,8 +438,12 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c3db4
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void _VoiceEnvelopeCheck()
 {
@@ -1017,8 +1021,12 @@ void SetVoiceSwitch(RedTrackDATA* track, int voiceSwitch)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c4da0
+ * PAL Size: 188b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void _AdsrStart(RedVoiceDATA* voice)
 {
@@ -1058,8 +1066,12 @@ void _AdsrStart(RedVoiceDATA* voice)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c4e5c
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void _AdsrDataCompute(RedVoiceDATA* voice)
 {
@@ -1791,6 +1803,8 @@ void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int fr
              (track < (int*)(*(int*)control + (u32)*(u8*)((u8*)control + 0x491) * 0x154)));
 }
 
+#pragma dont_inline on
+
 /*
  * --INFO--
  * PAL Address: 0x801c63c4
@@ -1875,6 +1889,8 @@ void _MusicNoteExecute()
         DAT_8032f424 = 0;
     }
 }
+
+#pragma dont_inline reset
 
 /*
  * --INFO--

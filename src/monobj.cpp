@@ -1438,12 +1438,33 @@ void CGMonObj::initFinishedFuncDefault()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80113F58
+ * PAL Size: 172b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::setIceJEffect(int)
+void CGMonObj::setIceJEffect(int enabled)
 {
-	// TODO
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+
+	reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x20000);
+	if (enabled == 0) {
+		return;
+	}
+
+	unsigned short count = *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]) + 0x1AA);
+	for (int i = 0; i < static_cast<int>(count); i++) {
+		void* pdtLoadRef = nullptr;
+		if (object->m_charaModelHandle != nullptr) {
+			pdtLoadRef = object->m_charaModelHandle->m_pdtLoadRef;
+		}
+		int dataNo = (pdtLoadRef != nullptr) ? reinterpret_cast<int*>(pdtLoadRef)[5] : -1;
+		prgObj->putParticleBindTrace((i + 0x5A) | (dataNo << 8), *reinterpret_cast<int*>(mon + 0x5A8), object, 0.0f, 0);
+	}
 }
 
 /*

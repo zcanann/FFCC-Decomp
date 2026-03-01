@@ -199,6 +199,7 @@ extern float FLOAT_803329f4;
 extern float FLOAT_803329f8;
 extern float FLOAT_80332994;
 extern float FLOAT_803329fc;
+extern float FLOAT_80332960;
 extern float FLOAT_80332a00;
 extern float FLOAT_80332a04;
 extern float FLOAT_80332a08;
@@ -1534,12 +1535,22 @@ void CMenuPcs::GetSingWinSize(int, short*, short*, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80146490
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::SetSingWinInfo(int, int, int, int)
+void CMenuPcs::SetSingWinInfo(int x, int y, int w, int h)
 {
-	// TODO
+    s16* winInfo = *reinterpret_cast<s16**>(reinterpret_cast<u8*>(this) + 0x848);
+    winInfo[0] = static_cast<s16>(x);
+    winInfo[1] = static_cast<s16>(y);
+    winInfo[2] = static_cast<s16>(w);
+    winInfo[3] = static_cast<s16>(h);
+    winInfo[4] = 0;
+    winInfo[5] = 3;
 }
 
 /*
@@ -1554,52 +1565,112 @@ void CMenuPcs::SetSingDynamicWinMessInfo(int, char*, char*, char*, char*, char*,
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80146364
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::SetSingWinScl(float)
+void CMenuPcs::SetSingWinScl(float scale)
 {
-	// TODO
+    FLOAT_8032ea78 = scale;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::GetSingWinScl()
+float CMenuPcs::GetSingWinScl()
 {
-	// TODO
+    return FLOAT_8032ea78;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8014630c
+ * PAL Size: 88b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::SingWinMessHeight()
+int CMenuPcs::SingWinMessHeight()
 {
-	// TODO
+    unsigned int lineHeight = static_cast<unsigned int>(FLOAT_80332960 * FLOAT_8032ea78);
+    float scaledHeight = FLOAT_80332960 * FLOAT_8032ea78;
+    double intHeight = static_cast<double>(lineHeight);
+
+    if (FLOAT_8033294c < (scaledHeight - static_cast<float>(intHeight))) {
+        lineHeight += 1;
+    }
+    return static_cast<int>(lineHeight + 3);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8014624c
+ * PAL Size: 192b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::ChkEquipPossible(int)
+int CMenuPcs::ChkEquipPossible(int itemNo)
 {
-	// TODO
+    u16 flags = *reinterpret_cast<u16*>(Game.game.unkCFlatData0[2] + itemNo * 0x48 + 4);
+    unsigned int raceMask = 1 << (*reinterpret_cast<u16*>(Game.game.m_scriptFoodBase[0] + 0x3E0) & 3);
+    unsigned int genderMask = 0x10;
+
+    if (*reinterpret_cast<s16*>(Game.game.m_scriptFoodBase[0] + 0x3E2) != 0) {
+        genderMask = 0x20;
+    }
+
+    bool result;
+    if ((flags & 0xF) != 0) {
+        if ((flags & 0x30) != 0) {
+            result = (((flags & 0xF) & raceMask) != 0) && (((flags & 0x30) & genderMask) != 0);
+            return result ? 1 : 0;
+        }
+        result = ((flags & 0xF) & raceMask) != 0;
+    } else {
+        result = ((flags & 0x30) & genderMask) != 0;
+    }
+
+    return result ? 1 : 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80146190
+ * PAL Size: 188b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::GetEquipType(int)
+int CMenuPcs::GetEquipType(int itemNo)
 {
-	// TODO
+    u16 flags = *reinterpret_cast<u16*>(Game.game.unkCFlatData0[2] + itemNo * 0x48 + 4);
+
+    if ((flags & 0x100) != 0) {
+        return 0;
+    }
+    if ((flags & 0x400) != 0) {
+        return 1;
+    }
+    if ((flags & 0xA00) != 0) {
+        return 2;
+    }
+    if ((flags & 0x3000) != 0) {
+        return 3;
+    }
+    return 0;
 }
 
 /*

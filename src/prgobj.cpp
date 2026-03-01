@@ -318,7 +318,12 @@ int CGPrgObj::playSe3D(int seNo, int volume, int dist, int pitch, Vec* pos)
 		pos = &m_worldPosition;
 	}
 
-	handle = PlaySe3D__6CSoundFiP3Vecffi(&Sound, seNo, pos, (float)volume, (float)dist, 0);
+	handle = PlaySe3D__6CSoundFiP3Vecffi(
+		&Sound, seNo, pos,
+		static_cast<float>(static_cast<unsigned int>(volume)),
+		static_cast<float>(static_cast<unsigned int>(dist)),
+		0
+	);
 
 	if (pitch != 0) {
 		Sound.ChangeSe3DPitch(handle, pitch, 0);

@@ -1,5 +1,6 @@
 #include "ffcc/charaobj.h"
 #include "ffcc/p_game.h"
+#include "ffcc/sound.h"
 
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
 	void*, int, int, int, int, void*, void*);
@@ -244,12 +245,23 @@ void CGCharaObj::decIgnoreHit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80111858
+ * PAL Size: 140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGCharaObj::damageDelete()
 {
-	// TODO
+	int* slots = (int*)((char*)this + 0x564);
+
+	Sound.StopSe3DGroup(*(short*)((char*)this + 0x30));
+	for (int i = 0; i < 0x16; i++) {
+		if (((1U << i) & 0x3bU) != 0) {
+			DeleteParticleSlot__13CFlatRuntime2Fii(CFlat, slots[i]);
+		}
+	}
 }
 
 /*

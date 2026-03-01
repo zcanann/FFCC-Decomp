@@ -764,9 +764,34 @@ void _PitchExecute(RedVoiceDATA* param_1)
  * Address:	TODO
  * Size:	TODO
  */
-void _WaveSplitSelect(RedWaveDATA*, RedNoteDATA*)
+void _WaveSplitSelect(RedWaveDATA* param_1, RedNoteDATA* param_2)
 {
-	// TODO
+    int* waveData = (int*)param_1;
+    s8* noteData = (s8*)param_2;
+
+    if ((waveData != 0) && ((waveData[0] & 0x30000) != 0)) {
+        s8 splitKey;
+
+        while (((waveData[0] & 0x200) == 0) && (*(s8*)(waveData + 6) < noteData[0])) {
+            waveData += 0x18;
+            if ((waveData[0] & 1) != 0) {
+                waveData += 0x18;
+            }
+        }
+
+        splitKey = *(s8*)(waveData + 6);
+        while (((waveData[0] & 0x200) == 0) && (((u8*)waveData)[0x19] < (u8)noteData[1])) {
+            if (splitKey != *(s8*)(waveData + 6)) {
+                return;
+            }
+
+            waveData += 0x18;
+            if ((waveData[0] & 1) != 0) {
+                waveData += 0x18;
+            }
+        }
+    }
+    return;
 }
 
 /*

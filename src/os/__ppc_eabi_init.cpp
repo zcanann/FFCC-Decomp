@@ -1,8 +1,8 @@
 #include "__ppc_eabi_linker.h"
 #include "global.h"
-#include <string.h>
 
 extern "C" {
+#include "string.h"
 
 SECTION_INIT extern void __flush_cache(void* addr, unsigned int size);
 extern void __OSPSInit(void);
@@ -39,7 +39,7 @@ SECTION_INIT void __init_data_80003340(void)
     __bss_init_info* bii;
 
     dci = _rom_copy_info;
-    while (1) {
+    while (TRUE) {
         if (dci->size == 0)
             break;
         __copy_rom_section(dci->addr, dci->rom, dci->size);
@@ -47,7 +47,7 @@ SECTION_INIT void __init_data_80003340(void)
     }
 
     bii = _bss_init_info;
-    while (1) {
+    while (TRUE) {
         if (bii->size == 0)
             break;
         __init_bss_section(bii->addr, bii->size);

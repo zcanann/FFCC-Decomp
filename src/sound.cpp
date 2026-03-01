@@ -738,88 +738,87 @@ void CSound::CheckDriver(int mode)
  */
 void CSound::Frame()
 {
-    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
-    unsigned char* se = reinterpret_cast<unsigned char*>(this) + 0x2C;
-
     loadWaveFrame();
-
-    for (u32 i = 0; i < 0x80; i++, se += 0x28) {
+    unsigned char* se = reinterpret_cast<unsigned char*>(this) + 0x2C;
+    u32 i = 0;
+    do {
         if (static_cast<signed char>(*se) < 0) {
-            int volumePan[3];
             int pan;
+            int volume[3];
 
-            calcVolumePan(reinterpret_cast<CSe3D*>(se), volumePan[0], pan);
+            calcVolumePan(reinterpret_cast<CSe3D*>(se), volume[0], pan);
 
             if (((*se >> 6) & 1) == 0) {
-                int& seId = *reinterpret_cast<int*>(se + 8);
-                if (SePlayState__9CRedSoundFi(redSound, seId) == 0) {
+                if (SePlayState__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), *reinterpret_cast<int*>(se + 8)) == 0) {
                     *se &= 0x7F;
                 } else {
-                    if (ReportSeLoop__9CRedSoundFi(redSound, seId) != 0 &&
-                        GetSeVolume__9CRedSoundFii(redSound, seId, 0) == 0 &&
-                        GetSeVolume__9CRedSoundFii(redSound, seId, 1) == 0) {
+                    int playing = ReportSeLoop__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), *reinterpret_cast<int*>(se + 8));
+                    if ((playing != 0) &&
+                        (GetSeVolume__9CRedSoundFii(reinterpret_cast<CRedSound*>(this), *reinterpret_cast<int*>(se + 8), 0) == 0) &&
+                        (GetSeVolume__9CRedSoundFii(reinterpret_cast<CRedSound*>(this), *reinterpret_cast<int*>(se + 8), 1) == 0)) {
                         if ((*reinterpret_cast<unsigned int*>(CFlat + 0x129C) & 0x400000) != 0) {
                             Printf__7CSystemFPce(&System, DAT_801db2b8, *reinterpret_cast<int*>(se + 0xC));
                         }
-                        SeStop__9CRedSoundFi(redSound, seId);
+                        SeStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), *reinterpret_cast<int*>(se + 8));
                         *se = (*se & 0xBF) | 0x40;
-                        continue;
+                        goto next;
                     }
 
                     if (static_cast<signed char>(se[2]) != pan) {
-                        if (seId < 0) {
+                        if (*reinterpret_cast<int*>(se + 8) < 0) {
                             Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
                         } else {
-                            SePan__9CRedSoundFiii(redSound, seId, pan, 0x1E);
+                            SePan__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), *reinterpret_cast<int*>(se + 8), pan, 0x1E);
                         }
                         se[2] = static_cast<unsigned char>(pan);
                     }
 
-                    if (static_cast<signed char>(se[1]) != volumePan[0]) {
-                        if (seId < 0) {
+                    if (static_cast<signed char>(se[1]) != volume[0]) {
+                        if (*reinterpret_cast<int*>(se + 8) < 0) {
                             Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
                         } else {
-                            SeVolume__9CRedSoundFiii(redSound, seId, volumePan[0], 0x1E);
+                            SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), *reinterpret_cast<int*>(se + 8), volume[0], 0x1E);
                         }
-                        se[1] = static_cast<unsigned char>(volumePan[0]);
+                        se[1] = static_cast<unsigned char>(volume[0]);
                     }
                 }
-            } else if (volumePan[0] != 0) {
+            } else if (volume[0] != 0) {
                 if ((*reinterpret_cast<unsigned int*>(CFlat + 0x129C) & 0x400000) != 0) {
                     Printf__7CSystemFPce(&System, DAT_801db29c, *reinterpret_cast<int*>(se + 0xC));
                 }
 
-                int soundId = *reinterpret_cast<int*>(se + 0xC);
-                int newSeId;
-                if (soundId < 0) {
+                int vol = volume[0];
+                int seNo = *reinterpret_cast<int*>(se + 0xC);
+                if (seNo < 0) {
                     Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
-                    newSeId = -1;
-                } else if (soundId < 4000) {
-                    int bank = soundId / 1000;
-                    newSeId = SePlay__9CRedSoundFiiiii(redSound, bank, soundId - bank * 1000, pan, 0, 0);
-                    SeVolume__9CRedSoundFiii(redSound, newSeId, volumePan[0], 0x1E);
+                    seNo = -1;
+                } else if (seNo < 4000) {
+                    int bank = seNo / 1000;
+                    seNo = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(this), bank, seNo - (bank * 1000), pan, 0, 0);
+                    SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), seNo, vol, 0x1E);
                 } else {
-                    newSeId = SePlay__9CRedSoundFiiiii(redSound, -1, soundId, pan, 0, 0);
-                    SeVolume__9CRedSoundFiii(redSound, newSeId, volumePan[0], 0x1E);
+                    seNo = SePlay__9CRedSoundFiiiii(reinterpret_cast<CRedSound*>(this), -1, seNo, pan, 0, 0);
+                    SeVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), seNo, vol, 0x1E);
                 }
-
-                *reinterpret_cast<int*>(se + 8) = newSeId;
+                *reinterpret_cast<int*>(se + 8) = seNo;
                 *se &= 0xBF;
             }
         }
-    }
+next:
+        i++;
+        se += 0x28;
+    } while (i < 0x80);
 
-    int& currentMusicVolume = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x22B8);
-    const int targetMusicVolume = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x22BC);
-    if (currentMusicVolume != targetMusicVolume) {
-        if (currentMusicVolume < targetMusicVolume) {
-            currentMusicVolume++;
+    int currentMusicVolume = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x22B8);
+    if (currentMusicVolume != *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x22BC)) {
+        if (currentMusicVolume < *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x22BC)) {
+            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x22B8) = currentMusicVolume + 1;
         } else {
-            currentMusicVolume--;
+            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x22B8) = currentMusicVolume - 1;
         }
     }
 
-    MusicVolume__9CRedSoundFiii(redSound, -1, currentMusicVolume, 0);
+    MusicVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), -1, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x22B8), 0);
 }
 
 /*
@@ -1428,24 +1427,32 @@ void CSound::FreeWave(int waveId)
  */
 void CSound::StopAndFreeAllSe(int clearMode)
 {
-    CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
-    short* seGroup = reinterpret_cast<short*>(reinterpret_cast<u8*>(this) + 0x22C0);
-    short* waveGroup = reinterpret_cast<short*>(reinterpret_cast<u8*>(this) + 0x22C8);
-
-    if (clearMode == 0) {
-        SeStopMG__9CRedSoundFiiii(redSound, seGroup[0], seGroup[1], seGroup[2], seGroup[3]);
-        ClearSeSepDataMG__9CRedSoundFiiii(redSound, seGroup[0], seGroup[1], seGroup[2], seGroup[3]);
-        ClearWaveDataM__9CRedSoundFiiii(redSound, waveGroup[0], waveGroup[1], waveGroup[2], waveGroup[3]);
+    if (clearMode != 0) {
+        SeStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), -1);
+        ClearSeSepData__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), -1);
+        ClearWaveData__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), -3);
     } else {
-        SeStop__9CRedSoundFi(redSound, -1);
-        ClearSeSepData__9CRedSoundFi(redSound, -1);
-        ClearWaveData__9CRedSoundFi(redSound, -3);
+        SeStopMG__9CRedSoundFiiii(reinterpret_cast<CRedSound*>(this),
+                                  *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C0),
+                                  *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C2),
+                                  *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C4),
+                                  *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C6));
+        ClearSeSepDataMG__9CRedSoundFiiii(reinterpret_cast<CRedSound*>(this),
+                                          *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C0),
+                                          *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C2),
+                                          *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C4),
+                                          *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C6));
+        ClearWaveDataM__9CRedSoundFiiii(reinterpret_cast<CRedSound*>(this),
+                                        *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C8),
+                                        *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22CA),
+                                        *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22CC),
+                                        *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22CE));
     }
 
     *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x28) = 10000000;
     memset(reinterpret_cast<u8*>(this) + 0x2C, 0, 0x1400);
-    memset(seGroup, 0xFF, 8);
-    memset(waveGroup, 0xFF, 8);
+    memset(reinterpret_cast<u8*>(this) + 0x22C0, 0xFF, 8);
+    memset(reinterpret_cast<u8*>(this) + 0x22C8, 0xFF, 8);
 }
 
 /*
@@ -1555,69 +1562,11 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
     float fVar3;
     int iVar4;
     int iVar5;
-    double dVar6;
-    double dVar7;
     float nearestDistance;
     float nearestT;
     Vec nearestPoint;
 
-    if (static_cast<s8>(se[3]) < 0) {
-        if ((FLOAT_80330cec == *reinterpret_cast<float*>(se + 0x10)) &&
-            (FLOAT_80330cec == *reinterpret_cast<float*>(se + 0x14))) {
-            outVolume = 0x7F;
-            outPan = 0x40;
-        } else {
-            dVar7 = (double)FLOAT_80330cf0;
-            if (*reinterpret_cast<unsigned char*>(Game + 0x13E4) != '\0') {
-                if ((*reinterpret_cast<short*>(Game + 0x13E0) == 0xE) ||
-                    (*reinterpret_cast<short*>(Game + 0x13E0) == 8)) {
-                    dVar7 = (double)FLOAT_80330cf4;
-                } else {
-                    dVar7 = (double)FLOAT_80330cf8;
-                }
-            }
-
-            PSMTXMultVec(*reinterpret_cast<Mtx*>(CameraPcs + 0x4), reinterpret_cast<Vec*>(se + 0x18), &nearestPoint);
-            dVar6 = (double)PSVECSquareDistance(reinterpret_cast<Vec*>(CameraPcs + 0xD4), reinterpret_cast<Vec*>(se + 0x18));
-            fVar3 = (float)(dVar7 * dVar6);
-            fVar1 = (float)(dVar7 * (double)(float)((double)*reinterpret_cast<float*>(se + 0x14) *
-                                                     (double)(float)((double)*reinterpret_cast<float*>(se + 0x14) * dVar7)));
-            if (fVar1 <= fVar3) {
-                outVolume = 0;
-            } else {
-                fVar2 = (float)(dVar7 * (double)(float)((double)*reinterpret_cast<float*>(se + 0x10) *
-                                                         (double)(float)((double)*reinterpret_cast<float*>(se + 0x10) * dVar7)));
-                if (fVar2 <= fVar3) {
-                    outVolume = 0x7F - (int)(FLOAT_80330ce8 * ((fVar3 - fVar2) / (fVar1 - fVar2)));
-                } else {
-                    outVolume = 0x7F;
-                }
-            }
-
-            if (*reinterpret_cast<unsigned int*>(Game + 0xC7F4) == 0x21) {
-                iVar4 = (int)(nearestPoint.x / FLOAT_80330cfc);
-                if (iVar4 < -0x38) {
-                    iVar5 = -0x38;
-                } else {
-                    iVar5 = 0x38;
-                    if (iVar4 < 0x39) {
-                        iVar5 = iVar4;
-                    }
-                }
-            } else {
-                iVar4 = (int)nearestPoint.x;
-                if (iVar4 < -0x38) {
-                    iVar5 = -0x38;
-                } else {
-                    iVar5 = 0x38;
-                    if (iVar4 < 0x39) {
-                        iVar5 = iVar4;
-                    }
-                }
-            }
-            outPan = iVar5 + 0x40;
-        }
-    } else {
+    if (static_cast<s8>(se[3]) >= 0) {
         iVar4 = Calc__9CLine((double)*reinterpret_cast<float*>(se + 0x14),
                              reinterpret_cast<CLine*>(reinterpret_cast<u8*>(this) + ((int)static_cast<s8>(se[3]) * 0x1CC) + 0x142C),
                              &nearestPoint, &nearestDistance, (u32*)0, &nearestT, reinterpret_cast<const Vec*>(CameraPcs + 0xE0));
@@ -1644,6 +1593,54 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
             }
             outPan = iVar5 + 0x40;
         }
+    } else if ((FLOAT_80330cec == *reinterpret_cast<float*>(se + 0x10)) &&
+               (FLOAT_80330cec == *reinterpret_cast<float*>(se + 0x14))) {
+        outVolume = 0x7F;
+        outPan = 0x40;
+    } else {
+        fVar1 = FLOAT_80330cf0;
+        if (*reinterpret_cast<unsigned char*>(Game + 0x13E4) != '\0') {
+            const short stageId = *reinterpret_cast<short*>(Game + 0x13E0);
+            if (stageId == 0xE) {
+                fVar1 = FLOAT_80330cf4;
+            } else if (stageId == 8) {
+                fVar1 = FLOAT_80330cf4;
+            } else {
+                fVar1 = FLOAT_80330cf8;
+            }
+        }
+
+        PSMTXMultVec(*reinterpret_cast<Mtx*>(CameraPcs + 0x4), reinterpret_cast<Vec*>(se + 0x18), &nearestPoint);
+        fVar3 = fVar1 * PSVECSquareDistance(reinterpret_cast<Vec*>(CameraPcs + 0xD4), reinterpret_cast<Vec*>(se + 0x18));
+        fVar2 = *reinterpret_cast<float*>(se + 0x14) * fVar1;
+        fVar2 = *reinterpret_cast<float*>(se + 0x14) * fVar2;
+        fVar2 = fVar1 * fVar2;
+        if (fVar2 <= fVar3) {
+            outVolume = 0;
+        } else {
+            float nearScaled = *reinterpret_cast<float*>(se + 0x10) * fVar1;
+            nearScaled = *reinterpret_cast<float*>(se + 0x10) * nearScaled;
+            if (nearScaled <= fVar3) {
+                outVolume = 0x7F - (int)(FLOAT_80330ce8 * ((fVar3 - nearScaled) / (fVar2 - nearScaled)));
+            } else {
+                outVolume = 0x7F;
+            }
+        }
+
+        if (*reinterpret_cast<unsigned int*>(Game + 0xC7F4) == 0x21) {
+            iVar4 = (int)(nearestPoint.x / FLOAT_80330cfc);
+        } else {
+            iVar4 = (int)nearestPoint.x;
+        }
+        if (iVar4 < -0x38) {
+            iVar5 = -0x38;
+        } else {
+            iVar5 = 0x38;
+            if (iVar4 < 0x39) {
+                iVar5 = iVar4;
+            }
+        }
+        outPan = iVar5 + 0x40;
     }
 
     if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22B8) < outVolume) {
@@ -2291,7 +2288,7 @@ void CSound::StopStream()
  */
 void CSound::SetStreamVolume(int volume, int frames)
 {
-    StreamVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), -1, volume, frames);
+    StreamVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(reinterpret_cast<u8*>(this) + 8), -1, volume, frames);
 }
 
 /*

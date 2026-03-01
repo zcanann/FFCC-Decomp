@@ -195,23 +195,27 @@ extern "C" CFunnyShape* dtor_80051D80(CFunnyShape* funnyShape, short shouldDelet
             PtrAt(funnyShape, 0x600C) = 0;
         }
 
-        for (s32 i = 0; i < 0x10; i++) {
-            u32 offs = static_cast<u32>(i) * 4;
-            if (PtrAt(funnyShape, 0x6094 + offs) != 0) {
-                __dla__FPv(PtrAt(funnyShape, 0x6094 + offs));
-                PtrAt(funnyShape, 0x6094 + offs) = 0;
+        s32 i = 0;
+        CFunnyShape* iter = funnyShape;
+        do {
+            if (PtrAt(iter, 0x6094) != 0) {
+                __dla__FPv(PtrAt(iter, 0x6094));
+                PtrAt(iter, 0x6094) = 0;
             }
 
-            if (PtrAt(funnyShape, 0x6014 + offs) != 0) {
-                __dl__FPv(PtrAt(funnyShape, 0x6014 + offs));
-                PtrAt(funnyShape, 0x6014 + offs) = 0;
+            if (PtrAt(iter, 0x6014) != 0) {
+                __dl__FPv(PtrAt(iter, 0x6014));
+                PtrAt(iter, 0x6014) = 0;
             }
 
-            if (PtrAt(funnyShape, 0x6054 + offs) != 0) {
-                __dl__FPv(PtrAt(funnyShape, 0x6054 + offs));
-                PtrAt(funnyShape, 0x6054 + offs) = 0;
+            if (PtrAt(iter, 0x6054) != 0) {
+                __dl__FPv(PtrAt(iter, 0x6054));
+                PtrAt(iter, 0x6054) = 0;
             }
-        }
+
+            i++;
+            iter = reinterpret_cast<CFunnyShape*>(Ptr(iter, 4));
+        } while (i < 0x10);
 
         if (shouldDelete > 0) {
             __dl__FPv(funnyShape);

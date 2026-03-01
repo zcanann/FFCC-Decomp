@@ -609,12 +609,40 @@ void CMenuPcs::SingCalcChara(float)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8014935c
+ * PAL Size: 472b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::DrawSingleBase(float)
+void CMenuPcs::DrawSingleBase(float alpha)
 {
-	// TODO
+    DrawInit__8CMenuPcsFv(this);
+    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+
+    _GXColor color = {0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_80332940 * alpha)};
+    GXSetChanMatColor(GX_COLOR0A0, color);
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x20);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 0, FLOAT_8033294c, FLOAT_8033294c, FLOAT_803329a4, FLOAT_80332928,
+                                     FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 4, FLOAT_8033294c, FLOAT_803329a8, FLOAT_803329a4, FLOAT_80332928,
+                                     FLOAT_8033294c, FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x28);
+    float y = 64.0f;
+    float sliceHeight = 32.0f;
+    while (y < 384.0f) {
+        if ((384.0f - y) < sliceHeight) {
+            sliceHeight = 384.0f - y;
+        }
+
+        DrawRect__8CMenuPcsFUlfffffffff(this, 0, FLOAT_8033294c, y, FLOAT_803329a4, sliceHeight, FLOAT_8033294c,
+                                         FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
+        y += sliceHeight;
+    }
 }
 
 /*

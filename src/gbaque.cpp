@@ -372,12 +372,84 @@ void GbaQueue::LoadAll()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800D0B98
+ * PAL Size: 596b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void GbaQueue::ClrShopMode()
 {
-	// TODO
+	int i;
+	char* obj;
+	CCaravanWork* caravanWork;
+
+	obj = reinterpret_cast<char*>(this);
+	for (i = 0; i < 4; i++) {
+		caravanWork = reinterpret_cast<CCaravanWork*>(Game.game.m_scriptFoodBase[i]);
+		if (caravanWork == 0) {
+			continue;
+		}
+
+		if (caravanWork->m_shopBusyFlag == 1) {
+			OSWaitSemaphore(accessSemaphores + i);
+			{
+				const unsigned char playerMask = static_cast<unsigned char>(1 << i);
+				obj[0x2D38] = static_cast<char>(obj[0x2D38] & ~playerMask);
+				obj[0x2D39] = static_cast<char>(obj[0x2D39] & ~playerMask);
+			}
+			OSSignalSemaphore(accessSemaphores + i);
+
+			for (int retry = 0; retry < 10; retry++) {
+				if (Joybus.SetMType(i, 0) == 0) {
+					break;
+				}
+			}
+			caravanWork->CallShop(0, 0, 0, 0, 0);
+		}
+
+		if (caravanWork->m_shopBusyFlag == 2) {
+			OSWaitSemaphore(accessSemaphores + i);
+			{
+				const unsigned char shopMask = static_cast<unsigned char>(0x10 << i);
+				obj[0x2D38] = static_cast<char>(obj[0x2D38] & ~shopMask);
+				obj[0x2D39] = static_cast<char>(obj[0x2D39] & ~shopMask);
+			}
+			OSSignalSemaphore(accessSemaphores + i);
+
+			for (int retry = 0; retry < 10; retry++) {
+				if (Joybus.SetMType(i, 0) == 0) {
+					break;
+				}
+			}
+			caravanWork->CallShop(1, 0, 0, 0, 0);
+		}
+
+		if ((static_cast<unsigned char>(obj[0x2D39]) & (1 << i)) == 0) {
+			const unsigned char shopMask = static_cast<unsigned char>(0x10 << i);
+			if ((static_cast<unsigned char>(obj[0x2D39]) & shopMask) != 0) {
+				OSWaitSemaphore(accessSemaphores + i);
+				obj[0x2D38] = static_cast<char>(obj[0x2D38] | shopMask);
+				OSSignalSemaphore(accessSemaphores + i);
+				if (Joybus.SetMType(i, 3) == 0) {
+					obj[0x2D39] = static_cast<char>(obj[0x2D39] & ~shopMask);
+				} else {
+					obj[0x2D39] = static_cast<char>(obj[0x2D39] | shopMask);
+				}
+			}
+		} else {
+			const unsigned char playerMask = static_cast<unsigned char>(1 << i);
+			OSWaitSemaphore(accessSemaphores + i);
+			obj[0x2D38] = static_cast<char>(obj[0x2D38] | playerMask);
+			OSSignalSemaphore(accessSemaphores + i);
+			if (Joybus.SetMType(i, 2) == 0) {
+				obj[0x2D39] = static_cast<char>(obj[0x2D39] & ~playerMask);
+			} else {
+				obj[0x2D39] = static_cast<char>(obj[0x2D39] | playerMask);
+			}
+		}
+	}
 }
 
 /*

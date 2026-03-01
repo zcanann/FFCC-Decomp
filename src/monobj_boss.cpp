@@ -16,18 +16,29 @@ extern "C" int isLoopAnim__8CGPrgObjFv(void*);
 extern "C" void changeStat__8CGPrgObjFiii(void*, int, int, int);
 extern "C" void Move__8CGObjectFP3Vecfiiiii(void*, Vec*, float, int, int, int, int, int);
 extern "C" void moveVectorHRot__8CGObjectFfffi(void*, float, float, float, int);
+extern "C" void ResetParticleWork__13CFlatRuntime2Fii(void*, int, int);
+extern "C" void SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
+extern "C" void SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(void*, void*);
+extern "C" void PutParticleWork__13CFlatRuntime2Fv(void*);
 extern float FLOAT_80331dd0;
 extern float FLOAT_80331cf8;
 extern float FLOAT_80331dcc;
 extern float FLOAT_80331dc8;
 extern float FLOAT_80331d18;
+extern float FLOAT_80331d1c;
+extern float FLOAT_80331d20;
 extern float FLOAT_80331dd4;
 extern float FLOAT_80331d24;
 extern float FLOAT_80331d2c;
 extern float FLOAT_80331dd8;
 extern float FLOAT_80331d60;
 extern float FLOAT_80331db8;
+extern float DAT_8032ec20;
+extern double DOUBLE_80331d00;
+extern double DOUBLE_80331d08;
+extern double DOUBLE_80331d10;
 extern double DOUBLE_80331dc0;
+extern unsigned char CFlat[];
 extern char SoundBuffer[];
 
 /*
@@ -1127,10 +1138,120 @@ void CGMonObj::suikomiSub(CGObject*, float)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012e5dc
+ * PAL Size: 992b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::suikomi(int, float)
+void CGMonObj::suikomi(int endFrame, float zOffset)
 {
-	// TODO
+	CGCharaObj* chara = reinterpret_cast<CGCharaObj*>(this);
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+
+	if (prgObj->m_stateFrame == 0) {
+		playSe3D__8CGPrgObjFiiiiP3Vec(prgObj, 0xdec0, 0x32, 0x1c2, 0, 0);
+		for (int i = 0; i < 4; i++) {
+			CGPartyObj* party = Game.game.m_partyObjArr[i];
+			if (party != 0) {
+				ResetParticleWork__13CFlatRuntime2Fii(CFlat, 0x26, *(int*)(self + 0x58c));
+				SetParticleWorkTrace__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, this);
+				SetParticleWorkBind__13CFlatRuntime2FPQ212CFlatRuntime7CObject(CFlat, party);
+				PutParticleWork__13CFlatRuntime2Fv(CFlat);
+			}
+		}
+	}
+
+	if (prgObj->m_stateFrame <= endFrame) {
+		for (int i = 0; i < 4; i++) {
+			CGPartyObj* party = Game.game.m_partyObjArr[i];
+			if (party != 0) {
+				float dx = *(float*)(self + 0x15c) - *(float*)((unsigned char*)party + 0x15c);
+				float dz =
+				    zOffset + (*(float*)(self + 0x164) - *(float*)((unsigned char*)party + 0x164));
+				float distSq = dx * dx + dz * dz;
+				double dist = (double)distSq;
+
+				if (dist <= (double)FLOAT_80331cf8) {
+					if (DOUBLE_80331d10 <= dist) {
+						unsigned int exp = (unsigned int)distSq & 0x7f800000;
+						int fpClass;
+						if (exp == 0x7f800000) {
+							fpClass = (((unsigned int)distSq & 0x7fffff) == 0) ? 2 : 1;
+						} else if ((exp < 0x7f800000) && (exp == 0)) {
+							fpClass = (((unsigned int)distSq & 0x7fffff) == 0) ? 3 : 5;
+						} else {
+							fpClass = 4;
+						}
+						if (fpClass == 1) {
+							dist = (double)DAT_8032ec20;
+						}
+					} else {
+						dist = (double)DAT_8032ec20;
+					}
+				} else {
+					double inv = 1.0 / sqrt(dist);
+					inv = DOUBLE_80331d00 * inv * -(dist * inv * inv - DOUBLE_80331d08);
+					inv = DOUBLE_80331d00 * inv * -(dist * inv * inv - DOUBLE_80331d08);
+					dist = (double)(float)(dist * DOUBLE_80331d00 * inv *
+					                       -(dist * inv * inv - DOUBLE_80331d08));
+				}
+
+				if ((double)FLOAT_80331cf8 < dist) {
+					float accel = (float)((double)FLOAT_80331d18 / dist) * FLOAT_80331d1c *
+					              (float)(dist / (double)FLOAT_80331d20);
+					*(float*)((unsigned char*)party + 0x104) += dx * accel;
+					*(float*)((unsigned char*)party + 0x10c) += dz * accel;
+				}
+			}
+		}
+
+		if ((Game.game.unk_flat3_0xc7d0 != 0) && (*(int*)(Game.game.unk_flat3_0xc7d0 + 0x550) == 0)) {
+			unsigned int target = Game.game.unk_flat3_0xc7d0;
+			float dx = *(float*)(self + 0x15c) - *(float*)(target + 0x15c);
+			float dz = zOffset + (*(float*)(self + 0x164) - *(float*)(target + 0x164));
+			float distSq = dx * dx + dz * dz;
+			double dist = (double)distSq;
+
+			if (dist <= (double)FLOAT_80331cf8) {
+				if (DOUBLE_80331d10 <= dist) {
+					unsigned int exp = (unsigned int)distSq & 0x7f800000;
+					int fpClass;
+					if (exp == 0x7f800000) {
+						fpClass = (((unsigned int)distSq & 0x7fffff) == 0) ? 2 : 1;
+					} else if ((exp < 0x7f800000) && (exp == 0)) {
+						fpClass = (((unsigned int)distSq & 0x7fffff) == 0) ? 3 : 5;
+					} else {
+						fpClass = 4;
+					}
+					if (fpClass == 1) {
+						dist = (double)DAT_8032ec20;
+					}
+				} else {
+					dist = (double)DAT_8032ec20;
+				}
+			} else {
+				double inv = 1.0 / sqrt(dist);
+				inv = DOUBLE_80331d00 * inv * -(dist * inv * inv - DOUBLE_80331d08);
+				inv = DOUBLE_80331d00 * inv * -(dist * inv * inv - DOUBLE_80331d08);
+				dist = (double)(float)(dist * DOUBLE_80331d00 * inv *
+				                       -(dist * inv * inv - DOUBLE_80331d08));
+			}
+
+			if ((double)FLOAT_80331cf8 < dist) {
+				float accel = (float)((double)FLOAT_80331d18 / dist) * FLOAT_80331d1c *
+				              (float)(dist / (double)FLOAT_80331d20);
+				*(float*)(target + 0x104) += dx * accel;
+				*(float*)(target + 0x10c) += dz * accel;
+			}
+		}
+
+		if (prgObj->m_stateFrame == endFrame) {
+			chara->endPSlotBit(0x400);
+		}
+	}
+
+	chara->statAttack();
 }

@@ -324,19 +324,27 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
         }
     }
 
-    unsigned short heldButtons = 0;
-    unsigned short triggerButtons = 0;
-    if ((Pad._452_4_ == 0) && (Pad._448_4_ == -1)) {
+    unsigned short heldButtons;
+    unsigned short triggerButtons;
+    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        heldButtons = 0;
+    } else {
         __cntlzw((unsigned int)Pad._448_4_);
         heldButtons = Pad._4_2_;
+    }
+    if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
+        triggerButtons = 0;
+    } else {
+        __cntlzw((unsigned int)Pad._448_4_);
         triggerButtons = Pad._8_2_;
     }
 
     if ((*(void**)(p + 0x190) != 0) && (*(int*)(p + 0x70C) != 0)) {
-        *(int*)(p + 0x704) = 0;
         if (*(int*)(p + 0x708) == 0) {
+            *(int*)(p + 0x704) = 0;
             AttachAnim__Q26CChara6CModelFPQ26CChara5CAnimiii(*(void**)(p + 0x190), *(void**)(p + 0x198), -1, -1, 0);
         } else {
+            *(int*)(p + 0x704) = 0;
             float frame = *(float*)(*(unsigned char**)(p + 0x190) + 0xB4);
             float animFrames = (float)*(unsigned short*)(*(unsigned char**)(p + 0x198) + 0x10);
             *(float*)(p + 0x700) = (float)fmod((double)frame, (double)animFrames);
@@ -377,7 +385,6 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
             offsetB = lbl_80330C28;
         }
         frameAdvance = lbl_80330BE8 + offsetA + offsetB;
-        *(float*)(p + 0x700) = frameAdvance;
     }
 
     for (unsigned int i = 0; i < 2; i++) {

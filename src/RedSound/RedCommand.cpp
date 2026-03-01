@@ -176,34 +176,37 @@ int _EraseTime(int eraseTrack)
  */
 int* SearchSeEmptyTrack(int trackCount, int eraseTrack, int attrMask)
 {
-	int* trackBasePtr;
+	int* trackBasePtr = (int*)((char*)DAT_8032f3f0 + 0xdbc);
 	int* scan;
 	int* track;
 	int remaining;
+	int* minTrack;
 
-	trackBasePtr = (int*)((char*)DAT_8032f3f0 + 0xdbc);
 	if (attrMask != 0) {
 		_EraseAttribute(eraseTrack, attrMask);
 	}
 
+	minTrack = (int*)*trackBasePtr;
 	do {
 		track = (int*)(*trackBasePtr + 0x292c);
 		scan = track;
 		remaining = trackCount;
 		do {
-			while (((track = scan, remaining = remaining - 1, remaining != 0) && (*track == 0)) &&
-			       ((((unsigned char*)track)[0x26] & 2) == 0)) {
+			track = scan;
+			remaining--;
+			if ((remaining != 0) && (*track == 0) && ((((unsigned char*)track)[0x26] & 2) == 0)) {
 				scan = track - 0x55;
+			} else {
+				if ((*track != 0) || ((((unsigned char*)track)[0x26] & 2) != 0)) {
+					remaining = 1;
+					scan = track;
+				}
+				scan = scan - 0x55;
 			}
-			if ((*track != 0) || ((((unsigned char*)track)[0x26] & 2) != 0)) {
-				remaining = 1;
-				scan = track;
-			}
-			scan = scan - 0x55;
-		} while ((remaining != 0) && ((int*)*trackBasePtr <= track));
-	} while ((track < (int*)*trackBasePtr) && (_EraseTime(eraseTrack) != 0));
+		} while ((remaining != 0) && (minTrack <= track));
+	} while ((track < minTrack) && (_EraseTime(eraseTrack) != 0));
 
-	if (track < (int*)*trackBasePtr) {
+	if (track < minTrack) {
 		track = 0;
 	}
 

@@ -1131,64 +1131,78 @@ int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
 {
     int polygonCount = 0;
     u8* data = static_cast<u8*>(dlData);
+    bool isPrimitive = true;
 
-    while (true) {
-        u8 cmd = *data;
-        u16 vertexCount16 = *(u16*)(data + 1);
-        int vertexCount = vertexCount16;
-        u8 primitive = cmd & 0xF8;
-        bool isPrimitive;
-
-        data += 3;
-
-        if (primitive == 0xA0) {
-            isPrimitive = true;
-        } else if (primitive > 0x9F) {
-            if (primitive == 0xB0) {
-                isPrimitive = true;
-            } else if (primitive < 0xB0) {
-                isPrimitive = (primitive == 0xA8);
-            } else {
-                isPrimitive = (primitive == 0xB8);
-            }
-        } else if (primitive == 0x90) {
-            isPrimitive = true;
-        } else if (primitive < 0x90) {
-            isPrimitive = (primitive == 0x80);
-        } else {
-            isPrimitive = (primitive == 0x98);
-        }
-
+    do {
         if (!isPrimitive) {
             return polygonCount;
         }
 
-        if (primitive == 0x90) {
-            polygonCount += vertexCount / 3;
-        } else if (primitive == 0x98) {
-            polygonCount += vertexCount - 2;
-        }
+        u8 cmd = *data;
+        u16 vertexCount16 = *(u16*)(data + 1);
+        u32 vertexCount = vertexCount16;
+        u8 primitive = cmd & 0xF8;
 
-        if (vertexCount <= 0) {
-            continue;
-        }
+        data += 3;
 
-        if ((cmd & 7) == 2) {
-            for (int i = vertexCount >> 3; i > 0; i--) {
-                data += 0x50;
-            }
-            for (int i = vertexCount & 7; i > 0; i--) {
-                data += 10;
-            }
+        if (primitive == 0xA0 || primitive == 0xB0 || primitive == 0xA8 || primitive == 0xB8 || primitive == 0x90 ||
+            primitive == 0x80 || primitive == 0x98) {
+            isPrimitive = true;
         } else {
-            for (int i = vertexCount >> 3; i > 0; i--) {
-                data += 0x40;
+            isPrimitive = false;
+        }
+
+        if (isPrimitive) {
+            if (primitive == 0x90) {
+                polygonCount += vertexCount / 3;
+            } else if (primitive == 0x98) {
+                polygonCount += vertexCount - 2;
             }
-            for (int i = vertexCount & 7; i > 0; i--) {
-                data += 8;
+
+            if ((cmd & 7) != 2) {
+                if (vertexCount != 0) {
+                    u32 blockCount = vertexCount16 >> 3;
+                    if (blockCount != 0) {
+                        do {
+                            data += 0x40;
+                            blockCount--;
+                        } while (blockCount != 0);
+
+                        vertexCount &= 7;
+                        if ((vertexCount16 & 7) == 0) {
+                            continue;
+                        }
+                    }
+
+                    do {
+                        data += 8;
+                        vertexCount--;
+                    } while (vertexCount != 0);
+                }
+                continue;
+            }
+
+            if (vertexCount != 0) {
+                u32 blockCount = vertexCount16 >> 3;
+                if (blockCount != 0) {
+                    do {
+                        data += 0x50;
+                        blockCount--;
+                    } while (blockCount != 0);
+
+                    vertexCount &= 7;
+                    if ((vertexCount16 & 7) == 0) {
+                        continue;
+                    }
+                }
+
+                do {
+                    data += 10;
+                    vertexCount--;
+                } while (vertexCount != 0);
             }
         }
-    }
+    } while (true);
 }
 
 /*

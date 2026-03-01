@@ -78,26 +78,6 @@ extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void __ct__10CAmemCacheFv(void*, int);
 extern "C" void __dt__10CAmemCacheFv(void*, int);
 
-static int calcCacheChecksum(const unsigned char* data, unsigned int size)
-{
-    int checksum = 0x12345678;
-    unsigned int blockCount = size >> 3;
-    while (blockCount != 0) {
-        checksum += data[0] + data[1] + data[2] + data[3] + data[4] + data[5] + data[6] + data[7];
-        data += 8;
-        blockCount--;
-    }
-
-    unsigned int remain = size & 7;
-    while (remain != 0) {
-        checksum += *data;
-        data++;
-        remain--;
-    }
-
-    return checksum;
-}
-
 static int stageGetAllocationMode(CMemory::CStage* stage)
 {
     return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(stage) + 0x10C);
@@ -1837,9 +1817,26 @@ int CAmemCacheSet::SetData(void* src, int size, CAmemCache::TYPE type, int dmaCo
 
     *reinterpret_cast<int*>(entry + 0x00) = 0;
     *reinterpret_cast<unsigned int*>(entry + 0x08) = allocSize;
-    *reinterpret_cast<int*>(entry + 0x14) = calcCacheChecksum(reinterpret_cast<unsigned char*>(src), allocSize);
+    {
+        const unsigned char* data = reinterpret_cast<unsigned char*>(src);
+        int checksum = 0x12345678;
+        unsigned int blockCount = allocSize >> 3;
+        while (blockCount != 0) {
+            checksum += data[0] + data[1] + data[2] + data[3] + data[4] + data[5] + data[6] + data[7];
+            data += 8;
+            blockCount--;
+        }
 
-    if (entry[0x1A] == 0) {
+        unsigned int remain = allocSize & 7;
+        while (remain != 0) {
+            checksum += *data;
+            data++;
+            remain--;
+        }
+        *reinterpret_cast<int*>(entry + 0x14) = checksum;
+    }
+
+    if (dmaCopy == 0) {
         memcpy(reinterpret_cast<void*>(*reinterpret_cast<int*>(entry + 0x04)), src, *reinterpret_cast<int*>(entry + 0x08));
         DCFlushRange(reinterpret_cast<void*>(*reinterpret_cast<int*>(entry + 0x04)), allocSize);
     } else {

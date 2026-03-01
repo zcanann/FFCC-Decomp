@@ -749,42 +749,81 @@ void __MidiCtrl_KeyOnSame(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C8328
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_KeyOnNoteVelocity(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+#pragma dont_inline on
+void __MidiCtrl_KeyOnNoteVelocity(RedSoundCONTROL*, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-	// TODO
+    int* trackData = reinterpret_cast<int*>(track);
+    unsigned char* command = reinterpret_cast<unsigned char*>(trackData[0]);
+
+    trackData[0] = reinterpret_cast<int>(command + 1);
+    *reinterpret_cast<unsigned char*>(trackData + 9) = *command;
+    command = reinterpret_cast<unsigned char*>(trackData[0]);
+    trackData[0] = reinterpret_cast<int>(command + 1);
+    *reinterpret_cast<unsigned char*>(reinterpret_cast<int>(trackData) + 0x25) = *command;
+
+    KeyOnReserve(keyOnData, track);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C8390
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_KeyOnNote(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_KeyOnNote(RedSoundCONTROL*, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-	// TODO
+    int* trackData = reinterpret_cast<int*>(track);
+    unsigned char* command = reinterpret_cast<unsigned char*>(trackData[0]);
+
+    trackData[0] = reinterpret_cast<int>(command + 1);
+    *reinterpret_cast<unsigned char*>(trackData + 9) = *command;
+
+    KeyOnReserve(keyOnData, track);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C83E0
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_KeyOnVelocity(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_KeyOnVelocity(RedSoundCONTROL*, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-	// TODO
+    int* trackData = reinterpret_cast<int*>(track);
+    unsigned char* command = reinterpret_cast<unsigned char*>(trackData[0]);
+
+    trackData[0] = reinterpret_cast<int>(command + 1);
+    *reinterpret_cast<unsigned char*>(reinterpret_cast<int>(trackData) + 0x25) = *command;
+
+    KeyOnReserve(keyOnData, track);
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C8430
+ * PAL Size: 56b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_KeyOffSame(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_KeyOffSame(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-	// TODO
+    KeyOffSet(control, keyOnData, track);
 }
 
 /*
@@ -830,12 +869,20 @@ void __MidiCtrl_KeyOffNote(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, Re
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C851C
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_KeyOffVelocity(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_KeyOffVelocity(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
-	// TODO
+    int* trackData = reinterpret_cast<int*>(track);
+
+    trackData[0] += 1;
+
+    KeyOffSet(control, keyOnData, track);
 }
 
 /*

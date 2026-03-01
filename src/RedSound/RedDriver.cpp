@@ -1350,18 +1350,18 @@ void CRedDriver::End()
  */
 int CRedDriver::GetProgramTime()
 {
-    register int total;
-    register int* current;
-    int* start;
+    int sum;
+    int* p;
+    int* end;
 
-    total = 0;
-    current = DAT_8032f3cc;
-    start = DAT_8032f3cc;
+    sum = 0;
+    p = DAT_8032f3cc;
+    end = p + 100;
     do {
-        total += *current;
-        current += 1;
-    } while (current < start + 100);
-    return total;
+        sum += *p;
+        p++;
+    } while (p < end);
+    return sum;
 }
 
 /*

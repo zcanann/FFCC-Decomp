@@ -702,12 +702,71 @@ void CGMonObj::onAnimPoint(int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80117B30
+ * PAL Size: 256b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::enableAttackCol(int, int, int)
+void CGMonObj::enableAttackCol(int enabled, int, int)
 {
-	// TODO
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+
+	unsigned int& attack1X = *reinterpret_cast<unsigned int*>(&object->m_attackColliders[1].m_localStart.x);
+	unsigned int& attack2X = *reinterpret_cast<unsigned int*>(&object->m_attackColliders[2].m_localStart.x);
+	unsigned int& attack3X = *reinterpret_cast<unsigned int*>(&object->m_attackColliders[3].m_localStart.x);
+	unsigned int& attack4X = *reinterpret_cast<unsigned int*>(&object->m_attackColliders[4].m_localStart.x);
+	unsigned int& attack5X = *reinterpret_cast<unsigned int*>(&object->m_attackColliders[5].m_localStart.x);
+	unsigned int& attack6X = *reinterpret_cast<unsigned int*>(&object->m_attackColliders[6].m_localStart.x);
+	unsigned int& attack7X = *reinterpret_cast<unsigned int*>(&object->m_attackColliders[7].m_localStart.x);
+	unsigned int& damage0X = *reinterpret_cast<unsigned int*>(&object->m_damageColliders[0].m_localPosition.x);
+
+	if (enabled == 0) {
+		attack1X = 0;
+		attack2X = 0;
+		attack3X = 0;
+		attack4X = 0;
+		attack5X = 0;
+		attack6X = 0;
+		attack7X = 0;
+		damage0X = 0;
+		return;
+	}
+
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	unsigned char* attackData = reinterpret_cast<unsigned char*>(Game.game.unkCFlatData0[2]) +
+		*reinterpret_cast<int*>(mon + 0x560) * 0x48;
+	unsigned int colMask = *reinterpret_cast<unsigned short*>(attackData + 0xC);
+	unsigned int colValue = 1;
+	if (*reinterpret_cast<int*>(mon + 0x560) >= 0x1F5) {
+		colValue = *reinterpret_cast<unsigned short*>(attackData + 2);
+	}
+
+	if ((colMask & 1) != 0) {
+		attack1X = colValue;
+	}
+	if ((colMask & 2) != 0) {
+		attack2X = colValue;
+	}
+	if ((colMask & 4) != 0) {
+		attack3X = colValue;
+	}
+	if ((colMask & 8) != 0) {
+		attack4X = colValue;
+	}
+	if ((colMask & 0x10) != 0) {
+		attack5X = colValue;
+	}
+	if ((colMask & 0x20) != 0) {
+		attack6X = colValue;
+	}
+	if ((colMask & 0x40) != 0) {
+		attack7X = colValue;
+	}
+	if ((colMask & 0x80) != 0) {
+		damage0X = colValue;
+	}
 }
 
 /*

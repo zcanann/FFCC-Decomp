@@ -7,8 +7,11 @@
 
 extern CMemory Memory;
 extern CPartMng PartMng;
+extern unsigned char PartPcs[];
 extern "C" void __dla__FPv(void*);
 extern "C" void __dl__FPv(void*);
+extern "C" void __dt__4CRefFv(void*, int);
+extern "C" void ReleasePdt__8CPartPcsFi(void*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 
 static char s_collection_ptrarray_h[] = "collection_ptrarray.h";
@@ -1031,7 +1034,18 @@ CCharaPcs::CLoadModel::CLoadModel()
  */
 CCharaPcs::CLoadModel::~CLoadModel()
 {
-	// TODO
+    void* model = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x18);
+    if (model != 0) {
+        int* refData = reinterpret_cast<int*>(model);
+        int refCount = refData[1] - 1;
+        refData[1] = refCount;
+        if (refCount == 0) {
+            (*(void (**)(void*, int))(*refData + 8))(model, 1);
+        }
+        *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x18) = 0;
+    }
+
+    __dt__4CRefFv(this, 0);
 }
 
 /*
@@ -1051,7 +1065,18 @@ CCharaPcs::CLoadAnim::CLoadAnim()
  */
 CCharaPcs::CLoadAnim::~CLoadAnim()
 {
-	// TODO
+    void* anim = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x28);
+    if (anim != 0) {
+        int* refData = reinterpret_cast<int*>(anim);
+        int refCount = refData[1] - 1;
+        refData[1] = refCount;
+        if (refCount == 0) {
+            (*(void (**)(void*, int))(*refData + 8))(anim, 1);
+        }
+        *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x28) = 0;
+    }
+
+    __dt__4CRefFv(this, 0);
 }
 
 /*
@@ -1071,7 +1096,18 @@ CCharaPcs::CLoadTexture::CLoadTexture()
  */
 CCharaPcs::CLoadTexture::~CLoadTexture()
 {
-	// TODO
+    void* texture = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x1C);
+    if (texture != 0) {
+        int* refData = reinterpret_cast<int*>(texture);
+        int refCount = refData[1] - 1;
+        refData[1] = refCount;
+        if (refCount == 0) {
+            (*(void (**)(void*, int))(*refData + 8))(texture, 1);
+        }
+        *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x1C) = 0;
+    }
+
+    __dt__4CRefFv(this, 0);
 }
 
 /*
@@ -1091,7 +1127,13 @@ CCharaPcs::CLoadPdt::CLoadPdt()
  */
 CCharaPcs::CLoadPdt::~CLoadPdt()
 {
-	// TODO
+    int& pdtSlot = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x14);
+    if (pdtSlot >= 0) {
+        ReleasePdt__8CPartPcsFi(PartPcs, pdtSlot);
+        pdtSlot = -1;
+    }
+
+    __dt__4CRefFv(this, 0);
 }
 
 /*

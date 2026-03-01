@@ -104,7 +104,7 @@ public:
     void ClampStatus(short&, unsigned short&);
     void CalcArtifactStatus(int, int, int&, int&, int&, int&, int&);
     void CalcStatus();
-    void CanPlayerUseItem();
+    int CanPlayerUseItem();
     void ValidCmdList(int);
     int GetIdxCmdList();
     void SetIdxCmdList(int);
@@ -118,7 +118,7 @@ public:
     void SearchCombiTop(int);
     void GetNumCombi(int);
     void GetNextCmdListIdx(int, int);
-    void CanPlayerPutItem();
+    int CanPlayerPutItem();
     void GetCurrentWeaponItem(int&, int&);
     void SetCurrentWeaponIdx(int);
     void CheckAndResetCurrentWeaponIdx(int);

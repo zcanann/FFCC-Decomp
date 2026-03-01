@@ -3,6 +3,8 @@
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
 
+extern "C" void pppDeletePart__8CPartMngFi(void*, int);
+
 extern "C" float GetWidth__5CFontFPc(CFont*, const char*);
 extern "C" void SetMargin__5CFontFf(float, CFont*);
 extern "C" void SetShadow__5CFontFi(CFont*, int);
@@ -30,6 +32,8 @@ extern float lbl_8033364C;
 extern float lbl_80333650;
 
 extern "C" int __cntlzw(unsigned int);
+
+extern unsigned char PartMng[];
 
 static unsigned short GetMenuPress()
 {

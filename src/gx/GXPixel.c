@@ -76,7 +76,7 @@ void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor
         c = C;
 
         fog1 = (b_m & 0x00FFFFFF) | 0xEF000000;
-        fog2 = (b_s & 0x1F) | 0xF0000000;
+        fog2 = (b_s & 0x00FFFFFF) | 0xF0000000;
     }
 
     a_hex = *(u32*)&a;

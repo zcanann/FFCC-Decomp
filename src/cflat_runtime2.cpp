@@ -1,11 +1,13 @@
 #include "ffcc/cflat_runtime2.h"
 #include "ffcc/astar.h"
 #include "ffcc/baseobj.h"
+#include "ffcc/graphic.h"
 #include "ffcc/gxfunc.h"
 #include "ffcc/monobj.h"
 #include "ffcc/partMng.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/p_game.h"
+#include "ffcc/ptrarray.h"
 #include "ffcc/stopwatch.h"
 #include "ffcc/textureman.h"
 #include <math.h>
@@ -67,6 +69,7 @@ extern "C" void DrawInit__5CFontFv(CFont*);
 extern "C" void SetTlut__5CFontFi(CFont*, int);
 extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
 extern "C" void SetPosZ__5CFontFf(float, CFont*);
+extern "C" int GetBackBufferRect__8CGraphicFRiRiRiRii(CGraphic*, int&, int&, int&, int&, int);
 
 extern unsigned char Pad[];
 extern unsigned char MenuPcs[];
@@ -82,7 +85,9 @@ extern unsigned char m_objMon[];
 extern int DAT_8032ed98;
 extern unsigned char DAT_8032ed9c;
 extern char DAT_801d8fc4[];
+extern CTextureMan TextureMan;
 extern CPartMng PartMng;
+extern CTextureMan TextureMan;
 extern "C" void* __vt__Q212CFlatRuntime7CObject[];
 extern "C" void* __vt__9CGBaseObj[];
 extern "C" void* __vt__9CGQuadObj[];
@@ -1863,12 +1868,186 @@ void CFlatRuntime2::loadLayerASync(int layerNo, char* fileName)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006A764
+ * PAL Size: 2040b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime2::drawLayer(int, char*, int, int, int, int, int, int, float, float, _GXColor*, int)
+void CFlatRuntime2::drawLayer(
+	int layerNo, char* textureName, int x, int y, int width, int height, int texU, int texV, float scaleX,
+	float scaleY, _GXColor* color, int flags)
 {
-	// TODO
+	CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(reinterpret_cast<u8*>(this) + 0x1774 + layerNo * 0xC);
+	if (textureSet == 0) {
+		return;
+	}
+
+	int textureIndex = textureSet->Find(textureName);
+	if (textureIndex < 0) {
+		return;
+	}
+
+	CPtrArray<CTexture*>* textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<u8*>(textureSet) + 8);
+	CTexture* texture = (*textureArray)[static_cast<unsigned long>(textureIndex)];
+
+	GXSetNumChans(1);
+	GXSetChanCtrl(
+		GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+	GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_SPEC);
+	GXSetChanMatColor(GX_COLOR0A0, *color);
+
+	Mtx44 ortho;
+	C_MTXOrtho(ortho, 0.0f, 448.0f, 0.0f, 640.0f, 0.0f, 1.0f);
+	GXSetProjection(ortho, GX_ORTHOGRAPHIC);
+
+	Mtx identity;
+	PSMTXIdentity(identity);
+	GXLoadPosMtxImm(identity, GX_PNMTX0);
+	GXSetCurrentMtx(GX_PNMTX0);
+
+	const unsigned int blendMode = static_cast<unsigned int>(flags >> 1) & 2;
+	if (blendMode == 1) {
+		_GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)1, (_GXLogicOp)5);
+	} else if (blendMode == 2) {
+		_GXSetBlendMode((_GXBlendMode)3, (_GXBlendFactor)4, (_GXBlendFactor)1, (_GXLogicOp)5);
+	} else {
+		_GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)5, (_GXLogicOp)1);
+	}
+
+	GXSetZMode(GX_FALSE, (_GXCompare)7, GX_FALSE);
+	PSMTXIdentity(identity);
+	GXLoadPosMtxImm(identity, GX_PNMTX0);
+	GXSetCullMode(GX_CULL_NONE);
+
+	TextureMan.SetTexture(GX_TEXMAP0, texture);
+
+	Mtx texMtx;
+	const float texW = static_cast<float>(*reinterpret_cast<u32*>(reinterpret_cast<u8*>(texture) + 0x64));
+	const float texH = static_cast<float>(*reinterpret_cast<u32*>(reinterpret_cast<u8*>(texture) + 0x68));
+	PSMTXScale(texMtx, 1.0f / texW, 1.0f / texH, 1.0f);
+	GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX3x4);
+	GXSetNumTexGens(1);
+	GXSetTexCoordGen2(
+		GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+
+	GXClearVtxDesc();
+	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+	GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 0);
+	int tevStage = TextureMan.SetTextureTev(texture);
+
+	const float scaledWidth = static_cast<float>(width) * scaleX;
+	const float scaledHeight = static_cast<float>(height) * scaleY;
+	const float xAnchor = (flags & 1) != 0 ? scaledWidth * 0.5f : 0.0f;
+	const float yAnchor = (flags & 1) != 0 ? scaledHeight * 0.5f : 0.0f;
+	const float x0 = static_cast<float>(x) - xAnchor;
+	const float y0 = static_cast<float>(y) - yAnchor;
+	const float x1 = x0 + scaledWidth;
+	const float y1 = y0 + scaledHeight;
+	short u0 = static_cast<short>(texU);
+	short v0 = static_cast<short>(texV);
+	short u1 = static_cast<short>(texU + width);
+	short v1 = static_cast<short>(texV + height);
+
+	if (blendMode == 3) {
+		GXSetNumTexGens(2);
+		GXSetTexCoordGen2(
+			GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+		GXClearVtxDesc();
+		GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+		GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+		GXSetVtxDesc(GX_VA_TEX1, GX_DIRECT);
+		GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+		GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 0);
+		GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX1, GX_TEX_ST, GX_S16, 1);
+		GXSetNumTevStages(static_cast<u8>(tevStage + 1));
+		_GXSetTevOrder(
+			(_GXTevStageID)tevStage, (_GXTexCoordID)GX_TEXCOORD1, (_GXTexMapID)GX_TEXMAP1, (_GXChannelID)0xFF);
+		_GXSetTevColorIn((_GXTevStageID)tevStage, (_GXTevColorArg)0xF, (_GXTevColorArg)8, (_GXTevColorArg)0, (_GXTevColorArg)0xF);
+		_GXSetTevColorOp((_GXTevStageID)tevStage, (_GXTevOp)0, (_GXTevBias)0, (_GXTevScale)2, 1, (_GXTevRegID)0);
+		_GXSetTevAlphaIn((_GXTevStageID)tevStage, (_GXTevAlphaArg)7, (_GXTevAlphaArg)4, (_GXTevAlphaArg)0, (_GXTevAlphaArg)7);
+		_GXSetTevAlphaOp((_GXTevStageID)tevStage, (_GXTevOp)0, (_GXTevBias)0, (_GXTevScale)0, 1, (_GXTevRegID)0);
+
+		const int pixelWidth = static_cast<int>(scaledWidth * 0.5f);
+		const int pixelHeight = static_cast<int>(scaledHeight * 0.5f);
+
+		for (int quad = 0; quad < 4; quad++) {
+			int bx = static_cast<int>(x0);
+			int by = static_cast<int>(y0);
+			int bw = pixelWidth;
+			int bh = pixelHeight;
+
+			if ((quad & 1) != 0) {
+				bx += pixelWidth;
+			}
+			if ((quad & 2) != 0) {
+				by += pixelHeight;
+			}
+
+			short quadU0 = u0;
+			short quadV0 = v0;
+			short quadU1 = static_cast<short>(quadU0 + bw);
+			short quadV1 = static_cast<short>(quadV0 + bh);
+			if ((quad & 1) != 0) {
+				quadU0 = static_cast<short>(quadU0 + pixelWidth);
+				quadU1 = static_cast<short>(quadU0 + bw);
+			}
+			if ((quad & 2) != 0) {
+				quadV0 = static_cast<short>(quadV0 + pixelHeight);
+				quadV1 = static_cast<short>(quadV0 + bh);
+			}
+
+			int rectX = bx;
+			int rectY = by;
+			int rectW = bw;
+			int rectH = bh;
+			int backTex =
+				GetBackBufferRect__8CGraphicFRiRiRiRii(&Graphic, rectX, rectY, rectW, rectH, 0);
+			GXLoadTexObj(reinterpret_cast<_GXTexObj*>(backTex), GX_TEXMAP1);
+
+			const float fx0 = static_cast<float>(rectX);
+			const float fy0 = static_cast<float>(rectY);
+			const float fx1 = static_cast<float>(rectX + rectW);
+			const float fy1 = static_cast<float>(rectY + rectH);
+
+			GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+			GXPosition3f32(fx0, fy0, 0.0f);
+			GXTexCoord2s16(quadU0, quadV0);
+			GXTexCoord2s16(0, 0);
+
+			GXPosition3f32(fx1, fy0, 0.0f);
+			GXTexCoord2s16(quadU1, quadV0);
+			GXTexCoord2s16(2, 0);
+
+			GXPosition3f32(fx1, fy1, 0.0f);
+			GXTexCoord2s16(quadU1, quadV1);
+			GXTexCoord2s16(2, 2);
+
+			GXPosition3f32(fx0, fy1, 0.0f);
+			GXTexCoord2s16(quadU0, quadV1);
+			GXTexCoord2s16(0, 2);
+		}
+	} else {
+		GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+		GXPosition3f32(x0, y0, 0.0f);
+		GXTexCoord2s16(u0, v0);
+
+		GXPosition3f32(x1, y0, 0.0f);
+		GXTexCoord2s16(u1, v0);
+
+		GXPosition3f32(x1, y1, 0.0f);
+		GXTexCoord2s16(u1, v1);
+
+		GXPosition3f32(x0, y1, 0.0f);
+		GXTexCoord2s16(u0, v1);
+	}
+
+	Mtx44 projection;
+	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcs + 0x40), projection);
+	GXSetProjection(projection, GX_PERSPECTIVE);
 }
 
 /*

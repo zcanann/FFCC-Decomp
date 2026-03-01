@@ -1153,12 +1153,35 @@ void GbaQueue::GetPlayerStat(int, GbaPInfo*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CE300
+ * PAL Size: 148b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::GetCaravanName(char*)
+void GbaQueue::GetCaravanName(char* outName)
 {
-	// TODO
+	int i;
+	GbaQueue* semaphoreIter;
+
+	i = 0;
+	semaphoreIter = this;
+	do {
+		OSWaitSemaphore(semaphoreIter->accessSemaphores);
+		i++;
+		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+	} while (i < 4);
+
+	memcpy(outName, reinterpret_cast<char*>(this) + 0x2A74, 0x80);
+
+	i = 0;
+	semaphoreIter = this;
+	do {
+		OSSignalSemaphore(semaphoreIter->accessSemaphores);
+		i++;
+		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+	} while (i < 4);
 }
 
 /*
@@ -2107,12 +2130,26 @@ void GbaQueue::GetRadarMode(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800C9CCC
+ * PAL Size: 160b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::SetRadarMode(int, int)
+void GbaQueue::SetRadarMode(int channel, int mode)
 {
-	// TODO
+	char* obj = reinterpret_cast<char*>(this);
+	unsigned char mask = static_cast<unsigned char>(1 << channel);
+	unsigned char radarMode;
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	radarMode = static_cast<unsigned char>(obj[0x2D41]);
+	obj[0x2D41] = static_cast<char>((radarMode & ~mask) | ((mode & 1) << channel));
+	if (radarMode != static_cast<unsigned char>(obj[0x2D41])) {
+		obj[0x2D42] = static_cast<char>(obj[0x2D42] | mask);
+	}
+	OSSignalSemaphore(accessSemaphores + channel);
 }
 
 /*
@@ -2187,12 +2224,33 @@ void GbaQueue::ClrChgScouFlg(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800C9640
+ * PAL Size: 160b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::SetHitEnemy(int, int)
+void GbaQueue::SetHitEnemy(int channel, int enemyIdx)
 {
-	// TODO
+	unsigned short enemyId;
+	unsigned short enemyType;
+	unsigned short* hitInfo = reinterpret_cast<unsigned short*>(reinterpret_cast<char*>(this) + 0x2CDE);
+	char* obj = reinterpret_cast<char*>(this);
+
+	if (enemyIdx < 0) {
+		enemyId = 0xFFFF;
+		enemyType = 0xFFFF;
+	} else {
+		enemyId = static_cast<unsigned short>(enemyIdx);
+		enemyType = *reinterpret_cast<unsigned short*>(Game.game.m_scriptWork[2][0][enemyIdx] + 0x1C);
+	}
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	hitInfo[channel * 2] = enemyId;
+	hitInfo[channel * 2 + 1] = enemyType;
+	obj[0x2CE8] = static_cast<char>(obj[0x2CE8] | (1 << channel));
+	OSSignalSemaphore(accessSemaphores + channel);
 }
 
 /*
@@ -2217,12 +2275,49 @@ bool GbaQueue::IsSingleMode(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800C9474
+ * PAL Size: 232b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::SetControllerMode(int)
+void GbaQueue::SetControllerMode(int controllerMode)
 {
-	// TODO
+	int i;
+	int retries;
+	int ret;
+	GbaQueue* semaphoreIter;
+
+	i = 0;
+	semaphoreIter = this;
+	do {
+		OSWaitSemaphore(semaphoreIter->accessSemaphores);
+		i++;
+		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+	} while (i < 4);
+
+	reinterpret_cast<char*>(this)[0x2D57] = static_cast<char>(controllerMode & 1);
+
+	i = 0;
+	semaphoreIter = this;
+	do {
+		OSSignalSemaphore(semaphoreIter->accessSemaphores);
+		i++;
+		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+	} while (i < 4);
+
+	for (i = 0; i < 4; i++) {
+		retries = 0;
+		do {
+			if (controllerMode == 0) {
+				ret = Joybus.SetMType(i, 0);
+			} else {
+				ret = Joybus.SetMType(i, 4);
+			}
+			retries++;
+		} while ((ret != 0) && (retries < 10));
+	}
 }
 
 /*

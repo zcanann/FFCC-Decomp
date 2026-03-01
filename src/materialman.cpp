@@ -62,6 +62,8 @@ extern float FLOAT_8032faf0;
 extern float FLOAT_8032faf4;
 extern float FLOAT_8032faf8;
 extern float FLOAT_8032fafc;
+extern float FLOAT_8032fb00;
+extern float FLOAT_8032fb04;
 extern float FLOAT_8032fb08;
 extern float FLOAT_8032fb0c;
 extern float FLOAT_8032fb10;
@@ -1675,12 +1677,135 @@ void CMaterialMan::SetShadowBit32(CMapShadow::TARGET, unsigned long*, float (*) 
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003e394
+ * PAL Size: 716b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMaterialMan::SetPosition(CMapShadow::TARGET, Vec*, float, float, float (*) [4], int)
+void CMaterialMan::SetPosition(
+    CMapShadow::TARGET target,
+    Vec* position,
+    float rangeXZ,
+    float rangeY,
+    float (*viewMtx)[4],
+    int ignoreFrustumCheck)
 {
-	// TODO
+    float minX = position->x - rangeXZ;
+    float minY = position->y;
+    float minZ = position->z - rangeXZ;
+    float maxX = position->x + rangeXZ;
+    float maxY = minY + rangeY;
+    float maxZ = position->z + rangeXZ;
+
+    CPtrArray<CMapShadow*>* mapShadowArray = reinterpret_cast<CPtrArray<CMapShadow*>*>(Ptr(&MapMng, 0x21434));
+    if (target == static_cast<CMapShadow::TARGET>(0)) {
+        int shadowCandidates[385];
+        int* candidateWrite = shadowCandidates;
+        int candidateCount = 0;
+
+        for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
+            CMapShadow* shadow = (*mapShadowArray)[i];
+            unsigned char* shadowBytes = reinterpret_cast<unsigned char*>(shadow);
+
+            if (*(shadowBytes + 0xF0) == 0) {
+                continue;
+            }
+
+            int model = *reinterpret_cast<int*>(shadowBytes + 0xC);
+            Vec shadowPos;
+            shadowPos.x = *reinterpret_cast<float*>(model + 0xC4);
+            shadowPos.y = *reinterpret_cast<float*>(model + 0xD4);
+            shadowPos.z = *reinterpret_cast<float*>(model + 0xE4);
+
+            Mtx scaledShadowMtx;
+            PSMTXScaleApply(
+                reinterpret_cast<float(*)[4]>(shadowBytes + 0x78),
+                scaledShadowMtx,
+                FLOAT_8032faf8,
+                FLOAT_8032faf8,
+                FLOAT_8032faf0);
+
+            if (*(shadowBytes + 7) == 1) {
+                SetShadow__12CMaterialManFR10CMapShadowPA4_fiUl(this, shadow, viewMtx, i, 0);
+                continue;
+            }
+
+            bool yFilterPass =
+                ((*(shadowBytes + 9) != 1) || (shadowPos.y <= position->y)) &&
+                ((*(shadowBytes + 9) != 2) || (position->y <= shadowPos.y));
+            if ((ignoreFrustumCheck != 0) ||
+                (yFilterPass &&
+                 (CheckFrustum__6CBoundFR3VecPA4_ff(
+                      reinterpret_cast<CBound*>(&minX),
+                      &shadowPos,
+                      scaledShadowMtx,
+                      FLOAT_8032fafc) != 0))) {
+                Vec delta;
+                PSVECSubtract(&shadowPos, position, &delta);
+                candidateWrite[0] = reinterpret_cast<int>(shadow);
+                candidateWrite[1] = static_cast<int>(PSVECSquareMag(&delta));
+                candidateWrite[2] = i;
+                candidateWrite += 3;
+                candidateCount++;
+            }
+        }
+
+        int* nearest = 0;
+        float nearestDist = FLOAT_8032fb00;
+        int* candidateRead = shadowCandidates;
+        for (int i = 0; i < candidateCount; i++) {
+            if (static_cast<float>(candidateRead[1]) < nearestDist) {
+                nearest = candidateRead;
+                nearestDist = static_cast<float>(candidateRead[1]);
+            }
+            candidateRead += 3;
+        }
+
+        if (nearest != 0) {
+            nearest[1] = static_cast<int>(FLOAT_8032fb04);
+            SetShadow__12CMaterialManFR10CMapShadowPA4_fiUl(
+                this,
+                reinterpret_cast<CMapShadow*>(nearest[0]),
+                viewMtx,
+                nearest[2],
+                0xFFFFFFFF);
+        }
+    } else {
+        int targetOffset = static_cast<int>(target);
+        for (unsigned int i = 0; i < static_cast<unsigned int>(mapShadowArray->GetSize()); i++) {
+            CMapShadow* shadow = (*mapShadowArray)[i];
+            unsigned char* shadowBytes = reinterpret_cast<unsigned char*>(shadow);
+
+            if (*(shadowBytes + targetOffset + 0xF0) == 0) {
+                continue;
+            }
+
+            int model = *reinterpret_cast<int*>(shadowBytes + 0xC);
+            Vec shadowPos;
+            shadowPos.x = *reinterpret_cast<float*>(model + 0xC4);
+            shadowPos.y = *reinterpret_cast<float*>(model + 0xD4);
+            shadowPos.z = *reinterpret_cast<float*>(model + 0xE4);
+
+            Mtx scaledShadowMtx;
+            PSMTXScaleApply(
+                reinterpret_cast<float(*)[4]>(shadowBytes + 0x78),
+                scaledShadowMtx,
+                FLOAT_8032faf8,
+                FLOAT_8032faf8,
+                FLOAT_8032faf0);
+
+            if ((*(shadowBytes + 7) == 1) ||
+                (CheckFrustum__6CBoundFR3VecPA4_ff(
+                     reinterpret_cast<CBound*>(&minX),
+                     &shadowPos,
+                     scaledShadowMtx,
+                     FLOAT_8032fafc) != 0)) {
+                SetShadow__12CMaterialManFR10CMapShadowPA4_fiUl(this, shadow, viewMtx, i, 0);
+            }
+        }
+    }
 }
 
 /*

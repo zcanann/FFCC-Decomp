@@ -1,4 +1,5 @@
 #include "ffcc/RedSound/RedEntry.h"
+#include "ffcc/RedSound/RedCommand.h"
 #include "ffcc/RedSound/RedDriver.h"
 #include "ffcc/RedSound/RedMemory.h"
 #include <dolphin/os.h>
@@ -6,6 +7,7 @@
 
 extern CRedMemory DAT_8032f480;
 extern int DAT_8032f408;
+extern void* DAT_8032f3f0;
 extern int DAT_8032e12c;
 extern int DAT_8021d1a8;
 extern char DAT_801e7905;
@@ -164,12 +166,39 @@ int CRedEntry::SearchWaveSequence(int waveNo)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c08a0
+ * PAL Size: 208b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedEntry::SearchUseWave(int)
+int CRedEntry::SearchUseWave(int waveNo)
 {
-	// TODO
+	unsigned int interruptLevel = OSDisableInterrupts();
+	int found = 0;
+	int soundBase = (int)DAT_8032f3f0 + 0x494;
+
+	do {
+		if ((-1 < *(int*)(soundBase + 0x470)) && (*(int*)(soundBase + 0x47c) == waveNo)) {
+			found = 1;
+			MusicStop(*(int*)(soundBase + 0x470));
+		}
+		soundBase -= 0x494;
+	} while ((int)DAT_8032f3f0 <= soundBase);
+
+	int* trackBasePtr = (int*)((char*)DAT_8032f3f0 + 0xdbc);
+	int* track = (int*)*trackBasePtr;
+	do {
+		if ((*track != 0) && (track[6] != 0) && (*(short*)(track[6] + 2) == waveNo)) {
+			found = 1;
+			SeStopID(track[0x3e]);
+		}
+		track += 0x55;
+	} while (track < (int*)(*trackBasePtr + 0x2a80));
+
+	OSRestoreInterrupts(interruptLevel);
+	return found;
 }
 
 /*

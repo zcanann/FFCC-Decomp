@@ -98,7 +98,7 @@ public:
     void ShopEnd(int);
     void SmithEnd(int);
     void MakeBuyData(int, char*);
-    void MakeSellData(int, char*);
+    int MakeSellData(int, char*);
     void MakeSmithData(int, char*);
     void GetSellFlg(int);
     void ClrSellFlg(int);

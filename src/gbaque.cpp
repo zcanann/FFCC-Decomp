@@ -23,9 +23,12 @@ extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*
 extern "C" void __dla__FPv(void*);
 extern "C" void Printf__7CSystemFPce(CSystem*, char*, ...);
 extern "C" int memcmp(const void*, const void*, unsigned long);
+extern "C" void MakeAgbString__4CMesFPcPcii(char*, char*, int, int);
 extern "C" int IsOutOfShouki__12CCaravanWorkFv(void*);
 extern "C" int CanPlayerUseItem__12CCaravanWorkFv(void*);
 extern "C" int CanPlayerPutItem__12CCaravanWorkFv(void*);
+extern float FLOAT_80330d50;
+extern double DOUBLE_80330d38;
 
 struct GbaFlatDataTableEntryView
 {
@@ -1860,12 +1863,102 @@ void GbaQueue::MakeBuyData(int, char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800cb0d0
+ * PAL Size: 972b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::MakeSellData(int, char*)
+int GbaQueue::MakeSellData(int channel, char* outData)
 {
-	// TODO
+	char* itemNameBuf = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(0x400, Game.game.m_mainStage, s_gbaque_cpp, 0xDD5));
+	if (itemNameBuf == 0) {
+		if (System.m_execParam != 0) {
+			Printf__7CSystemFPce(&System, s_mem_alloc_error, s_gbaque_cpp, 0xDD7);
+		}
+		return -1;
+	}
+	memset(itemNameBuf, 0, 0x400);
+
+	char* agbNameBuf = static_cast<char*>(__nwa__FUlPQ27CMemory6CStagePci(0x400, Game.game.m_mainStage, s_gbaque_cpp, 0xDDE));
+	if (agbNameBuf == 0) {
+		if (System.m_execParam != 0) {
+			Printf__7CSystemFPce(&System, s_mem_alloc_error, s_gbaque_cpp, 0xDE0);
+		}
+		__dla__FPv(itemNameBuf);
+		return -1;
+	}
+	memset(agbNameBuf, 0, 0x400);
+
+	GbaFlatDataView* flatData = reinterpret_cast<GbaFlatDataView*>(&Game.game.m_cFlatDataArr[1]);
+	const int scriptFood = static_cast<int>(Game.game.m_scriptFoodBase[channel]);
+	unsigned short* sellList = reinterpret_cast<unsigned short*>(scriptFood + 0xB6);
+	int totalSize = 0;
+
+	for (int i = 0; i < 0x40; i++) {
+		unsigned int itemId = static_cast<unsigned int>(sellList[i]);
+		unsigned short itemNameData[4];
+		memset(itemNameData, 0, sizeof(itemNameData));
+		if ((itemId >= 1) && (itemId <= 0x9E)) {
+			const int itemData = static_cast<int>(Game.game.unkCFlatData0[2] + itemId * 0x48);
+			itemNameData[0] = *reinterpret_cast<unsigned short*>(itemData + 4);
+			itemNameData[1] = *reinterpret_cast<unsigned short*>(itemData + 6);
+			itemNameData[2] = *reinterpret_cast<unsigned short*>(itemData + 8);
+		}
+		memcpy(outData, itemNameData, sizeof(itemNameData));
+		outData += sizeof(itemNameData);
+		totalSize += sizeof(itemNameData);
+	}
+
+	const float gilScale = (static_cast<float>(*reinterpret_cast<short*>(scriptFood + 0xBE2)) /
+		static_cast<float>(DOUBLE_80330d38)) * FLOAT_80330d50;
+	for (int i = 0; i < 0x40; i++) {
+		unsigned int itemId = static_cast<unsigned int>(sellList[i]);
+		unsigned int packedPrice = 0;
+		if (itemId >= 1) {
+			const unsigned short basePrice = *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemId * 0x48 + 0x20);
+			unsigned int price = static_cast<unsigned int>(static_cast<float>(basePrice) * gilScale);
+			if (price < 1) {
+				price = 1;
+			}
+			packedPrice = (price << 24) | ((price >> 8 & 0xFF) << 16) | ((price >> 16 & 0xFF) << 8) | (price >> 24);
+		}
+		memcpy(outData, &packedPrice, sizeof(packedPrice));
+		outData += sizeof(packedPrice);
+		totalSize += sizeof(packedPrice);
+	}
+
+	for (int i = 0; i < 0x40; i++) {
+		memset(itemNameBuf, 0, 0x400);
+		memset(agbNameBuf, 0, 0x400);
+
+		const unsigned int itemId = static_cast<unsigned int>(sellList[i]);
+		if (itemId < 1) {
+			*outData = 0;
+			outData += 1;
+			totalSize += 1;
+			continue;
+		}
+
+		strcpy(itemNameBuf, flatData->m_tabl[6].m_strings[itemId]);
+		MakeAgbString__4CMesFPcPcii(agbNameBuf, itemNameBuf, 0, 0);
+
+		const int stringSize = static_cast<int>(strlen(agbNameBuf) + 1);
+		memcpy(outData, agbNameBuf, static_cast<unsigned long>(stringSize));
+		outData += stringSize;
+		totalSize += stringSize;
+	}
+
+	__dla__FPv(agbNameBuf);
+	__dla__FPv(itemNameBuf);
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	reinterpret_cast<unsigned char*>(this)[0x2D54] |= static_cast<unsigned char>(1U << channel);
+	OSSignalSemaphore(accessSemaphores + channel);
+
+	Joybus.SetLetterSize(channel, totalSize);
+	return totalSize;
 }
 
 /*

@@ -696,15 +696,9 @@ void CChara::CModel::CalcNodeWorldMatrix(float (*) [4], CChara::CNode*)
 	// TODO
 }
 
-// Global Chara object - composite structure with nested base objects
 struct CharaGlobal {
-	struct Field0 {
-		struct Object {
-			struct BaseObject {
-				CFlatRuntime::CObject object;
-			} base_object;
-		} object;
-	} field0_0x0;
+	void* vtable;
+	u8 padding[0x264];
 } Chara;
 
 extern "C" char __vt__8CManager[];

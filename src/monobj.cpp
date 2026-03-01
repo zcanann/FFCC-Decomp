@@ -1733,12 +1733,20 @@ void CGMonObj::setUndeadEffect(int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80113EFC
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::IsDispRader()
+bool CGMonObj::IsDispRader()
 {
-	// TODO
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	if (object->IsDispRader() == 0) {
+		return false;
+	}
+	return static_cast<int>(static_cast<unsigned int>(object->m_weaponNodeFlags) << 24) < 0;
 }
 
 /*

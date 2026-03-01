@@ -33,6 +33,7 @@ extern "C" void SetPosX__5CFontFf(float, CFont*);
 extern "C" void SetPosY__5CFontFf(float, CFont*);
 extern "C" void SetPosZ__5CFontFf(float, CFont*);
 extern "C" void Draw__5CFontFPc(CFont*, const char*);
+extern "C" char SoundBuffer_1248_[];
 extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
 	int, int, int, CGObject*, float, void*);
 extern "C" float DAT_8032ec24;
@@ -2119,6 +2120,31 @@ void CGMonObj::moveFrame()
  * JP Size: TODO
  */
 #pragma dont_inline on
+/*
+ * --INFO--
+ * PAL Address: 0x801162B4
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void fn_801162B4(CGMonObj* monObj)
+{
+	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);
+	*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0;
+	memset(mon + 0x70C, 0, 0x34);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8011467C
+ * PAL Size: 1272b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 extern "C" void MonObjRelated(CGMonObj* monObj, int* targetIndex)
 {
 	unsigned char* mon = reinterpret_cast<unsigned char*>(monObj);

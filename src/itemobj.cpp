@@ -1195,10 +1195,12 @@ void CGItemObj::DeleteAllFieldItem()
 
 	while (itemObj != 0) {
 		unsigned char stateFlags = itemObj[0x50];
-		int isActive = (int)(((unsigned int)stateFlags << 0x1c) | ((unsigned int)stateFlags >> 4)) < 0;
+		unsigned int rotated = (unsigned int)stateFlags >> 4;
+		rotated |= (unsigned int)stateFlags << 0x1c;
+		int isActive = (int)(rotated >> 0x1f);
 
 		if (*(int*)(itemObj + 0x550) == 0 && isActive != 0) {
-			itemObj[0x54d] = (itemObj[0x54d] & 0x7f) | 0x80;
+			itemObj[0x38] = (itemObj[0x38] & 0x7f) | 0x80;
 		}
 
 		itemObj = (unsigned char*)FindGItemObjNext__13CFlatRuntime2FP9CGItemObj(CFlat, itemObj);

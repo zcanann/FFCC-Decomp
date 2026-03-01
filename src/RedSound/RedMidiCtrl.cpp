@@ -13,6 +13,8 @@ extern int DAT_8032f424;
 extern int DAT_8032f414;
 extern CRedEntry DAT_8032e154;
 extern int DAT_8021dc20[];
+extern signed char DAT_8021dcce[];
+extern int DAT_8021e1d0[];
 extern int lbl_8021EA10[];
 extern int PTR_SineSwing__Fi_8021e9d0[];
 
@@ -150,9 +152,13 @@ void KeyOffSet(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, RedTrackDATA* 
  * Address:	TODO
  * Size:	TODO
  */
-void SineSwing(int)
+int SineSwing(int phase)
 {
-	// TODO
+    int result = DAT_8021e1d0[phase & 0x1FF];
+    if ((phase & 0x200) != 0) {
+        result = -result;
+    }
+    return result;
 }
 
 /*
@@ -160,9 +166,23 @@ void SineSwing(int)
  * Address:	TODO
  * Size:	TODO
  */
-void TriangleSwing(int)
+int TriangleSwing(int phase)
 {
-	// TODO
+    unsigned int mode = static_cast<unsigned int>(phase) >> 8 & 3;
+    unsigned int step = static_cast<unsigned int>(phase) & 0xFF;
+    int result = static_cast<int>(step) * 0x100;
+
+    if (mode == 2) {
+        result = static_cast<int>(step) * -0x100;
+    } else if (mode < 2) {
+        if (mode != 0) {
+            result = static_cast<int>(step) * -0x100 + 0x10000;
+        }
+    } else if (mode < 4) {
+        result -= 0x10000;
+    }
+
+    return (result & ~0xFF) | (phase & 0xFF);
 }
 
 /*
@@ -170,9 +190,9 @@ void TriangleSwing(int)
  * Address:	TODO
  * Size:	TODO
  */
-void SawSwing(int)
+int SawSwing(int phase)
 {
-	// TODO
+    return static_cast<int>(static_cast<signed char>(phase >> 2)) << 8;
 }
 
 /*
@@ -180,9 +200,12 @@ void SawSwing(int)
  * Address:	TODO
  * Size:	TODO
  */
-void DutySwing(int)
+int DutySwing(int phase)
 {
-	// TODO
+    if ((phase & 0x200) == 0) {
+        return 0x10000;
+    }
+    return 0xFFFF0000;
 }
 
 /*
@@ -190,9 +213,9 @@ void DutySwing(int)
  * Address:	TODO
  * Size:	TODO
  */
-void RandomSwing(int)
+int RandomSwing(int phase)
 {
-	// TODO
+    return static_cast<int>(DAT_8021dcce[(phase >> 8) & 0xFF]) << 8;
 }
 
 /*
@@ -200,9 +223,14 @@ void RandomSwing(int)
  * Address:	TODO
  * Size:	TODO
  */
-void SineSwingR(int)
+int SineSwingR(int phase)
 {
-	// TODO
+    unsigned int flipped = static_cast<unsigned int>(phase) ^ 0x200;
+    int result = DAT_8021e1d0[flipped & 0x1FF];
+    if ((flipped & 0x200) != 0) {
+        result = -result;
+    }
+    return result;
 }
 
 /*
@@ -210,9 +238,24 @@ void SineSwingR(int)
  * Address:	TODO
  * Size:	TODO
  */
-void TriangleSwingR(int)
+int TriangleSwingR(int phase)
 {
-	// TODO
+    unsigned int flipped = static_cast<unsigned int>(phase) ^ 0x200;
+    unsigned int mode = flipped >> 8 & 3;
+    unsigned int step = flipped & 0xFF;
+    int result = static_cast<int>(step) * 0x100;
+
+    if (mode == 2) {
+        result = static_cast<int>(step) * -0x100;
+    } else if (mode < 2) {
+        if (mode != 0) {
+            result = static_cast<int>(step) * -0x100 + 0x10000;
+        }
+    } else if (mode < 4) {
+        result -= 0x10000;
+    }
+
+    return (result & ~0xFF) | (phase & 0xFF);
 }
 
 /*
@@ -220,9 +263,12 @@ void TriangleSwingR(int)
  * Address:	TODO
  * Size:	TODO
  */
-void DutySwingR(int)
+int DutySwingR(int phase)
 {
-	// TODO
+    if (((phase ^ 0x200) & 0x200) == 0) {
+        return 0x10000;
+    }
+    return 0xFFFF0000;
 }
 
 /*
@@ -230,9 +276,9 @@ void DutySwingR(int)
  * Address:	TODO
  * Size:	TODO
  */
-void SawSwingR(int)
+int SawSwingR(int phase)
 {
-	// TODO
+    return static_cast<int>(static_cast<signed char>(~phase >> 2)) << 8;
 }
 
 /*
@@ -240,9 +286,9 @@ void SawSwingR(int)
  * Address:	TODO
  * Size:	TODO
  */
-void RandomSwingR(int)
+int RandomSwingR(int phase)
 {
-	// TODO
+    return static_cast<int>(DAT_8021dcce[((phase >> 8) & 0xFF) ^ 0x40]) << 8;
 }
 
 /*

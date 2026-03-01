@@ -1464,49 +1464,62 @@ unsigned int CMenuPcs::CmdCtrlCur()
  */
 unsigned int CMenuPcs::CmdOpen0()
 {
-	u8* self = reinterpret_cast<u8*>(this);
-	u8* menuState = *reinterpret_cast<u8**>(self + 0x82c);
+	s16* psVar5;
+	s32 iVar7;
+	s32 iVar8;
 
-	*reinterpret_cast<s16*>(menuState + 0x22) = static_cast<s16>(*reinterpret_cast<s16*>(menuState + 0x22) + 1);
-	s32 time = static_cast<s32>(*reinterpret_cast<s16*>(menuState + 0x22));
-	s32 selectedOffset = static_cast<s32>(*reinterpret_cast<s16*>(menuState + 0x26)) * 0x40 + 8;
-
-	if (time < 5) {
-		*reinterpret_cast<s16*>(*reinterpret_cast<u8**>(self + 0x850) + selectedOffset) =
-		    static_cast<s16>(*reinterpret_cast<s16*>(*reinterpret_cast<u8**>(self + 0x850) + selectedOffset) - 0x13);
+	*reinterpret_cast<s16*>(*reinterpret_cast<s32*>((u8*)this + 0x82c) + 0x22) =
+		static_cast<s16>(*reinterpret_cast<s16*>(*reinterpret_cast<s32*>((u8*)this + 0x82c) + 0x22) + 1);
+	const s32 iVar4 = static_cast<s32>(*reinterpret_cast<s16*>(*reinterpret_cast<s32*>((u8*)this + 0x82c) + 0x22));
+	s32 iVar6 = static_cast<s32>(*reinterpret_cast<s16*>(*reinterpret_cast<s32*>((u8*)this + 0x82c) + 0x26)) * 0x40 + 8;
+	if (iVar4 < 5) {
+		*reinterpret_cast<s16*>(*reinterpret_cast<s32*>((u8*)this + 0x850) + iVar6) =
+			static_cast<s16>(*reinterpret_cast<s16*>(*reinterpret_cast<s32*>((u8*)this + 0x850) + iVar6) - 0x13);
 	}
 
-	s16* base = *reinterpret_cast<s16**>(self + 0x850);
-	s32 doneCount = 0;
-	s32 entryCount = static_cast<s32>(base[1]) - static_cast<s32>(base[0]);
-	s16* entry = base + base[0] * 0x20 + 4;
-
-	for (s32 i = 0; i < entryCount; i++) {
-		if (*reinterpret_cast<s32*>(entry + 0x12) <= time) {
-			if (time < (*reinterpret_cast<s32*>(entry + 0x12) + *reinterpret_cast<s32*>(entry + 0x14))) {
-				*reinterpret_cast<s32*>(entry + 0x10) = *reinterpret_cast<s32*>(entry + 0x10) + 1;
-				const f64 denom = static_cast<f64>(*reinterpret_cast<s32*>(entry + 0x14));
-				const f64 numer = static_cast<f64>(*reinterpret_cast<s32*>(entry + 0x10));
-
-				*reinterpret_cast<f32*>(entry + 8) = static_cast<f32>(numer / denom);
-				if ((*reinterpret_cast<u32*>(entry + 0x16) & 2) == 0) {
-					const f32 t = static_cast<f32>(numer / denom);
-					*reinterpret_cast<f32*>(entry + 0x18) =
-					    (*reinterpret_cast<f32*>(entry + 0x1c) - static_cast<f32>(entry[0])) * t;
-					*reinterpret_cast<f32*>(entry + 0x1a) =
-					    (*reinterpret_cast<f32*>(entry + 0x1e) - static_cast<f32>(entry[1])) * t;
+	psVar5 = *reinterpret_cast<s16**>((u8*)this + 0x850);
+	iVar7 = 0;
+	iVar8 = static_cast<s32>(psVar5[1]) - static_cast<s32>(psVar5[0]);
+	psVar5 = psVar5 + psVar5[0] * 0x20 + 4;
+	iVar6 = iVar8;
+	if (iVar8 > 0) {
+		do {
+			float fVar1 = FLOAT_80332ab0;
+			const double dVar3 = DOUBLE_80332a80;
+			if (*reinterpret_cast<s32*>(psVar5 + 0x12) <= iVar4) {
+				if (iVar4 < *reinterpret_cast<s32*>(psVar5 + 0x12) + *reinterpret_cast<s32*>(psVar5 + 0x14)) {
+					*reinterpret_cast<s32*>(psVar5 + 0x10) = *reinterpret_cast<s32*>(psVar5 + 0x10) + 1;
+					const double dVar2 = DOUBLE_80332a58;
+					*reinterpret_cast<float*>(psVar5 + 8) = static_cast<float>(
+						(dVar2 / (static_cast<double>(*reinterpret_cast<u32*>(psVar5 + 0x14)) - dVar3)) *
+						(static_cast<double>(*reinterpret_cast<u32*>(psVar5 + 0x10)) - dVar3));
+					if ((*reinterpret_cast<u32*>(psVar5 + 0x16) & 2) == 0) {
+						fVar1 = static_cast<float>(
+							(dVar2 / (static_cast<double>(*reinterpret_cast<u32*>(psVar5 + 0x14)) - dVar3)) *
+							(static_cast<double>(*reinterpret_cast<u32*>(psVar5 + 0x10)) - dVar3));
+						*reinterpret_cast<float*>(psVar5 + 0x18) =
+							(*reinterpret_cast<float*>(psVar5 + 0x1c) -
+							 static_cast<float>(static_cast<double>(*psVar5) - dVar3)) *
+							fVar1;
+						*reinterpret_cast<float*>(psVar5 + 0x1a) =
+							(*reinterpret_cast<float*>(psVar5 + 0x1e) -
+							 static_cast<float>(static_cast<double>(psVar5[1]) - dVar3)) *
+							fVar1;
+					}
+				} else {
+					iVar7 = iVar7 + 1;
+					*reinterpret_cast<float*>(psVar5 + 8) = FLOAT_80332a70;
+					*reinterpret_cast<float*>(psVar5 + 0x18) = fVar1;
+					*reinterpret_cast<float*>(psVar5 + 0x1a) = fVar1;
 				}
-			} else {
-				doneCount++;
-				*reinterpret_cast<f32*>(entry + 8) = 1.0f;
-				*reinterpret_cast<f32*>(entry + 0x18) = 0.0f;
-				*reinterpret_cast<f32*>(entry + 0x1a) = 0.0f;
 			}
-		}
-		entry += 0x20;
+
+			psVar5 = psVar5 + 0x20;
+			iVar6 = iVar6 - 1;
+		} while (iVar6 != 0);
 	}
 
-	return static_cast<unsigned int>(entryCount == doneCount);
+	return static_cast<unsigned int>(iVar8 == iVar7);
 }
 
 /*

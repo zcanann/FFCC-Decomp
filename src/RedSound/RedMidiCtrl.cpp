@@ -1601,12 +1601,26 @@ void __MidiCtrl_VibrateDepthChange(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C9260
+ * PAL Size: 96b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void __MidiCtrl_VibrateRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_VibrateRateDirect(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    int* trackData = (int*)track;
+    unsigned int rateDivisor;
+
+    if (*(char*)trackData[0] == '\0') {
+        rateDivisor = 0x100;
+    } else {
+        rateDivisor = (unsigned int)*(unsigned char*)trackData[0];
+    }
+    trackData[0x1e] = 0x100000 / rateDivisor;
+    *(short*)(trackData + 0x23) = 0;
+    trackData[0] += 1;
 }
 
 /*

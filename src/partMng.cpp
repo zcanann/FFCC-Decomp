@@ -5,19 +5,33 @@
 #include "ffcc/gobject.h"
 #include "ffcc/graphic.h"
 #include "ffcc/math.h"
+#include "ffcc/p_game.h"
+
+#include <string.h>
 
 extern "C" void __dl__FPv(void* ptr);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppPartInit__8CPartMngFv2(CPartMng* partMng);
+extern "C" void pppCreateHeap__FP9_pppEnvStUl(_pppEnvSt*, unsigned long);
 extern "C" unsigned int CheckSum__FPvi(void*, int);
 extern "C" void pppStopSe__FP9_pppMngStP7PPPSEST(_pppMngSt*, PPPSEST*);
 extern "C" float ppvScreenMatrix[4][4];
 extern "C" float ppvScreenMatrix0[4][4];
 extern "C" float ppvCameraMatrix02[3][4];
+extern "C" Mtx ppvUnitMatrix;
+extern "C" Vec ppvZeroVector;
 extern "C" float FLOAT_8032fe5c;
 extern "C" float FLOAT_8032fe60;
 extern "C" float FLOAT_8032fe64;
 extern "C" float FLOAT_8032fe68;
+extern "C" float FLOAT_8032fe8c;
+extern "C" float FLOAT_8032fe90;
+extern "C" float FLOAT_8032fe94;
+extern "C" float FLOAT_8032fe98;
+extern "C" float FLOAT_8032fe9c;
+extern "C" float FLOAT_8032fea0;
+extern "C" float FLOAT_8032fea4;
+extern "C" float FLOAT_8032fea8;
 extern "C" float FLOAT_8032fe4c;
 extern "C" float FLOAT_8032fe50;
 extern "C" float FLOAT_8032fe54;
@@ -28,6 +42,10 @@ extern "C" float FLOAT_8032ed60;
 extern "C" float FLOAT_8032fe18;
 extern "C" unsigned char DAT_8032ed68;
 extern "C" int DAT_8032ed6c;
+extern "C" int DAT_8032ed74;
+extern "C" unsigned char DAT_8032ed78;
+extern "C" unsigned char DAT_8032ed79;
+extern "C" int DAT_8032ed7c;
 extern "C" unsigned char DAT_8032ed90;
 extern "C" unsigned char DAT_8032ed91;
 extern unsigned char CameraPcs[];
@@ -166,12 +184,80 @@ CPartMng::CPartMng()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005f0fc
+ * PAL Size: 1308b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartMng::Create()
 {
-	// TODO
+    static const int kEnvOffset = 0x2351c;
+    static const int kPppMngCount = 0x180;
+    static const int kPppMngStride = 0x158;
+
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    _pppEnvSt* env = reinterpret_cast<_pppEnvSt*>(self + kEnvOffset);
+
+    C_MTXPerspective(ppvScreenMatrix, FLOAT_8032fe8c, FLOAT_8032fe90, FLOAT_8032fe94, FLOAT_8032fe58);
+    PSMTX44Copy(ppvScreenMatrix, ppvScreenMatrix0);
+
+    memset(self + 0x10, 0, 0x108);
+
+    DAT_8032ed68 = 1;
+    DAT_8032ed6c = 0;
+    DAT_8032ed70 = 0;
+    DAT_8032ed74 = 0;
+
+    if (Game.game.m_currentSceneId == 7) {
+        pppCreateHeap__FP9_pppEnvStUl(env, 0x100000);
+    } else {
+        pppCreateHeap__FP9_pppEnvStUl(env, 0xC0000);
+    }
+
+    pppEnvStPtr = env;
+    DAT_8032ed7c = 0;
+
+    PSMTXIdentity(ppvUnitMatrix);
+    ppvZeroVector.x = FLOAT_8032fe5c;
+    ppvZeroVector.y = FLOAT_8032fe5c;
+    ppvZeroVector.z = FLOAT_8032fe5c;
+
+    DAT_8032ed78 = 0;
+    DAT_8032ed79 = 0;
+
+    PSMTXIdentity(ppvWorldMatrix);
+    PSMTXIdentity(ppvWorldMatrix);
+    PSMTXIdentity(ppvCameraMatrix0);
+    PSMTXCopy(ppvCameraMatrix0, ppvCameraMatrix0);
+
+    memset(self + 0x1d4, 0, 0x600);
+
+    for (int i = 0; i < kPppMngCount; i++) {
+        unsigned char* mng = self + (i * kPppMngStride);
+        *reinterpret_cast<int*>(mng + 0x14) = -0x1000;
+        *reinterpret_cast<int*>(mng + 0x12c) = -1;
+        *reinterpret_cast<int*>(mng + 0x11c) = -1;
+        *reinterpret_cast<unsigned char*>(mng + 0x120) = 0;
+        *reinterpret_cast<unsigned char*>(mng + 0x121) = 1;
+        *reinterpret_cast<int*>(mng + 0x124) = 0;
+        *reinterpret_cast<unsigned char*>(mng + 0x122) = 0;
+        *reinterpret_cast<int*>(mng + 0x128) = 0x1e;
+    }
+
+    env->m_envParam = FLOAT_8032fe5c;
+    env->m_mngStCount = 0x10;
+    env->m_isEditMode = 1;
+
+    memset(self + 0x10, 0, 0x108);
+
+    env->m_boxMinX = FLOAT_8032fe98;
+    env->m_boxMaxX = FLOAT_8032fe9c;
+    env->m_boxMinY = FLOAT_8032fea0;
+    env->m_boxMaxY = FLOAT_8032fea4;
+    env->m_boxMinZ = FLOAT_8032fe9c;
+    env->m_boxMaxZ = FLOAT_8032fea8;
 }
 
 /*

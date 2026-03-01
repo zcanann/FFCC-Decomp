@@ -17,6 +17,7 @@ void* __vt__Q212CFlatRuntime7CObject[];
 int __cntlzw(unsigned int);
 void Printf__7CSystemFPce(CSystem*, char*, ...);
 int sprintf(char*, const char*, ...);
+double fmod(double, double);
 void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     CFlatRuntime*, CFlatRuntime::CObject*, int, int, int, CFlatRuntime::CStack*, CFlatRuntime::CStack*);
 }
@@ -1222,12 +1223,106 @@ void CFlatRuntime::PrintCodeInfo()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800679DC
+ * PAL Size: 516b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CFlatRuntime::GetCodeInfo(char*)
+void CFlatRuntime::GetCodeInfo(char* codeInfo)
 {
-	// TODO
+	union CodeWord {
+		u32 u;
+		s32 s;
+		float f;
+	};
+
+	CObject* object = reinterpret_cast<CObject*>(codeInfo);
+	register int op;
+	CodeWord rhs;
+	CodeWord lhs;
+	CodeWord result;
+
+#ifdef __MWERKS__
+	asm { mr op, r5 };
+#else
+	op = 0;
+#endif
+
+	object->m_sp--;
+	rhs.u = *object->m_sp;
+
+	if ((op == 0x20) || (op == 0x23) || (op == 0x25) || (op == 0x2B)) {
+		switch (op) {
+		case 0x20:
+			result.s = -rhs.s;
+			break;
+		case 0x23:
+			result.u = static_cast<u32>((__cntlzw(rhs.u) >> 5) & 0xFF);
+			break;
+		case 0x25:
+			result.u = ~rhs.u;
+			break;
+		case 0x2B:
+			result.f = -rhs.f;
+			break;
+		}
+	} else {
+		object->m_sp--;
+		lhs.u = *object->m_sp;
+
+		switch (op) {
+		case 0x19:
+			result.s = lhs.s + rhs.s;
+			break;
+		case 0x1A:
+			result.s = lhs.s - rhs.s;
+			break;
+		case 0x1B:
+			result.s = lhs.s * rhs.s;
+			break;
+		case 0x1C:
+			result.s = lhs.s / rhs.s;
+			break;
+		case 0x1D:
+			result.s = lhs.s - ((lhs.s / rhs.s) * rhs.s);
+			break;
+		case 0x1E:
+			result.u = lhs.u | rhs.u;
+			break;
+		case 0x1F:
+			result.u = lhs.u & rhs.u;
+			break;
+		case 0x21:
+			result.s = lhs.s >> (rhs.u & 0x3F);
+			break;
+		case 0x22:
+			result.s = lhs.s << rhs.s;
+			break;
+		case 0x24:
+			result.u = lhs.u ^ rhs.u;
+			break;
+		case 0x26:
+			result.f = lhs.f + rhs.f;
+			break;
+		case 0x27:
+			result.f = lhs.f - rhs.f;
+			break;
+		case 0x28:
+			result.f = lhs.f * rhs.f;
+			break;
+		case 0x29:
+			result.f = lhs.f / rhs.f;
+			break;
+		case 0x2A:
+			result.f = static_cast<float>(fmod(static_cast<double>(lhs.f), static_cast<double>(rhs.f)));
+			break;
+		}
+	}
+
+	*object->m_sp = result.u;
+	object->m_sp++;
 }
 
 /*

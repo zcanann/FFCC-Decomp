@@ -760,6 +760,7 @@ void __MidiCtrl_KeyOnSame(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 #pragma dont_inline on
 void __MidiCtrl_KeyOnNoteVelocity(RedSoundCONTROL*, RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
@@ -815,6 +816,7 @@ void __MidiCtrl_KeyOnVelocity(RedSoundCONTROL*, RedKeyOnDATA* keyOnData, RedTrac
     KeyOnReserve(keyOnData, track);
 }
 #pragma dont_inline reset
+#pragma optimization_level 4
 
 /*
  * --INFO--

@@ -175,6 +175,7 @@ static BOOL DBGRead(u32 count, u32* buffer, s32 param3) {
  * JP Size: TODO
  */
 static BOOL DBGWrite(u32 count, u32* buffer, s32 param3) {
+    u32 busyFlag;
     u32 regs;
     u32 result;
     u32 cmd;
@@ -184,15 +185,17 @@ static BOOL DBGWrite(u32 count, u32* buffer, s32 param3) {
     regs = __EXIRegs[10];
     __EXIRegs[10] = (regs & 0x405) | 0xc0;
 
-    result = ((u32)__cntlzw(DBGEXIImm((u8*)&cmd, 4, TRUE))) >> 5;
-    while (__EXIRegs[13] & 1)
-        ;
+    result = (u32)__cntlzw(DBGEXIImm((u8*)&cmd, 4, TRUE));
+    do {
+        busyFlag = __EXIRegs[13];
+    } while (busyFlag & 1);
 
     while (param3 != 0) {
         word = *buffer++;
-        result |= (u32)__cntlzw(DBGEXIImm((u8*)&word, 4, TRUE)) >> 5;
-        while (__EXIRegs[13] & 1)
-            ;
+        result |= ((u32)__cntlzw(DBGEXIImm((u8*)&word, 4, TRUE))) >> 5;
+        do {
+            busyFlag = __EXIRegs[13];
+        } while (busyFlag & 1);
 
         param3 -= 4;
         if (param3 < 0) {
@@ -201,8 +204,9 @@ static BOOL DBGWrite(u32 count, u32* buffer, s32 param3) {
     }
 
     regs = __EXIRegs[10];
+    result = (u32)__cntlzw(result);
     __EXIRegs[10] = regs & 0x405;
-    return ((u32)__cntlzw(result)) >> 5;
+    return result >> 5;
 }
 
 inline static BOOL _DBGReadStatus(u32* p1) {

@@ -49,10 +49,10 @@ public:
     void SetSingWinInfo(int, int, int, int);
     void SetSingDynamicWinMessInfo(int, char*, char*, char*, char*, char*, char*, char*, char*);
     void SetSingWinScl(float);
-    void GetSingWinScl();
-    void SingWinMessHeight();
-    void ChkEquipPossible(int);
-    void GetEquipType(int);
+    float GetSingWinScl();
+    int SingWinMessHeight();
+    int ChkEquipPossible(int);
+    int GetEquipType(int);
     void GetSmithItem(int);
     void GetRecipeMaterial(int, MaterialInfo*);
     void GetRaceStr(int, char*);

@@ -2,6 +2,7 @@
 #include "ffcc/prgobj.h"
 #include "ffcc/charaobj.h"
 #include "ffcc/math.h"
+#include "ffcc/p_game.h"
 
 #include <math.h>
 
@@ -784,12 +785,104 @@ void CGMonObj::cancelStatFuncLastBoss()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8012efa8
+ * PAL Size: 1088b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::frameStatFuncLastBoss()
 {
-	// TODO
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+
+	const int state = prgObj->m_lastStateId;
+	const int stateFrame = prgObj->m_stateFrame;
+
+	if (state == 0x65) {
+		if (stateFrame == 0) {
+			object->m_bgColMask &= 0xFFF7FFFF;
+			prgObj->reqAnim(0x19, 0, 0);
+
+			int pdtNo = -1;
+			if (object->m_charaModelHandle != 0 && object->m_charaModelHandle->m_pdtLoadRef != 0) {
+				pdtNo = reinterpret_cast<int*>(object->m_charaModelHandle->m_pdtLoadRef)[2];
+			}
+
+			prgObj->putParticle((pdtNo << 8) | 0x11, 0, object, 1.0f, 0);
+			prgObj->putParticle((pdtNo << 8) | 0x12, 0, object, 1.0f, 0);
+			prgObj->playSe3D(0x12913, 0x32, 0x96, 0, 0);
+		} else if (stateFrame == 0x29) {
+			object->m_bodyEllipsoidRadius = 7.0f;
+		} else if (prgObj->isLoopAnim() != 0) {
+			object->m_bgColMask |= 0x80000;
+			prgObj->changeStat(0, 0, 0);
+			object->SetAnimSlot(0x13, 0);
+			object->SetAnimSlot(0x15, 1);
+			object->SetAnimSlot(0x17, 4);
+			mon[0x6B4] = 0;
+		}
+	} else if (state < 0x65) {
+		if (99 < state) {
+			if (stateFrame == 0) {
+				reinterpret_cast<CGCharaObj*>(this)->damageDelete();
+				object->m_bgColMask &= 0xFFF7FFFF;
+				prgObj->reqAnim(0x18, 0, 0);
+
+				int pdtNo = -1;
+				if (object->m_charaModelHandle != 0 && object->m_charaModelHandle->m_pdtLoadRef != 0) {
+					pdtNo = reinterpret_cast<int*>(object->m_charaModelHandle->m_pdtLoadRef)[2];
+				}
+
+				prgObj->putParticle((pdtNo << 8) | 0x10, 0, object, 1.0f, 0);
+				prgObj->playSe3D(0x12912, 0x32, 0x96, 0, 0);
+			} else if (stateFrame == 0x7D) {
+				object->m_bodyEllipsoidRadius = 2.0f;
+			} else if (prgObj->isLoopAnim() != 0) {
+				object->m_bgColMask |= 0x80000;
+				object->SetAnimSlot(0x12, 0);
+				object->SetAnimSlot(0x14, 1);
+				object->SetAnimSlot(0x16, 4);
+				prgObj->changeStat(0, 0, 0);
+				mon[0x6B4] = 2;
+			}
+		}
+	} else if (state < 0x67) {
+		if (stateFrame == 0) {
+			int pdtNo = -1;
+			if (object->m_charaModelHandle != 0 && object->m_charaModelHandle->m_pdtLoadRef != 0) {
+				pdtNo = reinterpret_cast<int*>(object->m_charaModelHandle->m_pdtLoadRef)[2];
+			}
+			prgObj->putParticle((pdtNo << 8) | 5, *reinterpret_cast<int*>(mon + 0x58C), object, 1.0f, 0x12902);
+		} else if (stateFrame == 0x4B) {
+			for (int i = 0; i < 4; i++) {
+				CGPartyObj* party = Game.game.m_partyObjArr[i];
+				if (party != 0) {
+					CGPrgObj* partyPrg = reinterpret_cast<CGPrgObj*>(party);
+					if (partyPrg->m_lastStateId == 0x24) {
+						if (fabs(prgObj->getTargetRot(partyPrg)) < 0.5235987755982988) {
+							partyPrg->changeStat(0x25, 0, 0);
+						}
+					}
+				}
+			}
+		} else if (stateFrame == 200) {
+			for (int i = 0; i < 4; i++) {
+				CGPartyObj* party = Game.game.m_partyObjArr[i];
+				if (party != 0) {
+					CGPrgObj* partyPrg = reinterpret_cast<CGPrgObj*>(party);
+					if (partyPrg->m_lastStateId == 0x25) {
+						partyPrg->changeStat(0x24, 0, 0);
+					}
+				}
+			}
+			reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x400);
+		}
+
+		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+	}
 }
 
 /*

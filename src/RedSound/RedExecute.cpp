@@ -24,6 +24,8 @@ extern int DAT_8032f430;
 extern int DAT_8032f434;
 extern int DAT_8032f478;
 extern int DAT_8032f410;
+extern int DAT_8032f40c;
+extern int DAT_8032f424;
 extern void* DAT_8032f3f4;
 extern int DAT_8032f400;
 extern s16 DAT_8021ddce[];
@@ -1704,22 +1706,87 @@ void _MidiTrackExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int fr
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c63c4
+ * PAL Size: 236b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _MusicMidiNoteExecute(RedSoundCONTROL*, RedKeyOnDATA*, int)
+int _MusicMidiNoteExecute(RedSoundCONTROL* control, RedKeyOnDATA* keyOnData, int frames)
 {
-	// TODO
+    int* sound = (int*)control;
+
+    frames <<= DAT_8032f40c;
+    sound[0x121] = frames;
+    sound[4] += frames;
+
+    while (sound[5] <= sound[4]) {
+        sound[3]++;
+        sound[4] -= sound[5];
+    }
+
+    if (*(s16*)((u8*)sound + 0x48E) != 0) {
+        _MidiTrackExecute(control, keyOnData, frames);
+    }
+
+    sound[0x11D] = 1;
+    if ((DAT_8032f424 == 0) && ((sound[0x11B] & 2) != 0)) {
+        sound[0x11B] &= ~2;
+        if ((sound[0x11B] & 1) != 0) {
+            *(s16*)((u8*)sound + 0x48E) = 0;
+        }
+    }
+
+    return *(s16*)((u8*)sound + 0x48E);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c64b0
+ * PAL Size: 340b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void _MusicNoteExecute()
 {
-	// TODO
+    int i;
+    u32 trackCount;
+    u32* sound;
+    u32* track;
+    int status = _MusicMidiNoteExecute((RedSoundCONTROL*)DAT_8032f3f4, (RedKeyOnDATA*)DAT_8032f3fc, 1);
+
+    while (status == 0) {
+        if ((DAT_8032f424 != 0) || ((((u32*)DAT_8032f3f4)[0x11B] & 1) == 0)) {
+            break;
+        }
+
+        *(s16*)((u8*)DAT_8032f3f4 + 0x48E) = *(s16*)((u8*)DAT_8032f3f4 + 0x434);
+        memcpy((u8*)DAT_8032f3f4 + 0xC, (u8*)DAT_8032f3f4 + 0x438, 0x10);
+        memcpy((u8*)DAT_8032f3f4 + 0x448, (u8*)DAT_8032f3f4 + 0x428, 0xC);
+
+        sound = (u32*)DAT_8032f3f4;
+        track = (u32*)*(u32*)DAT_8032f3f4;
+        trackCount = (u8)*((u8*)DAT_8032f3f4 + 0x491);
+        i = 0;
+        do {
+            track[0] = sound[i + 0xA];
+            track[0x42] = sound[i + 0x4A];
+            track[0x41] = sound[i + 0x8A];
+            track[9] = sound[i + 0xCA];
+            track += 0x55;
+            i++;
+        } while (--trackCount != 0);
+
+        status = _MusicMidiNoteExecute((RedSoundCONTROL*)DAT_8032f3f4, (RedKeyOnDATA*)DAT_8032f3fc, 1);
+    }
+
+    if ((*(int*)((u8*)DAT_8032f3f0 + 0x470) < 0) && (*(int*)((u8*)DAT_8032f3f0 + 0x904) < 0) &&
+        (*(int*)((u8*)DAT_8032f3f0 + 0xD98) < 0)) {
+        DAT_8032f424 = 0;
+    }
 }
 
 /*
@@ -1847,12 +1914,57 @@ void _SkipMusicEntry()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c6980
+ * PAL Size: 308b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void MusicSkipFunction()
 {
-	// TODO
+    int i;
+    int status;
+    u32 trackCount;
+    u8* sound;
+    u32* track;
+
+    do {
+        DAT_8032f4b8 = (int*)RedNew(0x600);
+        if (DAT_8032f4b8 == 0) {
+            RedSleep(10000);
+        }
+        sound = (u8*)DAT_8032f3f0;
+    } while (DAT_8032f4b8 == 0);
+
+    memset(DAT_8032f4b8, 0, 0x600);
+    status = _MusicMidiNoteSkipExecute((RedSoundCONTROL*)((u8*)DAT_8032f3f0 + 0x928), (RedKeyOnDATA*)DAT_8032f4b8, 1);
+
+    while (true) {
+        if ((status != 0) || ((((u32*)sound)[0x365] & 1) == 0)) {
+            break;
+        }
+
+        *(s16*)(sound + 0xDB6) = *(s16*)(sound + 0xD5C);
+        memcpy(sound + 0x934, sound + 0xD60, 0x10);
+        memcpy(sound + 0xD70, sound + 0xD50, 0xC);
+
+        track = (u32*)*(u32*)(sound + 0x928);
+        trackCount = *(u8*)(sound + 0xDB9);
+        i = 0;
+        do {
+            track[0] = *(u32*)(sound + 0x950 + i * 4);
+            track[0x42] = *(u32*)(sound + 0xA50 + i * 4);
+            track[0x41] = *(u32*)(sound + 0xB50 + i * 4);
+            track[9] = *(u32*)(sound + 0xC50 + i * 4);
+            track += 0x55;
+            i++;
+        } while (--trackCount != 0);
+
+        status = _MusicMidiNoteSkipExecute((RedSoundCONTROL*)((u8*)DAT_8032f3f0 + 0x928), (RedKeyOnDATA*)DAT_8032f4b8, 1);
+    }
+
+    DAT_8032f470 = 1;
 }
 
 /*

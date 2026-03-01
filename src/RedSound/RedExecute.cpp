@@ -438,12 +438,22 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c3db4
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void _VoiceEnvelopeCheck()
 {
-	// TODO
+    u32* voiceData = DAT_8032f444;
+    do {
+        if ((((u8*)voiceData)[0x1A] & 7) != 0) {
+            voiceData[0x2C] = 0x8000;
+        }
+        voiceData += 0x30;
+    } while (voiceData < DAT_8032f444 + 0xC00);
 }
 
 /*
@@ -1011,12 +1021,47 @@ void SetVoiceSwitch(RedTrackDATA* track, int voiceSwitch)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c4da0
+ * PAL Size: 188b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _AdsrStart(RedVoiceDATA*)
+void _AdsrStart(RedVoiceDATA* voice)
 {
-	// TODO
+    int* voiceData = (int*)voice;
+    int envState = 0;
+    u16 envFrames = 0;
+    u8 envTarget = ((u8*)voiceData)[0x58];
+    u8 startLevel = envTarget;
+
+    do {
+        startLevel = envTarget;
+        envFrames = *(u16*)((u8*)voiceData + 0x50 + envState * 2);
+        envTarget = *(((u8*)voiceData + 0x59) + envState);
+        if (envFrames != 0) {
+            break;
+        }
+        envState += 1;
+    } while (envState < 3);
+
+    voiceData[0x17] = envState;
+    voiceData[0x18] = envFrames;
+
+    if (envTarget != 0) {
+        envTarget = ((envTarget + 1) * 0x100 - 1) * 0x1000;
+    }
+
+    if (envFrames == 0) {
+        voiceData[0x2B] = envTarget;
+    } else {
+        if (startLevel != 0) {
+            startLevel = ((startLevel + 1) * 0x100 - 1) * 0x1000;
+        }
+        voiceData[0x2B] = startLevel;
+        voiceData[0x19] = ((int)(envTarget | 0x800) - (int)startLevel) / (int)envFrames;
+    }
 }
 
 /*

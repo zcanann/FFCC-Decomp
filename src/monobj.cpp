@@ -551,12 +551,59 @@ void CGMonObj::setActionParam(int state)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80119278
+ * PAL Size: 432b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::onCancelStat(int)
+void CGMonObj::onCancelStat(int state)
 {
-	// TODO
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+
+	__ptmf_scall(this, mon + 0x708);
+
+	switch (*reinterpret_cast<int*>(mon + 0x520)) {
+	case 0x16:
+		mon[0x6B9] = 0;
+		object->SetAnimSlot(0, 0);
+		object->SetAnimSlot(1, 1);
+		object->SetAnimSlot(4, 4);
+		object->SetAnimSlot(6, 6);
+		break;
+
+	case 0x17:
+		mon[0x6B9] = 1;
+		object->SetAnimSlot(0x28, 0);
+		object->SetAnimSlot(0x29, 1);
+		object->SetAnimSlot(0x2A, 4);
+		object->SetAnimSlot(0x2B, 6);
+		break;
+
+	case 0x18:
+		mon[0x6BE] = 1;
+		object->SetAnimSlot(0, 0);
+		object->SetAnimSlot(4, 4);
+		object->m_bgColMask = (object->m_bgColMask | 0x50000) & 0xFFFFFFF7;
+		object->m_displayFlags &= 0xFFFFFFEF;
+		break;
+
+	case 0x1D:
+		object->CancelMove(1);
+		break;
+
+	case 0x21:
+		*reinterpret_cast<int*>(SoundBuffer_1248_ + 4) = 0;
+		memset(mon + 0x70C, 0, 0x34);
+		if ((*reinterpret_cast<unsigned int*>(mon + 0x710) & 2) == 0) {
+			__ptmf_scall(this, mon + 0x708);
+		}
+		break;
+	}
+
+	reinterpret_cast<CGCharaObj*>(this)->onCancelStat(state);
 }
 
 /*

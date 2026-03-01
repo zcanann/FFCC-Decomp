@@ -1,5 +1,21 @@
 #include "ffcc/partyobj.h"
 #include "ffcc/gobjwork.h"
+#include "ffcc/map.h"
+#include "ffcc/maphit.h"
+
+#include <math.h>
+
+extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, CMapCylinder*, Vec*, unsigned int);
+extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
+extern "C" void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
+
+extern float FLOAT_80331a78;
+extern float FLOAT_80331a9c;
+extern float FLOAT_80331aa0;
+extern float FLOAT_80331ac4;
+extern float FLOAT_80331ac8;
+extern float FLOAT_80331acc;
+extern float FLOAT_80331ad0;
 
 /*
  * --INFO--
@@ -368,12 +384,60 @@ void CGPartyObj::checkTargetParticle()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011E870
+ * PAL Size: 612b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::moveCenterTargetParticle()
 {
-	// TODO
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	int step = *reinterpret_cast<int*>(self + 0x530);
+
+	if (step >= 5) {
+		return;
+	}
+
+	float wave = static_cast<float>(sin(FLOAT_80331ac8 * ((float)(step + 1) / FLOAT_80331ac4)));
+
+	Vec centerPos = *reinterpret_cast<Vec*>(self + 0x678);
+	Vec targetPos = *reinterpret_cast<Vec*>(self + 0x66C);
+	Vec toTarget;
+	Vec movement;
+	Vec hitPos;
+	Vec moveVec = {FLOAT_80331a78, FLOAT_80331acc, FLOAT_80331a78};
+	Vec yOffset = {FLOAT_80331a78, FLOAT_80331ad0, FLOAT_80331a78};
+	Vec hitNormal;
+
+	PSVECSubtract(&targetPos, &centerPos, &toTarget);
+	PSVECScale(&toTarget, &movement, wave);
+	PSVECAdd(&centerPos, &movement, &hitPos);
+
+	CMapCylinder hitCylinder;
+	PSVECAdd(&hitPos, &yOffset, &hitCylinder.m_bottom);
+	hitCylinder.m_direction = moveVec;
+	hitCylinder.m_radius = FLOAT_80331a78;
+	hitCylinder.m_height = FLOAT_80331aa0;
+	hitCylinder.m_top.x = FLOAT_80331a9c;
+	hitCylinder.m_top.y = FLOAT_80331a9c;
+	hitCylinder.m_top.z = FLOAT_80331a9c;
+	hitCylinder.m_direction2.x = FLOAT_80331aa0;
+	hitCylinder.m_direction2.y = FLOAT_80331aa0;
+	hitCylinder.m_direction2.z = FLOAT_80331aa0;
+
+	if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &hitCylinder, &moveVec, 0x30) != 0) {
+		void* hitObj = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22A88);
+		CalcHitPosition__7CMapObjFP3Vec(hitObj, &hitPos);
+		GetHitFaceNormal__7CMapObjFP3Vec(hitObj, &hitNormal);
+
+		unsigned char* work = reinterpret_cast<unsigned char*>(m_scriptHandle);
+		*reinterpret_cast<Vec*>(work + 0xBB8) = hitNormal;
+	}
+
+	unsigned char* work = reinterpret_cast<unsigned char*>(m_scriptHandle);
+	*reinterpret_cast<Vec*>(work + 0xBAC) = hitPos;
 }
 
 /*

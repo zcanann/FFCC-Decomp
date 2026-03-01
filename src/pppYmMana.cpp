@@ -14,11 +14,14 @@ extern float FLOAT_80330e48;
 extern float FLOAT_80330e4c;
 extern float FLOAT_80330e58;
 extern float FLOAT_80330e5c;
+extern float FLOAT_80330e60;
+extern float FLOAT_80330e64;
 extern float FLOAT_80330e6c;
 extern float FLOAT_80330e68;
 extern float FLOAT_80330eb8;
 extern float FLOAT_80330ec0;
 extern double DOUBLE_80330e70;
+extern char DAT_80330e50[];
 extern char DAT_80330e88[];
 extern char DAT_80330e90[];
 extern char DAT_80330e98[];
@@ -26,6 +29,7 @@ extern char DAT_80330ea0[];
 extern char DAT_80330ea8[];
 extern char DAT_80330ebc[];
 extern char MaterialMan[];
+extern char DAT_8032ec70[];
 extern int DAT_8032ed70;
 
 extern struct {
@@ -58,6 +62,9 @@ void InitTexObj__8CTextureFv(void*);
 void genParaboloidMap__FPvPUlUs9_GXVtxFmt(void*, unsigned long*, unsigned short, GXVtxFmt);
 void DispCharaParts__8CGObjectFi(CGObject*, int);
 void _WaitDrawDone__8CGraphicFPci(CGraphic*, char*, int);
+int IsHasDrawFmtDL__5CUtilFUc(void*, unsigned char);
+void ConvI2FVector__5CUtilFR3Vec6S16Vecl(void*, Vec*, S16Vec*, unsigned long);
+void ConvF2IVector2d__5CUtilFR8S16Vec2d5Vec2dl(void*, S16Vec2d*, Vec2d*, long);
 }
 
 /*
@@ -1192,10 +1199,147 @@ extern "C" void CalcWaterReflectionVector__FP3VecP3VecP3Vecl3VecPA4_fP8_GXColorP
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800d4c7c
+ * PAL Size: 1120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CalcReflectionVector2(Vec*, S16Vec*, S16Vec*, long, unsigned long, unsigned long, float (*) [4], void*, unsigned long, _GXColor*, S16Vec2d*, S16Vec2d*, CChara::CNode*, PYmMana*, VYmMana*)
+void CalcReflectionVector2(
+    Vec* reflectionVec,
+    S16Vec* positions,
+    S16Vec* normals,
+    long count,
+    unsigned long posScale,
+    unsigned long normalScale,
+    float (*matrix)[4],
+    void* displayList,
+    unsigned long displayListSize,
+    _GXColor* color,
+    S16Vec2d* texCoordA,
+    S16Vec2d* texCoordB,
+    CChara::CNode* node,
+    PYmMana*,
+    VYmMana*)
 {
-	// TODO
+    Vec cameraPos;
+    Vec nodePos;
+    Vec matrixPos;
+    Vec worldPos;
+    Vec position;
+    Vec normal;
+    Vec eyeToPos;
+    Vec2d uv;
+    Mtx matrixCopy;
+    Mtx nodeOffsetMtx;
+    Mtx nodeRotMtx;
+    Mtx workMtx;
+    Mtx rotateMtx;
+    u16* dl = (u16*)displayList;
+    u16* dlEnd = (u16*)((u8*)displayList + displayListSize);
+    const double zero = (double)FLOAT_80330e4c;
+    const double denomBias = (double)FLOAT_80330e58;
+    const double half = (double)FLOAT_80330e5c;
+    const double warp = (double)FLOAT_80330e60;
+    const double scale = (double)FLOAT_80330e64;
+    char* compareName = (char*)&Game + 0xC7F4;
+
+    cameraPos.x = CameraPcs._224_4_;
+    cameraPos.y = CameraPcs._228_4_;
+    cameraPos.z = CameraPcs._232_4_;
+
+    PSMTXCopy(matrix, matrixCopy);
+    PSMTXCopy((float (*)[4])((u8*)node + 0x14), nodeOffsetMtx);
+    PSMTXCopy((float (*)[4])((u8*)node + 0x6C), workMtx);
+
+    nodePos.x = workMtx[0][3];
+    nodePos.y = workMtx[1][3];
+    nodePos.z = workMtx[2][3];
+
+    matrixPos.x = matrixCopy[0][3];
+    matrixPos.y = matrixCopy[1][3];
+    matrixPos.z = matrixCopy[2][3];
+    PSVECAdd(&nodePos, &matrixPos, &worldPos);
+
+    PSMTXCopy(workMtx, nodeRotMtx);
+    PSMTXRotRad(rotateMtx, 'y', FLOAT_80330e48);
+    nodeRotMtx[0][3] = worldPos.x;
+    nodeRotMtx[1][3] = worldPos.y;
+    nodeRotMtx[2][3] = worldPos.z;
+
+    PSMTXCopy(nodeRotMtx, workMtx);
+    workMtx[0][3] = FLOAT_80330e4c;
+    workMtx[1][3] = FLOAT_80330e4c;
+    workMtx[2][3] = FLOAT_80330e4c;
+
+    while (dl < dlEnd) {
+        u8 drawFmt = *(u8*)dl;
+        u16 itemCount = *(u16*)((u8*)dl + 1);
+        int i;
+
+        if (IsHasDrawFmtDL__5CUtilFUc((void*)DAT_8032ec70, drawFmt) == 0) {
+            break;
+        }
+
+        dl = (u16*)((u8*)dl + 3);
+        for (i = 0; i < itemCount; i++) {
+            u16 posIndex = dl[0];
+            u16 normalIndex = dl[1];
+            u16* next = dl + 4;
+            float denom;
+            double uVal;
+            double vVal;
+            u8* colorBytes = (u8*)&color[posIndex];
+
+            if ((drawFmt & 7) == 2) {
+                next = dl + 5;
+            }
+
+            ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)DAT_8032ec70, &position, &positions[posIndex], posScale);
+            ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)DAT_8032ec70, &normal, &normals[normalIndex], normalScale);
+            PSMTXMultVec(nodeRotMtx, &position, &position);
+            PSMTXMultVec(workMtx, &normal, &normal);
+
+            PSVECSubtract(&position, &cameraPos, &eyeToPos);
+            C_VECReflect(&eyeToPos, &normal, &reflectionVec[posIndex]);
+
+            if (strcmp(DAT_80330e50, compareName) == 0) {
+                PSMTXMultVec(rotateMtx, &reflectionVec[posIndex], &reflectionVec[posIndex]);
+            }
+
+            if ((double)reflectionVec[posIndex].z < zero) {
+                colorBytes[0] = 0;
+                colorBytes[1] = 0;
+                colorBytes[2] = 0;
+                colorBytes[3] = 0;
+            } else {
+                colorBytes[0] = 0xFF;
+                colorBytes[1] = 0xFF;
+                colorBytes[2] = 0xFF;
+                colorBytes[3] = 0xFF;
+            }
+
+            denom = (float)(denomBias + (double)reflectionVec[posIndex].z);
+            uVal = (double)(float)((double)(-reflectionVec[posIndex].x / denom) * half + half);
+            vVal = (double)(float)((double)(-reflectionVec[posIndex].y / denom) * half + half);
+            uv.x = -(float)(scale * (double)(float)(warp * (double)(float)(uVal - half) - uVal) - uVal);
+            uv.y = -(float)(scale * (double)(float)(warp * (double)(float)(vVal - half) - vVal) - vVal);
+            ConvF2IVector2d__5CUtilFR8S16Vec2d5Vec2dl((void*)DAT_8032ec70, &texCoordA[posIndex], &uv, 12);
+
+            denom = (float)(denomBias - (double)reflectionVec[posIndex].z);
+            uVal = (double)(float)((double)(-reflectionVec[posIndex].x / denom) * half + half);
+            vVal = (double)(float)((double)(-reflectionVec[posIndex].y / denom) * half + half);
+            uv.x = -(float)(scale * (double)(float)(warp * (double)(float)(uVal - half) - uVal) - uVal);
+            uv.y = -(float)(scale * (double)(float)(warp * (double)(float)(vVal - half) - vVal) - vVal);
+            ConvF2IVector2d__5CUtilFR8S16Vec2d5Vec2dl((void*)DAT_8032ec70, &texCoordB[posIndex], &uv, 12);
+
+            dl = next;
+        }
+    }
+
+    DCFlushRange(texCoordA, count << 2);
+    DCFlushRange(texCoordB, count << 2);
+    DCFlushRange(color, count << 2);
+    DCFlushRange(reflectionVec, count * 0xC);
 }

@@ -574,12 +574,52 @@ void CRedEntry::ReentryWaveData(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c1594
+ * PAL Size: 408b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedEntry::WaveHistoryManager(int, int)
+void CRedEntry::WaveHistoryManager(int mode, int waveNo)
 {
-	// TODO
+	int* entry = (int*)this;
+
+	if (mode == 0) {
+		bool inUse = false;
+		if ((*(short*)((int)DAT_8032f3f0 + 0x48e) != 0) && (*(int*)((int)DAT_8032f3f0 + 0x47c) == waveNo)) {
+			inUse = true;
+		}
+
+		if ((*(short*)((int)DAT_8032f3f0 + 0x922) != 0) && (*(int*)((int)DAT_8032f3f0 + 0x910) == waveNo)) {
+			inUse = true;
+		}
+
+		if (!inUse) {
+			int* track = (int*)*(int*)((int)DAT_8032f3f0 + 0xdbc);
+			do {
+				if ((*track != 0) && (track[6] != 0) && (*(short*)(track[6] + 2) == waveNo)) {
+					inUse = true;
+					break;
+				}
+				track += 0x55;
+			} while (track < (int*)(*(int*)((int)DAT_8032f3f0 + 0xdbc) + 0x2a80));
+		}
+
+		if (!inUse) {
+			int index = SearchWaveSequence(waveNo);
+			if ((0xf < index) && (*(int*)(entry[0] + index * 0x10 + 4) == 0)) {
+				WaveHistoryAdd(0x14);
+				*(int*)(entry[0] + index * 0x10 + 4) = 0x14;
+			}
+		}
+	} else {
+		int index = SearchWaveSequence(waveNo);
+		if ((0xf < index) && (*(int*)(entry[0] + index * 0x10 + 4) != 0)) {
+			WaveHistoryDelete(*(int*)(entry[0] + index * 0x10 + 4));
+			*(int*)(entry[0] + index * 0x10 + 4) = 0;
+		}
+	}
 }
 
 /*

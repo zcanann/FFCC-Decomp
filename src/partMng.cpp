@@ -48,6 +48,7 @@ extern unsigned char MapPcs[];
 extern CPartMng PartMng;
 extern PPPCREATEPARAM g_dcp;
 static char s_partMng_cpp_801d8230[] = "partMng.cpp";
+static char s_pppGetFreePppDataMngSt_CAN_NOT_ALLOC[] = "pppGetFreePppDataMngSt CAN NOT ALLOC!!\n";
 static char s_CheckSum_ERROR_code_0x_x____801d82f0[] = "CheckSum ERROR code[0x%x]!!!";
 
 struct CPtrArrayBare {
@@ -1378,9 +1379,23 @@ void CPartMng::pppLoadPdt(const char*, int, int, void*, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppGetFreeDataMng()
+int CPartMng::pppGetFreeDataMng()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    int index = 8;
+    _pppDataHead** pdtPtr = reinterpret_cast<_pppDataHead**>(self + 0x22E18 + (index * 0x38));
+
+    for (int i = 0; i < 0x18; i++, index++, pdtPtr = reinterpret_cast<_pppDataHead**>(reinterpret_cast<char*>(pdtPtr) + 0x38)) {
+        if (*pdtPtr == 0) {
+            return index;
+        }
+    }
+
+    if (System.m_execParam != 0) {
+        System.Printf(s_pppGetFreePppDataMngSt_CAN_NOT_ALLOC);
+    }
+    OSPanic(s_partMng_cpp_801d8230, 0xD74, "");
+    return -1;
 }
 
 /*

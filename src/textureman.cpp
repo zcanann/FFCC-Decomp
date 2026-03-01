@@ -1031,10 +1031,14 @@ void CTexture::SetTlutColor(int index, _GXColor color)
  */
 void CTexture::SetExternalTlutColor(void* tlutData, int tlutOffset, int index, _GXColor& color)
 {
-    unsigned short color0 = static_cast<unsigned short>(color.r | (color.g << 8));
-    unsigned short color1 = static_cast<unsigned short>(color.b | (color.a << 8));
-    U16At(tlutData, index * 2) = color0;
-    U16At(tlutData, (index + tlutOffset) * 2) = color1;
+    unsigned int packedColor;
+    unsigned char* packedBytes = reinterpret_cast<unsigned char*>(&packedColor);
+    packedBytes[3] = color.r;
+    packedBytes[2] = color.g;
+    packedBytes[1] = color.b;
+    packedBytes[0] = color.a;
+    U16At(tlutData, (index + tlutOffset) * 2) = static_cast<unsigned short>(packedColor >> 16);
+    U16At(tlutData, index * 2) = static_cast<unsigned short>(packedColor);
 }
 
 /*

@@ -11,6 +11,7 @@
 
 extern unsigned char Game[];
 extern CMath Math;
+extern char* PTR_DAT_8032e854;
 CMemoryCardMan MemoryCardMan;
 
 extern "C" void SaveScript__5CGameFPc(void* game, char* scriptData);
@@ -300,7 +301,7 @@ int CMemoryCardMan::McUnmount(int chan)
  */
 int CMemoryCardMan::McOpen(int chan)
 { 
-	m_result = CARDOpen(chan, (const char*)nullptr /* PTR_DAT_8032e854 */, &m_fileInfo);
+	m_result = CARDOpen(chan, PTR_DAT_8032e854, &m_fileInfo);
 	m_opDoneFlag = 1;
 	m_state = 3;
 

@@ -1350,18 +1350,18 @@ void CRedDriver::End()
  */
 int CRedDriver::GetProgramTime()
 {
-    int iVar1;
-    int iVar2;
-    int* piVar3;
+    int sum;
+    int* p;
+    int* end;
 
-    iVar2 = 0;
-    piVar3 = DAT_8032f3cc;
+    sum = 0;
+    p = DAT_8032f3cc;
+    end = p + 100;
     do {
-        iVar1 = *piVar3;
-        piVar3 = piVar3 + 1;
-        iVar2 = iVar2 + iVar1;
-    } while (piVar3 < DAT_8032f3cc + 100);
-    return iVar2;
+        sum += *p;
+        p++;
+    } while (p < end);
+    return sum;
 }
 
 /*

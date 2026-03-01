@@ -6,11 +6,13 @@ extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::C
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern "C" float RandF__5CMathFv(CMath*);
 extern s32 DAT_8032ed70;
-extern float FLOAT_80330448;
+extern float lbl_80330448;
 extern float FLOAT_80330458;
 extern float FLOAT_8033045c;
 extern float FLOAT_80330460;
 extern CMath Math;
+
+#define FLOAT_80330448 lbl_80330448
 
 static Mtx g_matUnit;
 
@@ -375,57 +377,60 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* par
 void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMegaBirthOffsets* offsets)
 {
 	bool hasRequiredMemory;
-	u8* payload = (u8*)particleData;
-	s32 colorOffset = offsets->m_serializedDataOffsets[1];
-	VRyjMegaBirth* work =
-		(VRyjMegaBirth*)((u8*)pObject + 8 + offsets->m_serializedDataOffsets[2]);
+	u8* particleDataBytes;
+	s32 colorOffset;
+	VRyjMegaBirth* work;
 
-	if (work->m_particleBlock == 0)
+	particleDataBytes = (u8*)particleData;
+	colorOffset = offsets->m_serializedDataOffsets[1];
+	work = (VRyjMegaBirth*)((u8*)pObject + 0x80 + offsets->m_serializedDataOffsets[2]);
+
+	if (work->m_particleBlock == NULL)
 	{
-		work->m_numParticles = *(u16*)(payload + 0xC);
-
+		work->m_numParticles = *(u16*)(particleDataBytes + 0x20);
 		work->m_particleBlock = (Vec*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
 			work->m_numParticles * 0x60, pppEnvStPtr->m_stagePtr, s_pppRyjMegaBirth_cpp, 0x262);
-		if (work->m_particleBlock != 0)
+		if (work->m_particleBlock != NULL)
 		{
 			memset(work->m_particleBlock, 0, work->m_numParticles * 0x60);
 		}
 
-		if ((payload[0xD8] == 1) || (payload[0xD8] == 2))
+		if ((particleDataBytes[0xEC] == 1) || (particleDataBytes[0xEC] == 2))
 		{
 			work->m_worldMatrixBlock = (PARTICLE_WMAT*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
 				work->m_numParticles * 0x30, pppEnvStPtr->m_stagePtr, s_pppRyjMegaBirth_cpp, 0x269);
-			if (work->m_worldMatrixBlock != 0)
+			if (work->m_worldMatrixBlock != NULL)
 			{
 				memset(work->m_worldMatrixBlock, 0, work->m_numParticles * 0x30);
 			}
 		}
 
-		if (payload[0xD5] != 0)
+		if (particleDataBytes[0xE9] != 0)
 		{
 			work->m_colorBlock = (_PARTICLE_COLOR*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
 				work->m_numParticles << 5, pppEnvStPtr->m_stagePtr, s_pppRyjMegaBirth_cpp, 0x271);
-			if (work->m_colorBlock != 0)
+			if (work->m_colorBlock != NULL)
 			{
 				memset(work->m_colorBlock, 0, work->m_numParticles << 5);
 			}
 		}
 
-		work->m_accelerationAxis.x = *(float*)(payload + 0x9C);
-		work->m_accelerationAxis.y = *(float*)(payload + 0xA0);
-		work->m_accelerationAxis.z = *(float*)(payload + 0xA4);
+		work->m_accelerationAxis.x = *(float*)(particleDataBytes + 0xB0);
+		work->m_accelerationAxis.y = *(float*)(particleDataBytes + 0xB4);
+		work->m_accelerationAxis.z = *(float*)(particleDataBytes + 0xB8);
 		PSVECNormalize(&work->m_accelerationAxis, &work->m_accelerationAxis);
 	}
 
-	if (work->m_particleBlock == 0)
+	if (work->m_particleBlock == NULL)
 	{
 		hasRequiredMemory = false;
 	}
-	else if (((payload[0xD8] == 1) || (payload[0xD8] == 2)) && (work->m_worldMatrixBlock == 0))
+	else if (((particleDataBytes[0xEC] == 1) || (particleDataBytes[0xEC] == 2)) &&
+	         (work->m_worldMatrixBlock == NULL))
 	{
 		hasRequiredMemory = false;
 	}
-	else if ((payload[0xD5] == 0) || (work->m_colorBlock != 0))
+	else if ((particleDataBytes[0xE9] == 0) || (work->m_colorBlock != NULL))
 	{
 		hasRequiredMemory = true;
 	}
@@ -436,7 +441,7 @@ void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMega
 
 	if (hasRequiredMemory)
 	{
-		switch (payload[0x16])
+		switch (particleDataBytes[0x2A])
 		{
 		default:
 			PSMTXCopy(pppMngStPtr->m_matrix.value, work->m_worldMatrix);
@@ -456,8 +461,7 @@ void pppRyjMegaBirth(_pppPObject* pObject, PRyjMegaBirth* particleData, PRyjMega
 			break;
 		}
 
-		calc_particle(
-			pObject, work, particleData, (VColor*)((u8*)pObject + 8 + colorOffset));
+		calc_particle(pObject, work, particleData, (VColor*)((u8*)pObject + 0x80 + colorOffset));
 	}
 }
 

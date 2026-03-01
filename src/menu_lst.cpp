@@ -1,4 +1,5 @@
 #include "ffcc/menu_lst.h"
+#include "ffcc/color.h"
 #include "ffcc/fontman.h"
 #include "ffcc/pad.h"
 #include "ffcc/sound.h"
@@ -514,8 +515,8 @@ void CMenuPcs::MLstDraw()
 
 	item = (short*)(listBase + 8);
 	for (int i = 0; i < itemCount; i++) {
-		GXColor color = {0xff, 0xff, 0xff, (unsigned char)(255.0f * *(float*)(item + 8))};
-		SetColor__5CFontF8_GXColor(font, &color);
+		CColor color(0xff, 0xff, 0xff, (unsigned char)(255.0f * *(float*)(item + 8)));
+		SetColor__5CFontF8_GXColor(font, &color.color);
 
 		const char* text = GetMenuStr__8CMenuPcsFi(this, i + 0x2e);
 		GetWidth__5CFontFPc(font, text);
@@ -542,8 +543,8 @@ void CMenuPcs::MLstDraw()
 	}
 
 	DrawInit__8CMenuPcsFv(this);
-	GXColor helpColor = {0xff, 0xff, 0xff, (unsigned char)(255.0f * *(float*)(listBase + 0x18))};
-	DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(this, cursor + 0x25c, font, 0, -20, helpColor, 0, 1.0f, 0.0f);
+	CColor helpColor(0xff, 0xff, 0xff, (unsigned char)(255.0f * *(float*)(listBase + 0x18)));
+	DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(this, cursor + 0x25c, font, 0, -20, helpColor.color, 0, 1.0f, 0.0f);
 }
 
 /*

@@ -10,7 +10,7 @@
 extern int lbl_8032ED70;
 extern float lbl_80330500;
 extern float lbl_80330504;
-extern _pppMngSt* pppMngStPtr;
+extern unsigned char* lbl_8032ED50;
 extern _pppEnvSt* lbl_8032ED54;
 extern _pppEnvSt* pppEnvStPtr;
 extern Mtx ppvWorldMatrix;
@@ -110,21 +110,19 @@ void pppKeShpTail2X(_pppPObject* obj, UnkB* param_2, UnkC* param_3)
             pppFMATRIX outMatrix;
 
             partMatrix = tailObj->m_obj.m_localMatrix;
-            ownerMatrix = pppMngStPtr->m_matrix;
+            ownerMatrix = ((_pppMngSt*)lbl_8032ED50)->m_matrix;
             pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&outMatrix, &ownerMatrix, &partMatrix);
             pos.x = outMatrix.value[0][3];
             pos.y = outMatrix.value[1][3];
             pos.z = outMatrix.value[2][3];
         }
 
-        u8 count = work->m_count;
+        int count = work->m_count;
         Vec* history = work->m_posHistory;
-        if (count != 0) {
-            do {
-                pppCopyVector__FR3Vec3Vec(history, &pos);
-                history++;
-                count--;
-            } while (count != 0);
+        while (count != 0) {
+            pppCopyVector__FR3Vec3Vec(history, &pos);
+            history++;
+            count--;
         }
     }
 
@@ -143,14 +141,14 @@ void pppKeShpTail2X(_pppPObject* obj, UnkB* param_2, UnkC* param_3)
         pppFMATRIX outMatrix;
 
         partMatrix = tailObj->m_obj.m_localMatrix;
-        ownerMatrix = pppMngStPtr->m_matrix;
+        ownerMatrix = ((_pppMngSt*)lbl_8032ED50)->m_matrix;
         pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&outMatrix, &ownerMatrix, &partMatrix);
         pos.x = outMatrix.value[0][3];
         pos.y = outMatrix.value[1][3];
         pos.z = outMatrix.value[2][3];
     }
 
-    pppCopyVector__FR3Vec3Vec((Vec*)((u8*)work + (u32)work->m_head * 0xc + 8), &pos);
+    pppCopyVector__FR3Vec3Vec(&work->m_posHistory[work->m_head], &pos);
 
     {
         long* shape = *(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);

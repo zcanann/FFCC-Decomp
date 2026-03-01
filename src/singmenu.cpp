@@ -152,7 +152,14 @@ extern "C" unsigned int MLstCtrl__8CMenuPcsFv(CMenuPcs*);
 extern "C" unsigned int MLstClose__8CMenuPcsFv(CMenuPcs*);
 extern "C" void MLstDraw__8CMenuPcsFv(CMenuPcs*);
 extern "C" void CalcHeart__8CMesMenuFv(void*);
+extern "C" void DrawHeart__8CMesMenuFffff(void*, float, float, float, float);
+extern "C" double sin(double);
 
+extern float FLOAT_80332918;
+extern float FLOAT_8033291c;
+extern float FLOAT_80332920;
+extern float FLOAT_80332924;
+extern float FLOAT_80332930;
 extern float FLOAT_8033292c;
 extern float FLOAT_80332928;
 extern float FLOAT_80332934;
@@ -1812,12 +1819,50 @@ void CMenuPcs::CalcSingLife()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80145738
+ * PAL Size: 420b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawSingLife()
 {
-	// TODO
+    int timer = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x874);
+    if (timer < 0) {
+        return;
+    }
+
+    float y = FLOAT_8033291c;
+    if (timer < 10) {
+        int clamped = timer;
+        if (clamped < 0) {
+            clamped = 0;
+        } else if (clamped > 10) {
+            clamped = 10;
+        }
+        y = static_cast<float>(static_cast<double>(FLOAT_80332928) *
+                                   sin(static_cast<double>(FLOAT_80332920 * FLOAT_80332924 * static_cast<float>(clamped))) +
+                               static_cast<double>(FLOAT_8033291c));
+    } else if (timer > 0x27) {
+        int bounceTimer = 10 - (timer - 0x28);
+        int clamped = bounceTimer;
+        if (clamped < 0) {
+            clamped = 0;
+        } else if (clamped > 10) {
+            clamped = 10;
+        }
+        y = static_cast<float>(static_cast<double>(FLOAT_80332928) *
+                                   sin(static_cast<double>(FLOAT_80332920 * FLOAT_80332924 * static_cast<float>(clamped))) +
+                               static_cast<double>(FLOAT_8033291c));
+    } else {
+        y = FLOAT_8033292c;
+    }
+
+    int halfHearts = static_cast<int>(*reinterpret_cast<u16*>(Game.game.m_scriptFoodBase[0] + 0x1A) >> 1);
+    float x = FLOAT_80332918 + static_cast<float>(((8 - halfHearts) * 0x18) / 2);
+    DrawHeart__8CMesMenuFffff(*reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0x268), x, y - FLOAT_80332930,
+                              FLOAT_80332934, FLOAT_80332934);
 }
 
 /*

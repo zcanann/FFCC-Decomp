@@ -1,9 +1,12 @@
 #include "ffcc/p_chara.h"
+#include "ffcc/graphic.h"
 #include "ffcc/memory.h"
+#include "ffcc/partMng.h"
 
 #include <string.h>
 
 extern CMemory Memory;
+extern CPartMng PartMng;
 extern "C" void __dla__FPv(void*);
 extern "C" void __dl__FPv(void*);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
@@ -889,12 +892,91 @@ void CCharaPcs::CHandle::draw(int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 8007435c
+ * PAL Size: 572b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCharaPcs::CHandle::LoadModelASync(int, unsigned long, unsigned long)
+void CCharaPcs::CHandle::LoadModelASync(int charaKind, unsigned long charaNo, unsigned long textureVariant)
 {
-	// TODO
+    if (m_asyncFileHandle != 0)
+	{
+		File.Close(m_asyncFileHandle);
+		m_asyncFileHandle = (CFile::CHandle*)0;
+	}
+
+	m_asyncState = 0;
+	Graphic._WaitDrawDone((char*)"p_chara.cpp", 0x8C9);
+	PartMng.pppDeleteCHandle(this);
+
+	if (m_model != 0)
+	{
+		int* modelRef = reinterpret_cast<int*>(m_model);
+		int refCount = modelRef[1] - 1;
+		modelRef[1] = refCount;
+		if (refCount == 0)
+		{
+			(*(void (**)(void*, int))(*modelRef + 8))(m_model, 1);
+		}
+		m_model = (CChara::CModel*)0;
+	}
+
+	if (m_textureSet != 0)
+	{
+		int* textureRef = reinterpret_cast<int*>(m_textureSet);
+		int refCount = textureRef[1] - 1;
+		textureRef[1] = refCount;
+		if (refCount == 0)
+		{
+			(*(void (**)(void*, int))(*textureRef + 8))(m_textureSet, 1);
+		}
+		m_textureSet = (CTextureSet*)0;
+	}
+
+	if (m_modelLoadRef != 0)
+	{
+		int* modelLoadRef = reinterpret_cast<int*>(m_modelLoadRef);
+		int refCount = modelLoadRef[1] - 1;
+		modelLoadRef[1] = refCount;
+		if (refCount == 0)
+		{
+			(*(void (**)(void*, int))(*modelLoadRef + 8))(m_modelLoadRef, 1);
+		}
+		m_modelLoadRef = (CRef*)0;
+	}
+
+	if (m_texLoadRef != 0)
+	{
+		int* texLoadRef = reinterpret_cast<int*>(m_texLoadRef);
+		int refCount = texLoadRef[1] - 1;
+		texLoadRef[1] = refCount;
+		if (refCount == 0)
+		{
+			(*(void (**)(void*, int))(*texLoadRef + 8))(m_texLoadRef, 1);
+		}
+		m_texLoadRef = (CRef*)0;
+	}
+
+	if (m_pdtLoadRef != 0)
+	{
+		int* pdtLoadRef = reinterpret_cast<int*>(m_pdtLoadRef);
+		int refCount = pdtLoadRef[1] - 1;
+		pdtLoadRef[1] = refCount;
+		if (refCount == 0)
+		{
+			(*(void (**)(void*, int))(*pdtLoadRef + 8))(m_pdtLoadRef, 1);
+		}
+		m_pdtLoadRef = (CRef*)0;
+	}
+
+	CharaPcs.releaseUnuseLoadModel(0);
+	m_asyncCharaKind = charaKind;
+	m_asyncCharaNo = static_cast<int>(charaNo);
+	m_asyncTextureVariant = static_cast<int>(textureVariant);
+	m_asyncState = 1;
+	loadModelASyncFrame();
 }
 
 /*

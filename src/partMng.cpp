@@ -30,6 +30,7 @@ extern "C" unsigned char DAT_8032ed68;
 extern "C" int DAT_8032ed6c;
 extern "C" unsigned char DAT_8032ed90;
 extern "C" unsigned char DAT_8032ed91;
+extern unsigned char CameraPcs[];
 extern "C" void __ct__9_pppMngStFv(_pppMngSt* pppMngSt);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
 extern "C" void pppSetBlendMode__FUc(unsigned char);
@@ -47,6 +48,7 @@ extern unsigned char MapPcs[];
 extern CPartMng PartMng;
 extern PPPCREATEPARAM g_dcp;
 static char s_partMng_cpp_801d8230[] = "partMng.cpp";
+static char s_pppGetFreePppDataMngSt_CAN_NOT_ALLOC[] = "pppGetFreePppDataMngSt CAN NOT ALLOC!!\n";
 static char s_CheckSum_ERROR_code_0x_x____801d82f0[] = "CheckSum ERROR code[0x%x]!!!";
 
 struct CPtrArrayBare {
@@ -1083,12 +1085,20 @@ void pppSetProjection()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005a8c0
+ * PAL Size: 108b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartMng::pppSetRendMatrix()
 {
-	// TODO
+    PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcs + 0x48), ppvScreenMatrix);
+    PSMTXCopy(*reinterpret_cast<Mtx*>(CameraPcs + 4), ppvCameraMatrix0);
+    FLOAT_8032ed58 = ppvScreenMatrix[2][0];
+    FLOAT_8032ed5c = ppvScreenMatrix[2][1];
+    FLOAT_8032ed60 = ppvScreenMatrix[2][3];
 }
 
 /*
@@ -1369,9 +1379,23 @@ void CPartMng::pppLoadPdt(const char*, int, int, void*, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CPartMng::pppGetFreeDataMng()
+int CPartMng::pppGetFreeDataMng()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    int index = 8;
+    _pppDataHead** pdtPtr = reinterpret_cast<_pppDataHead**>(self + 0x22E18 + (index * 0x38));
+
+    for (int i = 0; i < 0x18; i++, index++, pdtPtr = reinterpret_cast<_pppDataHead**>(reinterpret_cast<char*>(pdtPtr) + 0x38)) {
+        if (*pdtPtr == 0) {
+            return index;
+        }
+    }
+
+    if (System.m_execParam != 0) {
+        System.Printf(s_pppGetFreePppDataMngSt_CAN_NOT_ALLOC);
+    }
+    OSPanic(s_partMng_cpp_801d8230, 0xD74, "");
+    return -1;
 }
 
 /*

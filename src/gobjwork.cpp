@@ -19,9 +19,13 @@ static inline float GetStatusMultiplier(int offset)
 
 extern "C" void __dl__FPv(void*);
 extern "C" int __cntlzw(unsigned int);
+extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+	void*, void*, int, int, int, void*, void*);
+extern "C" int m_tempVar__4CMes[];
 extern "C" void* __vt__8CMonWork[];
 extern "C" void* __vt__12CCaravanWork[];
 extern "C" void* __vt__9CGObjWork[];
+extern unsigned char CFlat[];
 
 /*
  * --INFO--
@@ -348,22 +352,73 @@ void CCaravanWork::CLetterWork::operator= (const CCaravanWork::CLetterWork&)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a23d8
+ * PAL Size: 316b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::FGLetterOpen(int)
+void CCaravanWork::FGLetterOpen(int letterIdx)
 {
-	// TODO
+	int stack[2];
+	unsigned char* letter = m_letter0 + (letterIdx * 0xC);
+	unsigned short* words16 = reinterpret_cast<unsigned short*>(letter);
+	unsigned int* words32 = reinterpret_cast<unsigned int*>(letter);
+
+	stack[0] = (words16[0] >> 2) & 0x1FF;
+	stack[1] = (words32[0] >> 9) & 0x1FF;
+	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+		CFlat, Game.game.m_partyObjArr[m_joybusCaravanId], 2, 0xF, 2, stack, 0);
+
+	m_tempVar__4CMes[0] = words16[2];
+	m_tempVar__4CMes[1] = words16[3];
+	m_tempVar__4CMes[2] = words16[4];
+	m_tempVar__4CMes[3] = words16[5];
+	m_tempVar__4CMes[4] = stack[0];
+	m_tempVar__4CMes[5] = stack[1];
+
+	if (((letter[0] >> 3) & 1) == 0) {
+		m_tempVar__4CMes[6] = words16[1] & 0x1FF;
+		m_tempVar__4CMes[7] = 0;
+	} else {
+		m_tempVar__4CMes[6] = 0;
+		m_tempVar__4CMes[7] = (words16[1] & 0x1FF) * 100;
+	}
+
+	m_tempVar__4CMes[0x20] = m_saveSlot;
+	m_tempVar__4CMes[0x21] = m_partyIndex;
+	m_tempVar__4CMes[0x22] = m_isLoadingFlag;
+	m_tempVar__4CMes[0x23] = m_miscFlags;
+	letter[0] = (letter[0] & 0x7F) | 0x80;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a2330
+ * PAL Size: 168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::FGLetterReply(int, int, int, int)
+void CCaravanWork::FGLetterReply(int letterIdx, int param3, int param4, int param5)
 {
-	// TODO
+	int stack[5];
+	unsigned char* letter = m_letter0 + (letterIdx * 0xC);
+	unsigned short* words16 = reinterpret_cast<unsigned short*>(letter);
+	unsigned int* words32 = reinterpret_cast<unsigned int*>(letter);
+
+	stack[0] = (words16[0] >> 2) & 0x1FF;
+	stack[1] = (words32[0] >> 9) & 0x1FF;
+	stack[2] = param3;
+	stack[3] = param4;
+	stack[4] = param5;
+
+	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+		CFlat, Game.game.m_partyObjArr[m_joybusCaravanId], 2, 0x10, 5, stack, 0);
+
+	letter[0] = (letter[0] & 0xDF) | 0x20;
 }
 
 /*

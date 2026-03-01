@@ -26,6 +26,7 @@ extern "C" void SetPosX__5CFontFf(float, CFont*);
 extern "C" void SetPosY__5CFontFf(float, CFont*);
 extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" int sprintf(char*, const char*, ...);
+extern "C" int __cntlzw(unsigned int);
 
 struct FavoFlatTableEntry
 {
@@ -454,7 +455,7 @@ bool CMenuPcs::FavoOpen()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::FavoCtrl()
+unsigned int CMenuPcs::FavoCtrl()
 {
 	bool activeInput = false;
 	unsigned short press;
@@ -467,6 +468,7 @@ void CMenuPcs::FavoCtrl()
 	if (activeInput) {
 		press = 0;
 	} else {
+		__cntlzw((unsigned int)Pad._448_4_);
 		press = Pad._8_2_;
 	}
 
@@ -492,6 +494,8 @@ void CMenuPcs::FavoCtrl()
 	if (doReset) {
 		FavoInit0();
 	}
+
+	return doReset;
 }
 
 /*

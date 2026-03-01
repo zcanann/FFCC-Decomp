@@ -1822,7 +1822,7 @@ int COctTree::CheckHitCylinder(CMapCylinder* cylinder, Vec* move, unsigned long 
  * JP Address: TODO
  * JP Size: TODO
  */
-int COctTree::CheckHitCylinderNear_r(COctNode* octNode)
+void COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 {
 	bool hit = false;
 	bool axisYOk = false;
@@ -1873,7 +1873,7 @@ int COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 	}
 
 	if (!hit) {
-		return 0;
+		return;
 	}
 
 	if (*reinterpret_cast<unsigned short*>(Ptr(octNode, 0x3E)) != 0) {
@@ -1887,7 +1887,7 @@ int COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 	for (int i = 0; i < 8; i++) {
 		COctNode* child = *reinterpret_cast<COctNode**>(Ptr(octNode, 0x1C + (i * 4)));
 		if (child == 0) {
-			return 0;
+			return;
 		}
 
 		hit = false;
@@ -1974,7 +1974,7 @@ int COctTree::CheckHitCylinderNear_r(COctNode* octNode)
 		}
 	}
 
-	return 0;
+	return;
 }
 
 /*
@@ -1986,7 +1986,7 @@ int COctTree::CheckHitCylinderNear_r(COctNode* octNode)
  * JP Address: TODO
  * JP Size: TODO
  */
-int COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned long flag)
+void COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned long flag)
 {
 	float fVar1;
 	float fVar2;
@@ -2029,7 +2029,7 @@ int COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned l
 		CheckHitCylinderNear_r(*reinterpret_cast<COctNode**>(Ptr(this, 4)));
 	}
 
-	return 0;
+	return;
 }
 
 /*

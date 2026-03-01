@@ -33,6 +33,7 @@ extern "C" void SetPosX__5CFontFf(float, CFont*);
 extern "C" void SetPosY__5CFontFf(float, CFont*);
 extern "C" void SetPosZ__5CFontFf(float, CFont*);
 extern "C" void Draw__5CFontFPc(CFont*, const char*);
+extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(int, int, int, CGObject*, float, void*);
 extern "C" float DAT_8032ec24;
 extern "C" void* DAT_80212a1c[];
 extern "C" void* DAT_80212b30[];
@@ -708,12 +709,107 @@ void CGMonObj::onStatShield()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80117690
+ * PAL Size: 812b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGMonObj::onStatDie()
 {
-	// TODO
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	int subState = *reinterpret_cast<int*>(mon + 0x52C);
+
+	if (subState == 1) {
+		unsigned char* aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+		int subFrame = *reinterpret_cast<int*>(mon + 0x530);
+
+		if ((*reinterpret_cast<unsigned short*>(aiData + 0xFE) & 2) == 0) {
+			if (subFrame != 0) {
+				return;
+			}
+		} else {
+			if (subFrame == 0) {
+				int particleId = *reinterpret_cast<int*>(mon + 0x560);
+				void* classId = object->m_scriptHandle[4];
+				if (classId == reinterpret_cast<void*>(5)) {
+					particleId = 599;
+				} else if (classId == reinterpret_cast<void*>(4)) {
+					particleId = 0x253;
+				} else if (classId == reinterpret_cast<void*>(6)) {
+					particleId = 0x25B;
+				}
+
+				*reinterpret_cast<int*>(mon + 0x560) = particleId;
+				reinterpret_cast<CGCharaObj*>(this)->putParticleFromItem(particleId, 0, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+				reinterpret_cast<CGCharaObj*>(this)->putParticleFromItem(particleId, 1, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+				reinterpret_cast<CGCharaObj*>(this)->putParticleFromItem(particleId, 2, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+				reinterpret_cast<CGCharaObj*>(this)->putParticleFromItem(particleId, 3, *reinterpret_cast<int*>(mon + 0x564), (Vec*)0);
+				return;
+			}
+			if (subFrame != 0x19) {
+				return;
+			}
+		}
+
+		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x231000);
+		*reinterpret_cast<float*>(mon + 0x694) = 0.0f;
+		typedef void (*Virtual90)(CGMonObj*, int, int, int);
+		void** vtable = *reinterpret_cast<void***>(this);
+		reinterpret_cast<Virtual90>(vtable[0x90 / 4])(this, 0, 0, 0);
+		object->m_bgColMask &= 0xFFF6FFFD;
+		reinterpret_cast<CGPrgObj*>(this)->playSe3D(0x17, 0x32, 0x96, 0, (Vec*)0);
+		reinterpret_cast<CGPrgObj*>(this)->putParticle(0x116, 0, object, 20.0f * object->m_attackColRadius, 0);
+		CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(1, 0, 0, object, 0.0f, 0);
+		object->PutDropItem();
+		reinterpret_cast<CGPrgObj*>(this)->changeSubStat(2);
+		return;
+	}
+
+	if (subState == 2) {
+		unsigned short repopDelay = *reinterpret_cast<unsigned short*>(mon + 0x6D6);
+		if ((repopDelay != 0) && (*reinterpret_cast<int*>(mon + 0x530) == static_cast<int>(repopDelay) * 0x1E)) {
+			setRepop(0);
+		}
+		return;
+	}
+
+	if (subState == 0) {
+		if (*reinterpret_cast<int*>(mon + 0x530) == 0) {
+			unsigned char* aiData = reinterpret_cast<unsigned char*>(object->m_scriptHandle[9]);
+			reinterpret_cast<CGPrgObj*>(this)->playSe3D(
+				*reinterpret_cast<unsigned short*>(aiData + 0x190) * 1000 + *reinterpret_cast<unsigned short*>(aiData + 0x192) + 9,
+				0x32,
+				0x96,
+				0,
+				(Vec*)0
+			);
+
+			unsigned short pId = *reinterpret_cast<unsigned short*>(aiData + 0x19E);
+			if (pId != 0xFFFF) {
+				int dataNo = -1;
+				if (object->m_charaModelHandle != nullptr && object->m_charaModelHandle->m_pdtLoadRef != nullptr) {
+					dataNo = reinterpret_cast<int*>(object->m_charaModelHandle->m_pdtLoadRef)[5];
+				}
+				reinterpret_cast<CGPrgObj*>(this)->putParticle(pId | (dataNo << 8), 0, object, 20.0f * object->m_attackColRadius, 0);
+			}
+
+			int option = static_cast<short>(Game.game.m_gameWork.m_optionValue);
+			if (option <= 8 && *reinterpret_cast<short*>(mon + 0x6D6) == 0) {
+				int shift = reinterpret_cast<int>(object->m_scriptHandle[2]);
+				unsigned long long bit = (shift < 64) ? (1ULL << shift) : 0ULL;
+				*reinterpret_cast<unsigned int*>(CFlat + 0x12F4 + option * 8) |= static_cast<unsigned int>(bit);
+				*reinterpret_cast<unsigned int*>(CFlat + 0x12F0 + option * 8) |= static_cast<unsigned int>(bit >> 32);
+			}
+			return;
+		}
+
+		if (reinterpret_cast<CGPrgObj*>(this)->isLoopAnimDirect() != 0) {
+			reinterpret_cast<CGPrgObj*>(this)->changeSubStat(1);
+		}
+	}
 }
 
 /*

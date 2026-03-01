@@ -64,6 +64,8 @@ void CGPrgObj::onDestroy()
  */
 void CGPrgObj::onFrame()
 {
+    unsigned char animFlags;
+
     onFrameAlways();
 
 	if ((m_weaponNodeFlags & 0x8000) != 0) {
@@ -89,19 +91,18 @@ void CGPrgObj::onFrame()
 		onFrameStat();
 		onFramePostCalc();
 
-		if ((m_animFlags & 0x80) != 0) {
+		animFlags = m_animFlags;
+		if ((animFlags & 0x80) != 0) {
 			if (m_reqAnimId == -1) {
 				if (m_currentAnimSlot > -1) {
 					*reinterpret_cast<float*>(m_lastBgAttr) = 0.0f;
 					CancelAnim(0);
 				}
+			} else if ((animFlags & 0x20) != 0) {
+				*reinterpret_cast<float*>(m_lastBgAttr) = 1.0f;
+				PlayAnim(m_reqAnimId, (m_animFlags & 0x40) ? -1 : 0, 0, -1, -1, 0);
 			} else {
-				if ((m_animFlags & 0x20) != 0) {
-					*reinterpret_cast<float*>(m_lastBgAttr) = 1.0f;
-				} else {
-					*reinterpret_cast<float*>(m_lastBgAttr) = 0.0f;
-				}
-
+				*reinterpret_cast<float*>(m_lastBgAttr) = 0.0f;
 				PlayAnim(m_reqAnimId, (m_animFlags & 0x40) ? -1 : 0, 0, -1, -1, 0);
 			}
 
@@ -481,16 +482,16 @@ void CGPrgObj::rotTarget(CGPrgObj* target)
 void CGPrgObj::dstTargetRot(CGPrgObj* target)
 {
 	float targetRot;
-	Vec* basePosVec;
 	CVector targetPos(target->m_worldPosition);
 	CVector basePos(m_worldPosition);
-	Vec deltaPos;
+	CVector deltaPos;
 
-	basePosVec = reinterpret_cast<Vec*>(&basePos);
-	PSVECSubtract(basePosVec, reinterpret_cast<Vec*>(&targetPos), &deltaPos);
+	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
 	targetRot = 0.0f;
-	if (((double)0.0f != (double)deltaPos.x) && ((double)0.0f != (double)deltaPos.z)) {
-		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
+	if ((double)0.0f != (double)deltaPos.x) {
+		if ((double)0.0f != (double)deltaPos.z) {
+			targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
+		}
 	}
 
 	Math.DstRot(m_rotBaseY, 3.1415927f + targetRot);

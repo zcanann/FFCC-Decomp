@@ -1563,69 +1563,11 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
     float fVar3;
     int iVar4;
     int iVar5;
-    double dVar6;
-    double dVar7;
     float nearestDistance;
     float nearestT;
     Vec nearestPoint;
 
-    if (static_cast<s8>(se[3]) < 0) {
-        if ((FLOAT_80330cec == *reinterpret_cast<float*>(se + 0x10)) &&
-            (FLOAT_80330cec == *reinterpret_cast<float*>(se + 0x14))) {
-            outVolume = 0x7F;
-            outPan = 0x40;
-        } else {
-            dVar7 = (double)FLOAT_80330cf0;
-            if (*reinterpret_cast<unsigned char*>(Game + 0x13E4) != '\0') {
-                if ((*reinterpret_cast<short*>(Game + 0x13E0) == 0xE) ||
-                    (*reinterpret_cast<short*>(Game + 0x13E0) == 8)) {
-                    dVar7 = (double)FLOAT_80330cf4;
-                } else {
-                    dVar7 = (double)FLOAT_80330cf8;
-                }
-            }
-
-            PSMTXMultVec(*reinterpret_cast<Mtx*>(CameraPcs + 0x4), reinterpret_cast<Vec*>(se + 0x18), &nearestPoint);
-            dVar6 = (double)PSVECSquareDistance(reinterpret_cast<Vec*>(CameraPcs + 0xD4), reinterpret_cast<Vec*>(se + 0x18));
-            fVar3 = (float)(dVar7 * dVar6);
-            fVar1 = (float)(dVar7 * (double)(float)((double)*reinterpret_cast<float*>(se + 0x14) *
-                                                     (double)(float)((double)*reinterpret_cast<float*>(se + 0x14) * dVar7)));
-            if (fVar1 <= fVar3) {
-                outVolume = 0;
-            } else {
-                fVar2 = (float)(dVar7 * (double)(float)((double)*reinterpret_cast<float*>(se + 0x10) *
-                                                         (double)(float)((double)*reinterpret_cast<float*>(se + 0x10) * dVar7)));
-                if (fVar2 <= fVar3) {
-                    outVolume = 0x7F - (int)(FLOAT_80330ce8 * ((fVar3 - fVar2) / (fVar1 - fVar2)));
-                } else {
-                    outVolume = 0x7F;
-                }
-            }
-
-            if (*reinterpret_cast<unsigned int*>(Game + 0xC7F4) == 0x21) {
-                iVar4 = (int)(nearestPoint.x / FLOAT_80330cfc);
-                if (iVar4 < -0x38) {
-                    iVar5 = -0x38;
-                } else {
-                    iVar5 = 0x38;
-                    if (iVar4 < 0x39) {
-                        iVar5 = iVar4;
-                    }
-                }
-            } else {
-                iVar4 = (int)nearestPoint.x;
-                if (iVar4 < -0x38) {
-                    iVar5 = -0x38;
-                } else {
-                    iVar5 = 0x38;
-                    if (iVar4 < 0x39) {
-                        iVar5 = iVar4;
-                    }
-                }
-            }
-            outPan = iVar5 + 0x40;
-        }
-    } else {
+    if (static_cast<s8>(se[3]) >= 0) {
         iVar4 = Calc__9CLine((double)*reinterpret_cast<float*>(se + 0x14),
                              reinterpret_cast<CLine*>(reinterpret_cast<u8*>(this) + ((int)static_cast<s8>(se[3]) * 0x1CC) + 0x142C),
                              &nearestPoint, &nearestDistance, (u32*)0, &nearestT, reinterpret_cast<const Vec*>(CameraPcs + 0xE0));
@@ -1652,6 +1594,54 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
             }
             outPan = iVar5 + 0x40;
         }
+    } else if ((FLOAT_80330cec == *reinterpret_cast<float*>(se + 0x10)) &&
+               (FLOAT_80330cec == *reinterpret_cast<float*>(se + 0x14))) {
+        outVolume = 0x7F;
+        outPan = 0x40;
+    } else {
+        fVar1 = FLOAT_80330cf0;
+        if (*reinterpret_cast<unsigned char*>(Game + 0x13E4) != '\0') {
+            const short stageId = *reinterpret_cast<short*>(Game + 0x13E0);
+            if (stageId == 0xE) {
+                fVar1 = FLOAT_80330cf4;
+            } else if (stageId == 8) {
+                fVar1 = FLOAT_80330cf4;
+            } else {
+                fVar1 = FLOAT_80330cf8;
+            }
+        }
+
+        PSMTXMultVec(*reinterpret_cast<Mtx*>(CameraPcs + 0x4), reinterpret_cast<Vec*>(se + 0x18), &nearestPoint);
+        fVar3 = fVar1 * PSVECSquareDistance(reinterpret_cast<Vec*>(CameraPcs + 0xD4), reinterpret_cast<Vec*>(se + 0x18));
+        fVar2 = *reinterpret_cast<float*>(se + 0x14) * fVar1;
+        fVar2 = *reinterpret_cast<float*>(se + 0x14) * fVar2;
+        fVar2 = fVar1 * fVar2;
+        if (fVar2 <= fVar3) {
+            outVolume = 0;
+        } else {
+            float nearScaled = *reinterpret_cast<float*>(se + 0x10) * fVar1;
+            nearScaled = *reinterpret_cast<float*>(se + 0x10) * nearScaled;
+            if (nearScaled <= fVar3) {
+                outVolume = 0x7F - (int)(FLOAT_80330ce8 * ((fVar3 - nearScaled) / (fVar2 - nearScaled)));
+            } else {
+                outVolume = 0x7F;
+            }
+        }
+
+        if (*reinterpret_cast<unsigned int*>(Game + 0xC7F4) == 0x21) {
+            iVar4 = (int)(nearestPoint.x / FLOAT_80330cfc);
+        } else {
+            iVar4 = (int)nearestPoint.x;
+        }
+        if (iVar4 < -0x38) {
+            iVar5 = -0x38;
+        } else {
+            iVar5 = 0x38;
+            if (iVar4 < 0x39) {
+                iVar5 = iVar4;
+            }
+        }
+        outPan = iVar5 + 0x40;
     }
 
     if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22B8) < outVolume) {

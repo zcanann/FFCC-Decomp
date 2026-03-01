@@ -92,7 +92,15 @@ void pppDrawVtMime(void* param1, void* param2, void* param3)
 
     int vertIdx1 = *(int*)((char*)param2 + 0x4);
     int vertIdx2 = *(int*)((char*)param2 + 0x8);
-    if (vertIdx1 == 0xFFFF && vertIdx2 == 0xFFFF) {
+    unsigned int maskedIdx = (unsigned int)vertIdx1;
+    maskedIdx &= 0xFFFF0000;
+    if (maskedIdx + 0x00010000 == 0) {
+        return;
+    }
+
+    maskedIdx = (unsigned int)vertIdx2;
+    maskedIdx &= 0xFFFF0000;
+    if (maskedIdx + 0x00010000 == 0) {
         return;
     }
 
@@ -103,7 +111,7 @@ void pppDrawVtMime(void* param1, void* param2, void* param3)
     VtMimeSource* vert2Data = *(VtMimeSource**)((char*)globalData + (vertIdx2 * 4));
     float* vert1Pos = vert1Data->positions;
     float* vert2Pos = vert2Data->positions;
-    unsigned short vertCount = (unsigned short)vert1Data->vertexCount;
+    short vertCount = vert1Data->vertexCount;
     void** memPtr = (void**)(target + 0xC);
 
     if (*memPtr == 0) {
@@ -111,7 +119,7 @@ void pppDrawVtMime(void* param1, void* param2, void* param3)
     }
 
     float* outputVerts = (float*)*memPtr;
-    int remaining = (int)vertCount;
+    int remaining = vertCount;
     int pairCount = remaining >> 1;
     while (pairCount != 0) {
         outputVerts[0] = vert1Pos[0] + *(float*)target * (vert2Pos[0] - vert1Pos[0]);

@@ -1037,7 +1037,7 @@ int CMenuPcs::ChkEquipActive(int index)
 		if (equipIndex < 3) {
 			return 0;
 		}
-		return *reinterpret_cast<s16*>(caravanWork + equipIndex * 2 + 0xac) >= 0;
+		return (unsigned int)(int)*reinterpret_cast<s16*>(caravanWork + equipIndex * 2 + 0xac) >> 0x1f ^ 1;
 	}
 
 	int item = static_cast<int>(*reinterpret_cast<s16*>(caravanWork + entries[index] * 2 + 0xb6));

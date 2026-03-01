@@ -32,6 +32,8 @@ void SetColor__5CFontF8_GXColor(CFont*, _GXColor*);
 void DrawInit__5CFontFv(CFont*);
 float GetWidth__5CFontFPc(CFont*, const char*);
 void DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(void*, CFont*, char*, float, float, int, int);
+void DrawShadowFont__8CMenuPcsFP5CFontPcffii(void*, CFont*, char*, float, float, int, int);
+void DrawSingleIcon__8CMenuPcsFiiifif(void*, int, int, int, float, float, float);
 void DrawInit__8CMenuPcsFv(void*);
 int sprintf(char*, const char*, ...);
 }
@@ -46,9 +48,18 @@ extern void* Graphic;
 extern void* ppvAmemCacheSet;
 extern float FLOAT_80332d28;
 extern float FLOAT_80332d2c;
+extern float FLOAT_80332d34;
+extern float FLOAT_80332d3c;
 extern float FLOAT_80332d5c;
 extern float FLOAT_80332d60;
 extern float FLOAT_80332d64;
+extern float FLOAT_80332d54;
+extern float FLOAT_80332d58;
+extern float FLOAT_80332d68;
+extern float FLOAT_80332d6c;
+extern float FLOAT_80332d70;
+extern float FLOAT_80332d74;
+extern float FLOAT_80332d78;
 extern float FLOAT_80332e48;
 extern float FLOAT_80332e4c;
 extern float FLOAT_80332d7c;
@@ -60,10 +71,14 @@ extern float FLOAT_80332d94;
 extern float FLOAT_80332d98;
 extern char DAT_80332d84[];
 extern char DAT_80332d14[];
+extern char DAT_80332d18[];
 extern char* PTR_s_Blacksmith_80214da0[];
 extern char* PTR_s_Price_80214dc4[];
 extern char* PTR_s_Money_80214db0[];
 extern char* PTR_DAT_80214da8[];
+extern char* PTR_s_Cannot_buy_80214dc8[];
+extern char* PTR_s_Cannot_sell_80214dcc[];
+extern char* PTR_s_Quantity_80214dd0[];
 
 static inline int& ShopMenuInt(CShopMenu* shopMenu, int offset)
 {
@@ -1880,12 +1895,168 @@ void CShopMenu::DrawBuySellInfo()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80150e50
+ * PAL Size: 2284b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CShopMenu::DrawItemInfo0()
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    int selected = *reinterpret_cast<int*>(self + 0x28);
+    if (selected == -1) {
+        return;
+    }
+
+    int listType = *reinterpret_cast<int*>(self + 0x14);
+    int caravan = *reinterpret_cast<int*>(self + 0x20);
+    int itemNo = -1;
+    if (listType == 0) {
+        itemNo = *reinterpret_cast<short*>(caravan + selected * 2 + 0xBE6);
+    } else if (listType == 1) {
+        itemNo = *reinterpret_cast<short*>(caravan + selected * 2 + 0xB6);
+    } else if (listType == 2) {
+        int mapped = *reinterpret_cast<int*>(self + 0x50 + selected * 4);
+        if (mapped != -1) {
+            itemNo = *reinterpret_cast<short*>(caravan + mapped * 2 + 0xB6);
+        }
+    }
+
+    int languageId = static_cast<int>(Game.game.m_gameWork.m_languageId) - 1;
+    DrawInit__8CMenuPcsFv(MenuPcs);
+    if (itemNo > 0) {
+        DrawSingleIcon__8CMenuPcsFiiifif(MenuPcs, itemNo, 0x40, 100, 0.0f, FLOAT_80332d28, FLOAT_80332d28);
+    }
+
+    CFont* font = *reinterpret_cast<CFont**>(MenuPcs + 0x248);
+    SetMargin__5CFontFf(FLOAT_80332d28, font);
+    SetShadow__5CFontFi(font, 1);
+    SetScaleX__5CFontFf(FLOAT_80332d2c, font);
+    SetScaleY__5CFontFf(FLOAT_80332d28, font);
+    _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
+    SetColor__5CFontF8_GXColor(font, &white);
+    DrawInit__5CFontFv(font);
+
+    if (itemNo > 0) {
+        SetMargin__5CFontFf(FLOAT_80332d28, font);
+        char* itemName = (char*)0;
+        if (itemNo >= 1) {
+            itemName = reinterpret_cast<char*>(reinterpret_cast<int*>(Game.game.unkCFlatData0[1])[itemNo * 5 + 4]);
+        }
+        DrawInit__5CFontFv(font);
+        DrawShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcs, font, itemName, FLOAT_80332d54, FLOAT_80332d58, 0x18, 0x12);
+        DrawInit__8CMenuPcsFv(MenuPcs);
+        SetMargin__5CFontFf(FLOAT_80332d28, font);
+    }
+
+    bool canTrade = false;
+    if (itemNo > 0) {
+        if (listType == 0) {
+            canTrade = true;
+        } else if (listType == 2) {
+            unsigned int bit = static_cast<unsigned int>(itemNo - 0x191);
+            canTrade = (*reinterpret_cast<unsigned int*>(caravan + ((itemNo - 0x191) >> 5) * 4 + 0xC08) &
+                        (1U << (bit & 0x1F))) != 0;
+        } else {
+            if (EquipChk__8CMenuPcsFi(MenuPcs, selected) == 0) {
+                canTrade = itemNo >= 0x9F;
+            }
+        }
+    }
+
+    if (canTrade) {
+        SetMargin__5CFontFf(FLOAT_80332d28, font);
+        char* unitText = PTR_DAT_80214da8[languageId];
+        float unitWidth = GetWidth__5CFontFPc(font, unitText);
+        float rightX = FLOAT_80332d3c - unitWidth;
+        float amountRightX = rightX - FLOAT_80332d5c;
+
+        int unitGil = -1;
+        if (listType == 0) {
+            if (itemNo > 0) {
+                unitGil = *reinterpret_cast<short*>(caravan + 0xBE2) *
+                          *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemNo * 0x48 + 0x20);
+                unitGil = unitGil / 100 + (unitGil >> 0x1F);
+                unitGil = unitGil - (unitGil >> 0x1F);
+            } else {
+                unitGil = 0;
+            }
+        } else if (listType == 1) {
+            if (itemNo > 0) {
+                unitGil = *reinterpret_cast<short*>(caravan + 0xBE2) *
+                          *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemNo * 0x48 + 0x20);
+                unitGil = unitGil / 100 + (unitGil >> 0x1F);
+                unitGil = unitGil - (unitGil >> 0x1F);
+                unitGil = static_cast<int>(FLOAT_80332d60 * static_cast<float>(unitGil));
+            } else {
+                unitGil = 0;
+            }
+        }
+
+        int totalGil = *reinterpret_cast<int*>(self + 0x44) * unitGil;
+        SetShadow__5CFontFi(font, 1);
+        SetScale__5CFontFf(FLOAT_80332d28, font);
+        SetColor__5CFontF8_GXColor(font, &white);
+        DrawInit__5CFontFv(font);
+        reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
+        SetMargin__5CFontFf(FLOAT_80332d64, font);
+        char amountBuffer[64];
+        sprintf(amountBuffer, DAT_80332d14, totalGil);
+        float amountWidth = GetWidth__5CFontFPc(font, amountBuffer);
+        DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
+            MenuPcs, font, amountBuffer, amountRightX - amountWidth, FLOAT_80332d68, 0x1B, 0x12);
+        DrawInit__8CMenuPcsFv(MenuPcs);
+
+        SetMargin__5CFontFf(FLOAT_80332d28, font);
+        DrawInit__5CFontFv(font);
+        DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcs, font, unitText, rightX, FLOAT_80332d68, 0x19, 0x12);
+        DrawInit__8CMenuPcsFv(MenuPcs);
+    } else {
+        SetMargin__5CFontFf(FLOAT_80332d28, font);
+        char* message = (listType == 0) ? PTR_s_Cannot_buy_80214dc8[languageId] : PTR_s_Cannot_sell_80214dcc[languageId];
+        float width = GetWidth__5CFontFPc(font, message);
+        DrawInit__5CFontFv(font);
+        DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
+            MenuPcs, font, message, FLOAT_80332d3c - width, FLOAT_80332d68, 0x19, 0x12);
+        DrawInit__8CMenuPcsFv(MenuPcs);
+        SetMargin__5CFontFf(FLOAT_80332d28, font);
+    }
+
+    if (*reinterpret_cast<int*>(self + 0x10) == 0) {
+        DrawItemInfo(itemNo, 0, 0xA8, 0, 0xC6, 0, 0, 0);
+    }
+
+    if ((*reinterpret_cast<int*>(self + 0x10) == 1) && (listType == 0)) {
+        int amount = *reinterpret_cast<int*>(self + 0x44);
+        SetShadow__5CFontFi(font, 1);
+        SetScale__5CFontFf(FLOAT_80332d28, font);
+        SetColor__5CFontF8_GXColor(font, &white);
+        DrawInit__5CFontFv(font);
+        reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
+        SetMargin__5CFontFf(FLOAT_80332d34, font);
+
+        char countBuffer[64];
+        sprintf(countBuffer, DAT_80332d18, amount);
+        float countWidth = GetWidth__5CFontFPc(font, countBuffer);
+        float countRightX = 116.0f - countWidth;
+        DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcs, font, countBuffer, countRightX, FLOAT_80332d6c, 4, 0x12);
+        DrawInit__8CMenuPcsFv(MenuPcs);
+
+        DrawInit__5CFontFv(font);
+        SetScale__5CFontFf(FLOAT_80332d28, font);
+        SetMargin__5CFontFf(FLOAT_80332d28, font);
+        char* quantityText = PTR_s_Quantity_80214dd0[languageId];
+        float quantityWidth = GetWidth__5CFontFPc(font, quantityText);
+        DrawInit__5CFontFv(font);
+        DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
+            MenuPcs, font, quantityText, countRightX - quantityWidth - FLOAT_80332d5c, FLOAT_80332d6c, 0x18, 0x12);
+        DrawInit__8CMenuPcsFv(MenuPcs);
+
+        int x = static_cast<int>(-(*reinterpret_cast<int*>(self + 0x38) * FLOAT_80332d74 - FLOAT_80332d70));
+        drawShapeSeqScale(0x12, 0, x, 0xD4, FLOAT_80332d78, FLOAT_80332d78, 0xFF);
+    }
 }
 
 /*

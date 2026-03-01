@@ -225,15 +225,15 @@ extern "C" u32 CharaBreak_BeforeCalcMatrixCallback__FPQ26CChara6CModelPvPv(u32 v
  */
 void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, CChara::CModel* model, CChara::CMesh* mesh)
 {
-    u16* stream = (u16*)displayList;
+    bool isSkinned = *(u32*)(*(u8**)((u8*)mesh + 8) + 0x54) != 0;
     S16Vec* workPositions = *(S16Vec**)mesh;
-    u8* meshData = *(u8**)((u8*)mesh + 8);
-    bool isSkinned = *(u32*)(meshData + 0x54) != 0;
+    u16* stream = (u16*)displayList;
     Mtx meshMtx;
 
     if (!isSkinned) {
         PSMTXConcat(*(Mtx*)((u8*)model + 0x38),
-                    *(Mtx*)((u8*)*(u8**)((u8*)model + 0xA8) + (*(u32*)(meshData + 0x58) * 0xC0) + 0xC), meshMtx);
+                    *(Mtx*)((u8*)*(u8**)((u8*)model + 0xA8) + (*(u32*)(*(u8**)((u8*)mesh + 8) + 0x58) * 0xC0) + 0xC),
+                    meshMtx);
     }
 
     bool hasCommand = true;
@@ -268,13 +268,21 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
                 stream = nextStream;
 
                 if (isSkinned) {
-                    *(S16Vec*)((u8*)polygonData + (outVertex * 6) + 0x10) = workPositions[posIndex];
+                    S16Vec* sourcePos = workPositions + posIndex;
+                    s32 vertexOffset = outVertex * 6;
+
+                    *(s16*)((u8*)polygonData + vertexOffset + 0x10) = sourcePos->x;
+                    *(s16*)((u8*)polygonData + vertexOffset + 0x12) = sourcePos->y;
+                    *(s16*)((u8*)polygonData + vertexOffset + 0x14) = sourcePos->z;
                 } else {
-                    S16Vec sourcePos;
+                    S16Vec* sourcePos = workPositions + posIndex;
+                    S16Vec src;
                     Vec worldPos;
 
-                    sourcePos = workPositions[posIndex];
-                    ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)DAT_8032ec70, &worldPos, &sourcePos,
+                    src.x = sourcePos->x;
+                    src.y = sourcePos->y;
+                    src.z = sourcePos->z;
+                    ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)DAT_8032ec70, &worldPos, &src,
                                                         *(u32*)(*(u8**)((u8*)model + 0xA4) + 0x34));
                     PSMTXMultVec(meshMtx, &worldPos, &worldPos);
                     ConvF2IVector__5CUtilFR6S16Vec3Vecl((void*)DAT_8032ec70,
@@ -282,9 +290,9 @@ void CreatePolygon(POLYGON_DATA* polygonData, void* displayList, unsigned long, 
                                                         *(u32*)(*(u8**)((u8*)model + 0xA4) + 0x34));
                 }
 
-                polygonData->m_posIndices[outVertex] = posIndex;
-                polygonData->m_texIndices[outVertex] = texIndex;
-                polygonData->m_nrmIndices[outVertex] = nrmIndex;
+                *(u16*)((u8*)polygonData + (outVertex * 2) + 0x22) = posIndex;
+                *(u16*)((u8*)polygonData + (outVertex * 2) + 0x2E) = texIndex;
+                *(u16*)((u8*)polygonData + (outVertex * 2) + 0x28) = nrmIndex;
                 outVertex++;
                 stripRestart = previousRestart;
 

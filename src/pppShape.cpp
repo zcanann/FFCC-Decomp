@@ -5,7 +5,7 @@
 #include <string.h>
 
 extern "C" {
-    extern CMaterialMan MaterialMan;
+    extern unsigned char MaterialMan[];
     extern void* CAMemCacheSet;
     unsigned short FindTexName__12CMaterialSetFPcPl(CMaterialSet* materialSet, char* textureName,
                                                      long* outIndex);
@@ -67,12 +67,12 @@ void pppDrawShp(long* animData, short frameIndex, CMaterialSet* materialSet, uns
     int shapePtr = (int)animData;
     shapePtr = shapePtr + *(short*)(shapePtr + frameIndex * 8 + 0x10);
 
-    *(int*)((char*)&MaterialMan + 296) = *(int*)((char*)&MaterialMan + 284);
-    *(int*)((char*)&MaterialMan + 300) = *(int*)((char*)&MaterialMan + 288);
-    *(int*)((char*)&MaterialMan + 304) = *(int*)((char*)&MaterialMan + 292);
-    *(int*)((char*)&MaterialMan + 64) = *(int*)((char*)&MaterialMan + 72);
+    *(int*)(MaterialMan + 296) = *(int*)(MaterialMan + 284);
+    *(int*)(MaterialMan + 300) = *(int*)(MaterialMan + 288);
+    *(int*)(MaterialMan + 304) = *(int*)(MaterialMan + 292);
+    *(int*)(MaterialMan + 64) = *(int*)(MaterialMan + 72);
 
-    SetMaterialPart__12CMaterialManFP12CMaterialSetii(&MaterialMan, materialSet,
+    SetMaterialPart__12CMaterialManFP12CMaterialSetii((CMaterialMan*)MaterialMan, materialSet,
                                                       *(unsigned char*)(shapePtr + 10), 0);
 
     GXClearVtxDesc();
@@ -106,12 +106,12 @@ void pppDrawShp(tagOAN3_SHAPE* shape, CMaterialSet* materialSet, unsigned char b
 
     int shapePtr = (int)shape;
 
-    *(int*)((char*)&MaterialMan + 296) = *(int*)((char*)&MaterialMan + 284);
-    *(int*)((char*)&MaterialMan + 300) = *(int*)((char*)&MaterialMan + 288);
-    *(int*)((char*)&MaterialMan + 304) = *(int*)((char*)&MaterialMan + 292);
-    *(int*)((char*)&MaterialMan + 64) = *(int*)((char*)&MaterialMan + 72);
+    *(int*)(MaterialMan + 296) = *(int*)(MaterialMan + 284);
+    *(int*)(MaterialMan + 300) = *(int*)(MaterialMan + 288);
+    *(int*)(MaterialMan + 304) = *(int*)(MaterialMan + 292);
+    *(int*)(MaterialMan + 64) = *(int*)(MaterialMan + 72);
 
-    SetMaterialPart__12CMaterialManFP12CMaterialSetii(&MaterialMan, materialSet,
+    SetMaterialPart__12CMaterialManFP12CMaterialSetii((CMaterialMan*)MaterialMan, materialSet,
                                                       *(unsigned char*)(shapePtr + 10), 0);
 
     GXClearVtxDesc();

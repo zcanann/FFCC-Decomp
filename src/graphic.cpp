@@ -1,6 +1,7 @@
 #include "ffcc/graphic.h"
 
 #include <math.h>
+#include <stdarg.h>
 #include <string.h>
 
 #include "ffcc/memory.h"
@@ -10,6 +11,7 @@
 #include "ffcc/pppfunctbl.h"
 #include "ffcc/system.h"
 #include "ffcc/util.h"
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/printf.h"
 #include "dolphin/vi.h"
 #include "dolphin/vi/vifuncs.h"
 
@@ -688,22 +690,54 @@ void CGraphic::Flip()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800190f8
+ * PAL Size: 224b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGraphic::Printf(char*, ...)
+void CGraphic::Printf(char* fmt, ...)
 {
-	// TODO
+    if (*reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x14) < 0x70) {
+        char buffer[264];
+        va_list args;
+        va_start(args, fmt);
+        vsprintf(buffer, fmt, args);
+        va_end(args);
+
+        int index = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x14);
+        *reinterpret_cast<short*>(reinterpret_cast<u8*>(this) + index * 4 + 0x18) = -1;
+        *reinterpret_cast<short*>(reinterpret_cast<u8*>(this) + index * 4 + 0x1A) = -1;
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x14) = index + 1;
+        strcpy(reinterpret_cast<char*>(reinterpret_cast<u8*>(this) + index * 0x70 + 0x1E0), buffer);
+    }
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80019000
+ * PAL Size: 248b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGraphic::Printf(unsigned long, unsigned long, char*, ...)
+void CGraphic::Printf(unsigned long x, unsigned long y, char* fmt, ...)
 {
-	// TODO
+    if (*reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x14) < 0x70) {
+        char buffer[272];
+        va_list args;
+        va_start(args, fmt);
+        vsprintf(buffer, fmt, args);
+        va_end(args);
+
+        int index = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x14);
+        *reinterpret_cast<short*>(reinterpret_cast<u8*>(this) + index * 4 + 0x18) = static_cast<short>(x);
+        *reinterpret_cast<short*>(reinterpret_cast<u8*>(this) + index * 4 + 0x1A) = static_cast<short>(y);
+        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x14) = index + 1;
+        strcpy(reinterpret_cast<char*>(reinterpret_cast<u8*>(this) + index * 0x70 + 0x1E0), buffer);
+    }
 }
 
 /*

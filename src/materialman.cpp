@@ -1128,12 +1128,31 @@ void CMaterialMan::SetUnderWaterTex()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003fdf0
+ * PAL Size: 8504b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMaterialMan::SetMaterial(CMaterialSet*, int, int, _GXTevScale)
+void CMaterialMan::SetMaterial(CMaterialSet* materialSet, int materialIndex, int setVtxDesc, _GXTevScale)
 {
-	// TODO
+    SetStdEnv();
+
+    CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8));
+    CMaterial* material = (*materials)[materialIndex];
+    int bumpLight = *reinterpret_cast<int*>(Ptr(material, 0x28));
+    unsigned char materialType = *reinterpret_cast<unsigned char*>(Ptr(material, 0xA2));
+
+    if (materialType == 2) {
+        SetMaterialMenu(materialSet, materialIndex, setVtxDesc);
+        return;
+    }
+
+    SetMaterialPart(materialSet, materialIndex, setVtxDesc);
+    if ((bumpLight != 0) && (materialType == 3)) {
+        SetMaterialCharaShadow(material);
+    }
 }
 
 /*

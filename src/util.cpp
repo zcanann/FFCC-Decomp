@@ -727,38 +727,66 @@ void CUtil::RenderTextureQuad(float x, float y, float width, float height, _GXTe
         _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP1);
     }
 
-    float u1 = lbl_8032f888;
-    float v1 = lbl_8032f888;
-    float u2 = lbl_8032f88c;
-    float v2 = lbl_8032f88c;
-    if (uv1 != 0 && uv2 != 0) {
-        u1 = uv1->x;
-        v1 = uv1->y;
-        u2 = uv2->x;
-        v2 = uv2->y;
+    if (color == 0) {
+        float u1 = lbl_8032f888;
+        float v1 = lbl_8032f888;
+        float u2 = lbl_8032f88c;
+        float v2 = lbl_8032f88c;
+
+        if (uv1 != 0 && uv2 != 0) {
+            u1 = uv1->x;
+            v1 = uv1->y;
+            u2 = uv2->x;
+            v2 = uv2->y;
+        }
+
+        GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
+        GXPosition3f32(x, y, lbl_8032f888);
+        GXColor1u32(0xFFFFFFFF);
+        GXTexCoord2f32(u1, v1);
+
+        GXPosition3f32(x2, y, lbl_8032f888);
+        GXColor1u32(0xFFFFFFFF);
+        GXTexCoord2f32(u2, v1);
+
+        GXPosition3f32(x2, y2, lbl_8032f888);
+        GXColor1u32(0xFFFFFFFF);
+        GXTexCoord2f32(u2, v2);
+
+        GXPosition3f32(x, y2, lbl_8032f888);
+        GXColor1u32(0xFFFFFFFF);
+        GXTexCoord2f32(u1, v2);
+    } else {
+        float u1 = lbl_8032f888;
+        float v1 = lbl_8032f888;
+        float u2 = lbl_8032f88c;
+        float v2 = lbl_8032f88c;
+        u32 colorValue = *reinterpret_cast<u32*>(color);
+
+        if (uv1 != 0 && uv2 != 0) {
+            u1 = uv1->x;
+            v1 = uv1->y;
+            u2 = uv2->x;
+            v2 = uv2->y;
+        }
+
+        GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
+        GXPosition3f32(x, y, lbl_8032f888);
+        GXColor1u32(colorValue);
+        GXTexCoord2f32(u1, v1);
+
+        GXPosition3f32(x2, y, lbl_8032f888);
+        GXColor1u32(colorValue);
+        GXTexCoord2f32(u2, v1);
+
+        GXPosition3f32(x2, y2, lbl_8032f888);
+        GXColor1u32(colorValue);
+        GXTexCoord2f32(u2, v2);
+
+        GXPosition3f32(x, y2, lbl_8032f888);
+        GXColor1u32(colorValue);
+        GXTexCoord2f32(u1, v2);
     }
-
-    u32 colorValue = 0xFFFFFFFF;
-    if (color != 0) {
-        colorValue = *reinterpret_cast<u32*>(color);
-    }
-
-    GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT7, 4);
-    GXPosition3f32(x, y, lbl_8032f888);
-    GXColor1u32(colorValue);
-    GXTexCoord2f32(u1, v1);
-
-    GXPosition3f32(x2, y, lbl_8032f888);
-    GXColor1u32(colorValue);
-    GXTexCoord2f32(u2, v1);
-
-    GXPosition3f32(x2, y2, lbl_8032f888);
-    GXColor1u32(colorValue);
-    GXTexCoord2f32(u2, v2);
-
-    GXPosition3f32(x, y2, lbl_8032f888);
-    GXColor1u32(colorValue);
-    GXTexCoord2f32(u1, v2);
 
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
     PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
@@ -1101,105 +1129,66 @@ void CUtil::CalcBoundaryBoxQuantized(Vec* minOut, Vec* maxOut, S16Vec* vecs, uns
  */
 int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
 {
-    int cmd;
-    u16 vertexCount16;
-    bool isPrimitive;
-    bool running;
-    int polygonCount;
-    int primitive;
-    u32 vertexCount;
-    u32 blockCount;
+    int polygonCount = 0;
     u8* data = static_cast<u8*>(dlData);
 
-    running = true;
-    polygonCount = 0;
-LOOP:
-    do {
-        if (!running) {
+    while (true) {
+        u8 cmd = *data;
+        u16 vertexCount16 = *(u16*)(data + 1);
+        int vertexCount = vertexCount16;
+        u8 primitive = cmd & 0xF8;
+        bool isPrimitive;
+
+        data += 3;
+
+        if (primitive == 0xA0) {
+            isPrimitive = true;
+        } else if (primitive > 0x9F) {
+            if (primitive == 0xB0) {
+                isPrimitive = true;
+            } else if (primitive < 0xB0) {
+                isPrimitive = (primitive == 0xA8);
+            } else {
+                isPrimitive = (primitive == 0xB8);
+            }
+        } else if (primitive == 0x90) {
+            isPrimitive = true;
+        } else if (primitive < 0x90) {
+            isPrimitive = (primitive == 0x80);
+        } else {
+            isPrimitive = (primitive == 0x98);
+        }
+
+        if (!isPrimitive) {
             return polygonCount;
         }
-        cmd = *data;
-        vertexCount16 = *(u16*)(data + 1);
-        vertexCount = (u32)vertexCount16;
-        data += 3;
-        primitive = cmd & 0xF8;
-        if (primitive == 0xA0) {
-VALID:
-            isPrimitive = true;
+
+        if (primitive == 0x90) {
+            polygonCount += vertexCount / 3;
+        } else if (primitive == 0x98) {
+            polygonCount += vertexCount - 2;
+        }
+
+        if (vertexCount <= 0) {
+            continue;
+        }
+
+        if ((cmd & 7) == 2) {
+            for (int i = vertexCount >> 3; i > 0; i--) {
+                data += 0x50;
+            }
+            for (int i = vertexCount & 7; i > 0; i--) {
+                data += 10;
+            }
         } else {
-            if (0x9F < primitive) {
-                if (primitive != 0xB0) {
-                    if (primitive < 0xB0) {
-                        if (primitive == 0xA8) {
-                            goto VALID;
-                        }
-                    } else if (primitive == 0xB8) {
-                        goto VALID;
-                    }
-                    goto INVALID;
-                }
-                goto VALID;
+            for (int i = vertexCount >> 3; i > 0; i--) {
+                data += 0x40;
             }
-            if (primitive == 0x90) {
-                goto VALID;
+            for (int i = vertexCount & 7; i > 0; i--) {
+                data += 8;
             }
-            if (primitive < 0x90) {
-                if (primitive == 0x80) {
-                    goto VALID;
-                }
-            } else if (primitive == 0x98) {
-                goto VALID;
-            }
-INVALID:
-            isPrimitive = false;
         }
-        if (isPrimitive) {
-            if (primitive == 0x90) {
-                polygonCount += vertexCount / 3;
-            } else if (primitive == 0x98) {
-                polygonCount = vertexCount + polygonCount - 2;
-            }
-            if ((cmd & 7) != 2) {
-                if (vertexCount != 0) {
-                    blockCount = (u32)(vertexCount16 >> 3);
-                    if ((vertexCount16 >> 3) != 0) {
-                        do {
-                            data += 0x40;
-                            blockCount--;
-                        } while (blockCount != 0);
-                        vertexCount &= 7;
-                        if ((vertexCount16 & 7) == 0) {
-                            goto LOOP;
-                        }
-                    }
-                    do {
-                        data += 8;
-                        vertexCount--;
-                    } while (vertexCount != 0);
-                }
-                goto LOOP;
-            }
-            if (vertexCount != 0) {
-                blockCount = (u32)(vertexCount16 >> 3);
-                if ((vertexCount16 >> 3) != 0) {
-                    do {
-                        data += 0x50;
-                        blockCount--;
-                    } while (blockCount != 0);
-                    vertexCount &= 7;
-                    if ((vertexCount16 & 7) == 0) {
-                        goto LOOP;
-                    }
-                }
-                do {
-                    data += 10;
-                    vertexCount--;
-                } while (vertexCount != 0);
-            }
-            goto LOOP;
-        }
-        running = false;
-    } while (true);
+    }
 }
 
 /*

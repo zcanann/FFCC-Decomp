@@ -467,7 +467,7 @@ public:
     void pppLoadPan(const char*);
     void pppLoadPdt(const char*, int, int, void*, int);
 
-    void pppGetFreeDataMng();
+    int pppGetFreeDataMng();
     void pppGetDefaultCreateParam();
 
     int pppCreate0(int, int, PPPCREATEPARAM*, int);

@@ -17,6 +17,9 @@ extern "C" void SetColor__5CFontF8_GXColor(CFont*, _GXColor*);
 extern "C" void SetPosX__5CFontFf(float, CFont*);
 extern "C" void SetPosY__5CFontFf(float, CFont*);
 extern "C" void Draw__5CFontFPc(CFont*, const char*);
+extern "C" void pppDeletePart__8CPartMngFi(void*, int);
+extern "C" void BindEffect__8CMenuPcsFiii(CMenuPcs*, int, int, int);
+extern unsigned char PartMng[];
 
 extern float lbl_80333558;
 extern float lbl_8033354C;
@@ -481,66 +484,64 @@ void CMenuPcs::DrawOptionMenu()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::BindMcObj(int saveIndex)
+void CMenuPcs::BindMcObj(int slotNo)
 {
 	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
 	int slot = 0;
 
 	do {
-		if (saveIndex == slot) {
-			int* const effect = reinterpret_cast<int*>(reinterpret_cast<unsigned int*>(self + 0x840)[0] + (slot + 0x11) * 0x524);
+		if (slotNo == slot) {
+			int* obj = reinterpret_cast<int*>(
+				*reinterpret_cast<unsigned char**>(self + 0x840) + (slot + 0x11) * 0x524);
 
-			if (-1 < effect[1]) {
-				pppDeletePart__8CPartMngFi(PartMng, effect[1]);
-				effect[1] = -1;
-				effect[2] = -1;
-				effect[0] = -1;
+			if (obj[1] >= 0) {
+				pppDeletePart__8CPartMngFi(PartMng, obj[1]);
+				obj[1] = -1;
+				obj[2] = -1;
+				obj[0] = -1;
 			}
-			if (-1 < effect[0x525]) {
-				pppDeletePart__8CPartMngFi(PartMng, effect[0x525]);
-				effect[0x525] = -1;
-				effect[0x526] = -1;
-				effect[0x524] = -1;
+
+			if (obj[0x525] >= 0) {
+				pppDeletePart__8CPartMngFi(PartMng, obj[0x525]);
+				obj[0x525] = -1;
+				obj[0x526] = -1;
+				obj[0x524] = -1;
 			}
 		}
+
 		slot++;
 	} while (slot < 4);
 
 	slot = 0;
-	int offset = 0;
-
+	int entryOffset = 0;
 	do {
-		if (saveIndex == slot) {
-			unsigned int* const saveData = reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned int*>(self + 0x838)[0]);
-			int boundEffect = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(saveData) + offset + 0xC);
-			if (boundEffect != 0) {
-				BindEffect(slot + 0x11, boundEffect + 0x16, -1);
+		if (slotNo == slot) {
+			unsigned char* entry = *reinterpret_cast<unsigned char**>(self + 0x838) + entryOffset;
+			int iconType = *reinterpret_cast<int*>(entry + 0xC);
+
+			if (iconType != 0) {
+				BindEffect__8CMenuPcsFiii(this, slot + 0x11, iconType + 0x16, -1);
 			}
 
-			unsigned int flags = *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(saveData) + offset + 0x28);
-			int mode;
-			if ((flags & 1) == 0) {
-				if ((flags & 2) == 0) {
-					if ((flags & 4) == 0) {
-						if ((flags & 8) == 0) {
-							if ((flags & 0x10) != 0) {
-								mode = 4;
-							}
-						} else {
-							mode = 3;
-						}
-					} else {
-						mode = 2;
-					}
-				} else {
-					mode = 1;
-				}
-			} else {
-				mode = 0;
+			unsigned int flags = *reinterpret_cast<unsigned int*>(entry + 0x28);
+			int markType = iconType;
+
+			if ((flags & 1) != 0) {
+				markType = 0;
+			} else if ((flags & 2) != 0) {
+				markType = 1;
+			} else if ((flags & 4) != 0) {
+				markType = 2;
+			} else if ((flags & 8) != 0) {
+				markType = 3;
+			} else if ((flags & 0x10) != 0) {
+				markType = 4;
 			}
-			BindEffect(slot + 0x11, mode + 0x1A, -1);
+
+			BindEffect__8CMenuPcsFiii(this, slot + 0x11, markType + 0x1A, -1);
 		}
+
 		slot++;
-		offset += 0x48;
+		entryOffset += 0x48;
 	} while (slot < 4);
 }

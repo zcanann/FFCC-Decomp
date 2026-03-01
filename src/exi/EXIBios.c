@@ -100,11 +100,8 @@ static void CompleteTransfer(s32 chan) {
  * JP Size: TODO
  */
 int EXIImm(s32 chan, void* buf, s32 len, u32 type, EXICallback callback) {
-    EXIControl* exi;
     BOOL enabled;
-    u32 data;
-    u8* immBuf;
-    s32 i;
+    EXIControl* exi;
 
     ASSERTLINE(404, Ecb[chan].state & STATE_SELECTED);
     ASSERTLINE(405, 0 <= chan && chan < MAX_CHAN);
@@ -112,11 +109,11 @@ int EXIImm(s32 chan, void* buf, s32 len, u32 type, EXICallback callback) {
     ASSERTLINE(407, type < MAX_TYPE);
 
     enabled = OSDisableInterrupts();
-    exi = &Ecb[chan];
-    if ((exi->state & STATE_BUSY) || !(exi->state & STATE_SELECTED)) {
+    if ((Ecb[chan].state & STATE_BUSY) || !(Ecb[chan].state & STATE_SELECTED)) {
         OSRestoreInterrupts(enabled);
         return 0;
     }
+    exi = &Ecb[chan];
 
     exi->tcCallback = callback;
     if (exi->tcCallback != 0) {
@@ -126,22 +123,21 @@ int EXIImm(s32 chan, void* buf, s32 len, u32 type, EXICallback callback) {
 
     exi->state |= STATE_IMM;
     if (type != 0) {
-        data = 0;
-        immBuf = buf;
-        i = 0;
-        while (i < len) {
+        u32 data = 0;
+        u8* immBuf = buf;
+        s32 i;
+
+        for (i = 0; i < len; i++) {
             data |= *immBuf++ << ((3 - i) * 8);
-            i++;
         }
         __EXIRegs[(chan * 5) + 4] = data;
     }
 
     exi->immBuf = buf;
-    i = len;
-    if (type == 1) {
-        i = 0;
+    exi->immLen = len;
+    if (type == EXI_WRITE) {
+        exi->immLen = 0;
     }
-    exi->immLen = i;
     __EXIRegs[(chan * 5) + 3] = (type << 2) | 1 | ((len - 1) << 4);
     OSRestoreInterrupts(enabled);
     return 1;

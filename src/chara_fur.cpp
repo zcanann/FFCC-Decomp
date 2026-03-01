@@ -455,6 +455,77 @@ void CChara::CModel::InitMogFurTex()
 
 /*
  * --INFO--
+ * PAL Address: 0x800e00a8
+ * PAL Size: 4120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void MogFurFrame__Q26CChara6CModelFP8CGObject(void* model, void*)
+{
+	unsigned char* modelBytes = reinterpret_cast<unsigned char*>(model);
+	if ((modelBytes[0x10C] & 0x40) == 0) {
+		return;
+	}
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800e13fc
+ * PAL Size: 3448b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" int PickFur__Q26CChara6CModelFPA4_f8_GXColoriiP8_GXColorP8_GXColorP3Vec(
+    void* model, Mtx, _GXColor, int, int, _GXColor* centerBefore, _GXColor* centerAfter, Vec*)
+{
+	unsigned char* modelBytes = reinterpret_cast<unsigned char*>(model);
+	if ((modelBytes[0x10C] & 0x40) == 0) {
+		return 0;
+	}
+
+	if (centerBefore != 0) {
+		centerBefore->r = 0;
+		centerBefore->g = 0;
+		centerBefore->b = 0;
+		centerBefore->a = 0;
+	}
+	if (centerAfter != 0) {
+		centerAfter->r = 0;
+		centerAfter->g = 0;
+		centerAfter->b = 0;
+		centerAfter->a = 0;
+	}
+	return 0;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800e25e8
+ * PAL Size: 3296b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void DrawFur__Q26CChara6CModelFPA4_fi(void* model, Mtx, int shadowPass)
+{
+	unsigned char* modelBytes = reinterpret_cast<unsigned char*>(model);
+
+	if ((modelBytes[0x10C] & 0x40) == 0) {
+		return;
+	}
+
+	if ((shadowPass != 0) && ((modelBytes[0x10C] & 0x80) == 0)) {
+		return;
+	}
+}
+
+/*
+ * --INFO--
  * PAL Address: 0x800e32c8
  * PAL Size: 60b
  * EN Address: TODO

@@ -1272,6 +1272,21 @@ void CGMonObj::moveChaseAndStat(CGCharaObj*, int, float, int, int)
 
 /*
  * --INFO--
+ * PAL Address: 0x801162B4
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void fn_801162B4(CGMonObj* monObj)
+{
+	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(monObj) + 0x6C8) = 0;
+	memset(reinterpret_cast<unsigned char*>(monObj) + 0x70C, 0, 0x34);
+}
+
+/*
+ * --INFO--
  * Address:	TODO
  * Size:	TODO
  */

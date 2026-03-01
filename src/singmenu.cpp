@@ -152,6 +152,10 @@ extern float FLOAT_803329b0;
 extern float FLOAT_803329b4;
 extern float FLOAT_803329bc;
 extern float FLOAT_803329b8;
+extern float FLOAT_803329c0;
+extern float FLOAT_803329c4;
+extern float FLOAT_803329c8;
+extern float FLOAT_803329cc;
 extern CUtil DAT_8032ec70;
 extern int DAT_8032eeb8;
 extern int DAT_8032eebc;
@@ -608,12 +612,48 @@ void CMenuPcs::DrawSingleStat(float)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801488f0
+ * PAL Size: 680b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::DrawSingleHelpWim(float)
+void CMenuPcs::DrawSingleHelpWim(float alpha)
 {
-	// TODO
+    DrawInit__8CMenuPcsFv(this);
+    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+
+    int alphaInt = static_cast<int>(FLOAT_80332940 * alpha);
+    _GXColor color = {0xFF, 0xFF, 0xFF, static_cast<u8>(alphaInt)};
+    GXSetChanMatColor(GX_COLOR0A0, color);
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x23);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 0, FLOAT_8033292c, FLOAT_803329c0, FLOAT_8033292c, FLOAT_8033292c, FLOAT_8033294c,
+                                    FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 8, FLOAT_803329c4, FLOAT_803329c0, FLOAT_8033292c, FLOAT_8033292c, FLOAT_8033294c,
+                                    FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 4, FLOAT_8033292c, FLOAT_803329a8, FLOAT_8033292c, FLOAT_8033292c, FLOAT_8033294c,
+                                    FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 0xC, FLOAT_803329c4, FLOAT_803329a8, FLOAT_8033292c, FLOAT_8033292c, FLOAT_8033294c,
+                                    FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x27);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 0, FLOAT_80332928, FLOAT_803329c0, FLOAT_803329c8, FLOAT_8033292c, FLOAT_8033294c,
+                                    FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 4, FLOAT_80332928, FLOAT_803329a8, FLOAT_803329c8, FLOAT_8033292c, FLOAT_8033294c,
+                                    FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x24);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 0, FLOAT_8033292c, FLOAT_803329cc, FLOAT_8033292c, FLOAT_803329d0, FLOAT_8033294c,
+                                    FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 8, FLOAT_803329c4, FLOAT_803329cc, FLOAT_8033292c, FLOAT_803329d0, FLOAT_8033294c,
+                                    FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x2B);
+    DrawRect__8CMenuPcsFUlfffffffff(this, 8, FLOAT_80332928, FLOAT_803329cc, FLOAT_803329c8, FLOAT_803329d0, FLOAT_8033294c,
+                                    FLOAT_8033294c, FLOAT_80332934, FLOAT_80332934, 0.0f);
 }
 
 /*

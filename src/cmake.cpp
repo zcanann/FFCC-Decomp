@@ -1,5 +1,7 @@
 #include "ffcc/cmake.h"
+#include "ffcc/chara.h"
 #include "ffcc/p_game.h"
+#include <dolphin/mtx.h>
 #include <string.h>
 
 extern "C" void __dl__FPv(void*);
@@ -7,6 +9,15 @@ extern "C" void freeTexture__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
 extern "C" void CmakeVillageDraw__8CMenuPcsFv(CMenuPcs*);
 extern "C" void CallWorldParam__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" void ChgModel__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
+extern "C" void SetAnim__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" void PCAnimCtrl__8CMenuPcsFv(CMenuPcs*);
+extern "C" void SetMatrix__Q26CChara6CModelFPA4_f(CChara::CModel*, Mtx);
+extern "C" void CalcMatrix__Q26CChara6CModelFv(CChara::CModel*);
+extern "C" void CalcSkin__Q26CChara6CModelFv(CChara::CModel*);
+extern "C" float FLOAT_80333254;
+extern "C" float FLOAT_8033325c;
+extern "C" float FLOAT_80333260;
+extern "C" float FLOAT_80333264;
 
 static inline short& MenuS16(CMenuPcs* menu, int offset)
 {
@@ -717,12 +728,61 @@ void CMenuPcs::drawVillageMenu()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8016cd3c
+ * PAL Size: 400b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CalcSingleCMakeChara()
 {
-	// TODO
+    int slot = static_cast<int>(MenuS16(this, 0x86A));
+    int handle = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x7F4 + slot * 4);
+    CChara::CModel* model = *reinterpret_cast<CChara::CModel**>(reinterpret_cast<unsigned char*>(handle) + 0x168);
+    unsigned char* modelWork = reinterpret_cast<unsigned char*>(MenuS32(this, 0x814) + slot * 0x50 + 0xA00);
+
+    if (model == nullptr || *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(model) + 0xB0) == 0) {
+        *reinterpret_cast<int*>(modelWork + 0x00) = 0;
+        return;
+    }
+
+    unsigned char* animWork = reinterpret_cast<unsigned char*>(MenuS32(this, 0x824) + slot * 0x34);
+    if (animWork[0x0C] == 1) {
+        *reinterpret_cast<float*>(modelWork + 0x2C) = FLOAT_8033325c;
+        SetAnim__8CMenuPcsFi(this, slot);
+        animWork[0x0C] = 0;
+    }
+
+    *reinterpret_cast<int*>(modelWork + 0x00) = 1;
+    if (**reinterpret_cast<int**>(reinterpret_cast<unsigned char*>(this) + 0x7F4 + slot * 4) != 3) {
+        Mtx scaleMtx;
+        Mtx rotXMtx;
+        Mtx rotYMtx;
+
+        *reinterpret_cast<float*>(modelWork + 0x1C) = FLOAT_80333254;
+        *reinterpret_cast<float*>(modelWork + 0x20) = FLOAT_80333260;
+        *reinterpret_cast<float*>(modelWork + 0x24) = FLOAT_80333254;
+        *reinterpret_cast<float*>(modelWork + 0x34) = FLOAT_80333264;
+        *reinterpret_cast<float*>(modelWork + 0x38) = FLOAT_80333264;
+        *reinterpret_cast<float*>(modelWork + 0x3C) = FLOAT_80333264;
+
+        PSMTXScale(scaleMtx,
+            *reinterpret_cast<float*>(modelWork + 0x34),
+            *reinterpret_cast<float*>(modelWork + 0x38),
+            *reinterpret_cast<float*>(modelWork + 0x3C));
+        PSMTXRotRad(rotXMtx, 'x', *reinterpret_cast<float*>(modelWork + 0x28));
+        PSMTXRotRad(rotYMtx, 'y', *reinterpret_cast<float*>(modelWork + 0x2C));
+        PSMTXConcat(rotXMtx, rotYMtx, rotXMtx);
+        rotXMtx[0][3] = *reinterpret_cast<float*>(modelWork + 0x1C);
+        rotXMtx[1][3] = *reinterpret_cast<float*>(modelWork + 0x20);
+        rotXMtx[2][3] = *reinterpret_cast<float*>(modelWork + 0x24);
+        PSMTXConcat(rotXMtx, scaleMtx, scaleMtx);
+        SetMatrix__Q26CChara6CModelFPA4_f(model, scaleMtx);
+        CalcMatrix__Q26CChara6CModelFv(model);
+        CalcSkin__Q26CChara6CModelFv(model);
+        PCAnimCtrl__8CMenuPcsFv(this);
+    }
 }
 
 /*

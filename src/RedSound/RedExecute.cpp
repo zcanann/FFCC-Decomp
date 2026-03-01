@@ -968,22 +968,42 @@ RedVoiceDATA* _VoiceDataSelect(RedTrackDATA* track, RedNoteDATA* note, int* voic
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c4d08
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void SetVoiceAccess(RedTrackDATA*, int)
+void SetVoiceAccess(RedTrackDATA* track, int mask)
 {
-	// TODO
+    int* voiceData = (int*)DAT_8032f444;
+    do {
+        if ((voiceData[0] != 0) && (voiceData[0] == (int)track)) {
+            voiceData[0x24] |= mask;
+        }
+        voiceData += 0x30;
+    } while (voiceData < (int*)DAT_8032f444 + 0xC00);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c4d58
+ * PAL Size: 72b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void SetVoiceSwitch(RedTrackDATA*, int)
+void SetVoiceSwitch(RedTrackDATA* track, int voiceSwitch)
 {
-	// TODO
+    int* voiceData = (int*)DAT_8032f444;
+    do {
+        if ((voiceData[0] != 0) && (voiceData[0] == (int)track)) {
+            voiceData[0x25] = voiceSwitch;
+        }
+        voiceData += 0x30;
+    } while (voiceData < (int*)DAT_8032f444 + 0xC00);
 }
 
 /*

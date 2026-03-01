@@ -1190,6 +1190,7 @@ static unsigned int MiniGameCrc8(unsigned int value)
 void CMiniGamePcs::MngThreadMain(void*)
 {
     unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    unsigned char* game = reinterpret_cast<unsigned char*>(&Game.game);
     int managerStackOffset = 0x1000;
 
     for (int i = 0; i < 4; i++)
@@ -1199,7 +1200,7 @@ void CMiniGamePcs::MngThreadMain(void*)
 
         unsigned int imageSize = *reinterpret_cast<unsigned int*>(self + 0x1358);
         void* imageBase = *reinterpret_cast<void**>(self + 0x1354);
-        if (self[0x1344 + i] != 0)
+        if (game[0xA + i] != 0)
         {
             imageSize = *reinterpret_cast<unsigned int*>(self + 0x1360);
             imageBase = *reinterpret_cast<void**>(self + 0x135C);

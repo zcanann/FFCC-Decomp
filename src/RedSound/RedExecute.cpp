@@ -438,12 +438,22 @@ RedVoiceDATA* EntryVoiceSearch(RedTrackDATA* track)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c3db4
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void _VoiceEnvelopeCheck()
 {
-	// TODO
+    u32* voiceData = DAT_8032f444;
+    do {
+        if ((((u8*)voiceData)[0x1A] & 7) != 0) {
+            voiceData[0x2C] = 0x8000;
+        }
+        voiceData += 0x30;
+    } while (voiceData < DAT_8032f444 + 0xC00);
 }
 
 /*
@@ -1011,12 +1021,46 @@ void SetVoiceSwitch(RedTrackDATA* track, int voiceSwitch)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801c4da0
+ * PAL Size: 188b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void _AdsrStart(RedVoiceDATA*)
+void _AdsrStart(RedVoiceDATA* voice)
 {
-	// TODO
+    int* voiceData = (int*)voice;
+    u32 prevLevel;
+    u32 nextLevel;
+    u32 stepFrames;
+
+    voiceData[0x17] = 0;
+    nextLevel = *(u8*)((u8*)voiceData + 0x58);
+    do {
+        prevLevel = nextLevel;
+        stepFrames = *(u16*)((u8*)voiceData + 0x50 + voiceData[0x17] * 2);
+        nextLevel = *(u8*)((u8*)voiceData + 0x50 + voiceData[0x17] + 9);
+        if (stepFrames != 0) {
+            break;
+        }
+        voiceData[0x17] += 1;
+    } while (voiceData[0x17] < 3);
+
+    voiceData[0x18] = stepFrames;
+    if (nextLevel != 0) {
+        nextLevel = (((nextLevel + 1) * 0x100) - 1) * 0x1000;
+    }
+
+    if (stepFrames == 0) {
+        voiceData[0x2B] = nextLevel;
+    } else {
+        if (prevLevel != 0) {
+            prevLevel = (((prevLevel + 1) * 0x100) - 1) * 0x1000;
+        }
+        voiceData[0x2B] = prevLevel;
+        voiceData[0x19] = (int)((nextLevel | 0x800) - prevLevel) / (int)stepFrames;
+    }
 }
 
 /*

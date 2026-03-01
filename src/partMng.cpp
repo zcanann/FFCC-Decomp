@@ -30,6 +30,7 @@ extern "C" unsigned char DAT_8032ed68;
 extern "C" int DAT_8032ed6c;
 extern "C" unsigned char DAT_8032ed90;
 extern "C" unsigned char DAT_8032ed91;
+extern unsigned char CameraPcs[];
 extern "C" void __ct__9_pppMngStFv(_pppMngSt* pppMngSt);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
 extern "C" void pppSetBlendMode__FUc(unsigned char);
@@ -1083,12 +1084,20 @@ void pppSetProjection()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005a8c0
+ * PAL Size: 108b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartMng::pppSetRendMatrix()
 {
-	// TODO
+    PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcs + 0x48), ppvScreenMatrix);
+    PSMTXCopy(*reinterpret_cast<Mtx*>(CameraPcs + 4), ppvCameraMatrix0);
+    FLOAT_8032ed58 = ppvScreenMatrix[2][0];
+    FLOAT_8032ed5c = ppvScreenMatrix[2][1];
+    FLOAT_8032ed60 = ppvScreenMatrix[2][3];
 }
 
 /*

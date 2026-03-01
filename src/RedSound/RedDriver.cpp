@@ -865,6 +865,7 @@ int _WaveSettingThread(void* param_1)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 void _DMACheckProcess()
 {
     int semCount;
@@ -890,6 +891,7 @@ void _DMACheckProcess()
 
     fflush(&DAT_8021d1a8);
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--
@@ -2182,10 +2184,20 @@ void CRedDriver::SetReverbDepth(int bank, int mode, int depth)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801bfea4
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CRedDriver::TestProcess(int)
+void CRedDriver::TestProcess(int processType)
 {
-	// TODO
+    volatile int mode;
+
+    mode = processType;
+    if (mode != 1) {
+    } else {
+        _DMACheckProcess();
+    }
 }

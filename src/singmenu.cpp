@@ -1689,13 +1689,12 @@ void CMenuPcs::GetSingWinSize(int messageNo, short* outWidth, short* outHeight, 
  */
 void CMenuPcs::SetSingWinInfo(int x, int y, int w, int h)
 {
-    s16* winInfo = *reinterpret_cast<s16**>(reinterpret_cast<u8*>(this) + 0x848);
-    winInfo[0] = static_cast<s16>(x);
-    winInfo[1] = static_cast<s16>(y);
-    winInfo[2] = static_cast<s16>(w);
-    winInfo[3] = static_cast<s16>(h);
-    winInfo[4] = 0;
-    winInfo[5] = 3;
+    (*reinterpret_cast<s16**>(reinterpret_cast<u8*>(this) + 0x848))[0] = static_cast<s16>(x);
+    (*reinterpret_cast<s16**>(reinterpret_cast<u8*>(this) + 0x848))[1] = static_cast<s16>(y);
+    (*reinterpret_cast<s16**>(reinterpret_cast<u8*>(this) + 0x848))[2] = static_cast<s16>(w);
+    (*reinterpret_cast<s16**>(reinterpret_cast<u8*>(this) + 0x848))[3] = static_cast<s16>(h);
+    (*reinterpret_cast<s16**>(reinterpret_cast<u8*>(this) + 0x848))[4] = 0;
+    (*reinterpret_cast<s16**>(reinterpret_cast<u8*>(this) + 0x848))[5] = 3;
 }
 
 /*

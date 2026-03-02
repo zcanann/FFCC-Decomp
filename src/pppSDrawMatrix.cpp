@@ -4,6 +4,7 @@
 
 #ifdef __cplusplus
 extern "C" {
+extern Mtx ppvCameraMatrix02;
 #endif
 
 /*
@@ -17,9 +18,7 @@ extern "C" {
  */
 void pppSDrawMatrix(_pppPObject* obj)
 {
-	// Based on assembly analysis: PSMTXConcat(&ppvCameraMatrix0, obj+0x10, obj+0x40)
-	// The offsets suggest a different struct layout than expected
-	PSMTXConcat(ppvCameraMatrix0, 
+	PSMTXConcat(ppvCameraMatrix02,
 	           *(Mtx*)((u8*)obj + 0x10), 
 	           *(Mtx*)((u8*)obj + 0x40));
 }

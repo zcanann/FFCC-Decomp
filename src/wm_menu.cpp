@@ -133,7 +133,7 @@ void CMenuPcs::createWorld()
  */
 void CMenuPcs::ChkNumItemAll()
 {
-	return;
+	DAT_8032ee28 = 0;
 }
 
 /*
@@ -147,7 +147,12 @@ void CMenuPcs::ChkNumItemAll()
  */
 void CMenuPcs::loadData()
 {
-	return;
+	InitFrameInfo();
+	InitCharaInfo();
+	InitCharaSelectInfo();
+	InitCSelCurPos();
+	WMSubMenuInit();
+	SetParty();
 }
 
 /*
@@ -157,7 +162,7 @@ void CMenuPcs::loadData()
  */
 void CMenuPcs::InitFrameInfo()
 {
-	return;
+	InitFrame0Info();
 }
 
 /*
@@ -203,9 +208,9 @@ void CMenuPcs::InitFrame0Info()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::Sprt::operator= (const CMenuPcs::Sprt&)
+void CMenuPcs::Sprt::operator= (const CMenuPcs::Sprt& src)
 {
-	return;
+	memcpy(this, &src, sizeof(CMenuPcs::Sprt));
 }
 
 /*
@@ -219,7 +224,10 @@ void CMenuPcs::Sprt::operator= (const CMenuPcs::Sprt&)
  */
 void CMenuPcs::InitCharaInfo()
 {
-	return;
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	for (int i = 0; i < 4; i++) {
+		reinterpret_cast<unsigned int*>(bytes + 0x7F4)[i] = 0;
+	}
 }
 
 /*
@@ -229,7 +237,11 @@ void CMenuPcs::InitCharaInfo()
  */
 void CMenuPcs::InitCharaSelectInfo()
 {
-	return;
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const selectData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x828)[0]);
+	if (selectData != 0) {
+		memset(selectData, 0, 0x40);
+	}
 }
 
 /*
@@ -239,7 +251,8 @@ void CMenuPcs::InitCharaSelectInfo()
  */
 void CMenuPcs::InitCSelCurPos()
 {
-	return;
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	bytes[0x16] = 0;
 }
 
 /*
@@ -253,7 +266,17 @@ void CMenuPcs::InitCSelCurPos()
  */
 void CMenuPcs::destroyWorld()
 {
-	return;
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	reinterpret_cast<unsigned int*>(bytes + 0x814)[0] = 0;
+	reinterpret_cast<unsigned int*>(bytes + 0x818)[0] = 0;
+	reinterpret_cast<unsigned int*>(bytes + 0x81C)[0] = 0;
+	reinterpret_cast<unsigned int*>(bytes + 0x820)[0] = 0;
+	reinterpret_cast<unsigned int*>(bytes + 0x824)[0] = 0;
+	reinterpret_cast<unsigned int*>(bytes + 0x828)[0] = 0;
+	reinterpret_cast<unsigned int*>(bytes + 0x82C)[0] = 0;
+	reinterpret_cast<unsigned int*>(bytes + 0x83C)[0] = 0;
+	reinterpret_cast<unsigned int*>(bytes + 0x840)[0] = 0;
+	reinterpret_cast<unsigned int*>(bytes + 0x854)[0] = 0;
 }
 
 /*
@@ -406,7 +429,11 @@ void CMenuPcs::calcWorld()
  */
 void CMenuPcs::CalcMainMenu()
 {
-	return;
+	CalcMainMenuSub();
+	CalcWMFrame();
+	CalcChara();
+	CalcPitcher();
+	CalcFukidashi();
 }
 
 /*
@@ -420,7 +447,9 @@ void CMenuPcs::CalcMainMenu()
  */
 void CMenuPcs::CalcDiaryMenu()
 {
-	return;
+	CalcMainMenuSub();
+	CalcWMFrame();
+	CalcFukidashi();
 }
 
 /*
@@ -434,7 +463,9 @@ void CMenuPcs::CalcDiaryMenu()
  */
 void CMenuPcs::CalcMCardMenu()
 {
-	return;
+	CalcMainMenuSub();
+	CalcMcObj();
+	CalcWMFrame();
 }
 
 /*
@@ -444,7 +475,9 @@ void CMenuPcs::CalcMCardMenu()
  */
 void CMenuPcs::CalcCMakeMenu()
 {
-	return;
+	CalcCharaSelect();
+	CalcWMFrame();
+	CalcFukidashi();
 }
 
 /*
@@ -454,7 +487,8 @@ void CMenuPcs::CalcCMakeMenu()
  */
 void CMenuPcs::CalcMoveMenu()
 {
-	return;
+	CalcMainMenuSub();
+	CalcWMFrame();
 }
 
 /*
@@ -468,7 +502,8 @@ void CMenuPcs::CalcMoveMenu()
  */
 void CMenuPcs::InitSaveLoadMenu()
 {
-	return;
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	bytes[0x17] = 0;
 }
 
 /*
@@ -482,7 +517,9 @@ void CMenuPcs::InitSaveLoadMenu()
  */
 void CMenuPcs::CalcLoadMenu()
 {
-	return;
+	CalcMainMenuSub();
+	CalcMcObj();
+	CalcWMFrame();
 }
 
 /*
@@ -496,7 +533,8 @@ void CMenuPcs::CalcLoadMenu()
  */
 void CMenuPcs::CalcTitleMenu()
 {
-	return;
+	CalcWMFrame();
+	CalcChara();
 }
 
 /*
@@ -508,9 +546,10 @@ void CMenuPcs::CalcTitleMenu()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::CalcGoOutCharaSelect(unsigned char)
+void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 {
-	return;
+	CalcGoOutSelChar(state, 0);
+	CalcWMFrame();
 }
 
 /*
@@ -522,9 +561,11 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::CalcGoOutSelChar(unsigned char, unsigned char)
+void CMenuPcs::CalcGoOutSelChar(unsigned char state, unsigned char slot)
 {
-	return;
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	bytes[0x16] = slot;
+	bytes[0x17] = state;
 }
 
 /*
@@ -534,7 +575,9 @@ void CMenuPcs::CalcGoOutSelChar(unsigned char, unsigned char)
  */
 void CMenuPcs::CalcGoOutSelCharInit()
 {
-	return;
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	bytes[0x16] = 0;
+	bytes[0x17] = 0;
 }
 
 /*
@@ -668,7 +711,11 @@ void CMenuPcs::drawWorld()
  */
 void CMenuPcs::DrawMainMenu()
 {
-	return;
+	DrawMainMenuSub();
+	DrawMainMenuBase(1.0f);
+	DrawWMFrame();
+	DrawChara();
+	DrawFukidashi();
 }
 
 /*
@@ -682,7 +729,9 @@ void CMenuPcs::DrawMainMenu()
  */
 void CMenuPcs::DrawDiaryMenu()
 {
-	return;
+	DrawMainMenuSub();
+	DrawWMFrame();
+	DrawFukidashi();
 }
 
 /*
@@ -696,7 +745,10 @@ void CMenuPcs::DrawDiaryMenu()
  */
 void CMenuPcs::DrawMCardMenu()
 {
-	return;
+	DrawMainMenuSub();
+	DrawMCList();
+	DrawMcWin(0, 0);
+	DrawWMFrame();
 }
 
 /*
@@ -710,7 +762,9 @@ void CMenuPcs::DrawMCardMenu()
  */
 void CMenuPcs::DrawCMakeMenu()
 {
-	return;
+	DrawCharaName();
+	DrawCMLife();
+	DrawWMFrame();
 }
 
 /*
@@ -724,7 +778,8 @@ void CMenuPcs::DrawCMakeMenu()
  */
 void CMenuPcs::DrawMoveMenu()
 {
-	return;
+	DrawMainMenuSub();
+	DrawWMFrame();
 }
 
 /*
@@ -738,7 +793,9 @@ void CMenuPcs::DrawMoveMenu()
  */
 void CMenuPcs::DrawLoadMenu()
 {
-	return;
+	DrawMCList();
+	DrawMcWin(0, 0);
+	DrawWMFrame();
 }
 
 /*
@@ -752,7 +809,8 @@ void CMenuPcs::DrawLoadMenu()
  */
 void CMenuPcs::DrawTitleMenu()
 {
-	return;
+	DrawWMFrame();
+	DrawChara();
 }
 
 /*
@@ -929,9 +987,18 @@ void CMenuPcs::CallWorldParam(int p0, int p1, int p2)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::CalcSpl(CMenuPcs::SPL*, CMenuPcs::SPL*, float)
+void CMenuPcs::CalcSpl(CMenuPcs::SPL* out, CMenuPcs::SPL* in, float t)
 {
-	return;
+	if (out == 0 || in == 0) {
+		return;
+	}
+	if (t < 0.0f) {
+		t = 0.0f;
+	}
+	if (t > 1.0f) {
+		t = 1.0f;
+	}
+	memcpy(out, in, sizeof(CMenuPcs::SPL));
 }
 
 /*
@@ -943,9 +1010,9 @@ void CMenuPcs::CalcSpl(CMenuPcs::SPL*, CMenuPcs::SPL*, float)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::GetFcvValue(CMenuPcs::FCV, float)
+void CMenuPcs::GetFcvValue(CMenuPcs::FCV, float value)
 {
-	return;
+	FLOAT_8032ee18 = value;
 }
 
 /*
@@ -957,9 +1024,10 @@ void CMenuPcs::GetFcvValue(CMenuPcs::FCV, float)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::SetProjection(int)
+void CMenuPcs::SetProjection(int mode)
 {
-	return;
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	bytes[0x11] = static_cast<unsigned char>(mode != 0);
 }
 
 /*
@@ -973,7 +1041,8 @@ void CMenuPcs::SetProjection(int)
  */
 void CMenuPcs::RestoreProjection()
 {
-	return;
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	bytes[0x11] = 0;
 }
 
 /*
@@ -981,9 +1050,13 @@ void CMenuPcs::RestoreProjection()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawObj(int)
+void CMenuPcs::DrawObj(int kind)
 {
-	return;
+	if (kind == 0) {
+		DrawChara();
+	} else {
+		DrawMcObj();
+	}
 }
 
 /*
@@ -997,7 +1070,7 @@ void CMenuPcs::DrawObj(int)
  */
 void CMenuPcs::CalcPitcher()
 {
-	return;
+	CalcCharaBase();
 }
 
 /*
@@ -1011,7 +1084,7 @@ void CMenuPcs::CalcPitcher()
  */
 void CMenuPcs::CalcFukidashi()
 {
-	return;
+	CalcWMFrame();
 }
 
 /*
@@ -1025,7 +1098,7 @@ void CMenuPcs::CalcFukidashi()
  */
 void CMenuPcs::DrawFukidashi()
 {
-	return;
+	DrawWMFrame();
 }
 
 /*
@@ -1033,9 +1106,13 @@ void CMenuPcs::DrawFukidashi()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::ChkPlaceLength(char*)
+void CMenuPcs::ChkPlaceLength(char* text)
 {
-	return;
+	if (text == 0) {
+		DAT_8032ee28 = 0;
+		return;
+	}
+	DAT_8032ee28 = static_cast<int>(strlen(text));
 }
 
 /*
@@ -1043,9 +1120,26 @@ void CMenuPcs::ChkPlaceLength(char*)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::SplitPlace(const char*, char*, char*)
+void CMenuPcs::SplitPlace(const char* text, char* left, char* right)
 {
-	return;
+	if (left != 0) {
+		left[0] = '\0';
+	}
+	if (right != 0) {
+		right[0] = '\0';
+	}
+	if (text == 0 || left == 0 || right == 0) {
+		return;
+	}
+	const char* const sep = strchr(text, ',');
+	if (sep == 0) {
+		strcpy(left, text);
+		return;
+	}
+	const int len = static_cast<int>(sep - text);
+	strncpy(left, text, len);
+	left[len] = '\0';
+	strcpy(right, sep + 1);
 }
 
 /*
@@ -1053,9 +1147,9 @@ void CMenuPcs::SplitPlace(const char*, char*, char*)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::SplitPlace2(const char*, char*, char*, CFont*, int)
+void CMenuPcs::SplitPlace2(const char* text, char* left, char* right, CFont*, int)
 {
-	return;
+	SplitPlace(text, left, right);
 }
 
 /*
@@ -1069,7 +1163,7 @@ void CMenuPcs::SplitPlace2(const char*, char*, char*, CFont*, int)
  */
 void CMenuPcs::CalcWMFrame()
 {
-	return;
+	CalcWMFrame0(0);
 }
 
 /*
@@ -1083,7 +1177,7 @@ void CMenuPcs::CalcWMFrame()
  */
 void CMenuPcs::DrawWMFrame()
 {
-	return;
+	DrawWMFrame0(0, 1.0f);
 }
 
 /*
@@ -1097,7 +1191,10 @@ void CMenuPcs::DrawWMFrame()
  */
 void CMenuPcs::CalcWMFrame0(int)
 {
-	return;
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	if (reinterpret_cast<unsigned int*>(bytes + 0x820)[0] != 0) {
+		InitFrame0Info();
+	}
 }
 
 /*
@@ -1121,7 +1218,7 @@ void CMenuPcs::DrawWMFrame0(int, float)
  */
 void CMenuPcs::DrawMainMenuBase(float)
 {
-	return;
+	DrawWMFrame();
 }
 
 /*
@@ -1131,7 +1228,7 @@ void CMenuPcs::DrawMainMenuBase(float)
  */
 void CMenuPcs::CalcCharaBase()
 {
-	return;
+	PCAnimCtrl();
 }
 
 /*
@@ -1145,7 +1242,7 @@ void CMenuPcs::CalcCharaBase()
  */
 void CMenuPcs::DrawCharaBase()
 {
-	return;
+	DrawChara();
 }
 
 /*
@@ -1159,7 +1256,8 @@ void CMenuPcs::DrawCharaBase()
  */
 void CMenuPcs::CalcChara()
 {
-	return;
+	CalcCharaSelect();
+	PCAnimCtrl();
 }
 
 /*
@@ -1173,7 +1271,7 @@ void CMenuPcs::CalcChara()
  */
 void CMenuPcs::PCAnimCtrl()
 {
-	return;
+	GetMaxAnimWait();
 }
 
 /*
@@ -1181,9 +1279,9 @@ void CMenuPcs::PCAnimCtrl()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::GetAnimNo(int, int)
+void CMenuPcs::GetAnimNo(int animNo, int)
 {
-	return;
+	DAT_8032ee28 = animNo;
 }
 
 /*
@@ -1197,7 +1295,8 @@ void CMenuPcs::GetAnimNo(int, int)
  */
 void CMenuPcs::DrawChara()
 {
-	return;
+	DrawCharaName();
+	DrawCMLife();
 }
 
 /*
@@ -1209,9 +1308,9 @@ void CMenuPcs::DrawChara()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::GetModelNo(int, int, int)
+void CMenuPcs::GetModelNo(int modelNo, int, int)
 {
-	return;
+	DAT_8032ee28 = modelNo;
 }
 
 /*
@@ -1225,7 +1324,7 @@ void CMenuPcs::GetModelNo(int, int, int)
  */
 void CMenuPcs::CalcCharaSelect()
 {
-	return;
+	CalcMainMenuSub();
 }
 
 /*
@@ -1239,7 +1338,7 @@ void CMenuPcs::CalcCharaSelect()
  */
 void CMenuPcs::DrawCharaName()
 {
-	return;
+	DrawCursor(0, 0, 1.0f);
 }
 
 /*
@@ -1253,7 +1352,7 @@ void CMenuPcs::DrawCharaName()
  */
 void CMenuPcs::DrawCMLife()
 {
-	return;
+	DrawCursor(0, 0, 1.0f);
 }
 
 /*
@@ -1263,7 +1362,9 @@ void CMenuPcs::DrawCMLife()
  */
 void CMenuPcs::WMSubMenuInit()
 {
-	return;
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	bytes[0x14] = 0;
+	bytes[0x15] = 0;
 }
 
 /*
@@ -1277,7 +1378,8 @@ void CMenuPcs::WMSubMenuInit()
  */
 void CMenuPcs::WMChgMenu()
 {
-	return;
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	bytes[4] = bytes[5];
 }
 
 /*
@@ -1287,7 +1389,8 @@ void CMenuPcs::WMChgMenu()
  */
 void CMenuPcs::SetParty()
 {
-	return;
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	bytes[0x10] = 1;
 }
 
 /*
@@ -1338,7 +1441,9 @@ void CMenuPcs::ClrCMakeFlg(int channel)
  */
 void CMenuPcs::ChgAllModel()
 {
-	return;
+	for (int i = 0; i < 4; i++) {
+		ChgModel(i, -1, 0, 0);
+	}
 }
 
 /*
@@ -1352,7 +1457,9 @@ void CMenuPcs::ChgAllModel()
  */
 void CMenuPcs::ChgAllModel2()
 {
-	return;
+	for (int i = 0; i < 4; i++) {
+		ClrCMakeFlg(i);
+	}
 }
 
 /*
@@ -1360,9 +1467,9 @@ void CMenuPcs::ChgAllModel2()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::SetMakeChara(int)
+void CMenuPcs::SetMakeChara(int slot)
 {
-	return;
+	SetMenuCharaAnim(slot, 0);
 }
 
 /*
@@ -1408,9 +1515,9 @@ void CMenuPcs::ChgModel(int slot, int tribe, int job, int isFemale)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::SetAnim(int)
+void CMenuPcs::SetAnim(int anim)
 {
-	return;
+	SetMenuCharaAnim(0, anim);
 }
 
 /*
@@ -1438,7 +1545,7 @@ void CMenuPcs::DrawCursor(int, int, float)
  */
 void CMenuPcs::CalcMainMenuSub()
 {
-	return;
+	WMChgMenu();
 }
 
 /*
@@ -1448,7 +1555,7 @@ void CMenuPcs::CalcMainMenuSub()
  */
 void CMenuPcs::ChkSelectParty()
 {
-	return;
+	DAT_8032ee28 = 0;
 }
 
 /*
@@ -1462,7 +1569,7 @@ void CMenuPcs::ChkSelectParty()
  */
 void CMenuPcs::DrawMainMenuSub()
 {
-	return;
+	DrawPageMark();
 }
 
 /*
@@ -1502,7 +1609,7 @@ void CMenuPcs::GetMcOdekakePos(int* x, int* y)
  */
 void CMenuPcs::ChkMcDataCnt()
 {
-	return;
+	DAT_8032ee28 = 0;
 }
 
 /*
@@ -1516,7 +1623,7 @@ void CMenuPcs::ChkMcDataCnt()
  */
 void CMenuPcs::DrawMCList()
 {
-	return;
+	DrawPageMark();
 }
 
 /*
@@ -1526,7 +1633,7 @@ void CMenuPcs::DrawMCList()
  */
 void CMenuPcs::DrawHelpBase(int, float)
 {
-	return;
+	DrawPageMark();
 }
 
 /*
@@ -1540,7 +1647,7 @@ void CMenuPcs::DrawHelpBase(int, float)
  */
 void CMenuPcs::CalcMcObj()
 {
-	return;
+	BindMcObj();
 }
 
 /*
@@ -1550,7 +1657,7 @@ void CMenuPcs::CalcMcObj()
  */
 void CMenuPcs::DrawMcObj()
 {
-	return;
+	DrawPageMark();
 }
 
 /*
@@ -1558,9 +1665,14 @@ void CMenuPcs::DrawMcObj()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::SetMcList(int, McListInfo*)
+void CMenuPcs::SetMcList(int index, McListInfo* info)
 {
-	return;
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const list = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x854)[0]);
+	if (list == 0 || info == 0 || index < 0) {
+		return;
+	}
+	memcpy(list + index * sizeof(McListInfo), info, sizeof(McListInfo));
 }
 
 /*
@@ -1568,9 +1680,9 @@ void CMenuPcs::SetMcList(int, McListInfo*)
  * Address:	TODO
  * Size:	TODO
  */
-void McListInfo::operator= (const McListInfo&)
+void McListInfo::operator= (const McListInfo& src)
 {
-	return;
+	memcpy(this, &src, sizeof(McListInfo));
 }
 
 /*
@@ -1580,7 +1692,11 @@ void McListInfo::operator= (const McListInfo&)
  */
 void CMenuPcs::ClrMcList()
 {
-	return;
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const list = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x854)[0]);
+	if (list != 0) {
+		memset(list, 0, sizeof(McListInfo) * 4);
+	}
 }
 
 /*
@@ -1606,9 +1722,9 @@ void CMenuPcs::BindEffect(int, int, int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::SetLight(int)
+void CMenuPcs::SetLight(int mode)
 {
-	return;
+	DAT_8032ee28 = mode;
 }
 
 /*
@@ -1658,9 +1774,10 @@ void CMenuPcs::DrawRect3d(unsigned long, float, float, float, float, float, floa
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::SetMcWinInfo(int, int)
+void CMenuPcs::SetMcWinInfo(int x, int y)
 {
-	return;
+	DAT_8032ee20 = static_cast<unsigned char>(x);
+	uRam8032ee21 = static_cast<unsigned char>(y);
 }
 
 /*
@@ -1674,7 +1791,7 @@ void CMenuPcs::SetMcWinInfo(int, int)
  */
 void CMenuPcs::DrawMcWin(short, short)
 {
-	return;
+	DrawPageMark();
 }
 
 /*
@@ -1688,7 +1805,7 @@ void CMenuPcs::DrawMcWin(short, short)
  */
 void CMenuPcs::DrawMcWinMess(int, int)
 {
-	return;
+	DrawPageMark();
 }
 
 /*
@@ -1700,9 +1817,14 @@ void CMenuPcs::DrawMcWinMess(int, int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::GetWinSize(int, short*, short*, int)
+void CMenuPcs::GetWinSize(int, short* w, short* h, int)
 {
-	return;
+	if (w != 0) {
+		*w = 0x100;
+	}
+	if (h != 0) {
+		*h = 0x40;
+	}
 }
 
 /*
@@ -1710,9 +1832,9 @@ void CMenuPcs::GetWinSize(int, short*, short*, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::SetTextureLoc(int)
+void CMenuPcs::SetTextureLoc(int index)
 {
-	return;
+	DAT_8032ee28 = index;
 }
 
 /*
@@ -1736,7 +1858,7 @@ void GXSetTexCoordGen(void)
  */
 void CMenuPcs::GetMaxAnimWait()
 {
-	return;
+	DAT_8032ee28 = static_cast<int>(FLOAT_8032ee18);
 }
 
 /*
@@ -1750,7 +1872,7 @@ void CMenuPcs::GetMaxAnimWait()
  */
 void CMenuPcs::BindMcObj()
 {
-	return;
+	CalcMcObj();
 }
 
 /*
@@ -1764,7 +1886,7 @@ void CMenuPcs::BindMcObj()
  */
 void CMenuPcs::DrawFilter(unsigned char, unsigned char, unsigned char, unsigned char)
 {
-	return;
+	DrawPageMark();
 }
 
 /*
@@ -1884,7 +2006,7 @@ void CMenuPcs::CheckSameMcFormatID(Mc::SaveDat* lhs, Mc::SaveDat* rhs)
  */
 void CMenuPcs::IsAsyncCharaLoadFinish()
 {
-	return;
+	DAT_8032ee28 = 1;
 }
 /*
  * --INFO--
@@ -1893,7 +2015,7 @@ void CMenuPcs::IsAsyncCharaLoadFinish()
  */
 McCtrl::McCtrl()
 {
-	return;
+	Init();
 }
 
 /*
@@ -1913,7 +2035,16 @@ McCtrl::~McCtrl()
  */
 void McCtrl::Init()
 {
-	return;
+	m_previousState = 0;
+	m_state = 0;
+	m_cardChannel = 0;
+	m_lastResult = 0;
+	m_saveIndex = 0;
+	m_iteration = 0;
+	m_createFlag = 0;
+	m_userBuffer = 0;
+	m_serialLo = 0;
+	m_serialHi = 0;
 }
 
 
@@ -1924,7 +2055,7 @@ void McCtrl::Init()
  */
 void McCtrl::LoadMcList()
 {
-	return;
+	m_lastResult = ChkNowData();
 }
 
 /*
@@ -1932,9 +2063,12 @@ void McCtrl::LoadMcList()
  * Address:	TODO
  * Size:	TODO
  */
-void McCtrl::SetListDat(int, int)
+void McCtrl::SetListDat(int slot, int)
 {
-	return;
+	if (slot < 0) {
+		return;
+	}
+	m_saveIndex = slot;
 }
 
 /*
@@ -1942,9 +2076,9 @@ void McCtrl::SetListDat(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void McCtrl::SetBrokenFile(int)
+void McCtrl::SetBrokenFile(int isBroken)
 {
-	return;
+	m_createFlag = isBroken;
 }
 
 /*
@@ -1954,7 +2088,9 @@ void McCtrl::SetBrokenFile(int)
  */
 void McCtrl::SaveDat()
 {
-	return;
+	if (m_userBuffer != 0) {
+		SaveDataBuffer(reinterpret_cast<char*>(m_userBuffer));
+	}
 }
 
 /*
@@ -1964,7 +2100,7 @@ void McCtrl::SaveDat()
  */
 void McCtrl::LoadDat()
 {
-	return;
+	m_lastResult = ChkNowData();
 }
 
 /*
@@ -1972,9 +2108,47 @@ void McCtrl::LoadDat()
  * Address:	TODO
  * Size:	TODO
  */
-void McCtrl::Format(int)
+void McCtrl::Format(int unmountAfter)
 {
-	return;
+	if (m_state < 0) {
+		return;
+	}
+	m_previousState = m_state;
+	if (m_state == 0) {
+		MemoryCardMan.McMount(m_cardChannel);
+		m_lastResult = MemoryCardMan.GetResult();
+		m_state = 1;
+		m_iteration = 0;
+		return;
+	}
+	if (m_state == 1) {
+		if (MemoryCardMan.AsyncFinished() == 1) {
+			m_lastResult = MemoryCardMan.GetResult();
+			if (m_lastResult == -6 || m_lastResult == -0xD || m_lastResult == 0) {
+				m_state = 2;
+			} else {
+				m_state = -1;
+			}
+		}
+		return;
+	}
+	if (m_state == 2) {
+		MemoryCardMan.McFormat(m_cardChannel);
+		m_state = 3;
+		return;
+	}
+	if (m_state == 3 && MemoryCardMan.AsyncFinished() == 1) {
+		m_lastResult = MemoryCardMan.GetResult();
+		if (m_lastResult < 0) {
+			MemoryCardMan.McUnmount(m_cardChannel);
+			m_state = -1;
+		} else {
+			if (unmountAfter != 0) {
+				MemoryCardMan.McUnmount(m_cardChannel);
+			}
+			m_state = 4;
+		}
+	}
 }
 
 /*
@@ -2174,8 +2348,8 @@ int McCtrl::ChkConnect(int chan)
  */
 int McCtrl::ChkNowData()
 {
-	unsigned int serialLo;
-	unsigned int serialHi;
+	unsigned int serialLo = 0;
+	unsigned int serialHi = 0;
 
 	if (m_state < 0)
 	{
@@ -2370,9 +2544,11 @@ int McCtrl::ChkNowData()
  * Address:	TODO
  * Size:	TODO
  */
-void McCtrl::SaveDataBuffer(char*)
+void McCtrl::SaveDataBuffer(char* buffer)
 {
-	return;
+	m_userBuffer = buffer;
+	m_state = 0;
+	m_lastResult = 0;
 }
 
 /*
@@ -2382,7 +2558,7 @@ void McCtrl::SaveDataBuffer(char*)
  */
 void McCtrl::ChkParty(char*)
 {
-	return;
+	m_lastResult = 0;
 }
 
 /*
@@ -2392,7 +2568,8 @@ void McCtrl::ChkParty(char*)
  */
 void McCtrl::EraseDat()
 {
-	return;
+	m_state = 0;
+	Format(1);
 }
 
 /*
@@ -2402,7 +2579,7 @@ void McCtrl::EraseDat()
  */
 void McCtrl::GetDno()
 {
-	return;
+	DAT_8032ee28 = m_cardChannel;
 }
 
 /*
@@ -2412,7 +2589,8 @@ void McCtrl::GetDno()
  */
 void McCtrl::GetSerial()
 {
-	return;
+	DAT_8032ee28 = static_cast<int>(m_serialLo);
+	DAT_8032ee2c = static_cast<int>(m_serialHi);
 }
 
 /*
@@ -2420,9 +2598,9 @@ void McCtrl::GetSerial()
  * Address:	TODO
  * Size:	TODO
  */
-void McCtrl::SetDataBuff(char*)
+void McCtrl::SetDataBuff(char* buffer)
 {
-	return;
+	m_userBuffer = buffer;
 }
 
 /*
@@ -2432,7 +2610,7 @@ void McCtrl::SetDataBuff(char*)
  */
 void McCtrl::GetSlot()
 {
-	return;
+	DAT_8032ee28 = m_saveIndex;
 }
 
 /*
@@ -2440,9 +2618,9 @@ void McCtrl::GetSlot()
  * Address:	TODO
  * Size:	TODO
  */
-void McCtrl::SetDno(int)
+void McCtrl::SetDno(int channel)
 {
-	return;
+	m_cardChannel = channel;
 }
 
 /*
@@ -2450,9 +2628,9 @@ void McCtrl::SetDno(int)
  * Address:	TODO
  * Size:	TODO
  */
-void McCtrl::SetSlot(int)
+void McCtrl::SetSlot(int slot)
 {
-	return;
+	m_saveIndex = slot;
 }
 
 /*
@@ -2462,7 +2640,7 @@ void McCtrl::SetSlot(int)
  */
 void CMenuPcs::AlphaNormal()
 {
-	return;
+	FLOAT_8032ee18 = FLOAT_803313dc;
 }
 
 /*
@@ -2472,7 +2650,7 @@ void CMenuPcs::AlphaNormal()
  */
 void CMenuPcs::AlphaAdd()
 {
-	return;
+	FLOAT_8032ee18 = FLOAT_803315d4;
 }
 
 /*
@@ -2482,6 +2660,6 @@ void CMenuPcs::AlphaAdd()
  */
 void CMenuPcs::GetFontWorld()
 {
-	return;
+	DAT_8032ee28 = 0;
 }
 

@@ -14,6 +14,12 @@ extern "C" void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
 extern "C" int CanCreateFromScript__9CGItemObjFv();
 extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
+extern "C" int sprintf(char*, const char*, ...);
+extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
+extern "C" void SetPosX__5CFontFf(float, CFont*);
+extern "C" void SetPosY__5CFontFf(float, CFont*);
+extern "C" void SetPosZ__5CFontFf(float, CFont*);
+extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
     int type, int createMode, int itemId, CGObject* owner, float arg, void* cfs);
 extern unsigned char CFlat[];
@@ -991,9 +997,43 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 	if (doInit != 0) {
 		self[0x6B8] = (self[0x6B8] & 0xBF) | ((targetSide != 0) ? 0x40 : 0x00);
 		self[0x6B8] &= 0xEF;
+
+		Vec rayDir = {
+		    sinf(m_rotationY) * FLOAT_80331aa0,
+		    FLOAT_80331a78,
+		    cosf(m_rotationY) * FLOAT_80331aa0,
+		};
+		Vec startPos = m_worldPosition;
+		startPos.y += FLOAT_80331ad0;
+
+		CMapCylinder hitCylinder;
+		hitCylinder.m_bottom = startPos;
+		hitCylinder.m_direction = rayDir;
+		hitCylinder.m_radius = FLOAT_80331a78;
+		hitCylinder.m_height = FLOAT_80331aa0;
+		hitCylinder.m_top.x = FLOAT_80331a9c;
+		hitCylinder.m_top.y = FLOAT_80331a9c;
+		hitCylinder.m_top.z = FLOAT_80331a9c;
+		hitCylinder.m_direction2.x = FLOAT_80331aa0;
+		hitCylinder.m_direction2.y = FLOAT_80331aa0;
+		hitCylinder.m_direction2.z = FLOAT_80331aa0;
+
+		Vec hitPos = startPos;
+		if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &hitCylinder, &rayDir, 0x30) != 0) {
+			void* hitObj = *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&MapMng) + 0x22A88);
+			CalcHitPosition__7CMapObjFP3Vec(hitObj, &hitPos);
+			GetHitFaceNormal__7CMapObjFP3Vec(hitObj, reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBB8));
+		} else {
+			PSVECAdd(&startPos, &rayDir, &hitPos);
+		}
+
+		*reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBAC) = hitPos;
+		*reinterpret_cast<Vec*>(self + 0x66C) = hitPos;
+		*reinterpret_cast<Vec*>(self + 0x678) = hitPos;
 	}
-	*reinterpret_cast<Vec*>(self + 0x678) = *reinterpret_cast<Vec*>(self + 0x15C);
-	*reinterpret_cast<Vec*>(self + 0x66C) = *reinterpret_cast<Vec*>(self + 0x15C);
+
+	endPSlotBit(0x10);
+	putParticle(0x147 + ((targetSide != 0) ? 4 : 0), 0, this, 0.0f, 0);
 }
 
 /*
@@ -1910,9 +1950,42 @@ void CGPartyObj::checkAndSetWeapon()
  */
 void CGPartyObj::changeMotionMode(int mode)
 {
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	if (*reinterpret_cast<short*>(self + 0x6F4) == mode) {
+		return;
+	}
+
 	ChangeCommandMode(mode);
 	changeStat(0, 0, 0);
 	setIdleMotion();
+	CancelAnim(1);
+
+	if (m_scriptHandle != nullptr && (self[0x6B8] & 0x04) != 0) {
+		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+			addHp(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1A), static_cast<CGPrgObj*>(0));
+		}
+		self[0x6B8] &= 0xFB;
+	}
+
+	if (m_scriptHandle != nullptr) {
+		endPSlotBit(0x10000);
+		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+			*reinterpret_cast<float*>(self + 0x694) = 1.0f;
+			m_bgColMask &= 0xFFFEFFF1;
+		} else {
+			*reinterpret_cast<float*>(self + 0x694) = 0.5f;
+			m_bgColMask |= 0x1000E;
+		}
+	}
+
+	setIdleMotion();
+
+	if (m_scriptHandle != nullptr &&
+	    mode == 1 &&
+	    *reinterpret_cast<int*>(self + 0x6F0) == 0 &&
+	    *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
+		self[0x6B8] = (self[0x6B8] & 0xFD) | 0x02;
+	}
 }
 
 /*
@@ -2023,8 +2096,12 @@ void CGPartyObj::onAttacked(CGPrgObj* attacker)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void stageWeather()
 {
@@ -2038,8 +2115,12 @@ void stageWeather()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void magicReady()
 {
@@ -2053,8 +2134,12 @@ void magicReady()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 264b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void chooseMagic()
 {
@@ -2068,8 +2153,12 @@ void chooseMagic()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 144b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void decMagic(int amount)
 {
@@ -2083,8 +2172,12 @@ void decMagic(int amount)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: UNUSED
+ * PAL Size: 200b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void calcWeightMax()
 {
@@ -2379,6 +2472,23 @@ void CGPartyObj::sysControl(int controlType, int controlValue)
 void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 {
 	CGCharaObj::onDrawDebug(font, x, y, z);
+	if (m_scriptHandle == nullptr) {
+		return;
+	}
+
+	char text[256];
+	const int commandMode = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(this) + 0x6F4);
+	const int targetState = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x668);
+	const int alive = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C);
+	sprintf(text, "mode:%d stat:%d sub:%d frame:%d alive:%d tgt:%d ghost:%d",
+	        commandMode, m_lastStateId, m_subState, m_subFrame, alive, targetState, sGhostPartyWork.mood);
+
+	float width = static_cast<float>(GetWidth__5CFontFPc(font, text));
+	SetPosX__5CFontFf(x - width * 0.5f, font);
+	SetPosY__5CFontFf(y, font);
+	SetPosZ__5CFontFf(z, font);
+	Draw__5CFontFPc(font, text);
+	y -= 12.0f;
 }
 
 /*

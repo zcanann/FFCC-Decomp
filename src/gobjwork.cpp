@@ -70,12 +70,31 @@ extern "C" CGObjWork* dtor_800A2D8C(CGObjWork* gObjWork, short shouldDelete)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a2ca8
+ * PAL Size: 228b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGObjWork::Init(int, CRomWork*, int)
+void CGObjWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 {
-	// TODO
+	short* romData = reinterpret_cast<short*>(romWork);
+
+	m_baseDataIndex = baseDataIndex;
+	m_id = romData[0] + idOffset;
+	m_param1 = romData[1];
+	m_param2 = romData[2];
+	m_maxHp = romData[3];
+	m_strength = romData[4];
+	m_magic = romData[5];
+	m_defense = romData[6];
+	m_romWorkPtr = reinterpret_cast<unsigned short*>(romData + 8);
+
+	memcpy(m_elementResistances, m_romWorkPtr + 0x6F, 0x16);
+	memset(m_statusTimers + 3, 0, 0x4E);
+	memset(m_statusValues, 0xFF, sizeof(m_statusValues));
+	m_hp = m_maxHp;
 }
 
 /*

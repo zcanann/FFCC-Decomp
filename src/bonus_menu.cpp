@@ -1,15 +1,28 @@
 #include "ffcc/bonus_menu.h"
+#include "ffcc/fontman.h"
 #include "ffcc/gobjwork.h"
 #include "ffcc/p_game.h"
+#include "ffcc/p_tina.h"
 #include "ffcc/sound.h"
 #include <string.h>
 
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
 extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float, float, float, float, float, float, float, float, float);
+extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
+extern "C" void DrawMcWin__8CMenuPcsFss(CMenuPcs*, short, short);
+extern "C" void DrawMcWinMess__8CMenuPcsFii(CMenuPcs*, int, int);
+extern "C" int GetYesNoXPos__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" void DrawCursor__8CMenuPcsFiif(CMenuPcs*, int, int, float);
+extern "C" void SetProjection__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" void SetLight__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" void RestoreProjection__8CMenuPcsFv(CMenuPcs*);
+extern "C" void Draw__Q29CCharaPcs7CHandleFi(void*, int);
+extern "C" void DrawMenuIdx__8CPartPcsFi(void*, int);
 extern "C" {
 extern int lbl_8032EEA8;
 extern int lbl_8032EEB0;
+extern unsigned char PartPcs[];
 }
 
 namespace {
@@ -779,14 +792,29 @@ void CMenuPcs::DrawSelectOpenAnim()
 	int animPtr = *(int*)((char*)this + 0x84c);
 	int statePtr = *(int*)((char*)this + 0x82c);
 
-	if (animPtr == 0 || statePtr == 0) {
+	if (animPtr == 0 || statePtr == 0 || *(unsigned char*)(statePtr + 0xb) == 0) {
 		return;
 	}
 
+	unsigned int* scriptFoodBase = Game.game.m_scriptFoodBase;
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 	float strongest = 0.0f;
-	int digitIndex = 0;
+	float artiAlpha = 0.0f;
+	int modelIndex = 0;
+	int activePartyCount = 0;
+
+	for (int i = 0; i < 4; i++) {
+		if (scriptFoodBase[i] != 0) {
+			activePartyCount++;
+		}
+	}
+	if (activePartyCount <= 0) {
+		activePartyCount = 1;
+	}
+
+	DrawInit__8CMenuPcsFv(this);
+	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
 
 	for (int i = 0; i < (int)header->count; i++) {
 		BonusAnimSprite* sprite = &sprites[i];
@@ -799,19 +827,121 @@ void CMenuPcs::DrawSelectOpenAnim()
 		switch (sprite->kind) {
 		case -4:
 			DrawArtiBase((CMenuPcs::Sprt2*)sprite, alpha);
+			if (artiAlpha < alpha) {
+				artiAlpha = alpha;
+			}
 			break;
 		case -3:
 			DrawBonusFrame((float)sprite->x, (float)sprite->y, (float)sprite->w, (float)sprite->h, alpha);
 			break;
 		case -2:
-			DrawBonusCnt((CMenuPcs::Sprt2*)sprite, digitIndex++);
+			if (modelIndex < activePartyCount) {
+				int basePtr = *(int*)((char*)this + 0x840);
+				if (basePtr != 0) {
+					int slotPtr = basePtr + (modelIndex * 0x524);
+					void* handle = *(void**)slotPtr;
+					if (handle != 0) {
+						SetProjection__8CMenuPcsFi(this, modelIndex);
+						SetLight__8CMenuPcsFi(this, 1);
+						unsigned int oldFlags = *(unsigned int*)((char*)handle + 8);
+						*(unsigned int*)((char*)handle + 8) = 0x300543;
+						Draw__Q29CCharaPcs7CHandleFi(handle, 5);
+						*(unsigned int*)((char*)handle + 8) = oldFlags;
+						DrawMenuIdx__8CPartPcsFi(PartPcs, *(int*)(slotPtr + 4));
+						RestoreProjection__8CMenuPcsFv(this);
+					}
+				}
+			}
+			modelIndex++;
 			break;
 		default:
+			{
+				GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(alpha * 255.0f)};
+				GXSetChanMatColor(GX_COLOR0A0, color);
+				SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, sprite->tex);
+				if (sprite->tex == 0x20) {
+					GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_CLEAR);
+				}
+				DrawRect__8CMenuPcsFUlfffffffff(this, 0,
+				    (float)sprite->x + sprite->mulX, (float)sprite->y + sprite->mulY,
+				    (float)sprite->w, (float)sprite->h,
+				    sprite->depth, sprite->depth, sprite->scale, sprite->scale, 0.0f);
+				if (sprite->tex == 0x20) {
+					GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+				}
+			}
 			break;
 		}
 
 		if (strongest < alpha) {
 			strongest = alpha;
+		}
+	}
+
+	if (artiAlpha > 0.0f) {
+		unsigned char activeMask = *(unsigned char*)(statePtr + 9);
+		if (activeMask == 0) {
+			for (int i = 0; i < 4; i++) {
+				if (scriptFoodBase[i] != 0) {
+					activeMask = (unsigned char)(activeMask | (1 << i));
+				}
+			}
+		}
+
+		SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+		SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x23);
+		GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(artiAlpha * 255.0f)};
+		GXSetChanMatColor(GX_COLOR0A0, color);
+
+		float* markPos = (float*)lbl_8032EEB0;
+		if (markPos != 0) {
+			for (int i = 0; i < 8; i++) {
+				if ((activeMask & (1 << i)) != 0) {
+					float x = markPos[i * 2 + 0] + 4.0f;
+					float y = markPos[i * 2 + 1] + 4.0f;
+					DrawRect__8CMenuPcsFUlfffffffff(this, 0, x, y, 24.0f, 24.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+				}
+			}
+		}
+	}
+
+	DrawInit__8CMenuPcsFv(this);
+	CFont* font = *(CFont**)((char*)this + 0xf8);
+	if (font != 0) {
+		font->SetMargin(1.0f);
+		font->SetShadow(1);
+		font->SetScale(1.0f);
+		font->SetTlut(7);
+		font->DrawInit();
+
+		int nameIndex = 0;
+		for (int i = 0; i < (int)header->count && nameIndex < activePartyCount; i++) {
+			BonusAnimSprite* sprite = &sprites[i];
+			if (sprite->kind != -1) {
+				continue;
+			}
+
+			GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(sprite->alpha * 255.0f)};
+			font->SetColor(color);
+			if (scriptFoodBase[nameIndex] != 0) {
+				char* name = (char*)(scriptFoodBase[nameIndex] + 0x3ca);
+				font->SetPosX((float)sprite->x + sprite->mulX);
+				font->SetPosY((float)sprite->y + sprite->mulY - 12.0f);
+				font->Draw(name);
+			}
+			nameIndex++;
+		}
+	}
+
+	DrawInit__8CMenuPcsFv(this);
+	if (*(short*)(*(int*)((char*)this + 0x848) + 10) != 3) {
+		DrawMcWin__8CMenuPcsFss(this, -1, 1);
+		if (*(short*)(*(int*)((char*)this + 0x848) + 10) == 1) {
+			DrawMcWinMess__8CMenuPcsFii(this, 0x18, 1);
+			DrawInit__8CMenuPcsFv(this);
+			int cursorX = GetYesNoXPos__8CMenuPcsFi(this, (int)*(short*)(statePtr + 0x28));
+			float cursorY = (float)(*(short*)(*(int*)((char*)this + 0x848) + 2) + *(short*)(*(int*)((char*)this + 0x848) + 6) - 0x3e);
+			DrawCursor__8CMenuPcsFiif(this, cursorX, (int)cursorY, 1.0f);
 		}
 	}
 

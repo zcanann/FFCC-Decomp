@@ -1,8 +1,10 @@
 #include "ffcc/wm_menu.h"
 
 #include "ffcc/goout.h"
+#include "ffcc/gbaque.h"
 #include "ffcc/menu.h"
 #include "ffcc/p_game.h"
+#include "ffcc/THPSimple.h"
 
 #include <dolphin/mtx.h>
 #include <math.h>
@@ -35,8 +37,15 @@ extern "C" void SetAmbient__9CLightPcsF8_GXColor(void*, void*);
 extern "C" void SetNumDiffuse__9CLightPcsFUl(void*, unsigned long);
 extern "C" void SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(void*, unsigned long, void*, void*, int);
 extern "C" void SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(void*, int, Vec*, unsigned long);
+extern "C" void Create__9CGBaseObjFv(void*);
+extern "C" unsigned int pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(void*, int, int, void*, int);
+extern "C" void pppDestroyAll__8CPartMngFv(void*);
+extern "C" void __dl__FPv(void*);
+extern "C" void __dla__FPv(void*);
+extern "C" void* Free__7CMemoryFPv(CMemory*, void*);
 extern "C" unsigned char LightPcs[];
 extern "C" unsigned char Graphic[];
+extern "C" unsigned char PartMng[];
 extern "C" int DAT_8021082c[];
 extern "C" int DAT_80210830[];
 
@@ -46,6 +55,9 @@ extern float FLOAT_803313e0;
 extern float FLOAT_803313e4;
 extern float FLOAT_803313e8;
 extern float FLOAT_803314bc;
+extern float FLOAT_8033151c;
+extern float FLOAT_80331528;
+extern float FLOAT_803315cc;
 extern float FLOAT_80331598;
 extern float FLOAT_803315d4;
 extern float FLOAT_80331698;
@@ -65,6 +77,22 @@ extern char s__s__d___Error_WM_menu_no_error___801dc424[];
 
 static const int kMcListEntrySize = 0x48;
 static const int kMcListCount = 4;
+
+static void releaseRefCounted(void** refObj)
+{
+	if (refObj == 0 || *refObj == 0) {
+		return;
+	}
+	int* const obj = reinterpret_cast<int*>(*refObj);
+	const int refCount = obj[1] - 1;
+	obj[1] = refCount;
+	if (refCount == 0) {
+		typedef void (*DestroyFn)(void*, int);
+		DestroyFn destroyFn = *reinterpret_cast<DestroyFn*>(reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(obj)) + 8);
+		destroyFn(obj, 1);
+	}
+	*refObj = 0;
+}
 
 /*
  * --INFO--
@@ -324,16 +352,94 @@ void CMenuPcs::InitCSelCurPos()
 void CMenuPcs::destroyWorld()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	reinterpret_cast<unsigned int*>(bytes + 0x814)[0] = 0;
-	reinterpret_cast<unsigned int*>(bytes + 0x818)[0] = 0;
-	reinterpret_cast<unsigned int*>(bytes + 0x81C)[0] = 0;
-	reinterpret_cast<unsigned int*>(bytes + 0x820)[0] = 0;
-	reinterpret_cast<unsigned int*>(bytes + 0x824)[0] = 0;
-	reinterpret_cast<unsigned int*>(bytes + 0x828)[0] = 0;
-	reinterpret_cast<unsigned int*>(bytes + 0x82C)[0] = 0;
-	reinterpret_cast<unsigned int*>(bytes + 0x83C)[0] = 0;
-	reinterpret_cast<unsigned int*>(bytes + 0x840)[0] = 0;
-	reinterpret_cast<unsigned int*>(bytes + 0x854)[0] = 0;
+
+	releaseRefCounted(reinterpret_cast<void**>(bytes + 0x11C));
+	releaseRefCounted(reinterpret_cast<void**>(bytes + 0x120));
+	releaseRefCounted(reinterpret_cast<void**>(bytes + 0xFC));
+
+	if (reinterpret_cast<void**>(bytes + 0x81C)[0] != 0) {
+		__dl__FPv(reinterpret_cast<void**>(bytes + 0x81C)[0]);
+		reinterpret_cast<void**>(bytes + 0x81C)[0] = 0;
+	}
+
+	freeTexture(2, 3, 0x16, 0x2F);
+
+	if (reinterpret_cast<void**>(bytes + 0xBC)[0] != 0) {
+		releaseRefCounted(reinterpret_cast<void**>(bytes + 0xBC));
+	}
+
+	if (reinterpret_cast<void**>(bytes + 0x814)[0] != 0) {
+		__dla__FPv(reinterpret_cast<void**>(bytes + 0x814)[0]);
+		reinterpret_cast<void**>(bytes + 0x814)[0] = 0;
+	}
+	if (reinterpret_cast<void**>(bytes + 0x818)[0] != 0) {
+		__dl__FPv(reinterpret_cast<void**>(bytes + 0x818)[0]);
+		reinterpret_cast<void**>(bytes + 0x818)[0] = 0;
+	}
+	if (reinterpret_cast<void**>(bytes + 0x81C)[0] != 0) {
+		__dl__FPv(reinterpret_cast<void**>(bytes + 0x81C)[0]);
+		reinterpret_cast<void**>(bytes + 0x81C)[0] = 0;
+	}
+	if (reinterpret_cast<void**>(bytes + 0x820)[0] != 0) {
+		__dl__FPv(reinterpret_cast<void**>(bytes + 0x820)[0]);
+		reinterpret_cast<void**>(bytes + 0x820)[0] = 0;
+	}
+	if (reinterpret_cast<void**>(bytes + 0x824)[0] != 0) {
+		__dla__FPv(reinterpret_cast<void**>(bytes + 0x824)[0]);
+		reinterpret_cast<void**>(bytes + 0x824)[0] = 0;
+	}
+	if (reinterpret_cast<void**>(bytes + 0x828)[0] != 0) {
+		__dla__FPv(reinterpret_cast<void**>(bytes + 0x828)[0]);
+		reinterpret_cast<void**>(bytes + 0x828)[0] = 0;
+	}
+	if (reinterpret_cast<void**>(bytes + 0x844)[0] != 0) {
+		__dla__FPv(reinterpret_cast<void**>(bytes + 0x844)[0]);
+		reinterpret_cast<void**>(bytes + 0x844)[0] = 0;
+	}
+	if (reinterpret_cast<void**>(bytes + 0x82C)[0] != 0) {
+		__dl__FPv(reinterpret_cast<void**>(bytes + 0x82C)[0]);
+		reinterpret_cast<void**>(bytes + 0x82C)[0] = 0;
+	}
+	if (reinterpret_cast<void**>(bytes + 0x838)[0] != 0) {
+		__dla__FPv(reinterpret_cast<void**>(bytes + 0x838)[0]);
+		reinterpret_cast<void**>(bytes + 0x838)[0] = 0;
+	}
+	if (reinterpret_cast<void**>(bytes + 0x83C)[0] != 0) {
+		__dl__FPv(reinterpret_cast<void**>(bytes + 0x83C)[0]);
+		reinterpret_cast<void**>(bytes + 0x83C)[0] = 0;
+	}
+	if (reinterpret_cast<void**>(bytes + 0x840)[0] != 0) {
+		unsigned char* const slotAlloc = reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(bytes + 0x840)[0]);
+		__dla__FPv(slotAlloc - 0x10);
+		reinterpret_cast<void**>(bytes + 0x840)[0] = 0;
+	}
+	if (reinterpret_cast<void**>(bytes + 0x848)[0] != 0) {
+		__dl__FPv(reinterpret_cast<void**>(bytes + 0x848)[0]);
+		reinterpret_cast<void**>(bytes + 0x848)[0] = 0;
+	}
+
+	if (bytes[0x858] != 0) {
+		THPSimpleAudioStop();
+		THPSimpleLoadStop();
+		THPSimpleClose();
+		THPSimpleQuit();
+		if (reinterpret_cast<void**>(bytes + 0x854)[0] != 0) {
+			Free__7CMemoryFPv(&Memory, reinterpret_cast<void**>(bytes + 0x854)[0]);
+			reinterpret_cast<void**>(bytes + 0x854)[0] = 0;
+		}
+		bytes[0x858] = 0;
+	}
+
+	pppDestroyAll__8CPartMngFv(PartMng);
+	MemoryCardMan.McEnd();
+
+	GXColor clearColor;
+	clearColor.r = 0;
+	clearColor.g = 0;
+	clearColor.b = 0;
+	clearColor.a = 0;
+	GXSetCopyClear(clearColor, 0x00FFFFFF);
+	GbaQue.SetControllerMode(0);
 }
 
 /*
@@ -1793,6 +1899,85 @@ void CMenuPcs::DrawCursor(int x, int y, float scale)
  */
 void CMenuPcs::CalcMainMenuSub()
 {
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const world = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	const unsigned short btn = static_cast<unsigned short>(GetButtonDown(0));
+	const short state = reinterpret_cast<short*>(world + 0x10)[0];
+
+	if (((state > 0) && (state < 4)) || reinterpret_cast<short*>(world + 0x26)[0] == 1) {
+		if (state == 2 && reinterpret_cast<short*>(world + 0x18)[0] == 0) {
+			if ((btn & 1) != 0) {
+				*reinterpret_cast<float*>(bytes + 0x78) -= FLOAT_8033151c;
+				if (*reinterpret_cast<float*>(bytes + 0x78) < FLOAT_803313dc) {
+					*reinterpret_cast<float*>(bytes + 0x78) += FLOAT_80331528;
+					*reinterpret_cast<float*>(bytes + 0x7C) += FLOAT_80331528;
+				}
+				*reinterpret_cast<short*>(world + 0x22) = 0xE;
+				if (*reinterpret_cast<short*>(world + 0x26) < 4) {
+					(*reinterpret_cast<short*>(world + 0x26))++;
+				} else {
+					*reinterpret_cast<short*>(world + 0x26) = 0;
+				}
+				PlaySe__6CSoundFiiii(&Sound, 0x37, 0x40, 0x7F, 0);
+			} else if ((btn & 2) != 0) {
+				*reinterpret_cast<float*>(bytes + 0x78) += FLOAT_8033151c;
+				if (*reinterpret_cast<float*>(bytes + 0x78) > FLOAT_80331528) {
+					*reinterpret_cast<float*>(bytes + 0x78) -= FLOAT_80331528;
+					*reinterpret_cast<float*>(bytes + 0x7C) -= FLOAT_80331528;
+				}
+				*reinterpret_cast<short*>(world + 0x22) = 0xE;
+				if (*reinterpret_cast<short*>(world + 0x26) < 1) {
+					*reinterpret_cast<short*>(world + 0x26) = 4;
+				} else {
+					(*reinterpret_cast<short*>(world + 0x26))--;
+				}
+				PlaySe__6CSoundFiiii(&Sound, 0x37, 0x40, 0x7F, 0);
+			}
+
+			const float selA = *reinterpret_cast<float*>(bytes + 0x78);
+			const float selB = *reinterpret_cast<float*>(bytes + 0x7C);
+			const float lo = (selA < selB) ? selA : selB;
+			const float hi = (selA < selB) ? selB : selA;
+			const float delta = FLOAT_803315cc * (hi - lo);
+			if (selA < selB) {
+				*reinterpret_cast<float*>(bytes + 0x7C) -= delta;
+			} else {
+				*reinterpret_cast<float*>(bytes + 0x7C) += delta;
+			}
+
+			if (*reinterpret_cast<short*>(world + 0x22) > 0) {
+				(*reinterpret_cast<short*>(world + 0x22))--;
+			}
+
+			if (*reinterpret_cast<short*>(world + 0x22) == 0 && (btn & 3) == 0) {
+				if ((btn & 0x100) != 0) {
+					*reinterpret_cast<float*>(bytes + 0x7C) = *reinterpret_cast<float*>(bytes + 0x78);
+					*reinterpret_cast<short*>(world + 0x18) = 0x14;
+					*reinterpret_cast<short*>(world + 0x1E) = 1;
+					PlaySe__6CSoundFiiii(&Sound, 2, 0x40, 0x7F, 0);
+				} else if ((btn & 0x200) != 0) {
+					int valid = 0;
+					*reinterpret_cast<float*>(bytes + 0x7C) = *reinterpret_cast<float*>(bytes + 0x78);
+					for (int i = 0; i < 4; i++) {
+						if (Game.game.m_gameWork.m_menuStageMode != 0 && i != 0) {
+							break;
+						}
+						if (*reinterpret_cast<short*>(world + 0x3E + i * 2) >= 0) {
+							valid++;
+						}
+					}
+					if (valid == 0) {
+						PlaySe__6CSoundFiiii(&Sound, 4, 0x40, 0x7F, 0);
+					} else {
+						*reinterpret_cast<short*>(world + 0x18) = 1;
+						*reinterpret_cast<short*>(world + 0x1E) = -1;
+						PlaySe__6CSoundFiiii(&Sound, 3, 0x40, 0x7F, 0);
+					}
+				}
+			}
+		}
+	}
+
 	WMChgMenu();
 }
 
@@ -2027,9 +2212,47 @@ void CMenuPcs::ClrMcList()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::BindEffect(int, int, int)
+void CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 {
-	return;
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	if (cameraSlot < 0) {
+		cameraSlot = slot;
+	}
+
+	unsigned char* effect = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x840)[0] + slot * 0x524);
+	if (slot == 5 && effectNo < 0x13) {
+		effect += 0x524;
+	} else if (slot > 0x10 && slot < 0x15 && effectNo > 0x19) {
+		effect += 0x524;
+	}
+
+	*reinterpret_cast<unsigned int*>(effect + 0x0) = static_cast<unsigned int>(effectNo);
+	*reinterpret_cast<unsigned int*>(effect + 0x8) = static_cast<unsigned int>(slot);
+	Create__9CGBaseObjFv(effect + 0xC);
+	*reinterpret_cast<unsigned int*>(effect + 0x104) = *reinterpret_cast<unsigned int*>(bytes + 0x4A8 + cameraSlot * 4);
+
+	unsigned char createParam[0x88];
+	memset(createParam, 0, sizeof(createParam));
+	*reinterpret_cast<unsigned int*>(createParam + 0x48) = 0xFFFFFFFF;
+	*reinterpret_cast<unsigned int*>(createParam + 0x58) = 0xFFFFFFFF;
+	createParam[0x54] = 0;
+	createParam[0x53] = 1;
+	*reinterpret_cast<unsigned int*>(createParam + 0x50) = 0;
+	createParam[0x52] = 0;
+	*reinterpret_cast<unsigned int*>(createParam + 0x4C) = 0x1E;
+	*reinterpret_cast<unsigned int*>(createParam + 0x44) = 0;
+	*reinterpret_cast<unsigned short*>(createParam + 0x40) = 0;
+	createParam[0x3E] = 0;
+	createParam[0x3D] = 0;
+	*reinterpret_cast<void**>(createParam + 0x74) = effect + 0xC;
+	*reinterpret_cast<void**>(createParam + 0x70) = effect + 0xC;
+	*reinterpret_cast<float*>(createParam + 0x64) = FLOAT_803313e8;
+	*reinterpret_cast<float*>(createParam + 0x60) = FLOAT_803313e8;
+	createParam[0x5C] = 0;
+
+	const int group = ((effectNo ^ 100) >> 1) - ((((effectNo ^ 100) & effectNo)) >> 31);
+	const unsigned int partId = pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(PartMng, group, effectNo, createParam, 1);
+	*reinterpret_cast<unsigned int*>(effect + 0x4) = partId;
 }
 
 /*

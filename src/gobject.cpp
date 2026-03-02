@@ -972,12 +972,89 @@ void CGObject::bgWorldCollision()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800801c4
+ * PAL Size: 736b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGObject::bgAttribCollision()
 {
-	// TODO
+    const bool hasModel =
+        (m_charaModelHandle != (CCharaPcs::CHandle*)0) &&
+        (m_charaModelHandle->m_model != (CChara::CModel*)0);
+    if (!hasModel) {
+        return;
+    }
+
+    *reinterpret_cast<u8*>(&m_shieldNodeFlags) &= 0xDF;
+    if ((m_displayFlags & 4) != 0) {
+        CMapCylinder charmCylinder;
+        charmCylinder.m_bottom.x = m_worldPosition.x;
+        charmCylinder.m_bottom.y = FLOAT_80330410 + m_worldPosition.y;
+        charmCylinder.m_bottom.z = m_worldPosition.z;
+        charmCylinder.m_direction.x = sZeroFloat;
+        charmCylinder.m_direction.y = -1.0f;
+        charmCylinder.m_direction.z = sZeroFloat;
+        charmCylinder.m_radius = 0.3f;
+        charmCylinder.m_height = 0.3f;
+        charmCylinder.m_top = charmCylinder.m_direction;
+        charmCylinder.m_direction2.x = 0.3f;
+        charmCylinder.m_direction2.y = 0.6f;
+        charmCylinder.m_direction2.z = 0.6f;
+        charmCylinder.m_radius2 = sZeroFloat;
+        charmCylinder.m_height2 = sZeroFloat;
+
+        if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
+                &MapMng, &charmCylinder, &charmCylinder.m_direction, 0x80000000)
+            != 0) {
+            Vec hitPos;
+            CalcHitPosition__7CMapObjFP3Vec(
+                *reinterpret_cast<void**>(reinterpret_cast<u8*>(&MapMng) + 0x22A88), &hitPos);
+            m_bgCharmFactor = m_worldPosition.y - hitPos.y;
+            *reinterpret_cast<u8*>(&m_shieldNodeFlags) = (*reinterpret_cast<u8*>(&m_shieldNodeFlags) & 0xDF) | 0x20;
+        }
+    }
+
+    if ((m_weaponNodeFlags & 1) == 0) {
+        if ((m_groundHitOffset.x != sZeroFloat) || (m_groundHitOffset.z != sZeroFloat)) {
+            CMapCylinder attrCylinder;
+            attrCylinder.m_bottom.x = m_worldPosition.x;
+            attrCylinder.m_bottom.y = FLOAT_80330360 + m_worldPosition.y;
+            attrCylinder.m_bottom.z = m_worldPosition.z;
+            attrCylinder.m_direction.x = sZeroFloat;
+            attrCylinder.m_direction.y = -0.5f;
+            attrCylinder.m_direction.z = sZeroFloat;
+            attrCylinder.m_radius = 0.3f;
+            attrCylinder.m_height = 0.3f;
+            attrCylinder.m_top = attrCylinder.m_direction;
+            attrCylinder.m_direction2.x = 0.3f;
+            attrCylinder.m_direction2.y = 0.6f;
+            attrCylinder.m_direction2.z = 0.6f;
+            attrCylinder.m_radius2 = sZeroFloat;
+            attrCylinder.m_height2 = sZeroFloat;
+
+            if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
+                    &MapMng, &attrCylinder, &attrCylinder.m_direction, 0x78000000)
+                == 0) {
+                m_bgAttrValue = sAnimFrameOffset;
+            } else {
+                const int attr = static_cast<int>(DAT_8032ec90[0x47]) - 0x28;
+                if (attr == 0) {
+                    m_bgAttrValue = 0.5f;
+                } else if (attr == 1) {
+                    m_bgAttrValue = 0.75f;
+                } else if (attr == 2) {
+                    m_bgAttrValue = 0.25f;
+                } else if (attr == 3) {
+                    m_bgAttrValue = sZeroFloat;
+                }
+            }
+        }
+    } else {
+        m_bgAttrValue = m_attachOwner->m_bgAttrValue;
+    }
 }
 
 /*

@@ -8,6 +8,8 @@ extern "C" int rand(void);
 extern "C" int __cntlzw(unsigned int);
 
 CMath math;
+extern "C" char __vt__8CManager[];
+extern "C" char __vt__5CMath[];
 static Vec s_f_vpos;
 static Mtx s_f_lvmtx;
 static float s_hSpline[128];
@@ -20,6 +22,15 @@ struct Vec4d {
     float z;
     float w;
 };
+
+extern "C" void __sinit_math_cpp(void)
+{
+    void* const managerVtable = __vt__8CManager;
+    void* const mathVtable = __vt__5CMath;
+
+    *reinterpret_cast<volatile void**>(&math) = managerVtable;
+    *reinterpret_cast<volatile void**>(&math) = mathVtable;
+}
 
 /*
  * --INFO--

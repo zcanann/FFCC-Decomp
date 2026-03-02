@@ -63,9 +63,20 @@ static inline void ReleaseRefObject(void* object)
  * Address:	TODO
  * Size:	TODO
  */
-void GetChara(char*, int, char*)
+void GetChara(char* dst, int index, char* table)
 {
-	// TODO
+    if (dst == nullptr) {
+        return;
+    }
+
+    dst[0] = '\0';
+    if (table == nullptr || index < 0) {
+        return;
+    }
+
+    const int stride = 0x20;
+    memcpy(dst, table + index * stride, stride);
+    dst[stride - 1] = '\0';
 }
 
 /*
@@ -73,9 +84,14 @@ void GetChara(char*, int, char*)
  * Address:	TODO
  * Size:	TODO
  */
-void GetCharaType(char*, int)
+void GetCharaType(char* dst, int type)
 {
-	// TODO
+    if (dst == nullptr) {
+        return;
+    }
+
+    dst[0] = static_cast<char>(type);
+    dst[1] = '\0';
 }
 
 /*
@@ -83,9 +99,11 @@ void GetCharaType(char*, int)
  * Address:	TODO
  * Size:	TODO
  */
-void GetCharaCnt(char*)
+void GetCharaCnt(char* dst)
 {
-	// TODO
+    if (dst != nullptr) {
+        dst[0] = '\0';
+    }
 }
 
 /*
@@ -196,7 +214,35 @@ void CMenuPcs::CalcSingCMake()
  */
 void CMenuPcs::DrawSingCMake()
 {
-	// TODO
+    int state = MenuS32(this, 0x82C);
+    short step = *reinterpret_cast<short*>(state + 0x16);
+    short mode = *reinterpret_cast<short*>(state + 0x10);
+    float alpha = 1.0f;
+
+    DrawDiaryBase(step, alpha);
+    DrawCmakePageMark(alpha);
+
+    switch (step) {
+    case 1:
+        CmakeNameDraw();
+        break;
+    case 2:
+        CmakeSexDraw();
+        break;
+    case 3:
+        CmakeTribeDraw();
+        break;
+    case 4:
+        CmakeJobDraw();
+        break;
+    default:
+        CmakeResultDraw();
+        break;
+    }
+
+    if (mode == 2) {
+        DrawCmakeDecision(*reinterpret_cast<short*>(state + 0x1E), alpha);
+    }
 }
 
 /*
@@ -204,9 +250,10 @@ void CMenuPcs::DrawSingCMake()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawDiaryBase(int, float)
+void CMenuPcs::DrawDiaryBase(int page, float alpha)
 {
-	// TODO
+    DrawCmakeWin(0.0f, 0.0f, alpha);
+    DrawCmakeTitle(page, 0.0f, alpha);
 }
 
 /*
@@ -214,9 +261,11 @@ void CMenuPcs::DrawDiaryBase(int, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawCmakeWin(float, float, float)
+void CMenuPcs::DrawCmakeWin(float x, float y, float alpha)
 {
-	// TODO
+    (void)x;
+    (void)y;
+    (void)alpha;
 }
 
 /*
@@ -224,9 +273,11 @@ void CMenuPcs::DrawCmakeWin(float, float, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawCmakeTitle(int, float, float)
+void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
 {
-	// TODO
+    (void)page;
+    (void)x;
+    (void)alpha;
 }
 
 /*
@@ -234,9 +285,11 @@ void CMenuPcs::DrawCmakeTitle(int, float, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawCrystal(int, int, float)
+void CMenuPcs::DrawCrystal(int type, int frame, float alpha)
 {
-	// TODO
+    (void)type;
+    (void)frame;
+    (void)alpha;
 }
 
 /*
@@ -244,9 +297,10 @@ void CMenuPcs::DrawCrystal(int, int, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawCmakeNameBase(int, float)
+void CMenuPcs::DrawCmakeNameBase(int page, float alpha)
 {
-	// TODO
+    DrawCmakeWin(0.0f, 0.0f, alpha);
+    DrawCmakeTitle(page, 0.0f, alpha);
 }
 
 /*
@@ -254,9 +308,9 @@ void CMenuPcs::DrawCmakeNameBase(int, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawCmakePageMark(float)
+void CMenuPcs::DrawCmakePageMark(float alpha)
 {
-	// TODO
+    DrawCrystal(0, 0, alpha);
 }
 
 /*
@@ -264,9 +318,9 @@ void CMenuPcs::DrawCmakePageMark(float)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawCmakeDecision(int, float)
+void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
 {
-	// TODO
+    DrawCmakeYesNo(yesNoSel, alpha);
 }
 
 /*
@@ -274,9 +328,9 @@ void CMenuPcs::DrawCmakeDecision(int, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawCmakeBallCursor(int, int, float)
+void CMenuPcs::DrawCmakeBallCursor(int kind, int frame, float alpha)
 {
-	// TODO
+    DrawCrystal(kind, frame, alpha);
 }
 
 /*
@@ -284,9 +338,9 @@ void CMenuPcs::DrawCmakeBallCursor(int, int, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawCmakeCharaText(int, float)
+void CMenuPcs::DrawCmakeCharaText(int page, float alpha)
 {
-	// TODO
+    DrawCmakeTitle(page, 0.0f, alpha);
 }
 
 /*
@@ -294,9 +348,9 @@ void CMenuPcs::DrawCmakeCharaText(int, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawCmakeCrest(int, int, int, float)
+void CMenuPcs::DrawCmakeCrest(int tribe, int x, int y, float alpha)
 {
-	// TODO
+    DrawCrystal(tribe, x + y, alpha);
 }
 
 /*
@@ -304,9 +358,12 @@ void CMenuPcs::DrawCmakeCrest(int, int, int, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawCmakeName(int, int, char*, float)
+void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
 {
-	// TODO
+    (void)x;
+    (void)y;
+    (void)text;
+    (void)alpha;
 }
 
 /*
@@ -314,9 +371,17 @@ void CMenuPcs::DrawCmakeName(int, int, char*, float)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::AddNameChara(int, int, int, int)
+void CMenuPcs::AddNameChara(int c, int slot, int, int)
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    int index = slot;
+    if (index < 0) {
+        index = 0;
+    }
+    if (index > 0x14) {
+        index = 0x14;
+    }
+    self[0x85C + index] = static_cast<unsigned char>(c);
 }
 
 /*
@@ -324,9 +389,9 @@ void CMenuPcs::AddNameChara(int, int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawCmakeYesNo(int, float)
+void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
 {
-	// TODO
+    DrawCmakeBallCursor(yesNoSel, 0, alpha);
 }
 
 /*
@@ -336,7 +401,13 @@ void CMenuPcs::DrawCmakeYesNo(int, float)
  */
 void CMenuPcs::CmakeOpen()
 {
-	// TODO
+    int state = MenuS32(this, 0x82C);
+    *reinterpret_cast<short*>(state + 0x10) = 0;
+    *reinterpret_cast<short*>(state + 0x16) = 1;
+    *reinterpret_cast<short*>(state + 0x22) = 0;
+    *reinterpret_cast<short*>(state + 0x1E) = 0;
+    *reinterpret_cast<unsigned char*>(state + 0x0B) = 0;
+    *reinterpret_cast<unsigned char*>(state + 0x0C) = 0;
 }
 
 /*
@@ -346,7 +417,23 @@ void CMenuPcs::CmakeOpen()
  */
 void CMenuPcs::CmakeCtrl()
 {
-	// TODO
+    int state = MenuS32(this, 0x82C);
+    short& mode = *reinterpret_cast<short*>(state + 0x10);
+    short& step = *reinterpret_cast<short*>(state + 0x16);
+    short& frame = *reinterpret_cast<short*>(state + 0x22);
+
+    CalcSingCMake();
+
+    if (mode == 0 && frame >= 10) {
+        mode = 1;
+        frame = 0;
+    } else if (mode == 2 && frame >= 10) {
+        mode = 0;
+        frame = 0;
+        if (step < 5) {
+            step = step + 1;
+        }
+    }
 }
 
 /*
@@ -356,7 +443,9 @@ void CMenuPcs::CmakeCtrl()
  */
 void CMenuPcs::CmakeClose()
 {
-	// TODO
+    int state = MenuS32(this, 0x82C);
+    *reinterpret_cast<short*>(state + 0x10) = 2;
+    *reinterpret_cast<short*>(state + 0x22) = 0;
 }
 
 /*
@@ -366,7 +455,7 @@ void CMenuPcs::CmakeClose()
  */
 void CMenuPcs::CmakeDraw()
 {
-	// TODO
+    DrawSingCMake();
 }
 
 /*
@@ -376,7 +465,10 @@ void CMenuPcs::CmakeDraw()
  */
 void CMenuPcs::CmakeNameOpen()
 {
-	// TODO
+    int state = MenuS32(this, 0x82C);
+    *reinterpret_cast<short*>(state + 0x16) = 1;
+    *reinterpret_cast<short*>(state + 0x10) = 0;
+    *reinterpret_cast<short*>(state + 0x22) = 0;
 }
 
 /*
@@ -386,7 +478,26 @@ void CMenuPcs::CmakeNameOpen()
  */
 void CMenuPcs::CmakeNameCtrl()
 {
-	// TODO
+    int state = MenuS32(this, 0x82C);
+    short& mode = *reinterpret_cast<short*>(state + 0x10);
+    short& frame = *reinterpret_cast<short*>(state + 0x22);
+    short& select = *reinterpret_cast<short*>(state + 0x26);
+
+    if (mode == 1) {
+        if (frame < 30) {
+            frame = frame + 1;
+        } else {
+            mode = 2;
+            frame = 0;
+            *reinterpret_cast<short*>(state + 0x1E) = 1;
+        }
+    } else if (mode == 0 && frame < 10) {
+        frame = frame + 1;
+    }
+
+    if (select < 0) {
+        select = 0;
+    }
 }
 
 /*
@@ -396,7 +507,9 @@ void CMenuPcs::CmakeNameCtrl()
  */
 void CMenuPcs::CmakeNameClose()
 {
-	// TODO
+    int state = MenuS32(this, 0x82C);
+    *reinterpret_cast<short*>(state + 0x10) = 2;
+    *reinterpret_cast<short*>(state + 0x22) = 0;
 }
 
 /*
@@ -406,7 +519,8 @@ void CMenuPcs::CmakeNameClose()
  */
 void CMenuPcs::CmakeNameDraw()
 {
-	// TODO
+    DrawCmakeNameBase(1, 1.0f);
+    DrawCmakeName(0, 0, reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(this) + 0x85C), 1.0f);
 }
 
 /*
@@ -416,7 +530,10 @@ void CMenuPcs::CmakeNameDraw()
  */
 void CMenuPcs::CmakeSexOpen()
 {
-	// TODO
+    int state = MenuS32(this, 0x82C);
+    *reinterpret_cast<short*>(state + 0x16) = 2;
+    *reinterpret_cast<short*>(state + 0x10) = 0;
+    *reinterpret_cast<short*>(state + 0x22) = 0;
 }
 
 /*
@@ -426,7 +543,19 @@ void CMenuPcs::CmakeSexOpen()
  */
 void CMenuPcs::CmakeSexCtrl()
 {
-	// TODO
+    int state = MenuS32(this, 0x82C);
+    short& mode = *reinterpret_cast<short*>(state + 0x10);
+    short& frame = *reinterpret_cast<short*>(state + 0x22);
+
+    if (mode == 1) {
+        if (frame < 30) {
+            frame = frame + 1;
+        } else {
+            mode = 2;
+            frame = 0;
+            *reinterpret_cast<short*>(state + 0x1E) = 1;
+        }
+    }
 }
 
 /*
@@ -436,7 +565,9 @@ void CMenuPcs::CmakeSexCtrl()
  */
 void CMenuPcs::CmakeSexClose()
 {
-	// TODO
+    int state = MenuS32(this, 0x82C);
+    *reinterpret_cast<short*>(state + 0x10) = 2;
+    *reinterpret_cast<short*>(state + 0x22) = 0;
 }
 
 /*
@@ -446,7 +577,7 @@ void CMenuPcs::CmakeSexClose()
  */
 void CMenuPcs::CmakeSexDraw()
 {
-	// TODO
+    DrawCmakeCharaText(2, 1.0f);
 }
 
 /*
@@ -456,7 +587,10 @@ void CMenuPcs::CmakeSexDraw()
  */
 void CMenuPcs::CmakeTribeOpen()
 {
-	// TODO
+    int state = MenuS32(this, 0x82C);
+    *reinterpret_cast<short*>(state + 0x16) = 3;
+    *reinterpret_cast<short*>(state + 0x10) = 0;
+    *reinterpret_cast<short*>(state + 0x22) = 0;
 }
 
 /*
@@ -466,7 +600,19 @@ void CMenuPcs::CmakeTribeOpen()
  */
 void CMenuPcs::CmakeTribeCtrl()
 {
-	// TODO
+    int state = MenuS32(this, 0x82C);
+    short& mode = *reinterpret_cast<short*>(state + 0x10);
+    short& frame = *reinterpret_cast<short*>(state + 0x22);
+
+    if (mode == 1) {
+        if (frame < 30) {
+            frame = frame + 1;
+        } else {
+            mode = 2;
+            frame = 0;
+            *reinterpret_cast<short*>(state + 0x1E) = 1;
+        }
+    }
 }
 
 /*
@@ -476,7 +622,9 @@ void CMenuPcs::CmakeTribeCtrl()
  */
 void CMenuPcs::CmakeTribeClose()
 {
-	// TODO
+    int state = MenuS32(this, 0x82C);
+    *reinterpret_cast<short*>(state + 0x10) = 2;
+    *reinterpret_cast<short*>(state + 0x22) = 0;
 }
 
 /*
@@ -486,7 +634,7 @@ void CMenuPcs::CmakeTribeClose()
  */
 void CMenuPcs::CmakeTribeDraw()
 {
-	// TODO
+    DrawCmakeCrest(MenuS16(this, 0x862), 0, 0, 1.0f);
 }
 
 /*
@@ -496,7 +644,10 @@ void CMenuPcs::CmakeTribeDraw()
  */
 void CMenuPcs::CmakeJobOpen()
 {
-	// TODO
+    int state = MenuS32(this, 0x82C);
+    *reinterpret_cast<short*>(state + 0x16) = 4;
+    *reinterpret_cast<short*>(state + 0x10) = 0;
+    *reinterpret_cast<short*>(state + 0x22) = 0;
 }
 
 /*
@@ -506,7 +657,20 @@ void CMenuPcs::CmakeJobOpen()
  */
 void CMenuPcs::CmakeJobCtrl()
 {
-	// TODO
+    int state = MenuS32(this, 0x82C);
+    short& mode = *reinterpret_cast<short*>(state + 0x10);
+    short& frame = *reinterpret_cast<short*>(state + 0x22);
+
+    if (mode == 1) {
+        if (frame < 30) {
+            frame = frame + 1;
+        } else {
+            mode = 2;
+            frame = 0;
+            *reinterpret_cast<short*>(state + 0x1E) = 1;
+            SetSingMakeChara();
+        }
+    }
 }
 
 /*
@@ -516,7 +680,9 @@ void CMenuPcs::CmakeJobCtrl()
  */
 void CMenuPcs::CmakeJobClose()
 {
-	// TODO
+    int state = MenuS32(this, 0x82C);
+    *reinterpret_cast<short*>(state + 0x10) = 2;
+    *reinterpret_cast<short*>(state + 0x22) = 0;
 }
 
 /*
@@ -526,7 +692,7 @@ void CMenuPcs::CmakeJobClose()
  */
 void CMenuPcs::CmakeJobDraw()
 {
-	// TODO
+    DrawCmakeCharaText(4, 1.0f);
 }
 
 /*
@@ -536,7 +702,10 @@ void CMenuPcs::CmakeJobDraw()
  */
 void CMenuPcs::CmakeResultOpen()
 {
-	// TODO
+    int state = MenuS32(this, 0x82C);
+    *reinterpret_cast<short*>(state + 0x16) = 5;
+    *reinterpret_cast<short*>(state + 0x10) = 0;
+    *reinterpret_cast<short*>(state + 0x22) = 0;
 }
 
 /*
@@ -546,7 +715,14 @@ void CMenuPcs::CmakeResultOpen()
  */
 void CMenuPcs::CmakeResultCtrl()
 {
-	// TODO
+    int state = MenuS32(this, 0x82C);
+    short& frame = *reinterpret_cast<short*>(state + 0x22);
+    if (frame < 10) {
+        frame = frame + 1;
+    } else {
+        *reinterpret_cast<short*>(state + 0x10) = 2;
+        frame = 0;
+    }
 }
 
 /*
@@ -556,7 +732,9 @@ void CMenuPcs::CmakeResultCtrl()
  */
 void CMenuPcs::CmakeResultClose()
 {
-	// TODO
+    int state = MenuS32(this, 0x82C);
+    *reinterpret_cast<short*>(state + 0x10) = 2;
+    *reinterpret_cast<short*>(state + 0x22) = 0;
 }
 
 /*
@@ -566,7 +744,7 @@ void CMenuPcs::CmakeResultClose()
  */
 void CMenuPcs::CmakeResultDraw()
 {
-	// TODO
+    CmakeResultDraw1();
 }
 
 /*
@@ -576,7 +754,9 @@ void CMenuPcs::CmakeResultDraw()
  */
 void CMenuPcs::CmakeResultOpen1()
 {
-	// TODO
+    int state = MenuS32(this, 0x82C);
+    *reinterpret_cast<short*>(state + 0x10) = 0;
+    *reinterpret_cast<short*>(state + 0x22) = 0;
 }
 
 /*
@@ -586,7 +766,11 @@ void CMenuPcs::CmakeResultOpen1()
  */
 void CMenuPcs::CmakeResultCtrl1()
 {
-	// TODO
+    int state = MenuS32(this, 0x82C);
+    short& frame = *reinterpret_cast<short*>(state + 0x22);
+    if (frame < 10) {
+        frame = frame + 1;
+    }
 }
 
 /*
@@ -596,7 +780,9 @@ void CMenuPcs::CmakeResultCtrl1()
  */
 void CMenuPcs::CmakeResultClose1()
 {
-	// TODO
+    int state = MenuS32(this, 0x82C);
+    *reinterpret_cast<short*>(state + 0x10) = 2;
+    *reinterpret_cast<short*>(state + 0x22) = 0;
 }
 
 /*
@@ -606,7 +792,7 @@ void CMenuPcs::CmakeResultClose1()
  */
 void CMenuPcs::CmakeResultDraw1()
 {
-	// TODO
+    DrawCmakeDecision(1, 1.0f);
 }
 
 /*
@@ -616,7 +802,8 @@ void CMenuPcs::CmakeResultDraw1()
  */
 void CMenuPcs::CmakeVillageOpen()
 {
-	// TODO
+    MenuU8(this, 0x16) = 1;
+    createVillageMenu();
 }
 
 /*
@@ -626,7 +813,7 @@ void CMenuPcs::CmakeVillageOpen()
  */
 void CMenuPcs::CmakeVillageCtrl()
 {
-	// TODO
+    calcVillageMenu();
 }
 
 /*
@@ -636,7 +823,8 @@ void CMenuPcs::CmakeVillageCtrl()
  */
 void CMenuPcs::CmakeVillageClose()
 {
-	// TODO
+    MenuU8(this, 0x16) = 0;
+    destroyVillageMenu();
 }
 
 /*
@@ -646,7 +834,7 @@ void CMenuPcs::CmakeVillageClose()
  */
 void CMenuPcs::CmakeVillageDraw()
 {
-	// TODO
+    drawVillageMenu();
 }
 
 /*
@@ -656,7 +844,9 @@ void CMenuPcs::CmakeVillageDraw()
  */
 void CMenuPcs::SetSingMakeChara()
 {
-	// TODO
+    int slot = static_cast<int>(MenuS16(this, 0x86A));
+    ChgModel__8CMenuPcsFiiii(this, slot, MenuS16(this, 0x860), MenuS16(this, 0x862), MenuS16(this, 0x864));
+    SetAnim__8CMenuPcsFi(this, slot);
 }
 
 /*
@@ -666,7 +856,10 @@ void CMenuPcs::SetSingMakeChara()
  */
 void CMenuPcs::createVillageMenu()
 {
-	// TODO
+    if (MenuS16(this, 0x86C) == 0) {
+        MenuU8(this, 0x16) = 1;
+        calcVillageMenu();
+    }
 }
 
 /*
@@ -865,7 +1058,8 @@ void CMenuPcs::CalcSingleCMakeChara()
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::DrawSingleCMakeChara(float)
+void CMenuPcs::DrawSingleCMakeChara(float alpha)
 {
-	// TODO
+    (void)alpha;
+    CalcSingleCMakeChara();
 }

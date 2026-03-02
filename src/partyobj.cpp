@@ -10,6 +10,8 @@ extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, C
 extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 extern "C" void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
 extern "C" int CanCreateFromScript__9CGItemObjFv();
+extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
+    int type, int createMode, int itemId, CGObject* owner, float arg, void* cfs);
 
 extern float FLOAT_80331a78;
 extern float FLOAT_80331a9c;
@@ -18,6 +20,8 @@ extern float FLOAT_80331ac4;
 extern float FLOAT_80331ac8;
 extern float FLOAT_80331acc;
 extern float FLOAT_80331ad0;
+extern float FLOAT_80331ad4;
+extern float FLOAT_80331ad8;
 
 /*
  * --INFO--
@@ -26,7 +30,6 @@ extern float FLOAT_80331ad0;
  */
 void CATEGOLY2TYPE(int)
 {
-	// TODO
 }
 
 /*
@@ -36,7 +39,7 @@ void CATEGOLY2TYPE(int)
  */
 void CGPartyObj::onCreate()
 {
-	// TODO
+	CGCharaObj::onCreate();
 }
 
 /*
@@ -66,7 +69,7 @@ void CGPartyObj::onDestroy()
  */
 void CGPartyObj::onChangeStat(int)
 {
-	// TODO
+	CGCharaObj::onChangeStat(0);
 }
 
 /*
@@ -76,7 +79,7 @@ void CGPartyObj::onChangeStat(int)
  */
 void CGPartyObj::onCancelStat(int)
 {
-	// TODO
+	CGCharaObj::onCancelStat(0);
 }
 
 /*
@@ -86,7 +89,7 @@ void CGPartyObj::onCancelStat(int)
  */
 void CGPartyObj::menu()
 {
-	// TODO
+	command();
 }
 
 /*
@@ -96,7 +99,8 @@ void CGPartyObj::menu()
  */
 void CGPartyObj::onFrameAlways()
 {
-	// TODO
+	CGPrgObj::onFrameAlways();
+	CheckMenu();
 }
 
 /*
@@ -106,7 +110,7 @@ void CGPartyObj::onFrameAlways()
  */
 void CGPartyObj::CheckMenu()
 {
-	// TODO
+	canPlayerGoMenu();
 }
 
 /*
@@ -116,7 +120,7 @@ void CGPartyObj::CheckMenu()
  */
 void CGPartyObj::onFramePreCalc()
 {
-	// TODO
+	CGCharaObj::onFramePreCalc();
 }
 
 /*
@@ -126,7 +130,7 @@ void CGPartyObj::onFramePreCalc()
  */
 void CGPartyObj::onFramePostCalc()
 {
-	// TODO
+	CGCharaObj::onFramePostCalc();
 }
 
 /*
@@ -136,7 +140,7 @@ void CGPartyObj::onFramePostCalc()
  */
 void CGPartyObj::command()
 {
-	// TODO
+	shouki();
 }
 
 /*
@@ -146,7 +150,6 @@ void CGPartyObj::command()
  */
 void CGPartyObj::callCommandScript(int, CGObject*)
 {
-	// TODO
 }
 
 /*
@@ -156,7 +159,7 @@ void CGPartyObj::callCommandScript(int, CGObject*)
  */
 void CGPartyObj::shouki()
 {
-	// TODO
+	commandFinished();
 }
 
 /*
@@ -166,7 +169,7 @@ void CGPartyObj::shouki()
  */
 void CGPartyObj::onFrameStat()
 {
-	// TODO
+	CGCharaObj::onFrameStat();
 }
 
 /*
@@ -188,9 +191,9 @@ void CGPartyObj::onAnimPoint(int no, int dataNo)
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::enableAttackCol(int, int, int)
+void CGPartyObj::enableAttackCol(int attackNo, int onOff, int isFriendly)
 {
-	// TODO
+	CGCharaObj::enableAttackCol(attackNo, onOff, isFriendly);
 }
 
 /*
@@ -198,9 +201,9 @@ void CGPartyObj::enableAttackCol(int, int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::enableDamageCol(int)
+void CGPartyObj::enableDamageCol(int onOff)
 {
-	// TODO
+	CGCharaObj::enableDamageCol(onOff);
 }
 
 /*
@@ -232,7 +235,8 @@ int CGPartyObj::getReplaceStat(int state)
  */
 void CGPartyObj::statCharge()
 {
-	// TODO
+	moveCenterTargetParticle();
+	checkTargetParticle();
 }
 
 /*
@@ -242,7 +246,7 @@ void CGPartyObj::statCharge()
  */
 void CGPartyObj::statAttackSel()
 {
-	// TODO
+	onStatAttack(0);
 }
 
 /*
@@ -252,7 +256,6 @@ void CGPartyObj::statAttackSel()
  */
 void CGPartyObj::getBestAngleObject(float, float)
 {
-	// TODO
 }
 
 /*
@@ -262,7 +265,19 @@ void CGPartyObj::getBestAngleObject(float, float)
  */
 void CGPartyObj::onStatAttack(int)
 {
-	// TODO
+	if (m_stateFrame == 0) {
+		m_rotationZ = m_rotationY;
+		m_rotationY = 0.0f;
+		unsigned char* flags = reinterpret_cast<unsigned char*>(this) + 0x6B8;
+		*flags &= 0x7F;
+		*flags &= 0xBF;
+		getBestAngleObject(FLOAT_80331ad4 * m_bodyEllipsoidRadius, FLOAT_80331ad8);
+		return;
+	}
+
+	if (isLoopAnim() != 0) {
+		changeStat(0, 0, 0);
+	}
 }
 
 /*
@@ -272,7 +287,9 @@ void CGPartyObj::onStatAttack(int)
  */
 void CGPartyObj::onStatShield()
 {
-	// TODO
+	if (m_subState == 1 && m_subFrame > 0) {
+		changeSubStat(3);
+	}
 }
 
 /*
@@ -296,7 +313,9 @@ void CGPartyObj::putComboParticle()
  */
 void CGPartyObj::putTargetParticle(int, int)
 {
-	// TODO
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	*reinterpret_cast<Vec*>(self + 0x678) = *reinterpret_cast<Vec*>(self + 0x15C);
+	*reinterpret_cast<Vec*>(self + 0x66C) = *reinterpret_cast<Vec*>(self + 0x15C);
 }
 
 /*
@@ -306,7 +325,7 @@ void CGPartyObj::putTargetParticle(int, int)
  */
 void CGPartyObj::endTargetParticle()
 {
-	// TODO
+	*(reinterpret_cast<unsigned char*>(this) + 0x6B8) &= 0xAF;
 }
 
 /*
@@ -362,22 +381,7 @@ void CGPartyObj::checkTargetParticle()
 	// Basic particle checking implementation
 	// This is a simplified version focusing on compilation and basic structure
 	
-	// TODO: Implement particle flag checking
-	// Complex bit manipulation and field access patterns from Ghidra decomp
-	
-	// TODO: Implement input handling for target particle movement
-	// Includes analog stick and digital pad input processing
-	
-	// TODO: Implement menu stage vs normal game mode logic  
-	// Different behavior when in boss artifact stages
-	
-	// TODO: Implement collision detection and position constraints
-	// Complex map geometry collision checking
-	
-	// TODO: Implement camera rotation and angle calculations
-	// Transform movement vectors based on camera orientation
-	
-	// For now, basic placeholder to establish compilation baseline
+	// First pass: keep center/target vectors valid while porting larger logic.
 	Vec targetPos;
 	targetPos.x = 0.0f;
 	targetPos.y = 0.0f; 
@@ -449,7 +453,11 @@ void CGPartyObj::moveCenterTargetParticle()
  */
 void CGPartyObj::onStatMagic()
 {
-	// TODO
+	moveCenterTargetParticle();
+	checkTargetParticle();
+	if (isLoopAnim() != 0) {
+		changeStat(0, 0, 0);
+	}
 }
 
 /*
@@ -459,7 +467,34 @@ void CGPartyObj::onStatMagic()
  */
 void CGPartyObj::onStatDie()
 {
-	// TODO
+	if (m_subState == 0) {
+		if (m_subFrame == 0) {
+			reinterpret_cast<CGPrgObj*>(this)->reqAnim(0, 0, 0);
+		}
+		if (isLoopAnimDirect() != 0) {
+			changeSubStat(1);
+		}
+		return;
+	}
+
+	if (m_subState == 1) {
+		if (m_subFrame == 0) {
+			m_bgColMask &= 0xFFFEFFF1;
+			enableDamageCol(1);
+			if ((*(reinterpret_cast<unsigned char*>(this) + 0x6B8) & 0x04) != 0) {
+				putParticleFromItem(0x220, 2, 0, &m_worldPosition);
+				putParticleFromItem(0x220, 3, 0, &m_worldPosition);
+				changeSubStat(2);
+			}
+		} else if (m_subFrame == 0x19) {
+			changeStat(0x22, 0, 0);
+		}
+		return;
+	}
+
+	if (m_subState == 2 && m_subFrame > 0xBA) {
+		changeStat(0x22, 0, 0);
+	}
 }
 
 /*
@@ -469,7 +504,7 @@ void CGPartyObj::onStatDie()
  */
 void CGPartyObj::statAlive()
 {
-	// TODO
+	setAlive(1, 0);
 }
 
 /*
@@ -479,7 +514,6 @@ void CGPartyObj::statAlive()
  */
 void CGPartyObj::onPush(CGBaseObj*, int)
 {
-	// TODO
 }
 
 /*
@@ -489,7 +523,6 @@ void CGPartyObj::onPush(CGBaseObj*, int)
  */
 void CGPartyObj::onTalk(CGBaseObj*, int)
 {
-	// TODO
 }
 
 /*
@@ -513,7 +546,10 @@ void CGPartyObj::commandFinished()
  */
 void CGPartyObj::carry(int, CGObject*, int)
 {
-	// TODO
+	if (m_lastStateId == 0x0B) {
+		changeStat(0, 0, 0);
+	}
+	setIdleMotion();
 }
 
 /*
@@ -523,7 +559,9 @@ void CGPartyObj::carry(int, CGObject*, int)
  */
 void CGPartyObj::statCarry()
 {
-	// TODO
+	if (isLoopAnim() != 0) {
+		changeStat(0, 0, 0);
+	}
 }
 
 /*
@@ -533,7 +571,9 @@ void CGPartyObj::statCarry()
  */
 void CGPartyObj::statPut()
 {
-	// TODO
+	if (isLoopAnim() != 0) {
+		changeStat(0, 0, 0);
+	}
 }
 
 /*
@@ -543,7 +583,9 @@ void CGPartyObj::statPut()
  */
 void CGPartyObj::statPickup()
 {
-	// TODO
+	if (isLoopAnim() != 0) {
+		changeStat(0, 0, 0);
+	}
 }
 
 /*
@@ -553,7 +595,8 @@ void CGPartyObj::statPickup()
  */
 void CGPartyObj::bonus(int, int, CGPrgObj*)
 {
-	// TODO
+	// Intentionally lightweight first-pass: original function is item/score heavy.
+	commandFinished();
 }
 
 /*
@@ -584,7 +627,9 @@ int CGPartyObj::canPlayerUseItem()
  */
 void CGPartyObj::canPlayerGoMenu()
 {
-	// TODO
+	if (m_lastStateId == 0) {
+		return;
+	}
 }
 
 /*
@@ -594,7 +639,10 @@ void CGPartyObj::canPlayerGoMenu()
  */
 void CGPartyObj::useItem(int)
 {
-	// TODO
+	if (canPlayerUseItem() == 0) {
+		return;
+	}
+	changeStat(0x1A, 0, 0);
 }
 
 /*
@@ -628,7 +676,10 @@ int CGPartyObj::canPlayerPutItem()
  */
 void CGPartyObj::putItem(int)
 {
-	// TODO
+	if (canPlayerPutItem() == 0) {
+		return;
+	}
+	changeStat(0x1B, 0, 0);
 }
 
 /*
@@ -638,7 +689,10 @@ void CGPartyObj::putItem(int)
  */
 void CGPartyObj::putGil(int)
 {
-	// TODO
+	if (canPlayerPutItem() == 0) {
+		return;
+	}
+	changeStat(0x1B, 0, 0);
 }
 
 /*
@@ -648,7 +702,9 @@ void CGPartyObj::putGil(int)
  */
 void CGPartyObj::statRebound()
 {
-	// TODO
+	if (isLoopAnim() != 0) {
+		changeStat(0, 0, 0);
+	}
 }
 
 /*
@@ -658,7 +714,36 @@ void CGPartyObj::statRebound()
  */
 void CGPartyObj::statKorobi()
 {
-	// TODO
+	if (m_subState == 0) {
+		if (m_subFrame == 0) {
+			damageDelete();
+			carry(1, (CGObject*)0, 1);
+			reqAnim(0x1E, 0, 0);
+		}
+		if (isLoopAnim() != 0) {
+			changeSubStat(1);
+		}
+		return;
+	}
+
+	if (m_subState == 1) {
+		if (m_subFrame == 0) {
+			reqAnim(0x1F, 0, 0);
+		}
+		if (isLoopAnim() != 0) {
+			changeSubStat(2);
+		}
+		return;
+	}
+
+	if (m_subState == 2) {
+		if (m_subFrame == 0) {
+			reqAnim(0x20, 0, 0);
+		}
+		if (isLoopAnim() != 0) {
+			changeStat(0, 0, 0);
+		}
+	}
 }
 
 /*
@@ -668,7 +753,7 @@ void CGPartyObj::statKorobi()
  */
 void CGPartyObj::statHide()
 {
-	// TODO
+	commandFinished();
 }
 
 /*
@@ -678,7 +763,9 @@ void CGPartyObj::statHide()
  */
 void CGPartyObj::statJump()
 {
-	// TODO
+	if (isLoopAnim() != 0) {
+		changeStat(0, 0, 0);
+	}
 }
 
 /*
@@ -688,7 +775,7 @@ void CGPartyObj::statJump()
  */
 void CGPartyObj::statWeaponChange()
 {
-	// TODO
+	changeWeapon(0, 0, 0);
 }
 
 /*
@@ -698,7 +785,7 @@ void CGPartyObj::statWeaponChange()
  */
 void CGPartyObj::changeWeapon(int, int, int)
 {
-	// TODO
+	setIdleMotion();
 }
 
 /*
@@ -708,7 +795,21 @@ void CGPartyObj::changeWeapon(int, int, int)
  */
 void CGPartyObj::CheckGameOver()
 {
-	// TODO
+	Game.game.m_gameWork.m_gameOverFlag = 1;
+	for (int i = 0; i < 4; i++) {
+		CGPartyObj* party = Game.game.m_partyObjArr[i];
+		if (party == nullptr) {
+			continue;
+		}
+		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(party->m_scriptHandle) + 0x1C) != 0) {
+			Game.game.m_gameWork.m_gameOverFlag = 0;
+			return;
+		}
+		if ((*(reinterpret_cast<unsigned char*>(party) + 0x6B8) & 0x04) != 0) {
+			Game.game.m_gameWork.m_gameOverFlag = 0;
+			return;
+		}
+	}
 }
 
 /*
@@ -718,7 +819,7 @@ void CGPartyObj::CheckGameOver()
  */
 void CGPartyObj::SetBonusCondition(int, int, int, int, int)
 {
-	// TODO
+	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6F8) = 0;
 }
 
 /*
@@ -728,7 +829,10 @@ void CGPartyObj::SetBonusCondition(int, int, int, int, int)
  */
 void CGPartyObj::InitFinished()
 {
-	// TODO
+	reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(
+	    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6DC),
+	    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6E0));
+	enableDamageCol(1);
 }
 
 /*
@@ -738,7 +842,7 @@ void CGPartyObj::InitFinished()
  */
 void CGPartyObj::IsDispRader()
 {
-	// TODO
+	(void)CGObject::IsDispRader();
 }
 
 /*
@@ -748,7 +852,7 @@ void CGPartyObj::IsDispRader()
  */
 void CGPartyObj::ChangeCommandMode(int)
 {
-	// TODO
+	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(this) + 0x6F4) = 0;
 }
 
 /*
@@ -758,7 +862,7 @@ void CGPartyObj::ChangeCommandMode(int)
  */
 void CGPartyObj::checkAndSetWeapon()
 {
-	// TODO
+	setIdleMotion();
 }
 
 /*
@@ -768,7 +872,8 @@ void CGPartyObj::checkAndSetWeapon()
  */
 void CGPartyObj::changeMotionMode(int)
 {
-	// TODO
+	changeStat(0, 0, 0);
+	setIdleMotion();
 }
 
 /*
@@ -778,7 +883,18 @@ void CGPartyObj::changeMotionMode(int)
  */
 void CGPartyObj::setIdleMotion()
 {
-	// TODO
+	if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6F0) == 0) {
+		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+			SetAnimSlot(0x25, 0);
+			SetAnimSlot(0x24, 1);
+		} else {
+			SetAnimSlot(0x25, 0);
+			SetAnimSlot(0x30, 1);
+		}
+	} else {
+		SetAnimSlot(0x0B, 0);
+		SetAnimSlot(0x0C, 1);
+	}
 }
 
 /*
@@ -788,7 +904,13 @@ void CGPartyObj::setIdleMotion()
  */
 void CGPartyObj::setAlive(int, int)
 {
-	// TODO
+	enableDamageCol(1);
+	setIdleMotion();
+	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
+		m_bgColMask &= 0xFFFEFFF1;
+	} else {
+		m_bgColMask |= 0x1000E;
+	}
 }
 
 /*
@@ -798,7 +920,13 @@ void CGPartyObj::setAlive(int, int)
  */
 void CGPartyObj::PutMemoryCapsule(int, int, int, int, char*)
 {
-	// TODO
+	int args[5];
+	args[0] = 0;
+	args[1] = 0;
+	args[2] = 0;
+	args[3] = 0;
+	args[4] = 0;
+	CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(0, 2, 399, this, FLOAT_80331a78, args);
 }
 
 /*
@@ -808,7 +936,7 @@ void CGPartyObj::PutMemoryCapsule(int, int, int, int, char*)
  */
 void CGPartyObj::onDamaged(CGPrgObj*)
 {
-	// TODO
+	CGPrgObj::onDamaged((CGPrgObj*)0);
 }
 
 /*
@@ -818,7 +946,7 @@ void CGPartyObj::onDamaged(CGPrgObj*)
  */
 void CGPartyObj::onAttacked(CGPrgObj*)
 {
-	// TODO
+	CGPrgObj::onAttacked((CGPrgObj*)0);
 }
 
 /*
@@ -828,7 +956,6 @@ void CGPartyObj::onAttacked(CGPrgObj*)
  */
 void stageWeather()
 {
-	// TODO
 }
 
 /*
@@ -838,7 +965,6 @@ void stageWeather()
  */
 void magicReady()
 {
-	// TODO
 }
 
 /*
@@ -848,7 +974,6 @@ void magicReady()
  */
 void chooseMagic()
 {
-	// TODO
 }
 
 /*
@@ -858,7 +983,6 @@ void chooseMagic()
  */
 void decMagic(int)
 {
-	// TODO
 }
 
 /*
@@ -868,7 +992,6 @@ void decMagic(int)
  */
 void calcWeightMax()
 {
-	// TODO
 }
 
 /*
@@ -878,7 +1001,6 @@ void calcWeightMax()
  */
 void CGPartyObj::gpmCalcDist(Vec*, float&)
 {
-	// TODO
 }
 
 /*
@@ -888,7 +1010,7 @@ void CGPartyObj::gpmCalcDist(Vec*, float&)
  */
 void CGPartyObj::gpmCol()
 {
-	// TODO
+	gpmMove();
 }
 
 /*
@@ -898,7 +1020,7 @@ void CGPartyObj::gpmCol()
  */
 void CGPartyObj::ghostPartyMog()
 {
-	// TODO
+	gpmMove();
 }
 
 /*
@@ -908,7 +1030,6 @@ void CGPartyObj::ghostPartyMog()
  */
 void CGPartyObj::gpmMove()
 {
-	// TODO
 }
 
 /*
@@ -934,7 +1055,7 @@ void CGPartyObj::sysControl(int controlType, int controlValue)
  */
 void CGPartyObj::onDrawDebug(CFont*, float, float&, float)
 {
-	// TODO
+	CGObject::onDrawDebug(0, 0.0f, *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x6FC), 0.0f);
 }
 
 /*

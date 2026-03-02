@@ -562,19 +562,21 @@ void CCaravanWork::DeleteCmdList(int, int)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CCaravanWork::AddItem(int itemId, int* outInvIndex)
+int CCaravanWork::AddItem(int itemId, int* inventorySlotOut)
 {
-	if ((unsigned short)m_inventoryItemCount < 0x40) {
-		for (int i = 0; i < 0x40; i++) {
-			if (m_inventoryItems[i] == 0xFFFF) {
-				m_inventoryItems[i] = static_cast<unsigned short>(itemId);
-				m_inventoryItemCount++;
-				Joybus.SetItem(m_joybusCaravanId, static_cast<unsigned char>(i), static_cast<short>(itemId));
-				if (outInvIndex != 0) {
-					*outInvIndex = i;
-				}
-				return 1;
+	if ((unsigned short)m_inventoryItemCount >= 0x40) {
+		return 0;
+	}
+
+	for (unsigned int i = 0; i < 0x40; i++) {
+		if (m_inventoryItems[i] == 0xFFFF) {
+			m_inventoryItems[i] = (unsigned short)itemId;
+			m_inventoryItemCount = (short)(m_inventoryItemCount + 1);
+			Joybus.SetItem(m_joybusCaravanId, (unsigned char)i, (short)itemId);
+			if (inventorySlotOut != 0) {
+				*inventorySlotOut = i;
 			}
+			return 1;
 		}
 	}
 

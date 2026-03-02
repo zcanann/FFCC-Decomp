@@ -19,6 +19,8 @@ extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
 extern unsigned char CFlat[];
 
 extern float FLOAT_80331a78;
+extern float FLOAT_80331a54;
+extern float FLOAT_80331a74;
 extern float FLOAT_80331a9c;
 extern float FLOAT_80331aa0;
 extern float FLOAT_80331ac4;
@@ -27,6 +29,9 @@ extern float FLOAT_80331acc;
 extern float FLOAT_80331ad0;
 extern float FLOAT_80331ad4;
 extern float FLOAT_80331ad8;
+extern float FLOAT_80331b00;
+extern float FLOAT_80331b04;
+extern float FLOAT_80331b08;
 
 static unsigned short getPadHeldForSlot(int slot)
 {
@@ -330,7 +335,73 @@ void CGPartyObj::CheckMenu()
  */
 void CGPartyObj::onFramePreCalc()
 {
+	if (m_scriptHandle == nullptr) {
+		return;
+	}
+
 	CGCharaObj::onFramePreCalc();
+
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	if (Game.game.unk_flat3_0xc7d0 != 0) {
+		const Vec* chalicePos = reinterpret_cast<Vec*>(Game.game.unk_flat3_0xc7d0 + 0x15C);
+		m_projection.z = PSVECDistance(&m_worldPosition, chalicePos);
+	}
+
+	if (((self[0x63C] & 0x80) != 0) && ((self[0x6B8] & 0x80) == 0)) {
+		unsigned short held = getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc));
+		if (held != 0) {
+			changeStat(0, 0, 0);
+		}
+	}
+
+	int weaponItem;
+	int weaponRef;
+	reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(weaponItem, weaponRef);
+
+	if ((Game.game.m_gameWork.m_menuStageMode == 0) &&
+	    ((*reinterpret_cast<int*>(self + 0x6E0) != weaponItem) || (*reinterpret_cast<int*>(self + 0x6DC) != weaponRef))) {
+		bool canImmediateSwap =
+		    ((self[0x6B8] & 0x80) == 0) &&
+		    ((self[0x6B8] & 0x40) == 0) &&
+		    (*reinterpret_cast<int*>(self + 0x6F0) == 0) &&
+		    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) &&
+		    (reinterpret_cast<short*>(m_scriptHandle)[0x14] == 0) &&
+		    (reinterpret_cast<short*>(m_scriptHandle)[0x11] == 0);
+
+		if (canImmediateSwap) {
+			if (weaponItem < 1) {
+				LoadWeapon(-1, 0);
+			} else {
+				unsigned short packedItem = *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + weaponItem * 0x48 + 2);
+				LoadWeapon(packedItem & 0x0FFF, packedItem >> 12);
+			}
+			*reinterpret_cast<int*>(self + 0x6E0) = weaponItem;
+			*reinterpret_cast<int*>(self + 0x6DC) = weaponRef;
+			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(weaponRef);
+			self[0x6C4] &= 0xDF;
+		} else {
+			*reinterpret_cast<int*>(self + 0x6E0) = weaponItem;
+			*reinterpret_cast<int*>(self + 0x6DC) = weaponRef;
+			self[0x6C4] = (self[0x6C4] & 0xDF) | 0x20;
+			changeStat(0x0F, 0, 0);
+		}
+	}
+
+	onChangePrg(2);
+
+	if (Game.game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
+		if (*reinterpret_cast<int*>(self + 0x6F0) == 0 &&
+		    *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
+			m_moveBaseSpeed = FLOAT_80331ad4;
+		} else {
+			float speedScale = FLOAT_80331a54;
+			if (Game.game.m_gameWork.m_menuStageMode == 0) {
+				speedScale = FLOAT_80331b08;
+			}
+			m_moveBaseSpeed = FLOAT_80331b04 * speedScale;
+		}
+		m_moveBaseSpeed *= m_extraMoveVec.z;
+	}
 }
 
 /*
@@ -384,6 +455,39 @@ void CGPartyObj::command()
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	int mode = *reinterpret_cast<short*>(self + 0x6F4);
 	CGObject* target = *reinterpret_cast<CGObject**>(self + 0x6E4);
+	unsigned short trig = getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc));
+	unsigned short held = getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc));
+
+	if ((trig & 0x20) != 0) {
+		mode--;
+		if (mode < 0) {
+			mode = 5;
+		}
+	}
+	if ((trig & 0x40) != 0) {
+		mode++;
+		if (mode > 5) {
+			mode = 0;
+		}
+	}
+
+	if ((trig & 0x100) != 0 && m_lastStateId == 0) {
+		mode = 1;
+	}
+	if ((trig & 0x80) != 0 && m_lastStateId == 0) {
+		mode = 4;
+	}
+
+	if ((held & 0x200) != 0 && m_lastStateId == 0) {
+		mode = 0;
+	}
+
+	if (*reinterpret_cast<CGObject**>(self + 0x6E8) != nullptr) {
+		target = *reinterpret_cast<CGObject**>(self + 0x6E8);
+		mode = 0;
+	}
+
+	*reinterpret_cast<short*>(self + 0x6F4) = static_cast<short>(mode);
 	callCommandScript(mode, target);
 }
 
@@ -444,8 +548,44 @@ void CGPartyObj::callCommandScript(int mode, CGObject* target)
  */
 void CGPartyObj::shouki()
 {
-	canPlayerGoMenu();
-	commandFinished();
+	if (m_scriptHandle == nullptr) {
+		return;
+	}
+
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	int* shoukiMode = reinterpret_cast<int*>(self + 0x688);
+
+	bool canShouki = (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) &&
+	                 ((self[0x6B8] & 0x20) == 0) &&
+	                 ((static_cast<unsigned char>(m_weaponNodeFlags >> 8) & 0x40) == 0);
+
+	if (!canShouki || Game.game.unk_flat3_0xc7d0 == 0) {
+		if (*shoukiMode != 0) {
+			deletePSlotBit(0x200);
+			*shoukiMode = 0;
+		}
+		return;
+	}
+
+	const Vec* chalicePos = reinterpret_cast<Vec*>(Game.game.unk_flat3_0xc7d0 + 0x15C);
+	float chaliceDist = PSVECDistance(&m_worldPosition, chalicePos);
+	if (chaliceDist > FLOAT_80331b00 * Game.game.unkFloat_0xca10) {
+		*shoukiMode = 2;
+	} else if (chaliceDist < FLOAT_80331a74 * Game.game.unkFloat_0xca10) {
+		*shoukiMode = 0;
+	} else {
+		*shoukiMode = 1;
+	}
+
+	if (*shoukiMode == 0) {
+		if ((Game.game.m_gameWork.m_frameCounter % 30) == 0) {
+			addHp(1, static_cast<CGPrgObj*>(0));
+		}
+	} else if (*shoukiMode == 2) {
+		if ((Game.game.m_gameWork.m_frameCounter % 30) == 0) {
+			addHp(-1, static_cast<CGPrgObj*>(0));
+		}
+	}
 }
 
 /*
@@ -465,10 +605,51 @@ void CGPartyObj::onFrameStat()
 		return;
 	}
 
+	switch (m_lastStateId) {
+	case 0:
+		statAlive();
+		break;
+	case 2:
+		onStatMagic();
+		break;
+	case 6:
+		statCharge();
+		break;
+	case 7:
+		statAttackSel();
+		break;
+	case 0x0B:
+		statCarry();
+		break;
+	case 0x0C:
+		statPickup();
+		break;
+	case 0x0D:
+	case 0x1B:
+		statPut();
+		break;
+	case 0x0E:
+		statRebound();
+		break;
+	case 0x14:
+		statHide();
+		break;
+	case 0x15:
+		statJump();
+		break;
+	case 0x0F:
+		statWeaponChange();
+		break;
+	default:
+		break;
+	}
+
 	if (m_lastStateId == 2 || m_lastStateId == 6) {
 		moveCenterTargetParticle();
 		checkTargetParticle();
 	}
+
+	shouki();
 }
 
 /*

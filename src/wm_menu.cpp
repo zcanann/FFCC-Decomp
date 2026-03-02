@@ -794,6 +794,11 @@ void CMenuPcs::calcWorld()
  */
 void CMenuPcs::CalcMainMenu()
 {
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	if (reinterpret_cast<unsigned int*>(bytes + 0x82C)[0] == 0) {
+		return;
+	}
+
 	CalcMainMenuSub();
 	CalcWMFrame();
 	CalcChara();
@@ -946,11 +951,16 @@ void CMenuPcs::CalcMCardMenu()
  */
 void CMenuPcs::CalcCMakeMenu()
 {
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	if (reinterpret_cast<unsigned int*>(bytes + 0x82C)[0] == 0) {
+		return;
+	}
+
 	CalcCharaBase();
 	CalcCharaSelect();
 	CalcWMFrame();
 	CalcFukidashi();
-	if (static_cast<signed char>(reinterpret_cast<unsigned char*>(this)[0x17]) != 0) {
+	if (static_cast<signed char>(bytes[0x17]) != 0) {
 		CalcMainMenuSub();
 	}
 }
@@ -966,6 +976,11 @@ void CMenuPcs::CalcCMakeMenu()
  */
 void CMenuPcs::CalcMoveMenu()
 {
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	if (reinterpret_cast<unsigned int*>(bytes + 0x82C)[0] == 0) {
+		return;
+	}
+
 	CalcMainMenuSub();
 	CalcWMFrame();
 	CalcFukidashi();
@@ -1392,6 +1407,11 @@ void CMenuPcs::drawWorld()
  */
 void CMenuPcs::DrawMainMenu()
 {
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	if (reinterpret_cast<unsigned int*>(bytes + 0x82C)[0] == 0) {
+		return;
+	}
+
 	DrawMainMenuSub();
 	DrawMainMenuBase(1.0f);
 	DrawWMFrame();
@@ -1410,6 +1430,11 @@ void CMenuPcs::DrawMainMenu()
  */
 void CMenuPcs::DrawDiaryMenu()
 {
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	if (reinterpret_cast<unsigned int*>(bytes + 0x82C)[0] == 0) {
+		return;
+	}
+
 	DrawMainMenuSub();
 	DrawWMFrame();
 	DrawFukidashi();
@@ -1445,6 +1470,11 @@ void CMenuPcs::DrawMCardMenu()
  */
 void CMenuPcs::DrawCMakeMenu()
 {
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	if (reinterpret_cast<unsigned int*>(bytes + 0x82C)[0] == 0) {
+		return;
+	}
+
 	DrawCharaName();
 	DrawCMLife();
 	DrawWMFrame();
@@ -1461,6 +1491,11 @@ void CMenuPcs::DrawCMakeMenu()
  */
 void CMenuPcs::DrawMoveMenu()
 {
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	if (reinterpret_cast<unsigned int*>(bytes + 0x82C)[0] == 0) {
+		return;
+	}
+
 	DrawMainMenuSub();
 	DrawWMFrame();
 	DrawFukidashi();

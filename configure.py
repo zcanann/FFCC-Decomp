@@ -134,7 +134,12 @@ parser.add_argument(
     action="store_false",
     help="disable progress calculation",
 )
-args = parser.parse_args()
+args, extra_args = parser.parse_known_args()
+trailing_mode = None
+if len(extra_args) == 1 and extra_args[0] in {"configure", "progress"}:
+    trailing_mode = extra_args[0]
+elif len(extra_args) > 0:
+    parser.error(f"unrecognized arguments: {' '.join(extra_args)}")
 
 config = ProjectConfig()
 config.version = str(args.version)
@@ -161,7 +166,7 @@ if not config.non_matching:
 config.binutils_tag = "2.42-1"
 config.compilers_tag = "20250812"
 config.dtk_tag = "v1.7.4"
-config.objdiff_tag = "v3.4.1"
+config.objdiff_tag = "v3.6.1"
 config.sjiswrap_tag = "v1.2.2"
 config.wibo_tag = "1.0.0-beta.5"
 
@@ -323,6 +328,7 @@ config.libs = [
         "lib": "Game",
         "mw_version": config.linker_version,
         "cflags": cflags_game,
+        "progress_category": "game",
         "objects": [
             Object(NonMatching, "RedSound/RedCommand.cpp"),
             Object(NonMatching, "RedSound/RedDriver.cpp"),
@@ -947,6 +953,7 @@ config.libs = [
         "lib": "amcstubs",
         "mw_version": config.linker_version,
         "cflags": cflags_amcstub,
+        "progress_category": "sdk",
         "objects": [
             Object(NonMatching, "amcstubs/AmcExi2Stubs.c"),
         ],
@@ -955,6 +962,7 @@ config.libs = [
         "lib": "odenotstub",
         "mw_version": config.linker_version,
         "cflags": cflags_odenotstub,
+        "progress_category": "sdk",
         "objects": [
             Object(NonMatching, "odenotstub/odenotstub.c"),
         ],
@@ -963,6 +971,7 @@ config.libs = [
         "lib": "thp",
         "mw_version": "GC/1.2.5",
         "cflags": cflags_thp,
+        "progress_category": "sdk",
         "objects": [
             Object(NonMatching, "thp/THPDec.c"),
             Object(NonMatching, "thp/THPAudio.c"),
@@ -1002,11 +1011,13 @@ config.progress_report_args = [
     # "--config functionRelocDiffs=data_value",
 ]
 
-if args.mode == "configure":
+mode = trailing_mode or args.mode
+
+if mode == "configure":
     # Write build.ninja and objdiff.json
     generate_build(config)
-elif args.mode == "progress":
+elif mode == "progress":
     # Print progress information
     calculate_progress(config)
 else:
-    sys.exit("Unknown mode: " + args.mode)
+    sys.exit("Unknown mode: " + str(mode))

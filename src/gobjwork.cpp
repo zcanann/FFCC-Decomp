@@ -736,12 +736,339 @@ int CCaravanWork::GetFoodRank(int playerIdx)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a077c
+ * PAL Size: 4916b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::SearchRomLetterWork(CRomLetterWork **, int)
+void CCaravanWork::SearchRomLetterWork(CRomLetterWork **romLetterWork, int maxResults)
 {
-	// TODO
+	int foundCount = 0;
+	unsigned char* curLetter = reinterpret_cast<unsigned char*>(Game.game.unkCFlatData0[3]);
+	unsigned char* linkBase = &Game.game.m_gameWork.m_linkTable[m_saveSlot][0][0][0];
+
+	if (maxResults > 0) {
+		for (int i = 0; i < maxResults; i++) {
+			romLetterWork[i] = 0;
+		}
+	}
+
+	for (int letterIdx = 0; letterIdx < 0x200; letterIdx++, curLetter += 0x3E) {
+		unsigned short condBits = *reinterpret_cast<unsigned short*>(curLetter + 0x18);
+
+		if ((condBits & 0x7FFF) != 0) {
+			const bool invert = (condBits & 0x8000) != 0;
+			bool matched = false;
+
+			if ((condBits & 0x0001) != 0 && m_tribeId == 0) {
+				matched = true;
+			}
+			if ((condBits & 0x0002) != 0 && m_tribeId == 1) {
+				matched = true;
+			}
+			if ((condBits & 0x0004) != 0 && m_tribeId == 2) {
+				matched = true;
+			}
+			if ((condBits & 0x0008) != 0 && m_tribeId == 3) {
+				matched = true;
+			}
+			if ((condBits & 0x0010) != 0 && m_genderFlag == 0) {
+				matched = true;
+			}
+			if ((condBits & 0x0020) != 0 && m_genderFlag == 1) {
+				matched = true;
+			}
+			if ((condBits & 0x0040) != 0 && GetFoodRank(0) == 0) {
+				matched = true;
+			}
+			if ((condBits & 0x0080) != 0 && GetFoodRank(1) == 0) {
+				matched = true;
+			}
+			if ((condBits & 0x0100) != 0 && GetFoodRank(2) == 0) {
+				matched = true;
+			}
+			if ((condBits & 0x0200) != 0 && GetFoodRank(3) == 0) {
+				matched = true;
+			}
+			if ((condBits & 0x0400) != 0 && GetFoodRank(4) == 0) {
+				matched = true;
+			}
+			if ((condBits & 0x0800) != 0 && GetFoodRank(5) == 0) {
+				matched = true;
+			}
+			if ((condBits & 0x1000) != 0 && GetFoodRank(6) == 0) {
+				matched = true;
+			}
+			if ((condBits & 0x2000) != 0 && GetFoodRank(7) == 0) {
+				matched = true;
+			}
+
+			if ((!invert && !matched) || (invert && matched)) {
+				continue;
+			}
+		}
+
+		condBits = *reinterpret_cast<unsigned short*>(curLetter + 0x1A);
+		if ((condBits & 0x7FFF) != 0) {
+			const bool invert = (condBits & 0x8000) != 0;
+			bool matched = false;
+
+			if ((condBits & 0x0001) != 0 && unk_0x3ac == 0) {
+				matched = true;
+			}
+			if ((condBits & 0x0002) != 0 && unk_0x3ac == 1) {
+				matched = true;
+			}
+			if ((condBits & 0x0004) != 0 && unk_0x3ac == 2) {
+				matched = true;
+			}
+			if ((condBits & 0x0008) != 0 && unk_0x3ac == 3) {
+				matched = true;
+			}
+			if ((condBits & 0x0010) != 0 && unk_0x3ac == 4) {
+				matched = true;
+			}
+			if ((condBits & 0x0020) != 0 && unk_0x3ac == 5) {
+				matched = true;
+			}
+			if ((condBits & 0x0040) != 0 && unk_0x3ac == 6) {
+				matched = true;
+			}
+			if ((condBits & 0x0080) != 0 && unk_0x3ac == 7) {
+				matched = true;
+			}
+			if ((condBits & 0x0100) != 0 && linkBase[1] != 0) {
+				matched = true;
+			}
+			if ((condBits & 0x0200) != 0 && linkBase[2] != 0) {
+				matched = true;
+			}
+			if ((condBits & 0x0400) != 0 && linkBase[3] != 0) {
+				matched = true;
+			}
+			if ((condBits & 0x0800) != 0 && linkBase[4] != 0) {
+				matched = true;
+			}
+			if ((condBits & 0x1000) != 0 && linkBase[5] != 0) {
+				matched = true;
+			}
+			if ((condBits & 0x2000) != 0 && linkBase[6] != 0) {
+				matched = true;
+			}
+			if ((condBits & 0x4000) != 0 && linkBase[7] != 0) {
+				matched = true;
+			}
+
+			if ((!invert && !matched) || (invert && matched)) {
+				continue;
+			}
+		}
+
+		condBits = *reinterpret_cast<unsigned short*>(curLetter + 0x1C);
+		if ((condBits & 0x7FFF) != 0) {
+			const bool invert = (condBits & 0x8000) != 0;
+			bool matched = false;
+
+			if ((condBits & 0x0001) != 0 && linkBase[1] >= 0x3D) {
+				matched = true;
+			}
+			if ((condBits & 0x0002) != 0 && linkBase[2] >= 0x3D) {
+				matched = true;
+			}
+			if ((condBits & 0x0004) != 0 && linkBase[3] >= 0x3D) {
+				matched = true;
+			}
+			if ((condBits & 0x0008) != 0 && linkBase[4] >= 0x3D) {
+				matched = true;
+			}
+			if ((condBits & 0x0010) != 0 && linkBase[5] >= 0x3D) {
+				matched = true;
+			}
+			if ((condBits & 0x0020) != 0 && linkBase[6] >= 0x3D) {
+				matched = true;
+			}
+			if ((condBits & 0x0040) != 0 && linkBase[7] >= 0x3D) {
+				matched = true;
+			}
+			if ((condBits & 0x0100) != 0 && linkBase[1] > 0 && linkBase[1] <= 0x28) {
+				matched = true;
+			}
+			if ((condBits & 0x0200) != 0 && linkBase[2] > 0 && linkBase[2] <= 0x28) {
+				matched = true;
+			}
+			if ((condBits & 0x0400) != 0 && linkBase[3] > 0 && linkBase[3] <= 0x28) {
+				matched = true;
+			}
+			if ((condBits & 0x0800) != 0 && linkBase[4] > 0 && linkBase[4] <= 0x28) {
+				matched = true;
+			}
+			if ((condBits & 0x1000) != 0 && linkBase[5] > 0 && linkBase[5] <= 0x28) {
+				matched = true;
+			}
+			if ((condBits & 0x2000) != 0 && linkBase[6] > 0 && linkBase[6] <= 0x28) {
+				matched = true;
+			}
+			if ((condBits & 0x4000) != 0 && linkBase[7] > 0 && linkBase[7] <= 0x28) {
+				matched = true;
+			}
+
+			if ((!invert && !matched) || (invert && matched)) {
+				continue;
+			}
+		}
+
+		unsigned int cmpValue = 0;
+		for (int i = 0; i < 4; i++) {
+			const unsigned short cmpType = *reinterpret_cast<unsigned short*>(curLetter + 0x1E + i * 4);
+			const unsigned short sourceType = (cmpType >> 11) & 3;
+			const unsigned short sourceIdx = cmpType & 0x7FF;
+
+			if (sourceType != 3) {
+				if (sourceType == 1) {
+					cmpValue = static_cast<unsigned int>(Game.game.m_gameWork.m_eventWork[sourceIdx + 4]);
+				} else if (sourceType == 0) {
+					if (sourceIdx == 0) {
+						cmpValue = static_cast<unsigned int>(Game.game.m_gameWork.m_scriptSysVal0);
+					} else if (sourceIdx == 1) {
+						cmpValue = static_cast<unsigned int>(Game.game.m_gameWork.m_timerA);
+					} else if (sourceIdx == 2) {
+						cmpValue = static_cast<unsigned int>(Game.game.m_gameWork.m_scriptGlobalTime);
+					} else if (sourceIdx == 3) {
+						cmpValue = static_cast<unsigned int>(Game.game.m_gameWork.m_frameCounter);
+					}
+				} else if (sourceType == 2) {
+					cmpValue = static_cast<unsigned int>(m_evtWordArr[sourceIdx]);
+				}
+
+				const unsigned short op = cmpType >> 13;
+				const unsigned int compareValue = static_cast<unsigned int>(*reinterpret_cast<unsigned short*>(curLetter + 0x20 + i * 4));
+				if (op == 0) {
+					if (cmpValue != compareValue) {
+						goto NextLetter;
+					}
+				} else if (op == 1) {
+					if (cmpValue == compareValue) {
+						goto NextLetter;
+					}
+				} else if (op == 2) {
+					if (cmpValue < compareValue) {
+						goto NextLetter;
+					}
+				} else if (op == 3) {
+					if (compareValue < cmpValue) {
+						goto NextLetter;
+					}
+				} else if (op == 4) {
+					if (cmpValue <= compareValue) {
+						goto NextLetter;
+					}
+				} else if (op == 5) {
+					if (compareValue <= cmpValue) {
+						goto NextLetter;
+					}
+				}
+			}
+		}
+
+		{
+			unsigned int bit0 = 0;
+			unsigned int bit1 = 0;
+			unsigned int bit2 = 0;
+			unsigned char* evtWorkBytes = reinterpret_cast<unsigned char*>(m_evtWorkArr);
+
+			for (int i = 0; i < 8; i++) {
+				const unsigned short evtRule = *reinterpret_cast<unsigned short*>(curLetter + 0x2E + i * 2);
+				const unsigned short sourceType = (evtRule >> 11) & 3;
+				const unsigned short sourceIdx = evtRule & 0x7FF;
+				unsigned int checkValue = bit0;
+
+				if (sourceType == 3) {
+					continue;
+				}
+
+				if (sourceType == 2) {
+					bit0 = ((evtWorkBytes[sourceIdx >> 3] & (1 << (sourceIdx & 7))) != 0);
+					bit1 = ((evtWorkBytes[(sourceIdx + 1) >> 3] & (1 << ((sourceIdx + 1) & 7))) != 0);
+					bit2 = ((evtWorkBytes[(sourceIdx + 2) >> 3] & (1 << ((sourceIdx + 2) & 7))) != 0);
+				} else if (sourceType == 1) {
+					bit0 = ((static_cast<unsigned char>(Game.game.m_gameWork.m_eventFlags[(sourceIdx >> 3) + 8]) &
+							 (1 << (sourceIdx & 7))) != 0);
+					bit1 = ((static_cast<unsigned char>(Game.game.m_gameWork.m_eventFlags[((sourceIdx + 1) >> 3) + 8]) &
+							 (1 << ((sourceIdx + 1) & 7))) != 0);
+					bit2 = ((static_cast<unsigned char>(Game.game.m_gameWork.m_eventFlags[((sourceIdx + 2) >> 3) + 8]) &
+							 (1 << ((sourceIdx + 2) & 7))) != 0);
+				}
+
+				checkValue = bit0;
+
+				switch (evtRule >> 13) {
+				case 0:
+				case 1:
+					break;
+				case 2:
+					if (bit0 != 0) {
+						goto NextLetter;
+					}
+					checkValue = bit2;
+					if (bit1 != 0) {
+						goto NextLetter;
+					}
+					break;
+				case 3:
+					if ((bit0 != 0) || (bit1 != 0)) {
+						continue;
+					}
+					checkValue = bit2;
+					break;
+				case 4:
+				case 5:
+					checkValue = bit2;
+					if (bit1 != 0) {
+						goto NextLetter;
+					}
+					break;
+				case 6:
+				case 7:
+					checkValue = bit2;
+					if (bit1 == 0) {
+						goto NextLetter;
+					}
+					break;
+				default:
+					continue;
+				}
+
+				if (checkValue == 0) {
+					goto NextLetter;
+				}
+			}
+		}
+
+		if (foundCount == maxResults) {
+			unsigned short minPriority = 0xFFFF;
+			int replaceIndex = 0;
+			for (int i = 0; i < maxResults; i++) {
+				unsigned char* existing = reinterpret_cast<unsigned char*>(romLetterWork[i]);
+				unsigned short priority = *reinterpret_cast<unsigned short*>(existing + 6) & 0xF00;
+				if (priority < minPriority) {
+					minPriority = priority;
+					replaceIndex = i;
+				}
+			}
+
+			const unsigned short curPriority = *reinterpret_cast<unsigned short*>(curLetter + 6) & 0xF00;
+			if (minPriority < curPriority) {
+				romLetterWork[replaceIndex] = reinterpret_cast<CRomLetterWork*>(curLetter);
+			}
+		} else {
+			romLetterWork[foundCount] = reinterpret_cast<CRomLetterWork*>(curLetter);
+			foundCount++;
+		}
+
+	NextLetter:;
+	}
 }
 
 /*

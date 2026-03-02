@@ -1791,19 +1791,39 @@ void CGPartyObj::changeWeapon(int weaponRef, int weaponItem, int forceIdle)
 void CGPartyObj::CheckGameOver()
 {
 	Game.game.m_gameWork.m_gameOverFlag = 1;
-	for (int i = 0; i < 4; i++) {
-		CGPartyObj* party = Game.game.m_partyObjArr[i];
-		if (party == nullptr) {
-			continue;
-		}
-		if (party->m_scriptHandle == nullptr) {
-			continue;
-		}
-		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(party->m_scriptHandle) + 0x1C) != 0) {
+	CGPartyObj* party;
+
+	party = Game.game.m_partyObjArr[0];
+	if (party != nullptr && party->m_scriptHandle != nullptr) {
+		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(party->m_scriptHandle) + 0x1C) != 0 ||
+		    ((*(reinterpret_cast<unsigned char*>(party) + 0x6B8) & 0x04) != 0)) {
 			Game.game.m_gameWork.m_gameOverFlag = 0;
 			return;
 		}
-		if ((*(reinterpret_cast<unsigned char*>(party) + 0x6B8) & 0x04) != 0) {
+	}
+
+	party = Game.game.m_partyObjArr[1];
+	if (party != nullptr && party->m_scriptHandle != nullptr) {
+		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(party->m_scriptHandle) + 0x1C) != 0 ||
+		    ((*(reinterpret_cast<unsigned char*>(party) + 0x6B8) & 0x04) != 0)) {
+			Game.game.m_gameWork.m_gameOverFlag = 0;
+			return;
+		}
+	}
+
+	party = Game.game.m_partyObjArr[2];
+	if (party != nullptr && party->m_scriptHandle != nullptr) {
+		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(party->m_scriptHandle) + 0x1C) != 0 ||
+		    ((*(reinterpret_cast<unsigned char*>(party) + 0x6B8) & 0x04) != 0)) {
+			Game.game.m_gameWork.m_gameOverFlag = 0;
+			return;
+		}
+	}
+
+	party = Game.game.m_partyObjArr[3];
+	if (party != nullptr && party->m_scriptHandle != nullptr) {
+		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(party->m_scriptHandle) + 0x1C) != 0 ||
+		    ((*(reinterpret_cast<unsigned char*>(party) + 0x6B8) & 0x04) != 0)) {
 			Game.game.m_gameWork.m_gameOverFlag = 0;
 			return;
 		}

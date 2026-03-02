@@ -733,7 +733,7 @@ runFrame:
     mapAnim->Calc(run->currentFrame);
     run->currentFrame = run->currentFrame + 1;
 
-    if (run->endFrame < run->currentFrame) {
+    if (run->currentFrame > run->endFrame) {
         if (run->loop != 0) {
             run->currentFrame = 0;
         } else {

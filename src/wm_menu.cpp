@@ -176,7 +176,7 @@ void CMenuPcs::createWorld()
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 312b
  * EN Address: TODO
  * EN Size: TODO
@@ -185,10 +185,31 @@ void CMenuPcs::createWorld()
  */
 void CMenuPcs::ChkNumItemAll()
 {
-	ChkMcDataCnt();
-	const int mcCount = DAT_8032ee28;
-	ChkSelectParty();
-	DAT_8032ee28 += mcCount;
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	int total = 0;
+
+	unsigned char* const list = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x854)[0]);
+	if (list != 0) {
+		for (int i = 0; i < kMcListCount; i++) {
+			unsigned char* const entry = list + i * kMcListEntrySize;
+			if (entry[0x43] == 0 && entry[0x41] != 0 && entry[0x42] == 0) {
+				total++;
+			}
+		}
+	}
+
+	int selected = 0;
+	unsigned char* const modelData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x824)[0]);
+	if (modelData != 0) {
+		for (int i = 0; i < 8; i++) {
+			if (modelData[i * 0x34 + 0xC] != 0) {
+				selected++;
+			}
+		}
+	}
+
+	bytes[0x10] = static_cast<unsigned char>(selected != 0);
+	DAT_8032ee28 = total + selected;
 }
 
 /*
@@ -313,7 +334,7 @@ void CMenuPcs::loadData()
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 352b
  * EN Address: TODO
  * EN Size: TODO
@@ -401,7 +422,7 @@ void CMenuPcs::InitCharaInfo()
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 576b
  * EN Address: TODO
  * EN Size: TODO
@@ -426,7 +447,7 @@ void CMenuPcs::InitCharaSelectInfo()
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 560b
  * EN Address: TODO
  * EN Size: TODO
@@ -688,7 +709,7 @@ void CMenuPcs::calcWorld()
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 504b
  * EN Address: TODO
  * EN Size: TODO
@@ -738,7 +759,7 @@ void CMenuPcs::CalcMCardMenu()
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 636b
  * EN Address: TODO
  * EN Size: TODO
@@ -758,7 +779,7 @@ void CMenuPcs::CalcCMakeMenu()
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 164b
  * EN Address: TODO
  * EN Size: TODO
@@ -1359,7 +1380,7 @@ void CMenuPcs::CallWorldParam(int p0, int p1, int p2)
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 112b
  * EN Address: TODO
  * EN Size: TODO
@@ -1489,7 +1510,7 @@ void CMenuPcs::DrawFukidashi()
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 172b
  * EN Address: TODO
  * EN Size: TODO
@@ -1516,7 +1537,7 @@ void CMenuPcs::ChkPlaceLength(char* text)
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 112b
  * EN Address: TODO
  * EN Size: TODO
@@ -1551,7 +1572,7 @@ void CMenuPcs::SplitPlace(const char* text, char* left, char* right)
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 188b
  * EN Address: TODO
  * EN Size: TODO
@@ -1701,7 +1722,7 @@ void CMenuPcs::DrawWMFrame0(int mask, float alpha)
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 388b
  * EN Address: TODO
  * EN Size: TODO
@@ -1718,7 +1739,7 @@ void CMenuPcs::DrawMainMenuBase(float)
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 4b
  * EN Address: TODO
  * EN Size: TODO
@@ -1779,7 +1800,7 @@ void CMenuPcs::PCAnimCtrl()
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 180b
  * EN Address: TODO
  * EN Size: TODO
@@ -1867,7 +1888,7 @@ void CMenuPcs::DrawCMLife()
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 32b
  * EN Address: TODO
  * EN Size: TODO
@@ -1900,7 +1921,7 @@ void CMenuPcs::WMChgMenu()
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 184b
  * EN Address: TODO
  * EN Size: TODO
@@ -1988,7 +2009,7 @@ void CMenuPcs::ChgAllModel2()
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 660b
  * EN Address: TODO
  * EN Size: TODO
@@ -2171,7 +2192,7 @@ void CMenuPcs::CalcMainMenuSub()
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 172b
  * EN Address: TODO
  * EN Size: TODO
@@ -2245,7 +2266,7 @@ void CMenuPcs::GetMcOdekakePos(int* x, int* y)
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 76b
  * EN Address: TODO
  * EN Size: TODO
@@ -2289,7 +2310,7 @@ void CMenuPcs::DrawMCList()
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 248b
  * EN Address: TODO
  * EN Size: TODO
@@ -2318,7 +2339,7 @@ void CMenuPcs::CalcMcObj()
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 804b
  * EN Address: TODO
  * EN Size: TODO
@@ -2334,7 +2355,7 @@ void CMenuPcs::DrawMcObj()
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 188b
  * EN Address: TODO
  * EN Size: TODO
@@ -2369,7 +2390,7 @@ void McListInfo::operator= (const McListInfo& src)
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 44b
  * EN Address: TODO
  * EN Size: TODO
@@ -2471,7 +2492,7 @@ void CMenuPcs::SetLight(int mode)
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 524b
  * EN Address: TODO
  * EN Size: TODO
@@ -2739,7 +2760,7 @@ void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 204b
  * EN Address: TODO
  * EN Size: TODO
@@ -2943,7 +2964,7 @@ int CMenuPcs::CheckSameMcFormatID(Mc::SaveDat* lhs, Mc::SaveDat* rhs)
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 520b
  * EN Address: TODO
  * EN Size: TODO
@@ -3116,7 +3137,7 @@ void McCtrl::SetListDat(int slot, int)
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 232b
  * EN Address: TODO
  * EN Size: TODO
@@ -3762,7 +3783,7 @@ void McCtrl::SaveDataBuffer(char* buffer)
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 244b
  * EN Address: TODO
  * EN Size: TODO

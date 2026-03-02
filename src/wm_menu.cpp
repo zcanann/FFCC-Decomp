@@ -38,11 +38,16 @@ extern "C" void SetNumDiffuse__9CLightPcsFUl(void*, unsigned long);
 extern "C" void SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(void*, unsigned long, void*, void*, int);
 extern "C" void SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(void*, int, Vec*, unsigned long);
 extern "C" void Create__9CGBaseObjFv(void*);
+extern "C" void SetViewport__8CGraphicFv(void*);
+extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
+extern "C" void InitEnv__9CCharaPcsFi(void*, int);
 extern "C" unsigned int pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(void*, int, int, void*, int);
 extern "C" void pppDestroyAll__8CPartMngFv(void*);
 extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
 extern "C" void* Free__7CMemoryFPv(CMemory*, void*);
+extern "C" unsigned char CameraPcs[];
+extern "C" unsigned char CharaPcs[];
 extern "C" unsigned char LightPcs[];
 extern "C" unsigned char Graphic[];
 extern "C" unsigned char PartMng[];
@@ -54,7 +59,15 @@ extern float FLOAT_803313dc;
 extern float FLOAT_803313e0;
 extern float FLOAT_803313e4;
 extern float FLOAT_803313e8;
+extern float FLOAT_80331470;
+extern float FLOAT_80331474;
+extern float FLOAT_80331478;
+extern float FLOAT_8033147c;
 extern float FLOAT_803314bc;
+extern float FLOAT_803314c0;
+extern float FLOAT_803314c4;
+extern float FLOAT_803314c8;
+extern float FLOAT_803314cc;
 extern float FLOAT_8033151c;
 extern float FLOAT_80331528;
 extern float FLOAT_803315cc;
@@ -1446,7 +1459,50 @@ void CMenuPcs::GetFcvValue(CMenuPcs::FCV, float value)
 void CMenuPcs::SetProjection(int mode)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	bytes[0x11] = static_cast<unsigned char>(mode != 0);
+	unsigned char* const worldObj = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]);
+	if (worldObj == 0) {
+		return;
+	}
+
+	unsigned char* const slot = worldObj + mode * 0x50;
+	Mtx44 projectionMtx;
+	C_MTXPerspective(projectionMtx, FLOAT_80331470, FLOAT_80331474, FLOAT_80331478, FLOAT_8033147c);
+	GXSetProjection(projectionMtx, GX_PERSPECTIVE);
+	PSMTX44Copy(projectionMtx, *reinterpret_cast<Mtx44*>(CameraPcs + 0x48));
+
+	Vec target;
+	target.x = FLOAT_803313dc;
+	target.y = FLOAT_803313dc;
+	target.z = FLOAT_803313dc;
+	Vec up;
+	up.x = FLOAT_803313dc;
+	up.y = FLOAT_803313e8;
+	up.z = FLOAT_803313dc;
+
+	Mtx lookAtMtx;
+	C_MTXLookAt(lookAtMtx, reinterpret_cast<Point3d*>(slot + 0x10), &up, reinterpret_cast<Point3d*>(&target));
+	PSMTXCopy(lookAtMtx, *reinterpret_cast<Mtx*>(CameraPcs + 0x4));
+
+	InitEnv__9CCharaPcsFi(CharaPcs, 5);
+	GXSetColorUpdate(0);
+	GXSetAlphaUpdate(0);
+	_GXColor clearColor = {0, 0, 0, 0};
+	GXSetCopyClear(clearColor, 0x00FFFFFF);
+	GXSetColorUpdate(1);
+	GXSetAlphaUpdate(1);
+
+	GXSetViewport(
+	    static_cast<float>(*reinterpret_cast<short*>(slot + 8)),
+	    static_cast<float>(*reinterpret_cast<short*>(slot + 0xA)),
+	    static_cast<float>(*reinterpret_cast<short*>(slot + 0xC)),
+	    static_cast<float>(*reinterpret_cast<short*>(slot + 0xE)),
+	    FLOAT_803313dc,
+	    FLOAT_803313e8);
+	GXSetScissor(
+	    *reinterpret_cast<unsigned int*>(slot + 0x40),
+	    *reinterpret_cast<unsigned int*>(slot + 0x44),
+	    *reinterpret_cast<unsigned int*>(slot + 0x48),
+	    *reinterpret_cast<unsigned int*>(slot + 0x4C));
 }
 
 /*
@@ -1460,8 +1516,14 @@ void CMenuPcs::SetProjection(int mode)
  */
 void CMenuPcs::RestoreProjection()
 {
-	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	bytes[0x11] = 0;
+	Mtx44 projectionMtx;
+	_GXColor clearColor = {0, 0, 0, 0};
+	GXSetCopyClear(clearColor, 0x00FFFFFF);
+	PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcs + 0x48), projectionMtx);
+	GXSetProjection(projectionMtx, GX_PERSPECTIVE);
+	SetViewport__8CGraphicFv(Graphic);
+	GXSetScissor(0, 0, 0x280, 0x1C0);
+	DrawInit__8CMenuPcsFv(this);
 }
 
 /*

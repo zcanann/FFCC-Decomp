@@ -10,8 +10,11 @@ extern "C" int CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(CMapMng*, C
 extern "C" void CalcHitPosition__7CMapObjFP3Vec(void*, Vec*);
 extern "C" void GetHitFaceNormal__7CMapObjFP3Vec(void*, Vec*);
 extern "C" int CanCreateFromScript__9CGItemObjFv();
+extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
+extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
     int type, int createMode, int itemId, CGObject* owner, float arg, void* cfs);
+extern unsigned char CFlat[];
 
 extern float FLOAT_80331a78;
 extern float FLOAT_80331a9c;
@@ -146,8 +149,12 @@ void CGPartyObj::CheckMenu()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801230a0
+ * PAL Size: 844b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::onFramePreCalc()
 {
@@ -186,8 +193,12 @@ void CGPartyObj::onFramePostCalc()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80121f40
+ * PAL Size: 4252b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::command()
 {
@@ -205,8 +216,12 @@ void CGPartyObj::callCommandScript(int, CGObject*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80121ba4
+ * PAL Size: 924b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::shouki()
 {
@@ -215,8 +230,12 @@ void CGPartyObj::shouki()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80120b94
+ * PAL Size: 4112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::onFrameStat()
 {
@@ -314,8 +333,12 @@ int CGPartyObj::getReplaceStat(int state)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011ff8c
+ * PAL Size: 2560b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::statCharge()
 {
@@ -335,11 +358,55 @@ void CGPartyObj::statAttackSel()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011fda8
+ * PAL Size: 484b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::getBestAngleObject(float, float)
 {
+	CGPrgObj* best = 0;
+	float bestAbsAngle = 0.0f;
+
+	for (CGObject* obj = FindGObjFirst__13CFlatRuntime2Fv(CFlat); obj != 0;
+	     obj = FindGObjNext__13CFlatRuntime2FP8CGObject(CFlat, obj)) {
+		if (obj == this) {
+			continue;
+		}
+
+		const unsigned int flags = obj->m_attrFlags;
+		if ((flags & 0x18) == 0) {
+			continue;
+		}
+
+		if ((flags & 0x08) != 0) {
+			if ((obj->m_displayFlags & 1) == 0) {
+				continue;
+			}
+			if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(obj->m_scriptHandle) + 0x1C) == 0) {
+				continue;
+			}
+		}
+
+		Vec diff;
+		PSVECSubtract(&obj->m_worldPosition, &m_worldPosition, &diff);
+		diff.y = 0.0f;
+		if (PSVECSquareMag(&diff) <= 0.0f) {
+			continue;
+		}
+
+		const float absAngle = fabsf(getTargetRot(reinterpret_cast<CGPrgObj*>(obj)));
+		if (absAngle > bestAbsAngle) {
+			bestAbsAngle = absAngle;
+			best = reinterpret_cast<CGPrgObj*>(obj);
+		}
+	}
+
+	if (best != 0) {
+		dstTargetRot(best);
+	}
 }
 
 /*
@@ -547,8 +614,12 @@ void CGPartyObj::moveCenterTargetParticle()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011e32c
+ * PAL Size: 1348b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::onStatMagic()
 {
@@ -561,8 +632,12 @@ void CGPartyObj::onStatMagic()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011e1b4
+ * PAL Size: 376b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::onStatDie()
 {
@@ -608,11 +683,17 @@ void CGPartyObj::statAlive()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011e194
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGPartyObj::onPush(CGBaseObj*, int)
+void CGPartyObj::onPush(CGBaseObj* other, int pushType)
 {
+	(void)other;
+	(void)pushType;
 }
 
 /*
@@ -661,8 +742,12 @@ void CGPartyObj::commandFinished()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011da84
+ * PAL Size: 1620b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::carry(int, CGObject*, int)
 {
@@ -686,8 +771,12 @@ void CGPartyObj::statCarry()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011d710
+ * PAL Size: 884b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::statPut()
 {
@@ -710,8 +799,12 @@ void CGPartyObj::statPickup()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011d1cc
+ * PAL Size: 1348b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::bonus(int, int, CGPrgObj*)
 {
@@ -721,8 +814,12 @@ void CGPartyObj::bonus(int, int, CGPrgObj*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011d170
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CGPartyObj::canPlayerUseItem()
 {
@@ -754,8 +851,12 @@ void CGPartyObj::canPlayerGoMenu()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011cee4
+ * PAL Size: 652b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::useItem(int)
 {
@@ -767,8 +868,12 @@ void CGPartyObj::useItem(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011ce3c
+ * PAL Size: 168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int CGPartyObj::canPlayerPutItem()
 {
@@ -861,8 +966,12 @@ void CGPartyObj::statRebound()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011cab8
+ * PAL Size: 292b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::statKorobi()
 {
@@ -973,8 +1082,12 @@ void CGPartyObj::CheckGameOver()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011c7e0
+ * PAL Size: 488b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::SetBonusCondition(int, int, int, int, int)
 {
@@ -1047,8 +1160,12 @@ void CGPartyObj::checkAndSetWeapon()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011c184
+ * PAL Size: 1048b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::changeMotionMode(int)
 {
@@ -1058,8 +1175,12 @@ void CGPartyObj::changeMotionMode(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011c02c
+ * PAL Size: 344b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::setIdleMotion()
 {
@@ -1079,8 +1200,12 @@ void CGPartyObj::setIdleMotion()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011bd30
+ * PAL Size: 764b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::setAlive(int, int)
 {
@@ -1188,8 +1313,12 @@ void calcWeightMax()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011b9c8
+ * PAL Size: 448b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::gpmCalcDist(Vec*, float&)
 {
@@ -1197,8 +1326,12 @@ void CGPartyObj::gpmCalcDist(Vec*, float&)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011b790
+ * PAL Size: 568b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::gpmCol()
 {
@@ -1207,8 +1340,12 @@ void CGPartyObj::gpmCol()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011b268
+ * PAL Size: 1320b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::ghostPartyMog()
 {
@@ -1217,8 +1354,12 @@ void CGPartyObj::ghostPartyMog()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011a94c
+ * PAL Size: 2332b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::gpmMove()
 {
@@ -1242,8 +1383,12 @@ void CGPartyObj::sysControl(int controlType, int controlValue)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011a59c
+ * PAL Size: 892b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::onDrawDebug(CFont*, float, float&, float)
 {

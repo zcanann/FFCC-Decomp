@@ -4,6 +4,9 @@
 #include "ffcc/sound.h"
 #include <string.h>
 
+extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
+extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
+extern "C" void DrawRect__8CMenuPcsFUlfffffffff(CMenuPcs*, unsigned long, float, float, float, float, float, float, float, float, float);
 extern "C" {
 extern int lbl_8032EEA8;
 extern int lbl_8032EEB0;
@@ -1074,13 +1077,36 @@ void CMenuPcs::DrawBonusCnt(CMenuPcs::Sprt2* sprt, int value)
  */
 void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 {
-	float area = w * h * alpha;
-	if (area < 0.0f) {
-		area = 0.0f;
+	if (alpha <= 0.0f) {
+		return;
 	}
-	(void)x;
-	(void)y;
-	*(unsigned char*)((char*)this + 0x8c) = (unsigned char)((int)area & 0xff);
+
+	_GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(255.0f * alpha)};
+	const float corner = 8.0f;
+	const float right = (x + w) - corner;
+	const float bottom = (y + h) - corner;
+	const float innerW = w - (corner * 2.0f);
+	const float innerH = h - (corner * 2.0f);
+
+	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+	GXSetChanMatColor(GX_COLOR0A0, color);
+
+	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x1B);
+	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x, y, corner, corner, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect__8CMenuPcsFUlfffffffff(this, 0, right, y, corner, corner, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x, bottom, corner, corner, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect__8CMenuPcsFUlfffffffff(this, 0, right, bottom, corner, corner, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f);
+
+	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x1C);
+	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x + corner, y, innerW, corner, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x22);
+	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x + corner, bottom, innerW, corner, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x1D);
+	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x, y + corner, corner, innerH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x21);
+	DrawRect__8CMenuPcsFUlfffffffff(this, 0, right, y + corner, corner, innerH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x1E);
+	DrawRect__8CMenuPcsFUlfffffffff(this, 0, x + corner, y + corner, innerW, innerH, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 }
 
 /*

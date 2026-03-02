@@ -28,14 +28,45 @@ extern float FLOAT_80331ad0;
 extern float FLOAT_80331ad4;
 extern float FLOAT_80331ad8;
 
+static unsigned short getPadHeldForSlot(int slot)
+{
+	if (Pad._452_4_ != 0 || (slot == 0 && Pad._448_4_ != -1)) {
+		return 0;
+	}
+
+	int idx = slot & ~((~(Pad._448_4_ - slot | slot - Pad._448_4_) >> 31));
+	return *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x4 + idx * 0x54);
+}
+
+static unsigned short getPadTrigForSlot(int slot)
+{
+	if (Pad._452_4_ != 0 || (slot == 0 && Pad._448_4_ != -1)) {
+		return 0;
+	}
+
+	int idx = slot & ~((~(Pad._448_4_ - slot | slot - Pad._448_4_) >> 31));
+	return *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(&Pad) + 0x8 + idx * 0x54);
+}
+
 /*
  * --INFO--
  * Address:	TODO
  * Size:	TODO
  */
-void CATEGOLY2TYPE(int value)
+int CATEGOLY2TYPE(int value)
 {
-	(void)value;
+	switch (value) {
+	case 0:
+		return 0;
+	case 1:
+		return 9;
+	case 2:
+		return 6;
+	case 3:
+		return 2;
+	default:
+		return -1;
+	}
 }
 
 /*
@@ -368,7 +399,7 @@ void CGPartyObj::callCommandScript(int mode, CGObject* target)
 
 	switch (mode) {
 	case 0:
-		if (target != nullptr && m_lastStateId == 0) {
+		if (target != nullptr && m_lastStateId == 0 && target != this) {
 			changeStat(0x0C, 0, 0);
 		}
 		break;
@@ -385,6 +416,16 @@ void CGPartyObj::callCommandScript(int mode, CGObject* target)
 	case 3:
 		if (canPlayerPutItem() != 0) {
 			putItem(0);
+		}
+		break;
+	case 4:
+		if (m_lastStateId == 0) {
+			changeStat(0x0B, 0, 0);
+		}
+		break;
+	case 5:
+		if (m_lastStateId == 0) {
+			changeStat(0x0D, 0, 0);
 		}
 		break;
 	default:
@@ -544,6 +585,13 @@ void CGPartyObj::statAttackSel()
 	if (m_subState == 0 && m_subFrame == 0) {
 		putTargetParticle(0, 1);
 	}
+
+	unsigned short trig = getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc));
+	if ((trig & 0x200) != 0) {
+		changeStat(0, 0, 0);
+		return;
+	}
+
 	onStatAttack(1);
 }
 
@@ -704,6 +752,8 @@ void CGPartyObj::endTargetParticle()
 	self[0x6B8] &= 0xAF;
 	*reinterpret_cast<int*>(self + 0x668) = 0;
 	*reinterpret_cast<int*>(self + 0x660) = 0;
+	*reinterpret_cast<Vec*>(self + 0x678) = m_worldPosition;
+	*reinterpret_cast<Vec*>(self + 0x66C) = m_worldPosition;
 }
 
 /*
@@ -899,8 +949,16 @@ void CGPartyObj::statAlive()
 {
 	setAlive(1, 0);
 	canPlayerGoMenu();
-	if ((*(reinterpret_cast<unsigned char*>(this) + 0x6B8) & 0x20) != 0) {
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	if ((self[0x6B8] & 0x20) != 0) {
 		checkTargetParticle();
+	}
+
+	if (m_lastStateId == 0) {
+		unsigned short held = getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc));
+		if ((held & 0x100) == 0 && m_subState == 1) {
+			changeSubStat(0);
+		}
 	}
 }
 
@@ -1010,6 +1068,14 @@ void CGPartyObj::statCarry()
 	if (m_subState == 0 && m_subFrame == 0) {
 		reqAnim(0x1D, 0, 0);
 	}
+
+	unsigned short trig = getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc));
+	if ((trig & 0x200) != 0) {
+		carry(2, (CGObject*)0, 1);
+		changeStat(0, 0, 0);
+		return;
+	}
+
 	if (isLoopAnim() != 0 || m_subFrame > 0x1E) {
 		carry(1, (CGObject*)0, 1);
 		changeStat(0, 0, 0);
@@ -1054,6 +1120,13 @@ void CGPartyObj::statPickup()
 	if (m_subState == 0 && m_subFrame == 0) {
 		reqAnim(0x21, 0, 0);
 	}
+
+	unsigned short trig = getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc));
+	if ((trig & 0x200) != 0) {
+		changeStat(0, 0, 0);
+		return;
+	}
+
 	if (isLoopAnim() != 0 || m_subFrame > 0x1E) {
 		carry(0, *reinterpret_cast<CGObject**>(reinterpret_cast<unsigned char*>(this) + 0x6E4), 1);
 		changeStat(0, 0, 0);
@@ -1114,9 +1187,10 @@ int CGPartyObj::canPlayerUseItem()
 void CGPartyObj::canPlayerGoMenu()
 {
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	if (m_lastStateId == 0 && (Pad._8_2_ & 0x200) != 0) {
+	unsigned short trig = getPadTrigForSlot(static_cast<unsigned char>(m_animStateMisc));
+	if (m_lastStateId == 0 && (trig & 0x200) != 0) {
 		self[0x6B8] |= 0x10;
-	} else if ((m_lastStateId != 0) || ((Pad._8_2_ & 0x200) == 0)) {
+	} else if ((m_lastStateId != 0) || ((trig & 0x200) == 0)) {
 		self[0x6B8] &= 0xEF;
 	}
 }
@@ -1238,6 +1312,11 @@ void CGPartyObj::statRebound()
 		reqAnim(0x1C, 0, 0);
 		enableDamageCol(0);
 	}
+
+	if (m_subFrame == 8) {
+		playSe3D(0x22, 0x32, 0x96, 0, 0);
+	}
+
 	if (isLoopAnim() != 0 || m_subFrame > 0x1E) {
 		enableDamageCol(1);
 		changeStat(0, 0, 0);
@@ -1294,9 +1373,15 @@ void CGPartyObj::statKorobi()
  */
 void CGPartyObj::statHide()
 {
-	enableDamageCol(0);
-	commandFinished();
-	CancelMove(1);
+	if (m_subFrame == 0) {
+		enableDamageCol(0);
+		commandFinished();
+		CancelMove(1);
+	}
+
+	moveCenterTargetParticle();
+	checkTargetParticle();
+
 	if (m_subFrame > 0x20) {
 		enableDamageCol(1);
 		changeStat(0, 0, 0);
@@ -1314,6 +1399,11 @@ void CGPartyObj::statJump()
 		reqAnim(0x22, 0, 0);
 		enableDamageCol(0);
 	}
+
+	if (m_subFrame == 1) {
+		playSe3D(0x1F, 0x32, 0x96, 0, 0);
+	}
+
 	if (isLoopAnim() != 0) {
 		enableDamageCol(1);
 		changeStat(0, 0, 0);
@@ -1331,6 +1421,10 @@ void CGPartyObj::statWeaponChange()
 	changeWeapon(*reinterpret_cast<int*>(self + 0x6DC),
 	             *reinterpret_cast<int*>(self + 0x6E0),
 	             0);
+
+	if (m_subFrame > 1) {
+		changeStat(0, 0, 0);
+	}
 }
 
 /*
@@ -1348,6 +1442,10 @@ void CGPartyObj::changeWeapon(int weaponRef, int weaponItem, int forceIdle)
 		LoadWeapon(-1, 0);
 	} else {
 		LoadWeapon(weaponItem & 0xFFF, weaponItem >> 12);
+	}
+
+	if (m_scriptHandle != nullptr) {
+		reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(weaponRef);
 	}
 
 	if (forceIdle != 0 || m_lastStateId != 0) {
@@ -1503,6 +1601,15 @@ void CGPartyObj::checkAndSetWeapon()
 	} else {
 		LoadWeapon(weaponItem & 0xFFF, weaponItem >> 12);
 	}
+
+	int shieldIndex = reinterpret_cast<short*>(m_scriptHandle)[0x2C];
+	if (shieldIndex <= 0) {
+		LoadShield(-1);
+	} else {
+		int shieldItem = reinterpret_cast<short*>(m_scriptHandle)[0x5B + shieldIndex];
+		LoadShield((shieldItem > 0) ? (shieldItem & 0xFFF) : -1);
+	}
+
 	setIdleMotion();
 }
 

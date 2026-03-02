@@ -5,6 +5,7 @@
 #include "ffcc/p_game.h"
 
 #include <dolphin/mtx.h>
+#include <math.h>
 #include <string.h>
 
 extern "C" void* __vt__Q212CFlatRuntime7CObject[];
@@ -23,9 +24,26 @@ extern "C" void CalcMatrix__Q26CChara6CModelFv(void*);
 extern "C" void CalcSkin__Q26CChara6CModelFv(void*);
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void*, void*, int, int, int, void*, void*);
+extern "C" void SetMargin__5CFontFf(float, CFont*);
+extern "C" void SetShadow__5CFontFi(CFont*, int);
+extern "C" void SetScale__5CFontFf(float, CFont*);
+extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
+extern "C" int GetWinMess__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" int GetMcWinMessBuff__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" void SetFog__8CGraphicFii(void*, int, int);
+extern "C" void SetAmbient__9CLightPcsF8_GXColor(void*, void*);
+extern "C" void SetNumDiffuse__9CLightPcsFUl(void*, unsigned long);
+extern "C" void SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(void*, unsigned long, void*, void*, int);
+extern "C" void SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(void*, int, Vec*, unsigned long);
+extern "C" unsigned char LightPcs[];
+extern "C" unsigned char Graphic[];
+extern "C" int DAT_8021082c[];
+extern "C" int DAT_80210830[];
 
 extern float FLOAT_8032ee18;
 extern float FLOAT_803313dc;
+extern float FLOAT_803313e0;
+extern float FLOAT_803313e4;
 extern float FLOAT_803313e8;
 extern float FLOAT_803314bc;
 extern float FLOAT_80331598;
@@ -1290,7 +1308,7 @@ void CMenuPcs::CalcWMFrame()
  */
 void CMenuPcs::DrawWMFrame()
 {
-	DrawWMFrame0(0, 1.0f);
+	DrawWMFrame0(3, 1.0f);
 }
 
 /*
@@ -1302,11 +1320,31 @@ void CMenuPcs::DrawWMFrame()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::CalcWMFrame0(int)
+void CMenuPcs::CalcWMFrame0(int param)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	if (reinterpret_cast<unsigned int*>(bytes + 0x820)[0] != 0) {
-		InitFrame0Info();
+	unsigned char* const frame = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x820)[0]);
+
+	if (frame == 0) {
+		return;
+	}
+
+	reinterpret_cast<short*>(frame + 4)[0] = 0x10;
+	reinterpret_cast<short*>(frame + 0x20)[0] = static_cast<short>(640 - (reinterpret_cast<short*>(frame + 8)[0] + reinterpret_cast<short*>(frame + 4)[0]));
+
+	if (param < 0) {
+		float offset = static_cast<float>(reinterpret_cast<short*>(frame + 8)[0] + reinterpret_cast<short*>(frame + 4)[0]);
+		if (param > -11) {
+			int absParam = -param;
+			if (absParam > 10) {
+				absParam = 10;
+			}
+			float t = static_cast<float>(absParam);
+			offset = offset * 0.1f * t;
+			offset = offset * static_cast<float>(sin(FLOAT_803314bc * t * FLOAT_80331698));
+		}
+		reinterpret_cast<short*>(frame + 4)[0] = static_cast<short>(static_cast<float>(reinterpret_cast<short*>(frame + 4)[0]) - offset);
+		reinterpret_cast<short*>(frame + 0x20)[0] = static_cast<short>(static_cast<float>(reinterpret_cast<short*>(frame + 0x20)[0]) + offset);
 	}
 }
 
@@ -1343,6 +1381,10 @@ void CMenuPcs::DrawWMFrame0(int mask, float alpha)
 	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
 
 	SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
+
+	if (mask == 0) {
+		mask = 3;
+	}
 
 	for (int i = 0; i < 2; i++) {
 		if ((mask & (1 << i)) == 0) {
@@ -2001,7 +2043,19 @@ void CMenuPcs::BindEffect(int, int, int)
  */
 void CMenuPcs::SetLight(int mode)
 {
-	DAT_8032ee28 = mode;
+	int localColor;
+	int* const lightTable = DAT_8021082c + mode * 0xE;
+
+	SetFog__8CGraphicFii(Graphic, 1, 0);
+	SetAmbient__9CLightPcsF8_GXColor(LightPcs, &DAT_80210830[mode * 0xE]);
+	SetNumDiffuse__9CLightPcsFUl(LightPcs, static_cast<unsigned long>(lightTable[0]));
+
+	for (int i = 0; i < lightTable[0]; i++) {
+		localColor = lightTable[2 + i];
+		SetDiffuse__9CLightPcsFUl8_GXColorP3Veci(LightPcs, static_cast<unsigned long>(i), &localColor, lightTable + 5 + i * 3, 0);
+	}
+
+	SetPosition__9CLightPcsFQ29CLightPcs6TARGETP3VecUl(LightPcs, 0, 0, 0xFFFFFFFF);
 }
 
 /*
@@ -2229,13 +2283,46 @@ void CMenuPcs::DrawMcWinMess(int, int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::GetWinSize(int, short* w, short* h, int)
+void CMenuPcs::GetWinSize(int winType, short* w, short* h, int messType)
 {
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	CFont* const font = *reinterpret_cast<CFont**>(bytes + 0xF8);
+
+	SetMargin__5CFontFf(FLOAT_803313e8, font);
+	SetShadow__5CFontFi(font, 0);
+	SetScale__5CFontFf(FLOAT_803313e8, font);
+
+	const int msgTable = GetMcWinMessBuff__8CMenuPcsFi(this, messType);
+	const unsigned char* const winMess = reinterpret_cast<unsigned char*>(GetWinMess__8CMenuPcsFi(this, winType));
+	const int count = *reinterpret_cast<const int*>(winMess);
+	int maxWidth = 0;
+
+	const unsigned char* entry = winMess + 4;
+	for (int i = 0; i < count; i++) {
+		const short msgId = *reinterpret_cast<const short*>(entry + 4);
+		const char* text = *reinterpret_cast<const char**>(msgTable + msgId * 4);
+		if (text != 0) {
+			if (text[0] == '$') {
+				text++;
+			}
+			const int textWidth = GetWidth__5CFontFPc(font, text);
+			if (maxWidth < textWidth) {
+				maxWidth = textWidth;
+			}
+		}
+		entry += 8;
+	}
+
+	int cols = maxWidth / 0x16;
+	if ((maxWidth % 0x16) != 0) {
+		cols++;
+	}
+
 	if (w != 0) {
-		*w = 0x100;
+		*w = static_cast<short>((cols + 2) * 0x16 + 0x40);
 	}
 	if (h != 0) {
-		*h = 0x40;
+		*h = static_cast<short>(count * 0x1E + 0x40);
 	}
 }
 
@@ -2312,9 +2399,25 @@ void CMenuPcs::BindMcObj()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::DrawFilter(unsigned char, unsigned char, unsigned char, unsigned char)
+void CMenuPcs::DrawFilter(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
 {
-	DrawPageMark();
+	SetAttrFmt(static_cast<CMenuPcs::FMT>(2));
+
+	GXColor color;
+	color.r = r;
+	color.g = g;
+	color.b = b;
+	color.a = a;
+	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
+
+	SetTexture(static_cast<CMenuPcs::TEX>(-1));
+	GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+
+	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+	GXPosition3f32(FLOAT_803313dc, FLOAT_803313dc, FLOAT_803313dc);
+	GXPosition3f32(FLOAT_803313e0, FLOAT_803313dc, FLOAT_803313dc);
+	GXPosition3f32(FLOAT_803313e0, FLOAT_803313e4, FLOAT_803313dc);
+	GXPosition3f32(FLOAT_803313dc, FLOAT_803313e4, FLOAT_803313dc);
 }
 
 /*

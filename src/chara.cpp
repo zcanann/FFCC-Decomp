@@ -16,8 +16,12 @@ extern CharaGlobal Chara;
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void D3DXMatrixMultiplyRotate(float (*out)[4], float (*a)[4], float (*b)[4])
 {
@@ -33,8 +37,12 @@ void D3DXMatrixMultiplyRotate(float (*out)[4], float (*a)[4], float (*b)[4])
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CChara::CChara()
 {
@@ -154,8 +162,12 @@ void CChara::gqrInit(unsigned long, unsigned long, unsigned long)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CChara::CModel::CRefData::CRefData()
 {
@@ -486,8 +498,12 @@ void CChara::CModel::CalcSkin()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CChara::CModel::calcNowFrame()
 {
@@ -599,8 +615,12 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CChara::CModel::calcSkin()
 {
@@ -630,9 +650,21 @@ void CChara::CModel::SetMatrix(float (*mtx) [4])
  * JP Address: TODO
  * JP Size: TODO
  */
-void CChara::CModel::SearchNode(char*)
+int CChara::CModel::SearchNode(char* name)
 {
-	// Return type is unknown in this decomp state.
+	u32 index = 0;
+	CNode* node = *(CNode**)((u8*)this + 0xA8);
+	u32 nodeCount = *(u32*)((u8*)*(void**)((u8*)this + 0xA4) + 8);
+
+	while (index < nodeCount) {
+		if (strcmp((char*)((u8*)*(void**)node + 0x6C), name) == 0) {
+			return (int)index;
+		}
+		index++;
+		node = (CNode*)((u8*)node + 0xC0);
+	}
+
+	return -1;
 }
 
 /*
@@ -644,9 +676,44 @@ void CChara::CModel::SearchNode(char*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CChara::CModel::SearchNodeSk(char*)
+int CChara::CModel::SearchNodeSk(char* name)
 {
-	// Return type is unknown in this decomp state.
+	if (*name == '_') {
+		if (name[1] == 's' && name[2] == 'k') {
+			CNode* node = *(CNode**)((u8*)this + 0xA8);
+			u32 nodeCount = *(u32*)((u8*)*(void**)((u8*)this + 0xA4) + 8);
+			for (u32 i = 0; i < nodeCount; i++) {
+				char* nodeName = (char*)((u8*)*(void**)node + 0x6C);
+				int len = strlen(nodeName);
+				if ((len - 3) > 0 && strcmp(nodeName + len - 3, name) == 0) {
+					return (int)i;
+				}
+				node = (CNode*)((u8*)node + 0xC0);
+			}
+		} else if (name[1] == 'r' && name[2] == 'o' && name[3] == 'o' && name[4] == 't') {
+			CNode* node = *(CNode**)((u8*)this + 0xA8);
+			u32 nodeCount = *(u32*)((u8*)*(void**)((u8*)this + 0xA4) + 8);
+			for (u32 i = 0; i < nodeCount; i++) {
+				char* nodeName = (char*)((u8*)*(void**)node + 0x6C);
+				int len = strlen(nodeName);
+				if ((len - 5) > 0 && strcmp(nodeName + len - 5, name) == 0) {
+					return (int)i;
+				}
+				node = (CNode*)((u8*)node + 0xC0);
+			}
+		}
+	} else {
+		CNode* node = *(CNode**)((u8*)this + 0xA8);
+		u32 nodeCount = *(u32*)((u8*)*(void**)((u8*)this + 0xA4) + 8);
+		for (u32 i = 0; i < nodeCount; i++) {
+			if (strcmp((char*)((u8*)*(void**)node + 0x6C), name) == 0) {
+				return (int)i;
+			}
+			node = (CNode*)((u8*)node + 0xC0);
+		}
+	}
+
+	return -1;
 }
 
 /*
@@ -684,8 +751,12 @@ void CChara::CModel::DrawShadow(float (*view)[4], int zMode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CChara::CModel::CalcInterpFrame()
 {
@@ -822,9 +893,9 @@ void CChara::CModel::CalcFurColor()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CChara::CModel::GetDispIndex(CChara::CNode*)
+int CChara::CModel::GetDispIndex(CChara::CNode* node)
 {
-	// Return type is unknown in this decomp state.
+	return (int)*(s8*)((u8*)*(void**)node + 4);
 }
 
 /*
@@ -881,8 +952,12 @@ void CChara::CNode::Create(CChunkFile& chunk, CChara::CModel* model, CChara::CNo
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CChara::CNode::Duplicate(CChara::CNode* src, CMemory::CStage* stage)
 {
@@ -995,8 +1070,12 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CChara::CMesh::Duplicate(CChara::CMesh* src, CMemory::CStage* stage)
 {
@@ -1152,8 +1231,12 @@ CChara::CSkin::~CSkin()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CChara::CSkin::Create(CChunkFile& chunk, CMemory::CStage* stage)
 {
@@ -1164,8 +1247,12 @@ void CChara::CSkin::Create(CChunkFile& chunk, CMemory::CStage* stage)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CChara::CAnimNode::IsScale()
 {
@@ -1174,8 +1261,12 @@ void CChara::CAnimNode::IsScale()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CChara::CModel::CalcNodeWorldMatrix(float (*outMtx)[4], CChara::CNode* node)
 {

@@ -97,8 +97,8 @@ class CChara
 		void dynamics(CChara::CNode*, CChara::CNode*);
 		void calcSkin();
 		void SetMatrix(float (*)[4]);
-		void SearchNode(char*);
-		void SearchNodeSk(char*);
+		int SearchNode(char*);
+		int SearchNodeSk(char*);
 		void Draw(float (*)[4], int, int);
 		void DrawShadow(float (*)[4], int);
 		void CalcInterpFrame();
@@ -109,7 +109,7 @@ class CChara
 		void SetFrame(float);
 		void CalcFurColor();
 		void InitMogFurTex();
-		void GetDispIndex(CChara::CNode*);
+		int GetDispIndex(CChara::CNode*);
         void GetMatrix();
         void GetMatrix(float(*)[4]);
 

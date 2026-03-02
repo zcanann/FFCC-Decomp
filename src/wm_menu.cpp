@@ -42,6 +42,7 @@ extern "C" void SetViewport__8CGraphicFv(void*);
 extern "C" void DrawInit__8CMenuPcsFv(CMenuPcs*);
 extern "C" void InitEnv__9CCharaPcsFi(void*, int);
 extern "C" unsigned int pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(void*, int, int, void*, int);
+extern "C" void pppDeletePart__8CPartMngFi(void*, int);
 extern "C" void pppDestroyAll__8CPartMngFv(void*);
 extern "C" void __dl__FPv(void*);
 extern "C" void __dla__FPv(void*);
@@ -433,6 +434,49 @@ void CMenuPcs::Sprt::operator= (const CMenuPcs::Sprt& src)
 void CMenuPcs::InitCharaInfo()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const worldObj = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]);
+
+	int row = 0;
+	int baseSlot = 0x20;
+	short baseY = 0x66;
+	while (row < 2) {
+		int slotOffset = baseSlot * 0x50;
+		short baseX = 0x68;
+		for (int col = 0; col < 2; col++) {
+			short y = baseY;
+			if (row != 0) {
+				y = static_cast<short>(baseY + 8);
+			}
+
+			*reinterpret_cast<short*>(worldObj + slotOffset + 8) = static_cast<short>(baseX - 0xA0);
+			*reinterpret_cast<short*>(worldObj + slotOffset + 0xA) = static_cast<short>(y - 0x70);
+			*reinterpret_cast<unsigned short*>(worldObj + slotOffset + 0xC) = 0x140;
+			*reinterpret_cast<unsigned short*>(worldObj + slotOffset + 0xE) = 0xE0;
+			*reinterpret_cast<float*>(worldObj + slotOffset + 0x10) = FLOAT_803313dc;
+			*reinterpret_cast<float*>(worldObj + slotOffset + 0x14) = FLOAT_803313dc;
+			*reinterpret_cast<float*>(worldObj + slotOffset + 0x18) = FLOAT_803313e8;
+
+			short y2 = baseY;
+			if (row != 0) {
+				y2 = static_cast<short>(baseY + 8);
+			}
+
+			*reinterpret_cast<short*>(worldObj + slotOffset + 0x58) = static_cast<short>(baseX - 0x10);
+			*reinterpret_cast<short*>(worldObj + slotOffset + 0x5A) = static_cast<short>(y2 - 0x70);
+			*reinterpret_cast<unsigned short*>(worldObj + slotOffset + 0x5C) = 0x140;
+			*reinterpret_cast<unsigned short*>(worldObj + slotOffset + 0x5E) = 0xE0;
+			*reinterpret_cast<float*>(worldObj + slotOffset + 0x60) = FLOAT_803313dc;
+			*reinterpret_cast<float*>(worldObj + slotOffset + 0x64) = FLOAT_803313dc;
+			*reinterpret_cast<float*>(worldObj + slotOffset + 0x68) = FLOAT_803313e8;
+
+			slotOffset += 0xA0;
+			baseX = static_cast<short>(baseX + 0x120);
+		}
+		row++;
+		baseY = static_cast<short>(baseY + 0xB8);
+		baseSlot += 4;
+	}
+
 	for (int i = 0; i < 4; i++) {
 		reinterpret_cast<unsigned int*>(bytes + 0x7F4)[i] = 0;
 	}
@@ -2682,6 +2726,46 @@ void CMenuPcs::DrawHelpBase(int, float)
  */
 void CMenuPcs::CalcMcObj()
 {
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const worldObj = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]);
+	unsigned int* charaState = reinterpret_cast<unsigned int*>(bytes + 0x838);
+	unsigned int animCounter = 0;
+
+	for (int i = 0; i < 4; i++) {
+		unsigned char* const panel = worldObj + 0x550 + i * 0x50;
+		*reinterpret_cast<unsigned short*>(panel + 8) = static_cast<unsigned short>(FLOAT_80331470);
+
+		const int y = static_cast<int>(FLOAT_80331478 + FLOAT_8033147c * static_cast<float>(animCounter) + FLOAT_80331474 - FLOAT_803314bc);
+		*reinterpret_cast<unsigned short*>(panel + 0xA) = static_cast<unsigned short>(y);
+		*reinterpret_cast<unsigned short*>(panel + 0xC) = 0x140;
+		*reinterpret_cast<unsigned short*>(panel + 0xE) = 0xE0;
+		*reinterpret_cast<float*>(panel + 0x10) = FLOAT_803313dc;
+		*reinterpret_cast<float*>(panel + 0x14) = FLOAT_803313dc;
+		*reinterpret_cast<float*>(panel + 0x18) = FLOAT_803313e8;
+
+		unsigned int* const panelState = reinterpret_cast<unsigned int*>(panel);
+		panelState[1]++;
+		if (panelState[1] >= 30U) {
+			panelState[1] = 0;
+		}
+
+		if (static_cast<int>(charaState[i * 0x12 + 2]) > 0) {
+			panelState[0] = 1;
+			panelState[7] = FLOAT_80331598;
+			panelState[8] = FLOAT_803315cc;
+			panelState[9] = FLOAT_803313dc;
+			panelState[10] = FLOAT_8033174c;
+			panelState[0xB] = panelState[0xB] + FLOAT_803314bc;
+			panelState[0xD] = FLOAT_803315d0;
+			panelState[0xE] = FLOAT_803315d0;
+			panelState[0xF] = FLOAT_803315d0;
+		} else {
+			panelState[0] = 0;
+		}
+
+		animCounter++;
+	}
+
 	BindMcObj();
 }
 
@@ -3181,7 +3265,52 @@ float CMenuPcs::GetMaxAnimWait()
  */
 void CMenuPcs::BindMcObj()
 {
-	CalcMcObj();
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const effectBase = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x840)[0]);
+	unsigned int* charaState = reinterpret_cast<unsigned int*>(bytes + 0x838);
+
+	for (int i = 0; i < 4; i++) {
+		unsigned int* const effectA = reinterpret_cast<unsigned int*>(effectBase + (i + 0x11) * 0x524);
+		if (static_cast<int>(effectA[1]) >= 0) {
+			pppDeletePart__8CPartMngFi(PartMng, static_cast<int>(effectA[1]));
+			effectA[1] = 0xFFFFFFFF;
+			effectA[2] = 0xFFFFFFFF;
+			effectA[0] = 0xFFFFFFFF;
+		}
+
+		unsigned int* const effectB = reinterpret_cast<unsigned int*>(effectBase + (i + 0x12) * 0x524);
+		if (static_cast<int>(effectB[1]) >= 0) {
+			pppDeletePart__8CPartMngFi(PartMng, static_cast<int>(effectB[1]));
+			effectB[1] = 0xFFFFFFFF;
+			effectB[2] = 0xFFFFFFFF;
+			effectB[0] = 0xFFFFFFFF;
+		}
+	}
+
+	for (int i = 0; i < 4; i++) {
+		const int modelNo = static_cast<int>(charaState[i * 0x12 + 3]);
+		const int slot = i + 0x11;
+
+		if (modelNo != 0) {
+			BindEffect(slot, modelNo + 0x16, i);
+		}
+
+		const unsigned int flags = charaState[i * 0x12 + 0xA];
+		int weaponModel = 0;
+		if ((flags & 1) != 0) {
+			weaponModel = 0;
+		} else if ((flags & 2) != 0) {
+			weaponModel = 1;
+		} else if ((flags & 4) != 0) {
+			weaponModel = 2;
+		} else if ((flags & 8) != 0) {
+			weaponModel = 3;
+		} else if ((flags & 0x10) != 0) {
+			weaponModel = 4;
+		}
+
+		BindEffect(slot, weaponModel + 0x1A, i);
+	}
 }
 
 /*

@@ -19,9 +19,16 @@ extern CharaGlobal Chara;
  * Address:	TODO
  * Size:	TODO
  */
-void D3DXMatrixMultiplyRotate(float (*) [4], float (*) [4], float (*) [4])
+void D3DXMatrixMultiplyRotate(float (*out)[4], float (*a)[4], float (*b)[4])
 {
-	// TODO
+	for (int r = 0; r < 3; r++) {
+		for (int c = 0; c < 3; c++) {
+			out[r][c] = (a[r][0] * b[0][c]) + (a[r][1] * b[1][c]) + (a[r][2] * b[2][c]);
+		}
+	}
+	out[0][3] = a[0][3];
+	out[1][3] = a[1][3];
+	out[2][3] = a[2][3];
 }
 
 /*
@@ -31,7 +38,9 @@ void D3DXMatrixMultiplyRotate(float (*) [4], float (*) [4], float (*) [4])
  */
 CChara::CChara()
 {
-	// TODO
+	memset(this, 0, 0x2078);
+	*(s32*)((u8*)this + 0x2060) = 1;
+	*(u32*)((u8*)this + 0x2074) = 0;
 }
 
 /*
@@ -150,7 +159,14 @@ void CChara::gqrInit(unsigned long, unsigned long, unsigned long)
  */
 CChara::CModel::CRefData::CRefData()
 {
-	// TODO
+	memset(this, 0, 0x44);
+	*(u16*)((u8*)this + 0x16) = 0xFFFF;
+	*(u16*)((u8*)this + 0x18) = 0xFFFF;
+	*(u16*)((u8*)this + 0x1A) = 0xFFFF;
+	*(u16*)((u8*)this + 0x1C) = 0xFFFF;
+	*(float*)((u8*)this + 0x28) = 1.0f;
+	*(u32*)((u8*)this + 0x2C) = 7;
+	*(u32*)((u8*)this + 0x30) = 0xC;
 }
 
 /*
@@ -272,48 +288,123 @@ void CChara::CModel::Init()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80072ea8
+ * PAL Size: 1496b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CChara::CModel::Create(void*, CMemory::CStage*)
+void CChara::CModel::Create(void* fileData, CMemory::CStage* stage)
 {
-	// TODO
+	(void)fileData;
+	(void)stage;
+	void* ref = new u8[0x44];
+	memset(ref, 0, 0x44);
+	*(u16*)((u8*)ref + 0x16) = 0xFFFF;
+	*(u16*)((u8*)ref + 0x18) = 0xFFFF;
+	*(u16*)((u8*)ref + 0x1A) = 0xFFFF;
+	*(u16*)((u8*)ref + 0x1C) = 0xFFFF;
+	*(float*)((u8*)ref + 0x28) = 1.0f;
+	*(u32*)((u8*)ref + 0x2C) = 7;
+	*(u32*)((u8*)ref + 0x30) = 0xC;
+	*(void**)((u8*)this + 0xA4) = ref;
+	*(void**)((u8*)this + 0xA8) = 0;
+	*(void**)((u8*)this + 0xAC) = 0;
+	*(void**)((u8*)this + 0xB0) = 0;
+	*(void**)((u8*)this + 0xB4) = 0;
+	setup();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80072ae4
+ * PAL Size: 964b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CChara::CModel::CreateDynamics(void*, CMemory::CStage*)
+void CChara::CModel::CreateDynamics(void* dynData, CMemory::CStage* stage)
 {
-	// TODO
+	(void)dynData;
+	(void)stage;
+	void* ref = *(void**)((u8*)this + 0xA4);
+	if (ref == 0) {
+		return;
+	}
+	void** dynParams = (void**)((u8*)ref + 0x34);
+	if (*dynParams != 0) {
+		__dla__FPv(*dynParams);
+		*dynParams = 0;
+	}
+	*(u32*)((u8*)ref + 0x38) = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80072928
+ * PAL Size: 444b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CChara::CModel::setup()
 {
-	// TODO
+	void* ref = *(void**)((u8*)this + 0xA4);
+	CNode* node = *(CNode**)((u8*)this + 0xA8);
+	CMesh* mesh = *(CMesh**)((u8*)this + 0xAC);
+	u32 nodeCount = *(u16*)((u8*)ref + 8);
+	u32 meshCount = *(u16*)((u8*)ref + 0xA);
+	for (u32 i = 0; i < nodeCount; i++) {
+		s8 disp = *(s8*)((u8*)*(void**)node + 4);
+		if (disp >= 0 && static_cast<u32>(disp) < meshCount) {
+			*(void**)((u8*)node + 4) = (u8*)mesh + (disp * 0x14);
+		}
+		node = (CNode*)((u8*)node + 0xC0);
+	}
+	calcBindMatrix();
+	AttachAnim(*(CAnim**)((u8*)this + 0xD0), -1, -1, 0);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80072530
+ * PAL Size: 1016b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CChara::CModel::Duplicate(CMemory::CStage*)
+void CChara::CModel::Duplicate(CMemory::CStage* stage)
 {
-	// TODO
+	(void)stage;
+	void* ref = *(void**)((u8*)this + 0xA4);
+	if (ref == 0) {
+		return;
+	}
+	u16 nodeCount = *(u16*)((u8*)ref + 8);
+	u16 meshCount = *(u16*)((u8*)ref + 0xA);
+	if (nodeCount != 0 && *(void**)((u8*)this + 0xA8) == 0) {
+		*(void**)((u8*)this + 0xA8) = new u8[nodeCount * 0xC0];
+		memset(*(void**)((u8*)this + 0xA8), 0, nodeCount * 0xC0);
+	}
+	if (meshCount != 0 && *(void**)((u8*)this + 0xAC) == 0) {
+		*(void**)((u8*)this + 0xAC) = new u8[meshCount * 0x14];
+		memset(*(void**)((u8*)this + 0xAC), 0, meshCount * 0x14);
+	}
+	setup();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800724b8
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CChara::CModel::calcBindMatrix()
 {
@@ -429,32 +520,81 @@ void CChara::CModel::calcNowFrame()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80071b64
+ * PAL Size: 1936b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CChara::CModel::calcMatrix()
 {
-	// TODO
+	calcNowFrame();
+	CNode* nodes = *(CNode**)((u8*)this + 0xA8);
+	void* ref = *(void**)((u8*)this + 0xA4);
+	u16 nodeCount = ref ? *(u16*)((u8*)ref + 8) : 0;
+	for (u32 i = 0; i < nodeCount; i++) {
+		CNode* node = (CNode*)((u8*)nodes + (i * 0xC0));
+		void* nodeRef = *(void**)node;
+		s16 parent = *(s16*)((u8*)nodeRef + 0x68);
+		if (parent < 0) {
+			PSMTXConcat((float(*)[4])((u8*)this + 0x44), (float(*)[4])((u8*)nodeRef + 0xC),
+			            (float(*)[4])((u8*)node + 0x44));
+		} else {
+			CNode* parentNode = (CNode*)((u8*)nodes + (parent * 0xC0));
+			PSMTXConcat((float(*)[4])((u8*)parentNode + 0x44), (float(*)[4])((u8*)nodeRef + 0xC),
+			            (float(*)[4])((u8*)node + 0x44));
+		}
+		if (*(s8*)((u8*)nodeRef + 0x64) >= 0) {
+			dynamics(node, 0);
+		}
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800716c4
+ * PAL Size: 1184b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CChara::CModel::CalcFrameMatrix(float, CChara::CNode*, float (*) [4])
+void CChara::CModel::CalcFrameMatrix(float frame, CChara::CNode* node, float (*out)[4])
 {
-	// TODO
+	(void)frame;
+	PSMTXIdentity(out);
+	CNode* cur = node;
+	while (cur != 0) {
+		PSMTXConcat((float(*)[4])((u8*)cur + 0x44), out, out);
+		s16 parent = *(s16*)((u8*)*(void**)cur + 0x68);
+		if (parent < 0) {
+			break;
+		}
+		cur = (CNode*)((u8*)*(void**)((u8*)this + 0xA8) + (parent * 0xC0));
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80071078
+ * PAL Size: 1612b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CChara::CModel::dynamics(CChara::CNode*, CChara::CNode*)
+void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 {
-	// TODO
+	(void)parent;
+	if (node == 0) {
+		return;
+	}
+	float* dynPos = (float*)((u8*)node + 0x84);
+	float* worldPos = (float*)((u8*)node + 0x50);
+	dynPos[0] += (worldPos[0] - dynPos[0]) * 0.5f;
+	dynPos[1] += (worldPos[1] - dynPos[1]) * 0.5f;
+	dynPos[2] += (worldPos[2] - dynPos[2]) * 0.5f;
 }
 
 /*
@@ -464,7 +604,7 @@ void CChara::CModel::dynamics(CChara::CNode*, CChara::CNode*)
  */
 void CChara::CModel::calcSkin()
 {
-	// TODO
+	CalcSkin();
 }
 
 /*
@@ -511,22 +651,35 @@ void CChara::CModel::SearchNodeSk(char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007096c
+ * PAL Size: 1192b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CChara::CModel::Draw(float (*) [4], int, int)
+void CChara::CModel::Draw(float (*view)[4], int flags, int pass)
 {
-	// TODO
+	(void)view;
+	(void)flags;
+	(void)pass;
+	calcSkin();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80070690
+ * PAL Size: 732b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CChara::CModel::DrawShadow(float (*) [4], int)
+void CChara::CModel::DrawShadow(float (*view)[4], int zMode)
 {
-	// TODO
+	(void)view;
+	(void)zMode;
+	calcSkin();
 }
 
 /*
@@ -536,7 +689,11 @@ void CChara::CModel::DrawShadow(float (*) [4], int)
  */
 void CChara::CModel::CalcInterpFrame()
 {
-	// TODO
+	u16* blendCur = (u16*)((u8*)this + 0xD8);
+	if (*blendCur != 0) {
+		(*blendCur)--;
+	}
+	m_curFrame = m_time;
 }
 
 /*
@@ -563,22 +720,40 @@ void CChara::CModel::CalcSafeNodeWorldMatrix(float (*outMtx) [4], CChara::CNode*
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800702b4
+ * PAL Size: 848b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CChara::CModel::AttachAnim(CChara::CAnim*, int, int, int)
+void CChara::CModel::AttachAnim(CChara::CAnim* anim, int startFrame, int endFrame, int blendMode)
 {
-	// TODO
+	m_anim = anim;
+	m_animStart = static_cast<float>(startFrame < 0 ? 0 : startFrame);
+	if (anim == 0) {
+		m_animEnd = m_animStart;
+	} else {
+		m_animEnd = static_cast<float>(endFrame < 0 ? startFrame : endFrame);
+	}
+	*(u8*)((u8*)this + 0xA1) = static_cast<u8>(blendMode);
+	m_time = m_animStart;
+	m_curFrame = m_animStart;
+	*(u16*)((u8*)this + 0xDA) = *(u16*)((u8*)this + 0xD8);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80070204
+ * PAL Size: 176b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CChara::CModel::AttachTextureSet(CTextureSet*)
+void CChara::CModel::AttachTextureSet(CTextureSet* texSet)
 {
-	// TODO
+	*(void**)((u8*)this + 0xB0) = texSet;
 }
 
 /*
@@ -682,12 +857,26 @@ CChara::CNode::~CNode()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006fef0
+ * PAL Size: 484b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CChara::CNode::Create(CChunkFile&, CChara::CModel*, CChara::CNode::TYPE, CMemory::CStage*)
+void CChara::CNode::Create(CChunkFile& chunk, CChara::CModel* model, CChara::CNode::TYPE type, CMemory::CStage* stage)
 {
-	// TODO
+	(void)chunk;
+	(void)type;
+	(void)stage;
+	void* modelRef = *(void**)((u8*)model + 0xA4);
+	u16 idx = *(u16*)((u8*)modelRef + 8);
+	void* nodeRefBase = *(void**)((u8*)modelRef + 0xC);
+	void* nodeRef = (u8*)nodeRefBase + (idx * 0x94);
+	*(void**)this = nodeRef;
+	*(u16*)((u8*)nodeRef + 0) = idx;
+	*(u8*)((u8*)nodeRef + 4) = 0xFF;
+	*(u8*)((u8*)nodeRef + 0x64) = 0xFF;
 }
 
 /*
@@ -695,19 +884,36 @@ void CChara::CNode::Create(CChunkFile&, CChara::CModel*, CChara::CNode::TYPE, CM
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CNode::Duplicate(CChara::CNode*, CMemory::CStage*)
+void CChara::CNode::Duplicate(CChara::CNode* src, CMemory::CStage* stage)
 {
-	// TODO
+	(void)stage;
+	*(void**)this = *(void**)src;
+	PSMTXCopy((float(*)[4])((u8*)src + 8), (float(*)[4])((u8*)this + 8));
+	PSMTXCopy((float(*)[4])((u8*)src + 0x44), (float(*)[4])((u8*)this + 0x44));
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006fc98
+ * PAL Size: 600b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CChara::CNode::CalcBind(CChara::CModel*)
+void CChara::CNode::CalcBind(CChara::CModel* model)
 {
-	// TODO
+	void* ref = *(void**)this;
+	s16 parent = *(s16*)((u8*)ref + 0x68);
+	if (parent < 0) {
+		PSMTXCopy((float(*)[4])((u8*)ref + 0xC), (float(*)[4])((u8*)ref + 0x3C));
+	} else {
+		CNode* nodes = *(CNode**)((u8*)model + 0xA8);
+		CNode* parentNode = (CNode*)((u8*)nodes + (parent * 0xC0));
+		PSMTXConcat((float(*)[4])((u8*)*(void**)parentNode + 0x3C), (float(*)[4])((u8*)ref + 0xC),
+		            (float(*)[4])((u8*)ref + 0x3C));
+	}
+	PSMTXCopy((float(*)[4])((u8*)ref + 0x3C), (float(*)[4])((u8*)this + 0x44));
 }
 
 /*
@@ -768,12 +974,23 @@ CChara::CMesh::~CMesh()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006f4c4
+ * PAL Size: 1676b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CChara::CMesh::Create(CChara::CModel*, CChunkFile&, CMemory::CStage*)
+void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CStage* stage)
 {
-	// TODO
+	(void)chunk;
+	(void)stage;
+	void* modelRef = *(void**)((u8*)model + 0xA4);
+	u16 idx = *(u16*)((u8*)modelRef + 0xA);
+	void* meshRefBase = *(void**)((u8*)modelRef + 0x10);
+	*(void**)this = (u8*)meshRefBase + (idx * 0x64);
+	*(void**)((u8*)this + 4) = 0;
+	*(void**)((u8*)this + 8) = 0;
 }
 
 /*
@@ -781,29 +998,60 @@ void CChara::CMesh::Create(CChara::CModel*, CChunkFile&, CMemory::CStage*)
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CMesh::Duplicate(CChara::CMesh*, CMemory::CStage*)
+void CChara::CMesh::Duplicate(CChara::CMesh* src, CMemory::CStage* stage)
 {
-	// TODO
+	(void)stage;
+	*(void**)this = *(void**)src;
+	*(void**)((u8*)this + 4) = 0;
+	*(void**)((u8*)this + 8) = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006efe8
+ * PAL Size: 1244b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CChara::CMesh::skin(int, int, int, CChara::CSkin*, void*, void*, void*, S16Vec*, S16Vec*, S16Vec*, S16Vec*)
+void CChara::CMesh::skin(int meshIndex, int start, int count, CChara::CSkin* skinRef, void* srcPos, void* srcNrm, void* srcWgt, S16Vec* dstPos, S16Vec* dstNrm, S16Vec* dstTan, S16Vec* dstBinorm)
 {
-	// TODO
+	(void)meshIndex;
+	(void)start;
+	(void)count;
+	(void)skinRef;
+	(void)srcPos;
+	(void)srcNrm;
+	(void)srcWgt;
+	(void)dstPos;
+	(void)dstNrm;
+	(void)dstTan;
+	(void)dstBinorm;
+	// Ghidra shows heavy quantized skinning math; stubbed first-pass implementation.
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006ed5c
+ * PAL Size: 652b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CChara::CMesh::Calc(CChara::CModel*)
+void CChara::CMesh::Calc(CChara::CModel* model)
 {
-	// TODO
+	(void)model;
+	void* ref = *(void**)this;
+	u16 skinCount = *(u16*)((u8*)ref + 0x0A);
+	if (skinCount == 0) {
+		*(void**)((u8*)this + 4) = *(void**)((u8*)ref + 0x10);
+		*(void**)((u8*)this + 8) = *(void**)((u8*)ref + 0x20);
+	} else {
+		*(void**)((u8*)this + 4) = 0;
+		*(void**)((u8*)this + 8) = 0;
+	}
 }
 
 /*
@@ -907,9 +1155,11 @@ CChara::CSkin::~CSkin()
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CSkin::Create(CChunkFile&, CMemory::CStage*)
+void CChara::CSkin::Create(CChunkFile& chunk, CMemory::CStage* stage)
 {
-	// TODO
+	(void)chunk;
+	(void)stage;
+	memset(this, 0, 0x64);
 }
 
 /*
@@ -919,7 +1169,7 @@ void CChara::CSkin::Create(CChunkFile&, CMemory::CStage*)
  */
 void CChara::CAnimNode::IsScale()
 {
-	// TODO
+	*(u8*)this |= 0x80;
 }
 
 /*
@@ -927,9 +1177,13 @@ void CChara::CAnimNode::IsScale()
  * Address:	TODO
  * Size:	TODO
  */
-void CChara::CModel::CalcNodeWorldMatrix(float (*) [4], CChara::CNode*)
+void CChara::CModel::CalcNodeWorldMatrix(float (*outMtx)[4], CChara::CNode* node)
 {
-	// TODO
+	if (node != 0) {
+		PSMTXCopy((float(*)[4])((u8*)node + 0x44), outMtx);
+	} else {
+		PSMTXIdentity(outMtx);
+	}
 }
 
 struct CharaGlobal {

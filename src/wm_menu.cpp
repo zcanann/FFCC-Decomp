@@ -2571,7 +2571,7 @@ void CMenuPcs::ClrMcList()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
+unsigned int CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	if (cameraSlot < 0) {
@@ -2591,7 +2591,6 @@ void CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 	*reinterpret_cast<unsigned int*>(effect + 0x104) = *reinterpret_cast<unsigned int*>(bytes + 0x4A8 + cameraSlot * 4);
 
 	unsigned char createParam[0x88];
-	memset(createParam, 0, sizeof(createParam));
 	*reinterpret_cast<unsigned int*>(createParam + 0x48) = 0xFFFFFFFF;
 	*reinterpret_cast<unsigned int*>(createParam + 0x58) = 0xFFFFFFFF;
 	createParam[0x54] = 0;
@@ -2603,6 +2602,18 @@ void CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 	*reinterpret_cast<unsigned short*>(createParam + 0x40) = 0;
 	createParam[0x3E] = 0;
 	createParam[0x3D] = 0;
+	*reinterpret_cast<unsigned int*>(createParam + 0x0) = 0;
+	*reinterpret_cast<unsigned int*>(createParam + 0x4) = 0;
+	*reinterpret_cast<unsigned int*>(createParam + 0x8) = 0;
+	*reinterpret_cast<unsigned int*>(createParam + 0xC) = 0;
+	*reinterpret_cast<unsigned int*>(createParam + 0x10) = 0;
+	*reinterpret_cast<void**>(createParam + 0x14) = 0;
+	*reinterpret_cast<void**>(createParam + 0x18) = 0;
+	*reinterpret_cast<unsigned int*>(createParam + 0x1C) = 0;
+	*reinterpret_cast<unsigned int*>(createParam + 0x20) = 0;
+	*reinterpret_cast<float*>(createParam + 0x24) = FLOAT_803313e8;
+	*reinterpret_cast<float*>(createParam + 0x28) = FLOAT_803313e8;
+	createParam[0x2C] = 0;
 	*reinterpret_cast<void**>(createParam + 0x74) = effect + 0xC;
 	*reinterpret_cast<void**>(createParam + 0x70) = effect + 0xC;
 	*reinterpret_cast<float*>(createParam + 0x64) = FLOAT_803313e8;
@@ -2612,6 +2623,7 @@ void CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 	const int group = ((effectNo ^ 100) >> 1) - ((((effectNo ^ 100) & effectNo)) >> 31);
 	const unsigned int partId = pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(PartMng, group, effectNo, createParam, 1);
 	*reinterpret_cast<unsigned int*>(effect + 0x4) = partId;
+	return partId;
 }
 
 /*

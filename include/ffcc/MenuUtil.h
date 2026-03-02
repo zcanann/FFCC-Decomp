@@ -25,7 +25,7 @@ public:
     void CalcOptionMenu();
     void DrawOptionMenu();
     void BindMcObj(int);
-    void BindEffect(int, int, int);
+    unsigned int BindEffect(int, int, int);
 };
 
 #endif // _FFCC_MENU_UTIL_H_

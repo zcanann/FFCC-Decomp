@@ -128,11 +128,16 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
     _GXColor white;
     Vec posA;
     Vec posB;
-    Vec uvA;
-    Vec uvB;
+    Vec2d uvA;
+    Vec2d uvB;
+    unsigned int width;
+    unsigned int height;
 
-    Graphic.GetBackBufferRect2(DAT_80238030, &backTexObj, 0, 0, (int)FLOAT_80331050, (int)FLOAT_80331054, 0,
-                               GX_NEAR, GX_TF_RGBA8, 0);
+    GXGetTexBufferSize(0x140, 0xE0, GX_TF_RGBA8, GX_FALSE, GX_FALSE);
+    width = (unsigned int)FLOAT_80331050;
+    height = (unsigned int)FLOAT_80331054;
+
+    Graphic.GetBackBufferRect2(DAT_80238030, &backTexObj, 0, 0, width, height, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
     DAT_8032ec70.SetVtxFmt_POS_CLR();
     DAT_8032ec70.BeginQuadEnv();
@@ -153,7 +158,7 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
     DAT_8032ec70.EndQuadEnv();
 
     GXSetViewport(FLOAT_80331030, FLOAT_80331030, FLOAT_80331050, FLOAT_80331054, FLOAT_80331030, FLOAT_8033103c);
-    GXSetScissor(0, 0, (unsigned int)FLOAT_80331050, (unsigned int)FLOAT_80331054);
+    GXSetScissor(0, 0, width, height);
 
     *(void**)((char*)model + 0xF4) = (void*)BlurChara_SetBeforeMeshLockEnvCallback;
     *(void**)((char*)model + 0x108) = 0;
@@ -163,8 +168,8 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
 
     Graphic.SetViewport();
     GXSetScissor(0, 0, 0x280, 0x1C0);
-    Graphic.GetBackBufferRect2(((void**)param_2)[0], (_GXTexObj*)((void**)param_2)[2], 0, 0, (int)FLOAT_80331050,
-                               (int)FLOAT_80331054, 0, GX_NEAR, GX_TF_I8, 0);
+    Graphic.GetBackBufferRect2(((void**)param_2)[0], (_GXTexObj*)((void**)param_2)[2], 0, 0, width, height, 0,
+                               GX_NEAR, GX_TF_I8, 0);
 
     if (*((unsigned char*)param_3 + 4) == 1) {
         float blur = *(float*)((char*)param_3 + 0x14);
@@ -193,11 +198,11 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
         uvB.y = FLOAT_80331030;
 
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(3, 1, 1, 7);
-        DAT_8032ec70.RenderQuad(posA, posB, white, (Vec2d*)&uvA, (Vec2d*)&uvB);
+        DAT_8032ec70.RenderQuad(posA, posB, white, &uvA, &uvB);
         DAT_8032ec70.EndQuadEnv();
 
-        Graphic.GetBackBufferRect2(((void**)param_2)[0], (_GXTexObj*)((void**)param_2)[2], 0, 0, (int)FLOAT_80331050,
-                                   (int)FLOAT_80331054, 0, GX_NEAR, GX_TF_I8, 0);
+        Graphic.GetBackBufferRect2(((void**)param_2)[0], (_GXTexObj*)((void**)param_2)[2], 0, 0, width, height, 0,
+                                   GX_NEAR, GX_TF_I8, 0);
     }
 
     DAT_8032ec70.RenderTextureQuad(FLOAT_80331030, FLOAT_80331030, FLOAT_80331050, FLOAT_80331054, &backTexObj, 0, 0,

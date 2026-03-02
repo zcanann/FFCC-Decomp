@@ -420,19 +420,47 @@ void CMenuPcs::CalcResultOpenAnim()
 void CMenuPcs::DrawResultOpenAnim()
 {
 	int animPtr = *(int*)((char*)this + 0x84c);
+	int statePtr = *(int*)((char*)this + 0x82c);
 	float strongest = 0.0f;
+	float frameAlpha = 0.0f;
 
-	if (animPtr == 0) {
+	if (animPtr == 0 || statePtr == 0) {
 		return;
 	}
 
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
+
 	for (int i = 0; i < (int)header->count; i++) {
-		if (sprites[i].alpha > strongest) {
-			strongest = sprites[i].alpha;
+		BonusAnimSprite* sprite = &sprites[i];
+		float alpha = sprite->alpha;
+
+		if (alpha < 0.0f) {
+			alpha = 0.0f;
+		} else if (alpha > 1.0f) {
+			alpha = 1.0f;
+		}
+
+		if (sprite->kind == -3) {
+			DrawBonusFrame((float)sprite->x, (float)sprite->y, (float)sprite->w, (float)sprite->h, alpha);
+		} else if (sprite->kind == -4) {
+			DrawArtiBase((CMenuPcs::Sprt2*)sprite, alpha);
+		} else if (sprite->kind == -2) {
+			DrawBonusCnt((CMenuPcs::Sprt2*)sprite, i);
+		}
+
+		if (alpha > strongest) {
+			strongest = alpha;
+		}
+		if (sprite->kind == 0x16 && alpha > frameAlpha) {
+			frameAlpha = alpha;
 		}
 	}
+
+	if (*(unsigned char*)(statePtr + 8) != 0 && frameAlpha > 0.0f) {
+		DrawBonusChkMark(frameAlpha);
+	}
+
 	*(unsigned char*)((char*)this + 0x8c) = (unsigned char)(strongest * 255.0f);
 }
 
@@ -487,26 +515,43 @@ void CMenuPcs::CalcResultCountAnim()
 void CMenuPcs::DrawResultCountAnim()
 {
 	int animPtr = *(int*)((char*)this + 0x84c);
+	int statePtr = *(int*)((char*)this + 0x82c);
 
-	if (animPtr == 0) {
+	if (animPtr == 0 || statePtr == 0) {
 		return;
 	}
 
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 	float strongest = 0.0f;
+	int digitIndex = 0;
 
 	for (int i = 0; i < (int)header->count; i++) {
 		BonusAnimSprite* sprite = &sprites[i];
-		if (sprite->kind == -2) {
-			DrawBonusCnt((CMenuPcs::Sprt2*)sprite, i);
+		float alpha = sprite->alpha;
+
+		if (alpha < 0.0f) {
+			alpha = 0.0f;
+		} else if (alpha > 1.0f) {
+			alpha = 1.0f;
 		}
 
-		if (strongest < sprite->alpha) {
-			strongest = sprite->alpha;
+		if (sprite->kind == -3) {
+			DrawBonusFrame((float)sprite->x, (float)sprite->y, (float)sprite->w, (float)sprite->h, alpha);
+		} else if (sprite->kind == -4) {
+			DrawArtiBase((CMenuPcs::Sprt2*)sprite, alpha);
+		} else if (sprite->kind == -2) {
+			DrawBonusCnt((CMenuPcs::Sprt2*)sprite, digitIndex++);
+		}
+
+		if (strongest < alpha) {
+			strongest = alpha;
 		}
 	}
 
+	if (*(unsigned char*)(statePtr + 8) != 0) {
+		DrawBonusChkMark(strongest);
+	}
 	*(unsigned char*)((char*)this + 0x8c) = (unsigned char)(strongest * 255.0f);
 }
 
@@ -560,8 +605,9 @@ void CMenuPcs::CalcResultCloseAnim()
 void CMenuPcs::DrawResultCloseAnim()
 {
 	int animPtr = *(int*)((char*)this + 0x84c);
+	int statePtr = *(int*)((char*)this + 0x82c);
 
-	if (animPtr == 0) {
+	if (animPtr == 0 || statePtr == 0) {
 		return;
 	}
 
@@ -571,19 +617,29 @@ void CMenuPcs::DrawResultCloseAnim()
 
 	for (int i = 0; i < (int)header->count; i++) {
 		BonusAnimSprite* sprite = &sprites[i];
+		float alpha = sprite->alpha;
+		if (alpha < 0.0f) {
+			alpha = 0.0f;
+		} else if (alpha > 1.0f) {
+			alpha = 1.0f;
+		}
+
 		if (sprite->kind == -3) {
-			DrawBonusFrame((float)sprite->x, (float)sprite->y, (float)sprite->w, (float)sprite->h, sprite->alpha);
+			DrawBonusFrame((float)sprite->x, (float)sprite->y, (float)sprite->w, (float)sprite->h, alpha);
 		} else if (sprite->kind == -4) {
-			DrawArtiBase((CMenuPcs::Sprt2*)sprite, sprite->alpha);
+			DrawArtiBase((CMenuPcs::Sprt2*)sprite, alpha);
 		} else if (sprite->kind == -2) {
 			DrawBonusCnt((CMenuPcs::Sprt2*)sprite, i);
 		}
 
-		if (strongest < sprite->alpha) {
-			strongest = sprite->alpha;
+		if (strongest < alpha) {
+			strongest = alpha;
 		}
 	}
 
+	if (*(unsigned char*)(statePtr + 8) != 0 && strongest > 0.0f) {
+		DrawBonusChkMark(strongest);
+	}
 	*(unsigned char*)((char*)this + 0x8c) = (unsigned char)(strongest * 255.0f);
 }
 
@@ -726,25 +782,32 @@ void CMenuPcs::DrawSelectOpenAnim()
 	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
 	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
 	float strongest = 0.0f;
+	int digitIndex = 0;
 
 	for (int i = 0; i < (int)header->count; i++) {
 		BonusAnimSprite* sprite = &sprites[i];
+		float alpha = sprite->alpha;
+		if (alpha < 0.0f) {
+			alpha = 0.0f;
+		} else if (alpha > 1.0f) {
+			alpha = 1.0f;
+		}
 		switch (sprite->kind) {
 		case -4:
-			DrawArtiBase((CMenuPcs::Sprt2*)sprite, sprite->alpha);
+			DrawArtiBase((CMenuPcs::Sprt2*)sprite, alpha);
 			break;
 		case -3:
-			DrawBonusFrame((float)sprite->x, (float)sprite->y, (float)sprite->w, (float)sprite->h, sprite->alpha);
+			DrawBonusFrame((float)sprite->x, (float)sprite->y, (float)sprite->w, (float)sprite->h, alpha);
 			break;
 		case -2:
-			DrawBonusCnt((CMenuPcs::Sprt2*)sprite, i);
+			DrawBonusCnt((CMenuPcs::Sprt2*)sprite, digitIndex++);
 			break;
 		default:
 			break;
 		}
 
-		if (strongest < sprite->alpha) {
-			strongest = sprite->alpha;
+		if (strongest < alpha) {
+			strongest = alpha;
 		}
 	}
 
@@ -801,7 +864,54 @@ void CMenuPcs::CalcSelectWait()
  */
 void CMenuPcs::DrawSelectWait()
 {
-	DrawSelectOpenAnim();
+	int statePtr = *(int*)((char*)this + 0x82c);
+	int animPtr = *(int*)((char*)this + 0x84c);
+	float strongest = 0.0f;
+	int pulseFrame;
+
+	if (statePtr == 0 || animPtr == 0) {
+		return;
+	}
+
+	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
+	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
+
+	pulseFrame = (int)*(short*)(statePtr + 0x22);
+	for (int i = 0; i < (int)header->count; i++) {
+		BonusAnimSprite* sprite = &sprites[i];
+		float pulse = (float)((pulseFrame + i) & 0x1f) / 31.0f;
+		float alpha = 0.65f + pulse * 0.35f;
+
+		if (alpha < sprite->alpha) {
+			alpha = sprite->alpha;
+		}
+		if (alpha > 1.0f) {
+			alpha = 1.0f;
+		}
+
+		switch (sprite->kind) {
+		case -4:
+			DrawArtiBase((CMenuPcs::Sprt2*)sprite, alpha);
+			break;
+		case -3:
+			DrawBonusFrame((float)sprite->x, (float)sprite->y, (float)sprite->w, (float)sprite->h, alpha);
+			break;
+		case -2:
+			DrawBonusCnt((CMenuPcs::Sprt2*)sprite, i);
+			break;
+		default:
+			break;
+		}
+
+		if (strongest < alpha) {
+			strongest = alpha;
+		}
+	}
+
+	if (*(unsigned char*)(statePtr + 8) != 0) {
+		DrawBonusChkMark(strongest);
+	}
+	*(unsigned char*)((char*)this + 0x8c) = (unsigned char)(strongest * 255.0f);
 }
 
 /*
@@ -849,7 +959,50 @@ void CMenuPcs::CalcSelectCloseAnim()
  */
 void CMenuPcs::DrawSelectCloseAnim()
 {
-	DrawSelectOpenAnim();
+	int statePtr = *(int*)((char*)this + 0x82c);
+	int animPtr = *(int*)((char*)this + 0x84c);
+	float strongest = 0.0f;
+
+	if (statePtr == 0 || animPtr == 0) {
+		return;
+	}
+
+	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
+	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
+
+	for (int i = 0; i < (int)header->count; i++) {
+		BonusAnimSprite* sprite = &sprites[i];
+		float alpha = sprite->alpha;
+
+		if (alpha < 0.0f) {
+			alpha = 0.0f;
+		} else if (alpha > 1.0f) {
+			alpha = 1.0f;
+		}
+
+		switch (sprite->kind) {
+		case -4:
+			DrawArtiBase((CMenuPcs::Sprt2*)sprite, alpha);
+			break;
+		case -3:
+			DrawBonusFrame((float)sprite->x, (float)sprite->y, (float)sprite->w, (float)sprite->h, alpha);
+			break;
+		case -2:
+			DrawBonusCnt((CMenuPcs::Sprt2*)sprite, i);
+			break;
+		default:
+			break;
+		}
+
+		if (strongest < alpha) {
+			strongest = alpha;
+		}
+	}
+
+	if (*(unsigned char*)(statePtr + 8) != 0 && strongest > 0.0f) {
+		DrawBonusChkMark(strongest);
+	}
+	*(unsigned char*)((char*)this + 0x8c) = (unsigned char)(strongest * 255.0f);
 }
 
 /*
@@ -861,7 +1014,13 @@ void CMenuPcs::DrawBonusCnt(CMenuPcs::Sprt2* sprt, int value)
 {
 	BonusAnimSprite* sprite = (BonusAnimSprite*)sprt;
 	int digitValue;
+	int ones;
+	int tens;
 	float fade;
+	float baseX;
+	float baseY;
+	float digitW;
+	float digitH;
 
 	if (sprite == 0) {
 		return;
@@ -881,10 +1040,22 @@ void CMenuPcs::DrawBonusCnt(CMenuPcs::Sprt2* sprt, int value)
 		fade = 1.0f;
 	}
 
-	sprite->mulX = (float)(digitValue / 10) * 6.0f;
-	sprite->mulY = (float)(digitValue % 10) * 6.0f;
+	ones = digitValue % 10;
+	tens = (digitValue / 10) % 10;
+	baseX = (float)sprite->x + sprite->mulX;
+	baseY = (float)sprite->y + sprite->mulY;
+	digitW = (sprite->w > 0) ? (float)sprite->w : 24.0f;
+	digitH = (sprite->h > 0) ? (float)sprite->h : 24.0f;
+
+	sprite->mulX = (float)tens * 0.1f;
+	sprite->mulY = (float)ones * 0.1f;
 	sprite->depth = fade;
-	sprite->scale = 1.0f + (fade * 0.1f);
+	sprite->scale = 0.95f + (fade * 0.2f);
+
+	if (tens > 0) {
+		DrawBonusFrame(baseX, baseY, digitW, digitH, fade);
+	}
+	DrawBonusFrame(baseX + digitW * 0.7f, baseY, digitW, digitH, fade);
 
 	if (fade > 0.99f) {
 		DrawBonusChkMark(fade);
@@ -937,7 +1108,12 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
  */
 void CMenuPcs::DrawBonusChkMark(float alpha)
 {
+	int animPtr = *(int*)((char*)this + 0x84c);
+	int statePtr = *(int*)((char*)this + 0x82c);
 	float a = alpha;
+	float strongest = a;
+	float pulse;
+
 	if (a < 0.0f) {
 		a = 0.0f;
 	}
@@ -945,7 +1121,25 @@ void CMenuPcs::DrawBonusChkMark(float alpha)
 		a = 1.0f;
 	}
 
-	*(unsigned char*)((char*)this + 0x8d) = (unsigned char)(a > 0.5f ? 1 : 0);
+	if (animPtr != 0) {
+		BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
+		BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
+		for (int i = 0; i < (int)header->count; i++) {
+			if (sprites[i].kind == -2 && sprites[i].alpha > strongest) {
+				strongest = sprites[i].alpha;
+			}
+		}
+	}
+
+	if (statePtr != 0) {
+		pulse = (float)((*(short*)(statePtr + 0x22)) & 0x1f) / 31.0f;
+		strongest = strongest * (0.85f + pulse * 0.15f);
+	}
+
+	if (strongest > 1.0f) {
+		strongest = 1.0f;
+	}
+	*(unsigned char*)((char*)this + 0x8d) = (unsigned char)(strongest > 0.5f ? 1 : 0);
 }
 
 /*
@@ -977,6 +1171,8 @@ void CMenuPcs::GetAllPadOn()
 	int statePtr = *(int*)((char*)this + 0x82c);
 	unsigned char activeMask = 0;
 	int activePartyCount = 0;
+	int anyReady = 0;
+	int allReady = 1;
 
 	if (statePtr == 0) {
 		return;
@@ -986,12 +1182,15 @@ void CMenuPcs::GetAllPadOn()
 		if (Game.game.m_scriptFoodBase[i] != 0) {
 			activeMask = (unsigned char)(activeMask | (1 << i));
 			activePartyCount++;
+			anyReady = 1;
+		} else {
+			allReady = 0;
 		}
 	}
 
-	*(unsigned char*)(statePtr + 8) = (activePartyCount > 0) ? 1 : 0;
+	*(unsigned char*)(statePtr + 8) = (unsigned char)((anyReady != 0) ? 1 : 0);
 	*(unsigned char*)(statePtr + 9) = activeMask;
-	*(unsigned char*)(statePtr + 0xa) = (activePartyCount >= 4) ? 1 : 0;
+	*(unsigned char*)(statePtr + 0xa) = (unsigned char)((allReady != 0 && activePartyCount >= 4) ? 1 : 0);
 }
 
 /*

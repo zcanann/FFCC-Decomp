@@ -131,7 +131,7 @@ void CMenuPcs::createWorld()
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 312b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -164,7 +164,7 @@ void CMenuPcs::loadData()
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 352b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -247,7 +247,7 @@ void CMenuPcs::InitCharaInfo()
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 576b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -265,7 +265,7 @@ void CMenuPcs::InitCharaSelectInfo()
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 560b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -448,7 +448,7 @@ void CMenuPcs::calcWorld()
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 504b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -498,7 +498,7 @@ void CMenuPcs::CalcMCardMenu()
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 636b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -515,7 +515,7 @@ void CMenuPcs::CalcCMakeMenu()
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 164b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -608,7 +608,7 @@ void CMenuPcs::CalcGoOutSelChar(unsigned char state, unsigned char slot)
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 20b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -1026,7 +1026,7 @@ void CMenuPcs::CallWorldParam(int p0, int p1, int p2)
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 112b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -1093,7 +1093,7 @@ void CMenuPcs::RestoreProjection()
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 112b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -1153,7 +1153,7 @@ void CMenuPcs::DrawFukidashi()
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 172b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -1171,7 +1171,7 @@ void CMenuPcs::ChkPlaceLength(char* text)
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 112b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -1202,7 +1202,7 @@ void CMenuPcs::SplitPlace(const char* text, char* left, char* right)
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 188b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -1314,7 +1314,7 @@ void CMenuPcs::DrawWMFrame0(int mask, float alpha)
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 388b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -1330,7 +1330,7 @@ void CMenuPcs::DrawMainMenuBase(float)
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 4b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -1388,7 +1388,7 @@ void CMenuPcs::PCAnimCtrl()
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 180b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -1473,7 +1473,7 @@ void CMenuPcs::DrawCMLife()
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 32b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -1504,7 +1504,7 @@ void CMenuPcs::WMChgMenu()
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 184b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -1589,7 +1589,7 @@ void CMenuPcs::ChgAllModel2()
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 660b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -1686,7 +1686,7 @@ void CMenuPcs::CalcMainMenuSub()
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 172b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -1759,7 +1759,7 @@ void CMenuPcs::GetMcOdekakePos(int* x, int* y)
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 76b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -1803,7 +1803,7 @@ void CMenuPcs::DrawMCList()
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 248b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -1831,7 +1831,7 @@ void CMenuPcs::CalcMcObj()
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 804b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -1845,7 +1845,7 @@ void CMenuPcs::DrawMcObj()
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 188b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -1878,7 +1878,7 @@ void McListInfo::operator= (const McListInfo& src)
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 44b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -1929,7 +1929,7 @@ void CMenuPcs::SetLight(int mode)
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 524b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -2160,7 +2160,7 @@ void CMenuPcs::GetWinSize(int, short* w, short* h, int)
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 204b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -2342,7 +2342,7 @@ int CMenuPcs::CheckSameMcFormatID(Mc::SaveDat* lhs, Mc::SaveDat* rhs)
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 520b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -2377,7 +2377,7 @@ McCtrl::McCtrl()
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 96b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -2437,16 +2437,74 @@ void McCtrl::LoadMcList()
  */
 void McCtrl::SetListDat(int slot, int)
 {
-	if (slot < 0) {
+	if (slot < 0 || slot >= kMcListCount) {
 		return;
 	}
 	m_saveIndex = slot;
+
+	unsigned char entry[kMcListEntrySize];
+	memset(entry, 0, sizeof(entry));
+
+	unsigned char* const save = reinterpret_cast<unsigned char*>(MemoryCardMan.m_saveBuffer);
+	unsigned char hasData = 0;
+	unsigned char hasError = 0;
+
+	if (save == 0 || save[0x10C0] == 0) {
+		hasData = 0;
+		hasError = 0;
+	} else {
+		if (MemoryCardMan.ChkCrc(reinterpret_cast<Mc::SaveDat*>(save)) != 0) {
+			unsigned int playTime = *reinterpret_cast<unsigned int*>(save + 0x20);
+			memcpy(entry + 0x00, save + 0x8AD0, 8);
+			memcpy(entry + 0x0C, save + 0x24, 0x0C);
+
+			int party0 = *reinterpret_cast<int*>(save + 0x30);
+			int party1 = *reinterpret_cast<int*>(save + 0x34);
+			int party2 = *reinterpret_cast<int*>(save + 0x38);
+			int party3 = *reinterpret_cast<int*>(save + 0x3C);
+
+			if (party0 < 0 || party0 >= 8 || *reinterpret_cast<int*>(save + party0 * 0x9C0 + 0x1A84) == 0 || save[party0 * 0x9C0 + 0x1D90] != 0) {
+				*reinterpret_cast<int*>(save + 0x30) = -1;
+				party0 = -1;
+			}
+			if (party1 < 0 || party1 >= 8 || *reinterpret_cast<int*>(save + party1 * 0x9C0 + 0x1A84) == 0 || save[party1 * 0x9C0 + 0x1D90] != 0) {
+				*reinterpret_cast<int*>(save + 0x34) = -1;
+				party1 = -1;
+			}
+			if (party2 < 0 || party2 >= 8 || *reinterpret_cast<int*>(save + party2 * 0x9C0 + 0x1A84) == 0 || save[party2 * 0x9C0 + 0x1D90] != 0) {
+				*reinterpret_cast<int*>(save + 0x38) = -1;
+				party2 = -1;
+			}
+			if (party3 < 0 || party3 >= 8 || *reinterpret_cast<int*>(save + party3 * 0x9C0 + 0x1A84) == 0 || save[party3 * 0x9C0 + 0x1D90] != 0) {
+				*reinterpret_cast<int*>(save + 0x3C) = -1;
+				party3 = -1;
+			}
+
+			*reinterpret_cast<unsigned int*>(save + 0x1C) = MemoryCardMan.CalcCrc(reinterpret_cast<Mc::SaveDat*>(save));
+
+			*reinterpret_cast<unsigned int*>(entry + 0x08) = playTime;
+			*reinterpret_cast<unsigned int*>(entry + 0x18) = (party0 < 0) ? 0xFFFFFFFFu : *reinterpret_cast<unsigned short*>(save + party0 * 0x9C0 + 0x14D0);
+			*reinterpret_cast<unsigned int*>(entry + 0x1C) = (party1 < 0) ? 0xFFFFFFFFu : *reinterpret_cast<unsigned short*>(save + party1 * 0x9C0 + 0x14D0);
+			*reinterpret_cast<unsigned int*>(entry + 0x20) = (party2 < 0) ? 0xFFFFFFFFu : *reinterpret_cast<unsigned short*>(save + party2 * 0x9C0 + 0x14D0);
+			*reinterpret_cast<unsigned int*>(entry + 0x24) = (party3 < 0) ? 0xFFFFFFFFu : *reinterpret_cast<unsigned short*>(save + party3 * 0x9C0 + 0x14D0);
+			*reinterpret_cast<unsigned int*>(entry + 0x28) = *reinterpret_cast<unsigned int*>(save + 0xB8);
+			memcpy(entry + 0x2C, save + 0x10C0, 0x15);
+			hasData = 1;
+		} else {
+			hasError = 1;
+		}
+	}
+
+	entry[0x41] = hasData;
+	entry[0x42] = hasError;
+	entry[0x43] = 0;
+	MenuPcs.SetMcList(slot, reinterpret_cast<McListInfo*>(entry));
 }
 
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 232b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -2950,15 +3008,146 @@ int McCtrl::ChkNowData()
  */
 void McCtrl::SaveDataBuffer(char* buffer)
 {
+	unsigned int serialLo = 0;
+	unsigned int serialHi = 0;
+
 	m_userBuffer = buffer;
-	m_state = 0;
-	m_lastResult = 0;
+
+	if (m_state < 0) {
+		m_lastResult = -1000;
+		return;
+	}
+
+	m_previousState = m_state;
+
+	switch (m_state) {
+	case 0:
+		MemoryCardMan.McMount(m_cardChannel);
+		m_lastResult = MemoryCardMan.GetResult();
+		m_state = 1;
+		m_iteration = 0;
+		break;
+
+	case 1:
+		if (MemoryCardMan.AsyncFinished() == 1) {
+			m_lastResult = MemoryCardMan.GetResult();
+			if (m_lastResult < 0) {
+				MemoryCardMan.m_opDoneFlag = 1;
+				MemoryCardMan.m_currentSlot = static_cast<char>(0xFF);
+				if (m_lastResult == -6) {
+					m_state = 2;
+				} else if (m_lastResult == -0xD || m_lastResult == -5) {
+					m_state = -1;
+				} else {
+					m_state = -1;
+				}
+			} else {
+				m_state = 7;
+			}
+		}
+		break;
+
+	case 2:
+		MemoryCardMan.McCheck(m_cardChannel);
+		m_lastResult = MemoryCardMan.GetResult();
+		m_state = 3;
+		break;
+
+	case 3:
+		if (MemoryCardMan.AsyncFinished() == 1) {
+			m_lastResult = MemoryCardMan.GetResult();
+			if (m_lastResult != 0) {
+				MemoryCardMan.McUnmount(m_cardChannel);
+				m_state = -1;
+			} else {
+				m_state = 7;
+			}
+		}
+		break;
+
+	case 7:
+		m_lastResult = MemoryCardMan.McOpen(m_cardChannel);
+		if (m_lastResult == -4 || m_lastResult == -5) {
+			m_state = -1;
+			MemoryCardMan.McUnmount(m_cardChannel);
+		} else {
+			MemoryCardMan.CreateMcBuff();
+			m_state = 0x10;
+		}
+		break;
+
+	case 0x10: {
+		if (CARDGetSerialNo(m_cardChannel, reinterpret_cast<unsigned long long*>(&serialLo)) != 0) {
+			MemoryCardMan.McClose();
+			MemoryCardMan.McUnmount(m_cardChannel);
+			MemoryCardMan.DestroyMcBuff();
+			m_state = -1;
+			m_lastResult = -999;
+			break;
+		}
+
+		m_serialLo = serialLo;
+		m_serialHi = serialHi;
+
+		unsigned char* const save = reinterpret_cast<unsigned char*>(MemoryCardMan.m_saveBuffer);
+		if (save == 0 || m_userBuffer == 0) {
+			m_state = -1;
+			m_lastResult = -999;
+			break;
+		}
+
+		memcpy(save, m_userBuffer, 0x8BD0);
+
+		int member = *reinterpret_cast<int*>(save + 0x30);
+		if (member < 0 || member >= 8 || *reinterpret_cast<int*>(save + member * 0x9C0 + 0x1A84) == 0 || save[member * 0x9C0 + 0x1D90] != 0) {
+			*reinterpret_cast<int*>(save + 0x30) = -1;
+		}
+		member = *reinterpret_cast<int*>(save + 0x34);
+		if (member < 0 || member >= 8 || *reinterpret_cast<int*>(save + member * 0x9C0 + 0x1A84) == 0 || save[member * 0x9C0 + 0x1D90] != 0) {
+			*reinterpret_cast<int*>(save + 0x34) = -1;
+		}
+		member = *reinterpret_cast<int*>(save + 0x38);
+		if (member < 0 || member >= 8 || *reinterpret_cast<int*>(save + member * 0x9C0 + 0x1A84) == 0 || save[member * 0x9C0 + 0x1D90] != 0) {
+			*reinterpret_cast<int*>(save + 0x38) = -1;
+		}
+		member = *reinterpret_cast<int*>(save + 0x3C);
+		if (member < 0 || member >= 8 || *reinterpret_cast<int*>(save + member * 0x9C0 + 0x1A84) == 0 || save[member * 0x9C0 + 0x1D90] != 0) {
+			*reinterpret_cast<int*>(save + 0x3C) = -1;
+		}
+
+		*reinterpret_cast<unsigned int*>(save + 0x1C) = MemoryCardMan.CalcCrc(reinterpret_cast<Mc::SaveDat*>(save));
+		MemoryCardMan.EncodeData();
+		MemoryCardMan.McWrite(0, 0xA000, m_saveIndex * 0xA000 + 0x4000);
+		m_state = 0x11;
+		break;
+	}
+
+	case 0x11:
+		if (MemoryCardMan.AsyncFinished() == 1) {
+			m_lastResult = MemoryCardMan.GetResult();
+			if (m_lastResult < 0) {
+				m_state = -1;
+			} else {
+				m_state = 0x12;
+			}
+
+			const int closeResult = MemoryCardMan.McClose();
+			if (closeResult == 0) {
+				MemoryCardMan.McUnmount(m_cardChannel);
+				MemoryCardMan.DestroyMcBuff();
+			} else {
+				m_lastResult = closeResult;
+				m_state = -1;
+			}
+		}
+		break;
+	}
 }
 
 /*
  * --INFO--
  * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Size: 244b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO

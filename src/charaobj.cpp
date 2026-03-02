@@ -87,12 +87,15 @@ void CGPrgObj::onAttacked(CGPrgObj*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void SAFE_CAST_WORK(CGObjWork*)
 {
-	// TODO: unknown helper; keep as no-op until concrete usage is decompiled.
 }
 
 /*
@@ -480,8 +483,12 @@ void CGCharaObj::resetIgnoreHit()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGCharaObj::decIgnoreHit()
 {
@@ -767,8 +774,12 @@ void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGCharaObj::statShield()
 {
@@ -777,12 +788,15 @@ void CGCharaObj::statShield()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void la(CGObject*)
 {
-	// TODO: helper unknown.
 }
 
 /*
@@ -801,8 +815,12 @@ void CGCharaObj::statAttack()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGCharaObj::statDie()
 {
@@ -811,8 +829,12 @@ void CGCharaObj::statDie()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGCharaObj::statMagic()
 {
@@ -821,8 +843,12 @@ void CGCharaObj::statMagic()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGCharaObj::statKizetsu()
 {
@@ -845,8 +871,12 @@ void CGCharaObj::onStatMagic()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGCharaObj::statDamage()
 {
@@ -855,8 +885,12 @@ void CGCharaObj::statDamage()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGCharaObj::statButtobi()
 {
@@ -905,13 +939,16 @@ void CGCharaObj::calcCastTime(int)
  */
 void CGCharaObj::onDrawDebug(CFont*, float, float&, float)
 {
-	// Decomp placeholder: debug text is currently omitted in this unit.
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGCharaObj::addSe(int)
 {
@@ -920,8 +957,12 @@ void CGCharaObj::addSe(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGCharaObj::seDamageDelete()
 {
@@ -1010,22 +1051,28 @@ void CGCharaObj::sendCombiToScript(CGCharaObj* target, int scriptArg, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGCharaObj::scCheckItem(CCombi2Set*, CGCharaObj*, int)
 {
-	// Decomp placeholder: combi item checks are not yet reconstructed.
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGCharaObj::scCheckTime(CCombi2Set*, CGCharaObj*, CGCharaObj*, int)
 {
-	// Decomp placeholder: combi timing checks are not yet reconstructed.
 }
 
 /*

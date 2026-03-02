@@ -33,37 +33,39 @@ struct RandDownFloatCtx {
  */
 void pppRandDownFloat(void* param1, void* param2, void* param3)
 {
-    u8* base = (u8*)param1;
-    RandDownFloatCtx* ctx = (RandDownFloatCtx*)param3;
-    RandDownFloatParam* in = (RandDownFloatParam*)param2;
-    f32* out;
-
     if (lbl_8032ED70 != 0) {
         return;
     }
 
-    s32 state = *(s32*)(base + 0xC);
-    if (state == 0) {
+    u8* base = (u8*)param1;
+    RandDownFloatCtx* p3 = (RandDownFloatCtx*)param3;
+    RandDownFloatParam* p2 = (RandDownFloatParam*)param2;
+    f32* valuePtr;
+
+    s32 id = *(s32*)(base + 0xC);
+    if (id == 0) {
         f32 value = -RandF__5CMathFv(math);
-        if (in->randomTwice != 0) {
+        if (p2->randomTwice != 0) {
             value = (value - RandF__5CMathFv(math)) * lbl_8032FF38;
         }
 
-        out = (f32*)(base + *ctx->outputOffset + 0x80);
-        *out = value;
+        valuePtr = (f32*)(base + *p3->outputOffset + 0x80);
+        *valuePtr = value;
     } else {
-        if (in->targetId != state) {
+        if (p2->targetId != id) {
             return;
         }
-        out = (f32*)(base + *ctx->outputOffset + 0x80);
+        valuePtr = (f32*)(base + *p3->outputOffset + 0x80);
     }
 
+    s32 sourceOffset = p2->sourceOffset;
     f32* source;
-    if (in->sourceOffset == -1) {
+    if (sourceOffset == -1) {
         source = &lbl_801EADC8[0];
     } else {
-        source = (f32*)(base + in->sourceOffset + 0x80);
+        source = (f32*)(base + sourceOffset + 0x80);
     }
 
-    *source = *source + (in->blend * *out);
+    f32 delta = p2->blend * *valuePtr;
+    *source = *source + delta;
 }

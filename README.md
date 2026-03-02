@@ -17,9 +17,15 @@ Fortunately, the EN build contains a debug symbol file, and the PAL version cont
 # Contribution Guide
 
 ## Beginners Contribution Guide
-The most direct way to contribute that requires minimal setup, is to simply pick a 30-99% matching section from [the decomp tracker](https://decomp.dev/zcanann/FFCC-Decomp), and update the code until it has a higher match score.
+The most direct way to contribute with minimal setup is to pick any non-perfect section from [the decomp tracker](https://decomp.dev/zcanann/FFCC-Decomp), then improve overall progress (code match, data match, or linkage).
 
-Refer to the sections on building and diffing. Once you have this set up, all you need to do is modify .cpp and .h files until the score goes up!
+Refer to the sections on building and diffing. Once set up, modify `.cpp`/`.h` files and, when needed, `configure.py` flags to improve output.
+
+Small regressions can be acceptable when outweighed by larger gains in another category (for example, a minor code-byte loss with substantial data or linkage progress).
+
+If progress appears stuck at 0% for a unit/function, check linkage and declarations first. Common symptoms include unexpected Metrowerks mangled names, missing `extern "C"`, or missing special pragmas.
+
+Avoid leaving hardcoded offset-based member access (for example `(this + 0x28)`) in final contributions. Prefer proper types and named data members, even if the offset form currently matches.
 
 ## Advanced Contribution Guide
 For experienced reverse-engineers, there are still quite a few harder tasks remaining.

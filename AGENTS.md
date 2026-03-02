@@ -2,7 +2,7 @@
 
 This file is the canonical, step-by-step runbook for automated contributions to **FFCC-Decomp**.
 
-Goal: improve match scores by editing C/C++ source, rebuilding, diffing, and submitting clean PRs when progress is real.
+Goal: maximize throughput on overall progress by editing C/C++ source, improving data and linkage where possible, rebuilding, diffing, and submitting clean PRs when net progress is real.
 
 ## Ghidra Decompilation Reference
 WARNING: Do not fully trust Ghidra for anything other than address and sizes. The existing decomp is based off of a snapshot and guesswork. The function names however are 99% accurate and were reconstructed from Metrowerks build symbol files.
@@ -118,7 +118,9 @@ tools/objdiff-cli --version  # Should show v3.6.1+
 This is likely the starting point for the agent.
 
 ### Step 1 - Select Target & Gather Context (automated)
-Run the selector once. It prints several random viable targets with symbol summaries. You should strongly bias towards functions that are large and have 0% match scores. There is the most to be gained from these.
+Run the selector once. It prints random viable targets across multiple buckets (code opportunities, data opportunities, linkage opportunities, and name/linkage blockers) with symbol summaries.
+
+All non-perfect targets are valid now. Random selection is preferred; forcing a percent range is obsolete.
 
 ```sh
 python3 tools/agent_select_target.py
@@ -126,27 +128,29 @@ python3 tools/agent_select_target.py
 
 **Example output (abridged):**
 ```
-RANDOM TARGETS:
- 1. Unit: main/pppMove (gap: 100.0%, current: 0.0%)
+TARGET BUCKETS:
+Code opportunities (3)
+ 1. Unit: main/pppMove (code 0.0%, data 0.00%)
     Source: src/pppMove.cpp
     Object: pppMove.o
-    Functions: 0/2 (0.0%)
     Targets:
       - pppMoveCon (0.0% match, 36b)
       - pppMove (0.0% match, 156b)
-    PAL symbols: 2 funcs, 0 globals (showing up to 5 funcs)
-      - pppMoveCon (0x24b at 80065b18)
-      - pppMove (0x9cb at 80065b3c)
+Data opportunities (3)
+Linkage opportunities (3)
+Name/linkage blockers (3)
 ```
 
-WARNING: If the function parameters do not match, the match score cannot be improved beyond 0%! This is very common for ppp* functions as mentioned earlier, which may need C linkage or some other remedy to prevent Metrowerks mangled names (thus allowing objdiff to match these).
+WARNING: If function parameters or linkage do not match, the score can stay stuck at 0%. Common symptoms include unexpected Metrowerks mangled names, missing `extern "C"` where needed, and cases that need specific pragmas. Treat these as signs that declarations/linkage/source setup need updating.
+
+`configure.py` compiler and linker flags can also block perfect matches. Tuning flags may be required in addition to source changes.
 
 DO NOT TRUST GHIDRA BEYOND GETTING A FEEL FOR THE FUNCTION. GHIDRA IS A GUIDELINE. OBJDIFF IS THE REAL SOURCE OF TRUTH FOR HOW CLOSE WE ARE.
 
 ### Step 2 - Create branch: `git checkout -b pr/<unit>/$(date -u +%s)`
 
 ### Step 3 - Edit source files in `src/` and `include/`
-Make small changes: types, signedness, struct layout, control flow, constants.
+Make small changes: types, signedness, struct layout, control flow, constants, linkage/declaration cleanup, and (when justified) `configure.py` flag adjustments.
 
 ### Step 4 - Build: `ninja`
 
@@ -157,15 +161,17 @@ build/tools/objdiff-cli diff -p . -u <unit> -o - <symbol> > diff_result.json
 Parse JSON to assess real assembly improvements vs formatting changes.
 
 ### Step 6 - Check overall progress with `ninja` output
+Treat code, data, and linked progress as first-class outcomes.
 
-### Step 7 - Decide whether to create PR (match + plausibility)
-A higher match score is **necessary but not sufficient**.
+### Step 7 - Decide whether to create PR (net progress + plausibility)
+Net improvement is **necessary but not sufficient**.
 
 Make a PR only if **both** are true:
 
-**A) Match improves meaningfully**
-- objdiff shows real alignment improvement (not just formatting/renames)
-- preferably improves one or more specific functions, not just global noise
+**A) Net progress improves meaningfully**
+- objdiff/build output shows real improvement in one or more of: code match, data match, linkage progress
+- minor regressions are acceptable when outweighed by larger gains in other categories (for example, small code byte loss for substantial data/linkage gain)
+- improvements should be real, not just formatting/renames
 
 **B) The resulting C/C++ is plausible original source**
 The goal is to match what the **original FFCC authors likely wrote**, not merely to coax the compiler.
@@ -177,6 +183,8 @@ Reject/avoid changes that look like "compiler coaxing," e.g.:
 - changes that preserve output but reduce readability without a clear original-source rationale
 - **explanatory comments that add no real information** (e.g., "Plausible original behavior: ...")
 
+Even if code with hardcoded offsets like `(this + 0x28)` currently matches, it should be corrected to proper types and member-variable access as soon as practical.
+
 Prefer changes that are source-plausible:
 - fixing signedness / types to match ABI expectations
 - using idiomatic control flow the codebase uses elsewhere
@@ -185,7 +193,7 @@ Prefer changes that are source-plausible:
 
 EXCEPTION: If making a first pass at a large function, mangled code is tolerable.
 
-### Step 8 - Create Pull Request (if improvement is real + plausible)
+### Step 8 - Create Pull Request (if net improvement is real + plausible)
 
 **Required steps to create PR:**
 1. **Commit changes**: `git commit -m "Descriptive message"`
@@ -194,8 +202,8 @@ EXCEPTION: If making a first pass at a large function, mangled code is tolerable
 
 **PR description must include:**
 - **Summary**: What changed (types/control flow/constants/etc.)
-- **Functions improved**: Which unit(s)/symbol(s) and their improvement metrics
-- **Match evidence**: Before/after percentages, assembly analysis results
+- **Units/functions improved**: Which unit(s)/symbol(s) and their improvement metrics
+- **Progress evidence**: Before/after code/data/linkage metrics, including any accepted regressions and why they were acceptable
 - **Plausibility rationale**: Why the new code represents *plausible original source* (not just "score went up")
 - **Technical details**: Key insights from objdiff analysis, implementation approach
 
@@ -222,7 +230,7 @@ Before creating any FFCC-Decomp PR:
 1. Branched from clean `main`?
 2. All notes written to agent workspace (not project directory)?  
 3. Code is clean (no assembly comments, debug prints, etc.)?
-4. Real improvement achieved (size match or functionality)?
+4. Real net improvement achieved across code/data/linkage (with any regressions justified)?
 5. Build passes with `ninja`?
 
 ### If You Break These Rules
@@ -244,4 +252,4 @@ Before creating any FFCC-Decomp PR:
 5. **Edit source** (use Ghidra decomp for low-match functions)
 6. **Build**: `ninja`
 7. **Analyze**: `build/tools/objdiff-cli diff -p . -u <unit> -o - <symbol>`
-8. **If real improvement**: commit, push, create PR with technical details
+8. **If real net improvement**: commit, push, create PR with technical details

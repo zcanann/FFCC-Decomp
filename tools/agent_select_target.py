@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 """
 FFCC-Decomp Target Selection Script
-Randomly selects viable targets (0-90% match) to avoid getting stuck on problematic 0% functions.
+Selects random viable targets across multiple opportunity buckets:
+- Code matching opportunities
+- Data matching opportunities
+- Linkage opportunities
+- Name/linkage blocker opportunities (mangling symptoms)
 """
 
 import json
@@ -15,10 +19,12 @@ import extract_symbols
 WARNING_BUILD_MISMATCH = (
     "⚠️WARNING: ADDRESS AND SIZES ARE FOR A DIFFERENT BUILD AND COULD BE WRONG. ALWAYS CHECK GHIDRA. ⚠️"
 )
+COMPLETE_THRESHOLD_PERCENT = 100
 
 def warn_build_mismatch():
     """Print a warning immediately before reporting any address/size (scoped per output block)."""
     print(WARNING_BUILD_MISMATCH)
+
 
 def load_blacklist():
     """Load recently failed units to avoid"""
@@ -30,10 +36,6 @@ def load_blacklist():
     except:
         return []
 
-def calculate_gap(measures):
-    """Calculate improvement potential (gap between current and 100%)"""
-    fuzzy = measures.get("fuzzy_match_percent", 0)
-    return 100.0 - fuzzy
 
 def is_viable_target(unit, blacklist):
     """Check if unit is a good target candidate"""
@@ -48,9 +50,16 @@ def is_viable_target(unit, blacklist):
     if name in blacklist:
         return False, "recently failed"
 
-    # Skip units that are already perfect
-    fuzzy = measures.get("fuzzy_match_percent", 0)
-    if fuzzy >= 99.5:
+    # Skip units that are already effectively complete.
+    fuzzy = float(measures.get("fuzzy_match_percent", 0) or 0)
+    matched_code_percent = float(measures.get("matched_code_percent", 0) or 0)
+    matched_data_percent = float(measures.get("matched_data_percent", 0) or 0)
+
+    if (
+        fuzzy >= COMPLETE_THRESHOLD_PERCENT
+        and matched_code_percent >= COMPLETE_THRESHOLD_PERCENT
+        and matched_data_percent >= COMPLETE_THRESHOLD_PERCENT
+    ):
         return False, "already perfect"
 
     return True, "viable"
@@ -102,8 +111,26 @@ def summarize_symbols(label, all_info):
 
     return lines
 
-def extract_targets(report_path, max_targets=10):
-    """Extract viable targets from report.json"""
+
+def is_mangling_blocker(entry):
+    source_file = entry["source_file"]
+    unit_name = entry["name"]
+
+    if source_file.startswith("ppp"):
+        return True
+    if "/ppp" in unit_name:
+        return True
+
+    for func in entry["top_functions"]:
+        name = func["name"]
+        match = func["match"]
+        if match <= 1.0 and (name.startswith("ppp") or "__F" in name or "__Q" in name):
+            return True
+    return False
+
+
+def extract_candidates(report_path):
+    """Extract viable candidates from report.json."""
     with open(report_path) as f:
         data = json.load(f)
 
@@ -119,16 +146,21 @@ def extract_targets(report_path, max_targets=10):
 
         measures = unit.get("measures", {})
         functions = unit.get("functions", [])
+        source_path = unit.get("metadata", {}).get("source_path", "unknown")
+        source_file = Path(source_path).name if source_path and source_path != "unknown" else "unknown"
 
         entry = {
             "name": unit["name"],
-            "fuzzy_match": measures.get("fuzzy_match_percent", 0),
-            "gap": calculate_gap(measures),
-            "total_functions": measures.get("total_functions", 0),
-            "matched_functions": measures.get("matched_functions", 0),
-            "func_match_percent": measures.get("matched_functions_percent", 0),
-            "total_code": measures.get("total_code", 0),
-            "source_path": unit.get("metadata", {}).get("source_path", "unknown"),
+            "fuzzy_match": float(measures.get("fuzzy_match_percent", 0) or 0),
+            "matched_code_percent": float(measures.get("matched_code_percent", 0) or 0),
+            "matched_data_percent": float(measures.get("matched_data_percent", 0) or 0),
+            "total_functions": int(measures.get("total_functions", 0) or 0),
+            "matched_functions": int(measures.get("matched_functions", 0) or 0),
+            "func_match_percent": float(measures.get("matched_functions_percent", 0) or 0),
+            "total_code": int(measures.get("total_code", 0) or 0),
+            "total_data": int(measures.get("total_data", 0) or 0),
+            "source_path": source_path,
+            "source_file": source_file,
             "top_functions": []
         }
 
@@ -142,12 +174,106 @@ def extract_targets(report_path, max_targets=10):
 
         candidates.append(entry)
 
-    if not candidates:
-        return []
+    return candidates
 
-    viable_candidates = [c for c in candidates if 0 <= c["fuzzy_match"] <= 90]
-    random.shuffle(viable_candidates)
-    return viable_candidates[:max_targets]
+
+def select_unique_random(candidates, count, used_units):
+    shuffled = list(candidates)
+    random.shuffle(shuffled)
+    result = []
+    for c in shuffled:
+        if c["name"] in used_units:
+            continue
+        result.append(c)
+        used_units.add(c["name"])
+        if len(result) >= count:
+            break
+    return result
+
+
+def build_buckets(candidates, per_bucket):
+    # All viable units are acceptable code targets.
+    code_candidates = [c for c in candidates if c["fuzzy_match"] < COMPLETE_THRESHOLD_PERCENT]
+
+    # Prefer units with non-trivial data still unmatched.
+    data_candidates = [
+        c for c in candidates
+        if c["total_data"] > 0 and c["matched_data_percent"] < COMPLETE_THRESHOLD_PERCENT
+    ]
+
+    # Linkage opportunities: near matches that are likely close to linkability.
+    linkage_candidates = [
+        c for c in candidates
+        if 90.0 <= c["fuzzy_match"] < COMPLETE_THRESHOLD_PERCENT
+    ]
+
+    # Mangling/linkage blockers: common signatures of linkage/name mismatch work.
+    mangling_candidates = [c for c in candidates if is_mangling_blocker(c)]
+
+    used_units = set()
+    buckets = {
+        "code": select_unique_random(code_candidates, per_bucket, used_units),
+        "data": select_unique_random(data_candidates, per_bucket, used_units),
+        "linkage": select_unique_random(linkage_candidates, per_bucket, used_units),
+        "mangling": select_unique_random(mangling_candidates, per_bucket, used_units),
+    }
+
+    return buckets
+
+
+def print_bucket(name, targets, pal_map, en_map):
+    print(name)
+    print("-" * len(name))
+    if not targets:
+        print("  (no candidates found)\n")
+        return
+
+    for i, c in enumerate(targets, 1):
+        unit_info = {"name": c["name"], "metadata": {"source_path": c["source_path"]}}
+        obj_file = derive_object_file(unit_info)
+        src_file = derive_source_file(unit_info)
+
+        print(
+            f"{i:2}. Unit: {c['name']} (code {c['fuzzy_match']:.1f}%, data {c['matched_data_percent']:.2f}%)"
+        )
+        print(f"    Source: {c['source_path']}")
+        print(f"    Object: {obj_file}")
+        print(f"    Source file: {src_file}")
+        print(
+            f"    Functions: {c['matched_functions']}/{c['total_functions']} ({c['func_match_percent']:.1f}%)"
+        )
+        print(
+            f"    Bytes: code {c['total_code']} total, data {c['total_data']} total"
+        )
+
+        if c["top_functions"]:
+            print("    Targets:")
+            warn_build_mismatch()
+            for func in c["top_functions"]:
+                print(f"      - {func['name']} ({func['match']:.1f}% match, {func['size']}b)")
+
+        if pal_map.exists():
+            pal_info = extract_symbols.extract_all_for_module(
+                pal_map, object_file=obj_file, source_file=src_file
+            )
+            pal_lines = summarize_symbols("PAL symbols", pal_info)
+            if pal_lines and not (len(pal_lines) == 1 and "error:" in pal_lines[0]):
+                warn_build_mismatch()
+            for line in pal_lines:
+                print(line)
+
+        if en_map.exists():
+            en_info = extract_symbols.extract_all_for_module(
+                en_map, object_file=obj_file, source_file=src_file
+            )
+            en_lines = summarize_symbols("EN symbols", en_info)
+            if en_lines and not (len(en_lines) == 1 and "error:" in en_lines[0]):
+                warn_build_mismatch()
+            for line in en_lines:
+                print(line)
+
+        print()
+
 
 def main():
     repo_root = Path(__file__).resolve().parent.parent
@@ -159,53 +285,27 @@ def main():
         print(f"ERROR: {report_path} not found. Run 'ninja' first.")
         return 1
 
-    max_targets = 20 if (len(sys.argv) > 1 and sys.argv[1] == "--list") else 10
+    per_bucket = 6 if (len(sys.argv) > 1 and sys.argv[1] == "--list") else 3
 
-    candidates = extract_targets(report_path, max_targets=max_targets)
+    candidates = extract_candidates(report_path)
 
     if not candidates:
         print("No viable targets found.")
         return 1
 
-    print("RANDOM TARGETS:")
+    buckets = build_buckets(candidates, per_bucket=per_bucket)
+
+    print("TARGET BUCKETS:")
     print("=" * 70)
-
-    for i, c in enumerate(candidates, 1):
-        unit_info = {"name": c["name"], "metadata": {"source_path": c["source_path"]}}
-        obj_file = derive_object_file(unit_info)
-        src_file = derive_source_file(unit_info)
-
-        print(f"{i:2}. Unit: {c['name']} (gap: {c['gap']:.1f}%, current: {c['fuzzy_match']:.1f}%)")
-        print(f"    Source: {c['source_path']}")
-        print(f"    Object: {obj_file}")
-        print(f"    Source file: {src_file}")
-        print(f"    Functions: {c['matched_functions']}/{c['total_functions']} ({c['func_match_percent']:.1f}%)")
-
-        if c["top_functions"]:
-            print("    Targets:")
-            # This block prints sizes (from report.json), so warn once for the block.
-            warn_build_mismatch()
-            for func in c["top_functions"]:
-                print(f"      - {func['name']} ({func['match']:.1f}% match, {func['size']}b)")
-
-        if pal_map.exists():
-            pal_info = extract_symbols.extract_all_for_module(pal_map, object_file=obj_file, source_file=src_file)
-            pal_lines = summarize_symbols("PAL symbols", pal_info)
-            # Only warn if we are going to print the funcs (they include size/address).
-            if pal_lines and not (len(pal_lines) == 1 and "error:" in pal_lines[0]):
-                warn_build_mismatch()
-            for line in pal_lines:
-                print(line)
-
-        if en_map.exists():
-            en_info = extract_symbols.extract_all_for_module(en_map, object_file=obj_file, source_file=src_file)
-            en_lines = summarize_symbols("EN symbols", en_info)
-            if en_lines and not (len(en_lines) == 1 and "error:" in en_lines[0]):
-                warn_build_mismatch()
-            for line in en_lines:
-                print(line)
-
-        print()
+    print_bucket(f"Code opportunities ({per_bucket})", buckets["code"], pal_map, en_map)
+    print_bucket(f"Data opportunities ({per_bucket})", buckets["data"], pal_map, en_map)
+    print_bucket(f"Linkage opportunities ({per_bucket})", buckets["linkage"], pal_map, en_map)
+    print_bucket(
+        f"Name/linkage blockers ({per_bucket})",
+        buckets["mangling"],
+        pal_map,
+        en_map,
+    )
 
     return 0
 

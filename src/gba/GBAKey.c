@@ -7,13 +7,13 @@
 
 static s32 F152(void* task)
 {
-    if ((int)task == -0x7fcd7c38) {
+    if (task == &__GBA[0].task) {
         return 0;
-    } else if ((int)task == -0x7fcd7b38) {
+    } else if (task == &__GBA[1].task) {
         return 1;
-    } else if ((int)task == -0x7fcd7a38) {
+    } else if (task == &__GBA[2].task) {
         return 2;
-    } else if ((int)task == -0x7fcd7938) {
+    } else if (task == &__GBA[3].task) {
         return 3;
     } else {
         OSPanic(__FILE__, 169, "GBA - unexpected dsp call");
@@ -52,13 +52,13 @@ static void F232(void* task)
     s32 chan;
     s32 result;
     
-    if ((int)task == -0x7fcd7c38) {
+    if (task == &__GBA[0].task) {
         chan = 0;
-    } else if ((int)task == -0x7fcd7b38) {
+    } else if (task == &__GBA[1].task) {
         chan = 1;
-    } else if ((int)task == -0x7fcd7a38) {
+    } else if (task == &__GBA[2].task) {
         chan = 2;
-    } else if ((int)task == -0x7fcd7938) {
+    } else if (task == &__GBA[3].task) {
         chan = 3;
     } else {
         OSPanic(__FILE__, 169, "GBA - unexpected dsp call");
@@ -80,13 +80,13 @@ static void F252(void* task)
 {
     s32 chan;
 
-    if ((int)task == -0x7fcd7c38) {
+    if (task == &__GBA[0].task) {
         chan = 0;
-    } else if ((int)task == -0x7fcd7b38) {
+    } else if (task == &__GBA[1].task) {
         chan = 1;
-    } else if ((int)task == -0x7fcd7a38) {
+    } else if (task == &__GBA[2].task) {
         chan = 2;
-    } else if ((int)task == -0x7fcd7938) {
+    } else if (task == &__GBA[3].task) {
         chan = 3;
     } else {
         OSPanic(__FILE__, 169, "GBA - unexpected dsp call");
@@ -98,7 +98,7 @@ static void F252(void* task)
 
 void __GBAX02(s32 chan, u8* readbuf) {
     GBAControl* gba = &__GBA[chan];
-    void* param = &gba->param;
+    void* param = gba->param;
     
     memcpy(param, readbuf, 4);
     *(u32*)((u8*)param + 4) = gba->bootInfo.paletteColor;

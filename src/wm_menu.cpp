@@ -785,7 +785,30 @@ void CMenuPcs::CalcMoveMenu()
 void CMenuPcs::InitSaveLoadMenu()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	bytes[0x17] = 0;
+	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+
+	if (worldState != 0) {
+		*reinterpret_cast<float*>(worldState + 0x00) = FLOAT_803313dc;
+		*reinterpret_cast<float*>(worldState + 0x04) = FLOAT_803313e8;
+		worldState[0x08] = 0;
+		worldState[0x09] = 0;
+		worldState[0x0A] = 0;
+		*reinterpret_cast<short*>(worldState + 0x0E) = 0;
+		*reinterpret_cast<short*>(worldState + 0x10) = 0;
+		*reinterpret_cast<short*>(worldState + 0x12) = 0;
+		*reinterpret_cast<short*>(worldState + 0x16) = 0;
+		*reinterpret_cast<short*>(worldState + 0x18) = 0;
+		*reinterpret_cast<short*>(worldState + 0x1A) = 0;
+		*reinterpret_cast<short*>(worldState + 0x22) = 0;
+		*reinterpret_cast<short*>(worldState + 0x24) = 0;
+		worldState[0x0B] = 0;
+		*reinterpret_cast<short*>(worldState + 0x26) = 0;
+		*reinterpret_cast<short*>(worldState + 0x2E) = 0;
+	}
+
+	*reinterpret_cast<short*>(bytes + 0x870) = 0;
+	bytes[0x86E] = 0;
+	bytes[0x858] = 0;
 }
 
 /*
@@ -830,7 +853,25 @@ void CMenuPcs::CalcTitleMenu()
  */
 void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 {
-	CalcGoOutSelChar(state, 0);
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	unsigned char* const selectState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x828)[0]);
+	unsigned char* const animState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x844)[0]);
+
+	if (worldState != 0 && selectState != 0 && *reinterpret_cast<short*>(worldState + 0x10) == 2) {
+		short& cursor = *reinterpret_cast<short*>(selectState + 4);
+		if (cursor < 0) {
+			cursor = 0;
+		}
+		if (cursor > 7) {
+			cursor = 7;
+		}
+		if (state != 0 && animState != 0) {
+			*reinterpret_cast<int*>(animState + cursor * 0x14 + 4) = 3;
+			selectState[0x0A] = 1;
+		}
+	}
+
 	CalcWMFrame();
 }
 
@@ -846,8 +887,54 @@ void CMenuPcs::CalcGoOutCharaSelect(unsigned char state)
 void CMenuPcs::CalcGoOutSelChar(unsigned char state, unsigned char slot)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	unsigned char* const frameState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x820)[0]);
 	bytes[0x16] = slot;
 	bytes[0x17] = state;
+
+	if (worldState == 0 || frameState == 0 || *reinterpret_cast<short*>(worldState + 0x10) >= 5) {
+		return;
+	}
+
+	if (state != 0) {
+		CalcGoOutCharaSelect(slot);
+	}
+
+	const short menuAnim = *reinterpret_cast<short*>(worldState + 0x10);
+	int offset = 0;
+	if (menuAnim == 0) {
+		offset = static_cast<int>(*reinterpret_cast<short*>(worldState + 0x22)) - 10;
+	} else if (menuAnim < 1 || menuAnim > 3) {
+		offset = -static_cast<int>(*reinterpret_cast<short*>(worldState + 0x22));
+	}
+
+	*reinterpret_cast<short*>(frameState + 4) = 0x10;
+	*reinterpret_cast<short*>(frameState + 0x20) =
+	    static_cast<short>(0x280 - (*reinterpret_cast<short*>(frameState + 8) + *reinterpret_cast<short*>(frameState + 4)));
+
+	if (offset < 0) {
+		float shift = 0.0f;
+		if (offset > -11) {
+			int absOffset = offset < 0 ? -offset : offset;
+			if (absOffset > 10) {
+				absOffset = 10;
+			}
+			const float t = static_cast<float>(absOffset);
+			const float baseWidth =
+			    static_cast<float>(*reinterpret_cast<short*>(frameState + 8) + *reinterpret_cast<short*>(frameState + 4));
+			shift = baseWidth * FLOAT_8033151c * t;
+			shift *= static_cast<float>(sin(FLOAT_803314bc * t * FLOAT_80331698));
+		}
+
+		*reinterpret_cast<short*>(frameState + 4) =
+		    static_cast<short>(static_cast<float>(*reinterpret_cast<short*>(frameState + 4)) - shift);
+		*reinterpret_cast<short*>(frameState + 0x20) =
+		    static_cast<short>(static_cast<float>(*reinterpret_cast<short*>(frameState + 0x20)) + shift);
+	}
+
+	if (menuAnim > 0 && menuAnim < 4) {
+		CalcChara();
+	}
 }
 
 /*

@@ -45,6 +45,9 @@ extern unsigned char CFlat[];
 extern char s_wm_menu_cpp_801dc418[];
 extern char s__s__d___Error_WM_menu_no_error___801dc424[];
 
+static const int kMcListEntrySize = 0x48;
+static const int kMcListCount = 4;
+
 /*
  * --INFO--
  * PAL Address: 0x80102e9c
@@ -136,7 +139,7 @@ void CMenuPcs::createWorld()
  */
 void CMenuPcs::ChkNumItemAll()
 {
-	DAT_8032ee28 = 0;
+	ChkMcDataCnt();
 }
 
 /*
@@ -272,6 +275,7 @@ void CMenuPcs::InitCSelCurPos()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	bytes[0x16] = 0;
+	bytes[0x17] = 0;
 }
 
 /*
@@ -502,6 +506,7 @@ void CMenuPcs::CalcMCardMenu()
  */
 void CMenuPcs::CalcCMakeMenu()
 {
+	CalcCharaBase();
 	CalcCharaSelect();
 	CalcWMFrame();
 	CalcFukidashi();
@@ -520,6 +525,7 @@ void CMenuPcs::CalcMoveMenu()
 {
 	CalcMainMenuSub();
 	CalcWMFrame();
+	CalcFukidashi();
 }
 
 /*
@@ -1278,6 +1284,8 @@ void CMenuPcs::DrawWMFrame0(int, float)
 void CMenuPcs::DrawMainMenuBase(float)
 {
 	DrawWMFrame();
+	DrawMainMenuSub();
+	DrawPageMark();
 }
 
 /*
@@ -1291,6 +1299,7 @@ void CMenuPcs::DrawMainMenuBase(float)
  */
 void CMenuPcs::CalcCharaBase()
 {
+	ChkSelectParty();
 	PCAnimCtrl();
 }
 
@@ -1466,6 +1475,7 @@ void CMenuPcs::SetParty()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	bytes[0x10] = 1;
+	ChkSelectParty();
 }
 
 /*
@@ -1549,6 +1559,7 @@ void CMenuPcs::ChgAllModel2()
 void CMenuPcs::SetMakeChara(int slot)
 {
 	SetMenuCharaAnim(slot, 0);
+	ChkSelectParty();
 }
 
 /*
@@ -1608,9 +1619,15 @@ void CMenuPcs::SetAnim(int anim)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::DrawCursor(int, int, float)
+void CMenuPcs::DrawCursor(int x, int y, float scale)
 {
-	return;
+	float size = 20.0f * scale;
+	if (size < 1.0f) {
+		size = 1.0f;
+	}
+	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	SetTexture(static_cast<CMenuPcs::TEX>(0));
+	DrawRect(0xFFFFFFFF, static_cast<float>(x), static_cast<float>(y), size, size, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 }
 
 /*
@@ -1638,7 +1655,22 @@ void CMenuPcs::CalcMainMenuSub()
  */
 void CMenuPcs::ChkSelectParty()
 {
-	DAT_8032ee28 = 0;
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const modelData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x824)[0]);
+	int selected = 0;
+
+	if (modelData == 0) {
+		DAT_8032ee28 = 0;
+		return;
+	}
+
+	for (int i = 0; i < 8; i++) {
+		if (modelData[i * 0x34 + 0xC] != 0) {
+			selected++;
+		}
+	}
+
+	DAT_8032ee28 = selected;
 }
 
 /*
@@ -1696,7 +1728,23 @@ void CMenuPcs::GetMcOdekakePos(int* x, int* y)
  */
 void CMenuPcs::ChkMcDataCnt()
 {
-	DAT_8032ee28 = 0;
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const list = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x854)[0]);
+	int count = 0;
+
+	if (list == 0) {
+		DAT_8032ee28 = 0;
+		return;
+	}
+
+	for (int i = 0; i < kMcListCount; i++) {
+		unsigned char* const entry = list + i * kMcListEntrySize;
+		if (entry[0x41] != 0 && entry[0x42] == 0) {
+			count++;
+		}
+	}
+
+	DAT_8032ee28 = count;
 }
 
 /*
@@ -1768,10 +1816,10 @@ void CMenuPcs::SetMcList(int index, McListInfo* info)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const list = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x854)[0]);
-	if (list == 0 || info == 0 || index < 0) {
+	if (list == 0 || info == 0 || index < 0 || index >= kMcListCount) {
 		return;
 	}
-	memcpy(list + index * sizeof(McListInfo), info, sizeof(McListInfo));
+	memcpy(list + index * kMcListEntrySize, info, kMcListEntrySize);
 }
 
 /*
@@ -1785,7 +1833,7 @@ void CMenuPcs::SetMcList(int index, McListInfo* info)
  */
 void McListInfo::operator= (const McListInfo& src)
 {
-	memcpy(this, &src, sizeof(McListInfo));
+	memcpy(this, &src, kMcListEntrySize);
 }
 
 /*
@@ -1802,8 +1850,13 @@ void CMenuPcs::ClrMcList()
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const list = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x854)[0]);
 	if (list != 0) {
-		memset(list, 0, sizeof(McListInfo) * 4);
+		memset(list, 0, kMcListEntrySize * kMcListCount);
 	}
+	DAT_8032ee20 = 0xFF;
+	uRam8032ee21 = 0xFF;
+	DAT_8032ee24 = 0xFF;
+	uRam8032ee25 = 0xFF;
+	DAT_8032ee28 = 0;
 }
 
 /*
@@ -1845,7 +1898,12 @@ void CMenuPcs::SetLight(int mode)
  */
 void CMenuPcs::DrawPageMark()
 {
-	return;
+	int x;
+	int y;
+	GetMcAccessPos(&x, &y);
+	DrawCursor(x, y, 1.0f);
+	GetMcOdekakePos(&x, &y);
+	DrawCursor(x, y, 1.0f);
 }
 
 /*
@@ -1949,6 +2007,8 @@ void CMenuPcs::GetWinSize(int, short* w, short* h, int)
  */
 void CMenuPcs::SetTextureLoc(int index)
 {
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	bytes[0x86E] = static_cast<unsigned char>(index);
 	DAT_8032ee28 = index;
 }
 
@@ -2129,7 +2189,15 @@ void CMenuPcs::CheckSameMcFormatID(Mc::SaveDat* lhs, Mc::SaveDat* rhs)
  */
 void CMenuPcs::IsAsyncCharaLoadFinish()
 {
-	DAT_8032ee28 = 1;
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	int ready = 1;
+	for (int i = 0; i < 4; i++) {
+		if (reinterpret_cast<unsigned int*>(bytes + 0x7F4)[i] == 0) {
+			ready = 0;
+			break;
+		}
+	}
+	DAT_8032ee28 = ready;
 }
 /*
  * --INFO--
@@ -2879,7 +2947,8 @@ void CMenuPcs::AlphaAdd()
  */
 void CMenuPcs::GetFontWorld()
 {
-	DAT_8032ee28 = 0;
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	DAT_8032ee28 = static_cast<int>(reinterpret_cast<unsigned int*>(bytes + 0xFC)[0]);
 }
 
 

@@ -193,7 +193,7 @@ public:
     void DrawMcObj();
     void SetMcList(int, struct McListInfo*);
     void ClrMcList();
-    void BindEffect(int, int, int);
+    unsigned int BindEffect(int, int, int);
     void SetLight(int);
     void DrawPageMark();
     void DrawRect2(unsigned long, float, float, float, float, float, float, float, float, float (*)[4]);

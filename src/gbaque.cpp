@@ -817,12 +817,72 @@ void GbaQueue::SetSmithData(int, unsigned int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CFB6C
+ * PAL Size: 332b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::SetStageNo(int, int)
+void GbaQueue::SetStageNo(int stageId, int mapId)
 {
-	// TODO
+    int i = 0;
+    GbaQueue* semaphoreIter = this;
+    char* obj = reinterpret_cast<char*>(this);
+
+    do {
+        OSWaitSemaphore(semaphoreIter->accessSemaphores);
+        i++;
+        semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+    } while (i < 4);
+
+    obj[0x2D38] = 0;
+    obj[0x2D39] = 0;
+    obj[0x2C89] = 0;
+    obj[0x2C88] = 0;
+    obj[0x2C8A] = 0;
+    memset(obj + 0x2B00, 0, 0x188);
+
+    if ((*reinterpret_cast<int*>(obj + 0x444) != stageId) || (*reinterpret_cast<int*>(obj + 0x448) != mapId)) {
+        *reinterpret_cast<int*>(obj + 0x44C) = 0xF;
+        obj[0x2C89] = 0xF;
+    }
+
+    *reinterpret_cast<int*>(obj + 0x444) = stageId;
+    *reinterpret_cast<int*>(obj + 0x448) = mapId;
+    obj[0x2C8B] = 0xF;
+
+    i = 0;
+    semaphoreIter = this;
+    do {
+        OSSignalSemaphore(semaphoreIter->accessSemaphores);
+        i++;
+        semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+    } while (i < 4);
+
+    if (Joybus.LoadMap(stageId, mapId) == 0) {
+        i = 0;
+        semaphoreIter = this;
+        do {
+            OSWaitSemaphore(semaphoreIter->accessSemaphores);
+            i++;
+            semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+        } while (i < 4);
+
+        *reinterpret_cast<int*>(obj + 0x44C) = 0xF;
+        obj[0x2C89] = 0xF;
+
+        i = 0;
+        semaphoreIter = this;
+        do {
+            OSSignalSemaphore(semaphoreIter->accessSemaphores);
+            i++;
+            semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+        } while (i < 4);
+    }
+
+    memset(obj + 0x2D40, 0xFF, 0x10);
+    obj[0x2C8A] = 0;
 }
 
 /*

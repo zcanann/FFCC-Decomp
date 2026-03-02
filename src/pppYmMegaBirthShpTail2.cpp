@@ -67,7 +67,7 @@ void alloc_check(VYmMegaBirthShpTail2* vdata, PYmMegaBirthShpTail2* param)
  */
 void pppConstructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, UnkC* param2)
 {
-    pppFMATRIX* work = (pppFMATRIX*)((u8*)param1 + 0x80 + param2->m_serializedDataOffsets[2]);
+    pppFMATRIX* work = (pppFMATRIX*)((u8*)param1 + 8 + param2->m_serializedDataOffsets[2]);
     float initVal;
 
     pppUnitMatrix__FR10pppFMATRIX(work);
@@ -76,10 +76,10 @@ void pppConstructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, UnkC* param
     work[1].value[0][2] = initVal;
     work[1].value[0][1] = initVal;
     work[1].value[0][0] = initVal;
-    work[1].value[0][3] = 0.0f;
-    work[1].value[1][0] = 0.0f;
-    work[1].value[1][1] = 0.0f;
-    work[1].value[1][2] = 0.0f;
+    *reinterpret_cast<u32*>(&work[1].value[0][3]) = 0;
+    *reinterpret_cast<u32*>(&work[1].value[1][0]) = 0;
+    *reinterpret_cast<u32*>(&work[1].value[1][1]) = 0;
+    *reinterpret_cast<u32*>(&work[1].value[1][2]) = 0;
     *(u16*)(work[1].value[1] + 3) = 0;
     *(u16*)((u8*)work[1].value[1] + 0xe) = 0;
     *(u16*)(work[1].value[1] + 3) = 10000;

@@ -1,4 +1,5 @@
 #include "ffcc/p_chara_viewer.h"
+#include "ffcc/file.h"
 #include "ffcc/pad.h"
 #include <dolphin/gx.h>
 #include "dolphin/mtx.h"
@@ -8,7 +9,6 @@ extern "C" unsigned char Chara[];
 extern "C" unsigned char LightPcs[];
 extern "C" unsigned char Memory[];
 extern "C" unsigned char Graphic[];
-extern "C" unsigned char File[];
 extern "C" unsigned char USBPcs[];
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
@@ -31,10 +31,6 @@ extern "C" void DestroyBumpLightAll__9CLightPcsFQ29CLightPcs6TARGET(void*, int);
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
 extern "C" void SetCopyClear__8CGraphicF8_GXColori(void*, void*, int);
-extern "C" void* Open__5CFileFPcUlQ25CFile3PRI(void*, char*, unsigned long, int);
-extern "C" void Read__5CFileFPQ25CFile7CHandle(void*, void*);
-extern "C" void SyncCompleted__5CFileFPQ25CFile7CHandle(void*, void*);
-extern "C" void Close__5CFileFPQ25CFile7CHandle(void*, void*);
 extern "C" void* createTextureSet__9CCharaPcsFPvi(void*, void*, int);
 extern "C" void Printf__7CSystemFPce(void*, const char*, ...);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, void*, char*, int);
@@ -205,7 +201,7 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
 {
     unsigned char* p = (unsigned char*)param_1;
     char pathBuf[256];
-    void* fileHandle;
+    CFile::CHandle* fileHandle;
 
     if (*(int*)(p + 0x6FC) != 0) {
         releaseRef(p, 0x1A0);
@@ -217,7 +213,7 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
     if ((*(int*)(p + 0x2BC) != 0) || (*(int*)(p + 0x3C0) != 0) || (*(int*)(p + 0x4C4) != 0) || (*(int*)(p + 0x710) != 0)) {
         if (*(int*)(p + 0x2BC) != 0) {
             Printf__7CSystemFPce(System, lbl_801DA7E8 + 0x48, p + 0x2C0);
-            fileHandle = Open__5CFileFPcUlQ25CFile3PRI(File, (char*)(p + 0x2C0), 0, 0);
+            fileHandle = File.Open((char*)(p + 0x2C0), 0, CFile::PRI_LOW);
             if (fileHandle != 0) {
                 releaseRef(p, 0x194);
                 releaseRef(p, 0x19C);
@@ -230,27 +226,27 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
                 *(void**)(p + 0x198) = 0;
                 *(void**)(p + 0x2B0) = 0;
 
-                Read__5CFileFPQ25CFile7CHandle(File, fileHandle);
-                SyncCompleted__5CFileFPQ25CFile7CHandle(File, fileHandle);
+                File.Read(fileHandle);
+                File.SyncCompleted(fileHandle);
                 *(void**)(p + 0x190) = __nw__FUlPQ27CMemory6CStagePci(0x124, *(void**)(Chara + 0x2058), lbl_801DA7E8 + 0x10, 0xEA);
                 if (*(void**)(p + 0x190) != 0) {
                     *(void**)(p + 0x190) = __ct__Q26CChara6CModelFv(*(void**)(p + 0x190));
                 }
-                Create__Q26CChara6CModelFPvPQ27CMemory6CStage(*(void**)(p + 0x190), *(void**)(File + 8), *(void**)(p + 0xCC));
+                Create__Q26CChara6CModelFPvPQ27CMemory6CStage(*(void**)(p + 0x190), File.m_readBuffer, *(void**)(p + 0xCC));
                 *(unsigned char*)(*(unsigned char**)(p + 0x190) + 0x10C) = (*(unsigned char*)(*(unsigned char**)(p + 0x190) + 0x10C) & 0xBF) | 0x40;
-                Close__5CFileFPQ25CFile7CHandle(File, fileHandle);
+                File.Close(fileHandle);
             }
             *(int*)(p + 0x2BC) = 0;
         }
 
         if ((*(int*)(p + 0x5F0) != 0) && (*(void**)(p + 0x190) != 0)) {
             Printf__7CSystemFPce(System, lbl_801DA7E8 + 0x48, p + 0x5F4);
-            fileHandle = Open__5CFileFPcUlQ25CFile3PRI(File, (char*)(p + 0x5F4), 0, 0);
+            fileHandle = File.Open((char*)(p + 0x5F4), 0, CFile::PRI_LOW);
             if (fileHandle != 0) {
-                Read__5CFileFPQ25CFile7CHandle(File, fileHandle);
-                SyncCompleted__5CFileFPQ25CFile7CHandle(File, fileHandle);
-                CreateDynamics__Q26CChara6CModelFPvPQ27CMemory6CStage(*(void**)(p + 0x190), *(void**)(File + 8), *(void**)(p + 0xCC));
-                Close__5CFileFPQ25CFile7CHandle(File, fileHandle);
+                File.Read(fileHandle);
+                File.SyncCompleted(fileHandle);
+                CreateDynamics__Q26CChara6CModelFPvPQ27CMemory6CStage(*(void**)(p + 0x190), File.m_readBuffer, *(void**)(p + 0xCC));
+                File.Close(fileHandle);
             }
             *(int*)(p + 0x5F0) = 0;
         }
@@ -269,17 +265,17 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
                     unsigned int idx = *(unsigned int*)(p + 0x1A4);
                     sprintf(pathBuf, lbl_801DA7E8 + 0x64, p + 0x3C4, idx);
                     Printf__7CSystemFPce(System, lbl_801DA7E8 + 0x48, pathBuf);
-                    fileHandle = Open__5CFileFPcUlQ25CFile3PRI(File, pathBuf, 0, 0);
+                    fileHandle = File.Open(pathBuf, 0, CFile::PRI_LOW);
                     if (fileHandle != 0) {
                         releaseRef(p, 0x1B0 + idx * 4);
-                        Read__5CFileFPQ25CFile7CHandle(File, fileHandle);
-                        SyncCompleted__5CFileFPQ25CFile7CHandle(File, fileHandle);
+                        File.Read(fileHandle);
+                        File.SyncCompleted(fileHandle);
                         *(void**)(p + 0x1B0 + idx * 4) = __nw__FUlPQ27CMemory6CStagePci(0x30, *(void**)(Chara + 0x2058), lbl_801DA7E8 + 0x10, 0x124);
                         if (*(void**)(p + 0x1B0 + idx * 4) != 0) {
                             *(void**)(p + 0x1B0 + idx * 4) = __ct__Q26CChara5CAnimFv(*(void**)(p + 0x1B0 + idx * 4));
                         }
-                        Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(*(void**)(p + 0x1B0 + idx * 4), *(void**)(File + 8), *(void**)(p + 0xD4));
-                        Close__5CFileFPQ25CFile7CHandle(File, fileHandle);
+                        Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(*(void**)(p + 0x1B0 + idx * 4), File.m_readBuffer, *(void**)(p + 0xD4));
+                        File.Close(fileHandle);
                         if (idx == 0) {
                             *(void**)(p + 0x198) = *(void**)(p + 0x1B0);
                             addRef(p, 0x198);
@@ -290,16 +286,16 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
                 *(int*)(p + 0x710) = 0;
             } else {
                 Printf__7CSystemFPce(System, lbl_801DA7E8 + 0x48, p + 0x3C4);
-                fileHandle = Open__5CFileFPcUlQ25CFile3PRI(File, (char*)(p + 0x3C4), 0, 0);
+                fileHandle = File.Open((char*)(p + 0x3C4), 0, CFile::PRI_LOW);
                 if (fileHandle != 0) {
-                    Read__5CFileFPQ25CFile7CHandle(File, fileHandle);
-                    SyncCompleted__5CFileFPQ25CFile7CHandle(File, fileHandle);
+                    File.Read(fileHandle);
+                    File.SyncCompleted(fileHandle);
                     *(void**)(p + 0x198) = __nw__FUlPQ27CMemory6CStagePci(0x30, *(void**)(Chara + 0x2058), lbl_801DA7E8 + 0x10, 0x111);
                     if (*(void**)(p + 0x198) != 0) {
                         *(void**)(p + 0x198) = __ct__Q26CChara5CAnimFv(*(void**)(p + 0x198));
                     }
-                    Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(*(void**)(p + 0x198), *(void**)(File + 8), *(void**)(p + 0xD4));
-                    Close__5CFileFPQ25CFile7CHandle(File, fileHandle);
+                    Create__Q26CChara5CAnimFPvPQ27CMemory6CStage(*(void**)(p + 0x198), File.m_readBuffer, *(void**)(p + 0xD4));
+                    File.Close(fileHandle);
                 }
                 *(int*)(p + 0x3C0) = 0;
             }
@@ -307,13 +303,13 @@ extern "C" void calcViewer__9CCharaPcsFv(void* param_1)
 
         if (*(int*)(p + 0x4C4) != 0) {
             Printf__7CSystemFPce(System, lbl_801DA7E8 + 0x48, p + 0x4C8);
-            fileHandle = Open__5CFileFPcUlQ25CFile3PRI(File, (char*)(p + 0x4C8), 0, 0);
+            fileHandle = File.Open((char*)(p + 0x4C8), 0, CFile::PRI_LOW);
             if (fileHandle != 0) {
                 releaseRef(p, 0x2B0);
-                Read__5CFileFPQ25CFile7CHandle(File, fileHandle);
-                SyncCompleted__5CFileFPQ25CFile7CHandle(File, fileHandle);
-                *(void**)(p + 0x2B0) = createTextureSet__9CCharaPcsFPvi(p, *(void**)(File + 8), 0);
-                Close__5CFileFPQ25CFile7CHandle(File, fileHandle);
+                File.Read(fileHandle);
+                File.SyncCompleted(fileHandle);
+                *(void**)(p + 0x2B0) = createTextureSet__9CCharaPcsFPvi(p, File.m_readBuffer, 0);
+                File.Close(fileHandle);
             }
             *(int*)(p + 0x4C4) = 0;
         }
@@ -449,7 +445,7 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     unsigned char colorTmp[4];
     unsigned char white[4];
     char pathBuf[256];
-    void* fileHandle;
+    CFile::CHandle* fileHandle;
     unsigned char bumpLight[0x138];
     Vec lightPos;
     Vec lightTarget;
@@ -536,12 +532,12 @@ extern "C" void createViewer__9CCharaPcsFv(void* param_1)
     *(int*)(p + 0x5C8) = 1;
 
     sprintf(pathBuf, lbl_801DA7E8 + 0x17C, *(unsigned int*)(USBPcs + 4));
-    fileHandle = Open__5CFileFPcUlQ25CFile3PRI(File, pathBuf, 0, 0);
+    fileHandle = File.Open(pathBuf, 0, CFile::PRI_LOW);
     if (fileHandle != 0) {
-        Read__5CFileFPQ25CFile7CHandle(File, fileHandle);
-        SyncCompleted__5CFileFPQ25CFile7CHandle(File, fileHandle);
-        *(void**)(p + 0x2B8) = createTextureSet__9CCharaPcsFPvi(p, *(void**)(File + 8), 0);
-        Close__5CFileFPQ25CFile7CHandle(File, fileHandle);
+        File.Read(fileHandle);
+        File.SyncCompleted(fileHandle);
+        *(void**)(p + 0x2B8) = createTextureSet__9CCharaPcsFPvi(p, File.m_readBuffer, 0);
+        File.Close(fileHandle);
     }
 
     __ct__Q29CLightPcs10CBumpLightFv(bumpLight);

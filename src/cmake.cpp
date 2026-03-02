@@ -24,16 +24,22 @@ extern "C" float FLOAT_8033325c;
 extern "C" float FLOAT_80333260;
 extern "C" float FLOAT_80333264;
 extern "C" float FLOAT_80333240;
+extern "C" float FLOAT_80333244;
+extern "C" float FLOAT_80333248;
+extern "C" float FLOAT_80333250;
 extern "C" float FLOAT_80333258;
 extern "C" float FLOAT_803332dc;
 extern "C" float FLOAT_803332b0;
 extern "C" float FLOAT_80333364;
 extern "C" float FLOAT_803332a4;
 extern "C" float FLOAT_80333284;
+extern "C" float FLOAT_80333288;
+extern "C" float FLOAT_80333298;
 extern "C" float FLOAT_8033327c;
 extern "C" float FLOAT_8033324c;
 extern "C" float FLOAT_803332d8;
 extern "C" float FLOAT_803332e4;
+extern "C" float FLOAT_803332f4;
 extern "C" float FLOAT_80333348;
 extern "C" float FLOAT_80333350;
 extern "C" float FLOAT_80333354;
@@ -54,6 +60,7 @@ extern "C" float FLOAT_803333b0;
 extern "C" float FLOAT_803333c8;
 extern "C" double DOUBLE_803332d0;
 extern "C" double DOUBLE_80333270;
+extern "C" double DOUBLE_80333268;
 extern "C" double DOUBLE_80333298;
 extern "C" double DOUBLE_803333a0;
 extern "C" double DOUBLE_803333b8;
@@ -81,6 +88,14 @@ extern "C" void DrawInit__5CFontFv(CFont*);
 extern "C" void* __ct__6CColorFUcUcUcUc(void*, unsigned char, unsigned char, unsigned char, unsigned char);
 extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void DrawCursor__8CMenuPcsFiif(CMenuPcs*, int, int, float);
+extern "C" void DrawWMFrame0__8CMenuPcsFif(CMenuPcs*, int, float);
+extern "C" void SetProjection__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" void SetLight__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" void RestoreProjection__8CMenuPcsFv(CMenuPcs*);
+extern "C" void Draw__Q29CCharaPcs7CHandleFi(void*, int);
+extern "C" const char* GetJobStr__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" void DrawMcWin__8CMenuPcsFss(CMenuPcs*, short, short);
+extern "C" void DrawMcWinMess__8CMenuPcsFii(CMenuPcs*, int, int);
 extern "C" char s_dvd__smenu_subfont_fnt_801e3020[];
 extern "C" char* PTR_s_world2_802159a4[];
 extern "C" int DAT_802159c8;
@@ -114,6 +129,58 @@ static inline void ReleaseRefObject(void* object)
     if (refCount == 0) {
         reinterpret_cast<void (*)(void*, int)>(*reinterpret_cast<int*>(raw[0] + 8))(object, 1);
     }
+}
+
+static inline float CalcCmakeFadeAlpha(CMenuPcs* menu)
+{
+    int state = MenuS32(menu, 0x82C);
+    int frame = static_cast<int>(*reinterpret_cast<short*>(state + 0x22)) - 1;
+    if (frame < 0) {
+        frame = 0;
+    }
+
+    short mode = *reinterpret_cast<short*>(state + 0x10);
+    if (mode == 0) {
+        return static_cast<float>(DOUBLE_80333268 * static_cast<double>(frame));
+    }
+    if (mode == 1) {
+        return FLOAT_80333258;
+    }
+    return static_cast<float>(DOUBLE_80333270 - DOUBLE_80333268 * static_cast<double>(frame));
+}
+
+static inline void DrawCmakePreviewChara(CMenuPcs* menu)
+{
+    int slot = static_cast<int>(MenuS16(menu, 0x86A));
+    int modelBlock = MenuS32(menu, 0x814);
+    if (*reinterpret_cast<int*>(modelBlock + (slot + 0x20) * 0x50) == 0) {
+        return;
+    }
+
+    *reinterpret_cast<unsigned short*>(modelBlock + 0x6E8) = 0xFF24;
+    *reinterpret_cast<unsigned short*>(modelBlock + 0x6EA) = 4;
+    DrawInit__8CMenuPcsFv(menu);
+
+    int handle = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(menu) + 0x7F4 + slot * 4);
+    if (*reinterpret_cast<int*>(handle) == 3) {
+        SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcs, 0x32);
+        SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcs, 0);
+        GXColor col = {0xFF, 0xFF, 0xFF, 0xFF};
+        GXSetChanMatColor(GX_COLOR0A0, col);
+        DrawRect__8CMenuPcsFUlfffffffff(
+            MenuPcs, 0,
+            FLOAT_80333244, FLOAT_80333248, FLOAT_8033324c, FLOAT_80333250,
+            FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
+    } else {
+        SetProjection__8CMenuPcsFi(menu, 0x16);
+        SetLight__8CMenuPcsFi(menu, 2);
+        int model = *reinterpret_cast<int*>(handle + 0x168);
+        *reinterpret_cast<float*>(model + 0x9C) = FLOAT_80333258;
+        Draw__Q29CCharaPcs7CHandleFi(reinterpret_cast<void*>(handle), 5);
+        RestoreProjection__8CMenuPcsFv(menu);
+    }
+
+    DrawInit__8CMenuPcsFv(menu);
 }
 
 /*
@@ -1063,7 +1130,37 @@ void CMenuPcs::CmakeSexClose()
  */
 void CMenuPcs::CmakeSexDraw()
 {
-    DrawCmakeCharaText(2, 1.0f);
+    float alpha = CalcCmakeFadeAlpha(this);
+    DrawWMFrame0__8CMenuPcsFif(this, 1, FLOAT_80333258);
+    DrawCmakeWin(0.0f, 0.0f, 1.0f);
+    DrawCmakePreviewChara(this);
+    DrawCmakeTitle(2, 0.0f, alpha);
+
+    CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(this) + 0xFC);
+    SetMargin__5CFontFf(FLOAT_80333258, font);
+    SetShadow__5CFontFi(font, 0);
+    SetScale__5CFontFf(FLOAT_80333258, font);
+    DrawInit__5CFontFv(font);
+
+    int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
+    unsigned char rgba[8];
+    __ct__6CColorFUcUcUcUc(rgba, 0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
+    SetColor__5CFontF8_GXColor(font, reinterpret_cast<GXColor*>(rgba));
+
+    for (int i = 0; i < 2; ++i) {
+        const char* txt = GetMenuStr__8CMenuPcsFi(this, 0x11 + i);
+        float x = FLOAT_80333288 - static_cast<float>(GetWidth__5CFontFPc(font, txt)) * FLOAT_80333298;
+        SetPosX__5CFontFf(x, font);
+        SetPosY__5CFontFf(0x9C + i * 0x28 - FLOAT_803332f4, font);
+        Draw__5CFontFPc(font, txt);
+    }
+    DrawInit__8CMenuPcsFv(this);
+
+    if (*reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x10) == 1) {
+        int sel = *reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x26);
+        int frame = System.m_frameCounter & 7;
+        DrawCursor__8CMenuPcsFiif(this, 0xA4 + frame, 0x9C + sel * 0x28, alpha);
+    }
 }
 
 /*
@@ -1250,7 +1347,46 @@ void CMenuPcs::CmakeJobClose()
  */
 void CMenuPcs::CmakeJobDraw()
 {
-    DrawCmakeCharaText(4, 1.0f);
+    float alpha = CalcCmakeFadeAlpha(this);
+    DrawWMFrame0__8CMenuPcsFif(this, 1, FLOAT_80333258);
+    DrawCmakeWin(0.0f, 0.0f, 1.0f);
+    DrawCmakePreviewChara(this);
+    DrawCmakeTitle(5, 0.0f, alpha);
+
+    CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<unsigned char*>(this) + 0xFC);
+    SetMargin__5CFontFf(FLOAT_80333258, font);
+    SetShadow__5CFontFi(font, 0);
+    SetScale__5CFontFf(FLOAT_80333258, font);
+    DrawInit__5CFontFv(font);
+
+    int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
+    unsigned char rgba[8];
+    __ct__6CColorFUcUcUcUc(rgba, 0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a));
+    SetColor__5CFontF8_GXColor(font, reinterpret_cast<GXColor*>(rgba));
+
+    for (int i = 0; i < 8; ++i) {
+        const char* txt = GetJobStr__8CMenuPcsFi(this, i);
+        float x = (i < 4) ? 272.0f : 424.0f;
+        int row = (i < 4) ? i : (i - 4);
+        SetPosX__5CFontFf(x, font);
+        SetPosY__5CFontFf(0x70 + row * 0x28 - FLOAT_803332f4, font);
+        Draw__5CFontFPc(font, txt);
+    }
+
+    if (*reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x10) == 1) {
+        int sel = *reinterpret_cast<short*>(MenuS32(this, 0x82C) + 0x26);
+        int cursorX = (sel < 4) ? 0x110 : 0x1A8;
+        int cursorY = 0x70 + (sel & 3) * 0x28;
+        DrawCursor__8CMenuPcsFiif(this, cursorX - 0x18 + (System.m_frameCounter & 7), cursorY, alpha);
+    }
+
+    DrawInit__8CMenuPcsFv(this);
+    if ((*reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) != 3)) {
+        DrawMcWin__8CMenuPcsFss(this, -1, 0);
+        if (*reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) == 1) {
+            DrawMcWinMess__8CMenuPcsFii(this, 0x16, 0);
+        }
+    }
 }
 
 /*

@@ -25,6 +25,8 @@ extern "C" void __dla__FPv(void*);
 extern "C" void Printf__7CSystemFPce(CSystem*, char*, ...);
 extern "C" int memcmp(const void*, const void*, unsigned long);
 extern "C" void MakeAgbString__4CMesFPcPcii(char*, char*, int, int);
+extern "C" int AddItem__12CCaravanWorkFiPi(void*, int, int*);
+extern "C" int AddGil__12CCaravanWorkFi(void*, int);
 extern "C" int IsOutOfShouki__12CCaravanWorkFv(void*);
 extern "C" int CanPlayerUseItem__12CCaravanWorkFv(void*);
 extern "C" int CanPlayerPutItem__12CCaravanWorkFv(void*);
@@ -807,12 +809,95 @@ void GbaQueue::SetBuyData(int, unsigned int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CFCB8
+ * PAL Size: 640b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::SetSmithData(int, unsigned int)
+void GbaQueue::SetSmithData(int channel, unsigned int value)
 {
-	// TODO
+	CCaravanWork* caravanWork = reinterpret_cast<CCaravanWork*>(Game.game.m_scriptFoodBase[channel]);
+	const unsigned int itemSlot = (value >> 8) & 0xFF;
+	const unsigned short baseItem = caravanWork->m_inventoryItems[itemSlot];
+
+	caravanWork->DeleteItemIdx(itemSlot, 1);
+
+	const unsigned int itemTableBase = Game.game.unkCFlatData0[2] + static_cast<int>(baseItem) * 0x48;
+	const unsigned short smithItem = *reinterpret_cast<unsigned short*>(itemTableBase + (value & 0xFF) * 2 + 0x38);
+
+	for (int i = 0; i < 3; i++) {
+		const unsigned short materialId = *reinterpret_cast<unsigned short*>(itemTableBase + i * 2 + 0x26);
+		if (materialId == 0) {
+			break;
+		}
+
+		const unsigned short materialCount = *reinterpret_cast<unsigned short*>(itemTableBase + i * 2 + 0x2C);
+		if (materialCount == 0) {
+			break;
+		}
+
+		for (int materialIdx = 0; materialIdx < materialCount; materialIdx++) {
+			int foundSlot = 0;
+			int rowBase = 0;
+			int row = 0;
+			int remainingRows = 8;
+
+			do {
+				if (static_cast<int>(caravanWork->m_inventoryItems[rowBase + 0]) == static_cast<int>(materialId)) {
+					break;
+				}
+				if (static_cast<int>(caravanWork->m_inventoryItems[rowBase + 1]) == static_cast<int>(materialId)) {
+					foundSlot += 1;
+					break;
+				}
+				if (static_cast<int>(caravanWork->m_inventoryItems[rowBase + 2]) == static_cast<int>(materialId)) {
+					foundSlot += 2;
+					break;
+				}
+				if (static_cast<int>(caravanWork->m_inventoryItems[rowBase + 3]) == static_cast<int>(materialId)) {
+					foundSlot += 3;
+					break;
+				}
+				if (static_cast<int>(caravanWork->m_inventoryItems[rowBase + 4]) == static_cast<int>(materialId)) {
+					foundSlot += 4;
+					break;
+				}
+				if (static_cast<int>(caravanWork->m_inventoryItems[rowBase + 5]) == static_cast<int>(materialId)) {
+					foundSlot += 5;
+					break;
+				}
+				if (static_cast<int>(caravanWork->m_inventoryItems[rowBase + 6]) == static_cast<int>(materialId)) {
+					foundSlot += 6;
+					break;
+				}
+				if (static_cast<int>(caravanWork->m_inventoryItems[rowBase + 7]) == static_cast<int>(materialId)) {
+					foundSlot += 7;
+					break;
+				}
+
+				row++;
+				rowBase += 8;
+				foundSlot = row * 8;
+				remainingRows--;
+			} while (remainingRows != 0);
+
+			caravanWork->DeleteItemIdx(foundSlot, 1);
+		}
+	}
+
+	if (AddItem__12CCaravanWorkFiPi(reinterpret_cast<void*>(caravanWork), smithItem, 0) != 0) {
+		Joybus.SendResult(channel, 1, static_cast<unsigned char>(value >> 24), static_cast<unsigned char>(value >> 16));
+	}
+
+	const float smithRate = static_cast<float>(caravanWork->m_shopParam) / 100.0f;
+	const int gilCost = -static_cast<int>(static_cast<float>(*reinterpret_cast<unsigned short*>(itemTableBase + 0x24)) * smithRate);
+	if (AddGil__12CCaravanWorkFi(reinterpret_cast<void*>(caravanWork), gilCost) != 0) {
+		Joybus.SendResult(channel, 1, static_cast<unsigned char>(value >> 24), static_cast<unsigned char>(value >> 16));
+	}
+
+	Joybus.SendResult(channel, 0, static_cast<unsigned char>(value >> 24), static_cast<unsigned char>(value >> 16));
 }
 
 /*

@@ -58,9 +58,14 @@ extern float FLOAT_803314bc;
 extern float FLOAT_8033151c;
 extern float FLOAT_80331528;
 extern float FLOAT_803315cc;
+extern float FLOAT_803315d0;
 extern float FLOAT_80331598;
 extern float FLOAT_803315d4;
 extern float FLOAT_80331698;
+extern float FLOAT_80331748;
+extern float FLOAT_8033174c;
+extern float FLOAT_80331750;
+extern float FLOAT_80331754;
 extern float FLOAT_803317e0;
 extern float FLOAT_803317e4;
 extern float FLOAT_803317e8;
@@ -739,6 +744,7 @@ void CMenuPcs::CalcDiaryMenu()
 	CalcMainMenuSub();
 	CalcWMFrame();
 	CalcFukidashi();
+	CalcCharaBase();
 }
 
 /*
@@ -755,6 +761,8 @@ void CMenuPcs::CalcMCardMenu()
 	CalcMainMenuSub();
 	CalcMcObj();
 	CalcWMFrame();
+	CalcFukidashi();
+	CalcCharaBase();
 }
 
 /*
@@ -846,6 +854,8 @@ void CMenuPcs::CalcLoadMenu()
 	CalcMainMenuSub();
 	CalcMcObj();
 	CalcWMFrame();
+	CalcFukidashi();
+	CalcCharaBase();
 }
 
 /*
@@ -1128,6 +1138,7 @@ void CMenuPcs::DrawDiaryMenu()
 	DrawMainMenuSub();
 	DrawWMFrame();
 	DrawFukidashi();
+	DrawCharaBase();
 }
 
 /*
@@ -1145,6 +1156,7 @@ void CMenuPcs::DrawMCardMenu()
 	DrawMCList();
 	DrawMcWin(0, 0);
 	DrawWMFrame();
+	DrawPageMark();
 }
 
 /*
@@ -1176,6 +1188,8 @@ void CMenuPcs::DrawMoveMenu()
 {
 	DrawMainMenuSub();
 	DrawWMFrame();
+	DrawFukidashi();
+	DrawCharaBase();
 }
 
 /*
@@ -1189,9 +1203,12 @@ void CMenuPcs::DrawMoveMenu()
  */
 void CMenuPcs::DrawLoadMenu()
 {
+	DrawMainMenuSub();
 	DrawMCList();
-	DrawMcWin(0, 0);
+	DrawMcWin(-1, 0);
 	DrawWMFrame();
+	DrawPageMark();
+	DrawCharaBase();
 }
 
 /*
@@ -1207,6 +1224,8 @@ void CMenuPcs::DrawTitleMenu()
 {
 	DrawWMFrame();
 	DrawChara();
+	DrawFukidashi();
+	DrawPageMark();
 }
 
 /*
@@ -1477,7 +1496,62 @@ void CMenuPcs::DrawObj(int kind)
  */
 void CMenuPcs::CalcPitcher()
 {
-	CalcCharaBase();
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	unsigned char* const worldObj = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]);
+	unsigned char* const handle = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x788)[0]);
+	if (worldState == 0 || worldObj == 0 || handle == 0) {
+		return;
+	}
+
+	const short state = reinterpret_cast<short*>(worldState + 0x10)[0];
+	if (state <= 0 || state >= 3) {
+		return;
+	}
+
+	reinterpret_cast<unsigned int*>(worldObj + 0x190)[0] = 1;
+	reinterpret_cast<short*>(worldObj + 0x198)[0] = 0x140;
+	reinterpret_cast<short*>(worldObj + 0x19A)[0] = 0xE0;
+	reinterpret_cast<short*>(worldObj + 0x19C)[0] = 0x140;
+	reinterpret_cast<short*>(worldObj + 0x19E)[0] = 0xE0;
+	reinterpret_cast<float*>(worldObj + 0x1A0)[0] = FLOAT_803313dc;
+	reinterpret_cast<float*>(worldObj + 0x1A4)[0] = FLOAT_803313dc;
+	reinterpret_cast<float*>(worldObj + 0x1A8)[0] = FLOAT_803314bc;
+	reinterpret_cast<float*>(worldObj + 0x1AC)[0] = FLOAT_80331748;
+	reinterpret_cast<float*>(worldObj + 0x1B0)[0] = FLOAT_8033174c;
+	reinterpret_cast<float*>(worldObj + 0x1B4)[0] = FLOAT_80331750;
+	reinterpret_cast<float*>(worldObj + 0x1B8)[0] = FLOAT_803315d0;
+	reinterpret_cast<float*>(worldObj + 0x1BC)[0] += FLOAT_80331754;
+
+	Mtx scaleMtx;
+	Mtx rotXMtx;
+	Mtx rotYMtx;
+	PSMTXScale(scaleMtx, FLOAT_803313e8, FLOAT_803313e8, FLOAT_803313e8);
+	PSMTXRotRad(rotXMtx, 'x', reinterpret_cast<float*>(worldObj + 0x1B8)[0]);
+	PSMTXRotRad(rotYMtx, 'y', reinterpret_cast<float*>(worldObj + 0x1BC)[0]);
+	PSMTXConcat(rotXMtx, rotYMtx, rotXMtx);
+	rotXMtx[0][3] = reinterpret_cast<float*>(worldObj + 0x1AC)[0];
+	rotXMtx[1][3] = reinterpret_cast<float*>(worldObj + 0x1B0)[0];
+	rotXMtx[2][3] = reinterpret_cast<float*>(worldObj + 0x1B4)[0];
+	PSMTXConcat(rotXMtx, scaleMtx, scaleMtx);
+
+	void* const model = reinterpret_cast<void*>(reinterpret_cast<unsigned int*>(handle + 0x168)[0]);
+	if (model == 0) {
+		return;
+	}
+
+	const unsigned int step = static_cast<unsigned int>(reinterpret_cast<short*>(worldState + 0x22)[0]);
+	float blend = FLOAT_803313e8;
+	if (state == 1 && step < 10) {
+		blend = static_cast<float>(step) * 0.1f;
+	} else if (state == 2 && bytes[0x13] != 0) {
+		blend = 1.0f - static_cast<float>(step) * 0.1f;
+	}
+	reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(model) + 0x9C)[0] = blend;
+
+	SetMatrix__Q26CChara6CModelFPA4_f(model, scaleMtx);
+	CalcMatrix__Q26CChara6CModelFv(model);
+	CalcSkin__Q26CChara6CModelFv(model);
 }
 
 /*
@@ -1492,6 +1566,8 @@ void CMenuPcs::CalcPitcher()
 void CMenuPcs::CalcFukidashi()
 {
 	CalcWMFrame();
+	CalcPitcher();
+	CalcMainMenuSub();
 }
 
 /*
@@ -1506,6 +1582,8 @@ void CMenuPcs::CalcFukidashi()
 void CMenuPcs::DrawFukidashi()
 {
 	DrawWMFrame();
+	DrawWMFrame0(3, 1.0f);
+	DrawMainMenuSub();
 }
 
 /*
@@ -2232,6 +2310,10 @@ void CMenuPcs::ChkSelectParty()
 void CMenuPcs::DrawMainMenuSub()
 {
 	DrawPageMark();
+	DrawWMFrame0(3, 1.0f);
+	if (DAT_8032ee28 > 0) {
+		DrawCursor(DAT_8032ee20, uRam8032ee21, 1.0f);
+	}
 }
 
 /*
@@ -2305,7 +2387,11 @@ void CMenuPcs::ChkMcDataCnt()
  */
 void CMenuPcs::DrawMCList()
 {
+	ChkMcDataCnt();
 	DrawPageMark();
+	if (DAT_8032ee28 > 0) {
+		DrawMcWin(0, 0);
+	}
 }
 
 /*
@@ -2348,9 +2434,11 @@ void CMenuPcs::CalcMcObj()
  */
 void CMenuPcs::DrawMcObj()
 {
+	CalcMcObj();
 	DrawMCList();
-	DrawMcWin(0, 0);
+	DrawMcWin(-1, 0);
 	DrawPageMark();
+	DrawHelpBase(0, 1.0f);
 }
 
 /*

@@ -202,6 +202,107 @@ void CMenuPcs::ChkNumItemAll()
  */
 void CMenuPcs::loadData()
 {
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	*reinterpret_cast<unsigned short*>(bytes + 0x86C) = 0;
+
+	reinterpret_cast<void**>(bytes + 0x774)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x778)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x77C)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x780)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x784)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x788)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x78C)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x790)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x794)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x798)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x79C)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x7A0)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x7A4)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x7A8)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x7AC)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x7B0)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x7B4)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x7B8)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x7BC)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x7C0)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x7C4)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x7C8)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x7CC)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x7D0)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x7D4)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x7D8)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x7DC)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x7E0)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x7E4)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x7E8)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x7EC)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x7F0)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x7F4)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x7F8)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x7FC)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x800)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x804)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x808)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x80C)[0] = 0;
+	reinterpret_cast<void**>(bytes + 0x810)[0] = 0;
+
+	reinterpret_cast<void**>(bytes + 0x814)[0] = new unsigned char[0xC80];
+	memset(reinterpret_cast<void**>(bytes + 0x814)[0], 0, 0xC80);
+	for (int i = 0; i < 0x28; i++) {
+		unsigned char* const entry = reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(bytes + 0x814)[0]) + i * 0x50;
+		*reinterpret_cast<short*>(entry + 0x0C) = 0;
+		*reinterpret_cast<short*>(entry + 0x0E) = 0;
+		*reinterpret_cast<short*>(entry + 0x10) = 0x280;
+		*reinterpret_cast<short*>(entry + 0x12) = 0x1C0;
+		*reinterpret_cast<float*>(entry + 0x14) = FLOAT_803313dc;
+		*reinterpret_cast<float*>(entry + 0x18) = FLOAT_803313dc;
+		*reinterpret_cast<float*>(entry + 0x1C) = FLOAT_80331598;
+		*reinterpret_cast<unsigned int*>(entry + 0x40) = 0;
+		*reinterpret_cast<unsigned int*>(entry + 0x44) = 0;
+		*reinterpret_cast<unsigned int*>(entry + 0x48) = 0x280;
+		*reinterpret_cast<unsigned int*>(entry + 0x4C) = 0x1C0;
+	}
+
+	reinterpret_cast<void**>(bytes + 0x818)[0] = new unsigned char[0x8C];
+	memset(reinterpret_cast<void**>(bytes + 0x818)[0], 0, 0x8C);
+
+	reinterpret_cast<void**>(bytes + 0x81C)[0] = new unsigned char[0xEC];
+	memset(reinterpret_cast<void**>(bytes + 0x81C)[0], 0, 0xEC);
+
+	reinterpret_cast<void**>(bytes + 0x820)[0] = new unsigned char[0x3C];
+	memset(reinterpret_cast<void**>(bytes + 0x820)[0], 0, 0x3C);
+
+	reinterpret_cast<void**>(bytes + 0x824)[0] = new unsigned char[0x1A0];
+	memset(reinterpret_cast<void**>(bytes + 0x824)[0], 0, 0x1A0);
+
+	reinterpret_cast<void**>(bytes + 0x828)[0] = new unsigned char[0x80];
+	memset(reinterpret_cast<void**>(bytes + 0x828)[0], 0, 0x80);
+
+	reinterpret_cast<void**>(bytes + 0x82C)[0] = new unsigned char[0x48];
+	memset(reinterpret_cast<void**>(bytes + 0x82C)[0], 0, 0x48);
+
+	reinterpret_cast<void**>(bytes + 0x838)[0] = new unsigned char[0x120];
+	memset(reinterpret_cast<void**>(bytes + 0x838)[0], 0, 0x120);
+
+	reinterpret_cast<void**>(bytes + 0x83C)[0] = new unsigned char[0x10];
+	memset(reinterpret_cast<void**>(bytes + 0x83C)[0], 0, 0x10);
+
+	unsigned char* const effectRaw = new unsigned char[0xCDB0 + 0x10];
+	memset(effectRaw, 0, 0xCDB0 + 0x10);
+	reinterpret_cast<void**>(bytes + 0x840)[0] = effectRaw + 0x10;
+	for (int i = 0; i < 0x28; i++) {
+		unsigned char* const effect = reinterpret_cast<unsigned char*>(reinterpret_cast<void**>(bytes + 0x840)[0]) + i * 0x524;
+		*reinterpret_cast<int*>(effect + 0x0) = -1;
+		*reinterpret_cast<int*>(effect + 0x4) = -1;
+		*reinterpret_cast<int*>(effect + 0x8) = -1;
+	}
+
+	reinterpret_cast<void**>(bytes + 0x844)[0] = new unsigned char[0xA0];
+	memset(reinterpret_cast<void**>(bytes + 0x844)[0], 0, 0xA0);
+
+	reinterpret_cast<void**>(bytes + 0x848)[0] = new unsigned char[0x0C];
+	memset(reinterpret_cast<void**>(bytes + 0x848)[0], 0, 0x0C);
+
 	InitFrameInfo();
 	InitCharaInfo();
 	InitCharaSelectInfo();

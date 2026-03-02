@@ -1129,79 +1129,117 @@ void CUtil::CalcBoundaryBoxQuantized(Vec* minOut, Vec* maxOut, S16Vec* vecs, uns
  */
 int CUtil::GetNumPolygonFromDL(void* dlData, unsigned long)
 {
-    int polygonCount = 0;
-    u8* data = static_cast<u8*>(dlData);
-    bool isPrimitive = true;
+    u8 bVar1;
+    u16 uVar2;
+    bool bVar3;
+    bool bVar4;
+    int iVar5;
+    u8 bVar6;
+    u32 uVar7;
+    u32 uVar8;
+    u8* data;
 
+    bVar4 = true;
+    iVar5 = 0;
+    data = static_cast<u8*>(dlData);
+
+next_command:
     do {
-        if (!isPrimitive) {
-            return polygonCount;
+        if (!bVar4) {
+            return iVar5;
         }
 
-        u8 cmd = *data;
-        u16 vertexCount16 = *(u16*)(data + 1);
-        u32 vertexCount = vertexCount16;
-        u8 primitive = cmd & 0xF8;
+        bVar1 = *data;
+        uVar2 = *(u16*)(data + 1);
+        uVar7 = (u32)uVar2;
+        data = data + 3;
+        bVar6 = bVar1 & 0xF8;
 
-        data += 3;
-
-        if (primitive == 0xA0 || primitive == 0xB0 || primitive == 0xA8 || primitive == 0xB8 || primitive == 0x90 ||
-            primitive == 0x80 || primitive == 0x98) {
-            isPrimitive = true;
+        if (bVar6 == 0xA0) {
+primitive_ok:
+            bVar3 = true;
         } else {
-            isPrimitive = false;
-        }
-
-        if (isPrimitive) {
-            if (primitive == 0x90) {
-                polygonCount += vertexCount / 3;
-            } else if (primitive == 0x98) {
-                polygonCount += vertexCount - 2;
+            if (0x9F < bVar6) {
+                if (bVar6 != 0xB0) {
+                    if (bVar6 < 0xB0) {
+                        if (bVar6 == 0xA8) {
+                            goto primitive_ok;
+                        }
+                    } else if (bVar6 == 0xB8) {
+                        goto primitive_ok;
+                    }
+                    goto primitive_bad;
+                }
+                goto primitive_ok;
+            }
+            if (bVar6 == 0x90) {
+                goto primitive_ok;
+            }
+            if (bVar6 < 0x90) {
+                if (bVar6 == 0x80) {
+                    goto primitive_ok;
+                }
+            } else if (bVar6 == 0x98) {
+                goto primitive_ok;
             }
 
-            if ((cmd & 7) != 2) {
-                if (vertexCount != 0) {
-                    u32 blockCount = vertexCount16 >> 3;
-                    if (blockCount != 0) {
-                        do {
-                            data += 0x40;
-                            blockCount--;
-                        } while (blockCount != 0);
+primitive_bad:
+            bVar3 = false;
+        }
 
-                        vertexCount &= 7;
-                        if ((vertexCount16 & 7) == 0) {
-                            continue;
+        if (bVar3) {
+            if (bVar6 == 0x90) {
+                iVar5 = iVar5 + (uVar7 / 3);
+            } else if (bVar6 == 0x98) {
+                iVar5 = uVar7 + iVar5 - 2;
+            }
+
+            if ((bVar1 & 7) != 2) {
+                if (uVar7 != 0) {
+                    uVar8 = (u32)(uVar2 >> 3);
+                    if (uVar8 != 0) {
+                        do {
+                            data = data + 0x40;
+                            uVar8 = uVar8 - 1;
+                        } while (uVar8 != 0);
+
+                        uVar7 = uVar7 & 7;
+                        if ((uVar2 & 7) == 0) {
+                            goto next_command;
                         }
                     }
 
                     do {
-                        data += 8;
-                        vertexCount--;
-                    } while (vertexCount != 0);
+                        data = data + 8;
+                        uVar7 = uVar7 - 1;
+                    } while (uVar7 != 0);
                 }
-                continue;
+                goto next_command;
             }
 
-            if (vertexCount != 0) {
-                u32 blockCount = vertexCount16 >> 3;
-                if (blockCount != 0) {
+            if (uVar7 != 0) {
+                uVar8 = (u32)(uVar2 >> 3);
+                if (uVar8 != 0) {
                     do {
-                        data += 0x50;
-                        blockCount--;
-                    } while (blockCount != 0);
+                        data = data + 0x50;
+                        uVar8 = uVar8 - 1;
+                    } while (uVar8 != 0);
 
-                    vertexCount &= 7;
-                    if ((vertexCount16 & 7) == 0) {
-                        continue;
+                    uVar7 = uVar7 & 7;
+                    if ((uVar2 & 7) == 0) {
+                        goto next_command;
                     }
                 }
 
                 do {
-                    data += 10;
-                    vertexCount--;
-                } while (vertexCount != 0);
+                    data = data + 10;
+                    uVar7 = uVar7 - 1;
+                } while (uVar7 != 0);
             }
+            goto next_command;
         }
+
+        bVar4 = false;
     } while (true);
 }
 

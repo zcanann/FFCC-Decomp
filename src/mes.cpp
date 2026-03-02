@@ -964,39 +964,34 @@ void CMes::SetPosition(float x, float y)
 int CMes::useFlag(int maxCount, int stopOnClear)
 {
 	unsigned char* flagEntry = (unsigned char*)((char*)this + *(int*)((char*)this + 0x3c10) * 6 + 0x3c14);
-	while (true)
+	while (*(int*)((char*)this + 0x3c10) < maxCount)
 	{
-		if (maxCount <= *(int*)((char*)this + 0x3c10))
-		{
-			return 1;
-		}
+		unsigned char type = *flagEntry;
 
-		unsigned char type = flagEntry[0];
-		if (type != 3)
+		if ((type != 3) && (type < 3))
 		{
-			if (type < 3)
+			if (type == 1)
 			{
-				if (type == 1)
-				{
-					int idx = (unsigned int)flagEntry[2] * 4 + 0x3cc0;
-					*(int*)((char*)this + idx) = *(int*)((char*)this + idx) + 1;
-				}
-				else if (type != 0)
-				{
-					*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) = (int)*(short*)(flagEntry + 4);
-				}
+				int idx = (unsigned int)flagEntry[2] * 4 + 0x3cc0;
+				*(int*)((char*)this + idx) = *(int*)((char*)this + idx) + 1;
 			}
-			else if ((type < 5) &&
-			         (*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) == 0) &&
-			         (stopOnClear == 0))
+			else if (type != 0)
 			{
-				return 0;
+				*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) = (int)*(short*)(flagEntry + 4);
 			}
+		}
+		else if ((type < 5) &&
+		         (*(int*)((char*)this + (unsigned int)flagEntry[2] * 4 + 0x3cc0) == 0) &&
+		         (stopOnClear == 0))
+		{
+			return 0;
 		}
 
 		flagEntry += 6;
 		*(int*)((char*)this + 0x3c10) = *(int*)((char*)this + 0x3c10) + 1;
 	}
+
+	return 1;
 }
 
 /*

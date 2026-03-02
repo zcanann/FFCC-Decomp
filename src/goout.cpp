@@ -4,7 +4,7 @@
 #include <string.h>
 
 extern CGoOutMenu g_GoOutMenu;
-extern CGoOutMenu* g_pGoOutMenu;
+extern CGoOutMenu* lbl_8032EF08;
 extern "C" int __cntlzw(unsigned int);
 extern "C" int GetYesNoXPos__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" int CalcGoOutSelChar__8CMenuPcsFUcUc(CMenuPcs*, unsigned char, unsigned char);
@@ -128,7 +128,7 @@ static const char* const sSlotAErrorLine5[5] = {
 void DrawGoOutMenu()
 {
     CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
-    g_pGoOutMenu = &g_GoOutMenu;
+    lbl_8032EF08 = &g_GoOutMenu;
 
     if (ReadGoOutU8(g_GoOutMenu, 0x44) == 3) {
         MenuPcs.DrawInit();
@@ -1540,7 +1540,7 @@ void CGoOutMenu::Calc()
  */
 void CalcGoOutMenu()
 {
-    g_pGoOutMenu = &g_GoOutMenu;
+    lbl_8032EF08 = &g_GoOutMenu;
     Calc__10CGoOutMenuFv(&g_GoOutMenu);
 }
 

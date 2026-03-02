@@ -137,10 +137,10 @@ public:
     void GetHitEInfo(int);
     bool IsSingleMode(int);
     void SetControllerMode(int);
-    char GetControllerMode();
+    unsigned int GetControllerMode();
     void OpenMenu(int, int, int);
     void SetPauseMode(int);
-    void GetPauseMode();
+    unsigned int GetPauseMode();
     unsigned char GetItemUse(int);
     void GetSPModeFlg(int);
     void ClrSPModeFlg(int);

@@ -5,6 +5,7 @@
 #include "ffcc/p_game.h"
 
 #include <dolphin/gba/GBA.h>
+#include <dolphin/si.h>
 #include <string.h>
 
 extern CMiniGamePcs MiniGamePcs;
@@ -26,6 +27,24 @@ extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFla
 
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dl__FPv(void*);
+
+static void MiniGameThreadSleepTicks(OSTime ticks)
+{
+    OSAlarm alarm;
+    OSCreateAlarm(&alarm);
+    OSSetAlarmTag(&alarm, 1);
+    OSThread* currentThread = OSGetCurrentThread();
+    alarm.start = reinterpret_cast<OSTime>(currentThread);
+    BOOL interruptLevel = OSDisableInterrupts();
+    OSSetAlarm(&alarm, ticks, GbaThreadAlarmHandler);
+    OSSuspendThread(currentThread);
+    OSRestoreInterrupts(interruptLevel);
+}
+
+static bool MiniGameThreadTimedOut(OSTime start, OSTime timeout)
+{
+    return static_cast<u64>(OSGetTime() - start) > static_cast<u64>(timeout);
+}
 
 /*
  * --INFO--
@@ -735,12 +754,582 @@ void CMiniGamePcs::GbaThreadReadContext(MgGbaThreadParam*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801290cc
+ * PAL Size: 5380b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMiniGamePcs::GbaThreadMain(void*)
+void CMiniGamePcs::GbaThreadMain(void* threadParam)
 {
-	// TODO
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    unsigned char* param = reinterpret_cast<unsigned char*>(threadParam);
+    unsigned int command = 0;
+    unsigned int identity = 0;
+    int message = 0;
+    int ret = 0;
+    int step = 0;
+    int contextRecvOffset = 0;
+    int retryLine = 0;
+    OSTime timeoutTicks = 0;
+    OSTime startTime = 0;
+    const int channel = static_cast<int>(static_cast<signed char>(param[0xBC]));
+
+receive_message:
+    if (OSReceiveMessage(reinterpret_cast<OSMessageQueue*>(param), reinterpret_cast<OSMessage*>(&message), 0) == 0)
+    {
+        param[0xBD] = 0;
+        OSReceiveMessage(reinterpret_cast<OSMessageQueue*>(param), reinterpret_cast<OSMessage*>(&message), 1);
+        param[0xBE] = 0;
+    }
+
+    if (message == 1)
+    {
+        MiniGameThreadSleepTicks((DAT_800000f8 / 4000) * 10);
+        command = 0x80000000;
+        for (int i = 0; i < 100; i++)
+        {
+            GBAWrite(channel, reinterpret_cast<u8*>(&command), param + 0xC0);
+            MiniGameThreadSleepTicks((DAT_800000f8 / 4000) * 10);
+        }
+        MiniGameThreadSleepTicks((DAT_800000f8 / 4000) * 10);
+        self[0x649D] |= static_cast<unsigned char>(1 << channel);
+        OSExitThread(0);
+        return;
+    }
+
+    if (message == 7 && *reinterpret_cast<int*>(param + 0x8C) == 0)
+    {
+        message = 8;
+    }
+
+    param[0xBD] = 1;
+    contextRecvOffset = 0;
+    step = 0;
+    param[0xC2] = 0;
+    if (message == 5)
+    {
+        timeoutTicks = (DAT_800000f8 / 4000) * 1000;
+    }
+    else if (message == 3 || message == 10)
+    {
+        timeoutTicks = (DAT_800000f8 / 4000) * 500;
+    }
+    else
+    {
+        timeoutTicks = (DAT_800000f8 / 4000) * 1000;
+    }
+    startTime = OSGetTime();
+    retryLine = 0x22C;
+
+retry_loop:
+    if (param[0xBE] != 0)
+    {
+        param[0xBF] = 3;
+        if (param[0xC4] != 0)
+        {
+            Printf__7CSystemFPce(&System, "isConnectedLine=%d,Line=%d\n", channel, 0x234);
+        }
+        param[0xC4] = 0;
+        goto receive_message;
+    }
+
+    if (MiniGameThreadTimedOut(startTime, timeoutTicks))
+    {
+        Printf__7CSystemFPce(&System, "retry=%d chan=%d\n", retryLine, channel);
+        if (ret != 3)
+        {
+            ret = 1;
+        }
+        param[0xBF] = static_cast<unsigned char>(ret);
+        if (param[0xC4] != 0)
+        {
+            Printf__7CSystemFPce(&System, "isConnectedLine=%d,Line=%d\n", channel, 0x241);
+        }
+        param[0xC4] = 0;
+        goto receive_message;
+    }
+
+    switch (message)
+    {
+    default:
+        goto receive_message;
+    case 2:
+        if (param[0xC4] != 0)
+        {
+            Printf__7CSystemFPce(&System, "isConnectedLine=%d,Line=%d\n", channel, 0x248);
+        }
+        param[0xC4] = 0;
+        param[0xBF] = static_cast<unsigned char>(GBAReset(channel, param + 0xC0));
+        goto receive_message;
+    case 3:
+        if (param[0xC4] != 0)
+        {
+            Printf__7CSystemFPce(&System, "isConnectedLine=%d,Line=%d\n", channel, 0x24F);
+        }
+        param[0xC4] = 0;
+        ret = GBAReset(channel, param + 0xC0);
+        if (ret != 0)
+        {
+            param[0xBF] = 0;
+            goto receive_message;
+        }
+        ret = 3;
+        retryLine = 0x256;
+        MiniGameThreadSleepTicks(DAT_800000f8 / 4000);
+        goto retry_loop;
+    case 4:
+        if (param[0xC4] != 0)
+        {
+            Printf__7CSystemFPce(&System, "isConnectedLine=%d,Line=%d\n", channel, 0x25D);
+        }
+        param[0xC4] = 0;
+        ret = GBAGetStatus(channel, param + 0xC0);
+        if (ret != 0)
+        {
+            goto comm_fail;
+        }
+        if ((param[0xC0] & GBA_JSTAT_RECV) != 0)
+        {
+            retryLine = 0x266;
+            goto retry_loop;
+        }
+        if (step == 1)
+        {
+            param[0xBF] = 0;
+            goto receive_message;
+        }
+        command = 0x50000000;
+        ret = GBAWrite(channel, reinterpret_cast<u8*>(&command), param + 0xC0);
+        if (ret == 0)
+        {
+            retryLine = 0x274;
+            step++;
+            goto retry_loop;
+        }
+        goto comm_fail;
+    case 5:
+        Printf__7CSystemFPce(&System, "chan=%d step=%d contextRecvOffset=%d\n", channel, step, contextRecvOffset);
+        if (contextRecvOffset > 0x5F)
+        {
+            retryLine = 0x27A;
+            goto retry_loop;
+        }
+        ret = GBAGetStatus(channel, param + 0xC0);
+        if (ret == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK)
+        {
+            if (step < 0x19)
+            {
+                if ((param[0xC0] & GBA_JSTAT_RECV) != 0)
+                {
+                    retryLine = 0x292;
+                    goto retry_loop;
+                }
+                if (step == 0)
+                {
+                    command = 0x30000000;
+                    ret = GBAWrite(channel, reinterpret_cast<u8*>(&command), param + 0xC0);
+                }
+                else
+                {
+                    ret = GBAWrite(
+                        channel, reinterpret_cast<u8*>(self + channel * 0x60 + (step - 1) * 4 + 0x16AC),
+                        param + 0xC0);
+                }
+
+                if (ret == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK)
+                {
+                    step++;
+                    retryLine = 0x2BF;
+                    goto retry_loop;
+                }
+                Printf__7CSystemFPce(&System, "%s %d\n", "p_minigame.cpp", 0x2A1);
+            }
+            else
+            {
+                if ((param[0xC0] & GBA_JSTAT_SEND) == 0)
+                {
+                    retryLine = 0x2AA;
+                    goto retry_loop;
+                }
+                ret = GBARead(channel, param + contextRecvOffset + 0x28, param + 0xC0);
+                if (ret == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK)
+                {
+                    contextRecvOffset += 4;
+                    if (contextRecvOffset == 0x60)
+                    {
+                        param[0xC4] = 1;
+                        param[0xC7] = 0;
+                        param[0xC5] = 1;
+                        param[0xBF] = 0;
+                        goto receive_message;
+                    }
+                    retryLine = 0x2BF;
+                    goto retry_loop;
+                }
+                Printf__7CSystemFPce(&System, "%s %d\n", "p_minigame.cpp", 0x2B2);
+            }
+        }
+        else
+        {
+            Printf__7CSystemFPce(&System, "%s %d\n", "p_minigame.cpp", 0x27F);
+        }
+        goto comm_fail;
+    case 6:
+        ret = 1;
+        if (param[0xC4] != 0)
+        {
+            Printf__7CSystemFPce(&System, "isConnectedLine=%d,Line=%d\n", channel, 0x2C3);
+        }
+        param[0xC4] = 0;
+        *reinterpret_cast<int*>(param + 0x9C) = 1;
+        param[0xC3] = 0;
+        *reinterpret_cast<int*>(param + 0x98) = SIProbe(channel);
+        if (*reinterpret_cast<int*>(param + 0x98) != 0x80)
+        {
+            if (*reinterpret_cast<int*>(param + 0x98) == 0x40000)
+            {
+                *reinterpret_cast<int*>(param + 0x94) = 0x40000;
+                param[0xBF] = 0;
+            }
+            else
+            {
+                if (*reinterpret_cast<int*>(param + 0x98) != 8 && *reinterpret_cast<int*>(param + 0x98) != 0x40)
+                {
+                    *reinterpret_cast<int*>(param + 0x94) = *reinterpret_cast<int*>(param + 0x98);
+                }
+                param[0xBF] = 1;
+            }
+            goto receive_message;
+        }
+        retryLine = 0x2CB;
+        MiniGameThreadSleepTicks(DAT_800000f8 / 4000);
+        goto retry_loop;
+    case 7:
+        if (param[0xC4] != 0)
+        {
+            Printf__7CSystemFPce(&System, "isConnectedLine=%d,Line=%d\n", channel, 0x2DC);
+        }
+        param[0xC4] = 0;
+        *reinterpret_cast<int*>(param + 0x9C) = 1;
+        param[0xC3] = 0;
+
+        if (param[0xC7] < 2)
+        {
+            ret = GBAJoyBoot(channel, channel << 1, 2, *reinterpret_cast<u8**>(param + 0x8C),
+                             *reinterpret_cast<int*>(param + 0x90), param + 0xC0);
+            param[0xC7]++;
+        }
+        else
+        {
+            ret = 1;
+            for (int i = 0; i < 100; i++)
+            {
+                ret = GBAJoyBoot(channel, channel << 1, 2, *reinterpret_cast<u8**>(param + 0x8C),
+                                 *reinterpret_cast<int*>(param + 0x90), param + 0xC0);
+                if (ret == 0)
+                {
+                    break;
+                }
+            }
+        }
+
+        if (ret == 0)
+        {
+            GbaThreadInitGbaContext(reinterpret_cast<MgGbaThreadParam*>(param), 0);
+            message = 8;
+            startTime = OSGetTime();
+            retryLine = 0x2F7;
+            goto retry_loop;
+        }
+
+        MiniGameThreadSleepTicks((DAT_800000f8 / 4000) * 500);
+        if (ret == 3)
+        {
+            if ((param[0xC0] & (GBA_JSTAT_SEND | GBA_JSTAT_RECV)) == (GBA_JSTAT_SEND | GBA_JSTAT_RECV))
+            {
+                if ((param[0xC0] & GBA_JSTAT_FLAGS_MASK) != GBA_JSTAT_PSF0)
+                {
+                    GBARead(channel, param + 0x254, param + 0xC0);
+                }
+            }
+            else
+            {
+                int status = GBAGetStatus(channel, param + 0xC0);
+                if (status == 0 && param[0xC0] == 0x28)
+                {
+                    status = GBARead(channel, reinterpret_cast<u8*>(&identity), param + 0xC0);
+                    if (status == 0)
+                    {
+                        *reinterpret_cast<unsigned int*>(param + 0xA4) = identity;
+                        param[0xC3] = 1;
+                    }
+                }
+                if (status == 0 &&
+                    (memcmp(param + 0xA4, self + 0x1344, 4) == 0 || *reinterpret_cast<unsigned int*>(param + 0xA4) == 0x414D4752))
+                {
+                    if (memcmp(param + 0xA4, self + 0x1344, 4) == 0)
+                    {
+                        *reinterpret_cast<int*>(param + 0x9C) = 0;
+                    }
+
+                    status = GBAGetStatus(channel, param + 0xC0);
+                    if (status == 0 && param[0xC0] == 0x20)
+                    {
+                        status = GBAWrite(channel, self + 0x1344, param + 0xC0);
+                        if (status == 0 && GBAGetStatus(channel, param + 0xC0) == 0)
+                        {
+                            status = (param[0xC0] == 0x30) ? 0 : 1;
+                        }
+                    }
+                    else
+                    {
+                        status = 1;
+                    }
+
+                    if (status == 0)
+                    {
+                        command = 0x60000000;
+                        status = GBAWrite(channel, reinterpret_cast<u8*>(&command), param + 0xC0);
+                        if (status == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK)
+                        {
+                            bool failed = false;
+                            for (int i = 0; i < 0x60; i += 4)
+                            {
+                                int st = GBAGetStatus(channel, param + 0xC0);
+                                if (st != 0 || param[0xC0] != 0x38)
+                                {
+                                    failed = true;
+                                    break;
+                                }
+                                st = GBARead(channel, param + i + 0x28, param + 0xC0);
+                                if (st != 0 || (param[0xC0] & GBA_JSTAT_FLAGS_MASK) != GBA_JSTAT_FLAGS_MASK)
+                                {
+                                    failed = true;
+                                    break;
+                                }
+                            }
+                            if (!failed)
+                            {
+                                reinterpret_cast<void (*)(MgGbaThreadParam*, void*)>(*reinterpret_cast<void**>(param + 0x24))(
+                                    reinterpret_cast<MgGbaThreadParam*>(param), reinterpret_cast<void*>(param));
+                                goto receive_message;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        retryLine = 0x30F;
+        MiniGameThreadSleepTicks(DAT_800000f8 / 4000);
+        goto retry_loop;
+    case 8:
+        if (param[0xC4] != 0)
+        {
+            Printf__7CSystemFPce(&System, "isConnectedLine=%d,Line=%d\n", channel, 0x312);
+        }
+        param[0xC4] = 0;
+        *reinterpret_cast<int*>(param + 0x9C) = 1;
+        param[0xC3] = 0;
+        ret = GBAReset(channel, param + 0xC0);
+        if (ret == 0)
+        {
+            int status = GBAGetStatus(channel, param + 0xC0);
+            if (status == 0 && param[0xC0] == 0x28)
+            {
+                status = GBARead(channel, reinterpret_cast<u8*>(&identity), param + 0xC0);
+                if (status == 0)
+                {
+                    *reinterpret_cast<unsigned int*>(param + 0xA4) = identity;
+                    param[0xC3] = 1;
+                }
+            }
+            if (status == 0 &&
+                (memcmp(param + 0xA4, self + 0x1344, 4) == 0 || *reinterpret_cast<unsigned int*>(param + 0xA4) == 0x414D4752))
+            {
+                if (memcmp(param + 0xA4, self + 0x1344, 4) == 0)
+                {
+                    *reinterpret_cast<int*>(param + 0x9C) = 0;
+                }
+                status = GBAGetStatus(channel, param + 0xC0);
+                if (status == 0 && param[0xC0] == 0x20)
+                {
+                    status = GBAWrite(channel, self + 0x1344, param + 0xC0);
+                    if (status == 0 && GBAGetStatus(channel, param + 0xC0) == 0)
+                    {
+                        status = (param[0xC0] == 0x30) ? 0 : 1;
+                    }
+                }
+                else
+                {
+                    status = 1;
+                }
+
+                if (status == 0)
+                {
+                    command = 0x60000000;
+                    status = GBAWrite(channel, reinterpret_cast<u8*>(&command), param + 0xC0);
+                    if (status == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK)
+                    {
+                        bool failed = false;
+                        for (int i = 0; i < 0x60; i += 4)
+                        {
+                            int st = GBAGetStatus(channel, param + 0xC0);
+                            if (st != 0 || param[0xC0] != 0x38)
+                            {
+                                failed = true;
+                                break;
+                            }
+                            st = GBARead(channel, param + i + 0x28, param + 0xC0);
+                            if (st != 0 || (param[0xC0] & GBA_JSTAT_FLAGS_MASK) != GBA_JSTAT_FLAGS_MASK)
+                            {
+                                failed = true;
+                                break;
+                            }
+                        }
+                        if (!failed)
+                        {
+                            reinterpret_cast<void (*)(MgGbaThreadParam*, void*)>(*reinterpret_cast<void**>(param + 0x24))(
+                                reinterpret_cast<MgGbaThreadParam*>(param), reinterpret_cast<void*>(param));
+                            goto receive_message;
+                        }
+                    }
+                }
+            }
+            retryLine = 0x322;
+        }
+        else
+        {
+            retryLine = 0x31A;
+        }
+        MiniGameThreadSleepTicks(DAT_800000f8 / 4000);
+        goto retry_loop;
+    case 10:
+        if (step == 0)
+        {
+            if (param[0xC4] == 0)
+            {
+                param[0xBF] = 1;
+                goto receive_message;
+            }
+
+            ret = GBAGetStatus(channel, param + 0xC0);
+            if (ret == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_PSF0)
+            {
+                command = 0x10000000;
+                ret = GBAWrite(channel, reinterpret_cast<u8*>(&command), param + 0xC0);
+                if (ret != 0)
+                {
+                    Printf__7CSystemFPce(&System, "%s %d\n", "p_minigame.cpp", 0x33C);
+                    goto comm_fail;
+                }
+                startTime = OSGetTime();
+                retryLine = 0x341;
+                step = 1;
+                goto retry_loop;
+            }
+
+            MiniGameThreadSleepTicks(((DAT_800000f8 / 500000) * 100) >> 3);
+            retryLine = 0x333;
+            goto retry_loop;
+        }
+
+        if (step == 1)
+        {
+            ret = GBAGetStatus(channel, param + 0xC0);
+            if ((param[0xC0] & GBA_JSTAT_FLAGS_MASK) == GBA_JSTAT_FLAGS_MASK)
+            {
+                if ((param[0xC0] & (GBA_JSTAT_SEND | GBA_JSTAT_RECV)) == GBA_JSTAT_SEND)
+                {
+                    MiniGameThreadSleepTicks(((DAT_800000f8 / 500000) * 10) >> 3);
+                    ret = GBARead(channel, param + 0xA0, param + 0xC0);
+                    if (ret != 0 || ((*reinterpret_cast<unsigned int*>(param + 0xA0) >> 24) != 0x20))
+                    {
+                        Printf__7CSystemFPce(&System, "%s %d\n", "p_minigame.cpp", 0x372);
+                        goto comm_fail;
+                    }
+                    retryLine = 0x376;
+                    step = 2;
+                    goto retry_loop;
+                }
+                retryLine = 0x367;
+                goto retry_loop;
+            }
+
+            MiniGameThreadSleepTicks(((DAT_800000f8 / 500000) * 100) >> 3);
+            if (MiniGameThreadTimedOut(startTime, (DAT_800000f8 / 4000) * 200))
+            {
+                Printf__7CSystemFPce(&System, "GBA_JSTAT_FLAGS_MASK retry chan=%d\n", channel);
+                command = 0x10000000;
+                GBAWrite(channel, reinterpret_cast<u8*>(&command), param + 0xC0);
+                startTime = OSGetTime();
+                MiniGameThreadSleepTicks(((DAT_800000f8 / 500000) * 100) >> 3);
+            }
+            retryLine = 0x352;
+            goto retry_loop;
+        }
+
+        ret = GBAGetStatus(channel, param + 0xC0);
+        if (ret != 0 || (param[0xC0] & GBA_JSTAT_RECV) != 0)
+        {
+            retryLine = 0x37E;
+            goto retry_loop;
+        }
+
+        if (step == 7)
+        {
+            ret = GBAGetStatus(channel, param + 0xC0);
+            if (ret == 0 && (param[0xC0] & GBA_JSTAT_FLAGS_MASK) != GBA_JSTAT_FLAGS_MASK)
+            {
+                param[0xC2] = 1;
+                param[0xBF] = 0;
+                goto receive_message;
+            }
+            if (MiniGameThreadTimedOut(startTime, (DAT_800000f8 / 4000) * 200))
+            {
+                Printf__7CSystemFPce(&System, "GBA_JSTAT_PSF1 retry chan=%d\n", channel);
+                command = 0x70000000;
+                ret = GBAWrite(channel, reinterpret_cast<u8*>(&command), param + 0xC0);
+                if (ret != 0)
+                {
+                    Printf__7CSystemFPce(&System, "%s %d\n", "p_minigame.cpp", 0x397);
+                    goto comm_fail;
+                }
+                startTime = OSGetTime();
+                step = 2;
+            }
+            MiniGameThreadSleepTicks(((DAT_800000f8 / 500000) * 1000) >> 3);
+            retryLine = 0x39E;
+            goto retry_loop;
+        }
+
+        ret = GBAWrite(channel, param + (step - 2) * 4 + 0xA8, param + 0xC0);
+        MiniGameThreadSleepTicks(((DAT_800000f8 / 500000) * 100) >> 3);
+        if (ret == 0)
+        {
+            retryLine = 0x3B0;
+            step++;
+            goto retry_loop;
+        }
+        Printf__7CSystemFPce(&System, "%s %d\n", "p_minigame.cpp", 0x3AC);
+        goto comm_fail;
+    }
+
+comm_fail:
+    Printf__7CSystemFPce(&System, "ret=%d status=0x%02x step=%d contextRecvOffset=%d\n", ret,
+                         param[0xC0] & GBA_JSTAT_FLAGS_MASK, step, contextRecvOffset);
+    if (ret == 0)
+    {
+        ret = 3;
+    }
+    param[0xBF] = static_cast<unsigned char>(ret);
+    if (param[0xC4] != 0)
+    {
+        Printf__7CSystemFPce(&System, "isConnectedLine=%d,Line=%d\n", channel, 0x287);
+    }
+    param[0xC4] = 0;
+    goto receive_message;
 }
 
 /*

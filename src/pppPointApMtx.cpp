@@ -54,13 +54,12 @@ void pppPointApMtx(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal, _pppMngSt
 		}
 
 		objectData = (_pppPDataVal*)(*(u32*)((u8*)gPppMngSt + 0xD4) + (objectId << 4));
-		if (objectData != 0) {
+		if (objectData == 0) {
+			object = 0;
+		} else {
 			object = (_pppPObject*)pppCreatePObject(gPppMngSt, objectData);
-			goto object_ready;
 		}
-		object = 0;
 
-	object_ready:
 		*(void**)((u8*)object + 4) = pppPObject;
 
 		matrix = (Mtx*)((u8*)object + *(u32*)((u8*)pppPDataVal + 8) + 0x80);

@@ -2,6 +2,7 @@
 #include "ffcc/partMng.h"
 #include "ffcc/p_game.h"
 #include "ffcc/sound.h"
+#include <math.h>
 #include <string.h>
 
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
@@ -91,7 +92,7 @@ void CGPrgObj::onAttacked(CGPrgObj*)
  */
 void SAFE_CAST_WORK(CGObjWork*)
 {
-	// TODO
+	// TODO: unknown helper; keep as no-op until concrete usage is decompiled.
 }
 
 /*
@@ -248,7 +249,39 @@ void CGCharaObj::onCancelStat(int)
  */
 void CGCharaObj::onFramePostCalc()
 {
-	// TODO
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	void** script = m_scriptHandle;
+	if (script != 0) {
+		if (*reinterpret_cast<short*>(self + 0x42) != 0) {
+			int healTick = *reinterpret_cast<int*>(self + 0x6A0);
+			unsigned short tickDiv = *reinterpret_cast<unsigned short*>(Game.game.unk_flat3_field_8_0xc7dc + 0x3A);
+			if (healTick != 0 && tickDiv != 0 && (healTick % static_cast<int>(tickDiv)) == 0) {
+				playSe3D(0x19, 0x32, 0x96, 0, 0);
+				addHp(-1, 0);
+			}
+		}
+
+		for (int i = 0; i < 0x27; i++) {
+			short v = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(script) + 0x3E + (i * 2));
+			setSta(i, static_cast<int>(v) - 1);
+			if (i == 2 && v > 1) {
+				*reinterpret_cast<int*>(self + 0x6A0) += 1;
+			}
+		}
+
+		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(script) + 0x3E) == 0 &&
+			*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(script) + 0x14) == 0 &&
+			*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(script) + 0x11) == 0) {
+			m_displayFlags |= 2;
+		} else {
+			m_displayFlags &= ~2;
+			self[0x63C] &= 0x7F;
+		}
+	}
+
+	m_flags = static_cast<unsigned char>(m_flags + 1);
+
+	decIgnoreHit();
 }
 
 /*
@@ -262,7 +295,46 @@ void CGCharaObj::onFramePostCalc()
  */
 void CGCharaObj::onFramePreCalc()
 {
-	// TODO
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+
+	if (Game.game.unk_flat3_0xc7d0 != 0) {
+		PSVECSubtract(reinterpret_cast<Vec*>(Game.game.unk_flat3_0xc7d0 + 0x15C), &m_worldPosition,
+			reinterpret_cast<Vec*>(self + 0x5C0));
+		*reinterpret_cast<float*>(self + 0x5BC) = PSVECMag(reinterpret_cast<Vec*>(self + 0x5C0));
+	}
+
+	for (int i = 0; i < 4; i++) {
+		int partyObj = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&Game.game.m_partyObjArr[0]) + (i * 4));
+		float* dist = reinterpret_cast<float*>(self + 0x5D0 + (i * 4));
+		float* ang = reinterpret_cast<float*>(self + 0x610 + (i * 4));
+		int* rank = reinterpret_cast<int*>(self + 0x620 + (i * 4));
+		*rank = 0;
+		if (partyObj == 0) {
+			*dist = 0.0f;
+			*ang = 0.0f;
+		} else {
+			PSVECSubtract(reinterpret_cast<Vec*>(partyObj + 0x15C), &m_worldPosition,
+				reinterpret_cast<Vec*>(self + 0x5E0 + (i * 0xC)));
+			*dist = PSVECMag(reinterpret_cast<Vec*>(self + 0x5E0 + (i * 0xC)));
+		}
+	}
+
+	*reinterpret_cast<float*>(self + 0x690) = 1.0f;
+
+	unsigned int push = 0;
+	switch (m_lastStateId) {
+		case 1: case 2: case 4: case 6: case 7: case 8: case 9:
+		case 10: case 0xB: case 0xC: case 0xD: case 0xE: case 0xF:
+		case 0x12: case 0x13: case 0x16: case 0x17: case 0x19:
+		case 0x1B: case 0x22:
+			push = 0x19;
+			break;
+		default:
+			break;
+	}
+	m_pushParamB = static_cast<unsigned char>(push > 0x19 ? 0x19 : push);
+
+	*reinterpret_cast<unsigned short*>(self + 0x6A4) = m_lastBgGroup;
 }
 
 /*
@@ -276,7 +348,20 @@ void CGCharaObj::onFramePreCalc()
  */
 void CGCharaObj::onAlphaUpdate()
 {
-	// TODO
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	float alpha = *reinterpret_cast<float*>(self + 0x694);
+
+	if (m_scriptHandle != 0 && *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
+		alpha += sinf(static_cast<float>(m_flags) * 0.1f) * 0.05f;
+	}
+
+	if (alpha < 0.0f) {
+		alpha = 0.0f;
+	} else if (alpha > 1.0f) {
+		alpha = 1.0f;
+	}
+
+	*reinterpret_cast<float*>(self + 0x694) = alpha;
 }
 
 /*
@@ -328,7 +413,38 @@ void CGCharaObj::deletePSlotBit(int slotMask)
  */
 void CGCharaObj::onFrameStat()
 {
-	// TODO
+	switch (m_lastStateId) {
+		case 0:
+			break;
+		case 1:
+		case 3:
+		case 4:
+		case 5:
+		case 7:
+		case 8:
+		case 0xA:
+			statAttack();
+			break;
+		case 2:
+			statButtobi();
+			break;
+		case 6:
+			statDamage();
+			break;
+		case 9:
+			statDie();
+			break;
+		case 0xC:
+		case 0xD:
+			statMagic();
+			break;
+		case 0xE:
+			statShield();
+			break;
+		default:
+			statKizetsu();
+			break;
+	}
 }
 
 /*
@@ -369,7 +485,17 @@ void CGCharaObj::resetIgnoreHit()
  */
 void CGCharaObj::decIgnoreHit()
 {
-	// TODO
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	for (int i = 0; i < 4; i++) {
+		unsigned char* flag = self + 0x640 + (i * 8);
+		short* timer = reinterpret_cast<short*>(self + 0x642 + (i * 8));
+		if ((*flag & 0x80) != 0 && *timer != 0) {
+			*timer = static_cast<short>(*timer - 1);
+			if (*timer == 0) {
+				*flag &= 0x7F;
+			}
+		}
+	}
 }
 
 /*
@@ -404,7 +530,10 @@ void CGCharaObj::damageDelete()
  */
 void CGCharaObj::onHit(int, CGObject*, int, Vec*)
 {
-	// TODO
+	if ((m_displayFlags & 2) != 0) {
+		return;
+	}
+	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x660) = 1;
 }
 
 /*
@@ -482,7 +611,11 @@ int CGCharaObj::getReplaceStat(int state)
  */
 void CGCharaObj::putHitParticleFromItem(CGPrgObj*, int)
 {
-	// TODO
+	int item = 0;
+	int p0 = 0;
+	int p1 = 0;
+	getItemPdt(0, 0, item, p0, p1);
+	putParticleFromItem(item, p0, p1, &m_worldPosition);
 }
 
 /*
@@ -494,9 +627,19 @@ void CGCharaObj::putHitParticleFromItem(CGPrgObj*, int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGCharaObj::setSta(int, int)
+void CGCharaObj::setSta(int staIndex, int value)
 {
-	// TODO
+	if (m_scriptHandle == 0) {
+		return;
+	}
+	if (staIndex < 0 || staIndex >= 0x27) {
+		return;
+	}
+	if (value < 0) {
+		value = 0;
+	}
+	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E + (staIndex * 2)) =
+		static_cast<short>(value);
 }
 
 /*
@@ -508,9 +651,16 @@ void CGCharaObj::setSta(int, int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGCharaObj::effective(int, int, CGPrgObj*, int&)
+void CGCharaObj::effective(int staIndex, int amount, CGPrgObj*, int& outValue)
 {
-	// TODO
+	int regA = 0;
+	int regB = 0;
+	int regC = 0;
+	calcRegist(staIndex, amount, regA, regB, regC, 0);
+	outValue = amount - regA + regB - regC;
+	if (outValue < 0) {
+		outValue = 0;
+	}
 }
 
 /*
@@ -522,9 +672,11 @@ void CGCharaObj::effective(int, int, CGPrgObj*, int&)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGCharaObj::calcSta(int, int, CGObject*)
+void CGCharaObj::calcSta(int staIndex, int amount, CGObject* source)
 {
-	// TODO
+	int applied = 0;
+	effective(staIndex, amount, reinterpret_cast<CGPrgObj*>(source), applied);
+	setSta(staIndex, applied);
 }
 
 /*
@@ -536,9 +688,17 @@ void CGCharaObj::calcSta(int, int, CGObject*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGCharaObj::addHp(int, CGPrgObj*)
+void CGCharaObj::addHp(int delta, CGPrgObj*)
 {
-	// TODO
+	if (m_scriptHandle == 0) {
+		return;
+	}
+	short* hp = reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x42);
+	int next = static_cast<int>(*hp) + delta;
+	if (next < 0) {
+		next = 0;
+	}
+	*hp = static_cast<short>(next);
 }
 
 /*
@@ -550,9 +710,11 @@ void CGCharaObj::addHp(int, CGPrgObj*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGCharaObj::calcRegist(int, int, int&, int&, int&, int)
+void CGCharaObj::calcRegist(int, int amount, int& outA, int& outB, int& outC, int)
 {
-	// TODO
+	outA = amount > 0 ? (amount / 4) : 0;
+	outB = 0;
+	outC = 0;
 }
 
 /*
@@ -566,7 +728,8 @@ void CGCharaObj::calcRegist(int, int, int&, int&, int&, int)
  */
 void CGCharaObj::onDamage(CGPrgObj*, int, int, int, Vec*)
 {
-	// TODO
+	damageDelete();
+	changeStat(6, 0, 0);
 }
 
 /*
@@ -578,9 +741,11 @@ void CGCharaObj::onDamage(CGPrgObj*, int, int, int, Vec*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGCharaObj::getItemPdt(int, int, int&, int&, int&)
+void CGCharaObj::getItemPdt(int itemId, int level, int& outEffect, int& outArg0, int& outArg1)
 {
-	// TODO
+	outEffect = itemId;
+	outArg0 = level;
+	outArg1 = 0;
 }
 
 /*
@@ -592,9 +757,12 @@ void CGCharaObj::getItemPdt(int, int, int&, int&, int&)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGCharaObj::putParticleFromItem(int, int, int, Vec*)
+void CGCharaObj::putParticleFromItem(int effectId, int effectArg0, int effectArg1, Vec* pos)
 {
-	// TODO
+	if (pos == 0) {
+		pos = &m_worldPosition;
+	}
+	putParticle(effectId, effectArg0, pos, 1.0f, effectArg1);
 }
 
 /*
@@ -604,7 +772,7 @@ void CGCharaObj::putParticleFromItem(int, int, int, Vec*)
  */
 void CGCharaObj::statShield()
 {
-	// TODO
+	onStatShield();
 }
 
 /*
@@ -614,7 +782,7 @@ void CGCharaObj::statShield()
  */
 void la(CGObject*)
 {
-	// TODO
+	// TODO: helper unknown.
 }
 
 /*
@@ -628,7 +796,7 @@ void la(CGObject*)
  */
 void CGCharaObj::statAttack()
 {
-	// TODO
+	onStatAttack(0);
 }
 
 /*
@@ -638,7 +806,7 @@ void CGCharaObj::statAttack()
  */
 void CGCharaObj::statDie()
 {
-	// TODO
+	onStatDie();
 }
 
 /*
@@ -648,7 +816,7 @@ void CGCharaObj::statDie()
  */
 void CGCharaObj::statMagic()
 {
-	// TODO
+	onStatMagic();
 }
 
 /*
@@ -658,7 +826,8 @@ void CGCharaObj::statMagic()
  */
 void CGCharaObj::statKizetsu()
 {
-	// TODO
+	setSta(9, 1);
+	resetIgnoreHit();
 }
 
 /*
@@ -681,7 +850,7 @@ void CGCharaObj::onStatMagic()
  */
 void CGCharaObj::statDamage()
 {
-	// TODO
+	setSta(6, 1);
 }
 
 /*
@@ -691,7 +860,7 @@ void CGCharaObj::statDamage()
  */
 void CGCharaObj::statButtobi()
 {
-	// TODO
+	setSta(2, 1);
 }
 
 /*
@@ -722,7 +891,7 @@ void CGCharaObj::onChangePrg(int arg)
  */
 void CGCharaObj::calcCastTime(int)
 {
-	// TODO
+	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6A8) += 1;
 }
 
 /*
@@ -736,7 +905,7 @@ void CGCharaObj::calcCastTime(int)
  */
 void CGCharaObj::onDrawDebug(CFont*, float, float&, float)
 {
-	// TODO
+	// Decomp placeholder: debug text is currently omitted in this unit.
 }
 
 /*
@@ -746,7 +915,7 @@ void CGCharaObj::onDrawDebug(CFont*, float, float&, float)
  */
 void CGCharaObj::addSe(int)
 {
-	// TODO
+	playSe3D(0, 0x7F, 0x40, 0, &m_worldPosition);
 }
 
 /*
@@ -756,7 +925,7 @@ void CGCharaObj::addSe(int)
  */
 void CGCharaObj::seDamageDelete()
 {
-	// TODO
+	Sound.StopSe3DGroup(static_cast<short>(m_ownerType));
 }
 
 /*
@@ -770,7 +939,8 @@ void CGCharaObj::seDamageDelete()
  */
 void CGCharaObj::StaticFrame()
 {
-	// TODO
+	onAlphaUpdate();
+	onFramePreCalc();
 }
 
 /*
@@ -784,7 +954,9 @@ void CGCharaObj::StaticFrame()
  */
 void CGCharaObj::combi2()
 {
-	// TODO
+	CGPartyObj* party = 0;
+	int count = 0;
+	searchCombi(0, &party, count);
 }
 
 /*
@@ -843,7 +1015,7 @@ void CGCharaObj::sendCombiToScript(CGCharaObj* target, int scriptArg, int)
  */
 void CGCharaObj::scCheckItem(CCombi2Set*, CGCharaObj*, int)
 {
-	// TODO
+	// Decomp placeholder: combi item checks are not yet reconstructed.
 }
 
 /*
@@ -853,7 +1025,7 @@ void CGCharaObj::scCheckItem(CCombi2Set*, CGCharaObj*, int)
  */
 void CGCharaObj::scCheckTime(CCombi2Set*, CGCharaObj*, CGCharaObj*, int)
 {
-	// TODO
+	// Decomp placeholder: combi timing checks are not yet reconstructed.
 }
 
 /*
@@ -865,9 +1037,19 @@ void CGCharaObj::scCheckTime(CCombi2Set*, CGCharaObj*, CGCharaObj*, int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGCharaObj::searchCombi(int, CGPartyObj **, int&)
+void CGCharaObj::searchCombi(int, CGPartyObj** outParty, int& outCount)
 {
-	// TODO
+	outCount = 0;
+	*outParty = 0;
+	for (int i = 0; i < 4; i++) {
+		CGPartyObj* party = Game.game.GetPartyObj(i);
+		if (party != 0) {
+			if (*outParty == 0) {
+				*outParty = party;
+			}
+			outCount++;
+		}
+	}
 }
 
 /*

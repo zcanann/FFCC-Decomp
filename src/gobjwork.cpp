@@ -518,12 +518,29 @@ int CCaravanWork::CanAddComList(int count)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a200c
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::AddComList(int, int*)
+int CCaravanWork::AddComList(int itemSlot, int* cmdListSlotOut)
 {
-	// TODO
+	if (m_numCmdListSlots > 2) {
+		for (int i = 2; i < (short)m_numCmdListSlots; i++) {
+			if ((short)m_commandListInventorySlotRef[i] == -1) {
+				m_commandListInventorySlotRef[i] = (unsigned short)itemSlot;
+				Joybus.SetCmdLst(m_joybusCaravanId, i, itemSlot);
+				if (cmdListSlotOut != 0) {
+					*cmdListSlotOut = i;
+				}
+				return 1;
+			}
+		}
+	}
+
+	return 0;
 }
 
 /*
@@ -1879,12 +1896,44 @@ void CCaravanWork::GetNumCombi(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009f2a4
+ * PAL Size: 224b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::GetNextCmdListIdx(int, int)
+int CCaravanWork::GetNextCmdListIdx(int cmdListIdx, int step)
 {
-	// TODO
+	while (true) {
+		int prevIdx = cmdListIdx;
+		cmdListIdx = prevIdx + step;
+
+		if (cmdListIdx < 0) {
+			cmdListIdx += (short)m_numCmdListSlots;
+		} else if (cmdListIdx > (short)m_numCmdListSlots - 1) {
+			cmdListIdx -= (short)m_numCmdListSlots;
+		}
+
+		if (Game.game.m_gameWork.m_menuStageMode != 0) {
+			if (*(short*)(m_commandListExtra + cmdListIdx * 2) == -1) {
+				continue;
+			}
+
+			if (step == -1) {
+				if (*(short*)(m_commandListExtra + cmdListIdx * 2) == -1) {
+					if (*(short*)(m_commandListExtra + prevIdx * 2) > 0) {
+						continue;
+					}
+				}
+			}
+		}
+
+		int item = DelCmdListAndItem(cmdListIdx, 0);
+		if ((cmdListIdx < 2) || (item > 0)) {
+			return cmdListIdx;
+		}
+	}
 }
 
 /*

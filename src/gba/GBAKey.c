@@ -114,9 +114,11 @@ void __GBAX02(s32 chan, u8* readbuf) {
     gba->task.iram_addr = 0x21cb78;
     gba->task.dram_addr = 0x380;
     gba->task.dram_length = 0;
-    gba->task.dram_mmem_addr = (u16*)0x10;
-    gba->task.res_cb = F232;
+    gba->task.dsp_init_vector = 0x10;
+    gba->task.init_cb = F232;
+    gba->task.res_cb = 0;
     gba->task.done_cb = (DSPCallback)F252;
+    gba->task.req_cb = 0;
     
     DSPAddTask(&gba->task);
 }

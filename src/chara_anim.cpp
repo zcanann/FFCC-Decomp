@@ -21,7 +21,7 @@ extern "C" int TryReleaseAnimBank__9CCharaPcsFi(void*, int);
 
 extern "C" unsigned char Chara[];
 extern unsigned char CharaPcs[];
-extern "C" void* PTR_PTR_s_CChara_CAnim_80210534;
+extern "C" char lbl_80210534[];
 extern "C" char s_chara_anim_cpp_801da980[];
 extern "C" char DAT_801da990[];
 
@@ -132,7 +132,7 @@ CChara::CAnim::CAnim()
 	unsigned char* const p = (unsigned char*)this;
 
 	__ct__4CRefFv(this);
-	*(void**)p = &PTR_PTR_s_CChara_CAnim_80210534;
+	*(void**)p = lbl_80210534;
 	*(unsigned short*)(p + 0xE) = 0;
 	*(int*)(p + 0x14) = 0;
 	*(void**)(p + 0x20) = 0;
@@ -164,7 +164,7 @@ CChara::CAnim::~CAnim()
 	void* nodeArray;
 	void* bank;
 
-	*(void**)p = &PTR_PTR_s_CChara_CAnim_80210534;
+	*(void**)p = lbl_80210534;
 
 	nodeArray = *(void**)(p + 0x14);
 	if (nodeArray != 0) {
@@ -342,8 +342,7 @@ CChara::CAnimNode::CAnimNode()
 {
 	unsigned char* const p = (unsigned char*)this;
 	p[0x14] = (unsigned char)(p[0x14] & 0x7F);
-	const unsigned int flags = *(unsigned int*)(p + 0x14);
-	*(unsigned int*)(p + 0x14) = (((flags >> 0xD) & 0x3FFFFU) | 0U) << 0xD | (flags & 0x80001FFFU);
+	*(unsigned int*)(p + 0x14) = *(unsigned int*)(p + 0x14) & 0x80001FFFU;
 }
 
 /*

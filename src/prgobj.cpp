@@ -487,16 +487,16 @@ void CGPrgObj::rotTarget(CGPrgObj* target)
 void CGPrgObj::dstTargetRot(CGPrgObj* target)
 {
 	float targetRot;
+	Vec* basePosVec;
 	CVector targetPos(target->m_worldPosition);
 	CVector basePos(m_worldPosition);
-	CVector deltaPos;
+	Vec deltaPos;
 
-	PSVECSubtract(reinterpret_cast<Vec*>(&basePos), reinterpret_cast<Vec*>(&targetPos), reinterpret_cast<Vec*>(&deltaPos));
+	basePosVec = reinterpret_cast<Vec*>(&basePos);
+	PSVECSubtract(basePosVec, reinterpret_cast<Vec*>(&targetPos), &deltaPos);
 	targetRot = 0.0f;
-	if ((double)0.0f != (double)deltaPos.x) {
-		if ((double)0.0f != (double)deltaPos.z) {
-			targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
-		}
+	if (((double)0.0f != (double)deltaPos.x) && ((double)0.0f != (double)deltaPos.z)) {
+		targetRot = (float)atan2(-(double)deltaPos.x, -(double)deltaPos.z);
 	}
 
 	Math.DstRot(m_rotBaseY, 3.1415927f + targetRot);

@@ -140,6 +140,9 @@ void CMenuPcs::createWorld()
 void CMenuPcs::ChkNumItemAll()
 {
 	ChkMcDataCnt();
+	const int mcCount = DAT_8032ee28;
+	ChkSelectParty();
+	DAT_8032ee28 += mcCount;
 }
 
 /*
@@ -172,6 +175,11 @@ void CMenuPcs::loadData()
  */
 void CMenuPcs::InitFrameInfo()
 {
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const frame = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x820)[0]);
+	if (frame != 0) {
+		memset(frame, 0, 0x3C);
+	}
 	InitFrame0Info();
 }
 
@@ -259,6 +267,13 @@ void CMenuPcs::InitCharaSelectInfo()
 	unsigned char* const selectData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x828)[0]);
 	if (selectData != 0) {
 		memset(selectData, 0, 0x40);
+		for (int i = 0; i < 4; i++) {
+			unsigned char* const entry = selectData + i * 0x10;
+			*reinterpret_cast<short*>(entry + 4) = static_cast<short>(i);
+			entry[0xA] = 0;
+			entry[0xB] = 0;
+			entry[0xC] = 0;
+		}
 	}
 }
 
@@ -276,6 +291,7 @@ void CMenuPcs::InitCSelCurPos()
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	bytes[0x16] = 0;
 	bytes[0x17] = 0;
+	*reinterpret_cast<short*>(bytes + 0x1A) = 0;
 }
 
 /*
@@ -510,6 +526,9 @@ void CMenuPcs::CalcCMakeMenu()
 	CalcCharaSelect();
 	CalcWMFrame();
 	CalcFukidashi();
+	if (static_cast<signed char>(reinterpret_cast<unsigned char*>(this)[0x17]) != 0) {
+		CalcMainMenuSub();
+	}
 }
 
 /*
@@ -526,6 +545,7 @@ void CMenuPcs::CalcMoveMenu()
 	CalcMainMenuSub();
 	CalcWMFrame();
 	CalcFukidashi();
+	CalcCharaBase();
 }
 
 /*
@@ -619,6 +639,8 @@ void CMenuPcs::CalcGoOutSelCharInit()
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	bytes[0x16] = 0;
 	bytes[0x17] = 0;
+	bytes[0xE] = 0;
+	bytes[0xF] = 0;
 }
 
 /*
@@ -1103,8 +1125,11 @@ void CMenuPcs::DrawObj(int kind)
 {
 	if (kind == 0) {
 		DrawChara();
-	} else {
+	} else if (kind == 1) {
 		DrawMcObj();
+	} else {
+		DrawWMFrame();
+		DrawFukidashi();
 	}
 }
 
@@ -1165,7 +1190,16 @@ void CMenuPcs::ChkPlaceLength(char* text)
 		DAT_8032ee28 = 0;
 		return;
 	}
-	DAT_8032ee28 = static_cast<int>(strlen(text));
+
+	int len = static_cast<int>(strlen(text));
+	while (len > 0) {
+		const char c = text[len - 1];
+		if (c != ' ' && c != '\t' && c != '\n' && c != '\r') {
+			break;
+		}
+		len--;
+	}
+	DAT_8032ee28 = len;
 }
 
 /*
@@ -1196,7 +1230,11 @@ void CMenuPcs::SplitPlace(const char* text, char* left, char* right)
 	const int len = static_cast<int>(sep - text);
 	strncpy(left, text, len);
 	left[len] = '\0';
-	strcpy(right, sep + 1);
+	const char* rhs = sep + 1;
+	while (*rhs == ' ' || *rhs == '\t') {
+		rhs++;
+	}
+	strcpy(right, rhs);
 }
 
 /*
@@ -1211,6 +1249,20 @@ void CMenuPcs::SplitPlace(const char* text, char* left, char* right)
 void CMenuPcs::SplitPlace2(const char* text, char* left, char* right, CFont*, int)
 {
 	SplitPlace(text, left, right);
+	if (left != 0) {
+		for (char* p = left; *p != '\0'; p++) {
+			if (*p == '\t') {
+				*p = ' ';
+			}
+		}
+	}
+	if (right != 0) {
+		for (char* p = right; *p != '\0'; p++) {
+			if (*p == '\t') {
+				*p = ' ';
+			}
+		}
+	}
 }
 
 /*
@@ -1325,6 +1377,7 @@ void CMenuPcs::DrawMainMenuBase(float)
 	DrawWMFrame();
 	DrawMainMenuSub();
 	DrawPageMark();
+	DrawHelpBase(0, 1.0f);
 }
 
 /*
@@ -1340,6 +1393,9 @@ void CMenuPcs::CalcCharaBase()
 {
 	ChkSelectParty();
 	PCAnimCtrl();
+	if (DAT_8032ee28 == 0) {
+		GetAnimNo(0, 0);
+	}
 }
 
 /*
@@ -1396,6 +1452,9 @@ void CMenuPcs::PCAnimCtrl()
  */
 void CMenuPcs::GetAnimNo(int animNo, int)
 {
+	if (animNo < 0) {
+		animNo = 0;
+	}
 	DAT_8032ee28 = animNo;
 }
 
@@ -1484,6 +1543,8 @@ void CMenuPcs::WMSubMenuInit()
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	bytes[0x14] = 0;
 	bytes[0x15] = 0;
+	bytes[0x16] = 0;
+	bytes[0x17] = 0;
 }
 
 /*
@@ -1515,6 +1576,9 @@ void CMenuPcs::SetParty()
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	bytes[0x10] = 1;
 	ChkSelectParty();
+	if (DAT_8032ee28 == 0) {
+		bytes[0x10] = 0;
+	}
 }
 
 /*
@@ -1597,7 +1661,14 @@ void CMenuPcs::ChgAllModel2()
  */
 void CMenuPcs::SetMakeChara(int slot)
 {
+	if (slot < 0) {
+		slot = 0;
+	}
+	if (slot > 3) {
+		slot = 3;
+	}
 	SetMenuCharaAnim(slot, 0);
+	reinterpret_cast<unsigned char*>(this)[0x16] = static_cast<unsigned char>(slot);
 	ChkSelectParty();
 }
 
@@ -1710,6 +1781,7 @@ void CMenuPcs::ChkSelectParty()
 	}
 
 	DAT_8032ee28 = selected;
+	reinterpret_cast<unsigned char*>(this)[0x10] = static_cast<unsigned char>(selected != 0);
 }
 
 /*
@@ -1778,7 +1850,7 @@ void CMenuPcs::ChkMcDataCnt()
 
 	for (int i = 0; i < kMcListCount; i++) {
 		unsigned char* const entry = list + i * kMcListEntrySize;
-		if (entry[0x41] != 0 && entry[0x42] == 0) {
+		if (entry[0x43] == 0 && entry[0x41] != 0 && entry[0x42] == 0) {
 			count++;
 		}
 	}
@@ -1811,6 +1883,7 @@ void CMenuPcs::DrawMCList()
  */
 void CMenuPcs::DrawHelpBase(int, float)
 {
+	DrawWMFrame();
 	DrawPageMark();
 }
 
@@ -1839,6 +1912,8 @@ void CMenuPcs::CalcMcObj()
  */
 void CMenuPcs::DrawMcObj()
 {
+	DrawMCList();
+	DrawMcWin(0, 0);
 	DrawPageMark();
 }
 
@@ -1858,7 +1933,9 @@ void CMenuPcs::SetMcList(int index, McListInfo* info)
 	if (list == 0 || info == 0 || index < 0 || index >= kMcListCount) {
 		return;
 	}
-	memcpy(list + index * kMcListEntrySize, info, kMcListEntrySize);
+	unsigned char* const dst = list + index * kMcListEntrySize;
+	memcpy(dst, info, kMcListEntrySize);
+	dst[0x43] = 0;
 }
 
 /*
@@ -1896,6 +1973,7 @@ void CMenuPcs::ClrMcList()
 	DAT_8032ee24 = 0xFF;
 	uRam8032ee25 = 0xFF;
 	DAT_8032ee28 = 0;
+	DAT_8032ee2c = 0;
 }
 
 /*
@@ -1940,9 +2018,13 @@ void CMenuPcs::DrawPageMark()
 	int x;
 	int y;
 	GetMcAccessPos(&x, &y);
-	DrawCursor(x, y, 1.0f);
+	if (x >= 0 && x < 0x280 && y >= 0 && y < 0x1C0) {
+		DrawCursor(x, y, 1.0f);
+	}
 	GetMcOdekakePos(&x, &y);
-	DrawCursor(x, y, 1.0f);
+	if (x >= 0 && x < 0x280 && y >= 0 && y < 0x1C0) {
+		DrawCursor(x, y, 1.0f);
+	}
 }
 
 /*
@@ -2169,6 +2251,12 @@ void CMenuPcs::GetWinSize(int, short* w, short* h, int)
 void CMenuPcs::SetTextureLoc(int index)
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	if (index < 0) {
+		index = 0;
+	}
+	if (index > 0xFF) {
+		index = 0xFF;
+	}
 	bytes[0x86E] = static_cast<unsigned char>(index);
 	DAT_8032ee28 = index;
 }
@@ -2358,6 +2446,17 @@ void CMenuPcs::IsAsyncCharaLoadFinish()
 			break;
 		}
 	}
+	if (ready != 0) {
+		const unsigned char* const selectData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x828)[0]);
+		if (selectData != 0) {
+			for (int i = 0; i < 4; i++) {
+				if (selectData[i * 0x10 + 0xB] != 0 && selectData[i * 0x10 + 0xC] == 0) {
+					ready = 0;
+					break;
+				}
+			}
+		}
+	}
 	DAT_8032ee28 = ready;
 }
 /*
@@ -2513,6 +2612,9 @@ void McCtrl::SetListDat(int slot, int)
 void McCtrl::SetBrokenFile(int isBroken)
 {
 	m_createFlag = isBroken;
+	if (isBroken != 0) {
+		m_lastResult = -1;
+	}
 }
 
 /*
@@ -3156,6 +3258,17 @@ void McCtrl::SaveDataBuffer(char* buffer)
 void McCtrl::ChkParty(char*)
 {
 	m_lastResult = 0;
+	if (m_userBuffer == 0) {
+		return;
+	}
+
+	unsigned char* const save = reinterpret_cast<unsigned char*>(m_userBuffer);
+	for (int i = 0; i < 4; i++) {
+		const int party = *reinterpret_cast<int*>(save + 0x30 + i * 4);
+		if (party >= 0 && party < 8 && *reinterpret_cast<int*>(save + party * 0x9C0 + 0x1A84) != 0 && save[party * 0x9C0 + 0x1D90] == 0) {
+			m_lastResult++;
+		}
+	}
 }
 
 /*

@@ -227,12 +227,24 @@ void CMenuPcs::SetCrystalCageAttr()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80179e28
+ * PAL Size: 116b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::SetManaWaterEffect()
 {
-	// TODO
+	unsigned char* const self = reinterpret_cast<unsigned char*>(this);
+	int partNo = *reinterpret_cast<int*>(*reinterpret_cast<int*>(self + 0x840) + 0x19B8);
+
+	if (partNo != -1) {
+		pppDeletePart__8CPartMngFi(PartMng, partNo);
+	}
+
+	BindEffect__8CMenuPcsFiii(this, 5, Game.game.m_gameWork.m_timerA + 0x13, -1);
+	*reinterpret_cast<int*>(self + 0x70) = Game.game.m_gameWork.m_timerA;
 }
 
 /*

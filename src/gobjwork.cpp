@@ -1,5 +1,6 @@
 #include "ffcc/gobjwork.h"
 #include "ffcc/gbaque.h"
+#include "ffcc/joybus.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/p_game.h"
 #include "ffcc/system.h"
@@ -517,12 +518,29 @@ int CCaravanWork::CanAddComList(int count)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a200c
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::AddComList(int, int*)
+int CCaravanWork::AddComList(int itemSlot, int* cmdListSlotOut)
 {
-	// TODO
+	if (m_numCmdListSlots > 2) {
+		for (int i = 2; i < (short)m_numCmdListSlots; i++) {
+			if ((short)m_commandListInventorySlotRef[i] == -1) {
+				m_commandListInventorySlotRef[i] = (unsigned short)itemSlot;
+				Joybus.SetCmdLst(m_joybusCaravanId, i, itemSlot);
+				if (cmdListSlotOut != 0) {
+					*cmdListSlotOut = i;
+				}
+				return 1;
+			}
+		}
+	}
+
+	return 0;
 }
 
 /*
@@ -537,12 +555,30 @@ void CCaravanWork::DeleteCmdList(int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a1f08
+ * PAL Size: 180b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::AddItem(int, int*)
+int CCaravanWork::AddItem(int itemId, int* itemSlotOut)
 {
-	// TODO
+	if ((unsigned short)m_inventoryItemCount < 0x40) {
+		for (int i = 0; i < 0x40; i++) {
+			if (m_inventoryItems[i] == 0xFFFF) {
+				m_inventoryItems[i] = (unsigned short)itemId;
+				m_inventoryItemCount++;
+				Joybus.SetItem(m_joybusCaravanId, i, itemId);
+				if (itemSlotOut != 0) {
+					*itemSlotOut = i;
+				}
+				return 1;
+			}
+		}
+	}
+
+	return 0;
 }
 
 /*
@@ -1858,12 +1894,44 @@ void CCaravanWork::GetNumCombi(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009f2a4
+ * PAL Size: 224b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::GetNextCmdListIdx(int, int)
+int CCaravanWork::GetNextCmdListIdx(int cmdListIdx, int step)
 {
-	// TODO
+	while (true) {
+		int prevIdx = cmdListIdx;
+		cmdListIdx = prevIdx + step;
+
+		if (cmdListIdx < 0) {
+			cmdListIdx += (short)m_numCmdListSlots;
+		} else if (cmdListIdx > (short)m_numCmdListSlots - 1) {
+			cmdListIdx -= (short)m_numCmdListSlots;
+		}
+
+		if (Game.game.m_gameWork.m_menuStageMode != 0) {
+			if (*(short*)(m_commandListExtra + cmdListIdx * 2) == -1) {
+				continue;
+			}
+
+			if (step == -1) {
+				if (*(short*)(m_commandListExtra + cmdListIdx * 2) == -1) {
+					if (*(short*)(m_commandListExtra + prevIdx * 2) > 0) {
+						continue;
+					}
+				}
+			}
+		}
+
+		int item = DelCmdListAndItem(cmdListIdx, 0);
+		if ((cmdListIdx < 2) || (item > 0)) {
+			return cmdListIdx;
+		}
+	}
 }
 
 /*

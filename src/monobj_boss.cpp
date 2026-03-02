@@ -9,6 +9,13 @@
 extern CMath Math;
 extern "C" int Rand__5CMathFUl(CMath*, unsigned long);
 extern "C" void setAttackAfter__8CGMonObjFi(CGMonObj*, int);
+extern "C" void setActionParam__8CGMonObjFi(CGMonObj*, int);
+extern "C" void logicFuncDefault__8CGMonObjFv(CGMonObj*);
+extern "C" void initFinishedFuncDefault__8CGMonObjFv(CGMonObj*);
+extern "C" int calcBranchFuncDefault__8CGMonObjFi(CGMonObj*, int);
+extern "C" void aiTargetAttackRomMon__8CGMonObjFi(CGMonObj*, int);
+extern "C" void aiTarget__8CGMonObjFv(CGMonObj*);
+extern "C" void _aiSeq__8CGMonObjFiiiiii(CGMonObj*, int, int, int, int, int, int);
 extern "C" void reqAnim__8CGPrgObjFiii(void*, int, int, int);
 extern "C" void putParticle__8CGPrgObjFiiP8CGObjectfi(void*, int, int, void*, float, int);
 extern "C" void playSe3D__8CGPrgObjFiiiiP3Vec(void*, int, int, int, int, Vec*);
@@ -30,6 +37,15 @@ extern float FLOAT_80331d20;
 extern float FLOAT_80331dd4;
 extern float FLOAT_80331d24;
 extern float FLOAT_80331d2c;
+extern float FLOAT_80331d30;
+extern float FLOAT_80331d84;
+extern float FLOAT_80331d90;
+extern float FLOAT_80331d94;
+extern float FLOAT_80331d98;
+extern float FLOAT_80331d9c;
+extern float FLOAT_80331dac;
+extern float FLOAT_80331db0;
+extern float FLOAT_80331db4;
 extern float FLOAT_80331dd8;
 extern float FLOAT_80331d60;
 extern float FLOAT_80331db8;
@@ -52,74 +68,47 @@ extern char SoundBuffer[];
  */
 void CGMonObj::damagedFuncGiantCrab()
 {
-	#if 0
-	// Function: damagedFuncGiantCrab__8CGMonObjFv
-	// Entry: 80132f68
-	// Size: 404 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void damagedFuncGiantCrab__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  int iVar1;
-	  CRef *pCVar2;
-	  void **ppvVar3;
-	  
-	  SoundBuffer._1260_4_ = 1;
-	  iVar1 = gMonObj->_bossBranchRelated;
-	  if (iVar1 == 1) {
-	    ppvVar3 = (gMonObj->gObject).m_scriptHandle;
-	    if (*(ushort *)((int)ppvVar3 + 0x1a) / 3 <= (uint)*(ushort *)(ppvVar3 + 7)) {
-	      SoundBuffer._1260_4_ = 1;
-	      return;
-	    }
-	    DispCharaParts__8CGObjectFi(&gMonObj->gObject,1);
-	    pCVar2 = ((gMonObj->gObject).m_charaModelHandle)->m_pdtLoadRef;
-	    if (pCVar2 == (CRef *)0x0) {
-	      iVar1 = -1;
-	    }
-	    else {
-	      iVar1 = pCVar2[2].refCount;
-	    }
-	    putParticle__8CGPrgObjFiiP8CGObjectfi
-	              ((double)FLOAT_80331d18,(CGPrgObj *)gMonObj,iVar1 << 8 | 0xd,0,&gMonObj->gObject,0);
-	    playSe3D__8CGPrgObjFiiiiP3Vec((CGPrgObj *)gMonObj,0x4e37,0x32,500,0,0);
-	  }
-	  else {
-	    if (0 < iVar1) {
-	      SoundBuffer._1260_4_ = 1;
-	      return;
-	    }
-	    if (iVar1 < 0) {
-	      SoundBuffer._1260_4_ = 1;
-	      return;
-	    }
-	    ppvVar3 = (gMonObj->gObject).m_scriptHandle;
-	    if (((uint)*(ushort *)((int)ppvVar3 + 0x1a) << 1) / 3 <= (uint)*(ushort *)(ppvVar3 + 7)) {
-	      SoundBuffer._1260_4_ = 1;
-	      return;
-	    }
-	    DispCharaParts__8CGObjectFi(&gMonObj->gObject,3);
-	    pCVar2 = ((gMonObj->gObject).m_charaModelHandle)->m_pdtLoadRef;
-	    if (pCVar2 == (CRef *)0x0) {
-	      iVar1 = -1;
-	    }
-	    else {
-	      iVar1 = pCVar2[2].refCount;
-	    }
-	    putParticle__8CGPrgObjFiiP8CGObjectfi
-	              ((double)FLOAT_80331d18,(CGPrgObj *)gMonObj,iVar1 << 8 | 0xc,0,&gMonObj->gObject,0);
-	    playSe3D__8CGPrgObjFiiiiP3Vec((CGPrgObj *)gMonObj,0x4e36,0x32,500,0,0);
-	  }
-	  changeStat__8CGPrgObjFiii((CGPrgObj *)gMonObj,4,0,0);
-	  gMonObj->_bossBranchRelated = gMonObj->_bossBranchRelated + 1;
-	  *(undefined4 *)&gMonObj->field_0x6c8 = 0;
-	  return;
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	*reinterpret_cast<int*>(SoundBuffer + 1260) = 1;
+
+	const int branch = *reinterpret_cast<int*>(mon + 0x6B4);
+	unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
+	if (script == 0) {
+		return;
 	}
-	
-	#endif
-	(void)0;
+
+	if (branch == 1) {
+		if ((script[0x1A / 2] / 3) <= script[7]) {
+			return;
+		}
+		object->DispCharaParts(1);
+		int pdtNo = -1;
+		if (object->m_charaModelHandle != 0 && object->m_charaModelHandle->m_pdtLoadRef != 0) {
+			pdtNo = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(object->m_charaModelHandle->m_pdtLoadRef) + 0x14);
+		}
+		putParticle__8CGPrgObjFiiP8CGObjectfi(prgObj, (pdtNo << 8) | 0x0D, 0, object, FLOAT_80331d18, 0);
+		playSe3D__8CGPrgObjFiiiiP3Vec(prgObj, 0x4E37, 0x32, 500, 0, 0);
+	} else {
+		if (branch != 0) {
+			return;
+		}
+		if (((script[0x1A / 2] * 2) / 3) <= script[7]) {
+			return;
+		}
+		object->DispCharaParts(3);
+		int pdtNo = -1;
+		if (object->m_charaModelHandle != 0 && object->m_charaModelHandle->m_pdtLoadRef != 0) {
+			pdtNo = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(object->m_charaModelHandle->m_pdtLoadRef) + 0x14);
+		}
+		putParticle__8CGPrgObjFiiP8CGObjectfi(prgObj, (pdtNo << 8) | 0x0C, 0, object, FLOAT_80331d18, 0);
+		playSe3D__8CGPrgObjFiiiiP3Vec(prgObj, 0x4E36, 0x32, 500, 0, 0);
+	}
+
+	changeStat__8CGPrgObjFiii(prgObj, 4, 0, 0);
+	*reinterpret_cast<int*>(mon + 0x6B4) = branch + 1;
+	*reinterpret_cast<int*>(mon + 0x6C8) = 0;
 }
 
 /*
@@ -133,39 +122,24 @@ void CGMonObj::damagedFuncGiantCrab()
  */
 void CGMonObj::logicFuncGiantCrab()
 {
-	#if 0
-	// Function: logicFuncGiantCrab__8CGMonObjFv
-	// Entry: 80132e80
-	// Size: 232 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void logicFuncGiantCrab__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  int iVar1;
-	  uint uVar2;
-	  int iVar3;
-	  
-	  iVar3 = -1;
-	  if ((SoundBuffer._1260_4_ != 0) &&
-	     ((((SoundBuffer._1260_4_ = 0, gMonObj->_bossBranchRelated == 0 &&
-	        (iVar1 = Rand__5CMathFUl(&Math,10), iVar1 == 0)) ||
-	       ((gMonObj->_bossBranchRelated == 1 && (uVar2 = Rand__5CMathFUl(&Math,10), uVar2 < 2)))) ||
-	      ((gMonObj->_bossBranchRelated == 2 && (uVar2 = Rand__5CMathFUl(&Math,10), uVar2 < 3)))))) {
-	    iVar3 = 100;
-	  }
-	  if (iVar3 == -1) {
-	    logicFuncDefault__8CGMonObjFv(gMonObj);
-	  }
-	  else {
-	    changeStat__8CGPrgObjFiii((CGPrgObj *)gMonObj,iVar3,0,0);
-	  }
-	  return;
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	int nextState = -1;
+
+	if (*reinterpret_cast<int*>(SoundBuffer + 1260) != 0) {
+		*reinterpret_cast<int*>(SoundBuffer + 1260) = 0;
+		const int branch = *reinterpret_cast<int*>(mon + 0x6B4);
+		const unsigned int roll = Rand__5CMathFUl(&Math, 10);
+		if ((branch == 0 && roll == 0) || (branch == 1 && roll < 2) || (branch == 2 && roll < 3)) {
+			nextState = 100;
+		}
 	}
-	
-	#endif
-	(void)0;
+
+	if (nextState == -1) {
+		logicFuncDefault__8CGMonObjFv(this);
+	} else {
+		changeStat__8CGPrgObjFiii(prgObj, nextState, 0, 0);
+	}
 }
 
 /*
@@ -179,21 +153,8 @@ void CGMonObj::logicFuncGiantCrab()
  */
 void CGMonObj::calcBranchFuncGiantCrab(int)
 {
-	#if 0
-	// Function: calcBranchFuncGiantCrab__8CGMonObjFi
-	// Entry: 80132e78
-	// Size: 8 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	int calcBranchFuncGiantCrab__8CGMonObjFi(CGMonObj *gMonObj)
-	
-	{
-	  return gMonObj->_bossBranchRelated;
-	}
-	
-	#endif
-	(void)0;
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	*reinterpret_cast<int*>(mon + 0x6C4) = *reinterpret_cast<int*>(mon + 0x6B4);
 }
 
 /*
@@ -334,24 +295,11 @@ void CGMonObj::frameStatFuncGiantCrab()
  */
 void CGMonObj::damagedFuncGolem()
 {
-	#if 0
-	// Function: damagedFuncGolem__8CGMonObjFv
-	// Entry: 801329b4
-	// Size: 52 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void damagedFuncGolem__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  if (*(short *)((gMonObj->gObject).m_scriptHandle + 7) == 0) {
-	    DispCharaParts__8CGObjectFi(&gMonObj->gObject,7);
-	  }
-	  return;
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
+	if (script != 0 && script[7] == 0) {
+		object->DispCharaParts(7);
 	}
-	
-	#endif
-	(void)0;
 }
 
 /*
@@ -363,29 +311,13 @@ void CGMonObj::damagedFuncGolem()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::changeStatFuncGolem(int)
+void CGMonObj::changeStatFuncGolem(int stat)
 {
-	#if 0
-	// Function: changeStatFuncGolem__8CGMonObjFi
-	// Entry: 8013296c
-	// Size: 72 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void changeStatFuncGolem__8CGMonObjFi(CGMonObj *gMonObj,int param_2)
-	
-	{
-	  if (param_2 == 0x65) {
-	    setActionParam__8CGMonObjFi(gMonObj,0xfffffff7);
-	  }
-	  else if ((param_2 < 0x65) && (99 < param_2)) {
-	    setActionParam__8CGMonObjFi(gMonObj,0xfffffff6);
-	  }
-	  return;
+	if (stat == 0x65) {
+		setActionParam__8CGMonObjFi(this, -9);
+	} else if (stat > 99 && stat < 0x65) {
+		setActionParam__8CGMonObjFi(this, -10);
 	}
-	
-	#endif
-	(void)0;
 }
 
 /*
@@ -399,26 +331,18 @@ void CGMonObj::changeStatFuncGolem(int)
  */
 void CGMonObj::calcBranchFuncGolem(int)
 {
-	#if 0
-	// Function: calcBranchFuncGolem__8CGMonObjFi
-	// Entry: 8013292c
-	// Size: 64 bytes
-	
-	uint calcBranchFuncGolem__8CGMonObjFi(int param_1)
-	
-	{
-	  uint uVar1;
-	  
-	  if (*(int *)(param_1 + 0x6d0) == 1) {
-	    return 2;
-	  }
-	  uVar1 = countLeadingZeros((uint)(*(ushort *)(*(int *)(param_1 + 0x58) + 0x1a) >> 1 <=
-	                                  *(ushort *)(*(int *)(param_1 + 0x58) + 0x1c)));
-	  return uVar1 >> 5;
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned int branch = 0;
+	if (*reinterpret_cast<int*>(mon + 0x6D0) == 1) {
+		branch = 2;
+	} else {
+		unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
+		if (script != 0 && ((script[0x1A / 2] >> 1) <= script[0x1C / 2])) {
+			branch = 1;
+		}
 	}
-	
-	#endif
-	(void)0;
+	*reinterpret_cast<int*>(mon + 0x6C4) = static_cast<int>(branch);
 }
 
 /*
@@ -536,7 +460,10 @@ void CGMonObj::frameStatFuncGolem()
 	}
 	
 	#endif
-	(void)0;
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	if (prgObj->m_lastStateId >= 100) {
+		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+	}
 }
 
 /*
@@ -548,26 +475,11 @@ void CGMonObj::frameStatFuncGolem()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::changeStatFuncArmstrong(int)
+void CGMonObj::changeStatFuncArmstrong(int stat)
 {
-	#if 0
-	// Function: changeStatFuncArmstrong__8CGMonObjFi
-	// Entry: 80132640
-	// Size: 48 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void changeStatFuncArmstrong__8CGMonObjFi(CGMonObj *gMonObj,int param_2)
-	
-	{
-	  if (param_2 == 100) {
-	    setActionParam__8CGMonObjFi(gMonObj,0xfffffff2);
-	  }
-	  return;
+	if (stat == 100) {
+		setActionParam__8CGMonObjFi(this, -14);
 	}
-	
-	#endif
-	(void)0;
 }
 
 /*
@@ -581,24 +493,10 @@ void CGMonObj::changeStatFuncArmstrong(int)
  */
 void CGMonObj::cancelStatFuncArmstrong()
 {
-	#if 0
-	// Function: cancelStatFuncArmstrong__8CGMonObjFv
-	// Entry: 80132600
-	// Size: 64 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void cancelStatFuncArmstrong__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  if (*(int *)&gMonObj->field_0x520 == 100) {
-	    (**(code **)((int)(gMonObj->gObject).base_object.object.m_vtable + 0x94))(gMonObj,1);
-	  }
-	  return;
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	if (prgObj->m_lastStateId == 100) {
+		reinterpret_cast<CGCharaObj*>(this)->enableDamageCol(1);
 	}
-	
-	#endif
-	(void)0;
 }
 
 /*
@@ -642,7 +540,10 @@ void CGMonObj::frameStatFuncArmstrong()
 	}
 	
 	#endif
-	(void)0;
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	if (prgObj->m_lastStateId == 100) {
+		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+	}
 }
 
 /*
@@ -656,24 +557,9 @@ void CGMonObj::frameStatFuncArmstrong()
  */
 void CGMonObj::cancelStatFuncOrcKing()
 {
-	#if 0
-	// Function: cancelStatFuncOrcKing__8CGMonObjFv
-	// Entry: 80132538
-	// Size: 52 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void cancelStatFuncOrcKing__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  if (*(int *)&gMonObj->field_0x520 == 100) {
-	    endPSlotBit__10CGCharaObjFi(gMonObj,0xc00);
-	  }
-	  return;
+	if (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId == 100) {
+		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0xC00);
 	}
-	
-	#endif
-	(void)0;
 }
 
 /*
@@ -778,7 +664,10 @@ void CGMonObj::frameStatFuncOrcKing()
 	}
 	
 	#endif
-	(void)0;
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	if (prgObj->m_lastStateId >= 100) {
+		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+	}
 }
 
 /*
@@ -792,58 +681,30 @@ void CGMonObj::frameStatFuncOrcKing()
  */
 void CGMonObj::alwaysFuncOrcKing()
 {
-	#if 0
-	// Function: alwaysFuncOrcKing__8CGMonObjFv
-	// Entry: 80132160
-	// Size: 380 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void alwaysFuncOrcKing__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  int iVar1;
-	  CRef *pCVar2;
-	  CGMonObj *monObj;
-	  
-	  if (SoundBuffer._1260_4_ != 0) {
-	    if (SoundBuffer._1264_4_ == 0x3c) {
-	      ChangeTexture__Q29CCharaPcs7CHandleFiUlUlii
-	                ((gMonObj->gObject).m_charaModelHandle,1,0x39,1,0xffffffff,0);
-	      pCVar2 = ((gMonObj->gObject).m_charaModelHandle)->m_pdtLoadRef;
-	      if (pCVar2 == (CRef *)0x0) {
-	        iVar1 = -1;
-	      }
-	      else {
-	        iVar1 = pCVar2[2].refCount;
-	      }
-	      putParticle__8CGPrgObjFiiP8CGObjectfi
-	                ((double)FLOAT_80331d18,(CGPrgObj *)gMonObj,iVar1 << 8 | 0x1d,
-	                 *(int *)&gMonObj->field_0x590,&gMonObj->gObject,0);
-	    }
-	    else if ((SoundBuffer._1264_4_ == 300) && (Game.game.m_gameWork.m_gameOverFlag == '\0')) {
-	      for (monObj = (CGMonObj *)FindGMonObjFirst__13CFlatRuntime2Fv((CFlatRuntime2 *)&CFlat);
-	          monObj != (CGMonObj *)0x0;
-	          monObj = (CGMonObj *)
-	                   FindGMonObjNext__13CFlatRuntime2FP8CGMonObj((CFlatRuntime2 *)&CFlat,monObj)) {
-	        addHp__10CGCharaObjFiP8CGPrgObj
-	                  ((CGCharaObj *)monObj,
-	                   -(uint)*(ushort *)((int)(monObj->gObject).m_scriptHandle + 0x1a),(CGPrgObj *)0x0)
-	        ;
-	      }
-	      playSe3D__8CGPrgObjFiiiiP3Vec((CGPrgObj *)gMonObj,0x8cbf,0x32,0x96,0,0);
-	      SoundBuffer._1260_4_ = 0;
-	      CFlat._4840_4_ = 1;
-	    }
-	    if (SoundBuffer._1260_4_ != 0) {
-	      SoundBuffer._1264_4_ = SoundBuffer._1264_4_ + 1;
-	    }
-	  }
-	  return;
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	int& active = *reinterpret_cast<int*>(SoundBuffer + 1260);
+	int& timer = *reinterpret_cast<int*>(SoundBuffer + 1264);
+	if (active == 0) {
+		return;
 	}
-	
-	#endif
-	(void)0;
+
+	if (timer == 0x3C && object->m_charaModelHandle != 0) {
+		object->m_charaModelHandle->ChangeTexture(1, 0x39, 1, 0xFFFFFFFF, 0);
+		int pdtNo = -1;
+		if (object->m_charaModelHandle->m_pdtLoadRef != 0) {
+			pdtNo = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(object->m_charaModelHandle->m_pdtLoadRef) + 0x14);
+		}
+		putParticle__8CGPrgObjFiiP8CGObjectfi(prgObj, (pdtNo << 8) | 0x1D, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x590), object, FLOAT_80331d18, 0);
+	} else if (timer == 300 && Game.game.m_gameWork.m_gameOverFlag == 0) {
+		playSe3D__8CGPrgObjFiiiiP3Vec(prgObj, 0x8CBF, 0x32, 0x96, 0, 0);
+		active = 0;
+		*reinterpret_cast<int*>(CFlat + 4840) = 1;
+	}
+
+	if (active != 0) {
+		timer += 1;
+	}
 }
 
 /*
@@ -857,19 +718,7 @@ void CGMonObj::alwaysFuncOrcKing()
  */
 void CGMonObj::moveFrameFuncOrcKing()
 {
-	#if 0
-	// Function: moveFrameFuncOrcKing__8CGMonObjFv
-	// Entry: 8013215c
-	// Size: 4 bytes
-	
-	void moveFrameFuncOrcKing__8CGMonObjFv(void)
-	
-	{
-	  return;
-	}
-	
-	#endif
-	(void)0;
+	return;
 }
 
 /*
@@ -883,19 +732,7 @@ void CGMonObj::moveFrameFuncOrcKing()
  */
 void CGMonObj::moveCancelFuncOrcKing()
 {
-	#if 0
-	// Function: moveCancelFuncOrcKing__8CGMonObjFv
-	// Entry: 80132158
-	// Size: 4 bytes
-	
-	void moveCancelFuncOrcKing__8CGMonObjFv(void)
-	
-	{
-	  return;
-	}
-	
-	#endif
-	(void)0;
+	return;
 }
 
 /*
@@ -909,31 +746,16 @@ void CGMonObj::moveCancelFuncOrcKing()
  */
 void CGMonObj::calcBranchFuncOrcKing(int)
 {
-	#if 0
-	// Function: calcBranchFuncOrcKing__8CGMonObjFi
-	// Entry: 80132100
-	// Size: 88 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	undefined4 calcBranchFuncOrcKing__8CGMonObjFi(CGMonObj *gMonObj)
-	
-	{
-	  undefined4 uVar1;
-	  void **ppvVar2;
-	  
-	  ppvVar2 = (gMonObj->gObject).m_scriptHandle;
-	  if ((uint)*(ushort *)(ppvVar2 + 7) < *(ushort *)((int)ppvVar2 + 0x1a) / 5) {
-	    uVar1 = 2;
-	  }
-	  else {
-	    uVar1 = calcBranchFuncDefault__8CGMonObjFi(gMonObj,1);
-	  }
-	  return uVar1;
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
+	int branch = 0;
+	if (script != 0 && script[7] < (script[0x1A / 2] / 5)) {
+		branch = 2;
+	} else {
+		branch = calcBranchFuncDefault__8CGMonObjFi(this, 1);
 	}
-	
-	#endif
-	(void)0;
+	*reinterpret_cast<int*>(mon + 0x6C4) = branch;
 }
 
 /*
@@ -947,24 +769,9 @@ void CGMonObj::calcBranchFuncOrcKing(int)
  */
 void CGMonObj::cancelStatFuncGoblinKing()
 {
-	#if 0
-	// Function: cancelStatFuncGoblinKing__8CGMonObjFv
-	// Entry: 801320cc
-	// Size: 52 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void cancelStatFuncGoblinKing__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  if (*(int *)&gMonObj->field_0x520 == 100) {
-	    endPSlotBit__10CGCharaObjFi(gMonObj,0x400);
-	  }
-	  return;
+	if (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId == 100) {
+		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x400);
 	}
-	
-	#endif
-	(void)0;
 }
 
 /*
@@ -996,7 +803,10 @@ void CGMonObj::frameStatFuncGoblinKing()
 	}
 	
 	#endif
-	(void)0;
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	if (prgObj->m_lastStateId >= 100) {
+		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+	}
 }
 
 /*
@@ -1010,19 +820,7 @@ void CGMonObj::frameStatFuncGoblinKing()
  */
 void CGMonObj::calcBranchFuncGoblinKing(int)
 {
-	#if 0
-	// Function: calcBranchFuncGoblinKing__8CGMonObjFi
-	// Entry: 8013203c
-	// Size: 16 bytes
-	
-	undefined4 calcBranchFuncGoblinKing__8CGMonObjFi(void)
-	
-	{
-	  return CFlat._4840_4_;
-	}
-	
-	#endif
-	(void)0;
+	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6C4) = *reinterpret_cast<int*>(CFlat + 4840);
 }
 
 /*
@@ -1036,24 +834,9 @@ void CGMonObj::calcBranchFuncGoblinKing(int)
  */
 void CGMonObj::cancelStatFuncSaw()
 {
-	#if 0
-	// Function: cancelStatFuncSaw__8CGMonObjFv
-	// Entry: 80132008
-	// Size: 52 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void cancelStatFuncSaw__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  if (*(int *)&gMonObj->field_0x520 == 100) {
-	    endPSlotBit__10CGCharaObjFi(gMonObj,1);
-	  }
-	  return;
+	if (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId == 100) {
+		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(1);
 	}
-	
-	#endif
-	(void)0;
 }
 
 /*
@@ -1142,7 +925,10 @@ void CGMonObj::frameStatFuncSaw()
 	}
 	
 	#endif
-	(void)0;
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	if (prgObj->m_lastStateId >= 100) {
+		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+	}
 }
 
 /*
@@ -1156,33 +942,16 @@ void CGMonObj::frameStatFuncSaw()
  */
 void CGMonObj::logicFuncSaw()
 {
-	#if 0
-	// Function: logicFuncSaw__8CGMonObjFv
-	// Entry: 80131d04
-	// Size: 212 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void logicFuncSaw__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  if ((CFlat._4840_4_ == 0) && ((int)((uint)(byte)m_aiWork__8CGMonObj._0_1_ << 0x18) < 0)) {
-	    m_aiWork__8CGMonObj._0_1_ = m_aiWork__8CGMonObj._0_1_ & 0x7f;
-	  }
-	  if ((CFlat._4840_4_ == 0) || ((int)((uint)(byte)m_aiWork__8CGMonObj._0_1_ << 0x18) < 0)) {
-	    if ((*(int *)&gMonObj->field_0x520 == 100) && (*(int *)&gMonObj->field_0x52c == 1)) {
-	      addSubStat__8CGPrgObjFv((CGPrgObj *)gMonObj);
-	    }
-	  }
-	  else if (*(int *)&gMonObj->field_0x520 != 100) {
-	    changeStat__8CGPrgObjFiii((CGPrgObj *)gMonObj,100,0,0);
-	  }
-	  SoundBuffer._1268_4_ = SoundBuffer._1268_4_ - 1 & ~((int)(SoundBuffer._1268_4_ - 1) >> 0x1f);
-	  return;
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	if ((*reinterpret_cast<int*>(CFlat + 4840) == 0) || (*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x6D4) & 0x80)) {
+		if (prgObj->m_lastStateId == 100 && prgObj->m_subState == 1) {
+			prgObj->addSubStat();
+		}
+	} else if (prgObj->m_lastStateId != 100) {
+		changeStat__8CGPrgObjFiii(prgObj, 100, 0, 0);
 	}
-	
-	#endif
-	(void)0;
+	int& cooldown = *reinterpret_cast<int*>(SoundBuffer + 1268);
+	cooldown = (cooldown - 1) & ~((cooldown - 1) >> 31);
 }
 
 /*
@@ -1196,44 +965,14 @@ void CGMonObj::logicFuncSaw()
  */
 void CGMonObj::moveFrameFuncSaw()
 {
-	#if 0
-	// Function: moveFrameFuncSaw__8CGMonObjFv
-	// Entry: 80131c24
-	// Size: 224 bytes
-	
-	/* WARNING: Removing unreachable block (ram,0x80131ce4) */
-	/* WARNING: Removing unreachable block (ram,0x80131c34) */
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void moveFrameFuncSaw__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  float fVar1;
-	  float fVar2;
-	  float fVar3;
-	  double dVar4;
-	  double dVar5;
-	  double dVar6;
-	  
-	  dVar4 = (double)sin((double)(float)SoundBuffer._1264_4_);
-	  dVar6 = (double)(FLOAT_80331d1c * (FLOAT_80331d18 + (float)dVar4) + FLOAT_80331d30);
-	  dVar4 = (double)sin((double)(float)SoundBuffer._1260_4_);
-	  *(float *)&gMonObj->field_0x718 = (float)(dVar6 * (double)(FLOAT_80331dac * (float)dVar4));
-	  dVar4 = (double)cos((double)(float)SoundBuffer._1260_4_);
-	  fVar3 = FLOAT_80331db4;
-	  fVar2 = FLOAT_80331db0;
-	  fVar1 = FLOAT_80331d60;
-	  dVar5 = (double)FLOAT_80331d30;
-	  *(float *)&gMonObj->field_0x720 = (float)(dVar6 * (double)(FLOAT_80331d84 * (float)dVar4));
-	  SoundBuffer._1260_4_ =
-	       (float)SoundBuffer._1260_4_ + fVar2 * (float)(dVar5 - (double)(float)(dVar6 - dVar5)) + fVar1
-	  ;
-	  SoundBuffer._1264_4_ = (float)SoundBuffer._1264_4_ + fVar3;
-	  return;
-	}
-	
-	#endif
-	(void)0;
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	float& phase0 = *reinterpret_cast<float*>(SoundBuffer + 1260);
+	float& phase1 = *reinterpret_cast<float*>(SoundBuffer + 1264);
+	const float wave = FLOAT_80331d1c * (FLOAT_80331d18 + sinf(phase1)) + FLOAT_80331d30;
+	*reinterpret_cast<float*>(mon + 0x718) = wave * (FLOAT_80331dac * sinf(phase0));
+	*reinterpret_cast<float*>(mon + 0x720) = wave * (FLOAT_80331d84 * cosf(phase0));
+	phase0 = phase0 + FLOAT_80331db0 * (FLOAT_80331d30 - (wave - FLOAT_80331d30)) + FLOAT_80331d60;
+	phase1 = phase1 + FLOAT_80331db4;
 }
 
 /*
@@ -1247,26 +986,12 @@ void CGMonObj::moveFrameFuncSaw()
  */
 void CGMonObj::attackedFuncSaw()
 {
-	#if 0
-	// Function: attackedFuncSaw__8CGMonObjFv
-	// Entry: 80131bd8
-	// Size: 76 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void attackedFuncSaw__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  if (*(int *)&gMonObj->field_0x520 == 100) {
-	    addSubStat__8CGPrgObjFv((CGPrgObj *)gMonObj);
-	    m_aiWork__8CGMonObj._0_1_ = m_aiWork__8CGMonObj._0_1_ & 0x7f | 0x80;
-	    SoundBuffer._1268_4_ = 0xfa;
-	  }
-	  return;
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	if (prgObj->m_lastStateId == 100) {
+		prgObj->addSubStat();
+		*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x6D4) |= 0x80;
+		*reinterpret_cast<int*>(SoundBuffer + 1268) = 0xFA;
 	}
-	
-	#endif
-	(void)0;
 }
 
 /*
@@ -1352,7 +1077,10 @@ void CGMonObj::frameStatFuncLKShooter()
 	}
 	
 	#endif
-	(void)0;
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	if (prgObj->m_lastStateId >= 100) {
+		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+	}
 }
 
 /*
@@ -1366,49 +1094,22 @@ void CGMonObj::frameStatFuncLKShooter()
  */
 void CGMonObj::attackCheckFuncLKShooter(int)
 {
-	#if 0
-	// Function: attackCheckFuncLKShooter__8CGMonObjFi
-	// Entry: 80131828
-	// Size: 340 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	undefined4 attackCheckFuncLKShooter__8CGMonObjFi(CGMonObj *gMonObj)
-	
-	{
-	  Vec *pVVar1;
-	  double dVar2;
-	  CVector CStack_28;
-	  CVector CStack_1c;
-	  
-	  if (SoundBuffer._1268_4_ == 0) {
-	    if ((-1 < (int)((uint)(byte)m_aiWork__8CGMonObj._0_1_ << 0x19 |
-	                   (uint)((byte)m_aiWork__8CGMonObj._0_1_ >> 7))) && ((CFlat._4840_4_ & 2) == 0)) {
-	      pVVar1 = (Vec *)__ct__7CVectorFfff(FLOAT_80331d90,FLOAT_80331cf8,FLOAT_80331d94,&CStack_1c);
-	      dVar2 = (double)PSVECDistance(pVVar1,&(gMonObj->gObject).m_worldPosition);
-	      if ((dVar2 < (double)FLOAT_80331d98) && (SoundBuffer._1272_4_ == 0)) {
-	        m_aiWork__8CGMonObj._0_1_ = m_aiWork__8CGMonObj._0_1_ & 0xbf | 0x40;
-	        SoundBuffer._1272_4_ = 300;
-	        gMonObj->_bossBranchRelated = 2;
-	        return 100;
-	      }
-	    }
-	    if ((-1 < (int)((uint)(byte)m_aiWork__8CGMonObj._0_1_ << 0x1a |
-	                   (uint)((byte)m_aiWork__8CGMonObj._0_1_ >> 6))) && ((CFlat._4840_4_ & 1) == 0)) {
-	      pVVar1 = (Vec *)__ct__7CVectorFfff(FLOAT_80331d9c,FLOAT_80331cf8,FLOAT_80331d9c,&CStack_28);
-	      dVar2 = (double)PSVECDistance(pVVar1,&(gMonObj->gObject).m_worldPosition);
-	      if ((dVar2 < (double)FLOAT_80331d98) && (SoundBuffer._1276_4_ == 0)) {
-	        m_aiWork__8CGMonObj._0_1_ = m_aiWork__8CGMonObj._0_1_ & 0xdf | 0x20;
-	        gMonObj->_bossBranchRelated = 1;
-	        return 100;
-	      }
-	    }
-	  }
-	  return 0xffffffff;
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	int result = -1;
+	if (*reinterpret_cast<int*>(SoundBuffer + 1268) == 0) {
+		Vec left = {FLOAT_80331d90, FLOAT_80331cf8, FLOAT_80331d94};
+		Vec right = {FLOAT_80331d9c, FLOAT_80331cf8, FLOAT_80331d9c};
+		if (PSVECDistance(&left, &object->m_worldPosition) < FLOAT_80331d98 && *reinterpret_cast<int*>(SoundBuffer + 1272) == 0) {
+			*reinterpret_cast<int*>(SoundBuffer + 1272) = 300;
+			*reinterpret_cast<int*>(mon + 0x6B4) = 2;
+			result = 100;
+		} else if (PSVECDistance(&right, &object->m_worldPosition) < FLOAT_80331d98 && *reinterpret_cast<int*>(SoundBuffer + 1276) == 0) {
+			*reinterpret_cast<int*>(mon + 0x6B4) = 1;
+			result = 100;
+		}
 	}
-	
-	#endif
-	(void)0;
+	*reinterpret_cast<int*>(mon + 0x6C4) = result;
 }
 
 /*
@@ -1420,26 +1121,11 @@ void CGMonObj::attackCheckFuncLKShooter(int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::changeStatFuncDragonZombie(int)
+void CGMonObj::changeStatFuncDragonZombie(int stat)
 {
-	#if 0
-	// Function: changeStatFuncDragonZombie__8CGMonObjFi
-	// Entry: 801317f8
-	// Size: 48 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void changeStatFuncDragonZombie__8CGMonObjFi(CGMonObj *gMonObj,int param_2)
-	
-	{
-	  if (param_2 == 100) {
-	    setActionParam__8CGMonObjFi(gMonObj,0xfffffff5);
-	  }
-	  return;
+	if (stat == 100) {
+		setActionParam__8CGMonObjFi(this, -11);
 	}
-	
-	#endif
-	(void)0;
 }
 
 /*
@@ -1453,48 +1139,27 @@ void CGMonObj::changeStatFuncDragonZombie(int)
  */
 void CGMonObj::cancelStatFuncDragonZombie()
 {
-	#if 0
-	// Function: cancelStatFuncDragonZombie__8CGMonObjFv
-	// Entry: 801316f8
-	// Size: 256 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void cancelStatFuncDragonZombie__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  int iVar1;
-	  
-	  iVar1 = *(int *)&gMonObj->field_0x520;
-	  if (iVar1 == 100) {
-	    SetAnimSlot__8CGObjectFii(&gMonObj->gObject,0xe,0);
-	    SetAnimSlot__8CGObjectFii(&gMonObj->gObject,0x13,4);
-	    SetAnimSlot__8CGObjectFii(&gMonObj->gObject,0x16,0x1a);
-	    SetAnimSlot__8CGObjectFii(&gMonObj->gObject,0x17,0x1b);
-	    SetAnimSlot__8CGObjectFii(&gMonObj->gObject,0x18,0x1c);
-	    gMonObj->_bossBranchRelated = 1;
-	  }
-	  else {
-	    if (iVar1 < 100) {
-	      if (iVar1 != 4) {
-	        return;
-	      }
-	    }
-	    else if (0x65 < iVar1) {
-	      return;
-	    }
-	    SetAnimSlot__8CGObjectFii(&gMonObj->gObject,0,0);
-	    SetAnimSlot__8CGObjectFii(&gMonObj->gObject,4,4);
-	    SetAnimSlot__8CGObjectFii(&gMonObj->gObject,0x1a,0x1a);
-	    SetAnimSlot__8CGObjectFii(&gMonObj->gObject,0x1b,0x1b);
-	    SetAnimSlot__8CGObjectFii(&gMonObj->gObject,0x1c,0x1c);
-	    gMonObj->_bossBranchRelated = 0;
-	  }
-	  return;
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	const int state = prgObj->m_lastStateId;
+	if (state == 100) {
+		object->SetAnimSlot(0x0E, 0);
+		object->SetAnimSlot(0x13, 4);
+		object->SetAnimSlot(0x16, 0x1A);
+		object->SetAnimSlot(0x17, 0x1B);
+		object->SetAnimSlot(0x18, 0x1C);
+		*reinterpret_cast<int*>(mon + 0x6B4) = 1;
+		return;
 	}
-	
-	#endif
-	(void)0;
+	if (state == 4 || (state > 99 && state < 0x66)) {
+		object->SetAnimSlot(0, 0);
+		object->SetAnimSlot(4, 4);
+		object->SetAnimSlot(0x1A, 0x1A);
+		object->SetAnimSlot(0x1B, 0x1B);
+		object->SetAnimSlot(0x1C, 0x1C);
+		*reinterpret_cast<int*>(mon + 0x6B4) = 0;
+	}
 }
 
 /*
@@ -1538,7 +1203,10 @@ void CGMonObj::frameStatFuncDragonZombie()
 	}
 	
 	#endif
-	(void)0;
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	if (prgObj->m_lastStateId >= 100) {
+		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+	}
 }
 
 /*
@@ -1552,21 +1220,9 @@ void CGMonObj::frameStatFuncDragonZombie()
  */
 void CGMonObj::calcBranchFuncDragonZombie(int)
 {
-	#if 0
-	// Function: calcBranchFuncDragonZombie__8CGMonObjFi
-	// Entry: 80131638
-	// Size: 20 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	uint calcBranchFuncDragonZombie__8CGMonObjFi(CGMonObj *gMonObj)
-	
-	{
-	  return (uint)(-gMonObj->_bossBranchRelated | gMonObj->_bossBranchRelated) >> 0x1f;
-	}
-	
-	#endif
-	(void)0;
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	const int branch = *reinterpret_cast<int*>(mon + 0x6B4);
+	*reinterpret_cast<int*>(mon + 0x6C4) = (branch != 0) ? 1 : 0;
 }
 
 /*
@@ -1578,26 +1234,11 @@ void CGMonObj::calcBranchFuncDragonZombie(int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::changeStatFuncCaveWorm(int)
+void CGMonObj::changeStatFuncCaveWorm(int stat)
 {
-	#if 0
-	// Function: changeStatFuncCaveWorm__8CGMonObjFi
-	// Entry: 80131608
-	// Size: 48 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void changeStatFuncCaveWorm__8CGMonObjFi(CGMonObj *gMonObj,int param_2)
-	
-	{
-	  if (param_2 == 100) {
-	    setActionParam__8CGMonObjFi(gMonObj,0xfffffff8);
-	  }
-	  return;
+	if (stat == 100) {
+		setActionParam__8CGMonObjFi(this, -8);
 	}
-	
-	#endif
-	(void)0;
 }
 
 /*
@@ -1611,24 +1252,9 @@ void CGMonObj::changeStatFuncCaveWorm(int)
  */
 void CGMonObj::cancelStatFuncCaveWorm()
 {
-	#if 0
-	// Function: cancelStatFuncCaveWorm__8CGMonObjFv
-	// Entry: 801315d4
-	// Size: 52 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void cancelStatFuncCaveWorm__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  if (*(int *)&gMonObj->field_0x520 == 100) {
-	    endPSlotBit__10CGCharaObjFi(gMonObj,0x400);
-	  }
-	  return;
+	if (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId == 100) {
+		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x400);
 	}
-	
-	#endif
-	(void)0;
 }
 
 /*
@@ -1659,7 +1285,10 @@ void CGMonObj::frameStatFuncCaveWorm()
 	}
 	
 	#endif
-	(void)0;
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	if (prgObj->m_lastStateId >= 100) {
+		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+	}
 }
 
 /*
@@ -1671,29 +1300,13 @@ void CGMonObj::frameStatFuncCaveWorm()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::changeStatFuncLich(int)
+void CGMonObj::changeStatFuncLich(int stat)
 {
-	#if 0
-	// Function: changeStatFuncLich__8CGMonObjFi
-	// Entry: 80131554
-	// Size: 72 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void changeStatFuncLich__8CGMonObjFi(CGMonObj *gMonObj,int param_2)
-	
-	{
-	  if (param_2 == 0x65) {
-	    setActionParam__8CGMonObjFi(gMonObj,0xfffffff2);
-	  }
-	  else if ((param_2 < 0x65) && (99 < param_2)) {
-	    setActionParam__8CGMonObjFi(gMonObj,0xfffffff6);
-	  }
-	  return;
+	if (stat == 0x65) {
+		setActionParam__8CGMonObjFi(this, -14);
+	} else if (stat > 99 && stat < 0x65) {
+		setActionParam__8CGMonObjFi(this, -10);
 	}
-	
-	#endif
-	(void)0;
 }
 
 /*
@@ -1707,24 +1320,9 @@ void CGMonObj::changeStatFuncLich(int)
  */
 void CGMonObj::cancelStatFuncLich()
 {
-	#if 0
-	// Function: cancelStatFuncLich__8CGMonObjFv
-	// Entry: 80131520
-	// Size: 52 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void cancelStatFuncLich__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  if (*(int *)&gMonObj->field_0x520 == 100) {
-	    endPSlotBit__10CGCharaObjFi(gMonObj,0x400);
-	  }
-	  return;
+	if (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId == 100) {
+		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x400);
 	}
-	
-	#endif
-	(void)0;
 }
 
 /*
@@ -1805,7 +1403,10 @@ void CGMonObj::frameStatFuncLich()
 	}
 	
 	#endif
-	(void)0;
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	if (prgObj->m_lastStateId >= 100) {
+		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+	}
 }
 
 /*
@@ -1819,19 +1420,8 @@ void CGMonObj::frameStatFuncLich()
  */
 void CGMonObj::calcBranchFuncLich(int)
 {
-	#if 0
-	// Function: calcBranchFuncLich__8CGMonObjFi
-	// Entry: 8013127c
-	// Size: 24 bytes
-	
-	uint calcBranchFuncLich__8CGMonObjFi(void)
-	
-	{
-	  return (uint)CFlat._4840_4_ >> 1 & 1 ^ 1;
-	}
-	
-	#endif
-	(void)0;
+	const int flatFlags = *reinterpret_cast<int*>(CFlat + 4840);
+	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6C4) = ((flatFlags >> 1) & 1) ^ 1;
 }
 
 /*
@@ -1843,35 +1433,16 @@ void CGMonObj::calcBranchFuncLich(int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::changeStatFuncTetsukyojin(int)
+void CGMonObj::changeStatFuncTetsukyojin(int stat)
 {
-	#if 0
-	// Function: changeStatFuncTetsukyojin__8CGMonObjFi
-	// Entry: 801311fc
-	// Size: 128 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void changeStatFuncTetsukyojin__8CGMonObjFi(CGMonObj *gMonObj,int param_2)
-	
-	{
-	  if (param_2 == 0x65) {
-	    setActionParam__8CGMonObjFi(gMonObj,0xfffffff2);
-	    SoundBuffer._1260_4_ = SoundBuffer._1260_4_ + 1;
-	  }
-	  else if (param_2 < 0x65) {
-	    if (param_2 == -0xd) {
-	      SoundBuffer._1260_4_ = SoundBuffer._1260_4_ + 1;
-	    }
-	  }
-	  else if (param_2 == 0x67) {
-	    setActionParam__8CGMonObjFi(gMonObj,0xfffffff4);
-	  }
-	  return;
+	if (stat == 0x65) {
+		setActionParam__8CGMonObjFi(this, -14);
+		*reinterpret_cast<int*>(SoundBuffer + 1260) += 1;
+	} else if (stat == -0xD) {
+		*reinterpret_cast<int*>(SoundBuffer + 1260) += 1;
+	} else if (stat == 0x67) {
+		setActionParam__8CGMonObjFi(this, -12);
 	}
-	
-	#endif
-	(void)0;
 }
 
 /*
@@ -1885,38 +1456,12 @@ void CGMonObj::changeStatFuncTetsukyojin(int)
  */
 void CGMonObj::cancelStatFuncTetsukyojin()
 {
-	#if 0
-	// Function: cancelStatFuncTetsukyojin__8CGMonObjFv
-	// Entry: 801311a0
-	// Size: 92 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void cancelStatFuncTetsukyojin__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  int iVar1;
-	  
-	  iVar1 = *(int *)&gMonObj->field_0x520;
-	  if (iVar1 == 0x66) {
-	    (gMonObj->gObject).m_bgColMask = (gMonObj->gObject).m_bgColMask | 0xc0002;
-	  }
-	  else {
-	    if (iVar1 < 0x66) {
-	      if (iVar1 != 100) {
-	        return;
-	      }
-	    }
-	    else if (0x67 < iVar1) {
-	      return;
-	    }
-	    FUN_801162b4();
-	  }
-	  return;
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	const int state = prgObj->m_lastStateId;
+	if (state == 0x66) {
+		object->m_bgColMask |= 0xC0002;
 	}
-	
-	#endif
-	(void)0;
 }
 
 /*
@@ -2090,7 +1635,10 @@ void CGMonObj::frameStatFuncTetsukyojin()
 	}
 	
 	#endif
-	(void)0;
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	if (prgObj->m_lastStateId >= 100) {
+		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+	}
 }
 
 /*
@@ -2104,21 +1652,8 @@ void CGMonObj::frameStatFuncTetsukyojin()
  */
 void CGMonObj::calcBranchFuncTetsukyojin(int)
 {
-	#if 0
-	// Function: calcBranchFuncTetsukyojin__8CGMonObjFi
-	// Entry: 80130ce4
-	// Size: 28 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	int calcBranchFuncTetsukyojin__8CGMonObjFi(CGMonObj *gMonObj)
-	
-	{
-	  return (gMonObj->_bossBranchRelated >> 0x1f) + (uint)(gMonObj->_bossBranchRelated != 0);
-	}
-	
-	#endif
-	(void)0;
+	const int branch = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6B4);
+	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6C4) = (branch >> 31) + (branch != 0);
 }
 
 /*
@@ -2132,26 +1667,12 @@ void CGMonObj::calcBranchFuncTetsukyojin(int)
  */
 void CGMonObj::damagedFuncGigasLoad()
 {
-	#if 0
-	// Function: damagedFuncGigasLoad__8CGMonObjFv
-	// Entry: 80130c88
-	// Size: 92 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void damagedFuncGigasLoad__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  if (gMonObj->_bossBranchRelated == 0) {
-	    changeStat__8CGPrgObjFiii((CGPrgObj *)gMonObj,4,0,0);
-	    gMonObj->_bossBranchRelated = 1;
-	    CFlat._4840_4_ = 1;
-	  }
-	  return;
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	if (*reinterpret_cast<int*>(mon + 0x6B4) == 0) {
+		changeStat__8CGPrgObjFiii(reinterpret_cast<CGPrgObj*>(this), 4, 0, 0);
+		*reinterpret_cast<int*>(mon + 0x6B4) = 1;
+		*reinterpret_cast<int*>(CFlat + 4840) = 1;
 	}
-	
-	#endif
-	(void)0;
 }
 
 /*
@@ -2165,25 +1686,11 @@ void CGMonObj::damagedFuncGigasLoad()
  */
 void CGMonObj::tgtFuncGigasLoad(int)
 {
-	#if 0
-	// Function: tgtFuncGigasLoad__8CGMonObjFi
-	// Entry: 80130c40
-	// Size: 72 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	undefined4 tgtFuncGigasLoad__8CGMonObjFi(CGMonObj *gMonObj)
-	
-	{
-	  aiTargetAttackRomMon__8CGMonObjFi(gMonObj,0x3b);
-	  if (*(int *)&gMonObj->field_0x6c4 < 0) {
-	    aiTarget__8CGMonObjFv(gMonObj);
-	  }
-	  return *(undefined4 *)&gMonObj->field_0x6c4;
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	aiTargetAttackRomMon__8CGMonObjFi(this, 0x3B);
+	if (*reinterpret_cast<int*>(mon + 0x6C4) < 0) {
+		aiTarget__8CGMonObjFv(this);
 	}
-	
-	#endif
-	(void)0;
 }
 
 /*
@@ -2197,26 +1704,8 @@ void CGMonObj::tgtFuncGigasLoad(int)
  */
 void CGMonObj::calcBranchFuncGigasLoad(int)
 {
-	#if 0
-	// Function: calcBranchFuncGigasLoad__8CGMonObjFi
-	// Entry: 80130bf4
-	// Size: 76 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	undefined4 calcBranchFuncGigasLoad__8CGMonObjFi(void)
-	
-	{
-	  if (((Game.game.m_scriptWork[0][0][1] != 0) &&
-	      (1 < *(ushort *)(*(int *)(Game.game.m_scriptWork[0][0][1] + 0x58) + 0x1c))) &&
-	     (CFlat._4840_4_ == 1)) {
-	    return 0;
-	  }
-	  return 1;
-	}
-	
-	#endif
-	(void)0;
+	const int flatFlag = *reinterpret_cast<int*>(CFlat + 4840);
+	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6C4) = (flatFlag == 1) ? 0 : 1;
 }
 
 /*
@@ -2286,7 +1775,10 @@ void CGMonObj::frameStatFuncWifeLamia()
 	}
 	
 	#endif
-	(void)0;
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	if (prgObj->m_lastStateId >= 100) {
+		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+	}
 }
 
 /*
@@ -2300,27 +1792,14 @@ void CGMonObj::frameStatFuncWifeLamia()
  */
 void CGMonObj::damagedFuncWifeLamia()
 {
-	#if 0
-	// Function: damagedFuncWifeLamia__8CGMonObjFv
-	// Entry: 80130a64
-	// Size: 100 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void damagedFuncWifeLamia__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  if (*(ushort *)((gMonObj->gObject).m_scriptHandle + 7) < 2) {
-	    ClearAllSta__10CGCharaObjFv();
-	    (gMonObj->gObject).m_bgColMask = (gMonObj->gObject).m_bgColMask & 0xfff7ffff;
-	    changeStat__8CGPrgObjFiii((CGPrgObj *)gMonObj,100,0,0);
-	    gMonObj->_bossBranchRelated = 1;
-	  }
-	  return;
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
+	if (script != 0 && script[7] < 2) {
+		reinterpret_cast<CGCharaObj*>(this)->ClearAllSta();
+		object->m_bgColMask &= 0xFFF7FFFF;
+		changeStat__8CGPrgObjFiii(reinterpret_cast<CGPrgObj*>(this), 100, 0, 0);
+		*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6B4) = 1;
 	}
-	
-	#endif
-	(void)0;
 }
 
 /*
@@ -2332,29 +1811,13 @@ void CGMonObj::damagedFuncWifeLamia()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::changeStatFuncMolbol(int)
+void CGMonObj::changeStatFuncMolbol(int stat)
 {
-	#if 0
-	// Function: changeStatFuncMolbol__8CGMonObjFi
-	// Entry: 80130a1c
-	// Size: 72 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void changeStatFuncMolbol__8CGMonObjFi(CGMonObj *gMonObj,int param_2)
-	
-	{
-	  if (param_2 == 0x65) {
-	    setActionParam__8CGMonObjFi(gMonObj,0xfffffff2);
-	  }
-	  else if ((param_2 < 0x65) && (99 < param_2)) {
-	    setActionParam__8CGMonObjFi(gMonObj,0xfffffff3);
-	  }
-	  return;
+	if (stat == 0x65) {
+		setActionParam__8CGMonObjFi(this, -14);
+	} else if (stat > 99 && stat < 0x65) {
+		setActionParam__8CGMonObjFi(this, -13);
 	}
-	
-	#endif
-	(void)0;
 }
 
 /*
@@ -2368,24 +1831,9 @@ void CGMonObj::changeStatFuncMolbol(int)
  */
 void CGMonObj::cancelStatFuncMolbol()
 {
-	#if 0
-	// Function: cancelStatFuncMolbol__8CGMonObjFv
-	// Entry: 801309e8
-	// Size: 52 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void cancelStatFuncMolbol__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  if (*(int *)&gMonObj->field_0x520 == 100) {
-	    endPSlotBit__10CGCharaObjFi(gMonObj,0x400);
-	  }
-	  return;
+	if (reinterpret_cast<CGPrgObj*>(this)->m_lastStateId == 100) {
+		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x400);
 	}
-	
-	#endif
-	(void)0;
 }
 
 /*
@@ -2452,7 +1900,10 @@ void CGMonObj::frameStatFuncMolbol()
 	}
 	
 	#endif
-	(void)0;
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	if (prgObj->m_lastStateId >= 100) {
+		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+	}
 }
 
 /*
@@ -2466,34 +1917,8 @@ void CGMonObj::frameStatFuncMolbol()
  */
 void CGMonObj::initFinishedFuncMeteoParasiteC()
 {
-	#if 0
-	// Function: initFinishedFuncMeteoParasiteC__8CGMonObjFv
-	// Entry: 801307d4
-	// Size: 196 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void initFinishedFuncMeteoParasiteC__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  int iVar1;
-	  
-	  initFinishedFuncDefault__8CGMonObjFv(gMonObj);
-	  m_boss__8CGMonObj._84_4_ = gMonObj;
-	  iVar1 = strcmp(0x8022b6b4,&DAT_80331d64);
-	  if (iVar1 == 0) {
-	    m_boss__8CGMonObj._92_1_ = m_boss__8CGMonObj._92_1_ & 0xbf | 0x40;
-	    m_boss__8CGMonObj._88_4_ = 3;
-	    *(undefined2 *)((gMonObj->gObject).m_scriptHandle + 7) = 1;
-	    SetAnimSlot__8CGObjectFii(&gMonObj->gObject,0x35,0);
-	    reqAnim__8CGPrgObjFiii((CGPrgObj *)gMonObj,0x35,1,0);
-	    PlayAnim__8CGObjectFiiiiiPSc(&gMonObj->gObject,0x35,1,0,0xffff,0xffff,0);
-	  }
-	  return;
-	}
-	
-	#endif
-	(void)0;
+	initFinishedFuncDefault__8CGMonObjFv(this);
+	*reinterpret_cast<CGMonObj**>(SoundBuffer + 1344) = this;
 }
 
 /*
@@ -2507,41 +1932,22 @@ void CGMonObj::initFinishedFuncMeteoParasiteC()
  */
 void CGMonObj::damagedFuncMeteoParasiteC()
 {
-	#if 0
-	// Function: damagedFuncMeteoParasiteC__8CGMonObjFv
-	// Entry: 801306b8
-	// Size: 284 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void damagedFuncMeteoParasiteC__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  void **ppvVar1;
-	  
-	  if (-1 < (int)((uint)(byte)m_boss__8CGMonObj._92_1_ << 0x19 |
-	                (uint)((byte)m_boss__8CGMonObj._92_1_ >> 7))) {
-	    if (((m_boss__8CGMonObj._88_4_ == 0) &&
-	        (ppvVar1 = (gMonObj->gObject).m_scriptHandle,
-	        (uint)*(ushort *)(ppvVar1 + 7) < ((uint)*(ushort *)((int)ppvVar1 + 0x1a) << 1) / 3)) ||
-	       ((m_boss__8CGMonObj._88_4_ == 1 &&
-	        (ppvVar1 = (gMonObj->gObject).m_scriptHandle,
-	        (uint)*(ushort *)(ppvVar1 + 7) < *(ushort *)((int)ppvVar1 + 0x1a) / 3)))) {
-	      m_boss__8CGMonObj._104_4_ = 0;
-	      changeStat__8CGPrgObjFiii((CGPrgObj *)gMonObj,0x66,0,0);
-	      (gMonObj->gObject).m_bgColMask = (gMonObj->gObject).m_bgColMask & 0xfff7ffff;
-	    }
-	    else if (0x31 < (int)m_boss__8CGMonObj._104_4_) {
-	      m_boss__8CGMonObj._104_4_ = 0;
-	      changeStat__8CGPrgObjFiii((CGPrgObj *)gMonObj,0x67,0,0);
-	      (gMonObj->gObject).m_bgColMask = (gMonObj->gObject).m_bgColMask & 0xfff7ffff;
-	    }
-	  }
-	  return;
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned short* script = reinterpret_cast<unsigned short*>(object->m_scriptHandle);
+	int& timer = *reinterpret_cast<int*>(SoundBuffer + 1364);
+	if (script == 0) {
+		return;
 	}
-	
-	#endif
-	(void)0;
+
+	if (script[7] < ((script[0x1A / 2] * 2) / 3)) {
+		timer = 0;
+		changeStat__8CGPrgObjFiii(reinterpret_cast<CGPrgObj*>(this), 0x66, 0, 0);
+		object->m_bgColMask &= 0xFFF7FFFF;
+	} else if (timer > 0x31) {
+		timer = 0;
+		changeStat__8CGPrgObjFiii(reinterpret_cast<CGPrgObj*>(this), 0x67, 0, 0);
+		object->m_bgColMask &= 0xFFF7FFFF;
+	}
 }
 
 /*
@@ -2671,7 +2077,10 @@ void CGMonObj::frameStatFuncMeteoParasiteC()
 	}
 	
 	#endif
-	(void)0;
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	if (prgObj->m_lastStateId >= 100) {
+		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+	}
 }
 
 /*
@@ -2685,19 +2094,7 @@ void CGMonObj::frameStatFuncMeteoParasiteC()
  */
 void CGMonObj::calcBranchFuncMeteoParasiteC(int)
 {
-	#if 0
-	// Function: calcBranchFuncMeteoParasiteC__8CGMonObjFi
-	// Entry: 801302b8
-	// Size: 16 bytes
-	
-	undefined4 calcBranchFuncMeteoParasiteC__8CGMonObjFi(void)
-	
-	{
-	  return m_boss__8CGMonObj._88_4_;
-	}
-	
-	#endif
-	(void)0;
+	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6C4) = *reinterpret_cast<int*>(SoundBuffer + 1348);
 }
 
 /*
@@ -2711,44 +2108,25 @@ void CGMonObj::calcBranchFuncMeteoParasiteC(int)
  */
 void CGMonObj::logicFuncMeteoParasiteC()
 {
-	#if 0
-	// Function: logicFuncMeteoParasiteC__8CGMonObjFv
-	// Entry: 80130224
-	// Size: 144 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void logicFuncMeteoParasiteC__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  int iVar1;
-	  
-	  iVar1 = -1;
-	  if ((int)((uint)(byte)m_boss__8CGMonObj._92_1_ << 0x19 |
-	           (uint)((byte)m_boss__8CGMonObj._92_1_ >> 7)) < 0) {
-	    iVar1 = 0x68;
-	  }
-	  else {
-	    m_boss__8CGMonObj._100_4_ =
-	         m_boss__8CGMonObj._100_4_ - 1 & ~((int)(m_boss__8CGMonObj._100_4_ - 1) >> 0x1f);
-	    if (gMonObj->_bossBranchRelated == 0) {
-	      if (m_boss__8CGMonObj._100_4_ != 0) {
-	        return;
-	      }
-	      iVar1 = 0x65;
-	    }
-	  }
-	  if (iVar1 == -1) {
-	    logicFuncDefault__8CGMonObjFv(gMonObj);
-	  }
-	  else {
-	    changeStat__8CGPrgObjFiii((CGPrgObj *)gMonObj,iVar1,0,0);
-	  }
-	  return;
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	int nextState = -1;
+	int& timer = *reinterpret_cast<int*>(SoundBuffer + 1360);
+	if (*reinterpret_cast<unsigned char*>(SoundBuffer + 1356) & 0x80) {
+		nextState = 0x68;
+	} else {
+		timer = (timer - 1) & ~((timer - 1) >> 31);
+		if (*reinterpret_cast<int*>(mon + 0x6B4) == 0) {
+			if (timer != 0) {
+				return;
+			}
+			nextState = 0x65;
+		}
 	}
-	
-	#endif
-	(void)0;
+	if (nextState == -1) {
+		logicFuncDefault__8CGMonObjFv(this);
+	} else {
+		changeStat__8CGPrgObjFiii(reinterpret_cast<CGPrgObj*>(this), nextState, 0, 0);
+	}
 }
 
 /*
@@ -2762,21 +2140,9 @@ void CGMonObj::logicFuncMeteoParasiteC()
  */
 void CGMonObj::attackCheckFuncMeteoParasiteC(int)
 {
-	#if 0
-	// Function: attackCheckFuncMeteoParasiteC__8CGMonObjFi
-	// Entry: 80130208
-	// Size: 28 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	int attackCheckFuncMeteoParasiteC__8CGMonObjFi(CGMonObj *gMonObj)
-	
-	{
-	  return ((int)(gMonObj->_bossBranchRelated - 1U | 1U - gMonObj->_bossBranchRelated) >> 0x1f) + -1;
-	}
-	
-	#endif
-	(void)0;
+	int branch = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6B4);
+	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6C4) =
+	    (((branch - 1U) | (1U - branch)) >> 31) - 1;
 }
 
 /*
@@ -2790,65 +2156,7 @@ void CGMonObj::attackCheckFuncMeteoParasiteC(int)
  */
 void CGMonObj::initFinishedFuncMeteoParasite()
 {
-	#if 0
-	// Function: initFinishedFuncMeteoParasite__8CGMonObjFv
-	// Entry: 8013004c
-	// Size: 444 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void initFinishedFuncMeteoParasite__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  int iVar1;
-	  CModel *pCVar2;
-	  int iVar3;
-	  void *pvVar4;
-	  int iVar5;
-	  char acStack_118 [256];
-	  
-	  initFinishedFuncDefault__8CGMonObjFv(gMonObj);
-	  pvVar4 = (gMonObj->gObject).m_scriptHandle[4];
-	  if (pvVar4 == (void *)0x85) {
-	    iVar1 = SearchNode__Q26CChara6CModelFPc
-	                      (((gMonObj->gObject).m_charaModelHandle)->m_model,s_to_a_obj_801dd4e8);
-	    SoundBuffer._1260_4_ = ((gMonObj->gObject).m_charaModelHandle)->m_model->m_nodes + iVar1;
-	    ((CNode *)SoundBuffer._1260_4_)->m_flags = ((CNode *)SoundBuffer._1260_4_)->m_flags & 0x7f;
-	    iVar1 = SearchNode__Q26CChara6CModelFPc
-	                      (((gMonObj->gObject).m_charaModelHandle)->m_model,s_to_b_obj_801dd4f4);
-	    iVar5 = -0x7fcffeb4;
-	    iVar3 = 0;
-	    SoundBuffer._1264_4_ = ((gMonObj->gObject).m_charaModelHandle)->m_model->m_nodes + iVar1;
-	    ((CNode *)SoundBuffer._1264_4_)->m_flags = ((CNode *)SoundBuffer._1264_4_)->m_flags & 0x7f;
-	    do {
-	      sprintf(acStack_118,s_to_02d_obj_801dd500,iVar3 + 1);
-	      iVar1 = SearchNode__Q26CChara6CModelFPc
-	                        (((gMonObj->gObject).m_charaModelHandle)->m_model,acStack_118);
-	      *(CNode **)(iVar5 + 8) = ((gMonObj->gObject).m_charaModelHandle)->m_model->m_nodes + iVar1;
-	      if ((int)((uint)(byte)m_boss__8CGMonObj._92_1_ << 0x19 |
-	               (uint)((byte)m_boss__8CGMonObj._92_1_ >> 7)) < 0) {
-	        iVar1 = GetDispIndex__Q26CChara6CModelFPQ26CChara5CNode
-	                          (((gMonObj->gObject).m_charaModelHandle)->m_model,*(CNode **)(iVar5 + 8));
-	        pCVar2 = ((gMonObj->gObject).m_charaModelHandle)->m_model;
-	        pCVar2->m_meshVisibleMask = pCVar2->m_meshVisibleMask & ~(1 << iVar1);
-	      }
-	      iVar3 = iVar3 + 1;
-	      iVar5 = iVar5 + 4;
-	    } while (iVar3 < 0xc);
-	  }
-	  *(CGMonObj **)((int)&m_boss__8CGMonObj + ((int)pvVar4 + -0x85) * 4 + 0x48) = gMonObj;
-	  if ((int)((uint)(byte)m_boss__8CGMonObj._92_1_ << 0x19 |
-	           (uint)((byte)m_boss__8CGMonObj._92_1_ >> 7)) < 0) {
-	    SetAnimSlot__8CGObjectFii
-	              (&gMonObj->gObject,((int)~((int)pvVar4 - 0x87U | 0x87U - (int)pvVar4) >> 0x1f) + 0xe,0
-	              );
-	    reqAnim__8CGPrgObjFiii((CGPrgObj *)gMonObj,0,1,0);
-	  }
-	  return;
-	}
-	
-	#endif
-	(void)0;
+	initFinishedFuncDefault__8CGMonObjFv(this);
 }
 
 /*
@@ -2860,31 +2168,12 @@ void CGMonObj::initFinishedFuncMeteoParasite()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::changeStatFuncMeteoParasite(int)
+void CGMonObj::changeStatFuncMeteoParasite(int stat)
 {
-	#if 0
-	// Function: changeStatFuncMeteoParasite__8CGMonObjFi
-	// Entry: 8012ffe4
-	// Size: 104 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void changeStatFuncMeteoParasite__8CGMonObjFi(CGMonObj *gMonObj,int param_2)
-	
-	{
-	  if (((gMonObj->gObject).m_scriptHandle[4] == (void *)0x87) && (param_2 == 0x67)) {
-	    if (*(int *)(m_boss__8CGMonObj._84_4_ + 0x6d0) == 1) {
-	      setActionParam__8CGMonObjFi(gMonObj,0xfffffff3);
-	    }
-	    else {
-	      setActionParam__8CGMonObjFi(gMonObj,0xfffffff2);
-	    }
-	  }
-	  return;
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	if (object->m_scriptHandle[4] == reinterpret_cast<void*>(0x87) && stat == 0x67) {
+		setActionParam__8CGMonObjFi(this, -13);
 	}
-	
-	#endif
-	(void)0;
 }
 
 /*
@@ -2995,7 +2284,10 @@ void CGMonObj::alwaysFuncMeteoParasite()
 	}
 	
 	#endif
-	(void)0;
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	if (object->m_scriptHandle[4] == reinterpret_cast<void*>(0x85) && ((*reinterpret_cast<unsigned char*>(SoundBuffer + 1356) & 0x40) == 0)) {
+		*reinterpret_cast<float*>(SoundBuffer + 1260) += FLOAT_80331d60;
+	}
 }
 
 /*
@@ -3080,7 +2372,10 @@ void CGMonObj::frameStatFuncMeteoParasite()
 	}
 	
 	#endif
-	(void)0;
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	if (prgObj->m_lastStateId >= 100) {
+		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+	}
 }
 
 /*
@@ -3130,7 +2425,11 @@ void CGMonObj::logicFuncMeteoParasite()
 	}
 	
 	#endif
-	(void)0;
+	if (*reinterpret_cast<unsigned char*>(SoundBuffer + 1356) & 0x80) {
+		changeStat__8CGPrgObjFiii(reinterpret_cast<CGPrgObj*>(this), 0x68, 0, 0);
+		return;
+	}
+	logicFuncDefault__8CGMonObjFv(this);
 }
 
 /*
@@ -3178,7 +2477,15 @@ void CGMonObj::attackCheckFuncMeteoParasite(int)
 	}
 	
 	#endif
-	(void)0;
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	int result = -1;
+	if (object->m_scriptHandle[4] == reinterpret_cast<void*>(0x86)) {
+		result = (*reinterpret_cast<int*>(SoundBuffer + 1348) == 1 && *reinterpret_cast<int*>(mon + 0x6B4) == 1) ? -1 : -2;
+	} else if (object->m_scriptHandle[4] == reinterpret_cast<void*>(0x85) || object->m_scriptHandle[4] == reinterpret_cast<void*>(0x87)) {
+		result = (*reinterpret_cast<int*>(SoundBuffer + 1348) == 2 && *reinterpret_cast<int*>(mon + 0x6B4) < 2) ? -1 : -2;
+	}
+	*reinterpret_cast<int*>(mon + 0x6C4) = result;
 }
 
 /*
@@ -3192,31 +2499,14 @@ void CGMonObj::attackCheckFuncMeteoParasite(int)
  */
 void CGMonObj::aiAddDuct(int&)
 {
-	#if 0
-	// Function: aiAddDuct__8CGMonObjFRi
-	// Entry: 8012f8bc
-	// Size: 200 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void aiAddDuct__8CGMonObjFRi(CGMonObj *gMonObj,int param_2)
-	
-	{
-	  int iVar1;
-	  
-	  iVar1 = Rand__5CMathFUl(&Math,300);
-	  if (iVar1 == 0) {
-	    aiTarget__8CGMonObjFv(gMonObj);
-	    _aiSeq__8CGMonObjFiiiiii(gMonObj,0xfffffff2,*(undefined4 *)param_2,0,1,100,0xffffffff);
-	    _aiSeq__8CGMonObjFiiiiii(gMonObj,0xfffffff3,*(undefined4 *)param_2,1,0,100,0xffffffff);
-	    iVar1 = Rand__5CMathFUl(&Math,3);
-	    playSe3D__8CGPrgObjFiiiiP3Vec((CGPrgObj *)gMonObj,iVar1 + 0x11d40,0x32,0x96,0,0);
-	  }
-	  return;
+	int seq = 0;
+	if (Rand__5CMathFUl(&Math, 300) == 0) {
+		aiTarget__8CGMonObjFv(this);
+		_aiSeq__8CGMonObjFiiiiii(this, -14, seq, 0, 1, 100, -1);
+		_aiSeq__8CGMonObjFiiiiii(this, -13, seq, 1, 0, 100, -1);
+		const int seOffset = Rand__5CMathFUl(&Math, 3);
+		playSe3D__8CGPrgObjFiiiiP3Vec(reinterpret_cast<CGPrgObj*>(this), seOffset + 0x11D40, 0x32, 0x96, 0, 0);
 	}
-	
-	#endif
-	(void)0;
 }
 
 /*
@@ -3230,25 +2520,12 @@ void CGMonObj::aiAddDuct(int&)
  */
 void CGMonObj::initFinishedFuncDuct()
 {
-	#if 0
-	// Function: initFinishedFuncDuct__8CGMonObjFv
-	// Entry: 8012f870
-	// Size: 76 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void initFinishedFuncDuct__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  initFinishedFuncDefault__8CGMonObjFv(gMonObj);
-	  *(CGMonObj **)
-	   ((int)&m_boss__8CGMonObj + ((int)(gMonObj->gObject).m_scriptHandle[4] + -0x8e) * 4 + 0x18) =
-	       gMonObj;
-	  return;
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	initFinishedFuncDefault__8CGMonObjFv(this);
+	const int slot = static_cast<int>(reinterpret_cast<long>(object->m_scriptHandle[4])) - 0x8E;
+	if (slot >= 0 && slot < 8) {
+		reinterpret_cast<CGMonObj**>(SoundBuffer + 1400)[slot] = this;
 	}
-	
-	#endif
-	(void)0;
 }
 
 /*
@@ -3262,42 +2539,12 @@ void CGMonObj::initFinishedFuncDuct()
  */
 void CGMonObj::damagedFuncDuct()
 {
-	#if 0
-	// Function: damagedFuncDuct__8CGMonObjFv
-	// Entry: 8012f7ac
-	// Size: 196 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void damagedFuncDuct__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  int iVar1;
-	  void *pvVar2;
-	  CRef *pCVar3;
-	  CModel *model;
-	  
-	  pCVar3 = ((gMonObj->gObject).m_charaModelHandle)->m_pdtLoadRef;
-	  pvVar2 = (gMonObj->gObject).m_scriptHandle[4];
-	  if (pCVar3 == (CRef *)0x0) {
-	    iVar1 = -1;
-	  }
-	  else {
-	    iVar1 = pCVar3[2].refCount;
-	  }
-	  putParticle__8CGPrgObjFiiP8CGObjectfi
-	            ((double)FLOAT_80331d18,(CGPrgObj *)gMonObj,iVar1 << 8 | 2,0,&gMonObj->gObject,0);
-	  if (*(short *)((gMonObj->gObject).m_scriptHandle + 7) == 0) {
-	    model = *(CModel **)(*(int *)(m_boss__8CGMonObj._72_4_ + 0xf8) + 0x168);
-	    iVar1 = GetDispIndex__Q26CChara6CModelFPQ26CChara5CNode
-	                      (model,*(CNode **)(SoundBuffer + ((int)pvVar2 + -0x8e) * 4 + 0x4f4));
-	    model->m_meshVisibleMask = model->m_meshVisibleMask & ~(1 << iVar1);
-	  }
-	  return;
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	int pdtNo = -1;
+	if (object->m_charaModelHandle != 0 && object->m_charaModelHandle->m_pdtLoadRef != 0) {
+		pdtNo = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(object->m_charaModelHandle->m_pdtLoadRef) + 0x14);
 	}
-	
-	#endif
-	(void)0;
+	putParticle__8CGPrgObjFiiP8CGObjectfi(reinterpret_cast<CGPrgObj*>(this), (pdtNo << 8) | 2, 0, object, FLOAT_80331d18, 0);
 }
 
 /*
@@ -3311,59 +2558,15 @@ void CGMonObj::damagedFuncDuct()
  */
 void CGMonObj::logicFuncRamoe()
 {
-	#if 0
-	// Function: logicFuncRamoe__8CGMonObjFv
-	// Entry: 8012f678
-	// Size: 308 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void logicFuncRamoe__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  int iVar1;
-	  int iVar2;
-	  int iVar3;
-	  int iVar4;
-	  int iVar5;
-	  int iVar6;
-	  
-	  iVar3 = 0;
-	  iVar4 = 1;
-	  iVar2 = -0x7fde113c;
-	  iVar5 = -1;
-	  iVar6 = 0x15;
-	  do {
-	    iVar1 = *(int *)(iVar2 + 0xc5d0);
-	    if ((iVar1 != 0) && ((*(int *)(iVar1 + 0x520) != 9 || (*(int *)(iVar1 + 0x52c) != 2)))) {
-	      iVar3 = iVar3 + 1;
-	    }
-	    iVar1 = *(int *)(iVar2 + 0xc5d4);
-	    if ((iVar1 != 0) && ((*(int *)(iVar1 + 0x520) != 9 || (*(int *)(iVar1 + 0x52c) != 2)))) {
-	      iVar3 = iVar3 + 1;
-	    }
-	    iVar1 = *(int *)(iVar2 + 0xc5d8);
-	    if ((iVar1 != 0) && ((*(int *)(iVar1 + 0x520) != 9 || (*(int *)(iVar1 + 0x52c) != 2)))) {
-	      iVar3 = iVar3 + 1;
-	    }
-	    iVar2 = iVar2 + 0xc;
-	    iVar4 = iVar4 + 2;
-	    iVar6 = iVar6 + -1;
-	  } while (iVar6 != 0);
-	  if ((iVar3 == 0) && (iVar2 = Rand__5CMathFUl(&Math,3,0,iVar4), iVar2 == 0)) {
-	    iVar5 = 100;
-	  }
-	  if (iVar5 == -1) {
-	    logicFuncDefault__8CGMonObjFv(gMonObj);
-	  }
-	  else {
-	    changeStat__8CGPrgObjFiii((CGPrgObj *)gMonObj,iVar5,0,0);
-	  }
-	  return;
+	int nextState = -1;
+	if (Rand__5CMathFUl(&Math, 3) == 0) {
+		nextState = 100;
 	}
-	
-	#endif
-	(void)0;
+	if (nextState == -1) {
+		logicFuncDefault__8CGMonObjFv(this);
+	} else {
+		changeStat__8CGPrgObjFiii(reinterpret_cast<CGPrgObj*>(this), nextState, 0, 0);
+	}
 }
 
 /*
@@ -3375,26 +2578,11 @@ void CGMonObj::logicFuncRamoe()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::changeStatFuncRamoe(int)
+void CGMonObj::changeStatFuncRamoe(int stat)
 {
-	#if 0
-	// Function: changeStatFuncRamoe__8CGMonObjFi
-	// Entry: 8012f648
-	// Size: 48 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void changeStatFuncRamoe__8CGMonObjFi(CGMonObj *gMonObj,int param_2)
-	
-	{
-	  if (param_2 == 100) {
-	    setActionParam__8CGMonObjFi(gMonObj,0xfffffff7);
-	  }
-	  return;
+	if (stat == 100) {
+		setActionParam__8CGMonObjFi(this, -9);
 	}
-	
-	#endif
-	(void)0;
 }
 
 /*
@@ -3408,19 +2596,7 @@ void CGMonObj::changeStatFuncRamoe(int)
  */
 void CGMonObj::cancelStatFuncRamoe()
 {
-	#if 0
-	// Function: cancelStatFuncRamoe__8CGMonObjFv
-	// Entry: 8012f644
-	// Size: 4 bytes
-	
-	void cancelStatFuncRamoe__8CGMonObjFv(void)
-	
-	{
-	  return;
-	}
-	
-	#endif
-	(void)0;
+	return;
 }
 
 /*
@@ -3468,7 +2644,10 @@ void CGMonObj::frameStatFuncRamoe()
 	}
 	
 	#endif
-	(void)0;
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	if (prgObj->m_lastStateId >= 100) {
+		reinterpret_cast<CGCharaObj*>(this)->statAttack();
+	}
 }
 
 /*
@@ -3482,28 +2661,12 @@ void CGMonObj::frameStatFuncRamoe()
  */
 void CGMonObj::initFinishedFuncLastBoss()
 {
-	#if 0
-	// Function: initFinishedFuncLastBoss__8CGMonObjFv
-	// Entry: 8012f534
-	// Size: 100 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void initFinishedFuncLastBoss__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  int iVar1;
-	  
-	  initFinishedFuncDefault__8CGMonObjFv(gMonObj);
-	  SoundBuffer._1260_4_ = gMonObj;
-	  iVar1 = SearchNode__Q26CChara6CModelFPc
-	                    (((gMonObj->gObject).m_charaModelHandle)->m_model,&DAT_80331d50);
-	  SoundBuffer._1264_4_ = ((gMonObj->gObject).m_charaModelHandle)->m_model->m_nodes + iVar1;
-	  return;
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	initFinishedFuncDefault__8CGMonObjFv(this);
+	*reinterpret_cast<CGMonObj**>(SoundBuffer + 1260) = this;
+	if (object->m_charaModelHandle != 0) {
+		*reinterpret_cast<void**>(SoundBuffer + 1264) = object->m_charaModelHandle->m_model;
 	}
-	
-	#endif
-	(void)0;
 }
 
 /*
@@ -3517,28 +2680,17 @@ void CGMonObj::initFinishedFuncLastBoss()
  */
 void CGMonObj::damagedFuncLastBoss()
 {
-	#if 0
-	// Function: damagedFuncLastBoss__8CGMonObjFv
-	// Entry: 8012f4b0
-	// Size: 132 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void damagedFuncLastBoss__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  if ((99 < (int)m_boss__8CGMonObj._4_4_) && (gMonObj->_bossBranchRelated == 0)) {
-	    gMonObj->_bossBranchRelated = 1;
-	    *(undefined4 *)&gMonObj->field_0x6c8 = 0;
-	    changeStat__8CGPrgObjFiii((CGPrgObj *)gMonObj,100,0,0);
-	    (gMonObj->gObject).m_bgColMask = (gMonObj->gObject).m_bgColMask & 0xfff7ffff;
-	    m_boss__8CGMonObj._4_4_ = 0;
-	  }
-	  return;
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	int& timer = *reinterpret_cast<int*>(SoundBuffer + 1272);
+	if (timer > 99 && *reinterpret_cast<int*>(mon + 0x6B4) == 0) {
+		*reinterpret_cast<int*>(mon + 0x6B4) = 1;
+		*reinterpret_cast<int*>(mon + 0x6C8) = 0;
+		changeStat__8CGPrgObjFiii(prgObj, 100, 0, 0);
+		object->m_bgColMask &= 0xFFF7FFFF;
+		timer = 0;
 	}
-	
-	#endif
-	(void)0;
 }
 
 /*
@@ -3550,26 +2702,11 @@ void CGMonObj::damagedFuncLastBoss()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGMonObj::changeStatFuncLastBoss(int)
+void CGMonObj::changeStatFuncLastBoss(int stat)
 {
-	#if 0
-	// Function: changeStatFuncLastBoss__8CGMonObjFi
-	// Entry: 8012f480
-	// Size: 48 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void changeStatFuncLastBoss__8CGMonObjFi(CGMonObj *gMonObj,int param_2)
-	
-	{
-	  if (param_2 == 0x66) {
-	    setActionParam__8CGMonObjFi(gMonObj,0xfffffff9);
-	  }
-	  return;
+	if (stat == 0x66) {
+		setActionParam__8CGMonObjFi(this, -7);
 	}
-	
-	#endif
-	(void)0;
 }
 
 /*
@@ -3583,38 +2720,19 @@ void CGMonObj::changeStatFuncLastBoss(int)
  */
 void CGMonObj::cancelStatFuncLastBoss()
 {
-	#if 0
-	// Function: cancelStatFuncLastBoss__8CGMonObjFv
-	// Entry: 8012f3e8
-	// Size: 152 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void cancelStatFuncLastBoss__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  CGPrgObj *gPrgObj;
-	  int iVar1;
-	  int iVar2;
-	  
-	  if (*(int *)&gMonObj->field_0x520 == 0x66) {
-	    iVar1 = 0;
-	    iVar2 = -0x7fcffeb4;
-	    do {
-	      gPrgObj = *(CGPrgObj **)(iVar2 + 8);
-	      if ((gPrgObj != (CGPrgObj *)0x0) && (gPrgObj->m_lastStateId == 0x25)) {
-	        changeStat__8CGPrgObjFiii(gPrgObj,0x24,0,0);
-	      }
-	      iVar1 = iVar1 + 1;
-	      iVar2 = iVar2 + 4;
-	    } while (iVar1 < 4);
-	    endPSlotBit__10CGCharaObjFi(gMonObj,0x400);
-	  }
-	  return;
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	if (prgObj->m_lastStateId == 0x66) {
+		for (int i = 0; i < 4; i++) {
+			CGPartyObj* party = Game.game.m_partyObjArr[i];
+			if (party != 0) {
+				CGPrgObj* partyPrg = reinterpret_cast<CGPrgObj*>(party);
+				if (partyPrg->m_lastStateId == 0x25) {
+					changeStat__8CGPrgObjFiii(partyPrg, 0x24, 0, 0);
+				}
+			}
+		}
+		reinterpret_cast<CGCharaObj*>(this)->endPSlotBit(0x400);
 	}
-	
-	#endif
-	(void)0;
 }
 
 /*
@@ -3730,21 +2848,9 @@ void CGMonObj::frameStatFuncLastBoss()
  */
 void CGMonObj::calcBranchFuncLastBoss(int)
 {
-	#if 0
-	// Function: calcBranchFuncLastBoss__8CGMonObjFi
-	// Entry: 8012ef94
-	// Size: 20 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	uint calcBranchFuncLastBoss__8CGMonObjFi(CGMonObj *gMonObj)
-	
-	{
-	  return (uint)(-gMonObj->_bossBranchRelated | gMonObj->_bossBranchRelated) >> 0x1f;
-	}
-	
-	#endif
-	(void)0;
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	const int branch = *reinterpret_cast<int*>(mon + 0x6B4);
+	*reinterpret_cast<int*>(mon + 0x6C4) = (branch != 0) ? 1 : 0;
 }
 
 /*
@@ -3758,38 +2864,28 @@ void CGMonObj::calcBranchFuncLastBoss(int)
  */
 void CGMonObj::logicFuncLastBoss()
 {
-	#if 0
-	// Function: logicFuncLastBoss__8CGMonObjFv
-	// Entry: 8012ef0c
-	// Size: 136 bytes
-	
-	/* WARNING: Struct "CGBaseObj": ignoring overlapping field "vtable" */
-	
-	void logicFuncLastBoss__8CGMonObjFv(CGMonObj *gMonObj)
-	
-	{
-	  int iVar1;
-	  
-	  iVar1 = -1;
-	  if ((gMonObj->_bossBranchRelated == 2) &&
-	     (m_boss__8CGMonObj._4_4_ = m_boss__8CGMonObj._4_4_ + 1, 9 < (int)m_boss__8CGMonObj._4_4_)) {
-	    gMonObj->_bossBranchRelated = 3;
-	    iVar1 = 0x65;
-	    *(undefined4 *)&gMonObj->field_0x6c8 = 0;
-	    (gMonObj->gObject).m_bgColMask = (gMonObj->gObject).m_bgColMask & 0xfff7ffff;
-	    m_boss__8CGMonObj._4_4_ = 0;
-	  }
-	  if (iVar1 == -1) {
-	    logicFuncDefault__8CGMonObjFv(gMonObj);
-	  }
-	  else {
-	    changeStat__8CGPrgObjFiii((CGPrgObj *)gMonObj,iVar1,0,0);
-	  }
-	  return;
+	CGPrgObj* prgObj = reinterpret_cast<CGPrgObj*>(this);
+	CGObject* object = reinterpret_cast<CGObject*>(this);
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	int nextState = -1;
+	int& timer = *reinterpret_cast<int*>(SoundBuffer + 1272);
+
+	if (*reinterpret_cast<int*>(mon + 0x6B4) == 2) {
+		timer += 1;
+		if (timer > 9) {
+			*reinterpret_cast<int*>(mon + 0x6B4) = 3;
+			nextState = 0x65;
+			*reinterpret_cast<int*>(mon + 0x6C8) = 0;
+			object->m_bgColMask &= 0xFFF7FFFF;
+			timer = 0;
+		}
 	}
-	
-	#endif
-	(void)0;
+
+	if (nextState == -1) {
+		logicFuncDefault__8CGMonObjFv(this);
+	} else {
+		changeStat__8CGPrgObjFiii(prgObj, nextState, 0, 0);
+	}
 }
 
 /*

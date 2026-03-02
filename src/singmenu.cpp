@@ -1404,12 +1404,36 @@ void CMenuPcs::SingleDrawCtrl()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80147728
+ * PAL Size: 420b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::DrawSingleIcon(int, int, int, float, int, float)
+void CMenuPcs::DrawSingleIcon(int iconNo, int posX, int posY, float alpha, int rawIcon, float uvScale)
 {
-	// TODO
+    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
+
+    _GXColor color = {0xFF, 0xFF, 0xFF, static_cast<u8>(FLOAT_80332940 * alpha)};
+    GXSetChanMatColor(GX_COLOR0A0, color);
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(this, 0x25);
+    if (rawIcon == 0) {
+        iconNo = static_cast<int>(lbl_801DE6AC[iconNo]);
+    }
+
+    int row = iconNo / 8;
+    int col = iconNo % 8;
+    if (col < 0) {
+        col += 8;
+        row--;
+    }
+
+    DrawRect__8CMenuPcsFUlfffffffff(
+        this, 0, static_cast<float>(posX), static_cast<float>(posY), FLOAT_8033292c, FLOAT_8033292c,
+        static_cast<float>(col * 0x20), static_cast<float>(row * 0x20), uvScale, uvScale, FLOAT_8033294c);
 }
 
 /*
@@ -1922,12 +1946,73 @@ int CMenuPcs::GetEquipType(int itemNo)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80145ff4
+ * PAL Size: 412b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::GetSmithItem(int)
+int CMenuPcs::GetSmithItem(int itemNo)
 {
-	// TODO
+    int script = Game.game.m_scriptFoodBase[0];
+
+    GetItemType__8CMenuPcsFii(this, itemNo, 1);
+    u16 race = *reinterpret_cast<u16*>(script + 0x3E0);
+    u16 raceType = race & 3;
+    int itemBase = Game.game.unkCFlatData0[2] + itemNo * 0x48;
+
+    int smithItem = *reinterpret_cast<u16*>(itemBase + raceType * 2 + 0x38);
+    if (smithItem != 0) {
+        u16 flags = *reinterpret_cast<u16*>(Game.game.unkCFlatData0[2] + smithItem * 0x48 + 4);
+        unsigned int raceMask = 1 << (*reinterpret_cast<u16*>(script + 0x3E0) & 3);
+        unsigned int genderMask = 0x10;
+        if (*reinterpret_cast<s16*>(script + 0x3E2) != 0) {
+            genderMask = 0x20;
+        }
+
+        bool valid;
+        if (((flags & 0xF) == 0) || ((flags & 0x30) == 0)) {
+            if ((flags & 0xF) == 0) {
+                valid = (flags & 0x30 & genderMask) != 0;
+            } else {
+                valid = (flags & 0xF & raceMask) != 0;
+            }
+        } else {
+            valid = ((flags & 0xF & raceMask) != 0) && ((flags & 0x30 & genderMask) != 0);
+        }
+
+        if (valid) {
+            return smithItem;
+        }
+    }
+
+    if (raceType != 0) {
+        smithItem = *reinterpret_cast<u16*>(itemBase + 0x38);
+        if (smithItem != 0) {
+            return smithItem;
+        }
+    }
+    if (raceType != 1) {
+        smithItem = *reinterpret_cast<u16*>(itemBase + 0x3A);
+        if (smithItem != 0) {
+            return smithItem;
+        }
+    }
+    if (raceType != 2) {
+        smithItem = *reinterpret_cast<u16*>(itemBase + 0x3C);
+        if (smithItem != 0) {
+            return smithItem;
+        }
+    }
+    if (raceType != 3) {
+        smithItem = *reinterpret_cast<u16*>(itemBase + 0x3E);
+        if (smithItem != 0) {
+            return smithItem;
+        }
+    }
+
+    return -1;
 }
 
 /*

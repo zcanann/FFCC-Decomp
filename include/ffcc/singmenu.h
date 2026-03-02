@@ -53,7 +53,7 @@ public:
     int SingWinMessHeight();
     int ChkEquipPossible(int);
     int GetEquipType(int);
-    void GetSmithItem(int);
+    int GetSmithItem(int);
     void GetRecipeMaterial(int, MaterialInfo*);
     void GetRaceStr(int, char*);
     void DrawSingBar(int, int, int, float);

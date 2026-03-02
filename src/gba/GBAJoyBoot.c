@@ -10,6 +10,8 @@ static void F23(s32 chan, s32 ret);
 static void F25(s32 chan, s32 ret);
 static void F27(s32 chan, s32 ret);
 static void F29(s32 chan, s32 ret);
+static void F104(s32 chan, s32 ret);
+void __GBAX01(s32 chan, s32 ret);
 static void F31(s32 chan, s32 ret);
 static void F33(s32 chan, s32 ret);
 static void F35(s32 chan, s32 ret);
@@ -52,6 +54,19 @@ static void F104(s32 chan, s32 ret) {
         bootInfo->callback = NULL;
         callback(chan, ret);
     }
+}
+
+static void F29(s32 chan, s32 ret) {
+    GBAControl* gba = &__GBA[chan];
+    GBABootInfo* bootInfo = &__GBA[chan].bootInfo;
+
+    if (ret == GBA_READY) {
+        __GBAX02(chan, bootInfo->readbuf);
+    } else {
+        F104(chan, ret);
+    }
+
+    gba->ret = ret;
 }
 
 s32 GBAJoyBootAsync(s32 chan, s32 paletteColor, s32 paletteSpeed, u8* programp, s32 length,
@@ -135,7 +150,7 @@ static void F27(s32 chan, s32 ret) {
     gba->ret = ret;
 }
 
-static void F29(s32 chan, s32 ret) {
+void __GBAX01(s32 chan, s32 ret) {
     GBAControl* gba = &__GBA[chan];
     GBABootInfo* bootInfo = &__GBA[chan].bootInfo;
     int val200;

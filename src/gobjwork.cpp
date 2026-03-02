@@ -518,12 +518,29 @@ int CCaravanWork::CanAddComList(int count)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a200c
+ * PAL Size: 164b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::AddComList(int, int*)
+int CCaravanWork::AddComList(int itemSlot, int* cmdListSlotOut)
 {
-	// TODO
+	if (m_numCmdListSlots > 2) {
+		for (int i = 2; i < (short)m_numCmdListSlots; i++) {
+			if ((short)m_commandListInventorySlotRef[i] == -1) {
+				m_commandListInventorySlotRef[i] = (unsigned short)itemSlot;
+				Joybus.SetCmdLst(m_joybusCaravanId, i, itemSlot);
+				if (cmdListSlotOut != 0) {
+					*cmdListSlotOut = i;
+				}
+				return 1;
+			}
+		}
+	}
+
+	return 0;
 }
 
 /*

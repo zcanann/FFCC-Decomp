@@ -8,6 +8,7 @@
 #include "ffcc/map.h"
 #include "ffcc/math.h"
 #include "ffcc/p_game.h"
+#include "ffcc/stopwatch.h"
 
 #include <string.h>
 
@@ -66,7 +67,11 @@ extern "C" void _pppDrawPart__FP9_pppMngSt(_pppMngSt*);
 extern "C" void Create__9CGBaseObjFv(CGBaseObj*);
 extern "C" void LoadMap__7CMapPcsFiiPvUlUc(void*, int, int, void*, unsigned long, unsigned char);
 extern "C" int SearchNodeSk__Q26CChara6CModelFPc(CChara::CModel*, char*);
+extern "C" void SetFrame__Q26CChara6CModelFf(float, CChara::CModel*);
+extern "C" void CalcMatrix__Q26CChara6CModelFv(CChara::CModel*);
+extern "C" void CalcSkin__Q26CChara6CModelFv(CChara::CModel*);
 extern int DAT_8032ed70;
+extern CProfile g_par_calc_prof;
 extern unsigned char PartPcs[];
 extern unsigned char MapPcs[];
 extern void* CAMemCacheSet;
@@ -964,12 +969,129 @@ void CPartMng::pppEditBeforeCalc()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005b79c
+ * PAL Size: 1060b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CPartMng::pppEditPartCalc()
 {
-	// TODO
+    struct PppPdtSlotRaw {
+        _pppDataHead* m_pdt;
+        int m_refCount;
+        char m_name[0x30];
+    };
+
+    static const int kUsbEditOffset = 0x7F0;
+    static const int kPppMngOffset = 0x2A18;
+    static const int kPppMngCount = 0x180;
+    static const int kPppMngStride = 0x158;
+    static const int kPdtSlotsOffset = 0x22E18;
+
+    char* self = reinterpret_cast<char*>(this);
+    unsigned char* usbEdit = reinterpret_cast<unsigned char*>(self + kUsbEditOffset);
+    CGObject* editorObj = *reinterpret_cast<CGObject**>(usbEdit + 0x1C);
+    unsigned char* mng = reinterpret_cast<unsigned char*>(self + kPppMngOffset);
+    PppPdtSlotRaw* pdtSlots = reinterpret_cast<PppPdtSlotRaw*>(self + kPdtSlotsOffset);
+
+    OSStopStopwatch(&g_par_calc_prof);
+    if (editorObj != 0 && editorObj->m_charaModelHandle != 0 && editorObj->m_charaModelHandle->m_model != 0) {
+        CChara::CModel* model = editorObj->m_charaModelHandle->m_model;
+        CalcMatrix__Q26CChara6CModelFv(model);
+        CalcSkin__Q26CChara6CModelFv(model);
+        SetFrame__Q26CChara6CModelFf(*reinterpret_cast<float*>(self + 0x23564), model);
+        if (DAT_8032ed70 == 0) {
+            *reinterpret_cast<float*>(self + 0x23564) += FLOAT_8032fe18;
+        }
+    }
+    OSStartStopwatch(&g_par_calc_prof);
+
+    if (usbEdit[0x18] != 0) {
+        usbEdit[0x18] = 0;
+        usbEdit[0x19] = 1;
+        usbEdit[0x1A] = 0;
+
+        Graphic._WaitDrawDone(s_partMng_cpp_801d8230, 0x3a9);
+        for (int i = 0; i < kPppMngCount; i++) {
+            if (*reinterpret_cast<int*>(mng + 0x14) != -0x1000) {
+                _pppAllFreePObject(reinterpret_cast<_pppMngSt*>(mng));
+            }
+            mng += kPppMngStride;
+        }
+
+        *reinterpret_cast<int*>(self + 0x2355C) = 0;
+
+        Graphic._WaitDrawDone(s_partMng_cpp_801d8230, 0x3b3);
+        if (pdtSlots[0].m_pdt != 0) {
+            unsigned char* firstMng = reinterpret_cast<unsigned char*>(self + kPppMngOffset);
+            firstMng[0xE5] = 0;
+            firstMng[0xA8] = *reinterpret_cast<unsigned char*>(self + 0x158);
+            firstMng[0xA9] = *reinterpret_cast<unsigned char*>(self + 0x159);
+            firstMng[0xAA] = *reinterpret_cast<unsigned char*>(self + 0x15A);
+            firstMng[0xAB] = *reinterpret_cast<unsigned char*>(self + 0x15B);
+            _pppStartPart(reinterpret_cast<_pppMngSt*>(firstMng), reinterpret_cast<long*>(pdtSlots[0].m_pdt), 1);
+        }
+    }
+
+    if (DAT_8032ed68 != 0 || pdtSlots[0].m_pdt == 0) {
+        return;
+    }
+
+    int editDrawMode = *reinterpret_cast<int*>(self + 0x23570);
+    int loopCount = *reinterpret_cast<int*>(self + 0x2355C);
+    if (loopCount > kPppMngCount) {
+        loopCount = kPppMngCount;
+    }
+
+    mng = reinterpret_cast<unsigned char*>(self + kPppMngOffset);
+    for (int i = 0; i < loopCount; i++) {
+        int baseTime = *reinterpret_cast<int*>(mng + 0x14);
+        pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
+        if (baseTime == -0x1000) {
+            mng += kPppMngStride;
+            continue;
+        }
+
+        if (editDrawMode >= 4 && baseTime == -0x1000) {
+            *reinterpret_cast<int*>(mng + 0x14) = 0;
+            baseTime = 0;
+        }
+
+        if (baseTime >= 0) {
+            baseTime -= 1;
+            *reinterpret_cast<int*>(mng + 0x14) = baseTime;
+            if (baseTime < 0) {
+                mng[0xE5] = 0;
+                mng[0xA8] = *reinterpret_cast<unsigned char*>(self + 0x158);
+                mng[0xA9] = *reinterpret_cast<unsigned char*>(self + 0x159);
+                mng[0xAA] = *reinterpret_cast<unsigned char*>(self + 0x15A);
+                mng[0xAB] = *reinterpret_cast<unsigned char*>(self + 0x15B);
+                _pppStartPart(reinterpret_cast<_pppMngSt*>(mng), reinterpret_cast<long*>(pdtSlots[0].m_pdt), 1);
+            }
+        }
+
+        pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(*reinterpret_cast<char**>(mng) + 4);
+        pppSetMatrix(reinterpret_cast<_pppMngSt*>(mng));
+        pppSetFpMatrix(reinterpret_cast<_pppMngSt*>(mng));
+        _pppCalcPart(reinterpret_cast<_pppMngSt*>(mng));
+        _pppDeadPart(reinterpret_cast<_pppMngSt*>(mng));
+
+        if (mng[0xE6] != 0 || mng[0xE4] != 0) {
+            Graphic._WaitDrawDone(s_partMng_cpp_801d8230, (editDrawMode < 4) ? 0x827 : 0x861);
+            _pppAllFreePObject(reinterpret_cast<_pppMngSt*>(mng));
+            Graphic._WaitDrawDone(s_partMng_cpp_801d8230, (editDrawMode < 4) ? 0x82b : 0x865);
+            if (editDrawMode > 3) {
+                pppHeapCheckLeak(pppEnvStPtr->m_stagePtr);
+            }
+            if (i == 0) {
+                usbEdit[0x1A] = 1;
+            }
+        }
+
+        mng += kPppMngStride;
+    }
 }
 
 /*

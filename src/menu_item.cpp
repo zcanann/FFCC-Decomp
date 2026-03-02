@@ -433,12 +433,12 @@ int CMenuPcs::ItemCtrl()
     iVar2 = *(int*)((u8*)this + 0x82C);
     sVar1 = *(s16*)(iVar2 + 0x30);
 
-    if ((!sVar1) || ((sVar1) && (*(s16*)(iVar2 + 0x12) == 1))) {
+    if ((sVar1 == 0) || ((sVar1 != 0) && (*(s16*)(iVar2 + 0x12) == 1))) {
         iVar3 = ItemCtrlCur();
     } else if ((sVar1 == 1) && (*(s16*)(iVar2 + 0x12) == 0)) {
-        if ((!*(s16*)(iVar2 + 0x12)) && (*(s16*)(*(int*)((u8*)this + 0x848) + 10) == 1)) {
+        if (*(s16*)(*(int*)((u8*)this + 0x848) + 10) == 1) {
             iVar3 = 0;
-            *(s16*)(iVar2 + 0x12) = *(s16*)(iVar2 + 0x12) + 1;
+            *(s16*)(iVar2 + 0x12) = 1;
         }
     } else if (((sVar1 == 1) && (*(s16*)(iVar2 + 0x12) == 2)) &&
                (*(s16*)(*(int*)((u8*)this + 0x848) + 10) == 3)) {

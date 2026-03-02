@@ -61,15 +61,10 @@ void pppRandFV(void* param1, void* param2, void* param3)
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
 
-    f32* target;
-    if (in->field4 == -1) {
-        target = lbl_801EADC8;
-    } else {
-        target = (f32*)(base + in->field4 + 0x80);
-    }
+    f32* target = (in->field4 == -1) ? lbl_801EADC8 : (f32*)(base + in->field4 + 0x80);
 
     f32 scale = *valuePtr;
-    target[0] = in->field8 * scale + target[0];
-    target[1] = in->fieldC * scale + target[1];
-    target[2] = in->field10 * scale + target[2];
+    target[0] = target[0] + (in->field8 * scale - in->field8);
+    target[1] = target[1] + (in->fieldC * scale - in->fieldC);
+    target[2] = target[2] + (in->field10 * scale - in->field10);
 }

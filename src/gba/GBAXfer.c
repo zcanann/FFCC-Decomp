@@ -1,17 +1,27 @@
 #include "dolphin/gba/GBAPriv.h"
 #include "dolphin/si.h"
 
+/*
+ * --INFO--
+ * PAL Address: 0x801A8A64
+ * PAL Size: 220b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void __GBAHandler(s32 chan, u32 error, OSContext* context) {
     GBAControl* gba;
     GBATransferCallback proc;
     GBACallback callback;
     OSContext exceptionContext;
 
+    gba = &__GBA[chan];
+
     if (__GBAReset != 0) {
         return;
     }
 
-    gba = &__GBA[chan];
     if ((error & 0xf) == 0) {
         gba->ret = GBA_READY;
     } else {
@@ -24,10 +34,10 @@ void __GBAHandler(s32 chan, u32 error, OSContext* context) {
         proc(chan);
     }
 
-    callback = gba->callback;
-    if (callback != NULL) {
+    if (gba->callback != NULL) {
         OSClearContext(&exceptionContext);
         OSSetCurrentContext(&exceptionContext);
+        callback = gba->callback;
         gba->callback = NULL;
         callback(chan, gba->ret);
         OSClearContext(&exceptionContext);
@@ -40,21 +50,29 @@ void __GBASyncCallback(s32 chan, s32 ret) {
     OSWakeupThread(&__GBA[chan].threadQueue);
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801A8B74
+ * PAL Size: 108b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 s32 __GBASync(s32 chan) {
-    s32 enabled;
     GBAControl* gba;
-    s32 ret;
+    s32 enabled;
 
-    enabled = OSDisableInterrupts();
     gba = &__GBA[chan];
+    enabled = OSDisableInterrupts();
     while (gba->callback != NULL) {
         OSSleepThread(&gba->threadQueue);
     }
 
-    ret = __GBA[chan].ret;
+    chan = gba->ret;
     OSRestoreInterrupts(enabled);
 
-    return ret;
+    return chan;
 }
 
 void TypeAndStatusCallback(s32 chan, u32 type) {

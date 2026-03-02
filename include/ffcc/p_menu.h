@@ -203,14 +203,14 @@ public:
     void DrawMcWinMess(int, int);
     void GetWinSize(int, short*, short*, int);
     void SetTextureLoc(int);
-    void GetMaxAnimWait();
+    float GetMaxAnimWait();
     void BindMcObj();
     void DrawFilter(unsigned char, unsigned char, unsigned char, unsigned char);
     CFont* GetFont22();
     void CopyNowCaravanDat(Mc::SaveDat*);
     void SetCaravanWork(Mc::SaveDat*);
     void GetSameCharaData(Mc::SaveDat*, Mc::SaveDat*, int, int);
-    void CheckSameMcFormatID(Mc::SaveDat*, Mc::SaveDat*);
+    int CheckSameMcFormatID(Mc::SaveDat*, Mc::SaveDat*);
     void IsAsyncCharaLoadFinish();
     void AlphaNormal();
     void AlphaAdd();

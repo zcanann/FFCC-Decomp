@@ -13,6 +13,7 @@
 ###
 
 import argparse
+import os
 import sys
 from pathlib import Path
 from typing import Any, Dict, List
@@ -297,6 +298,55 @@ cflags_thp = [
     *cflags_base,
 ]
 
+
+def replace_flag_prefix(flags: List[str], prefix: str, new_flag: str) -> List[str]:
+    out = [f for f in flags if not f.startswith(prefix)]
+    out.append(new_flag)
+    return out
+
+
+def redsound_flags_from_profile(profile: str) -> List[str]:
+    base = list(cflags_game)
+    if profile == "game":
+        return base
+    if profile == "char_signed":
+        return [*base, "-char signed"]
+    if profile == "inline_auto_deferred":
+        return replace_flag_prefix(base, "-inline ", "-inline auto,deferred")
+    if profile == "str_pool_common_off":
+        return [
+            *replace_flag_prefix(base, "-str ", "-str reuse,pool,readonly"),
+            "-common off",
+        ]
+    if profile == "runtime_like":
+        return [
+            *replace_flag_prefix(base, "-str ", "-str reuse,pool,readonly"),
+            "-common off",
+            "-use_lmw_stmw on",
+            "-gccinc",
+            "-inline auto",
+        ]
+    if profile == "trk_like":
+        return [
+            *replace_flag_prefix(base, "-inline ", "-inline deferred,auto"),
+            "-str reuse",
+            "-char signed",
+            "-common off",
+            "-use_lmw_stmw on",
+            "-gccinc",
+            "-rostr",
+            "-sdata 0",
+            "-sdata2 0",
+        ]
+    print(f"Unknown FFCC_REDSOUND_PROFILE={profile!r}, using 'game' profile")
+    return base
+
+
+# RedSound appears to be authored as middleware-style code and currently responds
+# better to a runtime-like profile in fuzzy objdiff metrics.
+redsound_profile = os.environ.get("FFCC_REDSOUND_PROFILE", "runtime_like")
+redsound_cflags = redsound_flags_from_profile(redsound_profile)
+
 config.linker_version = "GC/1.3.2"
 
 
@@ -330,14 +380,14 @@ config.libs = [
         "cflags": cflags_game,
         "progress_category": "game",
         "objects": [
-            Object(NonMatching, "RedSound/RedCommand.cpp"),
-            Object(NonMatching, "RedSound/RedDriver.cpp"),
-            Object(NonMatching, "RedSound/RedEntry.cpp"),
-            Object(NonMatching, "RedSound/RedExecute.cpp"),
-            Object(NonMatching, "RedSound/RedMemory.cpp"),
-            Object(NonMatching, "RedSound/RedMidiCtrl.cpp"),
-            Object(NonMatching, "RedSound/RedSound.cpp"),
-            Object(NonMatching, "RedSound/RedStream.cpp"),
+            Object(NonMatching, "RedSound/RedCommand.cpp", cflags=redsound_cflags),
+            Object(NonMatching, "RedSound/RedDriver.cpp", cflags=redsound_cflags),
+            Object(NonMatching, "RedSound/RedEntry.cpp", cflags=redsound_cflags),
+            Object(NonMatching, "RedSound/RedExecute.cpp", cflags=redsound_cflags),
+            Object(NonMatching, "RedSound/RedMemory.cpp", cflags=redsound_cflags),
+            Object(NonMatching, "RedSound/RedMidiCtrl.cpp", cflags=redsound_cflags),
+            Object(NonMatching, "RedSound/RedSound.cpp", cflags=redsound_cflags),
+            Object(NonMatching, "RedSound/RedStream.cpp", cflags=redsound_cflags),
             Object(NonMatching, "astar.cpp"),
             Object(NonMatching, "baseobj.cpp"),
             Object(NonMatching, "bonus_menu.cpp"),

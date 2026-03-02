@@ -46,39 +46,26 @@ void pppColMoveCon(void* param1, void* param2)
  */
 void pppColMove(void* param1, void* param2, void* param3)
 {
-    extern int lbl_8032ED70;
-    
-    int** ptr_array = (int**)param3;
-    int* ptr0 = ptr_array[3];  // Load from offset 0xC
-
-    int* ptr_src = (int*)ptr0[0]; // Load from offset 0x0
-    int* ptr_dest = (int*)ptr0[1]; // Load from offset 0x4
-    
-    // Calculate offsets
-    ptr_src = (int*)((char*)ptr_src + 0x80);
-    ptr_dest = (int*)((char*)ptr_dest + 0x80);
-    short* src = (short*)((char*)param1 + (int)ptr_src);
-    short* dest = (short*)((char*)param1 + (int)ptr_dest);
+    pppColMoveInput* input = ((pppColMoveInput**)param3)[3];
+    int sourceOffset = input->id + 0x80;
+    int moveOffset = input->pad + 0x80;
+    pppColMoveVec4S* source = (pppColMoveVec4S*)((char*)param1 + sourceOffset);
+    pppColMoveVec4S* movement = (pppColMoveVec4S*)((char*)param1 + moveOffset);
 
     if (lbl_8032ED70 != 0) {
         return;
     }
-    
-    int* param2_int = (int*)param2;
-    int* param1_int = (int*)param1;
-    
-    if (param2_int[0] == param1_int[3]) {
-        // Update movement values
-        short* movement = (short*)((char*)param2 + 0x8);
-        
-        dest[0] += movement[0];  // x
-        dest[1] += movement[1];  // y
-        dest[2] += movement[2];  // z
-        dest[3] += movement[3];  // w
+
+    if (((int*)param2)[0] == ((int*)param1)[3]) {
+        pppColMoveVec4S* paramMove = (pppColMoveVec4S*)((char*)param2 + 8);
+        movement->x += paramMove->x;
+        movement->y += paramMove->y;
+        movement->z += paramMove->z;
+        movement->w += paramMove->w;
     }
 
-    src[0] += dest[0];  // x
-    src[1] += dest[1];  // y  
-    src[2] += dest[2];  // z
-    src[3] += dest[3];  // w
+    source->x += movement->x;
+    source->y += movement->y;
+    source->z += movement->z;
+    source->w += movement->w;
 }

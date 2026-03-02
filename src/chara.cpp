@@ -16,8 +16,8 @@ extern CharaGlobal Chara;
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 0b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -37,8 +37,8 @@ void D3DXMatrixMultiplyRotate(float (*out)[4], float (*a)[4], float (*b)[4])
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 0b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -126,7 +126,7 @@ void CChara::Destroy()
 /*
  * --INFO--
  * PAL Address: 0x8007392c
- * PAL Size: 68b
+ * PAL Size: 36b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -162,8 +162,8 @@ void CChara::gqrInit(unsigned long, unsigned long, unsigned long)
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 0b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -498,8 +498,8 @@ void CChara::CModel::CalcSkin()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 0b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -615,8 +615,8 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 0b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -751,8 +751,8 @@ void CChara::CModel::DrawShadow(float (*view)[4], int zMode)
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 0b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -952,8 +952,8 @@ void CChara::CNode::Create(CChunkFile& chunk, CChara::CModel* model, CChara::CNo
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 0b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -1070,8 +1070,8 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 0b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -1352,8 +1352,8 @@ CChara::CSkin::~CSkin()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 0b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -1368,8 +1368,8 @@ void CChara::CSkin::Create(CChunkFile& chunk, CMemory::CStage* stage)
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 0b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -1382,8 +1382,8 @@ void CChara::CAnimNode::IsScale()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 0b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO

@@ -40,11 +40,13 @@ void __GBASyncCallback(s32 chan, s32 ret) {
 
 s32 __GBASync(s32 chan) {
     s32 enabled;
+    GBAControl* gba;
     s32 ret;
 
     enabled = OSDisableInterrupts();
-    while (__GBA[chan].callback != NULL) {
-        OSSleepThread(&__GBA[chan].threadQueue);
+    gba = &__GBA[chan];
+    while (gba->callback != NULL) {
+        OSSleepThread(&gba->threadQueue);
     }
 
     ret = __GBA[chan].ret;

@@ -93,10 +93,6 @@ extern "C" void CalcDiaryMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void calcBonus__8CMenuPcsFv(CMenuPcs*);
 extern "C" void calcVillageMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" char* GetLangString__5CGameFv(void*);
-extern "C" void* Open__5CFileFPcUlQ25CFile3PRI(void*, char*, unsigned long, int);
-extern "C" void Read__5CFileFPQ25CFile7CHandle(void*, void*);
-extern "C" void SyncCompleted__5CFileFPQ25CFile7CHandle(void*, void*);
-extern "C" void Close__5CFileFPQ25CFile7CHandle(void*, void*);
 extern "C" void WmInit__8CMenuPcsFv(CMenuPcs*);
 extern "C" void BonusInit__8CMenuPcsFv(CMenuPcs*);
 extern "C" void drawBonus__8CMenuPcsFv(CMenuPcs*);
@@ -348,10 +344,10 @@ void CMenuPcs::create()
     for (int i = 0; i < 2; i++) {
         sprintf(texPath, s_dvd__smenu__s_tex_801d9d6c, Game.GetLangString(), PTR_s_common_8032e7a0[i]);
 
-        void* fileHandle = Open__5CFileFPcUlQ25CFile3PRI(&File, texPath, 0, 0);
+        CFile::CHandle* fileHandle = File.Open(texPath, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {
-            Read__5CFileFPQ25CFile7CHandle(&File, fileHandle);
-            SyncCompleted__5CFileFPQ25CFile7CHandle(&File, fileHandle);
+            File.Read(fileHandle);
+            File.SyncCompleted(fileHandle);
 
             void* stage = *reinterpret_cast<int*>(self + 0x740) == 1 ? *reinterpret_cast<void**>(&MapMng)
                                                                      : *reinterpret_cast<void**>(self + 0xEC);
@@ -362,7 +358,7 @@ void CMenuPcs::create()
                 textureSet->Create(File.m_readBuffer, reinterpret_cast<CMemory::CStage*>(stage), 0, 0, 0, 0);
             }
 
-            Close__5CFileFPQ25CFile7CHandle(&File, fileHandle);
+            File.Close(fileHandle);
         }
     }
 
@@ -1399,10 +1395,10 @@ void CMenuPcs::createBattle()
         const char* language = Game.GetLangString();
         sprintf(path, s_dvd__smenu__s_tex_801d9d6c, language, PTR_s_shibuya_8020f23c[i]);
 
-        void* fileHandle = Open__5CFileFPcUlQ25CFile3PRI(&File, path, 0, 0);
+        CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
         if (fileHandle != 0) {
-            Read__5CFileFPQ25CFile7CHandle(&File, fileHandle);
-            SyncCompleted__5CFileFPQ25CFile7CHandle(&File, fileHandle);
+            File.Read(fileHandle);
+            File.SyncCompleted(fileHandle);
 
             void* stage = *reinterpret_cast<int*>(self + 0x740) == 1 ? *reinterpret_cast<void**>(&MapMng)
                                                                      : *reinterpret_cast<void**>(self + 0xEC);
@@ -1413,7 +1409,7 @@ void CMenuPcs::createBattle()
                 textureSet->Create(File.m_readBuffer, reinterpret_cast<CMemory::CStage*>(stage), 0, 0, 0, 0);
             }
 
-            Close__5CFileFPQ25CFile7CHandle(&File, fileHandle);
+            File.Close(fileHandle);
         }
     }
 

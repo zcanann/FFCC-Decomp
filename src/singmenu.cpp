@@ -48,10 +48,6 @@ extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*,
 extern "C" void Create__11CTextureSetFPvPQ27CMemory6CStageiP13CAmemCacheSetii(CTextureSet*, void*, CMemory::CStage*, int, void*, int, int);
 extern "C" int Find__11CTextureSetFPc(CTextureSet*, char*);
 extern "C" char* GetLangString__5CGameFv(void*);
-extern "C" void* Open__5CFileFPcUlQ25CFile3PRI(void*, char*, unsigned long, int);
-extern "C" void ReadASync__5CFileFPQ25CFile7CHandle(void*, void*);
-extern "C" int IsCompleted__5CFileFPQ25CFile7CHandle(void*, void*);
-extern "C" void Close__5CFileFPQ25CFile7CHandle(void*, void*);
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" void loadFont__8CMenuPcsFiPcii(CMenuPcs*, int, char*, int, int);
 extern "C" void loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(CMenuPcs*, char**, int, int, void*, int, int, int);
@@ -604,11 +600,11 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
                 char path[260];
                 char* language = GetLangString__5CGameFv(&Game.game);
                 sprintf(path, s_dvd__smenu__s_tex_801de8e4, language, PTR_s_solo1_80214b18[loadIndex]);
-                DAT_8032eeb8 = reinterpret_cast<int>(Open__5CFileFPcUlQ25CFile3PRI(&File, path, 0, 0));
-                ReadASync__5CFileFPQ25CFile7CHandle(&File, reinterpret_cast<void*>(DAT_8032eeb8));
+                DAT_8032eeb8 = reinterpret_cast<int>(File.Open(path, 0, CFile::PRI_LOW));
+                File.ReadASync(reinterpret_cast<CFile::CHandle*>(DAT_8032eeb8));
                 *reinterpret_cast<int*>(self + 0x860) = *reinterpret_cast<int*>(self + 0x860) + 1;
             } else if (*reinterpret_cast<int*>(self + 0x860) == 1) {
-                if (IsCompleted__5CFileFPQ25CFile7CHandle(&File, reinterpret_cast<void*>(DAT_8032eeb8)) == 0) {
+                if (!File.IsCompleted(reinterpret_cast<CFile::CHandle*>(DAT_8032eeb8))) {
                     DAT_8032eebc = 0;
                     goto post_texture_load;
                 }
@@ -631,7 +627,7 @@ void CMenuPcs::loadTextureAsync(char **, int, int, CMenuPcs::CTmp*, int, int, in
                 }
 
                 Create__11CTextureSetFPvPQ27CMemory6CStageiP13CAmemCacheSetii(textureSet, File.m_readBuffer, stage, 0, 0, 0, 0);
-                Close__5CFileFPQ25CFile7CHandle(&File, reinterpret_cast<void*>(DAT_8032eeb8));
+                File.Close(reinterpret_cast<CFile::CHandle*>(DAT_8032eeb8));
                 DAT_8032eeb8 = 0;
                 *reinterpret_cast<int*>(self + 0x860) = 0;
                 *reinterpret_cast<int*>(self + 0x85C) = *reinterpret_cast<int*>(self + 0x85C) + 1;

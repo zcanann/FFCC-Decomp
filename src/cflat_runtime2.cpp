@@ -38,7 +38,6 @@ extern "C" void* __register_global_object(void* object, void* destructor, void* 
 extern "C" void AfterFrame__12CFlatRuntimeFi(CFlatRuntime*, int);
 extern "C" void __dt__9CFlatDataFv(void*, int);
 extern "C" void __dt__12CFlatRuntimeFv(CFlatRuntime*, int);
-extern "C" void Close__5CFileFPQ25CFile7CHandle(void*, void*);
 extern "C" void* __vt__13CFlatRuntime2[];
 extern "C" CFlatRuntime2* __ct__13CFlatRuntime2Fv(CFlatRuntime2*);
 extern "C" void __dt__13CFlatRuntime2Fv(void*);
@@ -52,10 +51,6 @@ extern "C" void __ct__9CGQuadObjFv(CGQuadObj*);
 extern "C" void __ct__9CGBaseObjFv(CGBaseObj*);
 extern "C" void pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(CPartMng*, int, int, PPPCREATEPARAM*, int);
 extern "C" char* GetLangString__5CGameFv(void*);
-extern "C" void* Open__5CFileFPcUlQ25CFile3PRI(void*, char*, unsigned long, int);
-extern "C" void Read__5CFileFPQ25CFile7CHandle(void*, void*);
-extern "C" void SyncCompleted__5CFileFPQ25CFile7CHandle(void*, void*);
-extern "C" void ReadASync__5CFileFPQ25CFile7CHandle(void*, void*);
 extern "C" void Printf__7CSystemFPce(CSystem*, const char*, ...);
 extern "C" void ClrBattleItem__8CMenuPcsFv(void*);
 extern "C" void ChangeMogMode__6CCharaFi(void*, int);
@@ -1078,15 +1073,15 @@ int CFlatRuntime2::Load(char* fileName)
 	char path[0x100];
 	sprintf(path, "dvd:/%s.cft", fileName);
 
-	void* fileHandle = Open__5CFileFPcUlQ25CFile3PRI(&File, path, 0, 0);
+	CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
 	if (fileHandle == 0) {
 		return 0;
 	}
 
-	Read__5CFileFPQ25CFile7CHandle(&File, fileHandle);
-	SyncCompleted__5CFileFPQ25CFile7CHandle(&File, fileHandle);
+	File.Read(fileHandle);
+	File.SyncCompleted(fileHandle);
 	Create__12CFlatRuntimeFPv(reinterpret_cast<CFlatRuntime*>(this), File.m_readBuffer);
-	Close__5CFileFPQ25CFile7CHandle(&File, fileHandle);
+	File.Close(fileHandle);
 
 	typedef int (*NeedDebugDataFn)(CFlatRuntime2*);
 	NeedDebugDataFn needDebugData = reinterpret_cast<NeedDebugDataFn>((*reinterpret_cast<void***>(this))[0x12]);
@@ -1099,16 +1094,16 @@ int CFlatRuntime2::Load(char* fileName)
 				sprintf(path, "%s%d", path, debugIndex);
 			}
 
-			fileHandle = Open__5CFileFPcUlQ25CFile3PRI(&File, path, 0, 0);
+			fileHandle = File.Open(path, 0, CFile::PRI_LOW);
 			if (fileHandle == 0) {
 				return 0;
 			}
 
-			Read__5CFileFPQ25CFile7CHandle(&File, fileHandle);
-			SyncCompleted__5CFileFPQ25CFile7CHandle(&File, fileHandle);
+			File.Read(fileHandle);
+			File.SyncCompleted(fileHandle);
 			debugChunk = CreateDebug__12CFlatRuntimeFPvi(
 				reinterpret_cast<CFlatRuntime*>(this), File.m_readBuffer, debugChunk);
-			Close__5CFileFPQ25CFile7CHandle(&File, fileHandle);
+			File.Close(fileHandle);
 
 			if (debugChunk == -1) {
 				break;
@@ -1415,10 +1410,10 @@ void CFlatRuntime2::Destroy()
 
 	u8* layer = reinterpret_cast<u8*>(this) + 0x1770;
 	for (int i = 0; i < 8; i++, layer += 0xC) {
-		void* fileHandle = *reinterpret_cast<void**>(layer + 8);
+		CFile::CHandle* fileHandle = *reinterpret_cast<CFile::CHandle**>(layer + 8);
 		if (fileHandle != 0) {
-			Close__5CFileFPQ25CFile7CHandle(&File, fileHandle);
-			*reinterpret_cast<void**>(layer + 8) = 0;
+			File.Close(fileHandle);
+			*reinterpret_cast<CFile::CHandle**>(layer + 8) = 0;
 		}
 
 		void* textureSet = *reinterpret_cast<void**>(layer + 4);
@@ -1444,12 +1439,12 @@ void CFlatRuntime2::Calc()
 
 	for (int i = 0; i < 8; i++) {
 		u8* layer = runtime + 0x1770 + i * 0xC;
-		void* fileHandle = *reinterpret_cast<void**>(layer + 8);
+		CFile::CHandle* fileHandle = *reinterpret_cast<CFile::CHandle**>(layer + 8);
 		if (fileHandle == 0) {
 			continue;
 		}
 
-		if (File.IsCompleted(reinterpret_cast<CFile::CHandle*>(fileHandle))) {
+		if (File.IsCompleted(fileHandle)) {
 			CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(layer + 4);
 			if (textureSet != 0) {
 				(*(void (**)(void*, int))(*reinterpret_cast<int*>(textureSet) + 8))(textureSet, 1);
@@ -1462,8 +1457,8 @@ void CFlatRuntime2::Calc()
 				textureSet->Create(File.m_readBuffer, Game.game.m_mainStage, 0, 0, 0, 0);
 			}
 
-			Close__5CFileFPQ25CFile7CHandle(&File, fileHandle);
-			*reinterpret_cast<void**>(layer + 8) = 0;
+			File.Close(fileHandle);
+			*reinterpret_cast<CFile::CHandle**>(layer + 8) = 0;
 		}
 	}
 
@@ -1802,10 +1797,10 @@ void CFlatRuntime2::loadLayer(int layerNo, char* fileName)
 	char path[0x104];
 	sprintf(path, "dvd:/%s/%s.tex", GetLangString__5CGameFv(&Game.game), fileName);
 
-	void* fileHandle = Open__5CFileFPcUlQ25CFile3PRI(&File, path, 0, 0);
+	CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
 	if (fileHandle != 0) {
-		Read__5CFileFPQ25CFile7CHandle(&File, fileHandle);
-		SyncCompleted__5CFileFPQ25CFile7CHandle(&File, fileHandle);
+		File.Read(fileHandle);
+		File.SyncCompleted(fileHandle);
 
 		textureSet = new (Game.game.m_mainStage, "cflat_runtime2.cpp", 0x4F4) CTextureSet;
 		*reinterpret_cast<CTextureSet**>(layer + 4) = textureSet;
@@ -1813,7 +1808,7 @@ void CFlatRuntime2::loadLayer(int layerNo, char* fileName)
 			textureSet->Create(File.m_readBuffer, Game.game.m_mainStage, 0, 0, 0, 0);
 		}
 
-		Close__5CFileFPQ25CFile7CHandle(&File, fileHandle);
+		File.Close(fileHandle);
 	}
 }
 
@@ -1842,10 +1837,10 @@ void CFlatRuntime2::loadLayerASync(int layerNo, char* fileName)
 	const int layerOffset = layerNo * 0xC;
 	u8* layer = reinterpret_cast<u8*>(this) + 0x1770 + layerOffset;
 
-	void* fileHandle = *reinterpret_cast<void**>(layer + 8);
+	CFile::CHandle* fileHandle = *reinterpret_cast<CFile::CHandle**>(layer + 8);
 	if (fileHandle != 0) {
-		Close__5CFileFPQ25CFile7CHandle(&File, fileHandle);
-		*reinterpret_cast<void**>(layer + 8) = 0;
+		File.Close(fileHandle);
+		*reinterpret_cast<CFile::CHandle**>(layer + 8) = 0;
 	}
 
 	void* textureSet = *reinterpret_cast<void**>(layer + 4);
@@ -1857,10 +1852,10 @@ void CFlatRuntime2::loadLayerASync(int layerNo, char* fileName)
 	char path[0x104];
 	sprintf(path, "dvd:/%s/%s.tex", GetLangString__5CGameFv(&Game.game), fileName);
 
-	fileHandle = Open__5CFileFPcUlQ25CFile3PRI(&File, path, 0, 0);
-	*reinterpret_cast<void**>(layer + 8) = fileHandle;
+	fileHandle = File.Open(path, 0, CFile::PRI_LOW);
+	*reinterpret_cast<CFile::CHandle**>(layer + 8) = fileHandle;
 	if (fileHandle != 0) {
-		ReadASync__5CFileFPQ25CFile7CHandle(&File, fileHandle);
+		File.ReadASync(fileHandle);
 	}
 
 	*reinterpret_cast<int*>(layer) = *reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 0xE4);

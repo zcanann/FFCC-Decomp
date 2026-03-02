@@ -1240,12 +1240,125 @@ void CGObject::update()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007e3ec
+ * PAL Size: 684b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGObject::copy()
 {
-	// TODO
+    CCharaPcs::CHandle* handle = m_charaModelHandle;
+    bool hasModel = false;
+
+    if ((handle != (CCharaPcs::CHandle*)0) && (handle->m_model != (CChara::CModel*)0)) {
+        hasModel = true;
+    }
+    if (!hasModel) {
+        return;
+    }
+
+    hasModel = false;
+    handle->m_flags = m_displayFlags;
+    m_charaModelHandle->m_colorPhase = m_animBlend;
+    m_charaModelHandle->m_sortZ = m_screenDepth;
+    m_charaModelHandle->m_fogBlend = m_worldParam;
+
+    handle = m_weaponModelHandle;
+    if ((handle != (CCharaPcs::CHandle*)0) && (handle->m_model != (CChara::CModel*)0)) {
+        hasModel = true;
+    }
+    if (hasModel) {
+        handle->m_flags = m_displayFlags;
+        m_weaponModelHandle->m_colorPhase = m_animBlend;
+        m_weaponModelHandle->m_sortZ = m_screenDepth;
+        m_weaponModelHandle->m_fogBlend = m_worldParam;
+    }
+
+    handle = m_shieldModelHandle;
+    hasModel = false;
+    if ((handle != (CCharaPcs::CHandle*)0) && (handle->m_model != (CChara::CModel*)0)) {
+        hasModel = true;
+    }
+    if (hasModel) {
+        handle->m_flags = m_displayFlags;
+        m_shieldModelHandle->m_colorPhase = m_animBlend;
+        m_shieldModelHandle->m_sortZ = m_screenDepth;
+        m_shieldModelHandle->m_fogBlend = m_worldParam;
+    }
+
+    if ((*reinterpret_cast<u8*>(&m_weaponNodeFlags) & 0x20) == 0) {
+        hasModel = false;
+        m_charaModelHandle->m_flags &= 0xFFFFFFFE;
+
+        handle = m_weaponModelHandle;
+        if ((handle != (CCharaPcs::CHandle*)0) && (handle->m_model != (CChara::CModel*)0)) {
+            hasModel = true;
+        }
+        if (hasModel) {
+            handle->m_flags &= 0xFFFFFFFE;
+        }
+
+        handle = m_shieldModelHandle;
+        hasModel = false;
+        if ((handle != (CCharaPcs::CHandle*)0) && (handle->m_model != (CChara::CModel*)0)) {
+            hasModel = true;
+        }
+        if (hasModel) {
+            handle->m_flags &= 0xFFFFFFFE;
+        }
+    }
+
+    if ((*reinterpret_cast<u8*>(&m_shieldNodeFlags) & 0x20) == 0) {
+        hasModel = false;
+        m_charaModelHandle->m_flags &= 0xFFFFFFFB;
+
+        handle = m_weaponModelHandle;
+        if ((handle != (CCharaPcs::CHandle*)0) && (handle->m_model != (CChara::CModel*)0)) {
+            hasModel = true;
+        }
+        if (hasModel) {
+            handle->m_flags &= 0xFFFFFFFB;
+        }
+
+        handle = m_shieldModelHandle;
+        hasModel = false;
+        if ((handle != (CCharaPcs::CHandle*)0) && (handle->m_model != (CChara::CModel*)0)) {
+            hasModel = true;
+        }
+        if (!hasModel) {
+            return;
+        }
+
+        handle->m_flags &= 0xFFFFFFFB;
+        return;
+    }
+
+    hasModel = false;
+    m_charaModelHandle->m_bgCharmPlaneY = m_bgCharmFactor;
+    m_charaModelHandle->m_worldPosY = m_worldPosition.y;
+
+    handle = m_weaponModelHandle;
+    if ((handle != (CCharaPcs::CHandle*)0) && (handle->m_model != (CChara::CModel*)0)) {
+        hasModel = true;
+    }
+    if (hasModel) {
+        handle->m_bgCharmPlaneY = m_bgCharmFactor;
+        m_weaponModelHandle->m_worldPosY = m_worldPosition.y;
+    }
+
+    handle = m_shieldModelHandle;
+    hasModel = false;
+    if ((handle != (CCharaPcs::CHandle*)0) && (handle->m_model != (CChara::CModel*)0)) {
+        hasModel = true;
+    }
+    if (!hasModel) {
+        return;
+    }
+
+    handle->m_bgCharmPlaneY = m_bgCharmFactor;
+    m_shieldModelHandle->m_worldPosY = m_worldPosition.y;
 }
 
 /*

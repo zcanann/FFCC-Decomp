@@ -535,12 +535,57 @@ void CGCharaObj::damageDelete()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGCharaObj::onHit(int, CGObject*, int, Vec*)
+void CGCharaObj::onHit(int hitArg, CGObject* sourceObj, int hitType, Vec* hitPos)
 {
-	if ((m_displayFlags & 2) != 0) {
+	typedef unsigned int (*VCall0C)(void*);
+	typedef void (*VCall80)(void*, void*, int, int, int, Vec*);
+
+	if (sourceObj == 0) {
 		return;
 	}
-	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x660) = 1;
+
+	VCall0C cidFn = *reinterpret_cast<VCall0C*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x48) + 0x0C);
+	unsigned int sourceCid = cidFn(sourceObj);
+	if ((sourceCid & 0x6D) == 0x6D && Game.game.m_gameWork.m_menuStageMode != 0 && Game.game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+		sourceCid = cidFn(sourceObj);
+		if ((sourceCid & 0x6D) == 0x6D && sourceObj->m_scriptHandle != 0 && sourceObj->m_scriptHandle[0xED] != 0) {
+			return;
+		}
+	}
+
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	int slot = -1;
+	for (int i = 0; i < 4; i++) {
+		unsigned char* flag = self + 0x640 + (i * 8);
+		if ((*flag & 0x80) == 0) {
+			slot = i;
+			*flag = static_cast<unsigned char>((*flag & 0x7F) | 0x80);
+			*reinterpret_cast<CGObject**>(self + 0x644 + (i * 8)) = sourceObj;
+
+			unsigned int particleIndex = *reinterpret_cast<unsigned int*>(self + 0x560);
+			unsigned short particleLife =
+				*reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + (particleIndex * 0x48) + 0xE);
+			*reinterpret_cast<unsigned short*>(self + 0x642 + (i * 8)) = (particleLife >= 3) ? 0x1E : 0;
+			break;
+		}
+		if (*reinterpret_cast<CGObject**>(self + 0x644 + (i * 8)) == sourceObj) {
+			return;
+		}
+	}
+
+	if (slot < 0) {
+		return;
+	}
+
+	if ((sourceObj->m_objectFlags & 0x100) != 0) {
+		changeStat(3, 0, 0);
+	}
+
+	sourceCid = cidFn(sourceObj);
+	if ((sourceCid & 0x2D) == 0x2D) {
+		VCall80 onHitVCall = *reinterpret_cast<VCall80*>(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(sourceObj) + 0x48) + 0x80);
+		onHitVCall(sourceObj, this, *reinterpret_cast<int*>(self + 0x560), hitArg, hitType, hitPos);
+	}
 }
 
 /*
@@ -995,9 +1040,36 @@ void CGCharaObj::StaticFrame()
  */
 void CGCharaObj::combi2()
 {
-	CGPartyObj* party = 0;
-	int count = 0;
-	searchCombi(0, &party, count);
+	CGPartyObj* candidates[4];
+	int candidateCount = 0;
+	for (int i = 0; i < 4; i++) {
+		CGPartyObj* party = Game.game.m_partyObjArr[i];
+		if (party == 0) {
+			continue;
+		}
+		int state = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party) + 0x520);
+		int subState = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(party) + 0x52C);
+		if ((state == 6 || state == 2) && subState == 1) {
+			candidates[candidateCount++] = party;
+		}
+	}
+
+	if (candidateCount == 0) {
+		return;
+	}
+
+	int fallback = 0;
+	int comboIndex = searchCombi(candidateCount, candidates, fallback);
+	if (comboIndex < 0) {
+		for (int i = 0; i < candidateCount; i++) {
+			*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(candidates[i]) + 0x118) = 0.0f;
+			*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(candidates[i]) + 0x110) = 0.0f;
+			reinterpret_cast<CGPrgObj*>(candidates[i])->addSubStat();
+		}
+		return;
+	}
+
+	sendCombiToScript(this, comboIndex, fallback);
 }
 
 /*
@@ -1084,19 +1156,73 @@ void CGCharaObj::scCheckTime(CCombi2Set*, CGCharaObj*, CGCharaObj*, int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGCharaObj::searchCombi(int, CGPartyObj** outParty, int& outCount)
+int CGCharaObj::searchCombi(int count, CGPartyObj** partyList, int& outFallback)
 {
-	outCount = 0;
-	*outParty = 0;
-	for (int i = 0; i < 4; i++) {
-		CGPartyObj* party = Game.game.GetPartyObj(i);
-		if (party != 0) {
-			if (*outParty == 0) {
-				*outParty = party;
+	int found = -1;
+	outFallback = 0;
+
+	unsigned short* combiCursor = reinterpret_cast<unsigned short*>(Game.game.unk_flat3_field_1C_0xc7d8);
+	for (int combiIndex = 0; combiIndex < Game.game.unk_flat3_count_0xc7d4; combiIndex++, combiCursor += 0xD) {
+		int reqCount = 0;
+		if (combiCursor[0] != 0) {
+			reqCount = 1;
+			if (combiCursor[3] != 0) {
+				reqCount = 2;
+				if (combiCursor[6] != 0) {
+					reqCount = 3;
+					if (combiCursor[9] != 0) {
+						reqCount = 4;
+					}
+				}
 			}
-			outCount++;
+		}
+
+		if (count < reqCount) {
+			return found;
+		}
+
+		bool matched = true;
+		for (int slot = 0; slot < reqCount; slot++) {
+			CGPartyObj* obj = partyList[slot];
+			if (obj == 0 || *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(obj) + 0x660) == 0) {
+				matched = false;
+				break;
+			}
+
+			unsigned int objParticle = *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(obj) + 0x560);
+			unsigned short reqParticle = combiCursor[slot * 3 + 0];
+			bool itemMatch = false;
+			if (slot == count - 1) {
+				unsigned short itemCode =
+					*reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + (objParticle * 0x48));
+				if (itemCode == 0x1F8 && reqParticle == 0x1F8) {
+					itemMatch = true;
+				}
+			}
+			if (!itemMatch && objParticle != reqParticle) {
+				matched = false;
+				break;
+			}
+
+			int diff = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(partyList[0]) + 0x660) -
+				*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(obj) + 0x660);
+			int minWindow = static_cast<int>(combiCursor[slot * 3 + 1]);
+			int maxWindow = static_cast<int>(combiCursor[slot * 3 + 2]);
+			if (partyList[0] != obj && (diff < minWindow || diff > maxWindow)) {
+				matched = false;
+				break;
+			}
+		}
+
+		if (matched) {
+			found = combiIndex;
 		}
 	}
+
+	if (found < 0 && count > 0) {
+		outFallback = 1;
+	}
+	return found;
 }
 
 /*

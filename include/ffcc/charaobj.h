@@ -72,7 +72,7 @@ public:
 	void sendCombiToScript(CGCharaObj*, int, int);
 	void scCheckItem(CCombi2Set*, CGCharaObj*, int);
 	void scCheckTime(CCombi2Set*, CGCharaObj*, CGCharaObj*, int);
-	void searchCombi(int, CGPartyObj **, int&);
+	int searchCombi(int, CGPartyObj **, int&);
 	void enableAttackCol(int, int, int);
 	int GetCID();
 	void enableDamageCol(int);

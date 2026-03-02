@@ -6,6 +6,7 @@
 #include "ffcc/gobject.h"
 #include "ffcc/graphic.h"
 #include "ffcc/map.h"
+#include "ffcc/materialman.h"
 #include "ffcc/math.h"
 #include "ffcc/p_game.h"
 #include "ffcc/stopwatch.h"
@@ -14,13 +15,16 @@
 
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" void __dl__FPv(void* ptr);
+extern "C" void __dla__FPv(void* ptr);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 extern "C" void pppPartInit__8CPartMngFv2(CPartMng* partMng);
 extern "C" void* pppPartInit__8CPartMngFv(CPartMng* partMng, const char* filePath, unsigned long* fileSize, void* readBuffer, unsigned long readBufferSize);
 extern "C" void pppCreateHeap__FP9_pppEnvStUl(_pppEnvSt*, unsigned long);
 extern "C" unsigned int CheckSum__FPvi(void*, int);
 extern "C" void pppStopSe__FP9_pppMngStP7PPPSEST(_pppMngSt*, PPPSEST*);
+extern "C" void _pppAllFreePObject__FP9_pppMngSt(_pppMngSt*);
 extern "C" float ppvScreenMatrix[4][4];
 extern "C" float ppvScreenMatrix0[4][4];
 extern "C" float ppvCameraMatrix02[3][4];
@@ -343,12 +347,129 @@ void CPartMng::pppReleasePmng(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8005ea20
+ * PAL Size: 732b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartMng::pppReleasePdt(int)
+void CPartMng::pppReleasePdt(int pdtSlotIndex)
 {
-	// TODO
+    struct PppPdtSlotRaw {
+        _pppDataHead* m_pppDataHead;
+        unsigned int m_envFields[5];
+        char m_name[0x20];
+    };
+
+    struct PppMngStRaw {
+        void* m_pppResSet;
+        char m_unused[0x154];
+    };
+
+    struct PartMngResRaw {
+        char m_unused[0x7e4];
+        CMaterialSet* m_materialSet;
+        CTextureSet* m_textureSet;
+    };
+
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    PppPdtSlotRaw* pdtSlots = reinterpret_cast<PppPdtSlotRaw*>(self + 0x22e18);
+    PppPdtSlotRaw* pdtSlot = &pdtSlots[pdtSlotIndex];
+    _pppDataHead* pdt = pdtSlot->m_pppDataHead;
+
+    if (pdt == 0) {
+        return;
+    }
+
+    PartMngResRaw* res = reinterpret_cast<PartMngResRaw*>(self);
+    _WaitDrawDone__8CGraphicFPci(&Graphic, s_partMng_cpp_801d8230, 0x158);
+    res->m_materialSet->ReleaseTag(res->m_textureSet, pdtSlotIndex, reinterpret_cast<CAmemCacheSet*>(CAMemCacheSet));
+    _WaitDrawDone__8CGraphicFPci(&Graphic, s_partMng_cpp_801d8230, 0x13a);
+
+    pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(pdtSlot->m_envFields);
+    PppMngStRaw* pppMngSt = reinterpret_cast<PppMngStRaw*>(self + 0x1d4);
+    for (int i = 0; i < 0x180; i++) {
+        if (pppMngSt[i].m_pppResSet == pdtSlot) {
+            _pppAllFreePObject__FP9_pppMngSt(reinterpret_cast<_pppMngSt*>(&pppMngSt[i]));
+        }
+    }
+
+    _WaitDrawDone__8CGraphicFPci(&Graphic, s_partMng_cpp_801d8230, 0x149);
+
+    pppModelSt** modelNames = reinterpret_cast<pppModelSt**>(pdt->m_modelNames);
+    for (int i = 0; i < pdt->m_modelCount; i++) {
+        pppModelSt* model = modelNames[i];
+        model->m_refCount--;
+        if (model->m_refCount < 1) {
+            if (model->m_cacheId != -1) {
+                reinterpret_cast<CAmemCacheSet*>(CAMemCacheSet)->DestroyCache(model->m_cacheId);
+                *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x24) = 0;
+                *reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(model) + 0x28) = 0;
+            }
+            model->m_mapMesh.Destroy();
+            model->m_refCount = 0;
+            model->m_isUsed = 0;
+        }
+    }
+
+    if (modelNames != 0) {
+        __dla__FPv(modelNames);
+        pdt->m_modelNames = 0;
+    }
+
+    pppShapeSt** shapeNames = reinterpret_cast<pppShapeSt**>(pdt->m_shapeNames);
+    for (int i = 0; i < pdt->m_shapeCount; i++) {
+        pppShapeSt* shape = shapeNames[i];
+        shape->m_refCount--;
+        if (shape->m_refCount < 1) {
+            if (shape->m_animData != 0) {
+                __dl__FPv(shape->m_animData);
+                shape->m_animData = 0;
+            }
+            if (shape->m_displayListData != 0) {
+                __dl__FPv(shape->m_displayListData);
+                shape->m_displayListData = 0;
+            }
+            shape->m_refCount = 0;
+            shape->m_inUse = 0;
+        }
+    }
+
+    if (shapeNames != 0) {
+        __dla__FPv(shapeNames);
+        pdt->m_shapeNames = 0;
+    }
+
+    unsigned char* shapeGroups = reinterpret_cast<unsigned char*>(pdt->m_shapeGroups);
+    for (int i = 0; i < pdt->m_shapeGroupCount; i++) {
+        void** groupData = reinterpret_cast<void**>(shapeGroups + i * 8 + 4);
+        if (*groupData != 0) {
+            __dl__FPv(*groupData);
+            *groupData = 0;
+        }
+    }
+
+    if (shapeGroups != 0) {
+        __dla__FPv(shapeGroups);
+        pdt->m_shapeGroups = 0;
+    }
+
+    unsigned char* cacheChunks = reinterpret_cast<unsigned char*>(pdt->m_cacheChunks);
+    for (int i = 0; i < pdt->m_cacheChunkCount; i++) {
+        short cacheId = *reinterpret_cast<short*>(cacheChunks + i * 8);
+        reinterpret_cast<CAmemCacheSet*>(CAMemCacheSet)->DestroyCache(cacheId);
+    }
+
+    if (cacheChunks != 0) {
+        __dl__FPv(cacheChunks);
+        pdt->m_cacheChunks = 0;
+    }
+
+    __dl__FPv(pdtSlot->m_pppDataHead);
+    pdtSlot->m_pppDataHead = 0;
+
+    _WaitDrawDone__8CGraphicFPci(&Graphic, s_partMng_cpp_801d8230, 0x182);
 }
 
 /*

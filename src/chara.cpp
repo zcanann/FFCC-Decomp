@@ -2,11 +2,14 @@
 #include "ffcc/cflat_runtime.h"
 
 #include <math.h>
+#include <string.h>
 
 extern "C" void CalcBind__Q26CChara5CNodeFPQ26CChara6CModel(void*, void*);
 extern "C" void freeFurTex__6CCharaFv();
+extern "C" void InitFurTexBuffer__6CCharaFv(CChara*);
 extern "C" void gqrInit__6CCharaFUlUlUl(void*, unsigned long, unsigned long, unsigned long);
 extern "C" void Calc__Q26CChara5CMeshFPQ26CChara6CModel(void*, void*);
+extern "C" void __dla__FPv(void*);
 
 struct CharaGlobal;
 extern CharaGlobal Chara;
@@ -33,38 +36,70 @@ CChara::CChara()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80073a0c
+ * PAL Size: 200b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CChara::Init()
 {
-	// TODO
+	*(void**)((u8*)this + 0x2058) = 0;
+	*(u32*)((u8*)this + 0x205c) = 0;
+	*(void**)((u8*)this + 0x2068) = new u8[0x58000];
+	*(void**)((u8*)this + 0x2070) = new u8[0x58000];
+	*(s32*)((u8*)this + 0x2060) = 1;
+	FlipDBuffer();
+	*(u32*)((u8*)this + 0x2074) = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800739a4
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CChara::Quit()
 {
-	// TODO
+	void** buf0 = (void**)((u8*)this + 0x2068);
+	void** buf1 = (void**)((u8*)this + 0x2070);
+	if (*buf0 != 0) {
+		__dla__FPv(*buf0);
+		*buf0 = 0;
+	}
+	if (*buf1 != 0) {
+		__dla__FPv(*buf1);
+		*buf1 = 0;
+	}
+	*(void**)((u8*)this + 0x2058) = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80073970
+ * PAL Size: 52b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CChara::Create()
 {
-	// TODO
+	InitFurTexBuffer__6CCharaFv(this);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80073950
+ * PAL Size: 32b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CChara::Destroy()
 {
@@ -73,8 +108,12 @@ void CChara::Destroy()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007392c
+ * PAL Size: 68b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CChara::FlipDBuffer()
 {
@@ -88,8 +127,12 @@ void CChara::FlipDBuffer()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006eb04
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CChara::gqrInit(unsigned long, unsigned long, unsigned long)
 {
@@ -112,42 +155,119 @@ CChara::CModel::CRefData::CRefData()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80073818
+ * PAL Size: 276b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CChara::CModel::CRefData::~CRefData()
 {
-	// TODO
+	void** data = (void**)this;
+	for (int i = 0; i < 5; i++) {
+		if (data[i] != 0) {
+			__dla__FPv(data[i]);
+			data[i] = 0;
+		}
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800736e4
+ * PAL Size: 308b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CChara::CModel::CModel()
 {
-	// TODO
+	memset(this, 0, 0x124);
+	PSMTXIdentity((float(*)[4])((u8*)this + 0x14));
+	*(float*)((u8*)this + 0x110) = 0.0f;
+	*(float*)((u8*)this + 0x114) = 1.0f;
+	*(u8*)((u8*)this + 0x10C) = (*(u8*)((u8*)this + 0x10C) & 0x7F) | 0x80;
+	*(u8*)((u8*)this + 0xA0) &= 0x7F;
+	*(u8*)((u8*)this + 0xA0) &= 0xBF;
+	*(u8*)((u8*)this + 0xA0) = (*(u8*)((u8*)this + 0xA0) & 0xDF) | 0x20;
+	*(u8*)((u8*)this + 0x10C) &= 0xBF;
+	*(float*)((u8*)this + 0x118) = 1.0f;
+	*(float*)((u8*)this + 0x11C) = 1.0f;
+	*(u8*)((u8*)this + 0xA1) = 0;
+	*(float*)((u8*)this + 0x120) = 0.0f;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80073540
+ * PAL Size: 420b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CChara::CModel::~CModel()
 {
-	// TODO
+	void** data = (void**)((u8*)this + 0xA4);
+	if (data[0] != 0) {
+		__dla__FPv(data[0]);
+		data[0] = 0;
+	}
+	if (data[1] != 0) {
+		__dla__FPv(data[1]);
+		data[1] = 0;
+	}
+	if (data[2] != 0) {
+		__dla__FPv(data[2]);
+		data[2] = 0;
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80073480
+ * PAL Size: 192b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CChara::CModel::Init()
 {
-	// TODO
+	*(float*)((u8*)this + 0xB4) = 0.0f;
+	*(float*)((u8*)this + 0xB8) = 0.0f;
+	*(float*)((u8*)this + 0xC4) = 0.0f;
+	*(float*)((u8*)this + 0xC8) = 0.0f;
+	*(float*)((u8*)this + 0xCC) = 0.0f;
+	*(u16*)((u8*)this + 0xD8) = 0;
+	*(u16*)((u8*)this + 0xDA) = 0;
+	*(u32*)((u8*)this + 0x98) = 0xFFFFFFFF;
+	*(float*)((u8*)this + 0xBC) = 0.0f;
+	*(float*)((u8*)this + 0xC0) = 0.0f;
+	*(float*)((u8*)this + 0xE0) = 0.0f;
+	*(float*)((u8*)this + 0xDC) = 0.0f;
+	*(float*)((u8*)this + 0x9C) = 1.0f;
+	*(void**)((u8*)this + 0xE4) = 0;
+	*(void**)((u8*)this + 0xE8) = 0;
+	*(void**)((u8*)this + 0xEC) = 0;
+	*(void**)((u8*)this + 0xF0) = 0;
+	*(void**)((u8*)this + 0xF4) = 0;
+	*(void**)((u8*)this + 0xF8) = 0;
+	*(void**)((u8*)this + 0xFC) = 0;
+	*(void**)((u8*)this + 0x100) = 0;
+	*(void**)((u8*)this + 0x104) = 0;
+	*(void**)((u8*)this + 0x108) = 0;
+	*(u8*)((u8*)this + 0x10C) = (*(u8*)((u8*)this + 0x10C) & 0x7F) | 0x80;
+	*(u8*)((u8*)this + 0xA0) &= 0x7F;
+	*(u8*)((u8*)this + 0xA0) &= 0xBF;
+	*(u8*)((u8*)this + 0xA0) = (*(u8*)((u8*)this + 0xA0) & 0xDF) | 0x20;
+	*(u8*)((u8*)this + 0x10C) &= 0xBF;
+	*(float*)((u8*)this + 0x118) = 1.0f;
+	*(float*)((u8*)this + 0x11C) = 1.0f;
+	*(u8*)((u8*)this + 0xA1) = 0;
+	*(float*)((u8*)this + 0x120) = 0.0f;
 }
 
 /*
@@ -349,32 +469,44 @@ void CChara::CModel::calcSkin()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007104c
+ * PAL Size: 44b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CChara::CModel::SetMatrix(float (*) [4])
+void CChara::CModel::SetMatrix(float (*mtx) [4])
 {
-	// TODO
+	PSMTXCopy(mtx, (float(*)[4])((u8*)this + 0x14));
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80070fc0
+ * PAL Size: 140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CChara::CModel::SearchNode(char*)
 {
-	// TODO
+	// Return type is unknown in this decomp state.
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80070e14
+ * PAL Size: 428b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CChara::CModel::SearchNodeSk(char*)
 {
-	// TODO
+	// Return type is unknown in this decomp state.
 }
 
 /*
@@ -409,12 +541,24 @@ void CChara::CModel::CalcInterpFrame()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80070604
+ * PAL Size: 140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CChara::CModel::CalcSafeNodeWorldMatrix(float (*) [4], CChara::CNode*)
+void CChara::CModel::CalcSafeNodeWorldMatrix(float (*outMtx) [4], CChara::CNode* node)
 {
-	// TODO
+	u8 flags = *(u8*)((u8*)this + 0xA0);
+	if ((flags & 0x40) != 0) {
+		PSMTXCopy((float(*)[4])((u8*)node + 0x44), outMtx);
+		outMtx[0][3] += *(float*)((u8*)this + 0x80);
+		outMtx[1][3] += *(float*)((u8*)this + 0x90);
+		outMtx[2][3] += *(float*)((u8*)this + 0xA0);
+	} else {
+		PSMTXCopy((float(*)[4])((u8*)this + 0x14), outMtx);
+	}
 }
 
 /*
@@ -439,8 +583,12 @@ void CChara::CModel::AttachTextureSet(CTextureSet*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800701f4
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CChara::CModel::AddFrame(float frame)
 {
@@ -449,8 +597,12 @@ void CChara::CModel::AddFrame(float frame)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800701ec
+ * PAL Size: 8b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CChara::CModel::SetFrame(float frame)
 {
@@ -459,42 +611,73 @@ void CChara::CModel::SetFrame(float frame)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80070180
+ * PAL Size: 108b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CChara::CModel::CalcFurColor()
 {
-	// TODO
+	float* furTarget = (float*)((u8*)this + 0x118);
+	float* furCur = (float*)((u8*)this + 0x11C);
+	float delta = *furTarget - *furCur;
+	float step = -0.01f;
+	if (delta >= -0.01f) {
+		step = delta;
+		if (0.01f < delta) {
+			step = 0.01f;
+		}
+	}
+	*furCur += step;
+	if (*furCur < 0.0f) {
+		*furCur = 0.0f;
+	} else if (*furCur > 1.0f) {
+		*furCur = 1.0f;
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80070170
+ * PAL Size: 16b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CChara::CModel::GetDispIndex(CChara::CNode*)
 {
-	// TODO
+	// Return type is unknown in this decomp state.
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80070110
+ * PAL Size: 96b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CChara::CNode::CNode()
 {
-	// TODO
+	memset(this, 0, 0xC0);
+	*(u8*)((u8*)this + 0x80) = (*(u8*)((u8*)this + 0x80) & 0x7F) | 0x80;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800700d4
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CChara::CNode::~CNode()
 {
-	// TODO
 }
 
 /*
@@ -529,42 +712,58 @@ void CChara::CNode::CalcBind(CChara::CModel*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006fc38
+ * PAL Size: 96b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CChara::CNode::CRefData::CRefData()
 {
-	// TODO
+	memset(this, 0, 0x70);
+	*(u8*)((u8*)this + 0x4) = 0xFF;
+	*(u8*)((u8*)this + 0x64) = 0xFF;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006fbfc
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CChara::CNode::CRefData::~CRefData()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006fbb0
+ * PAL Size: 76b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CChara::CMesh::CMesh()
 {
-	// TODO
+	memset(this, 0, 0x14);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006fb50
+ * PAL Size: 96b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CChara::CMesh::~CMesh()
 {
-	// TODO
 }
 
 /*
@@ -609,28 +808,46 @@ void CChara::CMesh::Calc(CChara::CModel*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006ed08
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CChara::CMesh::CRefData::CRefData()
 {
-	// TODO
+	memset(this, 0, 0x64);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006ebd4
+ * PAL Size: 308b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CChara::CMesh::CRefData::~CRefData()
 {
-	// TODO
+	void** ptrs = (void**)this;
+	for (int i = 0; i < 7; i++) {
+		if (ptrs[i] != 0) {
+			__dla__FPv(ptrs[i]);
+			ptrs[i] = 0;
+		}
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006ebb8
+ * PAL Size: 28b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CChara::CMesh::CDisplayList::CDisplayList()
 {
@@ -643,32 +860,46 @@ CChara::CMesh::CDisplayList::CDisplayList()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006eb54
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CChara::CMesh::CDisplayList::~CDisplayList()
 {
-	// TODO
+	void** data = (void**)this;
+	if (data[0] != 0) {
+		__dla__FPv(data[0]);
+		data[0] = 0;
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006eb50
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CChara::CSkin::CSkin()
 {
-	// TODO
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8006eb14
+ * PAL Size: 60b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 CChara::CSkin::~CSkin()
 {
-	// TODO
 }
 
 /*

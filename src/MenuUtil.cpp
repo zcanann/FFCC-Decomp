@@ -18,7 +18,7 @@ extern "C" void SetPosX__5CFontFf(float, CFont*);
 extern "C" void SetPosY__5CFontFf(float, CFont*);
 extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" void pppDeletePart__8CPartMngFi(void*, int);
-extern "C" void BindEffect__8CMenuPcsFiii(CMenuPcs*, int, int, int);
+extern "C" short BindEffect__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" unsigned int GetSoundMode__9CRedSoundFv(void*);
 extern unsigned char PartMng[];
 
@@ -180,12 +180,49 @@ void CMenuPcs::IsItemEquip(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80179e9c
+ * PAL Size: 244b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::SetCrystalCageAttr()
 {
-	// TODO
+	struct CrystalState {
+		unsigned char _pad0[0x80];
+		int m_effectTimer;
+		int m_crystalElem;
+		short m_crystalPart;
+		short m_crystalAttr;
+	};
+
+	CrystalState* state = reinterpret_cast<CrystalState*>(this);
+
+	if (state->m_crystalPart != -1) {
+		pppDeletePart__8CPartMngFi(PartMng, state->m_crystalPart);
+	}
+
+	unsigned int chaliceElement = *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&Game) + 0x10CC);
+	if ((chaliceElement & 1U) != 0) {
+		state->m_crystalAttr = 0xE;
+		state->m_crystalElem = 1;
+	} else if ((chaliceElement & 2U) != 0) {
+		state->m_crystalAttr = 0xF;
+		state->m_crystalElem = 2;
+	} else if ((chaliceElement & 4U) != 0) {
+		state->m_crystalAttr = 0x10;
+		state->m_crystalElem = 4;
+	} else if ((chaliceElement & 8U) != 0) {
+		state->m_crystalAttr = 0x11;
+		state->m_crystalElem = 8;
+	} else if ((chaliceElement & 0x10U) != 0) {
+		state->m_crystalAttr = 0x12;
+		state->m_crystalElem = 0x10;
+	}
+
+	state->m_crystalPart = BindEffect__8CMenuPcsFiii(this, 5, state->m_crystalAttr, -1);
+	*reinterpret_cast<volatile int*>(&state->m_effectTimer) = 0;
 }
 
 /*

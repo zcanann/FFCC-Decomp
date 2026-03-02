@@ -2,6 +2,7 @@
 #include "dolphin/si.h"
 
 void __GBAHandler(s32 chan, u32 error, OSContext* context) {
+    GBAControl* gba;
     GBATransferCallback proc;
     GBACallback callback;
     OSContext exceptionContext;
@@ -10,24 +11,25 @@ void __GBAHandler(s32 chan, u32 error, OSContext* context) {
         return;
     }
 
+    gba = &__GBA[chan];
     if ((error & 0xf) == 0) {
-        __GBA[chan].ret = GBA_READY;
+        gba->ret = GBA_READY;
     } else {
-        __GBA[chan].ret = GBA_NOT_READY;
+        gba->ret = GBA_NOT_READY;
     }
 
-    proc = __GBA[chan].proc;
+    proc = gba->proc;
     if (proc != NULL) {
-        __GBA[chan].proc = NULL;
+        gba->proc = NULL;
         proc(chan);
     }
 
-    if (__GBA[chan].callback != NULL) {
+    callback = gba->callback;
+    if (callback != NULL) {
         OSClearContext(&exceptionContext);
         OSSetCurrentContext(&exceptionContext);
-        callback = __GBA[chan].callback;
-        __GBA[chan].callback = NULL;
-        callback(chan, __GBA[chan].ret);
+        gba->callback = NULL;
+        callback(chan, gba->ret);
         OSClearContext(&exceptionContext);
         OSSetCurrentContext(context);
     }

@@ -55,6 +55,37 @@ struct BonusAnimSprite {
 STATIC_ASSERT(sizeof(BonusAnimHeader) == 8);
 STATIC_ASSERT(sizeof(BonusAnimSprite) == 0x40);
 
+struct BonusMenuMembers {
+	unsigned char pad_0000[0x8C];
+	unsigned char m_bonusAlpha;
+	unsigned char m_bonusCursorFlag;
+	unsigned char pad_008E[0x6A];
+	CFont* m_font;
+	unsigned char pad_00FC[0x718];
+	int m_bonusBoardPtr;
+	unsigned char pad_0818[0x14];
+	int m_bonusStatePtr;
+	unsigned char pad_0830[0x10];
+	int m_bonusListPtr;
+	unsigned char pad_0844[4];
+	int m_bonusAuxPtr;
+	int m_bonusAnimPtr;
+};
+
+STATIC_ASSERT(offsetof(BonusMenuMembers, m_bonusAlpha) == 0x8C);
+STATIC_ASSERT(offsetof(BonusMenuMembers, m_bonusCursorFlag) == 0x8D);
+STATIC_ASSERT(offsetof(BonusMenuMembers, m_font) == 0xF8);
+STATIC_ASSERT(offsetof(BonusMenuMembers, m_bonusBoardPtr) == 0x814);
+STATIC_ASSERT(offsetof(BonusMenuMembers, m_bonusStatePtr) == 0x82C);
+STATIC_ASSERT(offsetof(BonusMenuMembers, m_bonusListPtr) == 0x840);
+STATIC_ASSERT(offsetof(BonusMenuMembers, m_bonusAuxPtr) == 0x848);
+STATIC_ASSERT(offsetof(BonusMenuMembers, m_bonusAnimPtr) == 0x84C);
+
+static inline BonusMenuMembers& GetBonusMenuMembers(CMenuPcs* menu)
+{
+	return *reinterpret_cast<BonusMenuMembers*>(menu);
+}
+
 static void InitAnimSprite(BonusAnimSprite* sprite, int kind, short x, short y, short w, short h, int startFrame, int duration)
 {
 	sprite->x = x;
@@ -131,7 +162,7 @@ static void TickAnimSprites(int statePtr, int animPtr, int fadeDir)
 void CMenuPcs::BonusInit()
 {
 	lbl_8032EEA8 = 0;
-	*(int*)((char*)this + 0x84c) = 0;
+	GetBonusMenuMembers(this).m_bonusAnimPtr = 0;
 	lbl_8032EEB0 = 0;
 }
 
@@ -146,26 +177,26 @@ void CMenuPcs::BonusInit()
  */
 void CMenuPcs::createBonus()
 {
-	int statePtr = *(int*)((char*)this + 0x82c);
-	int animPtr = *(int*)((char*)this + 0x84c);
-	int auxPtr = *(int*)((char*)this + 0x848);
-	int boardPtr = *(int*)((char*)this + 0x814);
+	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
+	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
+	int auxPtr = GetBonusMenuMembers(this).m_bonusAuxPtr;
+	int boardPtr = GetBonusMenuMembers(this).m_bonusBoardPtr;
 
 	if (statePtr == 0) {
 		statePtr = (int)(new unsigned char[0x48]);
-		*(int*)((char*)this + 0x82c) = statePtr;
+		GetBonusMenuMembers(this).m_bonusStatePtr = statePtr;
 	}
 	if (animPtr == 0) {
 		animPtr = (int)(new unsigned char[0x1008]);
-		*(int*)((char*)this + 0x84c) = animPtr;
+		GetBonusMenuMembers(this).m_bonusAnimPtr = animPtr;
 	}
 	if (auxPtr == 0) {
 		auxPtr = (int)(new unsigned char[0xc]);
-		*(int*)((char*)this + 0x848) = auxPtr;
+		GetBonusMenuMembers(this).m_bonusAuxPtr = auxPtr;
 	}
 	if (boardPtr == 0) {
 		boardPtr = (int)(new unsigned char[0x780]);
-		*(int*)((char*)this + 0x814) = boardPtr;
+		GetBonusMenuMembers(this).m_bonusBoardPtr = boardPtr;
 	}
 
 	if (statePtr != 0) {
@@ -184,8 +215,8 @@ void CMenuPcs::createBonus()
 		memset((void*)boardPtr, 0, 0x780);
 	}
 
-	*(unsigned char*)((char*)this + 0x8c) = 0;
-	*(unsigned char*)((char*)this + 0x8d) = 0;
+	GetBonusMenuMembers(this).m_bonusAlpha = 0;
+	GetBonusMenuMembers(this).m_bonusCursorFlag = 0;
 }
 
 /*
@@ -199,34 +230,34 @@ void CMenuPcs::createBonus()
  */
 void CMenuPcs::destroyBonus()
 {
-	int ptr = *(int*)((char*)this + 0x840);
+	int ptr = GetBonusMenuMembers(this).m_bonusListPtr;
 	if (ptr != 0) {
 		delete[] (unsigned char*)ptr;
-		*(int*)((char*)this + 0x840) = 0;
+		GetBonusMenuMembers(this).m_bonusListPtr = 0;
 	}
 
-	ptr = *(int*)((char*)this + 0x82c);
+	ptr = GetBonusMenuMembers(this).m_bonusStatePtr;
 	if (ptr != 0) {
 		delete[] (unsigned char*)ptr;
-		*(int*)((char*)this + 0x82c) = 0;
+		GetBonusMenuMembers(this).m_bonusStatePtr = 0;
 	}
 
-	ptr = *(int*)((char*)this + 0x84c);
+	ptr = GetBonusMenuMembers(this).m_bonusAnimPtr;
 	if (ptr != 0) {
 		delete[] (unsigned char*)ptr;
-		*(int*)((char*)this + 0x84c) = 0;
+		GetBonusMenuMembers(this).m_bonusAnimPtr = 0;
 	}
 
-	ptr = *(int*)((char*)this + 0x814);
+	ptr = GetBonusMenuMembers(this).m_bonusBoardPtr;
 	if (ptr != 0) {
 		delete[] (unsigned char*)ptr;
-		*(int*)((char*)this + 0x814) = 0;
+		GetBonusMenuMembers(this).m_bonusBoardPtr = 0;
 	}
 
-	ptr = *(int*)((char*)this + 0x848);
+	ptr = GetBonusMenuMembers(this).m_bonusAuxPtr;
 	if (ptr != 0) {
 		delete[] (unsigned char*)ptr;
-		*(int*)((char*)this + 0x848) = 0;
+		GetBonusMenuMembers(this).m_bonusAuxPtr = 0;
 	}
 }
 
@@ -241,8 +272,8 @@ void CMenuPcs::destroyBonus()
  */
 void CMenuPcs::calcBonus()
 {
-	int statePtr = *(int*)((char*)this + 0x82c);
-	int animPtr = *(int*)((char*)this + 0x84c);
+	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
+	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
 	short state;
 
 	if (statePtr == 0 || animPtr == 0) {
@@ -297,7 +328,7 @@ void CMenuPcs::calcBonus()
  */
 void CMenuPcs::drawBonus()
 {
-	int statePtr = *(int*)((char*)this + 0x82c);
+	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
 	if (statePtr == 0) {
 		return;
 	}
@@ -338,8 +369,8 @@ void CMenuPcs::drawBonus()
 void CMenuPcs::CalcResultOpenAnim()
 {
 	unsigned int* scriptFoodBase = Game.game.m_scriptFoodBase;
-	int statePtr = *(int*)((char*)this + 0x82c);
-	int animPtr = *(int*)((char*)this + 0x84c);
+	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
+	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
 
 	if (statePtr == 0 || animPtr == 0) {
 		return;
@@ -351,7 +382,7 @@ void CMenuPcs::CalcResultOpenAnim()
 	if (*(unsigned char*)(statePtr + 0xb) == 0) {
 		int activePartyCount = 0;
 		Sound.PlaySe(0x46, 0x40, 0x7f, 0);
-		*(unsigned char*)((char*)this + 0x8c) = 0;
+		GetBonusMenuMembers(this).m_bonusAlpha = 0;
 		memset((void*)animPtr, 0, 0x1008);
 
 		for (int i = 0; i < 4; i++) {
@@ -436,8 +467,8 @@ void CMenuPcs::CalcResultOpenAnim()
  */
 void CMenuPcs::DrawResultOpenAnim()
 {
-	int animPtr = *(int*)((char*)this + 0x84c);
-	int statePtr = *(int*)((char*)this + 0x82c);
+	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
+	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
 	float strongest = 0.0f;
 	float frameAlpha = 0.0f;
 
@@ -478,7 +509,7 @@ void CMenuPcs::DrawResultOpenAnim()
 		DrawBonusChkMark(frameAlpha);
 	}
 
-	*(unsigned char*)((char*)this + 0x8c) = (unsigned char)(strongest * 255.0f);
+	GetBonusMenuMembers(this).m_bonusAlpha = (unsigned char)(strongest * 255.0f);
 }
 
 /*
@@ -492,8 +523,8 @@ void CMenuPcs::DrawResultOpenAnim()
  */
 void CMenuPcs::CalcResultCountAnim()
 {
-	int statePtr = *(int*)((char*)this + 0x82c);
-	int animPtr = *(int*)((char*)this + 0x84c);
+	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
+	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
 	if (statePtr == 0 || animPtr == 0) {
 		return;
 	}
@@ -531,8 +562,8 @@ void CMenuPcs::CalcResultCountAnim()
  */
 void CMenuPcs::DrawResultCountAnim()
 {
-	int animPtr = *(int*)((char*)this + 0x84c);
-	int statePtr = *(int*)((char*)this + 0x82c);
+	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
+	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
 
 	if (animPtr == 0 || statePtr == 0) {
 		return;
@@ -569,7 +600,7 @@ void CMenuPcs::DrawResultCountAnim()
 	if (*(unsigned char*)(statePtr + 8) != 0) {
 		DrawBonusChkMark(strongest);
 	}
-	*(unsigned char*)((char*)this + 0x8c) = (unsigned char)(strongest * 255.0f);
+	GetBonusMenuMembers(this).m_bonusAlpha = (unsigned char)(strongest * 255.0f);
 }
 
 /*
@@ -583,8 +614,8 @@ void CMenuPcs::DrawResultCountAnim()
  */
 void CMenuPcs::CalcResultCloseAnim()
 {
-	int statePtr = *(int*)((char*)this + 0x82c);
-	int animPtr = *(int*)((char*)this + 0x84c);
+	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
+	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
 	if (statePtr == 0 || animPtr == 0) {
 		return;
 	}
@@ -621,8 +652,8 @@ void CMenuPcs::CalcResultCloseAnim()
  */
 void CMenuPcs::DrawResultCloseAnim()
 {
-	int animPtr = *(int*)((char*)this + 0x84c);
-	int statePtr = *(int*)((char*)this + 0x82c);
+	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
+	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
 
 	if (animPtr == 0 || statePtr == 0) {
 		return;
@@ -657,7 +688,7 @@ void CMenuPcs::DrawResultCloseAnim()
 	if (*(unsigned char*)(statePtr + 8) != 0 && strongest > 0.0f) {
 		DrawBonusChkMark(strongest);
 	}
-	*(unsigned char*)((char*)this + 0x8c) = (unsigned char)(strongest * 255.0f);
+	GetBonusMenuMembers(this).m_bonusAlpha = (unsigned char)(strongest * 255.0f);
 }
 
 /*
@@ -672,8 +703,8 @@ void CMenuPcs::DrawResultCloseAnim()
 void CMenuPcs::CalcSelectOpenAnim()
 {
 	unsigned int* scriptFoodBase = Game.game.m_scriptFoodBase;
-	int statePtr = *(int*)((char*)this + 0x82c);
-	int animPtr = *(int*)((char*)this + 0x84c);
+	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
+	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
 
 	if (statePtr == 0 || animPtr == 0) {
 		return;
@@ -686,7 +717,7 @@ void CMenuPcs::CalcSelectOpenAnim()
 		int activePartyCount = 0;
 		int idx;
 
-		*(unsigned char*)((char*)this + 0x8d) = 0;
+		GetBonusMenuMembers(this).m_bonusCursorFlag = 0;
 		Sound.PlaySe(0x4c, 0x40, 0x7f, 0);
 		memset((void*)animPtr, 0, 0x1008);
 
@@ -789,8 +820,8 @@ void CMenuPcs::CalcSelectOpenAnim()
  */
 void CMenuPcs::DrawSelectOpenAnim()
 {
-	int animPtr = *(int*)((char*)this + 0x84c);
-	int statePtr = *(int*)((char*)this + 0x82c);
+	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
+	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
 
 	if (animPtr == 0 || statePtr == 0 || *(unsigned char*)(statePtr + 0xb) == 0) {
 		return;
@@ -836,7 +867,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 			break;
 		case -2:
 			if (modelIndex < activePartyCount) {
-				int basePtr = *(int*)((char*)this + 0x840);
+				int basePtr = GetBonusMenuMembers(this).m_bonusListPtr;
 				if (basePtr != 0) {
 					int slotPtr = basePtr + (modelIndex * 0x524);
 					void* handle = *(void**)slotPtr;
@@ -906,7 +937,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 	}
 
 	DrawInit__8CMenuPcsFv(this);
-	CFont* font = *(CFont**)((char*)this + 0xf8);
+	CFont* font = GetBonusMenuMembers(this).m_font;
 	if (font != 0) {
 		font->SetMargin(1.0f);
 		font->SetShadow(1);
@@ -934,13 +965,13 @@ void CMenuPcs::DrawSelectOpenAnim()
 	}
 
 	DrawInit__8CMenuPcsFv(this);
-	if (*(short*)(*(int*)((char*)this + 0x848) + 10) != 3) {
+	if (*(short*)(GetBonusMenuMembers(this).m_bonusAuxPtr + 10) != 3) {
 		DrawMcWin__8CMenuPcsFss(this, -1, 1);
-		if (*(short*)(*(int*)((char*)this + 0x848) + 10) == 1) {
+		if (*(short*)(GetBonusMenuMembers(this).m_bonusAuxPtr + 10) == 1) {
 			DrawMcWinMess__8CMenuPcsFii(this, 0x18, 1);
 			DrawInit__8CMenuPcsFv(this);
 			int cursorX = GetYesNoXPos__8CMenuPcsFi(this, (int)*(short*)(statePtr + 0x28));
-			float cursorY = (float)(*(short*)(*(int*)((char*)this + 0x848) + 2) + *(short*)(*(int*)((char*)this + 0x848) + 6) - 0x3e);
+			float cursorY = (float)(*(short*)(GetBonusMenuMembers(this).m_bonusAuxPtr + 2) + *(short*)(GetBonusMenuMembers(this).m_bonusAuxPtr + 6) - 0x3e);
 			DrawCursor__8CMenuPcsFiif(this, cursorX, (int)cursorY, 1.0f);
 		}
 	}
@@ -948,7 +979,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 	if (*(unsigned char*)(statePtr + 8) != 0) {
 		DrawBonusChkMark(strongest);
 	}
-	*(unsigned char*)((char*)this + 0x8c) = (unsigned char)(strongest * 255.0f);
+	GetBonusMenuMembers(this).m_bonusAlpha = (unsigned char)(strongest * 255.0f);
 }
 
 /*
@@ -962,8 +993,8 @@ void CMenuPcs::DrawSelectOpenAnim()
  */
 void CMenuPcs::CalcSelectWait()
 {
-	int statePtr = *(int*)((char*)this + 0x82c);
-	int animPtr = *(int*)((char*)this + 0x84c);
+	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
+	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
 	BonusAnimHeader* header;
 	BonusAnimSprite* sprites;
 
@@ -998,8 +1029,8 @@ void CMenuPcs::CalcSelectWait()
  */
 void CMenuPcs::DrawSelectWait()
 {
-	int statePtr = *(int*)((char*)this + 0x82c);
-	int animPtr = *(int*)((char*)this + 0x84c);
+	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
+	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
 	float strongest = 0.0f;
 	int pulseFrame;
 
@@ -1045,7 +1076,7 @@ void CMenuPcs::DrawSelectWait()
 	if (*(unsigned char*)(statePtr + 8) != 0) {
 		DrawBonusChkMark(strongest);
 	}
-	*(unsigned char*)((char*)this + 0x8c) = (unsigned char)(strongest * 255.0f);
+	GetBonusMenuMembers(this).m_bonusAlpha = (unsigned char)(strongest * 255.0f);
 }
 
 /*
@@ -1059,8 +1090,8 @@ void CMenuPcs::DrawSelectWait()
  */
 void CMenuPcs::CalcSelectCloseAnim()
 {
-	int statePtr = *(int*)((char*)this + 0x82c);
-	int animPtr = *(int*)((char*)this + 0x84c);
+	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
+	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
 	if (statePtr == 0 || animPtr == 0) {
 		return;
 	}
@@ -1093,8 +1124,8 @@ void CMenuPcs::CalcSelectCloseAnim()
  */
 void CMenuPcs::DrawSelectCloseAnim()
 {
-	int statePtr = *(int*)((char*)this + 0x82c);
-	int animPtr = *(int*)((char*)this + 0x84c);
+	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
+	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
 	float strongest = 0.0f;
 
 	if (statePtr == 0 || animPtr == 0) {
@@ -1136,7 +1167,7 @@ void CMenuPcs::DrawSelectCloseAnim()
 	if (*(unsigned char*)(statePtr + 8) != 0 && strongest > 0.0f) {
 		DrawBonusChkMark(strongest);
 	}
-	*(unsigned char*)((char*)this + 0x8c) = (unsigned char)(strongest * 255.0f);
+	GetBonusMenuMembers(this).m_bonusAlpha = (unsigned char)(strongest * 255.0f);
 }
 
 /*
@@ -1265,8 +1296,8 @@ void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
  */
 void CMenuPcs::DrawBonusChkMark(float alpha)
 {
-	int animPtr = *(int*)((char*)this + 0x84c);
-	int statePtr = *(int*)((char*)this + 0x82c);
+	int animPtr = GetBonusMenuMembers(this).m_bonusAnimPtr;
+	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
 	float a = alpha;
 	float strongest = a;
 	float pulse;
@@ -1296,7 +1327,7 @@ void CMenuPcs::DrawBonusChkMark(float alpha)
 	if (strongest > 1.0f) {
 		strongest = 1.0f;
 	}
-	*(unsigned char*)((char*)this + 0x8d) = (unsigned char)(strongest > 0.5f ? 1 : 0);
+	GetBonusMenuMembers(this).m_bonusCursorFlag = (unsigned char)(strongest > 0.5f ? 1 : 0);
 }
 
 /*
@@ -1325,7 +1356,7 @@ void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2* a, CMenuPcs::Sprt2* b)
  */
 void CMenuPcs::GetAllPadOn()
 {
-	int statePtr = *(int*)((char*)this + 0x82c);
+	int statePtr = GetBonusMenuMembers(this).m_bonusStatePtr;
 	unsigned char activeMask = 0;
 	int activePartyCount = 0;
 	int anyReady = 0;
@@ -1369,3 +1400,4 @@ void CMenuPcs::ClrBattleItem()
 		}
 	}
 }
+

@@ -76,7 +76,7 @@ static void F232(void* task)
     } while (result != 0);
 }
 
-static s32 F252(void* task)
+static void F252(void* task)
 {
     s32 chan;
 
@@ -94,7 +94,6 @@ static s32 F252(void* task)
     }
     
     __GBAX01(chan, 0);
-    return chan;
 }
 
 void __GBAX02(s32 chan, u8* readbuf) {
@@ -116,7 +115,7 @@ void __GBAX02(s32 chan, u8* readbuf) {
     gba->task.dram_length = 0;
     gba->task.dram_mmem_addr = (u16*)0x10;
     gba->task.res_cb = F232;
-    gba->task.done_cb = (DSPCallback)F252;
+    gba->task.done_cb = F252;
     
     DSPAddTask(&gba->task);
 }

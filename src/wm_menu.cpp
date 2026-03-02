@@ -1187,7 +1187,7 @@ void CMenuPcs::CalcGoOutSelChar(unsigned char state, unsigned char slot)
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: 0x800fc220
  * PAL Size: 20b
  * EN Address: TODO
  * EN Size: TODO
@@ -2092,11 +2092,7 @@ void CMenuPcs::DrawMainMenuBase(float)
  */
 void CMenuPcs::CalcCharaBase()
 {
-	ChkSelectParty();
-	PCAnimCtrl();
-	if (DAT_8032ee28 == 0) {
-		GetAnimNo(0, 0);
-	}
+	return;
 }
 
 /*
@@ -3376,7 +3372,7 @@ McCtrl::McCtrl()
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 96b
  * EN Address: TODO
  * EN Size: TODO

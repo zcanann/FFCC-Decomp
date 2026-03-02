@@ -141,7 +141,7 @@ CChara::CAnim::CAnim()
 	p[0xA] = 5;
 	p[0xB] = 0xB;
 	p[0xC] = 10;
-	p[0xD] = 0;
+	p[0x9] = 0;
 	*(void**)(p + 0x18) = 0;
 	*(void**)(p + 0x28) = 0;
 	*(int*)(p + 0x1C) = 0;

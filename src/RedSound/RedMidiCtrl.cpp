@@ -76,6 +76,7 @@ void KeyOnReserveClear(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma dont_inline on
 void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
 {
     int* slot;
@@ -109,6 +110,7 @@ void KeyOnReserve(RedKeyOnDATA* keyOnData, RedTrackDATA* track)
         slot += 2;
     } while (slot < limit);
 }
+#pragma dont_inline reset
 
 /*
  * --INFO--

@@ -2125,10 +2125,44 @@ void CMenuPcs::DrawWMFrame0(int mask, float alpha)
  */
 void CMenuPcs::DrawMainMenuBase(float)
 {
-	DrawWMFrame();
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	unsigned char* const frame = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x820)[0]);
+	float alpha = 1.0f;
+
+	if (worldState != 0) {
+		const short state = *reinterpret_cast<short*>(worldState + 0x10);
+		const short step = *reinterpret_cast<short*>(worldState + 0x22);
+		if (state == 0) {
+			alpha = static_cast<float>(step) * 0.1f;
+		} else if (state >= 3) {
+			alpha = 1.0f - static_cast<float>(step) * 0.1f;
+		}
+	}
+	if (alpha < 0.0f) {
+		alpha = 0.0f;
+	} else if (alpha > 1.0f) {
+		alpha = 1.0f;
+	}
+
+	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)};
+	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
+	SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
+
+	if (frame != 0) {
+		for (int i = 0; i < 2; i++) {
+			unsigned char* const entry = frame + 4 + i * 0x1C;
+			DrawRect(0xFFFFFFFF, static_cast<float>(*reinterpret_cast<short*>(entry + 0)),
+			         static_cast<float>(*reinterpret_cast<short*>(entry + 2)), static_cast<float>(*reinterpret_cast<short*>(entry + 4)),
+			         static_cast<float>(*reinterpret_cast<short*>(entry + 6)), *reinterpret_cast<float*>(entry + 8),
+			         *reinterpret_cast<float*>(entry + 0x0C), 1.0f, 1.0f, static_cast<float>(*reinterpret_cast<unsigned int*>(entry + 0x18)));
+		}
+	}
+
 	DrawMainMenuSub();
 	DrawPageMark();
-	DrawHelpBase(0, 1.0f);
+	DrawHelpBase(0, alpha);
 }
 
 /*
@@ -2142,7 +2176,27 @@ void CMenuPcs::DrawMainMenuBase(float)
  */
 void CMenuPcs::CalcCharaBase()
 {
-	return;
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	unsigned char* const worldObj = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x814)[0]);
+	if (worldState == 0 || worldObj == 0) {
+		return;
+	}
+
+	const short state = *reinterpret_cast<short*>(worldState + 0x10);
+	for (int row = 0; row < 2; row++) {
+		for (int col = 0; col < 4; col++) {
+			unsigned char* const slot = worldObj + 0x1E0 + (row * 4 + col) * 0x50;
+			*reinterpret_cast<unsigned int*>(slot + 0x00) = (state > 0 && state < 4) ? 1u : 0u;
+			*reinterpret_cast<short*>(slot + 0x08) = static_cast<short>(0x1C + col * 0x90);
+			*reinterpret_cast<short*>(slot + 0x0A) = static_cast<short>((row == 0 ? 0x22 : 0xCA) + (row != 0 ? 8 : 0));
+			*reinterpret_cast<unsigned short*>(slot + 0x0C) = 0x140;
+			*reinterpret_cast<unsigned short*>(slot + 0x0E) = 0xE0;
+			*reinterpret_cast<float*>(slot + 0x10) = FLOAT_803313dc;
+			*reinterpret_cast<float*>(slot + 0x14) = FLOAT_803313dc;
+			*reinterpret_cast<float*>(slot + 0x18) = FLOAT_80331598;
+		}
+	}
 }
 
 /*
@@ -2156,7 +2210,41 @@ void CMenuPcs::CalcCharaBase()
  */
 void CMenuPcs::DrawCharaBase()
 {
-	DrawChara();
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	if (worldState == 0) {
+		return;
+	}
+
+	const short state = *reinterpret_cast<short*>(worldState + 0x10);
+	if (state <= 0) {
+		return;
+	}
+
+	float alpha = 1.0f;
+	if (state == 1) {
+		alpha = static_cast<float>(*reinterpret_cast<short*>(worldState + 0x22)) * 0.1f;
+	} else if (state >= 3) {
+		alpha = 1.0f - static_cast<float>(*reinterpret_cast<short*>(worldState + 0x22)) * 0.1f;
+	}
+	if (alpha < 0.0f) {
+		alpha = 0.0f;
+	} else if (alpha > 1.0f) {
+		alpha = 1.0f;
+	}
+
+	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)};
+	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
+	SetTexture(static_cast<CMenuPcs::TEX>(0x29));
+
+	for (int row = 0; row < 2; row++) {
+		for (int col = 0; col < 4; col++) {
+			const float x = static_cast<float>(0x1C + col * 0x90);
+			const float y = static_cast<float>((row == 0 ? 0x22 : 0xCA) + (row != 0 ? 8 : 0));
+			DrawRect(0xFFFFFFFF, x, y, 0x140, 0xE0, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+		}
+	}
 }
 
 /*
@@ -2321,11 +2409,27 @@ void CMenuPcs::WMChgMenu()
 void CMenuPcs::SetParty()
 {
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
-	bytes[0x10] = 1;
-	ChkSelectParty();
-	if (DAT_8032ee28 == 0) {
-		bytes[0x10] = 0;
+	unsigned char* const modelData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x824)[0]);
+	unsigned char* const mcList = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x854)[0]);
+	int partyCount = 0;
+
+	if (modelData != 0) {
+		for (int i = 0; i < 8; i++) {
+			if (modelData[i * 0x34 + 0x0C] != 0) {
+				partyCount++;
+			}
+		}
 	}
+	if (partyCount == 0 && mcList != 0) {
+		for (int i = 0; i < kMcListCount; i++) {
+			unsigned char* const entry = mcList + i * kMcListEntrySize;
+			if (entry[0x41] != 0 && entry[0x42] == 0 && entry[0x43] == 0) {
+				partyCount++;
+			}
+		}
+	}
+	DAT_8032ee28 = partyCount;
+	bytes[0x10] = static_cast<unsigned char>(partyCount > 0);
 }
 
 /*
@@ -2717,8 +2821,29 @@ void CMenuPcs::DrawMCList()
  */
 void CMenuPcs::DrawHelpBase(int, float)
 {
-	DrawWMFrame();
-	DrawPageMark();
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	float alpha = 1.0f;
+
+	if (worldState != 0) {
+		const short state = *reinterpret_cast<short*>(worldState + 0x10);
+		if (state == 0) {
+			alpha = static_cast<float>(*reinterpret_cast<short*>(worldState + 0x22)) * 0.1f;
+		} else if (state >= 3) {
+			alpha = 1.0f - static_cast<float>(*reinterpret_cast<short*>(worldState + 0x22)) * 0.1f;
+		}
+	}
+	if (alpha < 0.0f) {
+		alpha = 0.0f;
+	} else if (alpha > 1.0f) {
+		alpha = 1.0f;
+	}
+
+	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(255.0f * alpha)};
+	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
+	SetTexture(static_cast<CMenuPcs::TEX>(0x1F));
+	DrawRect(0xFFFFFFFF, 0.0f, 0x1A8, 0x280, 0x18, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 }
 
 /*
@@ -2955,6 +3080,22 @@ void CMenuPcs::DrawPageMark()
 {
 	int x;
 	int y;
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+
+	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
+	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
+	SetTexture(static_cast<CMenuPcs::TEX>(0x2B));
+
+	const unsigned char cur = bytes[0x14];
+	const unsigned char max = bytes[0x15];
+	for (unsigned int i = 0; i < max; i++) {
+		const float px = 0x20 + static_cast<float>(i * 0x14);
+		const float py = 0x1A0;
+		const float tx = (i == cur) ? 0.0f : 16.0f;
+		DrawRect(0xFFFFFFFF, px, py, 16.0f, 16.0f, tx, 0.0f, 1.0f, 1.0f, 0.0f);
+	}
+
 	GetMcAccessPos(&x, &y);
 	if (x >= 0 && x < 0x280 && y >= 0 && y < 0x1C0) {
 		DrawCursor(x, y, 1.0f);
@@ -3366,6 +3507,7 @@ void CMenuPcs::SetTextureLoc(int index)
 		index = 0xFF;
 	}
 	bytes[0x86E] = static_cast<unsigned char>(index);
+	SetTexture(static_cast<CMenuPcs::TEX>(index));
 	DAT_8032ee28 = index;
 }
 

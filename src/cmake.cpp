@@ -30,7 +30,10 @@ extern "C" float FLOAT_803332b0;
 extern "C" float FLOAT_80333364;
 extern "C" float FLOAT_803332a4;
 extern "C" float FLOAT_80333284;
+extern "C" float FLOAT_8033327c;
 extern "C" float FLOAT_8033324c;
+extern "C" float FLOAT_803332d8;
+extern "C" float FLOAT_803332e4;
 extern "C" float FLOAT_80333348;
 extern "C" float FLOAT_80333350;
 extern "C" float FLOAT_80333354;
@@ -42,7 +45,19 @@ extern "C" float FLOAT_80333368;
 extern "C" float FLOAT_8033336c;
 extern "C" float FLOAT_80333370;
 extern "C" float FLOAT_80333380;
+extern "C" float FLOAT_80333390;
+extern "C" float FLOAT_80333394;
+extern "C" float FLOAT_80333398;
+extern "C" float FLOAT_803333a8;
+extern "C" float FLOAT_803333ac;
+extern "C" float FLOAT_803333b0;
+extern "C" float FLOAT_803333c8;
 extern "C" double DOUBLE_803332d0;
+extern "C" double DOUBLE_80333270;
+extern "C" double DOUBLE_80333298;
+extern "C" double DOUBLE_803333a0;
+extern "C" double DOUBLE_803333b8;
+extern "C" double DOUBLE_803333c0;
 extern "C" char* GetLangString__5CGameFv(void*);
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" void loadFont__8CMenuPcsFiPcii(CMenuPcs*, int, char*, int, int);
@@ -377,9 +392,36 @@ void CMenuPcs::DrawDiaryBase(int page, float alpha)
  */
 void CMenuPcs::DrawCmakeWin(float x, float y, float alpha)
 {
-    (void)x;
     (void)y;
-    (void)alpha;
+
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcs, 0);
+
+    int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
+    GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
+    GXSetChanMatColor(GX_COLOR0A0, col);
+
+    int frameH = (x == 0.0f) ? 0x150 : 0x180;
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcs, (x == 0.0f) ? 0x3F : 0x35);
+    DrawRect__8CMenuPcsFUlfffffffff(
+        MenuPcs, 0, FLOAT_80333254, 24.0f, FLOAT_803332dc, static_cast<float>(frameH),
+        FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
+    DrawRect__8CMenuPcsFUlfffffffff(
+        MenuPcs, 8, FLOAT_803332e4, 24.0f, FLOAT_803332dc, static_cast<float>(frameH),
+        FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcs, (x == 0.0f) ? 0x40 : 0x36);
+    for (int tileX = 0x20; tileX < 0x260; ) {
+        int tileW = 0x20;
+        if (0x260 - tileX < 0x20) {
+            tileW = 0x260 - tileX;
+        }
+
+        DrawRect__8CMenuPcsFUlfffffffff(
+            MenuPcs, 0, static_cast<float>(tileX), 24.0f, static_cast<float>(tileW), static_cast<float>(frameH),
+            FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
+        tileX += tileW;
+    }
 }
 
 /*
@@ -393,9 +435,38 @@ void CMenuPcs::DrawCmakeWin(float x, float y, float alpha)
  */
 void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
 {
-    (void)page;
-    (void)x;
-    (void)alpha;
+    _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
+    SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(MenuPcs, 0);
+
+    int a = static_cast<int>(static_cast<double>(FLOAT_80333240) * alpha);
+    GXColor col = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(a)};
+    GXSetChanMatColor(GX_COLOR0A0, col);
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcs, (MenuS16(this, 0x86C) != 0) ? 0x62 : 0x3B);
+    DrawRect__8CMenuPcsFUlfffffffff(
+        MenuPcs, 0, FLOAT_80333390, FLOAT_803332dc, FLOAT_80333394, FLOAT_8033327c,
+        FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
+    DrawRect__8CMenuPcsFUlfffffffff(
+        MenuPcs, 8, FLOAT_80333398, FLOAT_803332dc, FLOAT_80333394, FLOAT_8033327c,
+        FLOAT_80333254, FLOAT_80333254, FLOAT_80333258, FLOAT_80333258, 0.0f);
+
+    SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcs, (MenuS16(this, 0x86C) != 0) ? 0x61 : 0x3A);
+    unsigned int offsU = static_cast<unsigned int>(
+        -(static_cast<double>(FLOAT_803333a8 * x - FLOAT_803333a8) * DOUBLE_80333298) + DOUBLE_803333a0);
+    float offs = static_cast<float>(offsU);
+    DrawRect__8CMenuPcsFUlfffffffff(
+        MenuPcs, 0, FLOAT_803333ac, offs, FLOAT_803333b0, FLOAT_803333a8,
+        FLOAT_80333254, FLOAT_80333284, FLOAT_80333258, alpha, 0.0f);
+
+    if (x >= static_cast<float>(DOUBLE_80333270)) {
+        SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(MenuPcs, (MenuS16(this, 0x86C) != 0) ? 0x65 : 0x3E);
+
+        float titleX = static_cast<float>(offsU + static_cast<unsigned int>(DOUBLE_803333b8));
+        float titleY = static_cast<float>(offsU + static_cast<unsigned int>(DOUBLE_803333c0));
+        DrawRect__8CMenuPcsFUlfffffffff(
+            MenuPcs, 0, titleX, titleY, FLOAT_803333c8, FLOAT_803332d8,
+            FLOAT_80333254, static_cast<float>(page * 0x18), FLOAT_80333258, FLOAT_80333258, 0.0f);
+    }
 }
 
 /*

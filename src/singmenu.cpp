@@ -53,6 +53,8 @@ extern "C" void ReadASync__5CFileFPQ25CFile7CHandle(void*, void*);
 extern "C" int IsCompleted__5CFileFPQ25CFile7CHandle(void*, void*);
 extern "C" void Close__5CFileFPQ25CFile7CHandle(void*, void*);
 extern "C" int sprintf(char*, const char*, ...);
+extern "C" void loadFont__8CMenuPcsFiPcii(CMenuPcs*, int, char*, int, int);
+extern "C" void loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(CMenuPcs*, char**, int, int, void*, int, int, int);
 extern "C" void SetMargin__5CFontFf(float, CFont*);
 extern "C" void SetShadow__5CFontFi(CFont*, int);
 extern "C" void SetScale__5CFontFf(float, CFont*);
@@ -73,7 +75,10 @@ extern "C" void CreateSmithMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" char* s_stand_80332a24;
 extern "C" char* s_singmenu_cpp_801de8d4;
 extern "C" char* s_dvd__smenu__s_tex_801de8e4;
+extern "C" char s_dvd__smenu_subfont_fnt_801de8f8[];
 extern "C" char* PTR_s_solo1_80214b18[];
+extern "C" char* PTR_s_solo2_80214a8c[];
+extern "C" int DAT_80214ab0;
 extern "C" int GetItemType__8CMenuPcsFii(CMenuPcs*, int, int);
 extern "C" char* PTR_s_Tutti_802143ec;
 extern "C" char* PTR_s_Alle_Rassen_8021430c;
@@ -256,12 +261,62 @@ static inline double SingWinUIntToDouble(unsigned int value)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8014a7cc
+ * PAL Size: 372b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::createSingleMenu()
 {
-	// TODO
+    u8* self = reinterpret_cast<u8*>(this);
+
+    *reinterpret_cast<s16*>(self + 0x866) = 0;
+    DAT_8032eebc = 0;
+    if (Game.game.m_gameWork.m_menuStageMode == 0) {
+        if (self[0x859] != 0) {
+            *reinterpret_cast<int*>(self + 0xF0) = 0;
+
+            void* font = *reinterpret_cast<void**>(self + 0x108);
+            if (font != 0) {
+                int* raw = reinterpret_cast<int*>(font);
+                int refCount = raw[1] - 1;
+                raw[1] = refCount;
+                if (refCount == 0) {
+                    reinterpret_cast<void (*)(void*, int)>(*reinterpret_cast<int*>(raw[0] + 8))(font, 1);
+                }
+                *reinterpret_cast<void**>(self + 0x108) = 0;
+            }
+
+            self[0x859] = 0;
+            self[0x85A] = 0;
+        }
+    } else {
+        if (self[0x859] == 0) {
+            *reinterpret_cast<int*>(self + 0xF0) = *reinterpret_cast<int*>(reinterpret_cast<u8*>(&CharaPcs) + 0x212);
+            self[0x859] = 1;
+        }
+
+        char path[128];
+        char* language = GetLangString__5CGameFv(&Game.game);
+        sprintf(path, s_dvd__smenu_subfont_fnt_801de8f8, language);
+        loadFont__8CMenuPcsFiPcii(this, 1, path, 4, -1);
+
+        self[0x85A] = 0;
+        DAT_8032eec4 = -1;
+        DAT_8032eeb8 = 0;
+
+        if (Game.game.m_gameWork.m_menuStageMode != 0) {
+            loadTexture__8CMenuPcsFPPciiPQ28CMenuPcs4CTmpiii(
+                this, PTR_s_solo2_80214a8c, 4, 1, &DAT_80214ab0, 0x20, 0xD, 1);
+            *reinterpret_cast<int*>(self + 0x814) = 0;
+            *reinterpret_cast<int*>(self + 0x850) = 0;
+            *reinterpret_cast<int*>(self + 0x82C) = 0;
+            *reinterpret_cast<int*>(self + 0x848) = 0;
+            *reinterpret_cast<void**>(self + 0x868) = 0;
+        }
+    }
 }
 
 /*

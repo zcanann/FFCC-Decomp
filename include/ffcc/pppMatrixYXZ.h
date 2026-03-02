@@ -1,13 +1,13 @@
 #ifndef _PPP_MATRIXYXZ_H_
 #define _PPP_MATRIXYXZ_H_
 
+#include "ffcc/partMng.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppMatrixYXZ(void* matrix_ptr, void* param2, void* param3);
-void pppGetRotMatrixYXZ(void* matrix, void* vector);
-void PSVECScale(void* src, void* dst, float scale);
+void pppMatrixYXZ(void* target, void* unused, void* param);
 
 #ifdef __cplusplus
 }

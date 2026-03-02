@@ -15,6 +15,7 @@ extern "C" void DrawOptionMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawSingCMake__8CMenuPcsFv(CMenuPcs*);
 extern "C" void PlaySe__6CSoundFiiii(void*, int, int, int, int);
 extern "C" void SetAnim__Q29CCharaPcs7CHandleFiiiii(void*, int, int, int, int, int);
+extern "C" void LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(void*, int, unsigned long, unsigned long);
 extern "C" void SetFrame__Q26CChara6CModelFf(float, void*);
 extern "C" void AddFrame__Q26CChara6CModelFf(float, void*);
 extern "C" void SetMatrix__Q26CChara6CModelFPA4_f(void*, Mtx);
@@ -763,9 +764,71 @@ void CMenuPcs::DrawTitleMenu()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::SetWorldParam(int, int)
+void CMenuPcs::SetWorldParam(int code, int value)
 {
-	return;
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+
+	switch (code) {
+	case 0:
+		bytes[5] = bytes[4];
+		bytes[4] = static_cast<unsigned char>(value);
+		break;
+	case 1:
+		bytes[6] = static_cast<unsigned char>(value);
+		break;
+	case 2:
+		*reinterpret_cast<unsigned short*>(bytes + 0x1A) = static_cast<unsigned short>(value) & 0x3FF;
+		break;
+	case 3:
+		bytes[7] = static_cast<unsigned char>(value);
+		break;
+	case 4:
+		bytes[8] = static_cast<unsigned char>(value);
+		break;
+	case 5:
+		*reinterpret_cast<unsigned short*>(bytes + 0x1C) = static_cast<unsigned short>(value);
+		break;
+	case 6:
+		*reinterpret_cast<unsigned short*>(bytes + 0x1E) = static_cast<unsigned short>(value);
+		break;
+	case 7:
+		bytes[9] = static_cast<unsigned char>(value);
+		break;
+	case 8:
+		bytes[0xB] = bytes[0xC];
+		bytes[0xC] = static_cast<unsigned char>(value);
+		break;
+	case 9:
+		if (static_cast<signed char>(bytes[0xD]) != value) {
+			bytes[0xD] = static_cast<unsigned char>(value);
+		}
+		*reinterpret_cast<unsigned short*>(worldState + 0x20) = 2;
+		break;
+	case 10:
+		bytes[0x10] = static_cast<unsigned char>(value != 0);
+		break;
+	case 11:
+		bytes[0x11] = static_cast<unsigned char>(value != 0);
+		break;
+	case 12:
+		bytes[0xE] = static_cast<unsigned char>(value);
+		break;
+	case 13:
+		bytes[0xF] = static_cast<unsigned char>(value & 3);
+		break;
+	case 14:
+		bytes[0x12] = static_cast<unsigned char>(value != 0);
+		break;
+	case 15:
+		bytes[0x13] = static_cast<unsigned char>(value != 0);
+		break;
+	case 16:
+		bytes[0x17] = static_cast<unsigned char>(value);
+		break;
+	default:
+		break;
+	}
 }
 
 /*
@@ -777,9 +840,68 @@ void CMenuPcs::SetWorldParam(int, int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::GetWorldParam(int)
+void CMenuPcs::GetWorldParam(int code)
 {
-	return;
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned int result = 0;
+
+	switch (code) {
+	case 0:
+		result = static_cast<unsigned int>(static_cast<signed char>(bytes[4]));
+		break;
+	case 1:
+		result = static_cast<unsigned int>(static_cast<signed char>(bytes[6]));
+		break;
+	case 2:
+		result = static_cast<unsigned int>(*reinterpret_cast<short*>(bytes + 0x1A));
+		break;
+	case 3:
+		result = static_cast<unsigned int>(static_cast<signed char>(bytes[7]));
+		break;
+	case 4:
+		result = static_cast<unsigned int>(static_cast<signed char>(bytes[8]));
+		break;
+	case 5:
+		result = static_cast<unsigned int>(*reinterpret_cast<short*>(bytes + 0x1C));
+		break;
+	case 6:
+		result = static_cast<unsigned int>(*reinterpret_cast<short*>(bytes + 0x1E));
+		break;
+	case 7:
+		result = static_cast<unsigned int>(static_cast<signed char>(bytes[9]));
+		break;
+	case 8:
+		result = static_cast<unsigned int>(static_cast<signed char>(bytes[0xC]));
+		break;
+	case 9:
+		result = static_cast<unsigned int>(static_cast<signed char>(bytes[0xD]));
+		break;
+	case 10:
+		result = bytes[0x10] ? 1u : 0u;
+		break;
+	case 11:
+		result = bytes[0x11] ? 1u : 0u;
+		break;
+	case 12:
+		result = static_cast<unsigned int>(static_cast<signed char>(bytes[0xE]));
+		break;
+	case 13:
+		result = static_cast<unsigned int>(static_cast<signed char>(bytes[0xF]));
+		break;
+	case 14:
+		result = bytes[0x12] ? 1u : 0u;
+		break;
+	case 15:
+		result = bytes[0x13] ? 1u : 0u;
+		break;
+	case 16:
+		result = static_cast<unsigned int>(static_cast<signed char>(bytes[0x17]));
+		break;
+	default:
+		break;
+	}
+
+	DAT_8032ee28 = static_cast<int>(result);
 }
 
 /*
@@ -791,9 +913,15 @@ void CMenuPcs::GetWorldParam(int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::CallWorldParam(int, int, int)
+void CMenuPcs::CallWorldParam(int p0, int p1, int p2)
 {
-	return;
+	int stackData[3];
+	stackData[0] = p0;
+	stackData[1] = p1;
+	stackData[2] = p2;
+
+	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+	    CFlat, 0, 1, 4, 3, stackData, 0);
 }
 
 /*
@@ -1171,9 +1299,11 @@ void CMenuPcs::SetParty()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::SetCMakeEnd(int)
+void CMenuPcs::SetCMakeEnd(int channel)
 {
-	return;
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const selectData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x828)[0]);
+	selectData[channel * 0x10 + 0xC] = 1;
 }
 
 /*
@@ -1185,9 +1315,16 @@ void CMenuPcs::SetCMakeEnd(int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::ClrCMakeFlg(int)
+void CMenuPcs::ClrCMakeFlg(int channel)
 {
-	return;
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const selectData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x828)[0]);
+	unsigned char* const modelData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x824)[0]);
+
+	selectData[channel * 0x10 + 0xB] = 0;
+	const int current = *reinterpret_cast<short*>(selectData + channel * 0x10 + 4);
+	modelData[current * 0x34 + 0xC] = 0;
+	LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(reinterpret_cast<void*>(reinterpret_cast<unsigned int*>(bytes + 0x7F4)[current]), 3, 0x43, 0);
 }
 
 /*
@@ -1237,9 +1374,29 @@ void CMenuPcs::SetMakeChara(int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::ChgModel(int, int, int, int)
+void CMenuPcs::ChgModel(int slot, int tribe, int job, int isFemale)
 {
-	return;
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const modelData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x824)[0]) + slot * 0x34;
+	int modelNo;
+	int charaKind;
+
+	if (tribe < 0) {
+		charaKind = 3;
+		modelData[0xC] = 0;
+		modelNo = 0x43;
+	} else {
+		charaKind = 0;
+		modelNo = tribe * 200 + 100;
+		if (isFemale != 0) {
+			modelNo = tribe * 200 + 200;
+		}
+		modelNo += job;
+		modelData[0xC] = 1;
+	}
+
+	LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(reinterpret_cast<void*>(reinterpret_cast<unsigned int*>(bytes + 0x7F4)[slot]), charaKind,
+	                                            static_cast<unsigned long>(modelNo), 0);
 }
 
 /*
@@ -1619,9 +1776,13 @@ void CMenuPcs::DrawFilter(unsigned char, unsigned char, unsigned char, unsigned 
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::CopyNowCaravanDat(Mc::SaveDat*)
+void CMenuPcs::CopyNowCaravanDat(Mc::SaveDat* outSave)
 {
-	return;
+	MemoryCardMan.CreateMcBuff();
+	MemoryCardMan.MakeSaveData();
+	MemoryCardMan.DecodeData();
+	memcpy(outSave, MemoryCardMan.m_saveBuffer, 0x8BD0);
+	MemoryCardMan.DestroyMcBuff();
 }
 
 /*
@@ -1633,9 +1794,14 @@ void CMenuPcs::CopyNowCaravanDat(Mc::SaveDat*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::SetCaravanWork(Mc::SaveDat*)
+void CMenuPcs::SetCaravanWork(Mc::SaveDat* saveDat)
 {
-	return;
+	MemoryCardMan.CreateMcBuff();
+	memcpy(MemoryCardMan.m_saveBuffer, saveDat, 0x8BD0);
+	Game.game.LoadInit();
+	MemoryCardMan.SetLoadData();
+	Game.game.LoadFinished();
+	MemoryCardMan.DestroyMcBuff();
 }
 
 /*
@@ -1647,9 +1813,47 @@ void CMenuPcs::SetCaravanWork(Mc::SaveDat*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::GetSameCharaData(Mc::SaveDat*, Mc::SaveDat*, int, int)
+void CMenuPcs::GetSameCharaData(Mc::SaveDat* source, Mc::SaveDat* target, int memberIndex, int strictMode)
 {
-	return;
+	unsigned char* const src = reinterpret_cast<unsigned char*>(source);
+	unsigned char* const dst = reinterpret_cast<unsigned char*>(target);
+	unsigned int result = 0xFFFFFFFF;
+
+	if (strictMode == 0) {
+		const unsigned char* const targetHeader = dst + memberIndex * 0x9C0;
+		if (*reinterpret_cast<unsigned int*>(src + 0x13D4) != *reinterpret_cast<const unsigned int*>(targetHeader + 0x13D4) ||
+		    *reinterpret_cast<unsigned int*>(src + 0x13D0) != *reinterpret_cast<const unsigned int*>(targetHeader + 0x13D0) ||
+		    *reinterpret_cast<unsigned int*>(src + 0x13D8) != *reinterpret_cast<const unsigned int*>(targetHeader + 0x13D8)) {
+			DAT_8032ee2c = -2;
+			return;
+		}
+	}
+
+	for (unsigned int i = 0; i < 8; i++) {
+		const unsigned char* const cmpBase = dst + (memberIndex * 0x9C0 + 0x1D94) + ((i / 2) * 0x1380);
+		const unsigned char* const srcBase = src + ((i % 2) ? 0x2750 : 0x1D90);
+
+		if (srcBase[-0xC] != 0) {
+			const unsigned int srcId = *reinterpret_cast<const unsigned int*>(srcBase + 4);
+			const unsigned int dstId = *reinterpret_cast<const unsigned int*>(cmpBase);
+			if (srcId == dstId) {
+				if (strictMode == 0) {
+					if (srcBase[0] != 0) {
+						result = i;
+						break;
+					}
+				} else if (srcBase[1] != 0 &&
+				           *reinterpret_cast<const unsigned int*>(srcBase + 0xC) == *reinterpret_cast<const unsigned int*>(dst + 0x13D4) &&
+				           *reinterpret_cast<const unsigned int*>(srcBase + 8) == *reinterpret_cast<const unsigned int*>(dst + 0x13D0) &&
+				           *reinterpret_cast<const unsigned int*>(srcBase + 0x10) == *reinterpret_cast<const unsigned int*>(dst + 0x13D8)) {
+					result = i;
+					break;
+				}
+			}
+		}
+	}
+
+	DAT_8032ee2c = static_cast<int>(result);
 }
 
 /*
@@ -1661,9 +1865,16 @@ void CMenuPcs::GetSameCharaData(Mc::SaveDat*, Mc::SaveDat*, int, int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::CheckSameMcFormatID(Mc::SaveDat*, Mc::SaveDat*)
+void CMenuPcs::CheckSameMcFormatID(Mc::SaveDat* lhs, Mc::SaveDat* rhs)
 {
-	return;
+	unsigned char* const a = reinterpret_cast<unsigned char*>(lhs);
+	unsigned char* const b = reinterpret_cast<unsigned char*>(rhs);
+	const int same = (*reinterpret_cast<unsigned int*>(a + 0x13D4) == *reinterpret_cast<unsigned int*>(b + 0x13D4) &&
+	                  *reinterpret_cast<unsigned int*>(a + 0x13D0) == *reinterpret_cast<unsigned int*>(b + 0x13D0) &&
+	                  *reinterpret_cast<unsigned int*>(a + 0x13D8) == *reinterpret_cast<unsigned int*>(b + 0x13D8))
+	                     ? 1
+	                     : 0;
+	DAT_8032ee28 = same;
 }
 
 /*

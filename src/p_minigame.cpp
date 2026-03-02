@@ -1075,7 +1075,13 @@ void CMiniGamePcs::PadCodeProc(int player, unsigned short padCode)
         if (System.m_execParam != 0)
         {
             Printf__7CSystemFPce(&System, "--------------------------------\n");
+        }
+        if (System.m_execParam != 0)
+        {
             Printf__7CSystemFPce(&System, "GBA PADCODE MGR END\n");
+        }
+        if (System.m_execParam != 0)
+        {
             Printf__7CSystemFPce(&System, "--------------------------------\n");
         }
         self[0x6495] = 1;
@@ -1085,7 +1091,13 @@ void CMiniGamePcs::PadCodeProc(int player, unsigned short padCode)
         if (System.m_execParam != 0)
         {
             Printf__7CSystemFPce(&System, "--------------------------------\n");
+        }
+        if (System.m_execParam != 0)
+        {
             Printf__7CSystemFPce(&System, "GBA PADCODE RACE END\n");
+        }
+        if (System.m_execParam != 0)
+        {
             Printf__7CSystemFPce(&System, "--------------------------------\n");
         }
         self[0x6496] = 1;
@@ -1095,7 +1107,13 @@ void CMiniGamePcs::PadCodeProc(int player, unsigned short padCode)
         if (System.m_execParam != 0)
         {
             Printf__7CSystemFPce(&System, "--------------------------------\n");
+        }
+        if (System.m_execParam != 0)
+        {
             Printf__7CSystemFPce(&System, "GBA PADCODE RACE RESULT play=%d r=%d\n", player, padCode & 0xFF);
+        }
+        if (System.m_execParam != 0)
+        {
             Printf__7CSystemFPce(&System, "--------------------------------\n");
         }
         self[0x6498 + player] = static_cast<unsigned char>(padCode);
@@ -1105,7 +1123,13 @@ void CMiniGamePcs::PadCodeProc(int player, unsigned short padCode)
         if (System.m_execParam != 0)
         {
             Printf__7CSystemFPce(&System, "--------------------------------\n");
+        }
+        if (System.m_execParam != 0)
+        {
             Printf__7CSystemFPce(&System, "GBA PADCODE MGR CONTINUE\n");
+        }
+        if (System.m_execParam != 0)
+        {
             Printf__7CSystemFPce(&System, "--------------------------------\n");
         }
         self[0x6497] = 1;

@@ -4,6 +4,11 @@
 #include "ffcc/sound.h"
 #include <string.h>
 
+extern "C" {
+extern int lbl_8032EEA8;
+extern int lbl_8032EEB0;
+}
+
 namespace {
 
 struct BonusAnimHeader {
@@ -109,13 +114,9 @@ static void TickAnimSprites(int statePtr, int animPtr, int fadeDir)
  */
 void CMenuPcs::BonusInit()
 {
-	*(int*)((char*)this + 0x82c) = 0;
+	lbl_8032EEA8 = 0;
 	*(int*)((char*)this + 0x84c) = 0;
-	*(int*)((char*)this + 0x840) = 0;
-	*(int*)((char*)this + 0x848) = 0;
-	*(int*)((char*)this + 0x814) = 0;
-	*(unsigned char*)((char*)this + 0x8c) = 0;
-	*(unsigned char*)((char*)this + 0x8d) = 0;
+	lbl_8032EEB0 = 0;
 }
 
 /*

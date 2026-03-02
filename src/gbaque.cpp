@@ -3126,12 +3126,38 @@ void GbaQueue::SetControllerMode(int controllerMode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800C93E8
+ * PAL Size: 140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-char GbaQueue::GetControllerMode()
+unsigned int GbaQueue::GetControllerMode()
 {
-	return 0;
+	char mode;
+	int i;
+	GbaQueue* semaphoreIter;
+
+	i = 0;
+	semaphoreIter = this;
+	do {
+		OSWaitSemaphore(semaphoreIter->accessSemaphores);
+		i++;
+		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+	} while (i < 4);
+
+	mode = reinterpret_cast<char*>(this)[0x2D57];
+
+	i = 0;
+	semaphoreIter = this;
+	do {
+		OSSignalSemaphore(semaphoreIter->accessSemaphores);
+		i++;
+		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+	} while (i < 4);
+
+	return static_cast<unsigned int>((-static_cast<int>(mode) | static_cast<int>(mode)) >> 31);
 }
 
 /*
@@ -3146,22 +3172,71 @@ void GbaQueue::OpenMenu(int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800C9184
+ * PAL Size: 136b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::SetPauseMode(int)
+void GbaQueue::SetPauseMode(int mode)
 {
-	// TODO
+	int i;
+	GbaQueue* semaphoreIter;
+
+	i = 0;
+	semaphoreIter = this;
+	do {
+		OSWaitSemaphore(semaphoreIter->accessSemaphores);
+		i++;
+		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+	} while (i < 4);
+
+	reinterpret_cast<char*>(this)[0x2D5B] = static_cast<char>(mode);
+
+	i = 0;
+	semaphoreIter = this;
+	do {
+		OSSignalSemaphore(semaphoreIter->accessSemaphores);
+		i++;
+		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+	} while (i < 4);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800C90F8
+ * PAL Size: 140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::GetPauseMode()
+unsigned int GbaQueue::GetPauseMode()
 {
-	// TODO
+	char mode;
+	int i;
+	GbaQueue* semaphoreIter;
+
+	i = 0;
+	semaphoreIter = this;
+	do {
+		OSWaitSemaphore(semaphoreIter->accessSemaphores);
+		i++;
+		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+	} while (i < 4);
+
+	mode = reinterpret_cast<char*>(this)[0x2D5B];
+
+	i = 0;
+	semaphoreIter = this;
+	do {
+		OSSignalSemaphore(semaphoreIter->accessSemaphores);
+		i++;
+		semaphoreIter = reinterpret_cast<GbaQueue*>(semaphoreIter->accessSemaphores + 1);
+	} while (i < 4);
+
+	return static_cast<unsigned int>((-static_cast<int>(mode) | static_cast<int>(mode)) >> 31);
 }
 
 /*

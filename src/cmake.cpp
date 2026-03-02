@@ -12,6 +12,8 @@ extern "C" void CallWorldParam__8CMenuPcsFiii(CMenuPcs*, int, int, int);
 extern "C" void ChgModel__8CMenuPcsFiiii(CMenuPcs*, int, int, int, int);
 extern "C" void SetAnim__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void PCAnimCtrl__8CMenuPcsFv(CMenuPcs*);
+extern "C" unsigned short GetButtonRepeat__8CMenuPcsFi(CMenuPcs*, int);
+extern "C" unsigned short GetButtonDown__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void SetMatrix__Q26CChara6CModelFPA4_f(CChara::CModel*, Mtx);
 extern "C" void CalcMatrix__Q26CChara6CModelFv(CChara::CModel*);
 extern "C" void CalcSkin__Q26CChara6CModelFv(CChara::CModel*);
@@ -621,21 +623,78 @@ void CMenuPcs::CmakeNameCtrl()
     short& mode = *reinterpret_cast<short*>(state + 0x10);
     short& frame = *reinterpret_cast<short*>(state + 0x22);
     short& select = *reinterpret_cast<short*>(state + 0x26);
+    short& row = *reinterpret_cast<short*>(state + 0x28);
+    short& table = *reinterpret_cast<short*>(state + 0x2A);
+
+    unsigned short repeat = GetButtonRepeat__8CMenuPcsFi(this, 0);
+    unsigned short down = GetButtonDown__8CMenuPcsFi(this, 0);
 
     if (mode == 1) {
         if (frame < 30) {
             frame = frame + 1;
-        } else {
+        } else if ((down & 0x200) != 0) {
             mode = 2;
             frame = 0;
-            *reinterpret_cast<short*>(state + 0x1E) = 1;
+            *reinterpret_cast<short*>(state + 0x1E) = -1;
         }
     } else if (mode == 0 && frame < 10) {
         frame = frame + 1;
     }
 
+    if (mode != 1) {
+        return;
+    }
+
+    if ((repeat & 0x4) != 0) {
+        int maxRow = (select < 10) ? 4 : 5;
+        row = (row < maxRow) ? static_cast<short>(row + 1) : 0;
+    } else if ((repeat & 0x8) != 0) {
+        int maxRow = (select < 10) ? 4 : 5;
+        row = (row > 0) ? static_cast<short>(row - 1) : static_cast<short>(maxRow);
+    }
+
+    if ((repeat & 0x2) != 0 && row < 5) {
+        select = (select < 0xB) ? static_cast<short>(select + 1) : 0;
+    } else if ((repeat & 0x1) != 0 && row < 5) {
+        select = (select > 0) ? static_cast<short>(select - 1) : 0xB;
+    }
+
+    if ((down & 0x20) != 0) {
+        table = (table < 2) ? static_cast<short>(table + 1) : 0;
+    } else if ((down & 0x40) != 0) {
+        table = (table > 0) ? static_cast<short>(table - 1) : 2;
+    }
+
+    if ((down & 0x100) != 0) {
+        char* name = reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(this) + 0x85C);
+        size_t len = strlen(name);
+        if (row < 5) {
+            if (len < 7) {
+                int charIdx = (table * 5 + row + select) % 26;
+                AddNameChara(static_cast<int>('A' + charIdx), static_cast<int>(len), 0, 0);
+                name[len + 1] = '\0';
+            }
+        } else if (len > 0) {
+            mode = 2;
+            frame = 0;
+            *reinterpret_cast<short*>(state + 0x1E) = 1;
+        }
+    } else if ((down & 0x200) != 0) {
+        char* name = reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(this) + 0x85C);
+        size_t len = strlen(name);
+        if (len > 0) {
+            name[len - 1] = '\0';
+        } else {
+            mode = 2;
+            frame = 0;
+            *reinterpret_cast<short*>(state + 0x1E) = -1;
+        }
+    }
+
     if (select < 0) {
         select = 0;
+    } else if (select > 0xB) {
+        select = 0xB;
     }
 }
 
@@ -701,14 +760,26 @@ void CMenuPcs::CmakeSexCtrl()
     int state = MenuS32(this, 0x82C);
     short& mode = *reinterpret_cast<short*>(state + 0x10);
     short& frame = *reinterpret_cast<short*>(state + 0x22);
+    short& sel = *reinterpret_cast<short*>(state + 0x26);
+    unsigned short repeat = GetButtonRepeat__8CMenuPcsFi(this, 0);
+    unsigned short down = GetButtonDown__8CMenuPcsFi(this, 0);
 
     if (mode == 1) {
-        if (frame < 30) {
-            frame = frame + 1;
-        } else {
+        if ((repeat & 0x3) != 0) {
+            sel = (sel == 0) ? 1 : 0;
+        }
+
+        if ((down & 0x100) != 0) {
+            MenuS16(this, 0x860) = sel;
             mode = 2;
             frame = 0;
             *reinterpret_cast<short*>(state + 0x1E) = 1;
+        } else if ((down & 0x200) != 0) {
+            mode = 2;
+            frame = 0;
+            *reinterpret_cast<short*>(state + 0x1E) = -1;
+        } else if (frame < 30) {
+            frame = frame + 1;
         }
     }
 }
@@ -774,14 +845,35 @@ void CMenuPcs::CmakeTribeCtrl()
     int state = MenuS32(this, 0x82C);
     short& mode = *reinterpret_cast<short*>(state + 0x10);
     short& frame = *reinterpret_cast<short*>(state + 0x22);
+    short& tribe = *reinterpret_cast<short*>(state + 0x26);
+    short& crest = *reinterpret_cast<short*>(state + 0x28);
+    unsigned short repeat = GetButtonRepeat__8CMenuPcsFi(this, 0);
+    unsigned short down = GetButtonDown__8CMenuPcsFi(this, 0);
 
     if (mode == 1) {
-        if (frame < 30) {
-            frame = frame + 1;
-        } else {
+        if ((repeat & 0x4) != 0) {
+            tribe = (tribe < 3) ? static_cast<short>(tribe + 1) : 0;
+        } else if ((repeat & 0x8) != 0) {
+            tribe = (tribe > 0) ? static_cast<short>(tribe - 1) : 3;
+        }
+
+        if ((repeat & 0x3) != 0) {
+            crest = (crest < 3) ? static_cast<short>(crest + 1) : 0;
+        }
+
+        if ((down & 0x100) != 0) {
+            MenuS16(this, 0x862) = tribe;
+            ChgModel__8CMenuPcsFiiii(this, static_cast<int>(MenuS16(this, 0x86A)),
+                static_cast<int>(MenuS16(this, 0x860)), static_cast<int>(tribe), static_cast<int>(MenuS16(this, 0x864)));
             mode = 2;
             frame = 0;
             *reinterpret_cast<short*>(state + 0x1E) = 1;
+        } else if ((down & 0x200) != 0) {
+            mode = 2;
+            frame = 0;
+            *reinterpret_cast<short*>(state + 0x1E) = -1;
+        } else if (frame < 30) {
+            frame = frame + 1;
         }
     }
 }
@@ -847,15 +939,34 @@ void CMenuPcs::CmakeJobCtrl()
     int state = MenuS32(this, 0x82C);
     short& mode = *reinterpret_cast<short*>(state + 0x10);
     short& frame = *reinterpret_cast<short*>(state + 0x22);
+    short& job = *reinterpret_cast<short*>(state + 0x26);
+    unsigned short repeat = GetButtonRepeat__8CMenuPcsFi(this, 0);
+    unsigned short down = GetButtonDown__8CMenuPcsFi(this, 0);
 
     if (mode == 1) {
-        if (frame < 30) {
-            frame = frame + 1;
-        } else {
+        if ((repeat & 0x4) != 0) {
+            job = (job < 7) ? static_cast<short>(job + 1) : 0;
+        } else if ((repeat & 0x8) != 0) {
+            job = (job > 0) ? static_cast<short>(job - 1) : 7;
+        }
+
+        if ((repeat & 0x3) != 0) {
+            job = (job < 4) ? static_cast<short>(job + 4) : static_cast<short>(job - 4);
+        }
+
+        if ((down & 0x100) != 0) {
+            MenuS16(this, 0x864) = job;
             mode = 2;
             frame = 0;
             *reinterpret_cast<short*>(state + 0x1E) = 1;
             SetSingMakeChara();
+        } else if ((down & 0x200) != 0) {
+            mode = 2;
+            frame = 0;
+            *reinterpret_cast<short*>(state + 0x1E) = -1;
+            ChgModel__8CMenuPcsFiiii(this, static_cast<int>(MenuS16(this, 0x86A)), -1, -1, -1);
+        } else if (frame < 30) {
+            frame = frame + 1;
         }
     }
 }
@@ -919,12 +1030,32 @@ void CMenuPcs::CmakeResultOpen()
 void CMenuPcs::CmakeResultCtrl()
 {
     int state = MenuS32(this, 0x82C);
+    short& mode = *reinterpret_cast<short*>(state + 0x10);
+    short& sel = *reinterpret_cast<short*>(state + 0x26);
+    short& resultDir = *reinterpret_cast<short*>(state + 0x1E);
     short& frame = *reinterpret_cast<short*>(state + 0x22);
-    if (frame < 10) {
-        frame = frame + 1;
-    } else {
-        *reinterpret_cast<short*>(state + 0x10) = 2;
+    unsigned short repeat = GetButtonRepeat__8CMenuPcsFi(this, 0);
+    unsigned short down = GetButtonDown__8CMenuPcsFi(this, 0);
+
+    if (mode != 1) {
+        if (frame < 10) {
+            frame = frame + 1;
+        }
+        return;
+    }
+
+    if ((repeat & 0x3) != 0) {
+        sel = (sel == 0) ? 1 : 0;
+    }
+
+    if ((down & 0x100) != 0) {
+        mode = 2;
         frame = 0;
+        resultDir = (sel == 0) ? 1 : -1;
+    } else if ((down & 0x200) != 0) {
+        mode = 2;
+        frame = 0;
+        resultDir = -1;
     }
 }
 
@@ -1002,9 +1133,18 @@ void CMenuPcs::CmakeResultOpen1()
 void CMenuPcs::CmakeResultCtrl1()
 {
     int state = MenuS32(this, 0x82C);
+    short& mode = *reinterpret_cast<short*>(state + 0x10);
     short& frame = *reinterpret_cast<short*>(state + 0x22);
+    unsigned short down = GetButtonDown__8CMenuPcsFi(this, 0);
+
     if (frame < 10) {
         frame = frame + 1;
+        return;
+    }
+
+    if ((down & 0x300) != 0) {
+        mode = 2;
+        frame = 0;
     }
 }
 

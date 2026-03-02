@@ -1,4 +1,5 @@
 #include "ffcc/p_chara.h"
+#include "ffcc/chunkfile.h"
 #include "ffcc/graphic.h"
 #include "ffcc/memory.h"
 #include "ffcc/partMng.h"
@@ -10,6 +11,8 @@ extern CPartMng PartMng;
 extern unsigned char PartPcs[];
 extern "C" void __dla__FPv(void*);
 extern "C" void __dl__FPv(void*);
+extern "C" int sprintf(char*, const char*, ...);
+extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void __dt__4CRefFv(void*, int);
 extern "C" void ReleasePdt__8CPartPcsFi(void*, int);
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
@@ -612,12 +615,56 @@ void CCharaPcs::searchPdt(int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 800783d0
+ * PAL Size: 488b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCharaPcs::LoadCam(int, char*)
+void CCharaPcs::LoadCam(int index, char* fileName)
 {
-	// TODO
+    static char s_p_chara_cpp[] = "p_chara.cpp";
+    char path[0x104];
+    CChunkFile::CChunk chunk;
+
+    int* cameraCounts = reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x04);
+    void** cameraData = reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(this) + 0x14);
+    void*& cameraBuffer = cameraData[index];
+
+    if (cameraBuffer != 0) {
+        __dla__FPv(cameraBuffer);
+        cameraBuffer = 0;
+    }
+
+    sprintf(path, "dvd/cft/%s.cmd", fileName);
+    CFile::CHandle* fileHandle = File.Open(path, 0, CFile::PRI_LOW);
+    if (fileHandle == 0) {
+        return;
+    }
+
+    File.Read(fileHandle);
+    File.SyncCompleted(fileHandle);
+
+    CChunkFile chunkFile(File.m_readBuffer);
+    while (chunkFile.GetNextChunk(chunk)) {
+        if (chunk.m_id != 'CAM ') {
+            continue;
+        }
+
+        cameraCounts[index] = static_cast<int>(chunk.m_arg0);
+
+        CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(reinterpret_cast<unsigned char*>(this) + 0xD4);
+        cameraBuffer = __nwa__FUlPQ27CMemory6CStagePci(
+            static_cast<unsigned long>(cameraCounts[index] << 5), stage, s_p_chara_cpp, 0x4D4);
+
+        float* values = reinterpret_cast<float*>(cameraBuffer);
+        for (int i = 0; i < cameraCounts[index] * 8; i++) {
+            values[i] = chunkFile.GetF4();
+        }
+    }
+
+    File.Close(fileHandle);
 }
 
 /*

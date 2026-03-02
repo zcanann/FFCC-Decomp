@@ -1409,12 +1409,61 @@ void CMenuPcs::DrawListPosMark(float, float, float)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801471cc
+ * PAL Size: 400b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::EquipChk(int)
+int CMenuPcs::EquipChk(int itemNo)
 {
-	// TODO
+    int script = Game.game.m_scriptFoodBase[0];
+
+    if (*reinterpret_cast<s16*>(script + 0xbaa) > 2) {
+        if (*reinterpret_cast<s16*>(script + 0x208) >= 0 && *reinterpret_cast<s16*>(script + 0x208) == itemNo) {
+            return 1;
+        }
+        if (*reinterpret_cast<s16*>(script + 0xbaa) > 3) {
+            if (*reinterpret_cast<s16*>(script + 0x20a) >= 0 && *reinterpret_cast<s16*>(script + 0x20a) == itemNo) {
+                return 1;
+            }
+            if (*reinterpret_cast<s16*>(script + 0xbaa) > 4) {
+                if (*reinterpret_cast<s16*>(script + 0x20c) >= 0 && *reinterpret_cast<s16*>(script + 0x20c) == itemNo) {
+                    return 1;
+                }
+                if (*reinterpret_cast<s16*>(script + 0xbaa) > 5) {
+                    if (*reinterpret_cast<s16*>(script + 0x20e) >= 0 && *reinterpret_cast<s16*>(script + 0x20e) == itemNo) {
+                        return 1;
+                    }
+                    if (*reinterpret_cast<s16*>(script + 0xbaa) > 6) {
+                        if (*reinterpret_cast<s16*>(script + 0x210) >= 0 && *reinterpret_cast<s16*>(script + 0x210) == itemNo) {
+                            return 1;
+                        }
+                        if (*reinterpret_cast<s16*>(script + 0xbaa) > 7 && *reinterpret_cast<s16*>(script + 0x212) >= 0 &&
+                            *reinterpret_cast<s16*>(script + 0x212) == itemNo) {
+                            return 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if (*reinterpret_cast<s16*>(script + 0xac) >= 0 && *reinterpret_cast<s16*>(script + 0xac) == itemNo) {
+        return 1;
+    }
+    if (*reinterpret_cast<s16*>(script + 0xae) >= 0 && *reinterpret_cast<s16*>(script + 0xae) == itemNo) {
+        return 1;
+    }
+    if (*reinterpret_cast<s16*>(script + 0xb0) >= 0 && *reinterpret_cast<s16*>(script + 0xb0) == itemNo) {
+        return 1;
+    }
+    if (*reinterpret_cast<s16*>(script + 0xb2) >= 0 && *reinterpret_cast<s16*>(script + 0xb2) == itemNo) {
+        return 1;
+    }
+
+    return 0;
 }
 
 /*

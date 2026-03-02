@@ -2035,9 +2035,9 @@ void GXSetTexCoordGen(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::GetMaxAnimWait()
+float CMenuPcs::GetMaxAnimWait()
 {
-	DAT_8032ee28 = static_cast<int>(FLOAT_8032ee18);
+	return FLOAT_8032ee18;
 }
 
 /*
@@ -2166,16 +2166,16 @@ void CMenuPcs::GetSameCharaData(Mc::SaveDat* source, Mc::SaveDat* target, int me
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::CheckSameMcFormatID(Mc::SaveDat* lhs, Mc::SaveDat* rhs)
+int CMenuPcs::CheckSameMcFormatID(Mc::SaveDat* lhs, Mc::SaveDat* rhs)
 {
 	unsigned char* const a = reinterpret_cast<unsigned char*>(lhs);
 	unsigned char* const b = reinterpret_cast<unsigned char*>(rhs);
-	const int same = (*reinterpret_cast<unsigned int*>(a + 0x13D4) == *reinterpret_cast<unsigned int*>(b + 0x13D4) &&
-	                  *reinterpret_cast<unsigned int*>(a + 0x13D0) == *reinterpret_cast<unsigned int*>(b + 0x13D0) &&
-	                  *reinterpret_cast<unsigned int*>(a + 0x13D8) == *reinterpret_cast<unsigned int*>(b + 0x13D8))
-	                     ? 1
-	                     : 0;
-	DAT_8032ee28 = same;
+	if (*reinterpret_cast<unsigned int*>(a + 0x13D4) != *reinterpret_cast<unsigned int*>(b + 0x13D4) ||
+	    *reinterpret_cast<unsigned int*>(a + 0x13D0) != *reinterpret_cast<unsigned int*>(b + 0x13D0) ||
+	    *reinterpret_cast<unsigned int*>(a + 0x13D8) != *reinterpret_cast<unsigned int*>(b + 0x13D8)) {
+		return 0;
+	}
+	return 1;
 }
 
 /*
@@ -2950,5 +2950,3 @@ void CMenuPcs::GetFontWorld()
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	DAT_8032ee28 = static_cast<int>(reinterpret_cast<unsigned int*>(bytes + 0xFC)[0]);
 }
-
-

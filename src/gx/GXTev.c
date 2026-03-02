@@ -342,28 +342,35 @@ void GXSetTevSwapMode(GXTevStageID stage, GXTevSwapSel ras_sel, GXTevSwapSel tex
     __GXData->bpSentNot = 0;
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x801a5644
+ * PAL Size: 152b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void GXSetTevSwapModeTable(GXTevSwapSel table, GXTevColorChan red, GXTevColorChan green, GXTevColorChan blue, GXTevColorChan alpha) {
-    u32* Kreg;
-    u32 chan;
+    u32* reg0;
+    u32* reg1;
+    u32 idx;
 
     CHECK_GXBEGIN(978, "GXSetTevSwapModeTable");
     ASSERTMSGLINE(979, table < GX_MAX_TEVSWAP, "GXSetTevSwapModeTable: Invalid Swap Selection Index");
 
-    Kreg = &__GXData->tevKsel[table * 2];
-    chan = (u32)red & 3;
-    *Kreg = (*Kreg & ~3) | chan;
-    chan = ((u32)green & 3) << 2;
-    *Kreg = (*Kreg & ~0xC) | chan;
+    idx = table * 2;
+    reg0 = &__GXData->tevKsel[idx];
+    *reg0 = (*reg0 & 0xFFFFFFFC) | (u32)red;
+    *reg0 = (*reg0 & 0xFFFFFFF3) | ((u32)green << 2);
 
-    GX_WRITE_RAS_REG(*Kreg);
+    GX_WRITE_RAS_REG(*reg0);
 
-    Kreg = &__GXData->tevKsel[table * 2 + 1];
-    chan = (u32)blue & 3;
-    *Kreg = (*Kreg & ~3) | chan;
-    chan = ((u32)alpha & 3) << 2;
-    *Kreg = (*Kreg & ~0xC) | chan;
+    reg1 = &__GXData->tevKsel[idx + 1];
+    *reg1 = (*reg1 & 0xFFFFFFFC) | (u32)blue;
+    *reg1 = (*reg1 & 0xFFFFFFF3) | ((u32)alpha << 2);
 
-    GX_WRITE_RAS_REG(*Kreg);
+    GX_WRITE_RAS_REG(*reg1);
     __GXData->bpSentNot = 0;
 }
 

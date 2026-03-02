@@ -7,12 +7,11 @@ typedef struct {
 } pppAcceleObj;
 
 typedef struct {
-    int m_field_00;         // 0x00
-    int m_field_04;         // 0x04  
-    int m_graphId;          // 0x08
-    float m_initWOrk;       // 0x0C
-    float m_stepValue;      // 0x10
-    float m_arg3;          // 0x14
+    int m_graphId;          // 0x00
+    int m_field_04;         // 0x04
+    float m_initWOrk;       // 0x08
+    float m_stepValue;      // 0x0C
+    float m_arg3;           // 0x10
 } UnkB;
 
 typedef struct {

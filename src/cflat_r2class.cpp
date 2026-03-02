@@ -37,10 +37,12 @@ static inline void StoreU16(CFlatRuntime::CStack* stack, unsigned short* value, 
 
 	if (setMode == 0) {
 		*value = static_cast<unsigned short>(stack->m_word);
-	} else if (setMode == 1) {
+	} else if (setMode < 0) {
+		if (setMode > -2) {
+			*value = static_cast<unsigned short>(*value - static_cast<unsigned short>(stack->m_word));
+		}
+	} else if (setMode < 2) {
 		*value = static_cast<unsigned short>(*value + static_cast<unsigned short>(stack->m_word));
-	} else if (setMode == -1) {
-		*value = static_cast<unsigned short>(*value - static_cast<unsigned short>(stack->m_word));
 	}
 }
 
@@ -50,10 +52,12 @@ static inline void StoreS16(CFlatRuntime::CStack* stack, short* value, int setMo
 
 	if (setMode == 0) {
 		*value = static_cast<short>(stack->m_word);
-	} else if (setMode == 1) {
+	} else if (setMode < 0) {
+		if (setMode > -2) {
+			*value = static_cast<short>(*value - static_cast<short>(stack->m_word));
+		}
+	} else if (setMode < 2) {
 		*value = static_cast<short>(*value + static_cast<short>(stack->m_word));
-	} else if (setMode == -1) {
-		*value = static_cast<short>(*value - static_cast<short>(stack->m_word));
 	}
 }
 
@@ -63,10 +67,12 @@ static inline void StoreU32(CFlatRuntime::CStack* stack, unsigned int* value, in
 
 	if (setMode == 0) {
 		*value = stack->m_word;
-	} else if (setMode == 1) {
+	} else if (setMode < 0) {
+		if (setMode > -2) {
+			*value -= stack->m_word;
+		}
+	} else if (setMode < 2) {
 		*value += stack->m_word;
-	} else if (setMode == -1) {
-		*value -= stack->m_word;
 	}
 }
 
@@ -76,10 +82,12 @@ static inline void StoreF32(CFlatRuntime::CStack* stack, float* value, int setMo
 
 	if (setMode == 0) {
 		*value = static_cast<float>(stack->m_word);
-	} else if (setMode == 1) {
+	} else if (setMode < 0) {
+		if (setMode > -2) {
+			*value -= static_cast<float>(stack->m_word);
+		}
+	} else if (setMode < 2) {
 		*value += static_cast<float>(stack->m_word);
-	} else if (setMode == -1) {
-		*value -= static_cast<float>(stack->m_word);
 	}
 }
 

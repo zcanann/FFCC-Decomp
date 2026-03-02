@@ -410,8 +410,8 @@ void CMenuPcs::InitFrame0Info()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: 0x80101444
+ * PAL Size: 532b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO

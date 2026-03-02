@@ -608,7 +608,11 @@ config.libs = [
     DolphinLib(
         "os",
         [
-            Object(NonMatching, "os/__start.c"),
+            Object(
+                NonMatching,
+                "dolphin/os/__start.c",
+                source="os/__start.c",
+            ),
             Object(NonMatching, "os/__ppc_eabi_init.c"),
             Object(
                 NonMatching,
@@ -814,7 +818,11 @@ config.libs = [
         [
             Object(NonMatching, "gba/GBA.c"),
             Object(NonMatching, "gba/GBAGetProcessStatus.c"),
+            Object(NonMatching, "gba/GBAJoyBoot.c"),
             Object(NonMatching, "gba/GBARead.c"),
+            Object(NonMatching, "gba/GBAWrite.c"),
+            Object(NonMatching, "gba/GBAXfer.c"),
+            Object(NonMatching, "gba/GBAKey.c"),
         ],
     ),
     {

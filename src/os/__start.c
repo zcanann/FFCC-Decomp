@@ -1,5 +1,5 @@
-#include "dol2asm.h"
 #include <dolphin.h>
+#include "global.h"
 #include "__ppc_eabi_linker.h"
 
 extern void InitMetroTRK();

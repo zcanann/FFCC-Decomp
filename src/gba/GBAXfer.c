@@ -1,5 +1,5 @@
 #include "dolphin/gba/GBAPriv.h"
-#include "dolphin/si/SIBios.h"
+#include "dolphin/si.h"
 
 void __GBAHandler(s32 chan, u32 error, OSContext* context) {
     GBATransferCallback proc;
@@ -33,7 +33,8 @@ void __GBAHandler(s32 chan, u32 error, OSContext* context) {
     }
 }
 
-void __GBASyncCallback(s32 chan) {
+void __GBASyncCallback(s32 chan, s32 ret) {
+    (void)ret;
     OSWakeupThread(&__GBA[chan].threadQueue);
 }
 

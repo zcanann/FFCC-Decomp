@@ -2,6 +2,8 @@
 #include "dolphin/dsp.h"
 #include "dolphin/os.h"
 #include "GBA/GBA.h"
+#include "GBA/GBAPriv.h"
+#include <string.h>
 
 static s32 F152(void* task)
 {
@@ -109,14 +111,12 @@ void __GBAX02(s32 chan, u8* readbuf) {
     DCFlushRange(param, 32);
     
     gba->task.state = 0xff;
-    gba->task.iramAddress = 0x21cb78;
-    gba->task.aramAddress = 0x380;
-    gba->task.aramLength = 0;
-    gba->task.aramMmemAddress = 0x10;
-    gba->task.resumeCallback = F232;
-    gba->task.resumeContext = 0;
-    gba->task.doneCallback = F252;
-    gba->task.doneContext = 0;
+    gba->task.iram_addr = 0x21cb78;
+    gba->task.dram_addr = 0x380;
+    gba->task.dram_length = 0;
+    gba->task.dram_mmem_addr = (u16*)0x10;
+    gba->task.res_cb = F232;
+    gba->task.done_cb = (DSPCallback)F252;
     
     DSPAddTask(&gba->task);
 }

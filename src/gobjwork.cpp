@@ -1,5 +1,6 @@
 #include "ffcc/gobjwork.h"
 #include "ffcc/gbaque.h"
+#include "ffcc/joybus.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/p_game.h"
 #include "ffcc/system.h"
@@ -537,12 +538,30 @@ void CCaravanWork::DeleteCmdList(int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a1f08
+ * PAL Size: 180b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::AddItem(int, int*)
+int CCaravanWork::AddItem(int itemId, int* outInvIndex)
 {
-	// TODO
+	if ((unsigned short)m_inventoryItemCount < 0x40) {
+		for (int i = 0; i < 0x40; i++) {
+			if (m_inventoryItems[i] == 0xFFFF) {
+				m_inventoryItems[i] = static_cast<unsigned short>(itemId);
+				m_inventoryItemCount++;
+				Joybus.SetItem(m_joybusCaravanId, static_cast<unsigned char>(i), static_cast<short>(itemId));
+				if (outInvIndex != 0) {
+					*outInvIndex = i;
+				}
+				return 1;
+			}
+		}
+	}
+
+	return 0;
 }
 
 /*
@@ -1858,12 +1877,41 @@ void CCaravanWork::GetNumCombi(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009f2a4
+ * PAL Size: 224b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::GetNextCmdListIdx(int, int)
+int CCaravanWork::GetNextCmdListIdx(int cmdListIdx, int dir)
 {
-	// TODO
+	while (true) {
+		int prev = cmdListIdx;
+		cmdListIdx = prev + dir;
+
+		if (cmdListIdx < 0) {
+			cmdListIdx += static_cast<short>(m_numCmdListSlots);
+		} else if (cmdListIdx > static_cast<short>(m_numCmdListSlots) - 1) {
+			cmdListIdx -= static_cast<short>(m_numCmdListSlots);
+		}
+
+		if (Game.game.m_gameWork.m_menuStageMode != 0) {
+			if (*(short*)(m_commandListExtra + (cmdListIdx * 2)) == -1) {
+				continue;
+			}
+			if (dir == -1 && *(short*)(m_commandListExtra + (cmdListIdx * 2)) == -1) {
+				if (0 < *(short*)(m_commandListExtra + (prev * 2))) {
+					continue;
+				}
+			}
+		}
+
+		int item = DelCmdListAndItem(cmdListIdx, 0);
+		if (cmdListIdx < 2 || item > 0) {
+			return cmdListIdx;
+		}
+	}
 }
 
 /*

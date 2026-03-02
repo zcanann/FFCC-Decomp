@@ -1676,12 +1676,68 @@ void CMaterialMan::SetFullScreenShadow(CFullScreenShadow&, float (*) [4], long)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8003e71c
+ * PAL Size: 488b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMaterialMan::SetShadow(CMapShadow&, float (*) [4], int, unsigned long)
+void CMaterialMan::SetShadow(CMapShadow& shadow, float (*viewMtx) [4], int shadowIndex, unsigned long materialFlag)
 {
-	// TODO
+    CMaterialSet* materialSet = *reinterpret_cast<CMaterialSet**>(Ptr(&MapMng, 0x213D4));
+    CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8));
+    CMaterial* material = (*materials)[*reinterpret_cast<unsigned short*>(Ptr(&shadow, 4))];
+
+    unsigned long useShadowBit32 = materialFlag & *reinterpret_cast<unsigned long*>(Ptr(material, 0x24)) & 0x8000;
+    if (useShadowBit32 == 0) {
+        if (*reinterpret_cast<int*>(Ptr(this, 0x5C)) > 4) {
+            return;
+        }
+    } else if (*reinterpret_cast<int*>(Ptr(this, 0x5C)) > 3) {
+        return;
+    }
+
+    if (((*reinterpret_cast<unsigned int*>(Ptr(this, 0x11C)) & 0xFF) < 8) &&
+        ((*reinterpret_cast<unsigned int*>(Ptr(this, 0x120)) & 0xFF) < 0x3C) &&
+        ((*reinterpret_cast<unsigned int*>(Ptr(this, 0x124)) & 0xFF) < 8)) {
+        int materialNum = *reinterpret_cast<int*>(Ptr(this, 0x58));
+
+        *reinterpret_cast<unsigned int*>(Ptr(this, 0x48)) |= 0x10;
+        *Ptr(this, materialNum + 0x4D) = *Ptr(&shadow, 8);
+        *Ptr(this, materialNum + 0x20E) = static_cast<unsigned char>(shadowIndex);
+        *reinterpret_cast<int*>(Ptr(this, materialNum * 4 + 0x158)) = *reinterpret_cast<int*>(Ptr(this, 0x11C));
+        *reinterpret_cast<int*>(Ptr(this, materialNum * 4 + 0x16C)) = *reinterpret_cast<int*>(Ptr(this, 0x120));
+        *reinterpret_cast<int*>(Ptr(this, materialNum * 4 + 0x180)) = *reinterpret_cast<int*>(Ptr(this, 0x124));
+
+        Mtx texMtx;
+        PSMTXConcat(reinterpret_cast<float(*)[4]>(Ptr(&shadow, 0x78)), viewMtx, texMtx);
+        GXLoadTexMtxImm(texMtx, *reinterpret_cast<int*>(Ptr(this, 0x120)), GX_MTX2x4);
+
+        int texMtxCur = *reinterpret_cast<int*>(Ptr(this, 0x120));
+        *reinterpret_cast<int*>(Ptr(this, 0x120)) = texMtxCur + 3;
+
+        int texCoordCur = *reinterpret_cast<int*>(Ptr(this, 0x124));
+        *reinterpret_cast<int*>(Ptr(this, 0x124)) = texCoordCur + 1;
+        GXSetTexCoordGen2(static_cast<GXTexCoordID>(texCoordCur), GX_TG_MTX2x4, GX_TG_TEX0, texMtxCur, GX_FALSE,
+                          GX_PTIDENTITY);
+
+        int texMapCur = *reinterpret_cast<int*>(Ptr(this, 0x11C));
+        *reinterpret_cast<int*>(Ptr(this, 0x11C)) = texMapCur + 1;
+        TextureMan.SetTexture(static_cast<_GXTexMapID>(texMapCur), *reinterpret_cast<CTexture**>(Ptr(material, 0x3C)));
+
+        if (useShadowBit32 != 0) {
+            texMapCur = *reinterpret_cast<int*>(Ptr(this, 0x11C));
+            *reinterpret_cast<int*>(Ptr(this, 0x11C)) = texMapCur + 1;
+            TextureMan.SetTexture(static_cast<_GXTexMapID>(texMapCur), *reinterpret_cast<CTexture**>(Ptr(material, 0x40)));
+            *Ptr(this, materialNum + 0x209) = *Ptr(material, 0xA4);
+            *Ptr(this, 0x208) |= static_cast<unsigned char>(1 << materialNum);
+            *reinterpret_cast<int*>(Ptr(this, 0x5C)) = *reinterpret_cast<int*>(Ptr(this, 0x5C)) + 1;
+        }
+
+        *reinterpret_cast<int*>(Ptr(this, 0x58)) = materialNum + 1;
+        *reinterpret_cast<int*>(Ptr(this, 0x5C)) = *reinterpret_cast<int*>(Ptr(this, 0x5C)) + 1;
+    }
 }
 
 /*

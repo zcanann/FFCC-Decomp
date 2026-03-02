@@ -562,16 +562,16 @@ void CCaravanWork::DeleteCmdList(int, int)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CCaravanWork::AddItem(int itemId, int* itemSlotOut)
+int CCaravanWork::AddItem(int itemId, int* outInvIndex)
 {
 	if ((unsigned short)m_inventoryItemCount < 0x40) {
 		for (int i = 0; i < 0x40; i++) {
 			if (m_inventoryItems[i] == 0xFFFF) {
-				m_inventoryItems[i] = (unsigned short)itemId;
+				m_inventoryItems[i] = static_cast<unsigned short>(itemId);
 				m_inventoryItemCount++;
-				Joybus.SetItem(m_joybusCaravanId, i, itemId);
-				if (itemSlotOut != 0) {
-					*itemSlotOut = i;
+				Joybus.SetItem(m_joybusCaravanId, static_cast<unsigned char>(i), static_cast<short>(itemId));
+				if (outInvIndex != 0) {
+					*outInvIndex = i;
 				}
 				return 1;
 			}
@@ -1901,34 +1901,31 @@ void CCaravanWork::GetNumCombi(int)
  * JP Address: TODO
  * JP Size: TODO
  */
-int CCaravanWork::GetNextCmdListIdx(int cmdListIdx, int step)
+int CCaravanWork::GetNextCmdListIdx(int cmdListIdx, int dir)
 {
 	while (true) {
-		int prevIdx = cmdListIdx;
-		cmdListIdx = prevIdx + step;
+		int prev = cmdListIdx;
+		cmdListIdx = prev + dir;
 
 		if (cmdListIdx < 0) {
-			cmdListIdx += (short)m_numCmdListSlots;
-		} else if (cmdListIdx > (short)m_numCmdListSlots - 1) {
-			cmdListIdx -= (short)m_numCmdListSlots;
+			cmdListIdx += static_cast<short>(m_numCmdListSlots);
+		} else if (cmdListIdx > static_cast<short>(m_numCmdListSlots) - 1) {
+			cmdListIdx -= static_cast<short>(m_numCmdListSlots);
 		}
 
 		if (Game.game.m_gameWork.m_menuStageMode != 0) {
-			if (*(short*)(m_commandListExtra + cmdListIdx * 2) == -1) {
+			if (*(short*)(m_commandListExtra + (cmdListIdx * 2)) == -1) {
 				continue;
 			}
-
-			if (step == -1) {
-				if (*(short*)(m_commandListExtra + cmdListIdx * 2) == -1) {
-					if (*(short*)(m_commandListExtra + prevIdx * 2) > 0) {
-						continue;
-					}
+			if (dir == -1 && *(short*)(m_commandListExtra + (cmdListIdx * 2)) == -1) {
+				if (0 < *(short*)(m_commandListExtra + (prev * 2))) {
+					continue;
 				}
 			}
 		}
 
 		int item = DelCmdListAndItem(cmdListIdx, 0);
-		if ((cmdListIdx < 2) || (item > 0)) {
+		if (cmdListIdx < 2 || item > 0) {
 			return cmdListIdx;
 		}
 	}

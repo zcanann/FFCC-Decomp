@@ -13,11 +13,13 @@
 extern "C" void* __vt__Q212CFlatRuntime7CObject[];
 extern "C" void* __vt__8CGBaseObj[];
 extern "C" void* __vt__8CGObject[];
+extern "C" int rand(void);
 extern "C" void Printf__7CSystemFPce(CSystem* system, const char* format, ...);
 extern "C" void DrawOptionMenu__8CMenuPcsFv(CMenuPcs*);
 extern "C" void DrawSingCMake__8CMenuPcsFv(CMenuPcs*);
 extern "C" void PlaySe__6CSoundFiiii(void*, int, int, int, int);
 extern "C" void SetAnim__Q29CCharaPcs7CHandleFiiiii(void*, int, int, int, int, int);
+extern "C" void LoadAnim__Q29CCharaPcs7CHandleFPciiiiii(void*, char*, int, int, int, int, int, int);
 extern "C" void LoadModelASync__Q29CCharaPcs7CHandleFiUlUl(void*, int, unsigned long, unsigned long);
 extern "C" void SetFrame__Q26CChara6CModelFf(float, void*);
 extern "C" void AddFrame__Q26CChara6CModelFf(float, void*);
@@ -89,6 +91,12 @@ extern float FLOAT_80331754;
 extern float FLOAT_803317e0;
 extern float FLOAT_803317e4;
 extern float FLOAT_803317e8;
+extern char s_stand_80331638[];
+extern char DAT_80331640[];
+extern char DAT_80331648[];
+extern char DAT_8033164c[];
+extern char DAT_80331654[];
+extern char DAT_8033165c[];
 extern unsigned char DAT_8032ee20;
 extern unsigned char uRam8032ee21;
 extern unsigned char DAT_8032ee24;
@@ -2273,7 +2281,106 @@ void CMenuPcs::CalcChara()
  */
 void CMenuPcs::PCAnimCtrl()
 {
-	GetMaxAnimWait();
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const charaSelect = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x828)[0]);
+	unsigned char* const worldState = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x82C)[0]);
+	unsigned int selectedMask = 0;
+
+	if (charaSelect[0x0D] != 0 && charaSelect[0x0A] != 0) {
+		selectedMask |= 1u << static_cast<unsigned int>(reinterpret_cast<unsigned short*>(charaSelect + 4)[0]);
+	}
+	if (charaSelect[0x1D] != 0 && charaSelect[0x1A] != 0) {
+		selectedMask |= 1u << static_cast<unsigned int>(reinterpret_cast<unsigned short*>(charaSelect + 0x14)[0]);
+	}
+	if (charaSelect[0x2D] != 0 && charaSelect[0x2A] != 0) {
+		selectedMask |= 1u << static_cast<unsigned int>(reinterpret_cast<unsigned short*>(charaSelect + 0x24)[0]);
+	}
+	if (charaSelect[0x3D] != 0 && charaSelect[0x3A] != 0) {
+		selectedMask |= 1u << static_cast<unsigned int>(reinterpret_cast<unsigned short*>(charaSelect + 0x34)[0]);
+	}
+
+	int* animState = reinterpret_cast<int*>(reinterpret_cast<unsigned int*>(bytes + 0x844)[0]);
+	for (int i = 0; i < 8; i++, animState += 5) {
+		unsigned char* const handle = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x7F4)[i]);
+		if (handle == 0) {
+			continue;
+		}
+
+		unsigned char* const model = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(handle + 0x168)[0]);
+		if (model == 0 || reinterpret_cast<unsigned int*>(model + 0x18)[0] == 0 || reinterpret_cast<int*>(handle)[0] == 3) {
+			continue;
+		}
+
+		const unsigned int isSelected = selectedMask & (1u << static_cast<unsigned int>(i));
+		animState[3] = reinterpret_cast<int*>(model + 8)[0];
+		const int baseAnim = (static_cast<int>(reinterpret_cast<unsigned int*>(handle + 4)[0] / 100) - 1) * 6;
+		const int currentAnimIndex = reinterpret_cast<int*>(handle + 0x16C)[0];
+		const int blendMode = -1 - (currentAnimIndex >> 31);
+
+		if (animState[1] >= 0) {
+			animState[0] = animState[1];
+			animState[1] = -1;
+			SetAnim__Q29CCharaPcs7CHandleFiiiii(handle, baseAnim + animState[0], -1, -1, blendMode, 0);
+			animState[3] = reinterpret_cast<int*>(model + 8)[0];
+			animState[4] = reinterpret_cast<int*>(model + 0x10)[0];
+			animState[2] = 0;
+			continue;
+		}
+
+		const float frame = reinterpret_cast<float*>(model + 8)[0];
+		const float frameEnd = reinterpret_cast<float*>(model + 0x10)[0];
+		if (isSelected == 0 && reinterpret_cast<short*>(worldState + 0x1C)[0] != 8 && animState[0] == 0 && animState[2] > 2999) {
+			animState[0] = 4;
+			SetAnim__Q29CCharaPcs7CHandleFiiiii(handle, baseAnim + animState[0], -1, -1, blendMode, 0);
+			animState[3] = reinterpret_cast<int*>(model + 8)[0];
+			animState[4] = reinterpret_cast<int*>(model + 0x10)[0];
+			animState[2] = 0;
+		} else if (isSelected != 0 && reinterpret_cast<short*>(worldState + 0x1C)[0] != 8) {
+			if (animState[0] == 1 && animState[2] > 11999) {
+				animState[0] = 0;
+				animState[2] = 0;
+			} else if (animState[0] == 2 && animState[2] > 8999) {
+				animState[0] = 1;
+			} else if (animState[0] == 1 && animState[2] > 5999 && animState[2] < 9000) {
+				animState[0] = 2;
+			} else if (animState[0] == 0 && animState[2] >= 3000) {
+				animState[0] = 1;
+			} else {
+				if (frameEnd <= frame) {
+					if (animState[0] == 3 || animState[0] == 4 || animState[0] == 5) {
+						animState[0] = 0;
+						SetAnim__Q29CCharaPcs7CHandleFiiiii(handle, baseAnim + animState[0], -1, -1, blendMode, 0);
+						animState[3] = reinterpret_cast<int*>(model + 8)[0];
+						animState[4] = reinterpret_cast<int*>(model + 0x10)[0];
+						animState[2] = isSelected == 0 ? 0 : 0x834;
+					}
+					SetFrame__Q26CChara6CModelFf(FLOAT_803313dc, model);
+				} else {
+					AddFrame__Q26CChara6CModelFf(FLOAT_80331698, model);
+				}
+				animState[2]++;
+				continue;
+			}
+
+			SetAnim__Q29CCharaPcs7CHandleFiiiii(handle, baseAnim + animState[0], -1, -1, blendMode, 0);
+			animState[3] = reinterpret_cast<int*>(model + 8)[0];
+			animState[4] = reinterpret_cast<int*>(model + 0x10)[0];
+		} else {
+			if (frameEnd <= frame) {
+				if (animState[0] == 3 || animState[0] == 4 || animState[0] == 5) {
+					animState[0] = 0;
+					SetAnim__Q29CCharaPcs7CHandleFiiiii(handle, baseAnim + animState[0], -1, -1, blendMode, 0);
+					animState[3] = reinterpret_cast<int*>(model + 8)[0];
+					animState[4] = reinterpret_cast<int*>(model + 0x10)[0];
+					animState[2] = isSelected == 0 ? 0 : 0x834;
+				}
+				SetFrame__Q26CChara6CModelFf(FLOAT_803313dc, model);
+			} else {
+				AddFrame__Q26CChara6CModelFf(FLOAT_80331698, model);
+			}
+			animState[2]++;
+		}
+	}
 }
 
 /*
@@ -2568,7 +2675,37 @@ void CMenuPcs::ChgModel(int slot, int tribe, int job, int isFemale)
  */
 void CMenuPcs::SetAnim(int anim)
 {
-	SetMenuCharaAnim(0, anim);
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const handle = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x7F4)[anim]);
+	if (handle == 0 || reinterpret_cast<int*>(handle)[0] == 3) {
+		return;
+	}
+
+	const unsigned int charaNo = reinterpret_cast<unsigned int*>(handle + 4)[0];
+	const int modelBase = static_cast<int>(charaNo / 100) * 100;
+	const int animBase = (static_cast<int>(charaNo / 100) - 1) * 6;
+
+	LoadAnim__Q29CCharaPcs7CHandleFPciiiiii(handle, s_stand_80331638, animBase + 0, 1, 0, modelBase, -1, 0);
+	LoadAnim__Q29CCharaPcs7CHandleFPciiiiii(handle, DAT_80331640, animBase + 1, 1, 0, modelBase, -1, 0);
+	LoadAnim__Q29CCharaPcs7CHandleFPciiiiii(handle, DAT_80331648, animBase + 2, 1, 0, modelBase, -1, 0);
+	LoadAnim__Q29CCharaPcs7CHandleFPciiiiii(handle, DAT_8033164c, animBase + 3, 3, 0, modelBase, -1, 0);
+	LoadAnim__Q29CCharaPcs7CHandleFPciiiiii(handle, DAT_80331654, animBase + 4, 1, 0, modelBase, -1, 0);
+	LoadAnim__Q29CCharaPcs7CHandleFPciiiiii(handle, DAT_8033165c, animBase + 5, 1, 0, modelBase, -1, 0);
+
+	int* const animState = reinterpret_cast<int*>(reinterpret_cast<unsigned int*>(bytes + 0x844)[0]) + anim * 5;
+	animState[0] = 0;
+	animState[1] = -1;
+	animState[2] = rand() % 250;
+
+	const int currentAnimIndex = reinterpret_cast<int*>(handle + 0x16C)[0];
+	const int blendMode = -1 - (currentAnimIndex >> 31);
+	SetAnim__Q29CCharaPcs7CHandleFiiiii(handle, animBase + animState[0], -1, -1, blendMode, 1);
+
+	unsigned char* const model = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(handle + 0x168)[0]);
+	if (model != 0) {
+		animState[3] = reinterpret_cast<int*>(model + 8)[0];
+		animState[4] = reinterpret_cast<int*>(model + 0x10)[0];
+	}
 }
 
 /*

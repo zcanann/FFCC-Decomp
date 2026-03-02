@@ -24,6 +24,9 @@ extern CLightPcs LightPcs;
 extern "C" int IsRun__12CMapKeyFrameFv(CMapKeyFrame*);
 extern "C" int Get__12CMapKeyFrameFRiRiRf(CMapKeyFrame*, int*, int*, float*);
 extern "C" void Calc__12CMapKeyFrameFv(CMapKeyFrame*);
+extern "C" void ReadJun__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*, int);
+extern "C" void ReadFrame__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*);
+extern "C" void ReadKey__12CMapKeyFrameFR10CChunkFilei(CMapKeyFrame*, CChunkFile*, int);
 extern "C" void DCFlushRange(void*, unsigned long);
 
 namespace {
@@ -86,6 +89,7 @@ static inline CMapObj* MapObjArrayStart()
 
 extern "C" void __dl__FPv(void*);
 extern "C" void* __nw__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
+extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 
 template class CPtrArray<CMapAnimRun*>;
 template class CPtrArray<CMapShadow*>;
@@ -253,6 +257,7 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         CHUNK_GEOM = 0x47454F4D,
         CHUNK_ID = 0x49442020,
         CHUNK_LTST = 0x4C545354,
+        CHUNK_MIME = 0x4D494D45,
         CHUNK_MSID = 0x4D534944,
         CHUNK_PIDX = 0x50494458,
         CHUNK_PSTA = 0x50535441,
@@ -260,6 +265,11 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
         CHUNK_SDST = 0x53445354,
         CHUNK_TFRM = 0x5446524D,
         CHUNK_TRNS = 0x54524E53,
+        CHUNK_FRAM = 0x4652414D,
+        CHUNK_JUN = 0x4A554E20,
+        CHUNK_KEY = 0x4B455920,
+        CHUNK_VTX = 0x56545820,
+        CHUNK_VTXL = 0x5654584C,
     };
 
     Init();
@@ -402,6 +412,77 @@ void CMapObj::ReadOtmObj(CChunkFile& chunkFile)
                 reinterpret_cast<CPtrArray<CMapAnimRun*>*>(reinterpret_cast<unsigned char*>(&MapMng) + 0x213E0)
                     ->Add(reinterpret_cast<CMapAnimRun*>(animRun));
             }
+        } else if (chunk.m_id == CHUNK_MIME) {
+            unsigned char* mime = reinterpret_cast<unsigned char*>(
+                __nw__FUlPQ27CMemory6CStagePci(0x3C, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x33B));
+
+            if (mime != 0) {
+                reinterpret_cast<CMapObjAtrMime*>(mime)->CMapObjAtrMime::CMapObjAtrMime();
+                *reinterpret_cast<int*>(mime + 0x4) = 2;
+                *reinterpret_cast<void**>(mime + 0xC) = 0;
+                *reinterpret_cast<int*>(mime + 0x10) = 0;
+                *reinterpret_cast<int*>(mime + 0x14) = 0;
+                *reinterpret_cast<int*>(mime + 0x18) = 0;
+                *(mime + 0x17) = 1;
+                *(mime + 0x8) = 0;
+                *reinterpret_cast<int*>(mime + 0x1C) = 0;
+            }
+
+            chunkFile.PushChunk();
+            CChunkFile::CChunk mimeChunk;
+            while (chunkFile.GetNextChunk(mimeChunk) != 0) {
+                if (mimeChunk.m_id == CHUNK_KEY) {
+                    if (mime != 0) {
+                        ReadKey__12CMapKeyFrameFR10CChunkFilei(
+                            reinterpret_cast<CMapKeyFrame*>(mime + 0x14), &chunkFile, static_cast<char>(mimeChunk.m_arg0));
+                    }
+                } else if (mimeChunk.m_id == CHUNK_JUN) {
+                    if (mime != 0) {
+                        ReadJun__12CMapKeyFrameFR10CChunkFilei(
+                            reinterpret_cast<CMapKeyFrame*>(mime + 0x14), &chunkFile, static_cast<char>(mimeChunk.m_arg0));
+                    }
+                } else if (mimeChunk.m_id == CHUNK_FRAM) {
+                    if (mime != 0) {
+                        ReadFrame__12CMapKeyFrameFR10CChunkFilei(reinterpret_cast<CMapKeyFrame*>(mime + 0x14), &chunkFile);
+                    }
+                } else if (mimeChunk.m_id == CHUNK_VTXL) {
+                    if (mime != 0) {
+                        *(mime + 0x8) = static_cast<unsigned char>(mimeChunk.m_arg0);
+                        *reinterpret_cast<void**>(mime + 0xC) = __nwa__FUlPQ27CMemory6CStagePci(
+                            static_cast<unsigned long>(*(mime + 0x8)) << 2,
+                            *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x348);
+                    }
+
+                    chunkFile.PushChunk();
+                    CChunkFile::CChunk vtxChunk;
+                    int vtxTableOffset = 0;
+                    while (chunkFile.GetNextChunk(vtxChunk) != 0) {
+                        if (vtxChunk.m_id == CHUNK_VTX) {
+                            float* vtx = reinterpret_cast<float*>(__nwa__FUlPQ27CMemory6CStagePci(
+                                static_cast<unsigned long>(vtxChunk.m_arg0) * 0xC,
+                                *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x353));
+                            if ((mime != 0) && (*reinterpret_cast<void**>(mime + 0xC) != 0)) {
+                                *reinterpret_cast<float**>(
+                                    reinterpret_cast<unsigned char*>(*reinterpret_cast<void**>(mime + 0xC)) + vtxTableOffset) = vtx;
+                            }
+                            vtxTableOffset += 4;
+                            if (mime != 0) {
+                                *reinterpret_cast<int*>(mime + 0x10) = static_cast<int>(vtxChunk.m_arg0);
+                            }
+
+                            for (unsigned int i = 0; i < vtxChunk.m_arg0; i++) {
+                                vtx[0] = chunkFile.GetF4();
+                                vtx[1] = chunkFile.GetF4();
+                                vtx[2] = chunkFile.GetF4();
+                                vtx += 3;
+                            }
+                        }
+                    }
+                    chunkFile.PopChunk();
+                }
+            }
+            chunkFile.PopChunk();
+            PtrAt(this, 0xEC) = mime;
         } else if (chunk.m_id == CHUNK_PSTA) {
             CMapObjAtrPlaySta* playSta = reinterpret_cast<CMapObjAtrPlaySta*>(
                 __nw__FUlPQ27CMemory6CStagePci(0xC, *reinterpret_cast<CMemory::CStage**>(&MapMng), "mapobj.cpp", 0x39B));

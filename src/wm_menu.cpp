@@ -1782,7 +1782,7 @@ void CMenuPcs::RestoreProjection()
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 112b
  * EN Address: TODO
  * EN Size: TODO
@@ -2816,8 +2816,8 @@ void CMenuPcs::SetMcList(int index, McListInfo* info)
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -3371,8 +3371,8 @@ void CMenuPcs::SetTextureLoc(int index)
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -3630,8 +3630,8 @@ void CMenuPcs::IsAsyncCharaLoadFinish()
 }
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -3658,8 +3658,8 @@ McCtrl::~McCtrl()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -5312,8 +5312,8 @@ void McCtrl::EraseDat()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -5326,8 +5326,8 @@ void McCtrl::GetDno()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -5341,8 +5341,8 @@ void McCtrl::GetSerial()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -5355,8 +5355,8 @@ void McCtrl::SetDataBuff(char* buffer)
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -5369,8 +5369,8 @@ void McCtrl::GetSlot()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -5383,8 +5383,8 @@ void McCtrl::SetDno(int channel)
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -5397,8 +5397,8 @@ void McCtrl::SetSlot(int slot)
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -5411,8 +5411,8 @@ void CMenuPcs::AlphaNormal()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -5425,8 +5425,8 @@ void CMenuPcs::AlphaAdd()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO

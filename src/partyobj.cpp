@@ -4,6 +4,7 @@
 #include "ffcc/map.h"
 #include "ffcc/maphit.h"
 #include "ffcc/p_game.h"
+#include "ffcc/itemobj.h"
 
 #include <math.h>
 
@@ -32,8 +33,9 @@ extern float FLOAT_80331ad8;
  * Address:	TODO
  * Size:	TODO
  */
-void CATEGOLY2TYPE(int)
+void CATEGOLY2TYPE(int value)
 {
+	(void)value;
 }
 
 /*
@@ -341,7 +343,17 @@ void CGPartyObj::onFramePostCalc()
  */
 void CGPartyObj::command()
 {
+	if (m_scriptHandle == nullptr) {
+		return;
+	}
+
+	canPlayerGoMenu();
 	shouki();
+
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	int mode = *reinterpret_cast<short*>(self + 0x6F4);
+	CGObject* target = *reinterpret_cast<CGObject**>(self + 0x6E4);
+	callCommandScript(mode, target);
 }
 
 /*
@@ -349,8 +361,35 @@ void CGPartyObj::command()
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::callCommandScript(int, CGObject*)
+void CGPartyObj::callCommandScript(int mode, CGObject* target)
 {
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	*reinterpret_cast<CGObject**>(self + 0x6E4) = target;
+
+	switch (mode) {
+	case 0:
+		if (target != nullptr && m_lastStateId == 0) {
+			changeStat(0x0C, 0, 0);
+		}
+		break;
+	case 1:
+		if (m_lastStateId == 0) {
+			changeStat(1, 0, 0);
+		}
+		break;
+	case 2:
+		if (canPlayerUseItem() != 0) {
+			useItem(0);
+		}
+		break;
+	case 3:
+		if (canPlayerPutItem() != 0) {
+			putItem(0);
+		}
+		break;
+	default:
+		break;
+	}
 }
 
 /*
@@ -364,6 +403,7 @@ void CGPartyObj::callCommandScript(int, CGObject*)
  */
 void CGPartyObj::shouki()
 {
+	canPlayerGoMenu();
 	commandFinished();
 }
 
@@ -379,6 +419,15 @@ void CGPartyObj::shouki()
 void CGPartyObj::onFrameStat()
 {
 	CGCharaObj::onFrameStat();
+
+	if (m_scriptHandle == nullptr) {
+		return;
+	}
+
+	if (m_lastStateId == 2 || m_lastStateId == 6) {
+		moveCenterTargetParticle();
+		checkTargetParticle();
+	}
 }
 
 /*
@@ -492,7 +541,10 @@ void CGPartyObj::statCharge()
  */
 void CGPartyObj::statAttackSel()
 {
-	onStatAttack(0);
+	if (m_subState == 0 && m_subFrame == 0) {
+		putTargetParticle(0, 1);
+	}
+	onStatAttack(1);
 }
 
 /*
@@ -648,7 +700,10 @@ void CGPartyObj::putTargetParticle(int targetSide, int doInit)
  */
 void CGPartyObj::endTargetParticle()
 {
-	*(reinterpret_cast<unsigned char*>(this) + 0x6B8) &= 0xAF;
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	self[0x6B8] &= 0xAF;
+	*reinterpret_cast<int*>(self + 0x668) = 0;
+	*reinterpret_cast<int*>(self + 0x660) = 0;
 }
 
 /*
@@ -843,6 +898,10 @@ void CGPartyObj::onStatDie()
 void CGPartyObj::statAlive()
 {
 	setAlive(1, 0);
+	canPlayerGoMenu();
+	if ((*(reinterpret_cast<unsigned char*>(this) + 0x6B8) & 0x20) != 0) {
+		checkTargetParticle();
+	}
 }
 
 /*
@@ -913,11 +972,31 @@ void CGPartyObj::commandFinished()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGPartyObj::carry(int, CGObject*, int)
+void CGPartyObj::carry(int carryType, CGObject* object, int forceMode)
 {
-	if (m_lastStateId == 0x0B) {
-		changeStat(0, 0, 0);
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	CGObject*& carryObj = *reinterpret_cast<CGObject**>(self + 0x6F0);
+
+	if (carryType == 0) {
+		if (carryObj != nullptr) {
+			if (m_lastStateId == 0x0B) {
+				changeStat(0, 0, 0);
+			}
+			reinterpret_cast<CGItemObj*>(carryObj)->carry(this, 1, 0);
+			carryObj = (CGObject*)0;
+		}
+
+		carryObj = object;
+		if (carryObj != nullptr) {
+			rotTarget(reinterpret_cast<CGPrgObj*>(carryObj));
+			changeStat(0x0B, 0, 0);
+			reinterpret_cast<CGItemObj*>(carryObj)->carry(this, 0, (forceMode != 0) ? 0 : 5);
+		}
+	} else if ((carryType == 1 || carryType == 2) && carryObj != nullptr) {
+		reinterpret_cast<CGItemObj*>(carryObj)->carry(this, carryType, (forceMode != 0) ? 0 : 5);
+		carryObj = (CGObject*)0;
 	}
+
 	setIdleMotion();
 }
 
@@ -932,6 +1011,7 @@ void CGPartyObj::statCarry()
 		reqAnim(0x1D, 0, 0);
 	}
 	if (isLoopAnim() != 0 || m_subFrame > 0x1E) {
+		carry(1, (CGObject*)0, 1);
 		changeStat(0, 0, 0);
 	}
 }
@@ -947,7 +1027,19 @@ void CGPartyObj::statCarry()
  */
 void CGPartyObj::statPut()
 {
+	if (m_stateFrame == 0) {
+		int anim = 0x0E;
+		if (m_lastStateId == 0x0D) {
+			anim = 0x19;
+		} else if (m_lastStateId == 0x1B) {
+			anim = 9;
+		}
+		reqAnim(anim, 0, 0);
+	}
+
 	if (isLoopAnim() != 0) {
+		carry(2, (CGObject*)0, 1);
+		setIdleMotion();
 		changeStat(0, 0, 0);
 	}
 }
@@ -963,6 +1055,7 @@ void CGPartyObj::statPickup()
 		reqAnim(0x21, 0, 0);
 	}
 	if (isLoopAnim() != 0 || m_subFrame > 0x1E) {
+		carry(0, *reinterpret_cast<CGObject**>(reinterpret_cast<unsigned char*>(this) + 0x6E4), 1);
 		changeStat(0, 0, 0);
 	}
 }
@@ -976,9 +1069,15 @@ void CGPartyObj::statPickup()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGPartyObj::bonus(int, int, CGPrgObj*)
+void CGPartyObj::bonus(int kind, int value, CGPrgObj* source)
 {
-	// Intentionally lightweight first-pass: original function is item/score heavy.
+	(void)source;
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	if (kind == 0) {
+		*reinterpret_cast<int*>(self + 0x6F8) = value;
+	} else if (kind == 1) {
+		addHp(value, (CGPrgObj*)0);
+	}
 	commandFinished();
 }
 
@@ -1015,9 +1114,9 @@ int CGPartyObj::canPlayerUseItem()
 void CGPartyObj::canPlayerGoMenu()
 {
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	if ((m_lastStateId == 0) && ((self[0x6B8] & 0x10) == 0)) {
+	if (m_lastStateId == 0 && (Pad._8_2_ & 0x200) != 0) {
 		self[0x6B8] |= 0x10;
-	} else if ((m_lastStateId != 0) && ((self[0x6B8] & 0x10) != 0)) {
+	} else if ((m_lastStateId != 0) || ((Pad._8_2_ & 0x200) == 0)) {
 		self[0x6B8] &= 0xEF;
 	}
 }
@@ -1031,10 +1130,13 @@ void CGPartyObj::canPlayerGoMenu()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGPartyObj::useItem(int)
+void CGPartyObj::useItem(int itemId)
 {
 	if (canPlayerUseItem() == 0) {
 		return;
+	}
+	if (itemId >= 0) {
+		*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6E0) = itemId;
 	}
 	changeStat(0x1A, 0, 0);
 }
@@ -1134,8 +1236,10 @@ void CGPartyObj::statRebound()
 {
 	if ((m_subState == 0) && (m_subFrame == 0)) {
 		reqAnim(0x1C, 0, 0);
+		enableDamageCol(0);
 	}
 	if (isLoopAnim() != 0 || m_subFrame > 0x1E) {
+		enableDamageCol(1);
 		changeStat(0, 0, 0);
 	}
 }
@@ -1192,7 +1296,9 @@ void CGPartyObj::statHide()
 {
 	enableDamageCol(0);
 	commandFinished();
+	CancelMove(1);
 	if (m_subFrame > 0x20) {
+		enableDamageCol(1);
 		changeStat(0, 0, 0);
 	}
 }
@@ -1206,8 +1312,10 @@ void CGPartyObj::statJump()
 {
 	if ((m_subState == 0) && (m_subFrame == 0)) {
 		reqAnim(0x22, 0, 0);
+		enableDamageCol(0);
 	}
 	if (isLoopAnim() != 0) {
+		enableDamageCol(1);
 		changeStat(0, 0, 0);
 	}
 }
@@ -1219,8 +1327,9 @@ void CGPartyObj::statJump()
  */
 void CGPartyObj::statWeaponChange()
 {
-	changeWeapon(*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6DC),
-	             *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6E0),
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	changeWeapon(*reinterpret_cast<int*>(self + 0x6DC),
+	             *reinterpret_cast<int*>(self + 0x6E0),
 	             0);
 }
 
@@ -1229,10 +1338,21 @@ void CGPartyObj::statWeaponChange()
  * Address:	TODO
  * Size:	TODO
  */
-void CGPartyObj::changeWeapon(int, int, int)
+void CGPartyObj::changeWeapon(int weaponRef, int weaponItem, int forceIdle)
 {
-	checkAndSetWeapon();
-	setIdleMotion();
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	*reinterpret_cast<int*>(self + 0x6DC) = weaponRef;
+	*reinterpret_cast<int*>(self + 0x6E0) = weaponItem;
+
+	if (weaponItem <= 0) {
+		LoadWeapon(-1, 0);
+	} else {
+		LoadWeapon(weaponItem & 0xFFF, weaponItem >> 12);
+	}
+
+	if (forceIdle != 0 || m_lastStateId != 0) {
+		setIdleMotion();
+	}
 }
 
 /*
@@ -1275,9 +1395,27 @@ void CGPartyObj::CheckGameOver()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGPartyObj::SetBonusCondition(int, int, int, int, int)
+void CGPartyObj::SetBonusCondition(int useRandom, int bonus0, int bonus1, int bonus2, int bonus3)
 {
-	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6F8) = 0;
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	if (useRandom == 0) {
+		switch ((reinterpret_cast<unsigned int>(this) >> 2) & 3) {
+		case 0:
+			*reinterpret_cast<int*>(self + 0x6F8) = bonus0;
+			break;
+		case 1:
+			*reinterpret_cast<int*>(self + 0x6F8) = bonus1;
+			break;
+		case 2:
+			*reinterpret_cast<int*>(self + 0x6F8) = bonus2;
+			break;
+		default:
+			*reinterpret_cast<int*>(self + 0x6F8) = bonus3;
+			break;
+		}
+	} else {
+		*reinterpret_cast<int*>(self + 0x6F8) = (bonus0 + bonus1 + bonus2 + bonus3) & 0xFF;
+	}
 }
 
 /*
@@ -1291,11 +1429,19 @@ void CGPartyObj::SetBonusCondition(int, int, int, int, int)
  */
 void CGPartyObj::InitFinished()
 {
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(
-	    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6DC),
-	    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6E0));
+	    *reinterpret_cast<int*>(self + 0x6DC),
+	    *reinterpret_cast<int*>(self + 0x6E0));
 	enableDamageCol(1);
 	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBD0) = 0;
+	if ((Game.game.m_gameWork.m_menuStageMode != 0) &&
+	    (Game.game.m_gameWork.m_bossArtifactStageIndex < 0x0F) &&
+	    (m_scriptHandle[0xED] != nullptr)) {
+		*reinterpret_cast<float*>(self + 0x144) = 0.0f;
+		*reinterpret_cast<float*>(self + 0x134) = 0.0f;
+		*reinterpret_cast<float*>(self + 0x13C) = 1.0f;
+	}
 }
 
 /*
@@ -1331,6 +1477,8 @@ void CGPartyObj::ChangeCommandMode(int mode)
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	if (*reinterpret_cast<short*>(self + 0x6F4) != mode) {
 		*reinterpret_cast<short*>(self + 0x6F4) = static_cast<short>(mode);
+		*reinterpret_cast<int*>(self + 0x6EC) = 0;
+		*reinterpret_cast<CGObject**>(self + 0x6E4) = (CGObject*)0;
 	}
 }
 
@@ -1341,6 +1489,10 @@ void CGPartyObj::ChangeCommandMode(int mode)
  */
 void CGPartyObj::checkAndSetWeapon()
 {
+	if (m_scriptHandle == nullptr) {
+		return;
+	}
+
 	int weaponItem;
 	int weaponRef;
 	reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(weaponItem, weaponRef);
@@ -1363,8 +1515,9 @@ void CGPartyObj::checkAndSetWeapon()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGPartyObj::changeMotionMode(int)
+void CGPartyObj::changeMotionMode(int mode)
 {
+	ChangeCommandMode(mode);
 	changeStat(0, 0, 0);
 	setIdleMotion();
 }
@@ -1403,7 +1556,7 @@ void CGPartyObj::setIdleMotion()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGPartyObj::setAlive(int, int)
+void CGPartyObj::setAlive(int restoreDamageCol, int keepTarget)
 {
 	enableDamageCol(1);
 	setIdleMotion();
@@ -1411,6 +1564,13 @@ void CGPartyObj::setAlive(int, int)
 		m_bgColMask &= 0xFFFEFFF1;
 	} else {
 		m_bgColMask |= 0x1000E;
+	}
+
+	if (restoreDamageCol == 0) {
+		enableDamageCol(0);
+	}
+	if (keepTarget == 0) {
+		endTargetParticle();
 	}
 }
 
@@ -1446,6 +1606,9 @@ void CGPartyObj::PutMemoryCapsule(int, int, int, int, char*)
 void CGPartyObj::onDamaged(CGPrgObj* attacker)
 {
 	CGPrgObj::onDamaged(attacker);
+	if (m_lastStateId == 0) {
+		*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x6B8) |= 0x20;
+	}
 }
 
 /*
@@ -1460,6 +1623,9 @@ void CGPartyObj::onDamaged(CGPrgObj* attacker)
 void CGPartyObj::onAttacked(CGPrgObj* attacker)
 {
 	CGPrgObj::onAttacked(attacker);
+	if (attacker != nullptr && m_lastStateId == 0) {
+		rotTarget(attacker);
+	}
 }
 
 /*
@@ -1469,6 +1635,12 @@ void CGPartyObj::onAttacked(CGPrgObj* attacker)
  */
 void stageWeather()
 {
+	for (int i = 0; i < 4; i++) {
+		CGPartyObj* party = Game.game.m_partyObjArr[i];
+		if (party != nullptr && party->m_scriptHandle != nullptr) {
+			party->canPlayerGoMenu();
+		}
+	}
 }
 
 /*
@@ -1478,6 +1650,12 @@ void stageWeather()
  */
 void magicReady()
 {
+	for (int i = 0; i < 4; i++) {
+		CGPartyObj* party = Game.game.m_partyObjArr[i];
+		if (party != nullptr && party->m_scriptHandle != nullptr) {
+			party->ChangeCommandMode(2);
+		}
+	}
 }
 
 /*
@@ -1487,6 +1665,12 @@ void magicReady()
  */
 void chooseMagic()
 {
+	for (int i = 0; i < 4; i++) {
+		CGPartyObj* party = Game.game.m_partyObjArr[i];
+		if (party != nullptr && party->m_scriptHandle != nullptr) {
+			party->useItem(-1);
+		}
+	}
 }
 
 /*
@@ -1494,8 +1678,14 @@ void chooseMagic()
  * Address:	TODO
  * Size:	TODO
  */
-void decMagic(int)
+void decMagic(int amount)
 {
+	for (int i = 0; i < 4; i++) {
+		CGPartyObj* party = Game.game.m_partyObjArr[i];
+		if (party != nullptr && party->m_scriptHandle != nullptr) {
+			party->bonus(0, -amount, (CGPrgObj*)0);
+		}
+	}
 }
 
 /*
@@ -1505,6 +1695,12 @@ void decMagic(int)
  */
 void calcWeightMax()
 {
+	for (int i = 0; i < 4; i++) {
+		CGPartyObj* party = Game.game.m_partyObjArr[i];
+		if (party != nullptr && party->m_scriptHandle != nullptr) {
+			party->checkAndSetWeapon();
+		}
+	}
 }
 
 /*

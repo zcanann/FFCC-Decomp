@@ -1299,11 +1299,9 @@ CChara::CMesh::CRefData::~CRefData()
  */
 CChara::CMesh::CDisplayList::CDisplayList()
 {
-	u8* const bytes = reinterpret_cast<u8*>(this);
-
-	*reinterpret_cast<void**>(bytes + 0) = 0;
-	*reinterpret_cast<s32*>(bytes + 4) = 0;
-	*reinterpret_cast<s16*>(bytes + 8) = -1;
+	*(void**)this = 0;
+	*(s32*)((u8*)this + 4) = 0;
+	*(u16*)((u8*)this + 8) = 0xFFFF;
 }
 
 /*

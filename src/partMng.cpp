@@ -56,6 +56,10 @@ extern "C" unsigned char DAT_8032ed90;
 extern "C" unsigned char DAT_8032ed91;
 extern unsigned char CameraPcs[];
 extern "C" void __ct__9_pppMngStFv(_pppMngSt* pppMngSt);
+extern "C" void __ct__10pppShapeStFv(pppShapeSt* shapeSt);
+extern "C" void __dt__10pppShapeStFv(pppShapeSt* shapeSt, int);
+extern "C" void __ct__10pppModelStFv(pppModelSt* modelSt);
+extern "C" void __dt__10pppModelStFv(pppModelSt* modelSt, int);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
 extern "C" void pppSetBlendMode__FUc(unsigned char);
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
@@ -1556,12 +1560,110 @@ void CPartMng::pppLoadPmd(CChunkFile&)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80059238
+ * PAL Size: 912b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartMng::pppLoadPmd(const char*)
+void CPartMng::pppLoadPmd(const char* baseName)
 {
-	// TODO
+    char path[256];
+    unsigned long fileSize = 0;
+
+    sprintf(path, "%s.pmd", baseName);
+    if (System.m_execParam > 2) {
+        System.Printf("ReadPmd fn=[%s]\n", path);
+    }
+
+    void* fileData = pppPartInit__8CPartMngFv(this, path, &fileSize, 0, 0);
+    if (fileData == 0) {
+        if (System.m_execParam != 0) {
+            System.Printf("CAN NOT READ[%s]!!\n", path);
+        }
+        return;
+    }
+
+    pppModelSt** modelArrayPtr = reinterpret_cast<pppModelSt**>(reinterpret_cast<unsigned char*>(this) + 0x7ec);
+    if (*modelArrayPtr == 0) {
+        CMemory::CStage* stageLoad = *reinterpret_cast<CMemory::CStage**>(PartPcs + 0x1c);
+        pppModelSt* modelArray = reinterpret_cast<pppModelSt*>(
+            __nw__FUlPQ27CMemory6CStagePci(0x6c00, stageLoad, s_partMng_cpp_801d8230, 0xca9));
+        if (modelArray != 0) {
+            __construct_array(modelArray, reinterpret_cast<void (*)(void*)>(__ct__10pppModelStFv),
+                              reinterpret_cast<void (*)(void*, int)>(__dt__10pppModelStFv), 0x6c, 0x100);
+            for (int i = 0; i < 0x100; i++) {
+                modelArray[i].m_isUsed = 0;
+            }
+        }
+        *modelArrayPtr = modelArray;
+    }
+
+    CChunkFile chunkFile;
+    chunkFile.SetBuf(fileData);
+
+    CChunkFile::CChunk outerChunk;
+    while (chunkFile.GetNextChunk(outerChunk)) {
+        chunkFile.PushChunk();
+        if (outerChunk.m_id == 0x52534554) {
+            pppModelSt* modelArray = *modelArrayPtr;
+            pppModelSt* targetModel = 0;
+
+            CChunkFile::CChunk innerChunk;
+            while (chunkFile.GetNextChunk(innerChunk)) {
+                if (innerChunk.m_id == 0x5253444d) {
+                    if (targetModel != 0) {
+                        CChunkFile rsdFile;
+                        rsdFile.SetBuf(chunkFile.GetAddress());
+                        pppReadRsd(rsdFile, targetModel);
+                        targetModel->m_mapMesh.Ptr2Off();
+
+                        void** meshDataPtr =
+                            reinterpret_cast<void**>(reinterpret_cast<unsigned char*>(&targetModel->m_mapMesh) + 0x24);
+                        targetModel->m_cacheId = static_cast<short>(reinterpret_cast<CAmemCacheSet*>(CAMemCacheSet)->SetData(
+                            *meshDataPtr, 0, static_cast<CAmemCache::TYPE>(1), 1));
+
+                        if (*meshDataPtr != 0) {
+                            __dl__FPv(*meshDataPtr);
+                            *meshDataPtr = 0;
+                        }
+
+                        targetModel->m_refCount++;
+                        targetModel = 0;
+                    }
+                } else if (innerChunk.m_id == 0x4e414d45) {
+                    char* name = chunkFile.GetString();
+
+                    targetModel = 0;
+                    for (unsigned int i = 0; i < 0x100; i++) {
+                        if (modelArray[i].m_isUsed != 0 && strcmp(modelArray[i].m_name, name) == 0) {
+                            targetModel = &modelArray[i];
+                            break;
+                        }
+                    }
+
+                    if (targetModel == 0) {
+                        for (int i = 0; i < 0x100; i++) {
+                            if (modelArray[i].m_isUsed == 0) {
+                                targetModel = &modelArray[i];
+                                break;
+                            }
+                        }
+
+                        if (targetModel != 0) {
+                            targetModel->m_refCount = 0;
+                            targetModel->m_isUsed = 1;
+                            strcpy(targetModel->m_name, name);
+                        }
+                    } else {
+                        targetModel = 0;
+                    }
+                }
+            }
+        }
+        chunkFile.PopChunk();
+    }
 }
 
 /*
@@ -1576,12 +1678,98 @@ void CPartMng::pppLoadPan(CChunkFile&)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80058e58
+ * PAL Size: 844b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CPartMng::pppLoadPan(const char*)
+void CPartMng::pppLoadPan(const char* baseName)
 {
-	// TODO
+    char path[256];
+    unsigned long fileSize = 0;
+
+    sprintf(path, "%s.pan", baseName);
+    if (System.m_execParam > 2) {
+        System.Printf("ReadPan fn=[%s]\n", path);
+    }
+
+    void* fileData = pppPartInit__8CPartMngFv(this, path, &fileSize, 0, 0);
+    if (fileData == 0) {
+        if (System.m_execParam != 0) {
+            System.Printf("CAN NOT READ[%s]!!\n", path);
+        }
+        return;
+    }
+
+    pppShapeSt** shapeArrayPtr = reinterpret_cast<pppShapeSt**>(reinterpret_cast<unsigned char*>(this) + 0x7f0);
+    if (*shapeArrayPtr == 0) {
+        CMemory::CStage* stageLoad = *reinterpret_cast<CMemory::CStage**>(PartPcs + 0x1c);
+        pppShapeSt* shapeArray = reinterpret_cast<pppShapeSt*>(
+            __nw__FUlPQ27CMemory6CStagePci(0x2c00, stageLoad, s_partMng_cpp_801d8230, 0xd0b));
+        if (shapeArray != 0) {
+            __construct_array(shapeArray, reinterpret_cast<void (*)(void*)>(__ct__10pppShapeStFv),
+                              reinterpret_cast<void (*)(void*, int)>(__dt__10pppShapeStFv), 0x2c, 0x100);
+            for (int i = 0; i < 0x100; i++) {
+                shapeArray[i].m_inUse = 0;
+            }
+        }
+        *shapeArrayPtr = shapeArray;
+    }
+
+    CChunkFile chunkFile;
+    chunkFile.SetBuf(fileData);
+
+    CChunkFile::CChunk outerChunk;
+    while (chunkFile.GetNextChunk(outerChunk)) {
+        chunkFile.PushChunk();
+        if (outerChunk.m_id == 0x53534554) {
+            pppShapeSt* shapeArray = *shapeArrayPtr;
+            pppShapeSt* targetShape = 0;
+
+            CChunkFile::CChunk innerChunk;
+            while (chunkFile.GetNextChunk(innerChunk)) {
+                if (innerChunk.m_id == 0x5348504d) {
+                    if (targetShape != 0) {
+                        CChunkFile shpFile;
+                        shpFile.SetBuf(chunkFile.GetAddress());
+                        pppReadShp(shpFile, targetShape);
+                        targetShape->m_refCount++;
+                        targetShape = 0;
+                    }
+                } else if (innerChunk.m_id == 0x4e414d45) {
+                    char* name = chunkFile.GetString();
+
+                    targetShape = 0;
+                    for (unsigned int i = 0; i < 0x100; i++) {
+                        if (shapeArray[i].m_inUse != 0 && strcmp(shapeArray[i].m_name, name) == 0) {
+                            targetShape = &shapeArray[i];
+                            break;
+                        }
+                    }
+
+                    if (targetShape == 0) {
+                        for (int i = 0; i < 0x100; i++) {
+                            if (shapeArray[i].m_inUse == 0) {
+                                targetShape = &shapeArray[i];
+                                break;
+                            }
+                        }
+
+                        if (targetShape != 0) {
+                            targetShape->m_refCount = 0;
+                            targetShape->m_inUse = 1;
+                            strcpy(targetShape->m_name, name);
+                        }
+                    } else {
+                        targetShape = 0;
+                    }
+                }
+            }
+        }
+        chunkFile.PopChunk();
+    }
 }
 
 /*

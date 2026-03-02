@@ -482,12 +482,87 @@ void CGMonObj::setAttackAfter(int attackKind)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80119674
+ * PAL Size: 700b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGMonObj::getNearParty(int, int, float, float, int)
+int CGMonObj::getNearParty(int targetOrdinal, int flags, float minDist, float maxDist, int classId)
 {
-	// TODO
+	unsigned char* mon = reinterpret_cast<unsigned char*>(this);
+	CGObject* monObject = reinterpret_cast<CGObject*>(this);
+	int foundCount = 0;
+	int selectedPartyIndex = -1;
+
+	for (int slot = 0; slot < 4; slot++) {
+		int partyIndex = *reinterpret_cast<int*>(mon + 0x620 + slot * 4);
+		CGPartyObj* party = Game.game.m_partyObjArr[partyIndex];
+		if (party != NULL) {
+			CGPrgObj* partyPrg = reinterpret_cast<CGPrgObj*>(party);
+			CGObject* partyObj = reinterpret_cast<CGObject*>(party);
+			void** partyScript = partyObj->m_scriptHandle;
+			unsigned char* partyMon = reinterpret_cast<unsigned char*>(party);
+
+			bool menuBlocked = false;
+			if ((Game.game.m_gameWork.m_menuStageMode != 0) && (Game.game.m_gameWork.m_bossArtifactStageIndex < 0xF) &&
+				((partyPrg->GetCID() & 0x6D) == 0x6D) && (partyScript[0xED] != NULL)) {
+				menuBlocked = true;
+			}
+
+			bool valid = !menuBlocked;
+			if (valid && ((flags & 1) != 0)) {
+				int state = partyPrg->m_lastStateId;
+				valid = (*reinterpret_cast<short*>(partyScript + 7) != 0) && (state != 9) && (state != 0x22) && !menuBlocked;
+			}
+			if (valid && ((flags & 0x10) != 0)) {
+				valid = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(partyScript) + 0x4E) != 0;
+			}
+			if (valid && ((flags & 0x20) != 0)) {
+				int state = partyPrg->m_lastStateId;
+				valid = ((state == 6) || (state == 2)) && (partyPrg->m_subState == 1);
+			}
+			if (valid && ((flags & 0x40) != 0)) {
+				valid = (static_cast<signed char>(partyMon[0x6C0]) >= 0) && (partyScript[4] == reinterpret_cast<void*>(classId));
+			}
+			if (valid && ((flags & 2) == 0)) {
+				valid = minDist <= *reinterpret_cast<float*>(mon + 0x5D0 + slot * 4);
+			}
+			if (valid && ((flags & 4) == 0)) {
+				valid = *reinterpret_cast<float*>(mon + 0x5D0 + slot * 4) <= maxDist;
+			}
+
+			if (valid) {
+				float distance = *reinterpret_cast<float*>(mon + 0x5D0 + slot * 4);
+				if (((flags & 8) != 0) && (distance > 0.0f)) {
+					Vec toParty;
+					Vec facing;
+					PSVECSubtract(&partyObj->m_worldPosition, &monObject->m_worldPosition, &toParty);
+					PSVECScale(&toParty, &toParty, 1.0f / distance);
+					facing.x = sin(monObject->m_rotTargetY);
+					facing.y = 0.0f;
+					facing.z = cos(monObject->m_rotTargetY);
+					if (PSVECDotProduct(&toParty, &facing) <= 0.0f) {
+						goto next_slot;
+					}
+				}
+
+				if ((targetOrdinal == -1) || (targetOrdinal == foundCount)) {
+					selectedPartyIndex = partyIndex;
+					if (targetOrdinal == foundCount) {
+						return partyIndex;
+					}
+				}
+				foundCount++;
+			}
+		}
+
+next_slot:
+		;
+	}
+
+	return selectedPartyIndex;
 }
 
 /*

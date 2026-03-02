@@ -120,7 +120,7 @@ This is likely the starting point for the agent.
 ### Step 1 - Select Target & Gather Context (automated)
 Run the selector once. It prints random viable targets across multiple buckets (code opportunities, data opportunities, linkage opportunities, and name/linkage blockers) with symbol summaries.
 
-All non-perfect targets are valid now. Data & linkage are highest priority at the moment. These will unblock code opportunities. Focus on fixing member variable access, populating struct/class members, class hierarchies, and overall code-correctness. Large, impactful, big wins are preferred to small patches.
+All non-perfect targets are valid now. Data & linkage are the #1 priority. This means removing hacks like (object + 0x28). Create a member variable on the type and use that.
 
 ```sh
 python3 tools/agent_select_target.py
@@ -141,16 +141,14 @@ Linkage opportunities (3)
 Name/linkage blockers (3)
 ```
 
-WARNING: If function parameters or linkage do not match, the score can stay stuck at 0%. Common symptoms include unexpected Metrowerks mangled names, missing `extern "C"` where needed, and cases that need specific pragmas. Treat these as signs that declarations/linkage/source setup need updating.
-
-`configure.py` compiler and linker flags can also block perfect matches. Tuning flags may be required in addition to source changes.
+WARNING: If function parameters or linkage do not match, the score can stay stuck at 0%. `configure.py` compiler and linker flags can also block perfect matches. Tuning flags may be required in addition to source changes.
 
 DO NOT TRUST GHIDRA BEYOND GETTING A FEEL FOR THE FUNCTION. GHIDRA IS A GUIDELINE. OBJDIFF IS THE REAL SOURCE OF TRUTH FOR HOW CLOSE WE ARE.
 
 ### Step 2 - Create branch: `git checkout -b pr/<unit>/$(date -u +%s)`
 
 ### Step 3 - Edit source files in `src/` and `include/`
-Make small changes: types, signedness, struct layout, control flow, constants, linkage/declaration cleanup, and (when justified) `configure.py` flag adjustments.
+Make critical changes changes: types, signedness, struct layout, control flow, constants, linkage/declaration cleanup, and (when justified) `configure.py` flag adjustments. Our goal is to match the source code, so getting the data and structs matching are CRITICAL to making the code coherent.
 
 ### Step 4 - Build: `ninja`
 
@@ -172,6 +170,7 @@ Make a PR only if **both** are true:
 - objdiff/build output shows real improvement in one or more of: code match, data match, linkage progress
 - minor regressions are acceptable when outweighed by larger gains in other categories (for example, small code byte loss for substantial data/linkage gain)
 - improvements should be real, not just formatting/renames
+- The PR should feel like it is a step in the direction of recovering the original code.
 
 **B) The resulting C/C++ is plausible original source**
 The goal is to match what the **original FFCC authors likely wrote**, not merely to coax the compiler.

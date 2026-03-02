@@ -18,8 +18,8 @@ void pppMatrixYZX(void* target, void* unused, void* param)
     f32* matrix = (f32*)target;
     u32* offsets = (u32*)*(void**)((u8*)param + 0xC);
     pppIVECTOR4* angle = (pppIVECTOR4*)((u8*)target + offsets[1] + 0x80);
-    f32* scale = (f32*)((u8*)target + offsets[2] + 0x80);
     f32* translation = (f32*)((u8*)target + offsets[0] + 0x80);
+    f32* scale = (f32*)((u8*)target + offsets[2] + 0x80);
     Vec temp1;
     Vec temp2;
     Vec temp3;

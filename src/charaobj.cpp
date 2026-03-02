@@ -705,12 +705,19 @@ void CGCharaObj::setSta(int staIndex, int value)
  */
 void CGCharaObj::effective(int staIndex, int amount, CGPrgObj*, int& outValue)
 {
+	unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
+	if (script == 0) {
+		outValue = 0;
+		return;
+	}
+
+	CGObject* source = reinterpret_cast<CGObject*>(this);
 	int next = 0;
-	calcSta(staIndex, amount, this);
 
 	switch (staIndex) {
 		case 0:
-			if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x10) == 0) {
+			if (*reinterpret_cast<short*>(script + 0x10) == 0) {
+				calcSta(0, amount, source);
 				setSta(4, 0);
 				Sound.StopSe3DGroup(m_particleId);
 				damageDelete();
@@ -718,17 +725,21 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj*, int& outValue)
 			} else {
 				setSta(0, 0);
 				setSta(1, 0);
+				next = 0;
 			}
-			next = 0;
 			break;
 		case 1:
-			if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E) != 0) {
+			if (*reinterpret_cast<short*>(script + 0x3E) == 0) {
+				calcSta(1, amount, source);
+				setSta(4, 0);
+			} else {
 				setSta(0, 0);
 				setSta(1, 0);
 				next = 0;
-			} else {
-				next = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x40);
 			}
+			break;
+		case 2:
+			calcSta(2, amount, source);
 			break;
 		case 3:
 			setSta(1, 0);
@@ -737,6 +748,7 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj*, int& outValue)
 			setSta(9, 0);
 			setSta(7, 0);
 			setSta(8, 0);
+			calcSta(3, amount, source);
 			putHitParticleFromItem(0, amount);
 			Sound.StopSe3DGroup(m_particleId);
 			damageDelete();
@@ -744,24 +756,108 @@ void CGCharaObj::effective(int staIndex, int amount, CGPrgObj*, int& outValue)
 			next = 0;
 			break;
 		case 4:
+			calcSta(4, amount, source);
 			setSta(0, 0);
 			setSta(1, 0);
 			changeStat(10, 0, 0);
-			next = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x46);
 			break;
 		case 6:
+			calcSta(6, amount, source);
+			putHitParticleFromItem(0, amount);
+			next = 0;
+			break;
 		case 7:
+			if (*reinterpret_cast<short*>(script + 0x4E) == 0) {
+				calcSta(7, amount, source);
+				putHitParticleFromItem(0, amount);
+			} else {
+				setSta(7, 0);
+				setSta(8, 0);
+			}
+			next = 0;
+			break;
 		case 8:
+			if (*reinterpret_cast<short*>(script + 0x13) == 0) {
+				calcSta(8, amount, source);
+				putHitParticleFromItem(0, amount);
+			} else {
+				setSta(7, 0);
+				setSta(8, 0);
+			}
+			next = 0;
+			break;
 		case 9:
+			setSta(7, 0);
+			setSta(8, 0);
+			calcSta(9, amount, source);
+			putHitParticleFromItem(0, amount);
+			Sound.StopSe3DGroup(m_particleId);
+			damageDelete();
+			changeStat(0, 0, 0);
+			next = 0;
+			break;
 		case 0x1C:
+			calcSta(0x1C, amount, source);
+			break;
+		case 0x25:
+			if (*reinterpret_cast<short*>(script + 0x3E) != 0) {
+				setSta(0, 0);
+			}
+			changeStat(0x19, 0, 0);
+			break;
+		case 100:
+			if (Game.game.m_gameWork.m_gameOverFlag == 0) {
+				if (amount == 0x225) {
+					addHp(*reinterpret_cast<unsigned short*>(script + 0x1A), 0);
+				} else {
+					addHp(8, 0);
+				}
+				changeStat(0x22, 0, 0);
+				putHitParticleFromItem(0, amount);
+			}
+			next = 0;
+			break;
+		case 0x66:
+			addHp(*reinterpret_cast<unsigned short*>(script + 0x1A), 0);
+			putHitParticleFromItem(0, amount);
+			next = 0;
+			break;
+		case 0x68:
+			if (*reinterpret_cast<short*>(script + 0x3E) != 0) {
+				setSta(0, 0);
+			}
+			changeStat(4, 0, 0);
+			break;
+		case 0x69:
+			for (int i = 0; i < 0x27; i++) {
+				setSta(i, 0);
+			}
+			m_displayFlags |= 2;
+			putHitParticleFromItem(0, amount);
+			break;
 		case 0x6A:
-			next = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E + (staIndex * 2));
+			calcSta(4, amount, source);
+			setSta(0, 0);
+			setSta(1, 0);
+			changeStat(10, 0, 0);
+			break;
+		case 0x6B:
+			if (*reinterpret_cast<short*>(script + 0x46) != 0) {
+				setSta(4, 0);
+			}
+			if (*reinterpret_cast<short*>(script + 0x3E) == 0 &&
+				*reinterpret_cast<short*>(script + 0x14) == 0 &&
+				*reinterpret_cast<short*>(script + 0x11) == 0) {
+				changeStat(0x1A, 0, 0);
+			}
 			break;
 		default:
-			next = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x3E + (staIndex * 2));
 			break;
 	}
 
+	if (staIndex >= 0 && staIndex < 0x27) {
+		next = *reinterpret_cast<short*>(script + 0x3E + (staIndex * 2));
+	}
 	outValue = next;
 }
 
@@ -978,8 +1074,55 @@ void CGCharaObj::calcRegist(int staIndex, int itemId, int& outA, int& outB, int&
  */
 void CGCharaObj::onDamage(CGPrgObj*, int, int, int, Vec*)
 {
-	damageDelete();
-	changeStat(6, 0, 0);
+	typedef unsigned int (*VCall0C)(void*);
+
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	if (m_scriptHandle == 0) {
+		damageDelete();
+		changeStat(6, 0, 0);
+		return;
+	}
+
+	int itemId = *reinterpret_cast<int*>(self + 0x560);
+	int itemOffset = itemId * 0x48;
+	unsigned short staType = *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + itemOffset + 8);
+
+	VCall0C cidFn = *reinterpret_cast<VCall0C*>(*reinterpret_cast<int*>(self + 0x48) + 0x0C);
+	unsigned int cid = cidFn(this);
+	if ((cid & 0x6D) == 0x6D && *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x12) != 0) {
+		return;
+	}
+
+	if ((m_weaponNodeFlags & 0x80) == 0) {
+		return;
+	}
+
+	int regist = 0;
+	int blocked = 0;
+	int special = 0;
+	calcRegist(staType, itemId, regist, blocked, special, 0);
+
+	if (regist == 3) {
+		if (staType == 0 || staType == 1 || staType == 3 || staType == 4 || staType == 6 || staType == 8 ||
+			staType == 9 || staType == 0x1C) {
+			putParticle(0x201, 0, static_cast<Vec*>(0), m_attackColRadius, 0x65);
+		} else if (staType == 0x24 || staType == 0x25 || staType == 0x69 || staType == 0x6A) {
+			putParticle(0x200, 0, static_cast<Vec*>(0), m_attackColRadius, 0x1D);
+		}
+	}
+
+	int outValue = 0;
+	effective(static_cast<int>(staType), itemId, this, outValue);
+
+	if (blocked != 0) {
+		changeStat(6, 0, 0);
+		return;
+	}
+
+	if (outValue == 0) {
+		damageDelete();
+		changeStat(6, 0, 0);
+	}
 }
 
 /*
@@ -1230,7 +1373,42 @@ void CGCharaObj::onChangePrg(int arg)
  */
 void CGCharaObj::calcCastTime(int)
 {
-	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6A8) += 1;
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	*reinterpret_cast<int*>(self + 0x6A8) += 1;
+
+	if (m_scriptHandle == 0) {
+		return;
+	}
+
+	int itemId = *reinterpret_cast<int*>(self + 0x560);
+	int itemOffset = itemId * 0x48;
+	unsigned char* itemData = reinterpret_cast<unsigned char*>(Game.game.unkCFlatData0[2]) + itemOffset;
+
+	unsigned int baseCast = *reinterpret_cast<unsigned short*>(itemData + 0x2E);
+	unsigned short itemType = *reinterpret_cast<unsigned short*>(itemData + 0xE);
+	unsigned int cast = baseCast;
+
+	if (itemType == 2) {
+		unsigned int cid = GetCID();
+		if ((cid & 0xAD) == 0xAD && Game.game.m_gameWork.m_bossArtifactStageIndex < 0xF) {
+			int stage = Game.game.m_gameWork.m_bossArtifactStageTable[Game.game.m_gameWork.m_bossArtifactStageIndex];
+			if (stage > 2) {
+				stage = 2;
+			}
+			if (stage > 0) {
+				unsigned short bonus = *reinterpret_cast<unsigned short*>(Game.game.unk_flat3_field_8_0xc7dc + 0x58 + (stage * 2));
+				if (cast > bonus) {
+					cast -= bonus;
+				} else {
+					cast = 0;
+				}
+			}
+		}
+	}
+
+	*reinterpret_cast<int*>(self + 0x630) = static_cast<int>(cast);
+	*reinterpret_cast<int*>(self + 0x634) = static_cast<int>(cast) + 1;
+	*reinterpret_cast<int*>(self + 0x638) = *reinterpret_cast<int*>(self + 0x634);
 }
 
 /*

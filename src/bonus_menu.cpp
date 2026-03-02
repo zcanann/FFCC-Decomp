@@ -264,8 +264,111 @@ void CMenuPcs::DrawResultCloseAnim()
  */
 void CMenuPcs::CalcSelectOpenAnim()
 {
-	// Simplified implementation to get basic structure compiling
-	// TODO: Expand based on Ghidra decompilation patterns
+	unsigned int* scriptFoodBase = Game.game.m_scriptFoodBase;
+	int statePtr = *(int*)((char*)this + 0x82c);
+	int animPtr = *(int*)((char*)this + 0x84c);
+
+	if (statePtr == 0 || animPtr == 0) {
+		return;
+	}
+
+	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
+	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
+
+	if (*(unsigned char*)(statePtr + 0xb) == 0) {
+		int activePartyCount = 0;
+		int idx;
+
+		*(unsigned char*)((char*)this + 0x8d) = 0;
+		Sound.PlaySe(0x4c, 0x40, 0x7f, 0);
+		memset((void*)animPtr, 0, 0x1008);
+
+		for (int i = 0; i < 4; i++) {
+			if (scriptFoodBase[i] != 0) {
+				activePartyCount++;
+			}
+		}
+		if (activePartyCount <= 0) {
+			activePartyCount = 1;
+		}
+
+		header->count = (short)(12 + activePartyCount * 3);
+		header->unk02 = 0;
+		header->unk04 = 0;
+		header->finished = 0;
+
+		idx = 0;
+		InitAnimSprite(&sprites[idx++], 0x16, 0, 0, 0x280, 0x1c0, 0, 0);
+		sprites[0].scale = 3.0f;
+
+		InitAnimSprite(&sprites[idx++], -3, 0xf0, 0x38, 0x168, 0x148, 0, 8);
+		InitAnimSprite(&sprites[idx++], 0x1f, 0, 0, 0x80, 0x78, 9999, 8);
+		sprites[2].mulX = -150.0f;
+		sprites[2].mulY = -150.0f;
+		sprites[2].scale = 2.0f;
+		InitAnimSprite(&sprites[idx++], -4, 0, 0, 0x70, 0x68, 0, 8);
+
+		short y = 0x28;
+		for (int i = 0; i < activePartyCount; i++) {
+			short x = ((0 < i) && (i < 3)) ? 0x30 : 0x48;
+			InitAnimSprite(&sprites[idx], 0, x, y, 0x60, 0x58, 0, 0x18);
+			sprites[idx].mulX = 96.0f;
+			sprites[idx].mulY = 88.0f;
+			sprites[idx].timer = 0;
+			idx++;
+			y += 0x60;
+		}
+
+		const int iconBase = idx - activePartyCount;
+		for (int i = 0; i < activePartyCount; i++) {
+			InitAnimSprite(&sprites[idx], -1, 0, 0, 0, 0, sprites[iconBase + i].timer, 8);
+			sprites[idx].timer = 0;
+			idx++;
+		}
+
+		for (int i = 0; i < 8; i++) {
+			int start = (int)((float)(10 + i * 5) * 0.6f);
+			InitAnimSprite(&sprites[idx], -2, 0, 0, 0, 0, start, 0x21);
+			sprites[idx].scale = 1.0f;
+			idx++;
+		}
+
+		const int copyBase = iconBase;
+		for (int i = 0; i < activePartyCount; i++) {
+			sprites[idx] = sprites[copyBase + i];
+			sprites[idx].timer = 0;
+			sprites[idx].startFrame = 1;
+			idx++;
+		}
+
+		*(unsigned char*)(statePtr + 0xb) = 1;
+		return;
+	}
+
+	*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;
+	int frame = (int)*(short*)(statePtr + 0x22);
+	int doneCount = 0;
+
+	for (int i = 0; i < (int)header->count; i++) {
+		BonusAnimSprite* sprite = &sprites[i];
+		if (frame < sprite->startFrame) {
+			continue;
+		}
+
+		if (frame < sprite->startFrame + sprite->duration) {
+			sprite->timer++;
+			if (sprite->duration > 0) {
+				sprite->alpha = (float)sprite->timer / (float)sprite->duration;
+			}
+		} else {
+			sprite->alpha = 1.0f;
+			doneCount++;
+		}
+	}
+
+	if (doneCount == (int)header->count) {
+		header->finished = 1;
+	}
 }
 
 /*

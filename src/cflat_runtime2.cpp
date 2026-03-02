@@ -2585,11 +2585,16 @@ void CFlatRuntime2::SysControl(int controlNo, int controlValue)
  */
 int CFlatRuntime2::GetSysControl(int controlNo)
 {
-	if (controlNo != 3) {
-		return 0;
+	struct RuntimeSysControlView {
+		u8 m_padding[0x12E8];
+		int m_control;
+	};
+
+	if (controlNo == 3) {
+		return reinterpret_cast<RuntimeSysControlView*>(this)->m_control;
 	}
 
-	return *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x12E8);
+	return 0;
 }
 
 /*

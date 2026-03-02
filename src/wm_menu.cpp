@@ -1267,9 +1267,48 @@ void CMenuPcs::CalcWMFrame0(int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::DrawWMFrame0(int, float)
+void CMenuPcs::DrawWMFrame0(int mask, float alpha)
 {
-	return;
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	unsigned char* const frame = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x820)[0]);
+	if (frame == 0) {
+		return;
+	}
+
+	if (alpha < 0.0f) {
+		alpha = 0.0f;
+	} else if (alpha > 1.0f) {
+		alpha = 1.0f;
+	}
+
+	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+
+	GXColor color;
+	color.r = 0xFF;
+	color.g = 0xFF;
+	color.b = 0xFF;
+	color.a = static_cast<unsigned char>(255.0f * alpha);
+	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
+
+	SetTexture(static_cast<CMenuPcs::TEX>(0x1E));
+
+	for (int i = 0; i < 2; i++) {
+		if ((mask & (1 << i)) == 0) {
+			continue;
+		}
+
+		unsigned char* const entry = frame + 4 + i * 0x1C;
+		const short x = reinterpret_cast<short*>(entry + 0)[0];
+		const short y = reinterpret_cast<short*>(entry + 2)[0];
+		const short w = reinterpret_cast<short*>(entry + 4)[0];
+		const short h = reinterpret_cast<short*>(entry + 6)[0];
+		const float u = reinterpret_cast<float*>(entry + 8)[0];
+		const float v = reinterpret_cast<float*>(entry + 0xC)[0];
+		const unsigned int flags = reinterpret_cast<unsigned int*>(entry + 0x18)[0];
+
+		DrawRect(0xFFFFFFFF, static_cast<float>(x), static_cast<float>(y), static_cast<float>(w), static_cast<float>(h), u, v, 1.0f, 1.0f,
+		         static_cast<float>(flags));
+	}
 }
 
 /*
@@ -1915,9 +1954,82 @@ void CMenuPcs::DrawPageMark()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::DrawRect2(unsigned long, float, float, float, float, float, float, float, float, float (*) [4])
+void CMenuPcs::DrawRect2(unsigned long, float x, float y, float w, float h, float tx, float ty, float scale, float flags, float (*mtx)[4])
 {
-	return;
+	if (w <= 0.0f || h <= 0.0f) {
+		return;
+	}
+
+	const unsigned int drawFlags = static_cast<unsigned int>(flags);
+	const float halfTexel = FLOAT_803314bc;
+	float u0;
+	float u1;
+	float v0;
+	float v1;
+
+	if ((drawFlags & 8) == 0) {
+		u0 = tx + halfTexel;
+		u1 = (tx + w) - halfTexel;
+	} else {
+		u1 = tx + halfTexel;
+		u0 = (tx + w) - halfTexel;
+	}
+
+	if ((drawFlags & 4) == 0) {
+		v0 = ty + halfTexel;
+		v1 = (ty + h) - halfTexel;
+	} else {
+		v1 = ty + halfTexel;
+		v0 = (ty + h) - halfTexel;
+	}
+
+	if ((drawFlags & 1) != 0) {
+		x = x - halfTexel * (w * scale);
+	}
+	if ((drawFlags & 2) != 0) {
+		y = y - halfTexel * (h * scale);
+	}
+
+	Vec in[4];
+	Vec out[4];
+
+	in[0].x = x;
+	in[0].y = y;
+	in[0].z = 0.0f;
+
+	in[1].x = x + (w * scale);
+	in[1].y = y;
+	in[1].z = 0.0f;
+
+	in[2].x = x;
+	in[2].y = y + (h * scale);
+	in[2].z = 0.0f;
+
+	in[3].x = x + (w * scale);
+	in[3].y = y + (h * scale);
+	in[3].z = 0.0f;
+
+	if (mtx != 0) {
+		PSMTXMultVecArray(reinterpret_cast<MtxPtr>(mtx), in, out, 4);
+	} else {
+		for (int i = 0; i < 4; i++) {
+			out[i] = in[i];
+		}
+	}
+
+	GXBegin(static_cast<GXPrimitive>(0x98), static_cast<GXVtxFmt>(0), 4);
+
+	GXPosition3f32(out[0].x, out[0].y, out[0].z);
+	GXTexCoord2f32(u0, v0);
+
+	GXPosition3f32(out[1].x, out[1].y, out[1].z);
+	GXTexCoord2f32(u1, v0);
+
+	GXPosition3f32(out[2].x, out[2].y, out[2].z);
+	GXTexCoord2f32(u0, v1);
+
+	GXPosition3f32(out[3].x, out[3].y, out[3].z);
+	GXTexCoord2f32(u1, v1);
 }
 
 /*
@@ -1929,9 +2041,58 @@ void CMenuPcs::DrawRect2(unsigned long, float, float, float, float, float, float
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::DrawRect3d(unsigned long, float, float, float, float, float, float, float, float, float)
+void CMenuPcs::DrawRect3d(unsigned long, float x, float y, float z, float w, float h, float tx, float ty, float scale, float flags)
 {
-	return;
+	if (w <= 0.0f || h <= 0.0f) {
+		return;
+	}
+
+	const unsigned int drawFlags = static_cast<unsigned int>(flags);
+	const float halfTexel = FLOAT_803314bc;
+	float u0;
+	float u1;
+	float v0;
+	float v1;
+
+	if ((drawFlags & 8) == 0) {
+		u0 = tx + halfTexel;
+		u1 = (tx + w) - halfTexel;
+	} else {
+		u1 = tx + halfTexel;
+		u0 = (tx + w) - halfTexel;
+	}
+
+	if ((drawFlags & 4) == 0) {
+		v0 = ty + halfTexel;
+		v1 = (ty + h) - halfTexel;
+	} else {
+		v1 = ty + halfTexel;
+		v0 = (ty + h) - halfTexel;
+	}
+
+	if ((drawFlags & 1) != 0) {
+		x = x - halfTexel * (w * scale);
+	}
+	if ((drawFlags & 2) != 0) {
+		y = y - halfTexel * (h * scale);
+	}
+
+	const float x1 = x + (w * scale);
+	const float y1 = y + (h * scale);
+
+	GXBegin(static_cast<GXPrimitive>(0x98), static_cast<GXVtxFmt>(0), 4);
+
+	GXPosition3f32(x, y, z);
+	GXTexCoord2f32(u0, v0);
+
+	GXPosition3f32(x1, y, z);
+	GXTexCoord2f32(u1, v0);
+
+	GXPosition3f32(x, y1, z);
+	GXTexCoord2f32(u0, v1);
+
+	GXPosition3f32(x1, y1, z);
+	GXTexCoord2f32(u1, v1);
 }
 
 /*

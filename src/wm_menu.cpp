@@ -122,14 +122,17 @@ void CMenuPcs::WmInit()
  */
 void CMenuPcs::createWorld()
 {
-	// Ghidra body is a no-op.
 	return;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::ChkNumItemAll()
 {
@@ -157,8 +160,12 @@ void CMenuPcs::loadData()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::InitFrameInfo()
 {
@@ -205,8 +212,12 @@ void CMenuPcs::InitFrame0Info()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::Sprt::operator= (const CMenuPcs::Sprt& src)
 {
@@ -232,8 +243,12 @@ void CMenuPcs::InitCharaInfo()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::InitCharaSelectInfo()
 {
@@ -246,8 +261,12 @@ void CMenuPcs::InitCharaSelectInfo()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::InitCSelCurPos()
 {
@@ -424,8 +443,12 @@ void CMenuPcs::calcWorld()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CalcMainMenu()
 {
@@ -470,8 +493,12 @@ void CMenuPcs::CalcMCardMenu()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CalcCMakeMenu()
 {
@@ -482,8 +509,12 @@ void CMenuPcs::CalcCMakeMenu()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CalcMoveMenu()
 {
@@ -570,8 +601,12 @@ void CMenuPcs::CalcGoOutSelChar(unsigned char state, unsigned char slot)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CalcGoOutSelCharInit()
 {
@@ -984,8 +1019,12 @@ void CMenuPcs::CallWorldParam(int p0, int p1, int p2)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CalcSpl(CMenuPcs::SPL* out, CMenuPcs::SPL* in, float t)
 {
@@ -1047,8 +1086,12 @@ void CMenuPcs::RestoreProjection()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawObj(int kind)
 {
@@ -1103,8 +1146,12 @@ void CMenuPcs::DrawFukidashi()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::ChkPlaceLength(char* text)
 {
@@ -1117,8 +1164,12 @@ void CMenuPcs::ChkPlaceLength(char* text)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::SplitPlace(const char* text, char* left, char* right)
 {
@@ -1144,8 +1195,12 @@ void CMenuPcs::SplitPlace(const char* text, char* left, char* right)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::SplitPlace2(const char* text, char* left, char* right, CFont*, int)
 {
@@ -1213,8 +1268,12 @@ void CMenuPcs::DrawWMFrame0(int, float)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawMainMenuBase(float)
 {
@@ -1223,8 +1282,12 @@ void CMenuPcs::DrawMainMenuBase(float)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CalcCharaBase()
 {
@@ -1276,8 +1339,12 @@ void CMenuPcs::PCAnimCtrl()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::GetAnimNo(int animNo, int)
 {
@@ -1357,8 +1424,12 @@ void CMenuPcs::DrawCMLife()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::WMSubMenuInit()
 {
@@ -1384,8 +1455,12 @@ void CMenuPcs::WMChgMenu()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::SetParty()
 {
@@ -1464,8 +1539,12 @@ void CMenuPcs::ChgAllModel2()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::SetMakeChara(int slot)
 {
@@ -1550,8 +1629,12 @@ void CMenuPcs::CalcMainMenuSub()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::ChkSelectParty()
 {
@@ -1604,8 +1687,12 @@ void CMenuPcs::GetMcOdekakePos(int* x, int* y)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::ChkMcDataCnt()
 {
@@ -1628,8 +1715,12 @@ void CMenuPcs::DrawMCList()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawHelpBase(int, float)
 {
@@ -1652,8 +1743,12 @@ void CMenuPcs::CalcMcObj()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawMcObj()
 {
@@ -1662,8 +1757,12 @@ void CMenuPcs::DrawMcObj()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::SetMcList(int index, McListInfo* info)
 {
@@ -1677,8 +1776,12 @@ void CMenuPcs::SetMcList(int index, McListInfo* info)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void McListInfo::operator= (const McListInfo& src)
 {
@@ -1687,8 +1790,12 @@ void McListInfo::operator= (const McListInfo& src)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::ClrMcList()
 {
@@ -1729,8 +1836,12 @@ void CMenuPcs::SetLight(int mode)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawPageMark()
 {
@@ -1829,8 +1940,12 @@ void CMenuPcs::GetWinSize(int, short* w, short* h, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::SetTextureLoc(int index)
 {
@@ -1839,8 +1954,12 @@ void CMenuPcs::SetTextureLoc(int index)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void GXSetTexCoordGen(void)
 {
@@ -2001,8 +2120,12 @@ void CMenuPcs::CheckSameMcFormatID(Mc::SaveDat* lhs, Mc::SaveDat* rhs)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::IsAsyncCharaLoadFinish()
 {
@@ -2010,8 +2133,12 @@ void CMenuPcs::IsAsyncCharaLoadFinish()
 }
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 McCtrl::McCtrl()
 {
@@ -2020,8 +2147,12 @@ McCtrl::McCtrl()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 McCtrl::~McCtrl()
 {
@@ -2030,8 +2161,12 @@ McCtrl::~McCtrl()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void McCtrl::Init()
 {
@@ -2050,8 +2185,12 @@ void McCtrl::Init()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800e9348
+ * PAL Size: 1404b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void McCtrl::LoadMcList()
 {
@@ -2060,8 +2199,12 @@ void McCtrl::LoadMcList()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800e902c
+ * PAL Size: 796b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void McCtrl::SetListDat(int slot, int)
 {
@@ -2073,8 +2216,12 @@ void McCtrl::SetListDat(int slot, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void McCtrl::SetBrokenFile(int isBroken)
 {
@@ -2083,8 +2230,12 @@ void McCtrl::SetBrokenFile(int isBroken)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800e8738
+ * PAL Size: 2292b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void McCtrl::SaveDat()
 {
@@ -2095,8 +2246,12 @@ void McCtrl::SaveDat()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800e8300
+ * PAL Size: 1080b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void McCtrl::LoadDat()
 {
@@ -2105,8 +2260,12 @@ void McCtrl::LoadDat()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800e80f0
+ * PAL Size: 528b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void McCtrl::Format(int unmountAfter)
 {
@@ -2153,8 +2312,12 @@ void McCtrl::Format(int unmountAfter)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800e7dc8
+ * PAL Size: 808b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int McCtrl::ChkEmpty(int param_2)
 {
@@ -2305,8 +2468,12 @@ int McCtrl::ChkEmpty(int param_2)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800e7d4c
+ * PAL Size: 124b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int McCtrl::ChkConnect(int chan)
 {
@@ -2343,8 +2510,12 @@ int McCtrl::ChkConnect(int chan)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800e78f8
+ * PAL Size: 1108b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int McCtrl::ChkNowData()
 {
@@ -2541,8 +2712,12 @@ int McCtrl::ChkNowData()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800e7430
+ * PAL Size: 1224b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void McCtrl::SaveDataBuffer(char* buffer)
 {
@@ -2553,8 +2728,12 @@ void McCtrl::SaveDataBuffer(char* buffer)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void McCtrl::ChkParty(char*)
 {
@@ -2563,8 +2742,12 @@ void McCtrl::ChkParty(char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800e6b98
+ * PAL Size: 2200b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void McCtrl::EraseDat()
 {
@@ -2574,8 +2757,12 @@ void McCtrl::EraseDat()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void McCtrl::GetDno()
 {
@@ -2584,8 +2771,12 @@ void McCtrl::GetDno()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void McCtrl::GetSerial()
 {
@@ -2595,8 +2786,12 @@ void McCtrl::GetSerial()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void McCtrl::SetDataBuff(char* buffer)
 {
@@ -2605,8 +2800,12 @@ void McCtrl::SetDataBuff(char* buffer)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void McCtrl::GetSlot()
 {
@@ -2615,8 +2814,12 @@ void McCtrl::GetSlot()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void McCtrl::SetDno(int channel)
 {
@@ -2625,8 +2828,12 @@ void McCtrl::SetDno(int channel)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void McCtrl::SetSlot(int slot)
 {
@@ -2635,8 +2842,12 @@ void McCtrl::SetSlot(int slot)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::AlphaNormal()
 {
@@ -2645,8 +2856,12 @@ void CMenuPcs::AlphaNormal()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::AlphaAdd()
 {
@@ -2655,11 +2870,16 @@ void CMenuPcs::AlphaAdd()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: TODO
+ * PAL Size: TODO
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::GetFontWorld()
 {
 	DAT_8032ee28 = 0;
 }
+
 

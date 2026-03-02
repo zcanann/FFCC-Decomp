@@ -550,10 +550,14 @@ void CGPartyObj::getBestAngleObject(float, float)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011fa88
+ * PAL Size: 800b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGPartyObj::onStatAttack(int)
+void CGPartyObj::onStatAttack(int chargeType)
 {
 	if (m_stateFrame == 0) {
 		m_rotationZ = m_rotationY;
@@ -565,7 +569,7 @@ void CGPartyObj::onStatAttack(int)
 		return;
 	}
 
-	if ((m_stateArg != 0) && (m_stateFrame > 0)) {
+	if ((chargeType != 0) && (m_stateFrame > 0)) {
 		unsigned char* self = reinterpret_cast<unsigned char*>(this);
 		if ((Pad._452_4_ == 0) && (Pad._448_4_ == -1) && ((Pad._8_2_ & 0x100) != 0)) {
 			if ((self[0x6C4] & 0x80) != 0) {
@@ -583,8 +587,12 @@ void CGPartyObj::onStatAttack(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011f9dc
+ * PAL Size: 172b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::onStatShield()
 {
@@ -596,11 +604,6 @@ void CGPartyObj::onStatShield()
 		if ((trig & 0x100) == 0) {
 			changeSubStat(3);
 		}
-		return;
-	}
-
-	if (m_subFrame > 0) {
-		changeSubStat(3);
 	}
 }
 
@@ -1620,9 +1623,9 @@ void CGPartyObj::sysControl(int controlType, int controlValue)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGPartyObj::onDrawDebug(CFont*, float, float&, float)
+void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 {
-	CGObject::onDrawDebug(0, 0.0f, *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x6FC), 0.0f);
+	CGCharaObj::onDrawDebug(font, x, y, z);
 }
 
 /*

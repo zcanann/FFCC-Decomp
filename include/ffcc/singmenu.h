@@ -41,7 +41,7 @@ public:
     void GetItemType(int, int);
     void CalcListPos(int, int, int);
     void DrawListPosMark(float, float, float);
-    void EquipChk(int);
+    int EquipChk(int);
     void DrawEquipMark(int, int, float);
     void DrawSingWin(short);
     void DrawSingWinMess(int, int, int);

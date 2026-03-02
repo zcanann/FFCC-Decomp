@@ -1421,16 +1421,15 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 				*object->m_sp++ = *value;
 			} else if ((arg & 2) != 0) {
 				--object->m_sp;
-				const int stackIndex = static_cast<int>(*object->m_sp);
 				if (index < 0) {
-					value = (arg & 0x10) == 0 ? getSystemVal(this, object, index + stackIndex)
-					                          : getClassSystemVal(this, object, index + stackIndex);
+					value = (arg & 0x10) == 0 ? getSystemVal(this, object, index + static_cast<int>(*object->m_sp))
+					                          : getClassSystemVal(this, object, index + static_cast<int>(*object->m_sp));
 				} else if ((arg & 8) == 0) {
-					value = object->m_localBase + index + stackIndex;
+					value = object->m_localBase + index + static_cast<int>(*object->m_sp);
 				} else if ((arg & 0x10) == 0) {
-					value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x28) + ((index + stackIndex) * 4));
+					value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x28) + ((index + static_cast<int>(*object->m_sp)) * 4));
 				} else {
-					value = object->m_thisBase + index + stackIndex;
+					value = object->m_thisBase + index + static_cast<int>(*object->m_sp);
 				}
 				*object->m_sp++ = *value;
 			} else if ((arg & 4) != 0) {
@@ -1466,16 +1465,15 @@ int CFlatRuntime::objectFrame(CFlatRuntime::CObject* object)
 				*object->m_sp++ = reinterpret_cast<u32>(value);
 			} else if ((arg & 2) != 0) {
 				--object->m_sp;
-				const int stackIndex = static_cast<int>(*object->m_sp);
 				if (index < 0) {
-					value = (arg & 0x10) == 0 ? getSystemVal(this, object, index + stackIndex)
-					                          : getClassSystemVal(this, object, index + stackIndex);
+					value = (arg & 0x10) == 0 ? getSystemVal(this, object, index + static_cast<int>(*object->m_sp))
+					                          : getClassSystemVal(this, object, index + static_cast<int>(*object->m_sp));
 				} else if ((arg & 8) == 0) {
-					value = object->m_localBase + index + stackIndex;
+					value = object->m_localBase + index + static_cast<int>(*object->m_sp);
 				} else if ((arg & 0x10) == 0) {
-					value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x28) + ((index + stackIndex) * 4));
+					value = reinterpret_cast<unsigned int*>(*reinterpret_cast<u8**>(self + 0x28) + ((index + static_cast<int>(*object->m_sp)) * 4));
 				} else {
-					value = object->m_thisBase + index + stackIndex;
+					value = object->m_thisBase + index + static_cast<int>(*object->m_sp);
 				}
 				*object->m_sp++ = reinterpret_cast<u32>(value);
 			} else if ((arg & 4) != 0) {

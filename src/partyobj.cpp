@@ -34,12 +34,34 @@ void CATEGOLY2TYPE(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801248a4
+ * PAL Size: 244b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::onCreate()
 {
 	CGCharaObj::onCreate();
+
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	*reinterpret_cast<int*>(self + 0x6D0) = 0;
+	*reinterpret_cast<int*>(self + 0x6C8) = 0;
+	*reinterpret_cast<int*>(self + 0x6CC) = 0;
+	*reinterpret_cast<int*>(self + 0x6BC) = 0;
+	*reinterpret_cast<int*>(self + 0x6C0) = -1;
+	*reinterpret_cast<unsigned short*>(self + 0x6D2) = 0;
+
+	self[0x6B8] &= 0x7F;
+	self[0x6B8] &= 0xF7;
+	self[0x6B8] &= 0xBF;
+	self[0x6B8] &= 0xDF;
+	self[0x6B8] &= 0xEF;
+	self[0x6B8] &= 0xFB;
+	self[0x6B8] &= 0xFD;
+
+	*reinterpret_cast<float*>(self + 0x5BC) = FLOAT_80331a78;
 }
 
 /*
@@ -105,12 +127,21 @@ void CGPartyObj::onFrameAlways()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801233ec
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::CheckMenu()
 {
-	canPlayerGoMenu();
+	for (int i = 0; i < 4; i++) {
+		CGPartyObj* party = Game.game.m_partyObjArr[i];
+		if (party != nullptr && party->m_scriptHandle != nullptr) {
+			party->menu();
+		}
+	}
 }
 
 /*
@@ -125,11 +156,31 @@ void CGPartyObj::onFramePreCalc()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80122fdc
+ * PAL Size: 196b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::onFramePostCalc()
 {
+	if (m_scriptHandle == nullptr) {
+		return;
+	}
+
+	if (Game.game.m_gameWork.m_menuStageMode != 0 &&
+	    Game.game.m_gameWork.m_bossArtifactStageIndex < 0x0F &&
+	    m_scriptHandle[0xED] != nullptr) {
+		ghostPartyMog();
+	} else {
+		command();
+		shouki();
+	}
+
+	*reinterpret_cast<CGBaseObj**>(reinterpret_cast<unsigned char*>(this) + 0x6E4) = (CGBaseObj*)0;
+	*reinterpret_cast<CGBaseObj**>(reinterpret_cast<unsigned char*>(this) + 0x6E8) = (CGBaseObj*)0;
+	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x6EC) = 1000000.0f;
 	CGCharaObj::onFramePostCalc();
 }
 
@@ -188,22 +239,55 @@ void CGPartyObj::onAnimPoint(int no, int dataNo)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80120A90
+ * PAL Size: 228b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::enableAttackCol(int attackNo, int onOff, int isFriendly)
 {
-	CGCharaObj::enableAttackCol(attackNo, onOff, isFriendly);
+	(void)attackNo;
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	if (onOff == 0) {
+		*reinterpret_cast<int*>(self + 0x20C) = 0;
+		*reinterpret_cast<int*>(self + 0x23C) = 0;
+		*reinterpret_cast<int*>(self + 0x26C) = 0;
+		return;
+	}
+
+	resetIgnoreHit();
+	unsigned int hitMask = (isFriendly != 0) ? 7u : 1u;
+	*reinterpret_cast<unsigned int*>(self + 0x20C) = (hitMask & 1u) ? 1u : 0u;
+	*reinterpret_cast<unsigned int*>(self + 0x23C) = (hitMask & 2u) ? 1u : 0u;
+	*reinterpret_cast<unsigned int*>(self + 0x26C) = (hitMask & 4u) ? 1u : 0u;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801209d4
+ * PAL Size: 188b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::enableDamageCol(int onOff)
 {
-	CGCharaObj::enableDamageCol(onOff);
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	unsigned int hitMask = 4;
+	if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
+		hitMask = 8;
+	}
+
+	if (onOff == 0) {
+		*reinterpret_cast<unsigned int*>(self + 0x384) = 0;
+		*reinterpret_cast<unsigned int*>(self + 0x3AC) = 0;
+	} else {
+		*reinterpret_cast<unsigned int*>(self + 0x384) = hitMask;
+		*reinterpret_cast<unsigned int*>(self + 0x3AC) = hitMask;
+	}
 }
 
 /*
@@ -308,12 +392,20 @@ void CGPartyObj::putComboParticle()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011f5a4
+ * PAL Size: 1028b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGPartyObj::putTargetParticle(int, int)
+void CGPartyObj::putTargetParticle(int targetSide, int doInit)
 {
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	if (doInit != 0) {
+		self[0x6B8] = (self[0x6B8] & 0xBF) | ((targetSide != 0) ? 0x40 : 0x00);
+		self[0x6B8] &= 0xEF;
+	}
 	*reinterpret_cast<Vec*>(self + 0x678) = *reinterpret_cast<Vec*>(self + 0x15C);
 	*reinterpret_cast<Vec*>(self + 0x66C) = *reinterpret_cast<Vec*>(self + 0x15C);
 }
@@ -378,14 +470,21 @@ int CGPartyObj::isRideTarget()
  */
 void CGPartyObj::checkTargetParticle()
 {
-	// Basic particle checking implementation
-	// This is a simplified version focusing on compilation and basic structure
-	
-	// First pass: keep center/target vectors valid while porting larger logic.
-	Vec targetPos;
-	targetPos.x = 0.0f;
-	targetPos.y = 0.0f; 
-	targetPos.z = 0.0f;
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	unsigned char flags = self[0x6B8];
+
+	if ((flags & 0x10) != 0) {
+		putTargetParticle((flags & 0x80) ? 1 : 0, 0);
+		self[0x6B8] &= 0xEF;
+	}
+
+	Vec delta;
+	PSVECSubtract(reinterpret_cast<Vec*>(self + 0x66C), &m_worldPosition, &delta);
+	if (delta.x == FLOAT_80331a78 && delta.z == FLOAT_80331a78) {
+		self[0x6B8] &= 0xDF;
+	} else {
+		self[0x6B8] |= 0x20;
+	}
 }
 
 /*
@@ -518,11 +617,32 @@ void CGPartyObj::onPush(CGBaseObj*, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011e0ec
+ * PAL Size: 168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGPartyObj::onTalk(CGBaseObj*, int)
+void CGPartyObj::onTalk(CGBaseObj* other, int talkType)
 {
+	(void)talkType;
+	if (other == nullptr) {
+		return;
+	}
+
+	CGObject* targetObj = reinterpret_cast<CGObject*>(other);
+	if (targetObj->GetCID() == 0x23) {
+		*reinterpret_cast<CGBaseObj**>(reinterpret_cast<unsigned char*>(this) + 0x6E8) = other;
+		return;
+	}
+
+	float dist = PSVECDistance(&m_worldPosition, &targetObj->m_worldPosition);
+	float* bestDist = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x6EC);
+	if (dist < *bestDist) {
+		*reinterpret_cast<CGBaseObj**>(reinterpret_cast<unsigned char*>(this) + 0x6E4) = other;
+		*bestDist = dist;
+	}
 }
 
 /*
@@ -671,28 +791,60 @@ int CGPartyObj::canPlayerPutItem()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011cd10
+ * PAL Size: 300b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::putItem(int)
 {
 	if (canPlayerPutItem() == 0) {
 		return;
 	}
-	changeStat(0x1B, 0, 0);
+
+	int itemId = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6E0);
+	void* created = CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
+	    0, 9, itemId, this, FLOAT_80331a78, nullptr);
+	if (created == nullptr) {
+		return;
+	}
+
+	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(created) + 0x562) =
+	    static_cast<short>(reinterpret_cast<int>(m_scriptHandle[0xED]));
+	if (Game.game.m_gameWork.m_menuStageMode == 0) {
+		changeStat(0x1B, 0, 0);
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011cbdc
+ * PAL Size: 308b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGPartyObj::putGil(int)
+void CGPartyObj::putGil(int amount)
 {
 	if (canPlayerPutItem() == 0) {
 		return;
 	}
-	changeStat(0x1B, 0, 0);
+
+	void* created = CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
+	    2, 1, amount, this, FLOAT_80331a78, nullptr);
+	if (created == nullptr) {
+		return;
+	}
+
+	*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(created) + 0x560) = 1;
+	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(created) + 0x562) =
+	    static_cast<short>(reinterpret_cast<int>(m_scriptHandle[0xED]));
+	if (Game.game.m_gameWork.m_menuStageMode == 0) {
+		changeStat(0x1B, 0, 0);
+	}
 }
 
 /*
@@ -790,8 +942,12 @@ void CGPartyObj::changeWeapon(int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011c9c8
+ * PAL Size: 240b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::CheckGameOver()
 {
@@ -799,6 +955,9 @@ void CGPartyObj::CheckGameOver()
 	for (int i = 0; i < 4; i++) {
 		CGPartyObj* party = Game.game.m_partyObjArr[i];
 		if (party == nullptr) {
+			continue;
+		}
+		if (party->m_scriptHandle == nullptr) {
 			continue;
 		}
 		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(party->m_scriptHandle) + 0x1C) != 0) {
@@ -824,8 +983,12 @@ void CGPartyObj::SetBonusCondition(int, int, int, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011c6e8
+ * PAL Size: 248b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::InitFinished()
 {
@@ -833,26 +996,43 @@ void CGPartyObj::InitFinished()
 	    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6DC),
 	    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6E0));
 	enableDamageCol(1);
+	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0xBD0) = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011c678
+ * PAL Size: 112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::IsDispRader()
 {
-	(void)CGObject::IsDispRader();
+	if (CGObject::IsDispRader()) {
+		bool canDisp =
+		    ((int)((unsigned int)(unsigned char)m_weaponNodeFlags << 24) < 0) &&
+		    ((int)((unsigned int)(unsigned char)(m_weaponNodeFlags >> 8) << 24) < 0);
+		(void)canDisp;
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011c59c
+ * PAL Size: 220b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGPartyObj::ChangeCommandMode(int)
+void CGPartyObj::ChangeCommandMode(int mode)
 {
-	*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(this) + 0x6F4) = 0;
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	if (*reinterpret_cast<short*>(self + 0x6F4) != mode) {
+		*reinterpret_cast<short*>(self + 0x6F4) = static_cast<short>(mode);
+	}
 }
 
 /*
@@ -915,8 +1095,12 @@ void CGPartyObj::setAlive(int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011bce0
+ * PAL Size: 80b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGPartyObj::PutMemoryCapsule(int, int, int, int, char*)
 {
@@ -931,22 +1115,30 @@ void CGPartyObj::PutMemoryCapsule(int, int, int, int, char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011bc34
+ * PAL Size: 172b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGPartyObj::onDamaged(CGPrgObj*)
+void CGPartyObj::onDamaged(CGPrgObj* attacker)
 {
-	CGPrgObj::onDamaged((CGPrgObj*)0);
+	CGPrgObj::onDamaged(attacker);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8011bb88
+ * PAL Size: 172b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CGPartyObj::onAttacked(CGPrgObj*)
+void CGPartyObj::onAttacked(CGPrgObj* attacker)
 {
-	CGPrgObj::onAttacked((CGPrgObj*)0);
+	CGPrgObj::onAttacked(attacker);
 }
 
 /*

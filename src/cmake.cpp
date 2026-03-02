@@ -209,14 +209,17 @@ void CMenuPcs::CalcSingCMake()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80173794
+ * PAL Size: 1040b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawSingCMake()
 {
     int state = MenuS32(this, 0x82C);
     short step = *reinterpret_cast<short*>(state + 0x16);
-    short mode = *reinterpret_cast<short*>(state + 0x10);
     float alpha = 1.0f;
 
     DrawDiaryBase(step, alpha);
@@ -235,13 +238,61 @@ void CMenuPcs::DrawSingCMake()
     case 4:
         CmakeJobDraw();
         break;
+    case 5:
+        CmakeResultDraw();
+        break;
+    case 6:
+        CmakeResultDraw1();
+        break;
     default:
         CmakeResultDraw();
         break;
     }
 
-    if (mode == 2) {
-        DrawCmakeDecision(*reinterpret_cast<short*>(state + 0x1E), alpha);
+    if (*reinterpret_cast<short*>(state + 0x2E) != 0) {
+        short& mode = *reinterpret_cast<short*>(state + 0x10);
+        short& resultDir = *reinterpret_cast<short*>(state + 0x1E);
+        short& frame = *reinterpret_cast<short*>(state + 0x22);
+
+        if (mode < 2) {
+            mode = mode + 1;
+        } else {
+            if (step == 6) {
+                *reinterpret_cast<short*>(state + 0x16) = *reinterpret_cast<short*>(state + 0x26) + 1;
+                if (*reinterpret_cast<short*>(state + 0x16) == 0) {
+                    mode = 2;
+                } else {
+                    mode = 0;
+                }
+            } else if (resultDir < 0) {
+                if (step == 5) {
+                    *reinterpret_cast<short*>(state + 0x16) = 6;
+                } else if (step > 0) {
+                    *reinterpret_cast<short*>(state + 0x16) = step - 1;
+                }
+                if (*reinterpret_cast<short*>(state + 0x16) == 0) {
+                    mode = 2;
+                } else {
+                    mode = 0;
+                }
+            } else if (step != 5) {
+                *reinterpret_cast<short*>(state + 0x16) = step + 1;
+                if (*reinterpret_cast<short*>(state + 0x16) == 0) {
+                    mode = 2;
+                } else {
+                    mode = 0;
+                }
+            } else {
+                *reinterpret_cast<short*>(state + 0x16) = 0;
+                mode = 2;
+            }
+
+            *reinterpret_cast<unsigned char*>(state + 0x0C) = 0;
+            frame = 0;
+            *reinterpret_cast<short*>(MenuS32(this, 0x848) + 10) = 3;
+        }
+
+        *reinterpret_cast<short*>(state + 0x2E) = 0;
     }
 }
 
@@ -270,8 +321,12 @@ void CMenuPcs::DrawCmakeWin(float x, float y, float alpha)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80173258
+ * PAL Size: 724b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawCmakeTitle(int page, float x, float alpha)
 {
@@ -315,8 +370,12 @@ void CMenuPcs::DrawCmakePageMark(float alpha)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80172ef8
+ * PAL Size: 864b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawCmakeDecision(int yesNoSel, float alpha)
 {
@@ -355,8 +414,12 @@ void CMenuPcs::DrawCmakeCrest(int tribe, int x, int y, float alpha)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80172c1c
+ * PAL Size: 732b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawCmakeName(int x, int y, char* text, float alpha)
 {
@@ -386,8 +449,12 @@ void CMenuPcs::AddNameChara(int c, int slot, int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801728bc
+ * PAL Size: 864b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawCmakeYesNo(int yesNoSel, float alpha)
 {
@@ -473,8 +540,12 @@ void CMenuPcs::CmakeNameOpen()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80171fa0
+ * PAL Size: 2332b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CmakeNameCtrl()
 {
@@ -514,8 +585,12 @@ void CMenuPcs::CmakeNameClose()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80171340
+ * PAL Size: 3168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CmakeNameDraw()
 {
@@ -572,8 +647,12 @@ void CMenuPcs::CmakeSexClose()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80170ce8
+ * PAL Size: 1624b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CmakeSexDraw()
 {
@@ -595,8 +674,12 @@ void CMenuPcs::CmakeTribeOpen()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801708b0
+ * PAL Size: 1080b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CmakeTribeCtrl()
 {
@@ -629,8 +712,12 @@ void CMenuPcs::CmakeTribeClose()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8016ffbc
+ * PAL Size: 2292b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CmakeTribeDraw()
 {
@@ -652,8 +739,12 @@ void CMenuPcs::CmakeJobOpen()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8016fb38
+ * PAL Size: 1156b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CmakeJobCtrl()
 {
@@ -687,8 +778,12 @@ void CMenuPcs::CmakeJobClose()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8016f4f8
+ * PAL Size: 1600b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CmakeJobDraw()
 {
@@ -739,12 +834,32 @@ void CMenuPcs::CmakeResultClose()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8016ea78
+ * PAL Size: 2688b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CmakeResultDraw()
 {
-    CmakeResultDraw1();
+    int state = MenuS32(this, 0x82C);
+    short mode = *reinterpret_cast<short*>(state + 0x10);
+    short resultDir = *reinterpret_cast<short*>(state + 0x1E);
+
+    DrawCmakeTitle(6, 0.0f, 1.0f);
+    DrawCmakeCharaText(6, 1.0f);
+    DrawCmakeCrest(MenuS16(this, 0x862), 0, 0, 1.0f);
+
+    if (mode == 1) {
+        DrawCmakeYesNo(*reinterpret_cast<short*>(state + 0x26) + 1, 1.0f);
+    } else {
+        DrawCmakeYesNo(0, 1.0f);
+    }
+
+    if (mode == 2 && resultDir < 0) {
+        DrawCmakeDecision(-1, 1.0f);
+    }
 }
 
 /*
@@ -787,12 +902,19 @@ void CMenuPcs::CmakeResultClose1()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8016e0d4
+ * PAL Size: 2468b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CmakeResultDraw1()
 {
-    DrawCmakeDecision(1, 1.0f);
+    DrawCmakeTitle(7, 0.0f, 1.0f);
+    DrawCmakeCharaText(7, 1.0f);
+    DrawCmakeCrest(MenuS16(this, 0x862), 0, 0, 1.0f);
+    DrawCmakeYesNo(0, 1.0f);
 }
 
 /*
@@ -808,8 +930,12 @@ void CMenuPcs::CmakeVillageOpen()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8016d940
+ * PAL Size: 1940b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CmakeVillageCtrl()
 {
@@ -829,8 +955,12 @@ void CMenuPcs::CmakeVillageClose()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8016d25c
+ * PAL Size: 1764b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CmakeVillageDraw()
 {

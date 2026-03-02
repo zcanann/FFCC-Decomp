@@ -16,8 +16,8 @@ extern CharaGlobal Chara;
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 0b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -37,8 +37,8 @@ void D3DXMatrixMultiplyRotate(float (*out)[4], float (*a)[4], float (*b)[4])
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 0b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -126,7 +126,7 @@ void CChara::Destroy()
 /*
  * --INFO--
  * PAL Address: 0x8007392c
- * PAL Size: 68b
+ * PAL Size: 36b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -162,8 +162,8 @@ void CChara::gqrInit(unsigned long, unsigned long, unsigned long)
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 0b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -498,8 +498,8 @@ void CChara::CModel::CalcSkin()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 0b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -615,8 +615,8 @@ void CChara::CModel::dynamics(CChara::CNode* node, CChara::CNode* parent)
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 0b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -751,8 +751,8 @@ void CChara::CModel::DrawShadow(float (*view)[4], int zMode)
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 0b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -952,8 +952,8 @@ void CChara::CNode::Create(CChunkFile& chunk, CChara::CModel* model, CChara::CNo
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 0b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -1070,8 +1070,8 @@ void CChara::CMesh::Create(CChara::CModel* model, CChunkFile& chunk, CMemory::CS
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 0b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -1096,18 +1096,139 @@ void CChara::CMesh::Duplicate(CChara::CMesh* src, CMemory::CStage* stage)
  */
 void CChara::CMesh::skin(int meshIndex, int start, int count, CChara::CSkin* skinRef, void* srcPos, void* srcNrm, void* srcWgt, S16Vec* dstPos, S16Vec* dstNrm, S16Vec* dstTan, S16Vec* dstBinorm)
 {
-	(void)meshIndex;
-	(void)start;
-	(void)count;
-	(void)skinRef;
-	(void)srcPos;
-	(void)srcNrm;
-	(void)srcWgt;
-	(void)dstPos;
-	(void)dstNrm;
-	(void)dstTan;
-	(void)dstBinorm;
-	// Ghidra shows heavy quantized skinning math; stubbed first-pass implementation.
+	u8* oneWeightData = (u8*)srcPos;
+	u8* twoWeightData = (u8*)srcNrm;
+	u8* threeWeightData = (u8*)srcWgt;
+	S16Vec* srcVertices = dstPos;
+	S16Vec* outVertices = dstNrm;
+	S16Vec* srcNormals = dstTan;
+	S16Vec* outNormals = dstBinorm;
+
+	for (int i = 0; i < meshIndex; i++) {
+		u32 skinIndex = oneWeightData[0];
+		u16 vertexIndex = *(u16*)(oneWeightData + 2);
+		u16 normalCount = *(u16*)(oneWeightData + 4);
+		float* m = (float*)((u8*)skinRef + (skinIndex * 0x64));
+
+		float x = (float)srcVertices[vertexIndex].x;
+		float y = (float)srcVertices[vertexIndex].y;
+		float z = (float)srcVertices[vertexIndex].z;
+		outVertices[vertexIndex].x = (s16)(m[0] * x + m[1] * y + m[2] * z + m[3]);
+		outVertices[vertexIndex].y = (s16)(m[4] * x + m[5] * y + m[6] * z + m[7]);
+		outVertices[vertexIndex].z = (s16)(m[8] * x + m[9] * y + m[10] * z + m[11]);
+
+		for (u16 j = 0; j < normalCount; j++) {
+			u16 normalIndex = *(u16*)(oneWeightData + 6 + (j * 2));
+			float nx = (float)srcNormals[normalIndex].x;
+			float ny = (float)srcNormals[normalIndex].y;
+			float nz = (float)srcNormals[normalIndex].z;
+			outNormals[normalIndex].x = (s16)(m[0] * nx + m[1] * ny + m[2] * nz);
+			outNormals[normalIndex].y = (s16)(m[4] * nx + m[5] * ny + m[6] * nz);
+			outNormals[normalIndex].z = (s16)(m[8] * nx + m[9] * ny + m[10] * nz);
+		}
+
+		oneWeightData += 8 + (normalCount * 2);
+	}
+
+	for (int i = 0; i < start; i++) {
+		u32 skinIndexA = twoWeightData[0];
+		u32 skinIndexB = *(u16*)(twoWeightData + 2);
+		u16 wAraw = *(u16*)(twoWeightData + 4);
+		u16 wBraw = *(u16*)(twoWeightData + 6);
+		u16 vertexIndex = *(u16*)(twoWeightData + 8);
+		u16 normalCount = *(u16*)(twoWeightData + 10);
+		float totalW = (float)(wAraw + wBraw);
+		float wA = totalW > 0.0f ? (float)wAraw / totalW : 1.0f;
+		float wB = totalW > 0.0f ? (float)wBraw / totalW : 0.0f;
+		float* mA = (float*)((u8*)skinRef + (skinIndexA * 0x64));
+		float* mB = (float*)((u8*)skinRef + (skinIndexB * 0x64));
+
+		float x = (float)srcVertices[vertexIndex].x;
+		float y = (float)srcVertices[vertexIndex].y;
+		float z = (float)srcVertices[vertexIndex].z;
+		float pxA = mA[0] * x + mA[1] * y + mA[2] * z + mA[3];
+		float pyA = mA[4] * x + mA[5] * y + mA[6] * z + mA[7];
+		float pzA = mA[8] * x + mA[9] * y + mA[10] * z + mA[11];
+		float pxB = mB[0] * x + mB[1] * y + mB[2] * z + mB[3];
+		float pyB = mB[4] * x + mB[5] * y + mB[6] * z + mB[7];
+		float pzB = mB[8] * x + mB[9] * y + mB[10] * z + mB[11];
+		outVertices[vertexIndex].x = (s16)(pxA * wA + pxB * wB);
+		outVertices[vertexIndex].y = (s16)(pyA * wA + pyB * wB);
+		outVertices[vertexIndex].z = (s16)(pzA * wA + pzB * wB);
+
+		for (u16 j = 0; j < normalCount; j++) {
+			u16 normalIndex = *(u16*)(twoWeightData + 12 + (j * 2));
+			float nx = (float)srcNormals[normalIndex].x;
+			float ny = (float)srcNormals[normalIndex].y;
+			float nz = (float)srcNormals[normalIndex].z;
+			float nxa = mA[0] * nx + mA[1] * ny + mA[2] * nz;
+			float nya = mA[4] * nx + mA[5] * ny + mA[6] * nz;
+			float nza = mA[8] * nx + mA[9] * ny + mA[10] * nz;
+			float nxb = mB[0] * nx + mB[1] * ny + mB[2] * nz;
+			float nyb = mB[4] * nx + mB[5] * ny + mB[6] * nz;
+			float nzb = mB[8] * nx + mB[9] * ny + mB[10] * nz;
+			outNormals[normalIndex].x = (s16)(nxa * wA + nxb * wB);
+			outNormals[normalIndex].y = (s16)(nya * wA + nyb * wB);
+			outNormals[normalIndex].z = (s16)(nza * wA + nzb * wB);
+		}
+
+		twoWeightData += 12 + (normalCount * 2);
+	}
+
+	for (int i = 0; i < count; i++) {
+		u32 skinIndexA = *(u16*)(threeWeightData + 0);
+		u32 skinIndexB = *(u16*)(threeWeightData + 2);
+		u32 skinIndexC = *(u16*)(threeWeightData + 4);
+		u16 wAraw = *(u16*)(threeWeightData + 6);
+		u16 wBraw = *(u16*)(threeWeightData + 8);
+		u16 wCraw = *(u16*)(threeWeightData + 10);
+		u16 vertexIndex = *(u16*)(threeWeightData + 12);
+		u16 normalCount = *(u16*)(threeWeightData + 14);
+		float totalW = (float)(wAraw + wBraw + wCraw);
+		float wA = totalW > 0.0f ? (float)wAraw / totalW : 1.0f;
+		float wB = totalW > 0.0f ? (float)wBraw / totalW : 0.0f;
+		float wC = totalW > 0.0f ? (float)wCraw / totalW : 0.0f;
+		float* mA = (float*)((u8*)skinRef + (skinIndexA * 0x64));
+		float* mB = (float*)((u8*)skinRef + (skinIndexB * 0x64));
+		float* mC = (float*)((u8*)skinRef + (skinIndexC * 0x64));
+
+		float x = (float)srcVertices[vertexIndex].x;
+		float y = (float)srcVertices[vertexIndex].y;
+		float z = (float)srcVertices[vertexIndex].z;
+		float pxA = mA[0] * x + mA[1] * y + mA[2] * z + mA[3];
+		float pyA = mA[4] * x + mA[5] * y + mA[6] * z + mA[7];
+		float pzA = mA[8] * x + mA[9] * y + mA[10] * z + mA[11];
+		float pxB = mB[0] * x + mB[1] * y + mB[2] * z + mB[3];
+		float pyB = mB[4] * x + mB[5] * y + mB[6] * z + mB[7];
+		float pzB = mB[8] * x + mB[9] * y + mB[10] * z + mB[11];
+		float pxC = mC[0] * x + mC[1] * y + mC[2] * z + mC[3];
+		float pyC = mC[4] * x + mC[5] * y + mC[6] * z + mC[7];
+		float pzC = mC[8] * x + mC[9] * y + mC[10] * z + mC[11];
+		outVertices[vertexIndex].x = (s16)(pxA * wA + pxB * wB + pxC * wC);
+		outVertices[vertexIndex].y = (s16)(pyA * wA + pyB * wB + pyC * wC);
+		outVertices[vertexIndex].z = (s16)(pzA * wA + pzB * wB + pzC * wC);
+
+		for (u16 j = 0; j < normalCount; j++) {
+			u16 normalIndex = *(u16*)(threeWeightData + 16 + (j * 2));
+			float nx = (float)srcNormals[normalIndex].x;
+			float ny = (float)srcNormals[normalIndex].y;
+			float nz = (float)srcNormals[normalIndex].z;
+			float nxa = mA[0] * nx + mA[1] * ny + mA[2] * nz;
+			float nya = mA[4] * nx + mA[5] * ny + mA[6] * nz;
+			float nza = mA[8] * nx + mA[9] * ny + mA[10] * nz;
+			float nxb = mB[0] * nx + mB[1] * ny + mB[2] * nz;
+			float nyb = mB[4] * nx + mB[5] * ny + mB[6] * nz;
+			float nzb = mB[8] * nx + mB[9] * ny + mB[10] * nz;
+			float nxc = mC[0] * nx + mC[1] * ny + mC[2] * nz;
+			float nyc = mC[4] * nx + mC[5] * ny + mC[6] * nz;
+			float nzc = mC[8] * nx + mC[9] * ny + mC[10] * nz;
+			outNormals[normalIndex].x = (s16)(nxa * wA + nxb * wB + nxc * wC);
+			outNormals[normalIndex].y = (s16)(nya * wA + nyb * wB + nyc * wC);
+			outNormals[normalIndex].z = (s16)(nza * wA + nzb * wB + nzc * wC);
+		}
+
+		threeWeightData += 16 + (normalCount * 2);
+	}
 }
 
 /*
@@ -1231,8 +1352,8 @@ CChara::CSkin::~CSkin()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 0b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -1247,8 +1368,8 @@ void CChara::CSkin::Create(CChunkFile& chunk, CMemory::CStage* stage)
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 0b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -1261,8 +1382,8 @@ void CChara::CAnimNode::IsScale()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: 0b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO

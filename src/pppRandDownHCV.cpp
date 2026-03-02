@@ -8,8 +8,6 @@ extern s16 lbl_801EADC8[];
 extern float lbl_8032FF48;
 extern "C" float RandF__5CMathFv(CMath* instance);
 
-extern "C" {
-
 /*
  * --INFO--
  * Address: TODO
@@ -29,7 +27,7 @@ void randshort(short value, float multiplier)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRandDownHCV(void* param1, void* param2, void* param3)
+extern "C" void pppRandDownHCV(void* param1, void* param2, void* param3)
 {
     if (lbl_8032ED70 != 0) {
         return;
@@ -77,6 +75,4 @@ void pppRandDownHCV(void* param1, void* param2, void* param3)
             target[3] = (s16)(target[3] + (int)((float)base * scale));
         }
     }
-}
-
 }

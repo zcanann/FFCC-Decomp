@@ -85,7 +85,7 @@ public:
     int CanAddComList(int);
     void AddComList(int, int*);
     void DeleteCmdList(int, int);
-    void AddItem(int, int*);
+    int AddItem(int, int*);
     void SetArtifact(int, int);
     void FGAddItemIdx(int, int);
     void ChkNumItem(char*, int);

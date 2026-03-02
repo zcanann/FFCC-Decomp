@@ -1,5 +1,6 @@
 #include "ffcc/gobjwork.h"
 #include "ffcc/gbaque.h"
+#include "ffcc/joybus.h"
 #include "ffcc/partyobj.h"
 #include "ffcc/p_game.h"
 #include "ffcc/system.h"
@@ -537,12 +538,32 @@ void CCaravanWork::DeleteCmdList(int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a1f08
+ * PAL Size: 180b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::AddItem(int, int*)
+int CCaravanWork::AddItem(int itemId, int* outSlot)
 {
-	// TODO
+	if ((unsigned short)m_inventoryItemCount >= 0x40) {
+		return 0;
+	}
+
+	for (unsigned int i = 0; i < 0x40; i++) {
+		if (m_inventoryItems[i] == 0xFFFF) {
+			m_inventoryItems[i] = (unsigned short)itemId;
+			m_inventoryItemCount = (short)(m_inventoryItemCount + 1);
+			Joybus.SetItem(m_joybusCaravanId, (unsigned char)i, (short)itemId);
+			if (outSlot != 0) {
+				*outSlot = i;
+			}
+			return 1;
+		}
+	}
+
+	return 0;
 }
 
 /*

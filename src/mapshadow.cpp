@@ -35,14 +35,14 @@ void CMapShadowInsertOctTree(CMapShadow::TARGET mapShadow, COctTree& octTree)
 		for (i = 0; i < ((CPtrArray<CMapShadow>*)((char*)&MapMng + 0x21434))->GetSize(); i++) {
 			if (((*(u32*)(*(u32*)((char*)&octTree + 0x8) + 0x3c) & (1U << i)) != 0)
 			    && ((shadow = (*(CPtrArray<CMapShadow>*)((char*)&MapMng + 0x21434))[i]),
-			        (*(u8*)((char*)shadow + (int)mapShadow + 0xf0) != 0))
-			    && (*(u8*)((char*)shadow + 0x7) == 0)) {
-				model = *(int*)((char*)shadow + 0xc);
+			        (shadow->m_targetEnabled[(int)mapShadow] != 0))
+			    && (shadow->m_materialMode == 0)) {
+				model = (int)shadow->m_modelA;
 				pos.x = *(float*)(model + 0xc4);
 				pos.y = *(float*)(model + 0xd4);
 				pos.z = *(float*)(model + 0xe4);
 
-				bound = (CBound*)((char*)shadow + (int)mapShadow * 0x18 + 0xc0);
+				bound = (CBound*)(shadow->m_targetBounds + (int)mapShadow * 0x18);
 				octTree.InsertShadow(i, pos, *bound);
 			}
 		}
@@ -66,23 +66,23 @@ void CMapShadow::Init()
 	u32 materialIndex;
 
 	materialArray = *(int*)((char*)&MapMng + 0x213d4);
-	materialIndex = *(u16*)((char*)this + 4);
+	materialIndex = m_materialIndex;
 	material = (int)(((CPtrArray<CMaterial*>*)(materialArray + 8))->operator[](materialIndex));
 	material = *(int*)(material + 0x3c);
 	materialWidth = *(u32*)(material + 0x64);
 	materialHeight = *(u32*)(material + 0x68);
 	materialMode = *(u32*)(material + 0x6c);
-	*((u8*)this + 7) = materialMode;
+	m_materialMode = (u8)materialMode;
 	width = (float)materialWidth;
 	height = (float)materialHeight;
-	if (*(u8*)((char*)this + 6) != 0) {
-		float scale = *(float*)((char*)this + 0xa8);
-		C_MTXLightFrustum((MtxPtr)((char*)this + 0x48), -height, height, -width, width, *(float*)((char*)this + 0xac),
+	if (m_useFrustum != 0) {
+		float scale = m_shadowScale;
+		C_MTXLightFrustum(m_lightMtx, -height, height, -width, width, m_frustumNear,
 		                  (float)(DOUBLE_8032fce8 * (double)scale), FLOAT_8032fcf0 * scale, FLOAT_8032fcf0,
 		                  FLOAT_8032fcf0);
 	} else {
-		float scale = *(float*)((char*)this + 0xa8);
-		C_MTXLightOrtho((MtxPtr)((char*)this + 0x48), -height, height, -width, width,
+		float scale = m_shadowScale;
+		C_MTXLightOrtho(m_lightMtx, -height, height, -width, width,
 		                (float)(DOUBLE_8032fce8 * (double)scale), FLOAT_8032fcf0 * scale, FLOAT_8032fcf0,
 		                FLOAT_8032fcf0);
 	}
@@ -98,14 +98,14 @@ void CMapShadow::Calc()
 	float fVar1;
 	
 	fVar1 = FLOAT_8032fce0;
-	*(float*)((char*)this + 0x54) = *(float*)((char*)this + 0x54) + *(float*)((char*)this + 0xb8);
-	if (fVar1 < *(float*)((char*)this + 0x54)) {
-		*(float*)((char*)this + 0x54) = *(float*)((char*)this + 0x54) - fVar1;
+	m_lightMtx[0][3] = m_lightMtx[0][3] + m_scrollStepX;
+	if (fVar1 < m_lightMtx[0][3]) {
+		m_lightMtx[0][3] = m_lightMtx[0][3] - fVar1;
 	}
 	fVar1 = FLOAT_8032fce0;
-	*(float*)((char*)this + 0x64) = *(float*)((char*)this + 0x64) + *(float*)((char*)this + 0xbc);
-	if (*(float*)((char*)this + 0x64) > fVar1) {
-		*(float*)((char*)this + 0x64) = *(float*)((char*)this + 0x64) - fVar1;
+	m_lightMtx[1][3] = m_lightMtx[1][3] + m_scrollStepY;
+	if (m_lightMtx[1][3] > fVar1) {
+		m_lightMtx[1][3] = m_lightMtx[1][3] - fVar1;
 	}
 }
 
@@ -122,20 +122,20 @@ void CMapShadow::Draw()
 	Vec local_2c;
 	Vec VStack_38;
 	
-	iVar1 = *(int*)((char*)this + 0xc);
+	iVar1 = (int)m_modelA;
 	local_14.x = *(float*)(iVar1 + 0xc4);
 	local_14.y = *(float*)(iVar1 + 0xd4);
 	local_14.z = *(float*)(iVar1 + 0xe4);
-	iVar1 = *(int*)((char*)this + 0x14);
+	iVar1 = (int)m_modelC;
 	local_20.x = *(float*)(iVar1 + 0xc4);
 	local_20.y = *(float*)(iVar1 + 0xd4);
 	local_20.z = *(float*)(iVar1 + 0xe4);
-	iVar1 = *(int*)((char*)this + 0x10);
+	iVar1 = (int)m_modelB;
 	local_2c.x = *(float*)(iVar1 + 0xc4);
 	local_2c.y = *(float*)(iVar1 + 0xd4);
 	local_2c.z = *(float*)(iVar1 + 0xe4);
 	PSVECSubtract(&local_20, &local_14, &local_20);
 	PSVECSubtract(&local_2c, &local_14, &VStack_38);
-	C_MTXLookAt((MtxPtr)((char*)this + 0x18), (Point3d*)&local_14, &local_20, (Point3d*)&local_2c);
-	PSMTXConcat((MtxPtr)((char*)this + 0x48), (MtxPtr)((char*)this + 0x18), (MtxPtr)((char*)this + 0x78));
+	C_MTXLookAt(m_viewMtx, (Point3d*)&local_14, &local_20, (Point3d*)&local_2c);
+	PSMTXConcat(m_lightMtx, m_viewMtx, m_shadowMtx);
 }

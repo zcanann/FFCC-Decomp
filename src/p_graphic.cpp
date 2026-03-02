@@ -154,27 +154,27 @@ int CGraphicPcs::GetTable(unsigned long index)
 void CGraphicPcs::create()
 {
     _InitGxFunc();
-    *(int*)((char*)this + 0xb8) = 0;
-    *(int*)((char*)this + 0xbc) = 0;
-    *(int*)((char*)this + 0xc0) = 0;
-    *(char*)((char*)this + 0xc4) = 1;
-    *(float*)((char*)this + 0xc8) = FLOAT_8032fbfc;
-    *(float*)((char*)this + 0xcc) = FLOAT_8032fc00;
-    *(char*)((char*)this + 0xe0) = 0;
-    *(int*)((char*)this + 0xd0) = 0;
-    *(float*)((char*)this + 0xd4) = FLOAT_8032fb78;
-    *(float*)((char*)this + 0xd8) = FLOAT_8032fb78;
-    *(float*)((char*)this + 0xdc) = FLOAT_8032fb78;
-    memset((char*)this + 4, 0, 0xb0);
-    *(int*)((char*)this + 0xe4) = 0;
-    *(int*)((char*)this + 0xe8) = 0;
-    *(char*)((char*)this + 0xec) = 0;
-    *(char*)((char*)this + 0xed) = 0;
-    *(char*)((char*)this + 0xee) = 0;
-    *(char*)((char*)this + 0xef) = 0;
-    *(char*)((char*)this + 0xf0) = 1;
-    *(char*)((char*)this + 0xf1) = 0;
-    *(short*)((char*)this + 0xf2) = 4;
+    m_unkB8 = 0;
+    m_copySaveFlag = 0;
+    m_dofFlag = 0;
+    m_dofFlagB = 1;
+    m_dofNearZ = FLOAT_8032fbfc;
+    m_dofFarZ = FLOAT_8032fc00;
+    m_dofFlagA = 0;
+    m_dofMode = 0;
+    m_dofFocus = FLOAT_8032fb78;
+    m_dofBlurNear = FLOAT_8032fb78;
+    m_dofBlurFar = FLOAT_8032fb78;
+    memset(m_screenFade, 0, sizeof(m_screenFade));
+    m_blurMode = 0;
+    m_blurFadeOutFlag = 0;
+    m_blurR = 0;
+    m_blurG = 0;
+    m_blurB = 0;
+    m_blurStep = 0;
+    m_blurA = 1;
+    m_blurMode2 = 0;
+    m_blurScale = 4;
 }
 
 /*
@@ -188,14 +188,14 @@ void CGraphicPcs::create()
  */
 void CGraphicPcs::SetDOFParameter(signed char flagA, signed char flagB, float nearZ, float farZ, float focus, float blurNear, float blurFar, int mode)
 {
-	*(char*)((char*)this + 0xc4) = flagB;
-	*(float*)((char*)this + 0xc8) = nearZ;
-	*(float*)((char*)this + 0xcc) = farZ;
-	*(char*)((char*)this + 0xe0) = flagA;
-	*(int*)((char*)this + 0xd0) = mode;
-	*(float*)((char*)this + 0xd4) = focus;
-	*(float*)((char*)this + 0xd8) = blurNear;
-	*(float*)((char*)this + 0xdc) = blurFar;
+	m_dofFlagB = flagB;
+	m_dofNearZ = nearZ;
+	m_dofFarZ = farZ;
+	m_dofFlagA = flagA;
+	m_dofMode = mode;
+	m_dofFocus = focus;
+	m_dofBlurNear = blurNear;
+	m_dofBlurFar = blurFar;
 }
 
 /*
@@ -209,13 +209,13 @@ void CGraphicPcs::SetDOFParameter(signed char flagA, signed char flagB, float ne
  */
 void CGraphicPcs::SetBlurParameter(int mode, unsigned char r, unsigned char g, unsigned char b, unsigned char a, unsigned char mode2, short scale)
 {
-    *(int*)((char*)this + 0xe4) = mode;
-    *(char*)((char*)this + 0xec) = r;
-    *(char*)((char*)this + 0xed) = g;
-    *(char*)((char*)this + 0xee) = b;
-    *(char*)((char*)this + 0xf0) = a;
-    *(char*)((char*)this + 0xf1) = mode2;
-    *(short*)((char*)this + 0xf2) = scale;
+    m_blurMode = mode;
+    m_blurR = r;
+    m_blurG = g;
+    m_blurB = b;
+    m_blurA = a;
+    m_blurMode2 = mode2;
+    m_blurScale = scale;
 }
 
 /*
@@ -239,31 +239,31 @@ void CGraphicPcs::destroy()
  */
 void CGraphicPcs::calc()
 {
-    if (*(int*)((char*)this + 0x4) > 0) {
-        *(int*)((char*)this + 0x4) = *(int*)((char*)this + 0x4) - 1;
-        if (*(int*)((char*)this + 0x4) == 0) {
-            *(int*)((char*)this + 0x1c) = 0;
+    if (m_screenFade[0].m_timer > 0) {
+        m_screenFade[0].m_timer = m_screenFade[0].m_timer - 1;
+        if (m_screenFade[0].m_timer == 0) {
+            m_screenFade[0].m_targetObj = 0;
         }
     }
 
-    if (*(int*)((char*)this + 0x30) > 0) {
-        *(int*)((char*)this + 0x30) = *(int*)((char*)this + 0x30) - 1;
-        if (*(int*)((char*)this + 0x30) == 0) {
-            *(int*)((char*)this + 0x48) = 0;
+    if (m_screenFade[1].m_timer > 0) {
+        m_screenFade[1].m_timer = m_screenFade[1].m_timer - 1;
+        if (m_screenFade[1].m_timer == 0) {
+            m_screenFade[1].m_targetObj = 0;
         }
     }
 
-    if (*(int*)((char*)this + 0x5c) > 0) {
-        *(int*)((char*)this + 0x5c) = *(int*)((char*)this + 0x5c) - 1;
-        if (*(int*)((char*)this + 0x5c) == 0) {
-            *(int*)((char*)this + 0x74) = 0;
+    if (m_screenFade[2].m_timer > 0) {
+        m_screenFade[2].m_timer = m_screenFade[2].m_timer - 1;
+        if (m_screenFade[2].m_timer == 0) {
+            m_screenFade[2].m_targetObj = 0;
         }
     }
 
-    if (*(int*)((char*)this + 0x88) > 0) {
-        *(int*)((char*)this + 0x88) = *(int*)((char*)this + 0x88) - 1;
-        if (*(int*)((char*)this + 0x88) == 0) {
-            *(int*)((char*)this + 0xa0) = 0;
+    if (m_screenFade[3].m_timer > 0) {
+        m_screenFade[3].m_timer = m_screenFade[3].m_timer - 1;
+        if (m_screenFade[3].m_timer == 0) {
+            m_screenFade[3].m_targetObj = 0;
         }
     }
 }
@@ -547,45 +547,43 @@ void CGraphicPcs::drawBar()
  */
 void CGraphicPcs::drawCopy()
 {
-	if (*(int*)((u8*)this + 0xBC) != 0) {
+	if (m_copySaveFlag != 0) {
 		Graphic.CopySaveFrameBuffer();
-		*(int*)((u8*)this + 0xBC) = 0;
+		m_copySaveFlag = 0;
 	}
 
-	if (*(int*)((u8*)this + 0xC0) != 0) {
+	if (m_dofFlag != 0) {
 		Vec target;
-		target.x = *(float*)((u8*)this + 0xD4);
-		target.y = *(float*)((u8*)this + 0xD8);
-		target.z = *(float*)((u8*)this + 0xDC);
-		Graphic.RenderDOF(*(signed char*)((u8*)this + 0xE0), *(signed char*)((u8*)this + 0xC4), *(float*)((u8*)this + 0xC8),
-		                  *(float*)((u8*)this + 0xCC), target, *(int*)((u8*)this + 0xD0));
+		target.x = m_dofFocus;
+		target.y = m_dofBlurNear;
+		target.z = m_dofBlurFar;
+		Graphic.RenderDOF(m_dofFlagA, m_dofFlagB, m_dofNearZ, m_dofFarZ, target, m_dofMode);
 	}
 
 	int initBlur = 0;
-	if ((*(int*)((u8*)this + 0xE4) == 1) && (DAT_802381a0 == 0)) {
+	if ((m_blurMode == 1) && (DAT_802381a0 == 0)) {
 		DAT_802381a0 = 1;
 		Graphic.InitBlurParameter();
 		initBlur = 1;
-		*(u8*)((u8*)this + 0xEF) = *(u8*)((u8*)this + 0xEE) / *(u8*)((u8*)this + 0xEC);
-		*(int*)((u8*)this + 0xE8) = 0;
+		m_blurStep = m_blurB / m_blurR;
+		m_blurFadeOutFlag = 0;
 	}
 
-	if ((*(int*)((u8*)this + 0xE4) != 0) || (DAT_802381a0 != 0) || (*(int*)((u8*)this + 0xE8) != 0)) {
-		if (*(int*)((u8*)this + 0xE4) != DAT_802381a0) {
-			*(int*)((u8*)this + 0xE8) = 1;
+	if ((m_blurMode != 0) || (DAT_802381a0 != 0) || (m_blurFadeOutFlag != 0)) {
+		if (m_blurMode != DAT_802381a0) {
+			m_blurFadeOutFlag = 1;
 		}
 
-		Graphic.RenderBlur(initBlur, *(u8*)((u8*)this + 0xF1), *(u8*)((u8*)this + 0xF0), *(u8*)((u8*)this + 0xED),
-		                   *(u8*)((u8*)this + 0xEE), *(s16*)((u8*)this + 0xF2));
+		Graphic.RenderBlur(initBlur, m_blurMode2, m_blurA, m_blurG, m_blurB, m_blurScale);
 
-		if (*(int*)((u8*)this + 0xE8) != 0) {
-			if ((int)((u32)*(u8*)((u8*)this + 0xEE) - (u32)*(u8*)((u8*)this + 0xEF)) < 1) {
-				*(u8*)((u8*)this + 0xEE) = 0;
-				*(int*)((u8*)this + 0xE8) = 0;
-				*(int*)((u8*)this + 0xE4) = 0;
+		if (m_blurFadeOutFlag != 0) {
+			if ((int)((u32)m_blurB - (u32)m_blurStep) < 1) {
+				m_blurB = 0;
+				m_blurFadeOutFlag = 0;
+				m_blurMode = 0;
 				DAT_802381a0 = 0;
 			} else {
-				*(u8*)((u8*)this + 0xEE) = *(u8*)((u8*)this + 0xEE) - *(u8*)((u8*)this + 0xEF);
+				m_blurB = m_blurB - m_blurStep;
 			}
 		}
 	}
@@ -731,16 +729,16 @@ unsigned int CGraphicPcs::GetScreenFadeExecutingBit()
 {
     unsigned int result = 0;
 
-    if ((*(int*)((char*)this + 0x14) != 0) || (*(int*)((char*)this + 0x4) != 0)) {
+    if ((m_screenFade[0].m_invert != 0) || (m_screenFade[0].m_timer != 0)) {
         result = 1;
     }
-    if ((*(int*)((char*)this + 0x40) != 0) || (*(int*)((char*)this + 0x30) != 0)) {
+    if ((m_screenFade[1].m_invert != 0) || (m_screenFade[1].m_timer != 0)) {
         result |= 2;
     }
-    if ((*(int*)((char*)this + 0x6C) != 0) || (*(int*)((char*)this + 0x5C) != 0)) {
+    if ((m_screenFade[2].m_invert != 0) || (m_screenFade[2].m_timer != 0)) {
         result |= 4;
     }
-    if ((*(int*)((char*)this + 0x98) != 0) || (*(int*)((char*)this + 0x88) != 0)) {
+    if ((m_screenFade[3].m_invert != 0) || (m_screenFade[3].m_timer != 0)) {
         result |= 8;
     }
 
@@ -803,10 +801,10 @@ void CGraphicPcs::drawScreenFade()
     GXLoadTexMtxImm(identityMtx, GX_TEXMTX0, GX_MTX3x4);
 
     for (int slot = 0; slot < 4; slot++) {
-        u8* slotBase = (u8*)this + slot * 0x2C;
-        const int timer = *(int*)(slotBase + 4);
-        const int duration = *(int*)(slotBase + 8);
-        const int invert = *(int*)(slotBase + 0x14);
+        ScreenFadeSlot* slotData = &m_screenFade[slot];
+        const int timer = slotData->m_timer;
+        const int duration = slotData->m_duration;
+        const int invert = slotData->m_invert;
 
         if ((invert == 0) && (timer == 0)) {
             continue;
@@ -824,8 +822,8 @@ void CGraphicPcs::drawScreenFade()
         GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_SPEC);
         _GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
-        _GXColor baseColor = *(_GXColor*)(slotBase + 0x0C);
-        _GXColor baseColor2 = *(_GXColor*)(slotBase + 0x10);
+        _GXColor baseColor = slotData->m_colorA;
+        _GXColor baseColor2 = slotData->m_colorB;
 
         float t = (float)timer / (float)duration;
         if (invert != 0) {
@@ -918,13 +916,13 @@ void CGraphicPcs::drawScreenFade()
         }
 
         if (slot == 2) {
-            const int mode = *(int*)(slotBase + 0x18);
+            const int mode = slotData->m_mode;
             if (mode == 1) {
-                ScreenFadeObjPos* obj = *(ScreenFadeObjPos**)(slotBase + 0x1C);
+                ScreenFadeObjPos* obj = (ScreenFadeObjPos*)slotData->m_targetObj;
                 if (obj != NULL) {
                     Vec pos;
                     pos.x = obj->x;
-                    pos.y = obj->y + *(float*)(slotBase + 0x20);
+                    pos.y = obj->y + slotData->m_targetYOffs;
                     pos.z = obj->z;
                     PSMTX44MultVec(worldScreenMtx, &pos, &pos);
 
@@ -971,9 +969,9 @@ void CGraphicPcs::drawScreenFade()
                 _GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
                 _GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
 
-                const float phase = *(float*)((u8*)this + 0x24);
-                const float stretch = *(float*)((u8*)this + 0x28);
-                const float amp = *(float*)((u8*)this + 0x2C) * (1.0f - t);
+                const float phase = m_screenFade[0].m_phase;
+                const float stretch = m_screenFade[0].m_stretch;
+                const float amp = m_screenFade[0].m_amplitude * (1.0f - t);
                 const float size = amp + 1.0f;
                 const float offX = stretch * (320.0f * amp) * (float)sin((double)phase);
                 const float offY = stretch * (240.0f * amp) * (float)cos((double)phase);
@@ -1000,7 +998,7 @@ void CGraphicPcs::drawScreenFade()
         }
 
         if (slot == 1) {
-            const int mode = *(int*)(slotBase + 0x18);
+            const int mode = slotData->m_mode;
             if (mode == 4) {
                 GXSetNumTexGens(1);
                 GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);

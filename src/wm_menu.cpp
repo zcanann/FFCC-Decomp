@@ -30,6 +30,12 @@ extern "C" void SetMargin__5CFontFf(float, CFont*);
 extern "C" void SetShadow__5CFontFi(CFont*, int);
 extern "C" void SetScale__5CFontFf(float, CFont*);
 extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
+extern "C" void DrawInit__5CFontFv(CFont*);
+extern "C" void SetTlut__5CFontFi(CFont*, int);
+extern "C" void SetColor__5CFontF8_GXColor(CFont*, GXColor*);
+extern "C" void SetPosX__5CFontFf(float, CFont*);
+extern "C" void SetPosY__5CFontFf(float, CFont*);
+extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" int GetWinMess__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" int GetMcWinMessBuff__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void SetFog__8CGraphicFii(void*, int, int);
@@ -410,8 +416,8 @@ void CMenuPcs::InitFrame0Info()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: 0x80101444
+ * PAL Size: 532b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -1776,7 +1782,7 @@ void CMenuPcs::RestoreProjection()
 
 /*
  * --INFO--
- * PAL Address: TODO
+ * PAL Address: UNUSED
  * PAL Size: 112b
  * EN Address: TODO
  * EN Size: TODO
@@ -2810,8 +2816,8 @@ void CMenuPcs::SetMcList(int index, McListInfo* info)
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -3133,9 +3139,93 @@ void CMenuPcs::SetMcWinInfo(int x, int y)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::DrawMcWin(short, short)
+void CMenuPcs::DrawMcWin(short state, short kind)
 {
-	DrawPageMark();
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	short* const win = reinterpret_cast<short*>(reinterpret_cast<unsigned int*>(bytes + 0x848)[0]);
+	if (win == 0) {
+		return;
+	}
+
+	if (state >= 0 && win[5] != 3) {
+		win[5] = state;
+	}
+
+	if (win[5] == 3) {
+		return;
+	}
+
+	const float x = static_cast<float>(win[0]);
+	const float y = static_cast<float>(win[1]);
+	const float w = static_cast<float>(win[2]);
+	const float h = static_cast<float>(win[3]);
+	const float step = static_cast<float>(win[4]) / 6.0f;
+
+	float sx = x;
+	float sy = y;
+	float sw = w;
+	float sh = h;
+
+	if (win[5] == 0) {
+		sx += (w * 0.5f) * (1.0f - step);
+		sy += (h * 0.5f) * (1.0f - step);
+		sw *= step;
+		sh *= step;
+	} else if (win[5] == 2) {
+		sx += (w * 0.5f) * step;
+		sy += (h * 0.5f) * step;
+		sw *= (1.0f - step);
+		sh *= (1.0f - step);
+	}
+
+	if (sw <= 1.0f || sh <= 1.0f) {
+		return;
+	}
+
+	SetAttrFmt(static_cast<CMenuPcs::FMT>(0));
+	GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
+	GXSetChanMatColor(static_cast<GXChannelID>(4), color);
+
+	const int cornerTex = (kind == 0) ? 0x2C : 0x24;
+	const int edgeHTex = (kind == 0) ? 0x2D : 0x26;
+	const int edgeVTex = (kind == 0) ? 0x2E : 0x25;
+	const int fillTex = (kind == 0) ? 0x2F : 0x27;
+	const float border = 16.0f;
+
+	SetTexture(static_cast<CMenuPcs::TEX>(cornerTex));
+	DrawRect(0xFFFFFFFF, sx, sy, border, border, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect(0xFFFFFFFF, (sx + sw) - border, sy, border, border, 0.0f, 0.0f, 1.0f, 1.0f, 8.0f);
+	DrawRect(0xFFFFFFFF, sx, (sy + sh) - border, border, border, 0.0f, 0.0f, 1.0f, 1.0f, 4.0f);
+	DrawRect(0xFFFFFFFF, (sx + sw) - border, (sy + sh) - border, border, border, 0.0f, 0.0f, 1.0f, 1.0f, 12.0f);
+
+	SetTexture(static_cast<CMenuPcs::TEX>(edgeHTex));
+	DrawRect(0xFFFFFFFF, sx + border, sy, sw - border * 2.0f, border, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect(0xFFFFFFFF, sx + border, (sy + sh) - border, sw - border * 2.0f, border, 0.0f, 0.0f, 1.0f, 1.0f, 4.0f);
+
+	SetTexture(static_cast<CMenuPcs::TEX>(edgeVTex));
+	DrawRect(0xFFFFFFFF, sx, sy + border, border, sh - border * 2.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+	DrawRect(0xFFFFFFFF, (sx + sw) - border, sy + border, border, sh - border * 2.0f, 0.0f, 0.0f, 1.0f, 1.0f, 8.0f);
+
+	SetTexture(static_cast<CMenuPcs::TEX>(fillTex));
+	DrawRect(0xFFFFFFFF, sx + border, sy + border, sw - border * 2.0f, sh - border * 2.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
+
+	DrawMcWinMess(win[5], kind);
+
+	if (win[5] == 0) {
+		win[4]++;
+		if (win[4] >= 6) {
+			win[4] = 6;
+			win[5] = 1;
+		}
+	} else if (win[5] == 1) {
+		win[4] = 6;
+	} else if (win[5] == 2) {
+		win[4]--;
+		if (win[4] <= 0) {
+			win[4] = 0;
+			win[5] = 3;
+		}
+	}
 }
 
 /*
@@ -3147,9 +3237,62 @@ void CMenuPcs::DrawMcWin(short, short)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::DrawMcWinMess(int, int)
+void CMenuPcs::DrawMcWinMess(int winType, int messType)
 {
-	DrawPageMark();
+	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
+	CFont* const font = reinterpret_cast<CFont**>(bytes + 0xF8)[0];
+	short* const win = reinterpret_cast<short*>(reinterpret_cast<unsigned int*>(bytes + 0x848)[0]);
+	if (font == 0 || win == 0) {
+		return;
+	}
+
+	SetMargin__5CFontFf(FLOAT_803313e8, font);
+	SetShadow__5CFontFi(font, 0);
+	SetScale__5CFontFf(FLOAT_803313e8, font);
+	DrawInit__5CFontFv(font);
+
+	GXColor textColor = {0xFF, 0xFF, 0xFF, 0xFF};
+	SetColor__5CFontF8_GXColor(font, &textColor);
+	SetTlut__5CFontFi(font, 0x23);
+
+	const int msgTable = GetMcWinMessBuff__8CMenuPcsFi(this, messType);
+	const unsigned char* const winMess = reinterpret_cast<unsigned char*>(GetWinMess__8CMenuPcsFi(this, winType));
+	if (msgTable == 0 || winMess == 0) {
+		DrawInit__8CMenuPcsFv(this);
+		return;
+	}
+
+	const int count = *reinterpret_cast<const int*>(winMess);
+	float centerX = static_cast<float>(win[0] + win[2] / 2);
+	float y = static_cast<float>(win[1] + 0x20);
+
+	char textBuf[128];
+	const unsigned char* entry = winMess + 4;
+	for (int i = 0; i < count; i++) {
+		const short msgId = *reinterpret_cast<const short*>(entry + 4);
+		const char* text = *reinterpret_cast<const char**>(msgTable + msgId * 4);
+		if (text != 0 && text[0] != '\0') {
+			if (text[0] == '$') {
+				text++;
+			}
+
+			strncpy(textBuf, text, sizeof(textBuf) - 1);
+			textBuf[sizeof(textBuf) - 1] = '\0';
+
+			const int textWidth = GetWidth__5CFontFPc(font, textBuf);
+			float posX = static_cast<float>(win[0] + 0x20);
+			if (winType != 0) {
+				posX = centerX - static_cast<float>(textWidth) * 0.5f;
+			}
+			SetPosX__5CFontFf(posX, font);
+			SetPosY__5CFontFf(y, font);
+			Draw__5CFontFPc(font, textBuf);
+		}
+		y += 30.0f;
+		entry += 8;
+	}
+
+	DrawInit__8CMenuPcsFv(this);
 }
 
 /*
@@ -3228,8 +3371,8 @@ void CMenuPcs::SetTextureLoc(int index)
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -3487,8 +3630,8 @@ void CMenuPcs::IsAsyncCharaLoadFinish()
 }
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -3515,8 +3658,8 @@ McCtrl::~McCtrl()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -5169,8 +5312,8 @@ void McCtrl::EraseDat()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -5183,8 +5326,8 @@ void McCtrl::GetDno()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -5198,8 +5341,8 @@ void McCtrl::GetSerial()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -5212,8 +5355,8 @@ void McCtrl::SetDataBuff(char* buffer)
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -5226,8 +5369,8 @@ void McCtrl::GetSlot()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -5240,8 +5383,8 @@ void McCtrl::SetDno(int channel)
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -5254,8 +5397,8 @@ void McCtrl::SetSlot(int slot)
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -5268,8 +5411,8 @@ void CMenuPcs::AlphaNormal()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
@@ -5282,8 +5425,8 @@ void CMenuPcs::AlphaAdd()
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: UNUSED
+ * PAL Size: UNUSED
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO

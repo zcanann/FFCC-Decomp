@@ -278,169 +278,185 @@ void CMenuPcs::EquipInit1()
  */
 int CMenuPcs::EquipOpen()
 {
-	u8* self = reinterpret_cast<u8*>(this);
-	u8* equipState = *reinterpret_cast<u8**>(self + 0x82c);
+	float fVar1;
 	double dVar2;
 	double dVar3;
+	double dVar4;
 	float fVar5;
+	int iVar6;
+	s16* psVar7;
+	u32 uVar8;
+	s16* puVar9;
+	s16 sVar10;
+	int iVar11;
+	u32 uVar12;
+	double dVar20;
 
-	if (equipState[0xb] == 0) {
-		memset(*reinterpret_cast<void**>(self + 0x850), 0, 0x1008);
+	if (*(char*)(*(int*)((char*)this + 0x82c) + 0xb) == '\0') {
+		memset(*(void**)((char*)this + 0x850), 0, 0x1008);
+		fVar5 = FLOAT_80332ee0;
+		iVar6 = *(int*)((char*)this + 0x850) + 8;
+		iVar11 = 8;
+		do {
+			*(float*)(iVar6 + 0x14) = fVar5;
+			*(float*)(iVar6 + 0x54) = fVar5;
+			*(float*)(iVar6 + 0x94) = fVar5;
+			*(float*)(iVar6 + 0xd4) = fVar5;
+			*(float*)(iVar6 + 0x114) = fVar5;
+			*(float*)(iVar6 + 0x154) = fVar5;
+			*(float*)(iVar6 + 0x194) = fVar5;
+			*(float*)(iVar6 + 0x1d4) = fVar5;
+			dVar4 = DOUBLE_80332ed8;
+			dVar3 = DOUBLE_80332ed0;
+			dVar2 = DOUBLE_80332ec8;
+			fVar1 = FLOAT_80332eb8;
+			iVar6 += 0x200;
+			iVar11--;
+		} while (iVar11 != 0);
 
-		float fVar = FLOAT_80332ee0;
-		int scalePtr = *reinterpret_cast<int*>(self + 0x850) + 8;
-		for (int i = 0; i < 8; i++) {
-			*reinterpret_cast<float*>(scalePtr + 0x14) = fVar;
-			*reinterpret_cast<float*>(scalePtr + 0x54) = fVar;
-			*reinterpret_cast<float*>(scalePtr + 0x94) = fVar;
-			*reinterpret_cast<float*>(scalePtr + 0xd4) = fVar;
-			*reinterpret_cast<float*>(scalePtr + 0x114) = fVar;
-			*reinterpret_cast<float*>(scalePtr + 0x154) = fVar;
-			*reinterpret_cast<float*>(scalePtr + 0x194) = fVar;
-			*reinterpret_cast<float*>(scalePtr + 0x1d4) = fVar;
-			scalePtr += 0x200;
-		}
+		iVar6 = 0;
+		puVar9 = (s16*)(*(int*)((char*)this + 0x850) + 8);
+		iVar11 = 2;
+		do {
+			*(int*)(puVar9 + 0xe) = 0x34;
+			puVar9[2] = 200;
+			puVar9[3] = 0x28;
+			*puVar9 =
+			    (s16)(int)-(((double)(((u64)((u32)(u16)puVar9[2] ^ 0x80000000U)) | 0x4330000000000000ULL) - dVar4) * dVar3 - dVar2);
+			puVar9[1] = (s16)iVar6 * (puVar9[3] - 8) + 0x60;
+			*(float*)(puVar9 + 4) = fVar1;
+			*(float*)(puVar9 + 6) = fVar1;
+			*(int*)(puVar9 + 0x12) = iVar6;
+			*(int*)(puVar9 + 0x14) = 3;
 
-		dVar3 = DOUBLE_80332ed0;
-		dVar2 = DOUBLE_80332ec8;
-		fVar5 = FLOAT_80332eb8;
-		int menuIndex = 0;
-		s16* entry = reinterpret_cast<s16*>(*reinterpret_cast<int*>(self + 0x850) + 8);
-		for (int i = 0; i < 2; i++) {
-			*reinterpret_cast<int*>(entry + 0xe) = 0x34;
-			entry[2] = 200;
-			entry[3] = 0x28;
-			*entry = static_cast<s16>(-((static_cast<double>(entry[2]) * dVar3) - dVar2));
-			entry[1] = static_cast<s16>(menuIndex * (entry[3] - 8) + 0x60);
-			*reinterpret_cast<float*>(entry + 4) = fVar5;
-			*reinterpret_cast<float*>(entry + 6) = fVar5;
-			*reinterpret_cast<int*>(entry + 0x12) = menuIndex;
-			*reinterpret_cast<int*>(entry + 0x14) = 3;
+			*(int*)(puVar9 + 0x2e) = 0x34;
+			puVar9[0x22] = 200;
+			puVar9[0x23] = 0x28;
+			puVar9[0x20] =
+			    (s16)(int)-(((double)(((u64)((u32)(u16)puVar9[0x22] ^ 0x80000000U)) | 0x4330000000000000ULL) - dVar4) * dVar3 - dVar2);
+			puVar9[0x21] = (s16)(iVar6 + 1) * (puVar9[0x23] - 8) + 0x60;
+			*(float*)(puVar9 + 0x24) = fVar1;
+			*(float*)(puVar9 + 0x26) = fVar1;
+			*(int*)(puVar9 + 0x32) = iVar6 + 1;
+			iVar6 += 2;
+			*(int*)(puVar9 + 0x34) = 3;
+			puVar9 += 0x40;
+			iVar11--;
+		} while (iVar11 != 0);
 
-			*reinterpret_cast<int*>(entry + 0x2e) = 0x34;
-			entry[0x22] = 200;
-			entry[0x23] = 0x28;
-			entry[0x20] = static_cast<s16>(-((static_cast<double>(entry[0x22]) * dVar3) - dVar2));
-			entry[0x21] = static_cast<s16>((menuIndex + 1) * (entry[0x23] - 8) + 0x60);
-			*reinterpret_cast<float*>(entry + 0x24) = fVar5;
-			*reinterpret_cast<float*>(entry + 0x26) = fVar5;
-			*reinterpret_cast<int*>(entry + 0x32) = menuIndex + 1;
-			*reinterpret_cast<int*>(entry + 0x34) = 3;
-
-			entry += 0x40;
-			menuIndex += 2;
-		}
-
-		**reinterpret_cast<s16**>(self + 0x850) = 4;
+		**(s16**)((char*)this + 0x850) = 4;
 		EquipInit1();
-
-		s16* letterBuf = reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0));
-		s16 itemCount = 0;
-		for (int i = 0; i < 0x40; i++) {
-			if (GetItemType__8CMenuPcsFii(this, i, 0) == 1) {
-				letterBuf++;
-				*letterBuf = static_cast<s16>(i);
-				itemCount++;
+		puVar9 = GetLetterBuffer__6JoyBusFi(&Joybus, 0);
+		sVar10 = 0;
+		for (iVar6 = 0; iVar6 < 0x40; iVar6++) {
+			iVar11 = GetItemType__8CMenuPcsFii(this, iVar6, 0);
+			if (iVar11 == 1) {
+				puVar9++;
+				*puVar9 = (s16)iVar6;
+				sVar10++;
 			}
 		}
 
-		*reinterpret_cast<s16*>(Joybus.GetLetterBuffer(0)) = itemCount + 1;
-		*reinterpret_cast<s16*>(equipState + 0x26) = 0;
-		equipState[0xb] = 1;
+		psVar7 = GetLetterBuffer__6JoyBusFi(&Joybus, 0);
+		*psVar7 = sVar10 + 1;
+		*(s16*)(*(int*)((char*)this + 0x82c) + 0x26) = 0;
+		*(u8*)(*(int*)((char*)this + 0x82c) + 0xb) = 1;
 	}
 
-	int doneCount = 0;
-	*reinterpret_cast<s16*>(equipState + 0x22) = *reinterpret_cast<s16*>(equipState + 0x22) + 1;
-
-	s16* entries = *reinterpret_cast<s16**>(self + 0x850);
-	u32 count = static_cast<u32>(entries[0]);
-	s16* entry = entries + 4;
-	int timer = static_cast<int>(*reinterpret_cast<s16*>(equipState + 0x22));
-
-	for (u32 i = 0; i < count; i++) {
-		if (*reinterpret_cast<int*>(entry + 0x12) <= timer) {
-			if (timer < (*reinterpret_cast<int*>(entry + 0x12) + *reinterpret_cast<int*>(entry + 0x14))) {
-				*reinterpret_cast<int*>(entry + 0x10) = *reinterpret_cast<int*>(entry + 0x10) + 1;
-				*reinterpret_cast<float*>(entry + 8) = static_cast<float>(
-					(DOUBLE_80332ec0 / static_cast<double>(*reinterpret_cast<int*>(entry + 0x14))) *
-					static_cast<double>(*reinterpret_cast<int*>(entry + 0x10)));
-			} else {
-				doneCount++;
-				*reinterpret_cast<float*>(entry + 8) = FLOAT_80332ee0;
+	iVar6 = 0;
+	*(s16*)(*(int*)((char*)this + 0x82c) + 0x22) = *(s16*)(*(int*)((char*)this + 0x82c) + 0x22) + 1;
+	uVar8 = (u32)**(s16**)((char*)this + 0x850);
+	psVar7 = *(s16**)((char*)this + 0x850) + 4;
+	iVar11 = (int)*(s16*)(*(int*)((char*)this + 0x82c) + 0x22);
+	uVar12 = uVar8;
+	if (0 < (int)uVar8) {
+		do {
+			dVar2 = DOUBLE_80332ed8;
+			if (*(int*)(psVar7 + 0x12) <= iVar11) {
+				if (iVar11 < *(int*)(psVar7 + 0x12) + *(int*)(psVar7 + 0x14)) {
+					*(int*)(psVar7 + 0x10) = *(int*)(psVar7 + 0x10) + 1;
+					dVar20 = (double)(((u64)((u32)*(u32*)(psVar7 + 0x14) ^ 0x80000000U)) | 0x4330000000000000ULL);
+					*(float*)(psVar7 + 8) =
+					    (float)((DOUBLE_80332ec0 / (dVar20 - dVar2)) *
+					            ((double)(((u64)((u32)*(u32*)(psVar7 + 0x10) ^ 0x80000000U)) | 0x4330000000000000ULL) - dVar2));
+				} else {
+					iVar6++;
+					*(float*)(psVar7 + 8) = FLOAT_80332ee0;
+				}
 			}
-		}
-		entry += 0x20;
+			psVar7 += 0x20;
+			uVar12--;
+		} while (uVar12 != 0);
 	}
 
-	if (entries[0] == doneCount) {
-		entry = entries + 4;
-		if (count != 0) {
-			u32 blockCount = count >> 3;
-			if (blockCount != 0) {
+	fVar5 = FLOAT_80332ee0;
+	if (**(s16**)((char*)this + 0x850) == iVar6) {
+		psVar7 = *(s16**)((char*)this + 0x850) + 4;
+		if (0 < (int)uVar8) {
+			uVar12 = uVar8 >> 3;
+			if (uVar12 != 0) {
 				do {
-					entry[0x12] = 0;
-					entry[0x13] = 0;
-					entry[0x14] = 0;
-					entry[0x15] = 1;
-					*reinterpret_cast<float*>(entry + 8) = FLOAT_80332ee0;
-					entry[0x32] = 0;
-					entry[0x33] = 0;
-					entry[0x34] = 0;
-					entry[0x35] = 1;
-					*reinterpret_cast<float*>(entry + 0x28) = FLOAT_80332ee0;
-					entry[0x52] = 0;
-					entry[0x53] = 0;
-					entry[0x54] = 0;
-					entry[0x55] = 1;
-					*reinterpret_cast<float*>(entry + 0x48) = FLOAT_80332ee0;
-					entry[0x72] = 0;
-					entry[0x73] = 0;
-					entry[0x74] = 0;
-					entry[0x75] = 1;
-					*reinterpret_cast<float*>(entry + 0x68) = FLOAT_80332ee0;
-					entry[0x92] = 0;
-					entry[0x93] = 0;
-					entry[0x94] = 0;
-					entry[0x95] = 1;
-					*reinterpret_cast<float*>(entry + 0x88) = FLOAT_80332ee0;
-					entry[0xb2] = 0;
-					entry[0xb3] = 0;
-					entry[0xb4] = 0;
-					entry[0xb5] = 1;
-					*reinterpret_cast<float*>(entry + 0xa8) = FLOAT_80332ee0;
-					entry[0xd2] = 0;
-					entry[0xd3] = 0;
-					entry[0xd4] = 0;
-					entry[0xd5] = 1;
-					*reinterpret_cast<float*>(entry + 200) = FLOAT_80332ee0;
-					entry[0xf2] = 0;
-					entry[0xf3] = 0;
-					entry[0xf4] = 0;
-					entry[0xf5] = 1;
-					*reinterpret_cast<float*>(entry + 0xe8) = FLOAT_80332ee0;
-					entry += 0x100;
-					blockCount--;
-				} while (blockCount != 0);
-
-				count &= 7;
-				if (count == 0) {
+					psVar7[0x12] = 0;
+					psVar7[0x13] = 0;
+					psVar7[0x14] = 0;
+					psVar7[0x15] = 1;
+					*(float*)(psVar7 + 8) = fVar5;
+					psVar7[0x32] = 0;
+					psVar7[0x33] = 0;
+					psVar7[0x34] = 0;
+					psVar7[0x35] = 1;
+					*(float*)(psVar7 + 0x28) = fVar5;
+					psVar7[0x52] = 0;
+					psVar7[0x53] = 0;
+					psVar7[0x54] = 0;
+					psVar7[0x55] = 1;
+					*(float*)(psVar7 + 0x48) = fVar5;
+					psVar7[0x72] = 0;
+					psVar7[0x73] = 0;
+					psVar7[0x74] = 0;
+					psVar7[0x75] = 1;
+					*(float*)(psVar7 + 0x68) = fVar5;
+					psVar7[0x92] = 0;
+					psVar7[0x93] = 0;
+					psVar7[0x94] = 0;
+					psVar7[0x95] = 1;
+					*(float*)(psVar7 + 0x88) = fVar5;
+					psVar7[0xb2] = 0;
+					psVar7[0xb3] = 0;
+					psVar7[0xb4] = 0;
+					psVar7[0xb5] = 1;
+					*(float*)(psVar7 + 0xa8) = fVar5;
+					psVar7[0xd2] = 0;
+					psVar7[0xd3] = 0;
+					psVar7[0xd4] = 0;
+					psVar7[0xd5] = 1;
+					*(float*)(psVar7 + 200) = fVar5;
+					psVar7[0xf2] = 0;
+					psVar7[0xf3] = 0;
+					psVar7[0xf4] = 0;
+					psVar7[0xf5] = 1;
+					*(float*)(psVar7 + 0xe8) = fVar5;
+					psVar7 += 0x100;
+					uVar12--;
+				} while (uVar12 != 0);
+				uVar8 &= 7;
+				if (uVar8 == 0) {
 					return 1;
 				}
 			}
 
 			do {
-				entry[0x12] = 0;
-				entry[0x13] = 0;
-				entry[0x14] = 0;
-				entry[0x15] = 1;
-				*reinterpret_cast<float*>(entry + 8) = FLOAT_80332ee0;
-				entry += 0x20;
-				count--;
-			} while (count != 0);
+				psVar7[0x12] = 0;
+				psVar7[0x13] = 0;
+				psVar7[0x14] = 0;
+				psVar7[0x15] = 1;
+				*(float*)(psVar7 + 8) = fVar5;
+				psVar7 += 0x20;
+				uVar8--;
+			} while (uVar8 != 0);
 		}
 		return 1;
 	}
-
 	return 0;
 }
 

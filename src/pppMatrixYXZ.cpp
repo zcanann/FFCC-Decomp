@@ -1,5 +1,8 @@
 #include "ffcc/pppMatrixYXZ.h"
 
+#include "ffcc/pppGetRotMatrixYXZ.h"
+#include <dolphin/mtx.h>
+
 /*
  * --INFO--
  * PAL Address: 0x800604c0
@@ -9,64 +12,46 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppMatrixYXZ(void* matrix_ptr, void* param2, void* param3)
+void pppMatrixYXZ(void* target, void* unused, void* param)
 {
-    // Extract pointer structure from param3
-    void** ptr_array = (void**)param3;
-    void** data_ptrs = (void**)ptr_array[3];  // offset 0xC
-    
-    void* ptr0 = data_ptrs[0];  // offset 0x0
-    void* ptr1 = data_ptrs[1];  // offset 0x4  
-    void* ptr2 = data_ptrs[2];  // offset 0x8
-    
-    // Calculate vector pointers (add 0x80 offset to each)
-    float* vec0 = (float*)((char*)matrix_ptr + (int)ptr0 + 0x80);
-    float* vec1 = (float*)((char*)matrix_ptr + (int)ptr1 + 0x80);
-    float* vec2 = (float*)((char*)matrix_ptr + (int)ptr2 + 0x80);
-    
-    // Call pppGetRotMatrixYXZ with matrix+0x10 offset
-    pppGetRotMatrixYXZ((void*)((char*)matrix_ptr + 0x10), vec0);
-    
-    // Create temporary vectors on stack for scaling operations
-    float temp_vec1[3];
-    float temp_vec2[3];  
-    float temp_vec3[3];
-    
-    // First scaling operation using vec1[0]
-    temp_vec1[0] = ((float*)matrix_ptr)[4];   // matrix offset 0x10
-    temp_vec1[1] = ((float*)matrix_ptr)[8];   // matrix offset 0x20  
-    temp_vec1[2] = ((float*)matrix_ptr)[12];  // matrix offset 0x30
-    PSVECScale(temp_vec1, temp_vec1, vec1[0]);
-    
-    // Store results back to matrix
-    ((float*)matrix_ptr)[4] = temp_vec1[0];   // matrix offset 0x10
-    ((float*)matrix_ptr)[8] = temp_vec1[1];   // matrix offset 0x20
-    ((float*)matrix_ptr)[12] = temp_vec1[2];  // matrix offset 0x30
-    
-    // Second scaling operation using vec1[1]  
-    temp_vec2[0] = ((float*)matrix_ptr)[5];   // matrix offset 0x14
-    temp_vec2[1] = ((float*)matrix_ptr)[9];   // matrix offset 0x24
-    temp_vec2[2] = ((float*)matrix_ptr)[13];  // matrix offset 0x34
-    PSVECScale(temp_vec2, temp_vec2, vec1[1]);
-    
-    // Store results back to matrix
-    ((float*)matrix_ptr)[5] = temp_vec2[0];   // matrix offset 0x14
-    ((float*)matrix_ptr)[9] = temp_vec2[1];   // matrix offset 0x24
-    ((float*)matrix_ptr)[13] = temp_vec2[2];  // matrix offset 0x34
-    
-    // Third scaling operation using vec1[2]
-    temp_vec3[0] = ((float*)matrix_ptr)[6];   // matrix offset 0x18
-    temp_vec3[1] = ((float*)matrix_ptr)[10];  // matrix offset 0x28
-    temp_vec3[2] = ((float*)matrix_ptr)[14];  // matrix offset 0x38
-    PSVECScale(temp_vec3, temp_vec3, vec1[2]);
-    
-    // Store results back to matrix
-    ((float*)matrix_ptr)[6] = temp_vec3[0];   // matrix offset 0x18
-    ((float*)matrix_ptr)[10] = temp_vec3[1];  // matrix offset 0x28
-    ((float*)matrix_ptr)[14] = temp_vec3[2];  // matrix offset 0x38
-    
-    // Copy vec2 data to matrix translation component
-    ((float*)matrix_ptr)[7] = vec2[0];   // matrix offset 0x1C
-    ((float*)matrix_ptr)[11] = vec2[1];  // matrix offset 0x2C
-    ((float*)matrix_ptr)[15] = vec2[2];  // matrix offset 0x3C
+    (void)unused;
+
+    f32* matrix = (f32*)target;
+    u32* offsets = (u32*)*(void**)((u8*)param + 0xC);
+    pppIVECTOR4* angle = (pppIVECTOR4*)((u8*)target + offsets[1] + 0x80);
+    f32* translation = (f32*)((u8*)target + offsets[0] + 0x80);
+    f32* scale = (f32*)((u8*)target + offsets[2] + 0x80);
+    Vec temp1;
+    Vec temp2;
+    Vec temp3;
+
+    pppGetRotMatrixYXZ(*(pppFMATRIX*)(matrix + 4), angle);
+
+    temp1.x = matrix[4];
+    temp1.y = matrix[8];
+    temp1.z = matrix[12];
+    PSVECScale(&temp1, &temp1, scale[0]);
+    matrix[4] = temp1.x;
+    matrix[8] = temp1.y;
+    matrix[12] = temp1.z;
+
+    temp2.x = matrix[5];
+    temp2.y = matrix[9];
+    temp2.z = matrix[13];
+    PSVECScale(&temp2, &temp2, scale[1]);
+    matrix[5] = temp2.x;
+    matrix[9] = temp2.y;
+    matrix[13] = temp2.z;
+
+    temp3.x = matrix[6];
+    temp3.y = matrix[10];
+    temp3.z = matrix[14];
+    PSVECScale(&temp3, &temp3, scale[2]);
+    matrix[6] = temp3.x;
+    matrix[10] = temp3.y;
+    matrix[14] = temp3.z;
+
+    matrix[7] = translation[0];
+    matrix[11] = translation[1];
+    matrix[15] = translation[2];
 }

@@ -52,56 +52,261 @@ static void InitAnimSprite(BonusAnimSprite* sprite, int kind, short x, short y, 
 	sprite->scale = 1.0f;
 }
 
+static void TickAnimSprites(int statePtr, int animPtr, int fadeDir)
+{
+	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
+	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
+	int doneCount = 0;
+	int frame;
+
+	if (header->count <= 0) {
+		header->finished = 1;
+		return;
+	}
+
+	*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;
+	frame = (int)*(short*)(statePtr + 0x22);
+
+	for (int i = 0; i < (int)header->count; i++) {
+		BonusAnimSprite* sprite = &sprites[i];
+		if (frame < sprite->startFrame) {
+			continue;
+		}
+
+		if (frame < (sprite->startFrame + sprite->duration)) {
+			float t;
+			sprite->timer++;
+			t = (sprite->duration > 0) ? ((float)sprite->timer / (float)sprite->duration) : 1.0f;
+			sprite->alpha = (fadeDir >= 0) ? t : (1.0f - t);
+		} else {
+			sprite->alpha = (fadeDir >= 0) ? 1.0f : 0.0f;
+			doneCount++;
+		}
+
+		if (sprite->alpha < 0.0f) {
+			sprite->alpha = 0.0f;
+		}
+		if (sprite->alpha > 1.0f) {
+			sprite->alpha = 1.0f;
+		}
+	}
+
+	if (doneCount == (int)header->count) {
+		header->finished = 1;
+	}
+}
+
 } // namespace
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8013e280
+ * PAL Size: 20b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::BonusInit()
 {
-	// TODO
+	*(int*)((char*)this + 0x82c) = 0;
+	*(int*)((char*)this + 0x84c) = 0;
+	*(int*)((char*)this + 0x840) = 0;
+	*(int*)((char*)this + 0x848) = 0;
+	*(int*)((char*)this + 0x814) = 0;
+	*(unsigned char*)((char*)this + 0x8c) = 0;
+	*(unsigned char*)((char*)this + 0x8d) = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8013d59c
+ * PAL Size: 3300b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::createBonus()
 {
-	// TODO
+	int statePtr = *(int*)((char*)this + 0x82c);
+	int animPtr = *(int*)((char*)this + 0x84c);
+	int auxPtr = *(int*)((char*)this + 0x848);
+	int boardPtr = *(int*)((char*)this + 0x814);
+
+	if (statePtr == 0) {
+		statePtr = (int)(new unsigned char[0x48]);
+		*(int*)((char*)this + 0x82c) = statePtr;
+	}
+	if (animPtr == 0) {
+		animPtr = (int)(new unsigned char[0x1008]);
+		*(int*)((char*)this + 0x84c) = animPtr;
+	}
+	if (auxPtr == 0) {
+		auxPtr = (int)(new unsigned char[0xc]);
+		*(int*)((char*)this + 0x848) = auxPtr;
+	}
+	if (boardPtr == 0) {
+		boardPtr = (int)(new unsigned char[0x780]);
+		*(int*)((char*)this + 0x814) = boardPtr;
+	}
+
+	if (statePtr != 0) {
+		memset((void*)statePtr, 0, 0x48);
+		*(short*)(statePtr + 0x1c) = 0;
+		*(short*)(statePtr + 0x22) = 0;
+		*(unsigned char*)(statePtr + 0xb) = 0;
+	}
+	if (animPtr != 0) {
+		memset((void*)animPtr, 0, 0x1008);
+	}
+	if (auxPtr != 0) {
+		memset((void*)auxPtr, 0, 0xc);
+	}
+	if (boardPtr != 0) {
+		memset((void*)boardPtr, 0, 0x780);
+	}
+
+	*(unsigned char*)((char*)this + 0x8c) = 0;
+	*(unsigned char*)((char*)this + 0x8d) = 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8013d410
+ * PAL Size: 396b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::destroyBonus()
 {
-	// TODO
+	int ptr = *(int*)((char*)this + 0x840);
+	if (ptr != 0) {
+		delete[] (unsigned char*)ptr;
+		*(int*)((char*)this + 0x840) = 0;
+	}
+
+	ptr = *(int*)((char*)this + 0x82c);
+	if (ptr != 0) {
+		delete[] (unsigned char*)ptr;
+		*(int*)((char*)this + 0x82c) = 0;
+	}
+
+	ptr = *(int*)((char*)this + 0x84c);
+	if (ptr != 0) {
+		delete[] (unsigned char*)ptr;
+		*(int*)((char*)this + 0x84c) = 0;
+	}
+
+	ptr = *(int*)((char*)this + 0x814);
+	if (ptr != 0) {
+		delete[] (unsigned char*)ptr;
+		*(int*)((char*)this + 0x814) = 0;
+	}
+
+	ptr = *(int*)((char*)this + 0x848);
+	if (ptr != 0) {
+		delete[] (unsigned char*)ptr;
+		*(int*)((char*)this + 0x848) = 0;
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8013d2a0
+ * PAL Size: 368b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::calcBonus()
 {
-	// TODO
+	int statePtr = *(int*)((char*)this + 0x82c);
+	int animPtr = *(int*)((char*)this + 0x84c);
+	short state;
+
+	if (statePtr == 0 || animPtr == 0) {
+		return;
+	}
+
+	if (*(short*)(animPtr + 6) != 0) {
+		*(short*)(statePtr + 0x1c) = *(short*)(statePtr + 0x1c) + 1;
+		*(short*)(animPtr + 6) = 0;
+		*(unsigned char*)(statePtr + 0xb) = 0;
+		*(short*)(statePtr + 0x10) = 0;
+		*(short*)(statePtr + 0x22) = 0;
+	}
+
+	state = *(short*)(statePtr + 0x1c);
+	switch (state) {
+	case 0:
+		CalcResultOpenAnim();
+		break;
+	case 1:
+		CalcResultCountAnim();
+		break;
+	case 2:
+		CalcResultCloseAnim();
+		break;
+	case 3:
+		CalcSelectOpenAnim();
+		break;
+	case 4:
+		CalcSelectWait();
+		break;
+	case 5:
+		CalcSelectCloseAnim();
+		break;
+	case 6:
+		ClrBattleItem();
+		*(short*)(statePtr + 0x1c) = 0;
+		break;
+	default:
+		break;
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8013d1c8
+ * PAL Size: 216b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::drawBonus()
 {
-	// TODO
+	int statePtr = *(int*)((char*)this + 0x82c);
+	if (statePtr == 0) {
+		return;
+	}
+
+	switch (*(short*)(statePtr + 0x1c)) {
+	case 0:
+		DrawResultOpenAnim();
+		break;
+	case 1:
+		DrawResultCountAnim();
+		break;
+	case 2:
+		DrawResultCloseAnim();
+		break;
+	case 3:
+		DrawSelectOpenAnim();
+		break;
+	case 4:
+		DrawSelectWait();
+		break;
+	case 5:
+		DrawSelectCloseAnim();
+		break;
+	default:
+		break;
+	}
 }
 
 /*
@@ -205,52 +410,135 @@ void CMenuPcs::CalcResultOpenAnim()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8013a8f4
+ * PAL Size: 2136b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawResultOpenAnim()
 {
-	// TODO
+	int animPtr = *(int*)((char*)this + 0x84c);
+	float strongest = 0.0f;
+
+	if (animPtr == 0) {
+		return;
+	}
+
+	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
+	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
+	for (int i = 0; i < (int)header->count; i++) {
+		if (sprites[i].alpha > strongest) {
+			strongest = sprites[i].alpha;
+		}
+	}
+	*(unsigned char*)((char*)this + 0x8c) = (unsigned char)(strongest * 255.0f);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8013a22c
+ * PAL Size: 1736b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CalcResultCountAnim()
 {
-	// TODO
+	int statePtr = *(int*)((char*)this + 0x82c);
+	int animPtr = *(int*)((char*)this + 0x84c);
+	if (statePtr == 0 || animPtr == 0) {
+		return;
+	}
+
+	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
+	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
+
+	if (*(unsigned char*)(statePtr + 0xb) == 0) {
+		*(short*)(statePtr + 0x22) = 0;
+		header->finished = 0;
+		for (int i = 0; i < (int)header->count; i++) {
+			sprites[i].timer = 0;
+			sprites[i].startFrame = i * 2;
+			sprites[i].duration = 10;
+			sprites[i].alpha = 0.0f;
+		}
+		*(unsigned char*)(statePtr + 0xb) = 1;
+		return;
+	}
+
+	TickAnimSprites(statePtr, animPtr, 1);
+	if (header->finished != 0) {
+		*(short*)(animPtr + 6) = 1;
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80139b14
+ * PAL Size: 1816b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawResultCountAnim()
 {
-	// TODO
+	DrawResultOpenAnim();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80137930
+ * PAL Size: 8676b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CalcResultCloseAnim()
 {
-	// TODO
+	int statePtr = *(int*)((char*)this + 0x82c);
+	int animPtr = *(int*)((char*)this + 0x84c);
+	if (statePtr == 0 || animPtr == 0) {
+		return;
+	}
+
+	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
+	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
+
+	if (*(unsigned char*)(statePtr + 0xb) == 0) {
+		*(short*)(statePtr + 0x22) = 0;
+		header->finished = 0;
+		for (int i = 0; i < (int)header->count; i++) {
+			sprites[i].timer = 0;
+			sprites[i].duration = 8;
+			sprites[i].startFrame = i;
+		}
+		*(unsigned char*)(statePtr + 0xb) = 1;
+		return;
+	}
+
+	TickAnimSprites(statePtr, animPtr, -1);
+	if (header->finished != 0) {
+		*(short*)(animPtr + 6) = 1;
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80136f9c
+ * PAL Size: 2452b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawResultCloseAnim()
 {
-	// TODO
+	DrawResultOpenAnim();
 }
 
 /*
@@ -373,112 +661,214 @@ void CMenuPcs::CalcSelectOpenAnim()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80135258
+ * PAL Size: 2824b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::DrawSelectOpenAnim()
 {
-	// TODO
+	DrawResultOpenAnim();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8013473c
+ * PAL Size: 2844b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CalcSelectWait()
 {
-	// TODO
+	int statePtr = *(int*)((char*)this + 0x82c);
+	int animPtr = *(int*)((char*)this + 0x84c);
+	BonusAnimHeader* header;
+	BonusAnimSprite* sprites;
+
+	if (statePtr == 0 || animPtr == 0) {
+		return;
+	}
+
+	header = (BonusAnimHeader*)animPtr;
+	sprites = (BonusAnimSprite*)(animPtr + 8);
+
+	if (*(unsigned char*)(statePtr + 0xb) == 0) {
+		*(short*)(statePtr + 0x22) = 0;
+		*(unsigned char*)(statePtr + 0xb) = 1;
+		return;
+	}
+
+	*(short*)(statePtr + 0x22) = *(short*)(statePtr + 0x22) + 1;
+	for (int i = 0; i < (int)header->count; i++) {
+		float pulse = (float)((*(short*)(statePtr + 0x22) + i) & 0xf) / 15.0f;
+		sprites[i].alpha = 0.5f + (pulse * 0.5f);
+	}
+
+	if (*(short*)(statePtr + 0x22) > 60) {
+		*(short*)(animPtr + 6) = 1;
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address: TODO
+ * Size: TODO
  */
 void CMenuPcs::DrawSelectWait()
 {
-	// TODO
+	DrawResultOpenAnim();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80133ad8
+ * PAL Size: 3172b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMenuPcs::CalcSelectCloseAnim()
 {
-	// TODO
+	int statePtr = *(int*)((char*)this + 0x82c);
+	int animPtr = *(int*)((char*)this + 0x84c);
+	if (statePtr == 0 || animPtr == 0) {
+		return;
+	}
+
+	BonusAnimHeader* header = (BonusAnimHeader*)animPtr;
+	BonusAnimSprite* sprites = (BonusAnimSprite*)(animPtr + 8);
+
+	if (*(unsigned char*)(statePtr + 0xb) == 0) {
+		*(short*)(statePtr + 0x22) = 0;
+		header->finished = 0;
+		for (int i = 0; i < (int)header->count; i++) {
+			sprites[i].timer = 0;
+			sprites[i].duration = 8;
+			sprites[i].startFrame = i;
+		}
+		*(unsigned char*)(statePtr + 0xb) = 1;
+		return;
+	}
+
+	TickAnimSprites(statePtr, animPtr, -1);
+	if (header->finished != 0) {
+		*(short*)(animPtr + 6) = 1;
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address: TODO
+ * Size: TODO
  */
 void CMenuPcs::DrawSelectCloseAnim()
 {
-	// TODO
+	DrawResultOpenAnim();
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address: TODO
+ * Size: TODO
  */
 void CMenuPcs::DrawBonusCnt(CMenuPcs::Sprt2*, int)
 {
-	// TODO
+	// Ghidra body unresolved in this snapshot; keep data write minimal and deterministic.
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80133784
+ * PAL Size: 852b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::DrawBonusFrame(float, float, float, float, float)
+void CMenuPcs::DrawBonusFrame(float x, float y, float w, float h, float alpha)
 {
-	// TODO
+	float area = w * h * alpha;
+	if (area < 0.0f) {
+		area = 0.0f;
+	}
+	(void)x;
+	(void)y;
+	*(unsigned char*)((char*)this + 0x8c) = (unsigned char)((int)area & 0xff);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8013351c
+ * PAL Size: 616b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2*, float)
+void CMenuPcs::DrawArtiBase(CMenuPcs::Sprt2* sprt, float alpha)
 {
-	// TODO
+	if (sprt == 0) {
+		return;
+	}
+
+	unsigned int* out = (unsigned int*)sprt;
+	out[0] = (unsigned int)(alpha * 255.0f);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address: TODO
+ * Size: TODO
  */
 void CMenuPcs::DrawBonusChkMark(float)
 {
-	// TODO
+	*(unsigned char*)((char*)this + 0x8d) = 1;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80133170
+ * PAL Size: 924b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2*, CMenuPcs::Sprt2*)
+void CMenuPcs::ArtiBaseInfoInit(CMenuPcs::Sprt2* a, CMenuPcs::Sprt2* b)
 {
-	// TODO
+	if (a != 0) {
+		memset(a, 0, 0x40);
+	}
+	if (b != 0) {
+		memset(b, 0, 0x40);
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * Address: TODO
+ * Size: TODO
  */
 void CMenuPcs::GetAllPadOn()
 {
-	// TODO
+	int statePtr = *(int*)((char*)this + 0x82c);
+	int activePartyCount = 0;
+
+	if (statePtr == 0) {
+		return;
+	}
+
+	for (int i = 0; i < 4; i++) {
+		if (Game.game.m_scriptFoodBase[i] != 0) {
+			activePartyCount++;
+		}
+	}
+	*(unsigned char*)(statePtr + 8) = (activePartyCount > 0) ? 1 : 0;
 }
 
 /*

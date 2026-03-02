@@ -18,9 +18,9 @@ void pppWDrawMatrixFrontLoop(struct _pppPObject* param_1)
 	PSMTXScaleApply(
 		*(Mtx*)((char*)param_1 + 0x10),
 		*(Mtx*)((char*)param_1 + 0x40),
-		(pppMngStPtr->m_scale).x,
-		(pppMngStPtr->m_scale).y,
-		(pppMngStPtr->m_scale).z
+		*(float*)((char*)pppMngStPtr + 0x28),
+		*(float*)((char*)pppMngStPtr + 0x2c),
+		*(float*)((char*)pppMngStPtr + 0x30)
 	);
 	
 	local_18.x = *(float*)((char*)param_1 + 0x1c);

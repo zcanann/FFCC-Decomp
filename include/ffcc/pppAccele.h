@@ -2,8 +2,8 @@
 #define _FFCC_PPPACCELE_H_
 
 typedef struct {
-    char pad[8];      // padding to offset 0x08
-    int m_graphId;    // 0x08
+    char pad[0x0C];   // padding to offset 0x0C
+    int m_graphId;    // 0x0C
 } pppAcceleObj;
 
 typedef struct {

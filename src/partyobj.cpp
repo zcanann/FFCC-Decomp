@@ -33,6 +33,25 @@ extern float FLOAT_80331b00;
 extern float FLOAT_80331b04;
 extern float FLOAT_80331b08;
 
+struct GhostPartyWork {
+	int mood;
+	int thresholdA;
+	int thresholdB;
+	int thresholdC;
+	int slotSel;
+	float carrySpeed;
+	int pressure;
+	int settleTimer;
+	int activeTrailCount;
+	int trailIndex;
+	Vec trail[5];
+	Vec leaderTrail[5];
+	Vec carryDir;
+	int auraParticle;
+};
+
+static GhostPartyWork sGhostPartyWork = {};
+
 static unsigned short getPadHeldForSlot(int slot)
 {
 	if (Pad._452_4_ != 0 || (slot == 0 && Pad._448_4_ != -1)) {
@@ -752,6 +771,61 @@ int CGPartyObj::getReplaceStat(int state)
  */
 void CGPartyObj::statCharge()
 {
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	if (m_subState == 0) {
+		if (m_subFrame == 0) {
+			reqAnim(0x10, 0, 0);
+			putTargetParticle(0, 1);
+			*reinterpret_cast<int*>(self + 0x664) = 0;
+		}
+
+		moveCenterTargetParticle();
+		checkTargetParticle();
+
+		if (isLoopAnim() != 0) {
+			changeSubStat(1);
+		}
+		return;
+	}
+
+	if (m_subState == 1) {
+		if (m_subFrame == 0) {
+			reqAnim(0x11, 0, 0);
+			*reinterpret_cast<int*>(self + 0x664) = 0;
+		}
+
+		moveCenterTargetParticle();
+		checkTargetParticle();
+
+		*reinterpret_cast<int*>(self + 0x664) = *reinterpret_cast<int*>(self + 0x664) + 1;
+		if (m_subFrame == 0x0C) {
+			putParticle(0x577, 0, this, 0.0f, 0x80D);
+		} else if (m_subFrame == 0x12) {
+			putParticle(0x578, 0, this, 0.0f, 0x80D);
+		}
+
+		unsigned short held = getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc));
+		if ((held & 0x100) == 0 || m_subFrame > 0x20) {
+			changeSubStat(2);
+		}
+		return;
+	}
+
+	if (m_subState == 2) {
+		if (m_subFrame == 0) {
+			endPSlotBit(0x10);
+			endPSlotBit(0x100);
+			reqAnim(0x12, 0, 0);
+		}
+
+		moveCenterTargetParticle();
+		checkTargetParticle();
+		if (isLoopAnim() != 0) {
+			changeStat(0, 0, 0);
+		}
+		return;
+	}
+
 	moveCenterTargetParticle();
 	checkTargetParticle();
 }
@@ -1073,8 +1147,39 @@ void CGPartyObj::moveCenterTargetParticle()
  */
 void CGPartyObj::onStatMagic()
 {
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	if (m_subState == 0) {
+		if (m_subFrame == 0) {
+			putTargetParticle(0, 1);
+			*reinterpret_cast<int*>(self + 0x664) = 0;
+		}
+	} else if (m_subState == 1 && m_subFrame == 0) {
+		endPSlotBit(0x10);
+		endPSlotBit(0x100);
+		*reinterpret_cast<int*>(self + 0x664) = 0;
+	}
+
 	moveCenterTargetParticle();
 	checkTargetParticle();
+
+	int magicId = *reinterpret_cast<int*>(self + 0x560);
+	if (m_subState == 1 && m_subFrame == 0) {
+		if (magicId != 0x103) {
+			putParticleFromItem(magicId, 0, 0, &m_worldPosition);
+			putParticleFromItem(magicId, 1, 0, (Vec*)0);
+		}
+	}
+
+	if (m_subState == 1 && m_subFrame > 0x11) {
+		self[0x6C4] |= 0x80;
+	}
+
+	unsigned short held = getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc));
+	if ((held & 0x100) == 0 && m_subState < 2) {
+		changeStat(0, 0, 0);
+		return;
+	}
+
 	if (isLoopAnim() != 0) {
 		changeStat(0, 0, 0);
 	}
@@ -2002,14 +2107,50 @@ void calcWeightMax()
  */
 void CGPartyObj::gpmCalcDist(Vec*, float&)
 {
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	Vec* outVec = reinterpret_cast<Vec*>(self + 0x5E0);
-	float* outDist = reinterpret_cast<float*>(self + 0x5D0);
-	outVec->y = 0.0f;
-	float dist = PSVECMag(outVec);
-	if (dist < *outDist) {
-		*outDist = dist;
+	Vec* outVec = reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(this) + 0x5E0);
+	float* outDist = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x5D0);
+
+	if (sGhostPartyWork.activeTrailCount > 0) {
+		Vec prev = m_worldPosition;
+		float worldLen = 0.0f;
+		float flatLen = 0.0f;
+		bool capturedCurrent = false;
+
+		*outDist = 0.0f;
+		for (int i = 0; i < sGhostPartyWork.activeTrailCount && i < 5; i++) {
+			Vec* nextPos = (i == sGhostPartyWork.trailIndex) ? &m_worldPosition : &sGhostPartyWork.trail[i];
+
+			Vec delta;
+			PSVECSubtract(nextPos, &prev, &delta);
+			worldLen += PSVECMag(&delta);
+
+			delta.y = 0.0f;
+			flatLen += PSVECMag(&delta);
+
+			if (!capturedCurrent && i == sGhostPartyWork.trailIndex) {
+				capturedCurrent = true;
+				*outVec = delta;
+				if (PSVECMag(&delta) < m_moveBaseSpeed) {
+					sGhostPartyWork.trailIndex++;
+				}
+			}
+
+			prev = *nextPos;
+		}
+
+		*outDist = (flatLen < worldLen) ? flatLen : worldLen;
+		if (*outDist > 0.01f) {
+			return;
+		}
 	}
+
+	sGhostPartyWork.activeTrailCount = 0;
+	*outVec = *reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(this) + 0x5E0);
+	outVec->y = 0.0f;
+
+	float dist = PSVECMag(outVec);
+	float maxDist = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x5D0);
+	*outDist = (dist < maxDist) ? dist : maxDist;
 }
 
 /*
@@ -2023,7 +2164,47 @@ void CGPartyObj::gpmCalcDist(Vec*, float&)
  */
 void CGPartyObj::gpmCol()
 {
-	gpmMove();
+	CGPartyObj* leader = Game.game.m_partyObjArr[0];
+	if (leader == nullptr) {
+		return;
+	}
+
+	for (int i = 0; i < 5; i++) {
+		Vec* basePos = (i == 0) ? &m_worldPosition : &sGhostPartyWork.trail[i];
+
+		Vec moveVec;
+		PSVECSubtract(&leader->m_worldPosition, basePos, &moveVec);
+
+		CMapCylinder col;
+		col.m_bottom = *basePos;
+		col.m_bottom.y += FLOAT_80331aa0;
+		col.m_direction = moveVec;
+		col.m_radius = m_bodyEllipsoidRadius;
+		col.m_height = m_bodyEllipsoidRadius;
+		col.m_top.x = FLOAT_80331a9c;
+		col.m_top.y = FLOAT_80331a9c;
+		col.m_top.z = FLOAT_80331a9c;
+		col.m_direction2.x = FLOAT_80331aa0;
+		col.m_direction2.y = FLOAT_80331aa0;
+		col.m_direction2.z = FLOAT_80331aa0;
+
+		if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &col, &moveVec, m_attrFlags & ~0x10U) == 0) {
+			sGhostPartyWork.activeTrailCount = i + 1;
+			sGhostPartyWork.leaderTrail[i] = leader->m_worldPosition;
+			break;
+		}
+
+		int nextCount = i + 1;
+		if (sGhostPartyWork.activeTrailCount == 0 || sGhostPartyWork.activeTrailCount > nextCount) {
+			sGhostPartyWork.activeTrailCount = nextCount;
+		}
+	}
+
+	if (sGhostPartyWork.activeTrailCount <= 0) {
+		sGhostPartyWork.trailIndex = 0;
+	} else if (sGhostPartyWork.trailIndex >= sGhostPartyWork.activeTrailCount) {
+		sGhostPartyWork.trailIndex = sGhostPartyWork.activeTrailCount - 1;
+	}
 }
 
 /*
@@ -2037,7 +2218,75 @@ void CGPartyObj::gpmCol()
  */
 void CGPartyObj::ghostPartyMog()
 {
+	CGPartyObj* leader = Game.game.m_partyObjArr[0];
+	if (leader == nullptr) {
+		return;
+	}
+
+	gpmCol();
 	gpmMove();
+
+	int stageMode = 0;
+	switch (Game.game.m_gameWork.m_bossArtifactStageIndex) {
+	case 4:
+	case 8:
+	case 9:
+	case 0x0B:
+	case 0x0C:
+	case 0x0D:
+		stageMode = 2;
+		break;
+	case 6:
+	case 10:
+		stageMode = 1;
+		break;
+	default:
+		stageMode = 0;
+		break;
+	}
+
+	float frameRatio = (float)(Game.game.m_gameWork.m_frameCounter % 100) / 100.0f;
+	float pressureScale = 1.0f;
+	if (stageMode == 2) {
+		pressureScale = 0.5f + (frameRatio * 0.5f);
+	} else if (stageMode == 1) {
+		pressureScale = 0.5f + ((1.0f - frameRatio) * 0.5f);
+	}
+
+	int targetPressure = (int)(100.0f * pressureScale);
+	float leaderDist = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x5D0);
+	if (leaderDist > Game.game.unkFloat_0xca10) {
+		sGhostPartyWork.mood = 1;
+		sGhostPartyWork.pressure += 2;
+	} else {
+		sGhostPartyWork.mood = 0;
+		sGhostPartyWork.pressure -= 1;
+	}
+
+	if (sGhostPartyWork.pressure < 0) {
+		sGhostPartyWork.pressure = 0;
+	} else if (sGhostPartyWork.pressure > (targetPressure + 100)) {
+		sGhostPartyWork.pressure = targetPressure + 100;
+	}
+
+	if (sGhostPartyWork.auraParticle != 0 && sGhostPartyWork.pressure < targetPressure / 2) {
+		endPSlotBit(0x400);
+		sGhostPartyWork.auraParticle = 0;
+	} else if (sGhostPartyWork.auraParticle == 0 && sGhostPartyWork.pressure > targetPressure) {
+		putParticle(0x20D, 0, this, 0.0f, 0);
+		sGhostPartyWork.auraParticle = 1;
+	}
+
+	if ((leader->m_lastStateId == 2 || leader->m_lastStateId == 6) &&
+	    leader->m_subState == 1 &&
+	    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(leader) + 0x668) != 0 &&
+	    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(leader) + 0x660) == 0) {
+		sGhostPartyWork.thresholdA++;
+		sGhostPartyWork.thresholdB = 0;
+	} else {
+		sGhostPartyWork.thresholdA = 0;
+		sGhostPartyWork.thresholdB++;
+	}
 }
 
 /*
@@ -2057,16 +2306,35 @@ void CGPartyObj::gpmMove()
 		return;
 	}
 
+	if (leader->m_lastStateId == 0 &&
+	    leader->m_animSlotSel == 0x0C &&
+	    *reinterpret_cast<CGObject**>(reinterpret_cast<unsigned char*>(leader) + 0x6F0) == reinterpret_cast<CGObject*>(Game.game.unk_flat3_0xc7d0)) {
+		sGhostPartyWork.settleTimer++;
+	} else {
+		sGhostPartyWork.settleTimer = 0;
+	}
+
+	if (sGhostPartyWork.carrySpeed > 0.05f) {
+		moveVector(&sGhostPartyWork.carryDir, sGhostPartyWork.carrySpeed, 1);
+	}
+	sGhostPartyWork.carrySpeed *= 0.85f;
+
+	Vec pathVec;
+	float pathDist = 0.0f;
+	gpmCalcDist(&pathVec, pathDist);
+
 	Vec toLeader;
 	PSVECSubtract(&leader->m_worldPosition, &m_worldPosition, &toLeader);
 	toLeader.y = 0.0f;
 	float dist = PSVECMag(&toLeader);
 	float nearDist = m_nearColRadius + leader->m_nearColRadius;
 
-	if (dist > nearDist * 1.25f) {
+	if (dist > nearDist * 1.25f || pathDist > Game.game.unkFloat_0xca10 * 0.75f) {
 		dstTargetRot(reinterpret_cast<CGPrgObj*>(leader));
 		moveVector(&toLeader, m_moveBaseSpeed * 0.9f, 1);
 		*reinterpret_cast<float*>(self + 0x5D0) = dist;
+		sGhostPartyWork.carryDir = toLeader;
+		sGhostPartyWork.carrySpeed = m_moveBaseSpeed * 0.35f;
 	} else if ((m_lastStateId == 2) && (dist < nearDist * 0.75f)) {
 		changeStat(0, 0, 0);
 	}
@@ -2079,6 +2347,7 @@ void CGPartyObj::gpmMove()
 		CancelMove(1);
 		rotTarget(reinterpret_cast<CGPrgObj*>(leader));
 		carry(0, reinterpret_cast<CGObject*>(leader), 0);
+		sGhostPartyWork.carrySpeed = 0.0f;
 	}
 }
 

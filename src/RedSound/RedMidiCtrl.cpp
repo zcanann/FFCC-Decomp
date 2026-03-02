@@ -36,12 +36,14 @@ int GetWaveBank__9CRedEntryFi(CRedEntry*, int);
  */
 int DataAddCompute(int* current, int target, int* delta)
 {
-    if (target == (*current >> 0xc)) {
-        *delta = 0;
-        return 0;
+    int value = *current;
+
+    if (target != (value >> 0xc)) {
+        return (((target << 0xc) + 0x800) - value) / *delta;
     }
 
-    return ((target << 0xc) + 0x800 - *current) / *delta;
+    *delta = 0;
+    return 0;
 }
 #pragma dont_inline reset
 

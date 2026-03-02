@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-void pppMatrixScl(void* mtx, void* data, void* param3);
+void pppMatrixScl(void* target, void* unused, void* param);
 
 #ifdef __cplusplus
 }

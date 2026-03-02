@@ -28,6 +28,7 @@ extern "C" int __cntlzw(unsigned int);
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
     void*, CGBaseObj*, int, int, int, CFlatRuntime::CStack*, CFlatRuntime::CStack*);
 extern "C" int SearchNode__Q26CChara6CModelFPc(CChara::CModel*, char*);
+extern "C" CGObject* FindGObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" CGQuadObj* FindGQuadObjFirst__13CFlatRuntime2Fv(void*);
 extern "C" CGQuadObj* FindGQuadObjNext__13CFlatRuntime2FP9CGQuadObj(void*, CGQuadObj*);
@@ -40,14 +41,19 @@ extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
     int, int, int, CGObject*, float, void*);
 extern unsigned char DAT_8032ec90[];
 extern float FLOAT_8033033c;
+extern float FLOAT_80330354;
 extern float FLOAT_80330340;
 extern float FLOAT_80330344;
+extern float FLOAT_8033035c;
 extern float FLOAT_80330368;
+extern float FLOAT_80330364;
+extern float FLOAT_8033036c;
 extern float FLOAT_80330360;
 extern double DOUBLE_80330348;
 extern double DOUBLE_803303e8;
 extern double DOUBLE_80330400;
 extern float FLOAT_80330410;
+extern float FLOAT_80330414;
 extern float FLOAT_80330418;
 extern float FLOAT_8033041c;
 extern float FLOAT_80330420;
@@ -962,12 +968,60 @@ void CGObject::bgNormalCollision()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800804a4
+ * PAL Size: 560b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGObject::bgWorldCollision()
 {
-	// TODO
+    Vec radial = m_worldPosition;
+    PSVECAdd(&radial, &m_groundHitOffset, &radial);
+
+    if (PSVECMag(&radial) > sZeroFloat) {
+        PSVECNormalize(&radial, &radial);
+    }
+    PSVECScale(&radial, &radial, FLOAT_80330354);
+
+    Vec hitMove;
+    hitMove.x = -radial.x * FLOAT_80330414;
+    hitMove.y = -radial.y * FLOAT_80330414;
+    hitMove.z = -radial.z * FLOAT_80330414;
+
+    CMapCylinder bodyCylinder;
+    bodyCylinder.m_bottom = radial;
+    bodyCylinder.m_direction = hitMove;
+    bodyCylinder.m_radius = FLOAT_8033033c;
+    bodyCylinder.m_height = FLOAT_8033033c;
+    bodyCylinder.m_top = hitMove;
+    bodyCylinder.m_direction2.x = FLOAT_80330340;
+    bodyCylinder.m_direction2.y = FLOAT_80330340;
+    bodyCylinder.m_direction2.z = FLOAT_80330340;
+    bodyCylinder.m_radius2 = sZeroFloat;
+    bodyCylinder.m_height2 = sZeroFloat;
+
+    const u32 hitMask = *reinterpret_cast<u32*>(&m_moveVec.x);
+    if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &bodyCylinder, &hitMove, hitMask) == 0) {
+        return;
+    }
+
+    CalcHitPosition__7CMapObjFP3Vec(*reinterpret_cast<void**>(reinterpret_cast<u8*>(&MapMng) + 0x22A88), &radial);
+    PSVECSubtract(&radial, &m_worldPosition, &m_groundHitOffset);
+
+    const unsigned char mapGroup = DAT_8032ec90[0x47];
+    u8* mapGroupData = reinterpret_cast<u8*>(&MapMng) + 0x214E8 + (mapGroup * 0x14);
+    if ((*reinterpret_cast<u32*>(mapGroupData) & 0x20) == 0) {
+        m_stateFlags0 = (m_stateFlags0 & 0x7F) | 0x80;
+        m_radiusCtrl.x = *reinterpret_cast<float*>(mapGroupData);
+        if (mapGroup != 0) {
+            m_lastBgGroup = static_cast<short>(mapGroup);
+        }
+        GetHitFaceNormal__7CMapObjFP3Vec(
+            *reinterpret_cast<void**>(reinterpret_cast<u8*>(&MapMng) + 0x22A88),
+            reinterpret_cast<Vec*>(&m_hitNormal.y));
+    }
 }
 
 /*
@@ -988,71 +1042,83 @@ void CGObject::bgAttribCollision()
         return;
     }
 
-    *reinterpret_cast<u8*>(&m_shieldNodeFlags) &= 0xDF;
+    *(reinterpret_cast<u8*>(&m_shieldNodeFlags)) &= 0xDF;
+
     if ((m_displayFlags & 4) != 0) {
+        Vec probePos;
+        Vec probeMove;
+        probePos.x = m_worldPosition.x;
+        probePos.y = m_worldPosition.y + FLOAT_80330410;
+        probePos.z = m_worldPosition.z;
+        probeMove.x = sZeroFloat;
+        probeMove.y = FLOAT_8033035c;
+        probeMove.z = sZeroFloat;
+
         CMapCylinder charmCylinder;
-        charmCylinder.m_bottom.x = m_worldPosition.x;
-        charmCylinder.m_bottom.y = FLOAT_80330410 + m_worldPosition.y;
-        charmCylinder.m_bottom.z = m_worldPosition.z;
-        charmCylinder.m_direction.x = sZeroFloat;
-        charmCylinder.m_direction.y = -1.0f;
-        charmCylinder.m_direction.z = sZeroFloat;
-        charmCylinder.m_radius = 0.3f;
-        charmCylinder.m_height = 0.3f;
-        charmCylinder.m_top = charmCylinder.m_direction;
-        charmCylinder.m_direction2.x = 0.3f;
-        charmCylinder.m_direction2.y = 0.6f;
-        charmCylinder.m_direction2.z = 0.6f;
+        charmCylinder.m_bottom = probePos;
+        charmCylinder.m_direction = probeMove;
+        charmCylinder.m_radius = FLOAT_8033033c;
+        charmCylinder.m_height = FLOAT_8033033c;
+        charmCylinder.m_top = probeMove;
+        charmCylinder.m_direction2.x = FLOAT_80330340;
+        charmCylinder.m_direction2.y = FLOAT_80330340;
+        charmCylinder.m_direction2.z = FLOAT_80330340;
         charmCylinder.m_radius2 = sZeroFloat;
         charmCylinder.m_height2 = sZeroFloat;
 
-        if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-                &MapMng, &charmCylinder, &charmCylinder.m_direction, 0x80000000)
-            != 0) {
+        if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &charmCylinder, &probeMove, 0x80000000) != 0) {
             Vec hitPos;
-            CalcHitPosition__7CMapObjFP3Vec(
-                *reinterpret_cast<void**>(reinterpret_cast<u8*>(&MapMng) + 0x22A88), &hitPos);
+            CalcHitPosition__7CMapObjFP3Vec(*reinterpret_cast<void**>(reinterpret_cast<u8*>(&MapMng) + 0x22A88), &hitPos);
             m_bgCharmFactor = m_worldPosition.y - hitPos.y;
-            *reinterpret_cast<u8*>(&m_shieldNodeFlags) = (*reinterpret_cast<u8*>(&m_shieldNodeFlags) & 0xDF) | 0x20;
+            *(reinterpret_cast<u8*>(&m_shieldNodeFlags)) |= 0x20;
         }
     }
 
     if ((m_weaponNodeFlags & 1) == 0) {
         if ((m_groundHitOffset.x != sZeroFloat) || (m_groundHitOffset.z != sZeroFloat)) {
+            Vec probePos;
+            Vec probeMove;
+            probePos.x = m_worldPosition.x;
+            probePos.y = m_worldPosition.y + FLOAT_80330360;
+            probePos.z = m_worldPosition.z;
+            probeMove.x = sZeroFloat;
+            probeMove.y = FLOAT_8033035c;
+            probeMove.z = sZeroFloat;
+
             CMapCylinder attrCylinder;
-            attrCylinder.m_bottom.x = m_worldPosition.x;
-            attrCylinder.m_bottom.y = FLOAT_80330360 + m_worldPosition.y;
-            attrCylinder.m_bottom.z = m_worldPosition.z;
-            attrCylinder.m_direction.x = sZeroFloat;
-            attrCylinder.m_direction.y = -0.5f;
-            attrCylinder.m_direction.z = sZeroFloat;
-            attrCylinder.m_radius = 0.3f;
-            attrCylinder.m_height = 0.3f;
-            attrCylinder.m_top = attrCylinder.m_direction;
-            attrCylinder.m_direction2.x = 0.3f;
-            attrCylinder.m_direction2.y = 0.6f;
-            attrCylinder.m_direction2.z = 0.6f;
+            attrCylinder.m_bottom = probePos;
+            attrCylinder.m_direction = probeMove;
+            attrCylinder.m_radius = FLOAT_8033033c;
+            attrCylinder.m_height = FLOAT_8033033c;
+            attrCylinder.m_top = probeMove;
+            attrCylinder.m_direction2.x = FLOAT_80330340;
+            attrCylinder.m_direction2.y = FLOAT_80330340;
+            attrCylinder.m_direction2.z = FLOAT_80330340;
             attrCylinder.m_radius2 = sZeroFloat;
             attrCylinder.m_height2 = sZeroFloat;
 
-            if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(
-                    &MapMng, &attrCylinder, &attrCylinder.m_direction, 0x78000000)
-                == 0) {
+            if (CheckHitCylinderNear__7CMapMngFP12CMapCylinderP3VecUl(&MapMng, &attrCylinder, &probeMove, 0x78000000) == 0) {
                 m_bgAttrValue = sAnimFrameOffset;
             } else {
-                const int attr = static_cast<int>(DAT_8032ec90[0x47]) - 0x28;
-                if (attr == 0) {
-                    m_bgAttrValue = 0.5f;
-                } else if (attr == 1) {
-                    m_bgAttrValue = 0.75f;
-                } else if (attr == 2) {
-                    m_bgAttrValue = 0.25f;
-                } else if (attr == 3) {
+                switch (DAT_8032ec90[0x47]) {
+                case 0x28:
+                    m_bgAttrValue = FLOAT_80330364;
+                    break;
+                case 0x29:
+                    m_bgAttrValue = FLOAT_80330368;
+                    break;
+                case 0x2A:
+                    m_bgAttrValue = FLOAT_8033036c;
+                    break;
+                case 0x2B:
                     m_bgAttrValue = sZeroFloat;
+                    break;
+                default:
+                    break;
                 }
             }
         }
-    } else {
+    } else if (m_attachOwner != 0) {
         m_bgAttrValue = m_attachOwner->m_bgAttrValue;
     }
 }
@@ -1069,12 +1135,97 @@ void CGObject::bgShadeCollision()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8007fee0
+ * PAL Size: 740b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CGObject::hit()
 {
-	// TODO
+    const bool hasModel =
+        (m_charaModelHandle != (CCharaPcs::CHandle*)0) &&
+        (m_charaModelHandle->m_model != (CChara::CModel*)0);
+    if (!hasModel) {
+        return;
+    }
+    u8* const modelBytes = reinterpret_cast<u8*>(m_charaModelHandle->m_model);
+    u8* const modelNodes = *reinterpret_cast<u8**>(modelBytes + 0xA8);
+
+    for (int i = 0; i < 8; i++) {
+        AttackCol* attack = &m_attackColliders[i];
+        const int node = static_cast<int>(attack->m_radius2);
+        PSMTXMultVec(reinterpret_cast<const float (*)[4]>(modelNodes + node * 0xC0 + 0xC),
+                     &attack->m_localStart, &attack->m_worldPosition);
+        PSVECAdd(&attack->m_worldPosition, &m_worldPosition, &attack->m_worldPosition);
+    }
+
+    for (int i = 0; i < 8; i++) {
+        DamageCol* damage = &m_damageColliders[i];
+        const int node = static_cast<int>(damage->m_outerRadius);
+        PSMTXMultVec(reinterpret_cast<const float (*)[4]>(modelNodes + node * 0xC0 + 0xC),
+                     &damage->m_localPosition, &damage->m_worldPosition);
+        PSVECAdd(&damage->m_worldPosition, &m_worldPosition, &damage->m_worldPosition);
+    }
+
+    if ((m_bgColMask & 0x40000) == 0) {
+        return;
+    }
+
+    for (CGObject* other = FindGObjFirst__13CFlatRuntime2Fv(CFlat); other != 0;
+         other = FindGObjNext__13CFlatRuntime2FP8CGObject(CFlat, other)) {
+        if ((other == this) || ((other->m_bgColMask & 0x80000) == 0)) {
+            continue;
+        }
+
+        Vec delta;
+        PSVECSubtract(&m_worldPosition, &other->m_worldPosition, &delta);
+        const float nearRadius = m_nearColRadius + other->m_nearColRadius;
+        if (PSVECDotProduct(&delta, &delta) > (nearRadius * nearRadius)) {
+            continue;
+        }
+
+        for (int attackIndex = 0; attackIndex < 8; attackIndex++) {
+            AttackCol* attack = &m_attackColliders[attackIndex];
+            if (attack->m_hitMask == 0) {
+                continue;
+            }
+
+            for (int damageIndex = 0; damageIndex < 8; damageIndex++) {
+                DamageCol* damage = &other->m_damageColliders[damageIndex];
+                if (((attack->m_hitMask & damage->m_hitMask) == 0) ||
+                    (damage->m_innerRadius == sZeroFloat) ||
+                    (damage->m_outerRadius == sZeroFloat)) {
+                    continue;
+                }
+
+                Vec attackVec;
+                Vec hitPos;
+                PSVECSubtract(&attack->m_worldPosition, &attack->m_localEnd, &attackVec);
+                if (Math.CrossCheckSphereVector(&hitPos, 0, &attack->m_localEnd, &attackVec,
+                                                reinterpret_cast<Vec*>(&damage->m_worldPosition.y),
+                                                damage->m_innerRadius) == 0) {
+                    continue;
+                }
+
+                if ((GetCID() & 0x2D) == 0x2D) {
+                    CFlatRuntime::CStack stackIn[7];
+                    stackIn[0].m_word = static_cast<u32>(attackIndex);
+                    stackIn[1].m_word = static_cast<u32>(other->m_particleId);
+                    stackIn[2].m_word = static_cast<u32>(damageIndex);
+                    *reinterpret_cast<float*>(&stackIn[3].m_word) = hitPos.x;
+                    *reinterpret_cast<float*>(&stackIn[4].m_word) = hitPos.y;
+                    *reinterpret_cast<float*>(&stackIn[5].m_word) = hitPos.z;
+                    stackIn[6].m_word = reinterpret_cast<u32>(m_scriptHandle);
+                    CFlatRuntime::CStack stackOut;
+                    SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+                        CFlat, this, 2, 0x13, 7, stackIn, &stackOut);
+                    onHit(attackIndex, other, damageIndex, &hitPos);
+                }
+            }
+        }
+    }
 }
 
 /*

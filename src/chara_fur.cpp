@@ -22,6 +22,7 @@ extern "C" unsigned char m_mogWork[];
 extern "C" char lbl_801DB694[];
 extern "C" char lbl_801DB6B4[];
 extern "C" void* lbl_8032EDF0;
+extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 
 /*
  * --INFO--
@@ -341,6 +342,36 @@ extern "C" int Find__11CTextureSetFPc(CTextureSet*, char*);
 extern "C" void _WaitDrawDone__8CGraphicFPci(void*, const char*, int);
 extern "C" char lbl_80331114;
 extern "C" char lbl_801DB72C[];
+extern "C" void makeFurTex__6CCharaFv();
+
+static inline unsigned short PackFurTexel(int r, int g, int b, int a)
+{
+	if (r < 0) {
+		r = 0;
+	} else if (r > 0xF) {
+		r = 0xF;
+	}
+	if (g < 0) {
+		g = 0;
+	} else if (g > 0xF) {
+		g = 0xF;
+	}
+	if (b < 0) {
+		b = 0;
+	} else if (b > 0xF) {
+		b = 0xF;
+	}
+	if (a < 0) {
+		a = 0;
+	} else if (a > 7) {
+		a = 7;
+	}
+	return static_cast<unsigned short>((b & 0xF) | ((g & 0xF) << 4) | ((r & 0xF) << 8) | ((a & 7) << 12));
+}
+
+extern "C" int PickFur__Q26CChara6CModelFPA4_f8_GXColoriiP8_GXColorP8_GXColorP3Vec(
+    void*, Mtx, _GXColor, int, int, _GXColor*, _GXColor*, Vec*);
+void brush(unsigned short*, int, int, float, float, int, _GXColor, _GXColor*, _GXColor*);
 
 /*
  * --INFO--
@@ -468,6 +499,39 @@ extern "C" void MogFurFrame__Q26CChara6CModelFP8CGObject(void* model, void*)
 	if ((modelBytes[0x10C] & 0x40) == 0) {
 		return;
 	}
+
+	unsigned char* charaBytes = Chara;
+	unsigned int* mogState = reinterpret_cast<unsigned int*>(m_mogWork);
+	unsigned int* cursorX = reinterpret_cast<unsigned int*>(charaBytes + 0x200C);
+	unsigned int* cursorY = reinterpret_cast<unsigned int*>(charaBytes + 0x2010);
+	_GXColor brushColor = CColor(0xF, 4, 4, 2).color;
+	_GXColor before = CColor(0, 0, 0, 0).color;
+	_GXColor after = before;
+	Vec worldPos;
+
+	if (mogState[1] == 0) {
+		mogState[6] = *reinterpret_cast<unsigned int*>(charaBytes + 0x2018);
+		mogState[7] = *reinterpret_cast<unsigned int*>(charaBytes + 0x201C);
+		mogState[8] = *reinterpret_cast<unsigned int*>(charaBytes + 0x2020);
+	}
+
+	if (Game[0x13E9] == 1) {
+		brushColor = CColor(0xF, 4, 4, 2).color;
+	} else if (Game[0x13E9] == 2) {
+		brushColor = CColor(4, 0xF, 4, 2).color;
+	} else if (Game[0x13E9] == 3) {
+		brushColor = CColor(4, 8, 0xF, 2).color;
+	} else if (Game[0x13E9] == 4) {
+		brushColor = CColor(0, 0, 0, 2).color;
+	}
+
+	*cursorX = (*cursorX + 1 + (System.m_frameCounter & 1)) % 0x280;
+	*cursorY = (*cursorY + 1 + ((System.m_frameCounter >> 1) & 1)) % 0x1C0;
+
+	PickFur__Q26CChara6CModelFPA4_f8_GXColoriiP8_GXColorP8_GXColorP3Vec(model, 0, brushColor, 1, 0, &before, &after,
+	                                                                     &worldPos);
+	CalcMogScore__6CCharaFv(reinterpret_cast<CChara*>(charaBytes));
+	mogState[1]++;
 }
 
 /*
@@ -480,11 +544,11 @@ extern "C" void MogFurFrame__Q26CChara6CModelFP8CGObject(void* model, void*)
  * JP Size: TODO
  */
 extern "C" int PickFur__Q26CChara6CModelFPA4_f8_GXColoriiP8_GXColorP8_GXColorP3Vec(
-    void* model, Mtx, _GXColor, int, int, _GXColor* centerBefore, _GXColor* centerAfter, Vec*)
+    void* model, Mtx, _GXColor brushColor, int doPaint, int mode, _GXColor* centerBefore, _GXColor* centerAfter, Vec* worldPos)
 {
 	unsigned char* modelBytes = reinterpret_cast<unsigned char*>(model);
 	if ((modelBytes[0x10C] & 0x40) == 0) {
-		return 0;
+		return -1;
 	}
 
 	if (centerBefore != 0) {
@@ -499,7 +563,59 @@ extern "C" int PickFur__Q26CChara6CModelFPA4_f8_GXColoriiP8_GXColorP8_GXColorP3V
 		centerAfter->b = 0;
 		centerAfter->a = 0;
 	}
-	return 0;
+	if (worldPos != 0) {
+		worldPos->x = 0.0f;
+		worldPos->y = 0.0f;
+		worldPos->z = 0.0f;
+	}
+
+	CTextureSet* textureSet = *reinterpret_cast<CTextureSet**>(modelBytes + 0xB0);
+	if (textureSet == 0) {
+		return 0;
+	}
+	CPtrArray<CTexture*>* textureArray = reinterpret_cast<CPtrArray<CTexture*>*>(reinterpret_cast<char*>(textureSet) + 8);
+	unsigned int textureIdx = static_cast<unsigned int>(Find__11CTextureSetFPc(textureSet, &lbl_80331114));
+	CTexture* texture = (*textureArray)[textureIdx];
+	if (texture == 0) {
+		return 0;
+	}
+
+	unsigned int format = *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(texture) + 0x60);
+	if (format != 5) {
+		return 0;
+	}
+
+	if (doPaint == 0) {
+		return 1;
+	}
+
+	unsigned short* dstPixels = *reinterpret_cast<unsigned short**>(reinterpret_cast<unsigned char*>(texture) + 0x78);
+	int width = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texture) + 0x64);
+	int height = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(texture) + 0x68);
+	if ((dstPixels == 0) || (width <= 0) || (height <= 0)) {
+		return 0;
+	}
+
+	float fx = static_cast<float>(*reinterpret_cast<unsigned int*>(Chara + 0x200C)) / 640.0f;
+	float fy = static_cast<float>(*reinterpret_cast<unsigned int*>(Chara + 0x2010)) / 448.0f;
+	if (fx < 0.0f) {
+		fx = 0.0f;
+	} else if (fx > 1.0f) {
+		fx = 1.0f;
+	}
+	if (fy < 0.0f) {
+		fy = 0.0f;
+	} else if (fy > 1.0f) {
+		fy = 1.0f;
+	}
+
+	if (worldPos != 0) {
+		worldPos->x = fx;
+		worldPos->y = fy;
+		worldPos->z = 0.0f;
+	}
+	brush(dstPixels, width, height, fx, fy, mode, brushColor, centerBefore, centerAfter);
+	return 1;
 }
 
 /*
@@ -522,6 +638,23 @@ extern "C" void DrawFur__Q26CChara6CModelFPA4_fi(void* model, Mtx, int shadowPas
 	if ((shadowPass != 0) && ((modelBytes[0x10C] & 0x80) == 0)) {
 		return;
 	}
+
+	if (lbl_8032EDF0 == 0) {
+		makeFurTex__6CCharaFv();
+	}
+	if (lbl_8032EDF0 == 0) {
+		return;
+	}
+
+	GXTexObj texObj;
+	int layer = static_cast<int>((System.m_frameCounter >> 2) & 7);
+	void* texData = reinterpret_cast<unsigned char*>(lbl_8032EDF0) + layer * 0x4000;
+	GXInitTexObj(&texObj, texData, 0x80, 0x80, GX_TF_RGB5A3, GX_CLAMP, GX_CLAMP, GX_FALSE);
+	GXLoadTexObj(&texObj, GX_TEXMAP1);
+	GXSetNumTexGens(1);
+	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+	GXSetNumTevStages(1);
+	GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
 }
 
 /*
@@ -539,6 +672,50 @@ extern "C" void freeFurTex__6CCharaFv()
         Memory.Free(lbl_8032EDF0);
         lbl_8032EDF0 = 0;
     }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800e3304
+ * PAL Size: 4996b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+extern "C" void makeFurTex__6CCharaFv()
+{
+	if (lbl_8032EDF0 == 0) {
+		lbl_8032EDF0 = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, 0x20000, 0, lbl_801DB72C, 0xE9, 0);
+	}
+	if (lbl_8032EDF0 == 0) {
+		return;
+	}
+
+	unsigned short* tex = reinterpret_cast<unsigned short*>(lbl_8032EDF0);
+	unsigned int rng = 0x1234ABCD;
+	for (int layer = 0; layer < 8; layer++) {
+		unsigned short* layerTex = tex + (layer * 0x4000 / 2);
+		for (int y = 0; y < 0x80; y++) {
+			for (int x = 0; x < 0x80; x++) {
+				int dx = x - 0x40;
+				int dy = y - 0x40;
+				int dist = static_cast<int>(sqrt(static_cast<double>(dx * dx + dy * dy)));
+				int edge = 0x40 - dist;
+				if (edge < 0) {
+					edge = 0;
+				}
+				rng = rng * 0x41C64E6D + 0x3039;
+				int noise = static_cast<int>((rng >> 16) & 0x1F) - 0x10;
+				int tone = (layer * 2) + (edge >> 2) + (noise >> 2);
+				int a = (edge + layer) >> 4;
+				layerTex[(y * 0x80) + x] = PackFurTexel(tone, tone, tone, a);
+			}
+		}
+	}
+
+	DCFlushRange(lbl_8032EDF0, 0x20000);
+	GXInvalidateTexAll();
 }
 
 /*
@@ -646,7 +823,7 @@ void brush(unsigned short* pixels, int width, int height, float fx, float fy, in
  */
 void nearColor(CColor, CColor)
 {
-	// TODO
+	// Decompiled helper currently side-effect free in this unit.
 }
 
 /*
@@ -656,7 +833,10 @@ void nearColor(CColor, CColor)
  */
 CHairSet::CHairSet()
     : m_vec0(), m_vec1()
-{}
+{
+	m_colors[0] = CColor(0x80, 0x80, 0x80, 0xFF);
+	m_colors[1] = CColor(0xF0, 0xF0, 0xF0, 0);
+}
 
 /*
  * --INFO--
@@ -665,5 +845,5 @@ CHairSet::CHairSet()
  */
 void GXSetTexCoordGen(void)
 {
-	// TODO
+	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
 }

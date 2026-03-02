@@ -42,6 +42,7 @@ extern "C" void SetStage__26CPtrArray_P12CMapAnimNode_FPQ27CMemory6CStage(
     CPtrArray<CMapAnimNode*>*, CMemory::CStage*);
 extern "C" CMapAnim* __vc__21CPtrArray_P8CMapAnim_FUl(void*, unsigned long);
 extern "C" CMapAnimNode* __vc__26CPtrArray_P12CMapAnimNode_FUl(void*, unsigned long);
+extern "C" void Calc__8CMapAnimFl(CMapAnim*, long);
 extern "C" int GetSize__26CPtrArray_P12CMapAnimNode_Fv(void*);
 extern "C" int Add__26CPtrArray_P12CMapAnimNode_FP12CMapAnimNode(CPtrArray<CMapAnimNode*>*, CMapAnimNode*);
 extern "C" int Add__27CPtrArray_P13CMapAnimKeyDt_FP13CMapAnimKeyDt(CPtrArray<CMapAnimKeyDt*>*, CMapAnimKeyDt*);
@@ -730,7 +731,7 @@ void CMapAnimRun::Calc(long frame)
 
 runFrame:
     CMapAnim* mapAnim = __vc__21CPtrArray_P8CMapAnim_FUl(MapMng + 0x213FC, run->mapAnimIndex);
-    mapAnim->Calc(run->currentFrame);
+    Calc__8CMapAnimFl(mapAnim, run->currentFrame);
     run->currentFrame = run->currentFrame + 1;
 
     if (run->currentFrame > run->endFrame) {

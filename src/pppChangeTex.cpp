@@ -59,11 +59,11 @@ extern "C" {
  */
 extern "C" void ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2(CChara::CModel* model, void* param_2, void* param_3, int param_4, int param_5, float (*param_6) [4])
 {
-	void* meshData = *(void**)((char*)model + param_4 * 0x14 + 0xb4);
-	void* displayList = (void*)(*(int*)((char*)meshData + 0x50) + param_5 * 0xc);
+	char* mesh = (char*)*(void**)((char*)model + 0xac) + param_4 * 0x14;
+	void* displayList = (char*)(*(void**)(*(int*)(mesh + 8) + 0x50)) + param_5 * 0xc;
 
 	if (*(char*)((char*)param_3 + 0x14) == 0) {
-		*(int*)(MaterialMan + 0xd0) = *(int*)((char*)param_2 + 0x1c) + 0x28;
+		*(int*)(MaterialMan + 0xd0) = (int)param_2 + 0x1c + 0x28;
 		*(int*)(MaterialMan + 0x44) = 0xFFFFFFFF;
 		*(char*)(MaterialMan + 0x4c) = 0xFF;
 		*(int*)(MaterialMan + 0x11c) = 0;

@@ -50,10 +50,10 @@ extern char DAT_801db568[];
  */
 void CWind::ClearAll()
 {
-	memset(this, 0, 0xc80);
-	*(u32*)((char*)this + 0xc80) = 1;
-	memset((char*)this + 0xc84, 0, 0x7000);
-	*(u32*)((char*)this + 0x7c84) = 10000000;
+	memset(m_objects, 0, sizeof(m_objects));
+	m_nextId = 1;
+	memset(_padC84, 0, sizeof(_padC84));
+	m_unk7C84 = 10000000;
 }
 
 /*
@@ -67,7 +67,7 @@ void CWind::ClearAll()
  */
 void CWind::Frame()
 {
-    u8* obj;
+    WindObject* obj;
     int i;
     int rnd;
     float f0;
@@ -75,11 +75,11 @@ void CWind::Frame()
     float f2;
     double d0;
 
-    obj = (u8*)this;
+    obj = m_objects;
     i = 0;
 
     while (true) {
-        if ((obj[0] & 0x80) != 0) {
+        if ((obj->flags & 0x80) != 0) {
             rnd = Rand__5CMathFUl(&Math, 10);
             if (rnd == 0) {
                 rnd = Rand__5CMathFUl(&Math, 3);
@@ -89,72 +89,68 @@ void CWind::Frame()
                     f0 = FLOAT_80330f20;
                 }
 
-                *(float*)(obj + 0x54) = *(float*)(obj + 0x4C) * f0 + *(float*)(obj + 0x54);
-                f0 = *(float*)(obj + 0x54);
-                if ((f1 <= f0) && ((f1 = f0), (*(float*)(obj + 0x4C) < f0))) {
-                    f1 = *(float*)(obj + 0x4C);
+                obj->targetPower = obj->basePower * f0 + obj->targetPower;
+                f0 = obj->targetPower;
+                if ((f1 <= f0) && ((f1 = f0), (obj->basePower < f0))) {
+                    f1 = obj->basePower;
                 }
-                *(float*)(obj + 0x54) = f1;
+                obj->targetPower = f1;
             }
 
-            if ((((*(int*)(obj + 0x1C) == 0) || (*(int*)(obj + 0x1C) == 1)) &&
+            if ((((obj->type == 0) || (obj->type == 1)) &&
                  ((rnd = Rand__5CMathFUl(&Math, 0x1E)), rnd == 0)) &&
-                (*(float*)(obj + 0x50) < FLOAT_80330f28 * *(float*)(obj + 0x4C))) {
+                (obj->curPower < FLOAT_80330f28 * obj->basePower)) {
                 rnd = Rand__5CMathFUl(&Math, 3);
                 f0 = FLOAT_80330f30;
                 if (rnd == 0) {
                     f0 = FLOAT_80330f2c;
                 }
 
-                *(float*)(obj + 0x48) = *(float*)(obj + 0x40) * f0 + *(float*)(obj + 0x48);
-                f0 = *(float*)(obj + 0x48);
-                f1 = *(float*)(obj + 0x40);
+                obj->targetDir = obj->baseDir * f0 + obj->targetDir;
+                f0 = obj->targetDir;
+                f1 = obj->baseDir;
                 if ((f1 <= f0) && ((f2 = FLOAT_80330f34 + f1), (f1 = f0), (f2 < f0))) {
                     f1 = f2;
                 }
-                *(float*)(obj + 0x48) = f1;
+                obj->targetDir = f1;
             }
 
-            if (*(int*)(obj + 0x1C) == 2) {
-                *(int*)(obj + 0x28) = *(int*)(obj + 0x28) + 1;
-                if (*(u32*)(obj + 0x24) <= *(u32*)(obj + 0x28)) {
-                    obj[0] = obj[0] & 0x7F;
+            if (obj->type == 2) {
+                obj->lifeTimer = obj->lifeTimer + 1;
+                if ((u32)obj->life <= (u32)obj->lifeTimer) {
+                    obj->flags = obj->flags & 0x7F;
                     goto next;
                 }
 
-                *(float*)(obj + 0x38) = (float)(((double)*(int*)(obj + 0x28) - DOUBLE_80330f40) /
-                                                ((double)*(int*)(obj + 0x24) - DOUBLE_80330f40));
-                *(float*)(obj + 0x30) = *(float*)(obj + 0x2C) * *(float*)(obj + 0x38);
-                *(float*)(obj + 0x34) = *(float*)(obj + 0x30) * *(float*)(obj + 0x30);
-                *(float*)(obj + 0x0C) = *(float*)(obj + 4) - *(float*)(obj + 0x30);
-                *(float*)(obj + 0x10) = *(float*)(obj + 8) - *(float*)(obj + 0x30);
-                *(float*)(obj + 0x14) = *(float*)(obj + 4) + *(float*)(obj + 0x30);
-                *(float*)(obj + 0x18) = *(float*)(obj + 8) + *(float*)(obj + 0x30);
+                obj->lifeRatio = (float)(((double)obj->lifeTimer - DOUBLE_80330f40) /
+                                         ((double)obj->life - DOUBLE_80330f40));
+                obj->radius = obj->baseRadius * obj->lifeRatio;
+                obj->radiusSq = obj->radius * obj->radius;
+                obj->minX = obj->centerX - obj->radius;
+                obj->minZ = obj->centerZ - obj->radius;
+                obj->maxX = obj->centerX + obj->radius;
+                obj->maxZ = obj->centerZ + obj->radius;
             }
 
-            *(float*)(obj + 0x50) = FLOAT_80330f38 * (*(float*)(obj + 0x54) - *(float*)(obj + 0x50)) +
-                                    *(float*)(obj + 0x50);
+            obj->curPower = FLOAT_80330f38 * (obj->targetPower - obj->curPower) + obj->curPower;
             d0 = (double)RandF__5CMathFv(&Math);
-            *(float*)(obj + 0x44) = *(float*)(obj + 0x44) +
-                                    (float)((double)FLOAT_80330f2c * d0 +
-                                            (double)(FLOAT_80330f38 *
-                                                         (*(float*)(obj + 0x48) - *(float*)(obj + 0x44)) -
-                                                     FLOAT_80330f28));
+            obj->curDir = obj->curDir +
+                          (float)((double)FLOAT_80330f2c * d0 +
+                                  (double)(FLOAT_80330f38 * (obj->targetDir - obj->curDir) - FLOAT_80330f28));
 
-            if ((*(int*)(obj + 0x1C) == 0) || (*(int*)(obj + 0x1C) == 1)) {
-                d0 = (double)sin((double)*(float*)(obj + 0x44));
-                *(float*)(obj + 0x58) = *(float*)(obj + 0x50) * (float)d0;
+            if ((obj->type == 0) || (obj->type == 1)) {
+                d0 = (double)sin((double)obj->curDir);
+                obj->force.x = obj->curPower * (float)d0;
                 d0 = (double)RandF__5CMathFv(&Math);
-                *(float*)(obj + 0x5C) =
-                    *(float*)(obj + 0x50) * (float)((double)FLOAT_80330f20 * d0 + (double)FLOAT_80330f24);
-                d0 = (double)cos((double)*(float*)(obj + 0x44));
-                *(float*)(obj + 0x60) = *(float*)(obj + 0x50) * (float)d0;
+                obj->force.y = obj->curPower * (float)((double)FLOAT_80330f20 * d0 + (double)FLOAT_80330f24);
+                d0 = (double)cos((double)obj->curDir);
+                obj->force.z = obj->curPower * (float)d0;
             }
         }
 
     next:
         i = i + 1;
-        obj = obj + 100;
+        obj++;
         if (0x1F < i) {
             return;
         }
@@ -172,7 +168,7 @@ void CWind::Frame()
  */
 void CWind::Draw()
 {
-    u8* obj = (u8*)this;
+    WindObject* obj = m_objects;
     Mtx viewMtx;
 
     PSMTXCopy(CameraPcs.m_cameraMatrix, viewMtx);
@@ -192,20 +188,20 @@ void CWind::Draw()
     GXSetVtxAttrFmt((_GXVtxFmt)0, (_GXAttr)9, (_GXCompCnt)1, (_GXCompType)4, 0);
 
     if ((*(u32*)(CFlat + 0x129c) & 0x800000) != 0) {
-        for (int i = 0; i < 32; i++, obj += 100) {
-            if ((s8)obj[0] >= 0) {
+        for (int i = 0; i < 32; i++, obj++) {
+            if ((s8)obj->flags >= 0) {
                 continue;
             }
 
-            if (*(s32*)(obj + 0x1C) == 1) {
+            if (obj->type == 1) {
                 CColor color(0xff, 0xff, 0, 0xff);
-                CVector pos(*(float*)(obj + 4), FLOAT_80330ef0, *(float*)(obj + 8));
-                Graphic.DrawSphere(viewMtx, (Vec*)&pos, *(float*)(obj + 0x30), &color.color);
+                CVector pos(obj->centerX, FLOAT_80330ef0, obj->centerZ);
+                Graphic.DrawSphere(viewMtx, (Vec*)&pos, obj->radius, &color.color);
             } else {
-                int alpha = (int)(FLOAT_80330f1c * (FLOAT_80330ef8 - *(float*)(obj + 0x38)));
+                int alpha = (int)(FLOAT_80330f1c * (FLOAT_80330ef8 - obj->lifeRatio));
                 CColor color(0xff, 0xff, 0x80, alpha);
-                CVector pos(*(float*)(obj + 4), FLOAT_80330ef0, *(float*)(obj + 8));
-                Graphic.DrawSphere(viewMtx, (Vec*)&pos, *(float*)(obj + 0x30), &color.color);
+                CVector pos(obj->centerX, FLOAT_80330ef0, obj->centerZ);
+                Graphic.DrawSphere(viewMtx, (Vec*)&pos, obj->radius, &color.color);
             }
         }
     }
@@ -222,7 +218,7 @@ void CWind::Draw()
  */
 void CWind::Calc(Vec* out, const Vec* pos, int randomize)
 {
-    u8* obj = (u8*)this;
+    WindObject* obj = m_objects;
     int i;
     float zero;
     Vec tmp;
@@ -243,27 +239,26 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
 
     i = 0;
     do {
-        if ((s8)obj[0] < 0) {
-            if (*(s32*)(obj + 0x1C) == 0) {
+        if ((s8)obj->flags < 0) {
+            if (obj->type == 0) {
                 if (randomize == 0) {
-                    PSVECAdd(out, (Vec*)(obj + 0x58), out);
+                    PSVECAdd(out, &obj->force, out);
                 } else {
-                    PSVECScale((Vec*)(obj + 0x58), &tmp, (float)RandF__5CMathFv(&Math));
+                    PSVECScale(&obj->force, &tmp, (float)RandF__5CMathFv(&Math));
                     PSVECAdd(out, &tmp, out);
                 }
             } else {
-                if ((*(float*)(obj + 0x0C) < pos->x) && (*(float*)(obj + 0x10) < pos->z) &&
-                    (pos->x < *(float*)(obj + 0x14)) && (pos->z < *(float*)(obj + 0x18))) {
-                    nz = (double)(pos->z - *(float*)(obj + 8));
-                    nx = (double)(pos->x - *(float*)(obj + 4));
+                if ((obj->minX < pos->x) && (obj->minZ < pos->z) && (pos->x < obj->maxX) && (pos->z < obj->maxZ)) {
+                    nz = (double)(pos->z - obj->centerZ);
+                    nx = (double)(pos->x - obj->centerX);
                     d = (double)(float)(nx * nx + (double)(float)(nz * nz));
                     if (d < (double)FLOAT_80330ef4) {
                         d = (double)FLOAT_80330ef4;
                     }
 
-                    if (*(s32*)(obj + 0x1C) == 2) {
-                        if (d < (double)*(float*)(obj + 0x34)) {
-                            yRand = (double)(FLOAT_80330ef8 - *(float*)(obj + 0x38) * *(float*)(obj + 0x38));
+                    if (obj->type == 2) {
+                        if (d < (double)obj->radiusSq) {
+                            yRand = (double)(FLOAT_80330ef8 - obj->lifeRatio * obj->lifeRatio);
                             d = (double)sqrtf((float)d);
                             if (d <= DOUBLE_80330f10) {
                                 d = DAT_8032ec20;
@@ -272,18 +267,20 @@ void CWind::Calc(Vec* out, const Vec* pos, int randomize)
                             inv = (double)(float)(yRand / d);
                             out->x = (float)(nx * inv + (double)out->x);
                             yRand = (double)RandF__5CMathFv(&Math);
-                            out->y = (float)((double)(float)(FLOAT_80330f18 + yRand) * (double)(float)(FLOAT_80330ef8 - *(float*)(obj + 0x38) * *(float*)(obj + 0x38)) + (double)out->y);
+                            out->y = (float)((double)(float)(FLOAT_80330f18 + yRand) *
+                                                 (double)(float)(FLOAT_80330ef8 - obj->lifeRatio * obj->lifeRatio) +
+                                             (double)out->y);
                             out->z = (float)(nz * inv + (double)out->z);
                         }
                     } else {
-                        PSVECScale((Vec*)(obj + 0x58), &tmp, FLOAT_80330ef8 - (float)(d / (double)*(float*)(obj + 0x34)));
+                        PSVECScale(&obj->force, &tmp, FLOAT_80330ef8 - (float)(d / (double)obj->radiusSq));
                         PSVECAdd(out, &tmp, out);
                     }
                 }
             }
         }
         i = i + 1;
-        obj = obj + 100;
+        obj++;
     } while (i < 32);
 }
 
@@ -318,54 +315,36 @@ void CWind::getObj(int)
  */
 int CWind::AddAmbient(float dir, float speed)
 {
-	int freeIdx;
-	int group;
-	u8* scan;
-	u8* freeObj;
-
-	freeIdx = 0;
-	group = 4;
-	scan = (u8*)this;
-	do {
-		freeObj = scan;
-		if (((((s8)scan[0] >= 0) || ((freeObj = scan + 100), (s8)freeObj[0] >= 0)) ||
-		     ((freeObj = scan + 200), (s8)freeObj[0] >= 0)) ||
-		    (((freeObj = scan + 300), (s8)freeObj[0] >= 0) ||
-		     ((freeObj = scan + 400), (s8)freeObj[0] >= 0)) ||
-		   (((freeObj = scan + 500), (s8)freeObj[0] >= 0) ||
-		    (((freeObj = scan + 600), (s8)freeObj[0] >= 0) ||
-		     ((freeObj = scan + 700), (s8)scan[700] >= 0)))) {
-			goto found;
+	int freeIdx = -1;
+	for (int i = 0; i < 32; i++) {
+		if ((s8)m_objects[i].flags >= 0) {
+			freeIdx = i;
+			break;
 		}
+	}
 
-		freeIdx += 7;
-		scan += 800;
-		group--;
-	} while (group != 0);
-
-	freeObj = 0;
-found:
-	if (freeObj == 0) {
-		System.Printf(DAT_801db568, freeIdx);
+	if (freeIdx < 0) {
+		System.Printf(DAT_801db568, 28);
 		return -1;
 	}
 
-	*(s32*)(freeObj + 0x1C) = 0;
-	freeObj[0] = (freeObj[0] & 0x7F) | 0x80;
+	WindObject* obj = &m_objects[freeIdx];
+	obj->type = 0;
+	obj->flags = (obj->flags & 0x7F) | 0x80;
 
-	int id = *(s32*)((u8*)this + 0xC80);
-	*(s32*)((u8*)this + 0xC80) = id + 1;
-	*(s32*)(freeObj + 0x20) = id;
+	int id = m_nextId;
+	m_nextId = id + 1;
+	obj->id = id;
 
-	*(float*)(freeObj + 0x48) = dir;
-	*(float*)(freeObj + 0x44) = dir;
-	*(float*)(freeObj + 0x40) = dir;
+	obj->targetDir = dir;
+	obj->curDir = dir;
+	obj->baseDir = dir;
 
-	*(float*)(freeObj + 0x54) = speed;
-	*(float*)(freeObj + 0x50) = speed;
-	*(float*)(freeObj + 0x4C) = speed;
+	obj->targetPower = speed;
+	obj->curPower = speed;
+	obj->basePower = speed;
 
-	return *(s32*)(freeObj + 0x20);
+	return obj->id;
 }
 
 /*
@@ -379,71 +358,49 @@ found:
  */
 int CWind::AddDiffuse(const Vec* pos, float radius, float dir, float speed)
 {
-	int freeIdx;
-	int group;
-	u8* scan;
-	u8* freeObj;
-
-	freeIdx = 0;
-	group = 4;
-	scan = (u8*)this;
-	do {
-		freeObj = scan;
-		if (((((s8)scan[0] >= 0) || ((freeObj = scan + 100), (s8)freeObj[0] >= 0)) ||
-		     ((freeObj = scan + 200), (s8)freeObj[0] >= 0)) ||
-		    (((freeObj = scan + 300), (s8)freeObj[0] >= 0) ||
-		     ((freeObj = scan + 400), (s8)freeObj[0] >= 0)) ||
-		   (((freeObj = scan + 500), (s8)freeObj[0] >= 0) ||
-		    (((freeObj = scan + 600), (s8)freeObj[0] >= 0) ||
-		     ((freeObj = scan + 700), (s8)scan[700] >= 0)))) {
-			goto found;
+	int freeIdx = -1;
+	for (int i = 0; i < 32; i++) {
+		if ((s8)m_objects[i].flags >= 0) {
+			freeIdx = i;
+			break;
 		}
+	}
 
-		freeIdx += 7;
-		scan += 800;
-		group--;
-	} while (group != 0);
-	freeObj = 0;
-
-found:
-
-	if (freeObj == 0) {
-		System.Printf(DAT_801db548, freeIdx);
+	if (freeIdx < 0) {
+		System.Printf(DAT_801db548, 28);
 		return -1;
 	}
 
 	const float x = pos->x;
 	const float z = pos->z;
+	WindObject* obj = &m_objects[freeIdx];
 
-	freeObj[0x1C] = 0;
-	freeObj[0x1D] = 0;
-	freeObj[0x1E] = 0;
-	freeObj[0x1F] = 1;
-	freeObj[0] = (freeObj[0] & 0x7F) | 0x80;
+	obj->type = 1;
+	obj->flags = (obj->flags & 0x7F) | 0x80;
 
-	int id = *(s32*)((u8*)this + 0xC80);
-	*(s32*)((u8*)this + 0xC80) = id + 1;
-	*(s32*)(freeObj + 0x20) = id;
+	int id = m_nextId;
+	m_nextId = id + 1;
+	obj->id = id;
 
-	*(float*)(freeObj + 0x48) = dir;
-	*(float*)(freeObj + 0x44) = dir;
-	*(float*)(freeObj + 0x40) = dir;
+	obj->targetDir = dir;
+	obj->curDir = dir;
+	obj->baseDir = dir;
 
-	*(float*)(freeObj + 0x54) = speed;
-	*(float*)(freeObj + 0x50) = speed;
-	*(float*)(freeObj + 0x4C) = speed;
+	obj->targetPower = speed;
+	obj->curPower = speed;
+	obj->basePower = speed;
 
-	*(float*)(freeObj + 0x30) = radius;
-	*(float*)(freeObj + 0x34) = radius * radius;
+	obj->radius = radius;
+	obj->radiusSq = radius * radius;
 
-	*(float*)(freeObj + 0x04) = x;
-	*(float*)(freeObj + 0x08) = z;
-	*(float*)(freeObj + 0x0C) = x - radius;
-	*(float*)(freeObj + 0x10) = z - radius;
-	*(float*)(freeObj + 0x14) = x + radius;
-	*(float*)(freeObj + 0x18) = z + radius;
+	obj->centerX = x;
+	obj->centerZ = z;
+	obj->minX = x - radius;
+	obj->minZ = z - radius;
+	obj->maxX = x + radius;
+	obj->maxZ = z + radius;
 
-	return *(s32*)(freeObj + 0x20);
+	return obj->id;
 }
 
 /*
@@ -457,53 +414,38 @@ found:
  */
 int CWind::AddSphere(const Vec* pos, float radius, float speed, int life)
 {
-	u8* freeObj;
-	int freeIdx = 0;
-	u8* scan = (u8*)this;
-	int group = 4;
-
-	do {
-		freeObj = scan;
-		if (((((s8)scan[0] >= 0) || ((freeObj = scan + 100), (s8)freeObj[0] >= 0)) ||
-		     ((freeObj = scan + 200), (s8)freeObj[0] >= 0)) ||
-		    (((freeObj = scan + 300), (s8)freeObj[0] >= 0) ||
-		     ((freeObj = scan + 400), (s8)freeObj[0] >= 0)) ||
-		   (((freeObj = scan + 500), (s8)freeObj[0] >= 0) ||
-		    (((freeObj = scan + 600), (s8)freeObj[0] >= 0) ||
-		     ((freeObj = scan + 700), (s8)scan[700] >= 0)))) {
-			goto found;
+	int freeIdx = -1;
+	for (int i = 0; i < 32; i++) {
+		if ((s8)m_objects[i].flags >= 0) {
+			freeIdx = i;
+			break;
 		}
-		freeIdx += 7;
-		scan += 800;
-		group--;
-	} while (group != 0);
-	freeObj = 0;
+	}
 
-found:
-
-	if (freeObj == 0) {
-		System.Printf(DAT_801db528, life, freeIdx);
+	if (freeIdx < 0) {
+		System.Printf(DAT_801db528, life, 28);
 		return -1;
 	}
 
-	*(s32*)(freeObj + 0x1C) = 2;
-	freeObj[0] = (freeObj[0] & 0x7F) | 0x80;
+	WindObject* obj = &m_objects[freeIdx];
+	obj->type = 2;
+	obj->flags = (obj->flags & 0x7F) | 0x80;
 
-	int id = *(s32*)((u8*)this + 0xC80);
-	*(s32*)((u8*)this + 0xC80) = id + 1;
-	*(s32*)(freeObj + 0x20) = id;
+	int id = m_nextId;
+	m_nextId = id + 1;
+	obj->id = id;
 
-	*(float*)(freeObj + 0x54) = speed;
-	*(float*)(freeObj + 0x50) = speed;
-	*(float*)(freeObj + 0x4C) = speed;
+	obj->targetPower = speed;
+	obj->curPower = speed;
+	obj->basePower = speed;
 
-	*(float*)(freeObj + 0x2C) = radius;
-	*(s32*)(freeObj + 0x24) = life;
-	*(s32*)(freeObj + 0x28) = 0;
-	*(float*)(freeObj + 0x04) = pos->x;
-	*(float*)(freeObj + 0x08) = pos->z;
+	obj->baseRadius = radius;
+	obj->life = life;
+	obj->lifeTimer = 0;
+	obj->centerX = pos->x;
+	obj->centerZ = pos->z;
 
-	return *(s32*)(freeObj + 0x20);
+	return obj->id;
 }
 
 /*
@@ -517,47 +459,14 @@ found:
  */
 void CWind::ChangePower(int id, float power)
 {
-	u8* found;
-	u8* scan = (u8*)this;
-	int group = 8;
-
-	do {
-		found = scan;
-		if (((s8)found[0] >= 0) || (id != *(s32*)(found + 0x20))) {
-			;
-		} else {
-			goto found_label;
+	for (int i = 0; i < 32; i++) {
+		WindObject* obj = &m_objects[i];
+		if (((s8)obj->flags >= 0) || (id != obj->id)) {
+			continue;
 		}
 
-		found = scan + 100;
-		if (((s8)found[0] >= 0) || (id != *(s32*)(found + 0x20))) {
-			;
-		} else {
-			goto found_label;
-		}
-
-		found = scan + 200;
-		if (((s8)found[0] >= 0) || (id != *(s32*)(found + 0x20))) {
-			;
-		} else {
-			goto found_label;
-		}
-
-		found = scan + 300;
-		if (((s8)found[0] >= 0) || (id != *(s32*)(found + 0x20))) {
-			;
-		} else {
-			goto found_label;
-		}
-
-		scan += 400;
-		group--;
-	} while (group != 0);
-	found = 0;
-
-found_label:
-	if (found != 0) {
-		*(float*)(found + 0x54) = power;
-		*(float*)(found + 0x4C) = power;
+		obj->targetPower = power;
+		obj->basePower = power;
+		return;
 	}
 }

@@ -7,15 +7,29 @@
 struct WindObject
 {
     u8 flags;
-    u8 pad1[3];
-    Vec pos;
-    u8 pad2[16];
+    u8 _pad01[3];
+    f32 centerX;
+    f32 centerZ;
+    f32 minX;
+    f32 minZ;
+    f32 maxX;
+    f32 maxZ;
     s32 type;
-    u8 pad3[16];
+    s32 id;
+    s32 life;
+    s32 lifeTimer;
+    f32 baseRadius;
     f32 radius;
-    u8 pad4[4];
-    f32 intensity;
-    u8 pad5[56]; // Total size: 100 bytes
+    f32 radiusSq;
+    f32 lifeRatio;
+    f32 _unk3C;
+    f32 baseDir;
+    f32 curDir;
+    f32 targetDir;
+    f32 basePower;
+    f32 curPower;
+    f32 targetPower;
+    Vec force;
 };
 
 class CWind
@@ -34,6 +48,9 @@ public:
 
 private:
     WindObject m_objects[32];
+    s32 m_nextId;
+    u8 _padC84[0x7000];
+    u32 m_unk7C84;
 };
 
 #endif // _FFCC_PPP_WIND_H_

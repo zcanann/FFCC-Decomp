@@ -5,6 +5,9 @@
 #include "ffcc/sound.h"
 #include <string.h>
 
+typedef signed short s16;
+typedef unsigned char u8;
+
 extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int, int, int, int);
 extern "C" void SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(CMenuPcs*, int);
 extern "C" void SetTexture__8CMenuPcsFQ28CMenuPcs3TEX(CMenuPcs*, int);
@@ -177,42 +180,48 @@ void CMenuPcs::CompaInit0()
  */
 bool CMenuPcs::CompaOpen()
 {
-	int menuState = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c);
-	if (*reinterpret_cast<char*>(menuState + 0xb) == 0) {
+	float zero;
+	double one;
+	s16* anim;
+	int finished;
+	int count;
+	int currentTime;
+	int remaining;
+
+	if (*(char*)(*(int*)((u8*)this + 0x82C) + 0xB) == '\0') {
 		CompaInit();
 	}
-
-	*reinterpret_cast<short*>(menuState + 0x22) = static_cast<short>(*reinterpret_cast<short*>(menuState + 0x22) + 1);
-	int time = static_cast<int>(*reinterpret_cast<short*>(menuState + 0x22));
-
-	int entryCount = static_cast<int>(**reinterpret_cast<short**>(reinterpret_cast<char*>(this) + 0x850));
-	short* entry = *reinterpret_cast<short**>(reinterpret_cast<char*>(this) + 0x850) + 4;
-	int completeCount = 0;
-	for (int i = 0; i < entryCount; ++i) {
-		if (*reinterpret_cast<int*>(entry + 0x12) <= time) {
-			int duration = *reinterpret_cast<int*>(entry + 0x14);
-			if (time < *reinterpret_cast<int*>(entry + 0x12) + duration) {
-				*reinterpret_cast<int*>(entry + 0x10) = *reinterpret_cast<int*>(entry + 0x10) + 1;
-				float t = static_cast<float>(*reinterpret_cast<int*>(entry + 0x10)) / static_cast<float>(duration);
-				*reinterpret_cast<float*>(entry + 8) = t;
-
-				if ((*reinterpret_cast<unsigned int*>(entry + 0x16) & 2) == 0) {
-					*reinterpret_cast<float*>(entry + 0x18) =
-						(*reinterpret_cast<float*>(entry + 0x1c) - static_cast<float>(*entry)) * t;
-					*reinterpret_cast<float*>(entry + 0x1a) =
-						(*reinterpret_cast<float*>(entry + 0x1e) - static_cast<float>(entry[1])) * t;
+	finished = 0;
+	*(s16*)(*(int*)((u8*)this + 0x82C) + 0x22) = *(s16*)(*(int*)((u8*)this + 0x82C) + 0x22) + 1;
+	count = (int)**(s16**)((u8*)this + 0x850);
+	anim = *(s16**)((u8*)this + 0x850) + 4;
+	currentTime = (int)*(s16*)(*(int*)((u8*)this + 0x82C) + 0x22);
+	remaining = count;
+	if (0 < count) {
+		do {
+			zero = 0.0f;
+			if (*(int*)(anim + 0x12) <= currentTime) {
+				if (currentTime < *(int*)(anim + 0x12) + *(int*)(anim + 0x14)) {
+					*(int*)(anim + 0x10) = *(int*)(anim + 0x10) + 1;
+					one = 1.0;
+					*(float*)(anim + 8) = (float)((1.0 / (double)*(unsigned int*)(anim + 0x14)) * (double)*(unsigned int*)(anim + 0x10));
+					if ((*(unsigned int*)(anim + 0x16) & 2) == 0) {
+						float t = (float)((one / (double)*(unsigned int*)(anim + 0x14)) * (double)*(unsigned int*)(anim + 0x10));
+						*(float*)(anim + 0x18) = (*(float*)(anim + 0x1C) - (float)anim[0]) * t;
+						*(float*)(anim + 0x1A) = (*(float*)(anim + 0x1E) - (float)anim[1]) * t;
+					}
+				} else {
+					finished = finished + 1;
+					*(float*)(anim + 8) = 1.0f;
+					*(float*)(anim + 0x18) = zero;
+					*(float*)(anim + 0x1A) = zero;
 				}
-			} else {
-				completeCount = completeCount + 1;
-				*reinterpret_cast<float*>(entry + 8) = 1.0f;
-				*reinterpret_cast<float*>(entry + 0x18) = 0.0f;
-				*reinterpret_cast<float*>(entry + 0x1a) = 0.0f;
 			}
-		}
-
-		entry += 0x20;
+			anim = anim + 0x20;
+			remaining = remaining - 1;
+		} while (remaining != 0);
 	}
-	return entryCount == completeCount;
+	return count == finished;
 }
 
 /*

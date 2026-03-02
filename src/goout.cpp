@@ -404,7 +404,6 @@ void CGoOutMenu::SetMenu(short, long)
  */
 void CGoOutMenu::SetMenuStr(long timer, int lineCount, ...)
 {
-    CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
     va_list args;
     unsigned int leadingZeros;
     int indexBase;
@@ -414,13 +413,13 @@ void CGoOutMenu::SetMenuStr(long timer, int lineCount, ...)
     short messageIndex;
 
     field_0x38 ^= 1;
-    winMessage = reinterpret_cast<int*>(const_cast<char*>(GetWinMess__8CMenuPcsFi(&MenuPcs, field_0x38 + 0x22)));
+    winMessage = (int*)GetWinMess__8CMenuPcsFi(&MenuPcs, field_0x38 + 0x22);
     *winMessage = lineCount;
 
     va_start(args, lineCount);
-    leadingZeros = static_cast<unsigned int>(__cntlzw(static_cast<unsigned int>(field_0x38)));
+    leadingZeros = (unsigned int)__cntlzw((unsigned int)field_0x38);
     indexBase = static_cast<int>(~-(leadingZeros >> 5 & 1U) & 10U);
-    winMessageBuffer = const_cast<const char**>(GetMcWinMessBuff__8CMenuPcsFi(&MenuPcs, 2));
+    winMessageBuffer = (const char**)GetMcWinMessBuff__8CMenuPcsFi(&MenuPcs, 2);
     for (i = 0; i < lineCount; i++) {
         winMessageBuffer[indexBase + i] = va_arg(args, const char*);
     }
@@ -428,6 +427,7 @@ void CGoOutMenu::SetMenuStr(long timer, int lineCount, ...)
 
     messageIndex = field_0x38;
     if (field_0x36 >= 0) {
+        CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
         *reinterpret_cast<short*>(menuPcsLayout.field_2120 + 0xA) = 2;
         *reinterpret_cast<short*>(menuPcsLayout.field_2092 + 0x22) = 0;
     }

@@ -21,6 +21,7 @@ extern float FLOAT_80330e68;
 extern float FLOAT_80330eb8;
 extern float FLOAT_80330ec0;
 extern double DOUBLE_80330e70;
+extern void* DAT_80238030;
 extern char DAT_80330e50[];
 extern char DAT_80330e88[];
 extern char DAT_80330e90[];
@@ -36,6 +37,8 @@ extern struct {
     float _224_4_;
     float _228_4_;
     float _232_4_;
+    Mtx m_cameraMatrix;
+    Mtx44 m_screenMatrix;
 } CameraPcs;
 
 struct Vec2d {
@@ -65,6 +68,10 @@ void _WaitDrawDone__8CGraphicFPci(CGraphic*, char*, int);
 int IsHasDrawFmtDL__5CUtilFUc(void*, unsigned char);
 void ConvI2FVector__5CUtilFR3Vec6S16Vecl(void*, Vec*, S16Vec*, unsigned long);
 void ConvF2IVector2d__5CUtilFR8S16Vec2d5Vec2dl(void*, S16Vec2d*, Vec2d*, long);
+void RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
+    void* util, float x0, float y0, float x1, float y1, _GXTexObj* texObj, Vec2d* uv0, Vec2d* uv1, _GXColor* color,
+    _GXBlendFactor srcFactor, _GXBlendFactor dstFactor);
+void Draw__Q29CCharaPcs7CHandleFi(CCharaPcs::CHandle* handle, int drawType);
 }
 
 /*
@@ -750,12 +757,189 @@ void pppRenderYmMana(void)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800d6110
+ * PAL Size: 2040b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void Mana_BeforeDrawCallback(CChara::CModel*, void*, void*, float (*) [4], int)
+void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (*)[4], int pass)
 {
-	// TODO
+    u32* work = (u32*)workPtr;
+    Mtx savedCameraMtx;
+    Mtx lookAtMtx;
+    Mtx44 savedScreenMtx;
+    Mtx44 projectionMtx;
+    _GXTexObj sceneTexObj;
+    _GXTexObj depthTexObj;
+    Vec centerPos;
+    Vec cameraPos;
+    Vec cameraUp;
+    CCharaPcs::CHandle* handle;
+    CGObject* gObject;
+    s32 model;
+    u32 depthTexSize;
+    u32 sourceTexObjs;
+    u32 targetTexObjs;
+    s32 i;
+    f32 savedViewport[6];
+
+    if (pass != 0 || *(u8*)((u8*)step + 0x1C) == 0) {
+        return;
+    }
+
+    if (Game.game.m_currentMapId == 0x21) {
+        GXGetViewportv(savedViewport);
+    }
+
+    Graphic.SetViewport();
+    PSMTXCopy(CameraPcs.m_cameraMatrix, savedCameraMtx);
+    PSMTX44Copy(CameraPcs.m_screenMatrix, savedScreenMtx);
+    Graphic.GetBackBufferRect2(DAT_80238030, &sceneTexObj, 0, 0, 0x80, 0x80, 0, GX_NEAR, GX_TF_RGBA8, 0);
+
+    gObject = (CGObject*)work[0];
+    if (gObject == NULL) {
+        return;
+    }
+
+    handle = (CCharaPcs::CHandle*)GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
+    model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    *(u32*)(model + 0xF0) = 0;
+    *(u32*)(model + 0xFC) = 0;
+
+    if (Game.game.m_currentSceneId == 7) {
+        centerPos.x = FLOAT_80330e4c;
+        centerPos.y = FLOAT_80330e4c;
+        centerPos.z = FLOAT_80330e4c;
+    } else {
+        centerPos = gObject->m_worldPosition;
+    }
+    centerPos.y += FLOAT_80330e60;
+
+    depthTexSize = GXGetTexBufferSize(0x80, 0x80, GX_TF_Z24X8, GX_FALSE, 0);
+    GXGetTexBufferSize(0x80, 0x80, GX_TF_RGBA8, GX_FALSE, 0);
+    sourceTexObjs = work[8];
+
+    if (*(u8*)((u8*)step + 0x38) != 0) {
+        Graphic.GetBackBufferRect2(DAT_80238030, &depthTexObj, 0, 0, 0x80, 0x80, depthTexSize, GX_LINEAR,
+                                   (_GXTexFmt)0x16, 1);
+        GXSetViewport(FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330e48, FLOAT_80330e48, FLOAT_80330e4c, FLOAT_80330e58);
+        C_MTXPerspective(projectionMtx, FLOAT_80330eb8, FLOAT_80330e58, FLOAT_80330e58, FLOAT_80330ec0);
+        GXSetProjection(projectionMtx, (_GXProjectionType)0);
+
+        for (i = 0; i < 6; i++) {
+            cameraPos = centerPos;
+            cameraUp.x = FLOAT_80330e4c;
+            cameraUp.y = FLOAT_80330e58;
+            cameraUp.z = FLOAT_80330e4c;
+
+            if (i == 3) {
+                cameraPos.z -= FLOAT_80330e58;
+            } else if (i < 3) {
+                if (i == 1) {
+                    cameraPos.z += FLOAT_80330e58;
+                } else if (i < 1) {
+                    cameraPos.x += FLOAT_80330e58;
+                } else {
+                    cameraPos.x -= FLOAT_80330e58;
+                }
+            } else if (i == 5) {
+                cameraPos.y -= FLOAT_80330e58;
+                cameraUp.y = FLOAT_80330e4c;
+                cameraUp.z = FLOAT_80330e4c;
+            } else {
+                cameraPos.y += FLOAT_80330e58;
+                cameraUp.y = FLOAT_80330e4c;
+                cameraUp.z = FLOAT_80330e68;
+            }
+
+            C_MTXLookAt(lookAtMtx, (Point3d*)&centerPos, &cameraUp, (Point3d*)&cameraPos);
+            Graphic.SetViewport();
+            GXSetScissor(0, 0, 0x80, 0x80);
+            RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
+                DAT_8032ec70, FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330e48, FLOAT_80330e48, (GXTexObj*)sourceTexObjs,
+                0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
+
+            GXSetViewport(FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330e48, FLOAT_80330e48, FLOAT_80330e4c, FLOAT_80330e58);
+            GXSetScissor(0, 0, 0x80, 0x80);
+            PSMTXCopy(lookAtMtx, CameraPcs.m_cameraMatrix);
+            GXSetProjection(projectionMtx, (_GXProjectionType)0);
+
+            if (((gObject->m_weaponNodeFlags & 1) != 0 || gObject->m_attachOwner != NULL) &&
+                gObject->m_attachOwner != NULL && gObject->m_attachOwner->m_charaModelHandle != NULL) {
+                CCharaPcs::CHandle* owner = gObject->m_attachOwner->m_charaModelHandle;
+                s32 ownerModel = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(owner);
+
+                *(u32*)(ownerModel + 0xE4) = (u32)work;
+                *(u32*)(ownerModel + 0xE8) = (u32)step;
+                *(u32*)(ownerModel + 0xF0) = (u32)Mana_BeforeDrawShadowLockEnvCallback;
+                *(u32*)(ownerModel + 0x100) = (u32)Chara_DrawShadowMeshDLCallback;
+                Draw__Q29CCharaPcs7CHandleFi(owner, 1);
+                *(u32*)(ownerModel + 0xE4) = 0;
+                *(u32*)(ownerModel + 0xE8) = 0;
+                *(u32*)(ownerModel + 0xF0) = 0;
+                *(u32*)(ownerModel + 0x100) = 0;
+            }
+
+            Graphic.GetBackBufferRect2(DAT_80238030, (_GXTexObj*)sourceTexObjs, 0, 0, 0x80, 0x80, depthTexSize,
+                                       GX_NEAR, GX_TF_RGBA8, 0);
+            depthTexSize += GXGetTexBufferSize(0x80, 0x80, GX_TF_RGBA8, GX_FALSE, 0);
+            sourceTexObjs += 0x20;
+        }
+
+        PSMTXCopy(savedCameraMtx, CameraPcs.m_cameraMatrix);
+        Graphic.SetViewport();
+        GXSetScissor(0, 0, 0x280, 0x1C0);
+        for (i = 0; i < 0x10; i++) {
+            GXSetTevKColorSel((GXTevStageID)i, (GXTevKColorSel)6);
+            GXSetTevKAlphaSel((GXTevStageID)i, (GXTevKAlphaSel)0);
+            _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(i, 0, 0);
+        }
+        *((u8*)work + 0xF4) = 1;
+    }
+
+    targetTexObjs = work[0x1F];
+    if (*(u8*)((u8*)step + 0x38) == 0) {
+        if (*((u8*)work + 0xF4) == 0) {
+            GXInitTexObj((GXTexObj*)work[10], (void*)work[12], 0x80, 0x80, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+            GXInitTexObj((GXTexObj*)work[11], (void*)work[13], 0x80, 0x80, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+            drawParaboloidMap((GXTexObj*)work[8], (GXTexObj*)work[11], (void*)work[9], work[0x3B],
+                              (GXTexObj*)(targetTexObjs + 0x28), 1);
+            drawParaboloidMap((GXTexObj*)work[8], (GXTexObj*)work[10], (void*)work[9], work[0x3B],
+                              (GXTexObj*)(targetTexObjs + 0x28), 0);
+            RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
+                DAT_8032ec70, FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330e48, FLOAT_80330e48, &sceneTexObj, 0, 0, 0,
+                (_GXBlendFactor)4, (_GXBlendFactor)5);
+            *((u8*)work + 0xF4) = 1;
+        }
+    } else {
+        GXInitTexObj((GXTexObj*)work[10], (void*)work[12], 0x80, 0x80, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+        GXInitTexObjLOD((GXTexObj*)work[10], GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+        GXInitTexObj((GXTexObj*)work[11], (void*)work[13], 0x80, 0x80, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+        GXInitTexObjLOD((GXTexObj*)work[11], GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+        drawParaboloidMap((GXTexObj*)work[0x1E], (GXTexObj*)work[11], (void*)work[9], work[0x3B],
+                          (GXTexObj*)(targetTexObjs + 0x28), 1);
+        drawParaboloidMap((GXTexObj*)work[0x1E], (GXTexObj*)work[10], (void*)work[9], work[0x3B],
+                          (GXTexObj*)(targetTexObjs + 0x28), 0);
+        Graphic.SetViewport();
+        GXSetProjection(savedScreenMtx, (_GXProjectionType)0);
+        PSMTXCopy(savedCameraMtx, CameraPcs.m_cameraMatrix);
+        RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
+            DAT_8032ec70, FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330e48, FLOAT_80330e48, &sceneTexObj, 0, 0, 0,
+            (_GXBlendFactor)4, (_GXBlendFactor)5);
+    }
+
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+    handle = (CCharaPcs::CHandle*)GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
+    model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
+    *(u32*)(model + 0xF0) = (u32)Mana_BeforeDrawCallback;
+    *(u32*)(model + 0xFC) = (u32)Mana_DrawMeshDLCallback;
+
+    if (Game.game.m_currentMapId == 0x21) {
+        GXSetViewport(savedViewport[0], savedViewport[1], savedViewport[2], savedViewport[3], savedViewport[4],
+                      savedViewport[5]);
+    }
 }
 
 /*

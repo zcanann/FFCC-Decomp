@@ -5,7 +5,7 @@
 extern CMath math[];
 extern s32 lbl_8032ED70;
 extern f32 lbl_8032FF88;
-extern f32 lbl_801EADC8;
+extern f32 lbl_801EADC8[];
 extern "C" float RandF__5CMathFv(CMath* instance);
 
 struct RandFloatParam {
@@ -33,8 +33,8 @@ struct RandFloatCtx {
  */
 void pppRandFloat(void* param1, void* param2, void* param3)
 {
-    RandFloatParam* in = (RandFloatParam*)param2;
     RandFloatCtx* ctx = (RandFloatCtx*)param3;
+    RandFloatParam* in = (RandFloatParam*)param2;
     u8* base;
     f32* valuePtr;
 
@@ -62,11 +62,12 @@ void pppRandFloat(void* param1, void* param2, void* param3)
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
     }
 
+    s32 sourceOffset = in->sourceOffset;
     f32* source;
-    if (in->sourceOffset == -1) {
-        source = &lbl_801EADC8;
+    if (sourceOffset == -1) {
+        source = lbl_801EADC8;
     } else {
-        source = (f32*)(base + in->sourceOffset + 0x80);
+        source = (f32*)(base + sourceOffset + 0x80);
     }
 
     *source = *source + (in->blend * *valuePtr - in->blend);

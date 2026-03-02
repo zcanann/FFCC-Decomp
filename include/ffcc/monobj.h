@@ -29,7 +29,7 @@ public:
     void rotTarget(int, float);
     void onStatAttack(int);
     void setAttackAfter(int);
-    void getNearParty(int, int, float, float, int);
+    int getNearParty(int, int, float, float, int);
     void onChangeStat(int);
     void setActionParam(int);
     void onCancelStat(int);

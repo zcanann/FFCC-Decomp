@@ -855,7 +855,47 @@ void la(CGObject*)
  */
 void CGCharaObj::statAttack()
 {
-	onStatAttack(0);
+	typedef unsigned int (*VCall0C)(void*);
+	typedef void (*VCall88)(void*, int);
+	typedef void (*VCall90)(void*, int, int, int);
+
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	VCall0C cidFn = *reinterpret_cast<VCall0C*>(*reinterpret_cast<int*>(self + 0x48) + 0x0C);
+	unsigned int cid = cidFn(this);
+
+	if ((cid & 0xAD) == 0xAD && m_subState == 0) {
+		void* animPoint = m_scriptHandle != 0 ? m_scriptHandle[4] : 0;
+		if (animPoint == reinterpret_cast<void*>(0x88) || animPoint == reinterpret_cast<void*>(0x87)) {
+			m_subState = 1;
+			m_stateFrame = 0;
+		}
+	}
+
+	VCall88 vcall88 = *reinterpret_cast<VCall88*>(*reinterpret_cast<int*>(self + 0x48) + 0x88);
+	vcall88(this, 0);
+
+	if (m_stateFrame == 0) {
+		self[0x640] &= 0x7F;
+		self[0x648] &= 0x7F;
+		self[0x650] &= 0x7F;
+		self[0x658] &= 0x7F;
+
+		int pdt = *reinterpret_cast<int*>(self + 0x560);
+		int dataNo = *reinterpret_cast<int*>(self + 0x564);
+		putParticleFromItem(pdt, 0, dataNo, 0);
+		putParticleFromItem(pdt, 1, dataNo, 0);
+		putParticleFromItem(pdt, 2, dataNo, 0);
+		putParticleFromItem(pdt, 3, dataNo, 0);
+		reqAnim(*reinterpret_cast<int*>(self + 0x550), 0, 0);
+	}
+
+	VCall90 vcall90 = *reinterpret_cast<VCall90*>(*reinterpret_cast<int*>(self + 0x48) + 0x90);
+	if (m_stateFrame == static_cast<unsigned int>(*reinterpret_cast<int*>(self + 0x630))) {
+		vcall90(this, 1, 0, 0);
+	}
+	if (m_stateFrame == static_cast<unsigned int>(*reinterpret_cast<int*>(self + 0x634))) {
+		vcall90(this, 0, 0, 0);
+	}
 }
 
 /*
@@ -997,7 +1037,14 @@ void CGCharaObj::onDrawDebug(CFont*, float, float&, float)
  */
 void CGCharaObj::addSe(int)
 {
-	playSe3D(0, 0x7F, 0x40, 0, &m_worldPosition);
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	int particle = *reinterpret_cast<int*>(self + 0x560);
+	unsigned short se = *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + (particle * 0x48) + 0x38);
+	if (se == 0 || se == 0xFFFF) {
+		return;
+	}
+	int seNo = (se & 0xFF) + ((static_cast<int>(se) >> 8) * 1000);
+	playSe3D(seNo, 0x32, 0x96, 0, 0);
 }
 
 /*
@@ -1011,7 +1058,7 @@ void CGCharaObj::addSe(int)
  */
 void CGCharaObj::seDamageDelete()
 {
-	Sound.StopSe3DGroup(static_cast<short>(m_ownerType));
+	Sound.StopSe3DGroup(*(short*)(reinterpret_cast<unsigned char*>(this) + 0x30));
 }
 
 /*

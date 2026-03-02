@@ -510,7 +510,7 @@ void CMenuPcs::InitCharaSelectInfo()
 	unsigned char* const bytes = reinterpret_cast<unsigned char*>(this);
 	unsigned char* const selectData = reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int*>(bytes + 0x828)[0]);
 	if (selectData != 0) {
-		memset(selectData, 0, 0x40);
+		memset(selectData, 0, 0x80);
 		for (int i = 0; i < 4; i++) {
 			unsigned char* const entry = selectData + i * 0x10;
 			*reinterpret_cast<short*>(entry + 4) = static_cast<short>(i);

@@ -706,57 +706,51 @@ void _VolumeExecute(RedVoiceDATA* voice, int volume)
  */
 void _PitchExecute(RedVoiceDATA* param_1)
 {
-    int pitchDelta = 0;
-    int* voiceData = (int*)param_1;
-    int* trackData = (int*)voiceData[0];
+    int iVar1;
+    int iVar2;
+    int iVar3;
+    u32 uVar4;
+    int* param = (int*)param_1;
 
-    if ((trackData[0x1D] != 0) && (((s16*)voiceData)[10] == 0)) {
-        u32 pitchLfo = (u32)trackData[0x20] >> 0xC;
-        if ((int)pitchLfo < 0x80) {
-            pitchDelta = ((int)pitchLfo + 1) * 2;
+    iVar3 = 0;
+    if ((*(int*)(*param + 0x74) != 0) && (*(s16*)(param + 10) == 0)) {
+        uVar4 = (u32)(*(int*)(*param + 0x80)) >> 0xC;
+        if ((int)uVar4 < 0x80) {
+            iVar3 = ((int)uVar4 + 1) * 2;
         } else {
-            pitchDelta = ((int)(pitchLfo & 0x7F) + 1) * 0x18;
+            iVar3 = ((int)(uVar4 & 0x7F) + 1) * 0x18;
         }
 
-        if ((((u8*)voiceData)[0x1A] & 3) == 0) {
-            pitchDelta = PitchCompute(
-                voiceData[0x28] + *DAT_8032f420,
-                ((s16*)trackData)[0xA1] + ((s16*)trackData)[0x9F] + pitchDelta,
-                ((int*)voiceData[1])[5],
-                ((s8*)trackData)[0x148]);
+        if ((*(u8*)((int)param_1 + 0x1A) & 3) == 0) {
+            iVar2 = param[0x28] + *DAT_8032f420;
         } else {
-            pitchDelta = PitchCompute(
-                voiceData[0x28] + trackData[0x17],
-                ((s16*)trackData)[0xA1] + ((s16*)trackData)[0x9F] + pitchDelta,
-                ((int*)voiceData[1])[5],
-                ((s8*)trackData)[0x148]);
+            iVar2 = param[0x28] + *(int*)(*param + 0x5C);
         }
 
-        {
-            int currentPitch = voiceData[0x26];
-            int (*pitchWaveFunc)(u32) = *(int (**)(u32))((u8*)trackData + 0x74);
-            int pitchWave = pitchWaveFunc((u32)voiceData[7] >> 0xC);
-            pitchDelta = ((pitchDelta - currentPitch) * (pitchWave >> 4)) >> 0xC;
-        }
+        iVar3 =
+            PitchCompute(iVar2, (int)*(s16*)(*param + 0x142) + *(s16*)(*param + 0x13E) + iVar3, *(int*)(param[1] + 0x14), (int)*(s8*)(*param + 0x148));
+        iVar1 = param[0x26];
+        iVar2 = (**(int (**)(u32))(*param + 0x74))((u32)param[7] >> 0xC);
+        iVar3 = ((iVar3 - iVar1) * (iVar2 >> 4)) >> 0xC;
 
-        if (voiceData[8] != 0) {
-            int frame = voiceData[9];
-            voiceData[9] = frame + 1;
-            pitchDelta = (pitchDelta * frame) / voiceData[8];
-            if (voiceData[8] <= voiceData[9]) {
-                voiceData[8] = 0;
+        if (param[8] != 0) {
+            iVar2 = param[9];
+            param[9] = param[9] + 1;
+            iVar3 = (iVar3 * iVar2) / param[8];
+            if (param[8] <= param[9]) {
+                param[8] = 0;
             }
         }
 
-        if (pitchDelta < 0) {
-            pitchDelta >>= 1;
+        if (iVar3 < 0) {
+            iVar3 >>= 1;
         }
 
-        voiceData[7] += trackData[0x1E];
+        param[7] = param[7] + *(int*)(*param + 0x78);
     }
 
-    voiceData[0x27] = pitchDelta + voiceData[0x26] + voiceData[0xF];
-    voiceData[0x24] |= 0x10;
+    param[0x27] = iVar3 + param[0x26] + param[0xF];
+    param[0x24] |= 0x10;
 }
 
 /*

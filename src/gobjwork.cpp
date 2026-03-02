@@ -1858,12 +1858,35 @@ void CCaravanWork::GetNumCombi(int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009f2a4
+ * PAL Size: 224b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::GetNextCmdListIdx(int, int)
+int CCaravanWork::GetNextCmdListIdx(int cmdListIdx, int direction)
 {
-	// TODO
+	while (true) {
+		cmdListIdx += direction;
+
+		if (cmdListIdx < 0) {
+			cmdListIdx += (short)m_numCmdListSlots;
+		} else if ((short)m_numCmdListSlots - 1 < cmdListIdx) {
+			cmdListIdx -= (short)m_numCmdListSlots;
+		}
+
+		if (Game.game.m_gameWork.m_menuStageMode != 0) {
+			if (*(short*)(m_commandListExtra + cmdListIdx * 2) == -1) {
+				continue;
+			}
+		}
+
+		int cmdItem = DelCmdListAndItem(cmdListIdx, 0);
+		if (cmdListIdx < 2 || 0 < cmdItem) {
+			return cmdListIdx;
+		}
+	}
 }
 
 /*

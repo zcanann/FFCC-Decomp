@@ -26,6 +26,8 @@ int GetSmithItem__8CMenuPcsFi(void*, int);
 int __cntlzw(unsigned int);
 void __dl__FPv(void*);
 void pppCacheLoadShape__FPsP12_pppDataHead(short*, _pppDataHead*);
+int GetEquipType__8CMenuPcsFi(void*, int);
+char* GetAttrStr__8CMenuPcsFi(void*, int);
 void SetScale__5CFontFf(float, CFont*);
 void SetScaleX__5CFontFf(float, CFont*);
 void SetScaleY__5CFontFf(float, CFont*);
@@ -39,6 +41,8 @@ void DrawShadowFont__8CMenuPcsFP5CFontPcffii(void*, CFont*, char*, float, float,
 void DrawSingleIcon__8CMenuPcsFiiifif(void*, int, int, int, float, float, float);
 void DrawInit__8CMenuPcsFv(void*);
 int sprintf(char*, const char*, ...);
+char* strcpy(char*, const char*);
+char* strcat(char*, const char*);
 }
 
 extern char s_shopmenu_cpp_801ded8c[];
@@ -75,6 +79,12 @@ extern float FLOAT_80332d98;
 extern char DAT_80332d84[];
 extern char DAT_80332d14[];
 extern char DAT_80332d18[];
+extern char DAT_80332d30[];
+extern char DAT_80332d38[];
+extern char DAT_80332d40[];
+extern char DAT_80332d44[];
+extern char DAT_80332d4c[];
+extern char DAT_80332d50[];
 extern char* PTR_s_Blacksmith_80214da0[];
 extern char* PTR_s_Price_80214dc4[];
 extern char* PTR_s_Money_80214db0[];
@@ -82,6 +92,8 @@ extern char* PTR_DAT_80214da8[];
 extern char* PTR_s_Cannot_buy_80214dc8[];
 extern char* PTR_s_Cannot_sell_80214dcc[];
 extern char* PTR_s_Quantity_80214dd0[];
+extern char* PTR_s_Strength_80214dd4[];
+extern char* PTR_s_Defence_80214dd8[];
 
 static inline int& ShopMenuInt(CShopMenu* shopMenu, int offset)
 {
@@ -2297,12 +2309,134 @@ void CShopMenu::DrawItemInfo0()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801507e0
+ * PAL Size: 1640b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CShopMenu::DrawItemInfo(int, int, int, int, int, int, int, int)
+void CShopMenu::DrawItemInfo(int itemNo, int x, int y, int unused0, int attrY, int unused1, int unused2, int unused3)
 {
-	// TODO
+    (void)unused0;
+    (void)unused1;
+    (void)unused2;
+    (void)unused3;
+
+    if ((itemNo <= 0) || (itemNo >= 0x9F)) {
+        return;
+    }
+
+    CFont* font = *reinterpret_cast<CFont**>(MenuPcs + 0xF8);
+    SetMargin__5CFontFf(FLOAT_80332d28, font);
+    SetShadow__5CFontFi(font, 1);
+    SetScaleX__5CFontFf(FLOAT_80332d2c, font);
+    SetScaleY__5CFontFf(FLOAT_80332d28, font);
+    _GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
+    SetColor__5CFontF8_GXColor(font, &white);
+    DrawInit__5CFontFv(font);
+
+    int languageId = static_cast<unsigned int>(Game.game.m_gameWork.m_languageId);
+    int equipType = GetEquipType__8CMenuPcsFi(MenuPcs, itemNo);
+    int statType;
+    char* label = 0;
+    if (equipType == 0) {
+        statType = 0;
+        label = PTR_s_Strength_80214dd4[(languageId - 1) * 0x15];
+    } else {
+        equipType = GetEquipType__8CMenuPcsFi(MenuPcs, itemNo);
+        if (equipType == 3) {
+            statType = 2;
+        } else {
+            statType = 1;
+            label = PTR_s_Defence_80214dd8[(languageId - 1) * 0x15];
+        }
+    }
+
+    int itemData = Game.game.unkCFlatData0[2] + itemNo * 0x48;
+    unsigned short statValue = *reinterpret_cast<unsigned short*>(itemData + 6);
+    unsigned int attr = *reinterpret_cast<unsigned short*>(itemData + 8);
+    char textBuffer[256];
+
+    if (label == 0) {
+        SetScaleX__5CFontFf(FLOAT_80332d2c, font);
+        SetScaleY__5CFontFf(FLOAT_80332d28, font);
+        char* attrStr = GetAttrStr__8CMenuPcsFi(MenuPcs, attr);
+        DrawInit__5CFontFv(font);
+        DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(MenuPcs, font, attrStr, static_cast<float>(x + 0x40), static_cast<float>(y), 0x18, 0x12);
+        DrawInit__8CMenuPcsFv(MenuPcs);
+
+        int fontColor = 9;
+        if ((attr == 0) || (attr > 8)) {
+            if ((attr == 0xB) || (attr == 0x11) || (attr == 0x12)) {
+                sprintf(textBuffer, DAT_80332d44, DAT_80332d4c, statValue);
+            } else {
+                if ((attr != 9) && (attr != 10) && (attr != 0xC)) {
+                    return;
+                }
+                sprintf(textBuffer, DAT_80332d44, DAT_80332d50, statValue);
+                fontColor = 3;
+            }
+        } else {
+            sprintf(textBuffer, DAT_80332d40, DAT_80332d38);
+        }
+
+        SetScaleX__5CFontFf(FLOAT_80332d28, font);
+        float valueWidth = GetWidth__5CFontFPc(font, textBuffer);
+        DrawInit__5CFontFv(font);
+        DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
+            MenuPcs, font, textBuffer, static_cast<float>(x) + (FLOAT_80332d3c - valueWidth), static_cast<float>(y), fontColor, 0x12);
+        DrawInit__8CMenuPcsFv(MenuPcs);
+        return;
+    }
+
+    strcpy(textBuffer, label);
+    strcat(textBuffer, DAT_80332d30);
+    DrawInit__5CFontFv(font);
+    DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
+        MenuPcs, font, textBuffer, static_cast<float>(x + 0x40), static_cast<float>(y), 0x18, 0x12);
+    DrawInit__8CMenuPcsFv(MenuPcs);
+
+    int valueRightX = x + 0x108;
+    SetShadow__5CFontFi(font, 1);
+    SetScale__5CFontFf(FLOAT_80332d28, font);
+    SetColor__5CFontF8_GXColor(font, &white);
+    DrawInit__5CFontFv(font);
+    reinterpret_cast<unsigned char*>(font)[0x24] = (reinterpret_cast<unsigned char*>(font)[0x24] & 0xEF) | 0x10;
+    SetMargin__5CFontFf(FLOAT_80332d34, font);
+
+    char valueBuffer[64];
+    sprintf(valueBuffer, DAT_80332d14, statValue);
+    float valueWidth = GetWidth__5CFontFPc(font, valueBuffer);
+    DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
+        MenuPcs, font, valueBuffer, static_cast<float>(valueRightX) - valueWidth, static_cast<float>(y), 0x1A, 0x12);
+    DrawInit__8CMenuPcsFv(MenuPcs);
+
+    DrawInit__5CFontFv(font);
+    SetMargin__5CFontFf(FLOAT_80332d28, font);
+    SetScale__5CFontFf(FLOAT_80332d28, font);
+
+    if ((statType == 1) && (attr != 0)) {
+        SetScaleX__5CFontFf(FLOAT_80332d2c, font);
+        SetScaleY__5CFontFf(FLOAT_80332d28, font);
+        char* attrStr = GetAttrStr__8CMenuPcsFi(MenuPcs, attr);
+        DrawInit__5CFontFv(font);
+        DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
+            MenuPcs, font, attrStr, static_cast<float>(x + 0x40), static_cast<float>(attrY), 0x18, 0x12);
+        DrawInit__8CMenuPcsFv(MenuPcs);
+
+        SetScaleX__5CFontFf(FLOAT_80332d28, font);
+        attrStr = GetAttrStr__8CMenuPcsFi(MenuPcs, attr);
+        GetWidth__5CFontFPc(font, attrStr);
+        if ((attr != 0) && (attr < 9)) {
+            strcpy(textBuffer, DAT_80332d38);
+            valueWidth = GetWidth__5CFontFPc(font, textBuffer);
+            DrawInit__5CFontFv(font);
+            DrawNoShadowFont__8CMenuPcsFP5CFontPcffii(
+                MenuPcs, font, textBuffer, static_cast<float>(x) + (FLOAT_80332d3c - valueWidth), static_cast<float>(attrY), 9, 0x12);
+            DrawInit__8CMenuPcsFv(MenuPcs);
+        }
+    }
 }
 
 /*

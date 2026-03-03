@@ -83,8 +83,8 @@ public:
     int GetDbgFlag();
 
 private:
-    u8 m_pad54[0x4];                            // 0x54
-    CDM* m_rootMenu;                            // 0x58
+    u32 m_dbgFlags;                             // 0x04
+    CDM m_rootMenuNode;                         // 0x08
     CDM m_menuPool[0x80];                       // 0x5C
     CDM* m_currentMenu;                         // 0x2A5C
     CDM* m_defaultMenu;                         // 0x2A60

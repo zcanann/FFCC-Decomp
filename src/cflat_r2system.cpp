@@ -1424,7 +1424,7 @@ void CGame::SetNextScript(CGame::CNextScript* nextScript)
  */
 int CDbgMenuPcs::GetDbgFlag()
 {
-    return *(int*)((char*)this + 0x4);
+    return m_dbgFlags;
 }
 
 /*

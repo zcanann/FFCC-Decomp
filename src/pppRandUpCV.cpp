@@ -48,12 +48,9 @@ void pppRandUpCV(void* param1, void* param2, void* param3)
 
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
         *valuePtr = value;
-    } else {
-        return;
+    } else if (in->targetId != *(s32*)(base + 0xC)) {
+        valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
     }
-
-    valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
-    f32 scale = *valuePtr;
 
     s32 colorOffset = in->sourceOffset;
     u8* target;
@@ -62,6 +59,8 @@ void pppRandUpCV(void* param1, void* param2, void* param3)
     } else {
         target = base + colorOffset + 0x80;
     }
+
+    f32 scale = *valuePtr;
 
     {
         target[0] = (u8)(target[0] + (s32)((f32)in->delta[0] * scale));

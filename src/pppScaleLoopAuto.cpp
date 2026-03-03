@@ -3,6 +3,7 @@
 
 extern int lbl_8032ED70;
 extern float lbl_801EC9F0[];
+extern float lbl_80331C08;
 
 struct pppScaleLoopAutoWork {
     float m_scale[3];
@@ -116,21 +117,22 @@ void pppScaleLoopAutoCon(void* arg1, void* arg2)
 	int** arg2Data = (int**)arg2;
 	int* data = arg2Data[3];
 	int* ptr = (int*)data[0];
+	float zero = lbl_80331C08;
 	
 	void* targetPtr = (void*)((char*)arg1 + (int)ptr + 0x80);
 	float* targetData = (float*)targetPtr;
 	char* targetBytes = (char*)targetPtr;
 	
-	targetData[2] = 0.0f;
-	targetData[1] = 0.0f;
-	targetData[0] = 0.0f;
-	targetData[6] = 0.0f;
-	targetData[5] = 0.0f;
-	targetData[4] = 0.0f;
+	targetData[2] = zero;
+	targetData[1] = zero;
+	targetData[0] = zero;
+	targetData[6] = zero;
+	targetData[5] = zero;
+	targetData[4] = zero;
 	targetBytes[28] = 0;
 	targetBytes[29] = 0;
 	*(short*)(targetBytes + 30) = 0;
 	targetBytes[33] = 0;
 	targetBytes[32] = 0;
-	targetData[9] = 0.0f;
+	targetData[9] = zero;
 }

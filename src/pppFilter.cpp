@@ -84,10 +84,9 @@ void pppFrameFilter(void)
 void pppRenderFilter(pppFilter* pppFilterObj, UnkB* param_2, UnkC* param_3)
 {
     int serializedOffset = *param_3->m_serializedDataOffsets;
-    unsigned char* filterBytes = (unsigned char*)pppFilterObj;
-    _pppFilterSerializedData* serializedData = (_pppFilterSerializedData*)(filterBytes + serializedOffset + 0x80);
+    _pppFilterSerializedData* serializedData = (_pppFilterSerializedData*)((unsigned char*)pppFilterObj + serializedOffset + 0x80);
 
-    if (param_2->m_dataValIndex == 0xFFFF) {
+    if ((unsigned short)param_2->m_dataValIndex == 0xFFFF) {
         lbl_8032EC70.RenderColorQuad(
             lbl_803320C8, lbl_803320C8, lbl_803320CC, lbl_803320D0, serializedData->m_color);
         return;

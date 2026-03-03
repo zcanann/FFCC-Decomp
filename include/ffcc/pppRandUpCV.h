@@ -2,10 +2,11 @@
 #define _PPP_RANDUPCV_H_
 
 #ifdef __cplusplus
+void randchar(char, float);
+
 extern "C" {
 #endif
 
-void randchar(char, float);
 void pppRandUpCV(void* param1, void* param2, void* param3);
 
 #ifdef __cplusplus

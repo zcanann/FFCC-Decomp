@@ -163,6 +163,7 @@ void CUSB::Printf(char*, ...)
  */
 extern "C" void __sinit_usb_cpp()
 {
-	*(volatile void**)&USB = &__vt__8CManager;
-	*(volatile void**)&USB = &PTR_PTR_DAT_801e88a4;
+	volatile void** base = reinterpret_cast<volatile void**>(&USB);
+	*base = &__vt__8CManager;
+	*base = &PTR_PTR_DAT_801e88a4;
 }

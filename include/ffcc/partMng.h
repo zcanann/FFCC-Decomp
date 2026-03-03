@@ -498,11 +498,11 @@ public:
     void pppDestroyAll();
 };
 
-Mtx ppvCameraMatrix0;
-Mtx ppvWorldMatrix;
-Mtx ppvWorldMatrixWood;
+extern Mtx ppvCameraMatrix0;
+extern Mtx ppvWorldMatrix;
+extern Mtx ppvWorldMatrixWood;
 
-_pppEnvSt* pppEnvStPtr;
-_pppMngSt* pppMngStPtr;
+extern _pppEnvSt* pppEnvStPtr;
+extern _pppMngSt* pppMngStPtr;
 
 #endif

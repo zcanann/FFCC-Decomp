@@ -546,7 +546,7 @@ config.libs = [
             Object(NonMatching, "pppMatrixScl.cpp", cflags=cflags_game_cpp_exceptions),
             Object(NonMatching, "pppMatrixXYZ.cpp", cflags=cflags_game_cpp_exceptions),
             Object(NonMatching, "pppMatrixXZY.cpp"),
-            Object(NonMatching, "pppMatrixYXZ.cpp"),
+            Object(NonMatching, "pppMatrixYXZ.cpp", cflags=cflags_game_cpp_exceptions),
             Object(NonMatching, "pppMatrixYZX.cpp"),
             Object(NonMatching, "pppMatrixZXY.cpp"),
             Object(NonMatching, "pppMatrixZYX.cpp", cflags=cflags_game_cpp_exceptions),

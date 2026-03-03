@@ -13,6 +13,31 @@ extern unsigned char MaterialEditorPcs[];
 
 static char lbl_801D7DA8[] = "ME_AppRequest.cpp";
 
+struct RSDITEM {
+    int unk0;
+    int unk4;
+    int unk8;
+    void* ptrC;
+    void* ptr10;
+    void* ptr14;
+    void* ptr18;
+};
+
+struct ZCANMGRP {
+    void* ptr;
+    int unk4;
+    int unk8;
+    int unkC;
+    int unk10;
+};
+
+struct RSDLISTITEM {
+    RSDITEM* rsdItem;
+    ZCANMGRP* colAnmData;
+    int colAnmCount;
+    int flag;
+};
+
 /*
  * --INFO--
  * Address:	TODO
@@ -23,46 +48,46 @@ void CMaterialEditorPcs::ResetRsdList(ZLIST* zlist)
 	_ZLISTITEM* it = zlist->m_root.m_previous;
 
 	while (it != 0) {
-		int* listItem = (int*)zlist->GetDataNext(&it);
-		int rsdItem = *listItem;
+		RSDLISTITEM* listItem = (RSDLISTITEM*)zlist->GetDataNext(&it);
+		RSDITEM* rsdItem = listItem->rsdItem;
 
 		if (rsdItem != 0) {
-			if (*(void**)(rsdItem + 0xc) != 0) {
-				__dla__FPv(*(void**)(rsdItem + 0xc));
-				*(int*)(rsdItem + 0xc) = 0;
+			if (rsdItem->ptrC != 0) {
+				__dla__FPv(rsdItem->ptrC);
+				rsdItem->ptrC = 0;
 			}
-			if (*(void**)(rsdItem + 0x10) != 0) {
-				__dla__FPv(*(void**)(rsdItem + 0x10));
-				*(int*)(rsdItem + 0x10) = 0;
+			if (rsdItem->ptr10 != 0) {
+				__dla__FPv(rsdItem->ptr10);
+				rsdItem->ptr10 = 0;
 			}
-			if (*(void**)(rsdItem + 0x14) != 0) {
-				__dla__FPv(*(void**)(rsdItem + 0x14));
-				*(int*)(rsdItem + 0x14) = 0;
+			if (rsdItem->ptr14 != 0) {
+				__dla__FPv(rsdItem->ptr14);
+				rsdItem->ptr14 = 0;
 			}
-			if (*(void**)(rsdItem + 0x18) != 0) {
-				__dla__FPv(*(void**)(rsdItem + 0x18));
-				*(int*)(rsdItem + 0x18) = 0;
+			if (rsdItem->ptr18 != 0) {
+				__dla__FPv(rsdItem->ptr18);
+				rsdItem->ptr18 = 0;
 			}
 			__dl__FPv((void*)rsdItem);
 		}
 
-		unsigned int* colAnmData = (unsigned int*)listItem[1];
-		int colAnmCount = listItem[2];
+		ZCANMGRP* colAnmData = listItem->colAnmData;
+		int colAnmCount = listItem->colAnmCount;
 		if (colAnmData != 0) {
 			for (int i = 0; i < colAnmCount; i++) {
-				if ((void*)*colAnmData != 0) {
-					__dla__FPv((void*)*colAnmData);
-					*colAnmData = 0;
+				if (colAnmData->ptr != 0) {
+					__dla__FPv(colAnmData->ptr);
+					colAnmData->ptr = 0;
 				}
-				colAnmData += 5;
+				colAnmData++;
 			}
-			if ((void*)listItem[1] != 0) {
-				__dla__FPv((void*)listItem[1]);
-				listItem[1] = 0;
+			if (listItem->colAnmData != 0) {
+				__dla__FPv((void*)listItem->colAnmData);
+				listItem->colAnmData = 0;
 			}
-			listItem[1] = 0;
+			listItem->colAnmData = 0;
 		}
-		__dl__FPv(listItem);
+		__dl__FPv((void*)listItem);
 	}
 
 	zlist->DeleteList();

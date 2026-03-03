@@ -2,8 +2,6 @@
 #include "ffcc/partMng.h"
 #include "dolphin/gx/GXPixel.h"
 
-extern int DAT_8032ed70;
-
 struct UnkC {
     unsigned char pad0[0xC];
     int* m_serializedDataOffsets;
@@ -27,13 +25,13 @@ int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
  */
 void pppFrameCharaZEnvCtrl(pppCharaZEnvCtrl* pppCharaZEnvCtrl, UnkB* param_2, UnkC* param_3)
 {
-	if (DAT_8032ed70 != 0) {
+	if (lbl_8032ED70 != 0) {
 		return;
 	}
 
 	int dataOffset = *param_3->m_serializedDataOffsets;
 	void* work = (void*)((char*)pppCharaZEnvCtrl + dataOffset + 0x80);
-	void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)pppMngStPtr + 0xd8), 0);
+	void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)(lbl_8032ED50 + 0xd8), 0);
 	int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
 	*(void**)(model + 0xe4) = work;
 	*(UnkB**)(model + 0xe8) = param_2;
@@ -51,7 +49,7 @@ void pppFrameCharaZEnvCtrl(pppCharaZEnvCtrl* pppCharaZEnvCtrl, UnkB* param_2, Un
  */
 void pppDesCharaZEnvCtrl(void)
 {
-	void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)pppMngStPtr + 0xd8), 0);
+	void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)(lbl_8032ED50 + 0xd8), 0);
 	int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
 	*(void**)(model + 0xe4) = 0;
 	*(void**)(model + 0xe8) = 0;
@@ -69,7 +67,7 @@ void pppDesCharaZEnvCtrl(void)
  */
 void pppConCharaZEnvCtrl(void)
 {
-	void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)pppMngStPtr + 0xd8), 0);
+	void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)(lbl_8032ED50 + 0xd8), 0);
 	GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
 }
 

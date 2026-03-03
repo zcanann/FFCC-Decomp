@@ -3,6 +3,9 @@
 
 #include <dolphin/mtx.h>
 
+extern "C" float ppvCameraMatrix02[3][4];
+extern unsigned char* lbl_8032ED50;
+
 /*
  * --INFO--
  * PAL Address: 0x800905dc
@@ -16,11 +19,11 @@ void pppWDrawMatrix(_pppPObject* pppPObject)
 {
     register char* p = (char*)pppPObject;
 
-    PSMTXConcat(ppvCameraMatrix0, *(Mtx*)(p + 0x10), *(Mtx*)(p + 0x40));
+    PSMTXConcat(ppvCameraMatrix02, *(Mtx*)(p + 0x10), *(Mtx*)(p + 0x40));
     PSVECScale((Vec*)(p + 0x40), (Vec*)(p + 0x40),
-               *(float*)((char*)pppMngStPtr + 0x28));
+               *(float*)(lbl_8032ED50 + 0x28));
     PSVECScale((Vec*)(p + 0x50), (Vec*)(p + 0x50),
-               *(float*)((char*)pppMngStPtr + 0x2c));
+               *(float*)(lbl_8032ED50 + 0x2c));
     PSVECScale((Vec*)(p + 0x60), (Vec*)(p + 0x60),
-               *(float*)((char*)pppMngStPtr + 0x30));
+               *(float*)(lbl_8032ED50 + 0x30));
 }

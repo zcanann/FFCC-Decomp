@@ -23,13 +23,14 @@ typedef struct ShapeState {
 
 typedef struct ShapeControlData {
     u8 _pad0[4];
-    u32 type;
+    s16 type;
+    u16 _padType;
     u32 step;
     u8 _pad2[1];
     u8 blendMode;
     u8 paramE;
     u8 _pad3[1];
-    float scale;
+    f32 scale;
     u8 param14;
     u8 param15;
 } ShapeControlData;
@@ -79,15 +80,15 @@ void pppCalcShape(void* pppShape, void* data, void* additionalData)
 	ShapeRuntimeData* runtimeData = *(ShapeRuntimeData**)((u8*)additionalData + 0xC);
 	ShapeControlData* controlData = (ShapeControlData*)data;
 	ShapeState* shapeData = (ShapeState*)((u8*)pppShape + runtimeData->shapeDataOffset + 0x80);
-    s16 type = *(volatile s16*)((u8*)controlData + 0x4);
+    s16 type = controlData->type;
 
-    if (type == -1) {
+    if (type == (s16)0xFFFF) {
         return;
     }
 
-    u32* shapeTables = *(u32**)((u8*)lbl_8032ED54 + 0xC);
-    u8* shapeSpec = (u8*)shapeTables[(u16)type];
-    ShapeSpecEntry* shape = (ShapeSpecEntry*)(shapeSpec + ((u32)shapeData->counter << 3) + 0x10);
+    void** shapeTables = *(void***)((u8*)lbl_8032ED54 + 0xC);
+    void* shapeSpec = *(void**)*(u32*)((u8*)shapeTables + (type << 2));
+    ShapeSpecEntry* shape = (ShapeSpecEntry*)((u8*)shapeSpec + ((u32)shapeData->counter << 3) + 0x10);
 
 	shapeData->currentId = shapeData->counter;
 	shapeData->value = (u16)(shapeData->value + controlData->step);
@@ -99,7 +100,7 @@ void pppCalcShape(void* pppShape, void* data, void* additionalData)
 	shapeData->value = (u16)(value - maxValue);
 
 	shapeData->counter++;
-    if (shapeData->counter < *(s16*)(shapeSpec + 0x6)) {
+    if (shapeData->counter < *(s16*)((u8*)shapeSpec + 0x6)) {
         return;
     }
 
@@ -137,7 +138,7 @@ void pppDrawShape(void* pppShape, void* data, void* additionalData)
 	}
 
 	void** shapeTables = *(void***)((u8*)lbl_8032ED54 + 0xC);
-	void* shapeSpec = *(void**)((u8*)shapeTables + (type << 2));
+	void* shapeSpec = *(void**)*(u32*)((u8*)shapeTables + (type << 2));
 	ShapeSpecEntry* shape = (ShapeSpecEntry*)((u8*)shapeSpec + ((u32)shapeData->currentId << 3) + 0x10);
 	void* drawShape = (u8*)shapeSpec + shape->offset;
 

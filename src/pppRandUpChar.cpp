@@ -61,17 +61,8 @@ extern "C" void pppRandUpChar(void* param1, void* param2, void* param3)
 
     target = (in->sourceOffset == -1) ? lbl_801EADC8 : (u8*)(base + in->sourceOffset + 0x80);
 
-    union {
-        f64 d;
-        struct {
-            u32 hi;
-            u32 lo;
-        } parts;
-    } cvt;
-    cvt.parts.hi = 0x43300000;
-    cvt.parts.lo = in->scale;
-
-    f32 scaled = (f32)(cvt.d - lbl_8032FFE0) * *valuePtr;
+    f32 scale = (f32)in->scale;
+    f32 scaled = *valuePtr * scale;
     s32 delta = (s32)scaled;
     *target = (u8)(*target + delta);
 }

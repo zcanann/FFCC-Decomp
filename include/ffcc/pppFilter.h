@@ -1,8 +1,12 @@
 #ifndef _PPP_FILTER_H_
 #define _PPP_FILTER_H_
 
+#include <dolphin/gx/GXStruct.h>
+
 struct pppFilter {
-    char padding[0x90];
+    char padding[0x88];
+    _GXColor m_color;
+    char padding2[4];
 };
 
 struct UnkB {

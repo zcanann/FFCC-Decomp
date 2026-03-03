@@ -5,7 +5,6 @@
 extern CMath math[];
 extern s32 lbl_8032ED70;
 extern f32 lbl_8032FF18;
-extern f64 lbl_8032FF20;
 extern u8 lbl_801EADC8[];
 
 extern "C" {
@@ -62,18 +61,7 @@ void pppRandDownChar(void* param1, void* param2, void* param3)
 
     u8* target = (in->field4 == -1) ? lbl_801EADC8 : (u8*)(base + in->field4 + 0x80);
 
-    union {
-        f64 d;
-        struct {
-            u32 hi;
-            u32 lo;
-        } parts;
-    } cvt;
-    u8 scale = in->field8;
-    cvt.parts.hi = 0x43300000;
-    cvt.parts.lo = scale;
-
-    f32 factor = cvt.d - lbl_8032FF20;
+    f32 factor = (f32)in->field8;
     f32 scaled = factor * *valuePtr;
     s32 delta = (s32)scaled;
     *target = (u8)(*target + delta);

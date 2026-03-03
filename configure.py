@@ -599,7 +599,7 @@ config.libs = [
             Object(NonMatching, "pppScreenQuake.cpp"),
             Object(NonMatching, "pppSDrawMatrix.cpp"),
             Object(NonMatching, "pppShape.cpp"),
-            Object(NonMatching, "pppSpMatrix.cpp"),
+            Object(NonMatching, "pppSpMatrix.cpp", cflags=cflags_game_cpp_exceptions),
             Object(NonMatching, "pppSRandCV.cpp"),
             Object(NonMatching, "pppSRandDownCV.cpp"),
             Object(NonMatching, "pppSRandDownFV.cpp"),

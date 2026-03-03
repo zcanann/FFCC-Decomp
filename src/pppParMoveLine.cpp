@@ -16,8 +16,8 @@
 void pppParMoveLine(_pppPObject* param_1, int param_2)
 {
     _pppMngSt* pppMngSt;
-    Vec VStack_28;
     Vec local_1c;
+    Vec VStack_28;
     float fVar1;
 
     pppMngSt = pppMngStPtr;

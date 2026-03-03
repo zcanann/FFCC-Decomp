@@ -4,8 +4,6 @@
 #include <dolphin/mtx.h>
 
 extern int DAT_8032ed70;
-extern float FLOAT_80331920;
-extern float FLOAT_80331924;
 extern struct _pppMngSt* pppMngStPtr;
 
 extern class CCameraPcs {
@@ -64,15 +62,15 @@ struct pppAlignmentScale* pppFrameAlignmentScale(struct pppAlignmentScale* align
         objPos.z = pppMngStPtr->m_matrix.value[2][3];
 
         distanceScale = PSVECDistance(&cameraPos, &objPos) / data->m_unk0x4;
-        scale = FLOAT_80331920;
-        if (distanceScale > FLOAT_80331920) {
-            scale = (distanceScale - FLOAT_80331920) * data->m_unk0x8 + FLOAT_80331920;
+        scale = 1.0f;
+        if (distanceScale > 1.0f) {
+            scale = (distanceScale - 1.0f) * data->m_unk0x8 + 1.0f;
         }
 
         PSMTXScale(scaleMtx, scale, scale, scale);
 
-        zero = FLOAT_80331924;
-        pppMngStPtr->m_matrix.value[0][3] = FLOAT_80331924;
+        zero = 0.0f;
+        pppMngStPtr->m_matrix.value[0][3] = 0.0f;
         pppMngStPtr->m_matrix.value[1][3] = zero;
         pppMngStPtr->m_matrix.value[2][3] = zero;
         PSMTXConcat(scaleMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);

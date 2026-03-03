@@ -93,20 +93,11 @@ void CChunkFile::PopChunk()
 bool CChunkFile::GetNextChunk(CChunk& outChunk)
 {
     int skip;
-    int alignedSize;
-    unsigned int roundUp;
 
     if (m_lastChunkSize < 0) {
         skip = 0;
     } else {
-        alignedSize = m_lastChunkSize + 0xF;
-        roundUp = 0;
-        if (alignedSize < 0) {
-            if ((alignedSize & 0xF) != 0) {
-                roundUp = 1;
-            }
-        }
-        skip = ((alignedSize >> 4) + static_cast<int>(roundUp)) * 0x10 + 0x10;
+        skip = ((m_lastChunkSize + 0xF) / 0x10) * 0x10 + 0x10;
     }
 
     m_scopeOffset += skip;

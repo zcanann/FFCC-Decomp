@@ -4,6 +4,7 @@
 
 extern CMath math[];
 extern int lbl_8032ED70;
+extern float lbl_803300C8;
 extern s16 lbl_801EADC8[];
 extern f32 lbl_803300C8;
 extern "C" float RandF__5CMathFv(CMath* instance);

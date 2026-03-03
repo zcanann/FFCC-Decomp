@@ -638,7 +638,7 @@ void CChara::CModel::calcSkin()
  */
 void CChara::CModel::SetMatrix(float (*mtx) [4])
 {
-	PSMTXCopy(mtx, (float(*)[4])((u8*)this + 0x14));
+	PSMTXCopy(mtx, (float(*)[4])((u8*)this + 0x8));
 }
 
 /*

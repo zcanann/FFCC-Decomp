@@ -13,7 +13,7 @@ f32 RandF__5CMathFv(CMath*);
 struct PppRandUpIntParam2 {
     s32 field0;
     s32 field4;
-    s32 field8;
+    u32 field8;
     u8 fieldC;
 };
 

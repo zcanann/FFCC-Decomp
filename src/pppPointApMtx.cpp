@@ -1,9 +1,9 @@
 #include "ffcc/pppPointApMtx.h"
 #include <dolphin/mtx.h>
 
-extern int gPppGlobalFlag;
-extern _pppMngSt* gPppMngSt;
-extern "C" _pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
+extern int lbl_8032ED70;
+extern _pppMngSt* lbl_8032ED50;
+extern _pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
 
 /*
  * --INFO--
@@ -39,7 +39,7 @@ void pppPointApMtx(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal, _pppMngSt
 	Vec* source = (Vec*)((u8*)pppPObject + offsets[0] + 0x80);
 	Mtx* target = (Mtx*)((u8*)pppPObject + offsets[1] + 0x80);
 
-	if (gPppGlobalFlag != 0) {
+	if (lbl_8032ED70 != 0) {
 		return;
 	}
 
@@ -53,11 +53,11 @@ void pppPointApMtx(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal, _pppMngSt
 			return;
 		}
 
-		objectData = (_pppPDataVal*)(*(u32*)((u8*)gPppMngSt + 0xD4) + (objectId << 4));
+		objectData = (_pppPDataVal*)(*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (objectId << 4));
 		if (objectData == 0) {
 			object = 0;
 		} else {
-			object = (_pppPObject*)pppCreatePObject(gPppMngSt, objectData);
+			object = (_pppPObject*)pppCreatePObject(lbl_8032ED50, objectData);
 		}
 
 		*(void**)((u8*)object + 4) = pppPObject;
@@ -69,8 +69,8 @@ void pppPointApMtx(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal, _pppMngSt
 			(*matrix)[1][3] = source->x;
 			(*matrix)[2][3] = source->x;
 		} else {
-			PSMTXCopy(*(Mtx*)((u8*)gPppMngSt + 0x78), *matrix);
-			PSMTXMultVec(*(Mtx*)((u8*)gPppMngSt + 0x78), source, &pos);
+			PSMTXCopy(*(Mtx*)((u8*)lbl_8032ED50 + 0x78), *matrix);
+			PSMTXMultVec(*(Mtx*)((u8*)lbl_8032ED50 + 0x78), source, &pos);
 			(*matrix)[0][3] = pos.x;
 			(*matrix)[1][3] = pos.y;
 			(*matrix)[2][3] = pos.z;

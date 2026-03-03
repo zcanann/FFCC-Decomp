@@ -6,7 +6,7 @@ extern CMath math[];
 extern s32 lbl_8032ED70;
 extern f32 lbl_8032FFD8;
 extern f64 lbl_8032FFE0;
-extern u8 lbl_801EADC8[];
+extern u8 lbl_801EADC8[32];
 extern "C" f32 RandF__5CMathFv(CMath* instance);
 
 struct RandUpCharParam {
@@ -59,11 +59,7 @@ extern "C" void pppRandUpChar(void* param1, void* param2, void* param3)
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
     }
 
-    if (in->sourceOffset == -1) {
-        target = lbl_801EADC8;
-    } else {
-        target = base + in->sourceOffset + 0x80;
-    }
+    target = (in->sourceOffset == -1) ? lbl_801EADC8 : (u8*)(base + in->sourceOffset + 0x80);
 
     union {
         f64 d;
@@ -72,11 +68,10 @@ extern "C" void pppRandUpChar(void* param1, void* param2, void* param3)
             u32 lo;
         } parts;
     } cvt;
-    u8 scale = in->scale;
     cvt.parts.hi = 0x43300000;
-    cvt.parts.lo = scale;
+    cvt.parts.lo = in->scale;
 
-    f32 value = *valuePtr;
-    s32 delta = (s32)((cvt.d - lbl_8032FFE0) * value);
+    f32 scaled = (f32)(cvt.d - lbl_8032FFE0) * *valuePtr;
+    s32 delta = (s32)scaled;
     *target = (u8)(*target + delta);
 }

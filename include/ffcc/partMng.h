@@ -193,193 +193,80 @@ struct _pppEnvSt
 
 struct _pppMngSt
 {
-    // WIP
-    unsigned char m_rotationOrder;
-    unsigned char m_matrixMode;
-    pppFMATRIX m_matrix;
-    pppIVECTOR4 m_rotation;
-    void* m_owner;
-    unsigned char m_ownerFacing;
-    unsigned char m_ownerFlagsInitialized;
-    unsigned char m_slotVisible;
-    unsigned char m_nodeScaleInitialized;
-    unsigned char m_fpBillboard;
-    float m_ownerScale;
-    unsigned char m_useOwnerScaleSign;
-    CChara::CNode* m_bindNode;
-    Vec m_position;
-    short m_mapObjIndex;
-    Vec m_scale;
-    // Additional fields (based on offset layout in comments below)
-    char padding[0x74 - (0x28 + sizeof(Vec))]; // Fill to offset 0x74
-    short m_kind;        // 0x74
-    short m_nodeIndex;   // 0x76
-    /*
-    0x0	0x4	void *	void *	m_pppResSet	
-0x4	0x4	int32_t	typedef int32_t int	m_partIndex	
-0x8	0xc	Vec	/Dolphin/OS/Math/Vec
-pack(disabled)
-Structure Vec {
-   0   float   4   x   ""
-   4   float   4   y   ""
-   8   float   4   z   ""
-}
-Length: 12 Alignment: 1
-	m_position	
-0x14	0x4	int32_t	typedef int32_t int	m_baseTime	
-0x18	0x2	int16_t	typedef int16_t short	m_rotationX	
-0x1a	0x2	int16_t	typedef int16_t short	m_rotationY	
-0x1c	0x2	int16_t	typedef int16_t short	m_rotationZ	
-0x1e	0x2	int16_t	typedef int16_t short	m_rotationW	
-0x20	0x4	int32_t	typedef int32_t int		
-0x24	0x4	int32_t	typedef int32_t int	m_lifeEnd	
-0x28	0xc	Vec	/Dolphin/OS/Math/Vec
-pack(disabled)
-Structure Vec {
-   0   float   4   x   ""
-   4   float   4   y   ""
-   8   float   4   z   ""
-}
-Length: 12 Alignment: 1
-	m_scale	
-0x34	0x4	int32_t	typedef int32_t int	m_currentFrame	
-0x38	0x4	int32_t	typedef int32_t int		
-0x3c	0x4	int32_t	typedef int32_t int		
-0x40	0x4	float	float	m_scaleFactor	
-0x44	0x4	float	float	m_ownerScale	
-0x48	0x1	??	undefined		
-0x49	0x1	??	undefined		
-0x4a	0x1	??	undefined		
-0x4b	0x1	??	undefined		
-0x4c	0x1	??	undefined		
-0x4d	0x1	??	undefined		
-0x4e	0x1	??	undefined		
-0x4f	0x1	??	undefined		
-0x50	0x1	??	undefined		
-0x51	0x1	??	undefined		
-0x52	0x1	??	undefined		
-0x53	0x1	??	undefined		
-0x54	0x1	??	undefined		
-0x55	0x1	??	undefined		
-0x56	0x1	??	undefined		
-0x57	0x1	??	undefined		
-0x58	0x1	??	undefined		
-0x59	0x1	??	undefined		
-0x5a	0x1	??	undefined		
-0x5b	0x1	??	undefined		
-0x5c	0x1	??	undefined		
-0x5d	0x1	??	undefined		
-0x5e	0x1	??	undefined		
-0x5f	0x1	??	undefined		
-0x60	0x1	??	undefined		
-0x61	0x1	??	undefined		
-0x62	0x1	??	undefined		
-0x63	0x1	??	undefined		
-0x64	0x1	??	undefined		
-0x65	0x1	??	undefined		
-0x66	0x1	??	undefined		
-0x67	0x1	??	undefined		
-0x68	0x1	??	undefined		
-0x69	0x1	??	undefined		
-0x6a	0x1	??	undefined		
-0x6b	0x1	??	undefined		
-0x6c	0x1	??	undefined		
-0x6d	0x1	??	undefined		
-0x6e	0x1	??	undefined		
-0x6f	0x1	??	undefined		
-0x70	0x1	??	undefined		
-0x71	0x1	??	undefined		
-0x72	0x1	??	undefined		
-0x73	0x1	??	undefined		
-0x74	0x2	int16_t	typedef int16_t short	m_kind	
-0x76	0x2	int16_t	typedef int16_t short	m_nodeIndex	
-0x78	0x30	pppFMATRIX	typedef pppFMATRIX Mat3x4	m_matrix	
-0xa8	0x1	uint8_t	typedef uint8_t uchar	m_envColorR	
-0xa9	0x1	uint8_t	typedef uint8_t uchar	m_envColorG	
-0xaa	0x1	uint8_t	typedef uint8_t uchar	m_envColorB	
-0xab	0x1	uint8_t	typedef uint8_t uchar	m_envColorA	
-0xac	0x4	int32_t	typedef int32_t int	m_spawnedCount	
-0xb0	0x4	int32_t	typedef int32_t int	m_previousFrame	
-0xb4	0x4	int32_t	typedef int32_t int	m_numControlPrograms	
-0xb8	0x4	int32_t	typedef int32_t int	m_numPrograms	
-0xbc	0x4	uint32_t	typedef uint32_t uint	m_objHitMask	
-0xc0	0x4	uint32_t	typedef uint32_t uint	m_cylinderAttribute	
-0xc4	0x4	void *	void *	m_pObjList	TODO: _pppPObject* type
-0xc8	0x4	void *	void *	m_pDataValList	TODO: _pppPDataVal* type
-0xcc	0x4	void *	void *	m_controlProgramTable	
-0xd0	0x4	void *	void *	m_programInfoTable	
-0xd4	0x4	void *	void *	m_programControlArray
-0xd8	0x4	void *	void *	m_owner	
-0xdc	0x4	void *	void *	m_lookTarget	
-0xe0	0x4	CNode *	CNode *	m_bindNode	
-0xe4	0x1	uint8_t	typedef uint8_t uchar	m_mode	
-0xe5	0x1	uint8_t	typedef uint8_t uchar	m_particleEnded	
-0xe6	0x1	uint8_t	typedef uint8_t uchar	m_isFinished	
-0xe7	0x1	uint8_t	typedef uint8_t uchar	m_matrixMode	
-0xe8	0x1	uint8_t	typedef uint8_t uchar	m_hitBgFlag	
-0xe9	0x1	uint8_t	typedef uint8_t uchar	m_slotVisible	
-0xea	0x1	uint8_t	typedef uint8_t uchar	m_ownerFacing	
-0xeb	0x1	uint8_t	typedef uint8_t uchar	m_drawVariant	
-0xec	0x1	uint8_t	typedef uint8_t uchar	m_rotationOrder	
-0xed	0x1	uint8_t	typedef uint8_t uchar	m_drawPass	
-0xee	0x1	uint8_t	typedef uint8_t uchar	m_drawSubType	
-0xef	0x1	uint8_t	typedef uint8_t uchar	m_useOwnerScaleSign	
-0xf0	0x1	uint8_t	typedef uint8_t uchar	m_ownerFlagsInitialized	
-0xf1	0x1	uint8_t	typedef uint8_t uchar	m_nodeScaleInitialized	
-0xf2	0x1	uint8_t	typedef uint8_t uchar		
-0xf3	0x1	uint8_t	typedef uint8_t uchar		
-0xf4	0x1	uint8_t	typedef uint8_t uchar		
-0xf5	0x1	uint8_t	typedef uint8_t uchar	m_mapTexLoaded	
-0xf6	0x1	uint8_t	typedef uint8_t uchar	m_hasMapRef	
-0xf7	0x1	uint8_t	typedef uint8_t uchar	m_fpBillboard	
-0xf8	0x1	uint8_t	typedef uint8_t uchar	m_prio	
-0xf9	0x2	int16_t	typedef int16_t short	m_frameCounter	
-0xfb	0x1	??	undefined		
-0xfc	0x1	??	undefined		
-0xfd	0x1	??	undefined		
-0xfe	0x1	??	undefined		
-0xff	0x1	??	undefined		
-0x100	0x1	??	undefined		
-0x101	0x1	??	undefined		
-0x102	0x1	??	undefined		
-0x103	0x1	??	undefined		
-0x104	0x1	??	undefined		
-0x105	0x1	??	undefined		
-0x106	0x1	??	undefined		
-0x107	0x1	??	undefined		
-0x108	0x4	float	float	m_cullRadiusSq	
-0x10c	0x4	float	float	m_cullRadius	
-0x110	0x4	float	float	m_cullYOffset	
-0x114	0x4	float	float	m_sortDepth	
-0x118	0x1	??	undefined		
-0x119	0x1	??	undefined		
-0x11a	0x2	int16_t	typedef int16_t short	m_mapObjIndex	
-0x11c	0x14	PPPSEST	/Game/Classes/partMng/PPPSEST
-pack(disabled)
-Structure PPPSEST {
-   0   int32_t   4   m_soundEffectSlot   ""
-   4   uint8_t   1   m_soundEffectStopFlag   ""
-   5   uint8_t   1   m_soundEffectKind   ""
-   6   uint8_t   1   m_soundEffectStartedOnce   ""
-   7   uint8_t   1   unkSoundEffectRelated   ""
-   8   int32_t   4   m_soundEffectStartFrame   ""
-   12   int32_t   4   m_soundEffectFadeFrames   ""
-   16   int32_t   4   m_soundEffectHandle   ""
-}
-Length: 20 Alignment: 1
-	m_soundEffectData	
-0x130	0x8	PPPIFPARAM	/Game/Classes/partMng/PPPIFPARAM
-pack(disabled)
-Structure PPPIFPARAM {
-   0   int32_t   4   m_particleIndex   ""
-   4   int16_t   2   m_classId   ""
-   6   uint8_t   1   m_hitObjectCount   ""
-   7   uint8_t   1   m_hitFlags   ""
-}
-Length: 8 Alignment: 1
-	m_hitParams	
-0x138	0x20	int16_t[16]	int16_t[16]	m_hitObjectIds	
-    */
+    void* m_pppResSet;                 // 0x00
+    int m_partIndex;                   // 0x04
+    Vec m_position;                    // 0x08
+    int m_baseTime;                    // 0x14
+    pppIVECTOR4 m_rotation;            // 0x18
+    int m_rotationSpeed;               // 0x20
+    int m_lifeEnd;                     // 0x24
+    Vec m_scale;                       // 0x28
+    int m_currentFrame;                // 0x34
+    int m_previousFrame;               // 0x38
+    int m_numControlPrograms;          // 0x3C
+    float m_scaleFactor;               // 0x40
+    float m_ownerScale;                // 0x44
+    float m_userFloat0;                // 0x48
+    float m_userFloat1;                // 0x4C
+    Vec m_savedPosition;               // 0x50
+    Vec m_previousPosition;            // 0x5C
+    Vec m_paramVec0;                   // 0x68
+    short m_kind;                      // 0x74
+    short m_nodeIndex;                 // 0x76
+    pppFMATRIX m_matrix;               // 0x78
+    unsigned char m_envColorR;         // 0xA8
+    unsigned char m_envColorG;         // 0xA9
+    unsigned char m_envColorB;         // 0xAA
+    unsigned char m_envColorA;         // 0xAB
+    union {
+        int m_prioTime;                // 0xAC
+        int m_spawnedCount;
+    };
+    int m_previousFrame2;              // 0xB0
+    int m_numPrograms;                 // 0xB4
+    int m_reservedB8;                  // 0xB8
+    unsigned int m_objHitMask;         // 0xBC
+    unsigned int m_cylinderAttribute;  // 0xC0
+    unsigned char m_pObjList[0xC];     // 0xC4
+    void* m_pDataValList;              // 0xCC
+    void* m_controlProgramTable;       // 0xD0
+    void* m_programInfoTable;          // 0xD4
+    void* m_programControlArray;       // 0xD8
+    void* m_owner;                     // 0xDC
+    void* m_lookTarget;                // 0xE0
+    CChara::CNode* m_bindNode;         // 0xE4
+    unsigned char m_mode;              // 0xE8
+    unsigned char m_particleEnded;     // 0xE9
+    unsigned char m_isFinished;        // 0xEA
+    unsigned char m_matrixMode;        // 0xEB
+    unsigned char m_hitBgFlag;         // 0xEC
+    unsigned char m_slotVisible;       // 0xED
+    unsigned char m_ownerFacing;       // 0xEE
+    unsigned char m_drawVariant;       // 0xEF
+    unsigned char m_rotationOrder;     // 0xF0
+    unsigned char m_drawPass;          // 0xF1
+    signed char m_drawSubType;         // 0xF2
+    unsigned char m_useOwnerScaleSign; // 0xF3
+    unsigned char m_ownerFlagsInitialized; // 0xF4
+    unsigned char m_nodeScaleInitialized;  // 0xF5
+    unsigned char m_fieldF6;           // 0xF6
+    unsigned char m_mapTexLoaded;      // 0xF7
+    unsigned char m_hasMapRef;         // 0xF8
+    unsigned char m_fpBillboard;       // 0xF9
+    unsigned char m_prio;              // 0xFA
+    short m_frameCounter;              // 0xFB
+    unsigned char m_padFD[3];          // 0xFD
+    unsigned int m_paramA;             // 0x100
+    unsigned int m_paramB;             // 0x104
+    float m_cullRadiusSq;              // 0x108
+    float m_cullRadius;                // 0x10C
+    float m_cullYOffset;               // 0x110
+    float m_sortDepth;                 // 0x114
+    unsigned short m_field118;         // 0x118
+    short m_mapObjIndex;               // 0x11A
+    PPPSEST m_soundEffectData;         // 0x11C
+    PPPIFPARAM m_hitParams;            // 0x130
+    short m_hitObjectIds[0x10];        // 0x138
 }; // Size: 0x158
 
 void Screen2world(Vec&, Vec&);

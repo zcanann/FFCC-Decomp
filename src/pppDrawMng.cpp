@@ -1,10 +1,14 @@
 #include "ffcc/pppDrawMng.h"
 
 #include "ffcc/graphic.h"
+#include "ffcc/game.h"
 #include "ffcc/p_chara.h"
-#include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
+
+extern CGame Game;
+extern unsigned char* lbl_8032ED50;
+extern _pppEnvSt* lbl_8032ED54;
 
 /*
  * --INFO--
@@ -16,7 +20,7 @@ void pppDrawMng::ClearOt()
 	int count = sizeof(m_primitiveRefs) / sizeof(pppDrawPrimitive*);
 	pppDrawPrimitive** primitiveRef = m_primitiveRefs;
 
-	if (Game.game.m_currentMapId == 0x21)
+	if (Game.m_currentMapId == 0x21)
 	{
 		m_depthScale = 0.0512f; // FLOAT_80330330
 	}
@@ -64,8 +68,8 @@ void pppDrawMng::DrawOt()
                         pppInitDrawEnv(0);
                     }
 
-                    pppEnvStPtr = (_pppEnvSt*)((char*)(*(void**)prim->m_handle) + 4);
-                    pppMngStPtr = (_pppMngSt*)prim->m_handle;
+                    lbl_8032ED54 = (_pppEnvSt*)((char*)(*(void**)prim->m_handle) + 4);
+                    lbl_8032ED50 = (unsigned char*)prim->m_handle;
 
                     pppSetFpMatrix((_pppMngSt*)prim->m_handle);
                     _pppDrawPart((_pppMngSt*)prim->m_handle);

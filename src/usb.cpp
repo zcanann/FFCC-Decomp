@@ -2,7 +2,8 @@
 
 #include "ffcc/system.h"
 
-extern void* __vt__8CManager;
+extern "C" char __vt__8CManager[];
+extern "C" char lbl_801E88A4[];
 
 /*
  * --INFO--
@@ -163,7 +164,7 @@ void CUSB::Printf(char*, ...)
  */
 extern "C" void __sinit_usb_cpp()
 {
-	volatile void** base = reinterpret_cast<volatile void**>(&USB);
-	*base = &__vt__8CManager;
-	*base = &PTR_PTR_DAT_801e88a4;
+	void* vtbl = __vt__8CManager;
+	*reinterpret_cast<void**>(&USB) = vtbl;
+	*reinterpret_cast<void**>(&USB) = lbl_801E88A4;
 }

@@ -6,6 +6,7 @@
 
 extern CMaterialMan MaterialMan;
 extern int DAT_8032ed70;
+extern unsigned char* lbl_8032ED50;
 
 extern "C" {
 void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
@@ -90,7 +91,7 @@ void pppDestructEraseCharaParts(void)
     void* handle;
     int model;
 
-    handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)pppMngStPtr + 0x8), 0);
+    handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)(lbl_8032ED50 + 0xE0), 0);
     model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
     *(void**)(model + 0xE4) = 0;
     *(void**)(model + 0xE8) = 0;

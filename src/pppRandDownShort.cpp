@@ -31,7 +31,7 @@ struct RandDownShortCtx {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRandDownShort(void* r3, void* r4, void* r5)
+extern "C" void pppRandDownShort(void* r3, void* r4, void* r5)
 {
     u8* base = (u8*)r3;
     RandDownShortParam* in = (RandDownShortParam*)r4;

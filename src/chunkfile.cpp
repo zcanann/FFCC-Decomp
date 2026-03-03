@@ -94,19 +94,22 @@ bool CChunkFile::GetNextChunk(CChunk& outChunk)
 {
     int skip;
     int alignedSize;
-    unsigned int roundUp;
+    int alignedBlocks;
+    int roundUp;
 
     if (m_lastChunkSize < 0) {
         skip = 0;
     } else {
-        alignedSize = m_lastChunkSize + 0xF;
+        alignedSize = m_lastChunkSize;
+        alignedSize += 0xF;
         roundUp = 0;
         if (alignedSize < 0) {
             if ((alignedSize & 0xF) != 0) {
                 roundUp = 1;
             }
         }
-        skip = ((alignedSize >> 4) + static_cast<int>(roundUp)) * 0x10 + 0x10;
+        alignedBlocks = (alignedSize >> 4) + roundUp;
+        skip = (alignedBlocks << 4) + 0x10;
     }
 
     m_scopeOffset += skip;

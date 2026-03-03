@@ -459,14 +459,36 @@ int CWind::AddSphere(const Vec* pos, float radius, float speed, int life)
  */
 void CWind::ChangePower(int id, float power)
 {
-	for (int i = 0; i < 32; i++) {
-		WindObject* obj = &m_objects[i];
-		if (((s8)obj->flags >= 0) || (id != obj->id)) {
-			continue;
-		}
+    WindObject* obj = m_objects;
+    WindObject* found = 0;
+    int i = 8;
 
-		obj->targetPower = power;
-		obj->basePower = power;
-		return;
-	}
+    do {
+        if ((s8)obj[0].flags < 0 && id == obj[0].id) {
+            found = &obj[0];
+            break;
+        }
+        if ((s8)obj[1].flags < 0 && id == obj[1].id) {
+            found = &obj[1];
+            break;
+        }
+        if ((s8)obj[2].flags < 0 && id == obj[2].id) {
+            found = &obj[2];
+            break;
+        }
+        if ((s8)obj[3].flags < 0 && id == obj[3].id) {
+            found = &obj[3];
+            break;
+        }
+
+        obj += 4;
+        i--;
+    } while (i != 0);
+
+    if (found == 0) {
+        return;
+    }
+
+    found->targetPower = power;
+    found->basePower = power;
 }

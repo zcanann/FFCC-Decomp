@@ -10,8 +10,8 @@ static const float MaxBounds = 10000000.0;
 static const float MinBounds = -10000000.0;
 static const float EPS = 0.0;
 
-extern u32 CFlatFlags;     // CFlat._4764_4_
-extern Mtx gFlatPosMtx;    // at 0x802687ac
+extern unsigned char CFlat[];
+extern unsigned char CameraPcs[];
 
 /*
  * --INFO--
@@ -43,10 +43,10 @@ void CGQuadObj::onDestroy()
  */
 void CGQuadObj::onDraw()
 {
-    if (m_vertexCount != 0 && (CFlatFlags & 0x10000) != 0) {
+    if (m_vertexCount != 0 && (*(u32*)(CFlat + 0x129C) & 0x10000) != 0) {
         CColor color(0xff, 0xff, 0xff, 0xff);
         GXSetChanMatColor(GX_COLOR0A0, color.color);
-        GXLoadPosMtxImm(gFlatPosMtx, GX_PNMTX0);
+        GXLoadPosMtxImm(*(Mtx*)(CameraPcs + 0x4), GX_PNMTX0);
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, (u32)m_vertexCount * 6);
 
         int i = 0;

@@ -3,6 +3,25 @@
 #include "dolphin/mtx.h"
 #include "dolphin/types.h"
 
+struct KeShpTailOffsets {
+    u8 _pad0[0xc];
+    s32* m_serializedDataOffsets;
+};
+
+struct KeShpTailWork {
+    u8 m_count;
+    u8 m_head;
+    u16 m_field2;
+    u16 m_field4;
+    u16 m_field6;
+    Vec m_posHistory[31];
+};
+
+struct KeShpTailObject {
+    u8 _pad0[0xc];
+    _pppPObject m_obj;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x80088124
@@ -12,38 +31,40 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail(void* obj, void* param_2)
+void pppKeShpTail(void* r3, void* r4)
 {
 	extern int lbl_8032ED70;
+	KeShpTailObject* tailObj = (KeShpTailObject*)r3;
+	KeShpTailWork* work;
 	if (lbl_8032ED70 != 0) {
 		return;
 	}
 
-	int serializedOffset = **(int**)((u8*)param_2 + 0xc);
-	u8* tail = (u8*)obj + serializedOffset + 0x80;
-	if (*(u32*)((u8*)obj + 0xc) == 0) {
+	work = (KeShpTailWork*)((u8*)r3 + ((KeShpTailOffsets*)r4)->m_serializedDataOffsets[0] + 0x80);
+	if (tailObj->m_obj.m_graphId == 0) {
 		Vec local_14;
-		Vec local_30;
-		local_14.x = *(f32*)((u8*)obj + 0x1c);
-		local_14.y = *(f32*)((u8*)obj + 0x2c);
-		local_14.z = *(f32*)((u8*)obj + 0x3c);
-		pppCopyVector(local_30, local_14);
+		Vec local_20;
 
-		u8 count = tail[0];
-		Vec* tailVec = (Vec*)(tail + 8);
+		local_14.x = tailObj->m_obj.m_localMatrix.value[0][3];
+		local_14.y = tailObj->m_obj.m_localMatrix.value[1][3];
+		local_14.z = tailObj->m_obj.m_localMatrix.value[2][3];
+		pppCopyVector(local_20, local_14);
+
+		u8 count = work->m_count;
+		Vec* tailVec = work->m_posHistory;
 		if (count != 0) {
 			do {
-				pppCopyVector(*tailVec, local_30);
-				tailVec++;
+				pppCopyVector(*tailVec, local_20);
 				count--;
+				tailVec++;
 			} while (count != 0);
 		}
 	}
 
-	if (tail[1] == 0) {
-		tail[1] = tail[0];
+	if (work->m_head == 0) {
+		work->m_head = work->m_count;
 	}
-	tail[1]--;
+	work->m_head--;
 }
 
 /*
@@ -55,16 +76,14 @@ void pppKeShpTail(void* obj, void* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTailCon(void* obj, void* param_2)
+void pppKeShpTailCon(void* r3, void* r4)
 {
-	u32 serializedOffset = **(u32**)((u8*)param_2 + 0xc);
-	u8* tail = (u8*)obj + serializedOffset + 0x80;
-
-	*(u16*)(tail + 2) = 0;
-	*(u16*)(tail + 4) = 0;
-	*(u16*)(tail + 6) = 0;
-	tail[1] = 0;
-	tail[0] = 0x1f;
+	KeShpTailWork* work = (KeShpTailWork*)((u8*)r3 + ((KeShpTailOffsets*)r4)->m_serializedDataOffsets[0] + 0x80);
+	work->m_field2 = 0;
+	work->m_field4 = 0;
+	work->m_field6 = 0;
+	work->m_head = 0;
+	work->m_count = 0x1f;
 }
 
 /*

@@ -104,8 +104,6 @@ int setvbuf(FILE* file, char* buffer, int mode, size_t size)
 	file->buffer_ptr = file->buffer;
 	file->buffer_size = size;
 	file->buffer_alignment = 0;
-	file->save_buffer_length = 0;
-	file->buffer_position = 0;
 
 	__end_critical_region(2);
 	return 0;

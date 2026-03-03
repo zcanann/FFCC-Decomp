@@ -46,7 +46,7 @@ void pppRandDownFloat(void* param1, void* param2, void* param3)
     if (id == 0) {
         f32 value = -RandF__5CMathFv(math);
         if (p2->randomTwice != 0) {
-            value = (value - RandF__5CMathFv(math)) * lbl_8032FF38;
+            value = lbl_8032FF38 * (value - RandF__5CMathFv(math));
         }
 
         valuePtr = (f32*)(base + *p3->outputOffset + 0x80);
@@ -59,12 +59,7 @@ void pppRandDownFloat(void* param1, void* param2, void* param3)
     }
 
     s32 sourceOffset = p2->sourceOffset;
-    f32* source;
-    if (sourceOffset == -1) {
-        source = &lbl_801EADC8[0];
-    } else {
-        source = (f32*)(base + sourceOffset + 0x80);
-    }
+    f32* source = (sourceOffset == -1) ? lbl_801EADC8 : (f32*)(base + sourceOffset + 0x80);
 
     f32 delta = p2->blend * *valuePtr;
     *source = *source + delta;

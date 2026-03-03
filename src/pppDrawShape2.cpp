@@ -1,12 +1,16 @@
 #include "ffcc/pppDrawShape2.h"
+#include "ffcc/pppPart.h"
+#include "ffcc/pppShape.h"
 #include "dolphin/types.h"
 
 extern int lbl_8032ED70;
 extern void* lbl_8032ED54;
 
-extern void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
-extern void pppSetBlendMode__FUc(unsigned char);
-extern void pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(void*, void*, unsigned char);
+extern "C" {
+void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
+void pppSetBlendMode__FUc(unsigned char);
+void pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(void*, void*, unsigned char);
+}
 
 typedef struct ShapeState {
     u16 value;
@@ -27,7 +31,8 @@ typedef struct ShapeSpecEntry {
 
 typedef struct ShapeControlData {
     u8 _pad0[4];
-    u32 type;
+    s16 type;
+    u16 _padType;
     u32 step;
     u8 _pad2[1];
     u8 blendMode;
@@ -75,14 +80,14 @@ void pppCalcShape2(void* param1, void* param2, void* param3)
     ShapeRuntimeData* runtimeData = *(ShapeRuntimeData**)((u8*)param3 + 0xC);
     ShapeControlData* controlData = (ShapeControlData*)param2;
     ShapeState* shapeData = (ShapeState*)((u8*)param1 + runtimeData->shapeDataOffset + 0x80);
-    s16 type = *(s16*)((u8*)controlData + 0x4);
+    s16 type = controlData->type;
 
-    if (type == -1) {
+    if (type == 0xFFFF) {
         return;
     }
 
     void** shapeTables = *(void***)((u8*)lbl_8032ED54 + 0xC);
-    void* shapeSpec = *(void**)((u8*)shapeTables + ((u16)type << 2));
+    void* shapeSpec = *(void**)*(u32*)((u8*)shapeTables + (type << 2));
     ShapeSpecEntry* shape = (ShapeSpecEntry*)((u8*)shapeSpec + ((u32)shapeData->counter << 3) + 0x10);
 
     shapeData->currentId = shapeData->counter;
@@ -122,20 +127,20 @@ void pppDrawShape2(void* param1, void* param2, void* param3)
     ShapeControlData* controlData = (ShapeControlData*)param2;
     ShapeState* shapeData = (ShapeState*)((u8*)param1 + runtimeData->shapeDataOffset + 0x80);
     void* posData = (u8*)param1 + runtimeData->posDataOffset + 0x80;
-    u32 type = controlData->type;
+    u16 type = (u16)controlData->type;
 
     if (type == 0xFFFF) {
         return;
     }
 
     void** shapeTables = *(void***)((u8*)lbl_8032ED54 + 0xC);
-    void* shapeSpec = *(void**)((u8*)shapeTables + (type << 2));
+    void* shapeSpec = *(void**)*(u32*)((u8*)shapeTables + (type << 2));
     ShapeSpecEntry* shape = (ShapeSpecEntry*)((u8*)shapeSpec + ((u32)shapeData->currentId << 3) + 0x10);
     void* drawShape = (u8*)shapeSpec + shape->offset;
 
-    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        (u8*)posData + 8,
-        (u8*)param1 + 0x40,
+    pppSetDrawEnv(
+        (pppCVECTOR*)((u8*)posData + 8),
+        (pppFMATRIX*)((u8*)param1 + 0x40),
         controlData->scale,
         controlData->param15,
         controlData->paramE,
@@ -146,6 +151,6 @@ void pppDrawShape2(void* param1, void* param2, void* param3)
         0
     );
 
-    pppSetBlendMode__FUc(controlData->blendMode);
-    pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(drawShape, *(void**)((u8*)lbl_8032ED54 + 0x4), controlData->blendMode);
+    pppSetBlendMode(controlData->blendMode);
+    pppDrawShp((tagOAN3_SHAPE*)drawShape, *(CMaterialSet**)((u8*)lbl_8032ED54 + 0x4), controlData->blendMode);
 }

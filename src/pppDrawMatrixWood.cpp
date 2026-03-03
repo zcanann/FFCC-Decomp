@@ -2,6 +2,8 @@
 #include "ffcc/partMng.h"
 #include "dolphin/mtx.h"
 
+extern unsigned char* lbl_8032ED50;
+
 /*
  * --INFO--
  * PAL Address: 0x8008abc0
@@ -17,9 +19,9 @@ void pppDrawMatrixWood(_pppPObject* param_1) {
     PSMTXScaleApply(
         *(Mtx*)(p + 0x10),
         *(Mtx*)(p + 0x40),
-        *(float*)((char*)pppMngStPtr + 0x28),
-        *(float*)((char*)pppMngStPtr + 0x2C),
-        *(float*)((char*)pppMngStPtr + 0x30)
+        *(float*)((char*)lbl_8032ED50 + 0x28),
+        *(float*)((char*)lbl_8032ED50 + 0x2C),
+        *(float*)((char*)lbl_8032ED50 + 0x30)
     );
 
     *(float*)(p + 0x4C) = *(float*)(p + 0x1C);

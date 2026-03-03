@@ -34,7 +34,7 @@ void pppDrawMdl(_pppPObject* pObject, PDrawMdl* drawMdl, _pppCtrlTable* ctrlTabl
     _pppPObject* obj = pObject;
     PDrawMdl* mdl = drawMdl;
 
-    if ((*(u32*)((u8*)mdl + 4) >> 16) == 0xFFFF) {
+    if ((*(u32*)((u8*)mdl + 4) + 0x10000) == 0xFFFF) {
         return;
     }
 

@@ -525,7 +525,7 @@ config.libs = [
             Object(NonMatching, "pppGetRotMatrixYZX.cpp"),
             Object(NonMatching, "pppGetRotMatrixZ.cpp"),
             Object(NonMatching, "pppGetRotMatrixZXY.cpp"),
-            Object(NonMatching, "pppGetRotMatrixZYX.cpp"),
+            Object(NonMatching, "pppGetRotMatrixZYX.cpp", cflags=cflags_game_cpp_exceptions),
             Object(
                 NonMatching,
                 "pppKeDMat.cpp",

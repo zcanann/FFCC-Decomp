@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-void pppMatrixXYZ(pppFMATRIX& matrix, PPPCREATEPARAM* param);
+void pppMatrixXYZ(void* target, void* unused, void* param);
 
 #ifdef __cplusplus
 }

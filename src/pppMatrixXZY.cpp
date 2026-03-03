@@ -12,43 +12,46 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppMatrixXZY(pppFMATRIX& mtx, void* param)
+void pppMatrixXZY(void* target, void* unused, void* param)
 {
+    (void)unused;
+
+    f32* matrix = (f32*)target;
     u32* offsets = (u32*)*(void**)((u8*)param + 0xC);
-    pppIVECTOR4* angle = (pppIVECTOR4*)((u8*)&mtx + offsets[1] + 0x80);
-    f32* scale = (f32*)((u8*)&mtx + offsets[2] + 0x80);
-    f32* translation = (f32*)((u8*)&mtx + offsets[0] + 0x80);
+    pppIVECTOR4* angle = (pppIVECTOR4*)((u8*)target + offsets[1] + 0x80);
+    f32* translation = (f32*)((u8*)target + offsets[0] + 0x80);
+    f32* scale = (f32*)((u8*)target + offsets[2] + 0x80);
     Vec temp1;
     Vec temp2;
     Vec temp3;
 
-    pppGetRotMatrixXZY(mtx, angle);
+    pppGetRotMatrixXZY(*(pppFMATRIX*)(matrix + 4), angle);
 
-    temp1.x = mtx.value[0][0];
-    temp1.y = mtx.value[1][0];
-    temp1.z = mtx.value[2][0];
+    temp1.x = matrix[4];
+    temp1.y = matrix[8];
+    temp1.z = matrix[12];
     PSVECScale(&temp1, &temp1, scale[0]);
-    mtx.value[0][0] = temp1.x;
-    mtx.value[1][0] = temp1.y;
-    mtx.value[2][0] = temp1.z;
+    matrix[4] = temp1.x;
+    matrix[8] = temp1.y;
+    matrix[12] = temp1.z;
 
-    temp2.x = mtx.value[0][1];
-    temp2.y = mtx.value[1][1];
-    temp2.z = mtx.value[2][1];
+    temp2.x = matrix[5];
+    temp2.y = matrix[9];
+    temp2.z = matrix[13];
     PSVECScale(&temp2, &temp2, scale[1]);
-    mtx.value[0][1] = temp2.x;
-    mtx.value[1][1] = temp2.y;
-    mtx.value[2][1] = temp2.z;
+    matrix[5] = temp2.x;
+    matrix[9] = temp2.y;
+    matrix[13] = temp2.z;
 
-    temp3.x = mtx.value[0][2];
-    temp3.y = mtx.value[1][2];
-    temp3.z = mtx.value[2][2];
+    temp3.x = matrix[6];
+    temp3.y = matrix[10];
+    temp3.z = matrix[14];
     PSVECScale(&temp3, &temp3, scale[2]);
-    mtx.value[0][2] = temp3.x;
-    mtx.value[1][2] = temp3.y;
-    mtx.value[2][2] = temp3.z;
+    matrix[6] = temp3.x;
+    matrix[10] = temp3.y;
+    matrix[14] = temp3.z;
 
-    mtx.value[0][3] = translation[0];
-    mtx.value[1][3] = translation[1];
-    mtx.value[2][3] = translation[2];
+    matrix[7] = translation[0];
+    matrix[11] = translation[1];
+    matrix[15] = translation[2];
 }

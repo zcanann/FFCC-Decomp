@@ -86,8 +86,8 @@ BOOL OSGetResetButtonState(void) {
 
     LastState = state;
 
-    if (__gUnknown800030E3 & 0x1F) {
-        OSTime fire = (__gUnknown800030E3 & 0x1F) * 60;
+    if (__gUnknown800030E3 & 0x3F) {
+        OSTime fire = (__gUnknown800030E3 & 0x3F) * 60;
         fire = __OSStartTime + OSSecondsToTicks(fire);
         if (fire < now) {
             now -= fire;
@@ -110,11 +110,11 @@ int OSGetResetSwitchState(void) {
 
 void __OSSetResetButtonTimer(u8 min) {
     BOOL enabled = OSDisableInterrupts();
-    if (min > 0x1F) {
-        min = 0x1F;
+    if (min > 0x3F) {
+        min = 0x3F;
     }
 
-    __gUnknown800030E3 &= ~0x1F;
+    __gUnknown800030E3 &= ~0x3F;
     __gUnknown800030E3 |= min;
     OSRestoreInterrupts(enabled);
 }

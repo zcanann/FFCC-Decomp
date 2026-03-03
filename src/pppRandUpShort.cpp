@@ -46,7 +46,8 @@ extern "C" void pppRandUpShort(void* param1, void* param2, void* param3)
     if (state == 0) {
         f32 value = RandF__5CMathFv(&math[0]);
         if (in->randomTwice != 0) {
-            value = (value + RandF__5CMathFv(&math[0])) * lbl_80330038;
+            f32 mixed = value + RandF__5CMathFv(&math[0]);
+            value = lbl_80330038 * mixed;
         }
 
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
@@ -60,17 +61,8 @@ extern "C" void pppRandUpShort(void* param1, void* param2, void* param3)
 
     target = (in->sourceOffset == -1) ? &lbl_801EADC8[0] : (s16*)(base + in->sourceOffset + 0x80);
 
-    union {
-        f64 d;
-        struct {
-            u32 hi;
-            u32 lo;
-        } parts;
-    } cvt;
     u16 scale = in->scale;
-    cvt.parts.hi = 0x43300000;
-    cvt.parts.lo = scale;
-
-    s32 delta = (s32)(*valuePtr * (cvt.d - lbl_80330040));
+    double scaled = (double)*valuePtr * (double)scale;
+    s32 delta = (s32)scaled;
     *target = (s16)(*target + delta);
 }

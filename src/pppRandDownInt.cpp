@@ -2,7 +2,7 @@
 #include "ffcc/math.h"
 #include "types.h"
 
-extern CMath math;
+extern CMath math[];
 extern s32 lbl_8032ED70;
 extern f32 lbl_8032FF58;
 extern f64 lbl_8032FF60;
@@ -46,9 +46,9 @@ void pppRandDownInt(void* param1, void* param2, void* param3)
 
     s32 baseState = *(s32*)(base + 0xC);
     if (baseState == 0) {
-        f32 value = -RandF__5CMathFv(&math);
+        f32 value = -RandF__5CMathFv(math);
         if (in->fieldC != 0) {
-            value = (value - RandF__5CMathFv(&math)) * lbl_8032FF58;
+            value = (value - RandF__5CMathFv(math)) * lbl_8032FF58;
         }
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);

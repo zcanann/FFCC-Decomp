@@ -651,7 +651,7 @@ config.libs = [
             Object(NonMatching, "system.cpp"),
             Object(NonMatching, "texanim.cpp"),
             Object(NonMatching, "textureman.cpp"),
-            Object(NonMatching, "THPDraw.cpp"),
+            Object(NonMatching, "THPDraw.cpp", cflags=[*cflags_thp, "-use_lmw_stmw on"]),
             Object(NonMatching, "THPSimple.cpp"),
             Object(NonMatching, "usb.cpp"),
             Object(NonMatching, "USBStreamData.cpp"),

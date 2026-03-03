@@ -51,6 +51,10 @@ public:
     float Line1D(int, float, float*, float*);
     unsigned int Hsb2Rgb(int, int, int);
     float DstRot(float, float);
+
+private:
+    float m_localMtx[3][4];      // 0x04
+    unsigned char m_scratch[0x30]; // 0x34
 };
 
 #endif // _FFCC_CMATH_H_

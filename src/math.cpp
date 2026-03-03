@@ -53,8 +53,8 @@ CMath::CMath()
  */
 void CMath::Init()
 {
-	PSMTXIdentity((MtxPtr)((char*)this + 4));
-	memset((char*)this + 0x34, 0, 0x30);
+	PSMTXIdentity(m_localMtx);
+	memset(m_scratch, 0, sizeof(m_scratch));
 }
 
 /*

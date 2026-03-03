@@ -101,10 +101,9 @@ void CFlatRuntime::Init()
 	typedef void* (*GetStageFn)(CFlatRuntime*);
 	GetStageFn getStage = reinterpret_cast<GetStageFn>((*reinterpret_cast<void***>(this))[0x11]);
 
-	*reinterpret_cast<void**>(reinterpret_cast<char*>(this) + 0xC) =
-		__nwa__FUlPQ27CMemory6CStagePci(0x3000, getStage(this), s_cflat_runtime_cpp_801d8ef8, 0x2A);
-	*reinterpret_cast<void**>(reinterpret_cast<char*>(this) + 0x10) =
-		__nwa__FUlPQ27CMemory6CStagePci(0x14880, getStage(this), s_cflat_runtime_cpp_801d8ef8, 0x2B);
+	m_permanentVarValues = static_cast<u8*>(
+	    __nwa__FUlPQ27CMemory6CStagePci(0x3000, getStage(this), s_cflat_runtime_cpp_801d8ef8, 0x2A));
+	m_initScratchA = __nwa__FUlPQ27CMemory6CStagePci(0x14880, getStage(this), s_cflat_runtime_cpp_801d8ef8, 0x2B);
 }
 
 /*
@@ -118,8 +117,8 @@ void CFlatRuntime::Init()
  */
 void CFlatRuntime::Quit()
 {
-	delete[] (char*)*(void**)((char*)this + 0xC);
-	delete[] (char*)*(void**)((char*)this + 0x10);
+	delete[] (char*)m_permanentVarValues;
+	delete[] (char*)m_initScratchA;
 }
 
 /*
@@ -136,8 +135,8 @@ void CFlatRuntime::Destroy()
 	typedef void (*OnDeleteFn)(CFlatRuntime*, CFlatRuntime::CObject*);
 
 	u8* const self = reinterpret_cast<u8*>(this);
-	CObject* const root = reinterpret_cast<CObject*>(self + 0x8CC);
-	CObject* object = *reinterpret_cast<CObject**>(self + 0x8F0);
+	CObject* const root = &m_objectSentinel;
+	CObject* object = m_objectSentinel.m_next;
 
 	while (object != root) {
 		CObject* const next = object->m_next;
@@ -148,8 +147,8 @@ void CFlatRuntime::Destroy()
 		*reinterpret_cast<void**>(reinterpret_cast<u8*>(*object->m_freeListNode) + 4) = object->m_freeListNode[1];
 		*reinterpret_cast<void**>(object->m_freeListNode[1]) = *object->m_freeListNode;
 
-		object->m_freeListNode[1] = *reinterpret_cast<void***>(self + 0x98C);
-		*reinterpret_cast<void***>(self + 0x98C) = object->m_freeListNode;
+		object->m_freeListNode[1] = *m_objectFreeListHead;
+		*m_objectFreeListHead = object->m_freeListNode;
 
 		object->m_flags &= 0xEF;
 
@@ -164,49 +163,49 @@ void CFlatRuntime::Destroy()
 		__dla__FPv(ptr);
 	}
 
-	u8* funcs = *reinterpret_cast<u8**>(self + 0x20);
-	const int funcCount = *reinterpret_cast<int*>(self + 0x1C);
+	u8* funcs = m_funcs;
+	const int funcCount = m_funcCount;
 	for (int i = 0, off = 0; i < funcCount; i++, off += 0x50) {
 		__dla__FPv(*reinterpret_cast<void**>(funcs + off + 0x34));
 		__dla__FPv(*reinterpret_cast<void**>(funcs + off + 0x3C));
 	}
 
-	ptr = *reinterpret_cast<void**>(self + 0x20);
+	ptr = m_funcs;
 	if (ptr != 0) {
 		__dla__FPv(ptr);
 	}
 
-	ptr = *reinterpret_cast<void**>(self + 0x18);
+	ptr = m_classes;
 	if (ptr != 0) {
 		__dla__FPv(reinterpret_cast<u8*>(ptr) - 0x10);
 	}
 
-	ptr = *reinterpret_cast<void**>(self + 0x28);
+	ptr = m_0x28;
 	if (ptr != 0) {
 		__dla__FPv(ptr);
 	}
 
-	ptr = *reinterpret_cast<void**>(self + 0x2C);
+	ptr = m_0x2C;
 	if (ptr != 0) {
 		__dla__FPv(ptr);
 	}
 
-	ptr = *reinterpret_cast<void**>(self + 0x34);
+	ptr = m_0x34;
 	if (ptr != 0) {
 		__dla__FPv(ptr);
 	}
 
-	ptr = *reinterpret_cast<void**>(self + 0x38);
+	ptr = m_0x38;
 	if (ptr != 0) {
 		__dla__FPv(ptr);
 	}
 
-	ptr = *reinterpret_cast<void**>(self + 0x40);
+	ptr = m_0x40;
 	if (ptr != 0) {
 		__dla__FPv(ptr);
 	}
 
-	ptr = *reinterpret_cast<void**>(self + 0x44);
+	ptr = m_0x44;
 	if (ptr != 0) {
 		__dla__FPv(ptr);
 	}
@@ -229,19 +228,19 @@ void CFlatRuntime::clear()
 	const short clearMaskBits = static_cast<short>(-1);
 
 	*reinterpret_cast<void**>(self + 0x08) = 0;
-	*reinterpret_cast<void**>(self + 0x20) = 0;
-	*reinterpret_cast<void**>(self + 0x1C) = 0;
-	*reinterpret_cast<void**>(self + 0x18) = 0;
-	*reinterpret_cast<void**>(self + 0x14) = 0;
-	*reinterpret_cast<void**>(self + 0x2C) = 0;
-	*reinterpret_cast<void**>(self + 0x28) = 0;
-	*reinterpret_cast<void**>(self + 0x24) = 0;
-	*reinterpret_cast<void**>(self + 0x38) = 0;
-	*reinterpret_cast<void**>(self + 0x34) = 0;
-	*reinterpret_cast<void**>(self + 0x30) = 0;
-	*reinterpret_cast<void**>(self + 0x44) = 0;
-	*reinterpret_cast<void**>(self + 0x40) = 0;
-	*reinterpret_cast<void**>(self + 0x3C) = 0;
+	m_funcs = 0;
+	m_funcCount = 0;
+	m_classes = 0;
+	m_initScratchB = 0;
+	m_0x2C = 0;
+	m_0x28 = 0;
+	m_0x24 = 0;
+	m_0x38 = 0;
+	m_0x34 = 0;
+	m_0x30 = 0;
+	m_0x44 = 0;
+	m_0x40 = 0;
+	m_0x3C = 0;
 
 	*reinterpret_cast<short*>(self + 0x964) =
 	    static_cast<short>((*reinterpret_cast<short*>(self + 0x964) & 0x000F) | (clearMaskBits << 4));
@@ -252,13 +251,14 @@ void CFlatRuntime::clear()
 	*reinterpret_cast<void**>(self + 0x8F0) = self + 0x8CC;
 	*reinterpret_cast<short*>(self + 0x8FE) = 0x10;
 
-	*reinterpret_cast<void**>(self + 0x978) = self + 0x978;
-	*reinterpret_cast<void**>(self + 0x97C) = self + 0x978;
-	*reinterpret_cast<int*>(self + 0x980) = 0x5220;
-	*reinterpret_cast<void**>(self + 0x984) = 0;
+	m_freeListPrev = reinterpret_cast<void**>(self + 0x978);
+	m_freeListNext = reinterpret_cast<void**>(self + 0x978);
+	m_freeListCount = 0x5220;
+	m_0x984 = 0;
+	m_objectPoolBase = self + 0x1288;
 
 	*reinterpret_cast<void**>(self + 0x988) = self + 0x1288;
-	*reinterpret_cast<void**>(self + 0x98C) = self + 0x998;
+	m_objectFreeListHead = reinterpret_cast<void**>(self + 0x998);
 
 	u8* const freeNodes = self + 0x998;
 	for (int block = 0; block < 0x30; block++) {
@@ -287,7 +287,7 @@ void CFlatRuntime::clear()
 		                              : static_cast<void*>(freeNodes + (baseIndex + 3) * 0x10);
 	}
 
-	memset(self + 0x48, 0, 0x804);
+	memset(m_performanceBlock, 0, sizeof(m_performanceBlock));
 }
 
 /*
@@ -658,9 +658,9 @@ int CFlatRuntime::Frame(int, int mode)
  */
 void CFlatRuntime::AfterFrame(int mode)
 {
-	CObject* object = reinterpret_cast<CObject*>(reinterpret_cast<u8*>(this) + 0x8CC)->m_next;
+	CObject* object = m_objectSentinel.m_next;
 
-	while (object != reinterpret_cast<CObject*>(reinterpret_cast<u8*>(this) + 0x8CC)) {
+	while (object != &m_objectSentinel) {
 		CObject* const next = object->m_next;
 
 		if ((mode != 0) || (static_cast<s8>(object->m_flags) < 0)) {
@@ -670,8 +670,8 @@ void CFlatRuntime::AfterFrame(int mode)
 			*reinterpret_cast<void**>(reinterpret_cast<u8*>(*object->m_freeListNode) + 4) = object->m_freeListNode[1];
 			*reinterpret_cast<void**>(object->m_freeListNode[1]) = *object->m_freeListNode;
 
-			object->m_freeListNode[1] = *reinterpret_cast<void***>(reinterpret_cast<u8*>(this) + 0x98C);
-			*reinterpret_cast<void***>(reinterpret_cast<u8*>(this) + 0x98C) = object->m_freeListNode;
+			object->m_freeListNode[1] = *m_objectFreeListHead;
+			*m_objectFreeListHead = object->m_freeListNode;
 
 			object->m_flags &= 0xEF;
 
@@ -700,8 +700,8 @@ void CFlatRuntime::deleteObject(CFlatRuntime::CObject* object)
 	*(void**)((char*)*object->m_freeListNode + 4) = object->m_freeListNode[1];
 	*(void**)object->m_freeListNode[1] = *object->m_freeListNode;
 
-	object->m_freeListNode[1] = *(void***)((char*)this + 0x98C);
-	*(void***)((char*)this + 0x98C) = object->m_freeListNode;
+	object->m_freeListNode[1] = *m_objectFreeListHead;
+	*m_objectFreeListHead = object->m_freeListNode;
 
 	object->m_flags &= 0xEF;
 
@@ -728,7 +728,7 @@ CFlatRuntime::CObject* CFlatRuntime::createObject(int classIndex)
 
 	int varCount = 0;
 	if (classBase != 0) {
-		varCount = *reinterpret_cast<int*>(classBase + 0x228);
+		varCount = reinterpret_cast<CClass*>(classBase)->m_variableCount;
 	}
 
 	typedef CObject* (*GetFreeObjectFn)(CFlatRuntime*, int);
@@ -887,8 +887,8 @@ void CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind
 	u8* func = 0;
 	if ((*reinterpret_cast<s16*>(&object->m_classIndex) < 0)
 	    || (((systemKind != 2) && (systemKind != 3)) || (systemIndex < 0))) {
-		u8* searchFunc = *reinterpret_cast<u8**>(reinterpret_cast<u8*>(this) + 0x20);
-		int funcCount = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1C);
+		u8* searchFunc = m_funcs;
+		int funcCount = m_funcCount;
 
 		for (; funcCount > 0; funcCount--, searchFunc += 0x50) {
 			if ((*reinterpret_cast<int*>(searchFunc + 0x40) == systemKind)
@@ -899,10 +899,10 @@ void CFlatRuntime::SystemCall(CFlatRuntime::CObject* objectParam, int systemKind
 		}
 	} else {
 		const s16 classIndex = *reinterpret_cast<s16*>(&object->m_classIndex);
-		u8* const classes = *reinterpret_cast<u8**>(reinterpret_cast<u8*>(this) + 0x18);
+		u8* const classes = reinterpret_cast<u8*>(m_classes);
 		const int funcPos = *reinterpret_cast<int*>(classes + (classIndex * 0x22C) + 0x24 + (systemIndex * 4));
 		if (funcPos >= 0) {
-			func = *reinterpret_cast<u8**>(reinterpret_cast<u8*>(this) + 0x20) + (funcPos * 0x50);
+			func = m_funcs + (funcPos * 0x50);
 		}
 	}
 
@@ -1146,10 +1146,10 @@ void CFlatRuntime::ClearParmanent()
 	int varIndex = 0;
 	u32 clearValue = 0;
 
-	while (varIndex < *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x4)) {
-		u8* variableDefs = reinterpret_cast<u8*>(*reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x8));
+	while (varIndex < m_permanentVarCount) {
+		u8* variableDefs = m_permanentVarDefs;
 		if ((variableDefs[valueOffset + 1] & 0x20) != 0) {
-			*reinterpret_cast<u32*>(reinterpret_cast<u8*>(*reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0xC)) + valueOffset) = clearValue;
+			*reinterpret_cast<u32*>(m_permanentVarValues + valueOffset) = clearValue;
 		}
 		valueOffset += 4;
 		varIndex += 1;
@@ -1868,7 +1868,7 @@ int CFlatRuntime::systemFunc(CFlatRuntime::CObject* object, int systemKind, int 
  */
 void CFlatRuntime::ResetPerformance()
 {
-	memset((u8*)this + 0x48, 0, 0x804);
+	memset(m_performanceBlock, 0, sizeof(m_performanceBlock));
 }
 
 /*
@@ -1892,7 +1892,7 @@ void CFlatRuntime::PrintPerformance()
  */
 CFlatRuntime::CClass::CClass()
 {
-	*(u32*)((u8*)this + 0x228) = 2;
+	m_variableCount = 2;
 }
 
 /*

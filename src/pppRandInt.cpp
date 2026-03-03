@@ -12,57 +12,58 @@
  * JP Size: TODO
  */
 
-// Forward declarations from CMath
+extern CMath math[];
+extern s32 lbl_8032ED70;
+extern f32 lbl_8032FFA8;
+extern f64 lbl_8032FFB0;
+extern s32 lbl_801EADC8[];
+
 extern "C" {
-    float RandF__5CMathFv(CMath*);
+f32 RandF__5CMathFv(CMath*);
 }
 
-extern CMath math;
+struct PppRandIntParam2 {
+    s32 field0;
+    s32 field4;
+    u32 field8;
+    u8 fieldC;
+};
 
-void pppRandInt(void* basePtr, void* dataPtr, void* outputPtr)
+struct PppRandIntParam3 {
+    u8 field0[0xC];
+    s32* fieldC;
+};
+
+void pppRandInt(void* param1, void* param2, void* param3)
 {
-    extern u32 lbl_8032ED70;
-    u8* base = (u8*)basePtr;
-    u32* data = (u32*)dataPtr;
-    u32* out = (u32*)outputPtr;
-    float* source;
-    s32 baseValue;
+    u8* base = (u8*)param1;
+    PppRandIntParam2* in = (PppRandIntParam2*)param2;
+    PppRandIntParam3* out = (PppRandIntParam3*)param3;
+    f32* valuePtr;
 
     if (lbl_8032ED70 != 0) {
         return;
     }
 
-    baseValue = *(s32*)(base + 0xC);
-    if (baseValue == 0) {
-        float value = RandF__5CMathFv(&math);
-
-        if (((u8*)dataPtr)[0xC] != 0) {
-            value += RandF__5CMathFv(&math);
+    s32 baseState = *(s32*)(base + 0xC);
+    if (baseState == 0) {
+        f32 value = RandF__5CMathFv(&math[0]);
+        if (in->fieldC != 0) {
+            value += RandF__5CMathFv(&math[0]);
         } else {
-            value *= 2.0f;
+            value *= lbl_8032FFA8;
         }
 
-        source = (float*)(base + *(u32*)out[3] + 0x80);
-        *source = value;
+        valuePtr = (f32*)(base + *out->fieldC + 0x80);
+        *valuePtr = value;
     } else {
-        if ((s32)data[0] != baseValue) {
+        if (in->field0 != baseState) {
             return;
         }
 
-        source = (float*)(base + *(u32*)out[3] + 0x80);
+        valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
 
-    s32* targetPtr;
-    if ((s32)data[1] == -1) {
-        extern s32 lbl_801EADC8[];
-        targetPtr = lbl_801EADC8;
-    } else {
-        targetPtr = (s32*)(base + data[1] + 0x80);
-    }
-
-    {
-        u32 value = data[2];
-        float result = ((float)value * *source) - (float)value;
-        *targetPtr = (s32)result + *targetPtr;
-    }
+    s32* target = (in->field4 == -1) ? lbl_801EADC8 : (s32*)(base + in->field4 + 0x80);
+    *target += (s32)((f32)in->field8 * *valuePtr - (f32)in->field8);
 }

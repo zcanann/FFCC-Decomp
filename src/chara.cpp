@@ -1265,7 +1265,31 @@ void CChara::CMesh::Calc(CChara::CModel* model)
  */
 CChara::CMesh::CRefData::CRefData()
 {
-	memset(this, 0, 0x64);
+	*(u32*)((u8*)this + 0x00) = 0;
+	*(u32*)((u8*)this + 0x04) = 0;
+	*(u32*)((u8*)this + 0x08) = 0;
+	*(u32*)((u8*)this + 0x0C) = 0;
+	*(u32*)((u8*)this + 0x10) = 0;
+	*(u32*)((u8*)this + 0x14) = 0;
+	*(u32*)((u8*)this + 0x18) = 0;
+	*(u32*)((u8*)this + 0x1C) = 0;
+	*(u32*)((u8*)this + 0x20) = 0;
+	*(u32*)((u8*)this + 0x24) = 0;
+	*(u32*)((u8*)this + 0x28) = 0;
+	*(u32*)((u8*)this + 0x2C) = 0;
+	*(u32*)((u8*)this + 0x30) = 0;
+	*(u32*)((u8*)this + 0x34) = 0;
+	*(u32*)((u8*)this + 0x38) = 0;
+	*(u32*)((u8*)this + 0x3C) = 0;
+	*(u32*)((u8*)this + 0x40) = 0;
+	*(u32*)((u8*)this + 0x44) = 0;
+	*(u32*)((u8*)this + 0x48) = 0;
+	*(u32*)((u8*)this + 0x4C) = 0;
+	*(u32*)((u8*)this + 0x50) = 0;
+	*(u32*)((u8*)this + 0x54) = 0;
+	*(u32*)((u8*)this + 0x58) = 0;
+	*(u32*)((u8*)this + 0x5C) = 0;
+	*(u32*)((u8*)this + 0x60) = 0;
 }
 
 /*

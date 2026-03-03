@@ -55,8 +55,8 @@ void pppColMoveCon(void* param1, void* param2)
 void pppColMove(void* param1, void* param2, void* param3)
 {
     pppColMoveInput* input = ((pppColMoveInput**)param3)[3];
-    pppColMoveAccum* source = (pppColMoveAccum*)((char*)param1 + input->id);
-    pppColMoveAccum* movement = (pppColMoveAccum*)((char*)param1 + input->pad);
+    pppColMoveAccum* source = (pppColMoveAccum*)((char*)param1 + input->id + 0x80);
+    pppColMoveAccum* movement = (pppColMoveAccum*)((char*)param1 + input->pad + 0x80);
 
     if (lbl_8032ED70 != 0) {
         return;

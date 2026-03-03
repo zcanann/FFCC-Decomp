@@ -148,9 +148,9 @@ int CDbgMenuPcs::GetTable(unsigned long index)
  */
 void CDbgMenuPcs::create()
 {
-	memset((char*)this + 0x5C, 0, 0x2A00);
-	*(u32*)((char*)this + 0x2A60) = 0;
-	*(u32*)((char*)this + 0x2A64) = 0;
+	memset(m_menuPool, 0, sizeof(m_menuPool));
+	m_defaultMenu = 0;
+	m_selectedMenu = 0;
 }
 
 /*
@@ -200,7 +200,7 @@ void CDbgMenuPcs::calc()
 	int cursorPtr;
 	int stackData[3];
 
-	if (*(int*)((char*)this + 0x58) == 0) {
+	if (m_rootMenu == 0) {
 		return;
 	}
 
@@ -213,7 +213,7 @@ void CDbgMenuPcs::calc()
 	}
 
 	if ((padInput & 0x100) != 0) {
-		switch (*(int*)(*(int*)((char*)this + 0x2a5c) + 0x38)) {
+		switch (m_currentMenu->m_id) {
 		case 100:
 			*(unsigned int*)(CFlat + 0x12A4) = ~*(unsigned int*)(CFlat + 0x12A4);
 			break;
@@ -305,16 +305,16 @@ void CDbgMenuPcs::calc()
 		padInput = 0;
 	}
 	if ((padInput & 4) != 0) {
-		menuPtr = *(int*)((char*)this + 0x2a5c);
-		*(unsigned char*)(menuPtr + 0x34) &= 0xBF;
+		menuPtr = (int)m_currentMenu;
+		m_currentMenu->m_status &= 0xBF;
 		do {
-			*(int*)((char*)this + 0x2a5c) = *(int*)(*(int*)((char*)this + 0x2a5c) + 0x48);
-			cursorPtr = *(int*)((char*)this + 0x2a5c);
+			m_currentMenu = m_currentMenu->m_next;
+			cursorPtr = (int)m_currentMenu;
 			if ((*(unsigned int*)(cursorPtr + 4) & 1) != 0) {
 				break;
 			}
 		} while (menuPtr != cursorPtr);
-		*(unsigned char*)(cursorPtr + 0x34) = (*(unsigned char*)(cursorPtr + 0x34) & 0xBF) | 0x40;
+		m_currentMenu->m_status = (m_currentMenu->m_status & 0xBF) | 0x40;
 	}
 
 	if (Pad._452_4_ == 0) {
@@ -325,20 +325,20 @@ void CDbgMenuPcs::calc()
 		padInput = 0;
 	}
 	if ((padInput & 8) != 0) {
-		menuPtr = *(int*)((char*)this + 0x2a5c);
-		*(unsigned char*)(menuPtr + 0x34) &= 0xBF;
+		menuPtr = (int)m_currentMenu;
+		m_currentMenu->m_status &= 0xBF;
 		do {
-			*(int*)((char*)this + 0x2a5c) = *(int*)(*(int*)((char*)this + 0x2a5c) + 0x44);
-			cursorPtr = *(int*)((char*)this + 0x2a5c);
+			m_currentMenu = m_currentMenu->m_prev;
+			cursorPtr = (int)m_currentMenu;
 			if ((*(unsigned int*)(cursorPtr + 4) & 1) != 0) {
 				break;
 			}
 		} while (menuPtr != cursorPtr);
-		*(unsigned char*)(cursorPtr + 0x34) = (*(unsigned char*)(cursorPtr + 0x34) & 0xBF) | 0x40;
+		m_currentMenu->m_status = (m_currentMenu->m_status & 0xBF) | 0x40;
 	}
 
-	if (*(int*)((char*)this + 0x58) != 0) {
-		calcMenu(*(CDM**)((char*)this + 0x58));
+	if (m_rootMenu != 0) {
+		calcMenu(m_rootMenu);
 	}
 
 	if (Pad._452_4_ == 0) {
@@ -349,10 +349,10 @@ void CDbgMenuPcs::calc()
 		padInput = 0;
 	}
 	if ((padInput & 0x200) != 0) {
-		memset((char*)this + 0x5C, 0, 0x2A00);
-		*(int*)((char*)this + 0x58) = 0;
-		*(int*)((char*)this + 0x2A60) = 0;
-		*(int*)((char*)this + 0x2A5C) = 0;
+		memset(m_menuPool, 0, sizeof(m_menuPool));
+		m_rootMenu = 0;
+		m_defaultMenu = 0;
+		m_currentMenu = 0;
 	}
 
 	Pad._452_4_ = 1;
@@ -369,12 +369,12 @@ void CDbgMenuPcs::calc()
  */
 void CDbgMenuPcs::draw()
 {
-	*(s32*)((char*)this + 0x2A68) = -1;
+	m_currentVtxFmt = -1;
 	Graphic.InitDebugString();
 	_GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)5, (_GXLogicOp)1);
 	GXSetNumChans(1);
-	if (*(CDM**)((char*)this + 0x58) != 0) {
-		drawMenu(*(CDM**)((char*)this + 0x58));
+	if (m_rootMenu != 0) {
+		drawMenu(m_rootMenu);
 	}
 	Graphic.SetViewport();
 }
@@ -392,81 +392,81 @@ void CDbgMenuPcs::calcMenu(CDbgMenuPcs::CDM* menu)
 {
 	CDM* head = menu;
 	do {
-		*(CDM**)((char*)this + 0x2A5C) = menu;
-		switch (*(int*)((char*)menu + 0x38)) {
+		m_currentMenu = menu;
+		switch (menu->m_id) {
 		case 100:
-			*(u32*)((char*)menu + 0x30) = *(u32*)(CFlat + 0x12A4) != 0;
+			menu->m_state = *(u32*)(CFlat + 0x12A4) != 0;
 			break;
 		case 0x65:
-			*(u32*)((char*)menu + 0x30) = *(signed char*)(CFlat + 0x12E4) < 0;
+			menu->m_state = *(signed char*)(CFlat + 0x12E4) < 0;
 			break;
 		case 0x66:
-			*(u32*)((char*)menu + 0x30) = ((*(u8*)(CFlat + 0x12E4) >> 3) & 1) != 0;
+			menu->m_state = ((*(u8*)(CFlat + 0x12E4) >> 3) & 1) != 0;
 			break;
 		case 0x67:
-			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 0) & 1;
+			menu->m_state = (*(u32*)((char*)this + 4) >> 0) & 1;
 			break;
 		case 0x68:
-			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 1) & 1;
+			menu->m_state = (*(u32*)((char*)this + 4) >> 1) & 1;
 			break;
 		case 0x69:
-			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 2) & 1;
+			menu->m_state = (*(u32*)((char*)this + 4) >> 2) & 1;
 			break;
 		case 0x6A:
-			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 3) & 1;
+			menu->m_state = (*(u32*)((char*)this + 4) >> 3) & 1;
 			break;
 		case 0x6B:
-			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 4) & 1;
+			menu->m_state = (*(u32*)((char*)this + 4) >> 4) & 1;
 			break;
 		case 0x6C:
-			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 5) & 1;
+			menu->m_state = (*(u32*)((char*)this + 4) >> 5) & 1;
 			break;
 		case 0x6D:
-			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 6) & 1;
+			menu->m_state = (*(u32*)((char*)this + 4) >> 6) & 1;
 			break;
 		case 0x6E:
-			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 7) & 1;
+			menu->m_state = (*(u32*)((char*)this + 4) >> 7) & 1;
 			break;
 		case 0x6F:
-			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 8) & 1;
+			menu->m_state = (*(u32*)((char*)this + 4) >> 8) & 1;
 			break;
 		case 0x70:
-			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 9) & 1;
+			menu->m_state = (*(u32*)((char*)this + 4) >> 9) & 1;
 			break;
 		case 0x71:
-			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 10) & 1;
+			menu->m_state = (*(u32*)((char*)this + 4) >> 10) & 1;
 			break;
 		case 0x72:
-			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 11) & 1;
+			menu->m_state = (*(u32*)((char*)this + 4) >> 11) & 1;
 			break;
 		case 0x73:
-			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 12) & 1;
+			menu->m_state = (*(u32*)((char*)this + 4) >> 12) & 1;
 			break;
 		case 0x75:
-			*(u32*)((char*)menu + 0x30) = DAT_8032ecd8 != 0;
+			menu->m_state = DAT_8032ecd8 != 0;
 			break;
 		case 0x76:
-			*(u32*)((char*)menu + 0x30) = DAT_8032e698 != 0;
+			menu->m_state = DAT_8032e698 != 0;
 			break;
 		case 0x78:
-			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 13) & 1;
+			menu->m_state = (*(u32*)((char*)this + 4) >> 13) & 1;
 			break;
 		case 0x79:
-			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 14) & 1;
+			menu->m_state = (*(u32*)((char*)this + 4) >> 14) & 1;
 			break;
 		case 0x7A:
-			*(u32*)((char*)menu + 0x30) = (*(u32*)((char*)this + 4) >> 15) & 1;
+			menu->m_state = (*(u32*)((char*)this + 4) >> 15) & 1;
 			break;
 		}
 
-		*(int*)((char*)menu + 0x3C) = *(int*)((char*)*(CDM**)((char*)menu + 0x4C) + 0x10) + *(int*)((char*)menu + 0x10);
-		*(int*)((char*)menu + 0x40) = *(int*)((char*)*(CDM**)((char*)menu + 0x4C) + 0x14) + *(int*)((char*)menu + 0x14);
+		menu->m_drawX = menu->m_parent->m_width + menu->m_width;
+		menu->m_drawY = menu->m_parent->m_height + menu->m_height;
 
-		if (*(CDM**)((char*)menu + 0x50) != 0) {
-			calcMenu(*(CDM**)((char*)menu + 0x50));
+		if (menu->m_firstChild != 0) {
+			calcMenu(menu->m_firstChild);
 		}
 
-		menu = *(CDM**)((char*)menu + 0x48);
+		menu = menu->m_next;
 	} while (menu != head);
 }
 
@@ -486,12 +486,12 @@ void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
 	static char sStateUnknown[] = "?";
 	CDM* head = menu;
 	do {
-		*(CDM**)((char*)this + 0x2A5C) = menu;
-		GXSetViewport((f32)*(s32*)((char*)menu + 0x3C), (f32)*(s32*)((char*)menu + 0x40), 640.0f, 480.0f, 0.0f, 1.0f);
+		m_currentMenu = menu;
+		GXSetViewport((f32)menu->m_drawX, (f32)menu->m_drawY, 640.0f, 480.0f, 0.0f, 1.0f);
 
-		s32 type = *(s32*)menu;
+		s32 type = menu->m_type;
 		if (type == 2) {
-			s32 state = *(s32*)((char*)menu + 0x30);
+			s32 state = menu->m_state;
 			drawWindow(((-state | state) >> 0x1F) & 2, 1, 1, 0x1E, 0xE, 0);
 			char* stateText = sStateUnknown;
 			if (state == 1) {
@@ -502,25 +502,24 @@ void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
 			drawFont(9, 0x10, 8, stateText);
 		} else if (type < 2) {
 			if (type == 0) {
-				drawWindow(*(u32*)((char*)menu + 0xC), 0, 0, *(u32*)((char*)menu + 0x18), *(u32*)((char*)menu + 0x1C),
-				           *(char**)((char*)menu + 0x24));
+				drawWindow(menu->m_y, 0, 0, menu->m_unk18, menu->m_unk1C, menu->m_text);
 			} else if (type == 1) {
-				drawFont(*(u32*)((char*)menu + 0xC), 0, 0, *(char**)((char*)menu + 0x24));
+				drawFont(menu->m_y, 0, 0, menu->m_text);
 			}
 		} else if (type < 4) {
-			s32 state = *(s32*)((char*)menu + 0x30);
+			s32 state = menu->m_state;
 			drawWindow(((-state | state) >> 0x1F) & 2, 1, 1, 0x1E, 0xE, 0);
 		}
 
-		menu = *(CDM**)((char*)menu + 0x48);
+		menu = menu->m_next;
 	} while (menu != head);
 
 	menu = head;
 	do {
-		if (*(CDM**)((char*)menu + 0x50) != 0) {
-			drawMenu(*(CDM**)((char*)menu + 0x50));
+		if (menu->m_firstChild != 0) {
+			drawMenu(menu->m_firstChild);
 		}
-		menu = *(CDM**)((char*)menu + 0x48);
+		menu = menu->m_next;
 	} while (menu != head);
 }
 
@@ -531,9 +530,7 @@ void CDbgMenuPcs::drawMenu(CDbgMenuPcs::CDM* menu)
  */
 void CDbgMenuPcs::changeVtxFmt(int vtxFmt)
 {
-    int& currentVtxFmt = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x2A68);
-
-    if (currentVtxFmt != vtxFmt) {
+    if (m_currentVtxFmt != vtxFmt) {
         if (vtxFmt == 1) {
             GXClearVtxDesc();
             GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
@@ -549,7 +546,7 @@ void CDbgMenuPcs::changeVtxFmt(int vtxFmt)
             _GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
         }
 
-        currentVtxFmt = vtxFmt;
+        m_currentVtxFmt = vtxFmt;
     }
 }
 /*
@@ -564,7 +561,7 @@ void CDbgMenuPcs::changeVtxFmt(int vtxFmt)
 void CDbgMenuPcs::drawWindow(int x, int y, int width, int height, int flags, char* text)
 {
 	// Set up GX vertex format if not already done
-	if (*(int*)((char*)this + 0x2a68) != 1) {
+	if (m_currentVtxFmt != 1) {
 		GXClearVtxDesc();
 		GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
 		GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
@@ -573,7 +570,7 @@ void CDbgMenuPcs::drawWindow(int x, int y, int width, int height, int flags, cha
 		GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
 		GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
 		GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
-		*(int*)((char*)this + 0x2a68) = 1;
+		m_currentVtxFmt = 1;
 	}
 
 	// Draw window border if flag is not set
@@ -607,7 +604,7 @@ void CDbgMenuPcs::drawWindow(int x, int y, int width, int height, int flags, cha
 	GXColor1u32(0x808080ff);
 
 	// Draw selection highlight if flag is set
-	char selectionFlag = *(char*)(*(int*)((char*)this + 0x2a5c) + 0x34);
+	char selectionFlag = (char)m_currentMenu->m_status;
 	if (selectionFlag < 0) {
 		unsigned char alpha = 0xc0;
 		if ((System.m_frameCounter >> 2 & 1) != 0) {
@@ -647,11 +644,11 @@ void CDbgMenuPcs::drawWindow(int x, int y, int width, int height, int flags, cha
 void CDbgMenuPcs::drawFont(int flags, int x, int y, char* text)
 {
 	// Reset GX state if needed
-	if (*(int*)((char*)this + 0x2a68) != 0) {
+	if (m_currentVtxFmt != 0) {
 		GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
 		GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 		GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
-		*(int*)((char*)this + 0x2a68) = 0;
+		m_currentVtxFmt = 0;
 	}
 
 	// Draw drop shadow if flag is set
@@ -726,137 +723,18 @@ void CDbgMenuPcs::searchFreeCDM()
  */
 int CDbgMenuPcs::searchID(int id, CDbgMenuPcs::CDM& root)
 {
-	int* next;
-	CDM* result;
 	CDM* node = &root;
 	do {
-		if (*(int*)((char*)node + 0x38) == id) {
+		if (node->m_id == id) {
 			return (int)node;
 		}
-		CDM* first = *(CDM**)((char*)node + 0x50);
-		CDM* cur1 = first;
-		if (first != 0) {
-			do {
-				result = cur1;
-				if (*(int*)((char*)cur1 + 0x38) == id) {
-					goto level1_done;
-				}
-				CDM* first2 = *(CDM**)((char*)cur1 + 0x50);
-				CDM* cur2 = first2;
-				if (first2 != 0) {
-					do {
-						result = cur2;
-						if (*(int*)((char*)cur2 + 0x38) == id) {
-							goto level2_done;
-						}
-						CDM* first3 = *(CDM**)((char*)cur2 + 0x50);
-						CDM* cur3 = first3;
-						if (first3 != 0) {
-							do {
-								result = cur3;
-								if (*(int*)((char*)cur3 + 0x38) == id) {
-									goto level3_done;
-								}
-								CDM* first4 = *(CDM**)((char*)cur3 + 0x50);
-								CDM* cur4 = first4;
-								if (first4 != 0) {
-									do {
-										result = cur4;
-										if (*(int*)((char*)cur4 + 0x38) == id) {
-											goto level4_done;
-										}
-										CDM* first5 = *(CDM**)((char*)cur4 + 0x50);
-										CDM* cur5 = first5;
-										if (first5 != 0) {
-											do {
-												result = cur5;
-												if (*(int*)((char*)cur5 + 0x38) == id) {
-													goto level5_done;
-												}
-												CDM* first6 = *(CDM**)((char*)cur5 + 0x50);
-												CDM* cur6 = first6;
-												if (first6 != 0) {
-													do {
-														result = cur6;
-														if (*(int*)((char*)cur6 + 0x38) == id) {
-															goto level6_done;
-														}
-														CDM* first7 = *(CDM**)((char*)cur6 + 0x50);
-														CDM* cur7 = first7;
-														if (first7 != 0) {
-															do {
-																result = cur7;
-																if ((*(int*)((char*)cur7 + 0x38) == id) ||
-																	((*(CDM**)((char*)cur7 + 0x50) != 0 &&
-																	  (result = (CDM*)searchID(
-																		  id, **(CDM**)((char*)cur7 + 0x50)),
-																	   result != 0)))) {
-																	goto level7_done;
-																}
-																next = (int*)((char*)cur7 + 0x48);
-																cur7 = (CDM*)*next;
-															} while ((CDM*)*next != first7);
-															result = 0;
-level7_done:
-															if (result != 0) {
-																goto level6_done;
-															}
-														}
-														next = (int*)((char*)cur6 + 0x48);
-														cur6 = (CDM*)*next;
-													} while ((CDM*)*next != first6);
-													result = 0;
-level6_done:
-													if (result != 0) {
-														goto level5_done;
-													}
-												}
-												next = (int*)((char*)cur5 + 0x48);
-												cur5 = (CDM*)*next;
-											} while ((CDM*)*next != first5);
-											result = 0;
-level5_done:
-											if (result != 0) {
-												goto level4_done;
-											}
-										}
-										next = (int*)((char*)cur4 + 0x48);
-										cur4 = (CDM*)*next;
-									} while ((CDM*)*next != first4);
-									result = 0;
-level4_done:
-									if (result != 0) {
-										goto level3_done;
-									}
-								}
-								next = (int*)((char*)cur3 + 0x48);
-								cur3 = (CDM*)*next;
-							} while ((CDM*)*next != first3);
-							result = 0;
-level3_done:
-							if (result != 0) {
-								goto level2_done;
-							}
-						}
-						next = (int*)((char*)cur2 + 0x48);
-						cur2 = (CDM*)*next;
-					} while ((CDM*)*next != first2);
-					result = 0;
-level2_done:
-					if (result != 0) {
-						goto level1_done;
-					}
-				}
-				next = (int*)((char*)cur1 + 0x48);
-				cur1 = (CDM*)*next;
-			} while ((CDM*)*next != first);
-			result = 0;
-level1_done:
-			if (result != 0) {
-				return (int)result;
+		if (node->m_firstChild != 0) {
+			const int found = searchID(id, *node->m_firstChild);
+			if (found != 0) {
+				return found;
 			}
 		}
-		node = *(CDM**)((char*)node + 0x48);
+		node = node->m_next;
 		if (node == &root) {
 			return 0;
 		}
@@ -874,7 +752,7 @@ level1_done:
  */
 void CDbgMenuPcs::Add()
 {
-	if (*(int*)((char*)this + 0x58) != 0) {
+	if (m_rootMenu != 0) {
 		return;
 	}
 
@@ -965,10 +843,10 @@ void CDbgMenuPcs::Add(int parentID, int id, CDbgMenuPcs::CDMParam& param)
 	int freeIdx = 0;
 	int remaining = 0x80;
 	int cur = (int)this;
-	u32* menu;
+	CDM* menu;
 	do {
 		if ((s8)*(u8*)(cur + 0x90) >= 0) {
-			menu = (u32*)((char*)this + freeIdx * 0x54 + 0x5C);
+			menu = &m_menuPool[freeIdx];
 			goto found_slot;
 		}
 		cur += 0x54;
@@ -978,54 +856,42 @@ void CDbgMenuPcs::Add(int parentID, int id, CDbgMenuPcs::CDMParam& param)
 	menu = 0;
 
 found_slot:
-	memset(menu + 0xD, 0, 0x20);
-	*(u8*)(menu + 0xD) = (*(u8*)(menu + 0xD) & 0x7F) | 0x80;
+	memset(&menu->m_status, 0, 0x20);
+	menu->m_status = (menu->m_status & 0x7F) | 0x80;
 
-	u32* src = (u32*)&param;
-	menu[0] = src[0];
-	menu[1] = src[1];
-	menu[2] = src[2];
-	menu[3] = src[3];
-	menu[4] = src[4];
-	menu[5] = src[5];
-	menu[6] = src[6];
-	menu[7] = src[7];
-	menu[8] = src[8];
-	menu[9] = src[9];
-	menu[10] = src[10];
-	menu[11] = src[11];
-	menu[12] = src[12];
+	memcpy(menu, &param, sizeof(CDMParam));
 
-	menu[0x13] = parent;
-	menu[0x11] = (u32)menu;
-	menu[0x12] = (u32)menu;
-	menu[0x0E] = id;
+	CDM* parentMenu = (CDM*)parent;
+	menu->m_parent = parentMenu;
+	menu->m_prev = menu;
+	menu->m_next = menu;
+	menu->m_id = id;
 
-	int child = *(int*)(parent + 0x50);
+	CDM* child = parentMenu->m_firstChild;
 	if (child == 0) {
-		*(u32**)(parent + 0x50) = menu;
-		if ((menu[1] & 1) != 0) {
-			*(u8*)(menu + 0xD) = (*(u8*)(menu + 0xD) & 0xBF) | 0x40;
-			*(u32**)((char*)this + 0x2A64) = menu;
+		parentMenu->m_firstChild = menu;
+		if ((menu->m_flags & 1) != 0) {
+			menu->m_status = (menu->m_status & 0xBF) | 0x40;
+			m_selectedMenu = menu;
 		}
-		if ((menu[1] & 2) != 0) {
-			*(u32**)((char*)this + 0x2A60) = menu;
+		if ((menu->m_flags & 2) != 0) {
+			m_defaultMenu = menu;
 		}
 	} else {
 		bool found = false;
 		do {
-			if (!found && ((*(u32*)(child + 4) & 1) != 0)) {
+			if (!found && ((child->m_flags & 1) != 0)) {
 				found = true;
-				*(u8*)(child + 0x34) = (*(u8*)(child + 0x34) & 0xBF) | 0x40;
-				*(int*)((char*)this + 0x2A64) = child;
+				child->m_status = (child->m_status & 0xBF) | 0x40;
+				m_selectedMenu = child;
 			}
-			child = *(int*)(child + 0x48);
-		} while (child != *(int*)(parent + 0x50));
+			child = child->m_next;
+		} while (child != parentMenu->m_firstChild);
 
-		*(u32**)(*(int*)(child + 0x44) + 0x48) = menu;
-		menu[0x11] = *(u32*)(child + 0x44);
-		*(u32**)(child + 0x44) = menu;
-		menu[0x12] = child;
+		child->m_prev->m_next = menu;
+		menu->m_prev = child->m_prev;
+		child->m_prev = menu;
+		menu->m_next = child;
 	}
 }
 
@@ -1080,8 +946,7 @@ void CDbgMenuPcs::CDMParam::Clear()
  */
 CDbgMenuPcs::CDM::CDM()
 {
-	memset(this, 0, 0x34);
-	memset((char*)this + 0x34, 0, 0x20);
+	memset(this, 0, sizeof(CDM));
 }
 
 /*

@@ -50,7 +50,8 @@ void pppRandDownFV(void* param1, void* param2, void* param3)
     if (baseState == 0) {
         f32 value = -RandF__5CMathFv(math);
         if (in->field18 != 0) {
-            value = lbl_8032FF40 * (value - RandF__5CMathFv(math));
+            f32 randomValue = value - RandF__5CMathFv(math);
+            value = randomValue * lbl_8032FF40;
         }
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
@@ -66,7 +67,8 @@ void pppRandDownFV(void* param1, void* param2, void* param3)
     s32 sourceOffset = in->field4;
     f32* target;
     if (sourceOffset == -1) {
-        target = &lbl_801EADC8[0];
+        f32* source = lbl_801EADC8;
+        target = source;
     } else {
         target = (f32*)(base + sourceOffset + 0x80);
     }

@@ -5,6 +5,7 @@
 extern CMath math[];
 extern int lbl_8032ED70;
 extern s16 lbl_801EADC8[];
+extern float lbl_80330088;
 extern "C" float RandF__5CMathFv(CMath* instance);
 
 /*
@@ -33,7 +34,7 @@ void pppSRandDownHCV(void* param1, void* param2, void* param3)
 			u8 flag = *((u8*)param2 + 0x10);
 			float value = -RandF__5CMathFv(math);
 			if (flag != 0) {
-				value = (value - RandF__5CMathFv(math)) * 0.5f;
+				value = (value - RandF__5CMathFv(math)) * lbl_80330088;
 			}
 			target[0] = value;
 		}
@@ -42,7 +43,7 @@ void pppSRandDownHCV(void* param1, void* param2, void* param3)
 			u8 flag = *((u8*)param2 + 0x10);
 			float value = -RandF__5CMathFv(math);
 			if (flag != 0) {
-				value = (value - RandF__5CMathFv(math)) * 0.5f;
+				value = (value - RandF__5CMathFv(math)) * lbl_80330088;
 			}
 			target[1] = value;
 		}
@@ -51,7 +52,7 @@ void pppSRandDownHCV(void* param1, void* param2, void* param3)
 			u8 flag = *((u8*)param2 + 0x10);
 			float value = -RandF__5CMathFv(math);
 			if (flag != 0) {
-				value = (value - RandF__5CMathFv(math)) * 0.5f;
+				value = (value - RandF__5CMathFv(math)) * lbl_80330088;
 			}
 			target[2] = value;
 		}
@@ -60,7 +61,7 @@ void pppSRandDownHCV(void* param1, void* param2, void* param3)
 			u8 flag = *((u8*)param2 + 0x10);
 			float value = -RandF__5CMathFv(math);
 			if (flag != 0) {
-				value = (value - RandF__5CMathFv(math)) * 0.5f;
+				value = (value - RandF__5CMathFv(math)) * lbl_80330088;
 			}
 			target[3] = value;
 		}

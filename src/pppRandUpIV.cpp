@@ -2,14 +2,14 @@
 #include "ffcc/math.h"
 #include "types.h"
 
-extern s32 DAT_8032ed70;
-extern f32 DAT_80330028;
-extern f64 DAT_80330030;
+extern s32 lbl_8032ED70;
+extern f32 lbl_80330028;
+extern f64 lbl_80330030;
 extern CMath math[];
-extern s32 DAT_801EADC8[];
+extern s32 lbl_801EADC8[];
 
 extern "C" {
-float RandF__5CMathFv(CMath*);
+f32 RandF__5CMathFv(CMath*);
 }
 
 struct PppRandUpIVParam2 {
@@ -29,23 +29,12 @@ struct PppRandUpIVParam3 {
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
+ * PAL Address: 0x80062e0c
+ * PAL Size: 404b
  * EN Address: TODO
  * EN Size: TODO
  * JP Address: TODO
  * JP Size: TODO
- */
-void randint(int param1, float param2)
-{
-    float temp = (float)param1 * param2;
-    (void)temp;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80062e0c
- * PAL Size: 404b
  */
 extern "C" void pppRandUpIV(void* param1, void* param2, void* param3)
 {
@@ -56,17 +45,18 @@ extern "C" void pppRandUpIV(void* param1, void* param2, void* param3)
     s32* target;
     f32 value;
 
-    if (DAT_8032ed70 != 0) {
+    if (lbl_8032ED70 != 0) {
         return;
     }
 
     if (in->field0 == *(s32*)(base + 0xC)) {
         value = RandF__5CMathFv(&math[0]);
         if (in->field18 != 0) {
-            value = (value + RandF__5CMathFv(&math[0])) * DAT_80330028;
+            value = (value + RandF__5CMathFv(&math[0])) * lbl_80330028;
         }
 
-        *(f32*)(base + *out->fieldC + 0x80) = value;
+        valuePtr = (f32*)(base + *out->fieldC + 0x80);
+        *valuePtr = value;
     }
 
     if (in->field0 != *(s32*)(base + 0xC)) {
@@ -75,15 +65,15 @@ extern "C" void pppRandUpIV(void* param1, void* param2, void* param3)
 
     valuePtr = (f32*)(base + *out->fieldC + 0x80);
     if (in->field4 == -1) {
-        target = &DAT_801EADC8[0];
+        target = &lbl_801EADC8[0];
     } else {
         target = (s32*)(base + in->field4 + 0x80);
     }
 
     {
         f32 randValue = *valuePtr;
-        target[0] += (s32)(in->field8 * randValue);
-        target[1] += (s32)(in->fieldC * randValue);
-        target[2] += (s32)(in->field10 * randValue);
+        target[0] += (s32)((f32)in->field8 * randValue);
+        target[1] += (s32)((f32)in->fieldC * randValue);
+        target[2] += (s32)((f32)in->field10 * randValue);
     }
 }

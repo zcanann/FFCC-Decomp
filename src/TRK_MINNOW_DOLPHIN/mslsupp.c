@@ -12,7 +12,8 @@ DSIOResult __position_file(u32 handle, u32 offset, s32 whence);
 DSIOResult __close_file(u32 handle);
 
 DSIOResult __read_console(u32 handle, u8* buffer, u32* count, void* ref_con) {
-    if (GetUseSerialIO() == 0)
+    u8 useSerial = (u8)GetUseSerialIO();
+    if (useSerial == 0)
 	{
         return DS_IOError;
     }
@@ -22,7 +23,8 @@ DSIOResult __read_console(u32 handle, u8* buffer, u32* count, void* ref_con) {
 
 DSIOResult __TRK_write_console(u32 handle, u8* buffer, u32* count, void* ref_con)
 {
-    if (GetUseSerialIO() == 0)
+    u8 useSerial = (u8)GetUseSerialIO();
+    if (useSerial == 0)
 	{
         return DS_IOError;
     }

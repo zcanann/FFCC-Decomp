@@ -125,6 +125,49 @@ struct CLine {
     float totalLength;
 };
 
+struct CSoundLayout {
+    u32 m_redSoundWord0;
+    void* m_stage;
+    CFile::CHandle* m_waveFile;
+    void* m_aramBuffer;
+    int m_waveLoadMode;
+    int m_waveRemain;
+    int m_waveOffset;
+    int m_waveID;
+    int m_waveState;
+    int m_waveSyncMode;
+    int m_seCount;
+    u8 m_seWork[0x1400];
+    u8 m_lineWork[0xE60];
+    void* m_streamBuffer;
+    CFile::CHandle* m_streamFile;
+    int m_streamOffset;
+    int m_streamID;
+    u32 m_streamHalf;
+    int m_streamPlaying;
+    int m_streamRemain;
+    int m_streamState;
+    int m_streamWaveID;
+    int m_bgmMasterVolume;
+    int m_seMasterVolume;
+    int m_curMusicVolume;
+    int m_seMaxVolume;
+    s16 m_noFreeSeGroups[4];
+    s16 m_noFreeWaves[4];
+    int m_pauseAllSe;
+    int m_debugPrint;
+};
+
+static inline CSoundLayout& SoundData(CSound* self)
+{
+    return *reinterpret_cast<CSoundLayout*>(self);
+}
+
+static inline const CSoundLayout& SoundData(const CSound* self)
+{
+    return *reinterpret_cast<const CSoundLayout*>(self);
+}
+
 extern "C" void __ct__9CLine(CLine* line)
 {
     line->pointCount = 0;
@@ -320,8 +363,7 @@ extern "C" void __sinit_sound_cpp(void)
 {
     *reinterpret_cast<void**>(&Sound) = &PTR_PTR_s_CSound_8021056c;
     __ct__9CRedSoundFv(&Sound);
-    __construct_array(reinterpret_cast<unsigned char*>(&Sound) + 0x142c, (ConstructorDestructor)__ct__9CLine, 0, 0x1cc,
-                      8);
+    __construct_array(SoundData(&Sound).m_lineWork, (ConstructorDestructor)__ct__9CLine, 0, 0x1cc, 8);
     __register_global_object(&Sound, __dt__6CSoundFv, &ARRAY_802f26c8);
 }
 
@@ -357,28 +399,25 @@ CSound::~CSound()
 void CSound::Init()
 {
     CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+    CSoundLayout& sound = SoundData(this);
 
-    void* stage = CreateStage__7CMemoryFUlPci(&Memory, 0xA4000, s_CSound_80330ce0, 0);
-    *reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0x4) = stage;
+    sound.m_stage = CreateStage__7CMemoryFUlPci(&Memory, 0xA4000, s_CSound_80330ce0, 0);
 
-    *reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0xC) =
-        __nwa__FUlPQ27CMemory6CStagePci(0x80000, stage, s_sound_cpp_801db2d4, 0x2E);
-    *reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0x228C) =
-        __nwa__FUlPQ27CMemory6CStagePci(0x20000, stage, s_sound_cpp_801db2d4, 0x2F);
+    sound.m_aramBuffer = __nwa__FUlPQ27CMemory6CStagePci(0x80000, sound.m_stage, s_sound_cpp_801db2d4, 0x2E);
+    sound.m_streamBuffer = __nwa__FUlPQ27CMemory6CStagePci(0x20000, sound.m_stage, s_sound_cpp_801db2d4, 0x2F);
 
-    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22B0) = 0x7F;
-    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22B4) = 0x7F;
-    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22BC) = 0x7F;
-    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22B8) = 0x7F;
-    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22D4) = 0;
+    sound.m_bgmMasterVolume = 0x7F;
+    sound.m_seMasterVolume = 0x7F;
+    sound.m_seMaxVolume = 0x7F;
+    sound.m_curMusicVolume = 0x7F;
+    sound.m_debugPrint = 0;
 
     ARInit(0, 0);
     ARQInit();
 
-    Init__9CRedSoundFPviii(redSound, *reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0xC), 0x80000, 0x800000,
-                           0x800000);
+    Init__9CRedSoundFPviii(redSound, sound.m_aramBuffer, 0x80000, 0x800000, 0x800000);
     {
-        u32 debugPrint = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x22D4);
+        u32 debugPrint = sound.m_debugPrint;
         ReportPrint__9CRedSoundFi(redSound, (-debugPrint | debugPrint) >> 31);
     }
 
@@ -387,17 +426,17 @@ void CSound::Init()
         SetSoundMode__9CRedSoundFi(redSound, (u32)__cntlzw((u32)__cntlzw(soundMode) >> 5) >> 5);
     }
 
-    MusicMasterVolume__9CRedSoundFi(redSound, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22B0));
-    SeMasterVolume__9CRedSoundFi(redSound, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22B4));
+    MusicMasterVolume__9CRedSoundFi(redSound, sound.m_bgmMasterVolume);
+    SeMasterVolume__9CRedSoundFi(redSound, sound.m_seMasterVolume);
     SetReverb__9CRedSoundFii(redSound, 1, 4);
     SetReverbDepth__9CRedSoundFiii(redSound, 1, 0x40, 0xF);
 
-    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x10) = 0;
-    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x2290) = 0;
-    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22A0) = 0;
-    memset(reinterpret_cast<u8*>(this) + 0x22C0, 0xFF, 8);
-    memset(reinterpret_cast<u8*>(this) + 0x22C8, 0xFF, 8);
-    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22D0) = 0;
+    sound.m_waveLoadMode = 0;
+    sound.m_streamFile = 0;
+    sound.m_streamPlaying = 0;
+    memset(sound.m_noFreeSeGroups, 0xFF, sizeof(sound.m_noFreeSeGroups));
+    memset(sound.m_noFreeWaves, 0xFF, sizeof(sound.m_noFreeWaves));
+    sound.m_pauseAllSe = 0;
 }
 
 /*
@@ -412,8 +451,9 @@ void CSound::Init()
 void CSound::Quit()
 {
     CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+    CSoundLayout& sound = SoundData(this);
 
-    CFile::CHandle*& waveFile = *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 0x8);
+    CFile::CHandle*& waveFile = sound.m_waveFile;
     if (waveFile != 0) {
         File.Close(waveFile);
         waveFile = 0;
@@ -423,31 +463,30 @@ void CSound::Quit()
     SetWaveData__9CRedSoundFiPvi(redSound, -1, nullptr, 0);
 
     int shouldStopStream = 0;
-    if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22A0) != 0 &&
-        StreamPlayState__9CRedSoundFi(redSound, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x2298)) != 0) {
+    if (sound.m_streamPlaying != 0 && StreamPlayState__9CRedSoundFi(redSound, sound.m_streamID) != 0) {
         shouldStopStream = 1;
     }
 
     if (shouldStopStream != 0) {
-        StreamStop__9CRedSoundFi(redSound, *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x2298));
+        StreamStop__9CRedSoundFi(redSound, sound.m_streamID);
     }
 
-    CFile::CHandle*& streamFile = *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 0x2290);
+    CFile::CHandle*& streamFile = sound.m_streamFile;
     if (streamFile != 0) {
         File.Close(streamFile);
         streamFile = 0;
     }
 
-    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22A0) = 0;
+    sound.m_streamPlaying = 0;
 
     SeStop__9CRedSoundFi(redSound, -1);
     ClearSeSepData__9CRedSoundFi(redSound, -1);
     ClearWaveData__9CRedSoundFi(redSound, -3);
 
-    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x28) = 10000000;
-    memset(reinterpret_cast<u8*>(this) + 0x2C, 0, 0x1400);
-    memset(reinterpret_cast<u8*>(this) + 0x22C0, 0xFF, 8);
-    memset(reinterpret_cast<u8*>(this) + 0x22C8, 0xFF, 8);
+    sound.m_seCount = 10000000;
+    memset(sound.m_seWork, 0, sizeof(sound.m_seWork));
+    memset(sound.m_noFreeSeGroups, 0xFF, sizeof(sound.m_noFreeSeGroups));
+    memset(sound.m_noFreeWaves, 0xFF, sizeof(sound.m_noFreeWaves));
 
     ClearWaveBank__9CRedSoundFi(redSound, 500);
     ClearWaveBank__9CRedSoundFi(redSound, 0);
@@ -458,19 +497,19 @@ void CSound::Quit()
 
     End__9CRedSoundFv(redSound);
 
-    void*& streamBuffer = *reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0x228C);
+    void*& streamBuffer = sound.m_streamBuffer;
     if (streamBuffer != 0) {
         __dla__FPv(streamBuffer);
         streamBuffer = 0;
     }
 
-    void*& aramBuffer = *reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0xC);
+    void*& aramBuffer = sound.m_aramBuffer;
     if (aramBuffer != 0) {
         __dla__FPv(aramBuffer);
         aramBuffer = 0;
     }
 
-    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, *reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0x4));
+    DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, sound.m_stage);
 }
 
 /*
@@ -484,7 +523,7 @@ void CSound::Quit()
  */
 void CSound::SetStereo(int stereo)
 {
-    reinterpret_cast<CRedSound*>(reinterpret_cast<u8*>(this) + 8)->SetSoundMode((u32)__cntlzw(stereo) >> 5);
+    reinterpret_cast<CRedSound*>(this)->SetSoundMode((u32)__cntlzw(stereo) >> 5);
 }
 
 /*
@@ -498,7 +537,7 @@ void CSound::SetStereo(int stereo)
  */
 void CSound::SetBgmMasterVolume(int volume)
 {
-    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22B0) = volume;
+    SoundData(this).m_bgmMasterVolume = volume;
     reinterpret_cast<CRedSound*>(this)->MusicMasterVolume(volume);
 }
 
@@ -513,7 +552,7 @@ void CSound::SetBgmMasterVolume(int volume)
  */
 void CSound::SetSeMasterVolume(int volume)
 {
-    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22B4) = volume;
+    SoundData(this).m_seMasterVolume = volume;
     reinterpret_cast<CRedSound*>(this)->SeMasterVolume(volume);
 }
 
@@ -549,11 +588,12 @@ void CSound::destroy()
 void CSound::Realloc(int isMinMemoryMode)
 {
     CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
+    CSoundLayout& sound = SoundData(this);
 
-    CFile::CHandle*& waveFile = *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 0x8);
-    CFile::CHandle*& streamFile = *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 0x2290);
-    int& streamPlaying = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22A0);
-    int& streamID = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x2298);
+    CFile::CHandle*& waveFile = sound.m_waveFile;
+    CFile::CHandle*& streamFile = sound.m_streamFile;
+    int& streamPlaying = sound.m_streamPlaying;
+    int& streamID = sound.m_streamID;
 
     if (waveFile != 0) {
         File.Close(waveFile);
@@ -583,10 +623,10 @@ void CSound::Realloc(int isMinMemoryMode)
     redSound->ClearSeSepData(-1);
     redSound->ClearWaveData(-3);
 
-    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x28) = 10000000;
-    memset(reinterpret_cast<u8*>(this) + 0x2C, 0, 0x1400);
-    memset(reinterpret_cast<u8*>(this) + 0x22C0, 0xFF, 8);
-    memset(reinterpret_cast<u8*>(this) + 0x22C8, 0xFF, 8);
+    sound.m_seCount = 10000000;
+    memset(sound.m_seWork, 0, sizeof(sound.m_seWork));
+    memset(sound.m_noFreeSeGroups, 0xFF, sizeof(sound.m_noFreeSeGroups));
+    memset(sound.m_noFreeWaves, 0xFF, sizeof(sound.m_noFreeWaves));
 
     redSound->ClearWaveBank(500);
     redSound->ClearWaveBank(0);
@@ -599,16 +639,16 @@ void CSound::Realloc(int isMinMemoryMode)
 
     int streamHeapSize = (isMinMemoryMode != 0) ? 0x200000 : 0x800000;
     int waveHeapSize = (isMinMemoryMode != 0) ? 0xE00000 : 0x800000;
-    redSound->Init(*reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0x4), 0x80000, waveHeapSize, streamHeapSize);
+    redSound->Init(sound.m_stage, 0x80000, waveHeapSize, streamHeapSize);
 
-    u32 reportFlag = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x22D4);
+    u32 reportFlag = sound.m_debugPrint;
     redSound->ReportPrint(((-reportFlag) | reportFlag) >> 31);
 
     u32 soundMode = GetSoundMode__9CRedSoundFv(redSound);
     redSound->SetSoundMode((u32)__cntlzw((u32)__cntlzw(soundMode) >> 5) >> 5);
 
-    redSound->MusicMasterVolume(*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22B0));
-    redSound->SeMasterVolume(*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22B4));
+    redSound->MusicMasterVolume(sound.m_bgmMasterVolume);
+    redSound->SeMasterVolume(sound.m_seMasterVolume);
 
     redSound->SetReverb(1, 4);
     redSound->SetReverbDepth(1, 0x40, 0xF);
@@ -616,9 +656,9 @@ void CSound::Realloc(int isMinMemoryMode)
     waveFile = 0;
     streamFile = 0;
     streamPlaying = 0;
-    memset(reinterpret_cast<u8*>(this) + 0x22C0, 0xFF, 8);
-    memset(reinterpret_cast<u8*>(this) + 0x22C8, 0xFF, 8);
-    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22D0) = 0;
+    memset(sound.m_noFreeSeGroups, 0xFF, sizeof(sound.m_noFreeSeGroups));
+    memset(sound.m_noFreeWaves, 0xFF, sizeof(sound.m_noFreeWaves));
+    sound.m_pauseAllSe = 0;
 
     if (isMinMemoryMode != 0) {
         return;
@@ -636,11 +676,11 @@ void CSound::Realloc(int isMinMemoryMode)
         sprintf(wavePath, "dvd/sound/wave/wave_%04d.wd", 0);
         waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
         if (waveFile != 0) {
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x14) = File.GetLength(waveFile);
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x18) = 0;
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x20) = 0;
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1C) = 0;
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x24) = 1;
+            sound.m_waveRemain = File.GetLength(waveFile);
+            sound.m_waveOffset = 0;
+            sound.m_waveState = 0;
+            sound.m_waveID = 0;
+            sound.m_waveSyncMode = 1;
             while (waveFile != 0) {
                 loadWaveFrame();
             }
@@ -659,11 +699,11 @@ void CSound::Realloc(int isMinMemoryMode)
         sprintf(wavePath, "dvd/sound/wave/wave_%04d.wd", 500);
         waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
         if (waveFile != 0) {
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x14) = File.GetLength(waveFile);
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x18) = 0;
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x20) = 0;
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1C) = 1;
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x24) = 1;
+            sound.m_waveRemain = File.GetLength(waveFile);
+            sound.m_waveOffset = 0;
+            sound.m_waveState = 0;
+            sound.m_waveID = 1;
+            sound.m_waveSyncMode = 1;
             while (waveFile != 0) {
                 loadWaveFrame();
             }
@@ -703,7 +743,7 @@ float CSound::GetPerformance()
  */
 void CSound::PauseDiscError(int pause)
 {
-    if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x22D0) == 0) {
+    if (SoundData(this).m_pauseAllSe == 0) {
         int paused = (-pause | pause) >> 0x1F;
         SePause__9CRedSoundFii(reinterpret_cast<CRedSound*>(this), -1, paused);
         StreamPause__9CRedSoundFii(reinterpret_cast<CRedSound*>(this), -1, paused);
@@ -717,13 +757,14 @@ void CSound::PauseDiscError(int pause)
  */
 void CSound::CheckDriver(int mode)
 {
-    unsigned int oldPrint = *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x22D4);
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x22D4) = 1;
+    CSoundLayout& sound = SoundData(this);
+    unsigned int oldPrint = sound.m_debugPrint;
+    sound.m_debugPrint = 1;
     ReportPrint__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), 1);
     TestProcess__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), mode);
     DisplayWaveInfo__9CRedSoundFv(reinterpret_cast<CRedSound*>(this));
     DisplaySePlayInfo__9CRedSoundFv(reinterpret_cast<CRedSound*>(this));
-    *reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(this) + 0x22D4) = oldPrint;
+    sound.m_debugPrint = oldPrint;
     ReportPrint__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), (-oldPrint | oldPrint) >> 0x1F);
 }
 
@@ -809,16 +850,17 @@ next:
         se += 0x28;
     } while (i < 0x80);
 
-    int currentMusicVolume = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x22B8);
-    if (currentMusicVolume != *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x22BC)) {
-        if (currentMusicVolume < *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x22BC)) {
-            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x22B8) = currentMusicVolume + 1;
+    CSoundLayout& sound = SoundData(this);
+    int currentMusicVolume = sound.m_curMusicVolume;
+    if (currentMusicVolume != sound.m_seMaxVolume) {
+        if (currentMusicVolume < sound.m_seMaxVolume) {
+            sound.m_curMusicVolume = currentMusicVolume + 1;
         } else {
-            *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x22B8) = currentMusicVolume - 1;
+            sound.m_curMusicVolume = currentMusicVolume - 1;
         }
     }
 
-    MusicVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), -1, *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x22B8), 0);
+    MusicVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), -1, sound.m_curMusicVolume, 0);
 }
 
 /*
@@ -850,7 +892,8 @@ void CSound::Draw()
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
 
-    unsigned char* se = reinterpret_cast<unsigned char*>(this) + 0x2C;
+    CSoundLayout& sound = SoundData(this);
+    unsigned char* se = sound.m_seWork;
     for (u32 i = 0; i < 0x80; i++, se += 0x28) {
         if (static_cast<signed char>(*se) < 0) {
             u32 innerColor;
@@ -867,7 +910,7 @@ void CSound::Draw()
     GXSetChanMatColor((GXChannelID)4, lineColor);
     GXLoadPosMtxImm(cameraMatrix, 0);
 
-    CLine* line = reinterpret_cast<CLine*>(reinterpret_cast<unsigned char*>(this) + 0x142C);
+    CLine* line = reinterpret_cast<CLine*>(sound.m_lineWork);
     for (u32 i = 0; i < 8; i++) {
         Draw__9CLine(line);
         line = reinterpret_cast<CLine*>(reinterpret_cast<unsigned char*>(line) + 0x1CC);
@@ -886,13 +929,13 @@ void CSound::Draw()
 void CSound::loadWaveFrame()
 {
     CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
-    CFile::CHandle*& waveFile = *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 0x8);
-
-    int& waveRemain = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x14);
-    int& waveOffset = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x18);
-    int& waveID = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1C);
-    int& waveState = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x20);
-    int& waveSyncMode = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x24);
+    CSoundLayout& sound = SoundData(this);
+    CFile::CHandle*& waveFile = sound.m_waveFile;
+    int& waveRemain = sound.m_waveRemain;
+    int& waveOffset = sound.m_waveOffset;
+    int& waveID = sound.m_waveID;
+    int& waveState = sound.m_waveState;
+    int& waveSyncMode = sound.m_waveSyncMode;
 
     if (waveFile != 0) {
         if (waveState == 0) {
@@ -929,19 +972,19 @@ void CSound::loadWaveFrame()
     }
 
     bool streamPlaying = false;
-    int& isStreamEnabled = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22A0);
-    int& streamID = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x2298);
+    int& isStreamEnabled = sound.m_streamPlaying;
+    int& streamID = sound.m_streamID;
     if (isStreamEnabled != 0 && StreamPlayState__9CRedSoundFi(redSound, streamID) != 0) {
         streamPlaying = true;
     }
 
-    CFile::CHandle*& streamFile = *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 0x2290);
+    CFile::CHandle*& streamFile = sound.m_streamFile;
     if (streamPlaying && streamFile != 0) {
-        int& streamState = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22A8);
-        int& streamRemain = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22A4);
-        int& streamOffset = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x2294);
-        unsigned int& streamHalf = *reinterpret_cast<unsigned int*>(reinterpret_cast<u8*>(this) + 0x229C);
-        u8* streamBuffer = *reinterpret_cast<u8**>(reinterpret_cast<u8*>(this) + 0x228C);
+        int& streamState = sound.m_streamState;
+        int& streamRemain = sound.m_streamRemain;
+        int& streamOffset = sound.m_streamOffset;
+        u32& streamHalf = sound.m_streamHalf;
+        u8* streamBuffer = reinterpret_cast<u8*>(sound.m_streamBuffer);
 
         if (streamState == 0) {
             int playPoint[2];
@@ -995,7 +1038,8 @@ void CSound::LoadWaveASync(int waveNo, int waveId, int syncMode)
     if (waveNo < 0) {
         Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
     } else if (ReentryWaveData__9CRedSoundFi(redSound, waveNo) == -1) {
-        CFile::CHandle*& waveFile = *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 0x8);
+        CSoundLayout& sound = SoundData(this);
+        CFile::CHandle*& waveFile = sound.m_waveFile;
         if (waveFile != 0) {
             File.Close(waveFile);
             waveFile = 0;
@@ -1008,11 +1052,11 @@ void CSound::LoadWaveASync(int waveNo, int waveId, int syncMode)
         sprintf(wavePath, "dvd/sound/wave/wave_%04d.wd", waveNo);
         waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
         if (waveFile != 0) {
-            *reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x14) = File.GetLength(waveFile);
-            *reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x18) = 0;
-            *reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x20) = 0;
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1C) = waveId;
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x24) = syncMode;
+            sound.m_waveRemain = File.GetLength(waveFile);
+            sound.m_waveOffset = 0;
+            sound.m_waveState = 0;
+            sound.m_waveID = waveId;
+            sound.m_waveSyncMode = syncMode;
 
             if (syncMode != 0) {
                 while (((u32)__cntlzw((u32)waveFile) >> 5) == 0) {
@@ -1034,10 +1078,11 @@ void CSound::LoadWaveASync(int waveNo, int waveId, int syncMode)
  */
 void CSound::CancelLoadWaveASync()
 {
-    CFile::CHandle* handle = *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 8);
+    CSoundLayout& sound = SoundData(this);
+    CFile::CHandle* handle = sound.m_waveFile;
     if (handle != 0) {
         File.Close(handle);
-        *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 8) = 0;
+        sound.m_waveFile = 0;
         Printf__7CSystemFPce(&System, DAT_801db190);
     }
     SetWaveData__9CRedSoundFiPvi(reinterpret_cast<CRedSound*>(this), -1, nullptr, 0);
@@ -1054,7 +1099,7 @@ void CSound::CancelLoadWaveASync()
  */
 int CSound::IsLoadWaveASyncCompleted()
 {
-    CFile::CHandle* waveFile = *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 0x8);
+    CFile::CHandle* waveFile = SoundData(this).m_waveFile;
     return (u32)__cntlzw((u32)waveFile) >> 5;
 }
 
@@ -1191,7 +1236,8 @@ void CSound::FadeOutBgm(int fadeFrames)
 void CSound::LoadBlock()
 {
     CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
-    CFile::CHandle*& waveFile = *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 0x8);
+    CSoundLayout& sound = SoundData(this);
+    CFile::CHandle*& waveFile = sound.m_waveFile;
 
     if (ReentryWaveData__9CRedSoundFi(redSound, 0) == -1) {
         if (waveFile != 0) {
@@ -1206,11 +1252,11 @@ void CSound::LoadBlock()
         sprintf(wavePath, "dvd/sound/wave/wave_%04d.wd", 0);
         waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
         if (waveFile != 0) {
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x14) = File.GetLength(waveFile);
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x18) = 0;
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x20) = 0;
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1C) = 0;
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x24) = 1;
+            sound.m_waveRemain = File.GetLength(waveFile);
+            sound.m_waveOffset = 0;
+            sound.m_waveState = 0;
+            sound.m_waveID = 0;
+            sound.m_waveSyncMode = 1;
             while (waveFile != 0) {
                 loadWaveFrame();
             }
@@ -1230,11 +1276,11 @@ void CSound::LoadBlock()
         sprintf(wavePath, "dvd/sound/wave/wave_%04d.wd", 500);
         waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
         if (waveFile != 0) {
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x14) = File.GetLength(waveFile);
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x18) = 0;
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x20) = 0;
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1C) = 1;
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x24) = 1;
+            sound.m_waveRemain = File.GetLength(waveFile);
+            sound.m_waveOffset = 0;
+            sound.m_waveState = 0;
+            sound.m_waveID = 1;
+            sound.m_waveSyncMode = 1;
             while (waveFile != 0) {
                 loadWaveFrame();
             }
@@ -1333,7 +1379,8 @@ void CSound::LoadSe(void* seData)
 void CSound::LoadWave(int waveId)
 {
     CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
-    CFile::CHandle*& waveFile = *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 0x8);
+    CSoundLayout& sound = SoundData(this);
+    CFile::CHandle*& waveFile = sound.m_waveFile;
 
     if (waveId < 0) {
         Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
@@ -1355,11 +1402,11 @@ void CSound::LoadWave(int waveId)
                 waveFile = File.Open(wavePath, 0, CFile::PRI_LOW);
 
                 if (waveFile != 0) {
-                    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x14) = File.GetLength(waveFile);
-                    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x18) = 0;
-                    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x20) = 0;
-                    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x1C) = -1;
-                    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x24) = 1;
+                    sound.m_waveRemain = File.GetLength(waveFile);
+                    sound.m_waveOffset = 0;
+                    sound.m_waveState = 0;
+                    sound.m_waveID = -1;
+                    sound.m_waveSyncMode = 1;
                     while (waveFile != 0) {
                         loadWaveFrame();
                     }
@@ -1385,7 +1432,7 @@ void CSound::LoadWave(int waveId)
 void CSound::LoadWave(void* waveData)
 {
     CRedSound* redSound = reinterpret_cast<CRedSound*>(this);
-    CFile::CHandle*& waveFile = *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 0x8);
+    CFile::CHandle*& waveFile = SoundData(this).m_waveFile;
 
     if (ReentryWaveData__9CRedSoundFi(redSound, reinterpret_cast<s16*>(waveData)[1]) == -1) {
         if (waveFile != 0) {
@@ -1427,32 +1474,33 @@ void CSound::FreeWave(int waveId)
  */
 void CSound::StopAndFreeAllSe(int clearMode)
 {
+    CSoundLayout& sound = SoundData(this);
     if (clearMode != 0) {
         SeStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), -1);
         ClearSeSepData__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), -1);
         ClearWaveData__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), -3);
     } else {
         SeStopMG__9CRedSoundFiiii(reinterpret_cast<CRedSound*>(this),
-                                  *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C0),
-                                  *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C2),
-                                  *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C4),
-                                  *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C6));
+                                  sound.m_noFreeSeGroups[0],
+                                  sound.m_noFreeSeGroups[1],
+                                  sound.m_noFreeSeGroups[2],
+                                  sound.m_noFreeSeGroups[3]);
         ClearSeSepDataMG__9CRedSoundFiiii(reinterpret_cast<CRedSound*>(this),
-                                          *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C0),
-                                          *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C2),
-                                          *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C4),
-                                          *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C6));
+                                          sound.m_noFreeSeGroups[0],
+                                          sound.m_noFreeSeGroups[1],
+                                          sound.m_noFreeSeGroups[2],
+                                          sound.m_noFreeSeGroups[3]);
         ClearWaveDataM__9CRedSoundFiiii(reinterpret_cast<CRedSound*>(this),
-                                        *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C8),
-                                        *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22CA),
-                                        *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22CC),
-                                        *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22CE));
+                                        sound.m_noFreeWaves[0],
+                                        sound.m_noFreeWaves[1],
+                                        sound.m_noFreeWaves[2],
+                                        sound.m_noFreeWaves[3]);
     }
 
-    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x28) = 10000000;
-    memset(reinterpret_cast<u8*>(this) + 0x2C, 0, 0x1400);
-    memset(reinterpret_cast<u8*>(this) + 0x22C0, 0xFF, 8);
-    memset(reinterpret_cast<u8*>(this) + 0x22C8, 0xFF, 8);
+    sound.m_seCount = 10000000;
+    memset(sound.m_seWork, 0, sizeof(sound.m_seWork));
+    memset(sound.m_noFreeSeGroups, 0xFF, sizeof(sound.m_noFreeSeGroups));
+    memset(sound.m_noFreeWaves, 0xFF, sizeof(sound.m_noFreeWaves));
 }
 
 /*
@@ -1568,7 +1616,7 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
 
     if (static_cast<s8>(se[3]) >= 0) {
         iVar4 = Calc__9CLine((double)*reinterpret_cast<float*>(se + 0x14),
-                             reinterpret_cast<CLine*>(reinterpret_cast<u8*>(this) + ((int)static_cast<s8>(se[3]) * 0x1CC) + 0x142C),
+                             reinterpret_cast<CLine*>(SoundData(this).m_lineWork + ((int)static_cast<s8>(se[3]) * 0x1CC)),
                              &nearestPoint, &nearestDistance, (u32*)0, &nearestT, reinterpret_cast<const Vec*>(CameraPcs + 0xE0));
         if (iVar4 == 0) {
             outVolume = 0;
@@ -1643,8 +1691,8 @@ void CSound::calcVolumePan(CSound::CSe3D* se3D, int& outVolume, int& outPan)
         outPan = iVar5 + 0x40;
     }
 
-    if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22B8) < outVolume) {
-        outVolume = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22B8);
+    if (SoundData(this).m_curMusicVolume < outVolume) {
+        outVolume = SoundData(this).m_curMusicVolume;
     }
 }
 
@@ -1672,7 +1720,8 @@ int CSound::PlaySe3D(int soundId, Vec* pos, float nearDistance, float farDistanc
     if (soundId < 0) {
         Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
     } else {
-        u8* se = reinterpret_cast<u8*>(this) + 0x2C;
+        CSoundLayout& sound = SoundData(this);
+        u8* se = sound.m_seWork;
         for (int i = 0; i < 0x80; i++, se += 0x28) {
             if (static_cast<s8>(*se) >= 0) {
                 int volume;
@@ -1682,7 +1731,7 @@ int CSound::PlaySe3D(int soundId, Vec* pos, float nearDistance, float farDistanc
                 *se &= 0xBF;
                 *reinterpret_cast<int*>(se + 0xC) = soundId;
 
-                int& seCount = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x28);
+                int& seCount = sound.m_seCount;
                 const int seIndex = seCount;
                 seCount = seIndex + 1;
                 *reinterpret_cast<int*>(se + 4) = seIndex;
@@ -1747,7 +1796,8 @@ int CSound::PlaySe3DLine(int soundId, int lineIndex, float nearDistance, float f
     if (soundId < 0) {
         Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
     } else {
-        u8* se = reinterpret_cast<u8*>(this) + 0x2C;
+        CSoundLayout& sound = SoundData(this);
+        u8* se = sound.m_seWork;
         for (int i = 0; i < 0x80; i++, se += 0x28) {
             if (static_cast<s8>(*se) >= 0) {
                 int volume;
@@ -1757,7 +1807,7 @@ int CSound::PlaySe3DLine(int soundId, int lineIndex, float nearDistance, float f
                 *se &= 0xBF;
                 *reinterpret_cast<int*>(se + 0xC) = soundId;
 
-                int& seCount = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x28);
+                int& seCount = sound.m_seCount;
                 const int seIndex = seCount;
                 seCount = seIndex + 1;
                 *reinterpret_cast<int*>(se + 4) = seIndex;
@@ -2089,7 +2139,8 @@ void CSound::Clear3DLine(int lineIndex)
     if (lineIndex > 7) {
         Printf__7CSystemFPce(&System, s_CSound__C_B_801db170);
     }
-    *reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x1444 + lineIndex * 0x1CC) = 0;
+    u8* line = SoundData(this).m_lineWork + lineIndex * 0x1CC;
+    *reinterpret_cast<u32*>(line + 0x18) = 0;
 }
 
 /*
@@ -2104,12 +2155,12 @@ void CSound::Clear3DLine(int lineIndex)
 void CSound::Add3DLine(int lineIndex, Vec* position)
 {
     const int lineOffset = lineIndex * 0x1CC;
-    const u32 pointCount = *reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x1444 + lineOffset);
+    u8* line = SoundData(this).m_lineWork + lineOffset;
+    const u32 pointCount = *reinterpret_cast<u32*>(line + 0x18);
     if (pointCount < 10) {
-        *reinterpret_cast<u32*>(reinterpret_cast<u8*>(this) + 0x1444 + lineOffset) = pointCount + 1;
-        const int pointOffset = static_cast<int>(pointCount) * 0xC + lineOffset;
-        *reinterpret_cast<Vec*>(reinterpret_cast<u8*>(this) + 0x145C + pointOffset) = *position;
-        CalcBound__9CLine2(reinterpret_cast<CLine*>(reinterpret_cast<u8*>(this) + 0x142C + lineOffset));
+        *reinterpret_cast<u32*>(line + 0x18) = pointCount + 1;
+        *reinterpret_cast<Vec*>(line + 0x30 + static_cast<int>(pointCount) * 0xC) = *position;
+        CalcBound__9CLine2(reinterpret_cast<CLine*>(line));
     } else {
         Printf__7CSystemFPce(&System, s_CSound__C___B_801db14c);
     }
@@ -2145,27 +2196,26 @@ void CSound::LoadStream(int streamID)
     if (streamID < 0) {
         Printf__7CSystemFPce(&System, s_Sound___1_n_B_801db130);
     } else {
+        CSoundLayout& sound = SoundData(this);
         bool isPlaying = false;
 
-        if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22A0) != 0) {
-            if (StreamPlayState__9CRedSoundFi(reinterpret_cast<CRedSound*>(this),
-                                              *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x2298)) != 0) {
+        if (sound.m_streamPlaying != 0) {
+            if (StreamPlayState__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), sound.m_streamID) != 0) {
                 isPlaying = true;
             }
         }
 
         if (isPlaying) {
-            StreamStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(this),
-                                     *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x2298));
+            StreamStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), sound.m_streamID);
         }
 
-        CFile::CHandle*& streamFile = *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 0x2290);
+        CFile::CHandle*& streamFile = sound.m_streamFile;
         if (streamFile != 0) {
             File.Close(streamFile);
             streamFile = 0;
         }
 
-        *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22A0) = 0;
+        sound.m_streamPlaying = 0;
 
         char streamPath[268];
         sprintf(streamPath, "dvd/sound/stream/str_%04d.str", streamID);
@@ -2175,12 +2225,12 @@ void CSound::LoadStream(int streamID)
             streamFile->m_currentOffset = 0;
             File.Read(streamFile);
             File.SyncCompleted(streamFile);
-            memcpy(*reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0x228C), File.m_readBuffer, 0x20000);
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x2294) = 0x20000;
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x229C) = 0;
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22A4) = File.GetLength(streamFile) - 0x20000;
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22A8) = 0;
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22AC) = streamID;
+            memcpy(sound.m_streamBuffer, File.m_readBuffer, 0x20000);
+            sound.m_streamOffset = 0x20000;
+            sound.m_streamHalf = 0;
+            sound.m_streamRemain = File.GetLength(streamFile) - 0x20000;
+            sound.m_streamState = 0;
+            sound.m_streamWaveID = streamID;
             File.Close(streamFile);
             streamFile = 0;
         }
@@ -2199,21 +2249,21 @@ void CSound::LoadStream(int streamID)
 void CSound::PlayStreamASync()
 {
     char streamPath[260];
-    sprintf(streamPath, "dvd/sound/stream/str_%04d.str",
-            *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22ac));
+    CSoundLayout& sound = SoundData(this);
+    sprintf(streamPath, "dvd/sound/stream/str_%04d.str", sound.m_streamWaveID);
 
     CFile::CHandle* handle = File.Open(streamPath, 0, CFile::PRI_LOW);
-    *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 0x2290) = handle;
+    sound.m_streamFile = handle;
     if (handle == 0) {
         return;
     }
 
-    int streamId = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22ac);
+    int streamId = sound.m_streamWaveID;
     int volume;
     if (streamId == 5) {
-        volume = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22b0);
+        volume = sound.m_bgmMasterVolume;
     } else if (streamId == 1) {
-        int bgmVol = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22b0);
+        int bgmVol = sound.m_bgmMasterVolume;
         int adjust = (bgmVol * 0x19) / 0x7f + ((bgmVol * 0x19) >> 0x1f);
         volume = bgmVol - (adjust - (adjust >> 0x1f));
     } else if (streamId > 0 && streamId < 7) {
@@ -2222,7 +2272,7 @@ void CSound::PlayStreamASync()
             volume = 0x70;
         }
     } else {
-        volume = *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22b4);
+        volume = sound.m_seMasterVolume;
     }
 
     int clampedVolume;
@@ -2236,11 +2286,9 @@ void CSound::PlayStreamASync()
     }
 
     int streamNo =
-        StreamPlay__9CRedSoundFPviii(reinterpret_cast<CRedSound*>(this),
-                                     *reinterpret_cast<void**>(reinterpret_cast<u8*>(this) + 0x228c), 0x20000, 0x40,
-                                     clampedVolume);
-    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x2298) = streamNo;
-    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22a0) = 1;
+        StreamPlay__9CRedSoundFPviii(reinterpret_cast<CRedSound*>(this), sound.m_streamBuffer, 0x20000, 0x40, clampedVolume);
+    sound.m_streamID = streamNo;
+    sound.m_streamPlaying = 1;
 }
 
 /*
@@ -2254,27 +2302,26 @@ void CSound::PlayStreamASync()
  */
 void CSound::StopStream()
 {
+    CSoundLayout& sound = SoundData(this);
     int shouldStop = 0;
 
-    if (*reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22a0) != 0) {
-        int state = StreamPlayState__9CRedSoundFi(reinterpret_cast<CRedSound*>(this),
-                                                  *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x2298));
+    if (sound.m_streamPlaying != 0) {
+        int state = StreamPlayState__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), sound.m_streamID);
         if (state != 0) {
             shouldStop = 1;
         }
     }
 
     if (shouldStop != 0) {
-        StreamStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(this),
-                                 *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x2298));
+        StreamStop__9CRedSoundFi(reinterpret_cast<CRedSound*>(this), sound.m_streamID);
     }
 
-    CFile::CHandle* handle = *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 0x2290);
+    CFile::CHandle* handle = sound.m_streamFile;
     if (handle != 0) {
         File.Close(handle);
-        *reinterpret_cast<CFile::CHandle**>(reinterpret_cast<u8*>(this) + 0x2290) = 0;
+        sound.m_streamFile = 0;
     }
-    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22a0) = 0;
+    sound.m_streamPlaying = 0;
 }
 
 /*
@@ -2288,7 +2335,7 @@ void CSound::StopStream()
  */
 void CSound::SetStreamVolume(int volume, int frames)
 {
-    StreamVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(reinterpret_cast<u8*>(this) + 8), -1, volume, frames);
+    StreamVolume__9CRedSoundFiii(reinterpret_cast<CRedSound*>(this), -1, volume, frames);
 }
 
 /*
@@ -2325,7 +2372,7 @@ void CSound::PauseAllSe(int pause)
     int paused = (-pause | pause) >> 31;
     reinterpret_cast<CRedSound*>(this)->SePause(-1, paused);
     reinterpret_cast<CRedSound*>(this)->StreamPause(-1, paused);
-    *reinterpret_cast<int*>(reinterpret_cast<u8*>(this) + 0x22D0) = pause;
+    SoundData(this).m_pauseAllSe = pause;
 }
 
 /*
@@ -2339,15 +2386,14 @@ void CSound::PauseAllSe(int pause)
  */
 void CSound::AddNoFreeSeGroup(int group)
 {
-    CSound* sound = this;
+    s16* groupList = SoundData(this).m_noFreeSeGroups;
     int i = 0;
 
     while (i < 4) {
-        if (*reinterpret_cast<s16*>(reinterpret_cast<u8*>(sound) + 0x22C0) == -1) {
-            *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C0 + i * 2) = static_cast<s16>(group);
+        if (groupList[i] == -1) {
+            groupList[i] = static_cast<s16>(group);
             return;
         }
-        sound = reinterpret_cast<CSound*>(reinterpret_cast<u8*>(sound) + 2);
         i++;
     }
 
@@ -2367,15 +2413,14 @@ void CSound::AddNoFreeSeGroup(int group)
  */
 void CSound::AddNoFreeWave(int wave)
 {
-    CSound* sound = this;
+    s16* waveList = SoundData(this).m_noFreeWaves;
     int i = 0;
 
     while (i < 4) {
-        if (*reinterpret_cast<s16*>(reinterpret_cast<u8*>(sound) + 0x22C8) == -1) {
-            *reinterpret_cast<s16*>(reinterpret_cast<u8*>(this) + 0x22C8 + i * 2) = static_cast<s16>(wave);
+        if (waveList[i] == -1) {
+            waveList[i] = static_cast<s16>(wave);
             return;
         }
-        sound = reinterpret_cast<CSound*>(reinterpret_cast<u8*>(sound) + 2);
         i++;
     }
 

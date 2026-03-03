@@ -22,14 +22,14 @@ void __GBAHandler(s32 chan, u32 error, OSContext* context) {
         return;
     }
 
-    if ((error & 0xf) == 0) {
-        gba->ret = GBA_READY;
-    } else {
+    if (error & 0xf) {
         gba->ret = GBA_NOT_READY;
+    } else {
+        gba->ret = GBA_READY;
     }
 
-    proc = gba->proc;
-    if (proc != NULL) {
+    if (gba->proc != NULL) {
+        proc = gba->proc;
         gba->proc = NULL;
         proc(chan);
     }
@@ -84,14 +84,17 @@ void TypeAndStatusCallback(s32 chan, u32 type) {
 
     gba = &__GBA[chan];
 
+    if (__GBAReset != 0) {
+        return;
+    }
+
     if ((type & 0xFF) != 0 || (type & 0xffff0000) != 0x40000) {
         gba->ret = GBA_NOT_READY;
+    } else if (SITransfer(chan, gba->output, gba->outputBytes, gba->input, gba->inputBytes,
+                          __GBAHandler, gba->delay))
+    {
+        return;
     } else {
-        if (SITransfer(chan, gba->output, gba->outputBytes, gba->input, gba->inputBytes,
-                       __GBAHandler, gba->delay))
-        {
-            return;
-        }
         gba->ret = GBA_BUSY;
     }
 

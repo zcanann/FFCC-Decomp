@@ -59,10 +59,12 @@ void CMenuPcs::CompaInit()
 	float fVar3;
 	int iVar4;
 	int iVar5;
+	short* compaList = this->compaList;
+	int compaState = (int)this->compaMenuState;
 
-	memset(*reinterpret_cast<void**>(reinterpret_cast<char*>(this) + 0x850), 0, 0x1008);
+	memset(compaList, 0, 0x1008);
 	fVar1 = 1.0f;
-	iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 8;
+	iVar4 = (int)compaList + 8;
 	iVar5 = 8;
 	do {
 		*reinterpret_cast<float*>(iVar4 + 0x14) = fVar1;
@@ -77,7 +79,7 @@ void CMenuPcs::CompaInit()
 		iVar5 += -1;
 	} while (iVar5 != 0);
 
-	iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
+	iVar4 = (int)compaList;
 	*reinterpret_cast<int*>(iVar4 + 0x24) = 0x52;
 	*reinterpret_cast<int*>(iVar4 + 0x20) = 4;
 	*reinterpret_cast<short*>(iVar4 + 8) = 0x28;
@@ -92,7 +94,7 @@ void CMenuPcs::CompaInit()
 	*reinterpret_cast<int*>(iVar4 + 0x2c) = 5;
 	*reinterpret_cast<int*>(iVar4 + 0x30) = 5;
 
-	iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
+	iVar4 = (int)compaList;
 	*reinterpret_cast<int*>(iVar4 + 100) = 0x51;
 	*reinterpret_cast<short*>(iVar4 + 0x48) = 0x28;
 	*reinterpret_cast<short*>(iVar4 + 0x4a) = 0x48;
@@ -104,7 +106,7 @@ void CMenuPcs::CompaInit()
 	*reinterpret_cast<int*>(iVar4 + 0x6c) = 5;
 	*reinterpret_cast<int*>(iVar4 + 0x70) = 5;
 
-	iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
+	iVar4 = (int)compaList;
 	*reinterpret_cast<int*>(iVar4 + 0xa4) = 0x52;
 	*reinterpret_cast<short*>(iVar4 + 0x88) = 0x28;
 	*reinterpret_cast<short*>(iVar4 + 0x8a) = 0x110;
@@ -116,7 +118,7 @@ void CMenuPcs::CompaInit()
 	*reinterpret_cast<int*>(iVar4 + 0xac) = 5;
 	*reinterpret_cast<int*>(iVar4 + 0xb0) = 5;
 
-	iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
+	iVar4 = (int)compaList;
 	*reinterpret_cast<int*>(iVar4 + 0xe4) = 0x5e;
 	*reinterpret_cast<short*>(iVar4 + 200) = 0x10;
 	*reinterpret_cast<short*>(iVar4 + 0xca) = 0xe;
@@ -130,7 +132,7 @@ void CMenuPcs::CompaInit()
 
 	fVar3 = 6.0f;
 	fVar2 = -13.0f;
-	iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
+	iVar4 = (int)compaList;
 	*reinterpret_cast<int*>(iVar4 + 0x124) = 0x5e;
 	*reinterpret_cast<short*>(iVar4 + 0x108) = 0x15;
 	*reinterpret_cast<short*>(iVar4 + 0x10c) = 0x30;
@@ -142,7 +144,7 @@ void CMenuPcs::CompaInit()
 	*reinterpret_cast<int*>(iVar4 + 300) = 0;
 	*reinterpret_cast<int*>(iVar4 + 0x130) = 5;
 
-	iVar4 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
+	iVar4 = (int)compaList;
 	*reinterpret_cast<int*>(iVar4 + 0x174) = 2;
 	*reinterpret_cast<int*>(iVar4 + 0x164) = 0x2e;
 	*reinterpret_cast<short*>(iVar4 + 0x148) = 0x10;
@@ -154,9 +156,9 @@ void CMenuPcs::CompaInit()
 	*reinterpret_cast<int*>(iVar4 + 0x16c) = 0;
 	*reinterpret_cast<int*>(iVar4 + 0x170) = 5;
 
-	**reinterpret_cast<short**>(reinterpret_cast<char*>(this) + 0x850) = 6;
-	*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x26) = 0;
-	*reinterpret_cast<char*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0xb) = 1;
+	*compaList = 6;
+	*reinterpret_cast<short*>(compaState + 0x26) = 0;
+	*reinterpret_cast<char*>(compaState + 0xB) = 1;
 }
 
 /*
@@ -187,15 +189,17 @@ bool CMenuPcs::CompaOpen()
 	int count;
 	int currentTime;
 	int remaining;
+	int compaState = (int)this->compaMenuState;
+	short* compaList = this->compaList;
 
-	if (*(char*)(*(int*)((u8*)this + 0x82C) + 0xB) == '\0') {
+	if (*reinterpret_cast<char*>(compaState + 0xB) == 0) {
 		CompaInit();
 	}
 	finished = 0;
-	*(s16*)(*(int*)((u8*)this + 0x82C) + 0x22) = *(s16*)(*(int*)((u8*)this + 0x82C) + 0x22) + 1;
-	count = (int)**(s16**)((u8*)this + 0x850);
-	anim = *(s16**)((u8*)this + 0x850) + 4;
-	currentTime = (int)*(s16*)(*(int*)((u8*)this + 0x82C) + 0x22);
+	*reinterpret_cast<s16*>(compaState + 0x22) = *reinterpret_cast<s16*>(compaState + 0x22) + 1;
+	count = (int)*compaList;
+	anim = compaList + 4;
+	currentTime = (int)*reinterpret_cast<s16*>(compaState + 0x22);
 	remaining = count;
 	if (0 < count) {
 		do {
@@ -239,6 +243,8 @@ void CMenuPcs::CompaCtrl()
 	unsigned short press;
 	short hold;
 	bool doReset = false;
+	int compaState = (int)this->compaMenuState;
+	short* compaList = this->compaList;
 
 	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
 		activeInput = true;
@@ -264,18 +270,18 @@ void CMenuPcs::CompaCtrl()
 	if (hold == 0) {
 		doReset = false;
 	} else if ((press & 0x20) != 0) {
-		*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x1e) = 1;
+		*reinterpret_cast<short*>(compaState + 0x1e) = 1;
 		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 		doReset = true;
 	} else if ((press & 0x40) != 0) {
-		*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x1e) = -1;
+		*reinterpret_cast<short*>(compaState + 0x1e) = -1;
 		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 		doReset = true;
 	} else if ((press & 0x100) != 0) {
 		Sound.PlaySe(4, 0x40, 0x7f, 0);
 		doReset = false;
 	} else if ((press & 0x200) != 0) {
-		*reinterpret_cast<char*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0xd) = 1;
+		*reinterpret_cast<char*>(compaState + 0xd) = 1;
 		Sound.PlaySe(3, 0x40, 0x7f, 0);
 		doReset = true;
 	} else {
@@ -283,22 +289,22 @@ void CMenuPcs::CompaCtrl()
 	}
 
 	if (doReset) {
-		*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 0x2c) = 2;
-		*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 0x30) = 5;
-		*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 0x6c) = 2;
-		*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 0x70) = 5;
-		*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 0xac) = 2;
-		*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 0xb0) = 5;
-		*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 0xec) = 7;
-		*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 0xf0) = 5;
-		*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 300) = 7;
-		*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 0x130) = 5;
-		*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 0x174) = 2;
-		*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 0x16c) = 7;
-		*reinterpret_cast<int*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 0x170) = 5;
+		*reinterpret_cast<int*>((int)compaList + 0x2c) = 2;
+		*reinterpret_cast<int*>((int)compaList + 0x30) = 5;
+		*reinterpret_cast<int*>((int)compaList + 0x6c) = 2;
+		*reinterpret_cast<int*>((int)compaList + 0x70) = 5;
+		*reinterpret_cast<int*>((int)compaList + 0xac) = 2;
+		*reinterpret_cast<int*>((int)compaList + 0xb0) = 5;
+		*reinterpret_cast<int*>((int)compaList + 0xec) = 7;
+		*reinterpret_cast<int*>((int)compaList + 0xf0) = 5;
+		*reinterpret_cast<int*>((int)compaList + 300) = 7;
+		*reinterpret_cast<int*>((int)compaList + 0x130) = 5;
+		*reinterpret_cast<int*>((int)compaList + 0x174) = 2;
+		*reinterpret_cast<int*>((int)compaList + 0x16c) = 7;
+		*reinterpret_cast<int*>((int)compaList + 0x170) = 5;
 
-		int entryCount = static_cast<int>(**reinterpret_cast<short**>(reinterpret_cast<char*>(this) + 0x850));
-		short* entry = *reinterpret_cast<short**>(reinterpret_cast<char*>(this) + 0x850) + 4;
+		int entryCount = static_cast<int>(*compaList);
+		short* entry = compaList + 4;
 		for (int i = 0; i < entryCount; ++i) {
 			*reinterpret_cast<int*>(entry + 0x10) = 0;
 			*reinterpret_cast<int*>(entry + 0x12) = 0;
@@ -319,13 +325,14 @@ void CMenuPcs::CompaCtrl()
  */
 void CMenuPcs::CompaClose()
 {
-	int menuState = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c);
-	short time = static_cast<short>(*reinterpret_cast<short*>(menuState + 0x22) + 1);
-	*reinterpret_cast<short*>(menuState + 0x22) = time;
+	int compaState = (int)this->compaMenuState;
+	short* compaList = this->compaList;
+	short time = static_cast<short>(*reinterpret_cast<short*>(compaState + 0x22) + 1);
+	*reinterpret_cast<short*>(compaState + 0x22) = time;
 
-	short* entry = *reinterpret_cast<short**>(reinterpret_cast<char*>(this) + 0x850);
+	short* entry = compaList;
 	int entryCount = static_cast<int>(*entry);
-	short currentTime = *reinterpret_cast<short*>(menuState + 0x22);
+	short currentTime = *reinterpret_cast<short*>(compaState + 0x22);
 	entry += 4;
 	for (int i = 0; i < entryCount; ++i) {
 		if (*reinterpret_cast<int*>(entry + 0x12) <= currentTime) {
@@ -365,8 +372,9 @@ void CMenuPcs::CompaDraw()
 	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
 
 	int scriptFood = Game.game.m_scriptFoodBase[0];
-	short* entry = (short*)(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850) + 8);
-	int count = **reinterpret_cast<short**>(reinterpret_cast<char*>(this) + 0x850);
+	short* compaList = this->compaList;
+	short* entry = reinterpret_cast<short*>((int)compaList + 8);
+	int count = *compaList;
 	for (int i = 0; i < count; i++) {
 		int tex = *reinterpret_cast<int*>(entry + 0xE);
 		if (tex >= 0) {
@@ -455,7 +463,7 @@ void CMenuPcs::CompaDraw()
 		entry += 0x20;
 	}
 
-	int menuData = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
+	int menuData = (int)compaList;
 	float globalAlpha = *reinterpret_cast<float*>(menuData + 0x18);
 
 	GXColor color = {0xFF, 0xFF, 0xFF, static_cast<unsigned char>(globalAlpha * 255.0f)};
@@ -515,7 +523,7 @@ void CMenuPcs::CompaDraw()
 		memberIndex = drawIndex + 1;
 	}
 
-	CFont* font = *reinterpret_cast<CFont**>(reinterpret_cast<char*>(this) + 0x108);
+	CFont* font = listFont;
 	SetMargin__5CFontFf(0.0f, font);
 	SetShadow__5CFontFi(font, 0);
 	SetScaleX__5CFontFf(0.875f, font);
@@ -557,7 +565,7 @@ void CMenuPcs::CompaDraw()
 		memberIndex = drawIndex + 1;
 	}
 
-	font = *reinterpret_cast<CFont**>(reinterpret_cast<char*>(this) + 0x108);
+	font = listFont;
 	SetMargin__5CFontFf(0.0f, font);
 	SetShadow__5CFontFi(font, 0);
 	SetScale__5CFontFf(0.75f, font);

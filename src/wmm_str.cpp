@@ -163,13 +163,13 @@ int CMenuPcs::GetYesNoXPos(int right)
         yesText = lbl_80215C28[13];
     }
 
-    CFont* font = *(CFont**)((char*)this + 0xf8);
+    CFont* font = menuFont;
     SetMargin__5CFontFf(1.0f, font);
     SetShadow__5CFontFi(font, 0);
     SetScale__5CFontFf(1.0f, font);
 
     const int yesWidth = (int)GetWidth__5CFontFPc(font, yesText + 1);
-    short* windowInfo = *(short**)((char*)this + 0x848);
+    short* windowInfo = singWindowInfo;
     int x = (int)(((double)(windowInfo[2] - yesWidth) * 0.5) + (double)windowInfo[0]);
     if (right != 0) {
         const int noWidth = (int)GetWidth__5CFontFPc(font, lbl_8021672C[languageId - 1]);
@@ -207,14 +207,14 @@ int CMenuPcs::GetSlotABXPos(int right)
         slotAText = lbl_80215C28[2];
     }
 
-    CFont* font = *(CFont**)((char*)this + 0xf8);
+    CFont* font = menuFont;
     SetMargin__5CFontFf(1.0f, font);
     SetShadow__5CFontFi(font, 0);
     SetScale__5CFontFf(1.0f, font);
     SetTlut__5CFontFi(font, 0x23);
 
     const int slotAWidth = (int)GetWidth__5CFontFPc(font, slotAText + 1);
-    short* windowInfo = *(short**)((char*)this + 0x848);
+    short* windowInfo = singWindowInfo;
     int x = (int)(((double)(windowInfo[2] - slotAWidth) * 0.5) + (double)windowInfo[0]);
     if (right != 0) {
         const int slotBWidth = (int)GetWidth__5CFontFPc(font, lbl_80216740[languageId - 1]);

@@ -47,7 +47,7 @@ void pppRandUpInt(void* param1, void* param2, void* param3)
     if (baseState == 0) {
         f32 value = RandF__5CMathFv(math);
         if (in->fieldC != 0) {
-            value = (value + RandF__5CMathFv(math)) * lbl_80330018;
+            value = lbl_80330018 * (value + RandF__5CMathFv(math));
         }
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
@@ -59,12 +59,7 @@ void pppRandUpInt(void* param1, void* param2, void* param3)
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
 
-    s32* target;
-    if (in->field4 == -1) {
-        target = lbl_801EADC8;
-    } else {
-        target = (s32*)(base + in->field4 + 0x80);
-    }
+    s32* target = (in->field4 == -1) ? lbl_801EADC8 : (s32*)(base + in->field4 + 0x80);
 
     union {
         f64 d;
@@ -76,6 +71,7 @@ void pppRandUpInt(void* param1, void* param2, void* param3)
     cvt.parts.hi = 0x43300000;
     cvt.parts.lo = in->field8;
 
-    s32 delta = (s32)((cvt.d - lbl_80330020) * *valuePtr);
+    f32 scaled = (f32)(cvt.d - lbl_80330020) * *valuePtr;
+    s32 delta = (s32)scaled;
     *target += delta;
 }

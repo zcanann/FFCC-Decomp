@@ -1,7 +1,8 @@
 #include "ffcc/pppSclMove.h"
 #include <dolphin/mtx.h>
 
-extern int DAT_8032ed70;
+extern int lbl_8032ED70;
+extern float lbl_80330058;
 
 /*
  * --INFO--
@@ -16,10 +17,11 @@ void pppSclMoveCon(void* param1, void* param2)
 {
     void* ptr = (void*)((int*)((char*)param2 + 0xC))[0];
     ptr = (void*)((int*)((char*)ptr + 0x4))[0];
-    Vec* data1 = (Vec*)((char*)param1 + (int)ptr + 0x80);
-    data1->x = 0.0f;
-    data1->y = 0.0f;
-    data1->z = 0.0f;
+    float* data1 = (float*)((char*)param1 + (int)ptr + 0x80);
+    float zero = lbl_80330058;
+    data1[2] = zero;
+    data1[1] = zero;
+    data1[0] = zero;
 }
 
 /*
@@ -34,10 +36,10 @@ void pppSclMoveCon(void* param1, void* param2)
 void pppSclMove(void* param1, void* param2, void* param3)
 {
     int* data2 = *(int**)((char*)param3 + 0xC);
-    float* dataA = (float*)((char*)param1 + data2[1] + 0x80);
-    float* dataB = (float*)((char*)param1 + data2[0] + 0x80);
+    float* dataA = (float*)((char*)param1 + data2[0] + 0x80);
+    float* dataB = (float*)((char*)param1 + data2[1] + 0x80);
 
-    if (*(volatile int*)&DAT_8032ed70 != 0) {
+    if (lbl_8032ED70 != 0) {
         return;
     }
 

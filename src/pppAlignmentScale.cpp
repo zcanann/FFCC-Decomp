@@ -3,7 +3,7 @@
 
 #include <dolphin/mtx.h>
 
-extern int DAT_8032ed70;
+extern int lbl_8032ED70;
 extern struct _pppMngSt* pppMngStPtr;
 
 extern class CCameraPcs {
@@ -45,13 +45,12 @@ struct pppAlignmentScale* pppFrameAlignmentScale(struct pppAlignmentScale* align
 {
     float scale;
     float distanceScale;
-    float zero;
     struct _pppMngSt* pppMngSt;
     Vec cameraPos;
     Vec objPos;
     Mtx scaleMtx;
 
-    if (DAT_8032ed70 == 0) {
+    if (lbl_8032ED70 == 0) {
         pppMngSt = pppMngStPtr;
         cameraPos.x = CameraPcs._224_4_;
         cameraPos.y = CameraPcs._228_4_;
@@ -62,17 +61,17 @@ struct pppAlignmentScale* pppFrameAlignmentScale(struct pppAlignmentScale* align
         objPos.z = pppMngStPtr->m_matrix.value[2][3];
 
         distanceScale = PSVECDistance(&cameraPos, &objPos) / data->m_unk0x4;
-        scale = 1.0f;
-        if (distanceScale > 1.0f) {
+        if (distanceScale <= 1.0f) {
+            scale = 1.0f;
+        } else {
             scale = (distanceScale - 1.0f) * data->m_unk0x8 + 1.0f;
         }
 
         PSMTXScale(scaleMtx, scale, scale, scale);
 
-        zero = 0.0f;
         pppMngStPtr->m_matrix.value[0][3] = 0.0f;
-        pppMngStPtr->m_matrix.value[1][3] = zero;
-        pppMngStPtr->m_matrix.value[2][3] = zero;
+        pppMngStPtr->m_matrix.value[1][3] = 0.0f;
+        pppMngStPtr->m_matrix.value[2][3] = 0.0f;
         PSMTXConcat(scaleMtx, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
         pppMngStPtr->m_matrix.value[0][3] = objPos.x;
         pppMngStPtr->m_matrix.value[1][3] = objPos.y;

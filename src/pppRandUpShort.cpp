@@ -58,11 +58,7 @@ extern "C" void pppRandUpShort(void* param1, void* param2, void* param3)
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
     }
 
-    if (in->sourceOffset == -1) {
-        target = &lbl_801EADC8[0];
-    } else {
-        target = (s16*)(base + in->sourceOffset + 0x80);
-    }
+    target = (in->sourceOffset == -1) ? &lbl_801EADC8[0] : (s16*)(base + in->sourceOffset + 0x80);
 
     union {
         f64 d;
@@ -75,6 +71,6 @@ extern "C" void pppRandUpShort(void* param1, void* param2, void* param3)
     cvt.parts.hi = 0x43300000;
     cvt.parts.lo = scale;
 
-    s32 delta = (s32)((cvt.d - lbl_80330040) * *valuePtr);
+    s32 delta = (s32)(*valuePtr * (cvt.d - lbl_80330040));
     *target = (s16)(*target + delta);
 }

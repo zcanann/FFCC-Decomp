@@ -90,6 +90,64 @@ extern const char* PTR_s_Efecto_Fuego_80214d78[];
 s32 DAT_8032eec8;
 s32 s_UniteTop[3];
 
+namespace {
+
+struct MenuCmdMembers {
+	unsigned char pad_0000[0xF8];
+	CFont* m_helpFont;
+	unsigned char pad_00FC[0x0C];
+	CFont* m_nameFont;
+	unsigned char pad_010C[0x720];
+	s16* m_cmdState;
+	unsigned char pad_0830[0x20];
+	s16* m_cmdList;
+	unsigned char pad_0854[0x10];
+	s16 m_cmdLayoutFlag;
+};
+
+STATIC_ASSERT(offsetof(MenuCmdMembers, m_helpFont) == 0xF8);
+STATIC_ASSERT(offsetof(MenuCmdMembers, m_nameFont) == 0x108);
+STATIC_ASSERT(offsetof(MenuCmdMembers, m_cmdState) == 0x82C);
+STATIC_ASSERT(offsetof(MenuCmdMembers, m_cmdList) == 0x850);
+STATIC_ASSERT(offsetof(MenuCmdMembers, m_cmdLayoutFlag) == 0x864);
+
+static inline MenuCmdMembers& GetMenuCmdMembers(CMenuPcs* menu)
+{
+	return *reinterpret_cast<MenuCmdMembers*>(menu);
+}
+
+static inline const MenuCmdMembers& GetMenuCmdMembers(const CMenuPcs* menu)
+{
+	return *reinterpret_cast<const MenuCmdMembers*>(menu);
+}
+
+static inline s16* GetCmdState(CMenuPcs* menu)
+{
+	return GetMenuCmdMembers(menu).m_cmdState;
+}
+
+static inline s16* GetCmdList(CMenuPcs* menu)
+{
+	return GetMenuCmdMembers(menu).m_cmdList;
+}
+
+static inline int GetCmdStateBase(CMenuPcs* menu)
+{
+	return reinterpret_cast<int>(GetCmdState(menu));
+}
+
+static inline int GetCmdListBase(CMenuPcs* menu)
+{
+	return reinterpret_cast<int>(GetCmdList(menu));
+}
+
+static inline s16 GetCmdLayoutFlag(CMenuPcs* menu)
+{
+	return GetMenuCmdMembers(menu).m_cmdLayoutFlag;
+}
+
+} // namespace
+
 /*
  * --INFO--
  * Address:	TODO
@@ -114,10 +172,10 @@ void CMenuPcs::CmdInit()
 {
 	u8* self = reinterpret_cast<u8*>(this);
 	u32 caravanWork = Game.game.m_scriptFoodBase[0];
-	memset(*reinterpret_cast<void**>(self + 0x850), 0, 0x1008);
+	memset(GetCmdList(this), 0, 0x1008);
 
 	float fVar2 = FLOAT_80332a70;
-	s32 iVar5 = *reinterpret_cast<s32*>(self + 0x850) + 8;
+	s32 iVar5 = GetCmdListBase(this) + 8;
 	s32 iVar8 = 8;
 	do {
 		*reinterpret_cast<float*>(iVar5 + 0x14) = fVar2;
@@ -132,7 +190,7 @@ void CMenuPcs::CmdInit()
 		iVar8--;
 	} while (iVar8 != 0);
 
-	s16* puVar7 = reinterpret_cast<s16*>(*reinterpret_cast<s32*>(self + 0x850) + 8);
+	s16* puVar7 = reinterpret_cast<s16*>(GetCmdListBase(this) + 8);
 	iVar5 = 0;
 	iVar8 = 8;
 	u32 uVar6 = caravanWork;
@@ -164,11 +222,11 @@ void CMenuPcs::CmdInit()
 		iVar8--;
 	} while (iVar8 != 0);
 
-	**reinterpret_cast<s16**>(self + 0x850) = 8;
+	*GetCmdList(this) = 8;
 	CmdInit1__8CMenuPcsFv(this);
 	GetCmdItem();
-	*reinterpret_cast<s16*>(*reinterpret_cast<s32*>(self + 0x82C) + 0x26) = 2;
-	*reinterpret_cast<u8*>(*reinterpret_cast<s32*>(self + 0x82C) + 0x0B) = 1;
+	*reinterpret_cast<s16*>(GetCmdStateBase(this) + 0x26) = 2;
+	*reinterpret_cast<u8*>(GetCmdStateBase(this) + 0x0B) = 1;
 }
 
 /*
@@ -210,8 +268,8 @@ void CMenuPcs::CmdInit1()
 	fVar4 = FLOAT_80332b38;
 	fVar3 = FLOAT_80332ad0;
 	fVar2 = FLOAT_80332a70;
-	iVar10 = (int)**(s16**)((u8*)this + 0x850);
-	psVar8 = *(s16**)((u8*)this + 0x850) + iVar10 * 0x20 + 4;
+	iVar10 = (int)*GetCmdList(this);
+	psVar8 = GetCmdList(this) + iVar10 * 0x20 + 4;
 	psVar8[0xe] = 0;
 	psVar8[0xf] = 0x2e;
 	*psVar8 = 0xb8;
@@ -227,11 +285,11 @@ void CMenuPcs::CmdInit1()
 	psVar8[0x15] = 5;
 
 	iVar11 = 0x2f;
-	if (*(s16*)((u8*)this + 0x864) == 0) {
+	if (GetCmdLayoutFlag(this) == 0) {
 		iVar11 = 0x46;
 	}
 
-	psVar8 = (s16*)(*(int*)((u8*)this + 0x850) + (iVar10 + 1) * 0x40 + 8);
+	psVar8 = (s16*)(GetCmdListBase(this) + (iVar10 + 1) * 0x40 + 8);
 	*(int*)(psVar8 + 0xe) = iVar11;
 	*psVar8 = 0xa0;
 	fVar3 = FLOAT_80332ab0;
@@ -245,7 +303,7 @@ void CMenuPcs::CmdInit1()
 	*(int*)(psVar8 + 0x12) = 0;
 	*(int*)(psVar8 + 0x14) = 5;
 
-	psVar8 = (s16*)(*(int*)((u8*)this + 0x850) + (iVar10 + 2) * 0x40 + 8);
+	psVar8 = (s16*)(GetCmdListBase(this) + (iVar10 + 2) * 0x40 + 8);
 	*(int*)(psVar8 + 0xe) = iVar11;
 	psVar8[2] = 0x30;
 	fVar2 = FLOAT_80332ab0;
@@ -262,7 +320,7 @@ void CMenuPcs::CmdInit1()
 	*(int*)(psVar8 + 0x12) = 0;
 	*(int*)(psVar8 + 0x14) = 5;
 
-	psVar8 = (s16*)(*(int*)((u8*)this + 0x850) + (iVar10 + 3) * 0x40 + 8);
+	psVar8 = (s16*)(GetCmdListBase(this) + (iVar10 + 3) * 0x40 + 8);
 	*(int*)(psVar8 + 0x16) = 2;
 	*(int*)(psVar8 + 0xe) = 0x2e;
 	*psVar8 = 0xa0;
@@ -274,10 +332,10 @@ void CMenuPcs::CmdInit1()
 	*(int*)(psVar8 + 0x12) = 0;
 	*(int*)(psVar8 + 0x14) = 5;
 
-	psVar9 = *(s16**)((u8*)this + 0x850) + **(s16**)((u8*)this + 0x850) * 0x20 + 4;
+	psVar9 = GetCmdList(this) + *GetCmdList(this) * 0x20 + 4;
 	iVar10 = 4;
 	do {
-		psVar8 = (s16*)(*(int*)((u8*)this + 0x850) + iVar13 + 8);
+		psVar8 = (s16*)(GetCmdListBase(this) + iVar13 + 8);
 		psVar8[0x16] = 0;
 		psVar8[0x17] = 2;
 		psVar8[0xe] = 0;
@@ -297,7 +355,7 @@ void CMenuPcs::CmdInit1()
 
 		iVar11 = iVar13 + 0x48;
 		iVar13 += 0x80;
-		psVar8 = (s16*)(*(int*)((u8*)this + 0x850) + iVar11);
+		psVar8 = (s16*)(GetCmdListBase(this) + iVar11);
 		psVar8[0x16] = 0;
 		psVar8[0x17] = 2;
 		psVar8[0xe] = 0;
@@ -316,9 +374,9 @@ void CMenuPcs::CmdInit1()
 		psVar8[0x15] = 5;
 		iVar10 -= 1;
 	} while (iVar10 != 0);
-	*(s16*)(*(int*)((u8*)this + 0x850) + 2) = (s16)iVar12;
+	*(s16*)(GetCmdListBase(this) + 2) = (s16)iVar12;
 
-	psVar8 = *(s16**)((u8*)this + 0x850);
+	psVar8 = GetCmdList(this);
 	uVar5 = (u32)((int)psVar8[1] - (int)*psVar8);
 	psVar8 = psVar8 + *psVar8 * 0x20 + 4;
 	if ((int)uVar5 > 0) {
@@ -388,7 +446,7 @@ void CMenuPcs::CmdInit2()
 	int iVar6;
 
 	uVar4 = 0x2f;
-	psVar7 = *(s16**)((u8*)this + 0x850);
+	psVar7 = GetCmdList(this);
 	sVar1 = *psVar7;
 	iVar3 = (int)sVar1;
 	(psVar7 + iVar3 * 0x20 + 0x12)[0] = 0;
@@ -397,69 +455,69 @@ void CMenuPcs::CmdInit2()
 	(psVar7 + iVar3 * 0x20 + 0x16)[1] = 2;
 	(psVar7 + iVar3 * 0x20 + 0x18)[0] = 0;
 	(psVar7 + iVar3 * 0x20 + 0x18)[1] = 5;
-	iVar6 = *(int*)((u8*)this + 0x850) + (iVar3 + 1) * 0x40 + 8;
-	if (*(s16*)((u8*)this + 0x864) == 0) {
+	iVar6 = GetCmdListBase(this) + (iVar3 + 1) * 0x40 + 8;
+	if (GetCmdLayoutFlag(this) == 0) {
 		uVar4 = 0x46;
 	}
 	*(u32*)(iVar6 + 0x1c) = uVar4;
 	*(u32*)(iVar6 + 0x24) = 7;
 	uVar4 = 0x2f;
 	*(u32*)(iVar6 + 0x28) = 5;
-	iVar6 = *(int*)((u8*)this + 0x850) + (iVar3 + 2) * 0x40 + 8;
-	if (*(s16*)((u8*)this + 0x864) == 0) {
+	iVar6 = GetCmdListBase(this) + (iVar3 + 2) * 0x40 + 8;
+	if (GetCmdLayoutFlag(this) == 0) {
 		uVar4 = 0x46;
 	}
 	*(u32*)(iVar6 + 0x1c) = uVar4;
 	*(u32*)(iVar6 + 0x24) = 7;
 	*(u32*)(iVar6 + 0x28) = 5;
-	iVar6 = *(int*)((u8*)this + 0x850) + (iVar3 + 3) * 0x40 + 8;
+	iVar6 = GetCmdListBase(this) + (iVar3 + 3) * 0x40 + 8;
 	*(u32*)(iVar6 + 0x2c) = 2;
 	*(u32*)(iVar6 + 0x1c) = 0x2e;
 	*(u32*)(iVar6 + 0x24) = 7;
 	*(u32*)(iVar6 + 0x28) = 5;
-	iVar6 = *(int*)((u8*)this + 0x850) + (iVar3 + 4) * 0x40 + 8;
+	iVar6 = GetCmdListBase(this) + (iVar3 + 4) * 0x40 + 8;
 	*(u32*)(iVar6 + 0x2c) = 2;
 	*(u32*)(iVar6 + 0x1c) = 0x37;
 	*(u32*)(iVar6 + 0x24) = 0;
 	*(u32*)(iVar6 + 0x28) = 5;
-	iVar6 = *(int*)((u8*)this + 0x850) + (iVar3 + 5) * 0x40 + 8;
+	iVar6 = GetCmdListBase(this) + (iVar3 + 5) * 0x40 + 8;
 	*(u32*)(iVar6 + 0x2c) = 2;
 	*(u32*)(iVar6 + 0x1c) = 0x37;
 	*(u32*)(iVar6 + 0x24) = 0;
 	*(u32*)(iVar6 + 0x28) = 5;
-	iVar6 = *(int*)((u8*)this + 0x850) + (iVar3 + 6) * 0x40 + 8;
+	iVar6 = GetCmdListBase(this) + (iVar3 + 6) * 0x40 + 8;
 	*(u32*)(iVar6 + 0x2c) = 2;
 	*(u32*)(iVar6 + 0x1c) = 0x37;
 	*(u32*)(iVar6 + 0x24) = 0;
 	*(u32*)(iVar6 + 0x28) = 5;
-	iVar6 = *(int*)((u8*)this + 0x850) + (iVar3 + 7) * 0x40 + 8;
+	iVar6 = GetCmdListBase(this) + (iVar3 + 7) * 0x40 + 8;
 	*(u32*)(iVar6 + 0x2c) = 2;
 	*(u32*)(iVar6 + 0x1c) = 0x37;
 	*(u32*)(iVar6 + 0x24) = 0;
 	*(u32*)(iVar6 + 0x28) = 5;
-	iVar6 = *(int*)((u8*)this + 0x850) + (iVar3 + 8) * 0x40 + 8;
+	iVar6 = GetCmdListBase(this) + (iVar3 + 8) * 0x40 + 8;
 	*(u32*)(iVar6 + 0x2c) = 2;
 	*(u32*)(iVar6 + 0x1c) = 0x37;
 	*(u32*)(iVar6 + 0x24) = 0;
 	*(u32*)(iVar6 + 0x28) = 5;
-	iVar6 = *(int*)((u8*)this + 0x850) + (iVar3 + 9) * 0x40 + 8;
+	iVar6 = GetCmdListBase(this) + (iVar3 + 9) * 0x40 + 8;
 	*(u32*)(iVar6 + 0x2c) = 2;
 	*(u32*)(iVar6 + 0x1c) = 0x37;
 	*(u32*)(iVar6 + 0x24) = 0;
 	*(u32*)(iVar6 + 0x28) = 5;
 	fVar2 = FLOAT_80332a70;
-	iVar6 = *(int*)((u8*)this + 0x850) + (iVar3 + 10) * 0x40 + 8;
+	iVar6 = GetCmdListBase(this) + (iVar3 + 10) * 0x40 + 8;
 	*(u32*)(iVar6 + 0x2c) = 2;
 	*(u32*)(iVar6 + 0x1c) = 0x37;
 	*(u32*)(iVar6 + 0x24) = 0;
 	*(u32*)(iVar6 + 0x28) = 5;
-	iVar3 = *(int*)((u8*)this + 0x850) + (iVar3 + 0xb) * 0x40 + 8;
+	iVar3 = GetCmdListBase(this) + (iVar3 + 0xb) * 0x40 + 8;
 	*(u32*)(iVar3 + 0x2c) = 2;
 	*(u32*)(iVar3 + 0x1c) = 0x37;
 	*(u32*)(iVar3 + 0x24) = 0;
 	*(u32*)(iVar3 + 0x28) = 5;
-	*(s16*)(*(int*)((u8*)this + 0x850) + 2) = sVar1 + 0xc;
-	psVar7 = *(s16**)((u8*)this + 0x850);
+	*(s16*)(GetCmdListBase(this) + 2) = sVar1 + 0xc;
+	psVar7 = GetCmdList(this);
 	uVar5 = (u32)((int)psVar7[1] - (int)*psVar7);
 	psVar7 = psVar7 + *psVar7 * 0x20 + 4;
 	if ((int)uVar5 > 0) {
@@ -520,8 +578,8 @@ void CMenuPcs::CmdInit2()
 void CMenuPcs::CmdOpen()
 {
 	u8* self = reinterpret_cast<u8*>(this);
-	s16* cmd = *reinterpret_cast<s16**>(self + 0x82c);
-	s16* list = *reinterpret_cast<s16**>(self + 0x850);
+	s16* cmd = GetCmdState(this);
+	s16* list = GetCmdList(this);
 
 	if (*reinterpret_cast<u8*>(reinterpret_cast<u8*>(cmd) + 0x0b) == 0) {
 		CmdInit();
@@ -647,7 +705,7 @@ void CMenuPcs::CmdCtrl()
 	u8* self = reinterpret_cast<u8*>(this);
 	u32 actionHandled = 0;
 	s32 caravanWork = Game.game.m_scriptFoodBase[0];
-	s32 cmd = *reinterpret_cast<s32*>(self + 0x82c);
+	s32 cmd = GetCmdStateBase(this);
 
 	CalcStatus__12CCaravanWorkFv(reinterpret_cast<void*>(caravanWork));
 
@@ -725,7 +783,7 @@ void CMenuPcs::CmdCtrl()
 			}
 		}
 
-		s16* list = *reinterpret_cast<s16**>(self + 0x850);
+		s16* list = GetCmdList(this);
 		float minAnim = static_cast<float>(DOUBLE_80332a60);
 		double timer = static_cast<double>(static_cast<s32>(*reinterpret_cast<s16*>(cmd + 0x22)));
 		double anim = -((DOUBLE_80332a68 * timer) - DOUBLE_80332a58);
@@ -760,7 +818,7 @@ void CMenuPcs::CmdCtrl()
 		return;
 	}
 
-	s16* list = *reinterpret_cast<s16**>(self + 0x850);
+	s16* list = GetCmdList(this);
 	for (s32 i = 0; i < static_cast<s32>(list[0]); i++) {
 		*reinterpret_cast<float*>(list + i * 0x20 + 0x0c) = FLOAT_80332a70;
 		*reinterpret_cast<float*>(list + i * 0x20 + 0x0e) = FLOAT_80332a70;
@@ -787,7 +845,7 @@ void CMenuPcs::CmdCtrl()
 int CMenuPcs::CmdClose()
 {
 	u8* self = reinterpret_cast<u8*>(this);
-	s32 cmd = *reinterpret_cast<s32*>(self + 0x82c);
+	s32 cmd = GetCmdStateBase(this);
 	if (*reinterpret_cast<u8*>(cmd + 8) == 0) {
 		if (UniteCloseAnim(-1) != 0) {
 			*reinterpret_cast<s16*>(cmd + 0x22) = 0;
@@ -799,7 +857,7 @@ int CMenuPcs::CmdClose()
 	s32 doneCount = 0;
 	*reinterpret_cast<s16*>(cmd + 0x22) = *reinterpret_cast<s16*>(cmd + 0x22) + 1;
 
-	s16* list = *reinterpret_cast<s16**>(self + 0x850);
+	s16* list = GetCmdList(this);
 	u32 count = static_cast<u32>(list[0]);
 	s16* entry = list + 4;
 	s32 closeTimer = static_cast<s32>(*reinterpret_cast<s16*>(cmd + 0x22));
@@ -910,8 +968,8 @@ int CMenuPcs::CmdClose()
 void CMenuPcs::CmdDraw()
 {
 	u8* self = reinterpret_cast<u8*>(this);
-	s16* cmdState = *reinterpret_cast<s16**>(self + 0x82C);
-	s16* drawList = *reinterpret_cast<s16**>(self + 0x850);
+	s16* cmdState = GetCmdState(this);
+	s16* drawList = GetCmdList(this);
 	const s32 caravanWork = Game.game.m_scriptFoodBase[0];
 	s32 caravanIter = caravanWork;
 	s16* entry = drawList + 4;
@@ -961,7 +1019,7 @@ void CMenuPcs::CmdDraw()
 		entry += 0x20;
 	}
 
-	CFont* nameFont = *reinterpret_cast<CFont**>(self + 0x108);
+	CFont* nameFont = GetMenuCmdMembers(this).m_nameFont;
 	SetMargin__5CFontFf(FLOAT_80332a70, nameFont);
 	SetShadow__5CFontFi(nameFont, 0);
 	SetScale__5CFontFf(FLOAT_80332ad8, nameFont);
@@ -1047,15 +1105,15 @@ void CMenuPcs::CmdDraw()
 		if ((cmdMode == 0) || (cmdMode == 3)) {
 			s32 index = *reinterpret_cast<s16*>(reinterpret_cast<u8*>(cmdState) + cmdMode * 2 + 0x26);
 			if (*reinterpret_cast<s16*>(caravanWork + index * 2 + 0x214) == 0) {
-				cursorEntry = reinterpret_cast<s16*>(*reinterpret_cast<s32*>(self + 0x850) + index * 0x40 + 8);
+				cursorEntry = reinterpret_cast<s16*>(GetCmdListBase(this) + index * 0x40 + 8);
 			} else {
 				s32 uniteIdx = 0;
 				while ((uniteIdx < DAT_8032eec8) && (s_UniteTop[uniteIdx] != index)) {
 					uniteIdx++;
 				}
 				cursorEntry = reinterpret_cast<s16*>(
-				    *reinterpret_cast<s32*>(self + 0x850) +
-				    (*reinterpret_cast<s16*>(*reinterpret_cast<s32*>(self + 0x850) + 2) + uniteIdx) * 0x40 + 8);
+				    GetCmdListBase(this) +
+				    (*reinterpret_cast<s16*>(GetCmdListBase(this) + 2) + uniteIdx) * 0x40 + 8);
 			}
 			cursorX = static_cast<float>(cursorEntry[0] - 0x14);
 			cursorY = static_cast<float>(cursorEntry[1]);
@@ -1083,8 +1141,8 @@ void CMenuPcs::CmdDraw()
 			cursorY = static_cast<float>(scan[1]);
 		} else {
 			s16* panel = reinterpret_cast<s16*>(
-			    *reinterpret_cast<s32*>(self + 0x850) +
-			    (*reinterpret_cast<s16*>(*reinterpret_cast<s32*>(self + 0x850) + 2) + 3) * 0x40 + 8);
+			    GetCmdListBase(this) +
+			    (*reinterpret_cast<s16*>(GetCmdListBase(this) + 2) + 3) * 0x40 + 8);
 			const s32 choices = (DOUBLE_80332a58 == static_cast<double>(*reinterpret_cast<float*>(panel + 10))) ? 2 : 3;
 			const float pitch = static_cast<float>(
 			    ((static_cast<float>(panel[3]) * *reinterpret_cast<float*>(panel + 10)) - DOUBLE_80332b20) /
@@ -1136,7 +1194,7 @@ void CMenuPcs::CmdDraw()
 	helpColor.b = 0xFF;
 	helpColor.a = static_cast<u8>(FLOAT_80332acc * helpAlpha);
 	DrawHelpMessage__8CMenuPcsFiP5CFontii8_GXColoriff(
-	    this, helpId, *reinterpret_cast<CFont**>(self + 0xF8), 0, static_cast<s32>(-FLOAT_80332b28), helpColor, 0,
+	    this, helpId, GetMenuCmdMembers(this).m_helpFont, 0, static_cast<s32>(-FLOAT_80332b28), helpColor, 0,
 	    FLOAT_80332a88, FLOAT_80332b08);
 }
 
@@ -1179,7 +1237,7 @@ unsigned int CMenuPcs::CmdCtrlCur()
 		return 0;
 	}
 
-	s16* menuState = *reinterpret_cast<s16**>(reinterpret_cast<u8*>(this) + 0x82C);
+	s16* menuState = GetCmdState(this);
 	int mode = menuState[0x18];
 
 	if (mode == 0) {
@@ -1352,8 +1410,8 @@ unsigned int CMenuPcs::CmdCtrlCur()
 	} else if (mode == 2) {
 		int maxPos;
 		if (DOUBLE_80332a58 == static_cast<double>(*reinterpret_cast<float*>(
-		                         reinterpret_cast<u8*>(*reinterpret_cast<s16**>(reinterpret_cast<u8*>(this) + 0x850)) +
-		                         ((*reinterpret_cast<s16*>(*reinterpret_cast<s16**>(reinterpret_cast<u8*>(this) + 0x850) + 2) + 3) * 0x40 + 0x1C)))) {
+		                         reinterpret_cast<u8*>(GetCmdList(this)) +
+		                         ((GetCmdList(this)[1] + 3) * 0x40 + 0x1C)))) {
 			maxPos = 2;
 		} else {
 			maxPos = 3;
@@ -1469,16 +1527,16 @@ unsigned int CMenuPcs::CmdOpen0()
 	s32 iVar7;
 	s32 iVar8;
 
-	*reinterpret_cast<s16*>(*reinterpret_cast<s32*>((u8*)this + 0x82c) + 0x22) =
-		static_cast<s16>(*reinterpret_cast<s16*>(*reinterpret_cast<s32*>((u8*)this + 0x82c) + 0x22) + 1);
-	const s32 iVar4 = static_cast<s32>(*reinterpret_cast<s16*>(*reinterpret_cast<s32*>((u8*)this + 0x82c) + 0x22));
-	s32 iVar6 = static_cast<s32>(*reinterpret_cast<s16*>(*reinterpret_cast<s32*>((u8*)this + 0x82c) + 0x26)) * 0x40 + 8;
+	*reinterpret_cast<s16*>(GetCmdStateBase(this) + 0x22) =
+		static_cast<s16>(*reinterpret_cast<s16*>(GetCmdStateBase(this) + 0x22) + 1);
+	const s32 iVar4 = static_cast<s32>(*reinterpret_cast<s16*>(GetCmdStateBase(this) + 0x22));
+	s32 iVar6 = static_cast<s32>(*reinterpret_cast<s16*>(GetCmdStateBase(this) + 0x26)) * 0x40 + 8;
 	if (iVar4 < 5) {
-		*reinterpret_cast<s16*>(*reinterpret_cast<s32*>((u8*)this + 0x850) + iVar6) =
-			static_cast<s16>(*reinterpret_cast<s16*>(*reinterpret_cast<s32*>((u8*)this + 0x850) + iVar6) - 0x13);
+		*reinterpret_cast<s16*>(GetCmdListBase(this) + iVar6) =
+			static_cast<s16>(*reinterpret_cast<s16*>(GetCmdListBase(this) + iVar6) - 0x13);
 	}
 
-	psVar5 = *reinterpret_cast<s16**>((u8*)this + 0x850);
+	psVar5 = GetCmdList(this);
 	iVar7 = 0;
 	iVar8 = static_cast<s32>(psVar5[1]) - static_cast<s32>(psVar5[0]);
 	psVar5 = psVar5 + psVar5[0] * 0x20 + 4;
@@ -1535,18 +1593,18 @@ unsigned int CMenuPcs::CmdOpen0()
 unsigned int CMenuPcs::CmdClose0()
 {
 	u8* self = reinterpret_cast<u8*>(this);
-	u8* menuState = *reinterpret_cast<u8**>(self + 0x82c);
+	u8* menuState = reinterpret_cast<u8*>(GetCmdState(this));
 
 	*reinterpret_cast<s16*>(menuState + 0x22) = static_cast<s16>(*reinterpret_cast<s16*>(menuState + 0x22) + 1);
 	s32 time = static_cast<s32>(*reinterpret_cast<s16*>(menuState + 0x22));
 	s32 selectedOffset = static_cast<s32>(*reinterpret_cast<s16*>(menuState + 0x26)) * 0x40 + 8;
 
 	if (time > 7) {
-		*reinterpret_cast<s16*>(*reinterpret_cast<u8**>(self + 0x850) + selectedOffset) =
-		    static_cast<s16>(*reinterpret_cast<s16*>(*reinterpret_cast<u8**>(self + 0x850) + selectedOffset) + 0x13);
+		*reinterpret_cast<s16*>(reinterpret_cast<u8*>(GetCmdList(this)) + selectedOffset) =
+		    static_cast<s16>(*reinterpret_cast<s16*>(reinterpret_cast<u8*>(GetCmdList(this)) + selectedOffset) + 0x13);
 	}
 
-	s16* base = *reinterpret_cast<s16**>(self + 0x850);
+	s16* base = GetCmdList(this);
 	s32 doneCount = 0;
 	s32 entryCount = static_cast<s32>(base[1]) - static_cast<s32>(base[0]);
 	s16* entry = base + base[0] * 0x20 + 4;
@@ -1577,8 +1635,8 @@ unsigned int CMenuPcs::CmdClose0()
 	}
 
 	if (entryCount == doneCount) {
-		*reinterpret_cast<s16*>(*reinterpret_cast<u8**>(self + 0x850) + selectedOffset) =
-		    *reinterpret_cast<s16*>(*reinterpret_cast<u8**>(self + 0x850) + 8);
+		*reinterpret_cast<s16*>(reinterpret_cast<u8*>(GetCmdList(this)) + selectedOffset) =
+		    *reinterpret_cast<s16*>(reinterpret_cast<u8*>(GetCmdList(this)) + 8);
 	}
 
 	return static_cast<unsigned int>(entryCount == doneCount);
@@ -1672,7 +1730,7 @@ int CMenuPcs::ChkUnite(int selected, int (*comboOut)[2])
 {
 	u8* self = reinterpret_cast<u8*>(this);
 	const s32 caravanWork = Game.game.m_scriptFoodBase[0];
-	s16* const cmd = *reinterpret_cast<s16**>(self + 0x82c);
+	s16* const cmd = GetCmdState(this);
 
 	int candidates[10];
 	int itemKinds[11];
@@ -1895,8 +1953,8 @@ void CMenuPcs::CmdDismantle(int)
 void CMenuPcs::DrawUniteList()
 {
 	const s32 caravanWork = Game.game.m_scriptFoodBase[0];
-	s16* const list = *reinterpret_cast<s16**>((u8*)this + 0x850);
-	const s16* const cmd = *reinterpret_cast<s16**>((u8*)this + 0x82C);
+	s16* const list = GetCmdList(this);
+	const s16* const cmd = GetCmdState(this);
 	const s16 selected = cmd[0x26 / 2];
 	const s16 foodCount = *reinterpret_cast<const s16*>(caravanWork + 0xBAA);
 
@@ -1949,7 +2007,7 @@ void CMenuPcs::DrawUniteList()
 			FLOAT_80332a70);
 	}
 
-	CFont* const font = *reinterpret_cast<CFont**>((u8*)this + 0xF8);
+	CFont* const font = GetMenuCmdMembers(this).m_helpFont;
 	SetMargin__5CFontFf(FLOAT_80332a70, font);
 	SetShadow__5CFontFi(font, 1);
 	SetScale__5CFontFf(FLOAT_80332ad8, font);
@@ -2045,7 +2103,7 @@ void CMenuPcs::DrawUniteList()
  */
 int CMenuPcs::UniteOpenAnim(int topIdx)
 {
-	double baseX = static_cast<double>(*reinterpret_cast<s16*>(*reinterpret_cast<int*>((u8*)this + 0x850) + 8));
+	double baseX = static_cast<double>(*reinterpret_cast<s16*>(GetCmdListBase(this) + 8));
 	int caravanWork = Game.game.m_scriptFoodBase[0];
 
 	if (DAT_8032eec8 == 0) {
@@ -2060,7 +2118,7 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 			int j = 0;
 			int k = 3;
 			do {
-				int listBase = *reinterpret_cast<int*>((u8*)this + 0x850);
+				int listBase = GetCmdListBase(this);
 				int idx = j + *top;
 				int entry = idx * 0x40 + 8;
 				if ((j != 0) && (*reinterpret_cast<s16*>(caravanWork + idx * 2 + 0x214) != -1)) {
@@ -2090,7 +2148,7 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
 		int i = 0;
 		int k = 3;
 		do {
-			int listBase = *reinterpret_cast<int*>((u8*)this + 0x850);
+			int listBase = GetCmdListBase(this);
 			int idx = i + s_UniteTop[topIdx];
 			int entry = idx * 0x40 + 8;
 			if ((i != 0) && (*reinterpret_cast<s16*>(caravanWork + idx * 2 + 0x214) != -1)) {
@@ -2125,7 +2183,7 @@ int CMenuPcs::UniteOpenAnim(int topIdx)
  */
 int CMenuPcs::UniteCloseAnim(int topIdx)
 {
-	double baseX = static_cast<double>(*reinterpret_cast<s16*>(*reinterpret_cast<int*>((u8*)this + 0x850) + 8));
+	double baseX = static_cast<double>(*reinterpret_cast<s16*>(GetCmdListBase(this) + 8));
 	int caravanWork = Game.game.m_scriptFoodBase[0];
 
 	if (DAT_8032eec8 == 0) {
@@ -2139,7 +2197,7 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 			int j = 0;
 			int k = 3;
 			do {
-				int listBase = *reinterpret_cast<int*>((u8*)this + 0x850);
+				int listBase = GetCmdListBase(this);
 				int idx = j + *top;
 				int entry = idx * 0x40 + 8;
 				if ((j != 0) && (*reinterpret_cast<s16*>(caravanWork + idx * 2 + 0x214) != -1)) {
@@ -2168,7 +2226,7 @@ int CMenuPcs::UniteCloseAnim(int topIdx)
 		int i = 0;
 		int k = 3;
 		do {
-			int listBase = *reinterpret_cast<int*>((u8*)this + 0x850);
+			int listBase = GetCmdListBase(this);
 			int idx = i + s_UniteTop[topIdx];
 			int entry = idx * 0x40 + 8;
 			if ((i != 0) && (*reinterpret_cast<s16*>(caravanWork + idx * 2 + 0x214) != -1)) {
@@ -2206,8 +2264,8 @@ unsigned int CMenuPcs::CmdOpen1()
 {
 	u8* self = reinterpret_cast<u8*>(this);
 	const s32 caravanWork = Game.game.m_scriptFoodBase[0];
-	const s32 cmd = *reinterpret_cast<s32*>(self + 0x82c);
-	const s32 list = *reinterpret_cast<s32*>(self + 0x850);
+	const s32 cmd = GetCmdStateBase(this);
+	const s32 list = GetCmdListBase(this);
 
 	*reinterpret_cast<s16*>(cmd + 0x22) = static_cast<s16>(*reinterpret_cast<s16*>(cmd + 0x22) + 1);
 
@@ -2284,8 +2342,8 @@ unsigned int CMenuPcs::CmdClose1()
 {
 	u8* self = reinterpret_cast<u8*>(this);
 	s32 caravanWork = Game.game.m_scriptFoodBase[0];
-	s32 cmd = *reinterpret_cast<s32*>(self + 0x82c);
-	s16* list = *reinterpret_cast<s16**>(self + 0x850);
+	s32 cmd = GetCmdStateBase(this);
+	s16* list = GetCmdList(this);
 
 	*reinterpret_cast<s16*>(cmd + 0x22) = static_cast<s16>(*reinterpret_cast<s16*>(cmd + 0x22) + 1);
 	const s16 timer = *reinterpret_cast<s16*>(cmd + 0x22);
@@ -2414,8 +2472,8 @@ void CMenuPcs::CmdOpen2()
 unsigned int CMenuPcs::CmdClose2()
 {
 	u8* self = reinterpret_cast<u8*>(this);
-	s16* const cmd = *reinterpret_cast<s16**>(self + 0x82c);
-	s16* const list = *reinterpret_cast<s16**>(self + 0x850);
+	s16* const cmd = GetCmdState(this);
+	s16* const list = GetCmdList(this);
 	const s32 caravanWork = Game.game.m_scriptFoodBase[0];
 
 	const s32 selected = static_cast<s32>(cmd[0x13]);

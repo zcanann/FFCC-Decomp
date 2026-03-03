@@ -6,6 +6,7 @@
 #include <dolphin/mtx.h>
 
 extern unsigned char* lbl_8032ED50;
+extern float FLOAT_80330700;
 extern unsigned char CFlat[];
 
 /*
@@ -27,9 +28,9 @@ void pppParHitSphMat(void* param1, void* param2, void* param3)
     u8* pppMngSt = pppMngStTmp;
     f32 radius;
 
-    local_88.z = 0.0f;
-    local_88.y = 0.0f;
-    local_88.x = 0.0f;
+    local_88.z = FLOAT_80330700;
+    local_88.y = FLOAT_80330700;
+    local_88.x = FLOAT_80330700;
 
     if (step[0xC] != 0) {
         s32* offsets = *(s32**)((u8*)param3 + 0xC);
@@ -48,7 +49,7 @@ void pppParHitSphMat(void* param1, void* param2, void* param3)
         local_94.z = local_94.z + src->z;
     }
 
-    if (*(f32*)(step + 4) != 0.0f) {
+    if (*(f32*)(step + 4) != FLOAT_80330700) {
         PSVECSubtract((Vec*)(pppMngSt + 8), (Vec*)(pppMngSt + 0x48), &local_88);
     }
 

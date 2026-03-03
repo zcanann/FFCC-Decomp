@@ -2,11 +2,11 @@
 #include "ffcc/math.h"
 #include "types.h"
 
-extern CMath math;
+extern CMath math[];
 extern s32 lbl_8032ED70;
 extern f32 lbl_8032FFB8;
 extern f64 lbl_8032FFC0;
-extern s32 lbl_801EADC8;
+extern s32 lbl_801EADC8[];
 
 extern "C" {
 f32 RandF__5CMathFv(CMath*);
@@ -43,29 +43,30 @@ void pppRandIV(void* param1, void* param2, void* param3)
     PppRandIVParam3* out = (PppRandIVParam3*)param3;
     f32* valuePtr;
     s32* target;
+    f32 value;
 
     if (lbl_8032ED70 != 0) {
         return;
     }
 
     if (in->field0 == *(s32*)(base + 0xC)) {
-        f32 value = RandF__5CMathFv(&math);
+        value = RandF__5CMathFv(&math[0]);
         if (in->field18 != 0) {
-            value += RandF__5CMathFv(&math);
+            value += RandF__5CMathFv(&math[0]);
         } else {
             value *= lbl_8032FFB8;
         }
 
-        valuePtr = (f32*)(base + *out->fieldC + 0x80);
-        *valuePtr = value;
-    } else if (in->field0 != *(s32*)(base + 0xC)) {
-        return;
-    } else {
-        valuePtr = (f32*)(base + *out->fieldC + 0x80);
+        *(f32*)(base + *out->fieldC + 0x80) = value;
     }
 
+    if (in->field0 != *(s32*)(base + 0xC)) {
+        return;
+    }
+
+    valuePtr = (f32*)(base + *out->fieldC + 0x80);
     if (in->field4 == -1) {
-        target = &lbl_801EADC8;
+        target = &lbl_801EADC8[0];
     } else {
         target = (s32*)(base + in->field4 + 0x80);
     }

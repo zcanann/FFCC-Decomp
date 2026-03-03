@@ -2,6 +2,11 @@
 #include "ffcc/partMng.h"
 #include <dolphin/mtx.h>
 
+extern "C" {
+extern unsigned char* lbl_8032ED50;
+extern Mtx ppvCameraMatrix02;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x800c4dd8
@@ -14,11 +19,10 @@
 void pppWDrawMatrixLoop(_pppPObject* param_1)
 {
     char* base = (char*)param_1;
-    Mtx* worldMtx = (Mtx*)(base + 0x38);
 
-    PSMTXConcat(ppvCameraMatrix0, *(Mtx*)(base + 0x4), *worldMtx);
+    PSMTXConcat(ppvCameraMatrix02, *(Mtx*)(base + 0x10), *(Mtx*)(base + 0x40));
 
-    PSVECScale((Vec*)(base + 0x40), (Vec*)(base + 0x40), *(float*)((char*)pppMngStPtr + 0x64));
-    PSVECScale((Vec*)(base + 0x50), (Vec*)(base + 0x50), *(float*)((char*)pppMngStPtr + 0x68));
-    PSVECScale((Vec*)(base + 0x60), (Vec*)(base + 0x60), *(float*)((char*)pppMngStPtr + 0x6c));
+    PSVECScale((Vec*)(base + 0x40), (Vec*)(base + 0x40), *(float*)(lbl_8032ED50 + 0x28));
+    PSVECScale((Vec*)(base + 0x50), (Vec*)(base + 0x50), *(float*)(lbl_8032ED50 + 0x2c));
+    PSVECScale((Vec*)(base + 0x60), (Vec*)(base + 0x60), *(float*)(lbl_8032ED50 + 0x30));
 }

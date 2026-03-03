@@ -1,6 +1,7 @@
 #include "ffcc/pppFilter.h"
 #include "ffcc/mapmesh.h"
 #include "ffcc/util.h"
+#include <stddef.h>
 
 class CMaterialSet;
 struct _pppEnvStLite {

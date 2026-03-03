@@ -60,6 +60,7 @@ void CMaterialEditorPcs::ResetRsdList(ZLIST* zlist)
 				__dla__FPv((void*)listItem[1]);
 				listItem[1] = 0;
 			}
+			listItem[1] = 0;
 		}
 		__dl__FPv(listItem);
 	}

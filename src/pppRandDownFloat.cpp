@@ -46,7 +46,8 @@ void pppRandDownFloat(void* param1, void* param2, void* param3)
     if (id == 0) {
         f32 value = -RandF__5CMathFv(math);
         if (p2->randomTwice != 0) {
-            value = lbl_8032FF38 * (value - RandF__5CMathFv(math));
+            f32 randomValue = value - RandF__5CMathFv(math);
+            value = randomValue * lbl_8032FF38;
         }
 
         valuePtr = (f32*)(base + *p3->outputOffset + 0x80);

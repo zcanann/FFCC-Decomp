@@ -526,7 +526,11 @@ config.libs = [
             Object(NonMatching, "pppGetRotMatrixZ.cpp"),
             Object(NonMatching, "pppGetRotMatrixZXY.cpp"),
             Object(NonMatching, "pppGetRotMatrixZYX.cpp"),
-            Object(NonMatching, "pppKeDMat.cpp"),
+            Object(
+                NonMatching,
+                "pppKeDMat.cpp",
+                cflags=[*cflags_game, "-use_lmw_stmw on"],
+            ),
             Object(NonMatching, "pppKeLns.cpp"),
             Object(NonMatching, "pppKeShpTail.cpp"),
             Object(NonMatching, "pppKeShpTail2X.cpp"),

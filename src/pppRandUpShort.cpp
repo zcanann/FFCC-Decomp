@@ -12,7 +12,7 @@ extern "C" f32 RandF__5CMathFv(CMath* instance);
 struct RandUpShortParam {
     s32 targetId;
     s32 sourceOffset;
-    s16 scale;
+    u16 scale;
     u8 randomTwice;
 };
 
@@ -46,7 +46,7 @@ extern "C" void pppRandUpShort(void* param1, void* param2, void* param3)
     if (state == 0) {
         f32 value = RandF__5CMathFv(&math[0]);
         if (in->randomTwice != 0) {
-            value = lbl_80330038 * (value + RandF__5CMathFv(&math[0]));
+            value = (value + RandF__5CMathFv(&math[0])) * lbl_80330038;
         }
 
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
@@ -59,7 +59,7 @@ extern "C" void pppRandUpShort(void* param1, void* param2, void* param3)
     }
 
     if (in->sourceOffset == -1) {
-        target = lbl_801EADC8;
+        target = &lbl_801EADC8[0];
     } else {
         target = (s16*)(base + in->sourceOffset + 0x80);
     }
@@ -71,11 +71,10 @@ extern "C" void pppRandUpShort(void* param1, void* param2, void* param3)
             u32 lo;
         } parts;
     } cvt;
-    s16 scale = in->scale;
+    u16 scale = in->scale;
     cvt.parts.hi = 0x43300000;
-    cvt.parts.lo = (u16)scale;
+    cvt.parts.lo = scale;
 
-    f32 value = *valuePtr;
-    s32 delta = (s32)((cvt.d - lbl_80330040) * value);
+    s32 delta = (s32)((cvt.d - lbl_80330040) * *valuePtr);
     *target = (s16)(*target + delta);
 }

@@ -48,6 +48,59 @@ extern "C" void SetPosX__5CFontFf(float, CFont*);
 extern "C" void SetPosY__5CFontFf(float, CFont*);
 extern "C" void Draw__5CFontFPc(CFont*, const char*);
 
+namespace {
+struct MenuArtiMembers {
+	unsigned char pad_0000[0xF8];
+	CFont* m_helpFont;
+	unsigned char pad_00FC[0x0C];
+	CFont* m_listFont;
+	unsigned char pad_010C[0x720];
+	s16* m_artiState;
+	unsigned char pad_0830[0x20];
+	s16* m_artiList;
+};
+
+STATIC_ASSERT(offsetof(MenuArtiMembers, m_helpFont) == 0xF8);
+STATIC_ASSERT(offsetof(MenuArtiMembers, m_listFont) == 0x108);
+STATIC_ASSERT(offsetof(MenuArtiMembers, m_artiState) == 0x82C);
+STATIC_ASSERT(offsetof(MenuArtiMembers, m_artiList) == 0x850);
+
+static inline MenuArtiMembers& GetMenuArtiMembers(CMenuPcs* menu)
+{
+	return *reinterpret_cast<MenuArtiMembers*>(menu);
+}
+
+static inline s16* GetArtiState(CMenuPcs* menu)
+{
+	return GetMenuArtiMembers(menu).m_artiState;
+}
+
+static inline s16* GetArtiList(CMenuPcs* menu)
+{
+	return GetMenuArtiMembers(menu).m_artiList;
+}
+
+static inline int GetArtiStateBase(CMenuPcs* menu)
+{
+	return reinterpret_cast<int>(GetArtiState(menu));
+}
+
+static inline int GetArtiListBase(CMenuPcs* menu)
+{
+	return reinterpret_cast<int>(GetArtiList(menu));
+}
+
+static inline CFont* GetArtiListFont(CMenuPcs* menu)
+{
+	return GetMenuArtiMembers(menu).m_listFont;
+}
+
+static inline CFont* GetArtiHelpFont(CMenuPcs* menu)
+{
+	return GetMenuArtiMembers(menu).m_helpFont;
+}
+} // namespace
+
 struct ArtiFlatTableEntry
 {
 	int count;
@@ -111,9 +164,9 @@ void CMenuPcs::ArtiInit()
 	int iVar10;
 	int iVar11;
 
-	memset(*(void**)((char*)this + 0x850), 0, 0x1008);
+	memset((void*)GetArtiList(this), 0, 0x1008);
 	fVar2 = FLOAT_80332fac;
-	iVar5 = *(int*)((char*)this + 0x850) + 8;
+	iVar5 = GetArtiListBase(this) + 8;
 	iVar10 = 8;
 	do {
 		*(float*)(iVar5 + 0x14) = fVar2;
@@ -128,7 +181,7 @@ void CMenuPcs::ArtiInit()
 		iVar10 = iVar10 - 1;
 	} while (iVar10 != 0);
 
-	iVar5 = *(int*)((char*)this + 0x850);
+	iVar5 = GetArtiListBase(this);
 	*(int*)(iVar5 + 0x24) = 0x2e;
 	*(short*)(iVar5 + 8) = 0x68;
 	*(short*)(iVar5 + 10) = 0x28;
@@ -147,7 +200,7 @@ void CMenuPcs::ArtiInit()
 	*(int*)(iVar5 + 0x2c) = 5;
 	*(int*)(iVar5 + 0x30) = 5;
 	iVar5 = 0x100;
-	iVar10 = *(int*)((char*)this + 0x850);
+	iVar10 = GetArtiListBase(this);
 	*(int*)(iVar10 + 100) = 0x44;
 	*(short*)(iVar10 + 0x48) = 0x50;
 	*(short*)(iVar10 + 0x4a) = 0xe;
@@ -159,7 +212,7 @@ void CMenuPcs::ArtiInit()
 	*(int*)(iVar10 + 0x6c) = 0;
 	*(int*)(iVar10 + 0x70) = 5;
 
-	iVar10 = *(int*)((char*)this + 0x850);
+	iVar10 = GetArtiListBase(this);
 	*(int*)(iVar10 + 0xa4) = 0x44;
 	*(short*)(iVar10 + 0x88) = 0x55;
 	*(short*)(iVar10 + 0x8c) = 0x30;
@@ -171,7 +224,7 @@ void CMenuPcs::ArtiInit()
 	*(int*)(iVar10 + 0xac) = 0;
 	*(int*)(iVar10 + 0xb0) = 5;
 
-	iVar10 = *(int*)((char*)this + 0x850);
+	iVar10 = GetArtiListBase(this);
 	*(int*)(iVar10 + 0xf4) = 2;
 	*(int*)(iVar10 + 0xe4) = 0x2e;
 	*(short*)(iVar10 + 200) = 0x50;
@@ -183,10 +236,10 @@ void CMenuPcs::ArtiInit()
 	*(int*)(iVar10 + 0xec) = 0;
 	*(int*)(iVar10 + 0xf0) = 5;
 
-	iVar10 = *(int*)((char*)this + 0x850);
+	iVar10 = GetArtiListBase(this);
 	iVar11 = 4;
 	do {
-		psVar8 = (short*)(*(int*)((char*)this + 0x850) + iVar5 + 8);
+		psVar8 = (short*)(GetArtiListBase(this) + iVar5 + 8);
 		psVar8[0x16] = 0;
 		psVar8[0x17] = 2;
 		psVar8[0xe] = 0;
@@ -205,7 +258,7 @@ void CMenuPcs::ArtiInit()
 		psVar8[0x15] = 5;
 		iVar9 = iVar5 + 0x48;
 		iVar5 = iVar5 + 0x80;
-		psVar8 = (short*)(*(int*)((char*)this + 0x850) + iVar9);
+		psVar8 = (short*)(GetArtiListBase(this) + iVar9);
 		psVar8[0x16] = 0;
 		psVar8[0x17] = 2;
 		psVar8[0xe] = 0;
@@ -224,9 +277,9 @@ void CMenuPcs::ArtiInit()
 		iVar11 = iVar11 - 1;
 	} while (iVar11 != 0);
 
-	**(short**)((char*)this + 0x850) = sVar7;
-	*(short*)(*(int*)((char*)this + 0x82c) + 0x26) = 0;
-	*(char*)(*(int*)((char*)this + 0x82c) + 0xb) = 1;
+	*GetArtiList(this) = sVar7;
+	*(short*)(GetArtiStateBase(this) + 0x26) = 0;
+	*(char*)(GetArtiStateBase(this) + 0xb) = 1;
 }
 
 /*
@@ -246,67 +299,67 @@ void CMenuPcs::ArtiInit1()
 	unsigned int uVar4;
 	unsigned int uVar5;
 
-	iVar2 = *(int*)((char*)this + 0x850);
+	iVar2 = GetArtiListBase(this);
 	*(int*)(iVar2 + 0x24) = 0x2e;
 	*(int*)(iVar2 + 0x2c) = 2;
 	*(int*)(iVar2 + 0x30) = 5;
-	iVar2 = *(int*)((char*)this + 0x850);
+	iVar2 = GetArtiListBase(this);
 	*(int*)(iVar2 + 100) = 0x44;
 	*(int*)(iVar2 + 0x6c) = 7;
 	*(int*)(iVar2 + 0x70) = 5;
-	iVar2 = *(int*)((char*)this + 0x850);
+	iVar2 = GetArtiListBase(this);
 	*(int*)(iVar2 + 0xa4) = 0x44;
 	*(int*)(iVar2 + 0xac) = 7;
 	*(int*)(iVar2 + 0xb0) = 5;
-	iVar2 = *(int*)((char*)this + 0x850);
+	iVar2 = GetArtiListBase(this);
 	*(int*)(iVar2 + 0xf4) = 2;
 	*(int*)(iVar2 + 0xe4) = 0x2e;
 	*(int*)(iVar2 + 0xec) = 7;
 	*(int*)(iVar2 + 0xf0) = 5;
-	iVar2 = *(int*)((char*)this + 0x850);
+	iVar2 = GetArtiListBase(this);
 	*(int*)(iVar2 + 0x134) = 2;
 	*(int*)(iVar2 + 0x124) = 0x37;
 	*(int*)(iVar2 + 300) = 0;
 	*(int*)(iVar2 + 0x130) = 5;
-	iVar2 = *(int*)((char*)this + 0x850);
+	iVar2 = GetArtiListBase(this);
 	*(int*)(iVar2 + 0x174) = 2;
 	*(int*)(iVar2 + 0x164) = 0x37;
 	*(int*)(iVar2 + 0x16c) = 0;
 	*(int*)(iVar2 + 0x170) = 5;
-	iVar2 = *(int*)((char*)this + 0x850);
+	iVar2 = GetArtiListBase(this);
 	*(int*)(iVar2 + 0x1b4) = 2;
 	*(int*)(iVar2 + 0x1a4) = 0x37;
 	*(int*)(iVar2 + 0x1ac) = 0;
 	*(int*)(iVar2 + 0x1b0) = 5;
-	iVar2 = *(int*)((char*)this + 0x850);
+	iVar2 = GetArtiListBase(this);
 	*(int*)(iVar2 + 500) = 2;
 	*(int*)(iVar2 + 0x1e4) = 0x37;
 	fVar1 = FLOAT_80332fac;
 	*(int*)(iVar2 + 0x1ec) = 0;
 	*(int*)(iVar2 + 0x1f0) = 5;
-	iVar2 = *(int*)((char*)this + 0x850);
+	iVar2 = GetArtiListBase(this);
 	*(int*)(iVar2 + 0x234) = 2;
 	*(int*)(iVar2 + 0x224) = 0x37;
 	*(int*)(iVar2 + 0x22c) = 0;
 	*(int*)(iVar2 + 0x230) = 5;
-	iVar2 = *(int*)((char*)this + 0x850);
+	iVar2 = GetArtiListBase(this);
 	*(int*)(iVar2 + 0x274) = 2;
 	*(int*)(iVar2 + 0x264) = 0x37;
 	*(int*)(iVar2 + 0x26c) = 0;
 	*(int*)(iVar2 + 0x270) = 5;
-	iVar2 = *(int*)((char*)this + 0x850);
+	iVar2 = GetArtiListBase(this);
 	*(int*)(iVar2 + 0x2b4) = 2;
 	*(int*)(iVar2 + 0x2a4) = 0x37;
 	*(int*)(iVar2 + 0x2ac) = 0;
 	*(int*)(iVar2 + 0x2b0) = 5;
-	iVar2 = *(int*)((char*)this + 0x850);
+	iVar2 = GetArtiListBase(this);
 	*(int*)(iVar2 + 0x2f4) = 2;
 	*(int*)(iVar2 + 0x2e4) = 0x37;
 	*(int*)(iVar2 + 0x2ec) = 0;
 	*(int*)(iVar2 + 0x2f0) = 5;
 
-	uVar4 = (unsigned int)**(short**)((char*)this + 0x850);
-	psVar3 = *(short**)((char*)this + 0x850) + 4;
+	uVar4 = (unsigned int)*GetArtiList(this);
+	psVar3 = GetArtiList(this) + 4;
 	if (0 < (int)uVar4) {
 		uVar5 = uVar4 >> 3;
 		if (uVar5 != 0) {
@@ -364,8 +417,8 @@ void CMenuPcs::ArtiInit1()
  */
 unsigned int CMenuPcs::ArtiOpen()
 {
-	s16* artiState = *(s16**)((u8*)this + 0x82C);
-	s16* artiList = *(s16**)((u8*)this + 0x850);
+	s16* artiState = GetArtiState(this);
+	s16* artiList = GetArtiList(this);
 	int finished = 0;
 	int count = artiList[0];
 	ArtiOpenAnim* anim = (ArtiOpenAnim*)((u8*)artiList + 8);
@@ -413,7 +466,7 @@ int CMenuPcs::ArtiCtrl()
 {
 	int result;
 
-	*(short*)(*(int*)((char*)this + 0x82c) + 0x32) = *(short*)(*(int*)((char*)this + 0x82c) + 0x30);
+	*(short*)(GetArtiStateBase(this) + 0x32) = *(short*)(GetArtiStateBase(this) + 0x30);
 	result = ArtiCtrlCur();
 	if (result != 0) {
 		ArtiInit1();
@@ -433,8 +486,8 @@ int CMenuPcs::ArtiCtrl()
  */
 unsigned int CMenuPcs::ArtiClose()
 {
-	s16* artiState = *(s16**)((u8*)this + 0x82C);
-	s16* artiList = *(s16**)((u8*)this + 0x850);
+	s16* artiState = GetArtiState(this);
+	s16* artiList = GetArtiList(this);
 	int finished = 0;
 	int count = artiList[0];
 	ArtiOpenAnim* anim = (ArtiOpenAnim*)((u8*)artiList + 8);
@@ -489,9 +542,9 @@ void CMenuPcs::ArtiDraw()
 	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
 	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
 
-	short state = *(short*)(*(int*)((char*)this + 0x82c) + 0x10);
-	short* entry = (short*)(*(int*)((char*)this + 0x850) + 8);
-	int count = **(short**)((char*)this + 0x850);
+	short state = *(short*)(GetArtiStateBase(this) + 0x10);
+	short* entry = (short*)(GetArtiListBase(this) + 8);
+	int count = *GetArtiList(this);
 	int drawIndex = 0;
 
 	for (int i = 0; i < count; i++) {
@@ -542,13 +595,13 @@ void CMenuPcs::ArtiDraw()
 			} else {
 				float itemAlpha = alpha;
 				if (tex == 0x37) {
-					short itemCount = *(short*)(scriptFood + (drawIndex + *(short*)(*(int*)((char*)this + 0x82c) + 0x34)) * 2 + 0x136);
+					short itemCount = *(short*)(scriptFood + (drawIndex + *(short*)(GetArtiStateBase(this) + 0x34)) * 2 + 0x136);
 					if (itemCount < 1) {
 						tex = 0x34;
 						itemAlpha *= 0.5f;
 					}
 
-					if (tex == 0x37 && drawIndex == *(short*)(*(int*)((char*)this + 0x82c) + 0x26)) {
+					if (tex == 0x37 && drawIndex == *(short*)(GetArtiStateBase(this) + 0x26)) {
 						v += h;
 					}
 					drawIndex++;
@@ -563,14 +616,14 @@ void CMenuPcs::ArtiDraw()
 		entry += 0x20;
 	}
 
-	CFont* listFont = *(CFont**)((char*)this + 0x108);
+	CFont* listFont = GetArtiListFont(this);
 	SetMargin__5CFontFf(0.0f, listFont);
 	SetShadow__5CFontFi(listFont, 0);
 	SetScale__5CFontFf(0.875f, listFont);
 	DrawInit__5CFontFv(listFont);
 
-	short* listStart = (short*)(*(int*)((char*)this + 0x850) + 8);
-	int listCount = **(short**)((char*)this + 0x850);
+	short* listStart = (short*)(GetArtiListBase(this) + 8);
+	int listCount = *GetArtiList(this);
 	for (int i = 0; i < listCount; i++) {
 		if (*(int*)(listStart + 0xe) == 0x37) {
 			break;
@@ -584,14 +637,14 @@ void CMenuPcs::ArtiDraw()
 		GXColor color = {0xFF, 0xFF, 0xFF, alpha};
 		SetColor__5CFontF8_GXColor(listFont, &color);
 
-		int menuIndex = i + *(short*)(*(int*)((char*)this + 0x82c) + 0x34);
+		int menuIndex = i + *(short*)(GetArtiStateBase(this) + 0x34);
 		short itemCount = *(short*)(scriptFood + menuIndex * 2 + 0x136);
 		const char* text;
 		if (itemCount < 1) {
 			text = GetMenuStr__8CMenuPcsFi(this, 0x14);
 		} else {
 			text = flatData->table[0].strings[itemCount * 5 + 4];
-			if (menuIndex == (int)*(short*)(*(int*)((char*)this + 0x82c) + 0x26) + (int)*(short*)(*(int*)((char*)this + 0x82c) + 0x34)) {
+			if (menuIndex == (int)*(short*)(GetArtiStateBase(this) + 0x26) + (int)*(short*)(GetArtiStateBase(this) + 0x34)) {
 				hasSelectedArtifact = true;
 				selectedArtifactId = itemCount;
 			}
@@ -606,8 +659,8 @@ void CMenuPcs::ArtiDraw()
 
 	DrawInit__8CMenuPcsFv(this);
 
-	listStart = (short*)(*(int*)((char*)this + 0x850) + 8);
-	listCount = **(short**)((char*)this + 0x850);
+	listStart = (short*)(GetArtiListBase(this) + 8);
+	listCount = *GetArtiList(this);
 	for (int i = 0; i < listCount; i++) {
 		if (*(int*)(listStart + 0xe) == 0x37) {
 			break;
@@ -616,7 +669,7 @@ void CMenuPcs::ArtiDraw()
 	}
 
 	for (int i = 0; i < 8; i++) {
-		short itemCount = *(short*)(scriptFood + (i + *(short*)(*(int*)((char*)this + 0x82c) + 0x34)) * 2 + 0x136);
+		short itemCount = *(short*)(scriptFood + (i + *(short*)(GetArtiStateBase(this) + 0x34)) * 2 + 0x136);
 		if (itemCount > 0) {
 			int iconY = (int)((float)listStart[1] + 6.0f - 1.0f);
 			int iconX = (int)((float)(listStart[0] + listStart[2] - 0x10));
@@ -626,16 +679,16 @@ void CMenuPcs::ArtiDraw()
 	}
 
 	if (state == 1) {
-		int menuData = *(int*)((char*)this + 0x850);
-		float mark = CalcListPos__8CMenuPcsFiii(this, *(short*)(*(int*)((char*)this + 0x82c) + 0x34), 0x49, 0);
+		int menuData = GetArtiListBase(this);
+		float mark = CalcListPos__8CMenuPcsFiii(this, *(short*)(GetArtiStateBase(this) + 0x34), 0x49, 0);
 		if (mark > 0.0f) {
 			DrawListPosMark__8CMenuPcsFfff(this, (float)*(short*)(menuData + 8), (float)*(short*)(menuData + 10), mark);
 		}
 	}
 
 	if (state == 1) {
-		short* cursorBase = (short*)(*(int*)((char*)this + 0x850) + 8);
-		int cursorCount = **(short**)((char*)this + 0x850);
+		short* cursorBase = (short*)(GetArtiListBase(this) + 8);
+		int cursorCount = *GetArtiList(this);
 		for (int i = 0; i < cursorCount; i++) {
 			if (*(int*)(cursorBase + 0xe) == 0x37) {
 				break;
@@ -643,14 +696,14 @@ void CMenuPcs::ArtiDraw()
 			cursorBase += 0x20;
 		}
 
-		cursorBase += *(short*)(*(int*)((char*)this + 0x82c) + 0x26) * 0x20;
+		cursorBase += *(short*)(GetArtiStateBase(this) + 0x26) * 0x20;
 		int cursorY = (int)(((float)(cursorBase[3] - 0x20) * 0.5f) + (float)cursorBase[1]);
 		int cursorX = (int)((float)(cursorBase[0] - 0x14) + (float)(System.m_frameCounter & 7));
 		DrawCursor__8CMenuPcsFiif(this, cursorX, cursorY, 1.0f);
 	}
 
-	CFont* helpFont = *(CFont**)((char*)this + 0xf8);
-	u8 helpAlpha = (u8)(FLOAT_80332fc0 * *(float*)(*(int*)((char*)this + 0x850) + 0x18));
+	CFont* helpFont = GetArtiHelpFont(this);
+	u8 helpAlpha = (u8)(FLOAT_80332fc0 * *(float*)(GetArtiListBase(this) + 0x18));
 	if (!hasSelectedArtifact) {
 		selectedArtifactId = -1;
 	}
@@ -710,7 +763,7 @@ int CMenuPcs::ArtiCtrlCur()
 		return 0;
 	}
 
-	iVar5 = *(int*)((char*)this + 0x82c);
+	iVar5 = GetArtiStateBase(this);
 	if ((uVar4 & 8) == 0) {
 		if ((uVar4 & 4) != 0) {
 			iVar6 = iVar5 + *(short*)(iVar5 + 0x30) * 2;
@@ -743,18 +796,18 @@ int CMenuPcs::ArtiCtrlCur()
 
 	if ((uVar4 & 0xc) == 0) {
 		if ((uVar3 & 0x20) != 0) {
-			*(short*)(*(int*)((char*)this + 0x82c) + 0x1e) = 1;
+			*(short*)(GetArtiStateBase(this) + 0x1e) = 1;
 			Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 			return 1;
 		}
 		if ((uVar3 & 0x40) != 0) {
-			*(short*)(*(int*)((char*)this + 0x82c) + 0x1e) = -1;
+			*(short*)(GetArtiStateBase(this) + 0x1e) = -1;
 			Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 			return 1;
 		}
 		if ((uVar3 & 0x100) == 0) {
 			if ((uVar3 & 0x200) != 0) {
-				*(char*)(*(int*)((char*)this + 0x82c) + 0xd) = 1;
+				*(char*)(GetArtiStateBase(this) + 0xd) = 1;
 				Sound.PlaySe(3, 0x40, 0x7f, 0);
 				return 1;
 			}
@@ -765,3 +818,5 @@ int CMenuPcs::ArtiCtrlCur()
 
 	return 0;
 }
+
+

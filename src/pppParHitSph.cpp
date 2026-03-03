@@ -37,7 +37,7 @@ void pppParHitSph(struct _pppPObject* param_1, int param_2)
     
     if (((FLOAT_80330700 == local_88.x) && (FLOAT_80330700 == local_88.y)) &&
         (FLOAT_80330700 == local_88.z)) {
-        pppHitCylinderSendSystem(pppMngSt, &local_94, &local_88, radius, 0.0f);
+        pppHitCylinderSendSystem(pppMngSt, &local_94, &local_88, radius, FLOAT_80330700);
     } else {
         pppHitCylinderSendSystem(pppMngSt, &local_94, &local_88, radius, *(float*)(param_2 + 4));
     }

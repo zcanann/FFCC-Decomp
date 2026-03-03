@@ -654,7 +654,7 @@ config.libs = [
             Object(NonMatching, "THPDraw.cpp", cflags=[*cflags_thp, "-use_lmw_stmw on"]),
             Object(NonMatching, "THPSimple.cpp"),
             Object(NonMatching, "usb.cpp"),
-            Object(NonMatching, "USBStreamData.cpp"),
+            Object(NonMatching, "USBStreamData.cpp", cflags=cflags_game_cpp_exceptions),
             Object(NonMatching, "util.cpp"),
             Object(NonMatching, "vector.cpp"),
             Object(NonMatching, "wind.cpp"),

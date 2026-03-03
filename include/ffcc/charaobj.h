@@ -21,6 +21,14 @@ void SAFE_CAST_WORK(CGObjWork*);
 class CGCharaObj : public CGPrgObj
 {
 public:
+	struct IgnoreHitSlot
+	{
+		unsigned char m_flag;
+		unsigned char m_pad;
+		unsigned short m_timer;
+		CGObject* m_source;
+	};
+
 	CGCharaObj();
 	~CGCharaObj();
 	
@@ -77,7 +85,36 @@ public:
 	int GetCID();
 	void enableDamageCol(int);
 
+	int m_attackAnimId;
+	int m_itemId;
+	int m_particleSlots[0x16];
+	float m_targetDist;
+	Vec m_targetDelta;
+	unsigned char m_unk5CC[4];
+	float m_partyDistance[4];
+	Vec m_partyDelta[4];
+	float m_partyAngle[4];
+	int m_partyRank[4];
+	int m_castFrameStart;
+	int m_castFrameEnd;
+	int m_castFrameCurrent;
+	IgnoreHitSlot m_ignoreHit[4];
+	unsigned char m_unk65C[4];
+	int m_comboFrame;
+	int m_comboFramePrev;
+	int m_comboState;
+	unsigned char m_unk66C[0x18];
+	int m_damageParticle;
+	int m_unk688;
+	float m_pushScale;
+	float m_alpha;
+	int m_stateResetCounter;
+	int m_stateResetLimit;
+	int m_stateTick;
+	short m_lastBgGroupCopy;
 	short m_aStarGroupId;
+	int m_castTimeTick;
+	unsigned char m_unk6AC[0xC];
 };
 
 #endif // _FFCC_CGCHARAOBJ_H_

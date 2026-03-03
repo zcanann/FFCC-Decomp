@@ -117,19 +117,25 @@ void CSamplePcs::func1()
  */
 extern "C" void __sinit_p_sample_cpp(void)
 {
+	unsigned int* table = (unsigned int*)lbl_801E84C8;
+	unsigned int* srcA = lbl_801E8498;
+	unsigned int* srcB = lbl_801E84A4;
+	unsigned int* srcC = lbl_801E84B0;
+	unsigned int* srcD = lbl_801E84BC;
+
 	lbl_8032EC60 = (unsigned int)&lbl_801E8644;
-	((unsigned int*)lbl_801E84C8)[1] = lbl_801E8498[0];
-	((unsigned int*)lbl_801E84C8)[2] = lbl_801E8498[1];
-	((unsigned int*)lbl_801E84C8)[3] = lbl_801E8498[2];
-	((unsigned int*)lbl_801E84C8)[4] = lbl_801E84A4[0];
-	((unsigned int*)lbl_801E84C8)[5] = lbl_801E84A4[1];
-	((unsigned int*)lbl_801E84C8)[6] = lbl_801E84A4[2];
-	((unsigned int*)lbl_801E84C8)[7] = lbl_801E84B0[0];
-	((unsigned int*)lbl_801E84C8)[8] = lbl_801E84B0[1];
-	((unsigned int*)lbl_801E84C8)[9] = lbl_801E84B0[2];
-	((unsigned int*)lbl_801E84C8)[12] = lbl_801E84BC[0];
-	((unsigned int*)lbl_801E84C8)[13] = lbl_801E84BC[1];
-	((unsigned int*)lbl_801E84C8)[14] = lbl_801E84BC[2];
+	table[1] = srcA[0];
+	table[2] = srcA[1];
+	table[3] = srcA[2];
+	table[4] = srcB[0];
+	table[5] = srcB[1];
+	table[6] = srcB[2];
+	table[7] = srcC[0];
+	table[8] = srcC[1];
+	table[9] = srcC[2];
+	table[12] = srcD[0];
+	table[13] = srcD[1];
+	table[14] = srcD[2];
 }
 
 /*

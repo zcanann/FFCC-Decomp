@@ -36,6 +36,7 @@ extern "C" void pppRandDownShort(void* r3, void* r4, void* r5)
     u8* base = (u8*)r3;
     RandDownShortParam* in = (RandDownShortParam*)r4;
     RandDownShortCtx* ctx = (RandDownShortCtx*)r5;
+    s16* target;
     f32* valuePtr;
 
     if (lbl_8032ED70 != 0) {
@@ -47,7 +48,7 @@ extern "C" void pppRandDownShort(void* r3, void* r4, void* r5)
         f32 value = -RandF__5CMathFv(&math[0]);
 
         if (in->randomTwice != 0) {
-            value = (value - RandF__5CMathFv(&math[0])) * lbl_8032FF78;
+            value = lbl_8032FF78 * (value - RandF__5CMathFv(&math[0]));
         }
 
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
@@ -60,9 +61,9 @@ extern "C" void pppRandDownShort(void* r3, void* r4, void* r5)
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
     }
 
-    s16* target;
     if (in->sourceOffset == -1) {
-        target = &lbl_801EADC8[0];
+        s16* defaultTarget = &lbl_801EADC8[0];
+        target = defaultTarget;
     } else {
         target = (s16*)(base + in->sourceOffset + 0x80);
     }
@@ -78,6 +79,8 @@ extern "C" void pppRandDownShort(void* r3, void* r4, void* r5)
     cvt.bits.hi = 0x43300000;
     cvt.bits.lo = in->scale;
 
-    s32 delta = (s32)((cvt.d - lbl_8032FF80) * *valuePtr);
+    f64 scale = cvt.d - lbl_8032FF80;
+    f64 value = *valuePtr;
+    s32 delta = (s32)(value * scale);
     *target = (s16)(*target + delta);
 }

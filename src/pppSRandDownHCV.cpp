@@ -103,23 +103,3 @@ void pppSRandDownHCV(void* param1, void* param2, void* param3)
 		target_colors[3] = (s16)(target_colors[3] + delta);
 	}
 }
-
-/*
- * --INFO--
- * Address: TODO 
- * Size: TODO
- */
-void randshort(short val, float mult)
-{
-    // TODO - likely unused based on assembly
-}
-
-/*
- * --INFO--
- * Address: TODO
- * Size: TODO  
- */
-void randf(unsigned char flag)
-{
-    // TODO - likely unused based on assembly
-}

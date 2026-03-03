@@ -96,21 +96,23 @@ void CUSB::AddMessageCallback(MessageCallback callback, void* callerContext)
 	CUSBCallbackEntry* callbackEntry;
 	int i;
 
-	for (callbackEntry = m_callbacks, i = 0; i < 8; callbackEntry++, i++)
+	for (callbackEntry = m_callbacks, i = 0; i < 8; i++)
 	{
-		if (callbackEntry->m_inUse == 0)
+		if (callbackEntry->m_inUse != 0)
 		{
-			callbackEntry->m_inUse = 1;
-			callbackEntry->m_callback = callback;
-			callbackEntry->m_callerContext = callerContext;
-			break;
+			if (callbackEntry->m_callback == callback)
+			{
+				System.Printf("CUSB.AddMessageCallback: 同じ");
+				break;
+			}
+			callbackEntry++;
+			continue;
 		}
 
-		if (callbackEntry->m_callback == callback)
-		{
-			System.Printf("CUSB.AddMessageCallback: 同じ");
-			break;
-		}
+		callbackEntry->m_inUse = 1;
+		callbackEntry->m_callback = callback;
+		callbackEntry->m_callerContext = callerContext;
+		break;
 	}
 
 	if (i == 8)

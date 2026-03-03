@@ -88,15 +88,19 @@ bool CUSB::IsConnected()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002261c
+ * PAL Size: 168b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CUSB::AddMessageCallback(MessageCallback callback, void* callerContext)
 {
 	CUSBCallbackEntry* callbackEntry;
 	int i;
 
-	for (callbackEntry = m_callbacks, i = 0; i < 8; i++)
+	for (callbackEntry = m_callbacks, i = 0; i < 8; i++, callbackEntry++)
 	{
 		if (callbackEntry->m_inUse != 0)
 		{
@@ -105,7 +109,6 @@ void CUSB::AddMessageCallback(MessageCallback callback, void* callerContext)
 				System.Printf("CUSB.AddMessageCallback: 同じ");
 				break;
 			}
-			callbackEntry++;
 			continue;
 		}
 
@@ -123,8 +126,12 @@ void CUSB::AddMessageCallback(MessageCallback callback, void* callerContext)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8002249c
+ * PAL Size: 384b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CUSB::RemoveMessageCallback(MessageCallback callback)
 {

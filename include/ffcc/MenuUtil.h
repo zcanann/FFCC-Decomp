@@ -26,6 +26,9 @@ public:
     void DrawOptionMenu();
     void BindMcObj(int);
     unsigned int BindEffect(int, int, int);
+
+    char pad_00[0xF8];
+    CFont* menuFont;
 };
 
 #endif // _FFCC_MENU_UTIL_H_

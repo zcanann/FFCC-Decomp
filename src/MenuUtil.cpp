@@ -73,7 +73,7 @@ void CMenuPcs::GetLongHelpString(CFont*, int, int)
  */
 float CMenuPcs::CalcCenteringPos2(char* text, float margin, float scale)
 {
-	CFont* font = *(CFont**)((unsigned char*)this + 0xF8);
+	CFont* font = menuFont;
 
 	SetShadow__5CFontFi(font, 1);
 	SetMargin__5CFontFf(margin, font);
@@ -100,7 +100,7 @@ float CMenuPcs::CalcCenteringPos(char* text, CFont* font)
  */
 void CMenuPcs::DrawFont(int posX, int posY, _GXColor color, int tlut, char* text, float margin, float scale)
 {
-	CFont* font = *(CFont**)((unsigned char*)this + 0xF8);
+	CFont* font = menuFont;
 
 	SetMargin__5CFontFf(margin, font);
 	SetShadow__5CFontFi(font, 1);
@@ -134,7 +134,7 @@ void CMenuPcs::GetFontWidth(char*, float, float)
  */
 void CMenuPcs::DrawFont2(int posX, int posY, _GXColor color, int tlut, char* text, float margin, float scaleX, float scaleY)
 {
-	CFont* font = *(CFont**)((unsigned char*)this + 0xF8);
+	CFont* font = menuFont;
 
 	SetMargin__5CFontFf(margin, font);
 	SetShadow__5CFontFi(font, 1);

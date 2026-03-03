@@ -117,8 +117,10 @@ void pppDrawDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _
         return;
     }
 
+    int* ctrlData = *(int**)((u8*)ctrl + 0xC);
+
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        (u8*)obj + *(int*)*(int**)((u8*)ctrl + 0xC) + 0x88,
+        (u8*)obj + ctrlData[0] + 0x88,
         (u8*)obj + 0x40,
         *(float*)((u8*)data + 0x10),
         *(u8*)((u8*)data + 0x2C),
@@ -129,7 +131,7 @@ void pppDrawDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _
         *(u8*)((u8*)data + 0xD),
         *(u8*)((u8*)data + 0xE));
 
-    float* texCoords = (float*)((u8*)obj + *(int*)*(int**)((u8*)ctrl + 0xC + 0x8) + 0x80);
+    float* texCoords = (float*)((u8*)obj + ctrlData[2] + 0x80);
     MaterialMan.SetTexScroll(texCoords[0], texCoords[3], 0.0f, 0.0f);
 
     pppSetBlendMode__FUc(*(u8*)((u8*)data + 0x9));

@@ -4,7 +4,6 @@
 
 extern s32 lbl_8032ED70;
 extern f32 lbl_80330028;
-extern f64 lbl_80330030;
 extern CMath math[];
 extern s32 lbl_801EADC8[];
 
@@ -41,9 +40,9 @@ extern "C" void pppRandUpIV(void* param1, void* param2, void* param3)
     u8* base = (u8*)param1;
     PppRandUpIVParam2* in = (PppRandUpIVParam2*)param2;
     PppRandUpIVParam3* out = (PppRandUpIVParam3*)param3;
-    f32* valuePtr;
     s32* target;
     f32 value;
+    s32 outputOffset;
 
     if (lbl_8032ED70 != 0) {
         return;
@@ -52,18 +51,17 @@ extern "C" void pppRandUpIV(void* param1, void* param2, void* param3)
     if (in->field0 == *(s32*)(base + 0xC)) {
         value = RandF__5CMathFv(&math[0]);
         if (in->field18 != 0) {
-            value = (value + RandF__5CMathFv(&math[0])) * lbl_80330028;
+            value = lbl_80330028 * (value + RandF__5CMathFv(&math[0]));
         }
 
-        valuePtr = (f32*)(base + *out->fieldC + 0x80);
-        *valuePtr = value;
+        *(f32*)(base + *out->fieldC + 0x80) = value;
     }
 
     if (in->field0 != *(s32*)(base + 0xC)) {
         return;
     }
 
-    valuePtr = (f32*)(base + *out->fieldC + 0x80);
+    outputOffset = *out->fieldC + 0x80;
     if (in->field4 == -1) {
         target = &lbl_801EADC8[0];
     } else {
@@ -71,7 +69,7 @@ extern "C" void pppRandUpIV(void* param1, void* param2, void* param3)
     }
 
     {
-        f32 randValue = *valuePtr;
+        f32 randValue = *(f32*)(base + outputOffset);
         target[0] += (s32)((f32)in->field8 * randValue);
         target[1] += (s32)((f32)in->fieldC * randValue);
         target[2] += (s32)((f32)in->field10 * randValue);

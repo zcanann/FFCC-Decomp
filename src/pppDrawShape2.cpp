@@ -4,9 +4,11 @@
 extern int lbl_8032ED70;
 extern void* lbl_8032ED54;
 
-extern void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
-extern void pppSetBlendMode__FUc(unsigned char);
-extern void pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(void*, void*, unsigned char);
+extern "C" {
+void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
+void pppSetBlendMode__FUc(unsigned char);
+void pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(void*, void*, unsigned char);
+}
 
 typedef struct ShapeState {
     u16 value;
@@ -75,25 +77,27 @@ void pppCalcShape2(void* param1, void* param2, void* param3)
     ShapeRuntimeData* runtimeData = *(ShapeRuntimeData**)((u8*)param3 + 0xC);
     ShapeControlData* controlData = (ShapeControlData*)param2;
     ShapeState* shapeData = (ShapeState*)((u8*)param1 + runtimeData->shapeDataOffset + 0x80);
-    s16 type = *(s16*)((u8*)controlData + 0x4);
+    s16 type = *(volatile s16*)((u8*)controlData + 0x4);
 
     if (type == -1) {
         return;
     }
 
-    void** shapeTables = *(void***)((u8*)lbl_8032ED54 + 0xC);
-    void* shapeSpec = *(void**)((u8*)shapeTables + ((u16)type << 2));
-    ShapeSpecEntry* shape = (ShapeSpecEntry*)((u8*)shapeSpec + ((u32)shapeData->counter << 3) + 0x10);
+    u32* shapeTables = *(u32**)((u8*)lbl_8032ED54 + 0xC);
+    u8* shapeSpec = (u8*)shapeTables[(u16)type];
+    ShapeSpecEntry* shape = (ShapeSpecEntry*)(shapeSpec + ((u32)shapeData->counter << 3) + 0x10);
 
     shapeData->currentId = shapeData->counter;
     shapeData->value = (u16)(shapeData->value + controlData->step);
-    if (shapeData->value < shape->maxValue) {
+    u16 value = shapeData->value;
+    s16 maxValue = shape->maxValue;
+    if (value < maxValue) {
         return;
     }
-    shapeData->value = (u16)(shapeData->value - shape->maxValue);
+    shapeData->value = (u16)(value - maxValue);
 
     shapeData->counter++;
-    if (shapeData->counter < *(s16*)((u8*)shapeSpec + 0x6)) {
+    if (shapeData->counter < *(s16*)(shapeSpec + 0x6)) {
         return;
     }
 
@@ -120,8 +124,10 @@ void pppDrawShape2(void* param1, void* param2, void* param3)
 {
     ShapeRuntimeData* runtimeData = *(ShapeRuntimeData**)((u8*)param3 + 0xC);
     ShapeControlData* controlData = (ShapeControlData*)param2;
-    ShapeState* shapeData = (ShapeState*)((u8*)param1 + runtimeData->shapeDataOffset + 0x80);
-    void* posData = (u8*)param1 + runtimeData->posDataOffset + 0x80;
+    u32 shapeDataOffset = runtimeData->shapeDataOffset + 0x80;
+    u32 posDataOffset = runtimeData->posDataOffset + 0x80;
+    ShapeState* shapeData = (ShapeState*)((u8*)param1 + shapeDataOffset);
+    void* posData = (u8*)param1 + posDataOffset;
     u32 type = controlData->type;
 
     if (type == 0xFFFF) {

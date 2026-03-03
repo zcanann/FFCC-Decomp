@@ -144,14 +144,15 @@ void GXSetCullMode(GXCullMode mode) {
     }
     SET_REG_FIELD(570, __GXData->genMode, 2, 14, hwMode);
 #else
-    if (mode != GX_CULL_BACK) {
-        if (mode < GX_CULL_BACK) {
-            if (mode > GX_CULL_NONE) {
-                mode = GX_CULL_BACK;
-            }
-        }
-    } else {
+    switch (mode) {
+    case GX_CULL_FRONT:
+        mode = GX_CULL_BACK;
+        break;
+    case GX_CULL_BACK:
         mode = GX_CULL_FRONT;
+        break;
+    default:
+        break;
     }
 
     reg = __GXData->genMode;

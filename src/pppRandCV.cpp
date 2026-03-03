@@ -59,11 +59,9 @@ void pppRandCV(void* param1, void* param2, void* param3)
 
         randomValue = (float*)(base + *ctx->outputOffset + 0x80);
         *randomValue = value;
-    } else {
-        return;
+    } else if (params->index != *(int*)(base + 0xC)) {
+        randomValue = (float*)(base + *ctx->outputOffset + 0x80);
     }
-
-    randomValue = (float*)(base + *ctx->outputOffset + 0x80);
 
     u8* target;
     if (params->colorOffset == -1) {
@@ -73,9 +71,8 @@ void pppRandCV(void* param1, void* param2, void* param3)
     }
 
     float scale = *randomValue;
-
-    target[0] = (u8)(target[0] + (int)((float)params->delta[0] * scale - (float)target[0]));
-    target[1] = (u8)(target[1] + (int)((float)params->delta[1] * scale - (float)target[1]));
-    target[2] = (u8)(target[2] + (int)((float)params->delta[2] * scale - (float)target[2]));
-    target[3] = (u8)(target[3] + (int)((float)params->delta[3] * scale - (float)target[3]));
+    target[0] = (u8)(target[0] + (int)((float)params->delta[0] * scale - (float)params->delta[0]));
+    target[1] = (u8)(target[1] + (int)((float)params->delta[1] * scale - (float)params->delta[1]));
+    target[2] = (u8)(target[2] + (int)((float)params->delta[2] * scale - (float)params->delta[2]));
+    target[3] = (u8)(target[3] + (int)((float)params->delta[3] * scale - (float)params->delta[3]));
 }

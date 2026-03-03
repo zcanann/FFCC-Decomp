@@ -136,8 +136,8 @@ unsigned int __flush_all() {
  * JP Size: TODO
  */
 FILE* __find_unopened_file(void) {
-    FILE* file = &__files[0];
-    FILE* prev;
+    FILE* file = __files[2].next_file_struct;
+    FILE* prev = &__files[2];
 
     while (file != NULL) {
         if (file->file_mode.file_kind == __closed_file) {
@@ -168,8 +168,10 @@ FILE* __find_unopened_file(void) {
  * JP Size: TODO
  */
 void __init_file(FILE* file, file_modes mode, unsigned char* buffer, int buffer_size) {
+    file_modes init_mode = mode;
+
     file->handle = 0;
-    file->file_mode = mode;
+    file->file_mode = init_mode;
 
     file->file_state.io_state = __neutral;
     file->file_state.free_buffer = 0;
@@ -178,10 +180,10 @@ void __init_file(FILE* file, file_modes mode, unsigned char* buffer, int buffer_
 
     file->position = 0;
 
-    if (buffer_size == 0) {
-        setvbuf(file, NULL, _IONBF, 0);
-    } else {
+    if ((unsigned int)buffer_size != 0) {
         setvbuf(file, (char*)buffer, _IOFBF, buffer_size);
+    } else {
+        setvbuf(file, NULL, _IONBF, 0);
     }
 
     file->buffer_ptr = file->buffer;

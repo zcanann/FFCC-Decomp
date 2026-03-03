@@ -66,6 +66,12 @@ extern CPartMng PartMng;
 extern CLightPcs LightPcs;
 extern CMath Math;
 
+Mtx ppvCameraMatrix0;
+Mtx ppvWorldMatrix;
+Mtx ppvWorldMatrixWood;
+_pppEnvSt* pppEnvStPtr;
+_pppMngSt* pppMngStPtr;
+
 static const char s_pppPart_cpp[] = "pppPart.cpp";
 static const float FLOAT_8032fddc = 0.0f;
 extern "C" float FLOAT_8032fde0;

@@ -61,8 +61,8 @@ extern "C" void pppRandUpChar(void* param1, void* param2, void* param3)
 
     target = (in->sourceOffset == -1) ? lbl_801EADC8 : (u8*)(base + in->sourceOffset + 0x80);
 
-    f32 scale = (f32)in->scale;
-    f32 scaled = *valuePtr * scale;
+    f32 current = *valuePtr;
+    f32 scaled = (f32)in->scale * current;
     s32 delta = (s32)scaled;
     *target = (u8)(*target + delta);
 }

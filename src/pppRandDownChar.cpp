@@ -73,8 +73,6 @@ void pppRandDownChar(void* param1, void* param2, void* param3)
     cvt.parts.hi = 0x43300000;
     cvt.parts.lo = scale;
 
-    f32 factor = cvt.d - lbl_8032FF20;
-    f32 scaled = factor * *valuePtr;
-    s32 delta = (s32)scaled;
+    s32 delta = (s32)((cvt.d - lbl_8032FF20) * *valuePtr);
     *target = (u8)(*target + delta);
 }

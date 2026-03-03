@@ -543,7 +543,7 @@ config.libs = [
             Object(NonMatching, "pppLocationTitle.cpp"),
             Object(NonMatching, "pppMana2.cpp"),
             Object(NonMatching, "pppMatrixLoc.cpp", cflags=cflags_game_cpp_exceptions),
-            Object(NonMatching, "pppMatrixScl.cpp"),
+            Object(NonMatching, "pppMatrixScl.cpp", cflags=cflags_game_cpp_exceptions),
             Object(NonMatching, "pppMatrixXYZ.cpp"),
             Object(NonMatching, "pppMatrixXZY.cpp"),
             Object(NonMatching, "pppMatrixYXZ.cpp"),

@@ -4,7 +4,7 @@
 #include <dolphin/mtx.h>
 
 extern int lbl_8032ED70;
-extern struct _pppMngSt* pppMngStPtr;
+#define pppMngStPtr ((struct _pppMngSt*)lbl_8032ED50)
 
 extern class CCameraPcs {
 public:

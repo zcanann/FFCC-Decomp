@@ -22,12 +22,7 @@ void pppParMoveMatrix(void)
 	Mtx MStack_38;
 	
 	pppMngSt = pppMngStPtr;
-	
-	// Access m_previousPosition and m_position via pointer arithmetic since structure is WIP
-	// From objdiff: m_previousPosition appears to be at offset 0x48, m_position at 0x8
-	Vec* previousPosition = (Vec*)((char*)pppMngStPtr + 0x48);
-	Vec* position = (Vec*)((char*)pppMngStPtr + 0x8);
-	PSVECSubtract(previousPosition, position, &local_44);
+	PSVECSubtract(&pppMngStPtr->m_previousPosition, &pppMngStPtr->m_position, &local_44);
 	
 	if (((0.0f != local_44.x) || (0.0f != local_44.y)) || (0.0f != local_44.z)) {
 		PSVECNormalize(&local_44, &local_68);

@@ -2,10 +2,10 @@
 #include "ffcc/math.h"
 #include "types.h"
 
-extern CMath math;
+extern CMath math[];
 extern s32 lbl_8032ED70;
 extern f32 lbl_8032FFC8;
-extern s16 lbl_801EADC8;
+extern s16 lbl_801EADC8[];
 
 extern "C" {
 f32 RandF__5CMathFv(CMath*);
@@ -45,9 +45,9 @@ void pppRandShort(void* param1, void* param2, void* param3)
 
     s32 baseState = *(s32*)(base + 0xC);
     if (baseState == 0) {
-        f32 value = RandF__5CMathFv(&math);
+        f32 value = RandF__5CMathFv(math);
         if (in->fieldA != 0) {
-            value += RandF__5CMathFv(&math);
+            value += RandF__5CMathFv(math);
         } else {
             value *= lbl_8032FFC8;
         }
@@ -64,11 +64,12 @@ void pppRandShort(void* param1, void* param2, void* param3)
 
     s16* target;
     if (in->field4 == -1) {
-        target = &lbl_801EADC8;
+        target = lbl_801EADC8;
     } else {
         target = (s16*)(base + in->field4 + 0x80);
     }
 
-    f32 delta = ((f32)in->field8 * *valuePtr) - (f32)in->field8;
+    s16 scale = in->field8;
+    f32 delta = ((f32)scale * *valuePtr) - (f32)scale;
     *target = (s16)(*target + (s16)delta);
 }

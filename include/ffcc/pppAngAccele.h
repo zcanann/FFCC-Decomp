@@ -2,14 +2,13 @@
 #define _FFCC_PPPANGACCELE_H_
 
 typedef struct {
-    char pad[8];
-    int m_graphId;
+    char pad[0x0C];
+    int m_graphId; // 0x0C
 } pppAngAcceleObj;
 
 typedef struct {
-    int m_field_00;
+    int m_graphId; // 0x00
     int m_field_04;
-    int m_graphId;
     int m_x;
     int m_y;
     int m_z;

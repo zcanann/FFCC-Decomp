@@ -63,13 +63,7 @@ void pppRandShort(void* param1, void* param2, void* param3)
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
 
-    s16* target;
-    if (in->field4 == -1) {
-        target = lbl_801EADC8;
-    } else {
-        target = (s16*)(base + in->field4 + 0x80);
-    }
-
+    s16* target = (in->field4 == -1) ? lbl_801EADC8 : (s16*)(base + in->field4 + 0x80);
     f32 delta = ((f32)in->field8 * *valuePtr) - (f32)in->field8;
     *target = (s16)(*target + (s16)delta);
 }

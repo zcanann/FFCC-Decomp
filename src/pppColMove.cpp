@@ -55,8 +55,10 @@ void pppColMoveCon(void* param1, void* param2)
 void pppColMove(void* param1, void* param2, void* param3)
 {
     pppColMoveInput* input = ((pppColMoveInput**)param3)[3];
-    pppColMoveAccum* source = (pppColMoveAccum*)((char*)param1 + input->id + 0x80);
-    pppColMoveAccum* movement = (pppColMoveAccum*)((char*)param1 + input->pad + 0x80);
+    pppColMoveAccum* source = (pppColMoveAccum*)((char*)param1 + input->id);
+    pppColMoveAccum* movement = (pppColMoveAccum*)((char*)param1 + input->pad);
+    pppColMoveVec4S* sourceMove = (pppColMoveVec4S*)&source->_pad[0x40];
+    pppColMoveVec4S* movementMove = (pppColMoveVec4S*)&movement->_pad[0x40];
 
     if (lbl_8032ED70 != 0) {
         return;
@@ -64,14 +66,14 @@ void pppColMove(void* param1, void* param2, void* param3)
 
     if (((int*)param2)[0] == ((int*)param1)[3]) {
         pppColMoveVec4S* paramMove = (pppColMoveVec4S*)((char*)param2 + 8);
-        movement->x += paramMove->x;
-        movement->y += paramMove->y;
-        movement->z += paramMove->z;
-        movement->w += paramMove->w;
+        movementMove->x += paramMove->x;
+        movementMove->y += paramMove->y;
+        movementMove->z += paramMove->z;
+        movementMove->w += paramMove->w;
     }
 
-    source->x += movement->x;
-    source->y += movement->y;
-    source->z += movement->z;
-    source->w += movement->w;
+    sourceMove->x += movementMove->x;
+    sourceMove->y += movementMove->y;
+    sourceMove->z += movementMove->z;
+    sourceMove->w += movementMove->w;
 }

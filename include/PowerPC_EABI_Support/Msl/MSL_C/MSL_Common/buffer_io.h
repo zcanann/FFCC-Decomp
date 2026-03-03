@@ -5,6 +5,7 @@
 
 enum { __align_buffer, __dont_align_buffer };
 
+int __load_buffer(FILE* file, size_t* bytes_loaded, int mode);
 void __prep_buffer(FILE* file);
 int __flush_buffer(FILE* file, size_t* bytes_flushed);
 

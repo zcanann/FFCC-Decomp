@@ -11,7 +11,7 @@ void* memset(void*, int, unsigned int);
 
 extern unsigned char MaterialEditorPcs[];
 
-static char s_ME_AppRequest_cpp_801d7da8[] = "ME_AppRequest.cpp";
+static char lbl_801D7DA8[] = "ME_AppRequest.cpp";
 
 /*
  * --INFO--
@@ -95,14 +95,14 @@ void CMaterialEditorPcs::DeleteColAnmData(ZCANMGRP **, int)
 int CMaterialEditorPcs::AddRsdList(ZLIST* zlist)
 {
     int* tail = (int*)__nw__FUlPQ27CMemory6CStagePci(0x10, *(CMemory::CStage**)(MaterialEditorPcs + 4),
-                                                     s_ME_AppRequest_cpp_801d7da8, 0x61);
+                                                     lbl_801D7DA8, 0x61);
     if (tail == 0) {
         return 0;
     }
 
     memset(tail, 0, 0x10);
     int rsdItem = (int)__nw__FUlPQ27CMemory6CStagePci(0x1c, *(CMemory::CStage**)(MaterialEditorPcs + 4),
-                                                      s_ME_AppRequest_cpp_801d7da8, 0x67);
+                                                      lbl_801D7DA8, 0x67);
     if (rsdItem == 0) {
         if (tail != 0) {
             __dl__FPv(tail);

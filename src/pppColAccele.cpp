@@ -66,8 +66,8 @@ void pppColAcceleCon(_pppPObject* obj, void* data)
     short* accel = (short*)((char*)obj + (int)workPtr + 0x80);
     
     // Zero out acceleration values
-    accel[0] = 0;
-    accel[1] = 0;
-    accel[2] = 0;
     accel[3] = 0;
+    accel[2] = 0;
+    accel[1] = 0;
+    accel[0] = 0;
 }

@@ -118,7 +118,7 @@ void CUSB::AddMessageCallback(MessageCallback callback, void* callerContext)
 		break;
 	}
 
-	if (i == 8)
+	if (i == 8U)
 	{
 		System.Printf("CUSB.AddMessageCallback: イベント");
 	}

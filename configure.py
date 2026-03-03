@@ -298,11 +298,15 @@ cflags_thp = [
     *cflags_base,
 ]
 
-
 def replace_flag_prefix(flags: List[str], prefix: str, new_flag: str) -> List[str]:
     out = [f for f in flags if not f.startswith(prefix)]
     out.append(new_flag)
     return out
+
+
+cflags_game_cpp_exceptions = replace_flag_prefix(
+    cflags_game, "-Cpp_exceptions ", "-Cpp_exceptions on"
+)
 
 
 def redsound_flags_from_profile(profile: str) -> List[str]:
@@ -534,14 +538,14 @@ config.libs = [
             Object(NonMatching, "pppLight.cpp"),
             Object(NonMatching, "pppLocationTitle.cpp"),
             Object(NonMatching, "pppMana2.cpp"),
-            Object(NonMatching, "pppMatrixLoc.cpp"),
+            Object(NonMatching, "pppMatrixLoc.cpp", cflags=cflags_game_cpp_exceptions),
             Object(NonMatching, "pppMatrixScl.cpp"),
             Object(NonMatching, "pppMatrixXYZ.cpp"),
             Object(NonMatching, "pppMatrixXZY.cpp"),
             Object(NonMatching, "pppMatrixYXZ.cpp"),
             Object(NonMatching, "pppMatrixYZX.cpp"),
             Object(NonMatching, "pppMatrixZXY.cpp"),
-            Object(NonMatching, "pppMatrixZYX.cpp"),
+            Object(NonMatching, "pppMatrixZYX.cpp", cflags=cflags_game_cpp_exceptions),
             Object(NonMatching, "pppMiasma.cpp"),
             Object(NonMatching, "pppMove.cpp"),
             Object(NonMatching, "pppParHitSph.cpp"),

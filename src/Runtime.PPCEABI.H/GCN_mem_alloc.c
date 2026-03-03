@@ -5,12 +5,15 @@
 
 #include "dolphin/os.h"
 
+static const char gNoHeapMsg[] = "GCN_Mem_Alloc.c : InitDefaultHeap. No Heap Available\n";
+static const char gRuntimeInitMsg[] = "Metrowerks CW runtime library initializing default heap\n";
+
 inline static void InitDefaultHeap(void) {
 	void* arenaLo;
 	void* arenaHi;
 
-	OSReport("GCN_Mem_Alloc.c : InitDefaultHeap. No Heap Available\n");
-	OSReport("Metrowerks CW runtime library initializing default heap\n");
+	OSReport(gNoHeapMsg);
+	OSReport(gRuntimeInitMsg);
 
 	arenaLo = OSGetArenaLo();
 	arenaHi = OSGetArenaHi();

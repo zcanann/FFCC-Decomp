@@ -7,7 +7,7 @@
 
 /*
  * --INFO--
- * PAL Address: 0x80064874
+ * PAL Address: 0x8005f71c
  * PAL Size: 120b
  * EN Address: TODO
  * EN Size: TODO

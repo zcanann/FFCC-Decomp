@@ -168,17 +168,13 @@ FILE* __find_unopened_file(void) {
  * JP Size: TODO
  */
 void __init_file(FILE* file, file_modes mode, unsigned char* buffer, int buffer_size) {
-    unsigned char* state_bytes;
-    unsigned short mode_bits;
-
     file->handle = 0;
     file->file_mode = mode;
 
-    state_bytes = (unsigned char*)&file->file_state;
-    state_bytes[0] &= 0x1f;
-    state_bytes[0] &= 0xef;
-    state_bytes[1] = 0;
-    state_bytes[2] = 0;
+    file->file_state.io_state = __neutral;
+    file->file_state.free_buffer = 0;
+    file->file_state.eof = 0;
+    file->file_state.error = 0;
 
     file->position = 0;
 
@@ -191,8 +187,7 @@ void __init_file(FILE* file, file_modes mode, unsigned char* buffer, int buffer_
     file->buffer_ptr = file->buffer;
     file->buffer_length = 0;
 
-    mode_bits = *(unsigned short*)((unsigned char*)file + 4);
-    if (((mode_bits >> 6) & 7) == __disk_file) {
+    if (file->file_mode.file_kind == __disk_file) {
         file->position_fn = __position_file;
         file->read_fn = __read_file;
         file->write_fn = __write_file;

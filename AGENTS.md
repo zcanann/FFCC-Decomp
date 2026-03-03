@@ -147,6 +147,8 @@ DO NOT TRUST GHIDRA BEYOND GETTING A FEEL FOR THE FUNCTION. GHIDRA IS A GUIDELIN
 
 ### Step 2 - Create branch: `git checkout -b pr/<unit>/$(date -u +%s)`
 
+IF LOCAL CHANGES EXIST FROM A PRIOR RUN, ASSUME THEY ARE TO BE DISCARDED -- OTHERWISE THEY WOULD HAVE BEEN COMITTED.
+
 ### Step 3 - Edit source files in `src/` and `include/`
 Make critical changes changes: types, signedness, struct layout, control flow, constants, linkage/declaration cleanup, and (when justified) `configure.py` flag adjustments. Our goal is to match the source code, so getting the data and structs matching are CRITICAL to making the code coherent.
 

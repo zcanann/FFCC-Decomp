@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-void pppKeShpTail(void* r3, void* r5);
+void pppKeShpTail(void* r3, void* r4);
 void pppKeShpTailCon(void* r3, void* r4);
 void pppKeShpTailDraw(void);
 

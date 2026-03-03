@@ -26,16 +26,18 @@ void pppPObjPoint(PppPointData* pointData, PppObjData* objData, PppContainer* co
     PppPointObj* objPtr = (PppPointObj*)((u8*)pointData + *(s32*)container->ptrData + 0x80);
 
     if (objData->id == pointData->id) {
-        u32 vectorAddr;
+        u32 tableIndex = objData->field_4;
+        u8* vecPtr;
 
-        if ((objData->field_4 + 0x10000) == 0xFFFF) {
-            vectorAddr = (u32)&lbl_801EADC8;
+        if ((tableIndex + 0x10000) == 0xFFFF) {
+            vecPtr = lbl_801EADC8;
         } else {
             PObjPointEntry* table = *(PObjPointEntry**)((u8*)lbl_8032ED50 + 0xD4);
-            vectorAddr = (u32)((u8*)objData->data + table[objData->field_4].vecOffset + 0x80);
+            vecPtr = (u8*)objData->data + 0x80;
+            vecPtr += table[tableIndex].vecOffset;
         }
 
-        objPtr->vecPtr = (void*)vectorAddr;
+        objPtr->vecPtr = vecPtr;
     }
 
     objPtr->x = ((f32*)objPtr->vecPtr)[0];

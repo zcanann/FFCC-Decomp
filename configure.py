@@ -561,7 +561,7 @@ config.libs = [
             Object(NonMatching, "pppPObjPoint.cpp"),
             Object(NonMatching, "pppPoint.cpp"),
             Object(NonMatching, "pppPointAp.cpp"),
-            Object(NonMatching, "pppPointApMtx.cpp"),
+            Object(NonMatching, "pppPointApMtx.cpp", cflags=cflags_game_cpp_exceptions),
             Object(NonMatching, "pppPointRAp.cpp"),
             Object(NonMatching, "pppRain.cpp"),
             Object(NonMatching, "pppRandChar.cpp"),

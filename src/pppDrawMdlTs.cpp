@@ -1,27 +1,18 @@
 #include "ffcc/pppDrawMdlTs.h"
+#include "ffcc/materialman.h"
+#include "ffcc/pppPart.h"
+#include "dolphin/types.h"
 
-// Basic types
-typedef unsigned char u8;
-typedef unsigned short u16;  
-typedef unsigned int u32;
+extern "C" {
+extern int lbl_8032ED70;
+extern void* lbl_8032ED54;
+void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+    void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
+void pppSetBlendMode__FUc(unsigned char);
+void pppDrawMesh__FP10pppModelStP3Veci(void*, void*, int);
+}
 
-extern int lbl_8032ED70;  // Global state flag
-
-// Forward declarations for external functions
-extern void pppSetDrawEnv(void* pos, void* matrix, float scale, u8 r, u8 g, u8 b, u8 a, u8 e1, u8 e2, u8 e3);
-extern void pppSetBlendMode(u8 mode);
-extern void pppDrawMesh(void* model, void* pos, int flag);
-
-// External structs/globals
-struct MaterialManager {
-    void SetTexScroll(float f1, float f2, float f3, float f4);
-};
-extern MaterialManager MaterialMan;
-
-struct GlobalData {
-    void** field_at_0x8;
-};
-extern GlobalData lbl_8032ED54;
+extern CMaterialMan MaterialMan;
 
 // Use simple forward declarations and casting approach
 
@@ -122,43 +113,29 @@ void pppDrawDrawMdlTs0(_pppPObject*, PDrawMdlTs*, _pppCtrlTable*)
  */
 void pppDrawDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _pppCtrlTable* ctrl)
 {
-    if (*((int*)((char*)data + 0x4)) == -1) {
+    if ((*(u32*)((u8*)data + 4) >> 16) == 0xFFFF) {
         return;
     }
-    
-    // Setup drawing environment using simple pointer arithmetic
-    u8 blendMode = *((u8*)((char*)data + 0xe));
-    void* position = (void*)((char*)obj + 0x40);
-    
-    void* inner = *((void**)((char*)ctrl + 0xc)); 
-    void* inner2 = *((void**)inner);
-    void* drawPos = (void*)((char*)inner2 + 0x88);
-    void* finalPos = (void*)((char*)obj + (int)drawPos);
-    
-    float scale = *((float*)((char*)data + 0x10));
-    u8 r = *((u8*)((char*)data + 0x2c));
-    u8 g = *((u8*)((char*)data + 0xa));   
-    u8 b = *((u8*)((char*)data + 0x9));   
-    u8 a = *((u8*)((char*)data + 0xb));   
-    u8 env1 = *((u8*)((char*)data + 0xc));   
-    u8 env2 = *((u8*)((char*)data + 0xd));
-    
-    pppSetDrawEnv(finalPos, position, scale, r, g, b, a, env1, env2, blendMode);
-    
-    // Setup texture scrolling
-    void* matInner = *((void**)((char*)ctrl + 0xc));
-    void* texCoordPtr = *((void**)((char*)matInner + 0x8));
-    float* texCoords = (float*)((char*)obj + (int)texCoordPtr + 0x80);
-    
+
+    int* ctrlData = *(int**)((u8*)ctrl + 0xC);
+
+    pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
+        (u8*)obj + ctrlData[0] + 0x88,
+        (u8*)obj + 0x40,
+        *(float*)((u8*)data + 0x10),
+        *(u8*)((u8*)data + 0x2C),
+        *(u8*)((u8*)data + 0xA),
+        *(u8*)((u8*)data + 0x9),
+        *(u8*)((u8*)data + 0xB),
+        *(u8*)((u8*)data + 0xC),
+        *(u8*)((u8*)data + 0xD),
+        *(u8*)((u8*)data + 0xE));
+
+    float* texCoords = (float*)((u8*)obj + ctrlData[2] + 0x80);
     MaterialMan.SetTexScroll(texCoords[0], texCoords[3], 0.0f, 0.0f);
-    
-    // Set blend mode
-    pppSetBlendMode(*((u8*)((char*)data + 0x9)));
-    
-    // Draw mesh
-    int meshId = *((int*)((char*)data + 0x4));
-    void* model = lbl_8032ED54.field_at_0x8[meshId];
-    void* objPos = (void*)((char*)obj + 0x70);
-    
-    pppDrawMesh(model, objPos, 1);
+
+    pppSetBlendMode__FUc(*(u8*)((u8*)data + 0x9));
+
+    void** modelsArray = *(void***)((u8*)lbl_8032ED54 + 0x8);
+    pppDrawMesh__FP10pppModelStP3Veci(modelsArray[*(u32*)((u8*)data + 0x4)], (u8*)obj + 0x70, 1);
 }

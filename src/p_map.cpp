@@ -99,7 +99,7 @@ CMapPcs::CMapPcs()
  */
 void CMapPcs::Init()
 {
-	*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x174) = 0;
+	m_forceMapReload = 0;
 }
 
 /*
@@ -133,9 +133,9 @@ void* CMapPcs::GetTable(unsigned long tableIndex)
  */
 void CMapPcs::create()
 {
-    *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x17C) = 0;
-    *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x180) = 1;
-    *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this) + 0x184) = 0;
+    m_viewerMode = 0;
+    m_drawEnabled = 1;
+    m_useStoredViewMtx = 0;
 
     MapMng.Create();
 }
@@ -151,13 +151,13 @@ void CMapPcs::create()
  */
 void CMapPcs::createViewer()
 {
-    *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x17C) = 0;
-    *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x180) = 1;
-    *reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this) + 0x184) = 0;
+    m_viewerMode = 0;
+    m_drawEnabled = 1;
+    m_useStoredViewMtx = 0;
 
     MapMng.Create();
 
-    *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x17C) = 1;
+    m_viewerMode = 1;
 }
 
 /*
@@ -220,7 +220,7 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
     MapMng.ReadMid(mapPath);
 
     if ((mode != 1) && (mode != 2)) {
-        if ((*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x17C) != 0) &&
+        if ((m_viewerMode != 0) &&
             (strcmp(lbl_801E8EEC, mapPath) != 0)) {
             strcpy(lbl_801E8EEC, mapPath);
             if (MapMng.GetDebugPlaySta(0, &unusedVec) == 0) {
@@ -348,17 +348,17 @@ void CMapPcs::calc()
     *reinterpret_cast<float*>(reinterpret_cast<char*>(&MapMng) + 0x228F4) =
         *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8);
 
-    if (*reinterpret_cast<unsigned char*>(reinterpret_cast<char*>(this) + 0x184) == 0) {
+    if (m_useStoredViewMtx == 0) {
         PSMTXCopy(*reinterpret_cast<Mtx*>(reinterpret_cast<char*>(&CameraPcs) + 0x4), cameraMtx);
         PSMTX44Copy(*reinterpret_cast<Mtx44*>(reinterpret_cast<char*>(&CameraPcs) + 0x48), screenMtx);
     } else {
-        memcpy(cameraMtx, reinterpret_cast<char*>(this) + 0x4, 0x30);
-        memcpy(screenMtx, reinterpret_cast<char*>(this) + 0x34, 0x40);
+        memcpy(cameraMtx, m_viewMtx, sizeof(Mtx));
+        memcpy(screenMtx, m_screenMtx, sizeof(Mtx44));
     }
     MapMng.SetViewMtx(cameraMtx, screenMtx);
 
-    if (*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x174) == 0) {
-        *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x178) = 0;
+    if (m_forceMapReload == 0) {
+        m_mapCalcReady = 0;
         MapMng.Calc();
     } else {
         MapMng.DestroyMap();
@@ -371,13 +371,13 @@ void CMapPcs::calc()
         *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A0) = 0;
         *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A4) = 0;
         *reinterpret_cast<unsigned int*>(reinterpret_cast<char*>(&MapMng) + 0x229A8) = 0;
-        MapMng.ReadMtx(reinterpret_cast<char*>(this) + 0x74);
-        MapMng.ReadMpl(reinterpret_cast<char*>(this) + 0x74);
-        MapMng.ReadOtm(reinterpret_cast<char*>(this) + 0x74);
-        MapMng.ReadMid(reinterpret_cast<char*>(this) + 0x74);
-        if ((*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x17C) != 0) &&
-            (strcmp(lbl_801E8EEC, reinterpret_cast<char*>(this) + 0x74) != 0)) {
-            strcpy(lbl_801E8EEC, reinterpret_cast<char*>(this) + 0x74);
+        MapMng.ReadMtx(m_mapName);
+        MapMng.ReadMpl(m_mapName);
+        MapMng.ReadOtm(m_mapName);
+        MapMng.ReadMid(m_mapName);
+        if ((m_viewerMode != 0) &&
+            (strcmp(lbl_801E8EEC, m_mapName) != 0)) {
+            strcpy(lbl_801E8EEC, m_mapName);
             if (MapMng.GetDebugPlaySta(0, &cameraPos) == 0) {
                 COctNode* rootNode =
                     *reinterpret_cast<COctNode**>(reinterpret_cast<char*>(&MapMng) + 0x18);
@@ -392,8 +392,8 @@ void CMapPcs::calc()
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE4) = cameraPos.y + lbl_8032FA10;
             *reinterpret_cast<float*>(reinterpret_cast<char*>(&CameraPcs) + 0xE8) = cameraPos.z;
         }
-        *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x174) = 0;
-        *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x178) = 1;
+        m_forceMapReload = 0;
+        m_mapCalcReady = 1;
     }
 }
 
@@ -442,8 +442,8 @@ void mapInitDrawEnv()
  */
 void CMapPcs::drawBefore()
 {
-    if ((*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x178) == 0) &&
-        (*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x180) != 0)) {
+    if ((m_mapCalcReady == 0) &&
+        (m_drawEnabled != 0)) {
         Mtx cameraMtx;
         Mtx44 screenMtx;
 
@@ -498,8 +498,8 @@ void CMapPcs::drawBefore()
  */
 void CMapPcs::draw()
 {
-    if ((*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x178) == 0) &&
-        (*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x180) != 0)) {
+    if ((m_mapCalcReady == 0) &&
+        (m_drawEnabled != 0)) {
         Mtx cameraMtx;
         Mtx44 screenMtx;
 
@@ -554,8 +554,8 @@ void CMapPcs::draw()
  */
 void CMapPcs::drawBeforeViewer()
 {
-    if ((*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x180) != 0) &&
-        (*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x178) == 0)) {
+    if ((m_drawEnabled != 0) &&
+        (m_mapCalcReady == 0)) {
         Mtx cameraMtx;
         Mtx44 screenMtx;
 
@@ -610,8 +610,8 @@ void CMapPcs::drawBeforeViewer()
  */
 void CMapPcs::drawViewer()
 {
-    if ((*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x180) != 0) &&
-        (*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x178) == 0)) {
+    if ((m_drawEnabled != 0) &&
+        (m_mapCalcReady == 0)) {
         Mtx cameraMtx;
         Mtx44 screenMtx;
 
@@ -666,8 +666,8 @@ void CMapPcs::drawViewer()
  */
 void CMapPcs::drawAfter()
 {
-    if (*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x178) == 0) {
-        if (*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x180) != 0) {
+    if (m_mapCalcReady == 0) {
+        if (m_drawEnabled != 0) {
             CBoundHack bound;
             _GXColor debugColor;
             Mtx cameraMtx;
@@ -730,8 +730,8 @@ void CMapPcs::drawAfter()
  */
 void CMapPcs::drawAfterViewer()
 {
-    if (*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x178) == 0) {
-        if (*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x180) != 0) {
+    if (m_mapCalcReady == 0) {
+        if (m_drawEnabled != 0) {
             CBoundHack bound;
             _GXColor debugColor;
 

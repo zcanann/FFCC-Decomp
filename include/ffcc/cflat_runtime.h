@@ -24,6 +24,8 @@ public:
 	{
 	public:
 		CClass();
+        u8 m_unk0[0x228];
+        u32 m_variableCount;
 	};
 
 	class CObject
@@ -132,6 +134,41 @@ public:
 	void onSetClassSystemVal(int, CFlatRuntime::CObject*, CFlatRuntime::CStack*, int);
 	int onClassSystemFunc(CFlatRuntime::CObject*, int, int, int&);
 	int onSystemFunc(CFlatRuntime::CObject*, int, int, int&);
+
+private:
+    void** m_vtable;                // 0x0000
+    int m_permanentVarCount;        // 0x0004
+    u8* m_permanentVarDefs;         // 0x0008
+    u8* m_permanentVarValues;       // 0x000C
+    void* m_initScratchA;           // 0x0010
+    void* m_initScratchB;           // 0x0014
+    CClass* m_classes;              // 0x0018
+    int m_funcCount;                // 0x001C
+    u8* m_funcs;                    // 0x0020
+    void* m_0x24;                   // 0x0024
+    void* m_0x28;                   // 0x0028
+    void* m_0x2C;                   // 0x002C
+    void* m_0x30;                   // 0x0030
+    void* m_0x34;                   // 0x0034
+    void* m_0x38;                   // 0x0038
+    void* m_0x3C;                   // 0x003C
+    void* m_0x40;                   // 0x0040
+    void* m_0x44;                   // 0x0044
+    u8 m_performanceBlock[0x804];   // 0x0048
+    u8 m_pad_084C[0x80];            // 0x084C
+    CObject m_objectSentinel;       // 0x08CC
+    u8 m_pad_0914[0x64];            // 0x0914
+    void** m_freeListPrev;          // 0x0978
+    void** m_freeListNext;          // 0x097C
+    int m_freeListCount;            // 0x0980
+    void* m_0x984;                  // 0x0984
+    void* m_objectPoolBase;         // 0x0988
+    void** m_objectFreeListHead;    // 0x098C
+    u8 m_pad_0990[0x704];           // 0x0990
+    u8 m_0x1294;                    // 0x1294
+    u8 m_pad_1295[3];               // 0x1295
+    u8 m_0x1298;                    // 0x1298
+    u8 m_pad_1299[3];               // 0x1299
 };
 
 #endif // _FFCC_CFLAT_RUNTIME_H_

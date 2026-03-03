@@ -1,7 +1,18 @@
 #include <dolphin.h>
 #include <dolphin/ax.h>
 
-#include "dolphin/ax/__ax.h"
+void __AXAllocInit(void);
+void __AXVPBInit(void);
+void __AXSPBInit(void);
+void __AXAuxInit(void);
+void __AXClInit(void);
+void __AXOutInit();
+void __AXAllocQuit(void);
+void __AXVPBQuit(void);
+void __AXSPBQuit(void);
+void __AXAuxQuit(void);
+void __AXClQuit(void);
+void __AXOutQuit(void);
 
 #ifdef DEBUG
 const char* __AXVersion = "<< Dolphin SDK - AX\tdebug build: Apr  5 2004 03:56:21 (0x2301) >>";
@@ -17,21 +28,7 @@ void AXInit(void) {
     __AXSPBInit();
     __AXAuxInit();
     __AXClInit();
-    __AXOutInit(0);
-}
-
-void AXInitEx(u32 outputBufferMode) {
-#ifdef DEBUG
-    OSReport("Initializing AX\n");
-#endif
-    OSRegisterVersion(__AXVersion);
-
-    __AXAllocInit();
-    __AXVPBInit();
-    __AXSPBInit();
-    __AXAuxInit();
-    __AXClInit();
-    __AXOutInit(outputBufferMode);
+    __AXOutInit();
 }
 
 void AXQuit(void) {

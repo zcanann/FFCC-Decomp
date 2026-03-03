@@ -85,6 +85,33 @@ public:
     void ErrorTexMtxCur();
     void ErrorTexMapIdCur();
     void GetMemoryStage();
+
+private:
+    unsigned char m_pad000[0x40];
+    unsigned int m_stdEnvTevBit;         // 0x40
+    unsigned int m_activeEnvTevBit;      // 0x44
+    unsigned int m_curEnvTevBit;         // 0x48
+    unsigned char m_alphaRef;            // 0x4C
+    unsigned char m_pad04D[0x0B];
+    unsigned int m_lockedEnvTevBit;      // 0x58
+    unsigned int m_lockedEnvUnknown5c;   // 0x5C
+    unsigned char m_pad060[0xBC];
+    int m_texMapIdCur;                   // 0x11C
+    int m_texMtxCur;                     // 0x120
+    int m_texCoordIdCur;                 // 0x124
+    int m_stdTexMapId;                   // 0x128
+    int m_stdTexMtx;                     // 0x12C
+    int m_stdTexCoordId;                 // 0x130
+    int m_texMapIdCurShadow;             // 0x134
+    int m_texMtxCurShadow;               // 0x138
+    int m_texCoordIdCurShadow;           // 0x13C
+    unsigned char m_pad140[0xC5];
+    unsigned char m_blendMode;           // 0x205
+    unsigned char m_fogEnable;           // 0x206
+    unsigned char m_blendOverrideMode;   // 0x207
+    unsigned char m_shadowKColorMask;    // 0x208
+    unsigned char m_pad209[0x0F];
+    CMemory::CStage* m_materialStage;    // 0x218
 };
 
 class CMaterial

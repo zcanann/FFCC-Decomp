@@ -2039,12 +2039,10 @@ void COctTree::CheckHitCylinderNear(CMapCylinder* cylinder, Vec* move, unsigned 
  */
 void CMaterialMan::LockEnv()
 {
-	// Copy current values to locked values
-	// Based on Ghidra decomp field assignments
-	*((unsigned int*)this + 0x128/4) = *((unsigned int*)this + 0x11c/4);
-	*((unsigned int*)this + 300/4) = *((unsigned int*)this + 0x120/4);
-	*((unsigned int*)this + 0x130/4) = *((unsigned int*)this + 0x124/4);
-	*((unsigned int*)this + 0x40/4) = *((unsigned int*)this + 0x48/4);
+	m_stdTexMapId = m_texMapIdCur;
+	m_stdTexMtx = m_texMtxCur;
+	m_stdTexCoordId = m_texCoordIdCur;
+	m_stdEnvTevBit = m_curEnvTevBit;
 }
 
 /*
@@ -2054,22 +2052,20 @@ void CMaterialMan::LockEnv()
  */
 void CMaterialMan::InitEnv()
 {
-	// Initialize environment settings
-	// Based on Ghidra decomp initialization values
-	*((unsigned int*)this + 0x48/4) = 0xace0f;
-	*((unsigned int*)this + 0x44/4) = 0xffffffff;
-	*((unsigned char*)this + 0x4c) = 0xff;
-	*((unsigned int*)this + 0x128/4) = 0;
-	*((unsigned int*)this + 0x11c/4) = 0;
-	*((unsigned int*)this + 300/4) = 0x1e;
-	*((unsigned int*)this + 0x120/4) = 0x1e;
-	*((unsigned int*)this + 0x130/4) = 0;
-	*((unsigned int*)this + 0x124/4) = 0;
-	*((unsigned char*)this + 0x205) = 0xff;
-	*((unsigned char*)this + 0x206) = 0xff;
-	*((unsigned int*)this + 0x58/4) = 0;
-	*((unsigned int*)this + 0x5c/4) = 0;
-	*((unsigned char*)this + 0x208) = 0;
+	m_curEnvTevBit = 0x000ACE0F;
+	m_activeEnvTevBit = 0xFFFFFFFF;
+	m_alphaRef = 0xFF;
+	m_stdTexMapId = 0;
+	m_texMapIdCur = 0;
+	m_stdTexMtx = 0x1E;
+	m_texMtxCur = 0x1E;
+	m_stdTexCoordId = 0;
+	m_texCoordIdCur = 0;
+	m_blendMode = 0xFF;
+	m_fogEnable = 0xFF;
+	m_lockedEnvTevBit = 0;
+	m_lockedEnvUnknown5c = 0;
+	m_shadowKColorMask = 0;
 }
 
 /*

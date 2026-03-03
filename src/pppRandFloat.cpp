@@ -63,12 +63,7 @@ void pppRandFloat(void* param1, void* param2, void* param3)
     }
 
     s32 sourceOffset = in->sourceOffset;
-    f32* source;
-    if (sourceOffset == -1) {
-        source = lbl_801EADC8;
-    } else {
-        source = (f32*)(base + sourceOffset + 0x80);
-    }
+    f32* source = (sourceOffset == -1) ? lbl_801EADC8 : (f32*)(base + sourceOffset + 0x80);
 
     *source = *source + (in->blend * *valuePtr - in->blend);
 }

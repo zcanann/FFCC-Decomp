@@ -38,6 +38,7 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct UnkB* param_2, str
 {
     struct _pppMngSt* pppMngSt;
     int workOffset;
+    int ownerValue;
     u8* owner;
     Vec local_1c;
     Vec local_28;
@@ -52,17 +53,17 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct UnkB* param_2, str
 
     pppMngSt = pppMngStPtr;
     owner = *(u8**)((u8*)pppMngSt + 0xdc);
+    ownerValue = (int)owner;
     workOffset = *param_3->m_serializedDataOffsets;
-    if (owner == nullptr) {
-        if (*(int*)((u8*)pppYmLookOn + workOffset + 0x80) == 0) {
-            return;
-        }
+    if ((ownerValue == 0) && (*(int*)((u8*)pppYmLookOn + workOffset + 0x80) == 0)) {
+        return;
     }
 
-    *(u8**)((u8*)pppYmLookOn + workOffset + 0x80) = owner;
-    if (owner == nullptr) {
-        owner = *(u8**)((u8*)pppYmLookOn + workOffset + 0x80);
+    *(int*)((u8*)pppYmLookOn + workOffset + 0x80) = ownerValue;
+    if (ownerValue == 0) {
+        ownerValue = *(int*)((u8*)pppYmLookOn + workOffset + 0x80);
     }
+    owner = (u8*)ownerValue;
 
     local_4c.x = *(f32*)(owner + 0x15c);
     local_4c.y = *(f32*)(owner + 0x160) + (f32)param_2->m_dataValIndex;

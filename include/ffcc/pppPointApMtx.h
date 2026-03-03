@@ -10,8 +10,8 @@ struct Vec;
 extern "C" {
 #endif
 
-void pppPointApMtxCon(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal);
 void pppPointApMtx(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal, _pppMngSt* pppMngSt);
+void pppPointApMtxCon(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal);
 
 #ifdef __cplusplus
 }

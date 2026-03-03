@@ -7,24 +7,6 @@ extern _pppPObject* pppCreatePObject(_pppMngSt*, _pppPDataVal*);
 
 /*
  * --INFO--
- * PAL Address: 0x800de348
- * PAL Size: 24b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppPointApMtxCon(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal)
-{
-	unsigned long data = *(unsigned long*)((char*)pppPDataVal + 0xC);
-	unsigned long offset = *(unsigned long*)(data + 0x4);
-	_pppPObject* object = (_pppPObject*)((char*)pppPObject + offset);
-
-	*(unsigned char*)((char*)object + 0x81) = 0;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800de210  
  * PAL Size: 312b
  * EN Address: TODO
@@ -58,9 +40,8 @@ void pppPointApMtx(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal, _pppMngSt
 			object = 0;
 		} else {
 			object = (_pppPObject*)pppCreatePObject(lbl_8032ED50, objectData);
+			*(void**)((u8*)object + 4) = pppPObject;
 		}
-
-		*(void**)((u8*)object + 4) = pppPObject;
 
 		matrix = (Mtx*)((u8*)object + *(u32*)((u8*)pppPDataVal + 8) + 0x80);
 		if (((u8*)pppPDataVal)[0xD] == 0) {
@@ -75,8 +56,27 @@ void pppPointApMtx(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal, _pppMngSt
 			(*matrix)[1][3] = pos.y;
 			(*matrix)[2][3] = pos.z;
 		}
+
+		((u8*)target)[1] = ((u8*)pppPDataVal)[0xC];
 	}
 
-	((u8*)target)[1] = ((u8*)pppPDataVal)[0xC];
 	((u8*)target)[1]--;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x800de348
+ * PAL Size: 24b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppPointApMtxCon(_pppPObject* pppPObject, _pppPDataVal* pppPDataVal)
+{
+	unsigned long data = *(unsigned long*)((char*)pppPDataVal + 0xC);
+	unsigned long offset = *(unsigned long*)(data + 0x4);
+	_pppPObject* object = (_pppPObject*)((char*)pppPObject + offset);
+
+	*(unsigned char*)((char*)object + 0x81) = 0;
 }

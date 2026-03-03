@@ -1,8 +1,8 @@
 #include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/msgbuf.h"
 #include "TRK_MINNOW_DOLPHIN/MetroTRK/Portable/nubinit.h"
 
-/* 8044D8C0-8044F270 07A5E0 19B0+00 4/4 0/0 0/0 .bss             gTRKMsgBufs */
-TRKBuffer gTRKMsgBufs[3];
+/* 8044D8C0-8044F270 07A5E0 19B0+00 4/4 0/0 0/0 .bss             lbl_80328750 */
+TRKBuffer lbl_80328750[3];
 
 void TRKSetBufferUsed(TRKBuffer* msg, BOOL state) {
     msg->isInUse = state;
@@ -12,10 +12,10 @@ void TRKSetBufferUsed(TRKBuffer* msg, BOOL state) {
 DSError TRKInitializeMessageBuffers(void) {
     int i;
     for (i = 0; i < 3; i++) {
-        TRKInitializeMutex(&gTRKMsgBufs[i]);
-        TRKAcquireMutex(&gTRKMsgBufs[i]);
-        TRKSetBufferUsed(&gTRKMsgBufs[i], FALSE);
-        TRKReleaseMutex(&gTRKMsgBufs[i]);
+        TRKInitializeMutex(&lbl_80328750[i]);
+        TRKAcquireMutex(&lbl_80328750[i]);
+        TRKSetBufferUsed(&lbl_80328750[i], FALSE);
+        TRKReleaseMutex(&lbl_80328750[i]);
     }
 
     return DS_NoError;
@@ -55,7 +55,7 @@ DSError TRKGetFreeBuffer(int* msgID, TRKBuffer** outMsg) {
 void* TRKGetBuffer(int idx) {
     TRKBuffer* buf = NULL;
     if (idx >= 0 && idx < 3) {
-        buf = &gTRKMsgBufs[idx];
+        buf = &lbl_80328750[idx];
     }
 
     return buf;
@@ -65,7 +65,7 @@ void* TRKGetBuffer(int idx) {
 void TRKReleaseBuffer(int idx) {
     TRKBuffer* msg;
     if (idx != -1 && idx >= 0 && idx < 3) {
-        msg = &gTRKMsgBufs[idx];
+        msg = &lbl_80328750[idx];
         TRKAcquireMutex(msg);
         TRKSetBufferUsed(msg, FALSE);
         TRKReleaseMutex(msg);

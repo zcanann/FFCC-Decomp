@@ -59,12 +59,6 @@ extern "C" void pppRandUpChar(void* param1, void* param2, void* param3)
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
     }
 
-    if (in->sourceOffset == -1) {
-        target = lbl_801EADC8;
-    } else {
-        target = base + in->sourceOffset + 0x80;
-    }
-
     union {
         f64 d;
         struct {
@@ -78,5 +72,10 @@ extern "C" void pppRandUpChar(void* param1, void* param2, void* param3)
 
     f32 value = *valuePtr;
     s32 delta = (s32)((cvt.d - lbl_8032FFE0) * value);
-    *target = (u8)(*target + delta);
+    if (in->sourceOffset == -1) {
+        lbl_801EADC8[0] = (u8)(lbl_801EADC8[0] + delta);
+    } else {
+        target = base + in->sourceOffset + 0x80;
+        *target = (u8)(*target + delta);
+    }
 }

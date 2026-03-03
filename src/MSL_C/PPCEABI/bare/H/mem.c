@@ -138,9 +138,8 @@ void __fill_mem(void* dst, int c, size_t count)
 	unsigned int fillValue;
 	unsigned int words;
 
-	c &= 0xFF;
 	bytePtr = (unsigned char*)dst - 1;
-	fillValue = c;
+	fillValue = (unsigned char)c;
 
 	if (count >= 0x20) {
 		alignBytes = ~(unsigned int)bytePtr & 3;
@@ -157,8 +156,7 @@ void __fill_mem(void* dst, int c, size_t count)
 		}
 
 		wordPtr = (unsigned int*)(bytePtr - 3);
-		words = count >> 5;
-		if (words != 0) {
+		if ((words = (count >> 5)) != 0) {
 			do {
 				wordPtr[1] = fillValue;
 				wordPtr[2] = fillValue;

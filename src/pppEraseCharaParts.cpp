@@ -5,7 +5,7 @@
 #include <dolphin/gx.h>
 
 extern CMaterialMan MaterialMan;
-extern int DAT_8032ed70;
+extern int lbl_8032ED70;
 extern unsigned char* lbl_8032ED50;
 
 extern "C" {
@@ -116,7 +116,7 @@ void pppFrameEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, UnkB* param
     u8* dstColor;
     u8* srcColor;
 
-    if (DAT_8032ed70 == 0) {
+    if (lbl_8032ED70 == 0) {
         offsets = param_3->m_serializedDataOffsets;
         colorIndex = offsets[0];
         dstColor = (u8*)((char*)pppEraseCharaParts + 2 + offsets[1]);

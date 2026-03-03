@@ -25,6 +25,24 @@ extern "C" void SetPosY__5CFontFf(float, CFont*);
 extern "C" void Draw__5CFontFPc(CFont*, const char*);
 extern "C" const char* GetMenuStr__8CMenuPcsFi(CMenuPcs*, int);
 
+namespace {
+
+struct MenuLstMembers {
+	unsigned char pad_0000[0x108];
+	CFont* m_font;
+	unsigned char pad_010C[0x720];
+	int m_lstStatePtr;
+	unsigned char pad_0830[0x20];
+	int m_lstDataPtr;
+};
+
+static inline MenuLstMembers& GetMenuLstMembers(CMenuPcs* menu)
+{
+	return *reinterpret_cast<MenuLstMembers*>(menu);
+}
+
+} // namespace
+
 /*
  * --INFO--
  * Address:	TODO
@@ -56,19 +74,20 @@ void CMenuPcs::MLstInit1()
  */
 int CMenuPcs::MLstOpen()
 {
+	MenuLstMembers& members = GetMenuLstMembers(this);
 	int completedItems;
 	unsigned int itemCount;
 	short* itemPtr;
 
-	if (*(char*)((char*)this + 0x82c + 0xb) == 0) {
+	if (*(char*)(members.m_lstStatePtr + 0xb) == 0) {
 		int offset;
 		int i;
 		short yPos;
 		short initializedCount;
 
-		memset(*(void**)((char*)this + 0x850), 0, 0x1008);
+		memset((void*)members.m_lstDataPtr, 0, 0x1008);
 
-		offset = *(int*)((char*)this + 0x850) + 8;
+		offset = members.m_lstDataPtr + 8;
 		i = 8;
 		do {
 			*(float*)(offset + 0x14) = 1.0f;
@@ -88,7 +107,7 @@ int CMenuPcs::MLstOpen()
 		i = 0;
 		yPos = 0x18;
 		do {
-			short* entry = (short*)(*(int*)((char*)this + 0x850) + offset + 8);
+			short* entry = (short*)(members.m_lstDataPtr + offset + 8);
 
 			*(int*)(entry + 0x16) = 2;
 			initializedCount++;
@@ -106,17 +125,17 @@ int CMenuPcs::MLstOpen()
 			*(int*)(entry + 0x14) = 4;
 		} while (i < 9);
 
-		**(short**)((char*)this + 0x850) = initializedCount;
-		*(char*)((char*)this + 0x82c + 0xb) = 1;
+		*(short*)members.m_lstDataPtr = initializedCount;
+		*(char*)(members.m_lstStatePtr + 0xb) = 1;
 	}
 
 	completedItems = 0;
-	*(short*)((char*)this + 0x82c + 0x22) = *(short*)((char*)this + 0x82c + 0x22) + 1;
-	itemCount = (unsigned int)**(short**)((char*)this + 0x850);
-	itemPtr = *(short**)((char*)this + 0x850) + 4;
+	*(short*)(members.m_lstStatePtr + 0x22) = *(short*)(members.m_lstStatePtr + 0x22) + 1;
+	itemCount = (unsigned int)*(short*)members.m_lstDataPtr;
+	itemPtr = (short*)members.m_lstDataPtr + 4;
 	if ((int)itemCount > 0) {
 		unsigned int i = itemCount;
-		int currentFrame = (int)*(short*)(*(int*)((char*)this + 0x82c) + 0x22);
+		int currentFrame = (int)*(short*)(members.m_lstStatePtr + 0x22);
 		do {
 			if (*(int*)(itemPtr + 0x12) <= currentFrame) {
 				if (currentFrame < *(int*)(itemPtr + 0x12) + *(int*)(itemPtr + 0x14)) {
@@ -132,8 +151,8 @@ int CMenuPcs::MLstOpen()
 		} while (i != 0);
 	}
 
-	if (**(short**)((char*)this + 0x850) == completedItems) {
-		itemPtr = *(short**)((char*)this + 0x850) + 4;
+	if (*(short*)members.m_lstDataPtr == completedItems) {
+		itemPtr = (short*)members.m_lstDataPtr + 4;
 		if ((int)itemCount > 0) {
 			unsigned int blocks = itemCount >> 3;
 			if (blocks != 0) {
@@ -215,6 +234,7 @@ int CMenuPcs::MLstOpen()
  */
 void CMenuPcs::MLstCtrl()
 {
+	MenuLstMembers& members = GetMenuLstMembers(this);
 	bool blocked;
 	bool resetAnim;
 	unsigned short press;
@@ -250,7 +270,7 @@ void CMenuPcs::MLstCtrl()
 	if (hold == 0) {
 		resetAnim = false;
 	} else {
-		menuState = *(int*)((char*)this + 0x82c);
+		menuState = members.m_lstStatePtr;
 		if ((hold & 0x48) == 0) {
 			if ((hold & 0x24) != 0) {
 				if (*(short*)(menuState + 0x26) < 8) {
@@ -274,7 +294,7 @@ void CMenuPcs::MLstCtrl()
 				if ((press & 0x200) == 0) {
 					resetAnim = false;
 				} else {
-					*(char*)(*(int*)((char*)this + 0x82c) + 0xd) = (char)0xff;
+					*(char*)(members.m_lstStatePtr + 0xd) = (char)0xff;
 					Sound.PlaySe(3, 0x40, 0x7f, 0);
 					resetAnim = true;
 				}
@@ -291,8 +311,8 @@ void CMenuPcs::MLstCtrl()
 		return;
 	}
 
-	item = *(int*)((char*)this + 0x850) + 8;
-	for (i = 0; (itemCount = (unsigned int)**(short**)((char*)this + 0x850)), i < (int)itemCount; i++) {
+	item = members.m_lstDataPtr + 8;
+	for (i = 0; (itemCount = (unsigned int)*(short*)members.m_lstDataPtr), i < (int)itemCount; i++) {
 		*(float*)(item + 0x10) = 1.0f;
 		*(float*)(item + 0x14) = 1.0f;
 		item += 0x40;
@@ -304,28 +324,28 @@ void CMenuPcs::MLstCtrl()
 		chunkCount = itemCount >> 3;
 		if (chunkCount != 0) {
 			do {
-				item = *(int*)((char*)this + 0x850) + offset + 8;
+				item = members.m_lstDataPtr + offset + 8;
 				*(int*)(item + 0x24) = startFrame;
 				*(int*)(item + 0x28) = 4;
-				item = *(int*)((char*)this + 0x850) + offset - 0x38;
+				item = members.m_lstDataPtr + offset - 0x38;
 				*(int*)(item + 0x24) = startFrame + 1;
 				*(int*)(item + 0x28) = 4;
-				item = *(int*)((char*)this + 0x850) + offset - 0x78;
+				item = members.m_lstDataPtr + offset - 0x78;
 				*(int*)(item + 0x24) = startFrame + 2;
 				*(int*)(item + 0x28) = 4;
-				item = *(int*)((char*)this + 0x850) + offset - 0xb8;
+				item = members.m_lstDataPtr + offset - 0xb8;
 				*(int*)(item + 0x24) = startFrame + 3;
 				*(int*)(item + 0x28) = 4;
-				item = *(int*)((char*)this + 0x850) + offset - 0xf8;
+				item = members.m_lstDataPtr + offset - 0xf8;
 				*(int*)(item + 0x24) = startFrame + 4;
 				*(int*)(item + 0x28) = 4;
-				item = *(int*)((char*)this + 0x850) + offset - 0x138;
+				item = members.m_lstDataPtr + offset - 0x138;
 				*(int*)(item + 0x24) = startFrame + 5;
 				*(int*)(item + 0x28) = 4;
-				item = *(int*)((char*)this + 0x850) + offset - 0x178;
+				item = members.m_lstDataPtr + offset - 0x178;
 				*(int*)(item + 0x24) = startFrame + 6;
 				*(int*)(item + 0x28) = 4;
-				item = *(int*)((char*)this + 0x850) + offset - 0x1b8;
+				item = members.m_lstDataPtr + offset - 0x1b8;
 				offset -= 0x200;
 				*(int*)(item + 0x24) = startFrame + 7;
 				startFrame += 8;
@@ -335,13 +355,13 @@ void CMenuPcs::MLstCtrl()
 
 			itemCount &= 7;
 			if (itemCount == 0) {
-				*(short*)(*(int*)((char*)this + 0x82c) + 0x22) = 0;
+				*(short*)(members.m_lstStatePtr + 0x22) = 0;
 				return;
 			}
 		}
 
 		do {
-			item = *(int*)((char*)this + 0x850) + offset + 8;
+			item = members.m_lstDataPtr + offset + 8;
 			offset -= 0x40;
 			*(int*)(item + 0x24) = startFrame;
 			startFrame++;
@@ -350,7 +370,7 @@ void CMenuPcs::MLstCtrl()
 		} while (itemCount != 0);
 	}
 
-	*(short*)(*(int*)((char*)this + 0x82c) + 0x22) = 0;
+	*(short*)(members.m_lstStatePtr + 0x22) = 0;
 }
 
 /*
@@ -364,6 +384,7 @@ void CMenuPcs::MLstCtrl()
  */
 void CMenuPcs::MLstClose()
 {
+	MenuLstMembers& members = GetMenuLstMembers(this);
 	float fVar1;
 	short* psVar4;
 	int iVar5;
@@ -372,10 +393,10 @@ void CMenuPcs::MLstClose()
 	unsigned int uVar8;
 
 	iVar5 = 0;
-	*(short*)(*(int*)((char*)this + 0x82c) + 0x22) = *(short*)(*(int*)((char*)this + 0x82c) + 0x22) + 1;
-	uVar6 = (unsigned int)**(short**)((char*)this + 0x850);
-	psVar4 = *(short**)((char*)this + 0x850) + 4;
-	iVar7 = (int)*(short*)(*(int*)((char*)this + 0x82c) + 0x22);
+	*(short*)(members.m_lstStatePtr + 0x22) = *(short*)(members.m_lstStatePtr + 0x22) + 1;
+	uVar6 = (unsigned int)*(short*)members.m_lstDataPtr;
+	psVar4 = (short*)members.m_lstDataPtr + 4;
+	iVar7 = (int)*(short*)(members.m_lstStatePtr + 0x22);
 	uVar8 = uVar6;
 	if (0 < (int)uVar6) {
 		do {
@@ -396,8 +417,8 @@ void CMenuPcs::MLstClose()
 		} while (uVar8 != 0);
 	}
 	fVar1 = 0.0f;
-	if (**(short**)((char*)this + 0x850) == iVar5) {
-		psVar4 = *(short**)((char*)this + 0x850) + 4;
+	if (*(short*)members.m_lstDataPtr == iVar5) {
+		psVar4 = (short*)members.m_lstDataPtr + 4;
 		if (0 < (int)uVar6) {
 			uVar8 = uVar6 >> 3;
 			if (uVar8 != 0) {
@@ -466,15 +487,16 @@ void CMenuPcs::MLstClose()
  */
 void CMenuPcs::MLstDraw()
 {
+	MenuLstMembers& members = GetMenuLstMembers(this);
 	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
 	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
 
-	int menuState = *(int*)((char*)this + 0x82c);
-	int listBase = *(int*)((char*)this + 0x850);
+	int menuState = members.m_lstStatePtr;
+	int listBase = members.m_lstDataPtr;
 	short menuMode = *(short*)(menuState + 0x10);
 	short cursor = *(short*)(menuState + 0x26);
 	short* item = (short*)(listBase + 8);
-	int itemCount = **(short**)((char*)this + 0x850);
+	int itemCount = *(short*)members.m_lstDataPtr;
 
 	for (int i = 0; i < itemCount; i++) {
 		int tex = *(int*)(item + 0xe);
@@ -507,7 +529,7 @@ void CMenuPcs::MLstDraw()
 		item += 0x20;
 	}
 
-	CFont* font = *(CFont**)((char*)this + 0x108);
+	CFont* font = members.m_font;
 	SetMargin__5CFontFf(1.0f, font);
 	SetShadow__5CFontFi(font, 0);
 	SetScale__5CFontFf(1.0f, font);

@@ -20,22 +20,17 @@ extern unsigned int lbl_8032ED08;
  */
 extern "C" void __sinit_p_system_cpp(void)
 {
-    unsigned int* table = reinterpret_cast<unsigned int*>(lbl_801EA0F4);
-    unsigned int* desc0 = lbl_801EA0D0;
-    unsigned int* desc1 = lbl_801EA0DC;
-    unsigned int* desc2 = lbl_801EA0E8;
-
     lbl_8032ED08 = reinterpret_cast<unsigned int>(lbl_801EA270);
 
-    table[1] = desc0[0];
-    table[2] = desc0[1];
-    table[3] = desc0[2];
-    table[4] = desc1[0];
-    table[5] = desc1[1];
-    table[6] = desc1[2];
-    table[7] = desc2[0];
-    table[8] = desc2[1];
-    table[9] = desc2[2];
+    reinterpret_cast<unsigned int*>(lbl_801EA0F4)[1] = lbl_801EA0D0[0];
+    reinterpret_cast<unsigned int*>(lbl_801EA0F4)[2] = lbl_801EA0D0[1];
+    reinterpret_cast<unsigned int*>(lbl_801EA0F4)[3] = lbl_801EA0D0[2];
+    reinterpret_cast<unsigned int*>(lbl_801EA0F4)[4] = lbl_801EA0DC[0];
+    reinterpret_cast<unsigned int*>(lbl_801EA0F4)[5] = lbl_801EA0DC[1];
+    reinterpret_cast<unsigned int*>(lbl_801EA0F4)[6] = lbl_801EA0DC[2];
+    reinterpret_cast<unsigned int*>(lbl_801EA0F4)[7] = lbl_801EA0E8[0];
+    reinterpret_cast<unsigned int*>(lbl_801EA0F4)[8] = lbl_801EA0E8[1];
+    reinterpret_cast<unsigned int*>(lbl_801EA0F4)[9] = lbl_801EA0E8[2];
 }
 
 /*

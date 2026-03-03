@@ -6,8 +6,6 @@
 class CMcPcs : public CProcess
 {
 public:
-    CMcPcs();
-
     void Init();
     void Quit();
     void* GetTable(unsigned long);

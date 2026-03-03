@@ -3,8 +3,10 @@
 #include "ffcc/math.h"
 #include "ffcc/wm_menu.h"
 
-extern CMath math;
+extern CMath math[];
 extern "C" int Format__6McCtrlFi(McCtrl* mcCtrl, int slot);
+extern "C" int Rand__5CMathFUl(CMath* instance, unsigned long max);
+extern "C" void CallWorldParam__8CMenuPcsFiii(CMenuPcs* menu, int mode, int param, int unused);
 extern "C" void __sinit_p_mc_cpp(void);
 
 extern unsigned int lbl_80211D88[];
@@ -58,16 +60,6 @@ extern "C" void __sinit_p_mc_cpp(void)
  * Address:	TODO
  * Size:	TODO
  */
-CMcPcs::CMcPcs()
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
 void CMcPcs::Init()
 {
 	// TODO
@@ -90,8 +82,6 @@ void CMcPcs::Quit()
  */
 void* CMcPcs::GetTable(unsigned long index)
 {
-	// Based on assembly: mulli r4, r4, 0x15c; add to base address
-	// 0x15c = 348 bytes per entry
 	return lbl_80211DAC + (index * 0x15c);
 }
 
@@ -130,7 +120,7 @@ void CMcPcs::calc()
     int result;
     int worldParam;
 
-    math.Rand(0x7FFFFFFF);
+    Rand__5CMathFUl(math, 0x7FFFFFFF);
 
     if (menuPcsLayout->field14 != 1)
     {
@@ -152,7 +142,7 @@ void CMcPcs::calc()
                     worldParam = 6;
                 }
 
-                MenuPcs.CallWorldParam(6, worldParam, 0);
+                CallWorldParam__8CMenuPcsFiii(&MenuPcs, 6, worldParam, 0);
                 menuPcsLayout->field18 = 0;
             }
         }
@@ -182,7 +172,7 @@ void CMcPcs::calc()
                     worldParam = 6;
                 }
 
-                MenuPcs.CallWorldParam(5, worldParam, 0);
+                CallWorldParam__8CMenuPcsFiii(&MenuPcs, 5, worldParam, 0);
                 menuPcsLayout->field18 = 0;
             }
         }

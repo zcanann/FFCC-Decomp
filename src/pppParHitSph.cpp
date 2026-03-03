@@ -20,13 +20,13 @@ extern unsigned char CFlat[];
 void pppParHitSph(struct _pppPObject* param_1, int param_2)
 {
     _pppMngSt* pppMngSt;
-    float radius;
-    _GXColor local_a8;
-    Vec local_a0;
-    Vec local_94;
     Vec local_88;
-    Mtx MStack_78;
+    Vec local_94;
+    Vec local_a0;
     Mtx local_48;
+    Mtx MStack_78;
+    _GXColor local_a8;
+    float radius;
     
     pppMngSt = (_pppMngSt*)lbl_8032ED50;
     PSVECSubtract((Vec*)(lbl_8032ED50 + 0x8), (Vec*)(lbl_8032ED50 + 0x48), &local_88);

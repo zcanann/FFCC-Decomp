@@ -1,6 +1,6 @@
 #include "ffcc/pppGetRotMatrixZ.h"
 
-#include "ffcc/pppsintbl.h"
+extern float ppvSinTbl[];
 
 /*
  * --INFO--
@@ -9,10 +9,10 @@
  */
 void pppGetRotMatrixZ(pppFMATRIX& mtx, long angle)
 {    
-	float zero = 0.0f; // FLOAT_8032fec4
-	float one = 1.0f; // FLOAT_8032fec0
-	float sinValue = pppSinFromTable(angle);
-	float cosValue = pppCosFromTable(angle);
+	float zero = 0.0f;
+	float one = 1.0f;
+	float sinValue = *(float*)((unsigned char*)ppvSinTbl + (angle & 0xFFFC));
+	float cosValue = *(float*)((unsigned char*)ppvSinTbl + ((angle + 0x4000) & 0xFFFC));
 
     mtx.value[0][0] = cosValue;
     mtx.value[0][1] = -sinValue;

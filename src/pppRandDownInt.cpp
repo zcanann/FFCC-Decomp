@@ -5,7 +5,6 @@
 extern CMath math[];
 extern s32 lbl_8032ED70;
 extern f32 lbl_8032FF58;
-extern f64 lbl_8032FF60;
 extern s32 lbl_801EADC8[];
 
 extern "C" {
@@ -15,7 +14,7 @@ f32 RandF__5CMathFv(CMath*);
 struct PppRandDownIntParam2 {
     s32 field0;
     s32 field4;
-    s32 field8;
+    u32 field8;
     u8 fieldC;
 };
 
@@ -62,17 +61,7 @@ void pppRandDownInt(void* param1, void* param2, void* param3)
 
     s32* target = (in->field4 == -1) ? lbl_801EADC8 : (s32*)(base + in->field4 + 0x80);
 
-    union {
-        f64 d;
-        struct {
-            u32 hi;
-            u32 lo;
-        } parts;
-    } cvt;
-    cvt.parts.hi = 0x43300000;
-    cvt.parts.lo = in->field8;
-
-    f32 factor = cvt.d - lbl_8032FF60;
+    f32 factor = (f32)in->field8;
     f32 scaled = factor * *valuePtr;
     s32 delta = (s32)scaled;
     *target += delta;

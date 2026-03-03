@@ -96,11 +96,9 @@ static inline double U32ToDouble(unsigned int value)
  */
 CLightPcs::CLightPcs()
 {
-    char* self = reinterpret_cast<char*>(this);
-
-    __construct_array(self + 0xbc, (ConstructorDestructor)__ct__Q29CLightPcs6CLightFv, 0, 0xb0, 8);
-    __construct_array(self + 0x63c, (ConstructorDestructor)__ct__Q29CLightPcs6CLightFv, 0, 0xb0, 0x20);
-    __construct_array(self + 0x1c3c, (ConstructorDestructor)__ct__Q29CLightPcs10CBumpLightFv, 0, 0x138, 0x20);
+    __construct_array(m_diffuseLights, (ConstructorDestructor)__ct__Q29CLightPcs6CLightFv, 0, sizeof(CLight), 8);
+    __construct_array(m_sceneLights, (ConstructorDestructor)__ct__Q29CLightPcs6CLightFv, 0, sizeof(CLight), 0x20);
+    __construct_array(m_bumpLights, (ConstructorDestructor)__ct__Q29CLightPcs10CBumpLightFv, 0, sizeof(CBumpLight), 0x20);
 
     unsigned int* table = lbl_801EA2D4;
 
@@ -132,47 +130,46 @@ CLightPcs::CLightPcs()
  */
 void CLightPcs::Init()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
     float f1 = FLOAT_8032fc14;
     float f2 = FLOAT_8032fc2c;
     unsigned int z0 = __cntlzw(0);
     unsigned int z1 = __cntlzw(1);
     unsigned char v = static_cast<unsigned char>(-(((z0 >> 5) & 1))) & 0x3F;
 
-    self[0x433c] = 0x3f;
-    self[0x433d] = 0x3f;
-    self[0x433e] = 0x3f;
-    self[0x433f] = 0xff;
+    m_mapLightColor[0].r = 0x3F;
+    m_mapLightColor[0].g = 0x3F;
+    m_mapLightColor[0].b = 0x3F;
+    m_mapLightColor[0].a = 0xFF;
 
-    self[0x4340] = v;
-    self[0x4341] = v;
-    self[0x4342] = v;
+    m_mapLightColor[1].r = v;
+    m_mapLightColor[1].g = v;
+    m_mapLightColor[1].b = v;
     v = static_cast<unsigned char>(-(((z1 >> 5) & 1))) & 0x3F;
     unsigned int z2 = __cntlzw(2);
-    self[0x4343] = 0xff;
+    m_mapLightColor[1].a = 0xFF;
 
-    *reinterpret_cast<float*>(self + 0x434c) = f1;
-    *reinterpret_cast<float*>(self + 0x4350) = f1;
-    *reinterpret_cast<float*>(self + 0x4354) = f2;
+    m_mapLightParams[0] = f1;
+    m_mapLightParams[1] = f1;
+    m_mapLightParams[2] = f2;
 
-    self[0x4344] = v;
-    self[0x4345] = v;
-    self[0x4346] = v;
+    m_mapLightColor[2].r = v;
+    m_mapLightColor[2].g = v;
+    m_mapLightColor[2].b = v;
     v = static_cast<unsigned char>(-(((z2 >> 5) & 1))) & 0x3F;
-    self[0x4347] = 0xff;
+    m_mapLightColor[2].a = 0xFF;
 
-    *reinterpret_cast<float*>(self + 0x4358) = f1;
-    *reinterpret_cast<float*>(self + 0x435c) = f1;
-    *reinterpret_cast<float*>(self + 0x4360) = f2;
+    m_mapLightParams[3] = f1;
+    m_mapLightParams[4] = f1;
+    m_mapLightParams[5] = f2;
 
-    self[0x4348] = v;
-    self[0x4349] = v;
-    self[0x434a] = v;
-    self[0x434b] = 0xff;
+    m_mapLightColor[3].r = v;
+    m_mapLightColor[3].g = v;
+    m_mapLightColor[3].b = v;
+    m_mapLightColor[3].a = 0xFF;
 
-    *reinterpret_cast<float*>(self + 0x4364) = f1;
-    *reinterpret_cast<float*>(self + 0x4368) = f1;
-    *reinterpret_cast<float*>(self + 0x436c) = f2;
+    m_mapLightParams[6] = f1;
+    m_mapLightParams[7] = f1;
+    m_mapLightParams[8] = f2;
 }
 
 /*
@@ -328,7 +325,7 @@ void CLightPcs::DestroyBumpLightAll(CLightPcs::TARGET target)
  */
 void CLightPcs::calc()
 {
-    *(u32*)((char*)this + 0xb8) = 0;
+    m_sceneLightCount = 0;
     FLOAT_8032ed10 = FLOAT_8032ed10 + FLOAT_8032fc90;
 }
 
@@ -345,39 +342,36 @@ void CLightPcs::draw()
 {
     Mtx mtx;
     Vec vec;
-    char* light = (char*)this + 0x63c;
 
     PSMTXCopy(CameraPcs.m_cameraMatrix, mtx);
-    for (u32 i = 0; i < *(u32*)((char*)this + 0xb8); i++) {
-        if (*(u8*)(light + 0x4f) == 0) {
-            PSMTXMultVec(mtx, (Vec*)(light + 4), &vec);
-            GXInitLightPos((GXLightObj*)(light + 0x6c), vec.x, vec.y, vec.z);
+    for (u32 i = 0; i < m_sceneLightCount; i++) {
+        CLight* light = &m_sceneLights[i];
+        if (light->m_specularMode == 0) {
+            PSMTXMultVec(mtx, reinterpret_cast<Vec*>(&light->m_position), &vec);
+            GXInitLightPos(&light->m_gxLightObj, vec.x, vec.y, vec.z);
 
-            if (*(u8*)(light + 0x4e) == 0) {
-                PSMTXMultVecSR(mtx, (Vec*)(light + 0x38), &vec);
-                GXInitLightDir((GXLightObj*)(light + 0x6c), vec.x, vec.y, vec.z);
+            if (light->m_directionMode == 0) {
+                PSMTXMultVecSR(mtx, reinterpret_cast<Vec*>(&light->m_direction), &vec);
+                GXInitLightDir(&light->m_gxLightObj, vec.x, vec.y, vec.z);
             } else {
-                GXInitLightDir((GXLightObj*)(light + 0x6c), *(float*)(light + 0x38), *(float*)(light + 0x3c),
-                               *(float*)(light + 0x40));
+                GXInitLightDir(&light->m_gxLightObj, light->m_direction.x, light->m_direction.y, light->m_direction.z);
             }
 
             float cutoff = FLOAT_8032fc74;
-            if (*(u32*)light == 1) {
-                cutoff = FLOAT_8032fc94 * *(float*)(light + 0x44);
+            if (light->m_type == 1) {
+                cutoff = FLOAT_8032fc94 * light->m_spotScale;
             }
 
-            GXInitLightSpot((GXLightObj*)(light + 0x6c), cutoff, (GXSpotFn)*(u8*)(light + 0x4d));
-            GXInitLightAttnK((GXLightObj*)(light + 0x6c), FLOAT_8032fc84 / *(float*)(light + 0x20),
-                             FLOAT_8032fc84 / *(float*)(light + 0x1c), FLOAT_8032fc84 / *(float*)(light + 0x1c));
+            GXInitLightSpot(&light->m_gxLightObj, cutoff, (GXSpotFn)light->m_unk4D);
+            GXInitLightAttnK(&light->m_gxLightObj, FLOAT_8032fc84 / light->m_attenFalloff,
+                             FLOAT_8032fc84 / light->m_attenRadius, FLOAT_8032fc84 / light->m_attenRadius);
         } else {
-            PSMTXMultVecSR(mtx, (Vec*)(light + 0x38), &vec);
-            GXInitSpecularDir((GXLightObj*)(light + 0x6c), vec.x, vec.y, vec.z);
-            GXInitLightAttn((GXLightObj*)(light + 0x6c), FLOAT_8032fc14, FLOAT_8032fc14, FLOAT_8032fc1c,
-                            *(float*)(light + 0x48) * FLOAT_8032fc18, FLOAT_8032fc14,
-                            FLOAT_8032fc1c - (*(float*)(light + 0x48) * FLOAT_8032fc18));
+            PSMTXMultVecSR(mtx, reinterpret_cast<Vec*>(&light->m_direction), &vec);
+            GXInitSpecularDir(&light->m_gxLightObj, vec.x, vec.y, vec.z);
+            GXInitLightAttn(&light->m_gxLightObj, FLOAT_8032fc14, FLOAT_8032fc14, FLOAT_8032fc1c,
+                            light->m_specularScale * FLOAT_8032fc18, FLOAT_8032fc14,
+                            FLOAT_8032fc1c - (light->m_specularScale * FLOAT_8032fc18));
         }
-
-        light += 0xb0;
     }
 }
 
@@ -469,10 +463,10 @@ void CLightPcs::Add(CLightPcs::CLight* light)
         colorMask = (colorMask & 0xFFFF00FF) | ((colorMask >> 16) & 0x000000FF);
     }
 
-    int index = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0xb8);
-    *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0xb8) = index + 1;
+    int index = m_sceneLightCount;
+    m_sceneLightCount = index + 1;
 
-    u32* dst = reinterpret_cast<u32*>(reinterpret_cast<char*>(this) + (index * 0xb0) + 0x63c);
+    u32* dst = reinterpret_cast<u32*>(&m_sceneLights[index]);
     dst[0] = w0;
     dst[1] = w1;
     dst[2] = w2;
@@ -776,7 +770,7 @@ void CLightPcs::SetAmbientAlpha(float alpha)
  */
 void CLightPcs::SetNumDiffuse(unsigned long count)
 {
-    *(u32*)((char*)this + 0xac) = count;
+    m_numDiffuse = count;
 }
 
 /*
@@ -790,7 +784,7 @@ void CLightPcs::SetNumDiffuse(unsigned long count)
  */
 void CLightPcs::SetDiffuseColor(unsigned long idx, _GXColor color)
 {
-    GXInitLightColor((GXLightObj*)((char*)this + (idx * 0xb0) + 0x128), color);
+    GXInitLightColor(&m_diffuseLights[idx].m_gxLightObj, color);
 }
 
 /*
@@ -809,7 +803,7 @@ void CLightPcs::EnableLight(int param_1, int param_2)
     if (param_1 == 0) {
         light_mask = 0;
     } else {
-        light_mask = *(unsigned int*)((char*)this + 0xb4);
+        light_mask = m_loadedLightMask;
     }
 
     GXSetChanCtrl((GXChannelID)0, (u8)(((unsigned int)(-param_1 | param_1)) >> 0x1f), (GXColorSrc)0,
@@ -831,7 +825,7 @@ void CLightPcs::EnableLight(int param_1, int param_2)
  */
 void CLightPcs::SetDiffuse(unsigned long idx, _GXColor color, Vec* dir, int mode)
 {
-    char* light = (char*)this + idx * 0xb0 + 0xbc;
+    CLight* light = &m_diffuseLights[idx];
     Mtx cam;
     Vec tmp;
     Vec lightDir;
@@ -846,20 +840,20 @@ void CLightPcs::SetDiffuse(unsigned long idx, _GXColor color, Vec* dir, int mode
         lightDir.z = dir->z;
     }
 
-    GXInitLightColor((GXLightObj*)(light + 0x6c), color);
+    GXInitLightColor(&light->m_gxLightObj, color);
     PSMTXCopy(CameraPcs.m_cameraMatrix, cam);
 
     tmp.x = FLOAT_8032fc70 * -lightDir.x;
     tmp.y = FLOAT_8032fc70 * -lightDir.y;
     tmp.z = FLOAT_8032fc70 * -lightDir.z;
     PSMTXMultVec(cam, &tmp, &tmp);
-    GXInitLightPos((GXLightObj*)(light + 0x6c), tmp.x, tmp.y, tmp.z);
+    GXInitLightPos(&light->m_gxLightObj, tmp.x, tmp.y, tmp.z);
 
     PSMTXMultVecSR(cam, &lightDir, &lightDir);
-    GXInitLightDir((GXLightObj*)(light + 0x6c), lightDir.x, lightDir.y, lightDir.z);
+    GXInitLightDir(&light->m_gxLightObj, lightDir.x, lightDir.y, lightDir.z);
 
-    GXInitLightSpot((GXLightObj*)(light + 0x6c), FLOAT_8032fc74, (GXSpotFn)4);
-    GXInitLightAttnK((GXLightObj*)(light + 0x6c), FLOAT_8032fc14, FLOAT_8032fc78, FLOAT_8032fc14);
+    GXInitLightSpot(&light->m_gxLightObj, FLOAT_8032fc74, (GXSpotFn)4);
+    GXInitLightAttnK(&light->m_gxLightObj, FLOAT_8032fc14, FLOAT_8032fc78, FLOAT_8032fc14);
 }
 
 /*
@@ -1039,15 +1033,12 @@ void CLightPcs::SetPart(CLightPcs::TARGET target, void* part, unsigned char mode
  */
 void CLightPcs::InsertOctTree(CLightPcs::TARGET target, COctTree& octTree)
 {
-    char* light = (char*)this + 0x63c;
-    u32 i;
-
     octTree.ClearLight();
-    for (i = 0; i < *(u32*)((char*)this + 0xb8); i++) {
-        if (*(char*)(light + 0x60 + (int)target) != '\0') {
-            octTree.InsertLight(i, *(Vec*)(light + 4), *(float*)(light + 0x24), *(u32*)(light + 0x34));
+    for (u32 i = 0; i < m_sceneLightCount; i++) {
+        CLight* light = &m_sceneLights[i];
+        if (((light->m_targetEnableMask >> (target * 8)) & 0xFF) != 0) {
+            octTree.InsertLight(i, *reinterpret_cast<Vec*>(&light->m_position), light->m_range, light->m_partMask);
         }
-        light += 0xb0;
     }
 }
 
@@ -1062,7 +1053,7 @@ void CLightPcs::InsertOctTree(CLightPcs::TARGET target, COctTree& octTree)
  */
 void CLightPcs::CBumpLight::MakeLightMap()
 {
-    if (*(int*)((char*)this + 0xb4) == 0) {
+    if (m_textureData == 0) {
         return;
     }
 
@@ -1071,10 +1062,10 @@ void CLightPcs::CBumpLight::MakeLightMap()
     _GXColor chanAmb2;
     _GXColor chanMat2;
 
-    unsigned char u0 = *(unsigned char*)((char*)this + 0x68);
-    unsigned char u1 = *(unsigned char*)((char*)this + 0x69);
-    unsigned char u2 = *(unsigned char*)((char*)this + 0x6a);
-    unsigned char u3 = *(unsigned char*)((char*)this + 0x6b);
+    unsigned char u0 = m_bumpShade[0];
+    unsigned char u1 = m_bumpShade[1];
+    unsigned char u2 = m_bumpShade[2];
+    unsigned char u3 = m_bumpShade[3];
 
     chanAmb.r = u0;
     chanAmb.g = u0;
@@ -1099,7 +1090,7 @@ void CLightPcs::CBumpLight::MakeLightMap()
     GXSetChanMatColor((GXChannelID)2, chanMat2);
 
     Vec eyeDir;
-    if (*(char*)((char*)this + 0xb1) == 1) {
+    if (m_useViewSpace == 1) {
         Mtx tmp;
         PSMTXIdentity(tmp);
         PSMTXTrans(tmp, FLOAT_8032fc14, FLOAT_8032fc14, FLOAT_8032fc34);
@@ -1117,7 +1108,7 @@ void CLightPcs::CBumpLight::MakeLightMap()
         up.z = FLOAT_8032fc14;
 
         Mtx lookAt;
-        C_MTXLookAt(lookAt, &eye, &up, (Vec*)((char*)this + 0x38));
+        C_MTXLookAt(lookAt, &eye, &up, reinterpret_cast<Vec*>(&m_direction));
 
         Vec camPos;
         camPos.x = CameraPcs._224_4_;
@@ -1125,17 +1116,17 @@ void CLightPcs::CBumpLight::MakeLightMap()
         camPos.z = CameraPcs._232_4_;
 
         Vec lightPos;
-        PSVECSubtract((Vec*)((char*)this + 0x10), &camPos, &lightPos);
+        PSVECSubtract(reinterpret_cast<Vec*>(&m_targetPosition), &camPos, &lightPos);
         PSVECNormalize(&lightPos, &lightPos);
 
         Vec nrm;
-        PSVECNormalize((Vec*)((char*)this + 0x38), &nrm);
+        PSVECNormalize(reinterpret_cast<Vec*>(&m_direction), &nrm);
 
         Vec diff;
         PSVECSubtract(&lightPos, &nrm, &diff);
 
         float scale = FLOAT_8032fc1c;
-        if (*(char*)((char*)this + 0xb2) == 1) {
+        if (m_target == 1) {
             scale = FLOAT_8032fc38;
         }
         PSVECScale(&diff, &diff, scale);
@@ -1148,9 +1139,9 @@ void CLightPcs::CBumpLight::MakeLightMap()
         PSMTXIdentity(tmp);
         GXLoadPosMtxImm(tmp, 0);
         GXLoadNrmMtxImm(tmp, 0);
-        eyeDir.x = *(float*)((char*)this + 0x38);
-        eyeDir.y = *(float*)((char*)this + 0x3c);
-        eyeDir.z = *(float*)((char*)this + 0x40);
+        eyeDir.x = m_direction.x;
+        eyeDir.y = m_direction.y;
+        eyeDir.z = m_direction.z;
     }
 
     int copySize = GXGetTexBufferSize(0x40, 0x40, 3, 0, 0);
@@ -1163,8 +1154,8 @@ void CLightPcs::CBumpLight::MakeLightMap()
     int offset = 0;
     double dW = (double)FLOAT_8032fc60;
 
-    for (int i = 0; i < (int)(unsigned int)*(unsigned char*)((char*)this + 0xb3); i++) {
-        int texBase = *(int*)((char*)this + 0xb4);
+    for (int i = 0; i < (int)(unsigned int)m_textureCount; i++) {
+        int texBase = (int)m_textureData;
         GXLightObj lightObj;
         GXInitSpecularDir(&lightObj, eyeDir.x, eyeDir.y, eyeDir.z);
 
@@ -1172,9 +1163,9 @@ void CLightPcs::CBumpLight::MakeLightMap()
         *reinterpret_cast<unsigned int*>(&lightColor) = packedColor;
         GXInitLightColor(&lightObj, lightColor);
 
-        if (*(char*)((char*)this + 0xb2) == 1) {
+        if (m_target == 1) {
             double d0 = (double)FLOAT_8032fc14;
-            double d1 = (double)(*(float*)((char*)this + 0x48) * FLOAT_8032fc18);
+            double d1 = (double)(m_specularScale * FLOAT_8032fc18);
             GXInitLightAttn(&lightObj, (float)d0, (float)d0, FLOAT_8032fc1c, (float)d1, (float)d0,
                             (float)((double)FLOAT_8032fc1c - d1));
         } else {
@@ -1386,7 +1377,7 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
 
     Mtx cam;
     PSMTXCopy(CameraPcs.m_cameraMatrix, cam);
-    Mtx* out = (Mtx*)((char*)this + 0x30);
+    Mtx* out = &m_bumpTexMtx1;
 
     if (mode == 0) {
         if (scale == nullptr ||
@@ -1478,11 +1469,11 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
     nrm[2][3] = FLOAT_8032fc14;
     GXLoadNrmMtxImm(nrm, 0);
 
-    if ((bump != nullptr) && (*(char*)((char*)bump + 0xb0) != 0)) {
-        Mtx* bumpMat0 = (Mtx*)((char*)this + 4);
-        Mtx* bumpMat1 = (Mtx*)((char*)this + 0x34);
+    if ((bump != nullptr) && (bump->m_hasTexture != 0)) {
+        Mtx* bumpMat0 = &m_bumpTexMtx0;
+        Mtx* bumpMat1 = &m_bumpTexMtx1;
 
-        if (*(char*)((char*)bump + 0xb1) == 1) {
+        if (bump->m_useViewSpace == 1) {
             Mtx tmp;
             PSMTXTrans(tmp, FLOAT_8032fc18, FLOAT_8032fc18, FLOAT_8032fc14);
             PSMTXConcat(tmp, nrm, *bumpMat0);
@@ -1505,28 +1496,29 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
 
             double camX = (double)CameraPcs._224_4_;
             double camZ = (double)CameraPcs._232_4_;
-            PSMTXIdentity(*(Mtx*)((char*)this + 100));
+            PSMTXIdentity(reinterpret_cast<float(*)[4]>(m_bumpTexScratch));
+            float* scratch = m_bumpTexScratch;
 
             float f0 = FLOAT_8032fc24;
             float f1 = FLOAT_8032fc14;
-            *(float*)((char*)this + 100) = FLOAT_8032fc24;
+            scratch[0] = FLOAT_8032fc24;
             float f2 = FLOAT_8032fc18;
-            *(float*)((char*)this + 0x7c) = f0;
+            scratch[6] = f0;
             float f3 = FLOAT_8032fc20;
-            *(float*)((char*)this + 0x8c) = f1;
-            *(float*)((char*)this + 0x78) = f1;
-            *(float*)((char*)this + 0x88) = f1;
-            *(float*)((char*)this + 0x70) =
-                -(f0 * (float)(camX + (double)*(float*)((char*)bump + 0x2c)) - f2);
-            *(float*)((char*)this + 0x80) =
-                -(f0 * (float)(camZ + (double)*(float*)((char*)bump + 0x30)) - f2);
-            *(float*)((char*)this + 0x90) = f1;
-            *(float*)((char*)this + 0xa4) = f3;
-            *(float*)((char*)this + 0x94) = f3;
-            *(float*)((char*)this + 0xa8) = f1;
-            *(float*)((char*)this + 0xa0) = f1;
-            *(float*)((char*)this + 0x9c) = f1;
-            *(float*)((char*)this + 0x98) = f1;
+            scratch[10] = f1;
+            scratch[5] = f1;
+            scratch[9] = f1;
+            scratch[3] =
+                -(f0 * (float)(camX + (double)bump->m_offsetX) - f2);
+            scratch[7] =
+                -(f0 * (float)(camZ + (double)bump->m_offsetZ) - f2);
+            scratch[11] = f1;
+            scratch[16] = f3;
+            scratch[12] = f3;
+            scratch[17] = f1;
+            scratch[15] = f1;
+            scratch[14] = f1;
+            scratch[13] = f1;
         }
     }
 }
@@ -1542,30 +1534,27 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
  */
 CLightPcs::CBumpLight::CBumpLight()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
     float f2 = FLOAT_8032fc1c;
     int r5 = 0;
     float f1 = FLOAT_8032fc14;
     int r4 = 4;
 
-    *reinterpret_cast<float*>(self + 0x28) = f2;
     int r0 = -1;
     float f0 = FLOAT_8032fc10;
-    *reinterpret_cast<float*>(self + 0x30) = f1;
-    *reinterpret_cast<float*>(self + 0x2C) = f1;
-    *reinterpret_cast<float*>(self + 0x20) = f0;
-    self[0x4E] = static_cast<unsigned char>(r5);
-    self[0x4C] = static_cast<unsigned char>(r5);
-    self[0x4D] = static_cast<unsigned char>(r4);
-    self[0x4F] = static_cast<unsigned char>(r5);
-    *reinterpret_cast<int*>(self + 0x34) = r0;
-    *reinterpret_cast<int*>(self + 0x64) = r5;
-    *reinterpret_cast<int*>(self + 0x50) = r5;
-    *reinterpret_cast<int*>(self + 0x54) = r5;
-    *reinterpret_cast<int*>(self + 0x58) = r5;
-    *reinterpret_cast<int*>(self + 0x5C) = r5;
-    *reinterpret_cast<float*>(self + 0x28) = f2;
-    self[0xB0] = static_cast<unsigned char>(r5);
+    m_radius = f2;
+    m_offsetZ = f1;
+    m_offsetX = f1;
+    m_attenFalloff = f0;
+    m_directionMode = static_cast<unsigned char>(r5);
+    m_spotFn = static_cast<unsigned char>(r5);
+    m_unk4D = static_cast<unsigned char>(r4);
+    m_specularMode = static_cast<unsigned char>(r5);
+    m_partMask = r0;
+    m_part = 0;
+    memset(m_targetColor, 0, sizeof(m_targetColor));
+    m_targetEnableMask = 0;
+    m_radius = f2;
+    m_hasTexture = static_cast<unsigned char>(r5);
 }
 
 /*
@@ -1579,8 +1568,7 @@ CLightPcs::CBumpLight::CBumpLight()
  */
 void CLightPcs::CBumpLight::SetTexture(_GXTexMapID texMapID, int textureIdx)
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
-    GXLoadTexObj(reinterpret_cast<GXTexObj*>(self + textureIdx * 0x20 + 0xB8), texMapID);
+    GXLoadTexObj(&m_textures[textureIdx], texMapID);
 }
 
 /*
@@ -1594,28 +1582,25 @@ void CLightPcs::CBumpLight::SetTexture(_GXTexMapID texMapID, int textureIdx)
  */
 CLightPcs::CLight::CLight()
 {
-    unsigned char* self = reinterpret_cast<unsigned char*>(this);
     float f0 = FLOAT_8032fc1c;
     int r5 = 0;
     float f1 = FLOAT_8032fc14;
     int r4 = 4;
 
-    *reinterpret_cast<float*>(self + 0x28) = f0;
     int r0 = -1;
     f0 = FLOAT_8032fc10;
-    *reinterpret_cast<float*>(self + 0x30) = f1;
-    *reinterpret_cast<float*>(self + 0x2C) = f1;
-    *reinterpret_cast<float*>(self + 0x20) = f0;
-    self[0x4E] = static_cast<unsigned char>(r5);
-    self[0x4C] = static_cast<unsigned char>(r5);
-    self[0x4D] = static_cast<unsigned char>(r4);
-    self[0x4F] = static_cast<unsigned char>(r5);
-    *reinterpret_cast<int*>(self + 0x34) = r0;
-    *reinterpret_cast<int*>(self + 0x64) = r5;
-    *reinterpret_cast<int*>(self + 0x50) = r5;
-    *reinterpret_cast<int*>(self + 0x54) = r5;
-    *reinterpret_cast<int*>(self + 0x58) = r5;
-    *reinterpret_cast<int*>(self + 0x5C) = r5;
+    m_radius = f0;
+    m_offsetZ = f1;
+    m_offsetX = f1;
+    m_attenFalloff = f0;
+    m_directionMode = static_cast<unsigned char>(r5);
+    m_spotFn = static_cast<unsigned char>(r5);
+    m_unk4D = static_cast<unsigned char>(r4);
+    m_specularMode = static_cast<unsigned char>(r5);
+    m_partMask = r0;
+    m_part = 0;
+    memset(m_targetColor, 0, sizeof(m_targetColor));
+    m_targetEnableMask = 0;
 }
 
 /*

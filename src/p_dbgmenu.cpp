@@ -103,10 +103,10 @@ CDbgMenuPcs::CDbgMenuPcs()
  */
 void CDbgMenuPcs::Init()
 {
-	*(u32*)((char*)this + 0x40) = 0;
-	*(u32*)((char*)this + 0x20) = 0x280;
-	*(u32*)((char*)this + 0x24) = 0x1C0;
-	*(u32*)((char*)this + 4) = 0x8940;
+	m_rootMenuNode.m_id = 0;
+	m_rootMenuNode.m_unk18 = 0x280;
+	m_rootMenuNode.m_unk1C = 0x1C0;
+	m_dbgFlags = 0x8940;
 }
 
 /*
@@ -200,7 +200,7 @@ void CDbgMenuPcs::calc()
 	int cursorPtr;
 	int stackData[3];
 
-	if (m_rootMenu == 0) {
+	if (m_rootMenuNode.m_firstChild == 0) {
 		return;
 	}
 
@@ -232,45 +232,45 @@ void CDbgMenuPcs::calc()
 			CFlat[0x12E4] = (unsigned char)((((int)(char)(flags >> 5) << 2) & 4) | (CFlat[0x12E4] & 0xFB));
 			break;
 		case 0x67:
-			*(unsigned int*)((char*)this + 4) ^= 1;
+			m_dbgFlags ^= 1;
 			break;
 		case 0x68:
-			*(unsigned int*)((char*)this + 4) ^= 2;
+			m_dbgFlags ^= 2;
 			break;
 		case 0x69:
-			*(unsigned int*)((char*)this + 4) ^= 4;
+			m_dbgFlags ^= 4;
 			break;
 		case 0x6A:
-			*(unsigned int*)((char*)this + 4) ^= 8;
+			m_dbgFlags ^= 8;
 			break;
 		case 0x6B:
-			*(unsigned int*)((char*)this + 4) ^= 0x10;
+			m_dbgFlags ^= 0x10;
 			break;
 		case 0x6C:
-			*(unsigned int*)((char*)this + 4) ^= 0x20;
+			m_dbgFlags ^= 0x20;
 			break;
 		case 0x6D:
-			*(unsigned int*)((char*)this + 4) ^= 0x40;
+			m_dbgFlags ^= 0x40;
 			break;
 		case 0x6E:
-			*(unsigned int*)((char*)this + 4) ^= 0x80;
+			m_dbgFlags ^= 0x80;
 			break;
 		case 0x6F:
-			*(unsigned int*)((char*)this + 4) ^= 0x100;
+			m_dbgFlags ^= 0x100;
 			break;
 		case 0x70:
-			*(unsigned int*)((char*)this + 4) ^= 0x200;
+			m_dbgFlags ^= 0x200;
 			break;
 		case 0x71:
-			*(unsigned int*)((char*)this + 4) ^= 0x400;
+			m_dbgFlags ^= 0x400;
 			break;
 		case 0x72:
-			*(unsigned int*)((char*)this + 4) ^= 0x800;
-			flags = (unsigned int)__cntlzw(*(unsigned int*)((char*)this + 4) & 0x800);
+			m_dbgFlags ^= 0x800;
+			flags = (unsigned int)__cntlzw(m_dbgFlags & 0x800);
 			PartPcs[0x34] = (unsigned char)(flags >> 5);
 			break;
 		case 0x73:
-			*(unsigned int*)((char*)this + 4) ^= 0x1000;
+			m_dbgFlags ^= 0x1000;
 			break;
 		case 0x74:
 			CheckDriver__6CSoundFi(Sound, 1);
@@ -286,13 +286,13 @@ void CDbgMenuPcs::calc()
 			DumpLoad__9CCharaPcsFv(CharaPcs);
 			break;
 		case 0x78:
-			*(unsigned int*)((char*)this + 4) ^= 0x2000;
+			m_dbgFlags ^= 0x2000;
 			break;
 		case 0x79:
-			*(unsigned int*)((char*)this + 4) ^= 0x4000;
+			m_dbgFlags ^= 0x4000;
 			break;
 		case 0x7A:
-			*(unsigned int*)((char*)this + 4) ^= 0x8000;
+			m_dbgFlags ^= 0x8000;
 			break;
 		}
 	}
@@ -337,8 +337,8 @@ void CDbgMenuPcs::calc()
 		m_currentMenu->m_status = (m_currentMenu->m_status & 0xBF) | 0x40;
 	}
 
-	if (m_rootMenu != 0) {
-		calcMenu(m_rootMenu);
+	if (m_rootMenuNode.m_firstChild != 0) {
+		calcMenu(m_rootMenuNode.m_firstChild);
 	}
 
 	if (Pad._452_4_ == 0) {
@@ -350,7 +350,7 @@ void CDbgMenuPcs::calc()
 	}
 	if ((padInput & 0x200) != 0) {
 		memset(m_menuPool, 0, sizeof(m_menuPool));
-		m_rootMenu = 0;
+		m_rootMenuNode.m_firstChild = 0;
 		m_defaultMenu = 0;
 		m_currentMenu = 0;
 	}
@@ -373,8 +373,8 @@ void CDbgMenuPcs::draw()
 	Graphic.InitDebugString();
 	_GXSetBlendMode((_GXBlendMode)1, (_GXBlendFactor)4, (_GXBlendFactor)5, (_GXLogicOp)1);
 	GXSetNumChans(1);
-	if (m_rootMenu != 0) {
-		drawMenu(m_rootMenu);
+	if (m_rootMenuNode.m_firstChild != 0) {
+		drawMenu(m_rootMenuNode.m_firstChild);
 	}
 	Graphic.SetViewport();
 }
@@ -404,43 +404,43 @@ void CDbgMenuPcs::calcMenu(CDbgMenuPcs::CDM* menu)
 			menu->m_state = ((*(u8*)(CFlat + 0x12E4) >> 3) & 1) != 0;
 			break;
 		case 0x67:
-			menu->m_state = (*(u32*)((char*)this + 4) >> 0) & 1;
+			menu->m_state = (m_dbgFlags >> 0) & 1;
 			break;
 		case 0x68:
-			menu->m_state = (*(u32*)((char*)this + 4) >> 1) & 1;
+			menu->m_state = (m_dbgFlags >> 1) & 1;
 			break;
 		case 0x69:
-			menu->m_state = (*(u32*)((char*)this + 4) >> 2) & 1;
+			menu->m_state = (m_dbgFlags >> 2) & 1;
 			break;
 		case 0x6A:
-			menu->m_state = (*(u32*)((char*)this + 4) >> 3) & 1;
+			menu->m_state = (m_dbgFlags >> 3) & 1;
 			break;
 		case 0x6B:
-			menu->m_state = (*(u32*)((char*)this + 4) >> 4) & 1;
+			menu->m_state = (m_dbgFlags >> 4) & 1;
 			break;
 		case 0x6C:
-			menu->m_state = (*(u32*)((char*)this + 4) >> 5) & 1;
+			menu->m_state = (m_dbgFlags >> 5) & 1;
 			break;
 		case 0x6D:
-			menu->m_state = (*(u32*)((char*)this + 4) >> 6) & 1;
+			menu->m_state = (m_dbgFlags >> 6) & 1;
 			break;
 		case 0x6E:
-			menu->m_state = (*(u32*)((char*)this + 4) >> 7) & 1;
+			menu->m_state = (m_dbgFlags >> 7) & 1;
 			break;
 		case 0x6F:
-			menu->m_state = (*(u32*)((char*)this + 4) >> 8) & 1;
+			menu->m_state = (m_dbgFlags >> 8) & 1;
 			break;
 		case 0x70:
-			menu->m_state = (*(u32*)((char*)this + 4) >> 9) & 1;
+			menu->m_state = (m_dbgFlags >> 9) & 1;
 			break;
 		case 0x71:
-			menu->m_state = (*(u32*)((char*)this + 4) >> 10) & 1;
+			menu->m_state = (m_dbgFlags >> 10) & 1;
 			break;
 		case 0x72:
-			menu->m_state = (*(u32*)((char*)this + 4) >> 11) & 1;
+			menu->m_state = (m_dbgFlags >> 11) & 1;
 			break;
 		case 0x73:
-			menu->m_state = (*(u32*)((char*)this + 4) >> 12) & 1;
+			menu->m_state = (m_dbgFlags >> 12) & 1;
 			break;
 		case 0x75:
 			menu->m_state = DAT_8032ecd8 != 0;
@@ -449,13 +449,13 @@ void CDbgMenuPcs::calcMenu(CDbgMenuPcs::CDM* menu)
 			menu->m_state = DAT_8032e698 != 0;
 			break;
 		case 0x78:
-			menu->m_state = (*(u32*)((char*)this + 4) >> 13) & 1;
+			menu->m_state = (m_dbgFlags >> 13) & 1;
 			break;
 		case 0x79:
-			menu->m_state = (*(u32*)((char*)this + 4) >> 14) & 1;
+			menu->m_state = (m_dbgFlags >> 14) & 1;
 			break;
 		case 0x7A:
-			menu->m_state = (*(u32*)((char*)this + 4) >> 15) & 1;
+			menu->m_state = (m_dbgFlags >> 15) & 1;
 			break;
 		}
 
@@ -752,7 +752,7 @@ int CDbgMenuPcs::searchID(int id, CDbgMenuPcs::CDM& root)
  */
 void CDbgMenuPcs::Add()
 {
-	if (m_rootMenu != 0) {
+	if (m_rootMenuNode.m_firstChild != 0) {
 		return;
 	}
 
@@ -839,7 +839,7 @@ void CDbgMenuPcs::CDMParam::operator= (const CDbgMenuPcs::CDMParam&)
  */
 void CDbgMenuPcs::Add(int parentID, int id, CDbgMenuPcs::CDMParam& param)
 {
-	int parent = searchID(parentID, *(CDM*)((char*)this + 8));
+	int parent = searchID(parentID, m_rootMenuNode);
 	int freeIdx = 0;
 	int remaining = 0x80;
 	int cur = (int)this;
@@ -958,3 +958,4 @@ void CDbgMenuPcs::CDM::Clear()
 {
 	// TODO
 }
+

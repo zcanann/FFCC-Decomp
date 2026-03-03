@@ -67,14 +67,22 @@ void ZLIST::DeleteList()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004E04C
+ * PAL Size: 188b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 bool ZLIST::AddTail(void* data)
 {
 	_ZLISTITEM* newItem = new (MaterialEditorPcs.m_stage, lbl_801D7DC0, 0x107) _ZLISTITEM;
 
-	if (newItem != (_ZLISTITEM*)nullptr)
+	if (newItem == (_ZLISTITEM*)nullptr)
+	{
+		newItem = (_ZLISTITEM*)nullptr;
+	}
+	else
 	{
 		newItem->m_previous = (_ZLISTITEM*)nullptr;
 		newItem->m_next = (_ZLISTITEM*)nullptr;

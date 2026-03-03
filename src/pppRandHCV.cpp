@@ -24,21 +24,6 @@ typedef struct RandHCVCtx {
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void randshort(short value, float factor) {
-    float converted = (float)value;
-    float scaled = converted * factor;
-    (void)scaled;
-}
-
-/*
- * --INFO--
  * PAL Address: 80061f88
  * PAL Size: 524b
  * EN Address: TODO

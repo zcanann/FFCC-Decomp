@@ -494,7 +494,6 @@ BOOL DVDLowBreak(void) {
 DVDLowCallback DVDLowClearCallback(void) {
 	DVDLowCallback old;
 	__DIRegs[1] = 0;
-	WaitingCoverClose = FALSE;
 	old = Callback;
 	Callback = NULL;
 	return old;

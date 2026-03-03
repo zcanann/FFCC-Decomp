@@ -18,20 +18,6 @@ typedef struct RandUpHCVParams {
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void randshort(short value, float factor)
-{
-    return;
-}
-
-/*
- * --INFO--
  * PAL Address: 80062B18
  * PAL Size: 456b
  * EN Address: TODO

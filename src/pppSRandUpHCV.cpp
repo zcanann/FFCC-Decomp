@@ -4,6 +4,7 @@
 
 extern CMath math[];
 extern int lbl_8032ED70;
+extern float lbl_803300C8;
 extern s16 lbl_801EADC8[];
 extern "C" float RandF__5CMathFv(CMath* instance);
 
@@ -53,7 +54,7 @@ void pppSRandUpHCV(void* param1, void* param2, void* param3)
 			u8 flag = *((u8*)param2 + 0x10);
 			float value = RandF__5CMathFv(math);
 			if (flag != 0) {
-				value = (value + RandF__5CMathFv(math)) * 0.5f;
+				value = (value + RandF__5CMathFv(math)) * lbl_803300C8;
 			}
 			target[0] = value;
 		}
@@ -62,7 +63,7 @@ void pppSRandUpHCV(void* param1, void* param2, void* param3)
 			u8 flag = *((u8*)param2 + 0x10);
 			float value = RandF__5CMathFv(math);
 			if (flag != 0) {
-				value = (value + RandF__5CMathFv(math)) * 0.5f;
+				value = (value + RandF__5CMathFv(math)) * lbl_803300C8;
 			}
 			target[1] = value;
 		}
@@ -71,7 +72,7 @@ void pppSRandUpHCV(void* param1, void* param2, void* param3)
 			u8 flag = *((u8*)param2 + 0x10);
 			float value = RandF__5CMathFv(math);
 			if (flag != 0) {
-				value = (value + RandF__5CMathFv(math)) * 0.5f;
+				value = (value + RandF__5CMathFv(math)) * lbl_803300C8;
 			}
 			target[2] = value;
 		}
@@ -80,7 +81,7 @@ void pppSRandUpHCV(void* param1, void* param2, void* param3)
 			u8 flag = *((u8*)param2 + 0x10);
 			float value = RandF__5CMathFv(math);
 			if (flag != 0) {
-				value = (value + RandF__5CMathFv(math)) * 0.5f;
+				value = (value + RandF__5CMathFv(math)) * lbl_803300C8;
 			}
 			target[3] = value;
 		}

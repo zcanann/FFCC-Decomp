@@ -5,7 +5,6 @@
 extern "C" {
 #endif
 
-void randshort(short, float);
 void pppRandUpHCV(void*, void*, void*);
 
 #ifdef __cplusplus

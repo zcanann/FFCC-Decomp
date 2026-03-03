@@ -2,6 +2,7 @@
 #define _FFCC_P_MAP_H_
 
 #include <dolphin/gx.h>
+#include <dolphin/mtx.h>
 
 #include "ffcc/system.h"
 
@@ -34,6 +35,17 @@ public:
     void drawAfter();
     void drawAfterViewer();
     void GetMapLightHolder(long, _GXColor*, Vec*);
+
+private:
+    Mtx m_viewMtx;                       // 0x04
+    Mtx44 m_screenMtx;                   // 0x34
+    char m_mapName[0x100];               // 0x74
+    s32 m_forceMapReload;                // 0x174
+    s32 m_mapCalcReady;                  // 0x178
+    s32 m_viewerMode;                    // 0x17C
+    s32 m_drawEnabled;                   // 0x180
+    u8 m_useStoredViewMtx;               // 0x184
+    u8 m_pad185[3];                      // 0x185
 };
 
 #endif // _FFCC_P_MAP_H_

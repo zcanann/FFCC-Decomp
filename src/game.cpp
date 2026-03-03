@@ -99,7 +99,7 @@ void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CS
 unsigned char CFlat[];
 unsigned char PartMng[];
 unsigned char McPcs[];
-unsigned char GbaPcs[];
+unsigned char lbl_8032EDA8[];
 unsigned char MenuPcs[];
 unsigned char USBPcs[];
 unsigned char SoundPcs[];
@@ -326,7 +326,7 @@ void CGame::Init()
     Init__14CFunnyShapePcsFv(FunnyShapePcs);
     Init__7CUSBPcsFv(USBPcs);
     Init__8CMenuPcsFv(MenuPcs);
-    Init__7CGbaPcsFv(&GbaPcs);
+    Init__7CGbaPcsFv(&lbl_8032EDA8);
     Init__6CMcPcsFv(McPcs);
     Init__11CDbgMenuPcsFv(&DbgMenuPcs);
 
@@ -365,7 +365,7 @@ void CGame::Quit()
 	DestroyStage__7CMemoryFPQ27CMemory6CStage(&Memory, m_mainStage);
 	Quit__11CDbgMenuPcsFv(&DbgMenuPcs);
 	Quit__6CMcPcsFv(McPcs);
-	Quit__7CGbaPcsFv(&GbaPcs);
+	Quit__7CGbaPcsFv(&lbl_8032EDA8);
 	Quit__8CMenuPcsFv(MenuPcs);
 	Quit__7CUSBPcsFv(USBPcs);
 	Quit__6CCharaFv(Chara);
@@ -441,7 +441,7 @@ void CGame::Exec()
 			AddScenegraph__7CSystemFP8CProcessi(&System, &CharaPcs, 0);
 			AddScenegraph__7CSystemFP8CProcessi(&System, DAT_8032ed00, 0);
 			AddScenegraph__7CSystemFP8CProcessi(&System, &PartPcs, 0);
-			AddScenegraph__7CSystemFP8CProcessi(&System, &GbaPcs, 0);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &lbl_8032EDA8, 0);
 			AddScenegraph__7CSystemFP8CProcessi(&System, &DbgMenuPcs, 0);
 			AddScenegraph__7CSystemFP8CProcessi(&System, McPcs, 0);
 			AddScenegraph__7CSystemFP8CProcessi(&System, SoundPcs, 0);
@@ -485,7 +485,7 @@ void CGame::Exec()
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, MapPcs, 0);
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, &CharaPcs, 0);
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, &PartPcs, 0);
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, &GbaPcs, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &lbl_8032EDA8, 0);
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, DAT_8032ed00, 0);
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, MenuPcs, 0);
 			break;

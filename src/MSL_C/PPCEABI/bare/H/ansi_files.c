@@ -218,7 +218,7 @@ int __flush_line_buffered_output_files(void) {
         file_bytes = (unsigned char*)file;
         mode_bits = *(unsigned short*)(file_bytes + 4);
         if ((((mode_bits >> 6) & 7) != 0) && (((file_bytes[4] >> 1) & 1) != 0) &&
-            ((file_bytes[8] >> 5) == 1)) {
+            (((file_bytes[8] & 0xE0) >> 5) == 1u)) {
             if (fflush(file) != 0) {
                 result = -1;
             }

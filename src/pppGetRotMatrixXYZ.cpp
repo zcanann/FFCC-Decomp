@@ -7,19 +7,24 @@
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x80064874
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppGetRotMatrixXYZ(pppFMATRIX& out, pppIVECTOR4* angle)
 {
-	pppFMATRIX mZ;
-	pppFMATRIX mY;
-	pppFMATRIX yz;
-	pppFMATRIX mX;
+    s32* angle32 = (s32*)angle;
+    pppFMATRIX mZ;
+    pppFMATRIX mY;
+    pppFMATRIX yz;
+    pppFMATRIX mX;
 
-	pppGetRotMatrixZ(mZ, angle->z);
-	pppGetRotMatrixY(mY, angle->y);
-	PSMTXConcat(mY.value, mZ.value, yz.value);
-	pppGetRotMatrixX(mX, angle->x);
-	PSMTXConcat(mX.value, yz.value, out.value);
+    pppGetRotMatrixZ(mZ, angle32[2]);
+    pppGetRotMatrixY(mY, angle32[1]);
+    PSMTXConcat(mY.value, mZ.value, yz.value);
+    pppGetRotMatrixX(mX, angle32[0]);
+    PSMTXConcat(mX.value, yz.value, out.value);
 }

@@ -126,11 +126,11 @@ void pppDrawShape(void* pppShape, void* data, void* additionalData)
 {
 	ShapeRuntimeData* runtimeData = *(ShapeRuntimeData**)((u8*)additionalData + 0xC);
 	ShapeControlData* controlData = (ShapeControlData*)data;
-	u32 shapeDataOffset = runtimeData->shapeDataOffset + 0x80;
-	u32 posDataOffset = runtimeData->posDataOffset + 0x80;
-	ShapeState* shapeData = (ShapeState*)((u8*)pppShape + shapeDataOffset);
-	void* posData = (u8*)pppShape + posDataOffset;
-    u32 type = controlData->type;
+	u32 shapeDataOffset = runtimeData->shapeDataOffset;
+	u32 posDataOffset = runtimeData->posDataOffset;
+	ShapeState* shapeData = (ShapeState*)((u8*)pppShape + shapeDataOffset + 0x80);
+	void* posData = (u8*)pppShape + posDataOffset + 0x80;
+    u16 type = (u16)controlData->type;
 
 	if (type == 0xFFFF) {
 		return;

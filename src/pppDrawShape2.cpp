@@ -6,6 +6,12 @@
 extern int lbl_8032ED70;
 extern void* lbl_8032ED54;
 
+extern "C" {
+void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
+void pppSetBlendMode__FUc(unsigned char);
+void pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(void*, void*, unsigned char);
+}
+
 typedef struct ShapeState {
     u16 value;
     u16 counter;
@@ -25,7 +31,8 @@ typedef struct ShapeSpecEntry {
 
 typedef struct ShapeControlData {
     u8 _pad0[4];
-    u32 type;
+    s16 type;
+    u16 _padType;
     u32 step;
     u8 _pad2[1];
     u8 blendMode;
@@ -73,7 +80,7 @@ void pppCalcShape2(void* param1, void* param2, void* param3)
     ShapeRuntimeData* runtimeData = *(ShapeRuntimeData**)((u8*)param3 + 0xC);
     ShapeControlData* controlData = (ShapeControlData*)param2;
     ShapeState* shapeData = (ShapeState*)((u8*)param1 + runtimeData->shapeDataOffset + 0x80);
-    u32 type = controlData->type;
+    s16 type = controlData->type;
 
     if (type == 0xFFFF) {
         return;
@@ -120,7 +127,7 @@ void pppDrawShape2(void* param1, void* param2, void* param3)
     ShapeControlData* controlData = (ShapeControlData*)param2;
     ShapeState* shapeData = (ShapeState*)((u8*)param1 + runtimeData->shapeDataOffset + 0x80);
     void* posData = (u8*)param1 + runtimeData->posDataOffset + 0x80;
-    u32 type = controlData->type;
+    u16 type = (u16)controlData->type;
 
     if (type == 0xFFFF) {
         return;

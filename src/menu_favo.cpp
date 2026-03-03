@@ -70,9 +70,9 @@ void CMenuPcs::FavoInit()
 	int iVar17;
 
 	uVar3 = Game.game.m_scriptFoodBase[0];
-	memset(*(void**)&field_0x850, 0, 0x1008);
+	memset(favoList, 0, 0x1008);
 	fVar4 = 1.0f;
-	iVar8 = *(int*)&field_0x850 + 8;
+	iVar8 = (int)favoList + 8;
 	iVar16 = 8;
 	do {
 		*(float*)(iVar8 + 0x14) = fVar4;
@@ -87,7 +87,7 @@ void CMenuPcs::FavoInit()
 		iVar16 = iVar16 - 1;
 	} while (iVar16 != 0);
 
-	iVar8 = *(int*)&field_0x850;
+	iVar8 = (int)favoList;
 	*(int*)(iVar8 + 0x24) = 0x33;
 	*(int*)(iVar8 + 0x20) = 4;
 	*(short*)(iVar8 + 8) = 0x30;
@@ -102,7 +102,7 @@ void CMenuPcs::FavoInit()
 	*(int*)(iVar8 + 0x2c) = 5;
 	*(int*)(iVar8 + 0x30) = 5;
 
-	iVar8 = *(int*)&field_0x850;
+	iVar8 = (int)favoList;
 	*(int*)(iVar8 + 100) = 0x32;
 	*(short*)(iVar8 + 0x48) = 0x30;
 	*(short*)(iVar8 + 0x4a) = 0x48;
@@ -114,7 +114,7 @@ void CMenuPcs::FavoInit()
 	*(int*)(iVar8 + 0x6c) = 5;
 	*(int*)(iVar8 + 0x70) = 5;
 
-	iVar8 = *(int*)&field_0x850;
+	iVar8 = (int)favoList;
 	*(int*)(iVar8 + 0xa4) = 0x33;
 	*(short*)(iVar8 + 0x88) = 0x30;
 	*(short*)(iVar8 + 0x8a) = 0x110;
@@ -126,7 +126,7 @@ void CMenuPcs::FavoInit()
 	*(int*)(iVar8 + 0xac) = 5;
 	*(int*)(iVar8 + 0xb0) = 5;
 
-	iVar8 = *(int*)&field_0x850;
+	iVar8 = (int)favoList;
 	*(int*)(iVar8 + 0xe4) = 0x45;
 	fVar5 = 1.0f;
 	sVar9 = 0;
@@ -143,7 +143,7 @@ void CMenuPcs::FavoInit()
 	*(int*)(iVar8 + 0xec) = 0;
 	*(int*)(iVar8 + 0xf0) = 5;
 
-	iVar8 = *(int*)&field_0x850;
+	iVar8 = (int)favoList;
 	*(int*)(iVar8 + 0x124) = 0x45;
 	*(short*)(iVar8 + 0x108) = 0x1d;
 	*(short*)(iVar8 + 0x10c) = 0x30;
@@ -155,7 +155,7 @@ void CMenuPcs::FavoInit()
 	*(int*)(iVar8 + 300) = 0;
 	*(int*)(iVar8 + 0x130) = 5;
 
-	iVar8 = *(int*)&field_0x850;
+	iVar8 = (int)favoList;
 	*(int*)(iVar8 + 0x174) = 2;
 	*(int*)(iVar8 + 0x164) = 0x2e;
 	*(short*)(iVar8 + 0x148) = 0x18;
@@ -167,10 +167,10 @@ void CMenuPcs::FavoInit()
 	*(int*)(iVar8 + 0x16c) = 0;
 	*(int*)(iVar8 + 0x170) = 5;
 
-	iVar8 = *(int*)&field_0x850;
+	iVar8 = (int)favoList;
 	iVar17 = 4;
 	do {
-		psVar14 = (short*)(*(int*)&field_0x850 + iVar16 + 8);
+		psVar14 = (short*)((int)favoList + iVar16 + 8);
 		psVar14[0x16] = 0;
 		psVar14[0x17] = 2;
 		psVar14[0xe] = 0;
@@ -190,7 +190,7 @@ void CMenuPcs::FavoInit()
 
 		iVar15 = iVar16 + 0x48;
 		iVar16 = iVar16 + 0x80;
-		psVar14 = (short*)(*(int*)&field_0x850 + iVar15);
+		psVar14 = (short*)((int)favoList + iVar15);
 		psVar14[0x16] = 0;
 		psVar14[0x17] = 2;
 		psVar14[0xe] = 0;
@@ -209,7 +209,7 @@ void CMenuPcs::FavoInit()
 		iVar17 = iVar17 - 1;
 	} while (iVar17 != 0);
 
-	**(short**)&field_0x850 = sVar11;
+	*favoList = sVar11;
 
 	memset(s_rank, 0, 0x20);
 	iVar8 = 0;
@@ -270,8 +270,8 @@ void CMenuPcs::FavoInit()
 		iVar16 = iVar16 - 1;
 	} while (iVar16 != 0);
 
-	*(short*)(*(int*)((char*)this + 0x82c) + 0x26) = 0;
-	*(char*)(*(int*)((char*)this + 0x82c) + 0xb) = 1;
+	singMenuState->selectedIndex = 0;
+	singMenuState->initialized = 1;
 }
 
 /*
@@ -291,61 +291,61 @@ void CMenuPcs::FavoInit0()
 	int iVar4;
 	int iVar5;
 
-	iVar2 = *(int *)&field_0x850;
+	iVar2 = (int)favoList;
 	*(int *)(iVar2 + 0x2c) = 2;
 	*(int *)(iVar2 + 0x30) = 5;
-	iVar2 = *(int *)&field_0x850;
+	iVar2 = (int)favoList;
 	*(int *)(iVar2 + 0x6c) = 2;
 	*(int *)(iVar2 + 0x70) = 5;
-	iVar2 = *(int *)&field_0x850;
+	iVar2 = (int)favoList;
 	*(int *)(iVar2 + 0xac) = 2;
 	*(int *)(iVar2 + 0xb0) = 5;
-	iVar2 = *(int *)&field_0x850;
+	iVar2 = (int)favoList;
 	*(int *)(iVar2 + 0xec) = 7;
 	*(int *)(iVar2 + 0xf0) = 5;
-	iVar2 = *(int *)&field_0x850;
+	iVar2 = (int)favoList;
 	*(int *)(iVar2 + 300) = 7;
 	*(int *)(iVar2 + 0x130) = 5;
-	iVar2 = *(int *)&field_0x850;
+	iVar2 = (int)favoList;
 	*(int *)(iVar2 + 0x174) = 2;
 	*(int *)(iVar2 + 0x16c) = 7;
 	*(int *)(iVar2 + 0x170) = 5;
-	iVar2 = *(int *)&field_0x850;
+	iVar2 = (int)favoList;
 	*(int *)(iVar2 + 0x1b4) = 2;
 	*(int *)(iVar2 + 0x1ac) = 0;
 	*(int *)(iVar2 + 0x1b0) = 5;
-	iVar2 = *(int *)&field_0x850;
+	iVar2 = (int)favoList;
 	*(int *)(iVar2 + 500) = 2;
 	*(int *)(iVar2 + 0x1ec) = 0;
 	*(int *)(iVar2 + 0x1f0) = 5;
-	iVar2 = *(int *)&field_0x850;
+	iVar2 = (int)favoList;
 	*(int *)(iVar2 + 0x234) = 2;
 	*(int *)(iVar2 + 0x22c) = 0;
 	*(int *)(iVar2 + 0x230) = 5;
-	iVar2 = *(int *)&field_0x850;
+	iVar2 = (int)favoList;
 	*(int *)(iVar2 + 0x274) = 2;
 	fVar1 = 0.0f;
 	*(int *)(iVar2 + 0x26c) = 0;
 	*(int *)(iVar2 + 0x270) = 5;
-	iVar2 = *(int *)&field_0x850;
+	iVar2 = (int)favoList;
 	*(int *)(iVar2 + 0x2b4) = 2;
 	*(int *)(iVar2 + 0x2ac) = 0;
 	*(int *)(iVar2 + 0x2b0) = 5;
-	iVar2 = *(int *)&field_0x850;
+	iVar2 = (int)favoList;
 	*(int *)(iVar2 + 0x2f4) = 2;
 	*(int *)(iVar2 + 0x2ec) = 0;
 	*(int *)(iVar2 + 0x2f0) = 5;
-	iVar2 = *(int *)&field_0x850;
+	iVar2 = (int)favoList;
 	*(int *)(iVar2 + 0x334) = 2;
 	*(int *)(iVar2 + 0x32c) = 0;
 	*(int *)(iVar2 + 0x330) = 5;
-	iVar2 = *(int *)&field_0x850;
+	iVar2 = (int)favoList;
 	*(int *)(iVar2 + 0x374) = 2;
 	*(int *)(iVar2 + 0x36c) = 0;
 	*(int *)(iVar2 + 0x370) = 5;
 	
-	iVar4 = (int)**(short **)&field_0x850;
-	psVar3 = *(short **)&field_0x850 + 4;
+	iVar4 = (int)*favoList;
+	psVar3 = favoList + 4;
 	if (iVar4 > 0) {
 		iVar5 = iVar4 >> 3;
 		if (iVar5 != 0) {
@@ -409,15 +409,15 @@ bool CMenuPcs::FavoOpen()
 	int iVar7;
 	int iVar8;
 
-	if (*(char*)(*(int*)((char*)this + 0x82c) + 0xb) == 0) {
+	if (singMenuState->initialized == 0) {
 		FavoInit();
 	}
 
 	iVar5 = 0;
-	*(short*)(*(int*)((char*)this + 0x82c) + 0x22) = *(short*)(*(int*)((char*)this + 0x82c) + 0x22) + 1;
-	iVar6 = (int)**(short**)&field_0x850;
-	psVar4 = *(short**)&field_0x850 + 4;
-	iVar7 = (int)*(short*)(*(int*)((char*)this + 0x82c) + 0x22);
+	singMenuState->frame = singMenuState->frame + 1;
+	iVar6 = (int)*favoList;
+	psVar4 = favoList + 4;
+	iVar7 = (int)singMenuState->frame;
 	iVar8 = iVar6;
 	if (0 < iVar6) {
 		do {
@@ -474,17 +474,17 @@ unsigned int CMenuPcs::FavoCtrl()
 	doReset = false;
 	if (press != 0) {
 		if ((press & 0x20) != 0) {
-			*(short *)(*(int *)((char *)this + 0x82c) + 0x1e) = 1;
+			singMenuState->cursorMove = 1;
 			Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 			doReset = true;
 		} else if ((press & 0x40) != 0) {
-			*(short *)(*(int *)((char *)this + 0x82c) + 0x1e) = -1;
+			singMenuState->cursorMove = -1;
 			Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 			doReset = true;
 		} else if ((press & 0x100) != 0) {
 			Sound.PlaySe(4, 0x40, 0x7f, 0);
 		} else if ((press & 0x200) != 0) {
-			*(char *)(*(int *)((char *)this + 0x82c) + 0xd) = 1;
+			singMenuState->closeRequested = 1;
 			Sound.PlaySe(3, 0x40, 0x7f, 0);
 			doReset = true;
 		}
@@ -515,10 +515,10 @@ bool CMenuPcs::FavoClose()
 	int iVar8;
 
 	iVar5 = 0;
-	*(short*)(*(int*)((char*)this + 0x82c) + 0x22) = *(short*)(*(int*)((char*)this + 0x82c) + 0x22) + 1;
-	iVar6 = (int)**(short**)&field_0x850;
-	psVar4 = *(short**)&field_0x850 + 4;
-	iVar7 = (int)*(short*)(*(int*)((char*)this + 0x82c) + 0x22);
+	singMenuState->frame = singMenuState->frame + 1;
+	iVar6 = (int)*favoList;
+	psVar4 = favoList + 4;
+	iVar7 = (int)singMenuState->frame;
 	iVar8 = iVar6;
 	if (0 < iVar6) {
 		do {
@@ -562,8 +562,8 @@ void CMenuPcs::FavoDraw()
 	_GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
 	SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
 
-	short* entry = (short*)(*(int*)&field_0x850 + 8);
-	int count = **(short**)&field_0x850;
+	short* entry = (short*)((int)favoList + 8);
+	int count = *favoList;
 	for (int i = 0; i < count; i++) {
 		int tex = *(int*)(entry + 0xE);
 		if (tex >= 0) {
@@ -649,7 +649,7 @@ void CMenuPcs::FavoDraw()
 		entry += 0x20;
 	}
 
-	short* rankEntry = (short*)(*(int*)&field_0x850 + 8);
+	short* rankEntry = (short*)((int)favoList + 8);
 	int scanCount = count;
 	while (scanCount > 0) {
 		if (*(int*)(rankEntry + 0xE) == 0x37) {
@@ -669,7 +669,7 @@ void CMenuPcs::FavoDraw()
 	}
 
 	rank = s_rank;
-	rankEntry = (short*)(*(int*)&field_0x850 + 8);
+	rankEntry = (short*)((int)favoList + 8);
 	while (count > 0) {
 		if (*(int*)(rankEntry + 0xE) == 0x37) {
 			break;
@@ -686,15 +686,15 @@ void CMenuPcs::FavoDraw()
 		rankEntry += 0x20;
 	}
 
-	CFont* rankFont = *(CFont**)((char*)this + 0xF8);
+	CFont* rankFont = font22;
 	SetShadow__5CFontFi(rankFont, 1);
 	SetScale__5CFontFf(1.0f, rankFont);
 	DrawInit__5CFontFv(rankFont);
 
 	char textBuf[0x10];
 	rank = s_rank;
-	rankEntry = (short*)(*(int*)&field_0x850 + 8);
-	int tmpCount = **(short**)&field_0x850;
+	rankEntry = (short*)((int)favoList + 8);
+	int tmpCount = *favoList;
 	while (tmpCount > 0) {
 		if (*(int*)(rankEntry + 0xE) == 0x37) {
 			break;
@@ -717,7 +717,7 @@ void CMenuPcs::FavoDraw()
 		rankEntry += 0x20;
 	}
 
-	CFont* nameFont = *(CFont**)((char*)this + 0x108);
+	CFont* nameFont = font16;
 	SetShadow__5CFontFi(nameFont, 0);
 	SetScale__5CFontFf(0.875f, nameFont);
 	SetMargin__5CFontFf(1.0f, nameFont);
@@ -725,8 +725,8 @@ void CMenuPcs::FavoDraw()
 
 	const FavoFlatData* flatData = (const FavoFlatData*)&Game.game.m_cFlatDataArr[1];
 	rank = s_rank;
-	rankEntry = (short*)(*(int*)&field_0x850 + 8);
-	tmpCount = **(short**)&field_0x850;
+	rankEntry = (short*)((int)favoList + 8);
+	tmpCount = *favoList;
 	while (tmpCount > 0) {
 		if (*(int*)(rankEntry + 0xE) == 0x37) {
 			break;
@@ -758,3 +758,4 @@ void CMenuPcs::FavoCtrlCur()
 {
 	// TODO
 }
+

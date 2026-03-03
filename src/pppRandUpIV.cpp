@@ -51,13 +51,13 @@ extern "C" void pppRandUpIV(void* param1, void* param2, void* param3)
     if (in->field0 == *(s32*)(base + 0xC)) {
         value = RandF__5CMathFv(&math[0]);
         if (in->field18 != 0) {
-            value = lbl_80330028 * (value + RandF__5CMathFv(&math[0]));
+            f32 randValue = value + RandF__5CMathFv(&math[0]);
+            value = lbl_80330028 * randValue;
         }
 
-        *(f32*)(base + *out->fieldC + 0x80) = value;
-    }
-
-    if (in->field0 != *(s32*)(base + 0xC)) {
+        f32* outputValue = (f32*)&base[*out->fieldC];
+        outputValue[0x20] = value;
+    } else if (in->field0 != *(s32*)(base + 0xC)) {
         return;
     }
 

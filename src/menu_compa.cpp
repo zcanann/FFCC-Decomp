@@ -60,7 +60,7 @@ void CMenuPcs::CompaInit()
 	int iVar4;
 	int iVar5;
 	short* compaList = this->compaList;
-	CompaMenuState* compaState = this->compaMenuState;
+	int compaState = (int)this->compaMenuState;
 
 	memset(compaList, 0, 0x1008);
 	fVar1 = 1.0f;
@@ -157,8 +157,8 @@ void CMenuPcs::CompaInit()
 	*reinterpret_cast<int*>(iVar4 + 0x170) = 5;
 
 	*compaList = 6;
-	compaState->selectedIndex = 0;
-	compaState->initialized = 1;
+	*reinterpret_cast<short*>(compaState + 0x26) = 0;
+	*reinterpret_cast<char*>(compaState + 0xB) = 1;
 }
 
 /*
@@ -189,17 +189,17 @@ bool CMenuPcs::CompaOpen()
 	int count;
 	int currentTime;
 	int remaining;
-	CompaMenuState* compaState = this->compaMenuState;
+	int compaState = (int)this->compaMenuState;
 	short* compaList = this->compaList;
 
-	if (compaState->initialized == 0) {
+	if (*reinterpret_cast<char*>(compaState + 0xB) == 0) {
 		CompaInit();
 	}
 	finished = 0;
-	compaState->frame = compaState->frame + 1;
+	*reinterpret_cast<s16*>(compaState + 0x22) = *reinterpret_cast<s16*>(compaState + 0x22) + 1;
 	count = (int)*compaList;
 	anim = compaList + 4;
-	currentTime = (int)compaState->frame;
+	currentTime = (int)*reinterpret_cast<s16*>(compaState + 0x22);
 	remaining = count;
 	if (0 < count) {
 		do {
@@ -243,7 +243,7 @@ void CMenuPcs::CompaCtrl()
 	unsigned short press;
 	short hold;
 	bool doReset = false;
-	CompaMenuState* compaState = this->compaMenuState;
+	int compaState = (int)this->compaMenuState;
 	short* compaList = this->compaList;
 
 	if ((Pad._452_4_ != 0) || (Pad._448_4_ != -1)) {
@@ -270,18 +270,18 @@ void CMenuPcs::CompaCtrl()
 	if (hold == 0) {
 		doReset = false;
 	} else if ((press & 0x20) != 0) {
-		compaState->cursorMove = 1;
+		*reinterpret_cast<short*>(compaState + 0x1e) = 1;
 		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 		doReset = true;
 	} else if ((press & 0x40) != 0) {
-		compaState->cursorMove = -1;
+		*reinterpret_cast<short*>(compaState + 0x1e) = -1;
 		Sound.PlaySe(0x5a, 0x40, 0x7f, 0);
 		doReset = true;
 	} else if ((press & 0x100) != 0) {
 		Sound.PlaySe(4, 0x40, 0x7f, 0);
 		doReset = false;
 	} else if ((press & 0x200) != 0) {
-		compaState->closeRequested = 1;
+		*reinterpret_cast<char*>(compaState + 0xd) = 1;
 		Sound.PlaySe(3, 0x40, 0x7f, 0);
 		doReset = true;
 	} else {
@@ -325,14 +325,14 @@ void CMenuPcs::CompaCtrl()
  */
 void CMenuPcs::CompaClose()
 {
-	CompaMenuState* compaState = this->compaMenuState;
+	int compaState = (int)this->compaMenuState;
 	short* compaList = this->compaList;
-	short time = static_cast<short>(compaState->frame + 1);
-	compaState->frame = time;
+	short time = static_cast<short>(*reinterpret_cast<short*>(compaState + 0x22) + 1);
+	*reinterpret_cast<short*>(compaState + 0x22) = time;
 
 	short* entry = compaList;
 	int entryCount = static_cast<int>(*entry);
-	short currentTime = compaState->frame;
+	short currentTime = *reinterpret_cast<short*>(compaState + 0x22);
 	entry += 4;
 	for (int i = 0; i < entryCount; ++i) {
 		if (*reinterpret_cast<int*>(entry + 0x12) <= currentTime) {

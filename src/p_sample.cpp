@@ -117,13 +117,14 @@ void CSamplePcs::func1()
  */
 extern "C" void __sinit_p_sample_cpp(void)
 {
-	unsigned int* table = (unsigned int*)lbl_801E84C8;
 	unsigned int* srcA = lbl_801E8498;
 	unsigned int* srcB = lbl_801E84A4;
 	unsigned int* srcC = lbl_801E84B0;
 	unsigned int* srcD = lbl_801E84BC;
+	unsigned int* table;
 
 	lbl_8032EC60 = (unsigned int)&lbl_801E8644;
+	table = (unsigned int*)lbl_801E84C8;
 	table[1] = srcA[0];
 	table[2] = srcA[1];
 	table[3] = srcA[2];

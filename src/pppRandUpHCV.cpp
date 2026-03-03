@@ -2,7 +2,7 @@
 #include "ffcc/math.h"
 #include "dolphin/types.h"
 
-extern CMath math;
+extern CMath math[];
 extern int lbl_8032ED70;
 extern float lbl_80330008;
 extern s16 lbl_801EADC8[];
@@ -16,6 +16,11 @@ typedef struct RandUpHCVParams {
     u8 pad[3];
 } RandUpHCVParams;
 
+typedef struct RandUpHCVCtx {
+    u8 _pad0[0xC];
+    s32* outputOffset;
+} RandUpHCVCtx;
+
 /*
  * --INFO--
  * PAL Address: 80062B18
@@ -27,35 +32,38 @@ typedef struct RandUpHCVParams {
  */
 extern "C" void pppRandUpHCV(void* p1, void* p2, void* p3)
 {
-    u8* base = (u8*)p1;
     if (lbl_8032ED70 != 0) {
         return;
     }
 
+    u8* base = (u8*)p1;
     RandUpHCVParams* params = (RandUpHCVParams*)p2;
+    RandUpHCVCtx* ctx = (RandUpHCVCtx*)p3;
+    f32* valuePtr;
     if (params->index == *(int*)(base + 0xC)) {
-        f32 randValue = RandF__5CMathFv(&math);
+        f32 value = RandF__5CMathFv(math);
         if (params->flag != 0) {
-            randValue = (randValue + RandF__5CMathFv(&math)) * lbl_80330008;
+            value = (value + RandF__5CMathFv(math)) * lbl_80330008;
         }
 
-        s32 outputOffset = **(s32**)((u8*)p3 + 0xC) + 0x80;
-        *(f32*)(base + outputOffset) = randValue;
-    } else if (params->index != *(int*)(base + 0xC)) {
-        return;
+        valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
+        *valuePtr = value;
+    } else {
+        if (params->index != *(int*)(base + 0xC)) {
+            return;
+        }
+        valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
     }
 
-    s32 outputOffset = **(s32**)((u8*)p3 + 0xC) + 0x80;
-    s32 color_offset = params->colorOffset;
     s16* target;
-
-    if (color_offset == -1) {
+    s32 colorOffset = params->colorOffset;
+    if (colorOffset == -1) {
         target = lbl_801EADC8;
     } else {
-        target = (s16*)(base + color_offset + 0x80);
+        target = (s16*)(base + colorOffset + 0x80);
     }
 
-    f32 scale = *(f32*)(base + outputOffset);
+    f32 scale = *valuePtr;
 
     {
         s16 base = params->delta[0];

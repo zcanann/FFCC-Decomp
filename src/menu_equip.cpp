@@ -65,6 +65,51 @@ extern double DOUBLE_80332ec8;
 extern double DOUBLE_80332ed0;
 extern double DOUBLE_80332ed8;
 
+namespace {
+struct MenuEquipMembers {
+	unsigned char pad_0000[0x108];
+	void* m_equipFont;
+	unsigned char pad_010C[0x720];
+	s16* m_equipState;
+	unsigned char pad_0830[0x20];
+	s16* m_equipList;
+};
+
+STATIC_ASSERT(offsetof(MenuEquipMembers, m_equipFont) == 0x108);
+STATIC_ASSERT(offsetof(MenuEquipMembers, m_equipState) == 0x82C);
+STATIC_ASSERT(offsetof(MenuEquipMembers, m_equipList) == 0x850);
+
+static inline MenuEquipMembers& GetMenuEquipMembers(CMenuPcs* menu)
+{
+	return *reinterpret_cast<MenuEquipMembers*>(menu);
+}
+
+static inline s16* GetEquipState(CMenuPcs* menu)
+{
+	return GetMenuEquipMembers(menu).m_equipState;
+}
+
+static inline s16* GetEquipList(CMenuPcs* menu)
+{
+	return GetMenuEquipMembers(menu).m_equipList;
+}
+
+static inline int GetEquipStateBase(CMenuPcs* menu)
+{
+	return reinterpret_cast<int>(GetEquipState(menu));
+}
+
+static inline int GetEquipListBase(CMenuPcs* menu)
+{
+	return reinterpret_cast<int>(GetEquipList(menu));
+}
+
+static inline void* GetEquipFont(CMenuPcs* menu)
+{
+	return GetMenuEquipMembers(menu).m_equipFont;
+}
+} // namespace
+
 /*
  * --INFO--
  * Address:	TODO
@@ -113,7 +158,7 @@ void CMenuPcs::EquipInit1()
 	unsigned int uVar15;
 	int* workPtr;
 
-	workPtr = (int*)((char*)this + 0x850);
+	workPtr = (int*)GetEquipListBase(this);
 	fVar5 = FLOAT_80332f14;
 	fVar4 = FLOAT_80332f10;
 	fVar3 = FLOAT_80332ee0;
@@ -292,10 +337,10 @@ int CMenuPcs::EquipOpen()
 	u32 uVar12;
 	double dVar20;
 
-	if (*(char*)(*(int*)((char*)this + 0x82c) + 0xb) == '\0') {
-		memset(*(void**)((char*)this + 0x850), 0, 0x1008);
+	if (*(char*)(GetEquipStateBase(this) + 0xb) == '\0') {
+		memset((void*)GetEquipList(this), 0, 0x1008);
 		fVar5 = FLOAT_80332ee0;
-		iVar6 = *(int*)((char*)this + 0x850) + 8;
+		iVar6 = GetEquipListBase(this) + 8;
 		iVar11 = 8;
 		do {
 			*(float*)(iVar6 + 0x14) = fVar5;
@@ -315,7 +360,7 @@ int CMenuPcs::EquipOpen()
 		} while (iVar11 != 0);
 
 		iVar6 = 0;
-		puVar9 = (s16*)(*(int*)((char*)this + 0x850) + 8);
+		puVar9 = (s16*)(GetEquipListBase(this) + 8);
 		iVar11 = 2;
 		do {
 			*(int*)(puVar9 + 0xe) = 0x34;
@@ -344,7 +389,7 @@ int CMenuPcs::EquipOpen()
 			iVar11--;
 		} while (iVar11 != 0);
 
-		**(s16**)((char*)this + 0x850) = 4;
+		*GetEquipList(this) = 4;
 		EquipInit1();
 		puVar9 = GetLetterBuffer__6JoyBusFi(&Joybus, 0);
 		sVar10 = 0;
@@ -359,15 +404,15 @@ int CMenuPcs::EquipOpen()
 
 		psVar7 = GetLetterBuffer__6JoyBusFi(&Joybus, 0);
 		*psVar7 = sVar10 + 1;
-		*(s16*)(*(int*)((char*)this + 0x82c) + 0x26) = 0;
-		*(u8*)(*(int*)((char*)this + 0x82c) + 0xb) = 1;
+		*(s16*)(GetEquipStateBase(this) + 0x26) = 0;
+		*(u8*)(GetEquipStateBase(this) + 0xb) = 1;
 	}
 
 	iVar6 = 0;
-	*(s16*)(*(int*)((char*)this + 0x82c) + 0x22) = *(s16*)(*(int*)((char*)this + 0x82c) + 0x22) + 1;
-	uVar8 = (u32)**(s16**)((char*)this + 0x850);
-	psVar7 = *(s16**)((char*)this + 0x850) + 4;
-	iVar11 = (int)*(s16*)(*(int*)((char*)this + 0x82c) + 0x22);
+	*(s16*)(GetEquipStateBase(this) + 0x22) = *(s16*)(GetEquipStateBase(this) + 0x22) + 1;
+	uVar8 = (u32)*GetEquipList(this);
+	psVar7 = GetEquipList(this) + 4;
+	iVar11 = (int)*(s16*)(GetEquipStateBase(this) + 0x22);
 	uVar12 = uVar8;
 	if (0 < (int)uVar8) {
 		do {
@@ -390,8 +435,8 @@ int CMenuPcs::EquipOpen()
 	}
 
 	fVar5 = FLOAT_80332ee0;
-	if (**(s16**)((char*)this + 0x850) == iVar6) {
-		psVar7 = *(s16**)((char*)this + 0x850) + 4;
+	if (*GetEquipList(this) == iVar6) {
+		psVar7 = GetEquipList(this) + 4;
 		if (0 < (int)uVar8) {
 			uVar12 = uVar8 >> 3;
 			if (uVar12 != 0) {
@@ -587,11 +632,11 @@ void CMenuPcs::EquipClose()
  */
 void CMenuPcs::EquipDraw()
 {
-	int menuState = *(int*)((char*)this + 0x82c);
+	int menuState = GetEquipStateBase(this);
 	int mode = (int)*(s16*)(menuState + 0x30);
 	int listState = (int)*(s16*)(menuState + 0x10);
 	u32 caravanWork = Game.game.m_scriptFoodBase[0];
-	s16* menuData = *(s16**)((char*)this + 0x850);
+	s16* menuData = GetEquipList(this);
 	s16* item = menuData + 4;
 	int helpItem = -1;
 
@@ -631,7 +676,7 @@ void CMenuPcs::EquipDraw()
 		item += 0x20;
 	}
 
-	void* font = *(void**)((char*)this + 0x108);
+	void* font = GetEquipFont(this);
 	SetMargin__5CFontFf(FLOAT_80332ee0, font);
 	SetShadow__5CFontFi(font, 0);
 	SetScale__5CFontFf(FLOAT_80332ee8, font);
@@ -901,15 +946,15 @@ bool CMenuPcs::EquipOpen0()
 	int itemCount;
 	int remaining;
 
-	*(s16*)(*(int*)((char*)this + 0x82c) + 0x22) = *(s16*)(*(int*)((char*)this + 0x82c) + 0x22) + 1;
-	timer = (int)*(s16*)(*(int*)((char*)this + 0x82c) + 0x22);
-	selectedOffset = *(s16*)(*(int*)((char*)this + 0x82c) + 0x26) * 0x40 + 8;
+	*(s16*)(GetEquipStateBase(this) + 0x22) = *(s16*)(GetEquipStateBase(this) + 0x22) + 1;
+	timer = (int)*(s16*)(GetEquipStateBase(this) + 0x22);
+	selectedOffset = *(s16*)(GetEquipStateBase(this) + 0x26) * 0x40 + 8;
 
 	if (timer < 5) {
-		*(s16*)(*(int*)((char*)this + 0x850) + selectedOffset) = *(s16*)(*(int*)((char*)this + 0x850) + selectedOffset) - 0x13;
+		*(s16*)(GetEquipListBase(this) + selectedOffset) = *(s16*)(GetEquipListBase(this) + selectedOffset) - 0x13;
 	}
 
-	item = *(s16**)((char*)this + 0x850);
+	item = GetEquipList(this);
 	doneCount = 0;
 	itemCount = (int)item[1] - (int)*item;
 	item = item + *item * 0x20 + 4;
@@ -965,14 +1010,14 @@ bool CMenuPcs::EquipClose0()
 	int itemCount;
 	int selectedOffset;
 
-	*(s16*)(*(int*)((char*)this + 0x82c) + 0x22) = *(s16*)(*(int*)((char*)this + 0x82c) + 0x22) + 1;
-	timer = (int)*(s16*)(*(int*)((char*)this + 0x82c) + 0x22);
-	selectedOffset = *(s16*)(*(int*)((char*)this + 0x82c) + 0x26) * 0x40 + 8;
+	*(s16*)(GetEquipStateBase(this) + 0x22) = *(s16*)(GetEquipStateBase(this) + 0x22) + 1;
+	timer = (int)*(s16*)(GetEquipStateBase(this) + 0x22);
+	selectedOffset = *(s16*)(GetEquipStateBase(this) + 0x26) * 0x40 + 8;
 	if (7 < timer) {
-		*(s16*)(*(int*)((char*)this + 0x850) + selectedOffset) = *(s16*)(*(int*)((char*)this + 0x850) + selectedOffset) + 0x13;
+		*(s16*)(GetEquipListBase(this) + selectedOffset) = *(s16*)(GetEquipListBase(this) + selectedOffset) + 0x13;
 	}
 
-	item = *(s16**)((char*)this + 0x850);
+	item = GetEquipList(this);
 	doneCount = 0;
 	itemCount = (int)item[1] - (int)*item;
 	item = item + *item * 0x20 + 4;
@@ -1017,7 +1062,7 @@ bool CMenuPcs::EquipClose0()
 	}
 
 	if (itemCount == doneCount) {
-		selected = (s16*)(*(int*)((char*)this + 0x850) + selectedOffset);
+		selected = (s16*)(GetEquipListBase(this) + selectedOffset);
 		*selected = (s16)(int)-(((double)(((unsigned int)(short)selected[2] ^ 0x80000000U) | 0x4330000000000000ULL) - DOUBLE_80332ed8) *
 		                        DOUBLE_80332ed0 -
 		                        DOUBLE_80332ec8);
@@ -1073,3 +1118,5 @@ int CMenuPcs::ChkEquipActive(int index)
 	}
 	return active;
 }
+
+

@@ -174,7 +174,7 @@ void __DVDInterruptHandler(__OSInterrupt interrupt, OSContext* context) {
 	OSSetCurrentContext(context);
 }
 
-static void AlarmHandler(OSAlarm* alarm, OSContext* context) {
+static void AlarmHandler2(OSAlarm* alarm, OSContext* context) {
     BOOL processed = ProcessNextCommand();
     ASSERTLINE(652, processed);
 }
@@ -280,7 +280,7 @@ static void WaitBeforeRead(void* addr, u32 length, u32 offset, DVDLowCallback ca
 	CommandList[1].command = -1;
 	NextCommandNumber = 0;
 	OSCreateAlarm(&AlarmForWA);
-	OSSetAlarm(&AlarmForWA, wait, AlarmHandler);
+	OSSetAlarm(&AlarmForWA, wait, AlarmHandler2);
 }
 
 BOOL DVDLowRead(void* addr, u32 length, u32 offset, DVDLowCallback callback) {

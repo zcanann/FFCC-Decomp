@@ -15,10 +15,10 @@
 void pppParMoveMatrix(void)
 {
 	_pppMngSt *pppMngSt;
-	Vec local_68;
-	Vec local_5c;
-	Vec local_50;
 	Vec local_44;
+	Vec local_50;
+	Vec local_5c;
+	Vec local_68;
 	Mtx MStack_38;
 	
 	pppMngSt = pppMngStPtr;

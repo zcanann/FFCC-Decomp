@@ -11,19 +11,20 @@
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDrawMatrixWood(_pppPObject* param_1)
-{
-	PSMTXScaleApply(
-		param_1->m_localMatrix.value,
-		param_1[1].m_localMatrix.value,
-		(pppMngStPtr->m_scale).x,
-		(pppMngStPtr->m_scale).y,
-		(pppMngStPtr->m_scale).z
-	);
+void pppDrawMatrixWood(_pppPObject* param_1) {
+    char* p = (char*)param_1;
 
-	param_1[1].m_localMatrix.value[0][3] = (param_1->m_localMatrix).value[0][3];
-	param_1[1].m_localMatrix.value[1][3] = (param_1->m_localMatrix).value[1][3];
-	param_1[1].m_localMatrix.value[2][3] = (param_1->m_localMatrix).value[2][3];
+    PSMTXScaleApply(
+        *(Mtx*)(p + 0x10),
+        *(Mtx*)(p + 0x40),
+        *(float*)((char*)pppMngStPtr + 0x28),
+        *(float*)((char*)pppMngStPtr + 0x2C),
+        *(float*)((char*)pppMngStPtr + 0x30)
+    );
 
-	PSMTXConcat(ppvWorldMatrixWood, param_1[1].m_localMatrix.value, param_1[1].m_localMatrix.value);
+    *(float*)(p + 0x4C) = *(float*)(p + 0x1C);
+    *(float*)(p + 0x5C) = *(float*)(p + 0x2C);
+    *(float*)(p + 0x6C) = *(float*)(p + 0x3C);
+
+    PSMTXConcat(ppvWorldMatrixWood, *(Mtx*)(p + 0x40), *(Mtx*)(p + 0x40));
 }

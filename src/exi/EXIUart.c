@@ -131,21 +131,21 @@ static int QueueLength(void) {
 int WriteUARTN(void *buf, u32 len) {
     u32 cmd;
     s32 xLen;
+    BOOL enabled;
     int qLen;
     char* ptr;
-    int locked;
     int error;
 
     if ((Enabled - 0xA5FF0000) != 0x5A) {
         return 2;
     }
 
-    locked = EXILock(Chan, Dev, 0);
-    if (locked == 0) {
+    enabled = OSDisableInterrupts();
+    if (!EXILock(Chan, Dev, NULL)) {
+        OSRestoreInterrupts(enabled);
         return 0;
-    } else {
-        ptr = (char*)buf;
     }
+    ptr = (char*)buf;
 
     while ((u32)ptr - (u32)buf < len) {
         if (*(s8*)ptr == 0xA) {
@@ -180,7 +180,7 @@ int WriteUARTN(void *buf, u32 len) {
                 xLen = len < 4 ? (long)len : 4;
                 
                 EXIImm(Chan, buf, xLen, EXI_WRITE, 0);
-                (char*)buf += xLen;
+                buf = (char*)buf + xLen;
                 len -= xLen;
                 qLen -= xLen;
                 EXISync(Chan);
@@ -190,5 +190,6 @@ int WriteUARTN(void *buf, u32 len) {
     }
 
     EXIUnlock(Chan);
+    OSRestoreInterrupts(enabled);
     return error;
 }

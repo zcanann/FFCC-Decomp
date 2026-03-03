@@ -44,6 +44,50 @@ namespace {
 unsigned int DAT_8032eee0 = 0;
 signed char s_place[16];
 
+struct MenuMoneyMembers {
+    unsigned char pad_0000[0x108];
+    CFont* m_moneyFont;
+    unsigned char pad_010C[0x720];
+    short* m_moneyState;
+    unsigned char pad_0830[0x18];
+    short* m_singWindow;
+    unsigned char pad_084C[0x4];
+    short* m_moneyPanel;
+};
+
+STATIC_ASSERT(offsetof(MenuMoneyMembers, m_moneyFont) == 0x108);
+STATIC_ASSERT(offsetof(MenuMoneyMembers, m_moneyState) == 0x82C);
+STATIC_ASSERT(offsetof(MenuMoneyMembers, m_singWindow) == 0x848);
+STATIC_ASSERT(offsetof(MenuMoneyMembers, m_moneyPanel) == 0x850);
+
+static inline MenuMoneyMembers& GetMenuMoneyMembers(CMenuPcs* menu) {
+    return *reinterpret_cast<MenuMoneyMembers*>(menu);
+}
+
+static inline short* GetMoneyState(CMenuPcs* menu) {
+    return GetMenuMoneyMembers(menu).m_moneyState;
+}
+
+static inline short* GetMoneyPanel(CMenuPcs* menu) {
+    return GetMenuMoneyMembers(menu).m_moneyPanel;
+}
+
+static inline short* GetSingWindow(CMenuPcs* menu) {
+    return GetMenuMoneyMembers(menu).m_singWindow;
+}
+
+static inline CFont* GetMoneyFont(CMenuPcs* menu) {
+    return GetMenuMoneyMembers(menu).m_moneyFont;
+}
+
+static inline int GetMoneyStateBase(CMenuPcs* menu) {
+    return reinterpret_cast<int>(GetMoneyState(menu));
+}
+
+static inline int GetMoneyPanelBase(CMenuPcs* menu) {
+    return reinterpret_cast<int>(GetMoneyPanel(menu));
+}
+
 static unsigned short GetPadHoldMask() {
     return *reinterpret_cast<unsigned short*>(reinterpret_cast<char*>(&Pad) + 0x20);
 }
@@ -105,11 +149,11 @@ bool CMenuPcs::MoneyOpen()
 	short* psVar11;
 	signed char* puVar14;
 
-	if (*(char *)(*(int *)((char*)this + 0x82c) + 0xb) == '\0') {
-		memset(*(void**)((char*)this + 0x850), 0, 0x1008);
+	if (*(char*)(GetMoneyStateBase(this) + 0xB) == '\0') {
+		memset(GetMoneyPanel(this), 0, 0x1008);
 
 		fVar1 = FLOAT_80332f70;
-		iVar8 = *(int *)((char*)this + 0x850) + 8;
+		iVar8 = GetMoneyPanelBase(this) + 8;
 		iVar15 = 8;
 		do {
 			*(float *)(iVar8 + 0x14) = fVar1;
@@ -124,7 +168,7 @@ bool CMenuPcs::MoneyOpen()
 			iVar15 = iVar15 + -1;
 		} while (iVar15 != 0);
 
-		iVar8 = *(int *)((char*)this + 0x850);
+		iVar8 = GetMoneyPanelBase(this);
 		*(int *)(iVar8 + 0x24) = 0x3b;
 		*(short *)(iVar8 + 10) = 0x68;
 		*(short *)(iVar8 + 0xc) = 0xf8;
@@ -135,7 +179,7 @@ bool CMenuPcs::MoneyOpen()
 		*(float *)(iVar8 + 0x1c) = FLOAT_80332f70;
 		*(int *)(iVar8 + 0x2c) = 0;
 		*(int *)(iVar8 + 0x30) = 10;
-		**(short**)((char*)this + 0x850) = 1;
+		*GetMoneyPanel(this) = 1;
 
 		DAT_8032eee0 = 0;
 		puVar9 = s_place;
@@ -174,15 +218,15 @@ bool CMenuPcs::MoneyOpen()
 			puVar9 = puVar9 + 8;
 		} while (iVar15 < 2);
 
-		*(short *)(*(int *)((char*)this + 0x82c) + 0x26) = 0;
-		*(char *)(*(int *)((char*)this + 0x82c) + 0xb) = 1;
+		*(short*)(GetMoneyStateBase(this) + 0x26) = 0;
+		*(char*)(GetMoneyStateBase(this) + 0xB) = 1;
 	}
 
 	iVar15 = 0;
-	*(short *)(*(int *)((char*)this + 0x82c) + 0x22) = *(short *)(*(int *)((char*)this + 0x82c) + 0x22) + 1;
-	iVar12 = static_cast<int>(**(short**)((char*)this + 0x850));
-	psVar11 = *(short**)((char*)this + 0x850) + 4;
-	iVar7 = static_cast<int>(*(short *)(*(int *)((char*)this + 0x82c) + 0x22));
+	*(short*)(GetMoneyStateBase(this) + 0x22) = *(short*)(GetMoneyStateBase(this) + 0x22) + 1;
+	iVar12 = static_cast<int>(*GetMoneyPanel(this));
+	psVar11 = GetMoneyPanel(this) + 4;
+	iVar7 = static_cast<int>(*(short*)(GetMoneyStateBase(this) + 0x22));
 	iVar8 = iVar12;
 	if (0 < iVar12) {
 		do {
@@ -225,27 +269,26 @@ void CMenuPcs::MoneyCtrl()
 	int iVar3;
 	short sVar1;
 
-	*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x32) =
-		*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x30);
-	iVar3 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c);
+	*reinterpret_cast<short*>(GetMoneyStateBase(this) + 0x32) = *reinterpret_cast<short*>(GetMoneyStateBase(this) + 0x30);
+	iVar3 = GetMoneyStateBase(this);
 	sVar1 = *reinterpret_cast<short*>(iVar3 + 0x30);
 	if ((sVar1 == 0) || ((sVar1 != 0 && (*reinterpret_cast<short*>(iVar3 + 0x12) == 1)))) {
 		iVar2 = MoneyCtrlCur();
 	} else if ((sVar1 == 1) && (*reinterpret_cast<short*>(iVar3 + 0x12) == 0)) {
-		if (*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 10) == 1) {
+		if (*reinterpret_cast<short*>(reinterpret_cast<int>(GetSingWindow(this)) + 10) == 1) {
 			iVar2 = 0;
 			*reinterpret_cast<short*>(iVar3 + 0x12) = 1;
 		}
 	} else if (((sVar1 == 1) && (*reinterpret_cast<short*>(iVar3 + 0x12) == 2)) &&
-		       (*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 10) == 3)) {
+		       (*reinterpret_cast<short*>(reinterpret_cast<int>(GetSingWindow(this)) + 10) == 3)) {
 		iVar2 = 0;
 		*reinterpret_cast<short*>(iVar3 + 0x12) = 0;
-		*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x30) = 0;
-		*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c) + 0x22) = 0;
+		*reinterpret_cast<short*>(GetMoneyStateBase(this) + 0x30) = 0;
+		*reinterpret_cast<short*>(GetMoneyStateBase(this) + 0x22) = 0;
 	}
 
 	if (iVar2 != 0) {
-		iVar2 = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x850);
+		iVar2 = GetMoneyPanelBase(this);
 		*reinterpret_cast<float*>(iVar2 + 0x18) = FLOAT_80332f70;
 		*reinterpret_cast<int*>(iVar2 + 0x2c) = 0;
 		*reinterpret_cast<int*>(iVar2 + 0x30) = 10;
@@ -272,10 +315,10 @@ void CMenuPcs::MoneyClose()
 	int iVar8;
 
 	iVar4 = 0;
-	*(short *)(*(int *)((char*)this + 0x82c) + 0x22) = *(short *)(*(int *)((char*)this + 0x82c) + 0x22) + 1;
-	iVar6 = (int)**(short **)((char*)this + 0x850);
-	psVar5 = *(short **)((char*)this + 0x850) + 4;
-	iVar7 = (int)*(short *)(*(int *)((char*)this + 0x82c) + 0x22);
+	*(short*)(GetMoneyStateBase(this) + 0x22) = *(short*)(GetMoneyStateBase(this) + 0x22) + 1;
+	iVar6 = (int)*GetMoneyPanel(this);
+	psVar5 = GetMoneyPanel(this) + 4;
+	iVar7 = (int)*(short*)(GetMoneyStateBase(this) + 0x22);
 	iVar8 = iVar6;
 	if (0 < iVar6) {
 		do {
@@ -319,10 +362,10 @@ void CMenuPcs::MoneyDraw()
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
     SetAttrFmt__8CMenuPcsFQ28CMenuPcs3FMT(this, 0);
 
-    short* moneyState = reinterpret_cast<short*>(*(int*)((u8*)this + 0x82c));
+    short* moneyState = GetMoneyState(this);
     short selectionState = *reinterpret_cast<short*>((u8*)moneyState + 0x10);
     short mode = *reinterpret_cast<short*>((u8*)moneyState + 0x30);
-    short* panel = reinterpret_cast<short*>(*(int*)((u8*)this + 0x850));
+    short* panel = GetMoneyPanel(this);
 
     short* entry = panel + 4;
     int entryCount = panel[0];
@@ -379,7 +422,7 @@ void CMenuPcs::MoneyDraw()
             FLOAT_80332f64, FLOAT_80332f64, FLOAT_80332f70, FLOAT_80332f70, 0.0f);
     }
 
-    CFont* font = *(CFont**)((u8*)this + 0x108);
+    CFont* font = GetMoneyFont(this);
     SetMargin__5CFontFf(FLOAT_80332f70, font);
     SetShadow__5CFontFi(font, 0);
     SetScale__5CFontFf(FLOAT_80332f7c, font);
@@ -409,7 +452,7 @@ void CMenuPcs::MoneyDraw()
     }
 
     if (mode != 0 && *reinterpret_cast<short*>((u8*)moneyState + 0x12) == 1) {
-        short* singWindow = *reinterpret_cast<short**>((u8*)this + 0x848);
+        short* singWindow = GetSingWindow(this);
         float cursorX = (float)singWindow[0];
         float cursorY = (float)(singWindow[1] + 0x20);
         cursorY += (float)(*reinterpret_cast<short*>((u8*)moneyState + 0x28) * SingWinMessHeight__8CMenuPcsFv(this));
@@ -460,7 +503,7 @@ int CMenuPcs::MoneyCtrlCur()
 		return 0;
 	}
 
-	int menuState = *reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x82c);
+	int menuState = GetMoneyStateBase(this);
 	short mode = *reinterpret_cast<short*>(menuState + 0x30);
 
 	int maxDigits = 1;
@@ -485,7 +528,7 @@ int CMenuPcs::MoneyCtrlCur()
 		}
 
 		if ((press & 0x200) != 0) {
-			*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 10) = 2;
+			*reinterpret_cast<short*>(reinterpret_cast<int>(GetSingWindow(this)) + 10) = 2;
 			*reinterpret_cast<short*>(menuState + 0x12) += 1;
 			Sound.PlaySe(3, 0x40, 0x7f, 0);
 			return 0;
@@ -498,7 +541,7 @@ int CMenuPcs::MoneyCtrlCur()
 				UpdateDigits(static_cast<unsigned int>(caravanWork->m_gil), s_place);
 				UpdateDigits(0, s_place + 8);
 			}
-			*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 10) = 2;
+			*reinterpret_cast<short*>(reinterpret_cast<int>(GetSingWindow(this)) + 10) = 2;
 			*reinterpret_cast<short*>(menuState + 0x12) += 1;
 			Sound.PlaySe(2, 0x40, 0x7f, 0);
 		}
@@ -568,7 +611,7 @@ int CMenuPcs::MoneyCtrlCur()
 				Sound.PlaySe(4, 0x40, 0x7f, 0);
 			} else {
 				*reinterpret_cast<char*>(menuState + 9) = 2;
-				*reinterpret_cast<short*>(*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x848) + 10) = 0;
+				*reinterpret_cast<short*>(reinterpret_cast<int>(GetSingWindow(this)) + 10) = 0;
 				*reinterpret_cast<short*>(menuState + 0x12) = 0;
 				*reinterpret_cast<short*>(menuState + 0x30) = 1;
 				Sound.PlaySe(2, 0x40, 0x7f, 0);

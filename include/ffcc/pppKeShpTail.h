@@ -1,11 +1,15 @@
 #ifndef _PPP_KESHPTAIL_H_
 #define _PPP_KESHPTAIL_H_
 
+struct _pppPObject;
+struct UnkB;
+struct UnkC;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppKeShpTail(void* r3, void* r4);
+void pppKeShpTail(struct _pppPObject*, struct UnkB*, struct UnkC*);
 void pppKeShpTailCon(void* r3, void* r4);
 void pppKeShpTailDraw(void);
 

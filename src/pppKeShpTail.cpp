@@ -31,16 +31,16 @@ struct KeShpTailObject {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail(void* r3, void* r4)
+void pppKeShpTail(_pppPObject* obj, UnkB*, UnkC* offsets)
 {
 	extern int lbl_8032ED70;
-	KeShpTailObject* tailObj = (KeShpTailObject*)r3;
+	KeShpTailObject* tailObj = (KeShpTailObject*)obj;
 	KeShpTailWork* work;
 	if (lbl_8032ED70 != 0) {
 		return;
 	}
 
-	work = (KeShpTailWork*)((u8*)r3 + ((KeShpTailOffsets*)r4)->m_serializedDataOffsets[0] + 0x80);
+	work = (KeShpTailWork*)((u8*)obj + ((KeShpTailOffsets*)offsets)->m_serializedDataOffsets[0] + 0x80);
 	if (tailObj->m_obj.m_graphId == 0) {
 		Vec local_14;
 		Vec local_20;

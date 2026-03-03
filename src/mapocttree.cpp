@@ -87,9 +87,9 @@ void setbit32(unsigned long* arg0, unsigned long arg1)
  */
 COctTree::COctTree()
 {
-	*(unsigned int*)((unsigned char*)this + 0x4) = 0;
-	*(unsigned int*)((unsigned char*)this + 0x8) = 0;
-	*(unsigned int*)((unsigned char*)this + 0x48) = 0;
+	m_nodePool = 0;
+	m_mapObject = 0;
+	m_drawFlags = 0;
 }
 
 /*
@@ -103,15 +103,15 @@ COctTree::COctTree()
  */
 COctTree::~COctTree()
 {
-	COctNode* rootNode = *(COctNode**)((unsigned char*)this + 0x4);
+	COctNode* rootNode = m_nodePool;
 
 	if (rootNode != 0) {
 		__dla__FPv(rootNode);
-		*(COctNode**)((unsigned char*)this + 0x4) = 0;
+		m_nodePool = 0;
 	}
 
-	*(void**)((unsigned char*)this + 0x8) = 0;
-	*(unsigned short*)((unsigned char*)this + 0x2) = 0;
+	m_mapObject = 0;
+	m_nodeCount = 0;
 }
 
 /*
@@ -992,7 +992,7 @@ void ClearLight_r(COctNode* octNode)
  */
 void COctTree::ClearLight()
 {
-	ClearLight_r(*(COctNode**)((unsigned char*)this + 0x4));
+	ClearLight_r(m_nodePool);
 }
 
 /*
@@ -1222,7 +1222,7 @@ void ClearShadow_r(COctNode* node)
  */
 void COctTree::ClearShadow()
 {
-	ClearShadow_r(*(COctNode**)((unsigned char*)this + 0x4));
+	ClearShadow_r(m_nodePool);
 }
 
 /*
@@ -1577,7 +1577,7 @@ void ClearFlag_r(COctNode* node)
 void COctTree::ClearFlag(unsigned long flag)
 {
 	s_clearFlagMask = ~flag;
-	ClearFlag_r(*(COctNode**)((unsigned char*)this + 0x4));
+	ClearFlag_r(m_nodePool);
 }
 
 /*
@@ -1595,7 +1595,7 @@ int COctTree::CheckHitCylinder_r(COctNode* node)
 	bool axisYOk = false;
 	bool axisXOk = false;
 	float minValue;
-	CMapHit* mapHit = *(CMapHit**)(*(unsigned char**)((unsigned char*)this + 0x8) + 0xc);
+	CMapHit* mapHit = *reinterpret_cast<CMapHit**>(reinterpret_cast<u8*>(m_mapObject) + 0xC);
 	unsigned short meshStart;
 	unsigned short meshEnd;
 	COctNode* child1;
@@ -2147,8 +2147,8 @@ COctNode::COctNode()
 	bounds[5] = max;
 	bounds[4] = max;
 	bounds[3] = max;
-	*(void**)((unsigned char*)this + 0x44) = 0;
-	*(void**)((unsigned char*)this + 0x48) = 0;
+	m_unk44 = 0;
+	m_unk48 = 0;
 }
 
 /*

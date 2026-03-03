@@ -1,6 +1,8 @@
 #ifndef _FFCC_MAPOCTTREE_H_
 #define _FFCC_MAPOCTTREE_H_
 
+#include <Dolphin/types.h>
+
 class CChunkFile;
 class CMapCylinder;
 class COctNode;
@@ -18,6 +20,17 @@ class COctNode
 {
 public:
 	COctNode();
+
+private:
+	float m_boundMinX;      // 0x00
+	float m_boundMinY;      // 0x04
+	float m_boundMinZ;      // 0x08
+	float m_boundMaxX;      // 0x0C
+	float m_boundMaxY;      // 0x10
+	float m_boundMaxZ;      // 0x14
+	u8 m_pad18[0x2C];       // 0x18
+	void* m_unk44;          // 0x44
+	void* m_unk48;          // 0x48
 };
 
 class CBound
@@ -53,6 +66,18 @@ public:
 	void CheckHitCylinderNear_r(COctNode*);
 	void CheckHitCylinderNear(CMapCylinder*, Vec*, unsigned long);
 	void SetOctTreeMapObj(int);
+
+private:
+	u8 m_type;              // 0x00
+	u8 m_unk01;             // 0x01
+	u16 m_nodeCount;        // 0x02
+	COctNode* m_nodePool;   // 0x04
+	void* m_mapObject;      // 0x08
+	u8 m_pad0C[0x30];       // 0x0C
+	float m_localPosX;      // 0x3C
+	float m_localPosY;      // 0x40
+	float m_localPosZ;      // 0x44
+	u32 m_drawFlags;        // 0x48
 };
 
 #endif // _FFCC_MAPOCTTREE_H_

@@ -27,35 +27,35 @@ typedef struct RandUpHCVParams {
  */
 extern "C" void pppRandUpHCV(void* p1, void* p2, void* p3)
 {
+    u8* base = (u8*)p1;
     if (lbl_8032ED70 != 0) {
         return;
     }
 
     RandUpHCVParams* params = (RandUpHCVParams*)p2;
-    if (params->index == *(int*)((char*)p1 + 0xC)) {
-        float rand_value = RandF__5CMathFv(&math);
+    if (params->index == *(int*)(base + 0xC)) {
+        f32 randValue = RandF__5CMathFv(&math);
         if (params->flag != 0) {
-            rand_value = (rand_value + RandF__5CMathFv(&math)) * lbl_80330008;
+            randValue = (randValue + RandF__5CMathFv(&math)) * lbl_80330008;
         }
 
-        int data_offset = **(int**)((char*)p3 + 0xC);
-        *(float*)((char*)p1 + data_offset + 0x80) = rand_value;
-    } else if (params->index != *(int*)((char*)p1 + 0xC)) {
+        s32 outputOffset = **(s32**)((u8*)p3 + 0xC) + 0x80;
+        *(f32*)(base + outputOffset) = randValue;
+    } else if (params->index != *(int*)(base + 0xC)) {
         return;
     }
 
-    int data_offset = **(int**)((char*)p3 + 0xC);
-    float* random_value = (float*)((char*)p1 + data_offset + 0x80);
-    int color_offset = params->colorOffset;
+    s32 outputOffset = **(s32**)((u8*)p3 + 0xC) + 0x80;
+    s32 color_offset = params->colorOffset;
     s16* target;
 
     if (color_offset == -1) {
         target = lbl_801EADC8;
     } else {
-        target = (s16*)((char*)p1 + color_offset + 0x80);
+        target = (s16*)(base + color_offset + 0x80);
     }
 
-    float scale = random_value[0];
+    f32 scale = *(f32*)(base + outputOffset);
 
     {
         s16 base = params->delta[0];

@@ -10,11 +10,11 @@ struct _pppEnvStLite {
     CMapMesh** m_mapMeshPtr;
 };
 
-extern _pppEnvStLite* pppEnvStPtr;
-extern float FLOAT_803320c8;
-extern float FLOAT_803320cc;
-extern float FLOAT_803320d0;
-extern CUtil DAT_8032ec70;
+extern _pppEnvStLite* lbl_8032ED54;
+extern float lbl_803320C8;
+extern float lbl_803320CC;
+extern float lbl_803320D0;
+extern CUtil lbl_8032EC70;
 extern int lbl_8032ED70;
 
 struct _pppFilterSerializedData {
@@ -86,17 +86,17 @@ void pppRenderFilter(pppFilter* pppFilterObj, UnkB* param_2, UnkC* param_3)
     int serializedOffset = *param_3->m_serializedDataOffsets;
     unsigned char* filterBytes = (unsigned char*)pppFilterObj;
     _pppFilterSerializedData* serializedData = (_pppFilterSerializedData*)(filterBytes + serializedOffset + 0x80);
-    _GXColor* colorPtr = &serializedData->m_color;
 
     if (param_2->m_dataValIndex == 0xFFFF) {
-        DAT_8032ec70.RenderColorQuad(FLOAT_803320c8, FLOAT_803320c8, FLOAT_803320cc, FLOAT_803320d0, *colorPtr);
+        lbl_8032EC70.RenderColorQuad(
+            lbl_803320C8, lbl_803320C8, lbl_803320CC, lbl_803320D0, serializedData->m_color);
         return;
     }
 
     int textureIndex = 0;
     _pppTextureInfo* textureInfo = (_pppTextureInfo*)GetTexture__8CMapMeshFP12CMaterialSetRi(
-        pppEnvStPtr->m_mapMeshPtr[param_2->m_dataValIndex], pppEnvStPtr->m_materialSetPtr, textureIndex);
+        lbl_8032ED54->m_mapMeshPtr[param_2->m_dataValIndex], lbl_8032ED54->m_materialSetPtr, textureIndex);
     RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
-        &DAT_8032ec70, FLOAT_803320c8, FLOAT_803320c8, FLOAT_803320cc, FLOAT_803320d0, &textureInfo->m_texObj, 0, 0,
-        colorPtr, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
+        &lbl_8032EC70, lbl_803320C8, lbl_803320C8, lbl_803320CC, lbl_803320D0, &textureInfo->m_texObj, 0, 0,
+        &serializedData->m_color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 }

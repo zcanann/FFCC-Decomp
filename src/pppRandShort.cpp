@@ -5,6 +5,7 @@
 extern CMath math[];
 extern s32 lbl_8032ED70;
 extern f32 lbl_8032FFC8;
+extern f64 lbl_8032FFD0;
 extern s16 lbl_801EADC8[];
 
 extern "C" {

@@ -5,8 +5,9 @@
 #include <dolphin/mtx.h>
 
 extern unsigned char* lbl_8032ED50;
-extern float FLOAT_80330700;
+extern float lbl_80330700;
 extern unsigned char CFlat[];
+extern Mtx ppvCameraMatrix02;
 
 /*
  * --INFO--
@@ -33,11 +34,11 @@ void pppParHitSph(struct _pppPObject* param_1, int param_2)
     local_94.x = *(float*)(lbl_8032ED50 + 0x84);
     local_94.y = *(float*)(lbl_8032ED50 + 0x94);
     local_94.z = *(float*)(lbl_8032ED50 + 0xA4);
-    radius = *(float*)(lbl_8032ED50 + 0x64) * *(float*)(param_2 + 8);
+    radius = *(float*)((u8*)pppMngSt + 0x64) * *(float*)(param_2 + 8);
     
-    if (((FLOAT_80330700 == local_88.x) && (FLOAT_80330700 == local_88.y)) &&
-        (FLOAT_80330700 == local_88.z)) {
-        pppHitCylinderSendSystem(pppMngSt, &local_94, &local_88, radius, FLOAT_80330700);
+    if (((lbl_80330700 == local_88.x) && (lbl_80330700 == local_88.y)) &&
+        (lbl_80330700 == local_88.z)) {
+        pppHitCylinderSendSystem(pppMngSt, &local_94, &local_88, radius, lbl_80330700);
     } else {
         pppHitCylinderSendSystem(pppMngSt, &local_94, &local_88, radius, *(float*)(param_2 + 4));
     }
@@ -52,7 +53,7 @@ void pppParHitSph(struct _pppPObject* param_1, int param_2)
         local_48[0][0] = radius;
         local_48[1][1] = radius;
         local_48[2][2] = radius;
-        PSMTXConcat(ppvCameraMatrix0, MStack_78, MStack_78);
+        PSMTXConcat(ppvCameraMatrix02, MStack_78, MStack_78);
         PSMTXMultVec(MStack_78, &local_94, &local_a0);
         local_48[0][3] = local_a0.x;
         local_48[1][3] = local_a0.y;

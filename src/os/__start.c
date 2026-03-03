@@ -18,25 +18,25 @@ SECTION_INIT extern void __init_data(void);
 SECTION_INIT extern void __init_hardware(void);
 SECTION_INIT extern void __flush_cache(void* addr, u32 size);
 
-// Global variables based on Ghidra analysis
-extern u16 DAT_800030e4;  // Pad status at 0x800030E4  
-extern u8 DAT_8032efe0;   // Debug BBA flag
+extern u8 Debug_BBA_8032EFE0;
+
+#define PAD3_STATUS_800030E4 (*(volatile u16*)0x800030E4)
 
 /* 80003100-80003140 000000 0040+00 1/1 0/0 0/0 .init            __check_pad3 */
 SECTION_INIT void __check_pad3(void) {
-    if ((DAT_800030e4 & 0xeef) == 0xeef) {
+    if ((PAD3_STATUS_800030E4 & 0x0EEF) == 0x0EEF) {
         OSResetSystem(0, 0, 0);
     }
 }
 
 /* 80003140-8000314C 000040 000C+00 1/1 0/0 0/0 .init            __set_debug_bba */
 SECTION_INIT void __set_debug_bba(void) {
-    DAT_8032efe0 = 1;
+    Debug_BBA_8032EFE0 = 1;
 }
 
 /* 8000314C-80003154 -00001 0008+00 0/0 0/0 0/0 .init            __get_debug_bba */
 SECTION_INIT u8 __get_debug_bba(void) {
-    return DAT_8032efe0;
+    return Debug_BBA_8032EFE0;
 }
 
 /* 80003154-800032B0 000054 015C+00 0/0 1/0 0/0 .init            __start */

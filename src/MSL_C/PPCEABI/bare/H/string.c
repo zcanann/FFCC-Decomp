@@ -105,21 +105,21 @@ char* strcat(char* dst, const char* src, size_t n)
 {
 	char* srcPtr = (char*)src - 1;
 	char* dstPtr = (char*)dst - 1;
-	char* endPtr;
 	char c;
 
-	// Find end of dst string
-	do {
-		endPtr = dstPtr;
-		dstPtr = endPtr + 1;
-	} while (endPtr[1] != '\0');
+	(void)n;
 
-	// Copy src to end of dst (ignore n parameter for now)
+	do {
+		dstPtr = dstPtr + 1;
+		c      = *dstPtr;
+	} while (c != '\0');
+
+	dstPtr = dstPtr - 1;
 	do {
 		srcPtr = srcPtr + 1;
-		c = *srcPtr;
-		endPtr = endPtr + 1;
-		*endPtr = c;
+		c      = *srcPtr;
+		dstPtr = dstPtr + 1;
+		*dstPtr = c;
 	} while (c != '\0');
 
 	return dst;

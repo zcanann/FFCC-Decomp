@@ -10,6 +10,14 @@ typedef struct {
 } pppColMoveVec4S;
 
 typedef struct {
+    short _pad[0x40];
+    short x;
+    short y;
+    short z;
+    short w;
+} pppColMoveAccum;
+
+typedef struct {
     int id;
     int pad;
     pppColMoveVec4S move;
@@ -47,10 +55,8 @@ void pppColMoveCon(void* param1, void* param2)
 void pppColMove(void* param1, void* param2, void* param3)
 {
     pppColMoveInput* input = ((pppColMoveInput**)param3)[3];
-    int sourceOffset = input->id + 0x80;
-    int moveOffset = input->pad + 0x80;
-    pppColMoveVec4S* source = (pppColMoveVec4S*)((char*)param1 + sourceOffset);
-    pppColMoveVec4S* movement = (pppColMoveVec4S*)((char*)param1 + moveOffset);
+    pppColMoveAccum* source = (pppColMoveAccum*)((char*)param1 + input->id);
+    pppColMoveAccum* movement = (pppColMoveAccum*)((char*)param1 + input->pad);
 
     if (lbl_8032ED70 != 0) {
         return;

@@ -2,6 +2,10 @@
 #include "ffcc/partMng.h"
 #include <dolphin/mtx.h>
 
+extern "C" {
+extern unsigned char* lbl_8032ED50;
+}
+
 /*
  * --INFO--
  * PAL Address: 0x8006a584
@@ -18,9 +22,9 @@ void pppDrawMatrixFront(_pppPObject* param_1)
     PSMTXScaleApply(
         *(Mtx*)((char*)param_1 + 0x10),
         *(Mtx*)((char*)param_1 + 0x40),
-        *(f32*)((char*)pppMngStPtr + 0x28),
-        *(f32*)((char*)pppMngStPtr + 0x2C),
-        *(f32*)((char*)pppMngStPtr + 0x30)
+        *(f32*)(lbl_8032ED50 + 0x28),
+        *(f32*)(lbl_8032ED50 + 0x2C),
+        *(f32*)(lbl_8032ED50 + 0x30)
     );
 
     localPos.x = *(float*)((char*)param_1 + 0x1c);

@@ -3,6 +3,7 @@
 
 #include "ffcc/manager.h"
 #include "ffcc/memory.h"
+#include "ffcc/ref.h"
 
 #include <dolphin/gx.h>
 
@@ -12,7 +13,7 @@ class CMemory;
 
 enum _GXTexMapID;
 
-class CTexture
+class CTexture : public CRef
 {
 public:
     CTexture();
@@ -36,9 +37,25 @@ public:
     void FlushExternalTlut(void*);
     void FlushExternalTlut(void*, int);
     void GetNumTlut();
+
+    char m_name[0x20];
+    GXTexObj m_texObj;
+    GXTlutObj m_tlutObj0;
+    GXTlutObj m_tlutObj1;
+    int m_format;
+    int m_width;
+    int m_height;
+    int m_wrapMode;
+    unsigned char m_isIntensityAlpha;
+    unsigned char m_isAlphaLut;
+    short m_cacheId;
+    unsigned char m_maxLod;
+    unsigned char m_usesExternalAddress;
+    void* m_imageData;
+    void* m_tlutData;
 };
 
-class CTextureSet
+class CTextureSet : public CRef
 {
 public:
     CTextureSet();
@@ -50,6 +67,8 @@ public:
     void Create(CChunkFile&, CMemory::CStage*, int, CAmemCacheSet*, int, int);
     int Find(char*);
     void ReleaseTextureIdx(int, CAmemCacheSet*);
+
+    unsigned char m_textureArrayStorage[0x1C];
 };
 
 class CTextureMan : public CManager

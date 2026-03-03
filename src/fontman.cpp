@@ -20,11 +20,6 @@ static const char s_fontman_cpp[] = "fontman.cpp";
 static const char s_CFontMan[] = "CFontMan";
 
 namespace {
-static inline unsigned char* Ptr(void* p, unsigned int offset)
-{
-	return reinterpret_cast<unsigned char*>(p) + offset;
-}
-
 typedef void (*VirtualDtorFn)(void*, int);
 }
 
@@ -67,16 +62,16 @@ CFontMan::~CFontMan()
  */
 void CFontMan::Init()
 {
-	*reinterpret_cast<CFont**>(Ptr(this, 8)) = 0;
+	m_font = 0;
 
 	CMemory::CStage* stage = Memory.CreateStage(0x8000, const_cast<char*>(s_CFontMan), 0);
-	*reinterpret_cast<CMemory::CStage**>(Ptr(this, 4)) = stage;
+	m_stage = stage;
 
 	CFont* font = reinterpret_cast<CFont*>(
 	    _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
 	        &Memory,
 	        sizeof(CFont),
-	        *reinterpret_cast<CMemory::CStage**>(Ptr(&FontMan, 4)),
+	        FontMan.m_stage,
 	        const_cast<char*>(s_fontman_cpp),
 	        0x3D,
 	        0));
@@ -104,8 +99,8 @@ void CFontMan::Init()
 		font->m_pad0f = 0;
 	}
 
-	*reinterpret_cast<CFont**>(Ptr(this, 8)) = font;
-	reinterpret_cast<CFont*>(*reinterpret_cast<void**>(Ptr(this, 8)))->Create(0, 0);
+	m_font = font;
+	m_font->Create(0, 0);
 }
 
 /*

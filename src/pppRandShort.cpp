@@ -5,6 +5,7 @@
 extern CMath math[];
 extern s32 lbl_8032ED70;
 extern f32 lbl_8032FFC8;
+extern f64 lbl_8032FFD0;
 extern s16 lbl_801EADC8[];
 
 extern "C" {
@@ -14,7 +15,7 @@ f32 RandF__5CMathFv(CMath*);
 struct PppRandShortParam2 {
     s32 field0;
     s32 field4;
-    s16 field8;
+    u16 field8;
     u8 fieldA;
 };
 
@@ -62,14 +63,7 @@ void pppRandShort(void* param1, void* param2, void* param3)
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
 
-    s16* target;
-    if (in->field4 == -1) {
-        target = lbl_801EADC8;
-    } else {
-        target = (s16*)(base + in->field4 + 0x80);
-    }
-
-    s16 scale = in->field8;
-    f32 delta = ((f32)scale * *valuePtr) - (f32)scale;
+    s16* target = (in->field4 == -1) ? lbl_801EADC8 : (s16*)(base + in->field4 + 0x80);
+    f32 delta = ((f32)in->field8 * *valuePtr) - (f32)in->field8;
     *target = (s16)(*target + (s16)delta);
 }

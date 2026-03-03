@@ -60,12 +60,7 @@ void pppRandDownChar(void* param1, void* param2, void* param3)
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
 
-    u8* target;
-    if (in->field4 == -1) {
-        target = lbl_801EADC8;
-    } else {
-        target = (u8*)(base + in->field4 + 0x80);
-    }
+    u8* target = (in->field4 == -1) ? lbl_801EADC8 : (u8*)(base + in->field4 + 0x80);
 
     union {
         f64 d;
@@ -74,10 +69,10 @@ void pppRandDownChar(void* param1, void* param2, void* param3)
             u32 lo;
         } parts;
     } cvt;
-    u8 scale = in->field8;
     cvt.parts.hi = 0x43300000;
-    cvt.parts.lo = scale;
+    cvt.parts.lo = in->field8;
 
-    s32 delta = (s32)((float)(cvt.d - lbl_8032FF20) * *valuePtr);
+    f32 scaled = (f32)(cvt.d - lbl_8032FF20) * *valuePtr;
+    s32 delta = (s32)scaled;
     *target = (u8)(*target + delta);
 }

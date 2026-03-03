@@ -411,7 +411,7 @@ CMaterialMan::CMaterialMan()
  */
 void CMaterialMan::Init()
 {
-	*reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x218)) = Memory.CreateStage(0x20000, const_cast<char*>(s_materialStageName), 0);
+	m_materialStage = Memory.CreateStage(0x20000, const_cast<char*>(s_materialStageName), 0);
 	*Ptr(this, 0x204) = 0x30;
 }
 
@@ -422,7 +422,7 @@ void CMaterialMan::Init()
  */
 void CMaterialMan::Quit()
 {
-	Memory.DestroyStage(*reinterpret_cast<CMemory::CStage**>(Ptr(this, 0x218)));
+	Memory.DestroyStage(m_materialStage);
 }
 
 /*
@@ -445,7 +445,7 @@ void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
     }
 
     unsigned char blendMode = *Ptr(material, 0xA0);
-    if (*reinterpret_cast<int*>(Ptr(this, 0x207)) != -1) {
+    if (m_blendOverrideMode != 0xFF) {
         if (blendMode == 0) {
             blendMode = 5;
         } else if (blendMode == 4) {
@@ -453,21 +453,21 @@ void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
         }
     }
 
-    if ((*Ptr(this, 0x205) == blendMode) && (*Ptr(this, 0x206) == fogEnable)) {
+    if ((m_blendMode == blendMode) && (m_fogEnable == fogEnable)) {
         return;
     }
 
-    *Ptr(this, 0x205) = blendMode;
-    *Ptr(this, 0x206) = fogEnable;
+    m_blendMode = blendMode;
+    m_fogEnable = fogEnable;
 
-    switch (*Ptr(this, 0x205)) {
+    switch (m_blendMode) {
     case 3:
         _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
             0, 3, 3, 3, 3);
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(3, 4, 1, 5);
         _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0xFF);
         GXSetZCompLoc(1);
-        Graphic.SetFog(*Ptr(this, 0x206), 1);
+        Graphic.SetFog(m_fogEnable, 1);
         return;
 
     case 0:
@@ -476,7 +476,7 @@ void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 1, 5, 5);
         _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 0xC0, 0, 7, 0xFF);
         GXSetZCompLoc(0);
-        Graphic.SetFog(*Ptr(this, 0x206), 0);
+        Graphic.SetFog(m_fogEnable, 0);
         return;
 
     case 1:
@@ -485,7 +485,7 @@ void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 5);
         _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0xFF);
         GXSetZCompLoc(1);
-        Graphic.SetFog(*Ptr(this, 0x206), 0);
+        Graphic.SetFog(m_fogEnable, 0);
         return;
 
     case 2:
@@ -494,7 +494,7 @@ void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 1, 5);
         _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0xFF);
         GXSetZCompLoc(1);
-        Graphic.SetFog(*Ptr(this, 0x206), 1);
+        Graphic.SetFog(m_fogEnable, 1);
         return;
 
     case 4:
@@ -503,7 +503,7 @@ void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(0, 1, 5, 5);
         _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 0, 7, 0xFF);
         GXSetZCompLoc(1);
-        Graphic.SetFog(*Ptr(this, 0x206), 0);
+        Graphic.SetFog(m_fogEnable, 0);
         return;
 
     case 5:
@@ -512,7 +512,7 @@ void CMaterialMan::SetBlendMode(CMaterialSet* materialSet, int materialIndex)
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 5);
         _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(6, 1, 0, 7, 0xFF);
         GXSetZCompLoc(0);
-        Graphic.SetFog(*Ptr(this, 0x206), 0);
+        Graphic.SetFog(m_fogEnable, 0);
         return;
 
     default:
@@ -838,7 +838,7 @@ void CMaterialMan::addtev_lightmap(long index)
     unsigned char indexByte = static_cast<unsigned char>(index);
     int stageOffset = static_cast<int>(index) * 4;
 
-    if (((*Ptr(this, 0x208)) & (1 << indexByte)) == 0) {
+    if ((m_shadowKColorMask & (1 << indexByte)) == 0) {
         GXSetTevDirect(static_cast<GXTevStageID>(stage));
         _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(
             stage, *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x180)),
@@ -916,7 +916,7 @@ void CMaterialMan::addtev_shadow(long index)
     unsigned char indexByte = static_cast<unsigned char>(index);
     int stageOffset = static_cast<int>(index) * 4;
 
-    if (((*Ptr(this, 0x208)) & (1 << indexByte)) == 0) {
+    if ((m_shadowKColorMask & (1 << indexByte)) == 0) {
         GXSetTevDirect(static_cast<GXTevStageID>(stage));
         _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(
             stage, *reinterpret_cast<int*>(Ptr(this, stageOffset + 0x180)),
@@ -1228,24 +1228,24 @@ void CMaterialMan::SetMaterialCharaShadow(CMaterial* material)
  */
 void CMaterialMan::SetMaterialPart(CMaterialSet* materialSet, int materialIndex, int setVtxDesc)
 {
-    *reinterpret_cast<int*>(Ptr(this, 0x11C)) = *reinterpret_cast<int*>(Ptr(this, 0x128));
-    *reinterpret_cast<int*>(Ptr(this, 0x134)) = *reinterpret_cast<int*>(Ptr(this, 0x128));
-    *reinterpret_cast<int*>(Ptr(this, 0x120)) = *reinterpret_cast<int*>(Ptr(this, 0x12C));
-    *reinterpret_cast<int*>(Ptr(this, 0x138)) = *reinterpret_cast<int*>(Ptr(this, 0x12C));
-    *reinterpret_cast<int*>(Ptr(this, 0x124)) = *reinterpret_cast<int*>(Ptr(this, 0x130));
-    *reinterpret_cast<int*>(Ptr(this, 0x13C)) = *reinterpret_cast<int*>(Ptr(this, 0x130));
-    *reinterpret_cast<unsigned int*>(Ptr(this, 0x48)) = *reinterpret_cast<unsigned int*>(Ptr(this, 0x40));
+    m_texMapIdCur = m_stdTexMapId;
+    m_texMapIdCurShadow = m_stdTexMapId;
+    m_texMtxCur = m_stdTexMtx;
+    m_texMtxCurShadow = m_stdTexMtx;
+    m_texCoordIdCur = m_stdTexCoordId;
+    m_texCoordIdCurShadow = m_stdTexCoordId;
+    m_curEnvTevBit = m_stdEnvTevBit;
 
     CPtrArray<CMaterial*>* materials = reinterpret_cast<CPtrArray<CMaterial*>*>(Ptr(materialSet, 8));
     CMaterial* material = (*materials)[materialIndex];
-    material->Set(static_cast<_GXTexMapID>(*reinterpret_cast<int*>(Ptr(this, 0x11C))));
+    material->Set(static_cast<_GXTexMapID>(m_texMapIdCur));
 
-    unsigned int tevBit = *reinterpret_cast<unsigned int*>(Ptr(this, 0x48)) &
+    unsigned int tevBit = m_curEnvTevBit &
                           *reinterpret_cast<unsigned int*>(Ptr(material, 0x24));
-    if (*reinterpret_cast<unsigned int*>(Ptr(this, 0x44)) == tevBit) {
+    if (m_activeEnvTevBit == tevBit) {
         if ((tevBit & 0x200) != 0) {
             _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(
-                1, *reinterpret_cast<int*>(Ptr(this, 0x13C)), *reinterpret_cast<int*>(Ptr(this, 0x134)) + 1, 0xFF);
+                1, m_texCoordIdCurShadow, m_texMapIdCurShadow + 1, 0xFF);
         }
         return;
     }
@@ -2171,8 +2171,8 @@ void CMaterialMan::GetTexCoordIdCur()
  */
 int CMaterialMan::IncTexCoordIdCur()
 {
-    int texCoordId = *reinterpret_cast<int*>(Ptr(this, 0x124));
-    *reinterpret_cast<int*>(Ptr(this, 0x124)) = texCoordId + 1;
+    int texCoordId = m_texCoordIdCur;
+    m_texCoordIdCur = texCoordId + 1;
     return texCoordId;
 }
 
@@ -2187,8 +2187,8 @@ int CMaterialMan::IncTexCoordIdCur()
  */
 int CMaterialMan::IncTexMtxCur()
 {
-    int texMtx = *reinterpret_cast<int*>(Ptr(this, 0x120));
-    *reinterpret_cast<int*>(Ptr(this, 0x120)) = texMtx + 3;
+    int texMtx = m_texMtxCur;
+    m_texMtxCur = texMtx + 3;
     return texMtx;
 }
 
@@ -2229,13 +2229,13 @@ void CMaterialMan::GetTexMapIdCur()
  */
 void CMaterialMan::SetStdEnv()
 {
-    *reinterpret_cast<int*>(Ptr(this, 0x11C)) = *reinterpret_cast<int*>(Ptr(this, 0x128));
-    *reinterpret_cast<int*>(Ptr(this, 0x134)) = *reinterpret_cast<int*>(Ptr(this, 0x128));
-    *reinterpret_cast<int*>(Ptr(this, 0x120)) = *reinterpret_cast<int*>(Ptr(this, 0x12C));
-    *reinterpret_cast<int*>(Ptr(this, 0x138)) = *reinterpret_cast<int*>(Ptr(this, 0x12C));
-    *reinterpret_cast<int*>(Ptr(this, 0x124)) = *reinterpret_cast<int*>(Ptr(this, 0x130));
-    *reinterpret_cast<int*>(Ptr(this, 0x13C)) = *reinterpret_cast<int*>(Ptr(this, 0x130));
-    *reinterpret_cast<int*>(Ptr(this, 0x48)) = *reinterpret_cast<int*>(Ptr(this, 0x40));
+    m_texMapIdCur = m_stdTexMapId;
+    m_texMapIdCurShadow = m_stdTexMapId;
+    m_texMtxCur = m_stdTexMtx;
+    m_texMtxCurShadow = m_stdTexMtx;
+    m_texCoordIdCur = m_stdTexCoordId;
+    m_texCoordIdCurShadow = m_stdTexCoordId;
+    m_curEnvTevBit = m_stdEnvTevBit;
 }
 
 /*

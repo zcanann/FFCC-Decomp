@@ -9,8 +9,8 @@ public:
     CMenu();
     ~CMenu();
 	
-    void Create();
-    void Destroy();
+    virtual void Create();
+    virtual void Destroy();
     void Calc();
     void Draw();
     void ScriptChanging(char*);

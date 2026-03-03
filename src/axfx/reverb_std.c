@@ -437,26 +437,17 @@ static void ReverbSTDCallback(s32* left, s32* right, s32* surround, AXFX_REVSTD_
 
 static void ReverbSTDFree(AXFX_REVSTD_WORK* rv) {
     u8 i;
-    AXFX_REVSTD_DELAYLINE* dl;
-    f32** preDelayLine;
-
-    dl = rv->AP;
     for (i = 0; i < 6; i++) {
-        __AXFXFree(dl->inputs);
-        dl++;
+        __AXFXFree(rv->AP[i].inputs);
     }
 
-    dl = rv->C;
     for (i = 0; i < 6; i++) {
-        __AXFXFree(dl->inputs);
-        dl++;
+        __AXFXFree(rv->C[i].inputs);
     }
 
     if (rv->preDelayTime) {
-        preDelayLine = rv->preDelayLine;
         for (i = 0; i < 3; i++) {
-            __AXFXFree(*preDelayLine);
-            preDelayLine++;
+            __AXFXFree(rv->preDelayLine[i]);
         }
     }
 }

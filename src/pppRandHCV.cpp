@@ -5,21 +5,22 @@
 extern CMath math[];
 extern int lbl_8032ED70;
 extern float lbl_8032FF98;
-extern double lbl_8032FFA0;
 extern s16 lbl_801EADC8[];
 extern "C" float RandF__5CMathFv(CMath* instance);
 
 typedef struct RandHCVParams {
-    int index;
-    int colorOffset;
-    s16 delta[4];
-    u8 flag;
-    u8 pad[3];
+    s32 field0;
+    s32 field4;
+    s16 field8;
+    s16 fieldA;
+    s16 fieldC;
+    s16 fieldE;
+    u8 field10;
 } RandHCVParams;
 
 typedef struct RandHCVCtx {
-    u8 pad[0xC];
-    int* outputOffset;
+    u8 field0[0xC];
+    s32* fieldC;
 } RandHCVCtx;
 
 /*
@@ -34,65 +35,49 @@ typedef struct RandHCVCtx {
 
 extern "C" {
 
-void pppRandHCV(void* p1, void* p2, void* p3) {
+void pppRandHCV(void* p1, void* p2, void* p3)
+{
     u8* base = (u8*)p1;
     RandHCVParams* params = (RandHCVParams*)p2;
     RandHCVCtx* ctx = (RandHCVCtx*)p3;
-    int outputOffset;
-    int colorOffset;
-    float scale;
     s16* target;
+    f32 value;
+    s32 colorOffset;
+    s32 outputOffset;
 
     if (lbl_8032ED70 != 0) {
         return;
     }
 
-    if (params->index == *(int*)(base + 0xC)) {
-        float value = RandF__5CMathFv(math);
-        if (params->flag != 0) {
-            value += RandF__5CMathFv(math);
+    if (params->field0 == *(s32*)(base + 0xC)) {
+        value = RandF__5CMathFv(&math[0]);
+        if (params->field10 != 0) {
+            value += RandF__5CMathFv(&math[0]);
         } else {
             value *= lbl_8032FF98;
         }
 
-        outputOffset = *ctx->outputOffset + 0x80;
-        *(float*)(base + outputOffset) = value;
-    } else if (params->index != *(int*)(base + 0xC)) {
+        *(f32*)(base + *ctx->fieldC + 0x80) = value;
+    } else if (params->field0 != *(s32*)(base + 0xC)) {
         return;
     }
 
-    colorOffset = params->colorOffset;
-    outputOffset = *ctx->outputOffset + 0x80;
+    colorOffset = params->field4;
+    outputOffset = *ctx->fieldC + 0x80;
+
     if (colorOffset == -1) {
         target = lbl_801EADC8;
     } else {
         target = (s16*)(base + colorOffset + 0x80);
     }
 
-    scale = *(float*)(base + outputOffset);
-
     {
-        s16 delta = params->delta[0];
-        s16 current = target[0];
-        target[0] = (s16)(current + (int)((float)delta * scale - (float)delta));
-    }
+        f32 scale = *(f32*)(base + outputOffset);
 
-    {
-        s16 delta = params->delta[1];
-        s16 current = target[1];
-        target[1] = (s16)(current + (int)((float)delta * scale - (float)delta));
-    }
-
-    {
-        s16 delta = params->delta[2];
-        s16 current = target[2];
-        target[2] = (s16)(current + (int)((float)delta * scale - (float)delta));
-    }
-
-    {
-        s16 delta = params->delta[3];
-        s16 current = target[3];
-        target[3] = (s16)(current + (int)((float)delta * scale - (float)delta));
+        target[0] = (s16)(target[0] + (s32)((f32)params->field8 * scale - (f32)params->field8));
+        target[1] = (s16)(target[1] + (s32)((f32)params->fieldA * scale - (f32)params->fieldA));
+        target[2] = (s16)(target[2] + (s32)((f32)params->fieldC * scale - (f32)params->fieldC));
+        target[3] = (s16)(target[3] + (s32)((f32)params->fieldE * scale - (f32)params->fieldE));
     }
 }
 

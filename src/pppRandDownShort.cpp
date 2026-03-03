@@ -47,7 +47,7 @@ void pppRandDownShort(void* r3, void* r4, void* r5)
         f32 value = -RandF__5CMathFv(&math[0]);
 
         if (in->randomTwice != 0) {
-            value = lbl_8032FF78 * (value - RandF__5CMathFv(&math[0]));
+            value = (value - RandF__5CMathFv(&math[0])) * lbl_8032FF78;
         }
 
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
@@ -78,6 +78,6 @@ void pppRandDownShort(void* r3, void* r4, void* r5)
     cvt.bits.hi = 0x43300000;
     cvt.bits.lo = in->scale;
 
-    f32 scale = (f32)cvt.d - (f32)lbl_8032FF80;
-    *target = (s16)(*target + (s32)(scale * *valuePtr));
+    s32 delta = (s32)((cvt.d - lbl_8032FF80) * *valuePtr);
+    *target = (s16)(*target + delta);
 }

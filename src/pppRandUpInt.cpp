@@ -60,7 +60,7 @@ void pppRandUpInt(void* param1, void* param2, void* param3)
 
     s32* target = (in->field4 == -1) ? lbl_801EADC8 : (s32*)(base + in->field4 + 0x80);
 
-    f32 scaled = (f32)(f64)in->field8 * *valuePtr;
+    f32 scaled = (f32)in->field8 * *valuePtr;
     s32 delta = (s32)scaled;
     *target += delta;
 }

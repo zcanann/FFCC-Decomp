@@ -10,10 +10,10 @@ typedef struct FSTEntry {
 } FSTEntry;
 
 static OSBootInfo* BootInfo;
-static FSTEntry* FstStart;
+static FSTEntry* FstStart_8032F064;
 static char* FstStringStart;
 static u32 MaxEntryNum;
-static u32 currentDirectory;
+static u32 lbl_8032F070;
 
 OSThreadQueue __DVDThreadQueue;
 u32 __DVDLongFileNameFlag;
@@ -32,20 +32,20 @@ static void cbForPrepareStreamSync(s32 result, DVDCommandBlock* block);
 
 void __DVDFSInit(void) {
     BootInfo = (void*)OSPhysicalToCached(0);
-    FstStart = BootInfo->FSTLocation;
-    if (FstStart) {
-        MaxEntryNum = FstStart->nextEntryOrLength;
-        FstStringStart = (char*)FstStart + (MaxEntryNum* sizeof(FSTEntry));
+    FstStart_8032F064 = BootInfo->FSTLocation;
+    if (FstStart_8032F064) {
+        MaxEntryNum = FstStart_8032F064->nextEntryOrLength;
+        FstStringStart = (char*)FstStart_8032F064 + (MaxEntryNum* sizeof(FSTEntry));
     }
 }
 
 /* For convenience */
-#define entryIsDir(i) (((FstStart[i].isDirAndStringOff & 0xff000000) == 0) ? FALSE : TRUE)
-#define stringOff(i) (FstStart[i].isDirAndStringOff & ~0xff000000)
-#define parentDir(i) (FstStart[i].parentOrPosition)
-#define nextDir(i) (FstStart[i].nextEntryOrLength)
-#define filePosition(i) (FstStart[i].parentOrPosition)
-#define fileLength(i) (FstStart[i].nextEntryOrLength)
+#define entryIsDir(i) (((FstStart_8032F064[i].isDirAndStringOff & 0xff000000) == 0) ? FALSE : TRUE)
+#define stringOff(i) (FstStart_8032F064[i].isDirAndStringOff & ~0xff000000)
+#define parentDir(i) (FstStart_8032F064[i].parentOrPosition)
+#define nextDir(i) (FstStart_8032F064[i].nextEntryOrLength)
+#define filePosition(i) (FstStart_8032F064[i].parentOrPosition)
+#define fileLength(i) (FstStart_8032F064[i].nextEntryOrLength)
 
 static BOOL isSame(const char* path, const char* string) {
     while (*string != '\0') {
@@ -75,7 +75,7 @@ s32 DVDConvertPathToEntrynum(const char* pathPtr) {
     
     ASSERTMSGLINE(318, pathPtr, "DVDConvertPathToEntrynum(): null pointer is specified  ");
     
-    dirLookAt = currentDirectory;
+    dirLookAt = lbl_8032F070;
     
     while (1) {
         if (*pathPtr == '\0') {
@@ -275,7 +275,7 @@ static BOOL DVDConvertEntrynumToPath(s32 entrynum, char* path, u32 maxlen) {
 
 BOOL DVDGetCurrentDir(char* path, u32 maxlen) {
     ASSERTMSG1LINE(671, (maxlen > 1), "DVDGetCurrentDir: maxlen should be more than 1 (%d is specified)", maxlen);
-    return DVDConvertEntrynumToPath((s32)currentDirectory, path, maxlen);
+    return DVDConvertEntrynumToPath((s32)lbl_8032F070, path, maxlen);
 }
 
 BOOL DVDChangeDir(const char* dirName) {
@@ -291,7 +291,7 @@ BOOL DVDChangeDir(const char* dirName) {
         return FALSE;
     }
     
-    currentDirectory = (u32)entry;
+    lbl_8032F070 = (u32)entry;
     
     return TRUE;
 }
@@ -450,7 +450,7 @@ BOOL DVDFastOpenDir(s32 entrynum, DVDDir* dir) {
 
     dir->entryNum = entrynum;
     dir->location = entrynum + 1;
-    dir->next = FstStart[entrynum].nextEntryOrLength;
+    dir->next = FstStart_8032F064[entrynum].nextEntryOrLength;
     return TRUE;
 }
 

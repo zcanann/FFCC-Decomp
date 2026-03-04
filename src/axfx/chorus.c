@@ -423,11 +423,6 @@ int AXFXChorusShutdown(AXFX_CHORUS* c) {
 int AXFXChorusSettings(AXFX_CHORUS* c) {
     BOOL old;
 
-	ASSERTMSGLINE(1159, c->baseDelay >= 5 && c->baseDelay <= 15 && c->variation >= 0 && c->variation <= 5 && c->period >= 500 && c->period <= 10000, "The value of specified parameter is out of range.");
-	if (c->baseDelay < 5 || c->baseDelay > 15 || c->variation < 0 || c->variation > 5 || c->period < 500 || c->period > 10000) {
-		return 0;
-	}
-
     old = OSDisableInterrupts();
     c->work.currentPosHi = 0x140 - ((c->baseDelay - 5) << 5);
     c->work.currentPosLo = 0;

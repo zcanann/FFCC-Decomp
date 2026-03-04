@@ -42,25 +42,27 @@ extern "C" void pppRandDownIV(void* param1, void* param2, void* param3)
     PppRandDownIVParam2* in = (PppRandDownIVParam2*)param2;
     PppRandDownIVParam3* out = (PppRandDownIVParam3*)param3;
     s32* target;
-    f32 value;
-    s32 outputOffset;
+    f32* valuePtr;
 
     if (lbl_8032ED70 != 0) {
         return;
     }
 
     if (in->field0 == *(s32*)(base + 0xC)) {
-        value = -RandF__5CMathFv(&math[0]);
+        f32 value = -RandF__5CMathFv(math);
         if (in->field18 != 0) {
-            value = (value - RandF__5CMathFv(&math[0])) * lbl_8032FF68;
+            value = (value - RandF__5CMathFv(math)) * lbl_8032FF68;
         }
 
-        *(f32*)(base + *out->fieldC + 0x80) = value;
-    } else if (in->field0 != *(s32*)(base + 0xC)) {
-        return;
+        valuePtr = (f32*)(base + *out->fieldC + 0x80);
+        *valuePtr = value;
+    } else {
+        if (in->field0 != *(s32*)(base + 0xC)) {
+            return;
+        }
+        valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
 
-    outputOffset = *out->fieldC + 0x80;
     if (in->field4 == -1) {
         target = &lbl_801EADC8[0];
     } else {
@@ -68,9 +70,9 @@ extern "C" void pppRandDownIV(void* param1, void* param2, void* param3)
     }
 
     {
-        f32 randValue = *(f32*)(base + outputOffset);
-        target[0] += (s32)((f32)in->field8 * randValue);
-        target[1] += (s32)((f32)in->fieldC * randValue);
-        target[2] += (s32)((f32)in->field10 * randValue);
+        f32 scale = *valuePtr;
+        target[0] += (s32)((f32)in->field8 * scale);
+        target[1] += (s32)((f32)in->fieldC * scale);
+        target[2] += (s32)((f32)in->field10 * scale);
     }
 }

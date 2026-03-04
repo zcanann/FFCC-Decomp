@@ -615,7 +615,7 @@ config.libs = [
             Object(NonMatching, "pppVertexApMtx.cpp"),
             Object(NonMatching, "pppVertexAttend.cpp"),
             Object(NonMatching, "pppVtMime.cpp"),
-            Object(NonMatching, "pppWDrawMatrix.cpp"),
+            Object(NonMatching, "pppWDrawMatrix.cpp", cflags=cflags_game_cpp_exceptions),
             Object(NonMatching, "pppWDrawMatrixFront.cpp"),
             Object(NonMatching, "pppWDrawMatrixFrontLoop.cpp"),
             Object(NonMatching, "pppWDrawMatrixLoop.cpp"),

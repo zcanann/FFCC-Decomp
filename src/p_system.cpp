@@ -127,7 +127,7 @@ void CSystemPcs::calc()
         buttons = 0;
     } else {
         debugPad = Pad._1b4_4_;
-        stepPad = (debugPad == 4) ? 4 : 0;
+        stepPad = (debugPad == 4) ? 0 : 4;
         buttons = *(unsigned short*)(((unsigned char*)&Pad) + stepPad * 0x54 + 0x36);
     }
 

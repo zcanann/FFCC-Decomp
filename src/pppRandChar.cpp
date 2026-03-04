@@ -5,6 +5,7 @@
 extern CMath math[];
 extern s32 lbl_8032ED70;
 extern f32 lbl_8032FEF8;
+extern f64 lbl_8032FF00;
 extern u8 lbl_801EADC8[32];
 extern "C" f32 RandF__5CMathFv(CMath* instance);
 
@@ -63,7 +64,6 @@ extern "C" void pppRandChar(void* param1, void* param2, void* param3)
     target = (colorOffset == -1) ? lbl_801EADC8 : (u8*)(base + colorOffset + 0x80);
 
     u8 scale = in->scale;
-    u8 current = *target;
-    s32 delta = (s32)((f32)scale * *valuePtr - (f32)current);
-    *target = (u8)(current + delta);
+    s32 delta = (s32)((f32)scale * *valuePtr - (f32)scale);
+    *target = (u8)(*target + delta);
 }

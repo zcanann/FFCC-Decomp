@@ -10,6 +10,7 @@ void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
     void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
 void pppSetBlendMode__FUc(unsigned char);
 void pppDrawMesh__FP10pppModelStP3Veci(void*, void*, int);
+void SetTexScroll__12CMaterialManFffff(CMaterialMan*, float, float, float, float);
 }
 
 extern CMaterialMan MaterialMan;
@@ -23,18 +24,15 @@ extern CMaterialMan MaterialMan;
  */
 void pppDrawMdlTsCon(struct _pppPObject* obj, struct PDrawMdlTs* data)
 {
-    // Access nested structure: data->field_at_0xc->field_at_0x8 + 0x80
-    void* inner = *((void**)((char*)data + 0xc));
-    void* inner2 = *((void**)((char*)inner + 0x8));
-    float* texCoords = (float*)((char*)obj + (int)inner2 + 0x80);
-    
-    // Initialize all 6 texture coordinates to 0.0
-    texCoords[0] = 0.0f; // offset 0x0
-    texCoords[1] = 0.0f; // offset 0x4  
-    texCoords[2] = 0.0f; // offset 0x8
-    texCoords[3] = 0.0f; // offset 0xc
-    texCoords[4] = 0.0f; // offset 0x10
-    texCoords[5] = 0.0f; // offset 0x14
+    u8* ptr = (u8*)obj + *(s32*)((u8*)*(void**)((u8*)data + 0xC) + 0x8) + 0x80;
+    f32 zero = 0.0f;
+
+    *(f32*)(ptr + 0x14) = zero;
+    *(f32*)(ptr + 0x10) = zero;
+    *(f32*)(ptr + 0x0C) = zero;
+    *(f32*)(ptr + 0x08) = zero;
+    *(f32*)(ptr + 0x04) = zero;
+    *(f32*)(ptr + 0x00) = zero;
 }
 
 /*
@@ -44,14 +42,11 @@ void pppDrawMdlTsCon(struct _pppPObject* obj, struct PDrawMdlTs* data)
  */
 void pppDrawMdlTsCon3(struct _pppPObject* obj, struct PDrawMdlTs* data)
 {
-    // Access nested structure: data->field_at_0xc->field_at_0x8 + 0x80
-    void* inner = *((void**)((char*)data + 0xc));
-    void* inner2 = *((void**)((char*)inner + 0x8));  
-    float* texCoords = (float*)((char*)obj + (int)inner2 + 0x80);
-    
-    // Initialize specific texture coordinates to 0.0
-    texCoords[2] = 0.0f; // offset 0x8  
-    texCoords[5] = 0.0f; // offset 0x14
+    u8* ptr = (u8*)obj + *(s32*)((u8*)*(void**)((u8*)data + 0xC) + 0x8) + 0x80;
+    f32 zero = 0.0f;
+
+    *(f32*)(ptr + 0x14) = zero;
+    *(f32*)(ptr + 0x08) = zero;
 }
 
 /*
@@ -113,14 +108,12 @@ void pppDrawDrawMdlTs0(_pppPObject*, PDrawMdlTs*, _pppCtrlTable*)
  */
 void pppDrawDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _pppCtrlTable* ctrl)
 {
-    if ((*(u32*)((u8*)data + 4) >> 16) == 0xFFFF) {
+    if ((s32)*(u32*)((u8*)data + 4) == 0xFFFF) {
         return;
     }
 
-    int* ctrlData = *(int**)((u8*)ctrl + 0xC);
-
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-        (u8*)obj + ctrlData[0] + 0x88,
+        (u8*)obj + *(s32*)*(s32**)((u8*)ctrl + 0xC) + 0x88,
         (u8*)obj + 0x40,
         *(float*)((u8*)data + 0x10),
         *(u8*)((u8*)data + 0x2C),
@@ -131,11 +124,11 @@ void pppDrawDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _
         *(u8*)((u8*)data + 0xD),
         *(u8*)((u8*)data + 0xE));
 
-    float* texCoords = (float*)((u8*)obj + ctrlData[2] + 0x80);
-    MaterialMan.SetTexScroll(texCoords[0], texCoords[3], 0.0f, 0.0f);
+    f32* texCoords = (f32*)((u8*)obj + (*(s32*)((u8*)*(s32**)((u8*)ctrl + 0xC) + 8)) + 0x80);
+    SetTexScroll__12CMaterialManFffff(&MaterialMan, texCoords[0], texCoords[3], 0.0f, 0.0f);
 
     pppSetBlendMode__FUc(*(u8*)((u8*)data + 0x9));
 
     void** modelsArray = *(void***)((u8*)lbl_8032ED54 + 0x8);
-    pppDrawMesh__FP10pppModelStP3Veci(modelsArray[*(u32*)((u8*)data + 0x4)], (u8*)obj + 0x70, 1);
+    pppDrawMesh__FP10pppModelStP3Veci(modelsArray[*(u32*)((u8*)data + 0x4)], *(void**)((u8*)obj + 0x70), 1);
 }

@@ -1096,7 +1096,7 @@ void* CMemory::CStage::alloc(unsigned long size, char* source, unsigned long lin
  */
 void CMemory::CStage::setDefaultParam(unsigned long defaultParam)
 {
-    *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned char*>(this) + 0x108) =
+    *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned char*>(this) + 0x128) =
         defaultParam;
 }
 
@@ -1111,7 +1111,7 @@ void CMemory::CStage::setDefaultParam(unsigned long defaultParam)
  */
 void CMemory::CStage::resDefaultParam()
 {
-    *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned char*>(this) + 0x108) =
+    *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned char*>(this) + 0x128) =
         static_cast<unsigned long>(-1);
 }
 

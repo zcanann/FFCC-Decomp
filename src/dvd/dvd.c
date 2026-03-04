@@ -349,6 +349,7 @@ static void cbForStateGettingError(u32 intType) {
 
 static void cbForUnrecoveredError(u32 intType) {
 	if (intType == 16) {
+		executing->state = -1;
 		stateTimeout();
 		return;
 	}

@@ -367,12 +367,6 @@ int AXFXChorusInit(AXFX_CHORUS* c) {
     u32 i;
     BOOL old;
 
-	ASSERTMSGLINE(1074, c->baseDelay >= 5 && c->baseDelay <= 15 && c->variation >= 0 && c->variation <= 5 && c->period >= 500 && c->period <= 10000, "The value of specified parameter is out of range.");
-
-	if (c->baseDelay < 5 || c->baseDelay > 15 || c->variation < 0 || c->variation > 5 || c->period < 500 || c->period > 10000) {
-		return 0;
-	}
-
     old = OSDisableInterrupts();
 	c->work.lastLeft[0] = __AXFXAlloc(0x1680);
 	ASSERTMSGLINE(0x442, c->work.lastLeft[0], "Can't allocate the memory.");

@@ -72,13 +72,13 @@ void CStopWatch::Stop() { OSStopStopwatch(this); }
 float CStopWatch::Get()
 {
 	volatile u32* p = (volatile u32*)&this->total;
-	u32 lo = p[0];
 	u32 hi = p[1];
+	u32 lo = p[0];
 	float ticks = __cvt_sll_flt(lo, hi);
-	u32 scaled = (OS_TIMER_CLOCK / 500000) * 0x8235;
+	u32 scaled = (OS_TIMER_CLOCK / 2000000) * 0x8235;
 	float denom = (float)(scaled >> 3);
 	float value = ticks / denom;
-	return value * lbl_8032F850;
+	return lbl_8032F850 * value;
 }
 
 /*

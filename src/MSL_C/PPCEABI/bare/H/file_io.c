@@ -107,7 +107,7 @@ int fflush(FILE* file) {
 int __get_file_modes(const char* mode, file_modes* modes)
 {
 	const char *	mode_ptr = mode;
-	unsigned long	mode_str;
+	int	mode_str;
 	unsigned char	open_mode, io_mode;
 	
 	modes->file_kind = __disk_file;
@@ -125,11 +125,11 @@ int __get_file_modes(const char* mode, file_modes* modes)
 			break;
 		
 		case 'w':
-			open_mode = __create_if_necessary;
+			open_mode = __create_or_truncate;
 			break;
 		
 		case 'a':
-			open_mode = __create_or_truncate;
+			open_mode = __create_if_necessary;
 			break;
 		
 		default:

@@ -5,7 +5,6 @@
 extern CMath math[];
 extern s32 lbl_8032ED70;
 extern f32 lbl_8032FF68;
-extern f64 lbl_8032FF70;
 extern s32 lbl_801EADC8[];
 
 extern "C" {
@@ -63,9 +62,8 @@ extern "C" void pppRandDownIV(void* param1, void* param2, void* param3)
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
 
-    if (in->field4 == -1) {
-        target = &lbl_801EADC8[0];
-    } else {
+    target = &lbl_801EADC8[0];
+    if (in->field4 != -1) {
         target = (s32*)(base + in->field4 + 0x80);
     }
 

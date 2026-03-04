@@ -464,7 +464,11 @@ void __GXFifoInit(void) {
 }
 
 static void __GXFifoReadEnable(void) {
-    SET_REG_FIELD(0, __GXData->cpEnable, 1, 0, 1);
+    u32 reg = __GXData->cpEnable;
+
+    reg &= ~1;
+    reg |= 1;
+    __GXData->cpEnable = reg;
     GX_SET_CP_REG(1, __GXData->cpEnable);
 }
 
@@ -479,14 +483,28 @@ static void __GXFifoLink(u8 en) {
 }
 
 static void __GXWriteFifoIntEnable(u8 hiWatermarkEn, u8 loWatermarkEn) {
-    SET_REG_FIELD(LINE(1264, 1264, 1321), __GXData->cpEnable, 1, 2, hiWatermarkEn);
-    SET_REG_FIELD(LINE(1265, 1265, 1322), __GXData->cpEnable, 1, 3, loWatermarkEn);
+    u32 hi = (u32)(u8)hiWatermarkEn << 2;
+    u32 lo = (u32)(u8)loWatermarkEn << 3;
+    u32 reg = __GXData->cpEnable;
+
+    reg = (reg & ~4) | hi;
+    __GXData->cpEnable = reg;
+    reg = __GXData->cpEnable;
+    reg = (reg & ~8) | lo;
+    __GXData->cpEnable = reg;
     GX_SET_CP_REG(1, __GXData->cpEnable);
 }
 
 static void __GXWriteFifoIntReset(u8 hiWatermarkClr, u8 loWatermarkClr) {
-    SET_REG_FIELD(LINE(1288, 1288, 1345), __GXData->cpClr, 1, 0, hiWatermarkClr);
-    SET_REG_FIELD(LINE(1289, 1289, 1346), __GXData->cpClr, 1, 1, loWatermarkClr);
+    u32 hi = (u32)(u8)hiWatermarkClr;
+    u32 lo = (u32)(u8)loWatermarkClr << 1;
+    u32 reg = __GXData->cpClr;
+
+    reg = (reg & ~1) | hi;
+    __GXData->cpClr = reg;
+    reg = __GXData->cpClr;
+    reg = (reg & ~2) | lo;
+    __GXData->cpClr = reg;
     GX_SET_CP_REG(2, __GXData->cpClr);
 }
 

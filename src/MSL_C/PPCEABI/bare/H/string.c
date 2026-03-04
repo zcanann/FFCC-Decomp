@@ -5,7 +5,8 @@
 #define K2 0xFEFEFEFF
 
 // Static variables for strtok
-static char* strtok_ptr = NULL;
+static char* strtok_null = NULL;
+static char* strtok_ptr  = NULL;
 
 size_t strlen(const char* str)
 {
@@ -312,55 +313,46 @@ char* strstr(const char* str, const char* pat)
 char* strtok(char* str, const char* delim)
 {
 	unsigned char delimiter_table[32] = { 0 };
-	unsigned char current;
-	unsigned char* token_start;
-	unsigned char* scan;
-	unsigned char* token_end;
+	unsigned char ch;
+	unsigned char* result;
+	unsigned char* p;
+	unsigned char* prev;
 
 	if (str != NULL) {
 		strtok_ptr = str;
 	}
 
-	scan = (unsigned char*)delim - 1;
-	while (1) {
-		scan++;
-		current = *scan;
-		if (current == 0) {
-			break;
-		}
-		delimiter_table[current >> 3] |= (unsigned char)(1 << (current & 7));
+	p = (unsigned char*)delim - 1;
+	while ((ch = *++p) != 0) {
+		delimiter_table[ch >> 3] = delimiter_table[ch >> 3] | (unsigned char)(1 << (ch & 7));
 	}
 
-	token_start = (unsigned char*)strtok_ptr - 1;
+	p = (unsigned char*)strtok_ptr - 1;
 	do {
-		token_start++;
-		current = *token_start;
-		if (current == 0) {
+		ch = *++p;
+		if (ch == 0)
 			break;
-		}
-	} while ((delimiter_table[current >> 3] & (1 << (current & 7))) != 0);
+	} while ((delimiter_table[ch >> 3] & (1 << (ch & 7))) != 0);
 
-	scan = token_start;
-	if (current == 0) {
-		strtok_ptr = NULL;
-		return NULL;
-	}
-
-	do {
-		token_end = scan;
-		scan = token_end + 1;
-		current = *scan;
-		if (current == 0) {
-			break;
-		}
-	} while ((delimiter_table[current >> 3] & (1 << (current & 7))) == 0);
-
-	if (current == 0) {
-		strtok_ptr = NULL;
+	result = p;
+	if (ch == 0) {
+		p         = NULL;
+		strtok_ptr = strtok_null;
 	} else {
-		strtok_ptr = (char*)(token_end + 2);
-		*scan = 0;
+		do {
+			prev = result;
+			ch = *(result = prev + 1);
+			if (ch == 0)
+				break;
+		} while ((delimiter_table[ch >> 3] & (1 << (ch & 7))) == 0);
+
+		if (ch == 0) {
+			strtok_ptr = strtok_null;
+		} else {
+			strtok_ptr = (char*)(prev + 2);
+			*result    = 0;
+		}
 	}
 
-	return (char*)token_start;
+	return (char*)p;
 }

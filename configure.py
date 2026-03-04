@@ -241,7 +241,8 @@ elif args.warn == "error":
     
 # Game flags
 cflags_game = [
-    *cflags_base
+    *cflags_base,
+    "-use_lmw_stmw on",
 ]
 
 # Metrowerks library flags
@@ -381,7 +382,7 @@ config.libs = [
     {
         "lib": "Game",
         "mw_version": config.linker_version,
-        "cflags": cflags_game,
+        "cflags": cflags_game_cpp_exceptions,
         "progress_category": "game",
         "objects": [
             Object(NonMatching, "RedSound/RedCommand.cpp", cflags=redsound_cflags),

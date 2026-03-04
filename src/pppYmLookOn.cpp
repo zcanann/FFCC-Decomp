@@ -40,7 +40,7 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct UnkB* param_2, str
     int workOffset;
     u8* owner;
     u8** ownerRef;
-    Vec local_1c[2];
+    Vec local_1c[1];
     Vec local_28;
     Vec local_34;
     Vec local_40;

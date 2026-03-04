@@ -70,10 +70,10 @@ public:
     int GetMapObj(unsigned char*);
     void GetMapObjDrawFlg(unsigned int*);
     void SetAddLetter(int);
-    void GetFavoriteFlg(int);
+    unsigned int GetFavoriteFlg(int);
     void ClrFavoriteFlg(int);
     int GetFavorite(int, char*);
-    void GetMoneyFlg(int);
+    unsigned int GetMoneyFlg(int);
     void ClrMoneyFlg(int);
     int GetMoney(int);
     void ClrScrInitEnd();
@@ -85,7 +85,7 @@ public:
     void CMakeEnd(int, unsigned int);
     void CMakeBarthday(int, unsigned int);
     void CMakeFavorite(int, unsigned int);
-    void GetCompatibilityFlg(int);
+    unsigned int GetCompatibilityFlg(int);
     void ClrCompatibilityFlg(int);
     int GetCompatibility(int, unsigned char*);
     void GetCMakeInfo(int, GbaCMakeInfo*);

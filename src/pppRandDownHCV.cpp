@@ -6,7 +6,7 @@ extern CMath math[];
 extern s32 lbl_8032ED70;
 extern s16 lbl_801EADC8[];
 extern f32 lbl_8032FF48;
-extern f64 lbl_8032FF50;
+static f64 const lbl_8032FF50 = 4503601774854144.0;
 
 extern "C" {
 f32 RandF__5CMathFv(CMath*);
@@ -34,6 +34,8 @@ struct PppRandDownHCVParam3 {
  */
 void randshort(short value, float multiplier)
 {
+    (void)value;
+    (void)multiplier;
     return;
 }
 
@@ -54,7 +56,6 @@ extern "C" void pppRandDownHCV(void* param1, void* param2, void* param3)
     s16* target;
     f32* valuePtr;
     f32 value;
-    s32 outputOffset;
 
     if (lbl_8032ED70 != 0) {
         return;
@@ -77,11 +78,13 @@ extern "C" void pppRandDownHCV(void* param1, void* param2, void* param3)
         valuePtr = (f32*)(base + outputOffset + 0x80);
     }
 
+    s16* targetTemp;
     if (in->field4 == -1) {
-        target = &lbl_801EADC8[0];
+        targetTemp = &lbl_801EADC8[0];
     } else {
-        target = (s16*)(base + in->field4 + 0x80);
+        targetTemp = (s16*)(base + in->field4 + 0x80);
     }
+    target = targetTemp;
 
     {
         f32 randValue = *valuePtr;

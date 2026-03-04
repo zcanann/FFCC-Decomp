@@ -6,8 +6,8 @@
 #include "dolphin/gx/__gx.h"
 
 static __GXFifoObj DisplayListFifo;
-static volatile __GXFifoObj* OldCPUFifo;
-static GXData __savedGXdata;
+static __GXFifoObj* OldCPUFifo;
+static u8 __savedGXdata[0x4F8];
 
 void GXBeginDisplayList(void* list, u32 size) {
     __GXFifoObj* CPUFifo = (__GXFifoObj*)GXGetCPUFifo();
@@ -22,7 +22,7 @@ void GXBeginDisplayList(void* list, u32 size) {
     }
 
     if (__GXData->dlSaveContext != 0) {
-        memcpy(&__savedGXdata, __GXData, sizeof(__savedGXdata));
+        memcpy(__savedGXdata, __GXData, sizeof(__savedGXdata));
     }
 
     DisplayListFifo.base = (u8*)list;
@@ -63,7 +63,7 @@ u32 GXEndDisplayList(void) {
     if (__GXData->dlSaveContext != 0) {
         enabled = OSDisableInterrupts();
         cpenable = __GXData->cpEnable;
-        memcpy(__GXData, &__savedGXdata, sizeof(*__GXData));
+        memcpy(__GXData, __savedGXdata, sizeof(__savedGXdata));
         __GXData->cpEnable = cpenable;
         OSRestoreInterrupts(enabled);
     }

@@ -66,18 +66,18 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct UnkB* param_2, str
     }
 
     local_4c.x = *(f32*)(owner + 0x15c);
-    local_4c.y = *(f32*)(owner + 0x160) + (f32)param_2->m_dataValIndex;
+    local_4c.y = *(f32*)(owner + 0x160) + param_2->m_dataValIndex;
     local_4c.z = *(f32*)(owner + 0x164);
     local_58.x = *(f32*)((u8*)pppMngStPtr + 0x84);
     local_58.y = *(f32*)((u8*)pppMngStPtr + 0x94);
     local_58.z = *(f32*)((u8*)pppMngStPtr + 0xa4);
-    PSVECSubtract(&local_58, &local_4c, local_1c);
+    PSVECSubtract(&local_58, &local_4c, &local_44);
 
-    if (((FLOAT_80330ec8 != local_1c[0].x) || (FLOAT_80330ec8 != local_1c[0].y)) || (FLOAT_80330ec8 != local_1c[0].z)) {
-        PSVECNormalize(local_1c, &local_40);
-        local_28.z = -local_40.x;
+    if (((FLOAT_80330ec8 != local_44.x) || (FLOAT_80330ec8 != local_44.y)) || (FLOAT_80330ec8 != local_44.z)) {
+        PSVECNormalize(&local_44, &local_40);
         local_28.x = local_40.z;
         local_28.y = FLOAT_80330ec8;
+        local_28.z = -local_40.x;
         if ((FLOAT_80330ec8 == local_40.z) && (FLOAT_80330ec8 == local_28.z)) {
             local_28.x = FLOAT_80330ecc;
             local_28.z = FLOAT_80330ec8;

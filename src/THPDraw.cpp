@@ -7,6 +7,7 @@ static const GXColorS10 sTevColor = {-90, 0, -114, 135};
 static const GXColor sKColor0 = {0, 0, 226, 88};
 static const GXColor sKColor1 = {179, 0, 0, 182};
 static const GXColor sKColor2 = {0, 135, 0, 0};
+extern float lbl_80331884;
 
 void THPGXYuv2RgbDraw(u32* yImage, u32* uImage, u32* vImage, s16 x, s16 y, s16 texWidth, s16 texHeight, s16 polyWidth, s16 polyHeight) {
     GXTexObj yTexObj;
@@ -14,15 +15,15 @@ void THPGXYuv2RgbDraw(u32* yImage, u32* uImage, u32* vImage, s16 x, s16 y, s16 t
     GXTexObj vTexObj;
     
     GXInitTexObj(&yTexObj, yImage, texWidth, texHeight, GX_TF_I8, GX_CLAMP, GX_CLAMP, GX_FALSE);
-    GXInitTexObjLOD(&yTexObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXInitTexObjLOD(&yTexObj, GX_NEAR, GX_NEAR, lbl_80331884, lbl_80331884, lbl_80331884, GX_FALSE, GX_FALSE, GX_ANISO_1);
     GXLoadTexObj(&yTexObj, GX_TEXMAP0);
     
     GXInitTexObj(&uTexObj, uImage, texWidth >> 1, texHeight >> 1, GX_TF_I8, GX_CLAMP, GX_CLAMP, GX_FALSE);
-    GXInitTexObjLOD(&uTexObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXInitTexObjLOD(&uTexObj, GX_NEAR, GX_NEAR, lbl_80331884, lbl_80331884, lbl_80331884, GX_FALSE, GX_FALSE, GX_ANISO_1);
     GXLoadTexObj(&uTexObj, GX_TEXMAP1);
     
     GXInitTexObj(&vTexObj, vImage, texWidth >> 1, texHeight >> 1, GX_TF_I8, GX_CLAMP, GX_CLAMP, GX_FALSE);
-    GXInitTexObjLOD(&vTexObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXInitTexObjLOD(&vTexObj, GX_NEAR, GX_NEAR, lbl_80331884, lbl_80331884, lbl_80331884, GX_FALSE, GX_FALSE, GX_ANISO_1);
     GXLoadTexObj(&vTexObj, GX_TEXMAP2);
     
     GXBegin(GX_QUADS, GX_VTXFMT7, 4);

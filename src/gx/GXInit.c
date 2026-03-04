@@ -26,6 +26,7 @@ const char* __GXVersion = "<< Dolphin SDK - GX\trelease build: "BUILD_DATE" "RBU
 static GXFifoObj FifoObj;
 
 static GXData gxData;
+GXData* const gx = &gxData;
 GXData* const __GXData = &gxData;
 
 // these are supposed to be in-function static, but it messed up sbss order

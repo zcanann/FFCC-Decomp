@@ -3,6 +3,10 @@
 
 #include "dolphin/gx/__gx.h"
 
+extern GXData* const gx;
+#undef __GXData
+#define __GXData gx
+
 #if DEBUG
 #define GX_WRITE_SOME_REG5(a, b) \
 do { \
@@ -32,7 +36,7 @@ void GXSetTevIndirect(GXTevStageID tev_stage, GXIndTexStageID ind_stage, GXIndTe
     reg = (reg & 0xFFF8FFFFU) | ((u32)wrap_t << 16);
     reg = (reg & 0xFFF7FFFFU) | ((u32)utc_lod << 19);
     reg = (reg & 0xFFEFFFFFU) | ((u32)add_prev << 20);
-    reg |= (u32)(tev_stage + 16) << 24;
+    reg = (reg & 0x00FFFFFFU) | ((u32)(tev_stage + 16) << 24);
     GX_WRITE_SOME_REG5(GX_LOAD_BP_REG, reg);
     __GXData->bpSentNot = 0;
 }

@@ -278,7 +278,17 @@ int __OSReadROMAsync(void* buffer, s32 length, s32 offset, void (*callback)()) {
     return !err;
 }
 
-void OSSetSoundMode(u32 mode) {
+u32 OSSetSoundMode(void) {
+    OSSram* sram;
+    u32 mode;
+
+    sram = __OSLockSram();
+    mode = (sram->flags & 4) >> 2;
+    __OSUnlockSram(FALSE);
+    return mode;
+}
+
+void OSGetSoundMode(u32 mode) {
     OSSram* sram;
 
     ASSERTLINE(617, mode == OS_SOUND_MODE_MONO || mode == OS_SOUND_MODE_STEREO);
@@ -293,42 +303,29 @@ void OSSetSoundMode(u32 mode) {
     __OSUnlockSram(TRUE);
 }
 
-u32 OSGetSoundMode(void) {
+u32 OSSetProgressiveMode(void) {
     OSSram* sram;
-    u32 mode;
+    u32 on;
 
     sram = __OSLockSram();
-    mode = (sram->flags & 4) ? 1 : 0;
+    on = sram->ntd;
     __OSUnlockSram(FALSE);
-    return mode;
+    return on;
 }
 
-void OSSetProgressiveMode(u32 on) {
+void OSGetProgressiveMode(u32 on) {
     OSSram* sram;
 
     ASSERTLINE(670, on == OS_PROGRESSIVE_MODE_OFF || on == OS_PROGRESSIVE_MODE_ON);
-
     on = (on & 1) << 7;
-
     sram = __OSLockSram();
     if (on == (sram->flags & 0x80)) {
         __OSUnlockSram(FALSE);
         return;
     }
-
     sram->flags &= 0x7F;
     sram->flags |= on;
     __OSUnlockSram(TRUE);
-}
-
-u32 OSGetProgressiveMode(void) {
-    OSSram* sram;
-    u32 on;
-
-    sram = __OSLockSram();
-    on = (sram->flags & 0x80) ? 1 : 0;
-    __OSUnlockSram(FALSE);
-    return on;
 }
 
 u32 OSGetVideoMode(void) {

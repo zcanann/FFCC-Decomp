@@ -154,9 +154,9 @@ void _SetSoundMode(int* param_1)
     soundMode = *param_1;
     DAT_8032f3c8 = soundMode;
     if (soundMode == 1) {
-        OSSetSoundMode(0);
+        OSGetSoundMode(0);
     } else {
-        OSSetSoundMode(1);
+        OSGetSoundMode(1);
     }
     soundMode = DAT_8032f3c8;
     DAT_8032f400 = soundMode;
@@ -1385,7 +1385,7 @@ void CRedDriver::SetSoundMode(int soundMode)
  */
 int CRedDriver::GetSoundMode()
 {
-    if (OSGetSoundMode() == 0) {
+    if (OSSetSoundMode() == 0) {
         DAT_8032f400 = 1;
     } else {
         DAT_8032f400 = DAT_8032f3c8;

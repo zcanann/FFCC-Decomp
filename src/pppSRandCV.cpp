@@ -96,6 +96,9 @@ void pppSRandCV(void* param1, void* param2, void* param3)
             target[3] = value;
         }
     } else {
+        if (in->field0 != *(s32*)(base + 0xC)) {
+            return;
+        }
         target = (float*)(base + *out->fieldC + 0x80);
     }
 

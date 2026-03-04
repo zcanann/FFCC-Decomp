@@ -18,6 +18,23 @@ struct pppScaleLoopAutoWork {
     float m_delta;
 };
 
+struct pppScaleLoopAutoStep {
+    s32 m_index;
+    u8 _pad0x04[4];
+    float m_addScale[3];
+    float m_amplitude;
+    u8 m_stepCount;
+    s8 m_countA;
+    s8 m_countB;
+    u8 _pad0x1f;
+    float m_scale;
+};
+
+struct pppScaleLoopAutoContext {
+    s32 _pad0x00[3];
+    s32* m_serializedDataOffsets;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x8012b4f4
@@ -29,17 +46,19 @@ struct pppScaleLoopAutoWork {
  */
 void pppScaleLoopAuto(void* arg1, void* arg2, void* arg3)
 {
+    pppScaleLoopAutoStep* step = (pppScaleLoopAutoStep*)arg2;
+    pppScaleLoopAutoContext* context = (pppScaleLoopAutoContext*)arg3;
+
     if (lbl_8032ED70 != 0) {
         return;
     }
 
-    int* offsets = (int*)((u8*)arg3 + 0xC);
-    pppScaleLoopAutoWork* work = (pppScaleLoopAutoWork*)((u8*)arg1 + offsets[0] + 0x80);
+    pppScaleLoopAutoWork* work = (pppScaleLoopAutoWork*)((u8*)arg1 + context->m_serializedDataOffsets[0] + 0x80);
 
-    if (*(u32*)((u8*)arg2 + 0x0) == *(u32*)((u8*)arg1 + 0xC)) {
-        work->m_scale[0] += *(f32*)((u8*)arg2 + 0x8);
-        work->m_scale[1] += *(f32*)((u8*)arg2 + 0xC);
-        work->m_scale[2] += *(f32*)((u8*)arg2 + 0x10);
+    if (step->m_index == *(s32*)((u8*)arg1 + 0xC)) {
+        work->m_scale[0] += step->m_addScale[0];
+        work->m_scale[1] += step->m_addScale[1];
+        work->m_scale[2] += step->m_addScale[2];
     }
 
     if (work->m_initialized == 0) {
@@ -47,8 +66,8 @@ void pppScaleLoopAuto(void* arg1, void* arg2, void* arg3)
         work->m_baseScale[0] = work->m_scale[0];
         work->m_baseScale[1] = work->m_scale[1];
         work->m_baseScale[2] = work->m_scale[2];
-        work->m_countA = *((u8*)arg2 + 29);
-        work->m_countB = *((u8*)arg2 + 30);
+        work->m_countA = step->m_countA;
+        work->m_countB = step->m_countB;
         return;
     }
 
@@ -80,21 +99,21 @@ void pppScaleLoopAuto(void* arg1, void* arg2, void* arg3)
     }
 
     work->m_step++;
-    if (work->m_step > *((u8*)arg2 + 28)) {
+    if (work->m_step > step->m_stepCount) {
         work->m_step = 0;
         work->m_angle = 0;
-        work->m_countA = *((u8*)arg2 + 29);
-        work->m_countB = *((u8*)arg2 + 30);
+        work->m_countA = step->m_countA;
+        work->m_countB = step->m_countB;
         return;
     }
 
-    angle += 360 / (s32)(*((u8*)arg2 + 28));
+    angle += 360 / (s32)step->m_stepCount;
     work->m_angle = angle;
 
     {
-        s32 tableAngle = (s32)(((f64)((s32)work->m_angle << 15)) / 360.0);
+        s32 tableAngle = (s32)(((f32)((s32)work->m_angle << 15)) / 360.0f);
         f32 sinVal = *(f32*)((u8*)lbl_801EC9F0 + (tableAngle & 0x3FFC));
-        f32 delta = (*(f32*)((u8*)arg2 + 24) * sinVal) * *(f32*)((u8*)arg2 + 32);
+        f32 delta = (step->m_amplitude * sinVal) * step->m_scale;
 
         work->m_delta = delta;
         work->m_scale[0] = work->m_baseScale[0] + delta;

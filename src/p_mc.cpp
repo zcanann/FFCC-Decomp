@@ -118,13 +118,11 @@ void CMcPcs::destroy()
 void CMcPcs::calc()
 {
     MenuPcsMcLayout* menuPcsLayout;
-    CMenuPcs* menuPcs;
     int result;
     int worldParam;
 
     Rand__5CMathFUl(math, 0x7FFFFFFF);
     menuPcsLayout = reinterpret_cast<MenuPcsMcLayout*>(MenuPcs);
-    menuPcs = reinterpret_cast<CMenuPcs*>(MenuPcs);
 
     if (menuPcsLayout->field14 != 1)
     {
@@ -146,7 +144,7 @@ void CMcPcs::calc()
                     worldParam = 6;
                 }
 
-                CallWorldParam__8CMenuPcsFiii(menuPcs, 6, worldParam, 0);
+                CallWorldParam__8CMenuPcsFiii(reinterpret_cast<CMenuPcs*>(MenuPcs), 6, worldParam, 0);
                 menuPcsLayout->field18 = 0;
             }
         }
@@ -176,7 +174,7 @@ void CMcPcs::calc()
                     worldParam = 6;
                 }
 
-                CallWorldParam__8CMenuPcsFiii(menuPcs, 5, worldParam, 0);
+                CallWorldParam__8CMenuPcsFiii(reinterpret_cast<CMenuPcs*>(MenuPcs), 5, worldParam, 0);
                 menuPcsLayout->field18 = 0;
             }
         }

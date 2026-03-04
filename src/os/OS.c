@@ -433,19 +433,21 @@ static void OSExceptionInit(void) {
     
     // Copy the right vector into the table
     for (exception = 0; exception < __OS_EXCEPTION_MAX; exception++) {
-        if (BI2DebugFlag && (*BI2DebugFlag >= 2) && __DBIsExceptionMarked(exception)) {
+        __OSException exceptionNumber = exception;
+
+        if (BI2DebugFlag && (*BI2DebugFlag >= 2) && __DBIsExceptionMarked(exceptionNumber)) {
             // this DBPrintf is suspicious.
-            DBPrintf(">>> OSINIT: exception %d commandeered by TRK\n", exception);
+            DBPrintf(">>> OSINIT: exception %d commandeered by TRK\n", exceptionNumber);
             continue;
         }
         
         // Modify the copy of code in text before transferring
         // to the exception table.
-        *opCodeAddr = oldOpCode | exception;
+        *opCodeAddr = oldOpCode | exceptionNumber;
         
         // Modify opcodes at __DBVECTOR if necessary
-        if (__DBIsExceptionMarked(exception)) {
-            DBPrintf(">>> OSINIT: exception %d vectored to debugger\n", exception);
+        if (__DBIsExceptionMarked(exceptionNumber)) {
+            DBPrintf(">>> OSINIT: exception %d vectored to debugger\n", exceptionNumber);
             memcpy((void*)__DBVECTOR, (void*)__OSDBJUMPSTART, (u32)__OSDBJUMPEND - (u32)__OSDBJUMPSTART);
         } else {
             // make sure the opcodes are still nop

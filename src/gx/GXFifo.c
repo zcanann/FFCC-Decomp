@@ -473,7 +473,7 @@ static void __GXFifoReadEnable(void) {
 }
 
 static void __GXFifoReadDisable(void) {
-    SET_REG_FIELD(0, __GXData->cpEnable, 1, 0, 0);
+    __GXData->cpEnable &= ~1;
     GX_SET_CP_REG(1, __GXData->cpEnable);
 }
 

@@ -6,6 +6,7 @@ extern CMath math[];
 extern s32 lbl_8032ED70;
 extern s16 lbl_801EADC8[];
 extern f32 lbl_8032FF48;
+extern f64 lbl_8032FF50;
 
 extern "C" {
 f32 RandF__5CMathFv(CMath*);
@@ -51,6 +52,7 @@ extern "C" void pppRandDownHCV(void* param1, void* param2, void* param3)
     PppRandDownHCVParam2* in = (PppRandDownHCVParam2*)param2;
     PppRandDownHCVParam3* out = (PppRandDownHCVParam3*)param3;
     s16* target;
+    f32* valuePtr;
     f32 value;
     s32 outputOffset;
 
@@ -59,17 +61,22 @@ extern "C" void pppRandDownHCV(void* param1, void* param2, void* param3)
     }
 
     if (in->field0 == *(s32*)(base + 0xC)) {
-        value = -RandF__5CMathFv(&math[0]);
+        value = -RandF__5CMathFv(math);
         if (in->field10 != 0) {
-            value = (value - RandF__5CMathFv(&math[0])) * lbl_8032FF48;
+            value = (value - RandF__5CMathFv(math)) * lbl_8032FF48;
         }
 
-        *(f32*)(base + *out->fieldC + 0x80) = value;
-    } else if (in->field0 != *(s32*)(base + 0xC)) {
-        return;
+        outputOffset = *out->fieldC + 0x80;
+        valuePtr = (f32*)(base + outputOffset);
+        *valuePtr = value;
+    } else {
+        if (in->field0 != *(s32*)(base + 0xC)) {
+            return;
+        }
+        outputOffset = *out->fieldC + 0x80;
+        valuePtr = (f32*)(base + outputOffset);
     }
 
-    outputOffset = *out->fieldC + 0x80;
     if (in->field4 == -1) {
         target = &lbl_801EADC8[0];
     } else {
@@ -77,7 +84,7 @@ extern "C" void pppRandDownHCV(void* param1, void* param2, void* param3)
     }
 
     {
-        f32 randValue = *(f32*)(base + outputOffset);
+        f32 randValue = *valuePtr;
 
         target[0] = (s16)(target[0] + (s32)((f32)in->field8 * randValue));
         target[1] = (s16)(target[1] + (s32)((f32)in->fieldA * randValue));

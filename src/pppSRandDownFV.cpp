@@ -81,23 +81,19 @@ void pppSRandDownFV(void* param1, void* param2, void* param3)
         randVec = (f32*)(self + *info->fieldC + 0x80);
     }
 
-    f32* target;
-    if (cfg->field4 == -1) {
-        target = lbl_801EADC8;
-    } else {
-        target = (f32*)(self + cfg->field4 + 0x80);
-    }
+    s32 targetOffset = cfg->field4;
+    f32* target = (targetOffset == -1) ? lbl_801EADC8 : (f32*)(self + targetOffset + 0x80);
 
     {
-        f32 value = cfg->field8 * randVec[0];
+        f32 value = randVec[0] * cfg->field8;
         target[0] = target[0] + value;
     }
     {
-        f32 value = cfg->fieldC * randVec[1];
+        f32 value = randVec[1] * cfg->fieldC;
         target[1] = target[1] + value;
     }
     {
-        f32 value = cfg->field10 * randVec[2];
+        f32 value = randVec[2] * cfg->field10;
         target[2] = target[2] + value;
     }
 }

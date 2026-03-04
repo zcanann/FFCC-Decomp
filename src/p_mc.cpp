@@ -117,13 +117,11 @@ void CMcPcs::destroy()
 void CMcPcs::calc()
 {
     MenuPcsMcLayout* menuPcsLayout;
-    CMenuPcs* menuPcs;
     int result;
     int worldParam;
 
     Rand__5CMathFUl(math, 0x7FFFFFFF);
     menuPcsLayout = reinterpret_cast<MenuPcsMcLayout*>(MenuPcs);
-    menuPcs = reinterpret_cast<CMenuPcs*>(MenuPcs);
 
     if (menuPcsLayout->field14 != 1)
     {

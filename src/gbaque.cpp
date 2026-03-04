@@ -1873,32 +1873,52 @@ void GbaQueue::GetMapObjDrawFlg(unsigned int*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ccd94
+ * PAL Size: 24b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::SetAddLetter(int)
+void GbaQueue::SetAddLetter(int channel)
 {
-	// TODO
+	char* obj = reinterpret_cast<char*>(this);
+	obj[0x2C89] = static_cast<char>(obj[0x2C89] | (1 << channel));
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ccd1c
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::GetFavoriteFlg(int)
+unsigned int GbaQueue::GetFavoriteFlg(int channel)
 {
-	// TODO
+	char* obj = reinterpret_cast<char*>(this);
+	OSWaitSemaphore(accessSemaphores + channel);
+	unsigned int mask = static_cast<unsigned int>(obj[0x2CB1]) & (1U << channel);
+	OSSignalSemaphore(accessSemaphores + channel);
+	return (-mask | mask) >> 31;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800cccb4
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::ClrFavoriteFlg(int)
+void GbaQueue::ClrFavoriteFlg(int channel)
 {
-	// TODO
+	char* obj = reinterpret_cast<char*>(this);
+	OSWaitSemaphore(accessSemaphores + channel);
+	obj[0x2CB1] = static_cast<char>(obj[0x2CB1] & ~(1 << channel));
+	OSSignalSemaphore(accessSemaphores + channel);
 }
 
 /*
@@ -1913,22 +1933,37 @@ int GbaQueue::GetFavorite(int, char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ccbc0
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::GetMoneyFlg(int)
+unsigned int GbaQueue::GetMoneyFlg(int channel)
 {
-	// TODO
+	char* obj = reinterpret_cast<char*>(this);
+	OSWaitSemaphore(accessSemaphores + channel);
+	unsigned int mask = static_cast<unsigned int>(obj[0x2CB0]) & (1U << channel);
+	OSSignalSemaphore(accessSemaphores + channel);
+	return (-mask | mask) >> 31;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ccb58
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::ClrMoneyFlg(int)
+void GbaQueue::ClrMoneyFlg(int channel)
 {
-	// TODO
+	char* obj = reinterpret_cast<char*>(this);
+	OSWaitSemaphore(accessSemaphores + channel);
+	obj[0x2CB0] = static_cast<char>(obj[0x2CB0] & ~(1 << channel));
+	OSSignalSemaphore(accessSemaphores + channel);
 }
 
 /*
@@ -2160,22 +2195,37 @@ void GbaQueue::CMakeFavorite(int, unsigned int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800cbf04
+ * PAL Size: 112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::GetCompatibilityFlg(int)
+unsigned int GbaQueue::GetCompatibilityFlg(int channel)
 {
-	// TODO
+	char* obj = reinterpret_cast<char*>(this);
+	OSWaitSemaphore(accessSemaphores + channel);
+	char value = obj[0x2CCA + channel];
+	OSSignalSemaphore(accessSemaphores + channel);
+	return static_cast<unsigned int>((-static_cast<int>(value) | static_cast<int>(value)) >> 31);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800cbea4
+ * PAL Size: 96b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::ClrCompatibilityFlg(int)
+void GbaQueue::ClrCompatibilityFlg(int channel)
 {
-	// TODO
+	char* obj = reinterpret_cast<char*>(this);
+	OSWaitSemaphore(accessSemaphores + channel);
+	obj[0x2CCA + channel] = 0;
+	OSSignalSemaphore(accessSemaphores + channel);
 }
 
 /*

@@ -136,9 +136,9 @@ unsigned int __flush_all() {
  * JP Size: TODO
  */
 FILE* __find_unopened_file(void) {
+    FILE* result;
     FILE* prev = &__files[2];
     FILE* file = prev->next_file_struct;
-    FILE* result;
 
     while (file != NULL) {
         if (file->file_mode.file_kind == __closed_file) {

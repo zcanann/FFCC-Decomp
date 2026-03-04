@@ -248,9 +248,9 @@ asm f32 PSVECSquareDistance(register const Vec *a, register const Vec *b) {
 f32 PSVECDistance(register const Vec *a, register const Vec *b)
 {
     register f32 half_c;
-    register f32 three_c;
-    register f32 zero;
     register f32 square_dist;
+    register f32 zero;
+    register f32 three_c;
     register f32 recip;
     register f32 n_0;
     register f32 n_1;
@@ -267,13 +267,13 @@ f32 PSVECDistance(register const Vec *a, register const Vec *b)
 	}
 
     half_c = 0.5f;
+    zero = half_c - half_c;
 
     asm {
         ps_madd     square_dist, f0, f0, f2
         ps_sum0     square_dist, square_dist, f2, f2
     }
 
-    zero = half_c - half_c;
     if (square_dist == zero) {
     }
     else {

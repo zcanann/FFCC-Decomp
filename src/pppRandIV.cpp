@@ -41,30 +41,28 @@ void pppRandIV(void* param1, void* param2, void* param3)
     PppRandIVParam2* in = (PppRandIVParam2*)param2;
     PppRandIVParam3* out = (PppRandIVParam3*)param3;
     s32* target;
-    f32 value;
-    s32 outputOffset;
+    f32* valuePtr;
 
     if (lbl_8032ED70 != 0) {
         return;
     }
 
     if (in->field0 == *(s32*)(base + 0xC)) {
-        value = RandF__5CMathFv(&math[0]);
+        f32 value = RandF__5CMathFv(&math[0]);
         if (in->field18 != 0) {
             value += RandF__5CMathFv(&math[0]);
         } else {
             value *= lbl_8032FFB8;
         }
 
-        {
-            s32 valueOffset = *out->fieldC + 0x80;
-            *(f32*)(base + valueOffset) = value;
-        }
+        valuePtr = (f32*)(base + *out->fieldC + 0x80);
+        *valuePtr = value;
     } else if (in->field0 != *(s32*)(base + 0xC)) {
         return;
+    } else {
+        valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
-
-    outputOffset = *out->fieldC + 0x80;
+    
     if (in->field4 == -1) {
         target = lbl_801EADC8;
     } else {
@@ -72,7 +70,7 @@ void pppRandIV(void* param1, void* param2, void* param3)
     }
 
     {
-        f32 randValue = *(f32*)(base + outputOffset);
+        f32 randValue = *valuePtr;
         target[0] += (s32)((f32)in->field8 * randValue - (f32)in->field8);
         target[1] += (s32)((f32)in->fieldC * randValue - (f32)in->fieldC);
         target[2] += (s32)((f32)in->field10 * randValue - (f32)in->field10);

@@ -1882,8 +1882,7 @@ void GbaQueue::GetMapObjDrawFlg(unsigned int*)
  */
 void GbaQueue::SetAddLetter(int channel)
 {
-	char* obj = reinterpret_cast<char*>(this);
-	obj[0x2C89] = static_cast<char>(obj[0x2C89] | (1 << channel));
+	reinterpret_cast<unsigned char*>(this)[0x2C89] |= 1 << channel;
 }
 
 /*

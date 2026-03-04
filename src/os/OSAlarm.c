@@ -228,7 +228,6 @@ static void DecrementerExceptionCallback(register __OSException exception,
     OSLoadContext(context);
 }
 
-#ifdef __GEKKO__
 static asm void DecrementerExceptionHandler(register __OSException exception,
                                             register OSContext* context) {
     nofralloc 
@@ -236,7 +235,6 @@ static asm void DecrementerExceptionHandler(register __OSException exception,
     stwu r1, -8(r1)
     b DecrementerExceptionCallback
 }
-#endif
 
 void OSSetAlarmTag(OSAlarm* alarm, u32 tag) {
     alarm->tag = tag;

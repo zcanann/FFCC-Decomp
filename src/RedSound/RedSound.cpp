@@ -344,6 +344,7 @@ void CRedSound::GetSoundMode()
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void CRedSound::SetReverb(int bank, int kind)
 {
 	CRedDriver_8032f4c0.SetReverb(bank, kind);
@@ -401,7 +402,6 @@ void CRedSound::MusicStop(int id)
 	CRedDriver_8032f4c0.MusicStop(id);
 }
 
-#pragma optimization_level 4
 /*
  * --INFO--
  * Address:	TODO

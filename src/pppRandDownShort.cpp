@@ -48,7 +48,7 @@ extern "C" void pppRandDownShort(void* r3, void* r4, void* r5)
         f32 value = -RandF__5CMathFv(&math[0]);
         if (in->randomTwice != 0) {
             f32 mixed = value - RandF__5CMathFv(&math[0]);
-            value = lbl_8032FF78 * mixed;
+            value = mixed * lbl_8032FF78;
         }
 
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
@@ -63,7 +63,7 @@ extern "C" void pppRandDownShort(void* r3, void* r4, void* r5)
 
     target = (in->sourceOffset == -1) ? &lbl_801EADC8[0] : (s16*)(base + in->sourceOffset + 0x80);
     u16 scale = in->scale;
-    double scaled = (double)*valuePtr * (double)scale;
+    double scaled = (double)scale * (double)*valuePtr;
     s32 delta = (s32)scaled;
     *target = (s16)(*target + delta);
 }

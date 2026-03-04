@@ -47,7 +47,7 @@ void pppSRandUpCV(void* param1, void* param2, void* param3)
             u8 flag = in->randomTwice;
             f32 value = RandF__5CMathFv(math);
             if (flag != 0) {
-                value = (value + RandF__5CMathFv(math)) * lbl_803300B0;
+                value = lbl_803300B0 * (value + RandF__5CMathFv(math));
             }
             target[0] = value;
         }
@@ -56,7 +56,7 @@ void pppSRandUpCV(void* param1, void* param2, void* param3)
             u8 flag = in->randomTwice;
             f32 value = RandF__5CMathFv(math);
             if (flag != 0) {
-                value = (value + RandF__5CMathFv(math)) * lbl_803300B0;
+                value = lbl_803300B0 * (value + RandF__5CMathFv(math));
             }
             target[1] = value;
         }
@@ -65,7 +65,7 @@ void pppSRandUpCV(void* param1, void* param2, void* param3)
             u8 flag = in->randomTwice;
             f32 value = RandF__5CMathFv(math);
             if (flag != 0) {
-                value = (value + RandF__5CMathFv(math)) * lbl_803300B0;
+                value = lbl_803300B0 * (value + RandF__5CMathFv(math));
             }
             target[2] = value;
         }
@@ -74,11 +74,14 @@ void pppSRandUpCV(void* param1, void* param2, void* param3)
             u8 flag = in->randomTwice;
             f32 value = RandF__5CMathFv(math);
             if (flag != 0) {
-                value = (value + RandF__5CMathFv(math)) * lbl_803300B0;
+                value = lbl_803300B0 * (value + RandF__5CMathFv(math));
             }
             target[3] = value;
         }
     } else {
+        if (in->targetId != *(s32*)(base + 0xC)) {
+            return;
+        }
         target = (f32*)(base + *ctx->outputOffset + 0x80);
     }
 

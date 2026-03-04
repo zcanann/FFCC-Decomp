@@ -5,6 +5,10 @@
 #include "dolphin/gx/__gx.h"
 
 extern u32 __cvt_fp2unsigned(f64 d);
+extern GXData* const gx;
+
+#undef __GXData
+#define __GXData gx
 
 void GXProject(f32 x, f32 y, f32 z, const Mtx mtx, const f32* pm, const f32* vp, f32* sx, f32* sy, f32* sz) {
     f32 peX;

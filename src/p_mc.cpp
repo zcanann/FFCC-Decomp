@@ -39,8 +39,7 @@ struct MenuPcsMcLayout
 extern "C" void __sinit_p_mc_cpp(void)
 {
     unsigned int* table = (unsigned int*)lbl_80211DAC;
-    unsigned int* ptr = (unsigned int*)lbl_80211F28;
-    lbl_8032EE88 = (unsigned int)ptr;
+    lbl_8032EE88 = (unsigned int)lbl_80211F28;
 
     table[1] = lbl_80211D88[0];
     table[2] = lbl_80211D88[1];

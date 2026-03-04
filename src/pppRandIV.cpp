@@ -5,7 +5,6 @@
 extern CMath math[];
 extern s32 lbl_8032ED70;
 extern f32 lbl_8032FFB8;
-extern f64 lbl_8032FFC0;
 extern s32 lbl_801EADC8[];
 
 extern "C" {
@@ -57,14 +56,17 @@ void pppRandIV(void* param1, void* param2, void* param3)
             value *= lbl_8032FFB8;
         }
 
-        *(f32*)(base + *out->fieldC + 0x80) = value;
+        {
+            s32 valueOffset = *out->fieldC + 0x80;
+            *(f32*)(base + valueOffset) = value;
+        }
     } else if (in->field0 != *(s32*)(base + 0xC)) {
         return;
     }
 
     outputOffset = *out->fieldC + 0x80;
     if (in->field4 == -1) {
-        target = &lbl_801EADC8[0];
+        target = lbl_801EADC8;
     } else {
         target = (s32*)(base + in->field4 + 0x80);
     }

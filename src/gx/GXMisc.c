@@ -275,11 +275,10 @@ void GXPokeDither(GXBool dither) {
  * JP Size: TODO
  */
 void GXPokeZMode(GXBool compare_enable, GXCompare func, GXBool update_enable) {
-    u32 reg = 0;
-    reg |= compare_enable;
-    reg |= func << 1;
-    reg |= update_enable << 4;
-    GX_SET_PE_REG(0, reg);
+    volatile u16* pe_reg = (volatile u16*)__peReg;
+    u16 reg = (u16)(((compare_enable & 0xF1) | ((u16)func << 1)) & 0xFFEF);
+    reg = (u16)(reg | (((u16)update_enable << 4) & 0xFF0));
+    pe_reg[0] = reg;
 }
 
 void GXPeekARGB(u16 x, u16 y, u32* color) {

@@ -77,19 +77,8 @@ static void F252(void* task)
 {
     s32 chan;
 
-    if (&__GBA[0].task == task) {
-        chan = 0;
-    } else if (&__GBA[1].task == task) {
-        chan = 1;
-    } else if (&__GBA[2].task == task) {
-        chan = 2;
-    } else if (&__GBA[3].task == task) {
-        chan = 3;
-    } else {
-        OSPanic(__FILE__, 169, "GBA - unexpected dsp call");
-        chan = -1;
-    }
-    
+    chan = F152(task);
+
     __GBAX01(chan, 0);
 }
 

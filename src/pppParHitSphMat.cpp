@@ -27,7 +27,6 @@ void pppParHitSphMat(void* param1, void* param2, void* param3)
     Mtx local_48;
     Mtx MStack_78;
     _GXColor local_a8;
-    u8* data = (u8*)param1;
     u8* step = (u8*)param2;
     _pppMngSt* pppMngSt = (_pppMngSt*)lbl_8032ED50;
     f32 radius;
@@ -38,7 +37,7 @@ void pppParHitSphMat(void* param1, void* param2, void* param3)
 
     if (step[0xC] != 0) {
         s32* offsets = *(s32**)((u8*)param3 + 0xC);
-        Vec* src = (Vec*)(data + offsets[1] + 0x80);
+        Vec* src = (Vec*)((u8*)param1 + offsets[1] + 0x80);
 
         PSMTXMultVec(pppMngSt->m_matrix.value, src, &local_94);
     } else {
@@ -46,7 +45,7 @@ void pppParHitSphMat(void* param1, void* param2, void* param3)
         local_94.y = pppMngSt->m_matrix.value[1][3];
         local_94.z = pppMngSt->m_matrix.value[2][3];
         s32* offsets = *(s32**)((u8*)param3 + 0xC);
-        Vec* src = (Vec*)(data + offsets[1] + 0x80);
+        Vec* src = (Vec*)((u8*)param1 + offsets[1] + 0x80);
 
         local_94.x = local_94.x + src->x;
         local_94.y = local_94.y + src->y;
@@ -54,10 +53,10 @@ void pppParHitSphMat(void* param1, void* param2, void* param3)
     }
 
     if (*(f32*)(step + 4) != lbl_80330700) {
-        PSVECSubtract((Vec*)((u8*)pppMngSt + 8), (Vec*)((u8*)pppMngSt + 0x48), &local_88);
+        PSVECSubtract((Vec*)(lbl_8032ED50 + 8), (Vec*)(lbl_8032ED50 + 0x48), &local_88);
     }
 
-    radius = *(f32*)((u8*)pppMngSt + 0x64) * *(f32*)(step + 8);
+    radius = *(f32*)(lbl_8032ED50 + 0x64) * *(f32*)(step + 8);
     pppHitCylinderSendSystem(pppMngSt, &local_94, &local_88, radius, *(f32*)(step + 4));
 
     if ((*(u32*)(CFlat + 0x129c) & 0x200000) != 0) {

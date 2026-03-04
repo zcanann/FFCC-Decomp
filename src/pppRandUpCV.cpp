@@ -4,7 +4,8 @@
 
 extern CMath math[];
 extern s32 lbl_8032ED70;
-extern f32 lbl_8032FF08;
+extern f32 lbl_8032FFE8;
+extern f64 lbl_8032FFF0;
 extern u8 lbl_801EADC8[32];
 extern "C" f32 RandF__5CMathFv(CMath* instance);
 
@@ -40,17 +41,20 @@ void pppRandUpCV(void* param1, void* param2, void* param3)
     RandUpCVCtx* ctx = (RandUpCVCtx*)param3;
     u8* target;
     f32* valuePtr;
+    s32 state;
 
-    if (in->targetId == *(s32*)(base + 0xC)) {
+    state = *(s32*)(base + 0xC);
+    if (state == 0) {
         f32 value = RandF__5CMathFv(math);
         if (in->randomTwice != 0) {
-            value = (value + RandF__5CMathFv(math)) * lbl_8032FF08;
+            f32 mixed = value + RandF__5CMathFv(math);
+            value = mixed * lbl_8032FFE8;
         }
 
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
         *valuePtr = value;
     } else {
-        if (in->targetId != *(s32*)(base + 0xC)) {
+        if (in->targetId != state) {
             return;
         }
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
@@ -66,19 +70,23 @@ void pppRandUpCV(void* param1, void* param2, void* param3)
     f32 scale = *valuePtr;
 
     {
-        target[0] = (u8)(target[0] + (s32)((f32)in->delta[0] * scale));
+        s8 baseDelta = in->delta[0];
+        target[0] = (u8)(target[0] + (s32)((f32)baseDelta * scale));
     }
 
     {
-        target[1] = (u8)(target[1] + (s32)((f32)in->delta[1] * scale));
+        s8 baseDelta = in->delta[1];
+        target[1] = (u8)(target[1] + (s32)((f32)baseDelta * scale));
     }
 
     {
-        target[2] = (u8)(target[2] + (s32)((f32)in->delta[2] * scale));
+        s8 baseDelta = in->delta[2];
+        target[2] = (u8)(target[2] + (s32)((f32)baseDelta * scale));
     }
 
     {
-        target[3] = (u8)(target[3] + (s32)((f32)in->delta[3] * scale));
+        s8 baseDelta = in->delta[3];
+        target[3] = (u8)(target[3] + (s32)((f32)baseDelta * scale));
     }
 }
 

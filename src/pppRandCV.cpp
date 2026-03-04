@@ -3,14 +3,14 @@
 #include "dolphin/types.h"
 
 extern CMath math[];
-extern int lbl_8032ED70;
-extern float lbl_8032FF08;
+extern s32 lbl_8032ED70;
+extern f32 lbl_8032FF08;
 extern u8 lbl_801EADC8[];
-extern "C" float RandF__5CMathFv(CMath* instance);
+extern "C" f32 RandF__5CMathFv(CMath* instance);
 
 typedef struct RandCVParams {
-    int index;
-    int colorOffset;
+    s32 index;
+    s32 colorOffset;
     s8 delta[4];
     u8 flag;
     u8 pad[3];
@@ -18,7 +18,7 @@ typedef struct RandCVParams {
 
 typedef struct RandCVCtx {
     u8 pad[0xC];
-    int* outputOffset;
+    s32* outputOffset;
 } RandCVCtx;
 
 /*
@@ -28,8 +28,8 @@ typedef struct RandCVCtx {
  */
 void randchar(char range, float factor)
 {
-	float value = (float)range;
-	float scaled = value * factor;
+	f32 value = (f32)range;
+	f32 scaled = value * factor;
 	(void)scaled;
 }
 
@@ -47,36 +47,52 @@ void pppRandCV(void* param1, void* param2, void* param3)
     u8* base = (u8*)param1;
     RandCVParams* params = (RandCVParams*)param2;
     RandCVCtx* ctx = (RandCVCtx*)param3;
-    float* randomValue;
+    f32* randomValue;
 
     if (lbl_8032ED70 != 0) {
         return;
     }
 
-    if (params->index == *(int*)(base + 0xC)) {
-        float value = RandF__5CMathFv(math);
+    if (params->index == *(s32*)(base + 0xC)) {
+        f32 value = RandF__5CMathFv(&math[0]);
         if (params->flag != 0) {
-            value += RandF__5CMathFv(math);
+            value += RandF__5CMathFv(&math[0]);
         } else {
             value *= lbl_8032FF08;
         }
-        randomValue = (float*)(base + *ctx->outputOffset + 0x80);
+        randomValue = (f32*)(base + *ctx->outputOffset + 0x80);
         *randomValue = value;
+    } else if (params->index != *(s32*)(base + 0xC)) {
+        return;
     } else {
-        if (params->index != *(int*)(base + 0xC)) return;
-        randomValue = (float*)(base + *ctx->outputOffset + 0x80);
+        randomValue = (f32*)(base + *ctx->outputOffset + 0x80);
     }
 
-    u8* target;
-    if (params->colorOffset == -1) {
-        target = lbl_801EADC8;
-    } else {
-        target = base + params->colorOffset + 0x80;
+    s32 colorOffset = params->colorOffset;
+    u8* target = (colorOffset == -1) ? &lbl_801EADC8[0] : (u8*)(base + colorOffset + 0x80);
+    f32 scale = *randomValue;
+
+    {
+        s8 baseValue = params->delta[0];
+        s32 delta = (s32)((f32)baseValue * scale - (f32)baseValue);
+        target[0] = (u8)(target[0] + delta);
     }
 
-    float scale = *randomValue;
-    target[0] = (u8)(target[0] + (int)((float)params->delta[0] * scale - (float)params->delta[0]));
-    target[1] = (u8)(target[1] + (int)((float)params->delta[1] * scale - (float)params->delta[1]));
-    target[2] = (u8)(target[2] + (int)((float)params->delta[2] * scale - (float)params->delta[2]));
-    target[3] = (u8)(target[3] + (int)((float)params->delta[3] * scale - (float)params->delta[3]));
+    {
+        s8 baseValue = params->delta[1];
+        s32 delta = (s32)((f32)baseValue * scale - (f32)baseValue);
+        target[1] = (u8)(target[1] + delta);
+    }
+
+    {
+        s8 baseValue = params->delta[2];
+        s32 delta = (s32)((f32)baseValue * scale - (f32)baseValue);
+        target[2] = (u8)(target[2] + delta);
+    }
+
+    {
+        s8 baseValue = params->delta[3];
+        s32 delta = (s32)((f32)baseValue * scale - (f32)baseValue);
+        target[3] = (u8)(target[3] + delta);
+    }
 }

@@ -8,7 +8,6 @@
 #include "ffcc/memorycard.h"
 #include "ffcc/file.h"
 #include "ffcc/pad.h"
-#include "ffcc/pppfunctbl.h"
 #include "ffcc/system.h"
 #include "ffcc/util.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/printf.h"

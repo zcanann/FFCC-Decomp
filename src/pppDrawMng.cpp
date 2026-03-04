@@ -52,10 +52,11 @@ void pppDrawMng::DrawOt()
 
     do
     {
-        pppDrawPrimitive* prim = *slot;
+        pppDrawPrimitive* first = *slot;
 
-        if (prim != 0)
+        if (first != 0)
         {
+            pppDrawPrimitive* prim = first;
             do
             {
                 unsigned char type = prim->m_type;

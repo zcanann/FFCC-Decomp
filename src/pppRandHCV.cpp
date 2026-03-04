@@ -66,12 +66,19 @@ void pppRandHCV(void* p1, void* p2, void* p3)
     s16* target = (params->field4 == -1) ? lbl_801EADC8 : (s16*)(base + params->field4 + 0x80);
 
     {
-        f32 scale = *randomValue;
+        s32 delta;
 
-        target[0] = (s16)(target[0] + (s32)((f32)params->field8 * scale - (f32)params->field8));
-        target[1] = (s16)(target[1] + (s32)((f32)params->fieldA * scale - (f32)params->fieldA));
-        target[2] = (s16)(target[2] + (s32)((f32)params->fieldC * scale - (f32)params->fieldC));
-        target[3] = (s16)(target[3] + (s32)((f32)params->fieldE * scale - (f32)params->fieldE));
+        delta = (s32)((f32)params->field8 * *randomValue - (f32)params->field8);
+        target[0] = (s16)(target[0] + delta);
+
+        delta = (s32)((f32)params->fieldA * *randomValue - (f32)params->fieldA);
+        target[1] = (s16)(target[1] + delta);
+
+        delta = (s32)((f32)params->fieldC * *randomValue - (f32)params->fieldC);
+        target[2] = (s16)(target[2] + delta);
+
+        delta = (s32)((f32)params->fieldE * *randomValue - (f32)params->fieldE);
+        target[3] = (s16)(target[3] + delta);
     }
 }
 

@@ -47,7 +47,8 @@ void pppRandDownInt(void* param1, void* param2, void* param3)
     if (baseState == 0) {
         f32 value = -RandF__5CMathFv(math);
         if (in->fieldC != 0) {
-            value = (value - RandF__5CMathFv(math)) * lbl_8032FF58;
+            f32 mixed = value - RandF__5CMathFv(math);
+            value = mixed * lbl_8032FF58;
         }
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);

@@ -1876,9 +1876,9 @@ void GbaQueue::GetMapObjDrawFlg(unsigned int*)
  * Address:	TODO
  * Size:	TODO
  */
-void GbaQueue::SetAddLetter(int)
+void GbaQueue::SetAddLetter(int channel)
 {
-	// TODO
+	reinterpret_cast<unsigned char*>(this)[0x2C89] |= 1 << channel;
 }
 
 /*

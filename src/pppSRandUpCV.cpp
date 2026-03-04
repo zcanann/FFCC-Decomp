@@ -83,12 +83,7 @@ void pppSRandUpCV(void* param1, void* param2, void* param3)
     }
 
     s32 color_offset = in->sourceOffset;
-    u8* target_colors;
-    if (color_offset == -1) {
-        target_colors = lbl_801EADC8;
-    } else {
-        target_colors = base + color_offset + 0x80;
-    }
+    u8* target_colors = (color_offset == -1) ? lbl_801EADC8 : (base + color_offset + 0x80);
 
     {
         s8 deltaBase = in->delta[0];

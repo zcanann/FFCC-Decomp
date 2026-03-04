@@ -10,6 +10,7 @@ char DAT_8032ec6c;
 int DAT_8032ec68;
 
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
+extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
 
 extern "C" char __vt__8CManager[];
 extern "C" char lbl_801E8668[];
@@ -19,6 +20,7 @@ extern u32 lbl_801E869C[];
 extern u32 lbl_801E86A8[];
 extern u32 lbl_801E86B4[];
 extern char lbl_8032F810;
+extern char lbl_801D6D14[];
 extern CUSBPcs USBPcs;
 
 
@@ -38,10 +40,10 @@ CUSBPcs::CUSBPcs()
  */
 void CUSBPcs::Init()
 { 
-	m_smallStage = Memory.CreateStage(0x2000, &lbl_8032F810, 0);
+	m_smallStage = (CMemory::CStage*)CreateStage__7CMemoryFUlPci(&Memory, 0x2000, &lbl_8032F810, 0);
 	m_bigStage = (CMemory::CStage*)nullptr;
 
-	strcpy(m_rootPath, "plot/kmitsuru/");
+	strcpy(m_rootPath, lbl_801D6D14);
 	m_unk0x104 = 0;
 	m_unk0x108 = 0;
 

@@ -83,10 +83,10 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct UnkB* param_2, struct
     s32 iVar2;
     s32 iVar4;
     s32 iVar5;
-    float* pfVar6;
+    s32* piVar6;
     s32 iVar7;
-    Vec local_38;
     Vec local_2c;
+    Vec local_38;
     u32 count;
     Vec** historyPtr;
 
@@ -114,10 +114,10 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct UnkB* param_2, struct
             iVar5 = (u8)param_2->m_dataValIndex - 1;
             iVar7 = iVar5 * 0xc;
             for (; 0 < iVar5; iVar5 = iVar5 - 1) {
-                pfVar6 = (f32*)((u8*)*historyPtr + iVar7 - 0xc);
-                local_38.x = *pfVar6;
-                local_38.y = pfVar6[1];
-                local_38.z = pfVar6[2];
+                piVar6 = (s32*)((u8*)*historyPtr + iVar7 - 0xc);
+                *(s32*)&local_38.x = piVar6[0];
+                *(s32*)&local_38.y = piVar6[1];
+                *(s32*)&local_38.z = piVar6[2];
                 pppCopyVector__FR3Vec3Vec((void*)((u8*)*historyPtr + iVar7), &local_38);
                 iVar7 = iVar7 - 0xc;
             }

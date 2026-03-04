@@ -17,15 +17,15 @@ void pppDrawMatrixNoRot(struct _pppPObject* param_1)
     PSMTXScaleApply(
         *(Mtx*)((char*)param_1 + 0x10),
         *(Mtx*)((char*)param_1 + 0x40), 
-        (pppMngStPtr->m_scale).x,
-        (pppMngStPtr->m_scale).y, 
-        (pppMngStPtr->m_scale).z
+        (((_pppMngSt*)lbl_8032ED50)->m_scale).x,
+        (((_pppMngSt*)lbl_8032ED50)->m_scale).y, 
+        (((_pppMngSt*)lbl_8032ED50)->m_scale).z
     );
     *(float*)((char*)param_1 + 0x4c) = 
-        (*(float*)((char*)param_1 + 0x1c)) * (pppMngStPtr->m_scale).x +
+        (*(float*)((char*)param_1 + 0x1c)) * (((_pppMngSt*)lbl_8032ED50)->m_scale).x +
         ppvWorldMatrix[0][3];
     *(float*)((char*)param_1 + 0x5c) =
-        (*(float*)((char*)param_1 + 0x2c)) * (pppMngStPtr->m_scale).y + ppvWorldMatrix[1][3];
+        (*(float*)((char*)param_1 + 0x2c)) * (((_pppMngSt*)lbl_8032ED50)->m_scale).y + ppvWorldMatrix[1][3];
     *(float*)((char*)param_1 + 0x6c) =
-        (*(float*)((char*)param_1 + 0x3c)) * (pppMngStPtr->m_scale).z + ppvWorldMatrix[2][3];
+        (*(float*)((char*)param_1 + 0x3c)) * (((_pppMngSt*)lbl_8032ED50)->m_scale).z + ppvWorldMatrix[2][3];
 }

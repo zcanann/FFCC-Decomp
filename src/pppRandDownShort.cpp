@@ -62,9 +62,9 @@ extern "C" void pppRandDownShort(void* r3, void* r4, void* r5)
     }
 
     target = (in->sourceOffset == -1) ? &lbl_801EADC8[0] : (s16*)(base + in->sourceOffset + 0x80);
-    u16 scale = in->scale;
-    double value = (double)*valuePtr;
-    double scaleD = (double)scale;
-    s32 delta = (s32)(value * scaleD);
+    f32 scale = (f32)in->scale;
+    f32 current = *valuePtr;
+    f32 scaled = scale * current;
+    s32 delta = (s32)scaled;
     *target = (s16)(*target + delta);
 }

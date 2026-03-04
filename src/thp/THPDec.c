@@ -23,6 +23,12 @@ static THPCoeff *__THPMCUBuffer[6];
 static THPFileInfo *__THPInfo;
 static BOOL __THPInitFlag = FALSE;
 
+#ifdef DEBUG
+static const char* __THPVersion = "<< Dolphin SDK - THP\tdebug build: Apr  5 2004 04:18:14 (0x2301) >>";
+#else
+static const char* __THPVersion = "<< Dolphin SDK - THP\trelease build: Apr  5 2004 04:18:14 (0x2301) >>";
+#endif
+
 #define THPROUNDUP(a, b) ((((s32)(a)) + ((s32)(b)-1L)) / ((s32)(b)))
 
 s32 THPVideoDecode(void *file, void *tileY, void *tileU, void *tileV, void *work)
@@ -2256,6 +2262,9 @@ static void __THPHuffDecodeDCTCompV(register THPFileInfo *info, THPCoeff *block)
 BOOL THPInit(void)
 {
     u8 *base;
+
+    OSRegisterVersion(__THPVersion);
+
     base = (u8*)(0xE000 << 16);
 
     __THPLCWork512[0] = base;

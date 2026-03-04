@@ -123,14 +123,14 @@ void pppDrawShape(void* pppShape, void* data, void* additionalData)
 	ShapeControlData* controlData = (ShapeControlData*)data;
 	ShapeState* shapeData = (ShapeState*)((u8*)pppShape + runtimeData->shapeDataOffset + 0x80);
 	void* posData = (u8*)pppShape + runtimeData->posDataOffset + 0x80;
-	u16 type = (u16)controlData->type;
+	u32 type = *(u32*)((u8*)controlData + 4);
 
-	if (type == 0xFFFF) {
+	if ((s16)type == -1) {
 		return;
 	}
 
 	void** shapeTables = *(void***)((u8*)lbl_8032ED54 + 0xC);
-	void* shapeSpec = *(void**)*(u32*)((u8*)shapeTables + (type << 2));
+	void* shapeSpec = *(void**)shapeTables[type];
 	ShapeSpecEntry* shape = (ShapeSpecEntry*)((u8*)shapeSpec + ((u32)shapeData->currentId << 3) + 0x10);
 	void* drawShape = (u8*)shapeSpec + shape->offset;
 
@@ -142,8 +142,8 @@ void pppDrawShape(void* pppShape, void* data, void* additionalData)
 		controlData->paramE,
 		controlData->blendMode,
 		0,
-		1,
 		controlData->param14,
+		1,
 		0
 	);
 

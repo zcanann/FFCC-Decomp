@@ -147,9 +147,9 @@ FILE* __find_unopened_file(void) {
         file = file->next_file_struct;
     }
 
-    file = (FILE*)malloc(0x50);
+    file = (FILE*)malloc(sizeof(FILE));
     if (file != NULL) {
-        memset(file, 0, 0x50);
+        memset(file, 0, sizeof(FILE));
         file->is_dynamically_allocated = 1;
 
         prev->next_file_struct = file;
@@ -168,10 +168,8 @@ FILE* __find_unopened_file(void) {
  * JP Size: TODO
  */
 void __init_file(FILE* file, file_modes mode, unsigned char* buffer, int buffer_size) {
-    file_modes init_mode = mode;
-
     file->handle = 0;
-    file->file_mode = init_mode;
+    file->file_mode = mode;
 
     file->file_state.io_state = __neutral;
     file->file_state.free_buffer = 0;
@@ -180,7 +178,7 @@ void __init_file(FILE* file, file_modes mode, unsigned char* buffer, int buffer_
 
     file->position = 0;
 
-    if ((unsigned int)buffer_size != 0) {
+    if (buffer_size != 0) {
         setvbuf(file, (char*)buffer, _IOFBF, buffer_size);
     } else {
         setvbuf(file, NULL, _IONBF, 0);

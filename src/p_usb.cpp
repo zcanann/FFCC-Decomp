@@ -14,6 +14,7 @@ extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stag
 extern "C" char __vt__8CManager[];
 extern "C" char lbl_801E8668[];
 extern "C" char lbl_801E8830[];
+extern char lbl_801D6D14[];
 extern u32 lbl_801E8690[];
 extern u32 lbl_801E869C[];
 extern u32 lbl_801E86A8[];
@@ -38,10 +39,11 @@ CUSBPcs::CUSBPcs()
  */
 void CUSBPcs::Init()
 { 
-	m_smallStage = Memory.CreateStage(0x2000, &lbl_8032F810, 0);
-	m_bigStage = (CMemory::CStage*)nullptr;
+	CMemory::CStage* stage = Memory.CreateStage(0x2000, &lbl_8032F810, 0);
+	m_smallStage = stage;
+	m_bigStage = (CMemory::CStage*)0;
 
-	strcpy(m_rootPath, "plot/kmitsuru/");
+	strcpy(m_rootPath, lbl_801D6D14);
 	m_unk0x104 = 0;
 	m_unk0x108 = 0;
 

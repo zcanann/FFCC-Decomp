@@ -4,7 +4,7 @@
 
 extern CMath math;
 extern int lbl_8032ED70;
-extern char lbl_801EAC40[];
+extern u8 lbl_801EADC8[];
 extern float lbl_8032FF28;
 extern "C" float RandF__5CMathFv(CMath*);
 
@@ -52,12 +52,12 @@ void pppRandDownCV(void* param1, void* param2, void* param3)
     int data_offset = **(int**)((char*)param3 + 0xc);
     float* random_value = (float*)((char*)param1 + data_offset + 0x80);
     int color_offset = *((int*)param2 + 1);
-    char* target;
+    u8* target;
 
     if (color_offset == -1) {
-        target = lbl_801EAC40;
+        target = lbl_801EADC8;
     } else {
-        target = (char*)((char*)param1 + color_offset + 0x80);
+        target = (u8*)((u8*)param1 + color_offset + 0x80);
     }
 
     float scale = random_value[0];

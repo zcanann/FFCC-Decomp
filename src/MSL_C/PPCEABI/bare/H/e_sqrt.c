@@ -17,13 +17,15 @@ static const double one = 1.0, tiny = 1.0e-300;
 double __ieee754_sqrt(double x) {
     int ix0;
     int s0;
-    int i;
     int q;
     int m;
+    int t;
+    int i;
     unsigned ix1;
     unsigned q1;
     unsigned s1;
     unsigned r;
+    unsigned t1;
     double z;
 
     ix0 = __HI(x);
@@ -74,7 +76,7 @@ double __ieee754_sqrt(double x) {
     r = 0x00200000;
 
     while (r != 0) {
-        int t = s0 + r;
+        t = s0 + r;
         if (t <= ix0) {
             s0 = t + r;
             ix0 -= t;
@@ -87,8 +89,8 @@ double __ieee754_sqrt(double x) {
 
     r = 0x80000000;
     while (r != 0) {
-        unsigned t1 = s1 + r;
-        int t = s0;
+        t1 = s1 + r;
+        t = s0;
         if ((t < ix0) || ((t == ix0) && (t1 <= ix1))) {
             s1 = t1 + r;
             if (((t1 & 0x80000000) == 0x80000000) && ((s1 & 0x80000000) == 0)) {

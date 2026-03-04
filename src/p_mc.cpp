@@ -117,18 +117,16 @@ void CMcPcs::destroy()
  */
 void CMcPcs::calc()
 {
-    MenuPcsMcLayout* menuPcsLayout;
     int result;
     int worldParam;
 
     Rand__5CMathFUl(math, 0x7FFFFFFF);
-    menuPcsLayout = reinterpret_cast<MenuPcsMcLayout*>(MenuPcs);
 
-    if (menuPcsLayout->field14 != 1)
+    if (reinterpret_cast<MenuPcsMcLayout*>(MenuPcs)->field14 != 1)
     {
-        if (menuPcsLayout->field18 == 0x13)
+        if (reinterpret_cast<MenuPcsMcLayout*>(MenuPcs)->field18 == 0x13)
         {
-            result = Format__6McCtrlFi(&menuPcsLayout->m_mcCtrl, 1);
+            result = Format__6McCtrlFi(&reinterpret_cast<MenuPcsMcLayout*>(MenuPcs)->m_mcCtrl, 1);
             if (result != 0)
             {
                 if (result == 1)
@@ -145,38 +143,35 @@ void CMcPcs::calc()
                 }
 
                 CallWorldParam__8CMenuPcsFiii(reinterpret_cast<CMenuPcs*>(MenuPcs), 6, worldParam, 0);
-                menuPcsLayout->field18 = 0;
+                reinterpret_cast<MenuPcsMcLayout*>(MenuPcs)->field18 = 0;
             }
         }
-        else if (menuPcsLayout->field18 == 0x12)
+        else if (reinterpret_cast<MenuPcsMcLayout*>(MenuPcs)->field18 == 0x12 &&
+                 (result = reinterpret_cast<MenuPcsMcLayout*>(MenuPcs)->m_mcCtrl.ChkEmpty(0), result != 0))
         {
-            result = menuPcsLayout->m_mcCtrl.ChkEmpty(0);
-            if (result != 0)
+            if (result == 1)
             {
-                if (result == 1)
-                {
-                    worldParam = 1;
-                }
-                else if (result == -1)
-                {
-                    worldParam = 4;
-                }
-                else if (result == -2)
-                {
-                    worldParam = 5;
-                }
-                else if (result == -3 || result == -4)
-                {
-                    worldParam = 2;
-                }
-                else
-                {
-                    worldParam = 6;
-                }
-
-                CallWorldParam__8CMenuPcsFiii(reinterpret_cast<CMenuPcs*>(MenuPcs), 5, worldParam, 0);
-                menuPcsLayout->field18 = 0;
+                worldParam = 1;
             }
+            else if (result == -1)
+            {
+                worldParam = 4;
+            }
+            else if (result == -2)
+            {
+                worldParam = 5;
+            }
+            else if (result == -3 || result == -4)
+            {
+                worldParam = 2;
+            }
+            else
+            {
+                worldParam = 6;
+            }
+
+            CallWorldParam__8CMenuPcsFiii(reinterpret_cast<CMenuPcs*>(MenuPcs), 5, worldParam, 0);
+            reinterpret_cast<MenuPcsMcLayout*>(MenuPcs)->field18 = 0;
         }
     }
 }

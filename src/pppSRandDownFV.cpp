@@ -1,12 +1,28 @@
 #include "ffcc/pppSRandDownFV.h"
 #include "ffcc/math.h"
+#include "dolphin/types.h"
 
 extern CMath math[];
-extern int lbl_8032ED70;
-extern float lbl_80330080;
-extern float lbl_801EADC8[];
+extern s32 lbl_8032ED70;
+extern f32 lbl_80330080;
+extern f32 lbl_801EADC8[];
 
-extern "C" float RandF__5CMathFv(CMath*);
+extern "C" f32 RandF__5CMathFv(CMath*);
+
+struct PppSRandDownFVParam2 {
+    s32 field0;
+    s32 field4;
+    f32 field8;
+    f32 fieldC;
+    f32 field10;
+    u8 unk14[0x18 - 0x14];
+    u8 field18;
+};
+
+struct PppSRandDownFVParam3 {
+    u8 unk0[0xC];
+    s32* fieldC;
+};
 
 /*
  * --INFO--
@@ -19,78 +35,69 @@ extern "C" float RandF__5CMathFv(CMath*);
  */
 void pppSRandDownFV(void* param1, void* param2, void* param3)
 {
-    struct Param {
-        int index;
-        int offset;
-        float x;
-        float y;
-        float z;
-        unsigned char _pad[4];
-        unsigned char blendTwice;
-    };
-    struct SelectInfo {
-        int _pad0;
-        int _pad1;
-        int _pad2;
-        int* offsetPtr;
-    };
-
-    unsigned char* self = reinterpret_cast<unsigned char*>(param1);
-    Param* cfg = reinterpret_cast<Param*>(param2);
-    float* randVec;
-    int currentIndex;
+    u8* self = (u8*)param1;
+    PppSRandDownFVParam2* cfg = (PppSRandDownFVParam2*)param2;
+    PppSRandDownFVParam3* info = (PppSRandDownFVParam3*)param3;
+    f32* randVec;
 
     if (lbl_8032ED70 != 0) {
         return;
     }
 
-    currentIndex = *reinterpret_cast<int*>(self + 0xC);
+    s32 currentIndex = *(s32*)(self + 0xC);
     if (currentIndex == 0) {
-        int offset = *reinterpret_cast<SelectInfo*>(param3)->offsetPtr;
-        unsigned char blendTwice = cfg->blendTwice;
-        randVec = reinterpret_cast<float*>(self + offset + 0x80);
+        randVec = (f32*)(self + *info->fieldC + 0x80);
 
-        float value = -RandF__5CMathFv(math);
-        if (blendTwice != 0) {
-            value = (value - RandF__5CMathFv(math)) * lbl_80330080;
+        {
+            u8 flag = cfg->field18;
+            f32 value = -RandF__5CMathFv(math);
+            if (flag != 0) {
+                value = (value - RandF__5CMathFv(math)) * lbl_80330080;
+            }
+            randVec[0] = value;
         }
-        randVec[0] = value;
 
-        value = -RandF__5CMathFv(math);
-        if (blendTwice != 0) {
-            value = (value - RandF__5CMathFv(math)) * lbl_80330080;
+        {
+            u8 flag = cfg->field18;
+            f32 value = -RandF__5CMathFv(math);
+            if (flag != 0) {
+                value = (value - RandF__5CMathFv(math)) * lbl_80330080;
+            }
+            randVec[1] = value;
         }
-        randVec[1] = value;
 
-        value = -RandF__5CMathFv(math);
-        if (blendTwice != 0) {
-            value = (value - RandF__5CMathFv(math)) * lbl_80330080;
+        {
+            u8 flag = cfg->field18;
+            f32 value = -RandF__5CMathFv(math);
+            if (flag != 0) {
+                value = (value - RandF__5CMathFv(math)) * lbl_80330080;
+            }
+            randVec[2] = value;
         }
-        randVec[2] = value;
     } else {
-        if (cfg->index != currentIndex) {
+        if (cfg->field0 != currentIndex) {
             return;
         }
-        randVec = reinterpret_cast<float*>(self + *reinterpret_cast<SelectInfo*>(param3)->offsetPtr + 0x80);
+        randVec = (f32*)(self + *info->fieldC + 0x80);
     }
 
-    float* target;
-    if (cfg->offset == -1) {
+    f32* target;
+    if (cfg->field4 == -1) {
         target = lbl_801EADC8;
     } else {
-        target = reinterpret_cast<float*>(self + cfg->offset + 0x80);
+        target = (f32*)(self + cfg->field4 + 0x80);
     }
 
     {
-        float value = cfg->x * randVec[0];
+        f32 value = cfg->field8 * randVec[0];
         target[0] = target[0] + value;
     }
     {
-        float value = cfg->y * randVec[1];
+        f32 value = cfg->fieldC * randVec[1];
         target[1] = target[1] + value;
     }
     {
-        float value = cfg->z * randVec[2];
+        f32 value = cfg->field10 * randVec[2];
         target[2] = target[2] + value;
     }
 }

@@ -5,7 +5,7 @@
 extern CMath math[];
 extern s32 lbl_8032ED70;
 extern f32 lbl_80330038;
-extern f64 lbl_80330040;
+extern const f64 lbl_80330040;
 extern s16 lbl_801EADC8[];
 extern "C" f32 RandF__5CMathFv(CMath* instance);
 
@@ -47,7 +47,7 @@ extern "C" void pppRandUpShort(void* param1, void* param2, void* param3)
         f32 value = RandF__5CMathFv(&math[0]);
         if (in->randomTwice != 0) {
             f32 mixed = value + RandF__5CMathFv(&math[0]);
-            value = lbl_80330038 * mixed;
+            value = mixed * lbl_80330038;
         }
 
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
@@ -62,7 +62,7 @@ extern "C" void pppRandUpShort(void* param1, void* param2, void* param3)
     target = (in->sourceOffset == -1) ? &lbl_801EADC8[0] : (s16*)(base + in->sourceOffset + 0x80);
 
     u16 scale = in->scale;
-    double scaled = (double)*valuePtr * (double)scale;
+    f32 scaled = (f32)scale * *valuePtr;
     s32 delta = (s32)scaled;
     *target = (s16)(*target + delta);
 }

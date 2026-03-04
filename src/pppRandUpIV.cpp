@@ -37,10 +37,13 @@ struct PppRandUpIVParam3 {
  */
 extern "C" void pppRandUpIV(void* param1, void* param2, void* param3)
 {
+    if (lbl_8032ED70 != 0) {
+        return;
+    }
+
     u8* base = (u8*)param1;
     PppRandUpIVParam2* in = (PppRandUpIVParam2*)param2;
     PppRandUpIVParam3* out = (PppRandUpIVParam3*)param3;
-    s32* target;
     f32 value;
     s32 outputOffset = *out->fieldC + 0x80;
 
@@ -62,13 +65,16 @@ extern "C" void pppRandUpIV(void* param1, void* param2, void* param3)
     if (in->field4 == -1) {
         target = &lbl_801EADC8[0];
     } else {
-        target = (s32*)(base + in->field4 + 0x80);
+        if (in->field0 != *(s32*)(base + 0xC)) {
+            return;
+        }
+        valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
 
-    {
-        f32 randValue = *(f32*)(base + outputOffset);
-        target[0] += (s32)((f32)in->field8 * randValue);
-        target[1] += (s32)((f32)in->fieldC * randValue);
-        target[2] += (s32)((f32)in->field10 * randValue);
-    }
+    s32* target = (in->field4 == -1) ? &lbl_801EADC8[0] : (s32*)(base + in->field4 + 0x80);
+    f32 scale = *valuePtr;
+
+    target[0] += (s32)((f32)in->field8 * scale);
+    target[1] += (s32)((f32)in->fieldC * scale);
+    target[2] += (s32)((f32)in->field10 * scale);
 }

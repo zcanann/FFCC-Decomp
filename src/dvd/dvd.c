@@ -364,8 +364,10 @@ static void cbForUnrecoveredError(u32 intType) {
 
 static void cbForUnrecoveredErrorRetry(u32 intType) {
 	if (intType == 0x10) {
+        ((volatile DVDCommandBlock*)executing)->state = -1;
         stateTimeout();
 	} else {
+        ((volatile DVDCommandBlock*)executing)->state = -1;
         if (intType & 2) {
             stateError(0x01234567);
             return;

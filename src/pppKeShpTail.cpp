@@ -45,19 +45,19 @@ void pppKeShpTail(_pppPObject* obj, UnkB*, UnkC* offsets)
 		Vec local_14;
 		Vec local_20;
 
-		local_14.x = tailObj->m_obj.m_localMatrix.value[0][3];
-		local_14.y = tailObj->m_obj.m_localMatrix.value[1][3];
-		local_14.z = tailObj->m_obj.m_localMatrix.value[2][3];
-		pppCopyVector(local_20, local_14);
+		local_20.x = tailObj->m_obj.m_localMatrix.value[0][3];
+		local_20.y = tailObj->m_obj.m_localMatrix.value[1][3];
+		local_20.z = tailObj->m_obj.m_localMatrix.value[2][3];
+		pppCopyVector(local_14, local_20);
 
-		u8 count = work->m_count;
 		Vec* tailVec = work->m_posHistory;
+		int count = work->m_count;
 		if (count != 0) {
 			do {
-				pppCopyVector(*tailVec, local_20);
+				pppCopyVector(*tailVec, local_14);
 				count--;
 				tailVec++;
-			} while (count != 0);
+			} while ((u8)count != 0);
 		}
 	}
 

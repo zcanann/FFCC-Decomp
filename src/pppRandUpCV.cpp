@@ -4,7 +4,8 @@
 
 extern CMath math[];
 extern s32 lbl_8032ED70;
-extern f32 lbl_8032FF08;
+extern f32 lbl_8032FFE8;
+extern f64 lbl_8032FFF0;
 extern u8 lbl_801EADC8[32];
 extern "C" f32 RandF__5CMathFv(CMath* instance);
 
@@ -44,7 +45,7 @@ void pppRandUpCV(void* param1, void* param2, void* param3)
     if (in->targetId == *(s32*)(base + 0xC)) {
         f32 value = RandF__5CMathFv(math);
         if (in->randomTwice != 0) {
-            value = (value + RandF__5CMathFv(math)) * lbl_8032FF08;
+            value = (value + RandF__5CMathFv(math)) * lbl_8032FFE8;
         }
 
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
@@ -57,11 +58,7 @@ void pppRandUpCV(void* param1, void* param2, void* param3)
     }
 
     s32 colorOffset = in->sourceOffset;
-    if (colorOffset == -1) {
-        target = lbl_801EADC8;
-    } else {
-        target = base + colorOffset + 0x80;
-    }
+    target = (colorOffset == -1) ? lbl_801EADC8 : (u8*)(base + colorOffset + 0x80);
 
     f32 scale = *valuePtr;
 

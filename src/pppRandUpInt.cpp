@@ -5,6 +5,7 @@
 extern CMath math[];
 extern s32 lbl_8032ED70;
 extern f32 lbl_80330018;
+extern const f64 lbl_80330020;
 extern s32 lbl_801EADC8[];
 extern "C" {
 f32 RandF__5CMathFv(CMath*);
@@ -46,7 +47,8 @@ void pppRandUpInt(void* param1, void* param2, void* param3)
     if (baseState == 0) {
         f32 value = RandF__5CMathFv(math);
         if (in->fieldC != 0) {
-            value = lbl_80330018 * (value + RandF__5CMathFv(math));
+            f32 mixed = value + RandF__5CMathFv(math);
+            value = mixed * lbl_80330018;
         }
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);

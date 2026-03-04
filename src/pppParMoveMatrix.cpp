@@ -35,7 +35,7 @@ void pppParMoveMatrix(void)
 		local_50.x = local_68.z;
 		local_50.y = lbl_80330E38;
 		local_50.z = -local_68.x;
-		if ((lbl_80330E38 == local_68.z) && (lbl_80330E38 == local_50.z)) {
+		if ((local_68.z == lbl_80330E38) && (local_50.z == lbl_80330E38)) {
 			local_50.y = lbl_80330E38;
 			local_50.x = lbl_80330E3C;
 			local_50.z = lbl_80330E38;

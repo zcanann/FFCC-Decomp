@@ -107,43 +107,43 @@ int InitMetroTRKCommTable(int hwId)
         result = 0;
 
         gDBCommTable.initialize_func      = (DBCommInitFunc)udp_cc_initialize;
-        gDBCommTable.init_interrupts_func = NULL;
-        gDBCommTable.shutdown_func        = (DBCommFunc)udp_cc_shutdown;
-        gDBCommTable.peek_func            = (DBPollFunc)udp_cc_peek;
-        gDBCommTable.read_func            = (DBCommReadFunc)udp_cc_read;
-        gDBCommTable.write_func           = (DBCommWriteFunc)udp_cc_write;
         gDBCommTable.open_func            = (DBCommFunc)udp_cc_open;
         gDBCommTable.close_func           = (DBCommFunc)udp_cc_open;
+        gDBCommTable.read_func            = (DBCommReadFunc)udp_cc_read;
+        gDBCommTable.write_func           = (DBCommWriteFunc)udp_cc_write;
+        gDBCommTable.shutdown_func        = (DBCommFunc)udp_cc_shutdown;
+        gDBCommTable.peek_func            = (DBPollFunc)udp_cc_peek;
         gDBCommTable.pre_continue_func    = (DBCommFunc)udp_cc_pre_continue;
         gDBCommTable.post_stop_func       = (DBCommFunc)udp_cc_post_stop;
+        gDBCommTable.init_interrupts_func = NULL;
     } else if (hwId == HARDWARE_GDEV) {
         OSReport("MetroTRK : Set to GDEV hardware\n");
         result = Hu_IsStub();
 
         gDBCommTable.initialize_func      = (DBCommInitFunc)gdev_cc_initialize;
-        gDBCommTable.init_interrupts_func = (DBCommFunc)gdev_cc_initinterrupts;
-        gDBCommTable.shutdown_func        = (DBCommFunc)gdev_cc_shutdown;
-        gDBCommTable.peek_func            = (DBPollFunc)gdev_cc_peek;
-        gDBCommTable.read_func            = (DBCommReadFunc)gdev_cc_read;
-        gDBCommTable.write_func           = (DBCommWriteFunc)gdev_cc_write;
         gDBCommTable.open_func            = (DBCommFunc)gdev_cc_open;
         gDBCommTable.close_func           = (DBCommFunc)gdev_cc_close;
+        gDBCommTable.read_func            = (DBCommReadFunc)gdev_cc_read;
+        gDBCommTable.write_func           = (DBCommWriteFunc)gdev_cc_write;
+        gDBCommTable.shutdown_func        = (DBCommFunc)gdev_cc_shutdown;
+        gDBCommTable.peek_func            = (DBPollFunc)gdev_cc_peek;
         gDBCommTable.pre_continue_func    = (DBCommFunc)gdev_cc_pre_continue;
         gDBCommTable.post_stop_func       = (DBCommFunc)gdev_cc_post_stop;
+        gDBCommTable.init_interrupts_func = (DBCommFunc)gdev_cc_initinterrupts;
     } else if (hwId == HARDWARE_AMC_DDH) {
         OSReport("MetroTRK : Set to AMC DDH hardware\n");
         result = AMC_IsStub();
 
         gDBCommTable.initialize_func      = (DBCommInitFunc)ddh_cc_initialize;
-        gDBCommTable.init_interrupts_func = (DBCommFunc)ddh_cc_initinterrupts;
-        gDBCommTable.shutdown_func        = (DBCommFunc)ddh_cc_shutdown;
-        gDBCommTable.peek_func            = (DBPollFunc)ddh_cc_peek;
-        gDBCommTable.read_func            = (DBCommReadFunc)ddh_cc_read;
-        gDBCommTable.write_func           = (DBCommWriteFunc)ddh_cc_write;
         gDBCommTable.open_func            = (DBCommFunc)ddh_cc_open;
         gDBCommTable.close_func           = (DBCommFunc)ddh_cc_close;
+        gDBCommTable.read_func            = (DBCommReadFunc)ddh_cc_read;
+        gDBCommTable.write_func           = (DBCommWriteFunc)ddh_cc_write;
+        gDBCommTable.shutdown_func        = (DBCommFunc)ddh_cc_shutdown;
+        gDBCommTable.peek_func            = (DBPollFunc)ddh_cc_peek;
         gDBCommTable.pre_continue_func    = (DBCommFunc)ddh_cc_pre_continue;
         gDBCommTable.post_stop_func       = (DBCommFunc)ddh_cc_post_stop;
+        gDBCommTable.init_interrupts_func = (DBCommFunc)ddh_cc_initinterrupts;
     } else {
         OSReport("MetroTRK : Set to UNKNOWN hardware. (%ld)\n", hwId);
         OSReport("MetroTRK : Invalid hardware ID passed from OS\n");

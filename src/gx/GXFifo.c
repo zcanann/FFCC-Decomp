@@ -478,7 +478,17 @@ static void __GXFifoReadDisable(void) {
 }
 
 static void __GXFifoLink(u8 en) {
-    SET_REG_FIELD(LINE(1242, 1242, 1299), __GXData->cpEnable, 1, 4, (en != 0) ? 1 : 0);
+    u32 enable;
+    u32 reg;
+
+    if (en != 0) {
+        enable = 1;
+    } else {
+        enable = 0;
+    }
+    reg = __GXData->cpEnable;
+    reg = (u32)__rlwimi(reg, enable, 4, 27, 27);
+    __GXData->cpEnable = reg;
     GX_SET_CP_REG(1, __GXData->cpEnable);
 }
 

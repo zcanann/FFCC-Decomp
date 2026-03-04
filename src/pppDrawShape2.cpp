@@ -31,8 +31,7 @@ typedef struct ShapeSpecEntry {
 
 typedef struct ShapeControlData {
     u8 _pad0[4];
-    s16 type;
-    u16 _padType;
+    u32 type;
     u32 step;
     u8 _pad2[1];
     u8 blendMode;
@@ -80,9 +79,9 @@ void pppCalcShape2(void* param1, void* param2, void* param3)
     ShapeRuntimeData* runtimeData = *(ShapeRuntimeData**)((u8*)param3 + 0xC);
     ShapeControlData* controlData = (ShapeControlData*)param2;
     ShapeState* shapeData = (ShapeState*)((u8*)param1 + runtimeData->shapeDataOffset + 0x80);
-    u32 type = *(u32*)((u8*)controlData + 4);
+    u32 type = controlData->type;
 
-    if ((u16)type == 0xFFFF) {
+    if (type == (u32)-1) {
         return;
     }
 
@@ -127,9 +126,9 @@ void pppDrawShape2(void* param1, void* param2, void* param3)
     ShapeControlData* controlData = (ShapeControlData*)param2;
     ShapeState* shapeData = (ShapeState*)((u8*)param1 + runtimeData->shapeDataOffset + 0x80);
     void* posData = (u8*)param1 + runtimeData->posDataOffset + 0x80;
-    u32 type = *(u32*)((u8*)controlData + 4);
+    u32 type = controlData->type;
 
-    if ((u16)type == 0xFFFF) {
+    if (type == (u32)-1) {
         return;
     }
 

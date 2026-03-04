@@ -45,47 +45,52 @@ struct RSDLISTITEM {
  */
 void CMaterialEditorPcs::ResetRsdList(ZLIST* zlist)
 {
-	_ZLISTITEM* it = zlist->m_root.m_previous;
+	_ZLISTITEM* it[4];
+	it[0] = zlist->m_root.m_previous;
 
-	while (it != 0) {
-		RSDLISTITEM* listItem = (RSDLISTITEM*)zlist->GetDataNext(&it);
-		RSDITEM* rsdItem = listItem->rsdItem;
+	while (it[0] != 0) {
+		int* listItem = (int*)zlist->GetDataNext(&it[0]);
+		int rsdItem = listItem[0];
 
 		if (rsdItem != 0) {
-			if (rsdItem->ptrC != 0) {
-				__dla__FPv(rsdItem->ptrC);
-				rsdItem->ptrC = 0;
+			if (*(void**)(rsdItem + 0xC) != 0) {
+				__dla__FPv(*(void**)(rsdItem + 0xC));
+				*(int*)(rsdItem + 0xC) = 0;
 			}
-			if (rsdItem->ptr10 != 0) {
-				__dla__FPv(rsdItem->ptr10);
-				rsdItem->ptr10 = 0;
+			if (*(void**)(rsdItem + 0x10) != 0) {
+				__dla__FPv(*(void**)(rsdItem + 0x10));
+				*(int*)(rsdItem + 0x10) = 0;
 			}
-			if (rsdItem->ptr14 != 0) {
-				__dla__FPv(rsdItem->ptr14);
-				rsdItem->ptr14 = 0;
+			if (*(void**)(rsdItem + 0x14) != 0) {
+				__dla__FPv(*(void**)(rsdItem + 0x14));
+				*(int*)(rsdItem + 0x14) = 0;
 			}
-			if (rsdItem->ptr18 != 0) {
-				__dla__FPv(rsdItem->ptr18);
-				rsdItem->ptr18 = 0;
+			if (*(void**)(rsdItem + 0x18) != 0) {
+				__dla__FPv(*(void**)(rsdItem + 0x18));
+				*(int*)(rsdItem + 0x18) = 0;
 			}
-			__dl__FPv((void*)rsdItem);
+			if (rsdItem != 0) {
+				__dl__FPv((void*)rsdItem);
+			}
 		}
 
-		ZCANMGRP* colAnmData = listItem->colAnmData;
-		int colAnmCount = listItem->colAnmCount;
+		int* colAnmData = (int*)listItem[1];
+		int colAnmCount = listItem[2];
+
 		if (colAnmData != 0) {
 			for (int i = 0; i < colAnmCount; i++) {
-				if (colAnmData->ptr != 0) {
-					__dla__FPv(colAnmData->ptr);
-					colAnmData->ptr = 0;
+				if ((void*)*colAnmData != 0) {
+					__dla__FPv((void*)*colAnmData);
+					*colAnmData = 0;
 				}
-				colAnmData++;
+				colAnmData += 5;
 			}
-			if (listItem->colAnmData != 0) {
-				__dla__FPv((void*)listItem->colAnmData);
-				listItem->colAnmData = 0;
+
+			if ((void*)listItem[1] != 0) {
+				__dla__FPv((void*)listItem[1]);
+				listItem[1] = 0;
 			}
-			listItem->colAnmData = 0;
+			listItem[1] = 0;
 		}
 		__dl__FPv((void*)listItem);
 	}

@@ -64,32 +64,40 @@ void pppSRandFV(void* param1, void* param2, void* param3)
 
     int state = *(int*)(base + 0xC);
     if (state == 0) {
-        unsigned char blendTwice = in->field18;
         valuePtr = (float*)(base + *out->fieldC + 0x80);
 
-        float value = RandF__5CMathFv(math);
-        if (blendTwice != 0) {
-            value = value + RandF__5CMathFv(math);
-        } else {
-            value = value * lbl_80330098;
+        {
+            unsigned char flag = in->field18;
+            float value = RandF__5CMathFv(&math[0]);
+            if (flag != 0) {
+                value = value + RandF__5CMathFv(&math[0]);
+            } else {
+                value = value * lbl_80330098;
+            }
+            valuePtr[0] = value;
         }
-        valuePtr[0] = value;
 
-        value = RandF__5CMathFv(math);
-        if (blendTwice != 0) {
-            value = value + RandF__5CMathFv(math);
-        } else {
-            value = value * lbl_80330098;
+        {
+            unsigned char flag = in->field18;
+            float value = RandF__5CMathFv(&math[0]);
+            if (flag != 0) {
+                value = value + RandF__5CMathFv(&math[0]);
+            } else {
+                value = value * lbl_80330098;
+            }
+            valuePtr[1] = value;
         }
-        valuePtr[1] = value;
 
-        value = RandF__5CMathFv(math);
-        if (blendTwice != 0) {
-            value = value + RandF__5CMathFv(math);
-        } else {
-            value = value * lbl_80330098;
+        {
+            unsigned char flag = in->field18;
+            float value = RandF__5CMathFv(&math[0]);
+            if (flag != 0) {
+                value = value + RandF__5CMathFv(&math[0]);
+            } else {
+                value = value * lbl_80330098;
+            }
+            valuePtr[2] = value;
         }
-        valuePtr[2] = value;
     } else {
         if (in->field0 != state) {
             return;

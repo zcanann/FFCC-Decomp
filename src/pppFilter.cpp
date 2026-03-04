@@ -83,10 +83,17 @@ void pppFrameFilter(void)
  */
 void pppRenderFilter(pppFilter* pppFilterObj, UnkB* param_2, UnkC* param_3)
 {
-    int serializedOffset = *param_3->m_serializedDataOffsets;
+    struct FilterStep {
+        unsigned int unk0;
+        int dataValIndex;
+    };
+
+    FilterStep* step = (FilterStep*)param_2;
+    int* serializedDataOffsets = param_3->m_serializedDataOffsets;
+    int serializedOffset = *serializedDataOffsets;
     _pppFilterSerializedData* serializedData = (_pppFilterSerializedData*)((unsigned char*)pppFilterObj + serializedOffset + 0x80);
 
-    if ((unsigned short)param_2->m_dataValIndex == 0xFFFF) {
+    if (step->dataValIndex == 0xFFFF) {
         lbl_8032EC70.RenderColorQuad(
             lbl_803320C8, lbl_803320C8, lbl_803320CC, lbl_803320D0, serializedData->m_color);
         return;
@@ -94,7 +101,7 @@ void pppRenderFilter(pppFilter* pppFilterObj, UnkB* param_2, UnkC* param_3)
 
     int textureIndex = 0;
     _pppTextureInfo* textureInfo = (_pppTextureInfo*)GetTexture__8CMapMeshFP12CMaterialSetRi(
-        lbl_8032ED54->m_mapMeshPtr[param_2->m_dataValIndex], lbl_8032ED54->m_materialSetPtr, textureIndex);
+        lbl_8032ED54->m_mapMeshPtr[step->dataValIndex], lbl_8032ED54->m_materialSetPtr, textureIndex);
     RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
         &lbl_8032EC70, lbl_803320C8, lbl_803320C8, lbl_803320CC, lbl_803320D0, &textureInfo->m_texObj, 0, 0,
         &serializedData->m_color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);

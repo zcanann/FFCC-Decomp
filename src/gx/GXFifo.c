@@ -5,6 +5,8 @@
 
 #include "dolphin/gx/__gx.h"
 
+extern GXData* const gx;
+
 static __GXFifoObj* CPUFifo;
 static __GXFifoObj* GPFifo;
 
@@ -497,14 +499,14 @@ static void __GXFifoLink(u8 en) {
 static void __GXWriteFifoIntEnable(u8 hiWatermarkEn, u8 loWatermarkEn) {
     u32 hi = (u32)(u8)hiWatermarkEn << 2;
     u32 lo = (u32)(u8)loWatermarkEn << 3;
-    u32 reg = __GXData->cpEnable;
+    u32 reg = gx->cpEnable;
 
     reg = (reg & ~4) | hi;
-    __GXData->cpEnable = reg;
-    reg = __GXData->cpEnable;
+    gx->cpEnable = reg;
+    reg = gx->cpEnable;
     reg = (reg & ~8) | lo;
-    __GXData->cpEnable = reg;
-    GX_SET_CP_REG(1, __GXData->cpEnable);
+    gx->cpEnable = reg;
+    GX_SET_CP_REG(1, gx->cpEnable);
 }
 
 static void __GXWriteFifoIntReset(u8 hiWatermarkClr, u8 loWatermarkClr) {

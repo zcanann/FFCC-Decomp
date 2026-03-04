@@ -207,10 +207,9 @@ int CLightPcs::GetTable(unsigned long index)
  */
 void CLightPcs::create()
 {
-    int i = 2;
     char* ptr = (char*)this;
 
-    do {
+    for (int i = 2; i != 0; i--) {
         *(u8*)(ptr + 0x1CEC) = 0;
         *(u32*)(ptr + 0x1CF0) = 0;
         *(u8*)(ptr + 0x1E24) = 0;
@@ -245,8 +244,7 @@ void CLightPcs::create()
         *(u32*)(ptr + 0x2F38) = 0;
 
         ptr += 0x1380;
-        i--;
-    } while (i != 0);
+    }
 }
 
 /*

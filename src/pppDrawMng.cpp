@@ -1,6 +1,5 @@
 #include "ffcc/pppDrawMng.h"
 
-#include "ffcc/graphic.h"
 #include "ffcc/game.h"
 #include "ffcc/p_chara.h"
 #include "ffcc/partMng.h"
@@ -9,6 +8,12 @@
 extern CGame Game;
 extern unsigned char* lbl_8032ED50;
 extern _pppEnvSt* lbl_8032ED54;
+extern unsigned char Graphic[];
+
+extern "C" {
+void SetDrawDoneDebugDataPartControl__8CGraphicFi(void* graphic, int partControl);
+void InitEnv__9CCharaPcsFi(void* charaPcs, int env);
+}
 
 /*
  * --INFO--
@@ -59,12 +64,10 @@ void pppDrawMng::DrawOt()
             pppDrawPrimitive* prim = first;
             do
             {
-                unsigned char type = prim->m_type;
-
-                switch (type)
+                switch (prim->m_type)
                 {
                 case 0:
-                    if (lastType != type)
+                    if (lastType != prim->m_type)
                     {
                         pppInitDrawEnv(0);
                     }
@@ -76,17 +79,17 @@ void pppDrawMng::DrawOt()
                     _pppDrawPart((_pppMngSt*)prim->m_handle);
                     break;
                 case 1:
-                    Graphic.SetDrawDoneDebugDataPartControl(0x7ffe);
+                    SetDrawDoneDebugDataPartControl__8CGraphicFi(Graphic, 0x7ffe);
 
                     if (lastType != prim->m_type)
                     {
                         pppInitDrawEnv(0);
-                        CharaPcs.InitEnv(4);
+                        InitEnv__9CCharaPcsFi(&CharaPcs, 4);
                     }
 
                     ((CCharaPcs::CHandle*)prim->m_handle)->Draw(4);
 
-                    Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
+                    SetDrawDoneDebugDataPartControl__8CGraphicFi(Graphic, 0x7fff);
                     break;
                 default:
                     break;

@@ -63,19 +63,11 @@ void pppRandCV(void* param1, void* param2, void* param3)
         randomValue = (float*)(base + *ctx->outputOffset + 0x80);
         *randomValue = value;
     } else {
-        if (params->index != *(int*)(base + 0xC)) {
-            return;
-        }
+        if (params->index != *(int*)(base + 0xC)) return;
         randomValue = (float*)(base + *ctx->outputOffset + 0x80);
     }
 
-    u8* target;
-    if (params->colorOffset == -1) {
-        u8* defaultTarget = lbl_801EADC8;
-        target = defaultTarget;
-    } else {
-        target = base + params->colorOffset + 0x80;
-    }
+    u8* target = (params->colorOffset == -1) ? lbl_801EADC8 : (base + params->colorOffset + 0x80);
 
     float scale = *randomValue;
     target[0] = (u8)(target[0] + (int)((float)params->delta[0] * scale - (float)params->delta[0]));

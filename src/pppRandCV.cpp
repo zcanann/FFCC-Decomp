@@ -56,16 +56,20 @@ void pppRandCV(void* param1, void* param2, void* param3)
         } else {
             value *= lbl_8032FF08;
         }
-
         randomValue = (float*)(base + *ctx->outputOffset + 0x80);
         *randomValue = value;
-    } else if (params->index != *(int*)(base + 0xC)) {
-        randomValue = (float*)(base + *ctx->outputOffset + 0x80);
+    } else {
+        if (params->index == *(int*)(base + 0xC)) {
+            return;
+        } else {
+            randomValue = (float*)(base + *ctx->outputOffset + 0x80);
+        }
     }
 
     u8* target;
     if (params->colorOffset == -1) {
-        target = lbl_801EADC8;
+        u8* defaultTarget = lbl_801EADC8;
+        target = defaultTarget;
     } else {
         target = base + params->colorOffset + 0x80;
     }

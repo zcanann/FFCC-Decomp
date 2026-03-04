@@ -75,7 +75,8 @@ void pppSRandDownCV(void* param1, void* param2, void* param3)
     }
 
     int color_offset = *((int*)param2 + 1);
-    u8* target_colors = (color_offset == -1) ? lbl_801EADC8 : (u8*)((char*)param1 + color_offset + 0x80);
+    u8* target_colors =
+        (color_offset == -1) ? lbl_801EADC8 : (u8*)((char*)param1 + color_offset + 0x80);
 
     {
         s8 base = *(s8*)((char*)param2 + 0x8);

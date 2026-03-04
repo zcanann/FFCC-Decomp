@@ -20,17 +20,26 @@ extern unsigned int lbl_8032ED08;
  */
 extern "C" void __sinit_p_system_cpp(void)
 {
-    lbl_8032ED08 = reinterpret_cast<unsigned int>(lbl_801EA270);
+    unsigned int* table;
+    unsigned int* table0;
+    unsigned int* table1;
+    unsigned int* table2;
 
-    reinterpret_cast<unsigned int*>(lbl_801EA0F4)[1] = lbl_801EA0D0[0];
-    reinterpret_cast<unsigned int*>(lbl_801EA0F4)[2] = lbl_801EA0D0[1];
-    reinterpret_cast<unsigned int*>(lbl_801EA0F4)[3] = lbl_801EA0D0[2];
-    reinterpret_cast<unsigned int*>(lbl_801EA0F4)[4] = lbl_801EA0DC[0];
-    reinterpret_cast<unsigned int*>(lbl_801EA0F4)[5] = lbl_801EA0DC[1];
-    reinterpret_cast<unsigned int*>(lbl_801EA0F4)[6] = lbl_801EA0DC[2];
-    reinterpret_cast<unsigned int*>(lbl_801EA0F4)[7] = lbl_801EA0E8[0];
-    reinterpret_cast<unsigned int*>(lbl_801EA0F4)[8] = lbl_801EA0E8[1];
-    reinterpret_cast<unsigned int*>(lbl_801EA0F4)[9] = lbl_801EA0E8[2];
+    lbl_8032ED08 = reinterpret_cast<unsigned int>(lbl_801EA270);
+    table = reinterpret_cast<unsigned int*>(lbl_801EA0F4);
+    table0 = lbl_801EA0D0;
+    table1 = lbl_801EA0DC;
+    table2 = lbl_801EA0E8;
+
+    table[1] = table0[0];
+    table[2] = table0[1];
+    table[3] = table0[2];
+    table[4] = table1[0];
+    table[5] = table1[1];
+    table[6] = table1[2];
+    table[7] = table2[0];
+    table[8] = table2[1];
+    table[9] = table2[2];
 }
 
 /*
@@ -119,7 +128,7 @@ void CSystemPcs::calc()
 		buttons = 0;
 	} else {
 		debugPad = Pad._1b4_4_;
-		stepPad = (~((int)~(debugPad - 4 | 4 - debugPad) >> 31) & 4U);
+		stepPad = ((~((debugPad - 4) | (4 - debugPad)) >> 31) & 4U);
 		buttons = *(unsigned short*)(((unsigned char*)&Pad) + stepPad * 0x54 + 0x36);
 	}
 
@@ -127,7 +136,7 @@ void CSystemPcs::calc()
 		return;
 	}
 	if ((buttons & 0x100) != 0) {
-		((CDbgMenuPcs*)0x80306708)->Add();
+		DbgMenuPcs.Add();
 		return;
 	}
 	if (((buttons & 0x800) == 0) && ((buttons & 0x40) != 0)) {

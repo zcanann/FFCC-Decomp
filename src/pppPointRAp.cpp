@@ -70,8 +70,8 @@ void pppPointRAp(void* mngSt, void* dataVal, void* ctrlTable)
         float* trig = lbl_801EC9F0;
         s32 angleA = (s32)(lbl_8032FEE8 * RandF__5CMathFv(math) - lbl_8032FEEC);
         float scaleA = *(float*)((u8*)dataVal + 0x4);
-        float yOff = scaleA * *(float*)((u8*)trig + (angleA & 0xFFFC));
-        float zOff = scaleA * *(float*)((u8*)trig + ((angleA + 0x4000) & 0xFFFC));
+        float zOff = scaleA * *(float*)((u8*)trig + (angleA & 0xFFFC));
+        float yOff = scaleA * *(float*)((u8*)trig + ((angleA + 0x4000) & 0xFFFC));
         s32 angleB = (s32)(lbl_8032FEF0 * (lbl_8032FEE8 * RandF__5CMathFv(math)));
         Vec* dstPos = (Vec*)((u8*)obj + *(u32*)((u8*)dataVal + 0x10) + 0x80);
         Vec* dstVel = (Vec*)((u8*)obj + *(u32*)((u8*)dataVal + 0x18) + 0x80);
@@ -82,12 +82,9 @@ void pppPointRAp(void* mngSt, void* dataVal, void* ctrlTable)
         dstPos->y = srcPos->y + yOff;
         dstPos->z = srcPos->z + zOff;
 
-        {
-            float velocityScale = *(float*)((u8*)dataVal + 0x8);
-            dstVel->x = xOff * velocityScale;
-            dstVel->y = yOff * velocityScale;
-            dstVel->z = zOff * velocityScale;
-        }
+        dstVel->x = xOff * *(float*)((u8*)dataVal + 0x8);
+        dstVel->y = yOff * *(float*)((u8*)dataVal + 0x8);
+        dstVel->z = zOff * *(float*)((u8*)dataVal + 0x8);
 
         state[1] = *(u8*)((u8*)dataVal + 0x1C);
     }

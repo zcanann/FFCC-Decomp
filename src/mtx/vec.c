@@ -275,18 +275,18 @@ f32 PSVECDistance(register const Vec *a, register const Vec *b)
 
     zero = half_c - half_c;
     if (square_dist == zero) {
-        return square_dist;
     }
+    else {
+        three_c = 3.0f;
 
-    three_c = 3.0f;
-
-    asm {
-        frsqrte     recip, square_dist
-        fmuls       n_0, recip, recip
-        fmuls       n_1, recip, half_c
-        fnmsubs     n_0, n_0, square_dist, three_c
-        fmuls       recip, n_0, n_1
-        fmuls       square_dist, square_dist, recip
+        asm {
+            frsqrte     recip, square_dist
+            fmuls       n_0, recip, recip
+            fmuls       n_1, recip, half_c
+            fnmsubs     n_0, n_0, square_dist, three_c
+            fmuls       recip, n_0, n_1
+            fmuls       square_dist, square_dist, recip
+        }
     }
 
     return square_dist;

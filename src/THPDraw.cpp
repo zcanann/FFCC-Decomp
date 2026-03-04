@@ -50,13 +50,10 @@ void THPGXYuv2RgbDraw(u32* yImage, u32* uImage, u32* vImage, s16 x, s16 y, s16 t
  * JP Size: TODO
  */
 void THPGXYuv2RgbSetup(GXRenderModeObj* rmode) {
-    Mtx modelMtx;
     Mtx44 projMtx;
-    s16 fbWidth;
-    s16 efbHeight;
-
-    fbWidth = rmode->fbWidth;
-    efbHeight = rmode->efbHeight;
+    Mtx modelMtx;
+    s16 fbWidth = rmode->fbWidth;
+    s16 efbHeight = rmode->efbHeight;
 
     GXSetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
     C_MTXOrtho(projMtx, 0.0f, (f32)efbHeight, 0.0f, (f32)fbWidth, 0.0f, 1.0f);

@@ -14,8 +14,6 @@
  */
 void pppMatrixXZY(void* target, void* unused, void* param)
 {
-    (void)unused;
-
     f32* matrix = (f32*)target;
     u32* offsets = (u32*)*(void**)((u8*)param + 0xC);
     pppIVECTOR4* angle = (pppIVECTOR4*)((u8*)target + offsets[1] + 0x80);
@@ -25,7 +23,7 @@ void pppMatrixXZY(void* target, void* unused, void* param)
     Vec temp2;
     Vec temp3;
 
-    pppGetRotMatrixXZY(*(pppFMATRIX*)(matrix + 4), angle);
+    pppGetRotMatrixXZY(*(pppFMATRIX*)((u8*)target + 0x10), angle);
 
     temp1.x = matrix[4];
     temp1.y = matrix[8];

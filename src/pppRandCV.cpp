@@ -5,7 +5,7 @@
 extern CMath math[];
 extern int lbl_8032ED70;
 extern float lbl_8032FF08;
-extern u8 lbl_801EADC8[32];
+extern u8 lbl_801EADC8[];
 extern "C" float RandF__5CMathFv(CMath* instance);
 
 typedef struct RandCVParams {
@@ -37,6 +37,10 @@ void randchar(char range, float factor)
  * --INFO--
  * PAL Address: 0x80066194
  * PAL Size: 540b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppRandCV(void* param1, void* param2, void* param3)
 {
@@ -59,11 +63,10 @@ void pppRandCV(void* param1, void* param2, void* param3)
         randomValue = (float*)(base + *ctx->outputOffset + 0x80);
         *randomValue = value;
     } else {
-        if (params->index == *(int*)(base + 0xC)) {
+        if (params->index != *(int*)(base + 0xC)) {
             return;
-        } else {
-            randomValue = (float*)(base + *ctx->outputOffset + 0x80);
         }
+        randomValue = (float*)(base + *ctx->outputOffset + 0x80);
     }
 
     u8* target;

@@ -49,9 +49,10 @@ void pppPointAp(void* param1, void* param2, void* param3)
     _pppPointApOffsets* data = *(_pppPointApOffsets**)((u8*)param3 + 0xC);
     Vec* src = (Vec*)((u8*)param1 + data->srcOffset + 0x80);
     u8* target = (u8*)param1 + data->targetOffset + 0x80;
+    s8 count = *(s8*)(target + 1);
 
     if (lbl_8032ED70 == 0) {
-        if (target[1] == 0) {
+        if (count == 0) {
             u32 objId = *(u32*)((u8*)param2 + 0x4);
             if ((objId + 0x10000) != 0xFFFF) {
                 _pppPDataVal* objData = (_pppPDataVal*)(*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (objId << 4));
@@ -74,12 +75,14 @@ void pppPointAp(void* param1, void* param2, void* param3)
                     PSMTXMultVec((MtxPtr)((u8*)lbl_8032ED50 + 0x78), src, dst);
                 }
 
-                target[1] = *(u8*)((u8*)param2 + 0xC);
+                count = *(s8*)((u8*)param2 + 0xC);
             }
         }
 
-        if ((s8)target[1] > 0) {
-            target[1]--;
+        if (count > 0) {
+            count--;
         }
+
+        *(s8*)(target + 1) = count;
     }
 }

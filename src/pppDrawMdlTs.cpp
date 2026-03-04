@@ -23,18 +23,15 @@ extern CMaterialMan MaterialMan;
  */
 void pppDrawMdlTsCon(struct _pppPObject* obj, struct PDrawMdlTs* data)
 {
-    // Access nested structure: data->field_at_0xc->field_at_0x8 + 0x80
-    void* inner = *((void**)((char*)data + 0xc));
-    void* inner2 = *((void**)((char*)inner + 0x8));
-    float* texCoords = (float*)((char*)obj + (int)inner2 + 0x80);
-    
-    // Initialize all 6 texture coordinates to 0.0
-    texCoords[0] = 0.0f; // offset 0x0
-    texCoords[1] = 0.0f; // offset 0x4  
-    texCoords[2] = 0.0f; // offset 0x8
-    texCoords[3] = 0.0f; // offset 0xc
-    texCoords[4] = 0.0f; // offset 0x10
-    texCoords[5] = 0.0f; // offset 0x14
+    u8* ptr = (u8*)obj + *(s32*)((u8*)*(void**)((u8*)data + 0xC) + 0x8) + 0x80;
+    f32 zero = 0.0f;
+
+    *(f32*)(ptr + 0x14) = zero;
+    *(f32*)(ptr + 0x10) = zero;
+    *(f32*)(ptr + 0x0C) = zero;
+    *(f32*)(ptr + 0x08) = zero;
+    *(f32*)(ptr + 0x04) = zero;
+    *(f32*)(ptr + 0x00) = zero;
 }
 
 /*
@@ -44,14 +41,11 @@ void pppDrawMdlTsCon(struct _pppPObject* obj, struct PDrawMdlTs* data)
  */
 void pppDrawMdlTsCon3(struct _pppPObject* obj, struct PDrawMdlTs* data)
 {
-    // Access nested structure: data->field_at_0xc->field_at_0x8 + 0x80
-    void* inner = *((void**)((char*)data + 0xc));
-    void* inner2 = *((void**)((char*)inner + 0x8));  
-    float* texCoords = (float*)((char*)obj + (int)inner2 + 0x80);
-    
-    // Initialize specific texture coordinates to 0.0
-    texCoords[2] = 0.0f; // offset 0x8  
-    texCoords[5] = 0.0f; // offset 0x14
+    u8* ptr = (u8*)obj + *(s32*)((u8*)*(void**)((u8*)data + 0xC) + 0x8) + 0x80;
+    f32 zero = 0.0f;
+
+    *(f32*)(ptr + 0x14) = zero;
+    *(f32*)(ptr + 0x08) = zero;
 }
 
 /*

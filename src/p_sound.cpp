@@ -31,9 +31,9 @@ void Draw__6CSoundFv(CSound*);
  */
 extern "C" void __sinit_p_sound_cpp(void)
 {
-    unsigned int* table = (unsigned int*)lbl_802105B0;
-
     lbl_8032EDE0 = (unsigned int)&lbl_8021072C;
+
+    unsigned int* table = (unsigned int*)lbl_802105B0;
 
     table[1] = lbl_80210580[0];
     table[2] = lbl_80210580[1];

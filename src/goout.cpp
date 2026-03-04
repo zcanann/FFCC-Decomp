@@ -15,55 +15,58 @@ extern "C" const char* const* GetMcWinMessBuff__8CMenuPcsFi(CMenuPcs*, int);
 
 struct CMenuPcsGoOutLayout
 {
-    unsigned char unk0[2092];
-    int field_2092;
-    unsigned char unk2096[24];
-    int field_2120;
+    unsigned char unk0[0x20];
+    McCtrl m_mcCtrl;
+    unsigned char unkAfterMcCtrl[0x7E4];
+    int m_goOutStatePtr;
+    unsigned char unk830[0x18];
+    int m_mcWinStatePtr;
+    unsigned char unk84C[0x30];
+    unsigned char m_resetGoOutFlag;
+    unsigned char m_unknown_87D;
+    unsigned char m_unknown_87E;
+    unsigned char m_unknown_87F;
+    Mc::SaveDat* m_transferSaveData;
+    void* m_transferWork;
+    unsigned char m_unknown_888;
+    unsigned char m_saveLoadMode;
+    unsigned char m_unknown_88A;
+    unsigned char m_unknown_88B;
+    void* m_transferWorkActive;
 };
 
-static inline signed short ReadMenuShort(int base, int offset)
+struct CMenuGoOutState
 {
-    return *reinterpret_cast<signed short*>(base + offset);
+    unsigned char unk0[0x18];
+    signed short m_waitFrames;
+    signed short unk1A;
+    signed short m_closeMode;
+    signed short m_resultDir;
+    signed short m_resultSelect;
+    signed short m_animFrame;
+};
+
+struct CMenuMcWinState
+{
+    signed short m_x;
+    signed short m_y;
+    signed short m_width;
+    signed short m_height;
+    signed short m_mode;
+};
+
+static inline unsigned char ReadGoOutU8(CGoOutMenu& menu, int offset) { return *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(&menu) + offset); }
+static inline signed short ReadGoOutS16(CGoOutMenu& menu, int offset) { return *reinterpret_cast<signed short*>(reinterpret_cast<unsigned char*>(&menu) + offset); }
+static inline signed char ReadGoOutS8(CGoOutMenu& menu, int offset) { return *reinterpret_cast<signed char*>(reinterpret_cast<unsigned char*>(&menu) + offset); }
+
+static inline CMenuGoOutState& MenuGoOutState(CMenuPcsGoOutLayout& layout)
+{
+    return *reinterpret_cast<CMenuGoOutState*>(layout.m_goOutStatePtr);
 }
 
-static inline void WriteMenuShort(int base, int offset, signed short value)
+static inline CMenuMcWinState& MenuMcWinState(CMenuPcsGoOutLayout& layout)
 {
-    *reinterpret_cast<signed short*>(base + offset) = value;
-}
-
-static inline unsigned char ReadGoOutU8(CGoOutMenu& menu, int offset)
-{
-    return *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(&menu) + offset);
-}
-
-static inline signed short ReadGoOutS16(CGoOutMenu& menu, int offset)
-{
-    return *reinterpret_cast<signed short*>(reinterpret_cast<unsigned char*>(&menu) + offset);
-}
-
-static inline signed char ReadGoOutS8(CGoOutMenu& menu, int offset)
-{
-    return *reinterpret_cast<signed char*>(reinterpret_cast<unsigned char*>(&menu) + offset);
-}
-
-static inline void WriteMenuU8(int offset, unsigned char value)
-{
-    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(&MenuPcs) + offset) = value;
-}
-
-static inline unsigned char ReadMenuU8(int offset)
-{
-    return *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(&MenuPcs) + offset);
-}
-
-static inline int ReadMenuS32(int offset)
-{
-    return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&MenuPcs) + offset);
-}
-
-static inline void WriteMenuS32(int offset, int value)
-{
-    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(&MenuPcs) + offset) = value;
+    return *reinterpret_cast<CMenuMcWinState*>(layout.m_mcWinStatePtr);
 }
 
 static unsigned short GetGoOutInputMask()
@@ -133,10 +136,10 @@ void DrawGoOutMenu()
     if (ReadGoOutU8(g_GoOutMenu, 0x44) == 3) {
         MenuPcs.DrawInit();
         MenuPcs.DrawCMakeMenu();
-        if (ReadGoOutS16(g_GoOutMenu, 0x36) == 1 && ReadMenuShort(menuPcsLayout.field_2092, 0x20) != 0) {
-            WriteMenuShort(menuPcsLayout.field_2092, 0x1C, 8);
+        if (ReadGoOutS16(g_GoOutMenu, 0x36) == 1 && MenuGoOutState(menuPcsLayout).m_resultSelect != 0) {
+            MenuGoOutState(menuPcsLayout).m_closeMode = 8;
             g_GoOutMenu.SetMainMode(1);
-            WriteMenuShort(menuPcsLayout.field_2092, 0x20, 0);
+            MenuGoOutState(menuPcsLayout).m_resultSelect = 0;
         }
     } else if (ReadGoOutU8(g_GoOutMenu, 0x44) == 2) {
         if (ReadGoOutU8(g_GoOutMenu, 0x29) != 0) {
@@ -146,29 +149,29 @@ void DrawGoOutMenu()
         if (ReadGoOutS8(g_GoOutMenu, 0x24) > 0xD && ReadGoOutS8(g_GoOutMenu, 0x24) < 0xF) {
             MenuPcs.DrawLoadMenu();
         }
-        if (ReadGoOutS8(g_GoOutMenu, 0x24) == 1 && ReadMenuShort(menuPcsLayout.field_2092, 0x20) != 0) {
-            WriteMenuShort(menuPcsLayout.field_2092, 0x1C, 8);
+        if (ReadGoOutS8(g_GoOutMenu, 0x24) == 1 && MenuGoOutState(menuPcsLayout).m_resultSelect != 0) {
+            MenuGoOutState(menuPcsLayout).m_closeMode = 8;
             g_GoOutMenu.SetMainMode(1);
-            WriteMenuShort(menuPcsLayout.field_2092, 0x20, 0);
+            MenuGoOutState(menuPcsLayout).m_resultSelect = 0;
         }
     }
 
     if (ReadGoOutS16(g_GoOutMenu, 0x54) != -1) {
         MenuPcs.DrawMcWin(-1, 0);
-        if (ReadMenuShort(menuPcsLayout.field_2120, 0xA) == 1) {
+        if (MenuMcWinState(menuPcsLayout).m_mode == 1) {
             const int message = static_cast<int>(ReadGoOutS16(g_GoOutMenu, 0x54));
             MenuPcs.DrawMcWinMess(message, (message >= 0x1E) ? 2 : 0);
         }
     }
 
-    if (ReadMenuShort(menuPcsLayout.field_2120, 0xA) == 1 && ReadGoOutU8(g_GoOutMenu, 0x71) != 0) {
-        const int cursorY = ReadMenuShort(menuPcsLayout.field_2120, 2) + ReadMenuShort(menuPcsLayout.field_2120, 6) - 0x3E;
+    if (MenuMcWinState(menuPcsLayout).m_mode == 1 && ReadGoOutU8(g_GoOutMenu, 0x71) != 0) {
+        const int cursorY = MenuMcWinState(menuPcsLayout).m_y + MenuMcWinState(menuPcsLayout).m_height - 0x3E;
 
         if (ReadGoOutU8(g_GoOutMenu, 0x73) == 0) {
             const int cursorX = GetYesNoXPos__8CMenuPcsFi(&MenuPcs, ReadGoOutU8(g_GoOutMenu, 0x70));
             MenuPcs.DrawCursor(cursorX, cursorY, 1.0f);
         } else {
-            const int cursorX = ReadMenuShort(menuPcsLayout.field_2120, 0) + 0x20;
+            const int cursorX = MenuMcWinState(menuPcsLayout).m_x + 0x20;
             const int localY = ReadGoOutS16(g_GoOutMenu, 0x76) + ReadGoOutU8(g_GoOutMenu, 0x70) * 0x1E;
             MenuPcs.DrawCursor(cursorX, localY, 1.0f);
         }
@@ -261,14 +264,14 @@ int CGoOutMenu::SetMemCardError()
     int result = 1;
 
     if (field_0x4 == -5) {
-        WriteMenuShort(menuPcsLayout.field_2120, 0xA, 3);
-        WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+        MenuMcWinState(menuPcsLayout).m_mode = 3;
+        MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         field_0x36 = -1;
         field_0x40 = 0;
         field_0x44 = 1;
         if (field_0x36 >= 0) {
-            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
-            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+            MenuMcWinState(menuPcsLayout).m_mode = 2;
+            MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         }
         field_0x45 = 0;
         field_0x34 = 3;
@@ -281,8 +284,8 @@ int CGoOutMenu::SetMemCardError()
         }
 
         if ((field_0x4 == -999 || field_0x4 == -1000) && field_0x1 == 1) {
-            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 3);
-            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+            MenuMcWinState(menuPcsLayout).m_mode = 3;
+            MenuGoOutState(menuPcsLayout).m_animFrame = 0;
             field_0x36 = -1;
             field_0x40 = 0;
             field_0x44 = 1;
@@ -294,28 +297,28 @@ int CGoOutMenu::SetMemCardError()
                        sSlotAErrorLine4[languageId],
                        sSlotAErrorLine5[languageId]);
         } else if (field_0x1 == 3) {
-            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 3);
-            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+            MenuMcWinState(menuPcsLayout).m_mode = 3;
+            MenuGoOutState(menuPcsLayout).m_animFrame = 0;
             field_0x36 = -1;
             field_0x40 = 0;
             field_0x44 = 1;
             if (field_0x36 >= 0) {
-                WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
-                WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+                MenuMcWinState(menuPcsLayout).m_mode = 2;
+                MenuGoOutState(menuPcsLayout).m_animFrame = 0;
             }
             field_0x45 = 0;
             field_0x34 = 0xd;
             field_0x48 = 0;
             field_0x3c = 0;
         } else if (field_0x1 == 2) {
-            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 3);
-            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+            MenuMcWinState(menuPcsLayout).m_mode = 3;
+            MenuGoOutState(menuPcsLayout).m_animFrame = 0;
             field_0x36 = -1;
             field_0x40 = 0;
             field_0x44 = 1;
             if (field_0x36 >= 0) {
-                WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
-                WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+                MenuMcWinState(menuPcsLayout).m_mode = 2;
+                MenuGoOutState(menuPcsLayout).m_animFrame = 0;
             }
             field_0x45 = 0;
             field_0x34 = 0xf;
@@ -323,28 +326,28 @@ int CGoOutMenu::SetMemCardError()
             field_0x3c = 0;
         }
     } else if (field_0x4 == -1 || field_0x4 == -3) {
-        WriteMenuShort(menuPcsLayout.field_2120, 0xA, 3);
-        WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+        MenuMcWinState(menuPcsLayout).m_mode = 3;
+        MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         field_0x36 = -1;
         field_0x40 = 0;
         field_0x44 = 1;
         if (field_0x36 >= 0) {
-            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
-            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+            MenuMcWinState(menuPcsLayout).m_mode = 2;
+            MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         }
         field_0x45 = 0;
         field_0x34 = 1;
         field_0x48 = 0;
         field_0x3c = 0;
     } else if (field_0x4 == -2) {
-        WriteMenuShort(menuPcsLayout.field_2120, 0xA, 3);
-        WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+        MenuMcWinState(menuPcsLayout).m_mode = 3;
+        MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         field_0x36 = -1;
         field_0x40 = 0;
         field_0x44 = 1;
         if (field_0x36 >= 0) {
-            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
-            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+            MenuMcWinState(menuPcsLayout).m_mode = 2;
+            MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         }
         field_0x45 = 0;
         field_0x34 = 2;
@@ -352,22 +355,22 @@ int CGoOutMenu::SetMemCardError()
         field_0x3c = 0;
     } else if (field_0x4 == -4) {
         if (field_0x1 != 1) {
-            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 3);
-            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+            MenuMcWinState(menuPcsLayout).m_mode = 3;
+            MenuGoOutState(menuPcsLayout).m_animFrame = 0;
             field_0x36 = -1;
             field_0x40 = 0;
             field_0x44 = 1;
             if (field_0x36 >= 0) {
-                WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
-                WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+                MenuMcWinState(menuPcsLayout).m_mode = 2;
+                MenuGoOutState(menuPcsLayout).m_animFrame = 0;
             }
             field_0x45 = 0;
             field_0x34 = 0x13;
             field_0x48 = 0;
             field_0x3c = 0;
         } else {
-            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 3);
-            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+            MenuMcWinState(menuPcsLayout).m_mode = 3;
+            MenuGoOutState(menuPcsLayout).m_animFrame = 0;
             field_0x36 = -1;
             field_0x40 = 0;
             field_0x44 = 1;
@@ -428,8 +431,8 @@ void CGoOutMenu::SetMenuStr(long timer, int lineCount, ...)
     messageIndex = field_0x38;
     if (field_0x36 >= 0) {
         CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
-        *reinterpret_cast<short*>(menuPcsLayout.field_2120 + 0xA) = 2;
-        *reinterpret_cast<short*>(menuPcsLayout.field_2092 + 0x22) = 0;
+        MenuMcWinState(menuPcsLayout).m_mode = 2;
+        MenuGoOutState(menuPcsLayout).m_animFrame = 0;
     }
 
     field_0x45 = 0;
@@ -493,9 +496,9 @@ void CGoOutMenu::SetMainMode(unsigned char mode)
     char prevMainMode;
     int i;
 
-    WriteMenuU8(2185, 0);
-    WriteMenuU8(2186, 0);
-    WriteMenuS32(2188, 0);
+    menuPcsLayout.m_saveLoadMode = 0;
+    menuPcsLayout.m_unknown_88A = 0;
+    menuPcsLayout.m_transferWorkActive = 0;
     if (field_0x2c == '\x02') {
         MemoryCardMan.McEnd();
     }
@@ -536,8 +539,8 @@ void CGoOutMenu::SetMainMode(unsigned char mode)
             }
             MenuPcs.ChgAllModel();
             if (field_0x36 >= 0) {
-                *reinterpret_cast<short*>(menuPcsLayout.field_2120 + 10) = 2;
-                *reinterpret_cast<short*>(menuPcsLayout.field_2092 + 0x22) = 0;
+                MenuMcWinState(menuPcsLayout).m_mode = 2;
+                MenuGoOutState(menuPcsLayout).m_animFrame = 0;
             }
             field_0x45 = 0;
             field_0x34 = 0x1e;
@@ -547,7 +550,7 @@ void CGoOutMenu::SetMainMode(unsigned char mode)
         }
     } else if (mode < '\x04') {
         MenuPcs.ChgAllModel();
-        WriteMenuU8(2184, 2);
+        menuPcsLayout.m_unknown_888 = 2;
         field_0x14 = 0;
         field_0x24[2] = 0;
         SetDelMode(2);
@@ -626,19 +629,19 @@ void CGoOutMenu::Destroy()
 void CGoOutMenu::SetGoOutMode(unsigned char mode)
 {
     CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
-    McCtrl& mcCtrl = *reinterpret_cast<McCtrl*>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0x20);
+    McCtrl& mcCtrl = menuPcsLayout.m_mcCtrl;
 
 	field_0x18 = mode;
 	switch(field_0x18) {
 	case 1:
 		field_0x1c = 0;
-        WriteMenuShort(menuPcsLayout.field_2092, 0x1E, -1);
-        WriteMenuShort(menuPcsLayout.field_2092, 0x18, 10);
+        MenuGoOutState(menuPcsLayout).m_resultDir = -1;
+        MenuGoOutState(menuPcsLayout).m_waitFrames = 10;
 		break;
 	case 3:
         if (field_0x36 >= 0) {
-            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
-            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+            MenuMcWinState(menuPcsLayout).m_mode = 2;
+            MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         }
 		field_0x45 = 0;
 		field_0x34 = 4;
@@ -648,8 +651,8 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
 		break;
 	case 4:
         if (field_0x36 >= 0) {
-            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
-            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+            MenuMcWinState(menuPcsLayout).m_mode = 2;
+            MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         }
 		field_0x45 = 0;
 		field_0x34 = 5;
@@ -671,8 +674,8 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
             field_0x1 = 3;
         }
         if (field_0x36 >= 0) {
-            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
-            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+            MenuMcWinState(menuPcsLayout).m_mode = 2;
+            MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         }
         field_0x45 = 0;
         field_0x34 = 7;
@@ -680,16 +683,16 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         field_0x3c = 0;
         break;
     case 6:
-        if (ReadMenuShort(menuPcsLayout.field_2120, 0xA) == 1) {
-            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 3);
-            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+        if (MenuMcWinState(menuPcsLayout).m_mode == 1) {
+            MenuMcWinState(menuPcsLayout).m_mode = 3;
+            MenuGoOutState(menuPcsLayout).m_animFrame = 0;
             field_0x36 = -1;
             field_0x40 = 0;
             field_0x44 = 1;
         }
         if (field_0x36 >= 0) {
-            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
-            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+            MenuMcWinState(menuPcsLayout).m_mode = 2;
+            MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         }
         field_0x45 = 0;
         field_0x34 = 0xc;
@@ -698,7 +701,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         field_0x46 = 1;
         break;
     case 7:
-        WriteMenuU8(2184, 1);
+        menuPcsLayout.m_unknown_888 = 1;
         field_0x14 = 0;
         field_0x18 = 7;
         field_0x1c = 0;
@@ -714,8 +717,8 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         break;
     case 0xC:
         if (field_0x36 >= 0) {
-            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
-            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+            MenuMcWinState(menuPcsLayout).m_mode = 2;
+            MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         }
         field_0x45 = 0;
         field_0x34 = 0x21;
@@ -742,13 +745,13 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
     case 0xE:
         MenuPcs.InitSaveLoadMenu();
         MenuPcs.SetMenuCharaAnim(0, 0);
-        MenuPcs.CopyNowCaravanDat(*reinterpret_cast<Mc::SaveDat**>(reinterpret_cast<unsigned char*>(&MenuPcs) + 2176));
-        WriteMenuU8(2185, 2);
-        WriteMenuU8(2186, 1);
-        WriteMenuS32(2188, ReadMenuS32(2180));
+        MenuPcs.CopyNowCaravanDat(menuPcsLayout.m_transferSaveData);
+        menuPcsLayout.m_saveLoadMode = 2;
+        menuPcsLayout.m_unknown_88A = 1;
+        menuPcsLayout.m_transferWorkActive = menuPcsLayout.m_transferWork;
         if (field_0x36 >= 0) {
-            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
-            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+            MenuMcWinState(menuPcsLayout).m_mode = 2;
+            MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         }
         field_0x45 = 0;
         field_0x34 = -1;
@@ -763,16 +766,16 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         MenuPcs.SetMenuCharaAnim(0, 0);
         field_0x1d = 1;
         if (field_0x36 >= 0) {
-            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
-            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+            MenuMcWinState(menuPcsLayout).m_mode = 2;
+            MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         }
         field_0x45 = 0;
         field_0x34 = -1;
         field_0x48 = 0;
         field_0x3c = 0;
-        WriteMenuU8(2185, 2);
-        WriteMenuU8(2186, 1);
-        WriteMenuS32(2188, ReadMenuS32(2180));
+        menuPcsLayout.m_saveLoadMode = 2;
+        menuPcsLayout.m_unknown_88A = 1;
+        menuPcsLayout.m_transferWorkActive = menuPcsLayout.m_transferWork;
         break;
     case 0x10:
         if (field_0x1e == 0) {
@@ -794,8 +797,8 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         break;
     case 0x11:
         if (field_0x36 >= 0) {
-            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
-            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+            MenuMcWinState(menuPcsLayout).m_mode = 2;
+            MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         }
         field_0x45 = 0;
         field_0x34 = 0x1F;
@@ -807,7 +810,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         mcCtrl.m_cardChannel = static_cast<unsigned char>(field_0x1a);
         field_0x2 = field_0x1a;
         field_0x3 = field_0x1b;
-        field_0x8 = ReadMenuS32(2180);
+        field_0x8 = reinterpret_cast<int>(menuPcsLayout.m_transferWork);
         field_0x4 = mcCtrl.ChkConnect(static_cast<unsigned char>(field_0x2));
         if (field_0x4 == 1) {
             mcCtrl.m_saveIndex = static_cast<unsigned char>(field_0x3);
@@ -828,8 +831,8 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
         break;
     case 0x14:
         if (field_0x36 >= 0) {
-            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 2);
-            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+            MenuMcWinState(menuPcsLayout).m_mode = 2;
+            MenuGoOutState(menuPcsLayout).m_animFrame = 0;
         }
         field_0x45 = 0;
         field_0x34 = 0x20;
@@ -851,7 +854,7 @@ void CGoOutMenu::SetGoOutMode(unsigned char mode)
 void CGoOutMenu::CalcGoOut()
 {
     CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
-    McCtrl& mcCtrl = *reinterpret_cast<McCtrl*>(reinterpret_cast<unsigned char*>(&MenuPcs) + 0x20);
+    McCtrl& mcCtrl = menuPcsLayout.m_mcCtrl;
     unsigned short input;
     unsigned char next;
 
@@ -861,8 +864,8 @@ void CGoOutMenu::CalcGoOut()
             field_0x1c = 0;
             field_0x19 = -1;
             field_0x18 = 0;
-            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 3);
-            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+            MenuMcWinState(menuPcsLayout).m_mode = 3;
+            MenuGoOutState(menuPcsLayout).m_animFrame = 0;
             field_0x36 = -1;
             field_0x40 = 0;
             field_0x44 = 1;
@@ -919,7 +922,7 @@ void CGoOutMenu::CalcGoOut()
         field_0x49 = 0;
         next = 0;
 
-        if (ReadMenuShort(menuPcsLayout.field_2120, 0xA) == 1) {
+        if (MenuMcWinState(menuPcsLayout).m_mode == 1) {
             input = GetGoOutInputMask();
             if ((input & 3) == 0) {
                 input = GetGoOutInputMask();
@@ -955,7 +958,7 @@ void CGoOutMenu::CalcGoOut()
         field_0x49 = 0;
         next = 0;
 
-        if (ReadMenuShort(menuPcsLayout.field_2120, 0xA) == 1) {
+        if (MenuMcWinState(menuPcsLayout).m_mode == 1) {
             input = GetGoOutInputMask();
             if ((input & 3) == 0) {
                 input = GetGoOutInputMask();
@@ -1076,6 +1079,7 @@ void CGoOutMenu::DrawGoOut()
  */
 void CGoOutMenu::SetDelMode(unsigned char mode)
 {
+    CMenuPcsGoOutLayout& menuPcsLayout = *reinterpret_cast<CMenuPcsGoOutLayout*>(&MenuPcs);
     signed char& delMode = reinterpret_cast<signed char&>(field_0x24[0]);
     signed char& initSelChar = reinterpret_cast<signed char&>(field_0x24[2]);
     int& selectedChara = *reinterpret_cast<int*>(&field_0x24[4]);
@@ -1083,8 +1087,8 @@ void CGoOutMenu::SetDelMode(unsigned char mode)
     delMode = mode;
     switch (delMode) {
     case 1:
-        *reinterpret_cast<short*>(ReadMenuS32(2092) + 0x1E) = -1;
-        *reinterpret_cast<short*>(ReadMenuS32(2092) + 0x18) = 10;
+        MenuGoOutState(menuPcsLayout).m_resultDir = -1;
+        MenuGoOutState(menuPcsLayout).m_waitFrames = 10;
         break;
     case 2:
         field_0x45 = 0;
@@ -1241,7 +1245,7 @@ void CGoOutMenu::CalcDel()
         field_0x49 = 0;
         next = 0;
 
-        if (ReadMenuShort(menuPcsLayout.field_2120, 0xA) == 1) {
+        if (MenuMcWinState(menuPcsLayout).m_mode == 1) {
             input = GetGoOutInputMask();
             if ((input & 3) == 0) {
                 input = GetGoOutInputMask();
@@ -1282,7 +1286,7 @@ void CGoOutMenu::CalcDel()
         field_0x49 = 0;
         next = 0;
 
-        if (ReadMenuShort(menuPcsLayout.field_2120, 0xA) == 1) {
+        if (MenuMcWinState(menuPcsLayout).m_mode == 1) {
             input = GetGoOutInputMask();
             if ((input & 3) == 0) {
                 input = GetGoOutInputMask();
@@ -1336,7 +1340,7 @@ void CGoOutMenu::CalcDel()
         field_0x49 = 0;
         next = 0;
 
-        if (ReadMenuShort(menuPcsLayout.field_2120, 0xA) == 1) {
+        if (MenuMcWinState(menuPcsLayout).m_mode == 1) {
             input = GetGoOutInputMask();
             if ((input & 3) == 0) {
                 input = GetGoOutInputMask();
@@ -1377,7 +1381,7 @@ void CGoOutMenu::CalcDel()
         field_0x49 = 0;
         next = 0;
 
-        if (ReadMenuShort(menuPcsLayout.field_2120, 0xA) == 1) {
+        if (MenuMcWinState(menuPcsLayout).m_mode == 1) {
             input = GetGoOutInputMask();
             if ((input & 3) == 0) {
                 input = GetGoOutInputMask();
@@ -1443,9 +1447,9 @@ void CGoOutMenu::Calc()
 
     field_0x47 = 0;
 
-    if (ReadMenuU8(2172) != 0) {
-        WriteMenuU8(2172, 0);
-        WriteMenuShort(menuPcsLayout.field_2120, 0xA, 3);
+    if (menuPcsLayout.m_resetGoOutFlag != 0) {
+        menuPcsLayout.m_resetGoOutFlag = 0;
+        MenuMcWinState(menuPcsLayout).m_mode = 3;
         field_0x36 = -1;
         field_0x34 = -1;
         field_0x38 = 0;
@@ -1472,22 +1476,22 @@ void CGoOutMenu::Calc()
                     Sound.PlaySe(3, 0x40, 0x7f, 0);
                     MenuPcs.InitSaveLoadMenu();
                     MenuPcs.SetMenuCharaAnim(0, 0);
-                    WriteMenuShort(menuPcsLayout.field_2092, 0x20, -1);
+                    MenuGoOutState(menuPcsLayout).m_resultSelect = -1;
 
-                    if (ReadMenuS32(2176) != 0) {
-                        __dl__FPv(reinterpret_cast<void*>(ReadMenuS32(2176)));
-                        WriteMenuS32(2176, 0);
+                    if (menuPcsLayout.m_transferSaveData != 0) {
+                        __dl__FPv(menuPcsLayout.m_transferSaveData);
+                        menuPcsLayout.m_transferSaveData = 0;
                     }
-                    if (ReadMenuS32(2180) != 0) {
-                        __dl__FPv(reinterpret_cast<void*>(ReadMenuS32(2180)));
-                        WriteMenuS32(2180, 0);
+                    if (menuPcsLayout.m_transferWork != 0) {
+                        __dl__FPv(menuPcsLayout.m_transferWork);
+                        menuPcsLayout.m_transferWork = 0;
                     }
 
-                    WriteMenuS32(2188, 0);
-                    WriteMenuU8(2184, 0);
-                    WriteMenuU8(2185, 0);
-                    WriteMenuU8(2186, 0);
-                    WriteMenuU8(2172, 1);
+                    menuPcsLayout.m_transferWorkActive = 0;
+                    menuPcsLayout.m_unknown_888 = 0;
+                    menuPcsLayout.m_saveLoadMode = 0;
+                    menuPcsLayout.m_unknown_88A = 0;
+                    menuPcsLayout.m_resetGoOutFlag = 1;
                     MenuPcs.ChgAllModel();
                     return;
                 }
@@ -1506,12 +1510,12 @@ void CGoOutMenu::Calc()
         }
     }
 
-    if (ReadMenuShort(menuPcsLayout.field_2120, 0xA) == 1) {
+    if (MenuMcWinState(menuPcsLayout).m_mode == 1) {
         field_0x44 = 1;
         field_0x45 = 1;
     }
 
-    if (field_0x44 != 0 && ReadMenuShort(menuPcsLayout.field_2120, 0xA) == 3) {
+    if (field_0x44 != 0 && MenuMcWinState(menuPcsLayout).m_mode == 3) {
         short x;
         short y;
 
@@ -1521,8 +1525,8 @@ void CGoOutMenu::Calc()
         } else {
             MenuPcs.GetWinSize(static_cast<unsigned short>(field_0x36), &x, &y, (field_0x36 >= 0x1E) ? 2 : 0);
             MenuPcs.SetMcWinInfo(x, y);
-            WriteMenuShort(menuPcsLayout.field_2120, 0xA, 0);
-            WriteMenuShort(menuPcsLayout.field_2092, 0x22, 0);
+            MenuMcWinState(menuPcsLayout).m_mode = 0;
+            MenuGoOutState(menuPcsLayout).m_animFrame = 0;
             field_0x40 = field_0x3c;
             field_0x44 = 0;
         }
@@ -1583,3 +1587,5 @@ void CGoOutMenu::EndMemCardProc()
 {
 	// TODO
 }
+
+

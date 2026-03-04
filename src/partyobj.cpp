@@ -58,6 +58,27 @@ struct GhostPartyWork {
 
 static GhostPartyWork sGhostPartyWork = {};
 
+struct PartyObjOverlay {
+	unsigned char partyFlags;
+	unsigned char _pad6B9[0x0B];
+	unsigned char commandFlags;
+	unsigned char _pad6C5[0x17];
+	int weaponRef;
+	int weaponItem;
+	CGBaseObj* carryTarget;
+	CGBaseObj* secondaryTarget;
+	float targetSearchDistance;
+	CGObject* carryObject;
+	short commandMode;
+	unsigned short _pad6F6;
+	int bonusCondition;
+};
+
+static inline PartyObjOverlay& PartyData(CGPartyObj* self)
+{
+	return *reinterpret_cast<PartyObjOverlay*>(reinterpret_cast<unsigned char*>(self) + 0x6B8);
+}
+
 static unsigned short getPadHeldForSlot(int slot)
 {
 	if (Pad._452_4_ != 0 || (slot == 0 && Pad._448_4_ != -1)) {
@@ -142,7 +163,7 @@ void CGPartyObj::onCreate()
  */
 void CGPartyObj::onDestroy()
 {
-	unsigned char* partyFlags = reinterpret_cast<unsigned char*>(this) + 0x6B8;
+	unsigned char* partyFlags = &PartyData(this).partyFlags;
 	if ((*partyFlags & 0x04) != 0) {
 		addHp(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1A), static_cast<CGPrgObj*>(0));
 		*partyFlags &= ~0x04;
@@ -317,7 +338,7 @@ void CGPartyObj::onFrameAlways()
 				LoadWeapon(weaponItem & 0xFFF, weaponItem >> 12);
 			}
 			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(weaponRef);
-			*(reinterpret_cast<unsigned char*>(this) + 0x6C4) &= 0xDF;
+			PartyData(this).commandFlags &= 0xDF;
 		}
 
 		int shieldIndex = reinterpret_cast<short*>(m_scriptHandle)[0x2C];
@@ -453,9 +474,9 @@ void CGPartyObj::onFramePostCalc()
 		shouki();
 	}
 
-	*reinterpret_cast<CGBaseObj**>(reinterpret_cast<unsigned char*>(this) + 0x6E4) = (CGBaseObj*)0;
-	*reinterpret_cast<CGBaseObj**>(reinterpret_cast<unsigned char*>(this) + 0x6E8) = (CGBaseObj*)0;
-	*reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x6EC) = 1000000.0f;
+	PartyData(this).carryTarget = (CGBaseObj*)0;
+	PartyData(this).secondaryTarget = (CGBaseObj*)0;
+	PartyData(this).targetSearchDistance = 1000000.0f;
 	CGCharaObj::onFramePostCalc();
 }
 
@@ -923,7 +944,7 @@ void CGPartyObj::onStatAttack(int chargeType)
 	if (m_stateFrame == 0) {
 		m_rotationZ = m_rotationY;
 		m_rotationY = 0.0f;
-		unsigned char* flags = reinterpret_cast<unsigned char*>(this) + 0x6B8;
+		unsigned char* flags = &PartyData(this).partyFlags;
 		*flags &= 0x7F;
 		*flags &= 0xBF;
 		getBestAngleObject(FLOAT_80331ad4 * m_bodyEllipsoidRadius, FLOAT_80331ad8);
@@ -1062,8 +1083,9 @@ void CGPartyObj::endTargetParticle()
  */
 int CGPartyObj::isDispTarget()
 {
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	if ((m_lastStateId == 2 || m_lastStateId == 6) &&
-	    (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x668) != 0)) {
+	    (*reinterpret_cast<int*>(self + 0x668) != 0)) {
 		return 1;
 	}
 
@@ -1081,9 +1103,10 @@ int CGPartyObj::isDispTarget()
  */
 int CGPartyObj::isRideTarget()
 {
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	if ((m_lastStateId == 2 || m_lastStateId == 6) &&
-	    (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x668) != 0) &&
-	    ((*reinterpret_cast<unsigned char*>(this) + 0x6B8) & 0x80) != 0) {
+	    (*reinterpret_cast<int*>(self + 0x668) != 0) &&
+	    ((PartyData(this).partyFlags & 0x80) != 0)) {
 		return 1;
 	}
 
@@ -1250,7 +1273,7 @@ void CGPartyObj::onStatDie()
 		if (m_subFrame == 0) {
 			m_bgColMask &= 0xFFFEFFF1;
 			enableDamageCol(1);
-			if ((*(reinterpret_cast<unsigned char*>(this) + 0x6B8) & 0x04) != 0) {
+			if ((PartyData(this).partyFlags & 0x04) != 0) {
 				putParticleFromItem(0x220, 2, 0, &m_worldPosition);
 				putParticleFromItem(0x220, 3, 0, &m_worldPosition);
 				changeSubStat(2);
@@ -1321,14 +1344,14 @@ void CGPartyObj::onTalk(CGBaseObj* other, int talkType)
 
 	CGObject* targetObj = reinterpret_cast<CGObject*>(other);
 	if (targetObj->GetCID() == 0x23) {
-		*reinterpret_cast<CGBaseObj**>(reinterpret_cast<unsigned char*>(this) + 0x6E8) = other;
+		PartyData(this).secondaryTarget = other;
 		return;
 	}
 
 	float dist = PSVECDistance(&m_worldPosition, &targetObj->m_worldPosition);
-	float* bestDist = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x6EC);
+	float* bestDist = &PartyData(this).targetSearchDistance;
 	if (dist < *bestDist) {
-		*reinterpret_cast<CGBaseObj**>(reinterpret_cast<unsigned char*>(this) + 0x6E4) = other;
+		PartyData(this).carryTarget = other;
 		*bestDist = dist;
 	}
 }
@@ -1344,7 +1367,7 @@ void CGPartyObj::onTalk(CGBaseObj* other, int talkType)
  */
 void CGPartyObj::commandFinished()
 {
-	*(reinterpret_cast<unsigned char*>(this) + 0x6B8) &= 0x7F;
+	PartyData(this).partyFlags &= 0x7F;
 }
 
 /*
@@ -1454,7 +1477,7 @@ void CGPartyObj::statPickup()
 	}
 
 	if (isLoopAnim() != 0 || m_subFrame > 0x1E) {
-		carry(0, *reinterpret_cast<CGObject**>(reinterpret_cast<unsigned char*>(this) + 0x6E4), 1);
+		carry(0, reinterpret_cast<CGObject*>(PartyData(this).carryTarget), 1);
 		changeStat(0, 0, 0);
 	}
 }
@@ -1536,7 +1559,7 @@ void CGPartyObj::useItem(int itemId)
 		return;
 	}
 	if (itemId >= 0) {
-		*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6E0) = itemId;
+		PartyData(this).weaponItem = itemId;
 	}
 	changeStat(0x1A, 0, 0);
 }
@@ -1584,7 +1607,7 @@ void CGPartyObj::putItem(int)
 		return;
 	}
 
-	int itemId = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6E0);
+	int itemId = PartyData(this).weaponItem;
 	void* created = CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
 	    0, 9, itemId, this, FLOAT_80331a78, nullptr);
 	if (created == nullptr) {
@@ -1940,8 +1963,8 @@ void CGPartyObj::checkAndSetWeapon()
 	int weaponItem;
 	int weaponRef;
 	reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(weaponItem, weaponRef);
-	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6DC) = weaponRef;
-	*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6E0) = weaponItem;
+	PartyData(this).weaponRef = weaponRef;
+	PartyData(this).weaponItem = weaponItem;
 	if (weaponItem <= 0) {
 		LoadWeapon(-1, 0);
 	} else {
@@ -2019,7 +2042,7 @@ void CGPartyObj::changeMotionMode(int mode)
  */
 void CGPartyObj::setIdleMotion()
 {
-	if (*reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x6F0) == 0) {
+	if (PartyData(this).carryObject == 0) {
 		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
 			SetAnimSlot(0x25, 0);
 			SetAnimSlot(0x24, 1);
@@ -2093,7 +2116,7 @@ void CGPartyObj::onDamaged(CGPrgObj* attacker)
 {
 	CGPrgObj::onDamaged(attacker);
 	if (m_lastStateId == 0) {
-		*reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(this) + 0x6B8) |= 0x20;
+		PartyData(this).partyFlags |= 0x20;
 	}
 }
 
@@ -2220,8 +2243,8 @@ void calcWeightMax()
  */
 void CGPartyObj::gpmCalcDist(Vec*, float&)
 {
-	Vec* outVec = reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(this) + 0x5E0);
-	float* outDist = reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x5D0);
+	Vec* outVec = &m_targetDelta;
+	float* outDist = &m_targetDist;
 
 	if (sGhostPartyWork.activeTrailCount > 0) {
 		Vec prev = m_worldPosition;
@@ -2258,11 +2281,11 @@ void CGPartyObj::gpmCalcDist(Vec*, float&)
 	}
 
 	sGhostPartyWork.activeTrailCount = 0;
-	*outVec = *reinterpret_cast<Vec*>(reinterpret_cast<unsigned char*>(this) + 0x5E0);
+	*outVec = m_targetDelta;
 	outVec->y = 0.0f;
 
 	float dist = PSVECMag(outVec);
-	float maxDist = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x5D0);
+	float maxDist = m_targetDist;
 	*outDist = (dist < maxDist) ? dist : maxDist;
 }
 
@@ -2367,7 +2390,7 @@ void CGPartyObj::ghostPartyMog()
 	}
 
 	int targetPressure = (int)(100.0f * pressureScale);
-	float leaderDist = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(this) + 0x5D0);
+	float leaderDist = m_targetDist;
 	if (leaderDist > Game.game.unkFloat_0xca10) {
 		sGhostPartyWork.mood = 1;
 		sGhostPartyWork.pressure += 2;
@@ -2497,8 +2520,9 @@ void CGPartyObj::onDrawDebug(CFont* font, float x, float& y, float z)
 	}
 
 	char text[256];
-	const int commandMode = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(this) + 0x6F4);
-	const int targetState = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x668);
+	const int commandMode = PartyData(this).commandMode;
+	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	const int targetState = *reinterpret_cast<int*>(self + 0x668);
 	const int alive = *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C);
 	sprintf(text, "mode:%d stat:%d sub:%d frame:%d alive:%d tgt:%d ghost:%d",
 	        commandMode, m_lastStateId, m_subState, m_subFrame, alive, targetState, sGhostPartyWork.mood);

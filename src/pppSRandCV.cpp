@@ -8,6 +8,21 @@ extern float lbl_80330060;
 extern u8 lbl_801EADC8[];
 extern "C" float RandF__5CMathFv(CMath* instance);
 
+struct PppSRandCVParam2 {
+    s32 field0;
+    s32 field4;
+    s8 field8;
+    s8 field9;
+    s8 fieldA;
+    s8 fieldB;
+    u8 fieldC;
+};
+
+struct PppSRandCVParam3 {
+    u8 field0[0xC];
+    s32* fieldC;
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -23,87 +38,95 @@ extern "C" {
  */
 void pppSRandCV(void* param1, void* param2, void* param3)
 {
+    u8* base = (u8*)param1;
+    PppSRandCVParam2* in = (PppSRandCVParam2*)param2;
+    PppSRandCVParam3* out = (PppSRandCVParam3*)param3;
+    u8* targetColor;
+
     if (lbl_8032ED70 != 0) {
         return;
     }
 
     float* target;
 
-    if (*(int*)param2 == *((int*)param1 + 3)) {
-        int** base_ptr = (int**)((char*)param3 + 0xc);
-        int offset = **base_ptr;
-        target = (float*)((char*)param1 + offset + 0x80);
+    if (in->field0 == *(s32*)(base + 0xC)) {
+        target = (float*)(base + *out->fieldC + 0x80);
 
-        u8 flag = *((u8*)param2 + 0xc);
-        float value;
-
-        value = RandF__5CMathFv(math);
-        if (flag != 0) {
-            value = value + RandF__5CMathFv(math);
-        } else {
-            value = value * lbl_80330060;
+        {
+            u8 flag = in->fieldC;
+            float value = RandF__5CMathFv(&math[0]);
+            if (flag != 0) {
+                value = value + RandF__5CMathFv(&math[0]);
+            } else {
+                value = value * lbl_80330060;
+            }
+            target[0] = value;
         }
-        target[0] = value;
 
-        value = RandF__5CMathFv(math);
-        if (flag != 0) {
-            value = value + RandF__5CMathFv(math);
-        } else {
-            value = value * lbl_80330060;
+        {
+            u8 flag = in->fieldC;
+            float value = RandF__5CMathFv(&math[0]);
+            if (flag != 0) {
+                value = value + RandF__5CMathFv(&math[0]);
+            } else {
+                value = value * lbl_80330060;
+            }
+            target[1] = value;
         }
-        target[1] = value;
 
-        value = RandF__5CMathFv(math);
-        if (flag != 0) {
-            value = value + RandF__5CMathFv(math);
-        } else {
-            value = value * lbl_80330060;
+        {
+            u8 flag = in->fieldC;
+            float value = RandF__5CMathFv(&math[0]);
+            if (flag != 0) {
+                value = value + RandF__5CMathFv(&math[0]);
+            } else {
+                value = value * lbl_80330060;
+            }
+            target[2] = value;
         }
-        target[2] = value;
 
-        value = RandF__5CMathFv(math);
-        if (flag != 0) {
-            value = value + RandF__5CMathFv(math);
-        } else {
-            value = value * lbl_80330060;
+        {
+            u8 flag = in->fieldC;
+            float value = RandF__5CMathFv(&math[0]);
+            if (flag != 0) {
+                value = value + RandF__5CMathFv(&math[0]);
+            } else {
+                value = value * lbl_80330060;
+            }
+            target[3] = value;
         }
-        target[3] = value;
-    } else if (*(int*)param2 != *((int*)param1 + 3)) {
-        int** base_ptr = (int**)((char*)param3 + 0xc);
-        int offset = **base_ptr;
-        target = (float*)((char*)param1 + offset + 0x80);
-    }
-
-    int color_offset = *((int*)param2 + 1);
-    u8* target_colors;
-    if (color_offset == -1) {
-        target_colors = lbl_801EADC8;
     } else {
-        target_colors = (u8*)((char*)param1 + color_offset + 0x80);
+        target = (float*)(base + *out->fieldC + 0x80);
+    }
+
+    if (in->field4 == -1) {
+        targetColor = lbl_801EADC8;
+    } else {
+        targetColor = (u8*)(base + in->field4 + 0x80);
     }
 
     {
-        s8 base = *(s8*)((char*)param2 + 0x8);
-        int delta = (int)((float)base * target[0] - (float)base);
-        target_colors[0] = (u8)(target_colors[0] + delta);
+        s8 baseValue = in->field8;
+        s32 delta = (s32)((f32)baseValue * target[0] - (f32)baseValue);
+        targetColor[0] = (u8)(targetColor[0] + delta);
     }
 
     {
-        s8 base = *(s8*)((char*)param2 + 0x9);
-        int delta = (int)((float)base * target[1] - (float)base);
-        target_colors[1] = (u8)(target_colors[1] + delta);
+        s8 baseValue = in->field9;
+        s32 delta = (s32)((f32)baseValue * target[1] - (f32)baseValue);
+        targetColor[1] = (u8)(targetColor[1] + delta);
     }
 
     {
-        s8 base = *(s8*)((char*)param2 + 0xA);
-        int delta = (int)((float)base * target[2] - (float)base);
-        target_colors[2] = (u8)(target_colors[2] + delta);
+        s8 baseValue = in->fieldA;
+        s32 delta = (s32)((f32)baseValue * target[2] - (f32)baseValue);
+        targetColor[2] = (u8)(targetColor[2] + delta);
     }
 
     {
-        s8 base = *(s8*)((char*)param2 + 0xB);
-        int delta = (int)((float)base * target[3] - (float)base);
-        target_colors[3] = (u8)(target_colors[3] + delta);
+        s8 baseValue = in->fieldB;
+        s32 delta = (s32)((f32)baseValue * target[3] - (f32)baseValue);
+        targetColor[3] = (u8)(targetColor[3] + delta);
     }
 }
 

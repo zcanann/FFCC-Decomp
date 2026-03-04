@@ -119,35 +119,33 @@ void CSystemPcs::destroy()
  */
 void CSystemPcs::calc()
 {
-	unsigned short buttons;
-	int debugPad;
-	unsigned int stepPad;
-	int next;
+    int debugPad;
+    int stepPad;
+    unsigned short buttons;
 
-	if (Pad._1b8_4_ != 0) {
-		buttons = 0;
-	} else {
-		debugPad = Pad._1b4_4_;
-		stepPad = ((~((debugPad - 4) | (4 - debugPad)) >> 31) & 4U);
-		buttons = *(unsigned short*)(((unsigned char*)&Pad) + stepPad * 0x54 + 0x36);
-	}
+    if (Pad._1b8_4_ != 0) {
+        buttons = 0;
+    } else {
+        debugPad = Pad._1b4_4_;
+        stepPad = (debugPad == 4) ? 4 : 0;
+        buttons = *(unsigned short*)(((unsigned char*)&Pad) + stepPad * 0x54 + 0x36);
+    }
 
-	if ((buttons & 0x1000) != 0) {
-		return;
-	}
-	if ((buttons & 0x100) != 0) {
-		DbgMenuPcs.Add();
-		return;
-	}
-	if (((buttons & 0x800) == 0) && ((buttons & 0x40) != 0)) {
-		debugPad = Pad._1b4_4_;
-		next = debugPad + 1;
-		if (next == 0) {
-			next = debugPad + 2;
-		}
-		Pad._1b4_4_ = next;
-		if (next > 3) {
-			Pad._1b4_4_ = -1;
-		}
-	}
+    if ((buttons & 0x1000) != 0) {
+        return;
+    }
+    if ((buttons & 0x100) != 0) {
+        DbgMenuPcs.Add();
+        return;
+    }
+    if (((buttons & 0x800) == 0) && ((buttons & 0x40) != 0)) {
+        debugPad = Pad._1b4_4_ + 1;
+        if (debugPad == 0) {
+            debugPad = Pad._1b4_4_ + 2;
+        }
+        Pad._1b4_4_ = debugPad;
+        if (debugPad > 3) {
+            Pad._1b4_4_ = -1;
+        }
+    }
 }

@@ -170,7 +170,7 @@ FILE* __find_unopened_file(void) {
  * JP Address: TODO
  * JP Size: TODO
  */
-void __init_file(FILE* file, file_modes mode, unsigned char* buffer, int buffer_size) {
+void __init_file(FILE* file, file_modes mode, unsigned char* buffer, unsigned long buffer_size) {
     file->handle = 0;
     file->file_mode = mode;
 

@@ -107,18 +107,13 @@ void GXGetPointSize(u8* pointSize, GXTexOffset* texOffsets) {
  * JP Size: TODO
  */
 void GXEnableTexOffsets(GXTexCoordID coord, u8 line_enable, u8 point_enable) {
-    GXData* data;
-    u32 idx;
-
     CHECK_GXBEGIN(529, "GXEnableTexOffsets");
 
     ASSERTMSGLINE(531, coord < GX_MAX_TEXCOORD, "GXEnableTexOffsets: Invalid coordinate Id");
-    data = __GXData;
-    idx = (u32)coord;
-    data->suTs0[idx] = (data->suTs0[idx] & 0xFFFBFFFF) | (((u32)line_enable & 0xFF) << 18);
-    data->suTs0[idx] = (data->suTs0[idx] & 0xFFF7FFFF) | (((u32)point_enable & 0xFF) << 19);
-    GX_WRITE_RAS_REG(data->suTs0[idx]);
-    data->bpSentNot = 0;
+    __GXData->suTs0[coord] = (__GXData->suTs0[coord] & 0xFFFBFFFF) | (((u32)line_enable & 0xFF) << 18);
+    __GXData->suTs0[coord] = (__GXData->suTs0[coord] & 0xFFF7FFFF) | (((u32)point_enable & 0xFF) << 19);
+    GX_WRITE_RAS_REG(__GXData->suTs0[coord]);
+    __GXData->bpSentNot = 0;
 }
 
 /*

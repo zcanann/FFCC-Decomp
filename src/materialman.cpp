@@ -275,8 +275,8 @@ void CPtrArray<CMaterial*>::RemoveAll()
         __dla__FPv(m_items);
         m_items = 0;
     }
-    m_size = 0;
     m_numItems = 0;
+    m_size = 0;
 }
 
 template <>

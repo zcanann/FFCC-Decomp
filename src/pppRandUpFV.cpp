@@ -47,7 +47,8 @@ void pppRandUpFV(void* param1, void* param2, void* param3)
     if (state == 0) {
         f32 value = RandF__5CMathFv(math);
         if (in->field18 != 0) {
-            value = lbl_80330000 * (value + RandF__5CMathFv(math));
+            f32 randomValue = value + RandF__5CMathFv(math);
+            value = randomValue * lbl_80330000;
         }
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);

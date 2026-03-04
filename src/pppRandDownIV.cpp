@@ -48,24 +48,20 @@ extern "C" void pppRandDownIV(void* param1, void* param2, void* param3)
     }
 
     if (in->field0 == *(s32*)(base + 0xC)) {
-        f32 value = -RandF__5CMathFv(math);
+        f32 value = -RandF__5CMathFv(&math[0]);
         if (in->field18 != 0) {
-            value = (value - RandF__5CMathFv(math)) * lbl_8032FF68;
+            value = (value - RandF__5CMathFv(&math[0])) * lbl_8032FF68;
         }
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
         *valuePtr = value;
+    } else if (in->field0 != *(s32*)(base + 0xC)) {
+        return;
     } else {
-        if (in->field0 != *(s32*)(base + 0xC)) {
-            return;
-        }
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
 
-    target = &lbl_801EADC8[0];
-    if (in->field4 != -1) {
-        target = (s32*)(base + in->field4 + 0x80);
-    }
+    target = (in->field4 == -1) ? &lbl_801EADC8[0] : (s32*)(base + in->field4 + 0x80);
 
     {
         f32 scale = *valuePtr;

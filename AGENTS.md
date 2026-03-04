@@ -120,7 +120,9 @@ This is likely the starting point for the agent.
 ### Step 1 - Select Target & Gather Context (automated)
 Run the selector once. It prints random viable targets across multiple buckets (code opportunities, data opportunities, linkage opportunities, and name/linkage blockers) with symbol summaries.
 
-All non-perfect targets are valid now. Data & linkage are the #1 priority. This means removing hacks like (object + 0x28). Create a member variable on the type and use that.
+STRONGLY PREFER:
+- Real member access rather than hard coded pointer offsets.
+- Real linkage rather than making things extern. Minimize extern.
 
 ```sh
 python3 tools/agent_select_target.py

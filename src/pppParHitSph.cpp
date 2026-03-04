@@ -9,6 +9,11 @@ extern float lbl_80330700;
 extern unsigned char CFlat[];
 extern Mtx ppvCameraMatrix02;
 
+struct PppParHitSphMatrices {
+    Mtx cameraMtx;
+    Mtx sphereMtx;
+};
+
 /*
  * --INFO--
  * PAL Address: 80093d04
@@ -24,8 +29,7 @@ void pppParHitSph(struct _pppPObject* param_1, int param_2)
     Vec local_88;
     Vec local_94;
     Vec local_a0;
-    Mtx local_48;
-    Mtx MStack_78;
+    PppParHitSphMatrices mtx;
     _GXColor local_a8;
     float radius;
     
@@ -48,16 +52,16 @@ void pppParHitSph(struct _pppPObject* param_1, int param_2)
         local_a8.g = 0xFF;
         local_a8.b = 0xFF;
         local_a8.a = 0xFF;
-        PSMTXIdentity(MStack_78);
-        PSMTXIdentity(local_48);
-        local_48[0][0] = radius;
-        local_48[1][1] = radius;
-        local_48[2][2] = radius;
-        PSMTXConcat(ppvCameraMatrix02, MStack_78, MStack_78);
-        PSMTXMultVec(MStack_78, &local_94, &local_a0);
-        local_48[0][3] = local_a0.x;
-        local_48[1][3] = local_a0.y;
-        local_48[2][3] = local_a0.z;
-        Graphic.DrawSphere(local_48, local_a8);
+        PSMTXIdentity(mtx.cameraMtx);
+        PSMTXIdentity(mtx.sphereMtx);
+        mtx.sphereMtx[0][0] = radius;
+        mtx.sphereMtx[1][1] = radius;
+        mtx.sphereMtx[2][2] = radius;
+        PSMTXConcat(ppvCameraMatrix02, mtx.cameraMtx, mtx.cameraMtx);
+        PSMTXMultVec(mtx.cameraMtx, &local_94, &local_a0);
+        mtx.sphereMtx[0][3] = local_a0.x;
+        mtx.sphereMtx[1][3] = local_a0.y;
+        mtx.sphereMtx[2][3] = local_a0.z;
+        Graphic.DrawSphere(mtx.sphereMtx, local_a8);
     }
 }

@@ -106,7 +106,7 @@ void CUSB::AddMessageCallback(MessageCallback callback, void* callerContext)
 		{
 			if (callbackEntry->m_callback == callback)
 			{
-				System.Printf("CUSB.AddMessageCallback: 同じ");
+				System.Printf("CUSB.AddMessageCallback: 同じイベント関数が既に登録されています。\n");
 				break;
 			}
 			continue;
@@ -120,7 +120,7 @@ void CUSB::AddMessageCallback(MessageCallback callback, void* callerContext)
 
 	if (i == 8U)
 	{
-		System.Printf("CUSB.AddMessageCallback: イベント");
+		System.Printf("CUSB.AddMessageCallback: イベント関数が追加できません。\n");
 	}
 }
 
@@ -136,7 +136,7 @@ void CUSB::AddMessageCallback(MessageCallback callback, void* callerContext)
 void CUSB::RemoveMessageCallback(MessageCallback callback)
 {
     CUSBCallbackEntry* callbackEntry;
-    int i;
+    unsigned int i;
 
     for (callbackEntry = m_callbacks, i = 0; i < 8; callbackEntry++, i++)
     {
@@ -147,9 +147,9 @@ void CUSB::RemoveMessageCallback(MessageCallback callback)
         }
     }
 
-    if (i == 8)
+    if (i == 8U)
     {
-        System.Printf("RemoveMessageCallback: callback not found\n");
+        System.Printf("CUSB.AddMessageCallback: イベント関数は登録されていません。\n");
     }
 }
 

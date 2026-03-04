@@ -1,5 +1,4 @@
 #include "ffcc/pppConstrainCameraForLoc.h"
-#include "ffcc/p_camera.h"
 #include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
 #include <dolphin/mtx.h>
@@ -8,6 +7,17 @@
 extern int DAT_8032ec70;
 extern float lbl_803331A8;
 extern void GetDirectVector__5CUtilFP3VecP3Vec3Vec(void*, Vec*, Vec*, Vec*);
+extern struct {
+    int field0_0x0;
+    Mtx m_cameraMatrix;
+    unsigned char field34_0xe0[0xAC];
+    float _224_4_;
+    float _228_4_;
+    float _232_4_;
+    float _236_4_;
+    float _240_4_;
+    float _244_4_;
+} CameraPcs;
 
 // Function signatures from Ghidra decomp
 extern "C" int GetModelPtr__FP8CGObject(CGObject*);
@@ -25,8 +35,24 @@ extern "C" void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(pppConstrainCameraFo
  */
 int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
 {
-    float* params = (float*)param_2;
-    float fVar1 = params[0x10];
+    struct ConstrainCameraForLocModel {
+        unsigned char field0_0x0[0x38];
+        Mtx m_worldBaseMtx;
+        Mtx m_drawMtx;
+    };
+    struct ConstrainCameraForLocWork {
+        float field0_0x0;
+        float field4_0x4;
+        float field8_0x8;
+        float fieldc_0xc;
+        Mtx m_worldBaseMtx;
+        void* m_owner;
+    };
+
+    ConstrainCameraForLocWork* work = (ConstrainCameraForLocWork*)param_2;
+    ConstrainCameraForLocModel* constrainModel = (ConstrainCameraForLocModel*)model;
+    unsigned char* owner = (unsigned char*)work->m_owner;
+    float fVar1;
     float fVar2;
     float fVar3;
     float local_f8;
@@ -41,15 +67,15 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
     Mtx local_98;
     Mtx local_68;
 
-    local_f8 = *(float*)((char*)&CameraPcs + 0xec);
-    local_f4 = *(float*)((char*)&CameraPcs + 0xf0);
-    local_f0 = *(float*)((char*)&CameraPcs + 0xf4);
-    local_bc.x = *(float*)((char*)&CameraPcs + 0xe0);
-    local_bc.y = *(float*)((char*)&CameraPcs + 0xe4);
-    local_bc.z = *(float*)((char*)&CameraPcs + 0xe8);
-    PSMTXCopy(*(Mtx*)((char*)&CameraPcs + 4), local_68);
+    local_f8 = CameraPcs._236_4_;
+    local_f4 = CameraPcs._240_4_;
+    local_f0 = CameraPcs._244_4_;
+    local_bc.x = CameraPcs._224_4_;
+    local_bc.y = CameraPcs._228_4_;
+    local_bc.z = CameraPcs._232_4_;
+    PSMTXCopy(CameraPcs.m_cameraMatrix, local_68);
 
-    local_a4.z = params[0];
+    local_a4.z = work->field0_0x0;
     local_a4.x = local_a4.z * local_f8;
     local_a4.y = local_a4.z * local_f4;
     local_a4.z = local_a4.z * local_f0;
@@ -59,13 +85,13 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
         PSMTXInverse(local_68, local_98);
     }
 
-    PSMTXIdentity(*(Mtx*)((char*)model + 0x68));
-    PSMTXIdentity(*(Mtx*)((char*)model + 0x38));
-    PSMTXConcat(local_98, *(Mtx*)((char*)model + 0x38), *(Mtx*)((char*)model + 0x38));
+    PSMTXIdentity(constrainModel->m_drawMtx);
+    PSMTXIdentity(constrainModel->m_worldBaseMtx);
+    PSMTXConcat(local_98, constrainModel->m_worldBaseMtx, constrainModel->m_worldBaseMtx);
     PSVECAdd(&local_bc, &local_a4, &local_a4);
 
-    fVar3 = *(float*)((int)fVar1 + 0x1c);
-    fVar2 = *(float*)((int)fVar1 + 0x2c);
+    fVar3 = *(float*)(owner + 0x1c);
+    fVar2 = *(float*)(owner + 0x2c);
     GetDirectVector__5CUtilFP3VecP3Vec3Vec((void*)&DAT_8032ec70, &local_c8, &local_d4, (Vec*)&local_f8);
 
     local_e0.x = fVar3 * local_c8.x;
@@ -78,23 +104,23 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
     PSVECAdd(&local_a4, &local_ec, &local_a4);
 
     fVar1 = lbl_803331A8;
-    *(float*)((char*)model + 0x44) = lbl_803331A8;
-    *(float*)((char*)model + 0x54) = fVar1;
-    *(float*)((char*)model + 0x64) = fVar1;
+    constrainModel->m_worldBaseMtx[0][3] = lbl_803331A8;
+    constrainModel->m_worldBaseMtx[1][3] = fVar1;
+    constrainModel->m_worldBaseMtx[2][3] = fVar1;
     if (Game.game.m_currentSceneId == 7) {
-        *(float*)((char*)model + 0x74) = fVar1;
-        *(float*)((char*)model + 0x84) = fVar1;
-        *(float*)((char*)model + 0x94) = fVar1;
+        constrainModel->m_drawMtx[0][3] = fVar1;
+        constrainModel->m_drawMtx[1][3] = fVar1;
+        constrainModel->m_drawMtx[2][3] = fVar1;
     } else {
-        *(float*)((char*)model + 0x74) = local_a4.x;
-        *(float*)((char*)model + 0x84) = local_a4.y;
-        *(float*)((char*)model + 0x94) = local_a4.z;
+        constrainModel->m_drawMtx[0][3] = local_a4.x;
+        constrainModel->m_drawMtx[1][3] = local_a4.y;
+        constrainModel->m_drawMtx[2][3] = local_a4.z;
     }
 
-    PSMTXCopy(*(Mtx*)((char*)model + 0x38), *(Mtx*)((char*)params + 0x10));
-    params[7] = local_a4.x;
-    params[0xb] = local_a4.y;
-    params[0xf] = local_a4.z;
+    PSMTXCopy(constrainModel->m_worldBaseMtx, work->m_worldBaseMtx);
+    work->m_worldBaseMtx[0][3] = local_a4.x;
+    work->m_worldBaseMtx[1][3] = local_a4.y;
+    work->m_worldBaseMtx[2][3] = local_a4.z;
     return 1;
 }
 

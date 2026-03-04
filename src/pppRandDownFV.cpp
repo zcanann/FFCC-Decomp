@@ -65,13 +65,7 @@ void pppRandDownFV(void* param1, void* param2, void* param3)
     }
 
     s32 sourceOffset = in->field4;
-    f32* target;
-    if (sourceOffset == -1) {
-        f32* source = lbl_801EADC8;
-        target = source;
-    } else {
-        target = (f32*)(base + sourceOffset + 0x80);
-    }
+    f32* target = (sourceOffset == -1) ? lbl_801EADC8 : (f32*)(base + sourceOffset + 0x80);
 
     f32 scale = *valuePtr;
     f32 value = in->field8 * scale;

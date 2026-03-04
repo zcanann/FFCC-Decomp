@@ -105,12 +105,7 @@ void pppSRandFV(void* param1, void* param2, void* param3)
         valuePtr = (float*)(base + *out->fieldC + 0x80);
     }
 
-    float* target;
-    if (in->field4 == -1) {
-        target = lbl_801EADC8;
-    } else {
-        target = (float*)(base + in->field4 + 0x80);
-    }
+    float* target = (in->field4 == -1) ? &lbl_801EADC8[0] : (float*)(base + in->field4 + 0x80);
 
     float value = in->field8 * valuePtr[0] - in->field8;
     target[0] = target[0] + value;

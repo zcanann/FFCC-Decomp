@@ -33,70 +33,6 @@ extern int lbl_8032ED70;
 
 /*
  * --INFO--
- * PAL Address: 0x801555d8
- * PAL Size: 84b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppConScreenBlur(void* param1, void* param2)
-{
-    pppScreenBlur* blur = (pppScreenBlur*)param1;
-    pppScreenBlurOffsets* offsets = (pppScreenBlurOffsets*)param2;
-    s32 blurOffset = offsets->m_serializedDataOffsets[1] + 0x80;
-
-    InitBlurParameter__8CGraphicFv(Graphic);
-    blur->data[blurOffset] = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801555d4
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppCon2ScreenBlur(void)
-{
-    return;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801555ac
- * PAL Size: 40b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppDesScreenBlur(void)
-{
-    InitBlurParameter__8CGraphicFv(Graphic);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x801555a0
- * PAL Size: 12b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppFrameScreenBlur(void)
-{
-    if (lbl_8032ED70 == 0) {
-        return;
-    }
-    return;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80155504
  * PAL Size: 156b
  * EN Address: TODO
@@ -120,4 +56,68 @@ void pppRenderScreenBlur(void* param1, void* param2, void* param3)
     pppInitBlendMode();
     GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
     blur->data[blurActiveOffset] = 1;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801555a0
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppFrameScreenBlur(void)
+{
+    if (lbl_8032ED70 == 0) {
+        return;
+    }
+    return;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801555ac
+ * PAL Size: 40b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppDesScreenBlur(void)
+{
+    InitBlurParameter__8CGraphicFv(Graphic);
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801555d4
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppCon2ScreenBlur(void)
+{
+    return;
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801555d8
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConScreenBlur(void* param1, void* param2)
+{
+    pppScreenBlur* blur = (pppScreenBlur*)param1;
+    pppScreenBlurOffsets* offsets = (pppScreenBlurOffsets*)param2;
+    s32 blurOffset = offsets->m_serializedDataOffsets[1] + 0x80;
+
+    InitBlurParameter__8CGraphicFv(Graphic);
+    blur->data[blurOffset] = 0;
 }

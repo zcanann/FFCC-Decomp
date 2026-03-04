@@ -63,18 +63,18 @@ extern "C" void pppRandDownHCV(void* param1, void* param2, void* param3)
     if (in->field0 == *(s32*)(base + 0xC)) {
         value = -RandF__5CMathFv(math);
         if (in->field10 != 0) {
-            value = (value - RandF__5CMathFv(math)) * lbl_8032FF48;
+            value = lbl_8032FF48 * (value - RandF__5CMathFv(math));
         }
 
-        outputOffset = *out->fieldC + 0x80;
+        outputOffset = *out->fieldC;
         valuePtr = (f32*)(base + outputOffset);
-        *valuePtr = value;
+        valuePtr[0x20] = value;
     } else {
         if (in->field0 != *(s32*)(base + 0xC)) {
             return;
         }
-        outputOffset = *out->fieldC + 0x80;
-        valuePtr = (f32*)(base + outputOffset);
+        outputOffset = *out->fieldC;
+        valuePtr = (f32*)(base + outputOffset + 0x80);
     }
 
     if (in->field4 == -1) {

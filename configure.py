@@ -568,7 +568,7 @@ config.libs = [
             Object(NonMatching, "pppRandCV.cpp"),
             Object(NonMatching, "pppRandDownChar.cpp"),
             Object(NonMatching, "pppRandDownCV.cpp"),
-            Object(NonMatching, "pppRandDownFloat.cpp"),
+            Object(NonMatching, "pppRandDownFloat.cpp", cflags=cflags_game_cpp_exceptions),
             Object(NonMatching, "pppRandDownFV.cpp"),
             Object(NonMatching, "pppRandDownHCV.cpp"),
             Object(NonMatching, "pppRandDownInt.cpp"),

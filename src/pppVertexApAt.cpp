@@ -106,7 +106,7 @@ void pppVertexApAt(_pppPObject* parent, PVertexApAt* data, void* ctrl)
     }
 
     if (state->countdown == 0) {
-        u8 count = vtxData->spawnCount;
+        int count = vtxData->spawnCount;
         VertexApAtEntry* entry = &lbl_8032ED54->entries[vtxData->entryIndex];
 
         switch (vtxData->mode) {
@@ -137,7 +137,7 @@ void pppVertexApAt(_pppPObject* parent, PVertexApAt* data, void* ctrl)
             break;
         case 1:
             while (count-- != 0) {
-                u16 outValue = (u16)(RandF__5CMathFv(&math) * (f32)entry->maxValue);
+                int outValue = (int)(RandF__5CMathFv(&math) * (f32)entry->maxValue);
 
                 if ((vtxData->childId + 0x10000) != 0xFFFF) {
                     s32 childId = vtxData->childId;
@@ -151,7 +151,7 @@ void pppVertexApAt(_pppPObject* parent, PVertexApAt* data, void* ctrl)
                         *(void**)((u8*)child + 0x4) = parent;
                     }
 
-                    *(u16*)((u8*)child + vtxData->childValueOffset + 0x80) = outValue;
+                    *(u16*)((u8*)child + vtxData->childValueOffset + 0x80) = (u16)outValue;
                 }
             }
             break;

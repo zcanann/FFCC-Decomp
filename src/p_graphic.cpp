@@ -646,7 +646,7 @@ void CGraphicPcs::stdDrawEnvInit()
 	*(u32*)(MaterialMan + 0x128) = *(u32*)(MaterialMan + 0x11C);
 	*(u32*)(MaterialMan + 0x12C) = *(u32*)(MaterialMan + 0x120);
 	*(u32*)(MaterialMan + 0x130) = *(u32*)(MaterialMan + 0x124);
-	*(u32*)(MaterialMan + 0x58) = *(u32*)(MaterialMan + 0x48);
+	*(u32*)(MaterialMan + 0x40) = *(u32*)(MaterialMan + 0x48);
 }
 
 /*

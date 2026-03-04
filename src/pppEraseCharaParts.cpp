@@ -91,7 +91,7 @@ void pppDestructEraseCharaParts(void)
     void* handle;
     int model;
 
-    handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)(lbl_8032ED50 + 0xE0), 0);
+    handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)(lbl_8032ED50 + 0xD8), 0);
     model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
     *(void**)(model + 0xE4) = 0;
     *(void**)(model + 0xE8) = 0;

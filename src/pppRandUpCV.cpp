@@ -31,14 +31,15 @@ struct RandUpCVCtx {
  */
 void pppRandUpCV(void* param1, void* param2, void* param3)
 {
-    u8* base = (u8*)param1;
-    RandUpCVParam* in = (RandUpCVParam*)param2;
-    RandUpCVCtx* ctx = (RandUpCVCtx*)param3;
-    f32* valuePtr;
-
     if (lbl_8032ED70 != 0) {
         return;
     }
+
+    u8* base = (u8*)param1;
+    RandUpCVParam* in = (RandUpCVParam*)param2;
+    RandUpCVCtx* ctx = (RandUpCVCtx*)param3;
+    u8* target;
+    f32* valuePtr;
 
     if (in->targetId == *(s32*)(base + 0xC)) {
         f32 value = RandF__5CMathFv(math);
@@ -53,7 +54,6 @@ void pppRandUpCV(void* param1, void* param2, void* param3)
     }
 
     s32 colorOffset = in->sourceOffset;
-    u8* target;
     if (colorOffset == -1) {
         target = lbl_801EADC8;
     } else {

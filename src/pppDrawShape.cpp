@@ -78,7 +78,7 @@ void pppCalcShape(void* pppShape, void* data, void* additionalData)
 	ShapeState* shapeData = (ShapeState*)((u8*)pppShape + runtimeData->shapeDataOffset + 0x80);
 	u32 type = *(u32*)((u8*)controlData + 4);
 
-	if ((u16)type == 0xFFFF) {
+	if ((type + 0x10000) == 0xFFFF) {
 		return;
 	}
 
@@ -125,7 +125,7 @@ void pppDrawShape(void* pppShape, void* data, void* additionalData)
 	void* posData = (u8*)pppShape + runtimeData->posDataOffset + 0x80;
 	u32 type = *(u32*)((u8*)controlData + 4);
 
-	if ((u16)type == 0xFFFF) {
+	if ((type + 0x10000) == 0xFFFF) {
 		return;
 	}
 

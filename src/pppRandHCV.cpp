@@ -40,39 +40,33 @@ void pppRandHCV(void* p1, void* p2, void* p3)
     u8* base = (u8*)p1;
     RandHCVParams* params = (RandHCVParams*)p2;
     RandHCVCtx* ctx = (RandHCVCtx*)p3;
-    s16* target;
-    f32 value;
-    s32 colorOffset;
-    s32 outputOffset;
+    f32* randomValue;
 
     if (lbl_8032ED70 != 0) {
         return;
     }
 
     if (params->field0 == *(s32*)(base + 0xC)) {
-        value = RandF__5CMathFv(&math[0]);
+        f32 value = RandF__5CMathFv(&math[0]);
         if (params->field10 != 0) {
             value += RandF__5CMathFv(&math[0]);
         } else {
             value *= lbl_8032FF98;
         }
 
-        *(f32*)(base + *ctx->fieldC + 0x80) = value;
-    } else if (params->field0 != *(s32*)(base + 0xC)) {
-        return;
-    }
-
-    colorOffset = params->field4;
-    outputOffset = *ctx->fieldC + 0x80;
-
-    if (colorOffset == -1) {
-        target = lbl_801EADC8;
+        randomValue = (f32*)(base + *ctx->fieldC + 0x80);
+        *randomValue = value;
     } else {
-        target = (s16*)(base + colorOffset + 0x80);
+        if (params->field0 != *(s32*)(base + 0xC)) {
+            return;
+        }
+        randomValue = (f32*)(base + *ctx->fieldC + 0x80);
     }
+
+    s16* target = (params->field4 == -1) ? lbl_801EADC8 : (s16*)(base + params->field4 + 0x80);
 
     {
-        f32 scale = *(f32*)(base + outputOffset);
+        f32 scale = *randomValue;
 
         target[0] = (s16)(target[0] + (s32)((f32)params->field8 * scale - (f32)params->field8));
         target[1] = (s16)(target[1] + (s32)((f32)params->fieldA * scale - (f32)params->fieldA));

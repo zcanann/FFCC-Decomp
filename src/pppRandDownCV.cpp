@@ -1,12 +1,27 @@
 #include "ffcc/pppRandDownCV.h"
 #include "ffcc/math.h"
-#include "dolphin/types.h"
+#include "types.h"
 
-extern CMath math;
-extern int lbl_8032ED70;
+extern CMath math[];
+extern s32 lbl_8032ED70;
 extern u8 lbl_801EADC8[];
-extern float lbl_8032FF28;
-extern "C" float RandF__5CMathFv(CMath*);
+extern f32 lbl_8032FF28;
+extern "C" f32 RandF__5CMathFv(CMath*);
+
+struct PppRandDownCVParam2 {
+    s32 field0;
+    s32 field4;
+    s8 field8;
+    s8 field9;
+    s8 fieldA;
+    s8 fieldB;
+    u8 fieldC;
+};
+
+struct PppRandDownCVParam3 {
+    u8 field0[0xC];
+    s32* fieldC;
+};
 
 extern "C" {
 
@@ -17,7 +32,7 @@ extern "C" {
  */
 void randchar(char value, float multiplier)
 {
-    // Simple random char generation function
+    return;
 }
 
 /*
@@ -31,56 +46,42 @@ void randchar(char value, float multiplier)
  */
 void pppRandDownCV(void* param1, void* param2, void* param3)
 {
+    u8* base = (u8*)param1;
+    PppRandDownCVParam2* in = (PppRandDownCVParam2*)param2;
+    PppRandDownCVParam3* out = (PppRandDownCVParam3*)param3;
+    f32* valuePtr;
+    f32 value;
+
     if (lbl_8032ED70 != 0) {
         return;
     }
 
-    if (*(int*)param2 == *((int*)param1 + 3)) {
-        float rand_value = -RandF__5CMathFv(&math);
-        if (*((u8*)param2 + 0xc) != 0) {
-            rand_value = (rand_value - RandF__5CMathFv(&math)) * lbl_8032FF28;
+    if (in->field0 == *(s32*)(base + 0xC)) {
+        value = -RandF__5CMathFv(math);
+        if (in->fieldC != 0) {
+            value = (value - RandF__5CMathFv(math)) * lbl_8032FF28;
         }
-
-        int data_offset = **(int**)((char*)param3 + 0xc);
-        *(float*)((char*)param1 + data_offset + 0x80) = rand_value;
+        valuePtr = (f32*)(base + *out->fieldC + 0x80);
+        *valuePtr = value;
+    } else {
+        if (in->field0 != *(s32*)(base + 0xC)) {
+            return;
+        }
+        valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
 
-    if (*(int*)param2 != *((int*)param1 + 3)) {
-        return;
-    }
-
-    int data_offset = **(int**)((char*)param3 + 0xc);
-    float* random_value = (float*)((char*)param1 + data_offset + 0x80);
-    int color_offset = *((int*)param2 + 1);
     u8* target;
-
-    if (color_offset == -1) {
+    if (in->field4 == -1) {
         target = lbl_801EADC8;
     } else {
-        target = (u8*)((u8*)param1 + color_offset + 0x80);
+        target = (u8*)(base + in->field4 + 0x80);
     }
 
-    float scale = random_value[0];
-
-    {
-        char base = *(char*)((char*)param2 + 0x8);
-        target[0] = (char)(target[0] + (int)((float)base * scale));
-    }
-
-    {
-        char base = *(char*)((char*)param2 + 0x9);
-        target[1] = (char)(target[1] + (int)((float)base * scale));
-    }
-
-    {
-        char base = *(char*)((char*)param2 + 0xa);
-        target[2] = (char)(target[2] + (int)((float)base * scale));
-    }
-
-    {
-        char base = *(char*)((char*)param2 + 0xb);
-        target[3] = (char)(target[3] + (int)((float)base * scale));
-    }
+    f32 scale = *valuePtr;
+    target[0] = (u8)(target[0] + (s32)((f32)in->field8 * scale));
+    target[1] = (u8)(target[1] + (s32)((f32)in->field9 * scale));
+    target[2] = (u8)(target[2] + (s32)((f32)in->fieldA * scale));
+    target[3] = (u8)(target[3] + (s32)((f32)in->fieldB * scale));
 }
 
 }

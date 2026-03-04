@@ -3,21 +3,16 @@
 
 #include "ffcc/partMng.h"
 
-/*static const _pppDataHead::pppProg pppSysProgTbl[]; = {
-    
-    { {
-        (char*)nullptr,
-        (char*)nullptr,
-        (char*)nullptr,
-        (char*)nullptr,
-        (char*)nullptr,
-        (char*)nullptr,
-        (char*)nullptr,
-        (char*)nullptr,
-        (char*)nullptr,
-        (char*)nullptr,
-        (char*)nullptr
-    } },
-};*/ // 159 entries
+struct _pppSysProgTbl
+{
+    pppProg* m_progs;
+};
+
+extern _pppSysProgTbl pppSysProgTbl;
+
+static inline pppProg* pppGetSysProgTable()
+{
+    return pppSysProgTbl.m_progs;
+}
 
 #endif // _FFCC_FUNCTBL_H_

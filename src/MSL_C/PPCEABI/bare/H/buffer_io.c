@@ -29,23 +29,26 @@ int __load_buffer(FILE* file, size_t* bytes_loaded, int mode)
 		*bytes_loaded = file->buffer_length;
 	}
 	
-	if (ioresult == 0) {
+	if (ioresult != 0) {
+		return ioresult;
+	}
+
+	{
 		int i;
 		file->position += file->buffer_length;
 		if (!file->file_mode.binary_io) {
 			buffer_start = file->buffer;
 			for (i = file->buffer_length; i != 0; i--) {
-				char c = *buffer_start;
+				unsigned char c = *buffer_start;
 				buffer_start++;
 				if (c == '\n') {
 					file->position++;
 				}
 			}
 		}
-		ioresult = 0;
 	}
 	
-	return ioresult;
+	return 0;
 }
 
 /*

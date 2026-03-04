@@ -42,11 +42,10 @@ public:
  */
 void* pppShapeSt::GetTexture(long* animData, CMaterialSet* materialSet, int& textureIndex)
 {
-    int shapeOffset = *(short*)((int)animData + 0x10);
-    int materialIndex = *((unsigned char*)animData + shapeOffset + 0xA);
-    textureIndex = materialIndex;
-    CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>((char*)materialSet + 8))
-                              [materialIndex];
+    unsigned char* shape = (unsigned char*)animData + *(short*)((int)animData + 0x10) + 8;
+
+    textureIndex = shape[2];
+    CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>((char*)materialSet + 8))[shape[2]];
     return *(void**)((char*)material + 0x3C);
 }
 

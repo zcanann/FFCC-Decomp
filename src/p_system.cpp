@@ -143,9 +143,9 @@ void CSystemPcs::calc()
         if (debugPad == 0) {
             debugPad = Pad._1b4_4_ + 2;
         }
-        Pad._1b4_4_ = debugPad;
         if (debugPad > 3) {
-            Pad._1b4_4_ = -1;
+            debugPad = -1;
         }
+        Pad._1b4_4_ = debugPad;
     }
 }

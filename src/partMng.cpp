@@ -9,6 +9,7 @@
 #include "ffcc/materialman.h"
 #include "ffcc/math.h"
 #include "ffcc/p_game.h"
+#include "ffcc/pppfunctbl.h"
 #include "ffcc/stopwatch.h"
 
 #include <string.h>
@@ -85,11 +86,6 @@ extern unsigned char MapPcs[];
 extern void* CAMemCacheSet;
 extern CPartMng PartMng;
 extern PPPCREATEPARAM g_dcp;
-struct _pppSysProgTbl
-{
-    pppProg* m_progs;
-};
-extern _pppSysProgTbl pppSysProgTbl;
 static char s_partMng_cpp_801d8230[] = "partMng.cpp";
 static char s_pppGetFreePppDataMngSt_CAN_NOT_ALLOC[] = "pppGetFreePppDataMngSt CAN NOT ALLOC!!\n";
 static char s_CheckSum_ERROR_code_0x_x____801d82f0[] = "CheckSum ERROR code[0x%x]!!!";
@@ -1473,7 +1469,95 @@ void CPartMng::pppRefCnt0Up()
  */
 void CPartMng::pppDumpCacheIdx()
 {
-	// TODO
+    struct PppPartResourceRaw {
+        short m_cacheIndex;
+        short m_pad;
+        long* m_pdt;
+    };
+
+    struct PppMngStDumpRaw {
+        void* m_pppResSet;              // 0x00
+        int m_partIndex;                // 0x04
+        unsigned char m_pad08[0x14 - 8];
+        int m_baseTime;                 // 0x14
+        unsigned char m_pad18[0xA8 - 0x18];
+        unsigned char m_envColorR;      // 0xA8
+        unsigned char m_envColorG;      // 0xA9
+        unsigned char m_envColorB;      // 0xAA
+        unsigned char m_envColorA;      // 0xAB
+        int m_spawnedCount;             // 0xAC
+        unsigned char m_padB0[0xE4 - 0xB0];
+        unsigned char m_endRequested;   // 0xE4
+        unsigned char m_stopRequested;  // 0xE5
+        unsigned char m_isFinished;     // 0xE6
+        unsigned char m_matrixMode;     // 0xE7
+        unsigned char m_hitBgFlag;      // 0xE8
+        unsigned char m_slotVisible;    // 0xE9
+        unsigned char m_ownerFacing;    // 0xEA
+        unsigned char m_drawVariant;    // 0xEB
+        unsigned char m_rotationOrder;  // 0xEC
+        unsigned char m_drawPass;       // 0xED
+        signed char m_drawSubType;      // 0xEE
+        unsigned char m_useOwnerScaleSign; // 0xEF
+        unsigned char m_ownerFlagsInitialized; // 0xF0
+        unsigned char m_nodeScaleInitialized;  // 0xF1
+        unsigned char m_fieldF2;        // 0xF2
+        unsigned char m_padF3[0xF6 - 0xF3];
+        unsigned char m_hasMapRef;      // 0xF6
+    };
+
+    pppSetRendMatrix();
+
+    PppMngStDumpRaw* mng = reinterpret_cast<PppMngStDumpRaw*>(reinterpret_cast<unsigned char*>(this) + 0x1D4);
+    for (int i = 0; i < 0x180; i++) {
+        if ((Game.game.m_gameWork.m_gamePaused == 0 || (mng->m_drawVariant > 5 && mng->m_drawVariant < 8)) &&
+            mng->m_baseTime != -0x1000 && mng->m_endRequested == 0) {
+            pppMngStPtr = reinterpret_cast<_pppMngSt*>(mng);
+            pppEnvStPtr = reinterpret_cast<_pppEnvSt*>(reinterpret_cast<unsigned char*>(mng->m_pppResSet) + 4);
+
+            if (mng->m_baseTime >= 0) {
+                mng->m_baseTime--;
+                if (mng->m_baseTime < 0) {
+                    _pppDataHead* pdtHead = *reinterpret_cast<_pppDataHead**>(mng->m_pppResSet);
+                    PppPartResourceRaw* partResource =
+                        reinterpret_cast<PppPartResourceRaw*>(reinterpret_cast<unsigned char*>(pdtHead->m_cacheChunks) +
+                                                              mng->m_partIndex * sizeof(PppPartResourceRaw));
+
+                    CAmemCacheSet* cacheSet = reinterpret_cast<CAmemCacheSet*>(CAMemCacheSet);
+                    if (cacheSet->IsEnable(partResource->m_cacheIndex) == 0) {
+                        partResource->m_pdt = reinterpret_cast<long*>(
+                            cacheSet->GetData(partResource->m_cacheIndex, s_partMng_cpp_801d8230, 0x9A9));
+                        pppInitPdt(partResource->m_pdt, pppGetSysProgTable());
+                    }
+
+                    cacheSet->AddRef(partResource->m_cacheIndex);
+                    mng->m_hasMapRef = 1;
+                    _pppStartPart(reinterpret_cast<_pppMngSt*>(mng), partResource->m_pdt, 1);
+                }
+            }
+
+            pppSetMatrix(reinterpret_cast<_pppMngSt*>(mng));
+            pppSetFpMatrix(reinterpret_cast<_pppMngSt*>(mng));
+
+            mng->m_spawnedCount += *reinterpret_cast<int*>(&mng->m_envColorR);
+            DAT_8032ed79 = 0;
+
+            while (mng->m_spawnedCount > 0xFFF) {
+                _pppCalcPart(reinterpret_cast<_pppMngSt*>(mng));
+                _pppDeadPart(reinterpret_cast<_pppMngSt*>(mng));
+                if (mng->m_isFinished != 0) {
+                    break;
+                }
+
+                DAT_8032ed79 = 1;
+                mng->m_spawnedCount -= 0x1000;
+            }
+
+            DAT_8032ed79 = 0;
+        }
+
+        mng = reinterpret_cast<PppMngStDumpRaw*>(reinterpret_cast<unsigned char*>(mng) + 0x158);
+    }
 }
 
 /*
@@ -1955,7 +2039,7 @@ void CPartMng::pppLoadPdt(const char* baseName, int pdtSlotIndex, int cachePrior
                 pdtFile.PushChunk();
                 if (childChunk.m_id == 0x50445453) { // "PDTS"
                     _pppDataHead* sourceHead = reinterpret_cast<_pppDataHead*>(pdtFile.GetAddress());
-                    pppInitData(sourceHead, pppSysProgTbl.m_progs, cachePriority);
+                    pppInitData(sourceHead, pppGetSysProgTable(), cachePriority);
 
                     unsigned long copySize = sourceHead->m_partCount * 0x60 + 0x20;
                     _pppDataHead* copiedHead = static_cast<_pppDataHead*>(

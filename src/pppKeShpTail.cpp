@@ -51,13 +51,10 @@ void pppKeShpTail(_pppPObject* obj, UnkB*, UnkC* offsets)
 		pppCopyVector(local_14, local_20);
 
 		Vec* tailVec = work->m_posHistory;
-		int count = work->m_count;
-		if (count != 0) {
-			do {
-				pppCopyVector(*tailVec, local_14);
-				count--;
-				tailVec++;
-			} while ((u8)count != 0);
+		s32 count = work->m_count;
+		for (; count > 0; count--) {
+			pppCopyVector(*tailVec, local_14);
+			tailVec++;
 		}
 	}
 

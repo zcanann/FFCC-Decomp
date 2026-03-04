@@ -5,8 +5,8 @@
 
 #include "dolphin/gx/__gx.h"
 
-static __GXFifoObj DisplayListFifo;
-static volatile __GXFifoObj* OldCPUFifo;
+static __GXFifoObj lbl_80327CF8;
+static volatile __GXFifoObj* lbl_8032F348;
 static GXData __savedGXdata;
 
 void GXBeginDisplayList(void* list, u32 size) {
@@ -25,16 +25,16 @@ void GXBeginDisplayList(void* list, u32 size) {
         memcpy(&__savedGXdata, __GXData, sizeof(__savedGXdata));
     }
 
-    DisplayListFifo.base = (u8*)list;
-    DisplayListFifo.top = (u8*)list + size - 4;
-    DisplayListFifo.size = size;
-    DisplayListFifo.count = 0;
-    DisplayListFifo.rdPtr = list;
-    DisplayListFifo.wrPtr = list;
+    lbl_80327CF8.base = (u8*)list;
+    lbl_80327CF8.top = (u8*)list + size - 4;
+    lbl_80327CF8.size = size;
+    lbl_80327CF8.count = 0;
+    lbl_80327CF8.rdPtr = list;
+    lbl_80327CF8.wrPtr = list;
     __GXData->inDispList = 1;
     GXSaveCPUFifo((GXFifoObj*)CPUFifo);
-    OldCPUFifo = CPUFifo;
-    GXSetCPUFifo((GXFifoObj*)&DisplayListFifo);
+    lbl_8032F348 = CPUFifo;
+    GXSetCPUFifo((GXFifoObj*)&lbl_80327CF8);
 }
 
 u32 GXEndDisplayList(void) {
@@ -56,9 +56,9 @@ u32 GXEndDisplayList(void) {
 #else
     ov = (GX_GET_PI_REG(5) >> 26) & 1;
 #endif
-    __GXSaveCPUFifoAux(&DisplayListFifo);
+    __GXSaveCPUFifoAux(&lbl_80327CF8);
     ASSERTMSGLINE(213, !ov, "GXEndDisplayList: display list commands overflowed buffer");
-    GXSetCPUFifo((GXFifoObj*)OldCPUFifo);
+    GXSetCPUFifo((GXFifoObj*)lbl_8032F348);
 
     if (__GXData->dlSaveContext != 0) {
         enabled = OSDisableInterrupts();
@@ -70,19 +70,21 @@ u32 GXEndDisplayList(void) {
 
     __GXData->inDispList = 0;
     if (!ov) {
-        return DisplayListFifo.count;
+        return lbl_80327CF8.count;
     }
 
     return 0;
 }
 
 void GXCallDisplayList(void* list, u32 nbytes) {
+    GXData* gx = __GXData;
+
     CHECK_GXBEGIN(254, "GXCallDisplayList");
     ASSERTMSGLINE(255, !__GXData->inDispList, "GXCallDisplayList: display list already in progress");
     ASSERTMSGLINE(256, (nbytes & 0x1F) == 0, "GXCallDisplayList: nbytes is not 32 byte aligned");
     ASSERTMSGLINE(257, ((u32)list & 0x1F) == 0, "GXCallDisplayList: list is not 32 byte aligned");
 
-    if (__GXData->dirtyState != 0) {
+    if (gx->dirtyState != 0) {
         __GXSetDirtyState();
     }
 
@@ -90,7 +92,7 @@ void GXCallDisplayList(void* list, u32 nbytes) {
     __GXShadowDispList(list, nbytes);
 #endif
 
-    if (*(u32*)&__GXData->vNumNot == 0) {  // checks both vNum and bpSent
+    if (*(u32*)&gx->vNumNot == 0) {  // checks both vNum and bpSent
         __GXSendFlushPrim();
     }
 

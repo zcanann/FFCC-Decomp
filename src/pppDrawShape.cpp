@@ -142,8 +142,8 @@ void pppDrawShape(void* pppShape, void* data, void* additionalData)
 		controlData->paramE,
 		controlData->blendMode,
 		0,
-		controlData->param14,
 		1,
+		controlData->param14,
 		0
 	);
 

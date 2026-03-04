@@ -78,13 +78,3 @@ void pppRandUpCV(void* param1, void* param2, void* param3)
         target[3] = (u8)(target[3] + (s32)((f32)in->delta[3] * scale));
     }
 }
-
-/*
- * --INFO--
- * Address: TODO  
- * Size: TODO
- */
-void randchar(char, float)
-{
-    // TODO - appears to be unused based on objdiff
-}

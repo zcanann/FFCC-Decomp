@@ -2,6 +2,8 @@
 
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common_Embedded/Math/fdlibm.h"
 
+extern float lbl_80330CD8;
+
 /*
  * --INFO--
  * Address:	TODO
@@ -44,9 +46,10 @@ CVector::CVector(const Vec& vec)
  */
 void CVector::Identity()
 {
-	this->z = 0.0f;
-	this->y = 0.0f;
-	this->x = 0.0f;
+	float zero = lbl_80330CD8;
+	this->z = zero;
+	this->y = zero;
+	this->x = zero;
 }
 
 /*

@@ -1225,9 +1225,9 @@ void __MidiCtrl_Sweep(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  * Address:	TODO
  * Size:	TODO
  */
-void __MidiCtrl_TenutoOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_TenutoOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    ((unsigned int*)track)[0x41] |= 0x00200000;
 }
 
 /*
@@ -1235,9 +1235,9 @@ void __MidiCtrl_TenutoOn(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
  * Address:	TODO
  * Size:	TODO
  */
-void __MidiCtrl_TenutoOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA*)
+void __MidiCtrl_TenutoOff(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
 {
-	// TODO
+    ((unsigned int*)track)[0x41] &= ~0x00200000;
 }
 
 /*

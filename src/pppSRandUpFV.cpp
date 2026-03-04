@@ -33,65 +33,64 @@ extern "C" void pppSRandUpFV(void* param1, void* param2, void* param3)
         s32* outputOffset;
     };
 
-    u8* base = (u8*)param1;
-    SRandUpFVParam* in = (SRandUpFVParam*)param2;
-    SRandUpFVCtx* ctx = (SRandUpFVCtx*)param3;
+    u8* self = (u8*)param1;
+    SRandUpFVParam* cfg = (SRandUpFVParam*)param2;
+    SRandUpFVCtx* info = (SRandUpFVCtx*)param3;
     f32* randVec;
 
     if (lbl_8032ED70 != 0) {
         return;
     }
 
-    s32 state = *(s32*)(base + 0xC);
-    if (state == 0) {
-        randVec = (f32*)(base + *ctx->outputOffset + 0x80);
+    s32 currentIndex = *(s32*)(self + 0xC);
+    if (currentIndex == 0) {
+        randVec = (f32*)(self + *info->outputOffset + 0x80);
 
         {
-            u8 flag = in->blendTwice;
+            u8 flag = cfg->blendTwice;
             f32 value = RandF__5CMathFv(math);
             if (flag != 0) {
-                value = (value + RandF__5CMathFv(math)) * lbl_803300C0;
+                value = lbl_803300C0 * (value + RandF__5CMathFv(math));
             }
             randVec[0] = value;
         }
 
         {
-            u8 flag = in->blendTwice;
+            u8 flag = cfg->blendTwice;
             f32 value = RandF__5CMathFv(math);
             if (flag != 0) {
-                value = (value + RandF__5CMathFv(math)) * lbl_803300C0;
+                value = lbl_803300C0 * (value + RandF__5CMathFv(math));
             }
             randVec[1] = value;
         }
 
         {
-            u8 flag = in->blendTwice;
+            u8 flag = cfg->blendTwice;
             f32 value = RandF__5CMathFv(math);
             if (flag != 0) {
-                value = (value + RandF__5CMathFv(math)) * lbl_803300C0;
+                value = lbl_803300C0 * (value + RandF__5CMathFv(math));
             }
             randVec[2] = value;
         }
     } else {
-        if (in->index != state) {
+        if (cfg->index != currentIndex) {
             return;
         }
-        randVec = (f32*)(base + *ctx->outputOffset + 0x80);
+        randVec = (f32*)(self + *info->outputOffset + 0x80);
     }
 
-    s32 targetOffset = in->targetOffset;
-    f32* target = (targetOffset == -1) ? lbl_801EADC8 : (f32*)(base + targetOffset + 0x80);
+    f32* target = (cfg->targetOffset == -1) ? lbl_801EADC8 : (f32*)(self + cfg->targetOffset + 0x80);
 
     {
-        f32 value = in->x * randVec[0];
+        f32 value = randVec[0] * cfg->x;
         target[0] = target[0] + value;
     }
     {
-        f32 value = in->y * randVec[1];
+        f32 value = randVec[1] * cfg->y;
         target[1] = target[1] + value;
     }
     {
-        f32 value = in->z * randVec[2];
+        f32 value = randVec[2] * cfg->z;
         target[2] = target[2] + value;
     }
 }

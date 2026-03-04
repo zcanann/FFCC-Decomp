@@ -37,22 +37,19 @@ struct MenuPcsMcLayout
  */
 extern "C" void __sinit_p_mc_cpp(void)
 {
-    unsigned int* table = reinterpret_cast<unsigned int*>(lbl_80211DAC);
-    unsigned int* desc0 = lbl_80211D88;
-    unsigned int* desc1 = lbl_80211D94;
-    unsigned int* desc2 = lbl_80211DA0;
+    unsigned char* table = lbl_80211DAC;
 
     lbl_8032EE88 = reinterpret_cast<unsigned int>(lbl_80211F28);
 
-    table[1] = desc0[0];
-    table[2] = desc0[1];
-    table[3] = desc0[2];
-    table[4] = desc1[0];
-    table[5] = desc1[1];
-    table[6] = desc1[2];
-    table[7] = desc2[0];
-    table[8] = desc2[1];
-    table[9] = desc2[2];
+    *(unsigned int*)(table + 0x4) = lbl_80211D88[0];
+    *(unsigned int*)(table + 0x8) = lbl_80211D88[1];
+    *(unsigned int*)(table + 0xC) = lbl_80211D88[2];
+    *(unsigned int*)(table + 0x10) = lbl_80211D94[0];
+    *(unsigned int*)(table + 0x14) = lbl_80211D94[1];
+    *(unsigned int*)(table + 0x18) = lbl_80211D94[2];
+    *(unsigned int*)(table + 0x1C) = lbl_80211DA0[0];
+    *(unsigned int*)(table + 0x20) = lbl_80211DA0[1];
+    *(unsigned int*)(table + 0x24) = lbl_80211DA0[2];
 }
 
 /*

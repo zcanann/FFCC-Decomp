@@ -455,7 +455,7 @@ void DisableIndWarp(_GXTevStageID tevStage, _GXIndTexStageID indStage)
     indMtx[1][0] = 0.0f;
     indMtx[1][1] = 0.0f;
     indMtx[1][2] = 0.0f;
-    GXSetIndTexMtx(GX_ITM_1, indMtx, 1);
+    GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
 }
 
 /*

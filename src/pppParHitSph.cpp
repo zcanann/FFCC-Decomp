@@ -20,44 +20,44 @@ extern Mtx ppvCameraMatrix02;
  */
 void pppParHitSph(struct _pppPObject* param_1, int param_2)
 {
-    _pppMngSt* pppMngSt;
-    _GXColor local_a8;
-    Vec local_a0;
-    Vec local_94;
     Vec local_88;
-    Mtx cameraMtx;
+    Vec local_94;
+    Vec local_a0;
     Mtx sphereMtx;
+    Mtx cameraMtx;
+    _GXColor local_a8;
+    _pppMngSt* pppMngSt = (_pppMngSt*)lbl_8032ED50;
     float radius;
-    
-    pppMngSt = (_pppMngSt*)lbl_8032ED50;
+
     PSVECSubtract((Vec*)(lbl_8032ED50 + 0x8), (Vec*)(lbl_8032ED50 + 0x48), &local_88);
     local_94.x = *(float*)(lbl_8032ED50 + 0x84);
     local_94.y = *(float*)(lbl_8032ED50 + 0x94);
     local_94.z = *(float*)(lbl_8032ED50 + 0xA4);
     radius = *(float*)((u8*)pppMngSt + 0x64) * *(float*)(param_2 + 8);
-    
+
     if (((lbl_80330700 == local_88.x) && (lbl_80330700 == local_88.y)) &&
         (lbl_80330700 == local_88.z)) {
         pppHitCylinderSendSystem(pppMngSt, &local_94, &local_88, radius, lbl_80330700);
     } else {
         pppHitCylinderSendSystem(pppMngSt, &local_94, &local_88, radius, *(float*)(param_2 + 4));
     }
-    
+
     if ((*(unsigned int*)(CFlat + 0x129c) & 0x200000) != 0) {
         local_a8.r = 0xFF;
         local_a8.g = 0xFF;
         local_a8.b = 0xFF;
         local_a8.a = 0xFF;
+        register MtxPtr sphereMtxPtr = sphereMtx;
         PSMTXIdentity(cameraMtx);
-        PSMTXIdentity(sphereMtx);
-        sphereMtx[0][0] = radius;
-        sphereMtx[1][1] = radius;
-        sphereMtx[2][2] = radius;
+        PSMTXIdentity(sphereMtxPtr);
+        sphereMtxPtr[0][0] = radius;
+        sphereMtxPtr[1][1] = radius;
+        sphereMtxPtr[2][2] = radius;
         PSMTXConcat(ppvCameraMatrix02, cameraMtx, cameraMtx);
         PSMTXMultVec(cameraMtx, &local_94, &local_a0);
-        sphereMtx[0][3] = local_a0.x;
-        sphereMtx[1][3] = local_a0.y;
-        sphereMtx[2][3] = local_a0.z;
-        Graphic.DrawSphere(sphereMtx, local_a8);
+        sphereMtxPtr[0][3] = local_a0.x;
+        sphereMtxPtr[1][3] = local_a0.y;
+        sphereMtxPtr[2][3] = local_a0.z;
+        Graphic.DrawSphere(sphereMtxPtr, local_a8);
     }
 }

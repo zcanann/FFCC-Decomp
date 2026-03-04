@@ -37,36 +37,36 @@ struct PppRandDownIVParam3 {
  */
 extern "C" void pppRandDownIV(void* param1, void* param2, void* param3)
 {
-    u8* base = (u8*)param1;
-    PppRandDownIVParam2* in = (PppRandDownIVParam2*)param2;
-    PppRandDownIVParam3* out = (PppRandDownIVParam3*)param3;
-    s32* target;
-    f32* valuePtr;
-
     if (lbl_8032ED70 != 0) {
         return;
     }
 
+    u8* base = (u8*)param1;
+    PppRandDownIVParam2* in = (PppRandDownIVParam2*)param2;
+    PppRandDownIVParam3* out = (PppRandDownIVParam3*)param3;
+    f32 value;
+    f32* valuePtr;
+
     if (in->field0 == *(s32*)(base + 0xC)) {
-        f32 value = -RandF__5CMathFv(&math[0]);
+        value = -RandF__5CMathFv(&math[0]);
         if (in->field18 != 0) {
-            value = (value - RandF__5CMathFv(&math[0])) * lbl_8032FF68;
+            f32 randValue = value - RandF__5CMathFv(&math[0]);
+            value = randValue * lbl_8032FF68;
         }
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
         *valuePtr = value;
-    } else if (in->field0 != *(s32*)(base + 0xC)) {
-        return;
     } else {
+        if (in->field0 != *(s32*)(base + 0xC)) {
+            return;
+        }
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
 
-    target = (in->field4 == -1) ? &lbl_801EADC8[0] : (s32*)(base + in->field4 + 0x80);
+    s32* target = (in->field4 == -1) ? &lbl_801EADC8[0] : (s32*)(base + in->field4 + 0x80);
+    f32 scale = *valuePtr;
 
-    {
-        f32 scale = *valuePtr;
-        target[0] += (s32)((f32)in->field8 * scale);
-        target[1] += (s32)((f32)in->fieldC * scale);
-        target[2] += (s32)((f32)in->field10 * scale);
-    }
+    target[0] += (s32)((f32)in->field8 * scale);
+    target[1] += (s32)((f32)in->fieldC * scale);
+    target[2] += (s32)((f32)in->field10 * scale);
 }

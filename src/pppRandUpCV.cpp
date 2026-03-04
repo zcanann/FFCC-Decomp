@@ -48,9 +48,7 @@ void pppRandUpCV(void* param1, void* param2, void* param3)
 
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
         *valuePtr = value;
-    }
-
-    if (in->targetId != *(s32*)(base + 0xC)) {
+    } else if (in->targetId != *(s32*)(base + 0xC)) {
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
     }
 

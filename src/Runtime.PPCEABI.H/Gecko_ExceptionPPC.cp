@@ -75,6 +75,46 @@ static ProcessInfo fragmentinfo[MAXFRAGMENTS];
 
 typedef void (*DeleteFunc)(void*);
 
+namespace std {
+
+class exception {
+public:
+	virtual ~exception();
+	virtual const char* what() const;
+};
+
+class bad_exception : public exception {
+public:
+	virtual ~bad_exception();
+	virtual const char* what() const;
+};
+
+/*
+ * --INFO--
+ * PAL Address: 0x801b0f08
+ * PAL Size: 92b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+bad_exception::~bad_exception() {}
+
+/*
+ * --INFO--
+ * PAL Address: 0x801b1ae4
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+const char* bad_exception::what() const {
+	return "bad_exception";
+}
+
+} // namespace std
+
 /**
  * @note Address: 0x800C2374
  * @note Size: 0x34

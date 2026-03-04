@@ -137,7 +137,7 @@ DSError TRKAppendBuffer(TRKBuffer* msg, const void* data, unsigned int length) {
 /* 8036D4EC-8036D578 367E2C 008C+00 0/0 1/1 0/0 .text            TRKReadBuffer */
 DSError TRKReadBuffer(TRKBuffer* msg, void* data, unsigned int length) {
     DSError error = DS_NoError;
-    unsigned int bytesLeft;  // this has to be unsigned int not u32 to match lmfao.
+    u32 bytesLeft;
 
     // Return if no bytes to read
     if (length == 0) {

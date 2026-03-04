@@ -347,9 +347,9 @@ def redsound_flags_from_profile(profile: str) -> List[str]:
     return base
 
 
-# RedSound appears to be authored as middleware-style code and currently responds
-# better to a runtime-like profile in fuzzy objdiff metrics.
-redsound_profile = os.environ.get("FFCC_REDSOUND_PROFILE", "runtime_like")
+# RedSound currently benchmarks best with game-like flags in aggregate fuzzy
+# objdiff metrics; keep the environment override for quick re-testing.
+redsound_profile = os.environ.get("FFCC_REDSOUND_PROFILE", "game")
 redsound_cflags = redsound_flags_from_profile(redsound_profile)
 
 config.linker_version = "GC/1.3.2"

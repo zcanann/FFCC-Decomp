@@ -106,8 +106,8 @@ void pppVertexApAt(_pppPObject* parent, PVertexApAt* data, void* ctrl)
     }
 
     if (state->countdown == 0) {
-        VertexApAtEntry* entry = &lbl_8032ED54->entries[vtxData->entryIndex];
         u8 count = vtxData->spawnCount;
+        VertexApAtEntry* entry = &lbl_8032ED54->entries[vtxData->entryIndex];
 
         switch (vtxData->mode) {
         case 0:

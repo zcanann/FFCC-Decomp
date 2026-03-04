@@ -65,20 +65,17 @@ void pppSRandDownCV(void* param1, void* param2, void* param3)
             }
             target[3] = value;
         }
-    } else if (*(int*)param2 == *((int*)param1 + 3)) {
+    } else {
+        if (*(int*)param2 != *((int*)param1 + 3)) {
+            return;
+        }
         int** base_ptr = (int**)((char*)param3 + 0xC);
         int offset = **base_ptr;
         target = (float*)((char*)param1 + offset + 0x80);
     }
 
     int color_offset = *((int*)param2 + 1);
-    u8* target_colors;
-    if (color_offset == -1) {
-        u8* default_colors = lbl_801EADC8;
-        target_colors = default_colors;
-    } else {
-        target_colors = (u8*)((char*)param1 + color_offset + 0x80);
-    }
+    u8* target_colors = (color_offset == -1) ? lbl_801EADC8 : (u8*)((char*)param1 + color_offset + 0x80);
 
     {
         s8 base = *(s8*)((char*)param2 + 0x8);

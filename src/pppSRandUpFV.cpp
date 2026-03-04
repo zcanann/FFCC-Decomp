@@ -10,26 +10,6 @@ extern "C" f32 RandF__5CMathFv(CMath*);
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void randfloat(float f1, float f2)
-{
-    // Basic random float implementation
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void randf(unsigned char param)
-{
-    // Basic random function with byte parameter
-}
-
-/*
- * --INFO--
  * PAL Address: 0x800643a4
  * PAL Size: 428b
  * EN Address: TODO

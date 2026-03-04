@@ -490,7 +490,7 @@ config.libs = [
             Object(NonMatching, "pppChangeBGColor.cpp"),
             Object(NonMatching, "pppChangeTex.cpp"),
             Object(NonMatching, "pppCharaBreak.cpp"),
-            Object(NonMatching, "pppCharaZEnvCtrl.cpp"),
+            Object(NonMatching, "pppCharaZEnvCtrl.cpp", cflags=cflags_game_cpp_exceptions),
             Object(NonMatching, "pppColAccele.cpp"),
             Object(NonMatching, "pppColMove.cpp"),
             Object(NonMatching, "pppColor.cpp"),

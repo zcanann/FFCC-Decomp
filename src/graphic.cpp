@@ -285,7 +285,7 @@ int CGraphic::GetProgressive()
     if (VIGetDTVStatus() == 0) {
         return 0;
     }
-    return OSGetProgressiveMode() == 0 ? 1 : 2;
+    return OSSetProgressiveMode() == 0 ? 1 : 2;
 }
 
 /*
@@ -305,7 +305,7 @@ void CGraphic::ChangeProgressive(int mode)
         VIWaitForRetrace();
         VIWaitForRetrace();
     }
-    OSSetProgressiveMode(mode);
+    OSGetProgressiveMode(mode);
 }
 
 /*

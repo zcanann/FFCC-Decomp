@@ -4,8 +4,8 @@
 #include "PowerPC_EABI_Support/MetroTRK/trk.h"
 #include <string.h>
 
-/* 8044F288-8044F290 07BFA8 0004+04 4/4 0/0 0/0 .bss             IsTRKConnected */
-static BOOL IsTRKConnected;
+/* 8044F288-8044F290 07BFA8 0004+04 4/4 0/0 0/0 .bss             lbl_8032A118 */
+static BOOL lbl_8032A118;
 
 /* 8036ECDC-8036ED84 36961C 00A8+00 0/0 1/1 0/0 .text            OutputData */
 void OutputData(void* data, int length) {
@@ -25,12 +25,12 @@ void OutputData(void* data, int length) {
 
 /* 8036ECCC-8036ECDC 36960C 0010+00 0/0 3/3 0/0 .text            GetTRKConnected */
 BOOL GetTRKConnected(void) {
-    return IsTRKConnected;
+    return lbl_8032A118;
 }
 
 /* 8036ECC0-8036ECCC 369600 000C+00 0/0 1/1 0/0 .text            SetTRKConnected */
 void SetTRKConnected(BOOL isTRKConnected) {
-    IsTRKConnected = isTRKConnected;
+    lbl_8032A118 = isTRKConnected;
 }
 
 DSError TRKSendACK(TRKBuffer* buffer) {
@@ -55,7 +55,7 @@ DSError TRKStandardACK(TRKBuffer* buffer, MessageCommandID commandID,
 
 /* 8036EC5C-8036ECC0 36959C 0064+00 0/0 1/1 0/0 .text            TRKDoConnect */
 DSError TRKDoConnect(TRKBuffer* buffer) {
-    IsTRKConnected = TRUE;
+    lbl_8032A118 = TRUE;
     return TRKStandardACK(buffer, 0x80, DSREPLY_NoError);
 }
 
@@ -63,7 +63,7 @@ DSError TRKDoConnect(TRKBuffer* buffer) {
 DSError TRKDoDisconnect(TRKBuffer* buffer) {
     TRKEvent event;
 
-    IsTRKConnected = FALSE;
+    lbl_8032A118 = FALSE;
     TRKStandardACK(buffer, 0x80, DSREPLY_NoError);
     TRKConstructEvent(&event, 1);
     TRKPostEvent(&event);

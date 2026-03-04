@@ -60,14 +60,34 @@ static GhostPartyWork sGhostPartyWork = {};
 
 struct PartyObjOverlay {
 	unsigned char partyFlags;
-	unsigned char _pad6B9[0x0B];
+	unsigned char _pad6B9[3];
+	int unk6BC;
+	int unk6C0;
 	unsigned char commandFlags;
-	unsigned char _pad6C5[0x17];
+	unsigned char _pad6C5[3];
+	int attackSel;
+	int unk6CC;
+	int unk6D0;
+	unsigned short unk6D2;
+	unsigned short _pad6D4;
 	int weaponRef;
 	int weaponItem;
-	CGBaseObj* carryTarget;
-	CGBaseObj* secondaryTarget;
-	float targetSearchDistance;
+	union {
+		int pendingWeaponItem;
+		CGBaseObj* carryTarget;
+	};
+	union {
+		CGObject* target;
+		CGBaseObj* secondaryTarget;
+	};
+	union {
+		CGObject* targetOverride;
+		float targetSearchDistance;
+	};
+	union {
+		int unk6EC;
+		int _legacy6EC;
+	};
 	CGObject* carryObject;
 	short commandMode;
 	unsigned short _pad6F6;
@@ -133,23 +153,23 @@ void CGPartyObj::onCreate()
 {
 	CGCharaObj::onCreate();
 
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	*reinterpret_cast<int*>(self + 0x6D0) = 0;
-	*reinterpret_cast<int*>(self + 0x6C8) = 0;
-	*reinterpret_cast<int*>(self + 0x6CC) = 0;
-	*reinterpret_cast<int*>(self + 0x6BC) = 0;
-	*reinterpret_cast<int*>(self + 0x6C0) = -1;
-	*reinterpret_cast<unsigned short*>(self + 0x6D2) = 0;
+	PartyObjOverlay& party = PartyData(this);
+	party.unk6D0 = 0;
+	party.attackSel = 0;
+	party.unk6CC = 0;
+	party.unk6BC = 0;
+	party.unk6C0 = -1;
+	party.unk6D2 = 0;
 
-	self[0x6B8] &= 0x7F;
-	self[0x6B8] &= 0xF7;
-	self[0x6B8] &= 0xBF;
-	self[0x6B8] &= 0xDF;
-	self[0x6B8] &= 0xEF;
-	self[0x6B8] &= 0xFB;
-	self[0x6B8] &= 0xFD;
+	party.partyFlags &= 0x7F;
+	party.partyFlags &= 0xF7;
+	party.partyFlags &= 0xBF;
+	party.partyFlags &= 0xDF;
+	party.partyFlags &= 0xEF;
+	party.partyFlags &= 0xFB;
+	party.partyFlags &= 0xFD;
 
-	*reinterpret_cast<float*>(self + 0x5BC) = FLOAT_80331a78;
+	m_targetDist = FLOAT_80331a78;
 }
 
 /*
@@ -183,16 +203,16 @@ void CGPartyObj::onDestroy()
  */
 void CGPartyObj::onChangeStat(int state)
 {
+	PartyObjOverlay& party = PartyData(this);
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
-	self[0x6B8] &= 0xBF;
+	party.partyFlags &= 0xBF;
 
 	switch (state) {
 	case 0:
-		self[0x6B8] |= 0x40;
+		party.partyFlags |= 0x40;
 		break;
 	case 1: {
-		int attackSel = *reinterpret_cast<int*>(self + 0x6C8);
-		*reinterpret_cast<int*>(self + 0x550) = (attackSel == 0) ? 5 : ((attackSel == 1) ? 8 : 9);
+		*reinterpret_cast<int*>(self + 0x550) = (party.attackSel == 0) ? 5 : ((party.attackSel == 1) ? 8 : 9);
 		break;
 	}
 	case 2:
@@ -232,12 +252,13 @@ void CGPartyObj::onChangeStat(int state)
  */
 void CGPartyObj::onCancelStat(int state)
 {
+	PartyObjOverlay& party = PartyData(this);
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 
 	switch (m_lastStateId) {
 	case 2:
-		self[0x6B8] &= 0xBF;
-		self[0x6B8] &= 0xDF;
+		party.partyFlags &= 0xBF;
+		party.partyFlags &= 0xDF;
 		endPSlotBit(0x10);
 		endPSlotBit(0x100);
 		break;
@@ -249,18 +270,18 @@ void CGPartyObj::onCancelStat(int state)
 	case 0x0C:
 	case 0x0D:
 	case 0x22:
-		if (((self[0x6B8] & 0x04) != 0) && (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0)) {
+		if (((party.partyFlags & 0x04) != 0) && (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0)) {
 			addHp(*reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1A), static_cast<CGPrgObj*>(0));
-			self[0x6B8] &= 0xFB;
+			party.partyFlags &= 0xFB;
 		}
 		enableDamageCol(1);
 		setIdleMotion();
 		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) {
-			*reinterpret_cast<float*>(self + 0x694) = 1.0f;
+			m_alpha = 1.0f;
 			m_bgColMask &= 0xFFFEFFF1;
 		} else {
 			endPSlotBit(0x10000);
-			*reinterpret_cast<float*>(self + 0x694) = 0.5f;
+			m_alpha = 0.5f;
 			m_bgColMask |= 0x1000E;
 		}
 		break;
@@ -289,13 +310,13 @@ void CGPartyObj::onCancelStat(int state)
  */
 void CGPartyObj::menu()
 {
-	unsigned char* self = reinterpret_cast<unsigned char*>(this);
+	PartyObjOverlay& party = PartyData(this);
 	if (Game.game.m_gameWork.m_gamePaused != 0) {
 		return;
 	}
 
 	// Ghidra indicates this gates menu by controller role and stage mode.
-	if ((self[0x6B8] & 0x10) == 0) {
+	if ((party.partyFlags & 0x10) == 0) {
 		if (Game.game.m_gameWork.m_menuStageMode == 0) {
 			command();
 		}
@@ -387,13 +408,14 @@ void CGPartyObj::onFramePreCalc()
 
 	CGCharaObj::onFramePreCalc();
 
+	PartyObjOverlay& party = PartyData(this);
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	if (Game.game.unk_flat3_0xc7d0 != 0) {
 		const Vec* chalicePos = reinterpret_cast<Vec*>(Game.game.unk_flat3_0xc7d0 + 0x15C);
 		m_projection.z = PSVECDistance(&m_worldPosition, chalicePos);
 	}
 
-	if (((self[0x63C] & 0x80) != 0) && ((self[0x6B8] & 0x80) == 0)) {
+	if (((self[0x63C] & 0x80) != 0) && ((party.partyFlags & 0x80) == 0)) {
 		unsigned short held = getPadHeldForSlot(static_cast<unsigned char>(m_animStateMisc));
 		if (held != 0) {
 			changeStat(0, 0, 0);
@@ -405,11 +427,11 @@ void CGPartyObj::onFramePreCalc()
 	reinterpret_cast<CCaravanWork*>(m_scriptHandle)->GetCurrentWeaponItem(weaponItem, weaponRef);
 
 	if ((Game.game.m_gameWork.m_menuStageMode == 0) &&
-	    ((*reinterpret_cast<int*>(self + 0x6E0) != weaponItem) || (*reinterpret_cast<int*>(self + 0x6DC) != weaponRef))) {
+	    ((party.pendingWeaponItem != weaponItem) || (party.weaponItem != weaponRef))) {
 		bool canImmediateSwap =
-		    ((self[0x6B8] & 0x80) == 0) &&
-		    ((self[0x6B8] & 0x40) == 0) &&
-		    (*reinterpret_cast<int*>(self + 0x6F0) == 0) &&
+		    ((party.partyFlags & 0x80) == 0) &&
+		    ((party.partyFlags & 0x40) == 0) &&
+		    (party.carryObject == nullptr) &&
 		    (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) == 0) &&
 		    (reinterpret_cast<short*>(m_scriptHandle)[0x14] == 0) &&
 		    (reinterpret_cast<short*>(m_scriptHandle)[0x11] == 0);
@@ -421,14 +443,14 @@ void CGPartyObj::onFramePreCalc()
 				unsigned short packedItem = *reinterpret_cast<unsigned short*>(Game.game.unkCFlatData0[2] + weaponItem * 0x48 + 2);
 				LoadWeapon(packedItem & 0x0FFF, packedItem >> 12);
 			}
-			*reinterpret_cast<int*>(self + 0x6E0) = weaponItem;
-			*reinterpret_cast<int*>(self + 0x6DC) = weaponRef;
+			party.pendingWeaponItem = weaponItem;
+			party.weaponItem = weaponRef;
 			reinterpret_cast<CCaravanWork*>(m_scriptHandle)->SetCurrentWeaponIdx(weaponRef);
-			self[0x6C4] &= 0xDF;
+			party.commandFlags &= 0xDF;
 		} else {
-			*reinterpret_cast<int*>(self + 0x6E0) = weaponItem;
-			*reinterpret_cast<int*>(self + 0x6DC) = weaponRef;
-			self[0x6C4] = (self[0x6C4] & 0xDF) | 0x20;
+			party.pendingWeaponItem = weaponItem;
+			party.weaponItem = weaponRef;
+			party.commandFlags = (party.commandFlags & 0xDF) | 0x20;
 			changeStat(0x0F, 0, 0);
 		}
 	}
@@ -436,7 +458,7 @@ void CGPartyObj::onFramePreCalc()
 	onChangePrg(2);
 
 	if (Game.game.m_gameWork.m_bossArtifactStageIndex != 0x17) {
-		if (*reinterpret_cast<int*>(self + 0x6F0) == 0 &&
+		if (party.carryObject == nullptr &&
 		    *reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(m_scriptHandle) + 0x1C) != 0) {
 			m_moveBaseSpeed = FLOAT_80331ad4;
 		} else {

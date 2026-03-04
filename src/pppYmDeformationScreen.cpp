@@ -5,6 +5,7 @@
 #include "ffcc/partMng.h"
 #include "ffcc/pppYmEnv.h"
 #include "ffcc/util.h"
+#include "ffcc/math.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -55,10 +56,13 @@ struct _pppEnvStYmDeformationScreen {
 	CMapMesh** m_mapMeshPtr;
 };
 
-extern int DAT_8032ed70;
-extern unsigned char DAT_8032ed78;
+extern int lbl_8032ED70;
+extern unsigned char lbl_8032ED78;
+extern CMath math[];
 extern char DAT_80238030[];
 extern CUtil DAT_8032ec70;
+extern "C" float ppvCameraMatrix02[3][4];
+extern unsigned char* lbl_8032ED50;
 extern float ppvScreenMatrix[4][4];
 
 extern struct {
@@ -167,7 +171,7 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 	float cameraZ;
 	YmDeformationScreenStep* step;
 
-	if (DAT_8032ed70 == 0) {
+	if (lbl_8032ED70 == 0) {
 		step = (YmDeformationScreenStep*)param2;
 		serializedDataOffsets = *(int**)param3;
 		work = (float*)((char*)param1 + 0x80 + serializedDataOffsets[2]);
@@ -178,7 +182,7 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 		CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
 			param1, step->m_graphId, work + 5, work + 6, work + 7, step->m_payload0, &step->m_payload1, &step->m_payload2);
 
-		if (DAT_8032ed78 == 0) {
+		if (lbl_8032ED78 == 0) {
 			if (workBytes[6] != 0) {
 				s16 delta = (s16)(int)work[5];
 				s16 value = *(s16*)(workBytes + 4);
@@ -201,7 +205,7 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 				inVec.y = 0.0f;
 				inVec.z = -*(float*)&step->m_payloadBytes[2];
 				inVec.w = 1.0f;
-				MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(DAT_80238030, screenMtx, &inVec, &outVec);
+				MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(math, screenMtx, &inVec, &outVec);
 				if (outVec.w != 0.0f) {
 					outVec.z /= outVec.w;
 				}
@@ -209,18 +213,18 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 			}
 
 			if ((u32)Game.game.m_currentSceneId == 7) {
-				cameraX = ppvCameraMatrix0[0][3];
-				cameraY = ppvCameraMatrix0[1][3];
-				cameraZ = ppvCameraMatrix0[2][3];
+				cameraX = ppvCameraMatrix02[0][3];
+				cameraY = ppvCameraMatrix02[1][3];
+				cameraZ = ppvCameraMatrix02[2][3];
 			} else {
 				cameraX = CameraPcs._212_4_;
 				cameraY = CameraPcs._216_4_;
 				cameraZ = CameraPcs._220_4_;
 			}
-			*(float*)((char*)pppMngStPtr + 0x10) = cameraX;
-			*(float*)((char*)pppMngStPtr + 0x20) = cameraY;
-			*(float*)((char*)pppMngStPtr + 0x30) = cameraZ;
-			pppSetFpMatrix__FP9_pppMngSt(pppMngStPtr);
+			*(float*)(lbl_8032ED50 + 0x10) = cameraX;
+			*(float*)(lbl_8032ED50 + 0x20) = cameraY;
+			*(float*)(lbl_8032ED50 + 0x30) = cameraZ;
+			pppSetFpMatrix__FP9_pppMngSt((_pppMngSt*)lbl_8032ED50);
 		}
 	}
 }

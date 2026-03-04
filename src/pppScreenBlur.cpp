@@ -110,13 +110,13 @@ void pppRenderScreenBlur(void* param1, void* param2, void* param3)
     pppScreenBlurParam* blurParam = (pppScreenBlurParam*)param2;
     pppScreenBlurOffsets* offsets = (pppScreenBlurOffsets*)param3;
     s32 blurActiveOffset = offsets->m_serializedDataOffsets[1] + 0x80;
-    s32 blurValueOffset = offsets->m_serializedDataOffsets[0] + 0x80;
+    u8* blurValuePtr = blur->data + offsets->m_serializedDataOffsets[0] + 0x80;
     u32 blurMask;
 
     blurParam->m_blurB = 0;
     blurMask = __cntlzw((u32)blur->data[blurActiveOffset]);
     RenderBlur__8CGraphicFiUcUcUcUcs(Graphic, blurMask >> 5, blurParam->m_blurR, blurParam->m_blurG,
-                                     blurParam->m_blurB, blur->data[blurValueOffset + 0x0B], blurParam->m_initWOrk);
+                                     blurParam->m_blurB, blurValuePtr[0x0B], blurParam->m_initWOrk);
     pppInitBlendMode();
     GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
     blur->data[blurActiveOffset] = 1;

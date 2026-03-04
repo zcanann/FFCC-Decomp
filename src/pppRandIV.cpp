@@ -63,11 +63,7 @@ void pppRandIV(void* param1, void* param2, void* param3)
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
     
-    if (in->field4 == -1) {
-        target = lbl_801EADC8;
-    } else {
-        target = (s32*)(base + in->field4 + 0x80);
-    }
+    target = (in->field4 == -1) ? &lbl_801EADC8[0] : (s32*)(base + in->field4 + 0x80);
 
     {
         f32 randValue = *valuePtr;

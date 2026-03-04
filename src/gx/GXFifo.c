@@ -487,7 +487,7 @@ static void __GXFifoLink(u8 en) {
         enable = 0;
     }
     reg = __GXData->cpEnable;
-    reg = (u32)__rlwimi(reg, enable, 4, 27, 27);
+    reg = (reg & ~0x10) | (enable << 4);
     __GXData->cpEnable = reg;
     GX_SET_CP_REG(1, __GXData->cpEnable);
 }

@@ -24,35 +24,38 @@ extern "C" char lbl_801E9F2C[];
  * JP Size: TODO
  */
 void __sinit_p_game_cpp() {
-    GamePcs = reinterpret_cast<unsigned int>(lbl_801EA0A8);
+    unsigned int* dst;
 
-    reinterpret_cast<unsigned int*>(lbl_801E9F2C)[1] = lbl_801E9EC0[0];
-    reinterpret_cast<unsigned int*>(lbl_801E9F2C)[2] = lbl_801E9EC0[1];
-    reinterpret_cast<unsigned int*>(lbl_801E9F2C)[3] = lbl_801E9EC0[2];
-    reinterpret_cast<unsigned int*>(lbl_801E9F2C)[4] = lbl_801E9ECC[0];
-    reinterpret_cast<unsigned int*>(lbl_801E9F2C)[5] = lbl_801E9ECC[1];
-    reinterpret_cast<unsigned int*>(lbl_801E9F2C)[6] = lbl_801E9ECC[2];
-    reinterpret_cast<unsigned int*>(lbl_801E9F2C)[7] = lbl_801E9ED8[0];
-    reinterpret_cast<unsigned int*>(lbl_801E9F2C)[8] = lbl_801E9ED8[1];
-    reinterpret_cast<unsigned int*>(lbl_801E9F2C)[9] = lbl_801E9ED8[2];
-    reinterpret_cast<unsigned int*>(lbl_801E9F2C)[10] = lbl_801E9EE4[0];
-    reinterpret_cast<unsigned int*>(lbl_801E9F2C)[11] = lbl_801E9EE4[1];
-    reinterpret_cast<unsigned int*>(lbl_801E9F2C)[12] = lbl_801E9EE4[2];
-    reinterpret_cast<unsigned int*>(lbl_801E9F2C)[13] = lbl_801E9EF0[0];
-    reinterpret_cast<unsigned int*>(lbl_801E9F2C)[14] = lbl_801E9EF0[1];
-    reinterpret_cast<unsigned int*>(lbl_801E9F2C)[15] = lbl_801E9EF0[2];
-    reinterpret_cast<unsigned int*>(lbl_801E9F2C)[16] = lbl_801E9EFC[0];
-    reinterpret_cast<unsigned int*>(lbl_801E9F2C)[17] = lbl_801E9EFC[1];
-    reinterpret_cast<unsigned int*>(lbl_801E9F2C)[18] = lbl_801E9EFC[2];
-    reinterpret_cast<unsigned int*>(lbl_801E9F2C)[19] = lbl_801E9F08[0];
-    reinterpret_cast<unsigned int*>(lbl_801E9F2C)[20] = lbl_801E9F08[1];
-    reinterpret_cast<unsigned int*>(lbl_801E9F2C)[21] = lbl_801E9F08[2];
-    reinterpret_cast<unsigned int*>(lbl_801E9F2C)[22] = lbl_801E9F14[0];
-    reinterpret_cast<unsigned int*>(lbl_801E9F2C)[23] = lbl_801E9F14[1];
-    reinterpret_cast<unsigned int*>(lbl_801E9F2C)[24] = lbl_801E9F14[2];
-    reinterpret_cast<unsigned int*>(lbl_801E9F2C)[25] = lbl_801E9F20[0];
-    reinterpret_cast<unsigned int*>(lbl_801E9F2C)[26] = lbl_801E9F20[1];
-    reinterpret_cast<unsigned int*>(lbl_801E9F2C)[27] = lbl_801E9F20[2];
+    GamePcs = reinterpret_cast<unsigned int>(lbl_801EA0A8);
+    dst = reinterpret_cast<unsigned int*>(lbl_801E9F2C);
+
+    dst[1] = lbl_801E9EC0[0];
+    dst[2] = lbl_801E9EC0[1];
+    dst[3] = lbl_801E9EC0[2];
+    dst[4] = lbl_801E9ECC[0];
+    dst[5] = lbl_801E9ECC[1];
+    dst[6] = lbl_801E9ECC[2];
+    dst[7] = lbl_801E9ED8[0];
+    dst[8] = lbl_801E9ED8[1];
+    dst[9] = lbl_801E9ED8[2];
+    dst[12] = lbl_801E9EE4[0];
+    dst[13] = lbl_801E9EE4[1];
+    dst[14] = lbl_801E9EE4[2];
+    dst[17] = lbl_801E9EF0[0];
+    dst[18] = lbl_801E9EF0[1];
+    dst[19] = lbl_801E9EF0[2];
+    dst[22] = lbl_801E9EFC[0];
+    dst[23] = lbl_801E9EFC[1];
+    dst[24] = lbl_801E9EFC[2];
+    dst[27] = lbl_801E9F08[0];
+    dst[28] = lbl_801E9F08[1];
+    dst[29] = lbl_801E9F08[2];
+    dst[32] = lbl_801E9F14[0];
+    dst[33] = lbl_801E9F14[1];
+    dst[34] = lbl_801E9F14[2];
+    dst[37] = lbl_801E9F20[0];
+    dst[38] = lbl_801E9F20[1];
+    dst[39] = lbl_801E9F20[2];
 }
 
 /*

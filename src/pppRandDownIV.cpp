@@ -48,16 +48,17 @@ extern "C" void pppRandDownIV(void* param1, void* param2, void* param3)
         return;
     }
 
-    if (in->field0 == *(s32*)(base + 0xC)) {
+    s32 baseState = *(s32*)(base + 0xC);
+    if (baseState == 0) {
         f32 value = -RandF__5CMathFv(math);
         if (in->field18 != 0) {
-            value = (value - RandF__5CMathFv(math)) * lbl_8032FF68;
+            value = lbl_8032FF68 * (value - RandF__5CMathFv(math));
         }
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
         *valuePtr = value;
     } else {
-        if (in->field0 != *(s32*)(base + 0xC)) {
+        if (in->field0 != baseState) {
             return;
         }
         valuePtr = (f32*)(base + *out->fieldC + 0x80);

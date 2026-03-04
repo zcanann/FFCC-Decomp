@@ -360,16 +360,7 @@ void CRedSound::SetReverb(int bank, int kind)
  */
 void CRedSound::SetReverbDepth(int bank, int sep, int depth)
 {
-	CRedDriver* driver;
-	int localBank;
-	int localSep;
-	int localDepth;
-
-	driver = &CRedDriver_8032f4c0;
-	localBank = bank;
-	localSep = sep;
-	localDepth = depth;
-	driver->SetReverbDepth(localBank, localSep, localDepth);
+	CRedDriver_8032f4c0.SetReverbDepth(bank, sep, depth);
 }
 
 /*
@@ -410,6 +401,7 @@ void CRedSound::MusicStop(int id)
 	CRedDriver_8032f4c0.MusicStop(id);
 }
 
+#pragma optimization_level 4
 /*
  * --INFO--
  * Address:	TODO
@@ -429,6 +421,7 @@ void CRedSound::MusicCrossPlay(int id, int vol, int fadeTime)
 {
 	CRedDriver_8032f4c0.MusicCrossPlay(id, vol, fadeTime);
 }
+#pragma optimization_level 0
 
 /*
  * --INFO--

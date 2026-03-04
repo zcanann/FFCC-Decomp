@@ -102,11 +102,8 @@ void pppSRandCV(void* param1, void* param2, void* param3)
         target = (float*)(base + *out->fieldC + 0x80);
     }
 
-    if (in->field4 == -1) {
-        targetColor = lbl_801EADC8;
-    } else {
-        targetColor = (u8*)(base + in->field4 + 0x80);
-    }
+    s32 colorOffset = in->field4;
+    targetColor = (colorOffset == -1) ? lbl_801EADC8 : (u8*)(base + colorOffset + 0x80);
 
     {
         s8 baseValue = in->field8;

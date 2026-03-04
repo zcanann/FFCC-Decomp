@@ -32,49 +32,50 @@ struct RandUpCVCtx {
  */
 void pppRandUpCV(void* param1, void* param2, void* param3)
 {
-    if (lbl_8032ED70 != 0) {
-        return;
-    }
-
     u8* base = (u8*)param1;
     RandUpCVParam* in = (RandUpCVParam*)param2;
     RandUpCVCtx* ctx = (RandUpCVCtx*)param3;
     u8* target;
     f32* valuePtr;
 
+    if (lbl_8032ED70 != 0) {
+        return;
+    }
+
     if (in->targetId == *(s32*)(base + 0xC)) {
-        f32 value = RandF__5CMathFv(math);
+        f32 value = RandF__5CMathFv(&math[0]);
         if (in->randomTwice != 0) {
-            value = (value + RandF__5CMathFv(math)) * lbl_8032FFE8;
+            f32 mixed = value + RandF__5CMathFv(&math[0]);
+            value = mixed * lbl_8032FFE8;
         }
 
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
         *valuePtr = value;
+    } else if (in->targetId != *(s32*)(base + 0xC)) {
+        return;
     } else {
-        if (in->targetId != *(s32*)(base + 0xC)) {
-            return;
-        }
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
     }
 
-    s32 colorOffset = in->sourceOffset;
-    target = (colorOffset == -1) ? lbl_801EADC8 : (u8*)(base + colorOffset + 0x80);
-
-    f32 scale = *valuePtr;
+    target = (in->sourceOffset == -1) ? &lbl_801EADC8[0] : (u8*)(base + in->sourceOffset + 0x80);
 
     {
-        target[0] = (u8)(target[0] + (s32)((f32)in->delta[0] * scale));
-    }
-
-    {
-        target[1] = (u8)(target[1] + (s32)((f32)in->delta[1] * scale));
-    }
-
-    {
-        target[2] = (u8)(target[2] + (s32)((f32)in->delta[2] * scale));
-    }
-
-    {
-        target[3] = (u8)(target[3] + (s32)((f32)in->delta[3] * scale));
+        f32 scale = *valuePtr;
+        {
+            s8 baseValue = in->delta[0];
+            target[0] = (u8)(target[0] + (s32)((f32)baseValue * scale));
+        }
+        {
+            s8 baseValue = in->delta[1];
+            target[1] = (u8)(target[1] + (s32)((f32)baseValue * scale));
+        }
+        {
+            s8 baseValue = in->delta[2];
+            target[2] = (u8)(target[2] + (s32)((f32)baseValue * scale));
+        }
+        {
+            s8 baseValue = in->delta[3];
+            target[3] = (u8)(target[3] + (s32)((f32)baseValue * scale));
+        }
     }
 }

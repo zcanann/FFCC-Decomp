@@ -2439,7 +2439,7 @@ CMaterial::CMaterial()
     __ct__4CRefFv(this);
     *reinterpret_cast<void**>(this) = __vt__9CMaterial;
     __construct_array(Ptr(this, 0x4C), __ct__10CTexScrollFv, __dt__10CTexScrollFv, 0x14, 4);
-    memset(Ptr(this, 0x8C), 0, 0x10);
+    memset(Ptr(this, 0x8), 0, 0x10);
     *reinterpret_cast<int*>(Ptr(this, 0x9C)) = -1;
     *Ptr(this, 0xA0) = 4;
     *Ptr(this, 0xA1) = 1;

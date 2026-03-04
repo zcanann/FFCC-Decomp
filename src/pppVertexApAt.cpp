@@ -112,7 +112,7 @@ void pppVertexApAt(_pppPObject* parent, PVertexApAt* data, void* ctrl)
         switch (vtxData->mode) {
         case 0:
             while (count-- != 0) {
-                if ((s16)state->index >= entry->maxValue) {
+                if (state->index >= entry->maxValue) {
                     state->index = 0;
                 }
 

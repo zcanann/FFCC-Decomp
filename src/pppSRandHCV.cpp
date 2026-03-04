@@ -119,15 +119,13 @@ void pppSRandHCV(void* data1, void* data2, void* data3)
 			}
 			target[3] = value;
 		}
+	} else if (in->field0 != *(s32*)(base + 0xC)) {
+		return;
 	} else {
 		target = (float*)(base + *out->fieldC + 0x80);
 	}
 
-	if (in->field4 == -1) {
-		targetColor = lbl_801EADC8;
-	} else {
-		targetColor = (s16*)(base + in->field4 + 0x80);
-	}
+	targetColor = (in->field4 == -1) ? lbl_801EADC8 : (s16*)(base + in->field4 + 0x80);
 
 	{
 		s16 baseValue = in->field8;

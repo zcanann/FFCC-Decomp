@@ -80,14 +80,14 @@ void pppCalcShape2(void* param1, void* param2, void* param3)
     ShapeRuntimeData* runtimeData = *(ShapeRuntimeData**)((u8*)param3 + 0xC);
     ShapeControlData* controlData = (ShapeControlData*)param2;
     ShapeState* shapeData = (ShapeState*)((u8*)param1 + runtimeData->shapeDataOffset + 0x80);
-    s16 type = controlData->type;
+    u32 type = *(u32*)((u8*)controlData + 4);
 
-    if (type == 0xFFFF) {
+    if ((u16)type == 0xFFFF) {
         return;
     }
 
     void** shapeTables = *(void***)((u8*)lbl_8032ED54 + 0xC);
-    void* shapeSpec = *(void**)*(u32*)((u8*)shapeTables + (type << 2));
+    void* shapeSpec = *(void**)shapeTables[type];
     ShapeSpecEntry* shape = (ShapeSpecEntry*)((u8*)shapeSpec + ((u32)shapeData->counter << 3) + 0x10);
 
     shapeData->currentId = shapeData->counter;
@@ -127,14 +127,14 @@ void pppDrawShape2(void* param1, void* param2, void* param3)
     ShapeControlData* controlData = (ShapeControlData*)param2;
     ShapeState* shapeData = (ShapeState*)((u8*)param1 + runtimeData->shapeDataOffset + 0x80);
     void* posData = (u8*)param1 + runtimeData->posDataOffset + 0x80;
-    u16 type = (u16)controlData->type;
+    u32 type = *(u32*)((u8*)controlData + 4);
 
-    if (type == 0xFFFF) {
+    if ((u16)type == 0xFFFF) {
         return;
     }
 
     void** shapeTables = *(void***)((u8*)lbl_8032ED54 + 0xC);
-    void* shapeSpec = *(void**)*(u32*)((u8*)shapeTables + (type << 2));
+    void* shapeSpec = *(void**)shapeTables[type];
     ShapeSpecEntry* shape = (ShapeSpecEntry*)((u8*)shapeSpec + ((u32)shapeData->currentId << 3) + 0x10);
     void* drawShape = (u8*)shapeSpec + shape->offset;
 

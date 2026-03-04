@@ -59,13 +59,11 @@ extern "C" void pppRandChar(void* param1, void* param2, void* param3)
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
     }
 
-    if (in->sourceOffset == -1) {
-        target = lbl_801EADC8;
-    } else {
-        target = base + in->sourceOffset + 0x80;
-    }
+    s32 colorOffset = in->sourceOffset;
+    target = (colorOffset == -1) ? lbl_801EADC8 : (u8*)(base + colorOffset + 0x80);
 
+    u8 scale = in->scale;
     u8 current = *target;
-    s32 delta = (s32)((f32)in->scale * *valuePtr - (f32)current);
+    s32 delta = (s32)((f32)scale * *valuePtr - (f32)current);
     *target = (u8)(current + delta);
 }

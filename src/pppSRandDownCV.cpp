@@ -65,7 +65,10 @@ void pppSRandDownCV(void* param1, void* param2, void* param3)
             }
             target[3] = value;
         }
-    } else if (*(int*)param2 == *((int*)param1 + 3)) {
+    } else {
+        if (*(int*)param2 != *((int*)param1 + 3)) {
+            return;
+        }
         int** base_ptr = (int**)((char*)param3 + 0xC);
         int offset = **base_ptr;
         target = (float*)((char*)param1 + offset + 0x80);

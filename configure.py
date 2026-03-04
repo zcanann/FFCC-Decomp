@@ -982,7 +982,11 @@ config.libs = [
             Object(NonMatching, "TRK_MINNOW_DOLPHIN/dolphin_trk.c"),
             Object(NonMatching, "TRK_MINNOW_DOLPHIN/dolphin_trk_glue.c"),
             Object(NonMatching, "TRK_MINNOW_DOLPHIN/flush_cache.c"),
-            Object(NonMatching, "TRK_MINNOW_DOLPHIN/main.c"),
+            Object(
+                NonMatching,
+                "TRK_MINNOW_DOLPHIN/main.c",
+                cflags=[f for f in cflags_trk if f not in ("-sdata 0", "-sdata2 0")],
+            ),
             Object(NonMatching, "TRK_MINNOW_DOLPHIN/main_TRK.c"),
             Object(NonMatching, "TRK_MINNOW_DOLPHIN/mainloop.c"),
             Object(NonMatching, "TRK_MINNOW_DOLPHIN/mem_TRK.c"),

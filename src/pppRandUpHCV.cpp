@@ -55,13 +55,7 @@ extern "C" void pppRandUpHCV(void* p1, void* p2, void* p3)
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
     }
 
-    s16* target;
-    s32 colorOffset = params->colorOffset;
-    if (colorOffset == -1) {
-        target = lbl_801EADC8;
-    } else {
-        target = (s16*)(base + colorOffset + 0x80);
-    }
+    s16* target = (params->colorOffset == -1) ? lbl_801EADC8 : (s16*)(base + params->colorOffset + 0x80);
 
     f32 scale = *valuePtr;
 

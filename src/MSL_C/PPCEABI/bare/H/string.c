@@ -103,24 +103,17 @@ char* strncpy(char* dst, const char* src, size_t n)
 
 char* strcat(char* dst, const char* src, size_t n)
 {
-	char* srcPtr = (char*)src - 1;
-	char* dstPtr = (char*)dst - 1;
-	char c;
+	unsigned char* dstPtr       = (unsigned char*)dst - 1;
+	const unsigned char* srcPtr = (const unsigned char*)src - 1;
 
 	(void)n;
 
-	do {
-		dstPtr = dstPtr + 1;
-		c      = *dstPtr;
-	} while (c != '\0');
+	while (*++dstPtr) {
+	}
 
-	dstPtr = dstPtr - 1;
-	do {
-		srcPtr = srcPtr + 1;
-		c      = *srcPtr;
-		dstPtr = dstPtr + 1;
-		*dstPtr = c;
-	} while (c != '\0');
+	--dstPtr;
+	while ((*++dstPtr = *++srcPtr) != 0) {
+	}
 
 	return dst;
 }

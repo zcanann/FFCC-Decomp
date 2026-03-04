@@ -22,6 +22,7 @@ struct pppScaleLoopAutoStep {
     s32 m_index;
     u8 _pad0x04[4];
     float m_addScale[3];
+    u8 _pad0x14[4];
     float m_amplitude;
     u8 m_stepCount;
     s8 m_countA;

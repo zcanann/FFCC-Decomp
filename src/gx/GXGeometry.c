@@ -5,6 +5,8 @@
 #include "dolphin/gx/__gx.h"
 
 extern GXData* const gx;
+#undef __GXData
+#define __GXData gx
 
 void __GXSetDirtyState(void) {
     if (gx->dirtyState & 1) {
@@ -74,12 +76,14 @@ void GXSetLineWidth(u8 width, GXTexOffset texOffsets) {
     data->bpSentNot = 0;
 }
 
+#if DEBUG
 void GXGetLineWidth(u8* width, GXTexOffset* texOffsets) {
     ASSERTMSGLINE(463, width != NULL && texOffsets != NULL, "GXGet*: invalid null pointer");
 
     *width      = GET_REG_FIELD(__GXData->lpSize, 8, 0);
     *texOffsets = GET_REG_FIELD(__GXData->lpSize, 3, 16);
 }
+#endif
 
 void GXSetPointSize(u8 pointSize, GXTexOffset texOffsets) {
     GXData* data;
@@ -92,12 +96,14 @@ void GXSetPointSize(u8 pointSize, GXTexOffset texOffsets) {
     data->bpSentNot = 0;
 }
 
+#if DEBUG
 void GXGetPointSize(u8* pointSize, GXTexOffset* texOffsets) {
     ASSERTMSGLINE(507, pointSize != NULL && texOffsets != NULL, "GXGet*: invalid null pointer");
 
     *pointSize  = (int)GET_REG_FIELD(__GXData->lpSize, 8, 8);
     *texOffsets = GET_REG_FIELD(__GXData->lpSize, 3, 19);
 }
+#endif
 
 /*
  * --INFO--
@@ -158,8 +164,8 @@ void GXSetCullMode(GXCullMode mode) {
     __GXData->dirtyState |= 4;
 }
 
-void GXGetCullMode(GXCullMode* mode) {
 #if DEBUG
+void GXGetCullMode(GXCullMode* mode) {
     GXCullMode hwMode = GET_REG_FIELD(__GXData->genMode, 2, 14);
 
     switch (hwMode) {
@@ -167,12 +173,8 @@ void GXGetCullMode(GXCullMode* mode) {
     case GX_CULL_BACK:  *mode = GX_CULL_FRONT; break;
     default:            *mode = hwMode;        break;
     }
-#else
-    // fake match?
-    GXCullMode hwMode = __GXData->genMode;
-    *mode = ((hwMode >> 0xD) & 0x2) | (((((int)hwMode >> 0xE) & 0x2) >> 0x1));
-#endif
 }
+#endif
 
 void GXSetCoPlanar(GXBool enable) {
     u32 reg;

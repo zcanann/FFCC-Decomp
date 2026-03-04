@@ -30,32 +30,41 @@ void pppSRandDownCV(void* param1, void* param2, void* param3)
         int offset = **base_ptr;
         target = (float*)((char*)param1 + offset + 0x80);
 
-        u8 flag = *((u8*)param2 + 0xC);
-        float value;
-
-        value = -RandF__5CMathFv(math);
-        if (flag != 0) {
-            value = (value - RandF__5CMathFv(math)) * lbl_80330070;
+        {
+            u8 flag = *((u8*)param2 + 0xC);
+            float value = -RandF__5CMathFv(math);
+            if (flag != 0) {
+                value = (value - RandF__5CMathFv(math)) * lbl_80330070;
+            }
+            target[0] = value;
         }
-        target[0] = value;
 
-        value = -RandF__5CMathFv(math);
-        if (flag != 0) {
-            value = (value - RandF__5CMathFv(math)) * lbl_80330070;
+        {
+            u8 flag = *((u8*)param2 + 0xC);
+            float value = -RandF__5CMathFv(math);
+            if (flag != 0) {
+                value = (value - RandF__5CMathFv(math)) * lbl_80330070;
+            }
+            target[1] = value;
         }
-        target[1] = value;
 
-        value = -RandF__5CMathFv(math);
-        if (flag != 0) {
-            value = (value - RandF__5CMathFv(math)) * lbl_80330070;
+        {
+            u8 flag = *((u8*)param2 + 0xC);
+            float value = -RandF__5CMathFv(math);
+            if (flag != 0) {
+                value = (value - RandF__5CMathFv(math)) * lbl_80330070;
+            }
+            target[2] = value;
         }
-        target[2] = value;
 
-        value = -RandF__5CMathFv(math);
-        if (flag != 0) {
-            value = (value - RandF__5CMathFv(math)) * lbl_80330070;
+        {
+            u8 flag = *((u8*)param2 + 0xC);
+            float value = -RandF__5CMathFv(math);
+            if (flag != 0) {
+                value = (value - RandF__5CMathFv(math)) * lbl_80330070;
+            }
+            target[3] = value;
         }
-        target[3] = value;
     } else if (*(int*)param2 != *((int*)param1 + 3)) {
         int** base_ptr = (int**)((char*)param3 + 0xC);
         int offset = **base_ptr;
@@ -72,25 +81,25 @@ void pppSRandDownCV(void* param1, void* param2, void* param3)
 
     {
         s8 base = *(s8*)((char*)param2 + 0x8);
-        int delta = (int)(base * target[0]);
+        s8 delta = (s8)(base * target[0]);
         target_colors[0] = (u8)(target_colors[0] + delta);
     }
 
     {
         s8 base = *(s8*)((char*)param2 + 0x9);
-        int delta = (int)(base * target[1]);
+        s8 delta = (s8)(base * target[1]);
         target_colors[1] = (u8)(target_colors[1] + delta);
     }
 
     {
         s8 base = *(s8*)((char*)param2 + 0xA);
-        int delta = (int)(base * target[2]);
+        s8 delta = (s8)(base * target[2]);
         target_colors[2] = (u8)(target_colors[2] + delta);
     }
 
     {
         s8 base = *(s8*)((char*)param2 + 0xB);
-        int delta = (int)(base * target[3]);
+        s8 delta = (s8)(base * target[3]);
         target_colors[3] = (u8)(target_colors[3] + delta);
     }
 }

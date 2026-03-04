@@ -6,7 +6,6 @@
 extern CMath math[];
 extern "C" int Format__6McCtrlFi(McCtrl* mcCtrl, int slot);
 extern "C" int Rand__5CMathFUl(CMath* instance, unsigned long max);
-extern "C" void CallWorldParam__8CMenuPcsFiii(CMenuPcs* menu, int mode, int param, int unused);
 extern "C" void __sinit_p_mc_cpp(void);
 extern unsigned char MenuPcs[];
 
@@ -144,7 +143,7 @@ void CMcPcs::calc()
                     worldParam = 6;
                 }
 
-                CallWorldParam__8CMenuPcsFiii(reinterpret_cast<CMenuPcs*>(MenuPcs), 6, worldParam, 0);
+                menuPcs->CallWorldParam(6, worldParam, 0);
                 menuPcsLayout->field18 = 0;
             }
         }
@@ -174,7 +173,7 @@ void CMcPcs::calc()
                     worldParam = 6;
                 }
 
-                CallWorldParam__8CMenuPcsFiii(reinterpret_cast<CMenuPcs*>(MenuPcs), 5, worldParam, 0);
+                menuPcs->CallWorldParam(5, worldParam, 0);
                 menuPcsLayout->field18 = 0;
             }
         }

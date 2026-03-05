@@ -137,7 +137,8 @@ void pppVertexApAt(_pppPObject* parent, PVertexApAt* data, void* ctrl)
             break;
         case 1:
             while (count-- != 0) {
-                int outValue = (int)(RandF__5CMathFv(&math) * (f32)entry->maxValue);
+                int outValue = (int)((f32)entry->maxValue * RandF__5CMathFv(&math));
+                u16 outValue16 = (u16)outValue;
 
                 if ((vtxData->childId + 0x10000) != 0xFFFF) {
                     s32 childId = vtxData->childId;
@@ -151,7 +152,7 @@ void pppVertexApAt(_pppPObject* parent, PVertexApAt* data, void* ctrl)
                         *(void**)((u8*)child + 0x4) = parent;
                     }
 
-                    *(u16*)((u8*)child + vtxData->childValueOffset + 0x80) = (u16)outValue;
+                    *(u16*)((u8*)child + vtxData->childValueOffset + 0x80) = outValue16;
                 }
             }
             break;

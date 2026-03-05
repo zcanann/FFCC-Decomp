@@ -7,7 +7,7 @@ struct _pppPObject;
 extern "C" {
 #endif
 
-void pppDrawMatrixLoc(_pppPObject* param_1);
+void pppDrawMatrixLoc(void* param_1);
 
 #ifdef __cplusplus
 }

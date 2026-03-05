@@ -13,7 +13,7 @@ extern const float FLOAT_803331d8;
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDrawMatrixLoc(_pppPObject* param_1)
+void pppDrawMatrixLoc(void* param_1)
 {
     Vec local_2c;
     Vec local_38;

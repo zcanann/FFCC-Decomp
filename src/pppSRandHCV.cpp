@@ -25,35 +25,6 @@ struct PppSRandHCVParam3 {
 
 /*
  * --INFO--
- * PAL Address: TODO
- * PAL Size: TODO
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void randshort(short value, float range)
-{
-	(void)value;
-	(void)range;
-}
-
-/*
- * --INFO--
- * PAL Address: TODO 
- * PAL Size: TODO
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void randf(unsigned char flag)
-{
-	(void)flag;
-}
-
-/*
- * --INFO--
  * PAL Address: 80063e34
  * PAL Size: 736b
  * EN Address: TODO

@@ -2,9 +2,6 @@
 #define _PPP_SRANDHCV_H_
 
 #ifdef __cplusplus
-void randshort(short, float);
-void randf(unsigned char);
-
 extern "C" {
 #endif
 

@@ -187,12 +187,12 @@ void pppShapeSetUseTexture(tagOAN3_SHAPE*, unsigned char*)
  */
 void pppCacheLoadShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
 {
-    char textureUsed[264];
+    unsigned char textureUsed[0x100];
     void* animData = shapeSt->m_animData;
     void* currentFrame;
     unsigned int textureIndex;
     int frameIndex;
-    char* texturePtr;
+    unsigned char* texturePtr;
 
     memset(textureUsed, 0, 0x100);
 
@@ -252,12 +252,12 @@ void pppCacheRefCnt0UpShapeTexture(pppShapeSt*, CMaterialSet*)
  */
 void pppCacheDumpShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
 {
-    char textureUsed[264];
+    unsigned char textureUsed[0x100];
     void* animData = shapeSt->m_animData;
     void* currentFrame;
     unsigned int textureIndex;
     int frameIndex;
-    char* texturePtr;
+    unsigned char* texturePtr;
 
     memset(textureUsed, 0, 0x100);
 

@@ -30,9 +30,7 @@ struct PppRandDownCVParam3 {
  */
 void randchar(char value, float multiplier)
 {
-    f32 base = (f32)value;
-    f32 scaled = base * multiplier;
-    (void)scaled;
+    return;
 }
 
 /*
@@ -59,7 +57,9 @@ extern "C" void pppRandDownCV(void* param1, void* param2, void* param3)
     if (in->field0 == *(s32*)(base + 0xC)) {
         f32 value = -RandF__5CMathFv(&math[0]);
         if (in->fieldC != 0) {
-            value = (value - RandF__5CMathFv(&math[0])) * lbl_8032FF28;
+            f32 random = RandF__5CMathFv(&math[0]);
+            f32 blend = value - random;
+            value = blend * lbl_8032FF28;
         }
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
@@ -72,11 +72,21 @@ extern "C" void pppRandDownCV(void* param1, void* param2, void* param3)
 
     target = (in->field4 == -1) ? &lbl_801EADC8[0] : (u8*)(base + in->field4 + 0x80);
 
+    f32 scale = *valuePtr;
     {
-        f32 scale = *valuePtr;
-        target[0] = (u8)(target[0] + (s32)((f32)in->field8 * scale));
-        target[1] = (u8)(target[1] + (s32)((f32)in->field9 * scale));
-        target[2] = (u8)(target[2] + (s32)((f32)in->fieldA * scale));
-        target[3] = (u8)(target[3] + (s32)((f32)in->fieldB * scale));
+        s8 baseValue = in->field8;
+        target[0] = (u8)(target[0] + (s32)((f32)baseValue * scale));
+    }
+    {
+        s8 baseValue = in->field9;
+        target[1] = (u8)(target[1] + (s32)((f32)baseValue * scale));
+    }
+    {
+        s8 baseValue = in->fieldA;
+        target[2] = (u8)(target[2] + (s32)((f32)baseValue * scale));
+    }
+    {
+        s8 baseValue = in->fieldB;
+        target[3] = (u8)(target[3] + (s32)((f32)baseValue * scale));
     }
 }

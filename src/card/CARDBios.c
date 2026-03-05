@@ -488,12 +488,7 @@ s32 __CARDWritePage(s32 chan, CARDCallback callback) {
     ASSERTLINE(906, card->addr < (u32) card->size * 1024 * 1024 / 8);
     card->cmd[0] = 0xF2;
 
-    if (card->pageSize > 0x80) {
-        card->cmd[1] = AD1(card->addr) | 0x80;
-    } else {
-        card->cmd[1] = AD1(card->addr);
-    }
-
+    card->cmd[1] = AD1(card->addr);
     card->cmd[2] = AD2(card->addr);
     card->cmd[3] = AD3(card->addr);
     card->cmd[4] = BA(card->addr);
@@ -506,7 +501,7 @@ s32 __CARDWritePage(s32 chan, CARDCallback callback) {
         result = CARD_RESULT_READY;
     } else if (result >= 0) {
         if (!EXIImmEx(chan, card->cmd, card->cmdlen, EXI_WRITE) ||
-            !EXIDma(chan, card->buffer, card->pageSize, card->mode, __CARDTxHandler))
+            !EXIDma(chan, card->buffer, 0x80, card->mode, __CARDTxHandler))
         {
             card->exiCallback = 0;
             EXIDeselect(chan);

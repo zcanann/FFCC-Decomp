@@ -21,9 +21,9 @@ void pppDrawMatrixLoc(_pppPObject* param_1)
     Mtx* srcMtx;
     Mtx* dstMtx;
 
-    srcMtx = *(Mtx**)((char*)param_1 + 0x10);
+    srcMtx = (Mtx*)((char*)param_1 + 0x10);
     local_2c.z = FLOAT_803331d8;
-    dstMtx = *(Mtx**)((char*)param_1 + 0x40);
+    dstMtx = (Mtx*)((char*)param_1 + 0x40);
     local_2c.y = FLOAT_803331d8;
     local_2c.x = FLOAT_803331d8;
     PSMTXCopy(*srcMtx, *dstMtx);

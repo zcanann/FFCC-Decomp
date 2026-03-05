@@ -501,19 +501,30 @@ void CMapMesh::DrawMeshCharaShadow(unsigned short startIdx, unsigned short count
 {
     unsigned int remaining = count;
     MeshDrawEntry* entry = DrawEntries(this) + startIdx;
+    unsigned char* mapMng = MapMng;
 
-    while (remaining != 0) {
+    if (remaining == 0) {
+        return;
+    }
+
+    do {
         if (entry->size != 0) {
-            CMaterial* material = (*reinterpret_cast<CPtrArray<CMaterial*>*>(reinterpret_cast<unsigned char*>(DefaultMaterialSet()) + 8))[entry->materialIdx];
-            if ((material != 0) && ((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(material) + 0x24) &
-                                     0x100000) != 0)) {
-                SetMaterialCharaShadow__12CMaterialManFP9CMaterial(MaterialMan, material);
-                GXCallDisplayList(entry->displayList, entry->size);
+            CMaterial* material =
+                (*reinterpret_cast<CPtrArray<CMaterial*>*>(
+                    reinterpret_cast<unsigned char*>(*reinterpret_cast<CMaterialSet**>(mapMng + 0x21434)) + 8))[
+                    entry->materialIdx];
+
+            if (material != 0) {
+                if ((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(material) + 0x24) & 0x100000) !=
+                    0) {
+                    SetMaterialCharaShadow__12CMaterialManFP9CMaterial(MaterialMan, material);
+                    GXCallDisplayList(entry->displayList, entry->size);
+                }
             }
         }
         entry++;
         remaining--;
-    }
+    } while (remaining != 0);
 }
 
 /*

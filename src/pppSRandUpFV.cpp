@@ -86,15 +86,15 @@ void pppSRandUpFV(void* param1, void* param2, void* param3)
     f32* target = (cfg->field4 == -1) ? lbl_801EADC8 : (f32*)(self + cfg->field4 + 0x80);
 
     {
-        f32 value = randVec[0] * cfg->field8;
+        f32 value = cfg->field8 * randVec[0];
         target[0] = target[0] + value;
     }
     {
-        f32 value = randVec[1] * cfg->fieldC;
+        f32 value = cfg->fieldC * randVec[1];
         target[1] = target[1] + value;
     }
     {
-        f32 value = randVec[2] * cfg->field10;
+        f32 value = cfg->field10 * randVec[2];
         target[2] = target[2] + value;
     }
 }

@@ -10,26 +10,6 @@ extern "C" float RandF__5CMathFv(CMath* instance);
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void randshort(short, float)
-{
-	// TODO
-}
-
-/*
- * --INFO--
- * Address:	TODO
- * Size:	TODO
- */
-void randf(unsigned char)
-{
-	// TODO
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80064550
  * PAL Size: 656b
  * EN Address: TODO

@@ -1773,77 +1773,131 @@ int CAmemCacheSet::GetData(short index, char* source, int line)
  */
 int CAmemCacheSet::SetData(void* src, int size, CAmemCache::TYPE type, int dmaCopy)
 {
-    unsigned char* bytes = reinterpret_cast<unsigned char*>(this);
-    short index = -1;
-    short i = 0;
-    int cacheCount = *reinterpret_cast<int*>(bytes + 0x3C);
-    int tableBase = *reinterpret_cast<int*>(bytes + 0x58);
+    unsigned char* self = reinterpret_cast<unsigned char*>(this);
+    short slot = 0;
+    int scanOffset = 0;
+    int remaining = *reinterpret_cast<int*>(self + 0x3C);
+    int index = -1;
 
-    while (i < cacheCount) {
-        unsigned char* entry = reinterpret_cast<unsigned char*>(tableBase + i * 0x1C);
-        if (entry[0x0E] == 0) {
-            index = i;
-            break;
-        }
-        i++;
+    if (remaining > 0) {
+        do {
+            if (*reinterpret_cast<char*>(*reinterpret_cast<int*>(self + 0x58) + scanOffset + 0x0E) == 0) {
+                index = slot;
+                break;
+            }
+            scanOffset += 0x1C;
+            slot++;
+            remaining--;
+        } while (remaining != 0);
     }
 
-    if (index == -1) {
+    if (static_cast<short>(index) == -1) {
         return -1;
     }
 
-    unsigned char* entry = reinterpret_cast<unsigned char*>(tableBase + index * 0x1C);
-    unsigned int allocSize = static_cast<unsigned int>(size + 0x1F) & ~0x1F;
-    entry[0x0E] = 1;
-    entry[0x0F] = static_cast<unsigned char>(type);
-    entry[0x1A] = static_cast<char>(dmaCopy);
-    *reinterpret_cast<short*>(entry + 0x0C) = 0;
+    unsigned int* entry = reinterpret_cast<unsigned int*>(*reinterpret_cast<int*>(self + 0x58) + static_cast<short>(index) * 0x1C);
+    unsigned int allocSize = (static_cast<unsigned int>(size) + 0x1F) & ~0x1F;
+    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(entry) + 0x0E) = 1;
+    *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned char*>(entry) + 0x0F) = static_cast<unsigned char>(type);
+    *reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(entry) + 0x1A) = static_cast<char>(dmaCopy);
+    *reinterpret_cast<short*>(entry + 3) = 0;
 
     if (dmaCopy == 0) {
-        CMemory::CStage* stage = *reinterpret_cast<CMemory::CStage**>(bytes + 0x00);
-        int allocated = 0;
-        do {
-            allocated = reinterpret_cast<int>(stage->alloc(allocSize, s_memory_cpp, 0x807, 1));
-            *reinterpret_cast<int*>(entry + 0x04) = allocated;
-            if (allocated == 0) {
-                AmemFreeLowPrio(allocSize);
+        while (true) {
+            entry[1] = reinterpret_cast<unsigned int>(
+                reinterpret_cast<CMemory::CStage*>(*reinterpret_cast<void**>(self))->alloc(allocSize, s_memory_cpp, 0x807, 1));
+            if (entry[1] != 0) {
+                break;
             }
-        } while (allocated == 0);
-    } else {
-        *reinterpret_cast<int*>(bytes + 0x34) = *reinterpret_cast<int*>(bytes + 0x30);
-        *reinterpret_cast<int*>(bytes + 0x30) += allocSize;
-        *reinterpret_cast<int*>(entry + 0x04) = *reinterpret_cast<int*>(bytes + 0x34);
-    }
-
-    *reinterpret_cast<int*>(entry + 0x00) = 0;
-    *reinterpret_cast<unsigned int*>(entry + 0x08) = allocSize;
-    {
-        const unsigned char* data = reinterpret_cast<unsigned char*>(src);
-        int checksum = 0x12345678;
-        unsigned int blockCount = allocSize >> 3;
-        while (blockCount != 0) {
-            checksum += data[0] + data[1] + data[2] + data[3] + data[4] + data[5] + data[6] + data[7];
-            data += 8;
-            blockCount--;
+            AmemFreeLowPrio(allocSize);
         }
 
-        unsigned int remain = allocSize & 7;
-        while (remain != 0) {
+        entry[0] = 0;
+        entry[2] = allocSize;
+
+        int checksum = 0x12345678;
+        unsigned int remainingBytes = entry[2];
+        const unsigned char* data = reinterpret_cast<const unsigned char*>(src);
+        if (remainingBytes != 0) {
+            unsigned int chunks = remainingBytes >> 3;
+            if (chunks != 0) {
+                do {
+                    checksum += data[0] + data[1] + data[2] + data[3] + data[4] + data[5] + data[6] + data[7];
+                    data += 8;
+                    chunks--;
+                } while (chunks != 0);
+
+                remainingBytes &= 7;
+                if (remainingBytes == 0) {
+                    goto checksum_done_copy;
+                }
+            }
+
+            do {
+                checksum += *data;
+                data++;
+                remainingBytes--;
+            } while (remainingBytes != 0);
+        }
+
+    checksum_done_copy:
+        entry[5] = static_cast<unsigned int>(checksum);
+
+        if (*reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(entry) + 0x1A) == 0) {
+            memcpy(reinterpret_cast<void*>(entry[1]), src, entry[2]);
+        } else {
+            int dmaId = DMAEntry__9CRedSoundFiiiiiPFPv_vPv(&Sound, 0, 0, reinterpret_cast<int>(src), entry[1], entry[2], 0, 0);
+            CStopWatch watch((char*)-1);
+            watch.Start();
+            while (DMACheck__9CRedSoundFi(&Sound, dmaId) != 0) {
+                watch.Stop();
+                watch.Get();
+                watch.Start();
+            }
+        }
+
+        DCFlushRange(reinterpret_cast<void*>(entry[1]), allocSize);
+        return index;
+    }
+
+    *reinterpret_cast<int*>(self + 0x34) = *reinterpret_cast<int*>(self + 0x30);
+    *reinterpret_cast<unsigned int*>(self + 0x30) = *reinterpret_cast<unsigned int*>(self + 0x30) + allocSize;
+    entry[1] = *reinterpret_cast<unsigned int*>(self + 0x34);
+    entry[0] = 0;
+    entry[2] = allocSize;
+
+    int checksum = 0x12345678;
+    unsigned int remainingBytes = entry[2];
+    const unsigned char* data = reinterpret_cast<const unsigned char*>(src);
+    if (remainingBytes != 0) {
+        unsigned int chunks = remainingBytes >> 3;
+        if (chunks != 0) {
+            do {
+                checksum += data[0] + data[1] + data[2] + data[3] + data[4] + data[5] + data[6] + data[7];
+                data += 8;
+                chunks--;
+            } while (chunks != 0);
+
+            remainingBytes &= 7;
+            if (remainingBytes == 0) {
+                goto checksum_done_dma;
+            }
+        }
+
+        do {
             checksum += *data;
             data++;
-            remain--;
-        }
-        *reinterpret_cast<int*>(entry + 0x14) = checksum;
+            remainingBytes--;
+        } while (remainingBytes != 0);
     }
 
-    if (dmaCopy == 0) {
-        memcpy(reinterpret_cast<void*>(*reinterpret_cast<int*>(entry + 0x04)), src, *reinterpret_cast<int*>(entry + 0x08));
-        DCFlushRange(reinterpret_cast<void*>(*reinterpret_cast<int*>(entry + 0x04)), allocSize);
-    } else {
-        int dmaId = DMAEntry__9CRedSoundFiiiiiPFPv_vPv(
-            &Sound, 0, 0, reinterpret_cast<int>(src), *reinterpret_cast<int*>(entry + 0x04), *reinterpret_cast<int*>(entry + 0x08), 0,
-            0);
+checksum_done_dma:
+    entry[5] = static_cast<unsigned int>(checksum);
 
+    if (*reinterpret_cast<char*>(reinterpret_cast<unsigned char*>(entry) + 0x1A) == 0) {
+        memcpy(reinterpret_cast<void*>(entry[1]), src, entry[2]);
+    } else {
+        int dmaId = DMAEntry__9CRedSoundFiiiiiPFPv_vPv(&Sound, 0, 0, reinterpret_cast<int>(src), entry[1], entry[2], 0, 0);
         CStopWatch watch((char*)-1);
         watch.Start();
         while (DMACheck__9CRedSoundFi(&Sound, dmaId) != 0) {

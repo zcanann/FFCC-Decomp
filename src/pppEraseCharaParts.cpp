@@ -14,6 +14,34 @@ int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
 void DCFlushRange(void* ptr, unsigned long size);
 }
 
+struct EraseCharaPartsDisplayList {
+    void* m_data;
+    u32 m_size;
+    u16 m_material;
+};
+
+struct EraseCharaPartsMeshData {
+    u8 _pad0[0x50];
+    EraseCharaPartsDisplayList* m_displayLists;
+};
+
+struct EraseCharaPartsMesh {
+    u8 _pad0[0x8];
+    EraseCharaPartsMeshData* m_data;
+};
+
+struct EraseCharaPartsModelData {
+    u8 _pad0[0x24];
+    CMaterialSet* m_materialSet;
+};
+
+struct EraseCharaPartsModelView {
+    u8 _pad0[0xA4];
+    EraseCharaPartsModelData* m_data;
+    u8 _padA8[0x4];
+    EraseCharaPartsMesh* m_meshes;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x8010400C
@@ -26,24 +54,22 @@ void DCFlushRange(void* ptr, unsigned long size);
 void EraseCharaParts_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* param_3,
                                         int meshIndex, int param_5, float (*) [4])
 {
-    void* meshData;
-    void* displayList;
-    int modelData;
-    int meshList;
+    EraseCharaPartsModelView* modelView;
+    EraseCharaPartsDisplayList* displayList;
+    UnkB* callbackParams;
 
-    meshList = *(int*)((char*)model + 0xAC);
-    meshData = *(void**)(meshList + meshIndex * 0x14 + 8);
-    displayList = (void*)(*(int*)((char*)meshData + 0x50) + param_5 * 0xC);
+    modelView = (EraseCharaPartsModelView*)model;
+    displayList = modelView->m_meshes[meshIndex].m_data->m_displayLists + param_5;
+    callbackParams = (UnkB*)param_3;
 
-    modelData = *(int*)((char*)model + 0xA4);
-    MaterialMan.SetMaterial(*(CMaterialSet**)(modelData + 0x24), *(u16*)((char*)displayList + 8), 0,
+    MaterialMan.SetMaterial(modelView->m_data->m_materialSet, displayList->m_material, 0,
                             (_GXTevScale)0);
 
-    if ((*(s8*)((char*)param_3 + 4) != -1) && (meshIndex == *(s8*)((char*)param_3 + 4))) {
+    if ((callbackParams->m_meshIndex != -1) && (meshIndex == callbackParams->m_meshIndex)) {
         GXSetArray((GXAttr)0xB, param_2, 4);
     }
 
-    GXCallDisplayList(*(void**)displayList, *(u32*)((char*)displayList + 4));
+    GXCallDisplayList(displayList->m_data, displayList->m_size);
 }
 
 /*

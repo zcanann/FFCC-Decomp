@@ -1836,42 +1836,29 @@ void CGPartyObj::changeWeapon(int weaponRef, int weaponItem, int forceIdle)
 void CGPartyObj::CheckGameOver()
 {
 	Game.game.m_gameWork.m_gameOverFlag = 1;
-	CGPartyObj* party;
-
-	party = Game.game.m_partyObjArr[0];
-	if (party != nullptr && party->m_scriptHandle != nullptr) {
-		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(party->m_scriptHandle) + 0x1C) != 0 ||
-		    ((*(reinterpret_cast<unsigned char*>(party) + 0x6B8) & 0x04) != 0)) {
-			Game.game.m_gameWork.m_gameOverFlag = 0;
-			return;
+	for (int i = 0; i < 4; i++) {
+		CGPartyObj* party = Game.game.m_partyObjArr[i];
+		if (party == nullptr) {
+			continue;
 		}
-	}
 
-	party = Game.game.m_partyObjArr[1];
-	if (party != nullptr && party->m_scriptHandle != nullptr) {
-		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(party->m_scriptHandle) + 0x1C) != 0 ||
-		    ((*(reinterpret_cast<unsigned char*>(party) + 0x6B8) & 0x04) != 0)) {
-			Game.game.m_gameWork.m_gameOverFlag = 0;
-			return;
+		int keepGameOver = 0;
+		if ((Game.game.m_gameWork.m_menuStageMode != 0) && (Game.game.m_gameWork.m_bossArtifactStageIndex < 0x0F)) {
+			unsigned int status = (*(unsigned int(**)(CGPartyObj*))(*(unsigned char**)((unsigned char*)party + 0x48) + 0xC))(party);
+			if (((status & 0x6D) == 0x6D) &&
+			    (*(int*)(*(unsigned char**)((unsigned char*)party + 0x58) + 0x3B4) != 0)) {
+				keepGameOver = 1;
+			}
 		}
-	}
 
-	party = Game.game.m_partyObjArr[2];
-	if (party != nullptr && party->m_scriptHandle != nullptr) {
-		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(party->m_scriptHandle) + 0x1C) != 0 ||
-		    ((*(reinterpret_cast<unsigned char*>(party) + 0x6B8) & 0x04) != 0)) {
-			Game.game.m_gameWork.m_gameOverFlag = 0;
-			return;
+		if ((keepGameOver != 0) ||
+		    ((*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(party->m_scriptHandle) + 0x1C) == 0) &&
+		     ((*(reinterpret_cast<unsigned char*>(party) + 0x6B8) & 0x04) == 0))) {
+			continue;
 		}
-	}
 
-	party = Game.game.m_partyObjArr[3];
-	if (party != nullptr && party->m_scriptHandle != nullptr) {
-		if (*reinterpret_cast<short*>(reinterpret_cast<unsigned char*>(party->m_scriptHandle) + 0x1C) != 0 ||
-		    ((*(reinterpret_cast<unsigned char*>(party) + 0x6B8) & 0x04) != 0)) {
-			Game.game.m_gameWork.m_gameOverFlag = 0;
-			return;
-		}
+		Game.game.m_gameWork.m_gameOverFlag = 0;
+		return;
 	}
 }
 

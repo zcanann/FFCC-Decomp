@@ -71,9 +71,9 @@ extern "C" CFlatData* dtor_800980B4(CFlatData* flatData, short shouldDelete)
 		char* m_mesBuffer;
 	};
 
+	int iVar2;
 	FlatDataLayout* dataIter;
 	FlatDataLayout* tableIter;
-	int iVar2;
 
 	if (flatData != nullptr)
 	{

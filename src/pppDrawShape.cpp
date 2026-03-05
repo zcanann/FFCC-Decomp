@@ -19,16 +19,15 @@ typedef struct ShapeState {
 
 typedef struct ShapeControlData {
     u8 _pad0[4];
-    s16 type;
-    u16 _padType;
+    u32 type;
     u32 step;
     u8 _pad2[1];
     u8 blendMode;
     u8 paramE;
     u8 _pad3[1];
     f32 scale;
-    u8 param14;
     u8 param15;
+    u8 param14;
 } ShapeControlData;
 
 typedef struct ShapeSpecEntry {
@@ -76,7 +75,7 @@ void pppCalcShape(void* pppShape, void* data, void* additionalData)
 	ShapeRuntimeData* runtimeData = *(ShapeRuntimeData**)((u8*)additionalData + 0xC);
 	ShapeControlData* controlData = (ShapeControlData*)data;
 	ShapeState* shapeData = (ShapeState*)((u8*)pppShape + runtimeData->shapeDataOffset + 0x80);
-	u32 type = *(u32*)((u8*)controlData + 4);
+	u32 type = controlData->type;
 
 	if ((type + 0x10000) == 0xFFFF) {
 		return;
@@ -123,7 +122,7 @@ void pppDrawShape(void* pppShape, void* data, void* additionalData)
 	ShapeControlData* controlData = (ShapeControlData*)data;
 	ShapeState* shapeData = (ShapeState*)((u8*)pppShape + runtimeData->shapeDataOffset + 0x80);
 	void* posData = (u8*)pppShape + runtimeData->posDataOffset + 0x80;
-	u32 type = *(u32*)((u8*)controlData + 4);
+	u32 type = controlData->type;
 
 	if ((type + 0x10000) == 0xFFFF) {
 		return;
@@ -143,7 +142,7 @@ void pppDrawShape(void* pppShape, void* data, void* additionalData)
 		controlData->blendMode,
 		0,
 		1,
-		controlData->param14,
+		1,
 		0
 	);
 

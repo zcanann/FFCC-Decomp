@@ -15,8 +15,8 @@ void DCFlushRange(void* ptr, unsigned long size);
 }
 
 struct EraseCharaPartsDisplayList {
-    void* m_data;
     u32 m_size;
+    void* m_data;
     u16 m_material;
 };
 
@@ -28,6 +28,7 @@ struct EraseCharaPartsMeshData {
 struct EraseCharaPartsMesh {
     u8 _pad0[0x8];
     EraseCharaPartsMeshData* m_data;
+    u8 _padC[0x8];
 };
 
 struct EraseCharaPartsModelData {

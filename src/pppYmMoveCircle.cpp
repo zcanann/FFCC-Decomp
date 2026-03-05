@@ -45,7 +45,9 @@ extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCirc
     s32 offset = offsetData->m_serializedDataOffsets[0];
     pppYmMoveCircleWork* work = (pppYmMoveCircleWork*)((u8*)basePtr + offset + 0x80);
 
-    temp2 = (Vec){lbl_80330D7C, lbl_80330D7C, lbl_80330D8C};
+    temp2.x = lbl_80330D7C;
+    temp2.z = lbl_80330D7C;
+    temp2.y = lbl_80330D8C;
 
     PSVECSubtract((Vec*)(pppMngSt + 0x68), (Vec*)(pppMngSt + 0x58), &temp1);
     PSVECNormalize(&temp1, &temp1);

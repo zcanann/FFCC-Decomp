@@ -1,12 +1,12 @@
 #include "ffcc/pppYmLookOn.h"
 #include <dolphin/mtx.h>
 
-extern int DAT_8032ed70;
-extern float FLOAT_80330ec8;
-extern float FLOAT_80330ecc;
+extern int lbl_8032ED70;
+extern float lbl_80330EC8;
+extern float lbl_80330ECC;
 
 struct _pppMngSt;
-extern struct _pppMngSt* pppMngStPtr;
+extern struct _pppMngSt* lbl_8032ED50;
 
 extern "C" void pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
 
@@ -47,11 +47,11 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct UnkB* param_2, str
     Vec local_4c;
     Vec local_58;
 
-    if (DAT_8032ed70 != 0) {
+    if (lbl_8032ED70 != 0) {
         return;
     }
 
-    pppMngSt = pppMngStPtr;
+    pppMngSt = lbl_8032ED50;
     owner = *(u8**)((u8*)pppMngSt + 0xdc);
     workOffset = *param_3->m_serializedDataOffsets;
     ownerRef = (u8**)((u8*)pppYmLookOn + workOffset + 0x80);
@@ -73,31 +73,31 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct UnkB* param_2, str
     local_58.z = *(f32*)((u8*)pppMngSt + 0xa4);
     PSVECSubtract(&local_58, &local_4c, &local_44);
 
-    if (((FLOAT_80330ec8 != local_44.x) || (FLOAT_80330ec8 != local_44.y)) || (FLOAT_80330ec8 != local_44.z)) {
+    if (((lbl_80330EC8 != local_44.x) || (lbl_80330EC8 != local_44.y)) || (lbl_80330EC8 != local_44.z)) {
         PSVECNormalize(&local_44, &local_40);
         local_28.x = local_40.z;
-        local_28.y = FLOAT_80330ec8;
+        local_28.y = lbl_80330EC8;
         local_28.z = -local_40.x;
-        if ((FLOAT_80330ec8 == local_40.z) && (FLOAT_80330ec8 == local_28.z)) {
-            local_28.x = FLOAT_80330ecc;
-            local_28.z = FLOAT_80330ec8;
-            local_34.x = FLOAT_80330ec8;
-            local_34.y = FLOAT_80330ec8;
-            local_34.z = FLOAT_80330ecc;
+        if ((lbl_80330EC8 == local_40.z) && (lbl_80330EC8 == local_28.z)) {
+            local_28.x = lbl_80330ECC;
+            local_28.z = lbl_80330EC8;
+            local_34.x = lbl_80330EC8;
+            local_34.y = lbl_80330EC8;
+            local_34.z = lbl_80330ECC;
         } else {
             PSVECNormalize(&local_28, &local_28);
             PSVECCrossProduct(&local_40, &local_28, &local_34);
             PSVECNormalize(&local_34, &local_34);
         }
-        *(f32*)((u8*)pppMngStPtr + 0x78) = local_28.x;
-        *(f32*)((u8*)pppMngStPtr + 0x88) = local_28.y;
-        *(f32*)((u8*)pppMngStPtr + 0x98) = local_28.z;
-        *(f32*)((u8*)pppMngStPtr + 0x7c) = local_34.x;
-        *(f32*)((u8*)pppMngStPtr + 0x8c) = local_34.y;
-        *(f32*)((u8*)pppMngStPtr + 0x9c) = local_34.z;
-        *(f32*)((u8*)pppMngStPtr + 0x80) = local_40.x;
-        *(f32*)((u8*)pppMngStPtr + 0x90) = local_40.y;
-        *(f32*)((u8*)pppMngStPtr + 0xa0) = local_40.z;
+        *(f32*)((u8*)lbl_8032ED50 + 0x78) = local_28.x;
+        *(f32*)((u8*)lbl_8032ED50 + 0x88) = local_28.y;
+        *(f32*)((u8*)lbl_8032ED50 + 0x98) = local_28.z;
+        *(f32*)((u8*)lbl_8032ED50 + 0x7c) = local_34.x;
+        *(f32*)((u8*)lbl_8032ED50 + 0x8c) = local_34.y;
+        *(f32*)((u8*)lbl_8032ED50 + 0x9c) = local_34.z;
+        *(f32*)((u8*)lbl_8032ED50 + 0x80) = local_40.x;
+        *(f32*)((u8*)lbl_8032ED50 + 0x90) = local_40.y;
+        *(f32*)((u8*)lbl_8032ED50 + 0xa0) = local_40.z;
         pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
     }
 }

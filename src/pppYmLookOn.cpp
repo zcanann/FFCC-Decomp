@@ -39,7 +39,7 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct UnkB* param_2, str
     struct _pppMngSt* pppMngSt;
     int workOffset;
     u8* owner;
-    u8** ownerRef;
+    u8** work;
     Vec local_44;
     Vec local_28;
     Vec local_34;
@@ -54,20 +54,21 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct UnkB* param_2, str
     pppMngSt = lbl_8032ED50;
     owner = *(u8**)((u8*)pppMngSt + 0xdc);
     workOffset = *param_3->m_serializedDataOffsets;
-    ownerRef = (u8**)((u8*)pppYmLookOn + workOffset + 0x80);
+    work = (u8**)((u8*)pppYmLookOn + workOffset + 0x80);
     if (owner == nullptr) {
-        if (*ownerRef == nullptr) {
+        if (*work == nullptr) {
             return;
         }
     }
-    *ownerRef = owner;
+    *work = owner;
     if (owner == nullptr) {
-        owner = *ownerRef;
+        owner = *work;
     }
 
     local_4c.x = *(f32*)(owner + 0x15c);
     local_4c.z = *(f32*)(owner + 0x164);
-    local_4c.y = *(f32*)(owner + 0x160) + param_2->m_dataValIndex;
+    local_4c.y = *(f32*)(owner + 0x160);
+    local_4c.y += param_2->m_dataValIndex;
     local_58.x = *(f32*)((u8*)pppMngSt + 0x84);
     local_58.y = *(f32*)((u8*)pppMngSt + 0x94);
     local_58.z = *(f32*)((u8*)pppMngSt + 0xa4);
@@ -79,10 +80,10 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct UnkB* param_2, str
         local_28.y = lbl_80330EC8;
         local_28.z = -local_40.x;
         if ((lbl_80330EC8 == local_40.z) && (lbl_80330EC8 == local_28.z)) {
-            local_28.x = lbl_80330ECC;
             local_28.z = lbl_80330EC8;
-            local_34.x = lbl_80330EC8;
+            local_28.x = lbl_80330ECC;
             local_34.y = lbl_80330EC8;
+            local_34.x = lbl_80330EC8;
             local_34.z = lbl_80330ECC;
         } else {
             PSVECNormalize(&local_28, &local_28);

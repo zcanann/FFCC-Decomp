@@ -14,8 +14,12 @@ typedef struct PObjPointEntry {
 
 /*
  * --INFO--
- * Address:	80060AEC
- * Size:	148 bytes (0x94)
+ * PAL Address: 0x80060AEC
+ * PAL Size: 148b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void pppPObjPoint(PppPointData* pointData, PppObjData* objData, PppContainer* container)
 {
@@ -26,15 +30,14 @@ void pppPObjPoint(PppPointData* pointData, PppObjData* objData, PppContainer* co
     PppPointObj* objPtr = (PppPointObj*)((u8*)pointData + *(s32*)container->ptrData + 0x80);
 
     if (objData->id == pointData->id) {
-        u32 tableIndex = objData->field_4;
         u8* vecPtr;
 
-        if ((tableIndex + 0x10000) == 0xFFFF) {
-            vecPtr = lbl_801EADC8;
+        if ((objData->field_4 + 0x10000) == 0xFFFF) {
+            vecPtr = (u8*)lbl_801EADC8;
         } else {
             PObjPointEntry* table = *(PObjPointEntry**)((u8*)lbl_8032ED50 + 0xD4);
             vecPtr = (u8*)objData->data + 0x80;
-            vecPtr += table[tableIndex].vecOffset;
+            vecPtr += table[objData->field_4].vecOffset;
         }
 
         objPtr->vecPtr = vecPtr;

@@ -321,7 +321,7 @@ void OSGetProgressiveMode(u32 on) {
         __OSUnlockSram(FALSE);
         return;
     }
-    sram->flags &= 0x7F;
+    sram->flags &= ~0x80;
     sram->flags |= on;
     __OSUnlockSram(TRUE);
 }

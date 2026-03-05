@@ -79,7 +79,7 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct UnkB* param_2, str
         local_28.x = local_40.z;
         local_28.y = lbl_80330EC8;
         local_28.z = -local_40.x;
-        if (!((lbl_80330EC8 != local_40.z) || (lbl_80330EC8 != local_28.z))) {
+        if ((local_40.z == lbl_80330EC8) && (local_28.z == lbl_80330EC8)) {
             local_28.x = lbl_80330ECC;
             local_28.y = lbl_80330EC8;
             local_28.z = lbl_80330EC8;

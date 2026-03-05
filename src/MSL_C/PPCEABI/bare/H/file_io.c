@@ -106,7 +106,7 @@ int fflush(FILE* file) {
 
 int __get_file_modes(const char* mode, file_modes* modes)
 {
-	unsigned int mode_str;
+	int mode_str;
 	unsigned char open_mode;
 	unsigned char io_mode = 0;
 
@@ -116,7 +116,7 @@ int __get_file_modes(const char* mode, file_modes* modes)
 #endif
 	modes->binary_io = 0;
 	
-	mode_str = (unsigned char)mode[0];
+	mode_str = mode[0];
 	
 	switch (mode_str)
 	{

@@ -241,27 +241,32 @@ int SineSwingR(int phase)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x801C783C
+ * PAL Size: 96b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 int TriangleSwingR(int phase)
 {
-    unsigned int flipped = static_cast<unsigned int>(phase) ^ 0x200;
-    unsigned int mode = flipped >> 8 & 3;
-    unsigned int step = flipped & 0xFF;
-    int result = static_cast<int>(step) * 0x100;
+    u32 original = (u32)phase;
+    u32 flipped = original ^ 0x200;
+    u32 mode = (flipped >> 8) & 3;
+    u32 step = flipped & 0xFF;
+    int result = (int)(step << 8);
 
     if (mode == 2) {
-        result = static_cast<int>(step) * -0x100;
+        result = -(int)(step << 8);
     } else if (mode < 2) {
         if (mode != 0) {
-            result = static_cast<int>(step) * -0x100 + 0x10000;
+            result = -(int)(step << 8) + 0x10000;
         }
     } else if (mode < 4) {
         result -= 0x10000;
     }
 
-    return (result & ~0xFF) | (phase & 0xFF);
+    return (int)((u32)result & 0xFFFFFF00 | (original & 0xFF));
 }
 
 /*

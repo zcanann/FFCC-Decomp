@@ -440,6 +440,7 @@ static void stateCheckID2a() {
 
 static void cbForStateCheckID2a(u32 intType) {
     if (intType == 16) {
+        executing->state = -1;
 		stateTimeout();
 		return;
 	}

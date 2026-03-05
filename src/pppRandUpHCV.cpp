@@ -7,6 +7,7 @@ extern int lbl_8032ED70;
 extern float lbl_80330008;
 extern s16 lbl_801EADC8[];
 extern "C" float RandF__5CMathFv(CMath* instance);
+static f64 const lbl_80330010 = 4503601774854144.0;
 
 typedef struct RandUpHCVParams {
     int index;

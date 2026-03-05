@@ -355,7 +355,6 @@ void GXGetFifoStatus(GXFifoObj* fifo, GXBool* overhi, GXBool* underflow, u32* fi
     }
 
     if (realFifo == CPUFifo) {
-        GXFlush();
         __GXSaveCPUFifoAux(realFifo);
         *fifowrap = (int)GET_REG_FIELD(GX_GET_PI_REG(5), 1, 26);
     }

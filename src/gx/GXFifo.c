@@ -162,35 +162,24 @@ void GXSetCPUFifo(GXFifoObj* fifo) {
 
     CPUFifo = realFifo;
     if (CPUFifo == GPFifo) {
-        u32 reg = 0;
-
         GX_SET_PI_REG(3, (u32)realFifo->base & 0x3FFFFFFF);
         GX_SET_PI_REG(4, (u32)realFifo->top & 0x3FFFFFFF);
-
-        SET_REG_FIELD(LINE(691, 691, 695), reg, 21, 5, (u32)realFifo->wrPtr >> 5);
-        SET_REG_FIELD(LINE(691, 691, 695), reg, 1, 26, 0);
-        GX_SET_PI_REG(5, reg);
+        GX_SET_PI_REG(5, (u32)realFifo->wrPtr & 0x3BFFFFE0);
 
         CPGPLinked = GX_TRUE;
-
         __GXWriteFifoIntReset(1, 1);
         __GXWriteFifoIntEnable(1, 0);
         __GXFifoLink(1);
     } else {
-        u32 reg;
-
         if (CPGPLinked) {
             __GXFifoLink(0);
             CPGPLinked = GX_FALSE;
         }
 
         __GXWriteFifoIntEnable(0, 0);
-        reg = 0;
         GX_SET_PI_REG(3, (u32)realFifo->base & 0x3FFFFFFF);
         GX_SET_PI_REG(4, (u32)realFifo->top & 0x3FFFFFFF);
-        SET_REG_FIELD(LINE(726, 726, 730), reg, 21, 5, (u32)realFifo->wrPtr >> 5);
-        SET_REG_FIELD(LINE(726, 726, 730), reg, 1, 26, 0);
-        GX_SET_PI_REG(5, reg);
+        GX_SET_PI_REG(5, (u32)realFifo->wrPtr & 0x3BFFFFE0);
     }
 
     PPCSync();
@@ -505,16 +494,11 @@ static void __GXWriteFifoIntEnable(u8 hiWatermarkEn, u8 loWatermarkEn) {
 }
 
 static void __GXWriteFifoIntReset(u8 hiWatermarkClr, u8 loWatermarkClr) {
-    u32 hi = (u32)(u8)hiWatermarkClr;
-    u32 lo = (u32)(u8)loWatermarkClr << 1;
-    u32 reg = __GXData->cpClr;
+    GXData* data = __GXData;
 
-    reg = (reg & ~1) | hi;
-    __GXData->cpClr = reg;
-    reg = __GXData->cpClr;
-    reg = (reg & ~2) | lo;
-    __GXData->cpClr = reg;
-    GX_SET_CP_REG(2, __GXData->cpClr);
+    data->cpClr = (data->cpClr & ~1) | (u32)(u8)hiWatermarkClr;
+    data->cpClr = (data->cpClr & ~2) | ((u32)(u8)loWatermarkClr << 1);
+    GX_SET_CP_REG(2, data->cpClr);
 }
 
 void __GXInsaneWatermark(void) {

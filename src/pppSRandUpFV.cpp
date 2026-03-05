@@ -8,6 +8,21 @@ extern f32 lbl_803300C0;
 extern f32 lbl_801EADC8[];
 extern "C" f32 RandF__5CMathFv(CMath*);
 
+struct PppSRandUpFVParam2 {
+    s32 field0;
+    s32 field4;
+    f32 field8;
+    f32 fieldC;
+    f32 field10;
+    u8 unk14[0x18 - 0x14];
+    u8 field18;
+};
+
+struct PppSRandUpFVParam3 {
+    u8 unk0[0xC];
+    s32* fieldC;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x800643a4
@@ -17,24 +32,10 @@ extern "C" f32 RandF__5CMathFv(CMath*);
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppSRandUpFV(void* param1, void* param2, void* param3)
+void pppSRandUpFV(void* param1, void* param2, void* param3)
 {
-    struct PppSRandUpFVParam2 {
-        s32 field0;
-        s32 field4;
-        f32 field8;
-        f32 fieldC;
-        f32 field10;
-        u8 unk14[0x18 - 0x14];
-        u8 field18;
-    };
-    struct PppSRandUpFVParam3 {
-        u8 unk0[0xC];
-        s32* fieldC;
-    };
-
-    PppSRandUpFVParam2* cfg = (PppSRandUpFVParam2*)param2;
     u8* self = (u8*)param1;
+    PppSRandUpFVParam2* cfg = (PppSRandUpFVParam2*)param2;
     PppSRandUpFVParam3* info = (PppSRandUpFVParam3*)param3;
     f32* randVec;
 
@@ -51,7 +52,7 @@ extern "C" void pppSRandUpFV(void* param1, void* param2, void* param3)
             f32 value = RandF__5CMathFv(math);
             if (flag != 0) {
                 f32 randomPair = value + RandF__5CMathFv(math);
-                value = lbl_803300C0 * randomPair;
+                value = randomPair * lbl_803300C0;
             }
             randVec[0] = value;
         }
@@ -61,7 +62,7 @@ extern "C" void pppSRandUpFV(void* param1, void* param2, void* param3)
             f32 value = RandF__5CMathFv(math);
             if (flag != 0) {
                 f32 randomPair = value + RandF__5CMathFv(math);
-                value = lbl_803300C0 * randomPair;
+                value = randomPair * lbl_803300C0;
             }
             randVec[1] = value;
         }
@@ -71,7 +72,7 @@ extern "C" void pppSRandUpFV(void* param1, void* param2, void* param3)
             f32 value = RandF__5CMathFv(math);
             if (flag != 0) {
                 f32 randomPair = value + RandF__5CMathFv(math);
-                value = lbl_803300C0 * randomPair;
+                value = randomPair * lbl_803300C0;
             }
             randVec[2] = value;
         }

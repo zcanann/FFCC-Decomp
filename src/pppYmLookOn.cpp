@@ -65,7 +65,6 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct UnkB* param_2, str
     }
 
     local_4c.x = *(f32*)(owner + 0x15c);
-    local_4c.y = *(f32*)(owner + 0x160) + param_2->m_dataValIndex;
     local_4c.z = *(f32*)(owner + 0x164);
     local_58.x = *(f32*)((u8*)lbl_8032ED50 + 0x84);
     local_58.y = *(f32*)((u8*)lbl_8032ED50 + 0x94);

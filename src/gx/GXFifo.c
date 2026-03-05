@@ -162,35 +162,24 @@ void GXSetCPUFifo(GXFifoObj* fifo) {
 
     CPUFifo = realFifo;
     if (CPUFifo == GPFifo) {
-        u32 reg = 0;
-
         GX_SET_PI_REG(3, (u32)realFifo->base & 0x3FFFFFFF);
         GX_SET_PI_REG(4, (u32)realFifo->top & 0x3FFFFFFF);
-
-        SET_REG_FIELD(LINE(691, 691, 695), reg, 21, 5, (u32)realFifo->wrPtr >> 5);
-        SET_REG_FIELD(LINE(691, 691, 695), reg, 1, 26, 0);
-        GX_SET_PI_REG(5, reg);
+        GX_SET_PI_REG(5, (u32)realFifo->wrPtr & 0x3BFFFFE0);
 
         CPGPLinked = GX_TRUE;
-
         __GXWriteFifoIntReset(1, 1);
         __GXWriteFifoIntEnable(1, 0);
         __GXFifoLink(1);
     } else {
-        u32 reg;
-
         if (CPGPLinked) {
             __GXFifoLink(0);
             CPGPLinked = GX_FALSE;
         }
 
         __GXWriteFifoIntEnable(0, 0);
-        reg = 0;
         GX_SET_PI_REG(3, (u32)realFifo->base & 0x3FFFFFFF);
         GX_SET_PI_REG(4, (u32)realFifo->top & 0x3FFFFFFF);
-        SET_REG_FIELD(LINE(726, 726, 730), reg, 21, 5, (u32)realFifo->wrPtr >> 5);
-        SET_REG_FIELD(LINE(726, 726, 730), reg, 1, 26, 0);
-        GX_SET_PI_REG(5, reg);
+        GX_SET_PI_REG(5, (u32)realFifo->wrPtr & 0x3BFFFFE0);
     }
 
     PPCSync();

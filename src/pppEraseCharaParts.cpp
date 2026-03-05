@@ -86,7 +86,7 @@ void pppConstructEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, UnkC* p
     u8* colorPtr;
     void* gObject;
 
-    serializedDataOffsets = *(s32**)((u8*)param_2 + 0xC);
+    serializedDataOffsets = param_2->m_serializedDataOffsets;
     colorPtr = (u8*)pppEraseCharaParts + 0x80 + serializedDataOffsets[1];
     gObject = *(void**)(lbl_8032ED50 + 0xD8);
     colorPtr[0] = 0x80;

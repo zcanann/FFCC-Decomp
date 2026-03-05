@@ -2,6 +2,8 @@
 #define _PPP_RANDDOWNFV_H_
 
 #ifdef __cplusplus
+void randf(float, float);
+
 extern "C" {
 #endif
 

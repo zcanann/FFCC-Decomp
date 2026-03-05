@@ -23,8 +23,6 @@ struct PppRandDownCVParam3 {
     s32* fieldC;
 };
 
-extern "C" {
-
 /*
  * --INFO--
  * Address: TODO
@@ -32,7 +30,9 @@ extern "C" {
  */
 void randchar(char value, float multiplier)
 {
-    return;
+    f32 base = (f32)value;
+    f32 scaled = base * multiplier;
+    (void)scaled;
 }
 
 /*
@@ -44,7 +44,7 @@ void randchar(char value, float multiplier)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRandDownCV(void* param1, void* param2, void* param3)
+extern "C" void pppRandDownCV(void* param1, void* param2, void* param3)
 {
     u8* base = (u8*)param1;
     PppRandDownCVParam2* in = (PppRandDownCVParam2*)param2;
@@ -79,6 +79,4 @@ void pppRandDownCV(void* param1, void* param2, void* param3)
         target[2] = (u8)(target[2] + (s32)((f32)in->fieldA * scale));
         target[3] = (u8)(target[3] + (s32)((f32)in->fieldB * scale));
     }
-}
-
 }

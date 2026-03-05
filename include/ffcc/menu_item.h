@@ -35,7 +35,7 @@ public:
     CFont* listFont;
     char pad_10c[0x720];
     ItemMenuState* itemMenuState;
-    char pad_830[0x18];
+    char pad_830[0x1C];
     short* singWindowInfo;
     short* itemList;
     char pad_854[0x100];

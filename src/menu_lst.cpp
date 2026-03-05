@@ -140,7 +140,11 @@ int CMenuPcs::MLstOpen()
 			if (*(int*)(itemPtr + 0x12) <= currentFrame) {
 				if (currentFrame < *(int*)(itemPtr + 0x12) + *(int*)(itemPtr + 0x14)) {
 					*(int*)(itemPtr + 0x10) = *(int*)(itemPtr + 0x10) + 1;
-					*(float*)(itemPtr + 8) = (float)*(int*)(itemPtr + 0x10) / (float)*(int*)(itemPtr + 0x14);
+					{
+						double duration = (double)*(int*)(itemPtr + 0x14);
+						double progress = (double)*(int*)(itemPtr + 0x10);
+						*(float*)(itemPtr + 8) = (float)((1.0 / duration) * progress);
+					}
 				} else {
 					completedItems++;
 					*(float*)(itemPtr + 8) = 1.0f;

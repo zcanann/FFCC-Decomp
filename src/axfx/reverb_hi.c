@@ -671,30 +671,17 @@ static void ReverbHICallback(s32* left, s32* right, s32* surround, AXFX_REVHI_WO
 
 static void ReverbHIFree(AXFX_REVHI_WORK* rv) {
     u8 i;
-    AXFX_REVHI_DELAYLINE* dl;
-
-    dl = rv->AP;
-    for (i = 0; i < 9; i++, dl++) {
-		if (dl->inputs != NULL) {
-			DLdelete(dl);
-			dl->inputs = NULL;
-		}
+    for (i = 0; i < 9; i++) {
+        DLdelete(&rv->AP[i]);
     }
 
-    dl = rv->C;
-    for (i = 0; i < 9; i++, dl++) {
-		if (dl->inputs != NULL) {
-			DLdelete(dl);
-			dl->inputs = NULL;
-		}
+    for (i = 0; i < 9; i++) {
+        DLdelete(&rv->C[i]);
     }
 
     if (rv->preDelayTime) {
         for (i = 0; i < 3; i++) {
-			if (rv->preDelayLine[i] != 0) {
-				__AXFXFree(rv->preDelayLine[i]);
-				rv->preDelayLine[i] = NULL;
-			}
+            __AXFXFree(rv->preDelayLine[i]);
         }
     }
 }

@@ -41,7 +41,7 @@ void pppSRandCV(void* param1, void* param2, void* param3)
     u8* base = (u8*)param1;
     PppSRandCVParam2* in = (PppSRandCVParam2*)param2;
     PppSRandCVParam3* out = (PppSRandCVParam3*)param3;
-    u8* targetColor;
+    u8* color;
 
     if (lbl_8032ED70 != 0) {
         return;
@@ -102,12 +102,7 @@ void pppSRandCV(void* param1, void* param2, void* param3)
         target = (float*)(base + *out->fieldC + 0x80);
     }
 
-    if (in->field4 == -1) {
-        targetColor = lbl_801EADC8;
-    } else {
-        targetColor = (u8*)(base + in->field4 + 0x80);
-    }
-    u8* color = targetColor;
+    color = (in->field4 == -1) ? lbl_801EADC8 : (u8*)(base + in->field4 + 0x80);
 
     s8 baseValue = in->field8;
     color[0] = (u8)(color[0] + (s32)((f32)baseValue * target[0] - (f32)baseValue));

@@ -455,17 +455,12 @@ AXPB* __AXGetPBs(void) {
 }
 
 void __AXSetPBDefault(AXVPB* p) {
-    AXPBLPF* lpf;
-
     p->pb.state = 0;
     p->pb.itd.flag = 0;
-    p->sync = AX_SYNC_FLAG_COPYUPDATE | AX_SYNC_FLAG_COPYITD | AX_SYNC_FLAG_COPYSTATE;
-    p->sync |= AX_SYNC_FLAG_UNK10;
+    p->sync = AX_SYNC_FLAG_COPYUPDATE | AX_SYNC_FLAG_COPYITD | AX_SYNC_FLAG_COPYSTATE | 0x200000;
     p->updateMS = p->updateCounter = 0;
     p->updateWrite = p->updateData;
     p->pb.update.updNum[0] = p->pb.update.updNum[1] = p->pb.update.updNum[2] = p->pb.update.updNum[3] = p->pb.update.updNum[4] = 0;
-    lpf = &p->pb.lpf;
-    lpf->on = 0;
 }
 
 void __AXVPBInit(void) {

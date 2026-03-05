@@ -494,16 +494,11 @@ static void __GXWriteFifoIntEnable(u8 hiWatermarkEn, u8 loWatermarkEn) {
 }
 
 static void __GXWriteFifoIntReset(u8 hiWatermarkClr, u8 loWatermarkClr) {
-    u32 hi = (u32)(u8)hiWatermarkClr;
-    u32 lo = (u32)(u8)loWatermarkClr << 1;
-    u32 reg = __GXData->cpClr;
+    GXData* data = __GXData;
 
-    reg = (reg & ~1) | hi;
-    __GXData->cpClr = reg;
-    reg = __GXData->cpClr;
-    reg = (reg & ~2) | lo;
-    __GXData->cpClr = reg;
-    GX_SET_CP_REG(2, __GXData->cpClr);
+    data->cpClr = (data->cpClr & ~1) | (u32)(u8)hiWatermarkClr;
+    data->cpClr = (data->cpClr & ~2) | ((u32)(u8)loWatermarkClr << 1);
+    GX_SET_CP_REG(2, data->cpClr);
 }
 
 void __GXInsaneWatermark(void) {

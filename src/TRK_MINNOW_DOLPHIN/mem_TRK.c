@@ -10,7 +10,8 @@
 void TRK_fill_mem(void* dst, int val, u32 n) {
     u8* p8;
     u32* p32;
-    u32 v, i;
+    u32 v;
+    u32 i;
 
     v = (u8)val;
     p8 = (u8*)dst - 1;
@@ -30,10 +31,8 @@ void TRK_fill_mem(void* dst, int val, u32 n) {
             v |= v << 24 | v << 16 | v << 8;
 
         p32 = (u32*)(p8 - 3);
-
         i = n >> 5;
-
-        if (i) {
+        if (i != 0) {
             do {
                 p32[1] = v;
                 p32[2] = v;
@@ -49,14 +48,17 @@ void TRK_fill_mem(void* dst, int val, u32 n) {
 
         i = (n >> 2) & 7;
 
-        if (i) {
+        if (i != 0) {
             do {
                 *++p32 = v;
             } while (--i);
         }
 
         p8 = (u8*)p32 + 3;
-        n = n & 3;
+        {
+            u32 mask = 3;
+            n &= mask;
+        }
     }
 
     if (n)

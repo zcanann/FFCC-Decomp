@@ -574,19 +574,19 @@ void CGPrgObj::ClassControl(int classControl, int value)
  */
 int CGPrgObj::GetClassControl(int classControl)
 {
-	if (classControl == 9) {
-		return reinterpret_cast<CGPartyObj*>(this)->isRideTarget();
-	}
+	if (classControl != 9) {
+		if (classControl != 8) {
+			if (classControl != 10) {
+				return 0;
+			}
 
-	if (classControl == 8) {
+			return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x560);
+		}
+
 		return reinterpret_cast<CGPartyObj*>(this)->isDispTarget();
 	}
 
-	if (classControl == 10) {
-		return *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x560);
-	}
-
-	return 0;
+	return reinterpret_cast<CGPartyObj*>(this)->isRideTarget();
 }
 
 /*

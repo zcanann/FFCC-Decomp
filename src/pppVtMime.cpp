@@ -28,12 +28,13 @@ struct VtMimeSource
 {
     short vertexCount;
     unsigned char pad2[0x2A];
-    float positions[6];
+    float* positions;
 };
 
 struct VtMimeEnv
 {
     void* stage;
+    void* unk4;
     void** sourceTable;
 };
 

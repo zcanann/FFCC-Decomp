@@ -60,7 +60,8 @@ void pppRandUpFV(void* param1, void* param2, void* param3)
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
 
-    f32* target = (in->field4 == -1) ? lbl_801EADC8 : (f32*)(base + in->field4 + 0x80);
+    s32 sourceOffset = in->field4;
+    f32* target = (sourceOffset == -1) ? lbl_801EADC8 : (f32*)(base + sourceOffset + 0x80);
     f32 scale = *valuePtr;
     f32 base0 = target[0];
     f32 delta0 = in->field8 * scale;

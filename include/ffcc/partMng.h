@@ -383,6 +383,8 @@ public:
 
     void pppDeleteAll();
     void pppDestroyAll();
+
+    _pppMngSt m_pppMng[0x60];
 };
 
 extern Mtx ppvCameraMatrix0;

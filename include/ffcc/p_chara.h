@@ -116,7 +116,7 @@ public:
 
     void Init();
     void Quit();
-    void GetTable(unsigned long);
+    int GetTable(unsigned long);
     void create();
     void createLoad();
     void destroy();

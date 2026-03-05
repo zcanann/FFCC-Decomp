@@ -219,19 +219,30 @@ void GXPokeAlphaUpdate(GXBool update_enable) {
 }
 
 void GXPokeBlendMode(GXBlendMode type, GXBlendFactor src_factor, GXBlendFactor dst_factor, GXLogicOp op) {
-    u16 blend_enable;
-    u16 logic_enable;
-    u16 subtract_enable;
-    u16 reg;
+    u16 blend_enable = 1;
+    u32 logic_enable;
+    u32 subtract_enable;
+    u32 reg;
+    volatile u16* pe_reg;
+    volatile u16* pe_reg_1;
 
-    reg = GX_GET_PE_REG(1);
-    blend_enable = ((type == GX_BM_BLEND) || (type == GX_BM_SUBTRACT));
-    blend_enable = (blend_enable != 0);
-    logic_enable = (u16)(__cntlzw((u32)(GX_BM_LOGIC - type)) >> 4) & 0xFFFE;
-    subtract_enable = (u16)(__cntlzw((u32)(GX_BM_SUBTRACT - type)) << 6) & 0xF800;
-    reg = (u16)((reg & 0x1C) | blend_enable | logic_enable | subtract_enable |
-                ((u16)op << 12) | ((u16)src_factor << 8) | ((u16)dst_factor << 5));
-    GX_SET_PE_REG(1, reg);
+    pe_reg = (volatile u16*)__peReg;
+    pe_reg_1 = pe_reg + 1;
+    reg = *pe_reg_1;
+
+    if ((type != GX_BM_BLEND) && (type != GX_BM_SUBTRACT)) {
+        blend_enable = 0;
+    }
+
+    logic_enable = __cntlzw((u32)(GX_BM_LOGIC - type));
+    subtract_enable = __cntlzw((u32)(GX_BM_SUBTRACT - type));
+    reg = (reg & ~0x1) | blend_enable;
+    reg = (reg & ~0xF800) | ((subtract_enable << 6) & 0xF800);
+    reg = (reg & ~0xFFFE) | ((logic_enable >> 4) & 0xFFFE);
+    reg = (reg & ~0xF000) | ((u32)op << 12);
+    reg = (reg & ~0x0F00) | ((u32)src_factor << 8);
+    reg = (reg & ~0x01E0) | ((u32)dst_factor << 5);
+    *pe_reg_1 = (u16)reg;
 }
 
 void GXPokeColorUpdate(GXBool update_enable) {

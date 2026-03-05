@@ -34,7 +34,10 @@ void pppSRandDownHCV(void* param1, void* param2, void* param3)
 			u8 flag = *((u8*)param2 + 0x10);
 			float value = -RandF__5CMathFv(math);
 			if (flag != 0) {
-				value = (value - RandF__5CMathFv(math)) * lbl_80330088;
+				float random = RandF__5CMathFv(math);
+				float blend = value - random;
+				float scale = lbl_80330088;
+				value = blend * scale;
 			}
 			target[0] = value;
 		}
@@ -43,7 +46,10 @@ void pppSRandDownHCV(void* param1, void* param2, void* param3)
 			u8 flag = *((u8*)param2 + 0x10);
 			float value = -RandF__5CMathFv(math);
 			if (flag != 0) {
-				value = (value - RandF__5CMathFv(math)) * lbl_80330088;
+				float random = RandF__5CMathFv(math);
+				float blend = value - random;
+				float scale = lbl_80330088;
+				value = blend * scale;
 			}
 			target[1] = value;
 		}
@@ -52,7 +58,10 @@ void pppSRandDownHCV(void* param1, void* param2, void* param3)
 			u8 flag = *((u8*)param2 + 0x10);
 			float value = -RandF__5CMathFv(math);
 			if (flag != 0) {
-				value = (value - RandF__5CMathFv(math)) * lbl_80330088;
+				float random = RandF__5CMathFv(math);
+				float blend = value - random;
+				float scale = lbl_80330088;
+				value = blend * scale;
 			}
 			target[2] = value;
 		}
@@ -61,7 +70,10 @@ void pppSRandDownHCV(void* param1, void* param2, void* param3)
 			u8 flag = *((u8*)param2 + 0x10);
 			float value = -RandF__5CMathFv(math);
 			if (flag != 0) {
-				value = (value - RandF__5CMathFv(math)) * lbl_80330088;
+				float random = RandF__5CMathFv(math);
+				float blend = value - random;
+				float scale = lbl_80330088;
+				value = blend * scale;
 			}
 			target[3] = value;
 		}

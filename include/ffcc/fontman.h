@@ -66,14 +66,15 @@ public:
 	unsigned short m_glyphColumns;
 	unsigned char m_usesEmbeddedData;
 	unsigned char m_pad0f;
+	unsigned int m_unk10;
 	float posX;
 	float posY;
 	float posZ;
 	float margin;
+	unsigned char renderFlags;
+	unsigned char m_pad25[3];
 	float scaleX;
 	float scaleY;
-	unsigned char m_pad28[7];
-	unsigned char renderFlags;
 	_GXColor m_color;
 	CTexture* texturePtr;
 	void* m_glyphData;

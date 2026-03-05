@@ -14,6 +14,34 @@ int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
 void DCFlushRange(void* ptr, unsigned long size);
 }
 
+struct EraseCharaPartsDisplayList {
+    void* m_data;
+    u32 m_size;
+    u16 m_material;
+};
+
+struct EraseCharaPartsMeshData {
+    u8 _pad0[0x50];
+    EraseCharaPartsDisplayList* m_displayLists;
+};
+
+struct EraseCharaPartsMesh {
+    u8 _pad0[0x8];
+    EraseCharaPartsMeshData* m_data;
+};
+
+struct EraseCharaPartsModelData {
+    u8 _pad0[0x24];
+    CMaterialSet* m_materialSet;
+};
+
+struct EraseCharaPartsModelView {
+    u8 _pad0[0xA4];
+    EraseCharaPartsModelData* m_data;
+    u8 _padA8[0x4];
+    EraseCharaPartsMesh* m_meshes;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x8010400C

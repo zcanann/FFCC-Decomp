@@ -123,10 +123,10 @@ void CSystemPcs::calc()
     int stepPad;
     unsigned short buttons;
 
-    if (Pad._1b8_4_ != 0) {
+    if ((int)Pad._1c4_4_ != 0) {
         buttons = 0;
     } else {
-        debugPad = Pad._1b4_4_;
+        debugPad = (int)Pad._1c0_4_;
         stepPad = (debugPad == 4) ? 0 : 4;
         buttons = *(unsigned short*)(((unsigned char*)&Pad) + stepPad * 0x54 + 0x36);
     }
@@ -139,13 +139,15 @@ void CSystemPcs::calc()
         return;
     }
     if (((buttons & 0x800) == 0) && ((buttons & 0x40) != 0)) {
-        debugPad = Pad._1b4_4_ + 1;
-        if (debugPad == 0) {
-            debugPad = Pad._1b4_4_ + 2;
+        int nextPad = (int)Pad._1c0_4_;
+        CPad* pad = &Pad;
+        nextPad++;
+        if (nextPad == 0) {
+            nextPad++;
         }
-        if (debugPad > 3) {
-            debugPad = -1;
+        if (nextPad > 3) {
+            nextPad = -1;
         }
-        Pad._1b4_4_ = debugPad;
+        pad->_1c0_4_ = (unsigned int)nextPad;
     }
 }

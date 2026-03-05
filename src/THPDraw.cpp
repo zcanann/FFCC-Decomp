@@ -3,10 +3,10 @@
 #include "dolphin/mtx.h"
 #include "ffcc/gxfunc.h"
 
-static const GXColorS10 sTevColor = {-90, 0, -114, 135};
-static const GXColor sKColor0 = {0, 0, 226, 88};
-static const GXColor sKColor1 = {179, 0, 0, 182};
-static const GXColor sKColor2 = {0, 135, 0, 0};
+const GXColorS10 lbl_80331870 = {-90, 0, -114, 135};
+const GXColor lbl_80331878 = {0, 0, 226, 88};
+const GXColor lbl_8033187C = {179, 0, 0, 182};
+const GXColor lbl_80331880 = {0, 135, 0, 0};
 extern f32 lbl_80331884;
 
 void THPGXYuv2RgbDraw(u32* yImage, u32* uImage, u32* vImage, s16 x, s16 y, s16 texWidth, s16 texHeight, s16 polyWidth, s16 polyHeight) {
@@ -120,13 +120,13 @@ void THPGXYuv2RgbSetup(GXRenderModeObj* rmode) {
     _GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
     GXSetTevKColorSel(GX_TEVSTAGE3, GX_TEV_KCSEL_K2);
 
-    GXSetTevColorS10(GX_TEVREG0, sTevColor);
+    GXSetTevColorS10(GX_TEVREG0, lbl_80331870);
 
-    GXSetTevKColor(GX_KCOLOR0, sKColor0);
+    GXSetTevKColor(GX_KCOLOR0, lbl_80331878);
 
-    GXSetTevKColor(GX_KCOLOR1, sKColor1);
+    GXSetTevKColor(GX_KCOLOR1, lbl_8033187C);
 
-    GXSetTevKColor(GX_KCOLOR2, sKColor2);
+    GXSetTevKColor(GX_KCOLOR2, lbl_80331880);
 
     _GXSetTevSwapModeTable(GX_TEV_SWAP0, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
 

@@ -51,6 +51,13 @@ struct CTextureLite {
     GXTlutObj m_tlutObj1;
 };
 
+struct GraphValueState {
+    float value;
+    float velocity;
+    float acceleration;
+    s32 graphId;
+};
+
 /*
  * --INFO--
  * PAL Address: 0x800e602c
@@ -352,10 +359,12 @@ int GetCharaNodeFrameMatrix(_pppMngSt* mngSt, float frameAdd, float (*outMatrix)
 void CalcGraphValue(_pppPObject* object, long graphId, float& value, float& velocity, float& acceleration, float addValue,
                     float& velocityAdd, float& accelerationAdd)
 {
+    GraphValueState* state = (GraphValueState*)object;
+
     velocity += acceleration;
     value += velocity;
 
-    if (graphId == object->m_graphId) {
+    if (graphId == state->graphId) {
         value += addValue;
         velocity += velocityAdd;
         acceleration += accelerationAdd;

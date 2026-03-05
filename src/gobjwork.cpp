@@ -20,6 +20,9 @@ static inline float GetStatusMultiplier(int offset)
 
 extern "C" void __dl__FPv(void*);
 extern "C" int __cntlzw(unsigned int);
+extern "C" int useItem__10CGPartyObjFi(CGPartyObj*, int);
+extern "C" int putItem__10CGPartyObjFi(CGPartyObj*, int);
+extern "C" int DelItem__6JoyBusFiUc(JoyBus*, int, char);
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
 	void*, void*, int, int, int, void*, void*);
 extern "C" int m_tempVar__4CMes[];
@@ -446,22 +449,44 @@ void CCaravanWork::FGLetterReply(int letterIdx, int param3, int param4, int para
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a2290
+ * PAL Size: 160b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::FGUseItem(int, int)
+void CCaravanWork::FGUseItem(int itemIdx, int updateJoybus)
 {
-	// TODO
+	int used = useItem__10CGPartyObjFi((CGPartyObj*)m_ownerObj, (int)(short)m_inventoryItems[itemIdx]);
+	if ((used != 0) && ((short)m_inventoryItems[itemIdx] != -1)) {
+		m_inventoryItems[itemIdx] = 0xFFFF;
+		m_inventoryItemCount--;
+		if (updateJoybus != 0) {
+			DelItem__6JoyBusFiUc(&Joybus, m_joybusCaravanId, (char)itemIdx);
+		}
+	}
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a21f0
+ * PAL Size: 160b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::FGPutItem(int, int)
+void CCaravanWork::FGPutItem(int itemIdx, int updateJoybus)
 {
-	// TODO
+	int put = putItem__10CGPartyObjFi((CGPartyObj*)m_ownerObj, (int)(short)m_inventoryItems[itemIdx]);
+	if ((put != 0) && ((short)m_inventoryItems[itemIdx] != -1)) {
+		m_inventoryItems[itemIdx] = 0xFFFF;
+		m_inventoryItemCount--;
+		if (updateJoybus != 0) {
+			DelItem__6JoyBusFiUc(&Joybus, m_joybusCaravanId, (char)itemIdx);
+		}
+	}
 }
 
 /*

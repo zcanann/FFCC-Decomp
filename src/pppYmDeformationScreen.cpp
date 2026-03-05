@@ -58,6 +58,8 @@ struct _pppEnvStYmDeformationScreen {
 
 extern int lbl_8032ED70;
 extern unsigned char lbl_8032ED78;
+extern float lbl_80330670;
+extern float lbl_8033067C;
 extern CMath math[];
 extern char DAT_80238030[];
 extern CUtil DAT_8032ec70;
@@ -197,12 +199,12 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 
 			if (((_pppPObject*)param1)->m_graphId == 0) {
 				PSMTX44Copy(CameraPcs.m_screenMatrix, screenMtx);
-				inVec.x = 0.0f;
-				inVec.y = 0.0f;
+				inVec.x = lbl_80330670;
+				inVec.y = lbl_80330670;
 				inVec.z = -*(float*)&step->m_payloadBytes[2];
-				inVec.w = 1.0f;
+				inVec.w = lbl_8033067C;
 				MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(math, screenMtx, &inVec, &outVec);
-				if (0.0f != outVec.w) {
+				if (lbl_80330670 != outVec.w) {
 					outVec.z /= outVec.w;
 				}
 				work[0] = outVec.z;

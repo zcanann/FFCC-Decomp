@@ -28,17 +28,6 @@ struct PppRandDownFVParam3 {
 
 /*
  * --INFO--
- * Address: TODO
- * Size: TODO
- */
-void randf(float left, float right)
-{
-    f32 value = left + right;
-    (void)value;
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80061664
  * PAL Size: 304b
  * EN Address: TODO

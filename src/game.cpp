@@ -1385,7 +1385,7 @@ int CGame::GetBossArtifact(int ratioIndex, int amount)
  */
 int CGame::GetFoodLevel(int playerIndex, int foodIndex)
 {
-    s16 level = reinterpret_cast<s16*>(m_scriptFoodBase[playerIndex] + 0x3B8)[foodIndex];
+    u16 level = reinterpret_cast<u16*>(m_scriptFoodBase[playerIndex] + 0x3B8)[foodIndex];
     return level;
 }
 

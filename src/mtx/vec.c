@@ -113,34 +113,39 @@ asm f32 PSVECSquareMag(register const Vec *v) {
 
 f32 PSVECMag(const register Vec *v)
 {
-    register f32 v_xy, v_zz, square_mag;
-    register f32 ret_mag, n_0, n_1;
-    register f32 three, half, zero;
+    register f32 half_c;
+    register f32 square_mag;
+    register f32 zero;
+    register f32 three_c;
+    register f32 recip;
+    register f32 n_0;
 #ifdef __MWERKS__ // clang-format off
 	asm {
-		psq_l       v_xy, 0(v), 0, 0
-		ps_mul      v_xy, v_xy, v_xy
-		lfs         v_zz, 8(v)
-		ps_madd     square_mag, v_zz, v_zz, v_xy
-    }
-#endif // clang-format on
-    half = 0.5f;
-#ifdef __MWERKS__ // clang-format off
-    asm {
-		ps_sum0     square_mag, square_mag, v_xy, v_xy
-		frsqrte     ret_mag, square_mag
-    }
-#endif // clang-format on
-    three = 3.0f;
-#ifdef __MWERKS__ // clang-format off
-asm {
-		fmuls       n_0, ret_mag, ret_mag
-		fmuls       n_1, ret_mag, half
-		fnmsubs     n_0, n_0, square_mag, three
-		fmuls       ret_mag, n_0, n_1
-        fsel        ret_mag, ret_mag, ret_mag, square_mag
-		fmuls       square_mag, square_mag, ret_mag
+		psq_l       f0, 0(v), 0, 0 /* qr0 */
+        ps_mul      f0, f0, f0
+        lfs         f1, 8(v)
 	}
+
+    half_c = 0.5f;
+    asm {
+        fsubs       zero, half_c, half_c
+        ps_madd     square_mag, f1, f1, f0
+        ps_sum0     square_mag, square_mag, f0, f0
+    }
+
+    if (square_mag == zero) {
+    }
+    else {
+        three_c = 3.0f;
+        asm {
+            frsqrte     recip, square_mag
+            fmuls       n_0, recip, recip
+            fmuls       half_c, recip, half_c
+            fnmsubs     n_0, n_0, square_mag, three_c
+            fmuls       recip, n_0, half_c
+            fmuls       square_mag, square_mag, recip
+        }
+    }
 #endif // clang-format on
     return square_mag;
 }
@@ -268,16 +273,12 @@ f32 PSVECDistance(register const Vec *a, register const Vec *b)
     half_c = 0.5f;
 
     asm {
+        fsubs       zero, half_c, half_c
         ps_madd     square_dist, f0, f0, f2
-    }
-
-    zero = half_c - half_c;
-
-    asm {
         ps_sum0     square_dist, square_dist, f2, f2
     }
 
-    if (zero == square_dist) {
+    if (square_dist == zero) {
     }
     else {
         three_c = 3.0f;

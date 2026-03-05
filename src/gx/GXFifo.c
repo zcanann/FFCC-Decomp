@@ -497,16 +497,11 @@ static void __GXFifoLink(u8 en) {
 }
 
 static void __GXWriteFifoIntEnable(u8 hiWatermarkEn, u8 loWatermarkEn) {
-    u32 hi = (u32)(u8)hiWatermarkEn << 2;
-    u32 lo = (u32)(u8)loWatermarkEn << 3;
-    u32 reg = gx->cpEnable;
+    GXData* data = __GXData;
 
-    reg = (reg & ~4) | hi;
-    gx->cpEnable = reg;
-    reg = gx->cpEnable;
-    reg = (reg & ~8) | lo;
-    gx->cpEnable = reg;
-    GX_SET_CP_REG(1, gx->cpEnable);
+    data->cpEnable = (data->cpEnable & ~4) | ((u32)(u8)hiWatermarkEn << 2);
+    data->cpEnable = (data->cpEnable & ~8) | ((u32)(u8)loWatermarkEn << 3);
+    GX_SET_CP_REG(1, data->cpEnable);
 }
 
 static void __GXWriteFifoIntReset(u8 hiWatermarkClr, u8 loWatermarkClr) {

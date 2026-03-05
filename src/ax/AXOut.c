@@ -20,13 +20,21 @@ static int __AXDSPDoneFlag;
 
 static volatile u32 __AXDebugSteppingMode;
 static OSThreadQueue __AXOutThreadQueue;
-static u32 __AXOutputBufferMode;
 
 // prototypes
 static void __AXDSPInitCallback(void* task);
 static void __AXDSPResumeCallback(void* task);
 static void __AXDSPDoneCallback(void* task);
 
+/*
+ * --INFO--
+ * PAL Address: 0x801926B4
+ * PAL Size: 392b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
 void __AXOutNewFrame(u32 lessDspCycles) {
     u32 cl;
     AXPROFILE* profile;
@@ -57,14 +65,8 @@ void __AXOutNewFrame(u32 lessDspCycles) {
 
     __AXLocalProfile.userCallbackEnd = OSGetTime();
     __AXNextFrame(__AXOutSBuffer, &__AXOutBuffer[__AXOutFrame][0]);
-    __AXOutFrame += 1;
-
-    if (__AXOutputBufferMode == 1) {
-        __AXOutFrame %= 3;
-    } else {
-        __AXOutFrame &= 1;
-        AIInitDMA((u32)&__AXOutBuffer[__AXOutFrame][0], 0x280);
-    }
+    __AXOutFrame = (__AXOutFrame + 1) & 1;
+    AIInitDMA((u32)&__AXOutBuffer[__AXOutFrame][0], 0x280);
 
     __AXLocalProfile.axFrameEnd = OSGetTime();
     __AXLocalProfile.axNumVoices = __AXGetNumVoices();
@@ -163,11 +165,19 @@ void __AXOutInitDSP(void) {
     do {} while (__AXDSPInitFlag == 0);
 }
 
-void __AXOutInit(u32 outputBufferMode) {
+/*
+ * --INFO--
+ * PAL Address: 0x80192A00
+ * PAL Size: 832b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void __AXOutInit(void) {
 #ifdef DEBUG
     OSReport("Initializing AXOut code module\n");
 #endif
-    __AXOutputBufferMode = outputBufferMode;
     ASSERTLINE(404, ((u32)&__AXOutBuffer[0][0] & 0x1F) == 0);
     ASSERTLINE(405, ((u32)&__AXOutBuffer[1][0] & 0x1F) == 0);
     ASSERTLINE(406, ((u32)&__AXOutBuffer[2][0] & 0x1F) == 0);

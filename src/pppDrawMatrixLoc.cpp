@@ -2,7 +2,7 @@
 #include "ffcc/partMng.h"
 #include <dolphin/mtx.h>
 
-extern float FLOAT_803331d8;
+extern const float FLOAT_803331d8;
 
 /*
  * --INFO--

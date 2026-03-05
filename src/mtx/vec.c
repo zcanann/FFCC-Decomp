@@ -253,7 +253,6 @@ f32 PSVECDistance(register const Vec *a, register const Vec *b)
     register f32 three_c;
     register f32 recip;
     register f32 n_0;
-    register f32 n_1;
 
 #ifdef __MWERKS__ // clang-format off
 	asm {
@@ -267,14 +266,18 @@ f32 PSVECDistance(register const Vec *a, register const Vec *b)
 	}
 
     half_c = 0.5f;
-    zero = half_c - half_c;
 
     asm {
         ps_madd     square_dist, f0, f0, f2
+    }
+
+    zero = half_c - half_c;
+
+    asm {
         ps_sum0     square_dist, square_dist, f2, f2
     }
 
-    if (square_dist == zero) {
+    if (zero == square_dist) {
     }
     else {
         three_c = 3.0f;
@@ -282,9 +285,9 @@ f32 PSVECDistance(register const Vec *a, register const Vec *b)
         asm {
             frsqrte     recip, square_dist
             fmuls       n_0, recip, recip
-            fmuls       n_1, recip, half_c
+            fmuls       recip, recip, half_c
             fnmsubs     n_0, n_0, square_dist, three_c
-            fmuls       recip, n_0, n_1
+            fmuls       recip, n_0, recip
             fmuls       square_dist, square_dist, recip
         }
     }

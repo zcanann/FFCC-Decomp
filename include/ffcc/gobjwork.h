@@ -92,8 +92,8 @@ public:
     void CanAddTmpArtifact(int);
     int FindItem(int);
     void DeleteItemIdx(int, int);
-    void DeleteItem(int, int);
-    void AddTmpArtifact(int, int*);
+    int DeleteItem(int, int);
+    int AddTmpArtifact(int, int*);
     int CanAddGil(int);
     int AddGil(int);
     int GetFoodRank(int);

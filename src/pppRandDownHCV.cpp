@@ -61,7 +61,9 @@ extern "C" void pppRandDownHCV(void* param1, void* param2, void* param3)
     if (in->field0 == *(s32*)(base + 0xC)) {
         f32 value = -RandF__5CMathFv(&math[0]);
         if (in->field10 != 0) {
-            value = (value - RandF__5CMathFv(&math[0])) * lbl_8032FF48;
+            f32 random = RandF__5CMathFv(&math[0]);
+            f32 blend = value - random;
+            value = blend * lbl_8032FF48;
         }
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
@@ -74,11 +76,22 @@ extern "C" void pppRandDownHCV(void* param1, void* param2, void* param3)
 
     target = (in->field4 == -1) ? &lbl_801EADC8[0] : (s16*)(base + in->field4 + 0x80);
 
+    f32 scale = *valuePtr;
+
     {
-        f32 scale = *valuePtr;
-        target[0] = (s16)(target[0] + (s32)((f32)in->field8 * scale));
-        target[1] = (s16)(target[1] + (s32)((f32)in->fieldA * scale));
-        target[2] = (s16)(target[2] + (s32)((f32)in->fieldC * scale));
-        target[3] = (s16)(target[3] + (s32)((f32)in->fieldE * scale));
+        s16 baseValue = in->field8;
+        target[0] = (s16)(target[0] + (s32)((f32)baseValue * scale));
+    }
+    {
+        s16 baseValue = in->fieldA;
+        target[1] = (s16)(target[1] + (s32)((f32)baseValue * scale));
+    }
+    {
+        s16 baseValue = in->fieldC;
+        target[2] = (s16)(target[2] + (s32)((f32)baseValue * scale));
+    }
+    {
+        s16 baseValue = in->fieldE;
+        target[3] = (s16)(target[3] + (s32)((f32)baseValue * scale));
     }
 }

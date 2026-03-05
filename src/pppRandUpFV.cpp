@@ -62,7 +62,9 @@ void pppRandUpFV(void* param1, void* param2, void* param3)
 
     f32* target = (in->field4 == -1) ? lbl_801EADC8 : (f32*)(base + in->field4 + 0x80);
     f32 scale = *valuePtr;
-    f32 value = in->field8 * scale;
+
+    f32 value = scale;
+    value = value * in->field8;
     target[0] = target[0] + value;
     value = in->fieldC * scale;
     target[1] = target[1] + value;

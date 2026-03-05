@@ -4,6 +4,9 @@
 
 extern "C" char __vt__8CManager[];
 extern "C" char lbl_801E88A4[];
+extern "C" char lbl_801D6F9C[];
+extern "C" char lbl_801D6FDC[];
+extern "C" char lbl_801D7020[];
 
 /*
  * --INFO--
@@ -106,7 +109,7 @@ void CUSB::AddMessageCallback(MessageCallback callback, void* callerContext)
 		{
 			if (callbackEntry->m_callback == callback)
 			{
-				System.Printf("CUSB.AddMessageCallback: 同じイベント関数が既に登録されています。\n");
+				System.Printf(lbl_801D6FDC);
 				break;
 			}
 			continue;
@@ -120,7 +123,7 @@ void CUSB::AddMessageCallback(MessageCallback callback, void* callerContext)
 
 	if (i == 8U)
 	{
-		System.Printf("CUSB.AddMessageCallback: イベント関数が追加できません。\n");
+		System.Printf(lbl_801D7020);
 	}
 }
 
@@ -149,7 +152,7 @@ void CUSB::RemoveMessageCallback(MessageCallback callback)
 
     if (i == 8U)
     {
-        System.Printf("CUSB.AddMessageCallback: イベント関数は登録されていません。\n");
+        System.Printf(lbl_801D6F9C);
     }
 }
 

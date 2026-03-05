@@ -26,24 +26,35 @@ void DCFlushRange(void* ptr, unsigned long size);
 void EraseCharaParts_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* param_3,
                                         int meshIndex, int param_5, float (*) [4])
 {
-    void* meshData;
-    void* displayList;
-    int modelData;
-    int meshList;
+    struct MeshData {
+        u8 pad[0x50];
+        void* displayLists;
+    };
+    struct Mesh {
+        u8 pad[8];
+        MeshData* data;
+        u8 tail[8];
+    };
+    struct ModelData {
+        u8 pad[0x24];
+        CMaterialSet* materialSet;
+    };
+    struct DisplayList {
+        void* data;
+        u32 size;
+        u16 material;
+    };
 
-    meshList = *(int*)((char*)model + 0xAC);
-    meshData = *(void**)(meshList + meshIndex * 0x14 + 8);
-    displayList = (void*)(*(int*)((char*)meshData + 0x50) + param_5 * 0xC);
+    DisplayList* displayList = ((DisplayList*)(((Mesh*)((char*)model + 0xAC))[meshIndex].data->displayLists)) + param_5;
+    ModelData* modelData = *(ModelData**)((char*)model + 0xA4);
 
-    modelData = *(int*)((char*)model + 0xA4);
-    MaterialMan.SetMaterial(*(CMaterialSet**)(modelData + 0x24), *(u16*)((char*)displayList + 8), 0,
-                            (_GXTevScale)0);
+    MaterialMan.SetMaterial(modelData->materialSet, displayList->material, 0, (_GXTevScale)0);
 
-    if ((*(s8*)((char*)param_3 + 4) != -1) && (meshIndex == *(s8*)((char*)param_3 + 4))) {
+    if ((((UnkB*)param_3)->m_meshIndex != -1) && (meshIndex == ((UnkB*)param_3)->m_meshIndex)) {
         GXSetArray((GXAttr)0xB, param_2, 4);
     }
 
-    GXCallDisplayList(*(void**)displayList, *(u32*)((char*)displayList + 4));
+    GXCallDisplayList(displayList->data, displayList->size);
 }
 
 /*

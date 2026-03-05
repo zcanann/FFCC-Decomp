@@ -224,6 +224,7 @@ void C_VECReflect(const Vec *src, const Vec *normal, Vec *dst)
     Vec a0;
     Vec b0;
     f32 dot;
+    f32 scaledDot;
 
     a0.x = -src->x;
     a0.y = -src->y;
@@ -233,9 +234,12 @@ void C_VECReflect(const Vec *src, const Vec *normal, Vec *dst)
     VECNormalize(normal, &b0);
 
     dot = VECDotProduct(&a0, &b0);
-    dst->x = b0.x * 2.0f * dot - a0.x;
-    dst->y = b0.y * 2.0f * dot - a0.y;
-    dst->z = b0.z * 2.0f * dot - a0.z;
+    scaledDot = b0.x * 2.0f * dot;
+    dst->x = scaledDot - a0.x;
+    scaledDot = b0.y * 2.0f * dot;
+    dst->y = scaledDot - a0.y;
+    scaledDot = b0.z * 2.0f * dot;
+    dst->z = scaledDot - a0.z;
 
     VECNormalize(dst, dst);
 }

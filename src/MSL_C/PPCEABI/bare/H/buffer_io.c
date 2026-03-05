@@ -62,11 +62,14 @@ int __load_buffer(FILE* file, size_t* bytes_loaded, int mode)
  */
 int setvbuf(FILE* file, char* buffer, int mode, size_t size)
 {
+	unsigned char* file_bytes = (unsigned char*)file;
+	unsigned short mode_bits = *(unsigned short*)(file_bytes + 4);
+
 	if (mode == _IONBF) {
 		fflush(file);
 	}
 
-	if (file->file_state.io_state != __neutral || file->file_mode.io_mode == 0) {
+	if ((file_bytes[8] >> 5) != 0 || ((mode_bits >> 6) & 7) == 0) {
 		return -1;
 	}
 
@@ -88,7 +91,7 @@ int setvbuf(FILE* file, char* buffer, int mode, size_t size)
 	file->buffer_length = 0;
 	file->buffer_alignment = 0;
 
-	if (mode == _IONBF || size == 0) {
+	if (mode == _IONBF || size < 1) {
 		*file->buffer_ptr = 0;
 		__end_critical_region(2);
 		return 0;

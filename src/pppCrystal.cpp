@@ -90,8 +90,8 @@ void MakeRefractionMap(HSD_ImageBuffer*)
  */
 void pppConstructCrystal(struct pppCrystal* pppCrystal, struct UnkC* param_2)
 {
-	s32 iVar1 = param_2->m_serializedDataOffsets[2];
-	u32* data = (u32*)((char*)pppCrystal + iVar1 + 8);
+	s32* serializedDataOffsets = *(s32**)((u8*)param_2 + 0xC);
+	u32* data = (u32*)((char*)pppCrystal + serializedDataOffsets[2] + 0x80);
 
 	data[0] = 0;
 	data[1] = 0;

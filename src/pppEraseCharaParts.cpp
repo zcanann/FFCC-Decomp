@@ -55,18 +55,15 @@ struct EraseCharaPartsModelView {
 void EraseCharaParts_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* param_3,
                                         int meshIndex, int param_5, float (*) [4])
 {
-    EraseCharaPartsModelView* modelView;
-    EraseCharaPartsDisplayList* displayList;
-    UnkB* callbackParams;
-
-    modelView = (EraseCharaPartsModelView*)model;
-    displayList = modelView->m_meshes[meshIndex].m_data->m_displayLists + param_5;
-    callbackParams = (UnkB*)param_3;
+    EraseCharaPartsModelView* modelView = (EraseCharaPartsModelView*)model;
+    EraseCharaPartsDisplayList* displayList =
+        modelView->m_meshes[meshIndex].m_data->m_displayLists + param_5;
+    s8 callbackMeshIndex = *(s8*)((u8*)param_3 + 4);
 
     MaterialMan.SetMaterial(modelView->m_data->m_materialSet, displayList->m_material, 0,
                             (_GXTevScale)0);
 
-    if ((callbackParams->m_meshIndex != -1) && (meshIndex == callbackParams->m_meshIndex)) {
+    if ((callbackMeshIndex != -1) && (meshIndex == callbackMeshIndex)) {
         GXSetArray((GXAttr)0xB, param_2, 4);
     }
 
@@ -90,7 +87,7 @@ void pppConstructEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, UnkC* p
     u8* colorPtr;
     void* gObject;
 
-    serializedDataOffsets = *(s32**)((u8*)param_2 + 0xC);
+    serializedDataOffsets = param_2->m_serializedDataOffsets;
     colorPtr = (u8*)pppEraseCharaParts + 0x80 + serializedDataOffsets[1];
     gObject = *(void**)(lbl_8032ED50 + 0xD8);
     colorPtr[0] = 0x80;

@@ -439,7 +439,7 @@ static void stateCheckID2a() {
 
 void cbForStateCheckID2a(u32 intType) {
     if (intType == 16) {
-        ((volatile DVDCommandBlock*)executing)->state = -1;
+        executing->state = -1;
 		stateTimeout();
 		return;
 	}

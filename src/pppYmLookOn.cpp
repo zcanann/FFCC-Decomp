@@ -69,9 +69,9 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct UnkB* param_2, str
     local_4c.y = *(f32*)(owner + 0x160);
     local_4c.z = *(f32*)(owner + 0x164);
     local_4c.y += param_2->m_dataValIndex;
-    local_58.x = *(f32*)((u8*)pppMngSt + 0x84);
-    local_58.y = *(f32*)((u8*)pppMngSt + 0x94);
-    local_58.z = *(f32*)((u8*)pppMngSt + 0xa4);
+    local_58.x = *(f32*)((u8*)lbl_8032ED50 + 0x84);
+    local_58.y = *(f32*)((u8*)lbl_8032ED50 + 0x94);
+    local_58.z = *(f32*)((u8*)lbl_8032ED50 + 0xa4);
     PSVECSubtract(&local_58, &local_4c, &local_44);
 
     if (((lbl_80330EC8 != local_44.x) || (lbl_80330EC8 != local_44.y)) || (lbl_80330EC8 != local_44.z)) {

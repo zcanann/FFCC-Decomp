@@ -752,17 +752,17 @@ s32 THPSimpleDrawCurrentFrame(GXRenderModeObj* obj, int x, int y, int polyWidth,
 {
 	s16 drawHeight;
 
-	if (SimpleControl.curFrame < 0) {
-		return -1;
+	if (SimpleControl.curFrame >= 0) {
+		THPGXYuv2RgbSetup(obj);
+		drawHeight = static_cast<s16>(polyHeight);
+		THPGXYuv2RgbDraw(SimpleControl.yImage, SimpleControl.uImage, SimpleControl.vImage, static_cast<s16>(x),
+		                 static_cast<s16>(y), static_cast<s16>(SimpleControl.videoInfo.mXSize),
+		                 static_cast<s16>(SimpleControl.videoInfo.mYSize), static_cast<s16>(polyWidth), drawHeight);
+		THPGXRestore();
+		return SimpleControl.curFrame;
 	}
 
-	THPGXYuv2RgbSetup(obj);
-	drawHeight = static_cast<s16>(polyHeight);
-	THPGXYuv2RgbDraw(SimpleControl.yImage, SimpleControl.uImage, SimpleControl.vImage, static_cast<s16>(x),
-	                 static_cast<s16>(y), static_cast<s16>(SimpleControl.videoInfo.mXSize),
-	                 static_cast<s16>(SimpleControl.videoInfo.mYSize), static_cast<s16>(polyWidth), drawHeight);
-	THPGXRestore();
-	return SimpleControl.curFrame;
+	return -1;
 }
 
 /*

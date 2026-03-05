@@ -100,31 +100,35 @@ void GXAdjustForOverscan(const GXRenderModeObj* rmin, GXRenderModeObj* rmout, u1
 }
 
 void GXSetDispCopySrc(u16 left, u16 top, u16 wd, u16 ht) {
-    CHECK_GXBEGIN(1235, "GXSetDispCopySrc");
-    __GXData->cpDispSrc = 0;
-    OLD_SET_REG_FIELD(1238, __GXData->cpDispSrc, 10, 0, left);
-    OLD_SET_REG_FIELD(1239, __GXData->cpDispSrc, 10, 10, top);
-    OLD_SET_REG_FIELD(1239, __GXData->cpDispSrc, 8, 24, 0x49);
+    extern GXData* const gx;
 
-    __GXData->cpDispSize = 0;
-    OLD_SET_REG_FIELD(1243, __GXData->cpDispSize, 10, 0, wd - 1);
-    OLD_SET_REG_FIELD(1244, __GXData->cpDispSize, 10, 10, ht - 1);
-    OLD_SET_REG_FIELD(1244, __GXData->cpDispSize, 8, 24, 0x4A);
+    CHECK_GXBEGIN(1235, "GXSetDispCopySrc");
+    gx->cpDispSrc = 0;
+    OLD_SET_REG_FIELD(1238, gx->cpDispSrc, 10, 0, left);
+    OLD_SET_REG_FIELD(1239, gx->cpDispSrc, 10, 10, top);
+    OLD_SET_REG_FIELD(1239, gx->cpDispSrc, 8, 24, 0x49);
+
+    gx->cpDispSize = 0;
+    OLD_SET_REG_FIELD(1243, gx->cpDispSize, 10, 0, wd - 1);
+    OLD_SET_REG_FIELD(1244, gx->cpDispSize, 10, 10, ht - 1);
+    OLD_SET_REG_FIELD(1244, gx->cpDispSize, 8, 24, 0x4A);
 }
 
 
 void GXSetTexCopySrc(u16 left, u16 top, u16 wd, u16 ht) {
+    extern GXData* const gx;
+
     CHECK_GXBEGIN(1263, "GXSetTexCopySrc");
 
-    __GXData->cpTexSrc = 0;
-    OLD_SET_REG_FIELD(1266, __GXData->cpTexSrc, 10, 0, left);
-    OLD_SET_REG_FIELD(1267, __GXData->cpTexSrc, 10, 10, top);
-    OLD_SET_REG_FIELD(1267, __GXData->cpTexSrc, 8, 24, 0x49);
+    gx->cpTexSrc = 0;
+    OLD_SET_REG_FIELD(1266, gx->cpTexSrc, 10, 0, left);
+    OLD_SET_REG_FIELD(1267, gx->cpTexSrc, 10, 10, top);
+    OLD_SET_REG_FIELD(1267, gx->cpTexSrc, 8, 24, 0x49);
 
-    __GXData->cpTexSize = 0;
-    OLD_SET_REG_FIELD(1271, __GXData->cpTexSize, 10, 0, wd - 1);
-    OLD_SET_REG_FIELD(1272, __GXData->cpTexSize, 10, 10, ht - 1);
-    OLD_SET_REG_FIELD(1272, __GXData->cpTexSize, 8, 24, 0x4A);
+    gx->cpTexSize = 0;
+    OLD_SET_REG_FIELD(1271, gx->cpTexSize, 10, 0, wd - 1);
+    OLD_SET_REG_FIELD(1272, gx->cpTexSize, 10, 10, ht - 1);
+    OLD_SET_REG_FIELD(1272, gx->cpTexSize, 8, 24, 0x4A);
 }
 
 /*

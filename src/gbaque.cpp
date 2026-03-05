@@ -3290,42 +3290,75 @@ unsigned int GbaQueue::GetPauseMode()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c9090
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-unsigned char GbaQueue::GetItemUse(int)
+unsigned char GbaQueue::GetItemUse(int channel)
 {
-	return 0;
+	char* obj = reinterpret_cast<char*>(this);
+	OSWaitSemaphore(accessSemaphores + channel);
+	unsigned char value = static_cast<unsigned char>(obj[channel * 0xDC + 0x477]);
+	OSSignalSemaphore(accessSemaphores + channel);
+	return value;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c901c
+ * PAL Size: 116b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::GetSPModeFlg(int)
+unsigned int GbaQueue::GetSPModeFlg(int channel)
 {
-	// TODO
+	char* obj = reinterpret_cast<char*>(this);
+	OSWaitSemaphore(accessSemaphores + channel);
+	unsigned char value = static_cast<unsigned char>(obj[0x2D5D]);
+	OSSignalSemaphore(accessSemaphores + channel);
+	unsigned int mask = value & (1U << channel);
+	return (-mask | mask) >> 31;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c8fb4
+ * PAL Size: 104b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::ClrSPModeFlg(int)
+void GbaQueue::ClrSPModeFlg(int channel)
 {
-	// TODO
+	char* obj = reinterpret_cast<char*>(this);
+	OSWaitSemaphore(accessSemaphores + channel);
+	obj[0x2D5D] = obj[0x2D5D] & ~(1 << channel);
+	OSSignalSemaphore(accessSemaphores + channel);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c8f40
+ * PAL Size: 116b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-unsigned int GbaQueue::GetSPMode(int)
+unsigned int GbaQueue::GetSPMode(int channel)
 {
-	return 0;
+	char* obj = reinterpret_cast<char*>(this);
+	OSWaitSemaphore(accessSemaphores + channel);
+	unsigned char value = static_cast<unsigned char>(obj[0x2D5C]);
+	OSSignalSemaphore(accessSemaphores + channel);
+	unsigned int mask = value & (1U << channel);
+	return (-mask | mask) >> 31;
 }
 
 /*

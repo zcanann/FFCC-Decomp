@@ -5,6 +5,7 @@
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/scanf.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdio.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/stdlib.h"
+#include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/critical_regions.h"
 #include "string.h"
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common/wchar_io.h"
 #include "stdarg.h"
@@ -1224,7 +1225,9 @@ int vprintf(const char* format, va_list arg)
         return -1;
     }
 
+    __begin_critical_region(2);
     ret = __pformatter(&__FileWrite, (void*)stdout, format, arg);
+    __end_critical_region(2);
     return ret;
 }
 

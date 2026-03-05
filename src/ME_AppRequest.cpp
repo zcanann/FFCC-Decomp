@@ -49,12 +49,11 @@ struct RSDLISTITEM {
  */
 void CMaterialEditorPcs::ResetRsdList(ZLIST* zlist)
 {
-    _ZLISTITEM* local_28[4];
+    _ZLISTITEM* it = zlist->m_root.m_previous;
 
-    local_28[0] = zlist->m_root.m_previous;
-    while (local_28[0] != (_ZLISTITEM*)0) {
-        RSDLISTITEM* rsdListItem = (RSDLISTITEM*)zlist->GetDataNext(local_28);
-        RSDITEM* rsdItem = rsdListItem->rsdItem;
+    while (it != (_ZLISTITEM*)0) {
+        RSDLISTITEM* listItem = (RSDLISTITEM*)zlist->GetDataNext(&it);
+        RSDITEM* rsdItem = listItem->rsdItem;
         if (rsdItem != (RSDITEM*)0) {
             if (rsdItem->ptrC != (void*)0) {
                 __dla__FPv(rsdItem->ptrC);
@@ -76,23 +75,24 @@ void CMaterialEditorPcs::ResetRsdList(ZLIST* zlist)
                 __dl__FPv(rsdItem);
             }
         }
-        ZCANMGRP* colAnmData = rsdListItem->colAnmData;
-        int colAnmCount = rsdListItem->colAnmCount;
+
+        ZCANMGRP* colAnmData = listItem->colAnmData;
+        int colAnmCount = listItem->colAnmCount;
         if (colAnmData != (ZCANMGRP*)0) {
             for (int i = 0; i < colAnmCount; i++) {
                 if (colAnmData->ptr != (void*)0) {
                     __dla__FPv(colAnmData->ptr);
                     colAnmData->ptr = 0;
                 }
-                colAnmData = colAnmData + 1;
+                colAnmData++;
             }
-            if (rsdListItem->colAnmData != (ZCANMGRP*)0) {
-                __dla__FPv(rsdListItem->colAnmData);
-                rsdListItem->colAnmData = 0;
+            if (listItem->colAnmData != (ZCANMGRP*)0) {
+                __dla__FPv(listItem->colAnmData);
+                listItem->colAnmData = 0;
             }
-            rsdListItem->colAnmData = 0;
+            listItem->colAnmData = 0;
         }
-        __dl__FPv(rsdListItem);
+        __dl__FPv(listItem);
     }
     zlist->DeleteList();
 }

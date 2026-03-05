@@ -294,12 +294,25 @@ void CCaravanWork::Init(int baseDataIndex, CRomWork* romWork, int idOffset)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a2720
+ * PAL Size: 144b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::SetBonusCondition(int)
+void CCaravanWork::SetBonusCondition(int bonusCondition)
 {
-	// TODO
+	m_bonusCondition = static_cast<unsigned char>(bonusCondition);
+	memset(m_artifactRelated, 0, sizeof(m_artifactRelated));
+	m_artifactRelated[3] =
+		*(unsigned short*)(Game.game.m_bossArtifactBase +
+						   (Game.game.m_gameWork.m_bossArtifactStageIndex * 0x168) +
+						   (bonusCondition * 8) + 0x62);
+	m_artifactRelated[4] =
+		*(unsigned short*)(Game.game.m_bossArtifactBase +
+						   (Game.game.m_gameWork.m_bossArtifactStageIndex * 0x168) +
+						   (bonusCondition * 8) + 100);
 }
 
 /*

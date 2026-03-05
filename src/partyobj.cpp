@@ -20,6 +20,7 @@ extern "C" void SetPosX__5CFontFf(float, CFont*);
 extern "C" void SetPosY__5CFontFf(float, CFont*);
 extern "C" void SetPosZ__5CFontFf(float, CFont*);
 extern "C" void Draw__5CFontFPc(CFont*, const char*);
+extern "C" void onPush__9CGBaseObjFP9CGBaseObji(CGBaseObj*, CGBaseObj*, int);
 extern "C" void* CreateFromScript__9CGItemObjFiiiP8CGObjectfPQ29CGItemObj4CCFS(
     int type, int createMode, int itemId, CGObject* owner, float arg, void* cfs);
 extern unsigned char CFlat[];
@@ -1344,8 +1345,7 @@ void CGPartyObj::statAlive()
  */
 void CGPartyObj::onPush(CGBaseObj* other, int pushType)
 {
-	(void)other;
-	(void)pushType;
+	onPush__9CGBaseObjFP9CGBaseObji(this, other, pushType);
 }
 
 /*

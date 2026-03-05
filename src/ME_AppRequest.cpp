@@ -49,54 +49,50 @@ struct RSDLISTITEM {
  */
 void CMaterialEditorPcs::ResetRsdList(ZLIST* zlist)
 {
-    int* piVar1;
-    unsigned int* puVar2;
-    int iVar3;
-    int iVar4;
-    _ZLISTITEM* local_28[4];
+    _ZLISTITEM* it = zlist->m_root.m_previous;
 
-    local_28[0] = zlist->m_root.m_previous;
-    while (local_28[0] != (_ZLISTITEM*)0) {
-        piVar1 = (int*)zlist->GetDataNext(local_28);
-        iVar4 = *piVar1;
-        if (iVar4 != 0) {
-            if (*(void**)(iVar4 + 0xC) != (void*)0) {
-                __dla__FPv(*(void**)(iVar4 + 0xC));
-                *(unsigned int*)(iVar4 + 0xC) = 0;
+    while (it != (_ZLISTITEM*)0) {
+        RSDLISTITEM* listItem = (RSDLISTITEM*)zlist->GetDataNext(&it);
+        RSDITEM* rsdItem = listItem->rsdItem;
+        if (rsdItem != (RSDITEM*)0) {
+            if (rsdItem->ptrC != (void*)0) {
+                __dla__FPv(rsdItem->ptrC);
+                rsdItem->ptrC = 0;
             }
-            if (*(void**)(iVar4 + 0x10) != (void*)0) {
-                __dla__FPv(*(void**)(iVar4 + 0x10));
-                *(unsigned int*)(iVar4 + 0x10) = 0;
+            if (rsdItem->ptr10 != (void*)0) {
+                __dla__FPv(rsdItem->ptr10);
+                rsdItem->ptr10 = 0;
             }
-            if (*(void**)(iVar4 + 0x14) != (void*)0) {
-                __dla__FPv(*(void**)(iVar4 + 0x14));
-                *(unsigned int*)(iVar4 + 0x14) = 0;
+            if (rsdItem->ptr14 != (void*)0) {
+                __dla__FPv(rsdItem->ptr14);
+                rsdItem->ptr14 = 0;
             }
-            if (*(void**)(iVar4 + 0x18) != (void*)0) {
-                __dla__FPv(*(void**)(iVar4 + 0x18));
-                *(unsigned int*)(iVar4 + 0x18) = 0;
+            if (rsdItem->ptr18 != (void*)0) {
+                __dla__FPv(rsdItem->ptr18);
+                rsdItem->ptr18 = 0;
             }
-            if (iVar4 != 0) {
-                __dl__FPv((void*)iVar4);
+            if (rsdItem != (RSDITEM*)0) {
+                __dl__FPv(rsdItem);
             }
         }
-        puVar2 = (unsigned int*)piVar1[1];
-        iVar4 = piVar1[2];
-        if (puVar2 != (unsigned int*)0) {
-            for (iVar3 = 0; iVar3 < iVar4; iVar3 = iVar3 + 1) {
-                if ((void*)*puVar2 != (void*)0) {
-                    __dla__FPv((void*)*puVar2);
-                    *puVar2 = 0;
+
+        ZCANMGRP* colAnmData = listItem->colAnmData;
+        int colAnmCount = listItem->colAnmCount;
+        if (colAnmData != (ZCANMGRP*)0) {
+            for (int i = 0; i < colAnmCount; i++) {
+                if (colAnmData->ptr != (void*)0) {
+                    __dla__FPv(colAnmData->ptr);
+                    colAnmData->ptr = 0;
                 }
-                puVar2 = puVar2 + 5;
+                colAnmData++;
             }
-            if ((void*)piVar1[1] != (void*)0) {
-                __dla__FPv((void*)piVar1[1]);
-                piVar1[1] = 0;
+            if (listItem->colAnmData != (ZCANMGRP*)0) {
+                __dla__FPv(listItem->colAnmData);
+                listItem->colAnmData = 0;
             }
-            piVar1[1] = 0;
+            listItem->colAnmData = 0;
         }
-        __dl__FPv(piVar1);
+        __dl__FPv(listItem);
     }
     zlist->DeleteList();
 }

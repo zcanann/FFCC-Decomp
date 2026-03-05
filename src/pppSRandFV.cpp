@@ -59,12 +59,11 @@ void pppSRandFV(void* param1, void* param2, void* param3)
 
     unsigned char* base = (unsigned char*)param1;
     PppSRandFVParam2* in = (PppSRandFVParam2*)param2;
-    PppSRandFVParam3* out = (PppSRandFVParam3*)param3;
     float* valuePtr;
 
     int state = *(int*)(base + 0xC);
     if (state == 0) {
-        valuePtr = (float*)(base + *out->fieldC + 0x80);
+        valuePtr = (float*)(base + ((PppSRandFVParam3*)param3)->fieldC[0] + 0x80);
 
         {
             unsigned char flag = in->field18;
@@ -102,15 +101,21 @@ void pppSRandFV(void* param1, void* param2, void* param3)
         if (in->field0 != state) {
             return;
         }
-        valuePtr = (float*)(base + *out->fieldC + 0x80);
+        valuePtr = (float*)(base + ((PppSRandFVParam3*)param3)->fieldC[0] + 0x80);
     }
 
     float* target = (in->field4 == -1) ? &lbl_801EADC8[0] : (float*)(base + in->field4 + 0x80);
 
-    float value = in->field8 * valuePtr[0] - in->field8;
-    target[0] = target[0] + value;
-    value = in->fieldC * valuePtr[1] - in->fieldC;
-    target[1] = target[1] + value;
-    value = in->field10 * valuePtr[2] - in->field10;
-    target[2] = target[2] + value;
+    {
+        float value = in->field8 * valuePtr[0] - in->field8;
+        target[0] = target[0] + value;
+    }
+    {
+        float value = in->fieldC * valuePtr[1] - in->fieldC;
+        target[1] = target[1] + value;
+    }
+    {
+        float value = in->field10 * valuePtr[2] - in->field10;
+        target[2] = target[2] + value;
+    }
 }

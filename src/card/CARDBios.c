@@ -556,13 +556,6 @@ s32 __CARDEraseSector(s32 chan, u32 addr, CARDCallback callback) {
     ASSERTLINE(1012, addr % card->sectorSize == 0);
     ASSERTLINE(1013, addr < (u32) card->size * 1024 * 1024 / 8);
 
-    if (card->pageSize > 0x80) {
-        if (callback) {
-            callback(chan, 0);
-        }
-        return 0;
-    }
-
     card->cmd[0] = 0xF1;
     card->cmd[1] = AD1(addr);
     card->cmd[2] = AD2(addr);

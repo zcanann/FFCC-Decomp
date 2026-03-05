@@ -61,6 +61,8 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
     DVDCommandBlock appLoaderReadBlock;
     DVDCommandBlock rebootReadBlock;
     u32 rebootSize;
+    u32 regionStart;
+    u32 regionEnd;
 #if SDK_REVISION < 1
     OSTime start;
 #endif
@@ -70,11 +72,13 @@ void __OSReboot(u32 resetCode, u32 bootDol) {
 
     OSDisableInterrupts();
 
+    regionStart = (u32)__OSRebootParams.regionStart;
+    regionEnd = (u32)__OSRebootParams.regionEnd;
     g_unk_817FFFFC = 0;
     g_unk_817FFFF8 = 0;
     g_unk_800030E2 = 1;
-    BOOT_REGION_START = (u32)__OSRebootParams.regionStart;
-    BOOT_REGION_END = (u32)__OSRebootParams.regionEnd;
+    BOOT_REGION_START = regionStart;
+    BOOT_REGION_END = regionEnd;
 
     OSClearContext(&exceptionContext);
     OSSetCurrentContext(&exceptionContext);

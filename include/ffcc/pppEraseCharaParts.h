@@ -16,6 +16,7 @@ struct UnkB {
 };
 
 struct UnkC {
+    u8 m_unk0[0xC];
     s32* m_serializedDataOffsets;
 };
 

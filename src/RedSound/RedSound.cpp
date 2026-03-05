@@ -746,10 +746,12 @@ void CRedSound::StreamPlayState(int streamID)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void CRedSound::GetStreamPlayPoint(int streamID, int* point1, int* point2)
 {
 	CRedDriver_8032f4c0.GetStreamPlayPoint(streamID, point1, point2);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -802,10 +804,12 @@ int CRedSound::StreamPlay(void* data, int param_3, int param_4, int param_5)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void CRedSound::StreamVolume(int streamID, int volume, int frameCount)
 {
 	CRedDriver_8032f4c0.StreamVolume(streamID, volume, frameCount);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

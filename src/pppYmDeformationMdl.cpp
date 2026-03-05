@@ -1,6 +1,7 @@
 #include "ffcc/pppYmDeformationMdl.h"
 #include "ffcc/graphic.h"
 #include "ffcc/mapmesh.h"
+#include "ffcc/pppYmEnv.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -8,7 +9,6 @@
 extern int DAT_8032ed70;
 extern u8 DAT_8032ed78;
 
-extern void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
 extern float FLOAT_80330dac;
 
 struct pppCVECTOR {
@@ -20,6 +20,7 @@ struct pppFMATRIX {
 };
 
 struct pppModelSt;
+struct _pppPObject;
 
 struct _pppEnvStYmDeformationMdl {
     void* m_stagePtr;
@@ -154,12 +155,12 @@ void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, UnkB* pa
     if ((DAT_8032ed70 == 0) &&
         ((psVar1 = (s16*)((u8*)pppYmDeformationMdl + 0x80 + param_3->m_serializedDataOffsets[2])),
          (param_2->m_dataValIndex != 0xFFFF))) {
-        CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-            (float)param_2->m_initWOrk, pppYmDeformationMdl, param_2->m_graphId, (float*)(psVar1 + 2),
-            (float*)(psVar1 + 4), (float*)(psVar1 + 6), &param_2->m_stepValue, &param_2->m_arg3);
-        CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
-            (float)param_2->m_payload0, pppYmDeformationMdl, param_2->m_graphId, (float*)(psVar1 + 8),
-            (float*)(psVar1 + 10), (float*)(psVar1 + 0xC), &param_2->m_payload1, &param_2->m_payload2);
+        CalcGraphValue(
+            (_pppPObject*)pppYmDeformationMdl, param_2->m_graphId, *(float*)(psVar1 + 2), *(float*)(psVar1 + 4),
+            *(float*)(psVar1 + 6), param_2->m_initWOrk, param_2->m_stepValue, param_2->m_arg3);
+        CalcGraphValue(
+            (_pppPObject*)pppYmDeformationMdl, param_2->m_graphId, *(float*)(psVar1 + 8), *(float*)(psVar1 + 10),
+            *(float*)(psVar1 + 0xC), param_2->m_payload0, param_2->m_payload1, param_2->m_payload2);
 
         if (DAT_8032ed78 == 0) {
             if (*(u8*)(psVar1 + 1) != 0) {

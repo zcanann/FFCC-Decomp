@@ -185,15 +185,19 @@ void C_QUATMtx(Quaternion *r, const Mtx m)
 void C_QUATLerp(const Quaternion *p, const Quaternion *q, Quaternion *r, f32 t)
 {
     f32 value;
+    f32 pValue;
 
-    value = t * (q->x - p->x);
-    r->x = p->x + value;
+    pValue = p->x;
+    value = t * (q->x - pValue);
+    r->x = pValue + value;
 
-    value = t * (q->y - p->y);
-    r->y = p->y + value;
+    pValue = p->y;
+    value = t * (q->y - pValue);
+    r->y = pValue + value;
 
-    value = t * (q->z - p->z);
-    r->z = p->z + value;
+    pValue = p->z;
+    value = t * (q->z - pValue);
+    r->z = pValue + value;
 
     value = t * (q->w - p->w);
     r->w = p->w + value;

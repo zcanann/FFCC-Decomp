@@ -137,7 +137,9 @@ void pppVertexApAt(_pppPObject* parent, PVertexApAt* data, void* ctrl)
             break;
         case 1:
             while (count-- != 0) {
-                int outValue = (int)((f32)entry->maxValue * RandF__5CMathFv(&math));
+                f32 randValue = RandF__5CMathFv(&math);
+                f32 maxValue = (f32)entry->maxValue;
+                int outValue = (int)(randValue * maxValue);
                 u16 outValue16 = (u16)outValue;
 
                 if ((vtxData->childId + 0x10000) != 0xFFFF) {

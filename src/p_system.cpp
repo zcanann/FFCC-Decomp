@@ -139,15 +139,13 @@ void CSystemPcs::calc()
         return;
     }
     if (((buttons & 0x800) == 0) && ((buttons & 0x40) != 0)) {
-        int nextPad = (int)Pad._1c0_4_;
-        CPad* pad = &Pad;
-        nextPad++;
+        int nextPad = (int)Pad._1c0_4_ + 1;
         if (nextPad == 0) {
             nextPad++;
         }
         if (nextPad > 3) {
             nextPad = -1;
         }
-        pad->_1c0_4_ = (unsigned int)nextPad;
+        Pad._1c0_4_ = (unsigned int)nextPad;
     }
 }

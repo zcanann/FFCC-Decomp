@@ -64,13 +64,13 @@ int setvbuf(FILE* file, char* buffer, int mode, size_t size)
 {
 	unsigned char* file_bytes = (unsigned char*)file;
 	unsigned short mode_bits = *(unsigned short*)(file_bytes + 4);
-	unsigned int io_mode = (mode_bits >> 6) & 7;
+	int io_mode = (mode_bits >> 6) & 7;
 
 	if (mode == _IONBF) {
 		fflush(file);
 	}
 
-	if ((file_bytes[8] >> 5) != 0 || io_mode == 0) {
+	if (file->file_state.io_state != __neutral || io_mode == 0) {
 		return -1;
 	}
 

@@ -6,7 +6,7 @@
 #include <dolphin/mtx.h>
 
 extern unsigned char* lbl_8032ED50;
-extern float lbl_80330700;
+extern float lbl_80332080;
 extern unsigned char CFlat[];
 extern Mtx ppvCameraMatrix02;
 
@@ -32,9 +32,9 @@ void pppParHitSphMat(void* param1, void* param2, void* param3)
     _pppMngSt* pppMngSt = (_pppMngSt*)lbl_8032ED50;
     f32 radius;
 
-    local_88.z = lbl_80330700;
-    local_88.y = lbl_80330700;
-    local_88.x = lbl_80330700;
+    local_88.z = lbl_80332080;
+    local_88.y = lbl_80332080;
+    local_88.x = lbl_80332080;
 
     if (step[0xC] != 0) {
         s32* offsets = *(s32**)((u8*)param3 + 0xC);
@@ -53,7 +53,7 @@ void pppParHitSphMat(void* param1, void* param2, void* param3)
         local_94.z = local_94.z + src->z;
     }
 
-    if (*(f32*)(step + 4) != lbl_80330700) {
+    if (*(f32*)(step + 4) != lbl_80332080) {
         PSVECSubtract((Vec*)((u8*)pppMngSt + 8), (Vec*)((u8*)pppMngSt + 0x48), &local_88);
     }
 

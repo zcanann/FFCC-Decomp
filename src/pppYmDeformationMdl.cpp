@@ -164,12 +164,12 @@ void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, UnkB* pa
 
         if (DAT_8032ed78 == 0) {
             if (*(u8*)(psVar1 + 1) != 0) {
-                *psVar1 = *psVar1 + (s16)(int)*(float*)(psVar1 + 8);
-                if (param_2->m_payload3 < *psVar1) {
+                *psVar1 = *psVar1 + (int)*(float*)(psVar1 + 8);
+                if (*psVar1 > param_2->m_payload3) {
                     *(u8*)(psVar1 + 1) = 0;
                 }
             } else {
-                *psVar1 = *psVar1 - (s16)(int)*(float*)(psVar1 + 8);
+                *psVar1 = *psVar1 - (int)*(float*)(psVar1 + 8);
                 if ((int)*psVar1 < -(int)param_2->m_payload3) {
                     *(u8*)(psVar1 + 1) = 1;
                 }

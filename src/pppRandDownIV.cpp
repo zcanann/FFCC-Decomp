@@ -64,9 +64,10 @@ extern "C" void pppRandDownIV(void* param1, void* param2, void* param3)
     }
 
     s32* target = (in->field4 == -1) ? &lbl_801EADC8[0] : (s32*)(base + in->field4 + 0x80);
-    f32 scale = *valuePtr;
-
-    target[0] += (s32)((f32)in->field8 * scale);
-    target[1] += (s32)((f32)in->fieldC * scale);
-    target[2] += (s32)((f32)in->field10 * scale);
+    value = *valuePtr;
+    target[0] += (s32)((f32)in->field8 * value);
+    value = *valuePtr;
+    target[1] += (s32)((f32)in->fieldC * value);
+    value = *valuePtr;
+    target[2] += (s32)((f32)in->field10 * value);
 }

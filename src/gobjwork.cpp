@@ -20,6 +20,7 @@ static inline float GetStatusMultiplier(int offset)
 
 extern "C" void __dl__FPv(void*);
 extern "C" int __cntlzw(unsigned int);
+extern "C" int sprintf(char*, const char*, ...);
 extern "C" int useItem__10CGPartyObjFi(CGPartyObj*, int);
 extern "C" int putItem__10CGPartyObjFi(CGPartyObj*, int);
 extern "C" int putGil__10CGPartyObjFi(CGPartyObj*, int);
@@ -30,6 +31,7 @@ extern "C" int m_tempVar__4CMes[];
 extern "C" void* __vt__8CMonWork[];
 extern "C" void* __vt__12CCaravanWork[];
 extern "C" void* __vt__9CGObjWork[];
+extern char DAT_801d9ff0[];
 extern unsigned char CFlat[];
 
 /*
@@ -204,12 +206,30 @@ void CCaravanWork::clearCaravanWork()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a29dc
+ * PAL Size: 136b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CCaravanWork::LoadInit()
 {
-	// TODO
+	m_shopState = 0;
+	unk_0x3a8 = 0;
+	unk_0x3ac = 0;
+	m_objType = 0;
+	m_joybusCaravanId = -1;
+	sprintf((char*)unk_0x3ca_0x3dd, DAT_801d9ff0);
+	m_letterMeta[0] = 0xFFFF;
+	m_letterMeta[1] = 0xFFFF;
+	m_letterMeta[2] = 0xFFFF;
+	m_letterMeta[3] = 0xFFFF;
+	m_letterMeta[4] = 0xFFFF;
+	m_letterMeta[5] = 0xFFFF;
+	m_letterMeta[6] = 0xFFFF;
+	m_letterMeta[7] = 0xFFFF;
+	clearCaravanWork();
 }
 
 /*

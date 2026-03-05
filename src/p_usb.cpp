@@ -41,7 +41,7 @@ CUSBPcs::CUSBPcs()
  */
 void CUSBPcs::Init()
 { 
-	m_smallStage = (CMemory::CStage*)CreateStage__7CMemoryFUlPci(&Memory, 0x2000, &lbl_8032F810, 0);
+	m_smallStage = (CMemory::CStage*)CreateStage__7CMemoryFUlPci(&Memory, 0x2000, "p_usb.cpp", 0);
 	m_bigStage = (CMemory::CStage*)nullptr;
 
 	strcpy(m_rootPath, lbl_801D6D14);

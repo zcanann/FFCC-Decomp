@@ -8,7 +8,7 @@ extern u8 PartMng[];
 extern u8* lbl_8032ED50;
 
 extern "C" {
-void ParticleFrameCallback__5CGameFiiiiiP3Vec(CGame*, int, int, int, int, int);
+void ParticleFrameCallback__5CGameFiiiiiP3Vec(CGame*, int, int, int, int, int, Vec*);
 }
 
 /*
@@ -98,6 +98,6 @@ void pppFrameCallBackDistance(pppCallBackDistance* param1, UnkB* param2, UnkC* p
         initWork = (s32)*(s16*)&param2->m_initWOrk;
 
         ParticleFrameCallback__5CGameFiiiiiP3Vec(
-            &Game.game, partIndex, m_kind, m_nodeIndex, initWork, graphFrame);
+            (CGame*)&Game, partIndex, m_kind, m_nodeIndex, initWork, graphFrame, &local_28);
     }
 }

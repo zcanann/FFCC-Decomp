@@ -9,6 +9,8 @@ extern CGame Game;
 extern unsigned char* lbl_8032ED50;
 extern _pppEnvSt* lbl_8032ED54;
 extern unsigned char Graphic[];
+extern float lbl_80330330;
+extern float lbl_80330334;
 
 extern "C" {
 void SetDrawDoneDebugDataPartControl__8CGraphicFi(void* graphic, int partControl);
@@ -27,11 +29,11 @@ void pppDrawMng::ClearOt()
 
 	if (Game.m_currentMapId == 0x21)
 	{
-		m_depthScale = 0.0512f; // FLOAT_80330330
+		m_depthScale = lbl_80330330;
 	}
 	else
 	{
-		m_depthScale = 0.512f; // FLOAT_80330334
+		m_depthScale = lbl_80330334;
 	}
 
 	do

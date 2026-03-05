@@ -105,7 +105,6 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
     if (state->countdown == 0) {
         VertexApLcEntry* entry = &lbl_8032ED54->entries[data->entryIndex];
         Vec* points = *(Vec**)((u8*)parent + 0x70);
-        int count = data->spawnCount;
 
         if (points == 0) {
             u32* srcTable = *(u32**)((u8*)lbl_8032ED54 + 0x8);
@@ -113,16 +112,17 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
             points = src->points;
         }
 
+        u8 count = data->spawnCount;
+
         switch (data->mode) {
         case 0:
             while (count-- != 0) {
-                if (state->index >= entry->maxValue) {
+                if ((s16)state->index >= entry->maxValue) {
                     state->index = 0;
                 }
 
-                u16 vertexIndex = state->index;
+                u16 vertexIndex = entry->vertexIndices[state->index];
                 state->index++;
-                vertexIndex = entry->vertexIndices[vertexIndex];
                 Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;
@@ -149,11 +149,8 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
             break;
         case 1:
             while (count-- != 0) {
-                f32 randValue = RandF__5CMathFv(&math);
-                f32 maxValue = (f32)entry->maxValue;
-                int vertexIndex = (int)(randValue * maxValue);
-                u16 vertexIndex16 = entry->vertexIndices[vertexIndex];
-                Vec* vertex = &points[vertexIndex16];
+                u16 vertexIndex = entry->vertexIndices[(s32)(RandF__5CMathFv(&math) * (f32)entry->maxValue)];
+                Vec* vertex = &points[vertexIndex];
                 f32 x = vertex->x;
                 f32 y = vertex->y;
                 f32 z = vertex->z;

@@ -411,7 +411,7 @@ CPartPcs::~CPartPcs()
  */
 void CPartPcs::Init()
 {
-	CUSBStreamDataRaw* usbStream = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<unsigned char*>(this) + 0x8);
+	CUSBStreamDataRaw* usbStream = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<unsigned char*>(this) + 0x4);
 	usbStream->m_fieldLoadReq = 0;
 	usbStream->m_printFreeOnNext = 0;
 }
@@ -433,7 +433,7 @@ void CPartPcs::Quit()
  */
 void CPartPcs::onScriptChanging(char*)
 {
-	CUSBStreamData* usbStream = reinterpret_cast<CUSBStreamData*>(reinterpret_cast<unsigned char*>(this) + 0x8);
+	CUSBStreamDataRaw* usbStream = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<unsigned char*>(this) + 0x4);
 	usbStream->m_fieldLoadReq = 0;
 }
 

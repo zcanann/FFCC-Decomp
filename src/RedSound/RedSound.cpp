@@ -628,10 +628,12 @@ void CRedSound::SeFadeOut(int seID, int frameCount)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void CRedSound::SeVolume(int seID, int volume, int frameCount)
 {
 	CRedDriver_8032f4c0.SeVolume(seID, volume, frameCount);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -642,10 +644,12 @@ void CRedSound::SeVolume(int seID, int volume, int frameCount)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void CRedSound::SePan(int seID, int pan, int frameCount)
 {
 	CRedDriver_8032f4c0.SePan(seID, pan, frameCount);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--
@@ -656,10 +660,12 @@ void CRedSound::SePan(int seID, int pan, int frameCount)
  * JP Address: TODO
  * JP Size: TODO
  */
+#pragma optimization_level 0
 void CRedSound::SePitch(int seID, int pitch, int frameCount)
 {
 	CRedDriver_8032f4c0.SePitch(seID, pitch, frameCount);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

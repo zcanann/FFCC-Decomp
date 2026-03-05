@@ -436,16 +436,19 @@ void CPtrArray<OSFS_TEXTURE_ST*>::RemoveAll()
 template <>
 void CPtrArray<_GXTexObj*>::DeleteAndRemoveAll()
 {
-    int offset = 0;
     for (unsigned int i = 0; i < static_cast<unsigned int>(numItems); i++) {
-        void* item = *(void**)((int)items + offset);
+        void* item = items[i];
         if (item != 0) {
             __dl__FPv(item);
-            *(void**)((int)items + offset) = 0;
+            items[i] = 0;
         }
-        offset += 4;
     }
-    RemoveAll();
+    if (items != 0) {
+        __dla__FPv(items);
+        items = 0;
+    }
+    size = 0;
+    numItems = 0;
 }
 
 /*
@@ -456,16 +459,19 @@ void CPtrArray<_GXTexObj*>::DeleteAndRemoveAll()
 template <>
 void CPtrArray<OSFS_TEXTURE_ST*>::DeleteAndRemoveAll()
 {
-    int offset = 0;
     for (unsigned int i = 0; i < static_cast<unsigned int>(numItems); i++) {
-        void* item = *(void**)((int)items + offset);
+        void* item = items[i];
         if (item != 0) {
             __dl__FPv(item);
-            *(void**)((int)items + offset) = 0;
+            items[i] = 0;
         }
-        offset += 4;
     }
-    RemoveAll();
+    if (items != 0) {
+        __dla__FPv(items);
+        items = 0;
+    }
+    size = 0;
+    numItems = 0;
 }
 
 /*

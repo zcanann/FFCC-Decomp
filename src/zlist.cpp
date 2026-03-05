@@ -146,24 +146,26 @@ void* ZLIST::GetDataIdx(int index)
     _ZLISTITEM* it = m_root.m_previous;
 
     if (it == nullptr)
-	{
-        return nullptr;
-	}
-
-    while (index-- > 0)
     {
-        it = it->m_next;
+        it = (_ZLISTITEM*)nullptr;
+    }
+    else
+    {
+        while (index-- > 0)
+        {
+            it = it->m_next;
 
-        if (it == nullptr)
-		{
-            break;
-		}
+            if (it == nullptr)
+            {
+                break;
+            }
+        }
     }
 
     if (it == nullptr)
-	{
+    {
         return nullptr;
-	}
+    }
 
     return it->m_data;
 }

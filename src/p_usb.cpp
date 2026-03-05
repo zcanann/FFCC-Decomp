@@ -6,11 +6,12 @@
 #include "string.h"
 #include "types.h"
 
-char DAT_8032ec6c;
-int DAT_8032ec68;
+char lbl_8032EC6C;
+int lbl_8032EC68;
 
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
+extern "C" int IsConnected__4CUSBFv(void*);
 
 extern "C" char __vt__8CManager[];
 extern "C" char lbl_801E8668[];
@@ -138,22 +139,23 @@ void CUSBPcs::messageCallback(unsigned long, void*, MCCChannel)
  */
 void CUSBPcs::mccReadData()
 { 
-	if (DAT_8032ec6c == '\0')
+	if (lbl_8032EC6C == '\0')
 	{
-		DAT_8032ec68 = 0;
-		DAT_8032ec6c = '\x01';
+		lbl_8032EC68 = 0;
+		lbl_8032EC6C = '\x01';
 	}
 
-	DAT_8032ec68 = DAT_8032ec68 + 1;
+	lbl_8032EC68 = lbl_8032EC68 + 1;
 
-	if (4 < DAT_8032ec68)
+	if (4 < lbl_8032EC68)
 	{
-		DAT_8032ec68 = 0;
+		lbl_8032EC68 = 0;
 		goto read_usb;
 	end:
 		return;
 	read_usb:
-		if ((int)USB.IsConnected() != 0) {
+		int connected = IsConnected__4CUSBFv(&USB);
+		if (connected != 0) {
 			goto end;
 		}
 	}

@@ -98,7 +98,6 @@ size_t __fread(const void* buffer, size_t size, size_t count, FILE* stream)
     }
 
     bytes_to_go = total_bytes;
-    bytes_read  = 0;
     read_ptr    = (unsigned char*)buffer;
 
     if (bytes_to_go && (stream->buffer_length != 0 || always_buffer)) {

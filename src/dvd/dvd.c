@@ -560,6 +560,7 @@ static void stateCoverClosed_CMD(DVDCommandBlock* command) {
 
 static void cbForStateCoverClosed(u32 intType) {
     if (intType == 16) {
+        executing->state = -1;
 		stateTimeout();
 		return;
 	}

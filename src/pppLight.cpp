@@ -101,10 +101,13 @@ void pppLight(void* param1, void* param2, void* param3)
 {
 	unsigned char* lightParam = (unsigned char*)param2;
 	unsigned char* pppMng = (unsigned char*)param1;
-	unsigned char* owner = *(unsigned char**)((unsigned char*)param3 + 0xc);
 
-	if (lbl_8032ED70 == 0) {
-		unsigned char* work = pppMng + *(int*)owner + 0x80;
+	if (lbl_8032ED70 != 0) {
+		return;
+	}
+
+	{
+		unsigned char* work = pppMng + *(int*)(*(unsigned char**)((unsigned char*)param3 + 0xc)) + 0x80;
 		Vec sourcePos;
 		unsigned char lightData[0xb0];
 

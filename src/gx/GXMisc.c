@@ -9,7 +9,7 @@
 static GXDrawSyncCallback TokenCB;
 static GXDrawDoneCallback DrawDoneCB;
 static u8 DrawDone;
-static OSThreadQueue lbl_8032F33C;
+static OSThreadQueue FinishQueue;
 
 void GXSetMisc(GXMiscToken token, u32 val) {
     switch (token) {
@@ -150,7 +150,7 @@ void GXWaitDrawDone(void) {
 
     enabled = OSDisableInterrupts();
     while (!DrawDone) {
-        OSSleepThread(&lbl_8032F33C);
+        OSSleepThread(&FinishQueue);
     }
     OSRestoreInterrupts(enabled);
 }
@@ -375,7 +375,7 @@ static void GXFinishInterruptHandler(__OSInterrupt interrupt, OSContext* context
         OSClearContext(&exceptionContext);
         OSSetCurrentContext(context);
     }
-    OSWakeupThread(&lbl_8032F33C);
+    OSWakeupThread(&FinishQueue);
 }
 
 void __GXPEInit(void) {
@@ -383,7 +383,7 @@ void __GXPEInit(void) {
 
     __OSSetInterruptHandler(0x12, GXTokenInterruptHandler);
     __OSSetInterruptHandler(0x13, GXFinishInterruptHandler);
-    OSInitThreadQueue(&lbl_8032F33C);
+    OSInitThreadQueue(&FinishQueue);
     __OSUnmaskInterrupts(0x2000);
     __OSUnmaskInterrupts(0x1000);
     reg = GX_GET_PE_REG(5);

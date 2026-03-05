@@ -166,7 +166,7 @@ public:
     void PCAnimCtrl();
     void GetAnimNo(int, int);
     void DrawChara();
-    void GetModelNo(int, int, int);
+    int GetModelNo(int, int, int);
     void CalcCharaSelect();
     void DrawCharaName();
     void DrawCMLife();

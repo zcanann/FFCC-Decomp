@@ -2459,9 +2459,13 @@ void CMenuPcs::DrawChara()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CMenuPcs::GetModelNo(int modelNo, int, int)
+int CMenuPcs::GetModelNo(int modelNo, int offset, int baseType)
 {
-	DAT_8032ee28 = modelNo;
+	int result = modelNo * 200 + 100;
+	if (baseType != 0) {
+		result = modelNo * 200 + 200;
+	}
+	return result + offset;
 }
 
 /*

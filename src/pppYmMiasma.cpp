@@ -326,8 +326,8 @@ void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, UnkC* param_2)
  */
 void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, UnkC* param_2)
 {
-    if (*(void**)((u8*)pppYmMiasma_ + 8 + param_2->m_serializedDataOffsets[2]) != 0) {
-        pppHeapUseRate__FPQ27CMemory6CStage(*(void**)((u8*)pppYmMiasma_ + 8 + param_2->m_serializedDataOffsets[2]));
+    if (*(void**)((u8*)pppYmMiasma_ + 0x80 + param_2->m_serializedDataOffsets[2]) != 0) {
+        pppHeapUseRate__FPQ27CMemory6CStage(*(void**)((u8*)pppYmMiasma_ + 0x80 + param_2->m_serializedDataOffsets[2]));
     }
 }
 

@@ -67,7 +67,7 @@ void alloc_check(VYmMegaBirthShpTail2* vdata, PYmMegaBirthShpTail2* param)
  */
 void pppConstructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, UnkC* param2)
 {
-    pppFMATRIX* work = (pppFMATRIX*)((u8*)param1 + 8 + param2->m_serializedDataOffsets[2]);
+    pppFMATRIX* work = (pppFMATRIX*)((u8*)param1 + 0x80 + param2->m_serializedDataOffsets[2]);
     float initVal;
 
     pppUnitMatrix__FR10pppFMATRIX(work);

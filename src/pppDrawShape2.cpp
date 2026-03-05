@@ -79,9 +79,9 @@ void pppCalcShape2(void* param1, void* param2, void* param3)
     ShapeRuntimeData* runtimeData = *(ShapeRuntimeData**)((u8*)param3 + 0xC);
     ShapeControlData* controlData = (ShapeControlData*)param2;
     ShapeState* shapeData = (ShapeState*)((u8*)param1 + runtimeData->shapeDataOffset + 0x80);
-    u32 type = controlData->type;
+    s32 type = controlData->type;
 
-    if (type == (u32)-1) {
+    if (type == 0xFFFF) {
         return;
     }
 

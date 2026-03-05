@@ -4,7 +4,7 @@
 
 #include "dolphin/ax/__ax.h"
 
-static s16 __AXOutBuffer[3][320];
+static s16 __AXOutBuffer[2][320];
 static s32 __AXOutSBuffer[160];
 static u16 __AXDramImage[8192];
 static DSPTaskInfo __AXDSPTask;
@@ -181,14 +181,12 @@ void __AXOutInit(void) {
 #endif
     ASSERTLINE(404, ((u32)&__AXOutBuffer[0][0] & 0x1F) == 0);
     ASSERTLINE(405, ((u32)&__AXOutBuffer[1][0] & 0x1F) == 0);
-    ASSERTLINE(406, ((u32)&__AXOutBuffer[2][0] & 0x1F) == 0);
-    ASSERTLINE(407, ((u32)&__AXOutSBuffer[0] & 0x1F) == 0);
+    ASSERTLINE(406, ((u32)&__AXOutSBuffer[0] & 0x1F) == 0);
 
     __AXOutFrame = 0;
-    __AXAiDmaFrame = 0;
     __AXDebugSteppingMode = 0;
 
-    BUFFER_MEMSET(__AXOutBuffer, 0x1E0);
+    BUFFER_MEMSET(__AXOutBuffer, 0x140);
     DCFlushRange(__AXOutBuffer, sizeof(__AXOutBuffer));
 
     BUFFER_MEMSET(__AXOutSBuffer, 0xA0);

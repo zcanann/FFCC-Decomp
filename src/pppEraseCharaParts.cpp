@@ -55,18 +55,14 @@ struct EraseCharaPartsModelView {
 void EraseCharaParts_DrawMeshDLCallback(CChara::CModel* model, void* param_2, void* param_3,
                                         int meshIndex, int param_5, float (*) [4])
 {
-    EraseCharaPartsModelView* modelView;
-    EraseCharaPartsDisplayList* displayList;
-    UnkB* callbackParams;
+    EraseCharaPartsDisplayList* displayList =
+        ((EraseCharaPartsModelView*)model)->m_meshes[meshIndex].m_data->m_displayLists + param_5;
+    s8 callbackMeshIndex = ((UnkB*)param_3)->m_meshIndex;
 
-    modelView = (EraseCharaPartsModelView*)model;
-    displayList = modelView->m_meshes[meshIndex].m_data->m_displayLists + param_5;
-    callbackParams = (UnkB*)param_3;
+    MaterialMan.SetMaterial(((EraseCharaPartsModelView*)model)->m_data->m_materialSet,
+                            displayList->m_material, 0, (_GXTevScale)0);
 
-    MaterialMan.SetMaterial(modelView->m_data->m_materialSet, displayList->m_material, 0,
-                            (_GXTevScale)0);
-
-    if ((callbackParams->m_meshIndex != -1) && (meshIndex == callbackParams->m_meshIndex)) {
+    if ((callbackMeshIndex != -1) && (meshIndex == callbackMeshIndex)) {
         GXSetArray((GXAttr)0xB, param_2, 4);
     }
 

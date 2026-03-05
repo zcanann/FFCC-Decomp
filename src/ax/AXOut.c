@@ -65,7 +65,8 @@ void __AXOutNewFrame(u32 lessDspCycles) {
 
     __AXLocalProfile.userCallbackEnd = OSGetTime();
     __AXNextFrame(__AXOutSBuffer, &__AXOutBuffer[__AXOutFrame][0]);
-    __AXOutFrame = (__AXOutFrame + 1) & 1;
+    __AXOutFrame++;
+    __AXOutFrame &= 1;
     AIInitDMA((u32)&__AXOutBuffer[__AXOutFrame][0], 0x280);
 
     __AXLocalProfile.axFrameEnd = OSGetTime();

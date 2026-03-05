@@ -702,10 +702,10 @@ extern void __unexpected(CatchInfo* catchinfo)
 			throw;
 		}
 		if (ExPPC_IsInSpecification("!bad_exception!!", unexp)) {
-			throw;
+			throw std::bad_exception();
 		}
 		if (ExPPC_IsInSpecification("!std::bad_exception!!", unexp)) {
-			throw;
+			throw std::bad_exception();
 		}
 	}
 	unexpected();

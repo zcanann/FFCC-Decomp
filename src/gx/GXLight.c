@@ -563,10 +563,9 @@ void GXSetChanCtrl(GXChannelID chan, GXBool enable, GXColorSrc amb_src, GXColorS
     }
 
     reg = (reg & ~0x180) | ((u32)diff_fn << 7);
-    reg |= (light_mask & 0xF) << 2;
-    reg |= (light_mask & 0xF0) << 7;
-    reg |= (u32)(attn_fn != GX_AF_NONE) << 9;
-    reg |= (u32)(attn_fn != GX_AF_SPEC) << 10;
+    reg = (reg & ~0x3C) | ((light_mask << 2) & 0x3C);
+    reg = (reg & ~0x1E00) | ((light_mask << 7) & 0x1E00);
+    reg = (reg & ~0x600) | ((u32)(attn_fn != GX_AF_NONE) << 9) | ((u32)(attn_fn != GX_AF_SPEC) << 10);
 
     GX_WRITE_XF_REG(idx + 14, reg);
     

@@ -6,7 +6,7 @@ void __AXVPBInit(void);
 void __AXSPBInit(void);
 void __AXAuxInit(void);
 void __AXClInit(void);
-void __AXOutInit();
+void __AXOutInit(void);
 void __AXAllocQuit(void);
 void __AXVPBQuit(void);
 void __AXSPBQuit(void);

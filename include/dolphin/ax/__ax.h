@@ -53,7 +53,7 @@ void __AXClQuit(void);
 void __AXOutNewFrame(u32 lessDspCycles);
 void __AXOutAiCallback(void);
 void __AXOutInitDSP(void);
-void __AXOutInit(u32 outputBufferMode);
+void __AXOutInit(void);
 void __AXOutQuit(void);
 
 // AXProf

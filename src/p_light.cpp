@@ -1586,8 +1586,8 @@ CLightPcs::CLight::CLight()
     int r4 = 4;
 
     int r0 = -1;
-    f0 = FLOAT_8032fc10;
     m_radius = f0;
+    f0 = FLOAT_8032fc10;
     m_offsetZ = f1;
     m_offsetX = f1;
     m_attenFalloff = f0;

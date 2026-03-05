@@ -274,15 +274,21 @@ int TriangleSwingR(int phase)
  * Address:	TODO
  * Size:	TODO
  */
-#pragma optimization_level 4
 int DutySwingR(int phase)
 {
-    if (((phase ^ 0x200) & 0x200) == 0) {
-        return 0x10000;
+    int value;
+    int result;
+
+    phase ^= 0x200;
+    if ((phase & 0x200) != 0) {
+        value = -0x10000;
+    } else {
+        value = 0x10000;
     }
-    return 0xFFFF0000;
+
+    result = value;
+    return result;
 }
-#pragma optimization_level 0
 
 /*
  * --INFO--

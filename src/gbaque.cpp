@@ -1987,12 +1987,16 @@ int GbaQueue::GetMoney(int channel)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800ccae8
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void GbaQueue::ClrScrInitEnd()
 {
-	// TODO
+	*reinterpret_cast<int*>(reinterpret_cast<char*>(this) + 0x2AF8) = 0;
 }
 
 /*
@@ -2953,22 +2957,37 @@ int GbaQueue::GetTmpArtifactData(int, unsigned char*)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c9dec
+ * PAL Size: 100b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-unsigned char GbaQueue::GetRadarType(int)
+char GbaQueue::GetRadarType(int channel)
 {
-	return 0;
+	char* obj = reinterpret_cast<char*>(this);
+	OSSemaphore* semaphore = reinterpret_cast<OSSemaphore*>(obj + channel * 0xC);
+
+	OSWaitSemaphore(semaphore);
+	char radarType = obj[channel + 0x2D32];
+	OSSignalSemaphore(semaphore);
+
+	return radarType;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800c9de0
+ * PAL Size: 12b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void GbaQueue::ClrRadarTypeFlg()
 {
-	// TODO
+	*reinterpret_cast<char*>(reinterpret_cast<char*>(this) + 0x2D40) = 0;
 }
 
 /*

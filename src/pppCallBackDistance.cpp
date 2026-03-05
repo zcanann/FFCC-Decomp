@@ -7,6 +7,10 @@
 extern u8 PartMng[];
 extern u8* lbl_8032ED50;
 
+extern "C" {
+void ParticleFrameCallback__5CGameFiiiiiP3Vec(CGame*, int, int, int, int, int, Vec*);
+}
+
 /*
  * --INFO--
  * PAL Address: 0x80141318
@@ -77,6 +81,9 @@ void pppFrameCallBackDistance(pppCallBackDistance* param1, UnkB* param2, UnkC* p
         (*(f32*)((u8*)param1 + distanceOffset) <= distance)) {
         s32 partIndex;
         s32 graphFrame;
+        s32 m_kind;
+        s32 m_nodeIndex;
+        s32 initWork;
 
         pppMngSt = lbl_8032ED50;
         local_28.x = *(f32*)(pppMngSt + 0x84);
@@ -86,8 +93,11 @@ void pppFrameCallBackDistance(pppCallBackDistance* param1, UnkB* param2, UnkC* p
 
         partIndex = ((s32)(pppMngSt - (PartMng + 0x2A18))) / 0x158;
         graphFrame = (s32)(*(u32*)((u8*)param1 + 0xC)) / 0x1000;
-        Game.game.ParticleFrameCallback(partIndex, (s32)*(s16*)(pppMngSt + 0x74),
-                                        (s32)*(s16*)(pppMngSt + 0x76),
-                                        (s32)*(s16*)&param2->m_initWOrk, graphFrame, &local_28);
+        m_kind = (s32)*(s16*)(pppMngSt + 0x74);
+        m_nodeIndex = (s32)*(s16*)(pppMngSt + 0x76);
+        initWork = (s32)*(s16*)&param2->m_initWOrk;
+
+        ParticleFrameCallback__5CGameFiiiiiP3Vec(&Game.game, partIndex, m_kind, m_nodeIndex,
+                                                 initWork, graphFrame, &local_28);
     }
 }

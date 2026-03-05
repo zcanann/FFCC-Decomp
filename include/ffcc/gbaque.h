@@ -142,7 +142,7 @@ public:
     void SetPauseMode(int);
     unsigned int GetPauseMode();
     unsigned char GetItemUse(int);
-    void GetSPModeFlg(int);
+    unsigned int GetSPModeFlg(int);
     void ClrSPModeFlg(int);
     unsigned int GetSPMode(int);
     unsigned int GetMemorysFlg(int);

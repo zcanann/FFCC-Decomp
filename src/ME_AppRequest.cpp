@@ -40,61 +40,65 @@ struct RSDLISTITEM {
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8004de94
+ * PAL Size: 316b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
 void CMaterialEditorPcs::ResetRsdList(ZLIST* zlist)
 {
-	int* piVar1;
-	int iVar3;
-	int iVar4;
-	_ZLISTITEM* local_28[4];
+    int* piVar1;
+    unsigned int* puVar2;
+    int iVar3;
+    int iVar4;
+    _ZLISTITEM* local_28[4];
 
-	local_28[0] = zlist->m_root.m_previous;
-	while (local_28[0] != 0) {
-		piVar1 = (int*)zlist->GetDataNext(local_28);
-		iVar4 = *piVar1;
-		if (iVar4 != 0) {
-			if (*(void**)(iVar4 + 0xc) != 0) {
-				__dla__FPv(*(void**)(iVar4 + 0xc));
-				*(int*)(iVar4 + 0xc) = 0;
-			}
-			if (*(void**)(iVar4 + 0x10) != 0) {
-				__dla__FPv(*(void**)(iVar4 + 0x10));
-				*(int*)(iVar4 + 0x10) = 0;
-			}
-			if (*(void**)(iVar4 + 0x14) != 0) {
-				__dla__FPv(*(void**)(iVar4 + 0x14));
-				*(int*)(iVar4 + 0x14) = 0;
-			}
-			if (*(void**)(iVar4 + 0x18) != 0) {
-				__dla__FPv(*(void**)(iVar4 + 0x18));
-				*(int*)(iVar4 + 0x18) = 0;
-			}
-			if (iVar4 != 0) {
-				__dl__FPv((void*)iVar4);
-			}
-		}
-
-		int* colAnmData = (int*)piVar1[1];
-		iVar4 = piVar1[2];
-		if (colAnmData != 0) {
-			for (iVar3 = 0; iVar3 < iVar4; iVar3 = iVar3 + 1) {
-				if ((void*)*colAnmData != 0) {
-					__dla__FPv((void*)*colAnmData);
-					*colAnmData = 0;
-				}
-				colAnmData = colAnmData + 5;
-			}
-			if ((void*)piVar1[1] != 0) {
-				__dla__FPv((void*)piVar1[1]);
-				piVar1[1] = 0;
-			}
-			piVar1[1] = 0;
-		}
-		__dl__FPv((void*)piVar1);
-	}
-	zlist->DeleteList();
+    local_28[0] = zlist->m_root.m_previous;
+    while (local_28[0] != (_ZLISTITEM*)0) {
+        piVar1 = (int*)zlist->GetDataNext(local_28);
+        iVar4 = *piVar1;
+        if (iVar4 != 0) {
+            if (*(void**)(iVar4 + 0xC) != (void*)0) {
+                __dla__FPv(*(void**)(iVar4 + 0xC));
+                *(unsigned int*)(iVar4 + 0xC) = 0;
+            }
+            if (*(void**)(iVar4 + 0x10) != (void*)0) {
+                __dla__FPv(*(void**)(iVar4 + 0x10));
+                *(unsigned int*)(iVar4 + 0x10) = 0;
+            }
+            if (*(void**)(iVar4 + 0x14) != (void*)0) {
+                __dla__FPv(*(void**)(iVar4 + 0x14));
+                *(unsigned int*)(iVar4 + 0x14) = 0;
+            }
+            if (*(void**)(iVar4 + 0x18) != (void*)0) {
+                __dla__FPv(*(void**)(iVar4 + 0x18));
+                *(unsigned int*)(iVar4 + 0x18) = 0;
+            }
+            if (iVar4 != 0) {
+                __dl__FPv((void*)iVar4);
+            }
+        }
+        puVar2 = (unsigned int*)piVar1[1];
+        iVar4 = piVar1[2];
+        if (puVar2 != (unsigned int*)0) {
+            for (iVar3 = 0; iVar3 < iVar4; iVar3 = iVar3 + 1) {
+                if ((void*)*puVar2 != (void*)0) {
+                    __dla__FPv((void*)*puVar2);
+                    *puVar2 = 0;
+                }
+                puVar2 = puVar2 + 5;
+            }
+            if ((void*)piVar1[1] != (void*)0) {
+                __dla__FPv((void*)piVar1[1]);
+                piVar1[1] = 0;
+            }
+            piVar1[1] = 0;
+        }
+        __dl__FPv(piVar1);
+    }
+    zlist->DeleteList();
 }
 
 /*

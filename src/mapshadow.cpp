@@ -104,7 +104,7 @@ void CMapShadow::Calc()
 	
 	fVar1 = FLOAT_8032fce0;
 	m_lightMtx[0][3] = m_lightMtx[0][3] + m_scrollStepX;
-	if (m_lightMtx[0][3] > fVar1) {
+	if (fVar1 < m_lightMtx[0][3]) {
 		m_lightMtx[0][3] = m_lightMtx[0][3] - fVar1;
 	}
 	fVar1 = FLOAT_8032fce0;

@@ -19,23 +19,23 @@ extern "C" f32 RandF__5CMathFv(CMath*);
  */
 extern "C" void pppSRandUpFV(void* param1, void* param2, void* param3)
 {
-    struct SRandUpFVParam {
-        s32 index;
-        s32 targetOffset;
-        f32 x;
-        f32 y;
-        f32 z;
-        u8 _pad14[0x18 - 0x14];
-        u8 blendTwice;
+    struct PppSRandUpFVParam2 {
+        s32 field0;
+        s32 field4;
+        f32 field8;
+        f32 fieldC;
+        f32 field10;
+        u8 unk14[0x18 - 0x14];
+        u8 field18;
     };
-    struct SRandUpFVCtx {
-        u8 _pad0[0xC];
-        s32* outputOffset;
+    struct PppSRandUpFVParam3 {
+        u8 unk0[0xC];
+        s32* fieldC;
     };
 
+    PppSRandUpFVParam2* cfg = (PppSRandUpFVParam2*)param2;
     u8* self = (u8*)param1;
-    SRandUpFVParam* cfg = (SRandUpFVParam*)param2;
-    SRandUpFVCtx* info = (SRandUpFVCtx*)param3;
+    PppSRandUpFVParam3* info = (PppSRandUpFVParam3*)param3;
     f32* randVec;
 
     if (lbl_8032ED70 != 0) {
@@ -44,53 +44,56 @@ extern "C" void pppSRandUpFV(void* param1, void* param2, void* param3)
 
     s32 currentIndex = *(s32*)(self + 0xC);
     if (currentIndex == 0) {
-        randVec = (f32*)(self + *info->outputOffset + 0x80);
+        randVec = (f32*)(self + *info->fieldC + 0x80);
 
         {
-            u8 flag = cfg->blendTwice;
+            u8 flag = cfg->field18;
             f32 value = RandF__5CMathFv(math);
             if (flag != 0) {
-                value = lbl_803300C0 * (value + RandF__5CMathFv(math));
+                f32 randomPair = value + RandF__5CMathFv(math);
+                value = lbl_803300C0 * randomPair;
             }
             randVec[0] = value;
         }
 
         {
-            u8 flag = cfg->blendTwice;
+            u8 flag = cfg->field18;
             f32 value = RandF__5CMathFv(math);
             if (flag != 0) {
-                value = lbl_803300C0 * (value + RandF__5CMathFv(math));
+                f32 randomPair = value + RandF__5CMathFv(math);
+                value = lbl_803300C0 * randomPair;
             }
             randVec[1] = value;
         }
 
         {
-            u8 flag = cfg->blendTwice;
+            u8 flag = cfg->field18;
             f32 value = RandF__5CMathFv(math);
             if (flag != 0) {
-                value = lbl_803300C0 * (value + RandF__5CMathFv(math));
+                f32 randomPair = value + RandF__5CMathFv(math);
+                value = lbl_803300C0 * randomPair;
             }
             randVec[2] = value;
         }
     } else {
-        if (cfg->index != currentIndex) {
+        if (cfg->field0 != currentIndex) {
             return;
         }
-        randVec = (f32*)(self + *info->outputOffset + 0x80);
+        randVec = (f32*)(self + *info->fieldC + 0x80);
     }
 
-    f32* target = (cfg->targetOffset == -1) ? lbl_801EADC8 : (f32*)(self + cfg->targetOffset + 0x80);
+    f32* target = (cfg->field4 == -1) ? lbl_801EADC8 : (f32*)(self + cfg->field4 + 0x80);
 
     {
-        f32 value = randVec[0] * cfg->x;
+        f32 value = randVec[0] * cfg->field8;
         target[0] = target[0] + value;
     }
     {
-        f32 value = randVec[1] * cfg->y;
+        f32 value = randVec[1] * cfg->fieldC;
         target[1] = target[1] + value;
     }
     {
-        f32 value = randVec[2] * cfg->z;
+        f32 value = randVec[2] * cfg->field10;
         target[2] = target[2] + value;
     }
 }

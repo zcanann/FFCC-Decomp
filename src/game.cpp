@@ -1529,10 +1529,10 @@ char* CGame::MakeNumItemName(char* out, int itemIndex, int count)
 {
     char* itemName;
 
-    if (count < 2) {
-        itemName = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[0].m_strings[itemIndex * 5 + 1];
-    } else {
+    if (count > 1) {
         itemName = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[0].m_strings[itemIndex * 5 + 3];
+    } else {
+        itemName = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[0].m_strings[itemIndex * 5 + 1];
     }
 
     sprintf(out, s_numNameFmt, count, itemName);
@@ -1613,10 +1613,10 @@ char* CGame::MakeNumMonName(char* out, int monIndex, int count)
 {
     char* monName;
 
-    if (count < 2) {
-        monName = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[1].m_strings[monIndex * 5 + 1];
-    } else {
+    if (count > 1) {
         monName = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[1].m_strings[monIndex * 5 + 3];
+    } else {
+        monName = reinterpret_cast<CFlatDataView*>(&m_cFlatDataArr[1])->m_tabl[1].m_strings[monIndex * 5 + 1];
     }
 
     sprintf(out, s_numNameFmt, count, monName);

@@ -286,7 +286,7 @@ extern "C" unsigned long UnkMaterialSetGetter(void* ptrArray)
 template <>
 void CPtrArray<CMaterial*>::SetDefaultSize(unsigned long defaultSize)
 {
-    *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned char*>(this) + 8) = defaultSize;
+    *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned char*>(this) + 0xC) = defaultSize;
 }
 
 /*
@@ -301,7 +301,7 @@ void CPtrArray<CMaterial*>::SetDefaultSize(unsigned long defaultSize)
 template <>
 void CPtrArray<CMaterial*>::SetGrow(int growCapacity)
 {
-    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x14) = growCapacity;
+    *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(this) + 0x18) = growCapacity;
 }
 
 /*

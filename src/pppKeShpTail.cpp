@@ -42,7 +42,7 @@ void pppKeShpTail(_pppPObject* obj, UnkB*, UnkC* offsets)
 
 	work = (KeShpTailWork*)((u8*)obj + ((KeShpTailOffsets*)offsets)->m_serializedDataOffsets[0] + 0x80);
 	if (tailObj->m_obj.m_graphId == 0) {
-		Vec local_14;
+		Vec local_14 ATTRIBUTE_ALIGN(8);
 		Vec local_20;
 
 		local_20.x = tailObj->m_obj.m_localMatrix.value[0][3];

@@ -377,18 +377,12 @@ static void GXFinishInterruptHandler(__OSInterrupt interrupt, OSContext* context
 }
 
 void __GXPEInit(void) {
-    u32 reg;
     __OSSetInterruptHandler(0x12, GXTokenInterruptHandler);
     __OSSetInterruptHandler(0x13, GXFinishInterruptHandler);
     OSInitThreadQueue(&FinishQueue);
     __OSUnmaskInterrupts(0x2000);
     __OSUnmaskInterrupts(0x1000);
-    reg = GX_GET_PE_REG(5);
-    SET_REG_FIELD(0, reg, 1, 2, 1);
-    SET_REG_FIELD(0, reg, 1, 3, 1);
-    SET_REG_FIELD(0, reg, 1, 0, 1);
-    SET_REG_FIELD(0, reg, 1, 1, 1);
-    GX_SET_PE_REG(5, reg);
+    GX_SET_PE_REG(5, GX_GET_PE_REG(5) & 0xFFF0 | 0xF);
 }
 
 u32 GXCompressZ16(u32 z24, GXZFmt16 zfmt) {

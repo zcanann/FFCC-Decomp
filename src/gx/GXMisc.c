@@ -219,16 +219,12 @@ void GXPokeAlphaUpdate(GXBool update_enable) {
 }
 
 void GXPokeBlendMode(GXBlendMode type, GXBlendFactor src_factor, GXBlendFactor dst_factor, GXLogicOp op) {
-    u32 reg;
+    u16 reg;
 
     reg = GX_GET_PE_REG(1);
-    SET_REG_FIELD(720, reg, 1, 0, (type == GX_BM_BLEND) || (type == GX_BM_SUBTRACT));
-    SET_REG_FIELD(721, reg, 1, 11, (type == GX_BM_SUBTRACT));
-    SET_REG_FIELD(723, reg, 1, 1, (type == GX_BM_LOGIC));
-    SET_REG_FIELD(724, reg, 4, 12, op);
-    SET_REG_FIELD(725, reg, 3, 8, src_factor);
-    SET_REG_FIELD(726, reg, 3, 5, dst_factor);
-    SET_REG_FIELD(726, reg, 8, 24, 0x41);
+    reg = (u16)((reg & 0x1C) | (((type == GX_BM_BLEND) || (type == GX_BM_SUBTRACT)) ? 1 : 0) |
+                ((u16)(type == GX_BM_LOGIC) << 1) | ((u16)(type == GX_BM_SUBTRACT) << 11) |
+                ((u16)op << 12) | ((u16)src_factor << 8) | ((u16)dst_factor << 5));
     GX_SET_PE_REG(1, reg);
 }
 

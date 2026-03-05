@@ -586,15 +586,12 @@ void __MidiCtrl_LoopRepeat(RedSoundCONTROL*, RedKeyOnDATA*, RedTrackDATA* track)
  */
 void __MidiCtrl_TempoDirect(RedSoundCONTROL* control, RedKeyOnDATA*, RedTrackDATA* track)
 {
-    unsigned char* command;
-    int* controlData = (int*)control;
-    int* trackData = (int*)track;
+    u8* command = (u8*)*(u32*)track;
 
-    command = (unsigned char*)trackData[0];
-    trackData[0] = (int)(command + 1);
-    controlData[0x112] = ((unsigned int)*command) << 0xc;
-    controlData[0x113] = 0;
-    controlData[0x114] = 0;
+    *(u32*)track = (u32)(command + 1);
+    *(u32*)((u8*)control + 0x448) = ((u32)*command) << 0xc;
+    *(u32*)((u8*)control + 0x44C) = 0;
+    *(u32*)((u8*)control + 0x450) = 0;
 }
 
 /*

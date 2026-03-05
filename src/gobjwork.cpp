@@ -718,22 +718,57 @@ void CCaravanWork::DeleteItemIdx(int, int)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a1c7c
+ * PAL Size: 144b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::DeleteItem(int, int)
+int CCaravanWork::DeleteItem(int itemIndex, int updateJoybus)
 {
-	// TODO
+    int i;
+
+    for (i = 0; i < 0x40; i++) {
+        if ((short)m_inventoryItems[i] != -1 && (short)m_inventoryItems[i] == itemIndex) {
+            m_inventoryItems[i] = 0xFFFF;
+            m_inventoryItemCount = m_inventoryItemCount - 1;
+            if (updateJoybus != 0) {
+                DelItem__6JoyBusFiUc(&Joybus, m_joybusCaravanId, (char)i);
+            }
+            return 1;
+        }
+    }
+
+    return 0;
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a1be8
+ * PAL Size: 148b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::AddTmpArtifact(int, int*)
+int CCaravanWork::AddTmpArtifact(int itemId, int* outIndex)
 {
-	// TODO
+    int i;
+
+    for (i = 0; i < 4; i++) {
+        unsigned short treasure = m_treasures[i];
+        if ((short)treasure == -1) {
+            m_treasures[i] = (unsigned short)itemId;
+            Joybus.SetTmpArti(m_joybusCaravanId, i, itemId);
+            if (outIndex != 0) {
+                *outIndex = i;
+            }
+            return 1;
+        }
+    }
+
+    return 0;
 }
 
 /*

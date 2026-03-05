@@ -554,38 +554,34 @@ void CMaterialEditorPcs::drawViewer()
  */
 void CMaterialEditorPcs::CreateBoundaryBox(Vec& minPos, Vec& maxPos, long count, const Vec* points)
 {
-    minPos.x = lbl_8032FCAC;
-    minPos.y = lbl_8032FCAC;
-    minPos.z = lbl_8032FCAC;
-    maxPos.x = lbl_8032FCB0;
-    maxPos.y = lbl_8032FCB0;
-    maxPos.z = lbl_8032FCB0;
+    f32 maxInit = lbl_8032FCAC;
+    f32 minInit = lbl_8032FCB0;
+    minPos.x = maxInit;
+    minPos.y = maxInit;
+    minPos.z = maxInit;
+    maxPos.x = minInit;
+    maxPos.y = minInit;
+    maxPos.z = minInit;
 
-    if (count <= 0) {
-        return;
+    for (; count > 0; count--, points++) {
+        const Vec& point = *points;
+        if (minPos.x > point.x) {
+            minPos.x = point.x;
+        }
+        if (minPos.y > point.y) {
+            minPos.y = point.y;
+        }
+        if (minPos.z > point.z) {
+            minPos.z = point.z;
+        }
+        if (maxPos.x < point.x) {
+            maxPos.x = point.x;
+        }
+        if (maxPos.y < point.y) {
+            maxPos.y = point.y;
+        }
+        if (maxPos.z < point.z) {
+            maxPos.z = point.z;
+        }
     }
-
-    do {
-        if (minPos.x > points->x) {
-            minPos.x = points->x;
-        }
-        if (minPos.y > points->y) {
-            minPos.y = points->y;
-        }
-        if (minPos.z > points->z) {
-            minPos.z = points->z;
-        }
-        if (maxPos.x < points->x) {
-            maxPos.x = points->x;
-        }
-        if (maxPos.y < points->y) {
-            maxPos.y = points->y;
-        }
-        if (maxPos.z < points->z) {
-            maxPos.z = points->z;
-        }
-
-        points += 1;
-        count -= 1;
-    } while (count != 0);
 }

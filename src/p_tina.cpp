@@ -1100,11 +1100,16 @@ void CPartPcs::DrawMenuIdx(int index)
  */
 void CPartPcs::SetParLocIdx(int index, Vec& location)
 {
-	_pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(&PartMng) + index;
-
-	GetMngStPositionX(pppMngSt) = location.x;
-	GetMngStPositionY(pppMngSt) = location.y;
-	GetMngStPositionZ(pppMngSt) = location.z;
+	struct PartMngPosView {
+		u8 pad[0x2A20];
+		float x;
+		float y;
+		float z;
+	};
+	PartMngPosView* pppMngSt = reinterpret_cast<PartMngPosView*>(reinterpret_cast<u8*>(&PartMng) + (index * 0x158));
+	pppMngSt->x = location.x;
+	pppMngSt->y = location.y;
+	pppMngSt->z = location.z;
 }
 
 /*
@@ -1118,11 +1123,16 @@ void CPartPcs::SetParLocIdx(int index, Vec& location)
  */
 void CPartPcs::GetParLocIdx(int index, Vec& location)
 {
-	_pppMngSt* pppMngSt = reinterpret_cast<_pppMngSt*>(&PartMng) + index;
-
-	location.x = GetMngStPositionX(pppMngSt);
-	location.y = GetMngStPositionY(pppMngSt);
-	location.z = GetMngStPositionZ(pppMngSt);
+	struct PartMngPosView {
+		u8 pad[0x2A20];
+		float x;
+		float y;
+		float z;
+	};
+	PartMngPosView* pppMngSt = reinterpret_cast<PartMngPosView*>(reinterpret_cast<u8*>(&PartMng) + (index * 0x158));
+	location.x = pppMngSt->x;
+	location.y = pppMngSt->y;
+	location.z = pppMngSt->z;
 }
 
 /*

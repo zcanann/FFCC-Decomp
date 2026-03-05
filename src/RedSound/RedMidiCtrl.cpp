@@ -204,6 +204,7 @@ int SawSwing(int phase)
  * Address:	TODO
  * Size:	TODO
  */
+#pragma optimization_level 4
 int DutySwing(int phase)
 {
     if ((phase & 0x200) == 0) {
@@ -211,6 +212,7 @@ int DutySwing(int phase)
     }
     return 0xFFFF0000;
 }
+#pragma optimization_level 0
 
 /*
  * --INFO--
@@ -267,6 +269,7 @@ int TriangleSwingR(int phase)
  * Address:	TODO
  * Size:	TODO
  */
+#pragma optimization_level 4
 int DutySwingR(int phase)
 {
     if (((phase ^ 0x200) & 0x200) == 0) {
@@ -274,6 +277,7 @@ int DutySwingR(int phase)
     }
     return 0xFFFF0000;
 }
+#pragma optimization_level 0
 
 /*
  * --INFO--

@@ -7,7 +7,7 @@
 #include <string.h>
 
 extern CRedEntry DAT_8032e154;
-extern int DAT_8032e12c;
+extern int DAT_8032e12c[];
 extern void* DAT_8032f3f0;
 extern void* DAT_8032f3fc;
 extern unsigned int* DAT_8032f444;
@@ -485,8 +485,8 @@ int SeBlockPlay(int seId, int bank, int no, int pan, int volume)
 
 	bank &= 3;
 	no &= 0x1ff;
-	if ((&DAT_8032e12c)[bank] != 0) {
-		bankData = (&DAT_8032e12c)[bank];
+	if (DAT_8032e12c[bank] != 0) {
+		bankData = DAT_8032e12c[bank];
 		if ((no < *(short*)(bankData + 10)) &&
 		    ((dataBase = bankData + 0x10), *(int*)(dataBase + no * 4) != -1)) {
 			seInfo = (unsigned char*)(dataBase + *(short*)(bankData + 10) * 4 +

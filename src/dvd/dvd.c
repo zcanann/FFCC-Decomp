@@ -69,7 +69,7 @@ static void stateCheckID2();
 static void cbForStateCheckID1(u32 intType);
 static void cbForStateCheckID2(u32 intType);
 static void cbForStateCheckID3(u32 intType);
-static void cbForStateCheckID2a(u32 intType);
+void cbForStateCheckID2a(u32 intType);
 static void AlarmHandler(OSAlarm* alarm, OSContext* context);
 static void stateCoverClosed();
 static void stateCoverClosed_CMD(DVDCommandBlock* command);
@@ -111,7 +111,6 @@ void DVDInit(void) {
         __DVDClearWaitingQueue();
         __DVDInitWA();
 
-        MotorState = 0;
         bootInfo = (void*)OSPhysicalToCached(0);
         IDShouldBe = &bootInfo->DVDDiskID;
 
@@ -438,8 +437,9 @@ static void stateCheckID2a() {
     DVDLowAudioBufferConfig(IDShouldBe->streaming, 0xA, cbForStateCheckID2a);
 }
 
-static void cbForStateCheckID2a(u32 intType) {
+void cbForStateCheckID2a(u32 intType) {
     if (intType == 16) {
+        executing->state = -1;
 		stateTimeout();
 		return;
 	}

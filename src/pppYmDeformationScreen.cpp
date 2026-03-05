@@ -173,7 +173,7 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 
 	if (lbl_8032ED70 == 0) {
 		step = (YmDeformationScreenStep*)param2;
-		serializedDataOffsets = *(int**)param3;
+		serializedDataOffsets = ((YmDeformationScreenData*)param3)->m_serializedDataOffsets;
 		work = (float*)((char*)param1 + 0x80 + serializedDataOffsets[2]);
 		workBytes = (u8*)work;
 
@@ -184,16 +184,12 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 
 		if (lbl_8032ED78 == 0) {
 			if (workBytes[6] != 0) {
-				s16 delta = (s16)(int)work[5];
-				s16 value = *(s16*)(workBytes + 4);
-				*(s16*)(workBytes + 4) = value + delta;
+				*(s16*)(workBytes + 4) += (int)work[5];
 				if (*(s16*)(workBytes + 4) > step->m_payload3) {
 					workBytes[6] = 0;
 				}
 			} else {
-				s16 delta = (s16)(int)work[5];
-				s16 value = *(s16*)(workBytes + 4);
-				*(s16*)(workBytes + 4) = value - delta;
+				*(s16*)(workBytes + 4) -= (int)work[5];
 				if (*(s16*)(workBytes + 4) < -step->m_payload3) {
 					workBytes[6] = 1;
 				}
@@ -206,13 +202,13 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 				inVec.z = -*(float*)&step->m_payloadBytes[2];
 				inVec.w = 1.0f;
 				MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(math, screenMtx, &inVec, &outVec);
-				if (outVec.w != 0.0f) {
+				if (0.0f != outVec.w) {
 					outVec.z /= outVec.w;
 				}
 				work[0] = outVec.z;
 			}
 
-			if ((u32)Game.game.m_currentSceneId == 7) {
+			if (Game.game.m_currentSceneId == 7) {
 				cameraX = ppvCameraMatrix02[0][3];
 				cameraY = ppvCameraMatrix02[1][3];
 				cameraZ = ppvCameraMatrix02[2][3];

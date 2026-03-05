@@ -14,7 +14,7 @@ extern float lbl_80330334;
 
 extern "C" {
 void SetDrawDoneDebugDataPartControl__8CGraphicFi(void* graphic, int partControl);
-void InitEnv__9CCharaPcsFi(void* charaPcs, int env);
+void InitEnv__9CCharaPcsFi(int env, void* charaPcs);
 }
 
 /*
@@ -86,7 +86,7 @@ void pppDrawMng::DrawOt()
                     if (lastType != prim->m_type)
                     {
                         pppInitDrawEnv(0);
-                        InitEnv__9CCharaPcsFi(&CharaPcs, 4);
+                        InitEnv__9CCharaPcsFi(4, &CharaPcs);
                     }
 
                     ((CCharaPcs::CHandle*)prim->m_handle)->Draw(4);

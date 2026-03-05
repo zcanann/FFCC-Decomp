@@ -1532,27 +1532,26 @@ void CLightPcs::SetBumpTexMatirx(float (*mat)[4], CLightPcs::CBumpLight* bump, V
  */
 CLightPcs::CBumpLight::CBumpLight()
 {
-    float f2 = FLOAT_8032fc1c;
-    int r5 = 0;
-    float f1 = FLOAT_8032fc14;
-    int r4 = 4;
+    float f3 = FLOAT_8032fc1c;
+    float f2 = FLOAT_8032fc14;
+    float f1 = FLOAT_8032fc10;
 
-    int r0 = -1;
-    float f0 = FLOAT_8032fc10;
-    m_radius = f2;
-    m_offsetZ = f1;
-    m_offsetX = f1;
-    m_attenFalloff = f0;
-    m_directionMode = static_cast<unsigned char>(r5);
-    m_spotFn = static_cast<unsigned char>(r5);
-    m_unk4D = static_cast<unsigned char>(r4);
-    m_specularMode = static_cast<unsigned char>(r5);
-    m_partMask = r0;
+    m_radius = FLOAT_8032fc1c;
+    m_offsetZ = f2;
+    m_offsetX = f2;
+    m_attenFalloff = f1;
+    m_directionMode = 0;
+    m_spotFn = 0;
+    m_unk4D = 4;
+    m_specularMode = 0;
+    m_partMask = -1;
     m_part = 0;
-    memset(m_targetColor, 0, sizeof(m_targetColor));
-    m_targetEnableMask = 0;
-    m_radius = f2;
-    m_hasTexture = static_cast<unsigned char>(r5);
+    *(u32*)&m_targetColor[0] = 0;
+    *(u32*)&m_targetColor[1] = 0;
+    *(u32*)&m_targetColor[2] = 0;
+    *(u32*)&m_targetColor[3] = 0;
+    m_radius = f3;
+    m_hasTexture = 0;
 }
 
 /*
@@ -1580,25 +1579,23 @@ void CLightPcs::CBumpLight::SetTexture(_GXTexMapID texMapID, int textureIdx)
  */
 CLightPcs::CLight::CLight()
 {
-    float f0 = FLOAT_8032fc1c;
-    int r5 = 0;
-    float f1 = FLOAT_8032fc14;
-    int r4 = 4;
+    float f2 = FLOAT_8032fc14;
+    float f1 = FLOAT_8032fc10;
 
-    int r0 = -1;
-    m_radius = f0;
-    f0 = FLOAT_8032fc10;
-    m_offsetZ = f1;
-    m_offsetX = f1;
-    m_attenFalloff = f0;
-    m_directionMode = static_cast<unsigned char>(r5);
-    m_spotFn = static_cast<unsigned char>(r5);
-    m_unk4D = static_cast<unsigned char>(r4);
-    m_specularMode = static_cast<unsigned char>(r5);
-    m_partMask = r0;
+    m_radius = FLOAT_8032fc1c;
+    m_offsetZ = f2;
+    m_offsetX = f2;
+    m_attenFalloff = f1;
+    m_directionMode = 0;
+    m_spotFn = 0;
+    m_unk4D = 4;
+    m_specularMode = 0;
+    m_partMask = -1;
     m_part = 0;
-    memset(m_targetColor, 0, sizeof(m_targetColor));
-    m_targetEnableMask = 0;
+    *(u32*)&m_targetColor[0] = 0;
+    *(u32*)&m_targetColor[1] = 0;
+    *(u32*)&m_targetColor[2] = 0;
+    *(u32*)&m_targetColor[3] = 0;
 }
 
 /*

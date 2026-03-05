@@ -278,7 +278,7 @@ void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA
  */
 void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, UnkC* param_2)
 {
-    u8* workBytes = (u8*)pppYmMiasma_ + 8 + param_2->m_serializedDataOffsets[2];
+    u8* workBytes = (u8*)pppYmMiasma_ + 0x80 + param_2->m_serializedDataOffsets[2];
     float fVar1 = FLOAT_80330644;
     float* work = (float*)workBytes;
 
@@ -353,7 +353,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, UnkB* param_2, UnkC* param_3)
         return;
     }
 
-    workBytes = (u8*)pppYmMiasma_ + 8 + param_3->m_serializedDataOffsets[2];
+    workBytes = (u8*)pppYmMiasma_ + 0x80 + param_3->m_serializedDataOffsets[2];
     work = (float*)workBytes;
 
     if (*(int*)step == *(int*)pppYmMiasma_) {
@@ -435,7 +435,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, UnkB* param_2, UnkC* param_3)
  */
 void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, UnkB* param_2, UnkC* param_3)
 {
-    float* particle = (float*)((u8*)pppYmMiasma_ + 8 + param_3->m_serializedDataOffsets[2]);
+    float* particle = (float*)((u8*)pppYmMiasma_ + 0x80 + param_3->m_serializedDataOffsets[2]);
     u8* step = (u8*)param_2;
     u16 count = *(u16*)(step + 0x10);
 

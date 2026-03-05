@@ -53,9 +53,9 @@ void THPGXYuv2RgbDraw(u32* yImage, u32* uImage, u32* vImage, s16 x, s16 y, s16 t
 void THPGXYuv2RgbSetup(GXRenderModeObj* rmode) {
     Mtx44 projMtx;
     Mtx modelMtx;
-    GXCompType texCoordType = GX_S16;
-    s16 fbWidth = rmode->fbWidth;
-    s16 efbHeight = rmode->efbHeight;
+    GXCompType texCoordType = GX_U16;
+    s16 fbWidth = (s16)rmode->fbWidth;
+    s16 efbHeight = (s16)rmode->efbHeight;
 
     GXSetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
     C_MTXOrtho(projMtx, 0.0f, (f32)efbHeight, 0.0f, (f32)fbWidth, 0.0f, 1.0f);

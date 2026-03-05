@@ -22,6 +22,7 @@ extern "C" void __dl__FPv(void*);
 extern "C" int __cntlzw(unsigned int);
 extern "C" int useItem__10CGPartyObjFi(CGPartyObj*, int);
 extern "C" int putItem__10CGPartyObjFi(CGPartyObj*, int);
+extern "C" int putGil__10CGPartyObjFi(CGPartyObj*, int);
 extern "C" int DelItem__6JoyBusFiUc(JoyBus*, int, char);
 extern "C" void SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
 	void*, void*, int, int, int, void*, void*);
@@ -491,12 +492,28 @@ void CCaravanWork::FGPutItem(int itemIdx, int updateJoybus)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800a2164
+ * PAL Size: 140b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::FGPutGil(int)
+void CCaravanWork::FGPutGil(int gilToRemove)
 {
-	// TODO
+	int put = putGil__10CGPartyObjFi((CGPartyObj*)m_ownerObj, gilToRemove);
+	if (put != 0) {
+		int gil = m_gil;
+		gil += -gilToRemove;
+		m_gil = gil;
+		if (gil <= 99999999) {
+			if (gil < 0) {
+				m_gil = 0;
+			}
+		} else {
+			m_gil -= m_gil - 99999999;
+		}
+	}
 }
 
 /*

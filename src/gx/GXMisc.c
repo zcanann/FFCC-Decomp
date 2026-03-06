@@ -272,10 +272,10 @@ void GXPokeDither(GXBool dither) {
     volatile u16* pe_reg;
     u16 reg;
 
-    pe_reg = (volatile u16*)__peReg;
-    reg = pe_reg[1];
+    pe_reg = (volatile u16*)__peReg + 1;
+    reg = *pe_reg;
     reg = (reg & ~(1 << 2)) | ((u16)dither << 2);
-    pe_reg[1] = reg;
+    *pe_reg = reg;
 }
 
 /*

@@ -258,45 +258,45 @@ void CMapPcs::LoadMap(int stageNo, int mapNo, void* mapPtr, unsigned long mapSiz
  */
 unsigned long long CMapPcs::IsLoadMapCompleted()
 {
-    int* busy = reinterpret_cast<int*>(&MapMng);
-    busy += 0x22A2C / sizeof(int);
-    unsigned int result = 0;
-    int i;
+    CMapMng* mapMng = &MapMng;
+    unsigned int value = 0;
+    int count = 2;
 
-    for (i = 0; i < 2; i++) {
-        if (busy[0] != 0) {
-            return result;
+    while (true) {
+        if (*(int*)((char*)mapMng + 0x22A2C) != 0) {
+            return (unsigned long long)value;
         }
-        if (busy[1] != 0) {
-            return result;
+        if (*(int*)((char*)mapMng + 0x22A30) != 0) {
+            return (unsigned long long)value;
         }
-        if (busy[2] != 0) {
-            return result;
+        if (*(int*)((char*)mapMng + 0x22A34) != 0) {
+            return (unsigned long long)value;
         }
-        if (busy[3] != 0) {
-            return result;
+        if (*(int*)((char*)mapMng + 0x22A38) != 0) {
+            return (unsigned long long)value;
         }
-        if (busy[4] != 0) {
-            return result;
+        if (*(int*)((char*)mapMng + 0x22A3C) != 0) {
+            return (unsigned long long)value;
         }
-        if (busy[5] != 0) {
-            return result;
+        if (*(int*)((char*)mapMng + 0x22A40) != 0) {
+            return (unsigned long long)value;
         }
-        if (busy[6] != 0) {
-            return result;
+        if (*(int*)((char*)mapMng + 0x22A44) != 0) {
+            return (unsigned long long)value;
         }
-        if (busy[7] != 0) {
+        if (*(int*)((char*)mapMng + 0x22A48) != 0) {
             break;
         }
 
-        busy += 7;
-        result += 7;
-        if (i == 1) {
-            return (static_cast<unsigned long long>(1) << 32) | result;
+        mapMng = (CMapMng*)((char*)mapMng + 0xC);
+        value += 7;
+        count--;
+        if (count == 0) {
+            return ((unsigned long long)1 << 32) | value;
         }
     }
 
-    return result;
+    return (unsigned long long)value;
 }
 
 /*

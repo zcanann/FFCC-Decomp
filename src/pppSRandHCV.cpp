@@ -2,7 +2,7 @@
 #include "ffcc/math.h"
 #include "dolphin/types.h"
 
-extern CMath math[];
+extern CMath Math;
 extern int gPppCalcDisabled;
 extern float lbl_803300A0;
 extern s16 gPppDefaultValueBuffer[];
@@ -49,9 +49,9 @@ void pppSRandHCV(void* data1, void* data2, void* data3)
 
 		{
 			u8 flag = in->field10;
-			float value = RandF__5CMathFv(&math[0]);
+			float value = RandF__5CMathFv(&Math);
 			if (flag != 0) {
-				value = value + RandF__5CMathFv(&math[0]);
+				value = value + RandF__5CMathFv(&Math);
 			} else {
 				value = value * lbl_803300A0;
 			}
@@ -60,9 +60,9 @@ void pppSRandHCV(void* data1, void* data2, void* data3)
 
 		{
 			u8 flag = in->field10;
-			float value = RandF__5CMathFv(&math[0]);
+			float value = RandF__5CMathFv(&Math);
 			if (flag != 0) {
-				value = value + RandF__5CMathFv(&math[0]);
+				value = value + RandF__5CMathFv(&Math);
 			} else {
 				value = value * lbl_803300A0;
 			}
@@ -71,9 +71,9 @@ void pppSRandHCV(void* data1, void* data2, void* data3)
 
 		{
 			u8 flag = in->field10;
-			float value = RandF__5CMathFv(&math[0]);
+			float value = RandF__5CMathFv(&Math);
 			if (flag != 0) {
-				value = value + RandF__5CMathFv(&math[0]);
+				value = value + RandF__5CMathFv(&Math);
 			} else {
 				value = value * lbl_803300A0;
 			}
@@ -82,9 +82,9 @@ void pppSRandHCV(void* data1, void* data2, void* data3)
 
 		{
 			u8 flag = in->field10;
-			float value = RandF__5CMathFv(&math[0]);
+			float value = RandF__5CMathFv(&Math);
 			if (flag != 0) {
-				value = value + RandF__5CMathFv(&math[0]);
+				value = value + RandF__5CMathFv(&Math);
 			} else {
 				value = value * lbl_803300A0;
 			}

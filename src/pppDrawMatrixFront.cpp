@@ -3,7 +3,6 @@
 #include <dolphin/mtx.h>
 
 extern "C" {
-extern unsigned char* lbl_8032ED50;
 }
 
 /*
@@ -22,9 +21,9 @@ void pppDrawMatrixFront(_pppPObject* object, void*, _pppCtrlTable*)
     PSMTXScaleApply(
         *(Mtx*)((char*)object + 0x10),
         *(Mtx*)((char*)object + 0x40),
-        *(f32*)(lbl_8032ED50 + 0x28),
-        *(f32*)(lbl_8032ED50 + 0x2C),
-        *(f32*)(lbl_8032ED50 + 0x30)
+        *(f32*)(pppMngStPtr + 0x28),
+        *(f32*)(pppMngStPtr + 0x2C),
+        *(f32*)(pppMngStPtr + 0x30)
     );
 
     localPos.x = *(float*)((char*)object + 0x1c);
@@ -37,3 +36,5 @@ void pppDrawMatrixFront(_pppPObject* object, void*, _pppCtrlTable*)
     *(float*)((char*)object + 0x5c) = localPos.y;
     *(float*)((char*)object + 0x6c) = localPos.z;
 }
+
+

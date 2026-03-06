@@ -7,7 +7,6 @@
 
 #include <string.h>
 
-extern struct _pppMngSt* pppMngStPtr;
 extern CMath math[];
 extern const f32 FLOAT_80333428;
 extern const f32 lbl_80333428;
@@ -596,4 +595,5 @@ void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, str
         }
     }
 }
+
 

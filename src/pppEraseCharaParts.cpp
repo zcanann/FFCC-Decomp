@@ -6,7 +6,6 @@
 
 extern CMaterialMan MaterialMan;
 extern int gPppCalcDisabled;
-extern unsigned char* lbl_8032ED50;
 
 extern "C" {
 void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
@@ -88,7 +87,7 @@ void pppConstructEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEras
 
     serializedDataOffsets = param_2->m_serializedDataOffsets;
     colorPtr = (u8*)pppEraseCharaParts + 0x80 + serializedDataOffsets[1];
-    gObject = *(void**)(lbl_8032ED50 + 0xD8);
+    gObject = *(void**)(pppMngStPtr + 0xD8);
     colorPtr[0] = 0x80;
     colorPtr[1] = 0x80;
     colorPtr[2] = 0x80;
@@ -114,7 +113,7 @@ void pppDestructEraseCharaParts(pppEraseCharaParts*, pppEraseCharaPartsUnkC*)
     void* handle;
     int model;
 
-    handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)(lbl_8032ED50 + 0xD8), 0);
+    handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)(pppMngStPtr + 0xD8), 0);
     model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
     *(void**)(model + 0xE4) = 0;
     *(void**)(model + 0xE8) = 0;
@@ -144,7 +143,7 @@ void pppFrameEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEraseCha
         colorIndex = offsets[0];
         dstColor = (u8*)((char*)pppEraseCharaParts + 2 + offsets[1]);
         srcColor = (u8*)((char*)pppEraseCharaParts + 0x88 + colorIndex);
-        handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)lbl_8032ED50 + 0x8), 0);
+        handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)pppMngStPtr + 0x8), 0);
         model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
 
         *(u8**)(model + 0xE4) = dstColor;
@@ -158,4 +157,6 @@ void pppFrameEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEraseCha
         DCFlushRange(dstColor, 4);
     }
 }
+
+
 

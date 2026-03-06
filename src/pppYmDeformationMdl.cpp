@@ -27,8 +27,8 @@ struct _pppEnvStYmDeformationMdl {
     CMaterialSet* m_materialSetPtr;
     CMapMesh** m_mapMeshPtr;
 };
-
 extern _pppEnvStYmDeformationMdl* pppEnvStPtr;
+
 extern struct {
     float _212_4_;
     float _216_4_;
@@ -197,8 +197,9 @@ void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDe
         return;
     }
 
-    pppModelSt* model = (pppModelSt*)pppEnvStPtr->m_mapMeshPtr[param_2->m_dataValIndex];
-    int textureBase = GetTexture__8CMapMeshFP12CMaterialSetRi((CMapMesh*)model, pppEnvStPtr->m_materialSetPtr, textureIndex);
+    _pppEnvStYmDeformationMdl* env = (_pppEnvStYmDeformationMdl*)pppEnvStPtr;
+    pppModelSt* model = (pppModelSt*)env->m_mapMeshPtr[param_2->m_dataValIndex];
+    int textureBase = GetTexture__8CMapMeshFP12CMaterialSetRi((CMapMesh*)model, env->m_materialSetPtr, textureIndex);
     Mtx cameraMtx;
     Mtx texMtx;
     Mtx rotMtx;
@@ -317,4 +318,5 @@ void GXSetTexCoordGen(void)
 {
 	// TODO
 }
+
 

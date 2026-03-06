@@ -4,7 +4,6 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-extern unsigned char* lbl_8032ED50;
 extern float lbl_80330700;
 extern unsigned char CFlat[];
 extern unsigned char Graphic[];
@@ -28,13 +27,13 @@ void pppParHitSph(struct _pppPObject* param_1, int param_2)
     Mtx sphereMtx;
     Mtx cameraMtx ATTRIBUTE_ALIGN(8);
     _GXColor local_a8;
-    _pppMngSt* pppMngSt = (_pppMngSt*)lbl_8032ED50;
+    _pppMngSt* pppMngSt = (_pppMngSt*)pppMngStPtr;
     float radius;
 
-    PSVECSubtract((Vec*)(lbl_8032ED50 + 0x8), (Vec*)(lbl_8032ED50 + 0x48), &local_88);
-    local_94.x = *(float*)(lbl_8032ED50 + 0x84);
-    local_94.y = *(float*)(lbl_8032ED50 + 0x94);
-    local_94.z = *(float*)(lbl_8032ED50 + 0xA4);
+    PSVECSubtract((Vec*)(pppMngStPtr + 0x8), (Vec*)(pppMngStPtr + 0x48), &local_88);
+    local_94.x = *(float*)(pppMngStPtr + 0x84);
+    local_94.y = *(float*)(pppMngStPtr + 0x94);
+    local_94.z = *(float*)(pppMngStPtr + 0xA4);
     radius = *(float*)((u8*)pppMngSt + 0x64) * *(float*)(param_2 + 8);
 
     if (((lbl_80330700 == local_88.x) && (lbl_80330700 == local_88.y)) &&
@@ -62,3 +61,5 @@ void pppParHitSph(struct _pppPObject* param_1, int param_2)
         DrawSphere__8CGraphicFPA4_f8_GXColor(Graphic, sphereMtx, local_a8);
     }
 }
+
+

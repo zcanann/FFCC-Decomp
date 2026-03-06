@@ -5,7 +5,6 @@
 #include <dolphin/mtx.h>
 
 extern u8 PartMng[];
-extern u8* lbl_8032ED50;
 
 extern "C" {
 void ParticleFrameCallback__5CGameFiiiiiP3Vec(CGame*, int, int, int, int, int, Vec*);
@@ -22,7 +21,7 @@ void ParticleFrameCallback__5CGameFiiiiiP3Vec(CGame*, int, int, int, int, int, V
  */
 void pppFrameCallBackDistance(pppCallBackDistance* param1, pppCallBackDistanceUnkB* param2, pppCallBackDistanceUnkC* param3)
 {
-    u8* pppMngSt = lbl_8032ED50;
+    u8* pppMngSt = (u8*)pppMngStPtr;
     s32 distanceOffset = *param3->m_serializedDataOffsets + 0x80;
     f32 distance;
     Vec local_1c;
@@ -41,7 +40,7 @@ void pppFrameCallBackDistance(pppCallBackDistance* param1, pppCallBackDistanceUn
         s32 m_nodeIndex;
         s32 initWork;
 
-        pppMngSt = lbl_8032ED50;
+        pppMngSt = (u8*)pppMngStPtr;
         local_28.x = *(f32*)(pppMngSt + 0x84);
         local_28.y = *(f32*)(pppMngSt + 0x94);
         local_28.z = *(f32*)(pppMngSt + 0xA4);
@@ -89,7 +88,7 @@ void pppConstructCallBackDistance(pppCallBackDistance* param1, pppCallBackDistan
     s32 dataOffset;
     f32* distancePtr;
 
-    pppMngSt = lbl_8032ED50;
+    pppMngSt = (u8*)pppMngStPtr;
     dataOffset = *param2->m_serializedDataOffsets;
     distancePtr = (f32*)((u8*)param1 + dataOffset + 0x80);
     objPosBase = *(u8**)(pppMngSt + 0xDC);
@@ -101,3 +100,5 @@ void pppConstructCallBackDistance(pppCallBackDistance* param1, pppCallBackDistan
     local_1c.z = *(f32*)(pppMngSt + 0x70);
     *distancePtr = PSVECDistance(&local_28, &local_1c);
 }
+
+

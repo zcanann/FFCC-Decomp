@@ -18,6 +18,8 @@ struct _pppEnvStEmission {
     CMaterialSet* m_materialSetPtr;
     CMapMesh** m_mapMeshPtr;
 };
+extern _pppMngStEmission* pppMngStPtr;
+extern _pppEnvStEmission* pppEnvStPtr;
 
 struct CameraPcsForEmission {
     Mtx m_cameraMatrix;
@@ -30,8 +32,6 @@ extern CGraphic Graphic;
 extern CMath Math;
 extern CameraPcsForEmission CameraPcs;
 extern char MaterialMan[];
-extern _pppMngStEmission* pppMngStPtr;
-extern _pppEnvStEmission* pppEnvStPtr;
 extern int gPppCalcDisabled;
 extern u8 gPppInConstructor;
 extern char DAT_803311fc[];
@@ -469,4 +469,5 @@ void pppRenderEmission(pppEmission*, pppEmissionUnkB*, pppEmissionUnkC*) {
 void GXSetTexCoordGen(void) {
     // TODO
 }
+
 

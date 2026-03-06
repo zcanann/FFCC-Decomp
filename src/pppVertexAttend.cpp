@@ -1,4 +1,5 @@
 #include "ffcc/pppVertexAttend.h"
+#include "ffcc/partMng.h"
 #include "dolphin/mtx.h"
 
 struct VertexAttendStream
@@ -28,7 +29,6 @@ struct VertexAttendEnv
     VertexSetEntry* vertexSetTable;
 };
 
-extern VertexAttendEnv* pppEnvStPtr;
 
 /*
  * --INFO--
@@ -57,7 +57,7 @@ void pppVertexAttend(void* r3, void* r4, void* r5)
     }
 
     stream = *(VertexAttendStream**)((u8*)r5 + 0xC);
-    env = pppEnvStPtr;
+    env = (VertexAttendEnv*)pppEnvStPtr;
     setEntry = (VertexSetEntry*)((u8*)env->vertexSetTable + (entryIndex * sizeof(VertexSetEntry)));
     sourceIndex = *(u16*)((u8*)r3 + stream->sourceOffset + 0x80);
     output = (f32*)((u8*)r3 + stream->destOffset + 0x80);
@@ -72,3 +72,4 @@ void pppVertexAttend(void* r3, void* r4, void* r5)
     output[1] = transformed.y;
     output[2] = transformed.z;
 }
+

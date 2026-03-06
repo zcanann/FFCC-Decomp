@@ -12,8 +12,8 @@ struct _pppMngStCharaBreak {
     u8 _pad0[0xD8];
     void* m_charaObj;
 };
-
 extern _pppMngStCharaBreak* pppMngStPtr;
+
 extern struct _pppEnvSt {
     CMemory::CStage* m_stagePtr;
 } *pppEnvStPtr;
@@ -936,3 +936,4 @@ void pppRenderCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB*, CharaBreakU
         work[3] = *((u8*)charaBreak + 0x8B + colorOffset);
     }
 }
+

@@ -6,7 +6,6 @@
 #include <dolphin/types.h>
 
 extern int gPppCalcDisabled;
-extern struct _pppMngSt* pppMngStPtr;
 
 // Float constants (addresses from Ghidra)
 extern float lbl_80330ED0;
@@ -94,3 +93,4 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
 
     return pppYmCheckBGHeight;
 }
+

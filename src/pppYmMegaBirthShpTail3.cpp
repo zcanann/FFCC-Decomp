@@ -19,8 +19,6 @@ extern "C" void pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(void*, void*, uns
 extern int rand();
 extern float lbl_803305A4;
 extern pppFMATRIX g_matUnit3;
-extern _pppEnvSt* lbl_8032ED54;
-extern _pppMngSt* lbl_8032ED50;
 extern int gPppCalcDisabled;
 
 static char s_pppYmMegaBirthShpTail3_cpp[] = "pppYmMegaBirthShpTail3.cpp";
@@ -388,13 +386,13 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
     if (work->m_particles == 0) {
         work->m_maxParticles = *(u16*)(paramPayload + 0xe);
         work->m_particles = (_PARTICLE_DATA*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-            work->m_maxParticles * 0x1f8, lbl_8032ED54->m_stagePtr, s_pppYmMegaBirthShpTail3_cpp, 0x2db);
+            work->m_maxParticles * 0x1f8, pppEnvStPtr->m_stagePtr, s_pppYmMegaBirthShpTail3_cpp, 0x2db);
         if (work->m_particles != 0) {
             memset(work->m_particles, 0, work->m_maxParticles * 0x1f8);
         }
 
         work->m_wmats = (_PARTICLE_WMAT*)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-            work->m_maxParticles * 0x30, lbl_8032ED54->m_stagePtr, s_pppYmMegaBirthShpTail3_cpp, 0x2e3);
+            work->m_maxParticles * 0x30, pppEnvStPtr->m_stagePtr, s_pppYmMegaBirthShpTail3_cpp, 0x2e3);
         if (work->m_wmats != 0) {
             memset(work->m_wmats, 0, work->m_maxParticles * 0x30);
         }
@@ -466,7 +464,7 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
 
     switch (*(paramPayload + 0x12)) {
     default:
-        PSMTXCopy(lbl_8032ED50->m_matrix.value, work->m_emitterMatrix.value);
+        PSMTXCopy(pppMngStPtr->m_matrix.value, work->m_emitterMatrix.value);
         break;
     case 1:
     case 3:
@@ -474,12 +472,12 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
     case 7:
     case 9:
         PSMTXIdentity(work->m_emitterMatrix.value);
-        work->m_emitterMatrix.value[0][0] = lbl_8032ED50->m_scale.x;
-        work->m_emitterMatrix.value[1][1] = lbl_8032ED50->m_scale.x;
-        work->m_emitterMatrix.value[2][2] = lbl_8032ED50->m_scale.x;
-        work->m_emitterMatrix.value[0][3] = lbl_8032ED50->m_position.x;
-        work->m_emitterMatrix.value[1][3] = lbl_8032ED50->m_position.y;
-        work->m_emitterMatrix.value[2][3] = lbl_8032ED50->m_position.z;
+        work->m_emitterMatrix.value[0][0] = pppMngStPtr->m_scale.x;
+        work->m_emitterMatrix.value[1][1] = pppMngStPtr->m_scale.x;
+        work->m_emitterMatrix.value[2][2] = pppMngStPtr->m_scale.x;
+        work->m_emitterMatrix.value[0][3] = pppMngStPtr->m_position.x;
+        work->m_emitterMatrix.value[1][3] = pppMngStPtr->m_position.y;
+        work->m_emitterMatrix.value[2][3] = pppMngStPtr->m_position.z;
         break;
     }
 
@@ -546,7 +544,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
         return;
     }
 
-    int shapeTable = **(int**)(*(int*)&lbl_8032ED54->m_particleColors[0] + dataValIndex * 4);
+    int shapeTable = **(int**)(*(int*)&pppEnvStPtr->m_particleColors[0] + dataValIndex * 4);
     const u8 zEnable = (u8)(((u32)__cntlzw((u32)payload[0x55])) >> 5);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
         (void*)(payload + 0xA0), &object->field_0x40, *(float*)(payload + 0xA4), step[0x10], payload[0x58],
@@ -617,16 +615,16 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                     bool canDraw = (trailPos.x != 0.0f) || (trailPos.y != 0.0f) || (trailPos.z != 0.0f);
                     if (canDraw) {
                         pppUnitMatrix__FR10pppFMATRIX(&drawMtx);
-                        drawMtx.value[0][0] = drawScale * lbl_8032ED50->m_scale.x;
-                        drawMtx.value[1][1] = drawScale * lbl_8032ED50->m_scale.y;
-                        drawMtx.value[2][2] = drawScale * lbl_8032ED50->m_scale.z;
+                        drawMtx.value[0][0] = drawScale * pppMngStPtr->m_scale.x;
+                        drawMtx.value[1][1] = drawScale * pppMngStPtr->m_scale.y;
+                        drawMtx.value[2][2] = drawScale * pppMngStPtr->m_scale.z;
 
                         if (payload[0xA5] == 0) {
                             PSMTXMultVec(ppvWorldMatrix, &trailPos, &cameraPos);
                         } else if (payload[0xA5] == 1) {
-                            managerPos.x = lbl_8032ED50->m_matrix.value[0][3];
-                            managerPos.y = lbl_8032ED50->m_matrix.value[1][3];
-                            managerPos.z = lbl_8032ED50->m_matrix.value[2][3];
+                            managerPos.x = pppMngStPtr->m_matrix.value[0][3];
+                            managerPos.y = pppMngStPtr->m_matrix.value[1][3];
+                            managerPos.z = pppMngStPtr->m_matrix.value[2][3];
                             PSVECAdd(&trailPos, &managerPos, &trailPos);
                             PSMTXMultVec(ppvCameraMatrix0, &trailPos, &cameraPos);
                         } else {
@@ -647,7 +645,7 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
                         }
                         GXSetChanAmbColor(GX_COLOR0A0, amb);
                         pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(
-                            (void*)(shapeTable + shapeOffset), lbl_8032ED54->m_materialSetPtr, payload[0x58]);
+                            (void*)(shapeTable + shapeOffset), pppEnvStPtr->m_materialSetPtr, payload[0x58]);
                     }
 
                     frameCount--;
@@ -712,3 +710,5 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
         }
     }
 }
+
+

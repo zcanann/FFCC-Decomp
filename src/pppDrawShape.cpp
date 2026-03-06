@@ -4,7 +4,6 @@
 #include "dolphin/types.h"
 
 extern int gPppCalcDisabled;
-extern void* lbl_8032ED54;
 
 typedef struct ShapeRuntimeData {
     u32 shapeDataOffset;
@@ -80,7 +79,7 @@ void pppCalcShape(void* pppShape, void* data, void* additionalData)
 		return;
 	}
 
-	void** shapeTables = *(void***)((u8*)lbl_8032ED54 + 0xC);
+	void** shapeTables = *(void***)((u8*)pppEnvStPtr + 0xC);
 	void* shapeSpec = *(void**)shapeTables[type];
 	ShapeSpecEntry* shape = (ShapeSpecEntry*)((u8*)shapeSpec + ((u32)shapeData->counter << 3) + 0x10);
 
@@ -128,7 +127,7 @@ void pppDrawShape(void* pppShape, void* data, void* additionalData)
 		return;
 	}
 
-	void** shapeTables = *(void***)((u8*)lbl_8032ED54 + 0xC);
+	void** shapeTables = *(void***)((u8*)pppEnvStPtr + 0xC);
 	void* shapeSpec = *(void**)shapeTables[type];
 	ShapeSpecEntry* shape = (ShapeSpecEntry*)((u8*)shapeSpec + ((u32)shapeData->currentId << 3) + 0x10);
 	void* drawShape = (u8*)shapeSpec + shape->offset;
@@ -147,5 +146,7 @@ void pppDrawShape(void* pppShape, void* data, void* additionalData)
 	);
 
 	pppSetBlendMode(controlData->blendMode);
-	pppDrawShp((tagOAN3_SHAPE*)drawShape, *(CMaterialSet**)((u8*)lbl_8032ED54 + 0x4), controlData->blendMode);
+	pppDrawShp((tagOAN3_SHAPE*)drawShape, *(CMaterialSet**)((u8*)pppEnvStPtr + 0x4), controlData->blendMode);
 }
+
+

@@ -1,4 +1,5 @@
 #include "ffcc/pppVtMime.h"
+#include "ffcc/partMng.h"
 
 struct VtMimeCtrl
 {
@@ -39,10 +40,9 @@ struct VtMimeEnv
 };
 
 extern int gPppCalcDisabled;
-extern VtMimeEnv* lbl_8032ED54;
 extern const float lbl_803300F0;
 extern char Graphic[];
-static char lbl_801D8520[] = "pppVtMime.cpp";
+static char s_pppVtMime_cpp[] = "pppVtMime.cpp";
 
 extern "C" {
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long size, void* stage, char* file, int line);
@@ -66,7 +66,7 @@ void pppVtMimeDes(_pppPObjLink* object, _pppCtrlTable* ctrl)
 
     if (state->vertexBuffer != 0) {
         void* graphic = &Graphic;
-        char* file = lbl_801D8520;
+        char* file = s_pppVtMime_cpp;
         _WaitDrawDone__8CGraphicFPci(graphic, file, 0x50);
         pppHeapUseRate__FPQ27CMemory6CStage(state->vertexBuffer);
         state->vertexBuffer = 0;
@@ -131,7 +131,8 @@ void pppDrawVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
     }
 
     VtMimeState* state = (VtMimeState*)((char*)object + *ctrl->m_serializedDataOffsets + 0x80);
-    void** sourceTable = lbl_8032ED54->sourceTable;
+    VtMimeEnv* env = (VtMimeEnv*)pppEnvStPtr;
+    void** sourceTable = env->sourceTable;
     int vertIdx2 = *(int*)((char*)step + 0x8);
     VtMimeSource* vert1Data = (VtMimeSource*)sourceTable[vertIdx1];
     VtMimeSource* vert2Data = (VtMimeSource*)sourceTable[vertIdx2];
@@ -141,7 +142,7 @@ void pppDrawVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
     void** memPtr = &state->vertexBuffer;
 
     if (*memPtr == 0) {
-        *memPtr = pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(vertCount * 0xC), lbl_8032ED54->stage, lbl_801D8520, 0x2B);
+        *memPtr = pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(vertCount * 0xC), env->stage, s_pppVtMime_cpp, 0x2B);
     }
 
     float* outputVerts = (float*)*memPtr;
@@ -196,3 +197,6 @@ void pppVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
         state->accel += data->addZ;
     }
 }
+
+
+

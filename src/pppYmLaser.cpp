@@ -10,7 +10,6 @@
 extern CMath math[];
 extern "C" float RandF__5CMathFf(float param, CMath* math);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
-extern struct _pppMngSt* pppMngStPtr;
 extern int gPppCalcDisabled;
 extern void* gUtil;
 extern u32 CFlatFlags;
@@ -535,3 +534,4 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 		}
 	}
 }
+

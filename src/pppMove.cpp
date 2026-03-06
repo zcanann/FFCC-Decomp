@@ -1,20 +1,8 @@
 #include "ffcc/pppMove.h"
+#include "ffcc/partMng.h"
 
 extern int lbl_8032ED70;   // Global enable flag
 extern float lbl_8032FED8; // Zero constant
-
-struct _pppCtrlTableData {
-    int m_workOffset;
-    int m_workOffsetAlt;
-    int m_ownerWorkOffset;
-};
-
-struct _pppCtrlTable {
-    void* m_prog;
-    int m_initialWork;
-    int m_unk8;
-    _pppCtrlTableData* m_serializedDef;
-};
 
 struct PppMoveObj {
     f32 x;           // 0x0

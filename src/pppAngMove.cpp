@@ -1,19 +1,7 @@
 #include "ffcc/pppAngMove.h"
+#include "ffcc/partMng.h"
 
 extern int lbl_8032ED70;
-
-struct _pppCtrlTableData {
-    int m_workOffset;
-    int m_workOffsetAlt;
-    int m_ownerWorkOffset;
-};
-
-struct _pppCtrlTable {
-    void* m_prog;
-    int m_initialWork;
-    int m_unk8;
-    _pppCtrlTableData* m_serializedDef;
-};
 
 struct PppAngMoveObj {
     int x;

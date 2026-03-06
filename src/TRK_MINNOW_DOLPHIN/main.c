@@ -17,6 +17,11 @@ static u8 gRecvBuf[DDH_BUF_SIZE];
 
 /* 804519C0-804519C8 000EC0 0004+04 3/3 0/0 0/0 .sbss            gIsInitialized */
 BOOL gIsInitialized;
+extern char ddh_cc_initialize_calling_exi2_init[];
+extern char ddh_cc_initialize_done_calling_exi2_init[];
+extern char ddh_cc_write_trace_strings[];
+extern char ddh_cc_read_expected_packet_size_fmt[];
+extern char ddh_cc_read_error_fmt[];
 
 /*
  * --INFO--
@@ -108,21 +113,23 @@ int ddh_cc_write(const u8* bytes, int length)
     int exi2Len;
     int n_copy;
     u32 hexCopy;
+    const char* traceFmt;
 
     hexCopy = (u32)bytes;
     n_copy = length;
+    traceFmt = ddh_cc_write_trace_strings;
 
     if (gIsInitialized == FALSE)
 	{
-        MWTRACE(8, "cc not initialized\n");
+        MWTRACE(8, (char*)(traceFmt + 0));
         return DDH_ERR_NOT_INITIALIZED;
     }
 
-    MWTRACE(8, "cc_write : Output data 0x%08x %ld bytes\n", bytes, length);
+    MWTRACE(8, (char*)(traceFmt + 0x14), bytes, length);
 
     while (n_copy > 0)
 	{
-        MWTRACE(1, "cc_write sending %ld bytes\n", n_copy);
+        MWTRACE(1, (char*)(traceFmt + 0x40), n_copy);
         exi2Len = EXI2_WriteN((const void*)hexCopy, n_copy);
 		
         if (exi2Len == AMC_EXI_NO_ERROR)
@@ -161,7 +168,7 @@ int ddh_cc_read(u8* data, int size)
         return DDH_ERR_NOT_INITIALIZED;
     }
 
-    MWTRACE(1, "Expected packet size : 0x%08x (%ld)\n", size, size);
+    MWTRACE(1, ddh_cc_read_expected_packet_size_fmt, size, size);
     originalDataSize = expectedDataSize = size;
 	
     while ((u32)CBGetBytesAvailableForRead(&gRecvCB) < expectedDataSize)
@@ -184,7 +191,7 @@ int ddh_cc_read(u8* data, int size)
     }
 	else
 	{
-        MWTRACE(8, "cc_read : error reading bytes from EXI2 %ld\n", result);
+        MWTRACE(8, ddh_cc_read_error_fmt, result);
     }
 
     return result;
@@ -249,9 +256,9 @@ int ddh_cc_shutdown()
  */
 int ddh_cc_initialize(void* inputPendingPtrRef, EXICallback monitorCallback)
 {
-    MWTRACE(1, "CALLING EXI2_Init\n");
+    MWTRACE(1, ddh_cc_initialize_calling_exi2_init);
     EXI2_Init(inputPendingPtrRef, monitorCallback);
-    MWTRACE(1, "DONE CALLING EXI2_Init\n");
+    MWTRACE(1, ddh_cc_initialize_done_calling_exi2_init);
     CircleBufferInitialize(&gRecvCB, gRecvBuf, DDH_BUF_SIZE);
     return 0;
 }

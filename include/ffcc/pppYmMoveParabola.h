@@ -9,7 +9,7 @@ struct pppYmMoveParabola {
     } field0_0x0;
 };
 
-struct UnkB {
+struct pppYmMoveParabolaUnkB {
     u32 m_graphId;
     u32 _pad0x04;
     u32 _pad0x08;
@@ -20,7 +20,7 @@ struct UnkB {
     s32 m_initWOrk;
 };
 
-struct UnkC {
+struct pppYmMoveParabolaUnkC {
     u32 _pad0x00;
     u32 _pad0x04;
     u32 _pad0x08;
@@ -31,11 +31,12 @@ struct UnkC {
 extern "C" {
 #endif
 
-void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, struct UnkC* dataPtr);
-void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct UnkB* stepData, struct UnkC* offsetData);
+void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, struct pppYmMoveParabolaUnkC* dataPtr);
+void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct pppYmMoveParabolaUnkB* stepData, struct pppYmMoveParabolaUnkC* offsetData);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _FFCC_PPP_YMMOVEPARABOLA_H_
+

@@ -32,7 +32,7 @@ void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int,
 
 static char s_pppBreathModel_cpp[] = "pppBreathModel.cpp";
 
-struct UnkC {
+struct pppBreathModelUnkC {
     unsigned char _pad[0xC];
     int* m_serializedDataOffsets;
 };
@@ -469,7 +469,7 @@ found_search_index:
  * PAL Address: 0x800db6e0
  * PAL Size: 1264b
  */
-extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* pBreathModel, UnkC* offsets)
+extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* pBreathModel, pppBreathModelUnkC* offsets)
 {
     int i;
     int j;
@@ -631,7 +631,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* pBreathModel, UnkC* offsets)
+extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* pBreathModel, pppBreathModelUnkC* offsets)
 {
     int i;
     int dataOffset;
@@ -739,7 +739,7 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
  * PAL Address: 0x800db18c
  * PAL Size: 120b
  */
-extern "C" void pppConstructBreathModel(pppBreathModel* pppBreathModel, UnkC* param_2)
+extern "C" void pppConstructBreathModel(pppBreathModel* pppBreathModel, pppBreathModelUnkC* param_2)
 {
     unsigned char* state = (unsigned char*)pppBreathModel + 0x80 + *param_2->m_serializedDataOffsets;
     float fVar1;
@@ -768,7 +768,7 @@ extern "C" void pppConstructBreathModel(pppBreathModel* pppBreathModel, UnkC* pa
  * PAL Address: 0x800db094
  * PAL Size: 248b
  */
-extern "C" void pppDestructBreathModel(pppBreathModel* pppBreathModel, UnkC* param_2)
+extern "C" void pppDestructBreathModel(pppBreathModel* pppBreathModel, pppBreathModelUnkC* param_2)
 {
     unsigned char* work = (unsigned char*)pppBreathModel + 0x80 + *param_2->m_serializedDataOffsets;
     void** particleData = (void**)(work + 0x30);
@@ -891,3 +891,4 @@ void IsExistGroupParticle(PBreathModel* pBreathModel, VBreathModel* vBreathModel
         *(unsigned char*)(groupArray[groupIndex * 0x17 + 1] + slotIndex) = 0xFF;
     }
 }
+

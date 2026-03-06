@@ -12,16 +12,16 @@ struct pppKeShpTail3X
     char field_0x7d;
 };
 
-struct UnkB;
-struct UnkC;
+struct pppKeShpTail3XUnkB;
+struct pppKeShpTail3XUnkC;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppKeShpTail3X(struct pppKeShpTail3X*, struct UnkB*, struct UnkC*);
-void pppKeShpTail3XDraw(struct pppKeShpTail3X*, struct UnkB*, struct UnkC*);
-void pppKeShpTail3XCon(struct pppKeShpTail3X*, struct UnkC*);
+void pppKeShpTail3X(struct pppKeShpTail3X*, struct pppKeShpTail3XUnkB*, struct pppKeShpTail3XUnkC*);
+void pppKeShpTail3XDraw(struct pppKeShpTail3X*, struct pppKeShpTail3XUnkB*, struct pppKeShpTail3XUnkC*);
+void pppKeShpTail3XCon(struct pppKeShpTail3X*, struct pppKeShpTail3XUnkC*);
 void pppKeShpTail3XDes(void);
 void S4ToF32(pppFVECTOR4*, short*);
 
@@ -30,3 +30,4 @@ void S4ToF32(pppFVECTOR4*, short*);
 #endif
 
 #endif // _PPP_KESHPTAIL3X_H_
+

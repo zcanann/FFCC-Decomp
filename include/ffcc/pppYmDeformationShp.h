@@ -9,14 +9,14 @@ struct VYmDeformationShp;
 struct Vec;
 struct Vec2d;
 struct Vec4d;
-struct UnkB {
+struct pppYmDeformationShpUnkB {
     s32 m_graphId;
     s32 m_dataValIndex;
     f32 m_payload[6];
     s16 m_payload3;
     u8 m_pad_0x22[0x1a];
 };
-struct UnkC {
+struct pppYmDeformationShpUnkC {
     u8 m_pad_0x0[0xc];
     s32* m_serializedDataOffsets;
 };
@@ -34,14 +34,15 @@ void RenderDeformationShape(_pppPObject*, VYmDeformationShp*, Vec*, Vec2d*);
 extern "C" {
 #endif
 
-void pppConstructYmDeformationShp(pppYmDeformationShp*, UnkC*);
-void pppConstruct2YmDeformationShp(pppYmDeformationShp*, UnkC*);
+void pppConstructYmDeformationShp(pppYmDeformationShp*, pppYmDeformationShpUnkC*);
+void pppConstruct2YmDeformationShp(pppYmDeformationShp*, pppYmDeformationShpUnkC*);
 void pppDestructYmDeformationShp(void);
-void pppFrameYmDeformationShp(pppYmDeformationShp*, UnkB*, UnkC*);
-void pppRenderYmDeformationShp(pppYmDeformationShp*, UnkB*, UnkC*);
+void pppFrameYmDeformationShp(pppYmDeformationShp*, pppYmDeformationShpUnkB*, pppYmDeformationShpUnkC*);
+void pppRenderYmDeformationShp(pppYmDeformationShp*, pppYmDeformationShpUnkB*, pppYmDeformationShpUnkC*);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _PPP_YMDEFORMATIONSHP_H_
+

@@ -2,7 +2,7 @@
 #include "ffcc/partMng.h"
 #include "dolphin/gx/GXPixel.h"
 
-struct UnkC {
+struct pppCharaZEnvCtrlUnkC {
     unsigned char pad0[0xC];
     int* m_serializedDataOffsets;
 };
@@ -23,7 +23,7 @@ int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameCharaZEnvCtrl(pppCharaZEnvCtrl* pppCharaZEnvCtrl, UnkB* param_2, UnkC* param_3)
+void pppFrameCharaZEnvCtrl(pppCharaZEnvCtrl* pppCharaZEnvCtrl, pppCharaZEnvCtrlUnkB* param_2, pppCharaZEnvCtrlUnkC* param_3)
 {
 	if (lbl_8032ED70 != 0) {
 		return;
@@ -34,7 +34,7 @@ void pppFrameCharaZEnvCtrl(pppCharaZEnvCtrl* pppCharaZEnvCtrl, UnkB* param_2, Un
 	void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)(lbl_8032ED50 + 0xd8), 0);
 	int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
 	*(void**)(model + 0xe4) = work;
-	*(UnkB**)(model + 0xe8) = param_2;
+	*(pppCharaZEnvCtrlUnkB**)(model + 0xe8) = param_2;
 	*(void (**)(CChara::CModel*, void*, void*, int))(model + 0xf4) = CharaZEnvCtrl_BeforeMeshLockEnvCallback;
 }
 
@@ -85,3 +85,4 @@ void CharaZEnvCtrl_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void* data,
     unsigned char* zModeState = (unsigned char*)data;
     GXSetZMode((GXBool)zModeState[4], GX_LEQUAL, (GXBool)zModeState[5]);
 }
+

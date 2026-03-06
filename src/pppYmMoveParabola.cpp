@@ -30,7 +30,7 @@ void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, struct UnkC* dataPtr)
+extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, struct pppYmMoveParabolaUnkC* dataPtr)
 {
     _pppMngSt* pppMngSt = (_pppMngSt*)lbl_8032ED50;
     f32 fVar2 = lbl_80330E1C;
@@ -83,7 +83,7 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct UnkB* stepData, struct UnkC* offsetData)
+extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct pppYmMoveParabolaUnkB* stepData, struct pppYmMoveParabolaUnkC* offsetData)
 {
     if (lbl_8032ED70 == 0) {
         _pppMngSt* pppMngSt = (_pppMngSt*)lbl_8032ED50;
@@ -161,3 +161,4 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
         *(u16*)(pfVar + 3) = *(u16*)(pfVar + 3) + 1;
     }
 }
+

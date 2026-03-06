@@ -45,7 +45,7 @@ extern _pppEnvSt* pppEnvStPtr;
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct UnkB* param_2, struct UnkC* param_3)
+void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param_2, struct pppKeShpTail3XUnkC* param_3)
 {
     KeShpTail3XStep* step;
     s16* work;
@@ -169,7 +169,7 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct UnkB* param_2, struct Unk
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct UnkB* param_2, struct UnkC* param_3)
+void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param_2, struct pppKeShpTail3XUnkC* param_3)
 {
     KeShpTail3XStep* step = (KeShpTail3XStep*)param_2;
     KeShpTail3XOffsets* offsets = (KeShpTail3XOffsets*)param_3;
@@ -426,7 +426,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct UnkB* param_2, struct
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, struct UnkC* param_2)
+void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkC* param_2)
 {
     unsigned char* anglePtr;
     unsigned char* work;
@@ -484,3 +484,4 @@ void S4ToF32(pppFVECTOR4*, short*)
 {
 	// TODO
 }
+

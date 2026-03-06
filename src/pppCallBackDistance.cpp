@@ -20,7 +20,7 @@ void ParticleFrameCallback__5CGameFiiiiiP3Vec(CGame*, int, int, int, int, int, V
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameCallBackDistance(pppCallBackDistance* param1, UnkB* param2, UnkC* param3)
+void pppFrameCallBackDistance(pppCallBackDistance* param1, pppCallBackDistanceUnkB* param2, pppCallBackDistanceUnkC* param3)
 {
     u8* pppMngSt = lbl_8032ED50;
     s32 distanceOffset = *param3->m_serializedDataOffsets + 0x80;

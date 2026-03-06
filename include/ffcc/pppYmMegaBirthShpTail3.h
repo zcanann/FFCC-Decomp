@@ -30,8 +30,8 @@ struct PYmMegaBirthShpTail3 : _PARTICLE_DATA
 {
 };
 
-struct UnkB;
-struct UnkC
+struct pppYmMegaBirthShpTail3UnkB;
+struct pppYmMegaBirthShpTail3UnkC
 {
     u8 m_pad_0x0[0xc];
     s32* m_serializedDataOffsets;
@@ -52,13 +52,14 @@ void calc_particle(_pppPObject*, VYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, V
 extern "C" {
 #endif
 
-void pppConstructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3*, UnkC*);
-void pppDestructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3*, UnkC*);
-void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, UnkC*);
-void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3*, UnkB*, UnkC*);
+void pppConstructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3*, pppYmMegaBirthShpTail3UnkC*);
+void pppDestructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3*, pppYmMegaBirthShpTail3UnkC*);
+void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3*, PYmMegaBirthShpTail3*, pppYmMegaBirthShpTail3UnkC*);
+void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3*, pppYmMegaBirthShpTail3UnkB*, pppYmMegaBirthShpTail3UnkC*);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _FFCC_PPP_YMMEGABIRTHSHPTAIL3_H_
+

@@ -9,12 +9,12 @@ struct pppYmLookOn {
     int field0_0x0[2];
 };
 
-struct UnkB {
+struct pppYmLookOnUnkB {
     int m_graphId;
     float m_dataValIndex;
 };
 
-struct UnkC {
+struct pppYmLookOnUnkC {
     unsigned char pad[0x0C];
     int* m_serializedDataOffsets;
 };
@@ -23,8 +23,8 @@ struct UnkC {
 extern "C" {
 #endif
 
-void pppConstructYmLookOn(struct pppYmLookOn* pppYmLookOn, struct UnkC* param_2);
-void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct UnkB* param_2, struct UnkC* param_3);
+void pppConstructYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnUnkC* param_2);
+void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnUnkB* param_2, struct pppYmLookOnUnkC* param_3);
 
 #ifdef __cplusplus
 }
@@ -35,3 +35,4 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct UnkB* param_2, str
 #endif
 
 #endif // _PPP_YMLOOKON_H_
+

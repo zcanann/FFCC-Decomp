@@ -70,7 +70,7 @@ static char s_LocationTitle2_cpp[] = "LocationTitle2.cpp";
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppConstructLocationTitle2(struct pppLocationTitle2* locationTitle, struct UnkC* unkC)
+extern "C" void pppConstructLocationTitle2(struct pppLocationTitle2* locationTitle, struct pppLocationTitle2UnkC* unkC)
 {
     struct LocationTitle2Work {
         void* data;
@@ -101,7 +101,7 @@ extern "C" void pppConstructLocationTitle2(struct pppLocationTitle2* locationTit
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppDestructLocationTitle2(struct pppLocationTitle2* locationTitle, struct UnkC* unkC) 
+extern "C" void pppDestructLocationTitle2(struct pppLocationTitle2* locationTitle, struct pppLocationTitle2UnkC* unkC) 
 {
     int serializedOffset;
     CMemory::CStage** stagePtr;
@@ -124,7 +124,7 @@ extern "C" void pppDestructLocationTitle2(struct pppLocationTitle2* locationTitl
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, struct UnkB* unkB, struct UnkC* unkC)
+extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, struct pppLocationTitle2UnkB* unkB, struct pppLocationTitle2UnkC* unkC)
 {
     int colorOffset;
     LocationTitle2Work* work;
@@ -282,7 +282,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle, struct UnkB* unkB, struct UnkC* unkC)
+extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle, struct pppLocationTitle2UnkB* unkB, struct pppLocationTitle2UnkC* unkC)
 {
     int serializedOffset = *unkC->m_serializedDataOffsets;
     u32 dataValIndex = unkB->m_dataValIndex;
@@ -384,3 +384,4 @@ extern "C" void pppRenderLocationTitle2(struct pppLocationTitle2* locationTitle,
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
     }
 }
+

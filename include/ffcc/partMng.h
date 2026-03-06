@@ -92,6 +92,7 @@ struct _PARTICLE_COLOR
     float m_color[4];            // 0x0
     float m_colorFrameDeltas[4]; // 0x10
 };
+typedef _PARTICLE_COLOR PARTICLE_COLOR;
 
 struct _PARTICLE_DATA
 {
@@ -106,6 +107,7 @@ struct _PARTICLE_DATA
     int m_age;             // 0x68 - 0x6c
     char m_padding[0x140 - 0x6c]; // Pad to 0x140 bytes total
 };
+typedef _PARTICLE_DATA PARTICLE_DATA;
 
 struct _pppPObject
 {

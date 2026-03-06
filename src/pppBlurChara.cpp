@@ -93,7 +93,7 @@ void MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(void* math, Mtx44 mtx, Vec4d* src
 
 static char s_pppBlurCharaCpp[] = "pppBlurChara.cpp";
 
-static inline pppBlurCharaWork* GetBlurWork(pppBlurChara* blurChara, const UnkC* data) {
+static inline pppBlurCharaWork* GetBlurWork(pppBlurChara* blurChara, const pppBlurCharaUnkC* data) {
     return (pppBlurCharaWork*)((char*)blurChara + 0x80 + data->m_serializedDataOffsets[2]);
 }
 
@@ -218,7 +218,7 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructBlurChara(pppBlurChara* blurChara, UnkC* data)
+void pppConstructBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkC* data)
 {
     pppBlurCharaWork* work = GetBlurWork(blurChara, data);
     void* ownerObj = *(void**)(lbl_8032ED50 + 0xDC);
@@ -244,7 +244,7 @@ void pppConstructBlurChara(pppBlurChara* blurChara, UnkC* data)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructBlurChara(pppBlurChara* blurChara, UnkC* data)
+void pppDestructBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkC* data)
 {
     pppBlurCharaWork* work = GetBlurWork(blurChara, data);
     void* handle = GetCharaHandlePtr__FP8CGObjectl(work->m_ownerObj, 0);
@@ -276,7 +276,7 @@ void pppDestructBlurChara(pppBlurChara* blurChara, UnkC* data)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameBlurChara(pppBlurChara* blurChara, UnkB* param_2, UnkC* param_3)
+void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBlurCharaUnkC* param_3)
 {
     pppBlurCharaWork* work;
     void* handle;
@@ -291,7 +291,7 @@ void pppFrameBlurChara(pppBlurChara* blurChara, UnkB* param_2, UnkC* param_3)
     model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
 
     *(pppBlurCharaWork**)(model + 0xE4) = work;
-    *(UnkB**)(model + 0xE8) = param_2;
+    *(pppBlurCharaUnkB**)(model + 0xE8) = param_2;
 
     if ((unsigned int)work->m_captureBuffer == 0) {
         unsigned int texBufferSize = GXGetTexBufferSize(0x140, 0xE0, GX_TF_I8, GX_FALSE, GX_FALSE);
@@ -302,7 +302,7 @@ void pppFrameBlurChara(pppBlurChara* blurChara, UnkB* param_2, UnkC* param_3)
                                                                     s_pppBlurCharaCpp, 0xD7);
 
         *(pppBlurCharaWork**)(model + 0xE4) = work;
-        *(UnkB**)(model + 0xE8) = param_2;
+        *(pppBlurCharaUnkB**)(model + 0xE8) = param_2;
         *(void**)(model + 0xF4) = (void*)BlurChara_SetBeforeMeshLockEnvCallback;
     }
 }
@@ -316,7 +316,7 @@ void pppFrameBlurChara(pppBlurChara* blurChara, UnkB* param_2, UnkC* param_3)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderBlurChara(pppBlurChara* blurChara, UnkB* param_2, UnkC* param_3)
+void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBlurCharaUnkC* param_3)
 {
     int textureBase = 0;
     int textureIndex = 0;
@@ -467,3 +467,4 @@ void pppRenderBlurChara(pppBlurChara* blurChara, UnkB* param_2, UnkC* param_3)
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
     pppInitBlendMode__Fv();
 }
+

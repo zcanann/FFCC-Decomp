@@ -102,7 +102,7 @@ struct CMapCylinderRaw {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructLaser(struct pppLaser *pppLaser, struct UnkC *param_2)
+void pppConstructLaser(struct pppLaser *pppLaser, struct pppLaserUnkC *param_2)
 {
     f32 fVar1 = FLOAT_80333428;
     f32* pfVar3 = (f32*)((u8*)pppLaser + 0x80 + param_2->offsets->m_serializedDataOffsets[2]);
@@ -164,7 +164,7 @@ void pppConstructLaser(struct pppLaser *pppLaser, struct UnkC *param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstruct2Laser(struct pppLaser *pppLaser, struct UnkC *param_2)
+void pppConstruct2Laser(struct pppLaser *pppLaser, struct pppLaserUnkC *param_2)
 {
     f32 fVar1 = lbl_80333428;
     u8* work = (u8*)pppLaser + param_2->offsets->m_serializedDataOffsets[2] + 0x80;
@@ -190,7 +190,7 @@ void pppConstruct2Laser(struct pppLaser *pppLaser, struct UnkC *param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructLaser(struct pppLaser *pppLaser, struct UnkC *param_2)
+void pppDestructLaser(struct pppLaser *pppLaser, struct pppLaserUnkC *param_2)
 {
     f32* work = (f32*)((u8*)pppLaser + 0x80 + param_2->offsets->m_serializedDataOffsets[2]);
     void* alloc = *(void**)(work + 7);
@@ -209,7 +209,7 @@ void pppDestructLaser(struct pppLaser *pppLaser, struct UnkC *param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameLaser(struct pppLaser *pppLaser, struct UnkB *param_2, struct UnkC *param_3)
+void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, struct pppLaserUnkC *param_3)
 {
     LaserStep* step = (LaserStep*)param_2;
     float* work;
@@ -362,7 +362,7 @@ void pppFrameLaser(struct pppLaser *pppLaser, struct UnkB *param_2, struct UnkC 
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderLaser(struct pppLaser *pppLaser, struct UnkB *param_2, struct UnkC *param_3)
+void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, struct pppLaserUnkC *param_3)
 {
     LaserStep* step = (LaserStep*)param_2;
     _pppPObject* baseObj = (_pppPObject*)pppLaser;
@@ -597,3 +597,4 @@ void pppRenderLaser(struct pppLaser *pppLaser, struct UnkB *param_2, struct UnkC
         }
     }
 }
+

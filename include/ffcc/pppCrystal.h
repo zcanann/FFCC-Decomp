@@ -23,7 +23,7 @@ struct pppCrystal {
     float field_0x88; // Used as pppCVECTOR* in render
 };
 
-struct UnkB {
+struct pppCrystalUnkB {
     u32 m_dataValIndex;
     u16 m_initWOrk;
     
@@ -35,7 +35,7 @@ struct UnkB {
     char pad2[1];
 };
 
-struct UnkC {
+struct pppCrystalUnkC {
     s32* m_serializedDataOffsets;
 };
 
@@ -45,13 +45,14 @@ extern "C" {
 
 void ImageBufferSetPixel_IA8(struct HSD_ImageBuffer*, unsigned long, unsigned long, unsigned long, unsigned long, unsigned long, unsigned long);
 void MakeRefractionMap(struct HSD_ImageBuffer*);
-void pppConstructCrystal(struct pppCrystal*, struct UnkC*);
-void pppDestructCrystal(struct pppCrystal*, struct UnkC*);
-void pppFrameCrystal(struct pppCrystal*, struct UnkB*, struct UnkC*);
-void pppRenderCrystal(struct pppCrystal*, struct UnkB*, struct UnkC*);
+void pppConstructCrystal(struct pppCrystal*, struct pppCrystalUnkC*);
+void pppDestructCrystal(struct pppCrystal*, struct pppCrystalUnkC*);
+void pppFrameCrystal(struct pppCrystal*, struct pppCrystalUnkB*, struct pppCrystalUnkC*);
+void pppRenderCrystal(struct pppCrystal*, struct pppCrystalUnkB*, struct pppCrystalUnkC*);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _FFCC_PPPCRYSTAL_H_
+

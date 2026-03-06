@@ -32,7 +32,7 @@ extern float FLOAT_80330c84;
 extern double DOUBLE_80330c88;
 extern void pppNormalize__FR3Vec3Vec(float*, Vec*);
 
-struct UnkC {
+struct pppYmBreathUnkC {
     unsigned char _pad[0xC];
     int* m_serializedDataOffsets;
 };
@@ -480,7 +480,7 @@ void SetParticleMatrix(_pppPObject*, VYmBreath*, PARTICLE_DATA*, PARTICLE_WMAT*)
  * Address:	800c04f8
  * Size:	1264
  */
-extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, UnkC* offsets)
+extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pppYmBreathUnkC* offsets)
 {
     int i;
     int j;
@@ -638,7 +638,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, Un
  * Address:	800bffec
  * Size:	1292
  */
-extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, UnkC* offsets)
+extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pppYmBreathUnkC* offsets)
 {
     YmBreathRenderStep* step;
     int workOffset;
@@ -834,7 +834,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, U
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppConstructYmBreath(pppYmBreath* ymBreath, UnkC* dataOffsets)
+extern "C" void pppConstructYmBreath(pppYmBreath* ymBreath, pppYmBreathUnkC* dataOffsets)
 {
     Mtx* work = (Mtx*)((unsigned char*)ymBreath + 0x80 + *dataOffsets->m_serializedDataOffsets);
     unsigned char* state = (unsigned char*)work;
@@ -874,7 +874,7 @@ void pppConstruct2YmBreath(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppDestructYmBreath(pppYmBreath* ymBreath, UnkC* dataOffsets)
+extern "C" void pppDestructYmBreath(pppYmBreath* ymBreath, pppYmBreathUnkC* dataOffsets)
 {
     unsigned char* work = (unsigned char*)ymBreath + 0x80 + *dataOffsets->m_serializedDataOffsets;
     void** particleData = (void**)(work + 0x30);
@@ -997,3 +997,4 @@ void IsExistGroupParticle(PYmBreath* pYmBreath, VYmBreath* vYmBreath, short part
         *(unsigned char*)(groupArray[groupIndex * 0x17 + 1] + slotIndex) = 0xFF;
     }
 }
+

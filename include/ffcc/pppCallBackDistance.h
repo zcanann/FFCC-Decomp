@@ -12,13 +12,13 @@ struct pppCallBackDistance {
     } field0_0x0;
 };
 
-struct UnkB {
+struct pppCallBackDistanceUnkB {
     u32 m_unk0;
     f32 m_dataValIndex;
     s16 m_initWOrk;
 };
 
-struct UnkC {
+struct pppCallBackDistanceUnkC {
     u8 _pad0[0xC];
     s32* m_serializedDataOffsets;
 };
@@ -27,12 +27,13 @@ struct UnkC {
 extern "C" {
 #endif
 
-void pppConstructCallBackDistance(pppCallBackDistance* param1, UnkC* param2);
+void pppConstructCallBackDistance(pppCallBackDistance* param1, pppCallBackDistanceUnkC* param2);
 void pppDestructCallBackDistance(void);
-void pppFrameCallBackDistance(pppCallBackDistance* param1, UnkB* param2, UnkC* param3);
+void pppFrameCallBackDistance(pppCallBackDistance* param1, pppCallBackDistanceUnkB* param2, pppCallBackDistanceUnkC* param3);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _FFCC_PPPCALLBACKDISTANCE_H_
+

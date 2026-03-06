@@ -137,7 +137,7 @@ void oddToEven(float&)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, UnkC* param_2)
+void pppConstructYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpUnkC* param_2)
 {
 	struct WorkState {
 		u32 m_data0;
@@ -174,7 +174,7 @@ void pppConstructYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, Unk
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstruct2YmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, UnkC* param_2)
+void pppConstruct2YmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpUnkC* param_2)
 {
 	struct WorkState {
 		u32 m_data0;
@@ -220,7 +220,7 @@ void pppDestructYmDeformationShp(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, UnkB* param_2, UnkC* param_3)
+void pppFrameYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpUnkB* param_2, pppYmDeformationShpUnkC* param_3)
 {
 	struct FrameState {
 		u32 m_data0;
@@ -463,7 +463,7 @@ void RenderDeformationShape(_pppPObject* obj, VYmDeformationShp* work, Vec* vert
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, UnkB* param_2, UnkC* param_3)
+void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDeformationShpUnkB* param_2, pppYmDeformationShpUnkC* param_3)
 {
 	int textureIndex = 0;
 	u8* work = (u8*)pppYmDeformationShp_ + 0x80 + param_3->m_serializedDataOffsets[2];
@@ -745,3 +745,4 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, UnkB* 
 
 	DisableIndWarp__F13_GXTevStageID16_GXIndTexStageID(1, 0);
 }
+

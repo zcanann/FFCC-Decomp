@@ -12,22 +12,23 @@ typedef struct {
     float m_initWOrk;       // 0x08
     float m_stepValue;      // 0x0C
     float m_arg3;           // 0x10
-} UnkB;
+} pppAcceleUnkB;
 
 typedef struct {
     char pad[0x0C];           // padding to 0x0C
     int* m_serializedDataOffsets; // 0x0C
-} UnkC;
+} pppAcceleUnkC;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppAccele(pppAcceleObj* obj, UnkB* param_2, UnkC* param_3);
-void pppAcceleCon(pppAcceleObj* obj, UnkC* param);
+void pppAccele(pppAcceleObj* obj, pppAcceleUnkB* param_2, pppAcceleUnkC* param_3);
+void pppAcceleCon(pppAcceleObj* obj, pppAcceleUnkC* param);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
+

@@ -79,7 +79,7 @@ void copyPolygonData(TRACE_POLYGON*, TRACE_POLYGON*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmTracer2(pppYmTracer2* pppYmTracer2, UnkC* param_2)
+void pppConstructYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_2)
 {
 	float fVar1 = FLOAT_80331844;
 	unsigned char* puVar2 = (unsigned char*)pppYmTracer2 + 0x80 + *param_2->m_serializedDataOffsets;
@@ -112,7 +112,7 @@ void pppConstructYmTracer2(pppYmTracer2* pppYmTracer2, UnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstruct2YmTracer2(pppYmTracer2* pppYmTracer2, UnkC* param_2)
+void pppConstruct2YmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_2)
 {
 	unsigned char* iVar1 = (unsigned char*)pppYmTracer2 + 0x80 + *param_2->m_serializedDataOffsets;
 	
@@ -130,7 +130,7 @@ void pppConstruct2YmTracer2(pppYmTracer2* pppYmTracer2, UnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructYmTracer2(pppYmTracer2* pppYmTracer2, UnkC* param_2)
+void pppDestructYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkC* param_2)
 {
 	void** memPtr = (void**)((unsigned char*)pppYmTracer2 + 0x80 + *param_2->m_serializedDataOffsets + 0x28);
 	if (*memPtr != 0) {
@@ -147,7 +147,7 @@ void pppDestructYmTracer2(pppYmTracer2* pppYmTracer2, UnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, UnkB* param_2, UnkC* param_3)
+void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pppYmTracer2UnkC* param_3)
 {
     s32 useFallback;
     float fVar2;
@@ -323,7 +323,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, UnkB* param_2, UnkC* param_3)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, UnkB* param_2, UnkC* param_3)
+void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pppYmTracer2UnkC* param_3)
 {
     YmTracer2Step* step = (YmTracer2Step*)param_2;
     s32 dataOffset = *param_3->m_serializedDataOffsets;
@@ -419,3 +419,4 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, UnkB* param_2, UnkC* param_3
         }
     }
 }
+

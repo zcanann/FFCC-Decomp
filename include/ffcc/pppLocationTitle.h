@@ -18,7 +18,7 @@ struct pppLocationTitle {
     void* field_0x88;
 };
 
-struct UnkB {
+struct pppLocationTitleUnkB {
     u32 m_dataValIndex;
     u16 m_initWOrk;
     
@@ -29,7 +29,7 @@ struct UnkB {
     u8 m_stepValue;
 };
 
-struct UnkC {
+struct pppLocationTitleUnkC {
     s32* m_serializedDataOffsets;
 };
 
@@ -37,13 +37,14 @@ struct UnkC {
 extern "C" {
 #endif
 
-void pppConstructLocationTitle(pppLocationTitle* param_1, UnkC* param_2);
-void pppDestructLocationTitle(pppLocationTitle* param_1, UnkC* param_2);
-void pppFrameLocationTitle(pppLocationTitle* param_1, UnkB* param_2, UnkC* param_3);
-void pppRenderLocationTitle(pppLocationTitle* param_1, UnkB* param_2, UnkC* param_3);
+void pppConstructLocationTitle(pppLocationTitle* param_1, pppLocationTitleUnkC* param_2);
+void pppDestructLocationTitle(pppLocationTitle* param_1, pppLocationTitleUnkC* param_2);
+void pppFrameLocationTitle(pppLocationTitle* param_1, pppLocationTitleUnkB* param_2, pppLocationTitleUnkC* param_3);
+void pppRenderLocationTitle(pppLocationTitle* param_1, pppLocationTitleUnkB* param_2, pppLocationTitleUnkC* param_3);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _PPP_LOCATIONTITLE_H_
+

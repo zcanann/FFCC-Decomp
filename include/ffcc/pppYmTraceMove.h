@@ -8,7 +8,7 @@ struct pppYmTraceMove {
     s32 m_graphId;
 };
 
-struct UnkB {
+struct pppYmTraceMoveUnkB {
     s32 m_graphId;
     f32 m_dataValIndex;
     f32 m_initWOrk;
@@ -17,7 +17,7 @@ struct UnkB {
     f32 m_payload;
 };
 
-struct UnkC {
+struct pppYmTraceMoveUnkC {
     char pad[0x0c];
     s32* m_serializedDataOffsets;
 };
@@ -26,11 +26,12 @@ struct UnkC {
 extern "C" {
 #endif
 
-void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, UnkC* param_2);
-void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, UnkB* param_2, UnkC* param_3);
+void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkC* param_2);
+void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* param_2, pppYmTraceMoveUnkC* param_3);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _FFCC_PPP_YMTRACEMOVE_H_
+

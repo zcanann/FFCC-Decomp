@@ -19,7 +19,7 @@ extern "C" void pppSetFpMatrix__FP9_pppMngSt(struct _pppMngSt*);
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmLookOn(struct pppYmLookOn* pppYmLookOn, struct UnkC* param_2)
+void pppConstructYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnUnkC* param_2)
 {
     int dataOffset = *param_2->m_serializedDataOffsets;
     *(int*)((char*)pppYmLookOn + dataOffset + 0x80) = 0;
@@ -34,7 +34,7 @@ void pppConstructYmLookOn(struct pppYmLookOn* pppYmLookOn, struct UnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct UnkB* param_2, struct UnkC* param_3)
+void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnUnkB* param_2, struct pppYmLookOnUnkC* param_3)
 {
     struct _pppMngSt* pppMngSt;
     int workOffset;
@@ -103,3 +103,4 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct UnkB* param_2, str
         pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
     }
 }
+

@@ -98,7 +98,12 @@ extern "C" void pppSRandCV(void* param1, void* param2, void* param3)
         target = (float*)(base + *out->fieldC + 0x80);
     }
 
-    color = (in->field4 == -1) ? lbl_801EADC8 : (u8*)(base + in->field4 + 0x80);
+    if (in->field4 == -1) {
+        color = lbl_801EADC8;
+    } else {
+        s32 colorOffset = in->field4;
+        color = (u8*)(base + colorOffset + 0x80);
+    }
 
     s8 baseValue = in->field8;
     color[0] = (u8)(color[0] + (s32)((f32)baseValue * target[0] - (f32)baseValue));

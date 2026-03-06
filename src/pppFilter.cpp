@@ -81,7 +81,7 @@ void pppFrameFilter(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderFilter(pppFilter* pppFilterObj, UnkB* param_2, UnkC* param_3)
+void pppRenderFilter(pppFilter* pppFilterObj, pppFilterUnkB* param_2, pppFilterUnkC* param_3)
 {
     struct FilterStep {
         unsigned int unk0;
@@ -106,3 +106,4 @@ void pppRenderFilter(pppFilter* pppFilterObj, UnkB* param_2, UnkC* param_3)
         &lbl_8032EC70, lbl_803320C8, lbl_803320C8, lbl_803320CC, lbl_803320D0, &textureInfo->m_texObj, 0, 0,
         &serializedData->m_color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 }
+

@@ -5,7 +5,6 @@
 #include <dolphin/mtx.h>
 
 extern u8 PartMng[];
-extern unsigned char* lbl_8032ED50;
 extern CGame Game;
 
 /*
@@ -46,7 +45,7 @@ void pppFrameYmCallBack(pppYmCallBack* callbackObj, pppYmCallBackUnkB* param_2, 
     s32 mngStIndex;
 
     if (((s32)ymCallBack->m_graphId / 0x1000) == (s32)frameParam->m_graphId) {
-        mngSt = lbl_8032ED50;
+        mngSt = (unsigned char*)pppMngStPtr;
         position.x = *(f32*)(mngSt + 0x84);
         position.y = *(f32*)(mngSt + 0x94);
         position.z = *(f32*)(mngSt + 0xA4);
@@ -58,3 +57,5 @@ void pppFrameYmCallBack(pppYmCallBack* callbackObj, pppYmCallBackUnkB* param_2, 
                                    (s32)frameParam->m_graphId, &position);
     }
 }
+
+

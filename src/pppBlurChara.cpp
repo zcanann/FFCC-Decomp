@@ -36,7 +36,6 @@ extern int gPppCalcDisabled;
 extern void* DAT_80238030;
 extern CUtil gUtil;
 extern char MaterialMan[];
-extern unsigned char* lbl_8032ED50;
 
 extern float FLOAT_80331030;
 extern float FLOAT_80331034;
@@ -221,7 +220,7 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
 void pppConstructBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkC* data)
 {
     pppBlurCharaWork* work = GetBlurWork(blurChara, data);
-    void* ownerObj = *(void**)(lbl_8032ED50 + 0xDC);
+    void* ownerObj = *(void**)(pppMngStPtr + 0xDC);
     void* handle;
     int model;
 
@@ -287,7 +286,7 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
     }
 
     work = GetBlurWork(blurChara, param_3);
-    handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)(lbl_8032ED50 + 0xDC), 0);
+    handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)(pppMngStPtr + 0xDC), 0);
     model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
 
     *(pppBlurCharaWork**)(model + 0xE4) = work;
@@ -467,4 +466,6 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
     pppInitBlendMode__Fv();
 }
+
+
 

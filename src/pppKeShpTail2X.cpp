@@ -10,9 +10,6 @@
 extern int gPppCalcDisabled;
 extern float lbl_80330500;
 extern float lbl_80330504;
-extern unsigned char* lbl_8032ED50;
-extern _pppEnvSt* pppEnvStPtr;
-extern _pppEnvSt* lbl_8032ED54;
 extern Mtx ppvWorldMatrix;
 extern Mtx ppvCameraMatrix02;
 
@@ -110,7 +107,7 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
             pppFMATRIX outMatrix;
 
             partMatrix = tailObj->m_obj.m_localMatrix;
-            ownerMatrix = ((_pppMngSt*)lbl_8032ED50)->m_matrix;
+            ownerMatrix = ((_pppMngSt*)pppMngStPtr)->m_matrix;
             pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&outMatrix, &ownerMatrix, &partMatrix);
             pos.x = outMatrix.value[0][3];
             pos.y = outMatrix.value[1][3];
@@ -141,7 +138,7 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
         pppFMATRIX outMatrix;
 
         partMatrix = tailObj->m_obj.m_localMatrix;
-        ownerMatrix = ((_pppMngSt*)lbl_8032ED50)->m_matrix;
+        ownerMatrix = ((_pppMngSt*)pppMngStPtr)->m_matrix;
         pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&outMatrix, &ownerMatrix, &partMatrix);
         pos.x = outMatrix.value[0][3];
         pos.y = outMatrix.value[1][3];
@@ -151,7 +148,7 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
     pppCopyVector__FR3Vec3Vec(&work->m_posHistory[work->m_head], &pos);
 
     {
-        long* shape = *(long**)(*(u32*)&lbl_8032ED54->m_particleColors[0] + step->m_dataValIndex * 4);
+        long* shape = *(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
         u8* frameEntry;
         s16 frameDuration;
 
@@ -253,8 +250,8 @@ void pppKeShpTail2XDraw(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpT
     }
 
     work = (KeShpTail2XWork*)((u8*)obj + 0x80 + offsets->m_serializedDataOffsets[0]);
-    mng = (_pppMngSt*)lbl_8032ED50;
-    shapeTable = *(long**)(*(u32*)&lbl_8032ED54->m_particleColors[0] + step->m_dataValIndex * 4);
+    mng = (_pppMngSt*)pppMngStPtr;
+    shapeTable = *(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
     shapeEntry = (long*)((u8*)shapeTable + *(s16*)((u8*)shapeTable + ((u16)work->m_shapePrevFrame << 3) + 0x10));
 
     colorR = (float)step->m_colorStartR;
@@ -339,7 +336,7 @@ draw_loop:
     }
 
     pppSetBlendMode__FUc(step->m_blendMode);
-    pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(shapeEntry, lbl_8032ED54->m_materialSetPtr, step->m_blendMode);
+    pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(shapeEntry, pppEnvStPtr->m_materialSetPtr, step->m_blendMode);
 
     count--;
     if (count == 0) {
@@ -455,4 +452,6 @@ void U8ToF32(pppFVECTOR4*, unsigned char*)
 {
 	// TODO
 }
+
+
 

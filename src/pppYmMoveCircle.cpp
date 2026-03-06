@@ -19,7 +19,6 @@ struct pppYmMoveCircleWork {
 };
 
 extern int gPppCalcDisabled;
-extern _pppMngSt* lbl_8032ED50;
 extern f32 lbl_801EC9F0[];
 extern f32 lbl_80330D78;
 extern f32 lbl_80330D7C;
@@ -46,7 +45,7 @@ extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCirc
     s32 offset;
     pppYmMoveCircleWork* work;
 
-    pppMngSt = lbl_8032ED50;
+    pppMngSt = pppMngStPtr;
     offset = offsetData->m_serializedDataOffsets[0];
     work = (pppYmMoveCircleWork*)((u8*)basePtr + offset + 0x80);
 
@@ -100,7 +99,7 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
 
     serializedDataOffsets = offsetData->m_serializedDataOffsets;
     work = (pppYmMoveCircleWork*)((u8*)basePtr + serializedDataOffsets[0] + 0x80);
-    pppMngSt = (u8*)lbl_8032ED50;
+    pppMngSt = (u8*)pppMngStPtr;
 
     work->m_radiusStep += work->m_radiusStepStep;
     work->m_radius += work->m_radiusStep;
@@ -137,8 +136,10 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
     pppCopyVector(*(Vec*)(pppMngSt + 0x48), *(Vec*)(pppMngSt + 0x8));
     pppCopyVector(*(Vec*)(pppMngSt + 0x8), nextPos);
 
-    *(f32*)((u8*)lbl_8032ED50 + 0x84) = nextPos.x;
-    *(f32*)((u8*)lbl_8032ED50 + 0x94) = nextPos.y;
-    *(f32*)((u8*)lbl_8032ED50 + 0xA4) = nextPos.z;
+    *(f32*)((u8*)pppMngStPtr + 0x84) = nextPos.x;
+    *(f32*)((u8*)pppMngStPtr + 0x94) = nextPos.y;
+    *(f32*)((u8*)pppMngStPtr + 0xA4) = nextPos.z;
     pppSetFpMatrix((_pppMngSt*)pppMngSt);
 }
+
+

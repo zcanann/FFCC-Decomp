@@ -1,6 +1,7 @@
 #include "ffcc/pppYmDeformationShp.h"
 #include "ffcc/graphic.h"
 #include "ffcc/mapmesh.h"
+#include "ffcc/partMng.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
@@ -38,7 +39,6 @@ struct _pppEnvStYmDeformationShp {
 	CMapMesh** m_mapMeshPtr;
 };
 
-extern _pppEnvStYmDeformationShp* pppEnvStPtr;
 
 extern "C" void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
 
@@ -495,9 +495,10 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 		return;
 	}
 
+	_pppEnvStYmDeformationShp* env = (_pppEnvStYmDeformationShp*)pppEnvStPtr;
 	int colorOffset = param_3->m_serializedDataOffsets[1];
 	int textureBase = GetTexture__8CMapMeshFP12CMaterialSetRi(
-		pppEnvStPtr->m_mapMeshPtr[param_2->m_dataValIndex], pppEnvStPtr->m_materialSetPtr, textureIndex);
+		env->m_mapMeshPtr[param_2->m_dataValIndex], env->m_materialSetPtr, textureIndex);
 
 	pppSetBlendMode__FUc(1);
 	_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
@@ -745,4 +746,5 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 
 	DisableIndWarp__F13_GXTevStageID16_GXIndTexStageID(1, 0);
 }
+
 

@@ -4,7 +4,6 @@
 #include <dolphin/mtx.h>
 
 extern int gPppCalcDisabled;
-extern struct _pppMngSt* pppMngStPtr;
 
 extern class CCameraPcs {
 public:
@@ -81,3 +80,4 @@ struct pppAlignmentScale* pppFrameAlignmentScale(struct pppAlignmentScale* align
 
     return alignmentScale;
 }
+

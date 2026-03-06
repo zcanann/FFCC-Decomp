@@ -1,8 +1,8 @@
 #include "ffcc/pppPObjPoint.h"
+#include "ffcc/partMng.h"
 #include "dolphin/mtx.h"
 
 extern int gPppCalcDisabled;
-extern void* lbl_8032ED50;
 extern u8 gPppDefaultValueBuffer[32];
 
 typedef struct PObjPointEntry {
@@ -35,7 +35,7 @@ void pppPObjPoint(PppPointData* pointData, PppObjData* objData, PppContainer* co
         if ((objData->field_4 + 0x10000) == 0xFFFF) {
             vecPtr = (u8*)gPppDefaultValueBuffer;
         } else {
-            PObjPointEntry* table = *(PObjPointEntry**)((u8*)lbl_8032ED50 + 0xD4);
+            PObjPointEntry* table = *(PObjPointEntry**)((u8*)pppMngStPtr + 0xD4);
             vecPtr = (u8*)objData->data + 0x80;
             vecPtr += table[objData->field_4].vecOffset;
         }
@@ -47,3 +47,5 @@ void pppPObjPoint(PppPointData* pointData, PppObjData* objData, PppContainer* co
     objPtr->y = ((f32*)objPtr->vecPtr)[1];
     objPtr->z = ((f32*)objPtr->vecPtr)[2];
 }
+
+

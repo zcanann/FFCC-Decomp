@@ -72,8 +72,6 @@ extern char MaterialMan[];
 extern char s_f999_root_801dd4c8[];
 extern char s_pppScreenBreak_cpp_801dd4d4[];
 extern CGraphic GraphicsPcs;
-extern _pppMngSt* lbl_8032ED50;
-extern _pppEnvSt* lbl_8032ED54;
 extern float FLOAT_80331cf4;
 
 struct ScreenBreakCameraPcs {
@@ -563,7 +561,7 @@ void pppConScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2
 {
     s32 dataOffset = param_2->m_serializedDataOffsets[2];
     float* value = (float*)((u8*)pppScreenBreak + dataOffset + 0x80);
-    void* gObject = *(void**)((u8*)lbl_8032ED50 + 0xD8);
+    void* gObject = *(void**)((u8*)pppMngStPtr + 0xD8);
     void* handle = GetCharaHandlePtr__FP8CGObjectl(gObject, 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
     float f = FLOAT_80331cc4;
@@ -620,7 +618,7 @@ void pppDesScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2
     s32* serializedDataOffsets = *(s32**)param_2;
     s32 dataOffset = serializedDataOffsets[2];
     u8* pppData = ((u8*)pppScreenBreak + dataOffset + 0x80);
-    void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)lbl_8032ED50 + 0xD8), 0);
+    void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
     if (model != 0) {
         *(void**)(model + 0xF0) = NULL;
@@ -657,7 +655,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
 
     s32 index = param_3->m_serializedDataOffsets[0];
     float* value = (float*)((u8*)&pppScreenBreak->field0_0x0 + 8 + param_3->m_serializedDataOffsets[2]);
-    void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)lbl_8032ED50 + 0xD8), 0);
+    void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
     *(float**)(model + 0xE4) = value;
     *(pppScreenBreakUnkB**)(model + 0xE8) = param_2;
@@ -676,9 +674,9 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
 
     u32 pieceCount = *(u32*)(*(u8**)(model + 0xA4) + 0xC);
     if (*(void**)&value[3] == NULL) {
-        *(void**)&value[3] = pppMemAlloc__FUlPQ27CMemory6CStagePci(pieceCount * 0x3C, lbl_8032ED54->m_stagePtr,
+        *(void**)&value[3] = pppMemAlloc__FUlPQ27CMemory6CStagePci(pieceCount * 0x3C, pppEnvStPtr->m_stagePtr,
                                                                     s_pppScreenBreak_cpp_801dd4d4, 0x25E);
-        *(void**)&value[4] = pppMemAlloc__FUlPQ27CMemory6CStagePci(0x20, lbl_8032ED54->m_stagePtr,
+        *(void**)&value[4] = pppMemAlloc__FUlPQ27CMemory6CStagePci(0x20, pppEnvStPtr->m_stagePtr,
                                                                     s_pppScreenBreak_cpp_801dd4d4, 0x25F);
         InitPieceData((CChara::CModel*)model, pppScreenBreak, (VScreenBreak*)param_2);
         PSVECNormalize((Vec*)(param_2->m_payload + 0xC), (Vec*)(param_2->m_payload + 0xC));
@@ -736,7 +734,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param
         piece += 0x3C;
     }
 
-    pppSetFpMatrix(lbl_8032ED50);
+    pppSetFpMatrix(pppMngStPtr);
 }
 
 /*
@@ -752,7 +750,7 @@ void pppRenderScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB*, ppp
 {
     s32 dataOffset = param_3->m_serializedDataOffsets[2];
     u8* value = (u8*)pppScreenBreak + dataOffset + 0x80;
-    void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)lbl_8032ED50 + 0xD8), 0);
+    void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
     SearchNode__Q26CChara6CModelFPc((CChara::CModel*)model, s_f999_root_801dd4c8);
 
@@ -762,4 +760,6 @@ void pppRenderScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB*, ppp
         value[0x24] = 1;
     }
 }
+
+
 

@@ -4,7 +4,7 @@
 #include "ffcc/math.h"
 #include <dolphin/types.h>
 
-extern CMath math[];
+extern CMath Math;
 extern int gPppCalcDisabled;
 extern _pppMngSt* lbl_8032ED50;
 extern float lbl_801EC9F0[];
@@ -79,11 +79,11 @@ void pppPointRAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
         }
 
         float* trig = lbl_801EC9F0;
-        s32 angleA = (s32)(lbl_8032FEE8 * RandF__5CMathFv(math) - lbl_8032FEEC);
+        s32 angleA = (s32)(lbl_8032FEE8 * RandF__5CMathFv(&Math) - lbl_8032FEEC);
         float scaleA = payload->m_radius;
         float yOff = scaleA * *(float*)((u8*)trig + ((angleA + 0x4000) & 0xFFFC));
         float planarOff = scaleA * *(float*)((u8*)trig + (angleA & 0xFFFC));
-        s32 angleB = (s32)(lbl_8032FEF0 * (lbl_8032FEE8 * RandF__5CMathFv(math)));
+        s32 angleB = (s32)(lbl_8032FEF0 * (lbl_8032FEE8 * RandF__5CMathFv(&Math)));
         Vec* dstPos = (Vec*)((u8*)obj + payload->m_childPosOffset + 0x80);
         Vec* dstVel = (Vec*)((u8*)obj + payload->m_childVelocityOffset + 0x80);
         float xOff = planarOff * *(float*)((u8*)trig + (angleB & 0xFFFC));

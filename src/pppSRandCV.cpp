@@ -23,10 +23,6 @@ struct PppSRandCVParam3 {
     s32* fieldC;
 };
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /*
  * --INFO--
  * PAL Address: 800632d0
@@ -36,7 +32,7 @@ extern "C" {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppSRandCV(void* param1, void* param2, void* param3)
+extern "C" void pppSRandCV(void* param1, void* param2, void* param3)
 {
     u8* base = (u8*)param1;
     PppSRandCVParam2* in = (PppSRandCVParam2*)param2;
@@ -136,7 +132,3 @@ void randf(unsigned char)
 {
     // TODO
 }
-
-#ifdef __cplusplus
-}
-#endif

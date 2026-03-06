@@ -2,11 +2,12 @@
 #define _PPP_SRANDCV_H_
 
 #ifdef __cplusplus
+void randchar(char, float);
+void randf(unsigned char);
+
 extern "C" {
 #endif
 
-void randchar(char, float);
-void randf(unsigned char);
 void pppSRandCV(void* param1, void* param2, void* param3);
 
 #ifdef __cplusplus

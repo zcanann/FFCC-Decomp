@@ -120,11 +120,6 @@ This is likely the starting point for the agent.
 ### Step 1 - Select Target & Gather Context (automated)
 Run the selector once. It prints random viable targets across multiple buckets (code opportunities, data opportunities, linkage opportunities, and name/linkage blockers) with symbol summaries.
 
-STRONGLY PREFER:
-- Real member access rather than hard coded pointer offsets.
-- Do not do retarded hacks to get things to match that will be resolved automatically (ie hard coding an address, or changing a variable name to lbl_{xyz} to force a temporary output match).
-- Update `config/GCCP01/symbols.txt` rather than trying to conform to incoherent symbols like `lbl_{ADDRESS}`, or `fn_{ADDRESS}`.
-
 ```sh
 python3 tools/agent_select_target.py
 ```
@@ -145,6 +140,11 @@ Name/linkage blockers (3)
 ```
 
 WARNING: If function parameters or linkage do not match, the score can stay stuck at 0%. `configure.py` compiler and linker flags can also block perfect matches. Tuning flags may be required in addition to source changes.
+
+STRONGLY PREFER:
+- Real member access rather than hard coded pointer offsets.
+- Do not do retarded hacks to get things to match that will be resolved automatically (ie hard coding an address, or changing a variable name to lbl_{xyz} to force a temporary output match).
+- Update `config/GCCP01/symbols.txt` rather than trying to conform to incoherent symbols like `lbl_{ADDRESS}`, or `fn_{ADDRESS}`.
 
 DO NOT TRUST GHIDRA BEYOND GETTING A FEEL FOR THE FUNCTION. GHIDRA IS A GUIDELINE. OBJDIFF IS THE REAL SOURCE OF TRUTH FOR HOW CLOSE WE ARE.
 

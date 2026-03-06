@@ -1,6 +1,8 @@
 #include "ffcc/chunkfile.h"
 
-#include "string.h"
+extern "C" {
+void* memcpy(void* dst, const void* src, unsigned long n);
+}
 
 /*
  * --INFO--
@@ -146,7 +148,7 @@ unsigned char* CChunkFile::GetAddress()
  */
 void CChunkFile::Get(void* dest, long size)
 { 
-	memcpy(dest, m_cursor, size);
+	memcpy(dest, m_cursor, (unsigned long)size);
 	m_cursor += size;
 }
 

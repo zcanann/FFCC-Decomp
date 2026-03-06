@@ -11,7 +11,7 @@ extern unsigned int lbl_801E9F08[];
 extern unsigned int lbl_801E9F14[];
 extern unsigned int lbl_801E9F20[];
 extern unsigned int lbl_801EA0A8[];
-extern unsigned int GamePcs;
+extern unsigned int lbl_8032ED00;
 extern "C" char lbl_801E9F2C[];
 
 /*
@@ -26,7 +26,7 @@ extern "C" char lbl_801E9F2C[];
 void __sinit_p_game_cpp() {
     unsigned int* dst;
 
-    GamePcs = reinterpret_cast<unsigned int>(lbl_801EA0A8);
+    lbl_8032ED00 = reinterpret_cast<unsigned int>(lbl_801EA0A8);
     dst = reinterpret_cast<unsigned int*>(lbl_801E9F2C);
 
     dst[1] = lbl_801E9EC0[0];

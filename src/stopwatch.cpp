@@ -136,7 +136,8 @@ void CProfile::ProfEnd()
 	float ticks = __cvt_sll_flt(lo, hi);
 	u32 scaled = (OS_TIMER_CLOCK / 125000) * 0x8235;
 	float denom = (float)(scaled >> 3);
-	m_lastTime = lbl_8032F850 * (ticks / denom);
+	float elapsed = ticks / denom;
+	m_lastTime = elapsed * lbl_8032F850;
 
 	int next = m_frame + 1;
 	m_frame = next;

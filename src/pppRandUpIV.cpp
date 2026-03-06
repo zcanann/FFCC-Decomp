@@ -4,7 +4,7 @@
 
 extern int gPppCalcDisabled;
 extern f32 lbl_80330028;
-extern CMath math[];
+extern CMath Math;
 extern s32 gPppDefaultValueBuffer[];
 
 extern "C" {
@@ -48,9 +48,9 @@ extern "C" void pppRandUpIV(void* param1, void* param2, void* param3)
     f32* valuePtr;
 
     if (in->field0 == *(s32*)(base + 0xC)) {
-        value = RandF__5CMathFv(&math[0]);
+        value = RandF__5CMathFv(&Math);
         if (in->field18 != 0) {
-            f32 randValue = value + RandF__5CMathFv(&math[0]);
+            f32 randValue = value + RandF__5CMathFv(&Math);
             value = randValue * lbl_80330028;
         }
 

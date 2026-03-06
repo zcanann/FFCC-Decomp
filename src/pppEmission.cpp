@@ -32,8 +32,8 @@ extern CameraPcsForEmission CameraPcs;
 extern char MaterialMan[];
 extern _pppMngStEmission* pppMngStPtr;
 extern _pppEnvStEmission* pppEnvStPtr;
-extern int DAT_8032ed70;
-extern u8 DAT_8032ed78;
+extern int gPppCalcDisabled;
+extern u8 gPppInConstructor;
 extern char DAT_803311fc[];
 extern float FLOAT_803311e0;
 extern float FLOAT_803311e4;
@@ -328,7 +328,7 @@ void pppDestructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
  * JP Size: TODO
  */
 void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEmissionUnkC* param_3) {
-    if (DAT_8032ed70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 
@@ -355,7 +355,7 @@ void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEm
         (float*)(state + 3), (float*)(state + 4), (float*)(state + 5),
         &param_2->m_arg3, (float*)param_2->m_payload);
 
-    if (DAT_8032ed78 != 0) {
+    if (gPppInConstructor != 0) {
         return;
     }
 

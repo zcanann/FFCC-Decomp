@@ -1,6 +1,6 @@
 #include "ffcc/pppColMove.h"
 
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 
 typedef struct {
     short x;
@@ -60,7 +60,7 @@ void pppColMove(void* param1, void* param2, void* param3)
     pppColMoveVec4S* sourceMove = (pppColMoveVec4S*)&source->_pad[0x40];
     pppColMoveVec4S* movementMove = (pppColMoveVec4S*)&movement->_pad[0x40];
 
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

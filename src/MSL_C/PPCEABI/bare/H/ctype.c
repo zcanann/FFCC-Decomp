@@ -82,7 +82,7 @@ int toupper(int __c)
 	return __c == -1 ? -1 : __upper_map[(unsigned char)__c];
 }
 
-unsigned int fn_801b52a0(int c)
+unsigned int __ctype_get_flags(int c)
 {
 	if (c == -1) {
 		return -1;

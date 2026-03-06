@@ -5,10 +5,10 @@
 extern CMath math[];
 extern "C" f32 RandF__5CMathFv(CMath*);
 
-extern s32 lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern f32 lbl_8032FF78;
 extern f64 lbl_8032FF80;
-extern s16 lbl_801EADC8[];
+extern s16 gPppDefaultValueBuffer[];
 
 struct RandDownShortParam {
     s32 targetId;
@@ -39,7 +39,7 @@ extern "C" void pppRandDownShort(void* r3, void* r4, void* r5)
     s16* target;
     f32* valuePtr;
 
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 
@@ -61,7 +61,7 @@ extern "C" void pppRandDownShort(void* r3, void* r4, void* r5)
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
     }
 
-    target = (in->sourceOffset == -1) ? &lbl_801EADC8[0] : (s16*)(base + in->sourceOffset + 0x80);
+    target = (in->sourceOffset == -1) ? &gPppDefaultValueBuffer[0] : (s16*)(base + in->sourceOffset + 0x80);
     f32 scale = (f32)in->scale;
     f32 current = *valuePtr;
     f32 scaled = scale * current;

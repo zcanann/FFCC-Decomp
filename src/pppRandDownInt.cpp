@@ -3,9 +3,9 @@
 #include "types.h"
 
 extern CMath math[];
-extern s32 lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern f32 lbl_8032FF58;
-extern s32 lbl_801EADC8[];
+extern s32 gPppDefaultValueBuffer[];
 
 extern "C" {
 f32 RandF__5CMathFv(CMath*);
@@ -34,7 +34,7 @@ struct PppRandDownIntParam3 {
  */
 void pppRandDownInt(void* param1, void* param2, void* param3)
 {
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 
@@ -60,7 +60,7 @@ void pppRandDownInt(void* param1, void* param2, void* param3)
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
 
-    s32* target = (in->field4 == -1) ? lbl_801EADC8 : (s32*)(base + in->field4 + 0x80);
+    s32* target = (in->field4 == -1) ? gPppDefaultValueBuffer : (s32*)(base + in->field4 + 0x80);
 
     f32 factor = (f32)in->field8;
     f32 scaled = factor * *valuePtr;

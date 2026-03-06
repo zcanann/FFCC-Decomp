@@ -57,8 +57,8 @@ extern "C" float FLOAT_8032fe18;
 extern "C" unsigned char DAT_8032ed68;
 extern "C" int DAT_8032ed6c;
 extern "C" int DAT_8032ed74;
-extern "C" unsigned char DAT_8032ed78;
-extern "C" unsigned char DAT_8032ed79;
+extern "C" unsigned char gPppInConstructor;
+extern "C" unsigned char gPppInSubFrameCalc;
 extern "C" int DAT_8032ed7c;
 extern "C" unsigned char DAT_8032ed90;
 extern "C" unsigned char DAT_8032ed91;
@@ -82,7 +82,7 @@ extern "C" int SearchNodeSk__Q26CChara6CModelFPc(CChara::CModel*, char*);
 extern "C" void SetFrame__Q26CChara6CModelFf(float, CChara::CModel*);
 extern "C" void CalcMatrix__Q26CChara6CModelFv(CChara::CModel*);
 extern "C" void CalcSkin__Q26CChara6CModelFv(CChara::CModel*);
-extern int DAT_8032ed70;
+extern int gPppCalcDisabled;
 extern CProfile g_par_calc_prof;
 extern unsigned char PartPcs[];
 extern unsigned char MapPcs[];
@@ -231,7 +231,7 @@ void CPartMng::Create()
 
     DAT_8032ed68 = 1;
     DAT_8032ed6c = 0;
-    DAT_8032ed70 = 0;
+    gPppCalcDisabled = 0;
     DAT_8032ed74 = 0;
 
     if (Game.game.m_currentSceneId == 7) {
@@ -248,8 +248,8 @@ void CPartMng::Create()
     ppvZeroVector.y = FLOAT_8032fe5c;
     ppvZeroVector.z = FLOAT_8032fe5c;
 
-    DAT_8032ed78 = 0;
-    DAT_8032ed79 = 0;
+    gPppInConstructor = 0;
+    gPppInSubFrameCalc = 0;
 
     PSMTXIdentity(ppvWorldMatrix);
     PSMTXIdentity(ppvWorldMatrix);
@@ -904,10 +904,10 @@ void CPartMng::pppDataRcv(unsigned long code, char* packet, unsigned long packet
 
     switch (code) {
     case 0x14:
-        DAT_8032ed70 = 0;
+        gPppCalcDisabled = 0;
         return;
     case 0x15:
-        DAT_8032ed70 = 1;
+        gPppCalcDisabled = 1;
         return;
     case 0x1f:
     case 0xfe:
@@ -1126,7 +1126,7 @@ void CPartMng::pppEditPartCalc()
         CalcMatrix__Q26CChara6CModelFv(model);
         CalcSkin__Q26CChara6CModelFv(model);
         SetFrame__Q26CChara6CModelFf(*reinterpret_cast<float*>(self + 0x23564), model);
-        if (DAT_8032ed70 == 0) {
+        if (gPppCalcDisabled == 0) {
             *reinterpret_cast<float*>(self + 0x23564) += FLOAT_8032fe18;
         }
     }
@@ -1543,7 +1543,7 @@ void CPartMng::pppDumpCacheIdx()
             pppSetFpMatrix(reinterpret_cast<_pppMngSt*>(mng));
 
             mng->m_spawnedCount += *reinterpret_cast<int*>(&mng->m_envColorR);
-            DAT_8032ed79 = 0;
+            gPppInSubFrameCalc = 0;
 
             while (mng->m_spawnedCount > 0xFFF) {
                 _pppCalcPart(reinterpret_cast<_pppMngSt*>(mng));
@@ -1552,11 +1552,11 @@ void CPartMng::pppDumpCacheIdx()
                     break;
                 }
 
-                DAT_8032ed79 = 1;
+                gPppInSubFrameCalc = 1;
                 mng->m_spawnedCount -= 0x1000;
             }
 
-            DAT_8032ed79 = 0;
+            gPppInSubFrameCalc = 0;
         }
 
         mng = reinterpret_cast<PppMngStDumpRaw*>(reinterpret_cast<unsigned char*>(mng) + 0x158);
@@ -1663,7 +1663,7 @@ void CPartMng::pppPartDead()
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void fn_8005992C(CPartMng* partMng)
+extern "C" void LoadPartNoSyncCalc__8CPartMngFv(CPartMng* partMng)
 {
     char* base = reinterpret_cast<char*>(partMng);
     for (int i = 0; i < 0x10; i++) {

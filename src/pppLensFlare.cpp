@@ -7,7 +7,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-extern int DAT_8032ed70;
+extern int gPppCalcDisabled;
 extern float FLOAT_80331060;
 extern float FLOAT_80331064;
 extern float FLOAT_80331068;
@@ -73,7 +73,7 @@ void pppDestructLensFlare(pppColum*, _pppCtrlTable*)
  */
 void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTable)
 {
-	if (DAT_8032ed70 == 0) {
+	if (gPppCalcDisabled == 0) {
 		int shapeOffset = ctrlTable->m_serializedDataOffsets[2];
 		int colorOffset = ctrlTable->m_serializedDataOffsets[1];
 		u8* alphaPtr = (u8*)((u8*)obj + shapeOffset + 0xb2);

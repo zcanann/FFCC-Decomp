@@ -47,7 +47,7 @@ struct pppScreenBreakUnkC {
     s32* m_serializedDataOffsets;
 };
 
-extern int DAT_8032ed70;
+extern int gPppCalcDisabled;
 extern int DAT_802381a0;
 extern void* DAT_80238034;
 extern float FLOAT_80331cc0;
@@ -647,7 +647,7 @@ void pppDesScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2
  */
 void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param_2, pppScreenBreakUnkC* param_3)
 {
-    if (DAT_8032ed70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

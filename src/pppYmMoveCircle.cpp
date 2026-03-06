@@ -17,7 +17,7 @@ struct pppYmMoveCircleWork {
     u8 m_hasInit;
 };
 
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern unsigned char* lbl_8032ED50;
 extern f32 lbl_801EC9F0[];
 extern f32 lbl_80330D78;
@@ -93,7 +93,7 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
     f32 radiusX;
     f32 radiusZ;
 
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

@@ -9,8 +9,8 @@ extern float lbl_80331018;
 extern float FLOAT_8033101c;
 extern float FLOAT_80331020;
 extern double DOUBLE_80331028;
-extern s32 DAT_8032ed70;
-extern char DAT_8032ed78;
+extern int gPppCalcDisabled;
+extern char gPppInConstructor;
 extern void* DAT_8032ec70;
 extern _pppMngSt* pppMngStPtr;
 
@@ -177,7 +177,7 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
     RainDrop* drop;
     RainParam* rain;
 
-    if (DAT_8032ed70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 
@@ -217,7 +217,7 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
         drop++;
     }
 
-    if (DAT_8032ed78 == 0) {
+    if (gPppInConstructor == 0) {
         float posX = CameraPcs._212_4_;
         float posY = CameraPcs._216_4_;
         float posZ = CameraPcs._220_4_;

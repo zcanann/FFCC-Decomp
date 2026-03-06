@@ -43,8 +43,8 @@ extern "C" unsigned char DAT_8032ed88;
 extern "C" unsigned char DAT_8032ed89;
 extern "C" unsigned char DAT_8032ed8a;
 extern "C" unsigned char DAT_8032ed8b;
-extern "C" unsigned char lbl_8032ED78;
-extern "C" int DAT_8032ed70;
+extern "C" unsigned char gPppInConstructor;
+extern "C" int gPppCalcDisabled;
 extern "C" int DAT_8032ed7c;
 extern "C" unsigned int DAT_8032ed80;
 extern "C" unsigned char PartPcs[];
@@ -716,7 +716,7 @@ void callCon2Prog(_pppPObject* pObject)
 	_pppCtrlTable* stage = progSet->m_stages;
 	int stageIdx = 0;
 
-	lbl_8032ED78 = 1;
+	gPppInConstructor = 1;
 
 	for (stageIdx = 0; stageIdx < progSet->m_numStages; stageIdx++)
 	{
@@ -769,7 +769,7 @@ void callCon2Prog(_pppPObject* pObject)
 		}
 	}
 
-	lbl_8032ED78 = 0;
+	gPppInConstructor = 0;
 }
 
 /*
@@ -2148,7 +2148,7 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 	pppMngStDeadRaw* mng = (pppMngStDeadRaw*)pppMngSt;
 	u32 maxDeleteFrame = 0;
 
-	if (DAT_8032ed70 == 0)
+	if (gPppCalcDisabled == 0)
 	{
 		_pppPObjLink* prev = &mng->m_objHead;
 		for (_pppPObjLink* obj = prev->m_next; obj != 0;)
@@ -2260,7 +2260,7 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 		}
 	}
 
-	if (DAT_8032ed70 == 0)
+	if (gPppCalcDisabled == 0)
 	{
 		mng->m_prevFrame = mng->m_currentFrame;
 		mng->m_currentFrame += 0x1000;
@@ -2301,7 +2301,7 @@ void _pppInitPart(_pppMngSt* pppMngSt)
 		_pppPObjLink m_pppPObjLinkHead;
 	};
 
-	if (DAT_8032ed70 != 0)
+	if (gPppCalcDisabled != 0)
 	{
 		return;
 	}

@@ -51,7 +51,7 @@ struct VertexApLcSource
 struct _pppPDataVal;
 
 extern CMath math;
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern u8* lbl_8032ED50;
 extern VertexApLcEnv* lbl_8032ED54;
 
@@ -94,7 +94,7 @@ void pppVertexApLc(_pppPObject* parent, PVertexApLc* dataRaw, void* ctrlRaw)
     s32 stateOffset = *ctrl->stateOffset;
     VertexApLcState* state = (VertexApLcState*)((u8*)parent + stateOffset + 0x80);
 
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

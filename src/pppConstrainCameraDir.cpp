@@ -2,8 +2,8 @@
 #include "ffcc/partMng.h"
 #include <dolphin/mtx.h>
 
-extern int lbl_8032ED70;
-extern unsigned char lbl_8032ED78;
+extern int gPppCalcDisabled;
+extern unsigned char gPppInConstructor;
 extern struct {
     float _224_4_, _228_4_, _232_4_, _236_4_, _240_4_, _244_4_, _252_4_;
     Mtx m_cameraMatrix;
@@ -79,7 +79,7 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
 {
     _pppMngSt* pppMngSt = pppMngStPtr;
 
-    if (lbl_8032ED70 == 0) {
+    if (gPppCalcDisabled == 0) {
         float* value = (float*)((char*)pppConstrainCameraDir + *param_3->m_serializedDataOffsets + 0x80);
         unsigned char* flags = (unsigned char*)&param_2->m_arg3;
         float fVar2;
@@ -92,7 +92,7 @@ void pppFrameConstrainCameraDir(pppConstrainCameraDir* pppConstrainCameraDir, pp
             param_2->m_dataValIndex, pppConstrainCameraDir, param_2->m_graphId,
             value, value + 1, value + 2, &param_2->m_initWOrk, &param_2->m_stepValue);
         
-        if ((lbl_8032ED78 != 1) && ((flags[1] != 0 || flags[0] != 0))) {
+        if ((gPppInConstructor != 1) && ((flags[1] != 0 || flags[0] != 0))) {
             float fVar7 = CameraPcs._236_4_;
             float fVar8 = CameraPcs._240_4_;
             float fVar9 = CameraPcs._244_4_;

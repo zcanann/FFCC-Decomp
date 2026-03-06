@@ -5,7 +5,7 @@
 #include <dolphin/types.h>
 
 extern CMath math[];
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern float lbl_801EC9F0[];
 extern float lbl_8032FEE8;
 extern float lbl_8032FEEC;
@@ -55,7 +55,7 @@ void pppPointRAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
     u32* ctrlData = (u32*)ctrlTable->m_serializedDef;
     u8* state = (u8*)pObject + ctrlData[1] + 0x80;
 
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

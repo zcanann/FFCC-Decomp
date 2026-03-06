@@ -7,7 +7,7 @@
 #include <string.h>
 
 extern "C" int rand(void);
-extern int DAT_8032ed70;
+extern int gPppCalcDisabled;
 extern float lbl_80330520;
 
 struct KeShpTail3XStep {
@@ -52,7 +52,7 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
     Vec pos;
     Vec temp;
 
-    if (DAT_8032ed70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

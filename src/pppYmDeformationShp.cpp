@@ -5,8 +5,8 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-extern int DAT_8032ed70;
-extern u8 DAT_8032ed78;
+extern int gPppCalcDisabled;
+extern u8 gPppInConstructor;
 extern void* DAT_8032ec70;
 extern float FLOAT_803305f0;
 extern float lbl_803305F4;
@@ -234,7 +234,7 @@ void pppFrameYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDe
 
 	FrameState* state;
 
-	if (DAT_8032ed70 != 0) {
+	if (gPppCalcDisabled != 0) {
 		return;
 	}
 
@@ -247,7 +247,7 @@ void pppFrameYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmDe
 		param_2->m_payload[3], pppYmDeformationShp_, param_2->m_graphId, &state->m_values[3], &state->m_values[4],
 		&state->m_values[5], &param_2->m_payload[4], &param_2->m_payload[5]);
 
-	if (DAT_8032ed78 != 0) {
+	if (gPppInConstructor != 0) {
 		return;
 	}
 

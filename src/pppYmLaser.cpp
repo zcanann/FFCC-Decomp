@@ -11,7 +11,7 @@ extern CMath math[];
 extern "C" float RandF__5CMathFf(float param, CMath* math);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
 extern struct _pppMngSt* pppMngStPtr;
-extern s32 DAT_8032ed70;
+extern int gPppCalcDisabled;
 extern void* DAT_8032ec70;
 extern u32 CFlatFlags;
 extern CMapMng MapMng;
@@ -173,7 +173,7 @@ extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtr
 	Mtx tempMtx;
 	bool emptyHistory;
 
-	if ((DAT_8032ed70 == 0) && (step->m_stepValue != 1)) {
+	if ((gPppCalcDisabled == 0) && (step->m_stepValue != 1)) {
 		work = (float*)((u8*)laser + 0x88 + data->m_serializedDataOffsets[2]);
 		emptyHistory = (work[7] == 0.0f);
 

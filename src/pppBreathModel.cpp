@@ -7,7 +7,7 @@
 extern CMath math;
 extern float lbl_80330F70;
 extern float FLOAT_80330F80;
-extern int DAT_8032ed70;
+extern int gPppCalcDisabled;
 extern u32 CFlatFlags;
 extern unsigned char* pppEnvStPtr;
 extern unsigned char* pppMngStPtr;
@@ -364,7 +364,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VBreathModel* vBreathModel, PBrea
     unsigned short groups = *(unsigned short*)((unsigned char*)pBreathModel + 0x12);
     unsigned short slots = *(unsigned short*)((unsigned char*)pBreathModel + 0x10);
 
-    if (DAT_8032ed70 != 0 || *(short*)((unsigned char*)pBreathModel + 0xC) == -1) {
+    if (gPppCalcDisabled != 0 || *(short*)((unsigned char*)pBreathModel + 0xC) == -1) {
         return;
     }
 
@@ -492,7 +492,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
     Vec target;
     Vec hitVector;
 
-    if (DAT_8032ed70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

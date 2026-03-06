@@ -44,7 +44,7 @@ struct VertexApAtState
 struct _pppPDataVal;
 
 extern CMath math;
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern u8* lbl_8032ED50;
 extern VertexApAtEnv* lbl_8032ED54;
 extern "C" f32 RandF__5CMathFv(CMath*);
@@ -97,7 +97,7 @@ void pppVertexApAt(_pppPObject* parent, PVertexApAt* data, void* ctrl)
     s32 stateOffset = *vtxCtrl->stateOffset;
     VertexApAtState* state = (VertexApAtState*)((u8*)parent + stateOffset + 0x80);
 
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

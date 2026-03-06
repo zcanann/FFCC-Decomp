@@ -1,9 +1,9 @@
 #include "ffcc/pppPObjPoint.h"
 #include "dolphin/mtx.h"
 
-extern s32 lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern void* lbl_8032ED50;
-extern u8 lbl_801EADC8[32];
+extern u8 gPppDefaultValueBuffer[32];
 
 typedef struct PObjPointEntry {
     u32 unk0;
@@ -23,7 +23,7 @@ typedef struct PObjPointEntry {
  */
 void pppPObjPoint(PppPointData* pointData, PppObjData* objData, PppContainer* container)
 {
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 
@@ -33,7 +33,7 @@ void pppPObjPoint(PppPointData* pointData, PppObjData* objData, PppContainer* co
         u8* vecPtr;
 
         if ((objData->field_4 + 0x10000) == 0xFFFF) {
-            vecPtr = (u8*)lbl_801EADC8;
+            vecPtr = (u8*)gPppDefaultValueBuffer;
         } else {
             PObjPointEntry* table = *(PObjPointEntry**)((u8*)lbl_8032ED50 + 0xD4);
             vecPtr = (u8*)objData->data + 0x80;

@@ -49,7 +49,7 @@ extern char DAT_803318dc[];
 extern char DAT_803318e4[];
 extern char DAT_803318ec[];
 extern char DAT_803318f4[];
-extern int DAT_8032ed70;
+extern int gPppCalcDisabled;
 
 extern "C" {
 void* GetCharaHandlePtr__FP8CGObjectl(void* obj, long index);
@@ -336,7 +336,7 @@ void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* para
     s32 i;
     s32 setupOffset;
 
-    if (DAT_8032ed70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

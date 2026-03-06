@@ -1,7 +1,7 @@
 #include "ffcc/pppScaleLoopAuto.h"
 #include <dolphin/types.h>
 
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern float lbl_801EC9F0[];
 extern float lbl_80331C08;
 
@@ -50,7 +50,7 @@ void pppScaleLoopAuto(void* arg1, void* arg2, void* arg3)
     pppScaleLoopAutoStep* step = (pppScaleLoopAutoStep*)arg2;
     pppScaleLoopAutoContext* context = (pppScaleLoopAutoContext*)arg3;
 
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

@@ -31,7 +31,7 @@ extern char DAT_80330ea8[];
 extern char DAT_80330ebc[];
 extern char MaterialMan[];
 extern char DAT_8032ec70[];
-extern int DAT_8032ed70;
+extern int gPppCalcDisabled;
 
 extern struct {
     float _224_4_;
@@ -644,7 +644,7 @@ void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* p
     s32 i;
     s32 setupOffset;
 
-    if (DAT_8032ed70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

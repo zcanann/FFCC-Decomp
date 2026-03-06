@@ -3,7 +3,7 @@
 
 #include <dolphin/mtx.h>
 
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern struct _pppMngSt* pppMngStPtr;
 
 extern class CCameraPcs {
@@ -49,7 +49,7 @@ struct pppAlignmentScale* pppFrameAlignmentScale(struct pppAlignmentScale* align
     Vec objPos;
     Mtx scaleMtx;
 
-    if (lbl_8032ED70 == 0) {
+    if (gPppCalcDisabled == 0) {
         pppMngSt = pppMngStPtr;
         cameraPos.x = CameraPcs._224_4_;
         cameraPos.y = CameraPcs._228_4_;

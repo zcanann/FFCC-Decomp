@@ -29,7 +29,7 @@ extern _pppMngSt* pppMngStPtr;
 extern float FLOAT_80331bf8;
 extern float FLOAT_80331bfc;
 extern char s_pppLerpPos_cpp_801dd418[];
-extern s32 DAT_8032ed70;
+extern int gPppCalcDisabled;
 
 /*
  * --INFO--
@@ -54,7 +54,7 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param
     u32 count;
     Vec** historyPtr;
 
-    if (DAT_8032ed70 == 0) {
+    if (gPppCalcDisabled == 0) {
         iVar2 = *param_3->m_serializedDataOffsets;
         historyPtr = (Vec**)((u8*)pppLerpPos + 0x80 + iVar2);
         if (*historyPtr == 0) {

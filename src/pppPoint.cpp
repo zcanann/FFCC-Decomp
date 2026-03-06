@@ -1,7 +1,7 @@
 #include "ffcc/pppPoint.h"
 #include "ffcc/partMng.h"
 
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 
 /*
  * --INFO--
@@ -34,7 +34,7 @@ void pppPointCon(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
  */
 void pppPoint(_pppPObject* pObject, pppPointStep* step, _pppCtrlTable* ctrlTable)
 {
-	if (lbl_8032ED70 != 0) {
+	if (gPppCalcDisabled != 0) {
 		return;
 	}
 

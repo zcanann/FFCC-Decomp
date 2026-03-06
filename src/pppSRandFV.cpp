@@ -2,9 +2,9 @@
 #include "ffcc/math.h"
 
 extern CMath math[];
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern float lbl_80330098;
-extern float lbl_801EADC8[];
+extern float gPppDefaultValueBuffer[];
 extern "C" float RandF__5CMathFv(CMath*);
 
 void randfloat(float, float);
@@ -36,7 +36,7 @@ struct PppSRandFVParam3 {
 
 void pppSRandFV(void* param1, void* param2, void* param3)
 {
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 
@@ -87,7 +87,7 @@ void pppSRandFV(void* param1, void* param2, void* param3)
         valuePtr = (float*)(base + ((PppSRandFVParam3*)param3)->fieldC[0] + 0x80);
     }
 
-    float* target = (in->field4 == -1) ? &lbl_801EADC8[0] : (float*)(base + in->field4 + 0x80);
+    float* target = (in->field4 == -1) ? &gPppDefaultValueBuffer[0] : (float*)(base + in->field4 + 0x80);
 
     {
         float value = in->field8 * valuePtr[0] - in->field8;

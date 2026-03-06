@@ -3,12 +3,12 @@
 #include "ffcc/graphic.h"
 #include "ffcc/memory.h"
 #include "ffcc/partMng.h"
+#include "ffcc/symbols_shared.h"
 
 #include <string.h>
 
 extern CMemory Memory;
 extern unsigned char PartPcs[];
-extern u8* lbl_8032EDC0;
 extern "C" void __dla__FPv(void*);
 extern "C" void __dl__FPv(void*);
 extern "C" int sprintf(char*, const char*, ...);
@@ -468,7 +468,7 @@ void CCharaPcs::TryReleaseAnimBank(int)
  */
 void CCharaPcs::SetSpecularAlpha(int alpha)
 {
-    lbl_8032EDC0[0x6B] = (u8)alpha;
+    gCharaPartWorkPtr[0x6B] = (u8)alpha;
 }
 
 /*

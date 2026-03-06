@@ -1,6 +1,7 @@
 #include "ffcc/p_mc.h"
 #include "ffcc/math.h"
 #include "ffcc/p_menu.h"
+#include "ffcc/symbols_shared.h"
 #include "ffcc/wm_menu.h"
 
 extern CMath Math;
@@ -10,7 +11,6 @@ extern "C" void CallWorldParam__8CMenuPcsFiii(CMenuPcs* menu, int mode, int para
 extern "C" void __sinit_p_mc_cpp(void);
 extern unsigned char MenuPcs[];
 extern unsigned char PTR_PTR_s_CMcPcs_80211f28[];
-extern unsigned int lbl_8032EE88;
 
 struct MenuPcsMcLayout
 {
@@ -158,7 +158,7 @@ extern "C" void __sinit_p_mc_cpp(void)
     unsigned int* table1;
     unsigned int* table2;
 
-    lbl_8032EE88 = (unsigned int)PTR_PTR_s_CMcPcs_80211f28;
+    gMcPcsSingletonPtr = (unsigned int)PTR_PTR_s_CMcPcs_80211f28;
     table = (unsigned int*)m_table__6CMcPcs;
     table0 = m_table_desc0__6CMcPcs;
     table1 = m_table_desc1__6CMcPcs;

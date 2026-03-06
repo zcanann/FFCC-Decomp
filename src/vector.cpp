@@ -1,8 +1,7 @@
 #include "ffcc/vector.h"
+#include "ffcc/symbols_shared.h"
 
 #include "PowerPC_EABI_Support/Msl/MSL_C/MSL_Common_Embedded/Math/fdlibm.h"
-
-extern float lbl_80330CD8;
 
 /*
  * --INFO--
@@ -46,7 +45,7 @@ CVector::CVector(const Vec& vec)
  */
 void CVector::Identity()
 {
-	float zero = lbl_80330CD8;
+	float zero = kVectorZero;
 	this->z = zero;
 	this->y = zero;
 	this->x = zero;

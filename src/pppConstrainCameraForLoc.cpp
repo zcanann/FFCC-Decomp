@@ -1,11 +1,11 @@
 #include "ffcc/pppConstrainCameraForLoc.h"
 #include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
+#include "ffcc/symbols_shared.h"
 #include <dolphin/mtx.h>
 
 // External references
 extern int gUtil;
-extern float lbl_803331A8;
 extern void GetDirectVector__5CUtilFP3VecP3Vec3Vec(void*, Vec*, Vec*, Vec*);
 extern struct {
     int field0_0x0;
@@ -103,8 +103,8 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
     PSVECAdd(&local_a4, &local_e0, &local_a4);
     PSVECAdd(&local_a4, &local_ec, &local_a4);
 
-    fVar1 = lbl_803331A8;
-    constrainModel->m_worldBaseMtx[0][3] = lbl_803331A8;
+    fVar1 = kPppConstrainCameraForLocZero;
+    constrainModel->m_worldBaseMtx[0][3] = kPppConstrainCameraForLocZero;
     constrainModel->m_worldBaseMtx[1][3] = fVar1;
     constrainModel->m_worldBaseMtx[2][3] = fVar1;
     if (Game.game.m_currentSceneId == 7) {
@@ -148,7 +148,7 @@ void pppConstructConstrainCameraForLoc(_pppPObjLink*, _pppCtrlTable*)
 void pppConstruct2ConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraForLoc,
                                         _pppCtrlTable* data)
 {
-    float fVar1 = lbl_803331A8;
+    float fVar1 = kPppConstrainCameraForLocZero;
     float* value = (float*)((char*)constrainCameraForLoc + 0x80 + data->m_serializedDataOffsets[2]);
     value[2] = fVar1;
     value[1] = fVar1;
@@ -196,7 +196,7 @@ void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraF
  */
 void pppConstruct3ConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraForLoc, _pppCtrlTable* data)
 {
-    float fVar1 = lbl_803331A8;
+    float fVar1 = kPppConstrainCameraForLocZero;
     float* value = (float*)((char*)constrainCameraForLoc + 0x80 + data->m_serializedDataOffsets[2]);
     value[2] = fVar1;
     value[1] = fVar1;

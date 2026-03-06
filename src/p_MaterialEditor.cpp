@@ -2,6 +2,7 @@
 #include "ffcc/p_usb.h"
 #include "ffcc/ME_USB_process.h"
 #include "ffcc/graphic.h"
+#include "ffcc/symbols_shared.h"
 #include "ffcc/zlist.h"
 #include <Dolphin/mtx.h>
 #include <Dolphin/gx.h>
@@ -19,8 +20,6 @@ static char s_CMaterialEditorPcs[] = "CMaterialEditorPcs";
 extern void* __vt__8CManager;
 extern void* PTR_PTR_s_CMaterialEditorPcs_801ea644;
 extern unsigned char lbl_8026D338[];
-extern float lbl_8032FCAC;
-extern float lbl_8032FCB0;
 extern unsigned char DAT_8032ed1c;
 extern char* DAT_8032ed18;
 extern char DAT_8032fcb4[];
@@ -547,8 +546,8 @@ void CMaterialEditorPcs::drawViewer()
  */
 void CMaterialEditorPcs::CreateBoundaryBox(Vec& minPos, Vec& maxPos, long count, const Vec* points)
 {
-    f32 maxInit = lbl_8032FCAC;
-    f32 minInit = lbl_8032FCB0;
+    f32 maxInit = kMaterialEditorControlMaxInit;
+    f32 minInit = kMaterialEditorControlMinInit;
     minPos.x = maxInit;
     minPos.y = maxInit;
     minPos.z = maxInit;

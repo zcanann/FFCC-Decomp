@@ -1,11 +1,10 @@
 #include "ffcc/pppParHitSphMat.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/symbols_shared.h"
 
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
-extern float lbl_80332080;
 extern unsigned char CFlat[];
 extern unsigned char Graphic[];
 extern Mtx ppvCameraMatrix02;
@@ -31,9 +30,9 @@ void pppParHitSphMat(struct _pppPObject* param_1, int param_2, int param_3)
     _pppMngSt* pppMngSt = (_pppMngSt*)pppMngStPtr;
     float radius;
 
-    local_88.z = lbl_80332080;
-    local_88.y = lbl_80332080;
-    local_88.x = lbl_80332080;
+    local_88.z = kPppParHitSphMatZero;
+    local_88.y = kPppParHitSphMatZero;
+    local_88.x = kPppParHitSphMatZero;
 
     if (*(u8*)(param_2 + 0xC) != 0) {
         s32* offsets = *(s32**)(param_3 + 0xC);
@@ -50,7 +49,7 @@ void pppParHitSphMat(struct _pppPObject* param_1, int param_2, int param_3)
         local_94.z += src->z;
     }
 
-    if (*(float*)(param_2 + 4) != lbl_80332080) {
+    if (*(float*)(param_2 + 4) != kPppParHitSphMatZero) {
         PSVECSubtract((Vec*)((u8*)pppMngSt + 8), (Vec*)((u8*)pppMngSt + 0x48), &local_88);
     }
 

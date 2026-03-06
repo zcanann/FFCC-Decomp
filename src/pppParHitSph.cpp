@@ -1,10 +1,9 @@
 #include "ffcc/pppParHitSph.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/symbols_shared.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
-
-extern float lbl_80330700;
 extern unsigned char CFlat[];
 extern unsigned char Graphic[];
 extern Mtx ppvCameraMatrix02;
@@ -36,9 +35,9 @@ void pppParHitSph(struct _pppPObject* param_1, int param_2)
     local_94.z = *(float*)((u8*)pppMngStPtr + 0xA4);
     radius = *(float*)((u8*)pppMngSt + 0x64) * *(float*)(param_2 + 8);
 
-    if (((lbl_80330700 == local_88.x) && (lbl_80330700 == local_88.y)) &&
-        (lbl_80330700 == local_88.z)) {
-        pppHitCylinderSendSystem(pppMngSt, &local_94, &local_88, radius, lbl_80330700);
+    if (((kPppParHitSphZero == local_88.x) && (kPppParHitSphZero == local_88.y)) &&
+        (kPppParHitSphZero == local_88.z)) {
+        pppHitCylinderSendSystem(pppMngSt, &local_94, &local_88, radius, kPppParHitSphZero);
     } else {
         pppHitCylinderSendSystem(pppMngSt, &local_94, &local_88, radius, *(float*)(param_2 + 4));
     }

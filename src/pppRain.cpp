@@ -3,9 +3,8 @@
 #include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/symbols_shared.h"
 #include "dolphin/gx.h"
-
-extern float lbl_80331018;
 extern float FLOAT_8033101c;
 extern float FLOAT_80331020;
 extern double DOUBLE_80331028;
@@ -131,7 +130,7 @@ void pppConstructRain(struct pppRain* pppRain, struct RAIN_DATA* param_2)
     float fVar1;
     float* puVar2;
     
-    fVar1 = lbl_80331018;
+    fVar1 = kPppRainTexCoordBase;
     puVar2 = (float*)((u8*)pppRain + 0x80 + param_2->m_serializedDataOffsets[2]);
     *(u32*)puVar2 = 0;
     puVar2[3] = fVar1;
@@ -266,7 +265,7 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
         (u8*)pppRain + 0x88 + colorOffset,
         &ppvCameraMatrix0,
-        lbl_80331018,
+        kPppRainTexCoordBase,
         payload[0x5e],
         payload[0x5d],
         payload[0x5c],
@@ -298,7 +297,7 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
         PSVECScale((Vec*)&drop->dirX, &segment, drop->length);
         GXPosition3f32(x, y, z);
         GXColor1u32(*(u32*)((u8*)pppRain + 0x88 + colorOffset));
-        GXTexCoord2f32(lbl_80331018, lbl_80331018);
+        GXTexCoord2f32(kPppRainTexCoordBase, kPppRainTexCoordBase);
 
         GXPosition3f32(x + segment.x, y + segment.y, z + segment.z);
         GXColor1u32(*(u32*)((u8*)pppRain + 0x88 + colorOffset));

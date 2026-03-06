@@ -1,10 +1,7 @@
 #include "ffcc/pppLight.h"
+#include "ffcc/symbols_shared.h"
 #include "dolphin/mtx.h"
 
-extern float lbl_80330F60;
-extern float lbl_80330F64;
-extern float lbl_80330F68;
-extern float lbl_80330F6C;
 extern int gPppCalcDisabled;
 extern unsigned char gPppInConstructor;
 extern unsigned char gPppInSubFrameCalc;
@@ -34,7 +31,7 @@ void pppLightCon3(void* param1, void* param2)
 	void** ptr2 = (void**)*ptr1;
 	void* ptr3 = *ptr2;
 	char* base = (char*)param1 + (int)ptr3 + 0x80;
-	float zero = lbl_80330F60;
+	float zero = kPppLightZero;
 	
 	// Clear some integer values
 	*(int*)((char*)base + 0x10) = 0;
@@ -63,7 +60,7 @@ void pppLightCon(void* param1, void* param2)
 	void** ptr2 = (void**)*ptr1;
 	void* ptr3 = *ptr2;
 	char* base = (char*)param1 + (int)ptr3 + 0x80;
-	float zero = lbl_80330F60;
+	float zero = kPppLightZero;
 	
 	// Clear integer values
 	*(int*)((char*)base + 0x0) = 0;
@@ -169,7 +166,7 @@ void pppLight(void* param1, void* param2, void* param3)
 		*(float*)(lightData + 0x14) = sourcePos.z;
 		*(float*)(lightData + 0x24) = *(float*)(work + 0x24);
 		*(float*)(lightData + 0x28) = *(float*)(work + 0x18);
-		*(float*)(lightData + 0x30) = lbl_80330F64;
+		*(float*)(lightData + 0x30) = kPppLightOne;
 		*(unsigned char**)(lightData + 0x6c) = pppMngStPtr;
 		*(int*)(lightData + 0x70) = 0;
 
@@ -203,10 +200,10 @@ void pppLight(void* param1, void* param2, void* param3)
 		if (gPppInConstructor == 0 && gPppInSubFrameCalc == 0) {
 			if (lightParam[0x58] == 0) {
 				*(int*)(lightData + 0x8) = 0;
-				*(float*)(lightData + 0x40) = lbl_80330F60;
-				*(float*)(lightData + 0x44) = lbl_80330F60;
-				*(float*)(lightData + 0x48) = lbl_80330F64;
-				*(float*)(lightData + 0x4c) = lbl_80330F68;
+				*(float*)(lightData + 0x40) = kPppLightZero;
+				*(float*)(lightData + 0x44) = kPppLightZero;
+				*(float*)(lightData + 0x48) = kPppLightOne;
+				*(float*)(lightData + 0x4c) = kPppLightDefaultCosAtten;
 				Add__9CLightPcsFPQ29CLightPcs6CLight(LightPcs, lightData);
 			} else {
 				unsigned char* obj;
@@ -227,7 +224,7 @@ void pppLight(void* param1, void* param2, void* param3)
 
 				PSVECSubtract(direction, &sourcePos, direction);
 				PSVECNormalize(direction, direction);
-				*(float*)(lightData + 0x4c) = lbl_80330F6C * *(float*)(work + 0x30);
+				*(float*)(lightData + 0x4c) = kPppLightSpotScale * *(float*)(work + 0x30);
 
 				if (lightParam[0x58] == 2) {
 					*(float*)(lightData + 0x50) = *(float*)(work + 0x3c);

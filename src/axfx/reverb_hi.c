@@ -105,11 +105,10 @@ static int ReverbHICreate(AXFX_REVHI_WORK* rv, f32 coloration, f32 time, f32 mix
     rv->allPassCoeff = coloration;
     rv->level = mix;
     rv->crosstalk = crosstalk;
-    rv->damping = damping;
-    if (rv->damping < 0.05f) {
-        rv->damping = 0.05f;
+    if (damping < 0.05f) {
+        damping = 0.05f;
     }
-    rv->damping = (1.0f - (0.05f + (0.8f * rv->damping)));
+    rv->damping = 1.0f - ((0.8f * damping) + 0.05f);
 
     if (0.0f != preDelay) {
         rv->preDelayTime = (32000.0f * preDelay);

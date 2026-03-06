@@ -21,7 +21,7 @@ struct pppLerpPosUnkC {
 extern "C" {
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
 void pppHeapUseRate__FPQ27CMemory6CStage(CMemory::CStage* stage);
-void pppCopyVector__FR3Vec3Vec(void* dst, void* src);
+void pppCopyVector__FR3Vec3Vec(Vec* dst, const Vec* src);
 void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt* pppMngSt);
 }
 extern _pppEnvSt* pppEnvStPtr;
@@ -82,7 +82,7 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param
                 local_38.x = pfVar6[0];
                 local_38.y = pfVar6[1];
                 local_38.z = pfVar6[2];
-                pppCopyVector__FR3Vec3Vec((void*)((u8*)*historyPtr + iVar7), &local_38);
+                pppCopyVector__FR3Vec3Vec((Vec*)((u8*)*historyPtr + iVar7), &local_38);
                 iVar7 = iVar7 - 0xc;
             }
 

@@ -33,42 +33,6 @@ extern s32 DAT_8032ed70;
 
 /*
  * --INFO--
- * PAL Address: 0x8012b490
- * PAL Size: 24b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppConstructLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkC* param_2)
-{
-    s32 dataOffset = *param_2->m_serializedDataOffsets;
-    Vec** work = (Vec**)((u8*)pppLerpPos + 0x80 + dataOffset);
-    *work = 0;
-}
-
-/*
- * --INFO--
- * PAL Address: 0x8012b43c
- * PAL Size: 84b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppDestructLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkC* param_2)
-{
-    s32 dataOffset = *param_2->m_serializedDataOffsets;
-    void** work = (void**)((u8*)pppLerpPos + 0x80 + dataOffset);
-
-    if (*work != 0) {
-        pppHeapUseRate__FPQ27CMemory6CStage((CMemory::CStage*)*work);
-        *work = 0;
-    }
-}
-
-/*
- * --INFO--
  * PAL Address: 0x8012b24c
  * PAL Size: 496b
  * EN Address: TODO
@@ -141,3 +105,38 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x8012b43c
+ * PAL Size: 84b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppDestructLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkC* param_2)
+{
+    s32 dataOffset = *param_2->m_serializedDataOffsets;
+    void** work = (void**)((u8*)pppLerpPos + 0x80 + dataOffset);
+
+    if (*work != 0) {
+        pppHeapUseRate__FPQ27CMemory6CStage((CMemory::CStage*)*work);
+        *work = 0;
+    }
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x8012b490
+ * PAL Size: 24b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstructLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkC* param_2)
+{
+    s32 dataOffset = *param_2->m_serializedDataOffsets;
+    Vec** work = (Vec**)((u8*)pppLerpPos + 0x80 + dataOffset);
+    *work = 0;
+}

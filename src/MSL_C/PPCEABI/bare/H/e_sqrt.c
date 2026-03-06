@@ -37,7 +37,7 @@ double __ieee754_sqrt(double x) {
     }
 
     if (ix0 <= 0) {
-        if (((ix0 & (~0x80000000)) | ix1) == 0) {
+        if ((ix1 | (ix0 & (~0x80000000))) == 0) {
             return x;
         }
         if (ix0 < 0) {

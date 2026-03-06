@@ -420,10 +420,12 @@ void CMaterialMan::Init()
  * Address:	TODO
  * Size:	TODO
  */
+#pragma optimization_level 0
 void CMaterialMan::Quit()
 {
 	Memory.DestroyStage(m_materialStage);
 }
+#pragma optimization_level 4
 
 /*
  * --INFO--

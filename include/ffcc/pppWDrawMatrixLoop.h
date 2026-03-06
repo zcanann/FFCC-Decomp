@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-void pppWDrawMatrixLoop(_pppPObject* param_1);
+void pppWDrawMatrixLoop(_pppPObject* object, void* stepData, _pppCtrlTable* ctrlTable);
 
 #ifdef __cplusplus
 }

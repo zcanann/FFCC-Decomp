@@ -13,8 +13,8 @@ extern unsigned char* lbl_8032ED50;
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDrawMatrixWood(_pppPObject* param_1) {
-    char* p = (char*)param_1;
+void pppDrawMatrixWood(_pppPObject* object, void*, _pppCtrlTable*) {
+    char* p = (char*)object;
 
     PSMTXScaleApply(
         *(Mtx*)(p + 0x10),

@@ -13,7 +13,7 @@ extern const float FLOAT_803331d8;
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDrawMatrixLoc(void* param_1)
+void pppDrawMatrixLoc(_pppPObject* object, void*, _pppCtrlTable*)
 {
     Vec local_2c;
     Vec local_38;
@@ -21,18 +21,18 @@ void pppDrawMatrixLoc(void* param_1)
     Mtx* srcMtx;
     Mtx* dstMtx;
 
-    srcMtx = (Mtx*)((char*)param_1 + 0x10);
+    srcMtx = (Mtx*)((char*)object + 0x10);
     local_2c.z = FLOAT_803331d8;
-    dstMtx = (Mtx*)((char*)param_1 + 0x40);
+    dstMtx = (Mtx*)((char*)object + 0x40);
     local_2c.y = FLOAT_803331d8;
     local_2c.x = FLOAT_803331d8;
     PSMTXCopy(*srcMtx, *dstMtx);
     PSMTXMultVec(ppvWorldMatrix, &local_2c, &local_2c);
-    local_38.x = *(float*)((char*)param_1 + 0x4c);
-    local_38.y = *(float*)((char*)param_1 + 0x5c);
-    local_38.z = *(float*)((char*)param_1 + 0x6c);
+    local_38.x = *(float*)((char*)object + 0x4c);
+    local_38.y = *(float*)((char*)object + 0x5c);
+    local_38.z = *(float*)((char*)object + 0x6c);
     PSVECAdd(&local_38, &local_2c, local_20);
-    *(float*)((char*)param_1 + 0x4c) = local_20[0].x;
-    *(float*)((char*)param_1 + 0x5c) = local_20[0].y;
-    *(float*)((char*)param_1 + 0x6c) = local_20[0].z;
+    *(float*)((char*)object + 0x4c) = local_20[0].x;
+    *(float*)((char*)object + 0x5c) = local_20[0].y;
+    *(float*)((char*)object + 0x6c) = local_20[0].z;
 }

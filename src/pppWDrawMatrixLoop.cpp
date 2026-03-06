@@ -16,9 +16,9 @@ extern Mtx ppvCameraMatrix02;
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppWDrawMatrixLoop(_pppPObject* param_1)
+void pppWDrawMatrixLoop(_pppPObject* object, void*, _pppCtrlTable*)
 {
-    char* base = (char*)param_1;
+    char* base = (char*)object;
 
     PSMTXConcat(ppvCameraMatrix02, *(Mtx*)(base + 0x10), *(Mtx*)(base + 0x40));
 

@@ -2,12 +2,13 @@
 #define _PPP_WDRAWMATRIXFRONTLOOP_H_
 
 struct _pppPObject;
+struct _pppCtrlTable;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppWDrawMatrixFrontLoop(struct _pppPObject* param_1);
+void pppWDrawMatrixFrontLoop(struct _pppPObject* object, void* stepData, struct _pppCtrlTable* ctrlTable);
 
 #ifdef __cplusplus
 }

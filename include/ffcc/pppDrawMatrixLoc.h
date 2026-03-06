@@ -2,12 +2,13 @@
 #define _FFCC_PPPDRAWMATRIXLOC_H_
 
 struct _pppPObject;
+struct _pppCtrlTable;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppDrawMatrixLoc(void* param_1);
+void pppDrawMatrixLoc(_pppPObject* object, void* stepData, _pppCtrlTable* ctrlTable);
 
 #ifdef __cplusplus
 }

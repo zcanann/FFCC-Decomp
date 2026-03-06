@@ -154,6 +154,10 @@ pppProg* pppGetSysProgTable();
 #include "ffcc/pppYmTracer2.h"
 
 #define PPP_FN(fn) ((pppProgAnyCallback)(fn))
+#define PPP_OP(fn) ((pppProgAnyCallback)(pppProgOperationCallback)(fn))
+#define PPP_RENDER(fn) ((pppProgAnyCallback)(pppProgRenderCallback)(fn))
+#define PPP_CONSTRUCT(fn) ((pppProgAnyCallback)(pppProgConstructCallback)(fn))
+#define PPP_DESTRUCT(fn) ((pppProgAnyCallback)(pppProgDestructCallback)(fn))
 
 struct _pppSysProgTbl
 {
@@ -880,7 +884,7 @@ static pppProg s_pppSysProgTable[159] = {
         (char*)"pppDrawMatrix",
         0,
         0,
-        PPP_FN(pppDrawMatrix),
+        PPP_RENDER(pppDrawMatrix),
         { 0, 0, 0 },
         0,
         0,
@@ -891,7 +895,7 @@ static pppProg s_pppSysProgTable[159] = {
         (char*)"pppDrawMatrixFront",
         0,
         0,
-        PPP_FN(pppDrawMatrixFront),
+        PPP_RENDER(pppDrawMatrixFront),
         { 0, 0, 0 },
         0,
         0,
@@ -1100,7 +1104,7 @@ static pppProg s_pppSysProgTable[159] = {
         (char*)"pppDrawMatrixWood",
         0,
         0,
-        PPP_FN(pppDrawMatrixWood),
+        PPP_RENDER(pppDrawMatrixWood),
         { 0, 0, 0 },
         0,
         0,
@@ -1111,7 +1115,7 @@ static pppProg s_pppSysProgTable[159] = {
         (char*)"pppDrawMatrixNoRot",
         0,
         0,
-        PPP_FN(pppDrawMatrixNoRot),
+        PPP_RENDER(pppDrawMatrixNoRot),
         { 0, 0, 0 },
         0,
         0,
@@ -1188,7 +1192,7 @@ static pppProg s_pppSysProgTable[159] = {
         (char*)"pppWDrawMatrix",
         0,
         0,
-        PPP_FN(pppWDrawMatrix),
+        PPP_RENDER(pppWDrawMatrix),
         { 0, 0, 0 },
         0,
         0,
@@ -1199,7 +1203,7 @@ static pppProg s_pppSysProgTable[159] = {
         (char*)"pppWDrawMatrixFront",
         0,
         0,
-        PPP_FN(pppWDrawMatrixFront),
+        PPP_RENDER(pppWDrawMatrixFront),
         { 0, 0, 0 },
         0,
         0,
@@ -1298,7 +1302,7 @@ static pppProg s_pppSysProgTable[159] = {
         (char*)"pppWDrawMatrixLoop",
         0,
         0,
-        PPP_FN(pppWDrawMatrixLoop),
+        PPP_RENDER(pppWDrawMatrixLoop),
         { 0, 0, 0 },
         0,
         0,
@@ -1309,7 +1313,7 @@ static pppProg s_pppSysProgTable[159] = {
         (char*)"pppWDrawMatrixFrontLoop",
         0,
         0,
-        PPP_FN(pppWDrawMatrixFrontLoop),
+        PPP_RENDER(pppWDrawMatrixFrontLoop),
         { 0, 0, 0 },
         0,
         0,
@@ -1331,7 +1335,7 @@ static pppProg s_pppSysProgTable[159] = {
         (char*)"pppDrawMatrixFrontLnr",
         0,
         0,
-        PPP_FN(pppDrawMatrixFrontLnr),
+        PPP_RENDER(pppDrawMatrixFrontLnr),
         { 0, 0, 0 },
         0,
         0,
@@ -1375,7 +1379,7 @@ static pppProg s_pppSysProgTable[159] = {
         (char*)"pppSDrawMatrix",
         0,
         0,
-        PPP_FN(pppSDrawMatrix),
+        PPP_RENDER(pppSDrawMatrix),
         { 0, 0, 0 },
         0,
         0,
@@ -1859,7 +1863,7 @@ static pppProg s_pppSysProgTable[159] = {
         (char*)"pppDrawMatrixLoc",
         0,
         0,
-        PPP_FN(pppDrawMatrixLoc),
+        PPP_RENDER(pppDrawMatrixLoc),
         { 0, 0, 0 },
         0,
         0,

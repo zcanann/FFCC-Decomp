@@ -16,11 +16,11 @@ extern Mtx ppvCameraMatrix02;
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppSDrawMatrix(_pppPObject* obj)
+void pppSDrawMatrix(_pppPObject* object, void*, _pppCtrlTable*)
 {
 	PSMTXConcat(ppvCameraMatrix02,
-	           *(Mtx*)((u8*)obj + 0x10), 
-	           *(Mtx*)((u8*)obj + 0x40));
+	           *(Mtx*)((u8*)object + 0x10),
+	           *(Mtx*)((u8*)object + 0x40));
 }
 
 #ifdef __cplusplus

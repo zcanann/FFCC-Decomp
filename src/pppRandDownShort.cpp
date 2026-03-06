@@ -1,13 +1,11 @@
 #include "ffcc/pppRandDownShort.h"
 #include "ffcc/math.h"
 #include "types.h"
-
+#include "ffcc/ppp_constants.h"
 extern CMath Math;
 extern "C" f32 RandF__5CMathFv(CMath*);
 
 extern int gPppCalcDisabled;
-extern f32 lbl_8032FF78;
-extern f64 lbl_8032FF80;
 extern s16 gPppDefaultValueBuffer[];
 
 struct RandDownShortParam {
@@ -48,7 +46,7 @@ extern "C" void pppRandDownShort(void* r3, void* r4, void* r5)
         f32 value = -RandF__5CMathFv(&Math);
         if (in->randomTwice != 0) {
             f32 mixed = value - RandF__5CMathFv(&Math);
-            value = mixed * lbl_8032FF78;
+            value = mixed * kPppRandDownShortDualSampleScale;
         }
 
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);

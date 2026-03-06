@@ -1,7 +1,7 @@
 #include "ffcc/pppRandInt.h"
 #include "ffcc/math.h"
 #include "types.h"
-
+#include "ffcc/ppp_constants.h"
 /*
  * --INFO--
  * PAL Address: 0x80062194
@@ -14,8 +14,6 @@
 
 extern CMath Math;
 extern int gPppCalcDisabled;
-extern f32 lbl_8032FFA8;
-extern f64 lbl_8032FFB0;
 extern s32 gPppDefaultValueBuffer[];
 
 extern "C" {
@@ -51,7 +49,7 @@ void pppRandInt(void* param1, void* param2, void* param3)
         if (in->fieldC != 0) {
             value += RandF__5CMathFv(&Math);
         } else {
-            value *= lbl_8032FFA8;
+            value *= kPppRandIntSingleSampleScale;
         }
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);

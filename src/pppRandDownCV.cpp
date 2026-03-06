@@ -1,11 +1,10 @@
 #include "ffcc/pppRandDownCV.h"
 #include "ffcc/math.h"
 #include "types.h"
-
+#include "ffcc/ppp_constants.h"
 extern CMath Math;
 extern int gPppCalcDisabled;
 extern u8 gPppDefaultValueBuffer[];
-extern f32 lbl_8032FF28;
 extern "C" f32 RandF__5CMathFv(CMath*);
 
 struct PppRandDownCVParam2 {
@@ -49,7 +48,7 @@ extern "C" void pppRandDownCV(void* param1, void* param2, void* param3)
         if (in->fieldC != 0) {
             f32 random = RandF__5CMathFv(&Math);
             f32 blend = value - random;
-            value = blend * lbl_8032FF28;
+            value = blend * kPppRandDownCVDualSampleScale;
         }
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);

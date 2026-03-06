@@ -59,12 +59,6 @@ extern float FLOAT_80330424;
 extern float FLOAT_80330428;
 extern float FLOAT_8033042c;
 extern float FLOAT_80330430;
-extern float DAT_801d9b70;
-extern float DAT_801d9b74;
-extern float DAT_801d9b78;
-extern float DAT_801d9b7c;
-extern float DAT_801d9b80;
-extern float DAT_801d9b84;
 
 static inline void CallOnPush(CGBaseObj* self, CGBaseObj* other, int arg)
 {
@@ -569,12 +563,8 @@ void CGObject::move()
 
                     PSMTXRotRad(yawMtx, 'y', static_cast<float>(atan2(static_cast<double>(m_worldPosition.x),
                                                                       static_cast<double>(m_worldPosition.z))));
-                    worldUp.x = DAT_801d9b70;
-                    worldUp.y = DAT_801d9b74;
-                    worldUp.z = DAT_801d9b78;
-                    tangent.x = DAT_801d9b7c;
-                    tangent.y = DAT_801d9b80;
-                    tangent.z = DAT_801d9b84;
+                    worldUp = sMap21WorldUpAxis;
+                    tangent = sMap21TangentAxis;
                     PSVECNormalize(&m_worldPosition, &worldPosNorm);
                     float upDot = PSVECDotProduct(&worldUp, &worldPosNorm);
                     if (upDot > 1.0f) {

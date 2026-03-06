@@ -1,10 +1,9 @@
 #include "ffcc/pppRandFloat.h"
 #include "ffcc/math.h"
 #include "types.h"
-
+#include "ffcc/ppp_constants.h"
 extern CMath Math;
 extern int gPppCalcDisabled;
-extern f32 lbl_8032FF88;
 extern f32 gPppDefaultValueBuffer[];
 extern "C" float RandF__5CMathFv(CMath* instance);
 
@@ -50,7 +49,7 @@ void pppRandFloat(void* param1, void* param2, void* param3)
         if (in->randomTwice != 0) {
             value += RandF__5CMathFv(&Math);
         } else {
-            value *= lbl_8032FF88;
+            value *= kPppRandFloatSingleSampleScale;
         }
 
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);

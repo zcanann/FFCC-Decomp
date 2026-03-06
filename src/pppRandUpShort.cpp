@@ -1,11 +1,9 @@
 #include "ffcc/pppRandUpShort.h"
 #include "ffcc/math.h"
 #include "types.h"
-
+#include "ffcc/ppp_constants.h"
 extern CMath Math;
 extern int gPppCalcDisabled;
-extern f32 lbl_80330038;
-extern const f64 lbl_80330040;
 extern s16 gPppDefaultValueBuffer[];
 extern "C" f32 RandF__5CMathFv(CMath* instance);
 
@@ -47,7 +45,7 @@ extern "C" void pppRandUpShort(void* param1, void* param2, void* param3)
         f32 value = RandF__5CMathFv(&Math);
         if (in->randomTwice != 0) {
             f32 mixed = value + RandF__5CMathFv(&Math);
-            value = mixed * lbl_80330038;
+            value = mixed * kPppRandUpShortDualSampleScale;
         }
 
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);

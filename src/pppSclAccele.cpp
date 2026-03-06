@@ -1,7 +1,6 @@
 #include "ffcc/pppSclAccele.h"
-
+#include "ffcc/ppp_constants.h"
 extern int gPppCalcDisabled;
-extern float lbl_80330050;
 
 typedef struct {
     int m_graphId;
@@ -31,7 +30,7 @@ void pppSclAcceleCon(void* arg1, void* arg2)
 {
     PppSclAcceleConfig* config = (PppSclAcceleConfig*)arg2;
     float* accel = (float*)((char*)arg1 + config->m_offsets[1] + 0x80);
-    float zero = lbl_80330050;
+    float zero = kPppSclAcceleZero;
 
     accel[2] = zero;
     accel[1] = zero;

@@ -1,10 +1,9 @@
 #include "ffcc/pppRandIV.h"
 #include "ffcc/math.h"
 #include "types.h"
-
+#include "ffcc/ppp_constants.h"
 extern CMath Math;
 extern int gPppCalcDisabled;
-extern f32 lbl_8032FFB8;
 extern s32 gPppDefaultValueBuffer[];
 
 extern "C" {
@@ -52,7 +51,7 @@ void pppRandIV(void* param1, void* param2, void* param3)
         if (in->field18 != 0) {
             value += RandF__5CMathFv(&Math);
         } else {
-            value *= lbl_8032FFB8;
+            value *= kPppRandIVSingleSampleScale;
         }
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);

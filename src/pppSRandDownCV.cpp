@@ -1,11 +1,10 @@
 #include "ffcc/pppSRandDownCV.h"
 #include "ffcc/math.h"
 #include "dolphin/types.h"
-
+#include "ffcc/ppp_constants.h"
 extern CMath Math;
 extern int gPppCalcDisabled;
 extern u8 gPppDefaultValueBuffer[];
-extern float lbl_80330070;
 extern "C" float RandF__5CMathFv(CMath* instance);
 
 /*
@@ -36,7 +35,7 @@ void pppSRandDownCV(void* param1, void* param2, void* param3)
             if (flag != 0) {
                 float random = RandF__5CMathFv(&Math);
                 float blend = value - random;
-                float scale = lbl_80330070;
+                float scale = kPppSRandDownCVDualSampleScale;
                 value = blend * scale;
             }
             target[0] = value;
@@ -48,7 +47,7 @@ void pppSRandDownCV(void* param1, void* param2, void* param3)
             if (flag != 0) {
                 float random = RandF__5CMathFv(&Math);
                 float blend = value - random;
-                float scale = lbl_80330070;
+                float scale = kPppSRandDownCVDualSampleScale;
                 value = blend * scale;
             }
             target[1] = value;
@@ -60,7 +59,7 @@ void pppSRandDownCV(void* param1, void* param2, void* param3)
             if (flag != 0) {
                 float random = RandF__5CMathFv(&Math);
                 float blend = value - random;
-                float scale = lbl_80330070;
+                float scale = kPppSRandDownCVDualSampleScale;
                 value = blend * scale;
             }
             target[2] = value;
@@ -72,7 +71,7 @@ void pppSRandDownCV(void* param1, void* param2, void* param3)
             if (flag != 0) {
                 float random = RandF__5CMathFv(&Math);
                 float blend = value - random;
-                float scale = lbl_80330070;
+                float scale = kPppSRandDownCVDualSampleScale;
                 value = blend * scale;
             }
             target[3] = value;

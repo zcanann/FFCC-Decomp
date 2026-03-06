@@ -1,11 +1,9 @@
 #include "ffcc/pppRandShort.h"
 #include "ffcc/math.h"
 #include "types.h"
-
+#include "ffcc/ppp_constants.h"
 extern CMath Math;
 extern int gPppCalcDisabled;
-extern f32 lbl_8032FFC8;
-extern f64 lbl_8032FFD0;
 extern s16 gPppDefaultValueBuffer[];
 
 extern "C" {
@@ -50,7 +48,7 @@ void pppRandShort(void* param1, void* param2, void* param3)
         if (in->fieldA != 0) {
             value += RandF__5CMathFv(&Math);
         } else {
-            value *= lbl_8032FFC8;
+            value *= kPppRandShortSingleSampleScale;
         }
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);

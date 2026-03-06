@@ -15,6 +15,10 @@ class CGMonObj;
 class CGItemObj;
 struct Vec;
 
+extern int gCFlatRuntime2DebugDrawOverflowFrame;
+extern unsigned char gCFlatRuntime2DebugDrawOverflowInit;
+extern char sCFlatRuntime2DebugDrawOverflowMsg[];
+
 class CFlatRuntime2
 {
 	class CParticleWork

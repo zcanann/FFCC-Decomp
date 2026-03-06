@@ -1,10 +1,9 @@
 #include "ffcc/pppRandDownIV.h"
 #include "ffcc/math.h"
 #include "types.h"
-
+#include "ffcc/ppp_constants.h"
 extern CMath Math;
 extern int gPppCalcDisabled;
-extern f32 lbl_8032FF68;
 extern s32 gPppDefaultValueBuffer[];
 
 extern "C" {
@@ -51,7 +50,7 @@ extern "C" void pppRandDownIV(void* param1, void* param2, void* param3)
         value = -RandF__5CMathFv(&Math);
         if (in->field18 != 0) {
             f32 randValue = value - RandF__5CMathFv(&Math);
-            value = randValue * lbl_8032FF68;
+            value = randValue * kPppRandDownIVDualSampleScale;
         }
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);

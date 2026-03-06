@@ -21,6 +21,10 @@ class CFlatRuntime2;
 void la(CGObject*);
 void SAFE_CAST_WORK(CGObjWork*);
 
+extern "C" char* sMogRadarTypeLabels[];
+extern "C" char sMogRadarDebugFormatBlock[];
+extern "C" char sMogFurTextureName[];
+
 class CHairSet
 {
 public:

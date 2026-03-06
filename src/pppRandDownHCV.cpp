@@ -1,12 +1,11 @@
 #include "ffcc/pppRandDownHCV.h"
 #include "ffcc/math.h"
 #include "types.h"
-
+#include "ffcc/ppp_constants.h"
 extern CMath Math;
 extern int gPppCalcDisabled;
 extern s16 gPppDefaultValueBuffer[];
-extern f32 lbl_8032FF48;
-static f64 const lbl_8032FF50 = 4503601774854144.0;
+static f64 const sPppRandDownHCVConvertBias = 4503601774854144.0;
 
 extern "C" {
 f32 RandF__5CMathFv(CMath*);
@@ -63,7 +62,7 @@ extern "C" void pppRandDownHCV(void* param1, void* param2, void* param3)
         if (in->field10 != 0) {
             f32 random = RandF__5CMathFv(&Math);
             f32 blend = value - random;
-            value = blend * lbl_8032FF48;
+            value = blend * kPppRandDownHCVDualSampleScale;
         }
 
         valuePtr = (f32*)(base + *out->fieldC + 0x80);

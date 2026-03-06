@@ -92,7 +92,7 @@ void DisableIndWarp()
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, struct UnkC* param_2)
+void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, struct pppYmDeformationMdlUnkC* param_2)
 {
     float fVar1 = 1.0f; // FLOAT_80330dac equivalent 
     u16* puVar2 = (u16*)((u8*)pppYmDeformationMdl_ + 0x80 + param_2->m_serializedDataOffsets[2]);
@@ -112,7 +112,7 @@ void pppConstructYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, str
  * Address:	TODO
  * Size:	TODO
  */
-void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, UnkC* param_2)
+void pppConstruct2YmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl_, pppYmDeformationMdlUnkC* param_2)
 {
     float fVar1 = FLOAT_80330dac;
     u8* state = (u8*)pppYmDeformationMdl_ + param_2->m_serializedDataOffsets[2] + 0x80;
@@ -148,7 +148,7 @@ void pppDestructYmDeformationMdl(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, UnkB* param_2, UnkC* param_3)
+void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlUnkB* param_2, pppYmDeformationMdlUnkC* param_3)
 {
     s16* psVar1;
 
@@ -187,7 +187,7 @@ void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, UnkB* pa
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, UnkB* param_2, UnkC* param_3)
+void pppRenderYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDeformationMdlUnkB* param_2, pppYmDeformationMdlUnkC* param_3)
 {
     short* state = (short*)((u8*)pppYmDeformationMdl + 0x80 + param_3->m_serializedDataOffsets[2]);
     u8* control = (u8*)&param_2->m_payload0;
@@ -317,3 +317,4 @@ void GXSetTexCoordGen(void)
 {
 	// TODO
 }
+

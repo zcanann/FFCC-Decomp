@@ -196,7 +196,7 @@ void Mana2_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int
  * Address:	TODO
  * Size:	TODO
  */
-void pppConstructMana2(pppMana2* pppMana2, UnkC* param_2)
+void pppConstructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
 {
     CGObject* gObject;
     void* handle;
@@ -267,7 +267,7 @@ void pppConstructMana2(pppMana2* pppMana2, UnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructMana2(pppMana2* pppMana2, UnkC* param_2)
+void pppDestructMana2(pppMana2* pppMana2, pppMana2UnkC* param_2)
 {
     u32* work;
     CGObject* gObject;
@@ -324,7 +324,7 @@ void pppDestructMana2(pppMana2* pppMana2, UnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameMana2(pppMana2* pppMana2, UnkB* param_2, UnkC* param_3)
+void pppFrameMana2(pppMana2* pppMana2, pppMana2UnkB* param_2, pppMana2UnkC* param_3)
 {
     u32 texBufferSize;
     u32* work;
@@ -433,7 +433,7 @@ void pppFrameMana2(pppMana2* pppMana2, UnkB* param_2, UnkC* param_3)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderMana2(pppMana2*, UnkB*, UnkC*)
+void pppRenderMana2(pppMana2*, pppMana2UnkB*, pppMana2UnkC*)
 {
     Graphic.Printf(lbl_801DC4D0);
     GXSetNumTevStages(1);
@@ -1259,3 +1259,4 @@ extern "C" void CalcWaterReflectionVector__FP3VecP3VecP3Vecl3VecPA4_fP8_GXColorP
     DCFlushRange(reflectionVec - count, count * sizeof(Vec));
     DCFlushRange(texCoord, count << 3);
 }
+

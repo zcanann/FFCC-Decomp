@@ -5,33 +5,34 @@ typedef struct pppConstrainCameraDir {
     float field0_0x0;
 } pppConstrainCameraDir;
 
-typedef struct UnkB {
+typedef struct pppConstrainCameraDirUnkB {
     int m_graphId;
     float m_dataValIndex;
     float m_initWOrk;
     float m_stepValue;
     char m_arg3;
     char pad[3];
-} UnkB;
+} pppConstrainCameraDirUnkB;
 
-typedef struct UnkC {
+typedef struct pppConstrainCameraDirUnkC {
     int pad0;
     int pad4;
     int pad8;
     int* m_serializedDataOffsets;
-} UnkC;
+} pppConstrainCameraDirUnkC;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pppConstructConstrainCameraDir(pppConstrainCameraDir* param1, UnkC* param2);
-void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* param1, UnkC* param2);
+void pppConstructConstrainCameraDir(pppConstrainCameraDir* param1, pppConstrainCameraDirUnkC* param2);
+void pppConstruct2ConstrainCameraDir(pppConstrainCameraDir* param1, pppConstrainCameraDirUnkC* param2);
 void pppDestructConstrainCameraDir(void);
-void pppFrameConstrainCameraDir(pppConstrainCameraDir* param1, UnkB* param2, UnkC* param3);
+void pppFrameConstrainCameraDir(pppConstrainCameraDir* param1, pppConstrainCameraDirUnkB* param2, pppConstrainCameraDirUnkC* param3);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _FFCC_PPPCONSTRAINCAMERADIR_H_
+

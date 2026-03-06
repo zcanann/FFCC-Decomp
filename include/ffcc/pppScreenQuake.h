@@ -23,19 +23,19 @@ typedef struct {
     float m_quakeParam0;
     float m_quakeParam1;
     float m_quakeParam2;
-} UnkB;
+} pppScreenQuakeUnkB;
 
 typedef struct {
     int m_unk0;
     int m_unk4;
     int m_unk8;
     int *m_serializedDataOffsets;
-} UnkC;
+} pppScreenQuakeUnkC;
 
-void pppConScreenQuake(pppScreenQuake *quake, UnkC *param2);
-void pppCon2ScreenQuake(pppScreenQuake *quake, UnkC *param2);
+void pppConScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkC *param2);
+void pppCon2ScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkC *param2);
 void pppDesScreenQuake(void);
-void pppFrameScreenQuake(pppScreenQuake *quake, UnkB *param2, UnkC *param3);
+void pppFrameScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkB *param2, pppScreenQuakeUnkC *param3);
 void pppRenderScreenQuake(void);
 
 #ifdef __cplusplus
@@ -43,3 +43,4 @@ void pppRenderScreenQuake(void);
 #endif
 
 #endif // _PPP_SCREENQUAKE_H_
+

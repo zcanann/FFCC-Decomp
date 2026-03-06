@@ -65,7 +65,7 @@ void alloc_check(VYmMegaBirthShpTail2* vdata, PYmMegaBirthShpTail2* param)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, UnkC* param2)
+void pppConstructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, pppYmMegaBirthShpTail2UnkC* param2)
 {
     pppFMATRIX* work = (pppFMATRIX*)((u8*)param1 + 0x80 + param2->m_serializedDataOffsets[2]);
     float initVal;
@@ -95,7 +95,7 @@ void pppConstructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, UnkC* param
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, UnkC* param2)
+void pppDestructYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* param1, pppYmMegaBirthShpTail2UnkC* param2)
 {
     u8* work = (u8*)param1 + 0x80 + param2->m_serializedDataOffsets[2];
     void** ptrBc = (void**)(work + 0x3c);
@@ -382,7 +382,7 @@ void calc_particle(_pppPObject*, VYmMegaBirthShpTail2*, PYmMegaBirthShpTail2*, V
  * PAL Address: 0x8008b3f4
  * PAL Size: 1072b
  */
-void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShpTail2* param, UnkC* offsets)
+void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShpTail2* param, pppYmMegaBirthShpTail2UnkC* offsets)
 {
     bool hasRequiredMemory;
     int spawnCount = 0;
@@ -503,7 +503,7 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, UnkB* stepData, UnkC* offsets)
+void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, pppYmMegaBirthShpTail2UnkB* stepData, pppYmMegaBirthShpTail2UnkC* offsets)
 {
     u8* step = (u8*)stepData;
     u8* payload = step + 0x14;
@@ -674,3 +674,4 @@ void pppRenderYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, UnkB* stepData
         }
     }
 }
+

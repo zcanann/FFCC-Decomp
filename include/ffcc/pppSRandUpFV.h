@@ -1,5 +1,5 @@
-#ifndef _PPP_SRANDFV_H_
-#define _PPP_SRANDFV_H_
+#ifndef _PPP_SRANDUPFV_H_
+#define _PPP_SRANDUPFV_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,4 +13,4 @@ void pppSRandUpFV(void*, void*, void*);
 }
 #endif
 
-#endif // _PPP_SRANDFV_H_
+#endif // _PPP_SRANDUPFV_H_

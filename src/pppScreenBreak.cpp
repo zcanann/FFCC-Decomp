@@ -32,7 +32,7 @@ struct Vec4d {
     float w;
 };
 
-struct UnkB {
+struct pppScreenBreakUnkB {
     float m_dataValIndex;
     u16 m_initWOrk;
     u16 _pad6;
@@ -42,7 +42,7 @@ struct UnkB {
     u8* m_payload;
 };
 
-struct UnkC {
+struct pppScreenBreakUnkC {
     u8 _pad0[0xC];
     s32* m_serializedDataOffsets;
 };
@@ -559,7 +559,7 @@ void SB_BeforeMeshLockEnvCallback(CChara::CModel*, void*, void*, int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConScreenBreak(PScreenBreak* pppScreenBreak, UnkC* param_2)
+void pppConScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2)
 {
     s32 dataOffset = param_2->m_serializedDataOffsets[2];
     float* value = (float*)((u8*)pppScreenBreak + dataOffset + 0x80);
@@ -596,7 +596,7 @@ void pppConScreenBreak(PScreenBreak* pppScreenBreak, UnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppCon2ScreenBreak(PScreenBreak* pppScreenBreak, UnkC* param_2)
+void pppCon2ScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2)
 {
     s32 dataOffset = param_2->m_serializedDataOffsets[2];
     float* value = (float*)((u8*)pppScreenBreak + dataOffset + 0x80);
@@ -615,7 +615,7 @@ void pppCon2ScreenBreak(PScreenBreak* pppScreenBreak, UnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDesScreenBreak(PScreenBreak* pppScreenBreak, UnkC* param_2)
+void pppDesScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkC* param_2)
 {
     s32* serializedDataOffsets = *(s32**)param_2;
     s32 dataOffset = serializedDataOffsets[2];
@@ -645,7 +645,7 @@ void pppDesScreenBreak(PScreenBreak* pppScreenBreak, UnkC* param_2)
  * Address:	TODO
  * Size:	TODO
  */
-void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, UnkB* param_2, UnkC* param_3)
+void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB* param_2, pppScreenBreakUnkC* param_3)
 {
     if (DAT_8032ed70 != 0) {
         return;
@@ -660,7 +660,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, UnkB* param_2, UnkC* para
     void* handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((u8*)pppMngStPtr + 0xD8), 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
     *(float**)(model + 0xE4) = value;
-    *(UnkB**)(model + 0xE8) = param_2;
+    *(pppScreenBreakUnkB**)(model + 0xE8) = param_2;
 
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 
@@ -748,7 +748,7 @@ void pppFrameScreenBreak(PScreenBreak* pppScreenBreak, UnkB* param_2, UnkC* para
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderScreenBreak(PScreenBreak* pppScreenBreak, UnkB*, UnkC* param_3)
+void pppRenderScreenBreak(PScreenBreak* pppScreenBreak, pppScreenBreakUnkB*, pppScreenBreakUnkC* param_3)
 {
     s32 dataOffset = param_3->m_serializedDataOffsets[2];
     u8* value = (u8*)pppScreenBreak + dataOffset + 0x80;
@@ -762,3 +762,4 @@ void pppRenderScreenBreak(PScreenBreak* pppScreenBreak, UnkB*, UnkC* param_3)
         value[0x24] = 1;
     }
 }
+

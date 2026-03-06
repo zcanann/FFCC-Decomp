@@ -57,7 +57,7 @@ void EraseCharaParts_DrawMeshDLCallback(CChara::CModel* model, void* param_2, vo
 {
     EraseCharaPartsDisplayList* displayList =
         ((EraseCharaPartsModelView*)model)->m_meshes[meshIndex].m_data->m_displayLists + param_5;
-    s8 callbackMeshIndex = ((UnkB*)param_3)->m_meshIndex;
+    s8 callbackMeshIndex = ((pppEraseCharaPartsUnkB*)param_3)->m_meshIndex;
 
     MaterialMan.SetMaterial(((EraseCharaPartsModelView*)model)->m_data->m_materialSet,
                             displayList->m_material, 0, (_GXTevScale)0);
@@ -78,7 +78,7 @@ void EraseCharaParts_DrawMeshDLCallback(CChara::CModel* model, void* param_2, vo
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, UnkC* param_2)
+void pppConstructEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEraseCharaPartsUnkC* param_2)
 {
     s32* serializedDataOffsets;
     void* handle;
@@ -130,7 +130,7 @@ void pppDestructEraseCharaParts(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, UnkB* param_2, UnkC* param_3)
+void pppFrameEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEraseCharaPartsUnkB* param_2, pppEraseCharaPartsUnkC* param_3)
 {
     void* handle;
     int model;
@@ -148,7 +148,7 @@ void pppFrameEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, UnkB* param
         model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
 
         *(u8**)(model + 0xE4) = dstColor;
-        *(UnkB**)(model + 0xE8) = param_2;
+        *(pppEraseCharaPartsUnkB**)(model + 0xE8) = param_2;
 
         dstColor[0] = srcColor[0];
         dstColor[1] = srcColor[1];
@@ -158,3 +158,4 @@ void pppFrameEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, UnkB* param
         DCFlushRange(dstColor, 4);
     }
 }
+

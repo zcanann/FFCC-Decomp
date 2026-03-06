@@ -29,7 +29,7 @@ extern "C" void SetQuakeParameter__10CCameraPcsFiissffffffi(
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConScreenQuake(pppScreenQuake *quake, UnkC *param2)
+void pppConScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkC *param2)
 {
 	float val = lbl_80331FC8;
 	float* data = (float*)((char *)&quake->field0_0x0 + 128 + *param2->m_serializedDataOffsets);
@@ -54,7 +54,7 @@ void pppConScreenQuake(pppScreenQuake *quake, UnkC *param2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppCon2ScreenQuake(pppScreenQuake *quake, UnkC *param2)
+void pppCon2ScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkC *param2)
 {
 	float val = lbl_80331FC8;
 	float* data = (float*)((char *)&quake->field0_0x0 + 128 + *param2->m_serializedDataOffsets);
@@ -109,7 +109,7 @@ void pppDesScreenQuake(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameScreenQuake(pppScreenQuake *quake, UnkB *param2, UnkC *param3)
+void pppFrameScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkB *param2, pppScreenQuakeUnkC *param3)
 {
 	if (lbl_8032ED70 == 0) {
 		float *value = (float *)((char *)quake + 0x80 + *param3->m_serializedDataOffsets);
@@ -146,3 +146,4 @@ void pppFrameScreenQuake(pppScreenQuake *quake, UnkB *param2, UnkC *param3)
 void pppRenderScreenQuake(void)
 {
 }
+

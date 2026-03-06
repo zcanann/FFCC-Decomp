@@ -1,16 +1,20 @@
 #ifndef _FFCC_PPBBREATHMODEL_H_
 #define _FFCC_PPBBREATHMODEL_H_
 
+#include <dolphin/mtx.h>
+
 struct _pppPObject;
 struct _pppMngSt;
 struct pppBreathModel;
-struct UnkC;
+struct pppBreathModelUnkC;
 struct VBreathModel;
 struct PBreathModel;
 struct VColor;
-struct PARTICLE_DATA;
-struct PARTICLE_WMAT;
-struct PARTICLE_COLOR;
+struct _PARTICLE_DATA;
+struct _PARTICLE_COLOR;
+typedef _PARTICLE_DATA PARTICLE_DATA;
+typedef Mtx PARTICLE_WMAT;
+typedef _PARTICLE_COLOR PARTICLE_COLOR;
 
 void get_rand(void);
 void BirthParticle(_pppPObject*, VBreathModel*, PBreathModel*, VColor*, PARTICLE_DATA*, PARTICLE_WMAT*, PARTICLE_COLOR*);
@@ -25,13 +29,14 @@ void IsExistGroupParticle(PBreathModel*, VBreathModel*, short);
 extern "C" {
 #endif
 
-void pppFrameBreathModel(pppBreathModel*, PBreathModel*, UnkC*);
-void pppRenderBreathModel(pppBreathModel*, PBreathModel*, UnkC*);
-void pppConstructBreathModel(pppBreathModel*, UnkC*);
-void pppDestructBreathModel(pppBreathModel*, UnkC*);
+void pppFrameBreathModel(pppBreathModel*, PBreathModel*, pppBreathModelUnkC*);
+void pppRenderBreathModel(pppBreathModel*, PBreathModel*, pppBreathModelUnkC*);
+void pppConstructBreathModel(pppBreathModel*, pppBreathModelUnkC*);
+void pppDestructBreathModel(pppBreathModel*, pppBreathModelUnkC*);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
+

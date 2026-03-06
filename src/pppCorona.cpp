@@ -42,7 +42,7 @@ struct CoronaVecWork {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructCorona(pppCorona* param1, UnkC* param2)
+void pppConstructCorona(pppCorona* param1, pppCoronaUnkC* param2)
 {
     float fVar1 = lbl_803310C8;
     u16* puVar2 = (u16*)((u8*)param1 + 0x80 + param2->m_serializedDataOffsets[3]);
@@ -76,7 +76,7 @@ void pppDestructCorona(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameCorona(pppCorona* param1, CoronaParam* param2, UnkC* param3)
+void pppFrameCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* param3)
 {
     CoronaWork* work;
     long** shape;
@@ -114,7 +114,7 @@ void pppFrameCorona(pppCorona* param1, CoronaParam* param2, UnkC* param3)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderCorona(pppCorona* param1, CoronaParam* param2, UnkC* param3)
+void pppRenderCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* param3)
 {
     CoronaWork* work;
     CoronaVecWork* vecWork;
@@ -173,3 +173,4 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, UnkC* param3)
     pppSetBlendMode(param2->m_blendMode);
     pppDrawShp(*shape, work->m_shapeY, lbl_8032ED54->m_materialSetPtr, param2->m_blendMode);
 }
+

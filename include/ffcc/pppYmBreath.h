@@ -1,15 +1,19 @@
 #ifndef _PPP_YMBREATH_H_
 #define _PPP_YMBREATH_H_
 
+#include <dolphin/mtx.h>
+
 struct _pppPObject;
 struct pppYmBreath;
-struct UnkC;
+struct pppYmBreathUnkC;
 struct VYmBreath;
 struct PYmBreath;
 struct VColor;
-struct PARTICLE_DATA;
-struct PARTICLE_WMAT;
-struct PARTICLE_COLOR;
+struct _PARTICLE_DATA;
+struct _PARTICLE_COLOR;
+typedef _PARTICLE_DATA PARTICLE_DATA;
+typedef Mtx PARTICLE_WMAT;
+typedef _PARTICLE_COLOR PARTICLE_COLOR;
 
 void get_rand(void);
 void BirthParticle(_pppPObject*, VYmBreath*, PYmBreath*, VColor*, PARTICLE_DATA*, PARTICLE_WMAT*, PARTICLE_COLOR*);
@@ -21,11 +25,11 @@ void SetParticleMatrix(_pppPObject*, VYmBreath*, PARTICLE_DATA*, PARTICLE_WMAT*)
 extern "C" {
 #endif
 
-void pppFrameYmBreath(pppYmBreath*, PYmBreath*, UnkC*);
-void pppRenderYmBreath(pppYmBreath*, PYmBreath*, UnkC*);
-void pppConstructYmBreath(pppYmBreath*, UnkC*);
+void pppFrameYmBreath(pppYmBreath*, PYmBreath*, pppYmBreathUnkC*);
+void pppRenderYmBreath(pppYmBreath*, PYmBreath*, pppYmBreathUnkC*);
+void pppConstructYmBreath(pppYmBreath*, pppYmBreathUnkC*);
 void pppConstruct2YmBreath(void);
-void pppDestructYmBreath(pppYmBreath*, UnkC*);
+void pppDestructYmBreath(pppYmBreath*, pppYmBreathUnkC*);
 
 #ifdef __cplusplus
 }
@@ -36,3 +40,4 @@ void SearchIndex(PYmBreath*, VYmBreath*, short&, short&, short);
 void IsExistGroupParticle(PYmBreath*, VYmBreath*, short);
 
 #endif // _PPP_YMBREATH_H_
+

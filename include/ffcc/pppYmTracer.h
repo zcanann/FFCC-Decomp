@@ -3,7 +3,7 @@
 
 #include <dolphin/types.h>
 
-struct UnkB {
+struct pppYmTracerUnkB {
     s32 m_graphId;
     u32 m_dataValIndex;
     s32 m_initWOrk;
@@ -12,7 +12,7 @@ struct UnkB {
     u8 m_payload[0x20];
 };
 
-struct UnkC {
+struct pppYmTracerUnkC {
     u8 _pad[0xC];
     s32* m_serializedDataOffsets;
 };
@@ -32,14 +32,15 @@ void copyPolygonData(TRACE_POLYGON*, TRACE_POLYGON*);
 extern "C" {
 #endif
 
-void pppConstructYmTracer(pppYmTracer*, UnkC*);
-void pppConstruct2YmTracer(pppYmTracer*, UnkC*);
-void pppDestructYmTracer(pppYmTracer*, UnkC*);
-void pppFrameYmTracer(pppYmTracer*, UnkB*, UnkC*);
-void pppRenderYmTracer(pppYmTracer*, UnkB*, UnkC*);
+void pppConstructYmTracer(pppYmTracer*, pppYmTracerUnkC*);
+void pppConstruct2YmTracer(pppYmTracer*, pppYmTracerUnkC*);
+void pppDestructYmTracer(pppYmTracer*, pppYmTracerUnkC*);
+void pppFrameYmTracer(pppYmTracer*, pppYmTracerUnkB*, pppYmTracerUnkC*);
+void pppRenderYmTracer(pppYmTracer*, pppYmTracerUnkB*, pppYmTracerUnkC*);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _FFCC_PPP_YMTRACER_H_
+

@@ -88,7 +88,7 @@ void MakeRefractionMap(HSD_ImageBuffer*)
  * Address:	800dd404
  * Size:	32b
  */
-void pppConstructCrystal(struct pppCrystal* pppCrystal, struct UnkC* param_2)
+void pppConstructCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkC* param_2)
 {
 	s32* serializedDataOffsets = *(s32**)((u8*)param_2 + 0xC);
 	u32* data = (u32*)((char*)pppCrystal + serializedDataOffsets[2] + 0x80);
@@ -106,7 +106,7 @@ void pppConstructCrystal(struct pppCrystal* pppCrystal, struct UnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructCrystal(struct pppCrystal* pppCrystal, struct UnkC* param_2)
+void pppDestructCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkC* param_2)
 {
 	s32* serializedDataOffsets = *(s32**)((u8*)param_2 + 0xC);
 	u32* puVar1 = (u32*)((char*)pppCrystal + 0x80 + serializedDataOffsets[2]);
@@ -130,7 +130,7 @@ void pppDestructCrystal(struct pppCrystal* pppCrystal, struct UnkC* param_2)
  * Address:	800dcf44
  * Size:	1080b
  */
-void pppFrameCrystal(struct pppCrystal* pppCrystal, struct UnkB* param_2, struct UnkC* param_3)
+void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param_2, struct pppCrystalUnkC* param_3)
 {
 	int* refractionData;
 	int* textureInfo;
@@ -240,7 +240,7 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct UnkB* param_2, struct
  * Address:	800dc9a0
  * Size:	1444b
  */
-void pppRenderCrystal(struct pppCrystal* pppCrystal, struct UnkB* param_2, struct UnkC* param_3)
+void pppRenderCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param_2, struct pppCrystalUnkC* param_3)
 {
 	float texW;
 	float texH;
@@ -371,3 +371,4 @@ void GXSetTexCoordGen(void)
 {
 	// TODO
 }
+

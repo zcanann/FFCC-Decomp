@@ -5,7 +5,7 @@
 
 struct pppYmCheckBGHeight;
 
-struct UnkC {
+struct pppYmCheckBGHeightUnkC {
     float m_serializedDataOffsets;
     float m_unk0x4;
     float m_unk0x8;
@@ -16,10 +16,11 @@ extern "C" {
 #endif
 
 void pppConstructYmCheckBGHeight(void);
-struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(struct pppYmCheckBGHeight* param1, struct UnkC* param2);
+struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(struct pppYmCheckBGHeight* param1, struct pppYmCheckBGHeightUnkC* param2);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _PPP_YMCHECKBGHEIGHT_H_
+

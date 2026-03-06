@@ -31,7 +31,7 @@ struct KeShpTailObject {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail(_pppPObject* obj, UnkB*, UnkC* offsets)
+void pppKeShpTail(_pppPObject* obj, pppKeShpTailUnkB*, pppKeShpTailUnkC* offsets)
 {
 	extern int lbl_8032ED70;
 	KeShpTailObject* tailObj = (KeShpTailObject*)obj;
@@ -96,3 +96,4 @@ void pppKeShpTailDraw(void)
 {
 	return;
 }
+

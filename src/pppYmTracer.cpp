@@ -82,7 +82,7 @@ void copyPolygonData(TRACE_POLYGON*, TRACE_POLYGON*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmTracer(pppYmTracer* pppYmTracer, UnkC* param_2)
+void pppConstructYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkC* param_2)
 {
     f32 fVar1;
     u8* work;
@@ -116,7 +116,7 @@ void pppConstructYmTracer(pppYmTracer* pppYmTracer, UnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstruct2YmTracer(pppYmTracer* pppYmTracer, UnkC* param_2)
+void pppConstruct2YmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkC* param_2)
 {
     u8* work;
 
@@ -134,7 +134,7 @@ void pppConstruct2YmTracer(pppYmTracer* pppYmTracer, UnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructYmTracer(pppYmTracer* pppYmTracer, UnkC* param_2)
+void pppDestructYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkC* param_2)
 {
     CMemory::CStage** stagePtr = (CMemory::CStage**)((char*)pppYmTracer + 0xa8 + *param_2->m_serializedDataOffsets);
     if (*stagePtr != nullptr) {
@@ -151,7 +151,7 @@ void pppDestructYmTracer(pppYmTracer* pppYmTracer, UnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmTracer(pppYmTracer* pppYmTracer, UnkB* param_2, UnkC* param_3)
+void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmTracerUnkC* param_3)
 {
     f32* work;
     TRACE_POLYGON* entries;
@@ -317,7 +317,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, UnkB* param_2, UnkC* param_3)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderYmTracer(pppYmTracer* pppYmTracer, UnkB* param_2, UnkC* param_3)
+void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmTracerUnkC* param_3)
 {
     f32* poly;
     CMapMesh* mapMesh;
@@ -401,3 +401,4 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, UnkB* param_2, UnkC* param_3)
         }
     }
 }
+

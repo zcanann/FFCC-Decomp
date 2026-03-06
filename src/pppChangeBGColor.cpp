@@ -13,7 +13,7 @@ extern unsigned char MapMng[];
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameChangeBGColor(struct pppChangeBGColor* pppChangeBGColor, struct UnkB* param_2, struct UnkC* param_3)
+void pppFrameChangeBGColor(struct pppChangeBGColor* pppChangeBGColor, struct pppChangeBGColorUnkB* param_2, struct pppChangeBGColorUnkC* param_3)
 {
 	int iVar1;
 	unsigned char* data;
@@ -61,3 +61,4 @@ void pppConChangeBGColor(void)
 {
 	return;
 }
+

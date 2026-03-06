@@ -12,7 +12,7 @@ struct pppCorona {
     } field0_0x0;
 };
 
-struct UnkC {
+struct pppCoronaUnkC {
     u8 _pad0[0xC];
     s32* m_serializedDataOffsets;
 };
@@ -39,13 +39,14 @@ struct CoronaParam {
 extern "C" {
 #endif
 
-void pppConstructCorona(pppCorona* param1, UnkC* param2);
+void pppConstructCorona(pppCorona* param1, pppCoronaUnkC* param2);
 void pppDestructCorona(void);
-void pppFrameCorona(pppCorona* param1, CoronaParam* param2, UnkC* param3);
-void pppRenderCorona(pppCorona* param1, CoronaParam* param2, UnkC* param3);
+void pppFrameCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* param3);
+void pppRenderCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* param3);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _FFCC_PPPCORONA_H_
+

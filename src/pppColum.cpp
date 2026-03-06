@@ -48,7 +48,7 @@ void RenderQuad__5CUtilF3Vec3Vec8_GXColorP5Vec2dP5Vec2d(void*, Vec*, Vec*, GXCol
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderColum(pppColum *column, UnkB *param_2, UnkC *param_3)
+void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_3)
 {
     int* serializedDataOffsets = GetColumSerializedDataOffsets(param_3);
     int iVar7 = serializedDataOffsets[3];
@@ -168,7 +168,7 @@ void pppRenderColum(pppColum *column, UnkB *param_2, UnkC *param_3)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameColum(pppColum *column, UnkB *param_2, UnkC *param_3)
+void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_3)
 {
     if (lbl_8032ED70 == 0) {
         unsigned char* work = (unsigned char*)((char*)column + 0x80 + param_3->m_serializedDataOffsets[3]);
@@ -212,7 +212,7 @@ void pppFrameColum(pppColum *column, UnkB *param_2, UnkC *param_3)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructColum(pppColum *column, UnkC *param_2)
+void pppDestructColum(pppColum *column, pppColumUnkC *param_2)
 {
     int* serializedDataOffsets = GetColumSerializedDataOffsets(param_2);
     char* work = (char*)column + 0x80 + serializedDataOffsets[3];
@@ -232,7 +232,7 @@ void pppDestructColum(pppColum *column, UnkC *param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructColum(pppColum *column, UnkC *param_2)
+void pppConstructColum(pppColum *column, pppColumUnkC *param_2)
 {
     int* serializedDataOffsets = GetColumSerializedDataOffsets(param_2);
     unsigned short *puVar1 = (unsigned short *)((char*)column + 0x80 + serializedDataOffsets[3]);
@@ -241,3 +241,4 @@ void pppConstructColum(pppColum *column, UnkC *param_2)
     *puVar1 = 0;
     *(unsigned int *)(puVar1 + 4) = 0;
 }
+

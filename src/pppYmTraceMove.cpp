@@ -20,7 +20,7 @@ extern "C" {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, UnkC* param_2)
+void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkC* param_2)
 {
 	Vec* dest;
 	Vec local_38;
@@ -71,7 +71,7 @@ void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, UnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, UnkB* param_2, UnkC* param_3)
+void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* param_2, pppYmTraceMoveUnkC* param_3)
 {
 	u8* pppMngSt;
 	u8* owner;
@@ -206,3 +206,4 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, UnkB* param_2, UnkC* pa
 	((_pppMngSt*)pppMngSt)->m_matrix.value[1][3] = local_ec.y;
 	((_pppMngSt*)pppMngSt)->m_matrix.value[2][3] = local_ec.z;
 }
+

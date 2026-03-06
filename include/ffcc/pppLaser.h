@@ -18,8 +18,8 @@ struct pppLaser {
     u8 field_0xac;      // 0xac
 };
 
-struct UnkB {
-    // TODO: Define UnkB structure
+struct pppLaserUnkB {
+    // TODO: Define pppLaserUnkB structure
     u8 placeholder[0x100];
 };
 
@@ -27,7 +27,7 @@ struct UnkCLaserOffsets {
     int m_serializedDataOffsets[3];
 };
 
-struct UnkC {
+struct pppLaserUnkC {
     u8 unk_00[0xc];
     UnkCLaserOffsets* offsets;
 };
@@ -36,14 +36,15 @@ struct UnkC {
 extern "C" {
 #endif
 
-void pppConstructLaser(struct pppLaser* pppLaser, struct UnkC* param_2);
-void pppConstruct2Laser(struct pppLaser* pppLaser, struct UnkC* param_2);
-void pppDestructLaser(struct pppLaser* pppLaser, struct UnkC* param_2);
-void pppFrameLaser(struct pppLaser* pppLaser, struct UnkB* param_2, struct UnkC* param_3);
-void pppRenderLaser(struct pppLaser* pppLaser, struct UnkB* param_2, struct UnkC* param_3);
+void pppConstructLaser(struct pppLaser* pppLaser, struct pppLaserUnkC* param_2);
+void pppConstruct2Laser(struct pppLaser* pppLaser, struct pppLaserUnkC* param_2);
+void pppDestructLaser(struct pppLaser* pppLaser, struct pppLaserUnkC* param_2);
+void pppFrameLaser(struct pppLaser* pppLaser, struct pppLaserUnkB* param_2, struct pppLaserUnkC* param_3);
+void pppRenderLaser(struct pppLaser* pppLaser, struct pppLaserUnkB* param_2, struct pppLaserUnkC* param_3);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _PPP_LASER_H_
+

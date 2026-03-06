@@ -31,7 +31,7 @@ void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructConformBGNormal(struct pppConformBGNormal* conformBG, struct UnkC* param2)
+void pppConstructConformBGNormal(struct pppConformBGNormal* conformBG, struct pppConformBGNormalUnkC* param2)
 {
     int* serializedDataOffsets;
     f32* pfVar2;
@@ -55,7 +55,7 @@ void pppConstructConformBGNormal(struct pppConformBGNormal* conformBG, struct Un
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, struct UnkB* param2, struct UnkC* param3)
+void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, struct pppConformBGNormalUnkB* param2, struct pppConformBGNormalUnkC* param3)
 {
     u8 mode;
     f32 matrixX;
@@ -294,3 +294,4 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
         }
     }
 }
+

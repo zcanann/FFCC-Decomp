@@ -50,7 +50,7 @@ struct LocationTitleParticle {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructLocationTitle(pppLocationTitle* pppLocationTitle, UnkC* param_2)
+void pppConstructLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleUnkC* param_2)
 {
     s32* serializedOffsets = *(s32**)((u8*)param_2 + 0xC);
     u8* base = (u8*)pppLocationTitle + *serializedOffsets + 0x80;
@@ -72,7 +72,7 @@ void pppConstructLocationTitle(pppLocationTitle* pppLocationTitle, UnkC* param_2
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructLocationTitle(pppLocationTitle* pppLocationTitle, UnkC* param_2)
+void pppDestructLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleUnkC* param_2)
 {
     int serializedOffset;
     CMemory::CStage** stagePtr;
@@ -97,7 +97,7 @@ void pppDestructLocationTitle(pppLocationTitle* pppLocationTitle, UnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, UnkB* param_2, UnkC* param_3)
+void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleUnkB* param_2, pppLocationTitleUnkC* param_3)
 {
     int colorOffset;
     LocationTitleWork* work;
@@ -234,7 +234,7 @@ void pppFrameLocationTitle(pppLocationTitle* pppLocationTitle, UnkB* param_2, Un
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, UnkB* param_2, UnkC* param_3)
+void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, pppLocationTitleUnkB* param_2, pppLocationTitleUnkC* param_3)
 {
     int serializedOffset = *param_3->m_serializedDataOffsets;
 
@@ -285,3 +285,4 @@ void pppRenderLocationTitle(pppLocationTitle* pppLocationTitle, UnkB* param_2, U
         source = (Vec*)&source[2].y;
     }
 }
+

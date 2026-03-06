@@ -8,7 +8,7 @@ struct pppLocationTitle2 {
     char pad[0x80];  // Placeholder size, adjust based on actual usage
 };
 
-struct UnkB {
+struct pppLocationTitle2UnkB {
     u32 m_dataValIndex;
     u16 m_initWOrk;
     u16 m_pad;
@@ -18,7 +18,7 @@ struct UnkB {
     float m_stepValue;
 };
 
-struct UnkC {
+struct pppLocationTitle2UnkC {
     char pad[0xC];
     s32* m_serializedDataOffsets;
 };
@@ -27,13 +27,14 @@ struct UnkC {
 extern "C" {
 #endif
 
-void pppConstructLocationTitle2(struct pppLocationTitle2*, struct UnkC*);
-void pppDestructLocationTitle2(struct pppLocationTitle2*, struct UnkC*);
-void pppFrameLocationTitle2(struct pppLocationTitle2*, struct UnkB*, struct UnkC*);
-void pppRenderLocationTitle2(struct pppLocationTitle2*, struct UnkB*, struct UnkC*);
+void pppConstructLocationTitle2(struct pppLocationTitle2*, struct pppLocationTitle2UnkC*);
+void pppDestructLocationTitle2(struct pppLocationTitle2*, struct pppLocationTitle2UnkC*);
+void pppFrameLocationTitle2(struct pppLocationTitle2*, struct pppLocationTitle2UnkB*, struct pppLocationTitle2UnkC*);
+void pppRenderLocationTitle2(struct pppLocationTitle2*, struct pppLocationTitle2UnkB*, struct pppLocationTitle2UnkC*);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _FFCC_LOCATIONTITLE2_H_
+

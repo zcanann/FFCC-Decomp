@@ -174,7 +174,7 @@ extern "C" void ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2(C
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructChangeTex(pppChangeTex* changeTex, UnkC* data)
+void pppConstructChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
 {
 	float init = lbl_80332040;
 	float* state = (float*)((char*)changeTex + data->m_serializedDataOffsets[2] + 0x80);
@@ -199,7 +199,7 @@ void pppConstructChangeTex(pppChangeTex* changeTex, UnkC* data)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstruct2ChangeTex(pppChangeTex* changeTex, UnkC* data)
+void pppConstruct2ChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
 {
 	float* state = (float*)((char*)changeTex + data->m_serializedDataOffsets[2] + 0x80);
 	float init = lbl_80332040;
@@ -218,7 +218,7 @@ void pppConstruct2ChangeTex(pppChangeTex* changeTex, UnkC* data)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructChangeTex(pppChangeTex* changeTex, UnkC* data)
+void pppDestructChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
 {
 	unsigned int i;
 	unsigned int j;
@@ -321,7 +321,7 @@ void pppDestructChangeTex(pppChangeTex* changeTex, UnkC* data)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameChangeTex(pppChangeTex* changeTex, UnkB* step, UnkC* data)
+void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChangeTexUnkC* data)
 {
 	if (DAT_8032ed70 != 0) {
 		return;
@@ -341,7 +341,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, UnkB* step, UnkC* data)
 	valueInt[6] = (int)pppMngStPtr->m_charaObj;
 	valueInt[9] = (int)pppEnvStPtr;
 	*(float**)(model0 + 0xE4) = value;
-	*(UnkB**)(model0 + 0xE8) = step;
+	*(pppChangeTexUnkB**)(model0 + 0xE8) = step;
 	*(void**)(model0 + 0xFC) = (void*)ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2;
 	*(void**)(model0 + 0x104) = (void*)ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2;
 
@@ -354,7 +354,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, UnkB* step, UnkC* data)
 		int model1 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle1);
 		if (model1 != 0) {
 			*(float**)(model1 + 0xE4) = value;
-			*(UnkB**)(model1 + 0xE8) = step;
+			*(pppChangeTexUnkB**)(model1 + 0xE8) = step;
 			*(void**)(model1 + 0xFC) = (void*)ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2;
 			*(void**)(model1 + 0x104) = (void*)ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2;
 		}
@@ -364,7 +364,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, UnkB* step, UnkC* data)
 		int model2 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle2);
 		if (model2 != 0) {
 			*(float**)(model2 + 0xE4) = value;
-			*(UnkB**)(model2 + 0xE8) = step;
+			*(pppChangeTexUnkB**)(model2 + 0xE8) = step;
 			*(void**)(model2 + 0xFC) = (void*)ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2;
 			*(void**)(model2 + 0x104) = (void*)ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2;
 		}
@@ -471,7 +471,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, UnkB* step, UnkC* data)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderChangeTex(pppChangeTex*, UnkB* step, UnkC*)
+void pppRenderChangeTex(pppChangeTex*, pppChangeTexUnkB* step, pppChangeTexUnkC*)
 {
 	int textureIndex;
 
@@ -485,3 +485,4 @@ void pppRenderChangeTex(pppChangeTex*, UnkB* step, UnkC*)
 		pppInitBlendMode__Fv();
 	}
 }
+

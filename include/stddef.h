@@ -5,7 +5,9 @@
 extern "C" {
 #endif
 
+#ifndef offsetof
 #define offsetof(type, member) ((size_t) & (((type*)0)->member))
+#endif
 
 /* These break 1.2.5 */
 //typedef __typeof__(sizeof(0)) size_t;

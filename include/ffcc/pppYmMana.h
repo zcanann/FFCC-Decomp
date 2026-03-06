@@ -11,8 +11,8 @@ struct VYmMana;
 struct CTexture;
 struct CGObject;
 struct Vec2d;
-struct UnkB;
-struct UnkC {
+struct pppYmManaUnkB;
+struct pppYmManaUnkC {
     s32* m_serializedDataOffsets;
 };
 
@@ -34,9 +34,9 @@ void CalcReflectionVector2(Vec*, S16Vec*, S16Vec*, long, unsigned long, unsigned
 extern "C" {
 #endif
 
-void pppConstructYmMana(PYmMana*, UnkC*);
-void pppDestructYmMana(PYmMana*, UnkC*);
-void pppFrameYmMana(PYmMana*, UnkB*, UnkC*);
+void pppConstructYmMana(PYmMana*, pppYmManaUnkC*);
+void pppDestructYmMana(PYmMana*, pppYmManaUnkC*);
+void pppFrameYmMana(PYmMana*, pppYmManaUnkB*, pppYmManaUnkC*);
 void pppRenderYmMana(void);
 
 #ifdef __cplusplus
@@ -44,3 +44,4 @@ void pppRenderYmMana(void);
 #endif
 
 #endif // _PPP_YMMANA_H_
+

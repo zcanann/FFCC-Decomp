@@ -3,8 +3,8 @@
 
 #include "ffcc/chara.h"
 
-struct UnkB;
-struct UnkC;
+struct pppCharaZEnvCtrlUnkB;
+struct pppCharaZEnvCtrlUnkC;
 
 struct pppCharaZEnvCtrl
 {
@@ -19,10 +19,11 @@ extern "C" {
 
 void pppConCharaZEnvCtrl(void);
 void pppDesCharaZEnvCtrl(void);
-void pppFrameCharaZEnvCtrl(pppCharaZEnvCtrl*, UnkB*, UnkC*);
+void pppFrameCharaZEnvCtrl(pppCharaZEnvCtrl*, pppCharaZEnvCtrlUnkB*, pppCharaZEnvCtrlUnkC*);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _FFCC_PPPCHARAZENVCTRL_H_
+

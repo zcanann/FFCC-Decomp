@@ -10,12 +10,12 @@ struct pppEraseCharaParts {
     u8 field_0x88[4];
 };
 
-struct UnkB {
+struct pppEraseCharaPartsUnkB {
     u8 m_unk0[4];
     s8 m_meshIndex;
 };
 
-struct UnkC {
+struct pppEraseCharaPartsUnkC {
     u8 m_unk0[0xC];
     s32* m_serializedDataOffsets;
 };
@@ -26,12 +26,13 @@ void EraseCharaParts_DrawMeshDLCallback(CChara::CModel*, void*, void*, int, int,
 extern "C" {
 #endif
 
-void pppConstructEraseCharaParts(pppEraseCharaParts*, UnkC*);
+void pppConstructEraseCharaParts(pppEraseCharaParts*, pppEraseCharaPartsUnkC*);
 void pppDestructEraseCharaParts(void);
-void pppFrameEraseCharaParts(pppEraseCharaParts*, UnkB*, UnkC*);
+void pppFrameEraseCharaParts(pppEraseCharaParts*, pppEraseCharaPartsUnkB*, pppEraseCharaPartsUnkC*);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _PPP_ERASECHARAPARTS_H_
+

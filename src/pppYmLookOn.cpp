@@ -1,7 +1,7 @@
 #include "ffcc/pppYmLookOn.h"
 #include <dolphin/mtx.h>
 
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern float lbl_80330EC8;
 extern float lbl_80330ECC;
 
@@ -47,7 +47,7 @@ void pppFrameYmLookOn(struct pppYmLookOn* pppYmLookOn, struct pppYmLookOnUnkB* p
     Vec local_4c;
     Vec local_58;
 
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

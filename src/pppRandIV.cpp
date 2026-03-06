@@ -3,9 +3,9 @@
 #include "types.h"
 
 extern CMath math[];
-extern s32 lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern f32 lbl_8032FFB8;
-extern s32 lbl_801EADC8[];
+extern s32 gPppDefaultValueBuffer[];
 
 extern "C" {
 f32 RandF__5CMathFv(CMath*);
@@ -43,7 +43,7 @@ void pppRandIV(void* param1, void* param2, void* param3)
     s32* target;
     f32* valuePtr;
 
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 
@@ -63,7 +63,7 @@ void pppRandIV(void* param1, void* param2, void* param3)
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
     
-    target = (in->field4 == -1) ? &lbl_801EADC8[0] : (s32*)(base + in->field4 + 0x80);
+    target = (in->field4 == -1) ? &gPppDefaultValueBuffer[0] : (s32*)(base + in->field4 + 0x80);
 
     {
         f32 randValue = *valuePtr;

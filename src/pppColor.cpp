@@ -20,7 +20,7 @@ void pppColor(void* param1, void* param2, void* param3)
     PppColorOffsets* offsets = (PppColorOffsets*)param3;
     _pppColorWork* work = (_pppColorWork*)((u8*)param1 + offsets->m_serializedDataOffsets[0] + 0x80);
 
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

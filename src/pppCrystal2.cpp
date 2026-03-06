@@ -9,7 +9,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-extern int DAT_8032ed70;
+extern int gPppCalcDisabled;
 extern void* DAT_80238030;
 extern CUtil DAT_8032ec70;
 extern float DAT_801dd60c;
@@ -148,7 +148,7 @@ void pppDestructCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkC* param_2)
  */
 void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCrystal2UnkC* param_3)
 {
-    if ((DAT_8032ed70 == 0) && (param_2->m_payload[0] != 0)) {
+    if ((gPppCalcDisabled == 0) && (param_2->m_payload[0] != 0)) {
         int* refractionData = (int*)((char*)pppCrystal2 + param_3->m_serializedDataOffsets[2] + 0x80);
         if (refractionData[0] == 0) {
             u32 y;

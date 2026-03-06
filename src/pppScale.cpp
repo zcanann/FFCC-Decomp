@@ -1,6 +1,6 @@
 #include "ffcc/pppScale.h"
 
-extern int DAT_8032ed70;
+extern int gPppCalcDisabled;
 
 /*
  * --INFO--
@@ -13,7 +13,7 @@ extern int DAT_8032ed70;
  */
 void pppScale(void* obj, void* param2, void* param3)
 {
-	if (DAT_8032ed70 != 0) {
+	if (gPppCalcDisabled != 0) {
 		return;
 	}
 

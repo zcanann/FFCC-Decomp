@@ -1,7 +1,7 @@
 #include "ffcc/pppAngMove.h"
 #include "ffcc/partMng.h"
 
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 
 struct PppAngMoveObj {
     int x;
@@ -38,7 +38,7 @@ void pppAngMove(void* basePtr, void* input, _pppCtrlTable* ctrlTable)
     PppAngMoveObj* b = (PppAngMoveObj*)((char*)basePtr + offsets->b + 0x80);
     PppAngMoveInput* inputData = (PppAngMoveInput*)input;
 
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

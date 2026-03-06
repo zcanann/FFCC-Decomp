@@ -38,7 +38,7 @@ struct VtMimeEnv
     void** sourceTable;
 };
 
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern VtMimeEnv* lbl_8032ED54;
 extern const float lbl_803300F0;
 extern char Graphic[];
@@ -184,7 +184,7 @@ void pppVtMime(_pppPObject* object, void* step, _pppCtrlTable* ctrl)
     VtMimeState* state = (VtMimeState*)((char*)object + *ctrl->m_serializedDataOffsets + 0x80);
     VtMimeData* data = (VtMimeData*)step;
 
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

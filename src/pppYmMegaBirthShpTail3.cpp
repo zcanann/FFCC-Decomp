@@ -21,7 +21,7 @@ extern float lbl_803305A4;
 extern pppFMATRIX g_matUnit3;
 extern _pppEnvSt* pppEnvStPtr;
 extern _pppMngSt* pppMngStPtr;
-extern s32 DAT_8032ed70;
+extern int gPppCalcDisabled;
 
 static char s_pppYmMegaBirthShpTail3_cpp[] = "pppYmMegaBirthShpTail3.cpp";
 
@@ -487,7 +487,7 @@ void pppFrameYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, PYmMegaBirthShp
     particleColor = work->m_colors;
     particleData = (u8*)work->m_particles;
 
-    if ((DAT_8032ed70 != 0) || (*(float*)(paramPayload + 4) == 9.18341e-41f)) {
+    if ((gPppCalcDisabled != 0) || (*(float*)(paramPayload + 4) == 9.18341e-41f)) {
         return;
     }
 

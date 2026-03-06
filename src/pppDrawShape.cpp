@@ -3,7 +3,7 @@
 #include "ffcc/pppShape.h"
 #include "dolphin/types.h"
 
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern void* lbl_8032ED54;
 
 typedef struct ShapeRuntimeData {
@@ -68,7 +68,7 @@ void pppDrawShapeConstruct(void* pppShape, void* data)
  */
 void pppCalcShape(void* pppShape, void* data, void* additionalData)
 {
-	if (lbl_8032ED70 != 0) {
+	if (gPppCalcDisabled != 0) {
 		return;
 	}
 

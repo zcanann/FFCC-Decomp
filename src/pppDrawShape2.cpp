@@ -3,7 +3,7 @@
 #include "ffcc/pppShape.h"
 #include "dolphin/types.h"
 
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern void* lbl_8032ED54;
 
 extern "C" {
@@ -72,7 +72,7 @@ void pppDrawShape2Construct(void* param1, void* param2)
  */
 void pppCalcShape2(void* param1, void* param2, void* param3)
 {
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

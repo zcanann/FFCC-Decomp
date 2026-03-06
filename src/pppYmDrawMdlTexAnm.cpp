@@ -17,7 +17,7 @@ struct CMapMeshUVLayout {
     s16* m_uvPairs;
 };
 
-extern s32 DAT_8032ed70;
+extern int gPppCalcDisabled;
 extern f32 FLOAT_80330548;
 extern f32 FLOAT_8033054c;
 extern _pppEnvSt* pppEnvStPtr;
@@ -133,7 +133,7 @@ void pppFrameYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, 
     s32 i;
 
     work = (pppYmDrawMdlTexAnmWork*)((u8*)object + 0x80 + ctrl->m_serializedDataOffsets[2]);
-    if (DAT_8032ed70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

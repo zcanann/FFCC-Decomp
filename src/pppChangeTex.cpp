@@ -50,8 +50,8 @@ extern double DOUBLE_80332030;
 extern double DOUBLE_80332038;
 extern char DAT_80332024[];
 extern char DAT_8032ec70[];
-extern int DAT_8032ed70;
-extern char DAT_8032ed78;
+extern int gPppCalcDisabled;
+extern char gPppInConstructor;
 extern char s_pppChangeTex_cpp_801dd660[];
 
 extern "C" {
@@ -324,7 +324,7 @@ void pppDestructChangeTex(pppChangeTex* changeTex, pppChangeTexUnkC* data)
  */
 void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChangeTexUnkC* data)
 {
-	if (DAT_8032ed70 != 0) {
+	if (gPppCalcDisabled != 0) {
 		return;
 	}
 
@@ -430,7 +430,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 		}
 	}
 
-	if (DAT_8032ed78 == 0) {
+	if (gPppInConstructor == 0) {
 		float currentValue = value[0] * (value[15] - value[11]) + value[11];
 		short splitY = (short)(int)(currentValue * (float)((double)(1 << *(int*)(*(int*)(model0 + 0xA4) + 0x34)) - DOUBLE_80332030));
 		if (value[17] != currentValue) {

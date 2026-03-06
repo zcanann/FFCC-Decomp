@@ -5,7 +5,7 @@
 extern "C" void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern "C" float RandF__5CMathFv(CMath*);
-extern s32 DAT_8032ed70;
+extern int gPppCalcDisabled;
 extern float lbl_80330448;
 extern float FLOAT_80330458;
 extern float FLOAT_8033045c;
@@ -299,7 +299,7 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirth* work, PRyjMegaBirth* par
 	emitRate = *(u16*)(paramPayload + 0xB4);
 	emitPerFrame = *(u16*)(paramPayload + 0xB6);
 
-	if ((DAT_8032ed70 == 0) && (paramPayload[0x16] != 0))
+	if ((gPppCalcDisabled == 0) && (paramPayload[0x16] != 0))
 	{
 		work->m_emitTimer = work->m_emitTimer + 1;
 

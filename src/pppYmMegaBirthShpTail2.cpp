@@ -18,7 +18,7 @@ extern "C" void pppSetBlendMode__FUc(unsigned char);
 extern "C" void pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(void*, void*, unsigned char);
 extern float lbl_80330560;
 extern pppFMATRIX g_matUnit2;
-extern s32 DAT_8032ed70;
+extern int gPppCalcDisabled;
 
 static char s_pppYmMegaBirthShpTail2_cpp_801d9c68[] = "pppYmMegaBirthShpTail2.cpp";
 
@@ -457,7 +457,7 @@ void pppFrameYmMegaBirthShpTail2(pppYmMegaBirthShpTail2* object, PYmMegaBirthShp
         break;
     }
 
-    if ((DAT_8032ed70 != 0) || (paramPayload[0x16] == 0)) {
+    if ((gPppCalcDisabled != 0) || (paramPayload[0x16] == 0)) {
         return;
     }
 

@@ -18,7 +18,7 @@ extern char MaterialMan[];
 extern _pppMngStYmChangeTex* pppMngStPtr;
 extern _pppEnvStYmChangeTex* pppEnvStPtr;
 extern float DAT_80330e10;
-extern int DAT_8032ed70;
+extern int gPppCalcDisabled;
 extern char DAT_8032ec70[];
 extern char s_pppYmChangeTex_cpp_801db4c0[];
 extern float FLOAT_80330df8;
@@ -269,7 +269,7 @@ void pppDestructYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexData* dat
  */
 void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, pppYmChangeTexData* data)
 {
-	if (DAT_8032ed70 != 0) {
+	if (gPppCalcDisabled != 0) {
 		return;
 	}
 

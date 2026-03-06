@@ -3,10 +3,10 @@
 #include "dolphin/types.h"
 
 extern CMath math[];
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern float lbl_80330060;
 static f64 const lbl_80330068 = 4503601774854144.0;
-extern u8 lbl_801EADC8[];
+extern u8 gPppDefaultValueBuffer[];
 extern "C" float RandF__5CMathFv(CMath* instance);
 
 struct PppSRandCVParam2 {
@@ -40,7 +40,7 @@ extern "C" void pppSRandCV(void* param1, void* param2, void* param3)
     PppSRandCVParam3* out = (PppSRandCVParam3*)param3;
     u8* color;
 
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 
@@ -100,7 +100,7 @@ extern "C" void pppSRandCV(void* param1, void* param2, void* param3)
     }
 
     s32 colorOffset = in->field4;
-    color = (colorOffset == -1) ? lbl_801EADC8 : (u8*)(base + colorOffset + 0x80);
+    color = (colorOffset == -1) ? gPppDefaultValueBuffer : (u8*)(base + colorOffset + 0x80);
 
     s8 baseValue = in->field8;
     color[0] = (u8)(color[0] + (s32)((f32)baseValue * target[0] - (f32)baseValue));

@@ -2,7 +2,7 @@
 #include "ffcc/partMng.h"
 #include "dolphin/mtx.h"
 
-extern int DAT_8032ed70;
+extern int gPppCalcDisabled;
 extern float lbl_80330E40;
 
 extern "C" {
@@ -75,7 +75,7 @@ void pppFrameYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkB* par
 	Vec local_2c;
 	Vec local_20;
 
-	if (DAT_8032ed70 != 0) {
+	if (gPppCalcDisabled != 0) {
 		return;
 	}
 

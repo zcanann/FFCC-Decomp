@@ -3,10 +3,10 @@
 #include "types.h"
 
 extern CMath math[];
-extern s32 lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern f32 lbl_8032FFE8;
 extern f64 lbl_8032FFF0;
-extern u8 lbl_801EADC8[32];
+extern u8 gPppDefaultValueBuffer[32];
 extern "C" f32 RandF__5CMathFv(CMath* instance);
 
 struct RandUpCVParam {
@@ -38,7 +38,7 @@ void pppRandUpCV(void* param1, void* param2, void* param3)
     u8* target;
     f32* valuePtr;
 
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 
@@ -57,7 +57,7 @@ void pppRandUpCV(void* param1, void* param2, void* param3)
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
     }
 
-    target = (in->sourceOffset == -1) ? &lbl_801EADC8[0] : (u8*)(base + in->sourceOffset + 0x80);
+    target = (in->sourceOffset == -1) ? &gPppDefaultValueBuffer[0] : (u8*)(base + in->sourceOffset + 0x80);
 
     {
         f32 scale = *valuePtr;

@@ -9,7 +9,7 @@
 #include <math.h>
 #include <string.h>
 
-extern int DAT_8032ed70;
+extern int gPppCalcDisabled;
 extern float DAT_801db5b8;
 extern float DAT_801db5bc;
 extern float DAT_801db5c0;
@@ -142,7 +142,7 @@ void pppFrameCrystal(struct pppCrystal* pppCrystal, struct pppCrystalUnkB* param
 	u32 y;
 	u32 x;
 
-	if (DAT_8032ed70 != 0) {
+	if (gPppCalcDisabled != 0) {
 		return;
 	}
 

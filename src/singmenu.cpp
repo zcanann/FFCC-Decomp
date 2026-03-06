@@ -1826,9 +1826,43 @@ void CMenuPcs::SetSingWinInfo(int x, int y, int w, int h)
  * Address:	TODO
  * Size:	TODO
  */
-void CMenuPcs::SetSingDynamicWinMessInfo(int, char*, char*, char*, char*, char*, char*, char*, char*)
+void CMenuPcs::SetSingDynamicWinMessInfo(
+    int lineCount,
+    char* line0,
+    char* line1,
+    char* line2,
+    char* line3,
+    char* line4,
+    char* line5,
+    char* line6,
+    char* line7)
 {
-	// TODO
+    AStar.m_bestPath.m_pathLength = lineCount;
+
+    if (line0 != 0) {
+        strcpy(s_DynamicMessStr, line0);
+    }
+    if (line1 != 0) {
+        strcpy(s_DynamicMessStr + 0x80, line1);
+    }
+    if (line2 != 0) {
+        strcpy(s_DynamicMessStr + 0x100, line2);
+    }
+    if (line3 != 0) {
+        strcpy(s_DynamicMessStr + 0x180, line3);
+    }
+    if (line4 != 0) {
+        strcpy(s_DynamicMessStr + 0x200, line4);
+    }
+    if (line5 != 0) {
+        strcpy(s_DynamicMessStr + 0x280, line5);
+    }
+    if (line6 != 0) {
+        strcpy(s_DynamicMessStr + 0x300, line6);
+    }
+    if (line7 != 0) {
+        strcpy(s_DynamicMessStr + 0x380, line7);
+    }
 }
 
 /*

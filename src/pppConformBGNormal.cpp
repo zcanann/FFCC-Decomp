@@ -7,7 +7,7 @@
 #include "dolphin/gx.h"
 #include <math.h>
 
-extern s32 DAT_8032ed70;
+extern int gPppCalcDisabled;
 extern f32 lbl_80331908;
 extern f32 lbl_8033190C;
 extern f32 lbl_80331910;
@@ -111,7 +111,7 @@ void pppFrameConformBGNormal(struct pppConformBGNormal* pppConformBGNormal, stru
     Mtx basisMtx;
 
     pppMngSt = pppMngStPtr;
-    if (DAT_8032ed70 == 0) {
+    if (gPppCalcDisabled == 0) {
         owner = *(Vec**)((u8*)pppMngStPtr + 0xd8);
         hitFound = 0;
         matrixX = pppMngStPtr->m_matrix.value[0][3];

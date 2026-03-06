@@ -33,10 +33,10 @@ struct KeShpTailObject {
  */
 void pppKeShpTail(_pppPObject* obj, pppKeShpTailUnkB*, pppKeShpTailUnkC* offsets)
 {
-	extern int lbl_8032ED70;
+	extern int gPppCalcDisabled;
 	KeShpTailObject* tailObj = (KeShpTailObject*)obj;
 	KeShpTailWork* work;
-	if (lbl_8032ED70 != 0) {
+	if (gPppCalcDisabled != 0) {
 		return;
 	}
 

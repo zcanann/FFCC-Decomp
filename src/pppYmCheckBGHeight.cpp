@@ -5,7 +5,7 @@
 
 #include <dolphin/types.h>
 
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern struct _pppMngSt* pppMngStPtr;
 
 // Float constants (addresses from Ghidra)
@@ -48,7 +48,7 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(
 {
     _pppMngSt* pppMngSt = pppMngStPtr;
 
-    if (lbl_8032ED70 == 0) {
+    if (gPppCalcDisabled == 0) {
         Vec direction;
         CMapCylinder cyl;
         Vec hitPos;

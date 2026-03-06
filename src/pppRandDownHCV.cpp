@@ -3,8 +3,8 @@
 #include "types.h"
 
 extern CMath math[];
-extern s32 lbl_8032ED70;
-extern s16 lbl_801EADC8[];
+extern int gPppCalcDisabled;
+extern s16 gPppDefaultValueBuffer[];
 extern f32 lbl_8032FF48;
 static f64 const lbl_8032FF50 = 4503601774854144.0;
 
@@ -54,7 +54,7 @@ extern "C" void pppRandDownHCV(void* param1, void* param2, void* param3)
     s16* target;
     f32* valuePtr;
 
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 
@@ -74,7 +74,7 @@ extern "C" void pppRandDownHCV(void* param1, void* param2, void* param3)
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
 
-    target = (in->field4 == -1) ? &lbl_801EADC8[0] : (s16*)(base + in->field4 + 0x80);
+    target = (in->field4 == -1) ? &gPppDefaultValueBuffer[0] : (s16*)(base + in->field4 + 0x80);
 
     f32 scale = *valuePtr;
 

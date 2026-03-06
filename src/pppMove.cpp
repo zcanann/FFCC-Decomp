@@ -1,7 +1,7 @@
 #include "ffcc/pppMove.h"
 #include "ffcc/partMng.h"
 
-extern int lbl_8032ED70;   // Global enable flag
+extern int gPppCalcDisabled;   // Global enable flag
 extern float lbl_8032FED8; // Zero constant
 
 struct PppMoveObj {
@@ -51,7 +51,7 @@ void pppMove(void* basePtr, PppMoveInput* input, _pppCtrlTable* ctrlTable)
     PppMoveObj* a = (PppMoveObj*)((u8*)basePtr + offsets->a + 0x80);
     PppMoveObj* b = (PppMoveObj*)((u8*)basePtr + offsets->b + 0x80);
 
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

@@ -3,8 +3,8 @@
 #include "types.h"
 
 extern CMath math[];
-extern s32 lbl_8032ED70;
-extern u8 lbl_801EADC8[];
+extern int gPppCalcDisabled;
+extern u8 gPppDefaultValueBuffer[];
 extern f32 lbl_8032FF28;
 extern "C" f32 RandF__5CMathFv(CMath*);
 
@@ -40,7 +40,7 @@ extern "C" void pppRandDownCV(void* param1, void* param2, void* param3)
     u8* target;
     f32* valuePtr;
 
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 
@@ -60,7 +60,7 @@ extern "C" void pppRandDownCV(void* param1, void* param2, void* param3)
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
 
-    target = (in->field4 == -1) ? &lbl_801EADC8[0] : (u8*)(base + in->field4 + 0x80);
+    target = (in->field4 == -1) ? &gPppDefaultValueBuffer[0] : (u8*)(base + in->field4 + 0x80);
 
     f32 scale = *valuePtr;
     {

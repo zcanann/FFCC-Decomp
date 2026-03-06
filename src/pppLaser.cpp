@@ -21,7 +21,7 @@ extern const f32 FLOAT_8033342c;
 extern const f32 FLOAT_80333430;
 extern const f64 DOUBLE_80333440;
 extern const f64 DOUBLE_80333438;
-extern s32 DAT_8032ed70;
+extern int gPppCalcDisabled;
 extern void* DAT_8032ec70;
 extern u32 CFlatFlags;
 extern CMapMng MapMng;
@@ -221,7 +221,7 @@ void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, stru
     Mtx charaMtx;
     Mtx tempMtx;
 
-    if ((DAT_8032ed70 != 0) || (step->m_stepValue == 1)) {
+    if ((gPppCalcDisabled != 0) || (step->m_stepValue == 1)) {
         return;
     }
 

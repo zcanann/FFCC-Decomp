@@ -18,7 +18,7 @@ struct _pppPointApStep {
     u8 m_useWorldMatrix;
 };
 
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 
 /*
  * --INFO--
@@ -52,7 +52,7 @@ void pppPointAp(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
     Vec* src = (Vec*)((u8*)pObject + data->srcOffset + 0x80);
     _pppPointApStep* payload = (_pppPointApStep*)step;
 
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

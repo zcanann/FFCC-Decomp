@@ -15,7 +15,7 @@ extern float lbl_803320C8;
 extern float lbl_803320CC;
 extern float lbl_803320D0;
 extern CUtil lbl_8032EC70;
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 
 struct _pppFilterSerializedData {
     unsigned int m_unk80;
@@ -66,7 +66,7 @@ void pppDestructFilter(_pppPObjLink*, _pppCtrlTable*)
  */
 void pppFrameFilter(_pppPObject*, void*, _pppCtrlTable*)
 {
-	volatile int* stateFlag = &lbl_8032ED70;
+	volatile int* stateFlag = &gPppCalcDisabled;
 	if (*stateFlag == 0) {
 		return;
 	}

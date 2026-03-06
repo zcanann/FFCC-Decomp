@@ -8,7 +8,7 @@ extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void*);
 extern "C" float RandF__5CMathFv(CMath*);
 extern "C" void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
 
-extern s32 DAT_8032ed70;
+extern int gPppCalcDisabled;
 extern float FLOAT_80330498;
 extern float FLOAT_8033049c;
 extern float FLOAT_803304a0;
@@ -188,7 +188,7 @@ void calc_particle(_pppPObject* pObject, VRyjMegaBirthModel* work, PRyjMegaBirth
     maxParticles = *(s32*)((u8*)work + 0x18);
     emitTimer = (u16*)((u8*)work + 0x1C);
 
-    if (DAT_8032ed70 == 0) {
+    if (gPppCalcDisabled == 0) {
         *(float*)((u8*)work + 0x20) = *(float*)((u8*)work + 0x2C);
         *(float*)((u8*)work + 0x24) = *(float*)((u8*)work + 0x30);
         *(float*)((u8*)work + 0x28) = *(float*)((u8*)work + 0x34);

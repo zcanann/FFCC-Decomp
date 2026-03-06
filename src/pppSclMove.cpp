@@ -1,7 +1,7 @@
 #include "ffcc/pppSclMove.h"
 #include <dolphin/mtx.h>
 
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern float lbl_80330058;
 
 /*
@@ -39,7 +39,7 @@ void pppSclMove(void* param1, void* param2, void* param3)
     float* dataA = (float*)((char*)param1 + data2[0] + 0x80);
     float* dataB = (float*)((char*)param1 + data2[1] + 0x80);
 
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

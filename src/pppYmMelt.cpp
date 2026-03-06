@@ -6,7 +6,7 @@
 #include "ffcc/maphit.h"
 #include "dolphin/mtx.h"
 
-extern int DAT_8032ed70;
+extern int gPppCalcDisabled;
 extern float lbl_80330AF0;
 extern float FLOAT_80330af0;
 extern float FLOAT_80330af4;
@@ -232,7 +232,7 @@ void pppFrameYmMelt(PYmMelt* ymMelt, YmMeltCtrl* ctrl, PYmMeltDataOffsets* offse
 {
     static char s_pppYmMelt_cpp[] = "pppYmMelt.cpp";
 
-    if (DAT_8032ed70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

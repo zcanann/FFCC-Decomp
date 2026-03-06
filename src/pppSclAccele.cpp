@@ -1,6 +1,6 @@
 #include "ffcc/pppSclAccele.h"
 
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern float lbl_80330050;
 
 typedef struct {
@@ -54,7 +54,7 @@ void pppSclAccele(void* arg1, void* arg2, void* arg3)
     float* scale = (float*)((char*)arg1 + config->m_offsets[0] + 0x80);
     float* accel = (float*)((char*)arg1 + config->m_offsets[1] + 0x80);
 
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

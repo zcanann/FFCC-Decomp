@@ -172,7 +172,7 @@ void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraF
 	float* value;
 	int modelPtr;
 
-	if (lbl_8032ED70 == 0) {
+	if (gPppCalcDisabled == 0) {
 		value = (float*)((char*)constrainCameraForLoc + 0x80 + data->m_serializedDataOffsets[2]);
 		CGObject* obj = *(CGObject**)(lbl_8032ED50 + 0xd8);
 		modelPtr = GetModelPtr__FP8CGObject(obj);

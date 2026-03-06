@@ -3,8 +3,8 @@
 #include "dolphin/types.h"
 
 extern CMath math[];
-extern int lbl_8032ED70;
-extern u8 lbl_801EADC8[];
+extern int gPppCalcDisabled;
+extern u8 gPppDefaultValueBuffer[];
 extern float lbl_803300B0;
 extern "C" float RandF__5CMathFv(CMath* instance);
 
@@ -31,7 +31,7 @@ struct SRandUpCVCtx {
  */
 void pppSRandUpCV(void* param1, void* param2, void* param3)
 {
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 
@@ -90,7 +90,7 @@ void pppSRandUpCV(void* param1, void* param2, void* param3)
     }
 
     s32 color_offset = in->sourceOffset;
-    u8* target_colors = (color_offset == -1) ? lbl_801EADC8 : (base + color_offset + 0x80);
+    u8* target_colors = (color_offset == -1) ? gPppDefaultValueBuffer : (base + color_offset + 0x80);
 
     {
         s8 deltaBase = in->delta[0];

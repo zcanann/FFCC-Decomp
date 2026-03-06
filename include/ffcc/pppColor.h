@@ -19,7 +19,7 @@ struct _pppColorWork
 }; // Size 0xC
 
 // External data references used by pppColor
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern unsigned char* lbl_8032ED50;
 extern double lbl_8032FED0;
 

@@ -7,7 +7,7 @@
 #include <dolphin/types.h>
 #include <string.h>
 
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern float lbl_80330500;
 extern float lbl_80330504;
 extern unsigned char* lbl_8032ED50;
@@ -91,7 +91,7 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
     KeShpTail2XObject* tailObj;
     Vec pos;
 
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

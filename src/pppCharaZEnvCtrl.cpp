@@ -2,7 +2,7 @@
 #include "ffcc/partMng.h"
 #include "dolphin/gx/GXPixel.h"
 
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern u8* lbl_8032ED50;
 
 extern "C" {
@@ -21,7 +21,7 @@ int GetCharaModelPtr__FPQ29CCharaPcs7CHandle(void* handle);
  */
 void pppFrameCharaZEnvCtrl(pppCharaZEnvCtrl* pppCharaZEnvCtrl, pppCharaZEnvCtrlUnkB* param_2, _pppCtrlTable* param_3)
 {
-	if (lbl_8032ED70 != 0) {
+	if (gPppCalcDisabled != 0) {
 		return;
 	}
 

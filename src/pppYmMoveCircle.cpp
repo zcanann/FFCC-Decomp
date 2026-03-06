@@ -1,8 +1,9 @@
 #include "ffcc/pppYmMoveCircle.h"
 #include "ffcc/pppPart.h"
+#include "ffcc/partMng.h"
 #include "types.h"
 #include "dolphin/mtx.h"
-#include <math.h>
+#include "math.h"
 
 struct pppYmMoveCircleWork {
     f32 m_angle;
@@ -41,11 +42,11 @@ extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCirc
 {
     Vec tempUp;
     Vec temp1;
-    u8* pppMngSt;
+    _pppMngSt* pppMngSt;
     s32 offset;
     pppYmMoveCircleWork* work;
 
-    pppMngSt = lbl_8032ED50;
+    pppMngSt = pppMngStPtr;
     offset = offsetData->m_serializedDataOffsets[0];
     work = (pppYmMoveCircleWork*)((u8*)basePtr + offset + 0x80);
 
@@ -53,7 +54,7 @@ extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCirc
     tempUp.y = 1.0f;
     tempUp.z = 0.0f;
 
-    PSVECSubtract((Vec*)(pppMngSt + 0x68), (Vec*)(pppMngSt + 0x58), &temp1);
+    PSVECSubtract((Vec*)((u8*)pppMngSt + 0x68), (Vec*)((u8*)pppMngSt + 0x58), &temp1);
     PSVECNormalize(&temp1, &temp1);
 
     work->m_angle = (f32)(lbl_80330D90 * acos((f64)PSVECDotProduct(&tempUp, &temp1)));
@@ -68,7 +69,7 @@ extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCirc
     work->m_angleStepStepStep = 0.0f;
     work->m_angleStepStep = 0.0f;
     work->m_angleStep = 0.0f;
-    pppCopyVector(work->m_center, *(Vec*)(pppMngSt + 0x58));
+    pppCopyVector(work->m_center, *(Vec*)((u8*)pppMngSt + 0x58));
     work->m_hasInit = 0;
 }
 
@@ -99,7 +100,7 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
 
     serializedDataOffsets = offsetData->m_serializedDataOffsets;
     work = (pppYmMoveCircleWork*)((u8*)basePtr + serializedDataOffsets[0] + 0x80);
-    pppMngSt = lbl_8032ED50;
+    pppMngSt = (u8*)pppMngStPtr;
 
     work->m_radiusStep += work->m_radiusStepStep;
     work->m_radius += work->m_radiusStep;
@@ -136,8 +137,8 @@ extern "C" void pppFrameYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleSt
     pppCopyVector(*(Vec*)(pppMngSt + 0x48), *(Vec*)(pppMngSt + 0x8));
     pppCopyVector(*(Vec*)(pppMngSt + 0x8), nextPos);
 
-    *(f32*)(lbl_8032ED50 + 0x84) = nextPos.x;
-    *(f32*)(lbl_8032ED50 + 0x94) = nextPos.y;
-    *(f32*)(lbl_8032ED50 + 0xA4) = nextPos.z;
+    *(f32*)((u8*)pppMngStPtr + 0x84) = nextPos.x;
+    *(f32*)((u8*)pppMngStPtr + 0x94) = nextPos.y;
+    *(f32*)((u8*)pppMngStPtr + 0xA4) = nextPos.z;
     pppSetFpMatrix((_pppMngSt*)pppMngSt);
 }

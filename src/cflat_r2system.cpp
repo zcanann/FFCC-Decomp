@@ -999,7 +999,7 @@ extern "C" int GetNumMes__9CFlatDataFv(void* flatData)
  */
 extern "C" int GetSysMes__5CGameFi(void* game, int index)
 {
-    return ((int*)((char*)game + 0x3CDC))[index + 1];
+    return ((int*)((char*)game + 0xD4))[index];
 }
 
 /*

@@ -50,7 +50,7 @@ void pppParHitSphMat(struct _pppPObject* param_1, int param_2, int param_3)
     }
 
     if (*(float*)(param_2 + 4) != lbl_80332080) {
-        PSVECSubtract((Vec*)(lbl_8032ED50 + 8), (Vec*)(lbl_8032ED50 + 0x48), &local_88);
+        PSVECSubtract((Vec*)((u8*)pppMngSt + 8), (Vec*)((u8*)pppMngSt + 0x48), &local_88);
     }
 
     radius = *(float*)((u8*)pppMngSt + 0x64) * *(float*)(param_2 + 8);

@@ -972,32 +972,64 @@ void GbaQueue::SetStageNo(int stageId, int mapId)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CFAFC
+ * PAL Size: 112b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::GetStageNo(int, int*, int*)
+void GbaQueue::GetStageNo(int channel, int* stageNo, int* mapNo)
 {
-	// TODO
+	char* obj = reinterpret_cast<char*>(this);
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	*stageNo = *reinterpret_cast<int*>(obj + 0x444);
+	*mapNo = *reinterpret_cast<int*>(obj + 0x448);
+	OSSignalSemaphore(accessSemaphores + channel);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CFA84
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::GetStageFlg(int)
+unsigned int GbaQueue::GetStageFlg(int channel)
 {
-	// TODO
+	unsigned int flag;
+	char stageFlg;
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	stageFlg = *(reinterpret_cast<char*>(this) + 0x44C);
+	flag = static_cast<unsigned int>(stageFlg) & static_cast<unsigned int>(1 << channel);
+	OSSignalSemaphore(accessSemaphores + channel);
+
+	return static_cast<unsigned int>((-static_cast<int>(flag) | static_cast<int>(flag)) >> 31);
 }
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CFA10
+ * PAL Size: 116b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::ClrStageFlg(int)
+void GbaQueue::ClrStageFlg(int channel)
 {
-	// TODO
+	unsigned char bitMask;
+	char* obj = reinterpret_cast<char*>(this);
+
+	OSWaitSemaphore(accessSemaphores + channel);
+	bitMask = static_cast<unsigned char>(1 << channel);
+	obj[0x44C] = static_cast<char>(obj[0x44C] & ~bitMask);
+	obj[0x2C89] = static_cast<char>(obj[0x2C89] | bitMask);
+	OSSignalSemaphore(accessSemaphores + channel);
 }
 
 /*
@@ -1113,12 +1145,26 @@ void GbaQueue::SetRadarType()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800CF6EC
+ * PAL Size: 120b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void GbaQueue::GetMBasePos(int, short*, short*)
+void GbaQueue::GetMBasePos(int channel, short* outX, short* outY)
 {
-	// TODO
+	unsigned int actualChannel;
+	char* obj = reinterpret_cast<char*>(this);
+
+	actualChannel = static_cast<unsigned int>(channel) &
+	                ~static_cast<unsigned int>(
+	                    (-obj[0x2D56] | obj[0x2D56]) >> 31);
+
+	OSWaitSemaphore(accessSemaphores + actualChannel);
+	*outX = *reinterpret_cast<short*>(obj + 0x454 + actualChannel * 0xDC + 0x32);
+	*outY = *reinterpret_cast<short*>(obj + 0x454 + actualChannel * 0xDC + 0x34);
+	OSSignalSemaphore(accessSemaphores + actualChannel);
 }
 
 /*

@@ -41,7 +41,7 @@ public:
     void SetSmithData(int, unsigned int);
     void SetStageNo(int, int);
     void GetStageNo(int, int*, int*);
-    void GetStageFlg(int);
+    unsigned int GetStageFlg(int);
     void ClrStageFlg(int);
     void SetRadarType();
     void GetMBasePos(int, short*, short*);

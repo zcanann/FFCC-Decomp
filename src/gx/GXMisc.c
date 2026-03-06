@@ -115,10 +115,10 @@ void GXSetDrawSync(u16 token) {
     CHECK_GXBEGIN(430, "GXSetDrawSync");
 
     enabled = OSDisableInterrupts();
-    reg = token | 0x48000000;
+    reg = ((u32)token & 0xFFFF) | 0x48000000;
     GX_WRITE_RAS_REG(reg);
-    SET_REG_FIELD(443, reg, 16, 0, token);
-    SET_REG_FIELD(443, reg, 8, 24, 0x47);
+    reg = (reg & ~0xFFFF) | ((u32)token & 0xFFFF);
+    reg = (reg & ~0xFF000000) | ((u32)0x47 << 24);
     GX_WRITE_RAS_REG(reg);
     GXFlush();
     OSRestoreInterrupts(enabled);

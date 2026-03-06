@@ -17,18 +17,6 @@ extern "C" int GetPadType__6JoyBusFi(void*, int);
 
 extern void* __vt__8CManager;
 extern void* PTR_PTR_s_CGraphicPcs_801e9e9c;
-
-extern u32 lbl_801E9C90[];
-extern u32 lbl_801E9C9C[];
-extern u32 lbl_801E9CA8[];
-extern u32 lbl_801E9CB4[];
-extern u32 lbl_801E9CC0[];
-extern u32 lbl_801E9CCC[];
-extern u32 lbl_801E9CD8[];
-extern u32 lbl_801E9CE4[];
-extern u32 lbl_801E9CF0[];
-extern u32 lbl_801E9CFC[];
-extern u32 lbl_801E9D08[];
 extern int DAT_802381a0;
 extern unsigned char MaterialMan[];
 extern unsigned char MaterialMan[];
@@ -62,37 +50,37 @@ extern "C" void __sinit_p_graphic_cpp(void)
     *base = &__vt__8CProcess;
     *base = &PTR_PTR_s_CGraphicPcs_801e9e9c;
 
-    u32* dst = lbl_801E9D08;
-    dst[1] = lbl_801E9C90[0];
-    dst[2] = lbl_801E9C90[1];
-    dst[3] = lbl_801E9C90[2];
-    dst[4] = lbl_801E9C9C[0];
-    dst[5] = lbl_801E9C9C[1];
-    dst[6] = lbl_801E9C9C[2];
-    dst[7] = lbl_801E9CA8[0];
-    dst[8] = lbl_801E9CA8[1];
-    dst[9] = lbl_801E9CA8[2];
-    dst[12] = lbl_801E9CB4[0];
-    dst[13] = lbl_801E9CB4[1];
-    dst[14] = lbl_801E9CB4[2];
-    dst[17] = lbl_801E9CC0[0];
-    dst[18] = lbl_801E9CC0[1];
-    dst[19] = lbl_801E9CC0[2];
-    dst[22] = lbl_801E9CCC[0];
-    dst[23] = lbl_801E9CCC[1];
-    dst[24] = lbl_801E9CCC[2];
-    dst[27] = lbl_801E9CD8[0];
-    dst[28] = lbl_801E9CD8[1];
-    dst[29] = lbl_801E9CD8[2];
-    dst[32] = lbl_801E9CE4[0];
-    dst[33] = lbl_801E9CE4[1];
-    dst[34] = lbl_801E9CE4[2];
-    dst[37] = lbl_801E9CF0[0];
-    dst[38] = lbl_801E9CF0[1];
-    dst[39] = lbl_801E9CF0[2];
-    dst[42] = lbl_801E9CFC[0];
-    dst[43] = lbl_801E9CFC[1];
-    dst[44] = lbl_801E9CFC[2];
+    u32* dst = m_table__11CGraphicPcs;
+    dst[1] = m_table_desc0__11CGraphicPcs[0];
+    dst[2] = m_table_desc0__11CGraphicPcs[1];
+    dst[3] = m_table_desc0__11CGraphicPcs[2];
+    dst[4] = m_table_desc1__11CGraphicPcs[0];
+    dst[5] = m_table_desc1__11CGraphicPcs[1];
+    dst[6] = m_table_desc1__11CGraphicPcs[2];
+    dst[7] = m_table_desc2__11CGraphicPcs[0];
+    dst[8] = m_table_desc2__11CGraphicPcs[1];
+    dst[9] = m_table_desc2__11CGraphicPcs[2];
+    dst[12] = m_table_desc3__11CGraphicPcs[0];
+    dst[13] = m_table_desc3__11CGraphicPcs[1];
+    dst[14] = m_table_desc3__11CGraphicPcs[2];
+    dst[17] = m_table_desc4__11CGraphicPcs[0];
+    dst[18] = m_table_desc4__11CGraphicPcs[1];
+    dst[19] = m_table_desc4__11CGraphicPcs[2];
+    dst[22] = m_table_desc5__11CGraphicPcs[0];
+    dst[23] = m_table_desc5__11CGraphicPcs[1];
+    dst[24] = m_table_desc5__11CGraphicPcs[2];
+    dst[27] = m_table_desc6__11CGraphicPcs[0];
+    dst[28] = m_table_desc6__11CGraphicPcs[1];
+    dst[29] = m_table_desc6__11CGraphicPcs[2];
+    dst[32] = m_table_desc7__11CGraphicPcs[0];
+    dst[33] = m_table_desc7__11CGraphicPcs[1];
+    dst[34] = m_table_desc7__11CGraphicPcs[2];
+    dst[37] = m_table_desc8__11CGraphicPcs[0];
+    dst[38] = m_table_desc8__11CGraphicPcs[1];
+    dst[39] = m_table_desc8__11CGraphicPcs[2];
+    dst[42] = m_table_desc9__11CGraphicPcs[0];
+    dst[43] = m_table_desc9__11CGraphicPcs[1];
+    dst[44] = m_table_desc9__11CGraphicPcs[2];
 }
 
 /*
@@ -136,7 +124,7 @@ void CGraphicPcs::Quit()
  */
 int CGraphicPcs::GetTable(unsigned long index)
 {
-    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(lbl_801E9D08) + index * 0x15C);
+    return reinterpret_cast<int>(reinterpret_cast<unsigned char*>(m_table__11CGraphicPcs) + index * 0x15C);
 }
 
 /*

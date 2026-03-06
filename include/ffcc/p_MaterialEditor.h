@@ -56,5 +56,10 @@ public:
 };
 
 extern __declspec(section ".data") CMaterialEditorPcs MaterialEditorPcs;
+extern unsigned int m_table_desc0__18CMaterialEditorPcs[];
+extern unsigned int m_table_desc1__18CMaterialEditorPcs[];
+extern unsigned int m_table_desc2__18CMaterialEditorPcs[];
+extern unsigned int m_table_desc3__18CMaterialEditorPcs[];
+extern unsigned char m_table__18CMaterialEditorPcs[];
 
 #endif // _FFCC_P_MATERIALEDITOR_H_

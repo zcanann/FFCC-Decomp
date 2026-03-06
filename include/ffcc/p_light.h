@@ -117,5 +117,11 @@ public:
 
 void setchanctrl(CLightPcs::TARGET, unsigned long);
 extern CLightPcs LightPcs;
+extern unsigned int m_table_desc0__9CLightPcs[];
+extern unsigned int m_table_desc1__9CLightPcs[];
+extern unsigned int m_table_desc2__9CLightPcs[];
+extern unsigned int m_table_desc3__9CLightPcs[];
+extern unsigned int m_table_desc4__9CLightPcs[];
+extern unsigned int m_table__9CLightPcs[];
 
 #endif // _FFCC_P_LIGHT_H_

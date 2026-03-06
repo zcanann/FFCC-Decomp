@@ -3,9 +3,9 @@
 #include "dolphin/types.h"
 
 extern CMath math[];
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern float lbl_80330008;
-extern s16 lbl_801EADC8[];
+extern s16 gPppDefaultValueBuffer[];
 extern "C" float RandF__5CMathFv(CMath* instance);
 static f64 const lbl_80330010 = 4503601774854144.0;
 
@@ -33,7 +33,7 @@ typedef struct RandUpHCVCtx {
  */
 extern "C" void pppRandUpHCV(void* p1, void* p2, void* p3)
 {
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 
@@ -57,7 +57,7 @@ extern "C" void pppRandUpHCV(void* p1, void* p2, void* p3)
         valuePtr = (f32*)(base + *ctx->outputOffset + 0x80);
     }
 
-    s16* target = (params->colorOffset == -1) ? &lbl_801EADC8[0] : (s16*)(base + params->colorOffset + 0x80);
+    s16* target = (params->colorOffset == -1) ? &gPppDefaultValueBuffer[0] : (s16*)(base + params->colorOffset + 0x80);
 
     f32 scale = *valuePtr;
 

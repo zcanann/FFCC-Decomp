@@ -12,7 +12,7 @@ extern f32 FLOAT_803306ec;
 extern u32 DAT_803306e0;
 extern u32 DAT_803306e4;
 extern f64 DOUBLE_803306f8;
-extern s32 DAT_8032ed70;
+extern int gPppCalcDisabled;
 extern s32 DAT_801eadc8;
 extern CUtil DAT_8032ec70;
 
@@ -157,7 +157,7 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
     TRACE_POLYGON* entries;
     u16 maxCount;
 
-    if (DAT_8032ed70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

@@ -3,8 +3,8 @@
 #include "ffcc/pppConstrainCameraDir.h"
 #include <dolphin/mtx.h>
 
-extern int DAT_8032ed70;
-extern char DAT_8032ed78;
+extern int gPppCalcDisabled;
+extern char gPppInConstructor;
 extern _pppMngSt* pppMngStPtr;
 extern struct {
     float _224_4_, _228_4_, _232_4_, _236_4_, _240_4_, _244_4_, _252_4_;
@@ -54,7 +54,7 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
 	Mtx MStack_84;
 
 	pppMngSt = pppMngStPtr;
-	if (DAT_8032ed70 == 0) {
+	if (gPppCalcDisabled == 0) {
 		value = (float*)((char*)param_1 + *param_3->m_serializedDataOffsets + 0x80);
 		flags = (unsigned char*)&param_2->m_arg3;
 		
@@ -68,7 +68,7 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
 			&param_2->m_initWOrk,
 			&param_2->m_stepValue);
 
-		if ((DAT_8032ed78 != 1) && ((flags[1] != 0 || flags[0] != 0))) {
+		if ((gPppInConstructor != 1) && ((flags[1] != 0 || flags[0] != 0))) {
 			
 			local_cc = CameraPcs._236_4_;
 			local_c8 = CameraPcs._240_4_;

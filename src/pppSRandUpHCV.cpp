@@ -3,9 +3,9 @@
 #include "dolphin/types.h"
 
 extern CMath math[];
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern float lbl_803300C8;
-extern s16 lbl_801EADC8[];
+extern s16 gPppDefaultValueBuffer[];
 extern "C" float RandF__5CMathFv(CMath* instance);
 
 /*
@@ -19,7 +19,7 @@ extern "C" float RandF__5CMathFv(CMath* instance);
  */
 void pppSRandUpHCV(void* param1, void* param2, void* param3)
 {
-	if (lbl_8032ED70 != 0) {
+	if (gPppCalcDisabled != 0) {
 		return;
 	}
 
@@ -86,7 +86,7 @@ void pppSRandUpHCV(void* param1, void* param2, void* param3)
 	s16* target_colors;
 	int color_offset = *((int*)param2 + 1);
 	if (color_offset == -1) {
-		target_colors = lbl_801EADC8;
+		target_colors = gPppDefaultValueBuffer;
 	} else {
 		target_colors = (s16*)((char*)param1 + color_offset + 0x80);
 	}

@@ -3,10 +3,10 @@
 #include "types.h"
 
 extern CMath math[];
-extern s32 lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern f32 lbl_8032FFC8;
 extern f64 lbl_8032FFD0;
-extern s16 lbl_801EADC8[];
+extern s16 gPppDefaultValueBuffer[];
 
 extern "C" {
 f32 RandF__5CMathFv(CMath*);
@@ -40,7 +40,7 @@ void pppRandShort(void* param1, void* param2, void* param3)
     PppRandShortParam3* out = (PppRandShortParam3*)param3;
     f32* valuePtr;
 
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 
@@ -63,7 +63,7 @@ void pppRandShort(void* param1, void* param2, void* param3)
         valuePtr = (f32*)(base + *out->fieldC + 0x80);
     }
 
-    s16* target = (in->field4 == -1) ? lbl_801EADC8 : (s16*)(base + in->field4 + 0x80);
+    s16* target = (in->field4 == -1) ? gPppDefaultValueBuffer : (s16*)(base + in->field4 + 0x80);
     f32 delta = ((f32)in->field8 * *valuePtr) - (f32)in->field8;
     *target = (s16)(*target + (s16)delta);
 }

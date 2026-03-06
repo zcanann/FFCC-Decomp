@@ -3,10 +3,10 @@
 #include "types.h"
 
 extern CMath math[];
-extern s32 lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern f32 lbl_8032FEF8;
 extern f64 lbl_8032FF00;
-extern u8 lbl_801EADC8[32];
+extern u8 gPppDefaultValueBuffer[32];
 extern "C" f32 RandF__5CMathFv(CMath* instance);
 
 struct RandCharParam {
@@ -38,7 +38,7 @@ extern "C" void pppRandChar(void* param1, void* param2, void* param3)
     u8* target;
     f32* valuePtr;
 
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 
@@ -61,7 +61,7 @@ extern "C" void pppRandChar(void* param1, void* param2, void* param3)
     }
 
     s32 colorOffset = in->sourceOffset;
-    target = (colorOffset == -1) ? lbl_801EADC8 : (u8*)(base + colorOffset + 0x80);
+    target = (colorOffset == -1) ? gPppDefaultValueBuffer : (u8*)(base + colorOffset + 0x80);
 
     u8 scale = in->scale;
     s32 delta = (s32)((f32)scale * *valuePtr - (f32)scale);

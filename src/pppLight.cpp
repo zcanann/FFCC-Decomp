@@ -5,11 +5,11 @@ extern float lbl_80330F60;
 extern float lbl_80330F64;
 extern float lbl_80330F68;
 extern float lbl_80330F6C;
-extern int lbl_8032ED70;
-extern unsigned char lbl_8032ED78;
-extern unsigned char lbl_8032ED79;
+extern int gPppCalcDisabled;
+extern unsigned char gPppInConstructor;
+extern unsigned char gPppInSubFrameCalc;
 extern unsigned char* lbl_8032ED50;
-extern unsigned char lbl_801EADC8[];
+extern unsigned char gPppDefaultValueBuffer[];
 
 extern "C" {
 void __ct__Q29CLightPcs6CLightFv(void*);
@@ -102,7 +102,7 @@ void pppLight(void* param1, void* param2, void* param3)
 	unsigned char* lightParam = (unsigned char*)param2;
 	unsigned char* pppMng = (unsigned char*)param1;
 
-	if (lbl_8032ED70 != 0) {
+	if (gPppCalcDisabled != 0) {
 		return;
 	}
 
@@ -200,7 +200,7 @@ void pppLight(void* param1, void* param2, void* param3)
 			*(int*)(lightData + 0x58) = 0;
 		}
 
-		if (lbl_8032ED78 == 0 && lbl_8032ED79 == 0) {
+		if (gPppInConstructor == 0 && gPppInSubFrameCalc == 0) {
 			if (lightParam[0x58] == 0) {
 				*(int*)(lightData + 0x8) = 0;
 				*(float*)(lightData + 0x40) = lbl_80330F60;
@@ -214,7 +214,7 @@ void pppLight(void* param1, void* param2, void* param3)
 
 				*(int*)(lightData + 0x8) = 1;
 				if (*(int*)(lightParam + 0x44) == -1) {
-					obj = lbl_801EADC8;
+					obj = gPppDefaultValueBuffer;
 				} else {
 					obj = *(unsigned char**)(*(unsigned char**)(lbl_8032ED50 + 0xd4) + (*(int*)(lightParam + 0x44) << 4) + 0x4);
 				}

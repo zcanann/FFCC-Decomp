@@ -1,6 +1,6 @@
 #include "ffcc/pppColAccele.h"
 
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 
 /*
  * --INFO--
@@ -23,7 +23,7 @@ void pppColAccele(_pppPObject* obj1, void* data1, _pppPObject* obj2)
     short* accel2 = (short*)((char*)obj1 + (int)ptr4 + 0x80);
     
     // Early return if global flag is set
-    if (lbl_8032ED70 != 0)
+    if (gPppCalcDisabled != 0)
         return;
     
     // Check frame data match

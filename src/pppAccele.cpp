@@ -1,6 +1,6 @@
 #include "ffcc/pppAccele.h"
 
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern float lbl_8032FEC8;
 
 /*
@@ -36,7 +36,7 @@ void pppAccele(pppAcceleObj* obj, pppAcceleUnkB* param_2, pppAcceleUnkC* param_3
 	float* pfVar1 = (float*)((char*)obj + *param_3->m_serializedDataOffsets + 0x80);
 	float* pfVar2 = (float*)((char*)obj + param_3->m_serializedDataOffsets[1] + 0x80);
 
-	if (lbl_8032ED70 != 0) {
+	if (gPppCalcDisabled != 0) {
 		return;
 	}
 

@@ -17,7 +17,7 @@ extern "C" void SetFrame__Q26CChara6CModelFf(float, CChara::CModel*);
 extern "C" void CalcMatrix__Q26CChara6CModelFv(CChara::CModel*);
 
 // External data references
-extern int DAT_8032ed70;
+extern int gPppCalcDisabled;
 extern float FLOAT_80330f48;
 extern float FLOAT_80330f4c;
 extern double DOUBLE_80330f58;
@@ -130,7 +130,7 @@ extern "C" void pppFrameLocationTitle2(struct pppLocationTitle2* locationTitle, 
     LocationTitle2Work* work;
     u32 graphId;
 
-    if (DAT_8032ed70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

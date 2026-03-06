@@ -15,7 +15,7 @@ static inline int* GetColumSerializedDataOffsets(void* param) {
     return *(int**)((char*)param + 0xc);
 }
 
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern CMath Math;
 extern void* DAT_8032ec70;
 
@@ -170,7 +170,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
  */
 void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_3)
 {
-    if (lbl_8032ED70 == 0) {
+    if (gPppCalcDisabled == 0) {
         int* serializedDataOffsets = GetColumSerializedDataOffsets(param_3);
         unsigned char* work = (unsigned char*)((char*)column + 0x80 + serializedDataOffsets[3]);
         if (*(void**)(work + 8) == 0) {

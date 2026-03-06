@@ -81,7 +81,7 @@ void pppFrameCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* param
     long** shape;
     s32 shapeId;
 
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

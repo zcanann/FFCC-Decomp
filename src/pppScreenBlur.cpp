@@ -11,7 +11,7 @@ void RenderBlur__8CGraphicFiUcUcUcUcs(void* graphic, int enable, u8 r, u8 g, u8 
 extern char Graphic[];
 
 extern float ppvScreenMatrix[4][4];
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 
 /*
  * --INFO--
@@ -48,7 +48,7 @@ void pppRenderScreenBlur(pppScreenBlur* blur, pppScreenBlurUnkB* blurParam, _ppp
  */
 void pppFrameScreenBlur(_pppPObject*, void*, _pppCtrlTable*)
 {
-    if (lbl_8032ED70 == 0) {
+    if (gPppCalcDisabled == 0) {
         return;
     }
     return;

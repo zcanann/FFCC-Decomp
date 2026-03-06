@@ -3,7 +3,7 @@
 #include "ffcc/pppYmEnv.h"
 
 extern float lbl_80331FC8;
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern unsigned char CameraPcs[];
 
 extern "C" void SetQuakeParameter__10CCameraPcsFiissffffffi(
@@ -44,7 +44,7 @@ void pppRenderScreenQuake(pppScreenQuake*, pppScreenQuakeUnkB*, pppScreenQuakeUn
  */
 void pppFrameScreenQuake(pppScreenQuake *quake, pppScreenQuakeUnkB *param2, pppScreenQuakeUnkC *param3)
 {
-    if (lbl_8032ED70 == 0) {
+    if (gPppCalcDisabled == 0) {
         float *value = (float *)((char *)quake + 0x80 + *param3->m_serializedDataOffsets);
 
         CalcGraphValue((_pppPObject *)&quake->field0_0x0, param2->m_graphId, value[0], value[1], value[2], param2->m_dataValIndex, param2->m_initWOrk, param2->m_stepValue);

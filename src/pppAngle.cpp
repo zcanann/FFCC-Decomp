@@ -1,7 +1,7 @@
 #include "ffcc/pppAngle.h"
 #include "ffcc/partMng.h"
 
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 
 /*
  * --INFO--
@@ -10,7 +10,7 @@ extern int lbl_8032ED70;
  */
 void pppAngle(void* dest, void* src, _pppCtrlTable* ctrlTable)
 {
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

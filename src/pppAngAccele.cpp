@@ -1,6 +1,6 @@
 #include "ffcc/pppAngAccele.h"
 
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 
 /*
  * --INFO--
@@ -16,7 +16,7 @@ void pppAngAccele(pppAngAcceleObj* obj, pppAngAcceleUnkB* param_2, pppAngAcceleU
     int* angularVelocity = (int*)((char*)obj + *param_3->m_serializedDataOffsets + 0x80);
     int* angularAccel = (int*)((char*)obj + param_3->m_serializedDataOffsets[1] + 0x80);
 
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

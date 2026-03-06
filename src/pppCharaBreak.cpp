@@ -17,8 +17,8 @@ extern _pppMngStCharaBreak* pppMngStPtr;
 extern struct _pppEnvSt {
     CMemory::CStage* m_stagePtr;
 } *pppEnvStPtr;
-extern s32 DAT_8032ed70;
-extern u8 DAT_8032ed78;
+extern int gPppCalcDisabled;
+extern u8 gPppInConstructor;
 extern char DAT_8032ec70[];
 extern char MaterialMan[];
 extern CGraphic Graphic;
@@ -746,7 +746,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
     u32 meshCount;
     u32 i;
 
-    if (DAT_8032ed70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 
@@ -886,7 +886,7 @@ void pppFrameCharaBreak(pppCharaBreak* charaBreak, CharaBreakUnkB* step, CharaBr
         }
     }
 
-    if (DAT_8032ed78 == 0) {
+    if (gPppInConstructor == 0) {
         UpdatePolygonData((PCharaBreak*)step, (VCharaBreak*)work, (CChara::CModel*)model);
     }
     return;

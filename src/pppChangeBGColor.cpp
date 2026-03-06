@@ -1,7 +1,7 @@
 #include "ffcc/pppChangeBGColor.h"
 
 // External global variables 
-extern int DAT_8032ed70;
+extern int gPppCalcDisabled;
 extern unsigned char MapMng[];
 
 /*
@@ -20,7 +20,7 @@ void pppFrameChangeBGColor(struct pppChangeBGColor* pppChangeBGColor, struct ppp
 	unsigned char* data;
 	unsigned char* mapMng;
 
-	if (DAT_8032ed70 != 0) {
+	if (gPppCalcDisabled != 0) {
 		return;
 	}
 

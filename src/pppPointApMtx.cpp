@@ -3,7 +3,7 @@
 #include "ffcc/pppPart.h"
 #include <dolphin/mtx.h>
 
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern u8* lbl_8032ED50;
 
 struct pppPointApMtxStep {
@@ -31,7 +31,7 @@ void pppPointApMtx(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
 	Vec* source = (Vec*)((u8*)pObject + offsets[0] + 0x80);
 	Mtx* target = (Mtx*)((u8*)pObject + offsets[1] + 0x80);
 
-	if (lbl_8032ED70 != 0) {
+	if (gPppCalcDisabled != 0) {
 		return;
 	}
 

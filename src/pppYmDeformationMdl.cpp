@@ -6,8 +6,8 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-extern int lbl_8032ED70;
-extern u8 lbl_8032ED78;
+extern int gPppCalcDisabled;
+extern u8 gPppInConstructor;
 
 extern float FLOAT_80330dac;
 
@@ -152,7 +152,7 @@ void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDef
 {
     s16* psVar1;
 
-    if ((lbl_8032ED70 == 0) &&
+    if ((gPppCalcDisabled == 0) &&
         ((psVar1 = (s16*)((u8*)pppYmDeformationMdl + 0x80 + param_3->m_serializedDataOffsets[2])),
          (param_2->m_dataValIndex != 0xFFFF))) {
         CalcGraphValue(
@@ -162,7 +162,7 @@ void pppFrameYmDeformationMdl(pppYmDeformationMdl* pppYmDeformationMdl, pppYmDef
             (_pppPObject*)pppYmDeformationMdl, param_2->m_graphId, *(float*)(psVar1 + 8), *(float*)(psVar1 + 10),
             *(float*)(psVar1 + 0xC), param_2->m_payload0, param_2->m_payload1, param_2->m_payload2);
 
-        if (lbl_8032ED78 == 0) {
+        if (gPppInConstructor == 0) {
             if (*(u8*)(psVar1 + 1) != 0) {
                 *psVar1 = *psVar1 + (int)*(float*)(psVar1 + 8);
                 if (*psVar1 > param_2->m_payload3) {

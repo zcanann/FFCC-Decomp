@@ -21,7 +21,7 @@ extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
 class CMaterialSet;
 extern "C" void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
-extern int DAT_8032ed70;
+extern int gPppCalcDisabled;
 extern unsigned char* pppEnvStPtr;
 extern unsigned char* pppMngStPtr;
 extern Mtx ppvCameraMatrix0;
@@ -359,7 +359,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
     groupTable = *(int**)((unsigned char*)vYmBreath + 0x3C);
     maxParticleCount = *(int*)((unsigned char*)vYmBreath + 0x40);
 
-    if ((DAT_8032ed70 != 0) || (*(int*)((unsigned char*)pYmBreath + 0xC) == 0xFFFF)) {
+    if ((gPppCalcDisabled != 0) || (*(int*)((unsigned char*)pYmBreath + 0xC) == 0xFFFF)) {
         return;
     }
 
@@ -503,7 +503,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
     Vec target;
     Vec hitVector;
 
-    if (DAT_8032ed70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

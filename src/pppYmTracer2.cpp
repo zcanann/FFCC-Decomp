@@ -21,7 +21,7 @@ extern "C" void _GXSetTevOp__F13_GXTevStageID10_GXTevMode(int, int);
 extern "C" void _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(int, int, int);
 extern "C" void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
 
-extern int DAT_8032ed70;
+extern int gPppCalcDisabled;
 extern int DAT_801eadc8;
 extern float FLOAT_80331840;
 extern float FLOAT_80331844;
@@ -171,7 +171,7 @@ void pppFrameYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, pp
     u32 uStack_3c;
     YmTracer2Step* step = (YmTracer2Step*)param_2;
 
-    if (DAT_8032ed70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

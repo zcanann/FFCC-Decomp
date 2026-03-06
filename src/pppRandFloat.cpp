@@ -3,9 +3,9 @@
 #include "types.h"
 
 extern CMath math[];
-extern s32 lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern f32 lbl_8032FF88;
-extern f32 lbl_801EADC8[];
+extern f32 gPppDefaultValueBuffer[];
 extern "C" float RandF__5CMathFv(CMath* instance);
 
 struct RandFloatParam {
@@ -38,7 +38,7 @@ void pppRandFloat(void* param1, void* param2, void* param3)
     u8* base;
     f32* valuePtr;
 
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 
@@ -63,7 +63,7 @@ void pppRandFloat(void* param1, void* param2, void* param3)
     }
 
     s32 sourceOffset = in->sourceOffset;
-    f32* source = (sourceOffset == -1) ? lbl_801EADC8 : (f32*)(base + sourceOffset + 0x80);
+    f32* source = (sourceOffset == -1) ? gPppDefaultValueBuffer : (f32*)(base + sourceOffset + 0x80);
 
     *source = *source + (in->blend * *valuePtr - in->blend);
 }

@@ -57,8 +57,8 @@ struct _pppEnvStYmDeformationScreen {
 	CMapMesh** m_mapMeshPtr;
 };
 
-extern int lbl_8032ED70;
-extern unsigned char lbl_8032ED78;
+extern int gPppCalcDisabled;
+extern unsigned char gPppInConstructor;
 extern CMath math[];
 extern char DAT_80238030[];
 extern CUtil DAT_8032ec70;
@@ -171,7 +171,7 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 	float cameraZ;
 	YmDeformationScreenStep* step;
 
-	if (lbl_8032ED70 == 0) {
+	if (gPppCalcDisabled == 0) {
 		step = (YmDeformationScreenStep*)param2;
 		serializedDataOffsets = ((YmDeformationScreenData*)param3)->m_serializedDataOffsets;
 		work = (float*)((char*)param1 + 0x80 + serializedDataOffsets[2]);
@@ -182,7 +182,7 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 		CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
 			param1, step->m_graphId, work + 5, work + 6, work + 7, step->m_payload0, &step->m_payload1, &step->m_payload2);
 
-		if (lbl_8032ED78 == 0) {
+		if (gPppInConstructor == 0) {
 			if (workBytes[6] != 0) {
 				*(s16*)(workBytes + 4) += (int)work[5];
 				if (*(s16*)(workBytes + 4) > step->m_payload3) {

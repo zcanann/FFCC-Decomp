@@ -4,7 +4,7 @@
 #include "dolphin/types.h"
 
 extern "C" {
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern void* lbl_8032ED54;
 void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
     void*, void*, float, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char, unsigned char);
@@ -65,7 +65,7 @@ void pppDrawMdlTs(struct _pppPObject* obj, struct PDrawMdlTs* data, struct _pppC
     float* texCoords = (float*)((char*)obj + (int)inner2 + 0x80);
     
     // Check global flag - return early if set
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
     

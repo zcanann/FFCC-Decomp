@@ -32,7 +32,7 @@ struct pppMngStBlurCharaRaw {
     void* m_charaObj;
 };
 
-extern int DAT_8032ed70;
+extern int gPppCalcDisabled;
 extern void* DAT_80238030;
 extern CUtil DAT_8032ec70;
 extern char MaterialMan[];
@@ -282,7 +282,7 @@ void pppFrameBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppBl
     void* handle;
     int model;
 
-    if (DAT_8032ed70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

@@ -3,9 +3,9 @@
 #include "dolphin/types.h"
 
 extern CMath math[];
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern float lbl_803300A0;
-extern s16 lbl_801EADC8[];
+extern s16 gPppDefaultValueBuffer[];
 extern "C" float RandF__5CMathFv(CMath* instance);
 
 struct PppSRandHCVParam2 {
@@ -38,7 +38,7 @@ void pppSRandHCV(void* data1, void* data2, void* data3)
 	PppSRandHCVParam2* in = (PppSRandHCVParam2*)data2;
 	PppSRandHCVParam3* out = (PppSRandHCVParam3*)data3;
 	s16* targetColor;
-	if (lbl_8032ED70 != 0) {
+	if (gPppCalcDisabled != 0) {
 		return;
 	}
 
@@ -98,7 +98,7 @@ void pppSRandHCV(void* data1, void* data2, void* data3)
 
 	s32 colorOffset = in->field4;
 	if (colorOffset == -1) {
-		targetColor = lbl_801EADC8;
+		targetColor = gPppDefaultValueBuffer;
 	} else {
 		targetColor = (s16*)(base + colorOffset + 0x80);
 	}

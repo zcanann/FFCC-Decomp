@@ -11,7 +11,7 @@ extern float lbl_80330E20;
 extern float lbl_80330E24;
 extern float lbl_80330E28;
 extern float lbl_801EC9F0[];
-extern int lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern unsigned char* lbl_8032ED50;
 
 extern "C" {
@@ -85,7 +85,7 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
  */
 extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct pppYmMoveParabolaUnkB* stepData, struct pppYmMoveParabolaUnkC* offsetData)
 {
-    if (lbl_8032ED70 == 0) {
+    if (gPppCalcDisabled == 0) {
         _pppMngSt* pppMngSt = (_pppMngSt*)lbl_8032ED50;
         f32* pfVar = (f32*)((u8*)&basePtr->field0_0x0 + 8 + *offsetData->m_serializedDataOffsets);
         

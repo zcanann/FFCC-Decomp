@@ -17,7 +17,7 @@ extern float FLOAT_80330660;
 extern float FLOAT_80330664;
 extern float FLOAT_80330668;
 extern float FLOAT_80330658;
-extern int DAT_8032ed70;
+extern int gPppCalcDisabled;
 extern double DOUBLE_80330648;
 extern float RandF__5CMathFf(float, void*);
 extern void pppNormalize__FR3Vec3Vec(float*, Vec*);
@@ -352,7 +352,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYm
     Vec oldPos;
     Vec delta;
 
-    if (DAT_8032ed70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 

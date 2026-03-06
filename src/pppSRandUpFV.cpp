@@ -3,9 +3,9 @@
 #include "dolphin/types.h"
 
 extern CMath math[];
-extern s32 lbl_8032ED70;
+extern int gPppCalcDisabled;
 extern f32 lbl_803300C0;
-extern f32 lbl_801EADC8[];
+extern f32 gPppDefaultValueBuffer[];
 extern "C" f32 RandF__5CMathFv(CMath*);
 
 struct PppSRandUpFVParam2 {
@@ -39,7 +39,7 @@ void pppSRandUpFV(void* param1, void* param2, void* param3)
     PppSRandUpFVParam3* info = (PppSRandUpFVParam3*)param3;
     f32* randVec;
 
-    if (lbl_8032ED70 != 0) {
+    if (gPppCalcDisabled != 0) {
         return;
     }
 
@@ -83,7 +83,7 @@ void pppSRandUpFV(void* param1, void* param2, void* param3)
         randVec = (f32*)(self + *info->fieldC + 0x80);
     }
 
-    f32* target = (cfg->field4 == -1) ? lbl_801EADC8 : (f32*)(self + cfg->field4 + 0x80);
+    f32* target = (cfg->field4 == -1) ? gPppDefaultValueBuffer : (f32*)(self + cfg->field4 + 0x80);
 
     {
         f32 value = cfg->field8 * randVec[0];

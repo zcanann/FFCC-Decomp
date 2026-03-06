@@ -6,15 +6,12 @@
 #include "ffcc/pppPart.h"
 
 extern CGame Game;
-extern unsigned char* lbl_8032ED50;
-extern _pppEnvSt* lbl_8032ED54;
 extern unsigned char Graphic[];
 extern float lbl_80330330;
 extern float lbl_80330334;
 
 extern "C" {
 void SetDrawDoneDebugDataPartControl__8CGraphicFi(void* graphic, int partControl);
-void InitEnv__9CCharaPcsFi(int env, void* charaPcs);
 }
 
 /*
@@ -135,11 +132,12 @@ void pppDrawMng::DrawOt()
 						pppInitDrawEnv(0);
 					}
 
-					lbl_8032ED54 = (_pppEnvSt*)((char*)(*(void**)prim->m_handle) + 4);
-					lbl_8032ED50 = (unsigned char*)prim->m_handle;
+					_pppMngSt* pppMngSt = (_pppMngSt*)prim->m_handle;
+					pppEnvStPtr = (_pppEnvSt*)((char*)(*(void**)pppMngSt) + 4);
+					pppMngStPtr = pppMngSt;
 
-					pppSetFpMatrix((_pppMngSt*)prim->m_handle);
-					_pppDrawPart((_pppMngSt*)prim->m_handle);
+					pppSetFpMatrix(pppMngSt);
+					_pppDrawPart(pppMngSt);
 					break;
 				case 1:
 					SetDrawDoneDebugDataPartControl__8CGraphicFi(Graphic, 0x7ffe);
@@ -147,7 +145,7 @@ void pppDrawMng::DrawOt()
 					if (lastType != prim->m_type)
 					{
 						pppInitDrawEnv(0);
-						InitEnv__9CCharaPcsFi(4, &CharaPcs);
+						CharaPcs.InitEnv(4);
 					}
 
 					((CCharaPcs::CHandle*)prim->m_handle)->Draw(4);

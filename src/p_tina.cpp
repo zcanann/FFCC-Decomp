@@ -33,6 +33,11 @@ extern "C" void* Free__7CMemoryFPv(void*, void*);
 extern "C" void DestroyStage__7CMemoryFPQ27CMemory6CStage(void*, void*);
 extern "C" void Destroy__8CPartMngFv(CPartMng*);
 extern "C" void DrawOt__10pppDrawMngFv(void*);
+extern "C" void SetDrawDoneDebugDataPartControl__8CGraphicFi(void*, int);
+extern "C" void SetDrawDoneDebugData__8CGraphicFSc(void*, signed char);
+extern "C" void SetFog__8CGraphicFii(void*, int, int);
+extern "C" void pppSetRendMatrix__8CPartMngFv(CPartMng*);
+extern "C" void pppDraw__8CPartMngFv(CPartMng*);
 extern "C" void Init__13CAmemCacheSetFPcPQ27CMemory6CStagePQ27CMemory6CStageiPFUl_UcUlPFUl_UcUlPFUl_UcUl(
     void*,
     char*,
@@ -923,23 +928,25 @@ void CPartPcs::draw()
 {
     CUSBStreamDataRaw* usb = reinterpret_cast<CUSBStreamDataRaw*>(reinterpret_cast<char*>(this) + 8);
 
-    Graphic.SetDrawDoneDebugDataPartControl(0x7fff);
-    if (Game.game.m_gameWork.m_gamePaused == 0) {
-        if (usb->m_disableShokiDraw == 0) {
-            Graphic.SetFog(1, 0);
-            pppInitDrawEnv(0);
-            PartMng.pppSetRendMatrix();
-            PartMng.pppDraw();
-            pppClearDrawEnv();
-            Graphic.SetDrawDoneDebugData(0x7f);
-        } else {
-            DrawOt__10pppDrawMngFv(ppvDrawMng);
-            Graphic.SetDrawDoneDebugData(0x7f);
-        }
-    } else {
+    SetDrawDoneDebugDataPartControl__8CGraphicFi(&Graphic, 0x7fff);
+    if (Game.game.m_gameWork.m_gamePaused != 0) {
         DrawOt__10pppDrawMngFv(ppvDrawMng);
-        Graphic.SetDrawDoneDebugData(0x7f);
+        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x7f);
+        return;
     }
+
+    if (usb->m_disableShokiDraw != 0) {
+        DrawOt__10pppDrawMngFv(ppvDrawMng);
+        SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x7f);
+        return;
+    }
+
+    SetFog__8CGraphicFii(&Graphic, 1, 0);
+    pppInitDrawEnv(0);
+    pppSetRendMatrix__8CPartMngFv(&PartMng);
+    pppDraw__8CPartMngFv(&PartMng);
+    pppClearDrawEnv();
+    SetDrawDoneDebugData__8CGraphicFSc(&Graphic, 0x7f);
 }
 
 /*

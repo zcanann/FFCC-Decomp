@@ -202,20 +202,23 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 				inVec.z = -*(float*)&step->m_payloadBytes[2];
 				inVec.w = 1.0f;
 				MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(math, screenMtx, &inVec, &outVec);
-				if (0.0f != outVec.w) {
-					outVec.z /= outVec.w;
+				{
+					float outW = outVec.w;
+					if (outW != 0.0f) {
+						outVec.z /= outW;
+					}
 				}
 				work[0] = outVec.z;
 			}
 
-			if (Game.game.m_currentSceneId == 7) {
-				cameraX = ppvCameraMatrix02[0][3];
-				cameraY = ppvCameraMatrix02[1][3];
-				cameraZ = ppvCameraMatrix02[2][3];
-			} else {
+			if (Game.game.m_currentSceneId != 7) {
 				cameraX = CameraPcs._212_4_;
 				cameraY = CameraPcs._216_4_;
 				cameraZ = CameraPcs._220_4_;
+			} else {
+				cameraX = ppvCameraMatrix02[0][3];
+				cameraY = ppvCameraMatrix02[1][3];
+				cameraZ = ppvCameraMatrix02[2][3];
 			}
 			pppMngStPtr->m_matrix.value[0][3] = cameraX;
 			pppMngStPtr->m_matrix.value[1][3] = cameraY;

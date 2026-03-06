@@ -362,10 +362,10 @@ void CGraphic::SetStdDispCopyDst()
 void CGraphic::SetStdPixelFmt()
 {
     void* renderMode = PtrAt(this, 0x71E0);
-    if (*reinterpret_cast<u8*>(reinterpret_cast<u8*>(renderMode) + 0x19) == 0) {
-        GXSetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
+    if (*reinterpret_cast<u8*>(reinterpret_cast<u8*>(renderMode) + 0x19) != 0) {
+        GXSetPixelFmt(GX_PF_RGB565_Z16, GX_ZC_LINEAR);
     } else {
-        GXSetPixelFmt(GX_PF_RGBA6_Z24, GX_ZC_LINEAR);
+        GXSetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
     }
 }
 

@@ -8,8 +8,8 @@ extern float lbl_80330F6C;
 extern int gPppCalcDisabled;
 extern unsigned char gPppInConstructor;
 extern unsigned char gPppInSubFrameCalc;
-extern unsigned char* lbl_8032ED50;
 extern unsigned char gPppDefaultValueBuffer[];
+extern unsigned char* pppMngStPtr;
 
 extern "C" {
 void __ct__Q29CLightPcs6CLightFv(void*);
@@ -162,7 +162,7 @@ void pppLight(void* param1, void* param2, void* param3)
 		sourcePos.x = *(float*)(pppMng + 0x1c);
 		sourcePos.y = *(float*)(pppMng + 0x2c);
 		sourcePos.z = *(float*)(pppMng + 0x3c);
-		PSMTXMultVec((MtxPtr)(lbl_8032ED50 + 0x78), &sourcePos, &sourcePos);
+		PSMTXMultVec((MtxPtr)(pppMngStPtr + 0x78), &sourcePos, &sourcePos);
 
 		*(float*)(lightData + 0xc) = sourcePos.x;
 		*(float*)(lightData + 0x10) = sourcePos.y;
@@ -170,7 +170,7 @@ void pppLight(void* param1, void* param2, void* param3)
 		*(float*)(lightData + 0x24) = *(float*)(work + 0x24);
 		*(float*)(lightData + 0x28) = *(float*)(work + 0x18);
 		*(float*)(lightData + 0x30) = lbl_80330F64;
-		*(unsigned char**)(lightData + 0x6c) = lbl_8032ED50;
+		*(unsigned char**)(lightData + 0x6c) = pppMngStPtr;
 		*(int*)(lightData + 0x70) = 0;
 
 		lightData[0x58] = (unsigned char)(*(short*)(work + 0x0) >> 7);
@@ -216,14 +216,14 @@ void pppLight(void* param1, void* param2, void* param3)
 				if (*(int*)(lightParam + 0x44) == -1) {
 					obj = gPppDefaultValueBuffer;
 				} else {
-					obj = *(unsigned char**)(*(unsigned char**)(lbl_8032ED50 + 0xd4) + (*(int*)(lightParam + 0x44) << 4) + 0x4);
+					obj = *(unsigned char**)(*(unsigned char**)(pppMngStPtr + 0xd4) + (*(int*)(lightParam + 0x44) << 4) + 0x4);
 				}
 
 				direction = (Vec*)(lightData + 0x40);
 				direction->x = *(float*)(obj + 0x1c);
 				direction->y = *(float*)(obj + 0x2c);
 				direction->z = *(float*)(obj + 0x3c);
-				PSMTXMultVec((MtxPtr)(lbl_8032ED50 + 0x78), direction, direction);
+				PSMTXMultVec((MtxPtr)(pppMngStPtr + 0x78), direction, direction);
 
 				PSVECSubtract(direction, &sourcePos, direction);
 				PSVECNormalize(direction, direction);
@@ -239,3 +239,5 @@ void pppLight(void* param1, void* param2, void* param3)
 		}
 	}
 }
+
+

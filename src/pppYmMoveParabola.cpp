@@ -12,7 +12,6 @@ extern float lbl_80330E24;
 extern float lbl_80330E28;
 extern float lbl_801EC9F0[];
 extern int gPppCalcDisabled;
-extern unsigned char* lbl_8032ED50;
 
 extern "C" {
 void pppCopyVector__FR3Vec3Vec(Vec*, const Vec*);
@@ -32,7 +31,7 @@ void pppSetFpMatrix__FP9_pppMngSt(_pppMngSt*);
  */
 extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, struct pppYmMoveParabolaUnkC* dataPtr)
 {
-    _pppMngSt* pppMngSt = (_pppMngSt*)lbl_8032ED50;
+    _pppMngSt* pppMngSt = (_pppMngSt*)pppMngStPtr;
     f32 fVar2 = lbl_80330E1C;
     f32* pfVar = (f32*)((u8*)(&basePtr->field0_0x0 + 2) + *dataPtr->m_serializedDataOffsets);
     Vec local_48;
@@ -56,9 +55,9 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
         local_24.y = *(f32*)((u8*)pppMngSt + 0x5c);
         local_24.z = *(f32*)((u8*)pppMngSt + 0x60);
         pppCopyVector__FR3Vec3Vec((Vec*)(pfVar + 4), &local_24);
-        local_3c = ((_pppMngSt*)lbl_8032ED50)->m_matrix.value[0][3];
-        local_38 = ((_pppMngSt*)lbl_8032ED50)->m_matrix.value[1][3];
-        local_34 = ((_pppMngSt*)lbl_8032ED50)->m_matrix.value[2][3];
+        local_3c = ((_pppMngSt*)pppMngStPtr)->m_matrix.value[0][3];
+        local_38 = ((_pppMngSt*)pppMngStPtr)->m_matrix.value[1][3];
+        local_34 = ((_pppMngSt*)pppMngStPtr)->m_matrix.value[2][3];
         local_30 = pfVar[4];
         local_2c = pfVar[5];
         local_28 = pfVar[6];
@@ -86,7 +85,7 @@ extern "C" void pppConstructYmMoveParabola(struct pppYmMoveParabola* basePtr, st
 extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct pppYmMoveParabolaUnkB* stepData, struct pppYmMoveParabolaUnkC* offsetData)
 {
     if (gPppCalcDisabled == 0) {
-        _pppMngSt* pppMngSt = (_pppMngSt*)lbl_8032ED50;
+        _pppMngSt* pppMngSt = (_pppMngSt*)pppMngStPtr;
         f32* pfVar = (f32*)((u8*)&basePtr->field0_0x0 + 8 + *offsetData->m_serializedDataOffsets);
         
         // Update velocity and position
@@ -152,13 +151,15 @@ extern "C" void pppFrameYmMoveParabola(struct pppYmMoveParabola* basePtr, struct
         pppCopyVector__FR3Vec3Vec((Vec*)((u8*)pppMngSt + 0x8), &newPosition);
         
         // Update matrix with new position
-        ((_pppMngSt*)lbl_8032ED50)->m_matrix.value[0][3] = newPosition.x;
-        ((_pppMngSt*)lbl_8032ED50)->m_matrix.value[1][3] = newPosition.y;
-        ((_pppMngSt*)lbl_8032ED50)->m_matrix.value[2][3] = newPosition.z;
+        ((_pppMngSt*)pppMngStPtr)->m_matrix.value[0][3] = newPosition.x;
+        ((_pppMngSt*)pppMngStPtr)->m_matrix.value[1][3] = newPosition.y;
+        ((_pppMngSt*)pppMngStPtr)->m_matrix.value[2][3] = newPosition.z;
         
         pppSetFpMatrix__FP9_pppMngSt(pppMngSt);
         
         *(u16*)(pfVar + 3) = *(u16*)(pfVar + 3) + 1;
     }
 }
+
+
 

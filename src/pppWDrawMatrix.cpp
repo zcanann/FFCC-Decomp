@@ -4,7 +4,6 @@
 #include <dolphin/mtx.h>
 
 extern "C" float ppvCameraMatrix02[3][4];
-extern unsigned char* lbl_8032ED50;
 
 /*
  * --INFO--
@@ -21,9 +20,11 @@ void pppWDrawMatrix(_pppPObject* object, void*, _pppCtrlTable*)
 
     PSMTXConcat(ppvCameraMatrix02, *(Mtx*)(p + 0x10), *(Mtx*)(p + 0x40));
     PSVECScale((Vec*)(p + 0x40), (Vec*)(p + 0x40),
-               *(float*)(lbl_8032ED50 + 0x28));
+               *(float*)(pppMngStPtr + 0x28));
     PSVECScale((Vec*)(p + 0x50), (Vec*)(p + 0x50),
-               *(float*)(lbl_8032ED50 + 0x2c));
+               *(float*)(pppMngStPtr + 0x2c));
     PSVECScale((Vec*)(p + 0x60), (Vec*)(p + 0x60),
-               *(float*)(lbl_8032ED50 + 0x30));
+               *(float*)(pppMngStPtr + 0x30));
 }
+
+

@@ -4,7 +4,6 @@
 #include <dolphin/mtx.h>
 
 extern "C" {
-extern unsigned char* lbl_8032ED50;
 extern Mtx ppvCameraMatrix02;
 }
 
@@ -20,7 +19,7 @@ extern Mtx ppvCameraMatrix02;
 void pppDrawMatrixFrontLnr(_pppPObject* object, void*, _pppCtrlTable*)
 {
     Vec local_18;
-    _pppMngSt* mng = (_pppMngSt*)lbl_8032ED50;
+    _pppMngSt* mng = (_pppMngSt*)pppMngStPtr;
     
     PSMTXScaleApply(
         *(Mtx*)((char*)object + 0x10),
@@ -40,3 +39,5 @@ void pppDrawMatrixFrontLnr(_pppPObject* object, void*, _pppCtrlTable*)
     *(float*)((char*)object + 0x5c) = local_18.y;
     *(float*)((char*)object + 0x6c) = local_18.z;
 }
+
+

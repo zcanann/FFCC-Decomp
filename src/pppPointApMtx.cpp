@@ -4,7 +4,6 @@
 #include <dolphin/mtx.h>
 
 extern int gPppCalcDisabled;
-extern u8* lbl_8032ED50;
 
 struct pppPointApMtxStep {
 	u32 m_unknown0;
@@ -45,11 +44,11 @@ void pppPointApMtx(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
 			return;
 		}
 
-		objectData = (_pppPDataVal*)(*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (objectId << 4));
+		objectData = (_pppPDataVal*)(*(u32*)((u8*)pppMngStPtr + 0xD4) + (objectId << 4));
 		if (objectData == 0) {
 			object = 0;
 		} else {
-			object = (_pppPObject*)pppCreatePObject((_pppMngSt*)lbl_8032ED50, objectData);
+			object = (_pppPObject*)pppCreatePObject((_pppMngSt*)pppMngStPtr, objectData);
 			*(_pppPObject**)((u8*)object + 4) = pObject;
 		}
 
@@ -60,8 +59,8 @@ void pppPointApMtx(_pppPObject* pObject, void* step, _pppCtrlTable* ctrlTable)
 			(*matrix)[1][3] = source->x;
 			(*matrix)[2][3] = source->x;
 		} else {
-			PSMTXCopy(*(Mtx*)((u8*)lbl_8032ED50 + 0x78), *matrix);
-			PSMTXMultVec(*(Mtx*)((u8*)lbl_8032ED50 + 0x78), source, &pos);
+			PSMTXCopy(*(Mtx*)((u8*)pppMngStPtr + 0x78), *matrix);
+			PSMTXMultVec(*(Mtx*)((u8*)pppMngStPtr + 0x78), source, &pos);
 			(*matrix)[0][3] = pos.x;
 			(*matrix)[1][3] = pos.y;
 			(*matrix)[2][3] = pos.z;
@@ -89,3 +88,5 @@ void pppPointApMtxCon(_pppPObject* pObject, _pppCtrlTable* ctrlTable)
 
 	*(unsigned char*)((char*)object + 0x81) = 0;
 }
+
+

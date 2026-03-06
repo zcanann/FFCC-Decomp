@@ -10,11 +10,10 @@ struct _pppEnvStLite {
     CMapMesh** m_mapMeshPtr;
 };
 
-extern _pppEnvStLite* lbl_8032ED54;
 extern float lbl_803320C8;
 extern float lbl_803320CC;
 extern float lbl_803320D0;
-extern CUtil lbl_8032EC70;
+extern CUtil gUtil;
 extern int gPppCalcDisabled;
 
 struct _pppFilterSerializedData {
@@ -94,16 +93,18 @@ void pppRenderFilter(pppFilter* pppFilterObj, pppFilterUnkB* param_2, _pppCtrlTa
     _pppFilterSerializedData* serializedData = (_pppFilterSerializedData*)((unsigned char*)pppFilterObj + serializedOffset + 0x80);
 
     if (step->dataValIndex == 0xFFFF) {
-        lbl_8032EC70.RenderColorQuad(
+        gUtil.RenderColorQuad(
             lbl_803320C8, lbl_803320C8, lbl_803320CC, lbl_803320D0, serializedData->m_color);
         return;
     }
 
     int textureIndex = 0;
     _pppTextureInfo* textureInfo = (_pppTextureInfo*)GetTexture__8CMapMeshFP12CMaterialSetRi(
-        lbl_8032ED54->m_mapMeshPtr[step->dataValIndex], lbl_8032ED54->m_materialSetPtr, textureIndex);
+        &pppEnvStPtr->m_mapMeshPtr[step->dataValIndex], pppEnvStPtr->m_materialSetPtr, textureIndex);
     RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
-        &lbl_8032EC70, lbl_803320C8, lbl_803320C8, lbl_803320CC, lbl_803320D0, &textureInfo->m_texObj, 0, 0,
+        &gUtil, lbl_803320C8, lbl_803320C8, lbl_803320CC, lbl_803320D0, &textureInfo->m_texObj, 0, 0,
         &serializedData->m_color, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 }
+
+
 

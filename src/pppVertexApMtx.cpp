@@ -54,8 +54,6 @@ struct _pppPDataVal;
 
 extern CMath math;
 extern int gPppCalcDisabled;
-extern u8* lbl_8032ED50;
-extern VertexApMtxEnv* lbl_8032ED54;
 
 extern "C" {
 f32 RandF__5CMathFv(CMath*);
@@ -119,11 +117,12 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 	}
 
 	if (state->countdown == 0) {
-		VertexApMtxEntry* entry = &lbl_8032ED54->entries[data->entryIndex];
+		VertexApMtxEnv* env = (VertexApMtxEnv*)pppEnvStPtr;
+		VertexApMtxEntry* entry = &env->entries[data->entryIndex];
 		Vec* points = *(Vec**)((u8*)parent + 0x70);
 
 		if (points == 0) {
-			u32* srcTable = *(u32**)((u8*)lbl_8032ED54 + 0x8);
+			u32* srcTable = *(u32**)((u8*)env + 0x8);
 			VertexApMtxSource* src = *(VertexApMtxSource**)((u8*)srcTable + (entry->vertexSetIndex * 4));
 			points = src->points;
 		}
@@ -147,7 +146,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 					_pppPObject* child;
 					s32 childId = data->childId;
 					_pppPDataVal* childData =
-						(_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (childId << 4));
+						(_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
 					Mtx* outMtx;
 					Vec pos;
 					Vec worldPos;
@@ -155,7 +154,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 					if (childData == 0) {
 						child = 0;
 					} else {
-						child = pppCreatePObject((_pppMngSt*)lbl_8032ED50, childData);
+						child = pppCreatePObject((_pppMngSt*)pppMngStPtr, childData);
 						*(void**)((u8*)child + 0x4) = parent;
 					}
 
@@ -170,8 +169,8 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 						(*outMtx)[1][3] = pos.y;
 						(*outMtx)[2][3] = pos.z;
 					} else {
-						PSMTXCopy(*(Mtx*)((u8*)lbl_8032ED50 + 0x78), *outMtx);
-						PSMTXMultVec(*(Mtx*)((u8*)lbl_8032ED50 + 0x78), &pos, &worldPos);
+						PSMTXCopy(*(Mtx*)((u8*)pppMngStPtr + 0x78), *outMtx);
+						PSMTXMultVec(*(Mtx*)((u8*)pppMngStPtr + 0x78), &pos, &worldPos);
 						(*outMtx)[0][3] = worldPos.x;
 						(*outMtx)[1][3] = worldPos.y;
 						(*outMtx)[2][3] = worldPos.z;
@@ -191,7 +190,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 					_pppPObject* child;
 					s32 childId = data->childId;
 					_pppPDataVal* childData =
-						(_pppPDataVal*)((u8*)*(u32*)((u8*)lbl_8032ED50 + 0xD4) + (childId << 4));
+						(_pppPDataVal*)((u8*)*(u32*)((u8*)pppMngStPtr + 0xD4) + (childId << 4));
 					Mtx* outMtx;
 					Vec pos;
 					Vec worldPos;
@@ -199,7 +198,7 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 					if (childData == 0) {
 						child = 0;
 					} else {
-						child = pppCreatePObject((_pppMngSt*)lbl_8032ED50, childData);
+						child = pppCreatePObject((_pppMngSt*)pppMngStPtr, childData);
 						*(void**)((u8*)child + 0x4) = parent;
 					}
 
@@ -214,8 +213,8 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 						(*outMtx)[1][3] = pos.y;
 						(*outMtx)[2][3] = pos.z;
 					} else {
-						PSMTXCopy(*(Mtx*)((u8*)lbl_8032ED50 + 0x78), *outMtx);
-						PSMTXMultVec(*(Mtx*)((u8*)lbl_8032ED50 + 0x78), &pos, &worldPos);
+						PSMTXCopy(*(Mtx*)((u8*)pppMngStPtr + 0x78), *outMtx);
+						PSMTXMultVec(*(Mtx*)((u8*)pppMngStPtr + 0x78), &pos, &worldPos);
 						(*outMtx)[0][3] = worldPos.x;
 						(*outMtx)[1][3] = worldPos.y;
 						(*outMtx)[2][3] = worldPos.z;
@@ -229,3 +228,5 @@ void pppVertexApMtx(_pppPObject* parent, PVertexApMtx* dataRaw, void* ctrlRaw)
 
 	state->countdown--;
 }
+
+

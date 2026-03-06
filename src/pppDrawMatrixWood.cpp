@@ -2,7 +2,6 @@
 #include "ffcc/partMng.h"
 #include "dolphin/mtx.h"
 
-extern unsigned char* lbl_8032ED50;
 
 /*
  * --INFO--
@@ -19,9 +18,9 @@ void pppDrawMatrixWood(_pppPObject* object, void*, _pppCtrlTable*) {
     PSMTXScaleApply(
         *(Mtx*)(p + 0x10),
         *(Mtx*)(p + 0x40),
-        *(float*)((char*)lbl_8032ED50 + 0x28),
-        *(float*)((char*)lbl_8032ED50 + 0x2C),
-        *(float*)((char*)lbl_8032ED50 + 0x30)
+        *(float*)((char*)pppMngStPtr + 0x28),
+        *(float*)((char*)pppMngStPtr + 0x2C),
+        *(float*)((char*)pppMngStPtr + 0x30)
     );
 
     *(float*)(p + 0x4C) = *(float*)(p + 0x1C);
@@ -30,3 +29,5 @@ void pppDrawMatrixWood(_pppPObject* object, void*, _pppCtrlTable*) {
 
     PSMTXConcat(ppvWorldMatrixWood, *(Mtx*)(p + 0x40), *(Mtx*)(p + 0x40));
 }
+
+

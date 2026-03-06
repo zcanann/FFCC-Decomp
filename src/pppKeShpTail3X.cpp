@@ -34,8 +34,6 @@ int __cntlzw(unsigned int);
 }
 extern Mtx ppvWorldMatrix;
 extern Mtx ppvCameraMatrix0;
-extern _pppMngSt* lbl_8032ED50;
-extern _pppEnvSt* lbl_8032ED54;
 
 /*
  * --INFO--
@@ -73,7 +71,7 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
             pppFMATRIX outMatrix;
 
             partMatrix = obj->pppPObject.m_localMatrix;
-            ownerMatrix = lbl_8032ED50->m_matrix;
+            ownerMatrix = pppMngStPtr->m_matrix;
             pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&outMatrix, &ownerMatrix, &partMatrix);
             pos.x = outMatrix.value[0][3];
             pos.y = outMatrix.value[1][3];
@@ -105,7 +103,7 @@ void pppKeShpTail3X(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* param
         pppFMATRIX outMatrix;
 
         partMatrix = obj->pppPObject.m_localMatrix;
-        ownerMatrix = lbl_8032ED50->m_matrix;
+        ownerMatrix = pppMngStPtr->m_matrix;
         pppMulMatrix__FR10pppFMATRIX10pppFMATRIX10pppFMATRIX(&outMatrix, &ownerMatrix, &partMatrix);
         pos.x = outMatrix.value[0][3];
         pos.y = outMatrix.value[1][3];
@@ -227,7 +225,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
 
     work = (s16*)((u8*)&obj->pppPObject + 8 + offsets->m_serializedDataOffsets[0]);
     workBytes = (u8*)work;
-    shapeTable = *(long**)(*(int*)&lbl_8032ED54->m_particleColors[0] + step->m_dataValIndex * 4);
+    shapeTable = *(long**)(*(int*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
     if (shapeTable == NULL) {
         return;
     }
@@ -259,7 +257,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
     pppUnitMatrix__FR10pppFMATRIX(&local);
 
     scaleFalloff = ((float)step->m_stepValue - (float)step->m_arg3) / (float)(count - 1);
-    baseScale = *(float*)(step->m_payload + 4) * lbl_8032ED50->m_scale.x;
+    baseScale = *(float*)(step->m_payload + 4) * pppMngStPtr->m_scale.x;
     baseScaleStep = baseScale * (scaleFalloff / (float)step->m_stepValue);
     if (baseScale == 0.0f) {
         return;
@@ -317,8 +315,8 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
         pos.z = segBaseZ;
 
         if (step->m_payload[0x3f] == 0) {
-            PSMTXScaleApply(localBase.value, *(Mtx*)((u8*)obj + 0x40), drawScale * lbl_8032ED50->m_scale.x,
-                            drawScale * lbl_8032ED50->m_scale.y, drawScale * lbl_8032ED50->m_scale.z);
+            PSMTXScaleApply(localBase.value, *(Mtx*)((u8*)obj + 0x40), drawScale * pppMngStPtr->m_scale.x,
+                            drawScale * pppMngStPtr->m_scale.y, drawScale * pppMngStPtr->m_scale.z);
             if ((*(s16*)(step->m_payload + 10) != 0) && (count != 0)) {
                 PSMTXRotRad(rotMtx.value, 'z', 0.017453292f * (float)(u16)work[(int)count + 0xc0]);
                 pppCopyMatrix__FR10pppFMATRIX10pppFMATRIX(&tmpMtx, (pppFMATRIX*)((u8*)obj + 0x40));
@@ -328,9 +326,9 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
             PSMTXCopy(*(Mtx*)((u8*)obj + 0x40), drawMtx.value);
         } else if (step->m_payload[0x3f] == 1) {
             pppUnitMatrix__FR10pppFMATRIX(&drawMtx);
-            drawMtx.value[0][0] = drawScale * (localBase.value[0][0] * lbl_8032ED50->m_scale.x);
-            drawMtx.value[1][1] = drawScale * (localBase.value[1][1] * lbl_8032ED50->m_scale.y);
-            drawMtx.value[2][2] = drawScale * (localBase.value[2][2] * lbl_8032ED50->m_scale.z);
+            drawMtx.value[0][0] = drawScale * (localBase.value[0][0] * pppMngStPtr->m_scale.x);
+            drawMtx.value[1][1] = drawScale * (localBase.value[1][1] * pppMngStPtr->m_scale.y);
+            drawMtx.value[2][2] = drawScale * (localBase.value[2][2] * pppMngStPtr->m_scale.z);
             if ((*(s16*)(step->m_payload + 10) != 0) && (count != 0)) {
                 PSMTXRotRad(rotMtx.value, 'z', 0.017453292f * (float)(u16)work[(int)count + 0xc0]);
                 pppCopyMatrix__FR10pppFMATRIX10pppFMATRIX(&tmpMtx, &drawMtx);
@@ -357,7 +355,7 @@ void pppKeShpTail3XDraw(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkB* p
         GXSetChanAmbColor(GX_COLOR0A0, amb);
 
         pppSetBlendMode(blendMode);
-        pppDrawShp((tagOAN3_SHAPE*)shapeEntry, lbl_8032ED54->m_materialSetPtr, blendMode);
+        pppDrawShp((tagOAN3_SHAPE*)shapeEntry, pppEnvStPtr->m_materialSetPtr, blendMode);
 
         count--;
         if (count == 0) {
@@ -487,4 +485,6 @@ void S4ToF32(pppFVECTOR4*, short*)
 {
 	// TODO
 }
+
+
 

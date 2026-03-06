@@ -3,7 +3,7 @@
 
 #include <dolphin/mtx.h>
 
-extern unsigned char* lbl_8032ED50;
+extern _pppMngSt* pppMngStPtr;
 extern float lbl_80330E38;
 extern float lbl_80330E3C;
 
@@ -28,9 +28,9 @@ void pppParMoveMatrix(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable
 	Vec local_68;
 	Mtx MStack_38;
 	
-	pppMngSt = (_pppMngSt*)lbl_8032ED50;
-	Vec* previousPosition = (Vec*)(lbl_8032ED50 + 0x48);
-	Vec* position = (Vec*)(lbl_8032ED50 + 0x8);
+	pppMngSt = pppMngStPtr;
+	Vec* previousPosition = &pppMngStPtr->m_previousPosition;
+	Vec* position = &pppMngStPtr->m_position;
 	PSVECSubtract(previousPosition, position, &local_44);
 	
 	if (((lbl_80330E38 != local_44.x) || (lbl_80330E38 != local_44.y)) || (lbl_80330E38 != local_44.z)) {
@@ -51,21 +51,20 @@ void pppParMoveMatrix(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable
 			PSVECCrossProduct(&local_68, &local_50, &local_5c);
 			PSVECNormalize(&local_5c, &local_5c);
 		}
-		*(float*)(lbl_8032ED50 + 0x78) = local_50.x;
-		*(float*)(lbl_8032ED50 + 0x88) = local_50.y;
-		*(float*)(lbl_8032ED50 + 0x98) = local_50.z;
-		*(float*)(lbl_8032ED50 + 0x7C) = local_5c.x;
-		*(float*)(lbl_8032ED50 + 0x8C) = local_5c.y;
-		*(float*)(lbl_8032ED50 + 0x9C) = local_5c.z;
-		*(float*)(lbl_8032ED50 + 0x80) = local_68.x;
-		*(float*)(lbl_8032ED50 + 0x90) = local_68.y;
-		*(float*)(lbl_8032ED50 + 0xA0) = local_68.z;
-		PSMTXScale(MStack_38, *(float*)(lbl_8032ED50 + 0x28), *(float*)(lbl_8032ED50 + 0x2C),
-		           *(float*)(lbl_8032ED50 + 0x30));
-		PSMTXConcat(MStack_38, (MtxPtr)(lbl_8032ED50 + 0x78), (MtxPtr)(lbl_8032ED50 + 0x78));
-		*(float*)(lbl_8032ED50 + 0x84) = *(float*)((unsigned char*)pppMngSt + 0x8);
-		*(float*)(lbl_8032ED50 + 0x94) = *(float*)((unsigned char*)pppMngSt + 0xC);
-		*(float*)(lbl_8032ED50 + 0xA4) = *(float*)((unsigned char*)pppMngSt + 0x10);
+		pppMngStPtr->m_matrix.value[0][0] = local_50.x;
+		pppMngStPtr->m_matrix.value[1][0] = local_50.y;
+		pppMngStPtr->m_matrix.value[2][0] = local_50.z;
+		pppMngStPtr->m_matrix.value[0][1] = local_5c.x;
+		pppMngStPtr->m_matrix.value[1][1] = local_5c.y;
+		pppMngStPtr->m_matrix.value[2][1] = local_5c.z;
+		pppMngStPtr->m_matrix.value[0][2] = local_68.x;
+		pppMngStPtr->m_matrix.value[1][2] = local_68.y;
+		pppMngStPtr->m_matrix.value[2][2] = local_68.z;
+		PSMTXScale(MStack_38, pppMngStPtr->m_scale.x, pppMngStPtr->m_scale.y, pppMngStPtr->m_scale.z);
+		PSMTXConcat(MStack_38, pppMngStPtr->m_matrix.value, pppMngStPtr->m_matrix.value);
+		pppMngStPtr->m_matrix.value[0][3] = pppMngSt->m_position.x;
+		pppMngStPtr->m_matrix.value[1][3] = pppMngSt->m_position.y;
+		pppMngStPtr->m_matrix.value[2][3] = pppMngSt->m_position.z;
 		pppSetFpMatrix(pppMngSt);
 	}
 }

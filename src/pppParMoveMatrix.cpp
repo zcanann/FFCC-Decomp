@@ -29,8 +29,8 @@ void pppParMoveMatrix(_pppPObject* obj, void* stepData, _pppCtrlTable* ctrlTable
 	Mtx MStack_38;
 	
 	pppMngSt = pppMngStPtr;
-	Vec* previousPosition = &pppMngStPtr->m_previousPosition;
-	Vec* position = &pppMngStPtr->m_position;
+	Vec* previousPosition = (Vec*)&pppMngSt->m_userFloat0;
+	Vec* position = &pppMngSt->m_position;
 	PSVECSubtract(previousPosition, position, &local_44);
 	
 	if (((lbl_80330E38 != local_44.x) || (lbl_80330E38 != local_44.y)) || (lbl_80330E38 != local_44.z)) {

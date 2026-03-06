@@ -63,7 +63,6 @@ extern CMath math[];
 extern char DAT_80238030[];
 extern CUtil DAT_8032ec70;
 extern "C" float ppvCameraMatrix02[3][4];
-extern unsigned char* lbl_8032ED50;
 extern float ppvScreenMatrix[4][4];
 
 extern struct {
@@ -218,10 +217,10 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 				cameraY = CameraPcs._216_4_;
 				cameraZ = CameraPcs._220_4_;
 			}
-			*(float*)(lbl_8032ED50 + 0x84) = cameraX;
-			*(float*)(lbl_8032ED50 + 0x94) = cameraY;
-			*(float*)(lbl_8032ED50 + 0xA4) = cameraZ;
-			pppSetFpMatrix__FP9_pppMngSt((_pppMngSt*)lbl_8032ED50);
+			pppMngStPtr->m_matrix.value[0][3] = cameraX;
+			pppMngStPtr->m_matrix.value[1][3] = cameraY;
+			pppMngStPtr->m_matrix.value[2][3] = cameraZ;
+			pppSetFpMatrix__FP9_pppMngSt(pppMngStPtr);
 		}
 	}
 }

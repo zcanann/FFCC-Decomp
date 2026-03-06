@@ -39,33 +39,35 @@ extern f32 lbl_80330D90;
  */
 extern "C" void pppConstructYmMoveCircle(pppYmMoveCircle* basePtr, pppYmMoveCircleOffsets* offsetData)
 {
-    Vec temp2;
+    Vec tempUp;
     Vec temp1;
-    u8* pppMngSt = lbl_8032ED50;
-    s32 offset = offsetData->m_serializedDataOffsets[0];
-    pppYmMoveCircleWork* work = (pppYmMoveCircleWork*)((u8*)basePtr + offset + 0x80);
+    u8* pppMngSt;
+    s32 offset;
+    pppYmMoveCircleWork* work;
 
-    temp2.x = lbl_80330D7C;
-    temp2.z = lbl_80330D7C;
-    temp2.y = lbl_80330D8C;
+    pppMngSt = lbl_8032ED50;
+    offset = offsetData->m_serializedDataOffsets[0];
+    work = (pppYmMoveCircleWork*)((u8*)basePtr + offset + 0x80);
+
+    tempUp.x = 0.0f;
+    tempUp.y = 1.0f;
+    tempUp.z = 0.0f;
 
     PSVECSubtract((Vec*)(pppMngSt + 0x68), (Vec*)(pppMngSt + 0x58), &temp1);
     PSVECNormalize(&temp1, &temp1);
 
-    work->m_angle = lbl_80330D90 * (f32)acos((f64)PSVECDotProduct(&temp2, &temp1));
+    work->m_angle = (f32)(lbl_80330D90 * acos((f64)PSVECDotProduct(&tempUp, &temp1)));
 
-    if ((temp1.x <= lbl_80330D7C && temp1.z >= lbl_80330D7C) ||
-        (temp1.x >= lbl_80330D7C && temp1.z >= lbl_80330D7C)) {
+    if ((temp1.x <= 0.0f && temp1.z >= 0.0f) || (temp1.x >= 0.0f && temp1.z >= 0.0f)) {
         work->m_angle = lbl_80330D78 - work->m_angle;
     }
 
-    f32 zero = lbl_80330D7C;
-    work->m_radiusStepStep = zero;
-    work->m_radiusStep = zero;
-    work->m_radius = zero;
-    work->m_angleStepStepStep = zero;
-    work->m_angleStepStep = zero;
-    work->m_angleStep = zero;
+    work->m_radiusStepStep = 0.0f;
+    work->m_radiusStep = 0.0f;
+    work->m_radius = 0.0f;
+    work->m_angleStepStepStep = 0.0f;
+    work->m_angleStepStep = 0.0f;
+    work->m_angleStep = 0.0f;
     pppCopyVector(work->m_center, *(Vec*)(pppMngSt + 0x58));
     work->m_hasInit = 0;
 }

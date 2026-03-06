@@ -984,7 +984,7 @@ float CMath::Line1D(int lastIndex, float x, float* x_arr, float* y_arr)
 {
     float period = x_arr[lastIndex] - x_arr[0];
 
-    while (x_arr[lastIndex] < x) {
+    while (x > x_arr[lastIndex]) {
         x -= period;
     }
 

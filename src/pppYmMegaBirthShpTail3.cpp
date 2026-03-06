@@ -1,6 +1,7 @@
 #include "ffcc/pppYmMegaBirthShpTail3.h"
 #include "ffcc/pppPart.h"
 #include "ffcc/pppGetRotMatrixXYZ.h"
+#include "ffcc/symbols_shared.h"
 #include "dolphin/mtx.h"
 #include <string.h>
 
@@ -17,7 +18,6 @@ extern "C" void pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
 extern "C" void pppSetBlendMode__FUc(unsigned char);
 extern "C" void pppDrawShp__FP13tagOAN3_SHAPEP12CMaterialSetUc(void*, void*, unsigned char);
 extern int rand();
-extern float lbl_803305A4;
 extern pppFMATRIX g_matUnit3;
 extern int gPppCalcDisabled;
 
@@ -68,8 +68,8 @@ void pppConstructYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* pppYmMegaBirthShpTa
     float initVal;
 
     pppUnitMatrix__FR10pppFMATRIX(work);
-    initVal = lbl_803305A4;
-    work[1].value[0][2] = lbl_803305A4;
+    initVal = kPppYmMegaBirthShpTail3Zero;
+    work[1].value[0][2] = kPppYmMegaBirthShpTail3Zero;
     work[1].value[0][1] = initVal;
     work[1].value[0][0] = initVal;
     *reinterpret_cast<u32*>(&work[1].value[0][3]) = 0;
@@ -710,5 +710,6 @@ void pppRenderYmMegaBirthShpTail3(pppYmMegaBirthShpTail3* object, pppYmMegaBirth
         }
     }
 }
+
 
 

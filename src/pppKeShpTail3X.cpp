@@ -2,13 +2,13 @@
 #include "ffcc/pppPart.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppShape.h"
+#include "ffcc/symbols_shared.h"
 #include <dolphin/mtx.h>
 #include <dolphin/os.h>
 #include <string.h>
 
 extern "C" int rand(void);
 extern int gPppCalcDisabled;
-extern float lbl_80330520;
 
 struct KeShpTail3XStep {
     s32 m_graphId;
@@ -445,7 +445,7 @@ void pppKeShpTail3XCon(struct pppKeShpTail3X* obj, struct pppKeShpTail3XUnkC* pa
     memset__FPviUl(work + 0x20, 0, 8);
     memset__FPviUl(work + 0x28, 0, 8);
 
-    one = lbl_80330520;
+    one = kPppKeShpTail3XOne;
     i = 0;
     anglePtr = work;
     do {
@@ -485,6 +485,7 @@ void S4ToF32(pppFVECTOR4*, short*)
 {
 	// TODO
 }
+
 
 
 

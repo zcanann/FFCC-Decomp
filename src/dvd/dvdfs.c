@@ -13,7 +13,7 @@ static OSBootInfo* BootInfo;
 static FSTEntry* FstStart_8032F064;
 char* FstStringStart;
 static u32 MaxEntryNum;
-static u32 lbl_8032F070;
+static u32 sDvdfsCurrentDirEntry;
 
 OSThreadQueue __DVDThreadQueue;
 u32 __DVDLongFileNameFlag;
@@ -75,7 +75,7 @@ s32 DVDConvertPathToEntrynum(const char* pathPtr) {
     
     ASSERTMSGLINE(318, pathPtr, "DVDConvertPathToEntrynum(): null pointer is specified  ");
     
-    dirLookAt = lbl_8032F070;
+    dirLookAt = sDvdfsCurrentDirEntry;
     
     while (1) {
         if (*pathPtr == '\0') {
@@ -275,7 +275,7 @@ static BOOL DVDConvertEntrynumToPath(s32 entrynum, char* path, u32 maxlen) {
 
 BOOL DVDGetCurrentDir(char* path, u32 maxlen) {
     ASSERTMSG1LINE(671, (maxlen > 1), "DVDGetCurrentDir: maxlen should be more than 1 (%d is specified)", maxlen);
-    return DVDConvertEntrynumToPath((s32)lbl_8032F070, path, maxlen);
+    return DVDConvertEntrynumToPath((s32)sDvdfsCurrentDirEntry, path, maxlen);
 }
 
 BOOL DVDChangeDir(const char* dirName) {
@@ -291,7 +291,7 @@ BOOL DVDChangeDir(const char* dirName) {
         return FALSE;
     }
     
-    lbl_8032F070 = (u32)entry;
+    sDvdfsCurrentDirEntry = (u32)entry;
     
     return TRUE;
 }

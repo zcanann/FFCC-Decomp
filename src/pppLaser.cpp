@@ -4,12 +4,12 @@
 #include "ffcc/p_game.h"
 #include "ffcc/partMng.h"
 #include "ffcc/graphic.h"
+#include "ffcc/symbols_shared.h"
 
 #include <string.h>
 
 extern CMath Math;
 extern const f32 FLOAT_80333428;
-extern const f32 lbl_80333428;
 extern const f32 FLOAT_80333448;
 extern const f32 FLOAT_8033344c;
 extern const f32 FLOAT_80333450;
@@ -163,10 +163,10 @@ void pppConstructLaser(struct pppLaser *pppLaser, struct pppLaserUnkC *param_2)
  */
 void pppConstruct2Laser(struct pppLaser *pppLaser, struct pppLaserUnkC *param_2)
 {
-    f32 fVar1 = lbl_80333428;
+    f32 fVar1 = kPppLaserZero;
     u8* work = (u8*)pppLaser + param_2->offsets->m_serializedDataOffsets[2] + 0x80;
 
-    *(f32*)(work + 0x18) = lbl_80333428;
+    *(f32*)(work + 0x18) = kPppLaserZero;
     *(f32*)(work + 0x14) = fVar1;
     *(f32*)(work + 0x10) = fVar1;
     *(f32*)(work + 0x0C) = fVar1;
@@ -594,3 +594,4 @@ void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, str
         }
     }
 }
+

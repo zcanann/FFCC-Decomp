@@ -4,6 +4,7 @@
 #include "ffcc/graphic.h"
 #include "ffcc/memory.h"
 #include "ffcc/p_usb.h"
+#include "ffcc/symbols_shared.h"
 #include "dolphin/gx/GXFrameBuffer.h"
 #include "dolphin/mtx.h"
 
@@ -68,12 +69,6 @@ extern unsigned char FunnyShapePcs[];
 extern "C" CFunnyShapePcs* __dt__14CFunnyShapePcsFv(CFunnyShapePcs* self, short shouldDelete);
 extern "C" CPtrArray<OSFS_TEXTURE_ST*>* dtor_8004EAD0(CPtrArray<OSFS_TEXTURE_ST*>* ptrArray, short shouldDelete);
 
-extern f32 lbl_8032FD14;
-extern f32 lbl_8032FD10;
-extern f32 lbl_8032FD18;
-extern f32 lbl_8032FD24;
-extern f32 lbl_8032FD28;
-extern f32 lbl_8032FD2C;
 extern CMemory Memory;
 extern CUSBPcs USBPcs;
 extern unsigned char m_table__14CFunnyShapePcs[];
@@ -229,9 +224,9 @@ void CFunnyShapePcs::Init()
     clz1 = __cntlzw(1);
     level = -((u8)(clz0 >> 5) & 1) & 0x3F;
     self[0xB] = 0xFF;
-    value24 = lbl_8032FD24;
+    value24 = kFunnyShapeViewportOrigin;
     self[0xC] = level;
-    value14 = lbl_8032FD14;
+    value14 = kFunnyShapeNdcMin;
     clz0 = __cntlzw(2);
     self[0xD] = level;
     self[0xE] = level;
@@ -365,7 +360,7 @@ void CFunnyShapePcs::drawViewer()
     static char s_spinner[] = "|/-\\";
     static int frameCount;
 
-    C_MTXOrtho(ortho, lbl_8032FD10, lbl_8032FD14, lbl_8032FD14, lbl_8032FD10, lbl_8032FD10, lbl_8032FD18);
+    C_MTXOrtho(ortho, kFunnyShapeNdcMax, kFunnyShapeNdcMin, kFunnyShapeNdcMin, kFunnyShapeNdcMax, kFunnyShapeNdcMax, kFunnyShapeOrthoFarZ);
     GXSetProjection(ortho, GX_ORTHOGRAPHIC);
     C_MTXLookAt(view, reinterpret_cast<Point3d*>(&eye), &up, reinterpret_cast<Point3d*>(&at));
     GXLoadPosMtxImm(view, GX_PNMTX0);
@@ -391,7 +386,7 @@ void CFunnyShapePcs::drawViewer()
         frameCount = 0;
     }
 
-    GXSetViewport(lbl_8032FD24, lbl_8032FD24, lbl_8032FD28, lbl_8032FD2C, lbl_8032FD24, lbl_8032FD10);
+    GXSetViewport(kFunnyShapeViewportOrigin, kFunnyShapeViewportOrigin, kFunnyShapeViewportWidth, kFunnyShapeViewportHeight, kFunnyShapeViewportOrigin, kFunnyShapeNdcMax);
     Graphic.Printf(s_funnyShapeFmt, s_spinner[(frameCount >> 4) & 3]);
 }
 
@@ -500,4 +495,10 @@ extern "C" CPtrArray<OSFS_TEXTURE_ST*>* dtor_8004EAD0(CPtrArray<OSFS_TEXTURE_ST*
 
 template class CPtrArray<_GXTexObj*>;
 template class CPtrArray<OSFS_TEXTURE_ST*>;
+
+
+
+
+
+
 

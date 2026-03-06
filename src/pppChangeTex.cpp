@@ -33,7 +33,7 @@ struct ChangeTexMeshData {
 struct ChangeTexMeshRef {
 	u8 _pad0[0x8];
 	ChangeTexMeshData* m_data;
-	u8 _padC[0x8];
+	u8 _padC[0x14 - 0xC];
 };
 
 extern char MaterialMan[];
@@ -83,7 +83,7 @@ extern "C" void ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2(CCh
 	ChangeTexMeshRef* meshes = *(ChangeTexMeshRef**)((char*)model + 0xAC);
 	ChangeTexDisplayList* displayList = meshes[param_4].m_data->m_displayLists + param_5;
 
-	if (*(char*)((char*)param_3 + 0x14) == 0) {
+	if (*(u8*)((char*)param_3 + 0x14) == 0) {
 		*(int*)(MaterialMan + 0xd0) = (int)param_2 + 0x1c + 0x28;
 		*(int*)(MaterialMan + 0x44) = 0xFFFFFFFF;
 		*(char*)(MaterialMan + 0x4c) = 0xFF;

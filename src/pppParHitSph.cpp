@@ -1,13 +1,15 @@
 #include "ffcc/pppParHitSph.h"
-#include "ffcc/graphic.h"
 #include "ffcc/partMng.h"
 #include "ffcc/pppPart.h"
+#include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
 extern unsigned char* lbl_8032ED50;
 extern float lbl_80330700;
 extern unsigned char CFlat[];
+extern unsigned char Graphic[];
 extern Mtx ppvCameraMatrix02;
+extern "C" void DrawSphere__8CGraphicFPA4_f8_GXColor(void* graphic, MtxPtr mtx, _GXColor color);
 
 /*
  * --INFO--
@@ -47,17 +49,16 @@ void pppParHitSph(struct _pppPObject* param_1, int param_2)
         local_a8.g = 0xFF;
         local_a8.b = 0xFF;
         local_a8.a = 0xFF;
-        register MtxPtr sphereMtxPtr = sphereMtx;
         PSMTXIdentity(cameraMtx);
-        PSMTXIdentity(sphereMtxPtr);
-        sphereMtxPtr[0][0] = radius;
-        sphereMtxPtr[1][1] = radius;
-        sphereMtxPtr[2][2] = radius;
+        PSMTXIdentity(sphereMtx);
+        sphereMtx[0][0] = radius;
+        sphereMtx[1][1] = radius;
+        sphereMtx[2][2] = radius;
         PSMTXConcat(ppvCameraMatrix02, cameraMtx, cameraMtx);
         PSMTXMultVec(cameraMtx, &local_94, &local_a0);
-        sphereMtxPtr[0][3] = local_a0.x;
-        sphereMtxPtr[1][3] = local_a0.y;
-        sphereMtxPtr[2][3] = local_a0.z;
-        Graphic.DrawSphere(sphereMtxPtr, local_a8);
+        sphereMtx[0][3] = local_a0.x;
+        sphereMtx[1][3] = local_a0.y;
+        sphereMtx[2][3] = local_a0.z;
+        DrawSphere__8CGraphicFPA4_f8_GXColor(Graphic, sphereMtx, local_a8);
     }
 }

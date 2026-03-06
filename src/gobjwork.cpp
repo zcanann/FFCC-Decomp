@@ -43,6 +43,7 @@ extern "C" int m_tempVar__4CMes[];
 extern "C" void* __vt__8CMonWork[];
 extern "C" void* __vt__12CCaravanWork[];
 extern "C" void* __vt__9CGObjWork[];
+extern float FLOAT_803309a8;
 extern char DAT_801d9ff0[];
 extern unsigned char CFlat[];
 extern unsigned char MenuPcs[];
@@ -350,12 +351,33 @@ void CCaravanWork::SetBonusCondition(int bonusCondition)
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x800A269C
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::IsOutOfShouki()
+int CCaravanWork::IsOutOfShouki()
 {
-	// TODO
+	unsigned char* ownerBytes = reinterpret_cast<unsigned char*>(m_ownerObj);
+	float ownerValue = *reinterpret_cast<float*>(ownerBytes + 0x5BC);
+	float threshold = FLOAT_803309a8 * Game.game.unkFloat_0xca10;
+
+	if (!(threshold < ownerValue)) {
+		return 0;
+	}
+	if (m_hp == 0) {
+		return 0;
+	}
+	if (((CFlat[4836] & 0x80) == 0) && ((CFlat[4836] & 0x10) == 0)) {
+		return 0;
+	}
+	if ((ownerBytes[0x9B] & 0x80) == 0) {
+		return 0;
+	}
+
+	return 1;
 }
 
 /*
@@ -2083,12 +2105,33 @@ int CCaravanWork::CanPlayerPutItem()
 
 /*
  * --INFO--
- * Address:	TODO
- * Size:	TODO
+ * PAL Address: 0x8009F1FC
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
  */
-void CCaravanWork::GetCurrentWeaponItem(int&, int&)
+void CCaravanWork::GetCurrentWeaponItem(int& weaponItem, int& weaponRef)
 {
-	// TODO
+	short weaponIdx = m_weaponIdx;
+	if (weaponIdx == 0) {
+		int activeWeapon = 0;
+		weaponItem = 0;
+		int ownerWorkAddr = *reinterpret_cast<int*>(reinterpret_cast<unsigned char*>(m_ownerObj) + 0x58);
+		int equippedSlot = *reinterpret_cast<short*>(ownerWorkAddr + 0xAC);
+		if (equippedSlot >= 0) {
+			activeWeapon = *reinterpret_cast<short*>(ownerWorkAddr + equippedSlot * 2 + 0xB6);
+		}
+		weaponRef = activeWeapon;
+		return;
+	}
+
+	if (weaponIdx != 1) {
+		weaponItem = weaponIdx;
+		CCaravanWork* ownerWork = *reinterpret_cast<CCaravanWork**>(reinterpret_cast<unsigned char*>(m_ownerObj) + 0x58);
+		weaponRef = ownerWork->DelCmdListAndItem(weaponIdx, 0);
+	}
 }
 
 /*

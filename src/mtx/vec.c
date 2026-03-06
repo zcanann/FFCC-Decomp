@@ -117,8 +117,8 @@ f32 PSVECMag(const register Vec *v)
     register f32 square_mag;
     register f32 zero;
     register f32 three_c;
-    register f32 n_0;
     register f32 recip;
+    register f32 n_0;
 
     half_c = 0.5f;
 #ifdef __MWERKS__ // clang-format off
@@ -139,11 +139,16 @@ f32 PSVECMag(const register Vec *v)
     if (square_mag == zero) {
     }
     else {
+#ifdef __MWERKS__ // clang-format off
+		asm {
+			frsqrte     recip, square_mag
+		}
+#endif // clang-format on
+
         three_c = 3.0f;
 
 #ifdef __MWERKS__ // clang-format off
 		asm {
-			frsqrte     recip, square_mag
 			fmuls       n_0, recip, recip
 			fmuls       recip, recip, half_c
 			fnmsubs     n_0, n_0, square_mag, three_c

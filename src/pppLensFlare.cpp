@@ -27,20 +27,14 @@ extern struct {
 extern "C" unsigned int __cvt_fp2unsigned(double);
 extern "C" void GXPeekZ(unsigned short, unsigned short, unsigned int*);
 
-static inline s32* GetSerializedDataOffsets(void* param)
-{
-	return *(s32**)((char*)param + 0x0c);
-}
-
 /*
  * --INFO--
  * PAL Address: 0x800dec14
  * PAL Size: 72b
  */
-void pppConstructLensFlare(void* obj, void* param)
+void pppConstructLensFlare(pppColum* obj, _pppCtrlTable* ctrlTable)
 {
-	void* dataPtr = *((void**)((char*)param + 0x0c));
-	char* work = (char*)obj + *((int*)((char*)dataPtr + 0x08)) + 0x80;
+	char* work = (char*)obj + ctrlTable->m_serializedDataOffsets[2] + 0x80;
 
 	float initValue = FLOAT_80331060;
 
@@ -63,7 +57,7 @@ void pppConstructLensFlare(void* obj, void* param)
  * PAL Address: 0x800dec10
  * PAL Size: 4b
  */
-void pppDestructLensFlare(void*, void*)
+void pppDestructLensFlare(pppColum*, _pppCtrlTable*)
 {
 	return;
 }
@@ -77,13 +71,11 @@ void pppDestructLensFlare(void*, void*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameLensFlare(void* obj, void* param2, void* param3)
+void pppFrameLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTable)
 {
 	if (DAT_8032ed70 == 0) {
-		pppColumUnkB* unkB = (pppColumUnkB*)param2;
-		s32* serializedDataOffsets = GetSerializedDataOffsets(param3);
-		int shapeOffset = serializedDataOffsets[2];
-		int colorOffset = serializedDataOffsets[1];
+		int shapeOffset = ctrlTable->m_serializedDataOffsets[2];
+		int colorOffset = ctrlTable->m_serializedDataOffsets[1];
 		u8* alphaPtr = (u8*)((u8*)obj + shapeOffset + 0xb2);
 		u8 sourceAlpha = ((u8*)obj)[colorOffset + 0x88];
 		double alphaScale = (double)((float)sourceAlpha * FLOAT_80331064);
@@ -175,11 +167,8 @@ void pppFrameLensFlare(void* obj, void* param2, void* param3)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderLensFlare(void* obj, void* param2, void* param3)
+void pppRenderLensFlare(pppColum* obj, pppColumUnkB* unkB, _pppCtrlTable* ctrlTable)
 {
-	pppColum* pppLensFlare;
-	pppColumUnkB* unkB;
-	s32* serializedDataOffsets;
 	int iVar1;
 	int iVar2;
 	long* shape;
@@ -189,13 +178,9 @@ void pppRenderLensFlare(void* obj, void* param2, void* param3)
 	u8* arg3Bytes;
 	float stepValue;
 
-	pppLensFlare = (pppColum*)obj;
-	unkB = (pppColumUnkB*)param2;
-	serializedDataOffsets = GetSerializedDataOffsets(param3);
-
-	iVar2 = serializedDataOffsets[2];
-	iVar1 = serializedDataOffsets[1];
-	lensBytes = (u8*)pppLensFlare;
+	iVar2 = ctrlTable->m_serializedDataOffsets[2];
+	iVar1 = ctrlTable->m_serializedDataOffsets[1];
+	lensBytes = (u8*)obj;
 	shapeBytes = lensBytes + iVar2;
 	colorBytes = lensBytes + iVar1;
 	arg3Bytes = (u8*)&unkB->m_arg3;

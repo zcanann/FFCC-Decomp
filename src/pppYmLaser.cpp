@@ -62,24 +62,6 @@ void pppInitBlendMode__Fv(void);
 
 static char s_pppYmLaser_cpp[] = "pppYmLaser.cpp";
 
-struct YmLaserOffsets {
-	int m_serializedDataOffsets[3];
-};
-
-struct YmLaserParam {
-	unsigned char pad[0xc];
-	YmLaserOffsets* offsets;
-};
-
-struct YmLaserStep {
-	s32 m_graphId;
-	s32 m_dataValIndex;
-	u16 m_initWOrk;
-	u16 m_stepValue;
-	s32 m_arg3;
-	u8* m_payload;
-};
-
 struct CMapCylinderRaw {
 	Vec m_bottom;
 	Vec m_direction;
@@ -91,21 +73,6 @@ struct CMapCylinderRaw {
 	float m_height2;
 };
 
-struct pppYmLaser {
-	u8 field_0x0[0x84];
-	f32 field_0x84;
-	f32 field_0x88;
-	f32 field_0x8c;
-	f32 field_0x90;
-	f32 field_0x94;
-	f32 field_0x98;
-	f32 field_0x9c;
-	f32 field_0xa0;
-	f32 field_0xa4;
-	f32 field_0xa8;
-	u8 field_0xac;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x800d3780
@@ -115,11 +82,9 @@ struct pppYmLaser {
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppConstructYmLaser(void* pppYmLaser_, void* param_2_)
+extern "C" void pppConstructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 {
-	pppYmLaser* pppYmLaser = (struct pppYmLaser*)pppYmLaser_;
-	YmLaserParam* param_2 = (YmLaserParam*)param_2_;
-	f32* work = (f32*)((u8*)pppYmLaser + 0x80 + param_2->offsets->m_serializedDataOffsets[2]);
+	f32* work = (f32*)((u8*)laser + 0x80 + ctrlTable->m_serializedDataOffsets[2]);
 
 	*work = FLOAT_80330dc0;
 	work[6] = FLOAT_80330dc0;
@@ -150,12 +115,10 @@ extern "C" void pppConstructYmLaser(void* pppYmLaser_, void* param_2_)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppConstruct2YmLaser(void* pppYmLaser_, void* param_2_)
+extern "C" void pppConstruct2YmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 {
-	pppYmLaser* pppYmLaser = (struct pppYmLaser*)pppYmLaser_;
-	YmLaserParam* param_2 = (YmLaserParam*)param_2_;
 	f32 one = lbl_80330DC0;
-	f32* work = (f32*)((u8*)pppYmLaser + 0x80 + param_2->offsets->m_serializedDataOffsets[2]);
+	f32* work = (f32*)((u8*)laser + 0x80 + ctrlTable->m_serializedDataOffsets[2]);
 
 	work[6] = one;
 	work[5] = one;
@@ -178,11 +141,9 @@ extern "C" void pppConstruct2YmLaser(void* pppYmLaser_, void* param_2_)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppDestructYmLaser(void* pppYmLaser_, void* param_2_)
+extern "C" void pppDestructYmLaser(pppYmLaser* laser, _pppCtrlTable* ctrlTable)
 {
-	pppYmLaser* pppYmLaser = (struct pppYmLaser*)pppYmLaser_;
-	YmLaserParam* param_2 = (YmLaserParam*)param_2_;
-	f32* work = (f32*)((u8*)pppYmLaser + 0x80 + param_2->offsets->m_serializedDataOffsets[2]);
+	f32* work = (f32*)((u8*)laser + 0x80 + ctrlTable->m_serializedDataOffsets[2]);
 	void* stage = *(void**)(work + 7);
 
 	if (stage != 0) {
@@ -200,11 +161,9 @@ extern "C" void pppDestructYmLaser(void* pppYmLaser_, void* param_2_)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppFrameYmLaser(void* pppYmLaser, void* param_2, void* param_3)
+extern "C" void pppFrameYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtrlTable* data)
 {
-	YmLaserStep* step = (YmLaserStep*)param_2;
-	YmLaserParam* data = (YmLaserParam*)param_3;
-	_pppPObject* baseObj = (_pppPObject*)pppYmLaser;
+	_pppPObject* baseObj = (_pppPObject*)laser;
 	float* work;
 	Vec localA;
 	Vec localB;
@@ -215,7 +174,7 @@ extern "C" void pppFrameYmLaser(void* pppYmLaser, void* param_2, void* param_3)
 	bool emptyHistory;
 
 	if ((DAT_8032ed70 == 0) && (step->m_stepValue != 1)) {
-		work = (float*)((u8*)pppYmLaser + 0x88 + data->offsets->m_serializedDataOffsets[2]);
+		work = (float*)((u8*)laser + 0x88 + data->m_serializedDataOffsets[2]);
 		emptyHistory = (work[7] == 0.0f);
 
 	if (emptyHistory) {
@@ -312,7 +271,7 @@ extern "C" void pppFrameYmLaser(void* pppYmLaser, void* param_2, void* param_3)
 				int created;
 				if (dataVals != 0) {
 					created = pppCreatePObject__FP9_pppMngStP12_pppPDataVal(pppMngStPtr, dataVals + step->m_arg3 * 0x10);
-					*(void**)(created + 4) = pppYmLaser;
+					*(void**)(created + 4) = laser;
 					Vec* createdPos = (Vec*)(created + *(int*)step->m_payload + 0x80);
 					createdPos->x = points[i].x;
 					createdPos->y = points[i].y + *(float*)(step->m_payload + 0x34);
@@ -340,13 +299,11 @@ extern "C" void pppFrameYmLaser(void* pppYmLaser, void* param_2, void* param_3)
  * JP Address: TODO
  * JP Size: TODO
  */
-extern "C" void pppRenderYmLaser(void* pppYmLaser, void* param_2, void* param_3)
+extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCtrlTable* data)
 {
-	YmLaserStep* step = (YmLaserStep*)param_2;
-	YmLaserParam* data = (YmLaserParam*)param_3;
-	_pppPObject* baseObj = (_pppPObject*)pppYmLaser;
-	int colorOffset = data->offsets->m_serializedDataOffsets[1];
-	float* work = (float*)((u8*)pppYmLaser + 0x88 + data->offsets->m_serializedDataOffsets[2]);
+	_pppPObject* baseObj = (_pppPObject*)laser;
+	int colorOffset = data->m_serializedDataOffsets[1];
+	float* work = (float*)((u8*)laser + 0x88 + data->m_serializedDataOffsets[2]);
 	Vec* points;
 	u32 count;
 	u32 i;
@@ -378,7 +335,7 @@ extern "C" void pppRenderYmLaser(void* pppYmLaser, void* param_2, void* param_3)
 	pppSetBlendMode__FUc(step->m_payload[0x1c]);
 	_GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);
 	pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
-		(u8*)pppYmLaser + 0x88 + colorOffset, &baseObj->m_localMatrix, FLOAT_80330dc0, step->m_payload[0x39],
+		(u8*)laser + 0x88 + colorOffset, &baseObj->m_localMatrix, FLOAT_80330dc0, step->m_payload[0x39],
 		step->m_payload[0x38], step->m_payload[0x1c], 0, 1, 1, 0);
 	GXSetNumTevStages(1);
 	GXSetNumTexGens(1);
@@ -396,7 +353,7 @@ extern "C" void pppRenderYmLaser(void* pppYmLaser, void* param_2, void* param_3)
 	SetVtxFmt_POS_CLR_TEX__5CUtilFv(&DAT_8032ec70);
 	GXLoadTexObj((GXTexObj*)(tex + 0x28), GX_TEXMAP0);
 
-	color = *(u32*)((u8*)pppYmLaser + 0x88 + colorOffset);
+	color = *(u32*)((u8*)laser + 0x88 + colorOffset);
 	halfWidth = work[4];
 	length = work[0];
 

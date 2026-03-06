@@ -8,23 +8,12 @@ extern u8 PartMng[];
 extern unsigned char* lbl_8032ED50;
 extern CGame Game;
 
-struct YmCallBackObj {
-    u8 m_pad0[0xc];
-    u32 m_graphId;
-};
-
-struct YmCallBackParam {
-    u32 m_unk0;
-    s16 m_graphId;
-    s16 m_initWOrk;
-};
-
 /*
  * --INFO--
  * PAL Address: 0x800a6090
  * PAL Size: 4b
  */
-void pppConstructYmCallBack(void*, void*)
+void pppConstructYmCallBack(pppYmCallBack*, void*)
 {
 	return;
 }
@@ -34,7 +23,7 @@ void pppConstructYmCallBack(void*, void*)
  * PAL Address: TODO
  * PAL Size: 4b
  */
-void pppDestructYmCallBack(void*, void*)
+void pppDestructYmCallBack(pppYmCallBack*, void*)
 {
 	return;
 }
@@ -48,10 +37,10 @@ void pppDestructYmCallBack(void*, void*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmCallBack(void* pppYmCallBack, void* param_2, void*)
+void pppFrameYmCallBack(pppYmCallBack* callbackObj, pppYmCallBackUnkB* param_2, void*)
 {
-    YmCallBackParam* frameParam = (YmCallBackParam*)param_2;
-    YmCallBackObj* ymCallBack = (YmCallBackObj*)pppYmCallBack;
+    pppYmCallBackUnkB* frameParam = param_2;
+    pppYmCallBack* ymCallBack = callbackObj;
     unsigned char* mngSt;
     Vec position;
     s32 mngStIndex;

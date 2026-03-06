@@ -26,7 +26,7 @@ void pppParHitSph(struct _pppPObject* param_1, int param_2)
     Vec local_94;
     Vec local_a0;
     Mtx sphereMtx;
-    Mtx cameraMtx;
+    Mtx cameraMtx ATTRIBUTE_ALIGN(8);
     _GXColor local_a8;
     _pppMngSt* pppMngSt = (_pppMngSt*)lbl_8032ED50;
     float radius;

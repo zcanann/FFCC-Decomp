@@ -2129,29 +2129,6 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
  */
 void _pppDeadPart(_pppMngSt* pppMngSt)
 {
-	struct pppProgSetRaw
-	{
-		u8 m_pad0[0x14];
-		u32 m_deleteFrame;
-		u32 m_loopFrame;
-		u32 m_workBaseOffset;
-		s16 m_numStages;
-		u8 m_pad1[0x28 - 0x26];
-	};
-
-	struct pppStageDefRaw
-	{
-		u8 m_pad0[0x2C];
-		u16 m_workOffset;
-	};
-
-	struct pppPDataValRaw
-	{
-		pppProgSetRaw* m_progSet;
-		_pppPObjLink* m_headObj;
-		u16 m_activeCount;
-	};
-
 	struct pppMngStDeadRaw
 	{
 		u8 m_pad0[0x24];
@@ -2179,58 +2156,56 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 			_pppPObjLink* next = obj->m_next;
 			if (((u8*)obj)[0x7C] == 0)
 			{
-				pppPDataValRaw* owner = (pppPDataValRaw*)obj->m_owner;
-				pppProgSetRaw* progSet = owner->m_progSet;
-				pppStageDefRaw* stage = (pppStageDefRaw*)progSet;
+				_pppPDataVal* owner = (_pppPDataVal*)obj->m_owner;
+				_pppProgSetDef* progSet = owner->m_programSetDef;
 				int stageIdx = 0;
 
 				*(u32*)(((u8*)obj) + 0x0C) += 0x1000;
 
 				for (stageIdx = 0; stageIdx < progSet->m_numStages; stageIdx++)
 				{
+					_pppCtrlTable* stage = &progSet->m_stages[stageIdx];
 					u32 stageSlotOffset = progSet->m_workBaseOffset + stageIdx * 4;
 					u32* stageSlot = *(u32**)(((u8*)obj) + stageSlotOffset);
-					u32* nextSlot = (u32*)(((u8*)stageSlot) + stage->m_workOffset);
+					u32* nextSlot = (u32*)(((u8*)stageSlot) + stage->m_workInfo.m_workOffset);
 					if (*nextSlot == *(u32*)(((u8*)obj) + 0x0C))
 					{
 						*(u32**)(((u8*)obj) + stageSlotOffset) = nextSlot;
 					}
-					stage = (pppStageDefRaw*)(((u8*)stage) + 0x10);
 				}
 
 				if (mng->m_loopMode != 0 &&
 					*(u32*)(((u8*)obj) + 0x0C) >= progSet->m_loopFrame &&
 					(progSet->m_loopFrame & 0xF0000000) != 0x70000000)
 				{
-					*(u32*)(((u8*)obj) + 0x0C) = progSet->m_deleteFrame;
+					*(u32*)(((u8*)obj) + 0x0C) = progSet->m_endFrame;
 					callCon2Prog((_pppPObject*)obj);
 				}
 				else
 				{
-					maxDeleteFrame |= progSet->m_deleteFrame;
-					if (*(u32*)(((u8*)obj) + 0x0C) >= progSet->m_deleteFrame)
+					maxDeleteFrame |= progSet->m_endFrame;
+					if (*(u32*)(((u8*)obj) + 0x0C) >= progSet->m_endFrame)
 					{
 						prev->m_next = next;
 
-						stage = (pppStageDefRaw*)progSet;
 						for (stageIdx = 0; stageIdx < progSet->m_numStages; stageIdx++)
 						{
-							pppProg* prog = *(pppProg**)(((u8*)stage) + 0x28);
+							_pppCtrlTable* stage = &progSet->m_stages[stageIdx];
+							pppProg* prog = stage->m_prog;
 							if (prog != 0 && prog->m_pppFunctionDestructor != 0)
 							{
-								((pppProgDestructCallback)prog->m_pppFunctionDestructor)(obj, (_pppCtrlTable*)(((u8*)stage) + 0x28));
+								((pppProgDestructCallback)prog->m_pppFunctionDestructor)(obj, stage);
 							}
-							stage = (pppStageDefRaw*)(((u8*)stage) + 0x10);
 						}
 
 						owner->m_activeCount--;
 						if (owner->m_activeCount == 0)
 						{
-							owner->m_headObj = 0;
+							owner->m_pppPObjLink = 0;
 						}
-						else if (owner->m_headObj == obj)
+						else if (owner->m_pppPObjLink == obj)
 						{
-							owner->m_headObj = next;
+							owner->m_pppPObjLink = next;
 						}
 
 						Memory.Free(obj);
@@ -2254,28 +2229,27 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 			for (_pppPObjLink* obj = mng->m_objHead.m_next; obj != 0;)
 			{
 				_pppPObjLink* next = obj->m_next;
-				pppPDataValRaw* owner = (pppPDataValRaw*)obj->m_owner;
-				pppProgSetRaw* progSet = owner->m_progSet;
-				pppStageDefRaw* stage = (pppStageDefRaw*)progSet;
+				_pppPDataVal* owner = (_pppPDataVal*)obj->m_owner;
+				_pppProgSetDef* progSet = owner->m_programSetDef;
 
 				for (int stageIdx = 0; stageIdx < progSet->m_numStages; stageIdx++)
 				{
-					pppProg* prog = *(pppProg**)(((u8*)stage) + 0x28);
+					_pppCtrlTable* stage = &progSet->m_stages[stageIdx];
+					pppProg* prog = stage->m_prog;
 					if (prog != 0 && prog->m_pppFunctionDestructor != 0)
 					{
-						((pppProgDestructCallback)prog->m_pppFunctionDestructor)(obj, (_pppCtrlTable*)(((u8*)stage) + 0x28));
+						((pppProgDestructCallback)prog->m_pppFunctionDestructor)(obj, stage);
 					}
-					stage = (pppStageDefRaw*)(((u8*)stage) + 0x10);
 				}
 
 				owner->m_activeCount--;
 				if (owner->m_activeCount == 0)
 				{
-					owner->m_headObj = 0;
+					owner->m_pppPObjLink = 0;
 				}
-				else if (owner->m_headObj == obj)
+				else if (owner->m_pppPObjLink == obj)
 				{
-					owner->m_headObj = next;
+					owner->m_pppPObjLink = next;
 				}
 
 				Memory.Free(obj);

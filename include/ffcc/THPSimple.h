@@ -31,6 +31,15 @@ s32 THPSimpleDrawCurrentFrame(GXRenderModeObj*, int, int, int, int);
 void MixAudio__FPsPsUl(short*, short*, unsigned long);
 void THPAudioMixCallback__Fv();
 
+extern s32 gTHPSimpleInitialized;
+extern s32 gTHPSimpleSoundBufferIndex;
+extern void (*gTHPSimpleOldAIDCallback)(void);
+extern s16* gTHPSimpleCurAudioBuffer;
+extern s16* gTHPSimpleLastAudioBuffer;
+extern s32 gTHPSimpleAudioSystem;
+extern u16 gTHPSimpleVolumeTable[];
+extern s16 WorkBuffer_32_[];
+
 #define MixAudio MixAudio__FPsPsUl
 #define THPAudioMixCallback THPAudioMixCallback__Fv
 #define __THPSimpleDVDCallback __THPSimpleDVDCallback__FlP11DVDFileInfo

@@ -5,30 +5,30 @@
 extern const char* PTR_s_The_data_is_corrupt__80215bd8[];
 extern const char* PTR_s_Der_Spielstand_ist_fehlerhaft__80215be8[];
 extern const char* PTR_s_I_dati_sono_danneggiati__80215bf8[];
-extern const char* lbl_80215C08[];
-extern const char* lbl_80215C18[];
+extern const char* s_McStr_es[];
+extern const char* s_McStr_fr[];
 
-extern const char* lbl_80215C28[];
-extern const char* lbl_80215D14[];
-extern const char* lbl_80215E00[];
-extern const char* lbl_80215EEC[];
-extern const char* lbl_80215FD8[];
+extern const char* s_McWinMessGroup0_en[];
+extern const char* s_McWinMessGroup0_de[];
+extern const char* s_McWinMessGroup0_it[];
+extern const char* s_McWinMessGroup0_es[];
+extern const char* s_McWinMessGroup0_fr[];
 
-extern const char* lbl_802160C4[];
-extern const char* lbl_80216140[];
-extern const char* lbl_802161BC[];
-extern const char* lbl_80216238[];
-extern const char* lbl_802162B4[];
+extern const char* s_McWinMessGroup2_en[];
+extern const char* s_McWinMessGroup2_de[];
+extern const char* s_McWinMessGroup2_it[];
+extern const char* s_McWinMessGroup2_es[];
+extern const char* s_McWinMessGroup2_fr[];
 
-extern const char* lbl_80216330[];
-extern const char* lbl_8021636C[];
-extern const char* lbl_802163A8[];
-extern const char* lbl_802163E4[];
-extern const char* lbl_80216420[];
+extern const char* s_McWinMessGroup1_en[];
+extern const char* s_McWinMessGroup1_de[];
+extern const char* s_McWinMessGroup1_it[];
+extern const char* s_McWinMessGroup1_es[];
+extern const char* s_McWinMessGroup1_fr[];
 
-extern const char lbl_8021645C[];
-extern const char* lbl_8021672C[];
-extern const char* lbl_80216740[];
+extern const char s_WinMessTable[];
+extern const char* s_NoTextByLanguage[];
+extern const char* s_SlotBTextByLanguage[];
 
 extern "C" void SetMargin__5CFontFf(float, CFont*);
 extern "C" void SetShadow__5CFontFi(CFont*, int);
@@ -53,9 +53,9 @@ const char* CMenuPcs::GetMcStr(int index)
     case 3:
         return PTR_s_I_dati_sono_danneggiati__80215bf8[index];
     case 4:
-        return lbl_80215C08[index];
+        return s_McStr_es[index];
     case 5:
-        return lbl_80215C18[index];
+        return s_McStr_fr[index];
     default:
         return PTR_s_The_data_is_corrupt__80215bd8[index];
     }
@@ -77,41 +77,41 @@ const char* const* CMenuPcs::GetMcWinMessBuff(int group)
     case 0:
         switch (languageId) {
         case 2:
-            return lbl_80215D14;
+            return s_McWinMessGroup0_de;
         case 3:
-            return lbl_80215E00;
+            return s_McWinMessGroup0_it;
         case 4:
-            return lbl_80215EEC;
+            return s_McWinMessGroup0_es;
         case 5:
-            return lbl_80215FD8;
+            return s_McWinMessGroup0_fr;
         default:
-            return lbl_80215C28;
+            return s_McWinMessGroup0_en;
         }
     case 1:
         switch (languageId) {
         case 2:
-            return lbl_8021636C;
+            return s_McWinMessGroup1_de;
         case 3:
-            return lbl_802163A8;
+            return s_McWinMessGroup1_it;
         case 4:
-            return lbl_802163E4;
+            return s_McWinMessGroup1_es;
         case 5:
-            return lbl_80216420;
+            return s_McWinMessGroup1_fr;
         default:
-            return lbl_80216330;
+            return s_McWinMessGroup1_en;
         }
     default:
         switch (languageId) {
         case 2:
-            return lbl_80216140;
+            return s_McWinMessGroup2_de;
         case 3:
-            return lbl_802161BC;
+            return s_McWinMessGroup2_it;
         case 4:
-            return lbl_80216238;
+            return s_McWinMessGroup2_es;
         case 5:
-            return lbl_802162B4;
+            return s_McWinMessGroup2_fr;
         default:
-            return lbl_802160C4;
+            return s_McWinMessGroup2_en;
         }
     }
 }
@@ -129,9 +129,9 @@ const char* CMenuPcs::GetWinMess(int index)
 {
     int languageId = Game.game.m_gameWork.m_languageId;
     if ((languageId == 1) || (languageId < 1) || (languageId >= 6)) {
-        return &lbl_8021645C[index * 0x14];
+        return &s_WinMessTable[index * 0x14];
     }
-    return &lbl_8021645C[index * 0x14];
+    return &s_WinMessTable[index * 0x14];
 }
 
 /*
@@ -148,19 +148,19 @@ int CMenuPcs::GetYesNoXPos(int right)
     const unsigned char languageId = Game.game.m_gameWork.m_languageId;
     const char* yesText;
     if (languageId == 3) {
-        yesText = lbl_80215E00[13];
+        yesText = s_McWinMessGroup0_it[13];
     } else if (languageId < 3) {
         if ((languageId == 1) || (languageId == 0)) {
-            yesText = lbl_80215C28[13];
+            yesText = s_McWinMessGroup0_en[13];
         } else {
-            yesText = lbl_80215D14[13];
+            yesText = s_McWinMessGroup0_de[13];
         }
     } else if (languageId == 5) {
-        yesText = lbl_80215FD8[13];
+        yesText = s_McWinMessGroup0_fr[13];
     } else if (languageId < 5) {
-        yesText = lbl_80215EEC[13];
+        yesText = s_McWinMessGroup0_es[13];
     } else {
-        yesText = lbl_80215C28[13];
+        yesText = s_McWinMessGroup0_en[13];
     }
 
     CFont* font = menuFont;
@@ -172,7 +172,7 @@ int CMenuPcs::GetYesNoXPos(int right)
     short* windowInfo = singWindowInfo;
     int x = (int)(((double)(windowInfo[2] - yesWidth) * 0.5) + (double)windowInfo[0]);
     if (right != 0) {
-        const int noWidth = (int)GetWidth__5CFontFPc(font, lbl_8021672C[languageId - 1]);
+        const int noWidth = (int)GetWidth__5CFontFPc(font, s_NoTextByLanguage[languageId - 1]);
         x += yesWidth - noWidth;
     }
     return x - 0x1e;
@@ -192,19 +192,19 @@ int CMenuPcs::GetSlotABXPos(int right)
     const unsigned char languageId = Game.game.m_gameWork.m_languageId;
     const char* slotAText;
     if (languageId == 3) {
-        slotAText = lbl_80215E00[2];
+        slotAText = s_McWinMessGroup0_it[2];
     } else if (languageId < 3) {
         if ((languageId == 1) || (languageId == 0)) {
-            slotAText = lbl_80215C28[2];
+            slotAText = s_McWinMessGroup0_en[2];
         } else {
-            slotAText = lbl_80215D14[2];
+            slotAText = s_McWinMessGroup0_de[2];
         }
     } else if (languageId == 5) {
-        slotAText = lbl_80215FD8[2];
+        slotAText = s_McWinMessGroup0_fr[2];
     } else if (languageId < 5) {
-        slotAText = lbl_80215EEC[2];
+        slotAText = s_McWinMessGroup0_es[2];
     } else {
-        slotAText = lbl_80215C28[2];
+        slotAText = s_McWinMessGroup0_en[2];
     }
 
     CFont* font = menuFont;
@@ -217,7 +217,7 @@ int CMenuPcs::GetSlotABXPos(int right)
     short* windowInfo = singWindowInfo;
     int x = (int)(((double)(windowInfo[2] - slotAWidth) * 0.5) + (double)windowInfo[0]);
     if (right != 0) {
-        const int slotBWidth = (int)GetWidth__5CFontFPc(font, lbl_80216740[languageId - 1]);
+        const int slotBWidth = (int)GetWidth__5CFontFPc(font, s_SlotBTextByLanguage[languageId - 1]);
         x += slotAWidth - slotBWidth;
     }
     return x - 0x1e;

@@ -17,7 +17,7 @@
 #include <string.h>
 
 extern CFontMan FontMan;
-extern CUtil DAT_8032ec70;
+extern CUtil gUtil;
 extern void* DAT_8023802c;
 extern void* DAT_80238030;
 
@@ -533,13 +533,13 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
         {
             Graphic.GetBackBufferRect2(DAT_80238030, &backupTexObj, 0, 0, 0x280, 0x70, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
-            DAT_8032ec70.RenderColorQuad(0.0f, 0.0f, 640.0f, 112.0f, CColor(0, 0, 0, 255).color);
+            gUtil.RenderColorQuad(0.0f, 0.0f, 640.0f, 112.0f, CColor(0, 0, 0, 255).color);
             memcpy((void*)((char*)DAT_80238030 + 0x46000), (void*)((char*)DAT_8023802c + 0x34800), 0x29400);
             DCFlushRange((void*)((char*)DAT_80238030 + 0x46000), 0x29400);
         }
         else
         {
-            DAT_8032ec70.RenderColorQuad(0.0f, 0.0f, 640.0f, 448.0f, CColor(0, 0, 0, 255).color);
+            gUtil.RenderColorQuad(0.0f, 0.0f, 640.0f, 448.0f, CColor(0, 0, 0, 255).color);
         }
 
         font->SetScale(1.0f);
@@ -638,14 +638,14 @@ void CFile::DrawError(DVDFileInfo& info, int errorCode)
 
         if (compactLayout)
         {
-            DAT_8032ec70.RenderTextureQuad(0.0f, 0.0f, 640.0f, 112.0f, &backupTexObj, 0, 0, 0, GX_BL_SRCALPHA,
+            gUtil.RenderTextureQuad(0.0f, 0.0f, 640.0f, 112.0f, &backupTexObj, 0, 0, 0, GX_BL_SRCALPHA,
                                            GX_BL_INVSRCALPHA);
             memcpy((void*)((char*)DAT_8023802c + 0x34800), (void*)((char*)DAT_80238030 + 0x46000), 0x29400);
             DCFlushRange((void*)((char*)DAT_8023802c + 0x34800), 0x29400);
         }
         else
         {
-            DAT_8032ec70.RenderColorQuad(0.0f, 0.0f, 640.0f, 448.0f, CColor(0, 0, 0, 255).color);
+            gUtil.RenderColorQuad(0.0f, 0.0f, 640.0f, 448.0f, CColor(0, 0, 0, 255).color);
             GXCopyDisp(DAT_8023802c, GX_FALSE);
         }
 

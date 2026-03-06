@@ -14,7 +14,7 @@ extern u32 DAT_803306e4;
 extern f64 DOUBLE_803306f8;
 extern int gPppCalcDisabled;
 extern s32 DAT_801eadc8;
-extern CUtil DAT_8032ec70;
+extern CUtil gUtil;
 
 extern "C" {
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
@@ -256,9 +256,9 @@ void pppFrameYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYmT
             for (s32 i = 0; i < (s32)(u32)param_2->m_payload[9]; i++) {
                 f32 t = (f32)(stepScale * (f64)(i + 1));
 
-                DAT_8032ec70.GetSplinePos(splineFrom[(param_2->m_payload[9] - 1) - i], entries[3].to, entries[2].to,
+                gUtil.GetSplinePos(splineFrom[(param_2->m_payload[9] - 1) - i], entries[3].to, entries[2].to,
                                           entries[1].to, entries[0].from, t, FLOAT_803306ec);
-                DAT_8032ec70.GetSplinePos(splineTo[(param_2->m_payload[9] - 1) - i], entries[4].from, entries[3].from,
+                gUtil.GetSplinePos(splineTo[(param_2->m_payload[9] - 1) - i], entries[4].from, entries[3].from,
                                           entries[2].from, entries[0].to, t, FLOAT_803306ec);
 
                 splineCount++;
@@ -345,7 +345,7 @@ void pppRenderYmTracer(pppYmTracer* pppYmTracer, pppYmTracerUnkB* param_2, pppYm
         pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
             (void*)((char*)pppYmTracer + 0x88 + serializedOffset1), (void*)&ppvCameraMatrix0, FLOAT_803306e8,
             param_2->m_payload[0xC], param_2->m_payload[0xB], param_2->m_payload[10], 0, 1, 1, 0);
-        SetVtxFmt_POS_CLR_TEX__5CUtilFv(&DAT_8032ec70);
+        SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
 
         textureIndex = 0;
         texture = (CTexture*)GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, pppEnvStPtr->m_materialSetPtr, textureIndex);

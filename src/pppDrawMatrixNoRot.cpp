@@ -17,15 +17,15 @@ void pppDrawMatrixNoRot(struct _pppPObject* object, void*, struct _pppCtrlTable*
     PSMTXScaleApply(
         *(Mtx*)((char*)object + 0x10),
         *(Mtx*)((char*)object + 0x40),
-        (((_pppMngSt*)lbl_8032ED50)->m_scale).x,
-        (((_pppMngSt*)lbl_8032ED50)->m_scale).y, 
-        (((_pppMngSt*)lbl_8032ED50)->m_scale).z
+        (((_pppMngSt*)pppMngStPtr)->m_scale).x,
+        (((_pppMngSt*)pppMngStPtr)->m_scale).y, 
+        (((_pppMngSt*)pppMngStPtr)->m_scale).z
     );
     *(float*)((char*)object + 0x4c) =
-        (*(float*)((char*)object + 0x1c)) * (((_pppMngSt*)lbl_8032ED50)->m_scale).x +
+        (*(float*)((char*)object + 0x1c)) * (((_pppMngSt*)pppMngStPtr)->m_scale).x +
         ppvWorldMatrix[0][3];
     *(float*)((char*)object + 0x5c) =
-        (*(float*)((char*)object + 0x2c)) * (((_pppMngSt*)lbl_8032ED50)->m_scale).y + ppvWorldMatrix[1][3];
+        (*(float*)((char*)object + 0x2c)) * (((_pppMngSt*)pppMngStPtr)->m_scale).y + ppvWorldMatrix[1][3];
     *(float*)((char*)object + 0x6c) =
-        (*(float*)((char*)object + 0x3c)) * (((_pppMngSt*)lbl_8032ED50)->m_scale).z + ppvWorldMatrix[2][3];
+        (*(float*)((char*)object + 0x3c)) * (((_pppMngSt*)pppMngStPtr)->m_scale).z + ppvWorldMatrix[2][3];
 }

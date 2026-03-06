@@ -4,7 +4,7 @@
 #include <dolphin/mtx.h>
 
 // External references
-extern int DAT_8032ec70;
+extern int gUtil;
 extern float lbl_803331A8;
 extern void GetDirectVector__5CUtilFP3VecP3Vec3Vec(void*, Vec*, Vec*, Vec*);
 extern struct {
@@ -92,7 +92,7 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
 
     fVar3 = *(float*)(owner + 0x1c);
     fVar2 = *(float*)(owner + 0x2c);
-    GetDirectVector__5CUtilFP3VecP3Vec3Vec((void*)&DAT_8032ec70, &local_c8, &local_d4, (Vec*)&local_f8);
+    GetDirectVector__5CUtilFP3VecP3Vec3Vec((void*)&gUtil, &local_c8, &local_d4, (Vec*)&local_f8);
 
     local_e0.x = fVar3 * local_c8.x;
     local_e0.y = fVar3 * local_c8.y;
@@ -132,7 +132,7 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
 void pppConstructConstrainCameraForLoc(_pppPObjLink*, _pppCtrlTable*)
 {
 	// pppMngStPtr points to a structure, access CGObject at offset 0xd8
-	CGObject* obj = *(CGObject**)(lbl_8032ED50 + 0xd8);
+	CGObject* obj = *(CGObject**)(pppMngStPtr + 0xd8);
 	int modelPtr = GetModelPtr__FP8CGObject(obj);
 	*(int*)(modelPtr + 0xec) = 0;
 }
@@ -174,7 +174,7 @@ void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraF
 
 	if (gPppCalcDisabled == 0) {
 		value = (float*)((char*)constrainCameraForLoc + 0x80 + data->m_serializedDataOffsets[2]);
-		CGObject* obj = *(CGObject**)(lbl_8032ED50 + 0xd8);
+		CGObject* obj = *(CGObject**)(pppMngStPtr + 0xd8);
 		modelPtr = GetModelPtr__FP8CGObject(obj);
 		*(float**)(modelPtr + 0xe4) = value;
 		*(pppConstrainCameraForLocParams**)(modelPtr + 0xe8) = params;

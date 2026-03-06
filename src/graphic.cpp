@@ -18,7 +18,7 @@ extern "C" char lbl_801E8408[];
 extern GXRenderModeObj lbl_801E83C0;
 extern u8 DAT_801E83F2[7];
 extern char DAT_80238030[];
-extern CUtil DAT_8032ec70;
+extern CUtil gUtil;
 extern "C" u8 DAT_8032ec48;
 extern "C" u8 DAT_8032ec4c;
 extern "C" u8 DAT_8032ec50;
@@ -1697,11 +1697,11 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		farAlpha = 0xFF;
 	}
 
-	DAT_8032ec70.SetVtxFmt_POS_CLR_TEX();
+	gUtil.SetVtxFmt_POS_CLR_TEX();
 	CreateSmallBackTexture(DAT_80238030, &smallBackTex, 0x140, 0xE0, GX_NEAR, GX_TF_I8, 0);
 	GetBackBufferRect2(DAT_80238030, &backBufferTex, 0, 0, 0x280, 0x1C0, texBufferSize, GX_NEAR, (_GXTexFmt)0x11, 0);
-	DAT_8032ec70.SetVtxFmt_POS_CLR_TEX0_TEX1();
-	DAT_8032ec70.SetOrthoEnv();
+	gUtil.SetVtxFmt_POS_CLR_TEX0_TEX1();
+	gUtil.SetOrthoEnv();
 
 	xOffset = (float)blurWidth;
 	yOffset = xOffset * (224.0f / 640.0f);
@@ -1779,7 +1779,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		quadMax.x = 640.0f;
 		quadMax.y = 224.0f;
 		quadMax.z = 0.0f;
-		DAT_8032ec70.RenderQuadTex2(quadMin, quadMax, dofColor, 0, 0);
+		gUtil.RenderQuadTex2(quadMin, quadMax, dofColor, 0, 0);
 
 		quadMin.x = -xOffset;
 		quadMin.y = 0.0f;
@@ -1787,7 +1787,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		quadMax.x = 640.0f - xOffset;
 		quadMax.y = 224.0f;
 		quadMax.z = 0.0f;
-		DAT_8032ec70.RenderQuadTex2(quadMin, quadMax, dofColor, 0, 0);
+		gUtil.RenderQuadTex2(quadMin, quadMax, dofColor, 0, 0);
 
 		quadMin.x = xOffset;
 		quadMin.y = 0.0f;
@@ -1795,7 +1795,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		quadMax.x = 640.0f + xOffset;
 		quadMax.y = 224.0f;
 		quadMax.z = 0.0f;
-		DAT_8032ec70.RenderQuadTex2(quadMin, quadMax, dofColor, 0, 0);
+		gUtil.RenderQuadTex2(quadMin, quadMax, dofColor, 0, 0);
 
 		quadMin.x = 0.0f;
 		quadMin.y = -yOffset;
@@ -1803,7 +1803,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		quadMax.x = 640.0f;
 		quadMax.y = 224.0f - yOffset;
 		quadMax.z = 0.0f;
-		DAT_8032ec70.RenderQuadTex2(quadMin, quadMax, dofColor, 0, 0);
+		gUtil.RenderQuadTex2(quadMin, quadMax, dofColor, 0, 0);
 
 		quadMin.x = 0.0f;
 		quadMin.y = yOffset;
@@ -1811,7 +1811,7 @@ void CGraphic::RenderDOF(signed char mode, signed char blurWidth, float nearDist
 		quadMax.x = 640.0f;
 		quadMax.y = 224.0f + yOffset;
 		quadMax.z = 0.0f;
-		DAT_8032ec70.RenderQuadTex2(quadMin, quadMax, dofColor, 0, 0);
+		gUtil.RenderQuadTex2(quadMin, quadMax, dofColor, 0, 0);
 	}
 }
 
@@ -1836,9 +1836,9 @@ void CGraphic::CreateSmallBackTexture(void* src, _GXTexObj* texObj, long width, 
     int halfWidth = static_cast<int>(width) / 2;
     int halfHeight = static_cast<int>(height) / 2;
 
-    DAT_8032ec70.SetOrthoEnv();
-    DAT_8032ec70.SetVtxFmt_POS_CLR_TEX();
-    DAT_8032ec70.DisableIndMtx();
+    gUtil.SetOrthoEnv();
+    gUtil.SetVtxFmt_POS_CLR_TEX();
+    gUtil.DisableIndMtx();
 
     GXSetNumChans(1);
     GXSetZCompLoc(0);
@@ -1871,7 +1871,7 @@ void CGraphic::CreateSmallBackTexture(void* src, _GXTexObj* texObj, long width, 
     quadMax.x = static_cast<float>(halfWidth);
     quadMax.y = static_cast<float>(halfHeight);
     quadMax.z = 0.0f;
-    DAT_8032ec70.RenderQuad(quadMin, quadMax, white, 0, 0);
+    gUtil.RenderQuad(quadMin, quadMax, white, 0, 0);
 
     GetBackBufferRect2(PtrAt(this, 0x71E8), texObj, 0x140, 0, 0x140, 0xE0, 0, filter, format, 0);
     GXLoadTexObj(texObj, GX_TEXMAP0);
@@ -1881,7 +1881,7 @@ void CGraphic::CreateSmallBackTexture(void* src, _GXTexObj* texObj, long width, 
     quadMax.x = static_cast<float>(width);
     quadMax.y = static_cast<float>(halfHeight);
     quadMax.z = 0.0f;
-    DAT_8032ec70.RenderQuad(quadMin, quadMax, white, 0, 0);
+    gUtil.RenderQuad(quadMin, quadMax, white, 0, 0);
 
     GetBackBufferRect2(PtrAt(this, 0x71E8), texObj, 0, 0xE0, 0x140, 0xE0, 0, filter, format, 0);
     GXLoadTexObj(texObj, GX_TEXMAP0);
@@ -1891,7 +1891,7 @@ void CGraphic::CreateSmallBackTexture(void* src, _GXTexObj* texObj, long width, 
     quadMax.x = static_cast<float>(halfWidth);
     quadMax.y = static_cast<float>(height);
     quadMax.z = 0.0f;
-    DAT_8032ec70.RenderQuad(quadMin, quadMax, white, 0, 0);
+    gUtil.RenderQuad(quadMin, quadMax, white, 0, 0);
 
     GetBackBufferRect2(PtrAt(this, 0x71E8), texObj, 0x140, 0xE0, 0x140, 0xE0, 0, filter, format, 0);
     GXLoadTexObj(texObj, GX_TEXMAP0);
@@ -1901,7 +1901,7 @@ void CGraphic::CreateSmallBackTexture(void* src, _GXTexObj* texObj, long width, 
     quadMax.x = static_cast<float>(width);
     quadMax.y = static_cast<float>(height);
     quadMax.z = 0.0f;
-    DAT_8032ec70.RenderQuad(quadMin, quadMax, white, 0, 0);
+    gUtil.RenderQuad(quadMin, quadMax, white, 0, 0);
 
     GetBackBufferRect2(src, texObj, 0, 0, static_cast<int>(width), static_cast<int>(height), textureSize, filter, format, 0);
     GXLoadTexObj(&tempTex, GX_TEXMAP0);
@@ -1911,7 +1911,7 @@ void CGraphic::CreateSmallBackTexture(void* src, _GXTexObj* texObj, long width, 
     quadMax.x = 1.0f;
     quadMax.y = 1.0f;
     quadMax.z = 0.0f;
-    DAT_8032ec70.RenderQuad(quadMin, quadMax, white, 0, 0);
+    gUtil.RenderQuad(quadMin, quadMax, white, 0, 0);
 
     PSMTXCopy(CameraPcs.m_cameraMatrix, cameraMtx);
     GXGetProjectionv(projection);
@@ -1952,9 +1952,9 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
     (void)unused0;
     (void)unused2;
 
-    DAT_8032ec70.DisableIndMtx();
-    DAT_8032ec70.SetOrthoEnv();
-    DAT_8032ec70.SetVtxFmt_POS_CLR_TEX();
+    gUtil.DisableIndMtx();
+    gUtil.SetOrthoEnv();
+    gUtil.SetVtxFmt_POS_CLR_TEX();
     GXSetZCompLoc(GX_FALSE);
     GXSetAlphaCompare(GX_ALWAYS, 1, GX_AOP_OR, GX_ALWAYS, 0);
     GXSetCullMode(GX_CULL_NONE);
@@ -1969,7 +1969,7 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
     GXSetChanAmbColor(GX_COLOR0A0, blurColor);
     GXSetChanMatColor(GX_COLOR0A0, blurColor);
 
-    DAT_8032ec70.SetOrthoEnv();
+    gUtil.SetOrthoEnv();
     _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(1, 4, 5, 1);
     GXSetTevDirect(GX_TEVSTAGE0);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
@@ -1997,7 +1997,7 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
             quadMax.x = 640.0f;
             quadMax.y = 448.0f;
             quadMax.z = 0.0f;
-            DAT_8032ec70.RenderQuad(quadMin, quadMax, blurColor, 0, 0);
+            gUtil.RenderQuad(quadMin, quadMax, blurColor, 0, 0);
         } else if (mode == 0) {
             float blurOffset = static_cast<float>(offset);
             quadMin.x = -blurOffset;
@@ -2006,7 +2006,7 @@ void CGraphic::RenderBlur(int unused0, unsigned char mode, unsigned char unused2
             quadMax.x = 640.0f + blurOffset;
             quadMax.y = 448.0f + blurOffset;
             quadMax.z = 0.0f;
-            DAT_8032ec70.RenderQuad(quadMin, quadMax, blurColor, 0, 0);
+            gUtil.RenderQuad(quadMin, quadMax, blurColor, 0, 0);
         }
     }
 

@@ -20,7 +20,7 @@ struct CMapMeshUVLayout {
 extern int gPppCalcDisabled;
 extern f32 FLOAT_80330548;
 extern f32 FLOAT_8033054c;
-extern _pppEnvSt* pppEnvStPtr;
+extern _pppEnvSt* lbl_8032ED54;
 extern char DAT_801d9c54[];
 extern char s_PerU___0_2f_PerV___0_2f_801d9c38[];
 
@@ -58,7 +58,7 @@ void pppConstructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
     work->m_perU = FLOAT_8033054c;
     work->m_perV = FLOAT_8033054c;
 
-    mapMesh = pppEnvStPtr->m_mapMeshPtr;
+    mapMesh = lbl_8032ED54->m_mapMeshPtr;
     if (mapMesh != NULL) {
         uvLayout = (CMapMeshUVLayout*)mapMesh;
         uvPairs = uvLayout->m_uvPairs;
@@ -95,7 +95,7 @@ void pppDestructYmDrawMdlTexAnm(_pppPObjLink* object, _pppCtrlTable* ctrl)
 
     work = (pppYmDrawMdlTexAnmWork*)((u8*)object + 0x80 + ctrl->m_serializedDataOffsets[2]);
     frameIndex = work->m_frame;
-    if ((frameIndex != 0) && ((mapMesh = pppEnvStPtr->m_mapMeshPtr) != NULL)) {
+    if ((frameIndex != 0) && ((mapMesh = lbl_8032ED54->m_mapMeshPtr) != NULL)) {
         uvLayout = (CMapMeshUVLayout*)mapMesh;
         uvPairs = uvLayout->m_uvPairs;
         for (i = 0; i < (u32)uvLayout->m_uvCount; i++) {
@@ -146,7 +146,7 @@ void pppFrameYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step, 
         return;
     }
 
-    mapMesh = ((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[step->m_dataValIndex];
+    mapMesh = ((CMapMesh**)lbl_8032ED54->m_mapMeshPtr)[step->m_dataValIndex];
     if ((work->m_perU == FLOAT_8033054c) || (work->m_perV == FLOAT_8033054c)) {
         if (mapMesh == NULL) {
             return;
@@ -212,7 +212,7 @@ void pppRenderYmDrawMdlTexAnm(_pppPObject* object, pppYmDrawMdlTexAnmStep* step,
     u8* stepBytes;
     s32 colorOffset;
 
-    model = (pppModelSt*)((CMapMesh**)pppEnvStPtr->m_mapMeshPtr)[step->m_dataValIndex];
+    model = (pppModelSt*)((CMapMesh**)lbl_8032ED54->m_mapMeshPtr)[step->m_dataValIndex];
     if (model == NULL) {
         return;
     }

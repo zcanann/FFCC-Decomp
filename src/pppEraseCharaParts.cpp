@@ -144,7 +144,7 @@ void pppFrameEraseCharaParts(pppEraseCharaParts* pppEraseCharaParts, pppEraseCha
         colorIndex = offsets[0];
         dstColor = (u8*)((char*)pppEraseCharaParts + 2 + offsets[1]);
         srcColor = (u8*)((char*)pppEraseCharaParts + 0x88 + colorIndex);
-        handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)pppMngStPtr + 0x8), 0);
+        handle = GetCharaHandlePtr__FP8CGObjectl(*(void**)((char*)lbl_8032ED50 + 0x8), 0);
         model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
 
         *(u8**)(model + 0xE4) = dstColor;

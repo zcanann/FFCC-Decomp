@@ -19,7 +19,7 @@ extern _pppMngStYmChangeTex* pppMngStPtr;
 extern _pppEnvStYmChangeTex* pppEnvStPtr;
 extern float DAT_80330e10;
 extern int gPppCalcDisabled;
-extern char DAT_8032ec70[];
+extern char gUtil[];
 extern char s_pppYmChangeTex_cpp_801db4c0[];
 extern float FLOAT_80330df8;
 extern float FLOAT_80330dfc;
@@ -360,7 +360,7 @@ void pppFrameYmChangeTex(pppYmChangeTex* ymChangeTex, pppYmChangeTexStep* step, 
 				*(int*)dlPair =
 				    (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(dlInfo[0], pppEnvStPtr->m_stagePtr, s_pppYmChangeTex_cpp_801db4c0, 0x174);
 				memcpy(*(void**)dlPair, (void*)dlInfo[1], dlInfo[0]);
-				ReWriteDisplayList__5CUtilFPvUlUl(DAT_8032ec70, *(void**)dlPair, (unsigned long)dlInfo[0], 1);
+				ReWriteDisplayList__5CUtilFPvUlUl(gUtil, *(void**)dlPair, (unsigned long)dlInfo[0], 1);
 				DCFlushRange(*(void**)dlPair, (unsigned long)dlInfo[0]);
 
 				dlEntries--;

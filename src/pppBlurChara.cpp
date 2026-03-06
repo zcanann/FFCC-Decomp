@@ -34,7 +34,7 @@ struct pppMngStBlurCharaRaw {
 
 extern int gPppCalcDisabled;
 extern void* DAT_80238030;
-extern CUtil DAT_8032ec70;
+extern CUtil gUtil;
 extern char MaterialMan[];
 extern unsigned char* lbl_8032ED50;
 
@@ -139,8 +139,8 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
 
     Graphic.GetBackBufferRect2(DAT_80238030, &backTexObj, 0, 0, width, height, 0, GX_NEAR, GX_TF_RGBA8, 0);
 
-    DAT_8032ec70.SetVtxFmt_POS_CLR();
-    DAT_8032ec70.BeginQuadEnv();
+    gUtil.SetVtxFmt_POS_CLR();
+    gUtil.BeginQuadEnv();
     GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
     white.r = 0xFF;
@@ -154,8 +154,8 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
     posB.x = FLOAT_80331050;
     posB.y = FLOAT_80331054;
     posB.z = FLOAT_80331030;
-    DAT_8032ec70.RenderQuadNoTex(posA, posB, white);
-    DAT_8032ec70.EndQuadEnv();
+    gUtil.RenderQuadNoTex(posA, posB, white);
+    gUtil.EndQuadEnv();
 
     GXSetViewport(FLOAT_80331030, FLOAT_80331030, FLOAT_80331050, FLOAT_80331054, FLOAT_80331030, FLOAT_8033103c);
     GXSetScissor(0, 0, width, height);
@@ -175,11 +175,11 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
         float blur = *(float*)((char*)param_3 + 0x14);
         float blurX = FLOAT_80331044 * blur;
 
-        DAT_8032ec70.RenderTextureQuad(-blurX, -blur, FLOAT_80331050 + blurX, FLOAT_80331054 + blur,
+        gUtil.RenderTextureQuad(-blurX, -blur, FLOAT_80331050 + blurX, FLOAT_80331054 + blur,
                                        (_GXTexObj*)((void**)param_2)[2], 0, 0, 0, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 
-        DAT_8032ec70.BeginQuadEnv();
-        DAT_8032ec70.SetVtxFmt_POS_CLR_TEX();
+        gUtil.BeginQuadEnv();
+        gUtil.SetVtxFmt_POS_CLR_TEX();
         _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
         GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
@@ -198,14 +198,14 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel* model, void* param_2, void
         uvB.y = FLOAT_80331030;
 
         _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(3, 1, 1, 7);
-        DAT_8032ec70.RenderQuad(posA, posB, white, &uvA, &uvB);
-        DAT_8032ec70.EndQuadEnv();
+        gUtil.RenderQuad(posA, posB, white, &uvA, &uvB);
+        gUtil.EndQuadEnv();
 
         Graphic.GetBackBufferRect2(((void**)param_2)[0], (_GXTexObj*)((void**)param_2)[2], 0, 0, width, height, 0,
                                    GX_NEAR, GX_TF_I8, 0);
     }
 
-    DAT_8032ec70.RenderTextureQuad(FLOAT_80331030, FLOAT_80331030, FLOAT_80331050, FLOAT_80331054, &backTexObj, 0, 0,
+    gUtil.RenderTextureQuad(FLOAT_80331030, FLOAT_80331030, FLOAT_80331050, FLOAT_80331054, &backTexObj, 0, 0,
                                    0, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA);
 }
 
@@ -383,10 +383,10 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     GXProject(cameraPos.x + objPos.x, FLOAT_80331030, cameraPos.z + objPos.z, cameraMtx, gxProjection, viewport,
               &projX, &projY, &projZ);
 
-    DAT_8032ec70.BeginQuadEnv();
+    gUtil.BeginQuadEnv();
     GXSetNumTevStages(2);
     GXSetNumTexGens(2);
-    DAT_8032ec70.SetVtxFmt_POS_CLR_TEX();
+    gUtil.SetVtxFmt_POS_CLR_TEX();
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, 0x7d);
     GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_IDENTITY, GX_FALSE, 0x7d);
     _GXSetTevSwapModeTable__F13_GXTevSwapSel15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan15_GXTevColorChan(
@@ -461,7 +461,7 @@ void pppRenderBlurChara(pppBlurChara* blurChara, pppBlurCharaUnkB* param_2, pppB
     quadB.y = uv1.y;
     quadB.z = outVec.z;
 
-    DAT_8032ec70.RenderQuad(quadA, quadB, drawColor, &uv0, &uv1);
+    gUtil.RenderQuad(quadA, quadB, drawColor, &uv0, &uv1);
 
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(1, 0, 0);

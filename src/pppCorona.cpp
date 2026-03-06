@@ -150,9 +150,9 @@ void pppRenderCorona(pppCorona* param1, CoronaParam* param2, pppCoronaUnkC* para
         scale += param2->m_distMin;
     }
 
-    mtx.value[0][0] = *(float*)((u8*)lbl_8032ED50 + 0x28) * *(float*)((u8*)param1 + 0x40) * scale;
-    mtx.value[1][1] = *(float*)((u8*)lbl_8032ED50 + 0x2C) * *(float*)((u8*)param1 + 0x54) * scale;
-    mtx.value[2][2] = *(float*)((u8*)lbl_8032ED50 + 0x30) * *(float*)((u8*)param1 + 0x68) * scale;
+    mtx.value[0][0] = *(float*)((u8*)pppMngStPtr + 0x28) * *(float*)((u8*)param1 + 0x40) * scale;
+    mtx.value[1][1] = *(float*)((u8*)pppMngStPtr + 0x2C) * *(float*)((u8*)param1 + 0x54) * scale;
+    mtx.value[2][2] = *(float*)((u8*)pppMngStPtr + 0x30) * *(float*)((u8*)param1 + 0x68) * scale;
     mtx.value[0][3] = vecWork->m_translate.x;
     mtx.value[1][3] = vecWork->m_translate.y;
     mtx.value[2][3] = vecWork->m_translate.z;

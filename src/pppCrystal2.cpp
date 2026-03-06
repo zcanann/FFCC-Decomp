@@ -11,7 +11,7 @@
 
 extern int gPppCalcDisabled;
 extern void* DAT_80238030;
-extern CUtil DAT_8032ec70;
+extern CUtil gUtil;
 extern float DAT_801dd60c;
 extern float DAT_801dd610;
 extern float DAT_801dd614;
@@ -349,7 +349,7 @@ void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCr
         GXSetVtxDesc((GXAttr)0xB, GX_DIRECT);
         GXSetVtxDesc((GXAttr)0xD, GX_DIRECT);
         pppDrawMesh__FP10pppModelStP3Veci(model, 0, 0);
-        DAT_8032ec70.DisableIndMtx();
+        gUtil.DisableIndMtx();
     }
 }
 

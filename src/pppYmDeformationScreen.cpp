@@ -61,7 +61,7 @@ extern int gPppCalcDisabled;
 extern unsigned char gPppInConstructor;
 extern CMath math[];
 extern char DAT_80238030[];
-extern CUtil DAT_8032ec70;
+extern CUtil gUtil;
 extern "C" float ppvCameraMatrix02[3][4];
 extern float ppvScreenMatrix[4][4];
 
@@ -274,8 +274,8 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 	_GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(1, 0, 1, 0xFF);
 	_GXSetTevOp__F13_GXTevStageID10_GXTevMode(1, 0);
 
-	DAT_8032ec70.BeginQuadEnv();
-	DAT_8032ec70.SetVtxFmt_POS_CLR_TEX0_TEX1();
+	gUtil.BeginQuadEnv();
+	gUtil.SetVtxFmt_POS_CLR_TEX0_TEX1();
 	GXSetNumTevStages(1);
 	GXSetNumTexGens(2);
 	GXSetNumChans(1);
@@ -359,7 +359,7 @@ void pppRenderYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, 
 	GXTexCoord2f32(0.0f, texV);
 	GXTexCoord2f32(0.0f, 1.0f);
 
-	DAT_8032ec70.EndQuadEnv();
+	gUtil.EndQuadEnv();
 	DisableIndWarp(GX_TEVSTAGE1, GX_INDTEXSTAGE0);
 	GXSetProjection(ppvScreenMatrix, GX_PERSPECTIVE);
 	pppInitBlendMode__Fv();

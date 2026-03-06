@@ -30,7 +30,7 @@ extern char DAT_80330ea0[];
 extern char DAT_80330ea8[];
 extern char DAT_80330ebc[];
 extern char MaterialMan[];
-extern char DAT_8032ec70[];
+extern char gUtil[];
 extern int gPppCalcDisabled;
 
 extern struct {
@@ -858,7 +858,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
             Graphic.SetViewport();
             GXSetScissor(0, 0, 0x80, 0x80);
             RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
-                DAT_8032ec70, FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330e48, FLOAT_80330e48, (GXTexObj*)sourceTexObjs,
+                gUtil, FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330e48, FLOAT_80330e48, (GXTexObj*)sourceTexObjs,
                 0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
 
             GXSetViewport(FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330e48, FLOAT_80330e48, FLOAT_80330e4c, FLOAT_80330e58);
@@ -909,7 +909,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
             drawParaboloidMap((GXTexObj*)work[8], (GXTexObj*)work[10], (void*)work[9], work[0x3B],
                               (GXTexObj*)(targetTexObjs + 0x28), 0);
             RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
-                DAT_8032ec70, FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330e48, FLOAT_80330e48, &sceneTexObj, 0, 0, 0,
+                gUtil, FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330e48, FLOAT_80330e48, &sceneTexObj, 0, 0, 0,
                 (_GXBlendFactor)4, (_GXBlendFactor)5);
             *((u8*)work + 0xF4) = 1;
         }
@@ -926,7 +926,7 @@ void Mana_BeforeDrawCallback(CChara::CModel*, void* workPtr, void* step, float (
         GXSetProjection(savedScreenMtx, (_GXProjectionType)0);
         PSMTXCopy(savedCameraMtx, CameraPcs.m_cameraMatrix);
         RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
-            DAT_8032ec70, FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330e48, FLOAT_80330e48, &sceneTexObj, 0, 0, 0,
+            gUtil, FLOAT_80330e4c, FLOAT_80330e4c, FLOAT_80330e48, FLOAT_80330e48, &sceneTexObj, 0, 0, 0,
             (_GXBlendFactor)4, (_GXBlendFactor)5);
     }
 
@@ -1462,7 +1462,7 @@ void CalcReflectionVector2(
         u16 itemCount = *(u16*)((u8*)dl + 1);
         int i;
 
-        if (IsHasDrawFmtDL__5CUtilFUc((void*)DAT_8032ec70, drawFmt) == 0) {
+        if (IsHasDrawFmtDL__5CUtilFUc((void*)gUtil, drawFmt) == 0) {
             break;
         }
 
@@ -1480,8 +1480,8 @@ void CalcReflectionVector2(
                 next = dl + 5;
             }
 
-            ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)DAT_8032ec70, &position, &positions[posIndex], posScale);
-            ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)DAT_8032ec70, &normal, &normals[normalIndex], normalScale);
+            ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)gUtil, &position, &positions[posIndex], posScale);
+            ConvI2FVector__5CUtilFR3Vec6S16Vecl((void*)gUtil, &normal, &normals[normalIndex], normalScale);
             PSMTXMultVec(nodeRotMtx, &position, &position);
             PSMTXMultVec(workMtx, &normal, &normal);
 
@@ -1509,14 +1509,14 @@ void CalcReflectionVector2(
             vVal = (double)(float)((double)(-reflectionVec[posIndex].y / denom) * half + half);
             uv.x = -(float)(scale * (double)(float)(warp * (double)(float)(uVal - half) - uVal) - uVal);
             uv.y = -(float)(scale * (double)(float)(warp * (double)(float)(vVal - half) - vVal) - vVal);
-            ConvF2IVector2d__5CUtilFR8S16Vec2d5Vec2dl((void*)DAT_8032ec70, &texCoordA[posIndex], &uv, 12);
+            ConvF2IVector2d__5CUtilFR8S16Vec2d5Vec2dl((void*)gUtil, &texCoordA[posIndex], &uv, 12);
 
             denom = (float)(denomBias - (double)reflectionVec[posIndex].z);
             uVal = (double)(float)((double)(-reflectionVec[posIndex].x / denom) * half + half);
             vVal = (double)(float)((double)(-reflectionVec[posIndex].y / denom) * half + half);
             uv.x = -(float)(scale * (double)(float)(warp * (double)(float)(uVal - half) - uVal) - uVal);
             uv.y = -(float)(scale * (double)(float)(warp * (double)(float)(vVal - half) - vVal) - vVal);
-            ConvF2IVector2d__5CUtilFR8S16Vec2d5Vec2dl((void*)DAT_8032ec70, &texCoordB[posIndex], &uv, 12);
+            ConvF2IVector2d__5CUtilFR8S16Vec2d5Vec2dl((void*)gUtil, &texCoordB[posIndex], &uv, 12);
 
             dl = next;
         }

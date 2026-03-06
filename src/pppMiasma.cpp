@@ -15,7 +15,7 @@ extern float FLOAT_80331938;
 extern float FLOAT_8033193c;
 extern float FLOAT_80331940;
 extern void* DAT_80238030;
-extern CUtil DAT_8032ec70;
+extern CUtil gUtil;
 
 extern struct {
     float _212_4_, _216_4_, _220_4_;
@@ -189,7 +189,7 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
         Graphic.GetBackBufferRect2(DAT_80238030, &backI4Tex, 0, yOffset, texWidth, texHeight, 0, GX_LINEAR, GX_TF_I4, 0);
         GXSetScissor(0, yOffset, (u32)FLOAT_80331928, (u32)FLOAT_8033192c);
 
-        DAT_8032ec70.RenderColorQuad(FLOAT_8033193c, (float)yOffset, FLOAT_80331928, FLOAT_8033192c, drawColor);
+        gUtil.RenderColorQuad(FLOAT_8033193c, (float)yOffset, FLOAT_80331928, FLOAT_8033192c, drawColor);
 
         pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
             &drawColor, (u8*)pppMiasma + 0x40, FLOAT_8033193c, 0, 0, 1, 0, 1, 1, 1);
@@ -263,16 +263,16 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
         Graphic.GetBackBufferRect2(DAT_80238030, &backRgba8Tex, 0, yOffset, texWidth, texHeight, i4TexSize, GX_LINEAR,
                                    GX_TF_RGBA8, 0);
         if (step->m_payload[0x1D] != 0) {
-            DAT_8032ec70.RenderColorQuad(FLOAT_8033193c, (float)yOffset, FLOAT_80331928, FLOAT_8033192c, drawColor);
+            gUtil.RenderColorQuad(FLOAT_8033193c, (float)yOffset, FLOAT_80331928, FLOAT_8033192c, drawColor);
             Graphic.GetBackBufferRect2(DAT_80238030, &backRgba8Tex2, 0, yOffset, texWidth, texHeight, i4TexSize + rgba8TexSize,
                                        GX_LINEAR, GX_TF_RGBA8, 0);
         }
 
         Graphic.SetViewport();
-        DAT_8032ec70.RenderTextureQuad(FLOAT_8033193c, (float)yOffset, FLOAT_80331928, FLOAT_8033192c, &backI4Tex, 0, 0,
+        gUtil.RenderTextureQuad(FLOAT_8033193c, (float)yOffset, FLOAT_80331928, FLOAT_8033192c, &backI4Tex, 0, 0,
                                        0, (GXBlendFactor)4, (GXBlendFactor)5);
-        DAT_8032ec70.BeginQuadEnv();
-        DAT_8032ec70.SetVtxFmt_POS_CLR_TEX0_TEX1();
+        gUtil.BeginQuadEnv();
+        gUtil.SetVtxFmt_POS_CLR_TEX0_TEX1();
 
         if ((u8)step->m_initWOrk == 0) {
             tevSwapChannel = 0;
@@ -356,13 +356,13 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
             pppInitBlendMode__Fv();
             pppSetBlendMode__FUc(0);
             if ((u8)step->m_arg3 != 2) {
-                DAT_8032ec70.RenderQuadTex2(quadA, quadB, *(GXColor*)&packedColor, 0, 0);
+                gUtil.RenderQuadTex2(quadA, quadB, *(GXColor*)&packedColor, 0, 0);
             }
         }
 
-        DAT_8032ec70.InitConstantRegister();
-        DAT_8032ec70.BeginQuadEnv();
-        DAT_8032ec70.SetVtxFmt_POS_CLR_TEX();
+        gUtil.InitConstantRegister();
+        gUtil.BeginQuadEnv();
+        gUtil.SetVtxFmt_POS_CLR_TEX();
         if ((u8)step->m_arg3 != 1) {
             GXSetTevDirect((GXTevStageID)0);
             GXLoadTexObj(&backRgba8Tex, GX_TEXMAP0);
@@ -460,17 +460,17 @@ void pppRenderMiasma(pppMiasma* pppMiasma, void* param_2, pppMiasmaCtrl* param_3
             quadB.x = FLOAT_80331928;
             quadB.y = (float)yOffset + FLOAT_8033192c;
             quadB.z = FLOAT_8033193c;
-            DAT_8032ec70.RenderQuad(quadA, quadB, *(GXColor*)packedWork, 0, 0);
+            gUtil.RenderQuad(quadA, quadB, *(GXColor*)packedWork, 0, 0);
         }
 
-        DAT_8032ec70.InitConstantRegister();
+        gUtil.InitConstantRegister();
     }
 
-    DAT_8032ec70.EndQuadEnv();
+    gUtil.EndQuadEnv();
     pppInitBlendMode__Fv();
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
     Graphic.SetViewport();
-    DAT_8032ec70.InitConstantRegister();
+    gUtil.InitConstantRegister();
 }
 
 /*

@@ -11,8 +11,8 @@ extern int gPppCalcDisabled;
 extern float lbl_80330500;
 extern float lbl_80330504;
 extern unsigned char* lbl_8032ED50;
-extern _pppEnvSt* lbl_8032ED54;
 extern _pppEnvSt* pppEnvStPtr;
+extern _pppEnvSt* lbl_8032ED54;
 extern Mtx ppvWorldMatrix;
 extern Mtx ppvCameraMatrix02;
 
@@ -151,7 +151,7 @@ void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2
     pppCopyVector__FR3Vec3Vec(&work->m_posHistory[work->m_head], &pos);
 
     {
-        long* shape = *(long**)(*(u32*)&pppEnvStPtr->m_particleColors[0] + step->m_dataValIndex * 4);
+        long* shape = *(long**)(*(u32*)&lbl_8032ED54->m_particleColors[0] + step->m_dataValIndex * 4);
         u8* frameEntry;
         s16 frameDuration;
 

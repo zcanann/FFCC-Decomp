@@ -41,7 +41,7 @@ extern struct {
     Mtx m_cameraMatrix;
     Mtx44 m_screenMatrix;
 } CameraPcs;
-extern CUtil DAT_8032ec70;
+extern CUtil gUtil;
 extern char MaterialMan[];
 extern char DAT_80331900[];
 extern char DAT_803318d4[];
@@ -551,7 +551,7 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
             Graphic.SetViewport();
             GXSetScissor(0, 0, 0x280, 0x1C0);
             RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
-                &DAT_8032ec70, FLOAT_80331898, FLOAT_80331898, FLOAT_803318c8, FLOAT_803318c8,
+                &gUtil, FLOAT_80331898, FLOAT_80331898, FLOAT_803318c8, FLOAT_803318c8,
                 (GXTexObj*)baseParaboloidTexObjs, 0, 0, 0, (_GXBlendFactor)4, (_GXBlendFactor)5);
             baseParaboloidTexObjs += 0x20;
         }
@@ -561,10 +561,10 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
         GXSetScissor(0, 0, 0x280, 0x1C0);
         GXSetZTexture((GXZTexOp)2, (_GXTexFmt)0x16, 0);
         GXSetColorUpdate(GX_FALSE);
-        BeginQuadEnv__5CUtilFv(&DAT_8032ec70);
+        BeginQuadEnv__5CUtilFv(&gUtil);
         GXSetZMode(GX_TRUE, (_GXCompare)7, GX_TRUE);
         GXSetZCompLoc(GX_FALSE);
-        SetVtxFmt_POS_CLR_TEX__5CUtilFv(&DAT_8032ec70);
+        SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
         _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
         _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 0xFF);
         _GXSetTevColorIn__F13_GXTevStageID14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg14_GXTevColorArg(
@@ -586,14 +586,14 @@ void Mana2_BeforeDrawCallback(CChara::CModel*, void* param_2, void* param_3, flo
         quadColor.g = 0xFF;
         quadColor.b = 0xFF;
         quadColor.a = 0;
-        RenderQuad__5CUtilF3Vec3Vec8_GXColorP5Vec2dP5Vec2d(&DAT_8032ec70, &quadMin, &quadMax, quadColor, 0, 0);
-        EndQuadEnv__5CUtilFv(&DAT_8032ec70);
+        RenderQuad__5CUtilF3Vec3Vec8_GXColorP5Vec2dP5Vec2d(&gUtil, &quadMin, &quadMax, quadColor, 0, 0);
+        EndQuadEnv__5CUtilFv(&gUtil);
         GXSetZTexture((GXZTexOp)0, (_GXTexFmt)0x11, 0);
         GXSetColorUpdate(GX_TRUE);
         GXSetAlphaUpdate(GX_TRUE);
         GXSetZCompLoc(GX_TRUE);
         RenderTextureQuad__5CUtilFffffP9_GXTexObjP5Vec2dP5Vec2dP8_GXColor14_GXBlendFactor14_GXBlendFactor(
-            &DAT_8032ec70, FLOAT_80331898, FLOAT_80331898, FLOAT_803318c8, FLOAT_803318c8, &sceneTexObj, 0, 0, 0,
+            &gUtil, FLOAT_80331898, FLOAT_80331898, FLOAT_803318c8, FLOAT_803318c8, &sceneTexObj, 0, 0, 0,
             (_GXBlendFactor)4, (_GXBlendFactor)5);
         *((u8*)work + 0xEC) = 1;
     }
@@ -713,7 +713,7 @@ void CalcReflectionVector2(
         u16 itemCount = *(u16*)(dl + 1);
         int i;
 
-        if (DAT_8032ec70.IsHasDrawFmtDL(drawFmt) == 0) {
+        if (gUtil.IsHasDrawFmtDL(drawFmt) == 0) {
             break;
         }
 
@@ -731,8 +731,8 @@ void CalcReflectionVector2(
                 next = dl + 10;
             }
 
-            DAT_8032ec70.ConvI2FVector(objSpacePos, positions[posIndex], posScale);
-            DAT_8032ec70.ConvI2FVector(objSpaceNormal, normals[normalIndex], normalScale);
+            gUtil.ConvI2FVector(objSpacePos, positions[posIndex], posScale);
+            gUtil.ConvI2FVector(objSpaceNormal, normals[normalIndex], normalScale);
             PSMTXMultVec(matrix, &objSpacePos, &objSpacePos);
             PSMTXMultVec(nodeRotMtx, &objSpaceNormal, &objSpaceNormal);
 
@@ -800,7 +800,7 @@ void CalcReflectionVector2(
                 }
             }
 
-            DAT_8032ec70.ConvF2IVector2d(texCoord[normalIndex], uv, 12);
+            gUtil.ConvF2IVector2d(texCoord[normalIndex], uv, 12);
             dl = next;
         }
     }

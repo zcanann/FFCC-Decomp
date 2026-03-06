@@ -12,7 +12,7 @@ extern "C" float RandF__5CMathFf(float param, CMath* math);
 extern "C" void pppHeapUseRate__FPQ27CMemory6CStage(void* stage);
 extern struct _pppMngSt* pppMngStPtr;
 extern int gPppCalcDisabled;
-extern void* DAT_8032ec70;
+extern void* gUtil;
 extern u32 CFlatFlags;
 extern CMapMng MapMng;
 extern Mtx ppvCameraMatrix0;
@@ -350,7 +350,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 	_GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(
 		0, 7, 7, 7, 5);
 	_GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
-	SetVtxFmt_POS_CLR_TEX__5CUtilFv(&DAT_8032ec70);
+	SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
 	GXLoadTexObj((GXTexObj*)(tex + 0x28), GX_TEXMAP0);
 
 	color = *(u32*)((u8*)laser + 0x88 + colorOffset);
@@ -446,7 +446,7 @@ extern "C" void pppRenderYmLaser(pppYmLaser* laser, pppYmLaserUnkB* step, _pppCt
 		}
 
 		if ((CFlatFlags & 0x200000) != 0) {
-			SetVtxFmt_POS_CLR__5CUtilFv(&DAT_8032ec70);
+			SetVtxFmt_POS_CLR__5CUtilFv(&gUtil);
 			_GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
 			_GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
 			GXSetNumTexGens(0);

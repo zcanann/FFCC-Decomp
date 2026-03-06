@@ -1478,7 +1478,7 @@ void CPartPcs::StartLocationTitle()
 {
     int loaded;
     char path[1028];
-    CUSBStreamData* usb = reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 8);
+    CUSBStreamData* usb = reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 0x10);
 
     sprintf(path, s_dvd_tina_stage_03d_title_801d7f94, Game.game.m_currentMapId);
     loaded = pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, path, 6, 0, 0, 0);
@@ -1498,7 +1498,7 @@ void CPartPcs::StartLocationTitle()
  */
 void CPartPcs::EndLocationTitle()
 {
-    CUSBStreamData* usb = reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 8);
+    CUSBStreamData* usb = reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 0x10);
 
     pppReleasePdt__8CPartMngFi(&PartMng, 6);
     usb->m_blockOnFrame = 0;
@@ -1517,7 +1517,7 @@ void CPartPcs::StartMiruraEvent()
 {
     int loaded;
     char path[1028];
-    CUSBStreamData* usb = reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 8);
+    CUSBStreamData* usb = reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 0x10);
 
     sprintf(path, s_dvd_tina_stage_03d_mirura_801d7f78, Game.game.m_currentMapId);
     loaded = pppLoadPtx__8CPartMngFPCciiPvi(&PartMng, path, 7, 0, 0, 0);
@@ -1537,7 +1537,7 @@ void CPartPcs::StartMiruraEvent()
  */
 void CPartPcs::EndMiruraEvent()
 {
-    CUSBStreamData* usb = reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 8);
+    CUSBStreamData* usb = reinterpret_cast<CUSBStreamData*>(reinterpret_cast<char*>(this) + 0x10);
 
     pppReleasePdt__8CPartMngFi(&PartMng, 7);
     usb->m_miruraEventActive = 0;

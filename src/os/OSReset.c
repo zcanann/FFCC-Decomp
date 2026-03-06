@@ -57,7 +57,7 @@
         }                                            \
     } while(0);
 
-static OSResetFunctionQueue ResetFunctionQueue;
+static OSResetFunctionQueue ResetFunctionQueue_8032EFA8;
 static u32 bootThisDol;
 
 // prototypes
@@ -67,11 +67,11 @@ static void Reset(u32 resetCode);
 void OSRegisterResetFunction(OSResetFunctionInfo* info) {
     ASSERTLINE(208, info->func);
 
-    ENQUEUE_INFO_PRIO(info, &ResetFunctionQueue);
+    ENQUEUE_INFO_PRIO(info, &ResetFunctionQueue_8032EFA8);
 }
 
 void OSUnregisterResetFunction(OSResetFunctionInfo* info) {
-    DEQUEUE_INFO(info, &ResetFunctionQueue);
+    DEQUEUE_INFO(info, &ResetFunctionQueue_8032EFA8);
 }
 
 int __OSCallResetFunctions(BOOL final) {
@@ -82,7 +82,7 @@ int __OSCallResetFunctions(BOOL final) {
     priority = 0;
     err = 0;
 
-    for (info = ResetFunctionQueue.head; info != 0;) {
+    for (info = ResetFunctionQueue_8032EFA8.head; info != 0;) {
         if (err != 0 && priority != info->priority)
             break;
         err |= !info->func(final);
@@ -204,7 +204,7 @@ void OSResetSystem(BOOL reset, u32 resetCode, BOOL forceMenu) {
     }
 
     do {
-        info = ResetFunctionQueue.head;
+        info = ResetFunctionQueue_8032EFA8.head;
         err = 0;
         while (info != NULL && err == 0) {
             err |= !info->func(FALSE);
@@ -221,7 +221,7 @@ void OSResetSystem(BOOL reset, u32 resetCode, BOOL forceMenu) {
     }
 
     OSDisableInterrupts();
-    info = ResetFunctionQueue.head;
+    info = ResetFunctionQueue_8032EFA8.head;
     err = 0;
     while (info != NULL && err == 0) {
         err |= !info->func(TRUE);

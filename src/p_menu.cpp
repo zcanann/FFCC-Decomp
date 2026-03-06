@@ -12,6 +12,7 @@
 #include "ffcc/pad.h"
 #include "ffcc/ptrarray.h"
 #include "ffcc/ringmenu.h"
+#include "ffcc/symbols_shared.h"
 #include "ffcc/textureman.h"
 #include "ffcc/fontman.h"
 
@@ -31,7 +32,6 @@ struct Vec4d
     float z;
     float w;
 };
-extern unsigned char lbl_8020ee40[];
 extern u8 ARRAY_802ea1a0[];
 extern u32 PTR_PTR_s_CMenuPcs_8020f2d0;
 extern u32 DAT_8020edf8;
@@ -108,7 +108,6 @@ extern "C" void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor
 extern "C" void _GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(int, unsigned char, int, int, unsigned char);
 extern "C" unsigned char Graphic[];
 extern "C" unsigned char CFlat[];
-extern "C" f32 lbl_8033080C;
 
 static inline void ReleaseRefObject(void* object)
 {
@@ -235,7 +234,7 @@ void CMenuPcs::Init()
     BonusInit__8CMenuPcsFv(this);
 
     self[0x8E] = 0;
-    one = lbl_8033080C;
+    one = kMenuInitOne;
     i = 1;
     cardChannel = reinterpret_cast<int*>(self + 0x838);
     self[0x8F] = 0;
@@ -304,7 +303,7 @@ void CMenuPcs::Quit()
  */
 int CMenuPcs::GetTable(unsigned long index)
 {
-    unsigned char* table = lbl_8020ee40;
+    unsigned char* table = gMenuProcessTable;
     unsigned long offset = index * 0x15c;
     return (int)(table + offset);
 }

@@ -72,22 +72,16 @@ void pppScaleLoopAuto(void* arg1, void* arg2, void* arg3)
         return;
     }
 
-    if (work->m_angle < 90) {
-        s8 cnt = work->m_countA;
-        if (cnt > 0) {
-            work->m_countA = cnt - 1;
-            work->m_scale[0] = work->m_baseScale[0] + work->m_delta;
-            work->m_scale[1] = work->m_baseScale[1] + work->m_delta;
-            work->m_scale[2] = work->m_baseScale[2] + work->m_delta;
-        }
-    } else if (work->m_angle < 270) {
-        s8 cnt = work->m_countB;
-        if (cnt > 0) {
-            work->m_countB = cnt - 1;
-            work->m_scale[0] = work->m_baseScale[0] + work->m_delta;
-            work->m_scale[1] = work->m_baseScale[1] + work->m_delta;
-            work->m_scale[2] = work->m_baseScale[2] + work->m_delta;
-        }
+    if ((work->m_angle < 90) && (work->m_countA > 0)) {
+        work->m_countA--;
+        work->m_scale[0] = work->m_baseScale[0] + work->m_delta;
+        work->m_scale[1] = work->m_baseScale[1] + work->m_delta;
+        work->m_scale[2] = work->m_baseScale[2] + work->m_delta;
+    } else if ((work->m_angle < 270) && (work->m_countB > 0)) {
+        work->m_countB--;
+        work->m_scale[0] = work->m_baseScale[0] + work->m_delta;
+        work->m_scale[1] = work->m_baseScale[1] + work->m_delta;
+        work->m_scale[2] = work->m_baseScale[2] + work->m_delta;
     } else {
         work->m_step++;
         if (work->m_step > step->m_stepCount) {

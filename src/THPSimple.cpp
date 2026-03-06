@@ -52,15 +52,6 @@ static THPVideoInfo sVideoInfoWork;
 static THPAudioInfo sAudioInfoWork;
 static u8 sReadBuffer[0x40];
 
-extern s32 lbl_8032EE48;
-extern s32 lbl_8032EE4C;
-extern void (*lbl_8032EE50)(void);
-extern s16* lbl_8032EE54;
-extern s16* lbl_8032EE58;
-extern s32 lbl_8032EE5C;
-extern u16 lbl_802111E8[];
-extern s16 WorkBuffer_32_[];
-
 /*
  * --INFO--
  * Address:	TODO
@@ -108,13 +99,13 @@ s32 THPSimpleInit(s32 audioMixMode)
     }
 
     interruptState = OSDisableInterrupts();
-    lbl_8032EE4C = 0;
-    lbl_8032EE54 = (s16*)NULL;
-    lbl_8032EE58 = (s16*)NULL;
-    lbl_8032EE5C = audioMixMode;
-    lbl_8032EE50 = AIRegisterDMACallback(THPAudioMixCallback);
+    gTHPSimpleSoundBufferIndex = 0;
+    gTHPSimpleCurAudioBuffer = (s16*)NULL;
+    gTHPSimpleLastAudioBuffer = (s16*)NULL;
+    gTHPSimpleAudioSystem = audioMixMode;
+    gTHPSimpleOldAIDCallback = AIRegisterDMACallback(THPAudioMixCallback);
 
-    if ((lbl_8032EE50 == NULL) && (lbl_8032EE5C != 0)) {
+    if ((gTHPSimpleOldAIDCallback == NULL) && (gTHPSimpleAudioSystem != 0)) {
         AIRegisterDMACallback((AIDCallback)NULL);
         OSRestoreInterrupts(interruptState);
         return 0;
@@ -122,15 +113,15 @@ s32 THPSimpleInit(s32 audioMixMode)
 
     OSRestoreInterrupts(interruptState);
 
-    if (lbl_8032EE5C == 0) {
+    if (gTHPSimpleAudioSystem == 0) {
         memset(WorkBuffer_32_, 0, 0x500);
         DCFlushRange(WorkBuffer_32_, 0x500);
-        workBuffer = reinterpret_cast<s16*>(reinterpret_cast<u8*>(WorkBuffer_32_) + lbl_8032EE4C * 0x280);
+        workBuffer = reinterpret_cast<s16*>(reinterpret_cast<u8*>(WorkBuffer_32_) + gTHPSimpleSoundBufferIndex * 0x280);
         AIInitDMA((u32)workBuffer, 0x280);
         AIStartDMA();
     }
 
-    lbl_8032EE48 = 1;
+    gTHPSimpleInitialized = 1;
     return 1;
 }
 
@@ -149,11 +140,11 @@ void THPSimpleQuit(void)
 
     LCDisable();
     interruptState = OSDisableInterrupts();
-    if (lbl_8032EE50 != NULL) {
-        AIRegisterDMACallback(lbl_8032EE50);
+    if (gTHPSimpleOldAIDCallback != NULL) {
+        AIRegisterDMACallback(gTHPSimpleOldAIDCallback);
     }
     OSRestoreInterrupts(interruptState);
-    lbl_8032EE48 = 0;
+    gTHPSimpleInitialized = 0;
 }
 
 /*
@@ -171,7 +162,7 @@ s32 THPSimpleOpen(const char* path)
     s32 componentOffset;
     u8* frameComp;
 
-    if ((lbl_8032EE48 == 0) || (SimpleControl.isOpen != 0)) {
+    if ((gTHPSimpleInitialized == 0) || (SimpleControl.isOpen != 0)) {
         return 0;
     }
 
@@ -805,7 +796,7 @@ void MixAudio(short* output, short* input, unsigned long samples)
                         volumeIndex = SimpleControl.unk_C4 + SimpleControl.unk_CC;
                     }
                     SimpleControl.unk_C4 = volumeIndex;
-                    volume = lbl_802111E8[static_cast<s32>(volumeIndex)];
+                    volume = gTHPSimpleVolumeTable[static_cast<s32>(volumeIndex)];
 
                     mixedSample = static_cast<s32>((static_cast<u32>(volume) * static_cast<s32>(*audioPtr)) >> 15);
                     if (mixedSample < -0x8000) {
@@ -861,7 +852,7 @@ void MixAudio(short* output, short* input, unsigned long samples)
                     volumeIndex = SimpleControl.unk_C4 + SimpleControl.unk_CC;
                 }
                 SimpleControl.unk_C4 = volumeIndex;
-                volume = lbl_802111E8[static_cast<s32>(volumeIndex)];
+                volume = gTHPSimpleVolumeTable[static_cast<s32>(volumeIndex)];
 
                 mixedSample = static_cast<s32>(*input) +
                               static_cast<s32>((static_cast<u32>(volume) * static_cast<s32>(*audioPtr)) >> 15);
@@ -911,9 +902,9 @@ void THPAudioMixCallback()
 	u32 interruptState;
 	s16* workBuffer;
 
-	if (lbl_8032EE5C == 0) {
-		lbl_8032EE4C ^= 1;
-		workBuffer = reinterpret_cast<s16*>(reinterpret_cast<u8*>(WorkBuffer_32_) + lbl_8032EE4C * 0x280);
+	if (gTHPSimpleAudioSystem == 0) {
+		gTHPSimpleSoundBufferIndex ^= 1;
+		workBuffer = reinterpret_cast<s16*>(reinterpret_cast<u8*>(WorkBuffer_32_) + gTHPSimpleSoundBufferIndex * 0x280);
 		AIInitDMA((u32)workBuffer, 0x280);
 		interruptState = OSEnableInterrupts();
 		MixAudio(workBuffer, (short*)0, 0xA0);
@@ -922,25 +913,25 @@ void THPAudioMixCallback()
 		return;
 	}
 
-	if (lbl_8032EE5C == 1) {
-		if (lbl_8032EE54 != NULL) {
-			lbl_8032EE58 = lbl_8032EE54;
+	if (gTHPSimpleAudioSystem == 1) {
+		if (gTHPSimpleCurAudioBuffer != NULL) {
+			gTHPSimpleLastAudioBuffer = gTHPSimpleCurAudioBuffer;
 		}
-		lbl_8032EE50();
-		lbl_8032EE54 = reinterpret_cast<s16*>(AIGetDMAStartAddr() + 0x80000000);
+		gTHPSimpleOldAIDCallback();
+		gTHPSimpleCurAudioBuffer = reinterpret_cast<s16*>(AIGetDMAStartAddr() + 0x80000000);
 	} else {
-		lbl_8032EE50();
-		lbl_8032EE58 = reinterpret_cast<s16*>(AIGetDMAStartAddr() + 0x80000000);
+		gTHPSimpleOldAIDCallback();
+		gTHPSimpleLastAudioBuffer = reinterpret_cast<s16*>(AIGetDMAStartAddr() + 0x80000000);
 	}
 
-	lbl_8032EE4C ^= 1;
-	workBuffer = reinterpret_cast<s16*>(reinterpret_cast<u8*>(WorkBuffer_32_) + lbl_8032EE4C * 0x280);
+	gTHPSimpleSoundBufferIndex ^= 1;
+	workBuffer = reinterpret_cast<s16*>(reinterpret_cast<u8*>(WorkBuffer_32_) + gTHPSimpleSoundBufferIndex * 0x280);
 	AIInitDMA((u32)workBuffer, 0x280);
 	interruptState = OSEnableInterrupts();
-	if (lbl_8032EE58 != NULL) {
-		DCInvalidateRange(lbl_8032EE58, 0x280);
+	if (gTHPSimpleLastAudioBuffer != NULL) {
+		DCInvalidateRange(gTHPSimpleLastAudioBuffer, 0x280);
 	}
-	MixAudio(workBuffer, lbl_8032EE58, 0xA0);
+	MixAudio(workBuffer, gTHPSimpleLastAudioBuffer, 0xA0);
 	DCFlushRange(workBuffer, 0x280);
 	OSRestoreInterrupts(interruptState);
 }

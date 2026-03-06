@@ -50,6 +50,9 @@ extern "C" float FLOAT_8032fe58;
 extern "C" float FLOAT_8032ed58;
 extern "C" float FLOAT_8032ed5c;
 extern "C" float FLOAT_8032ed60;
+extern "C" float lbl_8032ED58;
+extern "C" float lbl_8032ED5C;
+extern "C" float lbl_8032ED60;
 extern "C" float FLOAT_8032fe18;
 extern "C" unsigned char DAT_8032ed68;
 extern "C" int DAT_8032ed6c;
@@ -1435,11 +1438,11 @@ void pppSetProjection()
  */
 void CPartMng::pppSetRendMatrix()
 {
-    PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcs + 0x48), ppvScreenMatrix);
-    PSMTXCopy(*reinterpret_cast<Mtx*>(CameraPcs + 4), ppvCameraMatrix0);
-    FLOAT_8032ed58 = ppvScreenMatrix[2][0];
-    FLOAT_8032ed5c = ppvScreenMatrix[2][1];
-    FLOAT_8032ed60 = ppvScreenMatrix[2][3];
+    PSMTX44Copy(*reinterpret_cast<Mtx44*>(CameraPcs + 0x94), ppvScreenMatrix);
+    PSMTXCopy(*reinterpret_cast<Mtx*>(CameraPcs + 4), ppvCameraMatrix02);
+    lbl_8032ED58 = ppvScreenMatrix[2][0];
+    lbl_8032ED5C = ppvScreenMatrix[2][1];
+    lbl_8032ED60 = ppvScreenMatrix[2][3];
 }
 
 /*

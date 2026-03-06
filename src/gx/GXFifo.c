@@ -67,20 +67,15 @@ static void GXUnderflowHandler(s16 interrupt, OSContext* context) {
     __GXWriteFifoIntEnable(1, 0);
 }
 
-#define SOME_SET_REG_MACRO(reg, size, shift, val)                                                   \
-	do {                                                                                            \
-		(reg) = (u32)__rlwimi((u32)(reg), (val), (shift), (32 - (shift) - (size)), (31 - (shift))); \
-	} while (0);
-
 static void GXBreakPointHandler(__OSInterrupt interrupt, OSContext* context) {
     OSContext exceptionContext;
     u32* cpEnable = &__GXData->cpEnable;
     u32 reg = *cpEnable;
     u32 val = 0;
 
-    SOME_SET_REG_MACRO(reg, 1, 5, val);
-    *cpEnable = reg;
-    GX_SET_CP_REG(1, *cpEnable);
+    reg &= ~0x20;
+    __GXData->cpEnable = reg;
+    GX_SET_CP_REG(1, __GXData->cpEnable);
     if (BreakPointCB != NULL) {
         OSClearContext(&exceptionContext);
         OSSetCurrentContext(&exceptionContext);

@@ -63,7 +63,7 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
         texture = shapeSt->GetTexture((long*)shapeSt->m_animData, pppEnvStPtr->m_materialSetPtr, textureIndex);
         if (alpha != 0) {
             float* values = *(float**)((u8*)column + 0x88 + iVar7);
-            u8 count = *((u8*)&param_2->m_arg3 + 1);
+            u8 count = param_2->m_count;
             Mtx identityMtx;
             Vec basePos;
             Vec cameraDelta;
@@ -178,11 +178,11 @@ void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_
             int i;
 
             *(void**)(work + 8) = pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                (unsigned long)*((unsigned char*)&param_2->m_arg3 + 1) * 0xc, pppEnvStPtr->m_stagePtr,
+                (unsigned long)param_2->m_count * 0xc, pppEnvStPtr->m_stagePtr,
                 (char*)"pppColum.cpp", 0x7d);
 
             values = *(float**)(work + 8);
-            for (i = 0; i < (int)(unsigned int)*((unsigned char*)&param_2->m_arg3 + 1); i++) {
+            for (i = 0; i < (int)(unsigned int)param_2->m_count; i++) {
                 values[0] = RandF__5CMathFf(*(float*)(payload + 4), &Math);
                 values[0] = values[0] + *(float*)(payload + 0);
                 values[1] = RandF__5CMathFf(*(float*)(payload + 0xc), &Math);
@@ -241,4 +241,3 @@ void pppConstructColum(pppColum *column, pppColumUnkC *param_2)
     *puVar1 = 0;
     *(unsigned int *)(puVar1 + 4) = 0;
 }
-

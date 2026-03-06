@@ -123,6 +123,7 @@ Run the selector once. It prints random viable targets across multiple buckets (
 STRONGLY PREFER:
 - Real member access rather than hard coded pointer offsets.
 - Do not do retarded hacks to get things to match that will be resolved automatically (ie hard coding an address, or changing a variable name to lbl_{xyz} to force a temporary output match).
+- DO NOT WORRY ABOUT SYMBOL NAME MATCHING FOR VARAIBLES. lbl_ prefixed names are compiler artifacts. There is NO reason to make the source code match them.
 
 ```sh
 python3 tools/agent_select_target.py

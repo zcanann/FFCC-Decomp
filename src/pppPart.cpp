@@ -444,7 +444,7 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 					pppSubProgEntryRaw* entry = &ownerSet->m_subProgEntries[stageIndex];
 					if (entry->m_prog != 0 && entry->m_prog->m_pppFunctionDestructor != 0)
 					{
-						((void (*)(_pppPObjLink*, pppSubProgEntryRaw*))entry->m_prog->m_pppFunctionDestructor)(obj, entry);
+						((pppProgDestructCallback)entry->m_prog->m_pppFunctionDestructor)(obj, entry);
 					}
 				}
 
@@ -606,7 +606,7 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 						pppSubProgEntryRaw* entry = &ownerSet->m_subProgEntries[stageIndex];
 						if (entry->m_prog != 0 && entry->m_prog->m_pppFunctionDestructor != 0)
 						{
-							((void (*)(_pppPObjLink*, pppSubProgEntryRaw*))entry->m_prog->m_pppFunctionDestructor)(obj, entry);
+							((pppProgDestructCallback)entry->m_prog->m_pppFunctionDestructor)(obj, entry);
 						}
 					}
 
@@ -746,14 +746,14 @@ void callCon2Prog(_pppPObject* pObject)
 		{
 			if (prog->m_pppFunctionConstructor3 != 0)
 			{
-				((void (*)(_pppPObject*, void*))prog->m_pppFunctionConstructor3)(pObject, (void*)(((u8*)stage) + 0x28));
+				((pppProgConstruct3Callback)prog->m_pppFunctionConstructor3)(pObject, (void*)(((u8*)stage) + 0x28));
 			}
 			else
 			{
 				*(u32*)(((u8*)pObject) + progSet->m_workBaseOffset + stageIdx * 4) = *(u32*)(((u8*)stage) + 0x30);
 				if (prog->m_pppFunctionConstructor2 != 0)
 				{
-					((void (*)(_pppPObject*))prog->m_pppFunctionConstructor2)(pObject);
+					((pppProgConstruct2Callback)prog->m_pppFunctionConstructor2)(pObject);
 				}
 			}
 		}
@@ -776,7 +776,7 @@ void callCon2Prog(_pppPObject* pObject)
 				*(u32**)(((u8*)pObject) + stageSlotOffset) = nextSlot;
 				if (prog != 0 && prog->m_pppFunctionOperation != 0 && prog->m_pppFunctionConstructor2 != 0)
 				{
-					((void (*)(_pppPObject*, void*))prog->m_pppFunctionOperation)(pObject, nextSlot);
+					((pppProgOperation2Callback)prog->m_pppFunctionOperation)(pObject, nextSlot);
 				}
 			}
 
@@ -934,7 +934,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 					pppSubProgEntryRaw* entry = &ownerSet->m_subProgEntries[stageIndex];
 					if (entry->m_prog != 0 && entry->m_prog->m_pppFunctionDestructor != 0)
 					{
-						((void (*)(_pppPObjLink*, pppSubProgEntryRaw*))entry->m_prog->m_pppFunctionDestructor)(obj, entry);
+						((pppProgDestructCallback)entry->m_prog->m_pppFunctionDestructor)(obj, entry);
 					}
 				}
 
@@ -1008,7 +1008,7 @@ done_insert:
 		*initWork++ = entry->m_initWork;
 		if (entry->m_prog != 0 && entry->m_prog->m_pppFunctionConstructor != 0)
 		{
-			((void (*)(_pppPObjLink*, pppSubProgEntryRaw*))entry->m_prog->m_pppFunctionConstructor)(newObj, entry);
+			((pppProgConstructCallback)entry->m_prog->m_pppFunctionConstructor)(newObj, entry);
 		}
 	}
 
@@ -1108,7 +1108,7 @@ void _pppAllFreePObject(_pppMngSt* pppMngSt)
 			pppSubProgEntryRaw* entry = &ownerSet->m_subProgEntries[stageIndex];
 			if (entry->m_prog != 0 && entry->m_prog->m_pppFunctionDestructor != 0)
 			{
-				((void (*)(_pppPObjLink*, pppSubProgEntryRaw*))entry->m_prog->m_pppFunctionDestructor)(obj, entry);
+				((pppProgDestructCallback)entry->m_prog->m_pppFunctionDestructor)(obj, entry);
 			}
 		}
 
@@ -2021,8 +2021,6 @@ void pppInitData(_pppDataHead* pppDataHead, pppProg* pppProg, int param_3)
  */
 void pppCalcPartStd(_pppMngSt* pppMngSt)
 {
-	typedef void (*ConProgFn)(void*, void*, void*);
-
 	s32 pDataOffset = 0;
 	for (s32 i = 0; i < *(s32*)(((u8*)pppMngSt) + 0xB8); i++)
 	{
@@ -2045,7 +2043,7 @@ void pppCalcPartStd(_pppMngSt* pppMngSt)
 					s32 prog = *(s32*)(stageIter + 0x28);
 					if (prog != 0)
 					{
-						ConProgFn fn = (ConProgFn)(*(void**)(prog + 8));
+						pppProgOperationCallback fn = (pppProgOperationCallback)(*(void**)(prog + 8));
 						if (fn != 0)
 						{
 							u16 count = activeCount;
@@ -2056,10 +2054,9 @@ void pppCalcPartStd(_pppMngSt* pppMngSt)
 								s32 next = obj[0];
 								if (*((u8*)obj + 0x7C) == 0)
 								{
-									fn(
-										obj,
-										*(void**)(((u8*)obj) + *(s32*)(progSet + 0x20) + workOffsetStep),
-										stageIter + 0x28);
+									fn((_pppPObject*)obj,
+									   *(void**)(((u8*)obj) + *(s32*)(progSet + 0x20) + workOffsetStep),
+									   stageIter + 0x28);
 								}
 								count--;
 								obj = (s32*)next;
@@ -2094,8 +2091,6 @@ void pppCalcPartStd(_pppMngSt* pppMngSt)
  */
 void pppDrawPartStd(_pppMngSt* pppMngSt)
 {
-	typedef void (*DrawProgFn)(void*, void*, void*);
-
 	s32 pDataOffset = 0;
 	for (s32 i = 0; i < *(s32*)(((u8*)pppMngSt) + 0xB8); i++)
 	{
@@ -2112,7 +2107,7 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
 				s32 prog = *(s32*)(stageIter + 0x28);
 				if (prog != 0)
 				{
-					DrawProgFn fn = (DrawProgFn)(*(void**)(prog + 0xC));
+					pppProgRenderCallback fn = (pppProgRenderCallback)(*(void**)(prog + 0xC));
 					if (fn != 0)
 					{
 						u16 count = *(u16*)(((u8*)pDataVal) + 0xC);
@@ -2123,10 +2118,9 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
 							s32 next = obj[0];
 							if (*((u8*)obj + 0x7C) == 0)
 							{
-								fn(
-									obj,
-									*(void**)(((u8*)obj) + *(s32*)(pDataVal[0] + 0x20) + workOffsetStep),
-									stageIter + 0x28);
+								fn((_pppPObject*)obj,
+								   *(void**)(((u8*)obj) + *(s32*)(pDataVal[0] + 0x20) + workOffsetStep),
+								   stageIter + 0x28);
 							}
 							count--;
 							obj = (s32*)next;
@@ -2144,7 +2138,6 @@ void pppDrawPartStd(_pppMngSt* pppMngSt)
 		pDataOffset += 0x10;
 	}
 }
-
 /*
  * --INFO--
  * PAL Address: 80054818
@@ -2245,7 +2238,7 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 							pppProg* prog = *(pppProg**)(((u8*)stage) + 0x28);
 							if (prog != 0 && prog->m_pppFunctionDestructor != 0)
 							{
-								((void (*)(_pppPObjLink*, void*))prog->m_pppFunctionDestructor)(obj, (void*)(((u8*)stage) + 0x28));
+								((pppProgDestructCallback)prog->m_pppFunctionDestructor)(obj, (void*)(((u8*)stage) + 0x28));
 							}
 							stage = (pppStageDefRaw*)(((u8*)stage) + 0x10);
 						}
@@ -2290,7 +2283,7 @@ void _pppDeadPart(_pppMngSt* pppMngSt)
 					pppProg* prog = *(pppProg**)(((u8*)stage) + 0x28);
 					if (prog != 0 && prog->m_pppFunctionDestructor != 0)
 					{
-						((void (*)(_pppPObjLink*, void*))prog->m_pppFunctionDestructor)(obj, (void*)(((u8*)stage) + 0x28));
+						((pppProgDestructCallback)prog->m_pppFunctionDestructor)(obj, (void*)(((u8*)stage) + 0x28));
 					}
 					stage = (pppStageDefRaw*)(((u8*)stage) + 0x10);
 				}
@@ -2885,3 +2878,4 @@ void pppHitCylinderSendSystem(_pppMngSt* pppMngSt, Vec* origin, Vec* vector, flo
 		return;
 	}
 }
+

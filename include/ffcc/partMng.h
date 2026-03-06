@@ -116,6 +116,17 @@ struct _pppPObject
     // Additional members may exist
 };
 
+struct _pppPObjLink;
+
+typedef void (*pppProgAnyCallback)(void);
+typedef void (*pppProgOperationCallback)(_pppPObject*, void*, void*);
+typedef void (*pppProgOperation2Callback)(_pppPObject*, void*);
+typedef void (*pppProgRenderCallback)(_pppPObject*, void*, void*);
+typedef void (*pppProgConstructCallback)(_pppPObjLink*, void*);
+typedef void (*pppProgConstruct2Callback)(_pppPObject*);
+typedef void (*pppProgConstruct3Callback)(_pppPObject*, void*);
+typedef void (*pppProgDestructCallback)(_pppPObjLink*, void*);
+
 struct pppFVECTOR4
 {
 
@@ -137,15 +148,15 @@ struct PPPIFPARAM
 
 struct pppProg
 {
-    char* m_pppName;                 // 0x0
-    char* m_unkPtr;                  // 0x4
-    void* m_pppFunctionOperation;    // 0x8
-    void* m_unkPtr2;                 // 0xC
-    CGObject* m_objects[3];          // 0x10
-    void* m_pppFunctionConstructor;  // 0x1C
-    void* m_pppFunctionConstructor2; // 0x20
-    void* m_pppFunctionConstructor3; // 0x24
-    void* m_pppFunctionDestructor;   // 0x28
+    char* m_pppName;                            // 0x0
+    char* m_unkPtr;                             // 0x4
+    pppProgAnyCallback m_pppFunctionOperation;  // 0x8
+    pppProgAnyCallback m_pppFunctionRender;     // 0xC
+    CGObject* m_objects[3];                     // 0x10
+    pppProgAnyCallback m_pppFunctionConstructor;  // 0x1C
+    pppProgAnyCallback m_pppFunctionConstructor2; // 0x20
+    pppProgAnyCallback m_pppFunctionConstructor3; // 0x24
+    pppProgAnyCallback m_pppFunctionDestructor;   // 0x28
 }; // Size 0x2c
 
 struct _pppCtrlTableData

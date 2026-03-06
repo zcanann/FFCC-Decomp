@@ -149,6 +149,8 @@
 #include "ffcc/pppYmTracer.h"
 #include "ffcc/pppYmTracer2.h"
 
+#define PPP_FN(fn) ((pppProgAnyCallback)(fn))
+
 struct _pppSysProgTbl
 {
     pppProg* m_progs;
@@ -169,84 +171,84 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppAccele",
         0,
-        (void*)pppAccele,
+        PPP_FN(pppAccele),
         0,
         { 0, 0, 0 },
-        (void*)pppAcceleCon,
-        (void*)pppAcceleCon,
+        PPP_FN(pppAcceleCon),
+        PPP_FN(pppAcceleCon),
         0,
         0
     },
     {
         (char*)"pppAngAccele",
         0,
-        (void*)pppAngAccele,
+        PPP_FN(pppAngAccele),
         0,
         { 0, 0, 0 },
-        (void*)pppAngAcceleCon,
-        (void*)pppAngAcceleCon,
+        PPP_FN(pppAngAcceleCon),
+        PPP_FN(pppAngAcceleCon),
         0,
         0
     },
     {
         (char*)"pppAngle",
         0,
-        (void*)pppAngle,
+        PPP_FN(pppAngle),
         0,
         { 0, 0, 0 },
-        (void*)pppAngleCon,
-        (void*)pppAngleCon,
+        PPP_FN(pppAngleCon),
+        PPP_FN(pppAngleCon),
         0,
         0
     },
     {
         (char*)"pppAngMove",
         0,
-        (void*)pppAngMove,
+        PPP_FN(pppAngMove),
         0,
         { 0, 0, 0 },
-        (void*)pppAngMoveCon,
-        (void*)pppAngMoveCon,
+        PPP_FN(pppAngMoveCon),
+        PPP_FN(pppAngMoveCon),
         0,
         0
     },
     {
         (char*)"pppColAccele",
         0,
-        (void*)pppColAccele,
+        PPP_FN(pppColAccele),
         0,
         { 0, 0, 0 },
-        (void*)pppColAcceleCon,
-        (void*)pppColAcceleCon,
+        PPP_FN(pppColAcceleCon),
+        PPP_FN(pppColAcceleCon),
         0,
         0
     },
     {
         (char*)"pppColMove",
         0,
-        (void*)pppColMove,
+        PPP_FN(pppColMove),
         0,
         { 0, 0, 0 },
-        (void*)pppColMoveCon,
-        (void*)pppColMoveCon,
+        PPP_FN(pppColMoveCon),
+        PPP_FN(pppColMoveCon),
         0,
         0
     },
     {
         (char*)"pppColor",
         0,
-        (void*)pppColor,
+        PPP_FN(pppColor),
         0,
         { 0, 0, 0 },
-        (void*)pppColorCon,
-        (void*)pppColorCon,
+        PPP_FN(pppColorCon),
+        PPP_FN(pppColorCon),
         0,
         0
     },
     {
         (char*)"pppMatrix",
         0,
-        (void*)pppMatrixXYZ,
+        PPP_FN(pppMatrixXYZ),
         0,
         { 0, 0, 0 },
         0,
@@ -257,7 +259,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppMatrixLoc",
         0,
-        (void*)pppMatrixLoc,
+        PPP_FN(pppMatrixLoc),
         0,
         { 0, 0, 0 },
         0,
@@ -268,7 +270,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppMatrixScl",
         0,
-        (void*)pppMatrixScl,
+        PPP_FN(pppMatrixScl),
         0,
         { 0, 0, 0 },
         0,
@@ -279,7 +281,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppMatrixXYZ",
         0,
-        (void*)pppMatrixXYZ,
+        PPP_FN(pppMatrixXYZ),
         0,
         { 0, 0, 0 },
         0,
@@ -290,7 +292,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppMatrixXZY",
         0,
-        (void*)pppMatrixXZY,
+        PPP_FN(pppMatrixXZY),
         0,
         { 0, 0, 0 },
         0,
@@ -301,7 +303,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppMatrixYXZ",
         0,
-        (void*)pppMatrixYXZ,
+        PPP_FN(pppMatrixYXZ),
         0,
         { 0, 0, 0 },
         0,
@@ -312,7 +314,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppMatrixYZX",
         0,
-        (void*)pppMatrixYZX,
+        PPP_FN(pppMatrixYZX),
         0,
         { 0, 0, 0 },
         0,
@@ -323,7 +325,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppMatrixZXY",
         0,
-        (void*)pppMatrixZXY,
+        PPP_FN(pppMatrixZXY),
         0,
         { 0, 0, 0 },
         0,
@@ -334,7 +336,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppMatrixZYX",
         0,
-        (void*)pppMatrixZYX,
+        PPP_FN(pppMatrixZYX),
         0,
         { 0, 0, 0 },
         0,
@@ -345,18 +347,18 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppMove",
         0,
-        (void*)pppMove,
+        PPP_FN(pppMove),
         0,
         { 0, 0, 0 },
-        (void*)pppMoveCon,
-        (void*)pppMoveCon,
+        PPP_FN(pppMoveCon),
+        PPP_FN(pppMoveCon),
         0,
         0
     },
     {
         (char*)"pppParMatrix",
         0,
-        (void*)pppParMatrix,
+        PPP_FN(pppParMatrix),
         0,
         { 0, 0, 0 },
         0,
@@ -367,7 +369,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppPObjPoint",
         0,
-        (void*)pppPObjPoint,
+        PPP_FN(pppPObjPoint),
         0,
         { 0, 0, 0 },
         0,
@@ -378,21 +380,21 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppPoint",
         0,
-        (void*)pppPoint,
+        PPP_FN(pppPoint),
         0,
         { 0, 0, 0 },
-        (void*)pppPointCon,
-        (void*)pppPointCon,
+        PPP_FN(pppPointCon),
+        PPP_FN(pppPointCon),
         0,
         0
     },
     {
         (char*)"pppPointAp",
         0,
-        (void*)pppPointAp,
+        PPP_FN(pppPointAp),
         0,
         { 0, 0, 0 },
-        (void*)pppPointApCon,
+        PPP_FN(pppPointApCon),
         0,
         0,
         0
@@ -400,10 +402,10 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppPointRAp",
         0,
-        (void*)pppPointRAp,
+        PPP_FN(pppPointRAp),
         0,
         { 0, 0, 0 },
-        (void*)pppPointRApCon,
+        PPP_FN(pppPointRApCon),
         0,
         0,
         0
@@ -411,7 +413,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppRandChar",
         0,
-        (void*)pppRandChar,
+        PPP_FN(pppRandChar),
         0,
         { 0, 0, 0 },
         0,
@@ -422,7 +424,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppRandCV",
         0,
-        (void*)pppRandCV,
+        PPP_FN(pppRandCV),
         0,
         { 0, 0, 0 },
         0,
@@ -433,7 +435,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppRandDownChar",
         0,
-        (void*)pppRandDownChar,
+        PPP_FN(pppRandDownChar),
         0,
         { 0, 0, 0 },
         0,
@@ -444,7 +446,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppRandDownCV",
         0,
-        (void*)pppRandDownCV,
+        PPP_FN(pppRandDownCV),
         0,
         { 0, 0, 0 },
         0,
@@ -455,7 +457,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppRandDownFloat",
         0,
-        (void*)pppRandDownFloat,
+        PPP_FN(pppRandDownFloat),
         0,
         { 0, 0, 0 },
         0,
@@ -466,7 +468,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppRandDownFV",
         0,
-        (void*)pppRandDownFV,
+        PPP_FN(pppRandDownFV),
         0,
         { 0, 0, 0 },
         0,
@@ -477,7 +479,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppRandDownHCV",
         0,
-        (void*)pppRandDownHCV,
+        PPP_FN(pppRandDownHCV),
         0,
         { 0, 0, 0 },
         0,
@@ -488,7 +490,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppRandDownInt",
         0,
-        (void*)pppRandDownInt,
+        PPP_FN(pppRandDownInt),
         0,
         { 0, 0, 0 },
         0,
@@ -499,7 +501,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppRandDownIV",
         0,
-        (void*)pppRandDownIV,
+        PPP_FN(pppRandDownIV),
         0,
         { 0, 0, 0 },
         0,
@@ -510,7 +512,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppRandDownShort",
         0,
-        (void*)pppRandDownShort,
+        PPP_FN(pppRandDownShort),
         0,
         { 0, 0, 0 },
         0,
@@ -521,7 +523,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppRandFloat",
         0,
-        (void*)pppRandFloat,
+        PPP_FN(pppRandFloat),
         0,
         { 0, 0, 0 },
         0,
@@ -532,7 +534,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppRandFV",
         0,
-        (void*)pppRandFV,
+        PPP_FN(pppRandFV),
         0,
         { 0, 0, 0 },
         0,
@@ -543,7 +545,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppRandHCV",
         0,
-        (void*)pppRandHCV,
+        PPP_FN(pppRandHCV),
         0,
         { 0, 0, 0 },
         0,
@@ -554,7 +556,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppRandInt",
         0,
-        (void*)pppRandInt,
+        PPP_FN(pppRandInt),
         0,
         { 0, 0, 0 },
         0,
@@ -565,7 +567,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppRandIV",
         0,
-        (void*)pppRandIV,
+        PPP_FN(pppRandIV),
         0,
         { 0, 0, 0 },
         0,
@@ -576,7 +578,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppRandShort",
         0,
-        (void*)pppRandShort,
+        PPP_FN(pppRandShort),
         0,
         { 0, 0, 0 },
         0,
@@ -587,7 +589,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppRandUpChar",
         0,
-        (void*)pppRandUpChar,
+        PPP_FN(pppRandUpChar),
         0,
         { 0, 0, 0 },
         0,
@@ -598,7 +600,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppRandUpCV",
         0,
-        (void*)pppRandUpCV,
+        PPP_FN(pppRandUpCV),
         0,
         { 0, 0, 0 },
         0,
@@ -609,7 +611,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppRandUpFloat",
         0,
-        (void*)pppRandUpFloat,
+        PPP_FN(pppRandUpFloat),
         0,
         { 0, 0, 0 },
         0,
@@ -620,7 +622,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppRandUpFV",
         0,
-        (void*)pppRandUpFV,
+        PPP_FN(pppRandUpFV),
         0,
         { 0, 0, 0 },
         0,
@@ -631,7 +633,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppRandUpHCV",
         0,
-        (void*)pppRandUpHCV,
+        PPP_FN(pppRandUpHCV),
         0,
         { 0, 0, 0 },
         0,
@@ -642,7 +644,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppRandUpInt",
         0,
-        (void*)pppRandUpInt,
+        PPP_FN(pppRandUpInt),
         0,
         { 0, 0, 0 },
         0,
@@ -653,7 +655,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppRandUpIV",
         0,
-        (void*)pppRandUpIV,
+        PPP_FN(pppRandUpIV),
         0,
         { 0, 0, 0 },
         0,
@@ -664,7 +666,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppRandUpShort",
         0,
-        (void*)pppRandUpShort,
+        PPP_FN(pppRandUpShort),
         0,
         { 0, 0, 0 },
         0,
@@ -675,33 +677,33 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppScale",
         0,
-        (void*)pppScale,
+        PPP_FN(pppScale),
         0,
         { 0, 0, 0 },
-        (void*)pppScaleCon,
-        (void*)pppScaleCon,
+        PPP_FN(pppScaleCon),
+        PPP_FN(pppScaleCon),
         0,
         0
     },
     {
         (char*)"pppSclAccele",
         0,
-        (void*)pppSclAccele,
+        PPP_FN(pppSclAccele),
         0,
         { 0, 0, 0 },
-        (void*)pppSclAcceleCon,
-        (void*)pppSclAcceleCon,
+        PPP_FN(pppSclAcceleCon),
+        PPP_FN(pppSclAcceleCon),
         0,
         0
     },
     {
         (char*)"pppSclMove",
         0,
-        (void*)pppSclMove,
+        PPP_FN(pppSclMove),
         0,
         { 0, 0, 0 },
-        (void*)pppSclMoveCon,
-        (void*)pppSclMoveCon,
+        PPP_FN(pppSclMoveCon),
+        PPP_FN(pppSclMoveCon),
         0,
         0
     },
@@ -719,7 +721,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppSRandCV",
         0,
-        (void*)pppSRandCV,
+        PPP_FN(pppSRandCV),
         0,
         { 0, 0, 0 },
         0,
@@ -730,7 +732,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppSRandDownCV",
         0,
-        (void*)pppSRandDownCV,
+        PPP_FN(pppSRandDownCV),
         0,
         { 0, 0, 0 },
         0,
@@ -741,7 +743,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppSRandDownFV",
         0,
-        (void*)pppSRandDownFV,
+        PPP_FN(pppSRandDownFV),
         0,
         { 0, 0, 0 },
         0,
@@ -752,7 +754,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppSRandDownHCV",
         0,
-        (void*)pppSRandDownHCV,
+        PPP_FN(pppSRandDownHCV),
         0,
         { 0, 0, 0 },
         0,
@@ -763,7 +765,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppSRandFV",
         0,
-        (void*)pppSRandFV,
+        PPP_FN(pppSRandFV),
         0,
         { 0, 0, 0 },
         0,
@@ -774,7 +776,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppSRandHCV",
         0,
-        (void*)pppSRandHCV,
+        PPP_FN(pppSRandHCV),
         0,
         { 0, 0, 0 },
         0,
@@ -785,7 +787,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppSRandUpCV",
         0,
-        (void*)pppSRandUpCV,
+        PPP_FN(pppSRandUpCV),
         0,
         { 0, 0, 0 },
         0,
@@ -796,7 +798,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppSRandUpFV",
         0,
-        (void*)pppSRandUpFV,
+        PPP_FN(pppSRandUpFV),
         0,
         { 0, 0, 0 },
         0,
@@ -807,7 +809,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppSRandUpHCV",
         0,
-        (void*)pppSRandUpHCV,
+        PPP_FN(pppSRandUpHCV),
         0,
         { 0, 0, 0 },
         0,
@@ -818,10 +820,10 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppVertexAp",
         0,
-        (void*)pppVertexAp,
+        PPP_FN(pppVertexAp),
         0,
         { 0, 0, 0 },
-        (void*)pppVertexApCon,
+        PPP_FN(pppVertexApCon),
         0,
         0,
         0
@@ -829,29 +831,29 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppVertexApAt",
         0,
-        (void*)pppVertexApAt,
+        PPP_FN(pppVertexApAt),
         0,
         { 0, 0, 0 },
-        (void*)pppVertexApAtCon,
-        (void*)pppVertexApAtCon,
+        PPP_FN(pppVertexApAtCon),
+        PPP_FN(pppVertexApAtCon),
         0,
         0
     },
     {
         (char*)"pppVertexApLc",
         0,
-        (void*)pppVertexApLc,
+        PPP_FN(pppVertexApLc),
         0,
         { 0, 0, 0 },
-        (void*)pppVertexApLcCon,
-        (void*)pppVertexApLcCon,
+        PPP_FN(pppVertexApLcCon),
+        PPP_FN(pppVertexApLcCon),
         0,
         0
     },
     {
         (char*)"pppVertexAttend",
         0,
-        (void*)pppVertexAttend,
+        PPP_FN(pppVertexAttend),
         0,
         { 0, 0, 0 },
         0,
@@ -862,19 +864,19 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppVtMime",
         0,
-        (void*)pppVtMime,
-        (void*)pppDrawVtMime,
+        PPP_FN(pppVtMime),
+        PPP_FN(pppDrawVtMime),
         { 0, 0, 0 },
-        (void*)pppVtMimeCon,
-        (void*)pppVtMimeCon2,
+        PPP_FN(pppVtMimeCon),
+        PPP_FN(pppVtMimeCon2),
         0,
-        (void*)pppVtMimeDes
+        PPP_FN(pppVtMimeDes)
     },
     {
         (char*)"pppDrawMatrix",
         0,
         0,
-        (void*)pppDrawMatrix,
+        PPP_FN(pppDrawMatrix),
         { 0, 0, 0 },
         0,
         0,
@@ -885,7 +887,7 @@ static pppProg s_pppSysProgTable[159] = {
         (char*)"pppDrawMatrixFront",
         0,
         0,
-        (void*)pppDrawMatrixFront,
+        PPP_FN(pppDrawMatrixFront),
         { 0, 0, 0 },
         0,
         0,
@@ -896,7 +898,7 @@ static pppProg s_pppSysProgTable[159] = {
         (char*)"pppDrawMdl",
         0,
         0,
-        (void*)pppDrawMdl,
+        PPP_FN(pppDrawMdl),
         { 0, 0, 0 },
         0,
         0,
@@ -906,54 +908,54 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppDrawShape",
         0,
-        (void*)pppCalcShape,
-        (void*)pppDrawShape,
+        PPP_FN(pppCalcShape),
+        PPP_FN(pppDrawShape),
         { 0, 0, 0 },
-        (void*)pppDrawShapeConstruct,
-        (void*)pppDrawShapeConstruct,
+        PPP_FN(pppDrawShapeConstruct),
+        PPP_FN(pppDrawShapeConstruct),
         0,
         0
     },
     {
         (char*)"pppRyjMegaBirth",
         0,
-        (void*)pppRyjMegaBirth,
-        (void*)pppRyjDrawMegaBirth,
+        PPP_FN(pppRyjMegaBirth),
+        PPP_FN(pppRyjDrawMegaBirth),
         { 0, 0, 0 },
-        (void*)pppRyjMegaBirthCon,
+        PPP_FN(pppRyjMegaBirthCon),
         0,
         0,
-        (void*)pppRyjMegaBirthDes
+        PPP_FN(pppRyjMegaBirthDes)
     },
     {
         (char*)"pppRyjMegaBirthModel",
         0,
-        (void*)pppRyjMegaBirthModel,
-        (void*)pppRyjDrawMegaBirthModel,
+        PPP_FN(pppRyjMegaBirthModel),
+        PPP_FN(pppRyjDrawMegaBirthModel),
         { 0, 0, 0 },
-        (void*)pppRyjMegaBirthModelCon,
+        PPP_FN(pppRyjMegaBirthModelCon),
         0,
         0,
-        (void*)pppRyjMegaBirthModelDes
+        PPP_FN(pppRyjMegaBirthModelDes)
     },
     {
         (char*)"pppDrawMdlTs",
         0,
-        (void*)pppDrawMdlTs,
-        (void*)pppDrawDrawMdlTs,
+        PPP_FN(pppDrawMdlTs),
+        PPP_FN(pppDrawDrawMdlTs),
         { 0, 0, 0 },
-        (void*)pppDrawMdlTsCon,
-        (void*)pppDrawMdlTsCon,
+        PPP_FN(pppDrawMdlTsCon),
+        PPP_FN(pppDrawMdlTsCon),
         0,
         0
     },
     {
         (char*)"pppKeShpTail",
         0,
-        (void*)pppKeShpTail,
-        (void*)pppKeShpTailDraw,
+        PPP_FN(pppKeShpTail),
+        PPP_FN(pppKeShpTailDraw),
         { 0, 0, 0 },
-        (void*)pppKeShpTailCon,
+        PPP_FN(pppKeShpTailCon),
         0,
         0,
         0
@@ -961,19 +963,19 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppKeShpTail2X",
         0,
-        (void*)pppKeShpTail2X,
-        (void*)pppKeShpTail2XDraw,
+        PPP_FN(pppKeShpTail2X),
+        PPP_FN(pppKeShpTail2XDraw),
         { 0, 0, 0 },
-        (void*)pppKeShpTail2XCon,
+        PPP_FN(pppKeShpTail2XCon),
         0,
         0,
-        (void*)pppKeShpTail2XDes
+        PPP_FN(pppKeShpTail2XDes)
     },
     {
         (char*)"pppKeZCrctShp",
         0,
         0,
-        (void*)pppKeZCrctShpDraw,
+        PPP_FN(pppKeZCrctShpDraw),
         { 0, 0, 0 },
         0,
         0,
@@ -983,21 +985,21 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppKeShpTail3X",
         0,
-        (void*)pppKeShpTail3X,
-        (void*)pppKeShpTail3XDraw,
+        PPP_FN(pppKeShpTail3X),
+        PPP_FN(pppKeShpTail3XDraw),
         { 0, 0, 0 },
-        (void*)pppKeShpTail3XCon,
+        PPP_FN(pppKeShpTail3XCon),
         0,
         0,
-        (void*)pppKeShpTail3XDes
+        PPP_FN(pppKeShpTail3XDes)
     },
     {
         (char*)"pppMoveLoop",
         0,
-        (void*)pppMove,
+        PPP_FN(pppMove),
         0,
         { 0, 0, 0 },
-        (void*)pppMoveCon,
+        PPP_FN(pppMoveCon),
         0,
         0,
         0
@@ -1005,10 +1007,10 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppAngMoveLoop",
         0,
-        (void*)pppAngMove,
+        PPP_FN(pppAngMove),
         0,
         { 0, 0, 0 },
-        (void*)pppAngMoveCon,
+        PPP_FN(pppAngMoveCon),
         0,
         0,
         0
@@ -1016,10 +1018,10 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppSclMoveLoop",
         0,
-        (void*)pppSclMove,
+        PPP_FN(pppSclMove),
         0,
         { 0, 0, 0 },
-        (void*)pppSclMoveCon,
+        PPP_FN(pppSclMoveCon),
         0,
         0,
         0
@@ -1027,10 +1029,10 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppPointLoop",
         0,
-        (void*)pppPoint,
+        PPP_FN(pppPoint),
         0,
         { 0, 0, 0 },
-        (void*)pppPointCon,
+        PPP_FN(pppPointCon),
         0,
         0,
         0
@@ -1038,10 +1040,10 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppAngleLoop",
         0,
-        (void*)pppAngle,
+        PPP_FN(pppAngle),
         0,
         { 0, 0, 0 },
-        (void*)pppAngleCon,
+        PPP_FN(pppAngleCon),
         0,
         0,
         0
@@ -1049,10 +1051,10 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppScaleLoop",
         0,
-        (void*)pppScale,
+        PPP_FN(pppScale),
         0,
         { 0, 0, 0 },
-        (void*)pppScaleCon,
+        PPP_FN(pppScaleCon),
         0,
         0,
         0
@@ -1060,10 +1062,10 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppColorLoop",
         0,
-        (void*)pppColor,
+        PPP_FN(pppColor),
         0,
         { 0, 0, 0 },
-        (void*)pppColorCon,
+        PPP_FN(pppColorCon),
         0,
         0,
         0
@@ -1071,30 +1073,30 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppDrawMdlLoop",
         0,
-        (void*)pppDrawMdlTs,
-        (void*)pppDrawDrawMdlTs,
+        PPP_FN(pppDrawMdlTs),
+        PPP_FN(pppDrawDrawMdlTs),
         { 0, 0, 0 },
-        (void*)pppDrawMdlTsCon,
+        PPP_FN(pppDrawMdlTsCon),
         0,
-        (void*)pppDrawMdlTsCon3,
+        PPP_FN(pppDrawMdlTsCon3),
         0
     },
     {
         (char*)"pppYmDrawMdlTexAnm",
         0,
-        (void*)pppFrameYmDrawMdlTexAnm,
-        (void*)pppRenderYmDrawMdlTexAnm,
+        PPP_FN(pppFrameYmDrawMdlTexAnm),
+        PPP_FN(pppRenderYmDrawMdlTexAnm),
         { 0, 0, 0 },
-        (void*)pppConstructYmDrawMdlTexAnm,
+        PPP_FN(pppConstructYmDrawMdlTexAnm),
         0,
         0,
-        (void*)pppDestructYmDrawMdlTexAnm
+        PPP_FN(pppDestructYmDrawMdlTexAnm)
     },
     {
         (char*)"pppDrawMatrixWood",
         0,
         0,
-        (void*)pppDrawMatrixWood,
+        PPP_FN(pppDrawMatrixWood),
         { 0, 0, 0 },
         0,
         0,
@@ -1105,7 +1107,7 @@ static pppProg s_pppSysProgTable[159] = {
         (char*)"pppDrawMatrixNoRot",
         0,
         0,
-        (void*)pppDrawMatrixNoRot,
+        PPP_FN(pppDrawMatrixNoRot),
         { 0, 0, 0 },
         0,
         0,
@@ -1115,32 +1117,32 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppYmMegaBirthShpTail2",
         0,
-        (void*)pppFrameYmMegaBirthShpTail2,
-        (void*)pppRenderYmMegaBirthShpTail2,
+        PPP_FN(pppFrameYmMegaBirthShpTail2),
+        PPP_FN(pppRenderYmMegaBirthShpTail2),
         { 0, 0, 0 },
-        (void*)pppConstructYmMegaBirthShpTail2,
+        PPP_FN(pppConstructYmMegaBirthShpTail2),
         0,
         0,
-        (void*)pppDestructYmMegaBirthShpTail2
+        PPP_FN(pppDestructYmMegaBirthShpTail2)
     },
     {
         (char*)"pppYmMegaBirthShpTail3",
         0,
-        (void*)pppFrameYmMegaBirthShpTail3,
-        (void*)pppRenderYmMegaBirthShpTail3,
+        PPP_FN(pppFrameYmMegaBirthShpTail3),
+        PPP_FN(pppRenderYmMegaBirthShpTail3),
         { 0, 0, 0 },
-        (void*)pppConstructYmMegaBirthShpTail3,
+        PPP_FN(pppConstructYmMegaBirthShpTail3),
         0,
         0,
-        (void*)pppDestructYmMegaBirthShpTail3
+        PPP_FN(pppDestructYmMegaBirthShpTail3)
     },
     {
         (char*)"pppKeLnsFls",
         0,
         0,
-        (void*)pppKeLnsFlsDraw,
+        PPP_FN(pppKeLnsFlsDraw),
         { 0, 0, 0 },
-        (void*)pppKeLnsFlsCon,
+        PPP_FN(pppKeLnsFlsCon),
         0,
         0,
         0
@@ -1149,10 +1151,10 @@ static pppProg s_pppSysProgTable[159] = {
         (char*)"pppKeLnsLp",
         0,
         0,
-        (void*)pppKeLnsLpDraw,
+        PPP_FN(pppKeLnsLpDraw),
         { 0, 0, 0 },
-        (void*)pppKeLnsLpCon,
-        (void*)pppKeLnsLpCon2,
+        PPP_FN(pppKeLnsLpCon),
+        PPP_FN(pppKeLnsLpCon2),
         0,
         0
     },
@@ -1160,7 +1162,7 @@ static pppProg s_pppSysProgTable[159] = {
         (char*)"pppKeDMat",
         0,
         0,
-        (void*)pppKeDMatDraw,
+        PPP_FN(pppKeDMatDraw),
         { 0, 0, 0 },
         0,
         0,
@@ -1170,19 +1172,19 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppYmDeformationShp",
         0,
-        (void*)pppFrameYmDeformationShp,
-        (void*)pppRenderYmDeformationShp,
+        PPP_FN(pppFrameYmDeformationShp),
+        PPP_FN(pppRenderYmDeformationShp),
         { 0, 0, 0 },
-        (void*)pppConstructYmDeformationShp,
-        (void*)pppConstruct2YmDeformationShp,
+        PPP_FN(pppConstructYmDeformationShp),
+        PPP_FN(pppConstruct2YmDeformationShp),
         0,
-        (void*)pppDestructYmDeformationShp
+        PPP_FN(pppDestructYmDeformationShp)
     },
     {
         (char*)"pppWDrawMatrix",
         0,
         0,
-        (void*)pppWDrawMatrix,
+        PPP_FN(pppWDrawMatrix),
         { 0, 0, 0 },
         0,
         0,
@@ -1193,7 +1195,7 @@ static pppProg s_pppSysProgTable[159] = {
         (char*)"pppWDrawMatrixFront",
         0,
         0,
-        (void*)pppWDrawMatrixFront,
+        PPP_FN(pppWDrawMatrixFront),
         { 0, 0, 0 },
         0,
         0,
@@ -1203,7 +1205,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppParMoveLine",
         0,
-        (void*)pppParMoveLine,
+        PPP_FN(pppParMoveLine),
         0,
         { 0, 0, 0 },
         0,
@@ -1214,40 +1216,40 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppYmMiasma",
         0,
-        (void*)pppFrameYmMiasma,
-        (void*)pppRenderYmMiasma,
+        PPP_FN(pppFrameYmMiasma),
+        PPP_FN(pppRenderYmMiasma),
         { 0, 0, 0 },
-        (void*)pppConstructYmMiasma,
-        (void*)pppConstruct2YmMiasma,
+        PPP_FN(pppConstructYmMiasma),
+        PPP_FN(pppConstruct2YmMiasma),
         0,
-        (void*)pppDestructYmMiasma
+        PPP_FN(pppDestructYmMiasma)
     },
     {
         (char*)"pppYmDeformationScreen",
         0,
-        (void*)pppFrameYmDeformationScreen,
-        (void*)pppRenderYmDeformationScreen,
+        PPP_FN(pppFrameYmDeformationScreen),
+        PPP_FN(pppRenderYmDeformationScreen),
         { 0, 0, 0 },
-        (void*)pppConstructYmDeformationScreen,
-        (void*)pppConstruct2YmDeformationScreen,
+        PPP_FN(pppConstructYmDeformationScreen),
+        PPP_FN(pppConstruct2YmDeformationScreen),
         0,
-        (void*)pppDestructYmDeformationScreen
+        PPP_FN(pppDestructYmDeformationScreen)
     },
     {
         (char*)"pppYmTracer",
         0,
-        (void*)pppFrameYmTracer,
-        (void*)pppRenderYmTracer,
+        PPP_FN(pppFrameYmTracer),
+        PPP_FN(pppRenderYmTracer),
         { 0, 0, 0 },
-        (void*)pppConstructYmTracer,
-        (void*)pppConstruct2YmTracer,
+        PPP_FN(pppConstructYmTracer),
+        PPP_FN(pppConstruct2YmTracer),
         0,
-        (void*)pppDestructYmTracer
+        PPP_FN(pppDestructYmTracer)
     },
     {
         (char*)"pppParHitSph",
         0,
-        (void*)pppParHitSph,
+        PPP_FN(pppParHitSph),
         0,
         { 0, 0, 0 },
         0,
@@ -1258,41 +1260,41 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppYmMelt",
         0,
-        (void*)pppFrameYmMelt,
-        (void*)pppRenderYmMelt,
+        PPP_FN(pppFrameYmMelt),
+        PPP_FN(pppRenderYmMelt),
         { 0, 0, 0 },
-        (void*)pppConstructYmMelt,
+        PPP_FN(pppConstructYmMelt),
         0,
         0,
-        (void*)pppDestructYmMelt
+        PPP_FN(pppDestructYmMelt)
     },
     {
         (char*)"pppYmCallBack",
         0,
-        (void*)pppFrameYmCallBack,
+        PPP_FN(pppFrameYmCallBack),
         0,
         { 0, 0, 0 },
-        (void*)pppConstructYmCallBack,
+        PPP_FN(pppConstructYmCallBack),
         0,
         0,
-        (void*)pppDestructYmCallBack
+        PPP_FN(pppDestructYmCallBack)
     },
     {
         (char*)"pppYmBreath",
         0,
-        (void*)pppFrameYmBreath,
-        (void*)pppRenderYmBreath,
+        PPP_FN(pppFrameYmBreath),
+        PPP_FN(pppRenderYmBreath),
         { 0, 0, 0 },
-        (void*)pppConstructYmBreath,
-        (void*)pppConstruct2YmBreath,
+        PPP_FN(pppConstructYmBreath),
+        PPP_FN(pppConstruct2YmBreath),
         0,
-        (void*)pppDestructYmBreath
+        PPP_FN(pppDestructYmBreath)
     },
     {
         (char*)"pppWDrawMatrixLoop",
         0,
         0,
-        (void*)pppWDrawMatrixLoop,
+        PPP_FN(pppWDrawMatrixLoop),
         { 0, 0, 0 },
         0,
         0,
@@ -1303,7 +1305,7 @@ static pppProg s_pppSysProgTable[159] = {
         (char*)"pppWDrawMatrixFrontLoop",
         0,
         0,
-        (void*)pppWDrawMatrixFrontLoop,
+        PPP_FN(pppWDrawMatrixFrontLoop),
         { 0, 0, 0 },
         0,
         0,
@@ -1313,10 +1315,10 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppYmMoveCircle",
         0,
-        (void*)pppFrameYmMoveCircle,
+        PPP_FN(pppFrameYmMoveCircle),
         0,
         { 0, 0, 0 },
-        (void*)pppConstructYmMoveCircle,
+        PPP_FN(pppConstructYmMoveCircle),
         0,
         0,
         0
@@ -1325,7 +1327,7 @@ static pppProg s_pppSysProgTable[159] = {
         (char*)"pppDrawMatrixFrontLnr",
         0,
         0,
-        (void*)pppDrawMatrixFrontLnr,
+        PPP_FN(pppDrawMatrixFrontLnr),
         { 0, 0, 0 },
         0,
         0,
@@ -1335,21 +1337,21 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppYmDeformationMdl",
         0,
-        (void*)pppFrameYmDeformationMdl,
-        (void*)pppRenderYmDeformationMdl,
+        PPP_FN(pppFrameYmDeformationMdl),
+        PPP_FN(pppRenderYmDeformationMdl),
         { 0, 0, 0 },
-        (void*)pppConstructYmDeformationMdl,
-        (void*)pppConstruct2YmDeformationMdl,
+        PPP_FN(pppConstructYmDeformationMdl),
+        PPP_FN(pppConstruct2YmDeformationMdl),
         0,
-        (void*)pppDestructYmDeformationMdl
+        PPP_FN(pppDestructYmDeformationMdl)
     },
     {
         (char*)"pppPointApMtx",
         0,
-        (void*)pppPointApMtx,
+        PPP_FN(pppPointApMtx),
         0,
         { 0, 0, 0 },
-        (void*)pppPointApMtxCon,
+        PPP_FN(pppPointApMtxCon),
         0,
         0,
         0
@@ -1357,10 +1359,10 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppVertexApMtx",
         0,
-        (void*)pppVertexApMtx,
+        PPP_FN(pppVertexApMtx),
         0,
         { 0, 0, 0 },
-        (void*)pppVertexApMtxCon,
+        PPP_FN(pppVertexApMtxCon),
         0,
         0,
         0
@@ -1369,7 +1371,7 @@ static pppProg s_pppSysProgTable[159] = {
         (char*)"pppSDrawMatrix",
         0,
         0,
-        (void*)pppSDrawMatrix,
+        PPP_FN(pppSDrawMatrix),
         { 0, 0, 0 },
         0,
         0,
@@ -1379,18 +1381,18 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppYmLaser",
         0,
-        (void*)pppFrameYmLaser,
-        (void*)pppRenderYmLaser,
+        PPP_FN(pppFrameYmLaser),
+        PPP_FN(pppRenderYmLaser),
         { 0, 0, 0 },
-        (void*)pppConstructYmLaser,
-        (void*)pppConstruct2YmLaser,
+        PPP_FN(pppConstructYmLaser),
+        PPP_FN(pppConstruct2YmLaser),
         0,
-        (void*)pppDestructYmLaser
+        PPP_FN(pppDestructYmLaser)
     },
     {
         (char*)"pppSpMatrix",
         0,
-        (void*)pppSpMatrix,
+        PPP_FN(pppSpMatrix),
         0,
         { 0, 0, 0 },
         0,
@@ -1401,21 +1403,21 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppYmChangeTex",
         0,
-        (void*)pppFrameYmChangeTex,
-        (void*)pppRenderYmChangeTex,
+        PPP_FN(pppFrameYmChangeTex),
+        PPP_FN(pppRenderYmChangeTex),
         { 0, 0, 0 },
-        (void*)pppConstructYmChangeTex,
+        PPP_FN(pppConstructYmChangeTex),
         0,
         0,
-        (void*)pppDestructYmChangeTex
+        PPP_FN(pppDestructYmChangeTex)
     },
     {
         (char*)"pppYmMoveParabola",
         0,
-        (void*)pppFrameYmMoveParabola,
+        PPP_FN(pppFrameYmMoveParabola),
         0,
         { 0, 0, 0 },
-        (void*)pppConstructYmMoveParabola,
+        PPP_FN(pppConstructYmMoveParabola),
         0,
         0,
         0
@@ -1423,7 +1425,7 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppParMoveMatrix",
         0,
-        (void*)pppParMoveMatrix,
+        PPP_FN(pppParMoveMatrix),
         0,
         { 0, 0, 0 },
         0,
@@ -1434,10 +1436,10 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppYmTraceMove",
         0,
-        (void*)pppFrameYmTraceMove,
+        PPP_FN(pppFrameYmTraceMove),
         0,
         { 0, 0, 0 },
-        (void*)pppConstructYmTraceMove,
+        PPP_FN(pppConstructYmTraceMove),
         0,
         0,
         0
@@ -1445,21 +1447,21 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppYmMana",
         0,
-        (void*)pppFrameYmMana,
-        (void*)pppRenderYmMana,
+        PPP_FN(pppFrameYmMana),
+        PPP_FN(pppRenderYmMana),
         { 0, 0, 0 },
-        (void*)pppConstructYmMana,
+        PPP_FN(pppConstructYmMana),
         0,
         0,
-        (void*)pppDestructYmMana
+        PPP_FN(pppDestructYmMana)
     },
     {
         (char*)"pppYmLookOn",
         0,
-        (void*)pppFrameYmLookOn,
+        PPP_FN(pppFrameYmLookOn),
         0,
         { 0, 0, 0 },
-        (void*)pppConstructYmLookOn,
+        PPP_FN(pppConstructYmLookOn),
         0,
         0,
         0
@@ -1467,10 +1469,10 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppYmCheckBGHeight",
         0,
-        (void*)pppFrameYmCheckBGHeight,
+        PPP_FN(pppFrameYmCheckBGHeight),
         0,
         { 0, 0, 0 },
-        (void*)pppConstructYmCheckBGHeight,
+        PPP_FN(pppConstructYmCheckBGHeight),
         0,
         0,
         0
@@ -1478,186 +1480,186 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppLocationTitle",
         0,
-        (void*)pppFrameLocationTitle,
-        (void*)pppRenderLocationTitle,
+        PPP_FN(pppFrameLocationTitle),
+        PPP_FN(pppRenderLocationTitle),
         { 0, 0, 0 },
-        (void*)pppConstructLocationTitle,
+        PPP_FN(pppConstructLocationTitle),
         0,
         0,
-        (void*)pppDestructLocationTitle
+        PPP_FN(pppDestructLocationTitle)
     },
     {
         (char*)"pppLocationTitle2",
         0,
-        (void*)pppFrameLocationTitle2,
-        (void*)pppRenderLocationTitle2,
+        PPP_FN(pppFrameLocationTitle2),
+        PPP_FN(pppRenderLocationTitle2),
         { 0, 0, 0 },
-        (void*)pppConstructLocationTitle2,
+        PPP_FN(pppConstructLocationTitle2),
         0,
         0,
-        (void*)pppDestructLocationTitle2
+        PPP_FN(pppDestructLocationTitle2)
     },
     {
         (char*)"pppDrawShape2",
         0,
-        (void*)pppCalcShape2,
-        (void*)pppDrawShape2,
+        PPP_FN(pppCalcShape2),
+        PPP_FN(pppDrawShape2),
         { 0, 0, 0 },
-        (void*)pppDrawShape2Construct,
-        (void*)pppDrawShape2Construct,
+        PPP_FN(pppDrawShape2Construct),
+        PPP_FN(pppDrawShape2Construct),
         0,
         0
     },
     {
         (char*)"pppLight",
         0,
-        (void*)pppLight,
+        PPP_FN(pppLight),
         0,
         { 0, 0, 0 },
-        (void*)pppLightCon,
-        (void*)pppLightCon,
+        PPP_FN(pppLightCon),
+        PPP_FN(pppLightCon),
         0,
         0
     },
     {
         (char*)"pppBreathModel",
         0,
-        (void*)pppFrameBreathModel,
-        (void*)pppRenderBreathModel,
+        PPP_FN(pppFrameBreathModel),
+        PPP_FN(pppRenderBreathModel),
         { 0, 0, 0 },
-        (void*)pppConstructBreathModel,
+        PPP_FN(pppConstructBreathModel),
         0,
         0,
-        (void*)pppDestructBreathModel
+        PPP_FN(pppDestructBreathModel)
     },
     {
         (char*)"pppCrystal",
         0,
-        (void*)pppFrameCrystal,
-        (void*)pppRenderCrystal,
+        PPP_FN(pppFrameCrystal),
+        PPP_FN(pppRenderCrystal),
         { 0, 0, 0 },
-        (void*)pppConstructCrystal,
+        PPP_FN(pppConstructCrystal),
         0,
         0,
-        (void*)pppDestructCrystal
+        PPP_FN(pppDestructCrystal)
     },
     {
         (char*)"pppRain",
         0,
-        (void*)pppFrameRain,
-        (void*)pppRenderRain,
+        PPP_FN(pppFrameRain),
+        PPP_FN(pppRenderRain),
         { 0, 0, 0 },
-        (void*)pppConstructRain,
+        PPP_FN(pppConstructRain),
         0,
         0,
-        (void*)pppDestructRain
+        PPP_FN(pppDestructRain)
     },
     {
         (char*)"pppBlurChara",
         0,
-        (void*)pppFrameBlurChara,
-        (void*)pppRenderBlurChara,
+        PPP_FN(pppFrameBlurChara),
+        PPP_FN(pppRenderBlurChara),
         { 0, 0, 0 },
-        (void*)pppConstructBlurChara,
+        PPP_FN(pppConstructBlurChara),
         0,
         0,
-        (void*)pppDestructBlurChara
+        PPP_FN(pppDestructBlurChara)
     },
     {
         (char*)"pppLensFlare",
         0,
-        (void*)pppFrameLensFlare,
-        (void*)pppRenderLensFlare,
+        PPP_FN(pppFrameLensFlare),
+        PPP_FN(pppRenderLensFlare),
         { 0, 0, 0 },
-        (void*)pppConstructLensFlare,
+        PPP_FN(pppConstructLensFlare),
         0,
         0,
-        (void*)pppDestructLensFlare
+        PPP_FN(pppDestructLensFlare)
     },
     {
         (char*)"pppCorona",
         0,
-        (void*)pppFrameCorona,
-        (void*)pppRenderCorona,
+        PPP_FN(pppFrameCorona),
+        PPP_FN(pppRenderCorona),
         { 0, 0, 0 },
-        (void*)pppConstructCorona,
+        PPP_FN(pppConstructCorona),
         0,
         0,
-        (void*)pppDestructCorona
+        PPP_FN(pppDestructCorona)
     },
     {
         (char*)"pppColum",
         0,
-        (void*)pppFrameColum,
-        (void*)pppRenderColum,
+        PPP_FN(pppFrameColum),
+        PPP_FN(pppRenderColum),
         { 0, 0, 0 },
-        (void*)pppConstructColum,
+        PPP_FN(pppConstructColum),
         0,
         0,
-        (void*)pppDestructColum
+        PPP_FN(pppDestructColum)
     },
     {
         (char*)"pppLightLoop",
         0,
-        (void*)pppLight,
+        PPP_FN(pppLight),
         0,
         { 0, 0, 0 },
-        (void*)pppLightCon,
-        (void*)pppLightCon,
-        (void*)pppLightCon3,
+        PPP_FN(pppLightCon),
+        PPP_FN(pppLightCon),
+        PPP_FN(pppLightCon3),
         0
     },
     {
         (char*)"pppEmission",
         0,
-        (void*)pppFrameEmission,
-        (void*)pppRenderEmission,
+        PPP_FN(pppFrameEmission),
+        PPP_FN(pppRenderEmission),
         { 0, 0, 0 },
-        (void*)pppConstructEmission,
-        (void*)pppConstruct2Emission,
+        PPP_FN(pppConstructEmission),
+        PPP_FN(pppConstruct2Emission),
         0,
-        (void*)pppDestructEmission
+        PPP_FN(pppDestructEmission)
     },
     {
         (char*)"pppEraseCharaParts",
         0,
-        (void*)pppFrameEraseCharaParts,
+        PPP_FN(pppFrameEraseCharaParts),
         0,
         { 0, 0, 0 },
-        (void*)pppConstructEraseCharaParts,
+        PPP_FN(pppConstructEraseCharaParts),
         0,
         0,
-        (void*)pppDestructEraseCharaParts
+        PPP_FN(pppDestructEraseCharaParts)
     },
     {
         (char*)"pppYmTracer2",
         0,
-        (void*)pppFrameYmTracer2,
-        (void*)pppRenderYmTracer2,
+        PPP_FN(pppFrameYmTracer2),
+        PPP_FN(pppRenderYmTracer2),
         { 0, 0, 0 },
-        (void*)pppConstructYmTracer2,
-        (void*)pppConstruct2YmTracer2,
+        PPP_FN(pppConstructYmTracer2),
+        PPP_FN(pppConstruct2YmTracer2),
         0,
-        (void*)pppDestructYmTracer2
+        PPP_FN(pppDestructYmTracer2)
     },
     {
         (char*)"pppMana2",
         0,
-        (void*)pppFrameMana2,
-        (void*)pppRenderMana2,
+        PPP_FN(pppFrameMana2),
+        PPP_FN(pppRenderMana2),
         { 0, 0, 0 },
-        (void*)pppConstructMana2,
+        PPP_FN(pppConstructMana2),
         0,
         0,
-        (void*)pppDestructMana2
+        PPP_FN(pppDestructMana2)
     },
     {
         (char*)"pppConformBGNormal",
         0,
-        (void*)pppFrameConformBGNormal,
+        PPP_FN(pppFrameConformBGNormal),
         0,
         { 0, 0, 0 },
-        (void*)pppConstructConformBGNormal,
+        PPP_FN(pppConstructConformBGNormal),
         0,
         0,
         0
@@ -1665,10 +1667,10 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppAlignmentScale",
         0,
-        (void*)pppFrameAlignmentScale,
+        PPP_FN(pppFrameAlignmentScale),
         0,
         { 0, 0, 0 },
-        (void*)pppConstructAlignmentScale,
+        PPP_FN(pppConstructAlignmentScale),
         0,
         0,
         0
@@ -1676,21 +1678,21 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppMiasma",
         0,
-        (void*)pppFrameMiasma,
-        (void*)pppRenderMiasma,
+        PPP_FN(pppFrameMiasma),
+        PPP_FN(pppRenderMiasma),
         { 0, 0, 0 },
-        (void*)pppConstructMiasma,
-        (void*)pppConstruct2Miasma,
+        PPP_FN(pppConstructMiasma),
+        PPP_FN(pppConstruct2Miasma),
         0,
-        (void*)pppDestructMiasma
+        PPP_FN(pppDestructMiasma)
     },
     {
         (char*)"pppBindOnlyPos",
         0,
-        (void*)pppFrameBindOnlyPos,
+        PPP_FN(pppFrameBindOnlyPos),
         0,
         { 0, 0, 0 },
-        (void*)pppConstructBindOnlyPos,
+        PPP_FN(pppConstructBindOnlyPos),
         0,
         0,
         0
@@ -1698,21 +1700,21 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppLerpPos",
         0,
-        (void*)pppFrameLerpPos,
+        PPP_FN(pppFrameLerpPos),
         0,
         { 0, 0, 0 },
-        (void*)pppConstructLerpPos,
+        PPP_FN(pppConstructLerpPos),
         0,
         0,
-        (void*)pppDestructLerpPos
+        PPP_FN(pppDestructLerpPos)
     },
     {
         (char*)"pppScaleLoopAuto",
         0,
-        (void*)pppScaleLoopAuto,
+        PPP_FN(pppScaleLoopAuto),
         0,
         { 0, 0, 0 },
-        (void*)pppScaleLoopAutoCon,
+        PPP_FN(pppScaleLoopAutoCon),
         0,
         0,
         0
@@ -1720,95 +1722,95 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppChangeBGColor",
         0,
-        (void*)pppFrameChangeBGColor,
+        PPP_FN(pppFrameChangeBGColor),
         0,
         { 0, 0, 0 },
-        (void*)pppConChangeBGColor,
+        PPP_FN(pppConChangeBGColor),
         0,
         0,
-        (void*)pppDesChangeBGColor
+        PPP_FN(pppDesChangeBGColor)
     },
     {
         (char*)"pppScreenBreak",
         0,
-        (void*)pppFrameScreenBreak,
-        (void*)pppRenderScreenBreak,
+        PPP_FN(pppFrameScreenBreak),
+        PPP_FN(pppRenderScreenBreak),
         { 0, 0, 0 },
-        (void*)pppConScreenBreak,
-        (void*)pppCon2ScreenBreak,
+        PPP_FN(pppConScreenBreak),
+        PPP_FN(pppCon2ScreenBreak),
         0,
-        (void*)pppDesScreenBreak
+        PPP_FN(pppDesScreenBreak)
     },
     {
         (char*)"pppScreenBlur",
         0,
-        (void*)pppFrameScreenBlur,
-        (void*)pppRenderScreenBlur,
+        PPP_FN(pppFrameScreenBlur),
+        PPP_FN(pppRenderScreenBlur),
         { 0, 0, 0 },
-        (void*)pppConScreenBlur,
-        (void*)pppCon2ScreenBlur,
+        PPP_FN(pppConScreenBlur),
+        PPP_FN(pppCon2ScreenBlur),
         0,
-        (void*)pppDesScreenBlur
+        PPP_FN(pppDesScreenBlur)
     },
     {
         (char*)"pppScreenQuake",
         0,
-        (void*)pppFrameScreenQuake,
-        (void*)pppRenderScreenQuake,
+        PPP_FN(pppFrameScreenQuake),
+        PPP_FN(pppRenderScreenQuake),
         { 0, 0, 0 },
-        (void*)pppConScreenQuake,
-        (void*)pppCon2ScreenQuake,
+        PPP_FN(pppConScreenQuake),
+        PPP_FN(pppCon2ScreenQuake),
         0,
-        (void*)pppDesScreenQuake
+        PPP_FN(pppDesScreenQuake)
     },
     {
         (char*)"pppCrystal2",
         0,
-        (void*)pppFrameCrystal2,
-        (void*)pppRenderCrystal2,
+        PPP_FN(pppFrameCrystal2),
+        PPP_FN(pppRenderCrystal2),
         { 0, 0, 0 },
-        (void*)pppConstructCrystal2,
+        PPP_FN(pppConstructCrystal2),
         0,
         0,
-        (void*)pppDestructCrystal2
+        PPP_FN(pppDestructCrystal2)
     },
     {
         (char*)"pppChangeTex",
         0,
-        (void*)pppFrameChangeTex,
-        (void*)pppRenderChangeTex,
+        PPP_FN(pppFrameChangeTex),
+        PPP_FN(pppRenderChangeTex),
         { 0, 0, 0 },
-        (void*)pppConstructChangeTex,
-        (void*)pppConstruct2ChangeTex,
+        PPP_FN(pppConstructChangeTex),
+        PPP_FN(pppConstruct2ChangeTex),
         0,
-        (void*)pppDestructChangeTex
+        PPP_FN(pppDestructChangeTex)
     },
     {
         (char*)"pppCharaBreak",
         0,
-        (void*)pppFrameCharaBreak,
-        (void*)pppRenderCharaBreak,
+        PPP_FN(pppFrameCharaBreak),
+        PPP_FN(pppRenderCharaBreak),
         { 0, 0, 0 },
-        (void*)pppConstructCharaBreak,
-        (void*)pppConstruct2CharaBreak,
+        PPP_FN(pppConstructCharaBreak),
+        PPP_FN(pppConstruct2CharaBreak),
         0,
-        (void*)pppDestructCharaBreak
+        PPP_FN(pppDestructCharaBreak)
     },
     {
         (char*)"pppCallBackDistance",
         0,
-        (void*)pppFrameCallBackDistance,
+        PPP_FN(pppFrameCallBackDistance),
         0,
         { 0, 0, 0 },
-        (void*)pppConstructCallBackDistance,
+        PPP_FN(pppConstructCallBackDistance),
         0,
         0,
-        (void*)pppDestructCallBackDistance
+        PPP_FN(pppDestructCallBackDistance)
     },
     {
         (char*)"pppParHitSphMat",
         0,
-        (void*)pppParHitSphMat,
+        PPP_FN(pppParHitSphMat),
         0,
         { 0, 0, 0 },
         0,
@@ -1819,41 +1821,41 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppConstrainCameraDir",
         0,
-        (void*)pppFrameConstrainCameraDir,
+        PPP_FN(pppFrameConstrainCameraDir),
         0,
         { 0, 0, 0 },
-        (void*)pppConstructConstrainCameraDir,
-        (void*)pppConstruct2ConstrainCameraDir,
+        PPP_FN(pppConstructConstrainCameraDir),
+        PPP_FN(pppConstruct2ConstrainCameraDir),
         0,
-        (void*)pppDestructConstrainCameraDir
+        PPP_FN(pppDestructConstrainCameraDir)
     },
     {
         (char*)"pppFilter",
         0,
-        (void*)pppFrameFilter,
-        (void*)pppRenderFilter,
+        PPP_FN(pppFrameFilter),
+        PPP_FN(pppRenderFilter),
         { 0, 0, 0 },
-        (void*)pppConstructFilter,
+        PPP_FN(pppConstructFilter),
         0,
         0,
-        (void*)pppDestructFilter
+        PPP_FN(pppDestructFilter)
     },
     {
         (char*)"pppConstrainCameraForLoc",
         0,
-        (void*)pppFrameConstrainCameraForLoc,
+        PPP_FN(pppFrameConstrainCameraForLoc),
         0,
         { 0, 0, 0 },
-        (void*)pppConstructConstrainCameraForLoc,
-        (void*)pppConstruct2ConstrainCameraForLoc,
-        (void*)fn_80167EC4,
-        (void*)pppDestructConstrainCameraForLoc
+        PPP_FN(pppConstructConstrainCameraForLoc),
+        PPP_FN(pppConstruct2ConstrainCameraForLoc),
+        PPP_FN(fn_80167EC4),
+        PPP_FN(pppDestructConstrainCameraForLoc)
     },
     {
         (char*)"pppDrawMatrixLoc",
         0,
         0,
-        (void*)pppDrawMatrixLoc,
+        PPP_FN(pppDrawMatrixLoc),
         { 0, 0, 0 },
         0,
         0,
@@ -1863,46 +1865,46 @@ static pppProg s_pppSysProgTable[159] = {
     {
         (char*)"pppCharaZEnvCtrl",
         0,
-        (void*)pppFrameCharaZEnvCtrl,
+        PPP_FN(pppFrameCharaZEnvCtrl),
         0,
         { 0, 0, 0 },
-        (void*)pppConCharaZEnvCtrl,
+        PPP_FN(pppConCharaZEnvCtrl),
         0,
         0,
-        (void*)pppDesCharaZEnvCtrl
+        PPP_FN(pppDesCharaZEnvCtrl)
     },
     {
         (char*)"pppConstrainCameraDir2",
         0,
-        (void*)pppFrameConstrainCameraDir2,
+        PPP_FN(pppFrameConstrainCameraDir2),
         0,
         { 0, 0, 0 },
-        (void*)pppConstructConstrainCameraDir,
-        (void*)pppConstruct2ConstrainCameraDir,
+        PPP_FN(pppConstructConstrainCameraDir),
+        PPP_FN(pppConstruct2ConstrainCameraDir),
         0,
-        (void*)pppDestructConstrainCameraDir
+        PPP_FN(pppDestructConstrainCameraDir)
     },
     {
         (char*)"pppFovAdjustMatrix",
         0,
-        (void*)pppFrameFovAdjustMatrix,
+        PPP_FN(pppFrameFovAdjustMatrix),
         0,
         { 0, 0, 0 },
-        (void*)pppConstructFovAdjustMatrix,
+        PPP_FN(pppConstructFovAdjustMatrix),
         0,
         0,
-        (void*)pppDestructFovAdjustMatrix
+        PPP_FN(pppDestructFovAdjustMatrix)
     },
     {
         (char*)"pppLaser",
         0,
-        (void*)pppFrameLaser,
-        (void*)pppRenderLaser,
+        PPP_FN(pppFrameLaser),
+        PPP_FN(pppRenderLaser),
         { 0, 0, 0 },
-        (void*)pppConstructLaser,
-        (void*)pppConstruct2Laser,
+        PPP_FN(pppConstructLaser),
+        PPP_FN(pppConstruct2Laser),
         0,
-        (void*)pppDestructLaser
+        PPP_FN(pppDestructLaser)
     },
 };
 
@@ -1916,3 +1918,4 @@ static inline pppProg* pppGetSysProgTable()
 }
 
 #endif // _FFCC_FUNCTBL_H_
+

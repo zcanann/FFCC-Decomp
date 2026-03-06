@@ -195,7 +195,7 @@ void pppDestructConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraF
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstruct3ConstrainCameraForLoc(pppConstrainCameraForLoc* constrainCameraForLoc, _pppCtrlTable* data)
+void fn_80167EC4(pppConstrainCameraForLoc* constrainCameraForLoc, _pppCtrlTable* data)
 {
     float fVar1 = lbl_803331A8;
     float* value = (float*)((char*)constrainCameraForLoc + 0x80 + data->m_serializedDataOffsets[2]);

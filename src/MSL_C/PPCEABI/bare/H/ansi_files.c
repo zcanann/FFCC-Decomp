@@ -149,12 +149,13 @@ FILE* __find_unopened_file(void) {
     }
 
     result = (FILE*)malloc(sizeof(FILE));
-    if (result != NULL) {
+    if (result == NULL) {
+        result = NULL;
+    } else {
         memset(result, 0, sizeof(FILE));
         result->is_dynamically_allocated = 1;
         prev->next_file_struct = result;
-    } else {
-        result = NULL;
+        return result;
     }
 
     return result;

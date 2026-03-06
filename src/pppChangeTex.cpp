@@ -16,8 +16,8 @@ struct _pppEnvStChangeTex {
 };
 
 struct ChangeTexDisplayList {
-	void* m_data;
 	u32 m_size;
+	void* m_data;
 	u16 m_material;
 	u16 _pad;
 };
@@ -33,6 +33,7 @@ struct ChangeTexMeshData {
 struct ChangeTexMeshRef {
 	u8 _pad0[0x8];
 	ChangeTexMeshData* m_data;
+	u8 _padC[0x8];
 };
 
 extern char MaterialMan[];
@@ -485,4 +486,3 @@ void pppRenderChangeTex(pppChangeTex*, pppChangeTexUnkB* step, pppChangeTexUnkC*
 		pppInitBlendMode__Fv();
 	}
 }
-

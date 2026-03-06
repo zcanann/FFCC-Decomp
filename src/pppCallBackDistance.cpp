@@ -13,50 +13,6 @@ void ParticleFrameCallback__5CGameFiiiiiP3Vec(CGame*, int, int, int, int, int, V
 
 /*
  * --INFO--
- * PAL Address: 0x80141318
- * PAL Size: 132b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppConstructCallBackDistance(pppCallBackDistance* param1, pppCallBackDistanceUnkC* param2)
-{
-    u8* pppMngSt;
-    u8* objPosBase;
-    Vec local_1c;
-    Vec local_28;
-    s32 dataOffset;
-    f32* distancePtr;
-
-    pppMngSt = lbl_8032ED50;
-    dataOffset = *param2->m_serializedDataOffsets;
-    distancePtr = (f32*)((u8*)param1 + dataOffset + 0x80);
-    objPosBase = *(u8**)(pppMngSt + 0xDC);
-    local_28.x = *(f32*)(objPosBase + 0x15C);
-    local_28.y = *(f32*)(objPosBase + 0x160);
-    local_28.z = *(f32*)(objPosBase + 0x164);
-    local_1c.x = *(f32*)(pppMngSt + 0x68);
-    local_1c.y = *(f32*)(pppMngSt + 0x6C);
-    local_1c.z = *(f32*)(pppMngSt + 0x70);
-    *distancePtr = PSVECDistance(&local_28, &local_1c);
-}
-
-/*
- * --INFO--
- * PAL Address: 0x80141314
- * PAL Size: 4b
- * EN Address: TODO
- * EN Size: TODO
- * JP Address: TODO
- * JP Size: TODO
- */
-void pppDestructCallBackDistance(pppCallBackDistance*, pppCallBackDistanceUnkC*)
-{
-}
-
-/*
- * --INFO--
  * PAL Address: 0x80141204
  * PAL Size: 272b
  * EN Address: TODO
@@ -102,3 +58,46 @@ void pppFrameCallBackDistance(pppCallBackDistance* param1, pppCallBackDistanceUn
     }
 }
 
+/*
+ * --INFO--
+ * PAL Address: 0x80141314
+ * PAL Size: 4b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppDestructCallBackDistance(pppCallBackDistance*, pppCallBackDistanceUnkC*)
+{
+}
+
+/*
+ * --INFO--
+ * PAL Address: 0x80141318
+ * PAL Size: 132b
+ * EN Address: TODO
+ * EN Size: TODO
+ * JP Address: TODO
+ * JP Size: TODO
+ */
+void pppConstructCallBackDistance(pppCallBackDistance* param1, pppCallBackDistanceUnkC* param2)
+{
+    u8* pppMngSt;
+    u8* objPosBase;
+    Vec local_1c;
+    Vec local_28;
+    s32 dataOffset;
+    f32* distancePtr;
+
+    pppMngSt = lbl_8032ED50;
+    dataOffset = *param2->m_serializedDataOffsets;
+    distancePtr = (f32*)((u8*)param1 + dataOffset + 0x80);
+    objPosBase = *(u8**)(pppMngSt + 0xDC);
+    local_28.x = *(f32*)(objPosBase + 0x15C);
+    local_28.y = *(f32*)(objPosBase + 0x160);
+    local_28.z = *(f32*)(objPosBase + 0x164);
+    local_1c.x = *(f32*)(pppMngSt + 0x68);
+    local_1c.y = *(f32*)(pppMngSt + 0x6C);
+    local_1c.z = *(f32*)(pppMngSt + 0x70);
+    *distancePtr = PSVECDistance(&local_28, &local_1c);
+}

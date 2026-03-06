@@ -1710,9 +1710,12 @@ void CGObject::Detach()
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::DispCharaParts(int)
+void CGObject::DispCharaParts(int showParts)
 {
-	// TODO
+    m_displayFlags = (m_displayFlags & 0xFFFFFFEF) | ((showParts << 4) & 0x10);
+    if (m_charaModelHandle != 0) {
+        m_charaModelHandle->m_flags = m_displayFlags;
+    }
 }
 
 /*

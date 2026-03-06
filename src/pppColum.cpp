@@ -171,7 +171,8 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
 void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_3)
 {
     if (lbl_8032ED70 == 0) {
-        unsigned char* work = (unsigned char*)((char*)column + 0x80 + param_3->m_serializedDataOffsets[3]);
+        int* serializedDataOffsets = GetColumSerializedDataOffsets(param_3);
+        unsigned char* work = (unsigned char*)((char*)column + 0x80 + serializedDataOffsets[3]);
         if (*(void**)(work + 8) == 0) {
             char* payload = param_2->m_payload;
             float* values;

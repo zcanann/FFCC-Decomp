@@ -247,7 +247,7 @@ void Emission_AfterDrawMeshCallback(CChara::CModel* model, void* param_2, void* 
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructEmission(pppEmission* pppEmission_, UnkC* param_2) {
+void pppConstructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
     float baseScale = FLOAT_803311f8;
     int offset = param_2->m_serializedDataOffsets[2];
     int* state = (int*)((u8*)pppEmission_ + 0x80 + offset);
@@ -279,7 +279,7 @@ void pppConstructEmission(pppEmission* pppEmission_, UnkC* param_2) {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstruct2Emission(pppEmission* pppEmission_, UnkC* param_2) {
+void pppConstruct2Emission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
     float baseScale = FLOAT_803311f8;
     int offset = param_2->m_serializedDataOffsets[2];
     float* state = (float*)((u8*)pppEmission_ + 0x80 + offset);
@@ -297,7 +297,7 @@ void pppConstruct2Emission(pppEmission* pppEmission_, UnkC* param_2) {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructEmission(pppEmission* pppEmission_, UnkC* param_2) {
+void pppDestructEmission(pppEmission* pppEmission_, pppEmissionUnkC* param_2) {
     int* state = (int*)((u8*)pppEmission_ + 0x80 + param_2->m_serializedDataOffsets[2]);
     void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
@@ -327,7 +327,7 @@ void pppDestructEmission(pppEmission* pppEmission_, UnkC* param_2) {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameEmission(pppEmission* pppEmission_, UnkB* param_2, UnkC* param_3) {
+void pppFrameEmission(pppEmission* pppEmission_, pppEmissionUnkB* param_2, pppEmissionUnkC* param_3) {
     if (DAT_8032ed70 != 0) {
         return;
     }
@@ -338,7 +338,7 @@ void pppFrameEmission(pppEmission* pppEmission_, UnkB* param_2, UnkC* param_3) {
     void* handle = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
     int model = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle);
     *(int**)(model + 0xE4) = state;
-    *(UnkB**)(model + 0xE8) = param_2;
+    *(pppEmissionUnkB**)(model + 0xE8) = param_2;
     *(u32*)(model + 0xFC) = (u32)Emission_DrawMeshDLCallback;
     *(u32*)(model + 0x104) = (u32)Emission_AfterDrawMeshCallback;
 
@@ -453,7 +453,7 @@ void pppFrameEmission(pppEmission* pppEmission_, UnkB* param_2, UnkC* param_3) {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderEmission(pppEmission*, UnkB*, UnkC*) {
+void pppRenderEmission(pppEmission*, pppEmissionUnkB*, pppEmissionUnkC*) {
     pppInitBlendMode__Fv();
 }
 
@@ -469,3 +469,4 @@ void pppRenderEmission(pppEmission*, UnkB*, UnkC*) {
 void GXSetTexCoordGen(void) {
     // TODO
 }
+

@@ -3,7 +3,7 @@
 
 struct _pppPObject;
 struct pppYmBreath;
-struct UnkC;
+struct pppYmBreathUnkC;
 struct VYmBreath;
 struct PYmBreath;
 struct VColor;
@@ -21,11 +21,11 @@ void SetParticleMatrix(_pppPObject*, VYmBreath*, PARTICLE_DATA*, PARTICLE_WMAT*)
 extern "C" {
 #endif
 
-void pppFrameYmBreath(pppYmBreath*, PYmBreath*, UnkC*);
-void pppRenderYmBreath(pppYmBreath*, PYmBreath*, UnkC*);
-void pppConstructYmBreath(pppYmBreath*, UnkC*);
+void pppFrameYmBreath(pppYmBreath*, PYmBreath*, pppYmBreathUnkC*);
+void pppRenderYmBreath(pppYmBreath*, PYmBreath*, pppYmBreathUnkC*);
+void pppConstructYmBreath(pppYmBreath*, pppYmBreathUnkC*);
 void pppConstruct2YmBreath(void);
-void pppDestructYmBreath(pppYmBreath*, UnkC*);
+void pppDestructYmBreath(pppYmBreath*, pppYmBreathUnkC*);
 
 #ifdef __cplusplus
 }
@@ -36,3 +36,4 @@ void SearchIndex(PYmBreath*, VYmBreath*, short&, short&, short);
 void IsExistGroupParticle(PYmBreath*, VYmBreath*, short);
 
 #endif // _PPP_YMBREATH_H_
+

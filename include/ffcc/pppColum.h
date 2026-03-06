@@ -30,7 +30,7 @@ struct pppColum {
     u8 field_0xb2;
 };
 
-struct UnkB {
+struct pppColumUnkB {
     u32 m_dataValIndex;
     u16 m_initWOrk;
     
@@ -42,7 +42,7 @@ struct UnkB {
     char* m_payload;
 };
 
-struct UnkC {
+struct pppColumUnkC {
     s32* m_serializedDataOffsets;
 };
 
@@ -50,13 +50,14 @@ struct UnkC {
 extern "C" {
 #endif
 
-void pppConstructColum(pppColum* column, UnkC* param_2);
-void pppDestructColum(pppColum* column, UnkC* param_2);
-void pppFrameColum(pppColum* column, UnkB* param_2, UnkC* param_3);
-void pppRenderColum(pppColum* column, UnkB* param_2, UnkC* param_3);
+void pppConstructColum(pppColum* column, pppColumUnkC* param_2);
+void pppDestructColum(pppColum* column, pppColumUnkC* param_2);
+void pppFrameColum(pppColum* column, pppColumUnkB* param_2, pppColumUnkC* param_3);
+void pppRenderColum(pppColum* column, pppColumUnkB* param_2, pppColumUnkC* param_3);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _FFCC_PPPCOLUM_H_
+

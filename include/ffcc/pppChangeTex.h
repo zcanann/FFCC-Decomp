@@ -17,7 +17,7 @@ struct pppChangeTex {
     } field0_0x0;
 };
 
-struct UnkB {
+struct pppChangeTexUnkB {
     s32 m_graphId;
     s32 m_dataValIndex;
     u16 m_initWOrk;
@@ -28,7 +28,7 @@ struct UnkB {
     u8 _pad1[1];
 };
 
-struct UnkC {
+struct pppChangeTexUnkC {
     u8 _pad0[0xC];
     s32* m_serializedDataOffsets;
 };
@@ -46,14 +46,15 @@ void ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2(CChara::CMod
 extern "C" {
 #endif
 
-void pppConstructChangeTex(pppChangeTex*, UnkC*);
-void pppConstruct2ChangeTex(pppChangeTex*, UnkC*);
-void pppDestructChangeTex(pppChangeTex*, UnkC*);
-void pppFrameChangeTex(pppChangeTex*, UnkB*, UnkC*);
-void pppRenderChangeTex(pppChangeTex*, UnkB*, UnkC*);
+void pppConstructChangeTex(pppChangeTex*, pppChangeTexUnkC*);
+void pppConstruct2ChangeTex(pppChangeTex*, pppChangeTexUnkC*);
+void pppDestructChangeTex(pppChangeTex*, pppChangeTexUnkC*);
+void pppFrameChangeTex(pppChangeTex*, pppChangeTexUnkB*, pppChangeTexUnkC*);
+void pppRenderChangeTex(pppChangeTex*, pppChangeTexUnkB*, pppChangeTexUnkC*);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _FFCC_PPPCHANGETEX_H_
+

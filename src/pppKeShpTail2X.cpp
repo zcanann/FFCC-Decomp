@@ -84,7 +84,7 @@ struct KeShpTail2XObject {
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail2X(_pppPObject* obj, UnkB* param_2, UnkC* param_3)
+void pppKeShpTail2X(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2XUnkC* param_3)
 {
     KeShpTail2XStep* step;
     KeShpTail2XWork* work;
@@ -185,7 +185,7 @@ void pppKeShpTail2X(_pppPObject* obj, UnkB* param_2, UnkC* param_3)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppKeShpTail2XDraw(_pppPObject* obj, UnkB* param_2, UnkC* param_3)
+void pppKeShpTail2XDraw(_pppPObject* obj, pppKeShpTail2XUnkB* param_2, pppKeShpTail2XUnkC* param_3)
 {
     KeShpTail2XStep* step = (KeShpTail2XStep*)param_2;
     KeShpTail2XOffsets* offsets = (KeShpTail2XOffsets*)param_3;
@@ -455,3 +455,4 @@ void U8ToF32(pppFVECTOR4*, unsigned char*)
 {
 	// TODO
 }
+

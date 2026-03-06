@@ -8,12 +8,12 @@ struct pppLerpPos {
     u8 m_pad[0x80];
 };
 
-struct UnkB {
+struct pppLerpPosUnkB {
     u8 m_pad[4];
     u8 m_dataValIndex;
 };
 
-struct UnkC {
+struct pppLerpPosUnkC {
     u8 m_pad[0x0C];
     s32* m_serializedDataOffsets;
 };
@@ -40,7 +40,7 @@ extern s32 DAT_8032ed70;
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructLerpPos(struct pppLerpPos* pppLerpPos, struct UnkC* param_2)
+void pppConstructLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkC* param_2)
 {
     s32 dataOffset = *param_2->m_serializedDataOffsets;
     Vec** work = (Vec**)((u8*)pppLerpPos + 0x80 + dataOffset);
@@ -56,7 +56,7 @@ void pppConstructLerpPos(struct pppLerpPos* pppLerpPos, struct UnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructLerpPos(struct pppLerpPos* pppLerpPos, struct UnkC* param_2)
+void pppDestructLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkC* param_2)
 {
     s32 dataOffset = *param_2->m_serializedDataOffsets;
     void** work = (void**)((u8*)pppLerpPos + 0x80 + dataOffset);
@@ -76,7 +76,7 @@ void pppDestructLerpPos(struct pppLerpPos* pppLerpPos, struct UnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct UnkB* param_2, struct UnkC* param_3)
+void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct pppLerpPosUnkB* param_2, struct pppLerpPosUnkC* param_3)
 {
     _pppMngSt* pppMngSt = pppMngStPtr;
     s32 iVar1;
@@ -140,3 +140,4 @@ void pppFrameLerpPos(struct pppLerpPos* pppLerpPos, struct UnkB* param_2, struct
         }
     }
 }
+

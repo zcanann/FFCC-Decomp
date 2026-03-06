@@ -43,7 +43,7 @@ void pppConstructYmCheckBGHeight(void)
  * JP Address: TODO
  * JP Size: TODO
  */
-struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(struct pppYmCheckBGHeight* pppYmCheckBGHeight, struct UnkC* param_2)
+struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(struct pppYmCheckBGHeight* pppYmCheckBGHeight, struct pppYmCheckBGHeightUnkC* param_2)
 {
     _pppMngSt* pppMngSt = pppMngStPtr;
 
@@ -99,3 +99,4 @@ struct pppYmCheckBGHeight* pppFrameYmCheckBGHeight(struct pppYmCheckBGHeight* pp
     }
     return pppYmCheckBGHeight;
 }
+

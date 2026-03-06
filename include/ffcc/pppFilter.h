@@ -9,12 +9,12 @@ struct pppFilter {
     char padding2[4];
 };
 
-struct UnkB {
+struct pppFilterUnkB {
     unsigned int m_unk0;
     unsigned int m_dataValIndex;
 };
 
-struct UnkC {
+struct pppFilterUnkC {
     char padding[0x0c];
     int* m_serializedDataOffsets;
 };
@@ -26,10 +26,11 @@ extern "C" {
 void pppConstructFilter(void);
 void pppDestructFilter(void);
 void pppFrameFilter(void);
-void pppRenderFilter(pppFilter* pppFilter, UnkB* param_2, UnkC* param_3);
+void pppRenderFilter(pppFilter* pppFilter, pppFilterUnkB* param_2, pppFilterUnkC* param_3);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _PPP_FILTER_H_
+

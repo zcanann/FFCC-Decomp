@@ -11,7 +11,7 @@ struct pppConformBGNormal {
     u8 field0_0x0[8]; // Placeholder structure
 };
 
-struct UnkB {
+struct pppConformBGNormalUnkB {
     u32 _pad0;
     float m_dataValIndex;
     float m_initWOrk;
@@ -20,15 +20,16 @@ struct UnkB {
     float m_arg3;
 };
 
-struct UnkC {
+struct pppConformBGNormalUnkC {
     int* m_serializedDataOffsets;
 };
 
-void pppConstructConformBGNormal(struct pppConformBGNormal* conformBG, struct UnkC* param2);
-void pppFrameConformBGNormal(struct pppConformBGNormal* conformBG, struct UnkB* param2, struct UnkC* param3);
+void pppConstructConformBGNormal(struct pppConformBGNormal* conformBG, struct pppConformBGNormalUnkC* param2);
+void pppFrameConformBGNormal(struct pppConformBGNormal* conformBG, struct pppConformBGNormalUnkB* param2, struct pppConformBGNormalUnkC* param3);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _FFCC_PPPCONFORMBGNORMAL_H_
+

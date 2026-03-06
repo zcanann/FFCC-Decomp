@@ -10,8 +10,8 @@ struct Vec2d;
 struct _GXColor;
 struct VMana2;
 struct pppMana2;
-struct UnkB;
-struct UnkC {
+struct pppMana2UnkB;
+struct pppMana2UnkC {
     s32* m_serializedDataOffsets;
 };
 
@@ -29,13 +29,14 @@ void CalcWaterReflectionVector(Vec*, Vec*, Vec*, long, Vec*, float (*)[4], _GXCo
 extern "C" {
 #endif
 
-void pppConstructMana2(pppMana2*, UnkC*);
-void pppDestructMana2(pppMana2*, UnkC*);
-void pppFrameMana2(pppMana2*, UnkB*, UnkC*);
-void pppRenderMana2(pppMana2*, UnkB*, UnkC*);
+void pppConstructMana2(pppMana2*, pppMana2UnkC*);
+void pppDestructMana2(pppMana2*, pppMana2UnkC*);
+void pppFrameMana2(pppMana2*, pppMana2UnkB*, pppMana2UnkC*);
+void pppRenderMana2(pppMana2*, pppMana2UnkB*, pppMana2UnkC*);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _PPP_MANA2_H_
+

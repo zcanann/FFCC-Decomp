@@ -388,7 +388,7 @@ void Mana_DrawMeshDLCallback(CChara::CModel* model, void* work, void* step, int 
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmMana(PYmMana* ymMana, UnkC* param_2)
+void pppConstructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
 {
     CGObject* gObject = *(CGObject**)((u8*)pppMngStPtr + 0xDC);
     u32* work = (u32*)((u8*)ymMana + 8 + param_2->m_serializedDataOffsets[2]);
@@ -471,7 +471,7 @@ void pppConstructYmMana(PYmMana* ymMana, UnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructYmMana(PYmMana* ymMana, UnkC* param_2)
+void pppDestructYmMana(PYmMana* ymMana, pppYmManaUnkC* param_2)
 {
     u32* work = (u32*)((u8*)ymMana + 8 + param_2->m_serializedDataOffsets[2]);
     CGObject* gObject = (CGObject*)work[0];
@@ -632,7 +632,7 @@ void pppDestructYmMana(PYmMana* ymMana, UnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameYmMana(PYmMana* pppYmMana, UnkB* param_2, UnkC* param_3)
+void pppFrameYmMana(PYmMana* pppYmMana, pppYmManaUnkB* param_2, pppYmManaUnkC* param_3)
 {
     u32 texBufferSize;
     u32* work;
@@ -1527,3 +1527,4 @@ void CalcReflectionVector2(
     DCFlushRange(color, count << 2);
     DCFlushRange(reflectionVec, count * 0xC);
 }
+

@@ -13,7 +13,7 @@ struct pppBlurChara {
     } field0_0x0;
 };
 
-struct UnkB {
+struct pppBlurCharaUnkB {
     s32 m_graphId;
     s32 m_dataValIndex;
     s16 m_initWOrk;
@@ -23,7 +23,7 @@ struct UnkB {
     u8 m_payload[8];
 };
 
-struct UnkC {
+struct pppBlurCharaUnkC {
     u8 _pad0[0x0C];
     s32* m_serializedDataOffsets;
 };
@@ -35,13 +35,14 @@ void BlurChara_AfterDrawModelCallback(CChara::CModel*, void*, void*);
 extern "C" {
 #endif
 
-void pppConstructBlurChara(pppBlurChara*, UnkC*);
-void pppDestructBlurChara(pppBlurChara*, UnkC*);
-void pppFrameBlurChara(pppBlurChara*, UnkB*, UnkC*);
-void pppRenderBlurChara(pppBlurChara*, UnkB*, UnkC*);
+void pppConstructBlurChara(pppBlurChara*, pppBlurCharaUnkC*);
+void pppDestructBlurChara(pppBlurChara*, pppBlurCharaUnkC*);
+void pppFrameBlurChara(pppBlurChara*, pppBlurCharaUnkB*, pppBlurCharaUnkC*);
+void pppRenderBlurChara(pppBlurChara*, pppBlurCharaUnkB*, pppBlurCharaUnkC*);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
+

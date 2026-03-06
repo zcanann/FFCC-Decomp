@@ -80,7 +80,7 @@ void pppDestructLensFlare(void)
 void pppFrameLensFlare(void* obj, void* param2, void* param3)
 {
 	if (DAT_8032ed70 == 0) {
-		UnkB* unkB = (UnkB*)param2;
+		pppColumUnkB* unkB = (pppColumUnkB*)param2;
 		s32* serializedDataOffsets = GetSerializedDataOffsets(param3);
 		int shapeOffset = serializedDataOffsets[2];
 		int colorOffset = serializedDataOffsets[1];
@@ -178,7 +178,7 @@ void pppFrameLensFlare(void* obj, void* param2, void* param3)
 void pppRenderLensFlare(void* obj, void* param2, void* param3)
 {
 	pppColum* pppLensFlare;
-	UnkB* unkB;
+	pppColumUnkB* unkB;
 	s32* serializedDataOffsets;
 	int iVar1;
 	int iVar2;
@@ -190,7 +190,7 @@ void pppRenderLensFlare(void* obj, void* param2, void* param3)
 	float stepValue;
 
 	pppLensFlare = (pppColum*)obj;
-	unkB = (UnkB*)param2;
+	unkB = (pppColumUnkB*)param2;
 	serializedDataOffsets = GetSerializedDataOffsets(param3);
 
 	iVar2 = serializedDataOffsets[2];
@@ -245,3 +245,5 @@ void pppRenderLensFlare(void* obj, void* param2, void* param3)
 		pppSetBlendMode(3);
 	}
 }
+
+

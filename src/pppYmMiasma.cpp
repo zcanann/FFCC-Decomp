@@ -144,7 +144,7 @@ void InitParticleData(VYmMiasma* vYmMiasma, _pppPObject* pppPObject, PYmMiasma* 
  */
 void UpdateParticleData(_pppPObject* pppPObject, _pppCtrlTable* pppCtrlTable, PYmMiasma* pYmMiasma, PARTICLE_DATA* particleData)
 {
-    u8* vData = (u8*)pppPObject + ((UnkC*)pppCtrlTable)->m_serializedDataOffsets[2] + 0x80;
+    u8* vData = (u8*)pppPObject + ((pppYmMiasmaUnkC*)pppCtrlTable)->m_serializedDataOffsets[2] + 0x80;
     u8* particle = (u8*)particleData;
     u8* ymData = (u8*)pYmMiasma;
     s16 fadeFrames;
@@ -276,7 +276,7 @@ void RenderParticle(_pppPObject* pppPObject, PYmMiasma* pYmMiasma, PARTICLE_DATA
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, UnkC* param_2)
+void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
 {
     u8* workBytes = (u8*)pppYmMiasma_ + 0x80 + param_2->m_serializedDataOffsets[2];
     float fVar1 = FLOAT_80330644;
@@ -305,7 +305,7 @@ void pppConstructYmMiasma(pppYmMiasma* pppYmMiasma_, UnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, UnkC* param_2)
+void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
 {
     u8* workBytes = (u8*)pppYmMiasma_ + 0x80 + param_2->m_serializedDataOffsets[2];
     float fVar1 = FLOAT_80330644;
@@ -324,7 +324,7 @@ void pppConstruct2YmMiasma(pppYmMiasma* pppYmMiasma_, UnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, UnkC* param_2)
+void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkC* param_2)
 {
     void** workPtr = (void**)((u8*)pppYmMiasma_ + 0x80 + param_2->m_serializedDataOffsets[2]);
     void* heap = *workPtr;
@@ -339,7 +339,7 @@ void pppDestructYmMiasma(pppYmMiasma* pppYmMiasma_, UnkC* param_2)
  * Address:	80090aa4
  * Size:	748b
  */
-void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, UnkB* param_2, UnkC* param_3)
+void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYmMiasmaUnkC* param_3)
 {
     static char sPppYmMiasmaCpp[] = "pppYmMiasma.cpp";
     u8* step = (u8*)param_2;
@@ -436,7 +436,7 @@ void pppFrameYmMiasma(pppYmMiasma* pppYmMiasma_, UnkB* param_2, UnkC* param_3)
  * Address:	TODO
  * Size:	TODO
  */
-void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, UnkB* param_2, UnkC* param_3)
+void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, pppYmMiasmaUnkB* param_2, pppYmMiasmaUnkC* param_3)
 {
     float* particle = (float*)((u8*)pppYmMiasma_ + 0x80 + param_3->m_serializedDataOffsets[2]);
     u8* step = (u8*)param_2;
@@ -497,3 +497,4 @@ void pppRenderYmMiasma(pppYmMiasma* pppYmMiasma_, UnkB* param_2, UnkC* param_3)
         particle += 0x14;
     }
 }
+

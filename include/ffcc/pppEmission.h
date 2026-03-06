@@ -22,7 +22,7 @@ struct pppEmission {
     u8 field_0x8b;
 };
 
-struct UnkB {
+struct pppEmissionUnkB {
     s32 m_graphId;
     s32 m_dataValIndex;
     u16 m_initWOrk;
@@ -32,7 +32,7 @@ struct UnkB {
     u8 m_payload[0x20];
 };
 
-struct UnkC {
+struct pppEmissionUnkC {
     u8 _pad0[0xC];
     s32* m_serializedDataOffsets;
 };
@@ -45,14 +45,15 @@ void Emission_AfterDrawMeshCallback(CChara::CModel*, void*, void*, int, float (*
 extern "C" {
 #endif
 
-void pppConstructEmission(pppEmission*, UnkC*);
-void pppConstruct2Emission(pppEmission*, UnkC*);
-void pppDestructEmission(pppEmission*, UnkC*);
-void pppFrameEmission(pppEmission*, UnkB*, UnkC*);
-void pppRenderEmission(pppEmission*, UnkB*, UnkC*);
+void pppConstructEmission(pppEmission*, pppEmissionUnkC*);
+void pppConstruct2Emission(pppEmission*, pppEmissionUnkC*);
+void pppDestructEmission(pppEmission*, pppEmissionUnkC*);
+void pppFrameEmission(pppEmission*, pppEmissionUnkB*, pppEmissionUnkC*);
+void pppRenderEmission(pppEmission*, pppEmissionUnkB*, pppEmissionUnkC*);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // _PPPEMISSION_H_
+

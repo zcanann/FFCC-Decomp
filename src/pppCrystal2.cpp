@@ -96,7 +96,7 @@ void MakeRefractionMap(HSD_ImageBuffer*)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppConstructCrystal2(pppCrystal2* pppCrystal2, UnkC* param_2)
+void pppConstructCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkC* param_2)
 {
     s32 iVar1 = param_2->m_serializedDataOffsets[2];
     u32* data = (u32*)((char*)pppCrystal2 + iVar1 + 0x80);
@@ -114,7 +114,7 @@ void pppConstructCrystal2(pppCrystal2* pppCrystal2, UnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppDestructCrystal2(pppCrystal2* pppCrystal2, UnkC* param_2)
+void pppDestructCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkC* param_2)
 {
     u32* puVar1;
     CMemory::CStage* stage;
@@ -146,7 +146,7 @@ void pppDestructCrystal2(pppCrystal2* pppCrystal2, UnkC* param_2)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppFrameCrystal2(pppCrystal2* pppCrystal2, UnkB* param_2, UnkC* param_3)
+void pppFrameCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCrystal2UnkC* param_3)
 {
     if ((DAT_8032ed70 == 0) && (param_2->m_payload[0] != 0)) {
         int* refractionData = (int*)((char*)pppCrystal2 + param_3->m_serializedDataOffsets[2] + 0x80);
@@ -226,7 +226,7 @@ void pppFrameCrystal2(pppCrystal2* pppCrystal2, UnkB* param_2, UnkC* param_3)
  * JP Address: TODO
  * JP Size: TODO
  */
-void pppRenderCrystal2(pppCrystal2* pppCrystal2, UnkB* param_2, UnkC* param_3)
+void pppRenderCrystal2(pppCrystal2* pppCrystal2, pppCrystal2UnkB* param_2, pppCrystal2UnkC* param_3)
 {
     int workOffset = param_3->m_serializedDataOffsets[2];
     int colorOffset = param_3->m_serializedDataOffsets[1];
@@ -362,3 +362,4 @@ void GXSetTexCoordGen(void)
 {
 	// TODO
 }
+

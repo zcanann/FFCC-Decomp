@@ -163,16 +163,6 @@ static s32 DoMount(s32 chan) {
 
         card->latency = LatencyTable[(id & 0x00000700) >> 8];
 
-        result = __CARDReadVendorID(chan, &card->vendorID);
-        if (result < 0)
-            goto error;
-
-        if (CARDGetFastMode() && (card->vendorID >> 8) == 0xEC) {
-            card->pageSize = 512;
-        } else {
-            card->pageSize = 128;
-        }
-
         result = __CARDClearStatus(chan);
         if (result < 0)
             goto error;

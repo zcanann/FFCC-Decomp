@@ -6,7 +6,6 @@ extern CMath math[];
 extern s32 lbl_8032ED70;
 extern s16 lbl_801EADC8[];
 extern f32 lbl_8032FF48;
-static f64 const lbl_8032FF50 = 4503601774854144.0;
 
 extern "C" {
 f32 RandF__5CMathFv(CMath*);

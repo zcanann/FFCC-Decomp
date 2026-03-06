@@ -36,7 +36,7 @@ void _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GX
 void _GXSetBlendMode__F12_GXBlendMode14_GXBlendFactor14_GXBlendFactor10_GXLogicOp(int type, int src, int dst, int op);
 }
 
-extern CUtil DAT_8032ec70;
+extern CUtil gUtil;
 
 struct _pppEnvStYmEnv {
     void* m_stagePtr;
@@ -673,7 +673,7 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     _GXColor blackColor = {0, 0, 0, 0};
 
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
-    DAT_8032ec70.RenderColorQuad(0.0f, 0.0f, texWidth, texHeight, clearColor);
+    gUtil.RenderColorQuad(0.0f, 0.0f, texWidth, texHeight, clearColor);
 
     const unsigned short rtWidth = GXGetTexObjWidth(targetTexObj);
     const unsigned short rtHeight = GXGetTexObjHeight(targetTexObj);
@@ -789,7 +789,7 @@ void drawParaboloidMap(_GXTexObj* texObjs, _GXTexObj* targetTexObj, void* displa
     Graphic.SetViewport();
 
     if (mode != 0) {
-        DAT_8032ec70.RenderTextureQuad(0.0f, 0.0f, rtWidth, rtHeight, targetTexObj, 0, 0, 0, (GXBlendFactor)4,
+        gUtil.RenderTextureQuad(0.0f, 0.0f, rtWidth, rtHeight, targetTexObj, 0, 0, 0, (GXBlendFactor)4,
                                        (GXBlendFactor)5);
         Graphic.GetBackBufferRect2(targetData, targetTexObj, 0, 0, texWidth, texHeight, 0, GX_LINEAR, GX_TF_RGBA8, 0);
     }

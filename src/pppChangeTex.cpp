@@ -41,15 +41,15 @@ extern void SetMaterial__12CMaterialManFP12CMaterialSetii11_GXTevScale(void*, vo
 extern void GXCallDisplayList(void*, unsigned int);
 extern _pppMngStChangeTex* pppMngStPtr;
 extern _pppMngStChangeTex* lbl_8032ED50;
-extern _pppEnvStChangeTex* lbl_8032ED54;
 extern _pppEnvStChangeTex* pppEnvStPtr;
+extern _pppEnvStChangeTex* lbl_8032ED54;
 extern float lbl_80332040;
 extern float FLOAT_80332020;
 extern float FLOAT_80332028;
 extern double DOUBLE_80332030;
 extern double DOUBLE_80332038;
 extern char DAT_80332024[];
-extern char DAT_8032ec70[];
+extern char gUtil[];
 extern int gPppCalcDisabled;
 extern char gPppInConstructor;
 extern char s_pppChangeTex_cpp_801dd660[];
@@ -332,21 +332,21 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 	float* value = (float*)((char*)changeTex + data->m_serializedDataOffsets[2] + 0x80);
 	int* valueInt = (int*)value;
 
-	void* handle0 = GetCharaHandlePtr__FP8CGObjectl(pppMngStPtr->m_charaObj, 0);
+	void* handle0 = GetCharaHandlePtr__FP8CGObjectl(lbl_8032ED50->m_charaObj, 0);
 	int model0 = GetCharaModelPtr__FPQ29CCharaPcs7CHandle(handle0);
 
 	CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(
 	    (float)step->m_initWOrk, &changeTex->field0_0x0, step->m_graphId, value, value + 1, value + 2,
 	    &step->m_stepValue, (float*)&step->m_arg3);
 
-	valueInt[6] = (int)pppMngStPtr->m_charaObj;
-	valueInt[9] = (int)pppEnvStPtr;
+	valueInt[6] = (int)lbl_8032ED50->m_charaObj;
+	valueInt[9] = (int)lbl_8032ED54;
 	*(float**)(model0 + 0xE4) = value;
 	*(pppChangeTexUnkB**)(model0 + 0xE8) = step;
 	*(void**)(model0 + 0xFC) = (void*)ChangeTex_DrawMeshDLCallback__FPQ26CChara6CModelPvPviiPA4_f2;
 	*(void**)(model0 + 0x104) = (void*)ChangeTex_AfterDrawMeshCallback__FPQ26CChara6CModelPvPviPA4_f2;
 
-	valueInt[7] = GetTextureFromRSD__FiP9_pppEnvSt(step->m_dataValIndex, pppEnvStPtr);
+	valueInt[7] = GetTextureFromRSD__FiP9_pppEnvSt(step->m_dataValIndex, lbl_8032ED54);
 
 	void* handle1 = GetCharaHandlePtr__FP8CGObjectl((void*)valueInt[6], 1);
 	void* handle2 = GetCharaHandlePtr__FP8CGObjectl((void*)valueInt[6], 2);
@@ -375,7 +375,7 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 		return;
 	}
 
-	int texObj = GetTextureFromRSD__FiP9_pppEnvSt(step->m_dataValIndex, pppEnvStPtr);
+	int texObj = GetTextureFromRSD__FiP9_pppEnvSt(step->m_dataValIndex, lbl_8032ED54);
 	if (texObj == 0) {
 		return;
 	}
@@ -387,9 +387,9 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 	if (valueInt[3] == 0 && valueInt[4] == 0) {
 		value[17] = FLOAT_80332020;
 		valueInt[3] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-		    meshCount << 2, pppEnvStPtr->m_stagePtr, s_pppChangeTex_cpp_801dd660, 0x163);
+		    meshCount << 2, lbl_8032ED54->m_stagePtr, s_pppChangeTex_cpp_801dd660, 0x163);
 		valueInt[4] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-		    meshCount << 2, pppEnvStPtr->m_stagePtr, s_pppChangeTex_cpp_801dd660, 0x166);
+		    meshCount << 2, lbl_8032ED54->m_stagePtr, s_pppChangeTex_cpp_801dd660, 0x166);
 
 		int* meshColorArrays = (int*)valueInt[3];
 		int allocIndex = 0;
@@ -398,31 +398,31 @@ void pppFrameChangeTex(pppChangeTex* changeTex, pppChangeTexUnkB* step, pppChang
 			int meshHdr = *(int*)(curMesh + 8);
 			if (strcmp((char*)meshHdr, DAT_80332024) == 0) {
 				CalcBoundaryBoxQuantized__5CUtilFP3VecP3VecP6S16VecUlUl(
-				    DAT_8032ec70, value + 10, value + 14, *(void**)(curMesh + 0xC), *(unsigned long*)(meshHdr + 0x14),
+				    gUtil, value + 10, value + 14, *(void**)(curMesh + 0xC), *(unsigned long*)(meshHdr + 0x14),
 				    *(unsigned long*)(*(int*)(model0 + 0xA4) + 0x34));
 			}
 
 			*(int*)(valueInt[4] + allocIndex) = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-			    *(int*)(meshHdr + 0x4C) << 2, pppEnvStPtr->m_stagePtr, s_pppChangeTex_cpp_801dd660, 0x181);
+			    *(int*)(meshHdr + 0x4C) << 2, lbl_8032ED54->m_stagePtr, s_pppChangeTex_cpp_801dd660, 0x181);
 
 			int dlCount = *(int*)(meshHdr + 0x4C);
 			int* dlInfo = (int*)(*(int*)(meshHdr + 0x50));
 			int* dlEntry = (int*)(*(int*)(valueInt[4] + allocIndex) + (dlCount - 1) * 4);
 			for (int dlIdx = dlCount - 1; dlIdx >= 0; dlIdx--) {
 				int dlPair = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-				    8, pppEnvStPtr->m_stagePtr, s_pppChangeTex_cpp_801dd660, 0x18B);
+				    8, lbl_8032ED54->m_stagePtr, s_pppChangeTex_cpp_801dd660, 0x18B);
 				*dlEntry = dlPair;
 				*(int*)(dlPair + 4) = dlInfo[0];
 				*(int*)dlPair = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-				    dlInfo[0], pppEnvStPtr->m_stagePtr, s_pppChangeTex_cpp_801dd660, 0x18D);
+				    dlInfo[0], lbl_8032ED54->m_stagePtr, s_pppChangeTex_cpp_801dd660, 0x18D);
 				memcpy(*(void**)dlPair, (void*)dlInfo[1], dlInfo[0]);
-				ReWriteDisplayList__5CUtilFPvUlUl(DAT_8032ec70, *(void**)dlPair, (unsigned long)dlInfo[0], 1);
+				ReWriteDisplayList__5CUtilFPvUlUl(gUtil, *(void**)dlPair, (unsigned long)dlInfo[0], 1);
 				dlEntry--;
 				dlInfo += 3;
 			}
 
 			meshColorArrays[meshIdx] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-			    *(int*)(meshHdr + 0x14) << 2, pppEnvStPtr->m_stagePtr, s_pppChangeTex_cpp_801dd660, 0x196);
+			    *(int*)(meshHdr + 0x14) << 2, lbl_8032ED54->m_stagePtr, s_pppChangeTex_cpp_801dd660, 0x196);
 			memset((void*)meshColorArrays[meshIdx], 0, *(int*)(meshHdr + 0x14) << 2);
 
 			allocIndex += 4;

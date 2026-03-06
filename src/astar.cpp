@@ -34,7 +34,7 @@ struct CMapCylinderRaw
 };
 
 extern Mtx gFlatPosMtx;
-extern unsigned char lbl_8032EC90[];
+extern unsigned char gMapHitFace[];
 extern char lbl_801DD6A8[];
 extern char lbl_801DD6B4[];
 extern char lbl_803320A0[];
@@ -929,7 +929,7 @@ unsigned char CAStar::calcSpecialPolygonGroup(Vec* pos)
 	if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl),
 	                                reinterpret_cast<Vec*>(&base), mask) != 0)
 	{
-		return lbl_8032EC90[0x47];
+		return gMapHitFace[0x47];
 	}
 
 	return 0;
@@ -969,7 +969,7 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 		if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl),
 		                                reinterpret_cast<Vec*>(&base), hitAttributeMask) != 0)
 		{
-			return lbl_8032EC90[0x47];
+			return gMapHitFace[0x47];
 		}
 	}
 	else
@@ -995,7 +995,7 @@ unsigned char CAStar::calcPolygonGroup(Vec* pos, int hitAttributeMask)
 		if (MapMng.CheckHitCylinderNear(reinterpret_cast<CMapCylinder*>(&cyl),
 		                                reinterpret_cast<Vec*>(&base), m_hitAttributeMask) != 0)
 		{
-			return lbl_8032EC90[0x47];
+			return gMapHitFace[0x47];
 		}
 	}
 

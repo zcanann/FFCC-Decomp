@@ -22,13 +22,12 @@ extern const f32 FLOAT_80333430;
 extern const f64 DOUBLE_80333440;
 extern const f64 DOUBLE_80333438;
 extern int gPppCalcDisabled;
-extern void* DAT_8032ec70;
+extern void* gUtil;
 extern u32 CFlatFlags;
 extern CMapMng MapMng;
 extern Mtx ppvCameraMatrix0;
 extern CGraphic Graphic;
 extern u8 PartMng[];
-extern u8* lbl_8032ED50;
 
 extern "C" {
 void pppHeapUseRate__FPQ27CMemory6CStage(void*);
@@ -302,7 +301,7 @@ void pppFrameLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, stru
             work[0] = PSVECDistance(&points[i], (Vec*)(work + 8));
         } else if (i == 0 && *((u8*)work + 0x4c) != 0) {
             if (work[0xf] - FLOAT_80333458 < work[0]) {
-                s32 partIndex = ((s32)(lbl_8032ED50 - (PartMng + 0x2A18))) / 0x158;
+                s32 partIndex = ((s32)((u8*)pppMngStPtr - (PartMng + 0x2A18))) / 0x158;
                 work[0] = work[0xf] - FLOAT_80333458;
                 ParticleFrameCallback__5CGameFiiiiiP3Vec(
                     &Game.game, partIndex, (int)pppMngStPtr->m_kind, (int)pppMngStPtr->m_nodeIndex, 3,
@@ -414,7 +413,7 @@ void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, str
     _GXSetTevAlphaIn__F13_GXTevStageID14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg14_GXTevAlphaArg(
         0, 7, 7, 7, 5);
     _GXSetTevAlphaOp__F13_GXTevStageID8_GXTevOp10_GXTevBias11_GXTevScaleUc11_GXTevRegID(0, 0, 0, 0, 1, 0);
-    SetVtxFmt_POS_CLR_TEX__5CUtilFv(&DAT_8032ec70);
+    SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
     GXLoadTexObj((GXTexObj*)(tex + 0x28), GX_TEXMAP0);
 
     color = *(u32*)((u8*)&pppLaser->field_0x88 + colorOffset);
@@ -509,7 +508,7 @@ void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, str
         }
 
         if ((CFlatFlags & 0x200000) != 0) {
-            SetVtxFmt_POS_CLR__5CUtilFv(&DAT_8032ec70);
+            SetVtxFmt_POS_CLR__5CUtilFv(&gUtil);
             _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0xFF, 0xFF, 4);
             _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 4);
             GXSetNumTexGens(0);

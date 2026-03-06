@@ -20,7 +20,8 @@ struct _pppColorWork
 
 // External data references used by pppColor
 extern int gPppCalcDisabled;
-extern unsigned char* lbl_8032ED50;
+struct _pppMngSt;
+extern _pppMngSt* pppMngStPtr;
 extern double lbl_8032FED0;
 
 #ifdef __cplusplus

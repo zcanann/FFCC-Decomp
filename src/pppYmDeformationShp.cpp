@@ -7,7 +7,7 @@
 
 extern int gPppCalcDisabled;
 extern u8 gPppInConstructor;
-extern void* DAT_8032ec70;
+extern void* gUtil;
 extern float FLOAT_803305f0;
 extern float lbl_803305F4;
 extern float FLOAT_803305f8;
@@ -511,7 +511,7 @@ void pppRenderYmDeformationShp(pppYmDeformationShp* pppYmDeformationShp_, pppYmD
 	_GXSetAlphaCompare__F10_GXCompareUc10_GXAlphaOp10_GXCompareUc(7, 0, 1, 7, 0);
 	_GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
 	_GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 3);
-	SetVtxFmt_POS_TEX0_TEX1__5CUtilFv(&DAT_8032ec70);
+	SetVtxFmt_POS_TEX0_TEX1__5CUtilFv(&gUtil);
 	GXLoadTexObj((GXTexObj*)(textureBase + 0x28), GX_TEXMAP1);
 	GXSetNumIndStages(1);
 	GXSetIndTexOrder(GX_INDTEXSTAGE0, GX_TEXCOORD1, GX_TEXMAP1);

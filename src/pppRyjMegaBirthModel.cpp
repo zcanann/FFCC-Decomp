@@ -19,7 +19,8 @@ extern float FLOAT_803304c0;
 extern float FLOAT_803304c4;
 extern float FLOAT_803304c8;
 extern CMath Math;
-extern _pppMngSt* pppMngStPtr;
+extern _pppMngSt* lbl_8032ED50;
+extern _pppEnvSt* lbl_8032ED54;
 extern Mtx ppvCameraMatrix0;
 
 static char s_pppRyjMegaBirthModel_cpp_801d9c18[] = "pppRyjMegaBirthModel.cpp";
@@ -104,14 +105,14 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
     if (*(void**)(work + 0xC) == 0) {
         *(u32*)(work + 0x18) = *(u16*)(payload + 0x20);
         *(void**)(work + 0xC) = pppMemAlloc__FUlPQ27CMemory6CStagePci(
-            *(u32*)(work + 0x18) * 0xA0, pppEnvStPtr->m_stagePtr, s_pppRyjMegaBirthModel_cpp_801d9c18, 0x8D);
+            *(u32*)(work + 0x18) * 0xA0, lbl_8032ED54->m_stagePtr, s_pppRyjMegaBirthModel_cpp_801d9c18, 0x8D);
         if (*(void**)(work + 0xC) != 0) {
             memset(*(void**)(work + 0xC), 0, *(u32*)(work + 0x18) * 0xA0);
         }
 
         if (*(u8*)(payload + 0x136) != 0) {
             *(void**)(work + 0x10) = pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                *(u32*)(work + 0x18) * 0x30, pppEnvStPtr->m_stagePtr, s_pppRyjMegaBirthModel_cpp_801d9c18, 0x97);
+                *(u32*)(work + 0x18) * 0x30, lbl_8032ED54->m_stagePtr, s_pppRyjMegaBirthModel_cpp_801d9c18, 0x97);
             if (*(void**)(work + 0x10) != 0) {
                 memset(*(void**)(work + 0x10), 0, *(u32*)(work + 0x18) * 0x30);
             }
@@ -119,7 +120,7 @@ void pppRyjMegaBirthModel(_pppPObject* pObject, PRyjMegaBirthModel* params, PRyj
 
         if (*(u8*)(payload + 0x131) != 0) {
             *(void**)(work + 0x14) = pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                *(u32*)(work + 0x18) << 5, pppEnvStPtr->m_stagePtr, s_pppRyjMegaBirthModel_cpp_801d9c18, 0xA2);
+                *(u32*)(work + 0x18) << 5, lbl_8032ED54->m_stagePtr, s_pppRyjMegaBirthModel_cpp_801d9c18, 0xA2);
             if (*(void**)(work + 0x14) != 0) {
                 memset(*(void**)(work + 0x14), 0, *(u32*)(work + 0x18) << 5);
             }
@@ -439,12 +440,12 @@ void init_matrix(_pppPObject* pObject, pppFMATRIX& out, PRyjMegaBirthModel* para
         PSMTXCopy(pObject->m_localMatrix.value, out.value);
     } else if (payload[0x2A] == 1 || payload[0x2A] == 3 || payload[0x2A] == 5 || payload[0x2A] == 7) {
         PSMTXIdentity(out.value);
-        out.value[0][0] = pppMngStPtr->m_scale.x;
-        out.value[1][1] = pppMngStPtr->m_scale.y;
-        out.value[2][2] = pppMngStPtr->m_scale.z;
-        out.value[0][3] = pppMngStPtr->m_position.x;
-        out.value[1][3] = pppMngStPtr->m_position.y;
-        out.value[2][3] = pppMngStPtr->m_position.z;
+        out.value[0][0] = lbl_8032ED50->m_scale.x;
+        out.value[1][1] = lbl_8032ED50->m_scale.y;
+        out.value[2][2] = lbl_8032ED50->m_scale.z;
+        out.value[0][3] = lbl_8032ED50->m_position.x;
+        out.value[1][3] = lbl_8032ED50->m_position.y;
+        out.value[2][3] = lbl_8032ED50->m_position.z;
     } else {
         PSMTXIdentity(out.value);
         out.value[0][3] = *f32_at((u8*)work, 0x2C);
@@ -507,7 +508,7 @@ void set_matrix(_pppPObject* pObject, pppFMATRIX mtxA, pppFMATRIX mtxB, PRyjMega
     }
 
     if (payload[0x136] != 0) {
-        PSMTXConcat(pppMngStPtr->m_matrix.value, model.value, model.value);
+        PSMTXConcat(lbl_8032ED50->m_matrix.value, model.value, model.value);
     }
 
     PSMTXConcat(ppvCameraMatrix0, model.value, tmp.value);

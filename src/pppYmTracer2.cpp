@@ -29,7 +29,7 @@ extern float FLOAT_80331848;
 extern float FLOAT_80331860;
 extern double DOUBLE_80331850;
 extern double DOUBLE_80331858;
-extern CUtil DAT_8032ec70;
+extern CUtil gUtil;
 
 static char s_pppYmTracer2_cpp_801dc4b8[] = "pppYmTracer2.cpp";
 
@@ -344,7 +344,7 @@ void pppRenderYmTracer2(pppYmTracer2* pppYmTracer2, pppYmTracer2UnkB* param_2, p
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
         (void*)((u8*)pppYmTracer2 + 0x88 + colorOffset), (void*)&ppvCameraMatrix0, FLOAT_80331840, step->m_payload[0xC],
         step->m_payload[0xB], step->m_payload[10], 0, 1, 1, 0);
-    SetVtxFmt_POS_CLR_TEX__5CUtilFv(&DAT_8032ec70);
+    SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
 
     textureIndex = 0;
     texture = (CTexture*)GetTexture__8CMapMeshFP12CMaterialSetRi(mapMesh, pppEnvStPtr->m_materialSetPtr, textureIndex);

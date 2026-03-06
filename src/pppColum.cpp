@@ -17,7 +17,7 @@ static inline int* GetColumSerializedDataOffsets(void* param) {
 
 extern int gPppCalcDisabled;
 extern CMath Math;
-extern void* DAT_8032ec70;
+extern void* gUtil;
 
 extern "C" {
 void* pppMemAlloc__FUlPQ27CMemory6CStagePci(unsigned long, CMemory::CStage*, char*, int);
@@ -120,8 +120,8 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                     &color, NULL, 0.0f, (u8)param_2->m_payload[0x15], (u8)param_2->m_payload[0x14],
                     param_2->m_arg3, 0, 0, 1, 0);
 
-                BeginQuadEnv__5CUtilFv(&DAT_8032ec70);
-                SetVtxFmt_POS_CLR_TEX__5CUtilFv(&DAT_8032ec70);
+                BeginQuadEnv__5CUtilFv(&gUtil);
+                SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
                 _GXSetTevOrder__F13_GXTevStageID13_GXTexCoordID11_GXTexMapID12_GXChannelID(0, 0, 0, 4);
                 _GXSetTevOp__F13_GXTevStageID10_GXTevMode(0, 0);
                 GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
@@ -148,10 +148,10 @@ void pppRenderColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param
                     quadColor.a = color.m_rgba[3];
 
                     RenderQuad__5CUtilF3Vec3Vec8_GXColorP5Vec2dP5Vec2d(
-                        &DAT_8032ec70, &shapePosA, &shapePosB, quadColor, &uvA, &uvB);
+                        &gUtil, &shapePosA, &shapePosB, quadColor, &uvA, &uvB);
                 }
 
-                EndQuadEnv__5CUtilFv(&DAT_8032ec70);
+                EndQuadEnv__5CUtilFv(&gUtil);
                 pppSetBlendMode__FUc(0);
                 values += 3;
             }
@@ -188,9 +188,9 @@ void pppFrameColum(pppColum *column, pppColumUnkB *param_2, pppColumUnkC *param_
                 values[0] = values[0] + *(float*)(payload + 0);
                 values[1] = RandF__5CMathFf(*(float*)(payload + 0xc), &Math);
                 values[1] = values[1] + *(float*)(payload + 8);
-                *(unsigned char*)(values + 2) = GetNoise__5CUtilFUc(&DAT_8032ec70, *(unsigned char*)(payload + 0x16));
-                *(unsigned char*)((char*)values + 9) = GetNoise__5CUtilFUc(&DAT_8032ec70, *(unsigned char*)(payload + 0x17));
-                *(unsigned char*)((char*)values + 10) = GetNoise__5CUtilFUc(&DAT_8032ec70, *(unsigned char*)(payload + 0x18));
+                *(unsigned char*)(values + 2) = GetNoise__5CUtilFUc(&gUtil, *(unsigned char*)(payload + 0x16));
+                *(unsigned char*)((char*)values + 9) = GetNoise__5CUtilFUc(&gUtil, *(unsigned char*)(payload + 0x17));
+                *(unsigned char*)((char*)values + 10) = GetNoise__5CUtilFUc(&gUtil, *(unsigned char*)(payload + 0x18));
                 values += 3;
             }
         }

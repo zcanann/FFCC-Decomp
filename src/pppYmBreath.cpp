@@ -22,8 +22,8 @@ extern "C" void pppUnitMatrix__FR10pppFMATRIX(pppFMATRIX*);
 class CMaterialSet;
 extern "C" void pppDrawShp__FPlsP12CMaterialSetUc(long*, short, CMaterialSet*, unsigned char);
 extern int gPppCalcDisabled;
-extern unsigned char* pppEnvStPtr;
-extern unsigned char* pppMngStPtr;
+extern unsigned char* lbl_8032ED54;
+extern unsigned char* lbl_8032ED50;
 extern Mtx ppvCameraMatrix0;
 extern unsigned int CFlatFlags;
 extern CMath math;
@@ -422,7 +422,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
         } else {
             UpdateParticle(vYmBreath, pYmBreath, (PARTICLE_DATA*)particleData, vColor, (PARTICLE_COLOR*)particleColor);
             pppCalcFrameShape__FPlRsRsRss(
-                *(long**)(*(int*)(pppEnvStPtr + 0xC) + *(int*)((unsigned char*)pYmBreath + 0xC) * 4), *(short*)&particleData[7].y,
+                *(long**)(*(int*)(lbl_8032ED54 + 0xC) + *(int*)((unsigned char*)pYmBreath + 0xC) * 4), *(short*)&particleData[7].y,
                 *(short*)((unsigned char*)&particleData[7].y + 2), *(short*)((unsigned char*)&particleData[7].x + 2),
                 *(short*)((unsigned char*)pYmBreath + 0x10));
         }
@@ -451,7 +451,7 @@ void UpdateAllParticle(_pppPObject* pppObject, VYmBreath* vYmBreath, PYmBreath* 
             group[4] = 0;
             group[3] = 0;
             *(Vec*)(group + 6) = unitVelocity;
-            PSMTXCopy(*(Mtx*)pppMngStPtr, *(Mtx*)(group + 0xB));
+            PSMTXCopy(*(Mtx*)lbl_8032ED50, *(Mtx*)(group + 0xB));
             group[0] = 1;
         }
     }
@@ -522,28 +522,28 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
         *(short*)(work + 0x56) = *(short*)((unsigned char*)pYmBreath + 0x12);
 
         *(void**)(work + 0x30) =
-            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x98), *(void**)pppEnvStPtr,
+            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x98), *(void**)lbl_8032ED54,
                                                   s_pppYmBreath_cpp, 0x243);
         if (*(void**)(work + 0x30) != NULL) {
             memset(*(void**)(work + 0x30), 0, (unsigned long)(maxParticleCount * 0x98));
         }
 
         *(void**)(work + 0x34) =
-            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x30), *(void**)pppEnvStPtr,
+            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x30), *(void**)lbl_8032ED54,
                                                   s_pppYmBreath_cpp, 0x249);
         if (*(void**)(work + 0x34) != NULL) {
             memset(*(void**)(work + 0x34), 0, (unsigned long)(maxParticleCount * 0x30));
         }
 
         *(void**)(work + 0x38) =
-            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x20), *(void**)pppEnvStPtr,
+            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x20), *(void**)lbl_8032ED54,
                                                   s_pppYmBreath_cpp, 0x24F);
         if (*(void**)(work + 0x38) != NULL) {
             memset(*(void**)(work + 0x38), 0, (unsigned long)(maxParticleCount * 0x20));
         }
 
         *(void**)(work + 0x3C) =
-            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(particleGroups * 0x5C), *(void**)pppEnvStPtr,
+            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(particleGroups * 0x5C), *(void**)lbl_8032ED54,
                                                   s_pppYmBreath_cpp, 0x255);
         if (*(void**)(work + 0x3C) != NULL) {
             memset(*(void**)(work + 0x3C), 0, (unsigned long)(particleGroups * 0x5C));
@@ -551,11 +551,11 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
             groupTable = (int*)*(void**)(work + 0x3C);
             for (i = 0; i < particleGroups; i++) {
                 groupTable[1] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                    (unsigned long)particlePerGroup, *(void**)pppEnvStPtr, s_pppYmBreath_cpp, 0x260);
+                    (unsigned long)particlePerGroup, *(void**)lbl_8032ED54, s_pppYmBreath_cpp, 0x260);
                 memset((void*)groupTable[1], 0xFF, (unsigned long)particlePerGroup);
 
                 groupTable[2] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                    (unsigned long)particlePerGroup, *(void**)pppEnvStPtr, s_pppYmBreath_cpp, 0x263);
+                    (unsigned long)particlePerGroup, *(void**)lbl_8032ED54, s_pppYmBreath_cpp, 0x263);
                 memset((void*)groupTable[2], 0xFF, (unsigned long)particlePerGroup);
                 groupTable[0] = 0;
                 groupTable += 0x17;
@@ -568,7 +568,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
         PSVECNormalize((Vec*)(work + 0x48), (Vec*)(work + 0x48));
     }
 
-    PSMTXCopy(*(Mtx*)pppMngStPtr, *(Mtx*)work);
+    PSMTXCopy(*(Mtx*)lbl_8032ED50, *(Mtx*)work);
     UpdateAllParticle((_pppPObject*)ymBreath, (VYmBreath*)work, pYmBreath, (VColor*)(base + dataOffsets[1]));
 
     groupCount = (int)(unsigned short)*(unsigned short*)((unsigned char*)pYmBreath + 0x12);
@@ -624,7 +624,7 @@ extern "C" void pppFrameYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, pp
                 PSVECAdd(&origin, &target, &target);
                 PSVECSubtract(&target, &origin, &hitVector);
 
-                pppHitCylinderSendSystem__FP9_pppMngStP3VecP3Vecff(pppMngStPtr, &origin, &hitVector, scaleValue,
+                pppHitCylinderSendSystem__FP9_pppMngStP3VecP3Vecff(lbl_8032ED50, &origin, &hitVector, scaleValue,
                                                                     *(float*)((unsigned char*)pYmBreath + 4));
             }
         }
@@ -668,7 +668,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
         return;
     }
 
-    shape = *(long**)(*(unsigned int*)(pppEnvStPtr + 0xC) + step->m_stepValue * 4);
+    shape = *(long**)(*(unsigned int*)(lbl_8032ED54 + 0xC) + step->m_stepValue * 4);
     pppSetBlendMode__FUc(step->m_payload[8]);
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
     pppSetDrawEnv__FP10pppCVECTORP10pppFMATRIXfUcUcUcUcUcUcUc(
@@ -692,8 +692,8 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
             int a;
 
             PSMTXIdentity(drawMtx);
-            drawMtx[0][0] = source[4].y * ((Vec*)(pppMngStPtr + 0x64))->x;
-            drawMtx[1][1] = source[4].z * ((Vec*)(pppMngStPtr + 0x64))->y;
+            drawMtx[0][0] = source[4].y * ((Vec*)(lbl_8032ED50 + 0x64))->x;
+            drawMtx[1][1] = source[4].z * ((Vec*)(lbl_8032ED50 + 0x64))->y;
             drawMtx[2][2] = drawMtx[0][0];
             if (FLOAT_80330c80 != source[3].y) {
                 PSMTXRotRad(rotMtx, 'z', FLOAT_80330c84 * source[3].y);
@@ -747,7 +747,7 @@ extern "C" void pppRenderYmBreath(pppYmBreath* ymBreath, PYmBreath* pYmBreath, p
             amb.a = (unsigned char)a;
             GXSetChanAmbColor(GX_COLOR0A0, amb);
             pppDrawShp__FPlsP12CMaterialSetUc(shape, *(short*)((unsigned char*)&source[7].y + 2),
-                                              *(CMaterialSet**)(pppEnvStPtr + 4),
+                                              *(CMaterialSet**)(lbl_8032ED54 + 4),
                                               step->m_payload[8]);
         }
 

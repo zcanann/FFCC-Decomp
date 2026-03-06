@@ -185,7 +185,7 @@ extern float FLOAT_803329c0;
 extern float FLOAT_803329c4;
 extern float FLOAT_803329c8;
 extern float FLOAT_803329cc;
-extern CUtil DAT_8032ec70;
+extern CUtil gUtil;
 extern int DAT_8032eeb8;
 extern int DAT_8032eebc;
 extern int DAT_8032eec0;
@@ -479,7 +479,7 @@ void CMenuPcs::drawSingleMenu()
         (Game.game.m_gameWork.m_singleShopOrSmithMenuActiveFlag != 0)) {
         DrawInit__8CMenuPcsFv(this);
         DrawFilter__8CMenuPcsFUcUcUcUc(this, 0, 0, 0, 0xFF);
-        DAT_8032ec70.ClearZBufferRect(FLOAT_8033294c, FLOAT_8033294c, FLOAT_803329a4, FLOAT_803329a4);
+        gUtil.ClearZBufferRect(FLOAT_8033294c, FLOAT_8033294c, FLOAT_803329a4, FLOAT_803329a4);
         DrawInit__8CMenuPcsFv(this);
 
         unsigned int scriptFoodBase = Game.game.m_scriptFoodBase[0];

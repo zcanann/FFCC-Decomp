@@ -11,8 +11,8 @@ extern float FLOAT_80331020;
 extern double DOUBLE_80331028;
 extern int gPppCalcDisabled;
 extern char gPppInConstructor;
-extern void* DAT_8032ec70;
-extern _pppMngSt* pppMngStPtr;
+extern void* gUtil;
+extern _pppMngSt* lbl_8032ED50;
 
 extern struct {
     float _212_4_, _216_4_, _220_4_;
@@ -226,10 +226,10 @@ void pppFrameRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_DA
             posY = ppvCameraMatrix0[1][3];
             posZ = ppvCameraMatrix0[2][3];
         }
-        pppMngStPtr->m_matrix.value[0][3] = posX;
-        pppMngStPtr->m_matrix.value[1][3] = posY;
-        pppMngStPtr->m_matrix.value[2][3] = posZ;
-        pppSetFpMatrix__FP9_pppMngSt(pppMngStPtr);
+        lbl_8032ED50->m_matrix.value[0][3] = posX;
+        lbl_8032ED50->m_matrix.value[1][3] = posY;
+        lbl_8032ED50->m_matrix.value[2][3] = posZ;
+        pppSetFpMatrix__FP9_pppMngSt(lbl_8032ED50);
     }
 }
 
@@ -282,13 +282,13 @@ void pppRenderRain(struct pppRain* pppRain, struct PRain* param_2, struct RAIN_D
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP_NULL, GX_COLOR0A0);
     GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
     GXSetLineWidth(payload[0x50], GX_TO_ZERO);
-    SetVtxFmt_POS_CLR_TEX__5CUtilFv(&DAT_8032ec70);
+    SetVtxFmt_POS_CLR_TEX__5CUtilFv(&gUtil);
 
     work = (RainWork*)((u8*)pppRain + 0x80 + workOffset);
     drop = (RainDrop*)work->drops;
-    baseX = pppMngStPtr->m_matrix.value[0][3];
-    baseY = pppMngStPtr->m_matrix.value[1][3];
-    baseZ = pppMngStPtr->m_matrix.value[2][3];
+    baseX = lbl_8032ED50->m_matrix.value[0][3];
+    baseY = lbl_8032ED50->m_matrix.value[1][3];
+    baseZ = lbl_8032ED50->m_matrix.value[2][3];
 
     GXBegin((GXPrimitive)0xA8, GX_VTXFMT7, (u16)(drawCount << 1));
     for (i = 0; i < count; i++) {

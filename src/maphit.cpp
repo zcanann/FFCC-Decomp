@@ -25,7 +25,7 @@ static inline unsigned char* Ptr(void* p, unsigned int offset)
 
 int DAT_8032ec78 = -1;
 float FLOAT_8032ec80 = 3.4e38f;
-CMapHitFace* lbl_8032EC90 = 0;
+CMapHitFace* gMapHitFace = 0;
 
 /*
  * --INFO--
@@ -480,7 +480,7 @@ int CMapHit::CheckHitFaceCylinder(unsigned long mask)
         }
 
         FLOAT_8032ec80 = hitT;
-        lbl_8032EC90 = reinterpret_cast<CMapHitFace*>(face);
+        gMapHitFace = reinterpret_cast<CMapHitFace*>(face);
         DAT_8032ec78 = -1;
         g_hit_cyl_min = g_hit_cyl;
         return 1;
@@ -517,7 +517,7 @@ void CMapCylinder::operator= (const CMapCylinder& other)
  */
 void CMapHit::GetHitFaceNormal(Vec* out)
 {
-    float* const normal = reinterpret_cast<float*>(lbl_8032EC90);
+    float* const normal = reinterpret_cast<float*>(gMapHitFace);
     out->x = normal[0];
     out->y = normal[1];
     out->z = normal[2];
@@ -534,7 +534,7 @@ void CMapHit::GetHitFaceNormal(Vec* out)
  */
 int CMapHit::CalcHitSlide(Vec* out, float y)
 {
-    if (lbl_8032EC90 == 0) {
+    if (gMapHitFace == 0) {
         out->x = 0.0f;
         out->y = 0.0f;
         out->z = 0.0f;
@@ -542,15 +542,15 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
     }
 
     if (DAT_8032ec78 == -1) {
-        if (y <= lbl_8032EC90->m_boundsMin.y) {
+        if (y <= gMapHitFace->m_boundsMin.y) {
             float len = PSVECMag(&g_hit_cyl_min.m_direction);
             PSVECScale(&g_hit_cyl_min.m_direction, out, FLOAT_8032ec80 - (s_push / len));
             return 0;
         }
 
         if (s_epsilon < FLOAT_8032ec80) {
-            Vec* normal = reinterpret_cast<Vec*>(lbl_8032EC90);
-            float planeD = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(lbl_8032EC90) + 0x0C);
+            Vec* normal = reinterpret_cast<Vec*>(gMapHitFace);
+            float planeD = *reinterpret_cast<float*>(reinterpret_cast<unsigned char*>(gMapHitFace) + 0x0C);
             float planeDot = PSVECDotProduct(&g_hit_cyl_min.m_direction, normal);
 
             Vec push;
@@ -566,13 +566,13 @@ int CMapHit::CalcHitSlide(Vec* out, float y)
         return 1;
     }
 
-    if (y <= lbl_8032EC90->m_boundsMin.y) {
+    if (y <= gMapHitFace->m_boundsMin.y) {
         float len = PSVECMag(&g_hit_cyl_min.m_direction);
         PSVECScale(&g_hit_cyl_min.m_direction, out, FLOAT_8032ec80 - (s_push / len));
         return 0;
     }
 
-    unsigned char* face = reinterpret_cast<unsigned char*>(lbl_8032EC90);
+    unsigned char* face = reinterpret_cast<unsigned char*>(gMapHitFace);
     const unsigned char vertexCount = face[0x46];
     unsigned short* faceIndices = reinterpret_cast<unsigned short*>(face + 0x48);
 
@@ -661,7 +661,7 @@ int CMapHit::CheckHitCylinder(CMapCylinder* mapCylinder, Vec* position, unsigned
     CMapHitFace* face = m_faces;
     int i = 0;
     while (i < m_faceCount) {
-        lbl_8032EC90 = face;
+        gMapHitFace = face;
         FLOAT_8032ec80 = s_large_pos;
         if (CheckHitFaceCylinder(mask) != 0) {
             return 1;
@@ -719,7 +719,7 @@ int CMapHit::CheckHitCylinderNear(CMapCylinder* mapCylinder, Vec* position, unsi
     g_hit_cyl = *mapCylinder;
     g_hit_mvec = *position;
     FLOAT_8032ec80 = s_large_pos;
-    lbl_8032EC90 = 0;
+    gMapHitFace = 0;
     DAT_8032ec78 = -1;
 
     return CheckHitFaceCylinder(mask);

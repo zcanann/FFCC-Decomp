@@ -35,11 +35,11 @@ void pppColor(void* param1, void* param2, void* param3)
         work->a += src_colors[3];
     }
 
-    if (((u8*)lbl_8032ED50)[0xef] != 0) {
-        work->result.r = (u8)((float)(work->r >> 7) * ((float*)lbl_8032ED50)[14]);
-        work->result.g = (u8)((float)(work->g >> 7) * ((float*)lbl_8032ED50)[15]);
-        work->result.b = (u8)((float)(work->b >> 7) * ((float*)lbl_8032ED50)[16]);
-        work->result.a = (u8)((float)(work->a >> 7) * ((float*)lbl_8032ED50)[17]);
+    if (((u8*)pppMngStPtr)[0xef] != 0) {
+        work->result.r = (u8)((float)(work->r >> 7) * ((float*)pppMngStPtr)[14]);
+        work->result.g = (u8)((float)(work->g >> 7) * ((float*)pppMngStPtr)[15]);
+        work->result.b = (u8)((float)(work->b >> 7) * ((float*)pppMngStPtr)[16]);
+        work->result.a = (u8)((float)(work->a >> 7) * ((float*)pppMngStPtr)[17]);
         return;
     }
 

@@ -9,8 +9,8 @@ extern float lbl_80330F70;
 extern float FLOAT_80330F80;
 extern int gPppCalcDisabled;
 extern u32 CFlatFlags;
-extern unsigned char* pppEnvStPtr;
-extern unsigned char* pppMngStPtr;
+extern unsigned char* lbl_8032ED54;
+extern unsigned char* lbl_8032ED50;
 extern Mtx ppvCameraMatrix0;
 
 struct pppFMATRIX {
@@ -449,7 +449,7 @@ found_search_index:
             *((float*)(group + 3) + 1) = lbl_80330F70;
             *((float*)(group + 3) + 2) = lbl_80330F70;
             *(Vec*)(group + 6) = unitVelocity;
-            PSMTXCopy(*(Mtx*)pppMngStPtr, *(Mtx*)(group + 0xB));
+            PSMTXCopy(*(Mtx*)lbl_8032ED50, *(Mtx*)(group + 0xB));
             group[0] = 1;
         }
     }
@@ -511,28 +511,28 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
         *(short*)(work + 0x56) = *(short*)((unsigned char*)pBreathModel + 0x12);
 
         *(void**)(work + 0x30) =
-            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x98), *(void**)pppEnvStPtr,
+            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x98), *(void**)lbl_8032ED54,
                                                   s_pppBreathModel_cpp, 0x257);
         if (*(void**)(work + 0x30) != NULL) {
             memset(*(void**)(work + 0x30), 0, (unsigned long)(maxParticleCount * 0x98));
         }
 
         *(void**)(work + 0x34) =
-            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x30), *(void**)pppEnvStPtr,
+            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x30), *(void**)lbl_8032ED54,
                                                   s_pppBreathModel_cpp, 0x25d);
         if (*(void**)(work + 0x34) != NULL) {
             memset(*(void**)(work + 0x34), 0, (unsigned long)(maxParticleCount * 0x30));
         }
 
         *(void**)(work + 0x38) =
-            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x20), *(void**)pppEnvStPtr,
+            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(maxParticleCount * 0x20), *(void**)lbl_8032ED54,
                                                   s_pppBreathModel_cpp, 0x263);
         if (*(void**)(work + 0x38) != NULL) {
             memset(*(void**)(work + 0x38), 0, (unsigned long)(maxParticleCount * 0x20));
         }
 
         *(void**)(work + 0x3C) =
-            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(particleGroups * 0x5C), *(void**)pppEnvStPtr,
+            pppMemAlloc__FUlPQ27CMemory6CStagePci((unsigned long)(particleGroups * 0x5C), *(void**)lbl_8032ED54,
                                                   s_pppBreathModel_cpp, 0x269);
         if (*(void**)(work + 0x3C) != NULL) {
             memset(*(void**)(work + 0x3C), 0, (unsigned long)(particleGroups * 0x5C));
@@ -540,11 +540,11 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
             groupTable = (int*)*(void**)(work + 0x3C);
             for (i = 0; i < particleGroups; i++) {
                 groupTable[1] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                    (unsigned long)particlePerGroup, *(void**)pppEnvStPtr, s_pppBreathModel_cpp, 0x274);
+                    (unsigned long)particlePerGroup, *(void**)lbl_8032ED54, s_pppBreathModel_cpp, 0x274);
                 memset((void*)groupTable[1], 0xFF, (unsigned long)particlePerGroup);
 
                 groupTable[2] = (int)pppMemAlloc__FUlPQ27CMemory6CStagePci(
-                    (unsigned long)particlePerGroup, *(void**)pppEnvStPtr, s_pppBreathModel_cpp, 0x277);
+                    (unsigned long)particlePerGroup, *(void**)lbl_8032ED54, s_pppBreathModel_cpp, 0x277);
                 memset((void*)groupTable[2], 0xFF, (unsigned long)particlePerGroup);
                 groupTable[0] = 0;
                 groupTable += 0x17;
@@ -557,7 +557,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
         PSVECNormalize((Vec*)(work + 0x48), (Vec*)(work + 0x48));
     }
 
-    PSMTXCopy(*(Mtx*)pppMngStPtr, *(Mtx*)work);
+    PSMTXCopy(*(Mtx*)lbl_8032ED50, *(Mtx*)work);
     UpdateAllParticle((_pppPObject*)breathModel, (VBreathModel*)work, pBreathModel, (VColor*)(base + dataOffsets[1]));
 
     groupCount = (int)(unsigned short)*(unsigned short*)((unsigned char*)pBreathModel + 0x12);
@@ -613,7 +613,7 @@ extern "C" void pppFrameBreathModel(pppBreathModel* breathModel, PBreathModel* p
                 PSVECAdd(&origin, &target, &target);
                 PSVECSubtract(&target, &origin, &hitVector);
 
-                pppHitCylinderSendSystem__FP9_pppMngStP3VecP3Vecff(pppMngStPtr, &origin, &hitVector, scaleValue,
+                pppHitCylinderSendSystem__FP9_pppMngStP3VecP3Vecff(lbl_8032ED50, &origin, &hitVector, scaleValue,
                                                                     *(float*)((unsigned char*)pBreathModel + 4));
             }
         }
@@ -665,7 +665,7 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
         return;
     }
 
-    model = (pppModelSt*)(*(void***)(pppEnvStPtr + 8))[graphId];
+    model = (pppModelSt*)(*(void***)(lbl_8032ED54 + 8))[graphId];
     pppInitBlendMode__Fv();
     pppSetBlendMode__FUc(*(unsigned char*)((unsigned char*)pBreathModel + 4));
     _GXSetTevSwapMode__F13_GXTevStageID13_GXTevSwapSel13_GXTevSwapSel(0, 0, 0);
@@ -682,9 +682,9 @@ extern "C" void pppRenderBreathModel(pppBreathModel* breathModel, PBreathModel* 
         if (*(short*)(particleData + 0x50) > 0) {
             drawColor = baseColor;
             PSMTXScale(scaledMtx,
-                       *(float*)(pppMngStPtr + 0x28) * *(float*)(particleData + 0x64),
-                       *(float*)(pppMngStPtr + 0x2C) * *(float*)(particleData + 0x68),
-                       *(float*)(pppMngStPtr + 0x30) * *(float*)(particleData + 0x6C));
+                       *(float*)(lbl_8032ED50 + 0x28) * *(float*)(particleData + 0x64),
+                       *(float*)(lbl_8032ED50 + 0x2C) * *(float*)(particleData + 0x68),
+                       *(float*)(lbl_8032ED50 + 0x30) * *(float*)(particleData + 0x6C));
             PSMTXConcat(*(Mtx*)particleData, scaledMtx, drawMtx);
             PSMTXConcat(ppvCameraMatrix0, drawMtx, drawMtx);
             PSMTXConcat(ppvCameraMatrix0, *(Mtx*)particleData, worldMtx);

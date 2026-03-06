@@ -298,10 +298,11 @@ void pppCacheDumpShapeTexture(pppShapeSt* shapeSt, CMaterialSet* materialSet)
 void pppGetShapePos(long* animData, short frameIndex, Vec& minPos, Vec& maxPos, int shapeIndex)
 {
     int shapeBase = *(short*)((int)animData + frameIndex * 8 + 0x10);
-    int shapeEntry = *(int*)((int)animData + shapeBase + 0xc + shapeIndex * 8);
+    u8* shapeEntry = (u8*)*(int*)((int)animData + shapeBase + 0xc + shapeIndex * 8);
+    u8* minSrc = shapeEntry + 3;
 
-    memcpy(&minPos, (void*)(shapeEntry + 3), 0xc);
-    memcpy(&maxPos, (void*)(shapeEntry + 0x2b), 0xc);
+    memcpy(&minPos, minSrc, 0xc);
+    memcpy(&maxPos, minSrc + 0x28, 0xc);
 }
 
 /*

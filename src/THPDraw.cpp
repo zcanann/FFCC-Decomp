@@ -54,8 +54,8 @@ void THPGXYuv2RgbSetup(GXRenderModeObj* rmode) {
     Mtx44 projMtx;
     Mtx modelMtx;
     GXCompType texCoordType = GX_U16;
-    s16 fbWidth = (s16)rmode->fbWidth;
-    s16 efbHeight = (s16)rmode->efbHeight;
+    int fbWidth = rmode->fbWidth;
+    int efbHeight = rmode->efbHeight;
 
     GXSetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
     C_MTXOrtho(projMtx, 0.0f, (f32)efbHeight, 0.0f, (f32)fbWidth, 0.0f, 1.0f);

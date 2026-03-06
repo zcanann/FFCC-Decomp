@@ -22,40 +22,17 @@ extern "C" {
  */
 void pppConstructYmTraceMove(pppYmTraceMove* pppYmTraceMove, pppYmTraceMoveUnkC* param_2)
 {
-	Vec* dest;
-	Vec local_38;
-	u32 local_2c;
-	u32 local_28;
-	u32 local_24;
-	u32 local_20;
-	u32 local_1c;
-	u32 local_18;
+	Vec* dest = (Vec*)((u8*)pppYmTraceMove + 0x80 + *param_2->m_serializedDataOffsets);
+	Vec savedPosition = pppMngStPtr->m_savedPosition;
+	Vec paramVec = pppMngStPtr->m_paramVec0;
+	Vec dir;
 	f32 zero;
-	u32 savedX;
-	u32 savedY;
-	u32 savedZ;
-	u32 paramX;
-	u32 paramY;
-	u32 paramZ;
 
-	dest = (Vec*)((u8*)pppYmTraceMove + 0x80 + *param_2->m_serializedDataOffsets);
-	savedX = *(u32*)((u8*)pppMngStPtr + 0x58);
-	savedY = *(u32*)((u8*)pppMngStPtr + 0x5c);
-	savedZ = *(u32*)((u8*)pppMngStPtr + 0x60);
-	paramX = *(u32*)((u8*)pppMngStPtr + 0x68);
-	paramY = *(u32*)((u8*)pppMngStPtr + 0x6c);
-	paramZ = *(u32*)((u8*)pppMngStPtr + 0x70);
-	local_2c = savedX;
-	local_28 = savedY;
-	local_24 = savedZ;
-	local_20 = paramX;
-	local_1c = paramY;
-	local_18 = paramZ;
-	pppSubVector__FR3Vec3Vec3Vec((Vec*)&dest[1].y, (Vec*)&local_20, (Vec*)&local_2c);
-	local_38.x = dest[1].y;
-	local_38.y = dest[1].z;
-	local_38.z = dest[2].x;
-	pppCopyVector__FR3Vec3Vec(dest, &local_38);
+	pppSubVector__FR3Vec3Vec3Vec((Vec*)&dest[1].y, &paramVec, &savedPosition);
+	dir.x = dest[1].y;
+	dir.y = dest[1].z;
+	dir.z = dest[2].x;
+	pppCopyVector__FR3Vec3Vec(dest, &dir);
 	zero = 0.0f;
 	dest[3].x = zero;
 	dest[2].z = zero;

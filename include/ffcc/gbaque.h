@@ -107,8 +107,8 @@ public:
     unsigned int GetMkSmithFlg(int);
     void ClrMkSmithFlg(int);
     void SetResetFlg(int);
-    void GetBonus(int);
-    void GetArtifactFlg(int);
+    unsigned char GetBonus(int);
+    unsigned int GetArtifactFlg(int);
     void ClrArtifactFlg(int);
     int GetArtifactData(int, unsigned char*);
     void GetUseItemFlg(int);

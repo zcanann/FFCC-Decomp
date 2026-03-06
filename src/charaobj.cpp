@@ -1,6 +1,8 @@
 #include "ffcc/charaobj.h"
+#include "ffcc/fontman.h"
 #include "ffcc/partMng.h"
 #include "ffcc/p_game.h"
+#include "ffcc/p_minigame.h"
 #include "ffcc/sound.h"
 #include <math.h>
 #include <string.h>
@@ -13,12 +15,21 @@ extern "C" void EndParticleSlot__13CFlatRuntime2Fii(void*, int, int);
 extern "C" int intToClass__13CFlatRuntime2Fi(void*, int);
 extern "C" void IgnoreParticle__13CFlatRuntime2FiPQ212CFlatRuntime7CObject(void*, int, void*);
 extern "C" void pppEndPart__8CPartMngFi(void*, int);
+extern "C" int sprintf(char*, const char*, ...);
+extern "C" int GetWidth__5CFontFPc(CFont*, const char*);
+extern "C" void SetPosX__5CFontFf(float, CFont*);
+extern "C" void SetPosY__5CFontFf(float, CFont*);
+extern "C" void SetPosZ__5CFontFf(float, CFont*);
+extern "C" void Draw__5CFontFPc(CFont*, const char*);
 
 extern unsigned char CFlat[];
+extern CMiniGamePcs MiniGamePcs;
 extern CPartMng PartMng;
 extern int DAT_8032ee68;
 extern unsigned char DAT_8032ee6c;
 extern float FLOAT_80331964;
+extern "C" char lbl_801DC5AC[];
+extern "C" float lbl_80331970;
 
 /*
  * --INFO--
@@ -1420,8 +1431,30 @@ void CGCharaObj::calcCastTime(int)
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGCharaObj::onDrawDebug(CFont*, float, float&, float)
+void CGCharaObj::onDrawDebug(CFont* font, float posX, float& posY, float posZ)
 {
+	if ((((int)((unsigned int)(unsigned char)m_weaponNodeFlags << 0x18) < 0) && (*reinterpret_cast<unsigned int*>(CFlat + 0x12AC) == 0)) &&
+	    ((*reinterpret_cast<unsigned int*>(reinterpret_cast<unsigned char*>(&MiniGamePcs) + 0x6484) & 0x80) != 0)) {
+		char text[0x110];
+		unsigned char* script = reinterpret_cast<unsigned char*>(m_scriptHandle);
+		double posYDouble;
+		double widthDouble;
+
+		sprintf(text, lbl_801DC5AC,
+		        *reinterpret_cast<short*>(script + 0x1C),
+		        *reinterpret_cast<short*>(script + 0x1A),
+		        *reinterpret_cast<short*>(script + 0x1E),
+		        *reinterpret_cast<short*>(script + 0x20),
+		        *reinterpret_cast<short*>(script + 0x22));
+
+		posYDouble = (double)posY;
+		widthDouble = (double)GetWidth__5CFontFPc(font, text);
+		SetPosX__5CFontFf(-(float)((double)lbl_80331970 * widthDouble - (double)posX), font);
+		SetPosY__5CFontFf((float)posYDouble, font);
+		SetPosZ__5CFontFf((float)posZ, font);
+		Draw__5CFontFPc(font, text);
+		posY -= (float)((double)(unsigned short)font->m_glyphWidth * (double)font->scaleY);
+	}
 }
 
 /*

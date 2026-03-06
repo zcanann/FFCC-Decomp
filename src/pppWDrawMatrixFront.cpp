@@ -22,9 +22,9 @@ void pppWDrawMatrixFront(struct _pppPObject* object, void*, struct _pppCtrlTable
     PSMTXScaleApply(
         *(Mtx*)((char*)object + 0x10),
         *(Mtx*)((char*)object + 0x40),
-        *(f32*)(pppMngStPtr + 0x28),
-        *(f32*)(pppMngStPtr + 0x2C),
-        *(f32*)(pppMngStPtr + 0x30)
+        pppMngStPtr->m_scale.x,
+        pppMngStPtr->m_scale.y,
+        pppMngStPtr->m_scale.z
     );
 
     localPos.x = *(float*)((char*)object + 0x1C);
@@ -37,5 +37,4 @@ void pppWDrawMatrixFront(struct _pppPObject* object, void*, struct _pppCtrlTable
     *(float*)((char*)object + 0x5C) = localPos.y;
     *(float*)((char*)object + 0x6C) = localPos.z;
 }
-
 

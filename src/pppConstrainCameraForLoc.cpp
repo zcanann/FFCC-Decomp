@@ -6,7 +6,7 @@
 // External references
 extern int gUtil;
 extern float lbl_803331A8;
-extern void GetDirectVector__5CUtilFP3VecP3Vec3Vec(void*, Vec*, Vec*, Vec*);
+extern "C" void GetDirectVector__5CUtilFP3VecP3Vec3Vec(void*, Vec*, Vec*, Vec);
 extern struct {
     int field0_0x0;
     Mtx m_cameraMatrix;
@@ -40,18 +40,10 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
         Mtx m_worldBaseMtx;
         Mtx m_drawMtx;
     };
-    struct ConstrainCameraForLocWork {
-        float field0_0x0;
-        float field4_0x4;
-        float field8_0x8;
-        float fieldc_0xc;
-        Mtx m_worldBaseMtx;
-        void* m_owner;
-    };
 
-    ConstrainCameraForLocWork* work = (ConstrainCameraForLocWork*)param_2;
     ConstrainCameraForLocModel* constrainModel = (ConstrainCameraForLocModel*)model;
-    unsigned char* owner = (unsigned char*)work->m_owner;
+    float* work = (float*)param_2;
+    unsigned char* owner = (unsigned char*)(int)work[0x10];
     float fVar1;
     float fVar2;
     float fVar3;
@@ -60,25 +52,32 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
     float local_f0;
     Vec local_ec;
     Vec local_e0;
-    Vec local_d4;
-    Vec local_c8;
+    float local_d4;
+    float local_d0;
+    float local_cc;
+    float local_c8;
+    float local_c4;
+    float local_c0;
     Vec local_bc;
+    float local_b0;
+    float local_ac;
+    float local_a8;
     Vec local_a4;
     Mtx local_98;
     Mtx local_68;
 
-    local_f8 = CameraPcs._236_4_;
-    local_f4 = CameraPcs._240_4_;
-    local_f0 = CameraPcs._244_4_;
+    local_b0 = CameraPcs._236_4_;
+    local_ac = CameraPcs._240_4_;
+    local_a8 = CameraPcs._244_4_;
     local_bc.x = CameraPcs._224_4_;
     local_bc.y = CameraPcs._228_4_;
     local_bc.z = CameraPcs._232_4_;
     PSMTXCopy(CameraPcs.m_cameraMatrix, local_68);
 
-    local_a4.z = work->field0_0x0;
-    local_a4.x = local_a4.z * local_f8;
-    local_a4.y = local_a4.z * local_f4;
-    local_a4.z = local_a4.z * local_f0;
+    local_a4.z = *work;
+    local_a4.x = local_a4.z * local_b0;
+    local_a4.y = local_a4.z * local_ac;
+    local_a4.z = local_a4.z * local_a8;
     if (Game.game.m_currentSceneId == 7) {
         PSMTXInverse(ppvCameraMatrix0, local_98);
     } else {
@@ -92,14 +91,18 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
 
     fVar3 = *(float*)(owner + 0x1c);
     fVar2 = *(float*)(owner + 0x2c);
-    GetDirectVector__5CUtilFP3VecP3Vec3Vec((void*)&gUtil, &local_c8, &local_d4, (Vec*)&local_f8);
+    local_f8 = local_b0;
+    local_f4 = local_ac;
+    local_f0 = local_a8;
+    GetDirectVector__5CUtilFP3VecP3Vec3Vec((void*)&gUtil, (Vec*)&local_c8, (Vec*)&local_d4,
+                                           *(Vec*)&local_f8);
 
-    local_e0.x = fVar3 * local_c8.x;
-    local_e0.y = fVar3 * local_c8.y;
-    local_e0.z = fVar3 * local_c8.z;
-    local_ec.x = fVar2 * local_d4.x;
-    local_ec.y = fVar2 * local_d4.y;
-    local_ec.z = fVar2 * local_d4.z;
+    local_e0.x = fVar3 * local_c8;
+    local_e0.y = fVar3 * local_c4;
+    local_e0.z = fVar3 * local_c0;
+    local_ec.x = fVar2 * local_d4;
+    local_ec.y = fVar2 * local_d0;
+    local_ec.z = fVar2 * local_cc;
     PSVECAdd(&local_a4, &local_e0, &local_a4);
     PSVECAdd(&local_a4, &local_ec, &local_a4);
 
@@ -117,10 +120,10 @@ int CC_BeforeCalcMatrixCallback(CChara::CModel* model, void* param_2, void*)
         constrainModel->m_drawMtx[2][3] = local_a4.z;
     }
 
-    PSMTXCopy(constrainModel->m_worldBaseMtx, work->m_worldBaseMtx);
-    work->m_worldBaseMtx[0][3] = local_a4.x;
-    work->m_worldBaseMtx[1][3] = local_a4.y;
-    work->m_worldBaseMtx[2][3] = local_a4.z;
+    PSMTXCopy(constrainModel->m_worldBaseMtx, (MtxPtr)(work + 4));
+    work[7] = local_a4.x;
+    work[0xb] = local_a4.y;
+    work[0xf] = local_a4.z;
     return 1;
 }
 

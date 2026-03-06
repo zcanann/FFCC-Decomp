@@ -796,9 +796,15 @@ int CCaravanWork::FindItem(int itemId)
  * Address:	TODO
  * Size:	TODO
  */
-void CCaravanWork::DeleteItemIdx(int, int)
+void CCaravanWork::DeleteItemIdx(int itemSlot, int updateJoybus)
 {
-	// TODO
+	if (m_inventoryItems[itemSlot] != 0xFFFF) {
+		m_inventoryItems[itemSlot] = 0xFFFF;
+		m_inventoryItemCount = m_inventoryItemCount - 1;
+		if (updateJoybus != 0) {
+			DelItem__6JoyBusFiUc(&Joybus, m_joybusCaravanId, (char)itemSlot);
+		}
+	}
 }
 
 /*
@@ -1343,9 +1349,24 @@ int CCaravanWork::ShopRequest(int requestType, int param3, int param4, int param
  * Address:	TODO
  * Size:	TODO
  */
-void CCaravanWork::CallShop(int, int, int, int, int)
+void CCaravanWork::CallShop(int requestType, int arg0, int arg1, int arg2, int arg3)
 {
-	// TODO
+	int local18;
+	int local14;
+	int local10;
+	int localC;
+	int local8;
+
+	if ((requestType == 0) || (requestType == 1)) {
+		m_shopRequestState = 0;
+	}
+	local18 = requestType;
+	local14 = arg0;
+	local10 = arg1;
+	localC = arg2;
+	local8 = arg3;
+	SystemCall__12CFlatRuntimeFPQ212CFlatRuntime7CObjectiiiPQ212CFlatRuntime6CStackPQ212CFlatRuntime6CStack(
+		&CFlat, m_ownerObj, 2, 0x12, 5, &local18, (void*)0);
 }
 
 /*

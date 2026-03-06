@@ -13,7 +13,6 @@ extern float kOctTreeBoundMaxInit;
 extern float kOctTreeCylinderPad;
 extern float lbl_8032F964;
 extern CMaterialMan MaterialMan;
-extern CLightPcs LightPcs;
 static unsigned long s_clearFlagMask;
 struct CBoundRaw
 {

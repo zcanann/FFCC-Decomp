@@ -7,7 +7,6 @@
 #include <string.h>
 
 extern CMemory Memory;
-extern CPartMng PartMng;
 extern unsigned char PartPcs[];
 extern u8* lbl_8032EDC0;
 extern "C" void __dla__FPv(void*);

@@ -7,11 +7,13 @@
 #include <dolphin/gx.h>
 #include <string.h>
 
+class CPartMng;
+extern CPartMng PartMng;
+
 extern unsigned char CFlat[];
 extern unsigned char DAT_8032e698;
 extern unsigned char DAT_8032ecd8;
 extern unsigned char CharaPcs[];
-extern unsigned char PartMng[];
 extern unsigned char PartPcs[];
 extern unsigned char Sound[];
 extern char s_Debug_80331c90[];
@@ -41,7 +43,6 @@ extern u32 DAT_802123ec;
 extern u32 DAT_802123f8;
 extern u32 DAT_802123fc;
 extern u32 DAT_80212400;
-extern CMiniGamePcs MiniGamePcs;
 
 extern "C" int __cntlzw(unsigned int);
 extern "C" void __construct_array(void*, void (*)(void*), void (*)(void*, int), unsigned long, unsigned long);
@@ -280,7 +281,7 @@ void CDbgMenuPcs::calc()
 			break;
 		case 0x76:
 			DAT_8032e698 = 1 - DAT_8032e698;
-			pppDumpMngSt__8CPartMngFv(PartMng);
+			pppDumpMngSt__8CPartMngFv(&PartMng);
 			break;
 		case 0x77:
 			DumpLoad__9CCharaPcsFv(CharaPcs);

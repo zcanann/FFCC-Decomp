@@ -10,6 +10,9 @@
 #include <math.h>
 #include <string.h>
 
+class CPartMng;
+extern CPartMng PartMng;
+
 extern "C" void* __vt__Q212CFlatRuntime7CObject[];
 extern "C" void* __vt__8CGBaseObj[];
 extern "C" void* __vt__8CGObject[];
@@ -59,7 +62,6 @@ extern "C" unsigned char CameraPcs[];
 extern "C" unsigned char CharaPcs[];
 extern "C" unsigned char LightPcs[];
 extern "C" unsigned char Graphic[];
-extern "C" unsigned char PartMng[];
 extern "C" int DAT_8021082c[];
 extern "C" int DAT_80210830[];
 
@@ -628,7 +630,7 @@ void CMenuPcs::destroyWorld()
 		bytes[0x858] = 0;
 	}
 
-	pppDestroyAll__8CPartMngFv(PartMng);
+	pppDestroyAll__8CPartMngFv(&PartMng);
 	MemoryCardMan.McEnd();
 
 	GXColor clearColor;
@@ -3212,7 +3214,7 @@ unsigned int CMenuPcs::BindEffect(int slot, int effectNo, int cameraSlot)
 	createParam[0x5C] = 0;
 
 	const int group = ((effectNo ^ 100) >> 1) - ((((effectNo ^ 100) & effectNo)) >> 31);
-	const unsigned int partId = pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(PartMng, group, effectNo, createParam, 1);
+	const unsigned int partId = pppCreate__8CPartMngFiiP14PPPCREATEPARAMi(&PartMng, group, effectNo, createParam, 1);
 	*reinterpret_cast<unsigned int*>(effect + 0x4) = partId;
 	return partId;
 }
@@ -3733,7 +3735,7 @@ void CMenuPcs::BindMcObj()
 	for (int i = 0; i < 4; i++) {
 		unsigned int* const effectA = reinterpret_cast<unsigned int*>(effectBase + (i + 0x11) * 0x524);
 		if (static_cast<int>(effectA[1]) >= 0) {
-			pppDeletePart__8CPartMngFi(PartMng, static_cast<int>(effectA[1]));
+			pppDeletePart__8CPartMngFi(&PartMng, static_cast<int>(effectA[1]));
 			effectA[1] = 0xFFFFFFFF;
 			effectA[2] = 0xFFFFFFFF;
 			effectA[0] = 0xFFFFFFFF;
@@ -3741,7 +3743,7 @@ void CMenuPcs::BindMcObj()
 
 		unsigned int* const effectB = reinterpret_cast<unsigned int*>(effectBase + (i + 0x12) * 0x524);
 		if (static_cast<int>(effectB[1]) >= 0) {
-			pppDeletePart__8CPartMngFi(PartMng, static_cast<int>(effectB[1]));
+			pppDeletePart__8CPartMngFi(&PartMng, static_cast<int>(effectB[1]));
 			effectB[1] = 0xFFFFFFFF;
 			effectB[2] = 0xFFFFFFFF;
 			effectB[0] = 0xFFFFFFFF;

@@ -4,8 +4,6 @@
 #include "ffcc/p_game.h"
 #include <dolphin/mtx.h>
 
-extern u8 PartMng[];
-
 extern "C" {
 void ParticleFrameCallback__5CGameFiiiiiP3Vec(CGame*, int, int, int, int, int, Vec*);
 }
@@ -46,7 +44,7 @@ void pppFrameCallBackDistance(pppCallBackDistance* param1, pppCallBackDistanceUn
         local_28.z = *(f32*)(pppMngSt + 0xA4);
         PSMTXMultVec(ppvWorldMatrix, &local_28, &local_28);
 
-        partIndex = ((s32)(pppMngSt - (PartMng + 0x2A18))) / 0x158;
+        partIndex = ((s32)(pppMngSt - (reinterpret_cast<u8*>(&PartMng) + 0x2A18))) / 0x158;
         graphFrame = (s32)(*(u32*)((u8*)param1 + 0xC)) / 0x1000;
         m_kind = (s32)*(s16*)(pppMngSt + 0x74);
         m_nodeIndex = (s32)*(s16*)(pppMngSt + 0x76);

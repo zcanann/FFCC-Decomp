@@ -21,7 +21,7 @@ extern "C" unsigned char Game[];
 extern "C" unsigned char m_mogWork[];
 extern "C" char lbl_801DB694[];
 extern "C" char lbl_801DB6B4[];
-extern "C" void* lbl_8032EDF0;
+extern "C" void* gMogFurTexBuffer;
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 
 /*
@@ -639,16 +639,16 @@ extern "C" void DrawFur__Q26CChara6CModelFPA4_fi(void* model, Mtx, int shadowPas
 		return;
 	}
 
-	if (lbl_8032EDF0 == 0) {
+	if (gMogFurTexBuffer == 0) {
 		makeFurTex__6CCharaFv();
 	}
-	if (lbl_8032EDF0 == 0) {
+	if (gMogFurTexBuffer == 0) {
 		return;
 	}
 
 	GXTexObj texObj;
 	int layer = static_cast<int>((System.m_frameCounter >> 2) & 7);
-	void* texData = reinterpret_cast<unsigned char*>(lbl_8032EDF0) + layer * 0x4000;
+	void* texData = reinterpret_cast<unsigned char*>(gMogFurTexBuffer) + layer * 0x4000;
 	GXInitTexObj(&texObj, texData, 0x80, 0x80, GX_TF_RGB5A3, GX_CLAMP, GX_CLAMP, GX_FALSE);
 	GXLoadTexObj(&texObj, GX_TEXMAP1);
 	GXSetNumTexGens(1);
@@ -668,9 +668,9 @@ extern "C" void DrawFur__Q26CChara6CModelFPA4_fi(void* model, Mtx, int shadowPas
  */
 extern "C" void freeFurTex__6CCharaFv()
 {
-    if (lbl_8032EDF0 != 0) {
-        Memory.Free(lbl_8032EDF0);
-        lbl_8032EDF0 = 0;
+    if (gMogFurTexBuffer != 0) {
+        Memory.Free(gMogFurTexBuffer);
+        gMogFurTexBuffer = 0;
     }
 }
 
@@ -685,14 +685,14 @@ extern "C" void freeFurTex__6CCharaFv()
  */
 extern "C" void makeFurTex__6CCharaFv()
 {
-	if (lbl_8032EDF0 == 0) {
-		lbl_8032EDF0 = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, 0x20000, 0, s_chara_fur_cpp_801db72c, 0xE9, 0);
+	if (gMogFurTexBuffer == 0) {
+		gMogFurTexBuffer = _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(&Memory, 0x20000, 0, s_chara_fur_cpp_801db72c, 0xE9, 0);
 	}
-	if (lbl_8032EDF0 == 0) {
+	if (gMogFurTexBuffer == 0) {
 		return;
 	}
 
-	unsigned short* tex = reinterpret_cast<unsigned short*>(lbl_8032EDF0);
+	unsigned short* tex = reinterpret_cast<unsigned short*>(gMogFurTexBuffer);
 	unsigned int rng = 0x1234ABCD;
 	for (int layer = 0; layer < 8; layer++) {
 		unsigned short* layerTex = tex + (layer * 0x4000 / 2);
@@ -714,7 +714,7 @@ extern "C" void makeFurTex__6CCharaFv()
 		}
 	}
 
-	DCFlushRange(lbl_8032EDF0, 0x20000);
+	DCFlushRange(gMogFurTexBuffer, 0x20000);
 	GXInvalidateTexAll();
 }
 

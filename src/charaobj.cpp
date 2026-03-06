@@ -23,8 +23,6 @@ extern "C" void SetPosZ__5CFontFf(float, CFont*);
 extern "C" void Draw__5CFontFPc(CFont*, const char*);
 
 extern unsigned char CFlat[];
-extern CMiniGamePcs MiniGamePcs;
-extern CPartMng PartMng;
 extern int DAT_8032ee68;
 extern unsigned char DAT_8032ee6c;
 extern float FLOAT_80331964;

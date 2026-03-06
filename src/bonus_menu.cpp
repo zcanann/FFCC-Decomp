@@ -18,11 +18,11 @@ extern "C" void SetProjection__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void SetLight__8CMenuPcsFi(CMenuPcs*, int);
 extern "C" void RestoreProjection__8CMenuPcsFv(CMenuPcs*);
 extern "C" void Draw__Q29CCharaPcs7CHandleFi(void*, int);
-extern "C" void DrawMenuIdx__8CPartPcsFi(void*, int);
+extern "C" void DrawMenuIdx__8CPartPcsFi(CPartPcs*, int);
 extern "C" {
-extern int lbl_8032EEA8;
-extern int lbl_8032EEB0;
-extern unsigned char PartPcs[];
+extern int gBonusMenuWork0;
+extern float* gBonusCheckMarkPosBuffer;
+extern CPartPcs PartPcs;
 }
 
 namespace {
@@ -161,9 +161,9 @@ static void TickAnimSprites(int statePtr, int animPtr, int fadeDir)
  */
 void CMenuPcs::BonusInit()
 {
-	lbl_8032EEA8 = 0;
+	gBonusMenuWork0 = 0;
 	GetBonusMenuMembers(this).m_bonusAnimPtr = 0;
-	lbl_8032EEB0 = 0;
+	gBonusCheckMarkPosBuffer = 0;
 }
 
 /*
@@ -878,7 +878,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 						*(unsigned int*)((char*)handle + 8) = 0x300543;
 						Draw__Q29CCharaPcs7CHandleFi(handle, 5);
 						*(unsigned int*)((char*)handle + 8) = oldFlags;
-						DrawMenuIdx__8CPartPcsFi(PartPcs, *(int*)(slotPtr + 4));
+						DrawMenuIdx__8CPartPcsFi(&PartPcs, *(int*)(slotPtr + 4));
 						RestoreProjection__8CMenuPcsFv(this);
 					}
 				}
@@ -924,7 +924,7 @@ void CMenuPcs::DrawSelectOpenAnim()
 		GXColor color = {0xFF, 0xFF, 0xFF, (unsigned char)(artiAlpha * 255.0f)};
 		GXSetChanMatColor(GX_COLOR0A0, color);
 
-		float* markPos = (float*)lbl_8032EEB0;
+		float* markPos = gBonusCheckMarkPosBuffer;
 		if (markPos != 0) {
 			for (int i = 0; i < 8; i++) {
 				if ((activeMask & (1 << i)) != 0) {

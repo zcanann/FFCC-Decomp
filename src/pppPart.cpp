@@ -26,7 +26,7 @@ static const float kPppZero = 0.0; // FLOAT_8032fddc
 static const float kPppOne = 1.0; // FLOAT_8032fdfc
 static const double kScaleConstA = 4503601774854144.0; // DOUBLE_803304b0
 static const float kScaleConstB = 0.017453292f; // FLOAT_803304a8
-extern "C" unsigned char lbl_8032ED85;
+extern "C" unsigned char gPppBlendModeState;
 extern "C" void* _Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(CMemory*, unsigned long, CMemory::CStage*, char*, int, int);
 extern "C" unsigned char MaterialMan[];
 extern "C" float ppvScreenMatrix[4][4];
@@ -62,8 +62,6 @@ extern "C" CGObject* FindGObjNext__13CFlatRuntime2FP8CGObject(void*, CGObject*);
 extern "C" void _WaitDrawDone__8CGraphicFPci(CGraphic*, const char*, int);
 extern "C" int PlaySe3D__6CSoundFiP3Vecffi(CSound*, int, Vec*, float, float, int);
 extern "C" void CalcSafeNodeWorldMatrix__Q26CChara6CModelFPA4_fPQ26CChara5CNode(void*, float (*)[4], void*);
-extern CPartMng PartMng;
-extern CLightPcs LightPcs;
 extern CMath Math;
 
 Mtx ppvCameraMatrix0;
@@ -372,7 +370,7 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 	u8 denied[0x180];
 	pppMngStRaw* allMngSt = (pppMngStRaw*)(((u8*)&PartMng) + 0x2A18);
 
-	lbl_8032ED85 = 0;
+	gPppBlendModeState = 0;
 	while (true)
 	{
 		_pppPObjLink* allocation = (_pppPObjLink*)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
@@ -423,7 +421,7 @@ void* pppMemAlloc(unsigned long allocSize, CMemory::CStage* stage, char* file, i
 		{
 			pppEnvStPtr->m_stagePtr->heapWalker(2, 0, 0xFFFFFFFF);
 			PartMng.pppDumpMngSt();
-			lbl_8032ED85 = 1;
+			gPppBlendModeState = 1;
 			return 0;
 		}
 
@@ -529,7 +527,7 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 	bool canRetry = true;
 	u8 denied[0x180];
 
-	lbl_8032ED85 = 0;
+	gPppBlendModeState = 0;
 	do
 	{
 		_pppPObjLink* allocation = (_pppPObjLink*)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
@@ -634,7 +632,7 @@ extern "C" void* pppMemFree__FPv(unsigned long allocSize, CMemory::CStage* stage
 
 	pppEnvStPtr->m_stagePtr->heapWalker(2, 0, 0xFFFFFFFF);
 	PartMng.pppDumpMngSt();
-	lbl_8032ED85 = 1;
+	gPppBlendModeState = 1;
 	return 0;
 }
 
@@ -844,7 +842,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 	u8 denied[0x180];
 	pppMngStRaw* allMngSt = (pppMngStRaw*)(((u8*)&PartMng) + 0x1D4);
 
-	lbl_8032ED85 = 0;
+	gPppBlendModeState = 0;
 	for (;;)
 	{
 		newObj = (_pppPObjLink*)_Alloc__7CMemoryFUlPQ27CMemory6CStagePcii(
@@ -892,7 +890,7 @@ _pppPObject* pppCreatePObject(_pppMngSt* pppMngSt, _pppPDataVal* pppPDataVal)
 		{
 			pppEnvStPtr->m_stagePtr->heapWalker(2, 0, 0xFFFFFFFF);
 			PartMng.pppDumpMngSt();
-			lbl_8032ED85 = 1;
+			gPppBlendModeState = 1;
 			return 0;
 		}
 
@@ -2467,7 +2465,7 @@ void pppDrawMesh(pppModelSt* model, Vec* positions, int usePartMaterial)
  */
 void pppInitBlendMode()
 {
-	lbl_8032ED85 = 0xFF;
+	gPppBlendModeState = 0xFF;
 }
 
 /*
@@ -2481,9 +2479,9 @@ void pppInitBlendMode()
  */
 void pppSetBlendMode(unsigned char blendMode)
 {
-	if ((blendMode != 0xFF) && (lbl_8032ED85 != blendMode))
+	if ((blendMode != 0xFF) && (gPppBlendModeState != blendMode))
 	{
-		lbl_8032ED85 = blendMode;
+		gPppBlendModeState = blendMode;
 		if (blendMode == 2)
 		{
 			_GXSetBlendMode((_GXBlendMode)3, (_GXBlendFactor)4, (_GXBlendFactor)1, (_GXLogicOp)5);
@@ -2656,7 +2654,7 @@ void pppInitDrawEnv(unsigned char useZeroDepth)
 	);
 
 	DAT_8032ed84 = 0xFF;
-	lbl_8032ED85 = 0xFF;
+	gPppBlendModeState = 0xFF;
 	DAT_8032ed86 = 0xFF;
 	DAT_8032ed88 = 0xFF;
 	DAT_8032ed89 = 0xFF;

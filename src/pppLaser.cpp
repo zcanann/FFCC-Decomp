@@ -7,7 +7,7 @@
 
 #include <string.h>
 
-extern CMath math[];
+extern CMath Math;
 extern const f32 FLOAT_80333428;
 extern const f32 lbl_80333428;
 extern const f32 FLOAT_80333448;
@@ -128,7 +128,7 @@ void pppConstructLaser(struct pppLaser *pppLaser, struct pppLaserUnkC *param_2)
     *((u16*)((u8*)pfVar3 + 0x34)) = 0;
     *((u16*)((u8*)pfVar3 + 0x32)) = 0;
 
-    pfVar3[14] = RandF__5CMathFf(FLOAT_8033345c, math);
+    pfVar3[14] = RandF__5CMathFf(FLOAT_8033345c, &Math);
     *((u8*)pfVar3 + 0x4c) = 1;
 
     iVar2 = GetParticleSpecialInfo__5CGameFR10PPPIFPARAMRiRi(
@@ -594,5 +594,3 @@ void pppRenderLaser(struct pppLaser *pppLaser, struct pppLaserUnkB *param_2, str
         }
     }
 }
-
-

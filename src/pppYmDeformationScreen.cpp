@@ -59,7 +59,7 @@ struct _pppEnvStYmDeformationScreen {
 
 extern int gPppCalcDisabled;
 extern unsigned char gPppInConstructor;
-extern CMath math[];
+extern CMath Math;
 extern char DAT_80238030[];
 extern CUtil gUtil;
 extern "C" float ppvCameraMatrix02[3][4];
@@ -201,7 +201,7 @@ void pppFrameYmDeformationScreen(pppYmDeformationScreen* param1, void* param2, v
 				inVec.y = 0.0f;
 				inVec.z = -*(float*)&step->m_payloadBytes[2];
 				inVec.w = 1.0f;
-				MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(math, screenMtx, &inVec, &outVec);
+				MTX44MultVec4__5CMathFPA4_fP5Vec4dP5Vec4d(&Math, screenMtx, &inVec, &outVec);
 				{
 					float outW = outVec.w;
 					if (outW != 0.0f) {

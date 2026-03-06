@@ -2,7 +2,7 @@
 #include "ffcc/math.h"
 #include "dolphin/types.h"
 
-extern CMath math[];
+extern CMath Math;
 extern int gPppCalcDisabled;
 extern float lbl_8032FF98;
 extern s16 gPppDefaultValueBuffer[];
@@ -47,9 +47,9 @@ void pppRandHCV(void* p1, void* p2, void* p3)
     }
 
     if (params->field0 == *(s32*)(base + 0xC)) {
-        f32 value = RandF__5CMathFv(&math[0]);
+        f32 value = RandF__5CMathFv(&Math);
         if (params->field10 != 0) {
-            value += RandF__5CMathFv(&math[0]);
+            value += RandF__5CMathFv(&Math);
         } else {
             value *= lbl_8032FF98;
         }

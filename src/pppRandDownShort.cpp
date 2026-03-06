@@ -2,7 +2,7 @@
 #include "ffcc/math.h"
 #include "types.h"
 
-extern CMath math[];
+extern CMath Math;
 extern "C" f32 RandF__5CMathFv(CMath*);
 
 extern int gPppCalcDisabled;
@@ -45,9 +45,9 @@ extern "C" void pppRandDownShort(void* r3, void* r4, void* r5)
 
     s32 state = *(s32*)(base + 0xC);
     if (state == 0) {
-        f32 value = -RandF__5CMathFv(&math[0]);
+        f32 value = -RandF__5CMathFv(&Math);
         if (in->randomTwice != 0) {
-            f32 mixed = value - RandF__5CMathFv(&math[0]);
+            f32 mixed = value - RandF__5CMathFv(&Math);
             value = mixed * lbl_8032FF78;
         }
 

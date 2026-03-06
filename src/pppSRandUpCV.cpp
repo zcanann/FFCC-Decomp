@@ -2,7 +2,7 @@
 #include "ffcc/math.h"
 #include "dolphin/types.h"
 
-extern CMath math[];
+extern CMath Math;
 extern int gPppCalcDisabled;
 extern u8 gPppDefaultValueBuffer[];
 extern float lbl_803300B0;
@@ -45,9 +45,9 @@ void pppSRandUpCV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = in->randomTwice;
-            f32 value = RandF__5CMathFv(math);
+            f32 value = RandF__5CMathFv(&Math);
             if (flag != 0) {
-                f32 randomPair = value + RandF__5CMathFv(math);
+                f32 randomPair = value + RandF__5CMathFv(&Math);
                 value = randomPair * lbl_803300B0;
             }
             target[0] = value;
@@ -55,9 +55,9 @@ void pppSRandUpCV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = in->randomTwice;
-            f32 value = RandF__5CMathFv(math);
+            f32 value = RandF__5CMathFv(&Math);
             if (flag != 0) {
-                f32 randomPair = value + RandF__5CMathFv(math);
+                f32 randomPair = value + RandF__5CMathFv(&Math);
                 value = randomPair * lbl_803300B0;
             }
             target[1] = value;
@@ -65,9 +65,9 @@ void pppSRandUpCV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = in->randomTwice;
-            f32 value = RandF__5CMathFv(math);
+            f32 value = RandF__5CMathFv(&Math);
             if (flag != 0) {
-                f32 randomPair = value + RandF__5CMathFv(math);
+                f32 randomPair = value + RandF__5CMathFv(&Math);
                 value = randomPair * lbl_803300B0;
             }
             target[2] = value;
@@ -75,9 +75,9 @@ void pppSRandUpCV(void* param1, void* param2, void* param3)
 
         {
             u8 flag = in->randomTwice;
-            f32 value = RandF__5CMathFv(math);
+            f32 value = RandF__5CMathFv(&Math);
             if (flag != 0) {
-                f32 randomPair = value + RandF__5CMathFv(math);
+                f32 randomPair = value + RandF__5CMathFv(&Math);
                 value = randomPair * lbl_803300B0;
             }
             target[3] = value;

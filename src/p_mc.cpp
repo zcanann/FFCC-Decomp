@@ -3,7 +3,7 @@
 #include "ffcc/p_menu.h"
 #include "ffcc/wm_menu.h"
 
-extern CMath math[];
+extern CMath Math;
 extern "C" int Format__6McCtrlFi(McCtrl* mcCtrl, int slot);
 extern "C" int Rand__5CMathFUl(CMath* instance, unsigned long max);
 extern "C" void CallWorldParam__8CMenuPcsFiii(CMenuPcs* menu, int mode, int param, int unused);
@@ -86,7 +86,7 @@ void CMcPcs::calc()
     int result;
     int worldParam;
 
-    Rand__5CMathFUl(math, 0x7FFFFFFF);
+    Rand__5CMathFUl(&Math, 0x7FFFFFFF);
 
     if (reinterpret_cast<MenuPcsMcLayout*>(MenuPcs)->field14 != 1)
     {

@@ -1,12 +1,6 @@
 #include "ffcc/p_sample.h"
 
-extern unsigned int lbl_801E8498[];
-extern unsigned int lbl_801E84A4[];
-extern unsigned int lbl_801E84B0[];
-extern unsigned int lbl_801E84BC[];
-extern unsigned char lbl_801E84C8[];
 extern unsigned int PTR_PTR_s_CSamplePcs_801e8644[];
-extern unsigned int lbl_8032EC60;
 
 /*
  * --INFO--
@@ -47,7 +41,7 @@ void CSamplePcs::Quit()
  */
 int CSamplePcs::GetTable(unsigned long index)
 {
-	return (int)(lbl_801E84C8 + index * 0x15C);
+	return (int)(m_table__10CSamplePcs + index * 0x15C);
 }
 
 /*
@@ -117,14 +111,14 @@ void CSamplePcs::func1()
  */
 extern "C" void __sinit_p_sample_cpp(void)
 {
-	unsigned int* srcA = lbl_801E8498;
-	unsigned int* srcB = lbl_801E84A4;
-	unsigned int* srcC = lbl_801E84B0;
-	unsigned int* srcD = lbl_801E84BC;
+	unsigned int* srcA = m_table_desc0__10CSamplePcs;
+	unsigned int* srcB = m_table_desc1__10CSamplePcs;
+	unsigned int* srcC = m_table_desc2__10CSamplePcs;
+	unsigned int* srcD = m_table_desc3__10CSamplePcs;
 	unsigned int* table;
 
-	lbl_8032EC60 = (unsigned int)&PTR_PTR_s_CSamplePcs_801e8644;
-	table = (unsigned int*)lbl_801E84C8;
+	*reinterpret_cast<unsigned int*>(&SamplePcs) = (unsigned int)&PTR_PTR_s_CSamplePcs_801e8644;
+	table = (unsigned int*)m_table__10CSamplePcs;
 	table[1] = srcA[0];
 	table[2] = srcA[1];
 	table[3] = srcA[2];

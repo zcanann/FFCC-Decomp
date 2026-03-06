@@ -59,4 +59,10 @@ public:
     void SetNumPlayer();
 };
 
+extern CMiniGamePcs MiniGamePcs;
+extern unsigned int m_table_desc0__12CMiniGamePcs[];
+extern unsigned int m_table_desc1__12CMiniGamePcs[];
+extern unsigned int m_table_desc2__12CMiniGamePcs[];
+extern unsigned char m_table__12CMiniGamePcs[];
+
 #endif // _FFCC_P_MINIGAME_H_

@@ -6,8 +6,8 @@
 #include "string.h"
 #include "types.h"
 
-char lbl_8032EC6C;
-int lbl_8032EC68;
+char s_usbReadPollInitialized;
+int s_usbReadPollFrameCounter;
 
 extern "C" void* __nwa__FUlPQ27CMemory6CStagePci(u32 size, CMemory::CStage* stage, char* file, int line);
 extern "C" void* CreateStage__7CMemoryFUlPci(void*, unsigned long, const char*, int);
@@ -16,13 +16,8 @@ extern "C" int IsConnected__4CUSBFv(void*);
 extern "C" char __vt__8CManager[];
 extern "C" char lbl_801E8668[];
 extern "C" char PTR_PTR_s_CUSBPcs_801e8830[];
-extern u32 lbl_801E8690[];
-extern u32 lbl_801E869C[];
-extern u32 lbl_801E86A8[];
-extern u32 lbl_801E86B4[];
 extern char s_CUSBPcs_8032f810;
 extern char s_plot_kmitsuru__801d6d14[];
-extern CUSBPcs USBPcs;
 
 
 /*
@@ -74,7 +69,7 @@ void CUSBPcs::Quit()
  */
 void* CUSBPcs::GetTable(unsigned long param)
 {
-    return (void*)((char*)lbl_801E86B4 + (param * 0x15c));
+    return (void*)((char*)m_table__7CUSBPcs + (param * 0x15c));
 }
 
 /*
@@ -139,17 +134,17 @@ void CUSBPcs::messageCallback(unsigned long, void*, MCCChannel)
  */
 void CUSBPcs::mccReadData()
 { 
-	if (lbl_8032EC6C == '\0')
+	if (s_usbReadPollInitialized == '\0')
 	{
-		lbl_8032EC68 = 0;
-		lbl_8032EC6C = '\x01';
+		s_usbReadPollFrameCounter = 0;
+		s_usbReadPollInitialized = '\x01';
 	}
 
-	lbl_8032EC68 = lbl_8032EC68 + 1;
+	s_usbReadPollFrameCounter = s_usbReadPollFrameCounter + 1;
 
-	if (4 < lbl_8032EC68)
+	if (4 < s_usbReadPollFrameCounter)
 	{
-		lbl_8032EC68 = 0;
+		s_usbReadPollFrameCounter = 0;
 		goto read_usb;
 	end:
 		return;
@@ -260,10 +255,10 @@ extern "C" void __sinit_p_usb_cpp()
     *reinterpret_cast<void**>(&USBPcs) = lbl_801E8668;
     *reinterpret_cast<void**>(&USBPcs) = PTR_PTR_s_CUSBPcs_801e8830;
 
-    u32* dst = lbl_801E86B4;
-    u32* src0 = lbl_801E8690;
-    u32* src1 = lbl_801E869C;
-    u32* src2 = lbl_801E86A8;
+    u32* dst = m_table__7CUSBPcs;
+    u32* src0 = m_table_desc0__7CUSBPcs;
+    u32* src1 = m_table_desc1__7CUSBPcs;
+    u32* src2 = m_table_desc2__7CUSBPcs;
 
     dst[1] = src0[0];
     dst[2] = src0[1];

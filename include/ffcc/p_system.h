@@ -18,4 +18,10 @@ public:
     void calc();
 };
 
+extern CSystemPcs SystemPcs;
+extern unsigned int m_table_desc0__10CSystemPcs[];
+extern unsigned int m_table_desc1__10CSystemPcs[];
+extern unsigned int m_table_desc2__10CSystemPcs[];
+extern unsigned char m_table__10CSystemPcs[];
+
 #endif

@@ -5,8 +5,10 @@
 #include "ffcc/vector.h"
 #include "ffcc/p_dbgmenu.h"
 #include "ffcc/p_minigame.h"
+#include "ffcc/p_system.h"
 #include "ffcc/p_game.h"
 #include "ffcc/map.h"
+#include "ffcc/p_sound.h"
 #include "ffcc/sound.h"
 #include "ffcc/graphic.h"
 #include "ffcc/file.h"
@@ -14,8 +16,6 @@
 #include "ffcc/maplight.h"
 
 #include <string.h>
-
-extern CMiniGamePcs MiniGamePcs;
 
 #include <dolphin/os/OSMemory.h>
 #include <dolphin/os/OSRtc.h>
@@ -102,7 +102,6 @@ unsigned char McPcs[];
 unsigned char GbaPcs[];
 unsigned char MenuPcs[];
 unsigned char USBPcs[];
-unsigned char SoundPcs[];
 unsigned char PartPcs[];
 unsigned char Chara[];
 unsigned char LightPcs[];
@@ -112,7 +111,6 @@ unsigned char FunnyShapePcs[];
 unsigned char GraphicsPcs[];
 unsigned char CameraPcs[];
 unsigned char DAT_8032ed00[];
-unsigned char DAT_8032ed08[];
 unsigned char Wind[];
 extern const char DAT_801d61dc[];
 extern const char DAT_801d60d4[];
@@ -386,7 +384,7 @@ void CGame::Quit()
 void CGame::LoadLogoWaitingData()
 {
 	if (m_assetsLoadedFlag == 0) {
-		createLoad__9CSoundPcsFv(SoundPcs);
+		createLoad__9CSoundPcsFv(&SoundPcs);
 		createLoad__9CCharaPcsFv(&CharaPcs);
 		createLoad__8CPartPcsFv(&PartPcs);
 		m_assetsLoadedFlag = 1;
@@ -407,7 +405,7 @@ void CGame::LoadLogoWaitingData()
  */
 void CGame::Exec()
 {
-	AddScenegraph__7CSystemFP8CProcessi(&System, DAT_8032ed08, 0);
+	AddScenegraph__7CSystemFP8CProcessi(&System, &SystemPcs, 0);
 	AddScenegraph__7CSystemFP8CProcessi(&System, GraphicsPcs, 0);
 	AddScenegraph__7CSystemFP8CProcessi(&System, LightPcs, 0);
 	AddScenegraph__7CSystemFP8CProcessi(&System, &MiniGamePcs, 0);
@@ -444,7 +442,7 @@ void CGame::Exec()
 			AddScenegraph__7CSystemFP8CProcessi(&System, &GbaPcs, 0);
 			AddScenegraph__7CSystemFP8CProcessi(&System, &DbgMenuPcs, 0);
 			AddScenegraph__7CSystemFP8CProcessi(&System, McPcs, 0);
-			AddScenegraph__7CSystemFP8CProcessi(&System, SoundPcs, 0);
+			AddScenegraph__7CSystemFP8CProcessi(&System, &SoundPcs, 0);
 			break;
 		case 5:
 			AddScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 3);
@@ -478,7 +476,7 @@ void CGame::Exec()
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, MapPcs, 1);
 			break;
 		case 4:
-			RemoveScenegraph__7CSystemFP8CProcessi(&System, SoundPcs, 0);
+			RemoveScenegraph__7CSystemFP8CProcessi(&System, &SoundPcs, 0);
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, McPcs, 0);
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 0);
 			RemoveScenegraph__7CSystemFP8CProcessi(&System, CameraPcs, 6);
@@ -513,7 +511,7 @@ void CGame::Exec()
 	RemoveScenegraph__7CSystemFP8CProcessi(&System, &MiniGamePcs, 0);
 	RemoveScenegraph__7CSystemFP8CProcessi(&System, LightPcs, 0);
 	RemoveScenegraph__7CSystemFP8CProcessi(&System, GraphicsPcs, 0);
-	RemoveScenegraph__7CSystemFP8CProcessi(&System, DAT_8032ed08, 0);
+	RemoveScenegraph__7CSystemFP8CProcessi(&System, &SystemPcs, 0);
 }
 
 static const char s_defaultTownName[] = "Tipa";
@@ -778,7 +776,7 @@ void CGame::CheckScriptChange()
         }
 
         if (m_assetsLoadedFlag == 0) {
-            createLoad__9CSoundPcsFv(SoundPcs);
+            createLoad__9CSoundPcsFv(&SoundPcs);
             createLoad__9CCharaPcsFv(&CharaPcs);
             createLoad__8CPartPcsFv(&PartPcs);
             m_assetsLoadedFlag = 1;

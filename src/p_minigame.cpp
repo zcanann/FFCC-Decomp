@@ -8,13 +8,8 @@
 #include <dolphin/si.h>
 #include <string.h>
 
-extern CMiniGamePcs MiniGamePcs;
 extern unsigned char CFlat[];
 extern unsigned char PartPcs[];
-extern unsigned int lbl_802121A8[];
-extern unsigned int lbl_802121B4[];
-extern unsigned int lbl_802121C0[];
-extern unsigned char lbl_802121CC[];
 extern unsigned int PTR_PTR_s_CMiniGamePcs_80212348[];
 extern int DAT_800000f8;
 extern char DAT_80331bf0[];
@@ -57,10 +52,10 @@ static bool MiniGameThreadTimedOut(OSTime start, OSTime timeout)
  */
 extern "C" void __sinit_p_minigame_cpp(void)
 {
-    unsigned int* table = reinterpret_cast<unsigned int*>(lbl_802121CC);
-    unsigned int* desc0 = lbl_802121A8;
-    unsigned int* desc1 = lbl_802121B4;
-    unsigned int* desc2 = lbl_802121C0;
+    unsigned int* table = reinterpret_cast<unsigned int*>(m_table__12CMiniGamePcs);
+    unsigned int* desc0 = m_table_desc0__12CMiniGamePcs;
+    unsigned int* desc1 = m_table_desc1__12CMiniGamePcs;
+    unsigned int* desc2 = m_table_desc2__12CMiniGamePcs;
 
     *reinterpret_cast<unsigned int*>(&MiniGamePcs) = reinterpret_cast<unsigned int>(PTR_PTR_s_CMiniGamePcs_80212348);
 
@@ -222,7 +217,7 @@ CMiniGamePcs::CMiniGamePcs()
  */
 int CMiniGamePcs::GetTable(unsigned long index)
 {
-    return (int)(lbl_802121CC + (int)index * 0x15C);
+    return (int)(m_table__12CMiniGamePcs + (int)index * 0x15C);
 }
 
 /*

@@ -476,7 +476,7 @@ config.libs = [
             Object(NonMatching, "p_system.cpp"),
             Object(NonMatching, "p_tina.cpp"),
             Object(NonMatching, "p_usb.cpp"),
-            Object(NonMatching, "pad.cpp"),
+            Object(NonMatching, "pad.cpp", cflags=[*cflags_game, "-sdata 0", "-sdata2 0"]),
             Object(NonMatching, "partMng.cpp"),
             Object(NonMatching, "partyobj.cpp"),
             Object(NonMatching, "pppAccele.cpp"),

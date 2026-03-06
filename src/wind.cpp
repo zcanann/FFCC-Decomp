@@ -358,22 +358,57 @@ int CWind::AddAmbient(float dir, float speed)
  */
 int CWind::AddDiffuse(const Vec* pos, float radius, float dir, float speed)
 {
-	int freeIdx = -1;
-	for (int i = 0; i < 32; i++) {
-		if ((s8)m_objects[i].flags >= 0) {
-			freeIdx = i;
-			break;
-		}
-	}
+	int checked = 0;
+	int blocks = 4;
+	WindObject* cur = m_objects;
+	WindObject* obj;
 
-	if (freeIdx < 0) {
-		System.Printf(DAT_801db548, 28);
+	do {
+		obj = &cur[0];
+		if ((s8)obj->flags >= 0) {
+			goto found;
+		}
+		obj = &cur[1];
+		if ((s8)obj->flags >= 0) {
+			goto found;
+		}
+		obj = &cur[2];
+		if ((s8)obj->flags >= 0) {
+			goto found;
+		}
+		obj = &cur[3];
+		if ((s8)obj->flags >= 0) {
+			goto found;
+		}
+		obj = &cur[4];
+		if ((s8)obj->flags >= 0) {
+			goto found;
+		}
+		obj = &cur[5];
+		if ((s8)obj->flags >= 0) {
+			goto found;
+		}
+		obj = &cur[6];
+		if ((s8)obj->flags >= 0) {
+			goto found;
+		}
+		obj = &cur[7];
+		if ((s8)obj->flags >= 0) {
+			goto found;
+		}
+
+		checked += 8;
+		cur += 8;
+		blocks--;
+	} while (blocks != 0);
+
+	obj = 0;
+
+found:
+	if (obj == 0) {
+		System.Printf(DAT_801db548, checked);
 		return -1;
 	}
-
-	const float x = pos->x;
-	const float z = pos->z;
-	WindObject* obj = &m_objects[freeIdx];
 
 	obj->type = 1;
 	obj->flags = (obj->flags & 0x7F) | 0x80;
@@ -393,12 +428,12 @@ int CWind::AddDiffuse(const Vec* pos, float radius, float dir, float speed)
 	obj->radius = radius;
 	obj->radiusSq = radius * radius;
 
-	obj->centerX = x;
-	obj->centerZ = z;
-	obj->minX = x - radius;
-	obj->minZ = z - radius;
-	obj->maxX = x + radius;
-	obj->maxZ = z + radius;
+	obj->centerX = pos->x;
+	obj->centerZ = pos->z;
+	obj->minX = pos->x - radius;
+	obj->minZ = pos->z - radius;
+	obj->maxX = pos->x + radius;
+	obj->maxZ = pos->z + radius;
 
 	return obj->id;
 }
@@ -414,20 +449,58 @@ int CWind::AddDiffuse(const Vec* pos, float radius, float dir, float speed)
  */
 int CWind::AddSphere(const Vec* pos, float radius, float speed, int life)
 {
-	int freeIdx = -1;
-	for (int i = 0; i < 32; i++) {
-		if ((s8)m_objects[i].flags >= 0) {
-			freeIdx = i;
-			break;
-		}
-	}
+	int checked = 0;
+	int blocks = 4;
+	WindObject* cur = m_objects;
+	WindObject* obj;
 
-	if (freeIdx < 0) {
-		System.Printf(DAT_801db528, life, 28);
+	do {
+		obj = &cur[0];
+		if ((s8)obj->flags >= 0) {
+			goto found;
+		}
+		obj = &cur[1];
+		if ((s8)obj->flags >= 0) {
+			goto found;
+		}
+		obj = &cur[2];
+		if ((s8)obj->flags >= 0) {
+			goto found;
+		}
+		obj = &cur[3];
+		if ((s8)obj->flags >= 0) {
+			goto found;
+		}
+		obj = &cur[4];
+		if ((s8)obj->flags >= 0) {
+			goto found;
+		}
+		obj = &cur[5];
+		if ((s8)obj->flags >= 0) {
+			goto found;
+		}
+		obj = &cur[6];
+		if ((s8)obj->flags >= 0) {
+			goto found;
+		}
+		obj = &cur[7];
+		if ((s8)obj->flags >= 0) {
+			goto found;
+		}
+
+		checked += 8;
+		cur += 8;
+		blocks--;
+	} while (blocks != 0);
+
+	obj = 0;
+
+found:
+	if (obj == 0) {
+		System.Printf(DAT_801db528, life, checked);
 		return -1;
 	}
 
-	WindObject* obj = &m_objects[freeIdx];
 	obj->type = 2;
 	obj->flags = (obj->flags & 0x7F) | 0x80;
 

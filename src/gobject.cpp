@@ -2375,9 +2375,9 @@ void CGObject::onAnimPoint(int, int)
  * Address:	TODO
  * Size:	TODO
  */
-void CGObject::onAlphaUpdate()
+float CGObject::onAlphaUpdate()
 {
-	// TODO
+	return sAnimFrameOffset;
 }
 
 /*

@@ -77,7 +77,7 @@ public:
     bool IsDispRader();
     void onHit(int, CGObject*, int, Vec*);
     void onAnimPoint(int, int);
-    void onAlphaUpdate();
+    float onAlphaUpdate();
     void onHitParticle(int, int, int, int, Vec*, PPPIFPARAM*);
     void onDrawDebug(CFont*, float, float&, float);
 

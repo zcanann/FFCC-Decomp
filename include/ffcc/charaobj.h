@@ -39,7 +39,7 @@ public:
 	void onCancelStat(int);
 	void onFramePostCalc();
 	void onFramePreCalc();
-	void onAlphaUpdate();
+	float onAlphaUpdate();
 	void endPSlotBit(int);
 	void deletePSlotBit(int);
 	void onFrameStat();

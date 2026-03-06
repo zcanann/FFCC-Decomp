@@ -349,7 +349,7 @@ void CGCharaObj::onFramePreCalc()
  * JP Address: TODO
  * JP Size: TODO
  */
-void CGCharaObj::onAlphaUpdate()
+float CGCharaObj::onAlphaUpdate()
 {
 	unsigned char* self = reinterpret_cast<unsigned char*>(this);
 	float alpha = m_alpha;
@@ -365,6 +365,7 @@ void CGCharaObj::onAlphaUpdate()
 	}
 
 	m_alpha = alpha;
+	return alpha;
 }
 
 /*

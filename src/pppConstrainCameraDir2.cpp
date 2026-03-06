@@ -16,7 +16,7 @@ extern float FLOAT_803331e8;
 extern int DAT_8032ec70;
 
 extern "C" void CalcGraphValue__FP11_pppPObjectlRfRfRffRfRf(float, void*, int, float*, float*, float*, float*, float*);
-extern "C" void GetDirectVector__5CUtilFP3VecP3Vec3Vec(void*, Vec*, Vec*, Vec*);
+extern "C" void GetDirectVector__5CUtilFP3VecP3Vec3Vec(void*, Vec*, Vec*, Vec);
 extern "C" void pppSetFpMatrix__FP9_pppMngSt(void*);
 
 /*
@@ -107,7 +107,7 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
 			local_104 = local_c8;
 			local_100 = local_c4;
 			
-			GetDirectVector__5CUtilFP3VecP3Vec3Vec((void*)&DAT_8032ec70, &local_d8, &local_e4, (Vec*)&local_108);
+			GetDirectVector__5CUtilFP3VecP3Vec3Vec((void*)&DAT_8032ec70, &local_d8, &local_e4, *(Vec*)&local_108);
 			
 			local_f0.x = fVar2 * local_d8.x;
 			local_f0.y = fVar2 * local_d8.y;
@@ -127,4 +127,3 @@ void pppFrameConstrainCameraDir2(pppConstrainCameraDir* param_1, pppConstrainCam
 		}
 	}
 }
-
